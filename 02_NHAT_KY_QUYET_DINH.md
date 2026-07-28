@@ -149,8 +149,68 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.26** (28/07 tối - MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG, cộng hội đồng
-> đợt 2 và 11 yêu cầu phát sinh của Luân). CÒN ĐÚNG MẢNG 5.
+> **Phiên bản: V9.27h** (28/07 khuya). MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG.
+> Bộ kiểm hiện tại: node --check 2 file · `_tall` 38 trang 0 lỗi (165 icon) · `_check11` 131 ·
+> `_check12` 37 · `_check13` 174 · `_check14` 100 · `_check15` 37 · **`_check16` 236** · `_checktour` ·
+> `check_logic.py` 132 luật (đúng 4 ca cố ý) · `check_data.py` DAT.
+>
+> **VIỆC PHẢI LÀM TIẾP - THEO ĐÚNG THỨ TỰ NÀY (Luân chốt 28/07 khuya, rồi về nghỉ):**
+>
+> **(A) DỮ LIỆU DEMO KHỚP TOÀN BỘ - ƯU TIÊN SỐ 1.** Luân bắt lỗi: lead đang ở ga "Có KQ, chờ tư vấn"
+> mà L/R/W/S trống trơn. Đã đo bằng CHÍNH bộ máy chặng của app (nạp `_APP.js`, chạy `jAll()`):
+> **179 chỗ lệch** - 47/107 hồ sơ từ ga `test_done` trở đi không có điểm test (`overall_score`,
+> `skill_listening/reading/writing/speaking` trong DL03); 7/93 thiếu phiếu tư vấn DL04; 4/76 thiếu
+> phiếu thu DL07; 3/70 số dòng điểm danh nhiều hơn số buổi đã dạy; **69 buổi WOW không có giáo viên**;
+> 2 buổi đã dạy xong mà không có dòng điểm danh nào.
+> *Vì sao 132 luật của `check_logic.py` không bắt được:* bộ máy chặng sống trong **JS** (`jStageOf`),
+> bộ kiểm dữ liệu sống trong **Python** - hai thế giới không nói chuyện, Python không biết ga "Có KQ"
+> nghĩa là gì nên không thể hỏi "vậy điểm đâu". **ĐỪNG chép luật sang Python lần hai - chép là sẽ lệch.**
+> Cách làm đã chốt: (1) viết `_src/_checkdata.js` chạy bằng node, nạp `_APP.js` thật, duyệt từng người,
+> hỏi app "đang ở ga nào" rồi soi đúng thứ ga đó bắt buộc phải có; (2) thêm một lượt vá cuối trong
+> `fixdata.py` bồi đủ dữ liệu theo đúng danh sách đó (điểm test khớp mục tiêu band, phiếu tư vấn khớp
+> ngày test, phiếu thu khớp học phí, buổi/điểm danh/WOW khớp lớp và khớp giáo viên); (3) đưa
+> `_checkdata.js` vào bộ verify BẮT BUỘC. Ước lượng 2-3 lượt đẩy: chạy - đo - vá - chạy lại tới khi về 0.
+>
+> **(B) BỘ MÁY LỌC CHUYÊN SÂU DÙNG CHUNG.** Luân: "hầu hết các trang đều cần, đừng nhầm với tab -
+> tab hiện tại đã ngon, chỉ bổ sung filter". Yêu cầu: nhiều điều kiện **kết hợp được**, và **lưu được
+> thành bộ lọc riêng của từng người**. TUYỆT ĐỐI không vá tay từng trang (50 hàm render = 50 kiểu).
+> Làm MỘT bộ máy khai báo: `FLTDEF[page] = [trục...]`, bộ máy lo giao diện + kết hợp + đếm + xoá + lưu.
+> VÀ giữa các trục, HOẶC trong cùng một trục. Trục dùng lại: người phụ trách · khoảng thời gian ·
+> cơ sở · trạng thái · lớp · khóa · chặng · quá hạn. Lưu theo từng người trên localStorage theo mã
+> nhân viên (đúng cách `drwKey()` đang làm với độ rộng drawer) - đây là thói quen cá nhân, KHÔNG
+> phải cấu hình trung tâm nên không ghi vào DATA.config. Không đụng tab; lọc chỉ thu hẹp trong tab
+> đang mở, hiện thành chip gỡ được. Làm 6-8 trang nặng trước (Giao việc, Học viên, Lead, Thanh toán,
+> Lớp, Buổi học, Chặng, Báo cáo) rồi ĐẨY, phủ nốt ở lượt sau.
+>
+> **(C) HỌC VIÊN XIN NGHỈ - còn hụt, Luân đã hỏi và đồng ý vá.** Đã truy vết thật: `hvAbsentSave` ghi
+> DL12 `no_show + excused` kèm `[HV tự báo]` và tạo việc DL23 giao cho `academic_staff`. Học vụ THẤY
+> (trang Giao việc + badge + chuông khi quá hạn). Giảng viên **chỉ thấy gián tiếp và chỉ khi tới giờ
+> điểm danh** - báo trước 3 ngày thì suốt 3 ngày GV không có chỗ nào biết, trong khi app hứa với học
+> viên là "báo trước giúp giảng viên chuẩn bị phần bù". Còn thiếu: (1) không có nút DUYỆT nghỉ phép;
+> (2) học viên tự ghi thẳng vào sổ chuyên cần trước khi ai duyệt; (3) không có chỗ xếp buổi bù cho
+> MỘT học viên (`bhMakeup` chỉ dùng cho buổi hủy cả lớp) - ô "cho tôi xin buổi học bù" hiện chỉ nằm
+> trong phần nội dung của việc. Cách vá đã chốt: màn xử lý riêng (Duyệt có phép / Đổi thành không
+> phép kèm lý do / Xếp buổi bù), DL12 ghi ở trạng thái CHỜ DUYỆT rồi mới tính chuyên cần, đẩy tín
+> hiệu sang màn Buổi học của GV ("N em đã báo nghỉ"), và xếp bù cho một học viên phải là MỘT HÀM LÕI
+> dùng chung (chạy `node _check15.js` đối chiếu cửa ghi trước khi thêm).
+>
+> **(D) MẢNG 5** (mảng cuối của hội đồng 6 chuyên gia): `slaChip(param)` in số SLA kèm icon bánh răng
+> nhảy về đúng dòng cấu hình (dùng `window.CFHL` để cuộn + tô), nút "Sửa câu này" cạnh câu CH4 trong
+> `sopBlock` (`window.MSGQ` đã có), link về CH1 khi hiện nhãn enum, **khai 23 tham số app đang đọc thật
+> mà thiếu ô sửa** (`refundFull/Partial/Reduced_days`, `slaTeacherNote_hours`, `thresholdDeposit_minimum`,
+> 4 tham số `installment*`, `slaFeedbackClassify_hours` - riêng cái này CHƯA CÓ trong CH2 nên đang chạy
+> bằng số cắm cứng), dọn 3 dòng CH2 chết (`slaLeadReassign_hours`, `slaPayment_hours`, `amount`), đưa
+> `DUEFALL=5` + 16 nhóm câu chăm RTOUCH + giờ hẹn preset vào cấu hình, màn cấp thêm quota WOW, xoá 4
+> hàm render chết (`renderDashboardOld`, `renderPipeline`, `renderTracuu`, `renderKhaosat`) + `roleSel`
+> luôn ẩn, bổ sung bộ phận chuẩn cho `renderDuyet`/`renderGiaoan`/`renderMaGioiThieu`/`renderReupTab`/
+> `renderBanggiao`, `statStrip` bấm được ở 15 trang, thêm notebar cho tab CH6.
+>
+> **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
+>
+> **HOÃN theo lệnh Luân:** viết lại toàn bộ nội dung hướng dẫn (tour) - chỉ làm SAU KHI hệ thống hoàn
+> chỉnh. Cơ chế neo `tourSel("@key")` + bộ kiểm đã có sẵn; 64 bước hiện vẫn dùng CSS selector.
+>
+> Trước đó V9.26 (28/07 tối - MẢNG 1+2+3+4 xong, cộng hội đồng đợt 2 và 11 yêu cầu phát sinh của Luân).
 > **DỮ LIỆU DEMO: 192 -> 4 bản ghi lỗi** (`check_logic.py` nay 123 luật). 4 ca còn lại là việc quá hạn
 > CỐ Ý để màn Giao việc có cảnh báo đỏ thật (luật 10k tự khai là "demo canh bao do").
 > Bộ kiểm sau mỗi build nay có **5 phần** (xem bảng trong `_src/README_SRC.md`), thêm `_src/_checktour.js`.
@@ -1702,3 +1762,91 @@ BẪY đã cắn trong buổi chuyển đổi (nhớ cho lần sau):
 Tệp -> Nhập -> Tải lên -> chọn xlsx -> **Thay thế bảng tính** -> (script không mất) ->
 chạy menu **ITTs Cong cu > CAI DAT BAN DAU**. Nếu chỉ trục trặc link giữa chừng:
 chạy lẻ "Sua lien ket (hyperlink)".
+
+---
+
+## 3sexvicies. V9.27 - LƯỢT "LUÂN NGỒI SOI TỪNG MÀN" (28/07 khuya)
+
+Luân mở app xem trực tiếp và bắn ảnh từng chỗ. Đây là lượt cho ra nhiều lỗi thật nhất từ trước tới
+giờ, và đáng chú ý là **hai hội đồng chuyên gia đều không tìm ra những lỗi này** - vì chúng chỉ lộ ra
+khi có người NGỒI DÙNG, không phải khi có người ĐỌC CODE.
+
+**Quyết định thiết kế:**
+
+1. **Chú thích phải hiện NGAY.** Thuộc tính `title` của trình duyệt đợi ~1 giây và bị khung cuộn cắt.
+   Thay bằng cơ chế `data-tip`: một thẻ `.tipbox` duy nhất gắn vào `body`, `position:fixed`, bắt hover
+   theo ủy quyền trên `document` nên MỌI phần tử có `data-tip` đều chạy, không phải khai gì thêm.
+   Tự lật lên/xuống cho vừa màn hình. `TIPCUR` chặn vẽ lại khi chuột đi trong cùng một thẻ.
+
+2. **MỖI HẠT trên dải hành trình một chú thích riêng** - trước cả dải chỉ có một câu chung nên rê vào
+   hạt nào cũng ra đúng câu đó. Nay: "Bước 3/7 · Đã hẹn test - đã qua / ĐANG Ở ĐÂY / chưa tới".
+   Hạt 8→11px, hạt đang đứng 11→15px, gap 4→7px, `:after{inset:-5px}` nới vùng bắt chuột.
+
+3. **NGÔN NGỮ CHUNG cho "bấm được" vs "chỉ để xem"** (Luân: "vẫn chưa phân biệt được rõ ràng").
+   Bấm được = nền trắng, viền LIỀN, con trỏ tay, hover nhấc lên + viền xanh. Chỉ để xem = nền xám,
+   viền ĐỨT, hover không đổi gì. Thêm `[onclick]{cursor:pointer}` toàn cục nên không sót chỗ nào.
+   Trước đó dải phễu (bấm được) trông phẳng như chữ, còn dải ô thống kê (chỉ để xem) lại có viền
+   như thẻ - **ngược hoàn toàn**.
+
+4. **Menu phải LUÔN biết mình đang ở đâu.** Trang không có mục riêng (vd "Chạy quy trình" mở ra từ
+   Chăm lại / Reup) làm cả menu tối thui. Nay `go()` nhớ mục đang sáng trước khi rời đi (`NAVFROM`),
+   `buildNav` tô MỜ mục đó kèm nhãn "ĐANG MỞ" + vạch đứt - khác hẳn mục đang thực sự đứng.
+
+5. **Tiêu đề CHẶNG thôi giả dạng mục đang chọn.** Nền đầy `#ffffff12` làm nó trông y như trạng thái
+   được chọn. Bỏ nền, chỉ còn chữ sáng + vạch màu chặng + đường kẻ mảnh. (Bẫy: lượt trước đã sửa
+   nhầm theo chiều ngược - làm mục con nặng hơn nhóm cha, Luân bắt "tổng quan chặng còn bự hơn cả chặng".)
+
+6. **Đóng/mở menu mặc định** (Luân chốt bằng ảnh): Làm việc + Điều hành mở sẵn, 4 nhóm CHẶNG và
+   Tra cứu gập lại. Khai ở `navOpenDef`, KHÔNG cắm cứng trong `navIsOpen`. Đảo lại quyết định V9.23
+   "xổ hết mọi nhóm" - xổ hết thì menu dài lê thê.
+
+7. **Đổi tên được TỪNG MỤC menu, không chỉ tên nhóm.** Tên gốc giữ trong `PAGES` để nâng cấp app
+   không vỡ; tên trung tâm tự đặt nằm riêng ở `UI().ilabel`. Gõ y hệt tên gốc thì XOÁ khỏi `ilabel`
+   chứ không lưu thừa. Màn Cài đặt > Menu bỏ dàn "viên thuốc" xanh đậm, đổi thành DANH SÁCH: mỗi dòng
+   một ô tick + icon + ô CHỮ GÕ ĐƯỢC + mã trang.
+
+8. **"Mặc định" từ nay là bản CỦA TRUNG TÂM.** `uiSaveDefault()` cất bản hiện tại vào
+   `DATA.config.ui_default`; `uiResetRun` trả về `uiBase()` chứ không phải `UIDEF`. Vẫn giữ
+   `uiFactoryRun()` làm đường về bản gốc của app.
+
+9. **Drawer kéo được độ rộng, lưu THEO TỪNG NGƯỜI** trên localStorage khoá theo mã nhân viên
+   (`drwKey()`), KHÔNG ghi vào DATA.config - vì đây là thói quen cá nhân, không phải cấu hình của
+   trung tâm. Đây là tiền lệ cho bộ lọc cá nhân sắp làm.
+
+10. **Drawer việc xếp lại thứ tự**: nút hành động (Nhận việc / Nhắc / Hủy) trước đây nằm DƯỚI ô nhập
+    trao đổi và dính sát nên nhìn như đè lên nhau, mà việc chính lại bị chôn dưới cùng. Thứ tự đúng:
+    đọc việc → làm gì với việc → trao đổi. Trả lời câu Luân hỏi: **hỏi được TRƯỚC khi nhận việc, và
+    mọi trao đổi giữ nguyên kể cả khi từ chối/hủy** - luồng này là BIÊN BẢN của việc, không phải hộp
+    chat xoá được. Đã nói thẳng câu đó ra màn hình (`.tkhint`).
+
+11. **Nút hẹn nhanh 4 → 10, nút nào cũng CHỐT LUÔN GIỜ** vì ô nhập là ngày+giờ. Nhãn và giá trị dùng
+    CHUNG một hàm dựng (`DTQUICK[i][1]`) nên không thể lệch. Nút đã trôi qua thì tự ẩn.
+
+**BẪY ĐÃ CẮN (lớp lỗi đáng giá nhất lượt này):**
+
+- **`quickStatus` chỉ được lưu NHỜ MAY.** Luân báo "đổi trạng thái mà chẳng thấy gì thay đổi". Đo
+  bằng cách chặn `persistSoon` rồi chạy từng cửa ghi: hàm này KHÔNG tự gọi `persistSoon`. Khi bảng
+  nằm trong hub thì `rlist` đi đường `reRender` → `reRenderKeep` gọi hộ ở dòng cuối. Trên **trang
+  danh sách đứng riêng** (`CUR === key`) `rlist` ghi thẳng `innerHTML` → **không ai lưu**, tắt trình
+  duyệt là mất, cửa sổ khác trong room không hay biết. `tkReturnSave` và `tkNewSave` cũng đang dựa
+  vào tác dụng phụ của hàm vẽ lại màn hình.
+  → **Luật bổ sung: cửa ghi phải TỰ gọi `persistSoon`, không được dựa vào hàm vẽ giao diện.**
+  → Bộ kiểm kiểu mới trong `_check16` mục 15: **tắt hẳn `reRender`/`reRenderKeep`/`rlist` rồi mới đếm
+  `persistSoon`**. Từ nay cửa ghi nào chỉ sống nhờ vẽ lại màn hình là ĐỎ ngay.
+- **Toast không nói hệ quả cũng bị hiểu là app không chạy.** Đổi trạng thái xong chỉ báo "Đã đổi
+  trạng thái L-2026-00001" - Luân tưởng không có gì xảy ra. Nay báo luôn "· chặng: Đã mất · việc kế:
+  Liên hệ lại (remarketing)".
+- **`.mstrip.clk:hover{background:var(--mscol)0F}`** - không nối chuỗi alpha vào `var()` được. Dùng
+  màu cố định.
+- **Stub `style:{}` trong 7 file kiểm thiếu `setProperty`** nên báo lỗi giả khi app dùng CSS variable.
+- **`_check16` dùng localStorage giả rỗng** nên mọi tiêu chí về lưu-theo-người đều sai; phải cấp cho
+  nó một `_LS` thật.
+- **Bỏ cấp độ hướng dẫn DEV** theo lệnh Luân - phải sửa cả 2 tiêu chí cũ trong `_check11` (đang canh
+  "đủ 4 cấp độ" và "có tour DEV"), không thì bộ kiểm đỏ vì chính việc mình vừa làm đúng.
+
+**Thanh thông tin lớp** chia 3 tầng: tên lớp riêng một dòng (kèm mã + trạng thái), rồi 2 khối
+"dạy gì - ai dạy - ở đâu" (5 ô) và "mốc thời gian - quy mô" (4 ô); số cột khai bằng `--cbn`.
+**Tên lớp ở 11 màn danh sách** thành link `lopLnk` mở drawer xem nhanh - CỐ Ý không áp vào các drawer
+đang nhập liệu, bấm vào đó sẽ thay nội dung drawer và mất form đang điền.
+**Dải chào Trang bắt đầu** từ 3 dòng + ô tìm to đứng → MỘT BĂNG: lời chào 22→17px, một dòng tóm tắt
+(việc / quá hạn / chip hẹn kế tiếp bấm được), ô tìm sang cột phải cùng hàng.

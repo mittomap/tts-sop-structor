@@ -39,11 +39,12 @@ Bộ kiểm gồm **5 phần, phải xanh HẾT mới được giao**:
 |---|---|
 | `node --check _APP.js` và `node --check _HV.js` | không báo gì |
 | `ITTS_OUT=<out> node _tall.js` | `Render 38 trang \| 0 loi` + `thieu trong font: khong` |
-| `ITTS_OUT=<out> node _check11.js` | `OK: 119` + `TONG: 128`, KHÔNG có dòng `FAIL` |
+| `ITTS_OUT=<out> node _check11.js` | `TONG: 131`, KHÔNG có dòng `FAIL` |
 | `ITTS_OUT=<out> node _check12.js` | `CHECK12 OK: 37 tieu chi` - một cửa vào, một luật |
 | `ITTS_OUT=<out> node _check13.js` | `CHECK13 OK: 174 tieu chi` - KPI biết nói |
 | `ITTS_OUT=<out> node _check14.js` | `CHECK14 OK: 100 tieu chi` - cổng học viên hai chiều |
-| `ITTS_OUT=<out> node _check15.js` | `CHECK15 OK: 36 tieu chi` - **kiểm kê cửa ghi + bất biến nghiệp vụ** |
+| `ITTS_OUT=<out> node _check15.js` | `CHECK15 OK: 37 tieu chi` - **kiểm kê cửa ghi + bất biến nghiệp vụ** |
+| `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 236 tieu chi` - học phí theo đợt + toàn bộ vá V9.27 |
 | `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` |
 | `python3 check_logic.py` | `TONG BAN GHI LOI: 4` (đúng 4 ca là việc quá hạn CỐ Ý để demo cảnh báo đỏ - xem luật 10k) |
 | `python3 check_data.py` | `KET QUA: DAT` |
@@ -55,6 +56,16 @@ Nó làm hai việc người đọc không làm được: (1) KIỂM KÊ mọi h
 cửa ghi MỚI chưa khai** - buộc người viết đối chiếu với các cửa sẵn có; (2) kiểm **BẤT BIẾN nghiệp
 vụ** (đúng dù đường nào ghi) bằng cách LÁI THẬT từng cửa rồi soi lại. Thêm hàm ghi mới vào bảng nào
 thì khai vào bảng `KHAI` trong `_check15.js`.
+
+**`_check16.js` mục 15 sinh ra vì một lớp lỗi họ hàng, Luân tự bắt được (28/07 khuya):** hàm ghi dữ
+liệu KHÔNG tự gọi `persistSoon` mà vẫn "có vẻ chạy", vì đường nào cũng tình cờ đi qua `reRender` ->
+`reRenderKeep` (dòng cuối hàm này có `persistSoon`). Đổi trạng thái trên trang danh sách đứng riêng
+thì `rlist` ghi thẳng `innerHTML`, không qua `reRenderKeep`, và dữ liệu mất khi tắt trình duyệt.
+Nên mục 15 **tắt hẳn `reRender`/`reRenderKeep`/`rlist` rồi mới đếm `persistSoon`** - chỉ lần gọi
+THẲNG mới tính. Thêm cửa ghi mới thì thêm một dòng `door(...)` vào đó.
+
+> **LUẬT:** hàm nào ghi vào DATA thì TỰ gọi `persistSoon()`. Không được dựa vào tác dụng phụ của
+> hàm vẽ giao diện - hôm nay đúng, mai đổi đường render là mất dữ liệu không ai hay.
 
 `check_logic.py` (V9.25: 132 luật) là **bộ kiểm dữ liệu BẮT BUỘC**, chạy sau trọn đường ống
 dữ liệu. Đường ống phải chạy ĐÚNG thứ tự, chạy thiếu bước nào là kết quả sai:
