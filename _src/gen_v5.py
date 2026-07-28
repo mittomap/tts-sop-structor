@@ -58,6 +58,30 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .navitem.from:after{content:"đang mở";margin-left:auto;font-size:8.5px;font-weight:800;letter-spacing:.4px;
  text-transform:uppercase;color:#8FB2D8;background:#ffffff12;border-radius:5px;padding:1px 5px;flex:none}
 .navitem.chang.from:after{content:"đang mở";width:auto;height:auto;border-radius:5px;background:#ffffff12;opacity:1}
+/* ===== V9.27 CAI DAT > MENU: danh sach checklist go duoc =====
+   Truoc day moi muc la mot "vien thuoc" mau xanh dam - dep thi khong dep ma con khong go lai duoc ten.
+   Nay moi muc mot dong: o tick - icon - o CHU GO DUOC - ma trang. */
+.mnbox{border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden;background:#fff}
+.mnbox.off{opacity:.6}
+.mnhd{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F7F9FC;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.mnct{margin-left:auto;font-size:11px;color:#8A94A0;font-weight:700;white-space:nowrap}
+.mnck{display:flex;align-items:center;cursor:pointer;flex:none}
+.mnck input{width:16px;height:16px;cursor:pointer;accent-color:var(--navy)}
+.mnin{height:32px;border:1px solid transparent;border-radius:8px;padding:0 9px;font-family:inherit;font-size:12.5px;
+ color:var(--text);background:transparent;flex:1 1 180px;min-width:0;transition:.12s}
+.mnin:hover{border-color:#DFE6EE;background:#fff}
+.mnin:focus{border-color:var(--blue);background:#fff;outline:none;box-shadow:0 0 0 3px rgba(59,130,196,.14)}
+.mnin.big{font-size:13px;font-weight:800;color:var(--navy);flex:0 1 260px}
+.mnlist{padding:4px 0}
+.mnrow{display:flex;align-items:center;gap:9px;padding:5px 12px;border-bottom:1px solid #F4F7FA}
+.mnrow:last-child{border-bottom:0}
+.mnrow:hover{background:#FAFCFE}
+.mnrow.off .mnin,.mnrow.off .mnic{opacity:.5}
+.mnic{font-size:16px;color:#7A8694;flex:none;width:18px;text-align:center}
+.mnrs{flex:none;height:26px;padding:0 8px;font-size:11px}
+.mncode{flex:none;font-size:10px;color:#AAB4C0;font-family:ui-monospace,Menlo,Consolas,monospace;min-width:74px;text-align:right}
+.mnact{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding-top:6px}
+@media(max-width:620px){.mncode{display:none}}
 .navgrp{margin-bottom:3px}
 .navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500;border-left:3px solid transparent}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
@@ -182,14 +206,24 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .btn.lg{height:42px;padding:0 20px;font-size:14px}
 .rundone{display:flex;align-items:center;gap:8px;background:var(--greenb);color:#116149;border-radius:10px;padding:10px 14px;font-size:12.5px;font-weight:700;margin-bottom:12px}
 .rqbox{display:flex;flex-wrap:wrap;gap:10px}
-.bwhero{display:flex;gap:20px;flex-wrap:wrap;background:linear-gradient(120deg,#0F2A4A,#1E4A7A);border-radius:16px;padding:22px 24px;margin-bottom:16px;color:#fff}
-.bwl{flex:1;min-width:280px}
-.bwg{font-size:22px;font-weight:800}
-.bwsub{font-size:12.5px;opacity:.92;margin-top:4px;line-height:1.55}
+/* V9.27: dai chao cu chiem gan nua man hinh cho 3 dong chu + mot o tim to dung. Nay gon lai
+   MOT BANG: ben trai loi chao + mot dong tom tat, ben phai o tim - cung mot hang. */
+.bwhero{display:flex;gap:16px;flex-wrap:wrap;align-items:center;background:linear-gradient(120deg,#0F2A4A,#1E4A7A);
+ border-radius:14px;padding:14px 18px;margin-bottom:14px;color:#fff}
+.bwl{flex:1 1 300px;min-width:0}
+.bwr{flex:0 1 400px;min-width:240px}
+.bwg{font-size:17px;font-weight:800;line-height:1.3}
+.bwsub{font-size:12px;opacity:.9;margin-top:3px;line-height:1.5;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 .bwsub b{color:#fff}
-.bwsearch{position:relative;display:flex;align-items:center;gap:8px;background:#fff;border-radius:10px;padding:0 12px;margin-top:14px;max-width:440px}
+.bwdot{opacity:.45}
+.bwap{display:inline-flex;align-items:center;gap:5px;background:#ffffff1f;border-radius:999px;padding:2px 9px;
+ cursor:pointer;transition:.12s;font-size:11.5px}
+.bwap:hover{background:#ffffff33}
+.bwover{color:#FFD3D3;font-weight:800}
+.bwsearch{position:relative;display:flex;align-items:center;gap:8px;background:#fff;border-radius:10px;padding:0 12px;max-width:none}
 .bwsearch i{color:var(--muted)}
-.bwsearch input{flex:1;border:0;outline:0;height:40px;font-family:inherit;font-size:13px;background:transparent}
+.bwsearch input{flex:1;border:0;outline:0;height:36px;font-family:inherit;font-size:12.5px;background:transparent}
+@media(max-width:760px){.bwr{flex:1 1 100%}}
 .bwr{display:flex;flex-direction:column;gap:10px;justify-content:center;min-width:220px}
 .bwcta{display:flex;align-items:center;gap:12px;background:#fff;color:var(--navy);border:0;border-radius:12px;padding:14px 18px;cursor:pointer;font-family:inherit;text-align:left}
 .bwcta:hover{box-shadow:0 6px 20px rgba(0,0,0,.25)}
@@ -527,7 +561,9 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .bstat{position:relative}
 .bstat .bsarr{position:absolute;right:9px;bottom:7px;font-size:13px;color:#B7C0CC;transition:.12s}
 .bstat:hover .bsarr{color:var(--navy);transform:translateY(2px)}
-.bwsrchhint{display:block;font-size:10.5px;color:rgba(255,255,255,.7);margin-top:5px}
+/* V9.27: dong goi y duoi o tim chi hien KHI DANG GO - luc chua go no la chu thua. */
+.bwsrchhint{display:block;font-size:10.5px;color:rgba(255,255,255,.75);margin-top:4px;min-height:0}
+.bwsrchhint:empty{display:none}
 .sesstrip{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:6px}
 .sespill{flex:none;position:relative;border:1.5px solid var(--line);border-radius:9px;padding:6px 11px 6px 22px;cursor:pointer;background:#fff;font-family:inherit;text-align:left;min-width:70px;transition:.12s}
 .sespill:hover{border-color:#9BB2CC;background:#FAFBFD}
@@ -3689,7 +3725,7 @@ function acBoxHTML(list){if(!list.length)return '<div class="pkitem mut">Không 
 function chaySrch(v){window.CHAYSRCH=v;var el=document.getElementById("chaybody");if(el)el.innerHTML=chayListHTML();
  var box=document.getElementById("bwac");if(box)box.innerHTML=String(v||"").trim().length>=2?acBoxHTML(acSearch(v)):"";
  var hint=document.getElementById("bwsrchhint");if(hint){var n=chayList().length;
-  hint.innerHTML=String(v||"").trim()?('<i class="ti ti-arrow-down"></i> <b>'+n+'</b> kết quả ở danh sách bên dưới - hoặc chọn nhanh trong gợi ý'):('<i class="ti ti-arrow-down"></i> kết quả hiện ở danh sách <b>"Chạy quy trình"</b> ngay bên dưới')}}
+  hint.innerHTML=String(v||"").trim()?('<i class="ti ti-arrow-down"></i> <b>'+n+'</b> kết quả ở danh sách bên dưới - hoặc chọn nhanh trong gợi ý'):""}}
 function chayList(){var s=vnorm(window.CHAYSRCH||"").trim();
  /* ĐANG TÌM -> tìm TOÀN BỘ hồ sơ trong hành trình (mọi chặng, kể cả đã học/đã xong),
     bỏ qua bộ lọc "Cần xử lý/chặng" - vì tìm một người thì phải ra dù họ không quá hạn. */
@@ -4002,11 +4038,14 @@ function renderBanlam(){
  var apptN=apptL.length;
  var nextAp=null;var nowT=new Date();
  all0.forEach(function(J){var nf=jNF(J);if(nf&&nf>=nowT&&(!nextAp||nf<jNF(nextAp)))nextAp=J});
+ /* Một dòng tóm tắt thay cho ba dòng: số việc · số quá hạn · hẹn kế tiếp (bấm được). */
+ var apChip=nextAp?('<span class="bwap" onclick="chayQSet(\'appt\')" data-tip="Bấm để lọc danh sách còn đúng các cuộc hẹn"><i class="ti ti-clock"></i>Hẹn kế: <b>'+esc((function(){var d=jNF(nextAp);var hh=("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);var td=new Date();var sameDay=d.getDate()===td.getDate()&&d.getMonth()===td.getMonth();return hh+(sameDay?" hôm nay":" "+("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2))})())+'</b> · '+esc(nextAp.name)+'</span>'):'';
  var h='<div class="bwhero"><div class="bwl"><div class="bwg">'+esc(greet)+', '+esc(meNm)+'</div>'+
-  '<div class="bwsub">Hôm nay có <b>'+tasks.length+'</b> việc trong hành trình cần xử lý'+(over.length?(' · <b style="color:#FFD3D3">'+over.length+' quá hạn</b>'):'')+'. Chọn một người bên dưới để bắt đầu.</div>'+
-  (nextAp?('<div class="bwsub" style="margin-top:4px;cursor:pointer" onclick="chayQSet(\'appt\')"><i class="ti ti-clock" style="margin-right:5px"></i>Cuộc hẹn kế tiếp: <b>'+esc((function(){var d=jNF(nextAp);var hh=("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);var td=new Date();var sameDay=d.getDate()===td.getDate()&&d.getMonth()===td.getMonth();return hh+(sameDay?" hôm nay":" ngày "+("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2))})())+'</b> - '+esc(nextAp.name)+(nextAp.phone?' ('+esc(nextAp.phone)+')':'')+'</div>'):'')+
-  '<div class="bwsearch"><i class="ti ti-search"></i><input placeholder="Tìm khách / học viên theo tên hoặc SĐT..." value="'+esc(window.CHAYSRCH||"")+'" oninput="chaySrch(this.value)" autocomplete="off"><div class="pkres" id="bwac" style="position:absolute;top:100%;left:0;right:0;z-index:30;background:#fff;color:var(--text);text-align:left;border-radius:0 0 10px 10px;box-shadow:0 8px 24px rgba(0,0,0,.18)"></div></div>'+
-  '<span class="bwsrchhint" id="bwsrchhint"><i class="ti ti-arrow-down"></i> kết quả hiện ở danh sách <b>"Chạy quy trình"</b> ngay bên dưới</span></div></div>'; /* V9.18b: hint phải nằm NGOÀI hộp tìm - nằm trong là chữ trắng trên nền trắng + bóp placeholder (Luân bắt lỗi) */
+  '<div class="bwsub"><span><b>'+tasks.length+'</b> việc cần xử lý</span>'+
+   (over.length?('<span class="bwdot">·</span><span class="bwover">'+over.length+' quá hạn</span>'):'')+
+   (apChip?('<span class="bwdot">·</span>'+apChip):'')+'</div></div>'+
+  '<div class="bwr"><div class="bwsearch"><i class="ti ti-search"></i><input placeholder="Tìm khách / học viên theo tên hoặc SĐT..." value="'+esc(window.CHAYSRCH||"")+'" oninput="chaySrch(this.value)" autocomplete="off"><div class="pkres" id="bwac" style="position:absolute;top:100%;left:0;right:0;z-index:30;background:#fff;color:var(--text);text-align:left;border-radius:0 0 10px 10px;box-shadow:0 8px 24px rgba(0,0,0,.18)"></div></div>'+
+  '<span class="bwsrchhint" id="bwsrchhint"></span></div></div>'; /* V9.18b: hint phải nằm NGOÀI hộp tìm - nằm trong là chữ trắng trên nền trắng + bóp placeholder (Luân bắt lỗi) */
  function cS(k){return all0.filter(function(J){return J.k===k&&J.act}).length}
  var nRisk=rows("DL09").filter(function(s){return isRisk(s.attendance_progress_status)||isRisk(s.academic_progress_status)}).length;
  var nDebt=rows("DL06").filter(function(e){return num(e.remaining_amount)>0&&!/cancel/.test(ecode(e.enrollment_status))}).length;
@@ -5759,19 +5798,33 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
   h+='</div></div></div></div>';
   return h}
  if(tab==="menu"){
-  h+='<div class="notebar"><i class="ti ti-menu-2"></i>Tắt mục không dùng cho gọn menu, hoặc đổi tên nhóm theo cách gọi của trung tâm bạn. Mục tắt chỉ <b>ẩn khỏi menu</b> - các đường dẫn trong app vẫn vào được, không mất dữ liệu.</div>';
+  h+='<div class="notebar"><i class="ti ti-menu-2"></i>Bỏ tick là <b>ẩn khỏi menu</b> (đường dẫn trong app vẫn vào được, không mất dữ liệu). Tên nhóm và tên từng mục <b>gõ lại được</b> - gõ xong bấm ra ngoài là áp ngay. Chỉnh vừa ý thì bấm <b>Lưu bản này thành mặc định</b>.</div>';
   h+='<div class="panel"><div class="pbody">';
   NAVTREE.forEach(function(G){var gon=uiMenuOn("g:"+G.g);
-   h+='<div style="border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:10px'+(gon?'':';opacity:.55')+'">';
-   h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
-   h+='<label style="display:flex;align-items:center;gap:7px;cursor:pointer"><input type="checkbox"'+(gon?" checked":"")+' onchange="uiMenuToggle(\'g:'+esc(G.g).split("'").join("")+'\')" style="width:16px;height:16px"><b style="font-size:12.5px">'+esc(G.g)+'</b></label>';
-   h+='<input value="'+esc(uiGroupLabel(G.g))+'" onchange="uiGroupRename(\''+esc(G.g).split("'").join("")+'\',this.value);reRender(CUR)" placeholder="Tên hiển thị" style="height:30px;border:1px solid var(--line);border-radius:8px;padding:0 9px;font-family:inherit;font-size:12px;max-width:230px">';
-   h+='<span class="mut" style="font-size:11px;margin-left:auto">'+G.items.length+' mục</span></div>';
-   h+='<div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:9px">';
+   var gkey=esc(G.g).split("'").join("");
+   var non=G.items.filter(function(k){return uiMenuOn(k)}).length;
+   h+='<div class="mnbox'+(gon?'':' off')+'">';
+   h+='<div class="mnhd"><label class="mnck"><input type="checkbox"'+(gon?" checked":"")+' onchange="uiMenuToggle(\'g:'+gkey+'\')"></label>'+
+    '<input class="mnin big" value="'+esc(uiGroupLabel(G.g))+'" placeholder="Tên nhóm" aria-label="Tên nhóm '+esc(G.g)+'"'+
+    ' onchange="uiGroupRename(\''+gkey+'\',this.value);reRender(CUR)">'+
+    '<span class="mnct">'+non+'/'+G.items.length+' mục đang hiện</span></div>';
+   h+='<div class="mnlist">';
    G.items.forEach(function(k){var m=navItemMeta(k),on=uiMenuOn(k);
-    h+='<label class="pill'+(on?" on":"")+'" style="cursor:pointer;gap:6px"><input type="checkbox"'+(on?" checked":"")+' onchange="uiMenuToggle(\''+esc(k)+'\')" style="width:14px;height:14px;margin-right:2px"><i class="ti '+m.ic+'"></i>'+esc(m.t)+'</label>'});
+    var doi=uiItemLabel(k)!==uiItemDefLabel(k);
+    h+='<div class="mnrow'+(on?'':' off')+'">'+
+     '<label class="mnck"><input type="checkbox"'+(on?" checked":"")+' onchange="uiMenuToggle(\''+esc(k)+'\')" aria-label="Hiện mục '+esc(m.t)+'"></label>'+
+     '<i class="ti '+m.ic+' mnic"></i>'+
+     '<input class="mnin" value="'+esc(m.t)+'" placeholder="Tên hiển thị trên menu" aria-label="Tên mục '+esc(k)+'"'+
+      ' onchange="uiItemRename(\''+esc(k)+'\',this.value);reRender(CUR)">'+
+     (doi?'<button class="btn sm mnrs" onclick="uiItemRename(\''+esc(k)+'\',\'\');reRender(CUR)" title="Trả về tên gốc: '+esc(uiItemDefLabel(k))+'"><i class="ti ti-restore"></i>Tên gốc</button>':'')+
+     '<span class="mncode">'+esc(k)+'</span></div>'});
    h+='</div></div>'});
-  h+='<div style="padding-top:4px"><button class="btn sm" onclick="uiReset()"><i class="ti ti-restore"></i>Khôi phục menu mặc định</button></div>';
+  h+='<div class="mnact">';
+  h+='<button class="btn primary" onclick="uiSaveDefault()"><i class="ti ti-device-floppy"></i>Lưu bản này thành mặc định</button>';
+  h+='<button class="btn" onclick="uiReset()"><i class="ti ti-restore"></i>Khôi phục '+(uiHasBase()?'bản mặc định của trung tâm':'mặc định')+'</button>';
+  if(uiHasBase())h+='<button class="btn sm" onclick="uiFactory()"><i class="ti ti-rotate-2"></i>Về bản gốc của app</button>';
+  h+='</div>';
+  h+='<div class="mut" style="font-size:11.5px;padding-top:9px">'+(uiHasBase()?'Đang có bản mặc định riêng của trung tâm - nút khôi phục trả về đúng bản đó.':'Chưa lưu bản mặc định riêng - nút khôi phục đang trả về bản gốc của app.')+'</div>';
   h+='</div></div>';
   return h}
  if(tab==="demo"){
@@ -9260,7 +9313,7 @@ function tourOfferOnce(){return}
    Áp bằng uiApply(): đổi biến màu CSS, tên + logo trên sidebar, tiêu đề tab trình duyệt.
    Menu: ẩn/hiện nhóm & mục, đổi tên nhóm - buildNav đọc UI().menu (KHÔNG sửa NAVTREE gốc). */
 var UIDEF={brand:"ITTs · Hành trình",sub:"Bản V5 - luồng vận hành",center:"IELTS The Tutors",
- title:"IELTS The Tutors · Cổng làm việc",logo:"",navy:"#1E3A5F",red:"#D51920",menu:{},mlabel:{}};
+ title:"IELTS The Tutors · Cổng làm việc",logo:"",navy:"#1E3A5F",red:"#D51920",menu:{},mlabel:{},ilabel:{}};
 function UI(){var c=(DATA.config=DATA.config||{});var u=(c.ui=c.ui||{});
  for(var k in UIDEF)if(u[k]===undefined)u[k]=(typeof UIDEF[k]==="object"?JSON.parse(JSON.stringify(UIDEF[k])):UIDEF[k]);
  return u}
@@ -9277,8 +9330,20 @@ function uiApply(){var u=UI();
   var bs=document.getElementById("brandSub");if(bs)bs.textContent=u.sub||"";
   if(typeof document!=="undefined")document.title=(u.title||UIDEF.title);
  }catch(e){}}
-function uiReset(){confirmRun("Đưa toàn bộ giao diện (tên, logo, màu, menu) về mặc định?","uiResetRun")}
-function uiResetRun(){DATA.config.ui=JSON.parse(JSON.stringify(UIDEF));uiApply();
+/* V9.27: "mặc định" từ nay là bản CỦA TRUNG TÂM, không phải bản gốc của app.
+   Anh Luân chỉnh xong bấm "Lưu bản này thành mặc định" - từ đó nút khôi phục trả về đúng bản đó.
+   Vẫn giữ đường về bản gốc của app cho trường hợp muốn làm lại từ đầu. */
+function uiBase(){var d=(DATA.config||{}).ui_default;return (d&&typeof d==="object")?d:UIDEF}
+function uiHasBase(){var d=(DATA.config||{}).ui_default;return !!(d&&typeof d==="object")}
+function uiSaveDefault(){DATA.config=DATA.config||{};
+ DATA.config.ui_default=JSON.parse(JSON.stringify(UI()));persistSoon();
+ toast("Đã lưu bản này thành mặc định của trung tâm. Nút khôi phục từ giờ trả về đúng bản này.",4200);reRender(CUR)}
+function uiFactory(){confirmRun("Bỏ bản mặc định của trung tâm và quay về bản gốc của app?","uiFactoryRun")}
+function uiFactoryRun(){if(DATA.config)delete DATA.config.ui_default;
+ DATA.config.ui=JSON.parse(JSON.stringify(UIDEF));uiApply();persistSoon();buildNav();
+ toast("Đã về bản gốc của app.");reRender(CUR)}
+function uiReset(){confirmRun(uiHasBase()?"Đưa giao diện (tên, logo, màu, menu) về bản mặc định của trung tâm?":"Đưa toàn bộ giao diện (tên, logo, màu, menu) về mặc định?","uiResetRun")}
+function uiResetRun(){DATA.config.ui=JSON.parse(JSON.stringify(uiBase()));uiApply();
  if(typeof buildNav==="function")buildNav();toast("Đã đưa giao diện về mặc định.");reRender(CUR)}
 function uiLogoFile(inp){var f=inp&&inp.files&&inp.files[0];if(!f)return;
  if(f.size>260000){toastErr("Ảnh nặng quá (>250KB) - chọn ảnh nhỏ hơn cho nhẹ bản demo.");return}
@@ -9290,6 +9355,13 @@ function uiMenuToggle(k){var u=UI();u.menu[k]=uiMenuOn(k)?0:1;persistSoon();buil
 function uiGroupLabel(g){var l=UI().mlabel;return (l&&l[g])||g}
 function uiGroupRename(g,v){var u=UI();v=String(v||"").trim();
  if(!v||v===g)delete u.mlabel[g];else u.mlabel[g]=v;
+ persistSoon();buildNav()}
+/* V9.27: đổi tên được TỪNG MỤC menu, không chỉ tên nhóm. Tên gốc giữ nguyên trong PAGES để
+   nâng cấp app không vỡ; tên trung tâm tự đặt nằm riêng ở UI().ilabel. */
+function uiItemDefLabel(k){if(/^chang[A-D]$/.test(k))return "Bản đồ chặng này";var p=PBK[k]||{};return p.t||k}
+function uiItemLabel(k){var l=UI().ilabel;return (l&&l[k])||uiItemDefLabel(k)}
+function uiItemRename(k,v){var u=UI();v=String(v||"").trim();
+ if(!v||v===uiItemDefLabel(k))delete u.ilabel[k];else u.ilabel[k]=v;
  persistSoon();buildNav()}
 
 /* ==================== V9.20 - MODULE GIAO VIỆC (DL23) + TRAO ĐỔI THEO VIỆC (DL24) ====================
@@ -9817,8 +9889,8 @@ var NAVSUB={nhaplead:"tuyensinh",test:"tuyensinh",tuvan:"tuyensinh",thanhtoan:"t
  changA:"chang",changB:"chang",changC:"chang",changD:"chang"};
 function navOwner(k){return NAVSUB[k]||k}
 function navItemMeta(k){
- if(/^chang[A-D]$/.test(k)){var A=ARCBK[k];return {t:"Bản đồ chặng này",ic:"ti-route",arc:A}}
- var p=PBK[k]||{};return {t:p.t||k,ic:p.ic||"ti-point"}}
+ if(/^chang[A-D]$/.test(k)){var A=ARCBK[k];return {t:uiItemLabel(k),ic:"ti-route",arc:A}}
+ var p=PBK[k]||{};return {t:uiItemLabel(k),ic:p.ic||"ti-point"}}
 function navVis(k){var r=RBK[CURROLE],rs=SCOPE();
  var o=navOwner(k);
  if(r.pages.indexOf(o)<0&&r.pages.indexOf(k)<0)return false;

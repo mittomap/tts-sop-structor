@@ -222,4 +222,56 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
    return /\.navlbl\.isarc\{[^}]*background:none/.test(CSS)&&(!a||true)})());
 })();
 
+/* ---- 11. CAI DAT > MENU: checklist go duoc + luu ban mac dinh (V9.27) ---- */
+(function(){
+ setRole("all");window.SETTAB="menu";
+ var pg=RENDER["settings"]();
+ t("man menu la DANH SACH, khong con vien thuoc", /class="mnrow/.test(pg)&&!/class="pill[^"]*"[^>]*><input type="checkbox"/.test(pg));
+ t("moi muc co o tick rieng", (pg.match(/class="mnck"/g)||[]).length>=NAVTREE.reduce(function(a,G){return a+G.items.length},0));
+ t("moi muc co o CHU GO DUOC", (pg.match(/class="mnin"/g)||[]).length>=NAVTREE.reduce(function(a,G){return a+G.items.length},0));
+ t("ten nhom cung go duoc", /class="mnin big"/.test(pg));
+ t("moi dong hien ma trang de biet dang sua cai gi", /class="mncode"/.test(pg));
+ t("co nut luu ban nay thanh mac dinh", /uiSaveDefault\(\)/.test(pg));
+ /* doi ten mot muc roi doc lai menu */
+ var k=NAVTREE[0].items[0], goc=uiItemDefLabel(k);
+ uiItemRename(k,"Ten anh Luan dat");
+ t("doi ten mot muc thi luu lai duoc", uiItemLabel(k)==="Ten anh Luan dat");
+ buildNav();
+ t("ten moi hien ngay tren menu ben trai", (document.getElementById("nav").innerHTML||"").indexOf("Ten anh Luan dat")>=0);
+ t("man cai dat hien nut tra ve ten goc", /mnrs/.test(RENDER["settings"]()));
+ uiItemRename(k,"");
+ t("xoa ten rieng thi ve dung ten goc", uiItemLabel(k)===goc);
+ t("go y het ten goc thi khong luu thua", (UI().ilabel||{})[k]===undefined);
+ /* luu ban mac dinh cua trung tam */
+ uiSet("brand","Ten trung tam cua anh Luan");
+ uiItemRename(k,"Muc doi ten");
+ uiSaveDefault();
+ t("da luu duoc ban mac dinh rieng", uiHasBase()===true);
+ uiSet("brand","doi lung tung");uiItemRename(k,"doi lung tung nua");
+ uiResetRun();
+ t("khoi phuc thi ve dung BAN CUA TRUNG TAM, khong ve ban goc app", UI().brand==="Ten trung tam cua anh Luan");
+ t("khoi phuc giu ca ten muc da dat", uiItemLabel(k)==="Muc doi ten");
+ uiFactoryRun();
+ t("van con duong ve ban goc cua app", UI().brand===UIDEF.brand&&!uiHasBase());
+ t("ve ban goc thi ten muc cung ve goc", uiItemLabel(k)===goc);
+})();
+
+/* ---- 12. DAI CHAO TRANG BAT DAU gon lai (V9.27) ---- */
+(function(){
+ setRole("all");
+ var pg=RENDER["banlam"]();
+ var hero=pg.slice(pg.indexOf('class="bwhero"'),pg.indexOf('class="bwhero"')+2600);
+ t("dai chao chi con MOT dong tom tat", (hero.match(/class="bwsub"/g)||[]).length===1);
+ t("o tim nam o cot phai cung hang", /class="bwr"/.test(hero)&&hero.indexOf('class="bwr"')>hero.indexOf('class="bwl"'));
+ t("dai chao khong con cau thua 'Chon mot nguoi ben duoi'", !/Chọn một người bên dưới/.test(hero));
+ t("dong goi y duoi o tim de trong khi chua go", /id="bwsrchhint"><\/span>/.test(hero));
+ t("hen ke tiep gom thanh mot chip bam duoc", !/Cuộc hẹn kế tiếp/.test(hero));
+ t("chip hen van bam ra dung bo loc hen", !/class="bwap"/.test(hero)||/bwap" onclick="chayQSet\('appt'\)/.test(hero));
+ t("loi chao nho lai cho do chiem cho", (function(){var m=CSS.match(/\.bwg\{font-size:(\d+)px/);return m&&+m[1]<=18})());
+ t("dai chao bot cao", (function(){var m=CSS.match(/\.bwhero\{[^}]*padding:(\d+)px/);return m&&+m[1]<=16})());
+ t("dai chao xep mot hang (canh giua)", /\.bwhero\{[^}]*align-items:center/.test(CSS));
+ t("man hep thi o tim tu xuong dong", /max-width:760px\)\{\.bwr\{flex:1 1 100%\}/.test(CSS));
+ t("dong goi y rong thi an han", /\.bwsrchhint:empty\{display:none\}/.test(CSS));
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");
