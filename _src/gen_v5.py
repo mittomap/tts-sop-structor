@@ -887,7 +887,12 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .fchip.on.red{background:var(--red)}.fchip.on.amber{background:var(--amber)}.fchip.on.green{background:var(--green)}.fchip.on.gray{background:#6B7887}.fchip.on.blue{background:var(--blue)}
 .fchip.clr{color:var(--red);border-color:#E8B4B4;font-weight:700}
 .fbar .lbl{font-size:11.5px;font-weight:700;color:#8A94A0;text-transform:uppercase;letter-spacing:.3px}
-.qsel{border:1px solid var(--line);border-radius:16px;padding:3px 6px;font-family:inherit;font-size:10.5px;font-weight:700;background:#fff;color:#5A6675;cursor:pointer;max-width:170px}
+/* V9.29l (anh Luân: "kéo ra tí em, khuyết chữ quá"): ô trạng thái bị cắt cụt vì max-width 170px -
+   "Đã chuyển đổi - đã thành HV" hiện thành "...đã thành H" và mũi tên đè lên chữ. Nhãn enum phải
+   đọc được NGUYÊN VĂN theo CH1, cắt chữ là đọc sai nghiệp vụ. Nay ô nở theo nhãn dài nhất, chừa
+   chỗ cho mũi tên; màn hình thật hẹp mới cắt lại. */
+.qsel{border:1px solid var(--line);border-radius:16px;padding:3px 22px 3px 9px;font-family:inherit;font-size:10.5px;font-weight:700;background:#fff;color:#5A6675;cursor:pointer;max-width:none;white-space:nowrap}
+@media(max-width:820px){.qsel{max-width:150px;padding-right:18px}}
 .qsel.red{color:#A32D2D;border-color:#F0B4B4;background:var(--redb)}
 .qsel.amber{color:#854F0B;border-color:#F0D08A;background:var(--amberb)}
 .qsel.green{color:#1E6A47;border-color:#A9DFC4;background:var(--greenb)}
