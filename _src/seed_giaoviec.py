@@ -318,7 +318,11 @@ def main():
 
     # them nhan enum cho module giao viec (de app va ban Sheets dung chung mot bo nhan)
     enums = data.setdefault("enums", {})
-    enums["enum_task_type"] = ["assign (Giao việc)", "peer (Phối hợp ngang cấp)", "support (Nhờ hỗ trợ)"]
+    # student_request: yêu cầu do CHÍNH học viên gửi lên từ cổng học viên (báo nghỉ, xin học bù,
+    # đặt WOW, xin đổi lớp, báo đã chuyển khoản...). seed_giaoviec chạy SAU fixdata nên nếu
+    # không khai ở đây thì giá trị fixdata thêm vào sẽ bị ghi đè mất.
+    enums["enum_task_type"] = ["assign (Giao việc)", "peer (Phối hợp ngang cấp)", "support (Nhờ hỗ trợ)",
+                               "student_request (Yêu cầu từ học viên)"]
     enums["enum_task_status"] = ["new (Mới giao)", "accepted (Đã nhận)", "done (Báo xong)",
                                  "confirmed (Hoàn thành)", "declined (Từ chối)", "cancelled (Đã hủy)"]
     enums["enum_task_priority"] = ["low (Thấp)", "normal (Bình thường)", "high (Cao)", "urgent (Gấp)"]

@@ -420,7 +420,10 @@ for s in missing:
 log.append("10. Điểm danh: bù %d bản ghi cho %d buổi đã dạy mà bỏ trống" % (made, len(missing) - len(leave)))
 # 10b. HÀNG CHỜ ĐIỂM DANH phải là buổi VỪA DẠY XONG (GV chưa kịp điểm danh), không phải
 # buổi từ tháng trước. Để trống đúng 2 buổi hoàn thành gần nhất.
-_done = [x for x in R("DL11") if code(x.get("session_status")) == "completed" and dt(x.get("session_date"))]
+# CHỈ để trống buổi vừa dạy xong TRONG 24H - buổi cũ hơn mà trống điểm danh là dữ liệu hỏng
+# (luật 4i tính từ mốc 24h), không phải hàng chờ.
+_done = [x for x in R("DL11") if code(x.get("session_status")) == "completed" and dt(x.get("session_date"))
+         and dt(x.get("session_date")) >= NOW - datetime.timedelta(hours=24)]
 _done.sort(key=lambda x: dt(x.get("session_date")), reverse=True)
 _queue = {str(x.get("session_id")) for x in _done[:2]}
 if _queue:
@@ -540,7 +543,12 @@ for a in ambassadors:
                 "note": "Bạn được giới thiệu đang cân nhắc, chưa đăng ký.",
             })
 
-# (c) tổng hợp về DL09 để đọc nhanh
+# (c) tổng hợp về DL09 để đọc nhanh.
+# XOÁ SẠCH bộ đếm cũ trước: chạy lại fixdata trên file đã xử lý thì danh sách đại sứ đổi,
+# ai không còn là đại sứ vẫn giữ số cũ -> bộ đếm lệch với sổ DL22 mà không ai thấy.
+for _st in R("DL09"):
+    _st["referral_uses"] = ""
+    _st["referral_enrolled"] = ""
 for a in ambassadors:
     evs = [x for x in dl["DL22"] if x["referrer_student_id"] == a["student_id"]]
     a["referral_uses"] = len(evs)
@@ -736,7 +744,10 @@ log.append("14b. Hồ sơ HV: đặt lại first_enrollment_id/date + total_enro
 _et = d.setdefault("enums", {}).setdefault("enum_task_type", [])
 if not any(str(x).startswith("student_request") for x in _et):
     _et.append("student_request (Yêu cầu từ học viên)")
-_ec = d["enums"].setdefault("enum_contact_channel", [])
+# Cổng học viên là một KÊNH phản hồi mới - phải có trong danh mục, nếu không app in ra mã trần.
+_fc = d["enums"].setdefault("enum_feedback_channel", [])
+if not any(str(x).startswith("app ") for x in _fc):
+    _fc.insert(0, "app (Cổng học viên)")
 c14c = 0
 for f in R("DL16"):
     if "session_id" not in f:
@@ -766,6 +777,12 @@ _p2set("installmentGap_days", 30, "ngày", "Khoảng cách giữa hai đợt đ�
 _p2set("installmentRemind_days", 3, "ngày", "Nhắc học viên TRƯỚC hạn đóng đợt bao nhiêu ngày")
 _p2set("installmentLate_days", 5, "ngày", "Quá hạn đợt bao nhiêu ngày thì chuyển sang mức cảnh báo đỏ")
 _p2set("installmentDepositPercent", 40, "%", "Tỷ lệ đóng đợt đầu (cọc) khi chia trả góp")
+# Cổng học viên khuyên "liên hệ trung tâm" mấy lần mà CẢ TRANG không có một số nào - vì
+# centerHotline/centerAddress được app khai trong APPPARAMS nhưng CH2 chưa bao giờ có dòng.
+_p2set("centerHotline", "1900 6789", "chữ", "Hotline hiện trên cổng học viên, tin nhắn xác nhận và phiếu thu")
+_p2set("centerAddress", "12 Nguyễn Văn Bảo, phường 4, quận Gò Vấp, TP.HCM", "chữ", "Địa chỉ hiện trên phiếu thu và cổng học viên")
+_p2set("slaFeedbackClassify_hours", 24, "giờ", "Hạn tiếp nhận và phân loại phản hồi của học viên")
+_p2set("permGrace_hours", 48, "giờ", "Quyền tạm theo việc còn hiệu lực thêm bao lâu sau hạn việc")
 
 GAP = int(n(next((c["value"] for c in CH2 if c.get("name") == "installmentGap_days"), 30)) or 30)
 DEP = float(n(next((c["value"] for c in CH2 if c.get("name") == "installmentDepositPercent"), 40)) or 40) / 100.0

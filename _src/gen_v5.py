@@ -206,6 +206,58 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .hvjc span{font-size:11.5px;color:var(--muted)}
 .hvjt{font-size:11.5px;color:var(--muted);font-weight:700;white-space:nowrap;flex:none;text-align:right;min-width:118px}
 @media(max-width:700px){.hvjt{min-width:0;font-size:10.5px}}
+/* V9.25 - cổng học viên: hộp hỏi hai chiều + lịch đóng theo đợt */
+.hvreq{border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:10px;background:#fff}
+.hvreqh{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--navy);margin-bottom:3px}
+.hvreqh b{flex:1;min-width:0}
+.hvreqm{font-size:11px;color:#8A98A8;margin-bottom:6px}
+.hvreqc{font-size:12.5px;line-height:1.6;color:#4A5A6E;margin-bottom:7px}
+.hvcmt{background:#F5F8FC;border-radius:9px;padding:7px 10px;margin-bottom:5px;font-size:12px;line-height:1.55}
+.hvcmt.me{background:#EAF3FF}
+.hvcmt b{display:block;font-size:11px;color:var(--navy)}
+.hvcmt i{display:block;font-size:10px;color:#9AA7B5;font-style:normal;margin-top:2px}
+.hvstars{display:inline-flex;gap:2px;vertical-align:middle}
+.hvstars i{font-size:18px;color:#D3DBE4;cursor:pointer;transition:.12s}
+.hvstars i:hover{color:#F0B429;transform:scale(1.12)}
+.hvstars i.on{color:#F0B429}
+.hvstars.done i{cursor:default}
+.hvgrph{font-size:9.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:#8FA6C2;padding:11px 12px 4px}
+.hvlopg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:11px;margin-bottom:12px}
+.hvlopi{display:flex;gap:10px;align-items:flex-start;font-size:12.5px}
+.hvlopi i{font-size:19px;color:var(--blue);flex:none;margin-top:1px}
+.hvlopi b{display:block;color:var(--navy);font-size:12px}
+.hvlopi span{color:#4A5A6E;line-height:1.5}
+.hvgvw{display:flex;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:12px}
+.hvgv{display:flex;gap:10px;align-items:flex-start;flex:1 1 260px;font-size:12.5px}
+.hvgva{width:44px;height:44px;border-radius:50%;flex:none;object-fit:cover;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px}
+.hvgv b{display:block;color:var(--navy);font-size:13px}
+.hvgvb{margin-top:3px;color:#4A5A6E;line-height:1.55;font-size:11.5px}
+.hvcert{background:linear-gradient(135deg,#FFFDF5,#FFF7E6);border:1px solid #F0DFAE;border-radius:14px;padding:15px 17px;margin-bottom:16px}
+.hvcerth{display:flex;gap:11px;align-items:center;margin-bottom:11px}
+.hvcerth i{font-size:30px;color:#C8912A}
+.hvcerth b{display:block;font-size:15px;color:#7A5A10}
+.hvcerth span{font-size:12px;color:#96793C}
+.hvcertg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.hvcertg>div{background:#ffffffaa;border-radius:9px;padding:8px 10px}
+.hvcertg span{display:block;font-size:10.5px;color:#96793C;text-transform:uppercase;letter-spacing:.4px}
+.hvcertg b{font-size:14px;color:#7A5A10}
+.hvask{background:#F2F7FF;border:1px solid #CFE0F7;border-left:4px solid var(--blue);border-radius:12px;padding:13px 15px;margin-bottom:16px}
+.hvaskh{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--navy);margin-bottom:5px}
+.hvaskh i{font-size:19px;color:var(--blue)}
+.hvaskb{font-size:12.5px;line-height:1.65;color:#4A5A6E;margin-bottom:10px}
+.hvaskf{display:flex;gap:8px;flex-wrap:wrap}
+.hvschd{border-top:1px solid var(--line);margin-top:4px;padding-top:10px}
+.hvschh{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--navy);padding:0 14px 8px}
+.hvschh i{font-size:17px;color:var(--blue)}.hvschh .mut{font-weight:500;font-size:11px;margin-left:auto}
+.hvschr{display:grid;grid-template-columns:76px 1fr auto 118px;gap:10px;align-items:center;padding:9px 14px;border-top:1px solid #F0F3F7;font-size:12.5px}
+.hvschr.ok{background:#F6FBF7}.hvschr.soon{background:#FFFBF0}.hvschr.due{background:#FFF7ED}.hvschr.late{background:#FFF5F5}
+.hvschn{font-weight:800;color:var(--navy);font-size:11.5px}
+.hvschd2{color:#4A5A6E}.hvscha{text-align:right}
+.hvschs{text-align:right;font-size:11.5px;font-weight:700;color:#64748B}
+.hvschr.ok .hvschs{color:#16A34A}.hvschr.soon .hvschs,.hvschr.due .hvschs{color:#B45309}.hvschr.late .hvschs{color:#DC2626}
+.hvup2.off{opacity:.72}
+.hvup2.off b{text-decoration:line-through;text-decoration-color:#DC262666}
+@media(max-width:560px){.hvschr{grid-template-columns:1fr auto;row-gap:3px}.hvschd2,.hvschs{text-align:left}}
 .hvfee{display:flex;flex-wrap:wrap;gap:0}
 .hvf{flex:1;min-width:130px;padding:8px 14px;border-right:1px solid var(--line)}
 .hvf:last-child{border-right:0}
@@ -315,6 +367,7 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .hvev span{flex:1;min-width:0}
 /* ===== CỔNG HỌC VIÊN (file riêng) ===== */
 .hvapp{display:flex;height:100vh;overflow:hidden}
+.hvmask{display:none}
 .hvside{width:262px;flex-shrink:0;background:var(--sidebar);color:#C4D2E4;display:flex;flex-direction:column;overflow-y:auto}
 .hvbrand{display:flex;align-items:center;gap:11px;padding:16px 15px;border-bottom:1px solid #ffffff14}
 .hvbrand b{font-size:13.5px;color:#fff;display:block}
@@ -337,6 +390,7 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 @media(max-width:900px){
  .hvside{position:fixed;left:0;top:0;bottom:0;z-index:60;transform:translateX(-100%);transition:.2s}
  .hvside.open{transform:none}
+ .hvmask.on{display:block;position:fixed;inset:0;background:#0006;z-index:55}
  .hvmain{padding:14px}
  .hvtop{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--line);padding:10px 12px;margin:-14px -14px 12px}
 }
@@ -7187,7 +7241,10 @@ function renderTrangHV(){
   (nextSes?('<div class="hvsub" style="margin-top:6px"><i class="ti ti-calendar-check" style="margin-right:5px"></i>Buổi học tiếp theo: <b>'+esc(nextSes.session_date)+'</b>'+(nextSes.teacher_id_name?' · GV '+esc(nextSes.teacher_id_name):'')+'</div>'):'')+
   '<div style="margin-top:9px;display:flex;gap:7px;flex-wrap:wrap">'+
   '<button class="pill" style="background:#ffffff22;border-color:#ffffff55;color:#fff" onclick="hvGo(\'s-saptoi\')"><i class="ti ti-calendar-check"></i> Lịch sắp tới</button>'+
-  '<button class="pill" style="background:#ffffff22;border-color:#ffffff55;color:#fff" onclick="hvGo(\'s-gopy\')"><i class="ti ti-message-plus"></i> Góp ý cho trung tâm</button></div></div>'+
+  '<button class="pill" style="background:#ffffff22;border-color:#ffffff55;color:#fff" onclick="hvGo(\'s-gopy\')"><i class="ti ti-message-plus"></i> Góp ý cho trung tâm</button>'+
+  '<button class="pill" style="background:#ffffff22;border-color:#ffffff55;color:#fff" onclick="hvGo(\'s-hoidap\')"><i class="ti ti-messages"></i> Trao đổi với trung tâm</button>'+
+  (hvHotline()?'<a class="pill" style="background:#ffffff22;border-color:#ffffff55;color:#fff" href="tel:'+esc(phoneKey(hvHotline()))+'"><i class="ti ti-phone"></i> '+esc(hvHotline())+'</a>':'')+
+  '</div></div>'+
   '<div class="hvav">'+esc(String(S.full_name||"?").trim().split(" ").pop().slice(0,1).toUpperCase())+'</div></div>';
  /* ---- chọn khóa khi HV học nhiều khóa ---- */
  if(multiC){
@@ -7228,6 +7285,16 @@ function renderTrangHV(){
  h+=cf("ti-users-group","Lớp học",clsOK,lop?(lop.class_name+(clsOK?" · bạn đã xác nhận":" · chờ bạn xác nhận")):"chưa xếp lớp");
  h+=cf("ti-school","Nhập học",obOK,obOK?"đã hoàn tất thủ tục":"đang hoàn tất thủ tục");
  h+='</div>';
+ /* (d) TỰ XÁC NHẬN LỚP - trước đây cổng ghi "chờ bạn xác nhận" mà KHÔNG cho bấm, học viên
+    không có cách nào xác nhận ngoài gọi điện. Đây là lỗi trải nghiệm rõ nhất của cổng. */
+ if(lop&&ob.onboarding_id&&!clsOK&&!isc(ob.class_confirmation_status,"rejected")){
+  h+='<div class="hvask"><div class="hvaskh"><i class="ti ti-circle-check"></i><b>Bạn có nhận lớp '+esc(lop.class_name)+' không?</b></div>'+
+   '<div class="hvaskb">Lịch học: <b>'+esc(lop.class_schedule||"")+'</b>'+(lop.class_start_date?' · khai giảng <b>'+esc(lop.class_start_date)+'</b>':'')+
+   (lop.venue_or_zoom_link?' · '+esc(lop.venue_or_zoom_link):'')+'. Xác nhận sớm để trung tâm giữ chỗ và gửi tài liệu cho bạn.</div>'+
+   '<div class="hvaskf"><button class="btn primary sm" onclick="hvClassConfirm(\''+esc(ob.onboarding_id)+'\',1)"><i class="ti ti-check"></i>Tôi nhận lớp này</button>'+
+   '<button class="btn sm" onclick="hvClassReject(\''+esc(ob.onboarding_id)+'\')"><i class="ti ti-x"></i>Lịch này không hợp, xin đổi</button></div></div>'}
+ if(isc(ob.class_confirmation_status,"rejected"))
+  h+='<div class="notebar" style="margin-bottom:16px;border-left-color:var(--amber)"><i class="ti ti-info-circle"></i>Bạn đã báo lịch lớp này không hợp. Trung tâm đang tìm lớp khác và sẽ liên hệ lại với bạn.</div>';
  /* HỌC PHÍ: tổng - ưu đãi - đã đóng - CÒN LẠI đặt cạnh nhau cho dễ đối chiếu */
  if(tot>0||paysC.length){
   h+='<div class="panel" id="s-hocphi" style="margin-bottom:16px"><div class="ph"><b>Học phí khóa '+esc(lop?lop.class_name:(enr.course_id_name||""))+'</b>'+
@@ -7240,6 +7307,29 @@ function renderTrangHV(){
    '</div>';
   if(tot>0){var pw=Math.min(100,Math.round(paid/tot*100));
    h+='<div class="hvbar"><i style="width:'+pw+'%"></i></div><div class="mut" style="font-size:11px;margin-top:5px">Đã đóng '+pw+'% học phí</div>'}
+  /* (h) LỊCH ĐÓNG THEO ĐỢT - trước đây cổng KHÔNG đọc lịch đóng lần nào, học viên không biết
+     đợt sau đóng ngày nào bao nhiêu tiền, phải gọi hỏi. Nhắc TRƯỚC hạn theo CH2. */
+  var _sch=rows("DL06b").filter(function(x){return String(x.enrollment_id||"")===String(enr.enrollment_id||"")})
+   .sort(function(a,b){return num(a.installment_no)-num(b.installment_no)});
+  if(_sch.length>1){
+   var _rd=paramOf("installmentRemind_days",3),_ld=paramOf("installmentLate_days",5);
+   h+='<div class="hvschd"><div class="hvschh"><i class="ti ti-calendar-dollar"></i><b>Lịch đóng học phí theo đợt</b>'+
+    '<span class="mut">'+_sch.length+' đợt · trung tâm nhắc bạn trước hạn '+_rd+' ngày</span></div>';
+   _sch.forEach(function(x){
+    var dd=pvnd(x.due_date),paidF=isc(x.status,"paid");
+    var days=dd?Math.round((dd.getTime()-hvT0())/864e5):null;
+    var cls=paidF?"ok":(days==null?"":(days<-_ld?"late":(days<0?"due":(days<=_rd?"soon":""))));
+    var say=paidF?("đã đóng"+(x.paid_time?" ngày "+esc(String(x.paid_time).slice(0,10)):"")):
+     (days==null?"":(days<0?("quá hạn "+Math.abs(days)+" ngày"):(days===0?"đến hạn HÔM NAY":("còn "+days+" ngày"))));
+    h+='<div class="hvschr '+cls+'"><span class="hvschn">Đợt '+esc(x.installment_no)+'/'+esc(x.installment_of)+'</span>'+
+     '<span class="hvschd2">'+esc(x.due_date||"")+'</span>'+
+     '<span class="hvscha"><b>'+vnd(num(x.due_amount))+'</b>'+(num(x.paid_amount)>0&&!paidF?'<br><span class="mut" style="font-size:10.5px">đã đóng '+vnd(num(x.paid_amount))+'</span>':'')+'</span>'+
+     '<span class="hvschs">'+esc(say)+'</span></div>'});
+   h+='</div>'}
+  if(rem>0){
+   h+='<div class="hvaskf" style="padding:0 14px 12px">'+
+    '<button class="btn primary sm" onclick="hvPaidNotify(\''+esc(enr.enrollment_id||"")+'\')"><i class="ti ti-upload"></i>Tôi đã chuyển khoản</button>'+
+    '<span class="mut" style="font-size:11px;align-self:center">Báo để kế toán đối soát nhanh - bạn không cần gọi điện.</span></div>'}
   h+='</div>';
   if(paysC.length){h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Ngày đóng</th><th>Số tiền</th><th>Hình thức</th><th>Xác nhận</th></tr></thead><tbody>';
    paysC.slice().sort(function(a,b){return (pvnd(b.payment_time)||0)-(pvnd(a.payment_time)||0)}).forEach(function(pp){var v=pp.verified_by&&String(pp.verified_by).trim();
@@ -7247,6 +7337,46 @@ function renderTrangHV(){
      '<td>'+(v?'<span class="chip green">đã xác nhận</span>':'<span class="chip amber">trung tâm đang xác nhận</span>')+'</td></tr>'});
    h+='</tbody></table></div>'}
   h+='</div>'}
+ /* ---- (j) LỚP CỦA BẠN: lịch cố định, phòng hoặc link Zoom BẤM ĐƯỢC, giảng viên có mặt mũi.
+    Trước đây học viên không biết lớp mình học ở đâu, ai dạy, người đó là ai. ---- */
+ if(lop){
+  var _gvs={};rows("DL11").forEach(function(x){if(x.class_id===lop.class_id&&x.teacher_id)_gvs[x.teacher_id]=1});
+  var _gvl=Object.keys(_gvs).map(function(id){return find("DL01","staff_id",id)}).filter(Boolean);
+  if(!_gvl.length&&gv)_gvl=[gv];
+  h+='<div class="panel" id="s-lop" style="margin-bottom:16px"><div class="ph"><b>Lớp của bạn</b>'+
+   '<span class="chip fill-'+(isc(lop.class_status,"in_progress")?"blue":isc(lop.class_status,"finished")?"gray":"green")+'">'+esc(elabel(lop.class_status)||"")+'</span></div><div class="pbody">';
+  h+='<div class="hvlopg">'+
+   '<div class="hvlopi"><i class="ti ti-calendar-week"></i><div><b>Lịch học cố định</b><span>'+esc(lop.class_schedule||"chưa chốt lịch")+'</span></div></div>'+
+   '<div class="hvlopi"><i class="ti ti-map-pin"></i><div><b>Học ở đâu</b><span>'+(hvLink(lop.venue_or_zoom_link,"Vào phòng học trực tuyến")||esc(lop.venue_or_zoom_link||"chưa xếp phòng"))+'</span></div></div>'+
+   '<div class="hvlopi"><i class="ti ti-flag"></i><div><b>Khai giảng - kết thúc</b><span>'+esc(lop.class_start_date||"?")+' → '+esc(lop.class_end_date||"?")+'</span></div></div>'+
+   '<div class="hvlopi"><i class="ti ti-users"></i><div><b>Sĩ số</b><span>'+esc(num(lop.current_enrollment))+' học viên</span></div></div>'+
+   '</div>';
+  if(_gvl.length){
+   h+='<div class="hvgvw">';
+   _gvl.forEach(function(g){
+    h+='<div class="hvgv">'+(g.avatar_url?'<img class="hvgva" src="'+esc(g.avatar_url)+'" alt="'+esc(g.full_name)+'">':
+      '<span class="hvgva ph">'+esc(String(g.full_name||"?").trim().split(" ").pop().slice(0,1).toUpperCase())+'</span>')+
+     '<div><b>'+esc(g.full_name||"")+'</b><span class="mut">'+esc(elabel(g.role)||"Giảng viên")+'</span>'+
+     (g.bio?'<div class="hvgvb">'+esc(g.bio)+'</div>':'')+'</div></div>'});
+   h+='</div>'}
+  h+='</div></div>'}
+ /* ---- (l) CHỨNG NHẬN HOÀN THÀNH KHÓA - DL18 đã có sẵn attendance_rate và completion_rate
+    ở cả 17 dòng mà cổng chưa dùng lần nào. ---- */
+ if(ce.course_end_id&&isc(ce.student_status,"completed")){
+  var _ar=num(ce.attendance_rate),_cr=num(ce.completion_rate);
+  if(_ar>0&&_ar<=1)_ar=_ar*100; if(_cr>0&&_cr<=1)_cr=_cr*100;
+  h+='<div class="hvcert" id="s-chungnhan"><div class="hvcerth"><i class="ti ti-award"></i><div>'+
+   '<b>Chứng nhận hoàn thành khóa</b><span>'+esc(lop?lop.course_id_name||lop.class_name:"")+'</span></div></div>'+
+   '<div class="hvcertg">'+
+    '<div><span>Học viên</span><b>'+esc(S.full_name)+'</b></div>'+
+    '<div><span>Hoàn thành ngày</span><b>'+esc(String(ce.course_completion_time||"").slice(0,10))+'</b></div>'+
+    (_ar?'<div><span>Chuyên cần</span><b>'+Math.round(_ar)+'%</b></div>':'')+
+    (_cr?'<div><span>Hoàn thành chương trình</span><b>'+Math.round(_cr)+'%</b></div>':'')+
+    (ce.final_test_score?'<div><span>Điểm đầu ra</span><b>'+esc(ce.final_test_score)+'</b></div>':'')+
+    (ce.target_band?'<div><span>Mục tiêu ban đầu</span><b>'+esc(ce.target_band)+'</b></div>':'')+
+   '</div>'+
+   '<div class="hvaskf" style="margin-top:10px"><button class="btn sm" onclick="window.print()"><i class="ti ti-printer"></i>In hoặc lưu PDF</button>'+
+   '<button class="btn sm" onclick="hvAskNew()"><i class="ti ti-mail"></i>Xin bản có dấu của trung tâm</button></div></div>'}
  /* ---- 2. HOÀN HỌC PHÍ (V9.16: BỎ khối "Yêu cầu & phê duyệt" - duyệt/chờ duyệt là quy trình
     NỘI BỘ, học viên không cần biết; ưu đãi đã hiện trong khối Học phí. Chỉ giữ lại điều học viên
     thật sự quan tâm: tiền hoàn đang về, nói theo ngôn ngữ học viên. ---- */
@@ -7314,7 +7444,9 @@ function renderTrangHV(){
     '</div></div></div>'}}
  /* ---- 4. SẮP TỚI ---- */
  var now=hvT0(); /* V9.17: mốc = 0h hôm nay - buổi học/hạn nộp/WOW của CHÍNH HÔM NAY phải hiện */
- var upSes=[];if(lop)rows("DL11").forEach(function(s2){if(s2.class_id!==lop.class_id)return;var d=pvnd(s2.session_date);if(d&&d.getTime()>=now&&!isc(s2.session_status,"cancelled"))upSes.push(s2)});
+ /* (i) Buổi NGHỈ và buổi HỌC BÙ trước đây bị lọc bỏ hẳn -> học viên vẫn tới trung tâm vào
+    buổi đã hủy. Đây là cuộc gọi lễ tân nhận nhiều nhất. Nay GIỮ LẠI và đánh dấu rõ. */
+ var upSes=[];if(lop)rows("DL11").forEach(function(s2){if(s2.class_id!==lop.class_id)return;var d=pvnd(s2.session_date);if(d&&d.getTime()>=now)upSes.push(s2)});
  upSes.sort(function(a,b){return (pvnd(a.session_date)||0)-(pvnd(b.session_date)||0)});
  var upWow=C.wow.filter(function(w){var d=pvnd(w.wow_session_date);return d&&d.getTime()>=now&&isc(w.wow_status,"booked","confirmed")});
  var dueHw=hwC.filter(function(x){var d=pvnd(x.homework_due_date);return d&&d.getTime()>=now&&!hwSubmitted(x)&&!hwMissing(x)});
@@ -7328,8 +7460,17 @@ function renderTrangHV(){
   items.forEach(render)}
  upGrp("ti-calendar-check","#3B82C4","Buổi học",upSes.slice(0,4),function(s2){
   var P=(typeof sesPlan==="function")?sesPlan(s2):null;
-  h+='<div class="hvup2"><b>Buổi '+esc(s2.session_number||"")+' · '+esc(lop?lop.class_name:"")+(P&&P.topic?' — '+esc(P.topic):'')+'</b>'+
-   '<span>'+esc(s2.session_date||"")+(gv?' · GV '+esc(gv.full_name):'')+(lop&&lop.venue_or_zoom_link?' · '+esc(lop.venue_or_zoom_link):'')+'</span>';
+  var _huy=isc(s2.session_status,"cancelled"),_bu=/BU/.test(String(s2.session_id||""))||/học bù/i.test(String(s2.notes||""));
+  /* GV của BUỔI, không phải GV chính của lớp - buổi dạy thay hiện sai tên là học viên tới lớp gặp người khác */
+  var _gvn=s2.teacher_id_name||(gv?gv.full_name:"");
+  h+='<div class="hvup2'+(_huy?" off":"")+'"><b>'+(_huy?'<span class="chip red" style="margin-right:6px">Đã nghỉ</span>':(_bu?'<span class="chip blue" style="margin-right:6px">Học bù</span>':''))+
+   'Buổi '+esc(s2.session_number||"")+' · '+esc(lop?lop.class_name:"")+(P&&P.topic?' — '+esc(P.topic):'')+'</b>'+
+   '<span>'+esc(s2.session_date||"")+(_gvn?' · GV '+esc(_gvn):'')+(lop&&lop.venue_or_zoom_link?' · '+esc(lop.venue_or_zoom_link):'')+'</span>';
+  if(_huy){h+='<div class="hvdan" style="border-left-color:var(--red)"><i class="ti ti-calendar-x"></i><span><b>Buổi này KHÔNG diễn ra.</b> '+
+   esc(String(s2.notes||"Trung tâm sẽ xếp buổi học bù và báo lại lịch cho bạn."))+'</span></div></div>';return}
+  if(!_huy&&!isc(s2.session_status,"completed")){
+   h+='<div class="hvaskf" style="margin-top:7px"><button class="btn sm" onclick="hvAbsentAsk(\''+esc(s2.session_id)+'\')"><i class="ti ti-user-off"></i>Báo nghỉ buổi này</button>'+
+    '<button class="btn sm" onclick="hvMakeupAsk(\''+esc(s2.session_id)+'\')"><i class="ti ti-calendar-plus"></i>Xin học bù</button></div>'}
   if(P&&P.note)h+='<div class="hvdan"><i class="ti ti-notes"></i><span><b>Giáo viên dặn:</b> '+esc(P.note)+'</span></div>';
   if(P&&P.hw)h+='<div class="hvdan hw"><i class="ti ti-book"></i><span><b>Bài sẽ giao sau buổi:</b> '+esc(P.hw.title)+
    (P.hw.est_minutes?' · khoảng '+esc(P.hw.est_minutes)+' phút':'')+(P.hw.description?'<br>'+esc(P.hw.description):'')+'</span></div>';
@@ -7337,7 +7478,11 @@ function renderTrangHV(){
   "Chưa có buổi học nào sắp tới.");
  upGrp("ti-star","#DB2777","Buổi WOW 1-1",upWow.slice(0,4),function(w){
   h+='<div class="hvup2"><b>'+esc(elabel(w.wow_skill)||"")+(w.wow_content_focus?' · '+esc(w.wow_content_focus):'')+'</b><span>'+esc(w.wow_session_date||"")+' · '+esc(elabel(w.wow_status))+(w.staff_name?' · kèm bởi '+esc(w.staff_name):'')+'</span></div>'},
-  wowLeft>0?("Chưa đặt buổi nào - bạn còn "+wowLeft+" lượt, liên hệ trung tâm để đặt."):"Bạn đã dùng hết lượt WOW của khóa.");
+  wowLeft>0?("Chưa đặt buổi nào - bạn còn "+wowLeft+" lượt kèm riêng miễn phí."):"Bạn đã dùng hết lượt WOW của khóa.");
+ /* (c) TỰ ĐẶT BUỔI WOW - danh mục đã mở sẵn đường (wow_booked_by có "student",
+    wow_session_type có "self_booked") mà cổng chưa bao giờ dùng tới. */
+ if(wowLeft>0)h+='<div class="hvaskf" style="margin:2px 0 10px"><button class="btn primary sm" onclick="hvWowAsk()"><i class="ti ti-star"></i>Đặt buổi WOW 1-1</button>'+
+  '<span class="mut" style="font-size:11px;align-self:center">Bạn còn '+wowLeft+' lượt - chọn kỹ năng và khung giờ, trung tâm xác nhận lại.</span></div>';
  upGrp("ti-book","#E08A1E","Bài tập đến hạn",dueHw.slice(0,5),function(x){
   h+='<div class="hvup2"><b>'+esc(x.homework_title||"")+'</b><span>hạn '+esc(x.homework_due_date||"")+' · '+esc(elabel(x.skill)||"")+'</span></div>'},
   "Không có bài nào sắp đến hạn.");
@@ -7430,9 +7575,22 @@ function renderTrangHV(){
    (a.check_in_time?' · vào lúc '+esc(String(a.check_in_time).slice(-5)):'')+
    (a.absence_type?' · '+esc(elabel(a.absence_type)):'')+
    (a.in_class_performance?' · thái độ trong lớp: <b>'+esc(elabel(a.in_class_performance))+'</b>':'')+
-   (a.note?' · '+esc(a.note):'')+'</span></div>'}
+   /* (m) DL12.note là ghi chú NỘI BỘ (vd "đã gọi hỏi thăm, HV hứa đi học lại") - in nguyên
+      văn cho học viên đọc là lộ chuyện chăm sóc nội bộ. Chỉ hiện phần HỌC VIÊN TỰ GHI. */
+   (a.student_reason?' · lý do bạn báo: '+esc(a.student_reason):'')+'</span></div>'}
   if(s2.teacher_note_summary)h+='<div class="hvev"><i class="ti ti-notes"></i><span><b>Nhận xét của giảng viên:</b> '+esc(s2.teacher_note_summary)+'</span></div>';
-  if(s2.materials_link)h+='<div class="hvev"><i class="ti ti-paperclip"></i><span><b>Tài liệu buổi học:</b> '+esc(s2.materials_link)+'</span></div>';
+  /* (g) ĐÁNH GIÁ TỪNG BUỔI bằng hàng sao - ghi vào DL16 kèm session_id để học vụ biết buổi nào
+     bị chấm thấp, thay vì đợi tới phiếu khảo sát cuối khóa mới biết. */
+  if(isc(s2.session_status,"completed")){
+   var _fb=rows("DL16").filter(function(f){return String(f.session_id||"")===String(s2.session_id||"")&&String(f.student_id||"")===sid})[0];
+   var _sc=_fb?num(_fb.feedback_score):0;
+   h+='<div class="hvev"><i class="ti ti-star"></i><span><b>Bạn thấy buổi này thế nào?</b> '+
+    (_sc?('<span class="hvstars done">'+[1,2,3,4,5].map(function(i){return '<i class="ti '+(i<=_sc?"ti-star-filled on":"ti-star")+'"></i>'}).join("")+'</span> <span class="mut">bạn đã chấm '+_sc+'/5</span>')
+        :('<span class="hvstars">'+[1,2,3,4,5].map(function(i){return '<i class="ti ti-star" onclick="hvRateSes(\''+esc(s2.session_id)+'\','+i+')" title="'+i+' sao"></i>'}).join("")+'</span> <span class="mut">bấm sao để chấm</span>'))+
+    '</span></div>'}
+  /* (k) trước đây in link dạng CHỮ THÔ - học viên phải bôi đen copy dán, trên điện thoại gần
+     như không dùng được. Nay là liên kết bấm được. */
+  if(s2.materials_link)h+='<div class="hvev"><i class="ti ti-paperclip"></i><span><b>Tài liệu buổi học:</b> '+hvLink(s2.materials_link,"Mở tài liệu")+'</span></div>';
   hws.forEach(function(x){
    h+='<div class="hvev"><i class="ti ti-book"></i><span><b>Bài tập:</b> '+esc(x.homework_title||"")+' ('+esc(elabel(x.skill)||"")+')'+
     ' · hạn '+esc(x.homework_due_date||"-")+' · '+hwChip(x)+
@@ -7461,7 +7619,8 @@ function renderTrangHV(){
    if(oc)h+='<div class="hvev"><i class="ti ti-chart-line"></i><span><b>Kết quả sau buổi:</b> <span class="chip '+ocls+'">'+esc(elabel(w.wow_outcome))+'</span>'+
     (oc==="needs_more"?' — nên đặt thêm buổi cho kỹ năng này':(oc==="improved"?' — tiến bộ rõ, giữ nhịp luyện':''))+'</span></div>';
    if(w.wow_no_show_reason)h+='<div class="hvev"><i class="ti ti-alert-triangle"></i><span><b>Vắng:</b> '+esc(w.wow_no_show_reason)+'</span></div>';
-   h+='<div class="hvev"><i class="ti ti-star"></i><span><b>Lượt WOW:</b> '+(String(w.quota_deducted||"").toLowerCase()==="yes"?"đã trừ 1 lượt":"chưa trừ lượt")+'</span></div>';
+   /* (m) "đã trừ 1 lượt quota" là ngôn ngữ sổ sách nội bộ - học viên chỉ cần biết còn mấy buổi */
+   h+='<div class="hvev"><i class="ti ti-star"></i><span><b>Buổi kèm riêng:</b> '+(String(w.quota_deducted||"").toLowerCase()==="yes"?"đã tính vào gói của bạn":"chưa tính vào gói")+'</span></div>';
    h+='</div></div>'});
   h+='</div></div>'}
  /* ---- 9. KHẢO SÁT CỦA BẠN: phiếu mới gửi + xem lại phiếu cũ ---- */
@@ -7485,6 +7644,39 @@ function renderTrangHV(){
    '<button class="btn sm" onclick="hvSurveyView(\''+esc(v.survey_id)+'\')"><i class="ti ti-history"></i>Xem lại</button></div>'});
  h+='</div></div>';
  /* ---- 10. GÓP Ý CHO TRUNG TÂM ---- */
+ /* ---- (e) TRAO ĐỔI VỚI TRUNG TÂM - dùng lại đúng bảng DL23/DL24 của module giao việc,
+    không dựng bảng mới. Học viên hỏi, nhân viên trả lời ngay trong việc đó. ---- */
+ var myReq=rows("DL23").filter(function(x){return String(x.assigner_id||"")===sid||
+   (isc(x.task_type,"student_request")&&String(x.related_id||"")===sid)})
+  .sort(function(a,b){return (pvnd(b.created_time)||0)-(pvnd(a.created_time)||0)});
+ var openReq=myReq.filter(function(x){return !isc(x.task_status,"confirmed","cancelled")}).length;
+ h+='<div class="sechd" id="s-hoidap">Trao đổi với trung tâm'+(openReq?' <span class="chip amber" style="text-transform:none">'+openReq+' đang xử lý</span>':'')+'</div>';
+ h+='<div class="panel" style="margin-bottom:16px"><div class="pbody">';
+ h+='<div class="hvaskf" style="margin-bottom:10px"><button class="btn primary sm" onclick="hvAskNew()"><i class="ti ti-message-plus"></i>Gửi câu hỏi / yêu cầu</button>'+
+  '<button class="btn sm" onclick="hvReqSpecial(\'baoluu\')"><i class="ti ti-player-pause"></i>Xin bảo lưu</button>'+
+  '<button class="btn sm" onclick="hvReqSpecial(\'doilop\')"><i class="ti ti-arrows-exchange"></i>Xin đổi lớp</button>'+
+  '<button class="btn sm" onclick="hvReqSpecial(\'rutphi\')"><i class="ti ti-arrow-back-up"></i>Xin rút học phí</button>'+
+  hvCallHTML()+'</div>';
+ if(!myReq.length)h+='<div class="hvempty">Bạn chưa gửi yêu cầu nào. Có gì cần hỏi hay cần trung tâm hỗ trợ, gửi ở đây - trung tâm trả lời ngay trong từng yêu cầu, không trôi như tin nhắn.</div>';
+ myReq.slice(0,6).forEach(function(x){
+  var st=ecode(x.task_status);
+  var cls=(st==="confirmed")?"green":(st==="declined"?"red":"amber");
+  var say=(st==="new")?"trung tâm đã nhận, đang phân công":(st==="accepted")?"đang xử lý":
+   (st==="done")?"trung tâm báo đã xử lý xong":(st==="confirmed")?"đã xong":(st==="declined")?"chưa xử lý được":elabel(x.task_status);
+  var cmts=rows("DL24").filter(function(c){return String(c.task_id||"")===String(x.task_id||"")})
+   .sort(function(a,b){return (pvnd(a.comment_time)||0)-(pvnd(b.comment_time)||0)});
+  h+='<div class="hvreq"><div class="hvreqh"><b>'+esc(x.title||"")+'</b><span class="chip '+cls+'">'+esc(say)+'</span></div>'+
+   '<div class="hvreqm">Gửi '+esc(x.created_time||"")+(x.assignee_id_name?' · người phụ trách: '+esc(x.assignee_id_name):'')+'</div>';
+  if(x.content)h+='<div class="hvreqc">'+esc(String(x.content).split("\n")[0])+'</div>';
+  cmts.slice(-3).forEach(function(c){
+   var me=String(c.staff_id||"")===sid;
+   h+='<div class="hvcmt'+(me?" me":"")+'"><b>'+esc(me?"Bạn":(c.staff_id_name||"Trung tâm"))+'</b><span>'+esc(c.content||"")+'</span><i>'+esc(c.comment_time||"")+'</i></div>'});
+  if(x.done_note&&(st==="done"||st==="confirmed"))
+   h+='<div class="hvcmt"><b>Kết quả</b><span>'+esc(x.done_note)+'</span></div>';
+  if(!isc(x.task_status,"confirmed","cancelled"))
+   h+='<div class="hvaskf" style="margin-top:7px"><button class="btn sm" onclick="hvAskSay(\''+esc(x.task_id)+'\')"><i class="ti ti-message"></i>Nhắn thêm</button></div>';
+  h+='</div>'});
+ h+='</div></div>';
  h+='<div class="sechd" id="s-gopy">Góp ý cho trung tâm</div>';
  h+='<div class="panel" style="margin-bottom:16px"><div class="ph"><b>Bạn muốn góp ý điều gì?</b>'+
   '<button class="btn primary sm" onclick="hvFeedbackForm()"><i class="ti ti-message-plus"></i>Gửi góp ý</button></div><div class="pbody">';
@@ -7499,8 +7691,12 @@ function renderTrangHV(){
    '<span>'+esc(f.feedback_time||"")+' · '+esc(String(f.feedback_content||"").slice(0,110))+'</span></div>'});
  if(C.kn.length){
   h+='<div class="hvgt"><span class="hvui" style="background:#E24B4A18;color:#E24B4A"><i class="ti ti-alert-triangle"></i></span><b>Phiếu xử lý dành cho bạn</b><span class="chip">'+C.kn.length+'</span></div>';
+  /* (m) Nhãn nội bộ "escalated (Leo thang lên QL cao)" là quy trình BÊN TRONG trung tâm -
+     học viên đọc thấy chỉ thêm lo. Học viên chỉ cần biết: đã nhận / đang xử lý / đã xong. */
+  function knSayHV(k){var c=ecode(k.complaint_status);
+   return (c==="new")?"trung tâm đã nhận":(c==="resolved"||c==="closed")?"đã xử lý xong":"đang xử lý"}
   C.kn.slice(0,6).forEach(function(k){h+='<div class="hvup2"><b>'+esc(elabel(k.complaint_type)||"")+
-   ' <span class="chip '+knStatusCls(ecode(k.complaint_status))+'">'+esc(elabel(k.complaint_status))+'</span></b>'+
+   ' <span class="chip '+knStatusCls(ecode(k.complaint_status))+'">'+esc(knSayHV(k))+'</span></b>'+
    '<span>'+esc(k.complaint_time||"")+' · '+esc(String(k.complaint_content||"").slice(0,110))+
    (k.resolution_note?'<br>Trung tâm phản hồi: '+esc(k.resolution_note):'')+'</span></div>'})}
  h+='</div></div>';
@@ -7547,6 +7743,300 @@ function hvFeedbackForm(){
  h+='<div class="fld full"><label>Bạn muốn nói gì? <i>*</i></label><textarea id="hf_content" rows="4" placeholder="Viết thoải mái - khen, chê hay đề xuất đều được."></textarea></div>';
  h+='<div class="dact"><button class="btn primary" onclick="hvFeedbackSave()"><i class="ti ti-send"></i>Gửi cho trung tâm</button></div></div>';
  openDrawer("Gửi góp ý",h)}
+/* ==================== V9.25 - CỔNG HỌC VIÊN: KÊNH HAI CHIỀU ====================
+   Cổng học viên là chỗ học viên GIAO TIẾP với trung tâm, không phải bảng thông báo một chiều.
+   Mọi yêu cầu học viên gửi lên đều đi vào ĐÚNG bảng nghiệp vụ đã có (DL23 giao việc, DL12 điểm
+   danh, DL14 WOW, DL08 xếp lớp) - màn xử lý phía nhân viên KHÔNG phải dựng mới.
+   LUẬT: hàm nào ghi vào DATA thì tự gọi persistSoon(); nút Lưu chặn bấm hai lần bằng actGuard. */
+
+/* Yêu cầu của học viên -> một dòng DL23 để nhân viên nhận và xử lý như mọi việc khác. */
+function hvReq(tieude,noidung,kind,rel){
+ var S=hvMe();if(!S)return null;
+ var dep=(kind==="tien")?"Kế toán":"Học vụ";
+ var who=rows("DL01").filter(function(x){return String(x.department||"")===dep&&isc(x.status,"active")})[0]
+   ||rows("DL01").filter(function(x){return isc(x.status,"active")})[0]||{};
+ var t={task_id:"TASK-"+(function(v){var z=String(v);while(z.length<4)z="0"+z;return z})(rows("DL23").length+1),
+  created_time:nowStr(),assigner_id:S.student_id,assigner_id_name:S.full_name,
+  assignee_id:who.staff_id||"",assignee_id_name:who.full_name||"",
+  task_type:eFull("enum_task_type","student_request"),
+  priority:eFull("enum_task_priority",kind==="tien"?"high":"normal"),
+  required:"Có",title:tieude,content:noidung,
+  related_type:"student",related_id:S.student_id,related_name:S.full_name,
+  perm_level:"view (Chỉ xem)",perm_until:"",perm_revoked_at:"",
+  perm_note:"Quyền tạm mở theo yêu cầu của chính học viên.",
+  due_time:(function(){var d=new Date();d.setDate(d.getDate()+1);
+   function z(n){return n<10?"0"+n:n}return z(d.getDate())+"/"+z(d.getMonth()+1)+"/"+d.getFullYear()+" "+z(d.getHours())+":"+z(d.getMinutes())})(),
+  task_status:eFull("enum_task_status","new"),
+  accepted_time:"",done_time:"",done_note:"",confirm_time:"",confirm_note:"",decline_reason:"",
+  remind_count:"",remind_last:""};
+ if(rel){t.related_type=rel[0];t.related_id=rel[1];t.related_name=rel[2]}
+ DL.DL23=DL.DL23||[];DL.DL23.unshift(t);
+ if(SVR)try{google.script.run.apiSave("DL23",t)}catch(e){}
+ persistSoon();return t}
+/* Hồ sơ học viên đang mở cổng. window.HVID do bootHV đặt; khi cổng được NHÚNG trong hồ sơ 360
+   của app nhân viên thì lấy theo JPID. */
+/* (k) mọi liên kết tài liệu phải BẤM ĐƯỢC, không in chữ thô bắt học viên bôi đen copy. */
+function hvLink(u,lb){u=String(u||"").trim();if(!u)return "";
+ if(!/^https?:\/\//i.test(u))return esc(u);
+ return '<a class="lnk" href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(lb||u)+' <i class="ti ti-external-link" style="font-size:13px"></i></a>'}
+/* (p) CẢ TRANG trước đây không có một số điện thoại nào dù khuyên "liên hệ trung tâm" 3-4 lần.
+   Số lấy từ CH2 (centerHotline) - không cắm cứng. */
+function hvHotline(){return String(paramStr("centerHotline","")||"").trim()}
+function hvCallHTML(lb){var p=hvHotline();
+ if(!p)return "";
+ return '<a class="btn sm" href="tel:'+esc(phoneKey(p))+'"><i class="ti ti-phone"></i>'+esc(lb||("Gọi trung tâm "+p))+'</a>'}
+function hvMe(){var sid=window.HVID||window.JPID||"";
+ var S=(sid&&find("DL09","student_id",sid))||null;
+ if(!S){var a=rows("DL09");S=a[0]||null}
+ return S}
+
+/* ---- (d) TỰ XÁC NHẬN LỚP ---- */
+function hvClassConfirm(obid){
+ if(!actGuard("hvClassConfirm:"+obid))return;
+ var o=find("DL08","onboarding_id",obid);if(!o){toast("Không thấy hồ sơ xếp lớp.");return}
+ o.class_confirmation_status=eFull("enum_class_confirmation_status","confirmed");
+ o.confirmation_time=nowStr();
+ if(SVR)try{google.script.run.apiUpdate("DL08",obid,{class_confirmation_status:o.class_confirmation_status,confirmation_time:o.confirmation_time})}catch(e){}
+ persistSoon();
+ toast("Đã ghi nhận: bạn nhận lớp này. Trung tâm sẽ gửi tài liệu và nhắc lịch buổi đầu.",4200);
+ hvReRender()}
+function hvClassReject(obid){
+ var h='<div class="dcard"><h4><i class="ti ti-calendar-x"></i>Lịch lớp này không hợp</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Bạn cho trung tâm biết lý do và khung giờ bạn học được, trung tâm sẽ tìm lớp khác rồi báo lại.</div>';
+ h+='<div class="fld full"><label>Vì sao lịch này chưa hợp <i>*</i></label><textarea id="hvrj_ly" rows="3" placeholder="vd: em đi làm tới 19h nên không kịp lớp 18h"></textarea></div>';
+ h+='<div class="fld full"><label>Khung giờ bạn học được</label><input id="hvrj_gio" placeholder="vd: tối T3-T5 sau 19h30, hoặc cuối tuần"></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="hvClassRejectSave(\''+esc(obid)+'\')"><i class="ti ti-send"></i>Gửi cho trung tâm</button>'+
+  '<button class="btn" onclick="closeModal()">Để lúc khác</button></div></div>';
+ openDrawer("Xin đổi lớp",h)}
+function hvClassRejectSave(obid){
+ if(!actGuard("hvClassReject:"+obid))return;
+ var ly=(fldV("hvrj_ly")||"").trim();if(!ly){toast("Cho trung tâm biết lý do giúp bạn nhé.");return}
+ var gio=(fldV("hvrj_gio")||"").trim();
+ var o=find("DL08","onboarding_id",obid);if(!o){toast("Không thấy hồ sơ xếp lớp.");return}
+ o.class_confirmation_status=eFull("enum_class_confirmation_status","rejected");
+ o.confirmation_time=nowStr();
+ o.placement_note=(o.placement_note?o.placement_note+" · ":"")+nowStr()+" HV xin đổi lớp: "+ly+(gio?" · học được: "+gio:"");
+ if(SVR)try{google.script.run.apiUpdate("DL08",obid,{class_confirmation_status:o.class_confirmation_status,confirmation_time:o.confirmation_time,placement_note:o.placement_note})}catch(e){}
+ hvReq("Học viên xin đổi lớp","Lý do: "+ly+(gio?"\nKhung giờ học được: "+gio:"")+"\nHồ sơ xếp lớp: "+obid,"hocvu");
+ persistSoon();closeModal();
+ toast("Đã gửi. Trung tâm sẽ tìm lớp phù hợp và liên hệ lại với bạn.",4200);hvReRender()}
+
+/* ---- (a) BÁO NGHỈ TRƯỚC MỘT BUỔI ---- */
+function hvAbsentAsk(sid2){
+ var s2=find("DL11","session_id",sid2)||{};
+ var h='<div class="dcard"><h4><i class="ti ti-user-off"></i>Báo nghỉ buổi '+esc(s2.session_number||"")+'</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Buổi <b>'+esc(s2.session_date||"")+'</b>. Báo trước giúp giảng viên chuẩn bị phần bù cho bạn - và buổi này được tính là <b>vắng CÓ PHÉP</b>.</div>';
+ h+='<div class="fld full"><label>Lý do <i>*</i></label><textarea id="hvab_ly" rows="3" placeholder="vd: em bị ốm, em có việc gia đình..."></textarea></div>';
+ h+='<div class="fld full" style="flex-direction:row;gap:8px;align-items:center"><input type="checkbox" id="hvab_bu" style="width:auto"><label for="hvab_bu" style="margin:0">Cho tôi xin buổi học bù</label></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="hvAbsentSave(\''+esc(sid2)+'\')"><i class="ti ti-send"></i>Gửi báo nghỉ</button>'+
+  '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
+ openDrawer("Báo nghỉ",h)}
+function hvAbsentSave(sid2){
+ if(!actGuard("hvAbsent:"+sid2))return;
+ var ly=(fldV("hvab_ly")||"").trim();if(!ly){toast("Cho trung tâm biết lý do giúp bạn nhé.");return}
+ var xinbu=!!(document.getElementById("hvab_bu")||{}).checked;
+ var S=hvMe();if(!S){toast("Chưa xác định được hồ sơ của bạn.");return}
+ var s2=find("DL11","session_id",sid2)||{};
+ /* ghi thẳng vào sổ điểm danh dạng vắng CÓ PHÉP - đúng bảng nhân viên vẫn dùng */
+ var a=rows("DL12").filter(function(x){return String(x.session_id||"")===sid2&&String(x.student_id||"")===S.student_id})[0];
+ if(!a){a={attendance_id:"AT-"+seqNo("DL12","attendance_id",4),session_id:sid2,student_id:S.student_id,
+   student_name:S.full_name,check_in_time:"",in_class_performance:"",note:"",next_action:""};
+  DL.DL12=DL.DL12||[];DL.DL12.unshift(a)}
+ a.attendance_status=eFull("enum_attendance_status","no_show");
+ a.absence_type=eFull("enum_absence_type","excused");
+ a.student_reported_at=nowStr();a.student_reason=ly;
+ hvReq("Học viên báo nghỉ buổi "+(s2.session_number||"")+(xinbu?" và xin học bù":""),
+  "Buổi: "+(s2.session_date||"")+" ("+sid2+")\nLý do: "+ly+(xinbu?"\nHọc viên XIN HỌC BÙ buổi này.":""),
+  "hocvu",["session",sid2,"Buổi "+(s2.session_number||"")]);
+ persistSoon();closeModal();
+ toast("Đã báo nghỉ. Buổi này tính là vắng có phép"+(xinbu?", trung tâm sẽ xếp buổi bù cho bạn.":"."),4600);
+ hvReRender()}
+
+/* ---- (b) XIN HỌC BÙ ---- */
+function hvMakeupAsk(sid2){
+ var s2=find("DL11","session_id",sid2)||{};
+ var h='<div class="dcard"><h4><i class="ti ti-calendar-plus"></i>Xin học bù</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Buổi <b>'+esc(s2.session_date||"")+'</b>. Cho trung tâm biết khung giờ bạn học bù được, học vụ sẽ xếp và báo lại.</div>';
+ h+='<div class="fld full"><label>Khung giờ bạn học bù được <i>*</i></label><input id="hvmk_gio" placeholder="vd: tối T4 hoặc sáng CN"></div>';
+ h+='<div class="fld full"><label>Ghi chú thêm</label><textarea id="hvmk_note" rows="2" placeholder="vd: em muốn học bù phần Writing của buổi này"></textarea></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="hvMakeupSave(\''+esc(sid2)+'\')"><i class="ti ti-send"></i>Gửi yêu cầu</button>'+
+  '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
+ openDrawer("Xin học bù",h)}
+function hvMakeupSave(sid2){
+ if(!actGuard("hvMakeup:"+sid2))return;
+ var gio=(fldV("hvmk_gio")||"").trim();if(!gio){toast("Cho trung tâm biết khung giờ bạn học được nhé.");return}
+ var s2=find("DL11","session_id",sid2)||{};
+ hvReq("Học viên xin học bù buổi "+(s2.session_number||""),
+  "Buổi gốc: "+(s2.session_date||"")+" ("+sid2+")\nKhung giờ học bù được: "+gio+
+  ((fldV("hvmk_note")||"").trim()?"\nGhi chú: "+(fldV("hvmk_note")||"").trim():""),
+  "hocvu",["session",sid2,"Buổi "+(s2.session_number||"")]);
+ closeModal();toast("Đã gửi yêu cầu học bù. Học vụ sẽ xếp lịch và báo lại cho bạn.",4200);hvReRender()}
+
+/* ---- (c) TỰ ĐẶT BUỔI WOW 1-1 ---- */
+function hvWowAsk(){
+ var h='<div class="dcard"><h4><i class="ti ti-star"></i>Đặt buổi WOW 1-1</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Buổi kèm riêng đã nằm trong gói học của bạn. Chọn kỹ năng yếu nhất và khung giờ - trung tâm xác nhận lại giảng viên và giờ chính thức.</div>';
+ h+='<div class="fld"><label>Kỹ năng muốn kèm <i>*</i></label><select id="hvw_skill">'+
+  ["Speaking (Nói)","Writing (Viết)","Listening (Nghe)","Reading (Đọc)"].map(function(x){return '<option>'+esc(x)+'</option>'}).join("")+'</select></div>';
+ h+='<div class="fld"><label>Ngày mong muốn <i>*</i></label><input id="hvw_date" type="date"></div>';
+ h+='<div class="fld full"><label>Khung giờ mong muốn</label><input id="hvw_gio" placeholder="vd: sau 19h các ngày trong tuần"></div>';
+ h+='<div class="fld full"><label>Bạn muốn tập trung vào phần nào</label><textarea id="hvw_focus" rows="2" placeholder="vd: em hay bí ý ở Speaking part 2"></textarea></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="hvWowSave()"><i class="ti ti-send"></i>Gửi yêu cầu đặt buổi</button>'+
+  '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
+ openDrawer("Đặt buổi WOW 1-1",h)}
+function hvWowSave(){
+ if(!actGuard("hvWow"))return;
+ var S=hvMe();if(!S){toast("Chưa xác định được hồ sơ của bạn.");return}
+ var d=(fldV("hvw_date")||"").trim();if(!d){toast("Chọn ngày bạn muốn học.");return}
+ var when=fromISOdt(d);
+ if(pvnd(when)&&pvnd(when).getTime()<hvT0()){toast("Ngày bạn chọn đã qua - chọn ngày khác nhé.");return}
+ var left=num(S.wow_quota_remaining);
+ if(left<=0){toast("Bạn đã dùng hết lượt WOW của khóa. Liên hệ trung tâm nếu cần thêm.",4200);return}
+ var w={wow_id:"WOW-"+seqNo("DL14","wow_id"),student_id:S.student_id,student_name:S.full_name,
+  booking_date:nowStr(),wow_session_date:when,
+  wow_session_type:eFull("enum_wow_session_type","self_booked"),
+  wow_booked_by:eFull("enum_wow_booked_by","student"),
+  wow_skill:fldV("hvw_skill"),wow_content_focus:(fldV("hvw_focus")||"").trim(),
+  staff_id:"",staff_name:"",wow_status:eFull("enum_wow_status","booked"),
+  wow_content_note:"",wow_outcome:"",wow_no_show_reason:"",
+  quota_deducted:"no",   /* CHƯA dạy thì CHƯA trừ quota - trừ lúc đặt là trừ oan nếu buổi bị hủy */
+  sla_content_note_24h:"",notes:"Học viên tự đặt qua cổng"+((fldV("hvw_gio")||"").trim()?" · khung giờ mong muốn: "+(fldV("hvw_gio")||"").trim():""),
+  next_action:"Xác nhận giảng viên và giờ chính thức với học viên."};
+ DL.DL14=DL.DL14||[];DL.DL14.unshift(w);
+ if(SVR)try{google.script.run.apiSave("DL14",w)}catch(e){}
+ hvReq("Học viên tự đặt buổi WOW 1-1",
+  "Kỹ năng: "+w.wow_skill+"\nNgày mong muốn: "+when+((fldV("hvw_gio")||"").trim()?"\nKhung giờ: "+(fldV("hvw_gio")||"").trim():"")+
+  (w.wow_content_focus?"\nMuốn tập trung: "+w.wow_content_focus:"")+"\nMã buổi: "+w.wow_id,
+  "hocvu",["wow",w.wow_id,"Buổi WOW "+w.wow_skill]);
+ persistSoon();closeModal();
+ toast("Đã gửi yêu cầu đặt buổi WOW. Trung tâm sẽ xác nhận giảng viên và giờ chính thức.",4600);
+ hvReRender()}
+
+/* ---- (h) BÁO ĐÃ CHUYỂN KHOẢN ---- */
+function hvPaidNotify(eid){
+ var e=find("DL06","enrollment_id",eid)||{};
+ var sch=rows("DL06b").filter(function(x){return String(x.enrollment_id||"")===eid&&!isc(x.status,"paid")})
+  .sort(function(a,b){return num(a.installment_no)-num(b.installment_no)})[0];
+ var h='<div class="dcard"><h4><i class="ti ti-upload"></i>Báo đã chuyển khoản</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Báo ở đây để kế toán đối soát nhanh, bạn không cần gọi điện. Khi đối soát xong, mục Học phí của bạn sẽ tự cập nhật.'+
+  (sch?' Đợt đang chờ: <b>đợt '+esc(sch.installment_no)+'</b> hạn <b>'+esc(sch.due_date)+'</b>, số tiền <b>'+vnd(num(sch.remaining_amount)||num(sch.due_amount))+'</b>.':'')+'</div>';
+ h+='<div class="fld"><label>Số tiền đã chuyển <i>*</i></label><input id="hvpn_amt" inputmode="numeric" value="'+esc(sch?String(num(sch.remaining_amount)||num(sch.due_amount)):"")+'"></div>';
+ h+='<div class="fld"><label>Ngày chuyển</label><input id="hvpn_date" type="date"></div>';
+ h+='<div class="fld full"><label>Nội dung chuyển khoản / mã giao dịch</label><input id="hvpn_ref" placeholder="vd: HV030 dong hoc phi dot 2"></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="hvPaidNotifySave(\''+esc(eid)+'\')"><i class="ti ti-send"></i>Gửi cho kế toán</button>'+
+  '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
+ openDrawer("Tôi đã chuyển khoản",h)}
+function hvPaidNotifySave(eid){
+ if(!actGuard("hvPaidNotify:"+eid))return;
+ var amt=num(fldV("hvpn_amt"));if(amt<=0){toast("Nhập số tiền bạn đã chuyển.");return}
+ var e=find("DL06","enrollment_id",eid)||{};
+ var rem=num(e.remaining_amount);
+ if(rem>0&&amt>rem+1){toast("Số tiền lớn hơn phần còn phải đóng ("+vnd(rem)+") - kiểm lại giúp bạn nhé.",4600);return}
+ /* KHÔNG tự ghi phiếu thu: tiền chỉ vào sổ khi kế toán đối soát. Đây là BÁO, không phải THU. */
+ hvReq("Học viên báo đã chuyển khoản "+vnd(amt),
+  "Đăng ký: "+eid+"\nSố tiền báo: "+vnd(amt)+
+  ((fldV("hvpn_date")||"").trim()?"\nNgày chuyển: "+fromISOdt(fldV("hvpn_date")).split(" ")[0]:"")+
+  ((fldV("hvpn_ref")||"").trim()?"\nNội dung/mã GD: "+(fldV("hvpn_ref")||"").trim():"")+
+  "\nKế toán đối soát rồi ghi phiếu thu - cổng KHÔNG tự ghi tiền vào sổ.",
+  "tien",["enrollment",eid,"Đăng ký "+eid]);
+ closeModal();
+ toast("Đã báo kế toán. Sau khi đối soát, mục Học phí của bạn sẽ tự cập nhật.",4600);hvReRender()}
+
+/* ---- (e) HỎI ĐÁP HAI CHIỀU ---- */
+function hvAskNew(){
+ var h='<div class="dcard"><h4><i class="ti ti-message-plus"></i>Gửi câu hỏi hoặc yêu cầu</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Gửi ở đây thì yêu cầu của bạn vào đúng người phụ trách và có người theo tới lúc xong - không trôi mất như tin nhắn.</div>';
+ h+='<div class="fld full"><label>Bạn cần gì <i>*</i></label><input id="hvq_t" placeholder="vd: em muốn xin giấy xác nhận đang học"></div>';
+ h+='<div class="fld full"><label>Nói rõ hơn</label><textarea id="hvq_c" rows="4" placeholder="Càng rõ thì trung tâm xử lý càng nhanh"></textarea></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="hvAskSave()"><i class="ti ti-send"></i>Gửi cho trung tâm</button>'+
+  '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
+ openDrawer("Trao đổi với trung tâm",h)}
+function hvAskSave(){
+ if(!actGuard("hvAsk"))return;
+ var ti=(fldV("hvq_t")||"").trim();if(!ti){toast("Cho trung tâm biết bạn cần gì nhé.");return}
+ hvReq(ti,(fldV("hvq_c")||"").trim()||ti,"hocvu");
+ closeModal();toast("Đã gửi. Trung tâm sẽ trả lời ngay trong yêu cầu này.",4200);hvReRender()}
+function hvAskSay(tid){
+ var h='<div class="dcard"><h4><i class="ti ti-message"></i>Nhắn thêm</h4>';
+ h+='<div class="fld full"><label>Nội dung <i>*</i></label><textarea id="hvsay_c" rows="3"></textarea></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="hvAskSaySave(\''+esc(tid)+'\')"><i class="ti ti-send"></i>Gửi</button>'+
+  '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
+ openDrawer("Nhắn thêm",h)}
+function hvAskSaySave(tid){
+ if(!actGuard("hvSay:"+tid))return;
+ var c=(fldV("hvsay_c")||"").trim();if(!c){toast("Nhập nội dung nhé.");return}
+ var S=hvMe();if(!S)return;
+ DL.DL24=DL.DL24||[];
+ DL.DL24.push({comment_id:"TCM-"+seqNo("DL24","comment_id",4),task_id:tid,
+  staff_id:S.student_id,staff_id_name:S.full_name,comment_time:nowStr(),content:c});
+ if(SVR)try{google.script.run.apiSave("DL24",DL.DL24[DL.DL24.length-1])}catch(e){}
+ persistSoon();closeModal();toast("Đã gửi tin nhắn.");hvReRender()}
+
+/* ---- (f) XIN BẢO LƯU / ĐỔI LỚP / RÚT HỌC PHÍ ---- */
+var HVSPEC={baoluu:["Xin bảo lưu khóa học","ti-player-pause",
+  "Bảo lưu là tạm dừng việc học và giữ lại phần học phí chưa dùng. Cho trung tâm biết lý do và dự kiến bao lâu bạn quay lại.",
+  "Lý do xin bảo lưu","Dự kiến quay lại học khi nào","hocvu"],
+ doilop:["Xin đổi lớp","ti-arrows-exchange",
+  "Đổi sang lớp khác cùng khóa. Cho trung tâm biết khung giờ bạn học được để học vụ tìm lớp phù hợp.",
+  "Vì sao bạn muốn đổi lớp","Khung giờ bạn học được","hocvu"],
+ rutphi:["Xin rút học phí","ti-arrow-back-up",
+  "Số tiền hoàn được tính theo chính sách hoàn phí của trung tâm dựa trên số buổi đã học. Kế toán sẽ đối chiếu và báo lại con số chính xác cho bạn.",
+  "Lý do xin rút học phí","Số tài khoản nhận hoàn (nếu có)","tien"]};
+function hvReqSpecial(kind){
+ var K=HVSPEC[kind];if(!K)return;
+ var h='<div class="dcard"><h4><i class="ti '+K[1]+'"></i>'+esc(K[0])+'</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>'+esc(K[2])+'</div>';
+ h+='<div class="fld full"><label>'+esc(K[3])+' <i>*</i></label><textarea id="hvsp_a" rows="3"></textarea></div>';
+ h+='<div class="fld full"><label>'+esc(K[4])+'</label><input id="hvsp_b"></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="hvReqSpecialSave(\''+esc(kind)+'\')"><i class="ti ti-send"></i>Gửi yêu cầu</button>'+
+  '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
+ openDrawer(K[0],h)}
+function hvReqSpecialSave(kind){
+ if(!actGuard("hvSpec:"+kind))return;
+ var K=HVSPEC[kind];if(!K)return;
+ var a=(fldV("hvsp_a")||"").trim();if(!a){toast("Cho trung tâm biết lý do giúp bạn nhé.");return}
+ var b=(fldV("hvsp_b")||"").trim();
+ hvReq(K[0],K[3]+": "+a+(b?("\n"+K[4]+": "+b):""),K[5]);
+ closeModal();toast("Đã gửi yêu cầu. Trung tâm sẽ liên hệ lại với bạn.",4200);hvReRender()}
+
+/* ---- (g) ĐÁNH GIÁ TỪNG BUỔI BẰNG HÀNG SAO ---- */
+function hvRateSes(sid2,sc){
+ if(!actGuard("hvRate:"+sid2))return;
+ var S=hvMe();if(!S)return;
+ var s2=find("DL11","session_id",sid2)||{};
+ var f=rows("DL16").filter(function(x){return String(x.session_id||"")===sid2&&String(x.student_id||"")===S.student_id})[0];
+ var low=sc<=paramOf("thresholdSurveyFollowup_score",3);
+ if(!f){
+  f={feedback_id:"FB-"+seqNo("DL16","feedback_id"),student_id:S.student_id,student_id_name:S.full_name,
+   class_id:s2.class_id||"",class_id_name:s2.class_id_name||"",session_id:sid2,
+   feedback_time:nowStr(),feedback_channel:eFull("enum_feedback_channel","app"),
+   feedback_type:eFull("enum_feedback_type",low?"negative":"positive"),
+   feedback_category:eFull("enum_feedback_category","teacher_quality"),
+   feedback_score:sc,feedback_content:"Học viên chấm "+sc+"/5 cho buổi "+(s2.session_number||"")+" ngày "+(s2.session_date||""),
+   feedback_status:eFull("enum_feedback_status","new"),classified_at:"",classified_by:"",
+   feedback_action_note:"",action_taken_at:"",is_testimonial:"",related_complaint_id:"",notes:"",next_action:""};
+  DL.DL16=DL.DL16||[];DL.DL16.unshift(f);
+  if(SVR)try{google.script.run.apiSave("DL16",f)}catch(e){}}
+ else{f.feedback_score=sc;f.feedback_time=nowStr();
+  f.feedback_type=eFull("enum_feedback_type",low?"negative":"positive")}
+ /* chấm thấp thì mở luôn ô nói rõ - và tạo yêu cầu để học vụ gọi lại, không đợi cuối khóa */
+ if(low){
+  var h='<div class="dcard"><h4><i class="ti ti-mood-sad"></i>Buổi này chưa ổn ở đâu?</h4>';
+  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Bạn chấm '+sc+'/5. Nói rõ giúp trung tâm sửa - học vụ sẽ liên hệ lại với bạn.</div>';
+  h+='<div class="fld full"><label>Điều bạn chưa hài lòng</label><textarea id="hvrt_c" rows="3"></textarea></div>';
+  h+='<div class="dact"><button class="btn primary" onclick="hvRateNote(\''+esc(f.feedback_id)+'\')"><i class="ti ti-send"></i>Gửi</button>'+
+   '<button class="btn" onclick="closeModal()">Chỉ chấm sao thôi</button></div></div>';
+  openDrawer("Góp ý buổi học",h)}
+ else toast("Cảm ơn bạn đã chấm "+sc+"/5 cho buổi này.");
+ persistSoon();hvReRender()}
+function hvRateNote(fid){
+ var f=find("DL16","feedback_id",fid);if(!f)return;
+ var c=(fldV("hvrt_c")||"").trim();
+ if(c){f.feedback_content=f.feedback_content+" · "+c;
+  hvReq("Học viên chấm thấp một buổi học","Buổi: "+(f.session_id||"")+"\nĐiểm: "+num(f.feedback_score)+"/5\nHọc viên nói: "+c,
+   "hocvu",["session",f.session_id||"","Buổi học"])}
+ persistSoon();closeModal();toast("Cảm ơn bạn, trung tâm sẽ xem lại buổi này.",4200);hvReRender()}
+
 function hvFeedbackSave(){var c=(fldV("hf_content")||"").trim();
  if(!c){toast("Bạn chưa nhập nội dung góp ý.");return}
  var S=find("DL09","student_id",window.HVID)||{};
@@ -9168,8 +9658,16 @@ var HVSEC=[
  ["s-buoihoc","Nhật ký buổi học","ti-notes"],
  ["s-wow","Nhật ký buổi WOW","ti-star"],
  ["s-khaosat","Khảo sát của bạn","ti-clipboard-text"],
+ ["s-lop","Lớp của bạn","ti-users-group"],
+ ["s-chungnhan","Chứng nhận hoàn thành","ti-award"],
+ ["s-hoidap","Trao đổi với trung tâm","ti-messages"],
  ["s-gopy","Góp ý cho trung tâm","ti-message-plus"]];
-function hvGo(id){var el=document.getElementById(id);if(!el)return;
+/* (n) Mục lục 12 mục phẳng xếp sai thứ tự nhu cầu. Chia 3 NHÓM theo việc học viên thật sự
+   cần: việc phải làm ngay - theo dõi việc học - nói chuyện với trung tâm. */
+var HVGRP=[["Cần bạn xử lý",["s-xacnhan","s-hocphi","s-saptoi","s-khaosat"]],
+ ["Việc học của bạn",["s-lop","s-hanhtrinh","s-tiendo","s-diem","s-buoihoc","s-wow","s-khuyennghi","s-chungnhan"]],
+ ["Nói chuyện với trung tâm",["s-hoidap","s-gopy","s-gioithieu"]]];
+function hvGo(id){hvCloseSide();var el=document.getElementById(id);if(!el)return;
  var box=document.getElementById("hvMain");
  var top=el.offsetTop-14;
  if(box&&box.scrollTo)box.scrollTo({top:top,behavior:"smooth"});
@@ -9179,9 +9677,15 @@ function hvGo(id){var el=document.getElementById(id);if(!el)return;
  var sd=document.getElementById("hvSide");if(sd)sd.classList.remove("open")}
 function hvMark(id){[].forEach.call(document.querySelectorAll("#hvNav .hvni"),function(n){
  n.classList.toggle("on",n.getAttribute("data-s")===id)})}
-function hvNav(){var h="";
- HVSEC.forEach(function(x){if(!document.getElementById(x[0]))return;
-  h+='<div class="hvni" data-s="'+x[0]+'" onclick="hvGo(\''+x[0]+'\')"><i class="ti '+x[2]+'"></i><span>'+esc(x[1])+'</span></div>'});
+function hvNav(){var h="",BK={};
+ HVSEC.forEach(function(x){BK[x[0]]=x});
+ /* (n) xếp theo 3 NHÓM nhu cầu thay vì 12 mục phẳng; mục nào không có trên trang thì bỏ nhóm luôn */
+ HVGRP.forEach(function(G){
+  var items=G[1].filter(function(k){return BK[k]&&document.getElementById(k)});
+  if(!items.length)return;
+  h+='<div class="hvgrph">'+esc(G[0])+'</div>';
+  items.forEach(function(k){var x=BK[k];
+   h+='<div class="hvni" data-s="'+x[0]+'" onclick="hvGo(\''+x[0]+'\')"><i class="ti '+x[2]+'"></i><span>'+esc(x[1])+'</span></div>'})});
  document.getElementById("hvNav").innerHTML=h}
 function hvSpy(){var box=document.getElementById("hvMain");if(!box)return;
  var best=null,bt=1e9;
@@ -9196,7 +9700,13 @@ function hvRender(){
  document.getElementById("hvWho2").textContent=S.student_id||"";
  document.getElementById("hvAv").textContent=String(S.full_name||"?").trim().split(" ").pop().slice(0,1).toUpperCase();
  hvNav();var box=document.getElementById("hvMain");if(box)box.scrollTop=0;hvSpy()}
-function hvToggleSide(){var s=document.getElementById("hvSide");if(s)s.classList.toggle("open")}
+/* (n) Trên điện thoại, mở mục lục xong bấm ra ngoài KHÔNG đóng được - phải bấm đúng nút.
+   Thêm lớp mờ phủ: bấm đâu cũng đóng, đúng phản xạ người dùng. */
+function hvToggleSide(){var s=document.getElementById("hvSide");if(!s)return;
+ var on=s.classList.toggle("open");
+ var m=document.getElementById("hvMask");if(m)m.classList.toggle("on",on)}
+function hvCloseSide(){var s=document.getElementById("hvSide");if(s)s.classList.remove("open");
+ var m=document.getElementById("hvMask");if(m)m.classList.remove("on")}
 function bootHV(sid){window.HVPORTAL=1;try{deriveAll()}catch(e){}
  var stu=rows("DL09");
  window.HVID=sid||(stu[0]||{}).student_id;
@@ -9322,6 +9832,7 @@ if(!SVR){demoBoot()}
 HV_SHELL = r"""
 <div class="login" id="login" style="display:none"></div>
 <div class="hvapp" id="hvapp">
+  <div class="hvmask" id="hvMask" onclick="hvCloseSide()"></div>
   <aside class="hvside" id="hvSide">
     <div class="hvbrand"><div class="logo" style="width:34px;height:34px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 40 40" width="22" height="22" aria-hidden="true"><g fill="none" stroke="#D51920" stroke-width="3.2"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="7.5"/></g><circle cx="20" cy="20" r="3.4" fill="#D51920"/><g stroke="#D51920" stroke-width="3.2"><line x1="20" y1="1.5" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="38.5"/><line x1="1.5" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="38.5" y2="20"/></g></svg></div><div><b>IELTS The Tutors</b><small>Trang học viên</small></div></div>
     <div class="hvme"><div class="av" id="hvAv">?</div><div><b id="hvWho">-</b><small id="hvWho2">-</small></div></div>

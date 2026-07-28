@@ -149,16 +149,16 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.24** (28/07 tối - MẢNG 1 + MẢNG 2 của hội đồng 6 chuyên gia ĐÃ XONG, cộng hội đồng đợt 2
-> và 8 yêu cầu phát sinh của Luân).
+> **Phiên bản: V9.25** (28/07 tối - MẢNG 1 + 2 + 3 của hội đồng 6 chuyên gia ĐÃ XONG, phần DỮ LIỆU của
+> mảng 4 cũng xong, cộng hội đồng đợt 2 và 9 yêu cầu phát sinh của Luân).
 > **DỮ LIỆU DEMO: 192 -> 4 bản ghi lỗi** (`check_logic.py` nay 123 luật). 4 ca còn lại là việc quá hạn
 > CỐ Ý để màn Giao việc có cảnh báo đỏ thật (luật 10k tự khai là "demo canh bao do").
 > Bộ kiểm sau mỗi build nay có **5 phần** (xem bảng trong `_src/README_SRC.md`), thêm `_src/_checktour.js`.
 > Chi tiết mảng 1 + 6 việc phát sinh: mục **3unvicies** bên dưới.
-> **CÒN LẠI của hội đồng: mảng 3 (cổng học viên 7 kênh), 4 (học phí theo đợt), 5 (link "sửa ở đây"
-> + tham số thiếu)** - làm tiếp theo đúng thứ tự đó.
-> Bộ kiểm nay **6 phần**: node --check 2 file · _tall 38 trang · _check11 (119+128) · _check12 (37) ·
-> _check13 (174) · _checktour · check_logic (4 ca cố ý) · check_data DAT.
+> **CÒN LẠI: mảng 4 phần APP (màn lịch đợt cho nhân viên + nhắc trước hạn + in lịch vào phiếu),
+> mảng 5 (link "sửa ở đây" + tham số thiếu + dọn trang thừa).**
+> Bộ kiểm nay **7 phần**: node --check 2 file · _tall 38 trang · _check11 (119+128) · _check12 (37) ·
+> _check13 (174) · _check14 (99) · _checktour · check_logic 132 luật (4 ca cố ý) · check_data DAT.
 > **HỘI ĐỒNG ĐỢT 2 - 5 vị trí mới đang rà** (Luân duyệt 28/07): nhân viên tư vấn kiêm tiếp khách,
 > giáo viên đứng lớp, kế toán/thu ngân, giáo vụ xếp lịch, kiểm thử phá hoại. Lý do: 6 chuyên gia cũ
 > đều nhìn từ THIẾT KẾ HỆ THỐNG, không ai nhìn từ GHẾ NGƯỜI NGỒI LÀM 8 TIẾNG - nên bỏ lọt lỗi kiểu
@@ -551,6 +551,67 @@ cần trỏ thì NÓI THẲNG thay vì khoanh bừa giữa màn.
 Bộ kiểm mới **`_src/_check13.js` (174 tiêu chí)**: khóa cả 4 lỗi tính, 5 bậc, đủ 6 trường cho từng
 chỉ số trong 17 chỉ số, mọi nút hành động phải trỏ tới trang CÓ THẬT, luật nhóm A/B, và thứ tự
 khối 3 việc phải nằm trên khối kinh doanh.
+
+
+## 3quatervicies. V9.25 - MẢNG 3: CỔNG HỌC VIÊN THÀNH KÊNH HAI CHIỀU
+
+Luân đặt vấn đề gốc: "trang học viên là để học viên giao tiếp với trung tâm nữa mà". Trước đợt này
+cổng chỉ có 1,5 kênh (trả lời khảo sát, gửi góp ý) - còn lại là bảng thông báo một chiều.
+
+**Nguyên tắc kiến trúc:** mọi yêu cầu học viên gửi lên đi vào ĐÚNG bảng nghiệp vụ đã có
+(DL23/DL24 giao việc, DL12 điểm danh, DL14 WOW, DL08 xếp lớp, DL16 phản hồi) - **màn xử lý phía
+nhân viên KHÔNG phải dựng mới một cái nào**. Tổng chi phí dữ liệu đúng như hội đồng ước lượng:
+1 enum mới (`student_request`), 1 cột mới (`DL16.session_id`), và cho tác giả dòng DL24 là học viên.
+
+### 7 kênh hai chiều
+| Kênh | Đi vào đâu | Ghi chú thiết kế |
+|---|---|---|
+| (d) Tự xác nhận lớp | DL08.class_confirmation_status | Lỗi trải nghiệm rõ nhất: cổng ghi "chờ bạn xác nhận" mà KHÔNG cho bấm. Kèm nhánh "lịch này không hợp, xin đổi" ghi luôn lý do + khung giờ học được. |
+| (a) Báo nghỉ trước buổi | DL12 (vắng CÓ PHÉP) + DL23 | Ghi thẳng vào sổ điểm danh nhân viên vẫn dùng. Lý do học viên tự ghi vào `student_reason` - KHÔNG ghi đè `note` của nhân viên. |
+| (b) Xin học bù | DL23 | Gắn `related_id` = buổi gốc. |
+| (c) Tự đặt WOW | DL14 (`booked_by=student`, `session_type=self_booked`) | **CHƯA dạy thì CHƯA trừ quota** - trừ lúc đặt là trừ oan nếu buổi bị hủy. Chặn ngày quá khứ, chặn khi hết lượt. |
+| (e) Trao đổi với trung tâm | DL23 + DL24 | Dùng lại module giao việc. Học viên hỏi, nhân viên trả lời NGAY TRONG việc đó - không trôi như tin nhắn Zalo. |
+| (f) Xin bảo lưu / đổi lớp / rút học phí | DL23 | Yêu cầu tiền tự động giao về phòng Kế toán và đặt ưu tiên cao. |
+| (g) Đánh giá từng buổi bằng sao | DL16 kèm `session_id` | Chấm thấp thì mở luôn ô nói rõ và sinh việc cho học vụ gọi lại - không đợi tới phiếu khảo sát cuối khóa. |
+
+### 8 thiếu sót
+- **(h) Lịch đóng học phí theo đợt** hiện trên cổng (đọc DL06b), tô màu theo còn mấy ngày, nhắc
+  trước hạn theo `installmentRemind_days` (CH2). Nút **"Tôi đã chuyển khoản"** gửi báo cho kế toán -
+  **KHÔNG tự ghi phiếu thu**: tiền chỉ vào sổ khi kế toán đối soát. Chặn báo số lớn hơn phần còn nợ.
+- **(i) Buổi NGHỈ và buổi HỌC BÙ hết vô hình.** `upSes` trước đây lọc bỏ hẳn buổi hủy nên học viên
+  vẫn tới trung tâm vào buổi đã nghỉ - đây là cuộc gọi lễ tân nhận nhiều nhất. Nay giữ lại, gạch
+  ngang, chip đỏ "Đã nghỉ" và nói rõ buổi KHÔNG diễn ra. Tiện thể sửa luôn: buổi hiện **GV của
+  BUỔI** chứ không phải GV chính của lớp (buổi dạy thay trước đây hiện sai tên).
+- **(j) Thẻ "Lớp của bạn"**: lịch cố định, phòng hoặc link Zoom BẤM ĐƯỢC, giảng viên kèm ảnh và
+  giới thiệu (DL01 nay có `bio` + `avatar_url` - hàm `gvBioEdit` biết ghi từ lâu mà chưa ai seed).
+- **(k)** `materials_link` thành liên kết bấm được; `DL20.file_link` hết rỗng 100%.
+- **(l) Chứng nhận hoàn thành khóa** dùng `attendance_rate`/`completion_rate` của DL18 - 17/17 dòng
+  có sẵn mà chưa dùng lần nào. In hoặc lưu PDF được.
+- **(m) Bịt 3 chỗ lộ nội bộ**: `DL12.note` (ghi chú chăm sóc kiểu "HV hứa đi học lại") không in nữa,
+  chỉ hiện phần học viên tự ghi · nhãn "escalated (Leo thang lên QL cao)" quy về "đang xử lý" ·
+  "đã trừ 1 lượt quota" đổi thành "đã tính vào gói của bạn".
+- **(n)** Mục lục 12 mục phẳng chia lại **3 nhóm theo nhu cầu** (Cần bạn xử lý / Việc học của bạn /
+  Nói chuyện với trung tâm); thêm **lớp mờ đóng mục lục trên điện thoại** - trước đây bấm ra ngoài
+  không đóng được, bắt bấm đúng nút.
+- **(p)** Cổng nay CÓ số điện thoại, lấy từ CH2 (`centerHotline`) - trước đây khuyên "liên hệ trung
+  tâm" 3-4 lần mà cả trang không có một số nào.
+
+### Bẫy đã cắn
+- **`seed_giaoviec.py` chạy SAU `fixdata.py` và GHI ĐÈ nguyên `enum_task_type`** - giá trị
+  `student_request` fixdata thêm vào bị xóa sạch, mà không script nào báo. LUẬT: script chạy sau ghi
+  đè danh mục thì phải khai đủ mọi giá trị, đừng giả định script trước còn nguyên.
+- **Chạy `fixdata.py` HAI LẦN trên cùng một file làm lệch bộ đếm giới thiệu**: pass 12 chọn lại danh
+  sách đại sứ nhưng chỉ GHI ĐÈ bộ đếm cho đại sứ mới, người không còn là đại sứ giữ số cũ. Nay xóa
+  sạch bộ đếm trước khi tính lại - fixdata chạy bao nhiêu lần cũng ra một kết quả.
+- Hàng chờ điểm danh chỉ được để trống buổi **trong 24h** (đúng mốc luật 4i), nếu không buổi cũ để
+  trống thành lỗi dữ liệu.
+- `enum_feedback_channel` chưa có giá trị cho cổng học viên -> `eFull` trả mã trần. Đã thêm
+  `app (Cổng học viên)`.
+
+Bộ kiểm mới **`_src/_check14.js` (99 tiêu chí)**: chạy THẬT từng kênh (bấm xác nhận lớp, báo nghỉ,
+đặt WOW, báo chuyển khoản, chấm sao, gửi yêu cầu) rồi soi lại đúng bảng dữ liệu; kiểm cả các luật
+chặn (ngày quá khứ, hết quota, báo tiền vượt công nợ) và **quét 12 hồ sơ học viên tìm câu chữ nội bộ
+lọt ra cổng**.
 
 > **VIỆC TỒN web app (ưu tiên trên xuống):**
 > 1. **CHỜ LUÂN NGHIỆM THU ĐỢT 9 + YÊU CẦU KẾ TIẾP** - 4 yêu cầu 28/07 (phòng 2 máy, cổng HV đúng vai, hồ sơ 360 superset, rà sidebar) đã trả xong trong V9.16. Luân cần THỬ THẬT phòng 2 máy trên 2 máy khác nhau (phiên cloud không tự test WebRTC được). Phiên sau: hỏi/đợi yêu cầu kế tiếp trước khi làm gì lớn.
