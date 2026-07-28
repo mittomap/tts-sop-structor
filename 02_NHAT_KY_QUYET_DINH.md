@@ -399,6 +399,17 @@
 > khác nhau. `_check11` canh **tổng dự thu = tổng còn nợ của các đợt** và canh trang này dùng ngưỡng
 > CH2 chứ không cắm cứng.
 >
+> **· 4 nhóm CHẶNG đi theo kiểu đàn xếp (anh Luân, V9.29m):** *"bấm vào 1 chặng thì nên ẩn mấy chặng
+> còn lại"*. Xổ hết 4 chặng cùng lúc thì menu dài lê thê trong khi người ta chỉ đang làm việc trong
+> MỘT chặng. Nay mở một chặng - dù bằng cách bấm nhóm hay bằng cách đi vào một trang thuộc chặng đó -
+> là ba chặng kia tự gập. Các nhóm khác (Làm việc / Điều hành / Tra cứu) **không** bị luật này đụng
+> tới: chúng không phải các giai đoạn loại trừ nhau của cùng một vòng đời. Tách `navIsArcGrp()` làm
+> một định nghĩa duy nhất "nhóm này có phải một chặng không" (trước đó regex nằm trong `navOpenDef`).
+> **· Ô trạng thái trong bảng bị khuyết chữ (anh Luân: *"kéo ra tí em, khuyết chữ quá"*):** `.qsel`
+> chặn `max-width:170px` nên *"Đã chuyển đổi - đã thành HV"* hiện thành *"...đã thành H"* và mũi tên
+> đè lên chữ. **Nhãn enum phải đọc được NGUYÊN VĂN theo CH1** - cắt chữ là đọc sai nghiệp vụ. Nay ô
+> nở theo nhãn, chừa chỗ cho mũi tên; dưới 820px mới cắt lại.
+>
 > **CÒN LẠI:** dời `DUEFALL=5` + 16 nhóm câu chăm RTOUCH + giờ hẹn preset vào cấu hình ·
 > màn cấp thêm quota WOW · `statStrip` bấm được ở các trang còn lại · bộ phận chuẩn cho
 > `renderDuyet`/`renderGiaoan`/`renderMaGioiThieu`/`renderReupTab`/`renderBanggiao`.

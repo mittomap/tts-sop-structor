@@ -10617,7 +10617,7 @@ function go(key,noHist){
  CUR=key;
  /* vào trang nào thì tự mở nhóm NAVTREE chứa nó (kể cả khi người dùng đã gập tay trước đó) */
  var g15=navGroupOf(key0)||navGroupOf(key);
- if(g15){window.NAVOPEN=window.NAVOPEN||{};window.NAVOPEN[g15]=true}
+ if(g15){window.NAVOPEN=window.NAVOPEN||{};window.NAVOPEN[g15]=true;navArcOnly(g15)}
  buildNav();
  document.getElementById("pgTitle").textContent=p.t;
  var el=document.getElementById("content");
@@ -10646,14 +10646,27 @@ function navBadge(k){
 /* V9.27 (anh Luân chốt bằng ảnh): mặc định KHÔNG xổ hết nữa. Nhóm việc hằng ngày (Làm việc,
    Điều hành) mở sẵn; 4 nhóm CHẶNG và nhóm Tra cứu gập lại - chặng là bản đồ vòng đời, mở hết
    thì menu dài lê thê mà ngày thường không đụng tới. Người dùng tự mở/gập thì nhớ theo phiên. */
+/* Một định nghĩa "nhóm này có phải một CHẶNG không" - dùng cho cả mặc định gập lẫn luật xổ
+   một chặng thì gập ba chặng kia. Viết regex ở hai nơi là hai nơi trôi khỏi nhau. */
+function navIsArcGrp(g){return /^Chặng \d/.test(String(g||""))}
 function navOpenDef(g){
- if(/^Chặng \d/.test(String(g||"")))return false;
+ if(navIsArcGrp(g))return false;
  if(g==="Tra cứu")return false;
  return true}
 function navIsOpen(g){window.NAVOPEN=window.NAVOPEN||{};
  if(window.NAVOPEN[g]!==undefined)return !!window.NAVOPEN[g];
  return navOpenDef(g)}
-function navToggle(g){window.NAVOPEN=window.NAVOPEN||{};window.NAVOPEN[g]=!navIsOpen(g);buildNav()}
+/* V9.29m (anh Luân): "bấm vào 1 chặng thì nên ẩn mấy chặng còn lại". 4 chặng xổ hết cùng lúc là
+   menu dài lê thê mà người ta chỉ đang làm việc trong MỘT chặng. Nay 4 nhóm chặng đi theo kiểu
+   đàn xếp: mở một cái là ba cái kia tự gập. Các nhóm khác (Làm việc, Điều hành, Tra cứu) giữ
+   nguyên - chúng không phải các giai đoạn loại trừ nhau của cùng một vòng đời. */
+function navArcOnly(g){window.NAVOPEN=window.NAVOPEN||{};
+ if(!navIsArcGrp(g))return;
+ NAVTREE.forEach(function(G){if(navIsArcGrp(G.g)&&G.g!==g)window.NAVOPEN[G.g]=false})}
+function navToggle(g){window.NAVOPEN=window.NAVOPEN||{};
+ var open=!navIsOpen(g);window.NAVOPEN[g]=open;
+ if(open)navArcOnly(g);
+ buildNav()}
 /* ===== V9.15 - MENU THEO CHẶNG VÒNG ĐỜI =====
    2 tầng: nhóm = chặng lớn (arc), mục = tổng quan chặng + các nghiệp vụ bên trong.
    Mục con của hub (test, tuvan, wow, baoluu...) đứng thẳng trong menu - go() tự remap

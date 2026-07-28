@@ -981,4 +981,30 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("cong hoc vien: doc nguoc ra dung muc", HVSEC.every(function(x){return hvSecOf(hvSlug(x[0]))===x[0]}));
 })();
 
+
+/* ---- 34. 4 NHOM CHANG di theo kieu dan xep: mo mot cai la ba cai kia gap ---- */
+(function(){
+ setRole("all");
+ var ARCG=NAVTREE.filter(function(G){return navIsArcGrp(G.g)}).map(function(G){return G.g});
+ t("co dung 4 nhom chang", ARCG.length===4);
+ t("mac dinh 4 chang deu gap", ARCG.every(function(g){return navOpenDef(g)===false}));
+ /* di vao mot trang trong chang 2 -> chi chang 2 mo */
+ window.NAVOPEN={};
+ go("banglop");
+ t("vao trang cua chang nao thi mo dung chang do", navIsOpen(ARCG[1]));
+ t("ba chang con lai tu gap", [ARCG[0],ARCG[2],ARCG[3]].every(function(g){return !navIsOpen(g)}));
+ /* sang chang 4 -> chang 2 phai gap lai */
+ go("ketthuc");
+ t("doi sang chang khac thi chang cu gap lai", navIsOpen(ARCG[3])&&!navIsOpen(ARCG[1]));
+ /* tu tay xo mot chang cung phai gap ba chang kia */
+ navToggle(ARCG[0]);
+ t("tu tay xo mot chang thi ba chang kia gap", navIsOpen(ARCG[0])&&[ARCG[1],ARCG[2],ARCG[3]].every(function(g){return !navIsOpen(g)}));
+ /* nhom KHONG phai chang thi khong bi luat nay dong toi */
+ window.NAVOPEN={};
+ t("nhom Lam viec / Dieu hanh khong bi gap oan", navIsOpen("Làm việc")&&navIsOpen("Điều hành"));
+ navToggle(ARCG[2]);
+ t("xo chang khong lam gap nhom Lam viec", navIsOpen("Làm việc"));
+ window.NAVOPEN={};go("banlam");
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");
