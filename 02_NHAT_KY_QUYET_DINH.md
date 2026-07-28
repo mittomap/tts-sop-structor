@@ -272,6 +272,17 @@
 > (3) **"KPI của tôi" rơi xuống đáy trang bắt đầu** - phải cuộn hết danh sách mới thấy số của chính
 > mình. Đưa lên ngay dưới lời chào, và bỏ lần gọi thứ hai ở nhánh "Bảng chặng" (trước đó gọi 2 chỗ).
 >
+> **(4) Trang Việc hôm nay thiếu bộ phận (anh Luân bắt, 28/07):** danh sách bộ phận **cắm cứng 4 cái**
+> trong khi `slaItems` còn sinh nhóm **"Giao việc"** - việc đó nằm trong danh sách nhưng KHÔNG có chip
+> để lọc tới. Nay lấy thẳng từ dữ liệu, thêm luật SLA nhóm mới là chip tự mọc.
+> **(5) ACA và WOW không có bộ phận riêng (anh Luân bắt tiếp):** việc chấm test / chấm bài / nhận xét
+> buổi (giảng viên ACA) và ghi nội dung buổi WOW đều bị dồn hết vào "Học vụ" - hai bộ phận thật mà
+> không có chỗ nào gọi tên. Đã tách thành **"Giảng viên (ACA)"** (42 việc) và **"WOW"**, Học vụ còn 18.
+> **Bất biến mới trong `_check16`:** mọi `cat` do `slaItems` sinh ra phải đến được chuông của ít nhất
+> một vai. Đổi `cat` mà quên cập nhật `ROLESCOPE.bell` là **cảnh báo biến mất khỏi mọi vai** - lớp lỗi
+> im lặng, không ai biết cho tới khi có người hỏi "sao không thấy việc". Tiện thể thêm "Giao việc" vào
+> chuông của tư vấn / kế toán / marketing - trước đó chỉ học vụ và giáo viên nhận được.
+>
 > **(D) MẢNG 5** (mảng cuối của hội đồng 6 chuyên gia): `slaChip(param)` in số SLA kèm icon bánh răng
 > nhảy về đúng dòng cấu hình (dùng `window.CFHL` để cuộn + tô), nút "Sửa câu này" cạnh câu CH4 trong
 > `sopBlock` (`window.MSGQ` đã có), link về CH1 khi hiện nhãn enum, **khai 23 tham số app đang đọc thật

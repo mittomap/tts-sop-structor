@@ -1589,23 +1589,23 @@ var ROLESCOPE={
   pages:["viec","banlam","hanhtrinh","hocvien","giangvien","tuyensinh","ketthuc","khac"],
   tabs:{khac:["magioithieu"]},
   blocks:["appt","new","contacted","test_done","enrolled","reup"],
-  mine:1,mineBtn:1,kpi:1,bell:["Tuyển sinh"]},
+  mine:1,mineBtn:1,kpi:1,bell:["Tuyển sinh","Giao việc"]},
  hocvu:{match:/^(academic|aca_)/,land:"banlam",
   pages:["viec","banlam","hanhtrinh","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ketthuc","khac"],
   tabs:{khac:["baoluu"]},
-  blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:0,kpi:1,bell:["Học vụ","CSKH"]},
+  blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:0,kpi:1,bell:["Học vụ","CSKH","Giảng viên (ACA)","WOW","Giao việc"]},
  giaovien:{match:/^teacher$/,land:"hoctap",ctx:{HTTAB:"today"},
   pages:["viec","banlam","hocvien","giangvien","banglop","hoctap","giaoan"],
-  blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:0,bell:["Học vụ"]},
+  blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:0,bell:["Giảng viên (ACA)","Học vụ","Giao việc"]},
  wow:{match:/^wow/,land:"hoctap",ctx:{HTTAB:"wow"},
   pages:["viec","banlam","hocvien","giangvien","hoctap","banglop"],
-  blocks:["test_grading","wowq","risk"],mine:0,mineBtn:0,kpi:0,bell:["Học vụ"]},
+  blocks:["test_grading","wowq","risk"],mine:0,mineBtn:0,kpi:0,bell:["WOW","Giảng viên (ACA)","Giao việc"]},
  ketoan:{match:/^account/,land:"tuyensinh",ctx:{TSTAB:"thanhtoan"},
   pages:["viec","banlam","hocvien","giangvien","tuyensinh","duyet","baocao"],
-  blocks:["enrolled","approve","debt"],mine:0,mineBtn:0,kpi:0,bell:["Tài chính"]},
+  blocks:["enrolled","approve","debt"],mine:0,mineBtn:0,kpi:0,bell:["Tài chính","Giao việc"]},
  marketing:{match:/^marketing/,land:"tuyensinh",ctx:{TSTAB:"lead"},
   pages:["viec","banlam","tuyensinh","khac","hocvien"],tabs:{khac:["magioithieu"]},
-  blocks:["new","reup"],mine:0,mineBtn:0,kpi:0,bell:["Tuyển sinh"]},
+  blocks:["new","reup"],mine:0,mineBtn:0,kpi:0,bell:["Tuyển sinh","Giao việc"]},
  hotro:{match:/^(hr_|it_|janitor|security)/,land:"banlam",lite:1,
   pages:["viec","banlam","hocvien","giangvien"],blocks:[],mine:0,mineBtn:0,kpi:0,bell:[]}};
 /* V9.20: GIAO VIỆC là việc của MỌI chức danh (kể cả nhóm hỗ trợ) - cấp quyền trang + chuông cho tất cả
@@ -2653,8 +2653,8 @@ function slaItems(){var out=jTasks();
  srows("DL06").forEach(function(e){if(num(e.discount_amount)>=ckThreshold()&&!String(e.discount_approved_by||"").trim()&&!isc(e.enrollment_status,"cancelled"))add("Tài chính","Duyệt chiết khấu","amber","ti-discount-check",e.student_id_name||e.student_id,"Chiết khấu "+vnd(num(e.discount_amount))+" chờ quản lý duyệt",hoursSince(e.enrollment_time),"duyet","",null,null,null,e.enrollment_id)});
  srows("DL03").forEach(function(r){var att=isc(r.test_attendance_status,"on_time","late"),graded=isc(r.test_status,"graded"),consulted=isc(r.post_test_status,"consulted");
   var age=hoursSince(r.test_attendance_time);var over=att&&!graded&&age!=null&&age>paramOf("slaTestResult_hours",48);
-  if(over)add("Học vụ","Chấm test đầu vào","red","ti-file-text",r.lead_id_name||r.lead_id,"Test chưa chấm quá hạn",age,"test","grade",null,null,"testgrade",r.test_booking_id);
-  else if(att&&!graded)add("Học vụ","Chấm test đầu vào","amber","ti-file-text",r.lead_id_name||r.lead_id,"Test chờ chấm điểm",age,"test","grade",null,null,"testgrade",r.test_booking_id);
+  if(over)add("Giảng viên (ACA)","Chấm test đầu vào","red","ti-file-text",r.lead_id_name||r.lead_id,"Test chưa chấm quá hạn",age,"test","grade",null,null,"testgrade",r.test_booking_id);
+  else if(att&&!graded)add("Giảng viên (ACA)","Chấm test đầu vào","amber","ti-file-text",r.lead_id_name||r.lead_id,"Test chờ chấm điểm",age,"test","grade",null,null,"testgrade",r.test_booking_id);
   else if(graded&&!consulted)add("Tuyển sinh","Tư vấn sau test","amber","ti-messages",r.lead_id_name||r.lead_id,"Có KQ test, chờ tư vấn",null,"test","consult",null,null,"testconsult",r.test_booking_id)});
  srows("DL08").forEach(function(o){var s=obState(o);
   if(s.infoOverdue)add("Học vụ","Gửi thông tin lớp","red","ti-send",o.student_id_name||o.student_id,"Chưa gửi thông tin lớp (quá hạn)",hoursSince(o.assigned_at),"xeplop","sendinfo",null,null,"ob",o.onboarding_id);
@@ -2681,11 +2681,11 @@ function slaItems(){var out=jTasks();
    return}
   var age=hoursSince(e.enrollment_time);if(rem>=paramOf("thresholdDebtAlert",3000000)&&age!=null&&age>paramOf("slaPayment_grace_days",7)*24)add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"Còn nợ học phí "+vnd(rem)+" (quá kỳ hạn "+paramOf("slaPayment_grace_days",7)+" ngày)",age,"thanhtoan","debt",null,null,"paydebt",e.enrollment_id)});
  srows("DL14").forEach(function(w){var done=ecode(w.wow_status)==="completed";var note=!!(w.wow_content_note&&String(w.wow_content_note).trim());var age=hoursSince(w.wow_session_date);var over=done&&!note&&age!=null&&age>paramOf("slaWowNote_hours",24);
-  if(over)add("Học vụ","Ghi nội dung WOW","red","ti-notes",w.student_name||w.student_id,"Buổi WOW chưa ghi nội dung (quá 24h)",age,"wow","note",null,null,"wownote",w.wow_id);
-  else if(done&&!note)add("Học vụ","Ghi nội dung WOW","amber","ti-notes",w.student_name||w.student_id,"Buổi WOW chờ ghi nội dung",age,"wow","note",null,null,"wownote",w.wow_id)});
+  if(over)add("WOW","Ghi nội dung WOW","red","ti-notes",w.student_name||w.student_id,"Buổi WOW chưa ghi nội dung (quá 24h)",age,"wow","note",null,null,"wownote",w.wow_id);
+  else if(done&&!note)add("WOW","Ghi nội dung WOW","amber","ti-notes",w.student_name||w.student_id,"Buổi WOW chờ ghi nội dung",age,"wow","note",null,null,"wownote",w.wow_id)});
  srows("DL17").forEach(function(c){if(isc(c.complaint_status,"resolved"))return;var sev=ecode(c.complaint_severity);var lim=sev==="high"?paramOf("slaComplaintHigh_hours",24):sev==="medium"?paramOf("slaComplaintMed_hours",48):paramOf("slaComplaintLow_hours",72);var age=hoursSince(c.complaint_time);var over=age!=null&&age>lim;
   add("CSKH","Xử lý khiếu nại",over?"red":"amber","ti-alert-triangle",c.student_id_name||c.student_id,(over?"Khiếu nại quá hạn xử lý":"Khiếu nại đang mở")+" · "+(elabel(c.complaint_severity)||sev),age,"khieunai",over?"overdue":"work",null,null,"complaint",c.complaint_id)});
- srows("DL13").forEach(function(hw){if(hwSubmitted(hw)&&!hwGraded(hw)){var age=hoursSince(hw.homework_submitted_time||hw.homework_assigned_time);if(age!=null&&age>paramOf("slaHomeworkGrade_hours",48))add("Học vụ","Chấm bài tập","red","ti-book",hw.student_name,"Bài tập chưa chấm quá 48h",age,"baitap",null,null,hw.student_id)}});
+ srows("DL13").forEach(function(hw){if(hwSubmitted(hw)&&!hwGraded(hw)){var age=hoursSince(hw.homework_submitted_time||hw.homework_assigned_time);if(age!=null&&age>paramOf("slaHomeworkGrade_hours",48))add("Giảng viên (ACA)","Chấm bài tập","red","ti-book",hw.student_name,"Bài tập chưa chấm quá 48h",age,"baitap",null,null,hw.student_id)}});
  /* Bảo lưu sắp hết hạn: gọi mời quay lại TRƯỚC thresholdPauseRemind_days ngày */
  (function(){var rmd=paramOf("thresholdPauseRemind_days",14);
   srows("DL09").forEach(function(x){if(!isc(x.student_status,"transferred","dropped"))return;
@@ -2811,7 +2811,14 @@ function renderViec(){var items=bellItems();
  var team=window.VIECTEAM||"all",grp=window.VIECGRP||"all";
  var sev=window.VIECSEV||(window.VIECOD?"red":"");   /* V9.29: MỘT biến cho mức độ; VIECOD là lối tắt cũ của "chỉ quá hạn" */
  var od=(sev==="red");
- var teams=["Tuyển sinh","Học vụ","Tài chính","CSKH"];
+ /* V9.29 (anh Luân: "thiếu bộ phận hả ta"): danh sách bộ phận trước đây CẮM CỨNG 4 cái, trong khi
+    slaItems còn sinh việc nhóm "Giao việc" - việc đó nằm trong danh sách nhưng KHÔNG có chip để lọc
+    tới. Nay lấy thẳng từ dữ liệu: bộ phận nào thật sự có việc thì có chip, thứ tự ưu tiên giữ
+    nguyên cho quen mắt, nhóm lạ xuống cuối. Thêm luật SLA nhóm mới là chip tự mọc. */
+ var TORD=["Tuyển sinh","Học vụ","Giảng viên (ACA)","WOW","Tài chính","CSKH","Giao việc"];
+ var teams=[];items.forEach(function(x){if(x.cat&&teams.indexOf(x.cat)<0)teams.push(x.cat)});
+ teams.sort(function(a,b){var ia=TORD.indexOf(a),ib=TORD.indexOf(b);
+  if(ia<0)ia=99;if(ib<0)ib=99;if(ia!==ib)return ia-ib;return String(a).localeCompare(String(b),"vi")});
  /* V9.29 (anh Luân yêu cầu nâng cấp): trước đây trang này chỉ là hai dải chip + một danh sách
     phẳng 150 dòng. Nay: dải số bấm được · lọc theo mức độ · gom theo ĐỘ GẤP thay vì đổ một đống. */
  var redn=items.filter(function(x){return x.sev==="red"}).length;
@@ -2834,7 +2841,9 @@ function renderViec(){var items=bellItems();
   vstat("ti-alert-triangle",redn,"Quá hạn","#E24B4A","làm ngay","viecOnly('red')")+
   vstat("ti-clock",ambn,"Sắp tới hạn","#E08A1E","còn kịp","viecOnly('amber')")+
   vstat("ti-checklist",items.length,"Tổng việc đang nợ","#2E5A88","toàn trung tâm","viecOnly('')")+
-  vstat("ti-user-check",items.filter(function(x){return x.cat==="Học vụ"}).length,"Của Học vụ","#0D9488","nhóm đông việc nhất","viecTeam('Học vụ')")+
+  (function(){var cc={};items.forEach(function(x){cc[x.cat]=(cc[x.cat]||0)+1});
+   var top=Object.keys(cc).sort(function(a,b){return cc[b]-cc[a]})[0];
+   return top?vstat("ti-user-check",cc[top],"Của "+top,"#0D9488","bộ phận đông việc nhất","viecTeam('"+String(top).replace(/'/g,"")+"')"):""})()+
   '</div>';
  var tsegs=[["all","Tất cả",base.length,""]];
  teams.forEach(function(t){if(teamC[t])tsegs.push([t,t,teamC[t],""])});
@@ -6790,7 +6799,6 @@ var APPPARAMS=[
  ["Giao việc","slaTaskAccept_hours","Người nhận phải BẤM NHẬN việc trong bao lâu (quá hạn -> nhắc)","giờ",4],
  ["Giao việc","slaTaskConfirm_hours","Người giao phải xác nhận sau khi được báo xong trong bao lâu","giờ",24],
  ["Tuyển sinh - Lead","slaLeadResponse_min","Gọi/nhắn lead MỚI trong bao lâu (quá hạn -> cảnh báo đỏ)","phút",15],
- ["Tuyển sinh - Lead","slaLeadReassign_hours","Quá bao lâu chưa gọi thì đề xuất giao lead cho NV khác","giờ",4],
  ["Tuyển sinh - Lead","slaRetryCall_hours","Gọi hụt bao lâu thì nhắc gọi lại (khi chưa đặt lịch hẹn)","giờ",4],
  ["Tuyển sinh - Lead","attemptsNoResponse","Gọi hụt liên tiếp bao nhiêu lần -> chuyển 'Không liên lạc được' + nhắc đổi kênh","lần",3],
  ["Tuyển sinh - Lead","attemptsUnreachable","Gọi hụt liên tiếp bao nhiêu lần -> chuyển 'Hết cách liên lạc'","lần",5],
@@ -6808,7 +6816,6 @@ var APPPARAMS=[
  ["Trung tâm","centerAddress","Địa chỉ hiện trên phiếu thu","chữ","","text"],
  ["Tài chính","thresholdDebtAlert","Còn nợ từ mức này trở lên thì hiện cảnh báo thu công nợ","VND",3000000],
  ["Tài chính","slaPayment_grace_days","Sau đăng ký bao nhiêu ngày mới bắt đầu nhắc nợ","ngày",7],
- ["Tài chính","slaPayment_hours","Sau đăng ký bao lâu thì câu nhắc thu tiền chuyển mức KHẨN (NA007)","giờ",48],
  ["Học vụ - Xếp lớp","slaClassInfoZalo_hours","Hạn gửi thông tin lớp cho HV sau khi xếp lớp","giờ",24],
  ["Học vụ - Xếp lớp","slaOBT_hours","Hạn hoàn tất onboarding cho HV mới","giờ",48],
  ["Học vụ - Lớp học","slaAttendanceGate_minutes","Cổng điểm danh mở bao nhiêu phút TRƯỚC giờ học (GV bấm Bắt đầu lớp trong khoảng này)","phút",20],
@@ -6820,7 +6827,34 @@ var APPPARAMS=[
  ["Học vụ - Lớp học","wowPendingMax_perStudent","Học viên được để tối đa bao nhiêu buổi WOW chờ trung tâm xác nhận","buổi",1],
  ["WOW & CSKH","slaComplaintHigh_hours","Hạn xử lý khiếu nại mức CAO","giờ",4],
  ["WOW & CSKH","slaComplaintMed_hours","Hạn xử lý khiếu nại mức TRUNG BÌNH","giờ",48],
- ["WOW & CSKH","slaComplaintLow_hours","Hạn xử lý khiếu nại mức THẤP","giờ",168]];
+ ["WOW & CSKH","slaComplaintLow_hours","Hạn xử lý khiếu nại mức THẤP","giờ",168],
+ /* ═══ V9.29 (mảng 5): 23 tham số app ĐANG ĐỌC THẬT mà trước đây không có ô sửa nào ═══
+    Người dùng vào Cài đặt tìm cũng không thấy - muốn đổi phải sửa code rồi build lại, đúng cái
+    kiến trúc "cấu hình sống" của dự án này cấm. Mỗi dòng dưới đây tương ứng một paramOf/paramStr
+    có thật trong code; _check18 canh hai chiều nên từ nay lệch một cái là đỏ. */
+ ["Tuyển sinh - Lead","slaLRT_minutes","Ngưỡng KPI thời gian phản hồi lead mới (LRT)","phút",15],
+ ["Tuyển sinh - Lead","slaFollowup_grace_days","Quá hẹn liên hệ bao nhiêu ngày thì coi là bỏ rơi khách","ngày",2],
+ ["Tuyển sinh - Test & Tư vấn","slaGLA_hours","Hạn chấm bài test đầu vào (GLA)","giờ",24],
+ ["Tuyển sinh - Test & Tư vấn","slaCVT_hours","Hạn tư vấn sau khi có kết quả test (CVT)","giờ",24],
+ ["Tài chính","thresholdDeposit_minimum","Số tiền cọc tối thiểu để giữ chỗ","VND",2000000],
+ ["Tài chính","refundFull_days","Rút trong bao nhiêu ngày đầu thì hoàn 100%","ngày",3],
+ ["Tài chính","refundPartial_days","Rút trong bao nhiêu ngày thì hoàn một phần","ngày",14],
+ ["Tài chính","refundReduced_days","Quá bao nhiêu ngày thì chỉ hoàn mức thấp nhất","ngày",30],
+ ["Tài chính","slaRefundProcess_days","Hạn xử lý xong một yêu cầu hoàn tiền","ngày",7],
+ ["Tài chính","installmentGap_days","Khoảng cách giữa hai đợt đóng học phí","ngày",30],
+ ["Tài chính","installmentDepositPercent","Đợt đầu chiếm bao nhiêu phần trăm học phí","%",40],
+ ["Tài chính","installmentRemind_days","Nhắc trước hạn đóng đợt bao nhiêu ngày","ngày",3],
+ ["Tài chính","installmentLate_days","Quá hạn bao nhiêu ngày thì chuyển thành nợ quá hạn","ngày",3],
+ ["Học vụ - Lớp","slaTeacherNote_hours","Hạn giáo viên ghi nhận xét sau buổi dạy","giờ",24],
+ ["Học vụ - Lớp","slaHomeworkGrading_hours","Hạn chấm bài tập cho học viên","giờ",48],
+ ["Học vụ - Lớp","slaAbsenceCall_hours","Học viên vắng thì phải gọi hỏi thăm trong bao lâu","giờ",24],
+ ["Học vụ - Lớp","slaPLR48_hours","Hạn phản hồi phụ huynh / học viên khi có việc phát sinh","giờ",48],
+ ["Học vụ - Kết thúc khóa","thresholdPreEnd_days","Trước khi khóa kết thúc bao nhiêu ngày thì bắt đầu mời tái ghi danh","ngày",14],
+ ["Học vụ - Kết thúc khóa","slaFinalTest_days","Hạn nhập kết quả đầu ra sau khi khóa kết thúc","ngày",3],
+ ["Học vụ - Kết thúc khóa","slaReenroll_contact_days","Hạn liên hệ mời tái ghi danh","ngày",7],
+ ["Học vụ - Kết thúc khóa","slaTestimonialAsk_days","Sau khi đạt mục tiêu bao nhiêu ngày thì xin cảm nhận","ngày",7],
+ ["WOW & CSKH","slaComplaintFirstResponse_hours","Hạn phản hồi LẦN ĐẦU cho một khiếu nại","giờ",4],
+ ["WOW & CSKH","slaFeedbackClassify_hours","Hạn phân loại một phản hồi mới nhận","giờ",24]];
 function pvnd(s){var m=String(s||"").match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);if(!m)return null;return new Date(+m[3],+m[2]-1,+m[1],m[4]?+m[4]:0,m[5]?+m[5]:0)}
 function hoursSince(s){var d=pvnd(s);return d?(Date.now()-d.getTime())/3600000:null}
 function nowStr(){var d=new Date();function p(n){return n<10?"0"+n:n}return p(d.getDate())+"/"+p(d.getMonth()+1)+"/"+d.getFullYear()+" "+p(d.getHours())+":"+p(d.getMinutes())}

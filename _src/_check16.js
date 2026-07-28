@@ -401,7 +401,8 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  DTQUICK.forEach(function(r){
   var d=r[1](),lb=r[2](d);
   t("nut '"+lb+"' co chot gio (khong de 00:00 mac ke)", d.getHours()!==0||/0h|00:00/.test(lb));
-  t("nut '"+lb+"' luon tro toi tuong lai", d.getTime()>now);
+  /* Nut da troi qua thi ĐƯỢC PHEP nam trong qua khu - no bi AN khoi giao dien, khong hien ra.
+     Tieu chi cu ("moi nut deu phai o tuong lai") sai ngay khi qua 15h - da sua cho dung y do. */
   t("nut '"+lb+"' co ghi gio trong nhan", /\d+\s*h|\d{1,2}:\d{2}/.test(lb));
  });
  /* nhan va gia tri phai KHOP - bam nut nao ra dung ngay gio nut do ghi */
@@ -415,6 +416,11 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  var html=dtQuickHTML("f_test");
  t("moi nut deu co chu thich ghi ro ngay gio se dat", (html.match(/data-tip="Đặt thành /g)||[]).length===(html.match(/data-q="/g)||[]).length);
  t("nut da troi qua thi khong hien", (html.match(/data-q="/g)||[]).length<=DTQUICK.length);
+(function(){var ids=(html.match(/data-q="([a-z0-9]+)"/g)||[]).map(function(x){return x.slice(8,-1)});
+ t("MOI nut DANG HIEN deu tro toi tuong lai",
+   ids.every(function(k){return DTQBK[k][1]().getTime()>Date.now()}));
+ t("nut da troi qua that su bi an",
+   DTQUICK.filter(function(r){return r[1]().getTime()<=Date.now()}).every(function(r){return ids.indexOf(r[0])<0}));})();
  t("bat ke gio nao trong ngay van con it nhat 4 nut", (html.match(/data-q="/g)||[]).length>=4);
  t("nhan va gia tri dung chung mot ham dung, khong the lech", /r\[1\]\(\)/.test(SRC)&&/DTQBK\[kind\]/.test(SRC));
  t("bam nut nao thi nut do sang len", /classList\.toggle\("on",b\.getAttribute\("data-q"\)===kind\)/.test(SRC));
@@ -567,6 +573,59 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
   t("goc nhin bang chang cung co KPI o tren", (function(){var a=b2.indexOf("KPI của tôi");return a>=0&&a<b2.length/2})());
   window.BLVIEW="list";
   CURSTAFF="";applyScope("");}
+})();
+
+
+/* ---- 21. BO PHAN tren trang Viec hom nay phai lay tu DU LIEU (V9.29, anh Luan bat) ----
+   Truoc day cam cung 4 bo phan; nhom "Giao viec" co viec that, nam trong chuong cua MOI vai,
+   nhung khong co chip de loc toi. Them luat SLA nhom moi la chip phai tu moc. */
+(function(){
+ var st=rows("DL01").filter(function(x){return ecode(x.role)==="academic_staff"})[0];
+ if(!st){t("co NV hoc vu de kiem",false);return}
+ CURSTAFF=st.staff_id;applyScope(st.staff_id);
+ window.VIECTEAM="all";window.VIECGRP="all";window.VIECSEV="";window.VIECOD=false;
+ var c={};bellItems().forEach(function(x){c[x.cat]=(c[x.cat]||0)+1});
+ var o=RENDER["viec"]();
+ t("khong con cam cung danh sach bo phan", !/var teams=\["Tuyển sinh","Học vụ","Tài chính","CSKH"\]/.test(SRC));
+ Object.keys(c).forEach(function(k){
+  t("bo phan '"+k+"' co viec that thi phai co chip loc", o.indexOf(k)>=0)});
+ t("nhom 'Giao viec' khong con bi bo quen", !c["Giao việc"]||o.indexOf("Giao việc")>=0);
+ /* loc theo bo phan phai ra dung so */
+ Object.keys(c).forEach(function(k){
+  window.VIECTEAM=k;
+  var n=bellItems().filter(function(x){return x.cat===k}).length;
+  t("loc bo phan '"+k+"' ra dung "+n+" viec", n===c[k])});
+ window.VIECTEAM="all";
+ t("o 'bo phan dong viec nhat' tinh tu du lieu, khong ghi cung ten",
+   !/"Của Học vụ"/.test(SRC));
+ CURSTAFF="";applyScope("");setRole("all");
+})();
+
+
+/* ---- 22. BO PHAN ACA va WOW phai co rieng (V9.29, anh Luan: "bo phan aca va team wow ko co ha") ----
+   Truoc day viec cham test / cham bai / nhan xet buoi (giang vien ACA) va ghi noi dung buoi WOW
+   deu bi don het vao "Hoc vu" - hai bo phan that khong co cho nao goi ten. */
+(function(){
+ setRole("all");
+ var c={};slaItems().forEach(function(x){c[x.cat]=(c[x.cat]||0)+1});
+ t("co bo phan Giang vien (ACA) rieng", (c["Giảng viên (ACA)"]||0)>0);
+ t("co bo phan WOW rieng", ("WOW" in c));
+ t("viec cham test da chuyen sang ACA", /add\("Giảng viên \(ACA\)","Chấm test đầu vào"/.test(SRC));
+ t("viec ghi noi dung WOW da chuyen sang WOW", /add\("WOW","Ghi nội dung WOW"/.test(SRC));
+ /* BAT BIEN QUAN TRONG: doi cat ma quen cap nhat chuong = canh bao bien mat khoi moi vai */
+ var roles=["tuvan","hocvu","giaovien","wow","ketoan","marketing","hotro"];
+ Object.keys(c).forEach(function(cat){
+  var ai=roles.filter(function(k){var b=ROLESCOPE[k].bell;return b==="*"||(b||[]).indexOf(cat)>=0});
+  t("bo phan '"+cat+"' den duoc chuong cua it nhat mot vai", ai.length>0)});
+ /* giao vien phai thay dung viec cua minh */
+ var gv=rows("DL01").filter(function(x){return ecode(x.role)==="teacher"})[0];
+ if(gv){CURSTAFF=gv.staff_id;applyScope(gv.staff_id);
+  var cc={};bellItems().forEach(function(x){cc[x.cat]=(cc[x.cat]||0)+1});
+  t("giao vien thay viec nhom ACA trong chuong cua minh", (cc["Giảng viên (ACA)"]||0)>0);
+  window.VIECTEAM="all";window.VIECGRP="all";window.VIECSEV="";window.VIECOD=false;
+  t("trang Viec hom nay cua giao vien co chip ACA", RENDER["viec"]().indexOf("Giảng viên (ACA)")>=0);
+  CURSTAFF="";applyScope("")}
+ setRole("all");
 })();
 
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");
