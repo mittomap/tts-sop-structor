@@ -728,6 +728,28 @@ for st in R("DL09"):
         st["total_enrollments"] = len(es); c14b += 1
 log.append("14b. Hồ sơ HV: đặt lại first_enrollment_id/date + total_enrollments cho %d chỗ lệch" % c14b)
 
+# ═══ 14c. DỮ LIỆU CHO CỔNG HỌC VIÊN (mảng 3) ═════════════════════════════
+# Cổng học viên sắp có 7 kênh hai chiều. Ba thứ dữ liệu phải mở đường trước:
+#  (1) enum_task_type thêm "student_request" - yêu cầu do CHÍNH học viên gửi lên;
+#  (2) DL16 thêm cột session_id - đánh giá gắn vào ĐÚNG buổi học (hàng sao từng buổi);
+#  (3) DL20.file_link đang rỗng 100% nên nút tải tài liệu bên cổng bấm vào không ra gì.
+_et = d.setdefault("enums", {}).setdefault("enum_task_type", [])
+if not any(str(x).startswith("student_request") for x in _et):
+    _et.append("student_request (Yêu cầu từ học viên)")
+_ec = d["enums"].setdefault("enum_contact_channel", [])
+c14c = 0
+for f in R("DL16"):
+    if "session_id" not in f:
+        f["session_id"] = ""
+        c14c += 1
+_lk = 0
+for b in R("DL20"):
+    if not str(b.get("file_link") or "").strip():
+        b["file_link"] = "https://drive.google.com/itts/baitap/%s" % str(b.get("hw_bank_id") or "").lower()
+        _lk += 1
+log.append("14c. Cổng học viên: thêm enum student_request | mở cột DL16.session_id cho %d dòng | "
+           "gán link tài liệu cho %d bài trong kho" % (c14c, _lk))
+
 # ═══ 15. SAN PHẲNG SƠ ĐỒ CỘT (UNION KEY) - PHẢI LÀ PASS CUỐI CÙNG ═════════
 # Cột chỉ có mặt ở vài dòng (referrer_name, referral_uses, net_received...) làm app render
 # ô trống và bản Sheets lệch cột. LUẬT: mọi dòng trong cùng một bảng phải CÙNG BỘ CỘT.

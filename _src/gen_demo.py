@@ -52,6 +52,28 @@ for _s in STAFF:
         _s["full_name"]=_f[0]; _s["email"]=_f[1]+"@ieltsthetutors.edu.vn"
     if str(_s.get("full_name") or "").strip()=="(Chưa tuyển)":
         _s["full_name"]="(Chưa tuyển - "+str(_s.get("department") or "?")+")"
+# Cổng học viên phải cho HV biết GV của mình là ai. gvBioEdit trong app đã biết ghi 2 cột này
+# nhưng DL01 chưa bao giờ seed -> thẻ giảng viên bên cổng HV trống trơn.
+_GVBIO=["Chuyên luyện Speaking và phát âm, 6 năm đứng lớp IELTS, IELTS 8.0.",
+        "Thế mạnh Writing Task 2 và tư duy lập luận, 5 năm kinh nghiệm, IELTS 8.5.",
+        "Chuyên Listening và chiến thuật làm đề, đã đưa hơn 200 học viên qua mốc 6.5.",
+        "Chuyên Reading và từ vựng học thuật, bám sát từng học viên yếu.",
+        "Luyện nền tảng cho người mới bắt đầu, kiên nhẫn và đi chậm chắc.",
+        "Chuyên nhóm mục tiêu 7.0+, luyện đề sát format thi thật.",
+        "Chuyên Speaking part 2-3, sửa phát âm theo từng lỗi cá nhân.",
+        "Thế mạnh ngữ pháp và sửa lỗi bài viết chi tiết từng câu.",
+        "Chuyên khóa cấp tốc, kèm sát tiến độ hằng tuần.",
+        "Chuyên Writing Task 1 và mô tả số liệu, chấm bài rất kỹ."]
+for _s in STAFF:
+    _s.setdefault("bio",""); _s.setdefault("avatar_url","")
+_gi=0
+for _s in STAFF:
+    if str(_s.get("role","")).startswith("teacher") or "wow_coach" in str(_s.get("role","")):
+        if not _s.get("bio"):
+            _s["bio"]=_GVBIO[_gi%len(_GVBIO)]; _gi+=1
+        if not _s.get("avatar_url"):
+            _s["avatar_url"]=("https://ui-avatars.com/api/?background=1E3A5F&color=fff&name="
+                              +"+".join(str(_s.get("full_name","GV")).split()[-2:]))
 for _tid,_tnm,_tml,_thr,_tsd in _NEW_TEACH:
     TEACH[_tid]=_tnm          # LUÔN ghi vào bảng GV, kể cả khi DL01 đã có sẵn từ lần chạy trước
     if any(x.get("staff_id")==_tid for x in STAFF): continue
