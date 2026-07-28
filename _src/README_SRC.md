@@ -42,9 +42,9 @@ Bộ kiểm gồm **5 phần, phải xanh HẾT mới được giao**:
 | `ITTS_OUT=<out> node _check11.js` | `TONG: 131`, KHÔNG có dòng `FAIL` |
 | `ITTS_OUT=<out> node _check12.js` | `CHECK12 OK: 37 tieu chi` - một cửa vào, một luật |
 | `ITTS_OUT=<out> node _check13.js` | `CHECK13 OK: 174 tieu chi` - KPI biết nói |
-| `ITTS_OUT=<out> node _check14.js` | `CHECK14 OK: 100 tieu chi` - cổng học viên hai chiều |
+| `ITTS_OUT=<out> node _check14.js` | `CHECK14 OK: 101 tieu chi` - cổng học viên hai chiều |
 | `ITTS_OUT=<out> node _check15.js` | `CHECK15 OK: 37 tieu chi` - **kiểm kê cửa ghi + bất biến nghiệp vụ** |
-| `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 236 tieu chi` - học phí theo đợt + toàn bộ vá V9.27 |
+| `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 270 tieu chi` - học phí theo đợt + toàn bộ vá V9.27 |
 | `ITTS_OUT=<out> node _checkdata.js` | `CHECKDATA OK: 26 luat ... 0 cho lech` - **dữ liệu demo có khớp ga nghiệp vụ không** |
 | `ITTS_OUT=<out> node _check17.js` | `CHECK17 OK: 392 tieu chi` - **bộ máy lọc chuyên sâu** (kết hợp trục, lưu theo người) |
 | `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` |
@@ -168,3 +168,30 @@ Trang không nằm trong `LISTCFG` thì khai bảng nguồn ở `FLTSRC` (ví d�
 > **MỌI trục phải đi qua `fltColOk()`** - trục trỏ vào cột KHÔNG CÓ THẬT thì bị loại và `_check17`
 > báo đỏ. Ngay lần đầu chạy, chốt chặn này đã bắt được `DL05.course_status` không tồn tại (bảng
 > khóa học dùng `status`). Đây đúng lớp lỗi đã làm hỏng một báo cáo trước đó (`wow_teacher_id`).
+
+
+## XIN NGHỈ CÓ PHÉP - VÒNG ĐỜI (V9.29, việc C)
+
+`BÁO NGHỈ -> CHỜ DUYỆT -> (Có phép / Không phép) -> tuỳ chọn XẾP BÙ`
+
+Ba hàm lõi, mọi cửa đều đi qua đúng ba hàm này (đã khai vào `KHAI.DL12` của `_check15.js`):
+
+| Hàm | Việc |
+|---|---|
+| `absReq(sid, sess, lyDo, xinBu)` | Học viên xin nghỉ. Ghi `absence_type = pending_review (Chờ duyệt)`. |
+| `absReview(attId, kind, note)` | Học vụ duyệt: `excused` hoặc `unexcused`. **Chuyên cần chỉ chốt ở đây.** |
+| `absMakeup(attId, target, note)` | Xếp bù cho MỘT học viên - gắn vào buổi CÓ SẴN, không đẻ buổi mới. |
+
+> **`absMakeup` khác hẳn `bhMakeup`.** `bhMakeup` dùng cho buổi bị hủy **cả lớp** và có tạo bản ghi
+> DL11 mới. `absMakeup` là chuyện của **một học viên** - chỉ ghi kế hoạch bù lên chính dòng vắng đó.
+> Nhầm hai cái này là đẻ ra buổi học ma.
+
+**Hai bẫy đã cắn khi làm:**
+- Hàng đợi duyệt phải nằm **TRÊN** cổng điểm danh. Buổi chưa tới giờ thì `ddHub` return sớm - mà đó
+  đúng là lúc giáo viên cần biết nhất để chuẩn bị phần bù.
+- `add()` trong `slaItems` nhận **13 tham số VỊ TRÍ** (`cat,grp,sev,ic,who,what,age,page,filter,lead,hoso,act,rid`).
+  Truyền một object vào giữa là chuông câm mà không báo lỗi.
+
+**Định nghĩa "vắng không phép" đã được thống nhất.** Trước đây `stuAttStats` viết `!== "excused"`
+còn ba chỗ khác dùng `/unexcused/` - thêm trạng thái thứ ba là dòng chờ duyệt bị tính oan ngay.
+Nay tất cả đều là `/unexcused/`.

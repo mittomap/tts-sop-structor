@@ -74,7 +74,11 @@ t("bang lich dong theo dot DL06b co du lieu", rows("DL06b").length>0);
  var a=rows("DL12").filter(function(x){return x.session_id===s2.session_id&&x.student_id===ob.student_id})[0];
  t("(a) bao nghi -> co ban ghi diem danh", !!a);
  t("(a) bao nghi -> danh dau VANG", a&&isc(a.attendance_status,"no_show"));
- t("(a) bao nghi -> tinh la CO PHEP", a&&isc(a.absence_type,"excused"));
+ /* V9.29 (viec C): DAO Y CO CHU DICH. Truoc day bao nghi la app tu cho "co phep" ngay - hoc vien
+    tu quyet chuyen can cua chinh minh. Nay phai nam o CHO DUYET cho toi khi hoc vu quyet. */
+ t("(a) bao nghi -> nam o CHO DUYET, khong tu cho minh co phep", a&&isc(a.absence_type,"pending_review"));
+ t("(a) bao nghi -> chua tinh vao vang KHONG PHEP khi chua ai duyet",
+   a&&!/unexcused/.test(ecode(a.absence_type)));
  t("(a) bao nghi -> luu lai ly do hoc vien tu ghi", a&&hvSelfWhy(a).indexOf("om")>=0);
  t("(a) dong HV tu bao duoc danh dau ro (khong de mot cot moi ngoai so do bang)", a&&hvSelfRow(a)&&("student_reason" in a)===false);
  t("(a) bao nghi -> sinh yeu cau cho hoc vu", rows("DL23").length===nTask+1);

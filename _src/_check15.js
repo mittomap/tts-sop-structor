@@ -44,7 +44,9 @@ var KHAI={
  DL09:["blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota"],
  DL10:["xepMoiLuu","obChangeSave","clsSave","rfNeed"],
  DL11:["bhCancelRun","bhDone","bhMakeupSave","bhNoteSave","ddSave","sessEnd","sessStart"],
- DL12:["ddSave","hvAbsentSave"],
+ /* V9.29: xin nghỉ có phép đi qua BA cửa lõi. hvAbsentSave (cổng học viên) nay chỉ GỌI absReq,
+    không tự ghi DL12 nữa - giữ tên trong sổ để nếu ai đó lại cho nó ghi tay thì lộ ra ngay. */
+ DL12:["ddSave","hvAbsentSave","absReq","absReview","absMakeup"],
  DL13:["chamLuu","giaoBaiCaLop","giaoBaiRieng","sesAssignRun","thuLuu"],
  DL14:["hvWowSave","wowAddSave","wowCancelRun","wowConfirm","wowNoShow","wowNoteSave","wowRescheduleRun","wowTaught","wowUseQuota"],
  DL15:["rvSend","svFollowDone","svResultSave","svSendSave"],

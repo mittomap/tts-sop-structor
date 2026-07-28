@@ -360,6 +360,13 @@ print("\nDA GHI", P)
 # ═══ 9. DANH MỤC ENUM THIẾU ══════════════════════════════════════════════
 # App gọi eFull("enum_cancellation_reason",...) nhưng danh mục không có bộ này
 # -> eFull trả chuỗi trần, người dùng nhìn thấy MÃ LẬP TRÌNH trên màn hình.
+# V9.29: thêm trạng thái CHỜ DUYỆT cho lý do vắng. Học viên báo nghỉ thì dòng điểm danh nằm ở
+# "chờ duyệt" cho tới khi học vụ quyết - không để em tự cho mình vắng có phép.
+_abs = d.setdefault("enums", {}).setdefault("enum_absence_type", [])
+if not any(str(x).startswith("pending_review") for x in _abs):
+    _abs.append("pending_review (Chờ duyệt)")
+    log.append("Danh mục: thêm 'pending_review (Chờ duyệt)' vào enum_absence_type")
+
 if "enum_cancellation_reason" not in d["enums"]:
     d["enums"]["enum_cancellation_reason"] = [
         "cancelled_by_student (Học viên tự hủy)",

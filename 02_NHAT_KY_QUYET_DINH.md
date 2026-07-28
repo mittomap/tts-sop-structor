@@ -149,14 +149,14 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.28** (28/07 - việc (A) dữ liệu demo XONG 218->0; việc (B) bộ máy lọc XONG, phủ 16 trang).
+> **Phiên bản: V9.29** (28/07 - việc (A) dữ liệu demo XONG 218->0; (B) bộ máy lọc XONG phủ 16 trang; (C) xin nghỉ có phép XONG). CÒN (D) mảng 5 và (E) việc tồn đợt 2.
 > **KHÔNG CÒN PHIÊN TỰ ĐỘNG.** Routine "Auto - Github ITTs-SOP-Demo" đã bị XOÁ theo lệnh anh Luân
 > (28/07 chiều). Lý do: phiên chạy lịch chỉ có quyền ĐỌC repo, `git push` trả 403 "Not authorized to
 > access repository mittomap/tts-sop-structor". Chúng nó làm xong việc rồi mới phát hiện không đẩy
 > được, công sức nằm chết trong container. Muốn bật lại thì phải cấp quyền GHI cho môi trường chạy
 > lịch trước, và giữ nguyên BƯỚC 0 "thử `git push --dry-run` trước khi làm bất cứ việc gì". MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG.
 > Bộ kiểm hiện tại: node --check 2 file · `_tall` 38 trang 0 lỗi (165 icon) · `_check11` 131 ·
-> `_check12` 37 · `_check13` 174 · `_check14` 100 · `_check15` 37 · **`_check16` 236** · `_checktour` ·
+> `_check12` 37 · `_check13` 174 · `_check14` 101 · `_check15` 37 · **`_check16` 236** · `_checktour` ·
 > `check_logic.py` 132 luật (đúng 4 ca cố ý) · `check_data.py` DAT · **`_checkdata.js` 26 luật / 6206 lượt kiểm - 0 lệch · `_check17.js` 392 tiêu chí**.
 >
 > **VIỆC PHẢI LÀM TIẾP - THEO ĐÚNG THỨ TỰ NÀY (Luân chốt 28/07 khuya, rồi về nghỉ):**
@@ -224,7 +224,25 @@
 > đang mở, hiện thành chip gỡ được. Làm 6-8 trang nặng trước (Giao việc, Học viên, Lead, Thanh toán,
 > Lớp, Buổi học, Chặng, Báo cáo) rồi ĐẨY, phủ nốt ở lượt sau.
 >
-> **(C) HỌC VIÊN XIN NGHỈ - còn hụt, Luân đã hỏi và đồng ý vá.** Đã truy vết thật: `hvAbsentSave` ghi
+> **(C) HỌC VIÊN XIN NGHỈ - ✅ XONG (28/07, V9.29).** Vòng đời đầy đủ: `BÁO NGHỈ -> CHỜ DUYỆT ->
+> (Có phép / Không phép) -> tuỳ chọn XẾP BÙ`. Ba hàm lõi `absReq` / `absReview` / `absMakeup`
+> (đã khai vào `KHAI.DL12` của `_check15`); `hvAbsentSave` của cổng học viên nay chỉ GỌI `absReq`,
+> không tự ghi DL12 nữa - **học viên không còn tự quyết chuyên cần của chính mình**. Thêm giá trị
+> `pending_review (Chờ duyệt)` vào CH1 `enum_absence_type` (sinh ở `fixdata.py`). Hàng đợi duyệt
+> hiện trên màn Điểm danh của đúng buổi + trên trang Buổi học liệt kê các buổi SẮP TỚI, nên
+> **giáo viên biết trước giờ dạy** - đúng lời app hứa với học viên. Đơn để lâu thì chuông reo theo
+> `slaTaskAccept_hours`. Cổng học viên hiện rõ trạng thái đơn ("trung tâm đang xem xét" / "đã được
+> duyệt" / "không được chấp nhận") và lịch học bù đã xếp. `absMakeup` gắn em đó vào buổi CÓ SẴN
+> cùng khóa ở tương lai - **khác hẳn `bhMakeup`** (buổi hủy cả lớp, có đẻ DL11 mới).
+> **Ba bẫy đã cắn:** (1) hàng đợi phải nằm TRÊN cổng điểm danh, vì buổi chưa tới giờ thì `ddHub`
+> return sớm - mà đó đúng là lúc GV cần biết nhất; (2) `add()` trong `slaItems` nhận **13 tham số
+> VỊ TRÍ**, truyền object vào giữa là chuông câm không báo lỗi; (3) định nghĩa "vắng không phép"
+> đang **lệch nhau trong chính app** - `stuAttStats` viết `!=="excused"` còn ba chỗ khác dùng
+> `/unexcused/`, nên vừa thêm trạng thái thứ ba là dòng chờ duyệt bị tính oan ngay. Đã thống nhất
+> hết về `/unexcused/`. `_check14` phải ĐẢO một tiêu chí cũ ("báo nghỉ -> tính là CÓ PHÉP") vì đó
+> chính là hành vi sai đang đi sửa.
+>
+> *(mô tả gốc)* HỌC VIÊN XIN NGHỈ - còn hụt, Luân đã hỏi và đồng ý vá. Đã truy vết thật: `hvAbsentSave` ghi
 > DL12 `no_show + excused` kèm `[HV tự báo]` và tạo việc DL23 giao cho `academic_staff`. Học vụ THẤY
 > (trang Giao việc + badge + chuông khi quá hạn). Giảng viên **chỉ thấy gián tiếp và chỉ khi tới giờ
 > điểm danh** - báo trước 3 ngày thì suốt 3 ngày GV không có chỗ nào biết, trong khi app hứa với học

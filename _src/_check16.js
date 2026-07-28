@@ -421,4 +421,84 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("hang nut co the xuong dong khi chat", /\.dtq\{[^}]*flex-wrap:wrap/.test(CSS));
 })();
 
+
+/* ---- 18. XIN NGHI CO PHEP - VONG DOI DAY DU (V9.29, viec C) ----
+   Chay THAT ca duong: hoc vien xin -> cho duyet -> hoc vu duyet -> xep bu. */
+(function(){
+ setRole("all");
+ var ob=rows("DL08").filter(function(o){return o.class_id})[0];
+ var ses=rows("DL11").filter(function(x){return x.class_id===ob.class_id&&pvnd(x.session_date)>Date.now()})[0]
+       ||rows("DL11").filter(function(x){return x.class_id===ob.class_id})[0];
+ var sid=ob.student_id;
+ t("co du lieu de kiem xin nghi", !!(ob&&ses&&sid));
+ t("danh muc CH1 co trang thai 'cho duyet'",
+   (ENUM.enum_absence_type||[]).some(function(x){return ecode(x)==="pending_review"}));
+ /* (1) hoc vien xin nghi */
+ var a=absReq(sid,ses.session_id,"em bi om",true);
+ t("xin nghi tao dong diem danh", !!a);
+ t("ghi la VANG", isc(a.attendance_status,"no_show"));
+ t("KHONG tu cho minh co phep - phai la CHO DUYET", absPending(a)&&ecode(a.absence_type)==="pending_review");
+ t("giu nguyen van ly do cua hoc vien", /em bi om/.test(a.note||""));
+ t("danh dau la HV tu bao", hvSelfRow(a));
+ t("ghi lai gio bao", !!String(a.absence_reported_at||"").trim());
+ t("ghi nhan nguyen vong hoc bu", a.absence_want_makeup==="Có");
+ /* dang cho duyet thi KHONG duoc tinh la vang khong phep */
+ var st=stuAttStats(sid);
+ t("dang cho duyet thi chua tinh vao vang KHONG PHEP",
+   st.absU.every(function(x){return x.attendance_id!==a.attendance_id}));
+ /* (2) hoc vu thay o hang doi + chuong reo */
+ t("don nay nam trong hang doi cho duyet",
+   absQueue().some(function(x){return x.attendance_id===a.attendance_id}));
+ t("man diem danh cua dung buoi do co hien don",
+   absOfSession(ses.session_id).some(function(x){return x.attendance_id===a.attendance_id}));
+ window.DDCLASS=ob.class_id;window.DDSESS=ses.session_id;
+ var dd=ddHub({});
+ t("man diem danh ve ra hang doi duyet", dd.indexOf("chờ duyệt")>=0);
+ t("man diem danh co nut Duyet", dd.indexOf("absForm(")>=0);
+ var bh=RENDER["buoihoc"]?RENDER["buoihoc"]():"";
+ t("GIAO VIEN thay truoc gio day ai da bao nghi", bh.indexOf("đã báo nghỉ các buổi sắp tới")>=0);
+ a.absence_reported_at="01/01/2026 08:00";
+ t("de lau khong duyet thi chuong reo do",
+   slaItems().some(function(x){return /Duyệt đơn xin nghỉ/.test(x.grp||"")&&x.sev==="red"}));
+ a.absence_reported_at=nowStr();
+ /* (3) duyet */
+ reset();setF({ab_note:"da goi xac nhan voi phu huynh"});
+ absRun(a.attendance_id,"excused");
+ t("duyet xong thi thanh VANG CO PHEP", ecode(a.absence_type)==="excused");
+ t("khong con nam trong hang doi", !absQueue().some(function(x){return x.attendance_id===a.attendance_id}));
+ t("ghi lai AI duyet va duyet LUC NAO", !!a.absence_reviewed_at);
+ t("giu ghi chu cua nguoi duyet", /phu huynh/.test(a.absence_review_note||""));
+ /* (4) xep bu cho MOT hoc vien */
+ var opts=absMakeupOpts(a);
+ t("co danh sach buoi de xep bu", opts.length>0);
+ t("chi goi y buoi o TUONG LAI", opts.every(function(x){return pvnd(x.session_date)>Date.now()}));
+ t("chi goi y buoi CHUA HUY", opts.every(function(x){return !isc(x.session_status,"cancelled")}));
+ if(opts.length){
+  reset();setF({ab_mk:opts[0].session_id});
+  absMkRun(a.attendance_id);
+  t("xep duoc buoi bu cho rieng em nay", a.makeup_session_id===opts[0].session_id);
+  t("ghi ro trang thai da xep lich bu", /planned/.test(a.makeup_status||""));
+  t("khong de ra buoi hoc moi (khac han bhMakeup cua buoi huy ca lop)",
+    !rows("DL11").some(function(x){return /dạy bù cho/.test(String(x.notes||""))&&x.session_id===a.makeup_session_id}));
+ }
+ /* (5) duong tu choi */
+ var ses2=rows("DL11").filter(function(x){return x.class_id===ob.class_id&&x.session_id!==ses.session_id})[0];
+ if(ses2){var b=absReq(sid,ses2.session_id,"em ban viec rieng",false);
+  reset();setF({ab_note:"bao sat gio qua"});
+  absRun(b.attendance_id,"unexcused");
+  t("khong chap nhan thi thanh VANG KHONG PHEP", ecode(b.absence_type)==="unexcused");
+  var st2=stuAttStats(sid);
+  t("luc do moi tinh vao vang khong phep",
+    st2.absU.some(function(x){return x.attendance_id===b.attendance_id}));}
+ /* (6) cong hoc vien nhin thay trang thai don cua minh */
+ t("cong hoc vien noi ro dang cho duyet", /trung tâm đang xem xét/.test(SRC));
+ t("cong hoc vien noi ro da duoc duyet", /đã được duyệt: vắng có phép/.test(SRC));
+ t("cong hoc vien noi ro khong duoc chap nhan", /không được chấp nhận/.test(SRC));
+ t("cong hoc vien thay lich hoc bu da xep", /đã xếp học bù: buổi/.test(SRC));
+ /* (7) cong hoc vien KHONG con tu ghi thang vao so diem danh */
+ t("hvAbsentSave nay di qua ham loi absReq", /function hvAbsentSave[\s\S]{0,900}?absReq\(/.test(SRC));
+ t("hvAbsentSave khong con tu dat absence_type",
+   !/function hvAbsentSave[\s\S]{0,900}?a\.absence_type=/.test(SRC));
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");

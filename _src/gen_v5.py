@@ -108,6 +108,17 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .fltchip i{font-size:13px;opacity:.55;cursor:pointer}
 .fltchip i:hover{opacity:1;color:var(--red)}
 .tbar2{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-4px 0 12px}
+/* ===== V9.29 XIN NGHI CHO DUYET ===== */
+.absq{margin-bottom:12px;border-left:3px solid var(--amber)}
+.absrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #F2F5F9;flex-wrap:wrap}
+.absrow:last-child{border-bottom:0}
+.absi{flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:2px}
+.absi b{font-size:13px}
+.absi span{font-size:11.5px;color:var(--muted)}
+.absi .absw{color:#5A6675;font-style:italic}
+.rost.pend{background:#FFFBF2}
+.abschip{margin-left:8px;cursor:pointer;border:0;font-family:inherit}
+.abschip i{margin-right:4px}
 .navgrp{margin-bottom:3px}
 .navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500;border-left:3px solid transparent}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
@@ -2273,7 +2284,9 @@ function openQuick(pid){if(!pid)return;
 /* ===== DRAWER THÔNG TIN NHANH HỌC VIÊN (bấm tên HV) — FB-12/13/14 ===== */
 function stuAttStats(sid){var att=rows("DL12").filter(function(a){return a.student_id===sid});
  var pres=att.filter(function(a){return isc(a.attendance_status,"on_time","late")}).length;
- var absU=att.filter(function(a){return isc(a.attendance_status,"no_show")&&ecode(a.absence_type)!=="excused"});
+ /* V9.29: phải là KHÔNG PHÉP thật. Trước đây viết !=="excused" nên dòng đang CHỜ DUYỆT bị tính
+    oan là vắng không phép - lệch hẳn với ba chỗ khác trong app (đều dùng /unexcused/). */
+ var absU=att.filter(function(a){return isc(a.attendance_status,"no_show")&&/unexcused/.test(ecode(a.absence_type))});
  return {n:att.length,pres:pres,rate:att.length?Math.round(pres/att.length*100):null,absU:absU}}
 function stuRiskReasons(s){var out=[];var sid=s.student_id;
  if(isRisk(s.attendance_progress_status)){var st=stuAttStats(sid);var t="Chuyên cần: "+(elabel(s.attendance_progress_status)||"nguy cơ");
@@ -2696,11 +2709,23 @@ function slaItems(){var out=jTasks();
    if(daysLeft<0&&!/cancelled/.test(stc)){var pend=ktGenTargets(c.class_id).length;
     if(pend)add("Học vụ","Hồ sơ kết thúc khóa","red","ti-school-off",c.class_name||c.class_id,
      pend+" HV chưa có hồ sơ đầu ra dù lớp đã kết thúc "+Math.floor(-daysLeft)+" ngày - tạo ngay để kịp mời tái ĐK",-daysLeft*24,"ketthuc",null)}})})();
+ /* V9.29: đơn xin nghỉ nằm chờ duyệt quá lâu - học viên đang chờ câu trả lời, và chuyên cần của
+    em treo lơ lửng cho tới khi có người quyết. Dùng chung ngưỡng nhận việc của CH2. */
+ (function(){var lim=num(paramOf("slaTaskAccept_hours",4))||4;
+  srows("DL12").filter(absPending).forEach(function(a){
+   var age=hoursSince(a.absence_reported_at);
+   var ss=find("DL11","session_id",a.session_id)||{};
+   add("Học vụ","Duyệt đơn xin nghỉ",(age!=null&&age>lim)?"red":"amber","ti-user-question",
+    a.student_name||a.student_id,
+    (age!=null&&age>lim?"QUÁ HẠN duyệt - ":"")+"HV xin nghỉ buổi "+(ss.session_number||"?")+
+    " ngày "+(ss.session_date||"")+(a.absence_want_makeup?" và xin học bù":""),
+    age||0,"diemdanh",null,null,null,"absForm",a.attendance_id)})})();
  /* HV vắng buổi mà chưa ai hỏi thăm: SOP gọi trong slaAbsenceCall_hours (24h). Ghi chú vào dòng điểm danh = đã xử lý. */
  (function(){var absH=paramOf("slaAbsenceCall_hours",24);
   srows("DL12").forEach(function(a){
    if(!isc(a.attendance_status,"no_show"))return;
    if(ecode(a.absence_type)==="excused")return;
+   if(absPending(a))return;   /* V9.29: đang chờ duyệt = đã có người lo, chuông không reo thêm */
    if(String(a.note||"").trim())return;
    var ss=find("DL11","session_id",a.session_id);var d=ss?pvnd(ss.session_date):null;if(!d)return;
    var age=(new Date().getTime()-d.getTime())/36e5;
@@ -2869,6 +2894,125 @@ function ddSessions(cid){var ss=rows("DL11").filter(function(s){return s.class_i
 function renderDiemDanh(){return ddHub({})}
 /* ddHub: bàn làm việc điểm danh + nhận xét. opt.embed=true -> bỏ tiêu đề trang, classBar,
    ô chọn lớp (do trang Lớp học đã có); chỉ giữ chọn buổi + workspace. */
+/* ═══════════ V9.29 XIN NGHỈ CÓ PHÉP - VÒNG ĐỜI ĐẦY ĐỦ (việc C, anh Luân hỏi 28/07) ═══════════
+   Trước đây: học viên bấm "Báo nghỉ" là app GHI THẲNG vào sổ điểm danh "vắng có phép" - tự quyết
+   chuyên cần của chính mình, chưa ai duyệt. Học vụ chỉ nhận một việc chung chung với nút "Báo xong",
+   KHÔNG có nút duyệt. Giáo viên báo trước 3 ngày cũng không có chỗ nào thấy, dù app hứa với học viên
+   là "báo trước giúp giảng viên chuẩn bị phần bù". Và ô "cho tôi xin buổi học bù" chỉ nằm trong phần
+   nội dung của việc, không thành hành động nào.
+
+   Nay: BÁO NGHỈ -> CHỜ DUYỆT -> (Có phép / Không phép) -> tuỳ chọn XẾP BÙ.
+   MỘT HÀNH ĐỘNG = MỘT HÀM LÕI: absReq (xin) · absReview (duyệt) · absMakeup (xếp bù).
+   Cổng học viên và app nhân viên đều đi qua đúng ba hàm này, không ai ghi tay vào DL12 nữa. */
+function absPending(a){return ecode(a&&a.absence_type)==="pending_review"}
+function absOf(sid,sess){return rows("DL12").filter(function(r){
+ return String(r.student_id||"")===String(sid)&&String(r.session_id||"")===String(sess)})[0]}
+/* danh sách chờ duyệt - dùng chung cho hàng đợi học vụ, cảnh báo chuông và badge */
+function absQueue(){return rows("DL12").filter(absPending)}
+function absOfSession(sess){return rows("DL12").filter(function(r){
+ return String(r.session_id||"")===String(sess)&&absPending(r)})}
+
+/* (1) XIN NGHỈ - gọi từ cổng học viên. Ghi CHỜ DUYỆT, không tự cho mình có phép. */
+function absReq(sid,sess,reason,wantMakeup){
+ if(!sid||!sess)return null;
+ var S=find("DL09","student_id",sid)||{}, s2=find("DL11","session_id",sess)||{};
+ var a=absOf(sid,sess);
+ if(!a){a={attendance_id:"AT-"+seqNo("DL12","attendance_id",4),session_id:sess,student_id:sid,
+   student_name:S.full_name||"",check_in_time:"",in_class_performance:"",note:"",next_action:""};
+  DL.DL12=DL.DL12||[];DL.DL12.unshift(a)}
+ a.attendance_status=eFull("enum_attendance_status","no_show");
+ a.absence_type=eFull("enum_absence_type","pending_review");
+ a.note=HVSELF+" "+nowStr()+": "+String(reason||"").trim();
+ a.absence_reported_at=nowStr();
+ a.absence_want_makeup=wantMakeup?"Có":"";
+ a.absence_reviewed_by="";a.absence_reviewed_at="";a.absence_review_note="";
+ a.makeup_session_id="";a.makeup_status="";
+ persistSoon();
+ return a}
+
+/* (2) DUYỆT - học vụ quyết định có phép hay không. Đây là chỗ chuyên cần THỰC SỰ được chốt. */
+function absReview(attId,kind,note){
+ var a=find("DL12","attendance_id",attId); if(!a)return null;
+ a.absence_type=eFull("enum_absence_type",kind==="excused"?"excused":"unexcused");
+ a.absence_reviewed_by=CURSTAFF||"";a.absence_reviewed_at=nowStr();
+ a.absence_review_note=String(note||"").trim();
+ persistSoon();
+ return a}
+
+/* (3) XẾP BÙ CHO MỘT HỌC VIÊN - khác hẳn bhMakeup (buổi bị hủy CẢ LỚP).
+   Không đẻ buổi mới: gắn em đó vào một buổi CÓ SẴN trong tương lai, ghi ngay trên dòng vắng. */
+function absMakeup(attId,target,note){
+ var a=find("DL12","attendance_id",attId); if(!a)return null;
+ var t=find("DL11","session_id",target); if(!t)return null;
+ a.makeup_session_id=target;
+ a.makeup_status="planned (Đã xếp lịch bù)";
+ a.absence_review_note=(a.absence_review_note?a.absence_review_note+" · ":"")+
+  "Học bù buổi "+(t.session_number||target)+" ngày "+(t.session_date||"");
+ if(note)a.absence_review_note+=" · "+String(note).trim();
+ persistSoon();
+ return a}
+/* các buổi còn có thể xếp bù cho em này: buổi TƯƠNG LAI, cùng khóa, chưa hủy */
+function absMakeupOpts(a){
+ var s0=find("DL11","session_id",a.session_id)||{};
+ var c0=find("DL10","class_id",s0.class_id)||{};
+ return rows("DL11").filter(function(x){
+  if(isc(x.session_status,"cancelled"))return false;
+  var d=pvnd(x.session_date); if(!d||d.getTime()<=Date.now())return false;
+  var c=find("DL10","class_id",x.class_id)||{};
+  return String(c.course_id||"")===String(c0.course_id||"")})
+ .sort(function(x,y){return (pvnd(x.session_date)||0)-(pvnd(y.session_date)||0)}).slice(0,30)}
+
+/* ---- màn duyệt (drawer) ---- */
+function absForm(attId){
+ var a=find("DL12","attendance_id",attId); if(!a){toast("Không thấy dòng báo nghỉ.");return}
+ var s2=find("DL11","session_id",a.session_id)||{};
+ var lop=find("DL10","class_id",s2.class_id)||{};
+ var h='<div class="dcard"><h4><i class="ti ti-user-question"></i>Duyệt đơn xin nghỉ</h4>';
+ h+=ctxRows([["Học viên",esc(a.student_name||a.student_id)],
+  ["Buổi",esc("Buổi "+(s2.session_number||"?")+" · "+(s2.session_date||"-"))],
+  ["Lớp",lopLnk(s2.class_id,lop.class_name)],
+  ["HV báo lúc",esc(a.absence_reported_at||"-")],
+  ["Xin học bù",a.absence_want_makeup?'<b style="color:var(--navy)">Có</b>':"không"]]);
+ h+=ctxContent("Lý do học viên nêu",hvSelfWhy(a)||a.note||"(không ghi)","var(--navy)");
+ h+='<div class="notebar" style="margin:10px 0"><i class="ti ti-info-circle"></i>Chuyên cần của em chỉ được chốt khi bạn duyệt. Trước lúc đó buổi này <b>chưa</b> tính là vắng không phép.</div>';
+ h+='<div class="fld full"><label>Ghi chú của bạn</label><textarea id="ab_note" rows="2" placeholder="vd: đã gọi xác nhận với phụ huynh"></textarea></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="absRun(\''+esc(attId)+'\',\'excused\')"><i class="ti ti-check"></i>Duyệt - vắng CÓ PHÉP</button>'+
+  '<button class="btn danger" onclick="absRun(\''+esc(attId)+'\',\'unexcused\')"><i class="ti ti-x"></i>Không chấp nhận - vắng KHÔNG PHÉP</button></div>';
+ if(a.absence_want_makeup){
+  var opts=absMakeupOpts(a);
+  h+='<div class="sechd" style="margin-top:14px">Xếp buổi học bù cho riêng em này</div>';
+  if(!opts.length)h+='<div class="mut" style="font-size:12px">Chưa có buổi nào phía trước để xếp bù.</div>';
+  else{h+='<div class="fld full"><label>Chọn buổi học bù</label><select id="ab_mk">'+
+   opts.map(function(x){var c=find("DL10","class_id",x.class_id)||{};
+    return '<option value="'+esc(x.session_id)+'">'+esc((c.class_name||x.class_id)+" · buổi "+(x.session_number||"?")+" · "+(x.session_date||""))+'</option>'}).join("")+
+   '</select></div>'+
+   '<div class="dact"><button class="btn" onclick="absMkRun(\''+esc(attId)+'\')"><i class="ti ti-calendar-plus"></i>Xếp buổi bù này</button></div>'}}
+ return openDrawer("Duyệt xin nghỉ",h+'</div>')}
+function absRun(attId,kind){
+ if(!actGuard("absReview:"+attId))return;
+ var a=absReview(attId,kind,fldV("ab_note"));
+ if(!a)return;
+ closeModal();
+ toast(kind==="excused"?"Đã duyệt: buổi này tính là vắng CÓ PHÉP.":"Đã ghi: buổi này tính là vắng KHÔNG PHÉP.",4200);
+ reRender(CUR)}
+function absMkRun(attId){
+ if(!actGuard("absMakeup:"+attId))return;
+ var t=fldV("ab_mk"); if(!t){toast("Chọn buổi học bù đã.");return}
+ var a=absMakeup(attId,t);
+ if(!a)return;
+ closeModal();toast("Đã xếp buổi học bù cho em này.",3800);reRender(CUR)}
+/* hàng đợi duyệt - dùng ở trang Điểm danh và trang Buổi học */
+function absQueueHTML(list,tit){
+ if(!list.length)return "";
+ var h='<div class="panel absq"><div class="ph"><b><i class="ti ti-user-question" style="margin-right:6px"></i>'+esc(tit||"Học viên xin nghỉ - chờ duyệt")+' ('+list.length+')</b></div><div class="pbody">';
+ list.forEach(function(a){var s2=find("DL11","session_id",a.session_id)||{};
+  var c=find("DL10","class_id",s2.class_id)||{};
+  h+='<div class="absrow"><div class="absi"><b>'+esc(a.student_name||a.student_id)+'</b>'+
+   '<span>'+esc((c.class_name||s2.class_id||"")+" · buổi "+(s2.session_number||"?")+" · "+(s2.session_date||""))+'</span>'+
+   '<span class="absw">'+esc(hvSelfWhy(a)||a.note||"")+'</span></div>'+
+   (a.absence_want_makeup?'<span class="chip blue">xin học bù</span>':'')+
+   '<button class="btn sm primary" onclick="absForm(\''+esc(a.attendance_id)+'\')"><i class="ti ti-gavel"></i>Duyệt</button></div>'});
+ return h+'</div></div>'}
 function ddHub(opt){opt=opt||{};var embed=opt.embed;
  var cls=rows("DL10");
  var cid=window.DDCLASS||(cls[0]&&cls[0].class_id);
@@ -2890,6 +3034,9 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
   sessList.forEach(function(x){var has=rows("DL12").some(function(r){return r.session_id===x.id});h+='<option value="'+esc(x.id)+'"'+(x.id===sess?" selected":"")+'>'+esc(x.label)+(has?" ✓":"")+'</option>'});
   h+='</select></div>';
  }
+ /* V9.29: ai đã báo nghỉ buổi này thì hiện NGAY, và phải nằm TRÊN cổng điểm danh - buổi chưa tới
+    giờ thì ddHub return sớm, mà đó đúng là lúc giáo viên cần biết nhất để chuẩn bị phần bù. */
+ h+=absQueueHTML(absOfSession(sess),"Đã báo nghỉ buổi này - chờ duyệt");
  /* ===== CỔNG ĐIỂM DANH: mở 20 phút trước giờ học; GV bấm Bắt đầu lớp (= điểm danh GV) rồi mới điểm danh HV ===== */
  var gateMin=num(paramOf("slaAttendanceGate_minutes",20))||20;
  var planned=ses?pvnd(ses.session_date):null;
@@ -2933,9 +3080,12 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
  enr.forEach(function(e){var sid=e.student_id,s=find("DL09","student_id",sid)||{};
   var cur=rows("DL12").filter(function(r){return r.student_id===sid&&r.session_id===sess})[0];
   var code=cur?ecode(cur.attendance_status):"";var abs=cur?ecode(cur.absence_type):"";var perf=cur?ecode(cur.in_class_performance):"";
-  var pp=(cur&&/^Học bù/.test(String(cur.note||"")))?"mk":(code==="late"?"l":(code==="no_show"?(abs==="excused"?"ap":"au"):"p"));
+  /* V9.29: dòng đang CHỜ DUYỆT không được tô sẵn vào "Vắng K" - chưa ai quyết cả. */
+  var pend=(abs==="pending_review");
+  var pp=(cur&&/^Học bù/.test(String(cur.note||"")))?"mk":(code==="late"?"l":(code==="no_show"?(pend?"":(abs==="excused"?"ap":"au")):"p"));
   var cin=cur&&String(cur.check_in_time||"").trim()?String(cur.check_in_time).split(" ").pop():"";
-  h+='<div class="rost ddrow" data-sid="'+esc(sid)+'"><div class="rn">'+esc(s.full_name||sid)+'<span class="mut" style="font-weight:500"> '+esc(sid)+'</span>'+(cin?'<span class="cintag"><i class="ti ti-clock"></i> vào '+esc(cin)+'</span>':'')+'</div>';
+  h+='<div class="rost ddrow'+(pend?" pend":"")+'" data-sid="'+esc(sid)+'"><div class="rn">'+esc(s.full_name||sid)+'<span class="mut" style="font-weight:500"> '+esc(sid)+'</span>'+
+   (pend?'<button class="chip amber abschip" onclick="event.stopPropagation();absForm(\''+esc(cur.attendance_id)+'\')" data-tip="Học viên đã xin nghỉ buổi này - bấm để duyệt"><i class="ti ti-user-question"></i>xin nghỉ · chờ duyệt</button>':'')+(cin?'<span class="cintag"><i class="ti ti-clock"></i> vào '+esc(cin)+'</span>':'')+'</div>';
   h+='<div class="att">'+
    '<button class="attb p'+(pp==="p"?" on":"")+'" onclick="ddSet(this)">Có mặt</button>'+
    '<button class="attb l'+(pp==="l"?" on":"")+'" onclick="ddSet(this)">Muộn</button>'+
@@ -8265,7 +8415,7 @@ function renderTrangHV(){
    (a.in_class_performance?' · thái độ trong lớp: <b>'+esc(elabel(a.in_class_performance))+'</b>':'')+
    /* (m) DL12.note là ghi chú NỘI BỘ (vd "đã gọi hỏi thăm, HV hứa đi học lại") - in nguyên
       văn cho học viên đọc là lộ chuyện chăm sóc nội bộ. Chỉ hiện phần HỌC VIÊN TỰ GHI. */
-   (hvSelfWhy(a)?' · lý do bạn báo: '+esc(hvSelfWhy(a)):'')+'</span></div>'}
+   (hvSelfWhy(a)?' · lý do bạn báo: '+esc(hvSelfWhy(a)):'')+/* V9.29: nói rõ đơn của em đang ở đâu - trước đây báo xong là im, em không biết đã được duyệt chưa */(absPending(a)?' · <b style="color:#8A6D1B">trung tâm đang xem xét</b>':(ecode(a.absence_type)==="excused"?' · <b style="color:#1E6A47">đã được duyệt: vắng có phép</b>':(ecode(a.absence_type)==="unexcused"?' · <b style="color:#A32D2D">không được chấp nhận</b>':'')))+(a.makeup_session_id?(function(){var t=find("DL11","session_id",a.makeup_session_id)||{};return ' · <b style="color:var(--navy)">đã xếp học bù: buổi '+esc(t.session_number||'')+' ngày '+esc(t.session_date||'')+'</b>'})():'')+'</span></div>'}
   if(s2.teacher_note_summary)h+='<div class="hvev"><i class="ti ti-notes"></i><span><b>Nhận xét của giảng viên:</b> '+esc(s2.teacher_note_summary)+'</span></div>';
   /* (g) ĐÁNH GIÁ TỪNG BUỔI bằng hàng sao - ghi vào DL16 kèm session_id để học vụ biết buổi nào
      bị chấm thấp, thay vì đợi tới phiếu khảo sát cuối khóa mới biết. */
@@ -8538,19 +8688,14 @@ function hvAbsentSave(sid2){
  var xinbu=!!(document.getElementById("hvab_bu")||{}).checked;
  var S=hvMe();if(!S){toast("Chưa xác định được hồ sơ của bạn.");return}
  var s2=find("DL11","session_id",sid2)||{};
- /* ghi thẳng vào sổ điểm danh dạng vắng CÓ PHÉP - đúng bảng nhân viên vẫn dùng */
- var a=rows("DL12").filter(function(x){return String(x.session_id||"")===sid2&&String(x.student_id||"")===S.student_id})[0];
- if(!a){a={attendance_id:"AT-"+seqNo("DL12","attendance_id",4),session_id:sid2,student_id:S.student_id,
-   student_name:S.full_name,check_in_time:"",in_class_performance:"",note:"",next_action:""};
-  DL.DL12=DL.DL12||[];DL.DL12.unshift(a)}
- a.attendance_status=eFull("enum_attendance_status","no_show");
- a.absence_type=eFull("enum_absence_type","excused");
- a.note=HVSELF+" "+nowStr()+": "+ly;
+ /* V9.29: đi qua HÀM LÕI absReq - ghi CHỜ DUYỆT, không tự cho mình có phép. Học viên không được
+    tự quyết chuyên cần của chính mình; học vụ duyệt rồi buổi này mới thành có phép hay không phép. */
+ absReq(S.student_id,sid2,ly,xinbu);
  hvReq("Học viên báo nghỉ buổi "+(s2.session_number||"")+(xinbu?" và xin học bù":""),
   "Buổi: "+(s2.session_date||"")+" ("+sid2+")\nLý do: "+ly+(xinbu?"\nHọc viên XIN HỌC BÙ buổi này.":""),
   "hocvu",["session",sid2,"Buổi "+(s2.session_number||"")]);
  persistSoon();closeModal();
- toast("Đã báo nghỉ. Buổi này tính là vắng có phép"+(xinbu?", trung tâm sẽ xếp buổi bù cho bạn.":"."),4600);
+ toast("Đã gửi đơn xin nghỉ. Học vụ duyệt xong sẽ báo lại"+(xinbu?" kèm lịch học bù.":"."),4600);
  hvReRender()}
 
 /* ---- (b) XIN HỌC BÙ ---- */
@@ -9209,6 +9354,11 @@ function renderBuoihoc(embed){var p="buoihoc",fil=fget(p);var all=rows("DL11");
   ["ti-alert-triangle",nOver,"Quá hạn ghi nhận xét","#E24B4A","ảnh hưởng KPI TNR"],
   ["ti-clock",all.filter(function(s2){return bhState(s2).late}).length,"Buổi GV vào trễ","#7C3AED","kỷ luật ADC"],
   ["ti-calendar-plus",all.filter(function(s2){return bhState(s2).cancelled}).length,"Hủy - cần dạy bù","#3B82C4","xếp lịch bù"]]);
+ /* V9.29: giáo viên phải biết TRƯỚC giờ dạy ai đã báo nghỉ - app hứa với học viên là "báo trước
+    giúp giảng viên chuẩn bị phần bù", trước đây GV chỉ thấy lúc mở điểm danh (tức là đã tới giờ). */
+ h+=absQueueHTML(absQueue().filter(function(a){
+   var ss=find("DL11","session_id",a.session_id); var d=ss?pvnd(ss.session_date):null;
+   return d&&d.getTime()>=Date.now()-2*36e5}),"Học viên đã báo nghỉ các buổi sắp tới - chờ duyệt");
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả"],["note","Chờ ghi nhận xét"],["overdue","Quá hạn ghi"],["late","GV vào trễ"],["upcoming","Chưa dạy xong"],["cancelled","Hủy / cần dạy bù"]],view.length);
  h+='<div class="obcards rows">';
