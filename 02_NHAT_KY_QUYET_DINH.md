@@ -1059,6 +1059,52 @@ học viên đâu có cần" · "Hồ sơ học viên ở app quản trị ít t
 7 nhóm NAVTREE V9.15 khớp luồng mới (menu này chính Luân duyệt thiết kế ở Đợt 8); tính năng đợt này đều
 nằm TRONG trang sẵn có (màn cổng, Cài đặt, hồ sơ 360, cổng HV) - không thêm/bớt mục menu nào.
 
+## 3vicies. V9.20 — MODULE GIAO VIỆC (DL23/DL24) + CẤU HÌNH GIAO DIỆN (28/07 tối)
+
+Hai yêu cầu mới của Luân: (a) trang cấu hình cho đổi logo / tiêu đề / menu và "mấy cái khác";
+(b) module giao việc cấp trên-cấp dưới / ngang cấp / nhờ hỗ trợ, có thông báo - tracking - báo cáo,
+có bắt buộc và không bắt buộc, **kèm thảo luận theo từng việc cho đỡ trôi**.
+
+### Module giao việc - mô hình nghiệp vụ
+- **Quan hệ tổ chức suy từ DL01** (không đẻ bảng mới): `staffLevel` (ceo=3 / *_manager=2 / *_leader=1 /
+  nhân viên=0), `staffBoss` (ưu tiên cột reports_to, thiếu thì lấy người cùng department cấp cao hơn,
+  cuối cùng rơi về CEO), `staffSubs`. `taskRel(a,b)` quyết định LOẠI gợi ý khi giao:
+  cấp trên+cùng phòng (hoặc CEO) -> assign · cùng cấp -> peer · còn lại -> support.
+- **3 loại** (TKTYPE): assign (giao xuống, mặc định BẮT BUỘC) · peer (phối hợp) · support (nhờ hỗ trợ).
+  **Bắt buộc vs không**: việc bắt buộc KHÔNG có nút Từ chối (chỉ trao đổi báo vướng) và tính vào tỷ lệ
+  đúng hạn; việc không bắt buộc được từ chối kèm lý do bắt buộc nhập.
+- **Vòng đời**: new -> accepted -> done -> confirmed; rẽ declined / cancelled; người giao có "Trả lại
+  làm tiếp" (done -> accepted, xóa done_note để làm lại) và "Nhắc" (tăng remind_count + ghi 1 dòng
+  trao đổi). Mọi chuyển trạng thái đều TỰ GHI một dòng vào luồng trao đổi -> lịch sử đọc được như chat.
+- **DL24 - trao đổi theo việc** (bảng riêng, đúng luật "mỗi dòng một bản ghi"): hỏi đáp nằm trong việc,
+  không trôi như tin nhắn. Drawer chi tiết có khung chat + ô gửi (Enter để gửi).
+- **Thông báo**: slaItems thêm cat "Giao việc" nhưng CHỈ việc của chính người đang đăng nhập (khác mọi
+  mục SLA khác vốn là toàn trung tâm) - việc mới / chưa bấm nhận quá slaTaskAccept_hours / quá hạn /
+  tới hạn hôm nay / chờ tôi xác nhận quá slaTaskConfirm_hours. Nhờ vậy bong bóng việc mới (V9.17) tự
+  nổ khi cổng khác giao việc, không phải viết thêm gì. Badge menu = việc tôi phải làm + chờ tôi xác nhận.
+- **Cấp quyền một chỗ**: vòng lặp sau ROLESCOPE tự thêm "giaoviec" vào pages và "Giao việc" vào bell của
+  MỌI nhóm vai (kể cả hotro lite) - thêm nhóm vai mới sau này không sót.
+- **Báo cáo** (tab Tổng hợp): 4 ô tổng + bảng theo người nhận (được giao / đang làm / quá hạn / đã xong /
+  trễ hạn / % đúng hạn, ngưỡng màu 90-70) + theo loại việc + so sánh bắt buộc vs không bắt buộc.
+- **Quản trị viên (không gắn NV thật) xem TOÀN BỘ** việc để giám sát khi demo (tkScopeMine/tkScopeGiven).
+- Dữ liệu mẫu: `_src/seed_giaoviec.py` (bước pipeline MỚI, chạy sau check_data) - 17 việc đủ trạng thái,
+  2 việc quá hạn có chủ đích, 3 việc chờ xác nhận, 34 dòng trao đổi; mốc neo theo NGÀY CHẠY.
+- BẢN SHEETS sau này: thêm 2 sheet DL23/DL24 + 3 enum (enum_task_type/status/priority đã ghi vào
+  DATA.enums) vào CH1; 2 tham số CH2 mới slaTaskAccept_hours (4), slaTaskConfirm_hours (24).
+
+### Cấu hình giao diện & thương hiệu (Cài đặt > 2 tab mới)
+- Lưu trong **DATA.config.ui** (không phải localStorage riêng) -> tự đồng bộ đa cổng/đa máy qua room và
+  Reset demo đưa về gốc. `UI()` tự vá thiếu khóa từ UIDEF nên bản dữ liệu cũ vẫn chạy.
+- Tab **Giao diện & Thương hiệu**: tên trên menu + dòng phụ, tên trung tâm, tiêu đề tab trình duyệt,
+  logo (tải ảnh lên -> data URI, hoặc URL, hoặc 1-2 chữ tắt, hoặc logo mặc định), màu chủ đạo + màu nhấn
+  (đổi biến CSS --navy/--red, áp ngay), hotline + địa chỉ (đi qua CH2 như cũ), nút Về mặc định.
+  Chặn ảnh >250KB (bản demo là 1 file HTML, nhét ảnh to vào localStorage sẽ vỡ).
+- Tab **Menu sidebar**: bật/tắt từng nhóm và từng mục, đổi tên nhóm. Lưu vào ui.menu / ui.mlabel và
+  buildNav đọc chúng - **KHÔNG sửa NAVTREE gốc**, nên nâng cấp menu sau này không đụng cấu hình người dùng.
+  Mục tắt chỉ ẩn khỏi menu, mọi đường dẫn trong app vẫn vào được (không mất chức năng).
+- uiApply() gọi ở demoBoot và syncApply -> cổng khác đổi thương hiệu thì cổng này đổi theo.
+- _check11 lên **110 điểm** (+19 tiêu chí cho 2 module).
+
 ## 3novemdecies. V9.18 — Gộp Trang bắt đầu + Hành trình, node bấm được, Tra cứu mở rộng (28/07 tối)
 
 ### Gộp banlam + hanhtrinh (kiến trúc - đừng phá)

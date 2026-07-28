@@ -125,8 +125,8 @@ t("V9.18 banlam view board co jboard + jflow", (function(){var o=RENDER.banlam()
  return o.indexOf("jboard")>=0&&o.indexOf("jflow")>=0})());
 window.BLVIEW="list";
 t("V9.18 banlam view list co Chay quy trinh", RENDER.banlam().indexOf("Chạy quy trình")>=0);
-t("V9.18 menu Lam viec chi con banlam", (function(){var g=NAVTREE.filter(function(x){return x.g==="Làm việc"})[0];
- return g&&g.items.length===1&&g.items[0]==="banlam"})());
+t("V9.18 menu Lam viec: banlam (hanhtrinh da gop) + giaoviec", (function(){var g=NAVTREE.filter(function(x){return x.g==="Làm việc"})[0];
+ return g&&g.items.indexOf("banlam")>=0&&g.items.indexOf("hanhtrinh")<0})());
 t("V9.18 Tra cuu >= 15 so", (function(){var g=NAVTREE.filter(function(x){return x.g==="Tra cứu"})[0];
  return g&&g.items.length>=15})());
 t("V9.18 cac so tra cuu du LISTCFG + PAGES ty=list", ["dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai"].every(function(k){return LISTCFG[k]&&LISTCFG[k].ro&&PBK[k]&&PBK[k].ty==="list"}));
@@ -173,4 +173,79 @@ t("V9.19 navJump cat vet dung diem nhay", (function(){window.NAVHIST=[];CUR="ban
  go("changB");go("banglop");go("hoso");navJump(1);
  return CUR==="chang"&&window.NAVHIST.length===1&&window.NAVHIST[0].key==="banlam"})());
 CUR="banlam";window.BLVIEW="list";window.NAVHIST=[];
+
+/* --- 11. V9.20: module GIAO VIEC + cau hinh GIAO DIEN --- */
+t("V9.20 DL23 co du liệu + DL24 trao doi", rows("DL23").length>0&&rows("DL24").length>0);
+t("V9.20 du 3 loai viec trong du lieu mau", (function(){var s={};rows("DL23").forEach(function(x){s[tkType(x)]=1});
+ return s.assign&&s.peer&&s.support})());
+t("V9.20 co viec BAT BUOC va KHONG bat buoc", rows("DL23").some(tkReq)&&rows("DL23").some(function(t2){return !tkReq(t2)}));
+t("V9.20 co viec qua han de demo canh bao", rows("DL23").some(tkOver));
+t("V9.20 trang giaoviec render 3 tab", (function(){var e2=0;
+ ["mine","given","report"].forEach(function(tb){window.TKTAB=tb;
+  try{var o=RENDER.giaoviec();if(typeof o!=="string"||o.length<400)e2++}catch(e){e2++}});
+ window.TKTAB="mine";return e2===0})());
+t("V9.20 tab tong hop co bang theo nguoi + theo loai + bat buoc", (function(){window.TKTAB="report";
+ var o=RENDER.giaoviec();window.TKTAB="mine";
+ return o.indexOf("Theo người nhận việc")>=0&&o.indexOf("Theo loại việc")>=0&&o.indexOf("Bắt buộc vs không bắt buộc")>=0})());
+t("V9.20 cap bac + quan he to chuc dung", (function(){
+ var ceo=rows("DL01").filter(function(x){return ecode(x.role)==="ceo"})[0];
+ var nv=rows("DL01").filter(function(x){return staffLevel(x)===0&&staffActive(x)})[0];
+ if(!ceo||!nv)return false;
+ return staffLevel(ceo)===3&&staffSubs(ceo.staff_id).length>0&&!!staffBoss(nv.staff_id)&&
+  taskRel(ceo.staff_id,nv.staff_id)==="assign"})());
+t("V9.20 viec BAT BUOC khong co nut Tu choi", (function(){
+ var t2=rows("DL23").filter(function(x){return tkReq(x)&&tkSt(x)==="new"})[0];if(!t2)return true;
+ CURSTAFF=t2.assignee_id;var c=tkCard(t2,"mine");CURSTAFF="";
+ return c.indexOf("Nhận việc")>=0&&c.indexOf("Từ chối")<0})());
+t("V9.20 viec KHONG bat buoc co nut Tu choi", (function(){
+ var t2=rows("DL23").filter(function(x){return !tkReq(x)&&tkSt(x)==="new"})[0];if(!t2)return true;
+ CURSTAFF=t2.assignee_id;var c=tkCard(t2,"mine");CURSTAFF="";
+ return c.indexOf("Từ chối")>=0})());
+t("V9.20 vong doi: nhan -> bao xong -> xac nhan", (function(){
+ var t2=rows("DL23").filter(function(x){return tkSt(x)==="new"})[0];if(!t2)return false;
+ var id=t2.task_id,n0=tkCmts(id).length;
+ CURSTAFF=t2.assignee_id;tkAccept(id);
+ if(tkSt(find("DL23","task_id",id))!=="accepted")return false;
+ var el=document.getElementById("tk_dn");
+ find("DL23","task_id",id).task_status="done (Báo xong)";find("DL23","task_id",id).done_time=nowStr();
+ CURSTAFF=t2.assigner_id;tkConfirmRun(id);CURSTAFF="";
+ var t3=find("DL23","task_id",id);
+ return tkSt(t3)==="confirmed"&&!!t3.confirm_time&&tkCmts(id).length>n0})());
+t("V9.20 giao viec moi sinh dung ban ghi", (function(){var n0=rows("DL23").length;
+ var a=rows("DL01")[0],b=rows("DL01")[1];
+ DL.DL23.push({task_id:tkNextId(),created_time:nowStr(),assigner_id:a.staff_id,assigner_id_name:a.full_name,
+  assignee_id:b.staff_id,assignee_id_name:b.full_name,task_type:"assign (Giao việc)",priority:"high (Cao)",
+  required:"Có",title:"Viec kiem thu",content:"",due_time:nowStr(),task_status:"new (Mới giao)"});
+ return rows("DL23").length===n0+1&&tkNextId().indexOf("TASK-")===0})());
+t("V9.20 chuong SLA co muc Giao viec cho dung nguoi", (function(){
+ var t2=rows("DL23").filter(function(x){return tkSt(x)==="new"})[0];if(!t2)return true;
+ CURSTAFF=t2.assignee_id;var it=slaItems().filter(function(x){return x.cat==="Giao việc"});CURSTAFF="";
+ return it.length>0})());
+t("V9.20 moi vai deu duoc vao trang giao viec + nhan chuong", (function(){var okk=true;
+ for(var k in ROLESCOPE){var r=ROLESCOPE[k];
+  if(Array.isArray(r.pages)&&r.pages.indexOf("giaoviec")<0)okk=false;
+  if(Array.isArray(r.bell)&&r.bell.indexOf("Giao việc")<0)okk=false}
+ return okk})());
+t("V9.20 menu co muc Giao viec + badge dem duoc", NAVTREE.some(function(G){return G.items.indexOf("giaoviec")>=0})&&typeof navBadge("giaoviec")==="number");
+/* cau hinh giao dien */
+t("V9.20 UI() tra cau hinh mac dinh day du", (function(){var u=UI();
+ return u.brand&&u.title&&u.navy&&u.red&&typeof u.menu==="object"})());
+t("V9.20 doi ten/mau/logo ap duoc va reset duoc", (function(){
+ uiSet("brand","Trung tam ABC");uiSet("navy","#123456");uiSet("logo","AB");
+ var ok1=UI().brand==="Trung tam ABC"&&UI().navy==="#123456"&&uiLogoHTML(20).indexOf("AB")>=0;
+ uiResetRun();
+ return ok1&&UI().brand===UIDEF.brand&&UI().navy===UIDEF.navy&&!UI().logo})());
+t("V9.20 an muc menu thi buildNav bo muc do", (function(){
+ buildNav();var before=NAVEL.innerHTML.indexOf('data-k="giaoviec"')>=0;
+ uiMenuToggle("giaoviec");buildNav();var after=NAVEL.innerHTML.indexOf('data-k="giaoviec"')>=0;
+ uiMenuToggle("giaoviec");buildNav();
+ return before&&!after&&NAVEL.innerHTML.indexOf('data-k="giaoviec"')>=0})());
+t("V9.20 doi ten nhom menu hien dung tren sidebar", (function(){
+ uiGroupRename("Làm việc","Bàn của tôi");buildNav();
+ var okk=NAVEL.innerHTML.indexOf("Bàn của tôi")>=0;
+ uiGroupRename("Làm việc","");buildNav();return okk})());
+t("V9.20 tab Giao dien + Menu co trong Cai dat", (function(){
+ window.SETTAB="brand";var o1=RENDER.settings();
+ window.SETTAB="menu";var o2=RENDER.settings();window.SETTAB="ch2";
+ return o1.indexOf("Tên trung tâm")>=0&&o1.indexOf("Màu thương hiệu")>=0&&o2.indexOf("Menu sidebar")>=0})());
 console.log(bad.length?("FAIL:\n  "+bad.join("\n  ")):"OK: "+ok);

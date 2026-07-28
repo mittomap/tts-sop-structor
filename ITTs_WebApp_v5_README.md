@@ -1327,3 +1327,31 @@ nhật ký buổi học thành timeline có rail + node ngày (mờ dần với 
 để nhóm thu gọn không bị bóp chữ.
 
 Verify: _tall 37 trang 0 lỗi, node --check 2 file OK, **_check11 = 82 điểm** (thêm 14 tiêu chí V9.18).
+
+## V9.20 (28/07 tối) - MODULE GIAO VIỆC + CẤU HÌNH GIAO DIỆN
+
+**Giao việc & Phối hợp (menu Làm việc > Giao việc)** - 3 kiểu việc theo đúng quan hệ trong công ty:
+- **Giao việc** (cấp trên xuống cấp dưới) - mặc định BẮT BUỘC, người nhận không được từ chối.
+- **Phối hợp** (ngang cấp) - hai bên cùng làm, chọn bắt buộc hay không.
+- **Nhờ hỗ trợ** - không bắt buộc, người nhận có quyền từ chối kèm lý do.
+App tự nhận diện kiểu việc theo chức danh + phòng ban của người nhận (vẫn đổi tay được).
+
+**Vòng đời một việc**: Mới giao - Đang làm - Báo xong - Hoàn thành. Người nhận bấm Nhận việc rồi Báo xong
+kèm kết quả; người giao Xác nhận hoặc Trả lại làm tiếp, có nút Nhắc và Hủy việc.
+
+**Thảo luận ngay trong từng việc**: mỗi việc có luồng trao đổi riêng - hỏi đáp, báo vướng nằm đúng chỗ,
+không trôi như tin nhắn Zalo. Mọi thao tác (nhận, báo xong, xác nhận, nhắc, trả lại) tự ghi một dòng vào
+luồng nên đọc lại là thấy toàn bộ diễn biến.
+
+**Thông báo & theo dõi**: việc mới, việc chưa bấm nhận quá hạn, việc tới hạn hôm nay, việc chờ mình xác
+nhận đều vào chuông và nổ bong bóng góc màn hình; menu có badge đếm việc còn tồn của riêng mình.
+
+**Tổng hợp & báo cáo**: bảng theo từng nhân viên (được giao / đang làm / quá hạn / đã xong / trễ hạn /
+tỷ lệ đúng hạn), thống kê theo loại việc, và so sánh nhóm bắt buộc với nhóm không bắt buộc.
+
+**Cấu hình giao diện (Cài đặt > Giao diện & Thương hiệu / Menu sidebar)**: đổi tên hiển thị, tên trung tâm,
+tiêu đề tab trình duyệt, logo (tải ảnh lên hoặc dán link hoặc chữ tắt), màu chủ đạo và màu nhấn - áp ngay
+toàn app; hotline/địa chỉ dùng cho phiếu in và tin nhắn. Tab Menu sidebar cho bật/tắt từng nhóm, từng mục
+và đổi tên nhóm theo cách gọi của trung tâm. Có nút Về mặc định. Cấu hình đồng bộ sang các cửa sổ/máy khác.
+
+Verify: 38 trang 0 lỗi, node --check 2 file, **_check11 = 110 điểm**, icon 144.

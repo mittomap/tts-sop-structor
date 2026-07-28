@@ -33,7 +33,11 @@ Song song với hệ Google Sheets, dự án có **web app demo offline** dựng
 Luân tương tác nhiều nhất gần đây. **Muốn sửa app: đọc `_src/README_SRC.md`** (build 1 lệnh
 `ITTS_OUT=... python3 gen_v5.py`, verify bằng `node _tall.js`). Hiện trạng tính năng: cuối
 `ITTs_WebApp_v5_README.md`. Bẫy & quyết định kiến trúc app: mục 3bis→3quater trong file 02.
-Phiên bản hiện tại: **V9.18** (28/07 tối - GỘP Hành trình vào Trang bắt đầu (1 trang 2 góc nhìn); node dải hạt
+Phiên bản hiện tại: **V9.20** (28/07 tối - MODULE GIAO VIỆC (DL23 + DL24 trao đổi theo việc): giao xuống /
+phối hợp ngang cấp / nhờ hỗ trợ, bắt buộc vs không, vòng đời nhận-làm-báo xong-xác nhận, thông báo vào chuông
++ bong bóng, báo cáo hiệu suất theo người; CẤU HÌNH GIAO DIỆN: đổi tên/logo/màu/tiêu đề tab + bật tắt & đổi tên
+menu sidebar (Cài đặt > Giao diện, Menu). Suite 110 điểm. Chi tiết: mục 3vicies file 02.
+Trước đó V9.18: GỘP Hành trình vào Trang bắt đầu (1 trang 2 góc nhìn); node dải hạt
 BẤM ĐƯỢC mở drawer từng chặng; TRA CỨU mở rộng 17 sổ chỉ-xem theo nghiệp vụ; tab Dữ liệu demo tối giản; bỏ
 "Gửi phụ huynh"; chip trạng thái khóa đặc màu; nhật ký buổi học thành timeline; badge menu gọn. Trước đó V9.17:
 ROOM DEMO TỰ ĐỘNG (các máy tự đồng bộ, không cần mã phòng) + bong bóng việc mới + navbar Room demo/Reset cả
