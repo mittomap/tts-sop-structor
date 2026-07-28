@@ -745,6 +745,10 @@ _et = d.setdefault("enums", {}).setdefault("enum_task_type", [])
 if not any(str(x).startswith("student_request") for x in _et):
     _et.append("student_request (Yêu cầu từ học viên)")
 # Cổng học viên là một KÊNH phản hồi mới - phải có trong danh mục, nếu không app in ra mã trần.
+# Trạng thái từng đợt đóng phải nằm trong DANH MỤC, nếu không app in ra mã trần.
+d.setdefault("enums", {})["enum_installment_status"] = [
+    "upcoming (Chưa tới hạn)", "due (Đến hạn)", "overdue (Quá hạn)",
+    "partial (Đóng một phần)", "paid (Đã đóng đủ)"]
 _fc = d["enums"].setdefault("enum_feedback_channel", [])
 if not any(str(x).startswith("app ") for x in _fc):
     _fc.insert(0, "app (Cổng học viên)")
@@ -870,6 +874,33 @@ for e in R("DL06"):
     e["next_payment_due"] = open_ins[0]["due_date"] if open_ins else ""
 for p in R("DL07"):
     p.setdefault("installment_no", "")
+
+# Rải lại HẠN của các đợt CHƯA ĐÓNG cho giống một trung tâm đang chạy bình thường.
+# Lịch sinh máy móc từ ngày đăng ký + 30 ngày làm 64/90 đơn quá hạn - đó là trung tâm sắp sập,
+# không phải trung tâm để đi demo. Và quan trọng hơn: không có ca nào SẮP tới hạn thì tính năng
+# "nhắc TRƯỚC hạn" không có gì để hiện.
+_open_by = {}
+for x in sched:
+    if not x["status"].startswith("paid"):
+        _open_by.setdefault(x["enrollment_id"], []).append(x)
+_MIX = [-21, -12, -6, -2, 0, 1, 2, 3, 6, 10, 17, 25, 34, 48]   # ngày so với hôm nay
+for _i, (_eid, _lst) in enumerate(sorted(_open_by.items())):
+    _lst.sort(key=lambda z: int(n(z.get("installment_no"))))
+    _first = NOW + datetime.timedelta(days=_MIX[_i % len(_MIX)])
+    for _k, _x in enumerate(_lst):
+        _d = _first + datetime.timedelta(days=GAP * _k)
+        _x["due_date"] = _d.strftime("%d/%m/%Y")
+        if n(_x.get("paid_amount")) > 0:
+            _x["status"] = "partial (Đóng một phần)"
+        elif _d < NOW - datetime.timedelta(days=LATE):
+            _x["status"] = "overdue (Quá hạn)"
+        elif _d < NOW:
+            _x["status"] = "due (Đến hạn)"
+        else:
+            _x["status"] = "upcoming (Chưa tới hạn)"
+    e = IDX["DL06"].get(_eid)
+    if e:
+        e["next_payment_due"] = _lst[0]["due_date"]
 dl["DL06b"] = sched
 _od = len([x for x in sched if x["status"].startswith("overdue")])
 _du = len([x for x in sched if x["status"].startswith("due")])

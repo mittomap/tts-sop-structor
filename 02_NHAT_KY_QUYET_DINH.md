@@ -149,16 +149,16 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.25** (28/07 tối - MẢNG 1 + 2 + 3 của hội đồng 6 chuyên gia ĐÃ XONG, phần DỮ LIỆU của
-> mảng 4 cũng xong, cộng hội đồng đợt 2 và 9 yêu cầu phát sinh của Luân).
+> **Phiên bản: V9.26** (28/07 tối - MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG, cộng hội đồng
+> đợt 2 và 11 yêu cầu phát sinh của Luân). CÒN ĐÚNG MẢNG 5.
 > **DỮ LIỆU DEMO: 192 -> 4 bản ghi lỗi** (`check_logic.py` nay 123 luật). 4 ca còn lại là việc quá hạn
 > CỐ Ý để màn Giao việc có cảnh báo đỏ thật (luật 10k tự khai là "demo canh bao do").
 > Bộ kiểm sau mỗi build nay có **5 phần** (xem bảng trong `_src/README_SRC.md`), thêm `_src/_checktour.js`.
 > Chi tiết mảng 1 + 6 việc phát sinh: mục **3unvicies** bên dưới.
-> **CÒN LẠI: mảng 4 phần APP (màn lịch đợt cho nhân viên + nhắc trước hạn + in lịch vào phiếu),
-> mảng 5 (link "sửa ở đây" + tham số thiếu + dọn trang thừa).**
-> Bộ kiểm nay **7 phần**: node --check 2 file · _tall 38 trang · _check11 (119+128) · _check12 (37) ·
-> _check13 (174) · _check14 (99) · _checktour · check_logic 132 luật (4 ca cố ý) · check_data DAT.
+> **CÒN LẠI: đúng mảng 5** (link "sửa ở đây" toàn app + 19 tham số thiếu + dọn trang thừa).
+> Bộ kiểm nay **9 phần**: node --check 2 file · _tall 38 trang · _check11 (119+128) · _check12 (37) ·
+> _check13 (174) · _check14 (100) · _check15 (37) · _check16 (35) · _checktour · check_logic 132 luật
+> (4 ca cố ý) · check_data DAT. Tổng **~700 tiêu chí tự động**.
 > **HỘI ĐỒNG ĐỢT 2 - 5 vị trí mới đang rà** (Luân duyệt 28/07): nhân viên tư vấn kiêm tiếp khách,
 > giáo viên đứng lớp, kế toán/thu ngân, giáo vụ xếp lịch, kiểm thử phá hoại. Lý do: 6 chuyên gia cũ
 > đều nhìn từ THIẾT KẾ HỆ THỐNG, không ai nhìn từ GHẾ NGƯỜI NGỒI LÀM 8 TIẾNG - nên bỏ lọt lỗi kiểu
@@ -612,6 +612,41 @@ Bộ kiểm mới **`_src/_check14.js` (99 tiêu chí)**: chạy THẬT từng k
 đặt WOW, báo chuyển khoản, chấm sao, gửi yêu cầu) rồi soi lại đúng bảng dữ liệu; kiểm cả các luật
 chặn (ngày quá khứ, hết quota, báo tiền vượt công nợ) và **quét 12 hồ sơ học viên tìm câu chữ nội bộ
 lọt ra cổng**.
+
+
+## 3quinvicies. V9.26 - MẢNG 4: ĐÓNG HỌC PHÍ THEO ĐỢT + BÀI HỌC "MỘT HÀNH ĐỘNG, MỘT HÀM LÕI"
+
+### A. Vì sao phải tách bảng riêng
+DL06 chỉ có MỘT cột `next_payment_due`, **bị ghi đè mỗi lần thu**. Hệ quả: không lưu được lịch trả
+góp, không nhắc TRƯỚC hạn, không biết học viên đang nợ ĐỢT NÀO, không in được lịch vào phiếu.
+Nay lịch nằm ở **DL06b - mỗi đợt một dòng** (`schedule_id`, `installment_no/of`, `due_date`,
+`due_amount`, `paid_amount`, `remaining_amount`, `status`, `paid_time`). `DL06.next_payment_due`
+trở thành cột **SUY RA** từ đợt chưa đóng gần nhất, không còn là nơi lưu duy nhất.
+DL07 thêm `installment_no`: phiếu thu nào trả cho đợt nào.
+CH2 thêm 4 tham số: `installmentGap_days`, `installmentRemind_days`, `installmentLate_days`,
+`installmentDepositPercent`. CH1 thêm `enum_installment_status` (5 giá trị).
+
+### B. MỘT HÀM LÕI `insSync(eid)` - áp thẳng bài học vừa trả giá
+Đây là chỗ áp dụng ngay bài học từ lỗi quota WOW: **chỉ MỘT hàm được phép tính lại phân bổ tiền
+vào các đợt và suy lại hẹn thu**; mọi cửa động vào tiền (ghi thu, hoàn tiền, xác nhận) đều gọi nó.
+Không làm vậy thì đúng một tuần sau sẽ có cửa thứ ba tính kiểu khác, và lại phải chờ ai đó đọc ra.
+
+### C. Nhắc TRƯỚC hạn, và nói rõ đang nhắc đợt nào
+`slaItems` cũ chỉ réo khi ĐÃ quá hạn. Nay 3 mức: **sắp tới hạn** (trong `installmentRemind_days`) ·
+**tới hạn** · **quá hạn** (đỏ sau `installmentLate_days`). Câu nhắc nêu đích danh
+"Đợt 2/3 · 3.600.000đ · hạn 16/07" thay vì "còn nợ học phí". Màn thu tiền hiện bảng lịch đợt và
+**điền sẵn số tiền theo đúng đợt đang tới hạn**; có nút chia lại lịch đợt (số đợt, ngày đợt đầu,
+khoảng cách, tỷ lệ cọc - mặc định lấy từ CH2). Phiếu in kèm luôn bảng lịch đợt.
+
+### D. Dữ liệu demo: rải lại hạn cho giống trung tâm đang chạy
+Lịch sinh máy móc từ ngày đăng ký + 30 ngày cho ra **64/90 đơn quá hạn** - đó là trung tâm sắp sập,
+không phải trung tâm mang đi demo. Và quan trọng hơn: không có ca nào SẮP tới hạn thì tính năng
+"nhắc trước hạn" không có gì để hiện. Nay rải theo dải cố định: 12 quá hạn · 3 đến hạn hôm nay ·
+9 trong 1-3 ngày · 8 trong 4-14 ngày · 60 xa hơn. Chuông cho ra 6 ca sắp tới hạn, 9 tới hạn, 9 quá hạn.
+
+Bộ kiểm mới **`_src/_check16.js` (35 tiêu chí)**: bất biến tiền của lịch đợt, 3 mức nhắc, màn thu
+tiền, chia lại lịch, và **lái thật một lần thu tiền rồi soi lại** xem đợt có chuyển trạng thái,
+hẹn thu có nhảy sang đợt kế tiếp, phiếu thu có được gắn số đợt.
 
 > **VIỆC TỒN web app (ưu tiên trên xuống):**
 > 1. **CHỜ LUÂN NGHIỆM THU ĐỢT 9 + YÊU CẦU KẾ TIẾP** - 4 yêu cầu 28/07 (phòng 2 máy, cổng HV đúng vai, hồ sơ 360 superset, rà sidebar) đã trả xong trong V9.16. Luân cần THỬ THẬT phòng 2 máy trên 2 máy khác nhau (phiên cloud không tự test WebRTC được). Phiên sau: hỏi/đợi yêu cầu kế tiếp trước khi làm gì lớn.

@@ -38,7 +38,7 @@ var KHAI={
  DL02b:["leadInboundSave","rfNeed","runRejectSave","runTouchSave","testQuickSave"],
  DL03:["rfNeed","testAttend","testBook","testConsult","testNoShowSave","testQuickSave","testRebookSave","testRefuse","testResultSave"],
  DL04:["rfNeed","runSkipTest","tvCloseSave","tvEnrollSave","tvQuickSave","tvSave"],
- DL06:["cancelEnrollRun","paySave","rfNeed","runCancelEnroll","tvEnrollSave"],
+ DL06:["cancelEnrollRun","paySave","rfNeed","runCancelEnroll","tvEnrollSave","insSync"],
  DL07:["duyetRefundRun","paySave","payVerifyRun","rfNeed"],
  DL08:["hvClassConfirm","hvClassRejectSave","midSave","obMark","rfNeed","xepMoiLuu","obChangeSave","obFinish"],
  DL09:["blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota"],
@@ -54,7 +54,8 @@ var KHAI={
  DL20:["hwbSave","sesSave"],
  DL21:["gaSave","gaAddSave"],
  DL23:["hvReq","tkNewSave"],
- DL24:["hvAskSaySave","tkSay"]
+ DL24:["hvAskSaySave","tkSay"],
+ DL06b:["insPlanSave"]
 };
 Object.keys(by).forEach(function(tb){
  var have=Object.keys(by[tb]).sort();

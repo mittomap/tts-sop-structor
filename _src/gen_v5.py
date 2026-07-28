@@ -2274,10 +2274,23 @@ function slaItems(){var out=jTasks();
   if(s.obOverdue)add("Học vụ","Hoàn tất onboarding","red","ti-layout-grid-add",o.student_id_name||o.student_id,"Onboarding quá hạn chưa hoàn tất",hoursSince(o.assigned_at),"xeplop","finish",null,null,"ob",o.onboarding_id)});
  srows("DL07").forEach(function(pp){if(!(pp.verified_by&&String(pp.verified_by).trim()))add("Tài chính","Xác nhận khoản thu","amber","ti-receipt",pp.student_id_name||pp.student_id,"Khoản thu chờ xác nhận "+vnd(pp.amount),null,"thanhtoan","verify",null,null,"payverify",pp.enrollment_id)});
  srows("DL06").forEach(function(e){if(/cancel/.test(ecode(e.enrollment_status)))return;var tot=num(e.final_fee)||num(e.total_fee);var rem=e.remaining_amount!==undefined&&e.remaining_amount!==""?num(e.remaining_amount):Math.max(0,tot-num(e.paid_amount));if(rem<=0)return;
+  /* NHẮC TRƯỚC HẠN chứ không đợi quá hạn mới réo - gọi trước vài ngày thì đòi dễ hơn nhiều.
+     Số ngày nhắc trước và ngưỡng chuyển đỏ đều lấy từ CH2. */
+  var _ins=insOf(e.enrollment_id).filter(function(x){return !isc(x.status,"paid")});
+  var _rd=paramOf("installmentRemind_days",3),_ld=paramOf("installmentLate_days",5);
+  if(_ins.length){var x0=_ins[0],st0=insDueState(x0);
+   var _amt=num(x0.remaining_amount)||num(x0.due_amount);
+   var _lbl="Đợt "+x0.installment_no+"/"+x0.installment_of+" · "+vnd(_amt)+" · hạn "+(x0.due_date||"?");
+   if(st0.k==="late")add("Tài chính","Thu công nợ","red","ti-cash",e.student_id_name||e.student_id,"QUÁ HẠN "+Math.abs(st0.days)+" ngày - "+_lbl,Math.abs(st0.days)*24,"thanhtoan","due",null,null,"paydebt",e.enrollment_id);
+   else if(st0.k==="due"||st0.k==="today")add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"TỚI HẠN - "+_lbl,0,"thanhtoan","due",null,null,"paydebt",e.enrollment_id);
+   else if(st0.k==="soon")add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"SẮP TỚI HẠN (còn "+st0.days+" ngày) - "+_lbl,0,"thanhtoan","due",null,null,"paydebt",e.enrollment_id);
+   return}
   var due=pvnd(e.next_payment_due);
   if(due){var dh=(new Date().getTime()-due.getTime())/36e5;
-   if(dh>=0)add("Tài chính","Thu công nợ",dh>48?"red":"amber","ti-cash",e.student_id_name||e.student_id,"TỚI HẸN THU "+vnd(rem)+" (hẹn "+e.next_payment_due+")",dh,"thanhtoan","due",null,null,"paydebt",e.enrollment_id);
-   return} /* có hẹn thì nhắc theo hẹn, chưa tới hẹn không réo */
+   var dRem=Math.round(-dh/24);
+   if(dh>=0)add("Tài chính","Thu công nợ",dh>_ld*24?"red":"amber","ti-cash",e.student_id_name||e.student_id,"TỚI HẸN THU "+vnd(rem)+" (hẹn "+e.next_payment_due+")",dh,"thanhtoan","due",null,null,"paydebt",e.enrollment_id);
+   else if(dRem<=_rd)add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"SẮP TỚI HẸN THU (còn "+dRem+" ngày) "+vnd(rem),0,"thanhtoan","due",null,null,"paydebt",e.enrollment_id);
+   return}
   var age=hoursSince(e.enrollment_time);if(rem>=paramOf("thresholdDebtAlert",3000000)&&age!=null&&age>paramOf("slaPayment_grace_days",7)*24)add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"Còn nợ học phí "+vnd(rem)+" (quá kỳ hạn "+paramOf("slaPayment_grace_days",7)+" ngày)",age,"thanhtoan","debt",null,null,"paydebt",e.enrollment_id)});
  srows("DL14").forEach(function(w){var done=ecode(w.wow_status)==="completed";var note=!!(w.wow_content_note&&String(w.wow_content_note).trim());var age=hoursSince(w.wow_session_date);var over=done&&!note&&age!=null&&age>paramOf("slaWowNote_hours",24);
   if(over)add("Học vụ","Ghi nội dung WOW","red","ti-notes",w.student_name||w.student_id,"Buổi WOW chưa ghi nội dung (quá 24h)",age,"wow","note",null,null,"wownote",w.wow_id);
@@ -2475,6 +2488,7 @@ function duyetRefundRun(id){var e=find("DL06","enrollment_id",id);if(!e)return;
    received_by:CURSTAFF||"",received_by_name:myName(),payment_note:"HOÀN TIỀN"+(note?" - "+note:"")};
    pay.payment_id="PMT-"+seqNo("DL07","payment_id");rows("DL07").unshift(pay);
    if(SVR)google.script.run.apiSave("DL07",pay);
+   try{insSync(id)}catch(e2){}
    r.paid_amount=Math.max(0,num(r.paid_amount)-amt)}
   r.notes=(r.notes?r.notes+" | ":"")+"Hoàn "+vnd(amt)+" "+nowStr()+" bởi "+myName()+(note?" ("+note+")":"");
   r.payment_status=eFull("enum_payment_status","refunded");
@@ -6667,17 +6681,133 @@ function cancelEnrollRun(id){var e=find("DL06","enrollment_id",id);if(!e)return;
   if(paid>0){toast("Đã hủy đăng ký. Còn "+vnd(paid)+" cần hoàn - đã đưa sang trang Duyệt.");go("duyet")}
   else{toast("Đã hủy đăng ký (chưa thu tiền).");reRender(CUR)}}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}done()}).withFailureHandler(function(er){toast("Lỗi kết nối: "+er.message)}).apiUpdate("DL06",id,vals)}else{done()}}
+/* ==================== V9.26 - ĐÓNG HỌC PHÍ THEO ĐỢT (mảng 4) ====================
+   Trước đây DL06 chỉ có MỘT cột next_payment_due, bị ghi đè mỗi lần thu: không lưu được lịch
+   trả góp, không nhắc TRƯỚC hạn, không biết học viên đang nợ ĐỢT NÀO, không in được lịch vào
+   phiếu. Nay lịch nằm ở bảng riêng DL06b, mỗi đợt một dòng.
+   LUẬT: chỉ MỘT hàm lõi insSync() được phép tính lại phân bổ và trạng thái đợt; mọi cửa động
+   vào tiền (thu, hoàn, xác nhận) đều gọi nó - đúng bài học từ lỗi quota WOW hai cửa lệch nhau. */
+function insOf(eid){return rows("DL06b").filter(function(x){return String(x.enrollment_id||"")===String(eid||"")})
+ .sort(function(a,b){return num(a.installment_no)-num(b.installment_no)})}
+function insDueState(x){
+ var ld=paramOf("installmentLate_days",5),rd=paramOf("installmentRemind_days",3);
+ if(isc(x.status,"paid"))return {k:"paid",lbl:"Đã đóng đủ",cls:"green",days:null};
+ var d=pvnd(x.due_date);
+ if(!d)return {k:"none",lbl:"Chưa hẹn ngày",cls:"gray",days:null};
+ var days=Math.round((d.getTime()-endToday())/864e5);
+ if(days< -ld)return {k:"late",lbl:"Quá hạn "+Math.abs(days)+" ngày",cls:"red",days:days};
+ if(days<0) return {k:"due",lbl:"Quá hạn "+Math.abs(days)+" ngày",cls:"amber",days:days};
+ if(days===0)return {k:"today",lbl:"Đến hạn hôm nay",cls:"amber",days:0};
+ if(days<=rd)return {k:"soon",lbl:"Còn "+days+" ngày",cls:"amber",days:days};
+ return {k:"far",lbl:"Còn "+days+" ngày",cls:"",days:days}}
+/* HÀM LÕI: phân bổ lại tiền đã thu vào các đợt theo thứ tự thời gian, tính lại trạng thái từng
+   đợt và suy lại next_payment_due của đơn. Gọi sau MỌI thay đổi tiền. */
+function insSync(eid){
+ var e=find("DL06","enrollment_id",eid);if(!e)return;
+ var lst=insOf(eid);if(!lst.length)return;
+ var pays=rows("DL07").filter(function(p){return String(p.enrollment_id||"")===String(eid)&&num(p.amount)>0})
+  .sort(function(a,b){return (pvnd(a.payment_time)||0)-(pvnd(b.payment_time)||0)});
+ var left=pays.reduce(function(a,p){return a+num(p.amount)},0);
+ var acc=0;
+ lst.forEach(function(x){
+  var amt=num(x.due_amount),alloc=Math.min(left,amt);left-=alloc;acc+=amt;
+  x.paid_amount=Math.round(alloc);x.remaining_amount=Math.round(Math.max(0,amt-alloc));
+  var st=insDueState({status:"",due_date:x.due_date});
+  if(alloc>=amt-1){x.status=eFull("enum_installment_status","paid");
+   if(!String(x.paid_time||"").trim()){var cum=0,hit=null;
+    pays.forEach(function(p){if(hit)return;cum+=num(p.amount);if(cum>=acc-1)hit=p});
+    x.paid_time=hit?(hit.payment_time||""):""}}
+  else if(alloc>0)x.status=eFull("enum_installment_status","partial");
+  else x.status=eFull("enum_installment_status",st.k==="late"?"overdue":(st.days!=null&&st.days<0?"overdue":(st.days===0?"due":"upcoming")));
+  if(!isc(x.status,"paid"))x.paid_time=""});
+ /* gắn số đợt cho từng phiếu thu: phiếu nào trả cho đợt nào */
+ var run=0,idx=0;
+ pays.forEach(function(p){run+=num(p.amount);
+  var sum=0;idx=0;
+  for(var i=0;i<lst.length;i++){sum+=num(lst[i].due_amount);idx=i;if(run<=sum+1)break}
+  p.installment_no=idx+1});
+ var open=lst.filter(function(x){return !isc(x.status,"paid")});
+ e.next_payment_due=open.length?String(open[0].due_date||""):"";
+ if(SVR)try{google.script.run.apiUpdate("DL06",eid,{next_payment_due:e.next_payment_due})}catch(er){}
+ persistSoon()}
+/* Chia lại lịch đợt cho một đơn - dùng khi khách xin giãn hoặc gộp đợt. */
+function insPlanForm(eid){
+ var e=find("DL06","enrollment_id",eid);if(!e){toast("Không thấy đăng ký.");return}
+ var lst=insOf(eid);
+ var tot=num(e.final_fee)||num(e.total_fee);
+ var h='<div class="dcard"><h4><i class="ti ti-calendar-dollar"></i>Chia lịch đóng theo đợt - '+esc(e.student_id_name||e.student_id)+'</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Học phí <b>'+vnd(tot)+'</b>'+
+  (num(e.paid_amount)>0?', đã đóng <b>'+vnd(num(e.paid_amount))+'</b>':'')+
+  '. Khoảng cách giữa hai đợt và tỷ lệ đợt đầu lấy từ Cài đặt (CH2) - đổi ở đó là mọi hồ sơ sau đều theo.</div>';
+ if(lst.length)h+=insTableHTML(lst,false);
+ h+='<div class="fld"><label>Chia thành mấy đợt</label><select id="ip_n">'+
+  [1,2,3,4].map(function(n){return '<option value="'+n+'"'+(lst.length===n?" selected":"")+'>'+n+' đợt</option>'}).join("")+'</select></div>';
+ h+='<div class="fld"><label>Ngày đóng đợt đầu</label><input id="ip_d0" type="date"></div>';
+ h+='<div class="fld"><label>Cách nhau bao nhiêu ngày</label><input id="ip_gap" type="number" min="1" value="'+paramOf("installmentGap_days",30)+'"></div>';
+ h+='<div class="fld"><label>Đợt đầu chiếm bao nhiêu %</label><input id="ip_dep" type="number" min="1" max="100" value="'+paramOf("installmentDepositPercent",40)+'"></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="insPlanSave(\''+esc(eid)+'\')"><i class="ti ti-check"></i>Lưu lịch đợt</button>'+
+  '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
+ openDrawer("Chia lịch đóng theo đợt",h)}
+function insPlanSave(eid){
+ if(!actGuard("insPlan:"+eid))return;
+ var e=find("DL06","enrollment_id",eid);if(!e)return;
+ var n=Math.max(1,Math.min(4,num(fldV("ip_n"))||1));
+ var gap=Math.max(1,num(fldV("ip_gap"))||paramOf("installmentGap_days",30));
+ var dep=Math.max(1,Math.min(100,num(fldV("ip_dep"))||paramOf("installmentDepositPercent",40)))/100;
+ var d0raw=(fldV("ip_d0")||"").trim();
+ var d0=d0raw?pvnd(fromISOdt(d0raw)):(pvnd(e.enrollment_time)||new Date());
+ if(!d0)d0=new Date();
+ var tot=num(e.final_fee)||num(e.total_fee);
+ if(tot<=0){toast("Đơn này chưa có học phí để chia đợt.");return}
+ function r1000(x){return Math.round(x/1000)*1000}
+ var amts=[];
+ if(n===1)amts=[tot];
+ else{var first=r1000(tot*dep),rest=tot-first,per=r1000(rest/(n-1));
+  amts=[first];for(var i=1;i<n-1;i++)amts.push(per);amts.push(tot-first-per*(n-2))}
+ DL.DL06b=(DL.DL06b||[]).filter(function(x){return String(x.enrollment_id||"")!==String(eid)});
+ amts.forEach(function(amt,i){
+  var d=new Date(d0.getTime()+gap*i*864e5);
+  function z(v){return v<10?"0"+v:v}
+  DL.DL06b.push({schedule_id:"SCH-"+seqNo("DL06b","schedule_id",4),enrollment_id:eid,
+   student_id:e.student_id||"",student_id_name:e.student_id_name||"",
+   course_id:e.course_id||"",course_id_name:e.course_id_name||"",
+   installment_no:i+1,installment_of:amts.length,
+   due_date:z(d.getDate())+"/"+z(d.getMonth()+1)+"/"+d.getFullYear(),
+   due_amount:Math.round(amt),paid_amount:0,remaining_amount:Math.round(amt),
+   status:eFull("enum_installment_status","upcoming"),paid_time:"",note:"",next_action:""})});
+ insSync(eid);closeModal();
+ toast("Đã chia "+amts.length+" đợt cho "+(e.student_id_name||eid)+".",4200);reRender(CUR)}
+/* Bảng lịch đợt dùng chung cho màn thu tiền, drawer chia đợt và phiếu in. */
+function insTableHTML(lst,acts){
+ if(!lst||!lst.length)return '<div class="empty">Đơn này chưa chia lịch đóng theo đợt.</div>';
+ var h='<div class="tbwrap"><table class="dt"><thead><tr><th>Đợt</th><th>Hạn đóng</th><th>Số tiền</th><th>Đã đóng</th><th>Tình trạng</th></tr></thead><tbody>';
+ lst.forEach(function(x){var st=insDueState(x);
+  h+='<tr><td><b>'+esc(x.installment_no)+'/'+esc(x.installment_of)+'</b></td><td>'+esc(x.due_date||"-")+'</td>'+
+   '<td>'+vnd(num(x.due_amount))+'</td><td>'+vnd(num(x.paid_amount))+'</td>'+
+   '<td><span class="chip '+st.cls+'">'+esc(st.lbl)+'</span></td></tr>'});
+ return h+'</tbody></table></div>'}
 function payForm(id){var e=find("DL06","enrollment_id",id)||{};var tot=num(e.final_fee)||num(e.total_fee);var rem=e.remaining_amount!==undefined&&e.remaining_amount!==""?num(e.remaining_amount):Math.max(0,tot-num(e.paid_amount));
  var h='<div class="dcard"><h4><i class="ti ti-cash"></i>Ghi nhận thanh toán - '+esc(e.student_id_name||e.student_id)+'</h4>';
  h+=ctxRows([["Khóa",esc(e.course_id_name||e.course_id||"-")],["Tổng phí",vnd(tot)],["Đã thu",vnd(num(e.paid_amount))],["Còn lại",'<b style="color:var(--red)">'+vnd(rem)+'</b>']]);
- h+='<div class="fld"><label>Số tiền thu</label><input id="pm_amt" type="number" min="0" value="'+rem+'"></div>';
+ /* Thu tiền mà không thấy lịch đợt thì kế toán phải mở chỗ khác để biết đang thu cho đợt nào. */
+ var _ins=insOf(id);
+ var _open=_ins.filter(function(x){return !isc(x.status,"paid")})[0];
+ if(_ins.length>1){
+  h+='<div class="fld full"><label>Lịch đóng theo đợt</label>'+insTableHTML(_ins,false)+
+   '<div class="fhint">Số tiền bên dưới đang điền sẵn theo <b>đợt '+esc(_open?_open.installment_no:"-")+'</b>'+
+   (_open&&_open.due_date?(' (hạn '+esc(_open.due_date)+')'):'')+' - sửa lại được nếu khách đóng khác.</div></div>'}
+ else h+='<div class="fld full"><div class="fhint">Đơn này đang đóng MỘT LẦN. '+
+  '<button class="pill" onclick="closeModal();insPlanForm(\''+esc(id)+'\')"><i class="ti ti-calendar-dollar"></i>Chia thành nhiều đợt</button></div></div>';
+ var _pref=_open?Math.min(rem,num(_open.remaining_amount)||num(_open.due_amount)):rem;
+ h+='<div class="fld"><label>Số tiền thu</label><input id="pm_amt" type="number" min="0" value="'+_pref+'"></div>';
  h+='<div class="fld"><label>Hình thức</label><select id="pm_method">'+enumOpts("enum_payment_method")+'</select></div>';
  h+='<div class="fld"><label>Người gửi</label><input id="pm_sender" value="'+esc(e.student_id_name||"")+'"></div>';
  h+='<div class="fld"><label>Mã giao dịch</label><input id="pm_ref"></div>';
  h+=attachBox("pay","Ảnh biên lai / màn hình chuyển khoản");
  h+='<div class="fld"><label>Hẹn thu phần còn lại (nếu chưa đủ)</label><input id="pm_due" type="date"><div class="fhint">Đến hẹn, hồ sơ tự nổi vào "Tới hẹn thu" thay vì chờ quá kỳ nhắc nợ.</div></div>';
  if(rem>0)h+='<div class="fld full">'+zaloBtn("phi",{ten:e.student_id_name||"",tien:vnd(rem),khoa:e.course_id_name||"",han:e.next_payment_due||"hạn đã hẹn"})+'</div>';
- h+='<div class="fld full" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" onclick="paySave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Lưu khoản thu</button><button class="btn" onclick="printEnroll(\''+esc(id)+'\')"><i class="ti ti-file-text"></i>In xác nhận đăng ký</button></div></div>';
+ h+='<div class="fld full" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" onclick="paySave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Lưu khoản thu</button><button class="btn" onclick="printEnroll(\''+esc(id)+'\')"><i class="ti ti-file-text"></i>In xác nhận đăng ký</button>'+
+  '<button class="btn" onclick="closeModal();insPlanForm(\''+esc(id)+'\')"><i class="ti ti-calendar-dollar"></i>Chia lại lịch đợt</button></div></div>';
  openDrawer("Ghi nhận thanh toán",h)}
 function printEnroll(eid){var e=find("DL06","enrollment_id",eid)||{};
  var hot=paramStr("centerHotline",""),addr=paramStr("centerAddress","");
@@ -6695,6 +6825,14 @@ function printEnroll(eid){var e=find("DL06","enrollment_id",eid)||{};
   '<tr><td>Học phí phải đóng</td><td><b>'+vnd(num(e.final_fee)||num(e.total_fee))+'</b></td></tr>'+
   '<tr><td>Đã đóng</td><td>'+vnd(num(e.paid_amount))+'</td></tr>'+
   '<tr><td>Còn lại</td><td>'+vnd(num(e.remaining_amount))+(e.next_payment_due?' (hẹn thu '+esc(e.next_payment_due)+')':'')+'</td></tr></table>'+
+  /* In LỊCH ĐỢT vào phiếu: học viên cầm về là biết còn mấy đợt, ngày nào, bao nhiêu tiền -
+     đỡ hẳn một loại cuộc gọi hỏi lại. */
+  (function(){var L=insOf(eid);if(L.length<2)return "";
+   var t2='<h3 style="margin:18px 0 6px;font-size:14px">LỊCH ĐÓNG HỌC PHÍ THEO ĐỢT</h3><table>'+
+    '<tr><td><b>Đợt</b></td><td><b>Hạn đóng</b></td><td><b>Số tiền</b></td><td><b>Tình trạng</b></td></tr>';
+   L.forEach(function(x){t2+='<tr><td>'+esc(x.installment_no)+'/'+esc(x.installment_of)+'</td><td>'+esc(x.due_date||"-")+'</td>'+
+    '<td>'+vnd(num(x.due_amount))+'</td><td>'+esc(insDueState(x).lbl)+'</td></tr>'});
+   return t2+'</table>'})()+
   '<div class="sm">In từ hệ thống vận hành ITTs - có giá trị xác nhận thông tin, không thay phiếu thu.</div>'+
   '<script>window.print()<\/script></body></html>');
  w.document.close()}
@@ -6754,6 +6892,8 @@ function paySave(id){var e=find("DL06","enrollment_id",id);if(!e)return;var amt=
    if(SVR)google.script.run.apiUpdate("DL06",id,{enrollment_status:e.enrollment_status})}
   var due=(fldV("pm_due")||"").trim();if(due){e.next_payment_due=fromISOdt(due).split(" ")[0];if(SVR)google.script.run.apiUpdate("DL06",id,{next_payment_due:e.next_payment_due})}
   else if(rem<=0){e.next_payment_due=""}
+  insSync(id);   /* HÀM LÕI: phân bổ lại tiền vào các đợt + suy lại hẹn thu. Mọi cửa động vào
+                    tiền đều phải gọi, nếu không lịch đợt và số dư của đơn lệch nhau ngay. */
   var dep=paramOf("thresholdDeposit_minimum",5000000);
   if(rem>0&&newPaid<dep)toast("Đã ghi thu. LƯU Ý: tổng đã đóng "+vnd(newPaid)+" dưới mức cọc chuẩn "+vnd(dep)+" - cân nhắc thu thêm.",5200);
   closeModal();reRender(CUR);payReceipt(id,amt,pay.payment_method,pay.transaction_ref,pid)}
