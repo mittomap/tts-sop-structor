@@ -483,6 +483,9 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .tourbox h5{font-size:14.5px;font-weight:800;color:var(--navy);margin:4px 0 6px;line-height:1.35}
 .tourbox p{font-size:12.5px;color:#4A5A6E;line-height:1.65;margin:0 0 11px}
 .tourbox .thint{background:#EAF3FC;border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:7px 10px;font-size:12px;color:var(--navy);margin:0 0 11px;line-height:1.55}
+.tourbox .tchk{display:flex;align-items:center;gap:7px;background:#FFF8E6;border:1px dashed #F0D08A;border-radius:8px;padding:7px 10px;font-size:12px;color:#8A5A0B;margin:0 0 11px;line-height:1.5}
+.tourbox .tchk.ok{background:#EAF7F0;border-color:#A9DFC4;border-style:solid;color:#1E6A47}
+.tourbox .tchk i{font-size:15px;flex:none}
 .tourbox .tfoot{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 .tourbox .tfoot .sp{margin-left:auto}
 .tourdots{display:flex;gap:4px;margin-bottom:10px}
@@ -10405,10 +10408,15 @@ function renderChang(){
    Nút: Tiếp theo · Quay lại · Làm lại từ đầu · Đóng. Người dùng vẫn bấm được vào app trong lúc học
    (lớp phủ để pointer-events:none nên không chặn thao tác - học xong làm luôn).
    Mỗi bước: {p:trang cần mở, ctx:hàm đặt ngữ cảnh, sel:CSS chọn phần tử, t:tiêu đề, d:mô tả, hint:việc cần làm} */
+/* V9.30 (anh Luân chốt tên): ba cấp độ gọi ĐÚNG TÊN việc chúng làm.
+   - THAM QUAN: chỉ xem, không đụng gì.
+   - THAO TÁC MẪU: LÀM THẬT một việc từ đầu tới cuối, app TỰ KIỂM đã làm được chưa.
+   - CẤU HÌNH: cho người thiết lập hệ thống.
+   Cấp giữa trước tên "Trải nghiệm" và chỉ dẫn đi xem - nghe như tham quan lần hai. */
 var TOURLV=[
- ["thamquan","Tham quan","ti-eye","Xem tổng thể app có gì - không cần làm gì cả"],
- ["trainghiem","Trải nghiệm","ti-hand-click","Làm thử đúng việc của từng vị trí trong trung tâm"],
- ["chuyennghiep","Chuyên nghiệp","ti-settings","Dành cho người cấu hình: ngưỡng, phân quyền, thương hiệu"]];
+ ["thamquan","Tham quan","ti-eye","Đi một vòng xem app có gì - không cần làm gì cả"],
+ ["trainghiem","Thao tác mẫu","ti-hand-click","Làm thật đúng việc của vị trí bạn - app kiểm giúp bạn đã làm được chưa"],
+ ["chuyennghiep","Cấu hình","ti-settings","Cho người thiết lập: ngưỡng, phân quyền, thương hiệu, câu nhắc việc"]];
 var TOURS={
  /* ---------- CẤP 1: THAM QUAN ---------- */
  tq_tong:{lv:"thamquan",t:"Toàn cảnh app",ic:"ti-rocket",d:"7 bước - hiểu app chạy thế nào trong 2 phút",steps:[
@@ -10422,18 +10430,18 @@ var TOURS={
  /* ---------- CẤP 2: TRẢI NGHIỆM THEO VỊ TRÍ ---------- */
  tn_sale:{lv:"trainghiem",role:"Nhân viên Tư vấn",t:"Một ngày của Nhân viên Tư vấn",ic:"ti-phone",d:"8 bước - từ khách mới tới lúc thu tiền",steps:[
   {p:"banlam",sel:'@bstats',t:"Mở máy là nhìn 5 ô này",d:"Tới hẹn hôm nay là việc gấp nhất - khách đã hẹn mà không gọi là mất. Sau đó tới học viên nguy cơ và đăng ký còn nợ.",hint:"Bấm ô Tới hẹn hôm nay."},
-  {p:"nhaplead",sel:'@phead',t:"Khách mới gọi đến",d:"Mọi khách hỏi qua điện thoại, Zalo, fanpage đều ghi vào đây. Hệ thống tự chặn trùng số và bắt đầu đếm giờ phản hồi.",hint:"Bấm nút Khách mới liên hệ đến, nhập tên và số điện thoại."},
-  {p:"nhaplead",sel:'@obcards',t:"Gọi và ghi kết quả",d:"Gọi xong bấm Ghi liên hệ, chọn kết quả: gặp được, không nghe máy, hẹn gọi lại... Một nỗ lực gọi là đủ tắt cảnh báo, không bị phạt vì khách không nghe.",hint:"Mở một khách rồi bấm Ghi liên hệ."},
+  {p:"nhaplead",sel:'@phead',t:"Khách mới gọi đến",d:"Mọi khách hỏi qua điện thoại, Zalo, fanpage đều ghi vào đây. Hệ thống tự chặn trùng số và bắt đầu đếm giờ phản hồi.",hint:"Bấm nút Khách mới liên hệ đến, nhập tên và số điện thoại rồi Lưu.",chk:function(){return tourMore("lead")}},
+  {p:"nhaplead",sel:'@obcards',t:"Gọi và ghi kết quả",d:"Gọi xong bấm Ghi liên hệ, chọn kết quả: gặp được, không nghe máy, hẹn gọi lại... Một nỗ lực gọi là đủ tắt cảnh báo, không bị phạt vì khách không nghe.",hint:"Mở một khách, bấm Ghi liên hệ, chọn kết quả rồi Lưu.",chk:function(){return tourMore("lh")}},
   {p:"test",sel:'@phead',t:"Đặt lịch test đầu vào",d:"Khách đồng ý test thì đặt lịch ngay. Đến ngày, học vụ chấm và trả kết quả, hệ thống tự nhắc bạn gọi tư vấn.",hint:"Xem danh sách test đang chờ."},
   {p:"tuvan",sel:'@phead',t:"Tư vấn lộ trình",d:"Dựa trên điểm test, tư vấn khóa phù hợp. Ghi rõ ngân sách và mối quan tâm của khách vào phiếu để lần sau gọi không hỏi lại.",hint:"Mở một khách có kết quả test."},
-  {p:"tuvan",sel:'@obcards',t:"Chốt và tạo đăng ký",d:"Khách đồng ý thì tạo phiếu đăng ký, chọn khóa và ưu đãi. Ưu đãi vượt ngưỡng sẽ tự chuyển quản lý duyệt - bạn không cần đi xin.",hint:"Bấm Tạo đăng ký trên một hồ sơ."},
-  {p:"thanhtoan",sel:'@phead',t:"Thu tiền và gửi xác nhận",d:"Thu đủ hoặc thu theo đợt đều được. Thu xong in phiếu và bấm nút copy tin nhắn Zalo gửi khách ngay.",hint:"Bấm Thu tiền trên một đăng ký."},
+  {p:"tuvan",sel:'@obcards',t:"Chốt và tạo đăng ký",d:"Khách đồng ý thì tạo phiếu đăng ký, chọn khóa và ưu đãi. Ưu đãi vượt ngưỡng sẽ tự chuyển quản lý duyệt - bạn không cần đi xin.",hint:"Bấm Tạo đăng ký trên một hồ sơ đã chốt.",chk:function(){return tourMore("dk")}},
+  {p:"thanhtoan",sel:'@phead',t:"Thu tiền và gửi xác nhận",d:"Thu đủ hoặc thu theo đợt đều được. Thu xong in phiếu và bấm nút copy tin nhắn Zalo gửi khách ngay.",hint:"Bấm Thu tiền trên một đăng ký còn nợ, nhập số tiền rồi Lưu.",chk:function(){return tourMore("thu")}},
   {p:"giaoviec",sel:'@phead',t:"Việc sếp giao cho bạn",d:"Ngoài khách, bạn còn nhận việc từ quản lý ở đây. Nhận việc, làm xong bấm Báo xong, có gì vướng thì trao đổi ngay trong việc.",hint:"Xong một ngày của tư vấn viên!"}]},
  tn_hocvu:{lv:"trainghiem",role:"Học vụ - CSKH",t:"Một ngày của Học vụ",ic:"ti-school",d:"7 bước - xếp lớp, theo lớp, chăm học viên",steps:[
-  {p:"xeplop",sel:'@phead',t:"Xếp lớp cho học viên mới",d:"Học viên đóng tiền xong về đây. Chọn lớp phù hợp trình độ và lịch học, gửi thông tin lớp, chờ học viên xác nhận rồi hoàn tất nhập học.",hint:"Bấm Xếp lớp trên một học viên đang chờ."},
+  {p:"xeplop",sel:'@phead',t:"Xếp lớp cho học viên mới",d:"Học viên đóng tiền xong về đây. Chọn lớp phù hợp trình độ và lịch học, gửi thông tin lớp, chờ học viên xác nhận rồi hoàn tất nhập học.",hint:"Bấm Xếp lớp trên một học viên đang chờ, chọn lớp rồi Lưu.",chk:function(){return tourMore("ob")}},
   {p:"hoctap",sel:'@phead',t:"Bức tranh dạy và học",d:"Tab Hôm nay là việc của giáo viên trong ngày, tab Lớp học là sức khỏe từng lớp, tab Lịch tuần là toàn bộ lịch dạy.",hint:"Bấm sang tab Lớp học."},
-  {p:"banglop",sel:'@phead',t:"Vận hành một lớp",d:"Điểm danh, giao bài, ghi nhận xét buổi, nhập điểm giữa khóa - tất cả trong một màn hình của lớp đó.",hint:"Chọn một lớp rồi bấm tab Điểm danh."},
-  {p:"buoihoc",sel:'@phead',t:"Nhắc giáo viên ghi nhận xét",d:"Buổi dạy xong mà quá hạn chưa có nhận xét sẽ hiện đỏ ở đây. Đây là việc học vụ phải đốc thúc hằng tuần.",hint:"Xem danh sách buổi đang nợ nhận xét."},
+  {p:"banglop",sel:'@phead',t:"Vận hành một lớp",d:"Điểm danh, giao bài, ghi nhận xét buổi, nhập điểm giữa khóa - tất cả trong một màn hình của lớp đó.",hint:"Chọn một lớp, mở tab Điểm danh, đánh dấu vài em rồi bấm Lưu buổi học.",chk:function(){return tourMore("dd")}},
+  {p:"buoihoc",sel:'@phead',t:"Nhắc giáo viên ghi nhận xét",d:"Buổi dạy xong mà quá hạn chưa có nhận xét sẽ hiện đỏ ở đây. Đây là việc học vụ phải đốc thúc hằng tuần.",hint:"Bấm Ghi nhận xét buổi trên một buổi đang chờ rồi Lưu.",chk:function(){return (window.TOURB&&rows("DL11").filter(function(x){return bhState(x).note}).length>(window.TOURB.nx||0))}},
   {p:"hocvien",sel:'@phead',t:"Học viên nguy cơ",d:"Lọc nhanh những em vắng nhiều hoặc tiến bộ chậm để gọi hỏi thăm trước khi phụ huynh phàn nàn.",hint:"Bấm chip lọc Nguy cơ."},
   {p:"cskh",sel:'@phead',t:"Khảo sát và phản hồi",d:"Gửi khảo sát định kỳ theo lớp, tiếp nhận góp ý, xử lý khiếu nại. Điểm hài lòng thấp sẽ tự bật việc follow-up.",hint:"Xem tab Khảo sát."},
   {p:"baoluu",sel:'@phead',t:"Giữ chân học viên muốn nghỉ",d:"Học viên xin bảo lưu hoặc có ý bỏ học nằm ở đây - gọi giữ chân, hẹn ngày quay lại, hoặc chốt bảo lưu có hạn.",hint:"Xong một ngày của học vụ!"}]},
@@ -10444,8 +10452,8 @@ var TOURS={
   {p:"buoihoc",sel:'@phead',t:"Ghi nhận xét buổi học",d:"Cuối buổi ghi nhận xét chung - học viên và phụ huynh đọc được trong cổng học viên. Quá hạn sẽ bị nhắc.",hint:"Bấm Ghi nhận xét cho buổi vừa dạy."},
   {p:"giaoviec",sel:'@phead',t:"Việc được giao",d:"Học vụ hoặc tổ trưởng giao việc cho bạn ở đây: chuẩn bị đề, dự giờ, viết giáo án bổ sung.",hint:"Xong một ngày của giáo viên!"}]},
  tn_ketoan:{lv:"trainghiem",role:"Kế toán",t:"Một ngày của Kế toán",ic:"ti-cash",d:"5 bước - thu, đối soát, công nợ, hoàn tiền",steps:[
-  {p:"thanhtoan",sel:'@phead',t:"Thu học phí",d:"Thu tiền mặt hay chuyển khoản đều ghi ở đây, in phiếu thu ngay. Đóng theo đợt thì ghi hẹn thu đợt sau.",hint:"Bấm Thu tiền trên một đăng ký."},
-  {p:"thanhtoan",sel:'@obcards',t:"Đối soát khoản thu",d:"Tư vấn viên thu hộ thì kế toán phải xác nhận lại. Khoản chưa xác nhận hiện chip hổ phách.",hint:"Bấm chip lọc Chờ xác nhận."},
+  {p:"thanhtoan",sel:'@phead',t:"Thu học phí",d:"Thu tiền mặt hay chuyển khoản đều ghi ở đây, in phiếu thu ngay. Đóng theo đợt thì ghi hẹn thu đợt sau.",hint:"Bấm Thu tiền trên một đăng ký còn nợ, nhập số tiền rồi Lưu.",chk:function(){return tourMore("thu")}},
+  {p:"thanhtoan",sel:'@obcards',t:"Đối soát khoản thu",d:"Tư vấn viên thu hộ thì kế toán phải xác nhận lại. Khoản chưa xác nhận hiện chip hổ phách.",hint:"Bấm chip Chờ xác nhận, mở một khoản và bấm Xác nhận đã nhận.",chk:function(){return (window.TOURB&&rows("DL07").filter(function(x){return String(x.verified_by||"").trim()}).length>(window.TOURB.xacnhan||0))}},
   {p:"thanhtoan",sel:'@tbar',t:"Công nợ và tới hẹn thu",d:"Danh sách đăng ký còn nợ, ai tới hẹn hôm nay, ai quá hạn. Gọi nhắc rồi ghi lại lịch hẹn mới.",hint:"Bấm chip Tới hẹn thu."},
   {p:"duyet",sel:'@phead',t:"Duyệt chiết khấu và hoàn tiền",d:"Ưu đãi vượt ngưỡng và yêu cầu hoàn tiền tập trung ở đây. Hoàn tiền có gợi ý mức theo chính sách và số ngày đã học.",hint:"Mở một yêu cầu để xem."},
   {p:"baocao",sel:'@phead',t:"Báo cáo doanh thu",d:"Doanh thu theo tháng, theo nguồn khách, công nợ tồn - số liệu tự tính từ phiếu thu, không phải gõ lại.",hint:"Xong một ngày của kế toán!"}]},
@@ -10453,14 +10461,14 @@ var TOURS={
   {p:"baocao",sel:'@phead',t:"Mở máy là nhìn số",d:"Doanh thu, phễu tuyển sinh, chuyên cần, hài lòng - và quan trọng nhất là phần nhận xét kèm việc nên làm ngay cho từng chỉ số.",hint:"Cuộn xuống xem khối chỉ số."},
   {p:"banlam",sel:'@bstats',t:"Điểm nghẽn toàn trung tâm",d:"Ô nào số cao bất thường là chỗ đang tắc. Bấm vào là ra đúng danh sách người đang kẹt ở đó.",hint:"Bấm ô có số lớn nhất."},
   {p:"changA",sel:'@nrail',t:"Tắc ở chặng nào",d:"Phần trăm chuyển đổi giữa các ga cho biết mất khách ở bước nào: gọi không được, test rồi không tư vấn, hay tư vấn rồi không chốt.",hint:"Nhìn tỷ lệ giữa các ga."},
-  {p:"duyet",sel:'@phead',t:"Duyệt việc chờ bạn",d:"Chiết khấu lớn, hoàn tiền - nhân viên tạo là bạn nhận thông báo ngay, duyệt xong nhân viên biết liền.",hint:"Xem hàng chờ duyệt."},
-  {p:"giaoviec",sel:'@phead',t:"Giao việc cho đội",d:"Giao xuống cấp dưới, phối hợp ngang cấp, hoặc nhờ hỗ trợ. Việc bắt buộc thì không được từ chối.",hint:"Bấm Giao việc mới."},
+  {p:"duyet",sel:'@phead',t:"Duyệt việc chờ bạn",d:"Chiết khấu lớn, hoàn tiền - nhân viên tạo là bạn nhận thông báo ngay, duyệt xong nhân viên biết liền.",hint:"Duyệt hoặc từ chối một chiết khấu đang chờ.",chk:function(){return (window.TOURB&&rows("DL06").filter(function(x){return String(x.discount_approved_by||"").trim()}).length>(window.TOURB.duyet||0))}},
+  {p:"giaoviec",sel:'@phead',t:"Giao việc cho đội",d:"Giao xuống cấp dưới, phối hợp ngang cấp, hoặc nhờ hỗ trợ. Việc bắt buộc thì không được từ chối.",hint:"Bấm Giao việc mới, chọn người nhận, ghi tiêu đề rồi Lưu.",chk:function(){return tourMore("viec")}},
   {p:"giaoviec",sel:'@tbar',t:"Ai đang làm tốt, ai hay trễ",d:"Tab Tổng hợp cho biết tỷ lệ hoàn thành đúng hạn của từng người - dùng khi đánh giá cuối tháng.",hint:"Bấm tab Tổng hợp & báo cáo."}]},
  /* ---------- CẤP 3: CHUYÊN NGHIỆP (người cấu hình) ---------- */
  cn_thuonghieu:{lv:"chuyennghiep",t:"Đổi thương hiệu và menu",ic:"ti-palette",d:"5 bước - biến app thành bản của trung tâm bạn",steps:[
   {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'@settabs',t:"Trang Cài đặt là trung tâm điều khiển",d:"9 tab: giao diện, menu, phân quyền, ngưỡng SLA, ngưỡng KPI, câu nhắc việc, danh mục, khóa học, nhân sự. App không cắm cứng con số nào.",hint:"Bấm Tiếp theo."},
-  {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'.pbody',t:"Tên và logo",d:"Đổi tên hiển thị, tên trung tâm dùng trong tin nhắn gửi khách, tiêu đề tab trình duyệt, và logo - tải ảnh lên hoặc gõ chữ tắt.",hint:"Thử gõ tên trung tâm của bạn."},
-  {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'.jgrid',t:"Màu thương hiệu",d:"Đổi màu nền menu và màu nhấn - áp ngay lập tức lên toàn app. Nhớ chọn màu nền đủ tối để chữ trắng còn đọc được.",hint:"Bấm vào ô màu và chọn thử."},
+  {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'.pbody',t:"Tên và logo",d:"Đổi tên hiển thị, tên trung tâm dùng trong tin nhắn gửi khách, tiêu đề tab trình duyệt, và logo - tải ảnh lên hoặc gõ chữ tắt.",hint:"Gõ tên trung tâm của bạn vào ô Tên trên đầu menu.",chk:function(){return (window.TOURB&&((UI().brand||"")+"|"+(UI().navy||""))!==window.TOURB.brand)}},
+  {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'.jgrid',t:"Màu thương hiệu",d:"Đổi màu nền menu và màu nhấn - áp ngay lập tức lên toàn app. Nhớ chọn màu nền đủ tối để chữ trắng còn đọc được.",hint:"Đổi màu nền menu và xem app đổi ngay.",chk:function(){return (window.TOURB&&((UI().brand||"")+"|"+(UI().navy||""))!==window.TOURB.brand)}},
   {p:"settings",ctx:function(){window.SETTAB="menu"},sel:'.pbody',t:"Bật tắt và đổi tên menu",d:"Trung tâm nhỏ không dùng hết chức năng thì tắt bớt cho menu gọn. Đổi tên nhóm theo cách gọi quen của bạn.",hint:"Tắt thử một mục rồi nhìn menu bên trái."},
   {p:"settings",ctx:function(){window.SETTAB="demo"},sel:'@settabs',t:"Dữ liệu demo",d:"Các máy mở bản demo tự đồng bộ nhau qua Room. Hết buổi bấm Reset là về nguyên bản.",hint:"Xong phần thương hiệu!"}]},
  cn_phanquyen:{lv:"chuyennghiep",t:"Phân quyền: ai thấy dữ liệu của ai",ic:"ti-shield-lock",d:"5 bước - thiết lập và kiểm chứng",steps:[
@@ -10470,7 +10478,7 @@ var TOURS={
   {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'.jgrid',t:"Che thông tin nhạy cảm",d:"Thấy dòng nhưng không đọc được ô: giáo viên không thấy tiền, marketing không thấy số điện thoại đầy đủ, kế toán không đọc nội dung tư vấn.",hint:"Xem 3 công tắc bên phải."},
   {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'.pbody',t:"Công tắc tổng",d:"Tắt phạm vi dữ liệu là mọi người thấy hết - dùng khi demo hoặc khi mới triển khai. Bật lên khi chạy thật.",hint:"Xong phần phân quyền!"}]},
  cn_nguong:{lv:"chuyennghiep",t:"Ngưỡng, KPI và câu nhắc việc",ic:"ti-adjustments",d:"5 bước - điều chỉnh quy trình theo trung tâm bạn",steps:[
-  {p:"settings",ctx:function(){window.SETTAB="ch2"},sel:'@settabs',t:"Ngưỡng thời gian và SLA",d:"Bao lâu phải gọi khách mới, bao lâu phải chấm test, bao lâu phải ghi nhận xét. Đổi ở đây là mọi cảnh báo trong app đổi theo ngay.",hint:"Tìm tham số gọi lead mới và thử đổi số."},
+  {p:"settings",ctx:function(){window.SETTAB="ch2"},sel:'@settabs',t:"Ngưỡng thời gian và SLA",d:"Bao lâu phải gọi khách mới, bao lâu phải chấm test, bao lâu phải ghi nhận xét. Đổi ở đây là mọi cảnh báo trong app đổi theo ngay.",hint:"Tìm slaLeadResponse_min (hoặc slaLRT_minutes), đổi số rồi Lưu - cảnh báo trên app đổi theo ngay.",chk:function(){return num(paramOf("slaLeadResponse_min",15))!==15}},
   {p:"settings",ctx:function(){window.SETTAB="ch2"},sel:'.pbody',t:"Ngưỡng tiền và chính sách",d:"Chiết khấu bao nhiêu thì phải duyệt, nợ bao lâu thì cảnh báo, hoàn tiền theo mốc nào - đều là tham số.",hint:"Cuộn tìm nhóm Tài chính."},
   {p:"settings",ctx:function(){window.SETTAB="ch6"},sel:'@settabs',t:"Ngưỡng KPI",d:"Chuyên cần bao nhiêu là đạt, tỷ lệ chuyển đổi bao nhiêu là tốt. Báo cáo chấm xanh đỏ dựa trên các ngưỡng này.",hint:"Xem bảng ngưỡng."},
   {p:"settings",ctx:function(){window.SETTAB="ch4"},sel:'@settabs',t:"Câu nhắc việc",d:"Toàn bộ câu chữ nhắc nhân viên làm gì nằm ở đây - sửa được, không cần lập trình viên. Câu có tham số tự điền số từ ngưỡng.",hint:"Sửa thử một câu và xem bản xem trước."},
@@ -10521,6 +10529,7 @@ function tourAsk(k){var T=TOURS[k];if(!T)return;
  openDrawer("Xác nhận chạy hướng dẫn",h)}
 function tourStart(k){if(!TOURS[k])return;
  try{closeModal()}catch(e){}          /* đóng hẳn ngăn kéo xác nhận trước khi phủ lớp tour */
+ try{tourBase()}catch(e){}            /* chụp mốc số liệu để biết người học có thật sự làm gì không */
  TOUR={key:k,i:0,on:true};tourShow()}
 function tourEnd(){TOUR.on=false;TOUR.key="";
  try{var s=document.getElementById("tourspot"),b=document.getElementById("tourbox");
@@ -10551,6 +10560,34 @@ function tourShow(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
  if(st.p&&typeof go==="function"&&CUR!==st.p){try{go(st.p)}catch(e){}}
  else if(st.ctx&&typeof reRender==="function")try{reRender(CUR)}catch(e){}
  setTimeout(tourPaint,st.p?170:40)}
+/* ═══ V9.30 - THAO TÁC MẪU: app tự kiểm "bạn đã làm được chưa" ═══
+   Hướng dẫn chỉ NÓI thì người học gật gù rồi quên. Bước nào có việc phải làm thì khai thêm
+   `chk:function(){...}` trả về true khi việc đó ĐÃ XẢY RA THẬT trong dữ liệu. Hộp hướng dẫn hiện
+   trạng thái sống và nút "Kiểm tra lại".
+   CỐ Ý KHÔNG CHẶN nút Tiếp theo: có người chỉ muốn xem, chặn lại là biến hướng dẫn thành cái khoá.
+   Chỉ nói rõ "app chưa thấy bạn làm" để họ tự quyết.
+
+   Mốc số liệu chụp lúc BẮT ĐẦU bài: "đã làm được chưa" nghĩa là CÓ THÊM so với lúc bắt đầu, chứ
+   không phải "trong hệ thống có tồn tại" - dữ liệu demo lúc nào chẳng có sẵn vài cái. */
+function tourBase(){window.TOURB={
+ lead:rows("DL02").length,lh:rows("DL02b").length,test:rows("DL03").length,tv:rows("DL04").length,
+ dk:rows("DL06").length,thu:rows("DL07").length,ob:rows("DL08").length,dd:rows("DL12").length,
+ bt:rows("DL13").length,wow:rows("DL14").length,kn:rows("DL17").length,viec:rows("DL23").length,
+ nx:rows("DL11").filter(function(x){return bhState(x).note}).length,
+ duyet:rows("DL06").filter(function(x){return String(x.discount_approved_by||"").trim()}).length,
+ xacnhan:rows("DL07").filter(function(x){return String(x.verified_by||"").trim()}).length,
+ lop:rows("DL08").filter(function(x){return String(x.class_id||"").trim()}).length,
+ brand:(UI().brand||"")+"|"+(UI().navy||"")}}
+var TOURTB={lead:"DL02",lh:"DL02b",test:"DL03",tv:"DL04",dk:"DL06",thu:"DL07",ob:"DL08",
+ dd:"DL12",bt:"DL13",wow:"DL14",kn:"DL17",viec:"DL23"};
+function tourMore(k){var b=window.TOURB||{};var tb=TOURTB[k];if(!tb)return false;
+ return rows(tb).length>(b[k]||0)}
+function tourChk(st){if(!st||typeof st.chk!=="function")return null;
+ try{return !!st.chk()}catch(e){return null}}
+function tourChkNow(){tourPaint();
+ var T=TOURS[TOUR.key]||{steps:[]};var st=T.steps[TOUR.i];var r=tourChk(st);
+ if(r===true)toast("Đúng rồi - bạn vừa làm được việc này.");
+ else if(r===false)toast("App chưa thấy thay đổi nào. Làm theo dòng \"Việc cần làm\" rồi bấm Kiểm tra lại.",4600)}
 function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
  var st=T.steps[TOUR.i];if(!st)return;
  var el=tourFind(st.sel);
@@ -10574,7 +10611,11 @@ function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
   '<div class="tnum">'+esc(T.t)+' · bước '+(TOUR.i+1)+'/'+n+'</div>'+
   '<h5>'+esc(st.t)+'</h5><p>'+esc(st.d)+'</p>'+
   (window.__tourMiss?'<div class="thint" style="border-left-color:var(--amber)"><i class="ti ti-alert-triangle" style="margin-right:5px"></i>Chỗ cần trỏ không có trên màn hình của bạn (khác chức danh, hoặc trang chưa có dữ liệu) - đọc phần mô tả rồi bấm Tiếp theo.</div>':'')+
-  (st.hint?'<div class="thint"><i class="ti ti-hand-finger" style="margin-right:5px"></i>'+esc(st.hint)+'</div>':'')+
+  (st.hint?'<div class="thint"><i class="ti ti-hand-finger" style="margin-right:5px"></i><b>Việc cần làm:</b> '+esc(st.hint)+'</div>':'')+
+  (function(){var r=tourChk(st);if(r===null)return "";
+   return '<div class="tchk '+(r?"ok":"")+'"><i class="ti '+(r?"ti-circle-check":"ti-clock")+'"></i>'+
+    (r?'<b>Bạn đã làm được việc này.</b>':'<span>App chưa thấy bạn làm - làm xong bấm <b>Kiểm tra lại</b>.</span>')+
+    (r?'':'<button class="btn sm" style="margin-left:auto" onclick="tourChkNow()"><i class="ti ti-refresh"></i>Kiểm tra lại</button>')+'</div>'})()+
   '<div class="tfoot">'+
    (TOUR.i>0?'<button class="btn sm" onclick="tourPrev()"><i class="ti ti-chevron-left"></i>Quay lại</button>':'')+
    '<button class="btn sm primary" onclick="tourNext()">'+(TOUR.i>=n-1?'<i class="ti ti-check"></i>Hoàn tất':'Tiếp theo<i class="ti ti-chevron-right"></i>')+'</button>'+

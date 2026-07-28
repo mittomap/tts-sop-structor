@@ -52,6 +52,7 @@ console.log("So bai huong dan:",keys.length,"| tong buoc:",keys.reduce((a,k)=>a+
    Nay 42/55 buoc neo bang @ma (data-tour) - ma la hop dong, khong phai chi tiet trinh bay.
    13 buoc con lai tro vao CAC KHOI KHUNG dung chung cua he thiet ke; giu nguyen nhung phai
    KHAI RO O DAY. Ai doi ten mot trong nhung lop nay se thay ngay minh dang lam gay cai gi. */
+function t2(n,c){if(!c)bad.push(n)}
 var KHUNG=[".pbody",".jgrid",".dt",".notebar","#chaybody"];
 (function(){
  var xau=[],neo=0,css=0;
@@ -76,6 +77,50 @@ var KHUNG=[".pbody",".jgrid",".dt",".notebar","#chaybody"];
   var ma=sel.slice(1);
   if(HTML.indexOf('data-tour="'+ma+'"')<0)thieu.push(ma)})});
  if(thieu.length)bad.push("neo @ma khong co that trong app: "+thieu.filter(function(v,i,a){return a.indexOf(v)===i}).join(", "));
+})();
+
+
+/* ---- V9.30: CAP "THAO TAC MAU" PHAI KIEM CHUNG DUOC ----
+   Huong dan chi NOI thi nguoi hoc gat gu roi quen. Buoc nao co viec phai lam thi phai co chk()
+   doc du lieu that. Khong co chk = quay lai lam mot chuyen tham quan lan hai. */
+(function(){
+ var lv=TOURLV.map(function(x){return x[0]});
+ t2("dung 3 cap do", lv.length===3);
+ t2("ten cap do dung loi anh Luan",
+   TOURLV[0][1]==="Tham quan"&&TOURLV[1][1]==="Thao tác mẫu"&&TOURLV[2][1]==="Cấu hình");
+ var tt=Object.keys(TOURS).filter(function(k){return TOURS[k].lv==="trainghiem"});
+ t2("co bai thao tac mau cho tung vi tri", tt.length>=5);
+ var nchk=0,ntot=0,thieu=[];
+ tt.forEach(function(k){TOURS[k].steps.forEach(function(st,i){
+  ntot++;
+  if(typeof st.chk==="function")nchk++;
+  })});
+ t2("cap thao tac mau co it nhat 10 buoc kiem chung duoc (dang "+nchk+")", nchk>=10);
+ /* chk phai CHAY DUOC, khong duoc nem loi */
+ var vo=[];
+ Object.keys(TOURS).forEach(function(k){TOURS[k].steps.forEach(function(st,i){
+  if(typeof st.chk!=="function")return;
+  try{st.chk()}catch(e){vo.push(k+"["+i+"]: "+e.message)}})});
+ t2("moi phep kiem deu chay duoc"+(vo.length?(" - "+vo.slice(0,3).join(" | ")):""), vo.length===0);
+ /* chua lam gi thi phai tra FALSE - tra true san la loi kiem gia */
+ try{tourBase()}catch(e){}
+ var gia=[];
+ Object.keys(TOURS).forEach(function(k){TOURS[k].steps.forEach(function(st,i){
+  if(typeof st.chk!=="function")return;
+  var r=null;try{r=!!st.chk()}catch(e){return}
+  if(r)gia.push(k+"["+i+"]")})});
+ t2("chua lam gi thi moi phep kiem deu bao CHUA"+(gia.length?(" - "+gia.slice(0,3).join(", ")):""), gia.length===0);
+ /* lam that mot viec -> phep kiem tuong ung phai doi sang DA LAM */
+ (function(){
+  var st=null,key="";
+  Object.keys(TOURS).some(function(k){return TOURS[k].steps.some(function(x){
+   if(typeof x.chk==="function"&&/tourMore\("lead"\)/.test(String(x.chk))){st=x;key=k;return true}
+   return false})});
+  if(!st){t2("tim duoc buoc kiem 'them lead moi'", false);return}
+  t2("tim duoc buoc kiem 'them lead moi'", true);
+  rows("DL02").unshift({lead_id:"L-TEST-TOUR",full_name:"Kiem thu"});
+  t2("them lead that thi phep kiem doi sang DA LAM", st.chk()===true);
+  rows("DL02").shift()})();
 })();
 
 console.log(bad.length?("TOUR FAIL:\n  "+bad.join("\n  ")):"TOUR OK: menu cap do + moi bai chay het buoc, 0 loi");

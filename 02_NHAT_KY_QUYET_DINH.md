@@ -693,6 +693,24 @@
 > CHẠY thì mọi cửa sổ thời gian phải chọn ở GIỮA, không sát mép.** Nay chỉ lấy buổi trong NỬA cửa
 > sổ, và nửa đó đọc từ chính `attendanceGrace_hours` chứ không gõ số.
 >
+> ### V9.30 - ĐỢT NÂNG CẤP HỆ THỐNG (anh Luân đặt: *"có chuyên gia chuyên nâng cấp hệ thống thì ngon"*)
+>
+> **(N1) HƯỚNG DẪN BA CẤP ĐỘ - GỌI ĐÚNG TÊN VÀ LÀM ĐÚNG VIỆC.**
+> Đổi tên theo đúng lời anh Luân: **Tham quan · Thao tác mẫu · Cấu hình**. Cấp giữa trước đây tên
+> "Trải nghiệm" nhưng nội dung vẫn là *dẫn đi xem* - nghe như tham quan lần hai.
+> **Nâng cấp thật ở chỗ này:** hướng dẫn chỉ NÓI thì người học gật gù rồi quên. Nay mỗi bước có việc
+> phải làm được khai thêm `chk()` - một phép kiểm **đọc dữ liệu thật** để trả lời *"bạn đã làm được
+> chưa"*. Hộp hướng dẫn hiện trạng thái sống (⏱ chưa làm / ✓ đã làm) kèm nút **Kiểm tra lại**.
+> **14/53 bước** đã kiểm chứng được, phủ cả 5 vị trí + cấp Cấu hình (đổi thương hiệu, đổi ngưỡng).
+> **Hai quyết định thiết kế:**
+> · **Mốc so sánh chụp lúc BẮT ĐẦU bài**, không hỏi "trong hệ thống có tồn tại không" - dữ liệu demo
+>   lúc nào chẳng có sẵn vài cái, hỏi kiểu đó là bước nào cũng "đã làm" ngay từ đầu.
+> · **CỐ Ý KHÔNG CHẶN nút Tiếp theo.** Có người chỉ muốn xem; chặn lại là biến hướng dẫn thành cái
+>   khoá. Chỉ nói rõ "app chưa thấy bạn làm" rồi để họ tự quyết.
+> Bộ kiểm `_checktour` canh: đúng 3 cấp độ với đúng tên · mọi `chk()` chạy được không ném lỗi ·
+> **chưa làm gì thì mọi phép kiểm phải báo CHƯA** (phép kiểm luôn xanh là phép kiểm giả) · và thêm
+> một lead thật thì phép kiểm tương ứng phải đổi sang ĐÃ LÀM.
+>
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
 >
 > **(G) TRỢ THỦ THAO TÁC - anh Luân đặt 28/07, LÀM SAU ĐỢT AUDIT (F):** *"a muốn nghiên cứu trợ thủ
