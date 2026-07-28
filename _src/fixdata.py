@@ -909,7 +909,7 @@ for _lid in sorted(_past_cons - _has_cons):
         "consultation_status": "consulted (Đã tư vấn xong)",
         "consultation_time": fmt(_ct),
         "recommended_course": (_crs or {}).get("course_name", "") or (_enr[0].get("course_id_name", "") if _enr else ""),
-        "recommended_duration": (_crs or {}).get("duration_weeks", "") and ("%s tuần" % (_crs or {}).get("duration_weeks")) or "",
+        "recommended_duration": ("%s tháng" % (_crs or {}).get("duration_months")) if (_crs or {}).get("duration_months") else "",
         "recommended_schedule": _L.get("availability_schedule", ""),
         "consultation_note": "Đã trao đổi kết quả test và lộ trình phù hợp với mục tiêu %s." % (_L.get("target_band") or ""),
         "conversion_status": "confirmed_with_deposit (Đồng ý + có cọc)" if _enr else "interested (Quan tâm, chưa chốt)",

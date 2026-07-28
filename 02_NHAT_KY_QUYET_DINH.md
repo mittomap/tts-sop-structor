@@ -149,10 +149,10 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.28** (28/07 trưa hôm sau - việc (A) dữ liệu demo ĐÃ XONG, 218 -> 0 chỗ lệch). MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG.
+> **Phiên bản: V9.28** (28/07 - việc (A) dữ liệu demo XONG 218->0; việc (B) bộ máy lọc XONG đợt 1, phủ 17 trang). MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG.
 > Bộ kiểm hiện tại: node --check 2 file · `_tall` 38 trang 0 lỗi (165 icon) · `_check11` 131 ·
 > `_check12` 37 · `_check13` 174 · `_check14` 100 · `_check15` 37 · **`_check16` 236** · `_checktour` ·
-> `check_logic.py` 132 luật (đúng 4 ca cố ý) · `check_data.py` DAT · **`_checkdata.js` 26 luật / 6195 lượt kiểm - 0 lệch**.
+> `check_logic.py` 132 luật (đúng 4 ca cố ý) · `check_data.py` DAT · **`_checkdata.js` 26 luật / 6206 lượt kiểm - 0 lệch · `_check17.js` 321 tiêu chí**.
 >
 > **VIỆC PHẢI LÀM TIẾP - THEO ĐÚNG THỨ TỰ NÀY (Luân chốt 28/07 khuya, rồi về nghỉ):**
 >
@@ -184,7 +184,19 @@
 > ngày test, phiếu thu khớp học phí, buổi/điểm danh/WOW khớp lớp và khớp giáo viên); (3) đưa
 > `_checkdata.js` vào bộ verify BẮT BUỘC. Ước lượng 2-3 lượt đẩy: chạy - đo - vá - chạy lại tới khi về 0.
 >
-> **(B) BỘ MÁY LỌC CHUYÊN SÂU DÙNG CHUNG.** Luân: "hầu hết các trang đều cần, đừng nhầm với tab -
+> **(B) BỘ MÁY LỌC CHUYÊN SÂU - ✅ XONG ĐỢT 1 (28/07 chiều, V9.28).** Bộ máy khai báo đã chạy:
+> `FLTDEF` khai trục cho **17 trang**, `fltApply()` là lõi duy nhất, `_check17` **321 tiêu chí**
+> (kiểm bằng CHẠY THẬT: bật điều kiện rồi đối chiếu từng dòng còn lại). Có 5 kiểu trục: `fxEnum`
+> `fxStaff` `fxRef` `fxDate` `fxCalc` (trục TÍNH TOÁN - lọc học viên theo lớp/khóa dù DL09 không
+> có cột đó). VÀ giữa các trục, HOẶC trong cùng một trục. Lưu bộ lọc **theo từng người** trên
+> localStorage `ITTS_FLT_<mã NV>`. Tab giữ nguyên, bộ lọc chỉ thu hẹp bên trong tab đang mở.
+> **Chốt chặn `fltColOk()`** loại trục trỏ vào cột không có thật - ngay lần chạy đầu đã bắt được
+> `DL05.course_status` không tồn tại (bảng khóa học dùng `status`), đúng lớp lỗi đã làm hỏng báo
+> cáo `wow_teacher_id` hôm trước. **CÒN LẠI ĐỢT 2:** phủ nốt các trang custom chưa có
+> (`renderXeplop`/`renderDuyet`/`renderBanglop`/`renderCskh`/`renderHoctap`/`renderBaocao`...),
+> và cân nhắc trục số (khoảng học phí, khoảng điểm).
+>
+> *(mô tả gốc)* **BỘ MÁY LỌC CHUYÊN SÂU DÙNG CHUNG.** Luân: "hầu hết các trang đều cần, đừng nhầm với tab -
 > tab hiện tại đã ngon, chỉ bổ sung filter". Yêu cầu: nhiều điều kiện **kết hợp được**, và **lưu được
 > thành bộ lọc riêng của từng người**. TUYỆT ĐỐI không vá tay từng trang (50 hàm render = 50 kiểu).
 > Làm MỘT bộ máy khai báo: `FLTDEF[page] = [trục...]`, bộ máy lo giao diện + kết hợp + đếm + xoá + lưu.

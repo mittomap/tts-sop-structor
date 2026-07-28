@@ -46,6 +46,7 @@ Bộ kiểm gồm **5 phần, phải xanh HẾT mới được giao**:
 | `ITTS_OUT=<out> node _check15.js` | `CHECK15 OK: 37 tieu chi` - **kiểm kê cửa ghi + bất biến nghiệp vụ** |
 | `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 236 tieu chi` - học phí theo đợt + toàn bộ vá V9.27 |
 | `ITTS_OUT=<out> node _checkdata.js` | `CHECKDATA OK: 26 luat ... 0 cho lech` - **dữ liệu demo có khớp ga nghiệp vụ không** |
+| `ITTS_OUT=<out> node _check17.js` | `CHECK17 OK: 321 tieu chi` - **bộ máy lọc chuyên sâu** (kết hợp trục, lưu theo người) |
 | `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` |
 | `python3 check_logic.py` | `TONG BAN GHI LOI: 4` (đúng 4 ca là việc quá hạn CỐ Ý để demo cảnh báo đỏ - xem luật 10k) |
 | `python3 check_data.py` | `KET QUA: DAT` |
@@ -132,3 +133,30 @@ PY
 - Icon: quét cả `ti ti-X` lẫn `"ti-X"`; thêm icon = dựng lại font.
 - Verify từng bước bằng harness, không tin script chạy đúng.
 - V9.7: mốc cắt lắp ráp file HV là chuỗi `'<script src="ITTs_data.js"></script>'` và boot `if(!SVR){demoBoot()}` — sửa vùng đó phải giữ nguyên 2 chuỗi.
+
+
+## BỘ MÁY LỌC CHUYÊN SÂU (V9.28, việc B)
+
+Thêm bộ lọc cho một trang = **thêm ĐÚNG MỘT DÒNG** vào bảng `FLTDEF` trong `gen_v5.py`, không
+viết thêm một dòng giao diện nào:
+
+```js
+FLTDEF.tenTrang = [
+  fxEnum("cot_enum","Nhãn"),                 // chọn nhiều - gom giá trị từ chính dữ liệu
+  fxStaff("cot_nhan_su","Người phụ trách"),  // chọn nhiều - hiện tên nhân viên
+  fxRef("class_id","Lớp","DL10","class_id","class_name"),   // tra sang bảng khác
+  fxDate("cot_thoi_gian","Ngày ..."),        // khoảng thời gian + 8 mốc sẵn
+  fxCalc("_khoa","Khóa học", getter, labeler)  // trục TÍNH TOÁN, không phải cột của bảng
+];
+```
+
+Trang không nằm trong `LISTCFG` thì khai bảng nguồn ở `FLTSRC` (ví dụ `giaoviec: "DL23"`).
+
+- **VÀ giữa các trục · HOẶC trong cùng một trục.** Một lõi duy nhất `fltApply(trang, mảng)`.
+- **Không đụng tab.** Tab chọn nhóm, bộ lọc thu hẹp bên trong nhóm đang mở.
+- **Lưu theo TỪNG NGƯỜI** trên localStorage khoá `ITTS_FLT_<mã nhân viên>` - thói quen cá nhân,
+  không ghi vào `DATA.config`.
+
+> **MỌI trục phải đi qua `fltColOk()`** - trục trỏ vào cột KHÔNG CÓ THẬT thì bị loại và `_check17`
+> báo đỏ. Ngay lần đầu chạy, chốt chặn này đã bắt được `DL05.course_status` không tồn tại (bảng
+> khóa học dùng `status`). Đây đúng lớp lỗi đã làm hỏng một báo cáo trước đó (`wow_teacher_id`).
