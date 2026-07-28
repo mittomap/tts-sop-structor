@@ -1,8 +1,8 @@
 /* _check11 - V9.15: CHANG VONG DOI (arc) + NAVTREE + mstrip + nodeRail + sopBlock + reup */
 function El(){return {innerHTML:"",value:"",checked:false,style:{},classList:{add(){},remove(){},contains(){return false}},
  querySelector(){return El()},querySelectorAll(){return []},getAttribute(){return ""},setAttribute(){},appendChild(){},focus(){},addEventListener(){},files:[]}}
-var NAVEL=El();
-global.document={getElementById:function(id){return id==="nav"?NAVEL:El()},querySelector:()=>El(),querySelectorAll:()=>[],createElement:()=>El(),body:El(),addEventListener(){}};
+var NAVEL=El(),CRUMBEL=El();
+global.document={getElementById:function(id){return id==="nav"?NAVEL:(id==="pgCrumb"?CRUMBEL:El())},querySelector:()=>El(),querySelectorAll:()=>[],createElement:()=>El(),body:El(),addEventListener(){}};
 global.window=global;global.location={hash:""};
 var store={};global.localStorage={getItem:k=>store[k]===undefined?null:store[k],setItem(k,v){store[k]=String(v)},removeItem(k){delete store[k]}};
 global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
@@ -144,4 +144,33 @@ t("V9.18 tab demo gon: co Reset, het huong dan dai", (function(){window.SETTAB="
  return o.indexOf("Reset demo")>=0&&o.indexOf("Cách demo hai cổng")<0})());
 CUR="banlam";window.BLVIEW="list";
 t("V9.18b hint o tim hero nam NGOAI hop tim (khong de len input)", RENDER.banlam().indexOf('</div><span class="bwsrchhint"')>=0);
+
+/* --- 10. V9.19: bam nghiep vu trong chang -> sidebar danh dau + breadcrumb vet duong di --- */
+applyScope("");CURROLE="all";
+(function(){var sai=[];
+ ["changA","changB","changC","changD"].forEach(function(a){
+  arcJobs(a).forEach(function(jb){var k=jb[0];
+   window.NAVOPEN={};window.NAVHIST=[];CUR="banlam";
+   go(a);go(k);
+   var on=(NAVEL.innerHTML.match(/class="navitem on" data-k="([a-z0-9]+)"/g)||[]).map(function(s){return s.match(/data-k="([a-z0-9]+)"/)[1]});
+   if(!(on.length===1&&on[0]===k))sai.push(a+">"+k+"=["+on.join(",")+"]")})});
+ t("V9.19 moi nghiep vu trong chang sang DUNG 1 muc sidebar"+(sai.length?" ["+sai.join(" ")+"]":""), sai.length===0)})();
+t("V9.19 hub khong sang de khi muc con dang sang (wow)", (function(){
+ window.HTTAB="wow";CUR="hoctap";return navCur("wow")===true&&navCur("hoctap")===false})());
+t("V9.19 hub VAN sang khi tab khong co muc con rieng (cskh/khaosat)", (function(){
+ window.CSTAB="khaosat";CUR="cskh";return navCur("cskh")===true})());
+window.HTTAB="today";
+t("V9.19 crumbLabel noi ro tab dang dung", (function(){window.TSTAB="test";
+ return crumbLabel("tuyensinh",{}).indexOf("·")>0})());
+window.TSTAB="lead";
+(function(){window.NAVHIST=[];CUR="banlam";go("changB");go("wow");go("hoso");
+ var c=CRUMBEL.innerHTML;
+ t("V9.19 breadcrumb la vet duong di, moc bam duoc", (c.match(/navJump\(/g)||[]).length>=2&&c.indexOf("navBack")>=0);
+ t("V9.19 breadcrumb ket bang trang hien tai", c.indexOf('class="crb cur"')>=0)})();
+t("V9.19 di vong A>B>A khong lam phinh vet", (function(){window.NAVHIST=[];CUR="banlam";
+ go("changA");go("cskh");go("changA");go("cskh");return window.NAVHIST.length<=2})());
+t("V9.19 navJump cat vet dung diem nhay", (function(){window.NAVHIST=[];CUR="banlam";
+ go("changB");go("banglop");go("hoso");navJump(1);
+ return CUR==="chang"&&window.NAVHIST.length===1&&window.NAVHIST[0].key==="banlam"})());
+CUR="banlam";window.BLVIEW="list";window.NAVHIST=[];
 console.log(bad.length?("FAIL:\n  "+bad.join("\n  ")):"OK: "+ok);

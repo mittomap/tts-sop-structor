@@ -36,7 +36,8 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500;border-left:3px solid transparent}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
 .navitem:hover{background:#ffffff12;color:#fff}
-.navitem.on{background:#ffffff1a;color:#fff;border-left-color:#5B9BD5;font-weight:600}
+.navitem.on{background:#ffffff2e;color:#fff;border-left-color:#8CC5F2;font-weight:700;box-shadow:inset 0 0 0 1px #ffffff1f} /* V9.19: nền 10% quá mờ trên navy - Luân không thấy mục đang mở; đậm lên + icon sáng */
+.navitem.on i{opacity:1;color:#A8D5F7}
 .navitem .dot{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px;flex:none}
 .me{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid #ffffff18}
 .me .av{width:34px;height:34px;border-radius:50%;background:#5B9BD5;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
@@ -7409,20 +7410,27 @@ function crumbLabel(key,ctx){ctx=ctx||{};var p=PBK[key];var t=p?p.t:key;
  else if(key==="hosonv"&&ctx.NVID)t="NV · "+nm("DL01","staff_id",ctx.NVID,"full_name");
  else if(key==="hosokhoa"&&ctx.KHID)t="Khóa · "+nm("DL05","course_id",ctx.KHID,"course_name");
  else if(key==="banglop"&&ctx.BLCLASS)t="Lớp · "+nm("DL10","class_id",ctx.BLCLASS,"class_name");
+ /* V9.19: hub/trang nhiều góc nhìn phải nói RÕ đang ở tab nào - breadcrumb mới có nghĩa */
+ else if(HUBTAB[key]){var sk=hubSubKey(key);if(sk&&PBK[sk])t=p.t+" · "+PBK[sk].t}
+ else if(key==="chang"){var A9=ARCBK[window.ARC||"changA"];if(A9)t="Chặng "+A9.n+" · "+A9.t}
+ else if(key==="banlam"&&window.BLVIEW==="board")t=p.t+" · Bảng chặng";
  return t}
-/* Breadcrumb THỨ BẬC (không phải vệt lịch sử): [Nhóm hoặc trang nguồn] › Trang hiện tại.
-   Nút Quay lại vẫn dựa trên lịch sử điều hướng - hai thứ tách bạch cho khỏi rối. */
+/* V9.19 - BREADCRUMB = VỆT ĐƯỜNG ĐI THẬT (Luân: "làm lại breadcrumb để phục vụ back trang").
+   [←] Trang bắt đầu › ... › Trang trước › **Trang hiện tại** - mỗi mốc BẤM ĐƯỢC để nhảy thẳng về đó
+   (navJump cắt vệt tại điểm nhảy). Vệt dài quá 4 mốc thì rút gọn bằng "..." (bấm về mốc đầu). */
 function renderCrumb(){var host=document.getElementById("pgCrumb");if(!host)return;
  var p=PBK[CUR]||{};var h=window.NAVHIST||[];var out="";
  if(h.length){var prev=h[h.length-1];
   out+='<button class="crbback" onclick="navBack()" aria-label="Quay lại" title="Quay lại: '+esc(crumbLabel(prev.key,prev.ctx))+'"><i class="ti ti-chevron-left"></i></button>';}
  var parts=[];
- if(p.g&&p.g!=="_"){                                   /* trang thường: Nhóm menu › Trang */
-  parts.push('<span class="crb">'+esc(p.g)+'</span>');
- }else if(h.length){                                   /* trang chi tiết (ẩn): Trang nguồn › Chi tiết */
-  var prev2=h[h.length-1];
-  parts.push('<a class="crb" onclick="navBack()">'+esc(crumbLabel(prev2.key,prev2.ctx))+'</a>');
- }
+ function step(i){var s=h[i];
+  return '<a class="crb" onclick="navJump('+i+')" title="Về: '+esc(crumbLabel(s.key,s.ctx))+'">'+esc(crumbLabel(s.key,s.ctx))+'</a>'}
+ if(h.length>4){                        /* rút gọn: mốc đầu ... 2 mốc gần nhất */
+  parts.push(step(0));
+  parts.push('<a class="crb" onclick="navJump(1)" title="Còn '+(h.length-3)+' bước ở giữa - bấm để lùi về bước thứ 2">...</a>');
+  parts.push(step(h.length-2));parts.push(step(h.length-1));
+ }else{for(var i=0;i<h.length;i++)parts.push(step(i))}
+ if(!h.length&&p.g&&p.g!=="_")parts.push('<span class="crb">'+esc(p.g)+'</span>'); /* chưa đi đâu: hiện nhóm menu cho có ngữ cảnh */
  parts.push('<span class="crb cur">'+esc(crumbLabel(CUR,navSnap()))+'</span>');
  host.innerHTML=out+parts.join('<span class="crbsep">›</span>')}
 function navBack(){var h=window.NAVHIST;if(!h||!h.length)return;var last=h.pop();navApply(last.ctx);go(last.key,true)}
@@ -7452,8 +7460,12 @@ function go(key,noHist){
    '<button class="btn primary" onclick="go(SCOPE().land||\'banlam\')"><i class="ti ti-home"></i>Về trang chính</button></div>';
   el0.scrollTop=0;closeNav();closeBell();return}
  if(!noHist&&CUR&&CUR!==key){window.NAVHIST=window.NAVHIST||[];
-  window.NAVHIST.push({key:CUR,ctx:window.CURCTX||{}});
-  if(window.NAVHIST.length>15)window.NAVHIST.shift();}
+  var hh=window.NAVHIST,dup=-1;
+  for(var i9=0;i9<hh.length;i9++)if(hh[i9].key===key){dup=i9;break}
+  /* V9.19: quay lại trang ĐÃ đi qua thì CẮT vệt tại đó thay vì đẻ thêm mốc - breadcrumb không phình
+     vòng lặp A>B>A>B, và luôn đọc được như đường đi thật từ gốc tới chỗ đang đứng. */
+  if(dup>=0)hh.length=dup;
+  else{hh.push({key:CUR,ctx:window.CURCTX||{}});if(hh.length>15)hh.shift()}}
  CUR=key;
  /* vào trang nào thì tự mở nhóm NAVTREE chứa nó (kể cả khi người dùng đã gập tay trước đó) */
  var g15=navGroupOf(key0)||navGroupOf(key);
@@ -7539,8 +7551,19 @@ function navVis(k){var r=RBK[CURROLE],rs=SCOPE();
  if(o==="khac"&&rs.pages!=="*"&&rs.tabs&&rs.tabs.khac&&rs.tabs.khac.indexOf(k)<0)return false;
  if(/^chang[A-D]$/.test(k)&&rs.lite)return false;
  return true}
+/* V9.19: hub vừa là MỤC MENU vừa là chủ của mục con (hoctap có mục con wow/lop/buoihoc/lichtuan) -
+   khi tab đang đứng thuộc về một mục con thì mục HUB không được sáng theo, nếu không 2 mục cùng sáng. */
+var HUBTAB={tuyensinh:{v:"TSTAB",d:"lead",m:{lead:"nhaplead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"}},
+ hoctap:{v:"HTTAB",d:"today",m:{lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan"}},
+ cskh:{v:"CSTAB",d:"khaosat",m:{khaosat:"khaosat",phanhoi:"ghinhan",khieunai:"khieunai"}},
+ khac:{v:"KTAB",d:"baoluu",m:{baoluu:"baoluu",magioithieu:"magioithieu",banggiao:"banggiao"}}};
+function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[window[H.v]||H.d]||""}
+function navInTree(k){for(var i=0;i<NAVTREE.length;i++)if(NAVTREE[i].items.indexOf(k)>=0)return true;return false}
 function navCur(k){
- if(k===CUR)return true;
+ /* mục con phải THỰC SỰ đứng trên menu mới nhường sáng cho nó (vd tab Khảo sát của CSKH không có
+    mục riêng -> chính mục CSKH phải sáng, nếu không cả menu không có gì sáng - bẫy đã cắn) */
+ if(k===CUR){var sub=hubSubKey(k);
+  return !(sub&&sub!==k&&navInTree(sub)&&navVis(sub))}
  var o=navOwner(k);if(o!==CUR)return false;
  if(o==="tuyensinh")return ({nhaplead:"lead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"})[k]===(window.TSTAB||"lead");
  if(o==="cskh")return ({review:"khaosat",khaosat:"khaosat",ghinhan:"phanhoi",khieunai:"khieunai"})[k]===(window.CSTAB||"khaosat");

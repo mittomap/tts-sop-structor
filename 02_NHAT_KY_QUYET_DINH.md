@@ -1108,6 +1108,28 @@ nằm TRONG trang sẵn có (màn cổng, Cài đặt, hồ sơ 360, cổng HV) 
 - Cổng học viên: BỎ chip Room demo + nút Reset khỏi sidebar + thanh mobile (học viên không cần công cụ demo);
   màn cổng chọn hồ sơ VẪN giữ (đó là chỗ người demo vận hành trước buổi).
 
+### V9.19 - Sidebar đánh dấu đúng + BREADCRUMB làm lại (Luân, 28/07 tối)
+- **Dấu sáng sidebar quá mờ (gốc của "bấm nghiệp vụ không thấy đánh dấu")**: `.navitem.on` dùng nền
+  #ffffff1a (10% trắng) trên nền navy - gần như vô hình. Đổi: nền #ffffff2e + viền trái #8CC5F2 +
+  inset ring + icon sáng #A8D5F7. LUẬT: mọi trạng thái "đang chọn" trên nền tối phải kiểm tương phản
+  thật, đừng tin alpha nhỏ.
+- **Hub sáng đè mục con**: navCur(k) trả true ngay khi k===CUR -> đứng ở tab WOW thì CẢ "Học tập &
+  Giảng dạy" lẫn "Buổi WOW 1-1" cùng sáng. Thêm `HUBTAB` (map hub -> biến tab -> mục con) + `hubSubKey`:
+  hub KHÔNG sáng khi tab đang đứng có mục con riêng trên menu.
+  **BẪY ĐÃ CẮN NGAY TRONG PHIÊN**: bản đầu kiểm bằng navVis(sub) -> tab Khảo sát của CSKH có sub
+  "khaosat" (navVis=true) nhưng sub đó KHÔNG có mục trên NAVTREE -> hub cskh tắt mà không ai thay =
+  MENU KHÔNG CÓ GÌ SÁNG. Phải kiểm `navInTree(sub) && navVis(sub)`. LUẬT: "nhường sáng" chỉ hợp lệ khi
+  có người NHẬN - luôn kiểm mục nhận thực sự đứng trên menu.
+- **Breadcrumb làm lại = VỆT ĐƯỜNG ĐI THẬT** (thay "Nhóm › Trang" tĩnh): [←] mốc1 › mốc2 › **hiện tại**,
+  mỗi mốc bấm nhảy thẳng về (navJump cắt vệt tại điểm nhảy); vệt >4 mốc rút gọn bằng "..."; chưa đi đâu
+  thì hiện nhóm menu như cũ. crumbLabel nay nói rõ TAB đang đứng (hub: "Tuyển sinh · Test đầu vào",
+  chặng: "Chặng 2 · Đang học", banlam board: "Trang bắt đầu · Bảng chặng").
+- **Chống phình vệt**: go() gặp trang ĐÃ có trong NAVHIST thì CẮT vệt tại đó thay vì push thêm - đi vòng
+  A>B>A>B không đẻ mốc rác, breadcrumb luôn đọc được như đường đi từ gốc.
+- Kiểm định: viết harness mô phỏng bấm ĐỦ 14 nghiệp vụ trong 4 chặng + kiểm vệt/navJump/vòng lặp;
+  đã khóa vào _check11 -> **91 điểm**. Cách này (mô phỏng thao tác thật rồi đọc DOM nav) là mẫu nên
+  dùng lại cho mọi bug điều hướng - đừng suy luận suông.
+
 ## 3octodecies. V9.17 — Room tự động + bong bóng việc mới + vá theo hội đồng 3 tester (28/07 chiều)
 
 Luân chê bản mã phòng V9.16 "phức tạp quá, mặc định phải là kết nối được" -> làm lại + cho 3 tester
