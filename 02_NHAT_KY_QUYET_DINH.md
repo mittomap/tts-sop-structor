@@ -419,6 +419,14 @@
 > dưới. Mục lục cũng đổi theo (Lớp của bạn lên đầu) và **"Trung tâm đã xác nhận" rời khỏi nhóm "Cần
 > bạn xử lý"** - xếp nhầm nhóm là hứa có việc rồi không có việc. `_check14` canh thứ tự này trên 40
 > hồ sơ thật, không kiểm bằng một ca mẫu.
+> **Nói rõ hơn (anh Luân: *"Khóa của bạn chứ, là chỗ chọn khóa ở đầu trang ấy"*):** khối "Khóa của
+> bạn" trước đây chỉ hiện khi học viên học **từ 2 khóa trở lên** (`if(multiC)`). Nghĩa là ĐA SỐ học
+> viên - người học đúng một khóa - vẫn mở cổng lên là thấy bảng "Trung tâm đã xác nhận" đúng như anh
+> chê. Nay LUÔN hiện; học một khóa thì bỏ câu "bấm để xem từng khóa" (không có gì để chọn). Thứ tự
+> cuối cùng: **Khóa của bạn -> Lớp của bạn -> Học phí -> Trung tâm đã xác nhận**.
+> Bài học: sửa "đưa khối X lên đầu" mà không hỏi **X có luôn tồn tại không** thì với phần lớn người
+> dùng chẳng có gì đổi cả. `_check14` nay đếm trên 60 hồ sơ thật rằng khối này có mặt ở MỌI học viên
+> có đăng ký, không chỉ ở ca nhiều khóa.
 > **· Bấm một chặng là mở luôn bản đồ chặng (anh Luân):** trước đây bấm tên chặng chỉ XỔ danh sách
 > rồi đứng im, phải bấm thêm một nhát vào mục đầu tiên mới thấy bản đồ. Đang đứng sẵn trong chặng đó
 > thì không nhảy lại (đỡ mất chỗ đang xem); gập lại thì tuyệt nhiên không điều hướng đi đâu.

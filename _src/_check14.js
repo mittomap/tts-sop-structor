@@ -298,9 +298,23 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
   if(iXn>=0)coXn++;
   if((iXn<0||iLop<iXn)&&(iFee<0||iLop<iFee))okOrder++});
  t("co du lieu de kiem thu tu cong hoc vien", n>=10&&coXn>=10);
+ /* KHOI "KHOA CUA BAN" phai hien cho MOI hoc vien, khong chi nguoi hoc nhieu khoa */
+ (function(){var co=0,tr=0,tong=0,mot=0;
+  rows("DL09").slice(0,60).forEach(function(s){window.HVID=s.student_id;
+   var o="";try{o=renderTrangHV()}catch(e){return}
+   if(o.indexOf('class="hvcr')<0&&o.indexOf('id="s-khoa"')<0)return;   /* HV chua co dang ky nao */
+   tong++;
+   var i=o.indexOf('id="s-khoa"'),x=o.indexOf('id="s-xacnhan"');
+   if(i>=0)co++;
+   if(i>=0&&(x<0||i<x))tr++;
+   if(o.indexOf("bấm để xem từng khóa")<0)mot++});
+  t("Khoa cua ban hien cho MOI hoc vien co dang ky", tong>=20&&co===tong);
+  t("Khoa cua ban dung TRUOC bang xac nhan", tong>0&&tr===tong);
+  t("hoc mot khoa thi khong moc goi y bam chon khoa", mot>0&&mot<tong+1)})();
+ t("muc luc: Khoa cua ban dung dau", HVSEC[0][0]==="s-khoa");
  t("cong hoc vien: LOP CUA BAN dung truoc hoc phi va bang xac nhan", n>0&&okOrder===n);
  /* muc luc phai xep dung thu tu tren trang, khong thi scrollspy nhay lung tung */
- t("muc luc: Lop cua ban dung dau", HVSEC[0][0]==="s-lop");
+ t("muc luc: Lop cua ban ngay sau Khoa cua ban", HVSEC[1][0]==="s-lop");
  /* "Trung tam da xac nhan" khong con nam trong nhom "Can ban xu ly" - no khong co viec gi de lam */
  t("bang xac nhan khong bi xep vao nhom viec phai lam",
    HVGRP[0][1].indexOf("s-xacnhan")<0&&HVGRP[1][1].indexOf("s-xacnhan")>=0);

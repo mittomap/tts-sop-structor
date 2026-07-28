@@ -8302,9 +8302,13 @@ function renderTrangHV(){
   (hvHotline()?hvCallHTML("Gọi trung tâm "+hvHotline(),"hvcall-dark"):'')+
   '</div></div>'+
   '<div class="hvav">'+esc(String(S.full_name||"?").trim().split(" ").pop().slice(0,1).toUpperCase())+'</div></div>';
- /* ---- chọn khóa khi HV học nhiều khóa ---- */
- if(multiC){
-  h+='<div class="sechd">Khóa của bạn <span class="mut" style="text-transform:none;font-weight:600">· bạn đã học '+obs.length+' khóa, bấm để xem từng khóa</span></div>';
+ /* ---- KHÓA CỦA BẠN ----
+    V9.29n (anh Luân: "Khóa của bạn chứ, là chỗ chọn khóa ở đầu trang ấy"): khối này trước đây chỉ
+    hiện khi học viên học TỪ 2 KHÓA TRỞ LÊN. Nghĩa là đa số học viên - người học đúng một khóa -
+    mở cổng lên thấy ngay bảng "Trung tâm đã xác nhận" đúng như anh chê. Nay LUÔN hiện: đó là thứ
+    học viên vào cổng để xem. Một khóa thì bỏ câu "bấm để xem từng khóa" (không có gì để chọn). ---- */
+ if(obs.length){
+  h+='<div class="sechd" id="s-khoa">Khóa của bạn'+(multiC?' <span class="mut" style="text-transform:none;font-weight:600">· bạn đã học '+obs.length+' khóa, bấm để xem từng khóa</span>':'')+'</div>';
   h+='<div class="hvcrs">';
   obs.forEach(function(o){
    var cl=find("DL10","class_id",o.class_id)||{};
@@ -10909,6 +10913,7 @@ function enter(k){try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{autoRet
 /* V9.17 (tester): mục lục xếp ĐÚNG thứ tự khối trên trang - hết cảnh scrollspy nhảy lộn xộn.
    ("Sắp tới" không cần đứng đầu mục lục nữa: hero đã có nút tắt 1 chạm) */
 var HVSEC=[
+ ["s-khoa","Khóa của bạn","ti-school"],
  ["s-lop","Lớp của bạn","ti-users-group"],
  ["s-hocphi","Học phí","ti-cash"],
  ["s-xacnhan","Trung tâm đã xác nhận","ti-circle-check"],
@@ -10929,7 +10934,7 @@ var HVSEC=[
 /* V9.29m: "Trung tâm đã xác nhận" rời khỏi nhóm "Cần bạn xử lý" - nó là bảng thủ tục để ĐỌC,
    không có gì cho học viên làm. Xếp nhầm nhóm là hứa việc rồi không có việc. */
 var HVGRP=[["Cần bạn xử lý",["s-hocphi","s-saptoi","s-khaosat"]],
- ["Việc học của bạn",["s-lop","s-xacnhan","s-hanhtrinh","s-tiendo","s-diem","s-buoihoc","s-wow","s-khuyennghi","s-chungnhan"]],
+ ["Việc học của bạn",["s-khoa","s-lop","s-xacnhan","s-hanhtrinh","s-tiendo","s-diem","s-buoihoc","s-wow","s-khuyennghi","s-chungnhan"]],
  ["Nói chuyện với trung tâm",["s-hoidap","s-gopy","s-gioithieu"]]];
 function hvGo(id){hvCloseSide();var el=document.getElementById(id);if(!el)return;
  var box=document.getElementById("hvMain");
