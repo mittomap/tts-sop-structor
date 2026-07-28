@@ -2122,8 +2122,16 @@ function saveForm(key){var cfg=LISTCFG[key];var o={},idk=cfg.cols[0][0]; var mis
 function openEdit(key,id){var cfg=LISTCFG[key];var rec=find(cfg.code,cfg.cols[0][0],id);if(!rec){toast("Không thấy bản ghi");return}window.PREFILL=null;EDIT[key]=rec;var el=document.getElementById("content");el.innerHTML=renderList(key);el.scrollTop=0}
 function newForm(key){EDIT[key]=null;window.PREFILL=null;var el=document.getElementById("content");el.innerHTML=renderList(key);var p=document.getElementById("formPanel");if(p)p.classList.remove("hidden");el.scrollTop=0}
 function cancelEdit(key){EDIT[key]=null;document.getElementById("content").innerHTML=renderList(key)}
+/* V9.27 (anh Luân bắt lỗi): đổi trạng thái ở bảng xong thấy "chẳng có gì thay đổi".
+   Gốc: hàm này KHÔNG tự gọi persistSoon. Nó chỉ được lưu NHỜ MAY - khi bảng nằm trong hub thì
+   rlist đi đường reRender -> reRenderKeep gọi persistSoon hộ. Trên trang danh sách đứng riêng
+   (CUR === key) rlist ghi thẳng innerHTML nên không ai lưu, tắt trình duyệt là mất, và cửa sổ
+   khác trong room cũng không hay biết. Luật của dự án: hàm nào ghi vào DATA thì TỰ gọi persistSoon. */
 function quickStatus(key,id,field,val){var cfg=LISTCFG[key];var rec=find(cfg.code,cfg.cols[0][0],id);if(!rec)return;var o={};o[field]=val;
- function _d(){rec[field]=val;toast("Đã đổi trạng thái "+id);rlist(key)}
+ function _d(){rec[field]=val;persistSoon();
+  /* nói rõ đổi xong thì chặng và việc kế tiếp thành gì - trước đây chỉ báo "đã đổi" nên nhìn như không có gì xảy ra */
+  var extra="";try{var J=jInfo(id);if(J&&J.k)extra=" · chặng: "+((JBY[J.k]||{}).t||J.k)+((J.act&&J.act.lb)?(" · việc kế: "+J.act.lb):"")}catch(e){}
+  toast("Đã đổi trạng thái "+id+extra,3600);rlist(key)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));rlist(key);return}_d()}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message);rlist(key)}).apiUpdate(cfg.code,id,o)}else{_d()}}
 function validateForm(o){for(var k in o){var v=o[k];if(v===""||v==null)continue;
   if(/phone/.test(k)){if(!/^0\d{9,10}$/.test(String(v).replace(/\s/g,"")))return "SĐT không hợp lệ (10-11 số, bắt đầu bằng 0)."}
@@ -9609,7 +9617,7 @@ function tkReturnForm(id){var h='<div class="dcard"><h4><i class="ti ti-corner-d
 function tkReturnSave(id){var t=find("DL23","task_id",id);if(!t)return;
  var r=(fldV("tk_rr")||"").trim();if(!r){toast("Ghi rõ phần cần bổ sung.");return}
  t.task_status=eFull("enum_task_status","accepted")||"accepted (Đã nhận)";t.done_time="";t.done_note="";
- tkSay(id,"Trả lại làm tiếp: "+r,1);closeModal();toast("Đã trả lại - việc quay về Đang làm.");tkAfter()}
+ tkSay(id,"Trả lại làm tiếp: "+r,1);closeModal();toast("Đã trả lại - việc quay về Đang làm.");persistSoon();tkAfter()}
 function tkCancel(id){confirmRun("Hủy việc này? Người nhận sẽ thấy việc đã hủy.","tkCancelRun",id)}
 function tkCancelRun(id){var t=find("DL23","task_id",id);if(!t)return;
  t.task_status=eFull("enum_task_status","cancelled")||"cancelled (Đã hủy)";
@@ -9679,7 +9687,7 @@ function tkNewSave(){var to=fldV("tk_to");if(!to){toast("Chọn người nhận 
   remind_count:"",remind_last:""};
  DL.DL23=DL.DL23||[];DL.DL23.push(t);
  closeModal();toast("Đã giao việc cho "+(t.assignee_id_name)+".");
- window.TKTAB="given";tkAfter()}
+ window.TKTAB="given";persistSoon();tkAfter()}
 
 /* ---------- TRANG GIAO VIỆC ---------- */
 function tkTabSet(k){window.TKTAB=k;reRender(CUR)}

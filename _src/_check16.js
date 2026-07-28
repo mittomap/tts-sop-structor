@@ -328,4 +328,44 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("so do la thoi quen ca nhan nen luu tren may, khong vao du lieu demo chung", /localStorage\.setItem\(drwKey\(\)/.test(SRC));
 })();
 
+/* ---- 15. CUA GHI NAO CUNG PHAI TU LUU (V9.27 - anh Luan bat loi "doi trang thai ma khong thay gi") ----
+   Bay o day: mot so ham ghi vao DATA khong tu goi persistSoon ma duoc luu NHO reRender
+   (reRenderKeep co goi persistSoon o cuoi). Duong nao khong di qua reRender thi mat du lieu.
+   Nen bo kiem nay TAT reRender di, chi dem persistSoon GOI THANG. */
+(function(){
+ setRole("all");
+ var N=0, realPS=global.persistSoon, realRR=global.reRender, realRK=global.reRenderKeep, realRL=global.rlist;
+ function on(){N=0;global.persistSoon=function(){N++};
+  global.reRender=function(){};global.reRenderKeep=function(){};global.rlist=function(){}}
+ function off(){global.persistSoon=realPS;global.reRender=realRR;global.reRenderKeep=realRK;global.rlist=realRL}
+ function door(name,fn){on();var err="";try{fn()}catch(e){err=e.message}var n=N;off();
+  t("cua ghi "+name+" tu goi persistSoon"+(err?" (nem loi: "+err+")":""), !err&&n>0)}
+
+ var L=rows("DL02").filter(function(x){return /contacted/.test(ecode(x.lead_status))})[0];
+ CUR="nhaplead";   /* trang danh sach DUNG RIENG - duong khong di qua reRender */
+ door("quickStatus (trang danh sach rieng)",function(){quickStatus("nhaplead",L.lead_id,"lead_status",eFull("enum_lead_status","rejected"))});
+ CUR="tuyensinh";
+ var L2=rows("DL02").filter(function(x){return /contacted/.test(ecode(x.lead_status))})[0];
+ if(L2)door("quickStatus (trong hub)",function(){quickStatus("nhaplead",L2.lead_id,"lead_status",eFull("enum_lead_status","rejected"))});
+
+ function pick(st,idx){return rows("DL23").filter(function(x){return new RegExp(st).test(ecode(x.task_status))})[idx||0]}
+ var a=pick("new"); if(a){CURSTAFF=a.assignee_id;reset();door("tkAccept",function(){tkAccept(a.task_id)})}
+ var b=pick("accepted"); if(b){CURSTAFF=b.assignee_id;reset();setF({tk_dn:"xong"});door("tkDoneSave",function(){tkDoneSave(b.task_id)})}
+ var c=pick("done"); if(c){CURSTAFF=c.assigner_id;reset();setF({tk_cn:"ok"});door("tkConfirmRun",function(){tkConfirmRun(c.task_id)})}
+ var d2=pick("done"); if(d2){CURSTAFF=d2.assigner_id;reset();setF({tk_rr:"bo sung so lieu"});door("tkReturnSave",function(){tkReturnSave(d2.task_id)})}
+ var e2=pick("new"); if(e2){CURSTAFF=e2.assignee_id;reset();setF({tk_dr:"ban lich"});door("tkDeclineSave",function(){tkDeclineSave(e2.task_id)})}
+ var f2=pick("new|accepted"); if(f2){CURSTAFF=f2.assigner_id;reset();door("tkRemind",function(){tkRemind(f2.task_id)})}
+ var g2=pick("new|accepted",1); if(g2){CURSTAFF=g2.assigner_id;reset();door("tkCancelRun",function(){tkCancelRun(g2.task_id)})}
+ CURSTAFF="NV001";reset();
+ setF({tk_to:"NV007",tk_ti:"viec moi",tk_ct:"noi dung",tk_du:"2026-12-31T10:00",tk_ty:"assign",tk_pr:"normal"});
+ door("tkNewSave (giao viec moi)",function(){tkNewSave()});
+ var en=rows("DL06").filter(function(x){return num(x.final_fee)>0})[0];
+ var dd=new Date(Date.now()+3*864e5);function z(n){return n<10?"0"+n:n}
+ reset();setF({ip_n:"2",ip_d0:dd.getFullYear()+"-"+z(dd.getMonth()+1)+"-"+z(dd.getDate()),ip_gap:"30",ip_dep:"50"});
+ door("insPlanSave",function(){insPlanSave(en.enrollment_id)});
+ CURSTAFF="";CUR="banlam";setF({});
+ /* doi trang thai xong phai NOI RO ket qua, khong chi bao "da doi" roi de nguoi dung doan */
+ t("doi trang thai xong bao luon chang va viec ke", /toast\("Đã đổi trạng thái "\+id\+extra/.test(SRC));
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");
