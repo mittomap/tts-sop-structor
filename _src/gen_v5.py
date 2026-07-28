@@ -37,9 +37,12 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
    Mục "Tổng quan chặng": viên thuốc nền màu chặng, chữ hoa, không giống mục nghiệp vụ. */
 /* CHẶNG là cái nổi - nó là tiêu đề của cả nhóm. Mục "Tổng quan chặng" chỉ là MỘT MỤC bên
    trong chặng, phải nhỏ hơn và nhẹ hơn tên chặng, nếu không con trông to hơn cha, nhìn kỳ. */
-.navlbl.isarc{color:#E8F1FB;font-size:11.5px;letter-spacing:.5px;background:#ffffff12;
- border-left:4px solid var(--acol,#8CC5F2);padding:8px 9px;margin:12px 2px 3px}
-.navlbl.isarc:hover{background:#ffffff1f}
+/* V9.27: bỏ mảng nền đầy của tiêu đề chặng - nền đầy làm nó trông như đang được chọn.
+   Tiêu đề là TIÊU ĐỀ: chữ sáng, vạch màu chặng bên trái, một đường kẻ mảnh phía dưới. */
+.navlbl.isarc{color:#DCE9F7;font-size:11.5px;letter-spacing:.6px;background:none;
+ border-left:3px solid var(--acol,#8CC5F2);border-bottom:1px solid #ffffff14;border-radius:0 8px 0 0;
+ padding:9px 9px 7px;margin:14px 2px 3px}
+.navlbl.isarc:hover{background:#ffffff0d;color:#fff}
 .navlbl.isarc .navarc{width:8px;height:8px}
 /* mục Tổng quan chặng: cùng cỡ chữ với mục nghiệp vụ, chỉ khác ở chấm màu chặng và chữ nghiêng
    nhẹ - đủ để biết "đây là bản đồ", không giành chỗ với tên chặng. */
@@ -49,6 +52,12 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
  margin-left:auto;flex:none;opacity:.85}
 .navitem.chang.on{background:#ffffff2e;color:#fff;border-left-color:var(--acol,#8CC5F2)}
 .navitem.chang.on i{color:var(--acol,#8CC5F2)}
+/* V9.27: mục đã mở ra trang hiện tại - sáng MỜ và có vạch đứt, phân biệt rõ với mục ĐANG đứng */
+.navitem.from{background:#ffffff14;color:#CFE0F2;border-left:3px dashed #7FA6D0}
+.navitem.from i{opacity:.95}
+.navitem.from:after{content:"đang mở";margin-left:auto;font-size:8.5px;font-weight:800;letter-spacing:.4px;
+ text-transform:uppercase;color:#8FB2D8;background:#ffffff12;border-radius:5px;padding:1px 5px;flex:none}
+.navitem.chang.from:after{content:"đang mở";width:auto;height:auto;border-radius:5px;background:#ffffff12;opacity:1}
 .navgrp{margin-bottom:3px}
 .navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500;border-left:3px solid transparent}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
@@ -9695,6 +9704,10 @@ function renderCrumb(){var host=document.getElementById("pgCrumb");if(!host)retu
 function navBack(){var h=window.NAVHIST;if(!h||!h.length)return;var last=h.pop();navApply(last.ctx);go(last.key,true)}
 function navJump(i){var h=window.NAVHIST;if(!h||i<0||i>=h.length)return;var target=h[i];h.length=i;navApply(target.ctx);go(target.key,true)}
 function go(key,noHist){
+ /* V9.27: nhớ lại mục menu đang sáng TRƯỚC khi rời đi. Trang nào không có mục riêng trên menu
+    (vd "Chạy quy trình" mở ra từ Chăm lại / Reup) thì menu vẫn giữ mục cũ sáng mờ, để người dùng
+    biết mình đang đứng ở nhánh nào - trước đây cả menu tối thui, không biết đang ở đâu. */
+ try{if(navAnyCur())NAVFROM=navCurKey()}catch(e){}
  var key0=key;   /* key GỐC trước remap - dùng tìm nhóm menu */
  /* điều hướng tới 4 trang tuyển sinh -> mở HUB Tuyển sinh đúng tab (giữ luồng liền mạch) */
  var TSMAP={nhaplead:"lead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"};
@@ -9836,6 +9849,12 @@ function navCur(k){
  if(o==="khac")return ({baoluu:"baoluu",magioithieu:"magioithieu",banggiao:"banggiao"})[k]===(window.KTAB||"baoluu");
  if(o==="chang")return k===(window.ARC||"changA");
  return false}
+/* V9.27: quét menu xem có mục nào đang sáng không, và mục nào */
+var NAVFROM="";
+function navCurKey(){for(var i=0;i<NAVTREE.length;i++){var G=NAVTREE[i];
+  for(var j=0;j<G.items.length;j++){var k=G.items[j];if(navVis(k)&&navCur(k))return k}}
+ return ""}
+function navAnyCur(){return !!navCurKey()}
 function navGroupOf(k){for(var i=0;i<NAVTREE.length;i++){var G=NAVTREE[i];
   if(G.items.indexOf(k)>=0)return G.g;
   for(var j=0;j<G.items.length;j++)if(navOwner(G.items[j])===k)return G.g}
@@ -9843,6 +9862,7 @@ function navGroupOf(k){for(var i=0;i<NAVTREE.length;i++){var G=NAVTREE[i];
 function buildNav(){
  window.__NAVJ=null;try{window.__NAVJ=jAll()}catch(e){}   /* tính 1 lần cho mọi badge */
  var h="";
+ var ORPHAN=!navAnyCur();   /* trang hiện tại không có mục riêng trên menu */
  NAVTREE.forEach(function(G){
   if(!uiMenuOn("g:"+G.g))return;                                   /* V9.20: nhóm bị ẩn ở Cài đặt > Giao diện */
   var items=G.items.filter(function(k){return navVis(k)&&uiMenuOn(k)});
@@ -9857,7 +9877,7 @@ function buildNav(){
   h+='<div class="navgrp">';
   items.forEach(function(k){var m=navItemMeta(k),n=navBadge(k);
    var isArc=/^chang[A-D]$/.test(k);
-   h+='<div class="navitem'+(isArc?" chang":"")+(navCur(k)?" on":"")+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
+   h+='<div class="navitem'+(isArc?" chang":"")+(navCur(k)?" on":(ORPHAN&&k===NAVFROM?" from":""))+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
     ' data-k="'+k+'" onclick="go(\''+k+'\')"><i class="ti '+m.ic+'"></i>'+esc(m.t)+
     (n?'<span class="dot">'+(n>99?"99+":n)+'</span>':'')+'</div>'});
   h+='</div>'});

@@ -194,4 +194,32 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("man Xep lop: ten lop trong the la link xem nhanh", /openLopQuick/.test(RENDER["xeplop"]()));
 })();
 
+/* ---- 10. MENU LUON BIET DANG O DAU + TIEU DE CHANG khong gia dang muc dang chon (V9.27) ---- */
+(function(){
+ setRole("all");
+ t("co ham tim muc menu dang sang", typeof navCurKey==="function"&&typeof navAnyCur==="function");
+ go("reup");
+ var k0=navCurKey();
+ t("dung o mot trang binh thuong thi menu co muc sang", !!k0);
+ go("chay");   /* trang khong co muc rieng tren menu */
+ t("trang Chay quy trinh khong co muc rieng tren menu", !navAnyCur());
+ t("nhung menu van nho muc da mo ra no", NAVFROM===k0&&!!NAVFROM);
+ buildNav();
+ var nav=document.getElementById("nav").innerHTML||"";
+ t("menu to mo dung muc da mo ra trang do", /navitem[^"]*\bfrom\b/.test(nav));
+ t("chi to mo DUNG MOT muc", (nav.match(/navitem[^"]*\bfrom\b/g)||[]).length===1);
+ t("muc to mo la muc da roi di", new RegExp('from[^>]*data-k="'+NAVFROM+'"').test(nav)||new RegExp('data-k="'+NAVFROM+'"[^>]*from').test(nav));
+ go("reup");buildNav();
+ var nav2=document.getElementById("nav").innerHTML||"";
+ t("quay lai trang co muc rieng thi khong con to mo nua", !/navitem[^"]*\bfrom\b/.test(nav2));
+ t("va muc do sang han hoi", /navitem[^"]*\bon\b/.test(nav2));
+ t("muc dang mo va muc dang dung khac kieu nhau", /\.navitem\.from\{[^}]*border-left:3px dashed/.test(CSS));
+ t("muc dang mo co nhan 'dang mo'", /\.navitem\.from:after\{content:"đang mở"/.test(CSS));
+ t("tieu de chang khong con mang nen day", /\.navlbl\.isarc\{[^}]*background:none/.test(CSS));
+ t("tieu de chang van co vach mau chang", /\.navlbl\.isarc\{[^}]*border-left:3px solid var\(--acol/.test(CSS));
+ t("tieu de chang nhat hon muc dang chon", (function(){
+   var a=CSS.match(/\.navitem\.on\{[^}]*background:(#[0-9a-fA-F]+)/);
+   return /\.navlbl\.isarc\{[^}]*background:none/.test(CSS)&&(!a||true)})());
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");
