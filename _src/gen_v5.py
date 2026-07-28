@@ -538,12 +538,22 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 @media(max-width:900px){.bteach{margin-left:0;width:100%}.bteach select.bthw{flex:1;min-width:0}}
 .ckline{display:flex!important;align-items:center;gap:8px;font-size:12px;color:var(--ink);font-weight:600;background:#F7F9FC;border:1px solid var(--line);border-radius:8px;padding:8px 10px;cursor:pointer;text-transform:none;letter-spacing:0}
 .ckline input{width:15px;height:15px;flex:none;margin:0}
-.classbar{display:flex;flex-wrap:wrap;gap:2px 0;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 6px;margin-bottom:12px}
-.cbit{display:flex;flex-direction:column;gap:2px;padding:2px 14px;min-width:112px;border-right:1px solid var(--line)}
+/* V9.27: thanh thong tin lop chia 3 tang - ten lop rieng mot dong, roi 2 khoi:
+   khoi tren "day gi - ai day - o dau", khoi duoi "thoi gian - quy mo".
+   Truoc day 11 o chay mot mach roi tu xuong dong nen cat khuc lung tung. */
+.classbar{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 8px 10px;margin-bottom:12px}
+.cbhead{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:0 8px 10px;border-bottom:1px solid var(--line)}
+.cbname{font-size:15.5px;font-weight:800;color:var(--navy);line-height:1.3}
+.cbcode{font-size:11px;font-weight:700;color:#7A8694;background:#F2F5F9;border-radius:6px;padding:2px 7px;letter-spacing:.3px}
+.cbgrid{display:grid;grid-template-columns:repeat(var(--cbn,5),minmax(0,1fr));gap:2px 0;padding-top:9px}
+.cbgrid+.cbgrid{margin-top:9px;border-top:1px dashed var(--line)}
+.cbit{display:flex;flex-direction:column;gap:3px;padding:2px 14px;min-width:0;border-right:1px solid var(--line)}
 .cbit:last-child{border-right:0}
 .cbit i{display:none}
 .cbl{font-size:10px;font-weight:700;color:#8A94A0;text-transform:uppercase;letter-spacing:.3px}
-.cbit b{font-size:12px;color:var(--text);font-weight:700}
+.cbit b{font-size:12.5px;color:var(--text);font-weight:700;overflow-wrap:anywhere;line-height:1.35}
+@media(max-width:1000px){.cbgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px 0}.cbit{border-right:0}}
+@media(max-width:620px){.cbgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:860px){.cbit{min-width:46%;border-right:0}}
 .tbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;margin-bottom:12px}
 .tbar .srch{margin:0}
@@ -4701,18 +4711,25 @@ function classBar(cid){var c=find("DL10","class_id",cid);if(!c)return '';
  var gvName=(c.main_teacher_id_name||(gv&&gv.full_name)||c.main_teacher_id||"chưa phân công");
  var stu=rows("DL08").filter(function(o){return o.class_id===cid}).length;
  function it(ic,lb,v,act){return '<span class="cbit"><i class="ti '+ic+'"></i><span class="cbl">'+esc(lb)+'</span><b>'+(act||esc(v||"-"))+'</b></span>'}
+ /* Tầng 1: tên lớp đứng riêng một dòng, kèm mã lớp và trạng thái - nhìn phát biết đang xem lớp nào.
+    Tầng 2: dạy gì, ai dạy, học lúc nào, ở đâu. Tầng 3: mốc thời gian và quy mô lớp. */
  return '<div class="classbar">'+
-  it("ti-users-group","Lớp",(c.class_name||cid)+" · "+cid)+
-  it("ti-chalkboard","Giảng viên","",(gv?'<a class="lnk" onclick="openGV(\''+esc(c.main_teacher_id)+'\')">'+esc(gvName)+'</a>':esc(gvName)))+
-  it("ti-school","Khóa",c.course_id_name||c.course_id)+
-  it("ti-calendar-check","Lịch học",c.class_schedule)+
-  it("ti-home","Phòng / link",c.venue_or_zoom_link)+
-  it("ti-user-check","Sĩ số",(c.current_enrollment||stu)+"/"+(c.class_capacity||"-"))+
-  it("ti-flag","Khai giảng",c.class_start_date)+
-  it("ti-flag-check","Kết thúc",c.class_end_date)+
-  it("ti-device-laptop","Hình thức",elabel(c.learning_mode))+
-  it("ti-building","Cơ sở",elabel(c.branch))+
-  it("ti-point","Trạng thái","",'<span class="chip '+stCls(c.class_status)+'">'+esc(elabel(c.class_status))+'</span>')+
+  '<div class="cbhead"><span class="cbl">Lớp</span><b class="cbname">'+esc(c.class_name||cid)+'</b>'+
+   '<span class="cbcode">'+esc(cid)+'</span>'+
+   '<span class="chip '+stCls(c.class_status)+'">'+esc(elabel(c.class_status))+'</span></div>'+
+  '<div class="cbgrid" style="--cbn:5">'+
+   it("ti-school","Khóa",c.course_id_name||c.course_id)+
+   it("ti-chalkboard","Giảng viên","",(gv?'<a class="lnk" onclick="openGV(\''+esc(c.main_teacher_id)+'\')">'+esc(gvName)+'</a>':esc(gvName)))+
+   it("ti-calendar-check","Lịch học",c.class_schedule)+
+   it("ti-home","Phòng / link",c.venue_or_zoom_link)+
+   it("ti-building","Cơ sở",elabel(c.branch))+
+  '</div>'+
+  '<div class="cbgrid" style="--cbn:4">'+
+   it("ti-flag","Khai giảng",c.class_start_date)+
+   it("ti-flag-check","Kết thúc",c.class_end_date)+
+   it("ti-user-check","Sĩ số",(c.current_enrollment||stu)+"/"+(c.class_capacity||"-"))+
+   it("ti-device-laptop","Hình thức",elabel(c.learning_mode))+
+  '</div>'+
   '</div>'}
 function midForm(cid){var obs=rows("DL08").filter(function(o){return o.class_id===cid});
  if(!obs.length){toast("Lớp chưa có học viên.");return}
