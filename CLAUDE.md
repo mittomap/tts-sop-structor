@@ -1,4 +1,4 @@
-# CLAUDE.md - Giao thức làm việc dự án ITTs SOP (repo private: mittomap/itts-sop)
+# CLAUDE.md - Giao thức làm việc dự án ITTs SOP (repo: mittomap/tts-sop-structor - PUBLIC, tên cũ itts-sop)
 
 Thư mục này là toàn bộ dự án SOP + web app demo của trung tâm IELTS The Tutors (ITTs).
 Chủ dự án: Luân. Mọi phiên làm việc (Claude Code hay Claude Cowork) đều theo giao thức này.
@@ -37,14 +37,18 @@ Chủ dự án: Luân. Mọi phiên làm việc (Claude Code hay Claude Cowork) 
 
 1. Cập nhật `02_NHAT_KY_QUYET_DINH.md`: thêm mục mới (quyết định + bẫy đã cắn) + sửa
    "⭐ HIỆN TRẠNG" + VIỆC TỒN. App đổi tính năng thì thêm mục vào `ITTs_WebApp_v5_README.md`.
-2. Chạy `./push.sh` (commit + đẩy repo private này).
-3. Nếu 3 file app ở gốc có bản mới: chạy `./update.sh` trong
-   `/Users/dothanhluan/Claude/itts-sop-demo` để cập nhật demo online
-   https://mittomap.github.io/itts-sop-demo/ (Pages deploy mất 1-2 phút; xem lại nhớ
-   Cmd+Shift+R để bỏ cache).
+2. Đẩy repo này: phiên cloud Claude Code tự `git add -A` + commit `cap nhat <ngay gio>` + push
+   (từ 28/07 chiều phiên cloud có quyền ghi cả 2 repo); làm trên máy Luân thì chạy `./push.sh`.
+3. Nếu 3 file app ở gốc có bản mới: chép 3 file sang gốc repo `mittomap/itts-sop-demo` rồi
+   commit + push (phiên cloud tự làm; trên máy Luân thì chạy `./update.sh` trong
+   `~/Claude/itts-sop-demo`). Demo online: https://mittomap.github.io/itts-sop-demo/
+   (Pages deploy mất 1-2 phút; xem lại nhớ Cmd+Shift+R để bỏ cache).
 
 ## Phối hợp 2 nơi làm việc
 
 Thư mục này đồng thời là nơi các phiên Claude Cowork làm việc (qua cầu nối desktop, không có
 git trong tay). Git là trọng tài duy nhất: phiên nào xong việc cũng commit + push; phiên nào
 bắt đầu cũng git status + pull. Đừng để 2 phiên cùng sửa app một lúc.
+Từ 28/07 chiều, nơi làm việc CHÍNH là phiên cloud Claude Code của Luân (đọc/ghi thẳng GitHub
+cả 2 repo, tự đẩy khi xong việc). Máy Luân là bản phụ: muốn lấy bản mới về thì `git pull`;
+nếu lỡ sửa ở máy/Cowork thì push ngay để 2 nơi không lệch.

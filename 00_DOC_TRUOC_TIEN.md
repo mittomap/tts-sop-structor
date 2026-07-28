@@ -34,9 +34,12 @@ Luân tương tác nhiều nhất gần đây. **Muốn sửa app: đọc `_src/
 `ITTS_OUT=... python3 gen_v5.py`, verify bằng `node _tall.js`). Hiện trạng tính năng: cuối
 `ITTs_WebApp_v5_README.md`. Bẫy & quyết định kiến trúc app: mục 3bis→3quater trong file 02.
 Phiên bản hiện tại: **V9.15** (28/07 - menu theo 4 CHẶNG VÒNG ĐỜI + hệ node 3 tầng (ray ga / dải hạt trên mọi dòng / sopBlock trang chi tiết) + tab Chăm lại/Reup + dữ liệu demo đại tu theo tester, suite kiểm 366 điểm. Nền demo đa cổng giữ từ V9.7: màn cổng chọn người, dữ liệu tách `ITTs_data.js`, thao tác lưu thật + đồng bộ giữa các cổng, nút Reset demo. HỘI ĐỒNG TỔNG KIỂM đang HOLD - chờ yêu cầu mới của Luân. Chi tiết: mục ⭐ HIỆN TRẠNG trong file 02).
-Dự án ĐÃ LÊN GITHUB (28/07): thư mục này = repo private `mittomap/itts-sop` (đẩy: `./push.sh`);
-demo online public: **https://mittomap.github.io/itts-sop-demo/** (cập nhật: `./update.sh` trong
-`~/Claude/itts-sop-demo`). Phiên Claude Code đọc thêm `CLAUDE.md` ở gốc. Chi tiết: mục 3quindecies file 02.
+Dự án ĐÃ LÊN GITHUB (28/07): thư mục này = repo `mittomap/tts-sop-structor` (PUBLIC từ 28/07 chiều,
+tên cũ itts-sop - Luân đổi tên + mở public để phiên cloud Claude Code truy cập được); demo online:
+**https://mittomap.github.io/itts-sop-demo/**. Từ 28/07 chiều, phiên cloud Claude Code của Luân có
+QUYỀN GHI cả 2 repo (app GitHub "claude" đã cài) - tự commit + push, Luân không phải chạy lệnh;
+làm trên máy Luân vẫn dùng `./push.sh` / `./update.sh` như cũ. Phiên Claude Code đọc thêm
+`CLAUDE.md` ở gốc. Chi tiết: mục 3quindecies + 3sedecies file 02.
 
 ## 3. LUẬT CỨNG (vi phạm = làm lại)
 1. Font **Montserrat** toàn bộ. KHÔNG emoji. Dùng "-" thường, không em-dash.

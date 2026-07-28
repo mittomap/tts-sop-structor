@@ -157,10 +157,12 @@
 > ở hồ sơ 360 + 2 drawer), tab Chăm lại/Reup trong Tuyển sinh, dữ liệu demo đại tu theo tester
 > (0 tên placeholder, lịch tương lai, hàng chờ quyết định sống, chuông 289 -> 87 việc). Chi tiết + bẫy: mục 3quaterdecies.
 > Suite kiểm: **11 bộ, 366 điểm xanh** (_check11 mới = 68 điểm cho arc/menu/node). Icon 130 (font dựng lại).
-> **ĐÃ LÊN GITHUB 2 REPO (28/07)**: private `mittomap/itts-sop` = CHÍNH thư mục này (đẩy: `./push.sh`);
-> public `mittomap/itts-sop-demo` = demo Pages **https://mittomap.github.io/itts-sop-demo/**
-> (cập nhật: `./update.sh` trong `~/Claude/itts-sop-demo`). Giao thức cho phiên Claude Code: `CLAUDE.md` ở gốc repo.
-> Kết phiên có sửa: push.sh; app đổi thì thêm update.sh. Chi tiết + bẫy: mục 3quindecies.
+> **ĐÃ LÊN GITHUB 2 REPO**: repo dự án `mittomap/tts-sop-structor` (28/07 sáng lên dạng private tên itts-sop;
+> 28/07 chiều Luân ĐỔI TÊN + chuyển PUBLIC để phiên cloud truy cập) = CHÍNH thư mục này;
+> public `mittomap/itts-sop-demo` = demo Pages **https://mittomap.github.io/itts-sop-demo/**.
+> TỪ 28/07 CHIỀU: phiên cloud Claude Code của Luân có QUYỀN GHI cả 2 repo - tự commit/push, Luân không chạy lệnh;
+> máy Luân = bản phụ (git pull khi cần; làm local vẫn dùng push.sh/update.sh). Giao thức: `CLAUDE.md` ở gốc repo.
+> Chi tiết + bẫy: mục 3quindecies + 3sedecies.
 > Trước đó V9.14 (27/07 - ĐỢT 6 UX+báo cáo và ĐỢT 7 cổng học viên ĐÃ XONG = HẾT các đợt kế hoạch.
 > **CHƯA GỌI HỘI ĐỒNG TỔNG KIỂM** - Luân dặn "từ từ hãy gọi hội đồng, a còn yêu cầu khác" → phiên sau CHỜ YÊU CẦU MỚI của Luân trước, tổng kiểm để sau khi Luân ra nốt yêu cầu. Trước đó V9.13 (27/07 - ĐỢT 5 điều phối & lịch xong. CÒN: Đợt 6 UX+báo cáo, Đợt 7 cổng HV, rồi HỘI ĐỒNG TỔNG KIỂM. Trước đó V9.12 (27/07 - ĐỢT 4B 'mỗi HV/lead 1 DÒNG' xong: 12 trang tác vụ sang danh sách hàng, bấm dòng nở chi tiết. KẾ TIẾP: Đợt 5 điều phối & lịch, 6, 7, tổng kiểm. Trước đó V9.11 (27/07 - ĐỢT 4 khép vòng đời + tiền xong; KẾ TIẾP: ĐỢT 4B 'mỗi HV/lead 1 DÒNG' theo yêu cầu Luân, rồi Đợt 5→7, tổng kiểm cuối. Trước đó V9.10 (27/07 - ĐỢT 3 học vụ & giảng viên xong một mạch; còn Đợt 4→7 rồi hội đồng TỔNG KIỂM CUỐI. Trước đó V9.9 (27/07 - MÀN HÌNH THEO CHỨC DANH đã chạy: ROLESCOPE 9 nhóm quyền, menu/landing/khối/chuông/tab theo nhóm; Luân đổi quy trình: LÀM MỘT MẠCH các đợt còn lại, hội đồng TỔNG KIỂM CUỐI. Trước đó V9.8 (27/07 - ĐỢT 2 "ngày làm việc của sales" đã xong + qua thẩm định sales veteran (VER-01..11) và UX/UI (UXV-01..10), vá hết. Màn cổng đổi 2 BƯỚC chức danh -> tên theo góp ý Luân; cổng HV chỉ hiện 10 hồ sơ giàu dữ liệu).
 > **VIỆC KẾ TIẾP THEO YÊU CẦU MỚI CỦA LUÂN (27/07): MÀN HÌNH THEO CHỨC DANH** - "đâu phải ai cũng được thấy đầy đủ". Hội đồng phải chốt ma trận chức danh x màn hình (xem `THIET_KE_PHAN_QUYEN_CHUC_DANH.md` nếu đã có), rồi triển khai: gateEnter đọc role -> menu/khối/trang theo vai trò. Đây là ưu tiên TRƯỚC Đợt 3 học vụ. Build nay xuất **3 file**: 2 HTML + `ITTs_data.js` (dữ liệu demo tách riêng — app ưu tiên đọc file này, thiếu thì dùng bản nhúng).
@@ -986,6 +988,33 @@ Luân thực hiện, phiên Cowork soạn hướng dẫn + CLAUDE.md).
 - 3 file app phải nằm CÙNG CẤP ở gốc repo demo (app đọc ITTs_data.js cạnh nó); thiếu data file
   app vẫn chạy bằng bản nhúng nhưng màn cổng ghi "kèm sẵn trong app" thay vì "bản mới nhất".
 - Repo public: tuyệt đối không để lọt tài liệu .md nội bộ / _src sang - update.sh chỉ chép đúng 3 file.
+
+## 3sedecies. Chuyển sang làm việc tại phiên cloud Claude Code (28/07 chiều)
+
+Luân chuyển hẳn sang làm việc trong MỘT phiên cloud Claude Code (giao việc qua chat), không chạy
+lệnh trên máy nữa. Các bước đã làm để phiên cloud đọc/ghi được GitHub:
+- Repo private `itts-sop` ĐỔI TÊN thành `tts-sop-structor` + chuyển PUBLIC (Luân chấp nhận công khai
+  tài liệu vận hành sau khi được cảnh báo rõ; GitHub tự redirect tên cũ nên remote cũ không hỏng).
+- Cài app GitHub **claude** (github.com/apps/claude) cho tài khoản mittomap, All repositories -
+  đây là bước mở QUYỀN GHI. Trước khi cài, phiên cloud chỉ ĐỌC được.
+- Phiên cloud gắn repo qua add_repo (quyền push), bản làm việc tại /workspace/tts-sop-structor.
+
+Quy trình từ nay:
+- Luân giao việc trong chat -> phiên cloud sửa nguồn + build + verify NGAY TRONG PHIÊN
+  (có sẵn python3/node) -> tự commit + push repo này -> nếu 3 file app đổi thì chép sang gốc
+  `itts-sop-demo` + push (Pages tự deploy 1-2 phút).
+- Máy Luân thành BẢN PHỤ: lấy bản mới = `git pull`. Phiên Cowork/local có sửa gì thì push ngay,
+  và phiên cloud pull trước khi làm - luật "không để 2 nơi cùng sửa" giữ nguyên.
+
+BẪY đã cắn trong buổi chuyển đổi (nhớ cho lần sau):
+- Phiên cloud kết nối repo kiểu mặc định là CHỈ-ĐỌC: mọi đường ghi (git push, contents API,
+  issues API) đều 403 "Resource not accessible by integration". KHÔNG có đường vòng - phải cài
+  app GitHub claude rồi gắn lại repo với quyền push. Đừng mất công thử lách.
+- gh CLI trên máy Luân KHÔNG gọi được API installation của GitHub App (403) - bước cấp quyền app
+  phải làm bằng tay trên web (github.com/apps/claude), không script hóa được.
+- Luật "repo public không để lọt tài liệu nội bộ" (mục 3quindecies) HẾT HIỆU LỰC với repo dự án
+  (đã public theo quyết định của Luân); vẫn GIỮ cho repo demo: gốc `itts-sop-demo` chỉ chứa
+  index.html + 3 file app + README + update.sh, không thêm gì khác.
 
 ## 4. Nhắc quy trình import cho Luân (khi bàn giao)
 Tệp -> Nhập -> Tải lên -> chọn xlsx -> **Thay thế bảng tính** -> (script không mất) ->
