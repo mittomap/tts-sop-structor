@@ -157,6 +157,10 @@
 > ở hồ sơ 360 + 2 drawer), tab Chăm lại/Reup trong Tuyển sinh, dữ liệu demo đại tu theo tester
 > (0 tên placeholder, lịch tương lai, hàng chờ quyết định sống, chuông 289 -> 87 việc). Chi tiết + bẫy: mục 3quaterdecies.
 > Suite kiểm: **11 bộ, 366 điểm xanh** (_check11 mới = 68 điểm cho arc/menu/node). Icon 130 (font dựng lại).
+> **ĐÃ LÊN GITHUB 2 REPO (28/07)**: private `mittomap/itts-sop` = CHÍNH thư mục này (đẩy: `./push.sh`);
+> public `mittomap/itts-sop-demo` = demo Pages **https://mittomap.github.io/itts-sop-demo/**
+> (cập nhật: `./update.sh` trong `~/Claude/itts-sop-demo`). Giao thức cho phiên Claude Code: `CLAUDE.md` ở gốc repo.
+> Kết phiên có sửa: push.sh; app đổi thì thêm update.sh. Chi tiết + bẫy: mục 3quindecies.
 > Trước đó V9.14 (27/07 - ĐỢT 6 UX+báo cáo và ĐỢT 7 cổng học viên ĐÃ XONG = HẾT các đợt kế hoạch.
 > **CHƯA GỌI HỘI ĐỒNG TỔNG KIỂM** - Luân dặn "từ từ hãy gọi hội đồng, a còn yêu cầu khác" → phiên sau CHỜ YÊU CẦU MỚI của Luân trước, tổng kiểm để sau khi Luân ra nốt yêu cầu. Trước đó V9.13 (27/07 - ĐỢT 5 điều phối & lịch xong. CÒN: Đợt 6 UX+báo cáo, Đợt 7 cổng HV, rồi HỘI ĐỒNG TỔNG KIỂM. Trước đó V9.12 (27/07 - ĐỢT 4B 'mỗi HV/lead 1 DÒNG' xong: 12 trang tác vụ sang danh sách hàng, bấm dòng nở chi tiết. KẾ TIẾP: Đợt 5 điều phối & lịch, 6, 7, tổng kiểm. Trước đó V9.11 (27/07 - ĐỢT 4 khép vòng đời + tiền xong; KẾ TIẾP: ĐỢT 4B 'mỗi HV/lead 1 DÒNG' theo yêu cầu Luân, rồi Đợt 5→7, tổng kiểm cuối. Trước đó V9.10 (27/07 - ĐỢT 3 học vụ & giảng viên xong một mạch; còn Đợt 4→7 rồi hội đồng TỔNG KIỂM CUỐI. Trước đó V9.9 (27/07 - MÀN HÌNH THEO CHỨC DANH đã chạy: ROLESCOPE 9 nhóm quyền, menu/landing/khối/chuông/tab theo nhóm; Luân đổi quy trình: LÀM MỘT MẠCH các đợt còn lại, hội đồng TỔNG KIỂM CUỐI. Trước đó V9.8 (27/07 - ĐỢT 2 "ngày làm việc của sales" đã xong + qua thẩm định sales veteran (VER-01..11) và UX/UI (UXV-01..10), vá hết. Màn cổng đổi 2 BƯỚC chức danh -> tên theo góp ý Luân; cổng HV chỉ hiện 10 hồ sơ giàu dữ liệu).
 > **VIỆC KẾ TIẾP THEO YÊU CẦU MỚI CỦA LUÂN (27/07): MÀN HÌNH THEO CHỨC DANH** - "đâu phải ai cũng được thấy đầy đủ". Hội đồng phải chốt ma trận chức danh x màn hình (xem `THIET_KE_PHAN_QUYEN_CHUC_DANH.md` nếu đã có), rồi triển khai: gateEnter đọc role -> menu/khối/trang theo vai trò. Đây là ưu tiên TRƯỚC Đợt 3 học vụ. Build nay xuất **3 file**: 2 HTML + `ITTs_data.js` (dữ liệu demo tách riêng — app ưu tiên đọc file này, thiếu thì dùng bản nhúng).
@@ -951,6 +955,37 @@ tuyển cả tester chuyên nghiệp để thiết kế dữ liệu demo". Hai c
   sopBlock 4 dòng + alias + 3 điểm gắn / 37 trang không vỡ. Tổng suite: **_check1..11 = 366 điểm xanh**
   + _tall (37 trang, icon đủ) + node --check 2 file + _tester.js 64 (2 trong đó là bug script tester).
 - Hội đồng tổng kiểm cuối: **VẪN HOLD** theo lệnh Luân - chờ yêu cầu mới.
+
+## 3quindecies. Lên GitHub - mô hình 2 repo + demo online (28/07)
+
+Luân chuyển dự án lên GitHub để làm việc trực tiếp và demo bằng link (phiên Claude Code trên máy
+Luân thực hiện, phiên Cowork soạn hướng dẫn + CLAUDE.md).
+
+### Mô hình
+- **Repo PRIVATE `mittomap/itts-sop`** = CHÍNH thư mục `~/Claude/SOP ITTs` (git init tại chỗ,
+  không copy đi đâu - phiên Cowork vẫn làm việc qua cầu nối desktop y như cũ, không biết gì về git).
+  Đẩy thay đổi: `./push.sh` ở gốc thư mục. Chứa TOÀN BỘ: tài liệu .md, _src/, 3 file app build.
+- **Repo PUBLIC `mittomap/itts-sop-demo`** (bản làm việc: `~/Claude/itts-sop-demo`) = CHỈ bản demo:
+  index.html (trang bìa 2 nút) + 3 file app + README. GitHub Pages bật (main/root).
+  **URL demo: https://mittomap.github.io/itts-sop-demo/**. Cập nhật demo: `./update.sh` trong repo đó
+  (tự chép 3 file mới nhất từ "SOP ITTs" sang, commit, push).
+- **`CLAUDE.md` ở gốc repo private**: giao thức cho phiên Claude Code (đọc 00->01->02, luật build/verify,
+  luật kết phiên push.sh/update.sh, luật phối hợp). Claude Code TỰ ĐỌC file này khi mở phiên trong thư mục.
+
+### Quy tắc phối hợp 2 loại phiên (QUAN TRỌNG - tránh dẫm chân)
+- Git là trọng tài duy nhất. Phiên Claude Code: bắt đầu = git status + pull, kết = commit + push.
+- Phiên Cowork (không có git): ghi file vào thư mục như cũ; thay đổi nằm ở trạng thái "chưa commit"
+  cho tới khi Luân/phiên Code chạy push.sh - vì vậy kết phiên Cowork PHẢI NHẮC Luân chạy push.sh
+  (và update.sh nếu app đổi).
+- KHÔNG để 2 phiên cùng sửa app một lúc; ai xong việc thì đẩy ngay cho sạch trạng thái.
+
+### Bẫy
+- Demo online: mỗi máy/trình duyệt một bộ localStorage riêng - đồng bộ 2 chiều CHỈ giữa các cửa sổ
+  TRÊN CÙNG MỘT MÁY. Đi demo hiệu ứng duyệt 2 chiều = mở 2 cửa sổ cùng máy, không phải 2 máy.
+- Pages deploy mất 1-2 phút sau khi push; trình duyệt cache khá lì - xem bản mới phải Cmd+Shift+R.
+- 3 file app phải nằm CÙNG CẤP ở gốc repo demo (app đọc ITTs_data.js cạnh nó); thiếu data file
+  app vẫn chạy bằng bản nhúng nhưng màn cổng ghi "kèm sẵn trong app" thay vì "bản mới nhất".
+- Repo public: tuyệt đối không để lọt tài liệu .md nội bộ / _src sang - update.sh chỉ chép đúng 3 file.
 
 ## 4. Nhắc quy trình import cho Luân (khi bàn giao)
 Tệp -> Nhập -> Tải lên -> chọn xlsx -> **Thay thế bảng tính** -> (script không mất) ->

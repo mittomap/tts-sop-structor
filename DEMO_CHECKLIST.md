@@ -3,6 +3,18 @@
 Bản này do chuyên gia pre-sales trong hội đồng soạn, đã cập nhật theo các bản vá 27/07.
 In ra hoặc mở cạnh máy khi đi demo.
 
+## DEMO BẰNG LINK - CÁCH MẶC ĐỊNH TỪ 28/07 (app đã lên GitHub Pages)
+
+- [ ] Link gửi khách/nhân viên: **https://mittomap.github.io/itts-sop-demo/** - trang bìa có 2 nút
+      (Cổng nhân viên / Trang học viên). Mở link là chạy: không chép file, Safari/điện thoại đều được.
+- [ ] Mỗi máy/trình duyệt là MỘT BỘ DỮ LIỆU RIÊNG: khách tự nghịch không phá demo của mình,
+      khỏi lo reset giùm. Muốn diễn màn "duyệt bên này - bên kia thấy" thì mở 2 CỬA SỔ TRÊN
+      CÙNG MỘT MÁY (2 máy khác nhau KHÔNG đồng bộ với nhau - đừng hứa nhầm với khách).
+- [ ] Trước buổi demo vẫn nhìn màn cổng: chip xanh "nguyên bản"; lỡ nghịch bẩn thì bấm Reset.
+- [ ] Đưa bản app mới lên demo: chạy `./update.sh` trong `~/Claude/itts-sop-demo`, đợi 1-2 phút
+      Pages deploy, rồi Cmd+Shift+R (bỏ cache) kiểm tra lại trước giờ demo.
+- [ ] Toàn bộ checklist bên dưới (bản chép file offline) GIỮ LÀM DỰ PHÒNG khi không có mạng.
+
 ## TRƯỚC BUỔI (ở văn phòng, 10 phút)
 
 - [ ] Chép CẢ THƯ MỤC vào máy demo: `ITTs_WebApp_v5_demo.html` + `ITTs_TrangHocVien_demo.html`
