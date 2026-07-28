@@ -798,4 +798,24 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("cau van con noi dung, khong bi cat cut", ch4.every(function(m){return String(m.tmpl||"").trim().length>10}));
 })();
 
+
+/* ---- 29. NHAN KHONG BE DOI KHI CON CHO (V9.29, anh Luan) ----
+   "co gang trong thiet ke dung de xuong dong, khi ma khong gian van dang on em, nhieu cho lam" */
+(function(){
+ var LB=[[".sopb .soprk","nhan trong khoi SOP (PHU TRACH bi be doi)"],
+         [".ctxk","nhan trong bang thong tin nhanh"],
+         [".cbl","nhan tren thanh thong tin lop"],
+         [".tblbl","nhan tren thanh cong cu"],
+         [".kpig","cot muc tieu KPI"],
+         [".slacat","nhan nhom viec"]];
+ LB.forEach(function(x){
+  var re=new RegExp(x[0].replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\{[^}]*white-space:nowrap");
+  t("khong be dong: "+x[1], re.test(CSS))});
+ t("cot nhan SOP tu no theo nhan dai nhat, khong con co dinh 66px",
+   /\.sopb \.soprk\{[^}]*flex:0 0 auto/.test(CSS));
+ t("cot nhan bang thong tin cung tu no", /\.ctxk\{[^}]*flex:0 0 auto/.test(CSS));
+ t("man hinh that su hep thi moi cho xuong dong lai",
+   /max-width:560px\)\{[^}]*white-space:normal/.test(CSS));
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");

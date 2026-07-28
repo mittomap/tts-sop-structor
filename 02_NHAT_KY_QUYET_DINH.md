@@ -327,6 +327,12 @@
 > nhánh mới** (`absForm`, `bhNoteForm`) - bấm "Xử lý ngay" ở hai loại việc đó sẽ không ra gì mà cũng
 > không báo lỗi.
 >
+> · **Nhãn không bẻ đôi khi còn chỗ** (anh Luân: *"cố gắng trong thiết kế đừng để xuống dòng, khi mà
+> không gian vẫn đang ổn"*): cột nhãn trong khối SOP đang cố định `flex:0 0 66px` nên "PHỤ TRÁCH"
+> bị bẻ đôi dù thừa chỗ. Nay cột **tự nở theo nhãn dài nhất** (`flex:0 0 auto` + `nowrap`), áp cho
+> 6 loại nhãn: khối SOP · bảng thông tin nhanh · thanh thông tin lớp · thanh công cụ · cột mục tiêu
+> KPI · nhãn nhóm việc. Màn hình thật sự hẹp (<560px) thì mới cho xuống dòng lại.
+>
 > **CÒN LẠI:** dời `DUEFALL=5` + 16 nhóm câu chăm RTOUCH + giờ hẹn preset vào cấu hình ·
 > màn cấp thêm quota WOW · `statStrip` bấm được ở các trang còn lại · bộ phận chuẩn cho
 > `renderDuyet`/`renderGiaoan`/`renderMaGioiThieu`/`renderReupTab`/`renderBanggiao`.
