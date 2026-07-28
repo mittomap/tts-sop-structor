@@ -1098,6 +1098,16 @@ nằm TRONG trang sẵn có (màn cổng, Cài đặt, hồ sơ 360, cổng HV) 
 - Badge đếm menu (.navlbl .dot / .navitem .dot) nhỏ lại + flex:none - nhóm thu gọn không bóp chữ.
 - _check11 lên **82 điểm** (+14 tiêu chí V9.18: remap, 2 view, mstrip clk/drawer, 13 sổ render, HVSEC, tab demo).
 
+### V9.18b-c - vá theo mắt Luân (cùng tối 28/07)
+- Ô tìm hero: dòng gợi ý bwsrchhint bị đặt TRONG hộp tìm trắng (chữ trắng tàng hình + bóp placeholder) -
+  đưa ra NGOÀI hộp về đúng thiết kế. BÀI HỌC: phần tử chữ trắng dành cho nền màu thì phải soi nó nằm trong
+  hộp nền gì; check dò thứ tự markup đã thêm (83 điểm).
+- Dải khối Trang bắt đầu: BỎ 8 khối đếm-theo-chặng (Luân xác nhận thừa - trùng chip lọc "Nhóm" + Bảng chặng
+  vừa gộp); GIỮ 5 khối giá trị riêng: Tới hẹn hôm nay / HV nguy cơ / WOW chờ xử lý / CK chờ duyệt / ĐK còn nợ.
+  ROLESCOPE.blocks vẫn lọc theo key trên 5 khối còn lại; dải rỗng thì tự ẩn như cũ.
+- Cổng học viên: BỎ chip Room demo + nút Reset khỏi sidebar + thanh mobile (học viên không cần công cụ demo);
+  màn cổng chọn hồ sơ VẪN giữ (đó là chỗ người demo vận hành trước buổi).
+
 ## 3octodecies. V9.17 — Room tự động + bong bóng việc mới + vá theo hội đồng 3 tester (28/07 chiều)
 
 Luân chê bản mã phòng V9.16 "phức tạp quá, mặc định phải là kết nối được" -> làm lại + cho 3 tester

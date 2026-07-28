@@ -3556,20 +3556,14 @@ function renderBanlam(){
  var reupN=cS("lost")+cS("no_contact");
  function stat(ic,n,lb,col,act,org){var dim=(window.MINEONLY&&org);
   return '<div class="bstat'+(n?"":" z")+(dim?" z":"")+'" onclick="'+act+'" title="'+(dim?"Đếm TOÀN trung tâm - không lọc theo bạn":"Bấm để lọc danh sách bên dưới")+'"><span class="bsic" style="background:'+col+'18;color:'+col+'"><i class="ti '+ic+'"></i></span><div><div class="bsn">'+n+'</div><div class="bsl">'+esc(lb)+'</div></div>'+(n?'<i class="ti ti-chevron-down bsarr"></i>':'')+'</div>'}
+ /* V9.18c (Luân xác nhận THỪA): bỏ 8 khối đếm-theo-chặng - trùng chip lọc "Nhóm" ngay dưới và
+    Bảng chặng đã gộp vào trang. Chỉ giữ khối có GIÁ TRỊ RIÊNG (lối tắt sang trang khác / tập đặc biệt). */
  var blocks=[
   ["ti-clock",apptToday,"Tới hẹn hôm nay"+(apptStale?" (+"+apptStale+" quá hẹn cũ)":""),"#2E5A88","chayQSet('appt')",0,"appt"],
-  ["ti-user-plus",cS("new"),"Lead mới cần gọi","#3B82C4","chayQSet('new')",0,"new"],
-  ["ti-phone",cS("contacted"),"Đang khai thác","#2F6BFF","chayQSet('contacted')",0,"contacted"],
-  ["ti-file-text",cS("test_grading"),"Test chờ chấm","#E08A1E","chayQSet('test_grading')",0,"test_grading"],
-  ["ti-message-2",cS("test_done"),"Có KQ chờ tư vấn","#7C3AED","chayQSet('test_done')",0,"test_done"],
-  ["ti-clipboard-check",cS("enrolled"),"Đăng ký chờ thu","#0D9488","chayQSet('enrolled')",0,"enrolled"],
-  ["ti-layout-grid-add",cS("paid"),"Đã thu, chờ xếp lớp","#3B82C4","chayQSet('paid')",0,"paid"],
-  ["ti-send",cS("onboarding"),"Onboarding chưa xong","#E08A1E","chayQSet('onboarding')",0,"onboarding"],
   ["ti-user-exclamation",nRisk,"Học viên nguy cơ","#DB2777","goRisk()",1,"risk"],
   ["ti-star",nWow,"WOW chờ xử lý","#DB2777","go('wow')",1,"wowq"],
   ["ti-discount",nApprove,"Chiết khấu chờ duyệt","#7C3AED","go('duyet')",1,"approve"],
-  ["ti-cash",nDebt,"Đăng ký còn nợ","#E08A1E","fset('thanhtoan','debt');go('thanhtoan')",1,"debt"],
-  ["ti-refresh",reupN,"Chăm lại / Reup","#6B7887","chayQSet('reup')",0,"reup"]];
+  ["ti-cash",nDebt,"Đăng ký còn nợ","#E08A1E","fset('thanhtoan','debt');go('thanhtoan')",1,"debt"]];
  var rsB=SCOPE();
  if(rsB.blocks!=="*")blocks=blocks.filter(function(b){return rsB.blocks.indexOf(b[6])>=0});
  if(rsB.lite){
@@ -7842,12 +7836,11 @@ HV_SHELL = r"""
     <div class="hvbrand"><div class="logo" style="width:34px;height:34px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 40 40" width="22" height="22" aria-hidden="true"><g fill="none" stroke="#D51920" stroke-width="3.2"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="7.5"/></g><circle cx="20" cy="20" r="3.4" fill="#D51920"/><g stroke="#D51920" stroke-width="3.2"><line x1="20" y1="1.5" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="38.5"/><line x1="1.5" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="38.5" y2="20"/></g></svg></div><div><b>IELTS The Tutors</b><small>Trang học viên</small></div></div>
     <div class="hvme"><div class="av" id="hvAv">?</div><div><b id="hvWho">-</b><small id="hvWho2">-</small></div></div>
     <div class="hvselbox">
-     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><span class="chip blue roomChip">Room demo</span><button class="btn sm" onclick="demoReset()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ và mọi máy trong room cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></div>
      <button class="btn sm" style="width:100%;justify-content:center" onclick="gateSwitchHV()"><i class="ti ti-arrows-exchange"></i>Đổi người / màn cổng</button></div>
     <nav class="hvnav" id="hvNav"></nav>
   </aside>
   <main class="hvmain" id="hvMain">
-    <div class="hvtop"><button class="tbtn" onclick="hvToggleSide()" aria-label="Mục lục"><i class="ti ti-menu-2"></i></button><b style="font-size:13px">Trang học viên</b><span style="margin-left:auto;display:inline-flex;align-items:center;gap:7px"><span class="chip blue roomChip">Room demo</span><button class="btn sm" onclick="demoReset()"><i class="ti ti-refresh"></i>Reset</button></span></div>
+    <div class="hvtop"><button class="tbtn" onclick="hvToggleSide()" aria-label="Mục lục"><i class="ti ti-menu-2"></i></button><b style="font-size:13px">Trang học viên</b></div>
     <div id="hvBody"></div>
   </main>
 </div>
