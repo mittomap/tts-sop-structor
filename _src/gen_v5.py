@@ -1217,7 +1217,7 @@ body.drsz .drawer{transition:none}
 
 <div class="app" id="app" style="display:none">
   <aside class="sidebar" id="sidebar">
-    <div class="brand"><div class="logo" id="brandLogo"><svg viewBox="0 0 40 40" width="26" height="26" aria-hidden="true"><g fill="none" stroke="#D51920" stroke-width="3.2"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="7.5"/></g><circle cx="20" cy="20" r="3.4" fill="#D51920"/><g stroke="#D51920" stroke-width="3.2"><line x1="20" y1="1.5" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="38.5"/><line x1="1.5" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="38.5" y2="20"/></g></svg></div><div><b id="brandName">ITTs · Hành trình</b><small id="brandSub">Bản V5 - luồng vận hành</small></div></div>
+    <div class="brand"><div class="logo" id="brandLogo"><svg viewBox="0 0 40 40" width="26" height="26" aria-hidden="true"><g fill="none" stroke="#D51920" stroke-width="3.2"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="7.5"/></g><circle cx="20" cy="20" r="3.4" fill="#D51920"/><g stroke="#D51920" stroke-width="3.2"><line x1="20" y1="1.5" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="38.5"/><line x1="1.5" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="38.5" y2="20"/></g></svg></div><div><b id="brandName">ITTs - SOP TEMP</b><small id="brandSub">Hệ thống tuân thủ SOP</small></div></div>
     <nav class="nav" id="nav"></nav>
     <div class="me" onclick="gateSwitch()" title="Đổi người / về màn cổng" style="cursor:pointer"><div class="av" id="meAv">M</div><div><b id="meName">-</b><small id="meRole">-</small></div><i class="ti ti-arrows-exchange" style="margin-left:auto;opacity:.6"></i></div>
   </aside>
@@ -3713,6 +3713,8 @@ var ARCS=[
  {k:"changD",n:4,t:"Kết thúc & Học tiếp",ic:"ti-award",col:"#7C3AED",
   d:"Ra kết quả đầu ra, mời học tiếp, xin giới thiệu bạn bè - vòng đời quay lại từ đầu."}];
 var ARCBK={};ARCS.forEach(function(a){ARCBK[a.k]=a});
+/* Tên nhóm chặng trên menu: "C1 · Khách tiềm năng". Một chỗ sinh ra, mọi chỗ dùng lại. */
+function arcGrpName(k){var A=ARCBK[k];return A?("C"+A.n+" · "+A.t):k}
 var ARCOF={new:"changA",contacted:"changA",test_booked:"changA",test_grading:"changA",
  test_done:"changA",consult:"changA",enrolled:"changA",no_contact:"changA",lost:"changA",
  paid:"changB",onboarding:"changB",learning:"changB",
@@ -9827,7 +9829,7 @@ var TOURS={
  /* ---------- CẤP 1: THAM QUAN ---------- */
  tq_tong:{lv:"thamquan",t:"Toàn cảnh app",ic:"ti-rocket",d:"7 bước - hiểu app chạy thế nào trong 2 phút",steps:[
   {sel:'.brand',t:"Đây là bàn làm việc của trung tâm",d:"App gom mọi việc về một chỗ: khách quan tâm, học viên đang học, lớp, tiền và việc được giao. Menu bên trái xếp theo đúng hành trình của khách.",hint:"Bấm Tiếp theo để đi từng phần."},
-  {p:"banlam",sel:'.navlbl',t:"Menu theo 4 chặng vòng đời",d:"Chặng 1 Khách tiềm năng - Chặng 2 Đang học - Chặng 3 Tạm dừng - Chặng 4 Kết thúc & Học tiếp. Chấm màu là chặng, số đỏ là việc quá hạn.",hint:"Bấm một nhóm chặng để mở ra."},
+  {p:"banlam",sel:'.navlbl',t:"Menu theo 4 chặng vòng đời",d:"C1 Khách tiềm năng - C2 Đang học - C3 Tạm dừng - C4 Kết thúc & Học tiếp. Chấm màu là chặng, số đỏ là việc quá hạn.",hint:"Bấm một nhóm chặng để mở ra."},
   {p:"banlam",sel:'.bstats',t:"Việc cần xử lý hôm nay",d:"Mỗi ô là một nhóm việc đang chờ. Bấm ô nào thì danh sách bên dưới lọc đúng nhóm đó.",hint:"Bấm thử ô Tới hẹn hôm nay."},
   {p:"banlam",sel:'#chaybody',t:"Danh sách người cần xử lý",d:"Mỗi dòng là một người kèm việc kế tiếp. Dải hạt màu cho biết họ đang ở chặng nào - bấm vào dải hạt mở toàn bộ hành trình.",hint:"Bấm vào dải hạt của một dòng."},
   {p:"changA",sel:'.nrail',t:"Bản đồ một chặng",d:"Đường ray hiện số người ở từng ga và phần trăm chuyển đổi thật giữa các ga - nhìn là biết đang tắc ở đâu.",hint:"Bấm một ga để lọc người ở ga đó."},
@@ -10015,7 +10017,7 @@ function tourOfferOnce(){return}
    Lưu trong DATA.config.ui -> tự đồng bộ đa cổng/đa máy như mọi dữ liệu demo và Reset demo đưa về gốc.
    Áp bằng uiApply(): đổi biến màu CSS, tên + logo trên sidebar, tiêu đề tab trình duyệt.
    Menu: ẩn/hiện nhóm & mục, đổi tên nhóm - buildNav đọc UI().menu (KHÔNG sửa NAVTREE gốc). */
-var UIDEF={brand:"ITTs · Hành trình",sub:"Bản V5 - luồng vận hành",center:"IELTS The Tutors",
+var UIDEF={brand:"ITTs - SOP TEMP",sub:"Hệ thống tuân thủ SOP",center:"IELTS The Tutors",
  title:"IELTS The Tutors · Cổng làm việc",logo:"",navy:"#1E3A5F",red:"#D51920",menu:{},mlabel:{},ilabel:{}};
 function UI(){var c=(DATA.config=DATA.config||{});var u=(c.ui=c.ui||{});
  for(var k in UIDEF)if(u[k]===undefined)u[k]=(typeof UIDEF[k]==="object"?JSON.parse(JSON.stringify(UIDEF[k])):UIDEF[k]);
@@ -10061,7 +10063,7 @@ function uiGroupRename(g,v){var u=UI();v=String(v||"").trim();
  persistSoon();buildNav()}
 /* V9.27: đổi tên được TỪNG MỤC menu, không chỉ tên nhóm. Tên gốc giữ nguyên trong PAGES để
    nâng cấp app không vỡ; tên trung tâm tự đặt nằm riêng ở UI().ilabel. */
-function uiItemDefLabel(k){if(/^chang[A-D]$/.test(k))return "Bản đồ chặng này";var p=PBK[k]||{};return p.t||k}
+function uiItemDefLabel(k){if(/^chang[A-D]$/.test(k))return "Bản đồ chặng";var p=PBK[k]||{};return p.t||k}
 function uiItemLabel(k){var l=UI().ilabel;return (l&&l[k])||uiItemDefLabel(k)}
 function uiItemRename(k,v){var u=UI();v=String(v||"").trim();
  if(!v||v===uiItemDefLabel(k))delete u.ilabel[k];else u.ilabel[k]=v;
@@ -10662,8 +10664,9 @@ function navBadge(k){
    Điều hành) mở sẵn; 4 nhóm CHẶNG và nhóm Tra cứu gập lại - chặng là bản đồ vòng đời, mở hết
    thì menu dài lê thê mà ngày thường không đụng tới. Người dùng tự mở/gập thì nhớ theo phiên. */
 /* Một định nghĩa "nhóm này có phải một CHẶNG không" - dùng cho cả mặc định gập lẫn luật xổ
-   một chặng thì gập ba chặng kia. Viết regex ở hai nơi là hai nơi trôi khỏi nhau. */
-function navIsArcGrp(g){return /^Chặng \d/.test(String(g||""))}
+   một chặng thì gập ba chặng kia. V9.29n: hỏi thẳng NAVTREE xem nhóm có gắn `arc` không, thay
+   vì đoán qua chữ "Chặng \d" - đổi tên nhóm thành "C1" là cái regex đó chết câm ngay. */
+function navIsArcGrp(g){return !!navGrpArc(g)}
 function navOpenDef(g){
  if(navIsArcGrp(g))return false;
  if(g==="Tra cứu")return false;
@@ -10720,7 +10723,7 @@ LISTCFG.dsdiemdanh={code:"DL12",filt:"attendance_status",ro:1,sub:"Sổ điểm 
  cols:[["student_name","Học viên"],["session_id","Buổi"],["attendance_status","Điểm danh","chip"],["check_in_time","Giờ vào"],["in_class_performance","Trong lớp","enum"]]};
 LISTCFG.dsbaitap=mkRO(LISTCFG.baitap,"Sổ bài tập (DL13) - chỉ xem; giao/chấm ở Vận hành lớp");
 LISTCFG.dswow=mkRO(LISTCFG.wow,"Sổ WOW 1-1 (DL14) - chỉ xem; đặt/xử lý ở hub Học tập");
-LISTCFG.dsketthuc=mkRO(LISTCFG.ketthuc,"Sổ kết thúc khóa (DL18) - chỉ xem; xử lý ở Chặng 4");
+LISTCFG.dsketthuc=mkRO(LISTCFG.ketthuc,"Sổ kết thúc khóa (DL18) - chỉ xem; xử lý ở C4");
 LISTCFG.dskhaosat={code:"DL15",filt:"survey_type",ro:1,sub:"Sổ khảo sát định kỳ (DL15) - chỉ xem; gửi/xử lý ở hub CSKH",
  cols:[["student_name","Học viên"],["survey_type","Đợt","enum"],["sent_date","Gửi"],["submitted_date","Trả lời"],["satisfaction_score","Hài lòng"],["follow_up_needed","Cần follow-up","enum"]]};
 LISTCFG.dsphanhoi=mkRO(LISTCFG.khaosat,"Sổ phản hồi / góp ý (DL16) - chỉ xem; xử lý ở hub CSKH");
@@ -10730,10 +10733,12 @@ var NAVTREE=[
  /* V9.29: "Việc hôm nay" trước đây khai hide:1 - vào được từ chuông và các ô Tổng quan nhưng
     KHÔNG có đường trên menu để quay lại. Anh Luân bắt đúng: vào được mà không tìm lại được là dở. */
  {g:"Làm việc",items:["banlam","viec","giaoviec"]}, /* V9.18: hanhtrinh gộp vào banlam (go() tự remap) */
- {g:"Chặng 1 · Khách tiềm năng",arc:"changA",items:["changA","nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:"Chặng 2 · Đang học",arc:"changB",items:["changB","xeplop","banglop","hoctap","giaoan","wow","cskh"]},
- {g:"Chặng 3 · Tạm dừng",arc:"changC",items:["changC","baoluu"]},
- {g:"Chặng 4 · Kết thúc & Học tiếp",arc:"changD",items:["changD","ketthuc","magioithieu"]},
+ /* V9.29n (anh Luân): "Chặng 1" -> "C1". Tên nhóm nay SINH TỪ ARCS (arcGrpName) chứ không gõ tay:
+    trước đây số chặng và tên chặng nằm cả ở ARCS lẫn ở đây, đổi một chỗ là hai chỗ nói khác nhau. */
+ {g:arcGrpName("changA"),arc:"changA",items:["changA","nhaplead","test","tuvan","thanhtoan","reup"]},
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","banglop","hoctap","giaoan","wow","cskh"]},
+ {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
+ {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","magioithieu"]},
  {g:"Điều hành",items:["baocao","duyet","banggiao","settings"]},
  {g:"Tra cứu",items:["hocvien","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","giangvien","nhanvien"]}];
 var NAVSUB={nhaplead:"tuyensinh",test:"tuyensinh",tuvan:"tuyensinh",thanhtoan:"tuyensinh",reup:"tuyensinh",

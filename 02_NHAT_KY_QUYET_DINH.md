@@ -427,6 +427,13 @@
 > Bài học: sửa "đưa khối X lên đầu" mà không hỏi **X có luôn tồn tại không** thì với phần lớn người
 > dùng chẳng có gì đổi cả. `_check14` nay đếm trên 60 hồ sơ thật rằng khối này có mặt ở MỌI học viên
 > có đăng ký, không chỉ ở ca nhiều khóa.
+> **· Đổi tên hiển thị (anh Luân chốt, V9.29n):** "Chặng 1" -> **"C1"** · "Bản đồ chặng này" ->
+> **"Bản đồ chặng"** · tên trên đầu menu **"ITTs - SOP TEMP"** · dòng phụ **"Hệ thống tuân thủ SOP"**.
+> Nhân đây dọn hai chỗ trùng lặp: (1) tên nhóm chặng nay **sinh từ ARCS** (`arcGrpName`) chứ không gõ
+> tay - trước đó số chặng và tên chặng nằm cả ở `ARCS` lẫn ở `NAVTREE`; (2) `navIsArcGrp` thôi đoán
+> bằng regex `/^Chặng \d/`, nay hỏi thẳng `NAVTREE` xem nhóm có gắn `arc` không - **đúng cái regex đó
+> sẽ chết câm ngay khi đổi tên thành "C1"**, mà chết câm thì luật đàn xếp im lặng ngừng chạy chứ
+> không báo lỗi. Đây là lớp lỗi "nhận dạng bằng chữ hiển thị" - đổi chữ là hỏng logic.
 > **· Bấm một chặng là mở luôn bản đồ chặng (anh Luân):** trước đây bấm tên chặng chỉ XỔ danh sách
 > rồi đứng im, phải bấm thêm một nhát vào mục đầu tiên mới thấy bản đồ. Đang đứng sẵn trong chặng đó
 > thì không nhảy lại (đỡ mất chỗ đang xem); gập lại thì tuyệt nhiên không điều hướng đi đâu.
