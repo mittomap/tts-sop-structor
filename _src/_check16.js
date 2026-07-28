@@ -658,4 +658,37 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("dung chung bhState, khong tu dat cach hieu thu tu", /var st=bhState\(s2\);/.test(SRC));
 })();
 
+
+/* ---- 24. "SUA O DAY": moi tham so app dung deu co o sua, va bam la nhay toi dung dong (V9.29) ---- */
+(function(){
+ setRole("all");
+ t("co ham cfEnsure", typeof cfEnsure==="function");
+ cfEnsure();
+ var ch2=(DATA.config.ch2||[]);
+ t("MOI tham so khai trong app deu co dong cau hinh that",
+   APPPARAMS.every(function(p){return ch2.some(function(c){return c.name===p[1]||c.name===paramSheetName(p[1])})}));
+ /* hai chieu: tham so app DOC that thi phai co o sua */
+ var used=(SRC.match(/param(?:Of|Str)\("[A-Za-z0-9_]+"/g)||[]).map(function(x){return x.slice(x.indexOf('"')+1,-1)});
+ var decl={};APPPARAMS.forEach(function(p){decl[p[1]]=1});
+ var thieu=used.filter(function(k,i){return used.indexOf(k)===i&&!decl[k]});
+ t("khong con tham so app doc ma khong co o sua"+(thieu.length?(" ("+thieu.join(", ")+")"):""), thieu.length===0);
+ window.SETTAB="ch2";
+ var pg=RENDER["settings"]();
+ t("bo han chu 'chua co tren sheet' (dau vet thoi chay Google Sheets)", pg.indexOf("chưa có trên sheet")<0);
+ t("moi dong cau hinh co ID de nhay toi", (pg.match(/id="cfrow_/g)||[]).length>=APPPARAMS.length);
+ /* slaChip: in dung so dang cau hinh + nhay dung dong */
+ var v=paramOf("slaTeacherNote_hours",48);
+ var chip=slaChip("slaTeacherNote_hours",48);
+ t("slaChip in dung con so dang cau hinh", chip.indexOf(">"+v)>=0);
+ t("slaChip bam duoc va tro dung tham so", /cfGo\('slaTeacherNote_hours'\)/.test(chip));
+ t("slaChip noi ro y nghia khi ro chuot", /data-tip="[^"]*bấm để sửa/.test(chip));
+ t("app da dung slaChip o cac cho in so SLA", (SRC.match(/slaChip\(/g)||[]).length>=3);
+ t("co ham nhay toi dong cau hinh va to sang", /function cfGo\(name\)\{[\s\S]{0,400}?cfrow_/.test(SRC)&&/cfhl/.test(SRC));
+ /* doi gia tri roi doc lai: chip phai doi theo */
+ var row=ch2.filter(function(c){return c.name==="slaTeacherNote_hours"})[0];
+ if(row){var cu=row.value;row.value="72";
+  t("doi cau hinh thi chip doi theo ngay", slaChip("slaTeacherNote_hours",48).indexOf(">72")>=0);
+  row.value=cu}
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");

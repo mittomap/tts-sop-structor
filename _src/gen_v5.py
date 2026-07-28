@@ -123,6 +123,15 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .viechd{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;letter-spacing:.3px;
  text-transform:uppercase;color:#5A6675;border-left:3px solid var(--line);padding:2px 0 2px 9px;margin:14px 0 7px}
 .viechd b{color:var(--navy)}
+/* V9.29: chip so SLA bam duoc + dong cau hinh duoc to sang khi nhay toi */
+.slachip{display:inline-flex;align-items:center;gap:4px;background:#EEF3F9;border:1px solid #DCE5EF;
+ border-radius:999px;padding:1px 4px 1px 8px;font-size:11.5px;font-weight:700;color:var(--navy);
+ cursor:pointer;transition:.12s;white-space:nowrap}
+.slachip:hover{background:#E2ECF7;border-color:var(--blue)}
+.slachip i{font-size:12px;opacity:.55}
+.slachip:hover i{opacity:1;color:var(--blue)}
+tr.cfhl{animation:cfhl 2.6s ease-out}
+@keyframes cfhl{0%,60%{background:#FFF6D8}100%{background:transparent}}
 .navgrp{margin-bottom:3px}
 .navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500;border-left:3px solid transparent}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
@@ -1268,7 +1277,7 @@ function syncApply(){if(!window.__pendSync)return;
   DATA.dl=st.dl;DL=DATA.dl;if(st.config)DATA.config=st.config;if(st.enums){DATA.enums=st.enums;ENUM=DATA.enums}
   by=st.by||"";__base=demoPack();
  }catch(e){return}
- try{deriveAll()}catch(e){}
+ try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}
  try{uiApply()}catch(e){}   /* V9.20: cổng khác đổi thương hiệu/màu -> cổng này đổi theo */
  if(window.HVPORTAL){if(typeof hvReRender==="function")hvReRender()}
  else{if(typeof CUR!=="undefined"&&CUR&&typeof reRender==="function")reRender(CUR);
@@ -2219,8 +2228,8 @@ function fromISOdt(v){var s=String(v||"").trim();if(!s)return "";
 function normDT(k,v){return /_time$|_date$|^dob$/.test(k)?fromISOdt(v):v}
 /* gợi ý dưới ô ngày giờ: giải thích hệ thống tự nhắc khi nào nếu để trống */
 function fldHint(k){
- if(k==="next_followup_time")return '<div class="fhint">Bỏ trống: hệ thống tự hẹn theo kết quả liên hệ - không nghe máy '+paramOf("slaRetryCall_hours",4)+'h, máy bận 6h, đã nhắn 24h. Quá hạn sẽ nhảy vào Việc hôm nay.</div>';
- if(k==="test_date")return '<div class="fhint">Sau khi HV dự test, hạn chấm bài là '+paramOf("slaTestResult_hours",24)+' giờ (Cài đặt).</div>';
+ if(k==="next_followup_time")return '<div class="fhint">Bỏ trống: hệ thống tự hẹn theo kết quả liên hệ - không nghe máy '+slaChip("slaRetryCall_hours",4)+', máy bận 6h, đã nhắn 24h. Quá hạn sẽ nhảy vào Việc hôm nay.</div>';
+ if(k==="test_date")return '<div class="fhint">Sau khi HV dự test, hạn chấm bài là '+slaChip("slaTestResult_hours",24)+'.</div>';
  if(k==="homework_due_date")return '<div class="fhint">Quá hạn mà chưa nộp sẽ vào nhóm nhắc "Thu bài".</div>';
  return ''}
 function pkSearch(k,ent){var inp=document.getElementById("pk_"+k),box=document.getElementById("pkr_"+k); if(!inp)return;
@@ -6403,7 +6412,7 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
    }else{                                                               /* số */
     inp='<input id="cf_'+esc(name)+'" value="'+esc(val)+'" inputmode="numeric" style="width:96px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit">';
    }
-   return '<tr><td><b style="font-size:11.5px">'+esc(name)+'</b>'+(miss?' <span class="chip amber" style="margin-left:4px">chưa có trên sheet</span>':'')+(sheetName&&sheetName!==name?'<div class="mut" style="font-size:10.5px">trên sheet: '+esc(sheetName)+'</div>':'')+'</td>'+
+   return '<tr id="cfrow_'+esc(name)+'"><td><b style="font-size:11.5px">'+esc(name)+'</b>'+(sheetName&&sheetName!==name?'<div class="mut" style="font-size:10.5px">trên sheet: '+esc(sheetName)+'</div>':'')+'</td>'+
     '<td style="max-width:420px;white-space:normal;font-size:11px;color:var(--muted)">'+esc(meaning)+'</td>'+
     '<td>'+inp+'</td>'+
     '<td style="font-size:11.5px">'+esc(unit)+'</td>'+
@@ -6802,6 +6811,37 @@ var PKEY={
  attemptsUnreachable:["thresholdContacted_attempts"],
  slaConsultAfterTest_hours:["slaCVT_hours"],
  slaLeadResponse_min:["slaLRT_minutes"]};
+/* ═══════════ V9.29 (mảng 5) "SỬA Ở ĐÂY" - nối con số trên màn hình với ô cấu hình ═══════════
+   Trước đây app in "hạn 24h" khắp nơi mà không nói 24 lấy từ đâu; muốn đổi thì phải mò trong Cài đặt
+   giữa hơn 60 dòng. slaChip in con số + một bánh răng bấm vào là nhảy thẳng tới ĐÚNG DÒNG đó và tô
+   sáng. Dùng ở mọi chỗ đang in số SLA. */
+function cfGo(name){window.SETTAB="ch2";window.CFHL=name;go("settings");
+ setTimeout(function(){var el=document.getElementById("cfrow_"+name);
+  if(el){if(el.scrollIntoView)el.scrollIntoView({block:"center"});el.classList.add("cfhl");
+   setTimeout(function(){el.classList.remove("cfhl")},2600)}
+  else toast("Tham số "+name+" chưa có ô sửa - báo kỹ thuật khai vào bảng APPPARAMS.",5000)},60)}
+function slaChip(name,fb,unit){
+ var v=paramOf(name,fb);
+ var u=unit||(function(){for(var i=0;i<APPPARAMS.length;i++)if(APPPARAMS[i][1]===name)return APPPARAMS[i][3];return ""})();
+ var mean=(function(){for(var i=0;i<APPPARAMS.length;i++)if(APPPARAMS[i][1]===name)return APPPARAMS[i][2];return name})();
+ return '<span class="slachip" onclick="event.stopPropagation();cfGo(\''+esc(name)+'\')" '+
+  'data-tip="'+esc(mean+" · đang đặt "+v+" "+u+" - bấm để sửa ở Cài đặt")+'">'+
+  esc(String(v))+(u?(" "+esc(u)):"")+'<i class="ti ti-settings"></i></span>'}
+/* V9.29 (anh Luân): màn Cài đặt còn hiện "chưa có trên sheet" - dấu vết thời chạy Google Sheets.
+   Nay dữ liệu nằm trong chính app, nên tham số nào app khai là phải CÓ SẴN một dòng cấu hình thật:
+   sửa được, lưu được, không còn trạng thái lấp lửng. Chạy một lần lúc khởi động; nguồn duy nhất
+   vẫn là APPPARAMS - không chép danh sách này sang pipeline Python (chép là hai bản trôi khỏi nhau). */
+function cfEnsure(){
+ DATA.config=DATA.config||{};var c=(DATA.config.ch2=DATA.config.ch2||[]);
+ var have={};c.forEach(function(x){have[x.name]=1});
+ var add=0;
+ APPPARAMS.forEach(function(p){
+  var sn=paramSheetName(p[1]);
+  if(have[sn]||have[p[1]])return;
+  c.push({name:p[1],meaning:p[2],unit:p[3],value:String(p[4]==null?"":p[4]),group:p[0]});
+  have[p[1]]=1;add++});
+ if(add)persistSoon();
+ return add}
 function paramOf(name,fb){var c=(DATA.config&&DATA.config.ch2)||[];
  var names=[name].concat(PKEY[name]||[]);
  for(var j=0;j<names.length;j++)for(var i=0;i<c.length;i++)if(c[i].name===names[j]){var n=Number(c[i].value);if(!isNaN(n))return n}
@@ -9321,7 +9361,7 @@ function renderHtToday(embed){
  h+=statStrip([["ti-calendar-check",ses.length,"Buổi dạy hôm nay","#2E5A88",""],
   ["ti-star",wowT.length,"Buổi WOW hôm nay","#DB2777",""],
   ["ti-book",hwQ.length,"Bài chờ chấm","#7C3AED","SLA "+paramOf("slaHomeworkGrade_hours",48)+"h"],
-  ["ti-message-2",owe.length,"Buổi nợ nhận xét","#E24B4A","SLA "+paramOf("slaTeacherNote_hours",48)+"h"]]);
+  ["ti-message-2",owe.length,"Buổi nợ nhận xét","#E24B4A","SLA "+slaChip("slaTeacherNote_hours",48)]]);
  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-calendar-check" style="margin-right:6px"></i>Buổi dạy hôm nay ('+ses.length+')</b></div>';
  if(!ses.length)h+='<div class="empty">Hôm nay không có buổi nào'+(gid?' của GV này':'')+'.</div>';
  h+='<div class="obcards" style="padding:12px">';
@@ -9445,7 +9485,7 @@ function renderBuoihoc(embed){var p="buoihoc",fil=fget(p);var all=rows("DL11");
  var h=embed?'':pageHead("Buổi học & nhận xét giảng viên","Theo dõi SLA ghi nhận xét (hạn "+paramOf("slaTeacherNote_hours",48)+"h sau buổi). Nhận xét chung có thể ghi ngay khi điểm danh xong ở trang Điểm danh — hai nơi cùng một ô.",
   nOver?'<span class="chip red">'+nOver+' buổi quá hạn ghi nhận xét</span>':'');
  h+=statStrip([
-  ["ti-writing",all.filter(function(s2){var t=bhState(s2);return t.done&&!t.note}).length,"Chờ ghi nhận xét","#E08A1E","SLA "+paramOf("slaTeacherNote_hours",48)+"h"],
+  ["ti-writing",all.filter(function(s2){var t=bhState(s2);return t.done&&!t.note}).length,"Chờ ghi nhận xét","#E08A1E","SLA "+slaChip("slaTeacherNote_hours",48)],
   ["ti-alert-triangle",nOver,"Quá hạn ghi nhận xét","#E24B4A","ảnh hưởng KPI TNR"],
   ["ti-clock",all.filter(function(s2){return bhState(s2).late}).length,"Buổi GV vào trễ","#7C3AED","kỷ luật ADC"],
   ["ti-calendar-plus",all.filter(function(s2){return bhState(s2).cancelled}).length,"Hủy - cần dạy bù","#3B82C4","xếp lịch bù"]]);
@@ -10651,7 +10691,7 @@ function deriveAll(){
   rows("DL10").forEach(function(c){derNum(c,"current_enrollment",cls[c.class_id]||0)});
  }catch(e){}
 }
-function enter(k){try{deriveAll()}catch(e){}try{autoReturnHandovers()}catch(e){}document.getElementById("login").style.display="none";document.getElementById("app").style.display="flex";setRole(k);
+function enter(k){try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{autoReturnHandovers()}catch(e){}document.getElementById("login").style.display="none";document.getElementById("app").style.display="flex";setRole(k);
  try{tourOfferOnce()}catch(e){}}
 
 /* ============ CỔNG HỌC VIÊN (file HTML riêng) ============
@@ -10719,7 +10759,7 @@ function hvToggleSide(){var s=document.getElementById("hvSide");if(!s)return;
  var m=document.getElementById("hvMask");if(m)m.classList.toggle("on",on)}
 function hvCloseSide(){var s=document.getElementById("hvSide");if(s)s.classList.remove("open");
  var m=document.getElementById("hvMask");if(m)m.classList.remove("on")}
-function bootHV(sid){window.HVPORTAL=1;try{deriveAll()}catch(e){}
+function bootHV(sid){window.HVPORTAL=1;try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}
  var stu=rows("DL09");
  window.HVID=sid||(stu[0]||{}).student_id;
  /* V9.17: bỏ ô "Xem thử hồ sơ" ở sidebar - chọn học viên đã có màn cổng lo, đổi người = nút bên dưới */

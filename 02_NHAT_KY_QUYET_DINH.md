@@ -295,7 +295,20 @@
 > im lặng, không ai biết cho tới khi có người hỏi "sao không thấy việc". Tiện thể thêm "Giao việc" vào
 > chuông của tư vấn / kế toán / marketing - trước đó chỉ học vụ và giáo viên nhận được.
 >
-> **(D) MẢNG 5** (mảng cuối của hội đồng 6 chuyên gia): `slaChip(param)` in số SLA kèm icon bánh răng
+> **(D) MẢNG 5 - đang làm, xong phần "sửa ở đây" (28/07, V9.29f):**
+> · Khai **23 tham số** app đọc thật mà không có ô sửa; bỏ 2 dòng CH2 chết.
+> · **`cfEnsure()`**: mọi tham số khai trong `APPPARAMS` được **gieo thành dòng cấu hình thật** lúc
+> khởi động (15 dòng mới). Anh Luân bắt: màn Cài đặt còn hiện *"chưa có trên sheet"* - dấu vết thời
+> chạy Google Sheets, giờ dữ liệu nằm trong chính app nên không được có trạng thái lấp lửng đó nữa.
+> Đã **bỏ hẳn** nhãn ấy. Nguồn duy nhất vẫn là `APPPARAMS`, KHÔNG chép danh sách sang pipeline Python.
+> · **`slaChip(name, mặc_định)`**: in con số SLA kèm bánh răng, bấm là `cfGo()` nhảy thẳng tới đúng
+> dòng cấu hình và **tô sáng** 2.6 giây. Mỗi dòng cấu hình nay có `id="cfrow_<tên>"`.
+> · `_check16` canh **hai chiều**: tham số app đọc phải có ô sửa, và tham số khai phải có dòng thật.
+> **CÒN LẠI:** nút "Sửa câu này" cho CH4 · link về CH1 khi hiện nhãn enum · dọn 4 hàm render chết +
+> `roleSel` · `statStrip` bấm được ở 15 trang · màn cấp thêm quota WOW · notebar cho tab CH6 ·
+> đưa `DUEFALL=5` + 16 nhóm câu chăm RTOUCH + giờ hẹn preset vào cấu hình.
+>
+> *(mô tả gốc)* **(D) MẢNG 5** (mảng cuối của hội đồng 6 chuyên gia): `slaChip(param)` in số SLA kèm icon bánh răng
 > nhảy về đúng dòng cấu hình (dùng `window.CFHL` để cuộn + tô), nút "Sửa câu này" cạnh câu CH4 trong
 > `sopBlock` (`window.MSGQ` đã có), link về CH1 khi hiện nhãn enum, **khai 23 tham số app đang đọc thật
 > mà thiếu ô sửa** (`refundFull/Partial/Reduced_days`, `slaTeacherNote_hours`, `thresholdDeposit_minimum`,
