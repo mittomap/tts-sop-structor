@@ -853,6 +853,15 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:900px){.grid2{grid-template-columns:1fr}}
 .minibar{height:10px;background:var(--gray);border-radius:6px;overflow:hidden;margin-top:4px}.minibar>i{display:block;height:100%;background:var(--navy)}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#1E2A38;color:#fff;font-size:13px;font-weight:600;padding:11px 18px;border-radius:10px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:80}.toast.show{opacity:1}
+.notis{position:fixed;right:16px;bottom:16px;z-index:96;display:flex;flex-direction:column;gap:9px;max-width:330px}
+.noti{background:#fff;border:1px solid var(--line);border-left:4px solid var(--navy);border-radius:11px;box-shadow:0 10px 28px rgba(15,30,50,.2);padding:11px 13px;display:flex;gap:10px;align-items:flex-start;cursor:pointer;animation:notiIn .22s ease}
+.noti.red{border-left-color:var(--red)}
+.noti .nic{font-size:18px;color:var(--navy);margin-top:1px;flex:none}
+.noti.red .nic{color:var(--red)}
+.noti b{font-size:12.5px;display:block}
+.noti span{font-size:11.5px;color:var(--muted);line-height:1.5;display:block;margin-top:2px}
+.noti .nx{margin-left:4px;border:0;background:none;cursor:pointer;color:var(--muted);font-size:15px;line-height:1;padding:0 2px;flex:none}
+@keyframes notiIn{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
 .login{position:fixed;inset:0;background:linear-gradient(160deg,#1B3350,#2E5A88);display:flex;align-items:center;justify-content:center;z-index:90;padding:20px}
 .loginbox{background:#fff;border-radius:18px;padding:34px;max-width:720px;width:100%}
 .loginbox h2{font-size:21px;font-weight:800}.loginbox p{font-size:13px;color:var(--muted);margin:6px 0 20px}
@@ -882,7 +891,7 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
   <div class="main">
     <div class="topbar">
       <button class="tbtn navtoggle" onclick="toggleNav()" aria-label="Menu"><i class="ti ti-menu-2"></i></button>
-      <div style="display:flex;align-items:center;gap:10px"><div><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span class="chip blue" id="demoBadge" style="display:none">DỮ LIỆU DEMO</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><div><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px"><span class="chip blue roomChip" id="demoBadge">Room demo</span><button class="btn sm" onclick="demoReset()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ và mọi máy trong room cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
       <div class="rolesel">
         <select class="sel" id="roleSel" onchange="setRole(this.value)" style="display:none"></select>
         <button class="tbtn" onclick="toggleBell(event)" aria-label="Thông báo"><i class="ti ti-bell"></i><span class="n" id="bellN" style="display:none">0</span></button>
@@ -949,10 +958,13 @@ function syncApply(){if(!window.__pendSync)return;
  if(ae&&/INPUT|TEXTAREA|SELECT/.test(ae.tagName||"")&&ae.closest&&ae.closest("#content")){setTimeout(syncApply,800);return} /* đang gõ: thử lại sau */
  window.__pendSync=0;
  if(__psT){clearTimeout(__psT);__psT=null;var __pre=__base;demoSave();
-  if(__base!==__pre)return} /* có thao tác local chưa kịp lưu: chốt nó làm bản MỚI NHẤT, các cổng kia tự hội tụ theo - không áp đè bản cũ hơn */
+  if(__pre!==null&&__base!==__pre){ /* thao tác local chưa kịp lưu: chốt nó làm bản MỚI NHẤT (lúc boot __pre=null thì KHÔNG coi là local-thắng - phải áp bản remote) */
+   if(window.__fromRoom){window.__fromRoom=0;try{roomCastState()}catch(e){};window.__fromRoom=1} /* tin đến từ room: phát bản local-thắng ra room ngay, không thì 2 máy lệch vĩnh viễn */
+   return}}
  var by="";
  try{var st=JSON.parse(raw);
   if(st.sig!==SEED_SIG){if(!window.__sigwarn){window.__sigwarn=1;toast("Một cửa sổ khác đang chạy BỘ DỮ LIỆU KHÁC - không đồng bộ với cửa sổ này.",4500)}return}
+  if(!window.HVPORTAL&&typeof bellItems==="function")try{window.__preBell=notiKeys()}catch(e){window.__preBell=null} /* chụp việc-cần-làm TRƯỚC khi áp - để nổ bong bóng đúng việc MỚI */
   DATA.dl=st.dl;DL=DATA.dl;if(st.config)DATA.config=st.config;if(st.enums){DATA.enums=st.enums;ENUM=DATA.enums}
   by=st.by||"";__base=demoPack();
  }catch(e){return}
@@ -963,8 +975,9 @@ function syncApply(){if(!window.__pendSync)return;
  if(typeof updateBellBadge==="function")try{updateBellBadge()}catch(e){}
  var lg=document.getElementById("login");
  if(lg&&lg.style.display!=="none"&&lg.innerHTML){try{if(window.HVPORTAL)demoGateHV();else demoGate()}catch(e){}}
- if(!window.__fromRoom)try{roomCastState()}catch(e){} /* cửa sổ trong phòng chuyển tiếp bản lưu của các cửa sổ cùng máy sang các máy kia */
- toast("Dữ liệu vừa cập nhật từ cổng khác"+(by?" ("+by+")":"")+".",3200)}
+ if(!window.__fromRoom)try{roomCastState()}catch(e){} /* cửa sổ trong room chuyển tiếp bản lưu của các cửa sổ cùng máy sang các máy kia */
+ toast("Dữ liệu vừa cập nhật từ cổng khác"+(by?" ("+by+")":"")+".",3200);
+ if(!window.HVPORTAL)try{notiDiff(by)}catch(e){}}
 if(CANLS&&!SVR&&typeof window.addEventListener==="function"){
  window.addEventListener("storage",function(e){
   if(e.key==="ITTS_PING_V1"){toast("Nhận được tín hiệu từ cửa sổ khác - đồng bộ HOẠT ĐỘNG.",3200);return}
@@ -973,97 +986,176 @@ if(CANLS&&!SVR&&typeof window.addEventListener==="function"){
 }
 function demoPing(){if(!CANLS){toast("Trình duyệt đang chặn lưu trữ - không đồng bộ được.");return}
  try{localStorage.setItem("ITTS_PING_V1",String(new Date().getTime()))}catch(e){}
- if(ROOM.on){var nm="";try{nm=window.HVPORTAL?"Trang học viên":(typeof myName==="function"?myName():"")}catch(e){}
+ if(ROOM.on&&roomN()){var nm="";try{nm=window.HVPORTAL?"Trang học viên":(typeof myName==="function"?myName():"")}catch(e){}
   try{roomCast({t:"ping",by:nm})}catch(e){}
-  toast("Đã phát tín hiệu tới các cửa sổ máy này VÀ các máy trong phòng "+ROOM.code+" - bên kia phải hiện thông báo trong 1-2 giây.",5200);return}
- toast("Đã phát tín hiệu - cửa sổ kia phải hiện thông báo trong 1-2 giây. Không hiện = đồng bộ không chạy (dùng Chrome hoặc http.server). Đồng bộ giữa 2 MÁY khác nhau: dùng nút Tạo phòng 2 máy.",5200)}
+  toast("Đã phát tín hiệu tới các cửa sổ máy này VÀ "+roomN()+" máy trong Room demo - bên kia phải hiện thông báo trong 1-2 giây.",5200);return}
+ toast("Đã phát tín hiệu - cửa sổ kia phải hiện thông báo trong 1-2 giây. Không hiện = đồng bộ không chạy (dùng Chrome hoặc http.server). Máy khác mở cùng bản demo sẽ TỰ vào Room demo khi có mạng.",5200)}
 
-/* ===== PHÒNG DEMO 2 MÁY (V9.16): đồng bộ giữa các MÁY KHÁC NHAU qua WebRTC (PeerJS) =====
-   - Máy A bấm "Tạo phòng 2 máy" -> có MÃ PHÒNG 5 ký tự; máy B bấm "Vào phòng 2 máy" nhập mã.
+/* ===== ROOM DEMO (V9.17): TỰ ĐỘNG đồng bộ giữa các MÁY KHÁC NHAU qua WebRTC (PeerJS) =====
+   - KHÔNG cần mã phòng: mọi máy mở bản demo (cùng bộ dữ liệu) tự vào chung MỘT room.
+     Máy đầu tiên giữ id chung làm TRẠM TRUNG CHUYỂN; máy sau thấy id bận thì vào làm khách;
+     trạm biến mất thì các máy còn lại nghỉ ngẫu nhiên rồi tranh làm trạm, tự nối lại.
    - Tin gửi đi = đúng khối state của localStorage; tin nhận về = ghi vào localStorage rồi đi qua
      syncApply như thể một cổng khác trên máy vừa lưu -> chuông/badge/toast/last-write-wins tự chạy.
-   - Thư viện PeerJS chỉ TẢI KHI BẤM NÚT (cần mạng); bản offline không đụng nút này thì như cũ.
-   - Máy tạo phòng là TRẠM TRUNG CHUYỂN: nhận tin của một khách rồi phát lại cho các khách còn lại.
-     Cầu nối bắt tay là dịch vụ PeerJS công cộng miễn phí - đủ cho demo, không dùng cho dữ liệu thật. */
-var ROOM={p:null,conns:[],code:"",host:false,on:false};
-function roomStatus(){if(!ROOM.on)return"";
- var n=ROOM.conns.filter(function(c){return c&&c.open}).length;
- return ROOM.host?("Phòng "+ROOM.code+(n?(" - đang nối "+n+" máy"):" - chờ máy khác vào")):("Trong phòng "+ROOM.code)}
+   - Thư viện PeerJS tải NGẦM khi có mạng; máy offline thì room im lặng đứng ngoài, app chạy như cũ.
+   - Cầu nối bắt tay là dịch vụ PeerJS công cộng miễn phí - đủ cho demo, không dùng dữ liệu thật.
+   - LƯU Ý: ai mở link demo cùng phiên bản cũng vào chung room (kể cả người lạ). Cần demo riêng tư
+     thì bấm "Ngắt room"; muốn cả room về dữ liệu gốc thì bấm "Reset demo". */
+var ROOM={p:null,conns:[],code:"AUTO",host:false,on:false,lastRaw:null};
+function roomOffFlag(){return ssGet("ITTS_ROOM_OFF")==="1"}
+function roomN(){var n=ROOM.conns.filter(function(c){return c&&c.open}).length;
+ return ROOM.host?n:(ROOM.remoteN!=null?ROOM.remoteN:n)} /* khách lấy sĩ số do trạm phát ({t:"n"}) */
+function roomStatus(){
+ if(roomOffFlag())return "Room demo: đã ngắt";
+ if(!ROOM.on)return "Room demo: đang dò máy khác...";
+ var n=roomN();
+ return "Room demo: "+(n?("nối "+n+" máy khác"):"chỉ máy này")}
 function roomLib(cb){if(window.Peer){cb();return}
  if(window.__peerLoading){setTimeout(function(){roomLib(cb)},400);return}
- window.__peerLoading=1;toast("Đang tải thư viện kết nối (cần mạng)...",2200);
+ window.__peerLoading=1;
  var urls=["https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js","https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"];
- (function tryN(i){if(i>=urls.length){window.__peerLoading=0;toastErr("Không tải được thư viện kết nối - máy này có mạng không?");return}
+ (function tryN(i){if(i>=urls.length){window.__peerLoading=0;return} /* offline: im lặng, lượt sau thử lại */
   var s=document.createElement("script");s.src=urls[i];
   s.onload=function(){window.__peerLoading=0;cb()};
   s.onerror=function(){try{s.remove()}catch(e){};tryN(i+1)};
   document.head.appendChild(s)})(0)}
-function roomId(code){return "itts-demo-"+SEED_SIG+"-"+code} /* gắn SEED_SIG: 2 máy phải chạy CÙNG bộ dữ liệu */
-function roomMake(){roomLib(function(){
- var code="",AB="ABCDEFGHJKMNPQRSTUVWXYZ23456789";for(var i=0;i<5;i++)code+=AB[Math.floor(Math.random()*AB.length)];
- var p=new Peer(roomId(code));
- p.on("open",function(){ROOM={p:p,conns:[],code:code,host:true,on:true};ssSet("ITTS_ROOM",code);ssSet("ITTS_ROOM_HOST","1");
-  roomUiRefresh();toast("Đã tạo phòng. Trên máy kia bấm 'Vào phòng 2 máy' và nhập mã: "+code,7000)});
- p.on("connection",roomWire);
- p.on("error",function(e){if(String(e.type)==="unavailable-id"){try{p.destroy()}catch(e2){};roomMake();return}roomFail(e)});
- p.on("disconnected",function(){try{p.reconnect()}catch(e){}})})}
-function roomJoin(code){code=String(code||"").trim().toUpperCase();if(!code){toastErr("Chưa nhập mã phòng.");return}
+function roomId(){return "itts-demo-"+SEED_SIG+"-auto"} /* gắn SEED_SIG: chỉ máy chạy CÙNG bộ dữ liệu mới chung room */
+window.__roomGen=0; /* THẾ HỆ kết nối: bump gen là mọi callback/timer của lượt cũ tự vô hiệu (chống zombie) */
+function roomDead(gen,p){if(gen!==window.__roomGen||roomOffFlag()){try{if(p)p.destroy()}catch(e){};return true}return false}
+function roomAuto(){ /* tự nối - không cần mã: thử giữ id chung (làm trạm), id bận thì vào làm khách */
+ if(SVR||!CANLS||roomOffFlag()||ROOM.on||window.__roomBusy)return;
+ if(typeof navigator!=="undefined"&&navigator.onLine===false){roomRetry();return}
+ window.__roomBusy=1;
+ var gen=++window.__roomGen;
+ setTimeout(function(){if(gen===window.__roomGen&&!ROOM.on&&window.__roomBusy){window.__roomBusy=0;roomRetry()}},20000);
  roomLib(function(){
- var p=new Peer();
- p.on("open",function(){var c=p.connect(roomId(code),{reliable:true});
-  var t=setTimeout(function(){if(!(c&&c.open)){toastErr("Không thấy phòng "+code+" - kiểm tra lại mã (máy kia phải đang giữ phòng mở).");try{p.destroy()}catch(e){}}},9000);
-  c.on("open",function(){clearTimeout(t);ROOM={p:p,conns:[c],code:code,host:false,on:true};ssSet("ITTS_ROOM",code);ssSet("ITTS_ROOM_HOST","");
-   roomWireData(c);roomUiRefresh();toast("Đã vào phòng "+code+" - các máy trong phòng giờ thấy chung dữ liệu demo.",4500);
-   try{c.send({t:"hello"})}catch(e){}});
-  c.on("close",function(){if(ROOM.on&&!ROOM.host){roomLeave(1);toastErr("Mất kết nối phòng (máy giữ phòng đóng?) - bấm Vào phòng nếu muốn nối lại.")}})});
- p.on("error",function(e){if(String(e.type)==="peer-unavailable"){toastErr("Không thấy phòng "+code+" - kiểm tra lại mã.");return}roomFail(e)})})}
-function roomWire(c){ /* máy giữ phòng nhận thêm khách */
+ if(gen!==window.__roomGen){window.__roomBusy=0;return}
+ var p=new Peer(roomId());window.__roomPend=p;
+ p.on("open",function(){
+  if(ROOM.p===p){roomUiRefresh();return} /* PeerJS bắn open LẠI sau reconnect: giữ nguyên conns, đừng reset */
+  if(roomDead(gen,p)){window.__roomBusy=0;return}
+  window.__roomBusy=0;ROOM={p:p,conns:[],code:"AUTO",host:true,on:true,lastRaw:ROOM.lastRaw,remoteN:null};roomUiRefresh()});
+ p.on("connection",function(c){if(gen!==window.__roomGen){try{c.close()}catch(e){};return}roomWire(c)});
+ p.on("error",function(e){var t=String(e&&e.type);
+  if(gen!==window.__roomGen)return;
+  if(t==="unavailable-id"){try{p.destroy()}catch(e2){};roomJoinAuto(gen);return}
+  window.__roomBusy=0;roomRetry()});
+ p.on("disconnected",function(){try{p.reconnect()}catch(e){}})})}
+function roomJoinAuto(gen){ /* id chung đã có máy giữ -> vào làm khách */
+ if(gen!==window.__roomGen)return;
+ var p=new Peer();window.__roomPend=p;
+ p.on("open",function(){if(roomDead(gen,p)){window.__roomBusy=0;return}
+  var c=p.connect(roomId(),{reliable:true});
+  var t=setTimeout(function(){if(gen!==window.__roomGen)return;
+   if(!(c&&c.open)){try{p.destroy()}catch(e){};window.__roomBusy=0;roomRetry()}},9000);
+  c.on("open",function(){clearTimeout(t);
+   if(roomDead(gen,p)){window.__roomBusy=0;return}
+   window.__roomBusy=0;
+   ROOM={p:p,conns:[c],code:"AUTO",host:false,on:true,lastRaw:ROOM.lastRaw,remoteN:null};
+   roomWireData(c);roomUiRefresh()});
+  c.on("close",function(){if(gen===window.__roomGen&&ROOM.on&&!ROOM.host)roomDown()})});
+ p.on("error",function(e){var t=String(e&&e.type);
+  if(gen!==window.__roomGen)return;
+  if(t==="peer-unavailable"){try{p.destroy()}catch(e2){};window.__roomBusy=0;
+   setTimeout(function(){if(gen===window.__roomGen)roomAuto()},200+Math.floor(Math.random()*900));return} /* trạm vừa rời: tranh làm trạm */
+  window.__roomBusy=0;roomRetry()})}
+function roomDown(){ /* mất trạm trung chuyển: nghỉ ngẫu nhiên rồi tự nối lại (tránh giẫm nhau) */
+ window.__roomGen++;window.__roomBusy=0;
+ try{if(ROOM.p)ROOM.p.destroy()}catch(e){}
+ ROOM={p:null,conns:[],code:"AUTO",host:false,on:false,lastRaw:ROOM.lastRaw,remoteN:null};roomUiRefresh();
+ setTimeout(roomAuto,300+Math.floor(Math.random()*1500))}
+function roomRetry(){roomUiRefresh();clearTimeout(window.__roomRt);window.__roomRt=setTimeout(roomAuto,15000)}
+function roomToggle(){ /* Ngắt / nối lại room (nhớ theo TAB) */
+ if(roomOffFlag()){ssSet("ITTS_ROOM_OFF",null);window.__roomGen++;window.__roomBusy=0;clearTimeout(window.__roomRt);
+  roomUiRefresh();roomAuto();toast("Đang nối lại Room demo...",2500)}
+ else{ssSet("ITTS_ROOM_OFF","1");window.__roomGen++;window.__roomBusy=0;clearTimeout(window.__roomRt);
+  try{if(window.__roomPend)window.__roomPend.destroy()}catch(e){}
+  try{if(ROOM.p)ROOM.p.destroy()}catch(e){}
+  ROOM={p:null,conns:[],code:"AUTO",host:false,on:false,lastRaw:null,remoteN:null};roomUiRefresh();
+  toast("Đã ngắt máy này khỏi Room demo - chỉ còn đồng bộ giữa các cửa sổ trên máy.",3200)}}
+function roomWire(c){ /* trạm nhận thêm máy khách */
  ROOM.conns.push(c);
- c.on("open",function(){roomUiRefresh();
+ c.on("open",function(){roomUiRefresh();roomCastN();
   var raw=null;try{raw=localStorage.getItem(LSKEY)}catch(e){}
-  if(raw)try{c.send({t:"state",raw:raw,init:1})}catch(e){} /* khách mới vào nhận ngay hiện trạng */
+  if(raw){ROOM.lastRaw=raw;try{c.send({t:"state",raw:raw,init:1})}catch(e){}} /* máy mới vào nhận ngay hiện trạng */
  });
  roomWireData(c);
- c.on("close",function(){roomUiRefresh()})}
+ c.on("close",function(){var i=ROOM.conns.indexOf(c);if(i>=0)ROOM.conns.splice(i,1);roomUiRefresh();roomCastN()})} /* gỡ hẳn conn đã đóng khỏi danh sách */
+function roomCastN(){if(ROOM.host)try{roomCast({t:"n",n:roomN()})}catch(e){}} /* trạm phát sĩ số room cho khách */
 function roomWireData(c){c.on("data",function(m){roomRecv(m,c)})}
 function roomRecv(m,from){if(!m||!m.t)return;
- if(m.t==="ping")toast("Nhận tín hiệu từ máy khác"+(m.by?" ("+m.by+")":"")+" - kết nối 2 máy HOẠT ĐỘNG.",3200);
- else if(m.t==="hello")toast("Một máy vừa vào phòng "+ROOM.code+".",2600);
- else if(m.t==="reset"){if(ROOM.host)roomRelay(m,from);try{localStorage.removeItem(LSKEY)}catch(e){};location.reload();return}
+ if(m.t==="ping")toast("Nhận tín hiệu từ máy khác"+(m.by?" ("+m.by+")":"")+" - Room demo HOẠT ĐỘNG.",3200);
+ else if(m.t==="n"){ROOM.remoteN=m.n;roomUiRefresh();return}
+ else if(m.t==="reset"){
+  if(ROOM.host)roomRelay(m,from);
+  var cr=null;try{cr=localStorage.getItem(LSKEY)}catch(e){}
+  if(cr==null)return; /* đã nguyên bản rồi - nuốt tin trùng, chặn bão reload */
+  try{localStorage.removeItem(LSKEY)}catch(e){}
+  setTimeout(function(){location.reload()},ROOM.host?300:60); /* trạm phải chờ DataChannel kịp đẩy relay đi rồi mới reload */
+  return}
  else if(m.t==="state"&&m.raw){
-  try{var st=JSON.parse(m.raw);if(st.sig!==SEED_SIG){if(!window.__roomsig){window.__roomsig=1;toastErr("Máy kia đang chạy BỘ DỮ LIỆU KHÁC - 2 máy phải mở cùng một phiên bản demo.")}return}}catch(e){return}
+  if(m.raw===ROOM.lastRaw)return; /* đã có đúng bản này - chặn dội, không khuếch đại tin trùng */
+  try{var st=JSON.parse(m.raw);if(st.sig!==SEED_SIG){if(!window.__roomsig){window.__roomsig=1;toastErr("Máy kia đang chạy BỘ DỮ LIỆU KHÁC - 2 máy phải mở cùng một phiên bản demo.")}return}
+   var cw=null,ct=0;try{cw=localStorage.getItem(LSKEY);ct=cw?(JSON.parse(cw).t||0):0}catch(e2){}
+   if(cw&&ct&&st.t&&st.t<ct){ /* bản đến CŨ hơn bản đang giữ: bỏ, PHÁT LẠI bản mới cho room (last-write-wins theo giờ ghi - chống init cũ đè bản mới, giúp 3 máy hội tụ) */
+    ROOM.lastRaw=null;try{roomCastState()}catch(e3){}
+    return}
+  }catch(e){return}
+  ROOM.lastRaw=m.raw;
   window.__fromRoom=1;
   try{localStorage.setItem(LSKEY,m.raw)}catch(e){}
   window.__pendSync=1;try{syncApply()}catch(e){}
-  window.__fromRoom=0}
- if(ROOM.host&&(m.t==="state"||m.t==="ping"))roomRelay(m,from)}
+  window.__fromRoom=0;
+  if(ROOM.host)roomRelay(m,from)} /* chỉ relay bản ĐÃ áp - bản trùng/cũ không phát tán */
+ if(ROOM.host&&m.t==="ping")roomRelay(m,from)}
 function roomRelay(m,from){ROOM.conns.forEach(function(c){if(c!==from&&c&&c.open)try{c.send(m)}catch(e){}})}
 function roomCast(m){if(!ROOM.on)return;ROOM.conns.forEach(function(c){if(c&&c.open)try{c.send(m)}catch(e){}})}
 function roomCastState(){if(!ROOM.on||window.__fromRoom)return;
  var raw=null;try{raw=localStorage.getItem(LSKEY)}catch(e){}
- if(raw)roomCast({t:"state",raw:raw})}
-function roomLeave(silent){ssSet("ITTS_ROOM",null);ssSet("ITTS_ROOM_HOST",null);
- try{if(ROOM.p)ROOM.p.destroy()}catch(e){}
- ROOM={p:null,conns:[],code:"",host:false,on:false};roomUiRefresh();
- if(!silent)toast("Đã rời phòng 2 máy - máy này quay về đồng bộ nội bộ như cũ.",2800)}
-function roomFail(e){toastErr("Kết nối 2 máy gặp lỗi ("+((e&&e.type)||"?")+") - kiểm tra mạng rồi thử lại.")}
-function roomUiRefresh(){var lg=document.getElementById("login");
+ if(!raw||raw===ROOM.lastRaw)return; /* không dội lại đúng bản vừa nhận/vừa phát */
+ ROOM.lastRaw=raw;roomCast({t:"state",raw:raw})}
+function roomUiRefresh(){
+ var __rc=roomOffFlag()?"gray":(ROOM.on?(roomN()?"blue":"gray"):"amber");
+ try{[].forEach.call(document.querySelectorAll(".roomChip"),function(n){n.textContent=roomStatus();n.className="chip roomChip "+__rc})}catch(e){}
+ var lg=document.getElementById("login");
  if(lg&&lg.style.display!=="none"&&lg.innerHTML){try{if(window.HVPORTAL)demoGateHV();else demoGate()}catch(e){}}
  if(!window.HVPORTAL&&typeof CUR!=="undefined"&&CUR==="settings"&&typeof reRender==="function")try{reRender("settings")}catch(e){}}
-function roomJoinAsk(){var code=prompt("Nhập MÃ PHÒNG đang hiện trên máy kia (5 ký tự):");if(code!=null)roomJoin(code)}
 function roomBtnHTML(){
- if(ROOM.on)return '<span class="chip blue">'+esc(roomStatus())+'</span> <button class="btn sm" onclick="roomLeave()"><i class="ti ti-plug-x"></i>Rời phòng</button>';
- return '<button class="btn sm" onclick="roomMake()" title="Tạo mã phòng để MÁY KHÁC vào demo chung"><i class="ti ti-devices"></i>Tạo phòng 2 máy</button>'+
-  '<button class="btn sm" onclick="roomJoinAsk()" title="Nhập mã phòng máy kia đã tạo"><i class="ti ti-login-2"></i>Vào phòng 2 máy</button>'}
-/* tự nối lại phòng sau F5 (mã lưu theo TAB - sessionStorage) */
-function roomResume(){var code=ssGet("ITTS_ROOM");if(!code)return;
- if(ssGet("ITTS_ROOM_HOST")==="1"){roomLib(function(){var p=new Peer(roomId(code));
-  p.on("open",function(){ROOM={p:p,conns:[],code:code,host:true,on:true};roomUiRefresh()});
-  p.on("connection",roomWire);
-  p.on("error",function(e){if(String(e.type)==="unavailable-id"){ssSet("ITTS_ROOM_HOST","");roomJoin(code)}});
-  p.on("disconnected",function(){try{p.reconnect()}catch(e){}})})}
- else roomJoin(code)}
-if(!SVR&&CANLS&&typeof window.addEventListener==="function"&&typeof document!=="undefined")setTimeout(function(){try{roomResume()}catch(e){}},800);
+ var n=roomN();
+ var cls=roomOffFlag()?"gray":(ROOM.on?(n?"blue":"gray"):"amber");
+ return '<span class="chip '+cls+'">'+esc(roomStatus())+'</span>'+
+  '<button class="btn sm" onclick="roomToggle()" title="'+(roomOffFlag()?"Cho máy này vào lại Room demo":"Tách máy này khỏi Room demo (demo riêng tư trên máy)")+'">'+
+  (roomOffFlag()?'<i class="ti ti-devices"></i>Nối lại room':'<i class="ti ti-plug-x"></i>Ngắt room')+'</button>'}
+/* TỰ VÀO ROOM khi mở app; có mạng trở lại cũng tự nối */
+if(!SVR&&CANLS&&typeof window.addEventListener==="function"&&typeof document!=="undefined"){
+ setTimeout(function(){try{roomAuto()}catch(e){}},600);
+ try{window.addEventListener("online",function(){setTimeout(function(){try{roomAuto()}catch(e){}},800)})}catch(e){}}
+
+/* ===== BONG BÓNG VIỆC MỚI (V9.17): việc cần duyệt / cần xử lý phát sinh từ cổng khác hay máy khác
+   nổ thẻ thông báo ở góc phải dưới - dễ thấy, không choán chỗ, bấm vào là nhảy tới nơi xử lý.
+   Cách đo "việc mới": chụp bellItems() TRƯỚC khi áp dữ liệu đồng bộ, so với SAU khi áp -
+   chỉ việc mới xuất hiện (đúng phạm vi vai trò đang đăng nhập) mới nổ. Tối đa 3 thẻ, tự tắt 9s. */
+function notiKey(x){return (x.grp||x.cat||"")+"|"+(x.who||"")+"|"+(x.what||"")}
+function notiKeys(){var o={};try{bellItems().forEach(function(x){o[notiKey(x)]=1})}catch(e){}return o}
+function notiShow(tt,sub,page,red){if(typeof document==="undefined"||!document.body)return;
+ var box=document.getElementById("notis");
+ if(!box){box=document.createElement("div");box.id="notis";box.className="notis";document.body.appendChild(box)}
+ var el=document.createElement("div");el.className="noti"+(red?" red":"");
+ el.innerHTML='<i class="ti ti-bell-ringing nic"></i><div style="flex:1;min-width:0"><b>'+esc(tt)+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</div><button class="nx" aria-label="Đóng thông báo">&times;</button>';
+ el.onclick=function(ev){var t=ev.target;
+  if(t&&t.className==="nx"){ev.stopPropagation();el.remove();return}
+  el.remove();if(page&&typeof go==="function")try{go(page)}catch(e){}};
+ box.appendChild(el);
+ while(box.children.length>3)box.removeChild(box.firstChild);
+ setTimeout(function(){try{el.remove()}catch(e){}},9000)}
+function notiDiff(by){var pre=window.__preBell;window.__preBell=null;if(!pre)return;
+ var fresh=[];try{fresh=bellItems().filter(function(x){return !pre[notiKey(x)]})}catch(e){return}
+ if(!fresh.length)return;
+ var red=fresh.some(function(x){return x.sev==="red"});
+ var f0=fresh[0];
+ var tt=fresh.length===1?((f0.grp||f0.cat||"Việc mới cần xử lý")+(by?" - từ "+by:"")):("Có "+fresh.length+" việc mới cần xử lý"+(by?" - từ "+by:""));
+ var sub=fresh.slice(0,2).map(function(x){return (x.who?x.who+": ":"")+(x.what||"")}).join("  ·  ")+(fresh.length>2?"  ·  +"+(fresh.length-2)+" việc khác":"");
+ notiShow(tt,sub,f0.page||"banlam",red)}
 demoLoad();
 function rows(c){return DL[c]||[]}
 function find(c,f,v){var a=rows(c);for(var i=0;i<a.length;i++)if(a[i][f]===v)return a[i];return null}
@@ -2167,7 +2259,7 @@ function renderTracuu(){
  res.slice(0,40).forEach(function(r){var cl=naCls(r.na);h+='<div class="task '+cl+'"><div class="ti"><div class="id">'+esc(r.t)+' - '+esc(r.id)+'</div><div class="nm">'+esc(r.nm)+'</div><div class="mt">'+esc(r.sub)+'</div>'+(r.na?'<div class="na">'+esc(r.na)+'</div>':'')+'</div>'+mstripFor(r.pid,MIX)+'<div class="ac">'+(r.sid?'<button class="btn sm" onclick="openHoso(\''+r.sid+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>':'<button class="btn sm" onclick="openQuick(\''+esc(r.id)+'\')"><i class="ti ti-external-link"></i>Mở lead</button>')+'</div></div>'});
  if(res.length>40)h+='<div class="mut" style="font-size:11px;padding:6px">... còn '+(res.length-40)+' kết quả - gõ rõ hơn để thu hẹp.</div>';
  h+='</div></div>';return h}
-function openHoso(sid){window.JPID=sid;window.HOSO=sid;go("hoso")}
+function openHoso(sid){if(sid!==window.JPID)window.HSTAB="in";window.JPID=sid;window.HOSO=sid;go("hoso")}
 function openLop(cid){window.BLCLASS=cid;go("banglop")}
 function goDD(cid,sess){window.BLCLASS=cid;window.DDCLASS=cid;window.DDSESS=sess;window.BLTAB="buoi";go("banglop")}
 function openDrawer(title,html){document.getElementById("drawerTitle").textContent=title;document.getElementById("drawerBody").innerHTML=html;document.getElementById("mask").classList.add("on");document.getElementById("drawer").classList.add("on")}
@@ -3707,7 +3799,7 @@ function renderHanhtrinh(){
  if(!list.length)h+='<div class="panel"><div class="empty">Không có hồ sơ nào khớp bộ lọc.</div></div>';
  return h}
 /* ===== MÀN 2: HỒ SƠ HÀNH TRÌNH MỘT NGƯỜI ===== */
-function jOpen(pid){window.JPID=pid;go("hoso")}
+function jOpen(pid){if(pid!==window.JPID)window.HSTAB="in";window.JPID=pid;go("hoso")}
 function hosoGoStage(pid,k){window.RUN={pid:pid,q:null,i:0,msg:"",viewStep:k};go("chay")}
 function jStepper(J,clickable){var cur=J.S.idx,h='<div class="jstep">';
  var mode=(clickable===true)?"run":clickable;var pid=J.C.pid;
@@ -3787,11 +3879,16 @@ function renderHoso(){
  var present=C.att.filter(function(a){return isc(a.attendance_status,"on_time","late")}).length;
  h+='<div class="bcards">';
  h+=card("ti-user","Thông tin",kv("SĐT",esc(C.phone))+kv("Zalo",esc(L.zalo_id||"-"))+kv("Nguồn",esc(elabel(L.lead_source)||"-"))+kv("Mục tiêu",esc(L.target_band||"-"))+kv("Đối tượng",esc(elabel(S.student_type||L.student_type)||"-"))+kv("Cơ sở",esc(elabel(S.branch||L.branch)||"-")));
- if(C.tests.length){var t=C.testMain;h+=card("ti-file-text","Test đầu vào",kv("Ngày test",esc(t.test_date||"-"))+kv("Dự test",esc(elabel(t.test_attendance_status)||"-"))+kv("Overall",esc(t.overall_score||"-"))+kv("L/R/W/S",esc([t.skill_listening,t.skill_reading,t.skill_writing,t.skill_speaking].join(" / ")))+kv("Nhận xét",esc(t.academic_note||"-")))}
- /* V9.16: bảng điểm 3 mốc - hồ sơ nội bộ không được ÍT thông tin hơn trang học viên */
- if(C.sid&&(C.tests.length||C.ceMain||(C.obMain&&C.obMain.mid_overall))){
-  var o15=C.obMain||{},t15=C.testMain||{},ce15=C.ceMain||{};
-  var br15=function(lb,a,b2,c2){return '<tr><td>'+lb+'</td><td>'+esc(a||"-")+'</td><td>'+esc(b2||"-")+'</td><td>'+esc(c2||"-")+'</td></tr>'};
+ if(C.tests.length){var t=C.testMain;h+=card("ti-file-text","Test đầu vào",kv("Ngày test",esc(t.test_date||"-"))+kv("Dự test",esc(elabel(t.test_attendance_status)||"-"))+kv("Overall",esc(t.overall_score||"-"))+(C.sid?"":kv("L/R/W/S",esc([t.skill_listening,t.skill_reading,t.skill_writing,t.skill_speaking].join(" / "))))+kv("Nhận xét",esc(t.academic_note||"-")))}
+ /* V9.16: bảng điểm 3 mốc - hồ sơ nội bộ không được ÍT thông tin hơn trang học viên.
+    V9.17 (tester): cột Giữa/Ra phải CÙNG MỘT KHÓA (theo lớp của ob chính) - không trộn điểm 2 khóa;
+    điểm 0 là điểm hợp lệ, không được rơi thành "-". */
+ if(C.sid&&(C.tests.length||C.ceMain||(C.obMain&&(C.obMain.mid_overall||C.obMain.mid_listening)))){
+  var o15=C.obMain||{},t15=C.testMain||{};
+  var ce15=(C.ce||[]).filter(function(x){return o15.class_id&&String(x.class_id||"")===o15.class_id})[0]
+   ||(((C.ob||[]).filter(function(o){return o.class_id}).length<=1)?(C.ceMain||{}):{});
+  var v15=function(x){return (x===0||x==="0"||x)?esc(x):"-"};
+  var br15=function(lb,a,b2,c2){return '<tr><td>'+lb+'</td><td>'+v15(a)+'</td><td>'+v15(b2)+'</td><td>'+v15(c2)+'</td></tr>'};
   h+=card("ti-target","Điểm: vào - giữa - ra",
    '<div class="tbwrap"><table class="dt"><thead><tr><th></th><th>Vào</th><th>Giữa</th><th>Ra</th></tr></thead><tbody>'+
    br15("L",t15.skill_listening,o15.mid_listening,ce15.final_listening)+
@@ -4621,16 +4718,15 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
  if(tab==="health")return h+renderHealth();
  if(tab==="demo"){
   var d=demoDirty();
-  h+='<div class="notebar"><i class="ti ti-broadcast"></i><b>Nền demo đa cổng:</b> mọi thao tác trên bản offline được LƯU THẬT trên máy này và tự đồng bộ sang các cửa sổ/cổng đang mở (kể cả Trang học viên). Muốn 2 MÁY khác nhau demo chung: dùng Phòng 2 máy bên dưới. Hết buổi demo bấm Reset là về nguyên bản.</div>';
+  h+='<div class="notebar"><i class="ti ti-broadcast"></i><b>Nền demo đa cổng:</b> mọi thao tác trên bản offline được LƯU THẬT trên máy này và tự đồng bộ sang các cửa sổ/cổng đang mở (kể cả Trang học viên). Máy khác mở cùng bản demo cũng TỰ đồng bộ qua Room demo. Hết buổi demo bấm Reset là về nguyên bản.</div>';
   h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-device-floppy" style="margin-right:6px"></i>Trạng thái dữ liệu</b></div><div style="padding:14px 16px;font-size:12.5px;line-height:1.8">';
   h+='Nguồn dữ liệu gốc: '+(DATASRC==="file"?'file <b>ITTs_data.js</b> cạnh app (thay file này là app đọc bộ dữ liệu mới, không cần build lại)':'<b>bản nhúng trong HTML</b> (không thấy file ITTs_data.js cạnh app)')+'.<br>';
   h+='Thay đổi demo: '+(d?('<span class="chip amber">đang có thay đổi</span> lưu lần cuối lúc <b>'+new Date(d).toLocaleString("vi-VN")+'</b> (chỉ trên trình duyệt này).'):'<span class="chip green">nguyên bản</span> - chưa có thao tác nào được lưu đè.')+'<br>';
   h+='Lưu &amp; đồng bộ: '+(CANLS?'<span class="chip green">đang bật</span> - các cửa sổ mở cùng thư mục app thấy chung dữ liệu.':'<span class="chip red">trình duyệt đang chặn localStorage</span> - thao tác chỉ sống trong phiên này. Mở bằng Chrome, hoặc chạy thư mục qua <code>python3 -m http.server</code> rồi vào <code>http://localhost:8000</code>.')+'</div>';
   h+='<div style="padding:0 16px 14px"><button class="btn danger" '+(d?'onclick="demoReset()"':'disabled style="opacity:.45;cursor:default"')+'><i class="ti ti-refresh"></i>Reset dữ liệu demo (về nguyên bản)</button>'+(d?'':'<span class="mut" style="margin-left:10px;font-size:11.5px">Chưa có gì để reset.</span>')+' <button class="btn" onclick="demoPing()"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ giữa các cửa sổ</button></div></div>';
-  h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-devices" style="margin-right:6px"></i>Phòng 2 máy (demo trên các máy khác nhau)</b></div><div style="padding:14px 16px;font-size:12.5px;line-height:1.9">';
-  h+=(ROOM.on?('Trạng thái: <span class="chip blue">'+esc(roomStatus())+'</span>'):'Trạng thái: <span class="chip gray">chưa kết nối</span> - hiện chỉ đồng bộ giữa các cửa sổ TRÊN MÁY NÀY.')+'<br>';
-  h+='Máy thứ nhất bấm <b>Tạo phòng 2 máy</b> (ở đây hoặc ở màn cổng) rồi đọc MÃ PHÒNG cho máy thứ hai bấm <b>Vào phòng 2 máy</b> nhập mã. Từ lúc đó thao tác bên này bên kia nổ chuông/toast y như 2 cửa sổ cùng máy - ví dụ tạo chiết khấu lớn cần duyệt, máy của quản lý báo ngay.<br>';
-  h+='<span class="mut">Cần mạng ở cả 2 máy; 2 máy phải mở CÙNG phiên bản demo. Kênh bắt tay dùng dịch vụ PeerJS công cộng miễn phí - đủ cho demo, không dùng cho dữ liệu thật. Mất kết nối thì bấm vào lại phòng.</span></div>';
+  h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-devices" style="margin-right:6px"></i>Room demo (tự đồng bộ giữa các máy)</b></div><div style="padding:14px 16px;font-size:12.5px;line-height:1.9">';
+  h+='Mở bản demo là máy TỰ VÀO chung một room - không cần mã, không cần cài gì. Thao tác bên này, máy kia nổ chuông/toast y như 2 cửa sổ cùng máy (vd tạo chiết khấu lớn cần duyệt, máy của quản lý báo ngay). Chip "Room demo" trên thanh tiêu đề cho biết đang nối mấy máy.<br>';
+  h+='<span class="mut">Cần mạng; chỉ các máy mở CÙNG phiên bản demo mới chung room. Ai mở link demo cũng vào room này - muốn demo riêng tư trên máy mình thì bấm Ngắt room. Kênh bắt tay dùng dịch vụ PeerJS công cộng miễn phí - đủ cho demo, không dùng cho dữ liệu thật.</span></div>';
   h+='<div style="padding:0 16px 14px">'+roomBtnHTML()+'</div></div>';
   h+='<div class="panel"><div class="ph"><b><i class="ti ti-presentation" style="margin-right:6px"></i>Cách demo hai cổng cạnh nhau</b></div><div style="padding:14px 16px;font-size:12.5px;line-height:1.9;color:var(--text)">';
   h+='1. Mở <b>ITTs_WebApp_v5_demo.html</b> ở 2 cửa sổ trình duyệt (kéo mỗi cửa sổ một nửa màn hình). Cửa sổ A chọn cổng NV tư vấn, cửa sổ B chọn cổng Quản lý.<br>';
@@ -6100,6 +6196,7 @@ function hvOpenHw(id){var x=find("DL13","homework_id",id)||{};
  if(x.teacher_feedback)h+=ctxContent("Nhận xét của giảng viên",x.teacher_feedback,"var(--green)");
  h+='</div>';openDrawer("Bài đã nộp",h)}
 function hvDays(d){var x=pvnd(d);return x?Math.max(0,Math.round((Date.now()-x.getTime())/864e5)):0}
+function hvT0(){var d=new Date();d.setHours(0,0,0,0);return d.getTime()} /* 0h hôm nay */
 function hvPct(a,b){return b>0?Math.round(a/b*100):null}
 /* ===== GIỚI THIỆU BẠN BÈ (trang học viên) =====
    Học viên tự tạo mã giới thiệu cá nhân; bạn được giới thiệu giảm theo chính sách
@@ -6188,7 +6285,7 @@ function renderTrangHV(){
  var hour=new Date().getHours();var greet=hour<11?"Chào buổi sáng":hour<14?"Chào buổi trưa":hour<18?"Chào buổi chiều":"Chào buổi tối";
  var nextSes=null;
  if(lop){rows("DL11").forEach(function(x){if(x.class_id!==lop.class_id||isc(x.session_status,"cancelled","completed"))return;
-  var d=pvnd(x.session_date);if(d&&d>=new Date()&&(!nextSes||d<pvnd(nextSes.session_date)))nextSes=x})}
+  var d=pvnd(x.session_date);if(d&&d.getTime()>=hvT0()&&(!nextSes||d<pvnd(nextSes.session_date)))nextSes=x})} /* V9.17: tính từ ĐẦU HÔM NAY - buổi của chính hôm nay không được ẩn */
  h+='<div class="hvhero"><div style="flex:1"><div class="hvg">'+esc(greet)+', '+esc(S.full_name)+'</div>'+
   '<div class="hvsub">'+esc(S.student_id)+(lop?' · Lớp <b>'+esc(lop.class_name)+'</b>':'')+(lop&&lop.course_id_name?' · '+esc(lop.course_id_name):'')+
   ' · <span class="chip '+stCls(S.student_status)+'">'+esc(elabel(S.student_status))+'</span></div>'+
@@ -6261,7 +6358,9 @@ function renderTrangHV(){
  C.enr.forEach(function(e){
   if(!isc(e.enrollment_status,"cancelled"))return;
   var pd=C.pays.filter(function(p){return p.enrollment_id===e.enrollment_id}).reduce(function(a,p){return a+num(p.amount)},0);
-  if(pd>0)h+='<div class="notebar" style="margin-bottom:16px"><i class="ti ti-arrow-back-up"></i><b>Hoàn học phí:</b> trung tâm đang xử lý hoàn <b>'+vnd(pd)+'</b> cho khóa '+esc(e.course_id_name||e.course_id||"đã hủy")+' theo chính sách. Có thắc mắc bạn cứ nhắn trung tâm nhé.</div>'});
+  /* V9.17 (tester): (a) hoàn xong (payment_status=refunded) phải TẮT notebar; (b) KHÔNG hứa con số -
+     số hoàn thật do kế toán chốt theo chính sách (100/70/50/0%), hứa cả khoản đã đóng là hứa sai */
+  if(pd>0&&!isc(e.payment_status,"refunded"))h+='<div class="notebar" style="margin-bottom:16px"><i class="ti ti-arrow-back-up"></i><b>Hoàn học phí:</b> trung tâm đang xử lý hoàn học phí cho khóa '+esc(e.course_id_name||e.course_id||"đã hủy")+' theo chính sách hoàn tiền. Số tiền và thời gian hoàn sẽ được trung tâm báo trực tiếp cho bạn.</div>'});
  /* ---- 3. HÀNH TRÌNH CÙNG IELTS THE TUTORS (có mốc thời gian) ---- */
  h+='<div class="sechd" id="s-hanhtrinh">Hành trình cùng IELTS The Tutors</div>';
  var L=C.L||{};
@@ -6294,8 +6393,8 @@ function renderTrangHV(){
   h+='<div class="hvjr'+(has?" on":"")+'"><span class="hvjd"><i class="ti '+r[0]+'"></i></span>'+
    '<div class="hvjc"><b>'+esc(r[1])+'</b>'+(r[3]?'<span>'+esc(r[3])+'</span>':'')+'</div>'+
    '<div class="hvjt">'+(has?esc(r[2]):'<span class="mut">chưa có</span>')+'</div></div>'});
- h+='</div><div class="mut" style="font-size:11.5px;margin-top:12px">Bạn đang ở: <b style="color:var(--navy)">'+esc(J.S?J.S.t:"")+'</b>'+
-  (L.lead_created_time&&(ce.course_completion_time||firstAtt)?' · đồng hành cùng trung tâm '+hvDays(L.lead_created_time)+' ngày':'')+'</div></div></div>';
+ /* V9.17: bỏ "Bạn đang ở <tên chặng CRM>" - từ vựng vận hành nội bộ, không nói với học viên */
+ h+='</div>'+(L.lead_created_time&&(ce.course_completion_time||firstAtt)?'<div class="mut" style="font-size:11.5px;margin-top:12px">Bạn đã đồng hành cùng IELTS The Tutors '+hvDays(L.lead_created_time)+' ngày.</div>':'')+'</div></div>';
  /* ---- 3. TIẾN ĐỘ ---- */
  var attAll=attC.length, attOK=attC.filter(function(a){return isc(a.attendance_status,"on_time","late")}).length;
  var attP=hvPct(attOK,attAll);
@@ -6319,7 +6418,7 @@ function renderTrangHV(){
      return '<div class="hvsk"><div class="hvskl">'+esc(x[0])+(isLow?' <span class="chip amber">cần cải thiện</span>':'')+'</div><div class="hvskb"><i style="width:'+w+'%;background:'+(isLow?"var(--amber)":"var(--blue)")+'"></i></div><b>'+x[1]+'</b></div>'}).join("")+
     '</div></div></div>'}}
  /* ---- 4. SẮP TỚI ---- */
- var now=Date.now();
+ var now=hvT0(); /* V9.17: mốc = 0h hôm nay - buổi học/hạn nộp/WOW của CHÍNH HÔM NAY phải hiện */
  var upSes=[];if(lop)rows("DL11").forEach(function(s2){if(s2.class_id!==lop.class_id)return;var d=pvnd(s2.session_date);if(d&&d.getTime()>=now&&!isc(s2.session_status,"cancelled"))upSes.push(s2)});
  upSes.sort(function(a,b){return (pvnd(a.session_date)||0)-(pvnd(b.session_date)||0)});
  var upWow=C.wow.filter(function(w){var d=pvnd(w.wow_session_date);return d&&d.getTime()>=now&&isc(w.wow_status,"booked","confirmed")});
@@ -6426,8 +6525,7 @@ function renderTrangHV(){
   var acls=a?stCls(a.attendance_status):"";
   h+='<div class="hvses"><div class="hvsh">'+
    '<span class="hvsn">Buổi '+esc(s2.session_number||"?")+'</span>'+
-   '<div class="hvst"><b>'+esc(s2.session_date||"")+'</b><span>GV '+esc(s2.teacher_id_name||s2.teacher_id||"-")+
-    (num(s2.teacher_late_minutes)>0?' · <span style="color:var(--amber)">GV vào trễ '+esc(s2.teacher_late_minutes)+' phút</span>':'')+'</span></div>'+
+   '<div class="hvst"><b>'+esc(s2.session_date||"")+'</b><span>GV '+esc(s2.teacher_id_name||s2.teacher_id||"-")+'</span></div>'+ /* V9.17: "GV vào trễ" là chỉ số QA nội bộ - không hiện cho học viên */
    (a?'<span class="chip '+acls+'">'+esc(elabel(a.attendance_status))+'</span>':'<span class="chip">chưa điểm danh</span>')+'</div>';
   h+='<div class="hvsb">';
   if(a){h+='<div class="hvev"><i class="ti ti-user-check"></i><span><b>Điểm danh:</b> '+esc(elabel(a.attendance_status))+
@@ -7529,15 +7627,17 @@ function enter(k){try{deriveAll()}catch(e){}try{autoReturnHandovers()}catch(e){}
 
 /* ============ CỔNG HỌC VIÊN (file HTML riêng) ============
    Sidebar là MỤC LỤC: bấm là trượt tới đúng phần, cuộn tới đâu sáng tới đó. */
+/* V9.17 (tester): mục lục xếp ĐÚNG thứ tự khối trên trang - hết cảnh scrollspy nhảy lộn xộn.
+   ("Sắp tới" không cần đứng đầu mục lục nữa: hero đã có nút tắt 1 chạm) */
 var HVSEC=[
  ["s-xacnhan","Trung tâm đã xác nhận","ti-circle-check"],
- ["s-saptoi","Sắp tới","ti-calendar-check"],
  ["s-hocphi","Học phí","ti-cash"],
  ["s-hanhtrinh","Hành trình cùng ITTs","ti-route"],
  ["s-tiendo","Tiến độ của bạn","ti-chart-line"],
- ["s-diem","Hành trình điểm số","ti-target"],
+ ["s-saptoi","Sắp tới","ti-calendar-check"],
  ["s-khuyennghi","Khuyến nghị cho bạn","ti-thumb-up"],
  ["s-gioithieu","Giới thiệu bạn bè","ti-gift"],
+ ["s-diem","Hành trình điểm số","ti-target"],
  ["s-buoihoc","Nhật ký buổi học","ti-notes"],
  ["s-wow","Nhật ký buổi WOW","ti-star"],
  ["s-khaosat","Khảo sát của bạn","ti-clipboard-text"],
@@ -7546,7 +7646,9 @@ var HVSEC=[
 function hvGo(id){var el=document.getElementById(id);if(!el)return;
  var box=document.getElementById("hvMain");
  var top=el.offsetTop-14;
- if(box&&box.scrollTo)box.scrollTo({top:top,behavior:"smooth"});else if(box)box.scrollTop=top;
+ if(box&&box.scrollTo)box.scrollTo({top:top,behavior:"smooth"});
+ else if(box)box.scrollTop=top;
+ else if(el.scrollIntoView)try{el.scrollIntoView({behavior:"smooth",block:"start"})}catch(e){el.scrollIntoView()} /* V9.17: trang HV nhúng trong hồ sơ 360 app NV không có #hvMain */
  hvMark(id);
  var sd=document.getElementById("hvSide");if(sd)sd.classList.remove("open")}
 function hvMark(id){[].forEach.call(document.querySelectorAll("#hvNav .hvni"),function(n){
@@ -7568,13 +7670,11 @@ function hvRender(){
  document.getElementById("hvWho2").textContent=S.student_id||"";
  document.getElementById("hvAv").textContent=String(S.full_name||"?").trim().split(" ").pop().slice(0,1).toUpperCase();
  hvNav();var box=document.getElementById("hvMain");if(box)box.scrollTop=0;hvSpy()}
-function hvPickStu(v){ssSet("ITTS_WHO_HV",v);window.HVID=v;window.HVCLASS="";hvRender()}
 function hvToggleSide(){var s=document.getElementById("hvSide");if(s)s.classList.toggle("open")}
 function bootHV(sid){window.HVPORTAL=1;try{deriveAll()}catch(e){}
  var stu=rows("DL09");
  window.HVID=sid||(stu[0]||{}).student_id;
- document.getElementById("hvSel").innerHTML=stu.map(function(x){
-  return '<option value="'+esc(x.student_id)+'"'+(x.student_id===window.HVID?" selected":"")+'>'+esc(x.full_name+" · "+x.student_id)+'</option>'}).join("");
+ /* V9.17: bỏ ô "Xem thử hồ sơ" ở sidebar - chọn học viên đã có màn cổng lo, đổi người = nút bên dưới */
  var lg=document.getElementById("login");if(lg)lg.style.display="none";
  var ap=document.getElementById("hvapp");if(ap)ap.style.display="";
  hvRender();
@@ -7683,7 +7783,7 @@ function gateSwitch(){ssSet("ITTS_WHO",null);location.reload()}
 function demoBoot(){try{deriveAll();autoReturnHandovers()}catch(e){}
  /* autoReturnHandovers chạy TRƯỚC khi chụp __base: lead tự quay về khi hết hạn bàn giao
     là việc của HỆ THỐNG theo thời gian, không được tính là "thay đổi demo" (chip cam oan). */
- var db=document.getElementById("demoBadge");if(db)db.style.display="";
+ var db=document.getElementById("demoBadgeWrap");if(db)db.style.display="inline-flex";
  if(__base===null)__base=demoPack();
  if(demoDirty())setTimeout(function(){toast("Đang dùng dữ liệu demo ĐÃ CHỈNH từ buổi trước - Reset ở màn cổng hoặc Cài đặt > Dữ liệu demo.",4200)},600);
  var who=ssGet("ITTS_WHO");
@@ -7698,12 +7798,13 @@ HV_SHELL = r"""
   <aside class="hvside" id="hvSide">
     <div class="hvbrand"><div class="logo" style="width:34px;height:34px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 40 40" width="22" height="22" aria-hidden="true"><g fill="none" stroke="#D51920" stroke-width="3.2"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="7.5"/></g><circle cx="20" cy="20" r="3.4" fill="#D51920"/><g stroke="#D51920" stroke-width="3.2"><line x1="20" y1="1.5" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="38.5"/><line x1="1.5" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="38.5" y2="20"/></g></svg></div><div><b>IELTS The Tutors</b><small>Trang học viên</small></div></div>
     <div class="hvme"><div class="av" id="hvAv">?</div><div><b id="hvWho">-</b><small id="hvWho2">-</small></div></div>
-    <div class="hvselbox"><label>Xem thử hồ sơ (bản demo)</label><select id="hvSel" onchange="hvPickStu(this.value)"></select>
-     <button class="btn sm" style="margin-top:8px;width:100%;justify-content:center" onclick="gateSwitchHV()"><i class="ti ti-arrows-exchange"></i>Đổi người / màn cổng</button></div>
+    <div class="hvselbox">
+     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><span class="chip blue roomChip">Room demo</span><button class="btn sm" onclick="demoReset()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ và mọi máy trong room cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></div>
+     <button class="btn sm" style="width:100%;justify-content:center" onclick="gateSwitchHV()"><i class="ti ti-arrows-exchange"></i>Đổi người / màn cổng</button></div>
     <nav class="hvnav" id="hvNav"></nav>
   </aside>
   <main class="hvmain" id="hvMain">
-    <div class="hvtop"><button class="tbtn" onclick="hvToggleSide()" aria-label="Mục lục"><i class="ti ti-menu-2"></i></button><b style="font-size:13px">Trang học viên</b></div>
+    <div class="hvtop"><button class="tbtn" onclick="hvToggleSide()" aria-label="Mục lục"><i class="ti ti-menu-2"></i></button><b style="font-size:13px">Trang học viên</b><span style="margin-left:auto;display:inline-flex;align-items:center;gap:7px"><span class="chip blue roomChip">Room demo</span><button class="btn sm" onclick="demoReset()"><i class="ti ti-refresh"></i>Reset</button></span></div>
     <div id="hvBody"></div>
   </main>
 </div>

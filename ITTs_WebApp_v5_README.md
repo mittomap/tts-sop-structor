@@ -1282,3 +1282,26 @@ Verify: _tall 37 trang 0 lỗi, icon 134 (font dựng lại: +ti-devices, ti-log
 node --check 2 file OK, _check11 68/68. LƯU Ý: bộ kiểm _check1.._check10 THẤT LẠC từ phiên trước
 (chỉ còn _tall + _check11 trong _src) - tái tạo dần, đụng vùng nào viết lại bộ kiểm vùng đó.
 PHÒNG 2 MÁY CHƯA TEST TRÊN 2 MÁY THẬT (phiên cloud không có trình duyệt) - Luân thử theo DEMO_CHECKLIST.
+
+## V9.17 (28/07 chiều) - Room tự động + bong bóng việc mới + vá theo hội đồng 3 tester
+
+**Room demo TỰ NỐI (Luân: "mặc định phải là kết nối được")**: bỏ hẳn mã phòng - mở bản demo là máy
+tự vào chung một room (máy đầu làm trạm trung chuyển, trạm rớt thì các máy tự tranh làm trạm rồi nối
+lại; có mạng lại là tự vào). Navbar CẢ 2 CỔNG có chip sống **"Room demo: nối N máy / chỉ máy này"**
++ nút **Reset demo**; ai cần demo riêng tư thì bấm "Ngắt room" (Cài đặt > Dữ liệu demo hoặc màn cổng).
+Cổng học viên BỎ ô "Xem thử hồ sơ" thừa ở sidebar - chọn người đã có màn cổng.
+
+**Bong bóng việc mới**: việc cần duyệt / cần xử lý phát sinh từ cổng khác hoặc máy khác nổ thẻ thông
+báo góc phải dưới (so bellItems trước/sau đồng bộ, đúng phạm vi vai trò đang đăng nhập): ghi rõ
+ai - việc gì, viền đỏ nếu quá hạn, bấm vào nhảy thẳng tới nơi xử lý, tự tắt 9 giây, tối đa 3 thẻ.
+
+**Vá theo 3 tester (room sync / cổng HV / hồ sơ 360)** - các sạn thật đã sửa: room chống zombie bằng
+thế hệ kết nối __roomGen, so mốc thời gian bản ghi (bản cũ không đè bản mới - 3 máy cùng sửa vẫn hội
+tụ), reset chờ kênh kịp phát rồi mới reload + chặn bão reload, bản local-thắng được phát lại cho room;
+cổng HV: notebar hoàn phí tắt khi đã hoàn + không hứa số tiền, lịch CHÍNH HÔM NAY không bị ẩn, bỏ tên
+chặng CRM + "GV vào trễ" khỏi trang học viên, mục lục xếp đúng thứ tự trang; hồ sơ 360: bảng điểm
+vào-giữa-ra không trộn 2 khóa, điểm 0 không thành "-", tab nhớ theo hồ sơ, nút mục lục cuộn được
+trong tab nhúng.
+
+Verify: _tall 37 trang 0 lỗi, node --check 2 file OK, _check11 68/68, icon 134 (+ti-bell-ringing).
+Room + bong bóng chưa test trên trình duyệt/2 máy thật - Luân thử theo DEMO_CHECKLIST.

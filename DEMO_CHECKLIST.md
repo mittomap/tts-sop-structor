@@ -7,11 +7,12 @@ In ra hoặc mở cạnh máy khi đi demo.
 
 - [ ] Link gửi khách/nhân viên: **https://mittomap.github.io/itts-sop-demo/** - trang bìa có 2 nút
       (Cổng nhân viên / Trang học viên). Mở link là chạy: không chép file, Safari/điện thoại đều được.
-- [ ] Mỗi máy/trình duyệt là MỘT BỘ DỮ LIỆU RIÊNG: khách tự nghịch không phá demo của mình,
-      khỏi lo reset giùm. Diễn màn "duyệt bên này - bên kia thấy": mở 2 CỬA SỔ TRÊN CÙNG MỘT MÁY,
-      HOẶC (từ V9.16) dùng PHÒNG 2 MÁY: máy A bấm "Tạo phòng 2 máy" ở màn cổng lấy MÃ 5 ký tự,
-      máy B bấm "Vào phòng 2 máy" nhập mã - 2 máy thật sự đồng bộ nhau. Cần mạng ở CẢ 2 máy;
-      THỬ TRƯỚC ở văn phòng bằng nút "Kiểm tra đồng bộ" (mạng công ty chặn thì phát 4G thử lại).
+- [ ] Từ V9.17: các máy mở demo TỰ ĐỒNG BỘ với nhau qua ROOM DEMO - không cần mã phòng, không bấm gì.
+      Chip "Room demo: nối N máy" trên navbar (cả 2 cổng) cho biết trạng thái; thao tác bên này thì
+      bên kia nổ chuông + BONG BÓNG việc mới góc phải dưới. Cần mạng ở các máy; THỬ TRƯỚC ở văn phòng
+      bằng nút "Kiểm tra đồng bộ" (mạng công ty chặn WebRTC thì một máy phát 4G thử lại).
+      LƯU Ý: khách lạ mở link cũng vào chung room - muốn demo riêng tư bấm "Ngắt room"
+      (Cài đặt > Dữ liệu demo); muốn dữ liệu sạch bấm "Reset demo" ngay trên navbar.
 - [ ] Trước buổi demo vẫn nhìn màn cổng: chip xanh "nguyên bản"; lỡ nghịch bẩn thì bấm Reset.
 - [ ] Đưa bản app mới lên demo: từ 28/07 chiều phiên cloud Claude Code TỰ ĐẨY khi làm xong việc;
       làm tay trên máy thì chạy `./update.sh` trong `~/Claude/itts-sop-demo`. Đợi 1-2 phút

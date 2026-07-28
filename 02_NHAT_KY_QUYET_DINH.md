@@ -149,16 +149,25 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.16** (28/07 chiều - ĐỢT 9 theo 4 yêu cầu mới của Luân ĐÃ XONG: (1) **PHÒNG DEMO 2 MÁY** -
-> đồng bộ giữa các MÁY KHÁC NHAU qua WebRTC/PeerJS, nút "Tạo phòng / Vào phòng 2 máy" ở màn cổng cả 2 file +
-> Cài đặt > Dữ liệu demo, mã phòng 5 ký tự, giao dịch cần duyệt bên này thì máy kia nổ chuông/toast ngay,
-> Reset lan cả phòng; (2) cổng học viên BỎ khối "Yêu cầu & phê duyệt" (nội dung nội bộ) - chỉ giữ dòng hoàn
-> học phí bằng ngôn ngữ học viên, "đang đối soát" -> "trung tâm đang xác nhận"; (3) hồ sơ 360 app NV thành
-> SUPERSET: tab "Trang của học viên" nhúng nguyên renderTrangHV + bảng điểm VÀO-GIỮA-RA + "Hẹn thu tiếp";
-> (4) rà sidebar: GIỮ NGUYÊN 7 nhóm V9.15 có chủ đích. Icon 134 (font dựng lại +4).
-> Verify: _tall 37 trang 0 lỗi + _check11 68/68 + node --check 2 file.
-> **CHÚ Ý PHIÊN SAU**: (a) bộ kiểm _check1.._check10 THẤT LẠC - chỉ còn _tall + _check11 trong _src, tái tạo dần;
-> (b) phòng 2 máy CHƯA test trên 2 máy thật (phiên cloud không có trình duyệt) - chờ Luân thử. Chi tiết: mục 3septendecies.
+> **Phiên bản: V9.17** (28/07 chiều - ROOM TỰ ĐỘNG + bong bóng việc mới + vá theo 3 tester, theo yêu cầu Luân:
+> (1) **Room demo TỰ NỐI** - bỏ hẳn mã phòng: mở demo là máy tự vào chung room (id chung gắn SEED_SIG,
+> máy đầu làm trạm relay, trạm rớt thì các máy tranh làm trạm lại); chip **"Room demo: nối N máy / chỉ máy này"**
+> + nút **Reset demo** trên navbar CẢ 2 CỔNG (app NV: topbar; cổng HV: sidebar + thanh mobile); nút Ngắt room /
+> Nối lại room cho demo riêng tư. (2) BỎ ô "Xem thử hồ sơ" thừa ở sidebar cổng HV (chọn người = màn cổng).
+> (3) **BONG BÓNG VIỆC MỚI**: việc cần duyệt/cần xử lý phát sinh từ cổng/máy khác nổ thẻ notiShow góc phải dưới
+> (diff bellItems trước/sau sync, đúng phạm vi vai trò) - bấm là nhảy tới nơi xử lý, tự tắt 9s, tối đa 3 thẻ.
+> (4) VÁ theo 3 tester (chi tiết + bẫy: mục 3octodecies): room chống zombie bằng __roomGen, last-write-wins
+> theo st.t (bản cũ không đè bản mới, 3 máy hội tụ), reset chờ DataChannel flush + chặn bão reload, bản
+> local-thắng được phát lại cho room; cổng HV: notebar hoàn phí TẮT khi refunded + không hứa số tiền, lịch
+> CHÍNH HÔM NAY không bị ẩn (hvT0), bỏ tên chặng CRM + "GV vào trễ" khỏi trang học viên, HVSEC xếp đúng thứ tự
+> trang; hồ sơ 360: bảng điểm không trộn 2 khóa, điểm 0 không rơi thành "-", HSTAB reset khi đổi hồ sơ,
+> hvGo cuộn được trong tab nhúng. Verify: _tall 37 trang 0 lỗi + _check11 68/68 + node --check. Icon 134.
+> **CHÚ Ý PHIÊN SAU**: (a) bộ kiểm _check1.._check10 THẤT LẠC - tái tạo dần; (b) room + bong bóng CHƯA test
+> trên trình duyệt/2 máy thật - chờ Luân thử; (c) room MỞ cho mọi ai mở link demo (Luân chấp nhận chủ đích) -
+> lối thoát là nút Ngắt room + Reset demo.
+> Trước đó V9.16 (28/07 chiều - Đợt 9 bản đầu: phòng 2 máy CÓ MÃ PHÒNG (V9.17 thay bằng room tự động), cổng HV
+> bỏ khối "Yêu cầu & phê duyệt", hồ sơ 360 superset + tab "Trang của học viên", rà sidebar giữ nguyên 7 nhóm.
+> Chi tiết: mục 3septendecies.
 > Trước đó V9.15 (28/07 - ĐỢT 8 "CHẶNG VÒNG ĐỜI + HỆ NODE + DỮ LIỆU DEMO SỐNG" ĐÃ XONG theo yêu cầu Luân:
 > menu gom theo 4 chặng vòng đời (C1 Khách tiềm năng / C2 Đang học / C3 Tạm dừng / C4 Kết thúc & Học tiếp,
 > mục con test/tuvan/wow/bảo lưu/mã giới thiệu TRỞ LẠI menu - go() remap vào hub đúng tab), 4 trang "Tổng quan chặng"
@@ -1039,6 +1048,51 @@ học viên đâu có cần" · "Hồ sơ học viên ở app quản trị ít t
 ### Sidebar (rà 28/07 - kết luận GIỮ NGUYÊN)
 7 nhóm NAVTREE V9.15 khớp luồng mới (menu này chính Luân duyệt thiết kế ở Đợt 8); tính năng đợt này đều
 nằm TRONG trang sẵn có (màn cổng, Cài đặt, hồ sơ 360, cổng HV) - không thêm/bớt mục menu nào.
+
+## 3octodecies. V9.17 — Room tự động + bong bóng việc mới + vá theo hội đồng 3 tester (28/07 chiều)
+
+Luân chê bản mã phòng V9.16 "phức tạp quá, mặc định phải là kết nối được" -> làm lại + cho 3 tester
+(room sync / cổng HV / hồ sơ 360) nhặt sạn, vá hết sạn thật trong cùng phiên.
+
+### Room tự động (thay bản mã phòng - kiến trúc đừng phá)
+- Peer id CHUNG: "itts-demo-"+SEED_SIG+"-auto". Máy đầu claim id = TRẠM relay; máy sau dính
+  unavailable-id thì vào làm khách; khách mất trạm (close/peer-unavailable) -> nghỉ ngẫu nhiên
+  200-1500ms rồi TRANH làm trạm (roomDown/roomAuto). Bám sự kiện "online" để tự nối khi có mạng lại.
+- **__roomGen (thế hệ kết nối)**: mọi callback/timer giữ gen lúc sinh ra; gen đổi (toggle, roomDown)
+  là tự vô hiệu + destroy peer - chống zombie peer/timer cũ clear cờ của lượt mới (bẫy tester chỉ ra:
+  toggle-off giữa lúc đang nối vẫn để room sống ngầm). window.__roomPend giữ peer đang bay để destroy được.
+- **last-write-wins theo st.t**: roomRecv so t của bản đến với bản đang giữ - bản CŨ hơn thì bỏ và
+  PHÁT LẠI bản mới cho room (ROOM.lastRaw=null rồi roomCastState). Chốt được 2 bẫy: init state cũ của
+  trạm đè bản mới của khách vừa rejoin, và 3 máy cùng sửa chia 3 ngả không hội tụ.
+- **Reset**: trạm nhận reset thì relay xong CHỜ 300ms (DataChannel kịp đẩy) mới reload; máy đã nguyên bản
+  nhận reset thì NUỐT (không reload) - chặn bão reload vòng lặp qua các tab cùng máy.
+- **Local-thắng phải phát ra room**: nhánh flush trong syncApply khi chạy trong ngữ cảnh __fromRoom
+  phải tạm hạ cờ để roomCastState - không thì máy giữ bản local, máy kia giữ bản remote, lệch vĩnh viễn.
+  Lúc boot __base=null thì KHÔNG coi là local-thắng (phải áp bản remote).
+- PeerJS re-bắn "open" sau reconnect: handler kiểm ROOM.p===p thì GIỮ conns (không reset mảng - mất relay).
+  Conn đóng bị splice khỏi ROOM.conns. Trạm phát sĩ số {t:"n"} cho khách (khách chỉ thấy 1 conn tới trạm).
+- roomUiRefresh cập nhật MỌI phần tử .roomChip (text + màu: amber đang dò / blue có máy / gray một mình-ngắt).
+
+### Bong bóng việc mới (notiShow/notiDiff)
+- Chụp notiKeys() = bellItems() TRƯỚC khi áp state đồng bộ; SAU khi áp so lại - việc MỚI xuất hiện
+  (đúng scope vai trò) nổ thẻ .noti góc phải dưới (z-index 96, không đè toast giữa-dưới), viền đỏ khi
+  có sev red, ghi "ai - việc gì", bấm go(page), tự tắt 9s, xếp chồng tối đa 3. Cổng HV không nổ (việc nội bộ).
+- LUẬT: key so sánh là grp|who|what - đổi cách sinh chữ trong slaItems là đổi luôn định nghĩa "việc mới".
+
+### Sạn cổng HV + hồ sơ 360 đã vá (nguồn: tester)
+- Notebar hoàn phí: thêm điều kiện !refunded (dòng DL07 âm làm tổng vẫn dương nên điều kiện cũ không bao
+  giờ tắt) + KHÔNG hứa số tiền (chính sách hoàn 100/70/50/0% - hứa cả khoản đã đóng là hứa sai).
+- hvT0() = 0h hôm nay: hero "buổi kế tiếp" + mục Sắp tới so mốc này thay vì Date.now() - buổi/hạn nộp/WOW
+  của CHÍNH HÔM NAY không còn bị ẩn (endToday() có sẵn nhưng trang HV đã quên dùng).
+- Bỏ khỏi trang học viên: "Bạn đang ở <tên chặng CRM>" (từ vựng vận hành) và "GV vào trễ X phút" (chỉ số
+  QA nội bộ - vẫn giữ nguyên ở hồ sơ GV/báo cáo).
+- HVSEC xếp lại ĐÚNG thứ tự khối trên trang (bỏ quyết định V9.14 "Sắp tới đứng đầu mục lục" - hero đã có
+  nút tắt 1 chạm; scrollspy hết nhảy lộn xộn).
+- Hồ sơ 360: bảng điểm vào-giữa-ra lấy Giữa/Ra CÙNG KHÓA (ce lọc theo class của ob chính - không trộn
+  đầu ra khóa cũ với giữa khóa mới); v15() giữ điểm 0 (0 là điểm hợp lệ, không rơi thành "-"); HSTAB reset
+  về "in" khi mở hồ sơ khác; hvGo có fallback scrollIntoView cho chế độ nhúng (không thì nút mục lục chết lặng).
+- Ghi nhận CÓ CHỦ ĐÍCH không sửa: hvSurveyView đổ DL15.notes (đúng thiết kế SVTPL - bộ câu lưu ở notes);
+  fallback enrMain/ceMain khi khóa đang chọn thiếu dữ liệu (hiếm, theo dõi thêm).
 
 ## 3sedecies. Chuyển sang làm việc tại phiên cloud Claude Code (28/07 chiều)
 
