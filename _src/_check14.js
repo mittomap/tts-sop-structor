@@ -244,7 +244,17 @@ t("(m) khong in nguyen van ghi chu noi bo cua nhan vien o nhat ky buoi", !/\(a\.
 t("(k) link tai lieu la the a bam duoc", /function hvLink/.test(SRC)&&/hvLink\(s2\.materials_link/.test(SRC));
 (function(){
  var S=rows("DL09")[0];window.HVID=S.student_id;var h=renderTrangHV();
- t("(p) cong co so dien thoai trung tam", h.indexOf('href="tel:')>=0);
+ /* V9.29 (anh Luân): dữ liệu demo KHÔNG bịa sẵn số hotline nữa - trung tâm tự điền số thật.
+    Nên bất biến đúng là: CÓ cấu hình thì cổng phải hiện số; CHƯA cấu hình thì không dựng nút gọi giả. */
+ (function(){
+  var cu=null;(DATA.config.ch2||[]).forEach(function(c){if(c.name==="centerHotline"){cu=c.value;c.value="028 7300 1234"}});
+  var h2=renderTrangHV();
+  t("(p) co cau hinh hotline thi cong hien so goi duoc", h2.indexOf('href="tel:02873001234')>=0);
+  (DATA.config.ch2||[]).forEach(function(c){if(c.name==="centerHotline")c.value=""});
+  var h3=renderTrangHV();
+  t("(p) chua cau hinh thi khong dung nut goi gia", h3.indexOf('href="tel:')<0);
+  (DATA.config.ch2||[]).forEach(function(c){if(c.name==="centerHotline")c.value=cu});
+ })();
  t("(p) so lay tu cau hinh CH2 chu khong cam cung", /paramStr\("centerHotline"/.test(SRC));})();
 
 /* ---- 13. (n) muc luc chia 3 nhom ---- */

@@ -146,6 +146,9 @@ tr.cfhl{animation:cfhl 2.6s ease-out}
 .slarow.clk:hover{background:#FAFCFE}
 /* V9.29: man hinh that su hep thi moi cho nhan xuong dong */
 @media(max-width:560px){.sopb .soprk,.ctxk,.cbl{white-space:normal}}
+/* V9.29: nut goi tren nen toi cua sidebar cong hoc vien */
+.btn.hvcall-dark{background:#ffffff1f;border-color:#ffffff4d;color:#fff}
+.btn.hvcall-dark:hover{background:#ffffff33;border-color:#ffffff80}
 .navgrp{margin-bottom:3px}
 .navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500;border-left:3px solid transparent}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
@@ -186,6 +189,7 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .phead{display:flex;align-items:flex-end;gap:14px;margin-bottom:18px}
 .phead .t{font-size:19px;font-weight:800;letter-spacing:-.2px}.phead .s{font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}
 .phead .sp{margin-left:auto;display:flex;gap:9px}
+a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi điện, mở link) không được ăn gạch chân của link */
 .btn{height:36px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--text);font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
 .btn i{font-size:16px;flex-shrink:0}.btn:hover{border-color:#B9C6D6;background:#F7F9FB}
 .btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}.btn.primary:hover{background:var(--navyd)}
@@ -2624,6 +2628,10 @@ var JGRP={thu:"Tuyển sinh",hv:"Học vụ",tc:"Tài chính",cs:"CSKH"};
    ga khác hẳn - "Chờ chấm test" nằm ở cột học vụ mà người làm là TEAM WOW. Ga nào lệch thì khai
    riêng ở đây, không sửa cột (sửa cột là vỡ cả bản đồ chặng). */
 var JCAT={test_grading:"WOW"};
+/* V9.29 (anh Luân: "theo luật SOP của chặng là tào lao, phải ghi rõ ra theo cấu hình chứ").
+   Mỗi ga khai hạn bằng sla:function(){return paramOf("slaXxx",n)} - đọc thẳng tên tham số ra từ
+   chính hàm đó, KHÔNG khai lại lần hai ở bảng nào (khai hai nơi là hai nơi trôi khỏi nhau). */
+function slaPrmOf(fn){try{var m=String(fn).match(/paramOf\("([A-Za-z0-9_]+)"/);return m?m[1]:""}catch(e){return ""}}
 function jTasks(){var out=[];
  jAll().forEach(function(J){
   if(!J.act)return;
@@ -2634,10 +2642,12 @@ function jTasks(){var out=[];
   out.push({cat:JCAT[J.k]||JGRP[J.S.col]||"Vận hành",grp:J.S.t,sev:(J.over?"red":"amber"),ic:J.S.ic,
    who:J.name,what:(J.miss.length?("Thiếu "+J.miss.join(", ")+" - "):"")+whatCore+(J.over?" (quá hạn)":""),
    age:J.ageH,page:null,filter:null,lead:(J.C.L?J.C.L.lead_id:null),hoso:(J.C.L?null:J.C.sid),
-   act:"jRun",rid:J.C.pid,jpid:J.C.pid})});
+   act:"jRun",rid:J.C.pid,jpid:J.C.pid,prm:slaPrmOf(J.S.sla),slaV:J.sla})});
  return out}
 function slaItems(){var out=jTasks();
- function add(cat,grp,sev,ic,who,what,age,page,filter,lead,hoso,act,rid){out.push({cat:cat,grp:grp,sev:sev,ic:ic,who:who,what:what,age:age,page:page,filter:filter,lead:lead,hoso:hoso,act:act,rid:rid})}
+ /* V9.29: tham số cuối = TÊN THAM SỐ CẤU HÌNH của luật này, để drawer xem nhanh chỉ đúng
+    "ngưỡng lấy từ đâu" thay vì nói chung chung. */
+ function add(cat,grp,sev,ic,who,what,age,page,filter,lead,hoso,act,rid,prm){out.push({cat:cat,grp:grp,sev:sev,ic:ic,who:who,what:what,age:age,page:page,filter:filter,lead:lead,hoso:hoso,act:act,rid:rid,prm:prm})}
  /* V9.20 GIAO VIỆC - chỉ việc CỦA CHÍNH NGƯỜI ĐANG ĐĂNG NHẬP (khác các mục dưới: toàn trung tâm).
     Quản trị viên (không gắn NV) thì thấy mọi việc quá hạn để giám sát khi demo. */
  (function(){var me=CURSTAFF||"";
@@ -2658,17 +2668,17 @@ function slaItems(){var out=jTasks();
   })})();
  /* (các luật lead cũ đã chuyển vào bộ máy hành trình - xem jTasks) */
  srows("DL04").forEach(function(c){if(isc(c.consultation_status,"not_consulted"))add("Tuyển sinh","Chờ tư vấn lộ trình","amber","ti-messages",c.customer_name_display||c.lead_id,"Chờ tư vấn lộ trình",null,"tuvan","todo",null,null,"tvform",c.consultation_id)});
- srows("DL06").forEach(function(e){if(num(e.discount_amount)>=ckThreshold()&&!String(e.discount_approved_by||"").trim()&&!isc(e.enrollment_status,"cancelled"))add("Tài chính","Duyệt chiết khấu","amber","ti-discount-check",e.student_id_name||e.student_id,"Chiết khấu "+vnd(num(e.discount_amount))+" chờ quản lý duyệt",hoursSince(e.enrollment_time),"duyet","",null,null,null,e.enrollment_id)});
+ srows("DL06").forEach(function(e){if(num(e.discount_amount)>=ckThreshold()&&!String(e.discount_approved_by||"").trim()&&!isc(e.enrollment_status,"cancelled"))add("Tài chính","Duyệt chiết khấu","amber","ti-discount-check",e.student_id_name||e.student_id,"Chiết khấu "+vnd(num(e.discount_amount))+" chờ quản lý duyệt",hoursSince(e.enrollment_time),"duyet","",null,null,null,e.enrollment_id,"slaDiscountApprove_hours")});
  srows("DL03").forEach(function(r){var att=isc(r.test_attendance_status,"on_time","late"),graded=isc(r.test_status,"graded"),consulted=isc(r.post_test_status,"consulted");
   var age=hoursSince(r.test_attendance_time);var over=att&&!graded&&age!=null&&age>paramOf("slaTestResult_hours",48);
   if(over)add("WOW","Chấm test đầu vào","red","ti-file-text",r.lead_id_name||r.lead_id,"Test chưa chấm quá hạn",age,"test","grade",null,null,"testgrade",r.test_booking_id);
   else if(att&&!graded)add("WOW","Chấm test đầu vào","amber","ti-file-text",r.lead_id_name||r.lead_id,"Test chờ chấm điểm",age,"test","grade",null,null,"testgrade",r.test_booking_id);
   else if(graded&&!consulted)add("Tuyển sinh","Tư vấn sau test","amber","ti-messages",r.lead_id_name||r.lead_id,"Có KQ test, chờ tư vấn",null,"test","consult",null,null,"testconsult",r.test_booking_id)});
  srows("DL08").forEach(function(o){var s=obState(o);
-  if(s.infoOverdue)add("Học vụ","Gửi thông tin lớp","red","ti-send",o.student_id_name||o.student_id,"Chưa gửi thông tin lớp (quá hạn)",hoursSince(o.assigned_at),"xeplop","sendinfo",null,null,"ob",o.onboarding_id);
-  else if(o.class_id&&!s.sent)add("Học vụ","Gửi thông tin lớp","amber","ti-send",o.student_id_name||o.student_id,"Chờ gửi thông tin lớp",hoursSince(o.assigned_at),"xeplop","sendinfo",null,null,"ob",o.onboarding_id);
+  if(s.infoOverdue)add("Học vụ","Gửi thông tin lớp","red","ti-send",o.student_id_name||o.student_id,"Chưa gửi thông tin lớp (quá hạn)",hoursSince(o.assigned_at),"xeplop","sendinfo",null,null,"ob",o.onboarding_id,"slaClassInfoSend_hours");
+  else if(o.class_id&&!s.sent)add("Học vụ","Gửi thông tin lớp","amber","ti-send",o.student_id_name||o.student_id,"Chờ gửi thông tin lớp",hoursSince(o.assigned_at),"xeplop","sendinfo",null,null,"ob",o.onboarding_id,"slaClassInfoSend_hours");
   if(s.obOverdue)add("Học vụ","Hoàn tất onboarding","red","ti-layout-grid-add",o.student_id_name||o.student_id,"Onboarding quá hạn chưa hoàn tất",hoursSince(o.assigned_at),"xeplop","finish",null,null,"ob",o.onboarding_id)});
- srows("DL07").forEach(function(pp){if(!(pp.verified_by&&String(pp.verified_by).trim()))add("Tài chính","Xác nhận khoản thu","amber","ti-receipt",pp.student_id_name||pp.student_id,"Khoản thu chờ xác nhận "+vnd(pp.amount),null,"thanhtoan","verify",null,null,"payverify",pp.enrollment_id)});
+ srows("DL07").forEach(function(pp){if(!(pp.verified_by&&String(pp.verified_by).trim()))add("Tài chính","Xác nhận khoản thu","amber","ti-receipt",pp.student_id_name||pp.student_id,"Khoản thu chờ xác nhận "+vnd(pp.amount),null,"thanhtoan","verify",null,null,"payverify",pp.enrollment_id,"slaPaymentVerify_hours")});
  srows("DL06").forEach(function(e){if(/cancel/.test(ecode(e.enrollment_status)))return;var tot=num(e.final_fee)||num(e.total_fee);var rem=e.remaining_amount!==undefined&&e.remaining_amount!==""?num(e.remaining_amount):Math.max(0,tot-num(e.paid_amount));if(rem<=0)return;
   /* NHẮC TRƯỚC HẠN chứ không đợi quá hạn mới réo - gọi trước vài ngày thì đòi dễ hơn nhiều.
      Số ngày nhắc trước và ngưỡng chuyển đỏ đều lấy từ CH2. */
@@ -2677,17 +2687,17 @@ function slaItems(){var out=jTasks();
   if(_ins.length){var x0=_ins[0],st0=insDueState(x0);
    var _amt=num(x0.remaining_amount)||num(x0.due_amount);
    var _lbl="Đợt "+x0.installment_no+"/"+x0.installment_of+" · "+vnd(_amt)+" · hạn "+(x0.due_date||"?");
-   if(st0.k==="late")add("Tài chính","Thu công nợ","red","ti-cash",e.student_id_name||e.student_id,"QUÁ HẠN "+Math.abs(st0.days)+" ngày - "+_lbl,Math.abs(st0.days)*24,"thanhtoan","due",null,null,"paydebt",e.enrollment_id);
-   else if(st0.k==="due"||st0.k==="today")add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"TỚI HẠN - "+_lbl,0,"thanhtoan","due",null,null,"paydebt",e.enrollment_id);
-   else if(st0.k==="soon")add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"SẮP TỚI HẠN (còn "+st0.days+" ngày) - "+_lbl,0,"thanhtoan","due",null,null,"paydebt",e.enrollment_id);
+   if(st0.k==="late")add("Tài chính","Thu công nợ","red","ti-cash",e.student_id_name||e.student_id,"QUÁ HẠN "+Math.abs(st0.days)+" ngày - "+_lbl,Math.abs(st0.days)*24,"thanhtoan","due",null,null,"paydebt",e.enrollment_id,"installmentLate_days");
+   else if(st0.k==="due"||st0.k==="today")add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"TỚI HẠN - "+_lbl,0,"thanhtoan","due",null,null,"paydebt",e.enrollment_id,"installmentLate_days");
+   else if(st0.k==="soon")add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"SẮP TỚI HẠN (còn "+st0.days+" ngày) - "+_lbl,0,"thanhtoan","due",null,null,"paydebt",e.enrollment_id,"installmentLate_days");
    return}
   var due=pvnd(e.next_payment_due);
   if(due){var dh=(new Date().getTime()-due.getTime())/36e5;
    var dRem=Math.round(-dh/24);
-   if(dh>=0)add("Tài chính","Thu công nợ",dh>_ld*24?"red":"amber","ti-cash",e.student_id_name||e.student_id,"TỚI HẸN THU "+vnd(rem)+" (hẹn "+e.next_payment_due+")",dh,"thanhtoan","due",null,null,"paydebt",e.enrollment_id);
-   else if(dRem<=_rd)add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"SẮP TỚI HẸN THU (còn "+dRem+" ngày) "+vnd(rem),0,"thanhtoan","due",null,null,"paydebt",e.enrollment_id);
+   if(dh>=0)add("Tài chính","Thu công nợ",dh>_ld*24?"red":"amber","ti-cash",e.student_id_name||e.student_id,"TỚI HẸN THU "+vnd(rem)+" (hẹn "+e.next_payment_due+")",dh,"thanhtoan","due",null,null,"paydebt",e.enrollment_id,"installmentLate_days");
+   else if(dRem<=_rd)add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"SẮP TỚI HẸN THU (còn "+dRem+" ngày) "+vnd(rem),0,"thanhtoan","due",null,null,"paydebt",e.enrollment_id,"installmentLate_days");
    return}
-  var age=hoursSince(e.enrollment_time);if(rem>=paramOf("thresholdDebtAlert",3000000)&&age!=null&&age>paramOf("slaPayment_grace_days",7)*24)add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"Còn nợ học phí "+vnd(rem)+" (quá kỳ hạn "+paramOf("slaPayment_grace_days",7)+" ngày)",age,"thanhtoan","debt",null,null,"paydebt",e.enrollment_id)});
+  var age=hoursSince(e.enrollment_time);if(rem>=paramOf("thresholdDebtAlert",3000000)&&age!=null&&age>paramOf("slaPayment_grace_days",7)*24)add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"Còn nợ học phí "+vnd(rem)+" (quá kỳ hạn "+paramOf("slaPayment_grace_days",7)+" ngày)",age,"thanhtoan","debt",null,null,"paydebt",e.enrollment_id,"installmentLate_days")});
  srows("DL14").forEach(function(w){var done=ecode(w.wow_status)==="completed";var note=!!(w.wow_content_note&&String(w.wow_content_note).trim());var age=hoursSince(w.wow_session_date);var over=done&&!note&&age!=null&&age>paramOf("slaWowNote_hours",24);
   if(over)add("WOW","Ghi nội dung WOW","red","ti-notes",w.student_name||w.student_id,"Buổi WOW chưa ghi nội dung (quá 24h)",age,"wow","note",null,null,"wownote",w.wow_id);
   else if(done&&!note)add("WOW","Ghi nội dung WOW","amber","ti-notes",w.student_name||w.student_id,"Buổi WOW chờ ghi nội dung",age,"wow","note",null,null,"wownote",w.wow_id)});
@@ -2700,7 +2710,7 @@ function slaItems(){var out=jTasks();
    var pu=pvnd(x.pause_until);if(!pu)return;
    var dl=(pu.getTime()-new Date().getTime())/864e5;
    if(dl<=rmd&&dl>-60)add("CSKH","Bảo lưu sắp hết hạn",dl<0?"red":"amber","ti-player-pause",x.full_name||x.student_id,
-    (dl<0?("QUÁ hạn bảo lưu "+Math.ceil(-dl)+" ngày"):("Hết hạn bảo lưu trong "+Math.ceil(dl)+" ngày"))+" - gọi mời quay lại học",null,"baoluu",null,null,x.student_id)})})();
+    (dl<0?("QUÁ hạn bảo lưu "+Math.ceil(-dl)+" ngày"):("Hết hạn bảo lưu trong "+Math.ceil(dl)+" ngày"))+" - gọi mời quay lại học",null,"baoluu",null,null,x.student_id,"thresholdPauseRemind_days")})})();
  /* Xin cảm nhận HV đạt mục tiêu (nguồn referral + social proof) */
  (function(){var tD=paramOf("slaTestimonialAsk_days",7);
   srows("DL18").forEach(function(x){if(!isc(x.achievement_status,"achieved"))return;
@@ -2709,7 +2719,7 @@ function slaItems(){var out=jTasks();
    var days=(new Date().getTime()-d.getTime())/864e5;
    if(days<0||days>60)return;
    add("CSKH","Xin cảm nhận học viên",days>tD?"red":"amber","ti-award",x.student_id_name||x.student_id,
-    "HV ĐẠT mục tiêu - xin cảm nhận/testimonial trong "+tD+" ngày sau kết thúc",days*24,"ketthuc",null,null,x.student_id)})})();
+    "HV ĐẠT mục tiêu - xin cảm nhận/testimonial trong "+tD+" ngày sau kết thúc",days*24,"ketthuc",null,null,x.student_id,"slaTestimonialAsk_days")})})();
  /* Cuối vòng đời lớp: sắp kết thúc -> chuẩn bị; đã kết thúc mà thiếu hồ sơ đầu ra -> việc đỏ */
  (function(){var preD=paramOf("thresholdPreEnd_days",30);var nowD=new Date();
   srows("DL10").forEach(function(c){var end=pvnd(c.class_end_date);if(!end)return;
@@ -2731,7 +2741,7 @@ function slaItems(){var out=jTasks();
     a.student_name||a.student_id,
     (age!=null&&age>lim?"QUÁ HẠN duyệt - ":"")+"HV xin nghỉ buổi "+(ss.session_number||"?")+
     " ngày "+(ss.session_date||"")+(a.absence_want_makeup?" và xin học bù":""),
-    age||0,"diemdanh",null,null,null,"absForm",a.attendance_id)})})();
+    age||0,"diemdanh",null,null,null,"absForm",a.attendance_id,"slaTaskAccept_hours")})})();
  /* V9.29: buổi đã dạy xong mà giảng viên chưa ghi nhận xét. Trang "Buổi học" có đếm số này từ lâu
     nhưng KHÔNG có luật SLA nào -> chuông của giáo viên không hề reo. Nay reo, đúng bộ phận ACA. */
  /* DÙNG CHÍNH bhState() - trang Buổi học đã định nghĩa "buổi đã có nhận xét" ở đó. App đang có
@@ -2748,7 +2758,7 @@ function slaItems(){var out=jTasks();
    add("Giảng viên (ACA)","Ghi nhận xét buổi",st.noteOver?"red":"amber","ti-message-2",
     (c.class_name||s2.class_id||"")+" · buổi "+(s2.session_number||"?"),
     (st.noteOver?"QUÁ HẠN ghi nhận xét - ":"")+"Buổi dạy xong "+Math.round(st.ageH)+"h trước, chưa có nhận xét (hạn "+st.lim+"h)",
-    st.ageH,"buoihoc",null,null,null,"bhNoteForm",s2.session_id)})})();
+    st.ageH,"buoihoc",null,null,null,"bhNoteForm",s2.session_id,"slaTeacherNote_hours")})})();
  /* HV vắng buổi mà chưa ai hỏi thăm: SOP gọi trong slaAbsenceCall_hours (24h). Ghi chú vào dòng điểm danh = đã xử lý. */
  (function(){var absH=paramOf("slaAbsenceCall_hours",24);
   srows("DL12").forEach(function(a){
@@ -2762,7 +2772,7 @@ function slaItems(){var out=jTasks();
    add("Học vụ","Gọi hỏi thăm HV vắng",age>absH?"red":"amber","ti-phone-off",a.student_name||a.student_id,
     "Vắng không phép buổi "+(ss.session_date||"")+" ("+(ss.class_id_name||ss.class_id||"")+") - gọi trong "+absH+"h rồi ghi chú vào buổi",
     age,"banglop",null,null,a.student_id)})})();
- srows("DL09").forEach(function(r){if(/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status)))add("Học vụ","Học viên nguy cơ","red","ti-user-exclamation",r.full_name,"Học viên nguy cơ cần can thiệp",null,null,null,null,r.student_id)});
+ srows("DL09").forEach(function(r){if(/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status)))add("Học vụ","Học viên nguy cơ","red","ti-user-exclamation",r.full_name,"Học viên nguy cơ cần can thiệp",null,null,null,null,r.student_id,"slaRiskFollowup_days")});
  return out}
 function jumpFlow(page,filter){if(filter){if(page==="xeplop")window.XLFILT=filter;else fset(page,filter)}go(page)}
 function slaAct(act,id){
@@ -2856,7 +2866,10 @@ function slaOpen(key){
   ["Bộ phận",'<span class="chip" style="background:'+gc+'22;color:'+gc+'">'+esc(it.cat)+'</span>'],
   ["Mức độ",it.sev==="red"?'<span class="chip red">Quá hạn - làm ngay</span>':(it.sev==="amber"?'<span class="chip amber">Sắp tới hạn</span>':'<span class="chip">Theo dõi</span>')],
   ["Đã chờ",it.age!=null?esc(fmtAge(it.age)):"-"],
-  ["Ngưỡng áp dụng",(function(){var pm=SLAPRM[it.grp];return pm?slaChip(pm[0],pm[1]):"theo luật SOP của chặng"})()]]);
+  ["Ngưỡng áp dụng",(function(){
+    if(it.prm)return slaChip(it.prm,it.slaV!=null?it.slaV:0);
+    var pm=SLAPRM[it.grp]; if(pm)return slaChip(pm[0],pm[1]);
+    return '<span class="chip amber">chưa khai ngưỡng - báo kỹ thuật thêm vào CH2</span>'})()]]);
  h+=ctxContent("Việc cần làm",it.what||"-","var(--navy)");
  h+='<div class="dact">';
  if(it.lead)h+='<button class="btn primary" onclick="closeModal();leadDetail(\''+esc(it.lead)+'\')"><i class="ti ti-external-link"></i>Xử lý ngay</button>';
@@ -6909,7 +6922,13 @@ var APPPARAMS=[
  ["Học vụ - Kết thúc khóa","slaReenroll_contact_days","Hạn liên hệ mời tái ghi danh","ngày",7],
  ["Học vụ - Kết thúc khóa","slaTestimonialAsk_days","Sau khi đạt mục tiêu bao nhiêu ngày thì xin cảm nhận","ngày",7],
  ["WOW & CSKH","slaComplaintFirstResponse_hours","Hạn phản hồi LẦN ĐẦU cho một khiếu nại","giờ",4],
- ["WOW & CSKH","slaFeedbackClassify_hours","Hạn phân loại một phản hồi mới nhận","giờ",24]];
+ ["WOW & CSKH","slaFeedbackClassify_hours","Hạn phân loại một phản hồi mới nhận","giờ",24],
+ /* V9.29 (anh Luân: "nếu chưa có cụ thể thì đưa vào cài đặt rồi gọi ra chứ em") - ba ngưỡng
+    trước đây nằm trong đầu người viết code, nay thành tham số sửa được. */
+ ["Tài chính","slaDiscountApprove_hours","Hạn quản lý duyệt một đề nghị chiết khấu","giờ",24],
+ ["Tài chính","slaPaymentVerify_hours","Hạn kế toán đối soát một khoản vừa thu","giờ",24],
+ ["Học vụ - Lớp","slaClassInfoSend_hours","Hạn gửi thông tin lớp cho học viên sau khi xếp lớp","giờ",24],
+ ["Học vụ - Lớp","slaRiskFollowup_days","Học viên vào diện nguy cơ bao lâu thì phải có can thiệp","ngày",3]];
 function pvnd(s){var m=String(s||"").match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);if(!m)return null;return new Date(+m[3],+m[2]-1,+m[1],m[4]?+m[4]:0,m[5]?+m[5]:0)}
 function hoursSince(s){var d=pvnd(s);return d?(Date.now()-d.getTime())/3600000:null}
 function nowStr(){var d=new Date();function p(n){return n<10?"0"+n:n}return p(d.getDate())+"/"+p(d.getMonth()+1)+"/"+d.getFullYear()+" "+p(d.getHours())+":"+p(d.getMinutes())}
@@ -8182,7 +8201,7 @@ function renderTrangHV(){
   '<button class="pill" style="background:#ffffff22;border-color:#ffffff55;color:#fff" onclick="hvGo(\'s-saptoi\')"><i class="ti ti-calendar-check"></i> Lịch sắp tới</button>'+
   '<button class="pill" style="background:#ffffff22;border-color:#ffffff55;color:#fff" onclick="hvGo(\'s-gopy\')"><i class="ti ti-message-plus"></i> Góp ý cho trung tâm</button>'+
   '<button class="pill" style="background:#ffffff22;border-color:#ffffff55;color:#fff" onclick="hvGo(\'s-hoidap\')"><i class="ti ti-messages"></i> Trao đổi với trung tâm</button>'+
-  (hvHotline()?'<a class="pill" style="background:#ffffff22;border-color:#ffffff55;color:#fff" href="tel:'+esc(phoneKey(hvHotline()))+'"><i class="ti ti-phone"></i> '+esc(hvHotline())+'</a>':'')+
+  (hvHotline()?hvCallHTML("Gọi trung tâm "+hvHotline(),"hvcall-dark"):'')+
   '</div></div>'+
   '<div class="hvav">'+esc(String(S.full_name||"?").trim().split(" ").pop().slice(0,1).toUpperCase())+'</div></div>';
  /* ---- chọn khóa khi HV học nhiều khóa ---- */
@@ -8728,9 +8747,13 @@ function hvLink(u,lb){u=String(u||"").trim();if(!u)return "";
 /* (p) CẢ TRANG trước đây không có một số điện thoại nào dù khuyên "liên hệ trung tâm" 3-4 lần.
    Số lấy từ CH2 (centerHotline) - không cắm cứng. */
 function hvHotline(){return String(paramStr("centerHotline","")||"").trim()}
-function hvCallHTML(lb){var p=hvHotline();
+function hvCallHTML(lb,cls){var p=hvHotline();
  if(!p)return "";
- return '<a class="btn sm" href="tel:'+esc(phoneKey(p))+'"><i class="ti ti-phone"></i>'+esc(lb||("Gọi trung tâm "+p))+'</a>'}
+ /* V9.29: một hàm duy nhất cho MỌI nút gọi - trước đây sidebar cổng HV tự dựng một kiểu riêng
+    (chỉ hiện số, viền trắng) nên hai chỗ trông khác hẳn nhau.
+    Chưa cấu hình hotline thì KHÔNG dựng nút gọi giả - người quản trị thấy lời nhắc để đi điền. */
+ if(!p)return (window.HVPORTAL?'':'<span class="chip amber" data-tip="Vào Cài đặt > Giao diện & Thương hiệu để điền hotline">chưa có hotline · <b>cấu hình</b></span>');
+ return '<a class="btn sm '+(cls||"")+'" href="tel:'+esc(phoneKey(p))+'" data-tip="Bấm để gọi '+esc(p)+'"><i class="ti ti-phone"></i>'+esc(lb||("Gọi trung tâm "+p))+'</a>'}
 /* Dòng điểm danh do CHÍNH học viên tự báo. Đánh dấu bằng tiền tố thay vì đẻ cột mới:
    DL12 chỉ có 10 cột, thêm cột lạ thì bản chạy trên Google Sheets ghi xong RƠI MẤT dữ liệu
    mà không ai biết. Phần sau dấu ":" là lời học viên - chỉ phần đó mới được hiện ra cổng. */

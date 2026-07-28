@@ -156,7 +156,7 @@
 > được, công sức nằm chết trong container. Muốn bật lại thì phải cấp quyền GHI cho môi trường chạy
 > lịch trước, và giữ nguyên BƯỚC 0 "thử `git push --dry-run` trước khi làm bất cứ việc gì". MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG.
 > Bộ kiểm hiện tại: node --check 2 file · `_tall` 38 trang 0 lỗi (165 icon) · `_check11` 131 ·
-> `_check12` 37 · `_check13` 174 · `_check14` 101 · `_check15` 37 · **`_check16` 236** · `_checktour` ·
+> `_check12` 37 · `_check13` 174 · `_check14` 102 · `_check15` 37 · **`_check16` 236** · `_checktour` ·
 > `check_logic.py` 132 luật (đúng 4 ca cố ý) · `check_data.py` DAT · **`_checkdata.js` 27 luật / 6283 lượt kiểm - 0 lệch · `_check17.js` 392 tiêu chí**.
 >
 > **VIỆC PHẢI LÀM TIẾP - THEO ĐÚNG THỨ TỰ NÀY (Luân chốt 28/07 khuya, rồi về nghỉ):**
@@ -332,6 +332,20 @@
 > bị bẻ đôi dù thừa chỗ. Nay cột **tự nở theo nhãn dài nhất** (`flex:0 0 auto` + `nowrap`), áp cho
 > 6 loại nhãn: khối SOP · bảng thông tin nhanh · thanh thông tin lớp · thanh công cụ · cột mục tiêu
 > KPI · nhãn nhóm việc. Màn hình thật sự hẹp (<560px) thì mới cho xuống dòng lại.
+>
+> · **"Ngưỡng áp dụng: theo luật SOP của chặng" là câu né** (anh Luân). Nay drawer chỉ đúng tham số
+> và con số của nó. Tên tham số **đọc thẳng từ chính hàm `sla` của ga** (`slaPrmOf` parse
+> `paramOf("...")` trong source hàm) - KHÔNG khai lại lần hai ở bảng nào, vì khai hai nơi là hai nơi
+> trôi khỏi nhau. `add()` của `slaItems` nhận thêm tham số thứ 14 = tên tham số cấu hình.
+> Khai mới **4 ngưỡng** trước đây nằm trong đầu người viết code: `slaDiscountApprove_hours`,
+> `slaPaymentVerify_hours`, `slaClassInfoSend_hours`, `slaRiskFollowup_days`. Nhóm nào thật sự chưa
+> có ngưỡng thì nói thẳng "chưa khai ngưỡng - báo kỹ thuật", không nói vòng vo.
+> · **Hotline `1900 6789` là số BỊA** lúc gieo dữ liệu (anh Luân: *"1900 6789 làm gì đúng, em phải
+> gọi ở hotline trong cấu hình chứ"*). Nhìn như số thật nên dễ tưởng đã đúng. Nay dữ liệu demo để
+> TRỐNG, app **không dựng nút gọi giả** khi chưa cấu hình. `_check14` đổi bất biến cho đúng: có cấu
+> hình thì cổng phải hiện số gọi được, chưa cấu hình thì không có nút.
+> · Nút dạng thẻ `<a>` (gọi điện, mở link) **ăn gạch chân của link** - thêm `a.btn,a.pill{text-decoration:none}`.
+> Hai nút gọi ở cổng học viên trước đây hai kiểu khác nhau, nay dùng chung `hvCallHTML()`.
 >
 > **CÒN LẠI:** dời `DUEFALL=5` + 16 nhóm câu chăm RTOUCH + giờ hẹn preset vào cấu hình ·
 > màn cấp thêm quota WOW · `statStrip` bấm được ở các trang còn lại · bộ phận chuẩn cho

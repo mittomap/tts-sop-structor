@@ -818,4 +818,35 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
    /max-width:560px\)\{[^}]*white-space:normal/.test(CSS));
 })();
 
+
+/* ---- 30. NGUONG PHAI GHI RO + HOTLINE PHAI LAY TU CAU HINH (V9.29, anh Luan) ---- */
+(function(){
+ setRole("all");
+ /* "theo luat SOP cua chang la tao lao, phai ghi ro ra theo cau hinh chu" */
+ var it=bellItems(), khong=[];
+ it.forEach(function(x){if(!(x.prm||SLAPRM[x.grp])&&khong.indexOf(x.grp)<0)khong.push(x.grp)});
+ t("phan lon viec chi ro duoc nguong lay tu dau ("+(it.length-khong.length)+" nhom co)", khong.length<=5);
+ t("khong con cau 'theo luat SOP cua chang'", !/theo luật SOP của chặng/.test(SRC));
+ t("chua khai nguong thi noi thang ra, khong noi vong vo", /chưa khai ngưỡng - báo kỹ thuật/.test(SRC));
+ t("ten tham so doc THANG tu ham sla cua ga, khong khai lai lan hai", /function slaPrmOf\(fn\)/.test(SRC));
+ t("add\\(\\) mang theo ten tham so", /function add\(cat,grp,sev,ic,who,what,age,page,filter,lead,hoso,act,rid,prm\)/.test(SRC));
+ /* bon nguong moi phai co o sua that */
+ ["slaDiscountApprove_hours","slaPaymentVerify_hours","slaClassInfoSend_hours","slaRiskFollowup_days"].forEach(function(k){
+  t("tham so moi "+k+" co o sua", APPPARAMS.some(function(p){return p[1]===k}))});
+ /* hotline: PHAI lay tu cau hinh, khong bia so */
+ t("du lieu demo KHONG bia san so hotline", String(paramStr("centerHotline","")||"").replace(/\s/g,"")!=="19006789");
+ t("chua cau hinh thi khong dung nut goi gia", (function(){
+   var cu=null;(DATA.config.ch2||[]).forEach(function(c){if(c.name==="centerHotline"){cu=c.value;c.value=""}});
+   var r=hvCallHTML();
+   (DATA.config.ch2||[]).forEach(function(c){if(c.name==="centerHotline")c.value=cu});
+   return r.indexOf("<a ")<0})());
+ t("dien so vao cau hinh thi nut goi ra dung so do", (function(){
+   var cu=null;(DATA.config.ch2||[]).forEach(function(c){if(c.name==="centerHotline"){cu=c.value;c.value="028 7300 1234"}});
+   var r=hvCallHTML();
+   (DATA.config.ch2||[]).forEach(function(c){if(c.name==="centerHotline")c.value=cu});
+   return /tel:02873001234/.test(r)&&/028 7300 1234/.test(r)})());
+ t("moi nut goi di qua MOT ham hvCallHTML", (SRC.match(/href="tel:/g)||[]).length<=2);
+ t("nut dang the <a> khong an gach chan cua link", /a\.btn,a\.pill\{text-decoration:none\}/.test(CSS));
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");

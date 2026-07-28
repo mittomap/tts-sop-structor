@@ -1021,7 +1021,15 @@ _p2set("installmentLate_days", 5, "ngày", "Quá hạn đợt bao nhiêu ngày t
 _p2set("installmentDepositPercent", 40, "%", "Tỷ lệ đóng đợt đầu (cọc) khi chia trả góp")
 # Cổng học viên khuyên "liên hệ trung tâm" mấy lần mà CẢ TRANG không có một số nào - vì
 # centerHotline/centerAddress được app khai trong APPPARAMS nhưng CH2 chưa bao giờ có dòng.
-_p2set("centerHotline", "1900 6789", "chữ", "Hotline hiện trên cổng học viên, tin nhắn xác nhận và phiếu thu")
+# V9.29 (anh Luân): "1900 6789 làm gì đúng, em phải gọi ở hotline trong cấu hình chứ".
+# Số cũ là số BỊA lúc gieo dữ liệu, nhìn như số thật nên dễ tưởng đã đúng. Nay để TRỐNG:
+# app tự ẩn nút gọi khi chưa cấu hình và nhắc vào Cài đặt điền số thật của trung tâm.
+# _p2set chỉ THÊM khi chưa có; số bịa cũ đã nằm sẵn trong file nên phải xoá thẳng.
+for _c in CH2:
+    if _c.get("name") == "centerHotline" and str(_c.get("value") or "").replace(" ", "") == "19006789":
+        _c["value"] = ""
+        _c["meaning"] = "Hotline của trung tâm - hiện trên cổng học viên, tin nhắn xác nhận và phiếu thu. Để trống thì app ẩn nút gọi."
+_p2set("centerHotline", "", "chữ", "Hotline của trung tâm - hiện trên cổng học viên, tin nhắn xác nhận và phiếu thu. Để trống thì app ẩn nút gọi.")
 _p2set("centerAddress", "12 Nguyễn Văn Bảo, phường 4, quận Gò Vấp, TP.HCM", "chữ", "Địa chỉ hiện trên phiếu thu và cổng học viên")
 _p2set("slaFeedbackClassify_hours", 24, "giờ", "Hạn tiếp nhận và phân loại phản hồi của học viên")
 _p2set("permGrace_hours", 48, "giờ", "Quyền tạm theo việc còn hiệu lực thêm bao lâu sau hạn việc")
