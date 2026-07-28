@@ -270,6 +270,27 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .tksay{display:flex;gap:7px;align-items:center}
 .tksay input{flex:1;height:36px;border:1px solid var(--line);border-radius:9px;padding:0 11px;font-family:inherit;font-size:12.5px}
 @media(max-width:820px){.tkrow{flex-wrap:wrap}.tkright{width:100%;align-items:flex-start}}
+/* ===== V9.21 TOUR HƯỚNG DẪN TỪNG BƯỚC ===== */
+.tourspot{position:fixed;border-radius:12px;pointer-events:none;z-index:150;transition:all .22s cubic-bezier(.4,0,.2,1);
+ box-shadow:0 0 0 3px #5B9BD5,0 0 0 6px rgba(91,155,213,.35),0 0 0 9999px rgba(12,22,38,.62)}
+.tourbox{position:fixed;z-index:151;width:330px;max-width:calc(100vw - 24px);background:#fff;border-radius:14px;
+ box-shadow:0 18px 48px rgba(10,20,40,.35);padding:15px 16px 13px;font-size:13px;transition:all .22s cubic-bezier(.4,0,.2,1)}
+.tourbox .tnum{font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--blue)}
+.tourbox h5{font-size:14.5px;font-weight:800;color:var(--navy);margin:4px 0 6px;line-height:1.35}
+.tourbox p{font-size:12.5px;color:#4A5A6E;line-height:1.65;margin:0 0 11px}
+.tourbox .thint{background:#EAF3FC;border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:7px 10px;font-size:12px;color:var(--navy);margin:0 0 11px;line-height:1.55}
+.tourbox .tfoot{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.tourbox .tfoot .sp{margin-left:auto}
+.tourdots{display:flex;gap:4px;margin-bottom:10px}
+.tourdots i{width:100%;height:3px;border-radius:2px;background:#DDE5EE;display:block}
+.tourdots i.on{background:var(--blue)}
+.tourdots i.done{background:#9FC7EA}
+.tourmenu{display:grid;gap:9px}
+.tourmi{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:12px 13px;cursor:pointer;transition:.13s}
+.tourmi:hover{border-color:var(--blue);background:#F6FAFE}
+.tourmi .tmi{width:34px;height:34px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;background:var(--blueb);color:var(--blue);font-size:17px}
+.tourmi b{font-size:13px;color:var(--navy);display:block}
+.tourmi span{font-size:11.5px;color:var(--muted);line-height:1.5;display:block;margin-top:2px}
 .hvsh{display:flex;align-items:center;gap:12px;padding:10px 13px;background:linear-gradient(180deg,#FBFCFD,#fff);border-bottom:1px solid var(--line)}
 .hvsn{min-width:62px;height:28px;border-radius:8px;background:var(--blueb);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;flex:none}
 .hvst{flex:1;min-width:0}
@@ -929,7 +950,8 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
       <div style="display:flex;align-items:center;gap:10px"><div><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px"><span class="chip blue roomChip" id="demoBadge">Room demo</span><button class="btn sm" onclick="demoReset()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ và mọi máy trong room cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
       <div class="rolesel">
         <select class="sel" id="roleSel" onchange="setRole(this.value)" style="display:none"></select>
-        <button class="tbtn" onclick="toggleBell(event)" aria-label="Thông báo"><i class="ti ti-bell"></i><span class="n" id="bellN" style="display:none">0</span></button>
+        <button class="tbtn" data-tour="help" onclick="tourMenu()" aria-label="Hướng dẫn sử dụng" title="Hướng dẫn từng bước"><i class="ti ti-help-circle"></i></button>
+        <button class="tbtn" data-tour="bell" onclick="toggleBell(event)" aria-label="Thông báo"><i class="ti ti-bell"></i><span class="n" id="bellN" style="display:none">0</span></button>
         <div class="notif" id="notif"></div>
       </div>
     </div>
@@ -7458,6 +7480,120 @@ function renderChang(){
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-list-check" style="margin-right:6px"></i>Sổ trực chặng'+(sel?(' · '+esc((JBY[sel]||{}).t||sel)):'')+' ('+LT.length+')</b>'+
   (sel?'<button class="btn sm" style="margin-left:auto" onclick="changPick(\''+sel+'\')"><i class="ti ti-x"></i>Bỏ lọc ga</button>':'<span class="mut" style="margin-left:auto;font-size:11px">bấm một ga trên ray để lọc</span>')+'</div><div class="pbody">'+chayListHTML(LT,"changList")+'</div></div>';
  return h}
+/* ==================== V9.21 - TOUR HƯỚNG DẪN TỪNG BƯỚC ====================
+   Nổ tooltip chỉ tận nơi: mở đúng trang -> khoanh sáng đúng chỗ -> nói làm gì tiếp.
+   Nút: Tiếp theo · Quay lại · Làm lại từ đầu · Đóng. Người dùng vẫn bấm được vào app trong lúc học
+   (lớp phủ để pointer-events:none nên không chặn thao tác - học xong làm luôn).
+   Mỗi bước: {p:trang cần mở, ctx:hàm đặt ngữ cảnh, sel:CSS chọn phần tử, t:tiêu đề, d:mô tả, hint:việc cần làm} */
+var TOURS={
+ batdau:{t:"Bắt đầu nhanh",ic:"ti-rocket",d:"7 bước - hiểu toàn bộ cách app chạy trong 2 phút",steps:[
+  {sel:'.brand',t:"Đây là bàn làm việc của bạn",d:"App gom mọi việc của trung tâm về một chỗ: khách quan tâm, học viên đang học, lớp, tiền, và việc được giao. Menu bên trái xếp theo ĐÚNG hành trình của khách.",hint:"Bấm Tiếp theo để đi từng phần."},
+  {p:"banlam",sel:'.navlbl',t:"Menu xếp theo 4 chặng vòng đời",d:"Chặng 1 Khách tiềm năng - Chặng 2 Đang học - Chặng 3 Tạm dừng - Chặng 4 Kết thúc & Học tiếp. Bấm tên nhóm để mở ra, chấm màu là chặng, số đỏ là việc quá hạn.",hint:"Thử bấm vào một nhóm chặng để xem các nghiệp vụ bên trong."},
+  {p:"banlam",sel:'.bstats',t:"Việc cần xử lý hôm nay",d:"Mỗi ô là một nhóm việc đang chờ. Bấm vào ô nào thì danh sách bên dưới lọc đúng nhóm đó - không phải tự đi tìm.",hint:"Bấm thử ô Tới hẹn hôm nay."},
+  {p:"banlam",sel:'.bwsearch',t:"Tìm nhanh khách hoặc học viên",d:"Gõ tên (không cần dấu) hoặc số điện thoại. Kết quả hiện ngay ở danh sách phía dưới.",hint:"Gõ thử: nguyen"},
+  {p:"banlam",sel:'#chaybody',t:"Danh sách người cần xử lý",d:"Mỗi dòng là một người kèm việc kế tiếp phải làm. Dải hạt màu cho biết họ đang ở chặng nào - bấm vào dải hạt sẽ mở toàn bộ hành trình của người đó.",hint:"Bấm nút Xử lý trên một dòng để chạy đúng quy trình cho người đó."},
+  {sel:'[data-tour="bell"]',t:"Chuông cảnh báo việc quá hạn",d:"Mọi việc trễ hẹn theo quy trình chuẩn (SLA) đều dồn về đây, chia theo bộ phận. Việc mới phát sinh từ máy khác còn nổ bong bóng ở góc phải màn hình.",hint:"Bấm chuông để xem danh sách việc đang trễ."},
+  {sel:'.me',t:"Đổi người để xem góc nhìn khác",d:"Bấm vào ô tên ở đáy menu để quay về màn chọn người. Mỗi chức danh thấy một màn hình khác nhau - đúng như khi chạy thật.",hint:"Xong rồi! Bấm Đóng để tự vọc, hoặc chọn tour khác ở nút dấu hỏi trên đầu."}]},
+ tuyensinh:{t:"Từ khách mới đến đăng ký",ic:"ti-user-plus",d:"8 bước - đi trọn một vòng bán hàng",steps:[
+  {p:"changA",sel:'.nrail',t:"Chặng 1: đường đi của một khách",d:"Mỗi ga là một bước: khách mới - đã liên hệ - đặt test - chấm test - tư vấn - đăng ký. Số trên ga là số người đang đứng ở đó, phần trăm giữa hai ga là tỷ lệ chuyển đổi thật.",hint:"Bấm vào một ga để lọc danh sách người ở ga đó."},
+  {p:"changA",sel:'.arcjobs',t:"Các nghiệp vụ trong chặng",d:"Mỗi ô là một màn làm việc: tiếp nhận lead, test đầu vào, tư vấn, thu tiền, chăm lại. Bấm ô là vào thẳng chỗ làm.",hint:"Bấm ô Lead & khai thác."},
+  {p:"nhaplead",sel:'.phead',t:"Tiếp nhận khách mới",d:"Khách gọi đến hay nhắn tin đều ghi vào đây. Hệ thống tự chặn trùng số điện thoại và bắt đầu đếm giờ phản hồi.",hint:"Bấm nút Khách mới liên hệ đến để nhập một khách."},
+  {p:"test",sel:'.phead',t:"Test đầu vào",d:"Đặt lịch test, ghi khách có đến hay không, chấm điểm 4 kỹ năng. Chấm xong hệ thống tự nhắc bước tư vấn.",hint:"Xem một hồ sơ đang chờ chấm ở danh sách bên dưới."},
+  {p:"tuvan",sel:'.phead',t:"Tư vấn lộ trình và chốt khóa",d:"Dựa trên điểm test, tư vấn viên đề xuất khóa phù hợp rồi tạo phiếu đăng ký. Chiết khấu vượt ngưỡng sẽ tự chuyển quản lý duyệt.",hint:"Mở một hồ sơ để xem màn tư vấn."},
+  {p:"thanhtoan",sel:'.phead',t:"Thu học phí",d:"Thu một lần hay nhiều đợt đều được. Thu xong in phiếu, gửi tin nhắn xác nhận cho khách, và kế toán đối soát lại.",hint:"Bấm Thu tiền trên một đăng ký còn nợ."},
+  {p:"duyet",sel:'.phead',t:"Quản lý duyệt chiết khấu",d:"Ưu đãi lớn phải qua quản lý. Khi tư vấn viên tạo, màn hình quản lý nổ thông báo ngay - đây là chỗ demo hiệu ứng hai cổng.",hint:"Mở app ở cửa sổ thứ hai bằng cổng Quản lý để xem thông báo nổ."},
+  {p:"xeplop",sel:'.phead',t:"Xếp lớp và nhập học",d:"Đóng tiền xong là xếp lớp, gửi thông tin lớp, chờ học viên xác nhận rồi hoàn tất nhập học. Từ đây khách chính thức thành học viên.",hint:"Xong vòng tuyển sinh! Tour Học tập sẽ đi tiếp phần dạy và học."}]},
+ giaoviec:{t:"Giao việc cho nhân sự",ic:"ti-clipboard-list",d:"6 bước - giao, theo dõi, nghiệm thu",steps:[
+  {p:"giaoviec",sel:'.phead',t:"Trang giao việc",d:"Ba kiểu việc: cấp trên giao xuống, phối hợp ngang cấp, và nhờ hỗ trợ. Kiểu việc quyết định người nhận có được từ chối hay không.",hint:"Bấm nút Giao việc mới ở góc phải."},
+  {p:"giaoviec",sel:'.bstats',t:"Bốn con số cần nhìn mỗi sáng",d:"Việc tôi phải làm, việc quá hạn của tôi, việc chờ tôi xác nhận, và việc tôi giao đang chạy.",hint:"Bấm Tiếp theo."},
+  {p:"giaoviec",sel:'.tbar',t:"Hai phía của một việc",d:"Tab Việc của tôi là việc người khác giao cho bạn. Tab Tôi đã giao là để theo dõi người khác làm tới đâu.",hint:"Bấm sang tab Tôi đã giao."},
+  {p:"giaoviec",sel:'.tkrow',t:"Một dòng việc",d:"Nhìn là biết: ai giao, còn bao lâu tới hạn, bắt buộc hay không, có bao nhiêu trao đổi. Bấm vào dòng để mở chi tiết.",hint:"Bấm vào một dòng việc."},
+  {p:"giaoviec",sel:'.tkrow',t:"Trao đổi ngay trong việc",d:"Mở một việc sẽ thấy khung trao đổi: hỏi đáp, báo vướng nằm đúng chỗ, không trôi như tin nhắn. Mọi thao tác nhận việc, báo xong, xác nhận đều tự ghi lại.",hint:"Mở một việc rồi gõ thử một dòng trao đổi."},
+  {p:"giaoviec",sel:'.tbar',t:"Tổng hợp và báo cáo",d:"Tab Tổng hợp cho biết ai đang ôm nhiều việc, ai hay trễ hạn, tỷ lệ hoàn thành đúng hạn của từng người.",hint:"Bấm tab Tổng hợp & báo cáo để xem."}]},
+ cauhinh:{t:"Cấu hình cho trung tâm của bạn",ic:"ti-settings",d:"6 bước - đổi thương hiệu, ngưỡng, câu chữ",steps:[
+  {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'.settabs',t:"Mọi thứ đều sửa được",d:"Trang Cài đặt là nơi đổi giao diện, ngưỡng thời gian, câu nhắc việc, danh mục, học phí và nhân sự. App không cắm cứng con số nào.",hint:"Bấm Tiếp theo để xem từng tab."},
+  {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'.phead',t:"Giao diện và thương hiệu",d:"Đổi tên trung tâm, logo, màu chủ đạo, tiêu đề tab trình duyệt. Mang demo đi đâu chỉ cần đổi ở đây là thành bản của trung tâm đó.",hint:"Thử đổi màu chủ đạo xem app đổi ngay."},
+  {p:"settings",ctx:function(){window.SETTAB="menu"},sel:'.settabs',t:"Menu sidebar",d:"Tắt mục không dùng cho menu gọn lại, hoặc đổi tên nhóm theo cách gọi quen của trung tâm bạn.",hint:"Tắt thử một mục rồi nhìn menu bên trái."},
+  {p:"settings",ctx:function(){window.SETTAB="ch2"},sel:'.settabs',t:"Ngưỡng thời gian và SLA",d:"Bao lâu phải gọi khách mới, bao lâu phải chấm test, bao lâu phải ghi nhận xét buổi học. Đổi ở đây thì mọi cảnh báo trong app tự đổi theo.",hint:"Xem danh sách tham số bên dưới."},
+  {p:"settings",ctx:function(){window.SETTAB="ch4"},sel:'.settabs',t:"Câu nhắc việc",d:"Toàn bộ câu chữ nhắc nhân viên làm gì đều nằm ở đây - sửa được, không phải nhờ lập trình viên.",hint:"Bấm Tiếp theo."},
+  {p:"settings",ctx:function(){window.SETTAB="demo"},sel:'.settabs',t:"Dữ liệu demo và Room",d:"Các máy mở bản demo tự đồng bộ với nhau. Hết buổi demo bấm Reset là dữ liệu về nguyên bản.",hint:"Xong! Bạn đã nắm cách cấu hình app."}]}
+};
+var TOUR={key:"",i:0,on:false};
+function tourMenu(){var h='<div class="tourmenu">';
+ h+='<div class="mut" style="font-size:12px;line-height:1.6;margin-bottom:2px">Chọn một hướng dẫn - app sẽ mở đúng màn hình và chỉ tận nơi từng bước. Đang học vẫn bấm thử được bình thường.</div>';
+ Object.keys(TOURS).forEach(function(k){var T=TOURS[k];
+  h+='<div class="tourmi" onclick="closeModal();tourStart(\''+k+'\')"><span class="tmi"><i class="ti '+T.ic+'"></i></span>'+
+   '<div><b>'+esc(T.t)+'</b><span>'+esc(T.d)+'</span></div></div>'});
+ h+='</div>';
+ openDrawer("Hướng dẫn sử dụng",h)}
+function tourStart(k){if(!TOURS[k])return;TOUR={key:k,i:0,on:true};tourShow()}
+function tourEnd(){TOUR.on=false;
+ try{var s=document.getElementById("tourspot"),b=document.getElementById("tourbox");
+  if(s)s.remove();if(b)b.remove()}catch(e){}
+ try{window.removeEventListener("resize",tourReflow);window.removeEventListener("scroll",tourReflow,true)}catch(e){}}
+function tourRestart(){if(!TOUR.key)return;TOUR.i=0;tourShow()}
+function tourNext(){var T=TOURS[TOUR.key];if(!T)return;
+ if(TOUR.i>=T.steps.length-1){tourEnd();toast("Đã xong hướng dẫn. Bấm dấu hỏi trên đầu để xem lại bất cứ lúc nào.",4200);return}
+ TOUR.i++;tourShow()}
+function tourPrev(){if(TOUR.i>0){TOUR.i--;tourShow()}}
+function tourFind(sel){if(!sel)return null;
+ try{var l=document.querySelectorAll(sel);
+  for(var i=0;i<l.length;i++){var r=l[i].getBoundingClientRect&&l[i].getBoundingClientRect();
+   if(r&&(r.width>4||r.height>4))return l[i]}
+  return l[0]||null}catch(e){return null}}
+function tourShow(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
+ var st=T.steps[TOUR.i];if(!st){tourEnd();return}
+ if(st.ctx)try{st.ctx()}catch(e){}
+ if(st.p&&typeof go==="function"&&CUR!==st.p){try{go(st.p)}catch(e){}}
+ else if(st.ctx&&typeof reRender==="function")try{reRender(CUR)}catch(e){}
+ setTimeout(tourPaint,st.p?170:40)}
+function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
+ var st=T.steps[TOUR.i];if(!st)return;
+ var el=tourFind(st.sel);
+ var s=document.getElementById("tourspot"),b=document.getElementById("tourbox");
+ if(!s){s=document.createElement("div");s.id="tourspot";s.className="tourspot";document.body.appendChild(s)}
+ if(!b){b=document.createElement("div");b.id="tourbox";b.className="tourbox";document.body.appendChild(b)}
+ var r=el&&el.getBoundingClientRect?el.getBoundingClientRect():null;
+ var vw=window.innerWidth||1200,vh=window.innerHeight||800;
+ if(r&&(r.width>4||r.height>4)){
+  if(r.top<70||r.bottom>vh-70){try{el.scrollIntoView({block:"center",behavior:"smooth"});
+   setTimeout(tourPaint,320);return}catch(e){}}
+  s.style.display="";s.style.left=(r.left-6)+"px";s.style.top=(r.top-6)+"px";
+  s.style.width=(r.width+12)+"px";s.style.height=(r.height+12)+"px";
+ }else{ /* không thấy phần tử: che giữa màn, vẫn chạy tiếp được */
+  s.style.display="";s.style.left=(vw/2-140)+"px";s.style.top=(vh/2-60)+"px";s.style.width="280px";s.style.height="120px"}
+ var n=T.steps.length;
+ var dots="";for(var i=0;i<n;i++)dots+='<i class="'+(i===TOUR.i?"on":(i<TOUR.i?"done":""))+'"></i>';
+ b.innerHTML='<div class="tourdots">'+dots+'</div>'+
+  '<div class="tnum">'+esc(T.t)+' · bước '+(TOUR.i+1)+'/'+n+'</div>'+
+  '<h5>'+esc(st.t)+'</h5><p>'+esc(st.d)+'</p>'+
+  (st.hint?'<div class="thint"><i class="ti ti-hand-finger" style="margin-right:5px"></i>'+esc(st.hint)+'</div>':'')+
+  '<div class="tfoot">'+
+   (TOUR.i>0?'<button class="btn sm" onclick="tourPrev()"><i class="ti ti-chevron-left"></i>Quay lại</button>':'')+
+   '<button class="btn sm primary" onclick="tourNext()">'+(TOUR.i>=n-1?'<i class="ti ti-check"></i>Hoàn tất':'Tiếp theo<i class="ti ti-chevron-right"></i>')+'</button>'+
+   '<span class="sp"></span>'+
+   '<button class="btn sm" onclick="tourRestart()" title="Quay về bước 1"><i class="ti ti-restore"></i>Làm lại</button>'+
+   '<button class="btn sm" onclick="tourEnd()"><i class="ti ti-x"></i>Đóng</button>'+
+  '</div>';
+ var bw=Math.min(330,vw-24),bh=b.offsetHeight||230;
+ var left,top;
+ if(r&&(r.width>4||r.height>4)){
+  top=r.bottom+14;if(top+bh>vh-10)top=Math.max(10,r.top-bh-14);
+  left=r.left+r.width/2-bw/2;
+ }else{top=vh/2+70;left=vw/2-bw/2}
+ b.style.left=Math.max(12,Math.min(left,vw-bw-12))+"px";
+ b.style.top=Math.max(10,Math.min(top,vh-bh-10))+"px";
+ try{window.addEventListener("resize",tourReflow);window.addEventListener("scroll",tourReflow,true)}catch(e){}}
+function tourReflow(){if(TOUR.on){clearTimeout(window.__trf);window.__trf=setTimeout(tourPaint,60)}}
+/* lần đầu mở app: mời xem hướng dẫn (chỉ hỏi 1 lần cho mỗi trình duyệt) */
+function tourOfferOnce(){if(SVR||!CANLS)return;
+ try{if(localStorage.getItem("ITTS_TOUR_SEEN"))return;localStorage.setItem("ITTS_TOUR_SEEN","1")}catch(e){return}
+ setTimeout(function(){try{
+  notiShow("Lần đầu dùng app? Xem hướng dẫn 2 phút","Bấm vào đây để app chỉ tận nơi từng bước - hoặc bấm dấu hỏi trên thanh tiêu đề bất cứ lúc nào.","",0);
+  var box=document.getElementById("notis");
+  if(box&&box.lastChild)box.lastChild.onclick=function(){try{this.remove()}catch(e){};tourStart("batdau")};
+ }catch(e){}},1500)}
+
 /* ==================== V9.20 - CẤU HÌNH GIAO DIỆN & THƯƠNG HIỆU (Cài đặt > Giao diện) ====================
    Lưu trong DATA.config.ui -> tự đồng bộ đa cổng/đa máy như mọi dữ liệu demo và Reset demo đưa về gốc.
    Áp bằng uiApply(): đổi biến màu CSS, tên + logo trên sidebar, tiêu đề tab trình duyệt.
@@ -8162,7 +8298,8 @@ function deriveAll(){
   rows("DL10").forEach(function(c){derNum(c,"current_enrollment",cls[c.class_id]||0)});
  }catch(e){}
 }
-function enter(k){try{deriveAll()}catch(e){}try{autoReturnHandovers()}catch(e){}document.getElementById("login").style.display="none";document.getElementById("app").style.display="flex";setRole(k)}
+function enter(k){try{deriveAll()}catch(e){}try{autoReturnHandovers()}catch(e){}document.getElementById("login").style.display="none";document.getElementById("app").style.display="flex";setRole(k);
+ try{tourOfferOnce()}catch(e){}}
 
 /* ============ CỔNG HỌC VIÊN (file HTML riêng) ============
    Sidebar là MỤC LỤC: bấm là trượt tới đúng phần, cuộn tới đâu sáng tới đó. */

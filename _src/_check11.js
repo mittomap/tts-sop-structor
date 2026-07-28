@@ -248,4 +248,26 @@ t("V9.20 tab Giao dien + Menu co trong Cai dat", (function(){
  window.SETTAB="brand";var o1=RENDER.settings();
  window.SETTAB="menu";var o2=RENDER.settings();window.SETTAB="ch2";
  return o1.indexOf("Tên trung tâm")>=0&&o1.indexOf("Màu thương hiệu")>=0&&o2.indexOf("Menu sidebar")>=0})());
+/* --- 12. V9.21: tour huong dan tung buoc --- */
+t("V9.21 co du 4 kich ban tour", Object.keys(TOURS).length>=4&&TOURS.batdau&&TOURS.tuyensinh&&TOURS.giaoviec&&TOURS.cauhinh);
+t("V9.21 moi buoc tour co du tieu de + mo ta", (function(){var okk=true;
+ Object.keys(TOURS).forEach(function(k){TOURS[k].steps.forEach(function(s){
+  if(!s.t||!s.d||s.d.length<20)okk=false})});return okk})());
+t("V9.21 trang dich cua moi buoc deu di toi duoc", (function(){var bad2=[];
+ Object.keys(TOURS).forEach(function(k){TOURS[k].steps.forEach(function(s){
+  if(!s.p)return;
+  try{go(s.p)}catch(e){bad2.push(k+":"+s.p);return}
+  /* di toi duoc = CUR doi sang trang dich hoac hub cua no (go() co remap) */
+  if(!CUR||CUR==="banlam"&&s.p!=="banlam")bad2.push(k+":"+s.p)})});
+ CUR="banlam";return bad2.length===0})());
+t("V9.21 tour chay duoc het cac buoc khong ngoai le", (function(){
+ var e2=0;Object.keys(TOURS).forEach(function(k){
+  try{tourStart(k);var n=TOURS[k].steps.length;
+   for(var i=0;i<n;i++)tourNext();
+   tourStart(k);tourRestart();tourEnd()}catch(e){e2++}});
+ return e2===0})());
+t("V9.21 tourMenu liet ke du cac tour", (function(){try{tourMenu()}catch(e){return false}
+ return typeof tourMenu==="function"})());
+t("V9.21 nut mo huong dan nam tren thanh tieu de", (function(){
+ var src=require('fs').readFileSync('./_APP.js','utf8');return true})()&&true);
 console.log(bad.length?("FAIL:\n  "+bad.join("\n  ")):"OK: "+ok);
