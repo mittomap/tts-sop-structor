@@ -1253,6 +1253,75 @@ for _m in _ch4b:
 log.append("14quinquies. Cột 'Khi nào hiện': bỏ số cắm cứng ở %d câu - nay lấy từ cấu hình như câu mẫu"
            % _fixw)
 
+# ═══ 14sexies. CHI NHÁNH CỦA NHÂN SỰ (V9.29o - anh Luân: "trung tâm có 5 chi nhánh và
+# hình thức học online, làm gì cũng phải cân nhắc") ═══════════════════════════
+# 10/10 giáo viên đang để TRỐNG cột branch. Hệ quả không nhìn thấy ngay: câu hỏi
+# "ai thay được buổi này ở Cơ sở 3" KHÔNG trả lời được, và mọi báo cáo tách theo chi
+# nhánh đều thiếu người. Không bịa chi nhánh: suy từ chính các lớp mà người đó đã dạy
+# (DL10.main_teacher_id + DL11.teacher_id) - chi nhánh dạy nhiều nhất là chi nhánh chính.
+# Lớp ONLINE không tính vào chi nhánh chính (dạy online thì ở đâu cũng dạy được), trừ khi
+# người đó chỉ dạy online - lúc đó chi nhánh chính đúng là "Cơ sở Online".
+_clsBr = {c.get("class_id"): c.get("branch", "") for c in dl.get("DL10", [])}
+_cnt = {}
+for c in dl.get("DL10", []):
+    t = str(c.get("main_teacher_id") or "").strip()
+    if t:
+        _cnt.setdefault(t, {}); b = c.get("branch", "")
+        _cnt[t][b] = _cnt[t].get(b, 0) + 3        # lớp chủ nhiệm nặng ký hơn buổi dạy thay
+for x in dl.get("DL11", []):
+    t = str(x.get("teacher_id") or "").strip()
+    b = _clsBr.get(x.get("class_id"), "")
+    if t and b:
+        _cnt.setdefault(t, {}); _cnt[t][b] = _cnt[t].get(b, 0) + 1
+_ONL = "online (Cơ sở Online)"
+_setbr = 0
+for st in dl.get("DL01", []):
+    if str(st.get("branch") or "").strip():
+        continue
+    c = _cnt.get(st.get("staff_id"), {})
+    if not c:
+        continue
+    off = {k: v for k, v in c.items() if k and k != _ONL}
+    pick = max(off, key=off.get) if off else _ONL
+    st["branch"] = pick; _setbr += 1
+# Giáo viên CHƯA từng dạy buổi nào thì không suy ra được gì. Đây là dữ liệu DEMO nên rải đều
+# họ về các chi nhánh đang có lớp - cốt để mỗi chi nhánh đều có người dự phòng, màn "GV dự phòng
+# theo ngày" mới có gì để thử. Ghi rõ đây là QUYẾT ĐỊNH GIEO DỮ LIỆU, không phải luật nghiệp vụ.
+_brs = [b for b in {c.get("branch", "") for c in dl.get("DL10", [])} if b and b != _ONL]
+_brs.sort()
+_free = [st for st in dl.get("DL01", [])
+         if "teacher" in str(st.get("role") or "") and not str(st.get("branch") or "").strip()]
+for _i, st in enumerate(_free):
+    if not _brs:
+        break
+    st["branch"] = _brs[_i % len(_brs)]; _setbr += 1
+# BÁO SỐ HIỆN TRẠNG, KHÔNG BÁO SỐ VỪA SỬA. Bẫy: gen_demo.py ĐỌC LẠI chính demo_data_big.json
+# (DL01/DL05/DL10 là fixture mang theo qua mỗi lượt chạy), nên thứ pass này vá hôm nay sẽ thành
+# ĐẦU VÀO của lượt chạy ngày mai - đếm "vừa sửa mấy dòng" thì lần thứ hai luôn ra số nhỏ hơn và
+# đọc log tưởng vá hụt. Đếm độ phủ thì lần nào cũng nói đúng.
+_gvAll = [st for st in dl.get("DL01", []) if "teacher" in str(st.get("role") or "")]
+_gvBr = sum(1 for st in _gvAll if str(st.get("branch") or "").strip())
+_stAll = len(dl.get("DL01", []))
+_stBr = sum(1 for st in dl.get("DL01", []) if str(st.get("branch") or "").strip())
+log.append("14sexies. Chi nhánh nhân sự: %d/%d giáo viên và %d/%d nhân sự đã có chi nhánh "
+           "(suy từ lớp/buổi đã dạy; lớp online không tính là chi nhánh chính)"
+           % (_gvBr, len(_gvAll), _stBr, _stAll))
+
+# --- Lớp ONLINE thì không được gán phòng học vật lý, và ngược lại ------------
+# Trộn hai thứ này là màn xếp phòng đếm nhầm và GV dự phòng lọc nhầm.
+_vfix = 0
+for c in dl.get("DL10", []):
+    lm = str(c.get("learning_mode") or "")
+    v = str(c.get("venue_or_zoom_link") or "")
+    if lm.startswith("online") and not v.startswith("http"):
+        c["venue_or_zoom_link"] = "https://zoom.us/j/itts-%s (gửi trước buổi đầu)" % str(c.get("class_id") or "").lower()
+        _vfix += 1
+    if lm.startswith("offline") and v.startswith("http"):
+        c["venue_or_zoom_link"] = "Phòng 101 - " + str(c.get("branch") or "").split(" (")[0]
+        _vfix += 1
+if _vfix:
+    log.append("14sexies-b. Chỗ học: sửa %d lớp bị lệch giữa hình thức học và phòng/link" % _vfix)
+
 # ═══ 15. SAN PHẲNG SƠ ĐỒ CỘT (UNION KEY) - PHẢI LÀ PASS CUỐI CÙNG ═════════
 # Cột chỉ có mặt ở vài dòng (referrer_name, referral_uses, net_received...) làm app render
 # ô trống và bản Sheets lệch cột. LUẬT: mọi dòng trong cùng một bảng phải CÙNG BỘ CỘT.

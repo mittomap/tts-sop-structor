@@ -1592,7 +1592,14 @@ var PAGES=[
 {k:"magioithieu",g:"_",ic:"ti-gift",t:"Mã giới thiệu",c:"Trong Tính năng khác",ty:"custom",hide:1},
 /* ===== QUẢN LÝ ===== */
 {k:"baocao",g:"Quản lý",ic:"ti-chart-bar",t:"Tổng quan · Báo cáo & KPI",c:"Điều hành theo SOP",ty:"custom"},
-{k:"duyet",g:"Quản lý",ic:"ti-discount-check",t:"Duyệt Chiết khấu & Hoàn tiền",c:"Phê duyệt",ty:"custom"},
+{k:"duyet",g:"Chờ duyệt",ic:"ti-discount-check",t:"Chờ duyệt & quyết định",c:"Mọi thứ đang chờ ai đó gật đầu",ty:"custom"},
+/* V9.29o: 5 mục con của hub Chờ duyệt - đứng riêng trên menu để người có thẩm quyền thấy thẳng
+   việc của mình, go() remap về hub đúng tab (DUYMAP). hide:1 vì chúng không phải trang riêng. */
+{k:"duyetck",g:"_",hide:1,ic:"ti-discount-2",t:"Duyệt chiết khấu",c:"Chiết khấu vượt ngưỡng chờ quản lý",ty:"custom"},
+{k:"duyethoan",g:"_",hide:1,ic:"ti-arrow-back-up",t:"Duyệt hoàn tiền",c:"Hoàn tiền theo mốc SOP",ty:"custom"},
+{k:"duyetnghi",g:"_",hide:1,ic:"ti-user-question",t:"Duyệt đơn xin nghỉ",c:"Học viên báo nghỉ chờ học vụ duyệt",ty:"custom"},
+{k:"duyetthu",g:"_",hide:1,ic:"ti-receipt",t:"Xác nhận thu tiền",c:"Kế toán đối soát khoản đã ghi",ty:"custom"},
+{k:"duyetgiao",g:"_",hide:1,ic:"ti-inbox",t:"Việc chờ nhận",c:"Việc đã giao chưa ai bấm nhận",ty:"custom"},
 {k:"khac",g:"Quản lý",ic:"ti-adjustments",t:"Tính năng khác",c:"Bảo lưu · Mã giới thiệu · Bàn giao lead",ty:"custom"},
 {k:"banggiao",g:"_",ic:"ti-arrows-exchange",t:"Bàn giao lead",c:"Trong Tính năng khác",ty:"custom",hide:1},
 {k:"settings",g:"Quản lý",ic:"ti-settings",t:"Cài đặt hệ thống",c:"Cấu hình",ty:"custom"},
@@ -1621,28 +1628,31 @@ var ROLESCOPE={
  quantri:{match:null,land:"banlam",pages:"*",blocks:"*",mine:0,mineBtn:0,kpi:0,bell:"*"},
  dieuhanh:{match:/^ceo$/,land:"baocao",pages:"*",blocks:"*",mine:0,mineBtn:0,kpi:0,bell:"*"},
  tuvan:{match:/^sales/,land:"banlam",
-  pages:["viec","banlam","hanhtrinh","hocvien","giangvien","tuyensinh","ketthuc","khac"],
-  tabs:{khac:["magioithieu"]},
+  pages:["viec","banlam","hanhtrinh","hocvien","giangvien","tuyensinh","ketthuc","khac","duyet"],
+  tabs:{khac:["magioithieu"],duyet:["duyetgiao","banggiao"]},
   blocks:["appt","new","contacted","test_done","enrolled","reup"],
   mine:1,mineBtn:1,kpi:1,bell:["Tuyển sinh","Giao việc"]},
  hocvu:{match:/^(academic|aca_)/,land:"banlam",
-  pages:["viec","banlam","hanhtrinh","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ketthuc","khac"],
-  tabs:{khac:["baoluu"]},
+  pages:["viec","banlam","hanhtrinh","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ketthuc","khac","duyet"],
+  tabs:{khac:["baoluu"],duyet:["duyetnghi","duyetgiao"]},
   blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:0,kpi:1,bell:["Học vụ","CSKH","Giảng viên (ACA)","WOW","Giao việc"]},
  giaovien:{match:/^teacher$/,land:"hoctap",ctx:{HTTAB:"today"},
-  pages:["viec","banlam","hocvien","giangvien","banglop","hoctap","giaoan"],
-  blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:0,bell:["Giảng viên (ACA)","Học vụ","Giao việc"]},
+  pages:["viec","banlam","hocvien","giangvien","banglop","hoctap","giaoan","duyet"],
+  tabs:{duyet:["duyetgiao"]},blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:0,bell:["Giảng viên (ACA)","Học vụ","Giao việc"]},
  wow:{match:/^wow/,land:"hoctap",ctx:{HTTAB:"wow"},
-  pages:["viec","banlam","hocvien","giangvien","hoctap","banglop"],
-  blocks:["test_grading","wowq","risk"],mine:0,mineBtn:0,kpi:0,bell:["WOW","Giảng viên (ACA)","Giao việc"]},
+  pages:["viec","banlam","hocvien","giangvien","hoctap","banglop","duyet"],
+  tabs:{duyet:["duyetgiao"]},blocks:["test_grading","wowq","risk"],mine:0,mineBtn:0,kpi:0,bell:["WOW","Giảng viên (ACA)","Giao việc"]},
  ketoan:{match:/^account/,land:"tuyensinh",ctx:{TSTAB:"thanhtoan"},
   pages:["viec","banlam","hocvien","giangvien","tuyensinh","duyet","baocao"],
+  tabs:{duyet:["duyetck","duyethoan","duyetthu","duyetgiao"]},
   blocks:["enrolled","approve","debt"],mine:0,mineBtn:0,kpi:0,bell:["Tài chính","Giao việc"]},
  marketing:{match:/^marketing/,land:"tuyensinh",ctx:{TSTAB:"lead"},
-  pages:["viec","banlam","tuyensinh","khac","hocvien"],tabs:{khac:["magioithieu"]},
+  pages:["viec","banlam","tuyensinh","khac","hocvien","duyet"],
+  tabs:{khac:["magioithieu"],duyet:["banggiao","duyetgiao"]},
   blocks:["new","reup"],mine:0,mineBtn:0,kpi:0,bell:["Tuyển sinh","Giao việc"]},
  hotro:{match:/^(hr_|it_|janitor|security)/,land:"banlam",lite:1,
-  pages:["viec","banlam","hocvien","giangvien"],blocks:[],mine:0,mineBtn:0,kpi:0,bell:[]}};
+  pages:["viec","banlam","hocvien","giangvien","duyet"],tabs:{duyet:["duyetgiao"]},
+  blocks:[],mine:0,mineBtn:0,kpi:0,bell:[]}};
 /* V9.20: GIAO VIỆC là việc của MỌI chức danh (kể cả nhóm hỗ trợ) - cấp quyền trang + chuông cho tất cả
    ở MỘT chỗ, khỏi sót khi thêm nhóm vai mới sau này. */
 (function(){for(var k in ROLESCOPE){var r=ROLESCOPE[k];
@@ -3008,21 +3018,93 @@ function viecOnly(sev){window.VIECSEV=sev||"";window.VIECOD=(sev==="red");
  window.VIECGRP="all";reRender("viec")}
 
 function ckThreshold(){return paramOf("thresholdDiscount_approval",1000000)}
+/* ═══════ V9.29o - HUB "CHỜ DUYỆT" (anh Luân 28/07 khuya) ═══════
+   "duyệt chiết khấu, hoàn tiền và bàn giao lead giờ đứng chỗ đó không còn hợp nữa... gom lại
+    thành chờ duyệt hoặc chờ quyết định gì đó, để ở nhóm sidebar nào đó".
+
+   NGUYÊN TẮC QUY HOẠCH (ghi ra để lần sau thêm việc mới biết bỏ vào đâu):
+   - Trang theo CHẶNG = NƠI LÀM VIỆC. Người ta vào đó để làm cho xong một việc của vòng đời.
+   - Hàng chờ QUYẾT ĐỊNH không thuộc chặng nào - nó thuộc về NGƯỜI CÓ THẨM QUYỀN. Một khoản
+     hoàn tiền phát sinh được ở C2 lẫn C3; nhét vào một chặng là chỗ kia mất dấu.
+   Vì vậy mọi thứ "có người đang chờ ai đó gật đầu" gom về ĐÚNG MỘT hub, mỗi loại một tab, và
+   hub đó có nhóm riêng trên sidebar. Lối vào cũ giữ nguyên: go('banggiao') vẫn chạy, chỉ là
+   nay nó mở hub đúng tab (DUYMAP trong go()) - không ai phải học lại đường đi. */
+function duyTabs(){
+ var TH=ckThreshold();
+ return [
+  {k:"duyetck",  t:"Chiết khấu",     ic:"ti-discount-2",   n:rows("DL06").filter(function(r){return num(r.discount_amount)>=TH&&!r.discount_approved_by}).length},
+  {k:"duyethoan",t:"Hoàn tiền",      ic:"ti-arrow-back-up",n:duyRefundList().length},
+  {k:"duyetnghi",t:"Đơn xin nghỉ",   ic:"ti-user-question",n:absQueue().length},
+  {k:"duyetthu", t:"Xác nhận thu tiền",ic:"ti-receipt",    n:duyPayList().length},
+  {k:"duyetgiao",t:"Việc chờ nhận",  ic:"ti-inbox",        n:duyTaskList().length},
+  {k:"banggiao",t:"Bàn giao lead",ic:"ti-arrows-exchange",n:0}]}
+function duyRefundList(){return rows("DL06").filter(function(r){
+ return (/cancel/.test(ecode(r.enrollment_status))||r.cancellation_reason)&&!/hoàn tiền|hoan tien/i.test(String(r.notes||""))})}
+function duyPayList(){return rows("DL07").filter(function(p){
+ return num(p.amount)>0&&!(p.verified_by&&String(p.verified_by).trim())})}
+function duyTaskList(){return rows("DL23").filter(function(t){return tkSt(t)==="new"})}
+function duyTabSet(k){window.DUYTAB=k;reRender("duyet")}
+function duyN(){var n=0;duyTabs().forEach(function(x){n+=x.n});return n}
 function renderDuyet(){var TH=ckThreshold();
+ var tab=window.DUYTAB||"duyetck";
+ var TB=duyTabs();
+ var h=pageHead("Chờ duyệt & quyết định","Mọi thứ đang chờ ai đó gật đầu - chiết khấu, hoàn tiền, đơn xin nghỉ, đối soát tiền, việc được giao, bàn giao lead. Quyết định ở đây ghi thẳng vào sổ gốc kèm tên người quyết và thời điểm.","");
+ /* tab nào KHÔNG phải việc của vai này thì không hiện - hub gom việc lại, không gom quyền lại */
+ var segs=scopeTabs("duyet",TB.map(function(x){return [x.k,x.t,x.n||"",x.n?"amber":""]}));
+ if(!segs.length)return h+'<div class="panel"><div class="empty">Chức danh của bạn không có hàng chờ quyết định nào.</div></div>';
+ if(!segs.some(function(t){return t[0]===tab})){tab=segs[0][0];window.DUYTAB=tab}
+ h+=tbar(segHTML(tab,segs,"duyTabSet('{k}')"),"");
+ if(tab==="duyetnghi")return h+duyNghiHTML();
+ if(tab==="duyetthu")return h+duyThuHTML();
+ if(tab==="duyetgiao")return h+duyGiaoHTML();
+ if(tab==="banggiao")return h+renderBanggiao(1);
+ if(tab==="duyethoan")return h+duyHoanHTML();
+ return h+duyCkHTML(TH)}
+/* --- tab ĐƠN XIN NGHỈ: dùng lại đúng hàng đợi của màn điểm danh, không dựng bản thứ hai --- */
+function duyNghiHTML(){var q=absQueue();
+ if(!q.length)return '<div class="panel"><div class="empty">Không có đơn xin nghỉ nào chờ duyệt.</div></div>';
+ return absQueueHTML(q,"Đơn xin nghỉ chờ duyệt");}
+/* --- tab XÁC NHẬN THU TIỀN: kế toán đối soát khoản đã ghi nhưng chưa xác nhận --- */
+function duyThuHTML(){var L=duyPayList();
+ var h='<div class="notebar"><i class="ti ti-info-circle"></i>Khoản đã ghi vào sổ nhưng kế toán chưa đối soát. Xác nhận xong mới tính là tiền thật vào két.</div>';
+ h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Ngày thu</th><th>Học viên</th><th>Số tiền</th><th>Hình thức</th><th>Người thu</th><th></th></tr></thead><tbody>';
+ if(!L.length)h+='<tr><td class="empty" colspan="6">Không còn khoản nào chờ đối soát.</td></tr>';
+ L.slice(0,120).forEach(function(p){var e=find("DL06","enrollment_id",p.enrollment_id)||{};
+  h+='<tr><td>'+esc(String(p.payment_time||"").slice(0,16))+'</td>'+
+   '<td>'+nguoiLnk(e.student_id,p.student_id_name||e.student_id_name,"-")+'</td>'+
+   '<td style="font-variant-numeric:tabular-nums"><b>'+vnd(num(p.amount))+'</b></td>'+
+   '<td>'+esc(elabel(p.payment_method)||"-")+'</td><td>'+esc(p.received_by_name||p.received_by||"-")+'</td>'+
+   '<td><button class="btn sm green" onclick="payVerify(\''+esc(p.enrollment_id)+'\')"><i class="ti ti-check"></i>Đã đối soát</button></td></tr>'});
+ return h+'</tbody></table></div></div>'}
+/* --- tab VIỆC CHỜ NHẬN: DL23 trạng thái "new" - người được giao chưa bấm nhận --- */
+function duyGiaoHTML(){var L=duyTaskList();
+ var h='<div class="notebar"><i class="ti ti-info-circle"></i>Việc đã giao nhưng người nhận chưa bấm nhận. Để lâu là việc treo - chuông reo theo '+slaChip("slaTaskAccept_hours",8)+'.</div>';
+ h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Việc</th><th>Giao cho</th><th>Người giao</th><th>Hạn</th><th>Mức</th><th></th></tr></thead><tbody>';
+ if(!L.length)h+='<tr><td class="empty" colspan="6">Mọi việc đã giao đều có người nhận.</td></tr>';
+ L.slice(0,120).forEach(function(t){
+  h+='<tr><td><b>'+esc(t.title||t.task_id||"")+'</b></td>'+
+   '<td>'+nsLnk(t.assignee_id,t.assignee_name,"-")+'</td><td>'+nsLnk(t.assigner_id,t.assigner_name,"-")+'</td>'+
+   '<td>'+esc(String(t.due_time||"").slice(0,16)||"-")+(tkOver(t)?' <span class="chip red">quá hạn</span>':'')+'</td>'+
+   '<td>'+tkStChip(t)+'</td>'+
+   '<td><button class="btn sm" onclick="go(\'giaoviec\')"><i class="ti ti-arrow-right"></i>Mở Giao việc</button></td></tr>'});
+ return h+'</tbody></table></div></div>'}
+function duyHoanHTML(){
+ var refund=duyRefundList();
+ var h='<div class="notebar"><i class="ti ti-info-circle"></i>Mức hoàn gợi ý theo 3 mốc ngày trong cấu hình: '+slaChip("refundFull_days",7)+' hoàn 100% · '+slaChip("refundPartial_days",14)+' hoàn '+slaChip("refundPartial_percent",70)+' · '+slaChip("refundReduced_days",30)+' hoàn '+slaChip("refundReduced_percent",50)+'.</div>';
+ h+='<div class="panel"><div class="pbody">';
+ if(!refund.length)h+='<div class="empty">Không có yêu cầu hoàn tiền.</div>';
+ refund.forEach(function(r){var id=esc(r.enrollment_id);var sg=refundSuggest(r);
+  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+esc(r.student_id_name||r.student_id)+' - đã đóng '+vnd(num(r.paid_amount))+'</div><div class="amt" style="color:var(--amber)">Gợi ý hoàn '+vnd(sg.amt)+' ('+sg.pct+'%)</div><div class="rs">Lý do hủy: '+esc(r.cancellation_reason||"-")+' - '+esc(sg.why)+'</div></div><div class="act"><button class="btn primary" onclick="duyetRefund(\''+id+'\')"><i class="ti ti-cash"></i>Xử lý hoàn tiền</button></div></div>'});
+ return h+'</div></div>'}
+function duyCkHTML(TH){
  var ck=rows("DL06").filter(function(r){return num(r.discount_amount)>=TH&&!r.discount_approved_by});
  var appr=rows("DL06").filter(function(r){return num(r.discount_amount)>=TH&&r.discount_approved_by});
- var h='<div class="phead"><div><div class="t">Duyệt Chiết khấu & Hoàn tiền</div><div class="s">Hàng chờ quản lý - mọi quyết định ghi thẳng vào DL06 (người duyệt + thời điểm)</div></div></div>';
- h+='<div class="notebar"><i class="ti ti-info-circle"></i>Ngưỡng cần duyệt: '+vnd(TH)+' - lấy từ CH2 (thresholdDiscount_approval). Đổi ở Cài đặt là hàng chờ đổi theo.</div>';
+ var h='';
+ h+='<div class="notebar"><i class="ti ti-info-circle"></i>Ngưỡng cần duyệt: '+slaChip("thresholdDiscount_approval",vnd(TH))+' - đổi ở cấu hình là hàng chờ đổi theo.</div>';
  h+='<div class="sechd">Chiết khấu chờ duyệt ('+ck.length+')</div><div class="panel"><div class="pbody">';
  if(!ck.length)h+='<div class="empty">Không có chiết khấu nào chờ duyệt.</div>';
  ck.forEach(function(r){var id=esc(r.enrollment_id);var pct=num(r.total_fee)?Math.round(num(r.discount_amount)/num(r.total_fee)*100):0;
   h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+esc(r.student_id_name||r.student_id)+' - '+esc(r.course_id_name||r.course_id)+'</div><div class="amt">'+money(r.discount_amount)+'đ <span style="font-size:12px;color:var(--muted);font-weight:600">('+pct+'% / học phí gốc '+money(r.total_fee)+'đ)</span></div><div class="rs">Loại: '+esc(elabel(r.discount_type)||"-")+' - Lý do: '+esc(r.discount_reason||"-")+'</div></div><div class="act"><button class="btn green" onclick="confirmRun(\'Duyệt chiết khấu '+money(r.discount_amount)+'đ cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi tên bạn là người duyệt.\',\'duyetOK\',\''+id+'\')"><i class="ti ti-check"></i>Duyệt</button><button class="btn danger" onclick="confirmRun(\'TỪ CHỐI chiết khấu này? Chiết khấu về 0 và học phí tính lại.\',\'duyetNo\',\''+id+'\')"><i class="ti ti-x"></i>Từ chối</button></div></div>'});
- h+='</div></div>';
- var refund=rows("DL06").filter(function(r){return(/cancel/.test(ecode(r.enrollment_status))||r.cancellation_reason)&&!/hoàn tiền|hoan tien/i.test(String(r.notes||""))});
- h+='<div class="sechd">Hoàn tiền chờ xử lý ('+refund.length+')</div><div class="panel"><div class="pbody">';
- if(!refund.length)h+='<div class="empty">Không có yêu cầu hoàn tiền.</div>';
- refund.forEach(function(r){var id=esc(r.enrollment_id);
-  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+esc(r.student_id_name||r.student_id)+' - đã đóng '+vnd(num(r.paid_amount))+'</div><div class="amt" style="color:var(--amber)">Xử lý hoàn</div><div class="rs">Lý do hủy: '+esc(r.cancellation_reason||"-")+' - mức hoàn theo mốc ngày (CH2 refund*).</div></div><div class="act"><button class="btn primary" onclick="confirmRun(\'Xác nhận ĐÃ hoàn tiền cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi chú vào hồ sơ đăng ký.\',\'duyetRefund\',\''+id+'\')"><i class="ti ti-cash"></i>Đã hoàn tiền</button></div></div>'});
  h+='</div></div>';
  if(appr.length){h+='<div class="sechd">Đã quyết định gần đây</div><div class="panel"><div class="pbody">';
   appr.slice(0,8).forEach(function(r){var rej=/từ chối|tu choi/i.test(String(r.discount_approved_by));h+='<div class="appcard done"><div class="info"><div class="id">'+esc(r.enrollment_id)+'</div><div class="big">'+esc(r.student_id_name||r.student_id)+' - CK '+money(r.discount_amount)+'đ</div><div class="rs">'+esc(r.discount_approved_by)+(r.discount_approved_at?' · '+esc(r.discount_approved_at):'')+'</div></div><div class="act"><span class="chip '+(rej?"red":"green")+'" style="padding:6px 12px">'+(rej?"Đã từ chối":"Đã duyệt")+'</span></div></div>'});
@@ -9665,12 +9747,11 @@ function renderKhac(){
  var nBlCall=bl.filter(function(x){return !String(x.next_followup_time||"").trim()}).length;
  var nRef=rows("DL22").length;
  var actBtn=(tab==="magioithieu")?'<button class="btn" onclick="window.SETTAB=\'ch2\';go(\'settings\')"><i class="ti ti-settings"></i>Cấu hình chính sách</button>':'';
- var h=pageHead("Tính năng khác","Các việc không nằm trong nhịp hằng ngày, gom về một chỗ cho menu gọn: giữ chân học viên dừng học, chương trình giới thiệu bạn, bàn giao lead khi nhân viên nghỉ / quá tải.",actBtn);
- var ksegs=scopeTabs("khac",[["baoluu","Bảo lưu / Bỏ học",bl.length||"",nBlCall?"amber":""],["magioithieu","Mã giới thiệu",nRef||"",""],["banggiao","Bàn giao lead","",""]]);
+ var h=pageHead("Tính năng khác","Các việc không nằm trong nhịp hằng ngày, gom về một chỗ cho menu gọn: giữ chân học viên dừng học và chương trình giới thiệu bạn. (Bàn giao lead đã chuyển sang nhóm Chờ duyệt.)",actBtn);
+ var ksegs=scopeTabs("khac",[["baoluu","Bảo lưu / Bỏ học",bl.length||"",nBlCall?"amber":""],["magioithieu","Mã giới thiệu",nRef||"",""]]);
  if(!ksegs.some(function(t){return t[0]===tab})){tab=(ksegs[0]||["baoluu"])[0];window.KTAB=tab}
  h+=tbar(segHTML(tab,ksegs,"kcTabSet('{k}')"),"");
  if(tab==="magioithieu")h+=renderMaGioiThieu(1);
- else if(tab==="banggiao")h+=renderBanggiao(1);
  else h+=renderBaoluu(1);
  return h}
 function renderBaoluu(embed){var p="baoluu",fil=fget(p);
@@ -9762,7 +9843,9 @@ function arcJobs(a){
    ["cskh","ti-headset","CSKH · Khảo sát","Khảo sát định kỳ - phản hồi - khiếu nại",function(){return rows("DL17").filter(function(c){return !isc(c.complaint_status,"resolved")}).length}]],
   changC:[
    ["baoluu","ti-player-pause","Bảo lưu / Bỏ học","Giữ chân - hẹn quay lại - chốt bỏ học",function(){return rows("DL09").filter(function(s){return isc(s.student_status,"dropped","transferred")}).length}],
-   ["duyet","ti-discount-check","Duyệt Hoàn tiền","ĐK hủy đã thu tiền - tính và duyệt hoàn",function(){return rows("DL06").filter(function(e){return isc(e.enrollment_status,"cancelled")&&num(e.paid_amount)>0&&!isc(e.payment_status,"refunded")}).length}]],
+   /* V9.29o: trỏ thẳng vào TAB hoàn tiền chứ không trỏ vào cả hub - bấm từ chặng C mà rơi vào
+      tab chiết khấu thì người ta lại phải tìm tiếp. */
+   ["duyethoan","ti-arrow-back-up","Duyệt Hoàn tiền","ĐK hủy đã thu tiền - tính và duyệt hoàn",function(){return rows("DL06").filter(function(e){return isc(e.enrollment_status,"cancelled")&&num(e.paid_amount)>0&&!isc(e.payment_status,"refunded")}).length}]],
   changD:[
    ["ketthuc","ti-flag","Kết thúc & Tái ĐK","Điểm đầu ra - đánh giá - mời học tiếp",function(){return rows("DL18").filter(function(r){return !String(r.final_test_score||"").trim()||!/confirmed|declined/.test(ecode(r.re_enrollment_status))}).length}],
    ["magioithieu","ti-gift","Mã giới thiệu","HV cũ giới thiệu bạn - thưởng hoa hồng",function(){return rows("DL19").filter(function(m){return isc(m.reward_status,"pending")}).length}]]};
@@ -10554,8 +10637,13 @@ var TSMAP={nhaplead:"lead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:
 var ARCMAP={changA:1,changB:1,changC:1,changD:1};
 var CSMAP={review:"khaosat",khaosat:"khaosat",ghinhan:"phanhoi",khieunai:"khieunai"};
 var HTMAP={lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan"};
-var KMAP={baoluu:"baoluu",magioithieu:"magioithieu",banggiao:"banggiao"};
-function goAlias(k){return !!(TSMAP[k]||ARCMAP[k]||CSMAP[k]||HTMAP[k]||KMAP[k]||k==="hanhtrinh")}
+var KMAP={baoluu:"baoluu",magioithieu:"magioithieu"};
+/* V9.29o: bàn giao lead rời hub "Tính năng khác" sang hub "Chờ duyệt" - nó là một QUYẾT ĐỊNH
+   (giao lead của người này cho người kia), không phải một tiện ích lặt vặt. */
+/* Mã tab TRÙNG mã mục menu - cố ý. Đặt hai tên cho cùng một thứ ("ck" ở tab, "duyetck" ở menu)
+   là sớm muộn có chỗ tra nhầm bảng; đây đúng là lớp lỗi vừa cắn ở scopeTabs. */
+var DUYMAP={duyetck:1,duyethoan:1,duyetnghi:1,duyetthu:1,duyetgiao:1,banggiao:1};
+function goAlias(k){return !!(TSMAP[k]||ARCMAP[k]||CSMAP[k]||HTMAP[k]||KMAP[k]||DUYMAP[k]||k==="hanhtrinh")}
 /* ===== V9.29c (anh Luân): MỖI TRANG MỘT ĐỊA CHỈ - F5 KHÔNG MẤT CHỖ ĐANG ĐỨNG =====
    "mỗi lần anh refresh là mất tiêu nơi anh đang đứng". App là một trang duy nhất nên trước đây
    nạp lại là quay về Trang bắt đầu. Nay go() ghi #/<khóa trang> vào thanh địa chỉ và lúc vào app
@@ -10614,6 +10702,7 @@ function go(key,noHist){
  if(CSMAP[key]){window.CSTAB=CSMAP[key];key="cskh"}
  if(HTMAP[key]){window.HTTAB=HTMAP[key];key="hoctap"}
  if(KMAP[key]){window.KTAB=KMAP[key];key="khac"}
+ if(DUYMAP[key]){window.DUYTAB=key;key="duyet"}
  var p=PBK[key];if(!p)return;
  if(!canSee(key)&&SENSITIVE[key]){
   var el0=document.getElementById("content");
@@ -10647,7 +10736,8 @@ function go(key,noHist){
    Giữ ĐỦ mọi trang (không rút gọn), chỉ gập nhóm không dùng tới cho đỡ phải cuộn. */
 function navBadge(k){
  try{
-  if(k==="duyet")return rows("DL06").filter(function(x){return num(x.discount_amount)>=ckThreshold()&&!x.discount_approved_by}).length;
+  if(k==="duyet")return duyN();
+  if(DUYMAP[k]){var TBd=duyTabs();for(var i8=0;i8<TBd.length;i8++)if(TBd[i8].k===k)return TBd[i8].n;return 0}
   if(k==="banlam")return (window.__NAVJ||jAll()).filter(function(J){return J.act&&J.over}).length;
   if(k==="giaoviec"){var me9=CURSTAFF||"";  /* việc TÔI phải làm còn tồn + việc chờ tôi xác nhận */
    return rows("DL23").filter(function(t){
@@ -10739,12 +10829,17 @@ var NAVTREE=[
  {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","banglop","hoctap","giaoan","wow","cskh"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","magioithieu"]},
- {g:"Điều hành",items:["baocao","duyet","banggiao","settings"]},
+ /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
+    thẩm quyền chứ không thuộc chặng nào. Duyệt nghỉ trước đây nằm lẫn trong màn Điểm danh nên
+    học vụ phải mò mới thấy. */
+ {g:"Chờ duyệt",items:["duyetck","duyethoan","duyetnghi","duyetthu","duyetgiao","banggiao"]},
+ {g:"Điều hành",items:["baocao","settings"]},
  {g:"Tra cứu",items:["hocvien","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","giangvien","nhanvien"]}];
 var NAVSUB={nhaplead:"tuyensinh",test:"tuyensinh",tuvan:"tuyensinh",thanhtoan:"tuyensinh",reup:"tuyensinh",
  review:"cskh",khaosat:"cskh",ghinhan:"cskh",khieunai:"cskh",
  lop:"hoctap",buoihoc:"hoctap",lichtuan:"hoctap",wow:"hoctap",
- baoluu:"khac",magioithieu:"khac",banggiao:"khac",
+ baoluu:"khac",magioithieu:"khac",
+ duyetck:"duyet",duyethoan:"duyet",duyetnghi:"duyet",duyetthu:"duyet",duyetgiao:"duyet",banggiao:"duyet",
  changA:"chang",changB:"chang",changC:"chang",changD:"chang"};
 function navOwner(k){return NAVSUB[k]||k}
 function navItemMeta(k){
@@ -10756,8 +10851,14 @@ function navVis(k){var r=RBK[CURROLE],rs=SCOPE();
  /* bản đồ chặng: ai cũng thấy (trừ nhóm hỗ trợ gọn) - nghiệp vụ BÊN TRONG mới lọc theo vai */
  if(o==="chang")return !rs.lite;
  if(rs.pages!=="*"&&rs.pages.indexOf(o)<0)return false;
- /* mục con của hub "khac" còn bị chặn theo rs.tabs.khac (vd tư vấn chỉ thấy mã giới thiệu) */
- if(o==="khac"&&rs.pages!=="*"&&rs.tabs&&rs.tabs.khac&&rs.tabs.khac.indexOf(k)<0)return false;
+ /* Mục con của một HUB còn bị chặn theo rs.tabs[<hub>] (vd tư vấn chỉ thấy mã giới thiệu trong
+    hub Khác; học vụ chỉ thấy tab Đơn xin nghỉ trong hub Chờ duyệt).
+    V9.29o: trước đây luật này CẮM CỨNG chữ "khac" - thêm hub thứ hai là nó im lặng không lọc,
+    nhân viên thấy cả những tab không phải việc của mình. Nay hỏi chung cho mọi hub. */
+ if(o!==k&&rs.pages!=="*"&&rs.tabs&&rs.tabs[o]){
+  var _sub=(HUBTAB[o]&&HUBTAB[o].m)||null,_names=[];
+  if(_sub)for(var _t in _sub)_names.push(_sub[_t]);
+  if((_names.length?_names.indexOf(k)>=0:true)&&rs.tabs[o].indexOf(k)<0)return false}
  if(/^chang[A-D]$/.test(k)&&rs.lite)return false;
  return true}
 /* V9.19: hub vừa là MỤC MENU vừa là chủ của mục con (hoctap có mục con wow/lop/buoihoc/lichtuan) -
@@ -10765,7 +10866,8 @@ function navVis(k){var r=RBK[CURROLE],rs=SCOPE();
 var HUBTAB={tuyensinh:{v:"TSTAB",d:"lead",m:{lead:"nhaplead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"}},
  hoctap:{v:"HTTAB",d:"today",m:{lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan"}},
  cskh:{v:"CSTAB",d:"khaosat",m:{khaosat:"khaosat",phanhoi:"ghinhan",khieunai:"khieunai"}},
- khac:{v:"KTAB",d:"baoluu",m:{baoluu:"baoluu",magioithieu:"magioithieu",banggiao:"banggiao"}}};
+ khac:{v:"KTAB",d:"baoluu",m:{baoluu:"baoluu",magioithieu:"magioithieu"}},
+ duyet:{v:"DUYTAB",d:"duyetck",m:{duyetck:"duyetck",duyethoan:"duyethoan",duyetnghi:"duyetnghi",duyetthu:"duyetthu",duyetgiao:"duyetgiao",banggiao:"banggiao"}}};
 function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[window[H.v]||H.d]||""}
 function navInTree(k){for(var i=0;i<NAVTREE.length;i++)if(NAVTREE[i].items.indexOf(k)>=0)return true;return false}
 function navCur(k){
@@ -10777,7 +10879,8 @@ function navCur(k){
  if(o==="tuyensinh")return ({nhaplead:"lead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"})[k]===(window.TSTAB||"lead");
  if(o==="cskh")return ({review:"khaosat",khaosat:"khaosat",ghinhan:"phanhoi",khieunai:"khieunai"})[k]===(window.CSTAB||"khaosat");
  if(o==="hoctap")return ({lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan"})[k]===(window.HTTAB||"today");
- if(o==="khac")return ({baoluu:"baoluu",magioithieu:"magioithieu",banggiao:"banggiao"})[k]===(window.KTAB||"baoluu");
+ if(o==="khac")return ({baoluu:"baoluu",magioithieu:"magioithieu"})[k]===(window.KTAB||"baoluu");
+ if(o==="duyet")return !!DUYMAP[k]&&k===(window.DUYTAB||"duyetck");
  if(o==="chang")return k===(window.ARC||"changA");
  return false}
 /* V9.27: quét menu xem có mục nào đang sáng không, và mục nào */

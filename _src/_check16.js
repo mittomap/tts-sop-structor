@@ -381,9 +381,11 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("nhom Dieu hanh mo san", navIsOpen("Điều hành")===true);
  t("4 nhom CHANG gap lai", NAVTREE.filter(function(G){return G.arc}).every(function(G){return navIsOpen(G.g)===false}));
  t("nhom Tra cuu gap lai", navIsOpen("Tra cứu")===false);
+ /* V9.29o: nhom "Cho duyet" MO SAN - hang cho quyet dinh ma phai bam moi thay thi de tri tre */
+ t("nhom Cho duyet mo san", navIsOpen("Chờ duyệt")===true);
  buildNav();
  var nav=document.getElementById("nav").innerHTML||"";
- t("menu ve dung: nhom mo co lop open", (nav.match(/navlbl open/g)||[]).length===2);
+ t("menu ve dung: nhom mo co lop open", (nav.match(/navlbl open/g)||[]).length===3);
  t("menu ve dung: 5 nhom con lai khong co lop open", (nav.match(/class="navlbl(?! open)/g)||[]).length===5);
  t("nhom gap lai thi khong ve muc ben trong", nav.indexOf('data-k="nhaplead"')<0);
  t("nhom mo van ve du muc ben trong", nav.indexOf('data-k="banlam"')>=0&&nav.indexOf('data-k="baocao"')>=0);

@@ -65,7 +65,13 @@ t("mstrip: chang khong ton tai -> rong", mstrip("xxx",false)==="");
  t("trang "+p+" co mstrip tren dong", (o.match(/class="mstrip/g)||[]).length>0)}); /* V9.18: mstrip co the kem class clk */
 
 /* --- 6. NAVTREE menu theo chang --- */
-t("NAVTREE co 7 nhom", NAVTREE.length===7);
+t("NAVTREE co 8 nhom (them nhom Cho duyet)", NAVTREE.length===8);
+/* V9.29o: nhom "Cho duyet" - moi hang cho QUYET DINH gom ve mot cho, theo NGUOI CO THAM QUYEN
+   chu khong theo chang. Bat bien: moi muc trong nhom deu remap ve hub duyet. */
+t("nhom Cho duyet co du 6 muc", (function(){var G=NAVTREE.filter(function(x){return x.g==="Chờ duyệt"})[0];
+ return G&&G.items.length===6&&G.items.every(function(k){return !!DUYMAP[k]&&navOwner(k)==="duyet"})})());
+t("ma tab TRUNG ma muc menu (mot ten cho mot thu)", duyTabs().every(function(x){return !!DUYMAP[x.k]}));
+t("ban giao lead da roi hub Khac", !KMAP.banggiao&&!!DUYMAP.banggiao);
 t("nhom chang du 4", NAVTREE.filter(function(G){return G.arc}).length===4);
 t("menu lo test/wow/baoluu tro lai (yeu cau Luan)", (function(){
  var all=[];NAVTREE.forEach(function(G){all=all.concat(G.items)});
@@ -78,7 +84,11 @@ t("menu co cham mau arc", (nv.match(/class="navarc"/g)||[]).length===4);
 /* navVis theo vai: tu van khong thay xep lop, giao vien khong thay lead */
 var sales=rows("DL01").filter(function(x){return /^sales/.test(ecode(x.role))&&!/manager|leader/.test(ecode(x.role))})[0];
 applyScope(sales.staff_id);
-t("tu van: thay nhaplead + reup, khong thay xeplop/duyet", navVis("nhaplead")&&navVis("reup")&&!navVis("xeplop")&&!navVis("duyet"));
+t("tu van: thay nhaplead + reup, khong thay xeplop", navVis("nhaplead")&&navVis("reup")&&!navVis("xeplop"));
+/* Tu van CO viec trong hub Cho duyet (ban giao lead, viec cho nhan) nhung KHONG duoc thay
+   chiet khau / hoan tien / doi soat tien - hub gom VIEC lai, khong gom QUYEN lai. */
+t("tu van chi thay tab cua minh trong Cho duyet",
+  navVis("banggiao")&&navVis("duyetgiao")&&!navVis("duyetck")&&!navVis("duyethoan")&&!navVis("duyetthu"));
 t("tu van: thay tong quan chang (ban do vong doi)", navVis("changA")&&navVis("changB"));
 t("tu van: khong thay bao luu (tab khac bi khoa)", !navVis("baoluu"));
 var gv=rows("DL01").filter(function(x){return /^teacher$/.test(ecode(x.role))})[0];
