@@ -198,6 +198,89 @@
 > **V9.7 = NỀN DEMO ĐA CỔNG** (Luân yêu cầu): màn cổng chọn NGƯỜI ở cả 2 file (nhân viên theo vai trò / học viên), mọi thao tác offline LƯU THẬT vào localStorage, các cửa sổ/cổng đang mở TỰ ĐỒNG BỘ (demo duyệt 2 chiều được), nút **Reset dữ liệu demo** (màn cổng + Cài đặt > Dữ liệu demo) đưa về nguyên bản. Chi tiết bẫy: mục 3sexies. Nguồn ở `_src/` (xem `_src/README_SRC.md`: build `ITTS_OUT="<mnt>/SOP ITTs" python3 gen_v5.py`, verify `ITTS_OUT=<out> node _tall.js` — kỳ vọng **36 trang 0 lỗi**, 125 icon đủ).
 > **CÓ KẾ HOẠCH TỔNG THỂ MỚI: `KE_HOACH_HOAN_THIEN_APP.md`** — Luân cấp toàn quyền, 4 chuyên gia (LMS/CRM, sales, UX/UI, học vụ) đã rà toàn app ra 104 phát hiện, chưng cất thành 7 đợt. ĐỢT 1 ĐÃ XONG trong V9.6.
 > **V9.6 đã xong:** hub **"Tính năng khác"** (FB-21: Bảo lưu · Mã giới thiệu · Bàn giao lead, nhóm Quản lý) + sửa lớp bug "sai êm" (DL09.class_id ở 3 hồ sơ, Bảo lưu đọc sai cột, 3 tham số sai tên CH2, 2 SLA cắm cứng) + UX quick wins (giữ scroll khi reRender, tương phản, focus ring, .jcard→.jpanel...) + màn gọi sales đủ thông tin.
+> ### KẾT LUẬN HỘI ĐỒNG 6 CHUYÊN GIA (28/07 tối) - VIỆC TỒN ƯU TIÊN CAO NHẤT
+> Luân triệu hội đồng rà toàn diện trước khi mang đi demo. 6 chuyên gia (vận hành / dữ liệu / phân quyền /
+> UX-cấu hình / BI-KPI / cổng học viên) đã ra kết luận. **ĐÃ LÀM trong V9.22**: phân quyền phạm vi dữ liệu
+> (8 miền x 4 mức x 11 nhóm chức danh, cắm ở scopeList + jAll + slaItems, che trường, tab Cài đặt > Phân quyền
+> có khối "Xem thử bằng mắt của...") và tour 4 cấp độ (Tham quan / Trải nghiệm theo 5 vị trí / Chuyên nghiệp /
+> DEV cho IT, bắt xác nhận trước khi chạy). **CÒN LẠI, làm theo thứ tự này:**
+>
+> **1. VÁ DỮ LIỆU DEMO - 192 bản ghi lỗi** (bộ kiểm cũ vẫn báo "ĐẠT" nên không thấy). Chuyên gia đã viết sẵn
+> `_src/check_logic.py` (116 luật) - THÊM VÀO BỘ KIỂM BẮT BUỘC. Sửa Ở NGUỒN pipeline, không sửa tay JSON:
+> (a) 19 ca GV dạy 2 lớp cùng giờ cùng phòng - gen_demo.py cần dict busy[(teacher,datetime)] + busy_room, và
+> thêm 2 GV ACA vào DL01 (4 GV cho 22 lớp là thiếu); (b) 11 HV lớp ĐÃ KẾT THÚC mà trống mid_* - vòng sinh
+> điểm giữa kỳ đang chạy trên list 4 lớp hardcode, phải duyệt mọi lớp finished; (c) 23 bài tập cờ nộp trễ
+> mâu thuẫn ngày nộp - sinh giờ nộp TRƯỚC rồi suy ra status; (d) 8 buổi completed mà 0 dòng điểm danh;
+> (e) 23 ca đảo thứ tự phễu (chốt trước tư vấn, xếp lớp trước đăng ký) - thêm pass kẹp mốc thời gian ở
+> fixdata.py; (f) lệch sơ đồ cột (DL07 thiếu 5 cột ở 2 dòng...) - san phẳng schema bằng union key;
+> (g) 105 dòng nhãn enum trôi ("late (Trễ)" vs "late (Đi trễ)"); (h) quota WOW sai phép tính; (i) 10 đơn
+> còn nợ không có next_payment_due; (j) first_enrollment_id trỏ đơn mới nhất; (k) 14 lớp không có buổi nào,
+> 11 lớp thiếu class_end_date, 3 lớp thiếu GV; (l) mid_overall không khớp TB 4 kỹ năng; (m) cột duyệt CK
+> lẫn 2 định dạng (mã NVxxx vs tên); (n) 5 phiếu thu rỗng student_id + 1 phiếu ngày tương lai.
+> SẠCH rồi: khóa ngoại 58 cặp + 19 cặp *_name khớp 100%, DL23/DL24 sạch, lịch tương lai đủ dày.
+>
+> **2. KPI DIỄN GIẢI + KHUYẾN NGHỊ** (Luân: "tính năng đặc biệt tiện ích"). PHẢI SỬA 4 LỖI TÍNH TRƯỚC, không
+> thì app khuyên sai: CUR 26% là ảo (tính cả 10 lớp planning + 1 cancelled; lọc in_progress+open ra 79%);
+> HCR 70% do đếm cả 44 bài chưa tới hạn (loại ra: 79%); AR 35% do tính cả 6 hồ sơ chưa có kết luận (loại: 55%);
+> kpiCompute KHÔNG theo bộ lọc kỳ REPKY của trang. Rồi thêm hằng `KPIDOC` (đặt liền trên kpiSection) cho 17
+> chỉ số quan trọng, mỗi mục 6 trường: nghia / visao / nguon / doc(v) động theo 5 bậc / vi(v,X) BẮT BUỘC kèm
+> số con thật / viec(sev) 2-3 hành động có nút bấm tới đúng chỗ + quy(v) quy ra người và tiền + mau() cỡ mẫu.
+> Hàm `kpiSev` 5 bậc (tot/dat/hut/canhbao/baodong) suy từ khoảng cách tới ngưỡng CH6, riêng 4 chỉ số ngưỡng
+> 100% và SS/NPS cần dải riêng KPIBAND. Hàm `kpiGo(key,{filt,q,qf,tab})` để nút mở đúng trang + đúng bộ lọc.
+> Hiển thị 3 tầng: nhãn 5 mức thay chấm nhị phân / 1 dòng nhận xét hiện sẵn CHỈ cho chỉ số không đạt / bung
+> chi tiết khi bấm. Thêm khối **"3 việc nên làm tuần này"** đặt TRÊN bizSection, chọn theo điểm = bậc x trọng
+> số KPIW, mỗi chặng tối đa 1 việc. XU HƯỚNG: chỉ bật cho nhóm A (mẫu số đóng trong kỳ: LRT, ATR, SS...);
+> nhóm B (TBR/CVR/PCR/RER/AR - mẫu số là lô cần thời gian chín) TUYỆT ĐỐI không hiện mũi tên nếu chưa trừ độ
+> chín, vì CVR 17% so 85% là ảo do lô lead chưa chín. Chi tiết nội dung 17 chỉ số: xem transcript phiên 28/07.
+>
+> **3. CỔNG HỌC VIÊN - THIẾU TRỤC GIAO TIẾP HAI CHIỀU** (Luân: "trang học viên là để học viên giao tiếp với
+> trung tâm nữa mà"). Hiện chỉ có 1,5 kênh (trả lời khảo sát, gửi góp ý). Dữ liệu ĐÃ mở sẵn đường cho
+> self-service mà cổng không dùng: enum_wow_booked_by có "student", enum_wow_session_type có "self_booked",
+> enum_class_confirmation_status đủ 3 giá trị. 7 kênh cần thêm, TỔNG CHI PHÍ chỉ 1 enum mới
+> (`student_request` trong enum_task_type) + 1 cột mới (`DL16.session_id`) + cho DL24 tác giả là HV:
+> (a) báo nghỉ trước một buổi (DL12.absence_type=excused đã có, 22 dòng đang nhập tay); (b) xin học bù;
+> (c) tự đặt WOW (20/72 buổi đã là student đặt qua kênh ngoài); (d) TỰ XÁC NHẬN LỚP - cổng đang ghi "chờ bạn
+> xác nhận" mà không cho bấm, lỗi trải nghiệm rõ nhất; (e) hộp "Trao đổi với trung tâm" tái dùng DL23/DL24;
+> (f) xin bảo lưu/đổi lớp/rút học phí; (g) đánh giá từng buổi bằng hàng sao. Màn xử lý phía nhân viên ĐÃ CÓ
+> HẾT, không phải dựng mới.
+> Cộng 8 thiếu sót khác: (h) LỊCH ĐÓNG HỌC PHÍ từng đợt không hiện trên cổng (next_payment_due có 25/97 đơn
+> nhưng renderTrangHV không đọc lần nào) + nút "Tôi đã chuyển khoản"; (i) buổi NGHỈ và buổi HỌC BÙ vô hình
+> (upSes lọc bỏ cancelled) - đây là cuộc gọi lễ tân nhận nhiều nhất; (j) thẻ "Lớp của bạn" (lịch cố định,
+> link Zoom bấm được, GV kèm ảnh - DL01 chưa seed bio/avatar_url dù gvBioEdit đã biết ghi); (k) materials_link
+> in dạng chữ thô không bấm được + DL20.file_link rỗng 100%; (l) chứng nhận hoàn thành khóa (DL18 có
+> attendance_rate/completion_rate 17/17 dòng chưa dùng); (m) 3 chỗ CÒN LỘ nội bộ: DL12.note in nguyên ghi chú
+> chăm sóc ("HV hứa đi học lại"), nhãn "escalated (Leo thang lên QL cao)", "đã trừ 1 lượt quota"; (n) mục lục
+> 12 mục phẳng sai thứ tự nhu cầu - chia 3 nhóm, thêm mask đóng sidebar trên điện thoại (hiện bấm ra ngoài
+> không đóng được) + thanh tab dính đáy 4 nút; (o) 3 điểm WOW: đếm ngược + nút tải lịch .ics, huy hiệu chuyên
+> cần theo chuỗi, so với mặt bằng lớp ẩn danh. CẢ TRANG KHÔNG CÓ SỐ ĐIỆN THOẠI nào dù khuyên "liên hệ trung
+> tâm" 3-4 lần. Nếu chỉ làm được 4 việc trước demo: (h), (d), (c), (i).
+>
+> **4. VẬN HÀNH - ĐÓNG HỌC PHÍ THEO ĐỢT** (Luân nêu đích danh). Hiện DL06 chỉ có MỘT cột next_payment_due bị
+> ghi đè mỗi lần thu, không lưu được lịch trả góp. Đề xuất: bảng DL06b (schedule_id, enrollment_id,
+> installment_no, due_date, due_amount, paid_amount, status) + installment_no vào DL07; tham số CH2 mới
+> installmentPlans / installmentGap_days / installmentRemind_days / installmentLate_days; nhắc TRƯỚC hạn chứ
+> không chỉ sau; in lịch đợt vào phiếu. Kèm 11 phát hiện vận hành khác: HV trả góp bị đánh dấu quá hạn oan
+> (jStageOf chỉ sang chặng paid khi rem<=0); xlWaiting tiêu đề "Đã đóng đủ tiền" nhưng lọc theo
+> enrollment_status; không chuyển được lớp khi ĐANG HỌC (obChange chỉ chạy lúc onboarding); bảo lưu quay lại
+> không nối được lớp mới; HV học khóa THỨ HAI bị bỏ quên (4 hàm khóa theo student_id thay vì enrollment_id -
+> HV079 có đơn 18 triệu không xuất hiện ở hàng chờ nào); không chuyển được học phí sang khóa khác;
+> bizSection cộng nhầm 11 triệu nợ ma từ đăng ký đã hủy; duyetRefundRun không tính lại remaining_amount;
+> ưu đãi chỉ 1 ô không chồng được + form đăng ký không có ô loại/lý do; đổi GV một buổi phải hủy rồi tạo bù;
+> bảng công tháng không cộng buổi WOW.
+>
+> **5. UX + NGUYÊN TẮC "CÓ HIỂN THỊ THÌ CÓ CHỖ SỬA"** (Luân đặt ra): viết helper `slaChip(param)` in số kèm
+> icon bánh răng bấm tới đúng dòng cấu hình (dùng window.CFHL để cuộn + tô sáng), thay mọi chỗ đang in SLA
+> thô (~15 trang); thêm nút "Sửa câu này" cạnh câu nhắn CH4 trong sopBlock (window.MSGQ đã có sẵn); link tới
+> CH1 khi hiện nhãn enum. Bổ sung 17 tham số app đang dùng mà KHÔNG có trong APPPARAMS (nặng nhất: mốc ngày
+> chính sách hoàn tiền refundFull/Partial/Reduced_days, slaTeacherNote_hours, thresholdDeposit_minimum...);
+> chuẩn hóa giá trị mặc định lệch giữa code và bảng cấu hình (slaComplaintHigh 4 vs 24, slaTestResult 24 vs 48);
+> DUEFALL=5 cắm cứng -> đưa vào CH2; RTOUCH 16 nhóm câu chăm sóc + preset giờ hẹn cắm cứng -> đưa ra cấu hình;
+> quota WOW chặn nhưng không có màn nào cấp thêm. XÓA 4 hàm render chết (renderDashboardOld, renderPipeline,
+> renderTracuu, renderKhaosat) + ô chọn vai roleSel luôn ẩn. Trang thiếu thành phần chuẩn (dải số + bộ lọc +
+> hàng đợi): renderDuyet, renderGiaoan, renderMaGioiThieu, renderReupTab, renderBanggiao. statStrip ở 15 trang
+> không bấm được trong khi ở Trang bắt đầu bấm được - cho nhận tham số onclick. Tab CH6 là tab Cài đặt DUY NHẤT
+> không có notebar hướng dẫn (vi phạm thẳng vế "ở nơi sửa nên hướng dẫn cách sửa").
+
 > **VIỆC TỒN web app (ưu tiên trên xuống):**
 > 1. **CHỜ LUÂN NGHIỆM THU ĐỢT 9 + YÊU CẦU KẾ TIẾP** - 4 yêu cầu 28/07 (phòng 2 máy, cổng HV đúng vai, hồ sơ 360 superset, rà sidebar) đã trả xong trong V9.16. Luân cần THỬ THẬT phòng 2 máy trên 2 máy khác nhau (phiên cloud không tự test WebRTC được). Phiên sau: hỏi/đợi yêu cầu kế tiếp trước khi làm gì lớn.
 > 2. **HỘI ĐỒNG TỔNG KIỂM CUỐI (đang HOLD theo lệnh Luân)** - khi Luân bật đèn xanh: gom UX-39 (font Montserrat offline), UX-12 (thanh lọc kiểu cũ), UX-13 (đồng nhất stat-tile), UX-06 (quét hex -> token), CRM-09 (kỳ báo cáo áp vào phễu/bizSection) + 62 cảnh báo mức app còn lại trong _tester.js (baseline 64, trong đó 2 cảnh báo là bug của chính script tester - hardcode enum "paused" không có trong CH1).
