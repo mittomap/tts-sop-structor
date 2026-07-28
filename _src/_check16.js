@@ -691,4 +691,63 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
   row.value=cu}
 })();
 
+
+/* ---- 25. DON CODE CHET (mang 5, V9.29) ---- */
+(function(){
+ setRole("all");
+ ["renderDashboardOld","renderPipeline","pipeSet","renderTracuu","renderKhaosat"].forEach(function(f){
+  t("da xoa han ham chet "+f, typeof global[f]==="undefined")});
+ ["pipeline","tracuu","khaosat"].forEach(function(k){
+  t("bo dang ky RENDER cho trang chet "+k, !RENDER[k])});
+ t("bo o chon vai roleSel (luon bi an tu V9.9)", !/id="roleSel"/.test(SRC));
+ /* xoa roi thi moi trang con lai van phai ve duoc */
+ var loi=[];Object.keys(RENDER).forEach(function(k){try{if(typeof RENDER[k]()!=="string")loi.push(k)}catch(e){loi.push(k+": "+e.message)}});
+ t("moi trang con lai van ve duoc"+(loi.length?(" - hong: "+loi.join(", ")):""), loi.length===0);
+ /* duong vao cu khong duoc vo: go('khaosat') phai ve hub CSKH */
+ go("khaosat");
+ t("go('khaosat') van vao duoc hub CSKH", CUR==="cskh");
+ go("banlam");
+})();
+
+
+/* ---- 26. MOI CHO DUNG CAU HINH DEU CO LOI SUA (anh Luan hoi 28/07) ----
+   "moi cho dung trong cau hinh deu co goi y banh rang sua duoc phai ko em? ke ca may cau thong bao,
+    next action hoac may cau goi y quan tri dua tren KPI?" - kiem ca ba loai. */
+(function(){
+ setRole("all");
+ t("co chip cho NGUONG KPI (CH6)", typeof kpiChip==="function");
+ t("co nut sua CAU NHAC (CH4)", typeof msgEditBtn==="function");
+ t("co nut sua DANH MUC (CH1)", typeof enumEditBtn==="function");
+ t("co chip cho NGUONG/SLA (CH2)", typeof slaChip==="function");
+ /* kpiChip phai tro dung dong CH6 va in dung nguong dang cau hinh */
+ var r=kpiRowOf(/^ATR/);
+ if(r){var chip=kpiChip(/^ATR/,0.85,1);
+  t("kpiChip tro dung ma KPI", chip.indexOf("kpiGoCf('"+r.code+"')")>=0);
+  t("kpiChip in dung nguong dang cau hinh", chip.indexOf(Math.round(kpiTh(/^ATR/,0.85)*100)+"%")>=0);
+  var cu=r.threshold;r.threshold="0.7";
+  t("doi nguong CH6 thi chip doi theo ngay", kpiChip(/^ATR/,0.85,1).indexOf("70%")>=0);
+  r.threshold=cu}
+ /* dong CH6 co ID de nhay toi + tab CH6 co notebar giai thich */
+ window.SETTAB="ch6";var pg=RENDER["settings"]();
+ t("moi dong CH6 co ID de nhay toi", (pg.match(/id="kpirow_/g)||[]).length>0);
+ t("tab CH6 co notebar giai thich (tab cuoi cung con thieu)", /class="notebar"/.test(pg)&&/ngưỡng đạt/.test(pg));
+ /* cau nhac SOP phai co nut sua ngay canh */
+ var L0=rows("DL02")[0];var J=jInfo(L0.lead_id);
+ var sb=sopBlock(J);
+ if(J.naMsg)t("cau nhac SOP co nut 'Sua cau nay'", sb.indexOf("msgGo(")>=0);
+ /* phu chu cua dai so cho phep gan chip - truoc day bi esc nen chip thanh chu tho */
+ t("dai so khong esc phan phu chu nua", !/\+\(t\[4\]\?' · '\+esc\(t\[4\]\)/.test(SRC));
+ t("khong con chuoi HTML tho lot ra man hinh", (function(){
+   var bad=0;Object.keys(RENDER).forEach(function(k){var o="";try{o=RENDER[k]()}catch(e){return}
+    if(/&lt;span class="slachip"/.test(o))bad++});return bad===0})());
+ /* dem phu song */
+ var trang=0,chip=0;
+ Object.keys(RENDER).forEach(function(k){var o="";try{o=RENDER[k]()}catch(e){return}
+  var c=(o.match(/class="slachip"/g)||[]).length+(o.match(/class="cfedit"/g)||[]).length;
+  if(c){trang++;chip+=c}});
+ t("nut sua cau hinh phu it nhat 8 trang (dang co "+trang+")", trang>=8);
+ t("tong so chip tren cac trang >= 12 (dang co "+chip+")", chip>=12);
+ window.SETTAB="ch2";
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");

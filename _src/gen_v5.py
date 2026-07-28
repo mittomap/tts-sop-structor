@@ -132,6 +132,11 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .slachip:hover i{opacity:1;color:var(--blue)}
 tr.cfhl{animation:cfhl 2.6s ease-out}
 @keyframes cfhl{0%,60%{background:#FFF6D8}100%{background:transparent}}
+/* V9.29: nut nho "sua o day" canh cau nhac / danh muc */
+.cfedit{display:inline-flex;align-items:center;gap:4px;margin-left:8px;background:none;border:1px dashed #C6D2E0;
+ border-radius:999px;padding:1px 9px;font-size:10.5px;font-weight:700;color:#5A6675;cursor:pointer;font-family:inherit}
+.cfedit:hover{border-color:var(--blue);color:var(--blue);border-style:solid}
+.cfedit i{font-size:12px}
 .navgrp{margin-bottom:3px}
 .navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500;border-left:3px solid transparent}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
@@ -1201,7 +1206,7 @@ body.drsz .drawer{transition:none}
       <button class="tbtn navtoggle" onclick="toggleNav()" aria-label="Menu"><i class="ti ti-menu-2"></i></button>
       <div style="display:flex;align-items:center;gap:10px"><div><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px"><span class="chip blue roomChip" id="demoBadge">Room demo</span><button class="btn sm" onclick="tourMenu()" title="Chạy hướng dẫn từng bước - chọn cấp độ rồi app chỉ tận nơi"><i class="ti ti-school"></i>Chạy hướng dẫn</button><button class="btn sm" onclick="demoReset()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ và mọi máy trong room cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
       <div class="rolesel">
-        <select class="sel" id="roleSel" onchange="setRole(this.value)" style="display:none"></select>
+<!-- V9.29: bỏ ô chọn vai roleSel - luôn bị ẩn từ V9.9, giữ lại chỉ tổ rối -->
         <button class="tbtn" data-tour="help" onclick="tourMenu()" aria-label="Hướng dẫn sử dụng" title="Hướng dẫn từng bước"><i class="ti ti-help-circle"></i></button>
         <button class="tbtn" data-tour="bell" onclick="toggleBell(event)" aria-label="Thông báo"><i class="ti ti-bell"></i><span class="n" id="bellN" style="display:none">0</span></button>
         <div class="notif" id="notif"></div>
@@ -2472,28 +2477,6 @@ var ROLEKPI={sales:["newlead","urgent","consider","convert"],smanager:["newlead"
 /* ---------- custom pages ---------- */
 /* Tổng quan đã GỘP vào Báo cáo & KPI - giữ khóa trang cũ để mọi liên kết cũ vẫn chạy */
 function renderDashboard(){return renderBaocao()}
-function renderDashboardOld(){
- var st=staffFor(CURROLE);
- var h='<div class="phead"><div><div class="t">Chào '+esc(st.full_name)+', tình hình hôm nay</div><div class="s">Tổng quan điều hành - dữ liệu trực tiếp từ hệ thống</div></div>'+
- '<div class="sp"><button class="btn" onclick="go(\'viec\')"><i class="ti ti-checklist"></i>Việc hôm nay</button><button class="btn" onclick="go(\'baocao\')"><i class="ti ti-chart-bar"></i>Báo cáo</button></div></div>';
- var items=slaItems();var red=items.filter(function(x){return x.sev==="red"});
- var top=items.slice().sort(function(a,b){return (a.sev==="red"?0:1)-(b.sev==="red"?0:1)});
- var gs={};["Tuyển sinh","Học vụ","Tài chính","CSKH"].forEach(function(t){gs[t]={n:0,red:0}});
- items.forEach(function(it){if(!gs[it.cat])gs[it.cat]={n:0,red:0};gs[it.cat].n++;if(it.sev==="red")gs[it.cat].red++});
- h+=upcomingSection();
- h+=bizSection();
- h+=deptSection();
- h+='<div class="sechd">Việc theo nhóm chức năng</div><div class="gcards">';
- ["Tuyển sinh","Học vụ","Tài chính","CSKH"].forEach(function(t){var g=gs[t],col=grpColor(t);h+='<div class="gcard" style="box-shadow:inset 4px 0 0 '+col+'" onclick="goViecTeam(\''+t+'\')"><div class="gci" style="background:'+col+'18;color:'+col+'"><i class="ti '+(TEAMICON[t]||"ti-users")+'"></i></div><div class="gcn"><div class="gcnum">'+g.n+'</div><div class="gclbl">'+esc(t)+'</div></div>'+(g.red?'<span class="chip red">'+g.red+' quá hạn</span>':'<span class="chip green">ổn</span>')+'</div>'});
- h+='</div>';
- h+='<div class="cols"><div class="panel"><div class="ph"><b>Việc cần làm hôm nay</b><span class="cnt" style="margin-left:8px">'+items.length+'</span><div class="mini"><button class="pill" onclick="go(\'viec\')">Xem tất cả</button></div></div><div class="pbody slalist">';
- if(!top.length)h+='<div class="empty">Không có việc nào - tốt!</div>';
- top.slice(0,5).forEach(function(it){h+=slaRow(it)});
- h+='</div></div><div class="panel"><div class="ph"><b>Quá hạn cần xử lý ngay</b><span class="cnt" style="margin-left:8px">'+red.length+'</span><div class="mini"><button class="pill" onclick="goViecOverdue()">Xem tất cả</button></div></div><div class="pbody slalist">';
- if(!red.length)h+='<div class="empty">Không có việc quá hạn.</div>';
- red.slice(0,6).forEach(function(it){h+=slaRow(it)});
- h+='</div></div>';
- return h}
 function goViecTeam(t){window.VIECTEAM=t;window.VIECGRP="all";window.VIECSEV="";window.VIECOD=false;go("viec")}
 function goViecOverdue(){window.VIECTEAM="all";window.VIECGRP="all";window.VIECSEV="red";window.VIECOD=true;go("viec")}
 function ymNow(){var d=new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)}
@@ -3226,20 +3209,6 @@ function ddSave(){var sess=window.DDSESS;if(!sess){toast("Chưa chọn buổi.")
   toast("Đã lưu: "+up+" cập nhật, "+ins+" thêm mới điểm danh"+ex+".");reRender(CUR)}
  if(SVR&&recs.length){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}apply()}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiAttendanceSave(sess,recs)}else{apply()}}
 
-function renderTracuu(){
- var q=vnorm(window.TQ||"").trim();
- var h='<div class="phead"><div><div class="t">Tra cứu nhanh</div><div class="s">Tìm Học viên & Khách tiềm năng theo tên (gõ không dấu cũng ra), SĐT hoặc mã hồ sơ</div></div></div>';
- h+='<div class="fbar"><div class="srch" style="flex:1"><i class="ti ti-search"></i><input style="width:100%" placeholder="Nhập tên / SĐT / mã hồ sơ... vd: minh anh · 0902 · HV061" oninput="TQ=this.value;reRenderKeep(\'tracuu\')" value="'+esc(window.TQ||"")+'"></div></div>';
- if(q.length<2){h+='<div class="panel"><div class="empty">Nhập ít nhất 2 ký tự để tìm - gõ "nguyen" vẫn ra "Nguyễn".</div></div>';return h}
- var MIX=jIndex();var res=[];
- function hit(nm,ph,id){return vnorm(nm).indexOf(q)>=0||String(ph||"").indexOf(q)>=0||vnorm(id).indexOf(q)>=0}
- srows("DL09").forEach(function(r){if(hit(r.full_name,r.phone_number,r.student_id))res.push({t:"Học viên",id:r.student_id,nm:r.full_name,sub:(elabel(r.student_status)||"-")+" - "+(r.phone_number||"-"),na:r.next_action,sid:r.student_id,pid:r.student_id})});
- srows("DL02").forEach(function(r){if(hit(r.full_name,r.phone_number,r.lead_id))res.push({t:"Lead",id:r.lead_id,nm:r.full_name,sub:(elabel(r.lead_status)||"-")+" - "+(r.phone_number||"-"),na:r.next_action,pid:r.lead_id})});
- h+='<div class="panel"><div class="pbody">';
- if(!res.length)h+='<div class="empty">Không thấy kết quả.</div>';
- res.slice(0,40).forEach(function(r){var cl=naCls(r.na);h+='<div class="task '+cl+'"><div class="ti"><div class="id">'+esc(r.t)+' - '+esc(r.id)+'</div><div class="nm">'+esc(r.nm)+'</div><div class="mt">'+esc(r.sub)+'</div>'+(r.na?'<div class="na">'+esc(r.na)+'</div>':'')+'</div>'+mstripFor(r.pid,MIX)+'<div class="ac">'+(r.sid?'<button class="btn sm" onclick="openHoso(\''+r.sid+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>':'<button class="btn sm" onclick="openQuick(\''+esc(r.id)+'\')"><i class="ti ti-external-link"></i>Mở lead</button>')+'</div></div>'});
- if(res.length>40)h+='<div class="mut" style="font-size:11px;padding:6px">... còn '+(res.length-40)+' kết quả - gõ rõ hơn để thu hẹp.</div>';
- h+='</div></div>';return h}
 function openHoso(sid){if(sid!==window.JPID)window.HSTAB="in";window.JPID=sid;window.HOSO=sid;go("hoso")}
 function openLop(cid){window.BLCLASS=cid;go("banglop")}
 function goDD(cid,sess){window.BLCLASS=cid;window.DDCLASS=cid;window.DDSESS=sess;window.BLTAB="buoi";go("banglop")}
@@ -3686,7 +3655,7 @@ function sopBlock(J,btns){
  h+='<div class="sopr"><span class="soprk">Thời hạn</span><span class="soprv">'+(J.sla>0?('Ở bước này đã '+age+' · hạn '+(J.sla<24?Math.round(J.sla)+" giờ":Math.round(J.sla/24)+" ngày")+(J.over?' · <b style="color:var(--red)">QUÁ HẠN</b>':'')):'Không đặt SLA cứng - chăm theo nhịp định kỳ')+'</span></div>';
  h+='<div class="sopr"><span class="soprk">Phụ trách</span><span class="soprv">'+esc(J.owner||J.S.owner||"-")+'</span></div>';
  if(J.miss.length)h+='<div class="jnm"><i class="ti ti-file-alert"></i><b>Thiếu dữ liệu bắt buộc:</b> '+esc(J.miss.join(", "))+' - bổ sung xong mới đi tiếp được.</div>';
- if(J.naMsg)h+='<div class="sopna"><i class="ti ti-message-2"></i><span><b>Câu nhắn chuẩn SOP:</b> '+esc(J.naMsg)+'</span></div>';
+ if(J.naMsg)h+='<div class="sopna"><i class="ti ti-message-2"></i><span><b>Câu nhắn chuẩn SOP:</b> '+esc(J.naMsg)+'</span>'+msgEditBtn(J.na)+'</div>';
  h+='</div>';
  if(btns!==false)h+='<div class="jnr">'+(btns||('<button class="btn primary" onclick="runStart(\''+esc(J.C.pid)+'\')"><i class="ti ti-player-play"></i>Xử lý theo quy trình</button>'))+'</div>';
  return h+'</div>'}
@@ -3696,6 +3665,18 @@ function vnorm(s){s=String(s==null?"":s).toLowerCase();
  return s.replace(/đ/g,"d")}
 /* ===== CHUẨN THÔNG ĐIỆP (CH4) - câu nhắc việc chuẩn của SOP ===== */
 function ch4List(){return (DATA.config&&DATA.config.ch4)||[]}
+/* V9.29 (mảng 5): câu nhắc in ra màn hình mà không nói lấy từ đâu - muốn sửa phải mò trong CH4.
+   msgEdit nhảy thẳng tới đúng câu, enumEdit nhảy tới đúng danh mục CH1. Cùng một ý với slaChip. */
+function msgGo(code){window.SETTAB="ch4";window.MSGQ=code||"";go("settings");
+ setTimeout(function(){var el=document.querySelector('[data-msg="'+code+'"]');
+  if(el&&el.scrollIntoView)el.scrollIntoView({block:"center"})},60)}
+function msgEditBtn(code){if(!code)return "";
+ return '<button class="cfedit" onclick="event.stopPropagation();msgGo(\''+esc(code)+'\')" '+
+  'data-tip="Sửa câu nhắc này trong Cài đặt > CH4"><i class="ti ti-pencil"></i>Sửa câu này</button>'}
+function enumGo(name){window.SETTAB="ch1";window.ENUMQ=name||"";go("settings")}
+function enumEditBtn(name){if(!name)return "";
+ return '<button class="cfedit" onclick="event.stopPropagation();enumGo(\''+esc(name)+'\')" '+
+  'data-tip="Sửa danh mục '+esc(name)+' trong Cài đặt > CH1"><i class="ti ti-list-details"></i>Sửa danh mục</button>'}
 function ch4Get(code){if(!code)return null;var a=ch4List();for(var i=0;i<a.length;i++)if(a[i].code===code)return a[i];return null}
 function msgText(code){var m=ch4Get(code);if(!m)return "";var t=String(m.tmpl||"");(m.params||[]).forEach(function(pn,i){var v=paramOf(pn,null);t=t.replace(new RegExp("\\{"+(i+1)+"\\}","g"),(v==null?"?":String(v)))});return t}
 /* chặng -> mã thông điệp CH4 [thường, khi quá hạn]; áp chuẩn SOP vào từng bước hành trình */
@@ -4378,7 +4359,7 @@ function renderChay(){
  var fs=ST.fields(C);
  h+='<div class="runh"><span class="runi"><i class="ti '+J.S.ic+'"></i></span><div><div class="runt">'+esc(ST.t)+'</div><div class="runs">'+esc(ST.sub)+'</div></div>'+
   (J.over?'<span class="chip red" style="margin-left:auto">Quá hạn '+(J.ageH>24?Math.floor(J.ageH/24)+" ngày":Math.round(J.ageH)+" giờ")+'</span>':'')+'</div>';
- if(J.naMsg)h+='<div class="runsop"><i class="ti ti-checklist"></i><div><b>Việc cần làm theo SOP · '+esc(J.na)+'</b>'+esc(J.naMsg)+'</div></div>';
+ if(J.naMsg)h+='<div class="runsop"><i class="ti ti-checklist"></i><div><b>Việc cần làm theo SOP · '+esc(J.na)+'</b>'+esc(J.naMsg)+msgEditBtn(J.na)+'</div></div>';
  /* thông tin cần biết để làm bước này */
  h+='<div class="runctx">'+runCtx(J,sk)+'</div>';
  if(sk==="contact"&&tps.length){
@@ -4429,7 +4410,7 @@ function jBranchCard(J){var C=J.C,pid=C.pid,S=J.S;
   '<div><div class="runt">Nhánh rẽ · '+esc(S.t)+'</div><div class="runs">'+esc(S.why)+'</div></div>'+
   '<span class="chip red" style="margin-left:auto">ngoài luồng chính</span></div>';
  h+='<div class="runctx"><span class="cx"><b>Tình trạng:</b> '+esc(G.fact)+'</span></div>';
- if(J.naMsg)h+='<div class="runsop"><i class="ti ti-checklist"></i><div><b>Việc cần làm theo SOP · '+esc(J.na)+'</b>'+esc(J.naMsg)+'</div></div>';
+ if(J.naMsg)h+='<div class="runsop"><i class="ti ti-checklist"></i><div><b>Việc cần làm theo SOP · '+esc(J.na)+'</b>'+esc(J.naMsg)+msgEditBtn(J.na)+'</div></div>';
  /* KHỐI "NẾU ĐẠT THÌ ĐI ĐÂU" - phần Luân yêu cầu */
  if(G.okFn)h+='<div class="brok"><div class="brokh"><i class="ti ti-arrow-bounce"></i>'+esc(G.okT)+'</div>'+
   '<button class="btn primary lg" onclick="'+G.okFn+'(\''+esc(pid)+'\')"><i class="ti ti-user-check"></i>'+G.okB+'</button>'+
@@ -4689,7 +4670,7 @@ function renderReview(embed){var p="review",fil=fget(p);
  h+=statStrip([
   ["ti-school",nNone,"Lớp chưa gửi đợt nào","#E24B4A","cần gửi ngay"],
   ["ti-clipboard-text",waiting,"Phiếu chờ trả lời","#E08A1E","nhắc HV nộp"],
-  ["ti-target",nLow,"Lớp trả lời dưới ngưỡng","#7C3AED","SRR ≥ "+Math.round(kpiTh(/^SRR/,0.6)*100)+"%"],
+  ["ti-target",nLow,"Lớp trả lời dưới ngưỡng","#7C3AED","SRR ≥ "+kpiChip(/^SRR/,0.6,1)],
   ["ti-alert-triangle",nFu,"Phiếu cần follow-up","#DB2777","hài lòng thấp"]]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả lớp",all.length],["none","Chưa gửi đợt nào",nNone,"red"],["low","Trả lời kém",nLow,"amber"],["fu","Có phiếu cần follow-up",nFu?nFu:"","amber"]],view.length);
@@ -5052,46 +5033,6 @@ function stageTime(L,stage){var lid=L.lead_id;
 function daysInStage(L,stage){var d=pvnd(stageTime(L,stage));return d?Math.floor((Date.now()-d.getTime())/864e5):null}
 function leadValue(L,avg){var enr=rows("DL06").filter(function(e){return e.lead_id===L.lead_id});if(enr.length)return num(enr[0].final_fee)||num(enr[0].total_fee);var con=rows("DL04").filter(function(c){return c.lead_id===L.lead_id&&c.recommended_course});if(con.length){var cs=rows("DL05").filter(function(x){return x.course_name===con[0].recommended_course})[0];if(cs&&num(cs.list_price))return num(cs.list_price)}return avg}
 function psum(ic,label,val,col){return '<div class="psum"><div class="psic" style="background:'+col+'18;color:'+col+'"><i class="ti '+ic+'"></i></div><div><div class="psv">'+esc(String(val))+'</div><div class="psl">'+esc(label)+'</div></div></div>'}
-function pipeSet(k,v){window.PIPE=window.PIPE||{q:"",nv:"all",src:"all",sort:"age"};window.PIPE[k]=v;if(k==="q")reRenderKeep("pipeline");else reRender("pipeline")}
-function renderPipeline(){var all=scopeList("DL02",rows("DL02"));
- var P=window.PIPE||(window.PIPE={q:"",nv:"all",src:"all",sort:"age"});
- var courses=rows("DL05");var avg=courses.length?Math.round(courses.reduce(function(a,b){return a+num(b.list_price)},0)/courses.length):0;
- var q=(P.q||"").toLowerCase().trim();
- var leads=all.filter(function(L){if(P.nv!=="all"&&String(L.assigned_to||"")!==P.nv)return false;if(P.src!=="all"&&ecode(L.lead_source)!==P.src)return false;if(q&&String(L.full_name||"").toLowerCase().indexOf(q)<0&&String(L.phone_number||"").indexOf(q)<0)return false;return true});
- var b={};STAGES.forEach(function(s){b[s.k]=[]});
- leads.forEach(function(L){var st=leadStage(L);(b[st]||b.new).push(L)});
- var STAGE_W={new:0.1,contacted:0.25,test:0.45,consult:0.65,enroll:0.9};
- var activeK=["new","contacted","test","consult","enroll"];var activeLeads=[],stuck=0,pipeVal=0;
- activeK.forEach(function(k){b[k].forEach(function(L){activeLeads.push(L);var di=daysInStage(L,k);if(di!=null&&di>(PIPE_STALE[k]||7))stuck++;pipeVal+=leadValue(L,avg)*(STAGE_W[k]||0.5)})});
- pipeVal=Math.round(pipeVal);
- var conv=all.filter(function(r){return isc(r.lead_status,"converted")}).length;var cvr=all.length?Math.round(conv/all.length*100):0;
- var h='<div class="phead"><div><div class="t">Phễu vận hành</div><div class="s">Giai đoạn tự suy từ dữ liệu · giá trị dự kiến & thời gian tồn đọng để biết khách nào cần đẩy</div></div></div>';
- h+='<div class="pipesum">'+psum("ti-users","Đang theo đuổi",activeLeads.length,"#3B82C4")+psum("ti-cash","Dự báo doanh thu (theo xác suất giai đoạn)",vnd(pipeVal),"#16A34A")+psum("ti-trending-up","Tỷ lệ chuyển đổi",cvr+"%",cvr>=40?"#16A34A":"#D97706")+psum("ti-alarm","Cần chú ý (tồn lâu)",stuck,stuck?"#DC2626":"#16A34A")+'</div>';
- var nvs={};all.forEach(function(L){if(L.assigned_to)nvs[L.assigned_to]=L.assigned_to_name||L.assigned_to});
- var srcs=ENUM["enum_lead_source"]||[];
- h+='<div class="fbar"><div class="srch" style="min-width:190px"><i class="ti ti-search"></i><input placeholder="Tìm tên / SĐT..." oninput="pipeSet(\'q\',this.value)" value="'+esc(P.q||"")+'"></div>';
- h+='<span class="lbl">NV</span><select class="sel" onchange="pipeSet(\'nv\',this.value)"><option value="all">Tất cả NV</option>'+Object.keys(nvs).map(function(id){return '<option value="'+esc(id)+'"'+(P.nv===id?" selected":"")+'>'+esc(nvs[id])+'</option>'}).join("")+'</select>';
- h+='<span class="lbl">Nguồn</span><select class="sel" onchange="pipeSet(\'src\',this.value)"><option value="all">Tất cả nguồn</option>'+srcs.map(function(v){var c=ecode(v);return '<option value="'+esc(c)+'"'+(P.src===c?" selected":"")+'>'+esc(elabel(v))+'</option>'}).join("")+'</select>';
- h+='<span class="lbl">Sắp xếp</span><select class="sel" onchange="pipeSet(\'sort\',this.value)">'+[["age","Tồn lâu nhất"],["value","Giá trị cao"],["new","Mới nhất"]].map(function(o){return '<option value="'+o[0]+'"'+(P.sort===o[0]?" selected":"")+'>'+o[1]+'</option>'}).join("")+'</select>';
- if(P.q||P.nv!=="all"||P.src!=="all")h+='<button class="fchip clr" onclick="window.PIPE={q:\'\',nv:\'all\',src:\'all\',sort:\''+P.sort+'\'};reRender(\'pipeline\')"><i class="ti ti-x"></i> Xóa lọc</button>';
- h+='<span class="cnt">'+leads.length+' khách</span></div>';
- h+='<div class="pipe">';
- STAGES.forEach(function(s){var arr=b[s.k].slice();var isAct=activeK.indexOf(s.k)>=0;
-  arr.sort(function(x,y){if(P.sort==="value")return leadValue(y,avg)-leadValue(x,avg);if(P.sort==="new"){var dx=pvnd(x.lead_created_time),dy=pvnd(y.lead_created_time);return (dy?dy.getTime():0)-(dx?dx.getTime():0)}var ax=daysInStage(x,s.k)||0,ay=daysInStage(y,s.k)||0;return ay-ax});
-  var colVal=arr.reduce(function(t,L){return t+leadValue(L,avg)},0);
-  h+='<div class="pcol"><div class="pcolh '+s.cls+'"><b><i class="ti '+(s.ic||"ti-point")+'"></i> '+esc(s.t)+'</b><span>'+arr.length+'</span></div><div class="pcolv"><i class="ti ti-cash"></i> '+vnd(colVal)+'</div><div class="pcards">';
-  if(!arr.length)h+='<div class="pempty">—</div>';
-  arr.slice(0,40).forEach(function(L){var steps=nextSteps(L,s.k);var di=daysInStage(L,s.k);var stale=isAct&&di!=null&&di>(PIPE_STALE[s.k]||7);
-   h+='<div class="pcard'+(stale?" stale":"")+'" onclick="leadDetail(\''+esc(L.lead_id)+'\')"><div class="pctop"><div class="pcn">'+esc(L.full_name)+'</div><div class="pcval">'+vnd(leadValue(L,avg))+'</div></div>';
-   h+='<div class="pcm">'+esc(L.phone_number||"")+(L.assigned_to_name?" · "+esc(L.assigned_to_name):"")+'</div>';
-   var chips="";if(L.lead_source)chips+='<span class="pchip"><i class="ti ti-broadcast"></i>'+esc(elabel(L.lead_source))+'</span>';if(L.target_band)chips+='<span class="pchip"><i class="ti ti-target"></i>'+esc(L.target_band)+'</span>';
-   if(chips)h+='<div class="pcchips">'+chips+'</div>';
-   if(isAct&&di!=null)h+='<div class="pcage'+(stale?" bad":"")+'"><i class="ti ti-clock"></i> '+di+' ngày trong giai đoạn'+(stale?" · cần đẩy":"")+'</div>';
-   if(steps.length)h+='<div class="pcact">'+steps.slice(0,2).map(function(a,i){return '<button class="btn sm'+(i===0?" primary":"")+'" onclick="event.stopPropagation();modalNext(\''+a.page+'\',\''+encPrefill(a.pf)+'\')"><i class="ti '+a.ic+'"></i>'+a.lb+'</button>'}).join("")+'</div>';
-   h+='</div>'});
-  if(arr.length>40)h+='<div class="pmore">... còn '+(arr.length-40)+' khách</div>';
-  h+='</div></div>'});
- h+='</div>';return h}
 function journeyHTML(sid){
  var enr=rows("DL06").filter(function(x){return x.student_id===sid});var lid=enr.length?enr[0].lead_id:"";
  var L=lid?find("DL02","lead_id",lid):null;
@@ -5413,8 +5354,8 @@ function renderBanglop(){
   var curP=cap>0?cur/cap:null, attP=att.length?pres/att.length:null, hcrP=hw.length?hwSub/hw.length:null;
   h+=statStrip([
    ["ti-users-group",cur+(cap?"/"+cap:""),"Sĩ số","#3B82C4",curP==null?"":Math.round(curP*100)+"% sức chứa"],
-   ["ti-checkbox",attP==null?"—":Math.round(attP*100)+"%","Chuyên cần (ATR)",(attP!=null&&attP>=kpiTh(/^ATR/,0.85))?"#16A34A":"#E24B4A","mục tiêu ≥ "+Math.round(kpiTh(/^ATR/,0.85)*100)+"%"],
-   ["ti-book",hcrP==null?"—":Math.round(hcrP*100)+"%","Nộp bài (HCR)",(hcrP!=null&&hcrP>=kpiTh(/^HCR/,0.8))?"#16A34A":"#E08A1E","mục tiêu ≥ "+Math.round(kpiTh(/^HCR/,0.8)*100)+"%"],
+   ["ti-checkbox",attP==null?"—":Math.round(attP*100)+"%","Chuyên cần (ATR)",(attP!=null&&attP>=kpiTh(/^ATR/,0.85))?"#16A34A":"#E24B4A","mục tiêu ≥ "+kpiChip(/^ATR/,0.85,1)],
+   ["ti-book",hcrP==null?"—":Math.round(hcrP*100)+"%","Nộp bài (HCR)",(hcrP!=null&&hcrP>=kpiTh(/^HCR/,0.8))?"#16A34A":"#E08A1E","mục tiêu ≥ "+kpiChip(/^HCR/,0.8,1)],
    ["ti-user-exclamation",risk,"HV nguy cơ",risk?"#DB2777":"#16A34A",risk?"cần can thiệp":"ổn"],
    ["ti-thumb-up",ss==null?"—":ss.toFixed(1)+"/5","Hài lòng (SS)",(ss!=null&&ss>=kpiTh(/^SS/,4.5))?"#16A34A":"#E08A1E","mục tiêu ≥ "+kpiTh(/^SS/,4.5)]]);
  })();
@@ -6429,8 +6370,10 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
   rest.forEach(function(p){h+=prow(p.name,p.meaning,p.unit,p.value,false,null)});
   if(!cf.ch2.length)h+='<tr><td class="empty" colspan="5">Chưa nạp được CH2 (bản v3 dùng cấu hình trong file demo; v4 đọc trực tiếp CH2 trên sheet).</td></tr>';
   h+='</tbody></table></div></div>';}
- else if(tab==="ch6"){h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>KPI</th><th>Hướng</th><th>Ngưỡng</th><th>Phase</th><th></th></tr></thead><tbody>';
-  cf.ch6.forEach(function(p){h+='<tr><td><b>'+esc(p.code)+'</b></td><td style="font-size:11.5px">'+esc(p.name)+'</td><td style="text-align:center">'+esc(p.dir)+'</td><td><input id="k_'+esc(p.code)+'" value="'+esc(p.threshold)+'" style="width:80px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit"></td><td>'+esc(p.phase)+'</td><td><button class="btn sm" onclick="saveKpi(\''+esc(p.code)+'\')"><i class="ti ti-device-floppy"></i>Lưu</button></td></tr>'});
+ else if(tab==="ch6"){
+  h+='<div class="notebar"><i class="ti ti-target"></i>Đây là <b>ngưỡng đạt</b> của từng chỉ số. App so số thực tế với ngưỡng ở đây để tô xanh/đỏ và để viết câu khuyến nghị trên trang Báo cáo - <b>đổi ở đây là mọi nơi đổi theo</b>. Con số ngưỡng hiện trên các màn đều bấm được để nhảy về đúng dòng.</div>';
+  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>KPI</th><th>Hướng</th><th>Ngưỡng</th><th>Phase</th><th></th></tr></thead><tbody>';
+  cf.ch6.forEach(function(p){h+='<tr id="kpirow_'+esc(p.code)+'"><td><b>'+esc(p.code)+'</b></td><td style="font-size:11.5px">'+esc(p.name)+'</td><td style="text-align:center">'+esc(p.dir)+'</td><td><input id="k_'+esc(p.code)+'" value="'+esc(p.threshold)+'" style="width:80px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit"></td><td>'+esc(p.phase)+'</td><td><button class="btn sm" onclick="saveKpi(\''+esc(p.code)+'\')"><i class="ti ti-device-floppy"></i>Lưu</button></td></tr>'});
   if(!cf.ch6.length)h+='<tr><td class="empty" colspan="6">Chưa nạp được ngưỡng KPI.</td></tr>';
   h+='</tbody></table></div></div>';}
  else if(tab==="ch4"){
@@ -6443,7 +6386,7 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
   if(!order.length)h+='<div class="panel"><div class="empty">Không thấy thông điệp nào khớp.</div></div>';
   order.forEach(function(sh){
    h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-file-text" style="margin-right:6px"></i>'+esc(sh)+'</b><span class="mut" style="font-size:11.5px">'+bySheet[sh].length+' thông điệp</span></div><div class="tbwrap"><table class="dt"><thead><tr><th style="width:74px">Mã</th><th>Mẫu câu (sửa ở đây)</th><th style="width:150px">Khi nào hiện</th><th style="width:110px">Ai làm</th><th style="width:80px"></th></tr></thead><tbody>';
-   bySheet[sh].forEach(function(m){var idx=ch4List().indexOf(m);var pv=msgText(m.code);
+   bySheet[sh].forEach(function(m){var idx=ch4List().indexOf(m);var pv=msgText(m.code);/* V9.29: neo de msgGo nhay toi */
     h+='<tr><td><code style="font-size:11px">'+esc(m.code)+'</code>'+(m.params&&m.params.length?'<div class="mut" style="font-size:10px">'+esc(m.params.join(", "))+'</div>':'')+'</td>'+
      '<td><textarea id="msg_'+idx+'" rows="2" style="width:100%;min-width:280px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-family:inherit;font-size:11.5px">'+esc(m.tmpl)+'</textarea>'+(pv&&pv!==m.tmpl?'<div class="mut" style="font-size:10.5px;margin-top:2px">→ '+esc(pv)+'</div>':'')+'</td>'+
      '<td style="font-size:11px;color:var(--muted);white-space:normal">'+esc(m.when)+'</td>'+
@@ -6940,9 +6883,9 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=rows("DL08");
  var h='<div class="phead"><div><div class="t">Xếp lớp & Onboarding</div><div class="s">Từ lúc đóng đủ tiền → xếp lớp → gửi thông tin → HV xác nhận → hoàn tất. Mỗi bước có dấu hoàn thành để tắt cảnh báo</div></div><div class="sp"><button class="btn primary" onclick="openXepMoi()"><i class="ti ti-plus"></i>Xếp lớp học viên</button></div></div>';
  h+=statStrip([
   ["ti-user-plus",wait.length,"Đã thu · chờ xếp lớp",wait.length?"#DB2777":"#16A34A","bước đầu tiên"],
-  ["ti-send",obs.filter(function(o){var s=obState(o);return o.class_id&&!s.sent}).length,"Chờ gửi thông tin lớp","#E08A1E","SLA "+paramOf("slaClassInfoZalo_hours",24)+"h"],
+  ["ti-send",obs.filter(function(o){var s=obState(o);return o.class_id&&!s.sent}).length,"Chờ gửi thông tin lớp","#E08A1E","SLA "+slaChip("slaClassInfoZalo_hours",24)],
   ["ti-checks",obs.filter(function(o){var s=obState(o);return s.sent&&!s.confirmed}).length,"Chờ HV xác nhận lớp","#7C3AED","gọi chốt giờ học"],
-  ["ti-layout-grid-add",obs.filter(function(o){return !isc(o.onboarding_status,"completed")}).length,"Onboarding chưa xong","#3B82C4","SLA "+paramOf("slaOBT_hours",72)+"h"],
+  ["ti-layout-grid-add",obs.filter(function(o){return !isc(o.onboarding_status,"completed")}).length,"Onboarding chưa xong","#3B82C4","SLA "+slaChip("slaOBT_hours",72)],
   ["ti-alert-triangle",obs.filter(function(o){var s=obState(o);return s.infoOverdue||s.obOverdue}).length,"Quá hạn","#E24B4A","vi phạm PLR48/OBT"]]);
  /* HÀNG ĐỢI CHỜ XẾP LỚP - trước đây bị giấu sau nút, nay thành danh sách như trong hành trình */
  if(wait.length&&(fil==="all")){
@@ -7089,6 +7032,22 @@ function hwChip(x){
  if(hwWaiting(x))return '<span class="chip">Đã giao · chờ nộp</span>';
  return '<span class="chip">'+esc(elabel(x&&x.homework_status)||"-")+'</span>'}
 function yes48(v){return /^(có|co|true|yes|đúng|dung|x|1)/i.test(String(v||"").trim())}
+/* V9.29 (mảng 5): ngưỡng KPI in ra khắp nơi ("mục tiêu ≥ 85%") mà không nói lấy từ đâu.
+   kpiChip in ngưỡng kèm bánh răng, bấm là về đúng dòng CH6. Cùng một ý với slaChip và msgEditBtn. */
+function kpiRowOf(rex){var c=(DATA.config&&DATA.config.ch6)||[];
+ for(var i=0;i<c.length;i++){var t=String(c[i].code||"")+" "+String(c[i].name||"");if(rex.test(t))return c[i]}
+ return null}
+function kpiGoCf(code){window.SETTAB="ch6";window.KPIQ=code||"";go("settings");
+ setTimeout(function(){var el=document.getElementById("kpirow_"+code);
+  if(el){if(el.scrollIntoView)el.scrollIntoView({block:"center"});el.classList.add("cfhl");
+   setTimeout(function(){el.classList.remove("cfhl")},2600)}},60)}
+function kpiChip(rex,fb,pct){
+ var r=kpiRowOf(rex), v=kpiTh(rex,fb);
+ var txt=pct?(Math.round(v*100)+"%"):String(v);
+ if(!r)return esc(txt);
+ return '<span class="slachip" onclick="event.stopPropagation();kpiGoCf(\''+esc(r.code||"")+'\')" '+
+  'data-tip="'+esc((r.name||r.code||"Ngưỡng KPI")+" · đang đặt "+txt+" - bấm để sửa ở Cài đặt > CH6")+'">'+
+  esc(txt)+'<i class="ti ti-settings"></i></span>'}
 function kpiTh(re,fb){var c=(DATA.config&&DATA.config.ch6)||[];for(var i=0;i<c.length;i++){var t=String(c[i].code||"")+" "+String(c[i].name||"");if(re.test(t)){var n=parseFloat(String(c[i].threshold).replace(/[^0-9.]/g,""));if(!isNaN(n))return n}}return fb}
 function ymOf(off){var d=new Date();d.setDate(1);d.setMonth(d.getMonth()+(off||0));return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)}
 function inYm(s,ym){var d=pvnd(s);return !!d&&(d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2))===ym}
@@ -7261,9 +7220,9 @@ function renderTest(embed){var p="test",fil=fget(p);var all=rows("DL03");
  var _s=all.map(st);
  h+=statStrip([
   ["ti-calendar-check",_s.filter(function(x){return !x.booked&&!x.refused}).length,"Chờ đặt lịch","#3B82C4","gọi hẹn khách"],
-  ["ti-file-text",_s.filter(function(x){return x.att&&!x.graded}).length,"Chờ chấm bài","#E08A1E","SLA "+paramOf("slaGLA_hours",24)+"h"],
+  ["ti-file-text",_s.filter(function(x){return x.att&&!x.graded}).length,"Chờ chấm bài","#E08A1E","SLA "+slaChip("slaGLA_hours",24)],
   ["ti-alert-triangle",_s.filter(function(x){return x.overdue}).length,"Quá hạn chấm","#E24B4A","vi phạm GLA"],
-  ["ti-messages",_s.filter(function(x){return x.graded&&!x.consulted}).length,"Có KQ chờ tư vấn","#7C3AED","SLA "+paramOf("slaCVT_hours",24)+"h"]]);
+  ["ti-messages",_s.filter(function(x){return x.graded&&!x.consulted}).length,"Có KQ chờ tư vấn","#7C3AED","SLA "+slaChip("slaCVT_hours",24)]]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả"],["book","Chờ đặt lịch"],["grade","Chờ chấm"],["consult","Chờ tư vấn"],["overdue","Quá hạn chấm"]],view.length);
  h+='<div class="obcards rows">';if(!view.length)h+='<div class="empty">Không có hồ sơ phù hợp.</div>';
@@ -7696,8 +7655,8 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=rows("DL14");
   ["ti-checks",_w.filter(function(x){return x.booked&&!x.confirmed&&!x.noshow}).length,"Chờ xác nhận lịch","#E08A1E","HV chưa chốt giờ"],
   ["ti-star",_w.filter(function(x){return x.confirmed&&!x.done&&!x.noshow}).length,"Đã xác nhận, sắp dạy","#DB2777","chuẩn bị nội dung"],
   ["ti-thumb-up",_done.length,"Đã dạy xong","#0D9488",_imp+" tiến bộ"],
-  ["ti-notes",_w.filter(function(x){return x.done&&!x.note}).length,"Chờ ghi nội dung","#E08A1E","SLA "+paramOf("slaWowNote_hours",24)+"h"],
-  ["ti-target",(_wor==null?"—":_wor+"%"),"Tỷ lệ tiến bộ (WOR)",(_wor!=null&&_wor>=Math.round(kpiTh(/^WOR/,0.6)*100))?"#16A34A":"#E24B4A","mục tiêu ≥ "+Math.round(kpiTh(/^WOR/,0.6)*100)+"%"]]);
+  ["ti-notes",_w.filter(function(x){return x.done&&!x.note}).length,"Chờ ghi nội dung","#E08A1E","SLA "+slaChip("slaWowNote_hours",24)],
+  ["ti-target",(_wor==null?"—":_wor+"%"),"Tỷ lệ tiến bộ (WOR)",(_wor!=null&&_wor>=Math.round(kpiTh(/^WOR/,0.6)*100))?"#16A34A":"#E24B4A","mục tiêu ≥ "+kpiChip(/^WOR/,0.6,1)]]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả",all.length],["confirm","Chờ xác nhận lịch",_w.filter(function(x){return x.booked&&!x.confirmed&&!x.noshow}).length,"amber"],["upcoming","Đã xác nhận, sắp dạy",_w.filter(function(x){return x.confirmed&&!x.done&&!x.noshow}).length],["note","Chờ ghi nội dung",_w.filter(function(x){return x.done&&!x.note}).length,"amber"],["overdue","Quá hạn ghi chú",_w.filter(function(x){return x.overdue}).length,"red"]],view.length);
  h+='<div class="obcards rows">';if(!view.length)h+='<div class="empty">Không có buổi WOW phù hợp.</div>';
@@ -7833,49 +7792,6 @@ function wowAddSave(force){var sid=fldV("wa_stu");if(!sid){toast("Chọn học v
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL14",w)}else{d("WOW-"+seqNo("DL14","wow_id"))}}
 /* ===== P8 Khảo sát & Phản hồi (DL15 + DL16) ===== */
 function fuNeed(v){var s=String(v||"").trim();return s!==""&&!/^(không|khong|no|false|0)/i.test(s)}
-function renderKhaosat(){var tab=window.KSTAB||"ks";
- var h=pageHead("Khảo sát & Phản hồi","Gửi khảo sát định kỳ - ghi kết quả - xử lý phản hồi; phản hồi tiêu cực chuyển thẳng thành khiếu nại (P9)",
-  tab==="ks"?'<button class="btn primary" onclick="svSend()"><i class="ti ti-send"></i>Gửi khảo sát</button>':'<button class="btn primary" onclick="modalNext(\'khaosat\',\'\')"><i class="ti ti-plus"></i>Ghi nhận phản hồi</button>');
- var svAll=rows("DL15"),fbAll=rows("DL16");
- var nWait=svAll.filter(function(v){return !String(v.submitted_date||"").trim()}).length;
- var nFb=fbAll.filter(function(f){return !isc(f.feedback_status,"resolved")}).length;
- h+=tbar(segHTML(tab,[["ks","Khảo sát",svAll.length,""],["fb","Phản hồi",fbAll.length,""]],"window.KSTAB='{k}';reRender(CUR)"),
-  '<span class="tbcnt">'+(tab==="ks"?(nWait+" phiếu chờ trả lời"):(nFb+" phản hồi chưa xử lý"))+'</span>');
- if(tab==="ks"){
-  h+='<div class="obcards rows">';if(!svAll.length)h+='<div class="empty">Chưa có khảo sát nào - bấm "Gửi khảo sát".</div>';
-  var MIX=jIndex();
-  svAll.forEach(function(v){var sub=!!(String(v.submitted_date||"").trim());var fu=fuNeed(v.follow_up_needed);
-   h+='<div class="obcard"><div class="obh"><div><b>'+esc(v.student_name||v.student_id)+'</b><div class="obm">'+esc(elabel(v.survey_type)||v.survey_type||"")+' · '+lopLnk(v.class_id,v.class_id_name,"")+' · gửi '+esc(v.sent_date||"-")+'</div></div>'+mstripFor(v.student_id,MIX)+(fu?'<span class="chip red">Cần follow-up</span>':(sub?'<span class="chip green">Đã trả lời</span>':'<span class="chip amber">Chờ trả lời</span>'))+'</div>';
-   if(sub)h+='<div class="obm2">Hài lòng: <b>'+esc(v.satisfaction_score||"-")+'/5</b> · NPS: <b>'+esc(v.nps_score||"-")+'</b>'+(v.negative_comments?' · <span style="color:var(--red)">'+esc(String(v.negative_comments).slice(0,80))+'</span>':'')+'</div>';
-   h+=stepBar([["Gửi KS",true],["HV trả lời",sub],["Follow-up",sub&&!fu]]);
-   h+='<div class="obact">';
-   if(!sub)h+='<button class="btn primary sm" onclick="svResult(\''+esc(v.survey_id)+'\')"><i class="ti ti-writing"></i>Ghi kết quả</button>';
-   if(fu)h+='<button class="btn green sm" onclick="confirmRun(\'Đánh dấu ĐÃ xử lý follow-up cho học viên này?\',\'svFollowDone\',\''+esc(v.survey_id)+'\')"><i class="ti ti-check"></i>Đã xử lý follow-up</button>';
-   h+='<button class="btn sm" onclick="openHoso(\''+esc(v.student_id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button></div></div>';});
-  h+='</div>';
- } else {
-  h+='<div class="obcards rows">';if(!fbAll.length)h+='<div class="empty">Chưa có phản hồi nào.</div>';
-  var MIX2=jIndex();
-  fbAll.forEach(function(f){var st2=ecode(f.feedback_status);var neg=isc(f.feedback_type,"negative");var linked=!!(String(f.related_complaint_id||"").trim());
-   h+='<div class="obcard"><div class="obh"><div><b>'+esc(f.student_id_name||f.student_id)+'</b><div class="obm">'+esc(elabel(f.feedback_category)||f.feedback_category||"")+' · '+esc(elabel(f.feedback_channel)||"")+(f.feedback_score?' · điểm '+esc(f.feedback_score)+'/5':'')+'</div></div>'+mstripFor(f.student_id,MIX2)+'<span class="chip '+(neg?"red":isc(f.feedback_type,"positive")?"green":"gray")+'">'+esc(elabel(f.feedback_type)||"-")+'</span></div>';
-   h+='<div class="obm2">'+esc(String(f.feedback_content||"").slice(0,120))+'</div>';
-   h+=stepBar([["Tiếp nhận",true],["Phân loại",st2!=="new"],["Xử lý xong",st2==="resolved"]]);
-   h+='<div class="obact">';
-   if(st2==="new")h+='<button class="btn primary sm" onclick="fbClassify(\''+esc(f.feedback_id)+'\')"><i class="ti ti-tags"></i>Tiếp nhận & phân loại</button>';
-   else if(st2!=="resolved")h+='<button class="btn green sm" onclick="fbResolve(\''+esc(f.feedback_id)+'\')"><i class="ti ti-check"></i>Xử lý xong</button>';
-   if(neg&&!linked&&st2!=="resolved")h+='<button class="btn danger sm" onclick="fbToComplaint(\''+esc(f.feedback_id)+'\')"><i class="ti ti-alert-triangle"></i>Chuyển thành khiếu nại</button>';
-   if(linked)h+='<button class="btn sm" onclick="openComplaint(\''+esc(f.related_complaint_id)+'\')"><i class="ti ti-external-link"></i>Xem khiếu nại '+esc(f.related_complaint_id)+'</button>';
-   h+='<button class="btn sm" onclick="openHoso(\''+esc(f.student_id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button></div></div>';});
-  h+='</div>';
- }
- return h}
-/* MẪU CÂU REVIEW theo từng đợt - để NV không phải tự nghĩ câu hỏi mỗi lần gửi */
-var SVTPL={
- "week_1":{t:"Tuần 1 · cảm nhận ban đầu",q:["Lớp học có đúng trình độ của bạn không?","Giảng viên giảng dễ hiểu chứ?","Lịch học và địa điểm có thuận tiện không?","Bạn cần trung tâm hỗ trợ thêm gì để học tốt hơn?"]},
- "week_4":{t:"Tuần 4 · giữa chặng",q:["Bạn thấy mình tiến bộ ở kỹ năng nào nhất?","Kỹ năng nào bạn vẫn thấy khó?","Lượng bài tập về nhà có vừa sức không?","Giảng viên chữa bài có kỹ không?"]},
- "week_8":{t:"Tuần 8 · trước khi kết thúc",q:["Bạn có tự tin đạt mục tiêu điểm đã đặt ra không?","Bạn cần luyện thêm phần nào trước khi thi?","Buổi WOW 1-1 có giúp ích cho bạn không?","Điều gì trung tâm nên cải thiện ngay?"]},
- "end_of_course":{t:"Cuối khóa · tổng kết",q:["Bạn hài lòng nhất điều gì ở khóa học?","Điều gì khiến bạn chưa hài lòng?","Bạn có giới thiệu ITTs cho bạn bè không? Vì sao?","Bạn có dự định học tiếp khóa sau không?"]},
- "adhoc":{t:"Đột xuất · hỏi nhanh",q:["Bạn có gặp khó khăn gì trong việc học không?","Bạn cần trung tâm hỗ trợ điều gì?"]}};
 function svTplBox(code){var t=SVTPL[ecode(code)||code];
  if(!t)return '<div class="fhint">Đợt này chưa có bộ câu mẫu.</div>';
  return '<div class="svtpl"><b>'+esc(t.t)+'</b><ol>'+t.q.map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ol>'+
@@ -8003,10 +7919,10 @@ function renderKetthuc(){var p="ketthuc",fil=fget(p);var all=rows("DL18");
  var view=all.filter(function(r){var s=st(r);if(fil==="all")return true;if(fil==="score")return !s.scored;if(fil==="invite")return s.scored&&!s.invited;if(fil==="follow")return s.invited&&!s.closed;return true});
  var h=pageHead("Kết thúc khóa & Tái ghi danh","Nhập kết quả đầu ra - đánh giá mục tiêu - mời & chốt tái ghi danh",'<button class="btn primary" onclick="ktGen()"><i class="ti ti-school-off"></i>Tạo hồ sơ kết thúc cho lớp</button>');
  h+=statStrip([
-  ["ti-writing",all.filter(function(x){return !String(x.final_test_score||"").trim()}).length,"Chờ nhập KQ đầu ra","#E08A1E","SLA "+paramOf("slaFinalTest_days",3)+" ngày"],
+  ["ti-writing",all.filter(function(x){return !String(x.final_test_score||"").trim()}).length,"Chờ nhập KQ đầu ra","#E08A1E","SLA "+slaChip("slaFinalTest_days",3)],
   ["ti-mail",all.filter(function(x){return String(x.final_test_score||"").trim()&&isc(x.re_enrollment_status,"not_contacted")}).length,"Chờ mời tái ĐK","#7C3AED","cửa sổ còn nhiệt"],
   ["ti-refresh",all.filter(function(x){return isc(x.re_enrollment_status,"contacted","interested")}).length,"Đang theo đuổi","#3B82C4","chưa chốt"],
-  ["ti-award",all.filter(function(x){return isc(x.re_enrollment_status,"confirmed_with_deposit")}).length,"Đã tái ghi danh","#16A34A","mục tiêu RER ≥ "+Math.round(kpiTh(/^RER/,0.4)*100)+"%"]]);
+  ["ti-award",all.filter(function(x){return isc(x.re_enrollment_status,"confirmed_with_deposit")}).length,"Đã tái ghi danh","#16A34A","mục tiêu RER ≥ "+kpiChip(/^RER/,0.4,1)]]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả"],["score","Chờ nhập KQ"],["invite","Chờ mời tái ĐK"],["follow","Đang theo đuổi"]],view.length);
  h+='<div class="obcards rows">';if(!view.length)h+='<div class="empty">Không có hồ sơ phù hợp.</div>';
@@ -9107,7 +9023,9 @@ function mgDetail(key){var ev=rows("DL22").filter(function(x){return String(x.re
  openDrawer("Bạn được giới thiệu · "+code,h)}
 function statStrip(items){return '<div class="bstats">'+items.map(function(t){
  return '<div class="bstat static" style="cursor:default"><span class="bsic" style="background:'+t[3]+'18;color:'+t[3]+'"><i class="ti '+t[0]+'"></i></span>'+
-  '<div><div class="bsn">'+esc(String(t[1]))+'</div><div class="bsl">'+esc(t[2])+(t[4]?' · '+esc(t[4]):'')+'</div></div></div>'}).join("")+'</div>'}
+  /* V9.29: phần phụ chú (t[4]) là chuỗi do lập trình viên viết, không phải dữ liệu người dùng nhập,
+     nên KHÔNG esc để gắn được chip bánh răng "sửa ở đây". Tên và số vẫn esc như cũ. */
+  '<div><div class="bsn">'+esc(String(t[1]))+'</div><div class="bsl">'+esc(t[2])+(t[4]?' · '+t[4]:'')+'</div></div></div>'}).join("")+'</div>'}
 function kpiMini(rows2){/* rows2 = [mã, tên, giá trị, đạt?, mục tiêu] */
  return '<div class="kpipanel" style="margin-bottom:16px"><div class="kpiphh">KPI & SLA của riêng người này (ngưỡng CH6)</div>'+
   rows2.map(function(r){var cls=(r[3]==null?"gray":(r[3]?"green":"red"));
@@ -9159,15 +9077,15 @@ function renderHosoGV(){var id=window.GVID;var g=find("DL01","staff_id",id);
   '</div></div></div>';
  h+=statStrip([["ti-school",done.length,"Buổi đã dạy","#3B82C4",cls.length+" lớp"],
   ["ti-writing",noNote.length,"Cần viết nhận xét","#E08A1E",overNote.length?(overNote.length+" quá hạn"):"trong hạn"],
-  ["ti-book",hwWait.length,"Bài chờ chấm","#7C3AED","SLA "+paramOf("slaHomeworkGrading_hours",48)+"h"],
+  ["ti-book",hwWait.length,"Bài chờ chấm","#7C3AED","SLA "+slaChip("slaHomeworkGrading_hours",48)],
   ["ti-user-exclamation",risk.length,"HV nguy cơ học thuật","#DB2777","cần WOW"]]);
  var tnrV=done.length?(done.length-noNote.length)/done.length:null;
  var gcrV=hwSub.length?(hwSub.length-hwWait.length)/hwSub.length:null;
  var adcV=ses.length?(ses.length-late.length)/ses.length:null;
  h+=kpiMini([
-  ["TNR","Tỷ lệ buổi có nhận xét đầy đủ",tnrV==null?"—":Math.round(tnrV*100)+"%",tnrV==null?null:(tnrV>=kpiTh(/^TNR/,0.9)),"≥ "+Math.round(kpiTh(/^TNR/,0.9)*100)+"%"],
-  ["GCR7","Tỷ lệ bài đã chấm",gcrV==null?"—":Math.round(gcrV*100)+"%",gcrV==null?null:(gcrV>=kpiTh(/^GCR7/,1)),"≥ "+Math.round(kpiTh(/^GCR7/,1)*100)+"%"],
-  ["ADC","Kỷ luật vào lớp đúng giờ",adcV==null?"—":Math.round(adcV*100)+"%",adcV==null?null:(adcV>=kpiTh(/^ADC/,0.95)),"≥ "+Math.round(kpiTh(/^ADC/,0.95)*100)+"%"]]);
+  ["TNR","Tỷ lệ buổi có nhận xét đầy đủ",tnrV==null?"—":Math.round(tnrV*100)+"%",tnrV==null?null:(tnrV>=kpiTh(/^TNR/,0.9)),"≥ "+kpiChip(/^TNR/,0.9,1)],
+  ["GCR7","Tỷ lệ bài đã chấm",gcrV==null?"—":Math.round(gcrV*100)+"%",gcrV==null?null:(gcrV>=kpiTh(/^GCR7/,1)),"≥ "+kpiChip(/^GCR7/,1,1)],
+  ["ADC","Kỷ luật vào lớp đúng giờ",adcV==null?"—":Math.round(adcV*100)+"%",adcV==null?null:(adcV>=kpiTh(/^ADC/,0.95)),"≥ "+kpiChip(/^ADC/,0.95,1)]]);
  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b>Lớp đang phụ trách ('+cls.length+')</b></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Tên lớp</th><th>Trạng thái</th><th>Sĩ số</th><th>Lịch</th><th>Khai giảng</th><th>Thao tác</th></tr></thead><tbody>';
  if(!cls.length)h+='<tr><td class="empty" colspan="7">Chưa phụ trách lớp nào.</td></tr>';
  cls.forEach(function(c){h+='<tr><td>'+esc(c.class_id)+'</td><td>'+esc(c.class_name)+'</td><td><span class="chip '+stCls(c.class_status)+'">'+esc(elabel(c.class_status))+'</span></td><td>'+esc(c.current_enrollment||0)+'/'+esc(c.class_capacity||0)+'</td><td>'+esc(c.class_schedule||"")+'</td><td>'+esc(c.class_start_date||"")+'</td><td><button class="btn sm" onclick="openLop(\''+esc(c.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Bảng lớp</button></td></tr>'});
@@ -9217,13 +9135,13 @@ function renderHosoNV(){var id=window.NVID;var s=find("DL01","staff_id",id);
   var lrt=[];leads.forEach(function(l){var a=pvnd(l.lead_created_time),b=pvnd(l.first_call_time);if(a&&b)lrt.push((b-a)/60000)});
   var lrtV=lrt.length?lrt.reduce(function(x,y){return x+y},0)/lrt.length:null;
   var cvrV=leads.length?conv/leads.length:null;
-  h+=statStrip([["ti-user-plus",nNew,"Lead mới chưa LH","#3B82C4","SLA "+paramOf("slaLRT_minutes",15)+" phút"],
+  h+=statStrip([["ti-user-plus",nNew,"Lead mới chưa LH","#3B82C4","SLA "+slaChip("slaLRT_minutes",15)],
    ["ti-phone",nWork,"Đang khai thác","#2F6BFF","đang chăm"],
    ["ti-file-text",tests.length,"Test sắp tới","#7C3AED","chuẩn bị tư vấn"],
    ["ti-alarm",due.length,"Cần liên hệ hôm nay","#E24B4A","quá hẹn = trễ"]]);
   h+=kpiMini([
    ["LRT","Thời gian phản hồi lead mới",lrtV==null?"—":(lrtV>=1440?(lrtV/1440).toFixed(1)+" ngày":lrtV>=120?(lrtV/60).toFixed(1)+" giờ":Math.round(lrtV)+" phút"),lrtV==null?null:(lrtV<=kpiTh(/^LRT/,15)),"≤ "+kpiTh(/^LRT/,15)+" phút"],
-   ["CVR","Tỷ lệ chuyển đổi lead",cvrV==null?"—":Math.round(cvrV*100)+"%",cvrV==null?null:(cvrV>=kpiTh(/^CVR/,0.4)),"≥ "+Math.round(kpiTh(/^CVR/,0.4)*100)+"%"]]);
+   ["CVR","Tỷ lệ chuyển đổi lead",cvrV==null?"—":Math.round(cvrV*100)+"%",cvrV==null?null:(cvrV>=kpiTh(/^CVR/,0.4)),"≥ "+kpiChip(/^CVR/,0.4,1)]]);
   h+='<div class="panel"><div class="ph"><b>Lead cần liên hệ ('+due.length+')</b><div class="mini"><button class="pill" onclick="go(\'nhaplead\')">Mở danh sách Lead</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Họ tên</th><th>SĐT</th><th>Trạng thái</th><th>Hẹn liên hệ</th><th>Thao tác</th></tr></thead><tbody>';
   if(!due.length)h+='<tr><td class="empty" colspan="6">Không có lead nào tới hẹn.</td></tr>';
   due.slice(0,25).forEach(function(l){h+='<tr><td>'+esc(l.lead_id)+'</td><td>'+esc(l.full_name)+'</td><td>'+esc(l.phone_number||"")+'</td><td><span class="chip '+stCls(l.lead_status)+'">'+esc(elabel(l.lead_status))+'</span></td><td>'+esc(l.next_followup_time||"")+'</td><td><button class="btn sm primary" onclick="runStart(\''+esc(l.lead_id)+'\')"><i class="ti ti-player-play"></i>Xử lý</button></td></tr>'});
@@ -9237,11 +9155,11 @@ function renderHosoNV(){var id=window.NVID;var s=find("DL01","staff_id",id);
   var wDone=w.filter(function(x){return isc(x.wow_status,"completed")});
   var wImp=wDone.filter(function(x){return isc(x.wow_outcome,"improved")});
   var worV=wDone.length?wImp.length/wDone.length:null;
-  h+=statStrip([["ti-file-text",tWait.length,"Test chờ chấm","#E08A1E","SLA "+paramOf("slaGLA_hours",24)+"h"],
+  h+=statStrip([["ti-file-text",tWait.length,"Test chờ chấm","#E08A1E","SLA "+slaChip("slaGLA_hours",24)],
    ["ti-writing",tDone.length,"Test đã chấm","#3B82C4","đã có điểm"],
    ["ti-star",wUp.length,"WOW sắp tới","#DB2777","đã đặt lịch"],
    ["ti-thumb-up",wDone.length,"WOW đã dạy","#0D9488",wImp.length+" tiến bộ"]]);
-  h+=kpiMini([["WOR","Tỷ lệ buổi WOW có tiến bộ",worV==null?"—":Math.round(worV*100)+"%",worV==null?null:(worV>=kpiTh(/^WOR/,0.6)),"≥ "+Math.round(kpiTh(/^WOR/,0.6)*100)+"%"]]);
+  h+=kpiMini([["WOR","Tỷ lệ buổi WOW có tiến bộ",worV==null?"—":Math.round(worV*100)+"%",worV==null?null:(worV>=kpiTh(/^WOR/,0.6)),"≥ "+kpiChip(/^WOR/,0.6,1)]]);
   h+='<div class="panel"><div class="ph"><b>Buổi WOW sắp tới ('+wUp.length+')</b><div class="mini"><button class="pill" onclick="go(\'wow\')">Mở trang WOW</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Loại buổi</th><th>Kỹ năng</th><th>Ngày</th><th>Trạng thái</th></tr></thead><tbody>';
   if(!wUp.length)h+='<tr><td class="empty" colspan="5">Không có buổi nào sắp tới.</td></tr>';
   wUp.slice(0,25).forEach(function(x){h+='<tr><td>'+esc(x.student_name||x.student_id)+'</td><td>'+esc(elabel(x.wow_session_type)||"")+'</td><td>'+esc(elabel(x.wow_skill)||"")+'</td><td>'+esc(x.wow_session_date||"")+'</td><td><span class="chip '+stCls(x.wow_status)+'">'+esc(elabel(x.wow_status))+'</span></td></tr>'});
@@ -9251,7 +9169,7 @@ function renderHosoNV(){var id=window.NVID;var s=find("DL01","staff_id",id);
   var risk2=rows("DL09").filter(function(x){return isRisk(x.attendance_progress_status)||isRisk(x.academic_progress_status)});
   var fbNew=rows("DL16").filter(function(f){return isc(f.feedback_status,"new")});
   var knOpen=rows("DL17").filter(function(k){return !isc(k.complaint_status,"resolved")});
-  h+=statStrip([["ti-layout-grid-add",ob.length,"Onboarding chưa xong","#E08A1E","SLA "+paramOf("slaOBT_hours",72)+"h"],
+  h+=statStrip([["ti-layout-grid-add",ob.length,"Onboarding chưa xong","#E08A1E","SLA "+slaChip("slaOBT_hours",72)],
    ["ti-user-exclamation",risk2.length,"HV nguy cơ","#DB2777","2 trục"],
    ["ti-message-plus",fbNew.length,"Phản hồi chờ phân loại","#7C3AED","SLA 24h"],
    ["ti-alert-triangle",knOpen.length,"Khiếu nại đang xử lý","#E24B4A","theo mức độ"]]);
@@ -9290,7 +9208,7 @@ function renderHosoKhoa(){var id=window.KHID;var c=find("DL05","course_id",id);
   ["ti-alert-triangle",vnd(debt),"Công nợ còn lại","#E08A1E",""]]);
  var crV=ce.length?doneN/ce.length:null, arV=ce.length?achN/ce.length:null;
  h+=kpiMini([
-  ["CR10","Tỷ lệ hoàn thành khóa",crV==null?"—":Math.round(crV*100)+"%",crV==null?null:(crV>=kpiTh(/^CR10/,0.85)),"≥ "+Math.round(kpiTh(/^CR10/,0.85)*100)+"%"],
+  ["CR10","Tỷ lệ hoàn thành khóa",crV==null?"—":Math.round(crV*100)+"%",crV==null?null:(crV>=kpiTh(/^CR10/,0.85)),"≥ "+kpiChip(/^CR10/,0.85,1)],
   ["AR","Tỷ lệ đạt mục tiêu đầu ra",arV==null?"—":Math.round(arV*100)+"%",arV==null?null:(arV>=kpiTh(/^AR$/,0.7)),"≥ "+Math.round(kpiTh(/^AR$/,0.7)*100)+"%"]]);
  h+='<div class="panel"><div class="ph"><b>Lớp thuộc khóa này ('+cls.length+')</b></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Tên lớp</th><th>Trạng thái</th><th>Sĩ số</th><th>GV chính</th><th>Khai giảng</th><th>Thao tác</th></tr></thead><tbody>';
  if(!cls.length)h+='<tr><td class="empty" colspan="7">Chưa có lớp nào.</td></tr>';
@@ -9360,7 +9278,7 @@ function renderHtToday(embed){
   gvs.map(function(g){return '<option value="'+esc(g.staff_id)+'"'+(g.staff_id===gid?" selected":"")+'>'+esc(g.staff_id+" - "+g.full_name)+'</option>'}).join("")+'</select></div>';
  h+=statStrip([["ti-calendar-check",ses.length,"Buổi dạy hôm nay","#2E5A88",""],
   ["ti-star",wowT.length,"Buổi WOW hôm nay","#DB2777",""],
-  ["ti-book",hwQ.length,"Bài chờ chấm","#7C3AED","SLA "+paramOf("slaHomeworkGrade_hours",48)+"h"],
+  ["ti-book",hwQ.length,"Bài chờ chấm","#7C3AED","SLA "+slaChip("slaHomeworkGrade_hours",48)],
   ["ti-message-2",owe.length,"Buổi nợ nhận xét","#E24B4A","SLA "+slaChip("slaTeacherNote_hours",48)]]);
  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-calendar-check" style="margin-right:6px"></i>Buổi dạy hôm nay ('+ses.length+')</b></div>';
  if(!ses.length)h+='<div class="empty">Hôm nay không có buổi nào'+(gid?' của GV này':'')+'.</div>';
@@ -10344,7 +10262,7 @@ function tkReport(){var all=srows("DL23");
   blk("Bắt buộc",req)+blk("Không bắt buộc",opt)+'</tbody></table></div>';
  h+='<div class="mut" style="font-size:11.5px;padding:10px 14px">Việc <b>bắt buộc</b> không được từ chối và tính vào tỷ lệ đúng hạn của nhân viên; việc <b>không bắt buộc</b> (nhờ hỗ trợ, phối hợp) được phép từ chối kèm lý do.</div></div></div></div>';
  return h}
-var RENDER={giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,pipeline:renderPipeline,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,tracuu:renderTracuu,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,khaosat:renderKhaosat,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang};
+var RENDER={giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang};
 function dashJump(key){var m={urgent:"viec",newlead:"nhaplead",consider:"viec",convert:"tuvan",risk:"viec",onboard:"xeplop",approve:"duyet",debt:"thanhtoan",complaint:"khieunai",ungraded:"baitap",testpend:"test",wowbook:"wow",unverified:"thanhtoan",classes:"banglop"};var pg=m[key];if(pg&&RBK[CURROLE].pages.indexOf(pg)>=0)go(pg);else go("viec")}
 
 /* ---------- router ---------- */
@@ -10606,7 +10524,6 @@ function setRole(k){CURROLE=k;var r=RBK[k];
  document.getElementById("meName").textContent=(st.staff_id==="ADMIN")?"Admin":(st.staff_id+" - "+st.full_name);
  document.getElementById("meRole").textContent=(st.staff_id==="ADMIN")?"Quản trị viên · toàn quyền":(window.GATE_SID?(elabel(st.role)||r.name):r.name);
  document.getElementById("meAv").textContent=(st.full_name||"?").trim().slice(-1).toUpperCase()==""?"?":(st.full_name.trim().split(" ").pop()[0]||"?");
- var _rs=document.getElementById("roleSel");if(_rs){_rs.value=k;_rs.style.display="none";if(_rs.previousElementSibling)_rs.previousElementSibling.style.display="none"}
  buildNav();go(SCOPE().land||"banlam")}
 function toast(m,ms,kind){var t=document.getElementById("toast");t.textContent=m;
  if(kind==="err"){t.classList.add("err");if(!ms)ms=6000}else t.classList.remove("err");

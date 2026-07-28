@@ -304,7 +304,22 @@
 > · **`slaChip(name, mặc_định)`**: in con số SLA kèm bánh răng, bấm là `cfGo()` nhảy thẳng tới đúng
 > dòng cấu hình và **tô sáng** 2.6 giây. Mỗi dòng cấu hình nay có `id="cfrow_<tên>"`.
 > · `_check16` canh **hai chiều**: tham số app đọc phải có ô sửa, và tham số khai phải có dòng thật.
-> **CÒN LẠI:** nút "Sửa câu này" cho CH4 · link về CH1 khi hiện nhãn enum · dọn 4 hàm render chết +
+> · **Phủ "sửa ở đây" cho CẢ BA loại cấu hình** (anh Luân hỏi 28/07): `slaChip` cho ngưỡng/SLA (CH2,
+> 16 chỗ) · `kpiChip` cho ngưỡng KPI (CH6, 11 chỗ - bấm về đúng dòng, có `id="kpirow_<mã>"`) ·
+> `msgEditBtn` cho câu nhắc SOP / next action (CH4) · `enumEditBtn` cho danh mục (CH1).
+> Để gắn được chip vào phụ chú của dải số, **`statStrip` thôi `esc()` phần phụ chú** - phần đó là
+> chuỗi lập trình viên viết, không phải dữ liệu người dùng nhập; tên và số vẫn `esc()` như cũ.
+> Hiện phủ **9 trang / 14 chip**, `_check16` canh sàn 8 trang + 12 chip và canh cả việc không có
+> chuỗi HTML thô lọt ra màn hình.
+> · **Dọn 114 dòng code chết:** `renderDashboardOld` (0 tham chiếu), `renderPipeline` + `pipeSet`,
+> `renderTracuu`, `renderKhaosat` (go('khaosat') luôn bị remap sang hub CSKH nên không bao giờ chạy)
+> + ô chọn vai `roleSel` luôn bị ẩn từ V9.9. Harness từ **38 -> 35 trang**.
+> · **Notebar cho tab CH6** - tab cuối cùng còn thiếu.
+>
+> **CÒN LẠI:** dời `DUEFALL=5` + 16 nhóm câu chăm RTOUCH + giờ hẹn preset vào cấu hình ·
+> màn cấp thêm quota WOW · `statStrip` bấm được ở các trang còn lại · bộ phận chuẩn cho
+> `renderDuyet`/`renderGiaoan`/`renderMaGioiThieu`/`renderReupTab`/`renderBanggiao`.
+> *(cũ)* nút "Sửa câu này" cho CH4 · link về CH1 khi hiện nhãn enum · dọn 4 hàm render chết +
 > `roleSel` · `statStrip` bấm được ở 15 trang · màn cấp thêm quota WOW · notebar cho tab CH6 ·
 > đưa `DUEFALL=5` + 16 nhóm câu chăm RTOUCH + giờ hẹn preset vào cấu hình.
 >

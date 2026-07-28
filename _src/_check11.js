@@ -111,7 +111,7 @@ t("hoso HV dung sopBlock", RENDER.hoso().indexOf("jnext sopb")>=0);
 
 /* --- 8. nen tang cu khong vo: 37 trang render --- */
 var rerr=0;Object.keys(RENDER).forEach(function(k){try{var o=RENDER[k]();if(typeof o!=="string")rerr++}catch(e){rerr++}});
-t("37 trang van render (loi="+rerr+")", rerr===0);
+t("35 trang van render (loi="+rerr+")", rerr===0);
 
 /* --- 9. V9.18: gop banlam+hanhtrinh, node bam duoc, Tra cuu mo rong, don cong HV --- */
 t("V9.18 mstrip co pid -> bam duoc (clk + mstripOpen)", (function(){var s=mstrip("contacted",false,"LEAD-X");

@@ -38,7 +38,7 @@ Bộ kiểm gồm **5 phần, phải xanh HẾT mới được giao**:
 | Lệnh | Kỳ vọng |
 |---|---|
 | `node --check _APP.js` và `node --check _HV.js` | không báo gì |
-| `ITTS_OUT=<out> node _tall.js` | `Render 38 trang \| 0 loi` + `thieu trong font: khong` |
+| `ITTS_OUT=<out> node _tall.js` | `Render 35 trang \| 0 loi` + `thieu trong font: khong` |
 | `ITTS_OUT=<out> node _check11.js` | `TONG: 131`, KHÔNG có dòng `FAIL` |
 | `ITTS_OUT=<out> node _check12.js` | `CHECK12 OK: 37 tieu chi` - một cửa vào, một luật |
 | `ITTS_OUT=<out> node _check13.js` | `CHECK13 OK: 174 tieu chi` - KPI biết nói |
