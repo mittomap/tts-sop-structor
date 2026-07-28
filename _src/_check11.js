@@ -143,4 +143,5 @@ t("V9.18 chip trang thai khoa dac mau (fill-)", (function(){
 t("V9.18 tab demo gon: co Reset, het huong dan dai", (function(){window.SETTAB="demo";var o=RENDER.settings();window.SETTAB="ch2";
  return o.indexOf("Reset demo")>=0&&o.indexOf("Cách demo hai cổng")<0})());
 CUR="banlam";window.BLVIEW="list";
+t("V9.18b hint o tim hero nam NGOAI hop tim (khong de len input)", RENDER.banlam().indexOf('</div><span class="bwsrchhint"')>=0);
 console.log(bad.length?("FAIL:\n  "+bad.join("\n  ")):"OK: "+ok);
