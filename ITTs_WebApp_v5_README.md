@@ -1305,3 +1305,25 @@ trong tab nhúng.
 
 Verify: _tall 37 trang 0 lỗi, node --check 2 file OK, _check11 68/68, icon 134 (+ti-bell-ringing).
 Room + bong bóng chưa test trên trình duyệt/2 máy thật - Luân thử theo DEMO_CHECKLIST.
+
+## V9.18 (28/07 tối) - Gộp Trang bắt đầu + Hành trình, node bấm được, Tra cứu mở rộng
+
+**Gộp trang (Luân duyệt)**: "Hành trình học viên" gộp vào "Trang bắt đầu" thành MỘT trang 2 góc nhìn -
+nút chuyển "Chạy quy trình" / "Bảng chặng - hành trình" ngay dưới dải khối; mọi đường link cũ tự về đúng
+chỗ; menu Làm việc còn 1 mục; toàn bộ logic 2 trang giữ nguyên.
+
+**Node hành trình hết "hiển thị cho có"**: bấm vào dải hạt trên bất kỳ dòng danh sách nào là mở drawer
+"hành trình từng chặng" của đúng người đó - 13 mốc kèm thời điểm, chặng đang đứng, nhánh rẽ nếu có,
+nút làm việc kế tiếp + xem hồ sơ.
+
+**Tra cứu mở rộng theo yêu cầu Luân**: nhóm Tra cứu giờ có 17 mục xếp theo dòng nghiệp vụ - Học viên,
+Sổ liên hệ, Sổ test đầu vào, Sổ tư vấn, Sổ đăng ký khóa, Sổ thu học phí, Sổ buổi học, Sổ điểm danh,
+Sổ bài tập, Sổ WOW 1-1, Sổ kết thúc khóa, Sổ khảo sát, Sổ phản hồi, Sổ khiếu nại, Khóa học, Giảng viên,
+Nhân viên. Toàn bộ là sổ CHỈ XEM (lọc + sắp xếp + phân trang); thao tác vẫn ở trang tác vụ theo chặng.
+
+**Các chỉnh nhỏ**: tab Cài đặt > Dữ liệu demo tối giản (trạng thái 1 dòng + Reset demo + Ngắt room);
+bỏ khối "Gửi phụ huynh" khỏi trang học viên; chip Đang học / Đã hoàn thành / Đã kết thúc đặc màu nổi bật;
+nhật ký buổi học thành timeline có rail + node ngày (mờ dần với buổi đã qua); badge đếm trên menu nhỏ lại
+để nhóm thu gọn không bị bóp chữ.
+
+Verify: _tall 37 trang 0 lỗi, node --check 2 file OK, **_check11 = 82 điểm** (thêm 14 tiêu chí V9.18).

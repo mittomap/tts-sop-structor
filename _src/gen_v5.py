@@ -30,14 +30,14 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .navlbl>span{flex:1;min-width:0}
 .navchev{font-size:13px;flex:none;transition:transform .15s;opacity:.75}
 .navlbl.open .navchev{transform:rotate(90deg)}
-.navlbl .dot{background:var(--red);color:#fff;font-size:9.5px;font-weight:800;min-width:17px;height:17px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px;letter-spacing:0}
+.navlbl .dot{background:var(--red);color:#fff;font-size:8.5px;font-weight:800;min-width:14px;height:14px;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:0 3px;letter-spacing:0;flex:none} /* V9.18: badge nhỏ lại - nhóm thu gọn không bị bóp chữ */
 .navlbl .navarc{width:7px;height:7px;border-radius:50%;flex:none;opacity:.9}
 .navgrp{margin-bottom:3px}
 .navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500;border-left:3px solid transparent}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
 .navitem:hover{background:#ffffff12;color:#fff}
 .navitem.on{background:#ffffff1a;color:#fff;border-left-color:#5B9BD5;font-weight:600}
-.navitem .dot{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px}
+.navitem .dot{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px;flex:none}
 .me{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid #ffffff18}
 .me .av{width:34px;height:34px;border-radius:50%;background:#5B9BD5;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
 .me b{color:#fff;font-size:12px;font-weight:600}.me small{display:block;color:#93A7C2;font-size:10.5px}
@@ -235,6 +235,18 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .hvcrf i{font-size:14px;opacity:.8}
 .hvcrf b{color:var(--text);font-weight:700}
 .hvses{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.hvtl{position:relative;padding-left:26px}
+.hvtl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line);border-radius:2px}
+.hvtlr{position:relative;margin-bottom:12px}
+.hvtlr:before{content:"";position:absolute;left:-24px;top:5px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--navy);z-index:1}
+.hvtlr.past:before{border-color:#B9C6D2}
+.hvtlr .hvtld{font-size:11px;font-weight:800;color:var(--navy);margin:0 0 5px 0;letter-spacing:.2px}
+.hvtlr.past .hvtld{color:var(--muted)}
+.hvtlr .hvses{margin-bottom:0}
+.chip.fill-blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.chip.fill-green{background:var(--green);border-color:var(--green);color:#fff}
+.chip.fill-gray{background:#6B7887;border-color:#6B7887;color:#fff}
+.mstrip.clk{cursor:pointer}
 .hvsh{display:flex;align-items:center;gap:12px;padding:10px 13px;background:linear-gradient(180deg,#FBFCFD,#fff);border-bottom:1px solid var(--line)}
 .hvsn{min-width:62px;height:28px;border-radius:8px;background:var(--blueb);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;flex:none}
 .hvst{flex:1;min-width:0}
@@ -1188,7 +1200,7 @@ complaint_status:"enum_complaint_status",achievement_status:"enum_achievement_st
 
 var PAGES=[
 /* ===== V5.2 - trang chủ Bàn làm việc ===== */
-{k:"banlam",g:"Vận hành",ic:"ti-home",t:"Trang bắt đầu",c:"Bắt đầu ở đây",ty:"custom"},
+{k:"banlam",g:"Vận hành",ic:"ti-home",t:"Trang bắt đầu",c:"Việc hôm nay + bảng chặng hành trình",ty:"custom"},
 {k:"chay",g:"_",hide:1,ic:"ti-player-play",t:"Chạy quy trình",c:"Dắt từng bước theo hành trình",ty:"custom"},
 {k:"chang",g:"_",hide:1,ic:"ti-route",t:"Tổng quan chặng",c:"Bản đồ một chặng vòng đời",ty:"custom"},
 {k:"hanhtrinh",g:"Vận hành",ic:"ti-route",t:"Hành trình học viên",c:"Toàn bộ theo chặng",ty:"custom"},
@@ -1196,6 +1208,19 @@ var PAGES=[
 {k:"hocvien",g:"Tra cứu",ic:"ti-user-check",t:"Học viên",c:"Đang & đã học",ty:"list"},
 {k:"lop",g:"_",ic:"ti-users-group",t:"Lớp học",c:"Các lớp (trong Học tập)",ty:"list",hide:1},
 {k:"giangvien",g:"Tra cứu",ic:"ti-chalkboard",t:"Giảng viên",c:"Đội ngũ giảng dạy",ty:"list"},
+{k:"dslienhe",g:"Tra cứu",ic:"ti-phone",t:"Sổ liên hệ",c:"Điểm chạm với khách",ty:"list"},
+{k:"dstest",g:"Tra cứu",ic:"ti-file-text",t:"Sổ test đầu vào",c:"Tra cứu test",ty:"list"},
+{k:"dstuvan",g:"Tra cứu",ic:"ti-messages",t:"Sổ tư vấn",c:"Tra cứu phiếu tư vấn",ty:"list"},
+{k:"dsdangky",g:"Tra cứu",ic:"ti-clipboard-check",t:"Sổ đăng ký khóa",c:"Tra cứu đăng ký",ty:"list"},
+{k:"dsthanhtoan",g:"Tra cứu",ic:"ti-cash",t:"Sổ thu học phí",c:"Tra cứu khoản thu",ty:"list"},
+{k:"dsbuoihoc",g:"Tra cứu",ic:"ti-calendar-event",t:"Sổ buổi học",c:"Tra cứu buổi học",ty:"list"},
+{k:"dsdiemdanh",g:"Tra cứu",ic:"ti-user-check",t:"Sổ điểm danh",c:"Tra cứu điểm danh",ty:"list"},
+{k:"dsbaitap",g:"Tra cứu",ic:"ti-book",t:"Sổ bài tập",c:"Tra cứu bài tập",ty:"list"},
+{k:"dswow",g:"Tra cứu",ic:"ti-star",t:"Sổ WOW 1-1",c:"Tra cứu buổi WOW",ty:"list"},
+{k:"dsketthuc",g:"Tra cứu",ic:"ti-flag",t:"Sổ kết thúc khóa",c:"Tra cứu đầu ra",ty:"list"},
+{k:"dskhaosat",g:"Tra cứu",ic:"ti-clipboard-text",t:"Sổ khảo sát",c:"Tra cứu khảo sát",ty:"list"},
+{k:"dsphanhoi",g:"Tra cứu",ic:"ti-message-2",t:"Sổ phản hồi",c:"Góp ý của học viên",ty:"list"},
+{k:"dskhieunai",g:"Tra cứu",ic:"ti-alert-triangle",t:"Sổ khiếu nại",c:"Tra cứu khiếu nại",ty:"list"},
 {k:"khoahoc",g:"_",ic:"ti-school",t:"Khóa học",c:"Sản phẩm & học phí (trong Cài đặt)",ty:"list",hide:1},
 /* ===== THEO CHẶNG P1-P4: TUYỂN SINH ===== */
 {k:"tuyensinh",g:"Chặng · Tuyển sinh",ic:"ti-user-plus",t:"Tuyển sinh",c:"Lead → Test → Tư vấn → Thu tiền (một luồng)",ty:"custom"},
@@ -2602,14 +2627,31 @@ function goArc(a){window.ARC=a;window.CHANGK="";go("chang")}
 /* NODE TANG 2 - dai hat hanh trinh gan tren tung dong danh sach.
    Nhin 1 giay biet: nguoi nay o chang lon nao (C1..C4), toi hat thu may, co qua han khong.
    Hat to = dang dung o day; hat mo = da qua; hat xam = chua toi; hinh thoi do = re nhanh. */
-function mstrip(k,over){var S=JBY[k];if(!S)return "";
+function mstrip(k,over,pid){var S=JBY[k];if(!S)return "";
  var a=arcOf(k),A=ARCBK[a],rail=ARCRAIL[a]||[],ci=rail.indexOf(k),br=ci<0;
- var tt="Chặng "+A.n+" · "+A.t+" - đang ở: "+S.t+(br?" (rẽ nhánh)":" (bước "+(ci+1)+"/"+rail.length+")")+(over?" · QUÁ HẠN":"");
- var h='<span class="mstrip" style="--mscol:'+A.col+'" title="'+esc(tt)+'"><span class="msarc">C'+A.n+'</span>';
+ var tt="Chặng "+A.n+" · "+A.t+" - đang ở: "+S.t+(br?" (rẽ nhánh)":" (bước "+(ci+1)+"/"+rail.length+")")+(over?" · QUÁ HẠN":"")+(pid?" - bấm xem từng chặng":"");
+ var oc=pid?' onclick="event.stopPropagation();mstripOpen(\''+esc(pid)+'\')"':''; /* V9.18: node bấm được - mở chi tiết từng chặng */
+ var h='<span class="mstrip'+(pid?" clk":"")+'" style="--mscol:'+A.col+'" title="'+esc(tt)+'"'+oc+'><span class="msarc">C'+A.n+'</span>';
  rail.forEach(function(rk,i){h+='<span class="msd'+(br?"":(i<ci?" done":(i===ci?" now"+(over?" over":""):"")))+'"></span>'});
  if(br)h+='<span class="msd br'+(over?" over":"")+'"></span>';
  return h+'</span>'}
-function mstripFor(pid,ix){if(!pid)return "";try{var J=jInfo(pid,ix);return mstrip(J.k,J.over)}catch(e){return ""}}
+function mstripFor(pid,ix){if(!pid)return "";try{var J=jInfo(pid,ix);return mstrip(J.k,J.over,pid)}catch(e){return ""}}
+/* V9.18: bấm dải hạt -> drawer "hành trình từng chặng" của đúng người đó */
+function mstripOpen(pid){var J,C;try{J=jInfo(pid);C=J.C}catch(e){return}
+ var cur=JMAIN.indexOf(J.k);
+ var h='<div class="dcard"><h4><i class="ti ti-route"></i>'+esc(J.name)+'</h4>';
+ if(J.S&&J.S.branch)h+='<div class="dnote" style="border-left-color:var(--red)"><b>Đang ở nhánh rẽ: '+esc(J.S.t)+'.</b> '+esc(J.S.why||"")+'</div>';
+ h+='<div class="hvj">';
+ JMAIN.forEach(function(k,i){var S=JBY[k];var st=(cur<0)?"":(i<cur?"done":(i===cur?"now":""));
+  var when=st?String(S.since(C)||""):"";
+  var A=ARCBK[arcOf(k)];
+  h+='<div class="hvjr'+(st?" on":"")+'"><span class="hvjd"'+(st==="now"?' style="background:'+A.col+';color:#fff"':'')+'><i class="ti '+(st==="done"?"ti-check":S.ic)+'"></i></span>'+
+   '<div class="hvjc"><b>'+esc(S.t)+(st==="now"?' <span class="chip blue">đang ở đây</span>':'')+'</b><span>Chặng '+A.n+' · '+esc(A.t)+'</span></div>'+
+   '<div class="hvjt">'+(when?esc(when.slice(0,16)):'<span class="mut">-</span>')+'</div></div>'});
+ h+='</div>';
+ h+='<div class="dact">'+(J.act?'<button class="btn primary" onclick="closeModal();runStart(\''+esc(pid)+'\')"><i class="ti '+((J.act&&J.act.ic)||"ti-player-play")+'"></i>'+esc(J.act?J.act.lb:"Chạy quy trình")+'</button>':'')+
+  '<button class="btn" onclick="closeModal();openQuick(\''+esc(pid)+'\')"><i class="ti ti-eye"></i>Xem hồ sơ</button></div></div>';
+ openDrawer("Hành trình từng chặng",h)}
 /* ===== V9.15 NODE TANG 3 - sopBlock: BLOCK NGHIEP VU CAN THIET tren moi trang chi tiet =====
    4 dong chuan: Chang (arc + ga + dai hat) / Viec ke / Thoi han / Phu trach
    + canh bao thieu du lieu + cau nhan chuan CH4. btns=false -> khong ve cot nut. */
@@ -3533,6 +3575,10 @@ function renderBanlam(){
   h+='<div class="panel" style="padding:18px;text-align:center;color:var(--muted);font-size:12.5px">Chức danh của bạn không tham gia hành trình khách - dùng ô tìm phía trên để tra cứu học viên / giảng viên khi cần.</div>';
   return h}
  if(blocks.length)h+='<div class="bstats">'+blocks.map(function(b){return stat(b[0],b[1],b[2],b[3],b[4],b[5])}).join("")+'</div>';
+ /* V9.18: GỘP "Hành trình" vào Trang bắt đầu - một trang, hai góc nhìn (danh sách chạy / bảng chặng) */
+ var vw=window.BLVIEW||"list";
+ h+='<div style="margin:2px 0 10px">'+segHTML(vw,[["list","Chạy quy trình",null,""],["board","Bảng chặng - hành trình",null,""]],"window.BLVIEW='{k}';reRender(CUR)")+'</div>';
+ if(vw==="board"){h+=renderHanhtrinh(1);if(rsB.kpi)h+=myKpiHTML();return h}
  /* CHẠY QUY TRÌNH gộp thẳng vào đây: chip lọc + danh sách người */
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-player-play" style="margin-right:6px"></i>Chạy quy trình</b><div class="mini"><button class="btn sm" onclick="leadInbound()"><i class="ti ti-message-plus"></i>Khách mới liên hệ đến</button></div></div>';
  var actN=all0.filter(function(J){return J.act}).length;
@@ -3730,11 +3776,11 @@ function ghToKN(fid){var f=find("DL16","feedback_id",fid);if(!f){go("ghinhan");r
   toast("Đã tạo khiếu nại "+id+" từ phản hồi.");go("khieunai")})}
 /* ===== MÀN 1: BẢNG HÀNH TRÌNH (mọi người, xếp theo chặng) ===== */
 var SCOPE_MINE=false;
-function jSet(k,v){window.JF=window.JF||{q:"",nv:"all",col:"all",risk:"all",stage:"all"};window.JF[k]=v;reRender("hanhtrinh")}
+function jSet(k,v){window.JF=window.JF||{q:"",nv:"all",col:"all",risk:"all",stage:"all"};window.JF[k]=v;reRender(CUR)} /* V9.18: bảng chặng nhúng trong Trang bắt đầu - re-render theo CUR (luật đường ống nhúng) */
 /* bấm một chặng trên dải tóm tắt -> chỉ xem danh sách chặng đó; bấm lại chính nó -> bỏ lọc */
 function jStage(k){window.JF=window.JF||{q:"",nv:"all",col:"all",risk:"all",stage:"all"};
- window.JF.stage=(window.JF.stage===k)?"all":k;reRender("hanhtrinh")}
-function renderHanhtrinh(){
+ window.JF.stage=(window.JF.stage===k)?"all":k;reRender(CUR)}
+function renderHanhtrinh(embed){ /* V9.18: thân trang dùng được cả khi NHÚNG trong Trang bắt đầu (embed=1: bỏ pageHead) */
  var F=window.JF||(window.JF={q:"",nv:"all",col:"all",risk:"all",stage:"all"});
  if(!F.stage)F.stage="all";
  var all=jAll();
@@ -3755,9 +3801,10 @@ function renderHanhtrinh(){
  var byK={};JSTAGE.forEach(function(s){byK[s.k]=[]});
  list.forEach(function(J){byK[J.k].push(J)});
  var nOver=base.filter(function(J){return J.over}).length,nMiss=base.filter(function(J){return J.miss.length}).length;
- var h=pageHead("Hành trình học viên","Toàn bộ khách & học viên xếp theo CHẶNG KHÁCH đang đứng - mỗi người một việc kế tiếp. Việc VẬN HÀNH LỚP (điểm danh, bài tập, nhận xét buổi) không nằm ở đây - làm trong hub Học tập & Giảng dạy.",
+ var h=embed?'<div class="notebar" style="margin-top:2px"><i class="ti ti-route"></i>Bảng chặng: toàn bộ khách &amp; học viên xếp theo CHẶNG đang đứng - bấm cột/thẻ để xử lý. Việc vận hành lớp làm trong hub Học tập &amp; Giảng dạy.</div>'
+  :pageHead("Hành trình học viên","Toàn bộ khách & học viên xếp theo CHẶNG KHÁCH đang đứng - mỗi người một việc kế tiếp. Việc VẬN HÀNH LỚP (điểm danh, bài tập, nhận xét buổi) không nằm ở đây - làm trong hub Học tập & Giảng dạy.",
   '<button class="btn" onclick="go(\'hoctap\')"><i class="ti ti-school"></i>Sang Học tập & Giảng dạy</button>');
- var lf=srchHTML(F.q,"window.JF.q=this.value;reRenderKeep('hanhtrinh')","Tìm tên hoặc số điện thoại...",250)+
+ var lf=srchHTML(F.q,"window.JF.q=this.value;reRenderKeep(CUR)","Tìm tên hoặc số điện thoại...",250)+
   segHTML(F.risk,[["all","Tất cả",null,""],["over","Quá hạn",nOver,"red"],["miss","Thiếu dữ liệu",nMiss,"amber"]],"jSet('risk','{k}')");
  var rf='<span class="tblbl">Bộ phận</span><select class="sel" onchange="jSet(\'col\',this.value)"><option value="all">Tất cả</option>'+JCOL.map(function(c){return '<option value="'+c[0]+'"'+(F.col===c[0]?" selected":"")+'>'+esc(c[1])+'</option>'}).join("")+'</select>'+
   '<span class="tblbl">Phụ trách</span><select class="sel" onchange="jSet(\'nv\',this.value)"><option value="all">Tất cả</option>'+rows("DL01").map(function(s){return '<option value="'+esc(s.staff_id)+'"'+(F.nv===s.staff_id?" selected":"")+'>'+esc(s.full_name)+'</option>'}).join("")+'</select>'+
@@ -3789,7 +3836,7 @@ function renderHanhtrinh(){
    h+='<div class="jcard'+(J.over?" over":"")+'" onclick="openQuick(\''+esc(J.C.pid)+'\')" title="Xem thông tin">';
    h+='<div class="jn">'+esc(J.name)+'</div>';
    h+='<div class="jm">'+esc(J.phone||"")+(J.owner?' · '+esc(J.owner):'')+(age?' · <b>'+age+'</b>':'')+'</div>';
-   h+='<div style="display:flex;margin:4px 0 1px">'+mstrip(J.k,J.over)+'</div>';
+   h+='<div style="display:flex;margin:4px 0 1px">'+mstrip(J.k,J.over,J.C.pid)+'</div>';
    if(J.miss.length)h+='<div class="jmiss"><i class="ti ti-file-alert"></i>Thiếu: '+esc(J.miss.join(", "))+'</div>';
    if(J.act)h+='<button class="jgo" onclick="event.stopPropagation();runStart(\''+esc(J.C.pid)+'\')"><i class="ti '+J.act.ic+'"></i>'+esc(J.act.lb)+'</button>';
    h+='</div>'});
@@ -4718,24 +4765,10 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
  if(tab==="health")return h+renderHealth();
  if(tab==="demo"){
   var d=demoDirty();
-  h+='<div class="notebar"><i class="ti ti-broadcast"></i><b>Nền demo đa cổng:</b> mọi thao tác trên bản offline được LƯU THẬT trên máy này và tự đồng bộ sang các cửa sổ/cổng đang mở (kể cả Trang học viên). Máy khác mở cùng bản demo cũng TỰ đồng bộ qua Room demo. Hết buổi demo bấm Reset là về nguyên bản.</div>';
-  h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-device-floppy" style="margin-right:6px"></i>Trạng thái dữ liệu</b></div><div style="padding:14px 16px;font-size:12.5px;line-height:1.8">';
-  h+='Nguồn dữ liệu gốc: '+(DATASRC==="file"?'file <b>ITTs_data.js</b> cạnh app (thay file này là app đọc bộ dữ liệu mới, không cần build lại)':'<b>bản nhúng trong HTML</b> (không thấy file ITTs_data.js cạnh app)')+'.<br>';
-  h+='Thay đổi demo: '+(d?('<span class="chip amber">đang có thay đổi</span> lưu lần cuối lúc <b>'+new Date(d).toLocaleString("vi-VN")+'</b> (chỉ trên trình duyệt này).'):'<span class="chip green">nguyên bản</span> - chưa có thao tác nào được lưu đè.')+'<br>';
-  h+='Lưu &amp; đồng bộ: '+(CANLS?'<span class="chip green">đang bật</span> - các cửa sổ mở cùng thư mục app thấy chung dữ liệu.':'<span class="chip red">trình duyệt đang chặn localStorage</span> - thao tác chỉ sống trong phiên này. Mở bằng Chrome, hoặc chạy thư mục qua <code>python3 -m http.server</code> rồi vào <code>http://localhost:8000</code>.')+'</div>';
-  h+='<div style="padding:0 16px 14px"><button class="btn danger" '+(d?'onclick="demoReset()"':'disabled style="opacity:.45;cursor:default"')+'><i class="ti ti-refresh"></i>Reset dữ liệu demo (về nguyên bản)</button>'+(d?'':'<span class="mut" style="margin-left:10px;font-size:11.5px">Chưa có gì để reset.</span>')+' <button class="btn" onclick="demoPing()"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ giữa các cửa sổ</button></div></div>';
-  h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-devices" style="margin-right:6px"></i>Room demo (tự đồng bộ giữa các máy)</b></div><div style="padding:14px 16px;font-size:12.5px;line-height:1.9">';
-  h+='Mở bản demo là máy TỰ VÀO chung một room - không cần mã, không cần cài gì. Thao tác bên này, máy kia nổ chuông/toast y như 2 cửa sổ cùng máy (vd tạo chiết khấu lớn cần duyệt, máy của quản lý báo ngay). Chip "Room demo" trên thanh tiêu đề cho biết đang nối mấy máy.<br>';
-  h+='<span class="mut">Cần mạng; chỉ các máy mở CÙNG phiên bản demo mới chung room. Ai mở link demo cũng vào room này - muốn demo riêng tư trên máy mình thì bấm Ngắt room. Kênh bắt tay dùng dịch vụ PeerJS công cộng miễn phí - đủ cho demo, không dùng cho dữ liệu thật.</span></div>';
-  h+='<div style="padding:0 16px 14px">'+roomBtnHTML()+'</div></div>';
-  h+='<div class="panel"><div class="ph"><b><i class="ti ti-presentation" style="margin-right:6px"></i>Cách demo hai cổng cạnh nhau</b></div><div style="padding:14px 16px;font-size:12.5px;line-height:1.9;color:var(--text)">';
-  h+='1. Mở <b>ITTs_WebApp_v5_demo.html</b> ở 2 cửa sổ trình duyệt (kéo mỗi cửa sổ một nửa màn hình). Cửa sổ A chọn cổng NV tư vấn, cửa sổ B chọn cổng Quản lý.<br>';
-  h+='2. Bên A thao tác (vd tạo đăng ký có chiết khấu lớn) - bên B thấy ngay việc chờ duyệt; bên B duyệt - bên A thấy kết quả.<br>';
-  h+='3. Mở thêm <b>ITTs_TrangHocVien_demo.html</b> chọn một học viên - phía học viên cũng thấy dữ liệu vừa thao tác.<br>';
-  h+='4. Đổi người ngay trong app: bấm ô tên ở đáy menu trái (app NV) hoặc nút "Đổi người" (trang HV).<br>';
-  h+='5. Hết buổi: bấm <b>Reset dữ liệu demo</b> ở đây hoặc ở màn cổng - mọi cửa sổ tự nạp lại dữ liệu gốc.<br>';
-  h+='<span class="mut">Khuyến nghị demo bằng Chrome khi mở file trực tiếp. Muốn chắc ăn 100% trên mọi trình duyệt: đặt cả thư mục sau một máy chủ tĩnh (python3 -m http.server).</span>';
-  h+='</div></div>';
+  /* V9.18 (Luân): room mặc định đã thông với nhau - tab này chỉ cần trạng thái 1 dòng + Reset */
+  h+='<div class="panel" style="max-width:640px"><div class="ph"><b><i class="ti ti-devices" style="margin-right:6px"></i>Room demo</b></div><div style="padding:14px 16px;font-size:12.5px;line-height:1.9">';
+  h+='Các cửa sổ trên máy này và các MÁY KHÁC mở cùng bản demo tự đồng bộ với nhau. Dữ liệu hiện tại: '+(d?'<span class="chip amber">đang có thay đổi demo</span>':'<span class="chip green">nguyên bản</span>')+(CANLS?'':' · <span class="chip red">trình duyệt chặn lưu - dùng Chrome hoặc http.server</span>')+'</div>';
+  h+='<div style="padding:0 16px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn danger" onclick="demoReset()"><i class="ti ti-refresh"></i>Reset demo (về nguyên bản)</button>'+roomBtnHTML()+'<button class="btn sm" onclick="demoPing()"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ</button></div></div>';
   return h;}
  if(tab==="khoa"){var cs=rows("DL05");
   h+='<div class="notebar"><i class="ti ti-info-circle"></i>Khóa học là <b>cấu hình sản phẩm</b> (học phí, số buổi, quota WOW…) - đặt trong Cài đặt. Lớp học mới là nơi vận hành hằng ngày.</div>';
@@ -6311,8 +6344,8 @@ function renderTrangHV(){
      '<div class="hvcrt"><b>'+esc(cl.class_name||o.class_id_name||o.class_id)+'</b>'+
       '<span>'+esc(cl.course_id_name||cl.course_id||"")+(cl.class_schedule?' · '+esc(cl.class_schedule):'')+'</span></div>'+
      (on?'<i class="ti ti-circle-check hvcrok"></i>':'')+'</div>'+
-    '<div class="hvcrb">'+
-     '<span class="chip '+(ceo?"green":"blue")+'">'+esc(ceo?"Đã hoàn thành":(elabel(cl.class_status)||"Đang học"))+'</span>'+
+    '<div class="hvcrb">'+ /* V9.18: chip ĐẶC màu nổi - hết nhầm Đang học / Đã hoàn thành / Đã kết thúc */
+     '<span class="chip fill-'+(ceo?"green":(isc(cl.class_status,"completed","closed","cancelled")?"gray":"blue"))+'">'+esc(ceo?"Đã hoàn thành":(elabel(cl.class_status)||"Đang học"))+'</span>'+
      (cl.class_start_date?'<span class="hvcrd">'+esc(String(cl.class_start_date).slice(0,10))+(cl.class_end_date?' → '+esc(String(cl.class_end_date).slice(0,10)):'')+'</span>':'')+
     '</div>'+
     '<div class="hvcrf">'+
@@ -6520,9 +6553,12 @@ function renderTrangHV(){
  var shown=mySes.filter(function(s2){return attBySes[s2.session_id]||hwBySes[s2.session_id]||isc(s2.session_status,"completed")});
  h+='<div class="panel" style="margin-bottom:16px"><div class="pbody">';
  if(!shown.length)h+='<div class="empty">Chưa có buổi học nào được ghi nhận.</div>';
+ if(shown.length)h+='<div class="hvtl">'; /* V9.18: rail + node thời gian - đúng nghĩa timeline, hết cảnh block hòa lẫn */
  shown.slice(0,12).forEach(function(s2){
   var a=attBySes[s2.session_id], hws=hwBySes[s2.session_id]||[];
   var acls=a?stCls(a.attendance_status):"";
+  var _sd=pvnd(s2.session_date);
+  h+='<div class="hvtlr'+(_sd&&_sd.getTime()<hvT0()?" past":"")+'"><div class="hvtld">'+esc(String(s2.session_date||"").slice(0,10)||"-")+'</div>';
   h+='<div class="hvses"><div class="hvsh">'+
    '<span class="hvsn">Buổi '+esc(s2.session_number||"?")+'</span>'+
    '<div class="hvst"><b>'+esc(s2.session_date||"")+'</b><span>GV '+esc(s2.teacher_id_name||s2.teacher_id||"-")+'</span></div>'+ /* V9.17: "GV vào trễ" là chỉ số QA nội bộ - không hiện cho học viên */
@@ -6542,7 +6578,8 @@ function renderTrangHV(){
     (x.homework_score?' · điểm <b>'+esc(x.homework_score)+'</b>':(hwSubmitted(x)?' · <span class="mut">chờ chấm</span>':''))+
     (hwSubmitted(x)?' · <a class="lnk" onclick="hvOpenHw(\''+esc(x.homework_id)+'\')">Xem bài đã nộp</a>':'')+
     (x.teacher_feedback?'<br><i style="color:var(--muted)">GV nhận xét: '+esc(x.teacher_feedback)+'</i>':'')+'</span></div>'});
-  h+='</div></div>'});
+  h+='</div></div></div>'});
+ if(shown.length)h+='</div>';
  if(shown.length>12)h+='<div class="mut" style="font-size:11.5px;padding:8px 0">... còn '+(shown.length-12)+' buổi trước đó.</div>';
  h+='</div></div>';
  /* ---- 8. NHẬT KÝ BUỔI WOW ---- */
@@ -6605,28 +6642,7 @@ function renderTrangHV(){
    '<span>'+esc(k.complaint_time||"")+' · '+esc(String(k.complaint_content||"").slice(0,110))+
    (k.resolution_note?'<br>Trung tâm phản hồi: '+esc(k.resolution_note):'')+'</span></div>'})}
  h+='</div></div>';
- /* ---- GỬI PHỤ HUYNH: tóm tắt tháng, copy dán Zalo ---- */
- (function(){
-  var m0=new Date();m0.setDate(1);m0.setHours(0,0,0,0);
-  var attM=(attC||C.att||[]).filter(function(x2){var ss=find("DL11","session_id",x2.session_id);var d=ss?pvnd(ss.session_date):null;return d&&d>=m0});
-  var pres=attM.filter(function(x2){return isc(x2.attendance_status,"on_time","late")}).length;
-  var hwM=(hwC||C.hw||[]).filter(function(x2){var d=pvnd(x2.homework_assigned_time);return d&&d>=m0});
-  var hwSub2=hwM.filter(hwSubmitted).length;
-  var lastNote="";var lastD=null;
-  (attC||C.att||[]).forEach(function(x2){var ss=find("DL11","session_id",x2.session_id);if(!ss||!String(ss.teacher_note_summary||"").trim())return;
-   var d=pvnd(ss.session_date);if(d&&(!lastD||d>lastD)){lastD=d;lastNote=ss.teacher_note_summary}});
-  var mo=("0"+(new Date().getMonth()+1)).slice(-2)+"/"+new Date().getFullYear();
-  var txt="IELTS The Tutors gui phu huynh tinh hinh hoc tap thang "+mo+" cua "+(S.full_name||"")+
-   (lop?(" (lop "+(lop.class_name||"")+")"):"")+": di hoc "+pres+"/"+attM.length+" buoi"+
-   ", nop bai "+hwSub2+"/"+hwM.length+
-   (ob&&ob.mid_overall?(", diem giua khoa "+ob.mid_overall):"")+
-   (lastNote?(". Nhan xet gan nhat cua giao vien: "+String(lastNote).slice(0,160)):"")+
-   ". Phu huynh can trao doi them vui long lien he trung tam"+(paramStr("centerHotline","")?(" - hotline "+paramStr("centerHotline","")):"")+".";
-  h+='<div class="sechd" id="s-phuhuynh">Gửi phụ huynh</div><div class="panel" style="margin-bottom:16px"><div class="pbody">';
-  h+='<div class="mut" style="font-size:12px;margin-bottom:8px">Bản tóm tắt tháng này - trung tâm (hoặc chính bạn) copy gửi cho phụ huynh qua Zalo.</div>';
-  h+='<div style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:12.5px;line-height:1.7">'+esc(txt)+'</div>';
-  h+='<div style="margin-top:10px"><button class="btn primary sm" onclick="hvCopy(\''+esc(txt.replace(/'/g,""))+'\',\'Đã copy bản tóm tắt - dán vào Zalo gửi phụ huynh.\')"><i class="ti ti-copy"></i>Copy gửi phụ huynh</button></div>';
-  h+='</div></div>'})();
+ /* V9.18 (Luân): BỎ khối "Gửi phụ huynh" - ngữ cảnh không hợp với trang học viên tự xem. */
  return h}
 /* ---- học viên TỰ trả lời khảo sát / xem lại / gửi góp ý ---- */
 function hvSurveyFill(id){var v=find("DL15","survey_id",id);if(!v){toast("Không thấy phiếu.");return}
@@ -7421,6 +7437,7 @@ function go(key,noHist){
  /* điều hướng tới 4 trang tuyển sinh -> mở HUB Tuyển sinh đúng tab (giữ luồng liền mạch) */
  var TSMAP={nhaplead:"lead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"};
  if(TSMAP[key]){window.TSTAB=TSMAP[key];key="tuyensinh"}
+ if(key==="hanhtrinh"){window.BLVIEW="board";key="banlam"} /* V9.18: Hành trình đã gộp vào Trang bắt đầu (góc nhìn bảng chặng) */
  var ARCMAP={changA:1,changB:1,changC:1,changD:1};
  if(ARCMAP[key]){if(window.ARC!==key)window.CHANGK="";window.ARC=key;key="chang"}
  var CSMAP={review:"khaosat",khaosat:"khaosat",ghinhan:"phanhoi",khieunai:"khieunai"};
@@ -7474,14 +7491,40 @@ function navToggle(g){window.NAVOPEN=window.NAVOPEN||{};window.NAVOPEN[g]=!navIs
    2 tầng: nhóm = chặng lớn (arc), mục = tổng quan chặng + các nghiệp vụ bên trong.
    Mục con của hub (test, tuvan, wow, baoluu...) đứng thẳng trong menu - go() tự remap
    vào hub đúng tab, nên "Quản lý WOW / Test đầu vào" không bao giờ biến mất nữa. */
+/* ===== V9.18: TRA CỨU MỞ RỘNG (Luân 28/07) - nhóm Tra cứu = nơi "muốn xem gì đó dạng danh sách",
+   bổ sung sổ CHỈ XEM cho mọi bảng nghiệp vụ chính, xếp theo dòng nghiệp vụ. Đây là đảo lại V6.0
+   CHO RIÊNG nhóm Tra cứu; trang tác vụ theo chặng vẫn là nơi LÀM VIỆC (các sổ này ro:1, không nút sửa). */
+function mkRO(src,sub){var c={};for(var k in src)c[k]=src[k];c.ro=1;if(sub)c.sub=sub;return c}
+LISTCFG.dslienhe={code:"DL02b",filt:"channel",ro:1,sub:"Sổ liên hệ (DL02b) - mọi điểm chạm với khách, chỉ xem",
+ cols:[["contact_time","Thời điểm"],["customer_name","Khách"],["channel","Kênh","enum"],["result_note","Kết quả","enum"],["content","Nội dung"]]};
+LISTCFG.dstest={code:"DL03",filt:"test_status",ro:1,sub:"Sổ test đầu vào (DL03) - chỉ xem; đặt lịch/chấm ở Tuyển sinh",
+ act:[{lb:"Hồ sơ",ic:"ti-id-badge-2",fn:"openQuick",arg:"lead_id"}],
+ cols:[["test_booking_id","Mã"],["lead_id_name","Khách"],["test_date","Ngày test"],["test_format","Hình thức","enum"],["test_attendance_status","Dự test","chip"],["test_status","Chấm","chip"],["overall_score","Overall"]]};
+LISTCFG.dstuvan={code:"DL04",filt:"conversion_status",ro:1,sub:"Sổ tư vấn (DL04) - chỉ xem; tư vấn ở Tuyển sinh",
+ cols:[["consultation_id","Mã"],["customer_name_display","Khách"],["consultation_time","Thời điểm"],["recommended_course","Khóa đề xuất"],["consultation_status","Trạng thái","chip"],["conversion_status","Kết quả","chip"]]};
+LISTCFG.dsdangky=mkRO(LISTCFG.tuvan,"Sổ đăng ký khóa (DL06) - chỉ xem; tạo/sửa ở Tuyển sinh");
+LISTCFG.dsthanhtoan={code:"DL07",filt:"payment_method",ro:1,sub:"Sổ thu học phí (DL07) - chỉ xem; thu tiền ở Tuyển sinh > Thanh toán",
+ cols:[["payment_time","Ngày thu"],["student_id_name","Học viên"],["amount","Số tiền","money"],["payment_method","Hình thức","enum"],["received_by","Người thu"],["verified_by","KT xác nhận"]]};
+LISTCFG.dsbuoihoc={code:"DL11",filt:"session_status",ro:1,sub:"Sổ buổi học (DL11) - chỉ xem; vận hành ở hub Học tập",
+ cols:[["session_id","Mã"],["class_id_name","Lớp"],["session_number","Buổi"],["session_date","Ngày giờ"],["teacher_id_name","GV"],["session_status","Trạng thái","chip"]]};
+LISTCFG.dsdiemdanh={code:"DL12",filt:"attendance_status",ro:1,sub:"Sổ điểm danh (DL12) - chỉ xem; điểm danh ở Vận hành lớp",
+ cols:[["student_name","Học viên"],["session_id","Buổi"],["attendance_status","Điểm danh","chip"],["check_in_time","Giờ vào"],["in_class_performance","Trong lớp","enum"]]};
+LISTCFG.dsbaitap=mkRO(LISTCFG.baitap,"Sổ bài tập (DL13) - chỉ xem; giao/chấm ở Vận hành lớp");
+LISTCFG.dswow=mkRO(LISTCFG.wow,"Sổ WOW 1-1 (DL14) - chỉ xem; đặt/xử lý ở hub Học tập");
+LISTCFG.dsketthuc=mkRO(LISTCFG.ketthuc,"Sổ kết thúc khóa (DL18) - chỉ xem; xử lý ở Chặng 4");
+LISTCFG.dskhaosat={code:"DL15",filt:"survey_type",ro:1,sub:"Sổ khảo sát định kỳ (DL15) - chỉ xem; gửi/xử lý ở hub CSKH",
+ cols:[["student_name","Học viên"],["survey_type","Đợt","enum"],["sent_date","Gửi"],["submitted_date","Trả lời"],["satisfaction_score","Hài lòng"],["follow_up_needed","Cần follow-up","enum"]]};
+LISTCFG.dsphanhoi=mkRO(LISTCFG.khaosat,"Sổ phản hồi / góp ý (DL16) - chỉ xem; xử lý ở hub CSKH");
+LISTCFG.dskhieunai=mkRO(LISTCFG.khieunai,"Sổ khiếu nại (DL17) - chỉ xem; xử lý ở hub CSKH");
+
 var NAVTREE=[
- {g:"Làm việc",items:["banlam","hanhtrinh"]},
+ {g:"Làm việc",items:["banlam"]}, /* V9.18: hanhtrinh gộp vào banlam (go() tự remap) */
  {g:"Chặng 1 · Khách tiềm năng",arc:"changA",items:["changA","nhaplead","test","tuvan","thanhtoan","reup"]},
  {g:"Chặng 2 · Đang học",arc:"changB",items:["changB","xeplop","banglop","hoctap","giaoan","wow","cskh"]},
  {g:"Chặng 3 · Tạm dừng",arc:"changC",items:["changC","baoluu"]},
  {g:"Chặng 4 · Kết thúc & Học tiếp",arc:"changD",items:["changD","ketthuc","magioithieu"]},
  {g:"Điều hành",items:["baocao","duyet","banggiao","settings"]},
- {g:"Tra cứu",items:["hocvien","giangvien"]}];
+ {g:"Tra cứu",items:["hocvien","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","giangvien","nhanvien"]}];
 var NAVSUB={nhaplead:"tuyensinh",test:"tuyensinh",tuvan:"tuyensinh",thanhtoan:"tuyensinh",reup:"tuyensinh",
  review:"cskh",khaosat:"cskh",ghinhan:"cskh",khieunai:"cskh",
  lop:"hoctap",buoihoc:"hoctap",lichtuan:"hoctap",wow:"hoctap",
@@ -7641,8 +7684,7 @@ var HVSEC=[
  ["s-buoihoc","Nhật ký buổi học","ti-notes"],
  ["s-wow","Nhật ký buổi WOW","ti-star"],
  ["s-khaosat","Khảo sát của bạn","ti-clipboard-text"],
- ["s-gopy","Góp ý cho trung tâm","ti-message-plus"],
- ["s-phuhuynh","Gửi phụ huynh","ti-users"]];
+ ["s-gopy","Góp ý cho trung tâm","ti-message-plus"]];
 function hvGo(id){var el=document.getElementById(id);if(!el)return;
  var box=document.getElementById("hvMain");
  var top=el.offsetTop-14;

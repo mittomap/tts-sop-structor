@@ -149,7 +149,17 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.17** (28/07 chiều - ROOM TỰ ĐỘNG + bong bóng việc mới + vá theo 3 tester, theo yêu cầu Luân:
+> **Phiên bản: V9.18** (28/07 tối - theo 8 yêu cầu mới của Luân: (1) **GỘP "Hành trình" vào "Trang bắt đầu"**
+> thành MỘT trang 2 góc nhìn (segmented "Chạy quy trình" / "Bảng chặng - hành trình"); go('hanhtrinh') tự remap,
+> menu Làm việc còn 1 mục, logic 2 trang giữ nguyên vẹn; (2) **node dải hạt (mstrip) BẤM ĐƯỢC** - mở drawer
+> "hành trình từng chặng" của đúng người (13 mốc + mốc thời gian + chặng hiện tại + nút xử lý); (3) **TRA CỨU
+> MỞ RỘNG**: 17 mục xếp theo dòng nghiệp vụ (13 sổ chỉ-xem mới: liên hệ/test/tư vấn/đăng ký/thu học phí/buổi học/
+> điểm danh/bài tập/WOW/kết thúc/khảo sát/phản hồi/khiếu nại + khóa học + nhân viên) - ĐẢO V6.0 CÓ CHỦ ĐÍCH
+> cho riêng nhóm Tra cứu theo lệnh Luân; (4) tab Dữ liệu demo GỌN (1 dòng trạng thái + Reset + Ngắt room);
+> (5) BỎ khối "Gửi phụ huynh" khỏi trang học viên; (6) chip trạng thái khóa ĐẶC MÀU (fill-blue/green/gray);
+> (7) nhật ký buổi học thành TIMELINE thật (rail + node ngày); (8) badge đếm ở menu nhỏ lại, hết bóp chữ.
+> Suite: **_check11 = 82 điểm** (thêm 14 tiêu chí V9.18) + _tall 37 trang 0 lỗi + node --check. Chi tiết: mục 3novemdecies.
+> Trước đó V9.17 (28/07 chiều - ROOM TỰ ĐỘNG + bong bóng việc mới + vá theo 3 tester, theo yêu cầu Luân:
 > (1) **Room demo TỰ NỐI** - bỏ hẳn mã phòng: mở demo là máy tự vào chung room (id chung gắn SEED_SIG,
 > máy đầu làm trạm relay, trạm rớt thì các máy tranh làm trạm lại); chip **"Room demo: nối N máy / chỉ máy này"**
 > + nút **Reset demo** trên navbar CẢ 2 CỔNG (app NV: topbar; cổng HV: sidebar + thanh mobile); nút Ngắt room /
@@ -1048,6 +1058,45 @@ học viên đâu có cần" · "Hồ sơ học viên ở app quản trị ít t
 ### Sidebar (rà 28/07 - kết luận GIỮ NGUYÊN)
 7 nhóm NAVTREE V9.15 khớp luồng mới (menu này chính Luân duyệt thiết kế ở Đợt 8); tính năng đợt này đều
 nằm TRONG trang sẵn có (màn cổng, Cài đặt, hồ sơ 360, cổng HV) - không thêm/bớt mục menu nào.
+
+## 3novemdecies. V9.18 — Gộp Trang bắt đầu + Hành trình, node bấm được, Tra cứu mở rộng (28/07 tối)
+
+### Gộp banlam + hanhtrinh (kiến trúc - đừng phá)
+- MỘT trang banlam, 2 góc nhìn qua `window.BLVIEW` ("list"/"board") + segmented ngay dưới dải khối.
+  View board = `renderHanhtrinh(1)` (embed: bỏ pageHead, thay bằng notebar). KHÔNG fork code bảng chặng.
+- `go('hanhtrinh')` remap -> banlam + BLVIEW="board" (đặt cạnh TSMAP trong go()). Mọi call-site cũ sống nguyên.
+- jSet/jStage/ô tìm của bảng chặng đổi từ reRender("hanhtrinh") sang **reRender(CUR)/reRenderKeep(CUR)** -
+  đúng luật đường ống nhúng (bài học V9.5); quên là bấm lọc trong banlam sẽ thổi bay trang.
+- PAGES giữ entry hanhtrinh (PBK còn tra), NAVTREE nhóm Làm việc chỉ còn banlam.
+
+### Node hành trình bấm được
+- mstrip(k,over,pid): CÓ pid -> thêm class clk + onclick mstripOpen(pid) (stopPropagation để không đụng
+  click của dòng); KHÔNG pid (sopBlock) giữ nguyên tĩnh. mstripFor tự truyền pid; jcard truyền J.C.pid.
+- mstripOpen(pid) = drawer 13 mốc JMAIN (tái dùng class hvjr/hvjd của portal): mốc done/now + thời điểm
+  (S.since(C)) + chặng thuộc arc nào + nút "việc kế" (runStart) + Xem hồ sơ. Nhánh rẽ có dnote đỏ.
+- BẪY BỘ KIỂM: _check11 từng dò cứng chuỗi 'class="mstrip"' -> gãy khi thêm class clk; đã đổi sang dò
+  tiền tố 'class="mstrip'. Quy tắc: check dò markup thì dò TIỀN TỐ class, đừng dò cả chuỗi đóng.
+
+### Tra cứu mở rộng (ĐẢO V6.0 có chủ đích - lệnh Luân 28/07)
+- Nguyên tắc mới: nhóm TRA CỨU = nơi "muốn xem gì đó dạng danh sách" -> nhiều sổ CHỈ-XEM xếp theo dòng
+  nghiệp vụ; trang tác vụ theo chặng vẫn là nơi LÀM VIỆC. V6.0 ("danh sách phục vụ hành trình") vẫn đúng
+  cho phần còn lại của menu - chỉ đảo cho nhóm Tra cứu.
+- 13 sổ mới: dslienhe(DL02b) dstest(DL03) dstuvan(DL04) dsdangky(=mkRO tuvan/DL06) dsthanhtoan(DL07)
+  dsbuoihoc(DL11) dsdiemdanh(DL12) dsbaitap(=mkRO baitap) dswow(=mkRO wow) dsketthuc(=mkRO ketthuc)
+  dskhaosat(DL15) dsphanhoi(=mkRO khaosat/DL16) dskhieunai(=mkRO khieunai) + khoahoc + nhanvien vào menu.
+  mkRO đã DỰNG LẠI (bị xóa từ V6.0). MỌI cột mới đã đối chiếu demo_data_big.json trước khi khai (luật cũ).
+  NHỚ bẫy tên key cũ: LISTCFG.tuvan = DL06 (đăng ký), LISTCFG.khaosat = DL16 (phản hồi).
+- Sổ chỉ hiện trên menu với vai có pages="*" (quản trị/điều hành); vai khác giữ menu gọn như cũ.
+
+### Các chỉnh còn lại
+- Tab Cài đặt > Dữ liệu demo rút còn 1 panel (trạng thái 1 dòng + Reset + Ngắt room + Kiểm tra đồng bộ) -
+  room mặc định tự thông nên hết cần hướng dẫn dài (đã bỏ cả panel "Cách demo hai cổng").
+- BỎ khối "Gửi phụ huynh" + mục s-phuhuynh khỏi trang học viên (Luân: ngữ cảnh không hợp).
+- Chip trạng thái khóa trên thẻ khóa trang HV: .chip.fill-blue/green/gray (đặc màu) - Đang học xanh dương,
+  Đã hoàn thành xanh lá, kết thúc/hủy xám.
+- Nhật ký buổi học portal = timeline thật: .hvtl (rail dọc) + .hvtlr (node tròn + nhãn ngày, mờ khi đã qua).
+- Badge đếm menu (.navlbl .dot / .navitem .dot) nhỏ lại + flex:none - nhóm thu gọn không bóp chữ.
+- _check11 lên **82 điểm** (+14 tiêu chí V9.18: remap, 2 view, mstrip clk/drawer, 13 sổ render, HVSEC, tab demo).
 
 ## 3octodecies. V9.17 — Room tự động + bong bóng việc mới + vá theo hội đồng 3 tester (28/07 chiều)
 

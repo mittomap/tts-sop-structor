@@ -62,7 +62,7 @@ t("mstrip: chang re nhanh ve hinh thoi", mstrip("lost",false).indexOf("msd br")>
 t("mstrip: chang khong ton tai -> rong", mstrip("xxx",false)==="");
 ["test","tuvan","thanhtoan","xeplop","wow","khieunai","ketthuc","baoluu"].forEach(function(p){
  var o=RENDER[p]();
- t("trang "+p+" co mstrip tren dong", (o.match(/class="mstrip"/g)||[]).length>0)});
+ t("trang "+p+" co mstrip tren dong", (o.match(/class="mstrip/g)||[]).length>0)}); /* V9.18: mstrip co the kem class clk */
 
 /* --- 6. NAVTREE menu theo chang --- */
 t("NAVTREE co 7 nhom", NAVTREE.length===7);
@@ -113,4 +113,34 @@ t("hoso HV dung sopBlock", RENDER.hoso().indexOf("jnext sopb")>=0);
 var rerr=0;Object.keys(RENDER).forEach(function(k){try{var o=RENDER[k]();if(typeof o!=="string")rerr++}catch(e){rerr++}});
 t("37 trang van render (loi="+rerr+")", rerr===0);
 
+/* --- 9. V9.18: gop banlam+hanhtrinh, node bam duoc, Tra cuu mo rong, don cong HV --- */
+t("V9.18 mstrip co pid -> bam duoc (clk + mstripOpen)", (function(){var s=mstrip("contacted",false,"LEAD-X");
+ return s.indexOf("mstrip clk")>=0&&s.indexOf("mstripOpen")>=0})());
+t("V9.18 mstrip khong pid -> khong clk (dung trong sopBlock)", mstrip("contacted",false).indexOf("clk")<0);
+t("V9.18 mstripOpen mo drawer tung chang", (function(){var L1=rows("DL02")[0];
+ try{mstripOpen(L1.lead_id)}catch(e){return false}return typeof mstripOpen==="function"})());
+go("hanhtrinh");
+t("V9.18 go(hanhtrinh) -> banlam goc nhin bang chang", CUR==="banlam"&&window.BLVIEW==="board");
+t("V9.18 banlam view board co jboard + jflow", (function(){var o=RENDER.banlam();
+ return o.indexOf("jboard")>=0&&o.indexOf("jflow")>=0})());
+window.BLVIEW="list";
+t("V9.18 banlam view list co Chay quy trinh", RENDER.banlam().indexOf("Chạy quy trình")>=0);
+t("V9.18 menu Lam viec chi con banlam", (function(){var g=NAVTREE.filter(function(x){return x.g==="Làm việc"})[0];
+ return g&&g.items.length===1&&g.items[0]==="banlam"})());
+t("V9.18 Tra cuu >= 15 so", (function(){var g=NAVTREE.filter(function(x){return x.g==="Tra cứu"})[0];
+ return g&&g.items.length>=15})());
+t("V9.18 cac so tra cuu du LISTCFG + PAGES ty=list", ["dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai"].every(function(k){return LISTCFG[k]&&LISTCFG[k].ro&&PBK[k]&&PBK[k].ty==="list"}));
+t("V9.18 cac so tra cuu render duoc", (function(){var e2=0;
+ ["dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai"].forEach(function(k){
+  try{var o=renderList(k);if(typeof o!=="string"||o.length<200)e2++}catch(e){e2++}});
+ return e2===0})());
+t("V9.18 HVSEC het Gui phu huynh", !HVSEC.some(function(x){return x[0]==="s-phuhuynh"}));
+t("V9.18 trang HV: co timeline buoi hoc + khong con Gui phu huynh", (function(){
+ window.HVID=(rows("DL09")[0]||{}).student_id;var o=renderTrangHV();
+ return o.indexOf('class="hvtl"')>=0&&o.indexOf("Gửi phụ huynh")<0})());
+t("V9.18 chip trang thai khoa dac mau (fill-)", (function(){
+ window.HVID="HV061";var o=renderTrangHV();return o.indexOf("chip fill-")>=0})());
+t("V9.18 tab demo gon: co Reset, het huong dan dai", (function(){window.SETTAB="demo";var o=RENDER.settings();window.SETTAB="ch2";
+ return o.indexOf("Reset demo")>=0&&o.indexOf("Cách demo hai cổng")<0})());
+CUR="banlam";window.BLVIEW="list";
 console.log(bad.length?("FAIL:\n  "+bad.join("\n  ")):"OK: "+ok);

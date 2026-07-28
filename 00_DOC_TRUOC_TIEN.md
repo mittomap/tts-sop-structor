@@ -33,10 +33,11 @@ Song song với hệ Google Sheets, dự án có **web app demo offline** dựng
 Luân tương tác nhiều nhất gần đây. **Muốn sửa app: đọc `_src/README_SRC.md`** (build 1 lệnh
 `ITTS_OUT=... python3 gen_v5.py`, verify bằng `node _tall.js`). Hiện trạng tính năng: cuối
 `ITTs_WebApp_v5_README.md`. Bẫy & quyết định kiến trúc app: mục 3bis→3quater trong file 02.
-Phiên bản hiện tại: **V9.17** (28/07 chiều - ROOM DEMO TỰ ĐỘNG: các máy mở demo tự đồng bộ nhau, không cần
-mã phòng; chip Room demo + nút Reset demo trên navbar cả 2 cổng; bong bóng việc mới cần duyệt/xử lý; cổng HV
-bỏ nội dung nội bộ; hồ sơ 360 superset có tab "Trang của học viên"; đã qua 1 vòng 3 tester nhặt sạn + vá hết
-sạn thật. Chi tiết: mục 3septendecies + 3octodecies file 02. Trước đó V9.15: menu theo 4 CHẶNG VÒNG ĐỜI + hệ node 3 tầng (ray ga / dải hạt trên mọi dòng / sopBlock trang chi tiết) + tab Chăm lại/Reup + dữ liệu demo đại tu theo tester, suite kiểm 366 điểm. Nền demo đa cổng giữ từ V9.7: màn cổng chọn người, dữ liệu tách `ITTs_data.js`, thao tác lưu thật + đồng bộ giữa các cổng, nút Reset demo. HỘI ĐỒNG TỔNG KIỂM đang HOLD - chờ yêu cầu mới của Luân. Chi tiết: mục ⭐ HIỆN TRẠNG trong file 02).
+Phiên bản hiện tại: **V9.18** (28/07 tối - GỘP Hành trình vào Trang bắt đầu (1 trang 2 góc nhìn); node dải hạt
+BẤM ĐƯỢC mở drawer từng chặng; TRA CỨU mở rộng 17 sổ chỉ-xem theo nghiệp vụ; tab Dữ liệu demo tối giản; bỏ
+"Gửi phụ huynh"; chip trạng thái khóa đặc màu; nhật ký buổi học thành timeline; badge menu gọn. Trước đó V9.17:
+ROOM DEMO TỰ ĐỘNG (các máy tự đồng bộ, không cần mã phòng) + bong bóng việc mới + navbar Room demo/Reset cả
+2 cổng + vá theo 3 tester. Chi tiết: mục 3septendecies/3octodecies/3novemdecies file 02. Trước đó V9.15: menu theo 4 CHẶNG VÒNG ĐỜI + hệ node 3 tầng (ray ga / dải hạt trên mọi dòng / sopBlock trang chi tiết) + tab Chăm lại/Reup + dữ liệu demo đại tu theo tester, suite kiểm 366 điểm. Nền demo đa cổng giữ từ V9.7: màn cổng chọn người, dữ liệu tách `ITTs_data.js`, thao tác lưu thật + đồng bộ giữa các cổng, nút Reset demo. HỘI ĐỒNG TỔNG KIỂM đang HOLD - chờ yêu cầu mới của Luân. Chi tiết: mục ⭐ HIỆN TRẠNG trong file 02).
 Dự án ĐÃ LÊN GITHUB (28/07): thư mục này = repo `mittomap/tts-sop-structor` (PUBLIC từ 28/07 chiều,
 tên cũ itts-sop - Luân đổi tên + mở public để phiên cloud Claude Code truy cập được); demo online:
 **https://mittomap.github.io/itts-sop-demo/**. Từ 28/07 chiều, phiên cloud Claude Code của Luân có
