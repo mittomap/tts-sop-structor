@@ -1304,4 +1304,37 @@ function stripOf(o){var i=o.indexOf('<div class="bstats">');if(i<0)return "";
   window.HTTAB="today"})();
 })();
 
+
+/* ---- 43. CHOT CONG GIANG DAY (viec ton dot 2 - khoi tien) ---- */
+(function(){
+ setRole("all");cfEnsure();
+ t("co bang cong giang day toan trung tam", typeof congThang==="function"&&typeof renderCong==="function");
+ t("don gia buoi day lay tu cau hinh", (DATA.config.ch2||[]).some(function(x){return x.name==="teacherPayPerSession"}));
+ var mo=congMonths();
+ t("co thang de tinh cong", mo.length>0);
+ /* BAT BIEN: tong buoi trong bang cong = tong buoi DA DAY XONG cua thang do. Sot mot buoi la
+    thieu tien cua giao vien; dem trung la tra thua. */
+ mo.slice(0,4).forEach(function(ym){
+  var tot=congThang(ym).reduce(function(a,x){return a+x.n},0);
+  var real=rows("DL11").filter(function(x){if(!isc(x.session_status,"completed"))return false;
+   var d=pvnd(x.session_date);if(!d)return false;
+   return (d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2))===ym&&String(x.teacher_id||"").trim()}).length;
+  t("thang "+ym+": tong buoi trong bang cong khop so buoi da day", tot===real)});
+ /* "da day xong" phai la DUNG MOT dinh nghia voi ho so giao vien - khong duoc dem kieu khac */
+ t("dung chung dinh nghia buoi da day voi ho so GV", /isc\(x\.session_status,"completed"\)/.test(SRC));
+ /* doi don gia thi tien doi theo */
+ (function(){var c=(DATA.config.ch2||[]).filter(function(x){return x.name==="teacherPayPerSession"})[0];
+  var old=c.value;var t1=congThang(mo[0]).reduce(function(a,x){return a+x.tien},0);
+  c.value=String(num(old)*2);
+  var t2=congThang(mo[0]).reduce(function(a,x){return a+x.tien},0);
+  c.value=old;
+  t("doi don gia thi tien cong doi theo", t1>0&&t2===t1*2)})();
+ /* tach theo co so + lop online - lang kinh chi nhanh */
+ (function(){window.STTAB="cong";var o=RENDER.dsthanhtoan();
+  t("bang cong tach theo co so", /Chia theo cơ sở/.test(o));
+  t("bang cong tach rieng buoi online", /Trong đó online/.test(o));
+  t("noi thang la chua noi bang luong", /chưa nối bảng lương/.test(o));
+  window.STTAB="da"})();
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");

@@ -7146,6 +7146,7 @@ var APPPARAMS=[
     VÀ cho việc lọc người thay được. Trước đây con số 2 giờ nằm cắm cứng trong renderLichTuan. */
  ["Xếp lịch & Giảng dạy","attendanceGrace_hours","Buổi dạy xong bao lâu thì BẮT BUỘC phải có điểm danh (trong khoảng này còn coi là hàng chờ)","giờ",24],
  ["Xếp lịch & Giảng dạy","homeworkDueFallback_days","Hạn nộp bài mặc định khi giáo án không ghi rõ (tính từ ngày học)","ngày",5],
+ ["Tiền - Công giảng dạy","teacherPayPerSession","Tiền công một buổi dạy (dùng để tạm tính bảng công tháng)","đ/buổi",250000],
  ["Học tập - WOW","wowGrantMax_perTime","Mỗi lần cấp thêm tối đa bao nhiêu lượt WOW cho một học viên","lượt",3],
  ["Hẹn & Chăm sóc","apptSoon_hours","Nút hẹn nhanh \"N tiếng nữa\" - N là bao nhiêu","giờ",2],
  ["Hẹn & Chăm sóc","apptMorning_hour","Giờ hẹn buổi sáng dùng cho các nút gợi ý","giờ trong ngày",9],
@@ -10915,6 +10916,59 @@ function tkReport(){var all=srows("DL23");
   blk("Bắt buộc",req)+blk("Không bắt buộc",opt)+'</tbody></table></div>';
  h+='<div class="mut" style="font-size:11.5px;padding:10px 14px">Việc <b>bắt buộc</b> không được từ chối và tính vào tỷ lệ đúng hạn của nhân viên; việc <b>không bắt buộc</b> (nhờ hỗ trợ, phối hợp) được phép từ chối kèm lý do.</div></div></div></div>';
  return h}
+/* ═══════ V9.29s - CHỐT CÔNG GIẢNG DẠY (việc tồn đợt 2 - khối tiền) ═══════
+   Hồ sơ từng giáo viên đã có bảng "công theo tháng", nhưng KHÔNG có chỗ nào xem CẢ TRUNG TÂM một
+   lượt - kế toán phải mở 10 hồ sơ rồi cộng tay. Đây là chỗ đó.
+   Nói thẳng giới hạn: bản demo CHƯA có bảng lương, nên màn này TÍNH và ĐỐI CHIẾU chứ không "chốt"
+   vào đâu cả. Ghi rõ ra màn hình còn hơn dựng một nút "Chốt công" bấm xong không đi đâu. */
+function payRate(){return num(paramOf("teacherPayPerSession",250000))||0}
+function congThang(ym){
+ var GV=rows("DL01").filter(isGVRole);
+ var out=GV.map(function(g){
+  var ses=rows("DL11").filter(function(x){
+   if(String(x.teacher_id||"")!==g.staff_id||!isc(x.session_status,"completed"))return false;
+   var d=pvnd(x.session_date);if(!d)return false;
+   return (d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2))===ym});
+  var late=ses.filter(function(x){return num(x.teacher_late_minutes)>0});
+  var noNote=ses.filter(function(x){return !bhState(x).note});
+  var brs={};ses.forEach(function(x){var c=find("DL10","class_id",x.class_id);if(c&&c.branch)brs[c.branch]=(brs[c.branch]||0)+1});
+  var onl=ses.filter(function(x){return clsOnline(find("DL10","class_id",x.class_id)||{})}).length;
+  return {g:g,n:ses.length,late:late.length,noNote:noNote.length,brs:brs,onl:onl,tien:ses.length*payRate()}});
+ out.sort(function(a,b){return b.n-a.n});
+ return out}
+function congMonths(){
+ var m={};rows("DL11").forEach(function(x){if(!isc(x.session_status,"completed"))return;
+  var d=pvnd(x.session_date);if(!d)return;m[d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)]=1});
+ return Object.keys(m).sort().reverse()}
+function congSet(v){window.CONGM=v;reRender(CUR)}
+function renderCong(){
+ var mo=congMonths();
+ var ym=window.CONGM||mo[0]||"";
+ var L=congThang(ym);
+ var tot=L.reduce(function(a,x){return a+x.n},0),tien=L.reduce(function(a,x){return a+x.tien},0);
+ var noNote=L.reduce(function(a,x){return a+x.noNote},0);
+ var h='<div class="notebar"><i class="ti ti-info-circle"></i><b>Bản demo chưa nối bảng lương</b> - màn này TÍNH và ĐỐI CHIẾU công, không ghi vào đâu cả. Đơn giá mỗi buổi lấy từ cấu hình: '+slaChip("teacherPayPerSession",250000,"đ/buổi")+'. Căn cứ tính: buổi có trạng thái <b>đã dạy xong</b> - đúng một định nghĩa với KPI và với hồ sơ giáo viên.</div>';
+ h+=statStrip([
+  ["ti-school",tot,"Buổi đã dạy trong tháng","#3B82C4",L.length+" giáo viên"],
+  ["ti-report-money",vnd(tien),"Tiền công tạm tính","#0D9488",vnd(payRate())+"/buổi"],
+  ["ti-writing",noNote,"Buổi chưa ghi nhận xét","#E08A1E",noNote?"đối chiếu trước khi chốt":"đã đủ nhận xét"],
+  ["ti-clock",L.reduce(function(a,x){return a+x.late},0),"Buổi vào trễ giờ","#E24B4A","ảnh hưởng KPI ADC"]]);
+ h+=tbar('<span class="tblbl">Tháng</span><select class="sel" onchange="congSet(this.value)">'+
+  mo.map(function(k){return '<option value="'+esc(k)+'"'+(k===ym?" selected":"")+'>'+esc(k.split("-")[1]+"/"+k.split("-")[0])+'</option>'}).join("")+'</select>',
+  '<span class="tbcnt">'+L.filter(function(x){return x.n}).length+' GV có công</span>');
+ h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Giáo viên</th><th>Cơ sở</th><th>Buổi đã dạy</th><th>Chia theo cơ sở</th><th>Trong đó online</th><th>Vào trễ</th><th>Chưa ghi nhận xét</th><th>Tiền công tạm tính</th></tr></thead><tbody>';
+ if(!L.filter(function(x){return x.n}).length)h+='<tr><td class="empty" colspan="8">Tháng này chưa có buổi dạy nào hoàn thành.</td></tr>';
+ L.forEach(function(x){if(!x.n)return;
+  h+='<tr><td>'+nsLnk(x.g.staff_id,x.g.full_name,"")+'</td>'+
+   '<td>'+esc(elabel(x.g.branch)||x.g.branch||"-")+'</td>'+
+   '<td><b>'+x.n+'</b></td>'+
+   '<td style="font-size:11.5px">'+esc(Object.keys(x.brs).map(function(b){return (elabel(b)||b)+" ("+x.brs[b]+")"}).join(" · ")||"-")+'</td>'+
+   '<td>'+(x.onl?'<span class="chip blue">'+x.onl+'</span>':'<span class="mut">0</span>')+'</td>'+
+   '<td>'+(x.late?'<span class="chip amber">'+x.late+'</span>':'0')+'</td>'+
+   '<td>'+(x.noNote?'<span class="chip red">'+x.noNote+'</span>':'<span class="chip green">0</span>')+'</td>'+
+   '<td style="font-variant-numeric:tabular-nums"><b>'+vnd(x.tien)+'</b></td></tr>'});
+ h+='<tr style="background:#F4F7FA;font-weight:800"><td colspan="2">TỔNG</td><td>'+tot+'</td><td colspan="3"></td><td>'+noNote+'</td><td style="font-variant-numeric:tabular-nums">'+vnd(tien)+'</td></tr>';
+ return h+'</tbody></table></div></div>'}
 /* ===== SỔ THU HỌC PHÍ: tab ĐÃ THU (DL07) + tab DỰ THU (DL06b) ===== */
 function sothuTab(k){window.STTAB=k;reRender("dsthanhtoan")}
 /* Gom mọi đợt CHƯA đóng đủ thành danh sách dự thu. Mỗi dòng = một đợt của một đơn.
@@ -10965,9 +11019,9 @@ function renderDuthu(){
  return h+'</tbody></table></div></div>'}
 function renderSothu(){var tab=window.STTAB||"da";
  var nDu=duthuList().length;
- var h=pageHead("Sổ thu học phí","Tiền ĐÃ VÀO (sổ thu DL07) và tiền CÒN PHẢI THU (lịch đợt DL06b) - hai mặt của cùng một cuốn sổ.","");
- h+=tbar(segHTML(tab,[["da","Đã thu",rows("DL07").length],["du","Dự thu",nDu]],"sothuTab('{k}')"),"");
- h+=(tab==="du")?renderDuthu():renderList("dsthanhtoan",1);
+ var h=pageHead("Sổ thu học phí","Tiền ĐÃ VÀO (sổ thu DL07), tiền CÒN PHẢI THU (lịch đợt DL06b) và tiền công giảng dạy phải trả - ba mặt của cùng một cuốn sổ tiền.","");
+ h+=tbar(segHTML(tab,[["da","Đã thu",rows("DL07").length],["du","Dự thu",nDu],["cong","Công giảng dạy",""]],"sothuTab('{k}')"),"");
+ h+=(tab==="du")?renderDuthu():(tab==="cong"?renderCong():renderList("dsthanhtoan",1));
  return h}
 var RENDER={giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
 function dashJump(key){var m={urgent:"viec",newlead:"nhaplead",consider:"viec",convert:"tuvan",risk:"viec",onboard:"xeplop",approve:"duyet",debt:"thanhtoan",complaint:"khieunai",ungraded:"baitap",testpend:"test",wowbook:"wow",unverified:"thanhtoan",classes:"banglop"};var pg=m[key];if(pg&&RBK[CURROLE].pages.indexOf(pg)>=0)go(pg);else go("viec")}

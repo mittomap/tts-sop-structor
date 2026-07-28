@@ -593,6 +593,17 @@
 > trùng khớp tuyệt đối (lớp online thì ai cũng được). Ngặt hơn nghĩa là mọi kết quả Python chọn đều
 > nằm trong tập JS chấp nhận - không có chuyện hai bên nói khác nhau.
 >
+> **(9) CHỐT CÔNG GIẢNG DẠY** (việc tồn đợt 2 - khối tiền). Hồ sơ từng giáo viên đã có bảng công
+> theo tháng, nhưng **không có chỗ nào xem cả trung tâm một lượt** - kế toán phải mở 10 hồ sơ rồi
+> cộng tay. Nay là tab thứ ba của Sổ thu học phí: từng GV · buổi đã dạy · **chia theo cơ sở** ·
+> trong đó online · vào trễ · chưa ghi nhận xét · tiền công tạm tính (đơn giá từ cấu hình).
+> **Nói thẳng giới hạn ra màn hình:** bản demo chưa nối bảng lương nên màn này TÍNH và ĐỐI CHIẾU,
+> không "chốt" vào đâu cả. Ghi rõ còn hơn dựng một nút "Chốt công" bấm xong không đi đâu - đúng cái
+> lỗi mà màn WOW đã mắc ("duyệt thêm lượt trước khi đặt" mà không có chỗ duyệt).
+> Bất biến: **tổng buổi trong bảng công = tổng buổi đã dạy xong của tháng đó**. Sót một buổi là
+> thiếu tiền của giáo viên; đếm trùng là trả thừa. Bộ kiểm còn nhân đôi đơn giá để chứng minh tiền
+> thật sự đi theo cấu hình.
+>
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
 >
 > **(G) TRỢ THỦ THAO TÁC - anh Luân đặt 28/07, LÀM SAU ĐỢT AUDIT (F):** *"a muốn nghiên cứu trợ thủ
