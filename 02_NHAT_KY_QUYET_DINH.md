@@ -157,7 +157,7 @@
 > lịch trước, và giữ nguyên BƯỚC 0 "thử `git push --dry-run` trước khi làm bất cứ việc gì". MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG.
 > Bộ kiểm hiện tại: node --check 2 file · `_tall` 38 trang 0 lỗi (165 icon) · `_check11` 131 ·
 > `_check12` 37 · `_check13` 174 · `_check14` 101 · `_check15` 37 · **`_check16` 236** · `_checktour` ·
-> `check_logic.py` 132 luật (đúng 4 ca cố ý) · `check_data.py` DAT · **`_checkdata.js` 26 luật / 6206 lượt kiểm - 0 lệch · `_check17.js` 392 tiêu chí**.
+> `check_logic.py` 132 luật (đúng 4 ca cố ý) · `check_data.py` DAT · **`_checkdata.js` 27 luật / 6283 lượt kiểm - 0 lệch · `_check17.js` 392 tiêu chí**.
 >
 > **VIỆC PHẢI LÀM TIẾP - THEO ĐÚNG THỨ TỰ NÀY (Luân chốt 28/07 khuya, rồi về nghỉ):**
 >
@@ -241,6 +241,13 @@
 > `/unexcused/`, nên vừa thêm trạng thái thứ ba là dòng chờ duyệt bị tính oan ngay. Đã thống nhất
 > hết về `/unexcused/`. `_check14` phải ĐẢO một tiêu chí cũ ("báo nghỉ -> tính là CÓ PHÉP") vì đó
 > chính là hành vi sai đang đi sửa.
+>
+> **Gieo 4 đơn CHỜ DUYỆT vào dữ liệu demo** (`fixdata.py` §14ter, 1 đơn cố ý quá hạn duyệt) - màn
+> duyệt mở ra mà rỗng thì không ai biết nó tồn tại, đúng nguyên tắc "hàng chờ quyết định phải SỐNG".
+> Việc gieo này lộ ra **ba luật cũ ngầm giả định "có dòng DL12 = đã điểm danh"**: `check_logic 4a/4b`
+> và `_checkdata E6`. Đã siết cả ba và thêm 4 luật mới canh chính đơn xin nghỉ (4a-bis/ter/quater, E7).
+> Đồng thời lộ một lỗi cũ của §14d: đợt chưa đóng bị rải ngày **trước** hạn của đợt đã đóng nên lịch
+> đi lùi (luật 17e) - đã kẹp ngày đợt chưa đóng phải sau đợt đã đóng.
 >
 > *(mô tả gốc)* HỌC VIÊN XIN NGHỈ - còn hụt, Luân đã hỏi và đồng ý vá. Đã truy vết thật: `hvAbsentSave` ghi
 > DL12 `no_show + excused` kèm `[HV tự báo]` và tạo việc DL23 giao cho `academic_staff`. Học vụ THẤY

@@ -1112,6 +1112,15 @@ _MIX = [-21, -12, -6, -2, 0, 1, 2, 3, 6, 10, 17, 25, 34, 48]   # ngày so với 
 for _i, (_eid, _lst) in enumerate(sorted(_open_by.items())):
     _lst.sort(key=lambda z: int(n(z.get("installment_no"))))
     _first = NOW + datetime.timedelta(days=_MIX[_i % len(_MIX)])
+    # V9.29: chỉ các đợt CHƯA đóng mới bị rải lại ngày; đợt đã đóng giữ nguyên hạn cũ. Nếu ngày rải
+    # rơi vào TRƯỚC hạn của đợt đã đóng thì lịch đi lùi (đợt 2 sớm hơn đợt 1) - luật 17e đỏ.
+    _da_dong = [dt(z.get("due_date")) for z in sched
+                if str(z.get("enrollment_id")) == str(_eid)
+                and z not in _lst and dt(z.get("due_date"))]
+    if _da_dong:
+        _min = max(_da_dong) + datetime.timedelta(days=GAP)
+        if _first < _min:
+            _first = _min
     for _k, _x in enumerate(_lst):
         _d = _first + datetime.timedelta(days=GAP * _k)
         _x["due_date"] = _d.strftime("%d/%m/%Y")
@@ -1133,6 +1142,52 @@ _up = len([x for x in sched if x["status"].startswith("upcoming")])
 log.append("14d. Lịch đóng theo đợt: %d đợt cho %d đơn (quá hạn %d, đến hạn %d, chưa tới hạn %d) "
            "| thêm 4 tham số CH2 | next_payment_due nay suy ra từ đợt chưa đóng gần nhất"
            % (len(sched), len(set(x["enrollment_id"] for x in sched)), _od, _du, _up))
+
+# ═══ 14ter. ĐƠN XIN NGHỈ ĐANG CHỜ DUYỆT (V9.29) ══════════════════════════
+# Màn duyệt xin nghỉ mở ra mà rỗng thì không ai biết nó tồn tại - đúng nguyên tắc
+# "hàng chờ quyết định phải SỐNG" mà hội đồng đã chốt. Gieo vài đơn thật cho các buổi
+# SẮP TỚI (để giáo viên còn kịp chuẩn bị phần bù - đó là lý do tính năng này ra đời).
+_up = [x for x in R("DL11") if dt(x.get("session_date")) and dt(x.get("session_date")) > NOW
+       and code(x.get("session_status")) != "cancelled"]
+_up.sort(key=lambda x: dt(x.get("session_date")))
+_LY = ["Em bị sốt từ tối qua, xin phép nghỉ buổi này ạ.",
+       "Nhà em có việc đột xuất, em xin nghỉ buổi này.",
+       "Em đi công tác tỉnh, hôm đó không kịp về ạ.",
+       "Em bị đau dạ dày phải đi khám, xin phép nghỉ."]
+_att_n = 0
+for _x in R("DL12"):
+    _m = re.search(r"(\d+)$", str(_x.get("attendance_id") or ""))
+    if _m:
+        _att_n = max(_att_n, int(_m.group(1)))
+_made_abs = 0
+for _i, _s in enumerate(_up[:4]):
+    _obs = [o for o in R("DL08") if str(o.get("class_id")) == str(_s.get("class_id"))
+            and str(o.get("student_id") or "").strip()]
+    if not _obs:
+        continue
+    _o = _obs[_i % len(_obs)]
+    _sid = str(_o["student_id"])
+    if any(str(a.get("session_id")) == str(_s.get("session_id")) and str(a.get("student_id")) == _sid
+           for a in R("DL12")):
+        continue
+    _stu = IDX["DL09"].get(_sid) or {}
+    _att_n += 1
+    _bao = NOW - datetime.timedelta(hours=[2, 9, 26, 5][_i % 4])   # một đơn cố ý để quá hạn duyệt
+    R("DL12").append({
+        "attendance_id": "AT-%04d" % _att_n, "session_id": _s.get("session_id"),
+        "student_id": _sid, "student_name": _stu.get("full_name", ""),
+        "attendance_status": "no_show (Vắng)", "absence_type": "pending_review (Chờ duyệt)",
+        "check_in_time": "", "in_class_performance": "",
+        "note": "[HV tự báo] %s: %s" % (fmt(_bao), _LY[_i % len(_LY)]),
+        "next_action": "",
+        "absence_reported_at": fmt(_bao),
+        "absence_want_makeup": "Có" if _i % 2 == 0 else "",
+        "absence_reviewed_by": "", "absence_reviewed_at": "", "absence_review_note": "",
+        "makeup_session_id": "", "makeup_status": "",
+    })
+    _made_abs += 1
+log.append("14ter. Xin nghỉ: gieo %d đơn đang CHỜ DUYỆT cho các buổi sắp tới (1 đơn cố ý quá hạn duyệt)"
+           % _made_abs)
 
 # ═══ 15. SAN PHẲNG SƠ ĐỒ CỘT (UNION KEY) - PHẢI LÀ PASS CUỐI CÙNG ═════════
 # Cột chỉ có mặt ở vài dòng (referrer_name, referral_uses, net_received...) làm app render

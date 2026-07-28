@@ -120,9 +120,24 @@ jAll().forEach(function(J){
     var ses=rows("DL11").filter(function(s){return s[C.sClass]===O[C.oClass]});
     chk("E5 lop dang hoc phai co buoi hoc", ses.length>0, nm+" -> "+O[C.oClass]);
     var done=ses.filter(function(s){return isc(s[C.sStatus],"completed")});
-    var att=rows("DL12").filter(function(a){return a[C.aStu]===sid&&ses.some(function(s){return s.session_id===a[C.aSess]})});
+    /* Don xin nghi cho buoi CHUA day khong phai la diem danh - no ton tai TRUOC buoi hoc dung
+       nghiep vu (bao truoc de giao vien chuan bi phan bu). Chi dem diem danh THAT. */
+    var att=rows("DL12").filter(function(a){
+     if(a[C.aStu]!==sid)return false;
+     var s1=ses.filter(function(s){return s.session_id===a[C.aSess]})[0];
+     if(!s1)return false;
+     if(!isc(s1[C.sStatus],"completed"))return false;
+     return true});
     chk("E6 so dong diem danh khong vuot so buoi da day",
      att.length<=done.length, nm+" ("+att.length+" diem danh / "+done.length+" buoi da day)");
+    var donSom=rows("DL12").filter(function(a){
+     if(a[C.aStu]!==sid)return false;
+     var s1=ses.filter(function(s){return s.session_id===a[C.aSess]})[0];
+     if(!s1||isc(s1[C.sStatus],"completed"))return false;
+     return true});
+    chk("E7 dong diem danh cho buoi CHUA day phai la don xin nghi",
+     donSom.every(function(a){return ecode(a.absence_type)==="pending_review"||/^\[HV tự báo\]/.test(String(a.note||""))}),
+     nm);
    }}}
 });
 

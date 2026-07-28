@@ -45,7 +45,7 @@ Bộ kiểm gồm **5 phần, phải xanh HẾT mới được giao**:
 | `ITTS_OUT=<out> node _check14.js` | `CHECK14 OK: 101 tieu chi` - cổng học viên hai chiều |
 | `ITTS_OUT=<out> node _check15.js` | `CHECK15 OK: 37 tieu chi` - **kiểm kê cửa ghi + bất biến nghiệp vụ** |
 | `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 270 tieu chi` - học phí theo đợt + toàn bộ vá V9.27 |
-| `ITTS_OUT=<out> node _checkdata.js` | `CHECKDATA OK: 26 luat ... 0 cho lech` - **dữ liệu demo có khớp ga nghiệp vụ không** |
+| `ITTS_OUT=<out> node _checkdata.js` | `CHECKDATA OK: 27 luat ... 0 cho lech` - **dữ liệu demo có khớp ga nghiệp vụ không** |
 | `ITTS_OUT=<out> node _check17.js` | `CHECK17 OK: 392 tieu chi` - **bộ máy lọc chuyên sâu** (kết hợp trục, lưu theo người) |
 | `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` |
 | `python3 check_logic.py` | `TONG BAN GHI LOI: 4` (đúng 4 ca là việc quá hạn CỐ Ý để demo cảnh báo đỏ - xem luật 10k) |
@@ -195,3 +195,11 @@ Ba hàm lõi, mọi cửa đều đi qua đúng ba hàm này (đã khai vào `KH
 **Định nghĩa "vắng không phép" đã được thống nhất.** Trước đây `stuAttStats` viết `!== "excused"`
 còn ba chỗ khác dùng `/unexcused/` - thêm trạng thái thứ ba là dòng chờ duyệt bị tính oan ngay.
 Nay tất cả đều là `/unexcused/`.
+
+**Đơn xin nghỉ KHÔNG phải điểm danh.** Dòng DL12 của một đơn xin nghỉ tồn tại **trước** buổi học -
+đó là điều đúng nghiệp vụ (báo trước để giáo viên chuẩn bị phần bù). Ba luật từng ngầm giả định
+"có dòng DL12 = đã điểm danh" và đều phải siết lại khi làm việc (C):
+`check_logic 4a/4b` (điểm danh cho buổi tương lai / buổi chưa dạy) và `_checkdata E6`
+(số dòng điểm danh vượt số buổi đã dạy). Kèm theo là 4 luật mới canh chính đơn xin nghỉ:
+`4a-bis` (thiếu giờ HV báo) · `4a-ter` (chờ duyệt mà không ghi là vắng) ·
+`4a-quater` (chưa duyệt mà đã có người/giờ duyệt) · `E7` (dòng cho buổi chưa dạy phải là đơn xin nghỉ).

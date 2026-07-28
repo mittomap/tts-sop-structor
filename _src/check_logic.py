@@ -169,13 +169,29 @@ t3 = [s(x,"session_id") for x in R("DL11") if (dt(x.get("session_date")) or NOW)
 rep("NANG", "3i Buoi hoc NGAY TUONG LAI nhung trang thai 'Da hoan thanh'", t3)
 
 # ══ 4. DIEM DANH ═════════════════════════════════════════════════════════
+# V9.29: DON XIN NGHI khong phai la diem danh. Hoc vien bao nghi TRUOC buoi hoc la dung nghiep vu
+# (bao truoc de giao vien chuan bi phan bu), nen dong "cho duyet" / "[HV tu bao]" duoc mien 4a-4b.
+# Truoc day luat nay ngam gia dinh "co dong DL12 = da diem danh" - gia dinh do khong con dung.
+def _la_don_xin_nghi(a):
+    return code(a.get("absence_type")) == "pending_review" or str(a.get("note") or "").startswith("[HV tự báo]")
+
 fut = [ "%s(%s %s)" % (s(a,"attendance_id"), s(a,"session_id"), s(SES.get(s(a,"session_id"),{}),"session_date"))
-        for a in R("DL12") if SES.get(s(a,"session_id"))
+        for a in R("DL12") if SES.get(s(a,"session_id")) and not _la_don_xin_nghi(a)
         and (dt(SES[s(a,"session_id")].get("session_date")) or NOW) > NOW]
 rep("NANG", "4a Diem danh cho buoi CHUA dien ra (ngay tuong lai)", fut)
-notdone = [s(a,"attendance_id") for a in R("DL12") if SES.get(s(a,"session_id"))
+notdone = [s(a,"attendance_id") for a in R("DL12") if SES.get(s(a,"session_id")) and not _la_don_xin_nghi(a)
            and code(SES[s(a,"session_id")].get("session_status")) in ("scheduled","cancelled")]
 rep("NANG", "4b Diem danh cho buoi trang thai 'Da len lich'/'Da huy'", notdone)
+# ...nhung don xin nghi thi phai co dung bo dau vet, khong duoc de trong
+_don = [s(a,"attendance_id") for a in R("DL12") if _la_don_xin_nghi(a)
+        and not str(a.get("absence_reported_at") or "").strip()]
+rep("NANG", "4a-bis Don xin nghi khong ghi gio hoc vien bao", _don)
+_don2 = [s(a,"attendance_id") for a in R("DL12") if code(a.get("absence_type")) == "pending_review"
+         and code(a.get("attendance_status")) != "no_show"]
+rep("NANG", "4a-ter Don cho duyet ma khong ghi la vang", _don2)
+_don3 = [s(a,"attendance_id") for a in R("DL12") if code(a.get("absence_type")) == "pending_review"
+         and (str(a.get("absence_reviewed_by") or "").strip() or str(a.get("absence_reviewed_at") or "").strip())]
+rep("NANG", "4a-quater Don CHUA duyet ma da co nguoi/gio duyet", _don3)
 # 4c. check_in_time lech ngay buoi hoc
 off = [s(a,"attendance_id") for a in R("DL12") if dt(a.get("check_in_time")) and SES.get(s(a,"session_id"))
        and dt(SES[s(a,"session_id")].get("session_date"))
