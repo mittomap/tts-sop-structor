@@ -891,6 +891,16 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    "Đã chuyển đổi - đã thành HV" hiện thành "...đã thành H" và mũi tên đè lên chữ. Nhãn enum phải
    đọc được NGUYÊN VĂN theo CH1, cắt chữ là đọc sai nghiệp vụ. Nay ô nở theo nhãn dài nhất, chừa
    chỗ cho mũi tên; màn hình thật hẹp mới cắt lại. */
+.tth{background:linear-gradient(180deg,#FFFBEB,#FFF);border:1px solid #F0D08A;border-left:3px solid var(--amber);border-radius:11px;padding:11px 14px;margin-bottom:14px}
+.tth .tthh{display:flex;align-items:center;gap:7px;font-size:12px;color:#8A5A0B;margin-bottom:7px}
+.tth .tthh i{font-size:15px}
+.tth .tthx{margin-left:auto;font-size:11px;color:var(--muted);cursor:pointer;border-bottom:1px dashed var(--line)}
+.tth .tthx:hover{color:var(--blue);border-color:var(--blue)}
+.tth .tthb{display:flex;flex-direction:column;gap:6px}
+.tth .tthr{display:flex;gap:10px;font-size:12px;line-height:1.55;align-items:flex-start}
+.tth .tthk{flex:0 0 auto;white-space:nowrap;color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.3px;padding-top:1px}
+@media(max-width:560px){.tth .tthr{flex-direction:column;gap:2px}.tth .tthk{white-space:normal}}
+.tbtn.on{background:#FFF4D6;border-color:#F0D08A;color:#8A5A0B}
 .qsel{border:1px solid var(--line);border-radius:16px;padding:3px 22px 3px 9px;font-family:inherit;font-size:10.5px;font-weight:700;background:#fff;color:#5A6675;cursor:pointer;max-width:none;white-space:nowrap}
 @media(max-width:820px){.qsel{max-width:150px;padding-right:18px}}
 .qsel.red{color:#A32D2D;border-color:#F0B4B4;background:var(--redb)}
@@ -1228,6 +1238,7 @@ body.drsz .drawer{transition:none}
       <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div style="min-width:0"><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px;margin-left:auto"><span class="chip blue roomChip" id="demoBadge">Room demo</span><button class="btn sm" onclick="tourMenu()" title="Chạy hướng dẫn từng bước - chọn cấp độ rồi app chỉ tận nơi"><i class="ti ti-school"></i>Chạy hướng dẫn</button><button class="btn sm" onclick="demoReset()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ và mọi máy trong room cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
       <div class="rolesel">
 <!-- V9.29: bỏ ô chọn vai roleSel - luôn bị ẩn từ V9.9, giữ lại chỉ tổ rối -->
+        <button class="tbtn" id="tthBtn" onclick="tthToggle()" aria-label="Bật/tắt Trợ thủ thao tác" data-tip="Trợ thủ thao tác - nhắc việc ngay trên từng trang"><i class="ti ti-bulb"></i></button>
         <button class="tbtn" data-tour="help" onclick="tourMenu()" aria-label="Hướng dẫn sử dụng" title="Hướng dẫn từng bước"><i class="ti ti-help-circle"></i></button>
         <button class="tbtn" data-tour="bell" onclick="toggleBell(event)" aria-label="Thông báo"><i class="ti ti-bell"></i><span class="n" id="bellN" style="display:none">0</span></button>
         <div class="notif" id="notif"></div>
@@ -11110,8 +11121,10 @@ function dashJump(key){var m={urgent:"viec",newlead:"nhaplead",consider:"viec",c
 /* ---------- router ---------- */
 function reRender(k){var el=document.getElementById("content");
  if(!el||!RENDER[k]){if(typeof hvReRender==="function")hvReRender();return}   /* cổng học viên: chỉ vẽ lại thân trang */
- var p=PBK[k];var sc=el.scrollTop;el.innerHTML=(p&&p.ty==="list")?renderList(k):RENDER[k]();el.scrollTop=sc;updateBellBadge();persistSoon()}
-function reRenderKeep(k){var el=document.getElementById("content");var sc=el.scrollTop;var p=PBK[k];el.innerHTML=(p&&p.ty==="list")?renderList(k):RENDER[k]();el.scrollTop=sc;var i=el.querySelector(".srch input");if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}persistSoon()}
+ var p=PBK[k];var sc=el.scrollTop;var _t="";try{_t=tthHTML(k)}catch(e){}
+ el.innerHTML=_t+((p&&p.ty==="list")?renderList(k):RENDER[k]());el.scrollTop=sc;updateBellBadge();persistSoon()}
+function reRenderKeep(k){var el=document.getElementById("content");var sc=el.scrollTop;var p=PBK[k];var _t="";try{_t=tthHTML(k)}catch(e){}
+ el.innerHTML=_t+((p&&p.ty==="list")?renderList(k):RENDER[k]());el.scrollTop=sc;var i=el.querySelector(".srch input");if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}persistSoon()}
 function toggleNav(){var s=document.getElementById("sidebar"),m=document.getElementById("navmask");if(!s)return;var open=s.classList.toggle("open");if(m)m.classList.toggle("on",open)}
 function closeNav(){var s=document.getElementById("sidebar"),m=document.getElementById("navmask");if(s)s.classList.remove("open");if(m)m.classList.remove("on")}
 function bellItems(){var rs=SCOPE();var items=slaItems();
@@ -11156,6 +11169,76 @@ function crumbLabel(key,ctx){ctx=ctx||{};var p=PBK[key];var t=p?p.t:key;
 /* V9.19 - BREADCRUMB = VỆT ĐƯỜNG ĐI THẬT (Luân: "làm lại breadcrumb để phục vụ back trang").
    [←] Trang bắt đầu › ... › Trang trước › **Trang hiện tại** - mỗi mốc BẤM ĐƯỢC để nhảy thẳng về đó
    (navJump cắt vệt tại điểm nhảy). Vệt dài quá 4 mốc thì rút gọn bằng "..." (bấm về mốc đầu). */
+/* ═══════ V9.29w - TRỢ THỦ THAO TÁC (anh Luân đặt 28/07) ═══════
+   "nó tương tự với hướng dẫn tooltip, nhưng nó THỰC CHIẾN, nó cầm tay chỉ việc cho 1 vị trí nào đó,
+    nếu họ đã quen thì trên navbar họ tắt Trợ thủ là xong".
+
+   KHÁC HƯỚNG DẪN (tour) Ở CHỖ NÀO - phải nói rõ, không thì thành hai thứ trùng nhau:
+     · tour  = ĐI MỘT VÒNG CHO BIẾT, chạy trên dữ liệu nào cũng nói y hệt nhau;
+     · trợ thủ = ĐỨNG CẠNH TRONG LÚC LÀM VIỆC THẬT, nói về CHÍNH việc đang tồn của CHÍNH người này
+       ở CHÍNH trang này, và bấm được để làm luôn.
+
+   LUẬT CỨNG KHI LÀM: KHÔNG khai lại việc lần thứ hai. Trợ thủ ĐỌC hai bộ máy đã có -
+   `slaItems()` (việc quá hạn/sắp hạn theo luật SLA) và `PBK[k].c` (trang này để làm gì) - rồi lọc
+   theo trang đang mở và theo phạm vi chuông của chức danh. Khai riêng một bảng "trang này nên làm
+   gì" là ngày mai nó nói khác cái chuông. */
+function tthKey(){var me="";try{me=tkMeId()||CURSTAFF||""}catch(e){me=CURSTAFF||""}
+ return "ITTS_TROTHU_"+(me||"guest")}
+function tthOn(){try{var v=localStorage.getItem(tthKey());return v===null?true:v==="1"}catch(e){return true}}
+function tthToggle(){try{localStorage.setItem(tthKey(),tthOn()?"0":"1")}catch(e){}
+ tthBtn();reRender(CUR);toast(tthOn()?"Đã bật Trợ thủ - app sẽ nhắc việc ngay trên từng trang.":"Đã tắt Trợ thủ. Bật lại ở nút trên thanh tiêu đề.")}
+function tthBtn(){var b=document.getElementById("tthBtn");if(!b)return;
+ var on=tthOn();
+ b.className="tbtn"+(on?" on":"");
+ b.setAttribute("aria-label",on?"Tắt Trợ thủ thao tác":"Bật Trợ thủ thao tác");
+ b.setAttribute("data-tip",on?"Trợ thủ đang BẬT - nhắc việc ngay trên từng trang. Bấm để tắt.":"Trợ thủ đang TẮT. Bấm để bật lại.");
+ b.innerHTML='<i class="ti '+(on?"ti-bulb":"ti-bulb")+'"></i>'}
+/* Việc của TRANG NÀY, của CHÍNH người đang đăng nhập - lấy thẳng từ slaItems, không khai lại. */
+function tthItems(key){
+ var rs=SCOPE(),items=[];
+ try{items=slaItems()}catch(e){return []}
+ if(Array.isArray(rs.bell))items=items.filter(function(x){return rs.bell.indexOf(x.cat)>=0});
+ /* Ba trang TỔNG HỢP (Trang bắt đầu / Việc hôm nay / Bản đồ chặng) không có hàng chờ riêng - chúng
+    LÀ chỗ gom việc. Ở đó trợ thủ nói về toàn bộ việc đang tồn, không lọc theo trang. */
+ if(["banlam","viec","chang","chay","hanhtrinh"].indexOf(key)>=0)return items;
+ /* trang gộp: việc khai page="nhaplead" vẫn thuộc hub Tuyển sinh đang mở */
+ var own=navOwner(key)||key;
+ return items.filter(function(x){
+  if(!x.page)return false;
+  return x.page===key||navOwner(x.page)===own})}
+/* Trang này có luật SLA nào trỏ tới không? Không có thì câu "không còn việc nào" là NÓI LÁO -
+   phải nói đúng: trang này không gắn hàng chờ. */
+function tthHasRule(key){
+ var own=navOwner(key)||key;
+ try{return slaItems().some(function(x){return x.page&&(x.page===key||navOwner(x.page)===own)})}catch(e){return false}}
+function tthHTML(key){
+ if(!tthOn())return "";
+ var p=PBK[key]||{};
+ var L=tthItems(key);
+ var red=L.filter(function(x){return x.sev==="red"});
+ var top=(red[0]||L[0]);
+ var who="";try{who=(SCOPE().name||"")}catch(e){}
+ var h='<div class="tth"><div class="tthh"><i class="ti ti-bulb"></i><b>Trợ thủ</b>'+
+  '<span class="tthx" onclick="tthToggle()" data-tip="Tắt Trợ thủ - bật lại ở nút bóng đèn trên thanh tiêu đề">Tôi quen rồi, tắt đi</span></div>';
+ h+='<div class="tthb"><div class="tthr"><span class="tthk">Trang này để làm gì</span><span>'+esc(p.c||p.t||"")+'</span></div>';
+ if(!L.length){
+  h+='<div class="tthr"><span class="tthk">Việc của bạn ở đây</span><span>'+
+   (tthHasRule(key)
+    ?'<b style="color:var(--green)">Không còn việc nào đang chờ.</b> Trang này đang sạch - bạn có thể sang việc khác.'
+    :'Trang này không gắn hàng chờ riêng - vào đây để tra cứu / nhập liệu. Việc cần làm của bạn nằm ở <b>Trang bắt đầu</b> và cái chuông.')+'</span></div>';
+ }else{
+  h+='<div class="tthr"><span class="tthk">Việc của bạn ở đây</span><span><b>'+L.length+' việc</b>'+
+   (red.length?(' · <b style="color:var(--red)">'+red.length+' quá hạn</b>'):' · còn trong hạn')+'</span></div>';
+  if(top){
+   var btn=top.act?('<button class="btn sm primary" onclick="slaAct(\''+esc(top.act)+'\',\''+esc(String(top.rid||""))+'\')"><i class="ti ti-tool"></i>Làm ngay</button>')
+    :(top.lead?('<button class="btn sm primary" onclick="leadDetail(\''+esc(String(top.lead))+'\')"><i class="ti ti-player-play"></i>Xử lý</button>')
+    :(top.hoso?('<button class="btn sm" onclick="openQuick(\''+esc(String(top.hoso))+'\')"><i class="ti ti-eye"></i>Xem nhanh</button>'):''));
+   h+='<div class="tthr"><span class="tthk">Làm cái này trước</span><span><b>'+esc(top.what||top.grp||"")+'</b>'+
+    (top.who?(' <span class="mut">· '+esc(top.who)+'</span>'):'')+
+    (top.prm?(' <span class="mut">· ngưỡng '+slaChip(top.prm,"")+'</span>'):'')+
+    (btn?('<div style="margin-top:6px">'+btn+'</div>'):'')+'</span></div>'}
+ }
+ return h+'</div></div>'}
 function renderCrumb(){var host=document.getElementById("pgCrumb");if(!host)return;
  var p=PBK[CUR]||{};var h=window.NAVHIST||[];var out="";
  if(h.length){var prev=h[h.length-1];
@@ -11270,7 +11353,10 @@ function go(key,noHist){
  buildNav();
  document.getElementById("pgTitle").textContent=p.t;
  var el=document.getElementById("content");
- if(p.ty==="list")el.innerHTML=renderList(key);else el.innerHTML=RENDER[key]();
+ /* V9.29w: Trợ thủ đứng NGAY TRÊN nội dung trang - nhắc việc rồi mới tới việc, không phải cuộn
+    xuống đáy mới thấy (đúng bài học "KPI của tôi rơi xuống đáy" anh Luân bắt ở V9.29). */
+ var _tth="";try{_tth=tthHTML(key)}catch(e){}
+ if(p.ty==="list")el.innerHTML=_tth+renderList(key);else el.innerHTML=_tth+RENDER[key]();
  if(!canSee(key)&&!SENSITIVE[key]&&SCOPE().pages!=="*")el.innerHTML='<div class="notebar" style="margin-bottom:12px"><i class="ti ti-info-circle"></i>Trang ngoài phạm vi chức danh của bạn - đang xem ở chế độ THAM KHẢO.</div>'+el.innerHTML;
  window.CURCTX=navSnap();   /* ngữ cảnh của TRANG NÀY, chụp sau khi đã render (dùng khi rời trang) */
  renderCrumb();
@@ -11465,7 +11551,7 @@ function setRole(k){CURROLE=k;var r=RBK[k];
  document.getElementById("meName").textContent=(st.staff_id==="ADMIN")?"Admin":(st.staff_id+" - "+st.full_name);
  document.getElementById("meRole").textContent=(st.staff_id==="ADMIN")?"Quản trị viên · toàn quyền":(window.GATE_SID?(elabel(st.role)||r.name):r.name);
  document.getElementById("meAv").textContent=(st.full_name||"?").trim().slice(-1).toUpperCase()==""?"?":(st.full_name.trim().split(" ").pop()[0]||"?");
- buildNav();go(SCOPE().land||"banlam")}
+ buildNav();try{tthBtn()}catch(e){}go(SCOPE().land||"banlam")}
 function toast(m,ms,kind){var t=document.getElementById("toast");t.textContent=m;
  if(kind==="err"){t.classList.add("err");if(!ms)ms=6000}else t.classList.remove("err");
  t.classList.add("show");clearTimeout(window._tt);window._tt=setTimeout(function(){t.classList.remove("show");t.classList.remove("err")},ms||1900)}

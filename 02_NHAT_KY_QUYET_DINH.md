@@ -646,6 +646,25 @@
 > `n` - phải bỏ chuỗi ký tự trước khi soi; (b) hỏi "tham số này có ô sửa không" mà bỏ qua bảng tên
 > thay thế `PKEY` thì báo thiếu oan 10 tham số.
 >
+> **(12) TRỢ THỦ THAO TÁC - XONG (anh Luân đặt tối 28/07).** *"tương tự hướng dẫn tooltip nhưng
+> THỰC CHIẾN, cầm tay chỉ việc cho 1 vị trí nào đó, quen rồi thì tắt Trợ thủ trên navbar là xong."*
+> **Khác hướng dẫn (tour) ở chỗ nào - phải nói rõ, không thì thành hai thứ trùng nhau:** tour là
+> *đi một vòng cho biết*, chạy trên dữ liệu nào cũng nói y hệt; trợ thủ là *đứng cạnh trong lúc làm
+> việc thật*, nói về CHÍNH việc đang tồn của CHÍNH người này ở CHÍNH trang này, và **bấm được để làm
+> luôn**.
+> **Luật cứng khi làm:** KHÔNG khai lại việc lần thứ hai. Trợ thủ **đọc `slaItems()`** (bộ máy đã
+> có) lọc theo trang đang mở + phạm vi chuông của chức danh, và đọc `PBK[k].c` cho câu "trang này để
+> làm gì". Khai riêng một bảng "trang này nên làm gì" là ngày mai nó nói khác cái chuông.
+> Ba khối: *trang này để làm gì* · *việc của bạn ở đây (N việc, M quá hạn)* · *làm cái này trước* +
+> nút Làm ngay. Công tắc bóng đèn trên thanh tiêu đề, nhớ **theo từng người** (`ITTS_TROTHU_<mã NV>`),
+> và có sẵn lối tắt "Tôi quen rồi, tắt đi" ngay trong khung.
+> **Chỗ dễ nói láo nhất đã chặn:** trang tra cứu / nhập liệu không gắn luật SLA nào thì KHÔNG được
+> bảo *"không còn việc nào - trang này đang sạch"* (nghe như đã kiểm tra xong), phải nói đúng *"trang
+> này không gắn hàng chờ riêng"*. Ba trang tổng hợp (Trang bắt đầu / Việc hôm nay / Bản đồ chặng)
+> thì ngược lại - chúng LÀ chỗ gom việc nên trợ thủ nói về toàn bộ việc đang tồn.
+> Bộ kiểm canh: đổi chức danh thì nội dung trợ thủ phải đổi theo (nếu không thì nó chỉ là chữ trang
+> trí), tắt là biến mất sạch, và việc gấp nhất phải bấm được ngay.
+>
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
 >
 > **(G) TRỢ THỦ THAO TÁC - anh Luân đặt 28/07, LÀM SAU ĐỢT AUDIT (F):** *"a muốn nghiên cứu trợ thủ

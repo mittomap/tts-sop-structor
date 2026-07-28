@@ -242,4 +242,39 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
  t("cổng học viên không để lọt HTML thô"+(tho.length?(" - "+tho.length+" hồ sơ, vd "+tho[0]):""), tho.length===0);
 })();
 
+
+/* ---------- 14. TRỢ THỦ THAO TÁC (anh Luân đặt) ---------- */
+(function(){
+ setRole("all");
+ t("có trợ thủ + công tắc trên thanh tiêu đề", typeof tthHTML==="function"&&typeof tthToggle==="function"&&/id="tthBtn"/.test(fs.readFileSync(OUT+'/ITTs_WebApp_v5_demo.html','utf8')));
+ t("mặc định BẬT", tthOn()===true);
+ /* LUẬT CỨNG: trợ thủ ĐỌC slaItems, KHÔNG khai lại việc lần thứ hai */
+ var SRCn=SRC0.replace(/\/\*[\s\S]*?\*\//g,"");
+ var i=SRCn.indexOf("function tthItems(");var body=SRCn.slice(i,i+700);
+ t("trợ thủ đọc slaItems chứ không tự khai việc", /slaItems\(\)/.test(body));
+ /* tắt là biến mất sạch, không để lại khoảng trống */
+ var was=tthOn();
+ if(was)tthToggle();
+ t("tắt thì không vẽ gì cả", tthHTML("banlam")==="");
+ tthToggle();
+ t("bật lại thì có", tthHTML("banlam").length>200);
+ if(!was)tthToggle();
+ /* KHÔNG ĐƯỢC NÓI LÁO: trang không gắn hàng chờ thì không được bảo "đã sạch" */
+ t("trang tra cứu không bị bảo là 'đã sạch'", /không gắn hàng chờ riêng/.test(tthHTML("hocvien")));
+ t("trang có hàng chờ thì đếm việc thật", /việc<\/b>/.test(tthHTML("buoihoc")));
+ /* nói đúng việc của ĐÚNG người: đổi chức danh là đổi nội dung */
+ (function(){
+  var gv=rows("DL01").filter(isGVRole)[0];
+  var ac=rows("DL01").filter(function(x){return /account/.test(ecode(x.role))})[0];
+  function nhu(sid){window.GATE_SID=sid;applyScope(sid);setRole("all")}
+  nhu(gv.staff_id);var a=tthHTML(SCOPE().land||"banlam");
+  nhu(ac.staff_id);var b=tthHTML(SCOPE().land||"banlam");
+  window.GATE_SID="";applyScope("");setRole("all");
+  t("hai chức danh khác nhau thì trợ thủ nói khác nhau", a!==b&&a.length>200&&b.length>200)})();
+ /* việc gấp nhất phải BẤM ĐƯỢC ngay, không chỉ đọc */
+ t("việc gấp nhất có nút làm ngay", /slaAct\(|leadDetail\(|openQuick\(/.test(tthHTML("buoihoc")));
+ /* trợ thủ đứng TRÊN nội dung trang, không rơi xuống đáy */
+ t("trợ thủ chèn trước nội dung trang", /_tth\+renderList\(key\)/.test(SRCn)||/_tth\+RENDER\[key\]\(\)/.test(SRCn));
+})();
+
 console.log(bad.length?("CHECK18 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK18 OK: "+ok+" tieu chi | da ve "+VIEWS.length+" trang/tab");
