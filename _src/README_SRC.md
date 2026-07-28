@@ -44,7 +44,7 @@ Bộ kiểm gồm **5 phần, phải xanh HẾT mới được giao**:
 | `ITTS_OUT=<out> node _check13.js` | `CHECK13 OK: 174 tieu chi` - KPI biết nói |
 | `ITTS_OUT=<out> node _check14.js` | `CHECK14 OK: 111 tieu chi` - cổng học viên hai chiều |
 | `ITTS_OUT=<out> node _check15.js` | `CHECK15 OK: 37 tieu chi` - **kiểm kê cửa ghi + bất biến nghiệp vụ** |
-| `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 496 tieu chi` - học phí theo đợt + vá V9.27 + bấm-tên-ra-drawer + địa chỉ từng trang |
+| `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 519 tieu chi` - học phí theo đợt + vá V9.27 + bấm-tên-ra-drawer + địa chỉ từng trang |
 | `ITTS_OUT=<out> node _checkdata.js` | `CHECKDATA OK: 27 luat ... 0 cho lech` - **dữ liệu demo có khớp ga nghiệp vụ không** |
 | `ITTS_OUT=<out> node _check17.js` | `CHECK17 OK: 392 tieu chi` - **bộ máy lọc chuyên sâu** (kết hợp trục, lưu theo người) |
 | `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` |

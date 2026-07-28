@@ -3054,6 +3054,7 @@ function renderDuyet(){var TH=ckThreshold();
  var segs=scopeTabs("duyet",TB.map(function(x){return [x.k,x.t,x.n||"",x.n?"amber":""]}));
  if(!segs.length)return h+'<div class="panel"><div class="empty">Chức danh của bạn không có hàng chờ quyết định nào.</div></div>';
  if(!segs.some(function(t){return t[0]===tab})){tab=segs[0][0];window.DUYTAB=tab}
+ h+=statStrip(TB.map(function(x){return [x.ic,x.n,x.t,x.n?"#E08A1E":"#16A34A",x.n?"đang chờ quyết định":"đã sạch","duyTabSet('"+x.k+"')"]}).slice(0,5));
  h+=tbar(segHTML(tab,segs,"duyTabSet('{k}')"),"");
  if(tab==="duyetnghi")return h+duyNghiHTML();
  if(tab==="duyetthu")return h+duyThuHTML();
@@ -4913,10 +4914,10 @@ function renderReview(embed){var p="review",fil=fget(p);
  var h=embed?'':pageHead("Gửi khảo sát theo lớp","Mỗi đợt gửi một phiếu cho từng HV của lớp - theo dõi lớp nào chưa gửi, lớp nào trả lời kém, ai cần follow-up.",
   '<button class="btn primary" onclick="rvForm()"><i class="ti ti-send"></i>Gửi đợt mới cho một lớp</button>');
  h+=statStrip([
-  ["ti-school",nNone,"Lớp chưa gửi đợt nào","#E24B4A","cần gửi ngay"],
+  ["ti-school",nNone,"Lớp chưa gửi đợt nào","#E24B4A","cần gửi ngay","fset('review','none');reRender(CUR)"],
   ["ti-clipboard-text",waiting,"Phiếu chờ trả lời","#E08A1E","nhắc HV nộp"],
-  ["ti-target",nLow,"Lớp trả lời dưới ngưỡng","#7C3AED","SRR ≥ "+kpiChip(/^SRR/,0.6,1)],
-  ["ti-alert-triangle",nFu,"Phiếu cần follow-up","#DB2777","hài lòng thấp"]]);
+  ["ti-target",nLow,"Lớp trả lời dưới ngưỡng","#7C3AED","SRR ≥ "+kpiChip(/^SRR/,0.6,1),"fset('review','low');reRender(CUR)"],
+  ["ti-alert-triangle",nFu,"Phiếu cần follow-up","#DB2777","hài lòng thấp","fset('review','fu');reRender(CUR)"]]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả lớp",all.length],["none","Chưa gửi đợt nào",nNone,"red"],["low","Trả lời kém",nLow,"amber"],["fu","Có phiếu cần follow-up",nFu?nFu:"","amber"]],view.length);
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>HV</th><th>Đã gửi</th><th>Đã trả lời</th><th>Tỷ lệ (SRR)</th><th>Hài lòng TB</th><th>Cần follow-up</th><th>Đợt gần nhất</th><th>Thao tác</th></tr></thead><tbody>';
@@ -4988,9 +4989,9 @@ function renderGhinhan(embed){var p="ghinhan",fil=fget(p);
  var h=embed?'':pageHead("Tiếp nhận & xử lý phản hồi","Phản hồi nhận qua gọi / nhắn / gặp trực tiếp - ghi lại ngay để không bỏ sót, phân loại trong "+lim+"h, tiêu cực thì chuyển thành khiếu nại.",
   '<button class="btn primary" onclick="ghForm()"><i class="ti ti-message-plus"></i>Ghi nhận phản hồi mới</button>');
  h+=statStrip([
-  ["ti-inbox",nNew,"Chờ phân loại","#E08A1E","SLA "+lim+"h"],
-  ["ti-alert-triangle",nOver,"Quá hạn phân loại","#E24B4A","vi phạm FTR"],
-  ["ti-message-circle",nNeg,"Tiêu cực chưa xử lý","#DB2777","cân nhắc lên khiếu nại"],
+  ["ti-inbox",nNew,"Chờ phân loại","#E08A1E","SLA "+lim+"h","fset('ghinhan','new');reRender(CUR)"],
+  ["ti-alert-triangle",nOver,"Quá hạn phân loại","#E24B4A","vi phạm FTR","fset('ghinhan','over');reRender(CUR)"],
+  ["ti-message-circle",nNeg,"Tiêu cực chưa xử lý","#DB2777","cân nhắc lên khiếu nại","fset('ghinhan','neg');reRender(CUR)"],
   ["ti-checks",fb.length-nOpen,"Đã xử lý xong","#16A34A","tổng "+fb.length+" phản hồi"]]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả",fb.length],["new","Chờ phân loại",nNew,"amber"],["over","Quá hạn",nOver,"red"],["neg","Tiêu cực chưa xử lý",nNeg,"red"],["open","Chưa đóng",nOpen]],view.length);
@@ -5333,6 +5334,17 @@ function renderGiaoan(){var tab=window.GATAB||"ga";
  var h=pageHead("Kho bài tập & Giáo án khóa",
   "Đặt sẵn cho TỪNG BUỔI của mỗi khóa: bài tập về nhà + lời dặn dò. Mọi lớp thuộc khóa đó tự áp dụng; giáo viên vẫn đổi riêng được ở Bảng lớp.",
   tab==="kho"?'<button class="btn primary" onclick="hwbForm()"><i class="ti ti-plus"></i>Thêm bài vào kho</button>':'');
+ /* V9.29p (mảng 5): trang này trước đây không có dải số - mở ra không biết kho đang thiếu chỗ nào. */
+ (function(){var pl=rows("DL21"),bank=hwBank();
+  var crs=rows("DL05").filter(function(c){return isc(c.status,"active")});
+  var noPlan=crs.filter(function(c){return !pl.some(function(x){return String(x.course_id||"")===c.course_id})}).length;
+  var noHw=pl.filter(function(x){return !String(x.hw_bank_id||"").trim()}).length;
+  var orphan=bank.filter(function(b){return !pl.some(function(x){return String(x.hw_bank_id||"")===String(b.id||b.hw_bank_id)})}).length;
+  h+=statStrip([
+   ["ti-notes",pl.length,"Buổi đã soạn giáo án","#3B82C4",crs.length+" khóa đang mở"],
+   ["ti-file-alert",noPlan,"Khóa chưa có giáo án nào","#E24B4A",noPlan?"soạn để lớp có bài":"đủ cả"],
+   ["ti-book",bank.length,"Bài trong kho","#0D9488",orphan?(orphan+" bài chưa dùng ở đâu"):"đều đang dùng","window.GATAB='kho';reRender('giaoan')"],
+   ["ti-clipboard-x",noHw,"Buổi chưa gắn bài tập","#E08A1E","học viên không có bài về nhà","window.GATAB='ga';reRender('giaoan')"]])})();
  h+=tbar(segHTML(tab,[["ga","Giáo án theo khóa",rows("DL21").length],["kho","Kho bài tập",hwBank().length]],"window.GATAB='{k}';reRender('giaoan')"),"");
  if(tab==="kho"){
   var q=vnorm(window.HWBQ||"");
@@ -6328,6 +6340,19 @@ function renderBanggiao(embed){
  var orphan=rows("DL02").filter(function(l){return !String(l.assigned_to||"").trim()&&!isc(l.lead_status,"converted","rejected","unreachable")}).length;
  if(orphan)h+='<span class="sep"></span><button class="btn" onclick="bgSplitOrphans()"><i class="ti ti-users"></i>Chia đều '+orphan+' lead chưa có NV</button>';
  h+='</div>';
+ /* V9.29p: dải số cho biết BÀN GIAO CÓ ĐÁNG LÀM KHÔNG - ai đang ôm bao nhiêu, bao nhiêu lead
+    không có ai phụ trách, bao nhiêu lead quá hạn liên hệ. Trước đây phải tự đếm bằng mắt. */
+ (function(){var L=rows("DL02");
+  var live=function(l){return !isc(l.lead_status,"converted","rejected","unreachable")};
+  var mine=L.filter(function(l){return String(l.assigned_to||"")===src&&live(l)});
+  var orph=L.filter(function(l){return !String(l.assigned_to||"").trim()&&live(l)});
+  var due=mine.filter(function(l){var d=pvnd(l.next_followup_time);return d&&d.getTime()<Date.now()});
+  var perBr={};L.forEach(function(l){if(!live(l))return;var st=find("DL01","staff_id",l.assigned_to);if(st&&st.branch)perBr[st.branch]=1});
+  h+=statStrip([
+   ["ti-users",mine.length,"Lead NV này đang ôm","#3B82C4",due.length?(due.length+" quá hẹn liên hệ"):"đúng hẹn"],
+   ["ti-user-off",orph.length,"Lead chưa có ai phụ trách","#E24B4A",orph.length?"chia ngay kẻo nguội":"không còn"],
+   ["ti-building",Object.keys(perBr).length,"Cơ sở đang có lead sống","#7C3AED","bàn giao nên ưu tiên cùng cơ sở"],
+   ["ti-arrows-exchange",staff.length,"Nhân viên tư vấn","#0D9488","nguồn nhận bàn giao"]])})();
  var allLeads=rows("DL02").filter(function(l){return String(l.assigned_to||"")===src});
  var q=vnorm(window.BGQ||"").trim();var stf=window.BGST||"all";
  var stCount={};allLeads.forEach(function(l){var c=ecode(l.lead_status);if(c)stCount[c]=(stCount[c]||0)+1});
@@ -7157,10 +7182,10 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=rows("DL08");
  var h='<div class="phead"><div><div class="t">Xếp lớp & Onboarding</div><div class="s">Từ lúc đóng đủ tiền → xếp lớp → gửi thông tin → HV xác nhận → hoàn tất. Mỗi bước có dấu hoàn thành để tắt cảnh báo</div></div><div class="sp"><button class="btn primary" onclick="openXepMoi()"><i class="ti ti-plus"></i>Xếp lớp học viên</button></div></div>';
  h+=statStrip([
   ["ti-user-plus",wait.length,"Đã thu · chờ xếp lớp",wait.length?"#DB2777":"#16A34A","bước đầu tiên"],
-  ["ti-send",obs.filter(function(o){var s=obState(o);return o.class_id&&!s.sent}).length,"Chờ gửi thông tin lớp","#E08A1E","SLA "+slaChip("slaClassInfoZalo_hours",24)],
-  ["ti-checks",obs.filter(function(o){var s=obState(o);return s.sent&&!s.confirmed}).length,"Chờ HV xác nhận lớp","#7C3AED","gọi chốt giờ học"],
-  ["ti-layout-grid-add",obs.filter(function(o){return !isc(o.onboarding_status,"completed")}).length,"Onboarding chưa xong","#3B82C4","SLA "+slaChip("slaOBT_hours",72)],
-  ["ti-alert-triangle",obs.filter(function(o){var s=obState(o);return s.infoOverdue||s.obOverdue}).length,"Quá hạn","#E24B4A","vi phạm PLR48/OBT"]]);
+  ["ti-send",obs.filter(function(o){var s=obState(o);return o.class_id&&!s.sent}).length,"Chờ gửi thông tin lớp","#E08A1E","SLA "+slaChip("slaClassInfoZalo_hours",24),"window.XLFILT='sendinfo';reRender('xeplop')"],
+  ["ti-checks",obs.filter(function(o){var s=obState(o);return s.sent&&!s.confirmed}).length,"Chờ HV xác nhận lớp","#7C3AED","gọi chốt giờ học","window.XLFILT='confirm';reRender('xeplop')"],
+  ["ti-layout-grid-add",obs.filter(function(o){return !isc(o.onboarding_status,"completed")}).length,"Onboarding chưa xong","#3B82C4","SLA "+slaChip("slaOBT_hours",72),"window.XLFILT='finish';reRender('xeplop')"],
+  ["ti-alert-triangle",obs.filter(function(o){var s=obState(o);return s.infoOverdue||s.obOverdue}).length,"Quá hạn","#E24B4A","vi phạm PLR48/OBT","window.XLFILT='overdue';reRender('xeplop')"]]);
  /* HÀNG ĐỢI CHỜ XẾP LỚP - trước đây bị giấu sau nút, nay thành danh sách như trong hành trình */
  if(wait.length&&(fil==="all")){
   h+='<div class="sechd" style="display:flex;align-items:center;gap:8px"><i class="ti ti-user-plus" style="color:var(--red)"></i>Đã đóng đủ tiền · chờ xếp lớp ('+wait.length+')</div>';
@@ -7493,10 +7518,10 @@ function renderTest(embed){var p="test",fil=fget(p);var all=rows("DL03");
  var h=embed?'':pageHead("Test đầu vào","Đặt lịch test - HV dự test - chấm điểm - tư vấn sau test",'<button class="btn primary" onclick="testQuickAdd()"><i class="ti ti-plus"></i>Khách muốn test ngay</button>');
  var _s=all.map(st);
  h+=statStrip([
-  ["ti-calendar-check",_s.filter(function(x){return !x.booked&&!x.refused}).length,"Chờ đặt lịch","#3B82C4","gọi hẹn khách"],
-  ["ti-file-text",_s.filter(function(x){return x.att&&!x.graded}).length,"Chờ chấm bài","#E08A1E","SLA "+slaChip("slaGLA_hours",24)],
-  ["ti-alert-triangle",_s.filter(function(x){return x.overdue}).length,"Quá hạn chấm","#E24B4A","vi phạm GLA"],
-  ["ti-messages",_s.filter(function(x){return x.graded&&!x.consulted}).length,"Có KQ chờ tư vấn","#7C3AED","SLA "+slaChip("slaCVT_hours",24)]]);
+  ["ti-calendar-check",_s.filter(function(x){return !x.booked&&!x.refused}).length,"Chờ đặt lịch","#3B82C4","gọi hẹn khách","fset('test','book');reRender(CUR)"],
+  ["ti-file-text",_s.filter(function(x){return x.att&&!x.graded}).length,"Chờ chấm bài","#E08A1E","SLA "+slaChip("slaGLA_hours",24),"fset('test','grade');reRender(CUR)"],
+  ["ti-alert-triangle",_s.filter(function(x){return x.overdue}).length,"Quá hạn chấm","#E24B4A","vi phạm GLA","fset('test','overdue');reRender(CUR)"],
+  ["ti-messages",_s.filter(function(x){return x.graded&&!x.consulted}).length,"Có KQ chờ tư vấn","#7C3AED","SLA "+slaChip("slaCVT_hours",24),"fset('test','consult');reRender(CUR)"]]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả"],["book","Chờ đặt lịch"],["grade","Chờ chấm"],["consult","Chờ tư vấn"],["overdue","Quá hạn chấm"]],view.length);
  h+='<div class="obcards rows">';if(!view.length)h+='<div class="empty">Không có hồ sơ phù hợp.</div>';
@@ -7556,9 +7581,9 @@ function renderTuvan(embed){var p="tuvan",fil=fget(p);var all=rows("DL04");
  var view=all.filter(function(c){var s=st(c);if(fil==="all")return true;if(fil==="todo")return !s.consulted;if(fil==="close")return s.consulted&&!s.closed&&!s.dropped;if(fil==="enroll")return s.closed&&!s.enr;return true});
  var h=embed?'':pageHead("Tư vấn & Đăng ký sau test","Tư vấn lộ trình sau test - chốt - tạo đăng ký",'<button class="btn primary" onclick="tvQuick()"><i class="ti ti-plus"></i>Tư vấn không qua test</button>');
  h+=statStrip([
-  ["ti-messages",all.filter(function(c){return isc(c.consultation_status,"not_consulted")}).length,"Chờ tư vấn","#E08A1E","SLA "+slaChip("slaCVT_hours",24)+" sau test"],
-  ["ti-target",all.filter(function(c){var t=st(c);return t.consulted&&!t.closed&&!t.dropped}).length,"Chờ chốt","#7C3AED","đang theo đuổi"],
-  ["ti-clipboard-check",all.filter(function(c){var t=st(c);return t.closed&&!t.enr}).length,"Chốt rồi, chưa tạo ĐK","#E24B4A","tạo phiếu ngay"],
+  ["ti-messages",all.filter(function(c){return isc(c.consultation_status,"not_consulted")}).length,"Chờ tư vấn","#E08A1E","SLA "+slaChip("slaCVT_hours",24)+" sau test","fset('tuvan','todo');reRender(CUR)"],
+  ["ti-target",all.filter(function(c){var t=st(c);return t.consulted&&!t.closed&&!t.dropped}).length,"Chờ chốt","#7C3AED","đang theo đuổi","fset('tuvan','close');reRender(CUR)"],
+  ["ti-clipboard-check",all.filter(function(c){var t=st(c);return t.closed&&!t.enr}).length,"Chốt rồi, chưa tạo ĐK","#E24B4A","tạo phiếu ngay","fset('tuvan','enroll');reRender(CUR)"],
   ["ti-user-x",all.filter(function(c){return isc(c.conversion_status,"dropped")}).length,"Khách từ chối","#6B7887","xem lý do để cải thiện"]]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả"],["todo","Chờ tư vấn"],["close","Chờ chốt"],["enroll","Chờ tạo ĐK"]],view.length);
@@ -7632,9 +7657,9 @@ function renderThanhtoan(embed){var p="thanhtoan",fil=fget(p);var enr=rows("DL06
   if(fil==="verify")return s.unverif>0;if(fil==="paid")return s.full;return true});
  var h=embed?'':pageHead("Thu & xác nhận Thanh toán","Chọn đăng ký còn công nợ - ghi nhận khoản thu - xác nhận đã nhận tiền",'<button class="btn primary" onclick="payQuick()"><i class="ti ti-cash"></i>Ghi nhận khoản thu</button>');
  h+=statStrip([
-  ["ti-cash",enr.filter(function(e){return pinfo(e).rem>0&&!isc(e.enrollment_status,"cancelled")}).length,"Đăng ký còn nợ","#E08A1E",vnd(enr.reduce(function(a,e){return a+(isc(e.enrollment_status,"cancelled")?0:pinfo(e).rem)},0))],
-  ["ti-shield-check",rows("DL07").filter(function(x){return !(x.verified_by&&String(x.verified_by).trim())}).length,"Khoản thu chờ xác nhận","#E24B4A","kế toán đối soát"],
-  ["ti-circle-check",enr.filter(function(e){return pinfo(e).full}).length,"Đã thu đủ","#16A34A","xong tài chính"],
+  ["ti-cash",enr.filter(function(e){return pinfo(e).rem>0&&!isc(e.enrollment_status,"cancelled")}).length,"Đăng ký còn nợ","#E08A1E",vnd(enr.reduce(function(a,e){return a+(isc(e.enrollment_status,"cancelled")?0:pinfo(e).rem)},0)),"fset('thanhtoan','debt');reRender(CUR)"],
+  ["ti-shield-check",rows("DL07").filter(function(x){return !(x.verified_by&&String(x.verified_by).trim())}).length,"Khoản thu chờ xác nhận","#E24B4A","kế toán đối soát","fset('thanhtoan','verify');reRender(CUR)"],
+  ["ti-circle-check",enr.filter(function(e){return pinfo(e).full}).length,"Đã thu đủ","#16A34A","xong tài chính","fset('thanhtoan','paid');reRender(CUR)"],
   ["ti-report-money",vnd(rows("DL07").reduce(function(a,x){return a+num(x.amount)},0)),"Tổng đã thu","#0D9488","toàn hệ thống"]]);
  var nDue=enr.filter(function(e2){var s2=pinfo(e2);var du=pvnd(e2.next_payment_due);return s2.rem>0&&du&&du<=endToday()&&!isc(e2.enrollment_status,"cancelled")}).length;
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
@@ -7985,10 +8010,10 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=rows("DL14");
  var _imp=_done.filter(function(w){return isc(w.wow_outcome,"improved")}).length;
  var _wor=_done.length?Math.round(_imp/_done.length*100):null;
  h+=statStrip([
-  ["ti-checks",_w.filter(function(x){return x.booked&&!x.confirmed&&!x.noshow}).length,"Chờ xác nhận lịch","#E08A1E","HV chưa chốt giờ"],
-  ["ti-star",_w.filter(function(x){return x.confirmed&&!x.done&&!x.noshow}).length,"Đã xác nhận, sắp dạy","#DB2777","chuẩn bị nội dung"],
+  ["ti-checks",_w.filter(function(x){return x.booked&&!x.confirmed&&!x.noshow}).length,"Chờ xác nhận lịch","#E08A1E","HV chưa chốt giờ","fset('wow','confirm');reRender(CUR)"],
+  ["ti-star",_w.filter(function(x){return x.confirmed&&!x.done&&!x.noshow}).length,"Đã xác nhận, sắp dạy","#DB2777","chuẩn bị nội dung","fset('wow','upcoming');reRender(CUR)"],
   ["ti-thumb-up",_done.length,"Đã dạy xong","#0D9488",_imp+" tiến bộ"],
-  ["ti-notes",_w.filter(function(x){return x.done&&!x.note}).length,"Chờ ghi nội dung","#E08A1E","SLA "+slaChip("slaWowNote_hours",24)],
+  ["ti-notes",_w.filter(function(x){return x.done&&!x.note}).length,"Chờ ghi nội dung","#E08A1E","SLA "+slaChip("slaWowNote_hours",24),"fset('wow','note');reRender(CUR)"],
   ["ti-target",(_wor==null?"—":_wor+"%"),"Tỷ lệ tiến bộ (WOR)",(_wor!=null&&_wor>=Math.round(kpiTh(/^WOR/,0.6)*100))?"#16A34A":"#E24B4A","mục tiêu ≥ "+kpiChip(/^WOR/,0.6,1)],
   ["ti-player-stop",rows("DL09").filter(function(x){return String(x.wow_quota_remaining||"")!==""&&wowQuotaOf(x.student_id).free<=0}).length,"HV đã hết lượt WOW","#6B7887","cấp thêm nếu có căn cứ"]]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
@@ -8200,10 +8225,10 @@ function renderKhieunai(embed){var p="khieunai",fil=fget(p);var all=rows("DL17")
  var view=all.filter(function(c){var s=st(c);if(fil==="all")return true;if(fil==="new")return !s.assigned;if(fil==="work")return s.assigned&&!s.resolved;if(fil==="overdue")return s.overdue;if(fil==="done")return s.resolved;return true});
  var h=embed?'':pageHead("Tiếp nhận & Xử lý Khiếu nại","Tiếp nhận - phân công - xử lý - đóng (SLA theo mức độ)",'<button class="btn primary" onclick="knAdd()"><i class="ti ti-plus"></i>Tiếp nhận khiếu nại</button>');
  h+=statStrip([
-  ["ti-inbox",all.filter(function(c){return isc(c.complaint_status,"new")}).length,"Mới tiếp nhận","#E08A1E","phân công ngay"],
-  ["ti-tool",all.filter(function(c){return isc(c.complaint_status,"assigned","in_progress","escalated")}).length,"Đang xử lý","#7C3AED","theo SLA mức độ"],
-  ["ti-alert-triangle",all.filter(function(c){var sv=ecode(c.complaint_severity);var lim=sv==="high"?paramOf("slaComplaintHigh_hours",24):sv==="medium"?paramOf("slaComplaintMed_hours",48):paramOf("slaComplaintLow_hours",72);var a=hoursSince(c.complaint_time);return !isc(c.complaint_status,"resolved")&&a!=null&&a>lim}).length,"Quá hạn xử lý","#E24B4A","vi phạm SLA_R"],
-  ["ti-checks",all.filter(function(c){return isc(c.complaint_status,"resolved")}).length,"Đã đóng","#16A34A","tổng "+all.length+" khiếu nại"]]);
+  ["ti-inbox",all.filter(function(c){return isc(c.complaint_status,"new")}).length,"Mới tiếp nhận","#E08A1E","phân công ngay","fset('khieunai','new');reRender(CUR)"],
+  ["ti-tool",all.filter(function(c){return isc(c.complaint_status,"assigned","in_progress","escalated")}).length,"Đang xử lý","#7C3AED","theo SLA mức độ","fset('khieunai','work');reRender(CUR)"],
+  ["ti-alert-triangle",all.filter(function(c){var sv=ecode(c.complaint_severity);var lim=sv==="high"?paramOf("slaComplaintHigh_hours",24):sv==="medium"?paramOf("slaComplaintMed_hours",48):paramOf("slaComplaintLow_hours",72);var a=hoursSince(c.complaint_time);return !isc(c.complaint_status,"resolved")&&a!=null&&a>lim}).length,"Quá hạn xử lý","#E24B4A","vi phạm SLA_R","fset('khieunai','overdue');reRender(CUR)"],
+  ["ti-checks",all.filter(function(c){return isc(c.complaint_status,"resolved")}).length,"Đã đóng","#16A34A","tổng "+all.length+" khiếu nại","fset('khieunai','done');reRender(CUR)"]]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả"],["new","Mới"],["work","Đang xử lý"],["overdue","Quá hạn"],["done","Đã xử lý"]],view.length);
  h+='<div class="obcards rows">';if(!view.length)h+='<div class="empty">Không có khiếu nại phù hợp.</div>';
@@ -8253,9 +8278,9 @@ function renderKetthuc(){var p="ketthuc",fil=fget(p);var all=rows("DL18");
  var view=all.filter(function(r){var s=st(r);if(fil==="all")return true;if(fil==="score")return !s.scored;if(fil==="invite")return s.scored&&!s.invited;if(fil==="follow")return s.invited&&!s.closed;return true});
  var h=pageHead("Kết thúc khóa & Tái ghi danh","Nhập kết quả đầu ra - đánh giá mục tiêu - mời & chốt tái ghi danh",'<button class="btn primary" onclick="ktGen()"><i class="ti ti-school-off"></i>Tạo hồ sơ kết thúc cho lớp</button>');
  h+=statStrip([
-  ["ti-writing",all.filter(function(x){return !String(x.final_test_score||"").trim()}).length,"Chờ nhập KQ đầu ra","#E08A1E","SLA "+slaChip("slaFinalTest_days",3)],
-  ["ti-mail",all.filter(function(x){return String(x.final_test_score||"").trim()&&isc(x.re_enrollment_status,"not_contacted")}).length,"Chờ mời tái ĐK","#7C3AED","cửa sổ còn nhiệt"],
-  ["ti-refresh",all.filter(function(x){return isc(x.re_enrollment_status,"contacted","interested")}).length,"Đang theo đuổi","#3B82C4","chưa chốt"],
+  ["ti-writing",all.filter(function(x){return !String(x.final_test_score||"").trim()}).length,"Chờ nhập KQ đầu ra","#E08A1E","SLA "+slaChip("slaFinalTest_days",3),"fset('ketthuc','score');reRender(CUR)"],
+  ["ti-mail",all.filter(function(x){return String(x.final_test_score||"").trim()&&isc(x.re_enrollment_status,"not_contacted")}).length,"Chờ mời tái ĐK","#7C3AED","cửa sổ còn nhiệt","fset('ketthuc','invite');reRender(CUR)"],
+  ["ti-refresh",all.filter(function(x){return isc(x.re_enrollment_status,"contacted","interested")}).length,"Đang theo đuổi","#3B82C4","chưa chốt","fset('ketthuc','follow');reRender(CUR)"],
   ["ti-award",all.filter(function(x){return isc(x.re_enrollment_status,"confirmed_with_deposit")}).length,"Đã tái ghi danh","#16A34A","mục tiêu RER ≥ "+kpiChip(/^RER/,0.4,1)]]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả"],["score","Chờ nhập KQ"],["invite","Chờ mời tái ĐK"],["follow","Đang theo đuổi"]],view.length);
@@ -9374,8 +9399,13 @@ function mgDetail(key){var ev=rows("DL22").filter(function(x){return String(x.re
    '<td>'+(num(x.friend_discount_amount)?vnd(num(x.friend_discount_amount)):'<span class="mut">—</span>')+'</td></tr>'});
  h+='</tbody></table></div></div>';
  openDrawer("Bạn được giới thiệu · "+code,h)}
+/* V9.29p (mảng 5, việc tồn từ đầu): dải số ĐỨNG YÊN là một lời hứa hụt - người dùng thấy
+   "5 buổi quá hạn" rồi bấm vào, không có gì xảy ra. Nay ô nào có chỗ để đi thì đi được:
+   phần tử thứ 6 (t[5]) = câu lệnh khi bấm. Ô nào thật sự không dẫn đi đâu thì vẫn để viền đứt
+   (.static) - phân biệt rõ bấm được / không bấm được đúng như anh Luân đã bắt ở V9.27. */
 function statStrip(items){return '<div class="bstats">'+items.map(function(t){
- return '<div class="bstat static" style="cursor:default"><span class="bsic" style="background:'+t[3]+'18;color:'+t[3]+'"><i class="ti '+t[0]+'"></i></span>'+
+ var act=t[5]||"";
+ return '<div class="bstat'+(act?'':' static')+'"'+(act?' onclick="'+act+'" data-tip="Bấm để lọc danh sách bên dưới"':' style="cursor:default"')+'><span class="bsic" style="background:'+t[3]+'18;color:'+t[3]+'"><i class="ti '+t[0]+'"></i></span>'+
   /* V9.29: phần phụ chú (t[4]) là chuỗi do lập trình viên viết, không phải dữ liệu người dùng nhập,
      nên KHÔNG esc để gắn được chip bánh răng "sửa ở đây". Tên và số vẫn esc như cũ. */
   '<div><div class="bsn">'+esc(String(t[1]))+'</div><div class="bsl">'+esc(t[2])+(t[4]?' · '+t[4]:'')+'</div></div></div>'}).join("")+'</div>'}
@@ -9902,10 +9932,10 @@ function renderBuoihoc(embed){var p="buoihoc",fil=fget(p);var all=rows("DL11");
  var h=embed?'':pageHead("Buổi học & nhận xét giảng viên","Theo dõi SLA ghi nhận xét (hạn "+slaChip("slaTeacherNote_hours",48)+" sau buổi). Nhận xét chung có thể ghi ngay khi điểm danh xong ở trang Điểm danh — hai nơi cùng một ô.",
   nOver?'<span class="chip red">'+nOver+' buổi quá hạn ghi nhận xét</span>':'');
  h+=statStrip([
-  ["ti-writing",all.filter(function(s2){var t=bhState(s2);return t.done&&!t.note}).length,"Chờ ghi nhận xét","#E08A1E","SLA "+slaChip("slaTeacherNote_hours",48)],
-  ["ti-alert-triangle",nOver,"Quá hạn ghi nhận xét","#E24B4A","ảnh hưởng KPI TNR"],
-  ["ti-clock",all.filter(function(s2){return bhState(s2).late}).length,"Buổi GV vào trễ","#7C3AED","kỷ luật ADC"],
-  ["ti-calendar-plus",all.filter(function(s2){return bhState(s2).cancelled}).length,"Hủy - cần dạy bù","#3B82C4","xếp lịch bù"]]);
+  ["ti-writing",all.filter(function(s2){var t=bhState(s2);return t.done&&!t.note}).length,"Chờ ghi nhận xét","#E08A1E","SLA "+slaChip("slaTeacherNote_hours",48),"fset('buoihoc','note');reRender(CUR)"],
+  ["ti-alert-triangle",nOver,"Quá hạn ghi nhận xét","#E24B4A","ảnh hưởng KPI TNR","fset('buoihoc','overdue');reRender(CUR)"],
+  ["ti-clock",all.filter(function(s2){return bhState(s2).late}).length,"Buổi GV vào trễ","#7C3AED","kỷ luật ADC","fset('buoihoc','late');reRender(CUR)"],
+  ["ti-calendar-plus",all.filter(function(s2){return bhState(s2).cancelled}).length,"Hủy - cần dạy bù","#3B82C4","xếp lịch bù","fset('buoihoc','cancelled');reRender(CUR)"]]);
  /* V9.29: giáo viên phải biết TRƯỚC giờ dạy ai đã báo nghỉ - app hứa với học viên là "báo trước
     giúp giảng viên chuẩn bị phần bù", trước đây GV chỉ thấy lúc mở điểm danh (tức là đã tới giờ). */
  h+=absQueueHTML(absQueue().filter(function(a){
@@ -10022,10 +10052,10 @@ function renderBaoluu(embed){var p="baoluu",fil=fget(p);
  var h=embed?'':pageHead("Bảo lưu / Bỏ học","Học viên đang dừng học - liên hệ giữ chân, chốt bảo lưu hoặc mời quay lại. SOP: nhắc trước khi hết hạn bảo lưu 2 tuần.",
   '<span class="chip amber">'+nHold+' bảo lưu</span> <span class="chip red">'+nDrop+' bỏ học</span>');
  h+=statStrip([
-  ["ti-player-pause",nHold,"Đang bảo lưu","#E08A1E","nhắc trước hạn 2 tuần"],
-  ["ti-user-x",nDrop,"Đã bỏ học","#E24B4A","ảnh hưởng KPI DOR"],
-  ["ti-phone-off",all.filter(function(s2){return !String(s2.next_followup_time||"").trim()}).length,"Chưa hẹn liên hệ lại","#DB2777","cần lên lịch giữ chân"],
-  ["ti-refresh",all.length,"Tổng cần chăm lại","#6B7887","cơ hội khôi phục doanh thu"]]);
+  ["ti-player-pause",nHold,"Đang bảo lưu","#E08A1E","nhắc trước hạn 2 tuần","fset('baoluu','hold');reRender(CUR)"],
+  ["ti-user-x",nDrop,"Đã bỏ học","#E24B4A","ảnh hưởng KPI DOR","fset('baoluu','drop');reRender(CUR)"],
+  ["ti-phone-off",all.filter(function(s2){return !String(s2.next_followup_time||"").trim()}).length,"Chưa hẹn liên hệ lại","#DB2777","cần lên lịch giữ chân","fset('baoluu','nocontact');reRender(CUR)"],
+  ["ti-refresh",all.length,"Tổng cần chăm lại","#6B7887","cơ hội khôi phục doanh thu","fset('baoluu','all');reRender(CUR)"]]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả"],["hold","Đang bảo lưu"],["drop","Đã bỏ học"],["nocontact","Chưa hẹn liên hệ lại"]],view.length);
  h+='<div class="obcards rows">';
@@ -10691,10 +10721,10 @@ function renderGiaoviec(){
  var h=pageHead("Giao việc & Phối hợp",
   "Giao việc cho cấp dưới, phối hợp ngang cấp hoặc nhờ hỗ trợ - mỗi việc có hạn, trạng thái và luồng trao đổi riêng nên không trôi mất như tin nhắn.",
   '<button class="btn primary" onclick="tkNew()"><i class="ti ti-clipboard-plus"></i>Giao việc mới</button>');
- h+=statStrip([["ti-checkbox",mLive.length,"Việc tôi phải làm","#2E5A88",mOver.length?(mOver.length+" quá hạn"):"trong hạn"],
-  ["ti-clock-exclamation",mOver.length,"Quá hạn của tôi","#E24B4A",mOver.length?"cần làm ngay":"không có"],
-  ["ti-inbox",gWait.length,"Chờ tôi xác nhận","#E08A1E",gWait.length?"người nhận đã báo xong":"không có"],
-  ["ti-send",gLive.length,"Tôi giao, đang chạy","#0D9488","theo dõi tiến độ"]]);
+ h+=statStrip([["ti-checkbox",mLive.length,"Việc tôi phải làm","#2E5A88",mOver.length?(mOver.length+" quá hạn"):"trong hạn","tkTabSet('mine');tkFset('live')"],
+  ["ti-clock-exclamation",mOver.length,"Quá hạn của tôi","#E24B4A",mOver.length?"cần làm ngay":"không có","tkTabSet('mine');tkFset('live')"],
+  ["ti-inbox",gWait.length,"Chờ tôi xác nhận","#E08A1E",gWait.length?"người nhận đã báo xong":"không có","tkTabSet('given');tkFset('live')"],
+  ["ti-send",gLive.length,"Tôi giao, đang chạy","#0D9488","theo dõi tiến độ","tkTabSet('given');tkFset('live')"]]);
  h+=tbar(segHTML(tab,[["mine","Việc của tôi",mLive.length||"",mOver.length?"red":""],
    ["given","Tôi đã giao",gLive.length||"",gWait.length?"amber":""],
    ["report","Tổng hợp & báo cáo",null,""]],"tkTabSet('{k}')"),

@@ -527,6 +527,29 @@
 > Bộ kiểm kiểu mới: không chỉ hỏi "có tham số chưa" mà **đổi giá trị rồi xem app có đổi theo không**
 > - đó mới là bằng chứng tham số thật sự được đọc.
 >
+> **(4) CẤP THÊM LƯỢT WOW** - app CHẶN đặt buổi khi hết lượt rồi bảo *"duyệt thêm lượt trước khi
+> đặt"*, mà **không có màn nào để duyệt** - câu hướng dẫn trỏ vào hư không. Nay bấm chặn là mở
+> thẳng màn cấp lượt. Không đẻ bảng mới: DL09 đã có sẵn `wow_extra_approved` (trung tâm duyệt,
+> miễn phí) và `wow_extra_purchased` (học viên mua thêm), `deriveAll` đã có công thức
+> `remaining = default + approved + purchased − used`. Màn mới ghi đúng cột rồi **tính lại bằng
+> chính công thức đó** - bộ kiểm canh hai nơi phải viết y hệt nhau.
+> Ba điểm nghiệp vụ: (a) "còn trống" ≠ "còn lại trên sổ" - buổi đã đặt chưa dạy vẫn GIỮ CHỖ;
+> (b) bắt buộc ghi lý do (đây là buổi học miễn phí, phải có căn cứ) và ghi vết ai cấp, lúc nào;
+> (c) trần mỗi lần cấp lấy từ cấu hình (`wowGrantMax_perTime`).
+>
+> **(5) DẢI SỐ BẤM ĐƯỢC** - việc tồn từ đầu mảng 5. Dải số đứng yên là **một lời hứa hụt**: người
+> dùng thấy "5 buổi quá hạn", bấm vào, không có gì xảy ra. `statStrip` nhận thêm tham số thứ 6 =
+> câu lệnh khi bấm; ô nào thật sự không dẫn đi đâu thì **vẫn để viền đứt** (`.static`) - giữ đúng
+> ngôn ngữ phân biệt bấm được / không bấm được mà anh Luân bắt từ V9.27.
+> Phủ 11 trang + Xếp lớp (dùng `XLFILT`) + Giáo án (dùng `GATAB`) + hub Chờ duyệt (`duyTabSet`).
+> **Bất biến đáng giá nhất:** ô dải số phải trỏ tới **một bộ lọc CÓ THẬT của chính trang đó** - gõ
+> nhầm `fset('wow','confirmed')` thay vì `'confirm'` thì bấm vào ra danh sách rỗng trơn, **không báo
+> lỗi, chỉ lặng lẽ sai**. Bộ kiểm đối chiếu mã lọc trong dải số với mã lọc trong thanh tab.
+> Ba trang trước đây **không có dải số nào** (Giáo án, Bàn giao lead, hub Chờ duyệt) nay đã có.
+> Bẫy khi viết bộ kiểm: cắt khối dải số bằng "3000 ký tự sau `<div class=bstats>`" là dính luôn cả
+> nút ở thanh lọc bên dưới → tiêu chí xanh mà không kiểm gì cả. Phải cắt tới thẻ container kế tiếp.
+> Một tiêu chí cũ **bị đảo**: "statStrip vẫn là ô chỉ để xem" - đó chính là hành vi đang đi sửa.
+>
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
 >
 > **(G) TRỢ THỦ THAO TÁC - anh Luân đặt 28/07, LÀM SAU ĐỢT AUDIT (F):** *"a muốn nghiên cứu trợ thủ
