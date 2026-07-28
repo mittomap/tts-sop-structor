@@ -1202,6 +1202,23 @@ for _i, _s in enumerate(_up[:4]):
 log.append("14ter. Xin nghỉ: gieo %d đơn đang CHỜ DUYỆT cho các buổi sắp tới (1 đơn cố ý quá hạn duyệt)"
            % _made_abs)
 
+# ═══ 14quater. DỌN GHI CHÚ "(cấu hình xxx)" TRONG CÂU NHẮC CH4 (V9.29) ════
+# Anh Luân: "mấy câu kiểu này đúng là chỉ cần bánh răng, khỏi cần ghi chú mắc công".
+# Từ V9.29 mỗi câu nhắc hiện trên màn đều có bánh răng nhảy thẳng về đúng dòng CH4, nên phần
+# "(cấu hình slaXxx_hours)" nhét giữa câu chỉ làm câu dài ra và lộ tên biến kỹ thuật cho người dùng.
+_ch4 = d.get("config", {}).get("ch4") or []
+_clean = 0
+for _m in _ch4:
+    _t = str(_m.get("tmpl") or "")
+    _n = re.sub(r"\s*\((?:cấu hình|cau hinh)\s+[A-Za-z0-9_]+\)", "", _t)
+    _n = re.sub(r"\s*\((?:cấu hình|cau hinh)\)", "", _n)   # dạng "(cấu hình)" trơ trọi
+    _n = re.sub(r"\s{2,}", " ", _n).strip()
+    if _n != _t:
+        _m["tmpl"] = _n
+        _clean += 1
+log.append("14quater. Câu nhắc CH4: bỏ ghi chú '(cấu hình ...)' ở %d câu - đã có bánh răng sửa tại chỗ"
+           % _clean)
+
 # ═══ 15. SAN PHẲNG SƠ ĐỒ CỘT (UNION KEY) - PHẢI LÀ PASS CUỐI CÙNG ═════════
 # Cột chỉ có mặt ở vài dòng (referrer_name, referral_uses, net_received...) làm app render
 # ô trống và bản Sheets lệch cột. LUẬT: mọi dòng trong cùng một bảng phải CÙNG BỘ CỘT.

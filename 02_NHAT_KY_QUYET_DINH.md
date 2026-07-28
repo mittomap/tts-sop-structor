@@ -316,6 +316,17 @@
 > + ô chọn vai `roleSel` luôn bị ẩn từ V9.9. Harness từ **38 -> 35 trang**.
 > · **Notebar cho tab CH6** - tab cuối cùng còn thiếu.
 >
+> · **Bánh răng trần thay chữ** (anh Luân): bỏ nhãn "Sửa câu này" / "Sửa danh mục", chỉ để icon
+> bánh răng 22px, chú thích hiện khi rê chuột. Cùng ngôn ngữ với `slaChip`/`kpiChip`.
+> · **Bỏ ghi chú "(cấu hình xxx)" trong 40 câu nhắc CH4** (`fixdata` §14quater) - đã có bánh răng
+> nhảy thẳng về đúng dòng thì ghi chú đó chỉ làm câu dài ra và lộ tên biến kỹ thuật cho người dùng.
+> Bộ kiểm canh thêm: mọi chỗ trống `{n}` trong câu phải thay được bằng số thật.
+> · **Drawer xem nhanh cho trang Việc hôm nay** (anh Luân bắt thiếu): bấm thân dòng mở drawer
+> "ai · việc gì · trễ bao lâu · bộ phận · **ngưỡng lấy từ đâu** (chip bánh răng) · làm gì tiếp";
+> nút Xử lý vẫn đi thẳng như cũ (`event.stopPropagation`). Tiện thể phát hiện `slaAct` **thiếu hai
+> nhánh mới** (`absForm`, `bhNoteForm`) - bấm "Xử lý ngay" ở hai loại việc đó sẽ không ra gì mà cũng
+> không báo lỗi.
+>
 > **CÒN LẠI:** dời `DUEFALL=5` + 16 nhóm câu chăm RTOUCH + giờ hẹn preset vào cấu hình ·
 > màn cấp thêm quota WOW · `statStrip` bấm được ở các trang còn lại · bộ phận chuẩn cho
 > `renderDuyet`/`renderGiaoan`/`renderMaGioiThieu`/`renderReupTab`/`renderBanggiao`.
@@ -333,6 +344,12 @@
 > hàm render chết (`renderDashboardOld`, `renderPipeline`, `renderTracuu`, `renderKhaosat`) + `roleSel`
 > luôn ẩn, bổ sung bộ phận chuẩn cho `renderDuyet`/`renderGiaoan`/`renderMaGioiThieu`/`renderReupTab`/
 > `renderBanggiao`, `statStrip` bấm được ở 15 trang, thêm notebar cho tab CH6.
+>
+> **(F) HỘI ĐỒNG AUDIT CUỐI - anh Luân đặt 28/07:** *"giờ chắc tới lúc kiếm vài hội đồng để audit,
+> nâng cấp, chuẩn hóa, đồng bộ các cổng cho anh rồi nhỉ. Biến thành bản final ngon lành luôn ấy."*
+> Làm SAU KHI xong (D) và (E). Nhớ nguyên tắc đã rút ra từ hai hội đồng trước: người rà đọc THEO
+> luồng, mà lỗi nằm GIỮA các luồng; phải ENUMERATE chứ không lấy mẫu; và mọi kết luận phải quy về
+> một bất biến kiểm được bằng máy, không dừng ở nhận xét.
 >
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
 >

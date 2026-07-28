@@ -718,6 +718,7 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("co chip cho NGUONG KPI (CH6)", typeof kpiChip==="function");
  t("co nut sua CAU NHAC (CH4)", typeof msgEditBtn==="function");
  t("co nut sua DANH MUC (CH1)", typeof enumEditBtn==="function");
+ t("nut sua danh muc cung la banh rang tran", enumEditBtn("enum_x").indexOf("Sửa danh mục</button>")<0&&/ti-settings/.test(enumEditBtn("enum_x")));
  t("co chip cho NGUONG/SLA (CH2)", typeof slaChip==="function");
  /* kpiChip phai tro dung dong CH6 va in dung nguong dang cau hinh */
  var r=kpiRowOf(/^ATR/);
@@ -734,7 +735,12 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  /* cau nhac SOP phai co nut sua ngay canh */
  var L0=rows("DL02")[0];var J=jInfo(L0.lead_id);
  var sb=sopBlock(J);
- if(J.naMsg)t("cau nhac SOP co nut 'Sua cau nay'", sb.indexOf("msgGo(")>=0);
+ if(J.naMsg){
+  t("cau nhac SOP co loi sua", sb.indexOf("msgGo(")>=0);
+  /* V9.29b: chi de BANH RANG, khong con chu "Sua cau nay" - chu thich hien khi ro chuot */
+  t("nut sua la banh rang tran, khong co chu", sb.indexOf("Sửa câu này")<0&&/class="cfedit"[\s\S]{0,200}?ti-settings"><\/i><\/button>/.test(sb));
+  t("van co chu thich khi ro chuot", /class="cfedit"[^>]*data-tip="[^"]{10,}"/.test(sb));
+  t("van co nhan cho trinh doc man hinh", /class="cfedit"[^>]*aria-label="/.test(sb));}
  /* phu chu cua dai so cho phep gan chip - truoc day bi esc nen chip thanh chu tho */
  t("dai so khong esc phan phu chu nua", !/\+\(t\[4\]\?' · '\+esc\(t\[4\]\)/.test(SRC));
  t("khong con chuoi HTML tho lot ra man hinh", (function(){
@@ -748,6 +754,48 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("nut sua cau hinh phu it nhat 8 trang (dang co "+trang+")", trang>=8);
  t("tong so chip tren cac trang >= 12 (dang co "+chip+")", chip>=12);
  window.SETTAB="ch2";
+})();
+
+
+/* ---- 27. DRAWER XEM NHANH tren trang Viec hom nay (V9.29, anh Luan bat thieu) ---- */
+(function(){
+ setRole("all");
+ window.VIECTEAM="all";window.VIECGRP="all";window.VIECSEV="";window.VIECOD=false;
+ var o=RENDER["viec"]();
+ t("moi dong viec bam duoc", (o.match(/class="slarow clk"/g)||[]).length>0);
+ t("nut Xu ly khong bi nuot boi cu bam dong", /class="slaa" onclick="event.stopPropagation\(\)"/.test(o));
+ var it=bellItems()[0];
+ var key=String(it.rid||it.lead||it.hoso||"")+"|"+String(it.grp||"");
+ slaOpen(key);
+ var d=ST["drawerBody"].innerHTML||"";
+ t("mo duoc drawer xem nhanh", d.length>200);
+ t("drawer noi ro DOI TUONG", d.indexOf(it.who)>=0);
+ t("drawer noi ro BO PHAN", d.indexOf(it.cat)>=0);
+ t("drawer noi ro DA CHO BAO LAU", /Đã chờ/.test(d));
+ t("drawer noi ro NGUONG lay tu dau", /slachip/.test(d)||/theo luật SOP/.test(d));
+ t("drawer co nut xu ly ngay", /Xử lý ngay/.test(d));
+ t("key khong khop thi bao tu te, khong vo", (function(){try{slaOpen("khong-co-that|khong-co");return true}catch(e){return false}})());
+ /* hai luat moi phai bam Xu ly ngay duoc */
+ t("slaAct biet mo man duyet xin nghi", /if\(act==="absForm"\)return absForm\(id\)/.test(SRC));
+ t("slaAct biet mo man ghi nhan xet buoi", /if\(act==="bhNoteForm"\)return bhNoteForm\(id\)/.test(SRC));
+})();
+
+
+/* ---- 28. CAU NHAC CH4 khong con ghi chu "(cau hinh xxx)" (V9.29, anh Luan) ----
+   Da co banh rang nhay thang ve dong CH4, nen ghi chu do chi lam cau dai ra va lo ten bien
+   ky thuat cho nguoi dung. */
+(function(){
+ var ch4=(DATA.config&&DATA.config.ch4)||[];
+ t("co du lieu CH4 de kiem", ch4.length>0);
+ var con=ch4.filter(function(m){return /\((?:cấu hình|cau hinh)[^)]*\)/.test(String(m.tmpl||""))});
+ t("khong con cau nhac nao chua ghi chu '(cau hinh ...)'"+(con.length?(" - con: "+con.map(function(x){return x.code}).join(", ")):""), con.length===0);
+ /* bo ghi chu roi thi cho trong cau van phai thay duoc bang so that */
+ var xau=ch4.filter(function(m){
+  if(!(m.params||[]).length)return false;
+  var t2=msgText(m.code);
+  return /\{\d\}/.test(t2)});
+ t("moi cho trong {n} deu thay duoc bang so that"+(xau.length?(" - hong: "+xau.map(function(x){return x.code}).join(", ")):""), xau.length===0);
+ t("cau van con noi dung, khong bi cat cut", ch4.every(function(m){return String(m.tmpl||"").trim().length>10}));
 })();
 
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");
