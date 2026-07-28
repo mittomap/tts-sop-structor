@@ -149,17 +149,28 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.29l** (28/07 - (A) dữ liệu demo XONG 218->0; (B) bộ máy lọc XONG phủ 16 trang;
-> (C) xin nghỉ có phép XONG; (D) mảng 5 gần xong - thêm bấm-tên-ra-drawer, địa chỉ riêng cho từng
-> trang, trang Dự thu). CÒN phần đuôi (D), (E) việc tồn đợt 2, (F) hội đồng audit, (G) trợ thủ thao tác.
+> **Phiên bản: V9.29x — HẾT VIỆC TỒN. (A)(B)(C)(D)(E)(F)(G)(H) ĐỀU ✅ XONG** (28/07 đêm, anh Luân
+> giao toàn quyền chạy hết rồi đi ngủ).
+> · (A) dữ liệu demo khớp ga nghiệp vụ 218→0 · (B) bộ máy lọc phủ 16 trang · (C) xin nghỉ có phép
+> · (D) mảng 5: mọi hằng số nghiệp vụ đã ra khỏi code, dải số bấm được, hub Chờ duyệt, cấp lượt WOW
+> · (E) việc tồn đợt 2: GV dự phòng theo ngày, đổi GV chính của lớp, phòng & đụng lịch, bảng công
+> giảng dạy · (F) hội đồng audit thành `_check18` (bắt 4 lỗi thật) · (G) Trợ thủ thao tác
+> · (H) bài hướng dẫn neo bằng `@mã`.
+> **RÀNG BUỘC XUYÊN SUỐT anh Luân nhắc:** trung tâm có **5 chi nhánh + học online** - mọi việc phải
+> soi qua lăng kính đó (xem mục V9.29o/r bên dưới).
+> **CÒN LẠI CHO PHIÊN SAU:** không còn việc tồn nào đã chốt. Có thể làm tiếp: viết lại NỘI DUNG các
+> bài hướng dẫn cho khớp app mới (neo đã sẵn), và soát lại 23 mục hội đồng đợt 2 xem còn mục nào
+> chưa đụng tới.
 > **KHÔNG CÒN PHIÊN TỰ ĐỘNG.** Routine "Auto - Github ITTs-SOP-Demo" đã bị XOÁ theo lệnh anh Luân
 > (28/07 chiều). Lý do: phiên chạy lịch chỉ có quyền ĐỌC repo, `git push` trả 403 "Not authorized to
 > access repository mittomap/tts-sop-structor". Chúng nó làm xong việc rồi mới phát hiện không đẩy
 > được, công sức nằm chết trong container. Muốn bật lại thì phải cấp quyền GHI cho môi trường chạy
 > lịch trước, và giữ nguyên BƯỚC 0 "thử `git push --dry-run` trước khi làm bất cứ việc gì". MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG.
-> Bộ kiểm hiện tại: node --check 2 file · `_tall` **36 trang** 0 lỗi (170 icon) · `_check11` **139** ·
-> `_check12` 37 · `_check13` 174 · `_check14` 102 · `_check15` 37 · **`_check16` 443** · `_checktour` ·
-> `check_logic.py` 132 luật (đúng 4 ca cố ý) · `check_data.py` DAT · **`_checkdata.js` 27 luật / 6274 lượt kiểm - 0 lệch · `_check17.js` 392 tiêu chí**.
+> **Bộ kiểm hiện tại (phải XANH HẾT mới được giao):** node --check 2 file · `_tall` **38 trang** 0 lỗi
+> (170 icon) · `_check11` **143** · `_check12` 37 · `_check13` 174 · `_check14` **111** · `_check15` 37
+> · **`_check16` 577** · `_check17` 392 · **`_check18` 44 (vẽ thật 75 trang/tab + 8 chức danh + mọi hồ
+> sơ cổng học viên)** · `_checktour` · `_checkdata.js` 27 luật / **6327 lượt kiểm - 0 lệch** ·
+> `check_logic.py` (đúng 4 ca cố ý) · `check_data.py` DAT. **Tổng ~1900 tiêu chí tự động.**
 >
 > **VIỆC PHẢI LÀM TIẾP - THEO ĐÚNG THỨ TỰ NÀY (Luân chốt 28/07 khuya, rồi về nghỉ):**
 >

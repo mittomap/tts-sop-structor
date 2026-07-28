@@ -34,7 +34,7 @@ ITTS_OUT="<mnt>/SOP ITTs" python3 gen_v5.py
 ```
 
 ## VERIFY (bắt buộc sau mỗi build)
-Bộ kiểm gồm **5 phần, phải xanh HẾT mới được giao**:
+Bộ kiểm gồm **13 phần, phải xanh HẾT mới được giao** (~1900 tiêu chí):
 | Lệnh | Kỳ vọng |
 |---|---|
 | `node --check _APP.js` và `node --check _HV.js` | không báo gì |
