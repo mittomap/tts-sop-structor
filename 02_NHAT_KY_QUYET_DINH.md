@@ -347,6 +347,13 @@
 > · Nút dạng thẻ `<a>` (gọi điện, mở link) **ăn gạch chân của link** - thêm `a.btn,a.pill{text-decoration:none}`.
 > Hai nút gọi ở cổng học viên trước đây hai kiểu khác nhau, nay dùng chung `hvCallHTML()`.
 >
+> · **Cột "Khi nào hiện" của CH4 cắm cứng con số** (anh Luân: *"gắn cứng ko được đâu nhé"*).
+> Câu mẫu (`tmpl`) đã dùng `{1}` và thay bằng số cấu hình, nhưng câu mô tả (`when`) lại viết thẳng
+> "(3 ngày)" - đổi ngưỡng thành 5 là cột đó **nói dối**. Nay `when` cũng dùng `{1}/{2}/...`
+> (`fixdata` §14quinquies sửa 5 câu), và app thay qua **một hàm dùng chung `msgFill()`** cho cả hai
+> cột - hai chỗ mà hai cách thay thì sớm muộn cũng in ra hai con số khác nhau. `_check16` canh:
+> không câu nào còn cắm cứng đúng giá trị tham số của chính nó, và đổi ngưỡng thì CẢ HAI cột đổi theo.
+>
 > **CÒN LẠI:** dời `DUEFALL=5` + 16 nhóm câu chăm RTOUCH + giờ hẹn preset vào cấu hình ·
 > màn cấp thêm quota WOW · `statStrip` bấm được ở các trang còn lại · bộ phận chuẩn cho
 > `renderDuyet`/`renderGiaoan`/`renderMaGioiThieu`/`renderReupTab`/`renderBanggiao`.

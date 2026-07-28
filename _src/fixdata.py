@@ -1227,6 +1227,32 @@ for _m in _ch4:
 log.append("14quater. Câu nhắc CH4: bỏ ghi chú '(cấu hình ...)' ở %d câu - đã có bánh răng sửa tại chỗ"
            % _clean)
 
+# ═══ 14quinquies. CỘT "KHI NÀO HIỆN" KHÔNG ĐƯỢC CẮM CỨNG CON SỐ (V9.29) ═══
+# Anh Luân: "cái đoạn khi nào hiện, con số 3 ngày đó, e cũng lấy từ cấu hình chứ đâu phải gắn cứng
+# phải ko, gắn cứng ko được đâu nhé". Đúng: câu mẫu (tmpl) đã dùng {1} và thay bằng số cấu hình,
+# nhưng câu mô tả (when) lại viết thẳng "(3 ngày)". Đổi ngưỡng thành 5 là cột đó NÓI DỐI.
+# Nay when cũng dùng {1}/{2}/... y như tmpl, và app thay bằng số cấu hình khi hiển thị.
+_ch4b = d.get("config", {}).get("ch4") or []
+_ch2v = {c.get("name"): str(c.get("value") or "") for c in (d.get("config", {}).get("ch2") or [])}
+_fixw = 0
+for _m in _ch4b:
+    _w = str(_m.get("when") or "")
+    if not _w:
+        continue
+    _ps = _m.get("params") or []
+    _new = _w
+    for _i, _pn in enumerate(_ps):
+        _v = re.sub(r"\.0$", "", _ch2v.get(_pn, ""))
+        if not _v:
+            continue
+        # chỉ thay khi con số ĐỨNG RIÊNG (không dính số khác, không đụng chỗ trống có sẵn)
+        _new = re.sub(r"(?<![\d{])" + re.escape(_v) + r"(?![\d}])", "{%d}" % (_i + 1), _new)
+    if _new != _w:
+        _m["when"] = _new
+        _fixw += 1
+log.append("14quinquies. Cột 'Khi nào hiện': bỏ số cắm cứng ở %d câu - nay lấy từ cấu hình như câu mẫu"
+           % _fixw)
+
 # ═══ 15. SAN PHẲNG SƠ ĐỒ CỘT (UNION KEY) - PHẢI LÀ PASS CUỐI CÙNG ═════════
 # Cột chỉ có mặt ở vài dòng (referrer_name, referral_uses, net_received...) làm app render
 # ô trống và bản Sheets lệch cột. LUẬT: mọi dòng trong cùng một bảng phải CÙNG BỘ CỘT.

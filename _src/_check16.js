@@ -849,4 +849,43 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("nut dang the <a> khong an gach chan cua link", /a\.btn,a\.pill\{text-decoration:none\}/.test(CSS));
 })();
 
+
+/* ---- 31. COT "KHI NAO HIEN" cung phai lay so tu cau hinh (V9.29, anh Luan) ----
+   "cai doan khi nao hien, con so 3 ngay do, e cung lay tu cau hinh chu dau phai gan cung phai ko,
+    gan cung ko duoc dau nhe" - dung: cau mau (tmpl) da dung {1}, nhung cau mo ta (when) viet thang
+   "(3 ngay)". Doi nguong la cot do NOI DOI. */
+(function(){
+ setRole("all");cfEnsure();
+ t("co ham thay cho trong dung chung cho ca hai cot", typeof msgFill==="function"&&typeof msgWhen==="function");
+ var ch4=(DATA.config&&DATA.config.ch4)||[];
+ /* khong cau nao con cam cung DUNG con so cua tham so cua chinh no */
+ var xau=[];
+ ch4.forEach(function(m){
+  var w=String(m.when||""); if(!w)return;
+  (m.params||[]).forEach(function(pn){
+   var v=String(paramOf(pn,"")||paramStr(pn,"")||"").replace(/\.0$/,"");
+   if(!v)return;
+   if(new RegExp("(?<![\\d{])"+v.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"(?![\\d}])").test(w))xau.push(m.code)})});
+ t("khong cau 'Khi nao hien' nao con cam cung so"+(xau.length?(" - con: "+xau.slice(0,5).join(", ")):""), xau.length===0);
+ /* doi nguong -> CA HAI cot phai doi theo */
+ var m3=ch4Get("NA003");
+ if(m3&&(m3.params||[]).length){
+  var pn=m3.params[0];
+  var row=(DATA.config.ch2||[]).filter(function(c){return c.name===pn})[0];
+  if(row){var cu=row.value;
+   row.value="7";
+   t("doi nguong: cot 'Khi nao hien' doi theo", msgWhen("NA003").indexOf("7")>=0);
+   t("doi nguong: cau mau cung doi theo", msgText("NA003").indexOf("7")>=0);
+   row.value="11";
+   t("doi lan nua van bam theo cau hinh", msgWhen("NA003").indexOf("11")>=0&&msgText("NA003").indexOf("11")>=0);
+   row.value=cu}}
+ /* man Cai dat phai VE cot when qua msgWhen, khong ve chuoi tho */
+ window.SETTAB="ch4";
+ t("man CH4 ve cot 'Khi nao hien' qua msgWhen", /esc\(msgWhen\(m\.code\)\)/.test(SRC));
+ var pg=RENDER["settings"]();
+ t("man CH4 khong lo cho trong {1} ra nguoi dung o cot Khi nao hien",
+   !/Khi nào hiện[\s\S]{0,4000}?\{1\}<\/td>/.test(pg));
+ window.SETTAB="ch2";
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");

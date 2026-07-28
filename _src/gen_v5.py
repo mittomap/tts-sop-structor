@@ -3742,7 +3742,16 @@ function enumEditBtn(name){if(!name)return "";
   'aria-label="Sửa danh mục '+esc(name)+'" '+
   'data-tip="Danh mục '+esc(name)+' · lấy từ Cài đặt > CH1 - bấm để sửa"><i class="ti ti-settings"></i></button>'}
 function ch4Get(code){if(!code)return null;var a=ch4List();for(var i=0;i<a.length;i++)if(a[i].code===code)return a[i];return null}
-function msgText(code){var m=ch4Get(code);if(!m)return "";var t=String(m.tmpl||"");(m.params||[]).forEach(function(pn,i){var v=paramOf(pn,null);t=t.replace(new RegExp("\\{"+(i+1)+"\\}","g"),(v==null?"?":String(v)))});return t}
+/* V9.29 (anh Luân): CỘT "KHI NÀO HIỆN" cũng phải lấy số từ cấu hình, không cắm cứng.
+   Một hàm thay chỗ trống dùng chung cho cả câu mẫu lẫn câu mô tả - hai chỗ mà hai cách thay
+   thì sớm muộn cũng nói hai con số khác nhau. */
+function msgFill(txt,params){var t=String(txt||"");
+ (params||[]).forEach(function(pn,i){var v=paramOf(pn,null);
+  if(v==null){var sv=paramStr(pn,"");v=sv!==""?sv:null}
+  t=t.replace(new RegExp("\\{"+(i+1)+"\\}","g"),(v==null?"?":String(v)))});
+ return t}
+function msgText(code){var m=ch4Get(code);if(!m)return "";return msgFill(m.tmpl,m.params)}
+function msgWhen(code){var m=ch4Get(code);if(!m)return "";return msgFill(m.when,m.params)}
 /* chặng -> mã thông điệp CH4 [thường, khi quá hạn]; áp chuẩn SOP vào từng bước hành trình */
 var JNA={new:["NA050","NA049"],contacted:["NA052","NA048"],test_booked:["",""],test_grading:["NA055","NA054"],
  test_done:["","NA001"],consult:["NA004","NA003"],enrolled:["NA006","NA007"],paid:["","NA063"],
@@ -6453,7 +6462,7 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
    bySheet[sh].forEach(function(m){var idx=ch4List().indexOf(m);var pv=msgText(m.code);/* V9.29: neo de msgGo nhay toi */
     h+='<tr><td><code style="font-size:11px">'+esc(m.code)+'</code>'+(m.params&&m.params.length?'<div class="mut" style="font-size:10px">'+esc(m.params.join(", "))+'</div>':'')+'</td>'+
      '<td><textarea id="msg_'+idx+'" rows="2" style="width:100%;min-width:280px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-family:inherit;font-size:11.5px">'+esc(m.tmpl)+'</textarea>'+(pv&&pv!==m.tmpl?'<div class="mut" style="font-size:10.5px;margin-top:2px">→ '+esc(pv)+'</div>':'')+'</td>'+
-     '<td style="font-size:11px;color:var(--muted);white-space:normal">'+esc(m.when)+'</td>'+
+     '<td style="font-size:11px;color:var(--muted);white-space:normal">'+esc(msgWhen(m.code))+'</td>'+
      '<td style="font-size:11px">'+esc(m.owner||"-")+'</td>'+
      '<td><button class="btn sm" onclick="saveMsg('+idx+')"><i class="ti ti-device-floppy"></i>Lưu</button></td></tr>'});
    h+='</tbody></table></div></div>'});
