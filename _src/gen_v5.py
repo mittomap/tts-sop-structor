@@ -82,6 +82,10 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .mncode{flex:none;font-size:10px;color:#AAB4C0;font-family:ui-monospace,Menlo,Consolas,monospace;min-width:74px;text-align:right}
 .mnact{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding-top:6px}
 @media(max-width:620px){.mncode{display:none}}
+/* V9.27: hang nut hen nhanh - nhieu nut hon nen cho xuong dong gon gang */
+.dtq{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.dtq .pill{font-size:11.5px;padding:4px 11px}
+.dtq .pill.on{background:var(--navy);color:#fff;border-color:var(--navy)}
 .navgrp{margin-bottom:3px}
 .navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500;border-left:3px solid transparent}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
@@ -3446,16 +3450,38 @@ function rfHTML(fs,C){var h='<div class="rform">';
  return h+'</div>'}
 function rfSeg(b){var box=b.parentNode;[].forEach.call(box.querySelectorAll(".rsb"),function(x){x.classList.remove("on")});
  b.classList.add("on");var inp=box.querySelector("input");if(inp)inp.value=b.getAttribute("data-v")}
-function dtPreset(id,kind){var d=new Date();
- if(kind==="t15"){d.setHours(15,0,0,0);if(d<=new Date())d=new Date(d.getTime()+864e5)}
- else if(kind==="t19"){d.setHours(19,0,0,0);if(d<=new Date())d=new Date(d.getTime()+864e5)}
- else if(kind==="m9"){d=new Date(d.getTime()+864e5);d.setHours(9,0,0,0)}
- else if(kind==="w"){d=new Date(d.getTime()+7*864e5);d.setHours(9,0,0,0)}
- var v=d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)+"T"+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);
- var e=document.getElementById(id);if(e)e.value=v}
-function dtQuickHTML(id){return '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:5px">'+
- [["t15","Chiều nay 15h"],["t19","Tối nay 19h"],["m9","Mai 9h"],["w","Tuần sau"]].map(function(p){
-  return '<button type="button" class="pill" onclick="dtPreset(\''+id+'\',\''+p[0]+'\')">'+p[1]+'</button>'}).join("")+'</div>'}
+/* ===== V9.27 NUT HEN NHANH (anh Luân: "làm vài nút thường dùng, kèm giờ vào") =====
+   Ô nhập là NGÀY + GIỜ nên mọi nút đều phải chốt luôn giờ - không có nút nào để trống giờ.
+   Nhãn và giá trị dùng CHUNG một hàm dựng, nên nhãn không bao giờ nói một đằng đặt một nẻo.
+   Nút nào đã trôi qua thì tự ẩn: 6h tối không còn thấy "Chiều nay 15h" nữa. */
+function dtAt(d,h,m){d.setHours(h,m||0,0,0);return d}
+function dtDay(n,h){return dtAt(new Date(Date.now()+n*864e5),h)}
+function dtDow(dow,h){var add=(dow-new Date().getDay()+7)%7||7;return dtDay(add,h)}
+function dtHHMM(d){return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
+function dtDMY(d){return ("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2)}
+var DTQUICK=[
+ ["h2", function(){var d=new Date(Date.now()+2*36e5);d.setSeconds(0,0);d.setMinutes(d.getMinutes()<=30?30:60);return d},
+        function(d){return "2 tiếng nữa · "+dtHHMM(d)}],
+ ["t15",function(){return dtAt(new Date(),15)}, function(){return "Chiều nay 15h"}],
+ ["t19",function(){return dtAt(new Date(),19)}, function(){return "Tối nay 19h"}],
+ ["m9", function(){return dtDay(1,9)},  function(){return "Mai 9h"}],
+ ["m14",function(){return dtDay(1,14)}, function(){return "Mai 14h"}],
+ ["m19",function(){return dtDay(1,19)}, function(){return "Mai 19h"}],
+ ["d2", function(){return dtDay(2,9)},  function(){return "Ngày kia 9h"}],
+ ["sat",function(){return dtDow(6,9)},  function(){return "Thứ 7 9h"}],
+ ["w9", function(){return dtDay(7,9)},  function(){return "Tuần sau 9h"}],
+ ["w2", function(){return dtDay(14,9)}, function(){return "2 tuần nữa 9h"}]];
+var DTQBK={};DTQUICK.forEach(function(r){DTQBK[r[0]]=r});
+function dtVal(d){return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)+"T"+dtHHMM(d)}
+function dtPreset(id,kind){var r=DTQBK[kind];if(!r)return;
+ var e=document.getElementById(id);if(e)e.value=dtVal(r[1]());
+ /* bấm nút nào thì nút đó sáng lên, biết mình vừa chọn cái gì */
+ try{var box=e&&e.parentNode&&e.parentNode.querySelector(".dtq");
+  if(box)[].forEach.call(box.querySelectorAll(".pill"),function(b){b.classList.toggle("on",b.getAttribute("data-q")===kind)})}catch(x){}}
+function dtQuickHTML(id){var now=Date.now();
+ var items=DTQUICK.filter(function(r){return r[1]().getTime()>now+6e4});
+ return '<div class="dtq">'+items.map(function(r){var d=r[1]();
+  return '<button type="button" class="pill" data-q="'+r[0]+'" data-tip="Đặt thành '+esc(dtDMY(d)+" "+dtHHMM(d))+'" onclick="dtPreset(\''+id+'\',\''+r[0]+'\')">'+esc(r[2](d))+'</button>'}).join("")+'</div>'}
 function rfV(k){var e=document.getElementById("r_"+k);if(!e)return "";return normDT(k,String(e.value||"").trim())}
 function rfNeed(fs){var m=[];fs.forEach(function(f){if(f[4]&&!rfV(f[0]))m.push(f[1])});return m}
 /* --- KHAI BÁO MÀN THAO TÁC CHO TỪNG CHẶNG --- */
@@ -9900,10 +9926,16 @@ function navBadge(k){
   if(k==="khieunai")return rows("DL17").filter(function(c){return !isc(c.complaint_status,"resolved")}).length;
  }catch(e){}
  return 0}
+/* V9.27 (anh Luân chốt bằng ảnh): mặc định KHÔNG xổ hết nữa. Nhóm việc hằng ngày (Làm việc,
+   Điều hành) mở sẵn; 4 nhóm CHẶNG và nhóm Tra cứu gập lại - chặng là bản đồ vòng đời, mở hết
+   thì menu dài lê thê mà ngày thường không đụng tới. Người dùng tự mở/gập thì nhớ theo phiên. */
+function navOpenDef(g){
+ if(/^Chặng \d/.test(String(g||"")))return false;
+ if(g==="Tra cứu")return false;
+ return true}
 function navIsOpen(g){window.NAVOPEN=window.NAVOPEN||{};
  if(window.NAVOPEN[g]!==undefined)return !!window.NAVOPEN[g];
- return true}   /* V9.23 (Luân): mặc định XỔ HẾT mọi nhóm - gập lại là do người dùng chủ động gập,
-                   không bắt người mới phải đi mò từng nhóm mới thấy trang mình cần */
+ return navOpenDef(g)}
 function navToggle(g){window.NAVOPEN=window.NAVOPEN||{};window.NAVOPEN[g]=!navIsOpen(g);buildNav()}
 /* ===== V9.15 - MENU THEO CHẶNG VÒNG ĐỜI =====
    2 tầng: nhóm = chặng lớn (arc), mục = tổng quan chặng + các nghiệp vụ bên trong.

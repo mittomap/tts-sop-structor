@@ -368,4 +368,57 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("doi trang thai xong bao luon chang va viec ke", /toast\("Đã đổi trạng thái "\+id\+extra/.test(SRC));
 })();
 
+/* ---- 16. TRANG THAI DONG/MO MAC DINH CUA MENU (V9.27 - anh Luan chot bang anh) ---- */
+(function(){
+ setRole("all");window.NAVOPEN={};
+ t("nhom Lam viec mo san", navIsOpen("Làm việc")===true);
+ t("nhom Dieu hanh mo san", navIsOpen("Điều hành")===true);
+ t("4 nhom CHANG gap lai", NAVTREE.filter(function(G){return G.arc}).every(function(G){return navIsOpen(G.g)===false}));
+ t("nhom Tra cuu gap lai", navIsOpen("Tra cứu")===false);
+ buildNav();
+ var nav=document.getElementById("nav").innerHTML||"";
+ t("menu ve dung: nhom mo co lop open", (nav.match(/navlbl open/g)||[]).length===2);
+ t("menu ve dung: 5 nhom con lai khong co lop open", (nav.match(/class="navlbl(?! open)/g)||[]).length===5);
+ t("nhom gap lai thi khong ve muc ben trong", nav.indexOf('data-k="nhaplead"')<0);
+ t("nhom mo van ve du muc ben trong", nav.indexOf('data-k="banlam"')>=0&&nav.indexOf('data-k="baocao"')>=0);
+ t("nhom gap lai van hien badge tong so viec", /navlbl(?! open)[^>]*>[\s\S]{0,400}?class="dot"/.test(nav));
+ /* nguoi dung tu mo thi phai nho */
+ navToggle("Chặng 1 · Khách tiềm năng");
+ t("tu mo mot nhom chang thi nho lai", navIsOpen("Chặng 1 · Khách tiềm năng")===true);
+ t("mo roi thi ve du muc ben trong", (document.getElementById("nav").innerHTML||"").indexOf('data-k="nhaplead"')>=0);
+ navToggle("Chặng 1 · Khách tiềm năng");
+ t("gap lai duoc", navIsOpen("Chặng 1 · Khách tiềm năng")===false);
+ navToggle("Làm việc");
+ t("nhom mac dinh mo cung gap lai duoc", navIsOpen("Làm việc")===false);
+ window.NAVOPEN={};
+ t("co ham khai mac dinh rieng, khong cam cung trong navIsOpen", typeof navOpenDef==="function");
+})();
+
+/* ---- 17. NUT HEN NHANH: nut nao cung phai kem GIO va dat dung nhu nhan (V9.27) ---- */
+(function(){
+ t("co du bo nut hen nhanh (>=8)", DTQUICK.length>=8);
+ var now=Date.now();
+ DTQUICK.forEach(function(r){
+  var d=r[1](),lb=r[2](d);
+  t("nut '"+lb+"' co chot gio (khong de 00:00 mac ke)", d.getHours()!==0||/0h|00:00/.test(lb));
+  t("nut '"+lb+"' luon tro toi tuong lai", d.getTime()>now);
+  t("nut '"+lb+"' co ghi gio trong nhan", /\d+\s*h|\d{1,2}:\d{2}/.test(lb));
+ });
+ /* nhan va gia tri phai KHOP - bam nut nao ra dung ngay gio nut do ghi */
+ var el=document.getElementById("f_test");
+ DTQUICK.forEach(function(r){
+  var want=r[1]();
+  dtPreset("f_test",r[0]);
+  var got=(document.getElementById("f_test")||{}).value||"";
+  t("bam '"+r[2](want)+"' ra dung gia tri", got===dtVal(want));
+ });
+ var html=dtQuickHTML("f_test");
+ t("moi nut deu co chu thich ghi ro ngay gio se dat", (html.match(/data-tip="Đặt thành /g)||[]).length===(html.match(/data-q="/g)||[]).length);
+ t("nut da troi qua thi khong hien", (html.match(/data-q="/g)||[]).length<=DTQUICK.length);
+ t("bat ke gio nao trong ngay van con it nhat 4 nut", (html.match(/data-q="/g)||[]).length>=4);
+ t("nhan va gia tri dung chung mot ham dung, khong the lech", /r\[1\]\(\)/.test(SRC)&&/DTQBK\[kind\]/.test(SRC));
+ t("bam nut nao thi nut do sang len", /classList\.toggle\("on",b\.getAttribute\("data-q"\)===kind\)/.test(SRC));
+ t("hang nut co the xuong dong khi chat", /\.dtq\{[^}]*flex-wrap:wrap/.test(CSS));
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");
