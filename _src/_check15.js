@@ -41,9 +41,13 @@ var KHAI={
  DL06:["cancelEnrollRun","paySave","rfNeed","runCancelEnroll","tvEnrollSave","insSync"],
  DL07:["duyetRefundRun","paySave","payVerifyRun","rfNeed"],
  DL08:["hvClassConfirm","hvClassRejectSave","midSave","obMark","rfNeed","xepMoiLuu","obChangeSave","obFinish"],
- DL09:["blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota"],
+ /* V9.29p: wowGrantSave = cua ghi CAP THEM LUOT WOW. Ghi wow_extra_approved/purchased roi tinh
+    lai wow_quota_remaining theo DUNG cong thuc cua deriveAll, kem ghi vet vao notes. */
+ DL09:["blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave"],
  DL10:["xepMoiLuu","obChangeSave","clsSave","rfNeed"],
- DL11:["bhCancelRun","bhDone","bhMakeupSave","bhNoteSave","ddSave","sessEnd","sessStart"],
+ /* V9.29p: sesSetTeacher = cua ghi DOI GIAO VIEN cua mot buoi (GV du phong). Chan trung gio va
+    chan sai co so voi lop hoc tai cho, ghi vet vao notes cua buoi. */
+ DL11:["bhCancelRun","bhDone","bhMakeupSave","bhNoteSave","ddSave","sessEnd","sessStart","sesSetTeacher"],
  /* V9.29: xin nghỉ có phép đi qua BA cửa lõi. hvAbsentSave (cổng học viên) nay chỉ GỌI absReq,
     không tự ghi DL12 nữa - giữ tên trong sổ để nếu ai đó lại cho nó ghi tay thì lộ ra ngay. */
  DL12:["ddSave","hvAbsentSave","absReq","absReview","absMakeup"],
