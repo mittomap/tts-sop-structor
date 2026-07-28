@@ -149,13 +149,16 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.23** (28/07 tối - MẢNG 1 của hội đồng 6 chuyên gia ĐÃ XONG + 6 yêu cầu phát sinh của Luân).
+> **Phiên bản: V9.24** (28/07 tối - MẢNG 1 + MẢNG 2 của hội đồng 6 chuyên gia ĐÃ XONG, cộng hội đồng đợt 2
+> và 8 yêu cầu phát sinh của Luân).
 > **DỮ LIỆU DEMO: 192 -> 4 bản ghi lỗi** (`check_logic.py` nay 123 luật). 4 ca còn lại là việc quá hạn
 > CỐ Ý để màn Giao việc có cảnh báo đỏ thật (luật 10k tự khai là "demo canh bao do").
 > Bộ kiểm sau mỗi build nay có **5 phần** (xem bảng trong `_src/README_SRC.md`), thêm `_src/_checktour.js`.
 > Chi tiết mảng 1 + 6 việc phát sinh: mục **3unvicies** bên dưới.
-> **CÒN LẠI của hội đồng: mảng 2 (KPI diễn giải), 3 (cổng học viên 7 kênh), 4 (học phí theo đợt),
-> 5 (link "sửa ở đây" + tham số thiếu)** - làm tiếp theo đúng thứ tự đó.
+> **CÒN LẠI của hội đồng: mảng 3 (cổng học viên 7 kênh), 4 (học phí theo đợt), 5 (link "sửa ở đây"
+> + tham số thiếu)** - làm tiếp theo đúng thứ tự đó.
+> Bộ kiểm nay **6 phần**: node --check 2 file · _tall 38 trang · _check11 (119+128) · _check12 (37) ·
+> _check13 (174) · _checktour · check_logic (4 ca cố ý) · check_data DAT.
 > **HỘI ĐỒNG ĐỢT 2 - 5 vị trí mới đang rà** (Luân duyệt 28/07): nhân viên tư vấn kiêm tiếp khách,
 > giáo viên đứng lớp, kế toán/thu ngân, giáo vụ xếp lịch, kiểm thử phá hoại. Lý do: 6 chuyên gia cũ
 > đều nhìn từ THIẾT KẾ HỆ THỐNG, không ai nhìn từ GHẾ NGƯỜI NGỒI LÀM 8 TIẾNG - nên bỏ lọt lỗi kiểu
@@ -504,6 +507,50 @@ trỏ sai vị trí". Anh chốt để làm lại toàn bộ guide sau khi hệ 
 còn đổi nhiều qua mảng 2-5 thì bộ trỏ viết bây giờ sẽ lệch tiếp. Phiên này chỉ làm phần KHÔNG phụ
 thuộc nội dung: sửa lỗi màn hình đen, đưa lối vào ra thanh tiêu đề, và bước nào không tìm thấy chỗ
 cần trỏ thì NÓI THẲNG thay vì khoanh bừa giữa màn.
+
+
+## 3tervicies. V9.24 - MẢNG 2: KPI BIẾT NÓI (diễn giải + khuyến nghị hành động)
+
+### A. BỐN LỖI TÍNH phải sửa TRƯỚC, không thì app khuyên sai (đo trên dữ liệu thật)
+| Chỉ số | Trước | Sau | Sai ở đâu |
+|---|---|---|---|
+| CUR - lấp đầy lớp | 26% | **54%** (9 lớp) | Tính cả 10 lớp "lên kế hoạch" (chưa khai giảng nên sĩ số 0) và 1 lớp đã hủy. App đọc 26% rồi khuyên "mở thêm lớp" trong khi lớp đang chạy đã gần đầy. |
+| HCR - nộp bài | 70% | **80%** (326 bài) | Đếm cả bài CHƯA TỚI HẠN vào mẫu số. Bài giao hôm qua chưa nộp là bình thường, không phải HV lười. |
+| AR - đạt mục tiêu | 35% | **45%** (11 hồ sơ) | Tính cả 6 hồ sơ chưa có kết luận đầu ra. App khuyên "siết chất lượng" trong khi thật ra là chưa chấm xong. |
+| Kỳ số liệu | không ăn | **ăn** | `kpiCompute` không đọc `window.REPKY`: chọn "Tháng này" mà mọi chỉ số vẫn tính toàn kỳ. Nay có `repF(bảng, cột ngày)`; điểm danh lọc gián tiếp qua buổi học vì DL12 không có mốc riêng. |
+
+### B. Kiến trúc lớp diễn giải
+- **`kpiSev` 5 bậc** (tot/dat/hut/canhbao/baodong) suy từ KHOẢNG CÁCH tới ngưỡng CH6, thay chấm
+  nhị phân. **`KPIBAND`** cho 3 loại đặc biệt: `tuyetdoi` (chỉ số mục tiêu 100% - GLA/ANR/GCR7/FTR,
+  hụt 5% đã là nghiêm trọng), `thang5` (SS - chênh 0,3 điểm là chuyện lớn), `nps`.
+- **`KPIDOC` 17 chỉ số**, mỗi mục 6 phần: `nghia` · `visao` · `nguon` · `doc(bậc)` viết riêng cho
+  cả 5 bậc · `viec(bậc)` 2-3 hành động CÓ NÚT BẤM tới đúng trang đúng bộ lọc · quy ra người và tiền.
+  Cộng `kpiNum(code)` trả **số con THẬT** (vd "7 lead chưa ai gọi quá hạn", "65 bài đã nộp chưa chấm"),
+  `kpiQuy` quy ra tiền, `kpiMau` nói thẳng cỡ mẫu ("dưới 8 quan sát thì đừng ra quyết định lớn").
+- **`kpiGo(page,{tstab,httab,cstab,settab,chay,filt,viec,jf})`** - nút mở đúng trang + đúng bộ lọc.
+  Không có hàm này thì lời khuyên chỉ là câu chữ.
+- **Hiển thị 3 tầng**: nhãn 5 mức thay chấm · một dòng nhận xét hiện sẵn CHỈ cho chỉ số chưa đạt ·
+  bấm vào bung drawer đầy đủ.
+- **Khối "3 việc nên làm tuần này"** đặt TRÊN khối Tình hình kinh doanh ở trang Báo cáo. Chọn theo
+  điểm = bậc lệch x trọng số `KPIW`, **mỗi chặng tối đa 1 việc** (`KPIARC`) để không dồn cả 3 việc
+  vào một chỗ.
+- **XU HƯỚNG chỉ bật cho nhóm A** (`KPITREND`: LRT/ATR/UAR/HCR/GCR7/TNR/SS/NPS/CLR/CUR - mẫu số
+  ĐÓNG trong kỳ). Nhóm B (CVR/TBR/PCR/RER/AR) mẫu số là LÔ CẦN THỜI GIAN CHÍN nên **cấm hiện mũi
+  tên**, thay bằng câu giải thích. Đo được ngay trên dữ liệu này: CVR 30 ngày = 17% so toàn kỳ 46%
+  - chênh hoàn toàn do lô lead chưa chín, hiện mũi tên đỏ là đọc sai hẳn tình hình.
+
+### C. Bẫy đã cắn trong lúc làm
+- **`window.FILT` bị HAI module dùng với HAI KIỂU dữ liệu** (renderList coi là MẢNG mã enum,
+  fget/fset coi là CHUỖI) trên các khóa TRÙNG nhau (test, tuvan, thanhtoan, wow, xeplop...). Chỉ cần
+  một luồng đặt `FILT.thanhtoan="debt"` rồi ai đó gọi `renderList("thanhtoan")` là bảng TRỐNG TRƠN
+  kèm dòng "không khớp bộ lọc" trong khi dữ liệu còn nguyên. Đã tách hẳn sang `CARDF`.
+- Thêm icon mới (`ti-gauge`, `ti-message`, `ti-file-x`, `ti-mood-sad`, `ti-message-report`) là phải
+  **dựng lại font subset** - harness báo ngay. Icon nay 158.
+- Tiền hiện cho người đọc phải làm tròn về nghìn, nếu không ra "69.268.817,204đ".
+
+Bộ kiểm mới **`_src/_check13.js` (174 tiêu chí)**: khóa cả 4 lỗi tính, 5 bậc, đủ 6 trường cho từng
+chỉ số trong 17 chỉ số, mọi nút hành động phải trỏ tới trang CÓ THẬT, luật nhóm A/B, và thứ tự
+khối 3 việc phải nằm trên khối kinh doanh.
 
 > **VIỆC TỒN web app (ưu tiên trên xuống):**
 > 1. **CHỜ LUÂN NGHIỆM THU ĐỢT 9 + YÊU CẦU KẾ TIẾP** - 4 yêu cầu 28/07 (phòng 2 máy, cổng HV đúng vai, hồ sơ 360 superset, rà sidebar) đã trả xong trong V9.16. Luân cần THỬ THẬT phòng 2 máy trên 2 máy khác nhau (phiên cloud không tự test WebRTC được). Phiên sau: hỏi/đợi yêu cầu kế tiếp trước khi làm gì lớn.

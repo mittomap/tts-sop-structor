@@ -32,5 +32,17 @@ keys.forEach(function(k){
     tourEnd();
   }catch(e){ bad.push("chay bai "+k+" NEM LOI: "+e.message) }
 });
+// ---- MA DIEM NEO: moi buoc goi sel:"@ma" thi ma do PHAI ton tai trong ma nguon ----
+var SRCPY=require('fs').readFileSync('./gen_v5.py','utf8');
+var have={};(SRCPY.match(/data-tour="[A-Za-z0-9_.\-]+"/g)||[]).forEach(function(m){have[m.slice(11,-1)]=1});
+var want={};
+keys.forEach(function(k){TOURS[k].steps.forEach(function(st,i){
+  var sl=String(st.sel||"");
+  if(sl.charAt(0)==="@"){var a=sl.slice(1);want[a]=1;
+    if(!have[a])bad.push("bai "+k+" buoc "+(i+1)+": goi ma neo @"+a+" KHONG co trong ma nguon")}
+})});
+var orphan=Object.keys(have).filter(function(a){return !want[a]});
+console.log("Ma diem neo: khai",Object.keys(have).length,"| bai huong dan dung",Object.keys(want).length,
+            orphan.length?("| khai ma dung: "+orphan.join(",")):"");
 console.log("So bai huong dan:",keys.length,"| tong buoc:",keys.reduce((a,k)=>a+TOURS[k].steps.length,0));
 console.log(bad.length?("TOUR FAIL:\n  "+bad.join("\n  ")):"TOUR OK: menu cap do + moi bai chay het buoc, 0 loi");

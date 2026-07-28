@@ -873,6 +873,27 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .rkpi .v{font-size:22px;font-weight:800;line-height:1.1}
 .rkpi .l{font-size:11.5px;color:var(--muted);margin-top:3px}
 .rkpi .g{margin-top:9px;display:flex;align-items:center;gap:6px}
+/* V9.23 - KPI biết nói: nhãn 5 bậc, dòng nhận xét, thẻ 3 việc nên làm */
+.kpirow.hasdoc:hover{background:#F3F7FF}
+.kpisev{font-size:9.5px;font-weight:800;letter-spacing:.3px;padding:2px 7px;border-radius:20px;white-space:nowrap;flex:none}
+.kpisev.green{background:#E7F6EC;color:#166534}.kpisev.amber{background:#FEF3C7;color:#92400E}
+.kpisev.red{background:#FEE2E2;color:#991B1B}.kpisev.gray{background:#EEF2F6;color:#64748B}
+.kpisay{font-size:11.5px;line-height:1.6;color:#4A5A6E;padding:6px 10px 8px 12px;margin:0 0 4px;border-left:3px solid var(--line);background:#FAFBFD;border-radius:0 8px 8px 0}
+.kpisay.amber{border-left-color:#E08A1E;background:#FFFBF2}.kpisay.red{border-left-color:#DC2626;background:#FFF6F6}
+.kpisay.green{border-left-color:#16A34A;background:#F4FBF6}
+.kpihero{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;background:#F7F9FC;border-left:4px solid var(--line);margin-bottom:12px}
+.kpihero.amber{border-left-color:#E08A1E}.kpihero.red{border-left-color:#DC2626}.kpihero.green{border-left-color:#16A34A}
+.kpihv{font-size:28px;font-weight:800;color:var(--navy);line-height:1}
+.kpihs{font-size:13px;font-weight:800;color:var(--navy)}
+.kpiacts{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.k3row{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:18px}
+.k3card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;border-top:4px solid var(--line)}
+.k3card.amber{border-top-color:#E08A1E}.k3card.red{border-top-color:#DC2626}.k3card.green{border-top-color:#16A34A}
+.k3hd{display:flex;align-items:center;gap:9px;margin-bottom:7px;font-size:13px}
+.k3n{width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none}
+.k3v{font-size:19px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.k3d{font-size:12px;line-height:1.6;color:#4A5A6E;margin-bottom:5px}
+.k3q{font-size:11.5px;line-height:1.55;margin-bottom:2px}
 .kpiph{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:12px;margin-bottom:16px}
 .kpipanel{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .kpiphh{font-size:11.5px;font-weight:800;color:var(--navy);padding:10px 14px;background:linear-gradient(180deg,#FBFCFD,#fff);border-bottom:1px solid var(--line)}
@@ -4693,8 +4714,21 @@ function svgDonut(segs){var tot=segs.reduce(function(a,b){return a+b[1]},0)||1;v
  var ly=20;segs.forEach(function(g){s+='<rect x="126" y="'+(ly-9)+'" width="10" height="10" rx="2" fill="'+g[2]+'"/><text x="141" y="'+ly+'" font-size="10.5" fill="#33404F">'+esc(g[0])+' ('+g[1]+')</text>';ly+=19;});
  return s+'</svg>'}
 /* ===== KPI THEO SOP: tính thẳng từ dữ liệu vận hành, so với ngưỡng CH6 ===== */
+/* Lọc một bảng theo KỲ SỐ LIỆU đang chọn trên trang (window.REPKY). Trước đây kpiCompute
+   KHÔNG đọc bộ lọc kỳ: người dùng chọn "Tháng này" mà mọi chỉ số vẫn tính toàn kỳ. */
+function repF(arr,fld){if(!repRange().from)return arr;
+ return arr.filter(function(r){return inRep(r[fld])})}
 function kpiCompute(){
- var L=rows("DL02"),T=rows("DL03"),CS=rows("DL04"),E=rows("DL06"),OB=rows("DL08"),S=rows("DL09"),CL=rows("DL10"),SE=rows("DL11"),AT=rows("DL12"),HW=rows("DL13"),W=rows("DL14"),SV=rows("DL15"),FB=rows("DL16"),KN=rows("DL17"),CE=rows("DL18");
+ var L=repF(rows("DL02"),"lead_created_time"),T=repF(rows("DL03"),"test_date"),
+     CS=repF(rows("DL04"),"consultation_time"),E=repF(rows("DL06"),"enrollment_time"),
+     OB=repF(rows("DL08"),"assigned_at"),S=rows("DL09"),CL=rows("DL10"),
+     SE=repF(rows("DL11"),"session_date"),HW=repF(rows("DL13"),"homework_assigned_time"),
+     W=repF(rows("DL14"),"wow_session_date"),SV=repF(rows("DL15"),"sent_date"),
+     FB=repF(rows("DL16"),"feedback_time"),KN=repF(rows("DL17"),"complaint_time"),
+     CE=repF(rows("DL18"),"course_completion_time");
+ /* điểm danh không có mốc riêng - lọc theo buổi học thuộc kỳ */
+ var _seIn={};SE.forEach(function(x){_seIn[String(x.session_id||"")]=1});
+ var AT=repRange().from?rows("DL12").filter(function(a){return _seIn[String(a.session_id||"")]}):rows("DL12");
  function hb(a,b){var da=pvnd(a),db=pvnd(b);return (da&&db)?(db.getTime()-da.getTime())/3600000:null}
  function rate(a,b){return b>0?a/b:null}
  function cnt(arr,fn){var n=0;arr.forEach(function(x){if(fn(x))n++});return n}
@@ -4727,8 +4761,12 @@ function kpiCompute(){
  /* P5 - xếp lớp & onboarding */
  v.PLR48=rate(cnt(OB,function(o){return o.class_id&&String(o.class_id).trim()}),OB.length);
  v.CLR=rate(cnt(OB,function(o){return isc(o.class_confirmation_status,"confirmed")}),OB.length);
- var cu=[];CL.forEach(function(c){var cap=num(c.class_capacity);if(cap>0)cu.push(num(c.current_enrollment)/cap)});
- v.CUR=avg(cu);
+ /* CUR chỉ có nghĩa với lớp ĐANG CHẠY hoặc ĐANG TUYỂN. Tính cả lớp "lên kế hoạch" (chưa
+    khai giảng nên sĩ số 0) và lớp "đã hủy" thì tỷ lệ lấp đầy tụt xuống mức ảo, app đọc số
+    đó rồi khuyên "mở thêm lớp" trong khi lớp đang chạy đã gần đầy. */
+ var cu=[];CL.forEach(function(c){if(!isc(c.class_status,"in_progress","open"))return;
+  var cap=num(c.class_capacity);if(cap>0)cu.push(num(c.current_enrollment)/cap)});
+ v.CUR=avg(cu);v.__CURn=cu.length;
  /* P6 - chuyên cần */
  v.ATR=rate(cnt(AT,function(a){return isc(a.attendance_status,"on_time","late")}),AT.length);
  v.UAR=rate(cnt(AT,function(a){return isc(a.attendance_status,"no_show")&&/unexcused/.test(ecode(a.absence_type))}),AT.length);
@@ -4736,7 +4774,11 @@ function kpiCompute(){
  v.AIR=rate(cnt(S,function(s){return isRisk(s.academic_progress_status)}),S.length);
  /* P7 - học thuật, bài tập, WOW */
  var hwSub=HW.filter(hwSubmitted);
- v.HCR=rate(hwSub.length,HW.length);
+ /* HCR đo "bài tới hạn thì HV có nộp không". Đếm cả bài CHƯA TỚI HẠN vào mẫu số là tự bôi
+    đen mình: bài mới giao hôm qua chưa nộp là chuyện bình thường, không phải HV lười. */
+ var hwDue=HW.filter(function(h){var d=pvnd(h.homework_due_date);return !d||d.getTime()<=Date.now()});
+ var hwDueSub=hwDue.filter(hwSubmitted);
+ v.HCR=rate(hwDueSub.length,hwDue.length);v.__HCRn=hwDue.length;
  v.GCR7=rate(cnt(HW,hwGraded),hwSub.length);
  v.OTR7=rate(cnt(hwSub,function(x){return !hwLate(x)}),hwSub.length);
  var seDone=SE.filter(function(s){return isc(s.session_status,"completed")});
@@ -4759,7 +4801,11 @@ function kpiCompute(){
  /* P10 - kết thúc & tái đăng ký */
  v.CR10=rate(cnt(CE,function(c){return isc(c.student_status,"completed")}),CE.length);
  v.RER=rate(cnt(CE,function(c){return isc(c.re_enrollment_status,"confirmed_with_deposit")}),CE.length);
- v.AR=rate(cnt(CE,function(c){return isc(c.achievement_status,"achieved")}),CE.length);
+ /* AR chỉ tính trên hồ sơ ĐÃ CÓ KẾT LUẬN đầu ra. Hồ sơ chưa chấm xong mà đã vào mẫu số thì
+    tỷ lệ đạt bị kéo xuống oan - app khuyên "siết chất lượng" trong khi thật ra là chưa chấm. */
+ var ceJudged=CE.filter(function(c){return String(c.achievement_status||"").trim()});
+ v.AR=rate(cnt(ceJudged,function(c){return isc(c.achievement_status,"achieved")}),ceJudged.length);
+ v.__ARn=ceJudged.length;v.__ARpend=CE.length-ceJudged.length;
  v.DOR=rate(cnt(S,function(s){return isc(s.student_status,"dropped")}),S.length);
 
  /* ===== 12 CHỈ SỐ BỔ SUNG (V8) — tính thẳng từ dữ liệu vận hành ===== */
@@ -4826,6 +4872,350 @@ function kpiFmt(code,val){if(val==null)return "—";var m=KPIUNIT[code];
 function kpiOK(dir,v,th){return dir==="≤"?(v<=th):(v>=th)}
 function kpiShort(n){n=String(n||"");var i=n.indexOf(" - ");return i>=0?n.slice(i+3):n}
 var KPIPH={P1:"P1 · Tiếp nhận lead",P2:"P2 · Test đầu vào",P3:"P3 · Tư vấn & chốt",P4:"P4 · Thanh toán",P5:"P5 · Xếp lớp & Onboarding",P6:"P6 · Chuyên cần",P7:"P7 · Học thuật, bài tập & WOW",P8:"P8 · Khảo sát & phản hồi",P9:"P9 · Khiếu nại",P10:"P10 · Kết thúc & tái ĐK"};
+/* ==================== V9.23 - KPI BIẾT NÓI (mảng 2 hội đồng 6 chuyên gia) ====================
+   Một con số trần không giúp ai quyết định gì. Mỗi chỉ số quan trọng phải trả lời đủ:
+   nó là gì · vì sao đáng quan tâm · lấy từ đâu · đang ở mức nào · nghĩa là bao nhiêu người và
+   bao nhiêu tiền · tuần này phải làm gì · cỡ mẫu có đủ để tin không.
+   Ngưỡng vẫn lấy từ CH6 qua kpiTh - KHÔNG cắm cứng số ở đây. */
+
+/* Dải riêng cho chỉ số mà "đạt" nghĩa là phải TUYỆT ĐỐI 100%, và cho thang điểm 1-5 / NPS:
+   với các chỉ số này, thiếu 5% đã là nghiêm trọng chứ không phải "hụt nhẹ". */
+var KPIBAND={GLA:"tuyetdoi",ANR:"tuyetdoi",GCR7:"tuyetdoi",FTR:"tuyetdoi",SS:"thang5",NPS:"nps"};
+
+/* 5 bậc: tot / dat / hut / canhbao / baodong - suy từ KHOẢNG CÁCH tới ngưỡng CH6,
+   không phải chấm nhị phân đạt/không đạt. */
+function kpiSev(code,v,th,dir){
+ if(v==null||isNaN(v))return "chuadu";
+ var band=KPIBAND[code]||"";
+ var r;                                  /* r = tỷ lệ so với ngưỡng, >1 là tốt hơn ngưỡng */
+ if(dir==="≤")r=(v<=0?2:(th/v));else r=(th<=0?2:(v/th));
+ if(band==="tuyetdoi"){                  /* mục tiêu 100%: hụt 1% đã phải để mắt */
+  if(v>=th)return "tot";
+  if(r>=0.98)return "dat";
+  if(r>=0.95)return "hut";
+  if(r>=0.90)return "canhbao";
+  return "baodong"}
+ if(band==="thang5"){                    /* điểm hài lòng 1-5: chênh 0,3 điểm là chuyện lớn */
+  if(v>=th+0.2)return "tot";
+  if(v>=th)return "dat";
+  if(v>=th-0.3)return "hut";
+  if(v>=th-0.7)return "canhbao";
+  return "baodong"}
+ if(band==="nps"){
+  if(v>=th+0.15)return "tot";
+  if(v>=th)return "dat";
+  if(v>=th-0.15)return "hut";
+  if(v>=0)return "canhbao";
+  return "baodong"}
+ if(r>=1.10)return "tot";
+ if(r>=1.00)return "dat";
+ if(r>=0.90)return "hut";
+ if(r>=0.75)return "canhbao";
+ return "baodong"}
+var SEVLBL={tot:["Tốt","green"],dat:["Đạt","green"],hut:["Hụt nhẹ","amber"],
+ canhbao:["Cảnh báo","amber"],baodong:["Báo động","red"],chuadu:["Chưa đủ dữ liệu","gray"]};
+var SEVW={tot:0,dat:0,hut:1,canhbao:3,baodong:6,chuadu:0};
+
+/* Mở đúng trang + đúng bộ lọc cho nút hành động. Không có hàm này thì lời khuyên chỉ là câu chữ. */
+function kpiGo(page,o){o=o||{};
+ if(o.tstab)window.TSTAB=o.tstab;
+ if(o.httab)window.HTTAB=o.httab;
+ if(o.cstab)window.CSTAB=o.cstab;
+ if(o.settab)window.SETTAB=o.settab;
+ if(o.chay){window.CHAYQ=o.chay;window.CHAYSRCH=""}
+ if(o.filt)fset(o.filtp||page,o.filt);
+ if(o.viec){window.VIECTEAM=o.viec;window.VIECGRP="all";window.VIECOD=!!o.od}
+ if(o.jf){window.JF=window.JF||{q:"",nv:"all",col:"all",risk:"all",stage:"all"};
+  for(var k in o.jf)window.JF[k]=o.jf[k]}
+ closeModal();go(page)}
+function kpiBtn(lb,ic,page,o){
+ return '<button class="btn sm" onclick=\'kpiGo("'+page+'",'+JSON.stringify(o||{})+')\'><i class="ti '+ic+'"></i>'+esc(lb)+'</button>'}
+
+/* Trọng số việc: chỉ số nào lệch thì đáng làm trước. Điểm việc = bậc x trọng số. */
+var KPIW={LRT:9,CVR:8,PCR:8,CAR:7,CLR:6,CUR:5,ATR:8,UAR:6,HCR:6,GCR7:7,TNR:5,SS:9,NPS:7,CR10:7,RER:8,AR:6,TBR:5};
+/* Chặng của chỉ số - mỗi chặng chỉ lấy tối đa 1 việc, tránh cả 3 việc dồn vào một chỗ. */
+var KPIARC={LRT:"A",TBR:"A",CVR:"A",PCR:"A",CAR:"A",CLR:"B",CUR:"B",ATR:"B",UAR:"B",HCR:"B",
+ GCR7:"B",TNR:"B",SS:"C",NPS:"C",CR10:"D",RER:"D",AR:"D"};
+/* Nhóm A: mẫu số ĐÓNG trong kỳ -> so kỳ trước có nghĩa. Nhóm B: mẫu số là LÔ CẦN THỜI GIAN CHÍN
+   (lead tháng này chưa kịp đăng ký) -> so kỳ trước là so bậy, TUYỆT ĐỐI không hiện mũi tên. */
+var KPITREND={LRT:1,ATR:1,UAR:1,HCR:1,GCR7:1,TNR:1,SS:1,NPS:1,CLR:1,CUR:1};
+
+function kpiNum(code){          /* con số con THẬT đứng sau mỗi chỉ số */
+ var L=rows("DL02"),T=rows("DL03"),E=rows("DL06"),OB=rows("DL08"),CL=rows("DL10"),
+     AT=rows("DL12"),HW=rows("DL13"),SV=rows("DL15"),CE=rows("DL18"),SE=rows("DL11");
+ function c(a,f){var n=0;a.forEach(function(x){if(f(x))n++});return n}
+ switch(code){
+  case "LRT":{var slow=c(L,function(l){var x=hoursSince(l.lead_created_time);
+    return !pvnd(l.first_call_time)&&x!=null&&x*60>paramOf("slaLeadResponse_min",15)});
+   return {n:slow,tot:L.length,lbl:slow+" lead chưa ai gọi quá hạn"}}
+  case "TBR":{var b=uniqBy(T,"lead_id");return {n:b,tot:L.length,lbl:b+"/"+L.length+" lead đã đặt test"}}
+  case "CVR":{var cv=c(L,function(l){return isc(l.lead_status,"converted")});
+   return {n:cv,tot:L.length,lbl:cv+"/"+L.length+" lead đã thành học viên"}}
+  case "PCR":{var deb=E.filter(function(e){return !isc(e.enrollment_status,"cancelled")&&num(e.remaining_amount)>0});
+   var money=deb.reduce(function(a,b){return a+num(b.remaining_amount)},0);
+   return {n:deb.length,tot:E.length,money:money,lbl:deb.length+" đơn còn nợ, tổng "+vnd(money)}}
+  case "CAR":{var cc=c(E,function(e){return isc(e.enrollment_status,"cancelled")});
+   var lost=E.filter(function(e){return isc(e.enrollment_status,"cancelled")}).reduce(function(a,b){return a+num(b.final_fee)},0);
+   return {n:cc,tot:E.length,money:lost,lbl:cc+" đơn đã hủy, hụt "+vnd(lost)}}
+  case "CLR":{var np=c(OB,function(o){return !isc(o.class_confirmation_status,"confirmed")});
+   return {n:np,tot:OB.length,lbl:np+" học viên chưa xác nhận lớp"}}
+  case "CUR":{var live=CL.filter(function(x){return isc(x.class_status,"in_progress","open")});
+   var empty=live.reduce(function(a,x){return a+Math.max(0,num(x.class_capacity)-num(x.current_enrollment))},0);
+   return {n:empty,tot:live.length,lbl:"còn trống "+empty+" chỗ ở "+live.length+" lớp"}}
+  case "ATR":{var ab=c(AT,function(a){return isc(a.attendance_status,"no_show")});
+   return {n:ab,tot:AT.length,lbl:ab+"/"+AT.length+" lượt vắng"}}
+  case "UAR":{var ux=c(AT,function(a){return isc(a.attendance_status,"no_show")&&/unexcused/.test(ecode(a.absence_type))});
+   return {n:ux,tot:AT.length,lbl:ux+" lượt vắng KHÔNG phép"}}
+  case "HCR":{var due=HW.filter(function(h){var d=pvnd(h.homework_due_date);return !d||d.getTime()<=Date.now()});
+   var miss=due.filter(function(h){return !hwSubmitted(h)});
+   return {n:miss.length,tot:due.length,lbl:miss.length+"/"+due.length+" bài tới hạn mà chưa nộp"}}
+  case "GCR7":{var sub=HW.filter(hwSubmitted),ung=sub.filter(function(h){return !hwGraded(h)});
+   return {n:ung.length,tot:sub.length,lbl:ung.length+" bài HV đã nộp mà chưa chấm"}}
+  case "TNR":{var done=SE.filter(function(x){return isc(x.session_status,"completed")});
+   var non=done.filter(function(x){return !(String(x.teacher_note_summary||"").trim())});
+   return {n:non.length,tot:done.length,lbl:non.length+" buổi đã dạy chưa ghi nhận xét"}}
+  case "SS":{var low=c(SV,function(x){return num(x.satisfaction_score)>0&&num(x.satisfaction_score)<=paramOf("thresholdSurveyFollowup_score",3)});
+   return {n:low,tot:SV.length,lbl:low+" phiếu chấm điểm thấp cần gọi lại"}}
+  case "NPS":{var det=c(SV,function(x){return num(x.nps_score)>0&&num(x.nps_score)<=6});
+   return {n:det,tot:SV.length,lbl:det+" học viên sẵn sàng nói xấu trung tâm"}}
+  case "CR10":{var nf=c(CE,function(x){return !isc(x.student_status,"completed")});
+   return {n:nf,tot:CE.length,lbl:nf+"/"+CE.length+" hồ sơ không hoàn thành khóa"}}
+  case "RER":{var no=c(CE,function(x){return !isc(x.re_enrollment_status,"confirmed_with_deposit")});
+   return {n:no,tot:CE.length,lbl:no+" học viên xong khóa mà chưa tái ghi danh"}}
+  case "AR":{var jud=CE.filter(function(x){return String(x.achievement_status||"").trim()});
+   var na=jud.filter(function(x){return !isc(x.achievement_status,"achieved")});
+   return {n:na.length,tot:jud.length,pend:CE.length-jud.length,
+    lbl:na.length+"/"+jud.length+" học viên chưa đạt mục tiêu đầu ra"}}
+ }
+ return {n:null,tot:null,lbl:""}}
+function uniqBy(a,f){var m={};a.forEach(function(x){if(x[f])m[x[f]]=1});return Object.keys(m).length}
+
+/* Giá trị trung bình một hợp đồng - dùng để quy chỉ số ra TIỀN. */
+function kpiAvgFee(){var e=rows("DL06").filter(function(x){return num(x.final_fee)>0});
+ if(!e.length)return 0;
+ /* làm tròn về nghìn: tiền hiện ra cho người đọc, không được có phần lẻ kiểu 817,204đ */
+ return Math.round(e.reduce(function(a,b){return a+num(b.final_fee)},0)/e.length/1000)*1000}
+
+/* 17 chỉ số quan trọng: nghĩa · vì sao · nguồn · đọc theo bậc · ví dụ số thật · việc nên làm ·
+   quy ra người và tiền · cỡ mẫu. */
+var KPIDOC={
+ LRT:{nghia:"Trung bình bao lâu kể từ lúc khách để lại thông tin tới lúc có người gọi/nhắn lần đầu.",
+  visao:"Khách hỏi 3-4 trung tâm cùng lúc. Ai gọi trước gần như thắng - gọi sau 1 tiếng thì cơ hội chốt giảm hẳn.",
+  nguon:"DL02: lead_created_time so với first_call_time. Ngưỡng ở CH6 (LRT) và CH2 (slaLeadResponse_min).",
+  doc:{tot:"Gọi rất nhanh, đang giữ được lợi thế tranh khách.",dat:"Trong hạn, giữ nhịp này.",
+   hut:"Bắt đầu chậm - vài khách đã kịp nghe trung tâm khác tư vấn.",
+   canhbao:"Chậm rõ. Khách nguội trước khi mình kịp mở lời.",
+   baodong:"Lead đang bị bỏ rơi. Tiền quảng cáo đổ ra rồi mà không ai nhấc máy."},
+  viec:{hut:[["Xem lead quá hạn chưa gọi","ti-phone-call","banlam",{chay:"over"}]],
+   canhbao:[["Gọi ngay nhóm quá hạn","ti-phone-call","banlam",{chay:"over"}],
+    ["Chia lại lead cho người rảnh","ti-users","banggiao",{}]],
+   baodong:[["Gọi ngay nhóm quá hạn","ti-phone-call","banlam",{chay:"over"}],
+    ["Chia lại lead cho người rảnh","ti-users","banggiao",{}],
+    ["Siết ngưỡng phản hồi ở cấu hình","ti-adjustments","settings",{settab:"ch2"}]]}},
+ TBR:{nghia:"Trong số khách để lại thông tin, bao nhiêu phần trăm chịu đặt lịch test đầu vào.",
+  visao:"Test là cửa vào của tư vấn. Khách không test thì tư vấn chỉ là nói giá, rất khó chốt.",
+  nguon:"Số lead khác nhau có phiếu test trong DL03, chia tổng lead DL02.",
+  doc:{tot:"Mời test rất tốt.",dat:"Đạt mục tiêu.",hut:"Hơi thấp - kịch bản mời test cần chỉnh.",
+   canhbao:"Phần lớn khách không chịu test, phễu tắc ngay cửa đầu.",
+   baodong:"Gần như không ai test. Xem lại cách chào và mức phí test."},
+  viec:{hut:[["Mở danh sách lead chưa test","ti-file-text","tuyensinh",{tstab:"lead"}]],
+   canhbao:[["Mở danh sách lead chưa test","ti-file-text","tuyensinh",{tstab:"lead"}],
+    ["Sửa câu mời test","ti-message","settings",{settab:"ch4"}]],
+   baodong:[["Mở danh sách lead chưa test","ti-file-text","tuyensinh",{tstab:"lead"}],
+    ["Sửa câu mời test","ti-message","settings",{settab:"ch4"}]]}},
+ CVR:{nghia:"Trong số khách để lại thông tin, bao nhiêu phần trăm thành học viên có đóng tiền.",
+  visao:"Đây là chỉ số tiền: nhân với số lead và học phí trung bình ra thẳng doanh thu tháng.",
+  nguon:"Số lead khác nhau có đăng ký chưa hủy trong DL06, chia tổng lead DL02.",
+  doc:{tot:"Chốt tốt hơn mục tiêu.",dat:"Đạt mục tiêu.",hut:"Hụt nhẹ - soi lại khâu tư vấn và báo giá.",
+   canhbao:"Chốt kém, lead đổ vào mà không ra tiền.",
+   baodong:"Phễu vỡ. Rà lại từ chất lượng lead tới kịch bản tư vấn."},
+  viec:{hut:[["Xem khách đang cân nhắc","ti-users","banlam",{chay:"considering"}]],
+   canhbao:[["Xem khách đang cân nhắc","ti-users","banlam",{chay:"considering"}],
+    ["Soi từng bước phễu","ti-chart-bar","baocao",{}]],
+   baodong:[["Xem khách đang cân nhắc","ti-users","banlam",{chay:"considering"}],
+    ["Soi từng bước phễu","ti-chart-bar","baocao",{}],
+    ["Xem lại nguồn lead","ti-target","baocao",{}]]}},
+ PCR:{nghia:"Trong số đăng ký còn hiệu lực, bao nhiêu phần trăm đã đóng đủ tiền.",
+  visao:"Phần chưa đủ chính là công nợ - tiền đã ghi doanh thu nhưng chưa nằm trong tài khoản.",
+  nguon:"DL06: remaining_amount bằng 0 thì tính là đủ.",
+  doc:{tot:"Thu tốt, công nợ mỏng.",dat:"Trong ngưỡng chấp nhận.",
+   hut:"Công nợ đang dày lên - nhắc sớm còn dễ đòi.",
+   canhbao:"Công nợ nhiều, dòng tiền tháng sẽ hụt.",
+   baodong:"Nợ đọng nghiêm trọng. Dừng xếp lớp cho đơn chưa đủ cọc."},
+  viec:{hut:[["Mở danh sách còn nợ","ti-cash","tuyensinh",{tstab:"thanhtoan",filt:"debt",filtp:"thanhtoan"}]],
+   canhbao:[["Mở danh sách còn nợ","ti-cash","tuyensinh",{tstab:"thanhtoan",filt:"debt",filtp:"thanhtoan"}],
+    ["Chỉnh ngưỡng nhắc nợ","ti-adjustments","settings",{settab:"ch2"}]],
+   baodong:[["Mở danh sách còn nợ","ti-cash","tuyensinh",{tstab:"thanhtoan",filt:"debt",filtp:"thanhtoan"}],
+    ["Chỉnh ngưỡng nhắc nợ","ti-adjustments","settings",{settab:"ch2"}]]}},
+ CAR:{nghia:"Bao nhiêu phần trăm đăng ký bị hủy sau khi đã chốt.",
+  visao:"Hủy sau chốt là mất cả tiền lẫn uy tín, và thường là dấu hiệu tư vấn hứa quá tay.",
+  nguon:"DL06: enrollment_status là đã hủy.",
+  doc:{tot:"Rất ít hủy.",dat:"Trong ngưỡng.",hut:"Hủy nhỉnh lên - đọc lý do hủy xem có lặp lại không.",
+   canhbao:"Hủy nhiều bất thường.",baodong:"Hủy tràn lan. Rà ngay khâu tư vấn và chất lượng buổi đầu."},
+  viec:{hut:[["Xem đơn đã hủy và lý do","ti-file-x","tuyensinh",{tstab:"thanhtoan"}]],
+   canhbao:[["Xem đơn đã hủy và lý do","ti-file-x","tuyensinh",{tstab:"thanhtoan"}],
+    ["Xem khiếu nại gần đây","ti-alert-triangle","cskh",{cstab:"khieunai"}]],
+   baodong:[["Xem đơn đã hủy và lý do","ti-file-x","tuyensinh",{tstab:"thanhtoan"}],
+    ["Xem khiếu nại gần đây","ti-alert-triangle","cskh",{cstab:"khieunai"}]]}},
+ CLR:{nghia:"Bao nhiêu phần trăm học viên đã xác nhận đồng ý với lớp được xếp.",
+  visao:"Chưa xác nhận là chưa chắc đi học. Buổi đầu vắng thì lớp mất khí thế và dễ kéo theo bỏ học.",
+  nguon:"DL08: class_confirmation_status.",
+  doc:{tot:"Gần như ai cũng xác nhận.",dat:"Đạt.",hut:"Còn kha khá người im lặng - gọi nhắc.",
+   canhbao:"Nhiều học viên chưa phản hồi, buổi đầu sẽ vắng.",
+   baodong:"Phần lớn chưa xác nhận. Kiểm xem tin nhắn lớp có gửi được không."},
+  viec:{hut:[["Mở hàng chờ xác nhận lớp","ti-school","xeplop",{}]],
+   canhbao:[["Mở hàng chờ xác nhận lớp","ti-school","xeplop",{}],
+    ["Sửa câu nhắn thông tin lớp","ti-message","settings",{settab:"ch4"}]],
+   baodong:[["Mở hàng chờ xác nhận lớp","ti-school","xeplop",{}],
+    ["Sửa câu nhắn thông tin lớp","ti-message","settings",{settab:"ch4"}]]}},
+ CUR:{nghia:"Trung bình lớp đang chạy và đang tuyển lấp đầy bao nhiêu phần trăm sức chứa.",
+  visao:"Lớp vắng vẫn tốn nguyên tiền giảng viên và phòng. Đây là chỉ số lãi lỗ của vận hành.",
+  nguon:"DL10: current_enrollment chia class_capacity, CHỈ tính lớp đang học và đang tuyển.",
+  doc:{tot:"Lớp đầy, hiệu quả tốt.",dat:"Đạt mục tiêu.",hut:"Còn trống - dồn lớp hoặc đẩy tuyển sinh.",
+   canhbao:"Nhiều chỗ trống, đang lỗ chi phí vận hành.",
+   baodong:"Lớp quá vắng. Cân nhắc gộp lớp hoặc lùi khai giảng."},
+  viec:{hut:[["Xem lớp còn trống chỗ","ti-users-group","hoctap",{httab:"lop"}]],
+   canhbao:[["Xem lớp còn trống chỗ","ti-users-group","hoctap",{httab:"lop"}],
+    ["Xem hàng chờ xếp lớp","ti-school","xeplop",{}]],
+   baodong:[["Xem lớp còn trống chỗ","ti-users-group","hoctap",{httab:"lop"}],
+    ["Xem hàng chờ xếp lớp","ti-school","xeplop",{}]]}},
+ ATR:{nghia:"Bao nhiêu phần trăm lượt điểm danh là có mặt (kể cả đi trễ).",
+  visao:"Chuyên cần tụt là chỉ báo sớm nhất của bỏ học, đi trước mọi dấu hiệu khác vài tuần.",
+  nguon:"DL12: attendance_status.",
+  doc:{tot:"Lớp đi học rất đều.",dat:"Đạt mục tiêu.",hut:"Chớm giảm - gọi hỏi thăm nhóm hay vắng.",
+   canhbao:"Vắng nhiều, nguy cơ bỏ học đang tích tụ.",
+   baodong:"Chuyên cần sụp. Rà giờ học, giảng viên và nhóm học viên yếu."},
+  viec:{hut:[["Xem học viên nguy cơ","ti-alert-triangle","banlam",{jf:{risk:"yes"}}]],
+   canhbao:[["Xem học viên nguy cơ","ti-alert-triangle","banlam",{jf:{risk:"yes"}}],
+    ["Mở sổ điểm danh","ti-checkbox","hoctap",{httab:"buoihoc"}]],
+   baodong:[["Xem học viên nguy cơ","ti-alert-triangle","banlam",{jf:{risk:"yes"}}],
+    ["Mở sổ điểm danh","ti-checkbox","hoctap",{httab:"buoihoc"}]]}},
+ UAR:{nghia:"Bao nhiêu phần trăm lượt điểm danh là vắng KHÔNG phép.",
+  visao:"Vắng có phép là hoàn cảnh; vắng không phép là mất kết nối - đây mới là nhóm sắp bỏ học.",
+  nguon:"DL12: attendance_status vắng và absence_type không phép.",
+  doc:{tot:"Rất ít vắng không phép.",dat:"Trong ngưỡng.",hut:"Bắt đầu có người biến mất không báo.",
+   canhbao:"Nhiều ca mất liên lạc.",baodong:"Học viên bỏ ngang mà không ai gọi lại."},
+  viec:{hut:[["Xem ca vắng chưa gọi hỏi thăm","ti-phone","banlam",{chay:"over"}]],
+   canhbao:[["Xem ca vắng chưa gọi hỏi thăm","ti-phone","banlam",{chay:"over"}],
+    ["Xem học viên nguy cơ","ti-alert-triangle","banlam",{jf:{risk:"yes"}}]],
+   baodong:[["Xem ca vắng chưa gọi hỏi thăm","ti-phone","banlam",{chay:"over"}],
+    ["Xem học viên nguy cơ","ti-alert-triangle","banlam",{jf:{risk:"yes"}}]]}},
+ HCR:{nghia:"Trong số bài tập ĐÃ TỚI HẠN, bao nhiêu phần trăm được nộp.",
+  visao:"Không làm bài thì không lên điểm, tới cuối khóa mới lộ ra thì đã muộn để cứu.",
+  nguon:"DL13: chỉ tính bài có hạn nộp đã qua - bài chưa tới hạn không vào mẫu số.",
+  doc:{tot:"Lớp làm bài rất đều.",dat:"Đạt.",hut:"Có nhóm bắt đầu bỏ bài.",
+   canhbao:"Nhiều bài không nộp, tiến độ học thuật đang chậm lại.",
+   baodong:"Bài tập gần như bỏ trống. Xem lại khối lượng bài và cách nhắc."},
+  viec:{hut:[["Mở danh sách bài chưa nộp","ti-book","hoctap",{httab:"lop"}]],
+   canhbao:[["Mở danh sách bài chưa nộp","ti-book","hoctap",{httab:"lop"}],
+    ["Xem học viên nguy cơ học thuật","ti-alert-triangle","banlam",{jf:{risk:"yes"}}]],
+   baodong:[["Mở danh sách bài chưa nộp","ti-book","hoctap",{httab:"lop"}],
+    ["Xem học viên nguy cơ học thuật","ti-alert-triangle","banlam",{jf:{risk:"yes"}}]]}},
+ GCR7:{nghia:"Bài học viên đã nộp thì bao nhiêu phần trăm được chấm trong hạn.",
+  visao:"Nộp bài mà không được chấm là cách nhanh nhất làm học viên ngừng nộp bài.",
+  nguon:"DL13: graded_at trên số bài đã nộp. Hạn chấm ở CH2 (slaHomeworkGrading_hours).",
+  doc:{tot:"Chấm kịp toàn bộ.",dat:"Gần như kịp.",hut:"Bắt đầu tồn bài chưa chấm.",
+   canhbao:"Tồn nhiều bài, học viên đang chờ.",baodong:"Bài chất đống không ai chấm."},
+  viec:{hut:[["Mở hàng chờ chấm bài","ti-checklist","hoctap",{httab:"lop"}]],
+   canhbao:[["Mở hàng chờ chấm bài","ti-checklist","hoctap",{httab:"lop"}],
+    ["Xem buổi học và hiệu suất lớp","ti-user","hoctap",{httab:"buoihoc"}]],
+   baodong:[["Mở hàng chờ chấm bài","ti-checklist","hoctap",{httab:"lop"}],
+    ["Xem buổi học và hiệu suất lớp","ti-user","hoctap",{httab:"buoihoc"}]]}},
+ TNR:{nghia:"Buổi đã dạy thì bao nhiêu phần trăm có nhận xét của giảng viên.",
+  visao:"Nhận xét là thứ phụ huynh đọc để thấy tiền học đi đâu. Trống nhận xét là trống niềm tin.",
+  nguon:"DL11: teacher_note_summary trên các buổi đã hoàn thành.",
+  doc:{tot:"Ghi nhận xét rất đều.",dat:"Đạt.",hut:"Vài buổi còn trống.",
+   canhbao:"Nhiều buổi không có nhận xét nào.",baodong:"Gần như không ai ghi nhận xét."},
+  viec:{hut:[["Mở buổi thiếu nhận xét","ti-notes","hoctap",{httab:"buoihoc"}]],
+   canhbao:[["Mở buổi thiếu nhận xét","ti-notes","hoctap",{httab:"buoihoc"}],
+    ["Chỉnh hạn ghi nhận xét","ti-adjustments","settings",{settab:"ch2"}]],
+   baodong:[["Mở buổi thiếu nhận xét","ti-notes","hoctap",{httab:"buoihoc"}],
+    ["Chỉnh hạn ghi nhận xét","ti-adjustments","settings",{settab:"ch2"}]]}},
+ SS:{nghia:"Điểm hài lòng trung bình học viên chấm cho trung tâm, thang 1 đến 5.",
+  visao:"Điểm này đi trước doanh thu khoảng một khóa: hài lòng tụt hôm nay thì tái ghi danh tụt sau đó.",
+  nguon:"DL15: satisfaction_score các phiếu đã nộp.",
+  doc:{tot:"Học viên hài lòng cao.",dat:"Đạt mục tiêu.",hut:"Chớm giảm - đọc kỹ phần góp ý.",
+   canhbao:"Hài lòng thấp, tái ghi danh sẽ giảm theo.",
+   baodong:"Học viên bất mãn rõ. Cần gặp trực tiếp nhóm chấm điểm thấp."},
+  viec:{hut:[["Xem phiếu điểm thấp","ti-mood-sad","cskh",{cstab:"khaosat"}]],
+   canhbao:[["Xem phiếu điểm thấp","ti-mood-sad","cskh",{cstab:"khaosat"}],
+    ["Xem phản hồi tiêu cực","ti-message-report","cskh",{cstab:"phanhoi"}]],
+   baodong:[["Xem phiếu điểm thấp","ti-mood-sad","cskh",{cstab:"khaosat"}],
+    ["Xem phản hồi tiêu cực","ti-message-report","cskh",{cstab:"phanhoi"}],
+    ["Xem khiếu nại đang mở","ti-alert-triangle","cskh",{cstab:"khieunai"}]]}},
+ NPS:{nghia:"Mức sẵn sàng giới thiệu trung tâm cho người khác.",
+  visao:"Giới thiệu là nguồn khách rẻ nhất và chốt nhanh nhất. Chỉ số này âm là truyền miệng đang chống lại mình.",
+  nguon:"DL15: nps_score, quy về tỷ lệ người ủng hộ trừ người phản đối.",
+  doc:{tot:"Nhiều người sẵn sàng giới thiệu.",dat:"Đạt.",hut:"Chưa đủ người ủng hộ.",
+   canhbao:"Ít người muốn giới thiệu.",baodong:"Số người nói xấu nhiều hơn người khen."},
+  viec:{hut:[["Xem người chấm thấp","ti-mood-sad","cskh",{cstab:"khaosat"}]],
+   canhbao:[["Xem người chấm thấp","ti-mood-sad","cskh",{cstab:"khaosat"}],
+    ["Mở chương trình giới thiệu","ti-gift","magioithieu",{}]],
+   baodong:[["Xem người chấm thấp","ti-mood-sad","cskh",{cstab:"khaosat"}],
+    ["Xem khiếu nại đang mở","ti-alert-triangle","cskh",{cstab:"khieunai"}]]}},
+ CR10:{nghia:"Bao nhiêu phần trăm học viên học hết khóa thay vì bỏ giữa chừng.",
+  visao:"Bỏ giữa chừng thường kéo theo đòi hoàn tiền, mất tái ghi danh và mất luôn lời giới thiệu.",
+  nguon:"DL18: student_status là hoàn thành khóa.",
+  doc:{tot:"Gần như ai cũng học hết khóa.",dat:"Đạt.",hut:"Có người rơi rụng.",
+   canhbao:"Rơi rụng nhiều.",baodong:"Mất phần lớn học viên trước khi kết khóa."},
+  viec:{hut:[["Xem học viên nguy cơ","ti-alert-triangle","banlam",{jf:{risk:"yes"}}]],
+   canhbao:[["Xem học viên nguy cơ","ti-alert-triangle","banlam",{jf:{risk:"yes"}}],
+    ["Xem hồ sơ kết thúc khóa","ti-flag","ketthuc",{}]],
+   baodong:[["Xem học viên nguy cơ","ti-alert-triangle","banlam",{jf:{risk:"yes"}}],
+    ["Xem hồ sơ kết thúc khóa","ti-flag","ketthuc",{}]]}},
+ RER:{nghia:"Học viên xong khóa thì bao nhiêu phần trăm đăng ký học tiếp.",
+  visao:"Giữ một học viên cũ rẻ hơn nhiều so với tìm một khách mới. Đây là chỉ số lợi nhuận thật.",
+  nguon:"DL18: re_enrollment_status đã xác nhận và đặt cọc.",
+  doc:{tot:"Học tiếp rất tốt.",dat:"Đạt mục tiêu.",hut:"Hụt - mời tái ghi danh sớm hơn.",
+   canhbao:"Ít người học tiếp, phải tuyển mới bù vào.",
+   baodong:"Gần như không ai học tiếp. Xem lại chất lượng và ưu đãi."},
+  viec:{hut:[["Mở hàng chờ mời học tiếp","ti-refresh","ketthuc",{}]],
+   canhbao:[["Mở hàng chờ mời học tiếp","ti-refresh","ketthuc",{}],
+    ["Xem điểm hài lòng","ti-thumb-up","cskh",{cstab:"khaosat"}]],
+   baodong:[["Mở hàng chờ mời học tiếp","ti-refresh","ketthuc",{}],
+    ["Xem điểm hài lòng","ti-thumb-up","cskh",{cstab:"khaosat"}]]}},
+ AR:{nghia:"Trong số hồ sơ ĐÃ CÓ KẾT LUẬN đầu ra, bao nhiêu phần trăm đạt mục tiêu ban đầu.",
+  visao:"Đây là lời hứa của trung tâm. Không đạt thì không xin được lời giới thiệu, không dùng được làm minh chứng tuyển sinh.",
+  nguon:"DL18: achievement_status. Hồ sơ CHƯA chấm xong không nằm trong mẫu số.",
+  doc:{tot:"Đầu ra tốt hơn cam kết.",dat:"Đạt cam kết.",hut:"Hụt so với cam kết.",
+   canhbao:"Nhiều học viên không đạt mục tiêu.",baodong:"Đầu ra kém xa cam kết - rủi ro hoàn tiền và mất uy tín."},
+  viec:{hut:[["Xem hồ sơ kết thúc khóa","ti-flag","ketthuc",{}]],
+   canhbao:[["Xem hồ sơ kết thúc khóa","ti-flag","ketthuc",{}],
+    ["Xem tiến bộ theo kỹ năng","ti-chart-bar","baocao",{}]],
+   baodong:[["Xem hồ sơ kết thúc khóa","ti-flag","ketthuc",{}],
+    ["Xem tiến bộ theo kỹ năng","ti-chart-bar","baocao",{}]]}}
+};
+
+/* Cỡ mẫu: dưới 20 quan sát thì một hai ca lệch đã làm chỉ số nhảy - phải nói rõ để không quyết vội. */
+function kpiMau(code){var d=kpiNum(code);var t=d.tot;
+ if(t==null)return "";
+ if(t<8)return "Cỡ mẫu rất nhỏ ("+t+") - con số này chỉ tham khảo, đừng ra quyết định lớn.";
+ if(t<20)return "Cỡ mẫu nhỏ ("+t+") - một vài trường hợp lệch đã làm chỉ số nhảy.";
+ return "Cỡ mẫu "+t+" - đủ để tin.";}
+/* Quy chỉ số ra NGƯỜI và TIỀN - đây là thứ người quyết định thật sự nghe. */
+function kpiQuy(code,v,th,dir){var d=kpiNum(code);var fee=kpiAvgFee();
+ if(d.n==null)return "";
+ if(code==="PCR"&&d.money)return "Đang có "+vnd(d.money)+" nằm ngoài tài khoản.";
+ if(code==="CAR"&&d.money)return "Số đơn hủy tương đương "+vnd(d.money)+" doanh thu đã hụt.";
+ if(code==="CVR"&&v!=null&&th){var gap=Math.max(0,th-v)*(d.tot||0);
+  if(gap>=1)return "Kéo lên đúng ngưỡng là thêm khoảng "+Math.round(gap)+" học viên, tương đương "+vnd(Math.round(gap)*fee)+".";}
+ if(code==="RER"&&v!=null&&th){var g2=Math.max(0,th-v)*(d.tot||0);
+  if(g2>=1)return "Thiếu khoảng "+Math.round(g2)+" người học tiếp, tương đương "+vnd(Math.round(g2)*fee)+".";}
+ if(code==="CUR"&&d.n)return "Còn "+d.n+" chỗ trống, lấp đầy tương đương "+vnd(d.n*fee)+".";
+ if(code==="CR10"&&d.n)return d.n+" hồ sơ không hoàn thành, rủi ro hoàn phí và mất tái ghi danh.";
+ return d.lbl?("Quy ra người: "+d.lbl+"."):"";}
+
+/* Xu hướng: chỉ bật cho nhóm A. Nhóm B (CVR/TBR/PCR/RER/AR...) mẫu số là LÔ CẦN THỜI GIAN CHÍN -
+   lead vào tháng này chưa kịp đăng ký, so với toàn kỳ ra 17% so 46% là so BẬY. */
+function kpiTrendHTML(code){
+ if(!KPITREND[code])return '<span class="mut" style="font-size:10.5px">Không so kỳ trước - lô dữ liệu cần thời gian chín, so sẽ ra kết luận sai</span>';
+ var keep=window.REPKY;var now=kpiCompute()[code];
+ window.REPKY=(keep==="m0"||!keep||keep==="all")?"90":"all";var prev=kpiCompute()[code];
+ window.REPKY=keep;
+ if(now==null||prev==null)return "";
+ var dl=now-prev;if(Math.abs(dl)<1e-9)return '<span class="mut" style="font-size:10.5px">Không đổi so kỳ đối chiếu</span>';
+ var up=dl>0;var good=(KPIBAND[code]==="thang5"||KPIBAND[code]==="nps")?up:up;
+ return '<span style="font-size:10.5px;color:'+(good?"#16A34A":"#DC2626")+'">'+(up?"▲":"▼")+" "+kpiFmt(code,Math.abs(dl))+' so kỳ đối chiếu</span>'}
 function kpiSection(){var comp=kpiCompute();var ch6=(DATA.config&&DATA.config.ch6)||[];
  if(!ch6.length)return '<div class="sechd">KPI theo SOP</div><div class="panel"><div class="empty">Chưa nạp được ngưỡng KPI (CH6).</div></div>';
  var byPhase={},order=[];
@@ -4838,12 +5228,86 @@ function kpiSection(){var comp=kpiCompute();var ch6=(DATA.config&&DATA.config.ch
  order.forEach(function(ph){
   h+='<div class="kpipanel"><div class="kpiphh">'+esc(KPIPH[ph]||ph)+'</div>';
   byPhase[ph].forEach(function(k){var c=comp[k.code];var na=(c==null||isNaN(c));
-   var ok=!na&&kpiOK(k.dir,c,Number(k.threshold));var cls=na?"gray":(ok?"green":"red");
-   h+='<div class="kpirow" title="'+esc(k.name)+'"><div class="kpil"><span class="kpic">'+esc(k.code)+'</span><span class="kpin">'+esc(kpiShort(k.name))+'</span></div>'+
-    '<div class="kpiv '+cls+'">'+esc(kpiFmt(k.code,na?null:c))+'</div>'+
-    '<div class="kpig">'+esc(k.dir||"")+' '+esc(kpiFmt(k.code,Number(k.threshold)))+'</div>'+
-    '<span class="kdot '+cls+'"></span></div>'});
+   var th=Number(k.threshold);
+   var sev=kpiSev(k.code,na?null:c,th,k.dir);
+   var SL=SEVLBL[sev]||SEVLBL.chuadu;
+   var doc=KPIDOC[k.code];
+   /* TẦNG 1: nhãn 5 mức thay chấm nhị phân. TẦNG 2: một dòng nhận xét hiện sẵn CHỈ khi chưa đạt.
+      TẦNG 3: bung chi tiết khi bấm. */
+   h+='<div class="kpirow'+(doc?" hasdoc":"")+'" title="'+esc(k.name)+'"'+(doc?' onclick="kpiOpen(\''+k.code+'\')" style="cursor:pointer"':'')+'>'+
+    '<div class="kpil"><span class="kpic">'+esc(k.code)+'</span><span class="kpin">'+esc(kpiShort(k.name))+'</span></div>'+
+    '<div class="kpiv '+SL[1]+'">'+esc(kpiFmt(k.code,na?null:c))+'</div>'+
+    '<div class="kpig">'+esc(k.dir||"")+' '+esc(kpiFmt(k.code,th))+'</div>'+
+    '<span class="kpisev '+SL[1]+'">'+esc(SL[0])+'</span></div>';
+   if(doc&&!na&&sev!=="tot"&&sev!=="dat"){
+    var d=kpiNum(k.code);
+    h+='<div class="kpisay '+SL[1]+'">'+esc(doc.doc[sev]||"")+(d.lbl?' <b>'+esc(d.lbl)+'</b>.':'')+
+     ' <span class="mut">Bấm để xem nên làm gì.</span></div>'}
+   });
   h+='</div>'});
+ return h+'</div>'}
+/* Bung chi tiết một chỉ số: nghĩa - vì sao - nguồn - đang ở mức nào - quy ra người và tiền -
+   cỡ mẫu - xu hướng - và VIỆC NÊN LÀM có nút bấm tới đúng chỗ. */
+function kpiOpen(code){
+ var doc=KPIDOC[code];if(!doc){toast("Chỉ số này chưa có phần diễn giải.");return}
+ var ch6=(DATA.config&&DATA.config.ch6)||[];
+ var k=ch6.filter(function(x){return x.code===code})[0]||{};
+ var v=kpiCompute()[code];var th=Number(k.threshold);
+ var sev=kpiSev(code,v,th,k.dir);var SL=SEVLBL[sev]||SEVLBL.chuadu;
+ var d=kpiNum(code);
+ var h='<div class="dcard"><h4><i class="ti ti-gauge"></i>'+esc(code)+' · '+esc(kpiShort(k.name||code))+'</h4>';
+ h+='<div class="kpihero '+SL[1]+'"><div class="kpihv">'+esc(kpiFmt(code,v))+'</div>'+
+  '<div><div class="kpihs">'+esc(SL[0])+'</div><div class="mut" style="font-size:11.5px">mục tiêu '+esc(k.dir||"")+' '+esc(kpiFmt(code,th))+'</div></div>'+
+  '<div style="margin-left:auto;text-align:right">'+kpiTrendHTML(code)+'</div></div>';
+ h+='<div class="kpisay '+SL[1]+'" style="margin:0 0 10px">'+esc(doc.doc[sev]||"")+(d.lbl?' <b>'+esc(d.lbl)+'</b>.':'')+'</div>';
+ h+=ctxRows([["Chỉ số này là gì",esc(doc.nghia)],["Vì sao đáng quan tâm",esc(doc.visao)],
+  ["Số này lấy từ đâu",esc(doc.nguon)],["Quy ra người và tiền",esc(kpiQuy(code,v,th,k.dir))],
+  ["Cỡ mẫu",esc(kpiMau(code))]]);
+ var acts=(doc.viec&&(doc.viec[sev]||doc.viec.canhbao))||[];
+ if(sev==="tot"||sev==="dat"){
+  h+='<div class="notebar" style="border-left-color:var(--green)"><i class="ti ti-check"></i>Chỉ số này đang ổn - chưa cần can thiệp. Giữ nhịp hiện tại và theo dõi tiếp.</div>'}
+ else if(acts.length){
+  h+='<div style="font-size:12.5px;font-weight:800;color:var(--navy);margin:12px 0 7px">Tuần này nên làm</div><div class="kpiacts">';
+  acts.forEach(function(a){h+=kpiBtn(a[0],a[1],a[2],a[3])});
+  h+='</div>'}
+ h+='<div class="mut" style="font-size:11px;margin-top:12px;line-height:1.6">Ngưỡng của chỉ số này chỉnh ở Cài đặt > Ngưỡng KPI (CH6). '+
+  '<button class="pill" onclick="kpiGo(\'settings\',{settab:\'ch6\'})"><i class="ti ti-adjustments"></i>Sửa ngưỡng</button></div>';
+ openDrawer("Chỉ số "+code,h+'</div>')}
+
+/* 3 VIỆC NÊN LÀM TUẦN NÀY: chọn theo điểm = bậc lệch x trọng số, mỗi chặng tối đa 1 việc để
+   không dồn cả 3 việc vào một chỗ. */
+function kpiTop3(){
+ var comp=kpiCompute();var ch6=(DATA.config&&DATA.config.ch6)||[];
+ var cand=[];
+ ch6.forEach(function(k){
+  if(!KPIDOC[k.code])return;
+  var v=comp[k.code];if(v==null||isNaN(v))return;
+  var th=Number(k.threshold);var sev=kpiSev(k.code,v,th,k.dir);
+  var w=SEVW[sev]||0;if(!w)return;
+  cand.push({code:k.code,name:kpiShort(k.name),v:v,th:th,dir:k.dir,sev:sev,
+   diem:w*(KPIW[k.code]||4),arc:KPIARC[k.code]||"Z"})});
+ cand.sort(function(a,b){return b.diem-a.diem});
+ var seen={},out=[];
+ cand.forEach(function(x){if(out.length>=3)return;if(seen[x.arc])return;seen[x.arc]=1;out.push(x)});
+ /* chưa đủ 3 thì nới luật một-việc-một-chặng */
+ if(out.length<3)cand.forEach(function(x){if(out.length>=3)return;if(out.indexOf(x)<0)out.push(x)});
+ return out}
+function kpiTop3Section(){
+ var top=kpiTop3();
+ if(!top.length)return '<div class="sechd">3 việc nên làm tuần này</div>'+
+  '<div class="panel"><div class="pbody"><div class="empty">Mọi chỉ số quan trọng đang đạt ngưỡng - tuần này không có việc nào phải chữa cháy.</div></div></div>';
+ var h='<div class="sechd">3 việc nên làm tuần này <span style="font-weight:600;text-transform:none;letter-spacing:0" class="mut">· chọn theo mức lệch ngưỡng và mức ảnh hưởng, mỗi chặng tối đa 1 việc</span></div><div class="k3row">';
+ top.forEach(function(x,i){
+  var doc=KPIDOC[x.code];var SL=SEVLBL[x.sev];var d=kpiNum(x.code);
+  var acts=(doc.viec&&(doc.viec[x.sev]||doc.viec.canhbao))||[];
+  h+='<div class="k3card '+SL[1]+'"><div class="k3hd"><span class="k3n">'+(i+1)+'</span>'+
+   '<div><b>'+esc(x.name)+'</b><span class="mut"> · '+esc(x.code)+'</span></div>'+
+   '<span class="kpisev '+SL[1]+'" style="margin-left:auto">'+esc(SL[0])+'</span></div>'+
+   '<div class="k3v">'+esc(kpiFmt(x.code,x.v))+' <span class="mut" style="font-size:11px">mục tiêu '+esc(x.dir||"")+' '+esc(kpiFmt(x.code,x.th))+'</span></div>'+
+   '<div class="k3d">'+esc(doc.doc[x.sev]||"")+(d.lbl?' <b>'+esc(d.lbl)+'</b>.':'')+'</div>'+
+   '<div class="k3q mut">'+esc(kpiQuy(x.code,x.v,x.th,x.dir))+'</div><div class="kpiacts">';
+  acts.slice(0,2).forEach(function(a){h+=kpiBtn(a[0],a[1],a[2],a[3])});
+  h+='<button class="btn sm" onclick="kpiOpen(\''+x.code+'\')"><i class="ti ti-info-circle"></i>Vì sao</button></div></div>'});
  return h+'</div>'}
 function renderBaocao(){
  if(dsLevel("baocao")==="none")return dsDeny("Báo cáo & KPI");
@@ -4851,7 +5315,9 @@ function renderBaocao(){
  var risk=S.filter(function(r){return/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status))}).length;
  var h='<div class="phead"><div><div class="t">Tổng quan · Báo cáo & KPI</div><div class="s">Bức tranh điều hành + toàn bộ chỉ số KPI theo SOP. Số liệu tính thẳng từ dữ liệu vận hành; ngưỡng chỉnh ở Cài đặt (CH6).</div></div>'+
   '<div class="sp"><button class="btn" onclick="go(\'banlam\')"><i class="ti ti-checklist"></i>Trang bắt đầu</button><button class="btn" onclick="window.SETTAB=\'ch6\';go(\'settings\')"><i class="ti ti-adjustments"></i>Ngưỡng KPI</button></div></div>';
- h+=tbar('<span class="tblbl">Kỳ số liệu (bảng Nguồn lead)</span>'+segHTML(window.REPKY||"all",[["m0","Tháng này"],["30","30 ngày"],["90","90 ngày"],["all","Toàn kỳ"]],"window.REPKY='{k}';reRender(CUR)"),"");
+ h+=tbar('<span class="tblbl">Kỳ số liệu</span>'+segHTML(window.REPKY||"all",[["m0","Tháng này"],["30","30 ngày"],["90","90 ngày"],["all","Toàn kỳ"]],"window.REPKY='{k}';reRender(CUR)")+
+  '<span class="mut" style="font-size:11px;margin-left:10px">Kỳ này áp cho TOÀN BỘ chỉ số bên dưới, không riêng bảng nguồn lead.</span>',"");
+ h+=kpiTop3Section();
  h+=bizSection();
  h+=upcomingSection();
  h+=kpiSection();
@@ -5713,8 +6179,13 @@ function xepMoiLuu(){var sid=document.getElementById("xm_stu").value,cid=documen
   if(SVR)google.script.run.apiUpdate("DL10",cid,{current_enrollment:c.current_enrollment});
   toast("Đã xếp "+(s.full_name||sid)+" vào "+(c.class_name||cid)+" (sĩ số "+c.current_enrollment+"/"+(c.class_capacity||"?")+"). Bước tiếp: gửi thông tin lớp.");closeModal();reRender(CUR)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL08",o)}else{d("OB-"+seqNo("DL08","onboarding_id"))}}
-function fget(p){return (window.FILT&&window.FILT[p])||"all"}
-function fset(p,v){window.FILT=window.FILT||{};window.FILT[p]=v}
+/* BẪY: window.FILT được HAI module dùng với HAI KIỂU khác nhau - renderList coi FILT[key] là
+   MẢNG mã enum, còn fget/fset coi là CHUỖI. Các khóa trùng nhau thật (test, tuvan, thanhtoan,
+   wow, xeplop, khaosat, khieunai). Chỉ cần một luồng đặt FILT.thanhtoan="debt" rồi ai đó gọi
+   renderList("thanhtoan") là bảng TRỐNG TRƠN kèm dòng "không khớp bộ lọc" trong khi dữ liệu
+   còn nguyên. Tách hẳn sang biến riêng CARDF. */
+function fget(p){return (window.CARDF&&window.CARDF[p])||"all"}
+function fset(p,v){window.CARDF=window.CARDF||{};window.CARDF[p]=v}
 function pageHead(t,s,btn){/* UX-23: tiêu đề đã có ở topbar (#pgTitle) - phead chỉ còn mô tả + nút, đỡ lặp và tiết kiệm ~46px */
  return '<div class="phead nohd"><div><div class="s" style="margin-top:0">'+esc(s)+'</div></div><div class="sp">'+(btn||"")+'</div></div>'}
 /* ===== THANH CÔNG CỤ CHUẨN =====
@@ -7905,7 +8376,16 @@ function tourNext(){var T=TOURS[TOUR.key];if(!T)return;
  if(TOUR.i>=T.steps.length-1){tourEnd();toast("Đã xong hướng dẫn. Bấm dấu hỏi trên đầu để xem lại bất cứ lúc nào.",4200);return}
  TOUR.i++;tourShow()}
 function tourPrev(){if(TOUR.i>0){TOUR.i--;tourShow()}}
-function tourFind(sel){if(!sel)return null;
+/* ===== MÃ ĐIỂM NEO CHO HƯỚNG DẪN (V9.23) =====
+   Trỏ bằng CSS selector (.settabs, .dt, .phead) là trỏ vào thứ dùng lại ở hàng chục trang -
+   đổi giao diện một chút là lệch, mà không ai biết cho tới lúc chạy thử. Cơ chế bền:
+   mỗi chỗ có thể được trỏ tới tự khai một MÃ NEO bằng thuộc tính data-tour="<mã>", bước
+   hướng dẫn chỉ gọi mã đó dưới dạng sel:"@<mã>". Bộ kiểm _checktour.js đối chiếu hai danh
+   sách và BÁO ĐỎ ngay lúc build nếu một bước gọi mã không tồn tại.
+   Viết màn mới thì gắn data-tour ngay lúc viết, đừng để dồn. */
+function tourSel(sel){sel=String(sel||"");
+ return sel.charAt(0)==="@" ? '[data-tour="'+sel.slice(1)+'"]' : sel}
+function tourFind(sel){sel=tourSel(sel);if(!sel)return null;
  try{var l=document.querySelectorAll(sel);
   for(var i=0;i<l.length;i++){var r=l[i].getBoundingClientRect&&l[i].getBoundingClientRect();
    if(r&&(r.width>4||r.height>4))return l[i]}
