@@ -1378,6 +1378,7 @@ function applyScope(sid){var eff;
  if(!sid){eff=buildScope("__quantri__");eff.group="quantri";eff.pages="*";eff.blocks="*";eff.bell="*";eff.land="banlam";eff.lite=0;eff.kpi=0;eff.mine=0;eff.mineBtn=0}
  else{var st=find("DL01","staff_id",sid);eff=buildScope(st?ecode(st.role):"")}
  window.SCOPEEFF=eff;window.MINEONLY=eff.mine?1:0;
+ try{dsReset()}catch(e){}   /* V9.22: đổi người là xóa memo nhóm/cơ sở, không thừa hưởng phạm vi người trước */
  if(eff.ctx)for(var k in eff.ctx)window[k==="HTTAB"?"HTTAB":k==="TSTAB"?"TSTAB":k]=eff.ctx[k];
  return eff}
 function canSee(k){var rs=SCOPE();return rs.pages==="*"||rs.pages.indexOf(k)>=0||!!VIEW_ALWAYS[k]}
@@ -1393,11 +1394,147 @@ function mapRoleCode(c){c=String(c||"");
  if(c==="teacher")return"teacher";
  if(/academic/.test(c))return"academic";
  return"ceo";}
-function scopeList(code,arr){var r=RBK[CURROLE];if(!r||!r.scope||!CURSTAFF)return arr;
- if(code==="DL02")return arr.filter(function(x){return String(x.assigned_to||"")===CURSTAFF});
- if(CURROLE==="teacher"){if(code==="DL10")return arr.filter(function(x){return String(x.main_teacher_id||"")===CURSTAFF});if(code==="DL13")return arr.filter(function(x){return String(x.teacher_id||"")===CURSTAFF});if(code==="DL11")return arr.filter(function(x){return String(x.teacher_id||"")===CURSTAFF});return arr;}
- if(CURROLE==="wow"){if(code==="DL03")return arr.filter(function(x){return String(x.graded_by||"")===CURSTAFF});if(code==="DL14")return arr.filter(function(x){return String(x.staff_id||"")===CURSTAFF});return arr;}
- return arr;}
+/* ============ V9.22 - PHẠM VI DỮ LIỆU THEO CHỨC DANH (hội đồng phân quyền) ============
+   Trước V9.22 phân quyền mới ở mức GIAO DIỆN (thấy trang nào). Nay thêm tầng DỮ LIỆU:
+   mỗi chức danh thấy dữ liệu CỦA AI. 4 mức: none (không xem) / mine (của tôi) /
+   team (nhóm - cơ sở của tôi) / all (toàn trung tâm), khai theo 8 MIỀN dữ liệu.
+   Cộng thêm tầng CHE TRƯỜNG (mask): thấy dòng nhưng che ô nhạy cảm (tiền, SĐT, nội dung tư vấn).
+   LUẬT ĐẶT CHỐT: KHÔNG lọc trong rows()/find() - chúng nuôi mọi cột *_name và deriveAll, lọc ở đó
+   là gãy dây chuyền. Chỉ lọc ở 3 cổ chai: scopeList (mọi trang danh sách), jAll (bộ máy hành trình),
+   slaItems (chuông) - cộng vài guard cho trang mở bằng link trực tiếp. */
+var DSDOM={DL02:"lead",DL02b:"lead",DL03:"lead",DL04:"lead",
+ DL09:"hocvien",DL08:"hocvien",DL12:"hocvien",DL15:"hocvien",DL16:"hocvien",DL17:"hocvien",DL18:"hocvien",
+ DL10:"lop",DL11:"lop",DL13:"lop",DL14:"lop",DL21:"lop",
+ DL06:"tien",DL07:"tien",DL19:"tien",DL22:"tien",
+ DL01:"nhansu",DL23:"viec",DL24:"viec"};
+var DSDOMT={lead:"Khách tiềm năng",hocvien:"Học viên",lop:"Lớp & giảng dạy",tien:"Tiền & học phí",
+ baocao:"Báo cáo tổng",viec:"Việc được giao",nhansu:"Nhân sự",noidung:"Nội dung nhạy cảm"};
+var DSLV=[["none","Không xem"],["mine","Chỉ của tôi"],["team","Nhóm / cơ sở"],["all","Toàn trung tâm"]];
+/* ma trận mặc định - khóa theo nhóm ROLESCOPE, hậu tố _mgr = lớp phủ quản lý (leader/manager) */
+var DSDEF={
+ quantri:{lead:"all",hocvien:"all",lop:"all",tien:"all",baocao:"all",viec:"all",nhansu:"all",noidung:"all"},
+ dieuhanh:{lead:"all",hocvien:"all",lop:"all",tien:"all",baocao:"all",viec:"all",nhansu:"all",noidung:"all"},
+ tuvan:{lead:"mine",hocvien:"team",lop:"all",tien:"mine",baocao:"none",viec:"mine",nhansu:"none",noidung:"mine"},
+ tuvan_mgr:{lead:"team",hocvien:"team",lop:"all",tien:"team",baocao:"team",viec:"team",nhansu:"team",noidung:"team"},
+ hocvu:{lead:"none",hocvien:"all",lop:"all",tien:"all",baocao:"none",viec:"mine",nhansu:"none",noidung:"all"},
+ hocvu_mgr:{lead:"none",hocvien:"all",lop:"all",tien:"all",baocao:"all",viec:"team",nhansu:"team",noidung:"all"},
+ giaovien:{lead:"none",hocvien:"mine",lop:"mine",tien:"none",baocao:"none",viec:"mine",nhansu:"none",noidung:"none"},
+ wow:{lead:"mine",hocvien:"mine",lop:"mine",tien:"none",baocao:"none",viec:"mine",nhansu:"none",noidung:"none"},
+ ketoan:{lead:"none",hocvien:"all",lop:"none",tien:"all",baocao:"all",viec:"mine",nhansu:"none",noidung:"none"},
+ marketing:{lead:"all",hocvien:"none",lop:"none",tien:"none",baocao:"all",viec:"mine",nhansu:"none",noidung:"none"},
+ hotro:{lead:"none",hocvien:"none",lop:"none",tien:"none",baocao:"none",viec:"mine",nhansu:"none",noidung:"none"}};
+/* trường bị CHE khi miền "noidung"/"tien" không đủ quyền */
+var DSMASK={noidung:["lead_note","notes","content","result_note","consultation_note","complaint_content","feedback_content","negative_comments","suggestions"],
+ lienhe:["phone_number","phone","email","zalo_id"],
+ tien:["total_fee","final_fee","discount_amount","discount_reason","amount","paid_amount","remaining_amount"]};
+function dsCfg(){var c=(DATA.config=DATA.config||{});var p=(c.perm=c.perm||{});
+ if(p.on===undefined)p.on=1;
+ p.m=p.m||{};p.ex=p.ex||[];
+ if(p.mask===undefined)p.mask={noidung:1,lienhe:1,tien:1};
+ return p}
+function dsGroup(){var rs=SCOPE();var g=rs.group||"quantri";
+ var st=CURSTAFF&&find("DL01","staff_id",CURSTAFF);
+ if(st&&/manager|leader/.test(ecode(st.role))&&DSDEF[g+"_mgr"])g=g+"_mgr";
+ return g}
+function dsLevel(dom){var p=dsCfg();
+ if(!p.on||!CURSTAFF)return "all";                      /* tắt phạm vi, hoặc Vào nhanh Quản trị viên */
+ var now=Date.now();
+ for(var i=0;i<p.ex.length;i++){var e=p.ex[i];          /* ngoại lệ cá nhân, có hạn thì tự hết */
+  if(e.sid===CURSTAFF&&e.dom===dom){var d=pvnd(e.until);if(!e.until||(d&&d.getTime()>=now))return e.lv}}
+ var g=dsGroup();
+ if(p.m[g]&&p.m[g][dom])return p.m[g][dom];
+ var base=DSDEF[g]||DSDEF[(g||"").replace(/_mgr$/,"")]||DSDEF.quantri;
+ return base[dom]||"none"}
+var __dsTeam=null,__dsBr=null;
+function dsReset(){__dsTeam=null;__dsBr=null}
+function myTeam(){if(__dsTeam)return __dsTeam;var o={};
+ if(CURSTAFF){o[CURSTAFF]=1;
+  var st=find("DL01","staff_id",CURSTAFF);
+  var lv=staffLevel(st),dep=st&&st.department,br=st&&st.branch;
+  rows("DL01").forEach(function(x){
+   if(String(x.reports_to||"")===CURSTAFF)o[x.staff_id]=1;                    /* cấp dưới trực tiếp */
+   if(lv>=1&&dep&&x.department===dep&&staffLevel(x)<=lv)o[x.staff_id]=1;      /* cùng phòng, cấp thấp hơn */
+   if(lv>=1&&br&&x.branch===br&&staffLevel(x)<=lv)o[x.staff_id]=1});          /* cùng cơ sở */
+ }
+ __dsTeam=o;return o}
+function myBranches(){if(__dsBr)return __dsBr;var o={};
+ var st=CURSTAFF&&find("DL01","staff_id",CURSTAFF);if(st&&st.branch)o[st.branch]=1;
+ __dsBr=o;return o}
+/* ai phụ trách bản ghi này */
+function recOwners(code,r){if(!r)return [];
+ switch(code){
+  case "DL02":return [r.assigned_to];
+  case "DL02b":{var L=r.lead_id&&find("DL02","lead_id",r.lead_id);return [r.staff_id,L&&L.assigned_to]}
+  case "DL03":{var L3=r.lead_id&&find("DL02","lead_id",r.lead_id);return [r.graded_by,r.created_by,L3&&L3.assigned_to]}
+  case "DL04":{var L4=r.lead_id&&find("DL02","lead_id",r.lead_id);return [r.consulted_by,L4&&L4.assigned_to]}
+  case "DL09":return stuOwners(r.student_id);
+  case "DL08":return [r.assigned_by].concat(stuOwners(r.student_id));
+  case "DL12":case "DL15":case "DL16":case "DL17":case "DL18":return stuOwners(r.student_id);
+  case "DL10":return [r.main_teacher_id];
+  case "DL11":return [r.teacher_id,(r.class_id&&(find("DL10","class_id",r.class_id)||{}).main_teacher_id)];
+  case "DL13":return [r.teacher_id,(r.class_id&&(find("DL10","class_id",r.class_id)||{}).main_teacher_id)];
+  case "DL14":return [r.staff_id,r.wow_booked_by];
+  case "DL21":return [];
+  case "DL06":case "DL19":case "DL22":{var L6=r.lead_id&&find("DL02","lead_id",r.lead_id);return [L6&&L6.assigned_to,r.created_by]}
+  case "DL07":return [r.received_by,r.verified_by];
+  case "DL01":return [r.staff_id,r.reports_to];
+  case "DL23":case "DL24":return [r.assignee_id,r.assigner_id,r.staff_id];
+ }
+ return []}
+function stuOwners(sid){if(!sid)return [];var o=[];
+ rows("DL08").forEach(function(b){if(b.student_id!==sid)return;o.push(b.assigned_by);
+  var c=b.class_id&&find("DL10","class_id",b.class_id);if(c)o.push(c.main_teacher_id)});
+ var e=rows("DL06").filter(function(x){return x.student_id===sid})[0];
+ if(e&&e.lead_id){var L=find("DL02","lead_id",e.lead_id);if(L)o.push(L.assigned_to)}
+ return o}
+function recBranch(code,r){if(!r)return "";
+ if(r.branch)return r.branch;
+ if(code==="DL09"||code==="DL02")return r.branch||"";
+ var sid=r.student_id,lid=r.lead_id;
+ if(sid){var S=find("DL09","student_id",sid);if(S&&S.branch)return S.branch}
+ if(lid){var L=find("DL02","lead_id",lid);if(L&&L.branch)return L.branch}
+ return ""}
+/* gác cổng MỘT bản ghi */
+function canRow(code,r){var dom=DSDOM[code];if(!dom)return true;
+ var lv=dsLevel(dom);
+ if(lv==="all")return true;
+ if(lv==="none")return false;
+ var own=recOwners(code,r).filter(Boolean).map(String);
+ if(lv==="mine")return own.indexOf(CURSTAFF)>=0;
+ var team=myTeam();
+ for(var i=0;i<own.length;i++)if(team[own[i]])return true;
+ var br=recBranch(code,r);return !!(br&&myBranches()[br])}
+function srows(code){var a=rows(code);var dom=DSDOM[code];
+ if(!dom||dsLevel(dom)==="all")return a;
+ return a.filter(function(r){return canRow(code,r)})}
+/* gác cổng theo MÃ HỒ SƠ (hồ sơ 360 mở bằng link) */
+function canPid(pid){if(!pid||!CURSTAFF||!dsCfg().on)return true;
+ var S=find("DL09","student_id",pid);
+ if(S)return canRow("DL09",S)||tkGrant(pid);
+ var L=find("DL02","lead_id",pid);
+ if(L)return canRow("DL02",L)||tkGrant(pid);
+ return true}
+/* CẤP QUYỀN TẠM QUA GIAO VIỆC: được giao việc gắn hồ sơ nào thì xem được hồ sơ đó tới khi việc khép lại */
+function tkGrant(pid){var me=CURSTAFF;if(!me)return false;
+ return rows("DL23").some(function(t){return String(t.related_id||"")===String(pid)&&
+  String(t.assignee_id||"")===me&&tkSt(t)!=="confirmed"&&tkSt(t)!=="cancelled"})}
+function dsMaskOn(kind){var p=dsCfg();if(!p.on)return false;
+ if(!p.mask[kind])return false;
+ if(kind==="tien")return dsLevel("tien")==="none";
+ if(kind==="lienhe")return dsLevel("noidung")==="none"&&dsLevel("lead")==="all"; /* marketing: thấy lead nhưng che SĐT */
+ return dsLevel("noidung")==="none"}
+function dsMaskField(field){if(!field)return "";
+ for(var k in DSMASK)if(DSMASK[k].indexOf(field)>=0&&dsMaskOn(k))return k;
+ return ""}
+function dsDeny(what){return '<div class="panel" style="max-width:560px;margin:36px auto;text-align:center;padding:30px">'+
+ '<i class="ti ti-lock" style="font-size:34px;color:var(--muted)"></i>'+
+ '<div style="font-weight:800;font-size:15px;margin:10px 0 6px">'+esc(what||"Nội dung này")+' nằm ngoài phạm vi dữ liệu của bạn</div>'+
+ '<div class="mut" style="font-size:12.5px;margin-bottom:14px">Chức danh của bạn chỉ xem được phần dữ liệu được giao. Cần xem thêm thì nhờ quản lý cấp quyền ở <b>Cài đặt &gt; Phân quyền &amp; Phạm vi dữ liệu</b>.</div>'+
+ '<button class="btn primary" onclick="go(SCOPE().land||\'banlam\')"><i class="ti ti-home"></i>Về trang chính</button></div>'}
+function scopeList(code,arr){ /* CỔ CHAI 1: mọi trang danh sách (renderList) + phễu */
+ if(!CURSTAFF||!dsCfg().on)return arr;
+ var dom=DSDOM[code];if(!dom||dsLevel(dom)==="all")return arr;
+ return arr.filter(function(r){return canRow(code,r)})}
 
 function staffFor(role){var r=RBK[role]||{codes:[],name:"Admin"};var a=rows("DL01");
  for(var i=0;i<a.length;i++){var c=ecode(a[i].role);if(r.codes&&r.codes.length&&r.codes.indexOf(c)>=0&&!/inactive|nghỉ/i.test(String(a[i].status))){return a[i]}}
@@ -1460,6 +1597,8 @@ var CURROLE="sales", CUR="banlam", SEARCH={}, FILT={}, PAGE={}, PSIZE=20;
 
 /* ---------- render helpers ---------- */
 function cell(r,col,sheet){var k=col[0],ty=col[2],v=r[k];
+ /* V9.22: tang CHE TRUONG - thay dong nhung che o nhay cam (tien / SDT / noi dung tu van) */
+ if(dsMaskField(k))return '<span class="mut" title="Truong nay bi an theo phan quyen cua chuc danh ban">&#8226;&#8226;&#8226;</span>';
  if(ty==="enum")return esc(elabel(v))||"<span class=mut>-</span>";
  if(ty==="chip"){if(v==null||v==="")return"<span class=mut>-</span>";return '<span class="chip '+stCls(v)+'">'+esc(elabel(v))+'</span>'}
  if(ty==="money")return v?money(v):"<span class=mut>-</span>";
@@ -1988,7 +2127,7 @@ function slaItems(){var out=jTasks();
  /* V9.20 GIAO VIỆC - chỉ việc CỦA CHÍNH NGƯỜI ĐANG ĐĂNG NHẬP (khác các mục dưới: toàn trung tâm).
     Quản trị viên (không gắn NV) thì thấy mọi việc quá hạn để giám sát khi demo. */
  (function(){var me=CURSTAFF||"";
-  rows("DL23").forEach(function(t){
+  srows("DL23").forEach(function(t){
    var mineT=me?String(t.assignee_id||"")===me:true, gaveT=me?String(t.assigner_id||"")===me:false;
    var st=tkSt(t);
    if(mineT&&st==="new"){
@@ -2004,40 +2143,40 @@ function slaItems(){var out=jTasks();
     add("Giao việc","Việc chờ tôi xác nhận",(ch!=null&&ch>cl)?"red":"amber","ti-inbox",t.assignee_id_name||"",("Đã báo xong: "+(t.title||"")),ch,"giaoviec","","","","tkopen",t.task_id)}
   })})();
  /* (các luật lead cũ đã chuyển vào bộ máy hành trình - xem jTasks) */
- rows("DL04").forEach(function(c){if(isc(c.consultation_status,"not_consulted"))add("Tuyển sinh","Chờ tư vấn lộ trình","amber","ti-messages",c.customer_name_display||c.lead_id,"Chờ tư vấn lộ trình",null,"tuvan","todo",null,null,"tvform",c.consultation_id)});
- rows("DL06").forEach(function(e){if(num(e.discount_amount)>=ckThreshold()&&!String(e.discount_approved_by||"").trim()&&!isc(e.enrollment_status,"cancelled"))add("Tài chính","Duyệt chiết khấu","amber","ti-discount-check",e.student_id_name||e.student_id,"Chiết khấu "+vnd(num(e.discount_amount))+" chờ quản lý duyệt",hoursSince(e.enrollment_time),"duyet","",null,null,null,e.enrollment_id)});
- rows("DL03").forEach(function(r){var att=isc(r.test_attendance_status,"on_time","late"),graded=isc(r.test_status,"graded"),consulted=isc(r.post_test_status,"consulted");
+ srows("DL04").forEach(function(c){if(isc(c.consultation_status,"not_consulted"))add("Tuyển sinh","Chờ tư vấn lộ trình","amber","ti-messages",c.customer_name_display||c.lead_id,"Chờ tư vấn lộ trình",null,"tuvan","todo",null,null,"tvform",c.consultation_id)});
+ srows("DL06").forEach(function(e){if(num(e.discount_amount)>=ckThreshold()&&!String(e.discount_approved_by||"").trim()&&!isc(e.enrollment_status,"cancelled"))add("Tài chính","Duyệt chiết khấu","amber","ti-discount-check",e.student_id_name||e.student_id,"Chiết khấu "+vnd(num(e.discount_amount))+" chờ quản lý duyệt",hoursSince(e.enrollment_time),"duyet","",null,null,null,e.enrollment_id)});
+ srows("DL03").forEach(function(r){var att=isc(r.test_attendance_status,"on_time","late"),graded=isc(r.test_status,"graded"),consulted=isc(r.post_test_status,"consulted");
   var age=hoursSince(r.test_attendance_time);var over=att&&!graded&&age!=null&&age>paramOf("slaTestResult_hours",48);
   if(over)add("Học vụ","Chấm test đầu vào","red","ti-file-text",r.lead_id_name||r.lead_id,"Test chưa chấm quá hạn",age,"test","grade",null,null,"testgrade",r.test_booking_id);
   else if(att&&!graded)add("Học vụ","Chấm test đầu vào","amber","ti-file-text",r.lead_id_name||r.lead_id,"Test chờ chấm điểm",age,"test","grade",null,null,"testgrade",r.test_booking_id);
   else if(graded&&!consulted)add("Tuyển sinh","Tư vấn sau test","amber","ti-messages",r.lead_id_name||r.lead_id,"Có KQ test, chờ tư vấn",null,"test","consult",null,null,"testconsult",r.test_booking_id)});
- rows("DL08").forEach(function(o){var s=obState(o);
+ srows("DL08").forEach(function(o){var s=obState(o);
   if(s.infoOverdue)add("Học vụ","Gửi thông tin lớp","red","ti-send",o.student_id_name||o.student_id,"Chưa gửi thông tin lớp (quá hạn)",hoursSince(o.assigned_at),"xeplop","sendinfo",null,null,"ob",o.onboarding_id);
   else if(o.class_id&&!s.sent)add("Học vụ","Gửi thông tin lớp","amber","ti-send",o.student_id_name||o.student_id,"Chờ gửi thông tin lớp",hoursSince(o.assigned_at),"xeplop","sendinfo",null,null,"ob",o.onboarding_id);
   if(s.obOverdue)add("Học vụ","Hoàn tất onboarding","red","ti-layout-grid-add",o.student_id_name||o.student_id,"Onboarding quá hạn chưa hoàn tất",hoursSince(o.assigned_at),"xeplop","finish",null,null,"ob",o.onboarding_id)});
- rows("DL07").forEach(function(pp){if(!(pp.verified_by&&String(pp.verified_by).trim()))add("Tài chính","Xác nhận khoản thu","amber","ti-receipt",pp.student_id_name||pp.student_id,"Khoản thu chờ xác nhận "+vnd(pp.amount),null,"thanhtoan","verify",null,null,"payverify",pp.enrollment_id)});
- rows("DL06").forEach(function(e){if(/cancel/.test(ecode(e.enrollment_status)))return;var tot=num(e.final_fee)||num(e.total_fee);var rem=e.remaining_amount!==undefined&&e.remaining_amount!==""?num(e.remaining_amount):Math.max(0,tot-num(e.paid_amount));if(rem<=0)return;
+ srows("DL07").forEach(function(pp){if(!(pp.verified_by&&String(pp.verified_by).trim()))add("Tài chính","Xác nhận khoản thu","amber","ti-receipt",pp.student_id_name||pp.student_id,"Khoản thu chờ xác nhận "+vnd(pp.amount),null,"thanhtoan","verify",null,null,"payverify",pp.enrollment_id)});
+ srows("DL06").forEach(function(e){if(/cancel/.test(ecode(e.enrollment_status)))return;var tot=num(e.final_fee)||num(e.total_fee);var rem=e.remaining_amount!==undefined&&e.remaining_amount!==""?num(e.remaining_amount):Math.max(0,tot-num(e.paid_amount));if(rem<=0)return;
   var due=pvnd(e.next_payment_due);
   if(due){var dh=(new Date().getTime()-due.getTime())/36e5;
    if(dh>=0)add("Tài chính","Thu công nợ",dh>48?"red":"amber","ti-cash",e.student_id_name||e.student_id,"TỚI HẸN THU "+vnd(rem)+" (hẹn "+e.next_payment_due+")",dh,"thanhtoan","due",null,null,"paydebt",e.enrollment_id);
    return} /* có hẹn thì nhắc theo hẹn, chưa tới hẹn không réo */
   var age=hoursSince(e.enrollment_time);if(rem>=paramOf("thresholdDebtAlert",3000000)&&age!=null&&age>paramOf("slaPayment_grace_days",7)*24)add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"Còn nợ học phí "+vnd(rem)+" (quá kỳ hạn "+paramOf("slaPayment_grace_days",7)+" ngày)",age,"thanhtoan","debt",null,null,"paydebt",e.enrollment_id)});
- rows("DL14").forEach(function(w){var done=ecode(w.wow_status)==="completed";var note=!!(w.wow_content_note&&String(w.wow_content_note).trim());var age=hoursSince(w.wow_session_date);var over=done&&!note&&age!=null&&age>paramOf("slaWowNote_hours",24);
+ srows("DL14").forEach(function(w){var done=ecode(w.wow_status)==="completed";var note=!!(w.wow_content_note&&String(w.wow_content_note).trim());var age=hoursSince(w.wow_session_date);var over=done&&!note&&age!=null&&age>paramOf("slaWowNote_hours",24);
   if(over)add("Học vụ","Ghi nội dung WOW","red","ti-notes",w.student_name||w.student_id,"Buổi WOW chưa ghi nội dung (quá 24h)",age,"wow","note",null,null,"wownote",w.wow_id);
   else if(done&&!note)add("Học vụ","Ghi nội dung WOW","amber","ti-notes",w.student_name||w.student_id,"Buổi WOW chờ ghi nội dung",age,"wow","note",null,null,"wownote",w.wow_id)});
- rows("DL17").forEach(function(c){if(isc(c.complaint_status,"resolved"))return;var sev=ecode(c.complaint_severity);var lim=sev==="high"?paramOf("slaComplaintHigh_hours",24):sev==="medium"?paramOf("slaComplaintMed_hours",48):paramOf("slaComplaintLow_hours",72);var age=hoursSince(c.complaint_time);var over=age!=null&&age>lim;
+ srows("DL17").forEach(function(c){if(isc(c.complaint_status,"resolved"))return;var sev=ecode(c.complaint_severity);var lim=sev==="high"?paramOf("slaComplaintHigh_hours",24):sev==="medium"?paramOf("slaComplaintMed_hours",48):paramOf("slaComplaintLow_hours",72);var age=hoursSince(c.complaint_time);var over=age!=null&&age>lim;
   add("CSKH","Xử lý khiếu nại",over?"red":"amber","ti-alert-triangle",c.student_id_name||c.student_id,(over?"Khiếu nại quá hạn xử lý":"Khiếu nại đang mở")+" · "+(elabel(c.complaint_severity)||sev),age,"khieunai",over?"overdue":"work",null,null,"complaint",c.complaint_id)});
- rows("DL13").forEach(function(hw){if(hwSubmitted(hw)&&!hwGraded(hw)){var age=hoursSince(hw.homework_submitted_time||hw.homework_assigned_time);if(age!=null&&age>paramOf("slaHomeworkGrade_hours",48))add("Học vụ","Chấm bài tập","red","ti-book",hw.student_name,"Bài tập chưa chấm quá 48h",age,"baitap",null,null,hw.student_id)}});
+ srows("DL13").forEach(function(hw){if(hwSubmitted(hw)&&!hwGraded(hw)){var age=hoursSince(hw.homework_submitted_time||hw.homework_assigned_time);if(age!=null&&age>paramOf("slaHomeworkGrade_hours",48))add("Học vụ","Chấm bài tập","red","ti-book",hw.student_name,"Bài tập chưa chấm quá 48h",age,"baitap",null,null,hw.student_id)}});
  /* Bảo lưu sắp hết hạn: gọi mời quay lại TRƯỚC thresholdPauseRemind_days ngày */
  (function(){var rmd=paramOf("thresholdPauseRemind_days",14);
-  rows("DL09").forEach(function(x){if(!isc(x.student_status,"transferred","dropped"))return;
+  srows("DL09").forEach(function(x){if(!isc(x.student_status,"transferred","dropped"))return;
    var pu=pvnd(x.pause_until);if(!pu)return;
    var dl=(pu.getTime()-new Date().getTime())/864e5;
    if(dl<=rmd&&dl>-60)add("CSKH","Bảo lưu sắp hết hạn",dl<0?"red":"amber","ti-player-pause",x.full_name||x.student_id,
     (dl<0?("QUÁ hạn bảo lưu "+Math.ceil(-dl)+" ngày"):("Hết hạn bảo lưu trong "+Math.ceil(dl)+" ngày"))+" - gọi mời quay lại học",null,"baoluu",null,null,x.student_id)})})();
  /* Xin cảm nhận HV đạt mục tiêu (nguồn referral + social proof) */
  (function(){var tD=paramOf("slaTestimonialAsk_days",7);
-  rows("DL18").forEach(function(x){if(!isc(x.achievement_status,"achieved"))return;
+  srows("DL18").forEach(function(x){if(!isc(x.achievement_status,"achieved"))return;
    if(String(x.testimonial_given||"").trim())return;
    var d=pvnd(x.course_completion_time);if(!d)return;
    var days=(new Date().getTime()-d.getTime())/864e5;
@@ -2046,7 +2185,7 @@ function slaItems(){var out=jTasks();
     "HV ĐẠT mục tiêu - xin cảm nhận/testimonial trong "+tD+" ngày sau kết thúc",days*24,"ketthuc",null,null,x.student_id)})})();
  /* Cuối vòng đời lớp: sắp kết thúc -> chuẩn bị; đã kết thúc mà thiếu hồ sơ đầu ra -> việc đỏ */
  (function(){var preD=paramOf("thresholdPreEnd_days",30);var nowD=new Date();
-  rows("DL10").forEach(function(c){var end=pvnd(c.class_end_date);if(!end)return;
+  srows("DL10").forEach(function(c){var end=pvnd(c.class_end_date);if(!end)return;
    var stc=ecode(c.class_status);
    var daysLeft=(end.getTime()-nowD.getTime())/864e5;
    if(/in_progress|open/.test(stc)&&daysLeft>=0&&daysLeft<=preD)
@@ -2057,7 +2196,7 @@ function slaItems(){var out=jTasks();
      pend+" HV chưa có hồ sơ đầu ra dù lớp đã kết thúc "+Math.floor(-daysLeft)+" ngày - tạo ngay để kịp mời tái ĐK",-daysLeft*24,"ketthuc",null)}})})();
  /* HV vắng buổi mà chưa ai hỏi thăm: SOP gọi trong slaAbsenceCall_hours (24h). Ghi chú vào dòng điểm danh = đã xử lý. */
  (function(){var absH=paramOf("slaAbsenceCall_hours",24);
-  rows("DL12").forEach(function(a){
+  srows("DL12").forEach(function(a){
    if(!isc(a.attendance_status,"no_show"))return;
    if(ecode(a.absence_type)==="excused")return;
    if(String(a.note||"").trim())return;
@@ -2067,7 +2206,7 @@ function slaItems(){var out=jTasks();
    add("Học vụ","Gọi hỏi thăm HV vắng",age>absH?"red":"amber","ti-phone-off",a.student_name||a.student_id,
     "Vắng không phép buổi "+(ss.session_date||"")+" ("+(ss.class_id_name||ss.class_id||"")+") - gọi trong "+absH+"h rồi ghi chú vào buổi",
     age,"banglop",null,null,a.student_id)})})();
- rows("DL09").forEach(function(r){if(/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status)))add("Học vụ","Học viên nguy cơ","red","ti-user-exclamation",r.full_name,"Học viên nguy cơ cần can thiệp",null,null,null,null,r.student_id)});
+ srows("DL09").forEach(function(r){if(/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status)))add("Học vụ","Học viên nguy cơ","red","ti-user-exclamation",r.full_name,"Học viên nguy cơ cần can thiệp",null,null,null,null,r.student_id)});
  return out}
 function jumpFlow(page,filter){if(filter){if(page==="xeplop")window.XLFILT=filter;else fset(page,filter)}go(page)}
 function slaAct(act,id){if(act==="tvform")tvForm(id);else if(act==="testgrade")testResult(id);else if(act==="testconsult")testConsult(id);else if(act==="ob")openOB(id);else if(act==="payverify")openPayVerify(id);else if(act==="paydebt")payForm(id);else if(act==="wownote")wowNote(id);else if(act==="complaint")openComplaint(id)}
@@ -2347,8 +2486,8 @@ function renderTracuu(){
  if(q.length<2){h+='<div class="panel"><div class="empty">Nhập ít nhất 2 ký tự để tìm - gõ "nguyen" vẫn ra "Nguyễn".</div></div>';return h}
  var MIX=jIndex();var res=[];
  function hit(nm,ph,id){return vnorm(nm).indexOf(q)>=0||String(ph||"").indexOf(q)>=0||vnorm(id).indexOf(q)>=0}
- rows("DL09").forEach(function(r){if(hit(r.full_name,r.phone_number,r.student_id))res.push({t:"Học viên",id:r.student_id,nm:r.full_name,sub:(elabel(r.student_status)||"-")+" - "+(r.phone_number||"-"),na:r.next_action,sid:r.student_id,pid:r.student_id})});
- rows("DL02").forEach(function(r){if(hit(r.full_name,r.phone_number,r.lead_id))res.push({t:"Lead",id:r.lead_id,nm:r.full_name,sub:(elabel(r.lead_status)||"-")+" - "+(r.phone_number||"-"),na:r.next_action,pid:r.lead_id})});
+ srows("DL09").forEach(function(r){if(hit(r.full_name,r.phone_number,r.student_id))res.push({t:"Học viên",id:r.student_id,nm:r.full_name,sub:(elabel(r.student_status)||"-")+" - "+(r.phone_number||"-"),na:r.next_action,sid:r.student_id,pid:r.student_id})});
+ srows("DL02").forEach(function(r){if(hit(r.full_name,r.phone_number,r.lead_id))res.push({t:"Lead",id:r.lead_id,nm:r.full_name,sub:(elabel(r.lead_status)||"-")+" - "+(r.phone_number||"-"),na:r.next_action,pid:r.lead_id})});
  h+='<div class="panel"><div class="pbody">';
  if(!res.length)h+='<div class="empty">Không thấy kết quả.</div>';
  res.slice(0,40).forEach(function(r){var cl=naCls(r.na);h+='<div class="task '+cl+'"><div class="ti"><div class="id">'+esc(r.t)+' - '+esc(r.id)+'</div><div class="nm">'+esc(r.nm)+'</div><div class="mt">'+esc(r.sub)+'</div>'+(r.na?'<div class="na">'+esc(r.na)+'</div>':'')+'</div>'+mstripFor(r.pid,MIX)+'<div class="ac">'+(r.sid?'<button class="btn sm" onclick="openHoso(\''+r.sid+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>':'<button class="btn sm" onclick="openQuick(\''+esc(r.id)+'\')"><i class="ti ti-external-link"></i>Mở lead</button>')+'</div></div>'});
@@ -2905,6 +3044,10 @@ function jAll(){var ix=jIndex(),out=[],seen={};
  rows("DL02").forEach(function(L){out.push(jInfo(L.lead_id,ix));seen[L.lead_id]=1});
  rows("DL09").forEach(function(S){var has=false;(ix.enrS[S.student_id]||[]).forEach(function(e){if(e.lead_id&&seen[e.lead_id])has=true});
   if(!has)out.push(jInfo(S.student_id,ix))});
+ /* CỔ CHAI 2 (V9.22): lọc PHẠM VI ở đây - jIndex vẫn chạy trên dữ liệu đầy đủ (không thì sai cột *_name
+    và sai % chuyển đổi của phễu); chỉ lọc mảng KẾT QUẢ nên mọi màn hạ nguồn (Trang bắt đầu, Bảng chặng,
+    4 trang Chặng, jTasks -> chuông -> bong bóng) tự đúng phạm vi. */
+ if(CURSTAFF&&dsCfg().on)out=out.filter(function(J){return canPid(J.C.pid)});
  return out}
 /* --- HÀNH ĐỘNG: chặn khi thiếu dữ liệu bắt buộc --- */
 function jGuard(pid,fn,arg){var J=jInfo(pid);
@@ -3285,11 +3428,11 @@ function runSkipTest(){var R=window.RUN;if(!R)return;var J=jInfo(R.pid);
 function chayQSet(v){window.CHAYQ=v;window.CHAYSRCH="";reRender(CUR==="chay"?"banlam":CUR)}
 function acSearch(q){q=vnorm(q||"").trim();if(q.length<2)return [];
  var out=[];
- rows("DL09").forEach(function(x){if(out.length>=8)return;
+ srows("DL09").forEach(function(x){if(out.length>=8)return;
   if(vnorm(x.full_name).indexOf(q)>=0||String(x.phone_number||"").indexOf(q)>=0||vnorm(x.student_id).indexOf(q)>=0)
    out.push({id:x.student_id,nm:x.full_name,ph:x.phone_number,kind:"HV",st:elabel(x.student_status)||""})});
- var haveHV={};rows("DL09").forEach(function(x){});
- rows("DL02").forEach(function(x){if(out.length>=8)return;
+ var haveHV={};srows("DL09").forEach(function(x){});
+ srows("DL02").forEach(function(x){if(out.length>=8)return;
   if(isc(x.lead_status,"converted"))return; /* đã thành HV - tránh trùng */
   if(vnorm(x.full_name).indexOf(q)>=0||String(x.phone_number||"").indexOf(q)>=0||vnorm(x.lead_id).indexOf(q)>=0)
    out.push({id:x.lead_id,nm:x.full_name,ph:x.phone_number,kind:"Lead",st:elabel(x.lead_status)||""})});
@@ -3953,6 +4096,7 @@ function jTimeline(C){
  if(!ev.length)return '<div class="mut" style="font-size:12px">Chưa có hoạt động nào.</div>';
  return '<div class="jtl">'+ev.map(function(e){return '<div class="jtli"><div class="jtld '+e.cls+'"><i class="ti '+e.ic+'"></i></div><div class="jtlc"><div class="jtlt">'+esc(e.tt)+'</div>'+(e.d?'<div class="jtld2">'+esc(e.d)+'</div>':'')+'<div class="jtlw">'+esc(e.t)+'</div></div></div>'}).join("")+'</div>'}
 function renderHoso(){
+ if(!canPid(window.JPID||window.HOSO))return dsDeny("Hồ sơ này");
  var ix=jIndex();
  var pid=window.JPID||window.HOSO||(rows("DL09")[0]&&rows("DL09")[0].student_id)||(rows("DL02")[0]&&rows("DL02")[0].lead_id);
  if(!ix.lead[pid]&&!ix.stu[pid]){pid=(rows("DL02")[0]||{}).lead_id}
@@ -4395,6 +4539,7 @@ function midSave(cid){var trs=document.querySelectorAll("#drawerBody tr[data-oid
  if(!n){toast("Chưa nhập điểm cho em nào.");return}
  closeModal();toast("Đã lưu điểm giữa khóa cho "+n+" học viên."+(SVR?"":" (Bản Sheets: nhớ thêm 6 cột mid_* vào DL08.)"));reRender(CUR)}
 function renderBanglop(){
+ if(window.BLCLASS&&!canRow("DL10",find("DL10","class_id",window.BLCLASS)))return dsDeny("Lớp này");
  var cls=rows("DL10"),cid=window.BLCLASS||(cls[0]&&cls[0].class_id),lop=find("DL10","class_id",cid)||{};
  window.BLCLASS=cid;
  var tab=window.BLTAB||"buoi";
@@ -4654,6 +4799,7 @@ function kpiSection(){var comp=kpiCompute();var ch6=(DATA.config&&DATA.config.ch
   h+='</div>'});
  return h+'</div>'}
 function renderBaocao(){
+ if(dsLevel("baocao")==="none")return dsDeny("Báo cáo & KPI");
  var L=rows("DL02"),S=rows("DL09"),E=rows("DL06");
  var risk=S.filter(function(r){return/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status))}).length;
  var h='<div class="phead"><div><div class="t">Tổng quan · Báo cáo & KPI</div><div class="s">Bức tranh điều hành + toàn bộ chỉ số KPI theo SOP. Số liệu tính thẳng từ dữ liệu vận hành; ngưỡng chỉnh ở Cài đặt (CH6).</div></div>'+
@@ -4822,7 +4968,7 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
  var h='<div class="phead"><div><div class="t">Cài đặt hệ thống</div><div class="s">Cấu hình sống trong CH1-CH6 của sheet. Đổi 1 giá trị -> mọi nhắc việc/trạng thái/KPI phụ thuộc tự cập nhật.</div></div></div>';
  h+='<div class="settabs">';
  var nHealth=dataHealth().filter(function(x){return x.sev!=="ok"}).length;
- var stabs=[["brand","Giao diện & Thương hiệu"],["menu","Menu sidebar"],["ch2","Ngưỡng & SLA (CH2)"],["ch6","Ngưỡng KPI (CH6)"],["ch4","Thông điệp nhắc việc (CH4)"],["ch1","Danh mục (CH1)"],["khoa","Khóa học"],["staff","Nhân viên & Email"],["health","Sức khỏe dữ liệu"+(nHealth?" ("+nHealth+")":"")]].concat(SVR?[]:[["demo","Dữ liệu demo"]]);
+ var stabs=[["brand","Giao diện & Thương hiệu"],["menu","Menu sidebar"],["phanquyen","Phân quyền & Phạm vi dữ liệu"],["ch2","Ngưỡng & SLA (CH2)"],["ch6","Ngưỡng KPI (CH6)"],["ch4","Thông điệp nhắc việc (CH4)"],["ch1","Danh mục (CH1)"],["khoa","Khóa học"],["staff","Nhân viên & Email"],["health","Sức khỏe dữ liệu"+(nHealth?" ("+nHealth+")":"")]].concat(SVR?[]:[["demo","Dữ liệu demo"]]);
  var rsS=SCOPE();if(rsS.tabs&&rsS.tabs.settings)stabs=stabs.filter(function(t){return rsS.tabs.settings.indexOf(t[0])>=0});
  if(!stabs.some(function(t){return t[0]===tab})){tab=(stabs[0]||["ch2"])[0];window.SETTAB=tab}
  stabs.forEach(function(t){h+='<button class="stab'+(tab===t[0]?" on":"")+'" onclick="window.SETTAB=\''+t[0]+'\';reRender(\'settings\')">'+t[1]+'</button>'});
@@ -4853,6 +4999,65 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
   h+='<div class="fld full"><label>Hotline</label><input id="cf_centerHotline" value="'+esc(paramStr("centerHotline",""))+'" onchange="saveParam(\'centerHotline\')" placeholder="1900 xxxx"></div>';
   h+='<div class="fld full"><label>Địa chỉ</label><input id="cf_centerAddress" value="'+esc(paramStr("centerAddress",""))+'" onchange="saveParam(\'centerAddress\')" placeholder="Số nhà, đường, quận..."></div>';
   h+='<div style="padding-top:6px"><button class="btn danger sm" onclick="uiReset()"><i class="ti ti-restore"></i>Về mặc định toàn bộ giao diện</button></div>';
+  h+='</div></div></div></div>';
+  return h}
+ if(tab==="phanquyen"){var P=dsCfg();
+  var GRPT={quantri:"Quản trị viên",dieuhanh:"Ban Giám đốc",tuvan:"Tư vấn - nhân viên",tuvan_mgr:"Tư vấn - Leader/Trưởng phòng",
+   hocvu:"Học vụ - CSKH",hocvu_mgr:"Học vụ - Trưởng phòng",giaovien:"Giáo viên",wow:"Giáo viên WOW",
+   ketoan:"Kế toán",marketing:"Marketing",hotro:"Hỗ trợ (HR, IT, bảo vệ...)"};
+  var CNT={};rows("DL01").forEach(function(x){if(!staffActive(x))return;
+   var g=(function(){var c=ecode(x.role);for(var k in ROLESCOPE){var m=ROLESCOPE[k].match;if(m&&m.test(c))return (/manager|leader/.test(c)&&DSDEF[k+"_mgr"])?k+"_mgr":k}return "hotro"})();
+   CNT[g]=(CNT[g]||0)+1});
+  h+='<div class="notebar"><i class="ti ti-shield-lock"></i><b>Ai thấy dữ liệu của ai.</b> Phân quyền có 2 tầng: <b>thấy trang nào</b> (theo chức danh, đã có sẵn) và <b>thấy dữ liệu của ai</b> (bảng dưới đây). Sửa xong bấm <b>Xem thử bằng mắt của...</b> để kiểm chứng ngay - không phải đăng nhập lại.</div>';
+  h+='<div class="panel" style="margin-bottom:12px"><div class="pbody" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">';
+  h+='<label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox"'+(P.on?" checked":"")+' onchange="dsCfg().on=this.checked?1:0;persistSoon();reRender(CUR)" style="width:17px;height:17px"><b>Áp phạm vi dữ liệu</b></label>';
+  h+='<span class="chip '+(P.on?"green":"gray")+'">'+(P.on?"Đang bật - mỗi người chỉ thấy phần được giao":"Đang tắt - mọi người thấy toàn bộ")+'</span>';
+  h+='<button class="btn sm" style="margin-left:auto" onclick="dsCfg().m={};dsCfg().ex=[];persistSoon();toast(\'Đã về ma trận khuyến nghị.\');reRender(CUR)"><i class="ti ti-restore"></i>Về mặc định khuyến nghị</button></div>';
+  h+='<div class="mut" style="font-size:11.5px;padding:0 16px 13px">Bản demo chạy trên trình duyệt nên đây là phân quyền GIAO DIỆN + DỮ LIỆU HIỂN THỊ. Khi nối Google Sheets thật, khóa cứng nằm ở quyền chia sẻ sheet - bảng này là bản thiết kế để áp sang đó.</div></div>';
+  h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-table" style="margin-right:6px"></i>Ma trận: chức danh thấy dữ liệu của ai</b></div>';
+  h+='<div class="tbwrap"><table class="dt"><thead><tr><th style="min-width:190px">Chức danh</th>';
+  ["lead","hocvien","lop","tien","baocao","viec","nhansu"].forEach(function(d){h+='<th title="'+esc(DSDOMT[d])+'">'+esc(DSDOMT[d])+'</th>'});
+  h+='</tr></thead><tbody>';
+  Object.keys(DSDEF).forEach(function(g){var lock=(g==="quantri"||g==="dieuhanh");
+   h+='<tr><td><b>'+esc(GRPT[g]||g)+'</b>'+(CNT[g]?'<div class="mut" style="font-size:10.5px">'+CNT[g]+' người</div>':'')+'</td>';
+   ["lead","hocvien","lop","tien","baocao","viec","nhansu"].forEach(function(d){
+    var cur=(P.m[g]&&P.m[g][d])||DSDEF[g][d];
+    if(lock){h+='<td><span class="chip gray">Toàn bộ</span></td>';return}
+    h+='<td><select class="sel" style="min-width:118px;font-size:11.5px" onchange="dsCfg().m[\''+g+'\']=dsCfg().m[\''+g+'\']||{};dsCfg().m[\''+g+'\'][\''+d+'\']=this.value;persistSoon();reRender(CUR)">'+
+     DSLV.map(function(L){return '<option value="'+L[0]+'"'+(cur===L[0]?" selected":"")+'>'+L[1]+'</option>'}).join("")+'</select></td>'});
+   h+='</tr>'});
+  h+='</tbody></table></div>';
+  h+='<div class="mut" style="font-size:11.5px;padding:11px 16px;line-height:1.7"><b>4 mức:</b> <b>Không xem</b> - bản ghi biến mất khỏi mọi danh sách và chuông · <b>Chỉ của tôi</b> - chỉ hồ sơ mình phụ trách · <b>Nhóm / cơ sở</b> - thêm hồ sơ của cấp dưới và người cùng cơ sở · <b>Toàn trung tâm</b> - không lọc.<br>Ví dụ đang áp: nhân viên tư vấn chỉ thấy <b>khách của mình</b> (chống tranh khách), leader thấy cả cơ sở; giáo viên chỉ thấy <b>lớp mình dạy</b>; kế toán thấy <b>toàn bộ tiền</b> nhưng không đọc được nội dung tư vấn.</div></div>';
+  /* xem thu bang mat nguoi khac */
+  var vs=window.PVSID||"";
+  h+='<div class="jgrid"><div><div class="panel"><div class="ph"><b><i class="ti ti-eye" style="margin-right:6px"></i>Xem thử bằng mắt của...</b></div><div class="pbody">';
+  h+='<div class="fld full"><label>Chọn một nhân viên để xem họ nhìn thấy gì</label><select onchange="window.PVSID=this.value;reRender(CUR)"><option value="">-- chọn nhân viên --</option>'+
+   rows("DL01").filter(staffActive).map(function(x){return '<option value="'+esc(x.staff_id)+'"'+(vs===x.staff_id?" selected":"")+'>'+esc(x.full_name)+' · '+esc(elabel(x.role)||"")+'</option>'}).join("")+'</select></div>';
+  if(vs){var keep=CURSTAFF,keepS=window.SCOPEEFF;
+   try{applyScope(vs);
+    var nLead=srows("DL02").length,nHV=srows("DL09").length,nLop=srows("DL10").length,nPay=srows("DL07").length;
+    var bc=dsLevel("baocao");
+    h+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:4px 0 10px">'+
+     '<div class="ctxbox" style="margin:0"><div class="ctxr"><span class="ctxk">Khách tiềm năng</span><span class="ctxv"><b>'+nLead+'</b> / '+rows("DL02").length+'</span></div></div>'+
+     '<div class="ctxbox" style="margin:0"><div class="ctxr"><span class="ctxk">Học viên</span><span class="ctxv"><b>'+nHV+'</b> / '+rows("DL09").length+'</span></div></div>'+
+     '<div class="ctxbox" style="margin:0"><div class="ctxr"><span class="ctxk">Lớp</span><span class="ctxv"><b>'+nLop+'</b> / '+rows("DL10").length+'</span></div></div>'+
+     '<div class="ctxbox" style="margin:0"><div class="ctxr"><span class="ctxk">Phiếu thu</span><span class="ctxv"><b>'+nPay+'</b> / '+rows("DL07").length+'</span></div></div>'+
+     '</div>';
+    h+='<div class="mut" style="font-size:12px;line-height:1.7">Báo cáo &amp; KPI: <b>'+(bc==="none"?"không được xem":(bc==="all"?"toàn trung tâm":"trong phạm vi nhóm"))+'</b>'+
+     ' · Nội dung tư vấn: <b>'+(dsLevel("noidung")==="none"?"bị che":"xem được")+'</b></div>';
+   }catch(e){}
+   applyScope(keep);window.SCOPEEFF=keepS;
+   h+='<div style="margin-top:10px"><button class="btn primary sm" onclick="gateEnter(\''+esc(vs)+'\')"><i class="ti ti-login-2"></i>Vào thẳng màn hình của người này</button></div>'}
+  h+='</div></div></div><div>';
+  /* che truong */
+  h+='<div class="panel"><div class="ph"><b><i class="ti ti-eye-off" style="margin-right:6px"></i>Che thông tin nhạy cảm</b></div><div class="pbody">';
+  [["noidung","Nội dung tư vấn &amp; ghi chú khách","đang che với: Giáo viên, Kế toán, Marketing"],
+   ["lienhe","Số điện thoại / email đầy đủ","đang che với: Marketing"],
+   ["tien","Số tiền &amp; chiết khấu","đang che với: Giáo viên"]].forEach(function(m){
+   h+='<label style="display:flex;align-items:flex-start;gap:9px;cursor:pointer;padding:7px 0;border-bottom:1px solid #F2F5F9">'+
+    '<input type="checkbox"'+(P.mask[m[0]]?" checked":"")+' onchange="dsCfg().mask[\''+m[0]+'\']=this.checked?1:0;persistSoon();reRender(CUR)" style="width:16px;height:16px;margin-top:2px">'+
+    '<span><b style="font-size:12.5px">'+m[1]+'</b><br><span class="mut" style="font-size:11px">'+m[2]+'</span></span></label>'});
+  h+='<div class="mut" style="font-size:11.5px;padding-top:10px">Ô bị che hiện dấu ba chấm trên bảng - người dùng vẫn thấy dòng dữ liệu, chỉ không đọc được giá trị nhạy cảm.</div>';
   h+='</div></div></div></div>';
   return h}
  if(tab==="menu"){
@@ -7485,47 +7690,133 @@ function renderChang(){
    Nút: Tiếp theo · Quay lại · Làm lại từ đầu · Đóng. Người dùng vẫn bấm được vào app trong lúc học
    (lớp phủ để pointer-events:none nên không chặn thao tác - học xong làm luôn).
    Mỗi bước: {p:trang cần mở, ctx:hàm đặt ngữ cảnh, sel:CSS chọn phần tử, t:tiêu đề, d:mô tả, hint:việc cần làm} */
+var TOURLV=[
+ ["thamquan","Tham quan","ti-eye","Xem tổng thể app có gì - không cần làm gì cả"],
+ ["trainghiem","Trải nghiệm","ti-hand-click","Làm thử đúng việc của từng vị trí trong trung tâm"],
+ ["chuyennghiep","Chuyên nghiệp","ti-settings","Dành cho người cấu hình: ngưỡng, phân quyền, thương hiệu"],
+ ["dev","Kỹ thuật (DEV)","ti-code","Dành cho IT: dữ liệu lấy từ đâu, cấu hình ở đâu, build thế nào"]];
 var TOURS={
- batdau:{t:"Bắt đầu nhanh",ic:"ti-rocket",d:"7 bước - hiểu toàn bộ cách app chạy trong 2 phút",steps:[
-  {sel:'.brand',t:"Đây là bàn làm việc của bạn",d:"App gom mọi việc của trung tâm về một chỗ: khách quan tâm, học viên đang học, lớp, tiền, và việc được giao. Menu bên trái xếp theo ĐÚNG hành trình của khách.",hint:"Bấm Tiếp theo để đi từng phần."},
-  {p:"banlam",sel:'.navlbl',t:"Menu xếp theo 4 chặng vòng đời",d:"Chặng 1 Khách tiềm năng - Chặng 2 Đang học - Chặng 3 Tạm dừng - Chặng 4 Kết thúc & Học tiếp. Bấm tên nhóm để mở ra, chấm màu là chặng, số đỏ là việc quá hạn.",hint:"Thử bấm vào một nhóm chặng để xem các nghiệp vụ bên trong."},
-  {p:"banlam",sel:'.bstats',t:"Việc cần xử lý hôm nay",d:"Mỗi ô là một nhóm việc đang chờ. Bấm vào ô nào thì danh sách bên dưới lọc đúng nhóm đó - không phải tự đi tìm.",hint:"Bấm thử ô Tới hẹn hôm nay."},
-  {p:"banlam",sel:'.bwsearch',t:"Tìm nhanh khách hoặc học viên",d:"Gõ tên (không cần dấu) hoặc số điện thoại. Kết quả hiện ngay ở danh sách phía dưới.",hint:"Gõ thử: nguyen"},
-  {p:"banlam",sel:'#chaybody',t:"Danh sách người cần xử lý",d:"Mỗi dòng là một người kèm việc kế tiếp phải làm. Dải hạt màu cho biết họ đang ở chặng nào - bấm vào dải hạt sẽ mở toàn bộ hành trình của người đó.",hint:"Bấm nút Xử lý trên một dòng để chạy đúng quy trình cho người đó."},
-  {sel:'[data-tour="bell"]',t:"Chuông cảnh báo việc quá hạn",d:"Mọi việc trễ hẹn theo quy trình chuẩn (SLA) đều dồn về đây, chia theo bộ phận. Việc mới phát sinh từ máy khác còn nổ bong bóng ở góc phải màn hình.",hint:"Bấm chuông để xem danh sách việc đang trễ."},
-  {sel:'.me',t:"Đổi người để xem góc nhìn khác",d:"Bấm vào ô tên ở đáy menu để quay về màn chọn người. Mỗi chức danh thấy một màn hình khác nhau - đúng như khi chạy thật.",hint:"Xong rồi! Bấm Đóng để tự vọc, hoặc chọn tour khác ở nút dấu hỏi trên đầu."}]},
- tuyensinh:{t:"Từ khách mới đến đăng ký",ic:"ti-user-plus",d:"8 bước - đi trọn một vòng bán hàng",steps:[
-  {p:"changA",sel:'.nrail',t:"Chặng 1: đường đi của một khách",d:"Mỗi ga là một bước: khách mới - đã liên hệ - đặt test - chấm test - tư vấn - đăng ký. Số trên ga là số người đang đứng ở đó, phần trăm giữa hai ga là tỷ lệ chuyển đổi thật.",hint:"Bấm vào một ga để lọc danh sách người ở ga đó."},
-  {p:"changA",sel:'.arcjobs',t:"Các nghiệp vụ trong chặng",d:"Mỗi ô là một màn làm việc: tiếp nhận lead, test đầu vào, tư vấn, thu tiền, chăm lại. Bấm ô là vào thẳng chỗ làm.",hint:"Bấm ô Lead & khai thác."},
-  {p:"nhaplead",sel:'.phead',t:"Tiếp nhận khách mới",d:"Khách gọi đến hay nhắn tin đều ghi vào đây. Hệ thống tự chặn trùng số điện thoại và bắt đầu đếm giờ phản hồi.",hint:"Bấm nút Khách mới liên hệ đến để nhập một khách."},
-  {p:"test",sel:'.phead',t:"Test đầu vào",d:"Đặt lịch test, ghi khách có đến hay không, chấm điểm 4 kỹ năng. Chấm xong hệ thống tự nhắc bước tư vấn.",hint:"Xem một hồ sơ đang chờ chấm ở danh sách bên dưới."},
-  {p:"tuvan",sel:'.phead',t:"Tư vấn lộ trình và chốt khóa",d:"Dựa trên điểm test, tư vấn viên đề xuất khóa phù hợp rồi tạo phiếu đăng ký. Chiết khấu vượt ngưỡng sẽ tự chuyển quản lý duyệt.",hint:"Mở một hồ sơ để xem màn tư vấn."},
-  {p:"thanhtoan",sel:'.phead',t:"Thu học phí",d:"Thu một lần hay nhiều đợt đều được. Thu xong in phiếu, gửi tin nhắn xác nhận cho khách, và kế toán đối soát lại.",hint:"Bấm Thu tiền trên một đăng ký còn nợ."},
-  {p:"duyet",sel:'.phead',t:"Quản lý duyệt chiết khấu",d:"Ưu đãi lớn phải qua quản lý. Khi tư vấn viên tạo, màn hình quản lý nổ thông báo ngay - đây là chỗ demo hiệu ứng hai cổng.",hint:"Mở app ở cửa sổ thứ hai bằng cổng Quản lý để xem thông báo nổ."},
-  {p:"xeplop",sel:'.phead',t:"Xếp lớp và nhập học",d:"Đóng tiền xong là xếp lớp, gửi thông tin lớp, chờ học viên xác nhận rồi hoàn tất nhập học. Từ đây khách chính thức thành học viên.",hint:"Xong vòng tuyển sinh! Tour Học tập sẽ đi tiếp phần dạy và học."}]},
- giaoviec:{t:"Giao việc cho nhân sự",ic:"ti-clipboard-list",d:"6 bước - giao, theo dõi, nghiệm thu",steps:[
-  {p:"giaoviec",sel:'.phead',t:"Trang giao việc",d:"Ba kiểu việc: cấp trên giao xuống, phối hợp ngang cấp, và nhờ hỗ trợ. Kiểu việc quyết định người nhận có được từ chối hay không.",hint:"Bấm nút Giao việc mới ở góc phải."},
-  {p:"giaoviec",sel:'.bstats',t:"Bốn con số cần nhìn mỗi sáng",d:"Việc tôi phải làm, việc quá hạn của tôi, việc chờ tôi xác nhận, và việc tôi giao đang chạy.",hint:"Bấm Tiếp theo."},
-  {p:"giaoviec",sel:'.tbar',t:"Hai phía của một việc",d:"Tab Việc của tôi là việc người khác giao cho bạn. Tab Tôi đã giao là để theo dõi người khác làm tới đâu.",hint:"Bấm sang tab Tôi đã giao."},
-  {p:"giaoviec",sel:'.tkrow',t:"Một dòng việc",d:"Nhìn là biết: ai giao, còn bao lâu tới hạn, bắt buộc hay không, có bao nhiêu trao đổi. Bấm vào dòng để mở chi tiết.",hint:"Bấm vào một dòng việc."},
-  {p:"giaoviec",sel:'.tkrow',t:"Trao đổi ngay trong việc",d:"Mở một việc sẽ thấy khung trao đổi: hỏi đáp, báo vướng nằm đúng chỗ, không trôi như tin nhắn. Mọi thao tác nhận việc, báo xong, xác nhận đều tự ghi lại.",hint:"Mở một việc rồi gõ thử một dòng trao đổi."},
-  {p:"giaoviec",sel:'.tbar',t:"Tổng hợp và báo cáo",d:"Tab Tổng hợp cho biết ai đang ôm nhiều việc, ai hay trễ hạn, tỷ lệ hoàn thành đúng hạn của từng người.",hint:"Bấm tab Tổng hợp & báo cáo để xem."}]},
- cauhinh:{t:"Cấu hình cho trung tâm của bạn",ic:"ti-settings",d:"6 bước - đổi thương hiệu, ngưỡng, câu chữ",steps:[
-  {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'.settabs',t:"Mọi thứ đều sửa được",d:"Trang Cài đặt là nơi đổi giao diện, ngưỡng thời gian, câu nhắc việc, danh mục, học phí và nhân sự. App không cắm cứng con số nào.",hint:"Bấm Tiếp theo để xem từng tab."},
-  {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'.phead',t:"Giao diện và thương hiệu",d:"Đổi tên trung tâm, logo, màu chủ đạo, tiêu đề tab trình duyệt. Mang demo đi đâu chỉ cần đổi ở đây là thành bản của trung tâm đó.",hint:"Thử đổi màu chủ đạo xem app đổi ngay."},
-  {p:"settings",ctx:function(){window.SETTAB="menu"},sel:'.settabs',t:"Menu sidebar",d:"Tắt mục không dùng cho menu gọn lại, hoặc đổi tên nhóm theo cách gọi quen của trung tâm bạn.",hint:"Tắt thử một mục rồi nhìn menu bên trái."},
-  {p:"settings",ctx:function(){window.SETTAB="ch2"},sel:'.settabs',t:"Ngưỡng thời gian và SLA",d:"Bao lâu phải gọi khách mới, bao lâu phải chấm test, bao lâu phải ghi nhận xét buổi học. Đổi ở đây thì mọi cảnh báo trong app tự đổi theo.",hint:"Xem danh sách tham số bên dưới."},
-  {p:"settings",ctx:function(){window.SETTAB="ch4"},sel:'.settabs',t:"Câu nhắc việc",d:"Toàn bộ câu chữ nhắc nhân viên làm gì đều nằm ở đây - sửa được, không phải nhờ lập trình viên.",hint:"Bấm Tiếp theo."},
-  {p:"settings",ctx:function(){window.SETTAB="demo"},sel:'.settabs',t:"Dữ liệu demo và Room",d:"Các máy mở bản demo tự đồng bộ với nhau. Hết buổi demo bấm Reset là dữ liệu về nguyên bản.",hint:"Xong! Bạn đã nắm cách cấu hình app."}]}
+ /* ---------- CẤP 1: THAM QUAN ---------- */
+ tq_tong:{lv:"thamquan",t:"Toàn cảnh app",ic:"ti-rocket",d:"7 bước - hiểu app chạy thế nào trong 2 phút",steps:[
+  {sel:'.brand',t:"Đây là bàn làm việc của trung tâm",d:"App gom mọi việc về một chỗ: khách quan tâm, học viên đang học, lớp, tiền và việc được giao. Menu bên trái xếp theo đúng hành trình của khách.",hint:"Bấm Tiếp theo để đi từng phần."},
+  {p:"banlam",sel:'.navlbl',t:"Menu theo 4 chặng vòng đời",d:"Chặng 1 Khách tiềm năng - Chặng 2 Đang học - Chặng 3 Tạm dừng - Chặng 4 Kết thúc & Học tiếp. Chấm màu là chặng, số đỏ là việc quá hạn.",hint:"Bấm một nhóm chặng để mở ra."},
+  {p:"banlam",sel:'.bstats',t:"Việc cần xử lý hôm nay",d:"Mỗi ô là một nhóm việc đang chờ. Bấm ô nào thì danh sách bên dưới lọc đúng nhóm đó.",hint:"Bấm thử ô Tới hẹn hôm nay."},
+  {p:"banlam",sel:'#chaybody',t:"Danh sách người cần xử lý",d:"Mỗi dòng là một người kèm việc kế tiếp. Dải hạt màu cho biết họ đang ở chặng nào - bấm vào dải hạt mở toàn bộ hành trình.",hint:"Bấm vào dải hạt của một dòng."},
+  {p:"changA",sel:'.nrail',t:"Bản đồ một chặng",d:"Đường ray hiện số người ở từng ga và phần trăm chuyển đổi thật giữa các ga - nhìn là biết đang tắc ở đâu.",hint:"Bấm một ga để lọc người ở ga đó."},
+  {sel:'[data-tour="bell"]',t:"Chuông cảnh báo",d:"Mọi việc trễ hẹn theo quy trình chuẩn dồn về đây, chia theo bộ phận. Việc mới từ máy khác còn nổ bong bóng góc màn hình.",hint:"Bấm chuông xem thử."},
+  {sel:'.me',t:"Mỗi chức danh một màn hình riêng",d:"Bấm ô tên ở đáy menu để đổi người. Sale, học vụ, giáo viên, kế toán mỗi người thấy một giao diện và một phạm vi dữ liệu khác nhau.",hint:"Xong phần tham quan. Thử cấp độ Trải nghiệm để làm việc thật."}]},
+ /* ---------- CẤP 2: TRẢI NGHIỆM THEO VỊ TRÍ ---------- */
+ tn_sale:{lv:"trainghiem",role:"Nhân viên Tư vấn",t:"Một ngày của Nhân viên Tư vấn",ic:"ti-phone",d:"8 bước - từ khách mới tới lúc thu tiền",steps:[
+  {p:"banlam",sel:'.bstats',t:"Mở máy là nhìn 5 ô này",d:"Tới hẹn hôm nay là việc gấp nhất - khách đã hẹn mà không gọi là mất. Sau đó tới học viên nguy cơ và đăng ký còn nợ.",hint:"Bấm ô Tới hẹn hôm nay."},
+  {p:"nhaplead",sel:'.phead',t:"Khách mới gọi đến",d:"Mọi khách hỏi qua điện thoại, Zalo, fanpage đều ghi vào đây. Hệ thống tự chặn trùng số và bắt đầu đếm giờ phản hồi.",hint:"Bấm nút Khách mới liên hệ đến, nhập tên và số điện thoại."},
+  {p:"nhaplead",sel:'.obcards',t:"Gọi và ghi kết quả",d:"Gọi xong bấm Ghi liên hệ, chọn kết quả: gặp được, không nghe máy, hẹn gọi lại... Một nỗ lực gọi là đủ tắt cảnh báo, không bị phạt vì khách không nghe.",hint:"Mở một khách rồi bấm Ghi liên hệ."},
+  {p:"test",sel:'.phead',t:"Đặt lịch test đầu vào",d:"Khách đồng ý test thì đặt lịch ngay. Đến ngày, học vụ chấm và trả kết quả, hệ thống tự nhắc bạn gọi tư vấn.",hint:"Xem danh sách test đang chờ."},
+  {p:"tuvan",sel:'.phead',t:"Tư vấn lộ trình",d:"Dựa trên điểm test, tư vấn khóa phù hợp. Ghi rõ ngân sách và mối quan tâm của khách vào phiếu để lần sau gọi không hỏi lại.",hint:"Mở một khách có kết quả test."},
+  {p:"tuvan",sel:'.obcards',t:"Chốt và tạo đăng ký",d:"Khách đồng ý thì tạo phiếu đăng ký, chọn khóa và ưu đãi. Ưu đãi vượt ngưỡng sẽ tự chuyển quản lý duyệt - bạn không cần đi xin.",hint:"Bấm Tạo đăng ký trên một hồ sơ."},
+  {p:"thanhtoan",sel:'.phead',t:"Thu tiền và gửi xác nhận",d:"Thu đủ hoặc thu theo đợt đều được. Thu xong in phiếu và bấm nút copy tin nhắn Zalo gửi khách ngay.",hint:"Bấm Thu tiền trên một đăng ký."},
+  {p:"giaoviec",sel:'.phead',t:"Việc sếp giao cho bạn",d:"Ngoài khách, bạn còn nhận việc từ quản lý ở đây. Nhận việc, làm xong bấm Báo xong, có gì vướng thì trao đổi ngay trong việc.",hint:"Xong một ngày của tư vấn viên!"}]},
+ tn_hocvu:{lv:"trainghiem",role:"Học vụ - CSKH",t:"Một ngày của Học vụ",ic:"ti-school",d:"7 bước - xếp lớp, theo lớp, chăm học viên",steps:[
+  {p:"xeplop",sel:'.phead',t:"Xếp lớp cho học viên mới",d:"Học viên đóng tiền xong về đây. Chọn lớp phù hợp trình độ và lịch học, gửi thông tin lớp, chờ học viên xác nhận rồi hoàn tất nhập học.",hint:"Bấm Xếp lớp trên một học viên đang chờ."},
+  {p:"hoctap",sel:'.phead',t:"Bức tranh dạy và học",d:"Tab Hôm nay là việc của giáo viên trong ngày, tab Lớp học là sức khỏe từng lớp, tab Lịch tuần là toàn bộ lịch dạy.",hint:"Bấm sang tab Lớp học."},
+  {p:"banglop",sel:'.phead',t:"Vận hành một lớp",d:"Điểm danh, giao bài, ghi nhận xét buổi, nhập điểm giữa khóa - tất cả trong một màn hình của lớp đó.",hint:"Chọn một lớp rồi bấm tab Điểm danh."},
+  {p:"buoihoc",sel:'.phead',t:"Nhắc giáo viên ghi nhận xét",d:"Buổi dạy xong mà quá hạn chưa có nhận xét sẽ hiện đỏ ở đây. Đây là việc học vụ phải đốc thúc hằng tuần.",hint:"Xem danh sách buổi đang nợ nhận xét."},
+  {p:"hocvien",sel:'.phead',t:"Học viên nguy cơ",d:"Lọc nhanh những em vắng nhiều hoặc tiến bộ chậm để gọi hỏi thăm trước khi phụ huynh phàn nàn.",hint:"Bấm chip lọc Nguy cơ."},
+  {p:"cskh",sel:'.phead',t:"Khảo sát và phản hồi",d:"Gửi khảo sát định kỳ theo lớp, tiếp nhận góp ý, xử lý khiếu nại. Điểm hài lòng thấp sẽ tự bật việc follow-up.",hint:"Xem tab Khảo sát."},
+  {p:"baoluu",sel:'.phead',t:"Giữ chân học viên muốn nghỉ",d:"Học viên xin bảo lưu hoặc có ý bỏ học nằm ở đây - gọi giữ chân, hẹn ngày quay lại, hoặc chốt bảo lưu có hạn.",hint:"Xong một ngày của học vụ!"}]},
+ tn_giaovien:{lv:"trainghiem",role:"Giáo viên",t:"Một ngày của Giáo viên",ic:"ti-chalkboard",d:"5 bước - dạy, điểm danh, chấm bài",steps:[
+  {p:"hoctap",sel:'.phead',t:"Hôm nay bạn dạy gì",d:"Vào app là thấy ngay buổi dạy hôm nay, chủ đề buổi, bài tập sẽ giao và lời dặn từ giáo án khóa.",hint:"Xem thẻ buổi học của bạn."},
+  {p:"banglop",sel:'.phead',t:"Vào lớp và điểm danh",d:"Bấm Bắt đầu lớp để mở cổng điểm danh. Vắng có phép hay không phép đều ghi rõ, vắng phải ghi lý do.",hint:"Bấm tab Điểm danh của lớp."},
+  {p:"banglop",sel:'.phead',t:"Giao bài tập",d:"Giao một bài chung cho cả lớp hoặc bài riêng cho từng em. Hạn nộp tự tính theo giáo án khóa, sửa được.",hint:"Bấm tab Bài tập rồi Giao bài."},
+  {p:"buoihoc",sel:'.phead',t:"Ghi nhận xét buổi học",d:"Cuối buổi ghi nhận xét chung - học viên và phụ huynh đọc được trong cổng học viên. Quá hạn sẽ bị nhắc.",hint:"Bấm Ghi nhận xét cho buổi vừa dạy."},
+  {p:"giaoviec",sel:'.phead',t:"Việc được giao",d:"Học vụ hoặc tổ trưởng giao việc cho bạn ở đây: chuẩn bị đề, dự giờ, viết giáo án bổ sung.",hint:"Xong một ngày của giáo viên!"}]},
+ tn_ketoan:{lv:"trainghiem",role:"Kế toán",t:"Một ngày của Kế toán",ic:"ti-cash",d:"5 bước - thu, đối soát, công nợ, hoàn tiền",steps:[
+  {p:"thanhtoan",sel:'.phead',t:"Thu học phí",d:"Thu tiền mặt hay chuyển khoản đều ghi ở đây, in phiếu thu ngay. Đóng theo đợt thì ghi hẹn thu đợt sau.",hint:"Bấm Thu tiền trên một đăng ký."},
+  {p:"thanhtoan",sel:'.obcards',t:"Đối soát khoản thu",d:"Tư vấn viên thu hộ thì kế toán phải xác nhận lại. Khoản chưa xác nhận hiện chip hổ phách.",hint:"Bấm chip lọc Chờ xác nhận."},
+  {p:"thanhtoan",sel:'.tbar',t:"Công nợ và tới hẹn thu",d:"Danh sách đăng ký còn nợ, ai tới hẹn hôm nay, ai quá hạn. Gọi nhắc rồi ghi lại lịch hẹn mới.",hint:"Bấm chip Tới hẹn thu."},
+  {p:"duyet",sel:'.phead',t:"Duyệt chiết khấu và hoàn tiền",d:"Ưu đãi vượt ngưỡng và yêu cầu hoàn tiền tập trung ở đây. Hoàn tiền có gợi ý mức theo chính sách và số ngày đã học.",hint:"Mở một yêu cầu để xem."},
+  {p:"baocao",sel:'.phead',t:"Báo cáo doanh thu",d:"Doanh thu theo tháng, theo nguồn khách, công nợ tồn - số liệu tự tính từ phiếu thu, không phải gõ lại.",hint:"Xong một ngày của kế toán!"}]},
+ tn_quanly:{lv:"trainghiem",role:"Quản lý - Giám đốc",t:"Một ngày của Quản lý",ic:"ti-shield-check",d:"6 bước - nhìn số, duyệt, giao việc",steps:[
+  {p:"baocao",sel:'.phead',t:"Mở máy là nhìn số",d:"Doanh thu, phễu tuyển sinh, chuyên cần, hài lòng - và quan trọng nhất là phần nhận xét kèm việc nên làm ngay cho từng chỉ số.",hint:"Cuộn xuống xem khối chỉ số."},
+  {p:"banlam",sel:'.bstats',t:"Điểm nghẽn toàn trung tâm",d:"Ô nào số cao bất thường là chỗ đang tắc. Bấm vào là ra đúng danh sách người đang kẹt ở đó.",hint:"Bấm ô có số lớn nhất."},
+  {p:"changA",sel:'.nrail',t:"Tắc ở chặng nào",d:"Phần trăm chuyển đổi giữa các ga cho biết mất khách ở bước nào: gọi không được, test rồi không tư vấn, hay tư vấn rồi không chốt.",hint:"Nhìn tỷ lệ giữa các ga."},
+  {p:"duyet",sel:'.phead',t:"Duyệt việc chờ bạn",d:"Chiết khấu lớn, hoàn tiền - nhân viên tạo là bạn nhận thông báo ngay, duyệt xong nhân viên biết liền.",hint:"Xem hàng chờ duyệt."},
+  {p:"giaoviec",sel:'.phead',t:"Giao việc cho đội",d:"Giao xuống cấp dưới, phối hợp ngang cấp, hoặc nhờ hỗ trợ. Việc bắt buộc thì không được từ chối.",hint:"Bấm Giao việc mới."},
+  {p:"giaoviec",sel:'.tbar',t:"Ai đang làm tốt, ai hay trễ",d:"Tab Tổng hợp cho biết tỷ lệ hoàn thành đúng hạn của từng người - dùng khi đánh giá cuối tháng.",hint:"Bấm tab Tổng hợp & báo cáo."}]},
+ /* ---------- CẤP 3: CHUYÊN NGHIỆP (người cấu hình) ---------- */
+ cn_thuonghieu:{lv:"chuyennghiep",t:"Đổi thương hiệu và menu",ic:"ti-palette",d:"5 bước - biến app thành bản của trung tâm bạn",steps:[
+  {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'.settabs',t:"Trang Cài đặt là trung tâm điều khiển",d:"9 tab: giao diện, menu, phân quyền, ngưỡng SLA, ngưỡng KPI, câu nhắc việc, danh mục, khóa học, nhân sự. App không cắm cứng con số nào.",hint:"Bấm Tiếp theo."},
+  {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'.pbody',t:"Tên và logo",d:"Đổi tên hiển thị, tên trung tâm dùng trong tin nhắn gửi khách, tiêu đề tab trình duyệt, và logo - tải ảnh lên hoặc gõ chữ tắt.",hint:"Thử gõ tên trung tâm của bạn."},
+  {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'.jgrid',t:"Màu thương hiệu",d:"Đổi màu nền menu và màu nhấn - áp ngay lập tức lên toàn app. Nhớ chọn màu nền đủ tối để chữ trắng còn đọc được.",hint:"Bấm vào ô màu và chọn thử."},
+  {p:"settings",ctx:function(){window.SETTAB="menu"},sel:'.pbody',t:"Bật tắt và đổi tên menu",d:"Trung tâm nhỏ không dùng hết chức năng thì tắt bớt cho menu gọn. Đổi tên nhóm theo cách gọi quen của bạn.",hint:"Tắt thử một mục rồi nhìn menu bên trái."},
+  {p:"settings",ctx:function(){window.SETTAB="demo"},sel:'.settabs',t:"Dữ liệu demo",d:"Các máy mở bản demo tự đồng bộ nhau qua Room. Hết buổi bấm Reset là về nguyên bản.",hint:"Xong phần thương hiệu!"}]},
+ cn_phanquyen:{lv:"chuyennghiep",t:"Phân quyền: ai thấy dữ liệu của ai",ic:"ti-shield-lock",d:"5 bước - thiết lập và kiểm chứng",steps:[
+  {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'.notebar',t:"Hai tầng phân quyền",d:"Tầng một: chức danh thấy trang nào. Tầng hai: thấy dữ liệu của ai. Tầng hai mới là thứ quan trọng khi nhiều nhân viên cùng dùng.",hint:"Bấm Tiếp theo."},
+  {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'.dt',t:"Ma trận chức danh và dữ liệu",d:"Mỗi ô chọn 1 trong 4 mức: Không xem - Chỉ của tôi - Nhóm/cơ sở - Toàn trung tâm. Mặc định đã đặt theo thông lệ: sale chỉ thấy khách của mình, giáo viên chỉ thấy lớp mình dạy.",hint:"Thử đổi mức của một ô."},
+  {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'.jgrid',t:"Xem thử bằng mắt người khác",d:"Chọn một nhân viên là biết ngay họ thấy bao nhiêu khách, bao nhiêu học viên, có xem được báo cáo không - kiểm chứng trước khi giao máy cho nhân viên.",hint:"Chọn một nhân viên tư vấn trong danh sách."},
+  {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'.jgrid',t:"Che thông tin nhạy cảm",d:"Thấy dòng nhưng không đọc được ô: giáo viên không thấy tiền, marketing không thấy số điện thoại đầy đủ, kế toán không đọc nội dung tư vấn.",hint:"Xem 3 công tắc bên phải."},
+  {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'.pbody',t:"Công tắc tổng",d:"Tắt phạm vi dữ liệu là mọi người thấy hết - dùng khi demo hoặc khi mới triển khai. Bật lên khi chạy thật.",hint:"Xong phần phân quyền!"}]},
+ cn_nguong:{lv:"chuyennghiep",t:"Ngưỡng, KPI và câu nhắc việc",ic:"ti-adjustments",d:"5 bước - điều chỉnh quy trình theo trung tâm bạn",steps:[
+  {p:"settings",ctx:function(){window.SETTAB="ch2"},sel:'.settabs',t:"Ngưỡng thời gian và SLA",d:"Bao lâu phải gọi khách mới, bao lâu phải chấm test, bao lâu phải ghi nhận xét. Đổi ở đây là mọi cảnh báo trong app đổi theo ngay.",hint:"Tìm tham số gọi lead mới và thử đổi số."},
+  {p:"settings",ctx:function(){window.SETTAB="ch2"},sel:'.pbody',t:"Ngưỡng tiền và chính sách",d:"Chiết khấu bao nhiêu thì phải duyệt, nợ bao lâu thì cảnh báo, hoàn tiền theo mốc nào - đều là tham số.",hint:"Cuộn tìm nhóm Tài chính."},
+  {p:"settings",ctx:function(){window.SETTAB="ch6"},sel:'.settabs',t:"Ngưỡng KPI",d:"Chuyên cần bao nhiêu là đạt, tỷ lệ chuyển đổi bao nhiêu là tốt. Báo cáo chấm xanh đỏ dựa trên các ngưỡng này.",hint:"Xem bảng ngưỡng."},
+  {p:"settings",ctx:function(){window.SETTAB="ch4"},sel:'.settabs',t:"Câu nhắc việc",d:"Toàn bộ câu chữ nhắc nhân viên làm gì nằm ở đây - sửa được, không cần lập trình viên. Câu có tham số tự điền số từ ngưỡng.",hint:"Sửa thử một câu và xem bản xem trước."},
+  {p:"settings",ctx:function(){window.SETTAB="ch1"},sel:'.settabs',t:"Danh mục",d:"Mọi nhãn trạng thái trong app lấy từ danh mục này: nguồn khách, trạng thái lớp, hình thức thanh toán...",hint:"Xong phần cấu hình quy trình!"}]},
+ /* ---------- CẤP 4: DEV ---------- */
+ dev_dulieu:{lv:"dev",t:"Dữ liệu lấy từ đâu",ic:"ti-database",d:"6 bước - bảng nào nuôi màn hình nào",steps:[
+  {p:"banlam",sel:'.bstats',t:"Kiến trúc dữ liệu: 24 bảng phẳng",d:"DL01 nhân sự, DL02 khách tiềm năng, DL03 test, DL04 tư vấn, DL05 khóa, DL06 đăng ký, DL07 thu tiền, DL08 xếp lớp, DL09 học viên, DL10 lớp, DL11 buổi, DL12 điểm danh, DL13 bài tập, DL14 WOW, DL15-17 khảo sát/phản hồi/khiếu nại, DL18 kết thúc khóa, DL19-22 giới thiệu và giáo án, DL23-24 giao việc và trao đổi.",hint:"Bản offline đọc từ file ITTs_data.js cạnh app; bản thật đọc Google Sheets cùng cấu trúc."},
+  {p:"banlam",sel:'#chaybody',t:"Máy tính chặng - trái tim của app",d:"Hàm jStageOf suy ra khách đang ở chặng nào từ dữ liệu thật (có phiếu test chưa, đã thu đủ chưa...) chứ không lưu cột trạng thái. Đổi dữ liệu là chặng tự đổi, không bao giờ lệch.",hint:"jAll dựng danh sách, jInfo tra một hồ sơ, jIndex đánh chỉ mục cho nhanh."},
+  {p:"banlam",sel:'[data-tour="bell"]',t:"Cảnh báo SLA sinh ra thế nào",d:"Hàm slaItems quét toàn bộ dữ liệu theo các luật nghiệp vụ, so với ngưỡng lấy từ CH2 rồi sinh danh sách việc. Chuông, Việc hôm nay, badge menu và bong bóng đều đọc từ một nguồn này.",hint:"Thêm luật cảnh báo mới = thêm một dòng add() trong slaItems."},
+  {p:"settings",ctx:function(){window.SETTAB="ch2"},sel:'.settabs',t:"Cấu hình sống: CH1 đến CH6",d:"CH1 danh mục, CH2 ngưỡng và SLA, CH4 câu nhắc việc, CH6 ngưỡng KPI. Code gọi paramOf/paramStr/kpiTh/msgText - không cắm cứng số. Thêm tham số mới phải khai vào bảng APPPARAMS.",hint:"Đây là lý do đổi ngưỡng không cần build lại app."},
+  {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'.dt',t:"Phân quyền cắm ở 3 cổ chai",d:"scopeList lọc mọi trang danh sách, jAll lọc bộ máy hành trình, slaItems lọc chuông. Không lọc trong rows/find vì chúng nuôi các cột tên và phần tính toán dẫn xuất.",hint:"Thêm bảng mới thì khai vào DSDOM để nó tự chịu phân quyền."},
+  {p:"settings",ctx:function(){window.SETTAB="demo"},sel:'.settabs',t:"Build và triển khai",d:"Toàn bộ app sinh từ một file Python gen_v5.py, xuất ra 2 file HTML tự chứa và 1 file dữ liệu. Kiểm tự động: node --check, harness render 38 trang, bộ kiểm 125 điểm. Đẩy lên GitHub Pages là xong.",hint:"Xem README_SRC.md trong repo để biết lệnh build và verify."}]},
+ dev_tuybien:{lv:"dev",t:"Tùy biến và mở rộng app",ic:"ti-code",d:"5 bước - thêm trang, thêm luật, đổi giao diện",steps:[
+  {p:"banlam",sel:'.navlbl',t:"Thêm một trang mới",d:"Khai vào PAGES (mã, nhóm, icon, tên, kiểu), viết hàm render, đăng ký vào RENDER, rồi thêm mã vào NAVTREE để nó hiện trên menu. Trang danh sách thì chỉ cần khai LISTCFG.",hint:"Mỗi trang tác vụ phải có: dải số tổng hợp, bộ lọc, hàng đợi có nút hành động."},
+  {p:"tuyensinh",sel:'.settabs',t:"Mẫu hub nhiều tab",d:"Một trang chủ + biến tab + hàm segHTML; thân tab gọi lại các hàm render con với cờ nhúng. Không đẻ trang mới cho từng tab. Hàm go có bảng map để mọi link cũ tự về đúng tab.",hint:"Tuyển sinh, Học tập, CSKH đều dùng mẫu này."},
+  {p:"hocvien",sel:'.tbar',t:"Trang danh sách khai bằng cấu hình",d:"LISTCFG khai bảng nguồn, các cột, cột lọc, các nút hành động, và cờ chỉ-xem. Bộ lọc, tìm kiếm bỏ dấu, sắp xếp, phân trang, ẩn hiện cột đều có sẵn.",hint:"Thêm sổ tra cứu mới chỉ mất vài dòng khai báo."},
+  {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'.pbody',t:"Giao diện lấy từ biến CSS",d:"Màu chủ đạo và màu nhấn là biến CSS, đổi trong Cài đặt là áp ngay. Cấu hình giao diện lưu trong phần config của dữ liệu nên đồng bộ được sang máy khác.",hint:"Icon dùng bộ Tabler nhúng offline - thêm icon mới phải dựng lại font subset."},
+  {p:"giaoviec",sel:'.phead',t:"Mẫu một module nghiệp vụ đầy đủ",d:"Module giao việc là ví dụ chuẩn: 2 bảng dữ liệu, vòng đời trạng thái, luồng trao đổi, cảnh báo vào chuông, badge menu, báo cáo, và bộ kiểm riêng. Sao chép mẫu này khi làm module mới.",hint:"Xem mục 3vicies trong nhật ký dự án để biết toàn bộ quyết định thiết kế."}]}
 };
+
 var TOUR={key:"",i:0,on:false};
-function tourMenu(){var h='<div class="tourmenu">';
- h+='<div class="mut" style="font-size:12px;line-height:1.6;margin-bottom:2px">Chọn một hướng dẫn - app sẽ mở đúng màn hình và chỉ tận nơi từng bước. Đang học vẫn bấm thử được bình thường.</div>';
- Object.keys(TOURS).forEach(function(k){var T=TOURS[k];
-  h+='<div class="tourmi" onclick="closeModal();tourStart(\''+k+'\')"><span class="tmi"><i class="ti '+T.ic+'"></i></span>'+
-   '<div><b>'+esc(T.t)+'</b><span>'+esc(T.d)+'</span></div></div>'});
+function tourMenu(lv){var L=lv||window.TOURLVSEL||"";
+ var h="";
+ if(!L){
+  h+='<div class="mut" style="font-size:12.5px;line-height:1.65;margin-bottom:11px">Chọn cấp độ phù hợp với bạn. App sẽ mở đúng màn hình và chỉ tận nơi từng bước - vừa xem vừa bấm thử được.</div>';
+  h+='<div class="tourmenu">';
+  TOURLV.forEach(function(V){var n=0;for(var k in TOURS)if(TOURS[k].lv===V[0])n++;
+   h+='<div class="tourmi" onclick="tourMenu(\''+V[0]+'\')"><span class="tmi"><i class="ti '+V[2]+'"></i></span>'+
+    '<div style="flex:1"><b>'+esc(V[1])+'</b><span>'+esc(V[3])+'</span></div>'+
+    '<span class="chip" style="align-self:center">'+n+' bài</span></div>'});
+  h+='</div>';
+  openDrawer("Hướng dẫn sử dụng",h);return}
+ window.TOURLVSEL=L;
+ var V=TOURLV.filter(function(x){return x[0]===L})[0]||TOURLV[0];
+ var me=CURSTAFF&&find("DL01","staff_id",CURSTAFF);
+ h+='<button class="pill" onclick="window.TOURLVSEL=\'\';tourMenu()"><i class="ti ti-arrow-left"></i>Chọn cấp độ khác</button>';
+ h+='<div style="font-size:13px;font-weight:800;color:var(--navy);margin:11px 0 3px"><i class="ti '+V[2]+'" style="margin-right:6px"></i>'+esc(V[1])+'</div>';
+ h+='<div class="mut" style="font-size:12px;margin-bottom:11px">'+esc(V[3])+'</div>';
+ h+='<div class="tourmenu">';
+ var any=false;
+ Object.keys(TOURS).forEach(function(k){var T=TOURS[k];if(T.lv!==L)return;any=true;
+  var mine=T.role&&me&&(elabel(me.role)||"").indexOf(T.role.split(" ")[0])>=0;
+  h+='<div class="tourmi" onclick="tourAsk(\''+k+'\')"><span class="tmi"><i class="ti '+(T.ic||"ti-book")+'"></i></span>'+
+   '<div style="flex:1"><b>'+esc(T.t)+(T.role?' <span class="chip '+(mine?"green":"gray")+'" style="font-size:9.5px">'+esc(T.role)+'</span>':'')+'</b>'+
+   '<span>'+esc(T.d)+'</span></div><span class="chip" style="align-self:center">'+T.steps.length+' bước</span></div>'});
+ if(!any)h+='<div class="empty">Chưa có bài hướng dẫn ở cấp độ này.</div>';
  h+='</div>';
- openDrawer("Hướng dẫn sử dụng",h)}
+ if(L==="trainghiem")h+='<div class="mut" style="font-size:11.5px;margin-top:10px;line-height:1.6">Mỗi vị trí có màn hình và phạm vi dữ liệu riêng. Muốn thấy đúng như người ta thấy, hãy vào cổng của chức danh đó rồi chạy bài tương ứng.</div>';
+ openDrawer("Hướng dẫn · "+V[1],h)}
+/* Luân yêu cầu: LUÔN hỏi xác nhận trước khi chạy tour, dù đã có nút Hủy */
+function tourAsk(k){var T=TOURS[k];if(!T)return;
+ var h='<div class="dcard"><h4><i class="ti '+(T.ic||"ti-book")+'"></i>'+esc(T.t)+'</h4>';
+ h+='<div class="notebar"><i class="ti ti-info-circle"></i>Bạn sắp chạy hướng dẫn <b>'+esc(T.t)+'</b> gồm <b>'+T.steps.length+' bước</b>. App sẽ tự chuyển màn hình theo từng bước và khoanh sáng chỗ cần nhìn.</div>';
+ h+=ctxRows([["Cấp độ",esc((TOURLV.filter(function(x){return x[0]===T.lv})[0]||["","?"])[1])],
+  ["Dành cho",esc(T.role||"Mọi người")],["Số bước",T.steps.length+" bước, khoảng "+Math.max(1,Math.round(T.steps.length*0.4))+" phút"]]);
+ h+='<div class="mut" style="font-size:12px;line-height:1.65;margin:2px 0 4px">Trong lúc chạy bạn vẫn thao tác bình thường được. Có nút <b>Quay lại</b>, <b>Làm lại từ đầu</b> và <b>Đóng</b> ở mọi bước.'+
+  (T.lv==="trainghiem"?' Bài này có thao tác thử trên dữ liệu demo - hết buổi bấm Reset demo là sạch.':'')+'</div>';
+ h+='<div class="dact"><button class="btn primary" onclick="closeModal();tourStart(\''+k+'\')"><i class="ti ti-player-play"></i>Bắt đầu hướng dẫn</button>'+
+  '<button class="btn" onclick="closeModal()"><i class="ti ti-x"></i>Để lúc khác</button></div></div>';
+ openDrawer("Xác nhận chạy hướng dẫn",h)}
 function tourStart(k){if(!TOURS[k])return;TOUR={key:k,i:0,on:true};tourShow()}
 function tourEnd(){TOUR.on=false;
  try{var s=document.getElementById("tourspot"),b=document.getElementById("tourbox");
@@ -7591,7 +7882,7 @@ function tourOfferOnce(){if(SVR||!CANLS)return;
  setTimeout(function(){try{
   notiShow("Lần đầu dùng app? Xem hướng dẫn 2 phút","Bấm vào đây để app chỉ tận nơi từng bước - hoặc bấm dấu hỏi trên thanh tiêu đề bất cứ lúc nào.","",0);
   var box=document.getElementById("notis");
-  if(box&&box.lastChild)box.lastChild.onclick=function(){try{this.remove()}catch(e){};tourStart("batdau")};
+  if(box&&box.lastChild)box.lastChild.onclick=function(){try{this.remove()}catch(e){};tourAsk("tq_tong")};
  }catch(e){}},1500)}
 
 /* ==================== V9.20 - CẤU HÌNH GIAO DIỆN & THƯƠNG HIỆU (Cài đặt > Giao diện) ====================
@@ -7928,7 +8219,7 @@ function renderGiaoviec(){
  list.forEach(function(t){h+=tkCard(t,tab)});
  h+='</div></div>';
  return h}
-function tkReport(){var all=rows("DL23");
+function tkReport(){var all=srows("DL23");
  var per={};
  all.forEach(function(t){var k=t.assignee_id||"?";
   var p=per[k]||(per[k]={n:0,done:0,late:0,live:0,over:0,nm:t.assignee_id_name||k});

@@ -249,7 +249,11 @@ t("V9.20 tab Giao dien + Menu co trong Cai dat", (function(){
  window.SETTAB="menu";var o2=RENDER.settings();window.SETTAB="ch2";
  return o1.indexOf("Tên trung tâm")>=0&&o1.indexOf("Màu thương hiệu")>=0&&o2.indexOf("Menu sidebar")>=0})());
 /* --- 12. V9.21: tour huong dan tung buoc --- */
-t("V9.21 co du 4 kich ban tour", Object.keys(TOURS).length>=4&&TOURS.batdau&&TOURS.tuyensinh&&TOURS.giaoviec&&TOURS.cauhinh);
+t("V9.21 tour co du 4 cap do + moi cap co bai", (function(){var c={};Object.keys(TOURS).forEach(function(k){c[TOURS[k].lv]=1});
+ return TOURLV.length===4&&TOURLV.every(function(V){return c[V[0]]})})());
+t("V9.21 co tour theo tung vi tri (trai nghiem)", Object.keys(TOURS).filter(function(k){return TOURS[k].lv==="trainghiem"&&TOURS[k].role}).length>=4);
+t("V9.21 co tour DEV cho IT", Object.keys(TOURS).filter(function(k){return TOURS[k].lv==="dev"}).length>=2);
+t("V9.21 bat buoc xac nhan truoc khi chay tour", (function(){try{tourAsk("tq_tong")}catch(e){return false}return typeof tourAsk==="function"})());
 t("V9.21 moi buoc tour co du tieu de + mo ta", (function(){var okk=true;
  Object.keys(TOURS).forEach(function(k){TOURS[k].steps.forEach(function(s){
   if(!s.t||!s.d||s.d.length<20)okk=false})});return okk})());
@@ -262,7 +266,7 @@ t("V9.21 trang dich cua moi buoc deu di toi duoc", (function(){var bad2=[];
  CUR="banlam";return bad2.length===0})());
 t("V9.21 tour chay duoc het cac buoc khong ngoai le", (function(){
  var e2=0;Object.keys(TOURS).forEach(function(k){
-  try{tourStart(k);var n=TOURS[k].steps.length;
+  try{tourAsk(k);tourStart(k);var n=TOURS[k].steps.length;
    for(var i=0;i<n;i++)tourNext();
    tourStart(k);tourRestart();tourEnd()}catch(e){e2++}});
  return e2===0})());
@@ -271,3 +275,44 @@ t("V9.21 tourMenu liet ke du cac tour", (function(){try{tourMenu()}catch(e){retu
 t("V9.21 nut mo huong dan nam tren thanh tieu de", (function(){
  var src=require('fs').readFileSync('./_APP.js','utf8');return true})()&&true);
 console.log(bad.length?("FAIL:\n  "+bad.join("\n  ")):"OK: "+ok);
+/* --- 13. V9.22: pham vi du lieu theo chuc danh --- */
+(function(){
+ var sale=rows("DL01").filter(function(x){return /^sales_staff/.test(ecode(x.role))&&staffActive(x)})[0];
+ var gv=rows("DL01").filter(function(x){return ecode(x.role)==="teacher"&&staffActive(x)})[0];
+ var kt=rows("DL01").filter(function(x){return /^account/.test(ecode(x.role))&&staffActive(x)})[0];
+ t("V9.22 sale chi thay lead CUA MINH", (function(){if(!sale)return true;applyScope(sale.staff_id);CURSTAFF=sale.staff_id;
+  var mine=srows("DL02"),all=rows("DL02");
+  var okk=mine.length<all.length&&mine.every(function(l){return String(l.assigned_to||"")===sale.staff_id});
+  applyScope("");CURSTAFF="";return okk})());
+ t("V9.22 giao vien chi thay lop MINH DAY, khong thay lead", (function(){if(!gv)return true;
+  applyScope(gv.staff_id);CURSTAFF=gv.staff_id;
+  var lop=srows("DL10"),lead=srows("DL02");
+  var okk=lead.length===0&&lop.every(function(c){return String(c.main_teacher_id||"")===gv.staff_id});
+  applyScope("");CURSTAFF="";return okk})());
+ t("V9.22 ke toan thay toan bo tien nhung bi che noi dung", (function(){if(!kt)return true;
+  applyScope(kt.staff_id);CURSTAFF=kt.staff_id;
+  var okk=srows("DL07").length===rows("DL07").length&&dsLevel("noidung")==="none"&&!!dsMaskField("consultation_note");
+  applyScope("");CURSTAFF="";return okk})());
+ t("V9.22 chuong khong ro viec ngoai pham vi", (function(){if(!gv)return true;
+  applyScope(gv.staff_id);CURSTAFF=gv.staff_id;
+  var it=slaItems();var okk=it.every(function(x){return x.cat!=="Tuyển sinh"});
+  applyScope("");CURSTAFF="";return okk})());
+ t("V9.22 ho so 360 ngoai pham vi bi chan", (function(){if(!gv)return true;
+  applyScope(gv.staff_id);CURSTAFF=gv.staff_id;
+  var out=rows("DL02").filter(function(l){return !canPid(l.lead_id)})[0];
+  var okk=true;if(out){window.JPID=out.lead_id;okk=RENDER.hoso().indexOf("ngoài phạm vi dữ liệu")>=0}
+  applyScope("");CURSTAFF="";window.JPID="";return okk})());
+ t("V9.22 giao viec cap quyen TAM cho ho so dinh kem", (function(){
+  var t2=rows("DL23").filter(function(x){return x.related_id&&tkSt(x)!=="confirmed"})[0];if(!t2)return true;
+  CURSTAFF=t2.assignee_id;applyScope(t2.assignee_id);
+  var okk=canPid(t2.related_id);applyScope("");CURSTAFF="";return okk})());
+ t("V9.22 tat cong tac pham vi thi thay lai toan bo", (function(){if(!sale)return true;
+  applyScope(sale.staff_id);CURSTAFF=sale.staff_id;dsCfg().on=0;
+  var okk=srows("DL02").length===rows("DL02").length;
+  dsCfg().on=1;applyScope("");CURSTAFF="";return okk})());
+ t("V9.22 quan tri vien (vao nhanh) van thay tat ca", (function(){applyScope("");CURSTAFF="";
+  return srows("DL02").length===rows("DL02").length&&dsLevel("tien")==="all"})());
+ t("V9.22 tab Phan quyen render du 3 khoi", (function(){window.SETTAB="phanquyen";var o=RENDER.settings();window.SETTAB="ch2";
+  return o.indexOf("Ma trận")>=0&&o.indexOf("Xem thử bằng mắt của")>=0&&o.indexOf("Che thông tin nhạy cảm")>=0})());
+})();
+console.log(bad.length?("FAIL2:\n  "+bad.join("\n  ")):"TONG: "+ok);
