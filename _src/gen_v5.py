@@ -6751,7 +6751,9 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
      '<td><input id="en_'+esc(en)+'_'+i+'" value="'+esc(lb)+'" style="width:100%;max-width:420px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit">'+
      (used?'<label style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--muted);margin-top:3px"><input type="checkbox" id="ens_'+esc(en)+'_'+i+'" checked>cập nhật luôn '+used+' dòng dữ liệu đang dùng</label>':'')+'</td>'+
      '<td><button class="btn sm" onclick="enumSave(\''+esc(en)+'\','+i+')"><i class="ti ti-device-floppy"></i>Lưu</button> '+
-     '<button class="btn danger sm" onclick="enumDelAsk(\''+esc(en)+'\','+i+')"><i class="ti ti-trash"></i></button></td></tr>'});
+     /* V9.29v (hội đồng audit): 291 nút xoá chỉ có cái thùng rác, không nhãn cũng không chú thích -
+        người dùng bàn phím và người đọc màn hình không biết nút này làm gì, mà đây lại là nút XOÁ. */
+     '<button class="btn danger sm" onclick="enumDelAsk(\''+esc(en)+'\','+i+')" aria-label="Xoá giá trị '+esc(cd)+' khỏi danh mục '+esc(en)+'" data-tip="Xoá giá trị này khỏi danh mục"><i class="ti ti-trash"></i></button></td></tr>'});
    h+='<tr><td><input id="enn_'+esc(en)+'_c" placeholder="mã_moi" style="width:100%;height:30px;border:1px dashed var(--line);border-radius:6px;padding:0 8px;font-family:inherit"></td>'+
     '<td><input id="enn_'+esc(en)+'_l" placeholder="Nhãn hiển thị" style="width:100%;max-width:420px;height:30px;border:1px dashed var(--line);border-radius:6px;padding:0 8px;font-family:inherit"></td>'+
     '<td><button class="btn primary sm" onclick="enumAdd(\''+esc(en)+'\')"><i class="ti ti-plus"></i>Thêm</button></td></tr>';
@@ -7346,7 +7348,11 @@ function xepMoiLuu(){var sid=document.getElementById("xm_stu").value,cid=documen
 function fget(p){return (window.CARDF&&window.CARDF[p])||"all"}
 function fset(p,v){window.CARDF=window.CARDF||{};window.CARDF[p]=v}
 function pageHead(t,s,btn){/* UX-23: tiêu đề đã có ở topbar (#pgTitle) - phead chỉ còn mô tả + nút, đỡ lặp và tiết kiệm ~46px */
- return '<div class="phead nohd"><div><div class="s" style="margin-top:0">'+esc(s)+'</div></div><div class="sp">'+(btn||"")+'</div></div>'}
+ /* V9.29v (hội đồng audit): dòng mô tả là chuỗi do LẬP TRÌNH VIÊN viết (không phải dữ liệu người
+    dùng nhập) và nhiều trang nhúng chip bánh răng slaChip vào đó - esc() nuốt mất, in ra màn hình
+    nguyên đoạn &lt;span class=&quot;slachip&quot;... Cùng một lý do đã bỏ esc ở phụ chú statStrip.
+    Nếu về sau cần nhúng dữ liệu người dùng vào đây thì phải esc() TẠI CHỖ GỌI. */
+ return '<div class="phead nohd"><div><div class="s" style="margin-top:0">'+s+'</div></div><div class="sp">'+(btn||"")+'</div></div>'}
 /* ===== THANH CÔNG CỤ CHUẨN =====
    segHTML(cur, opts, onTpl): opts = [mã, nhãn, (số đếm), (lớp màu)]; onTpl chứa {k} để thay mã.
    tbar(parts): ghép [tìm] [chip phân đoạn] ... đẩy [số dòng][Cột][nút] về BÊN PHẢI. */
@@ -10685,7 +10691,9 @@ function tkStChip(t){var s=tkSt(t),S=TKST[s]||TKST.new;
 function tkDueTxt(t){var d=pvnd(t.due_time);if(!d)return "không đặt hạn";
  var h=(d.getTime()-Date.now())/36e5;
  if(!tkLive(t))return "hạn "+String(t.due_time||"").slice(0,16);
- if(h<0)return "QUÁ HẠN "+Math.round(-h<48?(-h)+" giờ":(-h/24)+" ngày").toString().replace(".0","");
+ /* V9.29v (hội đồng audit): Math.round() được gọi trên một CHUỖI ("12.3 giờ") nên luôn ra NaN -
+    màn Giao việc in "QUÁ HẠN NaN" cho mọi việc trễ. Làm tròn SỐ trước rồi mới ghép đơn vị. */
+ if(h<0){var q=-h;return "QUÁ HẠN "+(q<48?(Math.round(q)+" giờ"):(Math.round(q/24)+" ngày"))}
  if(h<24)return "còn "+Math.max(1,Math.round(h))+" giờ";
  return "còn "+Math.round(h/24)+" ngày"}
 function tkCmts(id){return rows("DL24").filter(function(c){return String(c.task_id||"")===String(id)})
@@ -11064,7 +11072,7 @@ function renderDuthu(){
  var h=statStrip([
   ["ti-cash",vnd(sum(L)),"Tổng còn phải thu","#0D9488",L.length+" đợt của "+Object.keys(L.reduce(function(m,r){m[r.e.enrollment_id]=1;return m},{})).length+" đơn"],
   ["ti-alert-triangle",vnd(sum(late)),"Đã quá hạn","#E24B4A",late.length+" đợt · trễ quá "+slaChip("installmentLate_days",5,"ngày")+" là báo đỏ"],
-  ["ti-clock",vnd(sum(soon)),"Đến hạn trong "+slaChip("installmentRemind_days",3,"ngày"),"#E08A1E",soon.length+" đợt"],
+  ["ti-clock",vnd(sum(soon)),"Sắp đến hạn","#E08A1E",soon.length+" đợt · trước hạn "+slaChip("installmentRemind_days",3,"ngày")],
   ["ti-calendar",vnd(sum(far)),"Hạn xa hơn","#3B82C4",far.length+" đợt"]]);
  /* DÒNG TIỀN THEO THÁNG: câu hỏi thật của chủ trung tâm là "tháng sau về bao nhiêu" */
  var byM={},mo=[];

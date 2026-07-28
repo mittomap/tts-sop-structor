@@ -621,6 +621,31 @@
 > đụng lịch (danh sách lớp đang mở chưa có GV chính - trước đây chỉ là một dòng chữ đỏ trên lịch tuần,
 > không có lối nào để xử lý ngay).
 >
+> **(11) HỘI ĐỒNG AUDIT - LÀM THÀNH MỘT BỘ KIỂM, KHÔNG PHẢI MỘT BÀI ĐỌC (`_src/_check18.js`).**
+> Hai hội đồng người trước đọc THEO LUỒNG, mà lỗi lại nằm GIỮA các luồng. Lần này audit **vẽ THẬT**
+> từng trang, từng tab, rồi soi - và ENUMERATE chứ không lấy mẫu: **75 trang/tab**, cộng **304 lượt
+> vẽ qua mắt 8 chức danh**, cộng **toàn bộ hồ sơ của cổng học viên**.
+> **Lượt chạy đầu tiên bắt được 4 lỗi thật đang sống trong app - không lỗi nào đọc code mà thấy:**
+> · **"QUÁ HẠN NaN"** ở màn Giao việc: `Math.round(-h<48?(-h)+" giờ":(-h/24)+" ngày")` - `Math.round`
+>   chạy trên một CHUỖI nên luôn ra NaN. Mọi việc trễ hạn đều in "QUÁ HẠN NaN".
+> · **`pageHead()` esc() nuốt chip bánh răng**: trang Buổi học in ra nguyên đoạn
+>   `&lt;span class=&quot;slachip&quot;...`. Dòng mô tả là chuỗi lập trình viên viết - cùng một lý do
+>   đã bỏ `esc` ở phụ chú `statStrip`. **Lớp lỗi này đã cắn 3 lần** ở 3 chỗ khác nhau.
+> · **Dải số Dự thu** nhét chip vào NHÃN (bị esc) thay vì vào phụ chú - lỗi của chính đêm nay.
+> · **291 nút xoá danh mục** chỉ có icon thùng rác, không nhãn, không chú thích - người dùng bàn
+>   phím và người đọc màn hình không biết nút đó làm gì, mà đây là nút XOÁ.
+> **13 nhóm bất biến** giờ chạy mỗi lần build: trang không vỡ · **mọi hàm gọi trong `onclick` phải có
+> thật** (đổi tên hàm mà quên một chỗ thì nút đó bấm vào không làm gì và cũng không báo lỗi) · mọi
+> `go()` tới trang có thật · không HTML thô lọt màn hình · không undefined/NaN/[object Object] · nút
+> icon phải có nhãn · danh sách rỗng phải có dòng báo rỗng · không in mã enum thô · hai cổng dùng
+> chung hàm nghiệp vụ (không có bản sao riêng cho cổng học viên) · cửa ghi tự lưu · tham số hai chiều
+> · mọi mục menu mở được bằng địa chỉ · vẽ lại toàn app bằng mắt từng chức danh · cổng học viên vẽ
+> được cho mọi hồ sơ.
+> **Hai bẫy khi viết chính bộ kiểm này** (bộ kiểm sai thì tệ hơn không có): (a) tiếng Việt trong
+> chuỗi cũng khớp mẫu "chữ (" nên `onclick="viecTeam('Giảng viên (ACA)')"` bị đọc thành gọi hàm tên
+> `n` - phải bỏ chuỗi ký tự trước khi soi; (b) hỏi "tham số này có ô sửa không" mà bỏ qua bảng tên
+> thay thế `PKEY` thì báo thiếu oan 10 tham số.
+>
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
 >
 > **(G) TRỢ THỦ THAO TÁC - anh Luân đặt 28/07, LÀM SAU ĐỢT AUDIT (F):** *"a muốn nghiên cứu trợ thủ

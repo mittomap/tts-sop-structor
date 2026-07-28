@@ -47,6 +47,7 @@ Bộ kiểm gồm **5 phần, phải xanh HẾT mới được giao**:
 | `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 577 tieu chi` - học phí theo đợt + vá V9.27 + bấm-tên-ra-drawer + địa chỉ từng trang |
 | `ITTS_OUT=<out> node _checkdata.js` | `CHECKDATA OK: 27 luat ... 0 cho lech` - **dữ liệu demo có khớp ga nghiệp vụ không** |
 | `ITTS_OUT=<out> node _check17.js` | `CHECK17 OK: 392 tieu chi` - **bộ máy lọc chuyên sâu** (kết hợp trục, lưu theo người) |
+| `ITTS_OUT=<out> node _check18.js` | `CHECK18 OK: 34 tieu chi \| da ve 75 trang/tab` - **hội đồng audit tự động**: vẽ THẬT mọi trang/tab, mọi trang qua mắt 8 chức danh, cổng học viên qua mọi hồ sơ |
 | `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` |
 | `python3 check_logic.py` | `TONG BAN GHI LOI: 4` (đúng 4 ca là việc quá hạn CỐ Ý để demo cảnh báo đỏ - xem luật 10k) |
 | `python3 check_data.py` | `KET QUA: DAT` |
