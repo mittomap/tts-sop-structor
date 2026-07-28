@@ -149,14 +149,27 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.27h** (28/07 khuya). MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG.
+> **Phiên bản: V9.28** (28/07 trưa hôm sau - việc (A) dữ liệu demo ĐÃ XONG, 218 -> 0 chỗ lệch). MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG.
 > Bộ kiểm hiện tại: node --check 2 file · `_tall` 38 trang 0 lỗi (165 icon) · `_check11` 131 ·
 > `_check12` 37 · `_check13` 174 · `_check14` 100 · `_check15` 37 · **`_check16` 236** · `_checktour` ·
-> `check_logic.py` 132 luật (đúng 4 ca cố ý) · `check_data.py` DAT.
+> `check_logic.py` 132 luật (đúng 4 ca cố ý) · `check_data.py` DAT · **`_checkdata.js` 26 luật / 6195 lượt kiểm - 0 lệch**.
 >
 > **VIỆC PHẢI LÀM TIẾP - THEO ĐÚNG THỨ TỰ NÀY (Luân chốt 28/07 khuya, rồi về nghỉ):**
 >
-> **(A) DỮ LIỆU DEMO KHỚP TOÀN BỘ - ƯU TIÊN SỐ 1.** Luân bắt lỗi: lead đang ở ga "Có KQ, chờ tư vấn"
+> **(A) DỮ LIỆU DEMO KHỚP TOÀN BỘ - ✅ XONG 28/07 trưa (V9.28).** `_src/_checkdata.js` đã có và đã
+> vào bộ verify bắt buộc; `fixdata.py` §14bis vá ở nguồn. **218 chỗ lệch -> 0.** Đã bù 54 phiếu test
+> đã chấm (điểm suy từ chính `target_band` của khách, Overall = trung bình 4 kỹ năng), nối 44 phiếu
+> tư vấn vào đúng phiếu test, bù 10 phiếu tư vấn, bù 6 phiếu thu cọc cho người đã xếp lớp mà chưa
+> đóng đồng nào (phần còn lại vẫn là công nợ - giữ nguyên các ca nợ cố ý).
+> **Ba bẫy đã cắn:** (1) §14bis PHẢI chạy TRƯỚC §14d - 14d chia lịch đóng theo đợt dựa trên
+> `paid_amount`, chạy sau là lịch đợt ôm số cũ (luật 17b đỏ 6 đơn); (2) ngày thu cọc phải kẹp cho SAU
+> ngày đăng ký, không thì lọt luật 6d; (3) **số 179 báo cho Luân tối qua là SAI** - trong đó có 69
+> "buổi WOW không có giáo viên" do chính bộ kiểm soi cột `wow_teacher_id` không tồn tại (DL14 dùng
+> `staff_id`); cả 69 buổi đều có giáo viên hợp lệ. Vì vậy `_checkdata.js` có hàm `col()`: soi cột
+> không có thật là báo ngay, không lặng lẽ trả rỗng rồi đếm thành lỗi dữ liệu. 2 buổi dạy xong không
+> có điểm danh là HÀNG CHỜ cố ý trong 24h (đúng §10b) - luật F4 đã siết lại cho đúng ý.
+>
+> *(giữ lại phần mô tả gốc để hiểu vì sao làm)* **DỮ LIỆU DEMO KHỚP TOÀN BỘ.** Luân bắt lỗi: lead đang ở ga "Có KQ, chờ tư vấn"
 > mà L/R/W/S trống trơn. Đã đo bằng CHÍNH bộ máy chặng của app (nạp `_APP.js`, chạy `jAll()`):
 > **179 chỗ lệch** - 47/107 hồ sơ từ ga `test_done` trở đi không có điểm test (`overall_score`,
 > `skill_listening/reading/writing/speaking` trong DL03); 7/93 thiếu phiếu tư vấn DL04; 4/76 thiếu
