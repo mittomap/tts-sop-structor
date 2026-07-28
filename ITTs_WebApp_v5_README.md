@@ -1253,3 +1253,32 @@ cảnh báo). Sửa nhỏ: Tra cứu nhanh tìm KHÔNG DẤU + theo mã; hết "
 
 Verify: 37 trang 0 lỗi, **366 tiêu chí** (thêm _check11 = 68 điểm cho chặng/menu/node), icon 130.
 Hội đồng tổng kiểm cuối: vẫn chờ lệnh Luân.
+
+## V9.16 (28/07 chiều) - Đợt 9: PHÒNG DEMO 2 MÁY + cổng học viên đúng vai + hồ sơ 360 đủ thông tin
+
+**Phòng demo 2 máy (yêu cầu Luân)**: màn cổng (cả 2 file) + Cài đặt > Dữ liệu demo có nút **Tạo phòng
+2 máy / Vào phòng 2 máy**. Máy A tạo phòng lấy MÃ 5 ký tự, máy B nhập mã - từ đó mọi thao tác đồng bộ
+giữa các MÁY KHÁC NHAU y như 2 cửa sổ cùng máy: tạo giao dịch chiết khấu lớn bên A, bên B nổ chuông/
+badge/toast ngay; Reset lan cả phòng; nút "Kiểm tra đồng bộ" phát cả sang máy kia. Kỹ thuật: WebRTC
+DataChannel (PeerJS), thư viện chỉ tải khi bấm nút (CDN) - bản offline không mạng không ảnh hưởng gì;
+máy tạo phòng là trạm trung chuyển; tin đến ghi vào localStorage rồi đi qua syncApply như cũ
+(last-write-wins giữ nguyên). Cần mạng ở cả 2 máy + 2 máy mở CÙNG phiên bản demo (mã phòng gắn chữ ký
+bộ dữ liệu). F5 tự nối lại phòng.
+
+**Cổng học viên đúng vai** (Luân: "chờ duyệt gì đó học viên đâu có cần"): BỎ khối "Yêu cầu & phê duyệt"
+(duyệt là quy trình nội bộ) - giữ lại duy nhất điều học viên quan tâm: dòng "Hoàn học phí: trung tâm
+đang xử lý..." (chỉ hiện khi có, ngôn ngữ học viên); ưu đãi vẫn thấy trong khối Học phí. Chip
+"đang đối soát" đổi thành "trung tâm đang xác nhận". Mục lục còn 13 mục.
+
+**Hồ sơ 360 app quản trị hết cảnh "ít hơn trang học viên"**: 2 tab - "Hồ sơ nội bộ" (như cũ + bảng
+ĐIỂM VÀO-GIỮA-RA đủ 4 kỹ năng + Overall + mục tiêu; thẻ Học phí thêm "Hẹn thu tiếp") và "Trang của
+học viên" = nhúng NGUYÊN trang học viên vào hồ sơ (tái dùng renderTrangHV, không fork) - nhân viên
+thấy đúng cái học viên thấy, thao tác được y như học viên khi hướng dẫn qua điện thoại.
+
+**Rà sidebar sau luồng mới**: GIỮ NGUYÊN 7 nhóm menu V9.15 (không trang thừa/thiếu) - tính năng mới
+đợt này đều nằm TRONG trang sẵn có (màn cổng, Cài đặt, hồ sơ 360, cổng HV).
+
+Verify: _tall 37 trang 0 lỗi, icon 134 (font dựng lại: +ti-devices, ti-login-2, ti-plug-x, ti-eye),
+node --check 2 file OK, _check11 68/68. LƯU Ý: bộ kiểm _check1.._check10 THẤT LẠC từ phiên trước
+(chỉ còn _tall + _check11 trong _src) - tái tạo dần, đụng vùng nào viết lại bộ kiểm vùng đó.
+PHÒNG 2 MÁY CHƯA TEST TRÊN 2 MÁY THẬT (phiên cloud không có trình duyệt) - Luân thử theo DEMO_CHECKLIST.

@@ -149,7 +149,17 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.15** (28/07 - ĐỢT 8 "CHẶNG VÒNG ĐỜI + HỆ NODE + DỮ LIỆU DEMO SỐNG" ĐÃ XONG theo yêu cầu Luân:
+> **Phiên bản: V9.16** (28/07 chiều - ĐỢT 9 theo 4 yêu cầu mới của Luân ĐÃ XONG: (1) **PHÒNG DEMO 2 MÁY** -
+> đồng bộ giữa các MÁY KHÁC NHAU qua WebRTC/PeerJS, nút "Tạo phòng / Vào phòng 2 máy" ở màn cổng cả 2 file +
+> Cài đặt > Dữ liệu demo, mã phòng 5 ký tự, giao dịch cần duyệt bên này thì máy kia nổ chuông/toast ngay,
+> Reset lan cả phòng; (2) cổng học viên BỎ khối "Yêu cầu & phê duyệt" (nội dung nội bộ) - chỉ giữ dòng hoàn
+> học phí bằng ngôn ngữ học viên, "đang đối soát" -> "trung tâm đang xác nhận"; (3) hồ sơ 360 app NV thành
+> SUPERSET: tab "Trang của học viên" nhúng nguyên renderTrangHV + bảng điểm VÀO-GIỮA-RA + "Hẹn thu tiếp";
+> (4) rà sidebar: GIỮ NGUYÊN 7 nhóm V9.15 có chủ đích. Icon 134 (font dựng lại +4).
+> Verify: _tall 37 trang 0 lỗi + _check11 68/68 + node --check 2 file.
+> **CHÚ Ý PHIÊN SAU**: (a) bộ kiểm _check1.._check10 THẤT LẠC - chỉ còn _tall + _check11 trong _src, tái tạo dần;
+> (b) phòng 2 máy CHƯA test trên 2 máy thật (phiên cloud không có trình duyệt) - chờ Luân thử. Chi tiết: mục 3septendecies.
+> Trước đó V9.15 (28/07 - ĐỢT 8 "CHẶNG VÒNG ĐỜI + HỆ NODE + DỮ LIỆU DEMO SỐNG" ĐÃ XONG theo yêu cầu Luân:
 > menu gom theo 4 chặng vòng đời (C1 Khách tiềm năng / C2 Đang học / C3 Tạm dừng / C4 Kết thúc & Học tiếp,
 > mục con test/tuvan/wow/bảo lưu/mã giới thiệu TRỞ LẠI menu - go() remap vào hub đúng tab), 4 trang "Tổng quan chặng"
 > (ray ga node 44px + %% chuyển đổi + ga rẽ nhánh thoi + ga ghost, nghiệp vụ trong chặng, sổ trực),
@@ -170,9 +180,10 @@
 > **CÓ KẾ HOẠCH TỔNG THỂ MỚI: `KE_HOACH_HOAN_THIEN_APP.md`** — Luân cấp toàn quyền, 4 chuyên gia (LMS/CRM, sales, UX/UI, học vụ) đã rà toàn app ra 104 phát hiện, chưng cất thành 7 đợt. ĐỢT 1 ĐÃ XONG trong V9.6.
 > **V9.6 đã xong:** hub **"Tính năng khác"** (FB-21: Bảo lưu · Mã giới thiệu · Bàn giao lead, nhóm Quản lý) + sửa lớp bug "sai êm" (DL09.class_id ở 3 hồ sơ, Bảo lưu đọc sai cột, 3 tham số sai tên CH2, 2 SLA cắm cứng) + UX quick wins (giữ scroll khi reRender, tương phản, focus ring, .jcard→.jpanel...) + màn gọi sales đủ thông tin.
 > **VIỆC TỒN web app (ưu tiên trên xuống):**
-> 1. **CHỜ YÊU CẦU MỚI CỦA LUÂN** - Luân dặn (27/07): "e làm hết đi, nhưng từ từ hãy gọi hội đồng, a còn yêu cầu khác". Đợt 8 đã trả xong các yêu cầu chặng/node/tester. Phiên sau: hỏi/đợi yêu cầu kế tiếp của Luân trước khi làm gì lớn.
+> 1. **CHỜ LUÂN NGHIỆM THU ĐỢT 9 + YÊU CẦU KẾ TIẾP** - 4 yêu cầu 28/07 (phòng 2 máy, cổng HV đúng vai, hồ sơ 360 superset, rà sidebar) đã trả xong trong V9.16. Luân cần THỬ THẬT phòng 2 máy trên 2 máy khác nhau (phiên cloud không tự test WebRTC được). Phiên sau: hỏi/đợi yêu cầu kế tiếp trước khi làm gì lớn.
 > 2. **HỘI ĐỒNG TỔNG KIỂM CUỐI (đang HOLD theo lệnh Luân)** - khi Luân bật đèn xanh: gom UX-39 (font Montserrat offline), UX-12 (thanh lọc kiểu cũ), UX-13 (đồng nhất stat-tile), UX-06 (quét hex -> token), CRM-09 (kỳ báo cáo áp vào phễu/bizSection) + 62 cảnh báo mức app còn lại trong _tester.js (baseline 64, trong đó 2 cảnh báo là bug của chính script tester - hardcode enum "paused" không có trong CH1).
 > 3. **2 file Word hướng dẫn** (Luân nói "chưa cần" - chờ lệnh): phụ lục NA085-094, quy tắc MATCH-link, CH4 2 lớp, CH6.
+> 4. **Tái tạo bộ kiểm _check1.._check10** (thất lạc cùng scratchpad phiên cũ) - làm dần: đụng vùng nào viết lại bộ kiểm vùng đó, viết xong CẤT NGAY vào _src.
 > Chi tiết bẫy & quyết định app: mục **3bis→3quaterdecies** bên dưới. Danh sách feedback đầy đủ: `FEEDBACK_theo_doi.md`.
 
 1. **Cập nhật 2 file Word** (Luân nói "chưa cần" - chờ lệnh):
@@ -988,6 +999,46 @@ Luân thực hiện, phiên Cowork soạn hướng dẫn + CLAUDE.md).
 - 3 file app phải nằm CÙNG CẤP ở gốc repo demo (app đọc ITTs_data.js cạnh nó); thiếu data file
   app vẫn chạy bằng bản nhúng nhưng màn cổng ghi "kèm sẵn trong app" thay vì "bản mới nhất".
 - Repo public: tuyệt đối không để lọt tài liệu .md nội bộ / _src sang - update.sh chỉ chép đúng 3 file.
+
+## 3septendecies. V9.16 — Đợt 9: phòng demo 2 máy + cổng HV đúng vai + hồ sơ 360 superset (28/07 chiều)
+
+Yêu cầu Luân (4 điểm, nguyên văn rút gọn): "2 máy khác nhau cũng có thể test cùng 1 phiên... phát sinh
+giao dịch có khuyến mãi lớn, cần duyệt, thì máy kia cũng phải nổ" · "App học viên... chờ duyệt gì đó
+học viên đâu có cần" · "Hồ sơ học viên ở app quản trị ít thông tin hơn cả app học viên - vô lý" ·
+"xem lại toàn bộ các trang ở sidebar còn ổn không".
+
+### Phòng demo 2 máy (kiến trúc - đừng phá)
+- Toàn bộ nằm khối "PHÒNG DEMO 2 MÁY" trong gen_v5.py (ngay sau demoPing). Nguyên tắc: KHÔNG chế kênh
+  đồng bộ mới - tin từ máy khác đến = setItem(LSKEY) + __pendSync=1 + syncApply() -> đi đúng đường
+  "một cửa sổ khác vừa lưu" nên chuông/badge/toast/last-write-wins nguyên vẹn, không thêm nhánh logic.
+- Chống dội: cờ window.__fromRoom bao quanh đoạn áp state từ mạng; demoSave và CUỐI syncApply chỉ
+  roomCastState() khi KHÔNG phải __fromRoom. Cửa sổ trong phòng = đại diện phát sóng cho CẢ máy
+  (cửa sổ khác cùng máy lưu -> storage event -> cửa sổ phòng syncApply -> phát cho các máy kia).
+- Reset lan truyền: demoResetRun VÀ nhánh raw==null của syncApply đều roomCast({t:"reset"}) rồi mới
+  reload (delay 250ms cho DataChannel kịp gửi). Máy nhận reset: removeItem + reload.
+- PeerJS 1.5.4 lazy-load khi bấm nút (cdnjs -> unpkg fallback) - bản offline không đụng nút thì không
+  có request mạng nào. Peer id = "itts-demo-"+SEED_SIG+"-"+mã (mã 5 ký tự, bỏ 0/O/1/I/L) -> 2 máy chạy
+  KHÁC bộ dữ liệu không vào nhầm phòng nhau; lệch sig có toast báo. Máy tạo phòng = trạm trung chuyển
+  (relay cho các khách còn lại); máy đó đóng = phòng tan, khách nhận toastErr. F5 tự nối lại
+  (mã + vai lưu sessionStorage; host mất id thì tự hạ xuống vào lại làm khách).
+- Gửi NGUYÊN KHỐI state (~2MB JSON) mỗi lần lưu - DataChannel chịu tốt, demo ổn. ĐỪNG tối ưu sớm
+  sang diff/nén khi chưa thấy lag thật.
+- CHƯA TEST TRÊN 2 MÁY THẬT (phiên cloud không có trình duyệt/WebRTC). Lỗi dự kiến hay gặp: mạng công ty
+  chặn WebRTC/UDP -> một máy phát 4G thử lại; dịch vụ PeerJS công cộng chập chờn -> thử lại sau vài phút.
+
+### Cổng HV + hồ sơ 360
+- BỎ hẳn khối "Yêu cầu & phê duyệt" + mục s-duyet khỏi HVSEC. Giữ MỖI notebar "Hoàn học phí đang xử lý":
+  chỉ hiện khi đăng ký cancelled còn tiền chưa hoàn - dòng DL07 ÂM của luồng hoàn tiền (V9.11) tự làm nó
+  biến mất khi hoàn xong, tự nhất quán, không cần cờ mới. "đang đối soát" -> "trung tâm đang xác nhận".
+- Hồ sơ 360: window.HSTAB ("in"/"hv"); tab "hv" set window.HVID=C.sid rồi NHÚNG renderTrangHV() và return
+  luôn. hvReRender nay chạy được Ở CẢ 2 NGỮ CẢNH: có #hvBody (cổng HV) vẽ như cũ, không có thì
+  reRender(CUR) - nhờ vậy mọi nút trong trang HV nhúng (đổi khóa, trả khảo sát, góp ý) chạy trong app NV.
+  BẪY: nút mới trong renderTrangHV phải gọi hvReRender(), ĐỪNG gọi reRender('tranghv') (bài học V7.2).
+- Bảng "Điểm: vào - giữa - ra" đọc t.skill_* (DL03) / obMain.mid_* (DL08) / ceMain.final_* (DL18).
+
+### Sidebar (rà 28/07 - kết luận GIỮ NGUYÊN)
+7 nhóm NAVTREE V9.15 khớp luồng mới (menu này chính Luân duyệt thiết kế ở Đợt 8); tính năng đợt này đều
+nằm TRONG trang sẵn có (màn cổng, Cài đặt, hồ sơ 360, cổng HV) - không thêm/bớt mục menu nào.
 
 ## 3sedecies. Chuyển sang làm việc tại phiên cloud Claude Code (28/07 chiều)
 

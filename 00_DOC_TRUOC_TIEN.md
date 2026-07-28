@@ -33,7 +33,9 @@ Song song với hệ Google Sheets, dự án có **web app demo offline** dựng
 Luân tương tác nhiều nhất gần đây. **Muốn sửa app: đọc `_src/README_SRC.md`** (build 1 lệnh
 `ITTS_OUT=... python3 gen_v5.py`, verify bằng `node _tall.js`). Hiện trạng tính năng: cuối
 `ITTs_WebApp_v5_README.md`. Bẫy & quyết định kiến trúc app: mục 3bis→3quater trong file 02.
-Phiên bản hiện tại: **V9.15** (28/07 - menu theo 4 CHẶNG VÒNG ĐỜI + hệ node 3 tầng (ray ga / dải hạt trên mọi dòng / sopBlock trang chi tiết) + tab Chăm lại/Reup + dữ liệu demo đại tu theo tester, suite kiểm 366 điểm. Nền demo đa cổng giữ từ V9.7: màn cổng chọn người, dữ liệu tách `ITTs_data.js`, thao tác lưu thật + đồng bộ giữa các cổng, nút Reset demo. HỘI ĐỒNG TỔNG KIỂM đang HOLD - chờ yêu cầu mới của Luân. Chi tiết: mục ⭐ HIỆN TRẠNG trong file 02).
+Phiên bản hiện tại: **V9.16** (28/07 chiều - Đợt 9: PHÒNG DEMO 2 MÁY (đồng bộ giữa các máy khác nhau qua
+WebRTC) + cổng HV bỏ nội dung nội bộ + hồ sơ 360 superset có tab "Trang của học viên" + rà sidebar giữ nguyên
+menu. Chi tiết: mục 3septendecies file 02. Trước đó V9.15: menu theo 4 CHẶNG VÒNG ĐỜI + hệ node 3 tầng (ray ga / dải hạt trên mọi dòng / sopBlock trang chi tiết) + tab Chăm lại/Reup + dữ liệu demo đại tu theo tester, suite kiểm 366 điểm. Nền demo đa cổng giữ từ V9.7: màn cổng chọn người, dữ liệu tách `ITTs_data.js`, thao tác lưu thật + đồng bộ giữa các cổng, nút Reset demo. HỘI ĐỒNG TỔNG KIỂM đang HOLD - chờ yêu cầu mới của Luân. Chi tiết: mục ⭐ HIỆN TRẠNG trong file 02).
 Dự án ĐÃ LÊN GITHUB (28/07): thư mục này = repo `mittomap/tts-sop-structor` (PUBLIC từ 28/07 chiều,
 tên cũ itts-sop - Luân đổi tên + mở public để phiên cloud Claude Code truy cập được); demo online:
 **https://mittomap.github.io/itts-sop-demo/**. Từ 28/07 chiều, phiên cloud Claude Code của Luân có

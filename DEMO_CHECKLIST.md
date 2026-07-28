@@ -8,10 +8,13 @@ In ra hoặc mở cạnh máy khi đi demo.
 - [ ] Link gửi khách/nhân viên: **https://mittomap.github.io/itts-sop-demo/** - trang bìa có 2 nút
       (Cổng nhân viên / Trang học viên). Mở link là chạy: không chép file, Safari/điện thoại đều được.
 - [ ] Mỗi máy/trình duyệt là MỘT BỘ DỮ LIỆU RIÊNG: khách tự nghịch không phá demo của mình,
-      khỏi lo reset giùm. Muốn diễn màn "duyệt bên này - bên kia thấy" thì mở 2 CỬA SỔ TRÊN
-      CÙNG MỘT MÁY (2 máy khác nhau KHÔNG đồng bộ với nhau - đừng hứa nhầm với khách).
+      khỏi lo reset giùm. Diễn màn "duyệt bên này - bên kia thấy": mở 2 CỬA SỔ TRÊN CÙNG MỘT MÁY,
+      HOẶC (từ V9.16) dùng PHÒNG 2 MÁY: máy A bấm "Tạo phòng 2 máy" ở màn cổng lấy MÃ 5 ký tự,
+      máy B bấm "Vào phòng 2 máy" nhập mã - 2 máy thật sự đồng bộ nhau. Cần mạng ở CẢ 2 máy;
+      THỬ TRƯỚC ở văn phòng bằng nút "Kiểm tra đồng bộ" (mạng công ty chặn thì phát 4G thử lại).
 - [ ] Trước buổi demo vẫn nhìn màn cổng: chip xanh "nguyên bản"; lỡ nghịch bẩn thì bấm Reset.
-- [ ] Đưa bản app mới lên demo: chạy `./update.sh` trong `~/Claude/itts-sop-demo`, đợi 1-2 phút
+- [ ] Đưa bản app mới lên demo: từ 28/07 chiều phiên cloud Claude Code TỰ ĐẨY khi làm xong việc;
+      làm tay trên máy thì chạy `./update.sh` trong `~/Claude/itts-sop-demo`. Đợi 1-2 phút
       Pages deploy, rồi Cmd+Shift+R (bỏ cache) kiểm tra lại trước giờ demo.
 - [ ] Toàn bộ checklist bên dưới (bản chép file offline) GIỮ LÀM DỰ PHÒNG khi không có mạng.
 

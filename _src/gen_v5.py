@@ -929,16 +929,20 @@ function demoSave(){if(!CANLS||SVR)return;
  if(__base===null){__base=cur;return}   /* lần đầu sau boot: chỉ ghi mốc so sánh */
  if(cur===__base)return;
  var nm="";try{nm=(typeof myName==="function"&&!window.HVPORTAL)?myName():(window.HVPORTAL?"Trang học viên":"")}catch(e){}
- try{localStorage.setItem(LSKEY,JSON.stringify({sig:SEED_SIG,t:new Date().getTime(),by:nm,dl:DATA.dl,config:DATA.config,enums:DATA.enums}));__base=cur}
+ try{localStorage.setItem(LSKEY,JSON.stringify({sig:SEED_SIG,t:new Date().getTime(),by:nm,dl:DATA.dl,config:DATA.config,enums:DATA.enums}));__base=cur;try{roomCastState()}catch(e2){}}
  catch(e){if(!window.__swarn){window.__swarn=1;toastErr("KHÔNG lưu được thay đổi (trình duyệt chặn hoặc đầy bộ nhớ) - thao tác chỉ sống trong cửa sổ này.")}}}
 var __psT=null;function persistSoon(){if(SVR||!CANLS)return;clearTimeout(__psT);__psT=setTimeout(demoSave,350)}
 function demoDirty(){if(!CANLS)return null;try{var raw=localStorage.getItem(LSKEY);if(!raw)return null;var st=JSON.parse(raw);return st.t||1}catch(e){return null}}
 function demoReset(){confirmRun("Xóa MỌI thay đổi của buổi demo và quay về dữ liệu gốc? (mọi cổng đang mở cũng nạp lại)","demoResetRun")}
-function demoResetRun(){if(CANLS)try{localStorage.removeItem(LSKEY)}catch(e){};location.reload()}
+function demoResetRun(){if(CANLS)try{localStorage.removeItem(LSKEY)}catch(e){};
+ if(ROOM.on){try{roomCast({t:"reset"})}catch(e){};setTimeout(function(){location.reload()},250);return}
+ location.reload()}
 window.__pendSync=0;
 function syncApply(){if(!window.__pendSync)return;
  var raw=null;try{raw=localStorage.getItem(LSKEY)}catch(e){}
- if(!raw){window.__pendSync=0;location.reload();return} /* cổng khác vừa RESET -> nạp lại ngay, kể cả đang mở form */
+ if(!raw){window.__pendSync=0; /* cổng khác vừa RESET -> nạp lại ngay, kể cả đang mở form; đang trong phòng thì BÁO các máy kia trước */
+  if(ROOM.on&&!window.__fromRoom){try{roomCast({t:"reset"})}catch(e){};setTimeout(function(){location.reload()},250);return}
+  location.reload();return}
  var mk=document.getElementById("mask"),dr=document.getElementById("drawer");
  if((mk&&mk.classList.contains("on"))||(dr&&dr.classList.contains("on")))return; /* đang mở form: chờ đóng */
  var ae=document.activeElement;
@@ -959,6 +963,7 @@ function syncApply(){if(!window.__pendSync)return;
  if(typeof updateBellBadge==="function")try{updateBellBadge()}catch(e){}
  var lg=document.getElementById("login");
  if(lg&&lg.style.display!=="none"&&lg.innerHTML){try{if(window.HVPORTAL)demoGateHV();else demoGate()}catch(e){}}
+ if(!window.__fromRoom)try{roomCastState()}catch(e){} /* cửa sổ trong phòng chuyển tiếp bản lưu của các cửa sổ cùng máy sang các máy kia */
  toast("Dữ liệu vừa cập nhật từ cổng khác"+(by?" ("+by+")":"")+".",3200)}
 if(CANLS&&!SVR&&typeof window.addEventListener==="function"){
  window.addEventListener("storage",function(e){
@@ -968,7 +973,97 @@ if(CANLS&&!SVR&&typeof window.addEventListener==="function"){
 }
 function demoPing(){if(!CANLS){toast("Trình duyệt đang chặn lưu trữ - không đồng bộ được.");return}
  try{localStorage.setItem("ITTS_PING_V1",String(new Date().getTime()))}catch(e){}
- toast("Đã phát tín hiệu - cửa sổ kia phải hiện thông báo trong 1-2 giây. Không hiện = đồng bộ không chạy (dùng Chrome hoặc http.server).",5200)}
+ if(ROOM.on){var nm="";try{nm=window.HVPORTAL?"Trang học viên":(typeof myName==="function"?myName():"")}catch(e){}
+  try{roomCast({t:"ping",by:nm})}catch(e){}
+  toast("Đã phát tín hiệu tới các cửa sổ máy này VÀ các máy trong phòng "+ROOM.code+" - bên kia phải hiện thông báo trong 1-2 giây.",5200);return}
+ toast("Đã phát tín hiệu - cửa sổ kia phải hiện thông báo trong 1-2 giây. Không hiện = đồng bộ không chạy (dùng Chrome hoặc http.server). Đồng bộ giữa 2 MÁY khác nhau: dùng nút Tạo phòng 2 máy.",5200)}
+
+/* ===== PHÒNG DEMO 2 MÁY (V9.16): đồng bộ giữa các MÁY KHÁC NHAU qua WebRTC (PeerJS) =====
+   - Máy A bấm "Tạo phòng 2 máy" -> có MÃ PHÒNG 5 ký tự; máy B bấm "Vào phòng 2 máy" nhập mã.
+   - Tin gửi đi = đúng khối state của localStorage; tin nhận về = ghi vào localStorage rồi đi qua
+     syncApply như thể một cổng khác trên máy vừa lưu -> chuông/badge/toast/last-write-wins tự chạy.
+   - Thư viện PeerJS chỉ TẢI KHI BẤM NÚT (cần mạng); bản offline không đụng nút này thì như cũ.
+   - Máy tạo phòng là TRẠM TRUNG CHUYỂN: nhận tin của một khách rồi phát lại cho các khách còn lại.
+     Cầu nối bắt tay là dịch vụ PeerJS công cộng miễn phí - đủ cho demo, không dùng cho dữ liệu thật. */
+var ROOM={p:null,conns:[],code:"",host:false,on:false};
+function roomStatus(){if(!ROOM.on)return"";
+ var n=ROOM.conns.filter(function(c){return c&&c.open}).length;
+ return ROOM.host?("Phòng "+ROOM.code+(n?(" - đang nối "+n+" máy"):" - chờ máy khác vào")):("Trong phòng "+ROOM.code)}
+function roomLib(cb){if(window.Peer){cb();return}
+ if(window.__peerLoading){setTimeout(function(){roomLib(cb)},400);return}
+ window.__peerLoading=1;toast("Đang tải thư viện kết nối (cần mạng)...",2200);
+ var urls=["https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js","https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"];
+ (function tryN(i){if(i>=urls.length){window.__peerLoading=0;toastErr("Không tải được thư viện kết nối - máy này có mạng không?");return}
+  var s=document.createElement("script");s.src=urls[i];
+  s.onload=function(){window.__peerLoading=0;cb()};
+  s.onerror=function(){try{s.remove()}catch(e){};tryN(i+1)};
+  document.head.appendChild(s)})(0)}
+function roomId(code){return "itts-demo-"+SEED_SIG+"-"+code} /* gắn SEED_SIG: 2 máy phải chạy CÙNG bộ dữ liệu */
+function roomMake(){roomLib(function(){
+ var code="",AB="ABCDEFGHJKMNPQRSTUVWXYZ23456789";for(var i=0;i<5;i++)code+=AB[Math.floor(Math.random()*AB.length)];
+ var p=new Peer(roomId(code));
+ p.on("open",function(){ROOM={p:p,conns:[],code:code,host:true,on:true};ssSet("ITTS_ROOM",code);ssSet("ITTS_ROOM_HOST","1");
+  roomUiRefresh();toast("Đã tạo phòng. Trên máy kia bấm 'Vào phòng 2 máy' và nhập mã: "+code,7000)});
+ p.on("connection",roomWire);
+ p.on("error",function(e){if(String(e.type)==="unavailable-id"){try{p.destroy()}catch(e2){};roomMake();return}roomFail(e)});
+ p.on("disconnected",function(){try{p.reconnect()}catch(e){}})})}
+function roomJoin(code){code=String(code||"").trim().toUpperCase();if(!code){toastErr("Chưa nhập mã phòng.");return}
+ roomLib(function(){
+ var p=new Peer();
+ p.on("open",function(){var c=p.connect(roomId(code),{reliable:true});
+  var t=setTimeout(function(){if(!(c&&c.open)){toastErr("Không thấy phòng "+code+" - kiểm tra lại mã (máy kia phải đang giữ phòng mở).");try{p.destroy()}catch(e){}}},9000);
+  c.on("open",function(){clearTimeout(t);ROOM={p:p,conns:[c],code:code,host:false,on:true};ssSet("ITTS_ROOM",code);ssSet("ITTS_ROOM_HOST","");
+   roomWireData(c);roomUiRefresh();toast("Đã vào phòng "+code+" - các máy trong phòng giờ thấy chung dữ liệu demo.",4500);
+   try{c.send({t:"hello"})}catch(e){}});
+  c.on("close",function(){if(ROOM.on&&!ROOM.host){roomLeave(1);toastErr("Mất kết nối phòng (máy giữ phòng đóng?) - bấm Vào phòng nếu muốn nối lại.")}})});
+ p.on("error",function(e){if(String(e.type)==="peer-unavailable"){toastErr("Không thấy phòng "+code+" - kiểm tra lại mã.");return}roomFail(e)})})}
+function roomWire(c){ /* máy giữ phòng nhận thêm khách */
+ ROOM.conns.push(c);
+ c.on("open",function(){roomUiRefresh();
+  var raw=null;try{raw=localStorage.getItem(LSKEY)}catch(e){}
+  if(raw)try{c.send({t:"state",raw:raw,init:1})}catch(e){} /* khách mới vào nhận ngay hiện trạng */
+ });
+ roomWireData(c);
+ c.on("close",function(){roomUiRefresh()})}
+function roomWireData(c){c.on("data",function(m){roomRecv(m,c)})}
+function roomRecv(m,from){if(!m||!m.t)return;
+ if(m.t==="ping")toast("Nhận tín hiệu từ máy khác"+(m.by?" ("+m.by+")":"")+" - kết nối 2 máy HOẠT ĐỘNG.",3200);
+ else if(m.t==="hello")toast("Một máy vừa vào phòng "+ROOM.code+".",2600);
+ else if(m.t==="reset"){if(ROOM.host)roomRelay(m,from);try{localStorage.removeItem(LSKEY)}catch(e){};location.reload();return}
+ else if(m.t==="state"&&m.raw){
+  try{var st=JSON.parse(m.raw);if(st.sig!==SEED_SIG){if(!window.__roomsig){window.__roomsig=1;toastErr("Máy kia đang chạy BỘ DỮ LIỆU KHÁC - 2 máy phải mở cùng một phiên bản demo.")}return}}catch(e){return}
+  window.__fromRoom=1;
+  try{localStorage.setItem(LSKEY,m.raw)}catch(e){}
+  window.__pendSync=1;try{syncApply()}catch(e){}
+  window.__fromRoom=0}
+ if(ROOM.host&&(m.t==="state"||m.t==="ping"))roomRelay(m,from)}
+function roomRelay(m,from){ROOM.conns.forEach(function(c){if(c!==from&&c&&c.open)try{c.send(m)}catch(e){}})}
+function roomCast(m){if(!ROOM.on)return;ROOM.conns.forEach(function(c){if(c&&c.open)try{c.send(m)}catch(e){}})}
+function roomCastState(){if(!ROOM.on||window.__fromRoom)return;
+ var raw=null;try{raw=localStorage.getItem(LSKEY)}catch(e){}
+ if(raw)roomCast({t:"state",raw:raw})}
+function roomLeave(silent){ssSet("ITTS_ROOM",null);ssSet("ITTS_ROOM_HOST",null);
+ try{if(ROOM.p)ROOM.p.destroy()}catch(e){}
+ ROOM={p:null,conns:[],code:"",host:false,on:false};roomUiRefresh();
+ if(!silent)toast("Đã rời phòng 2 máy - máy này quay về đồng bộ nội bộ như cũ.",2800)}
+function roomFail(e){toastErr("Kết nối 2 máy gặp lỗi ("+((e&&e.type)||"?")+") - kiểm tra mạng rồi thử lại.")}
+function roomUiRefresh(){var lg=document.getElementById("login");
+ if(lg&&lg.style.display!=="none"&&lg.innerHTML){try{if(window.HVPORTAL)demoGateHV();else demoGate()}catch(e){}}
+ if(!window.HVPORTAL&&typeof CUR!=="undefined"&&CUR==="settings"&&typeof reRender==="function")try{reRender("settings")}catch(e){}}
+function roomJoinAsk(){var code=prompt("Nhập MÃ PHÒNG đang hiện trên máy kia (5 ký tự):");if(code!=null)roomJoin(code)}
+function roomBtnHTML(){
+ if(ROOM.on)return '<span class="chip blue">'+esc(roomStatus())+'</span> <button class="btn sm" onclick="roomLeave()"><i class="ti ti-plug-x"></i>Rời phòng</button>';
+ return '<button class="btn sm" onclick="roomMake()" title="Tạo mã phòng để MÁY KHÁC vào demo chung"><i class="ti ti-devices"></i>Tạo phòng 2 máy</button>'+
+  '<button class="btn sm" onclick="roomJoinAsk()" title="Nhập mã phòng máy kia đã tạo"><i class="ti ti-login-2"></i>Vào phòng 2 máy</button>'}
+/* tự nối lại phòng sau F5 (mã lưu theo TAB - sessionStorage) */
+function roomResume(){var code=ssGet("ITTS_ROOM");if(!code)return;
+ if(ssGet("ITTS_ROOM_HOST")==="1"){roomLib(function(){var p=new Peer(roomId(code));
+  p.on("open",function(){ROOM={p:p,conns:[],code:code,host:true,on:true};roomUiRefresh()});
+  p.on("connection",roomWire);
+  p.on("error",function(e){if(String(e.type)==="unavailable-id"){ssSet("ITTS_ROOM_HOST","");roomJoin(code)}});
+  p.on("disconnected",function(){try{p.reconnect()}catch(e){}})})}
+ else roomJoin(code)}
+if(!SVR&&CANLS&&typeof window.addEventListener==="function"&&typeof document!=="undefined")setTimeout(function(){try{roomResume()}catch(e){}},800);
 demoLoad();
 function rows(c){return DL[c]||[]}
 function find(c,f,v){var a=rows(c);for(var i=0;i<a.length;i++)if(a[i][f]===v)return a[i];return null}
@@ -3661,6 +3756,15 @@ function renderHoso(){
  var h='<div class="phead"><div><div class="t">'+esc(C.name)+' <span class="chip '+J.S.cls+'" style="margin-left:6px">'+esc(J.S.t)+'</span></div>'+
   '<div class="s">'+esc(C.phone||"")+(C.sid?' · HV '+esc(C.sid):'')+(C.L?' · Lead '+esc(C.L.lead_id):'')+(J.owner?' · phụ trách: '+esc(J.owner):'')+'</div></div>'+
   '<div class="sp"><button class="btn primary" onclick="runStart(\''+esc(pid)+'\')"><i class="ti ti-player-play"></i>Chạy quy trình</button><button class="btn" onclick="go(\'hanhtrinh\')"><i class="ti ti-arrow-left"></i>Bảng hành trình</button></div></div>';
+ /* V9.16: hồ sơ 360 có 2 tab - nội bộ + "Trang của học viên" (nhúng NGUYÊN renderTrangHV,
+    nhân viên thấy đúng cái học viên thấy; tái dùng code, không fork). Tab HV chỉ có khi là HV. */
+ var tabH=(window.HSTAB==="hv"&&C.sid)?"hv":"in";
+ if(C.sid){h+='<div class="settabs" style="margin-bottom:12px">'+
+  '<button class="stab'+(tabH==="in"?" on":"")+'" onclick="window.HSTAB=\'in\';reRender(\'hoso\')">Hồ sơ nội bộ</button>'+
+  '<button class="stab'+(tabH==="hv"?" on":"")+'" onclick="window.HSTAB=\'hv\';reRender(\'hoso\')">Trang của học viên</button></div>'}
+ if(tabH==="hv"){window.HVID=C.sid;
+  h+='<div class="notebar"><i class="ti ti-eye"></i><b>Đúng những gì học viên đang thấy</b> trên cổng học viên - dùng để đối chiếu khi nghe điện / hướng dẫn học viên. Thao tác ở đây y như học viên thao tác.</div>';
+  h+=renderTrangHV();return h}
  h+=jStepper(J,"hoso");
  /* Ô VIỆC KẾ TIẾP - V9.15: block nghiệp vụ chuẩn sopBlock, bộ nút giữ nguyên */
  var btns15='';
@@ -3684,7 +3788,19 @@ function renderHoso(){
  h+='<div class="bcards">';
  h+=card("ti-user","Thông tin",kv("SĐT",esc(C.phone))+kv("Zalo",esc(L.zalo_id||"-"))+kv("Nguồn",esc(elabel(L.lead_source)||"-"))+kv("Mục tiêu",esc(L.target_band||"-"))+kv("Đối tượng",esc(elabel(S.student_type||L.student_type)||"-"))+kv("Cơ sở",esc(elabel(S.branch||L.branch)||"-")));
  if(C.tests.length){var t=C.testMain;h+=card("ti-file-text","Test đầu vào",kv("Ngày test",esc(t.test_date||"-"))+kv("Dự test",esc(elabel(t.test_attendance_status)||"-"))+kv("Overall",esc(t.overall_score||"-"))+kv("L/R/W/S",esc([t.skill_listening,t.skill_reading,t.skill_writing,t.skill_speaking].join(" / ")))+kv("Nhận xét",esc(t.academic_note||"-")))}
- if(C.enr.length)h+=card("ti-cash","Học phí",kv("Số đăng ký",C.enr.length)+kv("Tổng phí",vnd(totFee))+kv("Đã thu",vnd(paid))+kv("Còn lại",'<b style="color:'+(rem>0?"var(--red)":"var(--green)")+'">'+vnd(rem)+'</b>')+kv("Trạng thái",esc(elabel((C.enrMain||{}).payment_status)||"-")));
+ /* V9.16: bảng điểm 3 mốc - hồ sơ nội bộ không được ÍT thông tin hơn trang học viên */
+ if(C.sid&&(C.tests.length||C.ceMain||(C.obMain&&C.obMain.mid_overall))){
+  var o15=C.obMain||{},t15=C.testMain||{},ce15=C.ceMain||{};
+  var br15=function(lb,a,b2,c2){return '<tr><td>'+lb+'</td><td>'+esc(a||"-")+'</td><td>'+esc(b2||"-")+'</td><td>'+esc(c2||"-")+'</td></tr>'};
+  h+=card("ti-target","Điểm: vào - giữa - ra",
+   '<div class="tbwrap"><table class="dt"><thead><tr><th></th><th>Vào</th><th>Giữa</th><th>Ra</th></tr></thead><tbody>'+
+   br15("L",t15.skill_listening,o15.mid_listening,ce15.final_listening)+
+   br15("R",t15.skill_reading,o15.mid_reading,ce15.final_reading)+
+   br15("W",t15.skill_writing,o15.mid_writing,ce15.final_writing)+
+   br15("S",t15.skill_speaking,o15.mid_speaking,ce15.final_speaking)+
+   br15("<b>Overall</b>",t15.overall_score,o15.mid_overall,ce15.final_test_score)+
+   '</tbody></table></div>'+((ce15.target_band||L.target_band)?kv("Mục tiêu",esc(ce15.target_band||L.target_band)):""))}
+ if(C.enr.length)h+=card("ti-cash","Học phí",kv("Số đăng ký",C.enr.length)+kv("Tổng phí",vnd(totFee))+kv("Đã thu",vnd(paid))+kv("Còn lại",'<b style="color:'+(rem>0?"var(--red)":"var(--green)")+'">'+vnd(rem)+'</b>')+kv("Trạng thái",esc(elabel((C.enrMain||{}).payment_status)||"-"))+((C.enrMain||{}).next_payment_due?kv("Hẹn thu tiếp",esc(C.enrMain.next_payment_due)):""));
  if(C.ob.length){var o=C.obMain;h+=card("ti-school","Lớp & học tập",kv("Lớp",esc(o.class_id_name||o.class_id||"-"))+kv("Onboarding",esc(elabel(o.onboarding_status)||"-"))+kv("Chuyên cần",present+"/"+C.att.length+" buổi")+kv("Bài tập",C.hw.filter(hwGraded).length+"/"+C.hw.length+" đã chấm")+kv("WOW còn",esc(S.wow_quota_remaining||"-")))}
  if(C.sv.length||C.kn.length)h+=card("ti-message-2","Cảm nhận & khiếu nại",kv("Khảo sát",C.sv.length)+kv("Phản hồi",C.fb.length)+kv("Khiếu nại",C.kn.length)+C.kn.slice(0,3).map(function(k){return kv(esc(elabel(k.complaint_type)),'<span class="chip '+stCls(k.complaint_status)+'">'+esc(elabel(k.complaint_status))+'</span>')}).join(""));
  if(C.ceMain)h+=card("ti-flag","Kết thúc & tái ĐK",kv("Điểm cuối",esc(C.ceMain.final_test_score||"-"))+kv("Chuyên cần",esc(C.ceMain.attendance_rate||"-"))+kv("Đạt mục tiêu",esc(elabel(C.ceMain.achievement_status)||"-"))+kv("Tái ĐK",esc(elabel(C.ceMain.re_enrollment_status)||"-")));
@@ -4505,12 +4621,17 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
  if(tab==="health")return h+renderHealth();
  if(tab==="demo"){
   var d=demoDirty();
-  h+='<div class="notebar"><i class="ti ti-broadcast"></i><b>Nền demo đa cổng:</b> mọi thao tác trên bản offline được LƯU THẬT trên máy này và tự đồng bộ sang các cửa sổ/cổng đang mở (kể cả Trang học viên). Hết buổi demo bấm Reset là về nguyên bản.</div>';
+  h+='<div class="notebar"><i class="ti ti-broadcast"></i><b>Nền demo đa cổng:</b> mọi thao tác trên bản offline được LƯU THẬT trên máy này và tự đồng bộ sang các cửa sổ/cổng đang mở (kể cả Trang học viên). Muốn 2 MÁY khác nhau demo chung: dùng Phòng 2 máy bên dưới. Hết buổi demo bấm Reset là về nguyên bản.</div>';
   h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-device-floppy" style="margin-right:6px"></i>Trạng thái dữ liệu</b></div><div style="padding:14px 16px;font-size:12.5px;line-height:1.8">';
   h+='Nguồn dữ liệu gốc: '+(DATASRC==="file"?'file <b>ITTs_data.js</b> cạnh app (thay file này là app đọc bộ dữ liệu mới, không cần build lại)':'<b>bản nhúng trong HTML</b> (không thấy file ITTs_data.js cạnh app)')+'.<br>';
   h+='Thay đổi demo: '+(d?('<span class="chip amber">đang có thay đổi</span> lưu lần cuối lúc <b>'+new Date(d).toLocaleString("vi-VN")+'</b> (chỉ trên trình duyệt này).'):'<span class="chip green">nguyên bản</span> - chưa có thao tác nào được lưu đè.')+'<br>';
   h+='Lưu &amp; đồng bộ: '+(CANLS?'<span class="chip green">đang bật</span> - các cửa sổ mở cùng thư mục app thấy chung dữ liệu.':'<span class="chip red">trình duyệt đang chặn localStorage</span> - thao tác chỉ sống trong phiên này. Mở bằng Chrome, hoặc chạy thư mục qua <code>python3 -m http.server</code> rồi vào <code>http://localhost:8000</code>.')+'</div>';
   h+='<div style="padding:0 16px 14px"><button class="btn danger" '+(d?'onclick="demoReset()"':'disabled style="opacity:.45;cursor:default"')+'><i class="ti ti-refresh"></i>Reset dữ liệu demo (về nguyên bản)</button>'+(d?'':'<span class="mut" style="margin-left:10px;font-size:11.5px">Chưa có gì để reset.</span>')+' <button class="btn" onclick="demoPing()"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ giữa các cửa sổ</button></div></div>';
+  h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-devices" style="margin-right:6px"></i>Phòng 2 máy (demo trên các máy khác nhau)</b></div><div style="padding:14px 16px;font-size:12.5px;line-height:1.9">';
+  h+=(ROOM.on?('Trạng thái: <span class="chip blue">'+esc(roomStatus())+'</span>'):'Trạng thái: <span class="chip gray">chưa kết nối</span> - hiện chỉ đồng bộ giữa các cửa sổ TRÊN MÁY NÀY.')+'<br>';
+  h+='Máy thứ nhất bấm <b>Tạo phòng 2 máy</b> (ở đây hoặc ở màn cổng) rồi đọc MÃ PHÒNG cho máy thứ hai bấm <b>Vào phòng 2 máy</b> nhập mã. Từ lúc đó thao tác bên này bên kia nổ chuông/toast y như 2 cửa sổ cùng máy - ví dụ tạo chiết khấu lớn cần duyệt, máy của quản lý báo ngay.<br>';
+  h+='<span class="mut">Cần mạng ở cả 2 máy; 2 máy phải mở CÙNG phiên bản demo. Kênh bắt tay dùng dịch vụ PeerJS công cộng miễn phí - đủ cho demo, không dùng cho dữ liệu thật. Mất kết nối thì bấm vào lại phòng.</span></div>';
+  h+='<div style="padding:0 16px 14px">'+roomBtnHTML()+'</div></div>';
   h+='<div class="panel"><div class="ph"><b><i class="ti ti-presentation" style="margin-right:6px"></i>Cách demo hai cổng cạnh nhau</b></div><div style="padding:14px 16px;font-size:12.5px;line-height:1.9;color:var(--text)">';
   h+='1. Mở <b>ITTs_WebApp_v5_demo.html</b> ở 2 cửa sổ trình duyệt (kéo mỗi cửa sổ một nửa màn hình). Cửa sổ A chọn cổng NV tư vấn, cửa sổ B chọn cổng Quản lý.<br>';
   h+='2. Bên A thao tác (vd tạo đăng ký có chiết khấu lớn) - bên B thấy ngay việc chờ duyệt; bên B duyệt - bên A thấy kết quả.<br>';
@@ -6131,34 +6252,16 @@ function renderTrangHV(){
   if(paysC.length){h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Ngày đóng</th><th>Số tiền</th><th>Hình thức</th><th>Xác nhận</th></tr></thead><tbody>';
    paysC.slice().sort(function(a,b){return (pvnd(b.payment_time)||0)-(pvnd(a.payment_time)||0)}).forEach(function(pp){var v=pp.verified_by&&String(pp.verified_by).trim();
     h+='<tr><td>'+esc(pp.payment_time||"")+'</td><td><b>'+vnd(num(pp.amount))+'</b></td><td>'+esc(elabel(pp.payment_method)||"")+'</td>'+
-     '<td>'+(v?'<span class="chip green">đã xác nhận</span>':'<span class="chip amber">đang đối soát</span>')+'</td></tr>'});
+     '<td>'+(v?'<span class="chip green">đã xác nhận</span>':'<span class="chip amber">trung tâm đang xác nhận</span>')+'</td></tr>'});
    h+='</tbody></table></div>'}
   h+='</div>'}
- /* ---- 2. YÊU CẦU & PHÊ DUYỆT ---- */
- var apr=[];
+ /* ---- 2. HOÀN HỌC PHÍ (V9.16: BỎ khối "Yêu cầu & phê duyệt" - duyệt/chờ duyệt là quy trình
+    NỘI BỘ, học viên không cần biết; ưu đãi đã hiện trong khối Học phí. Chỉ giữ lại điều học viên
+    thật sự quan tâm: tiền hoàn đang về, nói theo ngôn ngữ học viên. ---- */
  C.enr.forEach(function(e){
-  var da=num(e.discount_amount);
-  if(da>0){var ok=!!String(e.discount_approved_by||"").trim();
-   apr.push({ic:"ti-discount",ok:ok,t:"Ưu đãi học phí "+vnd(da),
-    s:(e.discount_reason||elabel(e.discount_type)||"")+(e.course_id_name?" · "+e.course_id_name:""),
-    st:ok?("Đã duyệt"+(e.discount_approved_at?" ngày "+esc(String(e.discount_approved_at).slice(0,10)):"")):"Đang chờ trung tâm duyệt"})}
-  if(isc(e.enrollment_status,"cancelled")){
-   var pd=C.pays.filter(function(p){return p.enrollment_id===e.enrollment_id}).reduce(function(a,p){return a+num(p.amount)},0);
-   if(pd>0)apr.push({ic:"ti-arrow-back-up",ok:false,t:"Hoàn tiền "+vnd(pd),
-    s:"Đăng ký đã hủy"+(e.cancellation_reason?" · "+e.cancellation_reason:""),
-    st:"Đang xử lý theo chính sách hoàn tiền"})}});
- var wex=num(S.wow_extra_approved), wpur=num(S.wow_extra_purchased);
- if(wex>0)apr.push({ic:"ti-star",ok:true,t:"Cấp thêm "+wex+" buổi WOW",s:"Ngoài số buổi kèm riêng 1-1 (WOW) có sẵn theo khóa",st:"Đã duyệt"});
- if(wpur>0)apr.push({ic:"ti-star",ok:true,t:"Mua thêm "+wpur+" buổi WOW",s:"Bạn đã mua thêm",st:"Đã ghi nhận"});
- var pcc=num(ob.placement_change_count);
- if(pcc>0)apr.push({ic:"ti-transfer",ok:true,t:"Đổi lớp "+pcc+" lần",s:ob.placement_note||"Theo nguyện vọng của bạn",st:"Đã duyệt"});
- if(apr.length){
-  var nWait=apr.filter(function(x){return !x.ok}).length;
-  h+='<div class="sechd" id="s-duyet">Yêu cầu & phê duyệt'+(nWait?' <span class="chip amber" style="text-transform:none">'+nWait+' đang chờ</span>':'')+'</div>';
-  h+='<div class="panel" style="margin-bottom:16px"><div class="pbody">';
-  apr.forEach(function(x){h+='<div class="hvrec '+(x.ok?"green":"amber")+'"><i class="ti '+(x.ok?"ti-circle-check":"ti-clock")+'"></i><div>'+
-   '<b>'+esc(x.t)+' <span class="chip '+(x.ok?"green":"amber")+'">'+esc(x.st)+'</span></b><span>'+esc(x.s)+'</span></div></div>'});
-  h+='</div></div>'}
+  if(!isc(e.enrollment_status,"cancelled"))return;
+  var pd=C.pays.filter(function(p){return p.enrollment_id===e.enrollment_id}).reduce(function(a,p){return a+num(p.amount)},0);
+  if(pd>0)h+='<div class="notebar" style="margin-bottom:16px"><i class="ti ti-arrow-back-up"></i><b>Hoàn học phí:</b> trung tâm đang xử lý hoàn <b>'+vnd(pd)+'</b> cho khóa '+esc(e.course_id_name||e.course_id||"đã hủy")+' theo chính sách. Có thắc mắc bạn cứ nhắn trung tâm nhé.</div>'});
  /* ---- 3. HÀNH TRÌNH CÙNG IELTS THE TUTORS (có mốc thời gian) ---- */
  h+='<div class="sechd" id="s-hanhtrinh">Hành trình cùng IELTS The Tutors</div>';
  var L=C.L||{};
@@ -7430,7 +7533,6 @@ var HVSEC=[
  ["s-xacnhan","Trung tâm đã xác nhận","ti-circle-check"],
  ["s-saptoi","Sắp tới","ti-calendar-check"],
  ["s-hocphi","Học phí","ti-cash"],
- ["s-duyet","Yêu cầu & phê duyệt","ti-shield-check"],
  ["s-hanhtrinh","Hành trình cùng ITTs","ti-route"],
  ["s-tiendo","Tiến độ của bạn","ti-chart-line"],
  ["s-diem","Hành trình điểm số","ti-target"],
@@ -7514,7 +7616,12 @@ function demoBootHV(){window.HVPORTAL=1;try{deriveAll();autoReturnHandovers()}ca
  if(who===null||who===undefined){var ap=document.getElementById("hvapp");if(ap)ap.style.display="none";demoGateHV()}
  else bootHV(who||"")}
 /* trên cổng HV, reRender chỉ vẽ lại thân trang */
-function hvReRender(){document.getElementById("hvBody").innerHTML=renderTrangHV();hvNav();hvSpy();persistSoon()}
+function hvReRender(){var b=document.getElementById("hvBody");
+ if(b){b.innerHTML=renderTrangHV();hvNav();hvSpy();persistSoon();return}
+ /* V9.16: renderTrangHV còn được NHÚNG trong hồ sơ 360 của app NV (tab "Trang của học viên") -
+    ở đó không có #hvBody thì vẽ lại trang đang đứng của app NV */
+ if(typeof reRender==="function"&&typeof CUR!=="undefined"&&CUR)reRender(CUR);
+ persistSoon()}
 
 /* ===== MÀN CỔNG (V9.7): mỗi người vào cổng của mình ===== */
 function gateAv(nm){var p=String(nm||"?").trim().split(" ");return (p.pop()[0]||"?").toUpperCase()}
@@ -7526,7 +7633,8 @@ function gateStatusHTML(){var d=demoDirty();
  return '<div style="font-size:11.5px;color:var(--muted);margin-top:14px;display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap">'+
   '<span>'+src+'</span>'+st+
   (d?'<button class="btn sm" onclick="demoReset()"><i class="ti ti-refresh"></i>Reset dữ liệu demo</button>':'')+
-  '<button class="btn sm" onclick="demoPing()" title="Bấm ở một cửa sổ, cửa sổ kia phải hiện thông báo"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ</button></div>'}
+  '<button class="btn sm" onclick="demoPing()" title="Bấm ở một cửa sổ, cửa sổ kia phải hiện thông báo"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ</button>'+
+  roomBtnHTML()+'</div>'}
 function gateRole(x){var m=String(x.role||"").match(/^[^(]*\((.+)\)\s*$/);return m?m[1]:(String(x.role||"").trim()||"Khác")}
 function gateRoleIcon(r){
  if(/Giám đốc|CEO/i.test(r))return "ti-shield-check";
