@@ -45,6 +45,7 @@ Bộ kiểm gồm **5 phần, phải xanh HẾT mới được giao**:
 | `ITTS_OUT=<out> node _check14.js` | `CHECK14 OK: 100 tieu chi` - cổng học viên hai chiều |
 | `ITTS_OUT=<out> node _check15.js` | `CHECK15 OK: 37 tieu chi` - **kiểm kê cửa ghi + bất biến nghiệp vụ** |
 | `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 236 tieu chi` - học phí theo đợt + toàn bộ vá V9.27 |
+| `ITTS_OUT=<out> node _checkdata.js` | `CHECKDATA OK: 26 luat ... 0 cho lech` - **dữ liệu demo có khớp ga nghiệp vụ không** |
 | `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` |
 | `python3 check_logic.py` | `TONG BAN GHI LOI: 4` (đúng 4 ca là việc quá hạn CỐ Ý để demo cảnh báo đỏ - xem luật 10k) |
 | `python3 check_data.py` | `KET QUA: DAT` |
@@ -66,6 +67,19 @@ THẲNG mới tính. Thêm cửa ghi mới thì thêm một dòng `door(...)` v�
 
 > **LUẬT:** hàm nào ghi vào DATA thì TỰ gọi `persistSoon()`. Không được dựa vào tác dụng phụ của
 > hàm vẽ giao diện - hôm nay đúng, mai đổi đường render là mất dữ liệu không ai hay.
+
+**`_checkdata.js` sinh ra vì bộ máy chặng và bộ kiểm dữ liệu ở HAI NGÔN NGỮ KHÁC NHAU.** Chặng được
+suy ra trong JS (`jStageOf`); `check_logic.py` viết bằng Python nên không biết ga "Có KQ, chờ tư vấn"
+nghĩa là gì, do đó 132 luật của nó vẫn để lọt một khách đứng ở ga đó mà không có điểm test nào.
+`_checkdata.js` **nạp chính `_APP.js`, chạy chính `jAll()`** rồi hỏi ngược: người này app bảo đang ở
+ga nào, ga đó bắt buộc phải có chứng từ gì. Nên nó không bao giờ lệch khỏi app.
+
+> **ĐỪNG chép luật chặng sang Python lần thứ hai** - chép là hai bản sẽ trôi khỏi nhau, đúng lớp lỗi
+> đã sinh ra file này.
+
+Thêm luật mới thì thêm vào `_checkdata.js`, và **luôn lấy tên cột qua `col(bảng, tên)`**: người viết
+file này đã từng soi cột `wow_teacher_id` trong khi DL14 dùng `staff_id`, rồi báo cáo 69 lỗi không có
+lỗi nào là thật. `col()` bắt cột không tồn tại và báo ngay, thay vì lặng lẽ trả về rỗng.
 
 `check_logic.py` (V9.25: 132 luật) là **bộ kiểm dữ liệu BẮT BUỘC**, chạy sau trọn đường ống
 dữ liệu. Đường ống phải chạy ĐÚNG thứ tự, chạy thiếu bước nào là kết quả sai:

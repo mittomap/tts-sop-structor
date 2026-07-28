@@ -765,6 +765,224 @@ for b in R("DL20"):
 log.append("14c. Cổng học viên: thêm enum student_request | mở cột DL16.session_id cho %d dòng | "
            "gán link tài liệu cho %d bài trong kho" % (c14c, _lk))
 
+# ═══ 14bis. KHỚP DỮ LIỆU VỚI GA NGHIỆP VỤ (28/07 - anh Luân bắt lỗi) ═══════
+# ĐẶT Ở ĐÂY CÓ CHỦ Ý: phải chạy TRƯỚC 14d, vì 14d chia lịch đóng theo đợt dựa trên
+# paid_amount - pass này sửa paid_amount nên chạy sau 14d là lịch đợt ôm số cũ (luật 17b đỏ).
+# Anh Luân mở màn "Chạy quy trình" thấy một khách ĐANG Ở GA "Có KQ, chờ tư vấn" mà ô L/R/W/S
+# trống trơn. 132 luật của check_logic.py không bắt được vì bộ máy chặng sống trong JS
+# (jStageOf), còn bộ kiểm dữ liệu sống ở đây - Python không biết ga "Có KQ" nghĩa là gì.
+# Bộ kiểm mới `_src/_checkdata.js` nạp chính _APP.js và hỏi ngược app; pass này vá theo nó.
+# NGUYÊN TẮC: đã đi qua một cổng thì phải để lại chứng từ của cổng đó.
+
+def _staff_role(*want):
+    out = [x for x in R("DL01") if code(x.get("role")) in want and code(x.get("status")) == "active"]
+    return out
+
+_GRADERS = _staff_role("teacher", "wow_coach") or _staff_role("academic_staff") or R("DL01")[:1]
+_ACCT = (_staff_role("accountant") or _staff_role("accounting_manager") or R("DL01")[:1])[0]
+
+
+def _half(x):
+    """Điểm IELTS đi theo bước 0.5 và nằm trong 0-9."""
+    return max(0.0, min(9.0, round(float(x) * 2) / 2.0))
+
+
+def _bandstr(x):
+    return ("%.1f" % _half(x))
+
+
+# --- 16a. Đã qua cổng TEST thì phải có phiếu test đã chấm ------------------
+# Ai có phiếu tư vấn hoặc đơn đăng ký = chắc chắn đã qua bước test, không thể không có phiếu.
+_lead_of_stu = {}
+for _e in R("DL06"):
+    if _e.get("student_id") and _e.get("lead_id"):
+        _lead_of_stu[str(_e["student_id"])] = str(_e["lead_id"])
+
+_past_test = set()
+for _c in R("DL04"):
+    if _c.get("lead_id"):
+        _past_test.add(str(_c["lead_id"]))
+for _e in R("DL06"):
+    _lid = str(_e.get("lead_id") or _lead_of_stu.get(str(_e.get("student_id")), ""))
+    if _lid:
+        _past_test.add(_lid)
+
+_has_test = set(str(x.get("lead_id")) for x in R("DL03") if x.get("lead_id"))
+_tb_n = 0
+for _x in R("DL03"):
+    _m = re.search(r"(\d+)$", str(_x.get("test_booking_id") or ""))
+    if _m:
+        _tb_n = max(_tb_n, int(_m.group(1)))
+
+_made_test = 0
+for _lid in sorted(_past_test - _has_test):
+    _L = IDX["DL02"].get(_lid)
+    if not _L:
+        continue
+    # mốc: phải TRƯỚC lúc tư vấn / đăng ký, vì test là cửa đứng trước hai cửa đó
+    _after = [dt(c.get("consultation_time")) for c in R("DL04") if str(c.get("lead_id")) == _lid]
+    _after += [dt(e.get("enrollment_time") or e.get("created_time"))
+               for e in R("DL06") if str(e.get("lead_id")) == _lid]
+    _after = [x for x in _after if x]
+    _anchor = min(_after) if _after else (dt(_L.get("lead_created_time")) or NOW)
+    _tdate = _anchor - datetime.timedelta(days=random.randint(4, 9))
+    _created = dt(_L.get("lead_created_time"))
+    if _created and _tdate < _created:                 # không được test trước cả lúc vào hệ thống
+        _tdate = _created + datetime.timedelta(days=1)
+    _tdate = _tdate.replace(hour=random.choice([9, 14, 19]), minute=0)
+
+    # điểm đầu vào suy từ MỤC TIÊU của chính khách: vào học thấp hơn đích khoảng 1 band
+    try:
+        _goal = float(re.sub(r"[^0-9.]", "", str(_L.get("target_band") or "6.5")) or 6.5)
+    except Exception:
+        _goal = 6.5
+    _base = _half(max(3.0, min(7.5, _goal - 1.0)))
+    _sk = [_half(_base + random.choice([-0.5, 0.0, 0.0, 0.5])) for _ in range(4)]
+    _ov = _bandstr(sum(_sk) / 4.0)                     # Overall = trung bình 4 kỹ năng
+    _tb_n += 1
+    _gr = random.choice(_GRADERS)
+    _consulted = any(str(c.get("lead_id")) == _lid for c in R("DL04"))
+    R("DL03").append({
+        "test_booking_id": "TB-2026-%03d" % _tb_n, "lead_id": _lid,
+        "test_date": fmt(_tdate), "test_format": random.choice(
+            ["offline (Offline tại trung tâm)", "offline (Offline tại trung tâm)", "online (Online (Zoom/LMS))"]),
+        "booking_status": "booked (Đã đặt lịch)", "booking_note": "",
+        "test_attendance_status": "on_time (Đúng giờ)", "test_attendance_time": fmt(_tdate),
+        "test_no_show_reason": "", "test_status": "graded (Đã chấm xong)",
+        "overall_score": _ov, "skill_listening": _bandstr(_sk[0]), "skill_reading": _bandstr(_sk[1]),
+        "skill_writing": _bandstr(_sk[2]), "skill_speaking": _bandstr(_sk[3]),
+        "academic_note": random.choice([
+            "Nền ngữ pháp ổn, cần siết phát âm và tốc độ đọc.",
+            "Nghe bắt ý chính tốt, viết còn thiếu liên kết đoạn.",
+            "Từ vựng đủ dùng, nói còn ngập ngừng khi đổi chủ đề.",
+            "Đọc tốt, nghe dạng bản đồ/điền từ còn yếu."]),
+        "result_time": fmt(_tdate + datetime.timedelta(days=1)),
+        "post_test_status": "consulted (Đã tư vấn xong)" if _consulted else "awaiting_consultation (Có KQ, chờ tư vấn)",
+        "graded_by": _gr.get("staff_id", ""), "auto_trigger_hint": "", "next_action": "",
+        "lead_id_name": _L.get("full_name", ""),
+    })
+    _has_test.add(_lid)
+    _made_test += 1
+
+# nối phiếu tư vấn với phiếu test vừa tạo (phiếu tư vấn trỏ tới test_booking_id)
+_tb_of_lead = {}
+for _x in R("DL03"):
+    _tb_of_lead.setdefault(str(_x.get("lead_id")), _x.get("test_booking_id"))
+_linked = 0
+for _c in R("DL04"):
+    if not str(_c.get("test_booking_id") or "").strip():
+        _tb = _tb_of_lead.get(str(_c.get("lead_id")))
+        if _tb:
+            _c["test_booking_id"] = _tb
+            _linked += 1
+
+# --- 16b. Đã qua cổng TƯ VẤN thì phải có phiếu tư vấn ----------------------
+_has_cons = set(str(x.get("lead_id")) for x in R("DL04") if x.get("lead_id"))
+_past_cons = set()
+for _e in R("DL06"):
+    _lid = str(_e.get("lead_id") or _lead_of_stu.get(str(_e.get("student_id")), ""))
+    if _lid:
+        _past_cons.add(_lid)
+_cs_n = 0
+for _x in R("DL04"):
+    _m = re.search(r"(\d+)$", str(_x.get("consultation_id") or ""))
+    if _m:
+        _cs_n = max(_cs_n, int(_m.group(1)))
+_made_cons = 0
+for _lid in sorted(_past_cons - _has_cons):
+    _L = IDX["DL02"].get(_lid)
+    if not _L:
+        continue
+    _enr = [e for e in R("DL06") if str(e.get("lead_id")) == _lid]
+    _edt = dt(_enr[0].get("enrollment_time")) if _enr else None
+    _tst = [x for x in R("DL03") if str(x.get("lead_id")) == _lid]
+    _rt = dt(_tst[0].get("result_time")) if _tst else None
+    _ct = _rt + datetime.timedelta(days=1) if _rt else ((_edt - datetime.timedelta(days=2)) if _edt else NOW)
+    if _edt and _ct >= _edt:                    # tư vấn phải trước lúc đăng ký
+        _ct = _edt - datetime.timedelta(days=1)
+    _cs_n += 1
+    _crs = IDX["DL05"].get(str(_enr[0].get("course_id"))) if _enr else None
+    R("DL04").append({
+        "consultation_id": "CS-2026-%03d" % _cs_n, "lead_id": _lid,
+        "test_booking_id": _tb_of_lead.get(_lid, ""),
+        "consulted_by": _L.get("assigned_to", ""),
+        "consultation_status": "consulted (Đã tư vấn xong)",
+        "consultation_time": fmt(_ct),
+        "recommended_course": (_crs or {}).get("course_name", "") or (_enr[0].get("course_id_name", "") if _enr else ""),
+        "recommended_duration": (_crs or {}).get("duration_weeks", "") and ("%s tuần" % (_crs or {}).get("duration_weeks")) or "",
+        "recommended_schedule": _L.get("availability_schedule", ""),
+        "consultation_note": "Đã trao đổi kết quả test và lộ trình phù hợp với mục tiêu %s." % (_L.get("target_band") or ""),
+        "conversion_status": "confirmed_with_deposit (Đồng ý + có cọc)" if _enr else "interested (Quan tâm, chưa chốt)",
+        "conversion_time": fmt(_edt) if _edt else "",
+        "conversion_note": "", "next_action": "",
+        "customer_name_display": _L.get("full_name", ""),
+    })
+    _made_cons += 1
+
+# --- 16c. Đã xếp lớp và đang học thì không thể chưa đóng đồng nào ---------
+# Đơn "đã xác nhận" + học viên đã ngồi trong lớp mà paid_amount = 0 là mâu thuẫn: trung tâm
+# không xếp lớp cho người chưa đóng cọc. Tạo phiếu thu ĐÚNG PHẦN CỌC, phần còn lại vẫn là
+# công nợ - giữ nguyên các ca nợ cố ý để màn Thu công nợ còn việc mà demo.
+_dep_pct = 40
+for _c2 in d.get("config", {}).get("ch2", []):
+    if _c2.get("name") == "installmentDepositPercent":
+        try:
+            _dep_pct = float(re.sub(r"[^0-9.]", "", str(_c2.get("value") or "40")) or 40)
+        except Exception:
+            _dep_pct = 40
+_placed = set(str(o.get("student_id")) for o in R("DL08") if str(o.get("class_id") or "").strip())
+_pay_n = 0
+for _x in R("DL07"):
+    _m = re.search(r"(\d+)$", str(_x.get("payment_id") or ""))
+    if _m:
+        _pay_n = max(_pay_n, int(_m.group(1)))
+_paid_of_enr = {}
+for _p in R("DL07"):
+    _paid_of_enr[str(_p.get("enrollment_id"))] = _paid_of_enr.get(str(_p.get("enrollment_id")), 0) + n(_p.get("amount"))
+_made_pay = 0
+for _e in R("DL06"):
+    if code(_e.get("enrollment_status")) == "cancelled":
+        continue
+    if str(_e.get("student_id")) not in _placed:
+        continue
+    if _paid_of_enr.get(str(_e.get("enrollment_id")), 0) > 0:
+        continue
+    _fee = n(_e.get("final_fee"))
+    if _fee <= 0:
+        continue
+    _amt = int(round(_fee * _dep_pct / 100.0 / 1000.0)) * 1000
+    _ob = [o for o in R("DL08") if str(o.get("student_id")) == str(_e.get("student_id"))]
+    _edt2 = dt(_e.get("enrollment_time"))
+    _when = dt((_ob[0] or {}).get("assigned_at")) if _ob else None
+    _when = (_when - datetime.timedelta(days=1)) if _when else (_edt2 or NOW)
+    # cọc phải thu SAU khi có đơn và TRƯỚC lúc xếp lớp - kẹp lại cho khỏi lọt luật 6d
+    if _edt2 and _when < _edt2:
+        _when = _edt2 + datetime.timedelta(hours=2)
+    _pay_n += 1
+    _stu = IDX["DL09"].get(str(_e.get("student_id")))
+    _rcv = random.choice(_staff_role("sales_staff") or R("DL01")[:1])
+    R("DL07").append({
+        "payment_id": "PAY-%04d" % _pay_n, "enrollment_id": _e.get("enrollment_id"),
+        "student_id": _e.get("student_id"), "lead_id": _e.get("lead_id", ""),
+        "student_id_name": (_stu or {}).get("full_name", "") or _e.get("student_id_name", ""),
+        "next_action": "", "payment_time": fmt(_when),
+        "payment_method": "bank_transfer (Chuyển khoản NH)", "amount": str(_amt),
+        "transaction_fee": "0", "net_received": str(_amt), "bank_name": "Vietcombank",
+        "sender_name": (_stu or {}).get("full_name", ""), "transaction_ref": "FT%s%04d" % (_when.strftime("%y%m%d"), _pay_n),
+        "received_by": _rcv.get("staff_id", ""), "received_by_name": _rcv.get("full_name", ""),
+        "verified_by": _ACCT.get("staff_id", ""), "verified_by_name": _ACCT.get("full_name", ""),
+        "payment_note": "Cọc giữ chỗ - xếp lớp xong thu phần còn lại.", "installment_no": "1",
+    })
+    _e["paid_amount"] = str(_amt)
+    _e["remaining_amount"] = str(max(0, int(_fee) - _amt))
+    _e["payment_status"] = ("paid (Đã thanh toán đủ)" if _amt >= _fee else "partial (Đã thanh toán 1 phần)")
+    _paid_of_enr[str(_e.get("enrollment_id"))] = _amt
+    _made_pay += 1
+
+log.append("14bis. Khớp ga nghiệp vụ: bù %d phiếu test đã chấm (nối %d phiếu tư vấn vào phiếu test), "
+           "%d phiếu tư vấn, %d phiếu thu cọc cho người đã xếp lớp mà chưa đóng đồng nào"
+           % (_made_test, _linked, _made_cons, _made_pay))
+
 # ═══ 14d. LỊCH ĐÓNG HỌC PHÍ THEO ĐỢT - BẢNG DL06b (mảng 4) ═══════════════
 # Trước đây DL06 chỉ có MỘT cột next_payment_due, bị GHI ĐÈ mỗi lần thu -> không lưu được
 # lịch trả góp, không nhắc TRƯỚC hạn, không in được lịch đợt vào phiếu, và không biết học
