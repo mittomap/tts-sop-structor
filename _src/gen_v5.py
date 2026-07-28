@@ -119,6 +119,10 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .rost.pend{background:#FFFBF2}
 .abschip{margin-left:8px;cursor:pointer;border:0;font-family:inherit}
 .abschip i{margin-right:4px}
+/* V9.29: tieu de nhom theo do gap trong trang Viec hom nay */
+.viechd{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;letter-spacing:.3px;
+ text-transform:uppercase;color:#5A6675;border-left:3px solid var(--line);padding:2px 0 2px 9px;margin:14px 0 7px}
+.viechd b{color:var(--navy)}
 .navgrp{margin-bottom:3px}
 .navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500;border-left:3px solid transparent}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
@@ -1563,7 +1567,7 @@ var PAGES=[
 {k:"hosonv",g:"_",ic:"ti-id-badge",t:"Hồ sơ Nhân viên",c:"Bảng việc theo vai trò",ty:"custom",hide:1},
 {k:"hosokhoa",g:"_",ic:"ti-school",t:"Hồ sơ Khóa học",c:"Lớp · doanh thu · đầu ra",ty:"custom",hide:1},
 {k:"dashboard",g:"_",ic:"ti-layout-dashboard",t:"Tổng quan",c:"Đã gộp vào Báo cáo & KPI",ty:"custom",hide:1},
-{k:"viec",g:"_",ic:"ti-checklist",t:"Việc hôm nay",c:"",ty:"custom",hide:1},
+{k:"viec",g:"_",ic:"ti-checklist",t:"Việc hôm nay",c:"Toàn bộ việc tới hạn hôm nay, gom theo nhóm và theo bộ phận",ty:"custom"},
 {k:"hoso",g:"_",ic:"ti-id-badge-2",t:"Hồ sơ hành trình 360",c:"",ty:"custom",hide:1},
 {k:"pipeline",g:"_",ic:"ti-layout-kanban",t:"Phễu vận hành",c:"",ty:"custom",hide:1},
 {k:"tracuu",g:"_",ic:"ti-search",t:"Tra cứu nhanh",c:"",ty:"custom",hide:1}];
@@ -1582,28 +1586,28 @@ var ROLESCOPE={
  quantri:{match:null,land:"banlam",pages:"*",blocks:"*",mine:0,mineBtn:0,kpi:0,bell:"*"},
  dieuhanh:{match:/^ceo$/,land:"baocao",pages:"*",blocks:"*",mine:0,mineBtn:0,kpi:0,bell:"*"},
  tuvan:{match:/^sales/,land:"banlam",
-  pages:["banlam","hanhtrinh","hocvien","giangvien","tuyensinh","ketthuc","khac"],
+  pages:["viec","banlam","hanhtrinh","hocvien","giangvien","tuyensinh","ketthuc","khac"],
   tabs:{khac:["magioithieu"]},
   blocks:["appt","new","contacted","test_done","enrolled","reup"],
   mine:1,mineBtn:1,kpi:1,bell:["Tuyển sinh"]},
  hocvu:{match:/^(academic|aca_)/,land:"banlam",
-  pages:["banlam","hanhtrinh","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ketthuc","khac"],
+  pages:["viec","banlam","hanhtrinh","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ketthuc","khac"],
   tabs:{khac:["baoluu"]},
   blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:0,kpi:1,bell:["Học vụ","CSKH"]},
  giaovien:{match:/^teacher$/,land:"hoctap",ctx:{HTTAB:"today"},
-  pages:["banlam","hocvien","giangvien","banglop","hoctap","giaoan"],
+  pages:["viec","banlam","hocvien","giangvien","banglop","hoctap","giaoan"],
   blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:0,bell:["Học vụ"]},
  wow:{match:/^wow/,land:"hoctap",ctx:{HTTAB:"wow"},
-  pages:["banlam","hocvien","giangvien","hoctap","banglop"],
+  pages:["viec","banlam","hocvien","giangvien","hoctap","banglop"],
   blocks:["test_grading","wowq","risk"],mine:0,mineBtn:0,kpi:0,bell:["Học vụ"]},
  ketoan:{match:/^account/,land:"tuyensinh",ctx:{TSTAB:"thanhtoan"},
-  pages:["banlam","hocvien","giangvien","tuyensinh","duyet","baocao"],
+  pages:["viec","banlam","hocvien","giangvien","tuyensinh","duyet","baocao"],
   blocks:["enrolled","approve","debt"],mine:0,mineBtn:0,kpi:0,bell:["Tài chính"]},
  marketing:{match:/^marketing/,land:"tuyensinh",ctx:{TSTAB:"lead"},
-  pages:["banlam","tuyensinh","khac","hocvien"],tabs:{khac:["magioithieu"]},
+  pages:["viec","banlam","tuyensinh","khac","hocvien"],tabs:{khac:["magioithieu"]},
   blocks:["new","reup"],mine:0,mineBtn:0,kpi:0,bell:["Tuyển sinh"]},
  hotro:{match:/^(hr_|it_|janitor|security)/,land:"banlam",lite:1,
-  pages:["banlam","hocvien","giangvien"],blocks:[],mine:0,mineBtn:0,kpi:0,bell:[]}};
+  pages:["viec","banlam","hocvien","giangvien"],blocks:[],mine:0,mineBtn:0,kpi:0,bell:[]}};
 /* V9.20: GIAO VIỆC là việc của MỌI chức danh (kể cả nhóm hỗ trợ) - cấp quyền trang + chuông cho tất cả
    ở MỘT chỗ, khỏi sót khi thêm nhóm vai mới sau này. */
 (function(){for(var k in ROLESCOPE){var r=ROLESCOPE[k];
@@ -2481,8 +2485,8 @@ function renderDashboardOld(){
  red.slice(0,6).forEach(function(it){h+=slaRow(it)});
  h+='</div></div>';
  return h}
-function goViecTeam(t){window.VIECTEAM=t;window.VIECGRP="all";window.VIECOD=false;go("viec")}
-function goViecOverdue(){window.VIECTEAM="all";window.VIECGRP="all";window.VIECOD=true;go("viec")}
+function goViecTeam(t){window.VIECTEAM=t;window.VIECGRP="all";window.VIECSEV="";window.VIECOD=false;go("viec")}
+function goViecOverdue(){window.VIECTEAM="all";window.VIECGRP="all";window.VIECSEV="red";window.VIECOD=true;go("viec")}
 function ymNow(){var d=new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)}
 function inMonth(s){var d=pvnd(s);return d&&(d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2))===ymNow()}
 function in30(s){var d=pvnd(s);return d&&(Date.now()-d.getTime())<30*864e5}
@@ -2804,30 +2808,63 @@ function slaRow(it){var age=it.age!=null?'<span class="agebadge '+it.sev+'">'+es
  return '<div class="slarow" style="box-shadow:inset 3px 0 0 '+gc+'"><div class="slaic '+it.sev+'"><i class="ti '+it.ic+'"></i></div><div class="slat"><div class="slaw">'+esc(it.who)+' '+age+'</div><div class="slad">'+esc(it.what)+' <span class="slacat" style="background:'+gc+'22;color:'+gc+'">'+esc(it.grp||it.cat)+'</span></div></div><div class="slaa">'+btn+'</div></div>'}
 function viecTeam(t){window.VIECTEAM=t;window.VIECGRP="all";reRender("viec")}
 function renderViec(){var items=bellItems();
- var team=window.VIECTEAM||"all",grp=window.VIECGRP||"all",od=window.VIECOD?true:false;
+ var team=window.VIECTEAM||"all",grp=window.VIECGRP||"all";
+ var sev=window.VIECSEV||(window.VIECOD?"red":"");   /* V9.29: MỘT biến cho mức độ; VIECOD là lối tắt cũ của "chỉ quá hạn" */
+ var od=(sev==="red");
  var teams=["Tuyển sinh","Học vụ","Tài chính","CSKH"];
+ /* V9.29 (anh Luân yêu cầu nâng cấp): trước đây trang này chỉ là hai dải chip + một danh sách
+    phẳng 150 dòng. Nay: dải số bấm được · lọc theo mức độ · gom theo ĐỘ GẤP thay vì đổ một đống. */
  var redn=items.filter(function(x){return x.sev==="red"}).length;
- var base=od?items.filter(function(x){return x.sev==="red"}):items;
+ var ambn=items.filter(function(x){return x.sev==="amber"}).length;
+ var base=sev?items.filter(function(x){return (x.sev||"")===sev}):items;
  var teamC={};base.forEach(function(it){teamC[it.cat]=(teamC[it.cat]||0)+1});
  var scoped=base.filter(function(it){return team==="all"||it.cat===team});
  var grpC={},grpOrder=[];scoped.forEach(function(it){if(grpC[it.grp]==null){grpOrder.push(it.grp);grpC[it.grp]=0}grpC[it.grp]++});
- var grpTeam={};base.forEach(function(it){if(grpTeam[it.grp]==null)grpTeam[it.grp]=it.cat});
  var view=scoped.filter(function(it){return grp==="all"||it.grp===grp});
- view.sort(function(a,b){return (a.sev==="red"?0:1)-(b.sev==="red"?0:1)});
- var h='<div class="phead"><div><div class="t">Việc hôm nay</div><div class="s">Trung tâm cảnh báo SLA · '+items.length+' việc ('+redn+' quá hạn). Chọn team → lọc theo nhóm việc. Làm xong ở màn nghiệp vụ là việc tự biến mất.</div></div></div>';
+ var h=pageHead("Việc hôm nay",
+  "Mọi việc trung tâm đang nợ, gom từ toàn bộ luật SLA. Đây là chỗ dọn việc; muốn xử lý từng người thì vào Trang bắt đầu.",
+  (sev?'<button class="btn primary" onclick="viecOnly(\'\')"><i class="ti ti-filter-off"></i>Bỏ lọc mức độ</button>':''));
+ /* dải số BẤM ĐƯỢC - bấm ô nào là lọc đúng ô đó */
+ function vstat(ic,n,lb,col,sub,act){
+  return '<div class="bstat'+(n?"":" z")+'" onclick="'+act+'" data-tip="Bấm để lọc danh sách bên dưới">'+
+   '<span class="bsic" style="background:'+col+'18;color:'+col+'"><i class="ti '+ic+'"></i></span>'+
+   '<div><div class="bsn">'+n+'</div><div class="bsl">'+esc(lb)+(sub?' · '+esc(sub):'')+'</div></div>'+
+   (n?'<i class="ti ti-chevron-down bsarr"></i>':'')+'</div>'}
+ h+='<div class="bstats">'+
+  vstat("ti-alert-triangle",redn,"Quá hạn","#E24B4A","làm ngay","viecOnly('red')")+
+  vstat("ti-clock",ambn,"Sắp tới hạn","#E08A1E","còn kịp","viecOnly('amber')")+
+  vstat("ti-checklist",items.length,"Tổng việc đang nợ","#2E5A88","toàn trung tâm","viecOnly('')")+
+  vstat("ti-user-check",items.filter(function(x){return x.cat==="Học vụ"}).length,"Của Học vụ","#0D9488","nhóm đông việc nhất","viecTeam('Học vụ')")+
+  '</div>';
  var tsegs=[["all","Tất cả",base.length,""]];
  teams.forEach(function(t){if(teamC[t])tsegs.push([t,t,teamC[t],""])});
- h+=tbar('<span class="tblbl">Nhóm chức năng</span>'+segHTML(team,tsegs,"viecTeam('{k}')"),
-  '<button class="btn sm'+(od?" primary":"")+'" onclick="window.VIECOD='+(od?"false":"true")+';reRender(\'viec\')"><i class="ti ti-alert-triangle"></i>Chỉ quá hạn</button>');
+ h+=tbar('<span class="tblbl">Bộ phận</span>'+segHTML(team,tsegs,"viecTeam('{k}')"),
+  '<button class="btn sm'+(od?" primary":"")+'" onclick="viecOnly(\''+(od?"":"red")+'\')"><i class="ti ti-alert-triangle"></i>Chỉ quá hạn</button>');
  var gsegs=[["all","Tất cả nhóm",scoped.length,""]];
  grpOrder.forEach(function(g){gsegs.push([String(g).replace(/'/g,""),g,grpC[g],""])});
  h+=tbar('<span class="tblbl">Nhóm việc</span>'+segHTML(grp,gsegs,"window.VIECGRP='{k}';reRender('viec')"),
   '<span class="tbcnt">'+view.length+' việc</span>');
- h+='<div class="panel"><div class="pbody slalist">';
- if(!view.length)h+='<div class="empty">Không có việc nào ở bộ lọc này.</div>';
- view.slice(0,150).forEach(function(it){h+=slaRow(it)});
- if(view.length>150)h+='<div class="pmore">... còn '+(view.length-150)+' việc nữa (chọn nhóm việc để thu hẹp)</div>';
- h+='</div></div>';return h}
+ /* GOM THEO ĐỘ GẤP - trước đây đổ một danh sách phẳng, đỏ lẫn vàng lẫn xám, không biết bắt đầu từ đâu */
+ var BUCK=[["red","Quá hạn - làm ngay","ti-alert-triangle","var(--red)"],
+           ["amber","Sắp tới hạn - còn kịp","ti-clock","var(--amber)"],
+           ["","Theo dõi","ti-eye","var(--muted)"]];
+ var shown=0, CAP=120;
+ BUCK.forEach(function(B){
+  var part=view.filter(function(it){return (it.sev||"")===B[0]});
+  if(!part.length)return;
+  h+='<div class="viechd" style="border-left-color:'+B[3]+'"><i class="ti '+B[2]+'" style="color:'+B[3]+'"></i>'+
+   esc(B[1])+' <b>'+part.length+'</b></div>';
+  h+='<div class="panel" style="margin-bottom:12px"><div class="pbody slalist">';
+  var lim=Math.max(0,CAP-shown);
+  part.slice(0,lim).forEach(function(it){h+=slaRow(it)});
+  shown+=Math.min(part.length,lim);
+  if(part.length>lim)h+='<div class="pmore">... còn '+(part.length-lim)+' việc nữa ở nhóm này - chọn một Nhóm việc ở trên để xem hết</div>';
+  h+='</div></div>'});
+ if(!view.length)h+='<div class="panel"><div class="pbody"><div class="empty">Không có việc nào ở bộ lọc này.</div></div></div>';
+ return h}
+/* bấm ô số trên dải: lọc theo mức độ, giữ nguyên bộ phận và nhóm việc đang chọn */
+function viecOnly(sev){window.VIECSEV=sev||"";window.VIECOD=(sev==="red");
+ window.VIECGRP="all";reRender("viec")}
 
 function ckThreshold(){return paramOf("thresholdDiscount_approval",1000000)}
 function renderDuyet(){var TH=ckThreshold();
@@ -4542,11 +4579,15 @@ function renderBanlam(){
  if(rsB.lite){
   h+='<div class="panel" style="padding:18px;text-align:center;color:var(--muted);font-size:12.5px">Chức danh của bạn không tham gia hành trình khách - dùng ô tìm phía trên để tra cứu học viên / giảng viên khi cần.</div>';
   return h}
+ /* V9.29 (anh Luân): "KPI của tôi" trước đây rơi xuống ĐÁY trang - phải cuộn hết danh sách mới
+    thấy số của chính mình, vô lý. Đưa lên ngay dưới lời chào: mở app là biết mình đang đứng đâu,
+    rồi mới tới việc phải làm. */
+ if(rsB.kpi)h+=myKpiHTML();
  if(blocks.length)h+='<div class="bstats">'+blocks.map(function(b){return stat(b[0],b[1],b[2],b[3],b[4],b[5])}).join("")+'</div>';
  /* V9.18: GỘP "Hành trình" vào Trang bắt đầu - một trang, hai góc nhìn (danh sách chạy / bảng chặng) */
  var vw=window.BLVIEW||"list";
  h+='<div style="margin:2px 0 10px">'+segHTML(vw,[["list","Chạy quy trình",null,""],["board","Bảng chặng - hành trình",null,""]],"window.BLVIEW='{k}';reRender(CUR)")+'</div>';
- if(vw==="board"){h+=renderHanhtrinh(1);if(rsB.kpi)h+=myKpiHTML();return h}
+ if(vw==="board"){h+=renderHanhtrinh(1);return h}   /* KPI đã nằm trên đầu trang */
  /* CHẠY QUY TRÌNH gộp thẳng vào đây: chip lọc + danh sách người */
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-player-play" style="margin-right:6px"></i>Chạy quy trình</b><div class="mini"><button class="btn sm" onclick="leadInbound()"><i class="ti ti-message-plus"></i>Khách mới liên hệ đến</button></div></div>';
  var actN=all0.filter(function(J){return J.act}).length;
@@ -4559,7 +4600,6 @@ function renderBanlam(){
   (meReal?'<button class="pill'+(window.MINEONLY?' on':'')+'" onclick="window.MINEONLY=window.MINEONLY?0:1;reRender(CUR)" title="Chỉ hiện hồ sơ tôi phụ trách"><i class="ti ti-user-check" style="margin-right:4px"></i>Chỉ khách của tôi</button> ':'')+
   '<span class="tbcnt">'+chayList().length+' hồ sơ đang hiện</span>')+'</div>';
  h+='<div class="pbody"><div id="chaybody">'+chayListHTML()+'</div></div></div>';
- if(rsB.kpi)h+=myKpiHTML();
  return h}
 /* ===== TÁC VỤ: TẠO REVIEW GỬI LỚP (khảo sát định kỳ cho cả lớp) ===== */
 /* ===== HUB CSKH 2 CHIỀU: Khảo sát (TT→HV) · Phản hồi/Góp ý & Khiếu nại (HV→TT) ===== */
@@ -10238,7 +10278,7 @@ function renderBell(){var items=bellItems();var groups={},order=[];
  return h+'<div class="nft"><button class="btn sm" onclick="bellGo(\'all\',\'all\')"><i class="ti ti-list"></i> Xem tất cả việc</button></div>'}
 function toggleBell(e){if(e&&e.stopPropagation)e.stopPropagation();var n=document.getElementById("notif");if(!n)return;var open=!n.classList.contains("on");if(open)n.innerHTML=renderBell();n.classList.toggle("on",open)}
 function closeBell(){var n=document.getElementById("notif");if(n)n.classList.remove("on")}
-function bellGo(team,grp){closeBell();window.VIECTEAM=team;window.VIECGRP=grp;window.VIECOD=false;go("viec")}
+function bellGo(team,grp){closeBell();window.VIECTEAM=team;window.VIECGRP=grp;window.VIECSEV="";window.VIECOD=false;go("viec")}
 document.addEventListener("click",function(e){var n=document.getElementById("notif");if(n&&n.classList.contains("on")&&e.target&&e.target.closest&&!e.target.closest("#notif")&&!e.target.closest(".tbtn"))closeBell()});
 /* ===== BREADCRUMB + LỊCH SỬ ĐIỀU HƯỚNG =====
    Mỗi lần go() sang trang khác thì đẩy trang đang rời vào lịch sử (kèm ngữ cảnh của
@@ -10384,7 +10424,9 @@ LISTCFG.dsphanhoi=mkRO(LISTCFG.khaosat,"Sổ phản hồi / góp ý (DL16) - ch�
 LISTCFG.dskhieunai=mkRO(LISTCFG.khieunai,"Sổ khiếu nại (DL17) - chỉ xem; xử lý ở hub CSKH");
 
 var NAVTREE=[
- {g:"Làm việc",items:["banlam","giaoviec"]}, /* V9.18: hanhtrinh gộp vào banlam (go() tự remap) */
+ /* V9.29: "Việc hôm nay" trước đây khai hide:1 - vào được từ chuông và các ô Tổng quan nhưng
+    KHÔNG có đường trên menu để quay lại. Anh Luân bắt đúng: vào được mà không tìm lại được là dở. */
+ {g:"Làm việc",items:["banlam","viec","giaoviec"]}, /* V9.18: hanhtrinh gộp vào banlam (go() tự remap) */
  {g:"Chặng 1 · Khách tiềm năng",arc:"changA",items:["changA","nhaplead","test","tuvan","thanhtoan","reup"]},
  {g:"Chặng 2 · Đang học",arc:"changB",items:["changB","xeplop","banglop","hoctap","giaoan","wow","cskh"]},
  {g:"Chặng 3 · Tạm dừng",arc:"changC",items:["changC","baoluu"]},

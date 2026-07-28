@@ -261,6 +261,17 @@
 > hiệu sang màn Buổi học của GV ("N em đã báo nghỉ"), và xếp bù cho một học viên phải là MỘT HÀM LÕI
 > dùng chung (chạy `node _check15.js` đối chiếu cửa ghi trước khi thêm).
 >
+> **Ba việc lẻ anh Luân bắt trong lúc dùng (28/07, V9.29c):**
+> (1) **"Việc hôm nay" không có trên sidebar** - trang khai `hide:1`, vào được từ chuông và các ô
+> Tổng quan nhưng KHÔNG có đường quay lại. Đã bỏ `hide`, đưa vào nhóm "Làm việc" ngay dưới Trang
+> bắt đầu, và thêm `viec` vào `pages` của **cả 7 vai** trong ROLESCOPE - trước đó chỉ quản trị thấy,
+> nghĩa là chuông đẩy nhân viên tới một trang mà menu của họ không cho vào.
+> (2) **Nâng cấp trang Việc hôm nay**: dải số BẤM ĐƯỢC (Quá hạn / Sắp tới hạn / Tổng / Của Học vụ),
+> gom việc theo ĐỘ GẤP thành 3 khối thay vì đổ một danh sách phẳng 150 dòng, nói rõ còn bao nhiêu
+> việc bị cắt. Gom `VIECOD` và `VIECSEV` về **một biến duy nhất** cho mức độ.
+> (3) **"KPI của tôi" rơi xuống đáy trang bắt đầu** - phải cuộn hết danh sách mới thấy số của chính
+> mình. Đưa lên ngay dưới lời chào, và bỏ lần gọi thứ hai ở nhánh "Bảng chặng" (trước đó gọi 2 chỗ).
+>
 > **(D) MẢNG 5** (mảng cuối của hội đồng 6 chuyên gia): `slaChip(param)` in số SLA kèm icon bánh răng
 > nhảy về đúng dòng cấu hình (dùng `window.CFHL` để cuộn + tô), nút "Sửa câu này" cạnh câu CH4 trong
 > `sopBlock` (`window.MSGQ` đã có), link về CH1 khi hiện nhãn enum, **khai 23 tham số app đang đọc thật

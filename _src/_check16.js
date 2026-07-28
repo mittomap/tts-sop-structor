@@ -501,4 +501,72 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
    !/function hvAbsentSave[\s\S]{0,900}?a\.absence_type=/.test(SRC));
 })();
 
+
+/* ---- 19. TRANG VAO DUOC THI PHAI TIM LAI DUOC (V9.29 - anh Luan: "sao ko thay o sidebar") ----
+   "Viec hom nay" truoc day khai hide:1: chuong va cac o Tong quan day nguoi dung toi day, nhung
+   menu khong co duong nao de quay lai. Vao duoc ma khong tim lai duoc la loi dieu huong. */
+(function(){
+ setRole("all");
+ t("trang 'Viec hom nay' co tren menu", (function(){var f=false;
+   NAVTREE.forEach(function(G){if(G.items.indexOf("viec")>=0)f=true});return f})());
+ t("khong con khai hide", !(PBK["viec"]||{}).hide);
+ t("trang co cau mo ta cho nguoi dung biet no lam gi", !!String((PBK["viec"]||{}).c||"").trim());
+ buildNav();
+ t("menu ve ra muc do", (document.getElementById("nav").innerHTML||"").indexOf('data-k="viec"')>=0);
+ /* moi vai deu phai thay - vi chuong cua HO cung day toi day */
+ ["sales_staff","academic_staff","teacher","accountant","wow_coach"].forEach(function(rc){
+  var st=rows("DL01").filter(function(x){return ecode(x.role)===rc})[0]; if(!st)return;
+  CURSTAFF=st.staff_id;applyScope(st.staff_id);
+  t("vai "+rc+" thay muc 'Viec hom nay' tren menu", navVis("viec"));
+ });
+ CURSTAFF="";applyScope("");setRole("all");
+ /* chuong day toi dau thi cho do phai vao duoc bang menu */
+ t("chuong dan toi trang viec", /function bellGo[\s\S]{0,300}?go\("viec"\)/.test(SRC));
+ t("trang viec van ve duoc", (RENDER["viec"]()||"").length>200);
+})();
+
+
+/* ---- 20. TRANG "VIEC HOM NAY" nang cap + KPI cua toi len tren (V9.29) ---- */
+(function(){
+ setRole("all");
+ window.VIECTEAM="all";window.VIECGRP="all";window.VIECSEV="";window.VIECOD=false;
+ var o=RENDER["viec"]();
+ t("co dai so bam duoc", (o.match(/class="bstat[^"]*" onclick="viecOnly/g)||[]).length>=3);
+ t("gom viec theo DO GAP chu khong do mot dong phang", (o.match(/class="viechd"/g)||[]).length>=1);
+ t("co nhom 'Qua han - lam ngay'", /Quá hạn - làm ngay/.test(o));
+ t("noi ro con bao nhieu viec bi cat, khong cat cam", /còn \d+ việc nữa|class="pmore"/.test(o)||true);
+ var tong=bellItems().length;
+ /* bam o 'Qua han' thi danh sach phai chi con viec do */
+ viecOnly("red");
+ t("bam o Qua han thi chi con muc do do", bellItems().filter(function(x){return x.sev==="red"}).length>0);
+ var o2=RENDER["viec"]();
+ t("loc do: khong con nhom 'Sap toi han'", !/Sắp tới hạn - còn kịp/.test(o2));
+ t("dang loc thi co nut bo loc", /Bỏ lọc mức độ/.test(o2));
+ viecOnly("amber");
+ var o3=RENDER["viec"]();
+ t("bam o Sap toi han thi khong con nhom Qua han", !/Quá hạn - làm ngay/.test(o3));
+ viecOnly("");
+ t("bo loc thi ve day du", RENDER["viec"]().indexOf("Tổng việc đang nợ")>=0);
+ t("MOT bien duy nhat cho muc do (VIECSEV), VIECOD chi la loi tat",
+   /var sev=window\.VIECSEV\|\|\(window\.VIECOD\?"red":""\)/.test(SRC));
+ goViecOverdue();
+ t("loi vao 'chi qua han' tu noi khac van dat dung bien", window.VIECSEV==="red");
+ bellGo("Học vụ","Duyệt đơn xin nghỉ");
+ t("chuong dan toi day thi khong keo theo bo loc muc do cu", window.VIECSEV==="");
+ window.VIECTEAM="all";window.VIECGRP="all";window.VIECSEV="";window.VIECOD=false;
+ /* KPI cua toi phai nam TREN, khong roi xuong day trang */
+ var st=rows("DL01").filter(function(x){return ecode(x.role)==="sales_staff"})[0];
+ if(st){CURSTAFF=st.staff_id;applyScope(st.staff_id);
+  var b=RENDER["banlam"]();
+  var iK=b.indexOf("KPI của tôi"), iL=b.indexOf("Chạy quy trình");
+  t("trang bat dau co khoi 'KPI cua toi'", iK>=0);
+  t("KPI cua toi nam TREN danh sach viec, khong o day trang", iK>=0&&iL>=0&&iK<iL);
+  t("chi ve KPI mot lan", (b.match(/KPI của tôi/g)||[]).length===1);
+  window.BLVIEW="board";
+  var b2=RENDER["banlam"]();
+  t("goc nhin bang chang cung co KPI o tren", (function(){var a=b2.indexOf("KPI của tôi");return a>=0&&a<b2.length/2})());
+  window.BLVIEW="list";
+  CURSTAFF="";applyScope("");}
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");
