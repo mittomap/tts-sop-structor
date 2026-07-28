@@ -46,7 +46,7 @@ Bộ kiểm gồm **5 phần, phải xanh HẾT mới được giao**:
 | `ITTS_OUT=<out> node _check15.js` | `CHECK15 OK: 37 tieu chi` - **kiểm kê cửa ghi + bất biến nghiệp vụ** |
 | `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 236 tieu chi` - học phí theo đợt + toàn bộ vá V9.27 |
 | `ITTS_OUT=<out> node _checkdata.js` | `CHECKDATA OK: 26 luat ... 0 cho lech` - **dữ liệu demo có khớp ga nghiệp vụ không** |
-| `ITTS_OUT=<out> node _check17.js` | `CHECK17 OK: 321 tieu chi` - **bộ máy lọc chuyên sâu** (kết hợp trục, lưu theo người) |
+| `ITTS_OUT=<out> node _check17.js` | `CHECK17 OK: 392 tieu chi` - **bộ máy lọc chuyên sâu** (kết hợp trục, lưu theo người) |
 | `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` |
 | `python3 check_logic.py` | `TONG BAN GHI LOI: 4` (đúng 4 ca là việc quá hạn CỐ Ý để demo cảnh báo đỏ - xem luật 10k) |
 | `python3 check_data.py` | `KET QUA: DAT` |
@@ -156,6 +156,14 @@ Trang không nằm trong `LISTCFG` thì khai bảng nguồn ở `FLTSRC` (ví d�
 - **Không đụng tab.** Tab chọn nhóm, bộ lọc thu hẹp bên trong nhóm đang mở.
 - **Lưu theo TỪNG NGƯỜI** trên localStorage khoá `ITTS_FLT_<mã nhân viên>` - thói quen cá nhân,
   không ghi vào `DATA.config`.
+
+> **KHAI TRỤC THÔI CHƯA ĐỦ - nút phải THẬT SỰ lên màn hình.** Bẫy đã cắn ngay trong lượt đầu:
+> khai trục cho 16 trang, `_check17` xanh, nhưng **9 trang custom không hề gọi `fltApply`/`fltBarHTML`**
+> nên người dùng không bao giờ thấy nút. Bộ kiểm cho cảm giác an toàn giả vì chỉ thử đúng một trang.
+> Nay `_check17` **vẽ thật từng trang trong `FLTDEF` rồi soi nút**, và bật thử một điều kiện xem danh
+> sách có đổi không. Trang tự dựng thanh công cụ (không dùng `filterBar`) phải nối tay - và nhớ
+> `renderXeplop` KHÔNG có biến `p`, viết `fltApply(p,...)` ở đó là tham chiếu biến không tồn tại,
+> lọc câm mà không báo lỗi.
 
 > **MỌI trục phải đi qua `fltColOk()`** - trục trỏ vào cột KHÔNG CÓ THẬT thì bị loại và `_check17`
 > báo đỏ. Ngay lần đầu chạy, chốt chặn này đã bắt được `DL05.course_status` không tồn tại (bảng

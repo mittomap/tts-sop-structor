@@ -32,6 +32,37 @@ Object.keys(FLTDEF).forEach(function(pg){
 t("moi trang trong FLTDEF deu con truc sau khi loc cot khong co that",
   Object.keys(FLTDEF).every(function(pg){return fltAxes(pg).length>0}));
 t("phu duoc nhieu trang (>=15)", Object.keys(FLTDEF).length>=15);
+/* ---- 1bis. KHAI THOI CHUA DU: NUT LOC PHAI THAT SU LEN MAN HINH ----
+   Bay da can 28/07: khai truc cho 16 trang, _check17 xanh, nhung 9 trang custom KHONG he goi
+   fltApply/fltBarHTML nen nguoi dung khong bao gio thay nut. Bo kiem cho cam giac an toan gia
+   vi chi thu dung mot trang. Tu nay: VE THAT tung trang roi soi nut. */
+Object.keys(FLTDEF).forEach(function(pg){
+ var o="",err="";
+ try{o=(PBK[pg]&&PBK[pg].ty==="list")?renderList(pg):(RENDER[pg]?RENDER[pg]():"")}catch(e){err=e.message}
+ t("trang "+pg+" ve duoc"+(err?(" (loi: "+err+")"):""), !err&&o.length>200);
+ t("trang "+pg+" CO NUT bo loc tren man hinh", o.indexOf("fltOpen('"+pg+"')")>=0);
+});
+/* trang khai roi thi loc phai AN THAT vao danh sach, khong chi ve nut cho dep */
+(function(){
+ var dem=0;
+ Object.keys(FLTDEF).forEach(function(pg){
+  var code=fltCode(pg); if(!code)return;
+  var ax=fltAxes(pg).filter(function(a){return a.ty==="multi"})[0]; if(!ax)return;
+  var all=rows(code); if(all.length<3)return;
+  var v=null;
+  for(var i=0;i<all.length&&v===null;i++){var g=ax.get(all[i]); g=(g&&g.join)?g[0]:g; if(g)v=String(g)}
+  if(v===null)return;
+  window.FLT2=window.FLT2||{};window.FLT2[pg]={};
+  var truoc="";try{truoc=(PBK[pg]&&PBK[pg].ty==="list")?renderList(pg):RENDER[pg]()}catch(e){return}
+  window.FLT2[pg][ax.k]=[v];
+  var sau="";try{sau=(PBK[pg]&&PBK[pg].ty==="list")?renderList(pg):RENDER[pg]()}catch(e){return}
+  window.FLT2[pg]={};
+  var conLai=fltApply(pg,all).length;
+  t("trang "+pg+": bat dieu kien thi DANH SACH THAT doi theo", conLai===all.length||sau!==truoc);
+  t("trang "+pg+": bat dieu kien thi hien chip dang loc", sau.indexOf("fltchip")>=0);
+  dem++});
+ t("da thu loc that tren it nhat 12 trang", dem>=12);
+})();
 t("co trang ngoai LISTCFG cung dung duoc (giao viec)", fltCode("giaoviec")==="DL23"&&fltAxes("giaoviec").length>0);
 
 /* ---- 2. LOC MOT TRUC: chay that roi doi chieu tung dong ---- */

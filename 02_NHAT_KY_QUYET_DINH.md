@@ -149,10 +149,15 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.28** (28/07 - việc (A) dữ liệu demo XONG 218->0; việc (B) bộ máy lọc XONG đợt 1, phủ 17 trang). MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG.
+> **Phiên bản: V9.28** (28/07 - việc (A) dữ liệu demo XONG 218->0; việc (B) bộ máy lọc XONG, phủ 16 trang).
+> **KHÔNG CÒN PHIÊN TỰ ĐỘNG.** Routine "Auto - Github ITTs-SOP-Demo" đã bị XOÁ theo lệnh anh Luân
+> (28/07 chiều). Lý do: phiên chạy lịch chỉ có quyền ĐỌC repo, `git push` trả 403 "Not authorized to
+> access repository mittomap/tts-sop-structor". Chúng nó làm xong việc rồi mới phát hiện không đẩy
+> được, công sức nằm chết trong container. Muốn bật lại thì phải cấp quyền GHI cho môi trường chạy
+> lịch trước, và giữ nguyên BƯỚC 0 "thử `git push --dry-run` trước khi làm bất cứ việc gì". MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG.
 > Bộ kiểm hiện tại: node --check 2 file · `_tall` 38 trang 0 lỗi (165 icon) · `_check11` 131 ·
 > `_check12` 37 · `_check13` 174 · `_check14` 100 · `_check15` 37 · **`_check16` 236** · `_checktour` ·
-> `check_logic.py` 132 luật (đúng 4 ca cố ý) · `check_data.py` DAT · **`_checkdata.js` 26 luật / 6206 lượt kiểm - 0 lệch · `_check17.js` 321 tiêu chí**.
+> `check_logic.py` 132 luật (đúng 4 ca cố ý) · `check_data.py` DAT · **`_checkdata.js` 26 luật / 6206 lượt kiểm - 0 lệch · `_check17.js` 392 tiêu chí**.
 >
 > **VIỆC PHẢI LÀM TIẾP - THEO ĐÚNG THỨ TỰ NÀY (Luân chốt 28/07 khuya, rồi về nghỉ):**
 >
@@ -184,7 +189,19 @@
 > ngày test, phiếu thu khớp học phí, buổi/điểm danh/WOW khớp lớp và khớp giáo viên); (3) đưa
 > `_checkdata.js` vào bộ verify BẮT BUỘC. Ước lượng 2-3 lượt đẩy: chạy - đo - vá - chạy lại tới khi về 0.
 >
-> **(B) BỘ MÁY LỌC CHUYÊN SÂU - ✅ XONG ĐỢT 1 (28/07 chiều, V9.28).** Bộ máy khai báo đã chạy:
+> **(B) BỘ MÁY LỌC CHUYÊN SÂU - ✅ XONG (28/07 chiều, V9.28).** Phủ **16 trang**, tất cả đều đã
+> NỐI THẬT (không chỉ khai). `_check17` **392 tiêu chí**. **Bẫy đáng nhớ nhất:** đợt 1 khai trục cho
+> 16 trang và bộ kiểm xanh, nhưng **9 trang custom không hề gọi `fltApply`/`fltBarHTML`** - người
+> dùng không bao giờ thấy nút. Bộ kiểm cho cảm giác an toàn giả vì chỉ thử đúng một trang. Đã sửa:
+> `_check17` nay VẼ THẬT từng trang trong `FLTDEF` rồi soi nút, và bật thử một điều kiện xem danh
+> sách có đổi không. Hai bẫy con: (a) `renderXeplop` KHÔNG có biến `p` (nó dùng `window.XLFILT`) nên
+> `fltApply(p,...)` là tham chiếu biến không tồn tại - lọc câm mà không báo lỗi; (b) trang `khaosat`
+> chỉ là hub 2 tab, sổ phản hồi thật nằm ở `ghinhan` (DL16) và sổ khảo sát ở `review` (DL15) - khai
+> nhầm trang thì nút mọc ở chỗ không có danh sách. Cố ý KHÔNG khai cho `baitap` vì trang đó là luồng
+> giao/thu/chấm theo lớp + buổi, không phải sổ danh sách. Gắn vào `filterBar()` nên 10 trang tác vụ
+> có nút chỉ bằng MỘT chỗ sửa.
+>
+> *(mô tả đợt 1)* XONG ĐỢT 1 (28/07 chiều, V9.28). Bộ máy khai báo đã chạy:
 > `FLTDEF` khai trục cho **17 trang**, `fltApply()` là lõi duy nhất, `_check17` **321 tiêu chí**
 > (kiểm bằng CHẠY THẬT: bật điều kiện rồi đối chiếu từng dòng còn lại). Có 5 kiểu trục: `fxEnum`
 > `fxStaff` `fxRef` `fxDate` `fxCalc` (trục TÍNH TOÁN - lọc học viên theo lớp/khóa dù DL09 không
