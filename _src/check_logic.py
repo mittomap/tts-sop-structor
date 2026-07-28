@@ -656,6 +656,74 @@ rep("VUA", "16f Hai nhan vien TRUNG KHIT ho ten (tra nguoi theo ten bi nhap nhan
 _nr = [s(p, "payment_id") for p in R("DL07") if s(p, "amount") and not str(p.get("net_received") or "").strip()]
 rep("VUA", "16g Phieu thu thieu net_received (bao cao thuc nhan doc rong)", _nr)
 
+# ══ 17. LICH DONG HOC PHI THEO DOT - DL06b (V9.25) ═══════════════════════
+SCH = R("DL06b")
+if SCH:
+    by_enr = collections.defaultdict(list)
+    for x in SCH: by_enr[s(x,"enrollment_id")].append(x)
+    # 17a. tong tien cac dot phai bang final_fee cua don
+    p1 = []
+    for eid, lst in by_enr.items():
+        e = ENR.get(eid)
+        if not e: continue
+        tot = sum(n(x.get("due_amount")) for x in lst)
+        if abs(tot - n(e.get("final_fee"))) > 1:
+            p1.append("%s(dot %.0f != hop dong %.0f)" % (eid, tot, n(e.get("final_fee"))))
+    rep("NANG", "17a Tong tien cac dot KHAC hoc phi cua don", p1)
+    # 17b. tong da dong o cac dot phai bang paid_amount cua don
+    p2 = []
+    for eid, lst in by_enr.items():
+        e = ENR.get(eid)
+        if not e: continue
+        if abs(sum(n(x.get("paid_amount")) for x in lst) - n(e.get("paid_amount"))) > 1:
+            p2.append(eid)
+    rep("NANG", "17b Tong da dong o cac dot KHAC paid_amount cua don", p2)
+    # 17c. so dot phai lien tuc tu 1
+    p3 = []
+    for eid, lst in by_enr.items():
+        nos = sorted(int(n(x.get("installment_no"))) for x in lst)
+        if nos != list(range(1, len(nos) + 1)): p3.append(eid)
+    rep("NANG", "17c So dot khong lien tuc tu 1", p3)
+    # 17d. moi dot phai co han va tien
+    p4 = [s(x,"schedule_id") for x in SCH if not (s(x,"due_date") and n(x.get("due_amount")) > 0)]
+    rep("NANG", "17d Dot thieu han dong hoac thieu so tien", p4)
+    # 17e. han dot sau phai SAU han dot truoc
+    p5 = []
+    for eid, lst in by_enr.items():
+        o = sorted(lst, key=lambda x: int(n(x.get("installment_no"))))
+        for i in range(1, len(o)):
+            a, b = dt(o[i-1].get("due_date")), dt(o[i].get("due_date"))
+            if a and b and b <= a: p5.append("%s dot %d" % (eid, i + 1))
+    rep("NANG", "17e Han dot sau KHONG sau han dot truoc", p5)
+    # 17f. trang thai dot phai khop so tien thuc
+    p6 = []
+    for x in SCH:
+        st, pa, du = code(x.get("status")), n(x.get("paid_amount")), n(x.get("due_amount"))
+        if st == "paid" and pa < du - 1: p6.append("%s(paid nhung con thieu)" % s(x,"schedule_id"))
+        elif st in ("due","overdue","upcoming") and pa >= du - 1: p6.append("%s(da du tien ma van bao no)" % s(x,"schedule_id"))
+        elif st == "partial" and (pa <= 0 or pa >= du): p6.append("%s(partial nhung tien khong khop)" % s(x,"schedule_id"))
+    rep("NANG", "17f Trang thai dot mau thuan voi so tien thuc", p6)
+    # 17g. don con no thi next_payment_due phai TRUNG han dot chua dong gan nhat
+    p7 = []
+    for eid, lst in by_enr.items():
+        e = ENR.get(eid)
+        if not e: continue
+        op = [x for x in sorted(lst, key=lambda y: int(n(y.get("installment_no")))) if code(x.get("status")) != "paid"]
+        want = s(op[0], "due_date") if op else ""
+        if s(e, "next_payment_due") != want:
+            p7.append("%s(don ghi %s, lich ghi %s)" % (eid, s(e,"next_payment_due") or "trong", want or "trong"))
+    rep("NANG", "17g next_payment_due cua don KHAC han dot chua dong gan nhat", p7)
+    # 17h. don chua huy va co hoc phi thi PHAI co lich dot
+    p8 = [s(e,"enrollment_id") for e in R("DL06")
+          if code(e.get("enrollment_status")) != "cancelled" and n(e.get("final_fee")) > 0
+          and not by_enr.get(s(e,"enrollment_id"))]
+    rep("NANG", "17h Don con hieu luc nhung KHONG co lich dong theo dot", p8)
+    # 17i. 4 tham so cau hinh cua tinh nang phai co trong CH2
+    _ch2 = {str(c.get("name")) for c in (d.get("config", {}).get("ch2") or [])}
+    p9 = [x for x in ("installmentGap_days","installmentRemind_days","installmentLate_days",
+                      "installmentDepositPercent") if x not in _ch2]
+    rep("NANG", "17i Tham so cau hinh dong theo dot THIEU trong CH2", p9)
+
 # ══ IN KET QUA ═══════════════════════════════════════════════════════════
 ORD = {"NANG":0,"VUA":1,"NHE":2}
 print("\n" + "="*90)

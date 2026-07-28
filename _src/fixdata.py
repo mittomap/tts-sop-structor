@@ -750,6 +750,117 @@ for b in R("DL20"):
 log.append("14c. Cổng học viên: thêm enum student_request | mở cột DL16.session_id cho %d dòng | "
            "gán link tài liệu cho %d bài trong kho" % (c14c, _lk))
 
+# ═══ 14d. LỊCH ĐÓNG HỌC PHÍ THEO ĐỢT - BẢNG DL06b (mảng 4) ═══════════════
+# Trước đây DL06 chỉ có MỘT cột next_payment_due, bị GHI ĐÈ mỗi lần thu -> không lưu được
+# lịch trả góp, không nhắc TRƯỚC hạn, không in được lịch đợt vào phiếu, và không biết học
+# viên đang nợ ĐỢT NÀO. Nay tách hẳn thành bảng lịch: mỗi đợt một dòng, một mã, một hạn.
+# next_payment_due của DL06 trở thành cột SUY RA (đợt chưa đóng gần nhất), không còn là
+# nơi lưu duy nhất.
+CH2 = d.setdefault("config", {}).setdefault("ch2", [])
+def _p2set(name, val, unit, mean):
+    for c in CH2:
+        if c.get("name") == name:
+            return
+    CH2.append({"name": name, "value": val, "unit": unit, "meaning": mean})
+_p2set("installmentGap_days", 30, "ngày", "Khoảng cách giữa hai đợt đóng học phí khi chia trả góp")
+_p2set("installmentRemind_days", 3, "ngày", "Nhắc học viên TRƯỚC hạn đóng đợt bao nhiêu ngày")
+_p2set("installmentLate_days", 5, "ngày", "Quá hạn đợt bao nhiêu ngày thì chuyển sang mức cảnh báo đỏ")
+_p2set("installmentDepositPercent", 40, "%", "Tỷ lệ đóng đợt đầu (cọc) khi chia trả góp")
+
+GAP = int(n(next((c["value"] for c in CH2 if c.get("name") == "installmentGap_days"), 30)) or 30)
+DEP = float(n(next((c["value"] for c in CH2 if c.get("name") == "installmentDepositPercent"), 40)) or 40) / 100.0
+LATE = int(n(next((c["value"] for c in CH2 if c.get("name") == "installmentLate_days"), 5)) or 5)
+
+def _round1000(x):
+    return int(round(x / 1000.0)) * 1000
+
+sched = []
+sn = 0
+for e in R("DL06"):
+    if code(e.get("enrollment_status")) == "cancelled":
+        continue
+    fin = n(e.get("final_fee"))
+    if fin <= 0:
+        continue
+    eid = str(e.get("enrollment_id"))
+    base = dt(e.get("enrollment_time")) or NOW
+    pays = sorted([p for p in R("DL07") if str(p.get("enrollment_id")) == eid and n(p.get("amount")) > 0],
+                  key=lambda p: dt(p.get("payment_time")) or NOW)
+    paid_tot = sum(n(p.get("amount")) for p in pays)
+    # Số đợt: đóng một lần thì 1 đợt; còn lại chia 2 hoặc 3 đợt theo giá trị hợp đồng.
+    if paid_tot >= fin - 1 and len(pays) <= 1:
+        nsplit = 1
+    elif fin >= 15000000:
+        nsplit = 3
+    else:
+        nsplit = 2
+    amounts = []
+    if nsplit == 1:
+        amounts = [fin]
+    else:
+        first = _round1000(fin * DEP)
+        rest = fin - first
+        per = _round1000(rest / (nsplit - 1))
+        amounts = [first] + [per] * (nsplit - 2) + [fin - first - per * (nsplit - 2)]
+    # phân bổ tiền đã thu vào các đợt theo thứ tự thời gian (đợt trước đủ mới sang đợt sau)
+    left = paid_tot
+    pay_i = 0
+    for i, amt in enumerate(amounts):
+        sn += 1
+        due = base if i == 0 else (base + datetime.timedelta(days=GAP * i))
+        alloc = min(left, amt)
+        left -= alloc
+        if alloc >= amt - 1:
+            st = "paid (Đã đóng đủ)"
+        elif alloc > 0:
+            st = "partial (Đóng một phần)"
+        elif due < NOW - datetime.timedelta(days=LATE):
+            st = "overdue (Quá hạn)"
+        elif due < NOW:
+            st = "due (Đến hạn)"
+        else:
+            st = "upcoming (Chưa tới hạn)"
+        sched.append({
+            "schedule_id": "SCH-%04d" % sn, "enrollment_id": eid,
+            "student_id": e.get("student_id", ""), "student_id_name": e.get("student_id_name", ""),
+            "course_id": e.get("course_id", ""), "course_id_name": e.get("course_id_name", ""),
+            "installment_no": i + 1, "installment_of": len(amounts),
+            "due_date": due.strftime("%d/%m/%Y"), "due_amount": int(amt),
+            "paid_amount": int(alloc), "remaining_amount": int(max(0, amt - alloc)),
+            "status": st,
+            "paid_time": "", "note": "", "next_action": "",
+        })
+    # gắn số đợt vào từng phiếu thu (phiếu nào trả cho đợt nào)
+    acc = 0
+    idx = 0
+    for p in pays:
+        acc += n(p.get("amount"))
+        while idx < len(amounts) - 1 and acc > sum(amounts[:idx + 1]) + 1:
+            idx += 1
+        p["installment_no"] = idx + 1
+    # đóng mốc thời gian đã đóng cho các đợt đã đủ tiền
+    mine = [x for x in sched if x["enrollment_id"] == eid]
+    for x in mine:
+        if x["status"].startswith("paid") and pays:
+            cum = 0
+            for p in pays:
+                cum += n(p.get("amount"))
+                if cum >= sum(a["due_amount"] for a in mine[:x["installment_no"]]) - 1:
+                    x["paid_time"] = p.get("payment_time", "")
+                    break
+    # next_payment_due của DL06 nay SUY RA từ đợt chưa đóng xong gần nhất
+    open_ins = [x for x in mine if not x["status"].startswith("paid")]
+    e["next_payment_due"] = open_ins[0]["due_date"] if open_ins else ""
+for p in R("DL07"):
+    p.setdefault("installment_no", "")
+dl["DL06b"] = sched
+_od = len([x for x in sched if x["status"].startswith("overdue")])
+_du = len([x for x in sched if x["status"].startswith("due")])
+_up = len([x for x in sched if x["status"].startswith("upcoming")])
+log.append("14d. Lịch đóng theo đợt: %d đợt cho %d đơn (quá hạn %d, đến hạn %d, chưa tới hạn %d) "
+           "| thêm 4 tham số CH2 | next_payment_due nay suy ra từ đợt chưa đóng gần nhất"
+           % (len(sched), len(set(x["enrollment_id"] for x in sched)), _od, _du, _up))
+
 # ═══ 15. SAN PHẲNG SƠ ĐỒ CỘT (UNION KEY) - PHẢI LÀ PASS CUỐI CÙNG ═════════
 # Cột chỉ có mặt ở vài dòng (referrer_name, referral_uses, net_received...) làm app render
 # ô trống và bản Sheets lệch cột. LUẬT: mọi dòng trong cùng một bảng phải CÙNG BỘ CỘT.
