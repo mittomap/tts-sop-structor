@@ -1214,4 +1214,34 @@ function stripOf(o){var i=o.indexOf('<div class="bstats">');if(i<0)return "";
   t("trang "+k+" da co dai so", /class="bstats"/.test(RENDER[k]()))});
 })();
 
+
+/* ---- 40. MAN "SUC KHOE DU LIEU" PHAI NOI CUNG MOT TIENG VOI BO KIEM ---- */
+(function(){
+ setRole("all");cfEnsure();
+ var it=dataHealth().filter(function(x){return x.sev!=="ok"});
+ /* BAT BIEN LOI: tren DU LIEU GOC, man nay phai SACH. Con dong nao tuc la no va bo kiem luc
+    sinh du lieu dang noi khac nhau ve cung mot chuyen - phai sua cho khop, khong duoc de do.
+    Day chinh la co che chong "bo luat thu ba troi khoi hai bo kia". */
+ t("man Suc khoe du lieu sach tren du lieu goc"+(it.length?(" - con: "+it.slice(0,3).map(function(x){return x.rule+"/"+x.msg.slice(0,40)}).join(" ; ")):""), it.length===0);
+ /* hang cho cong viec KHONG duoc tinh la loi du lieu - de vay thi man nay luc nao cung do vi
+    viec binh thuong, va nguoi ta hoc duoc thoi quen bo qua canh bao */
+ t("chiet khau cho duyet khong con bi tinh la loi du lieu", !/Chiết khấu",e.enrollment_id/.test(SRC));
+ /* cua so an han diem danh: app, man suc khoe va _checkdata phai dung CHUNG mot tham so */
+ t("cua so an han diem danh lay tu cau hinh", (DATA.config.ch2||[]).some(function(x){return x.name==="attendanceGrace_hours"}));
+ t("man suc khoe doc dung tham so do", /attendanceGrace_hours/.test(SRC));
+ (function(){var c=(DATA.config.ch2||[]).filter(function(x){return x.name==="attendanceGrace_hours"})[0];
+  var old=c.value;c.value="1";
+  var n1=dataHealth().filter(function(x){return x.rule==="Điểm danh"}).length;
+  c.value="99999";
+  var n2=dataHealth().filter(function(x){return x.rule==="Điểm danh"}).length;
+  c.value=old;
+  t("noi rong cua so an han thi canh bao diem danh bien mat", n1>=n2)})();
+ /* man nay soi DU LIEU DANG MO - sua du lieu la no thay doi theo (khac han bo kiem luc sinh) */
+ (function(){var e=rows("DL06").filter(function(x){return !isc(x.enrollment_status,"cancelled")&&num(x.final_fee)>0})[0];
+  var old=e.remaining_amount;e.remaining_amount=String(num(e.remaining_amount)+123456);
+  var n=dataHealth().filter(function(x){return x.rule==="Tiền"}).length;
+  e.remaining_amount=old;
+  t("sua du lieu trong app thi man suc khoe bat duoc ngay", n>0)})();
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");

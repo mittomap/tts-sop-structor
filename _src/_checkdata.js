@@ -148,13 +148,17 @@ rows("DL12").forEach(function(a){
  if(s)chk("F2 hoc vien duoc diem danh phai thuoc lop cua buoi do",
   rows("DL08").some(function(o){return o.student_id===a[C.aStu]&&o[C.oClass]===s[C.sClass]}),
   a.attendance_id+" ("+a[C.aStu]+" / "+s[C.sClass]+")")});
+var GRACE=num(paramOf("attendanceGrace_hours",24))||24;
 rows("DL11").forEach(function(s){
  chk("F3 buoi hoc phai thuoc mot lop co that", !!find("DL10","class_id",s[C.sClass]), s.session_id);
- /* Buoi VUA day xong trong 24h duoc phep con trong: do la HANG CHO diem danh co y (GV chua kip
-    diem danh), dung nhu §10b cua fixdata.py dung ra. Cu hon 24h ma van trong la du lieu hong. */
+ /* Buoi VUA day xong trong CUA SO AN HAN duoc phep con trong: do la HANG CHO diem danh co y
+    (GV chua kip diem danh), dung nhu §10b cua fixdata.py dung ra. Qua cua so do ma van trong la
+    du lieu hong.
+    V9.29q: con so nay lay tu CAU HINH cua chinh app (attendanceGrace_hours) chu khong go 24 vao
+    day - man "Suc khoe du lieu" trong app cung doc dung tham so do. Ba noi cung mot con so. */
  var sd=pvnd(s.session_date), tuoi=sd?(Date.now()-sd.getTime())/36e5:1e9;
- if(isc(s[C.sStatus],"completed")&&tuoi>24)
-  chk("F4 buoi day xong qua 24h phai co it nhat mot dong diem danh",
+ if(isc(s[C.sStatus],"completed")&&tuoi>GRACE)
+  chk("F4 buoi day xong qua "+GRACE+"h phai co it nhat mot dong diem danh",
    rows("DL12").some(function(a){return a[C.aSess]===s.session_id}), s.session_id+" ("+tuoi.toFixed(0)+"h truoc)")});
 rows("DL14").forEach(function(w){
  chk("G1 buoi WOW phai thuoc mot hoc vien co that", !!find("DL09","student_id",w[C.wStu]), w.wow_id);

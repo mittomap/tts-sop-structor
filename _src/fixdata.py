@@ -1332,6 +1332,23 @@ if _vfix or _mfix:
     log.append("14sexies-b. Chỗ học: sửa %d lớp lệch giữa hình thức học và phòng/link, "
                "%d lớp ở Cơ sở Online mà ghi học tại chỗ" % (_vfix, _mfix))
 
+# ═══ 14septies. TEST KHÔNG THỂ DIỄN RA TRƯỚC KHI LEAD TỒN TẠI (V9.29q) ═══
+# Do CHÍNH màn "Sức khỏe dữ liệu" trong app bắt được (3 phiếu), trong khi 132 luật của
+# check_logic.py không có luật nào canh cặp này. Đây là lý do giữ lại màn đó thay vì xoá:
+# nó soi trên dữ liệu ĐANG MỞ nên bắt được thứ bộ kiểm lúc sinh dữ liệu bỏ sót.
+# Vá: đẩy giờ test ra sau giờ tạo lead ít nhất 2 tiếng (cùng ngày thì lùi sang khung sau).
+_tfix = 0
+for t in dl.get("DL03", []):
+    L = IDX["DL02"].get(str(t.get("lead_id") or ""))
+    if not L:
+        continue
+    a, b = dt(L.get("lead_created_time")), dt(t.get("test_date"))
+    if a and b and b < a:
+        t["test_date"] = fmt(a + datetime.timedelta(hours=2))
+        _tfix += 1
+log.append("14septies. Thứ tự: đẩy %d phiếu test bị hẹn TRƯỚC giờ tạo lead ra sau ít nhất 2 tiếng"
+           % _tfix)
+
 # ═══ 15. SAN PHẲNG SƠ ĐỒ CỘT (UNION KEY) - PHẢI LÀ PASS CUỐI CÙNG ═════════
 # Cột chỉ có mặt ở vài dòng (referrer_name, referral_uses, net_received...) làm app render
 # ô trống và bản Sheets lệch cột. LUẬT: mọi dòng trong cùng một bảng phải CÙNG BỘ CỘT.

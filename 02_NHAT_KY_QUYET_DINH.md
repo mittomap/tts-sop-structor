@@ -550,6 +550,26 @@
 > nút ở thanh lọc bên dưới → tiêu chí xanh mà không kiểm gì cả. Phải cắt tới thẻ container kế tiếp.
 > Một tiêu chí cũ **bị đảo**: "statStrip vẫn là ô chỉ để xem" - đó chính là hành vi đang đi sửa.
 >
+> **(6) "SHEET SỨC KHỎE DỮ LIỆU CÒN CẦN KHÔNG?"** (anh Luân hỏi từ trước) - **CÒN**, và đây là lý do:
+> nó soi **DỮ LIỆU ĐANG MỞ** (sau khi người dùng đã sửa trong buổi demo, hoặc sau khi nối sheet thật),
+> còn `check_logic.py` và `_checkdata.js` chỉ soi bản dữ liệu **lúc sinh**. Bằng chứng ngay tại chỗ:
+> chính màn này bắt được **3 phiếu test hẹn TRƯỚC giờ tạo lead** mà 132 luật kia bỏ sót. Đã vá ở
+> nguồn (`fixdata` §14septies).
+> Nhưng nỗi lo "bộ luật thứ ba rồi trôi khỏi hai bộ kia" là có thật, nên thêm **một bất biến lõi**:
+> **trên dữ liệu gốc, màn này phải SẠCH**. Còn dòng nào tức là hai bên đang nói khác nhau về cùng
+> một chuyện, và phải sửa cho khớp chứ không được để đó.
+> Để về sạch phải sửa đúng ba chỗ nó đang nói sai:
+> · **"chiết khấu chưa duyệt" không phải lỗi dữ liệu** - đó là HÀNG CHỜ, nay đã có hub Chờ duyệt.
+>   Để nó ở đây thì màn sức khỏe lúc nào cũng đỏ vì việc bình thường, và người ta **học được thói
+>   quen bỏ qua cảnh báo** - đúng thứ nguy hiểm nhất của một màn cảnh báo.
+> · **"buổi đã dạy chưa điểm danh"** thiếu cửa sổ ân hạn, trong khi `_checkdata` F4 có 24h. Nay cả
+>   ba nơi (app · màn sức khỏe · `_checkdata`) đọc **cùng một tham số** `attendanceGrace_hours`;
+>   `_checkdata` cũng thôi gõ số 24 vào mã của nó.
+> · 3 phiếu test sai thứ tự thời gian - vá ở nguồn.
+> Bộ kiểm còn thử **nới/thu cửa sổ ân hạn** để chứng minh tham số thật sự được đọc, và **sửa một
+> dòng dữ liệu trong app** để chứng minh màn này bắt được thay đổi sống - tức là nó thật sự khác
+> bộ kiểm lúc sinh chứ không phải bản chép lại.
+>
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
 >
 > **(G) TRỢ THỦ THAO TÁC - anh Luân đặt 28/07, LÀM SAU ĐỢT AUDIT (F):** *"a muốn nghiên cứu trợ thủ

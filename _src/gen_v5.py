@@ -6414,7 +6414,10 @@ function dataHealth(){var out=[];
   var fin=num(e.final_fee),paid=num(e.paid_amount),rem=num(e.remaining_amount);
   if(fin&&Math.abs(paid+rem-fin)>1)add("nang","Tiền",e.enrollment_id+": đã đóng "+money(paid)+" + còn "+money(rem)+" ≠ phải thu "+money(fin),{page:"thanhtoan"});
   if(rem<-0.5)add("nang","Tiền",e.enrollment_id+": công nợ âm "+money(rem),{page:"thanhtoan"});
-  if(num(e.discount_amount)>0&&!String(e.discount_approved_by||"").trim())add("nhe","Chiết khấu",e.enrollment_id+": giảm "+money(num(e.discount_amount))+" chưa duyệt",{page:"duyet"});});
+  /* V9.29q: "chiết khấu chưa duyệt" KHÔNG phải lỗi dữ liệu - đó là HÀNG CHỜ QUYẾT ĐỊNH, nay có
+     hub Chờ duyệt riêng. Để nó ở đây thì màn sức khỏe lúc nào cũng đỏ vì việc bình thường, và
+     người ta học được thói quen bỏ qua cảnh báo - đúng thứ nguy hiểm nhất của một màn cảnh báo. */
+  });
  /* 3. bài tập: trạng thái ngược với dữ liệu nộp */
  rows("DL13").forEach(function(h){
   if(isc(h.homework_status,"submitted_on_time","submitted_late")&&!String(h.homework_submitted_time||"").trim())add("vua","Bài tập",h.homework_id+": ghi đã nộp nhưng không có giờ nộp",null);
@@ -6436,9 +6439,14 @@ function dataHealth(){var out=[];
   if(o)add("nang","Mồ côi",tb+": "+o+" bản ghi trỏ tới học viên không tồn tại",null)});
  /* 8. buổi đã dạy mà không ai điểm danh */
  var attSes={};rows("DL12").forEach(function(a){attSes[a.session_id]=1});
- var noAtt=rows("DL11").filter(function(s){return isc(s.session_status,"completed")&&!attSes[s.session_id]
-  &&rows("DL08").some(function(o){return o.class_id===s.class_id})}).length;
- if(noAtt)add("nhe","Điểm danh",noAtt+" buổi đã dạy nhưng chưa ai điểm danh",{page:"diemdanh"});
+ /* V9.29q: PHẢI dùng ĐÚNG cửa sổ ân hạn của bộ kiểm dữ liệu (_checkdata F4) - buổi vừa dạy xong
+    trong ngày là HÀNG CHỜ bình thường, không phải lỗi. Trước đây màn này không có cửa sổ nên nó
+    và bộ kiểm nói hai con số khác nhau về cùng một chuyện. */
+ var _grace=num(paramOf("attendanceGrace_hours",24))||24;
+ var noAtt=rows("DL11").filter(function(s){if(!isc(s.session_status,"completed")||attSes[s.session_id])return false;
+  if(!rows("DL08").some(function(o){return o.class_id===s.class_id}))return false;
+  var a=hoursSince(s.session_date);return a==null||a>_grace}).length;
+ if(noAtt)add("vua","Điểm danh",noAtt+" buổi đã dạy quá "+_grace+"h mà chưa ai điểm danh",{page:"diemdanh"});
  /* 9. enum lạ */
  [["DL02","lead_status","enum_lead_status"],["DL06","enrollment_status","enum_enrollment_status"],
   ["DL13","homework_status","enum_homework_status"],["DL14","wow_status","enum_wow_status"]].forEach(function(x){
@@ -6453,7 +6461,14 @@ window.healthJumps=[];
 function renderHealth(){var items=dataHealth();
  var by={nang:[],vua:[],nhe:[]};items.forEach(function(x){if(by[x.sev])by[x.sev].push(x)});
  var tot=by.nang.length+by.vua.length+by.nhe.length;
- var h='<div class="notebar"><i class="ti ti-stethoscope"></i>Chạy '+ '9 nhóm quy tắc ngay trên dữ liệu đang mở. Đây là bản rút gọn của bộ kiểm tự động dùng khi sinh dữ liệu. Bấm một dòng để nhảy tới nơi sửa.</div>';
+ /* V9.29q (anh Luân hỏi "sheet sức khỏe dữ liệu còn cần không"): CÒN, nhưng phải nói rõ nó khác
+    bộ kiểm lúc sinh dữ liệu ở chỗ nào, nếu không nó thành bộ luật thứ ba chạy song song rồi trôi
+    khỏi hai bộ kia. Khác biệt thật: nó soi DỮ LIỆU ĐANG MỞ (sau khi người dùng đã sửa trong buổi
+    demo / sau khi nối sheet thật), còn check_logic.py và _checkdata.js chỉ soi dữ liệu lúc sinh.
+    Chính nó vừa bắt được 3 phiếu test hẹn TRƯỚC giờ tạo lead mà 132 luật kia bỏ sót.
+    LUẬT MỚI: bộ kiểm bắt màn này phải SẠCH trên dữ liệu gốc - còn dòng nào tức là hai bên đang
+    nói khác nhau, và phải sửa cho khớp chứ không được để đó. */
+ var h='<div class="notebar"><i class="ti ti-stethoscope"></i>Soi <b>dữ liệu đang mở</b> (kể cả phần bạn vừa sửa trong buổi demo) bằng 9 nhóm quy tắc. Khác với bộ kiểm chạy lúc sinh dữ liệu: cái đó chỉ soi bản gốc. Hàng chờ công việc bình thường (chiết khấu chờ duyệt, buổi vừa dạy chưa điểm danh trong '+(num(paramOf("attendanceGrace_hours",24))||24)+'h) KHÔNG tính là lỗi - xem ở <b>Chờ duyệt</b>. Bấm một dòng để nhảy tới nơi sửa.</div>';
  h+='<div class="hstat">'+
   '<div class="hs '+(by.nang.length?"red":"green")+'"><b>'+by.nang.length+'</b><span>Nghiêm trọng</span></div>'+
   '<div class="hs '+(by.vua.length?"amber":"green")+'"><b>'+by.vua.length+'</b><span>Cần sửa</span></div>'+
@@ -7085,6 +7100,7 @@ function paramSheetName(name){var c=(DATA.config&&DATA.config.ch2)||[];
 var APPPARAMS=[
  /* V9.29o: một buổi chiếm chỗ của giáo viên bao lâu - dùng cho cảnh báo trùng giờ trên lịch tuần
     VÀ cho việc lọc người thay được. Trước đây con số 2 giờ nằm cắm cứng trong renderLichTuan. */
+ ["Xếp lịch & Giảng dạy","attendanceGrace_hours","Buổi dạy xong bao lâu thì BẮT BUỘC phải có điểm danh (trong khoảng này còn coi là hàng chờ)","giờ",24],
  ["Xếp lịch & Giảng dạy","homeworkDueFallback_days","Hạn nộp bài mặc định khi giáo án không ghi rõ (tính từ ngày học)","ngày",5],
  ["Học tập - WOW","wowGrantMax_perTime","Mỗi lần cấp thêm tối đa bao nhiêu lượt WOW cho một học viên","lượt",3],
  ["Hẹn & Chăm sóc","apptSoon_hours","Nút hẹn nhanh \"N tiếng nữa\" - N là bao nhiêu","giờ",2],
