@@ -6288,6 +6288,48 @@ function kpiTop3Section(){
   acts.slice(0,2).forEach(function(a){h+=kpiBtn(a[0],a[1],a[2],a[3])});
   h+='<button class="btn sm" onclick="kpiOpen(\''+x.code+'\')"><i class="ti ti-info-circle"></i>Vì sao</button></div></div>'});
  return h+'</div>'}
+/* ═══════ V9.29r - BẢNG SO SÁNH 5 CƠ SỞ + LỚP ONLINE (anh Luân: "trung tâm có 5 chi nhánh và
+   hình thức học online, làm gì cũng phải cân nhắc") ═══════
+   Báo cáo gộp toàn trung tâm thì chủ trung tâm không trả lời được câu quan trọng nhất của một
+   chuỗi 5 cơ sở: "cơ sở nào đang gánh, cơ sở nào đang hụt". Bảng này tách theo cơ sở của LỚP
+   (nơi việc học thật sự diễn ra), và tách riêng cột lớp học ONLINE - online không thuộc cơ sở
+   nào nên gộp vào một cơ sở bất kỳ là sai cả hai đầu. */
+function brOf(code){return elabel(code)||code||"(chưa ghi)"}
+function baocaoBranch(){
+ var cls=rows("DL10"),enr=rows("DL08"),ses=rows("DL11");
+ var clsBr={},clsOn={};cls.forEach(function(c){clsBr[c.class_id]=c.branch||"";clsOn[c.class_id]=clsOnline(c)});
+ var K={};
+ function slot(b){if(!K[b])K[b]={b:b,cls:0,on:0,stu:0,ses:0,note:0,risk:0,gv:{},rev:0,debt:0};return K[b]}
+ cls.forEach(function(c){var k=slot(c.branch||"");k.cls++;if(clsOnline(c))k.on++;
+  if(c.main_teacher_id)k.gv[c.main_teacher_id]=1});
+ var stuBr={};
+ enr.forEach(function(o){var b=clsBr[o.class_id];if(b===undefined)return;slot(b).stu++;stuBr[o.student_id]=b});
+ ses.forEach(function(x){var b=clsBr[x.class_id];if(b===undefined)return;var k=slot(b);
+  if(isc(x.session_status,"completed")){k.ses++;if(bhState(x).note)k.note++}
+  if(x.teacher_id)k.gv[x.teacher_id]=1});
+ rows("DL09").forEach(function(st){var b=stuBr[st.student_id];if(b===undefined)return;
+  if(isRisk(st.attendance_progress_status)||isRisk(st.academic_progress_status))slot(b).risk++});
+ /* tiền: quy về cơ sở của LỚP mà học viên đang học - không quy về cơ sở ghi trong hồ sơ HV,
+    vì hồ sơ ghi nơi đăng ký còn tiền thì theo nơi học. */
+ rows("DL06").forEach(function(e){var b=stuBr[e.student_id];if(b===undefined)return;
+  var k=slot(b);k.rev+=num(e.paid_amount);
+  if(!isc(e.enrollment_status,"cancelled"))k.debt+=num(e.remaining_amount)});
+ var list=Object.keys(K).map(function(b){return K[b]}).sort(function(a,b){return b.stu-a.stu});
+ if(!list.length)return "";
+ var h='<div class="panel" style="margin-bottom:16px"><div class="ph"><b><i class="ti ti-building" style="margin-right:6px"></i>So sánh theo cơ sở</b><span class="mut" style="font-size:11.5px">tính theo cơ sở của LỚP - nơi việc học thật sự diễn ra; lớp online tách riêng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Cơ sở</th><th>Lớp</th><th>Trong đó online</th><th>Học viên</th><th>HV nguy cơ</th><th>Giáo viên</th><th>Buổi đã dạy</th><th>Tỷ lệ có nhận xét</th><th>Đã thu</th><th>Còn nợ</th></tr></thead><tbody>';
+ list.forEach(function(k){
+  var tnr=k.ses?Math.round(k.note/k.ses*100):null;
+  var rr=k.stu?Math.round(k.risk/k.stu*100):0;
+  h+='<tr><td><b>'+esc(brOf(k.b))+'</b></td><td>'+k.cls+'</td>'+
+   '<td>'+(k.on?'<span class="chip blue">'+k.on+'</span>':'<span class="mut">0</span>')+'</td>'+
+   '<td><b>'+k.stu+'</b></td>'+
+   '<td>'+(k.risk?'<span class="chip '+(rr>=20?"red":"amber")+'">'+k.risk+' ('+rr+'%)</span>':'<span class="chip green">0</span>')+'</td>'+
+   '<td>'+Object.keys(k.gv).length+'</td><td>'+k.ses+'</td>'+
+   '<td>'+(tnr==null?'<span class="mut">—</span>':'<span class="chip '+(tnr>=Math.round(kpiTh(/^TNR/,0.9)*100)?"green":"red")+'">'+tnr+'%</span>')+'</td>'+
+   '<td style="font-variant-numeric:tabular-nums">'+vnd(k.rev)+'</td>'+
+   '<td style="font-variant-numeric:tabular-nums">'+(k.debt>0?'<b style="color:var(--red)">'+vnd(k.debt)+'</b>':vnd(0))+'</td></tr>'});
+ h+='</tbody></table></div><div class="mut" style="font-size:11.5px;padding:11px 16px;line-height:1.7">Cột <b>Trong đó online</b> đếm lớp có hình thức học trực tuyến - những lớp này KHÔNG ràng buộc cơ sở khi tìm giáo viên dạy thay. Ngưỡng tỷ lệ có nhận xét lấy từ '+kpiChip(/^TNR/,0.9,1)+'.</div></div>';
+ return h}
 function renderBaocao(){
  if(dsLevel("baocao")==="none")return dsDeny("Báo cáo & KPI");
  var L=rows("DL02"),S=rows("DL09"),E=rows("DL06");
@@ -6297,6 +6339,7 @@ function renderBaocao(){
  h+=tbar('<span class="tblbl">Kỳ số liệu</span>'+segHTML(window.REPKY||"all",[["m0","Tháng này"],["30","30 ngày"],["90","90 ngày"],["all","Toàn kỳ"]],"window.REPKY='{k}';reRender(CUR)")+
   '<span class="mut" style="font-size:11px;margin-left:10px">Kỳ này áp cho TOÀN BỘ chỉ số bên dưới, không riêng bảng nguồn lead.</span>',"");
  h+=kpiTop3Section();
+ h+=baocaoBranch();
  h+=bizSection();
  h+=upcomingSection();
  h+=kpiSection();

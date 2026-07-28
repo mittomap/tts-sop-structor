@@ -1244,4 +1244,32 @@ function stripOf(o){var i=o.indexOf('<div class="bstats">');if(i<0)return "";
   t("sua du lieu trong app thi man suc khoe bat duoc ngay", n>0)})();
 })();
 
+
+/* ---- 41. 5 CHI NHANH + HOC ONLINE la LANG KINH soi moi thu (anh Luân) ---- */
+(function(){
+ setRole("all");
+ /* (a) bao cao phai tach duoc theo co so - chuoi 5 co so ma bao cao gop thi khong ai biet
+    co so nao dang ganh, co so nao dang hut */
+ var o=RENDER.baocao();
+ t("bao cao co bang so sanh theo co so", /So sánh theo cơ sở/.test(o));
+ t("bang co so tach rieng cot lop online", /Trong đó online/.test(o));
+ /* so hoc vien trong bang phai KHOP voi ghi danh co lop that - khong duoc dem trung, khong sot */
+ (function(){var h2=baocaoBranch();
+  var clsBr={};rows("DL10").forEach(function(c){clsBr[c.class_id]=c.branch||""});
+  var real=rows("DL08").filter(function(x){return clsBr[x.class_id]!==undefined}).length;
+  var sum=0;(h2.match(/<td><b>(\d+)<\/b><\/td>/g)||[]).forEach(function(x){sum+=num(x.replace(/\D/g,""))});
+  t("tong hoc vien theo co so khop voi ghi danh co lop that ("+sum+"/"+real+")", sum===real)})();
+ /* (b) loc theo co so phai co o cac trang co du lieu theo co so */
+ ["hocvien","nhaplead","lop","giangvien","nhanvien"].forEach(function(k){
+  t("trang "+k+" loc duoc theo co so", (FLTDEF[k]||[]).some(function(x){return x.col==="branch"}))});
+ /* (c) hinh thuc hoc: lop online khong duoc rang buoc co so o BAT KY cho nao dung gvBackup */
+ t("lop online khong bi rang buoc co so", rows("DL11").filter(function(x){
+   var c=find("DL10","class_id",x.class_id)||{};if(!clsOnline(c))return false;
+   return gvBackup(x).some(function(r){return !r.okBr})}).length===0);
+ /* (d) du lieu: moi lop deu phai co co so VA hinh thuc hoc - thieu la moi bo loc/bao cao deu hut */
+ t("moi lop deu ghi co so", rows("DL10").filter(function(c){return !String(c.branch||"").trim()}).length===0);
+ t("moi lop deu ghi hinh thuc hoc", rows("DL10").filter(function(c){return !String(c.learning_mode||"").trim()}).length===0);
+ t("danh muc co so co du 5 co so + online", (ENUM.enum_branch||[]).length>=6);
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");
