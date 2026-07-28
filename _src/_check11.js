@@ -129,7 +129,26 @@ t("V9.18 menu Lam viec: banlam (hanhtrinh da gop) + giaoviec", (function(){var g
  return g&&g.items.indexOf("banlam")>=0&&g.items.indexOf("hanhtrinh")<0})());
 t("V9.18 Tra cuu >= 15 so", (function(){var g=NAVTREE.filter(function(x){return x.g==="Tra cứu"})[0];
  return g&&g.items.length>=15})());
-t("V9.18 cac so tra cuu du LISTCFG + PAGES ty=list", ["dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai"].every(function(k){return LISTCFG[k]&&LISTCFG[k].ro&&PBK[k]&&PBK[k].ty==="list"}));
+t("V9.18 cac so tra cuu du LISTCFG + PAGES ty=list", ["dslienhe","dstest","dstuvan","dsdangky","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai"].every(function(k){return LISTCFG[k]&&LISTCFG[k].ro&&PBK[k]&&PBK[k].ty==="list"}));
+/* V9.29c: rieng So thu hoc phi thanh trang 2 tab (Da thu / Du thu) nen ty="custom", nhung phan
+   "Da thu" van la chinh LISTCFG.dsthanhtoan nhung vao - khong de no bien thanh bang chep tay. */
+t("V9.29c so thu hoc phi: van con LISTCFG chi-xem", !!(LISTCFG.dsthanhtoan&&LISTCFG.dsthanhtoan.ro&&LISTCFG.dsthanhtoan.code==="DL07"));
+t("V9.29c so thu hoc phi la trang 2 tab", PBK.dsthanhtoan.ty==="custom"&&typeof renderSothu==="function");
+(function(){window.STTAB="da";var a=RENDER.dsthanhtoan();
+ t("V9.29c tab Da thu nhung so DL07 that", /listSearch\('dsthanhtoan'/.test(a)&&/Người thu/.test(a));
+ window.STTAB="du";var b=RENDER.dsthanhtoan();
+ t("V9.29c tab Du thu co bang theo thang", /Dự thu theo tháng/.test(b));
+ t("V9.29c du thu bam thang vao thu tien", /payForm\(/.test(b));
+ t("V9.29c du thu ten HV bam ra drawer", /openQuick\(/.test(b));
+ /* BAT BIEN: tong du thu = tong con no cua cac don con hieu luc - khong duoc lech */
+ var duNo=duthuList().reduce(function(a2,r){return a2+r.left},0);
+ var conNo=rows("DL06").filter(function(e){return !isc(e.enrollment_status,"cancelled")})
+  .reduce(function(a2,e){var L=insOf(e.enrollment_id);
+   return a2+L.reduce(function(t2,x){return t2+Math.max(0,num(x.due_amount)-num(x.paid_amount))},0)},0);
+ t("V9.29c tong du thu khop tong con no cua cac dot", Math.abs(duNo-conNo)<1);
+ /* nguong "qua han / sap den han" phai lay tu CH2, khong duoc dat lai rieng cho trang nay */
+ t("V9.29c du thu dung nguong CH2 chu khong cam cung", /installmentLate_days/.test(b)&&/installmentRemind_days/.test(b));
+ window.STTAB="da"})();
 t("V9.18 cac so tra cuu render duoc", (function(){var e2=0;
  ["dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai"].forEach(function(k){
   try{var o=renderList(k);if(typeof o!=="string"||o.length<200)e2++}catch(e){e2++}});

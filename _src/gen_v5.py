@@ -1220,7 +1220,7 @@ body.drsz .drawer{transition:none}
   <div class="main">
     <div class="topbar">
       <button class="tbtn navtoggle" onclick="toggleNav()" aria-label="Menu"><i class="ti ti-menu-2"></i></button>
-      <div style="display:flex;align-items:center;gap:10px"><div><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px"><span class="chip blue roomChip" id="demoBadge">Room demo</span><button class="btn sm" onclick="tourMenu()" title="Chạy hướng dẫn từng bước - chọn cấp độ rồi app chỉ tận nơi"><i class="ti ti-school"></i>Chạy hướng dẫn</button><button class="btn sm" onclick="demoReset()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ và mọi máy trong room cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
+      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div style="min-width:0"><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px;margin-left:auto"><span class="chip blue roomChip" id="demoBadge">Room demo</span><button class="btn sm" onclick="tourMenu()" title="Chạy hướng dẫn từng bước - chọn cấp độ rồi app chỉ tận nơi"><i class="ti ti-school"></i>Chạy hướng dẫn</button><button class="btn sm" onclick="demoReset()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ và mọi máy trong room cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
       <div class="rolesel">
 <!-- V9.29: bỏ ô chọn vai roleSel - luôn bị ẩn từ V9.9, giữ lại chỉ tổ rối -->
         <button class="tbtn" data-tour="help" onclick="tourMenu()" aria-label="Hướng dẫn sử dụng" title="Hướng dẫn từng bước"><i class="ti ti-help-circle"></i></button>
@@ -1547,7 +1547,7 @@ var PAGES=[
 {k:"dstest",g:"Tra cứu",ic:"ti-file-text",t:"Sổ test đầu vào",c:"Tra cứu test",ty:"list"},
 {k:"dstuvan",g:"Tra cứu",ic:"ti-messages",t:"Sổ tư vấn",c:"Tra cứu phiếu tư vấn",ty:"list"},
 {k:"dsdangky",g:"Tra cứu",ic:"ti-clipboard-check",t:"Sổ đăng ký khóa",c:"Tra cứu đăng ký",ty:"list"},
-{k:"dsthanhtoan",g:"Tra cứu",ic:"ti-cash",t:"Sổ thu học phí",c:"Tra cứu khoản thu",ty:"list"},
+{k:"dsthanhtoan",g:"Tra cứu",ic:"ti-cash",t:"Sổ thu học phí",c:"Đã thu & dự thu",ty:"custom"},
 {k:"dsbuoihoc",g:"Tra cứu",ic:"ti-calendar-event",t:"Sổ buổi học",c:"Tra cứu buổi học",ty:"list"},
 {k:"dsdiemdanh",g:"Tra cứu",ic:"ti-user-check",t:"Sổ điểm danh",c:"Tra cứu điểm danh",ty:"list"},
 {k:"dsbaitap",g:"Tra cứu",ic:"ti-book",t:"Sổ bài tập",c:"Tra cứu bài tập",ty:"list"},
@@ -1931,9 +1931,9 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
     if((key==="nhaplead"&&c[0]==="full_name"))h+='<td><a class="lnk" onclick="leadDetail(\''+id+'\')">'+esc(String(r[c[0]]||""))+'</a></td>';
     else if(key==="hocvien"&&c[0]==="full_name")h+='<td><a class="lnk" onclick="openStuQuick(\''+id+'\')">'+esc(String(r[c[0]]||""))+'</a></td>';
     else if(key==="lop"&&c[0]==="class_name")h+='<td><a class="lnk" onclick="openLopQuick(\''+id+'\')">'+esc(String(r[c[0]]||""))+'</a></td>';
-    else if(key==="giangvien"&&c[0]==="full_name")h+='<td><a class="lnk" onclick="openGV(\''+id+'\')">'+esc(String(r[c[0]]||""))+'</a></td>';
-    else if(key==="nhanvien"&&c[0]==="full_name")h+='<td><a class="lnk" onclick="openNV(\''+id+'\')">'+esc(String(r[c[0]]||""))+'</a></td>';
-    else if(key==="khoahoc"&&c[0]==="course_name")h+='<td><a class="lnk" onclick="openKhoa(\''+id+'\')">'+esc(String(r[c[0]]||""))+'</a></td>';
+    else if(key==="giangvien"&&c[0]==="full_name")h+='<td><a class="lnk" onclick="openNSQuick(\''+id+'\')">'+esc(String(r[c[0]]||""))+'</a></td>';
+    else if(key==="nhanvien"&&c[0]==="full_name")h+='<td><a class="lnk" onclick="openNSQuick(\''+id+'\')">'+esc(String(r[c[0]]||""))+'</a></td>';
+    else if(key==="khoahoc"&&c[0]==="course_name")h+='<td><a class="lnk" onclick="openKhoaQuick(\''+id+'\')">'+esc(String(r[c[0]]||""))+'</a></td>';
     else if(!cfg.ro&&cfg.filt&&c[0]===cfg.filt&&ENUMMAP[cfg.filt]&&ENUM[ENUMMAP[cfg.filt]])h+='<td>'+qsel(key,id,cfg.filt,r[c[0]])+'</td>';
     else h+='<td'+(c[2]==="money"?' style="text-align:right;font-variant-numeric:tabular-nums"':'')+'>'+cell(r,c,cfg.code)+'</td>';});
   h+='<td><div class="rowact">'+(cfg.ro?'':'<button class="btn sm" onclick="openEdit(\''+key+'\',\''+id+'\')"><i class="ti ti-edit"></i>Sửa</button>')+
@@ -2310,6 +2310,13 @@ function clearFilt(key){__clearHVF();FILT[key]=[];if(window.QF)window.QF[key]=nu
 function qfToggle(key,k){window.QF=window.QF||{};window.QF[key]=(window.QF[key]===k)?null:k;PAGE[key]=0;rlist(key)}
 function goRisk(){window.QF=window.QF||{};window.QF.hocvien="risk";PAGE.hocvien=0;go("hocvien")}
 /* Bấm tên bất kỳ (Trang bắt đầu / Hành trình) -> MỞ DRAWER thông tin trước; muốn xử lý thì bấm nút. */
+/* V9.29 (anh Luân: "ở xếp lớp & onboarding, sao ko có drawer tóm tắt thông tin học viên em").
+   Không riêng trang đó - 7 màn tác vụ đều in tên người thành CHỮ CHẾT. Một hàm dùng chung, cùng
+   kiểu với lopLnk: bấm tên là ra drawer tóm tắt (chặng, việc kế, chuyên cần, tiền, liên hệ). */
+function nguoiLnk(pid,nm,fb){var t=nm||pid||fb||"-";
+ if(!pid)return esc(t);
+ return '<a class="lnk" onclick="event.stopPropagation();openQuick(\''+esc(pid)+'\')" '+
+  'data-tip="Xem nhanh hồ sơ - chặng, việc kế tiếp, chuyên cần, công nợ">'+esc(t)+'</a>'}
 function openQuick(pid){if(!pid)return;
  if(find("DL09","student_id",pid))return openStuQuick(pid);
  if(find("DL02","lead_id",pid))return leadDetail(pid);
@@ -2382,6 +2389,53 @@ function openLopQuick(cid){var c=find("DL10","class_id",cid);if(!c){toast("Khôn
  if(risk.length)h+='<button class="btn" onclick="closeModal();goRisk()"><i class="ti ti-user-exclamation"></i>Xem HV nguy cơ</button>';
  h+='</div>';
  openDrawer(cid+" · "+(c.class_name||""),h)}
+/* ===== V9.29c (anh Luân): BẤM TÊN = XEM NHANH, KHÔNG NHẢY TRANG =====
+   "a bấm vào học viên, tự nhiên nảy trang khác, nó nhảm lắm" - bấm tên phải mở drawer trước,
+   trong drawer mới có nút Hồ sơ đầy đủ. Luật này áp cho CẢ 4 loại tên: học viên, lớp,
+   nhân sự, khóa học - nếu chỉ sửa học viên thì ba loại kia lại lệch nhịp.
+   isGVRole dùng chung với renderHosoGV/renderHosoNV: một định nghĩa "ai là giảng viên". */
+function isGVRole(s){if(!s)return false;return /teacher|giang/i.test(ecode(s.role)+" "+String(s.role||""))}
+function nsLnk(id,nm,fb){var t=nm||id||fb||"-";
+ if(!id)return esc(t);
+ return '<a class="lnk" onclick="event.stopPropagation();openNSQuick(\''+esc(id)+'\')" '+
+  'data-tip="Xem nhanh nhân sự - vai trò, lớp/hồ sơ phụ trách">'+esc(t)+'</a>'}
+function openNSQuick(id){var s=find("DL01","staff_id",id);if(!s){toast("Không thấy nhân sự");return}
+ var gv=isGVRole(s);
+ var cls=rows("DL10").filter(function(c){return String(c.main_teacher_id||"")===id});
+ var clsIds={};cls.forEach(function(c){clsIds[c.class_id]=1});
+ var done=rows("DL11").filter(function(x){return isc(x.session_status,"completed")&&(String(x.teacher_id||"")===id||clsIds[x.class_id])});
+ var lead=rows("DL02").filter(function(l){return String(l.assigned_to||"")===id});
+ var leadOpen=lead.filter(function(l){return !isc(l.lead_status,"converted","rejected","lost")});
+ var h='<div style="margin-bottom:10px"><span class="chip '+stCls(s.status)+'">'+esc(elabel(s.status)||"-")+'</span> <span class="chip '+(gv?"blue":"gray")+'">'+esc(elabel(s.role)||s.role||"-")+'</span></div>';
+ h+=ctxRows([["Bộ phận",elabel(s.department)||s.department],["Chi nhánh",elabel(s.branch)||s.branch],
+  ["Điện thoại",telHTML(s.phone)],["Email",s.email],["Quản lý trực tiếp",s.reports_to_name||s.reports_to],
+  ["Vào làm",s.start_date]]);
+ var st=[];
+ if(cls.length)st.push(cls.length+" lớp phụ trách");
+ if(done.length)st.push(done.length+" buổi đã dạy");
+ if(lead.length)st.push(leadOpen.length+"/"+lead.length+" lead đang mở");
+ if(st.length)h+='<div class="notebar" style="margin:8px 0"><i class="ti ti-briefcase"></i>'+esc(st.join(" · "))+'</div>';
+ h+='<div class="dsec">Thao tác</div><div class="dact">';
+ h+='<button class="btn primary" onclick="closeModal();'+(gv?'openGV':'openNV')+'(\''+esc(id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ đầy đủ</button>';
+ h+='</div>';
+ openDrawer((s.full_name||id)+" · "+id,h)}
+function khoaLnk(id,nm,fb){var t=nm||id||fb||"-";
+ if(!id)return esc(t);
+ return '<a class="lnk" onclick="event.stopPropagation();openKhoaQuick(\''+esc(id)+'\')" '+
+  'data-tip="Xem nhanh khóa học - học phí, số buổi, lớp đang chạy">'+esc(t)+'</a>'}
+function openKhoaQuick(id){var c=find("DL05","course_id",id);if(!c){toast("Không thấy khóa học");return}
+ var cls=rows("DL10").filter(function(x){return String(x.course_id||"")===id});
+ var run=cls.filter(function(x){return isc(x.class_status,"in_progress","open")});
+ var enr=rows("DL06").filter(function(e){return String(e.course_id||"")===id});
+ var h='<div style="margin-bottom:10px"><span class="chip '+stCls(c.status)+'">'+esc(elabel(c.status)||"-")+'</span></div>';
+ h+=ctxRows([["Trình độ",elabel(c.course_level)||c.course_level],["Học phí",vnd(num(c.list_price))],
+  ["Số buổi",c.duration_sessions],["Thời lượng",c.duration_months?(c.duration_months+" tháng"):""],
+  ["Quota WOW mặc định",c.wow_quota_default],["Hình thức học",elabel(c.learning_mode_supported)||c.learning_mode_supported]]);
+ h+='<div class="notebar" style="margin:8px 0"><i class="ti ti-school"></i>'+cls.length+' lớp ('+run.length+' đang chạy) · '+enr.length+' đăng ký</div>';
+ h+='<div class="dsec">Thao tác</div><div class="dact">';
+ h+='<button class="btn primary" onclick="closeModal();openKhoa(\''+esc(id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ đầy đủ</button>';
+ h+='</div>';
+ openDrawer((c.course_name||id)+" · "+id,h)}
 function pageGo(key,n){PAGE[key]=n;if(typeof CUR!=="undefined"&&CUR!==key&&RENDER[CUR]){reRender(CUR);var e0=document.getElementById("content");if(e0)e0.scrollTop=0;return}var el=document.getElementById("content");el.innerHTML=renderList(key);el.scrollTop=0}
 function listSort(key,col){window.SORT=window.SORT||{};var so=window.SORT[key];
  if(so&&so.col===col)so.dir=-so.dir;else window.SORT[key]={col:col,dir:1};
@@ -2555,7 +2609,7 @@ function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sa
   var nE=rows("DL06").filter(function(e){return myL[e.lead_id]&&!isc(e.enrollment_status,"cancelled")}).length;
   var nE7=rows("DL06").filter(function(e){if(!myL[e.lead_id]||isc(e.enrollment_status,"cancelled"))return false;var d=pvnd(e.enrollment_time);return d&&d>=w0}).length;
   var rev=0;rows("DL07").forEach(function(p){if(String(p.received_by||"")===id)rev+=num(p.amount)});
-  h+='<tr><td><a class="lnk" onclick="openNV(\''+esc(id)+'\')"><b>'+esc(sv.full_name)+'</b></a><div class="mut" style="font-size:10.5px">'+esc(id)+'</div></td><td>'+nL+'</td><td>'+tp.length+'</td><td>'+(tp.length?Math.round(ok*100/tp.length)+"%":"—")+'</td><td>'+nE7+'</td><td>'+nE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums">'+vnd(rev)+'</td></tr>'});
+  h+='<tr><td><a class="lnk" onclick="openNSQuick(\''+esc(id)+'\')"><b>'+esc(sv.full_name)+'</b></a><div class="mut" style="font-size:10.5px">'+esc(id)+'</div></td><td>'+nL+'</td><td>'+tp.length+'</td><td>'+(tp.length?Math.round(ok*100/tp.length)+"%":"—")+'</td><td>'+nE7+'</td><td>'+nE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums">'+vnd(rev)+'</td></tr>'});
  var tL=0,tT=0,tO=0,tE7=0,tE=0,tR=0;
  sales.forEach(function(sv){var id=sv.staff_id;var myL={};rows("DL02").forEach(function(l){if(String(l.assigned_to||"")===id){myL[l.lead_id]=1;tL++}});
   rows("DL02b").forEach(function(t2){if(String(t2.staff_id||"")!==id)return;var d=pvnd(t2.contact_time);if(d&&d>=w0){tT++;if(cresOK(ecode(t2.result_note)))tO++}});
@@ -3126,7 +3180,7 @@ function absQueueHTML(list,tit){
  var h='<div class="panel absq"><div class="ph"><b><i class="ti ti-user-question" style="margin-right:6px"></i>'+esc(tit||"Học viên xin nghỉ - chờ duyệt")+' ('+list.length+')</b></div><div class="pbody">';
  list.forEach(function(a){var s2=find("DL11","session_id",a.session_id)||{};
   var c=find("DL10","class_id",s2.class_id)||{};
-  h+='<div class="absrow"><div class="absi"><b>'+esc(a.student_name||a.student_id)+'</b>'+
+  h+='<div class="absrow"><div class="absi"><b>'+nguoiLnk(a.student_id,a.student_name)+'</b>'+
    '<span>'+esc((c.class_name||s2.class_id||"")+" · buổi "+(s2.session_number||"?")+" · "+(s2.session_date||""))+'</span>'+
    '<span class="absw">'+esc(hvSelfWhy(a)||a.note||"")+'</span></div>'+
    (a.absence_want_makeup?'<span class="chip blue">xin học bù</span>':'')+
@@ -3715,7 +3769,10 @@ function sopBlock(J,btns){
  h+='<div class="sopr"><span class="soprk">Thời hạn</span><span class="soprv">'+(J.sla>0?('Ở bước này đã '+age+' · hạn '+(J.sla<24?Math.round(J.sla)+" giờ":Math.round(J.sla/24)+" ngày")+(J.over?' · <b style="color:var(--red)">QUÁ HẠN</b>':'')):'Không đặt SLA cứng - chăm theo nhịp định kỳ')+'</span></div>';
  h+='<div class="sopr"><span class="soprk">Phụ trách</span><span class="soprv">'+esc(J.owner||J.S.owner||"-")+'</span></div>';
  if(J.miss.length)h+='<div class="jnm"><i class="ti ti-file-alert"></i><b>Thiếu dữ liệu bắt buộc:</b> '+esc(J.miss.join(", "))+' - bổ sung xong mới đi tiếp được.</div>';
- if(J.naMsg)h+='<div class="sopna"><i class="ti ti-message-2"></i><span><b>Câu nhắn chuẩn SOP:</b> '+esc(J.naMsg)+'</span>'+msgEditBtn(J.na)+'</div>';
+ /* V9.29c (anh Luân): trước ghi "Câu nhắn chuẩn SOP" - nghe như câu để GỬI CHO KHÁCH, trong khi
+    CH4 là câu NHẮC VIỆC cho nhân viên ("HV đang học đều, không cần làm gì thêm" thì nhắn cho ai?).
+    Dùng đúng một chữ với màn Chạy quy trình: "Việc cần làm theo SOP · <mã>". */
+ if(J.naMsg)h+='<div class="sopna"><i class="ti ti-checklist"></i><span><b>Việc cần làm theo SOP · '+esc(J.na)+':</b> '+esc(J.naMsg)+'</span>'+msgEditBtn(J.na)+'</div>';
  h+='</div>';
  if(btns!==false)h+='<div class="jnr">'+(btns||('<button class="btn primary" onclick="runStart(\''+esc(J.C.pid)+'\')"><i class="ti ti-player-play"></i>Xử lý theo quy trình</button>'))+'</div>';
  return h+'</div>'}
@@ -4826,7 +4883,7 @@ function renderGhinhan(embed){var p="ghinhan",fil=fget(p);
  if(!view.length)h+='<div class="empty">Không có phản hồi nào khớp bộ lọc.</div>';
  var MIX=jIndex();
  view.slice(0,60).forEach(function(f){var s=fst(f);var id=f.feedback_id;
-  h+='<div class="obcard"><div class="obh"><div><b>'+esc(f.student_id_name||f.student_id||"(chưa gắn HV)")+'</b>'+
+  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(f.student_id,f.student_id_name,"(chưa gắn HV)")+'</b>'+
    '<div class="obm">'+esc(elabel(f.feedback_category)||f.feedback_category||"")+' · '+esc(elabel(f.feedback_channel)||"")+
    (f.feedback_score?' · điểm '+esc(f.feedback_score)+'/5':'')+' · '+esc(f.feedback_time||"")+(f.class_id_name?' · '+esc(f.class_id_name):'')+'</div></div>'+mstripFor(f.student_id,MIX)+
    '<span class="chip '+(s.neg?"red":(isc(f.feedback_type,"positive")?"green":"gray"))+'">'+esc(elabel(f.feedback_type)||"-")+'</span></div>';
@@ -5365,7 +5422,7 @@ function classBar(cid){var c=find("DL10","class_id",cid);if(!c)return '';
    '<span class="chip '+stCls(c.class_status)+'">'+esc(elabel(c.class_status))+'</span></div>'+
   '<div class="cbgrid" style="--cbn:5">'+
    it("ti-school","Khóa",c.course_id_name||c.course_id)+
-   it("ti-chalkboard","Giảng viên","",(gv?'<a class="lnk" onclick="openGV(\''+esc(c.main_teacher_id)+'\')">'+esc(gvName)+'</a>':esc(gvName)))+
+   it("ti-chalkboard","Giảng viên","",(gv?nsLnk(c.main_teacher_id,gvName,""):esc(gvName)))+
    it("ti-calendar-check","Lịch học",c.class_schedule)+
    it("ti-home","Phòng / link",c.venue_or_zoom_link)+
    it("ti-building","Cơ sở",elabel(c.branch))+
@@ -5482,7 +5539,7 @@ function renderBanglop(){
    var hw=rows("DL13").filter(function(x){return x.student_id===e.student_id&&x.class_id===cid});
    var gr=hw.filter(hwGraded).length;
    var risk=/at_risk|off_track/.test(ecode(s.attendance_progress_status)+" "+ecode(s.academic_progress_status));
-   h+='<tr><td>'+esc(e.student_id)+'</td><td><a class="lnk" onclick="openHoso(\''+esc(e.student_id)+'\')">'+esc(s.full_name||"-")+'</a></td><td>'+rate+'</td><td>'+gr+'/'+hw.length+'</td><td><span class="chip '+(risk?"red":"green")+'">'+(risk?"Nguy cơ":"Ổn định")+'</span></td>'+
+   h+='<tr><td>'+esc(e.student_id)+'</td><td>'+nguoiLnk(e.student_id,s.full_name,"-")+'</td><td>'+rate+'</td><td>'+gr+'/'+hw.length+'</td><td><span class="chip '+(risk?"red":"green")+'">'+(risk?"Nguy cơ":"Ổn định")+'</span></td>'+
     '<td><button class="btn sm" onclick="openHoso(\''+esc(e.student_id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button></td></tr>'});
   h+='</tbody></table></div></div>';
  }
@@ -6971,7 +7028,7 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=rows("DL08");
   h+='<div class="sechd" style="display:flex;align-items:center;gap:8px"><i class="ti ti-user-plus" style="color:var(--red)"></i>Đã đóng đủ tiền · chờ xếp lớp ('+wait.length+')</div>';
   h+='<div class="panel" style="margin-bottom:16px"><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Khóa đã đăng ký</th><th>Ngày đóng đủ</th><th></th></tr></thead><tbody>';
   wait.forEach(function(e){var lastPay="";var ps=rows("DL07").filter(function(p){return String(p.enrollment_id)===String(e.enrollment_id)&&num(p.amount)>0});if(ps.length)lastPay=ps[ps.length-1].payment_time||"";
-   h+='<tr><td><a class="lnk" onclick="openHoso(\''+esc(e.student_id)+'\')">'+esc(e.student_id_name||e.student_id)+'</a></td>'+
+   h+='<tr><td>'+nguoiLnk(e.student_id,e.student_id_name,e.student_id)+'</td>'+
     '<td>'+esc(e.course_id_name||e.course_id||"-")+'</td><td>'+esc(String(lastPay).slice(0,10)||"-")+'</td>'+
     '<td><button class="btn primary sm" onclick="xepFor(\''+esc(e.student_id)+'\')"><i class="ti ti-layout-grid-add"></i>Xếp vào lớp</button></td></tr>'});
   h+='</tbody></table></div></div>';
@@ -6986,7 +7043,7 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=rows("DL08");
  var MIX=jIndex();
  view.forEach(function(o){var s=obState(o);var sid=o.student_id;
   var chg=num(o.placement_change_count);
-  h+='<div class="obcard"><div class="obh"><div><b>'+esc(o.student_id_name||sid)+'</b><div class="obm">Lớp: '+lopLnk(o.class_id,o.class_id_name,"chưa xếp")+' · '+esc(sid||"")+(chg?' · <span style="color:var(--amber)">đã đổi lớp '+chg+' lần</span>':'')+'</div></div>'+mstripFor(sid,MIX)+(s.rejected?'<span class="chip red">HV từ chối lớp</span>':(s.infoOverdue?'<span class="chip red">Quá hạn gửi info</span>':(s.obOverdue?'<span class="chip red">Quá hạn onboarding</span>':(s.done?'<span class="chip green">Hoàn tất</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div>';
+  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(sid,o.student_id_name)+'</b><div class="obm">Lớp: '+lopLnk(o.class_id,o.class_id_name,"chưa xếp")+' · '+esc(sid||"")+(chg?' · <span style="color:var(--amber)">đã đổi lớp '+chg+' lần</span>':'')+'</div></div>'+mstripFor(sid,MIX)+(s.rejected?'<span class="chip red">HV từ chối lớp</span>':(s.infoOverdue?'<span class="chip red">Quá hạn gửi info</span>':(s.obOverdue?'<span class="chip red">Quá hạn onboarding</span>':(s.done?'<span class="chip green">Hoàn tất</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div>';
   h+='<div class="steps">'+stepHTML("Xếp lớp",true)+stepHTML("Gửi info",s.sent)+stepHTML("HV xác nhận",s.confirmed)+stepHTML("Hoàn tất",s.done)+'</div>';
   h+='<div class="obact">';
   if(s.rejected)h+='<button class="btn primary sm" onclick="obChange(\''+esc(o.onboarding_id)+'\')"><i class="ti ti-transfer"></i>Đổi lớp khác</button>';
@@ -7229,7 +7286,7 @@ function pqSearch(){var q=vnorm(fldV("pq_srch")||"").trim();var box=document.get
   var st=find("DL09","student_id",x.student_id)||{};
   return vnorm(x.student_id_name||"").indexOf(q)>=0||phoneHit(st.phone_number,q)}).slice(0,8);
  box.innerHTML=res.length?res.map(function(x){
-  return '<div class="pkitem" onclick="document.getElementById(\'pq_enr\').value=\''+esc(x.enrollment_id)+'\';document.getElementById(\'pq_srch\').value=\''+esc(String(x.student_id_name||x.student_id).replace(/'/g,""))+'\';this.parentNode.innerHTML=\'\'"><b>'+esc(x.student_id_name||x.student_id)+'</b> <span class="mut">'+esc(x.course_id_name||"")+' · còn '+vnd(num(x.remaining_amount))+'</span></div>'}).join(""):'<div class="pkitem mut">Không thấy đăng ký còn nợ nào khớp</div>'}
+  return '<div class="pkitem" onclick="document.getElementById(\'pq_enr\').value=\''+esc(x.enrollment_id)+'\';document.getElementById(\'pq_srch\').value=\''+esc(String(x.student_id_name||x.student_id).replace(/'/g,""))+'\';this.parentNode.innerHTML=\'\'"><b>'+nguoiLnk(x.student_id,x.student_id_name)+'</b> <span class="mut">'+esc(x.course_id_name||"")+' · còn '+vnd(num(x.remaining_amount))+'</span></div>'}).join(""):'<div class="pkitem mut">Không thấy đăng ký còn nợ nào khớp</div>'}
 function payQuickGo(){var id=fldV("pq_enr");if(!id){toast("Gõ tên/SĐT rồi chọn trong gợi ý.");return}closeModal();payForm(id)}
 function tvQuick(){
  var leads=rows("DL02").filter(function(l){return !isc(l.lead_status,"converted")});
@@ -7307,7 +7364,7 @@ function renderTest(embed){var p="test",fil=fget(p);var all=rows("DL03");
  h+='<div class="obcards rows">';if(!view.length)h+='<div class="empty">Không có hồ sơ phù hợp.</div>';
  var MIX=jIndex();
  view.forEach(function(r){var s=st(r);var id=r.test_booking_id;
-  h+='<div class="obcard"><div class="obh"><div><b>'+esc(r.lead_id_name||r.lead_id)+'</b><div class="obm">Test '+esc(r.test_date||"")+' · '+esc(elabel(r.test_format)||r.test_format||"")+(r.test_no_show_reason?' · <span style="color:var(--amber)">vắng: '+esc(r.test_no_show_reason)+'</span>':'')+'</div></div>'+mstripFor(r.lead_id,MIX)+(s.refused?'<span class="chip red">Khách từ chối test</span>':(s.overdue?'<span class="chip red">Quá hạn chấm</span>':(s.consulted?'<span class="chip green">Xong</span>':(s.noshow?'<span class="chip amber">Vắng test</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div>';
+  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(r.lead_id,r.lead_id_name)+'</b><div class="obm">Test '+esc(r.test_date||"")+' · '+esc(elabel(r.test_format)||r.test_format||"")+(r.test_no_show_reason?' · <span style="color:var(--amber)">vắng: '+esc(r.test_no_show_reason)+'</span>':'')+'</div></div>'+mstripFor(r.lead_id,MIX)+(s.refused?'<span class="chip red">Khách từ chối test</span>':(s.overdue?'<span class="chip red">Quá hạn chấm</span>':(s.consulted?'<span class="chip green">Xong</span>':(s.noshow?'<span class="chip amber">Vắng test</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div>';
   h+=stepBar([["Đặt lịch",s.booked],["Dự test",s.att],["Chấm điểm",s.graded],["Tư vấn",s.consulted]]);
   h+='<div class="obact">';
   if(s.refused){h+='<button class="btn sm" onclick="testRebook(\''+esc(id)+'\')"><i class="ti ti-calendar-plus"></i>Đặt lại lịch</button>';}
@@ -7370,7 +7427,7 @@ function renderTuvan(embed){var p="tuvan",fil=fget(p);var all=rows("DL04");
  h+='<div class="obcards rows">';if(!view.length)h+='<div class="empty">Không có hồ sơ phù hợp.</div>';
  var MIX=jIndex();
  view.forEach(function(c){var s=st(c);var id=c.consultation_id;
-  h+='<div class="obcard"><div class="obh"><div><b>'+esc(c.customer_name_display||c.lead_id)+'</b><div class="obm">'+esc(c.recommended_course||"chưa đề xuất khóa")+'</div></div>'+mstripFor(c.lead_id,MIX)+(s.enr?'<span class="chip green">Đã đăng ký</span>':(s.dropped?'<span class="chip">Từ chối</span>':(s.closed?'<span class="chip amber">Đã chốt</span>':'<span class="chip amber">Đang xử lý</span>')))+'</div>';
+  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(c.lead_id,c.customer_name_display)+'</b><div class="obm">'+esc(c.recommended_course||"chưa đề xuất khóa")+'</div></div>'+mstripFor(c.lead_id,MIX)+(s.enr?'<span class="chip green">Đã đăng ký</span>':(s.dropped?'<span class="chip">Từ chối</span>':(s.closed?'<span class="chip amber">Đã chốt</span>':'<span class="chip amber">Đang xử lý</span>')))+'</div>';
   h+=stepBar([["Chờ tư vấn",true],["Đã tư vấn",s.consulted],["Chốt",s.closed],["Đăng ký",s.enr]]);
   h+='<div class="obact">';
   if(!s.consulted)h+='<button class="btn primary sm" onclick="tvForm(\''+esc(id)+'\')"><i class="ti ti-messages"></i>Ghi nhận tư vấn</button>';
@@ -7447,7 +7504,7 @@ function renderThanhtoan(embed){var p="thanhtoan",fil=fget(p);var enr=rows("DL06
  h+='<div class="obcards rows">';if(!view.length)h+='<div class="empty">Không có đăng ký phù hợp.</div>';
  var MIX=jIndex();
  view.forEach(function(e){var s=pinfo(e);var id=e.enrollment_id;var canc=isc(e.enrollment_status,"cancelled");
-  h+='<div class="obcard"'+(canc?' style="opacity:.75"':'')+'><div class="obh"><div><b>'+esc(e.student_id_name||e.student_id||e.lead_id_name)+'</b><div class="obm">'+esc(e.course_id_name||e.course_id||"")+' · '+esc(id)+'</div></div>'+mstripFor(e.student_id||e.lead_id,MIX)+(canc?'<span class="chip red">Đã hủy</span>':(s.unverif>0?'<span class="chip amber">'+s.unverif+' chờ xác nhận</span>':(s.full?'<span class="chip green">Đủ tiền</span>':'<span class="chip red">Còn nợ</span>')))+'</div>';
+  h+='<div class="obcard"'+(canc?' style="opacity:.75"':'')+'><div class="obh"><div><b>'+nguoiLnk(e.student_id,e.student_id_name)+'</b><div class="obm">'+esc(e.course_id_name||e.course_id||"")+' · '+esc(id)+'</div></div>'+mstripFor(e.student_id||e.lead_id,MIX)+(canc?'<span class="chip red">Đã hủy</span>':(s.unverif>0?'<span class="chip amber">'+s.unverif+' chờ xác nhận</span>':(s.full?'<span class="chip green">Đủ tiền</span>':'<span class="chip red">Còn nợ</span>')))+'</div>';
   h+='<div class="paybar"><span>Tổng '+vnd(s.tot)+'</span><span>Đã thu '+vnd(s.paid)+'</span><span class="'+(s.rem>0?"r":"g")+'">Còn '+vnd(s.rem)+'</span></div>';
   if(canc){var refunded=isc(e.payment_status,"refunded");
    h+='<div class="notebar" style="margin:8px 0 0"><i class="ti ti-info-circle"></i>Đã hủy'+(e.cancellation_reason?' · '+esc(elabel(e.cancellation_reason)):'')+'. '+(s.paid>0?(refunded?'Đã hoàn '+vnd(s.paid)+'.':'Đã đóng '+vnd(s.paid)+' → chờ hoàn tiền ở trang Duyệt.'):'Chưa thu tiền nên không phải hoàn.')+'</div>';
@@ -7624,7 +7681,7 @@ function printEnroll(eid){var e=find("DL06","enrollment_id",eid)||{};
  var w=window.open("","_blank");if(!w){toast("Trình duyệt chặn cửa sổ in - cho phép popup rồi thử lại.");return}
  w.document.write('<html><head><title>Xác nhận đăng ký '+esc(eid)+'</title><style>body{font-family:Arial,sans-serif;max-width:560px;margin:24px auto;color:#1E2A38;font-size:14px}h2{text-align:center;margin:4px 0}.c{text-align:center;color:#666;font-size:12px}table{width:100%;border-collapse:collapse;margin:14px 0}td{padding:7px 4px;border-bottom:1px solid #E3E9F0}td:first-child{color:#666;width:38%}.sm{font-size:11px;color:#999;text-align:center;margin-top:20px}</style></head><body>'+
   '<h2>IELTS THE TUTORS</h2><div class="c">'+esc(addr||"")+(hot?(' · Hotline: '+esc(hot)):'')+'</div><h2 style="margin-top:16px">XÁC NHẬN ĐĂNG KÝ KHÓA HỌC</h2><div class="c">Số: '+esc(eid)+' · Ngày in: '+esc(nowStr())+'</div>'+
-  '<table><tr><td>Học viên</td><td><b>'+esc(e.student_id_name||e.student_id||"")+'</b></td></tr>'+
+  '<table><tr><td>Học viên</td><td><b>'+nguoiLnk(e.student_id,e.student_id_name)+'</b></td></tr>'+
   '<tr><td>Khóa học</td><td>'+esc(e.course_id_name||e.course_id||"")+'</td></tr>'+
   (c?('<tr><td>Lớp / lịch học</td><td>'+esc((c.class_name||"")+(c.class_schedule?" · "+c.class_schedule:""))+'</td></tr>'):'')+
   '<tr><td>Ngày đăng ký</td><td>'+esc(e.enrollment_time||"")+'</td></tr>'+
@@ -7675,7 +7732,7 @@ function printReceipt(eid,amt,payId){var e=find("DL06","enrollment_id",eid)||{};
  var w=window.open("","_blank");if(!w){toast("Trình duyệt chặn cửa sổ in - cho phép popup rồi thử lại.");return}
  w.document.write('<html><head><title>Phiếu thu '+esc(payId||"")+'</title><style>body{font-family:Arial,sans-serif;max-width:520px;margin:24px auto;color:#1E2A38;font-size:14px}h2{text-align:center;margin:4px 0}.c{text-align:center;color:#666;font-size:12px}table{width:100%;border-collapse:collapse;margin:14px 0}td{padding:7px 4px;border-bottom:1px solid #E3E9F0}td:first-child{color:#666;width:38%}.sig{display:flex;justify-content:space-between;margin-top:28px;text-align:center;font-size:12.5px}.sig div{width:45%}.sm{font-size:11px;color:#999;text-align:center;margin-top:20px}</style></head><body>'+
   '<h2>IELTS THE TUTORS</h2><div class="c">'+esc(addr||"")+(hot?(' · Hotline: '+esc(hot)):'')+'</div><h2 style="margin-top:16px">PHIẾU THU HỌC PHÍ</h2><div class="c">Số: '+esc(payId||"-")+' · Ngày: '+esc(nowStr())+'</div>'+
-  '<table><tr><td>Người nộp</td><td><b>'+esc(e.student_id_name||e.student_id||"")+'</b></td></tr>'+
+  '<table><tr><td>Người nộp</td><td><b>'+nguoiLnk(e.student_id,e.student_id_name)+'</b></td></tr>'+
   '<tr><td>Khóa học</td><td>'+esc(e.course_id_name||e.course_id||"")+'</td></tr>'+
   '<tr><td>Số tiền thu</td><td><b>'+vnd(amt)+'</b></td></tr>'+
   '<tr><td>Đã đóng lũy kế</td><td>'+vnd(num(e.paid_amount))+' / '+vnd(num(e.final_fee)||num(e.total_fee))+'</td></tr>'+
@@ -7741,7 +7798,7 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=rows("DL14");
  h+='<div class="obcards rows">';if(!view.length)h+='<div class="empty">Không có buổi WOW phù hợp.</div>';
  var MIX=jIndex();
  view.forEach(function(w){var s=st(w);var id=w.wow_id;
-  h+='<div class="obcard"><div class="obh"><div><b>'+esc(w.student_name||w.student_id)+'</b><div class="obm">'+esc(elabel(w.wow_skill)||w.wow_skill||"")+' · '+esc(w.wow_session_date||"")+'</div></div>'+mstripFor(w.student_id,MIX)+(s.overdue?'<span class="chip red">Quá hạn ghi chú</span>':(s.noshow?'<span class="chip">HV vắng</span>':(s.note?'<span class="chip green">Xong</span>':'<span class="chip amber">Đang xử lý</span>')))+'</div>';
+  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(w.student_id,w.student_name)+'</b><div class="obm">'+esc(elabel(w.wow_skill)||w.wow_skill||"")+' · '+esc(w.wow_session_date||"")+'</div></div>'+mstripFor(w.student_id,MIX)+(s.overdue?'<span class="chip red">Quá hạn ghi chú</span>':(s.noshow?'<span class="chip">HV vắng</span>':(s.note?'<span class="chip green">Xong</span>':'<span class="chip amber">Đang xử lý</span>')))+'</div>';
   h+=stepBar([["Đặt buổi",s.booked],["Xác nhận",s.confirmed],["Đã dạy",s.done],["Ghi nội dung",s.note]]);
   /* (Luân 28/07) Buổi WOW đặt xong mà nhân viên KHÔNG xem nhanh được lý do và bối cảnh thì
      phải mở hồ sơ ra dò - nhất là buổi HỌC VIÊN TỰ ĐẶT qua cổng. Gom đủ ở đây: ai đặt, muốn
@@ -7954,7 +8011,7 @@ function renderKhieunai(embed){var p="khieunai",fil=fget(p);var all=rows("DL17")
  h+='<div class="obcards rows">';if(!view.length)h+='<div class="empty">Không có khiếu nại phù hợp.</div>';
  var MIX=jIndex();
  view.forEach(function(c){var s=st(c);var id=c.complaint_id;var sevc=ecode(c.complaint_severity);
-  h+='<div class="obcard"><div class="obh"><div><b>'+esc(c.student_id_name||c.student_id)+'</b><div class="obm">'+esc(elabel(c.complaint_type)||c.complaint_type||"")+' · '+lopLnk(c.class_id,c.class_id_name,"")+'</div></div>'+mstripFor(c.student_id,MIX)+(s.overdue?'<span class="chip red">Quá hạn</span>':(s.resolved?'<span class="chip green">Đã xử lý</span>':'<span class="chip '+(sevc==="high"?"red":"amber")+'">'+esc(elabel(c.complaint_severity)||sevc)+'</span>'))+'</div>';
+  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(c.student_id,c.student_id_name)+'</b><div class="obm">'+esc(elabel(c.complaint_type)||c.complaint_type||"")+' · '+lopLnk(c.class_id,c.class_id_name,"")+'</div></div>'+mstripFor(c.student_id,MIX)+(s.overdue?'<span class="chip red">Quá hạn</span>':(s.resolved?'<span class="chip green">Đã xử lý</span>':'<span class="chip '+(sevc==="high"?"red":"amber")+'">'+esc(elabel(c.complaint_severity)||sevc)+'</span>'))+'</div>';
   h+='<div class="obm2">'+esc(String(c.complaint_content||"").slice(0,120))+'</div>';
   h+=stepBar([["Tiếp nhận",true],["Phân công",s.assigned],["Xử lý",s.working],["Đóng",s.resolved]]);
   h+='<div class="obact">';
@@ -8007,7 +8064,7 @@ function renderKetthuc(){var p="ketthuc",fil=fget(p);var all=rows("DL18");
  h+='<div class="obcards rows">';if(!view.length)h+='<div class="empty">Không có hồ sơ phù hợp.</div>';
  var MIX=jIndex();
  view.forEach(function(r){var s=st(r);var id=r.course_end_id;
-  h+='<div class="obcard"><div class="obh"><div><b>'+esc(r.student_id_name||r.student_id)+'</b><div class="obm">'+lopLnk(r.class_id,r.class_id_name,"")+(r.final_test_score?" · Overall "+esc(r.final_test_score):"")+'</div></div>'+mstripFor(r.student_id,MIX)+(s.closed?'<span class="chip green">Xong</span>':(s.scored?'<span class="chip amber">'+esc(elabel(r.achievement_status)||"Đã có KQ")+'</span>':'<span class="chip">Chờ KQ</span>'))+'</div>';
+  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(r.student_id,r.student_id_name)+'</b><div class="obm">'+lopLnk(r.class_id,r.class_id_name,"")+(r.final_test_score?" · Overall "+esc(r.final_test_score):"")+'</div></div>'+mstripFor(r.student_id,MIX)+(s.closed?'<span class="chip green">Xong</span>':(s.scored?'<span class="chip amber">'+esc(elabel(r.achievement_status)||"Đã có KQ")+'</span>':'<span class="chip">Chờ KQ</span>'))+'</div>';
   h+=stepBar([["Kết thúc",true],["KQ đầu ra",s.scored],["Mời tái ĐK",s.invited],["Chốt",s.closed]]);
   h+='<div class="obact">';
   if(!s.scored)h+='<button class="btn primary sm" onclick="ktResult(\''+esc(id)+'\')"><i class="ti ti-writing"></i>Nhập kết quả đầu ra</button>';
@@ -9082,7 +9139,7 @@ function renderMaGioiThieu(embed){
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên chủ mã</th><th>Mã giới thiệu</th><th>Lượt dùng</th><th>Đã đăng ký</th><th>Ưu đãi đã cấp</th><th>Thưởng</th><th></th></tr></thead><tbody>';
  if(!list.length)h+='<tr><td class="empty" colspan="7">Chưa có mã giới thiệu nào được dùng.</td></tr>';
  list.forEach(function(g){
-  h+='<tr><td>'+(g.sid?'<a class="lnk" onclick="openHoso(\''+esc(g.sid)+'\')">'+esc(g.name)+'</a>':esc(g.name))+'</td>'+
+  h+='<tr><td>'+(g.sid?nguoiLnk(g.sid,g.name,""):esc(g.name))+'</td>'+
    '<td><code style="font-size:11.5px;letter-spacing:.5px">'+esc(g.code)+'</code></td>'+
    '<td><b>'+g.rows.length+'</b></td>'+
    '<td>'+(g.enrolled?'<span class="chip green">'+g.enrolled+' bạn</span>':'<span class="mut">0</span>')+'</td>'+
@@ -9098,7 +9155,7 @@ function mgDetail(key){var ev=rows("DL22").filter(function(x){return String(x.re
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-ticket"></i>Mã <b>'+esc(code)+'</b> · '+ev.length+' lượt dùng · '+ev.filter(function(x){return isc(x.status,"enrolled")}).length+' bạn đã đăng ký.</div>';
  h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Bạn được giới thiệu</th><th>SĐT</th><th>Ngày dùng</th><th>Trạng thái</th><th>Được giảm</th></tr></thead><tbody>';
  ev.forEach(function(x){var sid=x.referred_enrollment_id?(find("DL06","enrollment_id",x.referred_enrollment_id)||{}).student_id:"";
-  h+='<tr><td>'+(sid?'<a class="lnk" onclick="closeModal();openHoso(\''+esc(sid)+'\')">'+esc(x.referred_name)+'</a>':esc(x.referred_name||"-"))+'</td>'+
+  h+='<tr><td>'+(sid?nguoiLnk(sid,x.referred_name,""):esc(x.referred_name||"-"))+'</td>'+
    '<td>'+esc(x.referred_phone||"-")+'</td><td>'+esc(String(x.used_date||"").slice(0,10)||"-")+'</td>'+
    '<td><span class="chip '+(isc(x.status,"enrolled")?"green":"amber")+'">'+esc(elabel(x.status)||x.status)+'</span></td>'+
    '<td>'+(num(x.friend_discount_amount)?vnd(num(x.friend_discount_amount)):'<span class="mut">—</span>')+'</td></tr>'});
@@ -9130,7 +9187,7 @@ function gvBioSave(id){markRow("DL01","staff_id",id,{bio:fldV("gv_bio"),avatar_u
 function openGV(id){window.GVID=id;go("hosogv")}
 function renderHosoGV(){var id=window.GVID;var g=find("DL01","staff_id",id);
  if(!g)return pickerPage("Hồ sơ Giảng viên","Chọn giảng viên để xem lớp phụ trách, buổi đã dạy, bài đã chấm và KPI riêng","ti-chalkboard",
-  rows("DL01").filter(function(s){return /teacher|giang/i.test(ecode(s.role)+" "+String(s.role||""))}).map(function(s){
+  rows("DL01").filter(isGVRole).map(function(s){
    var nc=rows("DL10").filter(function(c){return String(c.main_teacher_id||"")===s.staff_id}).length;
    return {id:s.staff_id,t:s.full_name||s.staff_id,s:s.staff_id+" · "+(elabel(s.role)||s.role||""),
     chip:nc?nc+" lớp":"chưa có lớp",cls:nc?"blue":""}}),
@@ -9338,7 +9395,7 @@ function renderHtLop(embed){var fil=window.HTLOPQ||"all";
  if(!view.length)h+='<tr><td class="empty" colspan="9">Không có lớp nào'+(fil==="bad"?" dưới ngưỡng - tốt!":".")+'</td></tr>';
  view.forEach(function(m){var c=m.c;
   function pchip(v,t){if(v==null)return '<span class="mut">—</span>';var p=Math.round(v*100)+"%";return '<span class="chip '+(v>=t?"green":"red")+'">'+p+'</span>'}
-  h+='<tr><td><a class="lnk" onclick="openLop(\''+esc(c.class_id)+'\')"><b>'+esc(c.class_name||c.class_id)+'</b></a><div class="mut" style="font-size:10.5px">'+esc(c.class_id)+'</div></td>'+
+  h+='<tr><td><a class="lnk" onclick="openLopQuick(\''+esc(c.class_id)+'\')"><b>'+esc(c.class_name||c.class_id)+'</b></a><div class="mut" style="font-size:10.5px">'+esc(c.class_id)+'</div></td>'+
    '<td>'+esc(c.main_teacher_id?((find("DL01","staff_id",c.main_teacher_id)||{}).full_name||c.main_teacher_id):"chưa gán")+'</td>'+
    '<td>'+m.si+'/'+esc(c.class_capacity||"?")+'</td>'+
    '<td>'+pchip(m.atr,m.atrT)+'</td><td>'+pchip(m.hcr,m.hcrT)+'</td>'+
@@ -9501,7 +9558,7 @@ function renderBuoihoc(embed){var p="buoihoc",fil=fget(p);var all=rows("DL11");
  if(!view.length)h+='<div class="empty">Không có buổi học phù hợp.</div>';
  view.slice(0,80).forEach(function(s){var st=bhState(s);var id=s.session_id;
   h+='<div class="obcard"><div class="obh"><div><b>'+lopLnk(s.class_id,s.class_id_name,"")+' · buổi '+esc(s.session_number||"?")+'</b>'+
-   '<div class="obm">'+esc(s.session_date||"")+' · GV '+esc(s.teacher_id_name||s.teacher_id||"-")+(st.late?' · <span style="color:var(--amber)">vào trễ '+esc(s.teacher_late_minutes)+" phút"+'</span>':'')+'</div></div>'+
+   '<div class="obm">'+esc(s.session_date||"")+' · GV '+nsLnk(s.teacher_id,s.teacher_id_name,"-")+(st.late?' · <span style="color:var(--amber)">vào trễ '+esc(s.teacher_late_minutes)+" phút"+'</span>':'')+'</div></div>'+
    (st.cancelled?'<span class="chip red">Đã hủy</span>':(st.noteOver?'<span class="chip red">Quá hạn ghi nhận xét</span>':(st.note?'<span class="chip green">Đủ nhận xét</span>':(st.done?'<span class="chip amber">Chờ nhận xét</span>':'<span class="chip gray">Chưa dạy xong</span>'))))+'</div>';
   if(st.note&&s.teacher_note_summary)h+='<div class="obm2">'+esc(String(s.teacher_note_summary).slice(0,150))+'</div>';
   h+=stepBar([["Lên lịch",true],["Đã dạy",st.done],["Ghi nhận xét",st.note]]);
@@ -9622,7 +9679,7 @@ function renderBaoluu(embed){var p="baoluu",fil=fget(p);
   var reason=s.dropout_reason||s.academic_risk_reason||s.attendance_risk_reason||"";
   var ce=rows("DL18").filter(function(x){return x.student_id===id})[0];
   if(!reason&&ce)reason=ce.dropout_reason||ce.transferred_note||"";
-  h+='<div class="obcard"><div class="obh"><div><b>'+esc(s.full_name||id)+'</b>'+
+  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(id,s.full_name)+'</b>'+
    '<div class="obm">'+esc(id)+(s.phone_number?' · '+esc(s.phone_number):'')+(clsNm?' · '+esc(clsNm):'')+
    (s.last_learning_activity_time?' · hoạt động cuối '+esc(s.last_learning_activity_time):'')+'</div></div>'+mstripFor(id,MIX)+
    (dropped?'<span class="chip red">Bỏ học</span>':'<span class="chip amber">Bảo lưu</span>')+'</div>';
@@ -10059,7 +10116,7 @@ function tkRelLabel(t){if(!t.related_id)return "";
  var L={student:"Học viên",lead:"Khách",class:"Lớp"}[t.related_type]||"Hồ sơ";
  return L+": "+(t.related_name||t.related_id)}
 function tkRelGo(t){if(!t.related_id)return "";
- if(t.related_type==="class")return 'onclick="event.stopPropagation();openLop(\''+esc(t.related_id)+'\')"';
+ if(t.related_type==="class")return 'onclick="event.stopPropagation();openLopQuick(\''+esc(t.related_id)+'\')"';
  return 'onclick="event.stopPropagation();openQuick(\''+esc(t.related_id)+'\')"'}
 
 /* ---------- THẺ MỘT VIỆC (dùng chung ở mọi tab) ---------- */
@@ -10345,7 +10402,61 @@ function tkReport(){var all=srows("DL23");
   blk("Bắt buộc",req)+blk("Không bắt buộc",opt)+'</tbody></table></div>';
  h+='<div class="mut" style="font-size:11.5px;padding:10px 14px">Việc <b>bắt buộc</b> không được từ chối và tính vào tỷ lệ đúng hạn của nhân viên; việc <b>không bắt buộc</b> (nhờ hỗ trợ, phối hợp) được phép từ chối kèm lý do.</div></div></div></div>';
  return h}
-var RENDER={giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang};
+/* ===== SỔ THU HỌC PHÍ: tab ĐÃ THU (DL07) + tab DỰ THU (DL06b) ===== */
+function sothuTab(k){window.STTAB=k;reRender("dsthanhtoan")}
+/* Gom mọi đợt CHƯA đóng đủ thành danh sách dự thu. Mỗi dòng = một đợt của một đơn.
+   Số tiền còn phải thu của đợt = due_amount - paid_amount (đợt đóng dở vẫn còn phần chưa vào). */
+function duthuList(){var out=[];
+ rows("DL06").forEach(function(e){
+  if(isc(e.enrollment_status,"cancelled"))return;
+  insOf(e.enrollment_id).forEach(function(x){
+   var left=num(x.due_amount)-num(x.paid_amount);
+   if(left<=0||isc(x.status,"paid"))return;
+   out.push({e:e,x:x,left:left,st:insDueState(x),d:pvnd(x.due_date)})})});
+ out.sort(function(a,b){return (a.d?a.d.getTime():9e15)-(b.d?b.d.getTime():9e15)});
+ return out}
+function renderDuthu(){
+ var L=duthuList();
+ var late=L.filter(function(r){return r.st.k==="late"||r.st.k==="due"});
+ var soon=L.filter(function(r){return r.st.k==="today"||r.st.k==="soon"});
+ var far =L.filter(function(r){return r.st.k==="far"||r.st.k==="none"});
+ function sum(a){return a.reduce(function(t,r){return t+r.left},0)}
+ var h=statStrip([
+  ["ti-cash",vnd(sum(L)),"Tổng còn phải thu","#0D9488",L.length+" đợt của "+Object.keys(L.reduce(function(m,r){m[r.e.enrollment_id]=1;return m},{})).length+" đơn"],
+  ["ti-alert-triangle",vnd(sum(late)),"Đã quá hạn","#E24B4A",late.length+" đợt · trễ quá "+slaChip("installmentLate_days",5,"ngày")+" là báo đỏ"],
+  ["ti-clock",vnd(sum(soon)),"Đến hạn trong "+slaChip("installmentRemind_days",3,"ngày"),"#E08A1E",soon.length+" đợt"],
+  ["ti-calendar",vnd(sum(far)),"Hạn xa hơn","#3B82C4",far.length+" đợt"]]);
+ /* DÒNG TIỀN THEO THÁNG: câu hỏi thật của chủ trung tâm là "tháng sau về bao nhiêu" */
+ var byM={},mo=[];
+ L.forEach(function(r){var k=r.d?(r.d.getFullYear()+"-"+("0"+(r.d.getMonth()+1)).slice(-2)):"chua-hen";
+  if(!byM[k]){byM[k]={n:0,v:0};mo.push(k)}
+  byM[k].n++;byM[k].v+=r.left});
+ mo.sort();
+ h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-report-money" style="margin-right:6px"></i>Dự thu theo tháng</b><span class="mut" style="font-size:11.5px">theo hạn từng đợt - tiền chưa vào, không phải doanh thu đã ghi nhận</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Tháng đến hạn</th><th>Số đợt</th><th>Dự thu</th></tr></thead><tbody>';
+ if(!mo.length)h+='<tr><td class="empty" colspan="3">Không còn khoản nào phải thu - sạch nợ.</td></tr>';
+ mo.forEach(function(k){var v=byM[k];
+  h+='<tr><td><b>'+esc(k==="chua-hen"?"Chưa hẹn ngày":(k.split("-")[1]+"/"+k.split("-")[0]))+'</b></td><td>'+v.n+'</td><td style="font-variant-numeric:tabular-nums">'+vnd(v.v)+'</td></tr>'});
+ h+='</tbody></table></div></div>';
+ /* CHI TIẾT TỪNG ĐỢT - ai, đợt mấy, hạn nào, bao nhiêu, bấm thẳng vào thu tiền */
+ h+='<div class="panel"><div class="ph"><b>Từng đợt còn phải thu ('+L.length+')</b><div class="mini"><button class="pill" onclick="go(\'thanhtoan\')">Sang màn Thu học phí</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Hạn đóng</th><th>Học viên</th><th>Khóa</th><th>Đợt</th><th>Còn phải thu</th><th>Tình trạng</th><th></th></tr></thead><tbody>';
+ if(!L.length)h+='<tr><td class="empty" colspan="7">Không còn khoản nào phải thu.</td></tr>';
+ L.slice(0,120).forEach(function(r){
+  h+='<tr><td>'+esc(String(r.x.due_date||"").slice(0,10)||"-")+'</td>'+
+   '<td>'+nguoiLnk(r.e.student_id,r.e.student_id_name,"-")+'</td>'+
+   '<td>'+esc(r.e.course_id_name||r.e.course_id||"-")+'</td>'+
+   '<td>đợt '+esc(r.x.installment_no||"?")+'</td>'+
+   '<td style="font-variant-numeric:tabular-nums"><b>'+vnd(r.left)+'</b></td>'+
+   '<td><span class="chip '+(r.st.cls||"gray")+'">'+esc(r.st.lbl)+'</span></td>'+
+   '<td><button class="btn sm primary" onclick="payForm(\''+esc(r.e.enrollment_id)+'\')"><i class="ti ti-cash"></i>Thu tiền</button></td></tr>'});
+ if(L.length>120)h+='<tr><td class="empty" colspan="7">... còn '+(L.length-120)+' đợt nữa.</td></tr>';
+ return h+'</tbody></table></div></div>'}
+function renderSothu(){var tab=window.STTAB||"da";
+ var nDu=duthuList().length;
+ var h=pageHead("Sổ thu học phí","Tiền ĐÃ VÀO (sổ thu DL07) và tiền CÒN PHẢI THU (lịch đợt DL06b) - hai mặt của cùng một cuốn sổ.","");
+ h+=tbar(segHTML(tab,[["da","Đã thu",rows("DL07").length],["du","Dự thu",nDu]],"sothuTab('{k}')"),"");
+ h+=(tab==="du")?renderDuthu():renderList("dsthanhtoan",1);
+ return h}
+var RENDER={giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu};
 function dashJump(key){var m={urgent:"viec",newlead:"nhaplead",consider:"viec",convert:"tuvan",risk:"viec",onboard:"xeplop",approve:"duyet",debt:"thanhtoan",complaint:"khieunai",ungraded:"baitap",testpend:"test",wowbook:"wow",unverified:"thanhtoan",classes:"banglop"};var pg=m[key];if(pg&&RBK[CURROLE].pages.indexOf(pg)>=0)go(pg);else go("viec")}
 
 /* ---------- router ---------- */
@@ -10414,23 +10525,72 @@ function renderCrumb(){var host=document.getElementById("pgCrumb");if(!host)retu
  host.innerHTML=out+parts.join('<span class="crbsep">›</span>')}
 function navBack(){var h=window.NAVHIST;if(!h||!h.length)return;var last=h.pop();navApply(last.ctx);go(last.key,true)}
 function navJump(i){var h=window.NAVHIST;if(!h||i<0||i>=h.length)return;var target=h[i];h.length=i;navApply(target.ctx);go(target.key,true)}
+/* Bảng gộp trang: 4 trang tuyển sinh -> HUB Tuyển sinh đúng tab, 4 chặng -> trang Chặng...
+   Trước đây khai báo BÊN TRONG go() nên chỗ khác không biết "nhaplead" là một trang hợp lệ -
+   hashOK phải đọc được đúng bảng này, không được chép lại danh sách lần thứ hai. */
+var TSMAP={nhaplead:"lead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"};
+var ARCMAP={changA:1,changB:1,changC:1,changD:1};
+var CSMAP={review:"khaosat",khaosat:"khaosat",ghinhan:"phanhoi",khieunai:"khieunai"};
+var HTMAP={lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan"};
+var KMAP={baoluu:"baoluu",magioithieu:"magioithieu",banggiao:"banggiao"};
+function goAlias(k){return !!(TSMAP[k]||ARCMAP[k]||CSMAP[k]||HTMAP[k]||KMAP[k]||k==="hanhtrinh")}
+/* ===== V9.29c (anh Luân): MỖI TRANG MỘT ĐỊA CHỈ - F5 KHÔNG MẤT CHỖ ĐANG ĐỨNG =====
+   "mỗi lần anh refresh là mất tiêu nơi anh đang đứng". App là một trang duy nhất nên trước đây
+   nạp lại là quay về Trang bắt đầu. Nay go() ghi #/<khóa trang> vào thanh địa chỉ và lúc vào app
+   thì đọc lại - copy link gửi cho người khác cũng mở đúng trang đó.
+   Dùng replaceState chứ KHÔNG push: app đã có vệt breadcrumb + nút Quay lại riêng, đẻ thêm mốc
+   lịch sử trình duyệt thì nút Back của trình duyệt và nút Quay lại của app đá nhau. replaceState
+   cũng không bắn hashchange nên không có vòng lặp go -> hash -> go.
+   Ai là ai vẫn nằm ở sessionStorage (ITTS_WHO) - hash chỉ nói ĐANG Ở TRANG NÀO. */
+/* Địa chỉ viết bằng TIẾNG VIỆT KHÔNG DẤU lấy từ chính tên trang: "Trang bắt đầu" -> ?trang-bat-dau
+   (anh Luân chốt dạng .../cong-nhan-vien/?trang-bat-dau). Slug sinh từ PAGES nên thêm trang mới là
+   tự có địa chỉ, không phải nuôi thêm một bảng tên thứ hai để rồi hai bảng nói hai đằng.
+   Tên trang người dùng tự đổi (uiItemLabel) KHÔNG đụng tới slug - đổi tên menu mà gãy link đã gửi
+   đi thì còn tệ hơn. */
+function slugify(x){return vnorm(String(x||"")).replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"")}
+var __SLUG=null;
+function slugBuild(){if(__SLUG)return __SLUG;
+ var P={},S={};
+ function add(k,t){if(!k||P[k])return;var g=slugify(t)||k,b=g,i=2;
+  while(S[g]&&S[g]!==k){g=b+"-"+i;i++}          /* trùng slug thì thêm số - không đè link của nhau */
+  P[k]=g;S[g]=k}
+ try{PAGES.forEach(function(x){add(x.k,x.t)})}catch(e){}
+ try{for(var a in ARCBK)add(a,"Chang "+ARCBK[a].n+" "+ARCBK[a].t)}catch(e){}
+ __SLUG={p:P,s:S};return __SLUG}
+function pgSlug(k){return slugBuild().p[k]||k}
+function slugPg(g){if(!g)return "";var S=slugBuild();
+ if(S.s[g])return S.s[g];
+ return (PBK[g]||goAlias(g))?g:""}          /* gõ thẳng mã trang (?banlam) vẫn nhận */
+/* đọc địa chỉ: ưu tiên ?slug, còn nhận #/slug của bản trước cho link cũ khỏi chết */
+function hashKey(){
+ var q=String(location.search||"").replace(/^\?/,"").split("&")[0];
+ if(q&&q.indexOf("=")<0)return slugPg(decodeURIComponent(q));
+ var h=String(location.hash||"").replace(/^#\/?/,"").split(/[?&]/)[0];
+ return h?slugPg(decodeURIComponent(h)):""}
+function hashOK(k){return !!k&&(!!PBK[k]||goAlias(k))}
+function hashSet(k){if(SVR||!k)return;   /* bản chạy trên Apps Script không sở hữu thanh địa chỉ */
+ window.HASHCUR=k;var want="?"+pgSlug(k);
+ if(location.search===want)return;
+ /* replaceState chứ không push: app đã có breadcrumb + nút Quay lại riêng, đẻ thêm mốc lịch sử
+    thì Back của trình duyệt và Quay lại của app đá nhau. Mở bằng file:// thì replaceState đổi
+    query bị chặn -> lùi về #/slug. */
+ try{if(window.history&&history.replaceState){history.replaceState(null,"",location.pathname+want);return}}catch(e){}
+ try{location.hash="/"+pgSlug(k)}catch(e2){}}
+function hashApply(){var k=hashKey();
+ if(!k||k===window.HASHCUR)return;
+ if(!hashOK(k))return;
+ go(k)}
 function go(key,noHist){
  /* V9.27: nhớ lại mục menu đang sáng TRƯỚC khi rời đi. Trang nào không có mục riêng trên menu
     (vd "Chạy quy trình" mở ra từ Chăm lại / Reup) thì menu vẫn giữ mục cũ sáng mờ, để người dùng
     biết mình đang đứng ở nhánh nào - trước đây cả menu tối thui, không biết đang ở đâu. */
  try{if(navAnyCur())NAVFROM=navCurKey()}catch(e){}
  var key0=key;   /* key GỐC trước remap - dùng tìm nhóm menu */
- /* điều hướng tới 4 trang tuyển sinh -> mở HUB Tuyển sinh đúng tab (giữ luồng liền mạch) */
- var TSMAP={nhaplead:"lead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"};
  if(TSMAP[key]){window.TSTAB=TSMAP[key];key="tuyensinh"}
  if(key==="hanhtrinh"){window.BLVIEW="board";key="banlam"} /* V9.18: Hành trình đã gộp vào Trang bắt đầu (góc nhìn bảng chặng) */
- var ARCMAP={changA:1,changB:1,changC:1,changD:1};
  if(ARCMAP[key]){if(window.ARC!==key)window.CHANGK="";window.ARC=key;key="chang"}
- var CSMAP={review:"khaosat",khaosat:"khaosat",ghinhan:"phanhoi",khieunai:"khieunai"};
  if(CSMAP[key]){window.CSTAB=CSMAP[key];key="cskh"}
- var HTMAP={lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan"};
  if(HTMAP[key]){window.HTTAB=HTMAP[key];key="hoctap"}
- var KMAP={baoluu:"baoluu",magioithieu:"magioithieu",banggiao:"banggiao"};
  if(KMAP[key]){window.KTAB=KMAP[key];key="khac"}
  var p=PBK[key];if(!p)return;
  if(!canSee(key)&&SENSITIVE[key]){
@@ -10460,7 +10620,7 @@ function go(key,noHist){
  if(!canSee(key)&&!SENSITIVE[key]&&SCOPE().pages!=="*")el.innerHTML='<div class="notebar" style="margin-bottom:12px"><i class="ti ti-info-circle"></i>Trang ngoài phạm vi chức danh của bạn - đang xem ở chế độ THAM KHẢO.</div>'+el.innerHTML;
  window.CURCTX=navSnap();   /* ngữ cảnh của TRANG NÀY, chụp sau khi đã render (dùng khi rời trang) */
  renderCrumb();
- el.scrollTop=0;closeNav();closeBell();updateBellBadge();persistSoon()}
+ el.scrollTop=0;closeNav();closeBell();updateBellBadge();hashSet(key0);persistSoon()}
 /* ===== SIDEBAR: nhóm GẬP ĐƯỢC, tự mở nhóm chứa trang đang xem =====
    Giữ ĐỦ mọi trang (không rút gọn), chỉ gập nhóm không dùng tới cho đỡ phải cuộn. */
 function navBadge(k){
@@ -10505,6 +10665,12 @@ LISTCFG.dstest={code:"DL03",filt:"test_status",ro:1,sub:"Sổ test đầu vào (
 LISTCFG.dstuvan={code:"DL04",filt:"conversion_status",ro:1,sub:"Sổ tư vấn (DL04) - chỉ xem; tư vấn ở Tuyển sinh",
  cols:[["consultation_id","Mã"],["customer_name_display","Khách"],["consultation_time","Thời điểm"],["recommended_course","Khóa đề xuất"],["consultation_status","Trạng thái","chip"],["conversion_status","Kết quả","chip"]]};
 LISTCFG.dsdangky=mkRO(LISTCFG.tuvan,"Sổ đăng ký khóa (DL06) - chỉ xem; tạo/sửa ở Tuyển sinh");
+/* V9.29c (anh Luân): "còn thiếu 1 trang dự thu nhỉ - nằm trong sổ thu học phí cũng được".
+   Sổ thu chỉ ghi tiền ĐÃ VÀO, không ai trả lời được "tháng sau thu về bao nhiêu". Dự thu là tab
+   thứ hai của chính sổ đó: tiền CÒN PHẢI THU, xếp theo hạn từng đợt.
+   Nguồn số: DL06b (lịch đợt) qua insDueState - KHÔNG tự đặt lại mốc "sắp đến hạn / quá hạn",
+   dùng đúng ngưỡng installmentRemind_days / installmentLate_days của CH2 như chỗ nhắc đóng tiền,
+   nếu không thì sổ dự thu và cái chuông sẽ nói hai con số khác nhau. */
 LISTCFG.dsthanhtoan={code:"DL07",filt:"payment_method",ro:1,sub:"Sổ thu học phí (DL07) - chỉ xem; thu tiền ở Tuyển sinh > Thanh toán",
  cols:[["payment_time","Ngày thu"],["student_id_name","Học viên"],["amount","Số tiền","money"],["payment_method","Hình thức","enum"],["received_by","Người thu"],["verified_by","KT xác nhận"]]};
 LISTCFG.dsbuoihoc={code:"DL11",filt:"session_status",ro:1,sub:"Sổ buổi học (DL11) - chỉ xem; vận hành ở hub Học tập",
@@ -10692,6 +10858,13 @@ function deriveAll(){
  }catch(e){}
 }
 function enter(k){try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{autoReturnHandovers()}catch(e){}document.getElementById("login").style.display="none";document.getElementById("app").style.display="flex";setRole(k);
+ /* Vào app xong mới đọc địa chỉ: setRole đã dựng menu + đứng ở trang mặc định, giờ nếu trên thanh
+    địa chỉ có #/<trang> hợp lệ thì nhảy về đúng đó (F5 hoặc mở link người khác gửi). */
+ try{var hk=hashKey();if(hashOK(hk))go(hk)}catch(e){}
+ /* người dùng sửa tay thanh địa chỉ / bấm Back về hash cũ */
+ try{if(!window.__hashOn){window.__hashOn=1;
+  window.addEventListener("hashchange",function(){try{hashApply()}catch(e){}});
+  window.addEventListener("popstate",function(){try{hashApply()}catch(e){}})}}catch(e){}
  try{tourOfferOnce()}catch(e){}}
 
 /* ============ CỔNG HỌC VIÊN (file HTML riêng) ============
@@ -10743,7 +10916,26 @@ function hvSpy(){var box=document.getElementById("hvMain");if(!box)return;
  var best=null,bt=1e9;
  HVSEC.forEach(function(x){var el=document.getElementById(x[0]);if(!el)return;
   var d=Math.abs(el.offsetTop-box.scrollTop-20);if(d<bt){bt=d;best=x[0]}});
- if(best)hvMark(best)}
+ if(best){hvMark(best);hvHashSet(best)}}
+/* V9.29c: cổng học viên là MỘT trang dài, "trang" của nó là từng mục -> địa chỉ đi theo mục đang
+   đọc (.../cong-hoc-vien/?gop-y-cho-trung-tam). Cuộn tới đâu địa chỉ đổi tới đó nên copy link là
+   người kia mở đúng chỗ mình đang nói. Cùng một hàm slugify với cổng nhân viên. */
+var __HVSL=null;
+function hvSlugBuild(){if(__HVSL)return __HVSL;
+ var P={},S={};HVSEC.forEach(function(x){var g=slugify(x[1])||x[0];P[x[0]]=g;S[g]=x[0]});
+ __HVSL={p:P,s:S};return __HVSL}
+function hvSlug(id){return hvSlugBuild().p[id]||id}
+function hvSecOf(g){if(!g)return "";var S=hvSlugBuild();return S.s[g]||(S.p[g]?g:"")}
+function hvHashSet(id){if(SVR||!id)return;
+ window.HVHASH=id;var want="?"+hvSlug(id);
+ if(location.search===want)return;
+ try{if(window.history&&history.replaceState){history.replaceState(null,"",location.pathname+want);return}}catch(e){}
+ try{location.hash="/"+hvSlug(id)}catch(e2){}}
+function hvHashRead(){
+ var q=String(location.search||"").replace(/^\?/,"").split("&")[0];
+ if(q&&q.indexOf("=")<0)return hvSecOf(decodeURIComponent(q));
+ var h=String(location.hash||"").replace(/^#\/?/,"").split(/[?&]/)[0];
+ return h?hvSecOf(decodeURIComponent(h)):""}
 function hvRender(){
  var S=find("DL09","student_id",window.HVID)||rows("DL09")[0]||{};
  window.HVID=S.student_id;
@@ -10760,6 +10952,8 @@ function hvToggleSide(){var s=document.getElementById("hvSide");if(!s)return;
 function hvCloseSide(){var s=document.getElementById("hvSide");if(s)s.classList.remove("open");
  var m=document.getElementById("hvMask");if(m)m.classList.remove("on")}
 function bootHV(sid){window.HVPORTAL=1;try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}
+ /* đọc địa chỉ TRƯỚC khi vẽ: hvRender -> hvSpy sẽ ghi đè ?slug bằng mục đầu trang, đọc sau là mất */
+ var __want="";try{__want=hvHashRead()}catch(e){}
  var stu=rows("DL09");
  window.HVID=sid||(stu[0]||{}).student_id;
  /* V9.17: bỏ ô "Xem thử hồ sơ" ở sidebar - chọn học viên đã có màn cổng lo, đổi người = nút bên dưới */
@@ -10767,7 +10961,9 @@ function bootHV(sid){window.HVPORTAL=1;try{deriveAll()}catch(e){}try{cfEnsure()}
  var ap=document.getElementById("hvapp");if(ap)ap.style.display="";
  hvRender();
  var box=document.getElementById("hvMain");if(box)box.addEventListener("scroll",function(){
-  clearTimeout(window.__spy);window.__spy=setTimeout(hvSpy,60)})}
+  clearTimeout(window.__spy);window.__spy=setTimeout(hvSpy,60)});
+ /* F5 hay mở link người khác gửi: về đúng mục ghi trong địa chỉ, không phải cuộn lại từ đầu */
+ try{if(__want)setTimeout(function(){hvGo(__want)},80)}catch(e){}}
 function gateEnterHV(sid){ssSet("ITTS_WHO_HV",sid||"");bootHV(sid)}
 function gateSwitchHV(){ssSet("ITTS_WHO_HV",null);location.reload()}
 function hvRichTop(n){

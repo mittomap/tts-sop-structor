@@ -5,9 +5,15 @@ function El(id){return {id:id||"",innerHTML:"",textContent:"",value:(FIELDS[id]|
  querySelector(){return El()},querySelectorAll(){return []},getAttribute(){return ""},setAttribute(){},
  appendChild(){},remove(){},focus(){},addEventListener(){},getBoundingClientRect(){return{left:0,top:0,width:9,height:9,bottom:9,right:9}},files:[]}}
 global.document={getElementById:(id)=>ST[id]||(ST[id]=El(id)),querySelector:()=>El(),querySelectorAll:()=>[],createElement:()=>El(),body:El(),addEventListener(){}};
-global.window=global;global.location={hash:""};
+global.window=global;global.location={hash:"",search:"",pathname:"/cong-nhan-vien/"};
+global.history={replaceState:function(a,b,u){var i=String(u).indexOf("?");
+ location.search=i<0?"":String(u).slice(i);location.pathname=i<0?String(u):String(u).slice(0,i)}};
 var _LS={};global.localStorage={getItem:k=>_LS[k]===undefined?null:_LS[k],setItem(k,v){_LS[k]=String(v)},removeItem(k){delete _LS[k]}};global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
 var SRC0=require('fs').readFileSync('./_APP.js','utf8');
+/* Khung trang (navbar, #pgTitle) nam trong PHAN HTML chu khong nam trong <script> - kiem tra
+   markup phai doc file HTML that, doc _APP.js thi luat nao cung "fail" ma khong phai loi app. */
+var OUT=process.env.ITTS_OUT||'.';
+var HTML=require('fs').readFileSync(OUT+'/ITTs_WebApp_v5_demo.html','utf8');
 var SRC=SRC0.replace(/\/\*[\s\S]*?\*\//g,"");
 require('vm').runInThisContext(SRC0);
 setRole("all");
@@ -886,6 +892,93 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("man CH4 khong lo cho trong {1} ra nguoi dung o cot Khi nao hien",
    !/Khi nào hiện[\s\S]{0,4000}?\{1\}<\/td>/.test(pg));
  window.SETTAB="ch2";
+})();
+
+
+/* ---- 32. TEN NGUOI o MOI man tac vu deu mo duoc drawer xem nhanh (V9.29, anh Luan) ----
+   "o xep lop & onboarding, sao ko co drawer tom tat thong tin hoc vien em" - khong rieng trang do,
+   7 man deu in ten thanh CHU CHET. */
+(function(){
+ setRole("all");
+ t("co ham chung nguoiLnk", typeof nguoiLnk==="function");
+ t("nguoiLnk mo drawer xem nhanh", /openQuick/.test(nguoiLnk("HV001","A")));
+ t("nguoiLnk chan lan bam ra the dong", /stopPropagation/.test(nguoiLnk("HV001","A")));
+ t("khong co ma thi khong lam link chet", !/<a /.test(nguoiLnk("","","(chưa gắn HV)")));
+ t("nguoiLnk co chu thich cho biet bam ra gi", /data-tip="Xem nhanh hồ sơ/.test(nguoiLnk("HV001","A")));
+ /* BAT BIEN: trang nao co the ho so thi ten nguoi PHAI bam duoc */
+ var thieu=[];
+ /* the .obcard co the la the NGUOI (hoc vien/lead), the LOP hay the BUOI HOC - moi loai co drawer
+    xem nhanh rieng. Bat buoc: trang nao co the thi PHAI co it nhat mot duong dan xem nhanh, chu
+    khong bat moi trang phai co dung openQuick (trang Hoc tap la the buoi/lop, khong phai the nguoi). */
+ Object.keys(RENDER).forEach(function(k){var o="";try{o=RENDER[k]()}catch(e){return}
+  if(/class="obcard"/.test(o)&&!/open(Quick|LopQuick|NSQuick)\(/.test(o))thieu.push(k)});
+ t("moi trang co the ho so deu cho bam ten nguoi"+(thieu.length?(" - thieu: "+thieu.join(", ")):""), thieu.length===0);
+ /* rieng trang anh Luan chi ra */
+ var xl=RENDER["xeplop"]();
+ t("trang Xep lop & Onboarding: ten hoc vien bam duoc", /openQuick\(/.test(xl));
+ t("trang Xep lop & Onboarding: ten lop cung bam duoc", /openLopQuick\(/.test(xl));
+ /* cum nut demo tren thanh tieu de day sang phai cho do vuong */
+ t("cum Room demo / Chay huong dan / Reset demo canh phai", /id="demoBadgeWrap"[^>]*margin-left:auto/.test(HTML));
+ t("tieu de trang co the co lai khi ten dai", /id="pgTitle"/.test(HTML)&&/flex:1;min-width:0/.test(HTML));
+})();
+
+
+/* ---- 33. BAM TEN = XEM NHANH (khong nhay trang) + DIA CHI RIENG CHO TUNG TRANG ---- */
+(function(){
+ setRole("all");
+ /* (a) BAT BIEN: khong con TEN NGUOI nao la link nhay thang sang trang ho so.
+    Nut "Ho so" ro rang thi van duoc - do la nguoi dung CHU DONG doi xem day du. */
+ var xau=[];
+ Object.keys(RENDER).forEach(function(k){var o="";try{o=RENDER[k]()}catch(e){return}
+  if(/<a class="lnk"[^>]*openHoso\(/.test(o))xau.push(k)});
+ t("khong con ten nguoi nhay thang sang trang ho so"+(xau.length?(" - con: "+xau.join(", ")):""), xau.length===0);
+ t("drawer xem nhanh HV co loi ra ho so day du", (function(){var seen="";
+  var od=global.openDrawer;global.openDrawer=function(t2,h){seen=h};
+  try{openStuQuick(rows("DL09")[0].student_id)}catch(e){}
+  global.openDrawer=od;return /openHoso\(/.test(seen)&&/Hồ sơ đầy đủ/.test(seen)})());
+ t("co drawer xem nhanh nhan su + khoa hoc", typeof openNSQuick==="function"&&typeof openKhoaQuick==="function");
+ t("drawer nhan su co loi ra ho so day du", (function(){var seen="";
+  var od=global.openDrawer;global.openDrawer=function(t2,h){seen=h};
+  try{openNSQuick(rows("DL01")[0].staff_id)}catch(e){}
+  global.openDrawer=od;return /open(GV|NV)\(/.test(seen)&&/Hồ sơ đầy đủ/.test(seen)})());
+ t("drawer khoa hoc co loi ra ho so day du", (function(){var seen="";
+  var od=global.openDrawer;global.openDrawer=function(t2,h){seen=h};
+  try{openKhoaQuick(rows("DL05")[0].course_id)}catch(e){}
+  global.openDrawer=od;return /openKhoa\(/.test(seen)&&/Hồ sơ đầy đủ/.test(seen)})());
+ t("mot dinh nghia ai la giang vien", typeof isGVRole==="function");
+
+ /* (b) DIA CHI: moi trang mot slug tieng Viet khong dau, sinh tu chinh ten trang */
+ t("slug lay tu ten trang", pgSlug("banlam")==="trang-bat-dau");
+ t("slug khong dau, khong ky tu la", PAGES.every(function(x){return /^[a-z0-9-]+$/.test(pgSlug(x.k))}));
+ var dup={},trung=[];
+ PAGES.forEach(function(x){var g=pgSlug(x.k);if(dup[g])trung.push(g);dup[g]=x.k});
+ t("khong hai trang trung dia chi"+(trung.length?(" - trung: "+trung.join(", ")):""), trung.length===0);
+ t("doc nguoc slug ra dung trang", PAGES.every(function(x){return slugPg(pgSlug(x.k))===x.k}));
+ t("go thang ma trang cung nhan", slugPg("banlam")==="banlam");
+ t("dia chi la nhung trang khong co that thi bo qua", slugPg("khong-co-trang-nay")==="");
+ /* trang gop (nhaplead -> hub Tuyen sinh tab lead) van phai co dia chi rieng, khong thi F5 mat tab */
+ t("trang gop van co dia chi rieng", hashOK("nhaplead")&&hashOK("changA")&&hashOK("magioithieu"));
+ /* doc dia chi: ca ?slug lan #/slug (link ban cu) */
+ location.search="?trang-bat-dau";location.hash="";
+ t("doc duoc ?slug", hashKey()==="banlam");
+ location.search="";location.hash="#/trang-bat-dau";
+ t("doc duoc #/slug cua ban cu", hashKey()==="banlam");
+ location.search="?utm_source=fb";location.hash="";
+ t("tham so la khong bi nham la ten trang", hashKey()==="");
+ /* go() phai GHI dia chi - F5 moi ve dung cho */
+ location.search="";location.hash="";
+ go("giaoviec");
+ t("doi trang la doi dia chi", location.search==="?"+pgSlug("giaoviec"));
+ go("nhaplead");
+ t("trang gop ghi dia chi cua CHINH no, khong phai cua hub", location.search==="?"+pgSlug("nhaplead"));
+ location.search="";location.hash="";go("banlam");
+
+ /* (c) cong hoc vien: moi MUC mot dia chi */
+ t("cong hoc vien: muc cung co slug", hvSlug("s-gopy")===slugify("Góp ý cho trung tâm"));
+ var hdup={},htrung=[];
+ HVSEC.forEach(function(x){var g=hvSlug(x[0]);if(hdup[g])htrung.push(g);hdup[g]=x[0]});
+ t("cong hoc vien: khong hai muc trung dia chi", htrung.length===0);
+ t("cong hoc vien: doc nguoc ra dung muc", HVSEC.every(function(x){return hvSecOf(hvSlug(x[0]))===x[0]}));
 })();
 
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");

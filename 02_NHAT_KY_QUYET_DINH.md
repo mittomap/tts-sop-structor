@@ -149,15 +149,17 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.29** (28/07 - việc (A) dữ liệu demo XONG 218->0; (B) bộ máy lọc XONG phủ 16 trang; (C) xin nghỉ có phép XONG). CÒN (D) mảng 5 và (E) việc tồn đợt 2.
+> **Phiên bản: V9.29l** (28/07 - (A) dữ liệu demo XONG 218->0; (B) bộ máy lọc XONG phủ 16 trang;
+> (C) xin nghỉ có phép XONG; (D) mảng 5 gần xong - thêm bấm-tên-ra-drawer, địa chỉ riêng cho từng
+> trang, trang Dự thu). CÒN phần đuôi (D), (E) việc tồn đợt 2, (F) hội đồng audit, (G) trợ thủ thao tác.
 > **KHÔNG CÒN PHIÊN TỰ ĐỘNG.** Routine "Auto - Github ITTs-SOP-Demo" đã bị XOÁ theo lệnh anh Luân
 > (28/07 chiều). Lý do: phiên chạy lịch chỉ có quyền ĐỌC repo, `git push` trả 403 "Not authorized to
 > access repository mittomap/tts-sop-structor". Chúng nó làm xong việc rồi mới phát hiện không đẩy
 > được, công sức nằm chết trong container. Muốn bật lại thì phải cấp quyền GHI cho môi trường chạy
 > lịch trước, và giữ nguyên BƯỚC 0 "thử `git push --dry-run` trước khi làm bất cứ việc gì". MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG.
-> Bộ kiểm hiện tại: node --check 2 file · `_tall` 38 trang 0 lỗi (165 icon) · `_check11` 131 ·
-> `_check12` 37 · `_check13` 174 · `_check14` 102 · `_check15` 37 · **`_check16` 236** · `_checktour` ·
-> `check_logic.py` 132 luật (đúng 4 ca cố ý) · `check_data.py` DAT · **`_checkdata.js` 27 luật / 6283 lượt kiểm - 0 lệch · `_check17.js` 392 tiêu chí**.
+> Bộ kiểm hiện tại: node --check 2 file · `_tall` **36 trang** 0 lỗi (170 icon) · `_check11` **139** ·
+> `_check12` 37 · `_check13` 174 · `_check14` 102 · `_check15` 37 · **`_check16` 443** · `_checktour` ·
+> `check_logic.py` 132 luật (đúng 4 ca cố ý) · `check_data.py` DAT · **`_checkdata.js` 27 luật / 6274 lượt kiểm - 0 lệch · `_check17.js` 392 tiêu chí**.
 >
 > **VIỆC PHẢI LÀM TIẾP - THEO ĐÚNG THỨ TỰ NÀY (Luân chốt 28/07 khuya, rồi về nghỉ):**
 >
@@ -354,6 +356,49 @@
 > cột - hai chỗ mà hai cách thay thì sớm muộn cũng in ra hai con số khác nhau. `_check16` canh:
 > không câu nào còn cắm cứng đúng giá trị tham số của chính nó, và đổi ngưỡng thì CẢ HAI cột đổi theo.
 >
+> **· Bấm TÊN = xem nhanh, KHÔNG nhảy trang (anh Luân, V9.29l):** *"a đang ở trang vận hành lớp,
+> a bấm vào học viên, tự nhiên nảy trang khác, nó nhảm lắm. Hiện drawer trước, trong drawer muốn xem
+> nhiều hơn thì người ta bấm vào hồ sơ chi tiết"*. Luật này áp cho **cả 4 loại tên**, không chỉ học
+> viên - sửa mỗi học viên thì ba loại kia lại lệch nhịp: học viên/lead (`nguoiLnk` -> `openQuick`),
+> lớp (`lopLnk` -> `openLopQuick`), **nhân sự (`nsLnk` -> `openNSQuick` - MỚI)**, **khóa học
+> (`khoaLnk` -> `openKhoaQuick` - MỚI)**. Mỗi drawer đều có nút "Hồ sơ đầy đủ" đi tiếp.
+> Thêm `isGVRole()` làm **một định nghĩa duy nhất "ai là giảng viên"** (trước đó regex
+> `/teacher|giang/` chép ở 2 chỗ) để drawer biết mở `openGV` hay `openNV`.
+> **Bất biến mới:** không trang nào còn `<a class="lnk" onclick="openHoso(`. Nút "Hồ sơ" rõ ràng thì
+> vẫn giữ - đó là người dùng CHỦ ĐỘNG xin xem đầy đủ, khác hẳn với bấm nhầm vào cái tên.
+>
+> **· "Câu nhắn chuẩn SOP" là gọi sai (anh Luân, V9.29l):** khối SOP in *"Câu nhắn chuẩn SOP: HV đang
+> học đều và ổn định. Không cần làm gì thêm."* - nghe như câu để GỬI CHO KHÁCH, mà nhắn câu đó cho ai?
+> CH4 là câu **nhắc việc cho nhân viên**. Nay dùng đúng một chữ với màn Chạy quy trình:
+> *"Việc cần làm theo SOP · NA018"*.
+>
+> **· MỖI TRANG MỘT ĐỊA CHỈ (anh Luân, V9.29l):** *"Em tự sinh url cho mỗi trang được ko, mỗi lần anh
+> refresh là mất tiêu nơi anh đang đứng"* + mẫu `.../cong-nhan-vien/?trang-bat-dau`.
+> `go()` nay ghi `?<slug>` vào thanh địa chỉ, vào app thì đọc lại. **Slug sinh từ CHÍNH tên trang**
+> (`slugify(PAGES[].t)`): "Trang bắt đầu" -> `?trang-bat-dau` - thêm trang mới là tự có địa chỉ,
+> không phải nuôi một bảng tên thứ hai để rồi hai bảng nói hai đằng. Tên menu người dùng tự đổi
+> (`uiItemLabel`) KHÔNG đụng slug - đổi tên mà gãy link đã gửi đi thì còn tệ hơn.
+> **Bốn quyết định đáng ghi:** (1) `replaceState` chứ không `pushState` - app đã có breadcrumb + nút
+> Quay lại riêng, đẻ thêm mốc lịch sử thì Back của trình duyệt và Quay lại của app đá nhau; tiện thể
+> replaceState không bắn `hashchange` nên không có vòng lặp go -> hash -> go; (2) mở bằng `file://`
+> thì đổi query bị chặn -> tự lùi về `#/slug`, và bản Apps Script (`SVR`) không đụng thanh địa chỉ;
+> (3) `?utm_source=fb` (có dấu `=`) KHÔNG bị nhầm là tên trang; (4) **trang gộp giữ địa chỉ của chính
+> nó**: `?lead-khai-thac` mở hub Tuyển sinh đúng tab, chứ ghi `?tuyen-sinh` là F5 mất tab. Muốn vậy
+> phải **nhấc 5 bảng gộp (`TSMAP`/`ARCMAP`/`CSMAP`/`HTMAP`/`KMAP`) ra khỏi thân `go()`** - trước đó
+> khai bên trong nên chỗ khác không biết "nhaplead" là trang hợp lệ.
+> **Cổng học viên** là một trang dài nên "trang" của nó là từng MỤC: cuộn tới đâu địa chỉ đổi tới đó
+> (`.../cong-hoc-vien/?gop-y-cho-trung-tam`), F5 về đúng chỗ đang đọc. Bẫy đã cắn: `hvRender()` gọi
+> `hvSpy()` nên nó **ghi đè địa chỉ bằng mục đầu trang** - phải đọc địa chỉ TRƯỚC khi vẽ.
+>
+> **· Trang DỰ THU (anh Luân: *"còn thiếu 1 trang dự thu nhỉ - nằm trong sổ thu học phí cũng được"*):**
+> Sổ thu chỉ ghi tiền ĐÃ VÀO, không ai trả lời được "tháng sau thu về bao nhiêu". `dsthanhtoan` từ
+> trang danh sách thuần thành **hub 2 tab**: *Đã thu* (vẫn là chính `LISTCFG.dsthanhtoan` nhúng vào,
+> không chép tay bảng thứ hai) + *Dự thu* (tổng còn phải thu · quá hạn · đến hạn trong N ngày · dòng
+> tiền theo tháng · từng đợt, bấm thẳng ra `payForm`). Nguồn số là DL06b qua **`insDueState`** -
+> KHÔNG tự đặt lại mốc "sắp đến hạn / quá hạn", nếu không sổ dự thu và cái chuông sẽ nói hai con số
+> khác nhau. `_check11` canh **tổng dự thu = tổng còn nợ của các đợt** và canh trang này dùng ngưỡng
+> CH2 chứ không cắm cứng.
+>
 > **CÒN LẠI:** dời `DUEFALL=5` + 16 nhóm câu chăm RTOUCH + giờ hẹn preset vào cấu hình ·
 > màn cấp thêm quota WOW · `statStrip` bấm được ở các trang còn lại · bộ phận chuẩn cho
 > `renderDuyet`/`renderGiaoan`/`renderMaGioiThieu`/`renderReupTab`/`renderBanggiao`.
@@ -379,6 +424,14 @@
 > một bất biến kiểm được bằng máy, không dừng ở nhận xét.
 >
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
+>
+> **(G) TRỢ THỦ THAO TÁC - anh Luân đặt 28/07, LÀM SAU ĐỢT AUDIT (F):** *"a muốn nghiên cứu trợ thủ
+> thao tác, nó tương tự với hướng dẫn tooltip, nhưng nó thực chiến, nó cầm tay chỉ việc cho 1 vị trí
+> nào đó, nếu họ đã quen thì trên navbar họ tắt Trợ thủ là xong"*. Khác tour hiện có ở chỗ: tour là
+> **đi một vòng cho biết**, trợ thủ là **đứng cạnh trong lúc làm việc thật** - theo CHỨC DANH, gợi
+> đúng việc kế tiếp của người đó ngay tại chỗ họ đang đứng. Có công tắc bật/tắt trên navbar, nhớ theo
+> từng người. Ghi chú kỹ thuật: đã có sẵn `tourSel("@key")` (neo theo mã, không theo CSS selector) và
+> `jTasks`/`slaItems` biết "việc kế tiếp là gì" - trợ thủ nên ĐỌC hai chỗ đó chứ không tự khai lần hai.
 >
 > **HOÃN theo lệnh Luân:** viết lại toàn bộ nội dung hướng dẫn (tour) - chỉ làm SAU KHI hệ thống hoàn
 > chỉnh. Cơ chế neo `tourSel("@key")` + bộ kiểm đã có sẵn; 64 bước hiện vẫn dùng CSS selector.
