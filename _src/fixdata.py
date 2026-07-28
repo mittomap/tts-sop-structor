@@ -1416,6 +1416,16 @@ log.append("14octies. Đụng giờ: đổi người dạy cho %d/%d buổi bị
            "(giữ lại %d ca cố ý để màn Phòng & đụng lịch có gì mà xem)"
            % (_fixgv, len(_clash), min(_KEEP, len(_clash))))
 
+# ═══ 14nonies. GHI MỐC NGÀY SINH DỮ LIỆU (V9.30 - anh Luân) ═════════════════
+# "để demo lúc nào cũng ổn, nút reset demo thêm chức năng điều chỉnh thời gian".
+# Dữ liệu demo neo theo NGÀY CHẠY pipeline. Mở lại sau 3 tháng là mọi thứ thành "quá hạn 90 ngày",
+# lịch tuần trống trơn, "hôm nay" không có buổi nào - demo chết dù code không sai gì.
+# Ghi mốc này để app biết dữ liệu sinh ngày nào mà tự dịch về hiện tại.
+d["meta"] = d.get("meta") or {}
+d["meta"]["anchor"] = fmt(NOW)
+d["meta"]["anchor_note"] = ("Ngày sinh dữ liệu demo. App dịch toàn bộ mốc thời gian theo BỘI SỐ 7 "
+                            "NGÀY để giữ nguyên thứ trong tuần của lịch lớp.")
+
 # ═══ 15. SAN PHẲNG SƠ ĐỒ CỘT (UNION KEY) - PHẢI LÀ PASS CUỐI CÙNG ═════════
 # Cột chỉ có mặt ở vài dòng (referrer_name, referral_uses, net_received...) làm app render
 # ô trống và bản Sheets lệch cột. LUẬT: mọi dòng trong cùng một bảng phải CÙNG BỘ CỘT.

@@ -321,4 +321,63 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
   t("nhịp ngày KHÔNG lặp ở mọi trang", !/class="nhip"/.test(b))})();
 })();
 
+
+/* ---------- 16. DỊCH MỐC THỜI GIAN CỦA DỮ LIỆU DEMO (anh Luân đặt) ---------- */
+(function(){
+ t("có bộ dịch thời gian", typeof tshApply==="function"&&typeof tshAuto==="function"&&typeof tshNow==="function");
+ t("dữ liệu có ghi ngày sinh", !!(DATA.meta&&DATA.meta.anchor)&&!!tshAnchor());
+ t("ngưỡng tự kéo lấy từ cấu hình", cfHasRow("demoAutoShift_days"));
+ /* DỊCH THEO BỘI SỐ 7 - giữ nguyên thứ trong tuần, nếu không lớp khai "T2-T4-T6" mà buổi rơi T3 */
+ t("luôn dịch theo bội số 7 ngày", tshDays()%7===0);
+ (function(){var a=DATA.meta.anchor;
+  DATA.meta.anchor="01/01/2020 08:00";
+  var d=tshDays();
+  t("dữ liệu cũ vài năm vẫn ra bội số 7", d%7===0&&d>0);
+  DATA.meta.anchor=a})();
+ /* KHÔNG được đụng vào ngày tháng nằm trong CÂU GHI CHÚ - đó là vết lịch sử của người dùng */
+ t("không dịch ngày nằm lẫn trong câu", tshOne("Đổi GV: A -> B (Admin, 12/07/2026 09:00)",7)===null);
+ t("có dịch ô toàn bộ là một mốc", tshOne("12/07/2026 09:00",7)==="19/07/2026 09:00");
+ t("giữ nguyên dạng chỉ-có-ngày", tshOne("12/07/2026",7)==="19/07/2026");
+ t("bỏ qua ô không phải ngày", tshOne("Phòng 202 - Cơ sở 1",7)===null&&tshOne("",7)===null);
+ /* ĐI RỒI VỀ phải khớp y nguyên - và mốc neo phải dời theo, không thì lần sau dịch chồng lên */
+ (function(){
+  function snap(){return rows("DL11").map(function(x){return x.session_date}).join("|")}
+  var a0=DATA.meta.anchor,s0=snap();
+  var notes=rows("DL11").filter(function(x){return /\d{2}\/\d{2}\/\d{4}/.test(String(x.notes||""))})[0];
+  var n0=notes?String(notes.notes):"";
+  tshApply(-91);
+  t("dịch lùi thì mốc neo dời theo", DATA.meta.anchor!==a0);
+  t("dịch lùi thì dữ liệu đổi thật", snap()!==s0);
+  t("ghi chú KHÔNG bị dịch", !notes||String(notes.notes)===n0);
+  var d=tshDays();
+  t("app nhận ra dữ liệu đã cũ 91 ngày", d===91);
+  tshApply(d);
+  t("đi rồi về khớp y nguyên", snap()===s0);
+  t("mốc neo cũng về chỗ cũ", DATA.meta.anchor===a0)})();
+ /* THỨ TRONG TUẦN phải giữ nguyên sau khi dịch - kiểm trên lớp có khai lịch theo thứ */
+ (function(){
+  var c=rows("DL10").filter(function(x){return /T[2-7]|CN/.test(String(x.class_schedule||""))})[0];
+  if(!c){t("có lớp khai lịch theo thứ để kiểm", false);return}
+  function dows(){return rows("DL11").filter(function(x){return x.class_id===c.class_id})
+   .map(function(x){var d=pvnd(x.session_date);return d?d.getDay():-1}).join(",")}
+  var before=dows();
+  tshApply(35);var after=dows();tshApply(-35);
+  t("dịch xong thứ trong tuần không đổi", before===after)})();
+ /* KHÔNG tự đụng vào dữ liệu THẬT khi chạy trên Google Sheets */
+ (function(){var was=global.SVR;global.SVR=true;
+  var r=tshAuto();global.SVR=was;
+  t("bản chạy trên Sheets không tự dịch dữ liệu thật", r===0)})();
+ /* Reset demo phải NÓI RÕ nó sẽ kéo bao nhiêu ngày, không lặng lẽ đổi dữ liệu sau lưng */
+ t("Reset demo nói rõ sẽ kéo thời gian", /KÉO dữ liệu/.test(SRC0));
+ /* HAI CỔNG PHẢI KÉO GIỐNG NHAU - bỏ sót một cổng thì mở cạnh nhau hiện hai bộ ngày khác nhau */
+ (function(){var HV=fs.readFileSync('./_HV.js','utf8');
+  t("cổng học viên cũng tự kéo thời gian", /tshAuto\(\)/.test(HV));
+  t("hai cổng dùng chung một bộ dịch (không có bản sao)",
+    (HV.match(/function\s+tshApply\s*\(/g)||[]).length<=1)})();
+ /* tab Dữ liệu demo phải có nút kéo tay + bảng thông tin */
+ (function(){window.SETTAB="demo";var o=RENDER.settings();window.SETTAB="ch2";
+  t("tab Dữ liệu demo có nút kéo về hôm nay", /tshNow\(\)/.test(o));
+  t("tab Dữ liệu demo nói rõ dữ liệu sinh ngày nào", /Dữ liệu sinh ngày/.test(o))})();
+})();
+
 console.log(bad.length?("CHECK18 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK18 OK: "+ok+" tieu chi | da ve "+VIEWS.length+" trang/tab");

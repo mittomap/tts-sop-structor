@@ -1298,6 +1298,86 @@ function demoLoad(){if(!CANLS||SVR)return false;
   if(st.sig!==SEED_SIG)return false; /* bộ dữ liệu khác: đứng ngoài, KHÔNG phá state của các cửa sổ đang demo */
   DATA.dl=st.dl;DL=DATA.dl;if(st.config)DATA.config=st.config;if(st.enums){DATA.enums=st.enums;ENUM=DATA.enums}
   return true}catch(e){return false}}
+/* ═══════ V9.30 - DỊCH MỐC THỜI GIAN CỦA DỮ LIỆU DEMO (anh Luân đặt) ═══════
+   "để demo lúc nào cũng ổn, nút reset demo thêm chức năng điều chỉnh thời gian hay gì đó để lúc
+    nào nó cũng hợp lý."
+
+   VẤN ĐỀ THẬT: dữ liệu demo neo theo NGÀY CHẠY pipeline. Mở lại sau 3 tháng thì mọi việc thành
+   "quá hạn 90 ngày", lịch tuần trống trơn, "hôm nay" không có buổi nào - demo chết dù code không
+   sai một dòng. Người xem demo sẽ nghĩ app hỏng.
+
+   CÁCH LÀM: dịch TOÀN BỘ mốc thời gian đi một khoảng, để ngày sinh dữ liệu trùng với hôm nay.
+
+   BA QUYẾT ĐỊNH QUAN TRỌNG:
+   1. DỊCH THEO BỘI SỐ 7 NGÀY. Lớp khai lịch "T2-T4-T6 18:00"; dịch 37 ngày là buổi học rơi vào
+      thứ Ba trong khi lịch lớp vẫn ghi T2 - sai ngay chỗ dễ thấy nhất. Bội số 7 giữ nguyên thứ
+      trong tuần, đổi lại là dữ liệu chỉ về gần hôm nay trong khoảng ±3 ngày (đủ tốt).
+   2. CHỈ DỊCH Ô NÀO TOÀN BỘ LÀ MỘT MỐC THỜI GIAN. Ngày tháng nằm lẫn trong câu ghi chú
+      ("Đổi GV: A -> B (Admin, 12/07/2026 09:00)") là VẾT LỊCH SỬ - dịch nó đi là sửa lời khai
+      của người khác. Chỉ đụng vào ô nào khớp trọn vẹn mẫu ngày/giờ.
+   3. DỊCH XONG THÌ DỜI LUÔN MỐC NEO. Nếu không, mỗi lần mở lại nó dịch thêm một lần nữa và dữ
+      liệu bay về tương lai. */
+function tshAnchor(){var m=(DATA.meta&&DATA.meta.anchor)||"";return pvnd(m)}
+function tshDays(){var a=tshAnchor();if(!a)return 0;
+ var t=new Date();t.setHours(0,0,0,0);var a0=new Date(a.getFullYear(),a.getMonth(),a.getDate());
+ var d=Math.round((t.getTime()-a0.getTime())/864e5);
+ return Math.round(d/7)*7}                       /* bội số 7 - giữ nguyên thứ trong tuần */
+var TSHRE=/^\s*(\d{1,2})\/(\d{1,2})\/(\d{4})(\s+(\d{1,2}):(\d{2})(:\d{2})?)?\s*$/;
+function tshOne(v,days){
+ var m=String(v==null?"":v).match(TSHRE);if(!m)return null;
+ var d=new Date(+m[3],+m[2]-1,+m[1],m[5]?+m[5]:0,m[6]?+m[6]:0);
+ if(isNaN(d.getTime()))return null;
+ d=new Date(d.getTime()+days*864e5);
+ function p(n){return n<10?"0"+n:n}
+ var out=p(d.getDate())+"/"+p(d.getMonth()+1)+"/"+d.getFullYear();
+ if(m[4])out+=" "+p(d.getHours())+":"+p(d.getMinutes());
+ return out}
+/* Đếm thử trước khi làm - để nói với người dùng "sẽ dịch N mốc", không bắt họ tin suông. */
+function tshCount(days){var n=0;
+ for(var t in DL){var arr=DL[t];if(!arr||!arr.length)continue;
+  for(var i=0;i<arr.length;i++){var r=arr[i];
+   for(var k in r)if(tshOne(r[k],days)!==null)n++}}
+ return n}
+function tshApply(days){
+ if(!days)return 0;
+ var n=0;
+ for(var t in DL){var arr=DL[t];if(!arr||!arr.length)continue;
+  for(var i=0;i<arr.length;i++){var r=arr[i];
+   for(var k in r){var v=tshOne(r[k],days);if(v!==null){r[k]=v;n++}}}}
+ /* dời mốc neo theo, nếu không lần mở sau nó lại dịch thêm một lần nữa */
+ DATA.meta=DATA.meta||{};
+ var a=tshAnchor();
+ if(a){var b=new Date(a.getTime()+days*864e5);
+  function p(x){return x<10?"0"+x:x}
+  DATA.meta.anchor=p(b.getDate())+"/"+p(b.getMonth()+1)+"/"+b.getFullYear()+" "+p(b.getHours())+":"+p(b.getMinutes())}
+ return n}
+/* Tự dịch lúc khởi động khi dữ liệu đã quá cũ. Ngưỡng lấy từ cấu hình - trung tâm nào demo liên
+   tục thì để nhỏ, ai chỉ mở thỉnh thoảng thì để lớn. */
+function tshAuto(){
+ if(SVR)return 0;                       /* bản chạy trên Sheets là dữ liệu THẬT - không đụng vào */
+ var lim=num(paramOf("demoAutoShift_days",14))||14;
+ var d=tshDays();
+ if(Math.abs(d)<lim)return 0;
+ var n=tshApply(d);
+ if(n)setTimeout(function(){toast("Dữ liệu demo đã được kéo về hiện tại ("+(d>0?"+":"")+d+" ngày, "+n+" mốc thời gian) để lịch và hạn xử lý còn hợp lý.",6000)},900);
+ return n}
+/* Nút bấm tay: dịch về hôm nay ngay lập tức. */
+function tshNow(){
+ var d=tshDays();
+ if(!d){toast("Dữ liệu demo đang khớp với hiện tại - không cần dịch.",4000);return}
+ var n=tshApply(d);
+ toast("Đã kéo dữ liệu demo "+(d>0?"tới":"lùi")+" "+Math.abs(d)+" ngày ("+n+" mốc thời gian). Lịch, hạn và cảnh báo nay tính theo hôm nay.",6000);
+ try{deriveAll()}catch(e){}
+ persistSoon();reRender(CUR)}
+function tshInfoHTML(){
+ var a=tshAnchor(),d=tshDays();
+ if(!a)return '<div class="fhint">Bộ dữ liệu này chưa ghi ngày sinh - không tự dịch được. Chạy lại pipeline để có mốc.</div>';
+ var lech=Math.round((new Date()-a)/864e5);
+ return ctxRows([["Dữ liệu sinh ngày",String(DATA.meta.anchor).slice(0,10)],
+  ["So với hôm nay",(lech===0?"cùng ngày":(lech>0?("cũ hơn "+lech+" ngày"):("mới hơn "+Math.abs(lech)+" ngày")))],
+  ["Sẽ dịch",d?((d>0?"+":"")+d+" ngày (bội số 7 để giữ nguyên thứ trong tuần)"):"không cần dịch"],
+  ["Số mốc sẽ đổi",d?tshCount(d):0],
+  ["Tự dịch khi lệch quá",slaChip("demoAutoShift_days",14,"ngày")]])}
 function demoSave(){if(!CANLS||SVR)return;
  var cur=demoPack();
  if(__base===null){__base=cur;return}   /* lần đầu sau boot: chỉ ghi mốc so sánh */
@@ -1307,7 +1387,13 @@ function demoSave(){if(!CANLS||SVR)return;
  catch(e){if(!window.__swarn){window.__swarn=1;toastErr("KHÔNG lưu được thay đổi (trình duyệt chặn hoặc đầy bộ nhớ) - thao tác chỉ sống trong cửa sổ này.")}}}
 var __psT=null;function persistSoon(){if(SVR||!CANLS)return;clearTimeout(__psT);__psT=setTimeout(demoSave,350)}
 function demoDirty(){if(!CANLS)return null;try{var raw=localStorage.getItem(LSKEY);if(!raw)return null;var st=JSON.parse(raw);return st.t||1}catch(e){return null}}
-function demoReset(){confirmRun("Xóa MỌI thay đổi của buổi demo và quay về dữ liệu gốc? (mọi cổng đang mở cũng nạp lại)","demoResetRun")}
+/* V9.30 (anh Luân): Reset không chỉ là "xoá thay đổi" nữa - nó còn kéo dữ liệu về hiện tại, vì
+   dữ liệu gốc neo theo ngày sinh, reset về gốc mà không kéo là quay lại đúng cái demo đã cũ. */
+function demoReset(){
+ var d=tshDays();
+ confirmRun("Xóa MỌI thay đổi của buổi demo và quay về dữ liệu gốc?"+
+  (d?(" Đồng thời KÉO dữ liệu "+(d>0?"tới":"lùi")+" "+Math.abs(d)+" ngày để lịch và hạn xử lý hợp lý với hôm nay."):"")+
+  " (mọi cổng đang mở cũng nạp lại)","demoResetRun")}
 function demoResetRun(){if(CANLS)try{localStorage.removeItem(LSKEY)}catch(e){};
  if(ROOM.on){try{roomCast({t:"reset"})}catch(e){};setTimeout(function(){location.reload()},250);return}
  location.reload()}
@@ -6692,6 +6778,14 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
   h+='<div class="panel" style="max-width:640px"><div class="ph"><b><i class="ti ti-devices" style="margin-right:6px"></i>Room demo</b></div><div style="padding:14px 16px;font-size:12.5px;line-height:1.9">';
   h+='Các cửa sổ trên máy này và các MÁY KHÁC mở cùng bản demo tự đồng bộ với nhau. Dữ liệu hiện tại: '+(d?'<span class="chip amber">đang có thay đổi demo</span>':'<span class="chip green">nguyên bản</span>')+(CANLS?'':' · <span class="chip red">trình duyệt chặn lưu - dùng Chrome hoặc http.server</span>')+'</div>';
   h+='<div style="padding:0 16px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn danger" onclick="demoReset()"><i class="ti ti-refresh"></i>Reset demo (về nguyên bản)</button>'+roomBtnHTML()+'<button class="btn sm" onclick="demoPing()"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ</button></div></div>';
+  /* V9.30 (anh Luân): "để demo lúc nào cũng ổn... điều chỉnh thời gian để lúc nào nó cũng hợp lý" */
+  h+='<div class="panel" style="max-width:640px;margin-top:14px"><div class="ph"><b><i class="ti ti-calendar-event" style="margin-right:6px"></i>Mốc thời gian của dữ liệu demo</b></div><div class="pbody">';
+  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Dữ liệu demo neo theo <b>ngày sinh ra nó</b>. Để lâu không mở thì mọi việc thành "quá hạn 90 ngày" và lịch tuần trống trơn - app trông như hỏng dù không sai gì. Nút dưới kéo toàn bộ mốc thời gian về hiện tại.</div>';
+  h+=tshInfoHTML();
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn primary" onclick="tshNow()"><i class="ti ti-calendar-event"></i>Kéo dữ liệu về hôm nay</button>'+
+   '<button class="btn sm" onclick="window.SETTAB=\'ch2\';window.CFHL=\'demoAutoShift_days\';cfGo(\'demoAutoShift_days\')"><i class="ti ti-settings"></i>Đổi ngưỡng tự kéo</button></div>';
+  h+='<div class="mut" style="font-size:11.5px;margin-top:10px;line-height:1.7"><b>Dịch theo bội số 7 ngày</b> để giữ nguyên thứ trong tuần - lớp khai lịch "T2-T4-T6" thì buổi học vẫn phải rơi vào T2-T4-T6. Đổi lại, dữ liệu về gần hôm nay trong khoảng ±3 ngày.<br><b>Không đụng vào ngày tháng nằm trong câu ghi chú</b> - đó là vết lịch sử do người dùng ghi, dịch nó đi là sửa lời khai của người khác.</div>';
+  h+='</div></div>';
   return h;}
  if(tab==="khoa"){var cs=rows("DL05");
   h+='<div class="notebar"><i class="ti ti-info-circle"></i>Khóa học là <b>cấu hình sản phẩm</b> (học phí, số buổi, quota WOW…) - đặt trong Cài đặt. Lớp học mới là nơi vận hành hằng ngày.</div>';
@@ -7178,6 +7272,7 @@ function paramSheetName(name){var c=(DATA.config&&DATA.config.ch2)||[];
 var APPPARAMS=[
  /* V9.29o: một buổi chiếm chỗ của giáo viên bao lâu - dùng cho cảnh báo trùng giờ trên lịch tuần
     VÀ cho việc lọc người thay được. Trước đây con số 2 giờ nằm cắm cứng trong renderLichTuan. */
+ ["Dữ liệu demo","demoAutoShift_days","Dữ liệu demo cũ hơn hôm nay bao nhiêu ngày thì app tự kéo về hiện tại (0 = không tự kéo)","ngày",14],
  ["Xếp lịch & Giảng dạy","attendanceGrace_hours","Buổi dạy xong bao lâu thì BẮT BUỘC phải có điểm danh (trong khoảng này còn coi là hàng chờ)","giờ",24],
  ["Xếp lịch & Giảng dạy","homeworkDueFallback_days","Hạn nộp bài mặc định khi giáo án không ghi rõ (tính từ ngày học)","ngày",5],
  ["Tiền - Công giảng dạy","teacherPayPerSession","Tiền công một buổi dạy (dùng để tạm tính bảng công tháng)","đ/buổi",250000],
@@ -11942,7 +12037,11 @@ function demoGateHV(){var el=document.getElementById("login");if(!el){bootHV();r
  h+='<div style="text-align:center;margin-top:16px;border-top:1px solid var(--line);padding-top:12px">'+
   '<div style="font-size:11.5px;color:var(--muted)">Cổng NHÂN VIÊN nằm ở file <b>ITTs_WebApp_v5_demo.html</b> cùng thư mục.</div>'+gateStatusHTML()+'</div></div>';
  el.innerHTML=h;el.style.display="flex"}
-function demoBootHV(){window.HVPORTAL=1;try{deriveAll();autoReturnHandovers()}catch(e){}
+function demoBootHV(){window.HVPORTAL=1;
+ /* V9.30: cổng học viên PHẢI kéo thời gian y hệt cổng nhân viên. Bỏ sót ở đây thì hai cổng mở
+    cạnh nhau hiện hai bộ ngày khác nhau - lỗi khó tin nhất khi đang demo trước mặt khách. */
+ try{cfEnsure()}catch(e){}try{tshAuto()}catch(e){}
+ try{deriveAll();autoReturnHandovers()}catch(e){}
  if(__base===null)__base=demoPack();
  if(demoDirty())setTimeout(function(){toast("Đang dùng dữ liệu demo ĐÃ CHỈNH từ buổi trước - Reset ở màn cổng.",4200)},600);
  var who=ssGet("ITTS_WHO_HV");
@@ -12013,7 +12112,11 @@ function demoGate(){var el=document.getElementById("login");if(!el)return;
  el.innerHTML=h;el.style.display="flex"}
 function gateEnter(sid){window.__gateRole="";window.GATE_SID=sid||"";ssSet("ITTS_WHO",sid||"");applyScope(sid||"");enter("all")}
 function gateSwitch(){ssSet("ITTS_WHO",null);location.reload()}
-function demoBoot(){try{deriveAll();autoReturnHandovers()}catch(e){}
+function demoBoot(){
+ /* V9.30: kéo dữ liệu về hiện tại TRƯỚC khi tính cột dẫn xuất - deriveAll đọc ngày để suy trạng
+    thái, chạy sau khi dịch mới ra số đúng. */
+ try{cfEnsure()}catch(e){}try{tshAuto()}catch(e){}
+ try{deriveAll();autoReturnHandovers()}catch(e){}
  try{uiApply()}catch(e){}   /* V9.20: áp tên/logo/màu/tiêu đề tab do người dùng cấu hình */
  /* autoReturnHandovers chạy TRƯỚC khi chụp __base: lead tự quay về khi hết hạn bàn giao
     là việc của HỆ THỐNG theo thời gian, không được tính là "thay đổi demo" (chip cam oan). */

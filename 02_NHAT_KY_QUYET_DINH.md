@@ -728,6 +728,29 @@
 > khác; mỗi chức danh ra đúng nhóm nhịp; mọi nhịp trỏ tới trang có thật; và nhóm nào cũng phải có
 > ít nhất một hàng chờ đếm được - toàn thói quen thì nó chỉ là tờ giấy dán tường.
 >
+> **(N-thời gian) DỮ LIỆU DEMO TỰ KÉO VỀ HIỆN TẠI** (anh Luân: *"để demo lúc nào cũng ổn, nút reset
+> demo thêm chức năng điều chỉnh thời gian hay gì đó để lúc nào nó cũng hợp lý"*).
+> **Vấn đề thật:** dữ liệu demo neo theo NGÀY CHẠY pipeline. Mở lại sau 3 tháng thì mọi việc thành
+> "quá hạn 90 ngày", lịch tuần trống trơn, "hôm nay" không có buổi nào - **demo chết dù code không
+> sai một dòng**, và người xem sẽ nghĩ app hỏng. Đo thật: bỏ quên 3 tháng thì việc quá hạn nhảy từ
+> **92 → 257**, buổi học trong tuần từ **16 → 1**.
+> Nay `fixdata` ghi **ngày sinh dữ liệu** vào `meta.anchor`; app tự so với hôm nay và kéo toàn bộ
+> mốc thời gian về. Có nút **"Kéo dữ liệu về hôm nay"** trong Cài đặt > Dữ liệu demo, và **Reset demo
+> nói rõ nó sẽ kéo bao nhiêu ngày** chứ không lặng lẽ đổi dữ liệu sau lưng.
+> **Ba quyết định đáng ghi:**
+> · **Dịch theo BỘI SỐ 7 NGÀY.** Lớp khai lịch "T2-T4-T6 18:00"; dịch 37 ngày là buổi học rơi vào
+>   thứ Ba trong khi lịch lớp vẫn ghi T2 - sai ngay chỗ dễ thấy nhất. Bội số 7 giữ nguyên thứ trong
+>   tuần; đổi lại dữ liệu chỉ về gần hôm nay trong khoảng ±3 ngày (đủ tốt).
+> · **Chỉ dịch ô nào TOÀN BỘ là một mốc thời gian.** Ngày tháng nằm lẫn trong câu ghi chú
+>   (*"Đổi GV: A → B (Admin, 12/07/2026 09:00)"*) là **vết lịch sử** - dịch nó đi là sửa lời khai
+>   của người khác.
+> · **Dịch xong phải dời luôn mốc neo**, không thì mỗi lần mở lại nó dịch thêm một lần nữa và dữ
+>   liệu bay về tương lai.
+> Hai chỗ suýt sót: **cổng học viên** cũng phải kéo (bỏ sót thì hai cổng mở cạnh nhau hiện hai bộ
+> ngày khác nhau - lỗi khó tin nhất khi đang demo trước mặt khách), và **bản chạy trên Google Sheets
+> KHÔNG được tự dịch** vì đó là dữ liệu thật của trung tâm.
+> Bộ kiểm canh **đi rồi về phải khớp y nguyên**, thứ trong tuần không đổi, ghi chú không bị đụng.
+>
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
 >
 > **(G) TRỢ THỦ THAO TÁC - anh Luân đặt 28/07, LÀM SAU ĐỢT AUDIT (F):** *"a muốn nghiên cứu trợ thủ
