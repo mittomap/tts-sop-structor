@@ -1337,4 +1337,65 @@ function stripOf(o){var i=o.indexOf('<div class="bstats">');if(i<0)return "";
   window.STTAB="da"})();
 })();
 
+
+/* ---- 44. DOI GIAO VIEN CHINH CUA LOP (viec ton dot 2 - khoi giao vien/lop) ---- */
+(function(){
+ setRole("all");
+ t("co cua doi GV chinh cua lop", typeof clsSetTeacher==="function"&&typeof clsTeacherForm==="function");
+ /* o chon GV day bu phai di qua CUNG luat voi GV du phong, khong liet ke bua */
+ t("day bu chon GV qua gvBackup", /var _bk=gvBackup\(s\)/.test(SRC));
+ t("khong con liet ke bua moi giao vien cho day bu", !/\/teacher\|wow\/\.test\(ecode\(x\.role\)\)&&!\/inactive/.test(SRC));
+ /* cua ghi: chan sai co so, bat buoc ly do, ghi vet, va KHONG dung buoi da day */
+ (function(){
+  var c=rows("DL10").filter(function(x){return !clsOnline(x)&&String(x.branch||"").trim()&&
+    rows("DL11").some(function(s2){var d=pvnd(s2.session_date);
+     return s2.class_id===x.class_id&&!isc(s2.session_status,"cancelled","completed")&&d&&d.getTime()>=Date.now()})})[0];
+  t("tim duoc lop tai cho de thu", !!c);
+  if(!c)return;
+  var old=c.main_teacher_id,oldNotes=c.notes;
+  var probe=rows("DL11").filter(function(s2){var d=pvnd(s2.session_date);
+    return s2.class_id===c.class_id&&!isc(s2.session_status,"cancelled","completed")&&d&&d.getTime()>=Date.now()})[0];
+  var L=gvBackup(probe);
+  var bad=L.filter(function(r){return !r.okBr})[0];
+  reset();
+  if(bad){clsSetTeacher(c.class_id,bad.g.staff_id,"thu");
+   t("chan giao lop tai cho cho GV khong o co so do", c.main_teacher_id===old)}
+  else t("chan giao lop tai cho cho GV khong o co so do (khong co ca de thu)", true);
+  reset();
+  clsSetTeacher(c.class_id,(L.filter(function(r){return r.ok})[0]||{g:{}}).g.staff_id||"","");
+  t("khong ghi ly do thi khong doi", c.main_teacher_id===old);
+  var good=L.filter(function(r){return r.ok})[0];
+  if(good){
+   /* chup lai ten nguoi day cua cac buoi DA DAY XONG truoc khi doi */
+   var doneBefore=rows("DL11").filter(function(x){return x.class_id===c.class_id&&isc(x.session_status,"completed")})
+    .map(function(x){return x.session_id+"="+x.teacher_id});
+   reset();
+   clsSetTeacher(c.class_id,good.g.staff_id,"GV nghi viec");
+   t("doi duoc GV chinh", c.main_teacher_id===good.g.staff_id);
+   t("co ghi vet vao lop", /Đổi GV chính:/.test(String(c.notes||""))&&/GV nghi viec/.test(String(c.notes||"")));
+   var doneAfter=rows("DL11").filter(function(x){return x.class_id===c.class_id&&isc(x.session_status,"completed")})
+    .map(function(x){return x.session_id+"="+x.teacher_id});
+   t("buoi DA DAY XONG giu nguyen nguoi da day (lich su + can cu tinh cong)",
+     doneBefore.join("|")===doneAfter.join("|"));
+   var fut=rows("DL11").filter(function(x){var d=pvnd(x.session_date);
+     return x.class_id===c.class_id&&!isc(x.session_status,"cancelled","completed")&&d&&d.getTime()>=Date.now()});
+   t("buoi con lai chua day da doi sang GV moi (tru buoi trung gio)",
+     fut.every(function(x){return x.teacher_id===good.g.staff_id||gvBusyAt(good.g.staff_id,pvnd(x.session_date),x.session_id)}));
+  }
+  c.main_teacher_id=old;c.notes=oldNotes})();
+ /* lop dang mo chua co GV chinh phai co CHO XU LY, khong chi mot dong chu do */
+ (function(){window.HTTAB="phong";var o=RENDER.hoctap();
+  t("man Phong co danh sach lop chua co GV chinh", /chưa có giáo viên chính/.test(o));
+  var noGv=rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()});
+  t("co lop thieu GV thi giao ngay tai cho, khong co thi noi ro la khong con",
+    noGv.length? /clsTeacherForm\(/.test(o) : /nào cũng đã có giáo viên chính/.test(o));
+  window.HTTAB="today"})();
+ /* loi vao doi GV chinh phai co o CHO NGUOI TA DANG DUNG, khong chi o mot man rieng */
+ t("trang Van hanh lop doi duoc GV chinh", /clsTeacherForm\(/.test(RENDER.banglop()));
+ (function(){var seen="";var od=global.openDrawer;global.openDrawer=function(t2,h){seen=h};
+  try{openLopQuick(rows("DL10")[0].class_id)}catch(e){}
+  global.openDrawer=od;
+  t("drawer xem nhanh lop doi duoc GV chinh", /clsTeacherForm\(/.test(seen))})();
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");

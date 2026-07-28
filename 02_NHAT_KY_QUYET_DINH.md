@@ -604,6 +604,23 @@
 > thiếu tiền của giáo viên; đếm trùng là trả thừa. Bộ kiểm còn nhân đôi đơn giá để chứng minh tiền
 > thật sự đi theo cấu hình.
 >
+> **(10) ĐỔI GIÁO VIÊN CHÍNH CỦA LỚP** (việc tồn đợt 2 - khối giáo viên/lớp). Đã có cửa đổi GV cho
+> MỘT buổi (`sesSetTeacher`), nhưng khi một giáo viên nghỉ hẳn / chuyển cơ sở thì phải đổi **GV chính
+> của lớp và mọi buổi còn lại** - trước đây không có cửa nào, phải sửa tay từng buổi.
+> `clsSetTeacher()` vẫn đi qua đúng luật cơ sở/hình thức học của `gvBackup`. Ba quyết định:
+> · **buổi ĐÃ DẠY XONG giữ nguyên tên người đã dạy** - đó là lịch sử, và cũng là **căn cứ tính công**;
+>   ghi đè là bảng công tháng sai ngay (bộ kiểm chụp lại danh sách trước/sau để canh đúng chuyện này);
+> · buổi nào GV mới **bận trùng giờ** thì giữ nguyên và **nói rõ còn mấy buổi phải xử lý riêng** -
+>   im lặng bỏ qua là người dùng tưởng đã xong;
+> · bắt buộc ghi lý do - lớp đổi giáo viên là việc học viên sẽ hỏi.
+> Tiện thể vá một chỗ **âm thầm sai từ lâu**: ô chọn GV dạy bù (`bhMakeup`) liệt kê TẤT CẢ giáo viên,
+> không đếm xỉa tới cơ sở - xếp một GV Cơ sở 1 dạy bù cho lớp tại chỗ ở Cơ sở 4 mà app không nói gì.
+> Nay cũng đi qua `gvBackup`, người không hợp vẫn hiện nhưng **nói rõ vì sao** (quản lý có thể vẫn
+> muốn chọn, nhưng phải biết mình đang chọn gì).
+> Lối vào đặt ở **chỗ người ta đang đứng**: trang Vận hành lớp, drawer xem nhanh lớp, và màn Phòng &
+> đụng lịch (danh sách lớp đang mở chưa có GV chính - trước đây chỉ là một dòng chữ đỏ trên lịch tuần,
+> không có lối nào để xử lý ngay).
+>
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
 >
 > **(G) TRỢ THỦ THAO TÁC - anh Luân đặt 28/07, LÀM SAU ĐỢT AUDIT (F):** *"a muốn nghiên cứu trợ thủ

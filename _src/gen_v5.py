@@ -2403,6 +2403,7 @@ function openLopQuick(cid){var c=find("DL10","class_id",cid);if(!c){toast("Khôn
  if(al.length)h+='<div class="notebar" style="margin:8px 0">'+al.join(' &nbsp;·&nbsp; ')+'</div>';
  h+='<div class="dsec">Thao tác</div><div class="dact">';
  h+='<button class="btn primary" onclick="closeModal();openLop(\''+esc(cid)+'\')"><i class="ti ti-clipboard-list"></i>Mở vận hành lớp</button>';
+ h+='<button class="btn" onclick="closeModal();clsTeacherForm(\''+esc(cid)+'\')"><i class="ti ti-user-cog"></i>Đổi giáo viên chính</button>';
  if(risk.length)h+='<button class="btn" onclick="closeModal();goRisk()"><i class="ti ti-user-exclamation"></i>Xem HV nguy cơ</button>';
  h+='</div>';
  openDrawer(cid+" · "+(c.class_name||""),h)}
@@ -5551,7 +5552,8 @@ function classBar(cid){var c=find("DL10","class_id",cid);if(!c)return '';
    '<span class="chip '+stCls(c.class_status)+'">'+esc(elabel(c.class_status))+'</span></div>'+
   '<div class="cbgrid" style="--cbn:5">'+
    it("ti-school","Khóa",c.course_id_name||c.course_id)+
-   it("ti-chalkboard","Giảng viên","",(gv?nsLnk(c.main_teacher_id,gvName,""):esc(gvName)))+
+   it("ti-chalkboard","Giảng viên","",(gv?nsLnk(c.main_teacher_id,gvName,""):esc(gvName))+
+    ' <button class="cfedit" onclick="event.stopPropagation();clsTeacherForm(\''+esc(c.class_id)+'\')" aria-label="Đổi giáo viên chính" data-tip="Đổi giáo viên chính của lớp - gán luôn cho các buổi còn lại"><i class="ti ti-user-cog"></i></button>')+
    it("ti-calendar-check","Lịch học",c.class_schedule)+
    it("ti-home","Phòng / link",c.venue_or_zoom_link)+
    it("ti-building","Cơ sở",elabel(c.branch))+
@@ -10004,6 +10006,7 @@ function renderPhong(embed){
   ["ti-calendar-x",byT.lop,"Lớp trùng giờ với chính nó","#DB2777",byT.lop?"xếp lịch bị lặp":"không có"],
   ["ti-user-exclamation",byT.gv,"Giáo viên trùng giờ","#E08A1E",byT.gv?"cần đổi người hoặc đổi giờ":"không có"],
   ["ti-map-pin",nr.length,"Lớp tại chỗ chưa có phòng","#7C3AED",nr.length?"tới giờ mới đi tìm phòng":"đủ phòng"],
+  ["ti-user-exclamation",rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()}).length,"Lớp mở chưa có GV chính","#DB2777","giao lớp ngay"],
   ["ti-device-laptop",onl,"Lớp online","#0D9488","không ràng buộc phòng"]]);
  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b>Các điểm đụng ('+cl.length+')</b><span class="mut" style="font-size:11.5px">hai mục cách nhau dưới '+slaChip("sessionSpan_hours",2,"giờ")+' thì coi là đụng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Loại</th><th>Ngày giờ</th><th>Chi tiết</th><th>Cơ sở</th><th></th></tr></thead><tbody>';
  if(!cl.length)h+='<tr><td class="empty" colspan="5">Không có điểm đụng nào - lịch sạch.</td></tr>';
@@ -10015,6 +10018,17 @@ function renderPhong(embed){
    '<td>'+esc(clsOnline(ca)?"online":(elabel(ca.branch)||ca.branch||"-"))+'</td>'+
    '<td><button class="btn sm" onclick="goDD(\''+esc(x.a.class_id)+'\',\''+esc(x.a.session_id)+'\')"><i class="ti ti-arrow-right"></i>Mở buổi</button>'+
    (x.t==="gv"?' <button class="btn sm primary" onclick="gvBackupForm(\''+esc(x.b.session_id)+'\')"><i class="ti ti-user-plus"></i>Đổi GV</button>':'')+'</td></tr>'});
+ h+='</tbody></table></div></div>';
+ /* Lớp đang mở mà CHƯA CÓ GV CHÍNH: trước đây chỉ là một dòng chữ đỏ trên lịch tuần, không có
+    lối nào để xử lý ngay. Nay có danh sách + nút giao lớp. */
+ var noGv=rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()});
+ h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b>Lớp đang mở chưa có giáo viên chính ('+noGv.length+')</b><span class="mut" style="font-size:11.5px">giao lớp ngay tại đây</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Cơ sở</th><th>Hình thức</th><th>Lịch</th><th>Sĩ số</th><th></th></tr></thead><tbody>';
+ if(!noGv.length)h+='<tr><td class="empty" colspan="6">Lớp đang mở nào cũng đã có giáo viên chính.</td></tr>';
+ noGv.forEach(function(c){
+  h+='<tr><td>'+lopLnk(c.class_id,c.class_name,"")+'</td><td>'+esc(elabel(c.branch)||c.branch||"-")+'</td>'+
+   '<td>'+esc(elabel(c.learning_mode)||"-")+'</td><td>'+esc(c.class_schedule||"-")+'</td>'+
+   '<td>'+esc(num(c.current_enrollment))+'/'+esc(c.class_capacity||"?")+'</td>'+
+   '<td><button class="btn sm primary" onclick="clsTeacherForm(\''+esc(c.class_id)+'\')"><i class="ti ti-user-cog"></i>Giao lớp</button></td></tr>'});
  h+='</tbody></table></div></div>';
  h+='<div class="panel"><div class="ph"><b>Lớp học tại chỗ chưa ghi phòng ('+nr.length+')</b><span class="mut" style="font-size:11.5px">lớp online không cần phòng nên không nằm trong danh sách này</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Cơ sở</th><th>Hình thức</th><th>Lịch</th><th>Đang ghi gì</th></tr></thead><tbody>';
  if(!nr.length)h+='<tr><td class="empty" colspan="5">Lớp tại chỗ nào cũng đã có phòng.</td></tr>';
@@ -10121,13 +10135,72 @@ function bhNoteSave(id){var v=(fldV("bh_note")||"").trim();
  var late=(fldV("bh_late")||"").trim();
  markRow("DL11","session_id",id,{teacher_note_summary:v,has_teacher_note:"TRUE",teacher_note_completed_at:nowStr(),teacher_late_minutes:late,session_status:eFull("enum_session_status","completed")},"Đã lưu nhận xét buổi học.");
  closeModal()}
+/* ═══════ V9.29t - ĐỔI GIÁO VIÊN CHÍNH CỦA LỚP (việc tồn đợt 2 - khối giáo viên/lớp) ═══════
+   Đổi GV cho MỘT buổi đã có (sesSetTeacher). Nhưng khi một giáo viên nghỉ hẳn / chuyển cơ sở thì
+   phải đổi GV CHÍNH của lớp và của MỌI BUỔI CÒN LẠI - trước đây không có cửa nào, phải sửa tay
+   từng buổi trong danh sách. Vẫn qua đúng luật cơ sở/hình thức học của gvBackup. */
+function clsTeacherForm(cid){
+ var c=find("DL10","class_id",cid);if(!c){toast("Không thấy lớp");return}
+ var future=rows("DL11").filter(function(x){var d=pvnd(x.session_date);
+  return x.class_id===cid&&!isc(x.session_status,"cancelled","completed")&&d&&d.getTime()>=Date.now()});
+ /* xét trên MỘT buổi tương lai đại diện để biết ai hợp cơ sở; buổi nào cũng cùng lớp nên cùng cơ sở */
+ var probe=future[0]||{class_id:cid,session_date:c.class_start_date,teacher_id:c.main_teacher_id};
+ var L=gvBackup(probe);
+ var h='<div class="dcard"><h4><i class="ti ti-user-cog"></i>Đổi giáo viên chính - '+esc(c.class_name||cid)+'</h4>';
+ h+=ctxRows([["GV chính hiện tại",c.main_teacher_id_name||c.main_teacher_id||"chưa gán"],
+  ["Cơ sở",clsOnline(c)?"lớp online - không ràng buộc cơ sở":(elabel(c.branch)||c.branch||"-")],
+  ["Hình thức",elabel(c.learning_mode)||c.learning_mode],["Lịch",c.class_schedule],
+  ["Buổi còn lại chưa dạy",future.length]]);
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Đổi GV chính sẽ gán luôn cho <b>'+future.length+' buổi còn lại chưa dạy</b>. Buổi đã dạy xong giữ nguyên tên người đã dạy - đó là lịch sử, và cũng là căn cứ tính công.</div>';
+ h+='<div class="fld full"><label>Lý do đổi <i>*</i></label><input id="ct_why" placeholder="vd: GV nghỉ việc / chuyển cơ sở / đổi phân công"></div>';
+ h+='<div class="dsec">Người nhận lớp được ('+L.filter(function(r){return r.ok}).length+')</div><div class="pbody" style="padding:0">';
+ var okL=L.filter(function(r){return r.ok});
+ if(!okL.length)h+='<div class="empty">Không có ai vừa hợp cơ sở vừa trống lịch của lớp này.</div>';
+ okL.forEach(function(r){
+  h+='<div class="absrow"><div class="absi"><b>'+esc(r.g.full_name)+'</b><span>'+esc(r.why||"")+'</span></div>'+
+   '<div class="absa"><button class="btn sm primary" onclick="clsSetTeacher(\''+esc(cid)+'\',\''+esc(r.g.staff_id)+'\',(document.getElementById(\'ct_why\')||{}).value||\'\')"><i class="ti ti-check"></i>Giao lớp này</button></div></div>'});
+ h+='</div>';
+ var noL=L.filter(function(r){return !r.ok});
+ if(noL.length){h+='<div class="dsec">Không nhận được ('+noL.length+')</div><div class="pbody" style="padding:0">';
+  noL.forEach(function(r){h+='<div class="absrow" style="opacity:.7"><div class="absi"><b>'+esc(r.g.full_name)+'</b><span>'+esc(r.no)+'</span></div></div>'});
+  h+='</div>'}
+ openDrawer("Đổi giáo viên chính",h+'</div>')}
+function clsSetTeacher(cid,gvId,ly){
+ var c=find("DL10","class_id",cid);if(!c){toast("Không thấy lớp");return}
+ var g=find("DL01","staff_id",gvId);if(!g){toast("Không thấy giáo viên");return}
+ if(!actGuard("clsSetTeacher:"+cid))return;
+ var why=String(ly||"").trim();
+ if(!why){toast("Ghi lý do đổi - lớp đổi giáo viên là việc học viên sẽ hỏi.");return}
+ if(!clsOnline(c)&&c.branch&&!gvBranches(gvId)[c.branch]){
+  toast("Không giao được: "+g.full_name+" không có mặt ở "+(elabel(c.branch)||c.branch)+" (lớp học tại chỗ).");return}
+ var old=c.main_teacher_id_name||c.main_teacher_id||"chưa gán";
+ c.main_teacher_id=gvId;c.main_teacher_id_name=g.full_name;
+ c.notes=(c.notes?c.notes+" | ":"")+"Đổi GV chính: "+old+" -> "+g.full_name+" ("+myName()+", "+nowStr()+") - "+why;
+ /* mọi buổi CHƯA dạy đổi theo; buổi đã dạy giữ nguyên - đó là lịch sử và là căn cứ tính công */
+ var n=0,ke=0;
+ rows("DL11").forEach(function(x){
+  if(x.class_id!==cid||isc(x.session_status,"cancelled","completed"))return;
+  var d=pvnd(x.session_date);if(!d||d.getTime()<Date.now())return;
+  if(gvBusyAt(gvId,d,x.session_id)){ke++;return}      /* buổi nào GV mới bận thì để nguyên, báo rõ */
+  x.teacher_id=gvId;x.teacher_id_name=g.full_name;n++});
+ toast("Lớp "+(c.class_name||cid)+" nay do "+g.full_name+" phụ trách - đã gán "+n+" buổi còn lại"+
+  (ke?(", còn "+ke+" buổi bị trùng giờ nên giữ nguyên, xử lý riêng ở màn GV dự phòng"):"")+".",5200);
+ closeModal();reRender(CUR);persistSoon()}
 function bhMakeup(id){var s=find("DL11","session_id",id)||{};
- var gvs=rows("DL01").filter(function(x){return /teacher|wow/.test(ecode(x.role))&&!/inactive|nghỉ/i.test(String(x.status||""))});
+ /* V9.29t: ô chọn GV dạy bù trước đây liệt kê TẤT CẢ giáo viên, không đếm xỉa tới cơ sở của lớp -
+    xếp một GV Cơ sở 1 dạy bù cho lớp tại chỗ ở Cơ sở 4 mà app không nói gì. Nay đi qua CHÍNH
+    gvBackup như màn GV dự phòng: người hợp lệ đứng trước và có ghi lý do; người không hợp cơ sở
+    vẫn hiện nhưng nói rõ vì sao (có khi quản lý vẫn muốn chọn, nhưng phải biết mình đang chọn gì). */
+ var _bk=gvBackup(s);
+ var _cur=s.teacher_id?[{g:find("DL01","staff_id",s.teacher_id)||{staff_id:s.teacher_id,full_name:s.teacher_id_name||s.teacher_id},ok:true,why:"GV chính của lớp"}]:[];
+ var gvs=_cur.concat(_bk);
  var h='<div class="dcard"><h4><i class="ti ti-calendar-plus"></i>Xếp lịch dạy bù</h4>';
  h+=ctxRows([["Lớp",esc(s.class_id_name||s.class_id||"-")],["Buổi bị hủy",esc(s.session_number||"-")+" · "+esc(s.session_date||"-")]]);
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Buổi hủy GIỮ NGUYÊN trong lịch sử (để KPI đếm được số buổi hủy/bù) - lịch bù là MỘT BUỔI MỚI. Chọn GV khác nếu GV chính bận.</div>';
  h+='<div class="fld"><label>Ngày giờ dạy bù <i>*</i></label><input id="bh_md" type="datetime-local"></div>';
- h+='<div class="fld"><label>Giảng viên dạy buổi bù</label><select id="bh_gv">'+gvs.map(function(g){return '<option value="'+esc(g.staff_id)+'"'+(g.staff_id===s.teacher_id?" selected":"")+'>'+esc(g.staff_id+" - "+g.full_name)+(g.staff_id===s.teacher_id?" (GV chính)":"")+'</option>'}).join("")+'</select></div>';
+ h+='<div class="fld"><label>Giảng viên dạy buổi bù</label><select id="bh_gv">'+gvs.map(function(r){var g=r.g;
+  return '<option value="'+esc(g.staff_id)+'"'+(g.staff_id===s.teacher_id?" selected":"")+'>'+
+   esc(g.full_name||g.staff_id)+' · '+esc(r.ok?(r.why||"rảnh giờ này"):("KHÔNG hợp: "+(r.no||"")))+'</option>'}).join("")+'</select></div>';
  h+='<div class="fld full"><label>Ghi chú</label><textarea id="bh_mn" rows="2" placeholder="vd: dạy bù tại phòng 2, đã báo lớp"></textarea></div>';
  h+='<div class="dact"><button class="btn primary" onclick="bhMakeupSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Tạo buổi dạy bù</button></div></div>';
  openDrawer("Dạy bù",h)}

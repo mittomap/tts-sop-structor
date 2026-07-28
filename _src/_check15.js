@@ -44,10 +44,12 @@ var KHAI={
  /* V9.29p: wowGrantSave = cua ghi CAP THEM LUOT WOW. Ghi wow_extra_approved/purchased roi tinh
     lai wow_quota_remaining theo DUNG cong thuc cua deriveAll, kem ghi vet vao notes. */
  DL09:["blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave"],
- DL10:["xepMoiLuu","obChangeSave","clsSave","rfNeed"],
+ /* V9.29t: clsSetTeacher = cua ghi DOI GIAO VIEN CHINH cua lop. Ghi ca DL10 (GV chinh) lan DL11
+    (moi buoi CHUA day), chan sai co so, ghi vet vao notes cua lop. */
+ DL10:["xepMoiLuu","obChangeSave","clsSave","rfNeed","clsSetTeacher"],
  /* V9.29p: sesSetTeacher = cua ghi DOI GIAO VIEN cua mot buoi (GV du phong). Chan trung gio va
     chan sai co so voi lop hoc tai cho, ghi vet vao notes cua buoi. */
- DL11:["bhCancelRun","bhDone","bhMakeupSave","bhNoteSave","ddSave","sessEnd","sessStart","sesSetTeacher"],
+ DL11:["bhCancelRun","bhDone","bhMakeupSave","bhNoteSave","ddSave","sessEnd","sessStart","sesSetTeacher","clsSetTeacher"],
  /* V9.29: xin nghỉ có phép đi qua BA cửa lõi. hvAbsentSave (cổng học viên) nay chỉ GỌI absReq,
     không tự ghi DL12 nữa - giữ tên trong sổ để nếu ai đó lại cho nó ghi tay thì lộ ra ngay. */
  DL12:["ddSave","hvAbsentSave","absReq","absReview","absMakeup"],
