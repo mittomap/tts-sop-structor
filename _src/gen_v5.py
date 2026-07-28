@@ -7061,6 +7061,7 @@ var APPPARAMS=[
  /* V9.29o: một buổi chiếm chỗ của giáo viên bao lâu - dùng cho cảnh báo trùng giờ trên lịch tuần
     VÀ cho việc lọc người thay được. Trước đây con số 2 giờ nằm cắm cứng trong renderLichTuan. */
  ["Xếp lịch & Giảng dạy","homeworkDueFallback_days","Hạn nộp bài mặc định khi giáo án không ghi rõ (tính từ ngày học)","ngày",5],
+ ["Học tập - WOW","wowGrantMax_perTime","Mỗi lần cấp thêm tối đa bao nhiêu lượt WOW cho một học viên","lượt",3],
  ["Hẹn & Chăm sóc","apptSoon_hours","Nút hẹn nhanh \"N tiếng nữa\" - N là bao nhiêu","giờ",2],
  ["Hẹn & Chăm sóc","apptMorning_hour","Giờ hẹn buổi sáng dùng cho các nút gợi ý","giờ trong ngày",9],
  ["Hẹn & Chăm sóc","apptNoon_hour","Giờ hẹn đầu giờ chiều dùng cho các nút gợi ý","giờ trong ngày",14],
@@ -7916,10 +7917,69 @@ function payVerifyRun(id){var pays=rows("DL07").filter(function(x){return x.enro
   if(extra.trim())v.payment_note=(pp.payment_note?pp.payment_note+" | ":"")+extra.trim();
   markRow("DL07","payment_id",pp.payment_id,v,"Đã xác nhận "+cnt+" khoản thu.","thanhtoan")})}
 /* ===== P7 Buổi WOW 1-1 (DL14) ===== */
+/* ═══════ V9.29p - CẤP THÊM LƯỢT WOW (mảng 5, việc còn tồn từ đầu) ═══════
+   App CHẶN đặt buổi khi hết lượt và bảo "duyệt thêm lượt trước khi đặt", nhưng KHÔNG có màn nào
+   để duyệt - câu hướng dẫn trỏ vào hư không. Đây là màn đó.
+   Không đẻ bảng mới: DL09 đã có sẵn `wow_extra_approved` (trung tâm duyệt thêm, miễn phí) và
+   `wow_extra_purchased` (học viên mua thêm), và deriveAll đã tính
+   remaining = default + extra_approved + extra_purchased - used. Chỉ cần ghi đúng cột rồi tính lại.
+   Ai được cấp: quản trị / CEO / trưởng phòng học vụ + ACA. Người khác thấy nút nhưng bấm vào
+   được nói thẳng là không đủ thẩm quyền, chứ không giấu nút rồi để họ tưởng app thiếu tính năng. */
+function wowGrantCan(){var r=mapRoleCode(ecode((find("DL01","staff_id",CURSTAFF)||{}).role));
+ if(!CURSTAFF||CURSTAFF==="ADMIN")return true;
+ return /ceo|amanager/.test(r||"")}
+function wowQuotaOf(sid){var s=find("DL09","student_id",sid)||{};
+ var held=rows("DL14").filter(function(x){return String(x.student_id||"")===sid&&
+  isc(x.wow_status,"booked","confirmed")&&String(x.quota_deducted||"").toLowerCase()!=="yes"}).length;
+ return {s:s,def:num(s.wow_quota_default),appr:num(s.wow_extra_approved),buy:num(s.wow_extra_purchased),
+  used:num(s.wow_quota_used),rem:num(s.wow_quota_remaining),held:held,free:num(s.wow_quota_remaining)-held}}
+function wowGrantForm(psid){
+ var h='<div class="dcard"><h4><i class="ti ti-star"></i>Cấp thêm lượt WOW</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Lượt còn lại = quota của khóa + lượt duyệt thêm + lượt mua thêm − lượt đã dùng. Buổi đã đặt mà chưa dạy vẫn GIỮ CHỖ nên không tính là còn trống. Mỗi lần cấp tối đa '+slaChip("wowGrantMax_perTime",3,"lượt")+'.</div>';
+ h+='<div class="fld full"><label>Học viên <i>*</i></label><select id="wg_stu" onchange="wgInfo()"><option value="">-- chọn --</option>'+
+  rows("DL09").map(function(x){var q=wowQuotaOf(x.student_id);
+   return '<option value="'+esc(x.student_id)+'"'+(psid&&x.student_id===psid?" selected":"")+'>'+esc((x.full_name||x.student_id)+" · còn trống "+q.free+" lượt")+'</option>'}).join("")+'</select></div>';
+ h+='<div class="fld full" id="wg_info"></div>';
+ h+='<div class="fld"><label>Loại lượt cấp</label><select id="wg_kind"><option value="approved">Trung tâm duyệt thêm (miễn phí)</option><option value="purchased">Học viên mua thêm</option></select></div>';
+ h+='<div class="fld"><label>Số lượt <i>*</i></label><input id="wg_n" type="number" min="1" value="1"></div>';
+ h+='<div class="fld full"><label>Lý do <i>*</i></label><textarea id="wg_why" rows="2" placeholder="vd: Speaking 4.5 thấp hơn hẳn 3 kỹ năng còn lại, GV chủ nhiệm đề xuất kèm thêm 2 buổi"></textarea></div>';
+ h+='<div class="fld full"><button class="btn primary" onclick="wowGrantSave()"><i class="ti ti-check"></i>Cấp lượt</button></div></div>';
+ openDrawer("Cấp thêm lượt WOW",h);
+ setTimeout(wgInfo,30)}
+function wgInfo(){var box=document.getElementById("wg_info");if(!box)return;
+ var sid=fldV("wg_stu");if(!sid){box.innerHTML="";return}
+ var q=wowQuotaOf(sid);
+ box.innerHTML=ctxRows([["Quota khóa",q.def],["Đã duyệt thêm",q.appr],["Đã mua thêm",q.buy],
+  ["Đã dùng",q.used],["Còn lại trên sổ",q.rem],["Đang giữ chỗ (đã đặt chưa dạy)",q.held],
+  ["Thực sự còn trống",'<b style="color:'+(q.free>0?"var(--green)":"var(--red)")+'">'+q.free+'</b>']])+
+  wowGrantLog(q.s)}
+function wowGrantLog(s){
+ var lines=String((s&&s.notes)||"").split("|").map(function(x){return x.trim()}).filter(function(x){return /^WOW\+/.test(x)});
+ if(!lines.length)return '<div class="fhint">Chưa từng cấp thêm lượt nào.</div>';
+ return '<div class="fhint"><b>Đã cấp trước đây:</b><br>'+lines.map(esc).join("<br>")+'</div>'}
+function wowGrantSave(){
+ if(!wowGrantCan()){toast("Chức danh của bạn không được cấp thêm lượt WOW - nhờ trưởng phòng Học vụ / ACA.",5000);return}
+ var sid=fldV("wg_stu");if(!sid){toast("Chọn học viên.");return}
+ var n=num(fldV("wg_n"));if(n<=0){toast("Số lượt phải lớn hơn 0.");return}
+ var cap=num(paramOf("wowGrantMax_perTime",3))||3;
+ if(n>cap){toast("Mỗi lần cấp tối đa "+cap+" lượt (đổi ở cấu hình nếu cần).");return}
+ var why=(fldV("wg_why")||"").trim();
+ if(!why){toast("Ghi lý do - đây là lượt học miễn phí, phải có căn cứ.");return}
+ if(!actGuard("wowGrant:"+sid))return;
+ var s=find("DL09","student_id",sid);if(!s){toast("Không thấy học viên.");return}
+ var kind=fldV("wg_kind")==="purchased"?"purchased":"approved";
+ var col=kind==="purchased"?"wow_extra_purchased":"wow_extra_approved";
+ s[col]=String(num(s[col])+n);
+ /* tính lại theo ĐÚNG công thức của deriveAll - không tự cộng tay vào remaining */
+ s.wow_quota_remaining=String(Math.max(0,num(s.wow_quota_default)+num(s.wow_extra_approved)+num(s.wow_extra_purchased)-num(s.wow_quota_used)));
+ s.notes=(s.notes?s.notes+" | ":"")+"WOW+"+n+" ("+(kind==="purchased"?"HV mua thêm":"trung tâm duyệt")+") - "+myName()+" "+nowStr()+" - "+why;
+ if(SVR)google.script.run.apiUpdate("DL09",sid,{wow_extra_approved:s.wow_extra_approved,wow_extra_purchased:s.wow_extra_purchased,wow_quota_remaining:s.wow_quota_remaining,notes:s.notes});
+ toast("Đã cấp thêm "+n+" lượt WOW cho "+(s.full_name||sid)+" - còn "+s.wow_quota_remaining+" lượt.",4200);
+ closeModal();reRender(CUR);persistSoon()}
 function renderWow(embed){var p="wow",fil=fget(p);var all=rows("DL14");
  function st(w){var code=ecode(w.wow_status);var done=code==="completed";var confirmed=done||code==="confirmed";var booked=confirmed||code==="booked";var noshow=code==="no_show";var note=!!(w.wow_content_note&&String(w.wow_content_note).trim());var overdue=done&&!note&&hoursSince(w.wow_session_date)!=null&&hoursSince(w.wow_session_date)>paramOf("slaWowNote_hours",24);return {booked:booked,confirmed:confirmed,done:done,noshow:noshow,note:note,overdue:overdue}}
  var view=all.filter(function(w){var s=st(w);if(fil==="all")return true;if(fil==="confirm")return s.booked&&!s.confirmed&&!s.noshow;if(fil==="upcoming")return s.confirmed&&!s.done&&!s.noshow;if(fil==="note")return s.done&&!s.note;if(fil==="overdue")return s.overdue;return true});
- var h=embed?'':pageHead("Buổi WOW 1-1","Đặt buổi - xác nhận - dạy - ghi nội dung (trong 24h)",'<button class="btn primary" onclick="wowAdd()"><i class="ti ti-plus"></i>Đặt buổi WOW</button>');
+ var h=embed?'':pageHead("Buổi WOW 1-1","Đặt buổi - xác nhận - dạy - ghi nội dung (trong 24h)",'<button class="btn primary" onclick="wowAdd()"><i class="ti ti-plus"></i>Đặt buổi WOW</button><button class="btn" onclick="wowGrantForm()"><i class="ti ti-star"></i>Cấp thêm lượt WOW</button>');
  var _w=all.map(st);
  var _done=all.filter(function(w){return isc(w.wow_status,"completed")});
  var _imp=_done.filter(function(w){return isc(w.wow_outcome,"improved")}).length;
@@ -7929,7 +7989,8 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=rows("DL14");
   ["ti-star",_w.filter(function(x){return x.confirmed&&!x.done&&!x.noshow}).length,"Đã xác nhận, sắp dạy","#DB2777","chuẩn bị nội dung"],
   ["ti-thumb-up",_done.length,"Đã dạy xong","#0D9488",_imp+" tiến bộ"],
   ["ti-notes",_w.filter(function(x){return x.done&&!x.note}).length,"Chờ ghi nội dung","#E08A1E","SLA "+slaChip("slaWowNote_hours",24)],
-  ["ti-target",(_wor==null?"—":_wor+"%"),"Tỷ lệ tiến bộ (WOR)",(_wor!=null&&_wor>=Math.round(kpiTh(/^WOR/,0.6)*100))?"#16A34A":"#E24B4A","mục tiêu ≥ "+kpiChip(/^WOR/,0.6,1)]]);
+  ["ti-target",(_wor==null?"—":_wor+"%"),"Tỷ lệ tiến bộ (WOR)",(_wor!=null&&_wor>=Math.round(kpiTh(/^WOR/,0.6)*100))?"#16A34A":"#E24B4A","mục tiêu ≥ "+kpiChip(/^WOR/,0.6,1)],
+  ["ti-player-stop",rows("DL09").filter(function(x){return String(x.wow_quota_remaining||"")!==""&&wowQuotaOf(x.student_id).free<=0}).length,"HV đã hết lượt WOW","#6B7887","cấp thêm nếu có căn cứ"]]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả",all.length],["confirm","Chờ xác nhận lịch",_w.filter(function(x){return x.booked&&!x.confirmed&&!x.noshow}).length,"amber"],["upcoming","Đã xác nhận, sắp dạy",_w.filter(function(x){return x.confirmed&&!x.done&&!x.noshow}).length],["note","Chờ ghi nội dung",_w.filter(function(x){return x.done&&!x.note}).length,"amber"],["overdue","Quá hạn ghi chú",_w.filter(function(x){return x.overdue}).length,"red"]],view.length);
  h+='<div class="obcards rows">';if(!view.length)h+='<div class="empty">Không có buổi WOW phù hợp.</div>';
@@ -8044,7 +8105,7 @@ function wowAddSave(force){var sid=fldV("wa_stu");if(!sid){toast("Chọn học v
  var held=rows("DL14").filter(function(x){return String(x.student_id||"")===sid&&
   isc(x.wow_status,"booked","confirmed")&&String(x.quota_deducted||"").toLowerCase()!=="yes"}).length;
  if(s.wow_quota_remaining!==undefined&&String(s.wow_quota_remaining)!==""&&rem-held<=0){
-  toast("HV "+(s.full_name||sid)+" không còn lượt trống: còn "+rem+" lượt nhưng đang giữ "+held+" buổi chưa dạy. Duyệt thêm lượt trước khi đặt.",5200);return}
+  toast("HV "+(s.full_name||sid)+" không còn lượt trống: còn "+rem+" lượt nhưng đang giữ "+held+" buổi chưa dạy.",5200);closeModal();wowGrantForm(sid);return}
  var gvId=fldV("wa_staff");var gv=gvId?(find("DL01","staff_id",gvId)||{}):{};
  var wdRaw=(fldV("wa_date")||"").trim();var wd=wdRaw?fromISOdt(wdRaw):"";
  if(!force&&gvId&&wd){var cl=schedClash(gvId,pvnd(wd));

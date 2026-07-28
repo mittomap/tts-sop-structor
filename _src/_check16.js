@@ -1125,4 +1125,44 @@ function navIsArcGrpG(G){return navIsArcGrp(G.g)}
   t("tham so "+n+" co dong cau hinh that", (DATA.config.ch2||[]).some(function(x){return x.name===n}))});
 })();
 
+
+/* ---- 38. CAP THEM LUOT WOW (mang 5 - viec ton tu dau) ---- */
+(function(){
+ setRole("all");cfEnsure();
+ t("co man cap them luot WOW", typeof wowGrantForm==="function"&&typeof wowGrantSave==="function");
+ t("tran moi lan cap lay tu cau hinh", (DATA.config.ch2||[]).some(function(x){return x.name==="wowGrantMax_perTime"}));
+ /* KHONG de bang moi: dung dung 2 cot da co san cua DL09 */
+ t("dung cot co san wow_extra_approved / wow_extra_purchased",
+   /wow_extra_approved/.test(SRC)&&/wow_extra_purchased/.test(SRC));
+ /* CONG THUC con lai phai TRUNG voi deriveAll - hai noi hai cong thuc la som muon lech */
+ t("cong thuc con lai giong deriveAll",
+   (SRC.match(/num\(s\.wow_quota_default\)\+num\(s\.wow_extra_approved\)\+num\(s\.wow_extra_purchased\)-num\(s\.wow_quota_used\)/g)||[]).length>=2);
+ /* "con trong" phai tru ca buoi DA DAT CHUA DAY - dat 3 buoi voi quota 3 la het, du remaining van 3 */
+ (function(){
+  var sid=rows("DL09").filter(function(x){return String(x.wow_quota_remaining||"")!==""})[0].student_id;
+  var q0=wowQuotaOf(sid);
+  t("con trong = con lai tru cho dang giu", q0.free===q0.rem-q0.held);
+ })();
+ /* cua ghi: chan het cac truong hop sai, va CO ghi vet */
+ (function(){
+  var sid=rows("DL09").filter(function(x){return String(x.wow_quota_remaining||"")!==""})[0].student_id;
+  var s0=find("DL09","student_id",sid);
+  var appr0=num(s0.wow_extra_approved),rem0=num(s0.wow_quota_remaining),notes0=s0.notes;
+  setF({wg_stu:sid,wg_n:"2",wg_why:"",wg_kind:"approved"});reset();
+  wowGrantSave();
+  t("khong co ly do thi khong cap", num(s0.wow_extra_approved)===appr0);
+  setF({wg_stu:sid,wg_n:"99",wg_why:"thu vuot tran",wg_kind:"approved"});reset();
+  wowGrantSave();
+  t("vuot tran moi lan thi khong cap", num(s0.wow_extra_approved)===appr0);
+  setF({wg_stu:sid,wg_n:"2",wg_why:"Speaking thap hon han 3 ky nang",wg_kind:"approved"});reset();
+  wowGrantSave();
+  t("cap dung so luot", num(s0.wow_extra_approved)===appr0+2);
+  t("con lai tang theo", num(s0.wow_quota_remaining)===rem0+2);
+  t("co ghi vet ai cap, bao nhieu, vi sao", /WOW\+2/.test(String(s0.notes||""))&&/Speaking thap hon han/.test(String(s0.notes||"")));
+  t("nhat ky cap luot doc lai duoc", /WOW\+2/.test(wowGrantLog(s0)));
+  s0.wow_extra_approved=String(appr0);s0.wow_quota_remaining=String(rem0);s0.notes=notes0;
+ })();
+ setF({});
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");
