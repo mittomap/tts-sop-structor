@@ -1234,7 +1234,22 @@ function ecode(v){if(v==null)return"";var m=String(v).match(/^([^(]+?)\s*\(/);re
 function elabel(v){if(v==null||v==="")return"";var m=String(v).match(/\(([^)]+)\)\s*$/);return m?m[1]:String(v)}
 function num(v){if(v==null||v==="")return 0;var n=parseFloat(String(v).replace(/[^0-9.\-]/g,""));return isNaN(n)?0:n}
 function money(v){var n=num(v);return n?n.toLocaleString("vi-VN"):"-"}
-function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+/* esc PHAI escape ca nhay kep va nhay don: chuoi nay duoc nhet vao value="..." va onclick="...('..')".
+   Ten kieu Nguyen "Bi" An truoc day lam gay form (o input cut ngang) va lam chet nut. */
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+/* Chong bam hai lan: khong nut Luu nao trong app bi khoa khi dang luu -> mang cham la 2 lead
+   trung so, hoac THU TIEN HAI LAN tren cung mot khoan. Chan tai lai trong 1,2 giay. */
+var __actT={};
+function actGuard(k){var t=new Date().getTime();if(__actT[k]&&t-__actT[k]<1200){toast("Đang xử lý, đừng bấm lại.");return false}__actT[k]=t;return true}
+/* Chuan hoa so dien thoai TRUOC khi ghi: cung mot khach nguoi go 0912345678, nguoi go
+   0912 345 678, nguoi go +84912345678 -> o tim khong ra, nhan vien tao lead trung. */
+function phoneNorm(v){var k=(typeof phoneKey==="function")?phoneKey(v):"";return k||String(v==null?"":v).trim()}
+/* Sinh so thu tu ma ban ghi: lay MAX duoi so dang co roi +1, dem toi thieu 3 chu so nhung
+   KHONG cat bot khi vuot 999. Cong thuc cu ("000"+n).slice(-3) tra ve "000" tu ban ghi thu
+   1000 tro di -> ma trung hang loat (phieu thu trung so, doi soat ke toan vo). */
+function seqNo(code,idk,pad){var mx=0;rows(code).forEach(function(r){var m=String(r[idk]||"").match(/(\d+)\s*$/);
+ if(m){var v=parseInt(m[1],10);if(v>mx)mx=v}});var n=mx+1,z=String(n);
+ pad=pad||3;while(z.length<pad)z="0"+z;return z}
 function naCls(s){s=String(s||"");if(/ ngay| gấp|GỌI|NGUY|GẤP/.test(s))return"red";if(/Không cần làm gì/.test(s))return"green";return s?"amber":"gray"}
 function stCls(v){var c=ecode(v);
  if(/at_risk|off_track|rejected|unreachable|no_response|escalated|high|overdue|no_show|missing|cancelled|refunded|unpaid|not_achieved|dropped|failed/.test(c))return"red";
@@ -1758,7 +1773,7 @@ function fldHint(k){
 function pkSearch(k,ent){var inp=document.getElementById("pk_"+k),box=document.getElementById("pkr_"+k); if(!inp)return;
  var q=vnorm(inp.value||"").trim(); if(q.length<2){box.innerHTML="";return}
  var code=ent==="lead"?"DL02":"DL09", idf=ent==="lead"?"lead_id":"student_id", stf=ent==="lead"?"lead_status":"student_status";
- var r=rows(code).filter(function(x){return vnorm(x.full_name||"").indexOf(q)>=0||String(x.phone_number||"").indexOf(q)>=0}).slice(0,8);
+ var r=rows(code).filter(function(x){return vnorm(x.full_name||"").indexOf(q)>=0||phoneHit(x.phone_number,q)}).slice(0,8);
  box.innerHTML=r.length?r.map(function(x){var lab=(String(x.full_name)+" - "+x.phone_number).replace(/'/g,"");return '<div class="pkitem" onclick="pkPick(\''+k+'\',\''+x[idf]+'\',\''+esc(lab)+'\')"><b>'+esc(x.full_name)+'</b> <span class="mut">'+esc(x.phone_number)+" - "+esc(elabel(x[stf]))+'</span></div>'}).join(""):'<div class="pkitem mut">Không thấy - thử số/tên khác</div>'}
 function pkPick(k,id,label){document.getElementById("f_"+k).value=id;document.getElementById("pk_"+k).value=label;document.getElementById("pkr_"+k).innerHTML=""}
 function openLienhe(id){modalNext("lienhe","lead_id="+id)}
@@ -1888,8 +1903,17 @@ function saveForm(key){var cfg=LISTCFG[key];var o={},idk=cfg.cols[0][0]; var mis
   if(f[2]==="@class"&&v){var Kx=find("DL10","class_id",v);if(Kx)o.class_id_name=Kx.class_name}});
  if(miss.length){toast("Còn thiếu: "+miss.join(", "));return}
  var verr=validateForm(o);if(verr){toast(verr);return}
+ /* saveForm la ham luu cua TOAN BO form danh sach nhung truoc day KHONG goi bizGuard -
+    moi luat nghiep vu (day lop, chiet khau chua duyet...) bi bo qua neu nhap bang form nay. */
+ var berr=bizGuard(cfg.code,o);if(berr){toast(berr);return}
+ if(o.phone_number)o.phone_number=phoneNorm(o.phone_number);
+ if(!actGuard("saveForm:"+key))return;
  if(EDIT[key]){var eid=EDIT[key][idk],erec=EDIT[key];
-  function _done(){for(var kk in o){if(o[kk]!==""&&o[kk]!=null)erec[kk]=o[kk]}EDIT[key]=null;toast("Đã cập nhật "+eid);go(key)}
+  /* O nao CO tren form thi ghi de ke ca khi de trong - truoc day gia tri rong bi bo qua nen
+     go nham roi xoa trang khong bao gio sua lai duoc. */
+  function _done(){cfg.form.forEach(function(f){erec[f[0]]=(o[f[0]]==null?"":o[f[0]])});
+   for(var kk in o){if(o[kk]!==""&&o[kk]!=null)erec[kk]=o[kk]}
+   EDIT[key]=null;toast("Đã cập nhật "+eid);reRenderKeep(CUR)}
   if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi cập nhật: "+((res&&res.error)||""));return}_done()}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiUpdate(cfg.code,eid,o)}else{_done()}
   return}
  if(cfg.code==="DL02"){var dup=findDupPhone(o.phone_number);
@@ -1897,7 +1921,7 @@ function saveForm(key){var cfg=LISTCFG[key];var o={},idk=cfg.cols[0][0]; var mis
    toast("SĐT này đã có: "+(dup.rec.full_name||"")+" ("+(dup.type==="lead"?("lead "+(dup.rec.lead_id||"")+(dup.rec.assigned_to_name?" - NV "+dup.rec.assigned_to_name:"")):("học viên "+(dup.rec.student_id||"")))+"). Bấm Lưu lần nữa nếu VẪN muốn tạo mới.",5200);return}
   window.__dupOK="";
   if(!o.lead_status)o.lead_status=eFull("enum_lead_status","new");if(CURSTAFF){o.assigned_to=CURSTAFF;o.assigned_to_name=myName()}if(!o.lead_created_time)o.lead_created_time=nowStr();if(!String(o.contact_count||"").trim())o.contact_count="0"}
- var n=rows(cfg.code).length+1;o[idk]=cfg.idp+("000"+n).slice(-3);
+ o[idk]=cfg.idp+seqNo(cfg.code,idk);
  function _ins(nid){o[idk]=nid;rows(cfg.code).unshift(o);toast("Đã lưu "+nid+".");go(key)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi lưu: "+((res&&res.error)||""));return}_ins(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave(cfg.code,o)}else{_ins(o[idk])}}
 function openEdit(key,id){var cfg=LISTCFG[key];var rec=find(cfg.code,cfg.cols[0][0],id);if(!rec){toast("Không thấy bản ghi");return}window.PREFILL=null;EDIT[key]=rec;var el=document.getElementById("content");el.innerHTML=renderList(key);el.scrollTop=0}
@@ -2245,8 +2269,13 @@ function knStart(id){knUpd(id,{complaint_status:eFull("enum_complaint_status","i
 function knEscalate(id){knUpd(id,{complaint_status:eFull("enum_complaint_status","escalated"),escalated_to:"Quản lý cấp cao"},"Đã leo thang lên quản lý cấp cao.")}
 function myName(){var s=find("DL01","staff_id",CURSTAFF);return (s&&s.full_name)||"Admin"}
 function knClaim(id){knUpd(id,{assigned_handler:myName(),assigned_at:nowStr(),complaint_status:eFull("enum_complaint_status","in_progress")},"Bạn đã nhận xử lý khiếu nại này.")}
-function confirmRun(msg,fn,arg){var m=document.getElementById("cfm");if(!m){if(typeof window[fn]==="function")window[fn](arg);return}window.__cfn=fn;window.__carg=arg;document.getElementById("cfmMsg").textContent=msg;m.classList.add("on")}
-function confirmYes(){var f=window.__cfn,a=window.__carg;closeConfirm();if(f&&typeof window[f]==="function")window[f](a)}
+/* confirmRun nhan fn dang TEN HAM (chuoi) hoac chinh HAM. Truoc day chi chay duoc chuoi nen
+   3 cho truyen thang ham (huy dang ky, doi buoi WOW, dat WOW trung lich) bam Xac nhan xong
+   IM LANG khong luu gi - nguoi dung tuong da xong. */
+function cfnGet(f){return (typeof f==="function")?f:((f&&typeof window[f]==="function")?window[f]:null)}
+function confirmRun(msg,fn,arg){var m=document.getElementById("cfm");if(!m){var g0=cfnGet(fn);if(g0)g0(arg);return}window.__cfn=fn;window.__carg=arg;document.getElementById("cfmMsg").textContent=msg;m.classList.add("on")}
+function confirmYes(){var f=window.__cfn,a=window.__carg;closeConfirm();var g=cfnGet(f);
+ if(g)g(a); else toastErr("Không chạy được thao tác này - báo IT (thiếu hàm xử lý).")}
 function closeConfirm(){var m=document.getElementById("cfm");if(m)m.classList.remove("on")}
 function testBook(id){markRow("DL03","test_booking_id",id,{booking_status:eFull("enum_booking_status","booked")},"Đã đặt lịch test.")}
 function wowConfirm(id){var w=find("DL14","wow_id",id)||{};
@@ -2351,7 +2380,7 @@ function duyetRefundRun(id){var e=find("DL06","enrollment_id",id);if(!e)return;
   if(amt>0){var pay={enrollment_id:id,student_id:r.student_id,student_id_name:r.student_id_name,
    payment_time:nowStr(),payment_method:eFull("enum_payment_method","bank_transfer"),amount:-amt,net_received:-amt,
    received_by:CURSTAFF||"",received_by_name:myName(),payment_note:"HOÀN TIỀN"+(note?" - "+note:"")};
-   var n=rows("DL07").length+1;pay.payment_id="PMT-"+("000"+n).slice(-3);rows("DL07").unshift(pay);
+   pay.payment_id="PMT-"+seqNo("DL07","payment_id");rows("DL07").unshift(pay);
    if(SVR)google.script.run.apiSave("DL07",pay);
    r.paid_amount=Math.max(0,num(r.paid_amount)-amt)}
   r.notes=(r.notes?r.notes+" | ":"")+"Hoàn "+vnd(amt)+" "+nowStr()+" bởi "+myName()+(note?" ("+note+")":"");
@@ -2655,7 +2684,7 @@ function recalcLeadAction(L){
 function modalSave(key){var cfg=LISTCFG[key];var c=collectForm(cfg);if(c.miss.length){toast("Còn thiếu: "+c.miss.join(", "));return}var o=c.o;var verr=validateForm(o);if(verr){toast(verr);return}
  var berr=bizGuard(cfg.code,o);if(berr){toast(berr);return}
  if(key==="lienhe"){if(!o.contact_time)o.contact_time=nowStr();if(!o.staff_id){o.staff_id=CURSTAFF;o.staff_id_name=myName()}normLienhe(o)}
- var n=rows(cfg.code).length+1,idk=cfg.cols[0][0];o[idk]=cfg.idp+("000"+n).slice(-3);
+ var idk=cfg.cols[0][0];o[idk]=cfg.idp+seqNo(cfg.code,idk);
  function _after(){
   if(key==="lienhe"&&o.lead_id){touchLead(o);closeModal();
    var L=find("DL02","lead_id",o.lead_id);
@@ -3104,7 +3133,7 @@ function jSaveRow(code,o,cb){jIdInit();
  function done(id){o[idk]=id;rows(code).unshift(o);if(cb)cb(id)}
  if(SVR){google.script.run.withSuccessHandler(function(r){if(!r||!r.ok){toast("Lỗi ghi: "+((r&&r.error)||""));return}done(r.id)})
   .withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave(code,o)}
- else{var n=rows(code).length+1;done((JIDP[code]||(code+"-"))+("000"+n).slice(-3))}}
+ else{done((JIDP[code]||(code+"-"))+seqNo(code,idk))}}
 function jUpdRow(code,id,vals,cb){jIdInit();var idk=JIDK[code]||"id";var r=find(code,idk,id);
  if(r)for(var k in vals)r[k]=vals[k];
  if(SVR)google.script.run.withSuccessHandler(function(){if(cb)cb()}).withFailureHandler(function(){if(cb)cb()}).apiUpdate(code,id,vals);
@@ -3447,12 +3476,12 @@ function chayQSet(v){window.CHAYQ=v;window.CHAYSRCH="";reRender(CUR==="chay"?"ba
 function acSearch(q){q=vnorm(q||"").trim();if(q.length<2)return [];
  var out=[];
  srows("DL09").forEach(function(x){if(out.length>=8)return;
-  if(vnorm(x.full_name).indexOf(q)>=0||String(x.phone_number||"").indexOf(q)>=0||vnorm(x.student_id).indexOf(q)>=0)
+  if(vnorm(x.full_name).indexOf(q)>=0||phoneHit(x.phone_number,q)||vnorm(x.student_id).indexOf(q)>=0)
    out.push({id:x.student_id,nm:x.full_name,ph:x.phone_number,kind:"HV",st:elabel(x.student_status)||""})});
  var haveHV={};srows("DL09").forEach(function(x){});
  srows("DL02").forEach(function(x){if(out.length>=8)return;
   if(isc(x.lead_status,"converted"))return; /* đã thành HV - tránh trùng */
-  if(vnorm(x.full_name).indexOf(q)>=0||String(x.phone_number||"").indexOf(q)>=0||vnorm(x.lead_id).indexOf(q)>=0)
+  if(vnorm(x.full_name).indexOf(q)>=0||phoneHit(x.phone_number,q)||vnorm(x.lead_id).indexOf(q)>=0)
    out.push({id:x.lead_id,nm:x.full_name,ph:x.phone_number,kind:"Lead",st:elabel(x.lead_status)||""})});
  return out.slice(0,8)}
 function acBoxHTML(list){if(!list.length)return '<div class="pkitem mut">Không thấy - thử tên/SĐT khác</div>';
@@ -3465,7 +3494,7 @@ function chaySrch(v){window.CHAYSRCH=v;var el=document.getElementById("chaybody"
 function chayList(){var s=vnorm(window.CHAYSRCH||"").trim();
  /* ĐANG TÌM -> tìm TOÀN BỘ hồ sơ trong hành trình (mọi chặng, kể cả đã học/đã xong),
     bỏ qua bộ lọc "Cần xử lý/chặng" - vì tìm một người thì phải ra dù họ không quá hạn. */
- if(s){return jAll().filter(function(J){return vnorm(J.name).indexOf(s)>=0||String(J.phone||"").indexOf(s)>=0})
+ if(s){return jAll().filter(function(J){return vnorm(J.name).indexOf(s)>=0||phoneHit(J.phone,s)})
   .sort(function(a,b){return (b.over?1:0)-(a.over?1:0)||((b.ageH||0)-(a.ageH||0))})}
  var q=window.CHAYQ||"over";
  var all;
@@ -3979,7 +4008,7 @@ function ghForm(){
  h+='<div class="dact"><button class="btn primary" onclick="ghSave()"><i class="ti ti-device-floppy"></i>Lưu phản hồi</button></div></div>';
  openDrawer("Ghi nhận phản hồi",h)}
 function ghSearch(q){var box=document.getElementById("gh_res");if(!box)return;q=String(q||"").toLowerCase().trim();if(q.length<2){box.innerHTML="";return}
- var r=rows("DL09").filter(function(x){return String(x.full_name||"").toLowerCase().indexOf(q)>=0||String(x.phone_number||"").indexOf(q)>=0}).slice(0,8);
+ var r=rows("DL09").filter(function(x){return String(x.full_name||"").toLowerCase().indexOf(q)>=0||phoneHit(x.phone_number,q)}).slice(0,8);
  box.innerHTML=r.map(function(x){var lab=(x.full_name+" - "+x.phone_number).replace(/'/g,"");return '<div class="pkitem" onclick="ghPick(\''+x.student_id+'\',\''+esc(lab)+'\')"><b>'+esc(x.full_name)+'</b> <span class="mut">'+esc(x.phone_number)+'</span></div>'}).join("")||'<div class="pkitem mut">Không thấy</div>'}
 function ghPick(id,lab){document.getElementById("gh_sid").value=id;document.getElementById("gh_pk").value=lab;document.getElementById("gh_res").innerHTML=""}
 function ghType(v){var b=document.getElementById("gh_negbox");if(b)b.style.display=isc(v,"negative")?"block":"none"}
@@ -5683,7 +5712,7 @@ function xepMoiLuu(){var sid=document.getElementById("xm_stu").value,cid=documen
   c.current_enrollment=String(num(c.current_enrollment)+1);
   if(SVR)google.script.run.apiUpdate("DL10",cid,{current_enrollment:c.current_enrollment});
   toast("Đã xếp "+(s.full_name||sid)+" vào "+(c.class_name||cid)+" (sĩ số "+c.current_enrollment+"/"+(c.class_capacity||"?")+"). Bước tiếp: gửi thông tin lớp.");closeModal();reRender(CUR)}
- if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL08",o)}else{var n=rows("DL08").length+1;d("OB-"+("000"+n).slice(-3))}}
+ if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL08",o)}else{d("OB-"+seqNo("DL08","onboarding_id"))}}
 function fget(p){return (window.FILT&&window.FILT[p])||"all"}
 function fset(p,v){window.FILT=window.FILT||{};window.FILT[p]=v}
 function pageHead(t,s,btn){/* UX-23: tiêu đề đã có ở topbar (#pgTitle) - phead chỉ còn mô tả + nút, đỡ lặp và tiết kiệm ~46px */
@@ -5755,14 +5784,18 @@ function testQuickAdd(){
  h+='<div class="dact"><button class="btn primary" onclick="testQuickSave()"><i class="ti ti-check"></i>Tạo lead + đặt lịch test</button></div></div>';
  openDrawer("Test ngay cho khách mới",h)}
 function testQuickSave(){
+ if(!actGuard("testQuick"))return;
  var nm=(fldV("tq_name")||"").trim(),ph=(fldV("tq_phone")||"").trim(),dt=(fldV("tq_date")||"").trim();
  if(!nm||!ph){toast("Nhập họ tên và số điện thoại.");return}
+ if(!/^0\d{9,10}$/.test(phoneKey(ph))){toast("Số điện thoại chưa hợp lệ (10-11 số, bắt đầu bằng 0).");return}
  if(!dt){toast("Chọn ngày giờ test.");return}
+ var _td=pvnd(fromISOdt(dt));
+ if(_td&&_td.getTime()<Date.now()-36e5){toast("Ngày test đang ở QUÁ KHỨ - kiểm lại ngày.");return}
  var dup=findDupPhone(ph);
  if(dup&&window.__dupOK!==phoneKey(ph)){window.__dupOK=phoneKey(ph);toast("SĐT này đã có: "+(dup.rec.full_name||"")+". Bấm lần nữa nếu VẪN muốn tạo mới.",4500);return}
  window.__dupOK="";
  var ref=(fldV("tq_ref")||"").trim();
- jSaveRow("DL02",{full_name:nm,phone_number:ph,lead_source:fldV("tq_src"),
+ jSaveRow("DL02",{full_name:nm,phone_number:phoneNorm(ph),lead_source:fldV("tq_src"),
   lead_status:eFull("enum_lead_status","contacted"),lead_created_time:nowStr(),first_call_time:nowStr(),
   assigned_to:CURSTAFF,assigned_to_name:myName(),contact_count:1,
   lead_note:"Khách yêu cầu test ngay"+(ref?" · giới thiệu bởi "+ref:""),
@@ -5770,7 +5803,15 @@ function testQuickSave(){
   jSaveRow("DL03",{lead_id:lid,lead_id_name:nm,test_date:fromISOdt(dt),test_format:fldV("tq_fmt"),
    booking_status:eFull("enum_booking_status","booked"),test_status:eFull("enum_test_status","pending"),
    booking_note:"Tạo nhanh tại trang Test đầu vào (khách đòi test ngay)"},function(bid){
-   closeModal();toast("Đã tạo lead "+lid+" và phiếu test "+bid+".");go("test")})})}
+   /* Cửa này cũng phải ghi LƯỢT LIÊN HỆ ĐẦU như "Khách mới liên hệ đến", nếu không
+      contact_count=1 mà sổ chạm DL02b rỗng -> failStreak và việc-cần-làm tính sai. */
+   jSaveRow("DL02b",{lead_id:lid,customer_name:nm,contact_time:nowStr(),
+    channel:eFull("enum_contact_channel","phone"),direction:eFull("enum_contact_direction","inbound"),
+    content:"Khách chủ động hỏi và xin test ngay. Đã đặt lịch test "+fromISOdt(dt)+".",
+    staff_id:CURSTAFF||"",staff_id_name:myName(),
+    result_note:"connected (Kết nối được (đã nói chuyện/nhắn được))"},function(){
+    var _L=find("DL02","lead_id",lid);if(_L)_L.last_contact_time=nowStr();
+    closeModal();toast("Đã tạo lead "+lid+", phiếu test "+bid+" và ghi lượt liên hệ đầu.");go("test")})})})}
 function dupWarnHTML(dup){if(!dup)return "";
  var r=dup.rec;var nm=r.full_name||"";var ph=r.phone_number||"";
  var who=(dup.type==="lead")?("lead "+(r.lead_id||"")+(r.assigned_to_name?" · NV phụ trách: "+r.assigned_to_name:"")):("học viên "+(r.student_id||""));
@@ -5791,6 +5832,7 @@ function leadInbound(){window.__dupOK="";var dr=window.__liDraft||{};window.__li
 function liDupCheck(){var box=document.getElementById("li_dup");if(!box)return;
  var dup=findDupPhone(fldV("li_phone"));window.__dupFound=dup?1:0;box.innerHTML=dupWarnHTML(dup)}
 function leadInboundSave(){
+ if(!actGuard("leadInbound"))return;   /* bấm 2 lần = 2 lead trùng cùng một số */
  var nm=(fldV("li_name")||"").trim(),ph=(fldV("li_phone")||"").trim(),note=(fldV("li_note")||"").trim();
  if(!nm||!ph){toast("Nhập họ tên và số điện thoại.");return}
  if(!/^0\d{9,10}$/.test(phoneKey(ph))){toast("Số điện thoại chưa hợp lệ (10-11 số, bắt đầu bằng 0).");return}
@@ -5798,7 +5840,7 @@ function leadInboundSave(){
  var dup=findDupPhone(ph);
  if(dup&&window.__dupOK!==phoneKey(ph)){window.__dupOK=phoneKey(ph);liDupCheck();toast("Số này đã có hồ sơ - kiểm tra bên trên. Bấm Ghi nhận lần nữa nếu VẪN muốn tạo mới.",4200);return}
  var nx=(fldV("li_next")||"").trim();
- jSaveRow("DL02",{full_name:nm,phone_number:ph,lead_source:fldV("li_src"),
+ jSaveRow("DL02",{full_name:nm,phone_number:phoneNorm(ph),lead_source:fldV("li_src"),
   lead_status:eFull("enum_lead_status","contacted"),lead_created_time:nowStr(),first_call_time:nowStr(),
   assigned_to:CURSTAFF||"",assigned_to_name:myName(),contact_count:1,last_contact_time:nowStr(),
   next_followup_time:nx?fromISOdt(nx):"",lead_note:"Khách chủ động liên hệ. "+note},function(lid){
@@ -5820,7 +5862,7 @@ function pqSearch(){var q=vnorm(fldV("pq_srch")||"").trim();var box=document.get
  var res=rows("DL06").filter(function(x){
   if(isc(x.enrollment_status,"cancelled")||num(x.remaining_amount)<=0)return false;
   var st=find("DL09","student_id",x.student_id)||{};
-  return vnorm(x.student_id_name||"").indexOf(q)>=0||String(st.phone_number||"").indexOf(q)>=0}).slice(0,8);
+  return vnorm(x.student_id_name||"").indexOf(q)>=0||phoneHit(st.phone_number,q)}).slice(0,8);
  box.innerHTML=res.length?res.map(function(x){
   return '<div class="pkitem" onclick="document.getElementById(\'pq_enr\').value=\''+esc(x.enrollment_id)+'\';document.getElementById(\'pq_srch\').value=\''+esc(String(x.student_id_name||x.student_id).replace(/'/g,""))+'\';this.parentNode.innerHTML=\'\'"><b>'+esc(x.student_id_name||x.student_id)+'</b> <span class="mut">'+esc(x.course_id_name||"")+' · còn '+vnd(num(x.remaining_amount))+'</span></div>'}).join(""):'<div class="pkitem mut">Không thấy đăng ký còn nợ nào khớp</div>'}
 function payQuickGo(){var id=fldV("pq_enr");if(!id){toast("Gõ tên/SĐT rồi chọn trong gợi ý.");return}closeModal();payForm(id)}
@@ -6004,7 +6046,7 @@ function ensureStudent(leadId,cb){var exist=rows("DL06").filter(function(e){retu
  var L=find("DL02","lead_id",leadId)||{};
  var ids=rows("DL09").map(function(s){return String(s.student_id)});var pref=(ids[0]||"HV001").replace(/\d+$/,"");
  var mx=0;ids.forEach(function(x){var m=x.match(/(\d+)$/);if(m)mx=Math.max(mx,parseInt(m[1],10))});
- var nid=pref+("000"+(mx+1)).slice(-3);
+ var nid=pref+(function(v){var z=String(v);while(z.length<3)z="0"+z;return z})(mx+1);
  var stu={student_id:nid,full_name:L.full_name||leadId,phone_number:L.phone_number||"",student_type:L.student_type||"",branch:L.branch||"",student_status:eFull("enum_student_status","active"),joined_at:nowStr(),total_enrollments:"1"};
  function d(realId){stu.student_id=realId;rows("DL09").unshift(stu);toast("Đã tạo hồ sơ học viên "+realId+" từ lead.");cb(realId,stu.full_name)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi tạo HV: "+((res&&res.error)||""));cb("","");return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message);cb("","")}).apiSave("DL09",stu)}else{d(nid)}}
@@ -6015,7 +6057,7 @@ function tvEnrollSave(id){var c=find("DL04","consultation_id",id)||{};var cid=fl
    var s9=sid?find("DL09","student_id",sid):null;
    if(s9&&String(s9.wow_quota_remaining||"")===""&&num(course.wow_quota_default)>0){s9.wow_quota_default=String(course.wow_quota_default);s9.wow_quota_used="0";s9.wow_quota_remaining=String(course.wow_quota_default);
     if(SVR)google.script.run.apiUpdate("DL09",sid,{wow_quota_default:s9.wow_quota_default,wow_quota_used:"0",wow_quota_remaining:s9.wow_quota_remaining})}if(SVR&&c.lead_id)google.script.run.apiUpdate("DL02",c.lead_id,{lead_status:eFull("enum_lead_status","converted")});markRow("DL04","consultation_id",id,{conversion_status:eFull("enum_conversion_status","confirmed_with_deposit")},"Đã tạo đăng ký "+nid+(sid?" cho HV "+sid:"")+".","tuvan");closeModal()}
-  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL06",enr)}else{var n=rows("DL06").length+1;d("EN-"+("000"+n).slice(-3))}
+  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL06",enr)}else{d("EN-"+seqNo("DL06","enrollment_id"))}
  })}
 /* ===== P4 Thu & xác nhận Thanh toán (DL06 + DL07) ===== */
 function renderThanhtoan(embed){var p="thanhtoan",fil=fget(p);var enr=rows("DL06");
@@ -6152,17 +6194,24 @@ function printReceipt(eid,amt,payId){var e=find("DL06","enrollment_id",eid)||{};
   '<script>window.print()<\/script></body></html>');
  w.document.close()}
 function paySave(id){var e=find("DL06","enrollment_id",id);if(!e)return;var amt=num(fldV("pm_amt"));if(amt<=0){toast("Nhập số tiền hợp lệ.");return}
+ if(!actGuard("paySave:"+id))return;   /* bấm 2 lần = thu tiền 2 lần trên cùng một khoản */
  var rem0=e.remaining_amount!==undefined&&e.remaining_amount!==""?num(e.remaining_amount):Math.max(0,(num(e.final_fee)||num(e.total_fee))-num(e.paid_amount));
  if(amt>rem0){toast("Số thu "+vnd(amt)+" VƯỢT phần còn lại "+vnd(rem0)+" - không cho đóng thừa. Kiểm lại số tiền.",4500);return}
  var pay={enrollment_id:id,student_id:e.student_id,student_id_name:e.student_id_name,payment_time:nowStr(),payment_method:fldV("pm_method"),amount:amt,net_received:amt,sender_name:fldV("pm_sender"),transaction_ref:fldV("pm_ref"),received_by:CURSTAFF||"",received_by_name:myName(),payment_note:(attachVal("pay")?("Chứng từ: "+attachVal("pay")):"")};
  var tot=num(e.final_fee)||num(e.total_fee);var newPaid=num(e.paid_amount)+amt;var rem=Math.max(0,tot-newPaid);var pstatus=eFull("enum_payment_status",rem<=0?"paid":"partial");
  function d(pid){pay.payment_id=pid;rows("DL07").unshift(pay);e.paid_amount=newPaid;e.remaining_amount=rem;e.payment_status=pstatus;
+  /* Đã có tiền vào thì đơn phải sang "đã xác nhận", nếu không học viên đóng đủ tiền vẫn
+     KHÔNG lọt vào hàng chờ xếp lớp (openXepMoi lọc theo enrollment_status) - đóng tiền xong
+     ngồi chờ mãi không ai xếp lớp. Trước đây chỉ bước Thanh toán trong chạy quy trình mới đặt. */
+  if(newPaid>0&&!isc(e.enrollment_status,"cancelled")&&!isc(e.enrollment_status,"confirmed")){
+   e.enrollment_status=eFull("enum_enrollment_status","confirmed");
+   if(SVR)google.script.run.apiUpdate("DL06",id,{enrollment_status:e.enrollment_status})}
   var due=(fldV("pm_due")||"").trim();if(due){e.next_payment_due=fromISOdt(due).split(" ")[0];if(SVR)google.script.run.apiUpdate("DL06",id,{next_payment_due:e.next_payment_due})}
   else if(rem<=0){e.next_payment_due=""}
   var dep=paramOf("thresholdDeposit_minimum",5000000);
   if(rem>0&&newPaid<dep)toast("Đã ghi thu. LƯU Ý: tổng đã đóng "+vnd(newPaid)+" dưới mức cọc chuẩn "+vnd(dep)+" - cân nhắc thu thêm.",5200);
   closeModal();reRender(CUR);payReceipt(id,amt,pay.payment_method,pay.transaction_ref,pid)}
- if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}google.script.run.withSuccessHandler(function(){d(res.id)}).withFailureHandler(function(er){toast("Lỗi kết nối: "+er.message)}).apiUpdate("DL06",id,{paid_amount:newPaid,remaining_amount:rem,payment_status:pstatus})}).withFailureHandler(function(er){toast("Lỗi kết nối: "+er.message)}).apiSave("DL07",pay)}else{var n=rows("DL07").length+1;d("PMT-"+("000"+n).slice(-3))}}
+ if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}google.script.run.withSuccessHandler(function(){d(res.id)}).withFailureHandler(function(er){toast("Lỗi kết nối: "+er.message)}).apiUpdate("DL06",id,{paid_amount:newPaid,remaining_amount:rem,payment_status:pstatus})}).withFailureHandler(function(er){toast("Lỗi kết nối: "+er.message)}).apiSave("DL07",pay)}else{d("PMT-"+seqNo("DL07","payment_id"))}}
 function payVerify(id){var pays=rows("DL07").filter(function(x){return x.enrollment_id===id&&!(x.verified_by&&String(x.verified_by).trim())});if(!pays.length){toast("Không có khoản chờ xác nhận.");return}
  var e=find("DL06","enrollment_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-shield-check"></i>Xác nhận đã nhận tiền - '+esc(e.student_id_name||e.student_id||"")+'</h4>';
@@ -6286,7 +6335,7 @@ function wowAddSave(force){var sid=fldV("wa_stu");if(!sid){toast("Chọn học v
   if(s.student_id){s.wow_quota_used=String(num(s.wow_quota_used)+1);if(String(s.wow_quota_remaining)!=="")s.wow_quota_remaining=String(Math.max(0,rem-1));
    if(SVR)google.script.run.apiUpdate("DL09",sid,{wow_quota_used:s.wow_quota_used,wow_quota_remaining:s.wow_quota_remaining})}
   toast("Đã đặt buổi WOW cho "+(s.full_name||sid)+" - quota còn "+(s.wow_quota_remaining||"?")+".");closeModal();reRender(CUR)}
- if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL14",w)}else{var n=rows("DL14").length+1;d("WOW-"+("000"+n).slice(-3))}}
+ if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL14",w)}else{d("WOW-"+seqNo("DL14","wow_id"))}}
 /* ===== P8 Khảo sát & Phản hồi (DL15 + DL16) ===== */
 function fuNeed(v){var s=String(v||"").trim();return s!==""&&!/^(không|khong|no|false|0)/i.test(s)}
 function renderKhaosat(){var tab=window.KSTAB||"ks";
@@ -6351,7 +6400,7 @@ function svSendSave(){var sid=fldV("sv_stu");if(!sid){toast("Chọn học viên.
  var s=find("DL09","student_id",sid)||{};var ob=rows("DL08").filter(function(o){return o.student_id===sid})[0]||{};
  var v={student_id:sid,student_name:s.full_name,class_id:ob.class_id||"",class_id_name:ob.class_id_name||"",survey_type:fldV("sv_type"),sent_date:nowStr(),assigned_staff:myName(),notes:(fldV("sv_qs")||"")};
  function d(nid){v.survey_id=nid;rows("DL15").unshift(v);toast("Đã ghi nhận gửi khảo sát cho "+(s.full_name||sid)+".");closeModal();window.KSTAB="ks";reRender("khaosat")}
- if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL15",v)}else{var n=rows("DL15").length+1;d("SV-"+("000"+n).slice(-3))}}
+ if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL15",v)}else{d("SV-"+seqNo("DL15","survey_id"))}}
 function svResult(id){var v=find("DL15","survey_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-writing"></i>Kết quả khảo sát - '+esc(v.student_name||v.student_id)+'</h4>';
  h+=ctxRows([["Loại",esc(elabel(v.survey_type)||"-")],["Gửi lúc",esc(v.sent_date||"-")]]);
@@ -6451,7 +6500,7 @@ function knAdd(){var h='<div class="dcard"><h4><i class="ti ti-alert-triangle"><
 function knAddSave(){var sid=fldV("ka_stu");if(!sid){toast("Chọn học viên.");return}var s=find("DL09","student_id",sid)||{};
  var c={student_id:sid,student_id_name:s.full_name,complaint_time:nowStr(),complaint_channel:fldV("ka_ch"),complaint_type:fldV("ka_type"),complaint_severity:fldV("ka_sev"),complaint_content:fldV("ka_content"),complaint_status:eFull("enum_complaint_status","new")};
  function d(nid){c.complaint_id=nid;rows("DL17").unshift(c);toast("Đã tiếp nhận khiếu nại "+nid+".");closeModal();reRender(CUR)}
- if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL17",c)}else{var n=rows("DL17").length+1;d("CMP-"+("000"+n).slice(-3))}}
+ if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL17",c)}else{d("CMP-"+seqNo("DL17","complaint_id"))}}
 /* ===== P10 Kết thúc khóa & Tái ghi danh (DL18) ===== */
 function renderKetthuc(){var p="ketthuc",fil=fget(p);var all=rows("DL18");
  function st(r){var scored=!!(r.final_test_score&&String(r.final_test_score).trim());var invited=isc(r.re_enrollment_status,"contacted","interested","confirmed_with_deposit","rejected");var closed=isc(r.re_enrollment_status,"confirmed_with_deposit","rejected");return {scored:scored,invited:invited,closed:closed}}
@@ -6502,7 +6551,7 @@ function ktGenSave(){var cid=fldV("kg_cls");if(!cid){toast("Chọn lớp.");retu
   s.student_status=eFull("enum_student_status","completed");if(SVR)google.script.run.apiUpdate("DL09",sid,{student_status:s.student_status})}
  function done(n){toast("Đã tạo "+n+" hồ sơ kết thúc cho lớp "+(c.class_name||cid)+". Nhập kết quả đầu ra từng em.");closeModal();fset("ketthuc","score");reRender("ketthuc")}
  if(SVR){var d=0,ok=0;recs.forEach(function(o){google.script.run.withSuccessHandler(function(res){d++;if(res&&res.ok){ok++;o.course_end_id=res.id;rows("DL18").unshift(o);markStu(o.student_id)}if(d===recs.length)done(ok)}).withFailureHandler(function(){d++;if(d===recs.length)done(ok)}).apiSave("DL18",o)})}
- else{recs.forEach(function(o){var n=rows("DL18").length+1;o.course_end_id="CE-"+("000"+n).slice(-3);rows("DL18").unshift(o);markStu(o.student_id)});done(recs.length)}}
+ else{recs.forEach(function(o){o.course_end_id="CE-"+seqNo("DL18","course_end_id");rows("DL18").unshift(o);markStu(o.student_id)});done(recs.length)}}
 function ktResult(id){var r=find("DL18","course_end_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-writing"></i>Kết quả đầu ra - '+esc(r.student_id_name||r.student_id)+'</h4>';
  if(num(r.target_band)>0)h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-target"></i>Mục tiêu cam kết: <b>'+num(r.target_band)+'</b>. Nhập Overall xong hệ thống TỰ GỢI Ý đạt/chưa đạt - bạn xác nhận lại.</div>';
@@ -6588,6 +6637,10 @@ function hvMakeRef(){window.HVREFON=1;hvReRender();setTimeout(function(){hvGo("s
 function phoneKey(p){var d=String(p||"").replace(/\D/g,"");if(d.slice(0,2)==="84")d="0"+d.slice(2);return d}
 function telHTML(p){if(!p)return "-";var d=phoneKey(p);
  return '<a class="lnk" href="tel:'+esc(d)+'" onclick="event.stopPropagation()">'+esc(p)+'</a> <button class="pill" style="padding:0 9px" aria-label="Sao chép số điện thoại" onclick="event.stopPropagation();hvCopy(\''+esc(d)+'\',\'Đã copy số điện thoại.\')" title="Copy số"><i class="ti ti-copy"></i></button>'}
+/* So sanh SO DIEN THOAI theo dang chuan hoa: go "0912 345 678" hay "+84912345678" deu ra. */
+function phoneHit(stored,q){var a=phoneKey(stored),b=phoneKey(q);
+ return !!(a&&b&&a.indexOf(b)>=0)}
+function isPhoneQ(q){return /^[\d +().-]{3,}$/.test(String(q||""))}
 function findDupPhone(ph){var d=phoneKey(ph);if(!d)return null;
  var L=rows("DL02").filter(function(x){return phoneKey(x.phone_number)===d})[0];
  if(L)return {type:"lead",rec:L};
@@ -7549,7 +7602,7 @@ function bhMakeupSave(id,force){var d=(fldV("bh_md")||"").trim();
   toast("Đã tạo buổi bù "+nid+" ("+w.session_date+")"+(gv!==s.teacher_id?" - GV dạy thay: "+(gvRec.full_name||gv):"")+". Buổi hủy giữ nguyên trong lịch sử.");
   closeModal();reRender(CUR)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d2(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL11",w)}
- else{var n=rows("DL11").length+1;d2("SES-BU-"+("000"+n).slice(-3))}}
+ else{d2("SES-BU-"+seqNo("DL11","session_id"))}}
 /* ===== BẢO LƯU / BỎ HỌC - giữ chân & mời quay lại (KPI TCR, DOR) ===== */
 function kcTabSet(tab){window.KTAB=tab;reRender(CUR)}
 function renderKhac(){
@@ -7876,13 +7929,16 @@ function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
    setTimeout(tourPaint,320);return}catch(e){}}
   s.style.display="";s.style.left=(r.left-6)+"px";s.style.top=(r.top-6)+"px";
   s.style.width=(r.width+12)+"px";s.style.height=(r.height+12)+"px";
- }else{ /* không thấy phần tử: che giữa màn, vẫn chạy tiếp được */
-  s.style.display="";s.style.left=(vw/2-140)+"px";s.style.top=(vh/2-60)+"px";s.style.width="280px";s.style.height="120px"}
+ }else{ /* KHÔNG thấy phần tử cần trỏ: nói thẳng chứ đừng khoanh bừa giữa màn - khoanh bừa
+          làm người xem tưởng app đang chỉ sai chỗ. Ẩn vòng sáng, chỉ để lại hộp lời. */
+  s.style.display="none";window.__tourMiss=1}
+ if(el)window.__tourMiss=0;
  var n=T.steps.length;
  var dots="";for(var i=0;i<n;i++)dots+='<i class="'+(i===TOUR.i?"on":(i<TOUR.i?"done":""))+'"></i>';
  b.innerHTML='<div class="tourdots">'+dots+'</div>'+
   '<div class="tnum">'+esc(T.t)+' · bước '+(TOUR.i+1)+'/'+n+'</div>'+
   '<h5>'+esc(st.t)+'</h5><p>'+esc(st.d)+'</p>'+
+  (window.__tourMiss?'<div class="thint" style="border-left-color:var(--amber)"><i class="ti ti-alert-triangle" style="margin-right:5px"></i>Chỗ cần trỏ không có trên màn hình của bạn (khác chức danh, hoặc trang chưa có dữ liệu) - đọc phần mô tả rồi bấm Tiếp theo.</div>':'')+
   (st.hint?'<div class="thint"><i class="ti ti-hand-finger" style="margin-right:5px"></i>'+esc(st.hint)+'</div>':'')+
   '<div class="tfoot">'+
    (TOUR.i>0?'<button class="btn sm" onclick="tourPrev()"><i class="ti ti-chevron-left"></i>Quay lại</button>':'')+
@@ -8007,7 +8063,7 @@ function tkGiven(){var me=tkMeId();return rows("DL23").filter(function(t){return
 function tkScopeMine(){return tkIsStaff()?tkMine():rows("DL23")}
 function tkScopeGiven(){return tkIsStaff()?tkGiven():rows("DL23")}
 function tkNextId(){var n=0;rows("DL23").forEach(function(t){var m=String(t.task_id||"").match(/(\d+)$/);if(m&&+m[1]>n)n=+m[1]});
- return "TASK-"+("000"+(n+1)).slice(-4)}
+ return "TASK-"+(function(v){var z=String(v);while(z.length<4)z="0"+z;return z})(n+1)}
 function tkRelLabel(t){if(!t.related_id)return "";
  var L={student:"Học viên",lead:"Khách",class:"Lớp"}[t.related_type]||"Hồ sơ";
  return L+": "+(t.related_name||t.related_id)}
@@ -8092,7 +8148,7 @@ function tkSay(id,txt,quiet){var v=(txt!=null?txt:fldV("tk_say")).trim();if(!v)r
  var me=find("DL01","staff_id",tkMeId());
  var n=0;rows("DL24").forEach(function(c){var m=String(c.comment_id||"").match(/(\d+)$/);if(m&&+m[1]>n)n=+m[1]});
  DL.DL24=DL.DL24||[];
- DL.DL24.push({comment_id:"TCM-"+("000"+(n+1)).slice(-4),task_id:id,
+ DL.DL24.push({comment_id:"TCM-"+(function(v){var z=String(v);while(z.length<4)z="0"+z;return z})(n+1),task_id:id,
   staff_id:tkMeId()||"ADMIN",staff_id_name:(me&&me.full_name)||myName(),
   comment_time:nowStr(),content:v});
  if(!quiet){var el=document.getElementById("tk_say");if(el)el.value="";
@@ -8682,7 +8738,7 @@ function hvRichTop(n){
  window.__hvRich=all;return all.slice(0,n)}
 function demoGateHV(){var el=document.getElementById("login");if(!el){bootHV();return}
  var q=vnorm(window.__hvgq||"").trim();
- var stu=q?rows("DL09").filter(function(x){return vnorm(x.full_name).indexOf(q)>=0||String(x.phone_number||"").indexOf(q)>=0||vnorm(x.student_id).indexOf(q)>=0}):hvRichTop(10);
+ var stu=q?rows("DL09").filter(function(x){return vnorm(x.full_name).indexOf(q)>=0||phoneHit(x.phone_number,q)||vnorm(x.student_id).indexOf(q)>=0}):hvRichTop(10);
  var h='<div class="loginbox" style="max-width:760px;max-height:88vh;overflow:auto;text-align:left">';
  h+='<div style="text-align:center"><h2>IELTS The Tutors · Trang học viên</h2>'+
   '<p>Chọn học viên để vào trang của bạn ấy. Bản demo - trang hiển thị đúng dữ liệu trung tâm đang có, trình bày theo cách dành cho học viên.</p>'+

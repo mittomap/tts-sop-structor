@@ -397,6 +397,114 @@ sơ thì cho SỬA, còn lại chỉ XEM; việc đã xác nhận/từ chối/h�
 **CÒN LẠI cho mảng 5 (tầng app):** hiện mức + hạn quyền ngay trên thẻ việc, sổ "Quyền tạm đang mở"
 cho quản lý thu hồi tay, và ghi vết mọi lần cấp/thu.
 
+
+## 3duovicies. HỘI ĐỒNG ĐỢT 2 - 5 VỊ TRÍ "NGƯỜI NGỒI LÀM VIỆC" (28/07 tối) - 80 PHÁT HIỆN
+
+Luân hỏi: "nếu chuyên gia thiếu chuyên môn để tìm ra những thứ thực tế trong vận hành, có cần thêm
+vị trí nào để kiểm tiếp không?" - sau khi chính anh bắt được lỗi hai nút cùng tạo một lead mà hội
+đồng 6 chuyên gia không thấy. Chẩn đoán: 6 chuyên gia cũ đều nhìn từ **thiết kế hệ thống**, không ai
+nhìn từ **ghế người ngồi làm việc 8 tiếng/ngày**. Đã triệu 5 vị trí mới (Luân đính chính: trung tâm
+KHÔNG có lễ tân riêng, người tiếp khách chính là **nhân viên tư vấn**).
+
+**Kết luận lớn nhất: lỗi Luân bắt được KHÔNG cá biệt - nó là KHUÔN MẪU lặp 5 lần trong app.**
+Mỗi hành động nghiệp vụ có nhiều cửa vào, mỗi cửa viết ở một thời điểm, không cửa nào gọi chung một
+hàm. **LUẬT MỚI: một hành động nghiệp vụ = MỘT hàm lõi; mọi nút chỉ được gọi hàm lõi đó.**
+
+### ĐÃ VÁ NGAY trong V9.23 (nhóm "chặn máu" - rẻ mà chặn hỏng tiền / mất dữ liệu)
+- **3 nút Xác nhận bấm vào IM LẶNG không làm gì**: `confirmRun/confirmYes` chỉ chạy được khi tham số
+  là TÊN hàm dạng chuỗi, mà 3 chỗ truyền thẳng HÀM (hủy đăng ký, dời buổi WOW, đặt WOW trùng lịch).
+  Khách đã đồng ý hủy mà hệ thống vẫn ghi đang học. Nay nhận cả hai kiểu, không nhận được thì báo lỗi.
+- **Không nút Lưu nào bị khóa khi đang lưu** -> bấm 2 lần là 2 lead trùng, hoặc **THU TIỀN HAI LẦN**
+  trên cùng một khoản. Thêm `actGuard()` chặn tái nhập trong 1,2 giây, cắm ở saveForm / paySave /
+  leadInboundSave / testQuickSave.
+- **Mã bản ghi LẶP LẠI từ bản ghi thứ 1000**: `("000"+n).slice(-3)` với n=1000 trả về "000". Sổ chạm
+  DL02b vượt 999 trong vài tháng -> phiếu thu trùng số, đối soát kế toán vỡ. Thay bằng `seqNo()` lấy
+  MAX đuôi số hiện có, không cắt khi vượt 999.
+- **`esc()` không escape dấu nháy** -> tên kiểu `Nguyễn "Bi" An` làm gãy form (ô input cụt) và làm
+  chết nút (onclick gãy cú pháp).
+- **`saveForm` - hàm lưu của TOÀN BỘ form danh sách - không gọi `bizGuard`** nên mọi luật nghiệp vụ
+  bị bỏ qua nếu nhập bằng form đầy đủ thay vì drawer. Đã cắm.
+- **Ở chế độ Sửa không xóa trắng được ô nào** (giá trị rỗng bị bỏ qua, không ghi đè) - gõ nhầm rồi
+  không sửa lại được. Nay ô nào CÓ trên form thì ghi đè kể cả khi để trống.
+- **Thu tiền qua nút "Ghi nhận khoản thu" không đẩy đơn sang `confirmed`** -> học viên đóng đủ tiền
+  vẫn KHÔNG lọt vào hàng chờ xếp lớp, ngồi chờ mãi không ai xếp.
+- **Ô tìm không ra số điện thoại có dấu cách / dạng +84** -> nhân viên tưởng khách chưa có, tạo lead
+  trùng. Nay chuẩn hóa cả hai đầu bằng `phoneHit/phoneNorm`, và chuẩn hóa TRƯỚC KHI GHI.
+- **`testQuickSave` tạo lead mà không ghi lượt liên hệ đầu** (đúng y lỗi mẫu, chỉ khác nút) + không
+  kiểm định dạng SĐT + cho đặt lịch test trong QUÁ KHỨ. Đã vá cả ba.
+Bộ kiểm mới `_src/_check12.js` (**37 tiêu chí**) khóa toàn bộ nhóm này lại.
+
+### CÒN LẠI - việc tồn đợt sau, xếp theo mức
+
+**A. NẶNG - làm hỏng số liệu hoặc chặn công việc hằng ngày**
+1. GV dạy thay KHÔNG mở được lớp mình đang dạy thay (`recOwners("DL10")` chỉ trả `main_teacher_id`):
+   buổi hiện trên màn Hôm nay nhưng bấm vào ra màn khóa. Buổi đó mất sổ.
+2. Không có cách đổi GV cho MỘT buổi - muốn dạy thay phải hủy buổi rồi tạo buổi bù, sổ ghi "buổi bị
+   hủy", KPI đếm buổi hủy, HV nhận thông báo hủy oan.
+3. App KHÔNG có chức năng tạo lớp / gán GV chính / sinh lịch buổi - trong khi chính app lại chỉ
+   "gán ở Cài đặt / danh sách Lớp" mà cả hai chỗ đó đều chỉ-xem.
+4. Không có khái niệm PHÒNG HỌC ở bất kỳ đâu (DL11 không có trường phòng) -> không xếp phòng được,
+   không phát hiện trùng phòng được. (Dữ liệu demo đã sạch trùng phòng, nhưng APP chưa chặn.)
+5. GV ghi lý do vắng vào ô ghi chú là TẮT LUÔN cảnh báo "gọi hỏi thăm HV vắng" - mà app còn chủ động
+   ép GV gõ vào đúng ô đó. Phải tách `note` (GV) và `absence_followup_note` (học vụ).
+6. Nút "Bù" ghi học viên thành "Đúng giờ" cho buổi họ VẮNG -> thổi phồng chuyên cần, HV mở cổng thấy
+   buổi mình vắng ghi "Đúng giờ".
+7. Buổi hủy không tự sinh buổi bù, không nhắc theo hạn (dữ liệu thật: 2 buổi ghi "học bù tuần sau"
+   mà không có buổi bù nào tồn tại).
+8. HV không thấy buổi bị hủy (`upSes` lọc bỏ `cancelled`) và không biết buổi bù bù cho buổi nào.
+9. Cổng HV hiện SAI tên giảng viên cho buổi dạy thay (lấy GV chính của lớp, không lấy GV của buổi).
+10. Bảng công đếm TRÙNG: buổi dạy thay tính công cho cả hai người; và KHÔNG tính buổi WOW nên GV WOW
+    ra bảng công bằng 0 dù dạy 46 buổi.
+11. KPI trách nhiệm của GV chính bị tính cả buổi người khác dạy.
+12. Điểm danh xong mà không viết nhận xét thì buổi KHÔNG BAO GIỜ được đánh dấu đã dạy - kẹt ở "Đang
+    diễn ra" mãi: không ai nhắc, không vào bảng công, không tính tiến độ lớp.
+13. Cổng điểm danh không chặn buổi ĐÃ HỦY - điểm danh cả lớp cho buổi không diễn ra.
+14. Không có điểm danh nhanh cả lớp: lớp 20 em tốn 26 chạm (trang Bài tập thì lại có "Chọn tất cả").
+15. HV bỏ học / bảo lưu vẫn nằm trong danh sách điểm danh vĩnh viễn và vẫn chiếm ghế.
+16. HV đang học thật thì KHÔNG chuyển lớp được (nút "Đổi lớp" chỉ hiện khi onboarding chưa hoàn tất).
+17. HV đăng ký khóa THỨ HAI không bao giờ xuất hiện ở hàng chờ xếp lớp (`xlWaiting` khóa theo
+    `student_id` thay vì `enrollment_id`) - đúng nhóm khách quý nhất.
+18. Chiết khấu vượt ngưỡng: 4 cửa tạo đăng ký, chỉ 1 cửa chặn.
+19. Xếp lớp vượt sức chứa: bước `place` trong chạy quy trình không kiểm tra.
+20. Gạt trạng thái lead bằng dropdown ngay trên bảng (`quickStatus`) không ghi DL02b, không đặt
+    `first_call_time` -> lead biến khỏi hàng chờ SLA mà thực tế chưa ai gọi. Cửa thứ ba của lỗi mẫu.
+21. `ensureStudent` thất bại thì IM LẶNG tạo đăng ký mồ côi (`student_id` rỗng) và vẫn đánh dấu lead
+    đã chuyển đổi - khách rơi vào hố đen.
+22. Biến toàn cục `FILT` bị hai module dùng với HAI KIỂU dữ liệu (mảng vs chuỗi) trên các khóa trùng
+    nhau -> bảng trống trơn kèm dòng "Không có bản ghi khớp bộ lọc" trong khi dữ liệu còn nguyên.
+23. Toàn bộ module Giao việc (DL23/DL24) KHÔNG BAO GIỜ ghi lên Google Sheet ở bản chạy thật - giao
+    việc buổi sáng, chiều mở lại thấy trống.
+
+**B. VỪA - trải nghiệm và độ tin cậy**
+Bấm Back trên điện thoại là thoát hẳn app (không có `pushState`) · lưu xong bị đá về đầu trang, mất
+vị trí cuộn · bấm "Sửa" trên bảng lead làm biến mất cả hub Tuyển sinh · thu tiền cho khách vãng lai
+tốn 7 cú bấm qua 2 drawer · khối thống kê theo vai đã lỗi thời (marketing thấy 0 khối, tư vấn còn 1) ·
+đặt lại lịch test cho phép chọn ngày quá khứ · nhập kết quả test không kiểm khoảng điểm (gõ 55 thay
+5.5 vẫn lưu) · đặt WOW không bắt buộc ngày giờ mà vẫn trừ quota · tiếp nhận khiếu nại không bắt buộc
+nội dung · ô bắt buộc không chặn chuỗi toàn dấu cách · không có luật ngày ở tương lai/quá khứ vô lý ·
+chiết khấu lớn hơn học phí làm đơn thành "đã thu đủ" · lead tạo từ 2 cửa nhanh luôn báo LRT = 0 phút
+(làm đẹp KPI giả) · cảnh báo "không lưu được" chỉ hiện đúng MỘT lần cho cả phiên (dữ liệu 2,4 MB rất
+sát hạn mức localStorage) · `syncApply` nuốt lỗi tính lại số dẫn xuất · lịch tuần đếm cả buổi đã hủy ·
+ngưỡng trùng giờ cứng ±2 tiếng · không dời được buổi · lớp chưa có lịch thì app BỊA 12 buổi ảo và lưu
+điểm danh vào mã buổi không tồn tại · lưu điểm danh không cảnh báo còn em chưa chấm · bấm "Bắt đầu
+lớp" muộn một ngày bị ghi trễ 1440 phút · không có màn "ai đang rảnh" · `is_late` ghi hai định dạng
+khác nhau ở hai màn · chấm bài cứng thang 0-9, ô nhận xét 1 dòng · không có mẫu nhận xét soạn sẵn ·
+ghi chú riêng của GV cho từng em HIỆN NGUYÊN VĂN cho học viên · sửa nhận xét có thể xóa mất số phút
+trễ đã tự ghi · trang Điểm danh không áp phạm vi dữ liệu (khác hẳn trang Bài tập) · `slaAttendanceGate_minutes`
+không có trong CH2 nên luôn chạy mặc định.
+
+**C. NHẸ** - nút thao tác 26px quá nhỏ cho ngón tay · dải chặng bị ẩn hoàn toàn trên điện thoại ·
+chỉ có một hộp toast nên thông báo sau xóa thông báo trước · bấm chip lọc là mất từ khóa đang tìm ·
+ô tìm khi thu tiền không tra được theo mã đăng ký · hàng điểm danh chật trên màn 360px · lưu điểm
+danh phải qua thêm một hộp xác nhận thừa.
+
+### HỆ THỐNG HƯỚNG DẪN (tour) - Luân chốt: LÀM LẠI TOÀN BỘ SAU KHI 5 MẢNG XONG
+Luân thử thật: "vài màn hướng dẫn chưa chạy, hiệu ứng đẹp nhưng chưa thấy đầy đủ thao tác, đôi lúc
+trỏ sai vị trí". Anh chốt để làm lại toàn bộ guide sau khi hệ thống hoàn chỉnh - đúng, vì màn hình
+còn đổi nhiều qua mảng 2-5 thì bộ trỏ viết bây giờ sẽ lệch tiếp. Phiên này chỉ làm phần KHÔNG phụ
+thuộc nội dung: sửa lỗi màn hình đen, đưa lối vào ra thanh tiêu đề, và bước nào không tìm thấy chỗ
+cần trỏ thì NÓI THẲNG thay vì khoanh bừa giữa màn.
+
 > **VIỆC TỒN web app (ưu tiên trên xuống):**
 > 1. **CHỜ LUÂN NGHIỆM THU ĐỢT 9 + YÊU CẦU KẾ TIẾP** - 4 yêu cầu 28/07 (phòng 2 máy, cổng HV đúng vai, hồ sơ 360 superset, rà sidebar) đã trả xong trong V9.16. Luân cần THỬ THẬT phòng 2 máy trên 2 máy khác nhau (phiên cloud không tự test WebRTC được). Phiên sau: hỏi/đợi yêu cầu kế tiếp trước khi làm gì lớn.
 > 2. **HỘI ĐỒNG TỔNG KIỂM CUỐI (đang HOLD theo lệnh Luân)** - khi Luân bật đèn xanh: gom UX-39 (font Montserrat offline), UX-12 (thanh lọc kiểu cũ), UX-13 (đồng nhất stat-tile), UX-06 (quét hex -> token), CRM-09 (kỳ báo cáo áp vào phễu/bizSection) + 62 cảnh báo mức app còn lại trong _tester.js (baseline 64, trong đó 2 cảnh báo là bug của chính script tester - hardcode enum "paused" không có trong CH1).
