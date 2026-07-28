@@ -999,6 +999,11 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  /* tu tay xo mot chang cung phai gap ba chang kia */
  navToggle(ARCG[0]);
  t("tu tay xo mot chang thi ba chang kia gap", navIsOpen(ARCG[0])&&[ARCG[1],ARCG[2],ARCG[3]].every(function(g){return !navIsOpen(g)}));
+ /* xo mot chang la MO LUON ban do chang do - khong bat bam them mot nhat nua */
+ window.NAVOPEN={};go("banlam");
+ navToggle(ARCG[2]);
+ t("xo chang la mo luon ban do chang", CUR==="chang"&&window.ARC===navGrpArc(ARCG[2]));
+ t("gap chang lai thi khong dieu huong di dau", (function(){var cur0=CUR;navToggle(ARCG[2]);return CUR===cur0})());
  /* nhom KHONG phai chang thi khong bi luat nay dong toi */
  window.NAVOPEN={};
  t("nhom Lam viec / Dieu hanh khong bi gap oan", navIsOpen("Làm việc")&&navIsOpen("Điều hành"));

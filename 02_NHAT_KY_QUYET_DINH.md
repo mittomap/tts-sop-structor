@@ -410,6 +410,19 @@
 > đè lên chữ. **Nhãn enum phải đọc được NGUYÊN VĂN theo CH1** - cắt chữ là đọc sai nghiệp vụ. Nay ô
 > nở theo nhãn, chừa chỗ cho mũi tên; dưới 820px mới cắt lại.
 >
+> **· Cổng học viên mở ra phải thấy LỚP CỦA MÌNH (anh Luân, V9.29m):** *"mặc định phải là khóa học
+> của bạn, vừa vào thấy Trung tâm đã xác nhận nó phèn"*. Đúng - bảng tích xanh đó là **báo cáo thủ
+> tục của trung tâm**, không phải thứ học viên mở cổng lên để xem. Nay thứ tự là: Lớp của bạn (lịch,
+> chỗ học, giảng viên) -> Học phí -> Trung tâm đã xác nhận. Riêng câu hỏi *"bạn có nhận lớp này
+> không?"* **không lùi xuống** - đó là việc học viên phải trả lời, và nó đứng ngay dưới cái lớp mà nó
+> đang hỏi. Tách khối lớp thành `hvLopBlock()` để đổi vị trí mà không xáo trộn thứ tự tính toán bên
+> dưới. Mục lục cũng đổi theo (Lớp của bạn lên đầu) và **"Trung tâm đã xác nhận" rời khỏi nhóm "Cần
+> bạn xử lý"** - xếp nhầm nhóm là hứa có việc rồi không có việc. `_check14` canh thứ tự này trên 40
+> hồ sơ thật, không kiểm bằng một ca mẫu.
+> **· Bấm một chặng là mở luôn bản đồ chặng (anh Luân):** trước đây bấm tên chặng chỉ XỔ danh sách
+> rồi đứng im, phải bấm thêm một nhát vào mục đầu tiên mới thấy bản đồ. Đang đứng sẵn trong chặng đó
+> thì không nhảy lại (đỡ mất chỗ đang xem); gập lại thì tuyệt nhiên không điều hướng đi đâu.
+>
 > **CÒN LẠI:** dời `DUEFALL=5` + 16 nhóm câu chăm RTOUCH + giờ hẹn preset vào cấu hình ·
 > màn cấp thêm quota WOW · `statStrip` bấm được ở các trang còn lại · bộ phận chuẩn cho
 > `renderDuyet`/`renderGiaoan`/`renderMaGioiThieu`/`renderReupTab`/`renderBanggiao`.

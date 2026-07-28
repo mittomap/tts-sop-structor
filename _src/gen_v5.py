@@ -8234,6 +8234,33 @@ function hvReferral(S){var off=hvRefOffer();
   '</div>';
  return h+'</div></div>';
 }
+/* ---- (j) LỚP CỦA BẠN: lịch cố định, phòng hoặc link Zoom BẤM ĐƯỢC, giảng viên có mặt mũi.
+    Trước đây học viên không biết lớp mình học ở đâu, ai dạy, người đó là ai. ---- */
+/* V9.29m (anh Luân): khối này trước nằm giữa trang, sau cả bảng "Trung tâm đã xác nhận" -
+   vừa vào cổng thấy một danh sách tích xanh hành chính chứ không thấy LỚP CỦA MÌNH. Tách
+   thành hàm riêng để đặt lên đầu trang mà không phải xáo trộn thứ tự tính toán bên dưới. */
+function hvLopBlock(lop,gv){if(!lop)return "";var h="";
+ var _gvs={};rows("DL11").forEach(function(x){if(x.class_id===lop.class_id&&x.teacher_id)_gvs[x.teacher_id]=1});
+ var _gvl=Object.keys(_gvs).map(function(id){return find("DL01","staff_id",id)}).filter(Boolean);
+ if(!_gvl.length&&gv)_gvl=[gv];
+ h+='<div class="panel" id="s-lop" style="margin-bottom:16px"><div class="ph"><b>Lớp của bạn</b>'+
+  '<span class="chip fill-'+(isc(lop.class_status,"in_progress")?"blue":isc(lop.class_status,"finished")?"gray":"green")+'">'+esc(elabel(lop.class_status)||"")+'</span></div><div class="pbody">';
+ h+='<div class="hvlopg">'+
+  '<div class="hvlopi"><i class="ti ti-calendar-week"></i><div><b>Lịch học cố định</b><span>'+esc(lop.class_schedule||"chưa chốt lịch")+'</span></div></div>'+
+  '<div class="hvlopi"><i class="ti ti-map-pin"></i><div><b>Học ở đâu</b><span>'+(hvLink(lop.venue_or_zoom_link,"Vào phòng học trực tuyến")||esc(lop.venue_or_zoom_link||"chưa xếp phòng"))+'</span></div></div>'+
+  '<div class="hvlopi"><i class="ti ti-flag"></i><div><b>Khai giảng - kết thúc</b><span>'+esc(lop.class_start_date||"?")+' → '+esc(lop.class_end_date||"?")+'</span></div></div>'+
+  '<div class="hvlopi"><i class="ti ti-users"></i><div><b>Sĩ số</b><span>'+esc(num(lop.current_enrollment))+' học viên</span></div></div>'+
+  '</div>';
+ if(_gvl.length){
+  h+='<div class="hvgvw">';
+  _gvl.forEach(function(g){
+   h+='<div class="hvgv">'+(g.avatar_url?'<img class="hvgva" src="'+esc(g.avatar_url)+'" alt="'+esc(g.full_name)+'">':
+     '<span class="hvgva ph">'+esc(String(g.full_name||"?").trim().split(" ").pop().slice(0,1).toUpperCase())+'</span>')+
+    '<div><b>'+esc(g.full_name||"")+'</b><span class="mut">'+esc(elabel(g.role)||"Giảng viên")+'</span>'+
+    (g.bio?'<div class="hvgvb">'+esc(g.bio)+'</div>':'')+'</div></div>'});
+  h+='</div>'}
+ return h+'</div></div>'}
+
 function renderTrangHV(){
  var stu=rows("DL09");
  var sid=window.HVID||(stu[0]&&stu[0].student_id);
@@ -8302,18 +8329,17 @@ function renderTrangHV(){
      (remo>0?'<span style="color:var(--red)"><i class="ti ti-cash"></i>Còn <b>'+vnd(remo)+'</b></span>':'<span style="color:var(--green)"><i class="ti ti-circle-check"></i>Đã đóng đủ</span>')+
     '</div></div>'});
   h+='</div>'}
- /* ---- 1. TRUNG TÂM ĐÃ XÁC NHẬN ---- */
  var tot=num(enr.final_fee)||num(enr.total_fee), paid=num(enr.paid_amount), rem=num(enr.remaining_amount);
  var disc=num(enr.discount_amount);
  var clsOK=isc(ob.class_confirmation_status,"confirmed");
  var obOK=isc(ob.onboarding_status,"completed");
- h+='<div class="sechd" id="s-xacnhan">Trung tâm đã xác nhận'+(lop?' <span class="mut" style="text-transform:none;font-weight:600">· khóa '+esc(lop.class_name)+'</span>':'')+'</div><div class="hvconf">';
- function cf(ic,lb,ok,sub){return '<div class="hvc'+(ok?" ok":"")+'"><i class="ti '+(ok?"ti-circle-check":ic)+'"></i><div><b>'+esc(lb)+'</b><span>'+esc(sub)+'</span></div></div>'}
- h+=cf("ti-clipboard-check","Đăng ký khóa học",!!enr.enrollment_id,enr.course_id_name||enr.course_id||"chưa có đăng ký");
- h+=cf("ti-cash","Học phí",rem<=0&&paid>0,paid>0?(rem>0?"đã đóng một phần":"đã đóng đủ"):"chưa ghi nhận khoản nào");
- h+=cf("ti-users-group","Lớp học",clsOK,lop?(lop.class_name+(clsOK?" · bạn đã xác nhận":" · chờ bạn xác nhận")):"chưa xếp lớp");
- h+=cf("ti-school","Nhập học",obOK,obOK?"đã hoàn tất thủ tục":"đang hoàn tất thủ tục");
- h+='</div>';
+ /* ---- V9.29m (anh Luân): "mặc định phải là KHÓA HỌC CỦA BẠN, vừa vào thấy Trung tâm đã xác nhận
+    nó phèn". Đúng: bảng tích xanh đó là BÁO CÁO THỦ TỤC của trung tâm, không phải thứ học viên mở
+    cổng lên để xem. Nay mở ra là thấy ngay lớp mình học - lịch, chỗ học, giảng viên. Bảng xác nhận
+    vẫn giữ (vẫn cần khi mới nhập học) nhưng lùi xuống dưới học phí.
+    Riêng câu hỏi "bạn có nhận lớp này không?" thì KHÔNG lùi - đó là việc học viên phải trả lời,
+    và nó đứng ngay dưới cái lớp mà nó đang hỏi. ---- */
+ h+=hvLopBlock(lop,gv);
  /* (d) TỰ XÁC NHẬN LỚP - trước đây cổng ghi "chờ bạn xác nhận" mà KHÔNG cho bấm, học viên
     không có cách nào xác nhận ngoài gọi điện. Đây là lỗi trải nghiệm rõ nhất của cổng. */
  if(lop&&ob.onboarding_id&&!clsOK&&!isc(ob.class_confirmation_status,"rejected")){
@@ -8367,29 +8393,14 @@ function renderTrangHV(){
      '<td>'+(v?'<span class="chip green">đã xác nhận</span>':'<span class="chip amber">trung tâm đang xác nhận</span>')+'</td></tr>'});
    h+='</tbody></table></div>'}
   h+='</div>'}
- /* ---- (j) LỚP CỦA BẠN: lịch cố định, phòng hoặc link Zoom BẤM ĐƯỢC, giảng viên có mặt mũi.
-    Trước đây học viên không biết lớp mình học ở đâu, ai dạy, người đó là ai. ---- */
- if(lop){
-  var _gvs={};rows("DL11").forEach(function(x){if(x.class_id===lop.class_id&&x.teacher_id)_gvs[x.teacher_id]=1});
-  var _gvl=Object.keys(_gvs).map(function(id){return find("DL01","staff_id",id)}).filter(Boolean);
-  if(!_gvl.length&&gv)_gvl=[gv];
-  h+='<div class="panel" id="s-lop" style="margin-bottom:16px"><div class="ph"><b>Lớp của bạn</b>'+
-   '<span class="chip fill-'+(isc(lop.class_status,"in_progress")?"blue":isc(lop.class_status,"finished")?"gray":"green")+'">'+esc(elabel(lop.class_status)||"")+'</span></div><div class="pbody">';
-  h+='<div class="hvlopg">'+
-   '<div class="hvlopi"><i class="ti ti-calendar-week"></i><div><b>Lịch học cố định</b><span>'+esc(lop.class_schedule||"chưa chốt lịch")+'</span></div></div>'+
-   '<div class="hvlopi"><i class="ti ti-map-pin"></i><div><b>Học ở đâu</b><span>'+(hvLink(lop.venue_or_zoom_link,"Vào phòng học trực tuyến")||esc(lop.venue_or_zoom_link||"chưa xếp phòng"))+'</span></div></div>'+
-   '<div class="hvlopi"><i class="ti ti-flag"></i><div><b>Khai giảng - kết thúc</b><span>'+esc(lop.class_start_date||"?")+' → '+esc(lop.class_end_date||"?")+'</span></div></div>'+
-   '<div class="hvlopi"><i class="ti ti-users"></i><div><b>Sĩ số</b><span>'+esc(num(lop.current_enrollment))+' học viên</span></div></div>'+
-   '</div>';
-  if(_gvl.length){
-   h+='<div class="hvgvw">';
-   _gvl.forEach(function(g){
-    h+='<div class="hvgv">'+(g.avatar_url?'<img class="hvgva" src="'+esc(g.avatar_url)+'" alt="'+esc(g.full_name)+'">':
-      '<span class="hvgva ph">'+esc(String(g.full_name||"?").trim().split(" ").pop().slice(0,1).toUpperCase())+'</span>')+
-     '<div><b>'+esc(g.full_name||"")+'</b><span class="mut">'+esc(elabel(g.role)||"Giảng viên")+'</span>'+
-     (g.bio?'<div class="hvgvb">'+esc(g.bio)+'</div>':'')+'</div></div>'});
-   h+='</div>'}
-  h+='</div></div>'}
+ /* ---- TRUNG TÂM ĐÃ XÁC NHẬN: bảng thủ tục, đọc để yên tâm chứ không phải việc phải làm ---- */
+ h+='<div class="sechd" id="s-xacnhan">Trung tâm đã xác nhận'+(lop?' <span class="mut" style="text-transform:none;font-weight:600">· khóa '+esc(lop.class_name)+'</span>':'')+'</div><div class="hvconf">';
+ function cf(ic,lb,ok,sub){return '<div class="hvc'+(ok?" ok":"")+'"><i class="ti '+(ok?"ti-circle-check":ic)+'"></i><div><b>'+esc(lb)+'</b><span>'+esc(sub)+'</span></div></div>'}
+ h+=cf("ti-clipboard-check","Đăng ký khóa học",!!enr.enrollment_id,enr.course_id_name||enr.course_id||"chưa có đăng ký");
+ h+=cf("ti-cash","Học phí",rem<=0&&paid>0,paid>0?(rem>0?"đã đóng một phần":"đã đóng đủ"):"chưa ghi nhận khoản nào");
+ h+=cf("ti-users-group","Lớp học",clsOK,lop?(lop.class_name+(clsOK?" · bạn đã xác nhận":" · chờ bạn xác nhận")):"chưa xếp lớp");
+ h+=cf("ti-school","Nhập học",obOK,obOK?"đã hoàn tất thủ tục":"đang hoàn tất thủ tục");
+ h+='</div>';
  /* ---- (l) CHỨNG NHẬN HOÀN THÀNH KHÓA - DL18 đã có sẵn attendance_rate và completion_rate
     ở cả 17 dòng mà cổng chưa dùng lần nào. ---- */
  if(ce.course_end_id&&isc(ce.student_status,"completed")){
@@ -10663,9 +10674,17 @@ function navIsOpen(g){window.NAVOPEN=window.NAVOPEN||{};
 function navArcOnly(g){window.NAVOPEN=window.NAVOPEN||{};
  if(!navIsArcGrp(g))return;
  NAVTREE.forEach(function(G){if(navIsArcGrp(G.g)&&G.g!==g)window.NAVOPEN[G.g]=false})}
+/* V9.29m (anh Luân): "bấm vào một chặng, nó nên mặc định mở bản đồ chặng luôn cho nhanh".
+   Trước đây bấm tên chặng chỉ XỔ danh sách rồi đứng im - phải bấm thêm một nhát vào mục đầu tiên
+   mới thấy bản đồ. Nay xổ chặng nào là mở luôn bản đồ chặng đó. Đang đứng sẵn trong chặng đó thì
+   không nhảy lại (đỡ mất chỗ đang xem); gập lại thì tuyệt nhiên không điều hướng đi đâu. */
+function navGrpArc(g){for(var i=0;i<NAVTREE.length;i++)if(NAVTREE[i].g===g)return NAVTREE[i].arc||"";return ""}
 function navToggle(g){window.NAVOPEN=window.NAVOPEN||{};
  var open=!navIsOpen(g);window.NAVOPEN[g]=open;
- if(open)navArcOnly(g);
+ if(!open){buildNav();return}
+ navArcOnly(g);
+ var a=navGrpArc(g);
+ if(a&&navVis(a)&&window.ARC!==a){go(a);return}   /* go() tự dựng lại menu */
  buildNav()}
 /* ===== V9.15 - MENU THEO CHẶNG VÒNG ĐỜI =====
    2 tầng: nhóm = chặng lớn (arc), mục = tổng quan chặng + các nghiệp vụ bên trong.
@@ -10890,8 +10909,9 @@ function enter(k){try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{autoRet
 /* V9.17 (tester): mục lục xếp ĐÚNG thứ tự khối trên trang - hết cảnh scrollspy nhảy lộn xộn.
    ("Sắp tới" không cần đứng đầu mục lục nữa: hero đã có nút tắt 1 chạm) */
 var HVSEC=[
- ["s-xacnhan","Trung tâm đã xác nhận","ti-circle-check"],
+ ["s-lop","Lớp của bạn","ti-users-group"],
  ["s-hocphi","Học phí","ti-cash"],
+ ["s-xacnhan","Trung tâm đã xác nhận","ti-circle-check"],
  ["s-hanhtrinh","Hành trình cùng ITTs","ti-route"],
  ["s-tiendo","Tiến độ của bạn","ti-chart-line"],
  ["s-saptoi","Sắp tới","ti-calendar-check"],
@@ -10901,14 +10921,15 @@ var HVSEC=[
  ["s-buoihoc","Nhật ký buổi học","ti-notes"],
  ["s-wow","Nhật ký buổi WOW","ti-star"],
  ["s-khaosat","Khảo sát của bạn","ti-clipboard-text"],
- ["s-lop","Lớp của bạn","ti-users-group"],
  ["s-chungnhan","Chứng nhận hoàn thành","ti-award"],
  ["s-hoidap","Trao đổi với trung tâm","ti-messages"],
  ["s-gopy","Góp ý cho trung tâm","ti-message-plus"]];
 /* (n) Mục lục 12 mục phẳng xếp sai thứ tự nhu cầu. Chia 3 NHÓM theo việc học viên thật sự
    cần: việc phải làm ngay - theo dõi việc học - nói chuyện với trung tâm. */
-var HVGRP=[["Cần bạn xử lý",["s-xacnhan","s-hocphi","s-saptoi","s-khaosat"]],
- ["Việc học của bạn",["s-lop","s-hanhtrinh","s-tiendo","s-diem","s-buoihoc","s-wow","s-khuyennghi","s-chungnhan"]],
+/* V9.29m: "Trung tâm đã xác nhận" rời khỏi nhóm "Cần bạn xử lý" - nó là bảng thủ tục để ĐỌC,
+   không có gì cho học viên làm. Xếp nhầm nhóm là hứa việc rồi không có việc. */
+var HVGRP=[["Cần bạn xử lý",["s-hocphi","s-saptoi","s-khaosat"]],
+ ["Việc học của bạn",["s-lop","s-xacnhan","s-hanhtrinh","s-tiendo","s-diem","s-buoihoc","s-wow","s-khuyennghi","s-chungnhan"]],
  ["Nói chuyện với trung tâm",["s-hoidap","s-gopy","s-gioithieu"]]];
 function hvGo(id){hvCloseSide();var el=document.getElementById(id);if(!el)return;
  var box=document.getElementById("hvMain");

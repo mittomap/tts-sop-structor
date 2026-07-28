@@ -286,4 +286,33 @@ t("(n) moi muc trong HVSEC deu thuoc mot nhom",
 t("(n) co lop mo phu de bam ra ngoai la dong muc luc", /function hvCloseSide/.test(SRC)&&/id="hvMask"/.test(HTMLHV));
 t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSide\(\)/.test(SRC));
 
+
+/* ---- 16. Cong hoc vien mo ra la thay LOP CUA MINH truoc (anh Luân, V9.29m) ---- */
+(function(){
+ var n=0,okOrder=0,coXn=0;
+ rows("DL09").slice(0,40).forEach(function(s){window.HVID=s.student_id;
+  var o="";try{o=renderTrangHV()}catch(e){return}
+  var iLop=o.indexOf('id="s-lop"'),iFee=o.indexOf('id="s-hocphi"'),iXn=o.indexOf('id="s-xacnhan"');
+  if(iLop<0)return;                      /* HV chua xep lop thi khong co khoi nay */
+  n++;
+  if(iXn>=0)coXn++;
+  if((iXn<0||iLop<iXn)&&(iFee<0||iLop<iFee))okOrder++});
+ t("co du lieu de kiem thu tu cong hoc vien", n>=10&&coXn>=10);
+ t("cong hoc vien: LOP CUA BAN dung truoc hoc phi va bang xac nhan", n>0&&okOrder===n);
+ /* muc luc phai xep dung thu tu tren trang, khong thi scrollspy nhay lung tung */
+ t("muc luc: Lop cua ban dung dau", HVSEC[0][0]==="s-lop");
+ /* "Trung tam da xac nhan" khong con nam trong nhom "Can ban xu ly" - no khong co viec gi de lam */
+ t("bang xac nhan khong bi xep vao nhom viec phai lam",
+   HVGRP[0][1].indexOf("s-xacnhan")<0&&HVGRP[1][1].indexOf("s-xacnhan")>=0);
+ /* cau hoi "ban co nhan lop nay khong" thi VAN phai o tren - do la viec that */
+ (function(){var found=0,good=0;
+  rows("DL09").slice(0,80).forEach(function(s){window.HVID=s.student_id;
+   var o="";try{o=renderTrangHV()}catch(e){return}
+   var iAsk=o.indexOf("Bạn có nhận lớp");if(iAsk<0)return;found++;
+   var iXn=o.indexOf('id="s-xacnhan"');
+   if(iXn<0||iAsk<iXn)good++});
+  t("cau hoi nhan lop van dung tren bang xac nhan", found===0||good===found)})();
+ window.HVID=rows("DL09")[0].student_id;
+})();
+
 console.log(bad.length?("CHECK14 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK14 OK: "+ok+" tieu chi");
