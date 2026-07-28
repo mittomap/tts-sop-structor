@@ -75,7 +75,8 @@ t("bang lich dong theo dot DL06b co du lieu", rows("DL06b").length>0);
  t("(a) bao nghi -> co ban ghi diem danh", !!a);
  t("(a) bao nghi -> danh dau VANG", a&&isc(a.attendance_status,"no_show"));
  t("(a) bao nghi -> tinh la CO PHEP", a&&isc(a.absence_type,"excused"));
- t("(a) bao nghi -> luu lai ly do hoc vien tu ghi", a&&String(a.student_reason||"").indexOf("om")>=0);
+ t("(a) bao nghi -> luu lai ly do hoc vien tu ghi", a&&hvSelfWhy(a).indexOf("om")>=0);
+ t("(a) dong HV tu bao duoc danh dau ro (khong de mot cot moi ngoai so do bang)", a&&hvSelfRow(a)&&("student_reason" in a)===false);
  t("(a) bao nghi -> sinh yeu cau cho hoc vu", rows("DL23").length===nTask+1);
  t("(a) yeu cau gan dung BUOI hoc", rows("DL23")[0].related_id===s2.session_id);
 })();
@@ -222,7 +223,11 @@ t("khong cam cung so ngay qua han (doc CH2)", /paramOf\("installmentLate_days"/.
 
 /* ---- 11. (m) KHONG LO THONG TIN NOI BO ---- */
 t("(m) khong in nguyen van ghi chu noi bo cua nhan vien o nhat ky buoi", !/\(a\.note\?' · '\+esc\(a\.note\)/.test(SRC));
-t("(m) khong noi 'da tru 1 luot' theo ngon ngu so sach", SRC.indexOf("đã trừ 1 lượt")<0);
+(function(){  /* cau chu so sach chi cam o CONG HOC VIEN; ben nhan vien noi "tru 1 luot" la dung nghiep vu */
+ var leak=0;
+ rows("DL09").slice(0,12).forEach(function(S){window.HVID=S.student_id;
+  if(renderTrangHV().indexOf("trừ 1 lượt")>=0)leak++});
+ t("(m) cong hoc vien khong noi 'tru 1 luot' theo ngon ngu so sach", leak===0);})();
 (function(){
  var leak=0;
  rows("DL09").slice(0,12).forEach(function(S){window.HVID=S.student_id;var h=renderTrangHV();

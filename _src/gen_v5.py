@@ -241,6 +241,13 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .hvcertg>div{background:#ffffffaa;border-radius:9px;padding:8px 10px}
 .hvcertg span{display:block;font-size:10.5px;color:#96793C;text-transform:uppercase;letter-spacing:.4px}
 .hvcertg b{font-size:14px;color:#7A5A10}
+.wowinfo{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:6px 14px;background:#F7F9FC;border-radius:10px;padding:10px 12px;margin:8px 0}
+.wowinfo.self{background:#F2F7FF;box-shadow:inset 0 0 0 1px #CFE0F7}
+.wowself{grid-column:1/-1;display:flex;gap:8px;align-items:center;font-size:12px;font-weight:700;color:var(--blue);padding-bottom:4px}
+.wowself i{font-size:17px}
+.wowib{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.55;color:#4A5A6E}
+.wowib i{font-size:15px;color:#8FA6C2;flex:none;margin-top:2px}
+.wowib b{color:var(--navy);font-weight:700}
 .hvask{background:#F2F7FF;border:1px solid #CFE0F7;border-left:4px solid var(--blue);border-radius:12px;padding:13px 15px;margin-bottom:16px}
 .hvaskh{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--navy);margin-bottom:5px}
 .hvaskh i{font-size:19px;color:var(--blue)}
@@ -2358,7 +2365,18 @@ function wowConfirm(id){var w=find("DL14","wow_id",id)||{};
   notes:(w.notes?w.notes+" | ":"")+"Đã xác nhận lịch với HV lúc "+nowStr()+" bởi "+myName(),
   next_action:"Đã chốt lịch - chuẩn bị nội dung buổi."},
   "Đã xác nhận lịch buổi WOW với học viên.")}
-function wowTaught(id){markRow("DL14","wow_id",id,{wow_status:eFull("enum_wow_status","completed")},"Đã đánh dấu đã dạy.")}
+/* Trừ lượt WOW ĐÚNG LÚC buổi thành hiện thực: đã dạy hoặc HV không đến (SOP NA035).
+   Idempotent - bấm lại không trừ thêm lần nữa. */
+function wowUseQuota(id){var w=find("DL14","wow_id",id);if(!w)return;
+ if(String(w.quota_deducted||"").toLowerCase()==="yes")return;
+ w.quota_deducted="yes";
+ var s=find("DL09","student_id",w.student_id);
+ if(s){s.wow_quota_used=String(num(s.wow_quota_used)+1);
+  if(String(s.wow_quota_remaining)!=="")s.wow_quota_remaining=String(Math.max(0,num(s.wow_quota_remaining)-1));
+  if(SVR)google.script.run.apiUpdate("DL09",w.student_id,{wow_quota_used:s.wow_quota_used,wow_quota_remaining:s.wow_quota_remaining})}
+ if(SVR)google.script.run.apiUpdate("DL14",id,{quota_deducted:"yes"});
+ persistSoon()}
+function wowTaught(id){wowUseQuota(id);markRow("DL14","wow_id",id,{wow_status:eFull("enum_wow_status","completed")},"Đã đánh dấu đã dạy - đã trừ 1 lượt WOW.")}
 function openComplaint(id){var c=find("DL17","complaint_id",id);if(!c){toast("Không thấy khiếu nại.");return}
  var code=ecode(c.complaint_status);var sevc=ecode(c.complaint_severity);
  var isNew=!(/assigned|in_progress|resolved|escalated/.test(code));var working=/in_progress|resolved|escalated/.test(code);var resolved=code==="resolved";
@@ -2492,7 +2510,9 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
  var planned=ses?pvnd(ses.session_date):null;
  var gateOpen=(!planned)||(Date.now()>=planned.getTime()-gateMin*60000);
  var started=!!(ses&&String(ses.class_start_actual||"").trim());
- var hasAtt=rows("DL12").some(function(r){return r.session_id===sess});
+ /* Dòng do HỌC VIÊN tự báo nghỉ KHÔNG được coi là "đã điểm danh" - nếu không, một em báo
+    nghỉ trước 3 ngày là cổng điểm danh mở toang trước giờ học. */
+ var hasAtt=rows("DL12").some(function(r){return r.session_id===sess&&!hvSelfRow(r)});
  var canMark=started||hasAtt;
  var punc=null;
  if(started&&planned){var lm=num(ses.teacher_late_minutes);if(!lm){var da=pvnd(ses.class_start_actual);if(da)lm=Math.max(0,Math.round((da.getTime()-planned.getTime())/60000))}
@@ -6115,7 +6135,8 @@ var APPPARAMS=[
  ["Học vụ - Lớp học","thresholdAtRisk_absences","Vắng không phép bao nhiêu buổi -> HV có nguy cơ chuyên cần","buổi",2],
  ["Học vụ - Lớp học","thresholdAtRisk_hw_missing","Thiếu bài tập bao nhiêu lần -> HV có nguy cơ học thuật","lần",3],
  ["WOW & CSKH","slaWowNote_hours","Hạn ghi nội dung sau buổi WOW 1-1","giờ",24],
- ["WOW & CSKH","thresholdSurveyFollowup_score","Điểm hài lòng từ mức này trở xuống thì tự bật cờ cần follow-up","điểm",3],
+ ["WOW & CSKH","thresholdSurveyFollowup_score","Điểm hài lòng (và số sao học viên chấm buổi học) từ mức này trở xuống thì tính là phản hồi tiêu cực, tự bật cờ cần gọi lại","điểm",3],
+ ["Học vụ - Lớp học","wowPendingMax_perStudent","Học viên được để tối đa bao nhiêu buổi WOW chờ trung tâm xác nhận","buổi",1],
  ["WOW & CSKH","slaComplaintHigh_hours","Hạn xử lý khiếu nại mức CAO","giờ",4],
  ["WOW & CSKH","slaComplaintMed_hours","Hạn xử lý khiếu nại mức TRUNG BÌNH","giờ",48],
  ["WOW & CSKH","slaComplaintLow_hours","Hạn xử lý khiếu nại mức THẤP","giờ",168]];
@@ -6773,6 +6794,27 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=rows("DL14");
  view.forEach(function(w){var s=st(w);var id=w.wow_id;
   h+='<div class="obcard"><div class="obh"><div><b>'+esc(w.student_name||w.student_id)+'</b><div class="obm">'+esc(elabel(w.wow_skill)||w.wow_skill||"")+' · '+esc(w.wow_session_date||"")+'</div></div>'+mstripFor(w.student_id,MIX)+(s.overdue?'<span class="chip red">Quá hạn ghi chú</span>':(s.noshow?'<span class="chip">HV vắng</span>':(s.note?'<span class="chip green">Xong</span>':'<span class="chip amber">Đang xử lý</span>')))+'</div>';
   h+=stepBar([["Đặt buổi",s.booked],["Xác nhận",s.confirmed],["Đã dạy",s.done],["Ghi nội dung",s.note]]);
+  /* (Luân 28/07) Buổi WOW đặt xong mà nhân viên KHÔNG xem nhanh được lý do và bối cảnh thì
+     phải mở hồ sơ ra dò - nhất là buổi HỌC VIÊN TỰ ĐẶT qua cổng. Gom đủ ở đây: ai đặt, muốn
+     kèm gì, khung giờ mong muốn, còn mấy lượt, ai dạy, và yêu cầu gốc của học viên. */
+  var _S=find("DL09","student_id",w.student_id)||{};
+  var _self=isc(w.wow_booked_by,"student")||isc(w.wow_session_type,"self_booked");
+  var _left=num(_S.wow_quota_remaining);
+  var _req=rows("DL23").filter(function(t2){return String(t2.related_id||"")===String(w.wow_id||"")})[0];
+  var _bits=[];
+  _bits.push(["ti-user-check","Người đặt",(elabel(w.wow_booked_by)||"-")+(_self?" (qua cổng học viên)":"")]);
+  if(w.wow_content_focus)_bits.push(["ti-target","Học viên muốn kèm",w.wow_content_focus]);
+  if(w.notes)_bits.push(["ti-note","Ghi chú lúc đặt",w.notes]);
+  _bits.push(["ti-star","Lượt WOW còn lại",_left+" buổi"+(String(w.quota_deducted||"").toLowerCase()==="yes"?" (buổi này đã tính vào gói)":" (buổi này CHƯA tính vào gói)")]);
+  _bits.push(["ti-chalkboard","Giảng viên",w.staff_name||"CHƯA phân công"]);
+  if(w.wow_no_show_reason)_bits.push(["ti-user-x","Lý do vắng",elabel(w.wow_no_show_reason)||w.wow_no_show_reason]);
+  if(w.wow_outcome)_bits.push(["ti-trending-up","Kết quả buổi",elabel(w.wow_outcome)||w.wow_outcome]);
+  h+='<div class="wowinfo'+(_self?" self":"")+'">';
+  if(_self)h+='<div class="wowself"><i class="ti ti-device-mobile"></i>Học viên TỰ ĐẶT qua cổng - cần xác nhận giảng viên và giờ chính thức rồi báo lại em ấy.</div>';
+  _bits.forEach(function(b){h+='<div class="wowib"><i class="ti '+b[0]+'"></i><span><b>'+esc(b[1])+':</b> '+esc(b[2])+'</span></div>'});
+  if(_req)h+='<div class="wowib"><i class="ti ti-message"></i><span><b>Yêu cầu gốc của học viên:</b> '+
+   esc(String(_req.content||"").split("\n").join(" · "))+' <button class="pill" onclick="tkOpen(\''+esc(_req.task_id)+'\')">Mở yêu cầu</button></span></div>';
+  h+='</div>';
   h+='<div class="obact">';
   if(!s.confirmed&&!s.noshow)h+='<button class="btn primary sm" onclick="confirmRun(\'Xác nhận buổi WOW này?\',\'wowConfirm\',\''+esc(id)+'\')"><i class="ti ti-check"></i>Xác nhận</button>';
   else if(!s.done&&!s.noshow)h+='<button class="btn primary sm" onclick="confirmRun(\'Đánh dấu buổi WOW đã dạy xong?\',\'wowTaught\',\''+esc(id)+'\')"><i class="ti ti-presentation"></i>Đã dạy</button>';
@@ -6791,7 +6833,7 @@ function wowNote(id){var w=find("DL14","wow_id",id)||{};
  h+='<div class="fld full"><button class="btn primary" onclick="wowNoteSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Lưu nội dung</button></div></div>';
  openDrawer("Ghi nội dung buổi WOW",h)}
 function wowNoteSave(id){var n=fldV("w_note");if(!n.trim()){toast("Nhập nội dung buổi.");return}markRow("DL14","wow_id",id,{wow_content_note:n,wow_outcome:fldV("w_out"),sla_content_note_24h:"Đúng hạn"},"Đã ghi nội dung - cảnh báo 24h tắt.","wow");closeModal()}
-function wowNoShow(id){markRow("DL14","wow_id",id,{wow_status:eFull("enum_wow_status","no_show"),wow_no_show_reason:eFull("enum_wow_no_show_reason","no_contact")},"Đã ghi nhận HV không đến.","wow")}
+function wowNoShow(id){wowUseQuota(id);markRow("DL14","wow_id",id,{wow_status:eFull("enum_wow_status","no_show"),wow_no_show_reason:eFull("enum_wow_no_show_reason","no_contact")},"Đã ghi nhận HV không đến - vẫn trừ 1 lượt theo chính sách.","wow")}
 function wowCancel(id){var w=find("DL14","wow_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-x"></i>Hủy buổi WOW - '+esc(w.student_name||w.student_id)+'</h4>';
  h+=ctxRows([["Lịch",esc(w.wow_session_date||"-")],["GV",esc(w.staff_name||w.staff_id||"-")],["Quota đã trừ",esc(w.quota_deducted||"-")]]);
@@ -6835,7 +6877,11 @@ function wowAdd(psid){var h='<div class="dcard"><h4><i class="ti ti-star"></i>Đ
  h+='<div class="fld"><label>GV WOW dạy buổi</label><select id="wa_staff"><option value="">-- chọn GV --</option>'+rows("DL01").filter(function(x){return /wow/.test(ecode(x.role))&&!/inactive/.test(ecode(x.status))}).map(function(x){return '<option value="'+esc(x.staff_id)+'">'+esc(x.full_name+" · "+(elabel(x.role)||""))+'</option>'}).join("")+'</select></div>';
  h+='<div class="fld"><label>Ngày giờ buổi</label><input id="wa_date" type="datetime-local" onchange="waBusy()"></div>';
  h+='<div class="fld full" id="wa_busy"></div>';
- h+='<div class="fld full"><label>Trọng tâm buổi</label><input id="wa_focus" placeholder="vd: Writing Task 2 - opinion essay / phát âm ending sounds"></div>';
+ h+='<div class="fld full"><label>Trọng tâm buổi <i>*</i></label><input id="wa_focus" placeholder="vd: Writing Task 2 - opinion essay / phát âm ending sounds"></div>';
+ /* Ai đề xuất buổi này và VÌ SAO cần - mọi đường đặt WOW đều phải ghi đủ, không riêng đường
+    học viên tự đặt qua cổng. Không có 2 ô này thì người xác nhận và GV dạy đều phải đi hỏi lại. */
+ h+='<div class="fld"><label>Người đề xuất buổi</label><select id="wa_by">'+enumOpts("enum_wow_booked_by")+'</select></div>';
+ h+='<div class="fld full"><label>Vì sao cần buổi này <i>*</i></label><textarea id="wa_why" rows="2" placeholder="vd: em này Speaking 4.5, thấp hơn hẳn 3 kỹ năng còn lại; hoặc: GV chủ nhiệm đề xuất sau buổi 12"></textarea></div>';
  h+='<div class="fld full"><button class="btn primary" onclick="wowAddSave()"><i class="ti ti-check"></i>Đặt buổi</button></div></div>';
  openDrawer("Đặt buổi WOW",h)}
 function waBusy(){var box=document.getElementById("wa_busy");if(!box)return;
@@ -6850,16 +6896,29 @@ function waBusy(){var box=document.getElementById("wa_busy");if(!box)return;
  box.innerHTML=day.length?'<div class="fhint" style="color:var(--amber)">GV bận trong ngày này: '+esc(day.join(" · "))+'</div>':'<div class="fhint" style="color:var(--green)">GV rảnh cả ngày này.</div>'}
 function wowAddSave(force){var sid=fldV("wa_stu");if(!sid){toast("Chọn học viên.");return}var s=find("DL09","student_id",sid)||{};
  var rem=num(s.wow_quota_remaining);
- if(s.wow_quota_remaining!==undefined&&String(s.wow_quota_remaining)!==""&&rem<=0){toast("HV "+(s.full_name||sid)+" đã hết quota WOW ("+num(s.wow_quota_used)+" đã dùng). Cần duyệt thêm trước khi đặt.");return}
+ /* Quota chỉ trừ khi buổi đã diễn ra, nên phải đếm cả buổi ĐÃ ĐẶT còn treo, nếu không đặt
+    bao nhiêu buổi cũng lọt rồi vỡ quota lúc dạy. */
+ var held=rows("DL14").filter(function(x){return String(x.student_id||"")===sid&&
+  isc(x.wow_status,"booked","confirmed")&&String(x.quota_deducted||"").toLowerCase()!=="yes"}).length;
+ if(s.wow_quota_remaining!==undefined&&String(s.wow_quota_remaining)!==""&&rem-held<=0){
+  toast("HV "+(s.full_name||sid)+" không còn lượt trống: còn "+rem+" lượt nhưng đang giữ "+held+" buổi chưa dạy. Duyệt thêm lượt trước khi đặt.",5200);return}
  var gvId=fldV("wa_staff");var gv=gvId?(find("DL01","staff_id",gvId)||{}):{};
  var wdRaw=(fldV("wa_date")||"").trim();var wd=wdRaw?fromISOdt(wdRaw):"";
  if(!force&&gvId&&wd){var cl=schedClash(gvId,pvnd(wd));
   if(cl){confirmRun("GV "+(gv.full_name||gvId)+" đã có "+cl+" (cách dưới 2h). VẪN đặt buổi WOW này?",function(){wowAddSave(true)});return}}
- var w={student_id:sid,student_name:s.full_name,booking_date:nowStr(),wow_session_date:wd,wow_skill:fldV("wa_skill"),wow_session_type:fldV("wa_type"),wow_content_focus:fldV("wa_focus"),staff_id:gvId,staff_name:gv.full_name||"",wow_booked_by:eFull("enum_wow_booked_by","academic_hv"),wow_status:eFull("enum_wow_status","booked"),quota_deducted:"yes"};
- function d(nid){w.wow_id=nid;rows("DL14").unshift(w);
-  if(s.student_id){s.wow_quota_used=String(num(s.wow_quota_used)+1);if(String(s.wow_quota_remaining)!=="")s.wow_quota_remaining=String(Math.max(0,rem-1));
-   if(SVR)google.script.run.apiUpdate("DL09",sid,{wow_quota_used:s.wow_quota_used,wow_quota_remaining:s.wow_quota_remaining})}
-  toast("Đã đặt buổi WOW cho "+(s.full_name||sid)+" - quota còn "+(s.wow_quota_remaining||"?")+".");closeModal();reRender(CUR)}
+ var _focus=(fldV("wa_focus")||"").trim();if(!_focus){toast("Ghi trọng tâm buổi để GV biết dạy gì.");return}
+ var _why=(fldV("wa_why")||"").trim();if(!_why){toast("Ghi vì sao cần buổi này - người xác nhận và GV dạy đều cần biết.");return}
+ var w={student_id:sid,student_name:s.full_name,booking_date:nowStr(),wow_session_date:wd,wow_skill:fldV("wa_skill"),
+  wow_session_type:fldV("wa_type"),wow_content_focus:_focus,staff_id:gvId,staff_name:gv.full_name||"",
+  wow_booked_by:fldV("wa_by")||eFull("enum_wow_booked_by","academic_hv"),
+  wow_status:eFull("enum_wow_status","booked"),
+  /* CHƯA dạy thì CHƯA trừ quota (SOP NA035). Trước đây đường này trừ ngay lúc đặt, lệch hẳn
+     với đường học viên tự đặt và với chính pass vá dữ liệu - buổi bị hủy là trừ oan. */
+  quota_deducted:"no",
+  wow_content_note:"",wow_outcome:"",wow_no_show_reason:"",sla_content_note_24h:"",
+  notes:_why,next_action:"Xác nhận lịch với học viên rồi chuẩn bị nội dung."};
+ function d(nid){w.wow_id=nid;rows("DL14").unshift(w);persistSoon();
+  toast("Đã đặt buổi WOW cho "+(s.full_name||sid)+" - lượt chỉ trừ sau khi buổi diễn ra.",4200);closeModal();reRender(CUR)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL14",w)}else{d("WOW-"+seqNo("DL14","wow_id"))}}
 /* ===== P8 Khảo sát & Phản hồi (DL15 + DL16) ===== */
 function fuNeed(v){var s=String(v||"").trim();return s!==""&&!/^(không|khong|no|false|0)/i.test(s)}
@@ -7326,6 +7385,7 @@ function renderTrangHV(){
      '<span class="hvscha"><b>'+vnd(num(x.due_amount))+'</b>'+(num(x.paid_amount)>0&&!paidF?'<br><span class="mut" style="font-size:10.5px">đã đóng '+vnd(num(x.paid_amount))+'</span>':'')+'</span>'+
      '<span class="hvschs">'+esc(say)+'</span></div>'});
    h+='</div>'}
+  else h+=hvDueOne(enr,rem);
   if(rem>0){
    h+='<div class="hvaskf" style="padding:0 14px 12px">'+
     '<button class="btn primary sm" onclick="hvPaidNotify(\''+esc(enr.enrollment_id||"")+'\')"><i class="ti ti-upload"></i>Tôi đã chuyển khoản</button>'+
@@ -7577,7 +7637,7 @@ function renderTrangHV(){
    (a.in_class_performance?' · thái độ trong lớp: <b>'+esc(elabel(a.in_class_performance))+'</b>':'')+
    /* (m) DL12.note là ghi chú NỘI BỘ (vd "đã gọi hỏi thăm, HV hứa đi học lại") - in nguyên
       văn cho học viên đọc là lộ chuyện chăm sóc nội bộ. Chỉ hiện phần HỌC VIÊN TỰ GHI. */
-   (a.student_reason?' · lý do bạn báo: '+esc(a.student_reason):'')+'</span></div>'}
+   (hvSelfWhy(a)?' · lý do bạn báo: '+esc(hvSelfWhy(a)):'')+'</span></div>'}
   if(s2.teacher_note_summary)h+='<div class="hvev"><i class="ti ti-notes"></i><span><b>Nhận xét của giảng viên:</b> '+esc(s2.teacher_note_summary)+'</span></div>';
   /* (g) ĐÁNH GIÁ TỪNG BUỔI bằng hàng sao - ghi vào DL16 kèm session_id để học vụ biết buổi nào
      bị chấm thấp, thay vì đợi tới phiếu khảo sát cuối khóa mới biết. */
@@ -7752,11 +7812,15 @@ function hvFeedbackForm(){
 /* Yêu cầu của học viên -> một dòng DL23 để nhân viên nhận và xử lý như mọi việc khác. */
 function hvReq(tieude,noidung,kind,rel){
  var S=hvMe();if(!S)return null;
- var dep=(kind==="tien")?"Kế toán":"Học vụ";
- var who=rows("DL01").filter(function(x){return String(x.department||"")===dep&&isc(x.status,"active")})[0]
-   ||rows("DL01").filter(function(x){return isc(x.status,"active")})[0]||{};
- var t={task_id:"TASK-"+(function(v){var z=String(v);while(z.length<4)z="0"+z;return z})(rows("DL23").length+1),
-  created_time:nowStr(),assigner_id:S.student_id,assigner_id_name:S.full_name,
+ /* chọn người nhận theo MÃ VAI TRÒ trong CH1, không so tên phòng bằng chữ tiếng Việt cắm cứng */
+ var want=(kind==="tien")?["accountant","accounting_manager"]:["academic_staff","academic_manager"];
+ var who=null;
+ want.forEach(function(rc){if(who)return;
+  who=rows("DL01").filter(function(x){return ecode(x.role)===rc&&isc(x.status,"active")})[0]||null});
+ who=who||rows("DL01").filter(function(x){return isc(x.status,"active")})[0]||{};
+ /* mã việc lấy theo SỐ LỚN NHẤT đang có (tkNextId), không đếm theo số dòng - hủy một việc
+    rồi tạo hai việc là trùng mã ngay. */
+ var t={task_id:tkNextId(),created_time:nowStr(),assigner_id:S.student_id,assigner_id_name:S.full_name,
   assignee_id:who.staff_id||"",assignee_id_name:who.full_name||"",
   task_type:eFull("enum_task_type","student_request"),
   priority:eFull("enum_task_priority",kind==="tien"?"high":"normal"),
@@ -7764,8 +7828,10 @@ function hvReq(tieude,noidung,kind,rel){
   related_type:"student",related_id:S.student_id,related_name:S.full_name,
   perm_level:"view (Chỉ xem)",perm_until:"",perm_revoked_at:"",
   perm_note:"Quyền tạm mở theo yêu cầu của chính học viên.",
-  due_time:(function(){var d=new Date();d.setDate(d.getDate()+1);
-   function z(n){return n<10?"0"+n:n}return z(d.getDate())+"/"+z(d.getMonth()+1)+"/"+d.getFullYear()+" "+z(d.getHours())+":"+z(d.getMinutes())})(),
+  /* hạn nhận việc lấy từ CH2, không cắm cứng "ngày mai" */
+  due_time:(function(){var hrs=num(paramOf("slaTaskAccept_hours",4))||4;
+   var d=new Date(Date.now()+hrs*36e5);function z(n){return n<10?"0"+n:n}
+   return z(d.getDate())+"/"+z(d.getMonth()+1)+"/"+d.getFullYear()+" "+z(d.getHours())+":"+z(d.getMinutes())})(),
   task_status:eFull("enum_task_status","new"),
   accepted_time:"",done_time:"",done_note:"",confirm_time:"",confirm_note:"",decline_reason:"",
   remind_count:"",remind_last:""};
@@ -7785,6 +7851,13 @@ function hvHotline(){return String(paramStr("centerHotline","")||"").trim()}
 function hvCallHTML(lb){var p=hvHotline();
  if(!p)return "";
  return '<a class="btn sm" href="tel:'+esc(phoneKey(p))+'"><i class="ti ti-phone"></i>'+esc(lb||("Gọi trung tâm "+p))+'</a>'}
+/* Dòng điểm danh do CHÍNH học viên tự báo. Đánh dấu bằng tiền tố thay vì đẻ cột mới:
+   DL12 chỉ có 10 cột, thêm cột lạ thì bản chạy trên Google Sheets ghi xong RƠI MẤT dữ liệu
+   mà không ai biết. Phần sau dấu ":" là lời học viên - chỉ phần đó mới được hiện ra cổng. */
+var HVSELF="[HV tự báo]";
+function hvSelfRow(a){return String((a&&a.note)||"").indexOf(HVSELF)===0}
+function hvSelfWhy(a){if(!hvSelfRow(a))return "";
+ var t=String(a.note).slice(HVSELF.length).trim();var i=t.indexOf(": ");return i>=0?t.slice(i+2):t}
 function hvMe(){var sid=window.HVID||window.JPID||"";
  var S=(sid&&find("DL09","student_id",sid))||null;
  if(!S){var a=rows("DL09");S=a[0]||null}
@@ -7844,7 +7917,7 @@ function hvAbsentSave(sid2){
   DL.DL12=DL.DL12||[];DL.DL12.unshift(a)}
  a.attendance_status=eFull("enum_attendance_status","no_show");
  a.absence_type=eFull("enum_absence_type","excused");
- a.student_reported_at=nowStr();a.student_reason=ly;
+ a.note=HVSELF+" "+nowStr()+": "+ly;
  hvReq("Học viên báo nghỉ buổi "+(s2.session_number||"")+(xinbu?" và xin học bù":""),
   "Buổi: "+(s2.session_date||"")+" ("+sid2+")\nLý do: "+ly+(xinbu?"\nHọc viên XIN HỌC BÙ buổi này.":""),
   "hocvu",["session",sid2,"Buổi "+(s2.session_number||"")]);
@@ -7876,8 +7949,8 @@ function hvMakeupSave(sid2){
 function hvWowAsk(){
  var h='<div class="dcard"><h4><i class="ti ti-star"></i>Đặt buổi WOW 1-1</h4>';
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Buổi kèm riêng đã nằm trong gói học của bạn. Chọn kỹ năng yếu nhất và khung giờ - trung tâm xác nhận lại giảng viên và giờ chính thức.</div>';
- h+='<div class="fld"><label>Kỹ năng muốn kèm <i>*</i></label><select id="hvw_skill">'+
-  ["Speaking (Nói)","Writing (Viết)","Listening (Nghe)","Reading (Đọc)"].map(function(x){return '<option>'+esc(x)+'</option>'}).join("")+'</select></div>';
+ /* danh sách kỹ năng lấy NGUYÊN VĂN từ danh mục CH1, không gõ tay 4 chuỗi ở đây */
+ h+='<div class="fld"><label>Kỹ năng muốn kèm <i>*</i></label><select id="hvw_skill">'+enumOpts("enum_homework_skill")+'</select></div>';
  h+='<div class="fld"><label>Ngày mong muốn <i>*</i></label><input id="hvw_date" type="date"></div>';
  h+='<div class="fld full"><label>Khung giờ mong muốn</label><input id="hvw_gio" placeholder="vd: sau 19h các ngày trong tuần"></div>';
  h+='<div class="fld full"><label>Bạn muốn tập trung vào phần nào</label><textarea id="hvw_focus" rows="2" placeholder="vd: em hay bí ý ở Speaking part 2"></textarea></div>';
@@ -7891,7 +7964,11 @@ function hvWowSave(){
  var when=fromISOdt(d);
  if(pvnd(when)&&pvnd(when).getTime()<hvT0()){toast("Ngày bạn chọn đã qua - chọn ngày khác nhé.");return}
  var left=num(S.wow_quota_remaining);
- if(left<=0){toast("Bạn đã dùng hết lượt WOW của khóa. Liên hệ trung tâm nếu cần thêm.",4200);return}
+ if(left<=0){toast("Bạn đã dùng hết lượt WOW của khóa"+(hvHotline()?(" - gọi "+hvHotline()+" nếu cần thêm."):"."),4600);return}
+ var _pend=rows("DL14").filter(function(x){return String(x.student_id||"")===S.student_id&&
+  isc(x.wow_status,"booked")&&!String(x.staff_id||"").trim()}).length;
+ if(_pend>=num(paramOf("wowPendingMax_perStudent",1))){
+  toast("Bạn đang có một buổi WOW chờ trung tâm xác nhận. Chờ buổi đó chốt giờ rồi đặt tiếp nhé.",4600);return}
  var w={wow_id:"WOW-"+seqNo("DL14","wow_id"),student_id:S.student_id,student_name:S.full_name,
   booking_date:nowStr(),wow_session_date:when,
   wow_session_type:eFull("enum_wow_session_type","self_booked"),
@@ -7913,6 +7990,28 @@ function hvWowSave(){
  hvReRender()}
 
 /* ---- (h) BÁO ĐÃ CHUYỂN KHOẢN ---- */
+/* Đơn đóng MỘT LẦN (25/90 đơn) không có bảng đợt để vẽ - vẫn phải cho học viên biết ngày và
+   số tiền của lần đóng tiếp theo, đọc từ DL06.next_payment_due. */
+function hvDueOne(enr,rem){
+ if(!enr||!enr.enrollment_id)return "";
+ if(rem<=0)return '<div class="hvschd"><div class="hvschh"><i class="ti ti-circle-check" style="color:var(--green)"></i>'+
+  '<b>Bạn đã đóng đủ học phí khóa này</b><span class="mut">không còn đợt nào phải đóng</span></div></div>';
+ var due=String(enr.next_payment_due||"").trim();
+ var rd=paramOf("installmentRemind_days",3),ld=paramOf("installmentLate_days",5);
+ var d=due?pvnd(due):null;
+ var days=d?Math.round((d.getTime()-hvT0())/864e5):null;
+ var cls=(days==null)?"":(days<-ld?"late":(days<0?"due":(days<=rd?"soon":"")));
+ var say=(days==null)?"trung tâm chưa chốt ngày":(days<0?("quá hạn "+Math.abs(days)+" ngày"):
+  (days===0?"đến hạn HÔM NAY":("còn "+days+" ngày")));
+ var h='<div class="hvschd"><div class="hvschh"><i class="ti ti-calendar-dollar"></i>'+
+  '<b>Lần đóng tiếp theo</b><span class="mut">trung tâm nhắc bạn trước hạn '+rd+' ngày</span></div>'+
+  '<div class="hvschr '+cls+'"><span class="hvschn">Còn phải đóng</span>'+
+  '<span class="hvschd2">'+esc(due||"chưa hẹn ngày")+'</span>'+
+  '<span class="hvscha"><b>'+vnd(rem)+'</b></span>'+
+  '<span class="hvschs">'+esc(say)+'</span></div>';
+ if(!due)h+='<div class="hvreqc" style="margin:6px 14px 0">Trung tâm chưa chốt ngày cho lần đóng tiếp theo. '+
+  'Bạn bấm <b>Tôi đã chuyển khoản</b> nếu đã chuyển, hoặc gọi trung tâm để hẹn ngày.</div>';
+ return h+'</div>'}
 function hvPaidNotify(eid){
  var e=find("DL06","enrollment_id",eid)||{};
  var sch=rows("DL06b").filter(function(x){return String(x.enrollment_id||"")===eid&&!isc(x.status,"paid")})
