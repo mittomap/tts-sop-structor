@@ -35,15 +35,20 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 /* V9.23 (Luân): 4 CHẶNG vòng đời phải nổi hẳn so với trang nghiệp vụ - chặng là "bản đồ",
    nghiệp vụ là "chỗ làm việc". Nhóm chặng: chữ sáng hơn + vạch màu chặng chạy dọc mép trái.
    Mục "Tổng quan chặng": viên thuốc nền màu chặng, chữ hoa, không giống mục nghiệp vụ. */
-.navlbl.isarc{color:#D7E5F6;font-size:10.5px;background:#ffffff0a;border-left:3px solid var(--acol,#8CC5F2);padding-left:7px}
-.navlbl.isarc:hover{background:#ffffff18}
-.navitem.chang{margin:2px 0 4px;font-weight:800;font-size:12px;letter-spacing:.4px;text-transform:uppercase;
- color:#EAF3FF;background:linear-gradient(90deg,var(--acol,#8CC5F2)38,#ffffff08);
- border-left:3px solid var(--acol,#8CC5F2);box-shadow:inset 0 0 0 1px #ffffff14}
-.navitem.chang i{opacity:1;color:#fff}
-.navitem.chang:hover{background:linear-gradient(90deg,var(--acol,#8CC5F2)55,#ffffff12)}
-.navitem.chang.on{background:var(--acol,#8CC5F2);color:#0B2240;box-shadow:inset 0 0 0 1px #ffffff40}
-.navitem.chang.on i{color:#0B2240}
+/* CHẶNG là cái nổi - nó là tiêu đề của cả nhóm. Mục "Tổng quan chặng" chỉ là MỘT MỤC bên
+   trong chặng, phải nhỏ hơn và nhẹ hơn tên chặng, nếu không con trông to hơn cha, nhìn kỳ. */
+.navlbl.isarc{color:#E8F1FB;font-size:11.5px;letter-spacing:.5px;background:#ffffff12;
+ border-left:4px solid var(--acol,#8CC5F2);padding:8px 9px;margin:12px 2px 3px}
+.navlbl.isarc:hover{background:#ffffff1f}
+.navlbl.isarc .navarc{width:8px;height:8px}
+/* mục Tổng quan chặng: cùng cỡ chữ với mục nghiệp vụ, chỉ khác ở chấm màu chặng và chữ nghiêng
+   nhẹ - đủ để biết "đây là bản đồ", không giành chỗ với tên chặng. */
+.navitem.chang{font-weight:600;color:#BFD3EA}
+.navitem.chang i{color:var(--acol,#8CC5F2);opacity:1}
+.navitem.chang:after{content:"";width:6px;height:6px;border-radius:50%;background:var(--acol,#8CC5F2);
+ margin-left:auto;flex:none;opacity:.85}
+.navitem.chang.on{background:#ffffff2e;color:#fff;border-left-color:var(--acol,#8CC5F2)}
+.navitem.chang.on i{color:var(--acol,#8CC5F2)}
 .navgrp{margin-bottom:3px}
 .navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500;border-left:3px solid transparent}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
@@ -9729,7 +9734,7 @@ var NAVSUB={nhaplead:"tuyensinh",test:"tuyensinh",tuvan:"tuyensinh",thanhtoan:"t
  changA:"chang",changB:"chang",changC:"chang",changD:"chang"};
 function navOwner(k){return NAVSUB[k]||k}
 function navItemMeta(k){
- if(/^chang[A-D]$/.test(k)){var A=ARCBK[k];return {t:"Tổng quan chặng",ic:"ti-route",arc:A}}
+ if(/^chang[A-D]$/.test(k)){var A=ARCBK[k];return {t:"Bản đồ chặng này",ic:"ti-route",arc:A}}
  var p=PBK[k]||{};return {t:p.t||k,ic:p.ic||"ti-point"}}
 function navVis(k){var r=RBK[CURROLE],rs=SCOPE();
  var o=navOwner(k);
