@@ -711,6 +711,23 @@
 > **chưa làm gì thì mọi phép kiểm phải báo CHƯA** (phép kiểm luôn xanh là phép kiểm giả) · và thêm
 > một lead thật thì phép kiểm tương ứng phải đổi sang ĐÃ LÀM.
 >
+> **(N2) NHỊP NGÀY CHUẨN CỦA TỪNG VỊ TRÍ.** Trợ thủ đợt trước mới trả lời được *"ở TRANG NÀY bạn
+> còn việc gì"*. Câu người ta thật sự cần khi mở máy buổi sáng là: *"HÔM NAY tôi phải làm gì, theo
+> thứ tự nào, và tôi xong tới đâu rồi"*.
+> **5 nhịp ngày** cho 5 vị trí (tư vấn · học vụ · giáo viên · kế toán · quản lý), xếp theo
+> **Đầu ngày / Trong ngày / Cuối ngày**, mỗi dòng có số việc còn tồn và bấm thẳng vào chỗ làm.
+> Mỗi nhịp **không tự đếm lấy** - nó đọc `slaItems`/`absQueue`/`duthuList`/`clashList`/`kpiTop3`,
+> tức là những bộ máy đã có. Tự đếm là ngày mai nhịp ngày và cái chuông nói hai con số.
+> **Chỗ suýt nói láo, đã chặn:** ba nhịp là **THÓI QUEN** chứ không phải hàng chờ ("nhìn dự thu
+> tháng", "giao việc cho ngày mai") - không có gì để cạn. Gắn cho nó mác **"xong"** màu xanh là
+> người ta đọc thấy xanh rồi **bỏ qua đúng cái việc lẽ ra phải làm**. Nay hai loại tách hẳn: hàng
+> chờ đếm được thì "0 = xong", thói quen thì ghi "nên xem", và con số *"N/M hàng chờ đã sạch"* chỉ
+> đếm hàng chờ.
+> Nhịp ngày chỉ hiện ở **TRANG ĐẦU của chính người đó** - nhét vào mọi trang thì thành nhiễu, mà
+> nhiễu thì người ta tắt Trợ thủ luôn. Bộ kiểm canh cả hai chiều: có ở trang đầu, KHÔNG có ở trang
+> khác; mỗi chức danh ra đúng nhóm nhịp; mọi nhịp trỏ tới trang có thật; và nhóm nào cũng phải có
+> ít nhất một hàng chờ đếm được - toàn thói quen thì nó chỉ là tờ giấy dán tường.
+>
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
 >
 > **(G) TRỢ THỦ THAO TÁC - anh Luân đặt 28/07, LÀM SAU ĐỢT AUDIT (F):** *"a muốn nghiên cứu trợ thủ

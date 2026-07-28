@@ -277,4 +277,48 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
  t("trợ thủ chèn trước nội dung trang", /_tth\+renderList\(key\)/.test(SRCn)||/_tth\+RENDER\[key\]\(\)/.test(SRCn));
 })();
 
+
+/* ---------- 15. NHỊP NGÀY THEO CHỨC DANH (N2) ---------- */
+(function(){
+ t("có nhịp ngày", typeof nhipList==="function"&&typeof nhipHTML==="function");
+ t("đủ 5 nhóm vị trí", Object.keys(NHIP).length>=5);
+ var xau=[],rong=[];
+ function nhu(sid){window.GATE_SID=sid;applyScope(sid);setRole("all")}
+ var mau=[[/^sales_staff/,"tuvan"],[/^academic_staff/,"hocvu"],[/^teacher/,"giaovien"],
+          [/^account/,"ketoan"],[/^ceo/,"quanly"]];
+ mau.forEach(function(pr){
+  var st=rows("DL01").filter(function(x){return pr[0].test(ecode(x.role))})[0];
+  if(!st){xau.push("khong co nhan su vai "+pr[1]);return}
+  nhu(st.staff_id);
+  if(nhipKey()!==pr[1])xau.push(st.staff_id+" -> "+nhipKey()+" (mong "+pr[1]+")");
+  var L=nhipList();
+  if(!L.length)rong.push(pr[1]);
+  /* mọi nhịp phải trỏ tới một trang CÓ THẬT - trỏ vào trang không tồn tại thì bấm vào đứng im */
+  L.forEach(function(x){if(!PBK[x.page]&&!goAlias(x.page))xau.push(pr[1]+": trang "+x.page+" khong co that")});
+  /* nhịp phải có ít nhất một hàng chờ đếm được, nếu toàn thói quen thì nó chỉ là tờ giấy dán tường */
+  if(!L.some(function(x){return !x.hab}))xau.push(pr[1]+": khong co hang cho nao dem duoc")});
+ window.GATE_SID="";applyScope("");setRole("all");
+ t("mỗi chức danh ra đúng nhóm nhịp của mình"+(xau.length?(" - "+xau.slice(0,3).join(" | ")):""), xau.length===0);
+ t("chức danh nào cũng có nhịp ngày"+(rong.length?(" - trống: "+rong.join(", ")):""), rong.length===0);
+ /* THÓI QUEN không được gắn mác "xong" - đó là nói láo, người ta đọc thấy xanh rồi bỏ qua */
+ (function(){
+  var st=rows("DL01").filter(function(x){return /^ceo/.test(ecode(x.role))})[0];
+  if(!st)return; nhu(st.staff_id);
+  var L=nhipList(),hab=L.filter(function(x){return x.hab});
+  var html=nhipHTML();
+  window.GATE_SID="";applyScope("");setRole("all");
+  t("có phân biệt thói quen với hàng chờ", hab.length>0);
+  t("thói quen không bị gắn mác xong", hab.length===0||/nên xem/.test(html));
+  t("số 'đã sạch' chỉ đếm hàng chờ, không đếm thói quen",
+    html.indexOf("/"+L.filter(function(x){return !x.hab}).length+" hàng chờ đã sạch")>=0)})();
+ /* nhịp ngày chỉ ở TRANG ĐẦU - nhét vào mọi trang là nhiễu, nhiễu thì người ta tắt Trợ thủ luôn */
+ (function(){var st=rows("DL01").filter(function(x){return /^account/.test(ecode(x.role))})[0];
+  if(!st)return; nhu(st.staff_id);
+  var land=SCOPE().land||"banlam";
+  var a=tthHTML(land),b=tthHTML(land==="hocvien"?"banlam":"hocvien");
+  window.GATE_SID="";applyScope("");setRole("all");
+  t("nhịp ngày hiện ở trang đầu", /class="nhip"/.test(a));
+  t("nhịp ngày KHÔNG lặp ở mọi trang", !/class="nhip"/.test(b))})();
+})();
+
 console.log(bad.length?("CHECK18 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK18 OK: "+ok+" tieu chi | da ve "+VIEWS.length+" trang/tab");

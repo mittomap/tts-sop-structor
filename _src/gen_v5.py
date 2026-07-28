@@ -894,6 +894,22 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    "Đã chuyển đổi - đã thành HV" hiện thành "...đã thành H" và mũi tên đè lên chữ. Nhãn enum phải
    đọc được NGUYÊN VĂN theo CH1, cắt chữ là đọc sai nghiệp vụ. Nay ô nở theo nhãn dài nhất, chừa
    chỗ cho mũi tên; màn hình thật hẹp mới cắt lại. */
+.nhip{background:#fff;border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-bottom:12px}
+.nhip .nhiph{display:flex;align-items:center;gap:8px;font-size:12.5px;margin-bottom:9px;flex-wrap:wrap}
+.nhip .nhiph i{font-size:16px;color:var(--blue)}
+.nhip .nhiph .tthx{margin-left:auto;font-size:11px;color:var(--muted);cursor:pointer;border-bottom:1px dashed var(--line)}
+.nhip .nhiph .tthx:hover{color:var(--blue);border-color:var(--blue)}
+.nhipg{margin-bottom:7px}
+.nhipg:last-child{margin-bottom:0}
+.nhipgt{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);display:flex;align-items:center;gap:5px;margin:6px 0 4px}
+.nhipr{display:flex;align-items:center;gap:8px;padding:6px 9px;border:1px solid var(--line);border-radius:8px;margin-bottom:5px;cursor:pointer;font-size:12.5px;transition:.12s}
+.nhipr:hover{border-color:var(--blue);background:#F7FAFE;transform:translateY(-1px)}
+.nhipr>i{font-size:15px;color:var(--amber);flex:none}
+.nhipr.ok{opacity:.68}
+.nhipr.hab>i{color:var(--muted)}
+.nhipr.ok>i{color:var(--green)}
+.nhipr .nhipt{flex:1;min-width:0}
+@media(max-width:560px){.nhipr .nhipt{white-space:normal}}
 .tth{background:linear-gradient(180deg,#FFFBEB,#FFF);border:1px solid #F0D08A;border-left:3px solid var(--amber);border-radius:11px;padding:11px 14px;margin-bottom:14px}
 .tth .tthh{display:flex;align-items:center;gap:7px;font-size:12px;color:#8A5A0B;margin-bottom:7px}
 .tth .tthh i{font-size:15px}
@@ -11225,6 +11241,112 @@ function crumbLabel(key,ctx){ctx=ctx||{};var p=PBK[key];var t=p?p.t:key;
    `slaItems()` (việc quá hạn/sắp hạn theo luật SLA) và `PBK[k].c` (trang này để làm gì) - rồi lọc
    theo trang đang mở và theo phạm vi chuông của chức danh. Khai riêng một bảng "trang này nên làm
    gì" là ngày mai nó nói khác cái chuông. */
+/* ═══ V9.30 (N2) - NHỊP NGÀY CHUẨN CỦA TỪNG VỊ TRÍ ═══
+   Anh Luân: "nâng tầm trợ thủ, hướng dẫn từng nhân viên mỗi thao tác hằng ngày một cách chuẩn nhất."
+   Trợ thủ đợt trước mới trả lời được "ở TRANG NÀY bạn còn việc gì". Câu người ta thật sự cần khi
+   mở máy buổi sáng là: "HÔM NAY tôi phải làm gì, theo thứ tự nào, và tôi xong tới đâu rồi".
+
+   NHỊP NGÀY = danh sách việc CHUẨN của một vị trí, xếp theo ĐẦU NGÀY / TRONG NGÀY / CUỐI NGÀY.
+   LUẬT: mỗi nhịp KHÔNG tự đếm lấy - nó trỏ vào một nhóm việc CÓ SẴN của slaItems (cat/grp) hoặc
+   một phép đếm đã có trong app. Tự đếm là ngày mai nhịp ngày và cái chuông nói hai con số.
+   Nhịp nào không còn việc thì tick xanh - đó chính là "xong tới đâu". */
+var NHIP={
+ tuvan:[
+  ["sang","Gọi khách đã hẹn hôm nay","Khách hẹn mà không gọi là mất - việc gấp nhất trong ngày","nhaplead",
+   function(){return jTasks().filter(function(x){return x.cat==="Tuyển sinh"&&x.sev==="red"}).length}],
+  ["sang","Nhận lead mới về trong đêm","Lead mới phải liên hệ trong hạn phản hồi","nhaplead",
+   function(){return rows("DL02").filter(function(l){return isc(l.lead_status,"new")&&!String(l.first_call_time||"").trim()}).length}],
+  ["ngay","Chốt khách đã có kết quả test","Có điểm rồi mà không gọi tư vấn là nguội","tuvan",
+   function(){return rows("DL04").filter(function(c){return isc(c.consultation_status,"not_consulted")}).length}],
+  ["ngay","Tạo đăng ký cho khách đã chốt","Chốt miệng mà không lập phiếu thì không ai thu tiền được","tuvan",
+   function(){return rows("DL04").filter(function(c){return isc(c.conversion_status,"confirmed_with_deposit")&&
+    !rows("DL06").some(function(e){return String(e.lead_id||"")===String(c.lead_id||"")})}).length}],
+  ["chieu","Nhận và báo xong việc được giao","Việc treo qua đêm là người giao phải đi hỏi","giaoviec",
+   function(){var me=CURSTAFF||"";return rows("DL23").filter(function(t){return String(t.assignee_id||"")===me&&tkSt(t)==="new"}).length}]],
+ hocvu:[
+  ["sang","Duyệt đơn xin nghỉ của học viên","Giáo viên cần biết TRƯỚC giờ dạy ai vắng","duyetnghi",
+   function(){return absQueue().length}],
+  ["sang","Xếp lớp cho học viên đã đóng đủ","Đóng tiền rồi mà chờ xếp lớp là trải nghiệm tệ nhất","xeplop",
+   function(){return rows("DL06").filter(function(e){return num(e.remaining_amount)<=0&&num(e.paid_amount)>0&&
+    !rows("DL08").some(function(o){return o.student_id===e.student_id&&String(o.class_id||"").trim()})}).length}],
+  ["ngay","Gửi thông tin lớp và chốt xác nhận","Học viên chưa xác nhận lớp là chưa chắc đi học","xeplop",
+   function(){return rows("DL08").filter(function(o){var st=obState(o);return o.class_id&&!st.confirmed}).length}],
+  ["ngay","Theo học viên nguy cơ","Bỏ học không báo trước - dấu hiệu luôn có trước cả tuần","hocvien",
+   function(){return rows("DL09").filter(function(x){return isRisk(x.attendance_progress_status)||isRisk(x.academic_progress_status)}).length}],
+  ["chieu","Soi buổi chưa ghi nhận xét","Cuối ngày là lúc nhắc giáo viên, không phải sáng hôm sau","buoihoc",
+   function(){return rows("DL11").filter(function(x){return bhState(x).noteOver}).length}]],
+ giaovien:[
+  ["sang","Xem buổi dạy hôm nay và ai báo nghỉ","Biết trước ai vắng để chuẩn bị phần bù","hoctap",
+   function(){var t=new Date();return rows("DL11").filter(function(x){var d=pvnd(x.session_date);
+    return d&&sameDay(d,t)&&String(x.teacher_id||"")===(CURSTAFF||"")}).length}],
+  ["ngay","Điểm danh ngay khi vào lớp","Điểm danh muộn là số chuyên cần sai cả tháng","banglop",
+   function(){var g=num(paramOf("attendanceGrace_hours",24));
+    return rows("DL11").filter(function(x){if(!isc(x.session_status,"completed"))return false;
+     if(String(x.teacher_id||"")!==(CURSTAFF||""))return false;
+     var a=hoursSince(x.session_date);if(a==null||a>g)return false;
+     return !rows("DL12").some(function(y){return y.session_id===x.session_id})}).length}],
+  ["chieu","Ghi nhận xét buổi vừa dạy","Trong hạn thì viết còn nhớ; để hôm sau là viết cho có","buoihoc",
+   function(){return rows("DL11").filter(function(x){return String(x.teacher_id||"")===(CURSTAFF||"")&&bhState(x).done&&!bhState(x).note}).length}],
+  ["chieu","Chấm bài học viên đã nộp","Bài nộp mà không chấm thì lần sau các em không nộp nữa","baitap",
+   function(){return rows("DL13").filter(function(x){return String(x.teacher_id||"")===(CURSTAFF||"")&&hwSubmitted(x)&&!hwGraded(x)}).length}]],
+ ketoan:[
+  ["sang","Đối soát khoản thu hôm qua","Chưa đối soát thì chưa phải tiền vào két","duyetthu",
+   function(){return duyPayList().length}],
+  ["ngay","Thu các đợt tới hạn hôm nay","Nhắc đúng ngày thì thu được; trễ một tuần là phải đòi","thanhtoan",
+   function(){return duthuList().filter(function(r){return r.st.k==="today"||r.st.k==="due"||r.st.k==="late"}).length}],
+  ["ngay","Xử lý chiết khấu và hoàn tiền chờ duyệt","Hàng chờ quyết định để lâu là chặn cả luồng phía sau","duyetck",
+   function(){return duyTabs().filter(function(x){return x.k==="duyetck"||x.k==="duyethoan"}).reduce(function(a,x){return a+x.n},0)}],
+  ["chieu","Nhìn dự thu tháng","Biết tháng sau về bao nhiêu mới lên kế hoạch được","dsthanhtoan",
+   null]],
+ quanly:[
+  ["sang","Xem việc quá hạn toàn trung tâm","Số đỏ hôm nay là vấn đề tuần sau","viec",
+   function(){return slaItems().filter(function(x){return x.sev==="red"}).length}],
+  ["sang","Duyệt hàng chờ quyết định","Cấp dưới đang đợi mình gật đầu","duyet",
+   function(){return duyN()}],
+  ["ngay","Soi KPI dưới ngưỡng","Chỉ số dưới ngưỡng là việc phải giao, không phải để ngắm","baocao",
+   function(){return kpiTop3().length}],
+  ["ngay","Soi đụng lịch và lớp thiếu giáo viên","Một buổi vỡ là cả lớp mất buổi","phong",
+   function(){return clashList().length+rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()}).length}],
+  ["chieu","Giao việc cho ngày mai","Giao cuối ngày thì sáng mai người ta có việc ngay","giaoviec",
+   null]]};
+var NHIPBUOI={sang:["Đầu ngày","ti-alarm"],ngay:["Trong ngày","ti-clock-play"],chieu:["Cuối ngày","ti-clock-check"]};
+/* Vị trí của người đang đăng nhập -> nhóm nhịp. Dùng lại mapRoleCode, không tự phân loại lần hai. */
+function nhipKey(){
+ var r=mapRoleCode(ecode((find("DL01","staff_id",CURSTAFF)||{}).role))||"";
+ if(/ceo|smanager|amanager/.test(r))return "quanly";
+ if(/^sales/.test(r))return "tuvan";
+ if(/academic/.test(r))return "hocvu";
+ if(/teacher|wow/.test(r))return "giaovien";
+ if(/account/.test(r))return "ketoan";
+ return CURSTAFF?"":"quanly"}          /* chưa gắn nhân viên (quản trị demo) -> xem nhịp quản lý */
+/* Hai loại nhịp - KHÔNG được trộn:
+   · HÀNG CHỜ (có hàm đếm): đếm được nên "0 = xong" là câu nói thật;
+   · THÓI QUEN (khai null): không có hàng chờ nào để cạn, gắn mác "xong" cho nó là NÓI LÁO -
+     người ta đọc thấy xanh rồi bỏ qua đúng cái việc lẽ ra phải làm. */
+function nhipList(){var k=nhipKey();if(!k)return [];
+ return (NHIP[k]||[]).map(function(r){
+  if(typeof r[4]!=="function")return {buoi:r[0],t:r[1],vi:r[2],page:r[3],n:0,hab:true};
+  var n=0;try{n=num(r[4]())}catch(e){n=0}
+  return {buoi:r[0],t:r[1],vi:r[2],page:r[3],n:n,hab:false}})}
+function nhipHTML(){
+ var L=nhipList();if(!L.length)return "";
+ var Q=L.filter(function(x){return !x.hab});          /* chỉ hàng chờ mới đếm được "sạch" */
+ var xong=Q.filter(function(x){return !x.n}).length;
+ var h='<div class="nhip"><div class="nhiph"><i class="ti ti-checklist"></i><b>Nhịp ngày của bạn</b>'+
+  '<span class="chip '+(xong===Q.length?"green":"amber")+'">'+xong+'/'+Q.length+' hàng chờ đã sạch</span>'+
+  '<span class="tthx" onclick="tthToggle()" data-tip="Tắt Trợ thủ - bật lại ở nút bóng đèn trên thanh tiêu đề">Tôi quen rồi, tắt đi</span></div>';
+ ["sang","ngay","chieu"].forEach(function(b){
+  var g=L.filter(function(x){return x.buoi===b});if(!g.length)return;
+  h+='<div class="nhipg"><div class="nhipgt"><i class="ti '+NHIPBUOI[b][1]+'"></i>'+esc(NHIPBUOI[b][0])+'</div>';
+  g.forEach(function(x){
+   h+='<div class="nhipr'+(x.hab?" hab":(x.n?"":" ok"))+'" onclick="go(\''+esc(x.page)+'\')" data-tip="'+esc(x.vi)+'">'+
+    '<i class="ti '+(x.hab?"ti-eye":(x.n?"ti-clock":"ti-circle-check"))+'"></i>'+
+    '<span class="nhipt">'+esc(x.t)+'</span>'+
+    (x.hab?'<span class="chip gray">nên xem</span>'
+      :(x.n?'<span class="chip '+(x.n>9?"red":"amber")+'">'+x.n+'</span>':'<span class="chip green">xong</span>'))+
+    '</div>'});
+  h+='</div>'});
+ return h+'</div>'}
 function tthKey(){var me="";try{me=tkMeId()||CURSTAFF||""}catch(e){me=CURSTAFF||""}
  return "ITTS_TROTHU_"+(me||"guest")}
 function tthOn(){try{var v=localStorage.getItem(tthKey());return v===null?true:v==="1"}catch(e){return true}}
@@ -11261,7 +11383,10 @@ function tthHTML(key){
  var red=L.filter(function(x){return x.sev==="red"});
  var top=(red[0]||L[0]);
  var who="";try{who=(SCOPE().name||"")}catch(e){}
- var h='<div class="tth"><div class="tthh"><i class="ti ti-bulb"></i><b>Trợ thủ</b>'+
+ /* Nhịp ngày chỉ hiện ở TRANG ĐẦU của người đó (nơi họ mở máy ra là thấy) - nhét vào mọi trang
+    thì thành nhiễu, mà nhiễu thì người ta tắt Trợ thủ luôn. */
+ var nh=(key===(SCOPE().land||"banlam"))?nhipHTML():"";
+ var h=nh+'<div class="tth"><div class="tthh"><i class="ti ti-bulb"></i><b>Trợ thủ</b>'+
   '<span class="tthx" onclick="tthToggle()" data-tip="Tắt Trợ thủ - bật lại ở nút bóng đèn trên thanh tiêu đề">Tôi quen rồi, tắt đi</span></div>';
  h+='<div class="tthb"><div class="tthr"><span class="tthk">Trang này để làm gì</span><span>'+esc(p.c||p.t||"")+'</span></div>';
  if(!L.length){
