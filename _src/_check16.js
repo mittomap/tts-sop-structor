@@ -1029,4 +1029,62 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
 })();
 function navIsArcGrpG(G){return navIsArcGrp(G.g)}
 
+
+/* ---- 36. GIAO VIEN DU PHONG THEO NGAY + rang buoc 5 CHI NHANH / HOC ONLINE ---- */
+(function(){
+ setRole("all");
+ t("co man GV du phong", typeof renderGvdp==="function"&&typeof gvBackup==="function"&&typeof sesSetTeacher==="function");
+ /* du lieu: khong con giao vien nao thieu chi nhanh - thieu la cau hoi "ai thay o co so X" cham */
+ var gv=rows("DL01").filter(isGVRole);
+ t("moi giao vien deu co chi nhanh", gv.length>=5&&gv.every(function(g){return String(g.branch||"").trim()!==""}));
+ /* du lieu: lop o Co so Online thi hinh thuc hoc phai la online */
+ t("lop o Co so Online deu hoc online",
+   rows("DL10").filter(function(c){return /^online/.test(ecode(c.branch))&&!clsOnline(c)}).length===0);
+ t("lop online co link, lop tai cho co phong",
+   rows("DL10").filter(function(c){var v=String(c.venue_or_zoom_link||"");
+    if(clsOnline(c))return !/^http/.test(v);
+    if(isc(c.learning_mode,"offline"))return /^http/.test(v);
+    return false}).length===0);
+ /* BAT BIEN 1: lop HOC TAI CHO -> nguoi de xuat phai co mat duoc o dung co so */
+ var kt=0,sai=[];
+ rows("DL11").slice(0,400).forEach(function(x){var c=find("DL10","class_id",x.class_id)||{};
+  if(clsOnline(c)||!c.branch)return;
+  gvBackup(x).forEach(function(r){if(!r.ok)return;kt++;
+   if(!gvBranches(r.g.staff_id)[c.branch])sai.push(x.session_id+"/"+r.g.staff_id)})});
+ t("co du de xuat de kiem", kt>=50);
+ t("lop hoc tai cho: khong de xuat nguoi khong co mat duoc o co so do"+(sai.length?(" - "+sai.slice(0,3).join(",")):""), sai.length===0);
+ /* BAT BIEN 2: khong bao gio de xuat nguoi dang co buoi khac trung gio */
+ var sai2=[];
+ rows("DL11").slice(0,300).forEach(function(x){var d=pvnd(x.session_date);if(!d)return;
+  gvBackup(x).forEach(function(r){if(!r.ok)return;
+   if(gvBusyAt(r.g.staff_id,d,x.session_id))sai2.push(x.session_id+"/"+r.g.staff_id)})});
+ t("khong de xuat nguoi dang ban gio do", sai2.length===0);
+ /* BAT BIEN 3: lop ONLINE thi khong duoc loai ai vi ly do co so */
+ var onlSes=rows("DL11").filter(function(x){return clsOnline(find("DL10","class_id",x.class_id)||{})});
+ t("co lop online trong du lieu", onlSes.length>0);
+ t("lop online: khong ai bi loai vi co so",
+   onlSes.slice(0,60).every(function(x){return gvBackup(x).every(function(r){return r.okBr})}));
+ /* CUA GHI: doi GV phai CHAN dung 2 truong hop, va phai ghi VET */
+ (function(){
+  var ses=null,gvBad=null;
+  rows("DL11").some(function(x){var c=find("DL10","class_id",x.class_id)||{};
+   if(clsOnline(c)||!c.branch||!pvnd(x.session_date))return false;
+   var L=gvBackup(x).filter(function(r){return !r.okBr});
+   if(!L.length)return false; ses=x;gvBad=L[0].g;return true});
+  t("tim duoc ca de thu chan sai co so", !!ses);
+  if(ses){var old=ses.teacher_id;
+   sesSetTeacher(ses.session_id,gvBad.staff_id,"thu");
+   t("chan doi sang GV khong co mat o co so do", ses.teacher_id===old);
+   var good=gvBackup(ses).filter(function(r){return r.ok})[0];
+   if(good){reset();   /* actGuard chan bam lai trong 1.2s - bo dong ho truoc khi thu ca thu hai */
+    sesSetTeacher(ses.session_id,good.g.staff_id,"GV chinh bao nghi");
+    t("doi duoc sang nguoi hop le", ses.teacher_id===good.g.staff_id);
+    t("doi GV co ghi vet vao buoi", /Đổi GV:/.test(String(ses.notes||""))&&/GV chinh bao nghi/.test(String(ses.notes||"")));
+    ses.teacher_id=old}}})();
+ /* nguong "chiem cho bao lau" lay tu cau hinh, va LICH TUAN dung CHUNG con so do */
+ t("nguong trung gio lay tu cau hinh", sesSpanH()===paramOf("sessionSpan_hours",2));
+ t("lich tuan dung chung nguong voi GV du phong", /_sp=sesSpanH\(\)\*36e5/.test(SRC));
+ t("khong con so 2 gio cam cung o lich tuan", !/<2\*36e5/.test(SRC));
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");

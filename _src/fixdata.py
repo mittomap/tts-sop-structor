@@ -1319,8 +1319,18 @@ for c in dl.get("DL10", []):
     if lm.startswith("offline") and v.startswith("http"):
         c["venue_or_zoom_link"] = "Phòng 101 - " + str(c.get("branch") or "").split(" (")[0]
         _vfix += 1
-if _vfix:
-    log.append("14sexies-b. Chỗ học: sửa %d lớp bị lệch giữa hình thức học và phòng/link" % _vfix)
+# Lớp thuộc "Cơ sở Online" mà hình thức học lại ghi offline/hybrid là mâu thuẫn thẳng: không có
+# phòng nào ở cơ sở đó cả. Màn GV dự phòng đọc phải cặp này để biết có ràng buộc cơ sở hay không,
+# lệch một cái là lọc sai người.
+_mfix = 0
+for c in dl.get("DL10", []):
+    if str(c.get("branch") or "").startswith("online") and not str(c.get("learning_mode") or "").startswith("online"):
+        c["learning_mode"] = "online (Trực tuyến)"
+        c["venue_or_zoom_link"] = "https://zoom.us/j/itts-%s (gửi trước buổi đầu)" % str(c.get("class_id") or "").lower()
+        _mfix += 1
+if _vfix or _mfix:
+    log.append("14sexies-b. Chỗ học: sửa %d lớp lệch giữa hình thức học và phòng/link, "
+               "%d lớp ở Cơ sở Online mà ghi học tại chỗ" % (_vfix, _mfix))
 
 # ═══ 15. SAN PHẲNG SƠ ĐỒ CỘT (UNION KEY) - PHẢI LÀ PASS CUỐI CÙNG ═════════
 # Cột chỉ có mặt ở vài dòng (referrer_name, referral_uses, net_received...) làm app render

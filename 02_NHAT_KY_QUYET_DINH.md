@@ -462,6 +462,56 @@
 > luồng, mà lỗi nằm GIỮA các luồng; phải ENUMERATE chứ không lấy mẫu; và mọi kết luận phải quy về
 > một bất biến kiểm được bằng máy, không dừng ở nhận xét.
 >
+> ### V9.29o (28/07 khuya - anh Luân giao toàn quyền chạy hết, cắm máy đi ngủ)
+>
+> **RÀNG BUỘC XUYÊN SUỐT anh Luân nhắc: "trung tâm có 5 chi nhánh và hình thức học online nữa,
+> làm gì cũng phải cân nhắc đến cái đó."** Đây không phải một việc, nó là một cái lăng kính phải
+> soi qua mọi việc còn lại. Vừa đặt ra là nó bắt lỗi ngay: **10/10 giáo viên trong dữ liệu demo
+> KHÔNG có chi nhánh** - nên câu "ai thay được ở Cơ sở 3" không trả lời được, và mọi báo cáo tách
+> theo cơ sở đều thiếu người.
+>
+> **(1) Hub "CHỜ DUYỆT" - quy hoạch lại chỗ đứng của các hàng chờ quyết định.**
+> Anh Luân: *"duyệt chiết khấu, hoàn tiền và bàn giao lead giờ đứng chỗ đó không còn hợp nữa...
+> gom lại thành chờ duyệt hoặc chờ quyết định gì đó, để ở nhóm sidebar nào đó"*.
+> **Nguyên tắc chốt (ghi ra để lần sau thêm việc mới biết bỏ vào đâu):** trang theo CHẶNG là
+> *nơi làm việc*; hàng chờ QUYẾT ĐỊNH không thuộc chặng nào - nó thuộc về **người có thẩm quyền**.
+> Một khoản hoàn tiền phát sinh được ở C2 lẫn C3; nhét vào một chặng là chỗ kia mất dấu.
+> Hub 6 tab: chiết khấu · hoàn tiền · **đơn xin nghỉ** (trước nằm lẫn trong màn Điểm danh, học vụ
+> phải mò mới thấy) · xác nhận thu tiền · việc chờ nhận · bàn giao lead. Nhóm sidebar riêng, mở sẵn.
+> Mọi lối vào cũ vẫn sống (`DUYMAP` remap trong `go()`).
+> **Ba bẫy đã cắn:** (a) `navVis` lọc mục con theo tab bằng cách **cắm cứng chữ "khac"** - thêm hub
+> thứ hai là nó im lặng không lọc, nhân viên thấy cả tab không phải việc của mình; nay hỏi chung
+> cho mọi hub qua `HUBTAB`. (b) Ban đầu em đặt **hai tên cho cùng một thứ** (`ck` ở tab, `duyetck`
+> ở menu) → `scopeTabs` tra nhầm bảng, lọc quyền không chạy; nay mã tab TRÙNG mã mục menu.
+> (c) `arcJobs` của chặng C trỏ vào cả hub → bấm từ chặng C rơi vào tab chiết khấu; nay trỏ thẳng
+> tab hoàn tiền.
+> **Hub gom VIỆC lại, không gom QUYỀN lại:** tư vấn chỉ thấy Bàn giao lead + Việc chờ nhận; học vụ
+> chỉ thấy Đơn xin nghỉ; kế toán thấy tiền; giáo viên/WOW/hỗ trợ chỉ thấy Việc chờ nhận.
+>
+> **(2) GIÁO VIÊN DỰ PHÒNG THEO NGÀY** (anh Luân: *"lỡ 1 giáo viên nghỉ đột xuất vẫn có thể đẩy
+> người lên đó"*). Điểm cốt lõi: **"ai thay được" KHÔNG phải "ai rảnh"**.
+> · lớp **ONLINE** → giáo viên nào cũng dạy được, chi nhánh hết ý nghĩa;
+> · lớp **TẠI CHỖ** → phải là người CÓ MẶT ĐƯỢC ở đúng cơ sở đó. Lấy chi nhánh chính CỘNG mọi cơ sở
+>   người đó đã từng dạy - dạy chéo cơ sở là chuyện thật, chỉ lấy mỗi cột `branch` là loại oan;
+> · lớp **HYBRID** → coi như tại chỗ cho chắc (buổi hôm đó có thể là buổi tại trung tâm);
+> · và tất nhiên không được đang có buổi khác trùng giờ.
+> Xếp hạng: đã dạy chính lớp này > đã dạy cùng khóa > có mặt được ở cơ sở. Màn còn liệt kê cả
+> người **KHÔNG** thay được kèm lý do, để học vụ khỏi đoán.
+> **Một cửa ghi duy nhất `sesSetTeacher()`** - chặn cả hai trường hợp sai (trùng giờ / sai cơ sở)
+> và ghi VẾT vào buổi (ai đổi, đổi từ ai sang ai, lúc nào, vì sao).
+> **Dời thêm một hằng số vào cấu hình:** "một buổi chiếm chỗ của giáo viên bao lâu"
+> (`sessionSpan_hours`) - trước đây là số `2` cắm cứng trong `renderLichTuan`. Nay lịch tuần và màn
+> GV dự phòng **dùng chung đúng một con số**; hai nơi hai số là hai nơi nói khác nhau.
+> **Vá ở nguồn (`fixdata` §14sexies):** điền chi nhánh cho nhân sự suy từ chính lớp/buổi họ đã dạy
+> (lớp online không tính là chi nhánh chính); GV chưa có lịch sử thì rải đều để cơ sở nào cũng có
+> người dự phòng - ghi rõ đây là **quyết định gieo dữ liệu demo, không phải luật nghiệp vụ**.
+> Sửa 2 lớp ở "Cơ sở Online" mà lại ghi học tại chỗ, và bắt lớp online phải có link / lớp tại chỗ
+> phải có phòng.
+> **Bẫy pipeline đáng nhớ:** `gen_demo.py` **ĐỌC LẠI chính `demo_data_big.json`** (DL01/DL05/DL10 là
+> fixture mang theo qua mỗi lượt), nên thứ `fixdata` vá hôm nay trở thành ĐẦU VÀO của lượt chạy
+> ngày mai. Hệ quả: log kiểu "vừa sửa N dòng" lần thứ hai luôn ra số nhỏ hơn và đọc tưởng vá hụt.
+> Đã đổi sang **báo ĐỘ PHỦ** ("10/10 giáo viên đã có chi nhánh") - lần nào cũng nói đúng.
+>
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
 >
 > **(G) TRỢ THỦ THAO TÁC - anh Luân đặt 28/07, LÀM SAU ĐỢT AUDIT (F):** *"a muốn nghiên cứu trợ thủ

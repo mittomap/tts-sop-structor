@@ -1580,6 +1580,7 @@ var PAGES=[
 {k:"buoihoc",g:"_",ic:"ti-calendar-check",t:"Theo dõi nhận xét buổi",c:"SLA ghi nhận xét toàn bộ lớp",ty:"custom",hide:1},
 {k:"baitap",g:"_",ic:"ti-book",t:"Giao & chấm Bài tập",c:"Bài tập",ty:"custom",hide:1},
 {k:"wow",g:"_",ic:"ti-star",t:"Buổi WOW 1-1",c:"Kèm riêng",ty:"custom",hide:1},
+{k:"gvdp",g:"_",ic:"ti-user-plus",t:"GV dự phòng theo ngày",c:"Ai thay được khi GV nghỉ đột xuất",ty:"custom",hide:1},
 /* ===== THEO CHẶNG P8-P10: CSKH & KẾT THÚC ===== */
 {k:"cskh",g:"Chặng · CSKH & Kết thúc",ic:"ti-headset",t:"CSKH · Khảo sát & Phản hồi",c:"Khảo sát (TT→HV) · Góp ý & Khiếu nại (HV→TT)",ty:"custom"},
 /* 4 trang con gộp vào hub CSKH - ẩn khỏi menu, vẫn dùng được qua hub */
@@ -7019,6 +7020,9 @@ function paramSheetName(name){var c=(DATA.config&&DATA.config.ch2)||[];
  return (PKEY[name]&&PKEY[name][0])||name}
 /* Danh mục THAM SỐ APP ĐANG DÙNG: [nhóm, tên app, ý nghĩa, đơn vị, mặc định] */
 var APPPARAMS=[
+ /* V9.29o: một buổi chiếm chỗ của giáo viên bao lâu - dùng cho cảnh báo trùng giờ trên lịch tuần
+    VÀ cho việc lọc người thay được. Trước đây con số 2 giờ nằm cắm cứng trong renderLichTuan. */
+ ["Xếp lịch & Giảng dạy","sessionSpan_hours","Một buổi chiếm chỗ của giáo viên bao lâu (dùng để soi trùng giờ và tìm người dạy thay)","giờ",2],
  ["Giao việc","slaTaskAccept_hours","Người nhận phải BẤM NHẬN việc trong bao lâu (quá hạn -> nhắc)","giờ",4],
  ["Giao việc","slaTaskConfirm_hours","Người giao phải xác nhận sau khi được báo xong trong bao lâu","giờ",24],
  ["Tuyển sinh - Lead","slaLeadResponse_min","Gọi/nhắn lead MỚI trong bao lâu (quá hạn -> cảnh báo đỏ)","phút",15],
@@ -9472,6 +9476,9 @@ function yesv(x){return /^(true|1|yes|y|có|x)$/i.test(String(x==null?"":x).trim
 function htGo(tab){window.HTTAB=tab;go("hoctap")}
 function htTabSet(tab){window.HTTAB=tab;reRender(CUR)}
 function sameDay(d,e){return d&&e&&d.getDate()===e.getDate()&&d.getMonth()===e.getMonth()&&d.getFullYear()===e.getFullYear()}
+/* yyyy-mm-dd theo GIỜ ĐỊA PHƯƠNG. Không dùng toISOString(): nó quy về UTC nên buổi tối ở VN
+   bị lùi một ngày - ô chọn ngày sẽ nhảy lùi ngay khi bấm. */
+function fmtYMD(d){if(!d)return "";return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
 function clsHealth(c){var cid=c.class_id;
  var obs=rows("DL08").filter(function(o){return o.class_id===cid});
  var sids={};obs.forEach(function(o){sids[o.student_id]=1});
@@ -9582,8 +9589,9 @@ function renderLichTuan(embed){
   return nm(a).localeCompare(nm(b))});
  /* canh bao trung gio: cung who, cach <2h */
  var clash={};
+ var _sp=sesSpanH()*36e5;   /* V9.29o: lấy từ cấu hình, cùng một con số với màn GV dự phòng */
  evs.forEach(function(a){evs.forEach(function(b){if(a===b||!a.who||a.who!==b.who||a.who==="__test")return;
-  if(Math.abs(a.d.getTime()-b.d.getTime())<2*36e5){clash[a.who+"|"+a.d.getTime()]=1}})});
+  if(Math.abs(a.d.getTime()-b.d.getTime())<_sp){clash[a.who+"|"+a.d.getTime()]=1}})});
  var noGvCls=rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()});
  var h='';
  h+=tbar('<button class="pill" onclick="window.WKOFF=(window.WKOFF||0)-1;reRender(CUR)"><i class="ti ti-chevron-left"></i>Tuần trước</button>'+
@@ -9615,8 +9623,148 @@ function renderLichTuan(embed){
    h+='</td>'});
   h+='</tr>'});
  h+='</tbody></table></div></div>';
- h+='<div class="mut" style="font-size:11px;margin-top:8px">Chip viền đỏ = cùng người có 2 mục cách nhau dưới 2 giờ. Lịch chỉ để XEM - đổi giờ thì vào từng buổi (dạy bù/dời WOW).</div>';
+ h+='<div class="mut" style="font-size:11px;margin-top:8px">Chip viền đỏ = cùng người có 2 mục cách nhau dưới '+sesSpanH()+' giờ (ngưỡng lấy từ cấu hình). Lịch chỉ để XEM - đổi giờ thì vào từng buổi (dạy bù/dời WOW).</div>';
  return h}
+/* ═══════ V9.29o - GIÁO VIÊN DỰ PHÒNG THEO NGÀY (anh Luân đặt 28/07 khuya) ═══════
+   "lỡ 1 giáo viên nghỉ đột xuất vẫn có thể đẩy người lên đó".
+   RÀNG BUỘC anh Luân nhắc ngay sau đó: trung tâm có 5 CHI NHÁNH và có lớp học ONLINE.
+   Vì vậy "ai thay được" KHÔNG phải là "ai rảnh":
+     - lớp ONLINE  -> giáo viên nào cũng dạy được, chi nhánh không còn ý nghĩa;
+     - lớp OFFLINE -> phải là người CÓ MẶT ĐƯỢC ở đúng cơ sở đó. Lấy chi nhánh chính của
+       người đó, CỘNG THÊM mọi cơ sở người đó đã từng dạy (dạy chéo cơ sở là chuyện thật);
+     - lớp HYBRID  -> coi như offline cho chắc: buổi hôm đó có thể là buổi tại chỗ.
+   Và tất nhiên: không được đang có buổi khác trùng giờ. */
+function gvBranches(id){                       /* mọi cơ sở người này đã thật sự dạy */
+ var out={},st=find("DL01","staff_id",id);
+ if(st&&String(st.branch||"").trim())out[st.branch]=1;
+ rows("DL10").forEach(function(c){if(String(c.main_teacher_id||"")===id&&c.branch)out[c.branch]=1});
+ rows("DL11").forEach(function(x){if(String(x.teacher_id||"")!==id)return;
+  var c=find("DL10","class_id",x.class_id);if(c&&c.branch)out[c.branch]=1});
+ return out}
+function clsOnline(c){return isc(c&&c.learning_mode,"online")}
+/* khoảng thời gian một buổi chiếm chỗ của giáo viên - lấy từ cấu hình, không cắm cứng */
+function sesSpanH(){return paramOf("sessionSpan_hours",2)}
+function gvBusyAt(id,when,skipSes){
+ var t=when?when.getTime():0,sp=sesSpanH()*36e5,hit=null;
+ rows("DL11").forEach(function(x){
+  if(hit||String(x.teacher_id||"")!==id)return;
+  if(skipSes&&String(x.session_id)===String(skipSes))return;
+  if(isc(x.session_status,"cancelled"))return;
+  var d=pvnd(x.session_date);if(!d)return;
+  if(Math.abs(d.getTime()-t)<sp)hit={t:"lớp",lb:(x.class_id_name||x.class_id)+" · "+hhmmOf(d)}});
+ rows("DL14").forEach(function(w){
+  if(hit||String(w.staff_id||"")!==id||isc(w.wow_status,"cancelled"))return;
+  var d=pvnd(w.wow_session_date);if(!d)return;
+  if(Math.abs(d.getTime()-t)<sp)hit={t:"WOW",lb:"WOW "+(w.student_name||w.student_id)+" · "+hhmmOf(d)}});
+ return hit}
+function hhmmOf(d){return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
+/* Danh sách người thay được cho MỘT buổi, kèm LÝ DO xếp hạng - và kèm cả người KHÔNG thay được
+   với lý do vì sao, để học vụ không phải đoán. */
+function gvBackup(ses){
+ var c=find("DL10","class_id",ses.class_id)||{};
+ var when=pvnd(ses.session_date);
+ var onl=clsOnline(c);
+ var cur=String(ses.teacher_id||"");
+ var out=[];
+ rows("DL01").filter(isGVRole).forEach(function(g){
+  if(g.staff_id===cur)return;
+  if(!isc(g.status,"active")&&String(g.status||"").trim())return;   /* nghỉ việc thì không tính */
+  var brs=gvBranches(g.staff_id);
+  var okBr=onl||!c.branch||!!brs[c.branch];
+  var busy=gvBusyAt(g.staff_id,when,ses.session_id);
+  /* đã từng dạy chính lớp này / khóa này thì ưu tiên - quen học viên, quen giáo án */
+  var sameCls=rows("DL11").some(function(x){return String(x.teacher_id||"")===g.staff_id&&x.class_id===ses.class_id});
+  var sameCourse=rows("DL10").some(function(c2){return c2.course_id===c.course_id&&
+   (String(c2.main_teacher_id||"")===g.staff_id||rows("DL11").some(function(x){return x.class_id===c2.class_id&&String(x.teacher_id||"")===g.staff_id}))});
+  var score=(sameCls?100:0)+(sameCourse?40:0)+(okBr?20:0)-(busy?1000:0);
+  var why=[];
+  if(sameCls)why.push("đã dạy chính lớp này");
+  else if(sameCourse)why.push("đã dạy khóa "+(c.course_id_name||c.course_id||""));
+  if(onl)why.push("lớp online - ai cũng dạy được");
+  else if(okBr)why.push("có mặt được ở "+(elabel(c.branch)||c.branch||"cơ sở này"));
+  out.push({g:g,ok:okBr&&!busy,busy:busy,okBr:okBr,score:score,
+   why:why.join(" · "),
+   no:busy?("đang bận: "+busy.t+" "+busy.lb):(!okBr?("không ở "+(elabel(c.branch)||c.branch)):"")});});
+ out.sort(function(a,b){return b.score-a.score});
+ return out}
+/* MỘT CỬA GHI duy nhất để đổi giáo viên của một buổi. Mọi màn đều gọi hàm này. */
+function sesSetTeacher(sesId,gvId,ly){
+ var x=find("DL11","session_id",sesId);if(!x){toast("Không thấy buổi học");return}
+ var g=find("DL01","staff_id",gvId);if(!g){toast("Không thấy giáo viên");return}
+ if(!actGuard("sesSetTeacher:"+sesId))return;
+ var c=find("DL10","class_id",x.class_id)||{};
+ var when=pvnd(x.session_date);
+ var busy=gvBusyAt(gvId,when,sesId);
+ if(busy){toast("Không xếp được: "+g.full_name+" đang có "+busy.t+" "+busy.lb);return}
+ if(!clsOnline(c)&&c.branch&&!gvBranches(gvId)[c.branch]){
+  toast("Không xếp được: "+g.full_name+" không có mặt ở "+(elabel(c.branch)||c.branch)+" (lớp học tại chỗ).");return}
+ var old=x.teacher_id_name||x.teacher_id||"chưa gán";
+ x.teacher_id=gvId;x.teacher_id_name=g.full_name;
+ x.notes=(x.notes?x.notes+" | ":"")+"Đổi GV: "+old+" -> "+g.full_name+" ("+myName()+", "+nowStr()+")"+(ly?" - "+ly:"");
+ toast("Buổi "+(x.session_number||"")+" lớp "+(x.class_id_name||x.class_id)+" nay do "+g.full_name+" dạy.");
+ closeModal();reRender(CUR);persistSoon()}
+function gvBackupForm(sesId){
+ var x=find("DL11","session_id",sesId);if(!x){toast("Không thấy buổi học");return}
+ var c=find("DL10","class_id",x.class_id)||{};
+ var L=gvBackup(x);
+ var okL=L.filter(function(r){return r.ok}),noL=L.filter(function(r){return !r.ok});
+ var h='<div class="dcard"><h4><i class="ti ti-user-plus"></i>Đẩy người thay - '+esc(c.class_name||x.class_id)+' buổi '+esc(x.session_number||"?")+'</h4>';
+ h+=ctxRows([["Ngày giờ",x.session_date],["GV hiện tại",x.teacher_id_name||x.teacher_id||"chưa gán"],
+  ["Hình thức",elabel(c.learning_mode)||c.learning_mode],["Cơ sở",clsOnline(c)?"lớp online - không ràng buộc cơ sở":(elabel(c.branch)||c.branch||"-")],
+  ["Chỗ học",c.venue_or_zoom_link]]);
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Xếp hạng theo: đã dạy chính lớp này &gt; đã dạy cùng khóa &gt; có mặt được ở cơ sở. Người đang có buổi khác cách dưới '+slaChip("sessionSpan_hours",2,"giờ")+' bị loại.</div>';
+ h+='<div class="fld full"><label>Lý do đổi (ghi vào vết của buổi)</label><input id="f_gvly" placeholder="GV chính báo nghỉ đột xuất..."></div>';
+ h+='<div class="dsec">Thay được ('+okL.length+')</div><div class="pbody" style="padding:0">';
+ if(!okL.length)h+='<div class="empty">Không còn ai rảnh và hợp cơ sở cho buổi này.</div>';
+ okL.forEach(function(r){
+  h+='<div class="absrow"><div class="absi"><b>'+esc(r.g.full_name)+'</b><span>'+esc(r.why||"rảnh giờ này")+'</span></div>'+
+   '<div class="absa"><button class="btn sm primary" onclick="sesSetTeacher(\''+esc(sesId)+'\',\''+esc(r.g.staff_id)+'\',(document.getElementById(\'f_gvly\')||{}).value||\'\')"><i class="ti ti-check"></i>Đẩy người này</button></div></div>'});
+ h+='</div>';
+ if(noL.length){h+='<div class="dsec">Không thay được ('+noL.length+')</div><div class="pbody" style="padding:0">';
+  noL.forEach(function(r){h+='<div class="absrow" style="opacity:.7"><div class="absi"><b>'+esc(r.g.full_name)+'</b><span>'+esc(r.no)+'</span></div></div>'});
+  h+='</div>'}
+ openDrawer("Giáo viên dự phòng",h+'</div>')}
+/* MÀN "GV DỰ PHÒNG THEO NGÀY": chọn ngày, thấy từng buổi hôm đó và ai đang trống để đẩy lên. */
+function gvdpDay(){var d=pvnd(window.GVDPD||"");if(d)return d;var t=new Date();t.setHours(0,0,0,0);return t}
+function gvdpSet(v){window.GVDPD=v;reRender(CUR)}
+function renderGvdp(embed){
+ var day=gvdpDay();
+ var ses=rows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,day)&&!isc(x.session_status,"cancelled")})
+  .sort(function(a,b){return (pvnd(a.session_date)||0)-(pvnd(b.session_date)||0)});
+ var GV=rows("DL01").filter(isGVRole);
+ var busyMap={};ses.forEach(function(x){if(x.teacher_id)busyMap[x.teacher_id]=(busyMap[x.teacher_id]||0)+1});
+ var noGv=ses.filter(function(x){return !String(x.teacher_id||"").trim()});
+ var free=GV.filter(function(g){return !busyMap[g.staff_id]});
+ var ymd=fmtYMD(day);
+ var h=embed?'':pageHead("Giáo viên dự phòng theo ngày","Một giáo viên nghỉ đột xuất thì ai đẩy lên được - tính theo lịch dạy thật, cơ sở của lớp và hình thức học.","");
+ h+=statStrip([
+  ["ti-calendar",ses.length,"Buổi trong ngày","#3B82C4",noGv.length?(noGv.length+" buổi chưa có GV"):"đã có GV đủ"],
+  ["ti-user-check",free.length+"/"+GV.length,"Giáo viên trống lịch cả ngày","#16A34A","có thể nhận thay"],
+  ["ti-building",Object.keys(ses.reduce(function(m,x){var c=find("DL10","class_id",x.class_id);if(c&&c.branch)m[c.branch]=1;return m},{})).length,"Cơ sở có lớp hôm nay","#7C3AED","lớp online không ràng buộc cơ sở"],
+  ["ti-device-laptop",ses.filter(function(x){return clsOnline(find("DL10","class_id",x.class_id)||{})}).length,"Buổi học online","#0D9488","ai cũng dạy thay được"]]);
+ h+=tbar('<span class="tblbl">Ngày</span><input type="date" class="sel" value="'+esc(ymd)+'" onchange="gvdpSet(this.value)">'+
+  '<button class="pill" onclick="gvdpSet(\''+esc(fmtYMD(new Date(day.getTime()-864e5)))+'\')"><i class="ti ti-chevron-left"></i>Hôm trước</button>'+
+  '<button class="pill" onclick="gvdpSet(\''+esc(fmtYMD(new Date(day.getTime()+864e5)))+'\')">Hôm sau<i class="ti ti-chevron-right"></i></button>',
+  '<span class="tbcnt">'+ses.length+' buổi</span>');
+ h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b>Buổi học trong ngày</b><span class="mut" style="font-size:11.5px">bấm "Đẩy người thay" để xem ai nhận được</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Lớp</th><th>Cơ sở / hình thức</th><th>GV đang phụ trách</th><th>Người thay được</th><th></th></tr></thead><tbody>';
+ if(!ses.length)h+='<tr><td class="empty" colspan="6">Ngày này không có buổi học nào.</td></tr>';
+ ses.forEach(function(x){var c=find("DL10","class_id",x.class_id)||{};
+  var d=pvnd(x.session_date);var n=gvBackup(x).filter(function(r){return r.ok}).length;
+  h+='<tr><td>'+esc(d?hhmmOf(d):"")+'</td><td>'+lopLnk(x.class_id,x.class_id_name,"")+' <span class="mut">buổi '+esc(x.session_number||"?")+'</span></td>'+
+   '<td>'+(clsOnline(c)?'<span class="chip blue">Online</span>':'<span class="chip">'+esc(elabel(c.branch)||c.branch||"-")+'</span> <span class="mut" style="font-size:11px">'+esc(elabel(c.learning_mode)||"")+'</span>')+'</td>'+
+   '<td>'+(String(x.teacher_id||"").trim()?nsLnk(x.teacher_id,x.teacher_id_name,""):'<span class="chip red">chưa gán</span>')+'</td>'+
+   '<td>'+(n?'<span class="chip green">'+n+' người</span>':'<span class="chip red">không có ai</span>')+'</td>'+
+   '<td><button class="btn sm primary" onclick="gvBackupForm(\''+esc(x.session_id)+'\')"><i class="ti ti-user-plus"></i>Đẩy người thay</button></td></tr>'});
+ h+='</tbody></table></div></div>';
+ h+='<div class="panel"><div class="ph"><b>Giáo viên trống lịch hôm nay ('+free.length+')</b><span class="mut" style="font-size:11.5px">không có buổi nào trong ngày - nguồn dự phòng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giáo viên</th><th>Cơ sở</th><th>Đã dạy ở</th><th>Buổi hôm nay</th></tr></thead><tbody>';
+ if(!free.length)h+='<tr><td class="empty" colspan="4">Hôm nay giáo viên nào cũng có lịch - không còn người dự phòng.</td></tr>';
+ GV.forEach(function(g){var nb=busyMap[g.staff_id]||0;
+  var brs=Object.keys(gvBranches(g.staff_id)).map(function(b){return elabel(b)||b});
+  h+='<tr'+(nb?' style="opacity:.6"':'')+'><td>'+nsLnk(g.staff_id,g.full_name,"")+'</td>'+
+   '<td>'+esc(elabel(g.branch)||g.branch||"-")+'</td>'+
+   '<td style="font-size:11.5px">'+esc(brs.join(" · ")||"-")+'</td>'+
+   '<td>'+(nb?'<span class="chip amber">'+nb+' buổi</span>':'<span class="chip green">trống</span>')+'</td></tr>'});
+ return h+'</tbody></table></div></div>'}
 function renderHoctap(){
  var tab=window.HTTAB||"lop";
  var cls=rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))});
@@ -9625,10 +9773,12 @@ function renderHoctap(){
  var actBtn=(tab==="wow")?'<button class="btn primary" onclick="wowAdd()"><i class="ti ti-plus"></i>Đặt buổi WOW</button>':'<button class="btn primary" onclick="go(\'xeplop\')"><i class="ti ti-layout-grid-add"></i>Xếp lớp & Onboarding</button>';
  var h=pageHead("Học tập & Giảng dạy","Lớp đang mở, theo dõi nhận xét buổi (SLA), và buổi WOW 1-1 — một chỗ. Bấm một lớp để vào Vận hành lớp; theo dõi SLA nhận xét và WOW ở hai tab còn lại.",actBtn);
  var todayN=rows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,new Date())}).length;
- h+=tbar(segHTML(tab,[["today","Hôm nay",todayN||"",""],["lichtuan","Lịch tuần","",""],["lop","Lớp học",cls.length||"",""],["buoihoc","Nhận xét buổi",nNote||"",nNote?"red":""],["wow","Buổi WOW 1-1",nWow||"",nWow?"amber":""]],"htTabSet('{k}')"),
+ var nNoGv=rows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,new Date())&&!isc(x.session_status,"cancelled")&&!String(x.teacher_id||"").trim()}).length;
+ h+=tbar(segHTML(tab,[["today","Hôm nay",todayN||"",""],["lichtuan","Lịch tuần","",""],["gvdp","GV dự phòng",nNoGv||"",nNoGv?"red":""],["lop","Lớp học",cls.length||"",""],["buoihoc","Nhận xét buổi",nNote||"",nNote?"red":""],["wow","Buổi WOW 1-1",nWow||"",nWow?"amber":""]],"htTabSet('{k}')"),
   '<button class="pill" onclick="go(\'giaoan\')"><i class="ti ti-notes"></i>Kho bài & Giáo án</button><button class="pill" onclick="go(\'banglop\')"><i class="ti ti-clipboard-list"></i>Vận hành lớp</button>');
  if(tab==="today")h+=renderHtToday(1);
  else if(tab==="lichtuan")h+=renderLichTuan(1);
+ else if(tab==="gvdp")h+=renderGvdp(1);
  else if(tab==="lop")h+=renderHtLop(1);
  else if(tab==="buoihoc")h+=renderBuoihoc(1);
  else h+=renderWow(1);
@@ -10561,7 +10711,7 @@ function renderSothu(){var tab=window.STTAB||"da";
  h+=tbar(segHTML(tab,[["da","Đã thu",rows("DL07").length],["du","Dự thu",nDu]],"sothuTab('{k}')"),"");
  h+=(tab==="du")?renderDuthu():renderList("dsthanhtoan",1);
  return h}
-var RENDER={giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu};
+var RENDER={giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp};
 function dashJump(key){var m={urgent:"viec",newlead:"nhaplead",consider:"viec",convert:"tuvan",risk:"viec",onboard:"xeplop",approve:"duyet",debt:"thanhtoan",complaint:"khieunai",ungraded:"baitap",testpend:"test",wowbook:"wow",unverified:"thanhtoan",classes:"banglop"};var pg=m[key];if(pg&&RBK[CURROLE].pages.indexOf(pg)>=0)go(pg);else go("viec")}
 
 /* ---------- router ---------- */
@@ -10636,7 +10786,7 @@ function navJump(i){var h=window.NAVHIST;if(!h||i<0||i>=h.length)return;var targ
 var TSMAP={nhaplead:"lead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"};
 var ARCMAP={changA:1,changB:1,changC:1,changD:1};
 var CSMAP={review:"khaosat",khaosat:"khaosat",ghinhan:"phanhoi",khieunai:"khieunai"};
-var HTMAP={lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan"};
+var HTMAP={lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp"};
 var KMAP={baoluu:"baoluu",magioithieu:"magioithieu"};
 /* V9.29o: bàn giao lead rời hub "Tính năng khác" sang hub "Chờ duyệt" - nó là một QUYẾT ĐỊNH
    (giao lead của người này cho người kia), không phải một tiện ích lặt vặt. */
@@ -10826,7 +10976,7 @@ var NAVTREE=[
  /* V9.29n (anh Luân): "Chặng 1" -> "C1". Tên nhóm nay SINH TỪ ARCS (arcGrpName) chứ không gõ tay:
     trước đây số chặng và tên chặng nằm cả ở ARCS lẫn ở đây, đổi một chỗ là hai chỗ nói khác nhau. */
  {g:arcGrpName("changA"),arc:"changA",items:["changA","nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","banglop","hoctap","giaoan","wow","cskh"]},
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","banglop","hoctap","gvdp","giaoan","wow","cskh"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
@@ -10837,7 +10987,7 @@ var NAVTREE=[
  {g:"Tra cứu",items:["hocvien","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","giangvien","nhanvien"]}];
 var NAVSUB={nhaplead:"tuyensinh",test:"tuyensinh",tuvan:"tuyensinh",thanhtoan:"tuyensinh",reup:"tuyensinh",
  review:"cskh",khaosat:"cskh",ghinhan:"cskh",khieunai:"cskh",
- lop:"hoctap",buoihoc:"hoctap",lichtuan:"hoctap",wow:"hoctap",
+ lop:"hoctap",buoihoc:"hoctap",lichtuan:"hoctap",wow:"hoctap",gvdp:"hoctap",
  baoluu:"khac",magioithieu:"khac",
  duyetck:"duyet",duyethoan:"duyet",duyetnghi:"duyet",duyetthu:"duyet",duyetgiao:"duyet",banggiao:"duyet",
  changA:"chang",changB:"chang",changC:"chang",changD:"chang"};
@@ -10864,7 +11014,7 @@ function navVis(k){var r=RBK[CURROLE],rs=SCOPE();
 /* V9.19: hub vừa là MỤC MENU vừa là chủ của mục con (hoctap có mục con wow/lop/buoihoc/lichtuan) -
    khi tab đang đứng thuộc về một mục con thì mục HUB không được sáng theo, nếu không 2 mục cùng sáng. */
 var HUBTAB={tuyensinh:{v:"TSTAB",d:"lead",m:{lead:"nhaplead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"}},
- hoctap:{v:"HTTAB",d:"today",m:{lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan"}},
+ hoctap:{v:"HTTAB",d:"today",m:{lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp"}},
  cskh:{v:"CSTAB",d:"khaosat",m:{khaosat:"khaosat",phanhoi:"ghinhan",khieunai:"khieunai"}},
  khac:{v:"KTAB",d:"baoluu",m:{baoluu:"baoluu",magioithieu:"magioithieu"}},
  duyet:{v:"DUYTAB",d:"duyetck",m:{duyetck:"duyetck",duyethoan:"duyethoan",duyetnghi:"duyetnghi",duyetthu:"duyetthu",duyetgiao:"duyetgiao",banggiao:"banggiao"}}};
@@ -10878,7 +11028,7 @@ function navCur(k){
  var o=navOwner(k);if(o!==CUR)return false;
  if(o==="tuyensinh")return ({nhaplead:"lead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"})[k]===(window.TSTAB||"lead");
  if(o==="cskh")return ({review:"khaosat",khaosat:"khaosat",ghinhan:"phanhoi",khieunai:"khieunai"})[k]===(window.CSTAB||"khaosat");
- if(o==="hoctap")return ({lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan"})[k]===(window.HTTAB||"today");
+ if(o==="hoctap")return ({lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp"})[k]===(window.HTTAB||"today");
  if(o==="khac")return ({baoluu:"baoluu",magioithieu:"magioithieu"})[k]===(window.KTAB||"baoluu");
  if(o==="duyet")return !!DUYMAP[k]&&k===(window.DUYTAB||"duyetck");
  if(o==="chang")return k===(window.ARC||"changA");
