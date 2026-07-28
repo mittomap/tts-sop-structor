@@ -512,6 +512,21 @@
 > ngày mai. Hệ quả: log kiểu "vừa sửa N dòng" lần thứ hai luôn ra số nhỏ hơn và đọc tưởng vá hụt.
 > Đã đổi sang **báo ĐỘ PHỦ** ("10/10 giáo viên đã có chi nhánh") - lần nào cũng nói đúng.
 >
+> **(3) HẰNG SỐ NGHIỆP VỤ CUỐI CÙNG RỜI KHỎI CODE (đóng phần "CÒN LẠI" của mảng 5).**
+> · **`DUEFALL=5`** (hạn nộp bài mặc định khi giáo án không ghi) → `homeworkDueFallback_days`.
+> · **10 nút hẹn nhanh** cắm cứng giờ 9/14/15/19 → 5 tham số `apptSoon_hours` / `apptMorning_hour`
+>   / `apptNoon_hour` / `apptAfternoon_hour` / `apptEvening_hour`. Điểm đáng nói: **nhãn trên nút
+>   cũng sinh từ chính con số đó** - đổi ca tối sang 20h thì nút ghi "Tối nay 20h" và giờ đặt vào ô
+>   cũng là 20h. Nếu để nhãn gõ tay thì đổi cấu hình xong nút vẫn ghi 19h và người dùng tin cái nhãn.
+> · **16 nhóm câu gợi ý điểm chạm (`RTOUCH`)** → `DATA.config.rtouch`, sửa được ở Cài đặt > CH4,
+>   mỗi dòng một câu, có nút trả về bản gốc. Đây là **kịch bản chăm sóc của trung tâm**, không phải
+>   hằng số của phần mềm: muốn thêm "Gửi video review của HV cũ" thì không phải nhờ lập trình viên.
+>   `RTOUCH` đổi tên thành `RTOUCHDEF` (bản gốc xuất xưởng), app đọc qua `rtList()`; bộ kiểm canh
+>   **không còn chỗ nào đọc thẳng bảng gốc**.
+> · `sessionSpan_hours` (mục 2 ở trên) là cái thứ tư.
+> Bộ kiểm kiểu mới: không chỉ hỏi "có tham số chưa" mà **đổi giá trị rồi xem app có đổi theo không**
+> - đó mới là bằng chứng tham số thật sự được đọc.
+>
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
 >
 > **(G) TRỢ THỦ THAO TÁC - anh Luân đặt 28/07, LÀM SAU ĐỢT AUDIT (F):** *"a muốn nghiên cứu trợ thủ

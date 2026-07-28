@@ -1303,7 +1303,7 @@ function syncApply(){if(!window.__pendSync)return;
   DATA.dl=st.dl;DL=DATA.dl;if(st.config)DATA.config=st.config;if(st.enums){DATA.enums=st.enums;ENUM=DATA.enums}
   by=st.by||"";__base=demoPack();
  }catch(e){return}
- try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}
+ try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{rtEnsure()}catch(e){}
  try{uiApply()}catch(e){}   /* V9.20: cổng khác đổi thương hiệu/màu -> cổng này đổi theo */
  if(window.HVPORTAL){if(typeof hvReRender==="function")hvReRender()}
  else{if(typeof CUR!=="undefined"&&CUR&&typeof reRender==="function")reRender(CUR);
@@ -4132,18 +4132,22 @@ function dtDay(n,h){return dtAt(new Date(Date.now()+n*864e5),h)}
 function dtDow(dow,h){var add=(dow-new Date().getDay()+7)%7||7;return dtDay(add,h)}
 function dtHHMM(d){return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
 function dtDMY(d){return ("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2)}
+/* V9.29o (mảng 5): GIỜ HẸN GỢI Ý cũng là thói quen của trung tâm, không phải hằng số của app.
+   Trung tâm mở cửa 8h hay 9h30, ca tối 19h hay 20h - đổi ở cấu hình, mọi nút đổi theo và NHÃN
+   trên nút cũng tự đổi (nhãn sinh từ chính con số, không gõ tay lần hai). */
+function apptH(k,fb){return num(paramOf(k,fb))||fb}
 var DTQUICK=[
- ["h2", function(){var d=new Date(Date.now()+2*36e5);d.setSeconds(0,0);d.setMinutes(d.getMinutes()<=30?30:60);return d},
-        function(d){return "2 tiếng nữa · "+dtHHMM(d)}],
- ["t15",function(){return dtAt(new Date(),15)}, function(){return "Chiều nay 15h"}],
- ["t19",function(){return dtAt(new Date(),19)}, function(){return "Tối nay 19h"}],
- ["m9", function(){return dtDay(1,9)},  function(){return "Mai 9h"}],
- ["m14",function(){return dtDay(1,14)}, function(){return "Mai 14h"}],
- ["m19",function(){return dtDay(1,19)}, function(){return "Mai 19h"}],
- ["d2", function(){return dtDay(2,9)},  function(){return "Ngày kia 9h"}],
- ["sat",function(){return dtDow(6,9)},  function(){return "Thứ 7 9h"}],
- ["w9", function(){return dtDay(7,9)},  function(){return "Tuần sau 9h"}],
- ["w2", function(){return dtDay(14,9)}, function(){return "2 tuần nữa 9h"}]];
+ ["h2", function(){var d=new Date(Date.now()+apptH("apptSoon_hours",2)*36e5);d.setSeconds(0,0);d.setMinutes(d.getMinutes()<=30?30:60);return d},
+        function(d){return apptH("apptSoon_hours",2)+" tiếng nữa · "+dtHHMM(d)}],
+ ["t15",function(){return dtAt(new Date(),apptH("apptAfternoon_hour",15))}, function(){return "Chiều nay "+apptH("apptAfternoon_hour",15)+"h"}],
+ ["t19",function(){return dtAt(new Date(),apptH("apptEvening_hour",19))},   function(){return "Tối nay "+apptH("apptEvening_hour",19)+"h"}],
+ ["m9", function(){return dtDay(1,apptH("apptMorning_hour",9))},  function(){return "Mai "+apptH("apptMorning_hour",9)+"h"}],
+ ["m14",function(){return dtDay(1,apptH("apptNoon_hour",14))},    function(){return "Mai "+apptH("apptNoon_hour",14)+"h"}],
+ ["m19",function(){return dtDay(1,apptH("apptEvening_hour",19))}, function(){return "Mai "+apptH("apptEvening_hour",19)+"h"}],
+ ["d2", function(){return dtDay(2,apptH("apptMorning_hour",9))},  function(){return "Ngày kia "+apptH("apptMorning_hour",9)+"h"}],
+ ["sat",function(){return dtDow(6,apptH("apptMorning_hour",9))},  function(){return "Thứ 7 "+apptH("apptMorning_hour",9)+"h"}],
+ ["w9", function(){return dtDay(7,apptH("apptMorning_hour",9))},  function(){return "Tuần sau "+apptH("apptMorning_hour",9)+"h"}],
+ ["w2", function(){return dtDay(14,apptH("apptMorning_hour",9))}, function(){return "2 tuần nữa "+apptH("apptMorning_hour",9)+"h"}]];
 var DTQBK={};DTQUICK.forEach(function(r){DTQBK[r[0]]=r});
 function dtVal(d){return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)+"T"+dtHHMM(d)}
 function dtPreset(id,kind){var r=DTQBK[kind];if(!r)return;
@@ -4305,7 +4309,11 @@ var RSTEP={
 /* ===== ĐIỂM CHẠM: chăm ở NGUYÊN chặng, chưa đẩy bước =====
    Thực tế ít ai 1 lần là qua bước. Mỗi chặng đều ghi được nhiều lượt chạm,
    hệ thống đếm số lần đã chạm ở chặng đó và tự đặt lịch hẹn lại. */
-var RTOUCH={
+/* V9.29o (mảng 5): 16 nhóm câu gợi ý này là KỊCH BẢN CHĂM SÓC của trung tâm, không phải hằng số
+   của phần mềm. Trung tâm muốn thêm một câu "Gửi video review của HV cũ" thì phải sửa được, không
+   phải nhờ lập trình viên. Bảng dưới chỉ còn là BẢN GỐC XUẤT XƯỞNG; app đọc qua rtList(), người
+   dùng sửa ở Cài đặt > CH4. Cùng một lối với cfEnsure: gieo bản gốc vào cấu hình lúc khởi động. */
+var RTOUCHDEF={
  new:["Gọi giới thiệu, mời test miễn phí"],
  contacted:["Gọi lại theo hẹn","Nhắn Zalo gửi lộ trình + học phí","Mời đến trung tâm tham quan"],
  no_contact:["Thử gọi khung giờ khác","Nhắn Zalo/SMS để lại lời nhắn"],
@@ -4322,10 +4330,27 @@ var RTOUCH={
  ending:["Báo khách kết quả đầu ra"],
  reenroll:["Mời tái ghi danh","Gửi ưu đãi học viên cũ"],
  cancelled:["Trao đổi phương án hoàn tiền"]};
+function rtEnsure(){DATA.config=DATA.config||{};
+ var c=(DATA.config.rtouch=DATA.config.rtouch||{}),add=0;
+ for(var k in RTOUCHDEF)if(c[k]===undefined){c[k]=RTOUCHDEF[k].slice();add++}
+ if(add)persistSoon();return add}
+function rtList(k){var c=(DATA.config&&DATA.config.rtouch)||{};
+ var v=c[k];if(v===undefined)v=RTOUCHDEF[k];
+ if(typeof v==="string")v=v.split("\n");
+ return (v||[]).map(function(x){return String(x||"").trim()}).filter(Boolean)}
+function rtSet(k,txt){DATA.config=DATA.config||{};
+ var c=(DATA.config.rtouch=DATA.config.rtouch||{});
+ c[k]=String(txt||"").split("\n").map(function(x){return x.trim()}).filter(Boolean);
+ persistSoon()}
+function rtSave(k){var e=document.getElementById("rt_"+k);if(!e)return;
+ rtSet(k,e.value);toast("Đã lưu gợi ý cho chặng "+((JBY[k]&&JBY[k].t)||k)+".");reRender(CUR)}
+function rtReset(k){DATA.config=DATA.config||{};
+ var c=(DATA.config.rtouch=DATA.config.rtouch||{});
+ c[k]=(RTOUCHDEF[k]||[]).slice();persistSoon();reRender(CUR);toast("Đã trả về bản gốc.")}
 function runTouches(J){var since=pvnd(J.since);
  var t=(J.C.tps||[]).filter(function(x){var d=pvnd(x.contact_time);return d&&(!since||d.getTime()>=since.getTime())});
  t.sort(function(a,b){return (pvnd(b.contact_time)||0)-(pvnd(a.contact_time)||0)});return t}
-function runTouchFields(J){var sug=RTOUCH[J.k]||[];
+function runTouchFields(J){var sug=rtList(J.k);
  return [["channel","Kênh","enum","enum_contact_channel",1,eFull("enum_contact_channel","phone")],
   ["cres","Kết quả","cres",null,1,"connected"],
   ["content","Nội dung / mục đích chạm","sel",'<option value="">-- chọn nhanh hoặc gõ ở ô dưới --</option>'+sug.map(function(s){return '<option>'+esc(s)+'</option>'}).join("")],
@@ -5290,11 +5315,12 @@ function sesPlan(s){
   hw:hwId?hwB(hwId):null, hwId:hwId,
   hwFrom:ovHw?"lớp":(pl.hw_bank_id?"khóa":""),
   note:ovNote||pl.prep_note||"", noteFrom:ovNote?"lớp":(pl.prep_note?"khóa":""),
-  dueDays:num(ovDue||pl.due_days||0)||DUEFALL, dueFrom:ovDue?"lớp":(num(pl.due_days)?"khóa":""),
-  dueDate:dueAfter(s.session_date,num(ovDue||pl.due_days||0)||DUEFALL),
+  dueDays:num(ovDue||pl.due_days||0)||dueFall(), dueFrom:ovDue?"lớp":(num(pl.due_days)?"khóa":""),
+  dueDate:dueAfter(s.session_date,num(ovDue||pl.due_days||0)||dueFall()),
   plan:pl, cl:cl}}
-/* Hạn nộp = ngày học + N ngày. Không có giáo án thì rơi về DUEFALL ngày. */
-var DUEFALL=5;
+/* Hạn nộp = ngày học + N ngày. Không có giáo án thì rơi về mức mặc định của trung tâm.
+   V9.29o: trước đây là hằng số 5 nằm trong code - trung tâm đổi nếp là phải sửa code. */
+function dueFall(){return num(paramOf("homeworkDueFallback_days",5))||5}
 function dueAfter(sesDate,n){var d=pvnd(sesDate);if(!d||!n)return "";
  var x=new Date(d.getTime()+n*864e5);return fmtDT(x).slice(0,10)}
 function dueChip(P){if(!P||!P.dueDays)return '<span class="mut">chưa đặt hạn</span>';
@@ -5340,7 +5366,7 @@ function renderGiaoan(){var tab=window.GATAB||"ga";
  pls.slice(0,40).forEach(function(p){var b=hwB(p.hw_bank_id);var dd=num(p.due_days);
   h+='<tr><td><b>Buổi '+esc(p.session_number)+'</b></td><td style="font-size:11.5px">'+esc(p.topic||"")+'</td>'+
    '<td>'+(b?'<b style="font-size:11.5px">'+esc(b.title)+'</b><div class="mut" style="font-size:10.5px">'+esc(elabel(b.skill)||b.skill)+' · '+esc(b.level||"")+'</div>':'<span class="mut">chưa đặt</span>')+'</td>'+
-   '<td>'+(dd?'<b>+'+dd+' ngày</b><div class="mut" style="font-size:10.5px">sau buổi học</div>':'<span class="mut">theo mặc định ('+DUEFALL+' ngày)</span>')+'</td>'+
+   '<td>'+(dd?'<b>+'+dd+' ngày</b><div class="mut" style="font-size:10.5px">sau buổi học</div>':'<span class="mut">theo mặc định ('+dueFall()+' ngày)</span>')+'</td>'+
    '<td style="max-width:340px;white-space:normal;font-size:11px;color:var(--muted)">'+esc(p.prep_note||"")+'</td>'+
    '<td><button class="btn sm" onclick="gaForm(\''+esc(p.plan_id)+'\')"><i class="ti ti-edit"></i>Sửa</button></td></tr>'});
  if(pls.length>40)h+='<tr><td class="empty" colspan="6">... còn '+(pls.length-40)+' buổi.</td></tr>';
@@ -5352,13 +5378,13 @@ function gaBulkDue(cid){var crs=find("DL05","course_id",cid)||{};
  var h='<div class="dcard"><h4><i class="ti ti-calendar-cog"></i>Hạn nộp bài · '+esc(crs.course_name||cid)+'</h4>';
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-alert-triangle"></i>Ghi đè hạn nộp mặc định của <b>tất cả '+pls.length+' buổi</b> trong giáo án khóa này ('+cls+' lớp đang áp dụng). Buổi nào giáo viên đã đặt hạn riêng cho lớp mình thì vẫn giữ nguyên.</div>';
  h+='<div class="fld"><label>Hạn nộp <i>*</i></label><select id="gb_due">'+
-  [1,2,3,4,5,6,7,10,14].map(function(n){return '<option value="'+n+'"'+(n===DUEFALL?" selected":"")+'>'+n+' ngày sau buổi học</option>'}).join("")+'</select></div>';
+  [1,2,3,4,5,6,7,10,14].map(function(n){return '<option value="'+n+'"'+(n===dueFall()?" selected":"")+'>'+n+' ngày sau buổi học</option>'}).join("")+'</select></div>';
  h+='<div class="fld"><label>Phạm vi</label><select id="gb_scope"><option value="all">Tất cả các buổi</option><option value="empty">Chỉ buổi chưa đặt hạn</option></select></div>';
  h+='<div class="fhint">Ví dụ: buổi học 10/07 + 5 ngày → hạn nộp 15/07.</div>';
  h+='<div class="dact"><button class="btn primary" onclick="gaBulkDueSave(\''+esc(cid)+'\')"><i class="ti ti-device-floppy"></i>Áp dụng cho '+pls.length+' buổi</button>'+
   '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
  openDrawer("Đặt hạn nộp hàng loạt",h)}
-function gaBulkDueSave(cid){var n=num(fldV("gb_due"))||DUEFALL,sc=fldV("gb_scope"),c=0;
+function gaBulkDueSave(cid){var n=num(fldV("gb_due"))||dueFall(),sc=fldV("gb_scope"),c=0;
  rows("DL21").forEach(function(p){if(p.course_id!==cid)return;
   if(sc==="empty"&&num(p.due_days))return;
   p.due_days=n;c++});
@@ -5392,7 +5418,7 @@ function gaForm(pid){var p=find("DL21","plan_id",pid);if(!p)return;
  h+='<div class="fld full"><label>Chủ đề buổi</label><input id="ga_topic" value="'+esc(p.topic||"")+'"></div>';
  h+='<div class="fld full"><label>Bài tập về nhà mặc định</label><select id="ga_hw">'+hwbOpts(p.hw_bank_id,"-- không giao bài --")+'</select></div>';
  h+='<div class="fld"><label>Hạn nộp mặc định</label><select id="ga_due">'+
-  [1,2,3,4,5,6,7,10,14].map(function(n){return '<option value="'+n+'"'+(n===(num(p.due_days)||DUEFALL)?" selected":"")+'>'+n+' ngày sau buổi học</option>'}).join("")+'</select>'+
+  [1,2,3,4,5,6,7,10,14].map(function(n){return '<option value="'+n+'"'+(n===(num(p.due_days)||dueFall())?" selected":"")+'>'+n+' ngày sau buổi học</option>'}).join("")+'</select>'+
   '<div class="fhint">Giáo viên vẫn đổi được cho riêng lớp mình, hoặc đổi lúc giao bài.</div></div>';
  h+='<div class="fld"><label>&nbsp;</label><label class="ckline"><input type="checkbox" id="ga_dueall">Áp dụng hạn nộp này cho <b>tất cả các buổi</b> của khóa</label></div>';
  h+='<div class="fld full"><label>Lời dặn trước buổi (học viên sẽ thấy ở mục "Sắp tới")</label><textarea id="ga_note" rows="3">'+esc(p.prep_note||"")+'</textarea></div>';
@@ -5400,7 +5426,7 @@ function gaForm(pid){var p=find("DL21","plan_id",pid);if(!p)return;
  openDrawer("Sửa giáo án",h)}
 function gaSave(pid){var p=find("DL21","plan_id",pid);if(!p)return;
  p.topic=fldV("ga_topic");p.hw_bank_id=fldV("ga_hw");p.prep_note=fldV("ga_note");
- var dd=num(fldV("ga_due"))||DUEFALL;p.due_days=dd;
+ var dd=num(fldV("ga_due"))||dueFall();p.due_days=dd;
  var all=(document.getElementById("ga_dueall")||{}).checked,nAll=0;
  if(all)rows("DL21").forEach(function(x){if(x.course_id===p.course_id){x.due_days=dd;nAll++}});
  var b=hwB(p.hw_bank_id);p.hw_title=b?b.title:"";
@@ -5446,9 +5472,9 @@ function sesSave(sid){var s=find("DL11","session_id",sid);if(!s)return;
  var note=(fldV("sf_note")||"").trim();
  s.prep_note=(note===String((sesPlan(s).plan||{}).prep_note||"").trim())?"":note;
  /* hạn nộp: bằng mặc định khóa -> để trống để sau này khóa đổi thì buổi này đổi theo */
- var dd=num(fldV("sf_due"))||DUEFALL,nAll=0;
+ var dd=num(fldV("sf_due"))||dueFall(),nAll=0;
  function setDue(x){var pl=coursePlan((find("DL10","class_id",x.class_id)||{}).course_id,x.session_number)||{};
-  x.hw_due_days=(dd===(num(pl.due_days)||DUEFALL))?"":dd}
+  x.hw_due_days=(dd===(num(pl.due_days)||dueFall()))?"":dd}
  if((document.getElementById("sf_dueall")||{}).checked){
   rows("DL11").forEach(function(x){if(x.class_id===s.class_id){setDue(x);nAll++}})}
  else setDue(s);
@@ -6613,6 +6639,18 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
      '<td style="font-size:11px">'+esc(m.owner||"-")+'</td>'+
      '<td><button class="btn sm" onclick="saveMsg('+idx+')"><i class="ti ti-device-floppy"></i>Lưu</button></td></tr>'});
    h+='</tbody></table></div></div>'});
+  /* V9.29o (mảng 5): KỊCH BẢN CHĂM SÓC theo chặng - 16 nhóm câu gợi ý ở ô "Nội dung / mục đích
+     chạm" của màn Chạy quy trình. Trước đây nằm cứng trong code (RTOUCH), giờ sửa được tại đây. */
+  h+='<div class="sechd" id="rtsec">Gợi ý nội dung điểm chạm theo chặng</div>';
+  h+='<div class="notebar"><i class="ti ti-messages"></i>Đây là các câu gợi ý hiện trong ô <b>"Nội dung / mục đích chạm"</b> khi nhân viên ghi một lượt chạm ở màn Chạy quy trình. <b>Mỗi dòng là một gợi ý.</b> Đây là kịch bản chăm sóc của trung tâm - thêm bớt thoải mái, không đụng gì tới luật chặng.</div>';
+  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th style="width:210px">Chặng</th><th>Các câu gợi ý (mỗi dòng một câu)</th><th style="width:150px"></th></tr></thead><tbody>';
+  Object.keys(RTOUCHDEF).forEach(function(k){var S=JBY[k]||{};var cur=rtList(k);
+   var def=(RTOUCHDEF[k]||[]).join("\n"),now=cur.join("\n");
+   h+='<tr><td><b>'+esc(S.t||k)+'</b><div class="mut" style="font-size:10.5px">'+esc(k)+'</div></td>'+
+    '<td><textarea id="rt_'+esc(k)+'" rows="'+Math.max(2,cur.length)+'" style="width:100%;min-width:300px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-family:inherit;font-size:11.5px">'+esc(now)+'</textarea></td>'+
+    '<td><button class="btn sm" onclick="rtSave(\''+esc(k)+'\')"><i class="ti ti-device-floppy"></i>Lưu</button>'+
+    (now!==def?' <button class="btn sm" onclick="rtReset(\''+esc(k)+'\')" data-tip="Trả về bản gốc xuất xưởng"><i class="ti ti-restore"></i></button>':'')+'</td></tr>'});
+  h+='</tbody></table></div></div>';
  }
  else if(tab==="ch1"){
   var q=(window.ENQ||"").toLowerCase();
@@ -7022,6 +7060,12 @@ function paramSheetName(name){var c=(DATA.config&&DATA.config.ch2)||[];
 var APPPARAMS=[
  /* V9.29o: một buổi chiếm chỗ của giáo viên bao lâu - dùng cho cảnh báo trùng giờ trên lịch tuần
     VÀ cho việc lọc người thay được. Trước đây con số 2 giờ nằm cắm cứng trong renderLichTuan. */
+ ["Xếp lịch & Giảng dạy","homeworkDueFallback_days","Hạn nộp bài mặc định khi giáo án không ghi rõ (tính từ ngày học)","ngày",5],
+ ["Hẹn & Chăm sóc","apptSoon_hours","Nút hẹn nhanh \"N tiếng nữa\" - N là bao nhiêu","giờ",2],
+ ["Hẹn & Chăm sóc","apptMorning_hour","Giờ hẹn buổi sáng dùng cho các nút gợi ý","giờ trong ngày",9],
+ ["Hẹn & Chăm sóc","apptNoon_hour","Giờ hẹn đầu giờ chiều dùng cho các nút gợi ý","giờ trong ngày",14],
+ ["Hẹn & Chăm sóc","apptAfternoon_hour","Giờ hẹn chiều dùng cho các nút gợi ý","giờ trong ngày",15],
+ ["Hẹn & Chăm sóc","apptEvening_hour","Giờ hẹn ca tối dùng cho các nút gợi ý","giờ trong ngày",19],
  ["Xếp lịch & Giảng dạy","sessionSpan_hours","Một buổi chiếm chỗ của giáo viên bao lâu (dùng để soi trùng giờ và tìm người dạy thay)","giờ",2],
  ["Giao việc","slaTaskAccept_hours","Người nhận phải BẤM NHẬN việc trong bao lâu (quá hạn -> nhắc)","giờ",4],
  ["Giao việc","slaTaskConfirm_hours","Người giao phải xác nhận sau khi được báo xong trong bao lâu","giờ",24],
@@ -11156,7 +11200,7 @@ function deriveAll(){
   rows("DL10").forEach(function(c){derNum(c,"current_enrollment",cls[c.class_id]||0)});
  }catch(e){}
 }
-function enter(k){try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{autoReturnHandovers()}catch(e){}document.getElementById("login").style.display="none";document.getElementById("app").style.display="flex";setRole(k);
+function enter(k){try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{rtEnsure()}catch(e){}try{autoReturnHandovers()}catch(e){}document.getElementById("login").style.display="none";document.getElementById("app").style.display="flex";setRole(k);
  /* Vào app xong mới đọc địa chỉ: setRole đã dựng menu + đứng ở trang mặc định, giờ nếu trên thanh
     địa chỉ có #/<trang> hợp lệ thì nhảy về đúng đó (F5 hoặc mở link người khác gửi). */
  try{var hk=hashKey();if(hashOK(hk))go(hk)}catch(e){}
@@ -11253,7 +11297,7 @@ function hvToggleSide(){var s=document.getElementById("hvSide");if(!s)return;
  var m=document.getElementById("hvMask");if(m)m.classList.toggle("on",on)}
 function hvCloseSide(){var s=document.getElementById("hvSide");if(s)s.classList.remove("open");
  var m=document.getElementById("hvMask");if(m)m.classList.remove("on")}
-function bootHV(sid){window.HVPORTAL=1;try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}
+function bootHV(sid){window.HVPORTAL=1;try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{rtEnsure()}catch(e){}
  /* đọc địa chỉ TRƯỚC khi vẽ: hvRender -> hvSpy sẽ ghi đè ?slug bằng mục đầu trang, đọc sau là mất */
  var __want="";try{__want=hvHashRead()}catch(e){}
  var stu=rows("DL09");

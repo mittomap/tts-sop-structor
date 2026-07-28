@@ -1087,4 +1087,42 @@ function navIsArcGrpG(G){return navIsArcGrp(G.g)}
  t("khong con so 2 gio cam cung o lich tuan", !/<2\*36e5/.test(SRC));
 })();
 
+
+/* ---- 37. HANG SO NGHIEP VU CUOI CUNG RA KHOI CODE (mang 5) ---- */
+(function(){
+ setRole("all");cfEnsure();rtEnsure();
+ /* (a) han nop bai mac dinh */
+ t("han nop mac dinh lay tu cau hinh", typeof dueFall==="function"&&dueFall()===num(paramOf("homeworkDueFallback_days",5)));
+ t("khong con hang so DUEFALL trong ma nguon", !/\bDUEFALL\b/.test(SRC));
+ (function(){var c=(DATA.config.ch2||[]).filter(function(x){return x.name==="homeworkDueFallback_days"})[0];
+  var old=c.value;c.value="9";
+  t("doi cau hinh la han nop doi theo", dueFall()===9);
+  c.value=old})();
+ /* (b) gio hen goi y - ca CON SO lan NHAN tren nut */
+ t("gio hen lay tu cau hinh", apptH("apptEvening_hour",19)===num(paramOf("apptEvening_hour",19)));
+ (function(){var c=(DATA.config.ch2||[]).filter(function(x){return x.name==="apptEvening_hour"})[0];
+  var old=c.value;c.value="20";
+  var lb=DTQUICK.filter(function(r){return r[0]==="t19"})[0][2]();
+  t("doi gio ca toi thi NHAN tren nut doi theo", /20h/.test(lb));
+  var d=DTQUICK.filter(function(r){return r[0]==="t19"})[0][1]();
+  t("doi gio ca toi thi GIO dat vao o cung doi theo", d.getHours()===20);
+  c.value=old})();
+ t("khong con gio 15/19/9 cam cung trong DTQUICK", !/dtDay\(1,9\)/.test(SRC)&&!/dtAt\(new Date\(\),19\)/.test(SRC));
+ /* (c) kich ban cham soc 16 chang */
+ t("kich ban cham soc nam trong cau hinh", !!(DATA.config&&DATA.config.rtouch)&&Object.keys(DATA.config.rtouch).length===Object.keys(RTOUCHDEF).length);
+ t("moi chang trong RTOUCHDEF deu la chang co that", Object.keys(RTOUCHDEF).every(function(k){return !!JBY[k]}));
+ (function(){var k="contacted",old=rtList(k).join("\n");
+  rtSet(k,"Cau moi mot\nCau moi hai");
+  t("sua kich ban thi man Chay quy trinh doi theo", (function(){
+    var J={k:k};var f=runTouchFields(J).filter(function(x){return x[0]==="content"})[0];
+    return /Cau moi mot/.test(f[3])&&/Cau moi hai/.test(f[3])})());
+  rtSet(k,old);
+  t("tra ve ban goc duoc", rtList(k).join("\n")===old)})();
+ t("app doc kich ban qua rtList, khong doc thang bang goc", !/RTOUCH\[/.test(SRC));
+ /* moi tham so moi khai deu co dong cau hinh that (bat bien hai chieu da co tu V9.29f) */
+ ["homeworkDueFallback_days","apptSoon_hours","apptMorning_hour","apptNoon_hour",
+  "apptAfternoon_hour","apptEvening_hour","sessionSpan_hours"].forEach(function(n){
+  t("tham so "+n+" co dong cau hinh that", (DATA.config.ch2||[]).some(function(x){return x.name===n}))});
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");
