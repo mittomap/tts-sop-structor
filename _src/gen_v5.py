@@ -2616,6 +2616,10 @@ var GRPICON={"Lead cần gọi gấp":"ti-phone-call","Gọi lại - chưa kết
 var FKICON={all:"ti-list",overdue:"ti-alert-triangle",sendinfo:"ti-send",confirm:"ti-checks",finish:"ti-flag",book:"ti-calendar",grade:"ti-writing",consult:"ti-messages",todo:"ti-message-dots",close:"ti-target-arrow",enroll:"ti-clipboard-check",debt:"ti-cash",verify:"ti-shield-check",paid:"ti-circle-check",upcoming:"ti-clock",note:"ti-notes",new:"ti-inbox",work:"ti-tool",done:"ti-check",score:"ti-writing",invite:"ti-mail",follow:"ti-refresh"};
 /* Việc theo HÀNH TRÌNH: sinh thẳng từ bộ máy - không viết tay từng luật nữa */
 var JGRP={thu:"Tuyển sinh",hv:"Học vụ",tc:"Tài chính",cs:"CSKH"};
+/* V9.29 (anh Luân chốt): cột chặng quyết định MÀU/nhóm hành trình, nhưng bộ phận PHỤ TRÁCH thì có
+   ga khác hẳn - "Chờ chấm test" nằm ở cột học vụ mà người làm là TEAM WOW. Ga nào lệch thì khai
+   riêng ở đây, không sửa cột (sửa cột là vỡ cả bản đồ chặng). */
+var JCAT={test_grading:"WOW"};
 function jTasks(){var out=[];
  jAll().forEach(function(J){
   if(!J.act)return;
@@ -2623,7 +2627,7 @@ function jTasks(){var out=[];
   if(!urgent&&J.sla<=0)return;                     /* chặng không có hạn -> không nhắc */
   if(!urgent&&J.ageH!=null&&J.sla>0&&J.ageH<J.sla*0.5)return;  /* còn sớm -> chưa nhắc */
   var whatCore=J.naMsg||J.act.lb;
-  out.push({cat:JGRP[J.S.col]||"Vận hành",grp:J.S.t,sev:(J.over?"red":"amber"),ic:J.S.ic,
+  out.push({cat:JCAT[J.k]||JGRP[J.S.col]||"Vận hành",grp:J.S.t,sev:(J.over?"red":"amber"),ic:J.S.ic,
    who:J.name,what:(J.miss.length?("Thiếu "+J.miss.join(", ")+" - "):"")+whatCore+(J.over?" (quá hạn)":""),
    age:J.ageH,page:null,filter:null,lead:(J.C.L?J.C.L.lead_id:null),hoso:(J.C.L?null:J.C.sid),
    act:"jRun",rid:J.C.pid,jpid:J.C.pid})});
@@ -2653,8 +2657,8 @@ function slaItems(){var out=jTasks();
  srows("DL06").forEach(function(e){if(num(e.discount_amount)>=ckThreshold()&&!String(e.discount_approved_by||"").trim()&&!isc(e.enrollment_status,"cancelled"))add("Tài chính","Duyệt chiết khấu","amber","ti-discount-check",e.student_id_name||e.student_id,"Chiết khấu "+vnd(num(e.discount_amount))+" chờ quản lý duyệt",hoursSince(e.enrollment_time),"duyet","",null,null,null,e.enrollment_id)});
  srows("DL03").forEach(function(r){var att=isc(r.test_attendance_status,"on_time","late"),graded=isc(r.test_status,"graded"),consulted=isc(r.post_test_status,"consulted");
   var age=hoursSince(r.test_attendance_time);var over=att&&!graded&&age!=null&&age>paramOf("slaTestResult_hours",48);
-  if(over)add("Giảng viên (ACA)","Chấm test đầu vào","red","ti-file-text",r.lead_id_name||r.lead_id,"Test chưa chấm quá hạn",age,"test","grade",null,null,"testgrade",r.test_booking_id);
-  else if(att&&!graded)add("Giảng viên (ACA)","Chấm test đầu vào","amber","ti-file-text",r.lead_id_name||r.lead_id,"Test chờ chấm điểm",age,"test","grade",null,null,"testgrade",r.test_booking_id);
+  if(over)add("WOW","Chấm test đầu vào","red","ti-file-text",r.lead_id_name||r.lead_id,"Test chưa chấm quá hạn",age,"test","grade",null,null,"testgrade",r.test_booking_id);
+  else if(att&&!graded)add("WOW","Chấm test đầu vào","amber","ti-file-text",r.lead_id_name||r.lead_id,"Test chờ chấm điểm",age,"test","grade",null,null,"testgrade",r.test_booking_id);
   else if(graded&&!consulted)add("Tuyển sinh","Tư vấn sau test","amber","ti-messages",r.lead_id_name||r.lead_id,"Có KQ test, chờ tư vấn",null,"test","consult",null,null,"testconsult",r.test_booking_id)});
  srows("DL08").forEach(function(o){var s=obState(o);
   if(s.infoOverdue)add("Học vụ","Gửi thông tin lớp","red","ti-send",o.student_id_name||o.student_id,"Chưa gửi thông tin lớp (quá hạn)",hoursSince(o.assigned_at),"xeplop","sendinfo",null,null,"ob",o.onboarding_id);
@@ -2724,6 +2728,23 @@ function slaItems(){var out=jTasks();
     (age!=null&&age>lim?"QUÁ HẠN duyệt - ":"")+"HV xin nghỉ buổi "+(ss.session_number||"?")+
     " ngày "+(ss.session_date||"")+(a.absence_want_makeup?" và xin học bù":""),
     age||0,"diemdanh",null,null,null,"absForm",a.attendance_id)})})();
+ /* V9.29: buổi đã dạy xong mà giảng viên chưa ghi nhận xét. Trang "Buổi học" có đếm số này từ lâu
+    nhưng KHÔNG có luật SLA nào -> chuông của giáo viên không hề reo. Nay reo, đúng bộ phận ACA. */
+ /* DÙNG CHÍNH bhState() - trang Buổi học đã định nghĩa "buổi đã có nhận xét" ở đó. App đang có
+    BA cách hiểu khác nhau về việc này (class_note / teacher_note_summary / has_teacher_note);
+    tự đặt cách thứ tư là chuông đếm một đằng, trang đếm một nẻo. */
+ (function(){
+  srows("DL11").forEach(function(s2){
+   var st=bhState(s2);
+   if(!st.done||st.note)return;
+   if(st.ageH==null||st.ageH<0)return;
+   /* KHÔNG cắt theo tuổi. Bản đầu em cắt 14 ngày cho gọn chuông -> chuông đếm 1 mà trang Buổi học
+      đếm 22, hai con số đá nhau. Buổi dạy xong chưa có nhận xét là việc còn nợ, cũ mấy cũng vậy. */
+   var c=find("DL10","class_id",s2.class_id)||{};
+   add("Giảng viên (ACA)","Ghi nhận xét buổi",st.noteOver?"red":"amber","ti-message-2",
+    (c.class_name||s2.class_id||"")+" · buổi "+(s2.session_number||"?"),
+    (st.noteOver?"QUÁ HẠN ghi nhận xét - ":"")+"Buổi dạy xong "+Math.round(st.ageH)+"h trước, chưa có nhận xét (hạn "+st.lim+"h)",
+    st.ageH,"buoihoc",null,null,null,"bhNoteForm",s2.session_id)})})();
  /* HV vắng buổi mà chưa ai hỏi thăm: SOP gọi trong slaAbsenceCall_hours (24h). Ghi chú vào dòng điểm danh = đã xử lý. */
  (function(){var absH=paramOf("slaAbsenceCall_hours",24);
   srows("DL12").forEach(function(a){

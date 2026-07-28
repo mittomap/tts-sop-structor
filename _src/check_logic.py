@@ -168,6 +168,12 @@ t3 = [s(x,"session_id") for x in R("DL11") if (dt(x.get("session_date")) or NOW)
       and code(x.get("session_status")) == "completed"]
 rep("NANG", "3i Buoi hoc NGAY TUONG LAI nhung trang thai 'Da hoan thanh'", t3)
 
+# V9.29 (anh Luan chot): CHAM BAI TEST DAU VAO la viec cua TEAM WOW, khong phai giang vien ACA.
+_wow = set(s(x,"staff_id") for x in R("DL01") if code(x.get("role")) in ("wow_coach", "wow_leader"))
+_saicham = [s(t,"test_booking_id") for t in R("DL03")
+            if str(t.get("graded_by") or "").strip() and _wow and str(t.get("graded_by")).strip() not in _wow]
+rep("NANG", "3k Phieu test cham boi nguoi KHONG thuoc team WOW", _saicham)
+
 # ══ 4. DIEM DANH ═════════════════════════════════════════════════════════
 # V9.29: DON XIN NGHI khong phai la diem danh. Hoc vien bao nghi TRUOC buoi hoc la dung nghiep vu
 # (bao truoc de giao vien chuan bi phan bu), nen dong "cho duyet" / "[HV tu bao]" duoc mien 4a-4b.

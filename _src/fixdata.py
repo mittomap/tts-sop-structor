@@ -785,7 +785,9 @@ def _staff_role(*want):
     out = [x for x in R("DL01") if code(x.get("role")) in want and code(x.get("status")) == "active"]
     return out
 
-_GRADERS = _staff_role("teacher", "wow_coach") or _staff_role("academic_staff") or R("DL01")[:1]
+# Chấm bài test đầu vào là việc của TEAM WOW (anh Luân chốt 28/07) - không phải giảng viên ACA.
+# Lượt vá trước lấy cả "teacher" nên 46 phiếu test bị gán sai người chấm.
+_GRADERS = _staff_role("wow_coach", "wow_leader") or _staff_role("teacher") or R("DL01")[:1]
 _ACCT = (_staff_role("accountant") or _staff_role("accounting_manager") or R("DL01")[:1])[0]
 
 
@@ -985,6 +987,17 @@ for _e in R("DL06"):
     _e["payment_status"] = ("paid (Đã thanh toán đủ)" if _amt >= _fee else "partial (Đã thanh toán 1 phần)")
     _paid_of_enr[str(_e.get("enrollment_id"))] = _amt
     _made_pay += 1
+
+# Vá lại các phiếu test đang gán người chấm KHÔNG thuộc team WOW
+_wowids = set(x.get("staff_id") for x in _staff_role("wow_coach", "wow_leader"))
+_regrade = 0
+if _wowids:
+    for _t in R("DL03"):
+        _gb = str(_t.get("graded_by") or "").strip()
+        if _gb and _gb not in _wowids:
+            _t["graded_by"] = random.choice(sorted(_wowids))
+            _regrade += 1
+log.append("14bis-b. Chấm test: đưa %d phiếu về đúng người chấm thuộc team WOW" % _regrade)
 
 log.append("14bis. Khớp ga nghiệp vụ: bù %d phiếu test đã chấm (nối %d phiếu tư vấn vào phiếu test), "
            "%d phiếu tư vấn, %d phiếu thu cọc cho người đã xếp lớp mà chưa đóng đồng nào"

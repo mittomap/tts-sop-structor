@@ -610,7 +610,12 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  var c={};slaItems().forEach(function(x){c[x.cat]=(c[x.cat]||0)+1});
  t("co bo phan Giang vien (ACA) rieng", (c["Giảng viên (ACA)"]||0)>0);
  t("co bo phan WOW rieng", ("WOW" in c));
- t("viec cham test da chuyen sang ACA", /add\("Giảng viên \(ACA\)","Chấm test đầu vào"/.test(SRC));
+ /* anh Luân chốt 28/07: CHẤM BÀI TEST ĐẦU VÀO là việc của TEAM WOW, không phải giảng viên ACA */
+ t("viec cham test thuoc nhom WOW", /add\("WOW","Chấm test đầu vào"/.test(SRC));
+ t("khong con xep cham test vao ACA", !/add\("Giảng viên \(ACA\)","Chấm test đầu vào"/.test(SRC));
+ t("moi phieu test deu do team WOW cham", (function(){
+   var wow={};rows("DL01").forEach(function(x){if(/^wow_/.test(ecode(x.role)))wow[x.staff_id]=1});
+   return rows("DL03").filter(function(r){var g=String(r.graded_by||"").trim();return g&&!wow[g]}).length===0})());
  t("viec ghi noi dung WOW da chuyen sang WOW", /add\("WOW","Ghi nội dung WOW"/.test(SRC));
  /* BAT BIEN QUAN TRONG: doi cat ma quen cap nhat chuong = canh bao bien mat khoi moi vai */
  var roles=["tuvan","hocvu","giaovien","wow","ketoan","marketing","hotro"];
@@ -626,6 +631,31 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
   t("trang Viec hom nay cua giao vien co chip ACA", RENDER["viec"]().indexOf("Giảng viên (ACA)")>=0);
   CURSTAFF="";applyScope("")}
  setRole("all");
+})();
+
+
+/* ---- 23. PHAN CONG BO PHAN theo dung nghiep vu (anh Luan chot 28/07) ----
+   "giao vien cham bai trong lop hoc, test dau vao va buoi wow la cua team wow" */
+(function(){
+ setRole("all");
+ var m={};slaItems().forEach(function(x){(m[x.cat]=m[x.cat]||{})[x.grp]=1});
+ var ACA=m["Giảng viên (ACA)"]||{}, WOW=m["WOW"]||{};
+ t("ACA giu viec CHAM BAI TAP trong lop", !!ACA["Chấm bài tập"]);
+ t("ACA giu viec GHI NHAN XET BUOI", !!ACA["Ghi nhận xét buổi"]);
+ t("WOW giu viec CHAM TEST dau vao", !!WOW["Chấm test đầu vào"]||!!WOW["Chờ chấm test"]);
+ t("WOW giu viec BUOI WOW", !!WOW["Ghi nội dung WOW"]);
+ t("ACA khong con om viec test dau vao", !ACA["Chấm test đầu vào"]&&!ACA["Chờ chấm test"]);
+ t("ACA khong con om viec buoi WOW", !ACA["Ghi nội dung WOW"]);
+ t("ga 'Cho cham test' khai rieng bo phan phu trach, khong sua cot chang", /var JCAT=\{test_grading:"WOW"\}/.test(SRC));
+ t("moi phieu test do team WOW cham", (function(){
+   var w={};rows("DL01").forEach(function(x){if(/^wow_/.test(ecode(x.role)))w[x.staff_id]=1});
+   return rows("DL03").filter(function(r){var g=String(r.graded_by||"").trim();return g&&!w[g]}).length===0})());
+ /* luat moi: buoi day xong chua ghi nhan xet -> chuong phai reo, va dem KHOP voi trang Buoi hoc */
+ var chuong=slaItems().filter(function(x){return x.grp==="Ghi nhận xét buổi"}).length;
+ var trang=rows("DL11").filter(function(x){var st=bhState(x);return st.done&&!st.note}).length;
+ t("co luat SLA cho buoi no nhan xet", chuong>0);
+ t("chuong va trang Buoi hoc dem BANG NHAU (khong cat cam)", chuong===trang);
+ t("dung chung bhState, khong tu dat cach hieu thu tu", /var st=bhState\(s2\);/.test(SRC));
 })();
 
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");

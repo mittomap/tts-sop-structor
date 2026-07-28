@@ -278,6 +278,18 @@
 > **(5) ACA và WOW không có bộ phận riêng (anh Luân bắt tiếp):** việc chấm test / chấm bài / nhận xét
 > buổi (giảng viên ACA) và ghi nội dung buổi WOW đều bị dồn hết vào "Học vụ" - hai bộ phận thật mà
 > không có chỗ nào gọi tên. Đã tách thành **"Giảng viên (ACA)"** (42 việc) và **"WOW"**, Học vụ còn 18.
+> **(6) Phân công bộ phận đúng nghiệp vụ (anh Luân chốt):** *"giáo viên chấm bài trong lớp học, test
+> đầu vào và buổi WOW là của team WOW"*. Cuối cùng: **Giảng viên (ACA)** = Chấm bài tập + Ghi nhận xét
+> buổi (47) · **WOW** = Chờ chấm test + Chấm test đầu vào + Ghi nội dung WOW (13). Ga `test_grading`
+> nằm ở cột học vụ trên bản đồ chặng nhưng người làm là WOW - khai riêng ở bảng mới `JCAT`, **không
+> sửa cột** (sửa cột là vỡ cả bản đồ chặng). Dữ liệu: `fixdata` lấy người chấm test từ **team WOW**
+> (lượt vá trước em lấy cả `teacher` nên 46 phiếu gán sai người); thêm luật `check_logic 3k`.
+> **(7) Buổi dạy xong chưa ghi nhận xét CHƯA HỀ CÓ LUẬT SLA** - trang Buổi học đếm số này từ lâu mà
+> chuông của giáo viên không bao giờ reo. Đã thêm. Hai bẫy khi thêm: (a) app có **BA cách hiểu**
+> "buổi đã có nhận xét" (`class_note` / `teacher_note_summary` / `has_teacher_note`) - phải dùng
+> chính `bhState()` chứ không tự đặt cách thứ tư; (b) bản đầu em cắt 14 ngày cho gọn chuông nên
+> **chuông đếm 1 mà trang đếm 22** - bỏ cắt, buổi còn nợ nhận xét thì cũ mấy cũng vẫn nợ.
+>
 > **Bất biến mới trong `_check16`:** mọi `cat` do `slaItems` sinh ra phải đến được chuông của ít nhất
 > một vai. Đổi `cat` mà quên cập nhật `ROLESCOPE.bell` là **cảnh báo biến mất khỏi mọi vai** - lớp lỗi
 > im lặng, không ai biết cho tới khi có người hỏi "sao không thấy việc". Tiện thể thêm "Giao việc" vào
