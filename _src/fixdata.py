@@ -1349,6 +1349,62 @@ for t in dl.get("DL03", []):
 log.append("14septies. Thứ tự: đẩy %d phiếu test bị hẹn TRƯỚC giờ tạo lead ra sau ít nhất 2 tiếng"
            % _tfix)
 
+# ═══ 14octies. GIÁO VIÊN KHÔNG THỂ DẠY HAI LỚP CÙNG GIỜ (V9.29r) ═══════════
+# Màn "Phòng & đụng lịch" mới bắt được 20 điểm đụng giờ của giáo viên trong dữ liệu demo.
+# Giữ lại vài ca CỐ Ý cho màn đó có gì mà xem, số còn lại vá bằng cách đổi người dạy.
+#
+# LƯU Ý QUAN TRỌNG: luật "ai thay được" sống trong JS (gvBackup) - ở đây KHÔNG chép lại luật đó.
+# Python chỉ dùng một tập con NGẶT HƠN: người thay phải TRỐNG CẢ NGÀY và có cột branch TRÙNG KHỚP
+# tuyệt đối với chi nhánh của lớp (lớp online thì ai cũng được). Ngặt hơn nghĩa là mọi kết quả
+# Python chọn đều nằm trong tập mà JS chấp nhận - không có chuyện hai bên nói khác nhau.
+_SPAN_H = 2          # cùng khoảng "một buổi chiếm chỗ" mà app dùng (sessionSpan_hours)
+_KEEP = 3            # số ca đụng giờ cố ý giữ lại
+_clsIdx = {c.get("class_id"): c for c in dl.get("DL10", [])}
+_sess = [x for x in dl.get("DL11", [])
+         if not code(x.get("session_status", "")).startswith("cancelled") and dt(x.get("session_date"))]
+_sess.sort(key=lambda x: dt(x["session_date"]))
+_teachers = [st for st in dl.get("DL01", []) if "teacher" in str(st.get("role") or "")]
+
+def _busy_day(sid, day):
+    for x in _sess:
+        if str(x.get("teacher_id") or "") != sid:
+            continue
+        d = dt(x.get("session_date"))
+        if d and d.date() == day:
+            return True
+    return False
+
+_clash = []
+for i, A in enumerate(_sess):
+    da = dt(A["session_date"])
+    for B in _sess[i + 1:]:
+        db = dt(B["session_date"])
+        if (db - da).total_seconds() >= _SPAN_H * 3600:
+            break
+        ta, tb = str(A.get("teacher_id") or ""), str(B.get("teacher_id") or "")
+        if ta and ta == tb and A.get("class_id") != B.get("class_id"):
+            _clash.append(B)
+_fixgv = 0
+for B in _clash[_KEEP:]:
+    c = _clsIdx.get(B.get("class_id")) or {}
+    onl = str(c.get("learning_mode") or "").startswith("online")
+    br = c.get("branch") or ""
+    day = dt(B["session_date"]).date()
+    for st in _teachers:
+        if st.get("staff_id") == str(B.get("teacher_id") or ""):
+            continue
+        if not onl and st.get("branch") != br:
+            continue
+        if _busy_day(st["staff_id"], day):
+            continue
+        B["teacher_id"] = st["staff_id"]
+        B["teacher_id_name"] = st.get("full_name") or ""
+        _fixgv += 1
+        break
+log.append("14octies. Đụng giờ: đổi người dạy cho %d/%d buổi bị trùng giờ giáo viên "
+           "(giữ lại %d ca cố ý để màn Phòng & đụng lịch có gì mà xem)"
+           % (_fixgv, len(_clash), min(_KEEP, len(_clash))))
+
 # ═══ 15. SAN PHẲNG SƠ ĐỒ CỘT (UNION KEY) - PHẢI LÀ PASS CUỐI CÙNG ═════════
 # Cột chỉ có mặt ở vài dòng (referrer_name, referral_uses, net_received...) làm app render
 # ô trống và bản Sheets lệch cột. LUẬT: mọi dòng trong cùng một bảng phải CÙNG BỘ CỘT.

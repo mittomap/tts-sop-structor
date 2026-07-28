@@ -570,6 +570,29 @@
 > dòng dữ liệu trong app** để chứng minh màn này bắt được thay đổi sống - tức là nó thật sự khác
 > bộ kiểm lúc sinh chứ không phải bản chép lại.
 >
+> **(7) LĂNG KÍNH CHI NHÁNH: BÁO CÁO TÁCH THEO 5 CƠ SỞ.** Một chuỗi 5 cơ sở mà báo cáo gộp thì
+> chủ trung tâm không trả lời được câu quan trọng nhất: *"cơ sở nào đang gánh, cơ sở nào đang hụt"*.
+> Bảng mới tách theo cơ sở của **LỚP** (nơi việc học thật sự diễn ra, không phải nơi ghi trong hồ sơ
+> học viên - hồ sơ ghi nơi ĐĂNG KÝ), có cột riêng **"Trong đó online"**: lớp online không thuộc cơ
+> sở nào, gộp vào một cơ sở bất kỳ là sai cả hai đầu. 10 cột: lớp · online · học viên · HV nguy cơ ·
+> giáo viên · buổi đã dạy · tỷ lệ có nhận xét · đã thu · còn nợ. Bộ kiểm đối chiếu **tổng học viên
+> theo cơ sở = tổng ghi danh có lớp thật** - không đếm trùng, không sót.
+>
+> **(8) PHÒNG HỌC & ĐỤNG LỊCH** (việc tồn đợt 2 - khối xếp lịch). Lịch tuần cũ chỉ soi trùng giờ của
+> MỘT người. Ba loại đụng còn lại chưa ai canh: (1) hai lớp khác nhau cùng một **PHÒNG** cùng khung
+> giờ; (2) một lớp có hai buổi trùng giờ nhau; (3) lớp học tại chỗ **chưa ghi phòng**.
+> Điểm mấu chốt: **lớp ONLINE không bao giờ đụng phòng** - "phòng" của nó là link riêng, hai lớp
+> online cùng giờ là chuyện bình thường. Trộn hai loại vào một phép so là đẻ ra hàng loạt cảnh báo
+> giả rồi người dùng tắt hết cảnh báo. `roomOf()` cũng loại link Zoom và chữ "Đã hủy phòng" - hai
+> thứ đang nằm trong cột `venue_or_zoom_link` nhưng không phải phòng.
+> Màn này **có lối ra xử lý**, không chỉ tố cáo: mở thẳng buổi bị đụng, và đụng giờ giáo viên thì có
+> nút Đổi GV gọi luôn màn dự phòng.
+> **Nó bắt được 20 điểm đụng giờ thật trong dữ liệu demo.** Vá ở nguồn 17 ca, giữ 3 ca cố ý.
+> Cách vá đáng ghi: `fixdata` **KHÔNG chép lại luật "ai thay được"** (luật đó sống trong JS
+> `gvBackup`), chỉ dùng một **tập con NGẶT HƠN**: người thay phải trống CẢ NGÀY và cột `branch`
+> trùng khớp tuyệt đối (lớp online thì ai cũng được). Ngặt hơn nghĩa là mọi kết quả Python chọn đều
+> nằm trong tập JS chấp nhận - không có chuyện hai bên nói khác nhau.
+>
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
 >
 > **(G) TRỢ THỦ THAO TÁC - anh Luân đặt 28/07, LÀM SAU ĐỢT AUDIT (F):** *"a muốn nghiên cứu trợ thủ

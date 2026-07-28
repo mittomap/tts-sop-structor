@@ -1272,4 +1272,36 @@ function stripOf(o){var i=o.indexOf('<div class="bstats">');if(i<0)return "";
  t("danh muc co so co du 5 co so + online", (ENUM.enum_branch||[]).length>=6);
 })();
 
+
+/* ---- 42. PHONG HOC & DUNG LICH (viec ton dot 2 - khoi xep lich) ---- */
+(function(){
+ setRole("all");
+ t("co man Phong & dung lich", typeof renderPhong==="function"&&typeof clashList==="function");
+ /* LOP ONLINE KHONG BAO GIO DUNG PHONG - "phong" cua no la link rieng. Tron hai loai vao mot
+    phep so la de ra hang loat canh bao gia. */
+ t("lop online khong co phong vat ly", rows("DL10").filter(clsOnline).every(function(c){return roomOf(c)===""}));
+ t("khong bao gio bao lop online dung phong",
+   clashList().filter(function(x){return x.t==="phong"}).filter(function(x){
+    return clsOnline(find("DL10","class_id",x.a.class_id)||{})}).length===0);
+ /* link zoom / "da huy phong" KHONG duoc tinh la phong that */
+ t("link zoom khong bi coi la phong", roomOf({learning_mode:"offline (Tại trung tâm)",venue_or_zoom_link:"https://zoom.us/j/x"})==="");
+ t("phong da huy khong bi coi la phong", roomOf({learning_mode:"offline (Tại trung tâm)",venue_or_zoom_link:"Đã hủy phòng"})==="");
+ t("phong that thi nhan ra", roomOf({learning_mode:"offline (Tại trung tâm)",venue_or_zoom_link:"Phòng 202 - Cơ sở 1"})!=="");
+ /* dung cung nguong "mot buoi chiem cho bao lau" voi lich tuan va GV du phong */
+ t("dung chung nguong voi lich tuan", /sesSpanH\(\)\*36e5/.test(SRC));
+ /* du lieu demo: con dung it de man co gi ma xem, nhung khong duoc nhieu */
+ (function(){var cl=clashList();
+  t("du lieu demo con vai ca dung gio co y", cl.length>0&&cl.length<=6);
+  t("khong con dung phong nao trong du lieu demo", cl.filter(function(x){return x.t==="phong"}).length===0);
+  t("khong lop nao trung gio voi chinh no", cl.filter(function(x){return x.t==="lop"}).length===0)})();
+ /* moi lop TAI CHO deu phai co phong - lop online thi khong */
+ t("lop tai cho deu da co phong", noRoomList().length===0);
+ t("noRoomList khong dinh lop online", noRoomList().every(function(c){return !clsOnline(c)}));
+ /* man nay phai co loi ra XU LY, khong chi to cao */
+ (function(){window.HTTAB="phong";var o=RENDER.hoctap();
+  t("man dung lich mo duoc buoi bi dung", /goDD\(/.test(o));
+  t("dung gio GV thi co nut doi GV ngay tai cho", /gvBackupForm\(/.test(o));
+  window.HTTAB="today"})();
+})();
+
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");

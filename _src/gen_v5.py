@@ -1581,6 +1581,7 @@ var PAGES=[
 {k:"baitap",g:"_",ic:"ti-book",t:"Giao & chấm Bài tập",c:"Bài tập",ty:"custom",hide:1},
 {k:"wow",g:"_",ic:"ti-star",t:"Buổi WOW 1-1",c:"Kèm riêng",ty:"custom",hide:1},
 {k:"gvdp",g:"_",ic:"ti-user-plus",t:"GV dự phòng theo ngày",c:"Ai thay được khi GV nghỉ đột xuất",ty:"custom",hide:1},
+{k:"phong",g:"_",ic:"ti-layout-grid",t:"Phòng học & đụng lịch",c:"Đụng phòng, đụng giờ, lớp chưa có phòng",ty:"custom",hide:1},
 /* ===== THEO CHẶNG P8-P10: CSKH & KẾT THÚC ===== */
 {k:"cskh",g:"Chặng · CSKH & Kết thúc",ic:"ti-headset",t:"CSKH · Khảo sát & Phản hồi",c:"Khảo sát (TT→HV) · Góp ý & Khiếu nại (HV→TT)",ty:"custom"},
 /* 4 trang con gộp vào hub CSKH - ẩn khỏi menu, vẫn dùng được qua hub */
@@ -9959,6 +9960,68 @@ function renderGvdp(embed){
    '<td style="font-size:11.5px">'+esc(brs.join(" · ")||"-")+'</td>'+
    '<td>'+(nb?'<span class="chip amber">'+nb+' buổi</span>':'<span class="chip green">trống</span>')+'</td></tr>'});
  return h+'</tbody></table></div></div>'}
+/* ═══════ V9.29r - ĐỤNG PHÒNG / ĐỤNG GIỜ (việc tồn đợt 2 - khối xếp lịch) ═══════
+   Lịch tuần trước đây chỉ soi TRÙNG GIỜ CỦA MỘT NGƯỜI. Ba loại đụng còn lại chưa ai canh:
+     (1) hai lớp khác nhau xếp CÙNG MỘT PHÒNG cùng khung giờ - lớp thứ hai tới nơi không có chỗ;
+     (2) hai buổi CÙNG MỘT LỚP trùng giờ nhau (xếp lịch tay bị lặp);
+     (3) buổi học TẠI CHỖ mà lớp không ghi phòng - tới giờ mới đi tìm phòng.
+   Lớp ONLINE không bao giờ đụng phòng: "phòng" của nó là link Zoom riêng, hai lớp online cùng giờ
+   là chuyện bình thường. Trộn hai loại vào một phép so là đẻ ra hàng loạt cảnh báo giả. */
+function roomOf(c){                          /* phòng VẬT LÝ; lớp online trả về rỗng */
+ if(!c||clsOnline(c))return "";
+ var v=String(c.venue_or_zoom_link||"").trim();
+ if(!v||/^http/i.test(v)||/đã hủy/i.test(v))return "";
+ return v}
+function clashList(){
+ var sp=sesSpanH()*36e5,out=[];
+ var ses=rows("DL11").filter(function(x){return !isc(x.session_status,"cancelled")&&pvnd(x.session_date)});
+ ses.sort(function(a,b){return pvnd(a.session_date)-pvnd(b.session_date)});
+ var seen={};
+ for(var i=0;i<ses.length;i++){var A=ses[i],ca=find("DL10","class_id",A.class_id)||{},ra=roomOf(ca),da=pvnd(A.session_date);
+  for(var j=i+1;j<ses.length;j++){var B=ses[j],db=pvnd(B.session_date);
+   if(db-da>=sp)break;
+   var cb=find("DL10","class_id",B.class_id)||{},rb=roomOf(cb);
+   var key=A.session_id+"|"+B.session_id;if(seen[key])continue;
+   if(ra&&ra===rb&&A.class_id!==B.class_id){seen[key]=1;
+    out.push({t:"phong",sev:"nang",a:A,b:B,msg:"Trùng phòng "+ra+": "+(ca.class_name||A.class_id)+" và "+(cb.class_name||B.class_id)})}
+   else if(A.class_id===B.class_id){seen[key]=1;
+    out.push({t:"lop",sev:"nang",a:A,b:B,msg:"Lớp "+(ca.class_name||A.class_id)+" có 2 buổi trùng giờ (buổi "+(A.session_number||"?")+" và "+(B.session_number||"?")+")"})}
+   else if(A.teacher_id&&A.teacher_id===B.teacher_id){seen[key]=1;
+    out.push({t:"gv",sev:"nang",a:A,b:B,msg:"GV "+(A.teacher_id_name||A.teacher_id)+" có 2 buổi trùng giờ: "+(ca.class_name||A.class_id)+" và "+(cb.class_name||B.class_id)})}}}
+ return out}
+function noRoomList(){
+ return rows("DL10").filter(function(c){
+  if(clsOnline(c)||isc(c.class_status,"finished","cancelled"))return false;
+  return !roomOf(c)})}
+function renderPhong(embed){
+ var cl=clashList(),nr=noRoomList();
+ var byT={phong:0,lop:0,gv:0};cl.forEach(function(x){byT[x.t]++});
+ var onl=rows("DL10").filter(clsOnline).length;
+ var h=embed?'':pageHead("Phòng học & đụng lịch","Soi đụng phòng, đụng giờ của lớp và của giáo viên trên toàn bộ lịch. Lớp online không tính đụng phòng - 'phòng' của nó là link riêng.","");
+ h+=statStrip([
+  ["ti-layout-grid",byT.phong,"Đụng phòng","#E24B4A",byT.phong?"hai lớp cùng một phòng":"không có"],
+  ["ti-calendar-x",byT.lop,"Lớp trùng giờ với chính nó","#DB2777",byT.lop?"xếp lịch bị lặp":"không có"],
+  ["ti-user-exclamation",byT.gv,"Giáo viên trùng giờ","#E08A1E",byT.gv?"cần đổi người hoặc đổi giờ":"không có"],
+  ["ti-map-pin",nr.length,"Lớp tại chỗ chưa có phòng","#7C3AED",nr.length?"tới giờ mới đi tìm phòng":"đủ phòng"],
+  ["ti-device-laptop",onl,"Lớp online","#0D9488","không ràng buộc phòng"]]);
+ h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b>Các điểm đụng ('+cl.length+')</b><span class="mut" style="font-size:11.5px">hai mục cách nhau dưới '+slaChip("sessionSpan_hours",2,"giờ")+' thì coi là đụng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Loại</th><th>Ngày giờ</th><th>Chi tiết</th><th>Cơ sở</th><th></th></tr></thead><tbody>';
+ if(!cl.length)h+='<tr><td class="empty" colspan="5">Không có điểm đụng nào - lịch sạch.</td></tr>';
+ cl.slice(0,80).forEach(function(x){var d=pvnd(x.a.session_date);
+  var ca=find("DL10","class_id",x.a.class_id)||{};
+  h+='<tr><td><span class="chip '+(x.t==="phong"?"red":x.t==="lop"?"amber":"blue")+'">'+esc(x.t==="phong"?"Đụng phòng":x.t==="lop"?"Lớp trùng giờ":"GV trùng giờ")+'</span></td>'+
+   '<td>'+esc(String(x.a.session_date||"").slice(0,16))+'</td>'+
+   '<td style="white-space:normal">'+esc(x.msg)+'</td>'+
+   '<td>'+esc(clsOnline(ca)?"online":(elabel(ca.branch)||ca.branch||"-"))+'</td>'+
+   '<td><button class="btn sm" onclick="goDD(\''+esc(x.a.class_id)+'\',\''+esc(x.a.session_id)+'\')"><i class="ti ti-arrow-right"></i>Mở buổi</button>'+
+   (x.t==="gv"?' <button class="btn sm primary" onclick="gvBackupForm(\''+esc(x.b.session_id)+'\')"><i class="ti ti-user-plus"></i>Đổi GV</button>':'')+'</td></tr>'});
+ h+='</tbody></table></div></div>';
+ h+='<div class="panel"><div class="ph"><b>Lớp học tại chỗ chưa ghi phòng ('+nr.length+')</b><span class="mut" style="font-size:11.5px">lớp online không cần phòng nên không nằm trong danh sách này</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Cơ sở</th><th>Hình thức</th><th>Lịch</th><th>Đang ghi gì</th></tr></thead><tbody>';
+ if(!nr.length)h+='<tr><td class="empty" colspan="5">Lớp tại chỗ nào cũng đã có phòng.</td></tr>';
+ nr.forEach(function(c){
+  h+='<tr><td>'+lopLnk(c.class_id,c.class_name,"")+'</td><td>'+esc(elabel(c.branch)||c.branch||"-")+'</td>'+
+   '<td>'+esc(elabel(c.learning_mode)||c.learning_mode||"-")+'</td><td>'+esc(c.class_schedule||"-")+'</td>'+
+   '<td class="mut">'+esc(c.venue_or_zoom_link||"(trống)")+'</td></tr>'});
+ return h+'</tbody></table></div></div>'}
 function renderHoctap(){
  var tab=window.HTTAB||"lop";
  var cls=rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))});
@@ -9968,11 +10031,12 @@ function renderHoctap(){
  var h=pageHead("Học tập & Giảng dạy","Lớp đang mở, theo dõi nhận xét buổi (SLA), và buổi WOW 1-1 — một chỗ. Bấm một lớp để vào Vận hành lớp; theo dõi SLA nhận xét và WOW ở hai tab còn lại.",actBtn);
  var todayN=rows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,new Date())}).length;
  var nNoGv=rows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,new Date())&&!isc(x.session_status,"cancelled")&&!String(x.teacher_id||"").trim()}).length;
- h+=tbar(segHTML(tab,[["today","Hôm nay",todayN||"",""],["lichtuan","Lịch tuần","",""],["gvdp","GV dự phòng",nNoGv||"",nNoGv?"red":""],["lop","Lớp học",cls.length||"",""],["buoihoc","Nhận xét buổi",nNote||"",nNote?"red":""],["wow","Buổi WOW 1-1",nWow||"",nWow?"amber":""]],"htTabSet('{k}')"),
+ h+=tbar(segHTML(tab,[["today","Hôm nay",todayN||"",""],["lichtuan","Lịch tuần","",""],["gvdp","GV dự phòng",nNoGv||"",nNoGv?"red":""],["phong","Phòng & đụng lịch",clashList().length||"",clashList().length?"red":""],["lop","Lớp học",cls.length||"",""],["buoihoc","Nhận xét buổi",nNote||"",nNote?"red":""],["wow","Buổi WOW 1-1",nWow||"",nWow?"amber":""]],"htTabSet('{k}')"),
   '<button class="pill" onclick="go(\'giaoan\')"><i class="ti ti-notes"></i>Kho bài & Giáo án</button><button class="pill" onclick="go(\'banglop\')"><i class="ti ti-clipboard-list"></i>Vận hành lớp</button>');
  if(tab==="today")h+=renderHtToday(1);
  else if(tab==="lichtuan")h+=renderLichTuan(1);
  else if(tab==="gvdp")h+=renderGvdp(1);
+ else if(tab==="phong")h+=renderPhong(1);
  else if(tab==="lop")h+=renderHtLop(1);
  else if(tab==="buoihoc")h+=renderBuoihoc(1);
  else h+=renderWow(1);
@@ -10905,7 +10969,7 @@ function renderSothu(){var tab=window.STTAB||"da";
  h+=tbar(segHTML(tab,[["da","Đã thu",rows("DL07").length],["du","Dự thu",nDu]],"sothuTab('{k}')"),"");
  h+=(tab==="du")?renderDuthu():renderList("dsthanhtoan",1);
  return h}
-var RENDER={giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp};
+var RENDER={giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
 function dashJump(key){var m={urgent:"viec",newlead:"nhaplead",consider:"viec",convert:"tuvan",risk:"viec",onboard:"xeplop",approve:"duyet",debt:"thanhtoan",complaint:"khieunai",ungraded:"baitap",testpend:"test",wowbook:"wow",unverified:"thanhtoan",classes:"banglop"};var pg=m[key];if(pg&&RBK[CURROLE].pages.indexOf(pg)>=0)go(pg);else go("viec")}
 
 /* ---------- router ---------- */
@@ -10980,7 +11044,7 @@ function navJump(i){var h=window.NAVHIST;if(!h||i<0||i>=h.length)return;var targ
 var TSMAP={nhaplead:"lead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"};
 var ARCMAP={changA:1,changB:1,changC:1,changD:1};
 var CSMAP={review:"khaosat",khaosat:"khaosat",ghinhan:"phanhoi",khieunai:"khieunai"};
-var HTMAP={lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp"};
+var HTMAP={lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp",phong:"phong"};
 var KMAP={baoluu:"baoluu",magioithieu:"magioithieu"};
 /* V9.29o: bàn giao lead rời hub "Tính năng khác" sang hub "Chờ duyệt" - nó là một QUYẾT ĐỊNH
    (giao lead của người này cho người kia), không phải một tiện ích lặt vặt. */
@@ -11170,7 +11234,7 @@ var NAVTREE=[
  /* V9.29n (anh Luân): "Chặng 1" -> "C1". Tên nhóm nay SINH TỪ ARCS (arcGrpName) chứ không gõ tay:
     trước đây số chặng và tên chặng nằm cả ở ARCS lẫn ở đây, đổi một chỗ là hai chỗ nói khác nhau. */
  {g:arcGrpName("changA"),arc:"changA",items:["changA","nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","banglop","hoctap","gvdp","giaoan","wow","cskh"]},
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","banglop","hoctap","gvdp","phong","giaoan","wow","cskh"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
@@ -11181,7 +11245,7 @@ var NAVTREE=[
  {g:"Tra cứu",items:["hocvien","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","giangvien","nhanvien"]}];
 var NAVSUB={nhaplead:"tuyensinh",test:"tuyensinh",tuvan:"tuyensinh",thanhtoan:"tuyensinh",reup:"tuyensinh",
  review:"cskh",khaosat:"cskh",ghinhan:"cskh",khieunai:"cskh",
- lop:"hoctap",buoihoc:"hoctap",lichtuan:"hoctap",wow:"hoctap",gvdp:"hoctap",
+ lop:"hoctap",buoihoc:"hoctap",lichtuan:"hoctap",wow:"hoctap",gvdp:"hoctap",phong:"hoctap",
  baoluu:"khac",magioithieu:"khac",
  duyetck:"duyet",duyethoan:"duyet",duyetnghi:"duyet",duyetthu:"duyet",duyetgiao:"duyet",banggiao:"duyet",
  changA:"chang",changB:"chang",changC:"chang",changD:"chang"};
@@ -11208,7 +11272,7 @@ function navVis(k){var r=RBK[CURROLE],rs=SCOPE();
 /* V9.19: hub vừa là MỤC MENU vừa là chủ của mục con (hoctap có mục con wow/lop/buoihoc/lichtuan) -
    khi tab đang đứng thuộc về một mục con thì mục HUB không được sáng theo, nếu không 2 mục cùng sáng. */
 var HUBTAB={tuyensinh:{v:"TSTAB",d:"lead",m:{lead:"nhaplead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"}},
- hoctap:{v:"HTTAB",d:"today",m:{lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp"}},
+ hoctap:{v:"HTTAB",d:"today",m:{lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp",phong:"phong"}},
  cskh:{v:"CSTAB",d:"khaosat",m:{khaosat:"khaosat",phanhoi:"ghinhan",khieunai:"khieunai"}},
  khac:{v:"KTAB",d:"baoluu",m:{baoluu:"baoluu",magioithieu:"magioithieu"}},
  duyet:{v:"DUYTAB",d:"duyetck",m:{duyetck:"duyetck",duyethoan:"duyethoan",duyetnghi:"duyetnghi",duyetthu:"duyetthu",duyetgiao:"duyetgiao",banggiao:"banggiao"}}};
@@ -11222,7 +11286,7 @@ function navCur(k){
  var o=navOwner(k);if(o!==CUR)return false;
  if(o==="tuyensinh")return ({nhaplead:"lead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"})[k]===(window.TSTAB||"lead");
  if(o==="cskh")return ({review:"khaosat",khaosat:"khaosat",ghinhan:"phanhoi",khieunai:"khieunai"})[k]===(window.CSTAB||"khaosat");
- if(o==="hoctap")return ({lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp"})[k]===(window.HTTAB||"today");
+ if(o==="hoctap")return ({lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp",phong:"phong"})[k]===(window.HTTAB||"today");
  if(o==="khac")return ({baoluu:"baoluu",magioithieu:"magioithieu"})[k]===(window.KTAB||"baoluu");
  if(o==="duyet")return !!DUYMAP[k]&&k===(window.DUYTAB||"duyetck");
  if(o==="chang")return k===(window.ARC||"changA");
