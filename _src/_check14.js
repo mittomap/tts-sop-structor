@@ -1,6 +1,6 @@
 /* _check14: CONG HOC VIEN - KENH HAI CHIEU (mang 3). Chay: ITTS_OUT=<out> node _check14.js */
 var STORE={},FIELDS={};
-function El(id){var e={id:id||"",innerHTML:"",textContent:"",value:(FIELDS[id]||""),checked:!!FIELDS["chk_"+id],style:{},offsetHeight:200,
+function El(id){var e={id:id||"",innerHTML:"",textContent:"",value:(FIELDS[id]||""),checked:!!FIELDS["chk_"+id],style:{setProperty(){},removeProperty(){},getPropertyValue(){return ""}},offsetHeight:200,
  classList:{add(){},remove(){},contains(){return false},toggle(){return false}},
  querySelector(){return El()},querySelectorAll(){return []},getAttribute(){return ""},setAttribute(){},
  appendChild(){},remove(){},focus(){},addEventListener(){},getBoundingClientRect(){return {left:0,top:0,width:10,height:10,bottom:10,right:10}},files:[]};

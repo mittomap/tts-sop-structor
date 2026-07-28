@@ -1,5 +1,5 @@
 /* _check13: KPI BIET NOI (mang 2 hoi dong 6 chuyen gia). Chay: ITTS_OUT=<out> node _check13.js */
-function El(){return {innerHTML:"",textContent:"",value:"",style:{},classList:{add(){},remove(){},contains(){return false},toggle(){return false}},
+function El(){return {innerHTML:"",textContent:"",value:"",style:{setProperty(){},removeProperty(){},getPropertyValue(){return ""}},classList:{add(){},remove(){},contains(){return false},toggle(){return false}},
  querySelector(){return El()},querySelectorAll(){return []},getAttribute(){return ""},setAttribute(){},appendChild(){},remove(){},focus(){},addEventListener(){},files:[]}}
 global.document={getElementById:()=>El(),querySelector:()=>El(),querySelectorAll:()=>[],createElement:()=>El(),body:El(),addEventListener(){}};
 global.window=global;global.location={hash:""};

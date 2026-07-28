@@ -6,7 +6,7 @@ function El(id){return {id:id||"",innerHTML:"",textContent:"",value:(FIELDS[id]|
  appendChild(){},remove(){},focus(){},addEventListener(){},getBoundingClientRect(){return{left:0,top:0,width:9,height:9,bottom:9,right:9}},files:[]}}
 global.document={getElementById:(id)=>ST[id]||(ST[id]=El(id)),querySelector:()=>El(),querySelectorAll:()=>[],createElement:()=>El(),body:El(),addEventListener(){}};
 global.window=global;global.location={hash:""};
-global.localStorage={getItem:()=>null,setItem(){},removeItem(){}};global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
+var _LS={};global.localStorage={getItem:k=>_LS[k]===undefined?null:_LS[k],setItem(k,v){_LS[k]=String(v)},removeItem(k){delete _LS[k]}};global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
 var SRC0=require('fs').readFileSync('./_APP.js','utf8');
 var SRC=SRC0.replace(/\/\*[\s\S]*?\*\//g,"");
 require('vm').runInThisContext(SRC0);
@@ -272,6 +272,60 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("dai chao xep mot hang (canh giua)", /\.bwhero\{[^}]*align-items:center/.test(CSS));
  t("man hep thi o tim tu xuong dong", /max-width:760px\)\{\.bwr\{flex:1 1 100%\}/.test(CSS));
  t("dong goi y rong thi an han", /\.bwsrchhint:empty\{display:none\}/.test(CSS));
+})();
+
+/* ---- 13. DRAWER VIEC: nut hanh dong tach khoi trao doi + trao doi la BIEN BAN (V9.27) ---- */
+(function(){
+ setRole("all");
+ var tsk=rows("DL23").filter(function(x){return /new/.test(ecode(x.task_status))})[0]||rows("DL23")[0];
+ if(!tsk){t("co viec de kiem",false);return}
+ tkOpen(tsk.task_id);
+ var d=document.getElementById("drawerBody").innerHTML||"";
+ var iAct=d.indexOf('class="tkact"'), iChat=d.indexOf('class="tkchat"'), iSay=d.indexOf('class="tksay"');
+ t("nut hanh dong nam TREN luong trao doi", iAct>=0&&iAct<iChat&&iAct<iSay);
+ t("o nhap trao doi nam duoi cung", iSay>iChat);
+ t("nut hanh dong co duong ke tach han ra", /\.tkact\{[^}]*border-top:1px solid var\(--line\)/.test(CSS));
+ t("nut hanh dong khong con dinh sat o nhap", /\.tkact\{[^}]*margin:14px/.test(CSS));
+ t("o nhap trao doi cach luong chat ra", /\.tksay\{[^}]*margin-top:10px/.test(CSS));
+ t("chua nhan viec van go trao doi duoc", iSay>=0);
+ t("va noi ro la hoi duoc truoc khi nhan", /chưa nhận việc/.test(d));
+ /* chay that: gui trao doi TRUOC khi nhan viec, roi TU CHOI, xem trao doi con khong */
+ var n0=tkCmts(tsk.task_id).length;
+ tkSay(tsk.task_id,"Anh oi viec nay lam toi dau thi tinh la xong?",1);
+ t("gui duoc trao doi khi viec con o trang thai Moi giao", tkCmts(tsk.task_id).length===n0+1);
+ tkSay(tsk.task_id,"Tu choi viec: ban lich",1);
+ tsk.task_status=eFull("enum_task_status","declined");tsk.decline_reason="ban lich";
+ var sau=tkCmts(tsk.task_id);
+ t("tu choi roi trao doi VAN CON NGUYEN", sau.length===n0+2);
+ t("cau hoi hoi truoc khi nhan van con", sau.some(function(c){return /lam toi dau/.test(c.content||"")}));
+ t("ly do tu choi cung vao luong trao doi", sau.some(function(c){return /Từ chối việc|Tu choi viec/.test(c.content||"")}));
+ tkOpen(tsk.task_id);
+ var d2=document.getElementById("drawerBody").innerHTML||"";
+ t("viec da dong van doc lai duoc toan bo trao doi", d2.indexOf("lam toi dau")>=0);
+ t("va noi ro trao doi duoc giu lam bien ban", /vẫn giữ nguyên/.test(d2));
+})();
+
+/* ---- 14. DRAWER KEO DOI DO RONG, luu theo tung nguoi (V9.27) ---- */
+(function(){
+ t("co tay keo o mep trai drawer", /class="drszr"/.test(CSS)===false||/\.drszr\{[^}]*cursor:col-resize/.test(CSS));
+ t("do rong drawer chay bang bien --drw", /\.drawer\{[^}]*width:var\(--drw,760px\)/.test(CSS));
+ t("keo thi tat hieu ung truot cho khoi giat", /body\.drsz \.drawer\{transition:none\}/.test(CSS));
+ t("co du bo ham keo", ["drwKey","drwGet","drwSet","drwApply","drwReset","drwInit"].every(function(f){return typeof global[f]==="function"}));
+ t("so do luu theo TUNG NGUOI", (function(){CURSTAFF="NV001";var a=drwKey();CURSTAFF="NV007";var b=drwKey();CURSTAFF="";return a!==b&&/NV001/.test(a)&&/NV007/.test(b)})());
+ CURSTAFF="NV001";
+ drwSet(1000,1);
+ t("keo xong luu lai duoc", drwGet()===1000);
+ CURSTAFF="NV007";
+ t("nguoi khac khong bi dinh so do cua nguoi truoc", drwGet()===760);
+ CURSTAFF="NV001";
+ t("mo lai drawer thi tra ve dung so do da luu", drwGet()===1000);
+ drwSet(50,1);
+ t("keo hep qua thi chan lai o muc toi thieu", drwGet()===420);
+ drwReset();
+ t("bam dup tay keo thi ve mac dinh", drwGet()===760);
+ CURSTAFF="";
+ t("openDrawer tu goi drwInit va drwApply", /function openDrawer\(title,html\)\{tourCleanup\(\);drwInit\(\);drwApply\(\);/.test(SRC));
+ t("so do la thoi quen ca nhan nen luu tren may, khong vao du lieu demo chung", /localStorage\.setItem\(drwKey\(\)/.test(SRC));
 })();
 
 console.log(bad.length?("CHECK16 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK16 OK: "+ok+" tieu chi");

@@ -1,4 +1,4 @@
-function El(){return {innerHTML:"",value:"",checked:false,style:{},classList:{add(){},remove(){},contains(){return false}},
+function El(){return {innerHTML:"",value:"",checked:false,style:{setProperty(){},removeProperty(){},getPropertyValue(){return ""}},classList:{add(){},remove(){},contains(){return false}},
  querySelector(){return El()},querySelectorAll(){return []},getAttribute(){return ""},setAttribute(){},appendChild(){},focus(){},addEventListener(){},files:[]}}
 global.document={getElementById:()=>El(),querySelector:()=>El(),querySelectorAll:()=>[],createElement:()=>El(),body:El(),addEventListener(){}};
 global.window=global;global.location={hash:""};global.localStorage={getItem:()=>null,setItem(){}};

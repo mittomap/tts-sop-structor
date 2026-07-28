@@ -1,5 +1,5 @@
 // harness kiem TOUR: bat moi loi nem ra khi mo menu huong dan va khi chay tung buoc
-function El(id){return {id:id||"",innerHTML:"",textContent:"",value:"",checked:false,style:{},offsetHeight:230,
+function El(id){return {id:id||"",innerHTML:"",textContent:"",value:"",checked:false,style:{setProperty(){},removeProperty(){},getPropertyValue(){return ""}},offsetHeight:230,
  classList:{add(){},remove(){},contains(){return false},toggle(){return false}},
  querySelector(){return El()},querySelectorAll(){return []},getAttribute(){return ""},setAttribute(){},
  appendChild(){},remove(){},focus(){},addEventListener(){},getBoundingClientRect(){return {left:10,top:10,width:100,height:30,bottom:40,right:110}},files:[]}}

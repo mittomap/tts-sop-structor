@@ -1,6 +1,6 @@
 /* _check12: MOT CUA VAO - MOT LUAT. Bo kiem cho dot va "chan mau" theo hoi dong 2
    (nhan vien tu van + QA pha hoai, 28/07). Chay: ITTS_OUT=<out> node _check12.js */
-function El(id){return {id:id||"",innerHTML:"",textContent:"",value:"",checked:false,style:{},offsetHeight:200,
+function El(id){return {id:id||"",innerHTML:"",textContent:"",value:"",checked:false,style:{setProperty(){},removeProperty(){},getPropertyValue(){return ""}},offsetHeight:200,
  classList:{add(){},remove(){},contains(){return false},toggle(){return false}},
  querySelector(){return El()},querySelectorAll(){return []},getAttribute(){return ""},setAttribute(){},
  appendChild(){},remove(){},focus(){},addEventListener(){},getBoundingClientRect(){return {left:10,top:10,width:80,height:24,bottom:34,right:90}},files:[]}}

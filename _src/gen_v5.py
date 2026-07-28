@@ -396,8 +396,15 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .tkcmh b{font-size:11.5px;color:var(--navy)}
 .tkcmb{background:#fff;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:12.5px;line-height:1.55;margin-top:3px}
 .tkcm.me .tkcmb{background:#EAF3FC;border-color:#CFE3F7}
-.tksay{display:flex;gap:7px;align-items:center}
+/* V9.27: thanh nut hanh dong tach han khoi luong trao doi, khong con dinh sat gay cam giac de nhau */
+.tkact{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px;padding:12px 0 0;border-top:1px solid var(--line)}
+.tkchd{margin-top:18px}
+.tksay{display:flex;gap:7px;align-items:center;margin-top:10px}
 .tksay input{flex:1;height:36px;border:1px solid var(--line);border-radius:9px;padding:0 11px;font-family:inherit;font-size:12.5px}
+.tksay input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,196,.14)}
+.tkhint{display:flex;align-items:flex-start;gap:6px;font-size:11px;color:#7A8694;margin:7px 0 2px;line-height:1.5}
+.tkhint i{font-size:13px;flex:none;margin-top:1px}
+.tkhint b{color:#5A6675}
 @media(max-width:820px){.tkrow{flex-wrap:wrap}.tkright{width:100%;align-items:flex-start}}
 /* ===== V9.21 TOUR HƯỚNG DẪN TỪNG BƯỚC ===== */
 .tourspot{position:fixed;border-radius:12px;pointer-events:none;z-index:150;transition:all .22s cubic-bezier(.4,0,.2,1);
@@ -858,7 +865,14 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .cfh{font-size:14px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:7px;margin-bottom:10px}
 .cfmsg{font-size:13px;color:var(--text);line-height:1.55;margin-bottom:18px}
 .cfa{display:flex;justify-content:flex-end;gap:9px}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:760px;max-width:96vw;background:#fff;z-index:171;box-shadow:-8px 0 30px rgba(0,0,0,.16);transform:translateX(102%);transition:transform .22s ease;display:flex;flex-direction:column}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:var(--drw,760px);max-width:96vw;background:#fff;z-index:171;box-shadow:-8px 0 30px rgba(0,0,0,.16);transform:translateX(102%);transition:transform .22s ease;display:flex;flex-direction:column}
+/* V9.27: keo mep trai de doi do rong drawer, moi nguoi mot so do rieng (luu tren may cua nguoi do) */
+.drszr{position:absolute;left:0;top:0;bottom:0;width:8px;cursor:col-resize;z-index:5;background:transparent;transition:background .12s}
+.drszr:hover,.drszr.drag{background:linear-gradient(90deg,rgba(59,130,196,.28),transparent)}
+.drszr:after{content:"";position:absolute;left:2px;top:50%;margin-top:-18px;width:3px;height:36px;border-radius:2px;background:#CBD5E1;transition:.12s}
+.drszr:hover:after,.drszr.drag:after{background:var(--blue);height:56px;margin-top:-28px}
+body.drsz{cursor:col-resize;user-select:none}
+body.drsz .drawer{transition:none}
 .drawer.on{transform:none}
 .dh{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
 .dh b{flex:1;font-size:14.5px;font-weight:800}
@@ -1149,7 +1163,7 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 <div class="toast" id="toast"></div>
 <div class="mask" id="mask" onclick="closeModal()"></div>
 <div class="cfmask" id="cfm"><div class="cfbox"><div class="cfh"><i class="ti ti-alert-triangle"></i> Xác nhận thao tác</div><div class="cfmsg" id="cfmMsg"></div><div class="cfa"><button class="btn" onclick="closeConfirm()">Huỷ</button><button class="btn primary" onclick="confirmYes()">Xác nhận</button></div></div></div>
-<div class="drawer" id="drawer" role="dialog" aria-modal="true"><div class="dh"><b id="drawerTitle">Chi tiết</b><button class="x" onclick="closeModal()" aria-label="Đóng">&times;</button></div><div class="dbody" id="drawerBody"></div></div>
+<div class="drawer" id="drawer" role="dialog" aria-modal="true"><div class="drszr" id="drszr" title="Kéo để đổi độ rộng - bấm đúp để về mặc định"></div><div class="dh"><b id="drawerTitle">Chi tiết</b><button class="x" onclick="closeModal()" aria-label="Đóng">&times;</button></div><div class="dbody" id="drawerBody"></div></div>
 
 <script src="ITTs_data.js"></script>
 <script>
@@ -2750,7 +2764,38 @@ function goDD(cid,sess){window.BLCLASS=cid;window.DDCLASS=cid;window.DDSESS=sess
 function tourCleanup(){if(TOUR&&TOUR.on)return;
  try{var s=document.getElementById("tourspot");if(s&&s.remove)s.remove()}catch(e){}
  try{var b=document.getElementById("tourbox");if(b&&b.remove)b.remove()}catch(e){}}
-function openDrawer(title,html){tourCleanup();document.getElementById("drawerTitle").textContent=title;document.getElementById("drawerBody").innerHTML=html;document.getElementById("mask").classList.add("on");document.getElementById("drawer").classList.add("on")}
+/* ===== V9.27 KEO DOI DO RONG DRAWER =====
+   So do luu tren MAY CUA TUNG NGUOI (localStorage theo ma nhan vien), khong dua vao dữ liệu demo
+   chung - vi day la thoi quen ca nhan, khong phai cau hinh cua trung tam. */
+var DRW_MIN=420,DRW_DEF=760;
+function drwKey(){var me="";try{me=tkMeId()||CURSTAFF||""}catch(e){me=CURSTAFF||""}
+ return "ITTS_DRAWER_W_"+(me||"guest")}
+function drwMax(){return Math.max(DRW_MIN,(typeof window!=="undefined"&&window.innerWidth?window.innerWidth:1200)-40)}
+function drwGet(){try{var v=parseInt(localStorage.getItem(drwKey())||"",10);
+ if(v&&v>=DRW_MIN)return Math.min(v,drwMax())}catch(e){}return DRW_DEF}
+function drwSet(px,save){var d=document.getElementById("drawer");if(!d)return;
+ px=Math.max(DRW_MIN,Math.min(Math.round(px),drwMax()));
+ d.style.setProperty("--drw",px+"px");
+ if(save)try{localStorage.setItem(drwKey(),String(px))}catch(e){}}
+function drwApply(){drwSet(drwGet(),0)}
+function drwReset(){try{localStorage.removeItem(drwKey())}catch(e){}drwSet(DRW_DEF,0);toast("Đã về độ rộng mặc định.")}
+function drwInit(){var g=document.getElementById("drszr");if(!g||g.__on)return;g.__on=1;
+ function start(x0,w0){
+  document.body.classList.add("drsz");g.classList.add("drag");
+  function mv(ev){var cx=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX;
+   drwSet(w0+(x0-cx),0);if(ev.cancelable)ev.preventDefault()}
+  function up(){document.body.classList.remove("drsz");g.classList.remove("drag");
+   document.removeEventListener("mousemove",mv);document.removeEventListener("mouseup",up);
+   document.removeEventListener("touchmove",mv);document.removeEventListener("touchend",up);
+   var d=document.getElementById("drawer");drwSet(d?d.getBoundingClientRect().width:DRW_DEF,1)}
+  document.addEventListener("mousemove",mv);document.addEventListener("mouseup",up);
+  document.addEventListener("touchmove",mv,{passive:false});document.addEventListener("touchend",up)}
+ g.addEventListener("mousedown",function(e){var d=document.getElementById("drawer");
+  start(e.clientX,d?d.getBoundingClientRect().width:DRW_DEF);e.preventDefault()});
+ g.addEventListener("touchstart",function(e){var d=document.getElementById("drawer");
+  start(e.touches[0].clientX,d?d.getBoundingClientRect().width:DRW_DEF)},{passive:true});
+ g.addEventListener("dblclick",drwReset)}
+function openDrawer(title,html){tourCleanup();drwInit();drwApply();document.getElementById("drawerTitle").textContent=title;document.getElementById("drawerBody").innerHTML=html;document.getElementById("mask").classList.add("on");document.getElementById("drawer").classList.add("on")}
 function closeModal(){document.getElementById("mask").classList.remove("on");document.getElementById("drawer").classList.remove("on");if(window.__pendSync)setTimeout(syncApply,50)}
 /* ===== V9.27 TOOLTIP HIEN NGAY =====
    Thuoc tinh title cua trinh duyet doi khoang 1 giay moi hien, lai bi cat khi nam trong khung cuon.
@@ -9483,18 +9528,10 @@ function tkOpen(id){var t=find("DL23","task_id",id);if(!t){toast("Không thấy 
  if(t.decline_reason)h+=ctxContent("Lý do từ chối",t.decline_reason,"var(--red)");
  if(t.done_note)h+=ctxContent("Kết quả người nhận báo"+(t.done_time?" ("+esc(t.done_time)+")":""),t.done_note,"var(--green)");
  if(t.confirm_note)h+=ctxContent("Nhận xét khi xác nhận",t.confirm_note,"var(--green)");
- /* --- luồng trao đổi --- */
  var cm=tkCmts(id),me=tkMeId();
- h+='<div class="sechd" style="margin-top:14px">Trao đổi trong việc ('+cm.length+')</div>';
- h+='<div class="tkchat" id="tkchat">';
- if(!cm.length)h+='<div class="mut" style="font-size:12px;padding:6px 0">Chưa có trao đổi nào. Hỏi đáp về việc này ghi ở đây để không trôi mất.</div>';
- cm.forEach(function(c){var mine=String(c.staff_id||"")===me;
-  h+='<div class="tkcm'+(mine?" me":"")+'"><div class="tkcmh"><b>'+esc(c.staff_id_name||c.staff_id||"?")+'</b><span>'+esc(c.comment_time||"")+'</span></div>'+
-   '<div class="tkcmb">'+esc(c.content||"")+'</div></div>'});
- h+='</div>';
- h+='<div class="tksay"><input id="tk_say" placeholder="Nhập trao đổi rồi bấm Gửi..." onkeydown="if(event.key===\'Enter\')tkSay(\''+esc(id)+'\')">'+
-  '<button class="btn primary sm" onclick="tkSay(\''+esc(id)+'\')"><i class="ti ti-send"></i>Gửi</button></div>';
- /* --- nút hành động theo vai --- */
+ /* --- V9.27: NÚT HÀNH ĐỘNG lên TRƯỚC luồng trao đổi. Trước đây nút nằm dưới ô nhập trao đổi,
+    dính sát vào nhau nên nhìn như đè lên nhau, mà việc chính (nhận / hủy) lại bị chôn dưới cùng.
+    Thứ tự đúng: đọc việc -> làm gì với việc -> trao đổi. --- */
  var s=tkSt(t),act="";
  var amAssignee=(String(t.assignee_id||"")===me)||!tkIsStaff();
  var amAssigner=(String(t.assigner_id||"")===me)||!tkIsStaff();
@@ -9505,7 +9542,23 @@ function tkOpen(id){var t=find("DL23","task_id",id);if(!t){toast("Không thấy 
   '<button class="btn" onclick="tkReturnForm(\''+esc(id)+'\')"><i class="ti ti-corner-down-left"></i>Trả lại làm tiếp</button>';
  if(amAssigner&&tkLive(t))act+='<button class="btn" onclick="tkRemind(\''+esc(id)+'\')"><i class="ti ti-bell-ringing"></i>Nhắc</button>'+
   '<button class="btn danger" onclick="tkCancel(\''+esc(id)+'\')"><i class="ti ti-trash"></i>Hủy việc</button>';
- if(act)h+='<div class="dact">'+act+'</div>';
+ if(act)h+='<div class="tkact">'+act+'</div>';
+ /* --- luồng trao đổi (nằm cuối vì nó dài ra theo thời gian) --- */
+ h+='<div class="sechd tkchd">Trao đổi trong việc ('+cm.length+')</div>';
+ h+='<div class="tkchat" id="tkchat">';
+ if(!cm.length)h+='<div class="mut" style="font-size:12px;padding:6px 0">Chưa có trao đổi nào. Hỏi đáp về việc này ghi ở đây để không trôi mất.</div>';
+ cm.forEach(function(c){var mine=String(c.staff_id||"")===me;
+  h+='<div class="tkcm'+(mine?" me":"")+'"><div class="tkcmh"><b>'+esc(c.staff_id_name||c.staff_id||"?")+'</b><span>'+esc(c.comment_time||"")+'</span></div>'+
+   '<div class="tkcmb">'+esc(c.content||"")+'</div></div>'});
+ h+='</div>';
+ h+='<div class="tksay"><input id="tk_say" placeholder="Nhập trao đổi rồi bấm Gửi..." onkeydown="if(event.key===\'Enter\')tkSay(\''+esc(id)+'\')">'+
+  '<button class="btn primary sm" onclick="tkSay(\''+esc(id)+'\')"><i class="ti ti-send"></i>Gửi</button></div>';
+ /* Hỏi được TRƯỚC khi nhận việc, và mọi trao đổi đều giữ nguyên kể cả khi việc bị từ chối hay hủy -
+    luồng này là biên bản của việc, không phải hộp chat xóa được. Nói rõ ra cho người dùng biết. */
+ h+='<div class="tkhint"><i class="ti ti-info-circle"></i>'+
+  (s==="new"?'Hỏi lại được ngay cả khi <b>chưa nhận việc</b> - hỏi rõ rồi hãy bấm Nhận.'
+   :(s==="declined"||s==="cancelled")?'Việc đã đóng nhưng <b>toàn bộ trao đổi vẫn giữ nguyên</b> làm biên bản - vẫn ghi thêm được.'
+   :'Mọi trao đổi ở đây được giữ vĩnh viễn theo việc, kể cả khi việc bị từ chối hay hủy.')+'</div>';
  h+='</div>';
  openDrawer("Chi tiết việc · "+String(id),h);
  setTimeout(function(){var c=document.getElementById("tkchat");if(c)c.scrollTop=c.scrollHeight},30)}
@@ -10254,7 +10307,7 @@ HV_SHELL = r"""
 <div class="toast" id="toast"></div>
 <div class="mask" id="mask" onclick="closeModal()"></div>
 <div class="cfmask" id="cfm"><div class="cfbox"><div class="cfh"><i class="ti ti-alert-triangle"></i> Xác nhận thao tác</div><div class="cfmsg" id="cfmMsg"></div><div class="cfa"><button class="btn" onclick="closeConfirm()">Huỷ</button><button class="btn primary" onclick="confirmYes()">Xác nhận</button></div></div></div>
-<div class="drawer" id="drawer"><div class="dh"><b id="drawerTitle">Chi tiết</b><button class="x" onclick="closeModal()">&times;</button></div><div class="dbody" id="drawerBody"></div></div>
+<div class="drawer" id="drawer"><div class="drszr" id="drszr" title="Kéo để đổi độ rộng - bấm đúp để về mặc định"></div><div class="dh"><b id="drawerTitle">Chi tiết</b><button class="x" onclick="closeModal()">&times;</button></div><div class="dbody" id="drawerBody"></div></div>
 """
 _MH = "</style></head><body>"
 _i  = HTML.index(_MH) + len(_MH)

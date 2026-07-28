@@ -7,7 +7,7 @@
    (2) kiem BAT BIEN nghiep vu - dung du duong nao ghi cung phai thoa.
    Chay: ITTS_OUT=<out> node _check15.js */
 var FIELDS={};
-function El(id){return {id:id||"",innerHTML:"",textContent:"",value:(FIELDS[id]||""),checked:!!FIELDS["chk_"+id],style:{},offsetHeight:200,
+function El(id){return {id:id||"",innerHTML:"",textContent:"",value:(FIELDS[id]||""),checked:!!FIELDS["chk_"+id],style:{setProperty(){},removeProperty(){},getPropertyValue(){return ""}},offsetHeight:200,
  classList:{add(){},remove(){},contains(){return false},toggle(){return false}},
  querySelector(){return El()},querySelectorAll(){return []},getAttribute(){return ""},setAttribute(){},
  appendChild(){},remove(){},focus(){},addEventListener(){},getBoundingClientRect(){return{left:0,top:0,width:9,height:9,bottom:9,right:9}},files:[]}}

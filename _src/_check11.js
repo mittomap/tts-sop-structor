@@ -1,5 +1,5 @@
 /* _check11 - V9.15: CHANG VONG DOI (arc) + NAVTREE + mstrip + nodeRail + sopBlock + reup */
-function El(){return {innerHTML:"",value:"",checked:false,style:{},classList:{add(){},remove(){},contains(){return false}},
+function El(){return {innerHTML:"",value:"",checked:false,style:{setProperty(){},removeProperty(){},getPropertyValue(){return ""}},classList:{add(){},remove(){},contains(){return false}},
  querySelector(){return El()},querySelectorAll(){return []},getAttribute(){return ""},setAttribute(){},appendChild(){},focus(){},addEventListener(){},files:[]}}
 var NAVEL=El(),CRUMBEL=El();
 global.document={getElementById:function(id){return id==="nav"?NAVEL:(id==="pgCrumb"?CRUMBEL:El())},querySelector:()=>El(),querySelectorAll:()=>[],createElement:()=>El(),body:El(),addEventListener(){}};
