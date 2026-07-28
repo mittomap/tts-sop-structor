@@ -45,4 +45,37 @@ var orphan=Object.keys(have).filter(function(a){return !want[a]});
 console.log("Ma diem neo: khai",Object.keys(have).length,"| bai huong dan dung",Object.keys(want).length,
             orphan.length?("| khai ma dung: "+orphan.join(",")):"");
 console.log("So bai huong dan:",keys.length,"| tong buoc:",keys.reduce((a,k)=>a+TOURS[k].steps.length,0));
+
+/* ---- V9.29x: NEO CUA BAI HUONG DAN ----
+   55 buoc huong dan truoc day neo bang CSS SELECTOR (.phead, .bstats...). Doi mot ten lop CSS la
+   bai huong dan chi vao khoang khong, MA KHONG BAO LOI - no chi lang le highlight nham cho.
+   Nay 42/55 buoc neo bang @ma (data-tour) - ma la hop dong, khong phai chi tiet trinh bay.
+   13 buoc con lai tro vao CAC KHOI KHUNG dung chung cua he thiet ke; giu nguyen nhung phai
+   KHAI RO O DAY. Ai doi ten mot trong nhung lop nay se thay ngay minh dang lam gay cai gi. */
+var KHUNG=[".pbody",".jgrid",".dt",".notebar","#chaybody"];
+(function(){
+ var xau=[],neo=0,css=0;
+ keys.forEach(function(k){TOURS[k].steps.forEach(function(st,i){
+  var sel=String(st.sel||"");
+  if(!sel)return;
+  if(sel.charAt(0)==="@"||/^\[data-tour=/.test(sel)){neo++;return}
+  css++;
+  if(KHUNG.indexOf(sel)<0)xau.push(k+"["+i+"]="+sel)})});
+ if(xau.length)bad.push("buoc huong dan neo bang CSS selector khong khai truoc: "+xau.join(", "));
+ if(neo<40)bad.push("qua it buoc neo bang @ma (dang "+neo+", ky vong >=40)");
+ console.log("Neo cua buoc huong dan: @ma",neo,"| khoi khung da khai",css,"| neo la",xau.length);
+})();
+/* Moi @ma dung trong bai huong dan phai co data-tour THAT trong file HTML da build */
+(function(){
+ var HTML="";
+ try{HTML=require('fs').readFileSync((process.env.ITTS_OUT||'.')+'/ITTs_WebApp_v5_demo.html','utf8')}catch(e){}
+ if(!HTML)return;
+ var thieu=[];
+ keys.forEach(function(k){TOURS[k].steps.forEach(function(st,i){
+  var sel=String(st.sel||"");if(sel.charAt(0)!=="@")return;
+  var ma=sel.slice(1);
+  if(HTML.indexOf('data-tour="'+ma+'"')<0)thieu.push(ma)})});
+ if(thieu.length)bad.push("neo @ma khong co that trong app: "+thieu.filter(function(v,i,a){return a.indexOf(v)===i}).join(", "));
+})();
+
 console.log(bad.length?("TOUR FAIL:\n  "+bad.join("\n  ")):"TOUR OK: menu cap do + moi bai chay het buoc, 0 loi");

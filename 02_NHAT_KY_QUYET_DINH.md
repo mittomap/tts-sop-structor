@@ -665,6 +665,23 @@
 > Bộ kiểm canh: đổi chức danh thì nội dung trợ thủ phải đổi theo (nếu không thì nó chỉ là chữ trang
 > trí), tắt là biến mất sạch, và việc gấp nhất phải bấm được ngay.
 >
+> **(13) NEO CỦA BÀI HƯỚNG DẪN - XONG (mục H, anh Luân hoãn nhiều lần).** 55 bước hướng dẫn neo bằng
+> **CSS selector** (`.phead`, `.bstats`...). Đổi một tên lớp CSS là bài hướng dẫn chỉ vào khoảng
+> không **mà không báo lỗi** - nó chỉ lặng lẽ tô nhầm chỗ. Nay **43/53 bước neo bằng `@mã`**
+> (`data-tour`) - mã là HỢP ĐỒNG, tên lớp CSS là chi tiết trình bày.
+> Không phải dán mã vào 43 chỗ: dán vào **5 khối dùng chung** (`pageHead` · `statStrip` · `tbar` ·
+> thẻ danh sách · thanh tab Cài đặt) là 43 bước có neo. 10 bước còn lại trỏ vào các khối khung của
+> hệ thiết kế - **giữ nguyên nhưng KHAI RÕ trong `_checktour`**, ai đổi tên một trong những lớp đó
+> sẽ thấy ngay mình đang làm gãy cái gì. Thêm hai bất biến: bước hướng dẫn không được neo bằng CSS
+> selector lạ, và **mọi `@mã` phải có `data-tour` thật trong file HTML đã build**.
+>
+> **(14) BẪY THỜI GIAN trong dữ liệu demo (đêm 28/07 tự cắn).** Đang xanh hết, vài giờ sau ba bộ
+> kiểm đồng loạt báo đỏ **trên một bản build không hề đổi** - chỉ có đồng hồ chạy. Nguyên nhân: pass
+> §10b chọn "buổi vừa dạy xong chưa điểm danh" trong **đúng 24h**, tức là buổi được chọn có thể đã
+> 23,9h tuổi ngay lúc build; vài tiếng sau nó vượt mốc. **Luật rút ra: dữ liệu demo neo theo NGÀY
+> CHẠY thì mọi cửa sổ thời gian phải chọn ở GIỮA, không sát mép.** Nay chỉ lấy buổi trong NỬA cửa
+> sổ, và nửa đó đọc từ chính `attendanceGrace_hours` chứ không gõ số.
+>
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
 >
 > **(G) TRỢ THỦ THAO TÁC - anh Luân đặt 28/07, LÀM SAU ĐỢT AUDIT (F):** *"a muốn nghiên cứu trợ thủ

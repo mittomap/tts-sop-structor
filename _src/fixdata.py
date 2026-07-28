@@ -427,10 +427,21 @@ for s in missing:
 log.append("10. Điểm danh: bù %d bản ghi cho %d buổi đã dạy mà bỏ trống" % (made, len(missing) - len(leave)))
 # 10b. HÀNG CHỜ ĐIỂM DANH phải là buổi VỪA DẠY XONG (GV chưa kịp điểm danh), không phải
 # buổi từ tháng trước. Để trống đúng 2 buổi hoàn thành gần nhất.
-# CHỈ để trống buổi vừa dạy xong TRONG 24H - buổi cũ hơn mà trống điểm danh là dữ liệu hỏng
-# (luật 4i tính từ mốc 24h), không phải hàng chờ.
+# CHỈ để trống buổi vừa dạy xong TRONG CỬA SỔ ÂN HẠN - buổi cũ hơn mà trống điểm danh là dữ liệu
+# hỏng (luật 4i, _checkdata F4 và màn Sức khỏe dữ liệu đều tính từ mốc đó), không phải hàng chờ.
+#
+# V9.29x - BẪY THỜI GIAN đã cắn: lần trước lấy đúng 24h, tức là buổi được chọn có thể đã 23,9h tuổi
+# NGAY LÚC BUILD. Vài tiếng sau (bản build vẫn nguyên, chỉ đồng hồ chạy) nó vượt mốc và cả ba bộ
+# kiểm đồng loạt báo đỏ trên một bản build vốn xanh. Dữ liệu demo neo theo NGÀY CHẠY thì mọi cửa sổ
+# thời gian phải chọn ở GIỮA, không sát mép. Nay chỉ lấy buổi trong NỬA cửa sổ -> bản build sống
+# thêm được ít nhất nửa cửa sổ nữa mà không đổi kết luận.
+_grace = 24
+for _r in (d.get("config", {}).get("ch2") or []):
+    if _r.get("name") == "attendanceGrace_hours":
+        try: _grace = int(float(_r.get("value") or 24))
+        except Exception: pass
 _done = [x for x in R("DL11") if code(x.get("session_status")) == "completed" and dt(x.get("session_date"))
-         and dt(x.get("session_date")) >= NOW - datetime.timedelta(hours=24)]
+         and dt(x.get("session_date")) >= NOW - datetime.timedelta(hours=_grace / 2.0)]
 _done.sort(key=lambda x: dt(x.get("session_date")), reverse=True)
 _queue = {str(x.get("session_id")) for x in _done[:2]}
 if _queue:

@@ -1173,8 +1173,8 @@ function navIsArcGrpG(G){return navIsArcGrp(G.g)}
 
 /* Cat DUNG khoi dai so: tu <div class="bstats"> toi thanh cong cu ke tiep. Cat bang so ky tu
    thi dinh luon ca cac nut o thanh loc ben duoi - kiem se "xanh" ma khong kiem gi ca. */
-function stripOf(o){var i=o.indexOf('<div class="bstats">');if(i<0)return "";
- var rest=o.slice(i+20);
+function stripOf(o){var i=o.indexOf('<div class="bstats"');if(i<0)return "";   /* V9.29x: the nay nay co them data-tour, khong khop chuoi dong kin duoc nua */
+ var rest=o.slice(i+19);
  var j=rest.search(/<div class="(tbar|fbar|panel|sechd|obcards)/);
  return rest.slice(0,j<0?rest.length:j)}
 /* ---- 39. DAI SO BAM DUOC (mang 5 - viec ton tu dau) ---- */
