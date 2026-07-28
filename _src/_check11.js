@@ -249,10 +249,16 @@ t("V9.20 tab Giao dien + Menu co trong Cai dat", (function(){
  window.SETTAB="menu";var o2=RENDER.settings();window.SETTAB="ch2";
  return o1.indexOf("Tên trung tâm")>=0&&o1.indexOf("Màu thương hiệu")>=0&&o2.indexOf("Menu sidebar")>=0})());
 /* --- 12. V9.21: tour huong dan tung buoc --- */
-t("V9.21 tour co du 4 cap do + moi cap co bai", (function(){var c={};Object.keys(TOURS).forEach(function(k){c[TOURS[k].lv]=1});
- return TOURLV.length===4&&TOURLV.every(function(V){return c[V[0]]})})());
+t("V9.27 tour co du 3 cap do nguoi dung + moi cap co bai", (function(){var c={};Object.keys(TOURS).forEach(function(k){c[TOURS[k].lv]=1});
+ return TOURLV.length===3&&TOURLV.every(function(V){return c[V[0]]})})());
 t("V9.21 co tour theo tung vi tri (trai nghiem)", Object.keys(TOURS).filter(function(k){return TOURS[k].lv==="trainghiem"&&TOURS[k].role}).length>=4);
-t("V9.21 co tour DEV cho IT", Object.keys(TOURS).filter(function(k){return TOURS[k].lv==="dev"}).length>=2);
+/* V9.27: anh Luan yeu cau bo cap do KY THUAT (DEV) - huong dan trong app chi phuc vu nguoi dung
+   nghiep vu; chuyen ky thuat nam o README_SRC.md va nhat ky, khong bay ra man hinh demo. */
+t("V9.27 khong con cap do huong dan DEV", Object.keys(TOURS).filter(function(k){return TOURS[k].lv==="dev"}).length===0);
+t("V9.27 TOURLV cung khong con dong dev", TOURLV.filter(function(r){return r[0]==="dev"}).length===0);
+t("V9.27 con du 3 cap do cho nguoi dung", TOURLV.length===3);
+t("V9.27 moi cap do con lai deu con bai huong dan",
+  TOURLV.filter(function(r){return !Object.keys(TOURS).some(function(k){return TOURS[k].lv===r[0]})}).length===0);
 t("V9.21 bat buoc xac nhan truoc khi chay tour", (function(){try{tourAsk("tq_tong")}catch(e){return false}return typeof tourAsk==="function"})());
 t("V9.21 moi buoc tour co du tieu de + mo ta", (function(){var okk=true;
  Object.keys(TOURS).forEach(function(k){TOURS[k].steps.forEach(function(s){

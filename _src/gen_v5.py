@@ -838,17 +838,32 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .obcards.rows .obcard.open .steps{display:flex}
 .obcards.rows .obcard.open .obm2{display:block}
 .obcards.rows .obcard.open .obact{margin-left:0;flex-wrap:wrap}
-/* ===== V9.15 NODE TANG 2 - mstrip: dai hat hanh trinh tren tung dong ===== */
-.mstrip{display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;margin-left:auto;padding:0 4px}
-.mstrip .msarc{font-size:9px;font-weight:800;letter-spacing:.4px;color:var(--mscol,#2E5A88);border:1px solid currentColor;border-radius:5px;padding:0 4px;line-height:1.5;opacity:.85;margin-right:2px}
-.mstrip .msd{width:8px;height:8px;border-radius:50%;background:#E3E8EF;flex:0 0 auto}
-.mstrip .msd.done{background:var(--mscol,#2E5A88);opacity:.4}
-.mstrip .msd.now{width:11px;height:11px;background:var(--mscol,#2E5A88);box-shadow:0 0 0 2.5px rgba(46,90,136,.16)}
+/* ===== V9.15 NODE TANG 2 - mstrip: dai hat hanh trinh tren tung dong =====
+   V9.27: hat to hon + gian ra cho de tro chuot, va co phan hoi hover ngay lap tuc. */
+.mstrip{display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;margin-left:auto;padding:4px 8px;border-radius:999px;transition:background .12s ease}
+.mstrip.clk{cursor:pointer}
+.mstrip.clk:hover{background:#EEF3F9;box-shadow:inset 0 0 0 1px #DCE5EF}
+.mstrip .msarc{font-size:10px;font-weight:800;letter-spacing:.4px;color:var(--mscol,#2E5A88);border:1px solid currentColor;border-radius:5px;padding:1px 5px;line-height:1.5;opacity:.85;margin-right:3px;transition:opacity .12s ease}
+.mstrip.clk:hover .msarc{opacity:1}
+.mstrip .msd{width:11px;height:11px;border-radius:50%;background:#E3E8EF;flex:0 0 auto;transition:transform .12s ease,background .12s ease}
+.mstrip .msd.done{background:var(--mscol,#2E5A88);opacity:.42}
+.mstrip.clk:hover .msd.done{opacity:.7}
+.mstrip.clk:hover .msd{transform:scale(1.18)}
+.mstrip .msd.now{width:15px;height:15px;background:var(--mscol,#2E5A88);box-shadow:0 0 0 3px rgba(46,90,136,.16)}
 .mstrip .msd.now.over{background:var(--red);animation:msbeat 1.3s ease-in-out infinite}
-.mstrip .msd.br{width:9px;height:9px;border-radius:2.5px;transform:rotate(45deg);background:var(--red)}
+.mstrip .msd.br{width:12px;height:12px;border-radius:3px;transform:rotate(45deg);background:var(--red)}
+.mstrip.clk:hover .msd.br{transform:rotate(45deg) scale(1.18)}
 .mstrip .msd.br.over{animation:msbeat 1.3s ease-in-out infinite}
-@keyframes msbeat{0%,100%{box-shadow:0 0 0 2.5px rgba(226,75,74,.25)}50%{box-shadow:0 0 0 6px rgba(226,75,74,.08)}}
+@keyframes msbeat{0%,100%{box-shadow:0 0 0 3px rgba(226,75,74,.25)}50%{box-shadow:0 0 0 7px rgba(226,75,74,.08)}}
 @media(max-width:640px){.mstrip{display:none}}
+/* ===== V9.27 TOOLTIP HIEN NGAY - title cua trinh duyet cho ~1 giay moi hien va bi cat boi overflow.
+   tipbox nam trong body nen khong bao gio bi cat, va hien ngay khi chuot vao. ===== */
+.tipbox{position:fixed;z-index:400;display:none;max-width:340px;background:#26313F;color:#fff;font-size:12.5px;
+ line-height:1.5;padding:8px 11px;border-radius:9px;box-shadow:0 8px 24px rgba(16,24,40,.24);pointer-events:none;font-weight:500}
+.tipbox.on{display:block;animation:tipin .1s ease-out}
+@keyframes tipin{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.tipbox:after{content:"";position:absolute;left:var(--tipx,50%);margin-left:-6px;border:6px solid transparent;border-top-color:#26313F;bottom:-12px}
+.tipbox.below:after{bottom:auto;top:-12px;border-top-color:transparent;border-bottom-color:#26313F}
 /* ===== V9.15 NODE TANG 1 - nrail: duong ray ga tren trang CHANG ===== */
 .nrail{display:flex;align-items:flex-start;overflow-x:auto;padding:16px 10px 12px;background:linear-gradient(180deg,#fff,#FAFBFD);border:1px solid var(--line);border-radius:14px;margin-bottom:12px}
 .nst{display:flex;flex-direction:column;align-items:center;gap:7px;min-width:88px;cursor:pointer;position:relative;padding:0 5px;flex:0 0 auto}
@@ -2658,8 +2673,31 @@ function tourCleanup(){if(TOUR&&TOUR.on)return;
  try{var b=document.getElementById("tourbox");if(b&&b.remove)b.remove()}catch(e){}}
 function openDrawer(title,html){tourCleanup();document.getElementById("drawerTitle").textContent=title;document.getElementById("drawerBody").innerHTML=html;document.getElementById("mask").classList.add("on");document.getElementById("drawer").classList.add("on")}
 function closeModal(){document.getElementById("mask").classList.remove("on");document.getElementById("drawer").classList.remove("on");if(window.__pendSync)setTimeout(syncApply,50)}
+/* ===== V9.27 TOOLTIP HIEN NGAY =====
+   Thuoc tinh title cua trinh duyet doi khoang 1 giay moi hien, lai bi cat khi nam trong khung cuon.
+   Dung data-tip: mot the duy nhat gan vao body, hien ngay khi chuot vao, tu lat len/xuong cho vua man hinh.
+   Bat theo uy quyen tren document nen moi phan tu co data-tip deu dung duoc, khong can khai bao gi them. */
+var TIPCUR=null;
+function tipEl(){var t=document.getElementById("tipbox");
+ if(!t){t=document.createElement("div");t.id="tipbox";t.className="tipbox";document.body.appendChild(t)}return t}
+function tipShow(el){var s=el.getAttribute("data-tip");if(!s){tipHide();return}
+ if(TIPCUR===el)return; TIPCUR=el;
+ var t=tipEl();t.textContent=s;t.className="tipbox on";t.style.left="-9999px";t.style.top="0px";
+ var r=el.getBoundingClientRect(),tw=t.offsetWidth,th=t.offsetHeight;
+ var x=r.left+r.width/2-tw/2;x=Math.max(8,Math.min(x,Math.max(8,window.innerWidth-tw-8)));
+ var y=r.top-th-10,below=false;if(y<8){y=r.bottom+10;below=true}
+ t.className="tipbox on"+(below?" below":"");
+ t.style.left=Math.round(x)+"px";t.style.top=Math.round(y)+"px";
+ t.style.setProperty("--tipx",Math.round(r.left+r.width/2-x)+"px")}
+function tipHide(){TIPCUR=null;var t=document.getElementById("tipbox");if(t)t.className="tipbox"}
+if(typeof document.addEventListener==="function"){
+ document.addEventListener("mouseover",function(ev){var t=ev.target;if(!t||!t.closest)return;
+  var el=t.closest("[data-tip]");if(el)tipShow(el);else if(TIPCUR)tipHide()});
+ document.addEventListener("mousedown",tipHide,true);
+ if(typeof window.addEventListener==="function"){window.addEventListener("scroll",tipHide,true);window.addEventListener("resize",tipHide)}
+}
 if(typeof document.addEventListener==="function")document.addEventListener("keydown",function(ev){
- if(ev.key==="Escape"){try{if(TOUR&&TOUR.on){tourEnd();return}}catch(e){}
+ if(ev.key==="Escape"){tipHide();try{if(TOUR&&TOUR.on){tourEnd();return}}catch(e){}
   try{closeConfirm()}catch(e){}try{closeModal()}catch(e){}}});
 if(typeof document.addEventListener==="function")document.addEventListener("click",function(ev){
  var t=ev.target;if(!t||!t.closest)return;
@@ -3001,7 +3039,7 @@ function mstrip(k,over,pid){var S=JBY[k];if(!S)return "";
  var a=arcOf(k),A=ARCBK[a],rail=ARCRAIL[a]||[],ci=rail.indexOf(k),br=ci<0;
  var tt="Chặng "+A.n+" · "+A.t+" - đang ở: "+S.t+(br?" (rẽ nhánh)":" (bước "+(ci+1)+"/"+rail.length+")")+(over?" · QUÁ HẠN":"")+(pid?" - bấm xem từng chặng":"");
  var oc=pid?' onclick="event.stopPropagation();mstripOpen(\''+esc(pid)+'\')"':''; /* V9.18: node bấm được - mở chi tiết từng chặng */
- var h='<span class="mstrip'+(pid?" clk":"")+'" style="--mscol:'+A.col+'" title="'+esc(tt)+'"'+oc+'><span class="msarc">C'+A.n+'</span>';
+ var h='<span class="mstrip'+(pid?" clk":"")+'" style="--mscol:'+A.col+'" data-tip="'+esc(tt)+'"'+oc+'><span class="msarc">C'+A.n+'</span>';
  rail.forEach(function(rk,i){h+='<span class="msd'+(br?"":(i<ci?" done":(i===ci?" now"+(over?" over":""):"")))+'"></span>'});
  if(br)h+='<span class="msd br'+(over?" over":"")+'"></span>';
  return h+'</span>'}
@@ -8974,8 +9012,7 @@ function renderChang(){
 var TOURLV=[
  ["thamquan","Tham quan","ti-eye","Xem tổng thể app có gì - không cần làm gì cả"],
  ["trainghiem","Trải nghiệm","ti-hand-click","Làm thử đúng việc của từng vị trí trong trung tâm"],
- ["chuyennghiep","Chuyên nghiệp","ti-settings","Dành cho người cấu hình: ngưỡng, phân quyền, thương hiệu"],
- ["dev","Kỹ thuật (DEV)","ti-code","Dành cho IT: dữ liệu lấy từ đâu, cấu hình ở đâu, build thế nào"]];
+ ["chuyennghiep","Chuyên nghiệp","ti-settings","Dành cho người cấu hình: ngưỡng, phân quyền, thương hiệu"]];
 var TOURS={
  /* ---------- CẤP 1: THAM QUAN ---------- */
  tq_tong:{lv:"thamquan",t:"Toàn cảnh app",ic:"ti-rocket",d:"7 bước - hiểu app chạy thế nào trong 2 phút",steps:[
@@ -9043,19 +9080,7 @@ var TOURS={
   {p:"settings",ctx:function(){window.SETTAB="ch4"},sel:'.settabs',t:"Câu nhắc việc",d:"Toàn bộ câu chữ nhắc nhân viên làm gì nằm ở đây - sửa được, không cần lập trình viên. Câu có tham số tự điền số từ ngưỡng.",hint:"Sửa thử một câu và xem bản xem trước."},
   {p:"settings",ctx:function(){window.SETTAB="ch1"},sel:'.settabs',t:"Danh mục",d:"Mọi nhãn trạng thái trong app lấy từ danh mục này: nguồn khách, trạng thái lớp, hình thức thanh toán...",hint:"Xong phần cấu hình quy trình!"}]},
  /* ---------- CẤP 4: DEV ---------- */
- dev_dulieu:{lv:"dev",t:"Dữ liệu lấy từ đâu",ic:"ti-database",d:"6 bước - bảng nào nuôi màn hình nào",steps:[
-  {p:"banlam",sel:'.bstats',t:"Kiến trúc dữ liệu: 24 bảng phẳng",d:"DL01 nhân sự, DL02 khách tiềm năng, DL03 test, DL04 tư vấn, DL05 khóa, DL06 đăng ký, DL07 thu tiền, DL08 xếp lớp, DL09 học viên, DL10 lớp, DL11 buổi, DL12 điểm danh, DL13 bài tập, DL14 WOW, DL15-17 khảo sát/phản hồi/khiếu nại, DL18 kết thúc khóa, DL19-22 giới thiệu và giáo án, DL23-24 giao việc và trao đổi.",hint:"Bản offline đọc từ file ITTs_data.js cạnh app; bản thật đọc Google Sheets cùng cấu trúc."},
-  {p:"banlam",sel:'#chaybody',t:"Máy tính chặng - trái tim của app",d:"Hàm jStageOf suy ra khách đang ở chặng nào từ dữ liệu thật (có phiếu test chưa, đã thu đủ chưa...) chứ không lưu cột trạng thái. Đổi dữ liệu là chặng tự đổi, không bao giờ lệch.",hint:"jAll dựng danh sách, jInfo tra một hồ sơ, jIndex đánh chỉ mục cho nhanh."},
-  {p:"banlam",sel:'[data-tour="bell"]',t:"Cảnh báo SLA sinh ra thế nào",d:"Hàm slaItems quét toàn bộ dữ liệu theo các luật nghiệp vụ, so với ngưỡng lấy từ CH2 rồi sinh danh sách việc. Chuông, Việc hôm nay, badge menu và bong bóng đều đọc từ một nguồn này.",hint:"Thêm luật cảnh báo mới = thêm một dòng add() trong slaItems."},
-  {p:"settings",ctx:function(){window.SETTAB="ch2"},sel:'.settabs',t:"Cấu hình sống: CH1 đến CH6",d:"CH1 danh mục, CH2 ngưỡng và SLA, CH4 câu nhắc việc, CH6 ngưỡng KPI. Code gọi paramOf/paramStr/kpiTh/msgText - không cắm cứng số. Thêm tham số mới phải khai vào bảng APPPARAMS.",hint:"Đây là lý do đổi ngưỡng không cần build lại app."},
-  {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'.dt',t:"Phân quyền cắm ở 3 cổ chai",d:"scopeList lọc mọi trang danh sách, jAll lọc bộ máy hành trình, slaItems lọc chuông. Không lọc trong rows/find vì chúng nuôi các cột tên và phần tính toán dẫn xuất.",hint:"Thêm bảng mới thì khai vào DSDOM để nó tự chịu phân quyền."},
-  {p:"settings",ctx:function(){window.SETTAB="demo"},sel:'.settabs',t:"Build và triển khai",d:"Toàn bộ app sinh từ một file Python gen_v5.py, xuất ra 2 file HTML tự chứa và 1 file dữ liệu. Kiểm tự động: node --check, harness render 38 trang, bộ kiểm 125 điểm. Đẩy lên GitHub Pages là xong.",hint:"Xem README_SRC.md trong repo để biết lệnh build và verify."}]},
- dev_tuybien:{lv:"dev",t:"Tùy biến và mở rộng app",ic:"ti-code",d:"5 bước - thêm trang, thêm luật, đổi giao diện",steps:[
-  {p:"banlam",sel:'.navlbl',t:"Thêm một trang mới",d:"Khai vào PAGES (mã, nhóm, icon, tên, kiểu), viết hàm render, đăng ký vào RENDER, rồi thêm mã vào NAVTREE để nó hiện trên menu. Trang danh sách thì chỉ cần khai LISTCFG.",hint:"Mỗi trang tác vụ phải có: dải số tổng hợp, bộ lọc, hàng đợi có nút hành động."},
-  {p:"tuyensinh",sel:'.settabs',t:"Mẫu hub nhiều tab",d:"Một trang chủ + biến tab + hàm segHTML; thân tab gọi lại các hàm render con với cờ nhúng. Không đẻ trang mới cho từng tab. Hàm go có bảng map để mọi link cũ tự về đúng tab.",hint:"Tuyển sinh, Học tập, CSKH đều dùng mẫu này."},
-  {p:"hocvien",sel:'.tbar',t:"Trang danh sách khai bằng cấu hình",d:"LISTCFG khai bảng nguồn, các cột, cột lọc, các nút hành động, và cờ chỉ-xem. Bộ lọc, tìm kiếm bỏ dấu, sắp xếp, phân trang, ẩn hiện cột đều có sẵn.",hint:"Thêm sổ tra cứu mới chỉ mất vài dòng khai báo."},
-  {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'.pbody',t:"Giao diện lấy từ biến CSS",d:"Màu chủ đạo và màu nhấn là biến CSS, đổi trong Cài đặt là áp ngay. Cấu hình giao diện lưu trong phần config của dữ liệu nên đồng bộ được sang máy khác.",hint:"Icon dùng bộ Tabler nhúng offline - thêm icon mới phải dựng lại font subset."},
-  {p:"giaoviec",sel:'.phead',t:"Mẫu một module nghiệp vụ đầy đủ",d:"Module giao việc là ví dụ chuẩn: 2 bảng dữ liệu, vòng đời trạng thái, luồng trao đổi, cảnh báo vào chuông, badge menu, báo cáo, và bộ kiểm riêng. Sao chép mẫu này khi làm module mới.",hint:"Xem mục 3vicies trong nhật ký dự án để biết toàn bộ quyết định thiết kế."}]}
+
 };
 
 var TOUR={key:"",i:0,on:false};
