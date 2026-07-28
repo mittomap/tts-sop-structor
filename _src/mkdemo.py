@@ -154,7 +154,9 @@ def add_wow(sid, items):
         })
     used = len([w for w in rows("DL14") if w.get("student_id") == sid and "completed" in str(w.get("wow_status"))])
     S["wow_quota_used"] = str(used)
-    S["wow_quota_remaining"] = str(max(0, int(S.get("wow_quota_default") or 10) - used))
+    _tot = (int(float(S.get("wow_quota_default") or 10)) + int(float(S.get("wow_extra_approved") or 0))
+            + int(float(S.get("wow_extra_purchased") or 0)))
+    S["wow_quota_remaining"] = str(max(0, _tot - used))
 
 def add_test(sid, overall, sk):
     """Bảng 'Hành trình điểm số' cần test đầu vào."""
@@ -224,7 +226,7 @@ unverify_one_payment("HV061")
 
 # --- Demo 2 (HV065): có phê duyệt sẵn, thiếu WOW ---
 add_wow("HV065", [
-    dict(ago=21, type="academic_support (Hỗ trợ học thuật)", by="staff (Nhân viên)",
+    dict(ago=21, type="academic_support (Hỗ trợ học thuật)", by="academic_hv (Học vụ)",
          skill="Writing (Viết)", focus="Task 2 - cấu trúc bài luận",
          status="completed (Đã hoàn thành)", note="Chữa 2 bài Task 2, HV nắm được cách mở bài và dẫn ý.",
          outcome="improved (Tiến bộ rõ rệt)"),
@@ -232,7 +234,7 @@ add_wow("HV065", [
          skill="Speaking (Nói)", focus="Part 3 - mở rộng ý",
          status="completed (Đã hoàn thành)", note="Luyện Part 3, còn ngập ngừng khi phải lập luận dài.",
          outcome="needs_more (Cần thêm buổi)"),
-    dict(ago=-4, type="academic_support (Hỗ trợ học thuật)", by="staff (Nhân viên)",
+    dict(ago=-4, type="academic_support (Hỗ trợ học thuật)", by="academic_hv (Học vụ)",
          skill="Speaking (Nói)", focus="Part 3 - luyện tiếp theo buổi trước",
          status="confirmed (Đã xác nhận)"),
 ])
@@ -266,14 +268,24 @@ def sync_money(e):
     e["payment_status"] = ("paid (Đã thanh toán đủ)" if paid >= fin > 0
                            else "partial (Đã thanh toán 1 phần)" if paid > 0
                            else "unpaid (Chưa thanh toán)")
-def add_payment(e, amount, when, method="bank_transfer (Chuyển khoản)", verified=True):
+def add_payment(e, amount, when, method="bank_transfer (Chuyển khoản NH)", verified=True):
+    """Phiếu thu phải ĐỦ BỘ CỘT như phiếu do gen_demo sinh, nếu không app render ô trống và
+    bản Sheets lệch cột. Người thu / người đối soát là MÃ NHÂN VIÊN - ghi chữ "Kế toán" vào
+    ô mã là mã chết, tra ngược ra rỗng."""
     S = one("DL09", "student_id", e.get("student_id")) or {}
+    ACC = next((x for x in rows("DL01") if str(x.get("role", "")).startswith("accountant")), None) or {}
+    _aid, _anm = ACC.get("staff_id", ""), ACC.get("full_name", "")
+    _ref = "FT%09d" % (sum(ord(ch) for ch in (str(e["enrollment_id"]) + F(when))) * 7919 % 10 ** 9)
     rows("DL07").append({
         "payment_id": nextid("DL07", "payment_id", "PAY-2026-"), "enrollment_id": e["enrollment_id"],
-        "student_id": e.get("student_id"), "student_id_name": S.get("full_name"),
+        "student_id": e.get("student_id"), "lead_id": e.get("lead_id", ""),
+        "student_id_name": S.get("full_name"),
         "amount": amount, "payment_time": F(when), "payment_method": method,
-        "transaction_fee": "", "bank_name": "Vietcombank", "sender_name": S.get("full_name"),
-        "verified_by": ("Kế toán" if verified else ""), "payment_note": "", "next_action": "",
+        "transaction_fee": 0, "net_received": amount,
+        "bank_name": "Vietcombank", "sender_name": S.get("full_name"), "transaction_ref": _ref,
+        "received_by": _aid, "received_by_name": _anm,
+        "verified_by": (_aid if verified else ""), "verified_by_name": (_anm if verified else ""),
+        "payment_note": "", "next_action": "",
     })
 
 # TRA ĐỘNG theo học viên (ID enrollment đổi mỗi lần gen_demo đổi logic - KHÔNG hardcode mã)
@@ -301,17 +313,26 @@ if e_old and e_new:
     sync_money(e_new)
     if float(e_new.get("remaining_amount") or 0) > 0:
         e_new["next_payment_due"] = (NOW + dt.timedelta(days=7)).strftime("%d/%m/%Y")
-# xếp lớp phải TRƯỚC ngày lớp khai giảng và trước buổi học đầu (mọi hồ sơ xếp lớp của HV061)
+# Xếp lớp phải TRƯỚC ngày khai giảng NHƯNG cũng phải SAU ngày đăng ký. HV tái ghi danh vào
+# lớp ĐÃ khai giảng (vào giữa khóa - hợp lệ theo SOP) mà kéo mốc về trước khai giảng thì
+# thành "xếp lớp trước khi đăng ký". Neo theo mốc muộn hơn trong hai mốc.
+def _ob_anchor(ob, kg):
+    _e = one("DL06", "enrollment_id", ob.get("enrollment_id")) or {}
+    _et = p2(_e.get("enrollment_time"))
+    base = kg - dt.timedelta(days=5)
+    if _et and base < _et:
+        base = _et + dt.timedelta(hours=2)
+    ob["assigned_at"] = F(base)
+    ob["class_info_sent_at"] = F(base + dt.timedelta(days=1))
+    ob["confirmation_time"] = F(base + dt.timedelta(days=2))
+    ob["onboarding_completed_at"] = F(base + dt.timedelta(days=3))
 for ob in rows("DL08"):
     if ob.get("student_id") != "HV061" or not ob.get("class_id"):
         continue
     cl = one("DL10", "class_id", ob["class_id"])
     kg = p2(cl.get("class_start_date")) if cl else None
     if kg:
-        ob["assigned_at"] = F(kg - dt.timedelta(days=5))
-        ob["class_info_sent_at"] = F(kg - dt.timedelta(days=4))
-        ob["confirmation_time"] = F(kg - dt.timedelta(days=3))
-        ob["onboarding_completed_at"] = F(kg - dt.timedelta(days=2))
+        _ob_anchor(ob, kg)
     # hồ sơ xếp lớp 7.0 phải gắn với ĐĂNG KÝ khóa 7.0 (không trỏ nhầm sang khóa 6.5)
     if e_new and cl and str(cl.get("course_id")) == str(e_new.get("course_id")):
         ob["enrollment_id"] = e_new["enrollment_id"]
@@ -330,10 +351,7 @@ for ob in rows("DL08"):
     if ob.get("student_id") == "HV065" and ob.get("class_id"):
         cl = one("DL10", "class_id", ob["class_id"]); kg = p2(cl.get("class_start_date")) if cl else None
         if kg:
-            ob["assigned_at"] = F(kg - dt.timedelta(days=5))
-            ob["class_info_sent_at"] = F(kg - dt.timedelta(days=4))
-            ob["confirmation_time"] = F(kg - dt.timedelta(days=3))
-            ob["onboarding_completed_at"] = F(kg - dt.timedelta(days=2))
+            _ob_anchor(ob, kg)
 
 # --- Demo 3 (HV002): test đầu vào không được nằm TRƯỚC ngày lead vào hệ thống ---
 _e02s = enrs_of("HV002")
@@ -362,7 +380,9 @@ for sid, _ in TARGETS:
     S = one("DL09", "student_id", sid)
     ded = len([w for w in rows("DL14") if w.get("student_id") == sid and str(w.get("quota_deducted", "")).lower() == "yes"])
     S["wow_quota_used"] = str(ded)
-    S["wow_quota_remaining"] = str(max(0, int(float(S.get("wow_quota_default") or 10)) - ded))
+    _tot = (int(float(S.get("wow_quota_default") or 10)) + int(float(S.get("wow_extra_approved") or 0))
+            + int(float(S.get("wow_extra_purchased") or 0)))
+    S["wow_quota_remaining"] = str(max(0, _tot - ded))
 
 # ---------- 3b. HỒ SƠ DEMO SẠCH CỜ NGUY CƠ (cổng học viên demo không hiện cảnh báo đỏ) ----------
 import re as _re

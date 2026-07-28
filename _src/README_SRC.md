@@ -34,6 +34,25 @@ ITTS_OUT="<mnt>/SOP ITTs" python3 gen_v5.py
 ```
 
 ## VERIFY (bắt buộc sau mỗi build)
+Bộ kiểm gồm **5 phần, phải xanh HẾT mới được giao**:
+| Lệnh | Kỳ vọng |
+|---|---|
+| `node --check _APP.js` và `node --check _HV.js` | không báo gì |
+| `ITTS_OUT=<out> node _tall.js` | `Render 38 trang \| 0 loi` + `thieu trong font: khong` |
+| `ITTS_OUT=<out> node _check11.js` | `OK: 119` + `TONG: 128`, KHÔNG có dòng `FAIL` |
+| `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` |
+| `python3 check_logic.py` | `TONG BAN GHI LOI: 4` (đúng 4 ca là việc quá hạn CỐ Ý để demo cảnh báo đỏ - xem luật 10k) |
+| `python3 check_data.py` | `KET QUA: DAT` |
+
+`check_logic.py` (V9.23: 123 luật) là **bộ kiểm dữ liệu BẮT BUỘC**, chạy sau trọn đường ống
+dữ liệu. Đường ống phải chạy ĐÚNG thứ tự, chạy thiếu bước nào là kết quả sai:
+```bash
+python3 gen_demo.py && python3 seed_giaoan.py && python3 mkdemo.py \
+  && python3 fixdata.py && python3 check_data.py && python3 seed_giaoviec.py \
+  && python3 check_logic.py
+```
+
+
 ```bash
 # trích script lớn nhất -> _APP.js, kiểm cú pháp
 python3 - <<'PY'

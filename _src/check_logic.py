@@ -113,8 +113,12 @@ for st in R("DL09"):
 rep("VUA", "2b HV 'Hoan thanh khoa' nhung van nam trong lop DANG HOC", c_in_run)
 
 # 2c. HV chua tung duoc xep lop nao
-no_cls = [s(st,"student_id") for st in R("DL09") if not stu_cls.get(s(st,"student_id"))]
-rep("VUA", "2c HV khong co ban ghi xep lop nao (DL08)", no_cls)
+# HV moi dong coc, dang CHO xep lop van phai co ban ghi DL08 (placement_status=not_assigned).
+# Chi bao loi khi khong co BAT KY dong DL08 nao - luc do moi la thung du lieu.
+stu_ob = {s(o,"student_id") for o in R("DL08")}
+no_cls = [s(st,"student_id") for st in R("DL09")
+          if not stu_cls.get(s(st,"student_id")) and s(st,"student_id") not in stu_ob]
+rep("VUA", "2c HV khong co BAT KY ban ghi xep lop nao (DL08, ke ca trang thai cho xep)", no_cls)
 
 # 2d. DL18 ket thuc khoa nhung DL09 van 'active'
 mism = [ "%s(DL18=%s/DL09=%s)" % (s(r,"student_id"), code(r.get("student_status")),
@@ -190,9 +194,12 @@ rep("NANG", "4g Diem danh HV o lop MA HV KHONG duoc xep vao (DL08)", xcls)
 dupa = [k for k,v in collections.Counter((s(a,"session_id"), s(a,"student_id")) for a in R("DL12")).items() if v>1]
 rep("NANG", "4h Trung diem danh (cung buoi + cung HV nhieu ban ghi)", ["%s/%s"%k for k in dupa])
 # 4i. buoi completed thieu diem danh
+# Buoi VUA day xong ma GV chua kip diem danh la VIEC DANG CHO (co han 24h), khong phai
+# du lieu hong. Chi bao loi khi da qua han ma van trong.
 missatt = [s(x,"session_id") for x in R("DL11") if code(x.get("session_status"))=="completed"
+           and (dt(x.get("session_date")) or NOW) < NOW - datetime.timedelta(hours=24)
            and not [a for a in R("DL12") if s(a,"session_id")==s(x,"session_id")]]
-rep("VUA", "4i Buoi DA HOAN THANH nhung khong co ban ghi diem danh nao", missatt)
+rep("VUA", "4i Buoi da day xong QUA 24h ma khong co ban ghi diem danh nao", missatt)
 # 4j. nhan enum lech (cung code khac nhan)
 lbl = collections.defaultdict(set)
 for a in R("DL12"): lbl[code(a.get("attendance_status"))].add(s(a,"attendance_status"))
@@ -263,7 +270,9 @@ rep("VUA", "6g net_received != amount - transaction_fee", m6)
 m7 = ["%s(%s)" % (s(p,"payment_id"), s(p,"payment_time")) for p in R("DL07") if (dt(p.get("payment_time")) or NOW) > NOW]
 rep("VUA", "6h Phieu thu ghi ngay TUONG LAI", m7)
 # 6i. DL07.student_id trong / lech voi DL06
-m8 = [s(p,"payment_id") for p in R("DL07") if not s(p,"student_id")]
+# Don huy TRUOC khi nhap hoc thi chua co student_id - dung nghiep vu. Tien van phai truy
+# nguoc duoc, nen chap nhan lead_id thay the; trong CA HAI moi la loi.
+m8 = [s(p,"payment_id") for p in R("DL07") if not s(p,"student_id") and not s(p,"lead_id")]
 rep("VUA", "6i DL07.student_id de TRONG (khong truy nguoc duoc HV)", m8)
 m9 = [s(p,"payment_id") for p in R("DL07") if s(p,"student_id") and ENR.get(s(p,"enrollment_id"))
       and s(p,"student_id") != s(ENR[s(p,"enrollment_id")],"student_id")]
@@ -377,11 +386,20 @@ c8 = []
 for c in R("DL10"):
     crs = CRS.get(s(c,"course_id"))
     if not crs: continue
+    # Lop DANG HOC / DANG TUYEN / LEN KE HOACH chi cong bo lich vai tuan toi - chua du so buoi
+    # hop dong la DUNG nghiep vu. Chi lop DA KET THUC moi bat buoc du so buoi cua khoa.
+    if code(c.get("class_status")) != "finished": continue
     want, have = int(n(crs.get("duration_sessions"))), len(by_c.get(s(c,"class_id"), []))
     if want and have and have != want: c8.append("%s(%d/%d buoi)" % (s(c,"class_id"), have, want))
-rep("NHE", "9i So buoi tao ra khac duration_sessions cua khoa (DL05)", c8)
+rep("NHE", "9i Lop DA KET THUC ma so buoi khac duration_sessions cua khoa (DL05)", c8)
 c9 = [s(c,"class_id") for c in R("DL10") if not by_c.get(s(c,"class_id"))]
 rep("VUA", "9j Lop KHONG co buoi hoc nao trong DL11", c9)
+c10 = ["%s(%s)" % (s(c,"class_id"), s(c,"class_status")) for c in R("DL10")
+       if code(c.get("class_status")) != "cancelled" and not s(c,"class_end_date")]
+rep("VUA", "9k Lop chua huy nhung KHONG co ngay ket thuc du kien", c10)
+c11 = ["%s(%s)" % (s(c,"class_id"), s(c,"class_status")) for c in R("DL10")
+       if code(c.get("class_status")) != "cancelled" and not s(c,"main_teacher_id")]
+rep("VUA", "9l Lop chua huy nhung KHONG co GV chu nhiem", c11)
 
 # ══ 10. GIAO VIEC DL23 ═══════════════════════════════════════════════════
 t1 = [s(x,"task_id") for x in R("DL23") if dt(x.get("due_time")) and dt(x.get("created_time"))
@@ -470,7 +488,12 @@ NAMEP = [("DL02","assigned_to","assigned_to_name","DL01","full_name"),
          ("DL24","staff_id","staff_id_name","DL01","full_name"),
          ("DL12","student_id","student_name","DL09","full_name"),
          ("DL13","student_id","student_name","DL09","full_name"),
-         ("DL14","student_id","student_name","DL09","full_name")]
+         ("DL14","student_id","student_name","DL09","full_name"),
+         # 114 phieu thu tung ghi verified_by=NV011 (NV IT) kem ten "Tran Ke Toan" khong co
+         # trong DL01 - lot luoi vi cap cot nay chua duoc kiem.
+         ("DL07","received_by","received_by_name","DL01","full_name"),
+         ("DL07","verified_by","verified_by_name","DL01","full_name"),
+         ("DL06","discount_approved_by","discount_approved_by_name","DL01","full_name")]
 nm = []
 for t,f,fn,ref,rf in NAMEP:
     if not R(t) or fn not in R(t)[0]:
@@ -589,6 +612,49 @@ for t in dl:
     bads = [i for i,k in enumerate(ks) if k != u]
     if bads: dr.append("%s: %d/%d dong lech, cot khong dong deu = %s" % (t, len(bads), len(ks), sorted(u-inter)))
 rep("NANG", "14a LECH SO DO CUT: dong trong cung bang KHONG cung bo cot (app render o trong)", dr)
+
+# ══ 16. GIAO VIEC + QUYEN TAM + CHAT LUONG CHU (V9.23) ═══════════════════
+import unicodedata as _ud
+def _has_acc(t):
+    return any(_ud.combining(ch) for ch in _ud.normalize("NFD", str(t or "")))
+# 16a. moi cau chu nguoi doc thay phai la TIENG VIET CO DAU (demo tung viet khong dau)
+_novn = []
+for _t, _flds in (("DL23", ("title", "content", "done_note", "confirm_note", "decline_reason", "perm_note")),
+                  ("DL24", ("content",))):
+    for _r in R(_t):
+        for _f in _flds:
+            _v = str(_r.get(_f) or "")
+            if len(_v) >= 15 and not re.match(r"^[\dA-Za-z\-/:, .]+$", _v) and not _has_acc(_v):
+                _novn.append("%s.%s: %s" % (_t, _f, _v[:40]))
+rep("NANG", "16a Chu tieng Viet KHONG DAU lot vao du lieu demo", _novn)
+# 16b. giao viec phai phu du cac PHONG BAN co nguoi lam (khong bo quen vi tri nao)
+_dep_staff = {s(x, "department") for x in R("DL01")
+              if code(x.get("status")) == "active" and s(x, "department")
+              and code(x.get("role")) != "ceo"}
+_dep_task = {s(IDX["DL01"].get(s(x, "assignee_id")) or {}, "department") for x in R("DL23")}
+_miss_dep = sorted(_dep_staff - _dep_task)
+rep("VUA", "16b Phong ban co nguoi lam nhung KHONG he xuat hien trong so giao viec", _miss_dep)
+# 16c. QUYEN TAM theo viec: dinh ho so thi phai co MUC quyen va HAN quyen
+_pm = [s(x, "task_id") for x in R("DL23") if s(x, "related_id")
+       and not (s(x, "perm_level") and s(x, "perm_until"))]
+rep("NANG", "16c Viec dinh ho so nhung KHONG ghi muc quyen / han quyen tam", _pm)
+# 16d. viec da dong thi quyen tam phai duoc THU HOI (khong de mo vo thoi han)
+_pm2 = [s(x, "task_id") for x in R("DL23")
+        if s(x, "related_id") and code(x.get("task_status")) in ("confirmed", "declined", "cancelled")
+        and not s(x, "perm_revoked_at")]
+rep("NANG", "16d Viec da dong ma quyen tam CHUA thu hoi", _pm2)
+# 16e. han quyen tam khong duoc som hon han viec (cap quyen ma het han truoc khi lam xong)
+_pm3 = ["%s(quyen %s < han viec %s)" % (s(x, "task_id"), s(x, "perm_until"), s(x, "due_time"))
+        for x in R("DL23") if dt(x.get("perm_until")) and dt(x.get("due_time"))
+        and dt(x.get("perm_until")) < dt(x.get("due_time"))]
+rep("VUA", "16e Han quyen tam ket thuc TRUOC han viec", _pm3)
+# 16f. hai nhan vien TRUNG KHIT ho ten -> moi cho tra nguoi theo ten deu nhap nhang
+_nm = collections.Counter(s(x, "full_name") for x in R("DL01") if s(x, "full_name"))
+rep("VUA", "16f Hai nhan vien TRUNG KHIT ho ten (tra nguoi theo ten bi nhap nhang)",
+    ["%s x%d" % (k, v) for k, v in _nm.items() if v > 1])
+# 16g. phieu thu phai ghi du net_received (bao cao tien ve thuc nhan doc cot nay)
+_nr = [s(p, "payment_id") for p in R("DL07") if s(p, "amount") and not str(p.get("net_received") or "").strip()]
+rep("VUA", "16g Phieu thu thieu net_received (bao cao thuc nhan doc rong)", _nr)
 
 # ══ IN KET QUA ═══════════════════════════════════════════════════════════
 ORD = {"NANG":0,"VUA":1,"NHE":2}

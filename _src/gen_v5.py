@@ -32,6 +32,18 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .navlbl.open .navchev{transform:rotate(90deg)}
 .navlbl .dot{background:var(--red);color:#fff;font-size:8.5px;font-weight:800;min-width:14px;height:14px;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:0 3px;letter-spacing:0;flex:none} /* V9.18: badge nhỏ lại - nhóm thu gọn không bị bóp chữ */
 .navlbl .navarc{width:7px;height:7px;border-radius:50%;flex:none;opacity:.9}
+/* V9.23 (Luân): 4 CHẶNG vòng đời phải nổi hẳn so với trang nghiệp vụ - chặng là "bản đồ",
+   nghiệp vụ là "chỗ làm việc". Nhóm chặng: chữ sáng hơn + vạch màu chặng chạy dọc mép trái.
+   Mục "Tổng quan chặng": viên thuốc nền màu chặng, chữ hoa, không giống mục nghiệp vụ. */
+.navlbl.isarc{color:#D7E5F6;font-size:10.5px;background:#ffffff0a;border-left:3px solid var(--acol,#8CC5F2);padding-left:7px}
+.navlbl.isarc:hover{background:#ffffff18}
+.navitem.chang{margin:2px 0 4px;font-weight:800;font-size:12px;letter-spacing:.4px;text-transform:uppercase;
+ color:#EAF3FF;background:linear-gradient(90deg,var(--acol,#8CC5F2)38,#ffffff08);
+ border-left:3px solid var(--acol,#8CC5F2);box-shadow:inset 0 0 0 1px #ffffff14}
+.navitem.chang i{opacity:1;color:#fff}
+.navitem.chang:hover{background:linear-gradient(90deg,var(--acol,#8CC5F2)55,#ffffff12)}
+.navitem.chang.on{background:var(--acol,#8CC5F2);color:#0B2240;box-shadow:inset 0 0 0 1px #ffffff40}
+.navitem.chang.on i{color:#0B2240}
 .navgrp{margin-bottom:3px}
 .navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500;border-left:3px solid transparent}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
@@ -273,7 +285,7 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 /* ===== V9.21 TOUR HƯỚNG DẪN TỪNG BƯỚC ===== */
 .tourspot{position:fixed;border-radius:12px;pointer-events:none;z-index:150;transition:all .22s cubic-bezier(.4,0,.2,1);
  box-shadow:0 0 0 3px #5B9BD5,0 0 0 6px rgba(91,155,213,.35),0 0 0 9999px rgba(12,22,38,.62)}
-.tourbox{position:fixed;z-index:151;width:330px;max-width:calc(100vw - 24px);background:#fff;border-radius:14px;
+.tourbox{position:fixed;z-index:160;width:330px;max-width:calc(100vw - 24px);background:#fff;border-radius:14px;
  box-shadow:0 18px 48px rgba(10,20,40,.35);padding:15px 16px 13px;font-size:13px;transition:all .22s cubic-bezier(.4,0,.2,1)}
 .tourbox .tnum{font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--blue)}
 .tourbox h5{font-size:14.5px;font-weight:800;color:var(--navy);margin:4px 0 6px;line-height:1.35}
@@ -707,7 +719,7 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .jlc.done{background:var(--green)}
 .jd{font-size:11px;color:var(--muted)}
 .pcard{cursor:pointer}
-.mask{position:fixed;inset:0;background:rgba(20,30,45,.42);z-index:60;display:none}
+.mask{position:fixed;inset:0;background:rgba(20,30,45,.42);z-index:170;display:none}
 .mask.on{display:block}
 .cfmask{position:fixed;inset:0;background:rgba(20,30,45,.5);z-index:95;display:none;align-items:center;justify-content:center;padding:20px}
 .cfmask.on{display:flex}
@@ -715,7 +727,7 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .cfh{font-size:14px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:7px;margin-bottom:10px}
 .cfmsg{font-size:13px;color:var(--text);line-height:1.55;margin-bottom:18px}
 .cfa{display:flex;justify-content:flex-end;gap:9px}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:760px;max-width:96vw;background:#fff;z-index:61;box-shadow:-8px 0 30px rgba(0,0,0,.16);transform:translateX(102%);transition:transform .22s ease;display:flex;flex-direction:column}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:760px;max-width:96vw;background:#fff;z-index:171;box-shadow:-8px 0 30px rgba(0,0,0,.16);transform:translateX(102%);transition:transform .22s ease;display:flex;flex-direction:column}
 .drawer.on{transform:none}
 .dh{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
 .dh b{flex:1;font-size:14.5px;font-weight:800}
@@ -947,7 +959,7 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
   <div class="main">
     <div class="topbar">
       <button class="tbtn navtoggle" onclick="toggleNav()" aria-label="Menu"><i class="ti ti-menu-2"></i></button>
-      <div style="display:flex;align-items:center;gap:10px"><div><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px"><span class="chip blue roomChip" id="demoBadge">Room demo</span><button class="btn sm" onclick="demoReset()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ và mọi máy trong room cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
+      <div style="display:flex;align-items:center;gap:10px"><div><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px"><span class="chip blue roomChip" id="demoBadge">Room demo</span><button class="btn sm" onclick="tourMenu()" title="Chạy hướng dẫn từng bước - chọn cấp độ rồi app chỉ tận nơi"><i class="ti ti-school"></i>Chạy hướng dẫn</button><button class="btn sm" onclick="demoReset()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ và mọi máy trong room cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
       <div class="rolesel">
         <select class="sel" id="roleSel" onchange="setRole(this.value)" style="display:none"></select>
         <button class="tbtn" data-tour="help" onclick="tourMenu()" aria-label="Hướng dẫn sử dụng" title="Hướng dẫn từng bước"><i class="ti ti-help-circle"></i></button>
@@ -2496,10 +2508,16 @@ function renderTracuu(){
 function openHoso(sid){if(sid!==window.JPID)window.HSTAB="in";window.JPID=sid;window.HOSO=sid;go("hoso")}
 function openLop(cid){window.BLCLASS=cid;go("banglop")}
 function goDD(cid,sess){window.BLCLASS=cid;window.DDCLASS=cid;window.DDSESS=sess;window.BLTAB="buoi";go("banglop")}
-function openDrawer(title,html){document.getElementById("drawerTitle").textContent=title;document.getElementById("drawerBody").innerHTML=html;document.getElementById("mask").classList.add("on");document.getElementById("drawer").classList.add("on")}
+/* Lớp phủ tour nằm trên cùng: nếu nó bị bỏ lại (đổi trang, tour chưa kết thúc đàng hoàng)
+   thì mọi thứ mở sau đó đều chìm dưới nó - người dùng chỉ thấy MÀN HÌNH ĐEN. Dọn trước khi mở. */
+function tourCleanup(){if(TOUR&&TOUR.on)return;
+ try{var s=document.getElementById("tourspot");if(s&&s.remove)s.remove()}catch(e){}
+ try{var b=document.getElementById("tourbox");if(b&&b.remove)b.remove()}catch(e){}}
+function openDrawer(title,html){tourCleanup();document.getElementById("drawerTitle").textContent=title;document.getElementById("drawerBody").innerHTML=html;document.getElementById("mask").classList.add("on");document.getElementById("drawer").classList.add("on")}
 function closeModal(){document.getElementById("mask").classList.remove("on");document.getElementById("drawer").classList.remove("on");if(window.__pendSync)setTimeout(syncApply,50)}
 if(typeof document.addEventListener==="function")document.addEventListener("keydown",function(ev){
- if(ev.key==="Escape"){try{closeConfirm()}catch(e){}try{closeModal()}catch(e){}}});
+ if(ev.key==="Escape"){try{if(TOUR&&TOUR.on){tourEnd();return}}catch(e){}
+  try{closeConfirm()}catch(e){}try{closeModal()}catch(e){}}});
 if(typeof document.addEventListener==="function")document.addEventListener("click",function(ev){
  var t=ev.target;if(!t||!t.closest)return;
  if(t.closest("button,a,input,select,textarea,label,.qsel"))return;
@@ -5199,6 +5217,8 @@ function saveParam(name){var e=document.getElementById("cf_"+name);if(!e)return;
  function d(){var c=DATA.config.ch2||(DATA.config.ch2=[]);var hit=false;
   for(var i=0;i<c.length;i++)if(c[i].name===sn){c[i].value=out;hit=true}
   if(!hit)c.push({name:sn,value:out,unit:meta?meta[3]:"",meaning:meta?meta[2]:""});
+  persistSoon();   /* BẮT BUỘC: không lưu xuống localStorage thì F5 hoặc một lần đồng bộ
+                      room là DATA.config bị đè về bản gốc - người dùng sửa mà không ăn */
   toast("Đã lưu "+sn+" = "+out);reRender("settings")}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d()}).withFailureHandler(function(er){toast("Lỗi kết nối: "+er.message)}).apiSetParam(sn,out,meta?meta[2]:"",meta?meta[3]:"")}else{d()}}
 /* ===== SỬA DANH MỤC (CH1) ===== */
@@ -5227,7 +5247,7 @@ function enumSave(en,i){var e=document.getElementById("en_"+en+"_"+i);if(!e)retu
  var syncEl=document.getElementById("ens_"+en+"_"+i);
  var sync=syncEl?!!syncEl.checked:true;
  var used=enumUsage(en,cd);
- function fin(msg){ENUM[en][i]=full;toast(msg);reRender("settings")}
+ function fin(msg){ENUM[en][i]=full;persistSoon();toast(msg);reRender("settings")}
  function afterEnum(){
   if(sync&&used>0)enumMigrate(en,cd,full,function(n){fin("Đã đổi nhãn + cập nhật "+n+" dòng dữ liệu.")});
   else fin("Đã đổi nhãn."+(used>0?" ("+used+" dòng dữ liệu vẫn giữ nhãn cũ)":""))}
@@ -5238,7 +5258,7 @@ function enumAdd(en){var c=document.getElementById("enn_"+en+"_c"),l=document.ge
  if(!/^[a-z0-9_]+$/.test(cd)){toast("Mã chỉ gồm chữ thường, số và dấu _");return}
  for(var i=0;i<ENUM[en].length;i++)if(ecode(ENUM[en][i])===cd){toast("Mã này đã có trong danh mục.");return}
  var full=cd+" ("+lb+")";
- function d(){ENUM[en].push(full);toast("Đã thêm '"+lb+"' vào danh mục.");reRender("settings")}
+ function d(){ENUM[en].push(full);persistSoon();toast("Đã thêm '"+lb+"' vào danh mục.");reRender("settings")}
  if(SVR){google.script.run.withSuccessHandler(function(r){if(!r||!r.ok){toast("Lỗi: "+((r&&r.error)||""));return}d()}).withFailureHandler(function(er){toast("Lỗi kết nối: "+er.message)}).apiEnumAdd(en,full)}else{d()}}
 function enumDelAsk(en,i){
  if((ENUM[en]||[]).length<=1){toast("Phải còn ít nhất 1 giá trị.");return}
@@ -5255,7 +5275,7 @@ function enumDelRun(en,i){var to=fldV("edl_to");closeModal();enumDel(en+"|"+i+"|
 function enumDel(arg){var p=String(arg).split("|"),en=p[0],i=parseInt(p[1],10),to=p.slice(2).join("|");
  if((ENUM[en]||[]).length<=1){toast("Phải còn ít nhất 1 giá trị.");return}
  var cd=ecode(ENUM[en][i]);var used=enumUsage(en,cd);
- function del(){function d(){ENUM[en].splice(i,1);toast("Đã xóa khỏi danh mục.");reRender("settings")}
+ function del(){function d(){ENUM[en].splice(i,1);persistSoon();toast("Đã xóa khỏi danh mục.");reRender("settings")}
   if(SVR){google.script.run.withSuccessHandler(function(r){if(!r||!r.ok){toast("Lỗi: "+((r&&r.error)||""));return}d()}).withFailureHandler(function(er){toast("Lỗi kết nối: "+er.message)}).apiEnumDel(en,i)}else{d()}}
  if(used>0)enumMigrate(en,cd,to||"",function(n){toast("Đã chuyển "+n+" dòng"+(to?(" sang '"+(elabel(to)||to)+"'"):" về trống")+".");del()});
  else del()}
@@ -5265,7 +5285,7 @@ function staffSave(i){var s=rows("DL01")[i];if(!s)return;
  var v={full_name:gv("name"),email:gv("email"),role:gv("role"),status:gv("status")};
  if(!v.full_name){toast("Họ tên không được trống.");return}
  if(v.email&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.email)){toast("Email không hợp lệ.");return}
- function d(){for(var k in v)s[k]=v[k];toast("Đã lưu "+s.staff_id+".")}
+ function d(){for(var k in v)s[k]=v[k];persistSoon();toast("Đã lưu "+s.staff_id+".")}
  if(SVR){google.script.run.withSuccessHandler(function(r){if(!r||!r.ok){toast("Lỗi: "+((r&&r.error)||""));return}d()}).withFailureHandler(function(er){toast("Lỗi kết nối: "+er.message)}).apiUpdate("DL01",s.staff_id,v)}else{d()}}
 function staffAdd(){
  function gv(f){var e=document.getElementById("nv_"+f);return e?String(e.value||"").trim():""}
@@ -5274,14 +5294,14 @@ function staffAdd(){
  if(!o.role){toast("Chọn vai trò.");return}
  if(o.email&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(o.email)){toast("Email không hợp lệ.");return}
  if(o.phone&&!/^0\d{9}$/.test(o.phone)){toast("SĐT phải 10 số, bắt đầu bằng 0.");return}
- function d(id){o.staff_id=id;rows("DL01").unshift(o);toast("Đã thêm nhân viên "+id+".");reRender("settings")}
+ function d(id){o.staff_id=id;rows("DL01").unshift(o);persistSoon();toast("Đã thêm nhân viên "+id+".");reRender("settings")}
  if(SVR){google.script.run.withSuccessHandler(function(r){if(!r||!r.ok){toast("Lỗi: "+((r&&r.error)||""));return}d(r.id)}).withFailureHandler(function(er){toast("Lỗi kết nối: "+er.message)}).apiSave("DL01",o)}
  else{var mx=0;rows("DL01").forEach(function(s){var m=String(s.staff_id||"").match(/(\d+)$/);if(m)mx=Math.max(mx,parseInt(m[1],10))});d("NV"+("00"+(mx+1)).slice(-3))}}
 function saveKpi(code){var e=document.getElementById("k_"+code);var v=e.value;if(v===""||isNaN(Number(v))){toast("Ngưỡng phải là số.");return}
- function d(){for(var i=0;i<DATA.config.ch6.length;i++)if(DATA.config.ch6[i].code===code)DATA.config.ch6[i].threshold=Number(v);toast("Đã lưu KPI "+code+" = "+v)}
+ function d(){for(var i=0;i<DATA.config.ch6.length;i++)if(DATA.config.ch6[i].code===code)DATA.config.ch6[i].threshold=Number(v);persistSoon();toast("Đã lưu KPI "+code+" = "+v)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d()}).withFailureHandler(function(er){toast("Lỗi kết nối: "+er.message)}).apiSetParam("kpiThreshold_"+code,Number(v))}else{d()}}
 function saveMsg(idx){var a=ch4List();var m=a[idx];if(!m){toast("Không thấy thông điệp.");return}var e=document.getElementById("msg_"+idx);if(!e)return;var v=e.value;
- function d(){m.tmpl=v;toast("Đã lưu thông điệp "+m.code);reRender("settings")}
+ function d(){m.tmpl=v;persistSoon();toast("Đã lưu thông điệp "+m.code);reRender("settings")}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(res&&res.ok===false){toast("Lỗi: "+(res.error||""));return}d()}).withFailureHandler(function(er){toast("Lỗi kết nối: "+er.message)}).apiSaveMsg(m.code,v)}else{d()}}
 function eFull(en,code){var a=ENUM[en]||[];for(var i=0;i<a.length;i++){if(ecode(a[i])===code||a[i].indexOf(code)===0)return a[i]}return code}
 function uniqTitles(){var s={},o=[];rows("DL13").forEach(function(r){var t=r.homework_title;if(t&&!s[t]){s[t]=1;o.push(t)}});return o}
@@ -5832,7 +5852,10 @@ function renderTuyensinh(){
  var nTuvan=cons.filter(function(c){return !isc(c.conversion_status,"confirmed_with_deposit","dropped")}).length;
  var nPay=enr.filter(function(e){if(/cancel/.test(ecode(e.enrollment_status)))return false;var rem=(e.remaining_amount!==undefined&&e.remaining_amount!=="")?num(e.remaining_amount):Math.max(0,(num(e.final_fee)||num(e.total_fee))-num(e.paid_amount));var unv=rows("DL07").filter(function(x){return x.enrollment_id===e.enrollment_id&&!(x.verified_by&&String(x.verified_by).trim())}).length;return rem>0||unv>0}).length;
  var nReup=jAll().filter(function(J){return J.k==="lost"||J.k==="no_contact"}).length;
- var actBtn=(tab==="lead")?'<button class="btn" onclick="leadInbound()"><i class="ti ti-message-plus"></i>Khách mới liên hệ đến</button> <button class="btn primary" onclick="newForm(\'nhaplead\')"><i class="ti ti-user-plus"></i>Nhập lead mới</button>':(tab==="test")?'<button class="btn primary" onclick="testQuickAdd()"><i class="ti ti-plus"></i>Khách muốn test ngay</button>':(tab==="tuvan")?'<button class="btn primary" onclick="tvQuick()"><i class="ti ti-plus"></i>Tư vấn không qua test</button>':(tab==="reup")?'':'<button class="btn primary" onclick="payQuick()"><i class="ti ti-cash"></i>Ghi nhận khoản thu</button>';
+ /* V9.23 (Luân): BỎ nút "Nhập lead mới". Nó và "Khách mới liên hệ đến" cùng tạo một dòng DL02,
+   nhưng form chung KHÔNG chặn trùng số và KHÔNG ghi lượt liên hệ đầu (DL02b) - lead tạo bằng
+   nó làm sai luôn đồng hồ SLA phản hồi (LRT) và sổ chạm. Giữ đúng một cửa vào. */
+ var actBtn=(tab==="lead")?'<button class="btn primary" onclick="leadInbound()"><i class="ti ti-message-plus"></i>Khách mới liên hệ đến</button>':(tab==="test")?'<button class="btn primary" onclick="testQuickAdd()"><i class="ti ti-plus"></i>Khách muốn test ngay</button>':(tab==="tuvan")?'<button class="btn primary" onclick="tvQuick()"><i class="ti ti-plus"></i>Tư vấn không qua test</button>':(tab==="reup")?'':'<button class="btn primary" onclick="payQuick()"><i class="ti ti-cash"></i>Ghi nhận khoản thu</button>';
  var h=pageHead("Tuyển sinh","Một luồng liền mạch: Lead → Test đầu vào → Tư vấn & Đăng ký → Thanh toán. Bấm một bước để xử lý; số trên phễu là việc đang chờ ở bước đó. Khách rơi khỏi luồng nằm ở \"Chăm lại\".",actBtn);
  var steps=[["lead","ti-users","Lead",nLead,"#3B82C4"],["test","ti-file-text","Test đầu vào",nTest,"#7C3AED"],["tuvan","ti-messages","Tư vấn & ĐK",nTuvan,"#E08A1E"],["thanhtoan","ti-cash","Thanh toán",nPay,"#0D9488"]];
  h+='<div class="tsfun">';
@@ -7817,8 +7840,10 @@ function tourAsk(k){var T=TOURS[k];if(!T)return;
  h+='<div class="dact"><button class="btn primary" onclick="closeModal();tourStart(\''+k+'\')"><i class="ti ti-player-play"></i>Bắt đầu hướng dẫn</button>'+
   '<button class="btn" onclick="closeModal()"><i class="ti ti-x"></i>Để lúc khác</button></div></div>';
  openDrawer("Xác nhận chạy hướng dẫn",h)}
-function tourStart(k){if(!TOURS[k])return;TOUR={key:k,i:0,on:true};tourShow()}
-function tourEnd(){TOUR.on=false;
+function tourStart(k){if(!TOURS[k])return;
+ try{closeModal()}catch(e){}          /* đóng hẳn ngăn kéo xác nhận trước khi phủ lớp tour */
+ TOUR={key:k,i:0,on:true};tourShow()}
+function tourEnd(){TOUR.on=false;TOUR.key="";
  try{var s=document.getElementById("tourspot"),b=document.getElementById("tourbox");
   if(s)s.remove();if(b)b.remove()}catch(e){}
  try{window.removeEventListener("resize",tourReflow);window.removeEventListener("scroll",tourReflow,true)}catch(e){}}
@@ -7876,14 +7901,10 @@ function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
  b.style.top=Math.max(10,Math.min(top,vh-bh-10))+"px";
  try{window.addEventListener("resize",tourReflow);window.addEventListener("scroll",tourReflow,true)}catch(e){}}
 function tourReflow(){if(TOUR.on){clearTimeout(window.__trf);window.__trf=setTimeout(tourPaint,60)}}
-/* lần đầu mở app: mời xem hướng dẫn (chỉ hỏi 1 lần cho mỗi trình duyệt) */
-function tourOfferOnce(){if(SVR||!CANLS)return;
- try{if(localStorage.getItem("ITTS_TOUR_SEEN"))return;localStorage.setItem("ITTS_TOUR_SEEN","1")}catch(e){return}
- setTimeout(function(){try{
-  notiShow("Lần đầu dùng app? Xem hướng dẫn 2 phút","Bấm vào đây để app chỉ tận nơi từng bước - hoặc bấm dấu hỏi trên thanh tiêu đề bất cứ lúc nào.","",0);
-  var box=document.getElementById("notis");
-  if(box&&box.lastChild)box.lastChild.onclick=function(){try{this.remove()}catch(e){};tourAsk("tq_tong")};
- }catch(e){}},1500)}
+/* V9.23 (Luân): BỎ thẻ mời xem hướng dẫn tự nổ lúc mở app. Hướng dẫn là thứ NGƯỜI DÙNG
+   chủ động gọi khi cần, không phải thứ nhảy vào mặt ngay khi vừa vào. Lối vào giờ nằm cố
+   định trên thanh tiêu đề: nút "Chạy hướng dẫn" ngay cạnh "Reset demo", cộng dấu hỏi bên phải. */
+function tourOfferOnce(){return}
 
 /* ==================== V9.20 - CẤU HÌNH GIAO DIỆN & THƯƠNG HIỆU (Cài đặt > Giao diện) ====================
    Lưu trong DATA.config.ui -> tự đồng bộ đa cổng/đa máy như mọi dữ liệu demo và Reset demo đưa về gốc.
@@ -8395,7 +8416,8 @@ function navBadge(k){
  return 0}
 function navIsOpen(g){window.NAVOPEN=window.NAVOPEN||{};
  if(window.NAVOPEN[g]!==undefined)return !!window.NAVOPEN[g];
- return g==="Làm việc"}   /* V9.15: mặc định chỉ mở LÀM VIỆC + nhóm chứa trang đang xem (go() tự mở) */
+ return true}   /* V9.23 (Luân): mặc định XỔ HẾT mọi nhóm - gập lại là do người dùng chủ động gập,
+                   không bắt người mới phải đi mò từng nhóm mới thấy trang mình cần */
 function navToggle(g){window.NAVOPEN=window.NAVOPEN||{};window.NAVOPEN[g]=!navIsOpen(g);buildNav()}
 /* ===== V9.15 - MENU THEO CHẶNG VÒNG ĐỜI =====
    2 tầng: nhóm = chặng lớn (arc), mục = tổng quan chặng + các nghiệp vụ bên trong.
@@ -8488,13 +8510,15 @@ function buildNav(){
   var open=navIsOpen(G.g),gb=0;
   items.forEach(function(k){gb+=navBadge(k)});
   var A=G.arc?ARCBK[G.arc]:null;
-  h+='<div class="navlbl'+(open?" open":"")+'" onclick="navToggle(\''+esc(G.g).split("'").join("")+'\')">'+
+  h+='<div class="navlbl'+(open?" open":"")+(A?" isarc":"")+'"'+(A?' style="--acol:'+A.col+'"':'')+' onclick="navToggle(\''+esc(G.g).split("'").join("")+'\')">'+
    '<i class="ti ti-chevron-right navchev"></i>'+(A?'<span class="navarc" style="background:'+A.col+'"></span>':'')+'<span>'+esc(uiGroupLabel(G.g))+'</span>'+
    (!open&&gb?'<span class="dot">'+(gb>99?"99+":gb)+'</span>':'')+'</div>';
   if(!open)return;
   h+='<div class="navgrp">';
   items.forEach(function(k){var m=navItemMeta(k),n=navBadge(k);
-   h+='<div class="navitem'+(navCur(k)?" on":"")+'" data-k="'+k+'" onclick="go(\''+k+'\')"><i class="ti '+m.ic+'"></i>'+esc(m.t)+
+   var isArc=/^chang[A-D]$/.test(k);
+   h+='<div class="navitem'+(isArc?" chang":"")+(navCur(k)?" on":"")+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
+    ' data-k="'+k+'" onclick="go(\''+k+'\')"><i class="ti '+m.ic+'"></i>'+esc(m.t)+
     (n?'<span class="dot">'+(n>99?"99+":n)+'</span>':'')+'</div>'});
   h+='</div>'});
  document.getElementById("nav").innerHTML=h;

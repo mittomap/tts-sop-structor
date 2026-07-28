@@ -149,7 +149,18 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.18** (28/07 tối - theo 8 yêu cầu mới của Luân: (1) **GỘP "Hành trình" vào "Trang bắt đầu"**
+> **Phiên bản: V9.23** (28/07 tối - MẢNG 1 của hội đồng 6 chuyên gia ĐÃ XONG + 6 yêu cầu phát sinh của Luân).
+> **DỮ LIỆU DEMO: 192 -> 4 bản ghi lỗi** (`check_logic.py` nay 123 luật). 4 ca còn lại là việc quá hạn
+> CỐ Ý để màn Giao việc có cảnh báo đỏ thật (luật 10k tự khai là "demo canh bao do").
+> Bộ kiểm sau mỗi build nay có **5 phần** (xem bảng trong `_src/README_SRC.md`), thêm `_src/_checktour.js`.
+> Chi tiết mảng 1 + 6 việc phát sinh: mục **3unvicies** bên dưới.
+> **CÒN LẠI của hội đồng: mảng 2 (KPI diễn giải), 3 (cổng học viên 7 kênh), 4 (học phí theo đợt),
+> 5 (link "sửa ở đây" + tham số thiếu)** - làm tiếp theo đúng thứ tự đó.
+> **HỘI ĐỒNG ĐỢT 2 - 5 vị trí mới đang rà** (Luân duyệt 28/07): nhân viên tư vấn kiêm tiếp khách,
+> giáo viên đứng lớp, kế toán/thu ngân, giáo vụ xếp lịch, kiểm thử phá hoại. Lý do: 6 chuyên gia cũ
+> đều nhìn từ THIẾT KẾ HỆ THỐNG, không ai nhìn từ GHẾ NGƯỜI NGỒI LÀM 8 TIẾNG - nên bỏ lọt lỗi kiểu
+> "hai nút cùng tạo một lead" mà Luân tự bắt được.
+> Trước đó V9.18 (28/07 tối - theo 8 yêu cầu mới của Luân: (1) **GỘP "Hành trình" vào "Trang bắt đầu"**
 > thành MỘT trang 2 góc nhìn (segmented "Chạy quy trình" / "Bảng chặng - hành trình"); go('hanhtrinh') tự remap,
 > menu Làm việc còn 1 mục, logic 2 trang giữ nguyên vẹn; (2) **node dải hạt (mstrip) BẤM ĐƯỢC** - mở drawer
 > "hành trình từng chặng" của đúng người (13 mốc + mốc thời gian + chặng hiện tại + nút xử lý); (3) **TRA CỨU
@@ -280,6 +291,111 @@
 > hàng đợi): renderDuyet, renderGiaoan, renderMaGioiThieu, renderReupTab, renderBanggiao. statStrip ở 15 trang
 > không bấm được trong khi ở Trang bắt đầu bấm được - cho nhận tham số onclick. Tab CH6 là tab Cài đặt DUY NHẤT
 > không có notebar hướng dẫn (vi phạm thẳng vế "ở nơi sửa nên hướng dẫn cách sửa").
+
+
+## 3unvicies. V9.23 (28/07 tối) - MẢNG 1: VÁ SẠCH DỮ LIỆU DEMO + 6 YÊU CẦU PHÁT SINH CỦA LUÂN
+
+### A. Vá dữ liệu demo: 192 -> 4 bản ghi lỗi (sửa Ở NGUỒN pipeline, không sửa tay JSON)
+
+**Quyết định thiết kế phải ghi lại (đây là chỗ tốn suy nghĩ nhất):**
+
+1. **Lớp học phải có LỊCH THẬT thì mọi luật lịch mới đúng được.** Trước đây `gen_sessions` chỉ
+   rải buổi cho 6 lớp đang chạy + 2 lớp đã kết thúc, GV lấy cứng theo `main_teacher_id`, phòng bê
+   nguyên từ dữ liệu cũ. Hệ quả: 19 ca GV dạy 2 lớp cùng giờ, 19 ca trùng phòng, 14 lớp trắng lịch.
+   Nay dựng lại: mọi lớp đều có lịch; **ngày kết thúc SUY RA từ số buổi hợp đồng của khóa**
+   (`span_days` = số buổi / số buổi mỗi tuần), không đóng cứng 84 ngày như trước - trước đây lớp
+   12 tuần mà khóa ghi 64 buổi là mâu thuẫn thẳng trong chính dữ liệu.
+2. **PHÒNG HỌC là thuộc tính của LỚP (DL10.venue_or_zoom_link), không phải của buổi.** Bẫy đã cắn:
+   ban đầu định gỡ trùng phòng ở từng dòng DL11 - vô ích, vì luật 13p đọc phòng từ DL10. Phải xếp
+   phòng ở MỨC LỚP.
+3. **Bộ xếp lịch so KHOẢNG GIỜ, không so mốc giờ.** Hai lớp 18h-19h30 và 19h-20h30 không trùng mốc
+   nhưng trùng thời gian thật - GV không thể đứng cả hai. Xếp theo lớp KHÓ nhất trước (khoảng chạy
+   dài nhất) vì greedy "ai đến trước xếp trước" hay kẹt ở lớp cuối.
+4. **Quy mô nhân sự phải khớp quy mô lớp.** Dựng lịch thật xong mới lộ ra: giờ cao điểm tối T2-T4-T6
+   có tới 9 lớp chạy song song. 4 GV cho 22 lớp là bất khả thi -> **thêm 6 GV ACA (NV033-NV038,
+   tổng 10 GV)** và **12 phòng học ở 4 cơ sở**. Hội đồng đề xuất thêm 2 GV là ước lượng trước khi
+   có ai mô hình hóa lịch.
+5. **Ngày khai giảng lớp lên kế hoạch phải TẤT ĐỊNH** (rải đều 25 + i*4 ngày), không random - random
+   làm bộ xếp lịch lúc chạy được lúc báo thiếu GV.
+6. **Nhãn là tài sản của DANH MỤC CH1, không phải chuỗi gõ tay ở từng script.** Thêm pass §13 trong
+   `fixdata.py`: bản đồ cột -> enum khai TAY (không dò tự động, vì nhiều enum dùng chung mã như
+   `on_track`, `active`, `late`), kéo mọi ô về đúng nhãn CH1.
+7. **Trạng thái phải SUY RA từ mốc thời gian, không tung xúc xắc song song.** Bài tập trước đây bốc
+   nhãn "Nộp trễ/đúng hạn" độc lập với giờ nộp -> 23 bài mang nhãn ngược hẳn. Nay sinh giờ nộp
+   trước, kẹp trong khoảng hợp lệ, rồi mới suy nhãn. Thêm lưới chặn §7c-bis ở `fixdata.py` vì các
+   pass phía trên đều có thể dời giờ nộp.
+8. **Kẹp cả CHUỖI mốc phễu một lần (§14), không kẹp từng cặp.** Các pass cũ kéo từng cặp mốc nên vẫn
+   đẻ ra "chốt deal trước tư vấn". Pass mới chạy CUỐI, kẹp lead -> test -> tư vấn -> chốt -> đăng ký
+   -> thu tiền -> xếp lớp -> gửi info -> xác nhận.
+9. **Mọi dòng trong một bảng phải CÙNG BỘ CỘT (§15, pass cuối cùng).** Cột chỉ có ở vài dòng làm app
+   render ô trống. Phải chạy sau mọi pass khác vì nó thay object dict của từng dòng.
+10. **Cột `*_by` là MÃ nhân viên, tên để ở `*_name`.** Ghi tên vào ô mã = mã chết. Đã vá
+    `DL06.discount_approved_by` (ghi "Phạm Thị Kim Ngân"), `DL07.verified_by` (ghi "Kế toán"), và
+    `verified_by=NV011` vốn là NV IT chứ không phải kế toán (114 phiếu thu).
+11. **Ba cặp nhân sự trùng khít họ tên** (NV010/NV017 kế toán, NV011/NV018 IT, 2 ô "(Chưa tuyển)")
+    làm mọi chỗ tra người theo tên nhập nhằng - đã tách tên, ô trống biên chế ghi rõ phòng.
+12. **Hàng chờ phải là DỮ LIỆU CÓ THẬT, không phải sự vắng mặt của dòng dữ liệu.** HV080 "chờ xếp
+    lớp" trước đây thể hiện bằng cách KHÔNG có dòng DL08 - không phân biệt được với thủng dữ liệu.
+    Nay có dòng DL08 `placement_status = not_assigned (Chưa xếp lớp)`.
+13. **Hàng chờ điểm danh phải là buổi VỪA DẠY XONG**, không phải buổi từ tháng trước (§10b).
+
+**Ba luật kiểm được thu hẹp phạm vi CÓ LÝ DO nghiệp vụ (ghi rõ để lần audit sau không tưởng là gian):**
+- `9i`: chỉ xét lớp ĐÃ KẾT THÚC. Lớp đang chạy chỉ công bố lịch vài tuần tới - chưa đủ số buổi hợp
+  đồng là ĐÚNG nghiệp vụ.
+- `2c`: chỉ báo khi HV không có BẤT KỲ dòng DL08 nào (HV đang chờ xếp lớp vẫn có dòng).
+- `6i`: chấp nhận `lead_id` thay `student_id`. Đơn hủy TRƯỚC khi nhập học thì chưa có mã HV - tiền
+  vẫn truy ngược được qua lead.
+- `4i`: buổi vừa dạy xong trong 24h chưa điểm danh là VIỆC ĐANG CHỜ, không phải dữ liệu hỏng.
+
+**7 luật kiểm MỚI** (`check_logic.py` nay 123 luật): `9k` lớp chưa hủy phải có ngày kết thúc · `9l`
+lớp chưa hủy phải có GV · `16a` không cho chữ tiếng Việt KHÔNG DẤU lọt vào dữ liệu · `16b` giao việc
+phải phủ đủ phòng ban · `16c/16d/16e` quyền tạm theo việc phải có mức + hạn + được thu hồi ·
+`16f` không hai nhân viên trùng khít họ tên · `16g` phiếu thu phải có `net_received`.
+Cặp `DL07.received_by/verified_by` và `DL06.discount_approved_by` đã được đưa vào `NAMEP`.
+
+Số dòng dữ liệu: 4126 -> DL11 460 buổi (từ 215), DL12 1798 dòng điểm danh, DL01 41 người.
+
+### B. 6 yêu cầu phát sinh của Luân trong phiên (ghi lại vì đều là lỗi thật)
+
+1. **"Sửa cấu hình lưu quá trời mà không áp dụng"** - hai nguyên nhân tách bạch:
+   (a) `saveKpi`, `staffSave`, `enumAdd`, `enumDel` KHÔNG vẽ lại trang nên không kích hoạt
+   `persistSoon()` - sửa xong F5 là mất. Đã cho **cả 8 hàm cấu hình gọi `persistSoon()` trực tiếp**,
+   không đi nhờ `reRender` nữa. **LUẬT: hàm nào ghi vào DATA thì tự gọi persistSoon, đừng tin
+   render sẽ lưu hộ.**
+   (b) Nặng hơn: **32/61 dòng CH2 không có hàm nào trong app đọc tới** (`kpiThreshold_*`,
+   `slaWowBooking_hours`, `wowQuota_default_sessions`...) và **19 tham số app dùng thật lại không
+   khai trong APPPARAMS** nên không có ô mà sửa. Đây chính là mảng 5 - sẽ nối hai đầu lại.
+2. **Sidebar mặc định XỔ HẾT** mọi nhóm (trước chỉ mở "Làm việc").
+3. **4 CHẶNG vòng đời nổi hẳn so với trang nghiệp vụ**: nhóm chặng có vạch màu chạy dọc mép trái,
+   mục "Tổng quan chặng" thành viên thuốc nền màu chặng, chữ hoa - chặng là "bản đồ", nghiệp vụ là
+   "chỗ làm việc".
+4. **BỎ nút "Nhập lead mới"** (Luân tự bắt, hội đồng không thấy). Hai nút cùng tạo một dòng DL02
+   nhưng form chung KHÔNG chặn trùng số và KHÔNG ghi lượt liên hệ đầu vào DL02b -> lead tạo bằng nó
+   làm sai luôn đồng hồ SLA phản hồi (LRT) và sổ chạm. Giữ đúng MỘT cửa vào.
+5. **Hướng dẫn (tour) hiện ra màn hình đen** - lỗi xếp lớp hiển thị, không phải lỗi JS (harness mới
+   `_checktour.js` chạy 11 bài / 64 bước sạch). `.tourspot` z-index 150 kèm `box-shadow` phủ kín màn,
+   cao hơn cả ngăn kéo (61) và lớp mờ (60): lớp phủ tour bị bỏ lại là mọi thứ mở sau đó đều chìm
+   dưới nó. Đã: nâng `.mask`/`.drawer` lên 170/171, thêm `tourCleanup()` dọn lớp phủ mồ côi mỗi lần
+   mở ngăn kéo, Escape thoát tour, `tourStart` đóng hẳn ngăn kéo trước khi phủ.
+   **BỎ thẻ mời xem hướng dẫn tự nổ lúc mở app**; lối vào giờ là nút **"Chạy hướng dẫn"** cố định
+   trên thanh tiêu đề ngay cạnh "Reset demo".
+6. **Module giao việc viết bằng tiếng Việt KHÔNG DẤU và bỏ sót vị trí.** Đã viết lại toàn bộ 25 kịch
+   bản + lời trao đổi DL24 bằng tiếng Việt có dấu, và duyệt ĐỦ 9 phòng ban thay vì bốc ngẫu nhiên 10
+   người: nay 31 việc / 22 người / 15 chức danh, phủ 8 phòng ban (Ban Giám đốc không nhận việc giao
+   xuống là đúng - CEO không có cấp trên).
+
+### C. QUYỀN TẠM THEO VIỆC (Luân hỏi: "giao việc dính học viên thì có mở quyền sửa không, thế phải có lịch thu hồi nhỉ?")
+
+Luân đúng. App V9.22 CÓ cấp quyền tạm cho hồ sơ đính kèm việc, nhưng cấp theo TRẠNG THÁI việc -
+tức là thu hồi ngầm, không có hạn rõ, người được giao không biết mình còn quyền tới bao giờ và
+người giao không có chỗ nào nhìn thấy ai đang được mở quyền gì.
+
+Đã làm ở tầng DỮ LIỆU (DL23 thêm 4 cột): `perm_level` (view Chỉ xem / edit Xem và sửa / none Đã thu
+hồi), `perm_until` (mặc định = hạn việc + ân hạn, hiện cắm 48h - **mảng 5 phải đưa ra CH2 thành
+`permGrace_hours`**), `perm_revoked_at`, `perm_note`. Quy tắc: việc giao xuống BẮT BUỘC mà có đính hồ
+sơ thì cho SỬA, còn lại chỉ XEM; việc đã xác nhận/từ chối/hủy thì thu hồi ngay.
+**CÒN LẠI cho mảng 5 (tầng app):** hiện mức + hạn quyền ngay trên thẻ việc, sổ "Quyền tạm đang mở"
+cho quản lý thu hồi tay, và ghi vết mọi lần cấp/thu.
 
 > **VIỆC TỒN web app (ưu tiên trên xuống):**
 > 1. **CHỜ LUÂN NGHIỆM THU ĐỢT 9 + YÊU CẦU KẾ TIẾP** - 4 yêu cầu 28/07 (phòng 2 máy, cổng HV đúng vai, hồ sơ 360 superset, rà sidebar) đã trả xong trong V9.16. Luân cần THỬ THẬT phòng 2 máy trên 2 máy khác nhau (phiên cloud không tự test WebRTC được). Phiên sau: hỏi/đợi yêu cầu kế tiếp trước khi làm gì lớn.

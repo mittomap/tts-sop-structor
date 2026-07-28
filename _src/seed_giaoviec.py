@@ -58,48 +58,64 @@ def main():
     leads = dl.get("DL02", [])[:60]
     classes = dl.get("DL10", [])[:20]
 
-    # kich ban viec that cua trung tam - viet bang giong nguoi giao viec that
+    # Kịch bản việc THẬT của trung tâm - viết bằng giọng người giao việc thật.
+    # (title, content, phòng ban, mức ưu tiên, gợi ý vai trò người nhận)
     SCEN = [
-        ("Goi lai nhom khach chua ket noi tuan nay",
-         "Danh sach khach da goi 2 lan chua gap. Doi khung gio goi (buoi toi) va nhan Zalo truoc khi goi.", "Tư vấn", "high"),
-        ("Chot ho so con thieu giay to nhap hoc",
-         "Ra soat cac ho so onboarding con thieu, lien he phu huynh bo sung trong tuan.", "Học vụ", "normal"),
-        ("Doi soat khoan thu tien mat cuoi ngay",
-         "Doi soat phieu thu tien mat voi so quy, bao lech (neu co) truoc 18h.", "Kế toán", "high"),
-        ("Chuan bi de test dau vao dot moi",
-         "Ra soat ngan hang de, in 20 bo cho tuan sau, kiem tra file nghe.", "ACA", "normal"),
-        ("Viet nhan xet buoi con thieu",
-         "Cac buoi da day nhung chua ghi nhan xet - hoan thanh de hoc vien va phu huynh theo doi duoc.", "ACA", "high"),
-        ("Len lich WOW cho hoc vien yeu Speaking",
-         "Loc hoc vien diem Speaking thap, xep buoi kem rieng 1-1 trong 2 tuan toi.", "ACA", "normal"),
-        ("Tong hop phan hoi hoc vien thang nay",
-         "Gom phieu khao sat + gop y, phan loai va de xuat 3 diem can cai thien.", "Học vụ", "normal"),
-        ("Kiem tra thiet bi phong hoc truoc khai giang",
-         "May chieu, loa, dieu hoa cac phong - bao IT neu can sua.", "Cơ sở vật chất", "normal"),
-        ("Dang bai tuyen sinh khoa moi len fanpage",
-         "Bai gioi thieu khoa khai giang thang toi, kem uu dai dang ky som.", "Marketing", "normal"),
-        ("Ho tro truc tuyen sinh cuoi tuan",
-         "Nho ho tro truc quay tu van sang thu 7 (mot buoi), minh ban lich hop.", "Tư vấn", "normal"),
-        ("Ra soat cong no hoc phi qua han",
-         "Danh sach dang ky con no qua han - goi nhac va ghi lai lich hen thu.", "Kế toán", "urgent"),
-        ("Chuan bi bao cao ket qua thang cho hop giao ban",
-         "So lieu tuyen sinh, doanh thu, chuyen can - gui truoc hop 1 ngay.", "Ban Giám đốc", "high"),
-        ("Cap nhat giao an khoa 6.5 theo gop y giang vien",
-         "Bo sung phan Writing Task 2 vao buoi 8-10 theo de xuat cua to chuyen mon.", "ACA", "normal"),
-        ("Xu ly khieu nai muc cao con mo",
-         "Lien he hoc vien trong hom nay, ghi phuong an xu ly va bao lai.", "Học vụ", "urgent"),
-        ("Kiem tra lai danh sach lop sap khai giang",
-         "Doi chieu si so, phong hoc, giang vien phu trach truoc khi gui thong tin lop.", "Học vụ", "high"),
-        ("Nho check giup file du lieu truoc khi gui khach",
-         "Minh gui file bao cao, nho xem giup so lieu phan doanh thu co dung khong.", "Kế toán", "low"),
-        ("Sap xep lai kho tai lieu hoc thuat",
-         "Gom tai lieu tren Drive theo khoa, dat ten thong nhat de ai cung tim duoc.", "ACA", "low"),
-        ("Goi cham lai nhom khach da ngung",
-         "Nhom lead lost 30 ngay - goi lai theo kich ban reup, ghi ket qua vao he thong.", "Tư vấn", "normal"),
+        ("Gọi lại nhóm khách chưa kết nối được tuần này",
+         "Danh sách khách đã gọi 2 lần chưa gặp. Đổi khung giờ gọi (buổi tối) và nhắn Zalo trước khi gọi.", "Tư vấn", "high", "sales_staff"),
+        ("Chăm lại nhóm khách đã ngưng 30 ngày",
+         "Nhóm lead đã nguội - gọi lại theo kịch bản chăm lại, ghi kết quả vào hệ thống ngay sau cuộc gọi.", "Tư vấn", "normal", "sales_staff"),
+        ("Trực quầy tư vấn sáng thứ Bảy",
+         "Nhờ trực quầy tư vấn sáng thứ Bảy một buổi, mình bận lịch họp. Có 3 khách đã hẹn tới xem lớp.", "Tư vấn", "normal", "sales_leader"),
+        ("Chốt hồ sơ còn thiếu giấy tờ nhập học",
+         "Rà soát các hồ sơ xếp lớp còn thiếu giấy tờ, liên hệ phụ huynh bổ sung trong tuần.", "Học vụ", "normal", "academic_staff"),
+        ("Xử lý khiếu nại mức cao còn đang mở",
+         "Liên hệ học viên trong hôm nay, ghi phương án xử lý và báo lại trước giờ tan làm.", "Học vụ", "urgent", "academic_staff"),
+        ("Kiểm tra lại danh sách lớp sắp khai giảng",
+         "Đối chiếu sĩ số, phòng học, giảng viên phụ trách trước khi gửi thông tin lớp cho học viên.", "Học vụ", "high", "academic_manager"),
+        ("Tổng hợp phản hồi học viên tháng này",
+         "Gom phiếu khảo sát và góp ý, phân loại rồi đề xuất 3 điểm cần cải thiện.", "Học vụ", "normal", "academic_staff"),
+        ("Đối soát khoản thu tiền mặt cuối ngày",
+         "Đối soát phiếu thu tiền mặt với sổ quỹ, báo lệch (nếu có) trước 18h.", "Kế toán", "high", "accountant"),
+        ("Rà soát công nợ học phí quá hạn",
+         "Danh sách đăng ký còn nợ quá hạn - gọi nhắc và ghi lại lịch hẹn thu vào hồ sơ.", "Kế toán", "urgent", "accountant"),
+        ("Xem giúp số liệu doanh thu trước khi gửi khách",
+         "Mình gửi file báo cáo, nhờ xem giúp phần doanh thu có khớp sổ không rồi báo lại.", "Kế toán", "low", "accounting_manager"),
+        ("Chuẩn bị đề test đầu vào đợt mới",
+         "Rà soát ngân hàng đề, in 20 bộ cho tuần sau, kiểm tra lại file nghe trước khi dùng.", "ACA", "normal", "aca_manager"),
+        ("Viết nhận xét các buổi còn thiếu",
+         "Các buổi đã dạy nhưng chưa ghi nhận xét - hoàn thành để học viên và phụ huynh theo dõi được.", "ACA", "high", "teacher"),
+        ("Dạy thay buổi tối thứ Năm tuần này",
+         "Nhờ đứng lớp thay một buổi tối thứ Năm, giáo án và bài tập mình đã soạn sẵn trong hệ thống.", "ACA", "high", "teacher"),
+        ("Xếp buổi WOW cho học viên yếu Speaking",
+         "Lọc học viên điểm Speaking thấp, xếp buổi kèm riêng 1-1 trong 2 tuần tới.", "ACA", "normal", "wow_coach"),
+        ("Cập nhật giáo án khóa 6.5 theo góp ý giảng viên",
+         "Bổ sung phần Writing Task 2 vào buổi 8 đến buổi 10 theo đề xuất của tổ chuyên môn.", "ACA", "normal", "aca_manager"),
+        ("Sắp xếp lại kho tài liệu học thuật",
+         "Gom tài liệu trên Drive theo khóa, đặt tên thống nhất để ai cũng tìm được.", "ACA", "low", "teacher"),
+        ("Kiểm tra thiết bị phòng học trước khai giảng",
+         "Máy chiếu, loa, điều hòa các phòng - báo IT nếu cần sửa, xong trước ngày khai giảng.", "Cơ sở vật chất", "normal", "janitor"),
+        ("Rà soát lối thoát hiểm và bình chữa cháy",
+         "Kiểm tra hạn bình chữa cháy, lối thoát hiểm không bị chắn, chụp ảnh gửi lại.", "Cơ sở vật chất", "high", "security"),
+        ("Đăng bài tuyển sinh khóa mới lên fanpage",
+         "Bài giới thiệu khóa khai giảng tháng tới, kèm ưu đãi đăng ký sớm và nút nhắn tin.", "Marketing", "normal", "marketing_staff"),
+        ("Dựng lại bộ ảnh lớp học cho trang tuyển sinh",
+         "Chụp bổ sung 10 ảnh lớp đang học, xin phép học viên trước khi chụp.", "Marketing", "low", "marketing_staff"),
+        ("Sao lưu dữ liệu hệ thống tuần này",
+         "Chạy sao lưu bảng dữ liệu vận hành, kiểm tra file khôi phục mở được rồi báo lại.", "IT", "high", "it_staff"),
+        ("Cấp tài khoản cho 2 giảng viên mới",
+         "Tạo tài khoản, gán đúng quyền theo chức danh, gửi hướng dẫn đăng nhập cho hai bạn.", "IT", "normal", "it_staff"),
+        ("Chuẩn bị hợp đồng cho giảng viên mới",
+         "Soạn hợp đồng theo mẫu, hẹn ký trong tuần, lưu bản mềm vào hồ sơ nhân sự.", "Nhân sự", "normal", "hr_leader"),
+        ("Tổng hợp bảng công tháng cho khối giảng dạy",
+         "Cộng buổi dạy chính, buổi WOW và buổi dạy thay, đối chiếu với giáo vụ trước khi chốt.", "Nhân sự", "high", "hr_manager"),
+        ("Chuẩn bị báo cáo kết quả tháng cho họp giao ban",
+         "Số liệu tuyển sinh, doanh thu, chuyên cần - gửi trước cuộc họp 1 ngày.", "Ban Giám đốc", "high", "ceo"),
     ]
 
     rows = []
     n = 0
+
     def add(assigner, assignee, scen, ttype, status, req, due_off_h, created_off_h,
             related=None, decline=None, done_note=None, confirm_note=None):
         nonlocal n
@@ -121,6 +137,9 @@ def main():
             "title": scen[0],
             "content": scen[1],
             "related_type": "", "related_id": "", "related_name": "",
+            # QUYỀN TẠM theo việc: việc dính hồ sơ học viên thì người nhận phải được mở quyền,
+            # nhưng quyền phải CÓ HẠN và tự thu hồi - xem mục quyền tạm bên dưới.
+            "perm_level": "", "perm_until": "", "perm_revoked_at": "", "perm_note": "",
             "due_time": fmt(due),
             "task_status": {"new": "new (Mới giao)", "accepted": "accepted (Đã nhận)",
                             "done": "done (Báo xong)", "confirmed": "confirmed (Hoàn thành)",
@@ -135,13 +154,19 @@ def main():
             r["accepted_time"] = fmt(created + timedelta(hours=random.choice([1, 2, 3, 5])))
         if status in ("done", "confirmed"):
             r["done_time"] = fmt(min(NOW - timedelta(hours=1), due - timedelta(hours=random.choice([1, 4, 8]))))
-            r["done_note"] = done_note or "Da hoan thanh theo yeu cau, chi tiet ghi trong he thong."
+            r["done_note"] = done_note or "Đã hoàn thành theo yêu cầu, chi tiết ghi trong hệ thống."
         if status == "confirmed":
             r["confirm_time"] = fmt(NOW - timedelta(hours=random.choice([1, 2, 6])))
-            r["confirm_note"] = confirm_note or "Da kiem tra, dat yeu cau."
+            r["confirm_note"] = confirm_note or "Đã kiểm tra, đạt yêu cầu."
         if status == "declined":
-            r["decline_reason"] = decline or "Dang ban viec gap khac, xin chuyen nguoi khac ho tro."
-        return rows.append(r)
+            r["decline_reason"] = decline or "Đang bận việc gấp khác, xin chuyển người khác hỗ trợ."
+        # ĐÁNH DẤU CHỦ ĐÍCH: việc quá hạn mà chưa xong là kịch bản "cảnh báo đỏ" của màn Giao việc,
+        # không phải dữ liệu hỏng. Điền luôn số lần nhắc để màn nhắc việc có nội dung thật.
+        if status in ("new", "accepted") and due < NOW:
+            r["remind_count"] = "1"
+            r["remind_last"] = fmt(NOW - timedelta(hours=1))
+        rows.append(r)
+        return r
 
     def pick_related():
         c = random.random()
@@ -156,31 +181,50 @@ def main():
             return ("class", cl.get("class_id", ""), cl.get("class_name", ""))
         return None
 
-    # ---- 1. Giao xuong (cap tren -> cap duoi), phan lon BAT BUOC ----
-    downs = [s for s in staff if lvl(s.get("role")) == 0]
-    random.shuffle(downs)
-    plan_down = [
-        # (status, required, due_off_h, created_off_h)  -> tinh tu BAY GIO
-        ("new", True, 20, -2),          # moi giao, con han
-        ("new", True, -6, -30),         # QUA HAN chua nhan -> do
-        ("accepted", True, 30, -26),    # dang lam
-        ("accepted", True, -3, -50),    # QUA HAN dang lam -> do
-        ("done", True, 12, -48),        # bao xong, CHO CAP TREN XAC NHAN
-        ("done", True, 30, -40),        # cho xac nhan (2)
-        ("confirmed", True, -20, -96),  # da hoan thanh dung han
-        ("confirmed", True, -10, -80),
-        ("accepted", True, 6, -10),     # sap den han
-        ("new", True, 48, -1),
-    ]
-    for i, (st, req, due_h, cr_h) in enumerate(plan_down):
-        if i >= len(downs): break
-        who = downs[i]
-        bs = boss_of(who)
-        if not bs: continue
-        pool = [s for s in SCEN if s[2] == who.get("department")] or SCEN
-        add(bs, who, random.choice(pool), "assign", st, req, due_h, cr_h, related=pick_related())
+    def role_of(s):
+        return str(s.get("role") or "").split("(")[0].strip()
 
-    # ---- 2. Ngang cap (phoi hop) ----
+    # ---- 1. GIAO XUỐNG (cấp trên -> cấp dưới), phần lớn BẮT BUỘC ----
+    # Trước đây chỉ bốc ngẫu nhiên 10 nhân viên cấp 0 nên nhiều phòng ban / chức danh không bao
+    # giờ xuất hiện trong demo. Nay DUYỆT ĐỦ mọi phòng ban, mỗi phòng ít nhất một việc, và ưu
+    # tiên đúng chức danh mà kịch bản nhắm tới.
+    plan_down = [
+        ("new", True, 20, -2),          # mới giao, còn hạn
+        ("new", True, -6, -30),         # QUÁ HẠN chưa nhận -> đỏ
+        ("accepted", True, 30, -26),    # đang làm
+        ("accepted", True, -3, -50),    # QUÁ HẠN đang làm -> đỏ
+        ("done", True, 12, -48),        # báo xong, CHỜ CẤP TRÊN XÁC NHẬN
+        ("confirmed", True, -20, -96),  # đã hoàn thành đúng hạn
+        ("accepted", True, 6, -10),     # sắp đến hạn
+        ("new", True, 48, -1),
+        ("done", True, 30, -40),        # chờ xác nhận (2)
+        ("confirmed", True, -10, -80),
+        ("accepted", True, 54, -8), ("new", True, 26, -5), ("confirmed", True, -30, -110),
+        ("accepted", True, 18, -14), ("done", True, 40, -34), ("new", True, 72, -6),
+        ("accepted", True, 44, -22), ("confirmed", True, -40, -130),
+    ]
+    DEPTS = ["Tư vấn", "Học vụ", "Kế toán", "ACA", "Cơ sở vật chất", "Marketing", "IT",
+             "Nhân sự", "Ban Giám đốc"]
+    used_assignee = set()
+    k = 0
+    for dep in DEPTS:
+        pool = [x for x in SCEN if x[2] == dep] or SCEN
+        for scen in pool:
+            cands = [x for x in by_dep.get(dep, []) if role_of(x) == scen[4]] \
+                    or [x for x in by_dep.get(dep, []) if lvl(x.get("role")) == 0] \
+                    or by_dep.get(dep, [])
+            who = next((x for x in cands if x["staff_id"] not in used_assignee), cands[0] if cands else None)
+            if not who:
+                continue
+            bs = boss_of(who)
+            if not bs or bs["staff_id"] == who["staff_id"]:
+                continue
+            used_assignee.add(who["staff_id"])
+            st, req, due_h, cr_h = plan_down[k % len(plan_down)]
+            k += 1
+            add(bs, who, scen, "assign", st, req, due_h, cr_h, related=pick_related())
+
+    # ---- 2. NGANG CẤP (phối hợp) ----
     peers = {}
     for s in staff:
         peers.setdefault(lvl(s.get("role")), []).append(s)
@@ -189,18 +233,39 @@ def main():
     for st, req, due_h, cr_h in plan_peer:
         grp = peers.get(0, []) + peers.get(1, [])
         a, b = random.sample(grp, 2) if len(grp) > 2 else (None, None)
-        if not a: continue
-        pool = [s for s in SCEN if s[2] == a.get("department")] or SCEN
+        if not a:
+            continue
+        pool = [x for x in SCEN if x[2] == a.get("department")] or SCEN
         add(a, b, random.choice(pool), "peer", st, req, due_h, cr_h, related=pick_related(),
-            decline="Tuan nay minh dang chay chi tieu tuyen sinh, xin hen dau tuan sau.")
+            decline="Tuần này mình đang chạy chỉ tiêu tuyển sinh, xin hẹn đầu tuần sau.")
 
-    # ---- 3. Nho ho tro (khong bat buoc, co the tu cap duoi nho cap tren) ----
+    # ---- 3. NHỜ HỖ TRỢ (không bắt buộc, cấp dưới nhờ cấp trên cũng được) ----
     plan_sup = [("new", False, 30, -3), ("accepted", False, 50, -18), ("confirmed", False, -12, -70)]
     for st, req, due_h, cr_h in plan_sup:
         a, b = random.sample(staff, 2)
-        pool = [s for s in SCEN if s[3] == "low"] or SCEN
+        pool = [x for x in SCEN if x[3] == "low"] or SCEN
         add(a, b, random.choice(pool), "support", st, req, due_h, cr_h,
-            done_note="Da xem giup, co ghi chu lai vai diem can sua.")
+            done_note="Đã xem giúp, có ghi chú lại vài điểm cần sửa.")
+
+    # ---- 3b. QUYỀN TẠM THEO VIỆC (câu hỏi của Luân 28/07) ----
+    # Việc dính hồ sơ học viên thì người nhận PHẢI được mở quyền, nhưng quyền là thứ đi mượn:
+    # có MỨC rõ (chỉ xem / xem và sửa), có HẠN rõ (mặc định = hạn việc + số ngày ân hạn),
+    # và tự tắt khi việc được xác nhận xong. Không có hạn thì quyền mở ra là mở mãi.
+    GRACE_H = 48        # ân hạn sau hạn việc - app đọc qua tham số CH2 permGrace_hours
+    for r in rows:
+        if not r["related_id"]:
+            continue
+        st = r["task_status"].split("(")[0].strip()
+        due = datetime.strptime(r["due_time"], "%d/%m/%Y %H:%M")
+        # việc chỉ đi xem thông tin thì cho XEM; việc phải nhập liệu vào hồ sơ mới cho SỬA
+        need_edit = r["task_type"].startswith("assign") and r["required"] == "Có"
+        r["perm_level"] = "edit (Xem và sửa)" if need_edit else "view (Chỉ xem)"
+        r["perm_until"] = fmt(due + timedelta(hours=GRACE_H))
+        r["perm_note"] = ("Quyền tạm mở theo việc %s, tự thu hồi khi việc được xác nhận xong "
+                          "hoặc khi quá hạn quyền." % r["task_id"])
+        if st in ("confirmed", "declined", "cancelled"):
+            r["perm_revoked_at"] = r.get("confirm_time") or r["done_time"] or fmt(NOW - timedelta(hours=1))
+            r["perm_level"] = "none (Đã thu hồi)"
 
     dl["DL23"] = rows
 
@@ -208,16 +273,16 @@ def main():
     # Bang rieng theo dung luat "moi dong mot ban ghi, ma la dia chi" - de len Sheets van chay.
     TALK = {
         "new": [],
-        "accepted": [("assignee", "Em nhan viec nay a, em lam trong hom nay se bao lai anh/chi."),
-                     ("assigner", "Oke em, co gi vuong nhan lai ngay nhe.")],
-        "done": [("assignee", "Em nhan viec a."),
-                 ("assignee", "Em lam xong roi, ket qua em ghi trong phan bao xong nhe."),
-                 ("assigner", "De anh/chi xem lai roi xac nhan.")],
-        "confirmed": [("assignee", "Em nhan viec a."),
-                      ("assignee", "Da xong, nho anh/chi kiem tra giup."),
-                      ("assigner", "Da xem, dat yeu cau. Cam on em.")],
-        "declined": [("assignee", "Da anh/chi, tuan nay em ket viec qua, em xin phep tu choi."),
-                     ("assigner", "Oke, de minh nho ban khac ho tro.")],
+        "accepted": [("assignee", "Em nhận việc này ạ, em làm trong hôm nay rồi báo lại anh chị."),
+                     ("assigner", "Được em, có gì vướng thì nhắn lại ngay nhé.")],
+        "done": [("assignee", "Em nhận việc ạ."),
+                 ("assignee", "Em làm xong rồi, kết quả em ghi trong phần báo xong nhé."),
+                 ("assigner", "Để anh chị xem lại rồi xác nhận.")],
+        "confirmed": [("assignee", "Em nhận việc ạ."),
+                      ("assignee", "Dạ xong rồi, nhờ anh chị kiểm tra giúp em."),
+                      ("assigner", "Đã xem, đạt yêu cầu. Cảm ơn em.")],
+        "declined": [("assignee", "Dạ anh chị, tuần này em kẹt việc quá, em xin phép từ chối.")
+                     , ("assigner", "Được, để mình nhờ bạn khác hỗ trợ.")],
     }
     cmts = []
     cn = 0
@@ -241,8 +306,8 @@ def main():
     # them vai trao doi "hoi lai cho ro" o viec dang chay - dung kieu that hay gap
     live = [r for r in rows if r["task_status"].split("(")[0].strip() == "accepted"][:2]
     for r in live:
-        for who, txt in [("assignee", "Anh/chi oi, cai nay lam theo mau cu hay mau moi a?"),
-                         ("assigner", "Theo mau moi nhe em, file dinh kem trong SOP.")]:
+        for who, txt in [("assignee", "Anh chị ơi, cái này làm theo mẫu cũ hay mẫu mới ạ?"),
+                         ("assigner", "Theo mẫu mới nhé em, file đính kèm trong SOP.")]:
             cn += 1
             sid = r["assignee_id"] if who == "assignee" else r["assigner_id"]
             nm = r["assignee_id_name"] if who == "assignee" else r["assigner_id_name"]
