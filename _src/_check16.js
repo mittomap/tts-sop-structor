@@ -1293,7 +1293,23 @@ function stripOf(o){var i=o.indexOf('<div class="bstats"');if(i<0)return "";   /
   t("tong hoc vien theo co so khop voi ghi danh co lop that ("+sum+"/"+real+")", sum===real)})();
  /* (b) loc theo co so phai co o cac trang co du lieu theo co so */
  ["hocvien","nhaplead","lop","giangvien","nhanvien"].forEach(function(k){
-  t("trang "+k+" loc duoc theo co so", (FLTDEF[k]||[]).some(function(x){return x.col==="branch"}))});
+  /* V9.40: xet theo KHOA truc loc (x.k) chu khong theo ten cot (x.col) - truc "co so" cua trang
+     hoc vien nay la truc TINH (fxCalc), khong doc thang mot cot nao. Bat theo x.col la bat theo
+     cach cai dat chu khong phai theo cai ma nguoi dung nhin thay. */
+  t("trang "+k+" loc duoc theo co so", (FLTDEF[k]||[]).some(function(x){return x.k==="branch"}))});
+ /* V9.40 - va no phai RA SO DUNG. Truoc day loc thang tren DL09.branch (cot chi ghi mot lan luc
+    chuyen doi, khong bao gio doi): chon Co so 3 ra 0 nguoi du CS3 dang co 13 em va 4 lop, Co so 4
+    ra 0 du co 10 em. Tieu chi cu chi hoi "co truc loc khong", nen no van xanh suot. */
+ (function(){
+  var that={};rows("DL08").forEach(function(o){var c=find("DL10","class_id",o.class_id);
+   if(c&&!clsOnline(c)&&c.branch)that[c.branch]=(that[c.branch]||0)+1});
+  var hong=[];
+  Object.keys(that).forEach(function(b){
+   fltSt("hocvien").branch=[ecode(b)];
+   var n=fltApply("hocvien",rows("DL09")).length;
+   if(!n)hong.push((elabel(b)||b)+" co "+that[b]+" cho hoc ma loc ra 0")});
+  fltSt("hocvien").branch=null;
+  t("loc co so cua trang hoc vien ra dung so"+(hong.length?": "+hong.join("; "):""), hong.length===0)})();
  /* (c) hinh thuc hoc: lop online khong duoc rang buoc co so o BAT KY cho nao dung gvBackup */
  t("lop online khong bi rang buoc co so", rows("DL11").filter(function(x){
    var c=find("DL10","class_id",x.class_id)||{};if(!clsOnline(c))return false;
@@ -1355,12 +1371,22 @@ function stripOf(o){var i=o.indexOf('<div class="bstats"');if(i<0)return "";   /
  /* "da day xong" phai la DUNG MOT dinh nghia voi ho so giao vien - khong duoc dem kieu khac */
  t("dung chung dinh nghia buoi da day voi ho so GV", /isc\(x\.session_status,"completed"\)/.test(SRC));
  /* doi don gia thi tien doi theo */
- (function(){var c=(DATA.config.ch2||[]).filter(function(x){return x.name==="teacherPayPerSession"})[0];
-  var old=c.value;var t1=congThang(mo[0]).reduce(function(a,x){return a+x.tien},0);
-  c.value=String(num(old)*2);
-  var t2=congThang(mo[0]).reduce(function(a,x){return a+x.tien},0);
-  c.value=old;
-  t("doi don gia thi tien cong doi theo", t1>0&&t2===t1*2)})();
+ /* V9.40: bang cong nay co HAI don gia (buoi lop va buoi WOW 1-1). Thu tung don gia MOT: doi
+    don gia buoi lop thi phan tien buoi lop phai doi, phan WOW phai GIU NGUYEN - va nguoc lai.
+    Thu ca hai cung luc thi khong phan biet duoc don gia nao dang bi bo qua. */
+ (function(){
+  function tong(){return congThang(mo[0]).reduce(function(a,x){return a+x.tien},0)}
+  function nLop(){return congThang(mo[0]).reduce(function(a,x){return a+x.n},0)}
+  function nWow(){return congThang(mo[0]).reduce(function(a,x){return a+x.wow},0)}
+  function thu(ten,dem){
+   var c=(DATA.config.ch2||[]).filter(function(x){return x.name===ten})[0];
+   if(!c){t("co dong cau hinh "+ten, false);return}
+   var old=c.value,t1=tong(),n=dem();
+   c.value=String(num(old)+1000);
+   var t2=tong();c.value=old;
+   t("doi "+ten+" thi tien cong doi dung phan cua no ("+n+" buoi)", n>0&&t2-t1===n*1000)}
+  thu("teacherPayPerSession",nLop);
+  thu("wowPayPerSession",nWow)})();
  /* tach theo co so + lop online - lang kinh chi nhanh */
  (function(){window.STTAB="cong";var o=RENDER.dsthanhtoan();
   t("bang cong tach theo co so", /Chia theo cơ sở/.test(o));

@@ -2027,13 +2027,44 @@ function stuOwners(sid){if(!sid)return [];var o=[];
  var e=rows("DL06").filter(function(x){return x.student_id===sid})[0];
  if(e&&e.lead_id){var L=find("DL02","lead_id",e.lead_id);if(L)o.push(L.assigned_to)}
  return o}
-function recBranch(code,r){if(!r)return "";
- if(r.branch)return r.branch;
- if(code==="DL09"||code==="DL02")return r.branch||"";
- var sid=r.student_id,lid=r.lead_id;
- if(sid){var S=find("DL09","student_id",sid);if(S&&S.branch)return S.branch}
- if(lid){var L=find("DL02","lead_id",lid);if(L&&L.branch)return L.branch}
- return ""}
+/* ===== CƠ SỞ CỦA MỘT HỌC VIÊN: NƠI ĐĂNG KÝ **VÀ** NƠI ĐANG HỌC ===================
+   V9.40. DL09.branch được ghi ĐÚNG MỘT LẦN - lúc lead chuyển thành học viên, chép từ hồ sơ
+   lead - và không hàm nào trong 13.000 dòng ghi lại nó. Đo trên dữ liệu: 71/84 hồ sơ xếp lớp
+   có cơ sở của LỚP khác cơ sở ghi trong hồ sơ học viên. Hồ sơ HV chỉ tồn tại 3 giá trị (CS1,
+   CS2, Online) trong khi nơi học thật trải ra 5 chỗ. Hậu quả cụ thể: leader Cơ sở 3 lọc theo
+   cơ sở thấy 0 học viên, dù CS3 đang có 13 em và 4 lớp.
+   Chính app đã biết luật đúng - baocaoBranch() ghi rõ trong chú thích "quy về cơ sở của LỚP mà
+   học viên đang học, không quy về cơ sở ghi trong hồ sơ vì hồ sơ ghi nơi ĐĂNG KÝ còn tiền thì
+   theo nơi HỌC". Báo cáo làm đúng; tầng phân quyền thì dùng số kia.
+   Nay: một học viên thuộc về CẢ HAI - nơi đăng ký (người tư vấn cũ vẫn theo được) và nơi đang
+   học (học vụ cơ sở đó phải thấy). Lớp online không ràng buộc cơ sở nên không đóng góp gì. */
+var _sbC=null,_sbV=-1;
+function stuBranchTab(){
+ if(_sbC&&_sbV===DVER)return _sbC;
+ var CL={};rows("DL10").forEach(function(c){CL[c.class_id]=c});
+ var T={};
+ function put(sid,b){if(!sid||!b)return;(T[sid]||(T[sid]={}))[b]=1}
+ rows("DL09").forEach(function(s){put(s.student_id,s.branch)});
+ rows("DL08").forEach(function(o){var c=CL[o.class_id];if(!c||clsOnline(c))return;put(o.student_id,c.branch)});
+ _sbV=DVER;return (_sbC=T)}
+function stuBranches(sid){return stuBranchTab()[String(sid||"")]||{}}
+/* Cơ sở để HIỂN THỊ: nơi đang học nếu khác nơi đăng ký thì nói rõ cả hai. */
+function stuBranchText(s){if(!s)return "";
+ var reg=String(s.branch||""),all=Object.keys(stuBranches(s.student_id));
+ var hoc=all.filter(function(b){return b!==reg});
+ if(!reg&&!hoc.length)return "";
+ if(!hoc.length)return elabel(reg)||reg;
+ if(!reg)return "đang học tại "+hoc.map(function(b){return elabel(b)||b}).join(", ");
+ return "đăng ký "+(elabel(reg)||reg)+" · đang học tại "+hoc.map(function(b){return elabel(b)||b}).join(", ")}
+function recBranches(code,r){if(!r)return {};
+ var sid=r.student_id;
+ if(code==="DL09")return stuBranches(r.student_id);
+ if(sid&&!r.branch)return stuBranches(sid);
+ var o={};
+ if(r.branch){o[r.branch]=1;if(sid){var e=stuBranches(sid);for(var k in e)o[k]=1}return o}
+ var lid=r.lead_id;
+ if(lid){var L=find("DL02","lead_id",lid);if(L&&L.branch)o[L.branch]=1}
+ return o}
 /* gác cổng MỘT bản ghi */
 function canRow(code,r){var dom=DSDOM[code];if(!dom)return true;
  var lv=dsLevel(dom);
@@ -2043,7 +2074,9 @@ function canRow(code,r){var dom=DSDOM[code];if(!dom)return true;
  if(lv==="mine")return own.indexOf(CURSTAFF)>=0;
  var team=myTeam();
  for(var i=0;i<own.length;i++)if(team[own[i]])return true;
- var br=recBranch(code,r);return !!(br&&myBranches()[br])}
+ var br=recBranches(code,r),mine=myBranches();
+ for(var b in br)if(mine[b])return true;
+ return false}
 function srows(code){var a=rows(code);var dom=DSDOM[code];
  if(!dom||dsLevel(dom)==="all")return a;
  return a.filter(function(r){return canRow(code,r)})}
@@ -2267,7 +2300,15 @@ function fxCalc(k,t,getter,labeler){return {k:k,t:t,ty:"multi",col:null,get:gett
 
 /* --- khai cho từng trang. Thêm trang mới = thêm một dòng ở đây, không viết thêm giao diện --- */
 var FLTDEF={
- hocvien:[fxEnum("student_status","Trạng thái học viên"),fxEnum("branch","Cơ sở"),
+ /* V9.40 - "Cơ sở" của học viên lọc theo NƠI HỌC chứ không chỉ nơi ĐĂNG KÝ. Trước đây lọc thẳng
+    trên DL09.branch - cột chỉ được ghi một lần lúc chuyển đổi và không bao giờ đổi - nên chọn
+    Cơ sở 3 ra 0 người dù CS3 đang có 13 em, còn Cơ sở 4 ra 0 dù có 10 em. Một học viên đăng ký ở
+    CS1 rồi học lớp CS3 thì thuộc CẢ HAI: người tư vấn cũ vẫn theo được, học vụ CS3 vẫn thấy. */
+ hocvien:[fxEnum("student_status","Trạng thái học viên"),
+  fxCalc("branch","Cơ sở (đăng ký hoặc đang học)",
+   function(r){var b=Object.keys(stuBranches(r.student_id));return b.length?b.map(ecode):[ecode(r.branch)]},
+   function(v,all){for(var i=0;i<all.length;i++){var bs=Object.keys(stuBranches(all[i].student_id));
+    for(var j=0;j<bs.length;j++)if(ecode(bs[j])===v)return elabel(bs[j])||v}return v}),
   fxEnum("attendance_progress_status","Chuyên cần"),fxEnum("academic_progress_status","Học thuật"),
   fxCalc("_lop","Lớp đang học",function(r){var o=rows("DL08").filter(function(x){return x.student_id===r.student_id&&x.class_id});
    return o.length?o.map(function(x){return x.class_id}):[""]},
@@ -2815,6 +2856,8 @@ function openStuQuick(sid){var s=find("DL09","student_id",sid);if(!s){toast("Kh�
      (x.rem>0?(' · <b style="color:var(--red)">còn '+vnd(x.rem)+'</b>'):'')+'</div>'}).join("")
   : '<span class="mut">chưa có đăng ký</span>';
  h+=ctxRows([["SĐT",telHTML(s.phone_number)],
+  /* Nói rõ CẢ HAI cơ sở khi chúng khác nhau - hồ sơ ghi nơi đăng ký, lớp mới là nơi học thật */
+  ["Cơ sở",esc(stuBranchText(s))],
   [KL.length>1?("Khóa - lớp ("+KL.length+" đơn)"):"Khóa - lớp",klHTML],
   ["Công nợ",no>0?('<b style="color:var(--red)">'+vnd(no)+'</b>'+(KL.length>1?' <span class="mut">(cộng cả '+KL.length+' đơn)</span>':'')):'<span class="chip green">đã đóng đủ</span>'],
   ["Chuyên cần",st.rate!=null?st.rate+"% ("+st.pres+"/"+st.n+" buổi)":"chưa có buổi"],
@@ -3252,6 +3295,20 @@ function slaItems(){var out=jTasks();
  srows("DL14").forEach(function(w){var done=ecode(w.wow_status)==="completed";var note=!!(w.wow_content_note&&String(w.wow_content_note).trim());var age=hoursSince(w.wow_session_date);var over=done&&!note&&age!=null&&age>paramOf("slaWowNote_hours",24);
   if(over)add("WOW","Ghi nội dung WOW","red","ti-notes",w.student_name||w.student_id,"Buổi WOW chưa ghi nội dung (quá 24h)",age,"wow","note",{act:"wownote",rid:w.wow_id});
   else if(done&&!note)add("WOW","Ghi nội dung WOW","amber","ti-notes",w.student_name||w.student_id,"Buổi WOW chờ ghi nội dung",age,"wow","note",{act:"wownote",rid:w.wow_id})});
+ /* V9.40 - HAI HÀNG CHỜ WOW TRƯỚC ĐÂY KHÔNG AI CANH. Cả bộ máy chỉ sinh MỘT loại việc WOW
+    ("ghi nội dung sau buổi") - đo ra đúng 2 dòng. Còn 11 buổi đã đặt chưa xác nhận và 5 buổi
+    học viên không đến thì không sinh việc gì hết, dù buổi không đến đã TRỪ QUOTA của em rồi. */
+ (function(){var cf=paramOf("slaWowConfirm_hours",24);
+  srows("DL14").forEach(function(w){
+   if(isc(w.wow_status,"booked")){
+    var ab=hoursSince(w.booking_date),ov=ab!=null&&ab>cf;
+    add("WOW","Xác nhận buổi WOW mới đặt",ov?"red":"amber","ti-calendar-check",w.student_name||w.student_id,
+     (ov?"QUÁ HẠN XÁC NHẬN - ":"")+"Buổi "+(w.wow_session_date||"")+" chờ giáo viên WOW xác nhận (hạn "+cf+"h)",
+     ab,"wow","",{act:"wownote",rid:w.wow_id,hoso:w.student_id,prm:"slaWowConfirm_hours"})}
+   else if(isc(w.wow_status,"no_show")&&!String(w.wow_no_show_reason||"").trim())
+    add("WOW","HV không đến buổi WOW","amber","ti-user-x",w.student_name||w.student_id,
+     "Buổi "+(w.wow_session_date||"")+" em không đến mà chưa ghi lý do - quota đã trừ, hỏi rồi xếp bù",
+     hoursSince(w.wow_session_date),"wow","",{act:"wownote",rid:w.wow_id,hoso:w.student_id})})})();
  srows("DL17").forEach(function(c){if(isc(c.complaint_status,"resolved"))return;var sev=ecode(c.complaint_severity);var lim=sev==="high"?paramOf("slaComplaintHigh_hours",24):sev==="medium"?paramOf("slaComplaintMed_hours",48):paramOf("slaComplaintLow_hours",72);var age=hoursSince(c.complaint_time);var over=age!=null&&age>lim;
   add("CSKH","Xử lý khiếu nại",over?"red":"amber","ti-alert-triangle",c.student_id_name||c.student_id,(over?"Khiếu nại quá hạn xử lý":"Khiếu nại đang mở")+" · "+(elabel(c.complaint_severity)||sev),age,"khieunai",over?"overdue":"work",{act:"complaint",rid:c.complaint_id})});
  /* CHẤM BÀI - V9.40 gom theo (LỚP × BÀI), không phải mỗi học viên một dòng.
@@ -8064,6 +8121,7 @@ var APPPARAMS=[
  ["Xếp lịch & Giảng dạy","attendanceGrace_hours","Buổi dạy xong bao lâu thì BẮT BUỘC phải có điểm danh (trong khoảng này còn coi là hàng chờ)","giờ",24],
  ["Xếp lịch & Giảng dạy","homeworkDueFallback_days","Hạn nộp bài mặc định khi giáo án không ghi rõ (tính từ ngày học)","ngày",5],
  ["Tiền - Công giảng dạy","teacherPayPerSession","Tiền công một buổi dạy (dùng để tạm tính bảng công tháng)","đ/buổi",250000],
+ ["Tiền - Công giảng dạy","wowPayPerSession","Tiền công một buổi WOW 1-1 (buổi kèm riêng, tính tách khỏi buổi lớp)","đ/buổi",250000],
  ["Học tập - WOW","wowGrantMax_perTime","Mỗi lần cấp thêm tối đa bao nhiêu lượt WOW cho một học viên","lượt",3],
  ["Hẹn & Chăm sóc","apptSoon_hours","Nút hẹn nhanh \"N tiếng nữa\" - N là bao nhiêu","giờ",2],
  ["Hẹn & Chăm sóc","apptMorning_hour","Giờ hẹn buổi sáng dùng cho các nút gợi ý","giờ trong ngày",9],
@@ -8093,6 +8151,7 @@ var APPPARAMS=[
  ["Học vụ - Lớp học","slaAttendanceGate_minutes","Cổng điểm danh mở bao nhiêu phút TRƯỚC giờ học (GV bấm Bắt đầu lớp trong khoảng này)","phút",20],
  ["Học vụ - Lớp học","thresholdAtRisk_absences","Vắng không phép bao nhiêu buổi -> HV có nguy cơ chuyên cần","buổi",2],
  ["Học vụ - Lớp học","thresholdAtRisk_hw_missing","Thiếu bài tập bao nhiêu lần -> HV có nguy cơ học thuật","lần",3],
+ ["Học vụ - Lớp học","slaWowConfirm_hours","Hạn giáo viên WOW xác nhận một buổi vừa được đặt","giờ",24],
  ["Học vụ - Lớp học","riskIgnore_days","Học vụ xem rồi bấm 'tạm bỏ qua' thì máy im bao nhiêu ngày trước khi nhắc lại","ngày",14],
  ["Học vụ - Lớp học","thresholdClassStart_days","Còn bao nhiêu ngày tới khai giảng thì lớp vào diện theo dõi sĩ số","ngày",14],
  ["Học vụ - Lớp học","classMinStudents","Sĩ số tối thiểu để một lớp khai giảng - dưới mức này phải quyết dồn lớp, lùi ngày hoặc hủy sớm","học viên",6],
@@ -10866,13 +10925,39 @@ function renderHtToday(embed){
  h+='<div class="obcards" style="padding:12px">';
  ses.forEach(function(x){var sp=sesPlan(x);var d=pvnd(x.session_date);
   var hhmm=d?(("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)):"";
+  var c=find("DL10","class_id",x.class_id)||{};
   h+='<div class="obcard"><div class="obh"><div><b>'+esc(hhmm)+' · '+lopLnk(x.class_id,x.class_id_name,"")+'</b>'+
    '<div class="obm">Buổi '+esc(x.session_number||"?")+(sp.topic?' · '+esc(sp.topic):'')+'</div></div>'+
    '<span class="chip '+stCls(x.session_status)+'">'+esc(elabel(x.session_status)||"")+'</span></div>';
+  /* V9.40 - HÔM NAY DẠY Ở ĐÂU. 6/7 giáo viên có lịch ở nhiều hơn một cơ sở (NV005: 73 buổi
+     Cơ sở 1 + 24 Cơ sở 4 + 30 online). Thẻ này in giờ, tên lớp, chủ đề, bài sẽ giao, lời dặn -
+     mà KHÔNG in cơ sở, không in phòng, và lớp online cũng không in link Zoom, dù dữ liệu có sẵn.
+     Đó đúng là thông tin duy nhất giáo viên cần trước khi ra khỏi nhà. */
+  h+='<div class="obm2"><i class="ti ti-map-pin" style="margin-right:5px"></i>'+
+   (clsOnline(c)
+    ? ('<span class="chip blue">Online</span> '+(/^https?:/i.test(String(c.venue_or_zoom_link||""))
+        ? '<a href="'+esc(c.venue_or_zoom_link)+'" target="_blank" rel="noopener">Mở link phòng học</a>'
+        : '<span class="mut">chưa có link phòng học - hỏi học vụ trước giờ dạy</span>'))
+    : ('<b>'+esc(elabel(c.branch)||c.branch||"chưa ghi cơ sở")+'</b>'+
+       (roomOf(c)?(' · '+esc(roomOf(c))):' · <span class="mut">chưa ghi phòng</span>')))+'</div>';
   if(sp.hw)h+='<div class="obm2">Bài sẽ giao: '+esc(sp.hw.title||"")+(sp.hwFrom?' <span class="mut">(theo '+esc(sp.hwFrom)+')</span>':'')+'</div>';
   if(sp.note)h+='<div class="obm2">Lời dặn: '+esc(sp.note)+'</div>';
   h+='<div class="obact"><button class="btn primary sm" onclick="goDD(\''+esc(x.class_id)+'\',\''+esc(x.session_id)+'\')"><i class="ti ti-checkbox"></i>Vào lớp / điểm danh</button></div></div>'});
  h+='</div></div>';
+ /* V9.40 - BUỔI WOW HÔM NAY. Thanh chỉ số đã ĐẾM buổi WOW từ lâu nhưng không có panel nào liệt
+    kê và không có nút nào bấm - ba panel bên dưới đều lọc DL11/DL13 theo teacher_id, mà giáo
+    viên WOW (wow_coach) có 0 dòng ở cả hai bảng đó. Nghĩa là coach mở app buổi sáng thì màn
+    hình nói với họ "hôm nay anh hết việc", trong khi họ sở hữu toàn bộ 70 buổi WOW của trung tâm. */
+ h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-star" style="margin-right:6px"></i>Buổi WOW hôm nay ('+wowT.length+')</b><div class="mini"><button class="pill" onclick="go(\'wow\')">Mở trang WOW</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Học viên</th><th>Kỹ năng</th><th>Trọng tâm</th><th>Trạng thái</th><th></th></tr></thead><tbody>';
+ if(!wowT.length)h+='<tr><td class="empty" colspan="6">Hôm nay không có buổi WOW nào'+(gid?' của người này':'')+'.</td></tr>';
+ wowT.sort(function(a,b){return (pvnd(a.wow_session_date)||0)-(pvnd(b.wow_session_date)||0)});
+ wowT.forEach(function(w){var d=pvnd(w.wow_session_date);
+  h+='<tr><td>'+esc(d?hhmmOf(d):"")+'</td><td>'+nguoiLnk(w.student_id,w.student_name,w.student_id)+'</td>'+
+   '<td>'+esc(elabel(w.wow_skill)||w.wow_skill||"-")+'</td>'+
+   '<td style="white-space:normal">'+esc(w.wow_content_focus||w.notes||"-")+'</td>'+
+   '<td><span class="chip '+stCls(w.wow_status)+'">'+esc(elabel(w.wow_status)||"")+'</span></td>'+
+   '<td><button class="btn sm primary" onclick="wowNote(\''+esc(w.wow_id)+'\')"><i class="ti ti-writing"></i>Ghi nội dung buổi</button></td></tr>'});
+ h+='</tbody></table></div></div>';
  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-book" style="margin-right:6px"></i>Bài chờ chấm ('+hwQ.length+')</b></div><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Bài</th><th>Lớp</th><th>Nộp lúc</th><th></th></tr></thead><tbody>';
  if(!hwQ.length)h+='<tr><td class="empty" colspan="5">Không còn bài chờ chấm - tốt!</td></tr>';
  hwQ.slice(0,12).forEach(function(x){
@@ -11096,7 +11181,72 @@ function renderGvdp(embed){
    '<td>'+esc(elabel(g.branch)||g.branch||"-")+'</td>'+
    '<td style="font-size:11.5px">'+esc(brs.join(" · ")||"-")+'</td>'+
    '<td>'+(nb?'<span class="chip amber">'+nb+' buổi</span>':'<span class="chip green">trống</span>')+'</td></tr>'});
- return h+'</tbody></table></div></div>'}
+ h+='</tbody></table></div></div>';
+ return h+gvTaiHTML()}
+/* ===== TẢI GIẢNG VIÊN CẢ ĐỘI =======================================================
+   V9.40. App xem được từng giáo viên một (hồ sơ giảng viên rất đầy đủ) và xem được MỘT NGÀY
+   (bảng dự phòng ở trên), nhưng không có chỗ nào so ngang cả đội theo kỳ. Đo trên dữ liệu:
+   30 ngày tới có 67 buổi cho 10 giảng viên - chia đều là 6,7 buổi/người - mà NV005 ôm 25 buổi
+   (37%), còn NV036 đang "đang làm việc" từ 04/2025 mà 15 tháng KHÔNG một buổi nào trong lịch.
+   Trong khi đó lớp lên kế hoạch tháng 9 vẫn tiếp tục gán cho NV005.
+   Không ai cố ý làm vậy - chỉ là không có màn nào cho thấy. Đây là tiền lương đang trả cho
+   người không dạy, và là người sắp gãy vì ôm quá nhiều. */
+function gvTaiKy(){var k=num(window.GVTAIKY)||30;return k}
+function gvTaiSet(n){window.GVTAIKY=num(n)||30;reRender(CUR)}
+function gvTaiRows(){
+ var ky=gvTaiKy(),t0=new Date();t0.setHours(0,0,0,0);var t1=t0.getTime()+ky*864e5;
+ var GV=rows("DL01").filter(isGVRole);
+ var CL={};rows("DL10").forEach(function(c){CL[c.class_id]=c});
+ var M={};GV.forEach(function(g){M[g.staff_id]={g:g,toi:0,daDay:0,tre:0,coNX:0,xongNX:0,lop:{},cs:{}}});
+ rows("DL11").forEach(function(x){
+  var id=String(x.teacher_id||"");if(!M[id])return;var m=M[id];
+  if(isc(x.session_status,"cancelled"))return;
+  var d=pvnd(x.session_date);if(!d)return;
+  var c=CL[x.class_id]||{};
+  if(d.getTime()>=t0.getTime()&&d.getTime()<t1){m.toi++;m.lop[x.class_id]=1;
+   m.cs[clsOnline(c)?"online":(c.branch||"?")]=1}
+  if(isc(x.session_status,"completed")){m.daDay++;
+   if(num(x.teacher_late_minutes)>0)m.tre++;
+   m.coNX++;if(bhState(x).note)m.xongNX++}});
+ rows("DL10").forEach(function(c){var id=String(c.main_teacher_id||"");
+  if(M[id]&&!/finished|cancelled/.test(ecode(c.class_status)))M[id].lop[c.class_id]=1});
+ return GV.map(function(g){var m=M[g.staff_id];
+  return {id:g.staff_id,ten:g.full_name||g.staff_id,vai:elabel(g.role)||g.role||"",
+   cs:elabel(g.branch)||g.branch||"-",toi:m.toi,daDay:m.daDay,tre:m.tre,
+   lop:Object.keys(m.lop).length,noi:Object.keys(m.cs).length,
+   tnr:m.coNX?Math.round(m.xongNX/m.coNX*100):null}})
+  .sort(function(a,b){return b.toi-a.toi||b.daDay-a.daDay})}
+function gvTaiHTML(){
+ var L=gvTaiRows(),ky=gvTaiKy();
+ var tong=L.reduce(function(a,x){return a+x.toi},0);
+ var deu=L.length?tong/L.length:0;
+ var trong=L.filter(function(x){return !x.toi}).length;
+ var top=L[0];
+ var h='<div class="panel" style="margin-top:14px"><div class="ph"><b><i class="ti ti-scale" style="margin-right:6px"></i>Tải giảng viên '+ky+' ngày tới</b>'+
+  '<span class="mut" style="font-size:11.5px">chia đều là '+(Math.round(deu*10)/10)+' buổi/người'+
+  (top&&tong?(' · nhiều nhất '+esc(top.ten)+' ôm '+Math.round(top.toi/tong*100)+'%'):'')+
+  (trong?(' · '+trong+' người không có buổi nào'):'')+'</span>'+
+  '<div class="mini">'+[30,60,90].map(function(n){return '<button class="pill'+(n===ky?" on":"")+'" onclick="gvTaiSet('+n+')">'+n+' ngày</button>'}).join("")+'</div></div>'+
+  '<div class="tbwrap"><table class="dt"><thead><tr><th>Giảng viên</th><th>Cơ sở</th><th>Buổi '+ky+' ngày tới</th><th>So với mức đều</th><th>Lớp đang giữ</th><th>Nơi dạy</th><th>Đã dạy (tổng)</th><th>Trễ giờ</th><th>Tỷ lệ có nhận xét</th><th></th></tr></thead><tbody>';
+ if(!L.length)h+='<tr><td class="empty" colspan="10">Chưa có giảng viên nào.</td></tr>';
+ L.forEach(function(x){
+  var tl=deu?x.toi/deu:0;
+  var chip=!x.toi?'<span class="chip red">trống hoàn toàn</span>':
+   tl>=1.6?'<span class="chip red">quá tải '+Math.round(tl*100)+'%</span>':
+   tl<=0.5?'<span class="chip amber">nhẹ '+Math.round(tl*100)+'%</span>':
+   '<span class="chip green">'+Math.round(tl*100)+'%</span>';
+  var tnrOK=x.tnr==null?null:(x.tnr/100>=kpiTh(/^TNR/,0.9));
+  h+='<tr><td>'+nsLnk(x.id,x.ten,"")+' <span class="mut" style="font-size:11px">'+esc(x.vai)+'</span></td>'+
+   '<td>'+esc(x.cs)+'</td><td><b>'+x.toi+'</b></td><td>'+chip+'</td>'+
+   '<td>'+x.lop+'</td><td>'+(x.noi||"-")+'</td><td>'+x.daDay+'</td>'+
+   '<td>'+(x.tre?'<span class="chip amber">'+x.tre+'</span>':'0')+'</td>'+
+   '<td>'+(x.tnr==null?'<span class="mut">chưa có buổi</span>':('<span class="chip '+(tnrOK?"green":"red")+'">'+x.tnr+'%</span>'))+'</td>'+
+   '<td><button class="btn sm" onclick="openGV(\''+esc(x.id)+'\')"><i class="ti ti-eye"></i>Hồ sơ giảng viên</button></td></tr>'});
+ h+='</tbody></table></div><div class="mut" style="font-size:11.5px;padding:11px 16px;line-height:1.7">'+
+  '"Nơi dạy" đếm số cơ sở khác nhau người đó có buổi trong kỳ - lớp online tính là một nơi riêng và không ràng buộc cơ sở. '+
+  'Ngưỡng tỷ lệ có nhận xét lấy từ '+kpiChip(/^TNR/,0.9,1)+'. '+
+  'Người đang <b>trống hoàn toàn</b> là chỗ nhận được lớp mới mà không phải tuyển thêm ai.</div></div>';
+ return h}
 /* ═══════ V9.29r - ĐỤNG PHÒNG / ĐỤNG GIỜ (việc tồn đợt 2 - khối xếp lịch) ═══════
    Lịch tuần trước đây chỉ soi TRÙNG GIỜ CỦA MỘT NGƯỜI. Ba loại đụng còn lại chưa ai canh:
      (1) hai lớp khác nhau xếp CÙNG MỘT PHÒNG cùng khung giờ - lớp thứ hai tới nơi không có chỗ;
@@ -12463,19 +12613,31 @@ function tkReport(){var all=srows("DL23");
    Nói thẳng giới hạn: bản demo CHƯA có bảng lương, nên màn này TÍNH và ĐỐI CHIẾU chứ không "chốt"
    vào đâu cả. Ghi rõ ra màn hình còn hơn dựng một nút "Chốt công" bấm xong không đi đâu. */
 function payRate(){return num(paramOf("teacherPayPerSession",250000))||0}
+/* V9.40: bảng công GỘP CẢ giáo viên WOW. Trước đây lọc người bằng isGVRole() - biểu thức
+   /teacher|giang/ không khớp mã vai trò wow_coach - nên 51 buổi WOW đã hoàn thành KHÔNG vào
+   bảng công nào cả, và WOW Leader phải cộng tay cuối tháng. Buổi WOW là buổi 1-1 nên tính công
+   riêng: đơn giá lấy từ wowPayPerSession, mặc định bằng đơn giá buổi thường. */
+function isCongRole(s){return isGVRole(s)||/wow/.test(ecode(s&&s.role))}
+function wowRate(){return num(paramOf("wowPayPerSession",payRate()))||payRate()}
 function congThang(ym){
- var GV=rows("DL01").filter(isGVRole);
+ var GV=rows("DL01").filter(isCongRole);
+ function inYM(v){var d=pvnd(v);if(!d)return false;
+  return (d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2))===ym}
  var out=GV.map(function(g){
   var ses=rows("DL11").filter(function(x){
    if(String(x.teacher_id||"")!==g.staff_id||!isc(x.session_status,"completed"))return false;
-   var d=pvnd(x.session_date);if(!d)return false;
-   return (d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2))===ym});
+   return inYM(x.session_date)});
+  var wow=rows("DL14").filter(function(w){
+   if(String(w.staff_id||"")!==g.staff_id||!isc(w.wow_status,"completed"))return false;
+   return inYM(w.wow_session_date)});
   var late=ses.filter(function(x){return num(x.teacher_late_minutes)>0});
-  var noNote=ses.filter(function(x){return !bhState(x).note});
+  var noNote=ses.filter(function(x){return !bhState(x).note})
+   .concat(wow.filter(function(w){return !String(w.wow_content_note||"").trim()}));
   var brs={};ses.forEach(function(x){var c=find("DL10","class_id",x.class_id);if(c&&c.branch)brs[c.branch]=(brs[c.branch]||0)+1});
   var onl=ses.filter(function(x){return clsOnline(find("DL10","class_id",x.class_id)||{})}).length;
-  return {g:g,n:ses.length,late:late.length,noNote:noNote.length,brs:brs,onl:onl,tien:ses.length*payRate()}});
- out.sort(function(a,b){return b.n-a.n});
+  return {g:g,n:ses.length,wow:wow.length,late:late.length,noNote:noNote.length,brs:brs,onl:onl,
+   tien:ses.length*payRate()+wow.length*wowRate()}});
+ out.sort(function(a,b){return (b.n+b.wow)-(a.n+a.wow)});
  return out}
 function congMonths(){
  var m={};rows("DL11").forEach(function(x){if(!isc(x.session_status,"completed"))return;
@@ -12486,32 +12648,34 @@ function renderCong(){
  var mo=congMonths();
  var ym=window.CONGM||mo[0]||"";
  var L=fltApply("cong",congThang(ym).map(function(x){return {ma:x.g.staff_id,ten:x.g.full_name,
-   co_so:elabel(x.g.branch)||x.g.branch||"",buoi:x.n,online:x.onl,tre:x.late,chua_nhan_xet:x.noNote,
-   tien_cong:x.tien,_x:x}}).filter(function(r){return r.buoi})).map(function(r){return r._x});
- var tot=L.reduce(function(a,x){return a+x.n},0),tien=L.reduce(function(a,x){return a+x.tien},0);
+   co_so:elabel(x.g.branch)||x.g.branch||"",buoi:x.n,buoi_wow:x.wow,online:x.onl,tre:x.late,chua_nhan_xet:x.noNote,
+   tien_cong:x.tien,_x:x}}).filter(function(r){return r.buoi||r.buoi_wow})).map(function(r){return r._x});
+ var tot=L.reduce(function(a,x){return a+x.n},0),totW=L.reduce(function(a,x){return a+x.wow},0),tien=L.reduce(function(a,x){return a+x.tien},0);
  var noNote=L.reduce(function(a,x){return a+x.noNote},0);
  var h='<div class="notebar"><i class="ti ti-info-circle"></i><b>Bản demo chưa nối bảng lương</b> - màn này TÍNH và ĐỐI CHIẾU công, không ghi vào đâu cả. Đơn giá mỗi buổi lấy từ cấu hình: '+slaChip("teacherPayPerSession",250000,"đ/buổi")+'. Căn cứ tính: buổi có trạng thái <b>đã dạy xong</b> - đúng một định nghĩa với KPI và với hồ sơ giáo viên.</div>';
  h+=statStrip([
-  ["ti-school",tot,"Buổi đã dạy trong tháng","#3B82C4",L.length+" giáo viên"],
-  ["ti-report-money",vnd(tien),"Tiền công tạm tính","#0D9488",vnd(payRate())+"/buổi"],
+  ["ti-school",tot,"Buổi lớp đã dạy trong tháng","#3B82C4",L.length+" người có công"],
+  ["ti-star",totW,"Buổi WOW 1-1 đã dạy","#DB2777",vnd(wowRate())+"/buổi"],
+  ["ti-report-money",vnd(tien),"Tiền công tạm tính","#0D9488",vnd(payRate())+"/buổi lớp"],
   ["ti-writing",noNote,"Buổi chưa ghi nhận xét","#E08A1E",noNote?"đối chiếu trước khi chốt":"đã đủ nhận xét"],
   ["ti-clock",L.reduce(function(a,x){return a+x.late},0),"Buổi vào trễ giờ","#E24B4A","ảnh hưởng KPI ADC"]]);
  h+=tbar('<span class="tblbl">Tháng</span><select class="sel" onchange="congSet(this.value)">'+
   mo.map(function(k){return '<option value="'+esc(k)+'"'+(k===ym?" selected":"")+'>'+esc(k.split("-")[1]+"/"+k.split("-")[0])+'</option>'}).join("")+'</select>',
-  '<span class="tbcnt">'+L.filter(function(x){return x.n}).length+' GV có công</span>');
- h+=pgBar("cong",L.filter(function(x){return x.n}).length);
- h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Giáo viên</th><th>Cơ sở</th><th>Buổi đã dạy</th><th>Chia theo cơ sở</th><th>Trong đó online</th><th>Vào trễ</th><th>Chưa ghi nhận xét</th><th>Tiền công tạm tính</th></tr></thead><tbody>';
- if(!L.filter(function(x){return x.n}).length)h+='<tr><td class="empty" colspan="8">Tháng này chưa có buổi dạy nào hoàn thành.</td></tr>';
- L.forEach(function(x){if(!x.n)return;
+  '<span class="tbcnt">'+L.filter(function(x){return x.n||x.wow}).length+' người có công</span>');
+ h+=pgBar("cong",L.filter(function(x){return x.n||x.wow}).length);
+ h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Người dạy</th><th>Cơ sở</th><th>Buổi lớp</th><th>Buổi WOW 1-1</th><th>Chia theo cơ sở</th><th>Trong đó online</th><th>Vào trễ</th><th>Chưa ghi nội dung</th><th>Tiền công tạm tính</th></tr></thead><tbody>';
+ if(!L.filter(function(x){return x.n||x.wow}).length)h+='<tr><td class="empty" colspan="9">Tháng này chưa có buổi dạy nào hoàn thành.</td></tr>';
+ L.forEach(function(x){if(!x.n&&!x.wow)return;
   h+='<tr><td>'+nsLnk(x.g.staff_id,x.g.full_name,"")+'</td>'+
    '<td>'+esc(elabel(x.g.branch)||x.g.branch||"-")+'</td>'+
    '<td><b>'+x.n+'</b></td>'+
+   '<td>'+(x.wow?'<span class="chip" style="background:#FCE7F3;color:#9D174D">'+x.wow+'</span>':'<span class="mut">0</span>')+'</td>'+
    '<td style="font-size:11.5px">'+esc(Object.keys(x.brs).map(function(b){return (elabel(b)||b)+" ("+x.brs[b]+")"}).join(" · ")||"-")+'</td>'+
    '<td>'+(x.onl?'<span class="chip blue">'+x.onl+'</span>':'<span class="mut">0</span>')+'</td>'+
    '<td>'+(x.late?'<span class="chip amber">'+x.late+'</span>':'0')+'</td>'+
    '<td>'+(x.noNote?'<span class="chip red">'+x.noNote+'</span>':'<span class="chip green">0</span>')+'</td>'+
    '<td style="font-variant-numeric:tabular-nums"><b>'+vnd(x.tien)+'</b></td></tr>'});
- h+='<tr style="background:#F4F7FA;font-weight:800"><td colspan="2">TỔNG</td><td>'+tot+'</td><td colspan="3"></td><td>'+noNote+'</td><td style="font-variant-numeric:tabular-nums">'+vnd(tien)+'</td></tr>';
+ h+='<tr style="background:#F4F7FA;font-weight:800"><td colspan="2">TỔNG</td><td>'+tot+'</td><td>'+totW+'</td><td colspan="3"></td><td>'+noNote+'</td><td style="font-variant-numeric:tabular-nums">'+vnd(tien)+'</td></tr>';
  return h+'</tbody></table></div></div>'}
 /* ===== SỔ THU HỌC PHÍ: tab ĐÃ THU (DL07) + tab DỰ THU (DL06b) ===== */
 function sothuTab(k){window.STTAB=k;reRender("dsthanhtoan")}
@@ -12684,6 +12848,21 @@ var NHIP={
    function(){return rows("DL11").filter(function(x){return String(x.teacher_id||"")===(CURSTAFF||"")&&bhState(x).done&&!bhState(x).note}).length}],
   ["chieu","Chấm bài học viên đã nộp","Bài nộp mà không chấm thì lần sau các em không nộp nữa","baitap",
    function(){return rows("DL13").filter(function(x){return String(x.teacher_id||"")===(CURSTAFF||"")&&hwSubmitted(x)&&!hwGraded(x)}).length}]],
+ /* V9.40 - NHỊP NGÀY CỦA GIÁO VIÊN WOW. Trước đây họ dùng chung nhịp với giáo viên đứng lớp,
+    mà mọi dòng ở đó lọc DL11/DL13 theo teacher_id nên với họ dòng nào cũng bằng 0. Bốn dòng
+    dưới đây lọc DL14 theo staff_id - đúng bảng họ thật sự làm việc. */
+ wow:[
+  ["sang","Xem buổi WOW hôm nay","Buổi 1-1 mà không xem trước thì vào lớp mới biết em này yếu gì","hoctap",
+   function(){var t=new Date();return rows("DL14").filter(function(w){var d=pvnd(w.wow_session_date);
+    return d&&sameDay(d,t)&&String(w.staff_id||"")===(CURSTAFF||"")&&!isc(w.wow_status,"cancelled")}).length}],
+  ["sang","Xác nhận các buổi mới được đặt","Chưa xác nhận thì học viên không biết có buổi hay không","wow",
+   function(){return rows("DL14").filter(function(w){return String(w.staff_id||"")===(CURSTAFF||"")&&isc(w.wow_status,"booked")}).length}],
+  ["chieu","Ghi nội dung buổi vừa dạy","Không ghi thì giáo viên chủ nhiệm không biết đã kèm gì","wow",
+   function(){return rows("DL14").filter(function(w){return String(w.staff_id||"")===(CURSTAFF||"")&&
+    isc(w.wow_status,"completed")&&!String(w.wow_content_note||"").trim()}).length}],
+  ["chieu","Gọi lại học viên không đến buổi WOW","Buổi đã trừ quota mà em không đến - hỏi rồi xếp bù","wow",
+   function(){return rows("DL14").filter(function(w){return String(w.staff_id||"")===(CURSTAFF||"")&&
+    isc(w.wow_status,"no_show")&&!String(w.wow_no_show_reason||"").trim()}).length}]],
  ketoan:[
   ["sang","Đối soát khoản thu hôm qua","Chưa đối soát thì chưa phải tiền vào két","duyetthu",
    function(){return duyPayList().length}],
@@ -12750,7 +12929,12 @@ function nhipKey(){
  if(/ceo|smanager|amanager/.test(r))return "quanly";
  if(/^sales/.test(r))return "tuvan";
  if(/academic/.test(r))return "hocvu";
- if(/teacher|wow/.test(r))return "giaovien";
+ /* V9.40: giáo viên WOW TÁCH RIÊNG. Trước đây gộp vào nhóm "giaovien", nhưng cả 4 dòng nhịp của
+    nhóm đó đều lọc DL11/DL13 theo teacher_id - mà wow_coach có 0 dòng ở cả hai bảng. Kết quả:
+    mở app buổi sáng thấy 4 dòng đều bằng 0, tức app nói "hôm nay anh hết việc" với đúng người
+    đang giữ toàn bộ 70 buổi WOW của trung tâm. */
+ if(/wow/.test(r))return "wow";
+ if(/teacher/.test(r))return "giaovien";
  if(/account/.test(r))return "ketoan";
  return CURSTAFF?"":"quanly"}          /* chưa gắn nhân viên (quản trị demo) -> xem nhịp quản lý */
 /* Hai loại nhịp - KHÔNG được trộn:
