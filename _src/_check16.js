@@ -1371,25 +1371,64 @@ function stripOf(o){var i=o.indexOf('<div class="bstats"');if(i<0)return "";   /
  /* "da day xong" phai la DUNG MOT dinh nghia voi ho so giao vien - khong duoc dem kieu khac */
  t("dung chung dinh nghia buoi da day voi ho so GV", /isc\(x\.session_status,"completed"\)/.test(SRC));
  /* doi don gia thi tien doi theo */
- /* V9.40: bang cong nay co HAI don gia (buoi lop va buoi WOW 1-1). Thu tung don gia MOT: doi
-    don gia buoi lop thi phan tien buoi lop phai doi, phan WOW phai GIU NGUYEN - va nguoc lai.
-    Thu ca hai cung luc thi khong phan biet duoc don gia nao dang bi bo qua. */
+ /* V9.40 (anh Luan chot 29/07): cong giang day tinh theo GIO, don gia tra theo
+    (giang vien x loai ngay x ca). Buoi WOW 1-1 van tinh theo BUOI vi so WOW khong co gio vao -
+    gio ra de nhan. Thu TUNG lop mot chu khong thu ca cum: thu ca cum thi khong biet lop nao
+    dang bi bo qua. */
  (function(){
   function tong(){return congThang(mo[0]).reduce(function(a,x){return a+x.tien},0)}
-  function nLop(){return congThang(mo[0]).reduce(function(a,x){return a+x.n},0)}
+  function gioLop(){return congThang(mo[0]).reduce(function(a,x){return a+x.gio},0)}
   function nWow(){return congThang(mo[0]).reduce(function(a,x){return a+x.wow},0)}
-  function thu(ten,dem){
-   var c=(DATA.config.ch2||[]).filter(function(x){return x.name===ten})[0];
-   if(!c){t("co dong cau hinh "+ten, false);return}
-   var old=c.value,t1=tong(),n=dem();
-   c.value=String(num(old)+1000);
-   var t2=tong();c.value=old;
-   t("doi "+ten+" thi tien cong doi dung phan cua no ("+n+" buoi)", n>0&&t2-t1===n*1000)}
-  thu("teacherPayPerSession",nLop);
-  thu("wowPayPerSession",nWow)})();
- /* tach theo co so + lop online - lang kinh chi nhanh */
+  /* (1) don gia WOW van phai an theo so BUOI WOW */
+  (function(){var c=(DATA.config.ch2||[]).filter(function(x){return x.name==="wowPayPerSession"})[0];
+   if(!c){t("co dong cau hinh wowPayPerSession", false);return}
+   var cu=c.value,t1=tong(),n=nWow();
+   c.value=String(num(cu)+1000);var t2=tong();c.value=cu;
+   var ssW=congThang(mo[0]).filter(function(x){return x.wow>0}).length*1000+1;
+   t("doi wowPayPerSession thi tien doi dung so buoi WOW ("+n+" buoi)", n>0&&Math.abs(t2-t1-n*1000)<=ssW)})();
+  /* (2) tham so don gia GIO chung: chua khai bang gia thi moi gio deu an theo no */
+  (function(){var cu=(DATA.config.giagio||[]).slice();DATA.config.giagio=[];dataChanged();
+   var c=(DATA.config.ch2||[]).filter(function(x){return x.name==="teacherPayPerHour"})[0];
+   if(!c){t("co dong cau hinh teacherPayPerHour", false);DATA.config.giagio=cu;dataChanged();return}
+   var v=c.value,t1=tong(),g=gioLop();
+   c.value=String(num(v)+1000);dataChanged();var t2=tong();
+   c.value=v;DATA.config.giagio=cu;dataChanged();
+   /* tien cong lam tron nghin cho TUNG NGUOI nen sai so toi da = so nguoi x 1000 */
+   var ss=congThang(mo[0]).filter(function(x){return x.gio>0}).length*1000+1;
+   t("chua khai bang gia thi moi gio an theo teacherPayPerHour ("+(Math.round(g*10)/10)+"h)",
+     g>0&&Math.abs(t2-t1-g*1000)<=ss)})();
+  /* (3) MUC MAC DINH theo ca: doi mot o thi CHI phan gio cua ca do doi */
+  (function(){var cu=JSON.stringify(DATA.config.giagio||[]);
+   DATA.config.giagio=[];dataChanged();
+   var t1=tong();
+   var gioToiThuong=0;
+   congThang(mo[0]).forEach(function(x){var v=x.theoCa["thuong|toi"];if(v)gioToiThuong+=v.h});
+   rateSet("","thuong","toi",num(paramOf("teacherPayPerHour",180000))+1000);
+   var t2=tong();
+   DATA.config.giagio=JSON.parse(cu);dataChanged();
+   var ss2=congThang(mo[0]).filter(function(x){return x.gio>0}).length*1000+1;
+   t("doi muc mac dinh CA TOI NGAY THUONG chi doi phan gio cua ca do ("+(Math.round(gioToiThuong*10)/10)+"h)",
+     gioToiThuong>0&&Math.abs(t2-t1-gioToiThuong*1000)<=ss2)})();
+  /* (4) MUC RIENG cua mot nguoi phai DE LEN muc mac dinh, va KHONG dung toi nguoi khac */
+  (function(){var cu=JSON.stringify(DATA.config.giagio||[]);
+   DATA.config.giagio=[];dataChanged();
+   var L1=congThang(mo[0]).filter(function(x){return x.gio>0});
+   if(L1.length<2){DATA.config.giagio=JSON.parse(cu);dataChanged();
+    t("co it nhat 2 giang vien co gio de thu muc rieng", false);return}
+   var ai=L1[0].g.staff_id,khac=L1[1].g.staff_id;
+   var t1={};L1.forEach(function(x){t1[x.g.staff_id]=x.tien});
+   DAYK.forEach(function(d){SHIFTK.forEach(function(k){
+    rateSet(ai,d[0],k[0],num(paramOf("teacherPayPerHour",180000))*2)})});
+   var t2={};congThang(mo[0]).forEach(function(x){t2[x.g.staff_id]=x.tien});
+   DATA.config.giagio=JSON.parse(cu);dataChanged();
+   t("muc rieng de len muc mac dinh cho dung nguoi do", t2[ai]>t1[ai]);
+   t("khai muc rieng cho mot nguoi KHONG dung toi nguoi khac", t2[khac]===t1[khac])})();
+ })();
+ /* tach theo ca + lop online - lang kinh chi nhanh */
  (function(){window.STTAB="cong";var o=RENDER.dsthanhtoan();
-  t("bang cong tach theo co so", /Chia theo cơ sở/.test(o));
+  t("bang cong tach theo ca", /Chia theo ca/.test(o));
+  t("bang cong noi ro dang tinh theo GIO", /giờ dạy thật/.test(o));
+  t("bang cong co loi sang man don gia gio day", /SETTAB=.?giagio/.test(o));
   t("bang cong tach rieng buoi online", /Trong đó online/.test(o));
   t("noi thang la chua noi bang luong", /chưa nối bảng lương/.test(o));
   window.STTAB="da"})();

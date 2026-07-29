@@ -1490,6 +1490,36 @@ for r in dl.get("DL03", []):
 log.append("14undecies. Test: kéo %d buổi ĐÃ điểm danh dự thi về quá khứ (chống trôi theo đồng hồ)"
            % _ttfix)
 
+# ═══ 14quaterdecies. BẢNG ĐƠN GIÁ GIỜ DẠY (V9.40 - anh Luân chốt 29/07) ══
+# "Giảng viên tính theo giờ, mỗi giảng viên có mức giá riêng đấy, và ngày thường, cuối tuần,
+# sáng hay tối đều có mức riêng, em nên cho cấu hình để sau này bên nhân sự họ tự sửa."
+# Gieo MỘT bảng mặc định 6 ô + mức riêng cho 2 người để nhân sự mở ra là hiểu ngay cách dùng,
+# chứ không phải nhìn một màn trống rồi đoán. Số là số MẪU - trung tâm tự sửa lại.
+_gg = d.setdefault("config", {}).setdefault("giagio", [])
+def _ggset(sid, day, shift, rate):
+    for r in _gg:
+        if str(r.get("staff_id") or "") == sid and r.get("day") == day and r.get("shift") == shift:
+            return
+    _gg.append({"staff_id": sid, "day": day, "shift": shift, "rate": rate})
+
+# mặc định: tối đắt hơn sáng/chiều (giờ vàng), cuối tuần cộng thêm
+for _d, _hs in (("thuong", {"sang": 160000, "chieu": 170000, "toi": 200000}),
+                ("cuoituan", {"sang": 190000, "chieu": 190000, "toi": 220000})):
+    for _s, _v in _hs.items():
+        _ggset("", _d, _s, _v)
+
+# hai giảng viên lâu năm nhất có mức riêng cao hơn - để thấy lớp GHI ĐÈ chạy thật
+_gv = [x for x in R("DL01") if re.search(r"teacher", code(x.get("role")) or "")]
+_gv.sort(key=lambda x: str(x.get("start_date") or "9999"))
+for _i, _p in enumerate(_gv[:2]):
+    _bonus = 60000 if _i == 0 else 30000
+    for _d, _hs in (("thuong", {"sang": 160000, "chieu": 170000, "toi": 200000}),
+                    ("cuoituan", {"sang": 190000, "chieu": 190000, "toi": 220000})):
+        for _s, _v in _hs.items():
+            _ggset(_p["staff_id"], _d, _s, _v + _bonus)
+log.append("14quaterdecies. Don gia gio day: %d dong (mac dinh 6 o + muc rieng cho %d nguoi)"
+           % (len(_gg), min(2, len(_gv))))
+
 # ═══ 14terdecies. CỘT "LẦN NHẮC NỢ GẦN NHẤT" (V9.40) ═════════════════════
 # Luật sinh việc "Thu công nợ" hoàn toàn dựa vào ngày hạn, không có mốc nào ghi "đã nhắc" -
 # nên 25 dòng công nợ hiện y nguyên mỗi ngày và kế toán phải giữ một cuốn sổ ngoài app.

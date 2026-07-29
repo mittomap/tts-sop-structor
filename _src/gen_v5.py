@@ -1875,9 +1875,12 @@ var ROLESCOPE={
  wow:{match:/^wow/,land:"hoctap",ctx:{HTTAB:"wow"},
   pages:["viec","banlam","hocvien","giangvien","hoctap","banglop","duyet"],
   tabs:{duyet:["duyetgiao"]},blocks:["test_grading","wowq","risk"],mine:0,mineBtn:0,kpi:0,bell:["WOW","Giảng viên (ACA)","Giao việc"]},
+ /* V9.40 (anh Luân chốt 29/07): "Duyệt chiết khấu là trưởng phòng tư vấn, kế toán luôn chỉ xác
+    nhận và làm theo thôi." Trước đây cấu hình quyền cho Kế toán duyệt, trong khi DỮ LIỆU ghi
+    NV012 - Trưởng phòng Tư vấn - là người duyệt cả 8 lần. Cấu hình sai, dữ liệu đúng. */
  ketoan:{match:/^account/,land:"tuyensinh",ctx:{TSTAB:"thanhtoan"},
   pages:["viec","banlam","hocvien","giangvien","tuyensinh","duyet","baocao"],
-  tabs:{duyet:["duyetck","duyethoan","duyetthu","duyetgiao"]},
+  tabs:{duyet:["duyethoan","duyetthu","duyetgiao"]},
   blocks:["enrolled","approve","debt"],mine:0,mineBtn:0,kpi:0,bell:["Tài chính","Giao việc"]},
  marketing:{match:/^marketing/,land:"tuyensinh",ctx:{TSTAB:"lead"},
   pages:["viec","banlam","tuyensinh","khac","hocvien","duyet"],
@@ -1903,6 +1906,8 @@ function buildScope(code){
   if(gk==="tuvan"){if(eff.pages.indexOf("duyet")<0)eff.pages.push("duyet");
    eff.blocks=eff.blocks.concat(["approve","debt"]);
    eff.tabs=eff.tabs||{};eff.tabs.khac=["magioithieu","banggiao"];
+   /* V9.40: DUYỆT CHIẾT KHẤU là việc của Trưởng phòng / Leader Tư vấn - anh Luân chốt 29/07. */
+   eff.tabs.duyet=["duyetck","duyetgiao","banggiao"];
    eff.bell=["Tuyển sinh","Tài chính"]}}
  /* ngoại lệ khai báo nhóm hỗ trợ */
  if(gk==="hotro"){
@@ -3302,6 +3307,7 @@ function slaItems(){var out=jTasks();
    if(!(num(e.discount_amount)>=ckThreshold()))return;
    if(String(e.discount_approved_by||"").trim()||isc(e.enrollment_status,"cancelled"))return;
    var age=hoursSince(e.enrollment_time),over=age!=null&&age>dl;
+   if(!canDuyetCK())return;   /* việc của người quyết - không réo chuông người chỉ thực hiện */
    add("Tài chính","Duyệt chiết khấu",over?"red":"amber","ti-discount-check",e.student_id_name||e.student_id,
     (over?"QUÁ HẠN DUYỆT - ":"")+"Chiết khấu "+vnd(num(e.discount_amount))+" chờ quản lý duyệt (hạn "+dl+"h)",
     age,"duyet","",{act:"ckduyet",rid:e.enrollment_id,prm:"slaDiscountApprove_hours"})})})();
@@ -3878,8 +3884,19 @@ function duyCkHTML(TH){
  return h}
 function duyetWrite(id,decision,apply){var r=find("DL06","enrollment_id",id);if(!r){toast("Không thấy đăng ký.");return}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}apply(r);reRender(CUR)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiApprove(id,decision,myName())}else{apply(r);reRender(CUR)}}
-function duyetOK(id){duyetWrite(id,"approve",function(r){r.discount_approved_by=myName();r.discount_approved_at=nowStr();toast("Đã duyệt CK "+money(r.discount_amount)+"đ - ghi người duyệt + thời điểm.")})}
-function duyetNo(id){duyetWrite(id,"reject",function(r){var old=num(r.discount_amount);r.discount_amount=0;r.discount_approved_by="Từ chối - "+myName();r.discount_approved_at=nowStr();r.final_fee=num(r.total_fee);r.remaining_amount=Math.max(0,num(r.total_fee)-num(r.paid_amount));r.notes=(r.notes?r.notes+" | ":"")+"CK "+money(old)+"đ bị từ chối bởi "+myName();toast("Đã từ chối CK - học phí tính lại theo giá gốc.")})}
+/* V9.40 - QUYỀN DUYỆT CHIẾT KHẤU. Giấu tab thôi là chưa đủ: việc "Duyệt chiết khấu" vẫn chảy
+   vào chuông và Trợ thủ của người không có quyền, bấm ra ngăn kéo có đủ hai nút Duyệt / Từ chối.
+   Giấu lối vào mà không khóa cửa ghi thì phân quyền chỉ là trang trí. */
+function canDuyetCK(){var rs=SCOPE();
+ if(rs.pages==="*")return true;                      /* quản trị viên toàn quyền */
+ var t=rs.tabs&&rs.tabs.duyet;
+ return t?t.indexOf("duyetck")>=0:(rs.pages.indexOf("duyet")>=0)}
+function ckChanNeuKhongQuyen(){
+ if(canDuyetCK())return false;
+ toast("Chiết khấu do Trưởng phòng Tư vấn duyệt. Chức danh của bạn xác nhận và thực hiện theo quyết định đó.",5000);
+ return true}
+function duyetOK(id){if(ckChanNeuKhongQuyen())return;duyetWrite(id,"approve",function(r){r.discount_approved_by=myName();r.discount_approved_at=nowStr();toast("Đã duyệt CK "+money(r.discount_amount)+"đ - ghi người duyệt + thời điểm.")})}
+function duyetNo(id){if(ckChanNeuKhongQuyen())return;duyetWrite(id,"reject",function(r){var old=num(r.discount_amount);r.discount_amount=0;r.discount_approved_by="Từ chối - "+myName();r.discount_approved_at=nowStr();r.final_fee=num(r.total_fee);r.remaining_amount=Math.max(0,num(r.total_fee)-num(r.paid_amount));r.notes=(r.notes?r.notes+" | ":"")+"CK "+money(old)+"đ bị từ chối bởi "+myName();toast("Đã từ chối CK - học phí tính lại theo giá gốc.")})}
 function refundSuggest(e){var paid=num(e.paid_amount);if(paid<=0)return {pct:0,amt:0,why:"chưa đóng đồng nào"};
  var ob=rows("DL08").filter(function(o){return o.student_id===e.student_id&&o.class_id})[0];
  var c=ob?find("DL10","class_id",ob.class_id):null;
@@ -7583,6 +7600,7 @@ function setTabs(){
   ["huongdan","Bài hướng dẫn","dat"],
   ["phanquyen","Phân quyền & Phạm vi","quyen"],
   ["staff","Nhân viên & Email","quyen"],
+  ["giagio","Đơn giá giờ dạy","quyen"],
   ["khoa","Khóa học","dulieu"],
   ["health","Sức khỏe dữ liệu"+(nHealth?" ("+nHealth+")":""),"dulieu"],
   ["nhatky","Nhật ký thao tác","dulieu"]]
@@ -7833,6 +7851,7 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
     '<td><button class="btn primary sm" onclick="enumAdd(\''+esc(en)+'\')"><i class="ti ti-plus"></i>Thêm</button></td></tr>';
    h+='</tbody></table></div></div>'});
  }
+ else if(tab==="giagio"){h+=giaGioHTML()}
  else if(tab==="staff"){
   h+='<div class="notebar"><i class="ti ti-mail"></i>Email dùng để đăng nhập tự nhận vai trò + nhận nhắc việc SLA. Thiếu email -> không đăng nhập/nhắc được. Sửa xong bấm Lưu từng dòng.</div>';
   h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-user-plus" style="margin-right:6px"></i>Thêm nhân viên</b></div><div class="form">';
@@ -8228,6 +8247,9 @@ var APPPARAMS=[
  ["Xếp lịch & Giảng dạy","attendanceGrace_hours","Buổi dạy xong bao lâu thì BẮT BUỘC phải có điểm danh (trong khoảng này còn coi là hàng chờ)","giờ",24],
  ["Xếp lịch & Giảng dạy","homeworkDueFallback_days","Hạn nộp bài mặc định khi giáo án không ghi rõ (tính từ ngày học)","ngày",5],
  ["Tiền - Công giảng dạy","teacherPayPerSession","Tiền công một buổi dạy (dùng để tạm tính bảng công tháng)","đ/buổi",250000],
+ ["Tiền - Công giảng dạy","teacherPayPerHour","Đơn giá GIỜ dạy dùng khi bảng đơn giá chưa khai ô nào khớp","đ/giờ",180000],
+ ["Tiền - Công giảng dạy","shiftNoon_hour","Buổi bắt đầu từ giờ này trở đi tính là CA CHIỀU","giờ trong ngày",12],
+ ["Tiền - Công giảng dạy","shiftEvening_hour","Buổi bắt đầu từ giờ này trở đi tính là CA TỐI","giờ trong ngày",17],
  ["Tiền - Công giảng dạy","wowPayPerSession","Tiền công một buổi WOW 1-1 (buổi kèm riêng, tính tách khỏi buổi lớp)","đ/buổi",250000],
  ["Học tập - WOW","wowGrantMax_perTime","Mỗi lần cấp thêm tối đa bao nhiêu lượt WOW cho một học viên","lượt",3],
  ["Hẹn & Chăm sóc","apptSoon_hours","Nút hẹn nhanh \"N tiếng nữa\" - N là bao nhiêu","giờ",2],
@@ -11789,6 +11811,11 @@ function ckDuyet(eid){var r=find("DL06","enrollment_id",eid);if(!r){toast("Khôn
   ["Học phí gốc",esc(vnd(num(r.total_fee)))],["Chiết khấu",'<b>'+esc(vnd(num(r.discount_amount)))+'</b> ('+pct+'%)'],
   ["Còn phải đóng",esc(vnd(num(r.final_fee)))],["Loại",esc(elabel(r.discount_type)||"-")],["Lý do",esc(r.discount_reason||"-")]]);
  h+='<div class="notebar"><i class="ti ti-info-circle"></i>Ngưỡng phải trình duyệt: '+slaChip("thresholdDiscount_approval",1000000)+'.</div>';
+ if(!canDuyetCK()){
+  h+='<div class="notebar" style="margin-top:10px"><i class="ti ti-lock"></i>Chiết khấu do <b>Trưởng phòng Tư vấn</b> duyệt. '+
+   'Chức danh của bạn xem để biết và thực hiện theo quyết định đó, không bấm duyệt được.</div>'+
+   '<div class="dact"><button class="btn" onclick="closeModal();openQuick(\''+esc(r.student_id||r.lead_id||"")+'\')"><i class="ti ti-eye"></i>Xem nhanh người này</button></div></div>';
+  openDrawer("Chiết khấu chờ duyệt",h);return}
  h+='<div class="dact">'+
   '<button class="btn green" onclick="confirmRun(\'Duyệt chiết khấu '+esc(vnd(num(r.discount_amount)))+' cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi tên bạn là người duyệt.\',\'duyetOK\',\''+esc(eid)+'\')"><i class="ti ti-check"></i>Duyệt</button>'+
   '<button class="btn danger" onclick="confirmRun(\'TỪ CHỐI chiết khấu này? Chiết khấu về 0 và học phí tính lại theo giá gốc.\',\'duyetNo\',\''+esc(eid)+'\')"><i class="ti ti-x"></i>Từ chối</button>'+
@@ -12745,6 +12772,53 @@ function tkReport(){var all=srows("DL23");
    Nói thẳng giới hạn: bản demo CHƯA có bảng lương, nên màn này TÍNH và ĐỐI CHIẾU chứ không "chốt"
    vào đâu cả. Ghi rõ ra màn hình còn hơn dựng một nút "Chốt công" bấm xong không đi đâu. */
 function payRate(){return num(paramOf("teacherPayPerSession",250000))||0}
+/* ===== ĐƠN GIÁ GIỜ DẠY (V9.40 - anh Luân chốt 29/07) ================================
+   "Giảng viên tính theo giờ, mỗi giảng viên có mức giá riêng đấy, và ngày thường, cuối tuần,
+   sáng hay tối đều có mức riêng, em nên cho cấu hình để sau này bên nhân sự họ tự sửa."
+
+   Mô hình: MẶC ĐỊNH + GHI ĐÈ, đúng kiểu giáo án khóa/lớp đã dùng trong app.
+     · một bảng MẶC ĐỊNH 6 ô = (ngày thường | cuối tuần) x (sáng | chiều | tối)
+     · mỗi giảng viên có thể có bảng RIÊNG, ô nào để trống thì theo mặc định
+   Ranh giới ca lấy từ CH2 (shiftNoon_hour, shiftEvening_hour) chứ không cắm cứng 12h/17h -
+   trung tâm khác giờ khác thì sửa một ô là xong.
+
+   Buổi WOW 1-1 vẫn tính theo BUỔI (wowPayPerSession): DL14 chỉ ghi ngày giờ đặt, không có giờ
+   vào - giờ ra, nên không có gì để nhân với đơn giá giờ. Nói rõ chỗ này trên màn hình chứ không
+   lặng lẽ tính bừa. */
+var DAYK=[["thuong","Ngày thường"],["cuoituan","Cuối tuần"]];
+var SHIFTK=[["sang","Ca sáng"],["chieu","Ca chiều"],["toi","Ca tối"]];
+function shiftOf(d){if(!d)return "toi";var h=d.getHours();
+ return h<num(paramOf("shiftNoon_hour",12))?"sang":(h<num(paramOf("shiftEvening_hour",17))?"chieu":"toi")}
+function dayKindOf(d){if(!d)return "thuong";var w=d.getDay();return (w===0||w===6)?"cuoituan":"thuong"}
+function rateRows(){DATA.config=DATA.config||{};if(!DATA.config.giagio)DATA.config.giagio=[];return DATA.config.giagio}
+function rateFind(sid,day,shift){var L=rateRows();
+ for(var i=0;i<L.length;i++){var r=L[i];
+  if(String(r.staff_id||"")===String(sid||"")&&r.day===day&&r.shift===shift)return r}
+ return null}
+function rateGet(sid,day,shift){var r=rateFind(sid,day,shift);
+ return r&&String(r.rate||"").trim()!==""?num(r.rate):null}
+/* Đơn giá thật của MỘT buổi: mức riêng của người đó -> mức mặc định của ca đó -> tham số chung. */
+function hourRate(sid,d){
+ var day=dayKindOf(d),sh=shiftOf(d);
+ var v=rateGet(sid,day,sh);if(v!=null&&v>0)return v;
+ v=rateGet("",day,sh);if(v!=null&&v>0)return v;
+ return num(paramOf("teacherPayPerHour",180000))||0}
+function rateSrc(sid,d){
+ var day=dayKindOf(d),sh=shiftOf(d);
+ if(rateGet(sid,day,sh)!=null)return "riêng";
+ if(rateGet("",day,sh)!=null)return "mặc định";
+ return "tham số chung"}
+/* Số GIỜ thật của một buổi. Buổi đã dạy xong trong dữ liệu đều có giờ vào - giờ ra; buổi nào
+   thiếu thì trả 0 và bảng công đếm riêng để kế toán biết mà đi hỏi, KHÔNG tự bịa thời lượng. */
+function sesHours(x){var a=pvnd(x&&x.class_start_actual),b=pvnd(x&&x.class_end_actual);
+ if(!a||!b)return 0;var h=(b.getTime()-a.getTime())/36e5;
+ return (h>0&&h<24)?h:0}
+function rateSet(sid,day,shift,val){
+ var r=rateFind(sid,day,shift);
+ if(String(val||"").trim()===""){if(r)rateRows().splice(rateRows().indexOf(r),1)}
+ else if(r)r.rate=num(val);
+ else rateRows().push({staff_id:String(sid||""),day:day,shift:shift,rate:num(val)});
+ persistSoon();dataChanged()}
 /* V9.40: bảng công GỘP CẢ giáo viên WOW. Trước đây lọc người bằng isGVRole() - biểu thức
    /teacher|giang/ không khớp mã vai trò wow_coach - nên 51 buổi WOW đã hoàn thành KHÔNG vào
    bảng công nào cả, và WOW Leader phải cộng tay cuối tháng. Buổi WOW là buổi 1-1 nên tính công
@@ -12767,47 +12841,134 @@ function congThang(ym){
    .concat(wow.filter(function(w){return !String(w.wow_content_note||"").trim()}));
   var brs={};ses.forEach(function(x){var c=find("DL10","class_id",x.class_id);if(c&&c.branch)brs[c.branch]=(brs[c.branch]||0)+1});
   var onl=ses.filter(function(x){return clsOnline(find("DL10","class_id",x.class_id)||{})}).length;
+  /* V9.40: tính theo GIỜ, đơn giá tra theo (giảng viên x loại ngày x ca) - anh Luân chốt 29/07.
+     Buổi 3 giờ và buổi 1,5 giờ trước đây trả bằng nhau; đo trên dữ liệu có 8 buổi 3 giờ ở lớp
+     Foundation T7-CN, tức trả thiếu đúng một nửa cho những buổi đó. */
+  var gio=0,tienGio=0,thieuGio=0,theoCa={};
+  ses.forEach(function(x){var d=pvnd(x.class_start_actual)||pvnd(x.session_date);
+   var h=sesHours(x);
+   if(!h){thieuGio++;return}
+   var dr=hourRate(g.staff_id,d);
+   gio+=h;tienGio+=h*dr;
+   var k=dayKindOf(d)+"|"+shiftOf(d);
+   if(!theoCa[k])theoCa[k]={h:0,tien:0,dg:dr};
+   theoCa[k].h+=h;theoCa[k].tien+=h*dr});
+  /* Tiền công phải là số tròn nghìn - phiếu lương không có phần lẻ 666,667đ. Làm tròn MỘT LẦN
+     ở tổng của người đó, không làm tròn từng buổi (làm tròn từng buổi thì cộng lại lệch). */
   return {g:g,n:ses.length,wow:wow.length,late:late.length,noNote:noNote.length,brs:brs,onl:onl,
-   tien:ses.length*payRate()+wow.length*wowRate()}});
+   gio:gio,thieuGio:thieuGio,theoCa:theoCa,
+   tien:Math.round((tienGio+wow.length*wowRate())/1000)*1000}});
  out.sort(function(a,b){return (b.n+b.wow)-(a.n+a.wow)});
  return out}
 function congMonths(){
  var m={};rows("DL11").forEach(function(x){if(!isc(x.session_status,"completed"))return;
   var d=pvnd(x.session_date);if(!d)return;m[d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)]=1});
  return Object.keys(m).sort().reverse()}
+/* Chia theo ca: nói rõ giờ nào ăn đơn giá nào - kế toán đối chiếu được mà không phải mở bảng giá. */
+/* ===== MÀN CẤU HÌNH ĐƠN GIÁ GIỜ DẠY =================================================
+   Anh Luân: "em nên cho cấu hình để sau này bên nhân sự họ tự sửa". Nên màn này phải tự giải
+   thích được, không cần ai hướng dẫn: một bảng mặc định 6 ô, và bảng riêng cho từng người -
+   ô nào để trống thì tự động dùng mặc định, hiện luôn số mặc định mờ bên dưới. */
+function giaGioSave(sid,day,shift,el){rateSet(sid,day,shift,el.value);
+ toast(String(el.value||"").trim()===""?"Đã xoá mức riêng - ô này về theo mặc định.":"Đã lưu đơn giá.");
+ reRender("settings")}
+function giaGioO(sid,day,shift){
+ var v=rateGet(sid,day,shift);
+ var mac=sid?rateGet("",day,shift):null;
+ var ph=sid?(mac!=null?("theo mặc định "+mac):"theo mặc định"):String(num(paramOf("teacherPayPerHour",180000)));
+ return '<input type="number" step="1000" min="0" value="'+(v!=null?esc(String(v)):"")+'" placeholder="'+esc(ph)+'" '+
+  'onchange="giaGioSave(\''+esc(sid)+'\',\''+day+'\',\''+shift+'\',this)" '+
+  'style="width:120px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-variant-numeric:tabular-nums">'}
+function giaGioBang(sid){
+ var h='<div class="tbwrap"><table class="dt"><thead><tr><th>Loại ngày</th>'+
+  SHIFTK.map(function(k){return '<th>'+esc(k[1])+'</th>'}).join("")+'</tr></thead><tbody>';
+ DAYK.forEach(function(dk){
+  h+='<tr><td><b>'+esc(dk[1])+'</b></td>'+
+   SHIFTK.map(function(sk){return '<td>'+giaGioO(sid,dk[0],sk[0])+'</td>'}).join("")+'</tr>'});
+ return h+'</tbody></table></div>'}
+function giaGioHTML(){
+ var GV=rows("DL01").filter(isCongRole);
+ var pick=window.GGSTAFF||"";
+ var h='<div class="notebar"><i class="ti ti-clock-dollar"></i>Công giảng dạy tính theo <b>giờ dạy thật</b> '+
+  '(giờ vào lớp tới giờ kết thúc buổi), nhân đơn giá tra theo <b>giảng viên x loại ngày x ca</b>. '+
+  'Ranh giới ca: trước '+slaChip("shiftNoon_hour",12,"h")+' là ca sáng, tới '+slaChip("shiftEvening_hour",17,"h")+' là ca chiều, sau đó là ca tối. '+
+  'Ô nào chưa khai thì dùng mức mặc định; mặc định cũng chưa khai thì dùng '+slaChip("teacherPayPerHour",180000,"đ/giờ")+'.</div>';
+ h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-table" style="margin-right:6px"></i>Mức mặc định - áp cho mọi giảng viên chưa có mức riêng</b>'+
+  '<span class="mut" style="font-size:11.5px">đơn vị: đồng/giờ · sửa xong bấm ra ngoài ô là lưu</span></div>'+
+  giaGioBang("")+'</div>';
+ var co=GV.filter(function(g){return DAYK.some(function(d){return SHIFTK.some(function(k){return rateGet(g.staff_id,d[0],k[0])!=null})})});
+ h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-user-dollar" style="margin-right:6px"></i>Mức riêng của từng giảng viên ('+co.length+'/'+GV.length+' người đã khai)</b>'+
+  '<span class="mut" style="font-size:11.5px">để trống một ô = người này ăn theo mức mặc định của ca đó</span></div><div class="pbody">'+
+  '<div class="fld" style="max-width:420px"><label>Chọn giảng viên</label><select onchange="window.GGSTAFF=this.value;reRender(\'settings\')">'+
+  '<option value="">-- chọn để khai mức riêng --</option>'+
+  GV.map(function(g){var da=DAYK.some(function(d){return SHIFTK.some(function(k){return rateGet(g.staff_id,d[0],k[0])!=null})});
+   return '<option value="'+esc(g.staff_id)+'"'+(g.staff_id===pick?" selected":"")+'>'+
+    esc(g.staff_id+" - "+(g.full_name||"")+(da?" (đã khai mức riêng)":""))+'</option>'}).join("")+'</select></div>';
+ if(pick){var gg=find("DL01","staff_id",pick)||{};
+  h+='<div class="dsec" style="margin-top:6px">Mức riêng của '+esc(gg.full_name||pick)+'</div>'+giaGioBang(pick)}
+ else h+='<div class="empty">Chọn một giảng viên ở trên để khai mức riêng cho người đó.</div>';
+ h+='</div></div>';
+ /* Bảng tổng: nhân sự nhìn một phát thấy ai đang ăn mức nào - không phải bấm từng người */
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-list-check" style="margin-right:6px"></i>Đang áp dụng cho cả đội</b>'+
+  '<span class="mut" style="font-size:11.5px">ô in đậm là mức riêng, ô mờ là đang ăn theo mặc định</span></div>'+
+  '<div class="tbwrap"><table class="dt"><thead><tr><th>Giảng viên</th>'+
+  DAYK.map(function(d){return SHIFTK.map(function(k){return '<th>'+esc((d[0]==="cuoituan"?"CT ":"")+k[1].replace("Ca ",""))+'</th>'}).join("")}).join("")+
+  '</tr></thead><tbody>';
+ if(!GV.length)h+='<tr><td class="empty" colspan="7">Chưa có giảng viên nào.</td></tr>';
+ GV.forEach(function(g){
+  h+='<tr><td>'+nsLnk(g.staff_id,g.full_name,"")+'</td>';
+  DAYK.forEach(function(d){SHIFTK.forEach(function(k){
+   var r=rateGet(g.staff_id,d[0],k[0]);
+   var m=rateGet("",d[0],k[0]);
+   var v=r!=null?r:(m!=null?m:num(paramOf("teacherPayPerHour",180000)));
+   h+='<td style="font-variant-numeric:tabular-nums'+(r!=null?";font-weight:800":";opacity:.55")+'">'+esc(String(v))+'</td>'})});
+  h+='</tr>'});
+ h+='</tbody></table></div><div class="mut" style="font-size:11.5px;padding:11px 16px;line-height:1.7">'+
+  'Buổi WOW 1-1 <b>không</b> nằm trong bảng này - sổ WOW chỉ ghi ngày giờ đặt, không có giờ vào - giờ ra để nhân, '+
+  'nên nó tính theo BUỔI với đơn giá '+slaChip("wowPayPerSession",250000,"đ/buổi")+'. '+
+  'Muốn tính WOW theo giờ thì phải ghi giờ vào - giờ ra cho buổi WOW trước đã.</div></div>';
+ return h}
+function caText(theoCa){var out=[];
+ DAYK.forEach(function(dk){SHIFTK.forEach(function(sk){
+  var v=theoCa[dk[0]+"|"+sk[0]];if(!v||!v.h)return;
+  out.push((dk[0]==="cuoituan"?"CT ":"")+sk[1].replace("Ca ","")+" "+(Math.round(v.h*10)/10)+"h x "+vnd(v.dg))})});
+ return out.join(" · ")}
 function congSet(v){window.CONGM=v;reRender(CUR)}
 function renderCong(){
  var mo=congMonths();
  var ym=window.CONGM||mo[0]||"";
  var L=fltApply("cong",congThang(ym).map(function(x){return {ma:x.g.staff_id,ten:x.g.full_name,
-   co_so:elabel(x.g.branch)||x.g.branch||"",buoi:x.n,buoi_wow:x.wow,online:x.onl,tre:x.late,chua_nhan_xet:x.noNote,
+   co_so:elabel(x.g.branch)||x.g.branch||"",buoi:x.n,gio_day:Math.round(x.gio*10)/10,buoi_wow:x.wow,online:x.onl,tre:x.late,chua_nhan_xet:x.noNote,
    tien_cong:x.tien,_x:x}}).filter(function(r){return r.buoi||r.buoi_wow})).map(function(r){return r._x});
  var tot=L.reduce(function(a,x){return a+x.n},0),totW=L.reduce(function(a,x){return a+x.wow},0),tien=L.reduce(function(a,x){return a+x.tien},0);
+ var totG=L.reduce(function(a,x){return a+x.gio},0),totThieu=L.reduce(function(a,x){return a+x.thieuGio},0);
  var noNote=L.reduce(function(a,x){return a+x.noNote},0);
- var h='<div class="notebar"><i class="ti ti-info-circle"></i><b>Bản demo chưa nối bảng lương</b> - màn này TÍNH và ĐỐI CHIẾU công, không ghi vào đâu cả. Đơn giá mỗi buổi lấy từ cấu hình: '+slaChip("teacherPayPerSession",250000,"đ/buổi")+'. Căn cứ tính: buổi có trạng thái <b>đã dạy xong</b> - đúng một định nghĩa với KPI và với hồ sơ giáo viên.</div>';
+ var h='<div class="notebar"><i class="ti ti-info-circle"></i><b>Bản demo chưa nối bảng lương</b> - màn này TÍNH và ĐỐI CHIẾU công, không ghi vào đâu cả. Tính theo <b>giờ dạy thật</b> (giờ vào lớp tới giờ kết thúc), đơn giá tra theo <b>giảng viên x loại ngày x ca</b> - sửa ở <a class="lnk" onclick="window.SETTAB=\'giagio\';go(\'settings\')">Cài đặt &gt; Đơn giá giờ dạy</a>. Buổi WOW 1-1 tính theo BUỔI ('+slaChip("wowPayPerSession",250000,"đ/buổi")+') vì sổ WOW chỉ ghi ngày giờ đặt, không có giờ vào - giờ ra để nhân. Căn cứ tính: buổi <b>đã dạy xong</b> - đúng một định nghĩa với KPI và hồ sơ giáo viên.</div>';
  h+=statStrip([
   ["ti-school",tot,"Buổi lớp đã dạy trong tháng","#3B82C4",L.length+" người có công"],
+  ["ti-clock-hour-4",(Math.round(totG*10)/10)+"h","Tổng giờ dạy","#2E5A88",totThieu?(totThieu+" buổi thiếu giờ vào/ra"):"đủ giờ vào - giờ ra"],
   ["ti-star",totW,"Buổi WOW 1-1 đã dạy","#DB2777",vnd(wowRate())+"/buổi"],
-  ["ti-report-money",vnd(tien),"Tiền công tạm tính","#0D9488",vnd(payRate())+"/buổi lớp"],
+  ["ti-report-money",vnd(tien),"Tiền công tạm tính","#0D9488","theo giờ x ca x người"],
   ["ti-writing",noNote,"Buổi chưa ghi nhận xét","#E08A1E",noNote?"đối chiếu trước khi chốt":"đã đủ nhận xét"],
   ["ti-clock",L.reduce(function(a,x){return a+x.late},0),"Buổi vào trễ giờ","#E24B4A","ảnh hưởng KPI ADC"]]);
  h+=tbar('<span class="tblbl">Tháng</span><select class="sel" onchange="congSet(this.value)">'+
   mo.map(function(k){return '<option value="'+esc(k)+'"'+(k===ym?" selected":"")+'>'+esc(k.split("-")[1]+"/"+k.split("-")[0])+'</option>'}).join("")+'</select>',
   '<span class="tbcnt">'+L.filter(function(x){return x.n||x.wow}).length+' người có công</span>');
  h+=pgBar("cong",L.filter(function(x){return x.n||x.wow}).length);
- h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Người dạy</th><th>Cơ sở</th><th>Buổi lớp</th><th>Buổi WOW 1-1</th><th>Chia theo cơ sở</th><th>Trong đó online</th><th>Vào trễ</th><th>Chưa ghi nội dung</th><th>Tiền công tạm tính</th></tr></thead><tbody>';
- if(!L.filter(function(x){return x.n||x.wow}).length)h+='<tr><td class="empty" colspan="9">Tháng này chưa có buổi dạy nào hoàn thành.</td></tr>';
+ h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Người dạy</th><th>Cơ sở</th><th>Buổi lớp</th><th>Giờ dạy</th><th>Chia theo ca</th><th>Buổi WOW 1-1</th><th>Trong đó online</th><th>Vào trễ</th><th>Chưa ghi nội dung</th><th>Tiền công tạm tính</th></tr></thead><tbody>';
+ if(!L.filter(function(x){return x.n||x.wow}).length)h+='<tr><td class="empty" colspan="10">Tháng này chưa có buổi dạy nào hoàn thành.</td></tr>';
  L.forEach(function(x){if(!x.n&&!x.wow)return;
   h+='<tr><td>'+nsLnk(x.g.staff_id,x.g.full_name,"")+'</td>'+
    '<td>'+esc(elabel(x.g.branch)||x.g.branch||"-")+'</td>'+
    '<td><b>'+x.n+'</b></td>'+
+   '<td><b>'+(Math.round(x.gio*10)/10)+'h</b>'+(x.thieuGio?' <span class="chip red" data-tip="Buổi đã dạy xong mà không ghi giờ vào - giờ ra, không tính công được">'+x.thieuGio+' buổi thiếu giờ</span>':'')+'</td>'+
+   '<td style="font-size:11.5px">'+esc(caText(x.theoCa)||"-")+'</td>'+
    '<td>'+(x.wow?'<span class="chip" style="background:#FCE7F3;color:#9D174D">'+x.wow+'</span>':'<span class="mut">0</span>')+'</td>'+
-   '<td style="font-size:11.5px">'+esc(Object.keys(x.brs).map(function(b){return (elabel(b)||b)+" ("+x.brs[b]+")"}).join(" · ")||"-")+'</td>'+
    '<td>'+(x.onl?'<span class="chip blue">'+x.onl+'</span>':'<span class="mut">0</span>')+'</td>'+
    '<td>'+(x.late?'<span class="chip amber">'+x.late+'</span>':'0')+'</td>'+
    '<td>'+(x.noNote?'<span class="chip red">'+x.noNote+'</span>':'<span class="chip green">0</span>')+'</td>'+
    '<td style="font-variant-numeric:tabular-nums"><b>'+vnd(x.tien)+'</b></td></tr>'});
- h+='<tr style="background:#F4F7FA;font-weight:800"><td colspan="2">TỔNG</td><td>'+tot+'</td><td>'+totW+'</td><td colspan="3"></td><td>'+noNote+'</td><td style="font-variant-numeric:tabular-nums">'+vnd(tien)+'</td></tr>';
+ h+='<tr style="background:#F4F7FA;font-weight:800"><td colspan="2">TỔNG</td><td>'+tot+'</td><td>'+(Math.round(totG*10)/10)+'h</td><td></td><td>'+totW+'</td><td colspan="2"></td><td>'+noNote+'</td><td style="font-variant-numeric:tabular-nums">'+vnd(tien)+'</td></tr>';
  return h+'</tbody></table></div></div>'}
 /* ===== SỔ THU HỌC PHÍ: tab ĐÃ THU (DL07) + tab DỰ THU (DL06b) ===== */
 function sothuTab(k){window.STTAB=k;reRender("dsthanhtoan")}

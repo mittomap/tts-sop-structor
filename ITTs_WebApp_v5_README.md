@@ -1557,3 +1557,43 @@ lượt mở màn chấm cả lớp.
 - **Học vụ mở app thấy "0 việc"** dù trang Xếp lớp đang có 12 việc - nay đáp thẳng vào Xếp lớp và có
   nút "chỉ việc của tôi".
 - **Điểm danh** bỏ 3 hộp xác nhận thừa, thêm nút Lưu ngay dưới ô nhận xét (trước đây cách nhau 573px).
+
+---
+
+## V9.40b - Duyệt chiết khấu và đơn giá giờ dạy (29/07 chiều)
+
+### Duyệt chiết khấu là việc của Trưởng phòng Tư vấn
+
+Kế toán không còn nút duyệt - họ **xác nhận và thực hiện** theo quyết định. Cụ thể:
+
+- Tab "Duyệt chiết khấu" chuyển sang Trưởng phòng / Leader Tư vấn.
+- Việc "Duyệt chiết khấu" **không còn réo chuông** người không có quyền quyết.
+- Ai không có quyền mà vào được thẻ chiết khấu thì thấy bản **chỉ đọc** kèm câu giải thích rõ việc
+  này của ai - không phải một màn hình cụt không có nút.
+- Cả hai nút Duyệt và Từ chối đều được **khóa ở cửa ghi**, không chỉ ẩn đi.
+
+### Công giảng dạy tính theo giờ, đơn giá theo người và theo ca
+
+Trước đây mọi buổi trả một giá như nhau, kể cả buổi 3 tiếng và buổi 1,5 tiếng. Nay:
+
+**Tiền công = giờ dạy thật × đơn giá của ca đó**, trong đó giờ dạy thật lấy từ giờ vào lớp tới giờ
+kết thúc buổi (chính là hai mốc giáo viên bấm khi Bắt đầu lớp / Kết thúc buổi).
+
+**Màn mới: Cài đặt > Đơn giá giờ dạy** (nhóm Người & Quyền - để nhân sự tự sửa)
+
+- **Bảng mặc định 6 ô**: ngày thường / cuối tuần × ca sáng / chiều / tối.
+- **Bảng riêng từng giảng viên**: chọn người, điền ô nào cần khác. **Ô để trống nghĩa là ăn theo
+  mặc định** - trong ô hiện mờ luôn số mặc định để khỏi phải nhớ.
+- **Bảng "đang áp dụng cho cả đội"**: nhìn một phát thấy ai đang ăn mức nào. Ô in đậm là mức riêng,
+  ô mờ là đang theo mặc định.
+- Ranh giới ca (sáng / chiều / tối) cũng sửa được trong Cài đặt, không cắm cứng.
+
+**Bảng công tháng** nay có cột **Giờ dạy** và **Chia theo ca** (ví dụ: "tối 10,5h × 200.000đ · CT
+sáng 24h × 190.000đ") để kế toán đối chiếu mà không phải mở bảng giá.
+
+Hai chỗ nói thẳng thay vì làm cho đẹp:
+
+- Buổi đã dạy xong mà **quên bấm giờ vào / giờ kết thúc** thì không tính công được. Bảng đếm riêng
+  "N buổi thiếu giờ" để kế toán đi hỏi, chứ không tự bịa một thời lượng mặc định rồi ra số đẹp mà sai.
+- **Buổi WOW 1-1 vẫn tính theo buổi**, vì sổ WOW chỉ ghi ngày giờ đặt, không có giờ vào - giờ ra để
+  nhân. Muốn tính WOW theo giờ thì phải ghi hai mốc đó cho buổi WOW trước đã.

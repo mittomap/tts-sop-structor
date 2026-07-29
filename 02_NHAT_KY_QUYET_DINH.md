@@ -206,18 +206,39 @@
 > "TONG BAN GHI LOI: 4" mà số đó **trôi theo ngày**; (3) `_check16` ép phải có HAI dòng cấu hình cho
 > cùng một sự thật, tức nó đang canh gác đúng cái bệnh tham số trùng.
 >
-> **CÒN LẠI - PHẢI HỎI ANH LUÂN, EM KHÔNG TỰ QUYẾT:**
-> · **Ai được duyệt chiết khấu?** Dữ liệu ghi NV012 (TP Tư vấn) duyệt 8 lần, cấu hình quyền lại cho
-> Kế toán. Một trong hai sai.
-> · **Trả công giáo viên theo BUỔI hay theo GIỜ?** Buổi dài từ 1,3 tới 3 giờ (8 buổi 3 giờ ở lớp
-> Foundation T7-CN) mà đang tính một giá. Nếu trả theo giờ thì `class_start_actual/end_actual` đã có
-> sẵn dữ liệu để tính.
+> **HAI CÂU HỎI 29/07 - ANH LUÂN ĐÃ TRẢ LỜI, ĐÃ LÀM XONG (P18, P19):**
+> · **P18 - Duyệt chiết khấu là TRƯỞNG PHÒNG TƯ VẤN.** Nguyên văn: *"Duyệt chiết khấu là trưởng phòng
+> tư vấn, kế toán luôn chỉ xác nhận và làm theo thôi."* Cấu hình cũ cho Kế toán duyệt trong khi dữ liệu
+> ghi NV012 duyệt cả 8 lần - **cấu hình sai, dữ liệu đúng**. Đã chuyển tab `duyetck` sang lớp phủ quản
+> lý của nhóm tư vấn và bỏ khỏi Kế toán. Quan trọng: **không chỉ giấu tab mà khóa cả cửa ghi** -
+> `canDuyetCK()` gác `duyetOK`/`duyetNo`, ngăn kéo chỉ-đọc cho người không có quyền, và việc "Duyệt
+> chiết khấu" không sinh vào chuông của người chỉ thực hiện. Giấu lối vào mà không khóa cửa ghi thì
+> phân quyền chỉ là trang trí.
+> · **P19 - Công giảng dạy tính theo GIỜ, đơn giá theo người và theo ca.** Nguyên văn: *"Giảng viên
+> tính theo giờ, mỗi giảng viên có mức giá riêng đấy, và ngày thường, cuối tuần, sáng hay tối đều có
+> mức riêng, em nên cho cấu hình để sau này bên nhân sự họ tự sửa."*
+> Mô hình **MẶC ĐỊNH + GHI ĐÈ** (đúng kiểu giáo án khóa/lớp app đã dùng): một bảng mặc định 6 ô
+> (ngày thường | cuối tuần) x (sáng | chiều | tối), cộng bảng riêng từng giảng viên - ô nào để trống
+> thì ăn theo mặc định. Ranh giới ca lấy từ CH2 (`shiftNoon_hour`, `shiftEvening_hour`) chứ không cắm
+> cứng 12h/17h. Màn mới **Cài đặt > Đơn giá giờ dạy** (nhóm Người & Quyền - để nhân sự tự sửa), có
+> bảng tổng "đang áp dụng cho cả đội": ô in đậm là mức riêng, ô mờ là đang ăn mặc định.
+> Bảng công tháng đổi từ "buổi x một giá" sang **giờ thật x đơn giá của ca đó**, có cột "Chia theo ca"
+> để kế toán đối chiếu. Tiền làm tròn nghìn MỘT LẦN ở tổng mỗi người (làm tròn từng buổi thì cộng lại lệch).
+> **Buổi WOW 1-1 vẫn tính theo BUỔI** - sổ WOW chỉ ghi ngày giờ đặt, không có giờ vào - giờ ra để nhân.
+> Nói thẳng chỗ này trên màn hình chứ không lặng lẽ tính bừa.
+>
+> **RANH GIỚI PHẠM VI - ANH LUÂN CHỐT 29/07:** *"Đây là sop chuyên chăm sóc học viên, nếu quá lệch khỏi
+> mục tiêu này, em có thể bỏ qua, sau này cần a sẽ yêu cầu."*
+> Vậy **KHÔNG tự làm** bốn mảng ERP dưới đây, dù bộ phận nghiên cứu xếp hạng cao - chờ anh Luân yêu cầu:
+> · gửi Zalo THẬT (Zalo OA/ZNS) + sổ tin đã gửi - hiện mọi SLA nhắn tin đo trên lời tự khai;
+> · **hồ sơ phụ huynh** (ai trả tiền, ai nhận báo cáo, ai được duyệt bảo lưu) - nay chỉ có ô "liên hệ
+> khẩn cấp". Đây là mảng gần với chăm sóc học viên nhất trong bốn cái, nhưng vẫn chờ lệnh;
+> · sổ quỹ + chi phí theo cơ sở - chỉ có một chiều tiền vào nên chưa biết cơ sở nào lãi;
+> · chi phí marketing gắn nguồn lead (CPL/CAC).
+> Bảng lương nhiều đơn giá thì **đã làm** phần cấu hình đơn giá (P19); phần còn lại của bảng lương
+> (bảo hiểm, thuế, phụ cấp, chốt phiếu lương) là việc nhân sự - không làm.
 > · Bốn đề xuất **chưa duyệt** (nêu rồi để đó, đừng tự làm): thao tác hàng loạt, sửa tại chỗ trong bảng,
 > bản in cho phụ huynh, phím tắt bàn phím.
-> · Bốn mảng lớn bộ phận nghiên cứu nêu, **chưa làm vì cần anh Luân quyết trước**: gửi Zalo THẬT (Zalo OA)
-> + sổ tin đã gửi; **hồ sơ phụ huynh** (ai trả tiền, ai nhận báo cáo, ai được duyệt bảo lưu - nay chỉ có
-> ô "liên hệ khẩn cấp"); sổ quỹ + chi phí theo cơ sở (hiện chỉ có một chiều tiền vào nên không biết cơ sở
-> nào lãi); bảng lương giáo viên nhiều đơn giá.
 >
 > **Hai việc đã khuyên KHÔNG làm:** tách file 4MB (mất thế mạnh một-file-chạy-mọi-nơi) và biểu đồ trang trí.
 > **KHÔNG CÒN PHIÊN TỰ ĐỘNG.** Routine "Auto - Github ITTs-SOP-Demo" đã bị XOÁ theo lệnh anh Luân
@@ -2952,3 +2973,90 @@ Chi tiết từng mảng nằm trong mục **⭐ HIỆN TRẠNG** ở đầu fil
   lời được nửa câu hỏi - chủ không bao giờ biết cơ sở nào thật sự có lãi.
 - **Bảng lương giáo viên nhiều đơn giá** (bản ngữ theo giờ, giáo viên Việt theo trình độ lớp, buổi
   WOW, tiền chấm bài, dạy thay, trừ đi trễ). Nền tảng đã có sẵn số liệu, chỉ thiếu bảng đơn giá.
+
+---
+
+## V9.40b (29/07 chiều) - ANH LUÂN TRẢ LỜI HAI CÂU, VÀ CHỐT RANH GIỚI PHẠM VI
+
+### P18 - Duyệt chiết khấu: Trưởng phòng Tư vấn
+
+> *"Duyệt chiết khấu là trưởng phòng tư vấn, kế toán luôn chỉ xác nhận và làm theo thôi."*
+
+Cấu hình cũ cho Kế toán duyệt; dữ liệu ghi NV012 (TP Tư vấn) duyệt cả 8 lần. **Cấu hình sai, dữ
+liệu đúng** - đây là kiểu lệch chỉ lộ ra khi có người đọc chéo hai nguồn.
+
+**Bài học quan trọng hơn bản thân việc sửa:** giấu tab thôi là **chưa đủ**. Việc "Duyệt chiết
+khấu" vẫn chảy vào chuông và Trợ thủ của người không có quyền, bấm ra ngăn kéo có đủ hai nút
+Duyệt / Từ chối. Giấu lối vào mà không khóa cửa ghi thì phân quyền chỉ là trang trí. Nên vá ở
+**ba tầng cùng lúc**:
+
+1. `ROLESCOPE` - tab `duyetck` sang lớp phủ quản lý nhóm tư vấn, bỏ khỏi Kế toán;
+2. `slaItems` - không sinh việc cho người không quyết được (`if(!canDuyetCK())return`);
+3. `duyetOK` / `duyetNo` - **gác thẳng ở cửa ghi**, và ngăn kéo hiện bản chỉ-đọc kèm câu giải
+   thích "việc này của Trưởng phòng Tư vấn" thay vì im lặng không có nút.
+
+Đây là mẫu nên lặp lại cho mọi quyền quyết định về sau: **quyền = giấu lối vào + không réo chuông
++ khóa cửa ghi**. Thiếu vế thứ ba là lỗ hổng thật.
+
+### P19 - Công giảng dạy tính theo GIỜ, đơn giá theo người và theo ca
+
+> *"Giảng viên tính theo giờ, mỗi giảng viên có mức giá riêng đấy, và ngày thường, cuối tuần,
+> sáng hay tối đều có mức riêng, em nên cho cấu hình để sau này bên nhân sự họ tự sửa."*
+
+Trước đây nhân **một** đơn giá cho **mọi** buổi, bất kể buổi dài 1,3 giờ hay 3 giờ - đo trên dữ
+liệu có 8 buổi 3 giờ ở lớp Foundation T7-CN, tức trả thiếu đúng một nửa cho những buổi đó.
+
+**Mô hình: MẶC ĐỊNH + GHI ĐÈ** - đúng kiểu giáo án khóa/lớp app đã dùng, nên người dùng đã quen:
+
+```
+config.giagio = [ {staff_id, day, shift, rate}, ... ]
+   staff_id rỗng  = mức MẶC ĐỊNH, áp cho mọi giảng viên
+   staff_id có mã = mức RIÊNG, đè lên mặc định
+   ô để trống     = ăn theo mặc định (không phải = 0)
+```
+
+Tra giá: mức riêng → mức mặc định của ca đó → `teacherPayPerHour`. **Ranh giới ca lấy từ CH2**
+(`shiftNoon_hour`, `shiftEvening_hour`) chứ không cắm cứng 12h/17h - trung tâm khác giờ khác thì
+sửa một ô là xong, đúng LUẬT 2.
+
+Màn mới **Cài đặt > Đơn giá giờ dạy**, đặt trong nhóm **Người & Quyền** vì anh Luân nói "để bên
+nhân sự họ tự sửa". Có ba khối: bảng mặc định 6 ô · bảng riêng theo từng giảng viên (chọn người ở
+dropdown, ô trống hiện mờ số mặc định làm placeholder) · và **bảng tổng "đang áp dụng cho cả đội"**
+- ô in đậm là mức riêng, ô mờ là đang ăn mặc định. Không có bảng tổng thì nhân sự phải bấm từng
+người mới biết ai đang ăn mức nào.
+
+**Ba chi tiết cố ý, đừng "dọn" đi:**
+
+- **Làm tròn nghìn MỘT LẦN ở tổng của mỗi người**, không làm tròn từng buổi. Làm tròn từng buổi rồi
+  cộng lại thì lệch, mà lệch trong phiếu lương là thứ người ta đếm được.
+- **Buổi thiếu giờ vào/giờ ra thì trả 0 và ĐẾM RIÊNG** (cột "N buổi thiếu giờ"), không tự bịa thời
+  lượng mặc định. Trong dữ liệu hiện tại 243/243 buổi đã dạy xong đều có đủ giờ, nhưng ngoài đời
+  sẽ có buổi quên bấm - lúc đó kế toán phải **thấy** để đi hỏi, chứ không phải nhận một con số đẹp
+  mà sai.
+- **Buổi WOW 1-1 vẫn tính theo BUỔI** (`wowPayPerSession`), vì DL14 chỉ ghi ngày giờ đặt, không có
+  giờ vào - giờ ra để nhân. Nói thẳng chỗ này trên cả màn bảng công lẫn màn đơn giá, kèm câu
+  "muốn tính WOW theo giờ thì phải ghi giờ vào - giờ ra cho buổi WOW trước đã". Lặng lẽ nhân bừa
+  một con số không có căn cứ là cách làm hỏng niềm tin vào cả bảng.
+
+**Bộ kiểm** (`_check16`, đã bẻ lại từng cái để thử): đổi `wowPayPerSession` chỉ đổi phần WOW · chưa
+khai bảng giá thì mọi giờ ăn theo `teacherPayPerHour` · đổi **một ô** mặc định chỉ đổi phần giờ của
+đúng ca đó · **mức riêng đè lên mặc định cho đúng người, và không đụng tới người khác**. Bẻ lại
+bằng cách bỏ lớp ghi đè trong `hourRate` → tiêu chí thứ tư đỏ đúng.
+
+### RANH GIỚI PHẠM VI - anh Luân chốt
+
+> *"Đây là sop chuyên chăm sóc học viên, nếu quá lệch khỏi mục tiêu này, em có thể bỏ qua, sau này
+> cần a sẽ yêu cầu."*
+
+Ghi vào đây để phiên sau **không tự ý làm**, dù bộ phận nghiên cứu xếp hạng chúng rất cao:
+
+| Mảng | Vì sao để lại |
+|---|---|
+| Gửi Zalo thật (Zalo OA/ZNS) + sổ tin đã gửi | hạ tầng tích hợp, không phải nghiệp vụ SOP |
+| Hồ sơ phụ huynh | gần với chăm sóc học viên nhất trong bốn cái - nhưng vẫn chờ lệnh |
+| Sổ quỹ + chi phí theo cơ sở | kế toán quản trị |
+| Chi phí marketing gắn nguồn lead (CPL/CAC) | marketing |
+| Phần còn lại của bảng lương (bảo hiểm, thuế, phụ cấp, chốt phiếu) | nhân sự - P19 chỉ làm phần đơn giá |
+
+Nguyên tắc rút ra: **cái gì phục vụ "học viên này đang thế nào, ai phải làm gì cho em ấy hôm nay"
+thì làm; cái gì là sổ sách của phòng ban khác thì nêu ra rồi để đó.**
