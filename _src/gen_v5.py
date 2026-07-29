@@ -2132,8 +2132,10 @@ function cell(r,col,sheet){var k=col[0],ty=col[2],v=r[k];
   var live=sheet?naLive(sheet,r):v;
   if(!live)return"<span class=mut>-</span>";
   var cd=sheet?naFor(sheet,r):"";
-  return '<span class="chip '+naCls(live)+'" style="max-width:260px;white-space:normal;text-align:left"'+
-   (cd?' title="Mẫu '+cd+' · Cấu hình > Thông điệp"':'')+'>'+esc(live)+'</span>'}
+  /* V9.36 (anh Luân: "chỗ việc cần làm cũng chưa trỏ tới cấu hình"): câu này lấy từ CH4, nên phải
+     có đường bấm thẳng sang chỗ sửa nó - trước đây chỉ có tooltip, mà tooltip thì không bấm được. */
+  return '<span class="chip '+naCls(live)+'" style="max-width:260px;white-space:normal;text-align:left">'+esc(live)+'</span>'+
+   (cd?msgEditBtn(cd):'')}
  return (v==null||v==="")?"<span class=mut>-</span>":esc(v)}
 function qsel(key,id,field,val){var em=ENUMMAP[field];var opts=(em&&ENUM[em])||[];var cur=String(val||"");var cls=stCls(cur),found=false;
  var h='<select class="qsel '+cls+'" onclick="event.stopPropagation()" onchange="quickStatus(\''+key+'\',\''+id+'\',\''+field+'\',this.value)">';
@@ -2154,6 +2156,46 @@ function colMenuHTML(key){var cfg=LISTCFG[key];if(window.COLMENU!==key)return ''
  hideInit(key);cfg.cols.forEach(function(c,i){var on=colVisible(key,c[0]);
   h+='<label class="colmi"><input type="checkbox" '+(on?"checked":"")+' onclick="colToggle(\''+key+'\',\''+esc(c[0])+'\')">'+esc(c[1])+'</label>'});
  h+='</div>';return h}
+/* ═══════════ V9.36 - BẤM TÊN LÀ RA NGĂN KÉO, Ở MỌI BẢNG ═══════════
+   (anh Luân: "a nhớ em có làm drawer rồi mà sao mấy trang này chưa có")
+   Trước đây tableHTML nối ngăn kéo bằng cách LIỆT KÊ TÊN TRANG - đúng 6 trang được nối tay, 23
+   trang còn lại tên người/lớp/khóa chỉ là chữ chết. Đó là kiểu vá từng trang mà dự án này đã cấm:
+   thêm trang mới là quên, và không ai biết mình quên.
+   Nay khai MỘT LẦN theo TÊN CỘT - cột nào là người/lớp/khóa thì mọi bảng đều bấm ra ngăn kéo. */
+var CELLLNK={
+ student_id:["openStuQuick","student_id"],student_id_name:["openStuQuick","student_id"],
+ student_name:["openStuQuick","student_id"],
+ lead_id:["leadDetail","lead_id"],lead_id_name:["leadDetail","lead_id"],
+ customer_name_display:["leadDetail","lead_id"],customer_name:["leadDetail","lead_id"],
+ class_id:["openLopQuick","class_id"],class_id_name:["openLopQuick","class_id"],class_name:["openLopQuick","class_id"],
+ course_id:["openKhoaQuick","course_id"],course_id_name:["openKhoaQuick","course_id"],course_name:["openKhoaQuick","course_id"],
+ teacher_id:["openNSQuick","teacher_id"],teacher_id_name:["openNSQuick","teacher_id"],
+ main_teacher_id:["openNSQuick","main_teacher_id"],main_teacher_id_name:["openNSQuick","main_teacher_id"],
+ assigned_to:["openNSQuick","assigned_to"],assigned_to_name:["openNSQuick","assigned_to"],
+ assignee_id:["openNSQuick","assignee_id"],assignee_id_name:["openNSQuick","assignee_id"],
+ assigner_id:["openNSQuick","assigner_id"],assigner_id_name:["openNSQuick","assigner_id"],
+ staff_id:["openNSQuick","staff_id"]};
+/* cột full_name thuộc về ai thì tuỳ BẢNG - học viên, khách, hay nhân sự */
+var FULLNAMEOF={DL09:["openStuQuick","student_id"],DL02:["leadDetail","lead_id"],DL01:["openNSQuick","staff_id"]};
+function cellLnk(r,c,cfg){
+ var d=(c[0]==="full_name")?FULLNAMEOF[cfg.code]:CELLLNK[c[0]];
+ if(!d)return null;
+ var id=String(r[d[1]]==null?"":r[d[1]]).trim();
+ if(!id)return null;
+ var txt=String(r[c[0]]==null?"":r[c[0]]).trim();
+ if(!txt)return null;
+ return '<a class="lnk" onclick="'+d[0]+'(\''+esc(id)+'\')">'+esc(txt)+'</a>'}
+/* Nút thao tác ĐÚNG NGHIỆP VỤ cho từng dòng: lấy thẳng việc mà bộ máy SLA đang treo lên bản ghi
+   đó - nút hiện ra chính là việc trợ thủ sẽ bảo làm. Không khai lại lần thứ hai ở từng bảng.
+   (anh Luân: "thao tác khiếu nại chỗ này ko chuẩn rồi") */
+function rowActMap(){
+ if(window.__rowActT===DVER&&window.__rowAct)return window.__rowAct;
+ var m={};try{slaItems().forEach(function(x){if(x.rid!=null&&!m[String(x.rid)])m[String(x.rid)]=x})}catch(e){}
+ window.__rowAct=m;window.__rowActT=DVER;return m}
+function rowSlaBtn(r,pk){
+ var x=rowActMap()[String(r[pk]==null?"":r[pk])];
+ if(!x||!x.act)return "";
+ return '<button class="btn sm primary" onclick="slaAct(\''+esc(x.act)+'\',\''+esc(String(x.rid||""))+'\')" data-tip="'+esc(String(x.what||"").slice(0,90))+'"><i class="ti ti-tool"></i>Làm ngay</button>'}
 function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
  hideInit(key);var cols=cfg.cols.filter(function(c){return colVisible(key,c[0])});if(!cols.length)cols=[cfg.cols[0]];
  var h='<div class="tbwrap"><table class="dt"><thead><tr>';
@@ -2166,15 +2208,11 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
   h+='<tr><td class="empty" colspan="'+(cols.length+1)+'">'+(isF?'Không có bản ghi khớp BỘ LỌC hiện tại. <button class="btn sm" onclick="clearFilt(\''+key+'\')" style="margin-left:8px"><i class="ti ti-x"></i>Xóa lọc</button>':'Chưa có bản ghi nào trong bảng này.')+'</td></tr>'}
  data.forEach(function(r){var id=esc(String(r[pk]||""));h+='<tr>';
   cols.forEach(function(c){
-    if((key==="nhaplead"&&c[0]==="full_name"))h+='<td><a class="lnk" onclick="leadDetail(\''+id+'\')">'+esc(String(r[c[0]]||""))+'</a></td>';
-    else if(key==="hocvien"&&c[0]==="full_name")h+='<td><a class="lnk" onclick="openStuQuick(\''+id+'\')">'+esc(String(r[c[0]]||""))+'</a></td>';
-    else if(key==="lop"&&c[0]==="class_name")h+='<td><a class="lnk" onclick="openLopQuick(\''+id+'\')">'+esc(String(r[c[0]]||""))+'</a></td>';
-    else if(key==="giangvien"&&c[0]==="full_name")h+='<td><a class="lnk" onclick="openNSQuick(\''+id+'\')">'+esc(String(r[c[0]]||""))+'</a></td>';
-    else if(key==="nhanvien"&&c[0]==="full_name")h+='<td><a class="lnk" onclick="openNSQuick(\''+id+'\')">'+esc(String(r[c[0]]||""))+'</a></td>';
-    else if(key==="khoahoc"&&c[0]==="course_name")h+='<td><a class="lnk" onclick="openKhoaQuick(\''+id+'\')">'+esc(String(r[c[0]]||""))+'</a></td>';
-    else if(!cfg.ro&&cfg.filt&&c[0]===cfg.filt&&ENUMMAP[cfg.filt]&&ENUM[ENUMMAP[cfg.filt]])h+='<td>'+qsel(key,id,cfg.filt,r[c[0]])+'</td>';
-    else h+='<td'+(c[2]==="money"?' style="text-align:right;font-variant-numeric:tabular-nums"':'')+'>'+cell(r,c,cfg.code)+'</td>';});
-  h+='<td><div class="rowact">'+(cfg.ro?'':'<button class="btn sm" onclick="openEdit(\''+key+'\',\''+id+'\')"><i class="ti ti-edit"></i>Sửa</button>')+
+    if(!cfg.ro&&cfg.filt&&c[0]===cfg.filt&&ENUMMAP[cfg.filt]&&ENUM[ENUMMAP[cfg.filt]]){h+='<td>'+qsel(key,id,cfg.filt,r[c[0]])+'</td>';return}
+    var lk=(c[2]==="chip"||c[2]==="enum"||c[2]==="money"||c[2]==="na")?null:cellLnk(r,c,cfg);
+    if(lk){h+='<td>'+lk+'</td>';return}
+    h+='<td'+(c[2]==="money"?' style="text-align:right;font-variant-numeric:tabular-nums"':'')+'>'+cell(r,c,cfg.code)+'</td>'});
+  h+='<td><div class="rowact">'+rowSlaBtn(r,pk)+(cfg.ro?'':'<button class="btn sm" onclick="openEdit(\''+key+'\',\''+id+'\')"><i class="ti ti-edit"></i>Sửa</button>')+
    act.map(function(a){return '<button class="btn sm" onclick="'+a.fn+'(\''+esc(String(r[a.arg]||""))+'\')"><i class="ti '+a.ic+'"></i>'+a.lb+'</button>'}).join("")+'</div></td>';
   h+='</tr>'});
  return h+'</tbody></table></div>'}
@@ -12605,7 +12643,7 @@ function navToggle(g){window.NAVOPEN=window.NAVOPEN||{};
    CHO RIÊNG nhóm Tra cứu; trang tác vụ theo chặng vẫn là nơi LÀM VIỆC (các sổ này ro:1, không nút sửa). */
 function mkRO(src,sub){var c={};for(var k in src)c[k]=src[k];c.ro=1;if(sub)c.sub=sub;return c}
 LISTCFG.dslienhe={code:"DL02b",filt:"channel",ro:1,sub:"Sổ liên hệ (DL02b) - mọi điểm chạm với khách, chỉ xem",
- cols:[["contact_time","Thời điểm"],["customer_name","Khách"],["channel","Kênh","enum"],["result_note","Kết quả","enum"],["content","Nội dung"]]};
+ cols:[["touchpoint_id","Mã"],["contact_time","Thời điểm"],["customer_name","Khách"],["channel","Kênh","enum"],["result_note","Kết quả","enum"],["content","Nội dung"]]};
 LISTCFG.dstest={code:"DL03",filt:"test_status",ro:1,sub:"Sổ test đầu vào (DL03) - chỉ xem; đặt lịch/chấm ở Tuyển sinh",
  act:[{lb:"Hồ sơ",ic:"ti-id-badge-2",fn:"openQuick",arg:"lead_id"}],
  cols:[["test_booking_id","Mã"],["lead_id_name","Khách"],["test_date","Ngày test"],["test_format","Hình thức","enum"],["test_attendance_status","Dự test","chip"],["test_status","Chấm","chip"],["overall_score","Overall"]]};
@@ -12618,17 +12656,20 @@ LISTCFG.dsdangky=mkRO(LISTCFG.tuvan,"Sổ đăng ký khóa (DL06) - chỉ xem; t
    Nguồn số: DL06b (lịch đợt) qua insDueState - KHÔNG tự đặt lại mốc "sắp đến hạn / quá hạn",
    dùng đúng ngưỡng installmentRemind_days / installmentLate_days của CH2 như chỗ nhắc đóng tiền,
    nếu không thì sổ dự thu và cái chuông sẽ nói hai con số khác nhau. */
+/* V9.36: cột đầu của bảng danh sách được dùng làm MÃ DÒNG (sửa, mở, gắn thao tác). Ba sổ dưới đây
+   khai cột đầu là NGÀY hoặc TÊN - tức là mã dòng sai, nút thao tác trỏ vào một chuỗi không phải
+   khoá. Nay đưa mã thật lên đầu. */
 LISTCFG.dsthanhtoan={code:"DL07",filt:"payment_method",ro:1,sub:"Sổ thu học phí (DL07) - chỉ xem; thu tiền ở Tuyển sinh > Thanh toán",
- cols:[["payment_time","Ngày thu"],["student_id_name","Học viên"],["amount","Số tiền","money"],["payment_method","Hình thức","enum"],["received_by","Người thu"],["verified_by","KT xác nhận"]]};
+ cols:[["payment_id","Mã"],["payment_time","Ngày thu"],["student_id_name","Học viên"],["amount","Số tiền","money"],["payment_method","Hình thức","enum"],["received_by","Người thu"],["verified_by","KT xác nhận"]]};
 LISTCFG.dsbuoihoc={code:"DL11",filt:"session_status",ro:1,sub:"Sổ buổi học (DL11) - chỉ xem; vận hành ở hub Học tập",
  cols:[["session_id","Mã"],["class_id_name","Lớp"],["session_number","Buổi"],["session_date","Ngày giờ"],["teacher_id_name","GV"],["session_status","Trạng thái","chip"]]};
 LISTCFG.dsdiemdanh={code:"DL12",filt:"attendance_status",ro:1,sub:"Sổ điểm danh (DL12) - chỉ xem; điểm danh ở Vận hành lớp",
- cols:[["student_name","Học viên"],["session_id","Buổi"],["attendance_status","Điểm danh","chip"],["check_in_time","Giờ vào"],["in_class_performance","Trong lớp","enum"]]};
+ cols:[["attendance_id","Mã"],["student_name","Học viên"],["session_id","Buổi"],["attendance_status","Điểm danh","chip"],["check_in_time","Giờ vào"],["in_class_performance","Trong lớp","enum"]]};
 LISTCFG.dsbaitap=mkRO(LISTCFG.baitap,"Sổ bài tập (DL13) - chỉ xem; giao/chấm ở Vận hành lớp");
 LISTCFG.dswow=mkRO(LISTCFG.wow,"Sổ WOW 1-1 (DL14) - chỉ xem; đặt/xử lý ở hub Học tập");
 LISTCFG.dsketthuc=mkRO(LISTCFG.ketthuc,"Sổ kết thúc khóa (DL18) - chỉ xem; xử lý ở C4");
 LISTCFG.dskhaosat={code:"DL15",filt:"survey_type",ro:1,sub:"Sổ khảo sát định kỳ (DL15) - chỉ xem; gửi/xử lý ở hub CSKH",
- cols:[["student_name","Học viên"],["survey_type","Đợt","enum"],["sent_date","Gửi"],["submitted_date","Trả lời"],["satisfaction_score","Hài lòng"],["follow_up_needed","Cần follow-up","enum"]]};
+ cols:[["survey_id","Mã"],["student_name","Học viên"],["survey_type","Đợt","enum"],["sent_date","Gửi"],["submitted_date","Trả lời"],["satisfaction_score","Hài lòng"],["follow_up_needed","Cần follow-up","enum"]]};
 LISTCFG.dsphanhoi=mkRO(LISTCFG.khaosat,"Sổ phản hồi / góp ý (DL16) - chỉ xem; xử lý ở hub CSKH");
 LISTCFG.dskhieunai=mkRO(LISTCFG.khieunai,"Sổ khiếu nại (DL17) - chỉ xem; xử lý ở hub CSKH");
 

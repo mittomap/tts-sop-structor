@@ -608,6 +608,52 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
   t("man Nhat ky loc duoc theo bang va theo nguoi", /nkSet\('NKTB'/.test(o)&&/nkSet\('NKWHO'/.test(o));
   t("man Nhat ky noi thang gioi han giu bao nhieu dong", o.indexOf("dòng gần nhất")>=0);
   t("man Nhat ky goi ten bang bang tieng Viet", o.indexOf("Test đầu vào")>=0||o.indexOf("Buổi học")>=0)})();
+ /* ============ 24. MOI BANG DANH SACH PHAI DU BA THU (V9.36) ============
+    Anh Luan chup trang So khieu nai: "a nho em co lam drawer roi ma sao may trang nay chua co,
+    cho viec can lam cung chua tro toi cau hinh (banh rang). Thao tac khieu nai cho nay ko chuan
+    roi. Chac may trang khac cung chua co nut ho tro nghiep vu dung roi a."
+    Do ra dung the va rong hon mot trang: 22/29 bang khong bam ten ra duoc ngan keo, 29/29 thieu
+    banh rang o cot Viec can lam, va nhieu bang chi co nut "Ho so" chu khong phai thao tac dung.
+    Goc: tableHTML noi ngan keo bang cach LIET KE TEN TRANG - dung 6 trang duoc noi tay.
+    Ba tieu chi duoi day soi TOAN BO bang, khong soi mau. */
+ (function(){
+  setRole("all");applyScope("");CURSTAFF="";
+  var kDrawer=[],kGear=[],kPk=[];
+  Object.keys(LISTCFG).forEach(function(k){
+   var c=LISTCFG[k],o="";
+   try{o=renderList(k)}catch(e){kDrawer.push(k+" (nem loi)");return}
+   /* (1) bang nao co cot NGUOI/LOP/KHOA thi phai bam ra duoc ngan keo */
+   var coCotNguoi=(c.cols||[]).some(function(x){
+    return (x[0]==="full_name"&&FULLNAMEOF[c.code])||(CELLLNK[x[0]]&&x[2]!=="chip"&&x[2]!=="enum"&&x[2]!=="money")});
+   if(coCotNguoi&&!/class="lnk"/.test(o))kDrawer.push(k);
+   /* (2) bang nao co cot "Viec can lam" thi cau nhac phai co BANH RANG tro ve CH4 */
+   var coNa=(c.cols||[]).some(function(x){return x[2]==="na"});
+   if(coNa&&!/cfedit/.test(o))kGear.push(k);
+   /* (3) cot dau la MA DONG - phai duy nhat. Khai nham NGAY hoac TEN lam ma dong thi nut thao tac
+      tro vao mot chuoi khong phai khoa, ma khong ai bao loi. */
+   var pk=c.cols[0][0],R=rows(c.code),seen={},lech=0;
+   R.forEach(function(r){var v=String(r[pk]==null?"":r[pk]);if(!v||seen[v])lech++;seen[v]=1});
+   if(R.length&&lech)kPk.push(k+"("+pk+")")});
+  t("moi bang co cot nguoi/lop/khoa deu bam ra ngan keo"+(kDrawer.length?(" - thieu: "+kDrawer.slice(0,5).join(", ")):""), kDrawer.length===0);
+  t("moi cot 'Viec can lam' deu co banh rang ve CH4"+(kGear.length?(" - thieu: "+kGear.slice(0,5).join(", ")):""), kGear.length===0);
+  t("cot dau cua moi bang la MA DONG duy nhat"+(kPk.length?(" - sai: "+kPk.slice(0,5).join(", ")):""), kPk.length===0);
+  /* (4) dong nao dang co viec trong hang cho thi PHAI co nut lam ngay dung nghiep vu */
+  t("dong dang co viec thi hien nut lam ngay dung nghiep vu", (function(){
+    var m=rowActMap();
+    var k=Object.keys(LISTCFG).filter(function(kk){
+     var c=LISTCFG[kk],pk=c.cols[0][0];
+     return rows(c.code).some(function(r){return m[String(r[pk])]})})[0];
+    if(!k)return false;
+    var c=LISTCFG[k],pk=c.cols[0][0];
+    var r=rows(c.code).filter(function(x){return m[String(x[pk])]})[0];
+    var b=rowSlaBtn(r,pk);
+    return /slaAct\(/.test(b)&&b.indexOf(m[String(r[pk])].act)>=0})());
+  t("nut lam ngay KHONG hien o dong khong co viec", (function(){
+    var m=rowActMap();
+    var c=LISTCFG.hocvien,pk=c.cols[0][0];
+    var r=rows(c.code).filter(function(x){return !m[String(x[pk])]})[0];
+    return !r||rowSlaBtn(r,pk)===""})());
+ })();
  /* ============ 23. TRO THU NHAP VAO GUIDE + CAU HINH DUOC (V9.34) ============
     Anh Luan: "tro thu chua du dang cap... phai bao nguoi ta lam tung buoc luon de don sach se van
     de dang cho ho lam" va "cach lam cua guide rat hop de lam tro thu".

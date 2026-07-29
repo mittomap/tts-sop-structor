@@ -149,7 +149,7 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.35 — (A)…(H) + (N1)…(N4) + ba việc anh Luân chốt 29/07 + KIỂM THỬ THẬT TRÊN
+> **Phiên bản: V9.36 — (A)…(H) + (N1)…(N4) + ba việc anh Luân chốt 29/07 + KIỂM THỬ THẬT TRÊN
 > TRÌNH DUYỆT + VÁ "CHỜ DUYỆT BỊ ĐƠ" + TRỢ THỦ NHẬP VÀO GUIDE ĐỀU ✅ XONG.**
 > · **(1) Nhật ký thao tác (DL25)** - app từng có 115 cửa ghi mà không sổ nào ghi ai làm gì lúc nào.
 > · **(2) Hoàn tác** - 46 chỗ hỏi "Xác nhận?" mà không có đường lùi; nay lùi được theo LƯỢT BẤM.
@@ -175,10 +175,10 @@
 > ảnh đại diện kéo từ `ui-avatars.com` (gửi TÊN NGƯỜI THẬT ra máy chủ nước ngoài).
 > **Bộ kiểm hiện tại (phải XANH HẾT mới được giao):** node --check 2 file · `_tall` **38 trang** 0 lỗi
 > (170 icon) · `_check11` **144** · `_check12` 37 · `_check13` 174 · `_check14` **111** · `_check15`
-> **39** · **`_check16` 578** · `_check17` **394** · **`_check18` 155 (vẽ thật 77 trang/tab + 8 chức
+> **39** · **`_check16` 578** · `_check17` **394** · **`_check18` 160 (vẽ thật 77 trang/tab + 8 chức
 > danh + mọi hồ sơ cổng học viên + nhật ký/hoàn tác/bộ nhớ tạm)** · `_checktour` · `_checkdata.js`
 > 27 luật / **6289 lượt kiểm - 0 lệch** · `check_logic.py` (đúng 4 ca cố ý) · `check_data.py` DAT ·
-> **`_checkui.js` 402 lượt mở THẬT trong trình duyệt**.
+> **`_checkui.js` 456 lượt mở THẬT trong trình duyệt**.
 > **Tổng ~1975 tiêu chí tự động + 402 lượt mở thật.**
 >
 > **VIỆC PHẢI LÀM TIẾP - THEO ĐÚNG THỨ TỰ NÀY (Luân chốt 28/07 khuya, rồi về nghỉ):**
@@ -729,6 +729,33 @@
 > rồi gọi hàm vẽ** - đi đường tắt, **không bao giờ đi qua `go()`**, mà lỗi nằm đúng ở đường `go()` +
 > phạm vi chức danh. Nay nó **bấm từng mục menu như người dùng** rồi đối chiếu màn nhận được.
 > **Luật rút ra: bộ kiểm đi đường tắt là bộ kiểm mù đúng chỗ người dùng đi.**
+>
+> ### V9.36 - BẢNG DANH SÁCH THIẾU BA THỨ (anh Luân chụp trang Sổ khiếu nại)
+>
+> Anh Luân: *"a nhớ em có làm drawer rồi mà sao mấy trang này chưa có, chỗ việc cần làm cũng chưa
+> trỏ tới cấu hình (bánh răng). Thao tác khiếu nại chỗ này ko chuẩn rồi. Chắc mấy trang khác cũng
+> chưa có nút hỗ trợ nghiệp vụ đúng rồi á."*
+>
+> Đo ra thì đúng cả ba, và **rộng hơn một trang**: **22/29** bảng không bấm tên ra được ngăn kéo,
+> **29/29** thiếu bánh răng ở cột Việc cần làm, và nhiều bảng chỉ có nút "Hồ sơ" chứ không phải thao
+> tác đúng nghiệp vụ.
+>
+> **Gốc:** `tableHTML` nối ngăn kéo bằng cách **liệt kê TÊN TRANG** - đúng 6 trang được nối tay, 23
+> trang còn lại tên người/lớp/khóa chỉ là chữ chết. Đúng kiểu vá từng trang mà dự án này đã cấm từ
+> đợt bộ máy lọc: thêm trang mới là quên, và không ai biết mình quên.
+>
+> **Sửa ở tầng dùng chung, một chỗ cho cả 29 bảng:**
+> · `CELLLNK` khai theo **TÊN CỘT** (student_id, class_id_name, teacher_id...) chứ không theo tên
+>   trang; cột `full_name` thì tra `FULLNAMEOF` theo BẢNG (DL09 → học viên, DL02 → khách, DL01 → nhân sự).
+> · Ô "Việc cần làm" nay gắn **bánh răng `msgEditBtn`** bấm thẳng sang CH4 - trước đây chỉ có tooltip,
+>   mà tooltip thì không bấm được.
+> · `rowSlaBtn` lấy **thẳng việc mà bộ máy SLA đang treo lên bản ghi đó** - nút hiện ra chính là việc
+>   trợ thủ sẽ bảo làm, không khai lại lần thứ hai ở từng bảng. Dòng không có việc thì không có nút.
+>
+> **Lỗi thứ tư lòi ra khi soi:** cột đầu của bảng danh sách được dùng làm **MÃ DÒNG**, mà bốn sổ tra
+> cứu khai cột đầu là **NGÀY hoặc TÊN** (`payment_time`, `student_name`, `contact_time`) - tức là mã
+> dòng trùng nhau hàng loạt, nút thao tác trỏ vào một chuỗi không phải khoá, mà **không ai báo lỗi**.
+> Đã đưa mã thật lên đầu và thêm tiêu chí: cột đầu của MỌI bảng phải là mã duy nhất.
 >
 > ### V9.35 - TRỢ THỦ VỀ MỘT GÓC (anh Luân: *"cách hiển thị này a chưa thích lắm... chưa đủ hiện đại kiểu 1 trợ thủ"*)
 >
