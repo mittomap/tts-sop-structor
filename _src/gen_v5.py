@@ -2178,20 +2178,45 @@ ketthuc:{code:"DL18",filt:"re_enrollment_status",act:[{lb:"Xem nhanh",ic:"ti-eye
  cols:[["course_end_id","Mã"],["student_id_name","Học viên"],["final_test_score","Điểm cuối"],["attendance_rate","Chuyên cần"],["achievement_status","Đạt mục tiêu","chip"],["re_enrollment_status","Tái ĐK","chip"],["testimonial_given","Cảm nhận HV"]],
  form:[["student_id","Chọn HV (gõ SĐT/tên)","@student",1],["final_test_score","Điểm test cuối"],["attendance_rate","Tỷ lệ chuyên cần"],["completion_rate","Tỷ lệ hoàn thành"],["achievement_status","Mức đạt mục tiêu","enum_achievement_status"],["re_enrollment_status","Tái ĐK","enum_re_enrollment_status"],["achievement_note","Ghi chú","ta"]],idp:"CE-"},
 /* ===== 5 BẢNG TRƯỚC ĐÂY CHƯA CÓ DANH SÁCH NÀO TRỎ TỚI ===== */
+/* V9.40: thêm hai cột BÁN ĐƯỢC BAO NHIÊU. 9/16 khóa trong danh mục chưa bán được đơn nào suốt
+   10 tháng dữ liệu, tất cả đều để "đang bán" - mà lịch vẫn xếp 4 lớp cho chúng, chiếm 56 ghế và
+   3 giáo viên. Danh mục cũ chỉ liệt kê giá, số buổi, quota, nên 9 mã chết trông y hệt 7 mã sống. */
 khoahoc:{code:"DL05",filt:"status",sub:"Khóa học - sản phẩm & học phí (DL05)",act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openKhoaQuick",arg:"course_id"}],
- cols:[["course_id","Mã"],["course_name","Tên khóa"],["course_level","Trình độ","chip"],["duration_sessions","Số buổi"],["duration_months","Số tháng"],["list_price","Học phí","money"],["wow_quota_default","Quota WOW"],["learning_mode_supported","Hình thức"],["description","Mô tả"],["status","Trạng thái","chip"]],
+ cols:[["course_id","Mã"],["course_name","Tên khóa"],["course_level","Trình độ","chip"],["duration_sessions","Số buổi"],["duration_months","Số tháng"],["list_price","Học phí","money"],["__don","Đơn đã bán","calc"],["__dt","Doanh thu","calcmoney"],["wow_quota_default","Quota WOW"],["learning_mode_supported","Hình thức"],["status","Trạng thái","chip"]],
  form:[["course_id","Mã khóa (vd CRS-IELTS65-04)",0,1],["course_name","Tên khóa",0,1],["course_level","Trình độ","enum_class_level",1],["duration_sessions","Số buổi"],["duration_months","Số tháng"],["list_price","Học phí niêm yết (đ)",0,1],["wow_quota_default","Quota WOW mặc định"],["learning_mode_supported","Hình thức hỗ trợ (online/offline/hybrid)"],["description","Mô tả khóa","ta"],["status","Trạng thái (active / inactive)"]],idp:"CRS-"},
 };
 
 var CURROLE="sales", CUR="banlam", SEARCH={}, FILT={}, PAGE={}, PSIZE=20;
 
 /* ---------- render helpers ---------- */
+/* Cột tính: nhớ tạm theo DVER vì bảng danh mục vẽ lại liên tục. */
+var _ccC=null,_ccV=-1;
+function calcTab(){
+ if(_ccC&&_ccV===DVER)return _ccC;
+ var T={};
+ rows("DL06").forEach(function(e){
+  if(isc(e.enrollment_status,"cancelled"))return;
+  var c=String(e.course_id||"");if(!c)return;
+  if(!T[c])T[c]={don:0,tien:0};
+  T[c].don++;T[c].tien+=num(e.final_fee)||num(e.total_fee)});
+ _ccV=DVER;return (_ccC=T)}
+function calcCol(k,r,sheet){
+ if(sheet!=="DL05")return 0;
+ var t=calcTab()[String(r.course_id||"")]||{don:0,tien:0};
+ return k==="__don"?t.don:(k==="__dt"?t.tien:0)}
 function cell(r,col,sheet){var k=col[0],ty=col[2],v=r[k];
  /* V9.22: tang CHE TRUONG - thay dong nhung che o nhay cam (tien / SDT / noi dung tu van) */
  if(dsMaskField(k))return '<span class="mut" title="Truong nay bi an theo phan quyen cua chuc danh ban">&#8226;&#8226;&#8226;</span>';
  if(ty==="enum")return esc(elabel(v))||"<span class=mut>-</span>";
  if(ty==="chip"){if(v==null||v==="")return"<span class=mut>-</span>";return '<span class="chip '+stCls(v)+'">'+esc(elabel(v))+'</span>'}
  if(ty==="money")return v?money(v):"<span class=mut>-</span>";
+ /* V9.40: cột TÍNH - không đọc một ô nào của dòng, mà đếm từ bảng khác. Dùng cho "khóa này bán
+    được bao nhiêu đơn" - con số quan trọng nhất của một dòng danh mục sản phẩm mà bảng gốc
+    không có. Khóa 0 đơn tô đỏ để nó không trông giống khóa đang bán chạy. */
+ if(ty==="calc"||ty==="calcmoney"){
+  var cv=calcCol(k,r,sheet);
+  if(ty==="calcmoney")return cv?money(cv):'<span class="chip red">chưa bán được đồng nào</span>';
+  return cv?('<b>'+cv+'</b>'):'<span class="chip red">0 đơn</span>'}
  if(ty==="na"){                       /* việc cần làm: tra CH4 theo trạng thái THẬT, không đọc chữ lưu sẵn */
   var live=sheet?naLive(sheet,r):v;
   if(!live)return"<span class=mut>-</span>";
@@ -3125,22 +3150,41 @@ function srcPerfSection(){var R=repRange();
 function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sales/.test(ecode(x.role))&&!/inactive|nghỉ/i.test(String(x.status||""))});
  if(!sales.length)return "";
  var w0=new Date();w0.setHours(0,0,0,0);w0=new Date(w0.getTime()-6*864e5);
- var h='<div class="panel" style="margin-bottom:16px"><div class="ph"><b><i class="ti ti-users" style="margin-right:6px"></i>Hiệu suất đội tư vấn</b><span class="mut" style="font-size:11.5px">liên hệ &amp; kết nối: 7 ngày gần nhất · đăng ký &amp; doanh thu: toàn kỳ dữ liệu</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Nhân viên</th><th>Lead phụ trách</th><th>Liên hệ (7 ngày)</th><th>Kết nối (7 ngày)</th><th>ĐK (7 ngày)</th><th>ĐK toàn kỳ</th><th>Doanh thu ghi nhận</th></tr></thead><tbody>';
+ var h='<div class="panel" style="margin-bottom:16px"><div class="ph"><b><i class="ti ti-users" style="margin-right:6px"></i>Hiệu suất đội tư vấn</b><span class="mut" style="font-size:11.5px">liên hệ &amp; kết nối: 7 ngày gần nhất · đăng ký &amp; doanh thu: toàn kỳ dữ liệu</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Nhân viên</th><th>Lead phụ trách</th><th>Liên hệ (7 ngày)</th><th>Kết nối (7 ngày)</th><th>ĐK (7 ngày)</th><th>ĐK toàn kỳ</th><th>Doanh thu khách của mình</th><th>Trong đó tự tay thu</th></tr></thead><tbody>';
  sales.forEach(function(sv){var id=sv.staff_id;
   var myL={};var nL=0;rows("DL02").forEach(function(l){if(String(l.assigned_to||"")===id){myL[l.lead_id]=1;nL++}});
   var tp=rows("DL02b").filter(function(t){if(String(t.staff_id||"")!==id)return false;var d=pvnd(t.contact_time);return d&&d>=w0});
   var ok=tp.filter(function(t){return cresOK(ecode(t.result_note))}).length;
   var nE=rows("DL06").filter(function(e){return myL[e.lead_id]&&!isc(e.enrollment_status,"cancelled")}).length;
   var nE7=rows("DL06").filter(function(e){if(!myL[e.lead_id]||isc(e.enrollment_status,"cancelled"))return false;var d=pvnd(e.enrollment_time);return d&&d>=w0}).length;
-  var rev=0;rows("DL07").forEach(function(p){if(String(p.received_by||"")===id)rev+=num(p.amount)});
-  h+='<tr><td><a class="lnk" onclick="openNSQuick(\''+esc(id)+'\')"><b>'+esc(sv.full_name)+'</b></a><div class="mut" style="font-size:10.5px">'+esc(id)+'</div></td><td>'+nL+'</td><td>'+tp.length+'</td><td>'+(tp.length?Math.round(ok*100/tp.length)+"%":"—")+'</td><td>'+nE7+'</td><td>'+nE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums">'+vnd(rev)+'</td></tr>'});
- var tL=0,tT=0,tO=0,tE7=0,tE=0,tR=0;
+  /* V9.40 - DOANH THU THEO NGƯỜI CHỐT, KHÔNG PHẢI NGƯỜI CẦM TIỀN. Trước đây cột này cộng
+     DL07 theo received_by, tức tổng tiền người đó TRỰC TIẾP NHẬN. Đo lệch tới 2,4 lần: NV026
+     app ghi 79,6tr trong khi khách của em ấy đóng 188,8tr. 24/112 khoản thu do học vụ và kế
+     toán nhận nên không rơi vào NV tư vấn nào. Ở mô hình 5 cơ sở đây là chuyện thường ngày:
+     khách chuyển khoản thẳng, hoặc đóng ở quầy cơ sở khác nơi NV ngồi. Đây là bảng DUY NHẤT
+     nói NV tư vấn làm được bao nhiêu - sai 2,4 lần thì không họp bằng nó được, nên ai cũng
+     tự giữ một file Excel doanh số riêng.
+     Nay: quy về LEAD do người đó phụ trách. Giữ thêm cột "tự tay thu" để đối chiếu quỹ. */
+  var myE={};rows("DL06").forEach(function(e){if(myL[e.lead_id]&&!isc(e.enrollment_status,"cancelled"))myE[e.enrollment_id]=1});
+  var rev=0,revTay=0;
+  rows("DL07").forEach(function(p){
+   if(myE[p.enrollment_id])rev+=num(p.amount);
+   if(String(p.received_by||"")===id)revTay+=num(p.amount)});
+  h+='<tr><td><a class="lnk" onclick="openNSQuick(\''+esc(id)+'\')"><b>'+esc(sv.full_name)+'</b></a><div class="mut" style="font-size:10.5px">'+esc(id)+'</div></td><td>'+nL+'</td><td>'+tp.length+'</td><td>'+(tp.length?Math.round(ok*100/tp.length)+"%":"—")+'</td><td>'+nE7+'</td><td>'+nE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums"><b>'+vnd(rev)+'</b></td>'+
+   '<td style="text-align:right;font-variant-numeric:tabular-nums" class="mut">'+vnd(revTay)+'</td></tr>'});
+ var tL=0,tT=0,tO=0,tE7=0,tE=0,tR=0,tRt=0;
  sales.forEach(function(sv){var id=sv.staff_id;var myL={};rows("DL02").forEach(function(l){if(String(l.assigned_to||"")===id){myL[l.lead_id]=1;tL++}});
   rows("DL02b").forEach(function(t2){if(String(t2.staff_id||"")!==id)return;var d=pvnd(t2.contact_time);if(d&&d>=w0){tT++;if(cresOK(ecode(t2.result_note)))tO++}});
   rows("DL06").forEach(function(e){if(!myL[e.lead_id]||isc(e.enrollment_status,"cancelled"))return;tE++;var d=pvnd(e.enrollment_time);if(d&&d>=w0)tE7++});
-  rows("DL07").forEach(function(p){if(String(p.received_by||"")===id)tR+=num(p.amount)})});
- h+='<tr style="font-weight:700;background:#F7F9FC"><td>Cả đội</td><td>'+tL+'</td><td>'+tT+'</td><td>'+(tT?Math.round(tO*100/tT)+"%":"—")+'</td><td>'+tE7+'</td><td>'+tE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums">'+vnd(tR)+'</td></tr>';
- h+='</tbody></table></div></div>';return h}
+  var myE2={};rows("DL06").forEach(function(e){if(myL[e.lead_id]&&!isc(e.enrollment_status,"cancelled"))myE2[e.enrollment_id]=1});
+  rows("DL07").forEach(function(p){if(myE2[p.enrollment_id])tR+=num(p.amount);
+   if(String(p.received_by||"")===id)tRt+=num(p.amount)})});
+ h+='<tr style="font-weight:700;background:#F7F9FC"><td>Cả đội</td><td>'+tL+'</td><td>'+tT+'</td><td>'+(tT?Math.round(tO*100/tT)+"%":"—")+'</td><td>'+tE7+'</td><td>'+tE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums">'+vnd(tR)+'</td>'+
+  '<td style="text-align:right;font-variant-numeric:tabular-nums" class="mut">'+vnd(tRt)+'</td></tr>';
+ h+='</tbody></table></div><div class="mut" style="font-size:11.5px;padding:11px 16px;line-height:1.7">'+
+  '<b>Doanh thu khách của mình</b> = mọi khoản đã thu của các đơn thuộc lead người đó phụ trách - đây là con số dùng để đánh giá và để họp. '+
+  '<b>Trong đó tự tay thu</b> = phần chính người đó trực tiếp nhận tiền; cột này để kế toán đối chiếu quỹ, không phải để chấm công. '+
+  'Hai số lệch nhau là bình thường: khách chuyển khoản thẳng, hoặc đóng ở quầy cơ sở khác.</div></div>';return h}
 function deptSection(){var L=rows("DL02"),S=rows("DL09"),E=rows("DL06"),pay=rows("DL07"),HW=rows("DL13"),T=rows("DL03"),W=rows("DL14"),KN=rows("DL17"),FB=rows("DL16"),SV=rows("DL15"),OB=rows("DL08"),ATT=rows("DL12");
  function cnt(a,fn){return a.filter(fn).length}function pct(a,b){return b?Math.round(a/b*100)+"%":"-"}
  var conv=cnt(L,function(r){return isc(r.lead_status,"converted")});var cvr=L.length?Math.round(conv/L.length*100):0;
@@ -3284,14 +3328,24 @@ function slaItems(){var out=jTasks();
  srows("DL06").forEach(function(e){if(/cancel/.test(ecode(e.enrollment_status)))return;var tot=num(e.final_fee)||num(e.total_fee);var rem=e.remaining_amount!==undefined&&e.remaining_amount!==""?num(e.remaining_amount):Math.max(0,tot-num(e.paid_amount));if(rem<=0)return;
   /* NHẮC TRƯỚC HẠN chứ không đợi quá hạn mới réo - gọi trước vài ngày thì đòi dễ hơn nhiều.
      Số ngày nhắc trước và ngưỡng chuyển đỏ đều lấy từ CH2. */
+  /* V9.40: người đã rời trung tâm thì đây không phải "thu công nợ" nữa - xem nhóm nợ treo. */
+  if(enrBoRoi(e))return;
   var _ins=insOf(e.enrollment_id).filter(function(x){return !isc(x.status,"paid")});
   var _rd=paramOf("installmentRemind_days",3),_ld=paramOf("installmentLate_days",5);
+  /* V9.40: ĐÃ NHẮC thì tạm lùi. Khoản CHƯA quá hạn mà vừa nhắc trong debtRemindGap_days thì
+     không réo lại - kế toán vừa gọi hôm qua, hôm nay hiện y nguyên là dạy người ta bỏ qua cả
+     hàng chờ. Khoản ĐÃ QUÁ HẠN thì VẪN GIỮ (nhắc rồi mà chưa thu được vẫn là tiền chưa về),
+     chỉ ghi thêm đã nhắc bao lâu để biết ai lâu nhất chưa ai đụng. */
+  var _gap=num(paramOf("debtRemindGap_days",3)),_rdays=debtRemindDays(e);
+  var _vuaNhac=_rdays!=null&&_rdays<_gap;
+  var _nhac=_rdays==null?" · chưa ghi lần nhắc nào":(" · đã nhắc "+Math.max(0,Math.round(_rdays))+" ngày trước");
   if(_ins.length){var x0=_ins[0],st0=insDueState(x0);
    var _amt=num(x0.remaining_amount)||num(x0.due_amount);
    var _lbl="Đợt "+x0.installment_no+"/"+x0.installment_of+" · "+vnd(_amt)+" · hạn "+(x0.due_date||"?");
-   if(st0.k==="late")add("Tài chính","Thu công nợ","red","ti-cash",e.student_id_name||e.student_id,"QUÁ HẠN "+Math.abs(st0.days)+" ngày - "+_lbl,Math.abs(st0.days)*24,"thanhtoan","due",{act:"paydebt",rid:e.enrollment_id,prm:"installmentLate_days"});
-   else if(st0.k==="due"||st0.k==="today")add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"TỚI HẠN - "+_lbl,0,"thanhtoan","due",{act:"paydebt",rid:e.enrollment_id,prm:"installmentLate_days"});
-   else if(st0.k==="soon")add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"SẮP TỚI HẠN (còn "+st0.days+" ngày) - "+_lbl,0,"thanhtoan","due",{act:"paydebt",rid:e.enrollment_id,prm:"installmentLate_days"});
+   if(st0.k==="late")add("Tài chính","Thu công nợ","red","ti-cash",e.student_id_name||e.student_id,"QUÁ HẠN "+Math.abs(st0.days)+" ngày - "+_lbl+_nhac,Math.abs(st0.days)*24,"thanhtoan","due",{act:"paydebt",rid:e.enrollment_id,prm:"installmentLate_days"});
+   else if(_vuaNhac)return;
+   else if(st0.k==="due"||st0.k==="today")add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"TỚI HẠN - "+_lbl+_nhac,0,"thanhtoan","due",{act:"paydebt",rid:e.enrollment_id,prm:"debtRemindGap_days"});
+   else if(st0.k==="soon")add("Tài chính","Thu công nợ","amber","ti-cash",e.student_id_name||e.student_id,"SẮP TỚI HẠN (còn "+st0.days+" ngày) - "+_lbl+_nhac,0,"thanhtoan","due",{act:"paydebt",rid:e.enrollment_id,prm:"debtRemindGap_days"});
    return}
   var due=pvnd(e.next_payment_due);
   if(due){var dh=(new Date().getTime()-due.getTime())/36e5;
@@ -3368,6 +3422,19 @@ function slaItems(){var out=jTasks();
     add("Học vụ","Lớp sắp khai giảng chưa có giáo viên",left<=dec?"red":"amber","ti-user-question",nhan,
      "Còn "+left+" ngày là khai giảng mà chưa gán giáo viên chính",
      left*24,"xeplop",null,{act:"molop",rid:c.class_id,prm:"thresholdClassStart_days"})})})();
+ /* V9.40 - THƯỞNG GIỚI THIỆU TREO. Kênh giới thiệu ra 147,5tr doanh thu từ đúng 5 học viên -
+    tỷ lệ chốt cao nhất trong mọi nguồn. Vậy mà có 2 phần thưởng treo 76 và 48 ngày không ai
+    nhắc: trang Khác chỉ ĐẾM số thưởng chờ, không nói khoản đó treo bao lâu. Trao thưởng chậm
+    là thứ giết chương trình giới thiệu nhanh nhất - người ta giới thiệu một lần rồi thôi. */
+ (function(){var gd=num(paramOf("referralRewardGrant_days",7))||7;
+  srows("DL19").forEach(function(r){
+   if(!isc(r.reward_status,"pending"))return;
+   var d=pvnd(r.created_at);var days=d?Math.round((new Date().getTime()-d.getTime())/864e5):null;
+   var over=days!=null&&days>gd;
+   add("CSKH","Trao thưởng giới thiệu",over?"red":"amber","ti-gift",r.referrer_name||r.referrer_student_id,
+    (over?"TREO "+days+" NGÀY - ":"")+"Thưởng \""+(r.reward_content||"")+"\" cho người giới thiệu "+
+    (r.referred_name?("(bạn "+r.referred_name+" đã đăng ký)"):"")+" - hạn trao "+gd+" ngày",
+    days!=null?days*24:null,"magioithieu",null,{hoso:r.referrer_student_id,prm:"referralRewardGrant_days"})})})();
  /* Bảo lưu sắp hết hạn: gọi mời quay lại TRƯỚC thresholdPauseRemind_days ngày */
  (function(){var rmd=paramOf("thresholdPauseRemind_days",14);
   srows("DL09").forEach(function(x){if(!isc(x.student_status,"transferred","dropped"))return;
@@ -8191,6 +8258,8 @@ var APPPARAMS=[
  ["Học vụ - Lớp học","slaAttendanceGate_minutes","Cổng điểm danh mở bao nhiêu phút TRƯỚC giờ học (GV bấm Bắt đầu lớp trong khoảng này)","phút",20],
  ["Học vụ - Lớp học","thresholdAtRisk_absences","Vắng không phép bao nhiêu buổi -> HV có nguy cơ chuyên cần","buổi",2],
  ["Học vụ - Lớp học","thresholdAtRisk_hw_missing","Thiếu bài tập bao nhiêu lần -> HV có nguy cơ học thuật","lần",3],
+ ["Tài chính","referralRewardGrant_days","Bạn được giới thiệu đã đăng ký thì phải trao thưởng cho người giới thiệu trong bao nhiêu ngày","ngày",7],
+ ["Tài chính","debtRemindGap_days","Nhắc thu nợ rồi thì việc tạm lùi bao nhiêu ngày trước khi hiện lại (khoản quá hạn vẫn giữ)","ngày",3],
  ["Học vụ - Lớp học","slaWowConfirm_hours","Hạn giáo viên WOW xác nhận một buổi vừa được đặt","giờ",24],
  ["Học vụ - Lớp học","riskIgnore_days","Học vụ xem rồi bấm 'tạm bỏ qua' thì máy im bao nhiêu ngày trước khi nhắc lại","ngày",14],
  ["Học vụ - Lớp học","thresholdClassStart_days","Còn bao nhiêu ngày tới khai giảng thì lớp vào diện theo dõi sĩ số","ngày",14],
@@ -9137,7 +9206,7 @@ function payForm(id){var e=find("DL06","enrollment_id",id)||{};var tot=num(e.fin
  h+='<div class="fld"><label>Mã giao dịch</label><input id="pm_ref"></div>';
  h+=attachBox("pay","Ảnh biên lai / màn hình chuyển khoản");
  h+='<div class="fld"><label>Hẹn thu phần còn lại (nếu chưa đủ)</label><input id="pm_due" type="date"><div class="fhint">Đến hẹn, hồ sơ tự nổi vào "Tới hẹn thu" thay vì chờ quá kỳ nhắc nợ.</div></div>';
- if(rem>0)h+='<div class="fld full">'+zaloBtn("phi",{ten:e.student_id_name||"",tien:vnd(rem),khoa:e.course_id_name||"",han:e.next_payment_due||"hạn đã hẹn"})+'</div>';
+ if(rem>0)h+='<div class="fld full">'+zaloBtn("phi",{ten:e.student_id_name||"",tien:vnd(rem),khoa:e.course_id_name||"",han:e.next_payment_due||"hạn đã hẹn"},e.enrollment_id)+'</div>';
  h+='<div class="fld full" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" onclick="paySave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Lưu khoản thu</button><button class="btn" onclick="printEnroll(\''+esc(id)+'\')"><i class="ti ti-file-text"></i>In xác nhận đăng ký</button>'+
   '<button class="btn" onclick="closeModal();insPlanForm(\''+esc(id)+'\')"><i class="ti ti-calendar-dollar"></i>Chia lại lịch đợt</button></div></div>';
  openDrawer("Ghi nhận thanh toán",h)}
@@ -9173,9 +9242,22 @@ var MSGKH={
  info:function(c){return "IELTS The Tutors gui thong tin lop cua "+c.ten+": lop "+c.lop+", lich hoc "+c.lich+". Vui long xac nhan de trung tam chot danh sach. Hen gap ban o buoi dau tien!"+c.hot},
  phi:function(c){return "IELTS The Tutors nhac lich thanh toan cua "+c.ten+": con lai "+c.tien+" cho khoa "+c.khoa+". Ban vui long hoan tat truoc "+c.han+" de giu cho lop nhe."+c.hot},
  taidk:function(c){return "IELTS The Tutors chuc mung "+c.ten+" da hoan thanh khoa "+c.khoa+"! Trung tam dang co uu dai tai ghi danh cho hoc vien cu - ban ghe qua hoac nhan lai de duoc tu van lo trinh tiep theo nhe."+c.hot}};
-function zaloBtn(kind,ctx){var hot=paramStr("centerHotline","");ctx.hot=hot?(" Hotline: "+hot):"";
+/* V9.40: nút này ĐỒNG THỜI ghi lại "đã nhắc lúc nào". Trước đây nó chỉ chép vào clipboard -
+   người dùng rời app sang Zalo dán rồi quay lại, và KHÔNG có chỗ nào ghi là đã nhắc. Luật sinh
+   việc "Thu công nợ" hoàn toàn dựa vào ngày hạn, không có mốc "lần nhắc gần nhất", nên 25 dòng
+   công nợ hiện y nguyên ngày mai, ngày kia. Kế toán hoặc mở lại từng dòng để nhớ mình đã nhắc
+   ai (25 x 2 bấm = 50 bấm/ngày phí), hoặc ghi ra một cuốn sổ ngoài app. */
+function zaloBtn(kind,ctx,rid){var hot=paramStr("centerHotline","");ctx.hot=hot?(" Hotline: "+hot):"";
  var txt=(MSGKH[kind]||function(){return ""})(ctx);
- return '<button class="btn sm" onclick="hvCopy(\''+esc(txt.replace(/'/g,""))+'\',\'Đã copy tin - dán vào Zalo cho khách.\')"><i class="ti ti-copy"></i>Copy tin Zalo</button>'}
+ var sau=rid?(";debtRemind(\''+esc(rid)+'\')"):'"';
+ return '<button class="btn sm" onclick="hvCopy(\''+esc(txt.replace(/'/g,""))+'\',\'Đã copy tin - dán vào Zalo cho khách.\')'+sau+'><i class="ti ti-copy"></i>Copy tin Zalo'+(rid?" và ghi đã nhắc":"")+'</button>'}
+/* Ghi mốc nhắc nợ. KHÔNG xoá việc khỏi hàng chờ khi khoản đã QUÁ HẠN - nhắc rồi mà chưa thu
+   được thì vẫn là tiền chưa về; chỉ ghi thêm "đã nhắc N ngày trước" để biết ai lâu chưa ai đụng. */
+function debtRemind(eid){var e=find("DL06","enrollment_id",eid);if(!e)return;
+ markRow("DL06","enrollment_id",eid,{last_reminded_at:nowStr()},
+  "Đã ghi lần nhắc - việc này tạm lùi "+num(paramOf("debtRemindGap_days",3))+" ngày (khoản quá hạn thì vẫn giữ trong hàng chờ).")}
+function debtRemindDays(e){var d=pvnd(e&&e.last_reminded_at);if(!d)return null;
+ return (new Date().getTime()-d.getTime())/864e5}
 function payMsgText(e,amt,method,ref){var rem=Math.max(0,(num(e.final_fee)||num(e.total_fee))-num(e.paid_amount));
  var hot=paramStr("centerHotline","");
  return "IELTS The Tutors xac nhan da nhan "+vnd(amt)+" tu "+(e.student_id_name||e.student_id||"")+
@@ -12731,9 +12813,27 @@ function renderCong(){
 function sothuTab(k){window.STTAB=k;reRender("dsthanhtoan")}
 /* Gom mọi đợt CHƯA đóng đủ thành danh sách dự thu. Mỗi dòng = một đợt của một đơn.
    Số tiền còn phải thu của đợt = due_amount - paid_amount (đợt đóng dở vẫn còn phần chưa vào). */
+/* ===== ĐƠN CÒN MỞ CỦA HỌC VIÊN ĐÃ RỜI ==============================================
+   V9.40. duthuList() trước đây chỉ loại đơn "đã hủy". Nhưng có 5 đơn vẫn ghi "đã xác nhận"
+   trong khi HỌC VIÊN thì đã bỏ học hoặc đã chuyển - giữ 43,1 triệu công nợ. Số đó nằm nguyên
+   trong bảng Dự thu và trong cột "Còn nợ" của bảng so sánh cơ sở, làm dự báo dòng tiền bị thổi
+   lên. Không nơi nào bắt chéo DL09.student_status với DL06.enrollment_status.
+   Nay tách hẳn thành một nhóm riêng: chúng KHÔNG vào dự thu (vì không phải tiền sắp về), nhưng
+   cũng KHÔNG biến mất - có hàng chờ riêng với ba lối ra: thu dứt, hủy đơn, hoàn theo chính sách. */
+function enrBoRoi(e){var s=e&&e.student_id&&find("DL09","student_id",e.student_id);
+ return !!(s&&/dropped|transferred/.test(ecode(s.student_status)))}
+function noTreoList(){var out=[];
+ rows("DL06").forEach(function(e){
+  if(isc(e.enrollment_status,"cancelled")||!enrBoRoi(e))return;
+  var left=num(e.remaining_amount);if(left<=0)return;
+  var s=find("DL09","student_id",e.student_id)||{};
+  out.push({e:e,s:s,left:left})});
+ out.sort(function(a,b){return b.left-a.left});
+ return out}
 function duthuList(){var out=[];
  rows("DL06").forEach(function(e){
   if(isc(e.enrollment_status,"cancelled"))return;
+  if(enrBoRoi(e))return;   /* học viên đã rời - tiền này không phải "sắp về", xem nhóm nợ treo */
   insOf(e.enrollment_id).forEach(function(x){
    var left=num(x.due_amount)-num(x.paid_amount);
    if(left<=0||isc(x.status,"paid"))return;
@@ -12762,6 +12862,22 @@ function renderDuthu(){
  mo.forEach(function(k){var v=byM[k];
   h+='<tr><td><b>'+esc(k==="chua-hen"?"Chưa hẹn ngày":(k.split("-")[1]+"/"+k.split("-")[0]))+'</b></td><td>'+v.n+'</td><td style="font-variant-numeric:tabular-nums">'+vnd(v.v)+'</td></tr>'});
  h+='</tbody></table></div></div>';
+ /* NỢ TREO CỦA NGƯỜI ĐÃ RỜI - tách khỏi dự thu vì đây KHÔNG phải tiền sắp về */
+ (function(){var T=noTreoList();if(!T.length)return;
+  var tong=T.reduce(function(a,r){return a+r.left},0);
+  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-user-off" style="margin-right:6px"></i>Nợ treo của học viên đã rời ('+T.length+' đơn · '+vnd(tong)+')</b>'+
+   '<span class="mut" style="font-size:11.5px">đơn vẫn để "đã xác nhận" mà người thì đã bỏ học hoặc đã chuyển - KHÔNG tính vào dự thu ở trên</span></div>'+
+   '<div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Tình trạng</th><th>Đơn</th><th>Khóa</th><th>Còn nợ</th><th>Quyết</th></tr></thead><tbody>';
+  T.forEach(function(r){
+   h+='<tr><td>'+nguoiLnk(r.e.student_id,r.e.student_id_name,r.e.student_id)+'</td>'+
+    '<td><span class="chip red">'+esc(elabel(r.s.student_status)||r.s.student_status||"-")+'</span></td>'+
+    '<td>'+esc(r.e.enrollment_id)+'</td><td>'+esc(r.e.course_id_name||r.e.course_id||"-")+'</td>'+
+    '<td style="font-variant-numeric:tabular-nums"><b style="color:var(--red)">'+vnd(r.left)+'</b></td>'+
+    '<td><button class="btn sm primary" onclick="payForm(\''+esc(r.e.enrollment_id)+'\')"><i class="ti ti-cash"></i>Thu dứt</button> '+
+    '<button class="btn sm" onclick="cancelEnroll(\''+esc(r.e.enrollment_id)+'\')"><i class="ti ti-file-x"></i>Hủy đơn</button></td></tr>'});
+  h+='</tbody></table></div><div class="mut" style="font-size:11.5px;padding:11px 16px;line-height:1.7">'+
+   'Ba lối ra: <b>thu dứt</b> (em vẫn nợ thật, gọi đòi), <b>hủy đơn</b> (viết off, phần đã đóng xử theo chính sách hoàn tiền), '+
+   'hoặc để nguyên nếu đang thương lượng - nhưng để nguyên thì tháng nào cũng phải trả lời câu này.</div></div>'})();
  /* CHI TIẾT TỪNG ĐỢT - ai, đợt mấy, hạn nào, bao nhiêu, bấm thẳng vào thu tiền */
  h+=pgBar("duthu",L.length);
  h+='<div class="panel"><div class="ph"><b>Từng đợt còn phải thu ('+L.length+')</b><div class="mini"><button class="pill" onclick="go(\'thanhtoan\')">Sang màn Thu học phí</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Hạn đóng</th><th>Học viên</th><th>Khóa</th><th>Đợt</th><th>Còn phải thu</th><th>Tình trạng</th><th></th></tr></thead><tbody>';
@@ -13825,7 +13941,7 @@ DOORS = {
  "DL02b":["leadInboundSave","rfNeed","runRejectSave","runTouchSave","testQuickSave"],
  "DL03":["rfNeed","testAttend","testBook","testNoShowSave","testQuickSave","testRebookSave","testRefuse","testResultSave","tvSave"],
  "DL04":["rfNeed","runSkipTest","tvCloseSave","tvEnrollSave","tvQuickSave","tvSave","testConsult"],
- "DL06":["cancelEnrollRun","paySave","rfNeed","runCancelEnroll","tvEnrollSave","insSync"],
+ "DL06":["cancelEnrollRun","paySave","rfNeed","runCancelEnroll","tvEnrollSave","insSync","debtRemind"],
  "DL06b":["insPlanSave"],
  "DL07":["duyetRefundRun","paySave","payVerifyRun","rfNeed"],
  "DL08":["hvClassConfirm","hvClassRejectSave","midSave","obMark","rfNeed","xepMoiLuu","obChangeSave","obFinish"],

@@ -150,12 +150,19 @@ t("V9.29c so thu hoc phi la trang 2 tab", PBK.dsthanhtoan.ty==="custom"&&typeof 
  t("V9.29c tab Du thu co bang theo thang", /Dự thu theo tháng/.test(b));
  t("V9.29c du thu bam thang vao thu tien", /payForm\(/.test(b));
  t("V9.29c du thu ten HV bam ra drawer", /openQuick\(/.test(b));
- /* BAT BIEN: tong du thu = tong con no cua cac don con hieu luc - khong duoc lech */
+ /* BAT BIEN: tong con no cua cac don con hieu luc = DU THU + NO TREO cua nguoi da roi.
+    V9.40 tach lam hai: don cua hoc vien da bo hoc / da chuyen thi KHONG phai tien sap ve, de
+    trong du thu la thoi phong du bao dong tien (do duoc 43,1tr tren 5 don). Nhung tach ra roi
+    thi tong hai phan van phai bang tong cu - neu khong la co tien roi ra ngoai ca hai bang. */
  var duNo=duthuList().reduce(function(a2,r){return a2+r.left},0);
+ var treo=noTreoList().reduce(function(a2,r){return a2+r.left},0);
  var conNo=rows("DL06").filter(function(e){return !isc(e.enrollment_status,"cancelled")})
   .reduce(function(a2,e){var L=insOf(e.enrollment_id);
    return a2+L.reduce(function(t2,x){return t2+Math.max(0,num(x.due_amount)-num(x.paid_amount))},0)},0);
- t("V9.29c tong du thu khop tong con no cua cac dot", Math.abs(duNo-conNo)<1);
+ t("V9.29c du thu + no treo = tong con no cua cac dot (khong ro ri dong nao)",
+   Math.abs(duNo+treo-conNo)<1000);
+ t("V9.29c no treo cua nguoi da roi KHONG con nam trong du thu",
+   duthuList().every(function(r){return !enrBoRoi(r.e)}));
  /* nguong "qua han / sap den han" phai lay tu CH2, khong duoc dat lai rieng cho trang nay */
  t("V9.29c du thu dung nguong CH2 chu khong cam cung", /installmentLate_days/.test(b)&&/installmentRemind_days/.test(b));
  window.STTAB="da"})();

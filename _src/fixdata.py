@@ -1490,6 +1490,13 @@ for r in dl.get("DL03", []):
 log.append("14undecies. Test: kéo %d buổi ĐÃ điểm danh dự thi về quá khứ (chống trôi theo đồng hồ)"
            % _ttfix)
 
+# ═══ 14terdecies. CỘT "LẦN NHẮC NỢ GẦN NHẤT" (V9.40) ═════════════════════
+# Luật sinh việc "Thu công nợ" hoàn toàn dựa vào ngày hạn, không có mốc nào ghi "đã nhắc" -
+# nên 25 dòng công nợ hiện y nguyên mỗi ngày và kế toán phải giữ một cuốn sổ ngoài app.
+for _e in dl.get("DL06", []):
+    _e.setdefault("last_reminded_at", "")
+log.append("14terdecies. Cong no: them cot last_reminded_at cho %d don" % len(dl.get("DL06", [])))
+
 # ═══ 14duodecies. HAI CỘT CHO "TẠM BỎ QUA CẢNH BÁO NGUY CƠ" (V9.40) ══════
 # Từ V9.40 máy tự đếm vắng/thiếu bài theo ngưỡng CH2 chứ không đợi ai bấm cờ. Học vụ xem
 # xong mà thấy KHÔNG phải nguy cơ thật thì phải gạt được - nhưng gạt VĨNH VIỄN thì việc
