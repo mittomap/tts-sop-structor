@@ -1597,3 +1597,44 @@ Hai chỗ nói thẳng thay vì làm cho đẹp:
   "N buổi thiếu giờ" để kế toán đi hỏi, chứ không tự bịa một thời lượng mặc định rồi ra số đẹp mà sai.
 - **Buổi WOW 1-1 vẫn tính theo buổi**, vì sổ WOW chỉ ghi ngày giờ đặt, không có giờ vào - giờ ra để
   nhân. Muốn tính WOW theo giờ thì phải ghi hai mốc đó cho buổi WOW trước đã.
+
+---
+
+## V9.40c - Buổi WOW quản lý chặt, ca test tính theo lần
+
+### Buổi WOW 1-1 nay có giờ vào - giờ ra
+
+Buổi WOW là quyền lợi đắt nhất bán kèm học phí, nhưng trước đây sổ WOW chỉ ghi **ngày giờ đặt** -
+không biết buổi có thật sự diễn ra không, kèm được bao lâu, giáo viên có tới đúng giờ không.
+
+Nay buổi WOW đi đúng vòng đời của buổi lớp:
+
+- **Bắt đầu buổi** - ghi giờ vào và tự tính số phút trễ so với giờ hẹn.
+- **Kết thúc buổi** - ghi giờ ra, chuyển sang đã dạy, và **lúc này mới trừ lượt WOW** của học viên.
+- Thẻ buổi WOW hiện thẳng "vào - ra thật" kèm thời lượng; buổi nào ghi bù không có mốc thì nói rõ
+  là không đối chiếu được.
+- Nút "Ghi bù đã dạy" vẫn còn cho buổi hôm trước quên bấm - nhưng hộp xác nhận nói trước là buổi
+  đó sẽ không có mốc giờ.
+
+**Ba việc mới vào chuông:** buổi tới giờ mà chưa ai bấm bắt đầu · buổi bắt đầu rồi mà quên bấm kết
+thúc (lượt chưa được trừ) · buổi ghi là đã dạy mà không có mốc giờ nào.
+
+Trang WOW có thêm chỉ số **"Giờ kèm đã ghi nhận"**, kèm số buổi còn thiếu mốc.
+
+### Ca test đầu vào: tính theo lần, vẫn ghi vào - ra
+
+- Bấm "HV đã dự test" là **tự mở mốc giờ vào** - không phải học thao tác mới.
+- Hết ca bấm **Kết thúc ca test** để ghi giờ ra.
+- Tiền công ca test tính **theo lần** (cấu hình được), gán cho người chấm.
+- Hai mốc giờ **không dùng để nhân đơn giá** - chúng để biết ca test kéo dài bao lâu, có đúng thời
+  lượng đề thi không.
+
+### Bảng công tháng nay tách ba loại công
+
+| Loại | Cách tính |
+|---|---|
+| Buổi lớp | giờ dạy thật × đơn giá theo giảng viên và theo ca |
+| Buổi WOW 1-1 | theo buổi - kèm cột giờ để đối chiếu |
+| Ca test đầu vào | theo lần |
+
+Giáo viên WOW từ chỗ không xuất hiện trong bảng công nào, nay có công thật.

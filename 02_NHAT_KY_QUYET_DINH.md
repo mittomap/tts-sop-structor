@@ -3060,3 +3060,66 @@ Ghi vào đây để phiên sau **không tự ý làm**, dù bộ phận nghiên
 
 Nguyên tắc rút ra: **cái gì phục vụ "học viên này đang thế nào, ai phải làm gì cho em ấy hôm nay"
 thì làm; cái gì là sổ sách của phòng ban khác thì nêu ra rồi để đó.**
+
+---
+
+## V9.40c (29/07 tối) - QUẢN LÝ CHẶT BUỔI WOW, CA TEST TÍNH THEO LẦN
+
+Anh Luân sau khi hỏi *"Ủa mà sao em lại dựng cái đơn giá giảng viên làm gì, có liên quan gì đến
+sop này đâu"* rồi chốt: **"Thôi e cứ giữ đi. Test đầu vào thì tính theo lần nhưng vẫn phải ghi
+nhận vào ra. Buổi wow cũng phải quản lý chặt."**
+
+### Ghi lại cái em đã hiểu sai, để phiên sau đừng lặp
+
+Anh trả lời câu hỏi "theo giờ hay theo buổi" rồi **phanh ngay lại** ở câu sau: *"nếu quá lệch khỏi
+mục tiêu này, em có thể bỏ qua"*. Em đọc câu phanh đó là ranh giới cho **những thứ khác**, còn đơn
+giá thì cứ dựng - và bỏ công dựng cả một màn cấu hình trước khi hỏi lại. Bài học: **khi chủ dự án
+vừa mô tả chi tiết một thứ vừa nói "nếu lệch thì bỏ qua", đó là một câu hỏi chứ không phải một đơn
+đặt hàng - phải hỏi lại trước khi làm.** Cuối cùng anh chốt giữ, nhưng đó là may chứ không phải em
+đã làm đúng quy trình.
+
+### P20 - Buổi WOW: ghi nhận vào - ra
+
+Buổi WOW 1-1 là **quyền lợi đắt nhất bán kèm học phí** - đo được: hứa 598 lượt, dùng 56. Vậy mà sổ
+WOW chỉ ghi ngày giờ **ĐẶT**: không biết buổi có thật sự diễn ra không, kèm bao lâu, giáo viên có
+tới đúng giờ không. Một quyền lợi đắt tiền mà không ai đo được là chỗ **vừa mất tiền vừa mất lòng
+tin của học viên** - nên đây đúng là việc của SOP chăm sóc học viên, không phải chuyện lương.
+
+- DL14 thêm `wow_start_actual` / `wow_end_actual` / `wow_late_minutes`.
+- Buổi WOW đi đúng vòng đời buổi lớp: **Bắt đầu buổi** (ghi giờ + tính phút trễ so với giờ hẹn) →
+  **Kết thúc buổi** (ghi giờ + chuyển đã dạy + **trừ lượt**). Trước đây lượt bị trừ khi bấm "Đã
+  dạy"; nay mốc trừ lượt gắn với việc bấm kết thúc - tức gắn với buổi thật sự đã xong.
+- Nút "Đã dạy" cũ **giữ lại** làm đường **ghi bù** cho buổi hôm trước quên bấm, nhưng đổi nhãn
+  thành "Ghi bù đã dạy" và **nói thẳng** trong hộp xác nhận là buổi này sẽ không có mốc giờ.
+- **Ba luật SLA mới**: tới giờ chưa bấm bắt đầu · bắt đầu rồi mà quá `wowMaxHours` chưa bấm kết
+  thúc (lượt chưa được trừ) · đã dạy mà không có mốc giờ nào. Thiếu ba luật này thì "quản lý chặt"
+  chỉ là hai cái nút không ai bấm.
+- Ngăn kéo `wowMoc` cho nút "Làm ngay" của ba luật đó.
+
+**Dữ liệu demo cố ý chừa 3 buổi thiếu mốc giờ.** Nếu gieo đủ hết thì luật "Buổi WOW thiếu mốc giờ"
+xanh suốt và không ai biết nó có chạy không - và bộ kiểm có một tiêu chí **đòi phải còn ca thiếu**
+đúng vì lý do đó.
+
+### P21 - Ca test đầu vào: tính theo LẦN, nhưng vẫn ghi vào - ra
+
+- DL03 thêm `test_start_actual` / `test_end_actual`. Mốc **vào** tự mở khi bấm "HV đã dự test"
+  (giữ nguyên thao tác cũ, không bắt ai học nút mới); mốc **ra** bấm khi hết ca.
+- Tiền công: `testPayPerCase` **theo LẦN**, gán cho người chấm (`graded_by`, thuộc team WOW).
+- **Hai mốc giờ KHÔNG dùng để nhân đơn giá** - chúng để quản lý ca (ca kéo dài bao lâu, có đúng
+  thời lượng đề thi không). Ghi rõ câu này trên màn bảng công, vì nếu không ai đọc sẽ tưởng ghi giờ
+  là để tính tiền rồi thắc mắc sao giờ nhiều mà tiền không đổi.
+
+Bảng công tháng nay có **ba loại công tách bạch**: buổi lớp (giờ × đơn giá theo ca) · buổi WOW
+(theo buổi, kèm cột giờ để đối chiếu) · ca test (theo lần). WOW coach từ chỗ không vào bảng công
+nào, nay có công thật: ví dụ tháng 07 một coach có 14 buổi WOW + 17 ca test.
+
+### Bộ kiểm mới (đã bẻ lại từng cái)
+
+- bấm Bắt đầu buổi WOW **ghi mốc vào**; bấm Kết thúc **ghi mốc ra + chuyển đã dạy**;
+- **kéo dài buổi WOW thêm 1 giờ KHÔNG làm tiền công đổi** - đây là tiêu chí canh đúng câu "WOW tính
+  theo BUỔI". Bẻ lại bằng cách đổi công thức sang `gioWow*wowRate()` → đỏ đúng;
+- đổi `testPayPerCase` thì tiền đổi đúng **số LẦN** test;
+- vẫn còn buổi WOW thiếu mốc giờ để luật cảnh báo có việc thật, và số việc sinh ra **khớp đúng** số
+  buổi thiếu đó;
+- bảng công vẫn tách riêng **buổi online** - ràng buộc 5 cơ sở + học online là luật xuyên suốt, thêm
+  cột mới không được đẩy nó ra. (Bộ kiểm đã bắt em đúng chỗ này khi em lỡ bỏ cột online.)

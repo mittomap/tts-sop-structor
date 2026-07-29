@@ -1431,6 +1431,53 @@ function stripOf(o){var i=o.indexOf('<div class="bstats"');if(i<0)return "";   /
   t("bang cong co loi sang man don gia gio day", /SETTAB=.?giagio/.test(o));
   t("bang cong tach rieng buoi online", /Trong đó online/.test(o));
   t("noi thang la chua noi bang luong", /chưa nối bảng lương/.test(o));
+  t("bang cong co cot ca test tinh theo LAN", /Ca test/.test(o)&&/đ\/lần/.test(o));
+  t("bang cong in gio kem WOW de doi chieu", /Buổi WOW \(giờ kèm\)/.test(o));})();
+ /* ===== V9.40c - QUAN LY CHAT BUOI WOW + CA TEST (anh Luan chot 29/07) ==============
+    "Buoi wow cung phai quan ly chat" / "Test dau vao thi tinh theo lan nhung van phai ghi
+    nhan vao ra". Bo kiem phai chung minh ba viec: moc gio GHI DUOC, moc gio DOI duoc so lieu,
+    va tien cong KHONG bi nhan theo gio o hai loai nay. */
+ (function(){
+  var W=rows("DL14").filter(function(w){return isc(w.wow_status,"completed")});
+  t("co ham moc gio buoi WOW", typeof wowStart==="function"&&typeof wowEnd==="function"&&typeof wowHours==="function");
+  t("du lieu demo co buoi WOW ghi du moc vao - ra", W.filter(function(w){return wowHours(w)>0}).length>0);
+  /* CO Y chua vai buoi thieu moc de luat canh bao co ca that ma nhac - neu du het thi luat do
+     xanh suot va khong ai biet no co chay khong */
+  var thieu=W.filter(function(w){return !wowHours(w)});
+  t("van con buoi WOW thieu moc gio de luat canh bao co viec that ("+thieu.length+" buoi)", thieu.length>0);
+  t("luat 'Buoi WOW thieu moc gio' sinh dung so viec do",
+    slaItems().filter(function(x){return x.grp==="Buổi WOW thiếu mốc giờ"}).length===thieu.length);
+  /* bam BAT DAU that -> phai ghi moc va tinh phut tre */
+  (function(){var w=rows("DL14").filter(function(x){return isc(x.wow_status,"booked","confirmed")&&!String(x.wow_start_actual||"").trim()})[0];
+   if(!w){t("co buoi WOW chua bat dau de thu", false);return}
+   var cu={a:w.wow_start_actual,b:w.wow_end_actual,c:w.wow_late_minutes,d:w.wow_status};
+   wowStart(w.wow_id);
+   var ok1=!!String(w.wow_start_actual||"").trim();
+   wowEnd(w.wow_id);
+   var ok2=!!String(w.wow_end_actual||"").trim()&&isc(w.wow_status,"completed")&&wowHours(w)>=0;
+   w.wow_start_actual=cu.a;w.wow_end_actual=cu.b;w.wow_late_minutes=cu.c;w.wow_status=cu.d;dataChanged();
+   t("bam Bat dau buoi WOW thi ghi moc gio vao", ok1);
+   t("bam Ket thuc buoi WOW thi ghi moc ra + chuyen sang da day", ok2)})();
+  /* TIEN CONG: WOW theo BUOI, ca test theo LAN - doi so GIO khong duoc lam tien doi */
+  (function(){var mo2=congMonths();if(!mo2.length){t("co thang de thu cong WOW", false);return}
+   var t1=congThang(mo2[0]).reduce(function(a,x){return a+x.tien},0);
+   var W2=rows("DL14").filter(function(w){return isc(w.wow_status,"completed")&&wowHours(w)>0});
+   var cu=W2.map(function(w){return w.wow_end_actual});
+   W2.forEach(function(w){var e=pvnd(w.wow_end_actual);if(e)w.wow_end_actual=fmtDT(new Date(e.getTime()+36e5))});
+   dataChanged();
+   var t2=congThang(mo2[0]).reduce(function(a,x){return a+x.tien},0);
+   W2.forEach(function(w,i){w.wow_end_actual=cu[i]});dataChanged();
+   t("keo dai buoi WOW them 1 gio KHONG lam tien cong doi (WOW tinh theo BUOI)", t1===t2)})();
+  (function(){var mo2=congMonths();if(!mo2.length)return;
+   var c=(DATA.config.ch2||[]).filter(function(x){return x.name==="testPayPerCase"})[0];
+   if(!c){t("co dong cau hinh testPayPerCase", false);return}
+   var n=congThang(mo2[0]).reduce(function(a,x){return a+x.test},0);
+   var t1=congThang(mo2[0]).reduce(function(a,x){return a+x.tien},0);
+   var cu=c.value;c.value=String(num(cu)+1000);
+   var t2=congThang(mo2[0]).reduce(function(a,x){return a+x.tien},0);c.value=cu;
+   var ss=congThang(mo2[0]).filter(function(x){return x.test>0}).length*1000+1;
+   t("doi testPayPerCase thi tien doi dung so LAN test ("+n+" lan)", n>0&&Math.abs(t2-t1-n*1000)<=ss)})();
+  t("ca test co ghi moc gio vao - ra", rows("DL03").filter(function(x){return testHours(x)>0}).length>0);
   window.STTAB="da"})();
 })();
 

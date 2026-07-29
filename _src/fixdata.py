@@ -1490,6 +1490,58 @@ for r in dl.get("DL03", []):
 log.append("14undecies. Test: kéo %d buổi ĐÃ điểm danh dự thi về quá khứ (chống trôi theo đồng hồ)"
            % _ttfix)
 
+# ═══ 14quindecies. MỐC GIỜ BUỔI WOW + CA TEST (V9.40c - anh Luân chốt 29/07) ═
+# "Buổi wow cũng phải quản lý chặt" / "Test đầu vào thì tính theo lần nhưng vẫn phải ghi nhận
+# vào ra". Buổi WOW 1-1 là quyền lợi ĐẮT NHẤT bán kèm học phí, mà sổ WOW chỉ ghi ngày giờ ĐẶT:
+# không biết buổi có thật sự diễn ra không, kèm bao lâu, giáo viên có tới đúng giờ không.
+# Ba cột mới cho DL14, hai cột cho DL03. Buổi/ca ĐÃ XONG thì gieo mốc giờ hợp lý để màn hình có
+# cái mà xem; buổi chưa xong để trống - đó mới là hàng chờ thật.
+_wowdur = {"speaking": 1.0, "writing": 1.5, "reading": 1.0, "listening": 1.0}
+_wg = _wm = 0
+for _w in R("DL14"):
+    _w.setdefault("wow_start_actual", "")
+    _w.setdefault("wow_end_actual", "")
+    _w.setdefault("wow_late_minutes", "")
+    if code(_w.get("wow_status")) != "completed":
+        continue
+    if str(_w.get("wow_start_actual") or "").strip():
+        continue
+    _d = dt(_w.get("wow_session_date"))
+    if not _d:
+        _wm += 1
+        continue
+    # phần lớn đúng giờ, một số ít trễ - để KPI kỷ luật có gì mà đo
+    _late = random.choice([0, 0, 0, 0, 0, 3, 7, 12])
+    _h = _wowdur.get(code(_w.get("wow_skill")) or "", 1.0)
+    _w["wow_start_actual"] = fmt(_d + datetime.timedelta(minutes=_late))
+    _w["wow_end_actual"] = fmt(_d + datetime.timedelta(minutes=_late + int(_h * 60)))
+    _w["wow_late_minutes"] = str(_late)
+    _wg += 1
+# cố ý chừa vài buổi đã dạy mà KHÔNG có mốc giờ - đúng cảnh "ghi bù, quên bấm" ngoài đời,
+# để luật "Buổi WOW thiếu mốc giờ" có ca thật mà nhắc
+_done = [x for x in R("DL14") if code(x.get("wow_status")) == "completed" and x.get("wow_start_actual")]
+for _w in _done[:3]:
+    _w["wow_start_actual"] = ""; _w["wow_end_actual"] = ""; _w["wow_late_minutes"] = ""
+    _wg -= 1
+log.append("14quindecies-a. WOW: gieo moc gio vao-ra cho %d buoi da day (chua 3 buoi thieu moc de canh bao co ca that)" % _wg)
+
+# CA TEST: tính công theo LẦN nhưng vẫn phải ghi vào - ra (anh Luân chốt)
+_tg = 0
+for _t in R("DL03"):
+    _t.setdefault("test_start_actual", "")
+    _t.setdefault("test_end_actual", "")
+    if not str(_t.get("test_attendance_time") or "").strip():
+        continue
+    if str(_t.get("test_start_actual") or "").strip():
+        continue
+    _d = dt(_t.get("test_attendance_time"))
+    if not _d:
+        continue
+    _t["test_start_actual"] = fmt(_d)
+    _t["test_end_actual"] = fmt(_d + datetime.timedelta(minutes=random.choice([90, 105, 120])))
+    _tg += 1
+log.append("14quindecies-b. Test dau vao: gieo moc gio vao-ra cho %d ca da du test" % _tg)
+
 # ═══ 14quaterdecies. BẢNG ĐƠN GIÁ GIỜ DẠY (V9.40 - anh Luân chốt 29/07) ══
 # "Giảng viên tính theo giờ, mỗi giảng viên có mức giá riêng đấy, và ngày thường, cuối tuần,
 # sáng hay tối đều có mức riêng, em nên cho cấu hình để sau này bên nhân sự họ tự sửa."

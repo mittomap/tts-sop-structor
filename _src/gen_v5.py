@@ -3373,7 +3373,26 @@ function slaItems(){var out=jTasks();
     add("WOW","Xác nhận buổi WOW mới đặt",ov?"red":"amber","ti-calendar-check",w.student_name||w.student_id,
      (ov?"QUÁ HẠN XÁC NHẬN - ":"")+"Buổi "+(w.wow_session_date||"")+" chờ giáo viên WOW xác nhận (hạn "+cf+"h)",
      ab,"wow","",{act:"wownote",rid:w.wow_id,hoso:w.student_id,prm:"slaWowConfirm_hours"})}
-   else if(isc(w.wow_status,"no_show")&&!String(w.wow_no_show_reason||"").trim())
+   /* V9.40c - QUẢN LÝ CHẶT BUỔI WOW (anh Luân chốt 29/07). Ba mốc phải có người canh:
+      tới giờ mà chưa bấm bắt đầu · bắt đầu rồi mà quên bấm kết thúc · đã dạy mà không có mốc
+      giờ nào. Thiếu ba luật này thì "quản lý chặt" chỉ là hai cái nút không ai bấm. */
+   else if(isc(w.wow_status,"confirmed","booked")&&!String(w.wow_start_actual||"").trim()){
+    var _hb=hoursSince(w.wow_session_date);
+    if(_hb!=null&&_hb>=0)
+     add("WOW","Buổi WOW tới giờ chưa bấm bắt đầu",_hb>1?"red":"amber","ti-player-play",w.student_name||w.student_id,
+      "Buổi hẹn "+(w.wow_session_date||"")+" đã qua "+Math.round(_hb)+"h mà chưa ai bấm Bắt đầu - buổi có diễn ra không?",
+      _hb,"wow","upcoming",{act:"wowmoc",rid:w.wow_id,hoso:w.student_id})}
+   else if(String(w.wow_start_actual||"").trim()&&!String(w.wow_end_actual||"").trim()&&!isc(w.wow_status,"completed","cancelled")){
+    var _ha=hoursSince(w.wow_start_actual);
+    if(_ha!=null&&_ha>num(paramOf("wowMaxHours",3)))
+     add("WOW","Buổi WOW chưa bấm kết thúc","amber","ti-player-stop",w.student_name||w.student_id,
+      "Bắt đầu lúc "+w.wow_start_actual+", đã "+Math.round(_ha)+"h chưa bấm Kết thúc - lượt WOW chưa được trừ",
+      _ha,"wow","upcoming",{act:"wowmoc",rid:w.wow_id,hoso:w.student_id,prm:"wowMaxHours"})}
+   else if(isc(w.wow_status,"completed")&&!wowHours(w))
+    add("WOW","Buổi WOW thiếu mốc giờ","amber","ti-clock-off",w.student_name||w.student_id,
+     "Buổi "+(w.wow_session_date||"")+" ghi là đã dạy mà không có giờ vào - giờ ra, không đối chiếu được thời lượng",
+     hoursSince(w.wow_session_date),"wow","",{act:"wowmoc",rid:w.wow_id,hoso:w.student_id});
+   if(isc(w.wow_status,"no_show")&&!String(w.wow_no_show_reason||"").trim())
     add("WOW","HV không đến buổi WOW","amber","ti-user-x",w.student_name||w.student_id,
      "Buổi "+(w.wow_session_date||"")+" em không đến mà chưa ghi lý do - quota đã trừ, hỏi rồi xếp bù",
      hoursSince(w.wow_session_date),"wow","",{act:"wownote",rid:w.wow_id,hoso:w.student_id})})})();
@@ -3552,6 +3571,7 @@ function slaAct(act,id){
  if(act==="jRun")return runStart(id);
  if(act==="tkopen")return tkOpen(id);   /* mã viết thường, hàm viết hoa chữ O - lệch một chữ là im lặng */
  if(act==="riskCare")return riskCare(id);
+ if(act==="wowmoc")return wowMoc(id);
  if(act==="molop")return moLop(id);
  if(act==="abscall")return absCall(id);
  if(act==="ckduyet")return ckDuyet(id);
@@ -3637,7 +3657,61 @@ function wowUseQuota(id){var w=find("DL14","wow_id",id);if(!w)return;
   if(SVR)google.script.run.apiUpdate("DL09",w.student_id,{wow_quota_used:s.wow_quota_used,wow_quota_remaining:s.wow_quota_remaining})}
  if(SVR)google.script.run.apiUpdate("DL14",id,{quota_deducted:"yes"});
  persistSoon()}
-function wowTaught(id){wowUseQuota(id);markRow("DL14","wow_id",id,{wow_status:eFull("enum_wow_status","completed")},"Đã đánh dấu đã dạy - đã trừ 1 lượt WOW.")}
+/* ===== BUỔI WOW: GHI NHẬN VÀO - RA (V9.40c, anh Luân chốt 29/07: "buổi WOW cũng phải quản
+   lý chặt") ==========================================================================
+   Buổi WOW 1-1 là quyền lợi ĐẮT NHẤT bán kèm học phí - đo trên dữ liệu: hứa 598 lượt, dùng 56.
+   Vậy mà sổ WOW chỉ ghi ngày giờ ĐẶT: không biết buổi có thật sự diễn ra không, kèm bao lâu,
+   giáo viên có đến đúng giờ không. Một quyền lợi đắt tiền mà không ai đo được là chỗ vừa mất
+   tiền vừa mất lòng tin của học viên.
+   Nay buổi WOW đi đúng vòng đời của buổi lớp: bấm BẮT ĐẦU (ghi giờ + tính phút trễ so với giờ
+   hẹn) rồi bấm KẾT THÚC (ghi giờ + chuyển trạng thái đã dạy + trừ lượt).
+   Tiền công WOW VẪN tính theo BUỔI - anh Luân chốt vậy. Giờ vào - ra ghi để QUẢN LÝ, không phải
+   để nhân đơn giá; bảng công in cột giờ WOW chỉ để đối chiếu. */
+function wowStart(id){var w=find("DL14","wow_id",id);if(!w){toast("Không thấy buổi WOW.");return}
+ if(String(w.wow_start_actual||"").trim()){toast("Buổi này đã bấm bắt đầu lúc "+w.wow_start_actual+".");return}
+ var hen=pvnd(w.wow_session_date),tre="";
+ if(hen)tre=String(Math.max(0,Math.round((Date.now()-hen.getTime())/60000)));
+ markRow("DL14","wow_id",id,{wow_start_actual:nowStr(),wow_late_minutes:tre,
+  wow_status:eFull("enum_wow_status","confirmed")},
+  (num(tre)>5?("Đã bắt đầu buổi WOW - vào trễ "+tre+" phút."):"Đã bắt đầu buổi WOW đúng giờ.")+
+  " Xong buổi nhớ bấm Kết thúc rồi ghi nội dung.","wow")}
+function wowEnd(id){var w=find("DL14","wow_id",id);if(!w){toast("Không thấy buổi WOW.");return}
+ if(!String(w.wow_start_actual||"").trim()){toast("Chưa bấm Bắt đầu buổi - không có mốc để tính thời lượng.");return}
+ wowUseQuota(id);
+ markRow("DL14","wow_id",id,{wow_end_actual:nowStr(),wow_status:eFull("enum_wow_status","completed")},
+  "Đã kết thúc buổi WOW ("+wowHoursText(find("DL14","wow_id",id))+") - đã trừ 1 lượt. Còn ghi nội dung buổi.","wow")}
+/* Ngăn kéo mốc giờ buổi WOW - bấm "Làm ngay" từ ba luật trên rơi vào đây. Phải đủ để quyết
+   ngay: buổi hẹn lúc nào, đã bấm gì, và ba lối ra (bắt đầu / kết thúc / HV không đến). */
+function wowMoc(id){var w=find("DL14","wow_id",id);if(!w){toast("Không thấy buổi WOW.");return}
+ var bd=String(w.wow_start_actual||"").trim(),kt=String(w.wow_end_actual||"").trim();
+ var h='<div class="dcard"><h4><i class="ti ti-clock-play"></i>Mốc giờ buổi WOW - '+esc(w.student_name||w.student_id)+'</h4>';
+ h+=ctxRows([["Giờ hẹn",esc(w.wow_session_date||"-")],["Giảng viên",esc(w.staff_name||"chưa phân công")],
+  ["Kỹ năng",esc(elabel(w.wow_skill)||w.wow_skill||"-")],["Trọng tâm",esc(w.wow_content_focus||"-")],
+  ["Trạng thái",'<span class="chip '+stCls(w.wow_status)+'">'+esc(elabel(w.wow_status)||"")+'</span>'],
+  ["Đã bấm bắt đầu",bd?(esc(bd)+(num(w.wow_late_minutes)>5?(' <span class="chip amber">trễ '+esc(w.wow_late_minutes)+' phút</span>'):' <span class="chip green">đúng giờ</span>')):'<span class="chip red">chưa</span>'],
+  ["Đã bấm kết thúc",kt?(esc(kt)+" · "+esc(wowHoursText(w))):'<span class="chip red">chưa</span>']]);
+ h+='<div class="notebar"><i class="ti ti-info-circle"></i>Buổi WOW 1-1 là quyền lợi đắt nhất bán kèm học phí. '+
+  'Ghi giờ vào - giờ ra để trung tâm biết buổi có thật sự diễn ra và kèm được bao lâu; '+
+  'lượt WOW chỉ bị trừ khi bấm <b>Kết thúc buổi</b>.</div>';
+ h+='<div class="dact">';
+ if(!bd)h+='<button class="btn primary" onclick="wowStart(\''+esc(id)+'\');closeModal()"><i class="ti ti-player-play"></i>Bắt đầu buổi (ghi giờ bây giờ)</button>';
+ else if(!kt)h+='<button class="btn green" onclick="wowEnd(\''+esc(id)+'\');closeModal()"><i class="ti ti-player-stop"></i>Kết thúc buổi (ghi giờ bây giờ)</button>';
+ if(!isc(w.wow_status,"completed","no_show","cancelled"))
+  h+='<button class="btn" onclick="confirmRun(\'Ghi nhận học viên không đến buổi WOW này?\',\'wowNoShow\',\''+esc(id)+'\')"><i class="ti ti-user-x"></i>HV không đến</button>'+
+   '<button class="btn" onclick="wowReschedule(\''+esc(id)+'\')"><i class="ti ti-calendar-plus"></i>Dời buổi</button>';
+ if(isc(w.wow_status,"completed")&&!String(w.wow_content_note||"").trim())
+  h+='<button class="btn primary" onclick="wowNote(\''+esc(id)+'\')"><i class="ti ti-notes"></i>Ghi nội dung buổi</button>';
+ h+='<button class="btn" onclick="closeModal();openStuQuick(\''+esc(w.student_id)+'\')"><i class="ti ti-eye"></i>Xem nhanh học viên</button></div></div>';
+ openDrawer("Mốc giờ buổi WOW",h)}
+function wowHours(w){var a=pvnd(w&&w.wow_start_actual),b=pvnd(w&&w.wow_end_actual);
+ if(!a||!b)return 0;var h=(b.getTime()-a.getTime())/36e5;return (h>0&&h<12)?h:0}
+function wowHoursText(w){var h=wowHours(w);return h?((Math.round(h*10)/10)+" giờ"):"chưa đủ mốc giờ"}
+function wowTaught(id){var w=find("DL14","wow_id",id)||{};
+ /* Giữ nút cũ cho ca ghi bù (buổi đã dạy hôm trước mà quên bấm), nhưng NHẮC là thiếu mốc giờ -
+    im lặng cho qua thì cột giờ WOW mãi mãi rỗng và chẳng ai biết vì sao. */
+ wowUseQuota(id);markRow("DL14","wow_id",id,{wow_status:eFull("enum_wow_status","completed")},
+  "Đã đánh dấu đã dạy - đã trừ 1 lượt WOW."+
+  (String(w.wow_start_actual||"").trim()?"":" Buổi này KHÔNG có giờ vào - giờ ra, không đối chiếu được thời lượng."))}
 function openComplaint(id){var c=find("DL17","complaint_id",id);if(!c){toast("Không thấy khiếu nại.");return}
  var code=ecode(c.complaint_status);var sevc=ecode(c.complaint_severity);
  var isNew=!(/assigned|in_progress|resolved|escalated/.test(code));var working=/in_progress|resolved|escalated/.test(code);var resolved=code==="resolved";
@@ -8250,6 +8324,7 @@ var APPPARAMS=[
  ["Tiền - Công giảng dạy","teacherPayPerHour","Đơn giá GIỜ dạy dùng khi bảng đơn giá chưa khai ô nào khớp","đ/giờ",180000],
  ["Tiền - Công giảng dạy","shiftNoon_hour","Buổi bắt đầu từ giờ này trở đi tính là CA CHIỀU","giờ trong ngày",12],
  ["Tiền - Công giảng dạy","shiftEvening_hour","Buổi bắt đầu từ giờ này trở đi tính là CA TỐI","giờ trong ngày",17],
+ ["Tiền - Công giảng dạy","testPayPerCase","Tiền công một CA TEST đầu vào (coi + chấm) - tính theo LẦN, không theo giờ","đ/lần",120000],
  ["Tiền - Công giảng dạy","wowPayPerSession","Tiền công một buổi WOW 1-1 (buổi kèm riêng, tính tách khỏi buổi lớp)","đ/buổi",250000],
  ["Học tập - WOW","wowGrantMax_perTime","Mỗi lần cấp thêm tối đa bao nhiêu lượt WOW cho một học viên","lượt",3],
  ["Hẹn & Chăm sóc","apptSoon_hours","Nút hẹn nhanh \"N tiếng nữa\" - N là bao nhiêu","giờ",2],
@@ -8282,6 +8357,7 @@ var APPPARAMS=[
  ["Học vụ - Lớp học","thresholdAtRisk_hw_missing","Thiếu bài tập bao nhiêu lần -> HV có nguy cơ học thuật","lần",3],
  ["Tài chính","referralRewardGrant_days","Bạn được giới thiệu đã đăng ký thì phải trao thưởng cho người giới thiệu trong bao nhiêu ngày","ngày",7],
  ["Tài chính","debtRemindGap_days","Nhắc thu nợ rồi thì việc tạm lùi bao nhiêu ngày trước khi hiện lại (khoản quá hạn vẫn giữ)","ngày",3],
+ ["Học vụ - Lớp học","wowMaxHours","Buổi WOW bấm bắt đầu quá bao nhiêu giờ mà chưa bấm kết thúc thì nhắc","giờ",3],
  ["Học vụ - Lớp học","slaWowConfirm_hours","Hạn giáo viên WOW xác nhận một buổi vừa được đặt","giờ",24],
  ["Học vụ - Lớp học","riskIgnore_days","Học vụ xem rồi bấm 'tạm bỏ qua' thì máy im bao nhiêu ngày trước khi nhắc lại","ngày",14],
  ["Học vụ - Lớp học","thresholdClassStart_days","Còn bao nhiêu ngày tới khai giảng thì lớp vào diện theo dõi sĩ số","ngày",14],
@@ -8921,12 +8997,31 @@ function renderTest(embed){var p="test",fil=fget(p);var all=rows("DL03");
    '<button class="btn danger sm" onclick="confirmRun(\'Khách TỪ CHỐI làm test? (vẫn có thể tư vấn thẳng)\',\'testRefuse\',\''+esc(id)+'\')"><i class="ti ti-x"></i>Khách từ chối</button>';}
   else if(!s.att){h+='<button class="btn primary sm" onclick="confirmRun(\'Xác nhận học viên đã đến dự test?\',\'testAttend\',\''+esc(id)+'\')"><i class="ti ti-user-check"></i>HV đã dự test</button>'+
    '<button class="btn danger sm" onclick="testNoShowForm(\''+esc(id)+'\')"><i class="ti ti-user-x"></i>Vắng test</button>';}
+  /* V9.40c - mốc giờ ra của ca test. Anh Luân: "Test đầu vào thì tính theo lần nhưng vẫn phải
+     ghi nhận vào ra". Mốc VÀO tự mở khi bấm "HV đã dự test"; mốc RA phải bấm khi hết ca. */
+  else if(!String(r.test_end_actual||"").trim())h+='<button class="btn green sm" onclick="testEnd(\''+esc(id)+'\')"><i class="ti ti-player-stop"></i>Kết thúc ca test</button>'+
+   (!s.graded?'<button class="btn sm" onclick="testResult(\''+esc(id)+'\')"><i class="ti ti-writing"></i>Nhập kết quả</button>':'');
   else if(!s.graded)h+='<button class="btn primary sm" onclick="testResult(\''+esc(id)+'\')"><i class="ti ti-writing"></i>Nhập kết quả</button>';
-  else if(!s.consulted)h+='<button class="btn green sm" onclick="confirmRun(\'Đánh dấu đã tư vấn sau test?\',\'testConsult\',\''+esc(id)+'\')"><i class="ti ti-messages"></i>Đã tư vấn</button>';
+  else if(!s.consulted)h+='<button class="btn green sm" onclick="testConsult(\''+esc(id)+'\')"><i class="ti ti-messages"></i>Tư vấn sau test</button>';
   h+='<button class="btn sm" onclick="openHoso(\''+esc(r.lead_id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button>';
   h+='</div></div>';});
  h+='</div>';return h}
-function testAttend(id){markRow("DL03","test_booking_id",id,{test_attendance_status:eFull("enum_test_attendance_status","on_time"),test_attendance_time:nowStr()},"Đã ghi nhận HV dự test.","test")}
+/* ===== CA TEST ĐẦU VÀO: GHI NHẬN VÀO - RA (V9.40c, anh Luân chốt 29/07) =============
+   "Test đầu vào thì tính theo lần nhưng vẫn phải ghi nhận vào ra."
+   Hai mốc này KHÔNG dùng để nhân đơn giá - công coi/chấm test tính theo LẦN. Chúng dùng để
+   quản lý: ca test kéo dài bao lâu, có đúng thời lượng đề thi không, khách ngồi từ mấy giờ.
+   Bấm "HV dự test" = mở mốc vào (giữ nguyên thao tác cũ, không bắt ai học lại nút mới). */
+function testAttend(id){var r=find("DL03","test_booking_id",id)||{};
+ markRow("DL03","test_booking_id",id,{test_attendance_status:eFull("enum_test_attendance_status","on_time"),
+  test_attendance_time:nowStr(),test_start_actual:String(r.test_start_actual||"").trim()||nowStr()},
+  "Đã ghi nhận HV dự test - đã mở mốc giờ vào. Hết ca nhớ bấm Kết thúc ca test.","test")}
+function testEnd(id){var r=find("DL03","test_booking_id",id);if(!r){toast("Không thấy phiếu test.");return}
+ if(!String(r.test_start_actual||"").trim()){toast("Chưa có mốc giờ vào - bấm 'HV dự test' trước đã.");return}
+ markRow("DL03","test_booking_id",id,{test_end_actual:nowStr()},
+  "Đã ghi giờ kết thúc ca test ("+testHoursText(find("DL03","test_booking_id",id))+"). Bước tiếp: chấm điểm.","test")}
+function testHours(r){var a=pvnd(r&&r.test_start_actual),b=pvnd(r&&r.test_end_actual);
+ if(!a||!b)return 0;var h=(b.getTime()-a.getTime())/36e5;return (h>0&&h<12)?h:0}
+function testHoursText(r){var h=testHours(r);return h?((Math.round(h*10)/10)+" giờ"):"chưa đủ mốc giờ"}
 function testRefuse(id){markRow("DL03","test_booking_id",id,{booking_status:eFull("enum_booking_status","rejected"),booking_note:"Khách từ chối test "+nowStr()},"Đã ghi nhận khách từ chối test.")}
 function testNoShowForm(id){var r=find("DL03","test_booking_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-user-x"></i>Vắng test - '+esc(r.lead_id_name||r.lead_id)+'</h4>';
@@ -9421,6 +9516,10 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=rows("DL14");
   ["ti-checks",_w.filter(function(x){return x.booked&&!x.confirmed&&!x.noshow}).length,"Chờ xác nhận lịch","#E08A1E","HV chưa chốt giờ","fset('wow','confirm');reRender(CUR)"],
   ["ti-star",_w.filter(function(x){return x.confirmed&&!x.done&&!x.noshow}).length,"Đã xác nhận, sắp dạy","#DB2777","chuẩn bị nội dung","fset('wow','upcoming');reRender(CUR)"],
   ["ti-thumb-up",_done.length,"Đã dạy xong","#0D9488",_imp+" tiến bộ"],
+  ["ti-clock-play",(function(){var g=0,n=0;_done.forEach(function(w){var x=wowHours(w);if(x){g+=x;n++}});
+    return n?((Math.round(g*10)/10)+"h"):"—"})(),"Giờ kèm đã ghi nhận","#7C3AED",
+   (function(){var thieu=_done.filter(function(w){return !wowHours(w)}).length;
+    return thieu?(thieu+" buổi thiếu mốc giờ"):"đủ mốc vào - ra"})()],
   ["ti-notes",_w.filter(function(x){return x.done&&!x.note}).length,"Chờ ghi nội dung","#E08A1E","SLA "+slaChip("slaWowNote_hours",24),"fset('wow','note');reRender(CUR)"],
   ["ti-target",(_wor==null?"—":_wor+"%"),"Tỷ lệ tiến bộ (WOR)",(_wor!=null&&_wor>=Math.round(kpiTh(/^WOR/,0.6)*100))?"#16A34A":"#E24B4A","mục tiêu ≥ "+kpiChip(/^WOR/,0.6,1)],
   ["ti-player-stop",rows("DL09").filter(function(x){return String(x.wow_quota_remaining||"")!==""&&wowQuotaOf(x.student_id).free<=0}).length,"HV đã hết lượt WOW","#6B7887","cấp thêm nếu có căn cứ"]]);
@@ -9444,6 +9543,13 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=rows("DL14");
   if(w.notes)_bits.push(["ti-note","Ghi chú lúc đặt",w.notes]);
   _bits.push(["ti-star","Lượt WOW còn lại",_left+" buổi"+(String(w.quota_deducted||"").toLowerCase()==="yes"?" (buổi này đã tính vào gói)":" (buổi này CHƯA tính vào gói)")]);
   _bits.push(["ti-chalkboard","Giảng viên",w.staff_name||"CHƯA phân công"]);
+  /* V9.40c: buổi WOW đi đúng vòng đời của buổi lớp - phải thấy được nó có thật sự diễn ra không
+     và dài bao lâu, chứ không chỉ thấy ngày giờ ĐẶT. */
+  if(String(w.wow_start_actual||"").trim())
+   _bits.push(["ti-clock-play","Vào - ra thật",w.wow_start_actual+(w.wow_end_actual?(" tới "+w.wow_end_actual+" ("+wowHoursText(w)+")"):" - CHƯA bấm kết thúc")+
+    (num(w.wow_late_minutes)>5?(" · vào trễ "+w.wow_late_minutes+" phút"):"")]);
+  else if(isc(w.wow_status,"completed"))
+   _bits.push(["ti-clock-off","Vào - ra thật","KHÔNG có mốc giờ - buổi này ghi bù, không đối chiếu được thời lượng"]);
   if(w.wow_no_show_reason)_bits.push(["ti-user-x","Lý do vắng",elabel(w.wow_no_show_reason)||w.wow_no_show_reason]);
   if(w.wow_outcome)_bits.push(["ti-trending-up","Kết quả buổi",elabel(w.wow_outcome)||w.wow_outcome]);
   h+='<div class="wowinfo'+(_self?" self":"")+'">';
@@ -9453,8 +9559,13 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=rows("DL14");
    esc(String(_req.content||"").split("\n").join(" · "))+' <button class="pill" onclick="tkOpen(\''+esc(_req.task_id)+'\')">Mở yêu cầu</button></span></div>';
   h+='</div>';
   h+='<div class="obact">';
+  var _daBd=!!String(w.wow_start_actual||"").trim(),_daKt=!!String(w.wow_end_actual||"").trim();
   if(!s.confirmed&&!s.noshow)h+='<button class="btn primary sm" onclick="confirmRun(\'Xác nhận buổi WOW này?\',\'wowConfirm\',\''+esc(id)+'\')"><i class="ti ti-check"></i>Xác nhận</button>';
-  else if(!s.done&&!s.noshow)h+='<button class="btn primary sm" onclick="confirmRun(\'Đánh dấu buổi WOW đã dạy xong?\',\'wowTaught\',\''+esc(id)+'\')"><i class="ti ti-presentation"></i>Đã dạy</button>';
+  /* V9.40c - hai nút mốc giờ. Bấm Bắt đầu / Kết thúc là đường CHÍNH; nút "Đã dạy" giữ lại làm
+     đường ghi bù cho buổi hôm trước quên bấm, nên đẩy xuống dạng phụ. */
+  else if(!s.done&&!s.noshow&&!_daBd)h+='<button class="btn primary sm" onclick="wowStart(\''+esc(id)+'\')"><i class="ti ti-player-play"></i>Bắt đầu buổi</button>';
+  else if(!s.done&&!s.noshow&&_daBd&&!_daKt)h+='<button class="btn green sm" onclick="wowEnd(\''+esc(id)+'\')"><i class="ti ti-player-stop"></i>Kết thúc buổi</button>';
+  if(!s.done&&!s.noshow&&!_daBd)h+='<button class="btn sm" onclick="confirmRun(\'Ghi bù buổi WOW đã dạy hôm trước? Buổi này sẽ KHÔNG có giờ vào - giờ ra để đối chiếu.\',\'wowTaught\',\''+esc(id)+'\')"><i class="ti ti-presentation"></i>Ghi bù đã dạy</button>';
   else if(s.done&&!s.note)h+='<button class="btn green sm" onclick="wowNote(\''+esc(id)+'\')"><i class="ti ti-notes"></i>Ghi nội dung buổi</button>';
   if(!s.done&&!s.noshow)h+='<button class="btn sm" onclick="confirmRun(\'Ghi nhận học viên không đến buổi WOW này?\',\'wowNoShow\',\''+esc(id)+'\')"><i class="ti ti-user-x"></i>HV không đến</button>';
   if(!s.done&&!s.noshow&&!isc(w.wow_status,"cancelled")){h+='<button class="btn sm" onclick="wowReschedule(\''+esc(id)+'\')"><i class="ti ti-calendar-plus"></i>Dời</button>';
@@ -12825,6 +12936,7 @@ function rateSet(sid,day,shift,val){
    riêng: đơn giá lấy từ wowPayPerSession, mặc định bằng đơn giá buổi thường. */
 function isCongRole(s){return isGVRole(s)||/wow/.test(ecode(s&&s.role))}
 function wowRate(){return num(paramOf("wowPayPerSession",payRate()))||payRate()}
+function testRate(){return num(paramOf("testPayPerCase",120000))||0}
 function congThang(ym){
  var GV=rows("DL01").filter(isCongRole);
  function inYM(v){var d=pvnd(v);if(!d)return false;
@@ -12836,6 +12948,11 @@ function congThang(ym){
   var wow=rows("DL14").filter(function(w){
    if(String(w.staff_id||"")!==g.staff_id||!isc(w.wow_status,"completed"))return false;
    return inYM(w.wow_session_date)});
+  /* V9.40c: CA TEST đầu vào tính theo LẦN (anh Luân chốt) - người chấm là graded_by. Giờ vào -
+     ra của ca test có ghi, nhưng KHÔNG dùng để nhân: nó để quản lý ca chứ không phải để trả công. */
+  var test=rows("DL03").filter(function(x){
+   if(String(x.graded_by||"")!==g.staff_id||!isc(x.test_status,"graded"))return false;
+   return inYM(x.result_time||x.test_attendance_time||x.test_date)});
   var late=ses.filter(function(x){return num(x.teacher_late_minutes)>0});
   var noNote=ses.filter(function(x){return !bhState(x).note})
    .concat(wow.filter(function(w){return !String(w.wow_content_note||"").trim()}));
@@ -12855,9 +12972,15 @@ function congThang(ym){
    theoCa[k].h+=h;theoCa[k].tien+=h*dr});
   /* Tiền công phải là số tròn nghìn - phiếu lương không có phần lẻ 666,667đ. Làm tròn MỘT LẦN
      ở tổng của người đó, không làm tròn từng buổi (làm tròn từng buổi thì cộng lại lệch). */
-  return {g:g,n:ses.length,wow:wow.length,late:late.length,noNote:noNote.length,brs:brs,onl:onl,
+  /* Giờ WOW và giờ test ghi lại để ĐỐI CHIẾU, không nhân vào tiền - nói rõ trên màn hình. */
+  var gioWow=0,thieuWow=0;
+  wow.forEach(function(w){var x=wowHours(w);if(x)gioWow+=x;else thieuWow++});
+  var gioTest=0,thieuTest=0;
+  test.forEach(function(x){var y=testHours(x);if(y)gioTest+=y;else thieuTest++});
+  return {g:g,n:ses.length,wow:wow.length,test:test.length,late:late.length,noNote:noNote.length,brs:brs,onl:onl,
    gio:gio,thieuGio:thieuGio,theoCa:theoCa,
-   tien:Math.round((tienGio+wow.length*wowRate())/1000)*1000}});
+   gioWow:gioWow,thieuWow:thieuWow,gioTest:gioTest,thieuTest:thieuTest,
+   tien:Math.round((tienGio+wow.length*wowRate()+test.length*testRate())/1000)*1000}});
  out.sort(function(a,b){return (b.n+b.wow)-(a.n+a.wow)});
  return out}
 function congMonths(){
@@ -12938,37 +13061,41 @@ function renderCong(){
  var mo=congMonths();
  var ym=window.CONGM||mo[0]||"";
  var L=fltApply("cong",congThang(ym).map(function(x){return {ma:x.g.staff_id,ten:x.g.full_name,
-   co_so:elabel(x.g.branch)||x.g.branch||"",buoi:x.n,gio_day:Math.round(x.gio*10)/10,buoi_wow:x.wow,online:x.onl,tre:x.late,chua_nhan_xet:x.noNote,
-   tien_cong:x.tien,_x:x}}).filter(function(r){return r.buoi||r.buoi_wow})).map(function(r){return r._x});
+   co_so:elabel(x.g.branch)||x.g.branch||"",buoi:x.n,gio_day:Math.round(x.gio*10)/10,buoi_wow:x.wow,ca_test:x.test,online:x.onl,tre:x.late,chua_nhan_xet:x.noNote,
+   tien_cong:x.tien,_x:x}}).filter(function(r){return r.buoi||r.buoi_wow||r.ca_test})).map(function(r){return r._x});
  var tot=L.reduce(function(a,x){return a+x.n},0),totW=L.reduce(function(a,x){return a+x.wow},0),tien=L.reduce(function(a,x){return a+x.tien},0);
  var totG=L.reduce(function(a,x){return a+x.gio},0),totThieu=L.reduce(function(a,x){return a+x.thieuGio},0);
+ var totT=L.reduce(function(a,x){return a+x.test},0);
+ var totWG=L.reduce(function(a,x){return a+x.gioWow},0),totWThieu=L.reduce(function(a,x){return a+x.thieuWow},0);
  var noNote=L.reduce(function(a,x){return a+x.noNote},0);
- var h='<div class="notebar"><i class="ti ti-info-circle"></i><b>Bản demo chưa nối bảng lương</b> - màn này TÍNH và ĐỐI CHIẾU công, không ghi vào đâu cả. Tính theo <b>giờ dạy thật</b> (giờ vào lớp tới giờ kết thúc), đơn giá tra theo <b>giảng viên x loại ngày x ca</b> - sửa ở <a class="lnk" onclick="window.SETTAB=\'giagio\';go(\'settings\')">Cài đặt &gt; Đơn giá giờ dạy</a>. Buổi WOW 1-1 tính theo BUỔI ('+slaChip("wowPayPerSession",250000,"đ/buổi")+') vì sổ WOW chỉ ghi ngày giờ đặt, không có giờ vào - giờ ra để nhân. Căn cứ tính: buổi <b>đã dạy xong</b> - đúng một định nghĩa với KPI và hồ sơ giáo viên.</div>';
+ var h='<div class="notebar"><i class="ti ti-info-circle"></i><b>Bản demo chưa nối bảng lương</b> - màn này TÍNH và ĐỐI CHIẾU công, không ghi vào đâu cả. Tính theo <b>giờ dạy thật</b> (giờ vào lớp tới giờ kết thúc), đơn giá tra theo <b>giảng viên x loại ngày x ca</b> - sửa ở <a class="lnk" onclick="window.SETTAB=\'giagio\';go(\'settings\')">Cài đặt &gt; Đơn giá giờ dạy</a>. Buổi WOW 1-1 tính theo BUỔI ('+slaChip("wowPayPerSession",250000,"đ/buổi")+') và ca test đầu vào tính theo LẦN ('+slaChip("testPayPerCase",120000,"đ/lần")+') - anh Luân chốt 29/07. Giờ vào - ra của hai loại này VẪN ghi nhận, nhưng để quản lý ca chứ không nhân vào tiền. Căn cứ tính: buổi <b>đã dạy xong</b> - đúng một định nghĩa với KPI và hồ sơ giáo viên.</div>';
  h+=statStrip([
   ["ti-school",tot,"Buổi lớp đã dạy trong tháng","#3B82C4",L.length+" người có công"],
   ["ti-clock-hour-4",(Math.round(totG*10)/10)+"h","Tổng giờ dạy","#2E5A88",totThieu?(totThieu+" buổi thiếu giờ vào/ra"):"đủ giờ vào - giờ ra"],
-  ["ti-star",totW,"Buổi WOW 1-1 đã dạy","#DB2777",vnd(wowRate())+"/buổi"],
+  ["ti-star",totW,"Buổi WOW 1-1 đã dạy","#DB2777",vnd(wowRate())+"/buổi · "+(Math.round(totWG*10)/10)+"h kèm"+(totWThieu?(" · "+totWThieu+" buổi thiếu mốc"):"")],
+  ["ti-file-text",totT,"Ca test đầu vào","#7C3AED",vnd(testRate())+"/lần"],
   ["ti-report-money",vnd(tien),"Tiền công tạm tính","#0D9488","theo giờ x ca x người"],
   ["ti-writing",noNote,"Buổi chưa ghi nhận xét","#E08A1E",noNote?"đối chiếu trước khi chốt":"đã đủ nhận xét"],
   ["ti-clock",L.reduce(function(a,x){return a+x.late},0),"Buổi vào trễ giờ","#E24B4A","ảnh hưởng KPI ADC"]]);
  h+=tbar('<span class="tblbl">Tháng</span><select class="sel" onchange="congSet(this.value)">'+
   mo.map(function(k){return '<option value="'+esc(k)+'"'+(k===ym?" selected":"")+'>'+esc(k.split("-")[1]+"/"+k.split("-")[0])+'</option>'}).join("")+'</select>',
-  '<span class="tbcnt">'+L.filter(function(x){return x.n||x.wow}).length+' người có công</span>');
- h+=pgBar("cong",L.filter(function(x){return x.n||x.wow}).length);
- h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Người dạy</th><th>Cơ sở</th><th>Buổi lớp</th><th>Giờ dạy</th><th>Chia theo ca</th><th>Buổi WOW 1-1</th><th>Trong đó online</th><th>Vào trễ</th><th>Chưa ghi nội dung</th><th>Tiền công tạm tính</th></tr></thead><tbody>';
- if(!L.filter(function(x){return x.n||x.wow}).length)h+='<tr><td class="empty" colspan="10">Tháng này chưa có buổi dạy nào hoàn thành.</td></tr>';
- L.forEach(function(x){if(!x.n&&!x.wow)return;
+  '<span class="tbcnt">'+L.filter(function(x){return x.n||x.wow||x.test}).length+' người có công</span>');
+ h+=pgBar("cong",L.filter(function(x){return x.n||x.wow||x.test}).length);
+ h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Người dạy</th><th>Cơ sở</th><th>Buổi lớp</th><th>Giờ dạy</th><th>Chia theo ca</th><th>Trong đó online</th><th>Buổi WOW (giờ kèm)</th><th>Ca test</th><th>Vào trễ</th><th>Chưa ghi nội dung</th><th>Tiền công tạm tính</th></tr></thead><tbody>';
+ if(!L.filter(function(x){return x.n||x.wow||x.test}).length)h+='<tr><td class="empty" colspan="11">Tháng này chưa có buổi dạy nào hoàn thành.</td></tr>';
+ L.forEach(function(x){if(!x.n&&!x.wow&&!x.test)return;
   h+='<tr><td>'+nsLnk(x.g.staff_id,x.g.full_name,"")+'</td>'+
    '<td>'+esc(elabel(x.g.branch)||x.g.branch||"-")+'</td>'+
    '<td><b>'+x.n+'</b></td>'+
    '<td><b>'+(Math.round(x.gio*10)/10)+'h</b>'+(x.thieuGio?' <span class="chip red" data-tip="Buổi đã dạy xong mà không ghi giờ vào - giờ ra, không tính công được">'+x.thieuGio+' buổi thiếu giờ</span>':'')+'</td>'+
    '<td style="font-size:11.5px">'+esc(caText(x.theoCa)||"-")+'</td>'+
-   '<td>'+(x.wow?'<span class="chip" style="background:#FCE7F3;color:#9D174D">'+x.wow+'</span>':'<span class="mut">0</span>')+'</td>'+
    '<td>'+(x.onl?'<span class="chip blue">'+x.onl+'</span>':'<span class="mut">0</span>')+'</td>'+
+   '<td>'+(x.wow?('<span class="chip" style="background:#FCE7F3;color:#9D174D">'+x.wow+'</span> <span class="mut" style="font-size:11px">'+(Math.round(x.gioWow*10)/10)+'h'+(x.thieuWow?(' · '+x.thieuWow+' thiếu mốc'):'')+'</span>'):'<span class="mut">0</span>')+'</td>'+
+   '<td>'+(x.test?('<span class="chip" style="background:#EDE9FE;color:#5B21B6">'+x.test+'</span>'):'<span class="mut">0</span>')+'</td>'+
    '<td>'+(x.late?'<span class="chip amber">'+x.late+'</span>':'0')+'</td>'+
    '<td>'+(x.noNote?'<span class="chip red">'+x.noNote+'</span>':'<span class="chip green">0</span>')+'</td>'+
    '<td style="font-variant-numeric:tabular-nums"><b>'+vnd(x.tien)+'</b></td></tr>'});
- h+='<tr style="background:#F4F7FA;font-weight:800"><td colspan="2">TỔNG</td><td>'+tot+'</td><td>'+(Math.round(totG*10)/10)+'h</td><td></td><td>'+totW+'</td><td colspan="2"></td><td>'+noNote+'</td><td style="font-variant-numeric:tabular-nums">'+vnd(tien)+'</td></tr>';
+ h+='<tr style="background:#F4F7FA;font-weight:800"><td colspan="2">TỔNG</td><td>'+tot+'</td><td>'+(Math.round(totG*10)/10)+'h</td><td colspan="2"></td><td>'+totW+'</td><td>'+totT+'</td><td></td><td>'+noNote+'</td><td style="font-variant-numeric:tabular-nums">'+vnd(tien)+'</td></tr>';
  return h+'</tbody></table></div></div>'}
 /* ===== SỔ THU HỌC PHÍ: tab ĐÃ THU (DL07) + tab DỰ THU (DL06b) ===== */
 function sothuTab(k){window.STTAB=k;reRender("dsthanhtoan")}
@@ -14100,7 +14227,7 @@ DOORS = {
  "DL01":["staffAdd","staffSave","gvBioSave"],
  "DL02":["bgSplitOrphansRun","doHandoverRun","leadInboundSave","reassignSave","runGiveUpDo","runRejectSave","testQuickSave","touchLead","tvEnrollSave"],
  "DL02b":["leadInboundSave","rfNeed","runRejectSave","runTouchSave","testQuickSave"],
- "DL03":["rfNeed","testAttend","testBook","testNoShowSave","testQuickSave","testRebookSave","testRefuse","testResultSave","tvSave"],
+ "DL03":["rfNeed","testAttend","testBook","testNoShowSave","testQuickSave","testRebookSave","testRefuse","testResultSave","tvSave","testEnd"],
  "DL04":["rfNeed","runSkipTest","tvCloseSave","tvEnrollSave","tvQuickSave","tvSave","testConsult"],
  "DL06":["cancelEnrollRun","paySave","rfNeed","runCancelEnroll","tvEnrollSave","insSync","debtRemind"],
  "DL06b":["insPlanSave"],
@@ -14111,7 +14238,7 @@ DOORS = {
  "DL11":["bhCancelRun","bhDone","bhMakeupSave","bhNoteSave","ddSave","sessEnd","sessStart","sesSetTeacher","clsSetTeacher"],
  "DL12":["ddSave","hvAbsentSave","absReq","absReview","absMakeup","absCallSave"],
  "DL13":["chamLuu","giaoBaiCaLop","giaoBaiRieng","sesAssignRun","thuLuu"],
- "DL14":["hvWowSave","wowAddSave","wowCancelRun","wowConfirm","wowNoShow","wowNoteSave","wowRescheduleRun","wowTaught","wowUseQuota"],
+ "DL14":["hvWowSave","wowAddSave","wowCancelRun","wowConfirm","wowNoShow","wowNoteSave","wowRescheduleRun","wowTaught","wowUseQuota","wowStart","wowEnd"],
  "DL15":["rvSend","svFollowDone","svResultSave","svSendSave"],
  "DL16":["fbClassifySave","fbResolveSave","fbToComplaintSave","ghSave","ghToKN","hvFeedbackSave","hvRateSes"],
  "DL17":["fbToComplaintSave","ghToKN","knAddSave","knUpd"],
