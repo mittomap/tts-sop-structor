@@ -149,7 +149,7 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.38 — (A)…(H) + (N1)…(N4) + ba việc anh Luân chốt 29/07 + KIỂM THỬ THẬT TRÊN
+> **Phiên bản: V9.39 — (A)…(H) + (N1)…(N4) + ba việc anh Luân chốt 29/07 + KIỂM THỬ THẬT TRÊN
 > TRÌNH DUYỆT + VÁ "CHỜ DUYỆT BỊ ĐƠ" + TRỢ THỦ NHẬP VÀO GUIDE ĐỀU ✅ XONG.**
 > · **(1) Nhật ký thao tác (DL25)** - app từng có 115 cửa ghi mà không sổ nào ghi ai làm gì lúc nào.
 > · **(2) Hoàn tác** - 46 chỗ hỏi "Xác nhận?" mà không có đường lùi; nay lùi được theo LƯỢT BẤM.
@@ -175,7 +175,7 @@
 > ảnh đại diện kéo từ `ui-avatars.com` (gửi TÊN NGƯỜI THẬT ra máy chủ nước ngoài).
 > **Bộ kiểm hiện tại (phải XANH HẾT mới được giao):** node --check 2 file · `_tall` **38 trang** 0 lỗi
 > (170 icon) · `_check11` **144** · `_check12` 37 · `_check13` 174 · `_check14` **111** · `_check15`
-> **39** · **`_check16` 578** · `_check17` **394** · **`_check18` 173 (vẽ thật 79 trang/tab + 8 chức
+> **39** · **`_check16` 578** · `_check17` **394** · **`_check18` 176 (vẽ thật 79 trang/tab + 8 chức
 > danh + mọi hồ sơ cổng học viên + nhật ký/hoàn tác/bộ nhớ tạm)** · `_checktour` · `_checkdata.js`
 > 27 luật / **6289 lượt kiểm - 0 lệch** · `check_logic.py` (đúng 4 ca cố ý) · `check_data.py` DAT ·
 > **`_checkui.js` 462 lượt mở THẬT trong trình duyệt**.
@@ -729,6 +729,39 @@
 > rồi gọi hàm vẽ** - đi đường tắt, **không bao giờ đi qua `go()`**, mà lỗi nằm đúng ở đường `go()` +
 > phạm vi chức danh. Nay nó **bấm từng mục menu như người dùng** rồi đối chiếu màn nhận được.
 > **Luật rút ra: bộ kiểm đi đường tắt là bộ kiểm mù đúng chỗ người dùng đi.**
+>
+> ### V9.39 - CHUẨN BỊ BÀN GIAO (anh Luân: *"giờ a đưa cho dev, nó không thể làm được là chết anh thật sự"*)
+>
+> Lo lắng chính đáng, và soi kỹ thì tình trạng bàn giao đang **tệ hơn anh Luân nghĩ**:
+>
+> **(1) Script sinh `_APP.js` KHÔNG nằm trong repo.** Toàn bộ 14 bộ kiểm đều nạp `_APP.js`/`_HV.js`
+> rồi chạy thật các hàm của app - mà hai file đó là SẢN PHẨM trích từ HTML, và script trích chỉ tồn
+> tại trên máy người build. Ai nhận bàn giao mà sửa `gen_v5.py` xong sẽ **không chạy được bộ kiểm
+> nào cả** - tức là mất sạch lớp bảo vệ duy nhất. Nay có `_src/extract_js.py` trong repo.
+>
+> **(2) Phải nhớ 14 lệnh riêng và kỳ vọng riêng của từng lệnh** (cái thì `OK: 143`, cái thì
+> `KET QUA: DAT`, cái thì đếm đúng 4 ca cố ý). Ai không biết chính xác 14 lệnh đó thì không chạy gì.
+> Nay **một lệnh `./verify.sh`** - build, trích, chạy hết, in bảng xanh/đỏ, trả mã thoát.
+>
+> **(3) `./verify.sh` chỉ bảo vệ nếu người ta NHỚ chạy nó.** Nay có CI (`.github/workflows/verify.yml`)
+> chạy trên mọi push và mọi PR, cộng một chốt riêng: **3 file sản phẩm phải khớp với bản build từ
+> nguồn** - lệch nghĩa là ai đó sửa tay file HTML hoặc quên build lại, cả hai đều dẫn tới "trên máy
+> tôi chạy được".
+>
+> **(4) 14 tài liệu, gần 6.000 dòng - người mới chết chìm.** Nay có `BAN_GIAO_DEV.md`: một file,
+> đọc 10 phút, đủ để bắt đầu. Ba luật cứng, vòng làm việc, bản đồ 6 chỗ chiếm 90% thời gian, bốn cái
+> bẫy đã có người cắn, và **một bảng nói rõ bộ kiểm bắt được gì / KHÔNG bắt được gì**.
+>
+> **BẪY ĐÃ CẮN - LUẬT 2 KHÔNG CÓ GÌ CANH GÁC.** Thử nghiệm: cố tình gõ thẳng số `24` thay vì đọc
+> `paramOf("attendanceGrace_hours")` → **cả 1975 tiêu chí vẫn xanh**. Tức là luật cứng số 2 của dự án
+> chỉ tồn tại trong tài liệu. Đã thêm kiểm hai chiều: đổi giá trị từng tham số rồi đòi màn hình phải
+> đổi theo (soi toàn bộ trang + mọi tab hub + trạng thái dẫn xuất).
+> **Nhưng phải nói rõ giới hạn thật:** bẻ lại đúng lỗi ban đầu thì nó **vẫn xanh**, vì tham số đó
+> được đọc ở 3 chỗ mà chỉ 1 chỗ bị gõ cứng - hai chỗ kia vẫn theo cấu hình nên màn hình vẫn đổi.
+> Bộ kiểm bắt được **tham số chết** và **tham số bị gõ cứng ở MỌI chỗ**, không bắt được **gõ cứng ở
+> một trong nhiều chỗ**. Đã ghi thẳng giới hạn đó vào chính bộ kiểm và vào tài liệu bàn giao -
+> **để người sau không ngỡ mình đã an toàn.** Một bộ kiểm hứa nhiều hơn nó làm được thì nguy hiểm
+> hơn là không có.
 >
 > ### V9.38 - NGĂN KÉO TRƯỚC, TRANG SAU (anh Luân dạy lại đúng lúc em vừa làm ngược)
 >

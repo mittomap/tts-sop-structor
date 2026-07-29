@@ -608,6 +608,73 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
   t("man Nhat ky loc duoc theo bang va theo nguoi", /nkSet\('NKTB'/.test(o)&&/nkSet\('NKWHO'/.test(o));
   t("man Nhat ky noi thang gioi han giu bao nhieu dong", o.indexOf("dòng gần nhất")>=0);
   t("man Nhat ky goi ten bang bang tieng Viet", o.indexOf("Test đầu vào")>=0||o.indexOf("Buổi học")>=0)})();
+ /* ============ 27. THAM SO CAU HINH PHAI CO TAC DUNG THAT (V9.39) ============
+    Anh Luan lo: "gio a dua cho dev, no khong the lam duoc la chet anh that su".
+    Thu nghiem: co tinh go thang so 24 vao code thay vi doc paramOf("attendanceGrace_hours") -
+    CA 1975 TIEU CHI VAN XANH. Tuc la luat cung so 2 cua du an ("moi hang so nghiep vu di qua cau
+    hinh") KHONG CO GI CANH GAC. Dev moi go thang mot con so, man hinh van dung, bo kiem van xanh,
+    va chu trung tam mat kha nang tu doi nguong ma khong ai biet - toi luc phat hien thi da lau.
+    KIEM HAI CHIEU: doi gia tri tham so roi doi man hinh PHAI DOI THEO.
+
+    NOI RO NO BAT DUOC GI VA KHONG BAT DUOC GI - de khong ai tin nham:
+      BAT DUOC: tham so CHET (khai trong danh muc ma khong ai doc), va tham so bi go cung o
+                TAT CA cac cho doc no.
+      KHONG BAT DUOC: go cung o MOT trong nhieu cho doc. Vi du that: attendanceGrace_hours duoc
+                doc o 3 cho; go cung 1 cho thi 2 cho kia van theo cau hinh, man hinh van doi,
+                bo kiem van xanh. Da thu that va no thuc su khong bat duoc.
+    Nen luat 2 ("moi hang so nghiep vu di qua cau hinh") van CAN NGUOI DOC MA canh, bo kiem chi
+    do bot rui ro chu khong thay the duoc. Ghi ro o day de nguoi sau khong ngo minh da an toan. */
+ (function(){
+  setRole("all");applyScope("");CURSTAFF="";
+  /* Soi TOAN BO man hinh chu khong soi mau: mot tham so co the chi hien o dung mot tab sau cung
+     (vd tien cong giang day chi hien o tab Bang cong). Soi thieu man thi bao nham - ma bo kiem
+     bao nham vai lan la nguoi ta thoi doc no. */
+  var MAN=Object.keys(RENDER);
+  var HUB=[["hoctap","HTTAB",["lop","buoihoc","wow","lichtuan","gvdp","phong"]],
+           ["duyet","DUYTAB",["duyetck","duyethoan","duyetnghi","duyetthu","duyetgiao"]],
+           ["dsthanhtoan","STTAB",["thu","du","cong"]],
+           ["cskh","CSTAB",["khaosat","phanhoi","khieunai"]]];
+  function anh(){var o="";
+   MAN.forEach(function(k){try{o+=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){}});
+   HUB.forEach(function(H){var cu=window[H[1]];H[2].forEach(function(tb){window[H[1]]=tb;
+    try{o+=RENDER[H[0]]()}catch(e){}});window[H[1]]=cu});
+   ["nhatky","health","tro","nhip"].forEach(function(tb){var cu=window.SETTAB;window.SETTAB=tb;
+    try{o+=RENDER.settings()}catch(e){}window.SETTAB=cu});
+   try{o+=asstHTML()}catch(e){}
+   try{o+=JSON.stringify(slaItems().map(function(x){return x.cat+x.grp+x.what+x.sev+x.prm}))}catch(e){}
+   try{o+=JSON.stringify(dataHealth().map(function(x){return x.rule+x.msg}))}catch(e){}
+   return o}
+  /* Tham so KHONG the hien tren man hinh - khai ro TUNG CAI kem ly do, chu khong tha cho danh
+     sach bao nham roi ai cung bo qua. Them tham so vao day phai co ly do doc duoc. */
+  var KHONGVE={
+   demoAutoShift_days:"chi chay LUC KHOI DONG (tshAuto keo ngay ve hien tai), doi giua phien khong ve lai gi",
+   undoWindow_seconds:"chi la thoi gian thanh Hoan tac tu an - la nhip thoi gian, khong phai noi dung man hinh"};
+  var cf=(DATA.config&&DATA.config.ch2)||[];
+  function dong(ten){for(var i=0;i<cf.length;i++)if(cf[i].name===ten)return cf[i];
+   var al=(PKEY[ten]||[]);for(var j=0;j<al.length;j++)for(var i2=0;i2<cf.length;i2++)if(cf[i2].name===al[j])return cf[i2];
+   return null}
+  var khongTacDung=[],khongKhai=[];
+  APPPARAMS.forEach(function(P){
+   var ten=P[1],mac=P[4];
+   if(typeof mac!=="number")return;              /* tham so dang chu: doi chieu kieu khac, bo qua */
+   var r=dong(ten);
+   if(!r){khongKhai.push(ten);return}
+   var cu=r.value;
+   var truoc=anh();
+   /* doi that xa de chac chan vuot moi nguong, roi doi ve 0 - mot trong hai chieu phai lam man doi */
+   r.value=String(Math.max(1,Math.round(Math.abs(num(mac)||1)*40))); try{dataChanged()}catch(e){}
+   var sau1=anh();
+   r.value="0"; try{dataChanged()}catch(e){}
+   var sau2=anh();
+   r.value=cu; try{dataChanged()}catch(e){}
+   if(truoc===sau1&&truoc===sau2&&!KHONGVE[ten])khongTacDung.push(ten)});
+  t("tham so 'khong ve ra man' deu duoc khai ro ly do", Object.keys(KHONGVE).every(function(k){
+    return typeof KHONGVE[k]==="string"&&KHONGVE[k].length>30}));
+  t("moi tham so trong danh muc deu co dong trong CH2"+(khongKhai.length?(" - thieu: "+khongKhai.slice(0,4).join(", ")):""), khongKhai.length===0);
+  t("doi tham so cau hinh thi man hinh PHAI doi theo (khong bi go cung trong code)"+
+    (khongTacDung.length?(" - khong tac dung: "+khongTacDung.slice(0,6).join(", ")):""),
+    khongTacDung.length===0);
+ })();
  /* ============ 26. NGAN KEO TRUOC, TRANG SAU (V9.38 - anh Luan) ============
     "khong phai luc nao ho so 360 cung tien, du thong tin thi drawer van tien hon rat chi la nhieu
      - drawer khong du thi nguoi ta tu khac bam xem 360".

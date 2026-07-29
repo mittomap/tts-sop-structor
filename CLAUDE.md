@@ -17,7 +17,10 @@ Chủ dự án: Luân. Mọi phiên làm việc (Claude Code hay Claude Cowork) 
 - NGUỒN DUY NHẤT: `_src/gen_v5.py` (generator Python chứa toàn bộ HTML/CSS/JS trong chuỗi).
   KHÔNG BAO GIỜ sửa tay 3 file build ở gốc repo: `ITTs_WebApp_v5_demo.html`,
   `ITTs_TrangHocVien_demo.html`, `ITTs_data.js` - sửa gen_v5.py rồi build lại.
-- Build + verify: làm ĐÚNG theo `_src/README_SRC.md`. Verify BẮT BUỘC sau mỗi build:
+- Build + verify: **một lệnh duy nhất `./verify.sh`** ở gốc repo (build -> trích JS -> 14 bộ kiểm ->
+  in bảng xanh/đỏ, mã thoát khác 0 là có chỗ đỏ). `./verify.sh --nhanh` bỏ phần trình duyệt.
+  Chi tiết từng bộ kiểm canh điều gì: `_src/README_SRC.md`. Người mới nhận bàn giao đọc `BAN_GIAO_DEV.md`.
+- Chi tiết cũ (vẫn đúng, verify.sh gọi hộ): Verify BẮT BUỘC sau mỗi build:
   `node --check` script của cả 2 file HTML, `_tall.js` (kỳ vọng 37 trang 0 lỗi + icon đủ),
   và `_src/_check11.js` cùng các bộ check khác nếu có (suite chuẩn 366 điểm) - xanh hết mới giao.
 - Dữ liệu demo: pipeline `_src/gen_demo.py -> seed_giaoan.py -> mkdemo.py -> fixdata.py ->

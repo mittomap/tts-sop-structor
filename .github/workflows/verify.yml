@@ -1,0 +1,52 @@
+# CHAN BAN GAY NGAY TU CUA - chay bo kiem tren MOI push va MOI pull request.
+#
+# Vi sao can: `./verify.sh` chi bao ve duoc neu nguoi ta NHO chay no. Ai nhan ban giao ma khong
+# biet co bo kiem, hoac "sua co ti nen bo qua", thi lop bao ve bien mat dung luc can nhat.
+# CI thi khong quen. Do la khac biet giua "co bo kiem" va "duoc bo kiem bao ve".
+name: verify
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Bo kiem giao dien can trinh duyet that. Khong cai duoc thi _checkui TU BAO QUA
+      # chu khong bao do bay - 13 bo kiem con lai van chay.
+      - name: Cai Playwright + Chromium
+        run: |
+          cd _src
+          npm init -y >/dev/null 2>&1
+          npm i --no-audit --no-fund playwright
+          npx playwright install --with-deps chromium
+
+      - name: Chay toan bo bo kiem
+        run: ./verify.sh
+
+      # Ban sua khong duoc lam 3 file san pham lech voi nguon. Lech nghia la ai do sua tay file
+      # san pham, hoac quen build lai - ca hai deu dan toi "tren may toi chay duoc" o lan sau.
+      - name: Doi chieu ban build voi nguon
+        run: |
+          if ! git diff --quiet -- ITTs_WebApp_v5_demo.html ITTs_TrangHocVien_demo.html ITTs_data.js; then
+            echo "::error::3 file san pham LECH voi ban build tu _src/gen_v5.py."
+            echo "Nguyen nhan thuong gap: sua tay file HTML/data thay vi sua gen_v5.py, hoac quen build lai."
+            echo "Cach xu ly: cd _src && ITTS_OUT=\"\$(cd .. && pwd)\" python3 gen_v5.py  roi commit lai."
+            git diff --stat -- ITTs_WebApp_v5_demo.html ITTs_TrangHocVien_demo.html ITTs_data.js
+            exit 1
+          fi
+          echo "3 file san pham khop voi nguon."

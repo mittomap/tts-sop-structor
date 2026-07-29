@@ -34,6 +34,12 @@ ITTS_OUT="<mnt>/SOP ITTs" python3 gen_v5.py
 ```
 
 ## VERIFY (bắt buộc sau mỗi build)
+> **Chạy một lệnh là xong: `./verify.sh` ở gốc repo.** Nó build lại, trích `_APP.js`/`_HV.js` rồi
+> chạy toàn bộ bảng dưới đây, in xanh/đỏ và trả mã thoát. Bảng này để tra "bộ kiểm nào canh điều gì",
+> không phải để gõ tay từng dòng.
+>
+> `_APP.js` / `_HV.js` sinh bằng `_src/extract_js.py` - **không** phải mã nguồn, đừng sửa.
+
 Bộ kiểm gồm **14 phần, phải xanh HẾT mới được giao** (~1930 tiêu chí tự động + 396 lượt mở thật trong trình duyệt):
 | Lệnh | Kỳ vọng |
 |---|---|
@@ -47,7 +53,7 @@ Bộ kiểm gồm **14 phần, phải xanh HẾT mới được giao** (~1930 ti
 | `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 578 tieu chi` - học phí theo đợt + vá V9.27 + bấm-tên-ra-drawer + địa chỉ từng trang |
 | `ITTS_OUT=<out> node _checkdata.js` | `CHECKDATA OK: 27 luat ... 0 cho lech` - **dữ liệu demo có khớp ga nghiệp vụ không** |
 | `ITTS_OUT=<out> node _check17.js` | `CHECK17 OK: 394 tieu chi` - **bộ máy lọc chuyên sâu** (kết hợp trục, lưu theo người) |
-| `ITTS_OUT=<out> node _check18.js` | `CHECK18 OK: 155 tieu chi \| da ve 77 trang/tab` - **hội đồng audit tự động**: vẽ THẬT mọi trang/tab, mọi trang qua mắt 8 chức danh, cổng học viên qua mọi hồ sơ; từ V9.31 kiêm luôn **nhật ký thao tác + hoàn tác + bộ nhớ tạm bảng tra** (bấm cửa ghi thật, lùi lại thật, và bắt chốt chặn từ chối lùi) |
+| `ITTS_OUT=<out> node _check18.js` | `CHECK18 OK: 176 tieu chi \| da ve 79 trang/tab` - **hội đồng audit tự động**: vẽ THẬT mọi trang/tab, mọi trang qua mắt 8 chức danh, cổng học viên qua mọi hồ sơ; từ V9.31 kiêm luôn **nhật ký thao tác + hoàn tác + bộ nhớ tạm bảng tra** (bấm cửa ghi thật, lùi lại thật, và bắt chốt chặn từ chối lùi) |
 | `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` |
 | `python3 check_logic.py` | `TONG BAN GHI LOI: 4` (đúng 4 ca là việc quá hạn CỐ Ý để demo cảnh báo đỏ - xem luật 10k) |
 | `python3 check_data.py` | `KET QUA: DAT` |
