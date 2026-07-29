@@ -2074,20 +2074,29 @@ function staffFor(role){var r=RBK[role]||{codes:[],name:"Admin"};var a=rows("DL0
  return{staff_id:"ADMIN",full_name:"Admin",role:"admin (Quản trị viên)"}}
 
 function isRisk(v){return /at_risk|off_track/.test(ecode(v))}
+/* ═══ NGUYÊN TẮC TIỆN DỤNG - NGĂN KÉO TRƯỚC, TRANG SAU (anh Luân, V9.38) ═══
+   "không phải lúc nào hồ sơ 360 cũng tiện, đủ thông tin thì drawer vẫn tiện hơn rất chi là
+    nhiều - drawer không đủ thì người ta tự khắc bấm xem 360".
+   Đo trước khi sửa: 20/29 bảng có nút hàng RỜI TRANG (openHoso / openLop / openGV / openKhoa),
+   đúng 1 bảng mở ngăn kéo. Tức là làm ngược hẳn: mỗi lần liếc một dòng là mất chỗ đang đứng,
+   xem xong phải bấm quay lại, mà thường chỉ cần biết đúng ba con số.
+   LUẬT: nút hàng của bảng danh sách mở NGĂN KÉO. Cả bốn ngăn kéo (học viên / lớp / nhân sự /
+   khóa) đều đã có sẵn nút "Hồ sơ đầy đủ" bên trong - ai cần sâu hơn thì đi tiếp một bước,
+   còn đa số dừng ở ngăn kéo là đủ. */
 var LISTCFG={
 hocvien:{code:"DL09",filt:"student_status",ro:1,sub:"Học viên (DL09) - lọc theo trạng thái / nguy cơ / lớp / khóa",extra:"hvExtraFilter",
  qf:[["risk","Nguy cơ",function(s){return isRisk(s.attendance_progress_status)||isRisk(s.academic_progress_status)}]],
- act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"student_id"},{lb:"Hồ sơ",ic:"ti-id-badge-2",fn:"openHoso",arg:"student_id"}],
+ act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"student_id"},{lb:"Xem nhanh",ic:"ti-eye",fn:"openQuick",arg:"student_id"}],
  cols:[["student_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["student_status","Trạng thái","chip"],["attendance_progress_status","Chuyên cần","chip"],["academic_progress_status","Học thuật","chip"],["attendance_risk_reason","Lý do CC","enum"],["academic_risk_reason","Lý do HT","enum"],["wow_quota_remaining","WOW còn"]]},
 lop:{code:"DL10",filt:"class_status",ro:1,sub:"Lớp học (DL10)",
- act:[{lb:"Bảng lớp",ic:"ti-clipboard-list",fn:"openLop",arg:"class_id"}],
+ act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openLopQuick",arg:"class_id"}],
  cols:[["class_id","Mã"],["class_name","Tên lớp"],["course_id_name","Khóa"],["class_status","Trạng thái","chip"],["current_enrollment","Sĩ số"],["class_capacity","Sức chứa"],["main_teacher_id_name","GV chính"],["class_schedule","Lịch"],["class_start_date","Khai giảng"]]},
-giangvien:{code:"DL01",ro:1,sub:"Giảng viên (DL01)",act:[{lb:"Hồ sơ GV",ic:"ti-chalkboard",fn:"openGV",arg:"staff_id"}],
+giangvien:{code:"DL01",ro:1,sub:"Giảng viên (DL01)",act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openNSQuick",arg:"staff_id"}],
  pre:function(s){return /teacher|wow|giảng|giang/.test(ecode(s.role))||/giảng|giang|teacher/i.test(String(s.role))},
  cols:[["staff_id","Mã"],["full_name","Họ tên"],["role","Vai trò","enum"],["phone","SĐT"],["email","Email"],["branch","Cơ sở","enum"],["status","Trạng thái","chip"]]},
-nhanvien:{code:"DL01",filt:"status",ro:1,sub:"Toàn bộ nhân sự (DL01)",act:[{lb:"Bảng việc",ic:"ti-id-badge",fn:"openNV",arg:"staff_id"}],
+nhanvien:{code:"DL01",filt:"status",ro:1,sub:"Toàn bộ nhân sự (DL01)",act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openNSQuick",arg:"staff_id"}],
  cols:[["staff_id","Mã"],["full_name","Họ tên"],["role","Vai trò","enum"],["department","Bộ phận"],["email","Email"],["reports_to_name","Quản lý"],["status","Trạng thái","chip"]]},
-nhaplead:{code:"DL02",filt:"lead_status",act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"lead_id"},{lb:"Ghi liên hệ",ic:"ti-phone",fn:"openLienhe",arg:"lead_id"},{lb:"Hồ sơ",ic:"ti-id-badge-2",fn:"openHoso",arg:"lead_id"}],
+nhaplead:{code:"DL02",filt:"lead_status",act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"lead_id"},{lb:"Ghi liên hệ",ic:"ti-phone",fn:"openLienhe",arg:"lead_id"},{lb:"Xem nhanh",ic:"ti-eye",fn:"openQuick",arg:"lead_id"}],
  cols:[["lead_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["lead_created_time","Vào hệ thống"],["lead_status","Trạng thái","chip"],["contact_count","Lượt LH"],["next_followup_time","Hẹn liên hệ"],["assigned_to_name","NV phụ trách"],["next_action","Việc cần làm","na"]],
  form:[["full_name","Họ tên",0,1],["phone_number","SĐT",0,1],["zalo_id","Zalo (SĐT/nick)",0],["lead_source","Nguồn","enum_lead_source",1],["student_type","Đối tượng","enum_student_type"],["learning_goal","Mục tiêu học","enum_learning_goal_type"],["target_band","Điểm mục tiêu"],["learning_mode","Hình thức","enum_learning_mode"],["expected_start_time","Dự kiến bắt đầu"],["availability_schedule","Lịch rảnh"],["lead_qualification_status","Mức đủ ĐK","enum_lead_qualification_status"],["branch","Cơ sở","enum_branch"],["lead_note","Ghi chú trao đổi","ta"]],idp:"L-2026-"},
 lienhe:{code:"DL02b",filt:"channel",
@@ -2096,32 +2105,32 @@ lienhe:{code:"DL02b",filt:"channel",
 test:{code:"DL03",filt:"test_status",
  cols:[["test_booking_id","Mã"],["lead_id_name","Khách"],["test_date","Ngày test"],["test_format","Hình thức","enum"],["booking_status","Đặt lịch","chip"],["test_attendance_status","Điểm danh","chip"],["overall_score","Điểm"],["test_status","Chấm bài","chip"]],
  form:[["lead_id","Chọn khách (gõ SĐT/tên)","@lead",1],["test_date","Ngày giờ test"],["test_format","Hình thức","enum_test_format"],["booking_status","Trạng thái đặt lịch","enum_booking_status"],["test_attendance_status","Điểm danh test","enum_test_attendance_status"],["skill_listening","Listening"],["skill_reading","Reading"],["skill_writing","Writing"],["skill_speaking","Speaking"],["overall_score","Điểm tổng"],["academic_note","Nhận xét học thuật","ta"]],idp:"TB-2026-"},
-tuvan:{code:"DL06",filt:"enrollment_status",act:[{lb:"Hồ sơ",ic:"ti-id-badge-2",fn:"openHoso",arg:"student_id"}],
+tuvan:{code:"DL06",filt:"enrollment_status",act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openQuick",arg:"student_id"}],
  cols:[["enrollment_id","Mã ĐK"],["student_id_name","Học viên"],["course_id_name","Khóa"],["enrollment_status","Trạng thái","chip"],["final_fee","Học phí","money"],["paid_amount","Đã đóng","money"],["remaining_amount","Còn lại","money"],["next_action","Việc cần làm","na"]],
  form:[["lead_id","Chọn khách (gõ SĐT/tên)","@lead",1],["course_id","Khóa học","@course",1],["enrollment_status","Trạng thái ĐK","enum_enrollment_status"],["total_fee","Học phí gốc"],["discount_amount","Chiết khấu"],["discount_type","Loại CK","enum_discount_type"],["discount_reason","Lý do CK"],["notes","Ghi chú","ta"]],idp:"ENR-2026-"},
-thanhtoan:{code:"DL07",filt:"payment_method",act:[{lb:"Hồ sơ",ic:"ti-id-badge-2",fn:"openHoso",arg:"student_id"}],
+thanhtoan:{code:"DL07",filt:"payment_method",act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openQuick",arg:"student_id"}],
  cols:[["payment_id","Mã GD"],["student_id_name","Học viên"],["amount","Số tiền","money"],["payment_method","Phương thức","enum"],["net_received","Thực nhận","money"],["received_by_name","NV thu"],["verified_by_name","Xác nhận"]],
  form:[["enrollment_id","Mã đăng ký",0,1],["student_id","Chọn HV (gõ SĐT/tên)","@student"],["amount","Số tiền",0,1],["payment_method","Phương thức","enum_payment_method"],["transaction_fee","Phí giao dịch"],["bank_name","Ngân hàng"],["sender_name","Người chuyển"],["payment_note","Ghi chú","ta"]],idp:"PAY-2026-"},
-xeplop:{code:"DL08",filt:"onboarding_status",act:[{lb:"Hồ sơ",ic:"ti-id-badge-2",fn:"openHoso",arg:"student_id"}],
+xeplop:{code:"DL08",filt:"onboarding_status",act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openQuick",arg:"student_id"}],
  cols:[["onboarding_id","Mã"],["student_id_name","Học viên"],["class_id_name","Lớp"],["placement_status","Xếp lớp","chip"],["onboarding_status","Onboarding","chip"],["next_action","Việc cần làm","na"]],
  form:[["student_id","Chọn HV (gõ SĐT/tên)","@student",1],["class_id","Lớp","@class",1],["placement_status","Trạng thái xếp lớp","enum_placement_status"],["class_confirmation_status","HV xác nhận lớp","enum_class_confirmation_status"],["onboarding_status","Onboarding","enum_onboarding_status"],["onboarding_note","Ghi chú","ta"]],idp:"OB-"},
-baitap:{code:"DL13",filt:"homework_status",act:[{lb:"Hồ sơ",ic:"ti-id-badge-2",fn:"openHoso",arg:"student_id"}],
+baitap:{code:"DL13",filt:"homework_status",act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openQuick",arg:"student_id"}],
  cols:[["homework_id","Mã"],["student_name","Học viên"],["homework_title","Tên bài"],["skill","Kỹ năng","enum"],["homework_status","Trạng thái","chip"],["homework_score","Điểm"],["graded_within_48h","48h"]],
  form:[["class_id","Lớp","@class"],["student_id","Chọn HV (gõ SĐT/tên)","@student"],["homework_title","Tên bài",0,1],["skill","Kỹ năng","enum_homework_skill"],["homework_due_date","Hạn nộp"],["homework_status","Trạng thái","enum_homework_status"],["homework_score","Điểm"],["teacher_feedback","Nhận xét","ta"]],idp:"HW-"},
-wow:{code:"DL14",filt:"wow_status",act:[{lb:"Hồ sơ",ic:"ti-id-badge-2",fn:"openHoso",arg:"student_id"}],
+wow:{code:"DL14",filt:"wow_status",act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openQuick",arg:"student_id"}],
  cols:[["wow_id","Mã"],["student_name","Học viên"],["wow_session_date","Ngày học"],["wow_session_type","Loại","enum"],["wow_status","Trạng thái","chip"],["wow_outcome","Kết quả","enum"],["staff_name","NV WOW"]],
  form:[["student_id","Chọn HV (gõ SĐT/tên)","@student",1],["wow_session_type","Loại buổi","enum_wow_session_type"],["wow_skill","Kỹ năng","enum_homework_skill"],["wow_session_date","Ngày học"],["wow_status","Trạng thái","enum_wow_status"],["wow_outcome","Kết quả","enum_wow_outcome"],["wow_content_note","Ghi chú sau buổi","ta"]],idp:"WOW-"},
-khaosat:{code:"DL16",filt:"feedback_status",act:[{lb:"Hồ sơ",ic:"ti-id-badge-2",fn:"openHoso",arg:"student_id"}],
+khaosat:{code:"DL16",filt:"feedback_status",act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openQuick",arg:"student_id"}],
  cols:[["feedback_id","Mã"],["student_id_name","Học viên"],["feedback_type","Loại","enum"],["feedback_category","Danh mục","enum"],["feedback_score","Điểm"],["feedback_status","Trạng thái","chip"]],
  form:[["student_id","Chọn HV (gõ SĐT/tên)","@student"],["feedback_channel","Kênh","enum_feedback_channel"],["feedback_type","Loại","enum_feedback_type"],["feedback_category","Danh mục","enum_feedback_category"],["feedback_score","Điểm 1-5"],["feedback_content","Nội dung","ta"]],idp:"FB-"},
-khieunai:{code:"DL17",filt:"complaint_status",act:[{lb:"Hồ sơ",ic:"ti-id-badge-2",fn:"openHoso",arg:"student_id"}],
+khieunai:{code:"DL17",filt:"complaint_status",act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openQuick",arg:"student_id"}],
  cols:[["complaint_id","Mã"],["student_id_name","Học viên"],["complaint_type","Loại","enum"],["complaint_severity","Mức độ","chip"],["complaint_status","Trạng thái","chip"],["complaint_time","Tiếp nhận"],["next_action","Việc cần làm","na"]],
  form:[["student_id","Chọn HV (gõ SĐT/tên)","@student",1],["complaint_channel","Kênh tiếp nhận","enum_complaint_channel"],["complaint_type","Loại","enum_complaint_type"],["complaint_severity","Mức độ","enum_complaint_severity"],["complaint_content","Nội dung khiếu nại","ta"]],idp:"KN-2026-"},
-ketthuc:{code:"DL18",filt:"re_enrollment_status",act:[{lb:"Hồ sơ",ic:"ti-id-badge-2",fn:"openHoso",arg:"student_id"}],
+ketthuc:{code:"DL18",filt:"re_enrollment_status",act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openQuick",arg:"student_id"}],
  cols:[["course_end_id","Mã"],["student_id_name","Học viên"],["final_test_score","Điểm cuối"],["attendance_rate","Chuyên cần"],["achievement_status","Đạt mục tiêu","chip"],["re_enrollment_status","Tái ĐK","chip"],["testimonial_given","Cảm nhận HV"]],
  form:[["student_id","Chọn HV (gõ SĐT/tên)","@student",1],["final_test_score","Điểm test cuối"],["attendance_rate","Tỷ lệ chuyên cần"],["completion_rate","Tỷ lệ hoàn thành"],["achievement_status","Mức đạt mục tiêu","enum_achievement_status"],["re_enrollment_status","Tái ĐK","enum_re_enrollment_status"],["achievement_note","Ghi chú","ta"]],idp:"CE-"},
 /* ===== 5 BẢNG TRƯỚC ĐÂY CHƯA CÓ DANH SÁCH NÀO TRỎ TỚI ===== */
-khoahoc:{code:"DL05",filt:"status",sub:"Khóa học - sản phẩm & học phí (DL05)",act:[{lb:"Hồ sơ khóa",ic:"ti-school",fn:"openKhoa",arg:"course_id"}],
+khoahoc:{code:"DL05",filt:"status",sub:"Khóa học - sản phẩm & học phí (DL05)",act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openKhoaQuick",arg:"course_id"}],
  cols:[["course_id","Mã"],["course_name","Tên khóa"],["course_level","Trình độ","chip"],["duration_sessions","Số buổi"],["duration_months","Số tháng"],["list_price","Học phí","money"],["wow_quota_default","Quota WOW"],["learning_mode_supported","Hình thức"],["description","Mô tả"],["status","Trạng thái","chip"]],
  form:[["course_id","Mã khóa (vd CRS-IELTS65-04)",0,1],["course_name","Tên khóa",0,1],["course_level","Trình độ","enum_class_level",1],["duration_sessions","Số buổi"],["duration_months","Số tháng"],["list_price","Học phí niêm yết (đ)",0,1],["wow_quota_default","Quota WOW mặc định"],["learning_mode_supported","Hình thức hỗ trợ (online/offline/hybrid)"],["description","Mô tả khóa","ta"],["status","Trạng thái (active / inactive)"]],idp:"CRS-"},
 };
@@ -3456,7 +3465,7 @@ function duyHoanHTML(){
  h+='<div class="panel"><div class="pbody">';
  if(!refund.length)h+='<div class="empty">Không có yêu cầu hoàn tiền.</div>';
  refund.forEach(function(r){var id=esc(r.enrollment_id);var sg=refundSuggest(r);
-  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+duyWho(r)+' - đã đóng '+vnd(num(r.paid_amount))+'</div><div class="amt" style="color:var(--amber)">Gợi ý hoàn '+vnd(sg.amt)+' ('+sg.pct+'%)</div><div class="rs">Lý do hủy: '+esc(r.cancellation_reason||"-")+' - '+esc(sg.why)+'</div></div><div class="act">'+duyHosoBtn(r)+'<button class="btn primary" onclick="duyetRefund(\''+id+'\')"><i class="ti ti-cash"></i>Xử lý hoàn tiền</button></div></div>'});
+  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+duyWho(r)+' - đã đóng '+vnd(num(r.paid_amount))+'</div><div class="amt" style="color:var(--amber)">Gợi ý hoàn '+vnd(sg.amt)+' ('+sg.pct+'%)</div><div class="rs">Lý do hủy: '+esc(r.cancellation_reason||"-")+' - '+esc(sg.why)+'</div></div><div class="act">'+duyXemBtn(r)+'<button class="btn primary" onclick="duyetRefund(\''+id+'\')"><i class="ti ti-cash"></i>Xử lý hoàn tiền</button></div></div>'});
  return h+'</div></div>'}
 /* ═══════════ V9.37 - DUYỆT PHẢI XEM ĐƯỢC HỒ SƠ (anh Luân) ═══════════
    "Mấy cái chỗ duyệt, không có drawer thông tin thì làm sao biết duyệt kiểu gì."
@@ -3470,10 +3479,17 @@ function duyWho(r){
  if(sid)return '<a class="lnk" onclick="openStuQuick(\''+esc(sid)+'\')">'+ten+'</a>';
  if(lid)return '<a class="lnk" onclick="leadDetail(\''+esc(lid)+'\')">'+ten+'</a>';
  return ten}
-function duyHosoBtn(r){
- var pid=String(r.student_id||r.lead_id||"").trim();
- if(!pid)return "";
- return '<button class="btn" onclick="jOpen(\''+esc(pid)+'\')" data-tip="Mở hồ sơ 360: toàn bộ hành trình, tiền đã đóng, lớp, phản hồi - xem rồi hẵng quyết"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>'}
+/* NGUYÊN TẮC TIỆN DỤNG (anh Luân): "không phải lúc nào hồ sơ 360 cũng tiện, đủ thông tin thì
+   drawer vẫn tiện hơn rất chi là nhiều - drawer không đủ thì người ta tự khắc bấm xem 360".
+   Nên MẶC ĐỊNH LÀ NGĂN KÉO: mở ngay tại chỗ, không rời trang, đọc xong đóng lại là quyết tiếp.
+   Ngăn kéo học viên đã có sẵn khóa-lớp, công nợ, chuyên cần, lý do gắn cờ nguy cơ - đủ để quyết
+   một khoản chiết khấu. Và ngay TRONG ngăn kéo đã có nút "Hồ sơ đầy đủ" cho ai cần đi sâu.
+   Đẩy hồ sơ 360 lên làm nút chính là bắt mọi người rời trang cho một việc mà đa số không cần. */
+function duyXemBtn(r){
+ var sid=String(r.student_id||"").trim(),lid=String(r.lead_id||"").trim();
+ if(!sid&&!lid)return "";
+ var fn=sid?("openStuQuick('"+esc(sid)+"')"):("leadDetail('"+esc(lid)+"')");
+ return '<button class="btn" onclick="'+fn+'" data-tip="Xem nhanh ngay tại đây: khóa - lớp, đã đóng, còn nợ, chuyên cần. Cần sâu hơn thì trong đó có nút Hồ sơ đầy đủ."><i class="ti ti-eye"></i>Xem nhanh</button>'}
 function duyCkHTML(TH){
  var ck=rows("DL06").filter(function(r){return num(r.discount_amount)>=TH&&!r.discount_approved_by});
  var appr=rows("DL06").filter(function(r){return num(r.discount_amount)>=TH&&r.discount_approved_by});
@@ -3482,7 +3498,7 @@ function duyCkHTML(TH){
  h+='<div class="sechd">Chiết khấu chờ duyệt ('+ck.length+')</div><div class="panel"><div class="pbody">';
  if(!ck.length)h+='<div class="empty">Không có chiết khấu nào chờ duyệt.</div>';
  ck.forEach(function(r){var id=esc(r.enrollment_id);var pct=num(r.total_fee)?Math.round(num(r.discount_amount)/num(r.total_fee)*100):0;
-  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+duyWho(r)+' - '+esc(r.course_id_name||r.course_id)+'</div><div class="amt">'+money(r.discount_amount)+'đ <span style="font-size:12px;color:var(--muted);font-weight:600">('+pct+'% / học phí gốc '+money(r.total_fee)+'đ)</span></div><div class="rs">Loại: '+esc(elabel(r.discount_type)||"-")+' - Lý do: '+esc(r.discount_reason||"-")+'</div></div><div class="act">'+duyHosoBtn(r)+'<button class="btn green" onclick="confirmRun(\'Duyệt chiết khấu '+money(r.discount_amount)+'đ cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi tên bạn là người duyệt.\',\'duyetOK\',\''+id+'\')"><i class="ti ti-check"></i>Duyệt</button><button class="btn danger" onclick="confirmRun(\'TỪ CHỐI chiết khấu này? Chiết khấu về 0 và học phí tính lại.\',\'duyetNo\',\''+id+'\')"><i class="ti ti-x"></i>Từ chối</button></div></div>'});
+  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+duyWho(r)+' - '+esc(r.course_id_name||r.course_id)+'</div><div class="amt">'+money(r.discount_amount)+'đ <span style="font-size:12px;color:var(--muted);font-weight:600">('+pct+'% / học phí gốc '+money(r.total_fee)+'đ)</span></div><div class="rs">Loại: '+esc(elabel(r.discount_type)||"-")+' - Lý do: '+esc(r.discount_reason||"-")+'</div></div><div class="act">'+duyXemBtn(r)+'<button class="btn green" onclick="confirmRun(\'Duyệt chiết khấu '+money(r.discount_amount)+'đ cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi tên bạn là người duyệt.\',\'duyetOK\',\''+id+'\')"><i class="ti ti-check"></i>Duyệt</button><button class="btn danger" onclick="confirmRun(\'TỪ CHỐI chiết khấu này? Chiết khấu về 0 và học phí tính lại.\',\'duyetNo\',\''+id+'\')"><i class="ti ti-x"></i>Từ chối</button></div></div>'});
  h+='</div></div>';
  if(appr.length){h+='<div class="sechd">Đã quyết định gần đây</div><div class="panel"><div class="pbody">';
   appr.slice(0,8).forEach(function(r){var rej=/từ chối|tu choi/i.test(String(r.discount_approved_by));h+='<div class="appcard done"><div class="info"><div class="id">'+esc(r.enrollment_id)+'</div><div class="big">'+esc(r.student_id_name||r.student_id)+' - CK '+money(r.discount_amount)+'đ</div><div class="rs">'+esc(r.discount_approved_by)+(r.discount_approved_at?' · '+esc(r.discount_approved_at):'')+'</div></div><div class="act"><span class="chip '+(rej?"red":"green")+'" style="padding:6px 12px">'+(rej?"Đã từ chối":"Đã duyệt")+'</span></div></div>'});

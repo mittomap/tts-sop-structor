@@ -149,7 +149,7 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.37 — (A)…(H) + (N1)…(N4) + ba việc anh Luân chốt 29/07 + KIỂM THỬ THẬT TRÊN
+> **Phiên bản: V9.38 — (A)…(H) + (N1)…(N4) + ba việc anh Luân chốt 29/07 + KIỂM THỬ THẬT TRÊN
 > TRÌNH DUYỆT + VÁ "CHỜ DUYỆT BỊ ĐƠ" + TRỢ THỦ NHẬP VÀO GUIDE ĐỀU ✅ XONG.**
 > · **(1) Nhật ký thao tác (DL25)** - app từng có 115 cửa ghi mà không sổ nào ghi ai làm gì lúc nào.
 > · **(2) Hoàn tác** - 46 chỗ hỏi "Xác nhận?" mà không có đường lùi; nay lùi được theo LƯỢT BẤM.
@@ -175,7 +175,7 @@
 > ảnh đại diện kéo từ `ui-avatars.com` (gửi TÊN NGƯỜI THẬT ra máy chủ nước ngoài).
 > **Bộ kiểm hiện tại (phải XANH HẾT mới được giao):** node --check 2 file · `_tall` **38 trang** 0 lỗi
 > (170 icon) · `_check11` **144** · `_check12` 37 · `_check13` 174 · `_check14` **111** · `_check15`
-> **39** · **`_check16` 578** · `_check17` **394** · **`_check18` 169 (vẽ thật 79 trang/tab + 8 chức
+> **39** · **`_check16` 578** · `_check17` **394** · **`_check18` 173 (vẽ thật 79 trang/tab + 8 chức
 > danh + mọi hồ sơ cổng học viên + nhật ký/hoàn tác/bộ nhớ tạm)** · `_checktour` · `_checkdata.js`
 > 27 luật / **6289 lượt kiểm - 0 lệch** · `check_logic.py` (đúng 4 ca cố ý) · `check_data.py` DAT ·
 > **`_checkui.js` 462 lượt mở THẬT trong trình duyệt**.
@@ -729,6 +729,32 @@
 > rồi gọi hàm vẽ** - đi đường tắt, **không bao giờ đi qua `go()`**, mà lỗi nằm đúng ở đường `go()` +
 > phạm vi chức danh. Nay nó **bấm từng mục menu như người dùng** rồi đối chiếu màn nhận được.
 > **Luật rút ra: bộ kiểm đi đường tắt là bộ kiểm mù đúng chỗ người dùng đi.**
+>
+> ### V9.38 - NGĂN KÉO TRƯỚC, TRANG SAU (anh Luân dạy lại đúng lúc em vừa làm ngược)
+>
+> Anh Luân: *"Em nên nắm tinh thần tiện dụng, vì không phải lúc nào hồ sơ 360 cũng tiện, đủ thông
+> tin thì drawer vẫn tiện hơn rất chi là nhiều. Drawer không đủ thì người ta tự khắc bấm xem 360."*
+>
+> **Em vừa làm sai đúng chỗ này ở V9.37:** thấy tab duyệt thiếu đường xem hồ sơ, em vội đẩy **"Hồ sơ
+> 360" lên làm nút chính** trên thẻ duyệt. Sai ở chỗ: 360 là **rời trang**. Người duyệt 3 khoản chiết
+> khấu phải rời trang 3 lần rồi bấm quay lại 3 lần, cho một việc mà đa số chỉ cần biết *khóa nào, đã
+> đóng bao nhiêu, còn nợ bao nhiêu* - **ngăn kéo học viên vốn đã hiện đủ cả ba**.
+>
+> **Đo lại toàn app thì lỗi này không chỉ ở thẻ duyệt: 20/29 bảng danh sách có nút hàng RỜI TRANG**
+> (`openHoso` / `openLop` / `openGV` / `openKhoa`), **đúng 1 bảng** mở ngăn kéo. Tức là cả app đang
+> làm ngược nguyên tắc, chứ không phải một chỗ lỡ tay.
+>
+> **LUẬT MỚI - ngăn kéo trước, trang sau:**
+> · nút hàng của mọi bảng danh sách mở **NGĂN KÉO** (21 nút, 0 nút rời trang);
+> · thẻ duyệt cũng vậy - "Xem nhanh" thay cho "Hồ sơ 360";
+> · và **mỗi ngăn kéo phải có lối ra "Hồ sơ đầy đủ"** bên trong (cả 4 ngăn kéo đều đã có sẵn) - ai
+>   cần sâu hơn thì đi tiếp một bước, còn đa số dừng ở ngăn kéo là đủ.
+> `_check18` canh cả hai vế: không nút hàng nào được rời trang, VÀ không ngăn kéo nào được thành cụt
+> đường. Thiếu vế thứ hai thì "ngăn kéo trước" biến thành nhốt người ta trong ngăn kéo.
+>
+> **Bài học rộng hơn:** thấy thiếu thông tin thì phản xạ là *thêm đường tới chỗ nhiều thông tin
+> nhất*. Nhưng tiện dụng đo bằng **số bước phải bấm để quyết xong**, không đo bằng lượng thông tin
+> bày ra. Chỗ nào cũng đưa người ta tới hồ sơ đầy đủ thì hồ sơ đầy đủ thành thuế đường đi.
 >
 > ### V9.37 - CÀI ĐẶT QUY HOẠCH LẠI + DUYỆT PHẢI XEM ĐƯỢC HỒ SƠ
 >

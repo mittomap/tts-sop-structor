@@ -1455,3 +1455,13 @@ Nhóm *Dắt việc & Hướng dẫn* gom đủ ba thứ, mỗi thứ một tab 
 trước đây chỉ có con số và nút Duyệt - không có cách nào mở hồ sơ ra xem. Nay tên học viên/khách
 bấm được ra ngăn kéo, và mỗi thẻ có nút **Hồ sơ 360** mở toàn bộ hành trình, tiền đã đóng, lớp,
 phản hồi - xem rồi hẵng quyết.
+
+## V9.38 (29/07) - XEM NHANH Ở MỌI BẢNG, KHÔNG PHẢI RỜI TRANG
+
+Trước đây bấm nút ở một dòng danh sách là **nhảy sang trang hồ sơ đầy đủ** - mất chỗ đang đứng, xem
+xong phải bấm quay lại, trong khi thường chỉ cần biết đúng vài con số. Nay nút ở mọi bảng là
+**Xem nhanh**: mở ngăn kéo ngay tại chỗ với khóa - lớp, đã đóng, còn nợ, chuyên cần, lý do gắn cờ
+nguy cơ. Cần sâu hơn thì ngay trong ngăn kéo có nút **Hồ sơ đầy đủ**.
+
+Áp dụng cho cả 21 nút ở các bảng danh sách và cho thẻ ở **Chờ duyệt** (chiết khấu, hoàn tiền) - duyệt
+xong khoản này là quyết được khoản kế, không phải đi ra đi vào.

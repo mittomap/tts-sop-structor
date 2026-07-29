@@ -608,6 +608,30 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
   t("man Nhat ky loc duoc theo bang va theo nguoi", /nkSet\('NKTB'/.test(o)&&/nkSet\('NKWHO'/.test(o));
   t("man Nhat ky noi thang gioi han giu bao nhieu dong", o.indexOf("dòng gần nhất")>=0);
   t("man Nhat ky goi ten bang bang tieng Viet", o.indexOf("Test đầu vào")>=0||o.indexOf("Buổi học")>=0)})();
+ /* ============ 26. NGAN KEO TRUOC, TRANG SAU (V9.38 - anh Luan) ============
+    "khong phai luc nao ho so 360 cung tien, du thong tin thi drawer van tien hon rat chi la nhieu
+     - drawer khong du thi nguoi ta tu khac bam xem 360".
+    Do truoc khi sua: 20/29 bang co nut hang ROI TRANG, dung 1 bang mo ngan keo - lam nguoc han.
+    Moi lan liec mot dong la mat cho dang dung, xem xong phai bam quay lai, ma thuong chi can biet
+    dung ba con so. */
+ (function(){
+  setRole("all");applyScope("");CURSTAFF="";
+  var roi=[];
+  Object.keys(LISTCFG).forEach(function(k){(LISTCFG[k].act||[]).forEach(function(a){
+   if(/^(openHoso|openLop|openGV|openNV|openKhoa)$/.test(a.fn))roi.push(k+"/"+a.fn)})});
+  t("nut hang cua bang danh sach mo NGAN KEO, khong roi trang"+(roi.length?(" - con: "+roi.slice(0,5).join(", ")):""), roi.length===0);
+  /* nhung ngan keo PHAI co loi ra trang day du - khong thi thanh cut duong */
+  var thieu=[];
+  [["openStuQuick",(rows("DL09")[0]||{}).student_id,"openHoso"],
+   ["openLopQuick",(rows("DL10")[0]||{}).class_id,"openLop"],
+   ["openNSQuick",(rows("DL01")[0]||{}).staff_id,"openGV|openNV"],
+   ["openKhoaQuick",(rows("DL05")[0]||{}).course_id,"openKhoa"]].forEach(function(x){
+   if(!x[1])return;
+   try{global[x[0]](x[1])}catch(e){thieu.push(x[0]+" nem loi");return}
+   var h=(document.getElementById("drawerBody")||{}).innerHTML||"";
+   if(!new RegExp("("+x[2]+")\\(").test(h))thieu.push(x[0])});
+  t("moi ngan keo deu co loi ra HO SO DAY DU"+(thieu.length?(" - thieu: "+thieu.join(", ")):""), thieu.length===0);
+ })();
  /* ============ 25. HANG CHO QUYET DINH PHAI XEM DUOC HO SO (V9.37) ============
     Anh Luan: "may cai cho duyet, khong co drawer thong tin thi lam sao biet duyet kieu gi".
     Do ra: tab Chiet khau / Hoan tien / Ban giao lead KHONG co duong nao mo ho so - dung ba tab
@@ -621,12 +645,24 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
    if(!/class="lnk"/.test(o))thieu.push(t.k)});
   window.DUYTAB=cuTab;
   t("moi tab Cho duyet dang co viec deu bam ra duoc ho so"+(thieu.length?(" - thieu: "+thieu.join(", ")):""), thieu.length===0);
-  t("the duyet CHIET KHAU co nut Ho so 360 (quyet dinh dinh tien, phai xem ky)", (function(){
+  /* NGUYEN TAC TIEN DUNG (anh Luan): "khong phai luc nao ho so 360 cung tien, du thong tin thi
+     drawer van tien hon rat chi la nhieu - drawer khong du thi nguoi ta tu khac bam xem 360".
+     Nen NGAN KEO la mac dinh o the duyet, con ho so 360 la LOI THOAT nam TRONG ngan keo. */
+  t("the duyet CHIET KHAU mo NGAN KEO (khong bat roi trang)", (function(){
     window.DUYTAB="duyetck";var o="";try{o=RENDER.duyet()}catch(e){o=""}window.DUYTAB=cuTab;
-    return /jOpen\(/.test(o)&&/Hồ sơ 360/.test(o)})());
-  t("the duyet HOAN TIEN co nut Ho so 360", (function(){
+    return /openStuQuick\(|leadDetail\(/.test(o)&&/Xem nhanh/.test(o)&&!/Hồ sơ 360/.test(o)})());
+  t("the duyet HOAN TIEN mo NGAN KEO", (function(){
     window.DUYTAB="duyethoan";var o="";try{o=RENDER.duyet()}catch(e){o=""}window.DUYTAB=cuTab;
-    return /jOpen\(/.test(o)})());
+    return /openStuQuick\(|leadDetail\(/.test(o)})());
+  t("ngan keo hoc vien du de quyet mot khoan tien (khoa-lop, cong no, chuyen can)", (function(){
+    var sv=rows("DL06").filter(function(x){return num(x.discount_amount)>0&&x.student_id})[0];
+    if(!sv)return false;
+    openStuQuick(sv.student_id);
+    var h=(document.getElementById("drawerBody")||{}).innerHTML||"";
+    return h.indexOf("Khóa - lớp")>=0&&h.indexOf("Công nợ")>=0&&h.indexOf("Chuyên cần")>=0})());
+  t("va TRONG ngan keo co loi ra Ho so day du", (function(){
+    var h=(document.getElementById("drawerBody")||{}).innerHTML||"";
+    return /openHoso\(/.test(h)&&/Hồ sơ đầy đủ/.test(h)})());
  })();
  /* ============ 24. MOI BANG DANH SACH PHAI DU BA THU (V9.36) ============
     Anh Luan chup trang So khieu nai: "a nho em co lam drawer roi ma sao may trang nay chua co,
