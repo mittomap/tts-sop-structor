@@ -43,8 +43,12 @@ Chủ dự án: Luân. Mọi phiên làm việc (Claude Code hay Claude Cowork) 
   `emergency_contact_*` từ đầu). "Việc của phòng ban khác" và "việc SOP đã mô tả mà chưa làm" là
   hai chuyện khác hẳn nhau - cái sau không có quyền bỏ.
 - **Canh bằng máy, không bằng trí nhớ:** `_src/check_sop.py` đọc THẲNG `ITTs_Operations_Template_v4.xlsx`
-  và đối chiếu 357 cột với `gen_v5.py`. Cột nào app không dùng phải khai vào `BOQUA` **kèm lý do
-  đọc được**. Đã nằm trong `./verify.sh`.
+  và đối chiếu **bốn mặt** với app: **357 cột** DL (`BOQUA`) · **93 tình huống** sổ trigger HD3
+  (`TRIG_BOQUA`, chạy thật `naFor()` trên mọi dòng) · **51 chỉ số** bảng BC2 (`KPI_BOQUA`, phải có
+  cả công thức lẫn dòng ngưỡng CH6) · **31 hành động** bảng phân quyền CH3 (`CH3_BOQUA`, đóng vai
+  từng chức danh rồi hỏi lại; việc "Quản lý phê duyệt" phải có cửa ghi gọi `chanAct`).
+  Chỗ nào app không làm phải khai **kèm lý do đọc được**. Đã nằm trong `./verify.sh`.
+  Cột chỉ nói "có chỗ để lưu" - nó KHÔNG nói app có nhắc việc, có tính chỉ số, có chặn đúng người.
 
 ## LUẬT CỨNG rút gọn (bản đầy đủ trong 00/01/02)
 

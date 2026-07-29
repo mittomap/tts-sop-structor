@@ -151,9 +151,11 @@ if need("DL08", "assigned_at", "class_id", "onboarding_status") and need("DL10",
         a = dt(o.get("assigned_at"))
         return (not code(o.get("onboarding_status")) == "completed") and a and (NOW - a).days <= 14 \
             and code(cl.get("class_status")) == "in_progress"
+    # So theo NGAY, khong so theo gio: class_start_date chi co ngay nen dt() quy ve 00:00, xep lop
+    # luc 8h sang DUNG NGAY khai giang (lop hoc 9h-12h) se bi ket oan la "xep sau ngay khai giang".
     c = [o for o in R("DL08") if IDX["DL10"].get(str(o.get("class_id") or ""))
          and dt(o.get("assigned_at")) and dt(IDX["DL10"][str(o.get("class_id"))].get("class_start_date"))
-         and dt(o.get("assigned_at")) > dt(IDX["DL10"][str(o.get("class_id"))].get("class_start_date"))
+         and dt(o.get("assigned_at")).date() > dt(IDX["DL10"][str(o.get("class_id"))].get("class_start_date")).date()
          and not _midjoin(o, IDX["DL10"][str(o.get("class_id"))])]
     if c:
         bad(VUA, "4 thứ tự", "xếp lớp SAU ngày khai giảng: %d hồ sơ (vd %s)" % (len(c), ", ".join(str(x.get("onboarding_id")) for x in c[:3])))

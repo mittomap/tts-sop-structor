@@ -1900,6 +1900,7 @@ function buildScope(code){
  var base=ROLESCOPE[gk];var eff={group:gk};
  for(var p in base)if(p!=="match")eff[p]=Array.isArray(base[p])?base[p].slice():(base[p]&&typeof base[p]==="object"?JSON.parse(JSON.stringify(base[p])):base[p]);
  var isMgr=/manager|leader/.test(code);
+ eff.mgr=isMgr?1:0;              /* V9.41: CH3 phân quyền theo "có phải quản lý không" - phải nhớ */
  if(isMgr&&eff.pages!=="*"){
   if(eff.pages.indexOf("baocao")<0)eff.pages.push("baocao");
   eff.mine=0;
@@ -1932,6 +1933,79 @@ function applyScope(sid){var eff;
  if(eff.ctx)for(var k in eff.ctx)window[k==="HTTAB"?"HTTAB":k==="TSTAB"?"TSTAB":k]=eff.ctx[k];
  return eff}
 function canSee(k){var rs=SCOPE();return rs.pages==="*"||rs.pages.indexOf(k)>=0||!!VIEW_ALWAYS[k]}
+/* ═══════════ V9.41 - BẢNG PHÂN QUYỀN CH3 CỦA SOP ═══════════════════════════════════════
+   SOP có hẳn một trang CH3 "BẢNG PHÂN QUYỀN VẬN HÀNH (Ai được làm gì)": 30 hành động x 5 vai,
+   trong đó 8 hành động ghi rõ "Quản lý phê duyệt". App trước đây phân quyền theo TRANG (thấy
+   trang nào) chứ không theo HÀNH ĐỘNG, và chỉ có ĐÚNG MỘT cửa được canh thật (duyệt chiết khấu).
+   Nghĩa là 7 việc SOP nói "phải Quản lý duyệt" thì bất kỳ ai mở được trang đều bấm xong - phân
+   quyền nhìn thì có, mà chỗ đau nhất lại hở.
+   Đây đúng bài học đã ghi trong 02: "phân quyền = giấu lối vào + tắt chuông + CHẶN CHÍNH CỬA GHI".
+   Hai vế đầu app làm rồi, vế thứ ba mới là vế giữ được tiền.
+   Bảng dưới đây chép NGUYÊN VĂN tên hành động trong CH3 (bộ kiểm check_sop.py đọc thẳng file SOP
+   và đối chiếu từng dòng - sai một chữ là đỏ), kèm nhóm vai của app được làm.
+   Ánh xạ cột CH3 -> nhóm vai app: sales_staff→tuvan · wow_coach→wow · academic_staff→hocvu ·
+   teacher→giaovien · các *_manager→cờ mgr. Kế toán/marketing không có cột riêng trong CH3 nên
+   khai thêm ở đây kèm lý do (SOP viết "NV Tư vấn (hoặc Kế toán) ghi nhận thanh toán"). */
+var CH3=[
+ {k:"lead_new",   t:"Nhập và tạo lead mới",                    vai:["tuvan","wow","marketing"]},
+ {k:"lead_edit",  t:"Cập nhật thông tin lead",                  vai:["tuvan","marketing"]},
+ {k:"test_book",  t:"Đặt lịch test đầu vào",                    vai:["tuvan"]},
+ {k:"lead_giao",  t:"Bàn giao lead khi NV nghỉ đột xuất",       vai:[],duyet:1,mgr:["tuvan","marketing"]},
+ {k:"test_att",   t:"Điểm danh và giám sát buổi test",          vai:["wow"]},
+ {k:"test_grade", t:"Chấm bài test, viết academic_note",        vai:["wow"]},
+ {k:"test_nhac",  t:"Nhắc lịch test cho học viên",              vai:["tuvan"]},
+ {k:"test_rebook",t:"Đặt lại lịch test sau khi vắng",           vai:["tuvan"]},
+ {k:"pay_ghi",    t:"Ghi nhận thanh toán",                      vai:["tuvan","ketoan"]},
+ {k:"ck_nho",     t:"Áp dụng chiết khấu dưới 1 triệu",          vai:["tuvan"]},
+ {k:"ck_lon",     t:"Áp dụng chiết khấu từ 1 triệu trở lên",    vai:[],duyet:1,mgr:["tuvan"]},
+ {k:"hoantien",   t:"Xác nhận hoàn tiền",                       vai:[],duyet:1,mgr:["ketoan","tuvan"]},
+ {k:"xeplop",     t:"Xếp lớp học viên",                         vai:["hocvu"]},
+ {k:"doilop1",    t:"Đổi lớp (lần 1 - miễn phí)",               vai:["hocvu"]},
+ {k:"doilop2",    t:"Đổi lớp (lần 2 trở đi)",                   vai:[],duyet:1,mgr:["hocvu"]},
+ {k:"diemdanh",   t:"Điểm danh buổi học",                       vai:["giaovien"]},
+ {k:"baitap",     t:"Giao và chấm bài tập về nhà",              vai:["giaovien"]},
+ {k:"tnote",      t:"Viết teacher_note",                        vai:["giaovien"]},
+ {k:"wow_book",   t:"Book buổi WOW 1-1 cho học viên",           vai:["hocvu","giaovien"]},
+ {k:"risk_flag",  t:"Cập nhật at_risk/off_track",               vai:["hocvu","giaovien"]},
+ {k:"wow_auto",   t:"Tạo buổi WOW từ cảnh báo at_risk",         vai:[],may:1},
+ {k:"wow_lms",    t:"Học viên tự book WOW qua LMS",             vai:["hocvu","giaovien"],hv:1},
+ {k:"wow_day",    t:"Thực hiện buổi WOW 1-1",                   vai:["wow"]},
+ {k:"wow_them",   t:"Phê duyệt WOW bổ sung miễn phí",           vai:[],duyet:1,mgr:["hocvu","wow"]},
+ {k:"wow_ban",    t:"Bán gói WOW bổ sung (có phí)",             vai:["tuvan"]},
+ {k:"fb_ghi",     t:"Ghi nhận và phân loại feedback",           vai:["hocvu"]},
+ {k:"fb_xau",     t:"Xử lý feedback tiêu cực (điểm 1-2)",       vai:["hocvu"]},
+ {k:"kn_mo",      t:"Mở khiếu nại chính thức",                  vai:["hocvu"]},
+ {k:"kn_duyet",   t:"Phê duyệt giải pháp khiếu nại",            vai:[],duyet:1,mgr:["hocvu"]},
+ {k:"baoluu",     t:"Phê duyệt bảo lưu khóa học",               vai:[],duyet:1,mgr:["hocvu"]},
+ {k:"gia_khoa",   t:"Cập nhật bảng giá khóa học",               vai:[],duyet:1,mgr:[]}];
+var CH3BY={};CH3.forEach(function(a){CH3BY[a.k]=a});
+/* Ai đang đăng nhập có được làm việc này không. Việc KHÔNG nằm trong CH3 thì không chặn - CH3 là
+   danh sách việc SOP có ý kiến, không phải danh sách trắng cho toàn bộ app. */
+function canAct(k){
+ var a=CH3BY[k];if(!a)return true;
+ if(a.may)return true;                                   /* máy tự làm, không phải quyền của ai */
+ var rs=SCOPE();
+ if(rs.pages==="*")return true;                          /* Quản trị / Điều hành: toàn quyền */
+ /* SOP ghi "các *_manager", nhưng KHÔNG phải quản lý nào cũng duyệt được mọi thứ: trưởng
+    phòng HR không có lý do gì để chốt hoàn tiền hay duyệt bảo lưu. Nên mỗi việc cần duyệt
+    khai rõ quản lý NHÓM NÀO sở hữu nó. Khai rỗng = chỉ Ban Giám đốc / Quản trị (bảng giá). */
+ if(a.duyet)return !!rs.mgr&&(a.mgr||[]).indexOf(rs.group)>=0;
+ return (a.vai||[]).indexOf(rs.group)>=0}
+/* Chặn ngay tại CỬA GHI, kèm câu nói rõ vì sao và phải nhờ ai. Trả true nghĩa là ĐÃ CHẶN. */
+function chanAct(k){
+ if(canAct(k))return false;
+ var a=CH3BY[k]||{};
+ toastErr("Bảng phân quyền CH3 của SOP: việc \""+(a.t||k)+"\" không thuộc quyền của bạn."+
+  (a.duyet?" Việc này cần Quản lý phê duyệt - hãy chuyển cho trưởng phòng.":" Hãy chuyển cho người có thẩm quyền."));
+ return true}
+function ch3Vai(a){
+ if(a.may)return "Hệ thống tự làm";
+ if(a.duyet){var mm={tuvan:"TP Tư vấn",hocvu:"TP Học vụ",ketoan:"TP Kế toán",wow:"TP WOW",marketing:"TP Marketing"};
+  var ds=(a.mgr||[]).map(function(x){return mm[x]||x}).join(" · ");
+  return "Quản lý phê duyệt"+(ds?" ("+ds+")":" (Ban Giám đốc)")}
+ var m={tuvan:"NV Tư vấn",wow:"NV WOW",hocvu:"NV Học vụ",giaovien:"Giảng viên",
+        ketoan:"Kế toán",marketing:"Marketing"};
+ return (a.vai||[]).map(function(x){return m[x]||x}).join(" · ")||"-"}
 /* Chốt chặn: ai có TOÀN QUYỀN trang thì không thể bị chặn tab. Không có dòng này thì chỉ cần một
    nhóm vai nào đó khai tabs là lỗi "toàn quyền mà chỉ thấy 1 tab" quay lại theo đường khác. */
 function scopeTabs(page,segs){var rs=SCOPE();if(rs.pages==="*")return segs;
@@ -2801,6 +2875,39 @@ function stuGone(s){return /dropped|graduated|transferred/.test(ecode(s&&s.stude
 function stuAtt(s){return !!s&&(isRisk(s.attendance_progress_status)||(!ignRisk(s)&&riskAuto(s.student_id).att))}
 function stuAca(s){return !!s&&(isRisk(s.academic_progress_status)||(!ignRisk(s)&&riskAuto(s.student_id).aca))}
 function stuRisk(s){return stuAtt(s)||stuAca(s)}
+/* ===== NĂM MỨC CAN THIỆP (V9.41 - theo đúng sổ trigger HD3 của SOP) =================
+   NA014 yếu cả hai      -> họp 4 bên GẤP
+   NA015 học thuật rớt lộ trình -> họp 3 bên trong 24 giờ
+   NA016 chuyên cần rớt lộ trình -> họp 3 bên gấp
+   NA066 học thuật at-risk -> đặt buổi WOW kèm học thuật
+   NA017 chuyên cần at-risk -> liên hệ trong 24-48 giờ
+   Mức nặng nhất thắng - một học viên nhận MỘT việc, không réo năm lần cùng một người. */
+var RISKMUC=[
+ {k:"nguyhiem",cc:"off_track",ht:"off_track",grp:"Nguy cơ - HỌP 4 BÊN GẤP",ic:"ti-alert-octagon",sev:"red",
+  viec:"Yếu CẢ chuyên cần lẫn học thuật - mức nguy hiểm. Họp 4 bên (học viên, phụ huynh, giáo viên, học vụ) và đặt cam kết",
+  han:"gấp trong ngày",prm:"slaRiskFollowup_days",lam:"Đặt lịch họp 4 bên"},
+ {k:"ht_off",ht:"off_track",grp:"Nguy cơ - HỌP 3 BÊN trong 24h",ic:"ti-chart-arrows-vertical",sev:"red",
+  viec:"Tiến độ học thuật rớt khỏi lộ trình. Họp 3 bên trong 24 giờ và dựng lại kế hoạch học",
+  han:"24 giờ",prm:"slaRiskFollowup_days",lam:"Đặt lịch họp 3 bên"},
+ {k:"cc_off",cc:"off_track",grp:"Nguy cơ - HỌP 3 BÊN gấp",ic:"ti-calendar-x",sev:"red",
+  viec:"Chuyên cần sa sút nặng - nghỉ học nhiều. Họp 3 bên gấp",
+  han:"gấp trong ngày",prm:"slaRiskFollowup_days",lam:"Đặt lịch họp 3 bên"},
+ {k:"ht_at",ht:"at_risk",grp:"Nguy cơ - ĐẶT BUỔI WOW KÈM",ic:"ti-star",sev:"amber",
+  viec:"Học thuật có dấu hiệu rủi ro. Đặt buổi WOW kèm đúng kỹ năng đang yếu",
+  han:"trong tuần",prm:"slaRiskFollowup_days",lam:"Đặt buổi WOW"},
+ {k:"cc_at",cc:"at_risk",grp:"Nguy cơ - GỌI trong 24-48h",ic:"ti-phone",sev:"amber",
+  viec:"Chuyên cần có dấu hiệu rủi ro - bắt đầu nghỉ nhiều. Liên hệ nhắc sớm",
+  han:"24-48 giờ",prm:"slaRiskFollowup_days",lam:"Gọi nhắc"}];
+function riskMuc(s){
+ var cc=ecode(s&&s.attendance_progress_status),ht=ecode(s&&s.academic_progress_status);
+ for(var i=0;i<RISKMUC.length;i++){var m=RISKMUC[i];
+  if(m.cc&&m.cc!==cc)continue;
+  if(m.ht&&m.ht!==ht)continue;
+  return m}
+ /* cờ tay ở mức lạ (dữ liệu cũ) - vẫn phải có việc, không được nuốt mất */
+ return {k:"khac",grp:"Học viên nguy cơ",ic:"ti-user-exclamation",sev:"amber",
+  viec:"Nguy cơ cần can thiệp",han:num(paramOf("slaRiskFollowup_days",3))+" ngày",
+  prm:"slaRiskFollowup_days",lam:"Chăm ngay"}}
 function riskWhy(a){var w=[];
  if(a.abs)w.push("vắng không phép "+a.abs+" buổi");
  if(a.miss)w.push("thiếu "+a.miss+" bài");
@@ -2826,10 +2933,19 @@ function riskCare(sid){var s=find("DL09","student_id",sid);if(!s){toast("Không 
  var A=riskAuto(sid),hand=isRisk(s.attendance_progress_status)||isRisk(s.academic_progress_status);
  var care=stuLastCare(s),dd=care?Math.round((new Date().getTime()-care.getTime())/864e5):null;
  var q=num(s.wow_quota_remaining);
- var h='<div class="dcard"><h4><i class="ti ti-user-exclamation"></i>'+esc(s.full_name||sid)+'</h4>';
+ var M=hand?riskMuc(s):null;
+ var h='<div class="dcard"><h4><i class="ti '+(M?M.ic:"ti-user-exclamation")+'"></i>'+esc(s.full_name||sid)+'</h4>';
+ /* V9.41: nói RÕ em này đang ở mức nào và SOP yêu cầu làm gì ở mức đó - không để học vụ phải nhớ
+    năm mức trong đầu rồi tự đoán nên họp mấy bên. */
+ if(M)h+='<div class="notebar" style="margin:0 0 10px;border-left:3px solid var(--'+(M.sev==="red"?"red":"amber")+')">'+
+  '<i class="ti '+M.ic+'"></i><b>'+esc(M.grp.replace("Nguy cơ - ",""))+'</b> - '+esc(M.viec)+'. Hạn: <b>'+esc(M.han)+'</b>.</div>';
  h+='<div style="margin-bottom:10px">'+(hand?'<span class="chip red">người đã gắn cờ</span> ':'')+
   (A.any?'<span class="chip amber">máy thấy vượt ngưỡng</span> ':'')+
   (ignRisk(s)?'<span class="chip gray">đang tạm bỏ qua tới '+esc(s.risk_ignore_until)+'</span>':'')+'</div>';
+ (function(){var im=hoursSince(s.last_learning_activity_time);
+  var nd=num(paramOf("slaActivity_inactive_days",7))||7;
+  if(im==null)h+='<div class="notebar" style="border-left:3px solid var(--amber)"><i class="ti ti-zzz"></i>Hồ sơ chưa ghi hoạt động học nào - không biết em còn theo lớp không.</div>';
+  else if(im/24>nd)h+='<div class="notebar" style="border-left:3px solid var(--red)"><i class="ti ti-zzz"></i><b>Im lặng '+Math.round(im/24)+' ngày</b> - không nộp bài, không đặt WOW, không vào cổng (ngưỡng '+slaChip("slaActivity_inactive_days",7)+').</div>'})();
  h+='<div class="notebar"><i class="ti ti-radar"></i>Vắng không phép <b>'+A.abs+'</b> buổi, ngưỡng '+
   slaChip("thresholdAtRisk_absences",2)+' · thiếu <b>'+A.miss+'</b> bài, ngưỡng '+
   slaChip("thresholdAtRisk_hw_missing",3)+' · còn <b>'+(String(s.wow_quota_remaining||"")===""?"-":q)+'</b> lượt WOW chưa dùng.</div>';
@@ -2841,7 +2957,7 @@ function riskCare(sid){var s=find("DL09","student_id",sid);if(!s){toast("Không 
   '<div class="fhint">Hạn chăm lại '+slaChip("slaRiskFollowup_days",3)+'</div></div></div>';
  h+='<div class="fld full"><label>Ghi lần chăm này <i>*</i></label><textarea id="rc_note" rows="2" placeholder="vd: gọi phụ huynh, em bận thi học kỳ, hẹn đi học lại từ tuần sau"></textarea></div>';
  h+='<div class="fld full" style="display:block">'+
-  '<button class="btn primary" onclick="riskCareSave(\''+esc(sid)+'\')"><i class="ti ti-phone-check"></i>Ghi lần chăm</button> '+
+  '<button class="btn primary" onclick="riskCareSave(\''+esc(sid)+'\')"><i class="ti ti-phone-check"></i>Ghi lần chăm'+(M?(" ("+esc(M.lam)+")"):"")+'</button> '+
   (q>0?'<button class="btn" onclick="wowAdd(\''+esc(sid)+'\')"><i class="ti ti-star"></i>Đặt buổi WOW ('+q+' lượt còn)</button> ':'')+
   (hand?'':'<button class="btn danger" onclick="riskFlagRun(\''+esc(sid)+'\')"><i class="ti ti-flag"></i>Gắn cờ nguy cơ</button> ')+
   '<button class="btn" onclick="openHoso(\''+esc(sid)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>'+
@@ -3097,6 +3213,9 @@ function saveForm(key){var cfg=LISTCFG[key];var o={},idk=cfg.cols[0][0]; var mis
  /* saveForm la ham luu cua TOAN BO form danh sach nhung truoc day KHONG goi bizGuard -
     moi luat nghiep vu (day lop, chiet khau chua duyet...) bi bo qua neu nhap bang form nay. */
  var berr=bizGuard(cfg.code,o);if(berr){toast(berr);return}
+ /* V9.41 - CH3: "Cập nhật bảng giá khóa học" là việc Quản lý phê duyệt. Bảng khóa học đi qua
+    đúng cửa ghi chung này, nên chặn ở đây là chặn được mọi đường vào form. */
+ if(cfg.code==="DL05"&&chanAct("gia_khoa"))return;
  if(o.phone_number)o.phone_number=phoneNorm(o.phone_number);
  if(!actGuard("saveForm:"+key))return;
  if(EDIT[key]){var eid=EDIT[key][idk],erec=EDIT[key];
@@ -3647,11 +3766,28 @@ function slaItems(){var out=jTasks();
    if(hand){
     var care=stuLastCare(r),dh=care?(new Date().getTime()-care.getTime())/36e5:null;
     var over=(dh==null)||dh>fd*24;
-    add("Học vụ","Học viên nguy cơ",over?"red":"amber","ti-user-exclamation",r.full_name,
-     (over?"QUÁ HẠN CHĂM - ":"")+"Nguy cơ cần can thiệp"+(why?" ("+why+")":"")+
+    /* V9.41 - NĂM MỨC CAN THIỆP, không phải một mức "nguy cơ" chung. SOP chỉ định cho mỗi mức
+       một hành động KHÁC HẲN và một hạn khác hẳn; gộp năm mức làm một là biến "mỗi em một cách
+       lo" thành "một danh sách phải lo", tức mất đúng phần giá trị của SOP. */
+    var M=riskMuc(r);
+    add("Học vụ",M.grp,M.sev==="red"||over?"red":"amber",M.ic,r.full_name,
+     (over?"QUÁ HẠN CHĂM - ":"")+M.viec+(why?" ("+why+")":"")+
      (care?" · chăm gần nhất "+Math.round(dh/24)+" ngày trước":" · chưa ghi lần chăm nào")+
-     " - hạn chăm lại "+fd+" ngày",
-     dh,null,null,{hoso:r.student_id,act:"riskCare",rid:r.student_id,prm:"slaRiskFollowup_days"})}
+     " - hạn "+M.han,
+     dh,null,null,{hoso:r.student_id,act:"riskCare",rid:r.student_id,prm:M.prm})}
+   /* V9.41 - NA067: HỌC VIÊN IM LẶNG QUÁ LÂU. Tham số slaActivity_inactive_days đã nằm trong CH2
+      từ đầu và cột last_learning_activity_time đã nằm trong DL09 từ đầu, mà KHÔNG luật nào đọc -
+      nghĩa là app không biết một em đã im lặng bao lâu. Đây khác hẳn "vắng buổi": em có thể chưa
+      vắng buổi nào mà đã hai tuần không nộp bài, không đặt WOW, không vào cổng. Ở mô hình bán
+      trước - học sau, im lặng là dấu hiệu sớm nhất của bỏ học. */
+   else if((function(){
+     var im=hoursSince(r.last_learning_activity_time);
+     var nd=num(paramOf("slaActivity_inactive_days",7))||7;
+     if(im==null||im/24<=nd)return false;
+     add("Học vụ","Học viên im lặng quá lâu",im/24>nd*2?"red":"amber","ti-zzz",r.full_name,
+      "Không có hoạt động học nào "+Math.round(im/24)+" ngày (ngưỡng "+nd+" ngày) - gọi kiểm tra xem em còn học không",
+      im,null,null,{hoso:r.student_id,act:"riskCare",rid:r.student_id,prm:"slaActivity_inactive_days"});
+     return true})()){}
    else if(A.any&&!ignRisk(r))
     add("Học vụ","Máy thấy nguy cơ - chưa gắn cờ","amber","ti-radar",r.full_name,
      "Vượt ngưỡng của trung tâm ("+why+") mà hồ sơ vẫn ghi đang đều đặn - xác nhận rồi gắn cờ",
@@ -4073,6 +4209,7 @@ function canDuyetCK(){var rs=SCOPE();
  var t=rs.tabs&&rs.tabs.duyet;
  return t?t.indexOf("duyetck")>=0:(rs.pages.indexOf("duyet")>=0)}
 function ckChanNeuKhongQuyen(){
+ if(chanAct("ck_lon"))return true;                   /* CH3: việc này của Quản lý */
  if(canDuyetCK())return false;
  toast("Chiết khấu do Trưởng phòng Tư vấn duyệt. Chức danh của bạn xác nhận và thực hiện theo quyết định đó.",5000);
  return true}
@@ -4099,7 +4236,7 @@ function duyetRefund(id){var e=find("DL06","enrollment_id",id);if(!e){toast("Kh�
  h+='<div class="fld full"><label>Lý do / ghi chú</label><input id="rf_note" placeholder="vd: HV chuyển tỉnh, hoàn theo chính sách"></div>';
  h+='<div class="dact"><button class="btn danger" onclick="duyetRefundRun(\''+esc(id)+'\')"><i class="ti ti-arrow-back-up"></i>Chốt hoàn tiền</button></div></div>';
  openDrawer("Xử lý hoàn tiền",h)}
-function duyetRefundRun(id){var e=find("DL06","enrollment_id",id);if(!e)return;
+function duyetRefundRun(id){if(chanAct("hoantien"))return;var e=find("DL06","enrollment_id",id);if(!e)return;
  var amt=num(fldV("rf_amt"));var note=(fldV("rf_note")||"").trim();
  if(amt<0||amt>num(e.paid_amount)){toast("Số hoàn phải từ 0 tới số đã đóng.");return}
  duyetWrite(id,"refund",function(r){
@@ -4507,7 +4644,7 @@ function reassignLead(lid){var L=find("DL02","lead_id",lid)||{};
  openDrawer("Giao lại lead", h)}
 function tempNote(L){if(!(L&&L.handover_until&&L.handover_return_to))return '';var rt=find("DL01","staff_id",L.handover_return_to)||{};return '<div class="dnote" style="background:var(--blueb);border-color:#B6D4EF;color:#1E5A88;margin:8px 0"><i class="ti ti-clock"></i> Bàn giao tạm - lead sẽ <b>tự quay về '+esc(rt.full_name||L.handover_return_to)+'</b> từ ngày '+esc(L.handover_until)+'.</div>'}
 function autoReturnHandovers(){var n=0;rows("DL02").forEach(function(L){if(!L.handover_return_to||!L.handover_until)return;var d=pvnd(L.handover_until);if(!d)return;if(Date.now()>d.getTime()+864e5){var rt=find("DL01","staff_id",L.handover_return_to)||{};var oldName=L.assigned_to_name||L.assigned_to;var backName=rt.full_name||L.handover_return_to;var entry=nowStr()+": "+oldName+" → "+backName+" (Hệ thống) · Tự quay về khi hết hạn bàn giao tạm ("+L.handover_until+")";L.assigned_to=L.handover_return_to;L.assigned_to_name=backName;L.view_history=entry+(L.view_history?"\n"+L.view_history:"");L.handover_return_to="";L.handover_until="";n++}});return n}
-function reassignSave(lid){var e=document.getElementById("ra_nv");var dest=e?e.value:"";if(!dest){toast("Chọn NV để giao.");return}
+function reassignSave(lid){if(chanAct("lead_giao"))return;var e=document.getElementById("ra_nv");var dest=e?e.value:"";if(!dest){toast("Chọn NV để giao.");return}
  var dn=find("DL01","staff_id",dest);var note=(document.getElementById("ra_note")||{}).value||"";
  var until=((document.getElementById("ra_until")||{}).value||"").trim();
  if(until&&!pvnd(until)){toast("Ngày quay về không hợp lệ (dd/mm/yyyy).");return}
@@ -4933,13 +5070,29 @@ function naFor(sheet,r){
   if(isc(r.enrollment_status,"cancelled"))return "NA008";           /* hủy -> kiểm tra hoàn tiền */
   if(num(r.discount_amount)>0&&!String(r.discount_approved_by||"").trim())return "NA061";  /* CK vượt mức, chờ duyệt */
   var rem=num(r.remaining_amount);
-  if(rem<=0)return "NA009";                                          /* đã đóng đủ - không cần làm gì */
+  /* V9.41 - SOP tách hai trạng thái "đã đóng đủ": NA088 là ĐÃ ĐỦ TIỀN mà chưa mở onboarding
+     (còn việc phải làm), NA009 là đã đủ và đã xong. Trước đây app trả cùng một mã cho cả hai
+     nên hồ sơ đóng đủ tiền rồi nằm im không ai biết phải mở bước sau. */
+  if(rem<=0){
+   var _ob=rows("DL08").some(function(o){return String(o.enrollment_id||"")===String(r.enrollment_id||"")});
+   return _ob?"NA009":"NA088"}
   var hd=hSince(r.enrollment_time);
-  if(isc(r.enrollment_status,"pending"))
-   return (hd!=null&&hd>P("slaENR_pending_hours",24))?"NA005":"NA006";
+  if(isc(r.enrollment_status,"pending")){
+   /* NA087: đã đủ cọc tối thiểu mà đơn còn treo ở "chờ" - phải chuyển sang xác nhận và mở
+      onboarding, không thì em đã đóng tiền mà chưa được xếp lớp. */
+   var _coc=num(paramOf("thresholdDeposit_minimum",0));
+   if(_coc>0&&num(r.paid_amount)>=_coc)return "NA087";
+   /* NA060: chờ quá lâu - cân nhắc hủy để dọn dữ liệu, không để đơn ma nằm mãi trong phễu */
+   if(hd!=null&&hd>P("slaENR_stale_hours",P("slaENR_pending_hours",24)*7))return "NA060";
+   return (hd!=null&&hd>P("slaENR_pending_hours",24))?"NA005":"NA006"}
   return (hd!=null&&hd>P("slaPayment_hours",48))?"NA007":"NA006"}
  if(sheet==="DL08"){                                   /* xếp lớp & onboarding */
-  if(isc(r.onboarding_status,"completed"))return "NA012";
+  /* V9.41 - SOP tách: NA089 là đã xác nhận lớp VÀ hoàn tất onboarding nhưng học viên chưa được
+     chuyển sang "đang học"; NA012 là đã xong trọn vẹn. Không tách thì bước cuối bị nuốt. */
+  if(isc(r.onboarding_status,"completed")){
+   var _s9=find("DL09","student_id",r.student_id);
+   if(_s9&&!/active|studying/.test(ecode(_s9.student_status))&&!stuGone(_s9))return "NA089";
+   return "NA012"}
   if(!String(r.class_id||"").trim()){var hz=hSince(r.assigned_at);
    return (hz!=null&&hz>P("slaPLR48_hours",48))?"NA063":"NA013"}
   if(!String(r.class_info_sent_at||"").trim()){var hi=hSince(r.assigned_at);
@@ -4947,6 +5100,52 @@ function naFor(sheet,r){
   if(!isc(r.class_confirmation_status,"confirmed"))return "NA090";
   var ha=hSince(r.confirmation_time);
   return (ha!=null&&ha>P("slaOBT_hours",48))?"NA010":"NA011"}
+ /* ===== V9.41 - BA BẢNG SOP MÔ TẢ TRIGGER MÀ naFor CHƯA HỀ CÓ NHÁNH =================
+    Đo bằng máy: sổ trigger HD3 của SOP có 93 tình huống, app sinh ra 50. Gốc của 21 chỗ hụt
+    nằm ở đây - naFor không có nhánh nào cho DL09 (học viên), DL11 (buổi học), DL12 (điểm danh),
+    nên mọi mã nhắc việc SOP viết cho ba bảng đó chưa bao giờ chạy.
+    Riêng DL09: SOP phân NĂM MỨC can thiệp khác nhau, không phải một mức "nguy cơ" chung. Trộn
+    năm mức làm một là mất đúng phần giá trị - vì mỗi mức SOP chỉ định một hành động khác hẳn:
+    họp 4 bên / họp 3 bên trong 24h / đặt buổi WOW / gọi trong 24-48h. */
+ if(sheet==="DL09"){                                   /* học viên */
+  if(/dropped|transferred|graduated/.test(C("student_status")))return "";
+  var _cc=C("attendance_progress_status"),_ht=C("academic_progress_status");
+  var _A=riskAuto(r.student_id);
+  /* mức nặng nhất trước - một học viên chỉ nhận MỘT việc, không réo năm lần */
+  if(_cc==="off_track"&&_ht==="off_track")return "NA014";   /* yếu cả hai - họp 4 bên gấp */
+  if(_ht==="off_track")return "NA015";                      /* học thuật rớt lộ trình - họp 3 bên 24h */
+  if(_cc==="off_track")return "NA016";                      /* chuyên cần rớt lộ trình - họp 3 bên */
+  if(_ht==="at_risk")return "NA066";                        /* học thuật at-risk - đặt WOW kèm */
+  if(_cc==="at_risk")return "NA017";                        /* chuyên cần at-risk - gọi trong 24-48h */
+  /* máy thấy vượt ngưỡng mà người chưa gắn cờ - SOP tách riêng hai mã này */
+  if(!ignRisk(r)&&_A.att)return "NA064";
+  if(!ignRisk(r)&&_A.aca)return "NA065";
+  var _im=hSince(r.last_learning_activity_time);
+  if(_im!=null&&_im/24>P("slaActivity_inactive_days",7))return "NA067";
+  return "NA018"}    /* đang học đều và ổn định - SOP muốn cột việc cần làm nói RÕ điều đó */
+ if(sheet==="DL11"){                                   /* buổi học */
+  if(isc(r.session_status,"cancelled"))return "NA023";      /* hủy - lên lịch bù */
+  if(isc(r.session_status,"rescheduled"))return "NA024";    /* đã dời - cập nhật lại lịch */
+  if(isc(r.session_status,"in_progress"))return "NA020";    /* đang diễn ra */
+  if(isc(r.session_status,"completed")){
+   var _st=bhState(r);
+   if(_st.note)return "NA022";                              /* đã xong, đã ghi nhận xét */
+   return "NA021"}                                          /* đã xong, chưa ghi nhận xét */
+  /* SOP: NA019 = buổi sắp tới, giáo viên chuẩn bị giáo án. Trước đây app dùng nhầm mã này cho
+     "đã dạy xong còn trong hạn ghi nhận xét" - sai nghĩa, và làm tình huống chuẩn bị giáo án
+     biến mất khỏi mọi màn. */
+  return "NA019"}
+ if(sheet==="DL12"){                                   /* điểm danh */
+  if(isc(r.attendance_status,"no_show")){
+   if(/unexcused/.test(C("absence_type"))){
+    var _ss=find("DL11","session_id",r.session_id);
+    var _h=_ss?hSince(_ss.session_date):null;
+    if(String(r.note||"").trim())return "NA025";
+    return (_h!=null&&_h>P("slaAbsenceCall_hours",24))?"NA070":"NA025"}
+   return "NA026"}                                          /* vắng có phép - đề xuất WOW học bù */
+  if(isc(r.attendance_status,"late"))return "NA027";
+  if(isc(r.attendance_status,"on_time"))return "NA028";
+  return ""}
  if(sheet==="DL13"){                                   /* bài tập */
   if(hwGraded(r))return "NA030";
   if(hwSubmitted(r)){var hs=hSince(r.homework_submitted_time);
@@ -5470,6 +5669,7 @@ function runDropout(){var R=window.RUN;if(!R)return;var J=jInfo(R.pid);var S=J.C
  h+='<div class="fld full"><button class="btn danger" onclick="runDropoutSave()"><i class="ti ti-check"></i>Ghi nhận</button></div></div>';
  openDrawer("Dừng học",h)}
 function runDropoutSave(){var R=window.RUN;var J=jInfo(R.pid);var S=J.C.S;var t=fldV("dp_type"),rs=fldV("dp_reason");
+ if(t==="transferred"&&chanAct("baoluu"))return;   /* SOP: bảo lưu khóa cần Quản lý duyệt */
  jUpdRow("DL09",S.student_id,{student_status:eFull("enum_student_status",t),learning_followup_note:(S.learning_followup_note?S.learning_followup_note+" | ":"")+nowStr()+": "+(t==="dropped"?"bỏ học":"bảo lưu")+(rs?" - "+rs:"")},function(){
   closeModal();R.msg="Đã ghi nhận HV "+(t==="dropped"?"bỏ học":"bảo lưu")+" - chuyển sang nhánh rẽ.";R.viewStep="";reRender("chay")})}
 function runSkipTest(){var R=window.RUN;if(!R)return;var J=jInfo(R.pid);
@@ -6845,8 +7045,35 @@ function kpiCompute(){
  /* P10 · WRR - buổi WOW đề xuất đúng chỗ: dạy xong và có tiến bộ */
  var wReal=W.filter(function(w){return !isc(w.wow_status,"cancelled")});
  v.WRR=rate(cnt(wReal,function(w){return isc(w.wow_status,"completed")&&!isc(w.wow_outcome,"no_change")}),wReal.length);
+ /* ═══ V9.41 - BA CHỈ SỐ SOP MÔ TẢ MÀ APP CHƯA HỀ TÍNH ═══════════════════════════════
+    Đo bằng máy: bảng BC2 của SOP liệt kê 51 chỉ số, app tính 48. Ba cái hụt là LFR, APR,
+    SS_ALL - và chúng hụt ở CẢ hai nơi: không có công thức trong app, cũng không có dòng
+    ngưỡng trong CH6. Bản thân SOP cũng lệch (BC2 có 51 dòng, CH6 chỉ có 48 ngưỡng) - anh
+    Luân chốt "nếu SOP chưa thoả đáng, em cứ sửa", nên em lấy ngưỡng ghi ngay trong BC2. */
+ /* P10 · LFR - học viên đang học phải có ghi chú theo dõi, không để ai trôi không dấu vết */
+ var hvHoc=S.filter(function(s){return isc(s.student_status,"active")});
+ v.LFR=rate(cnt(hvHoc,function(s){return String(s.learning_followup_note||"").trim()}),hvHoc.length);
+ /* P10 · APR - yêu cầu cần cấp trên gật đầu có được duyệt ĐÚNG HẠN không.
+    Mẫu số chỉ gồm hồ sơ đã ngã ngũ: đã duyệt, hoặc chưa duyệt mà đã quá hạn. Hồ sơ chưa
+    duyệt nhưng CÒN trong hạn thì chưa vi phạm gì - đếm nó là trượt thì chỉ số chửi oan
+    người đang làm đúng, và ai nhìn cũng thấy bất công nên sẽ thôi tin cả bảng KPI. */
+ var slaCK=paramOf("slaDiscountApprove_hours",24),apOK=0,apN=0;
+ E.forEach(function(e){
+  if(num(e.discount_amount)<num(paramOf("thresholdDiscount_approval",1000000)))return;
+  var xong=String(e.discount_approved_by||"").trim();
+  var x=hb(e.enrollment_time,e.discount_approved_at);
+  if(xong){apN++;if(x!=null&&x>=0&&x<=slaCK)apOK++;return}
+  var cho=hoursSince(e.enrollment_time);
+  if(cho!=null&&cho>slaCK)apN++;          /* chưa duyệt mà đã quá hạn - trượt */
+ });
+ v.APR=rate(apOK,apN);
+ /* P10 · SS_ALL - điểm hài lòng TOÀN trung tâm: gộp khảo sát định kỳ và phản hồi lẻ, vì
+    SS chỉ đọc khảo sát nên bỏ sót đúng nhóm khách chịu khó góp ý riêng. */
+ var ssAll=[];SV.forEach(function(s){var x=num(s.satisfaction_score);if(x>0)ssAll.push(x)});
+ FB.forEach(function(f){var x=num(f.feedback_score);if(x>0)ssAll.push(x)});
+ v.SS_ALL=avg(ssAll);
  return v}
-var KPIUNIT={LRT:["phút",0],CVT:["giờ",0],OBT:["giờ",0],CTR:["giờ",0],SS:["",1],NPS:["",2]};
+var KPIUNIT={LRT:["phút",0],CVT:["giờ",0],OBT:["giờ",0],CTR:["giờ",0],SS:["",1],SS_ALL:["",1],NPS:["",2]};
 function kpiFmt(code,val){if(val==null)return "—";var m=KPIUNIT[code];
  if(m){if(m[1])return Number(val).toFixed(m[1])+(m[0]?" "+m[0]:"");
   /* đổi đơn vị cho dễ đọc: phút -> giờ/ngày, giờ -> ngày */
@@ -7842,7 +8069,19 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
   var CNT={};rows("DL01").forEach(function(x){if(!staffActive(x))return;
    var g=(function(){var c=ecode(x.role);for(var k in ROLESCOPE){var m=ROLESCOPE[k].match;if(m&&m.test(c))return (/manager|leader/.test(c)&&DSDEF[k+"_mgr"])?k+"_mgr":k}return "hotro"})();
    CNT[g]=(CNT[g]||0)+1});
-  h+='<div class="notebar"><i class="ti ti-shield-lock"></i><b>Ai thấy dữ liệu của ai.</b> Phân quyền có 2 tầng: <b>thấy trang nào</b> (theo chức danh, đã có sẵn) và <b>thấy dữ liệu của ai</b> (bảng dưới đây). Sửa xong bấm <b>Xem thử bằng mắt của...</b> để kiểm chứng ngay - không phải đăng nhập lại.</div>';
+  h+='<div class="notebar"><i class="ti ti-shield-lock"></i><b>Phân quyền có BA tầng.</b> (1) <b>Thấy trang nào</b> - theo chức danh. (2) <b>Thấy dữ liệu của ai</b> - bảng phạm vi bên dưới. (3) <b>Được LÀM việc gì</b> - bảng CH3 của SOP, chặn ngay tại cửa ghi. Giấu lối vào mà không khóa cửa ghi thì phân quyền chỉ là trang trí.</div>';
+  /* V9.41 - BẢNG CH3: tầng thứ ba, trước đây app không có. SOP ghi 8 việc "Quản lý phê duyệt",
+     app chỉ canh thật đúng 1 (duyệt chiết khấu) - 7 việc còn lại ai mở được trang là bấm xong. */
+  h+='<div class="sechd">Được làm việc gì · bảng phân quyền CH3 của SOP</div>';
+  h+='<div class="panel" style="margin-bottom:14px"><div class="pbody">';
+  h+='<div class="fhint" style="margin:0 0 10px">Bảng này chép nguyên văn từ trang <b>CH3. Phân quyền</b> của file SOP. Bộ kiểm <code>check_sop.py</code> đọc thẳng file SOP và đối chiếu từng dòng - lệch một dòng là đỏ, nên bảng ở đây không thể trôi khỏi SOP mà không ai biết. Cột cuối cho biết <b>chức danh đang xem</b> có được làm việc đó không.</div>';
+  h+='<div class="tbwrap"><table class="tb"><thead><tr><th>Hành động (theo SOP)</th><th style="width:230px">Ai được làm</th><th style="width:120px">Bạn</th></tr></thead><tbody>';
+  CH3.forEach(function(a){
+   var ok=canAct(a.k);
+   h+='<tr><td>'+esc(a.t)+(a.duyet?' <span class="chip amber">cần duyệt</span>':'')+'</td>'+
+    '<td>'+esc(ch3Vai(a))+'</td>'+
+    '<td>'+(ok?'<span class="chip green">được</span>':'<span class="chip red">không</span>')+'</td></tr>'});
+  h+='</tbody></table></div></div></div>';
   h+='<div class="panel" style="margin-bottom:12px"><div class="pbody" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">';
   h+='<label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox"'+(P.on?" checked":"")+' onchange="dsCfg().on=this.checked?1:0;persistSoon();reRender(CUR)" style="width:17px;height:17px"><b>Áp phạm vi dữ liệu</b></label>';
   h+='<span class="chip '+(P.on?"green":"gray")+'">'+(P.on?"Đang bật - mỗi người chỉ thấy phần được giao":"Đang tắt - mọi người thấy toàn bộ")+'</span>';
@@ -8472,6 +8711,7 @@ var APPPARAMS=[
  ["Tài chính","referralRewardGrant_days","Bạn được giới thiệu đã đăng ký thì phải trao thưởng cho người giới thiệu trong bao nhiêu ngày","ngày",7],
  ["Tài chính","debtRemindGap_days","Nhắc thu nợ rồi thì việc tạm lùi bao nhiêu ngày trước khi hiện lại (khoản quá hạn vẫn giữ)","ngày",3],
  ["CSKH","slaComplaintFollowup_days","Đóng khiếu nại rồi thì trong bao nhiêu ngày phải hỏi lại học viên đã ổn chưa","ngày",3],
+ ["Tuyển sinh - Đăng ký","slaENR_stale_hours","Đăng ký để ở trạng thái chờ quá bao nhiêu giờ thì cân nhắc hủy để dọn dữ liệu","giờ",168],
  ["Học vụ - Lớp học","wowMaxHours","Buổi WOW bấm bắt đầu quá bao nhiêu giờ mà chưa bấm kết thúc thì nhắc","giờ",3],
  ["Học vụ - Lớp học","slaWowConfirm_hours","Hạn giáo viên WOW xác nhận một buổi vừa được đặt","giờ",24],
  ["Học vụ - Lớp học","riskIgnore_days","Học vụ xem rồi bấm 'tạm bỏ qua' thì máy im bao nhiêu ngày trước khi nhắc lại","ngày",14],
@@ -8515,7 +8755,10 @@ var APPPARAMS=[
     trước đây nằm trong đầu người viết code, nay thành tham số sửa được. */
  ["Tài chính","slaDiscountApprove_hours","Hạn quản lý duyệt một đề nghị chiết khấu","giờ",24],
  ["Tài chính","slaPaymentVerify_hours","Hạn kế toán đối soát một khoản vừa thu","giờ",24],
- ["Học vụ - Lớp","slaRiskFollowup_days","Học viên vào diện nguy cơ bao lâu thì phải có can thiệp","ngày",3]];
+ ["Học vụ - Lớp","slaRiskFollowup_days","Học viên vào diện nguy cơ bao lâu thì phải có can thiệp","ngày",3],
+ /* V9.41: SOP có mã nhắc riêng cho "học viên im ắng quá lâu" (NA067) - naFor đọc tham số này để
+    quyết định. Thêm luật mà quên ô sửa là lại đẻ ra hằng số cắm cứng; _check16 canh hai chiều. */
+ ["Học vụ - Lớp","slaActivity_inactive_days","Học viên không có hoạt động nào (điểm danh, bài tập, WOW) quá bao nhiêu ngày thì phải hỏi thăm","ngày",7]];
 function pvnd(s){var m=String(s||"").match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);if(!m)return null;return new Date(+m[3],+m[2]-1,+m[1],m[4]?+m[4]:0,m[5]?+m[5]:0)}
 function hoursSince(s){var d=pvnd(s);return d?(Date.now()-d.getTime())/3600000:null}
 function nowStr(){var d=new Date();function p(n){return n<10?"0"+n:n}return p(d.getDate())+"/"+p(d.getMonth()+1)+"/"+d.getFullYear()+" "+p(d.getHours())+":"+p(d.getMinutes())}
@@ -8624,7 +8867,10 @@ function obChange(id){var o=find("DL08","onboarding_id",id);if(!o){toast("Không
  h+='<div class="fld"><label>Lý do đổi</label><input id="oc_reason" placeholder="vd: HV từ chối lịch T3-5-7 / đổi cơ sở"></div>';
  h+='<div class="fld full"><button class="btn primary" onclick="obChangeSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Đổi lớp (gửi lại thông tin lớp mới)</button></div></div>';
  openDrawer("Đổi lớp",h)}
-function obChangeSave(id){var o=find("DL08","onboarding_id",id);if(!o)return;var cid=fldV("oc_cls");if(!cid){toast("Chọn lớp mới.");return}
+function obChangeSave(id){var o=find("DL08","onboarding_id",id);if(!o)return;
+ /* SOP: đổi lớp lần 1 miễn phí do Học vụ; từ lần 2 phải Quản lý duyệt. */
+ if(num(o.placement_change_count)>=1){if(chanAct("doilop2"))return}else{if(chanAct("doilop1"))return}
+ var cid=fldV("oc_cls");if(!cid){toast("Chọn lớp mới.");return}
  var g=bizGuard("DL08",{class_id:cid,onboarding_id:id});if(g){toast(g);return}
  var reason=fldV("oc_reason");var oldC=o.class_id?find("DL10","class_id",o.class_id):null;var newC=find("DL10","class_id",cid)||{};
  var vals={class_id:cid,class_id_name:newC.class_name,placement_status:eFull("enum_placement_status","changed"),placement_change_count:String(num(o.placement_change_count)+1),class_confirmation_status:eFull("enum_class_confirmation_status","pending"),confirmation_time:"",class_info_sent_at:"",onboarding_status:eFull("enum_onboarding_status","in_progress")};
@@ -9582,9 +9828,6 @@ function payVerifyRun(id){var pays=rows("DL07").filter(function(x){return x.enro
    remaining = default + extra_approved + extra_purchased - used. Chỉ cần ghi đúng cột rồi tính lại.
    Ai được cấp: quản trị / CEO / trưởng phòng học vụ + ACA. Người khác thấy nút nhưng bấm vào
    được nói thẳng là không đủ thẩm quyền, chứ không giấu nút rồi để họ tưởng app thiếu tính năng. */
-function wowGrantCan(){var r=mapRoleCode(ecode((find("DL01","staff_id",CURSTAFF)||{}).role));
- if(!CURSTAFF||CURSTAFF==="ADMIN")return true;
- return /ceo|amanager/.test(r||"")}
 function wowQuotaOf(sid){var s=find("DL09","student_id",sid)||{};
  var held=rows("DL14").filter(function(x){return String(x.student_id||"")===sid&&
   isc(x.wow_status,"booked","confirmed")&&String(x.quota_deducted||"").toLowerCase()!=="yes"}).length;
@@ -9615,7 +9858,7 @@ function wowGrantLog(s){
  if(!lines.length)return '<div class="fhint">Chưa từng cấp thêm lượt nào.</div>';
  return '<div class="fhint"><b>Đã cấp trước đây:</b><br>'+lines.map(esc).join("<br>")+'</div>'}
 function wowGrantSave(){
- if(!wowGrantCan()){toast("Chức danh của bạn không được cấp thêm lượt WOW - nhờ trưởng phòng Học vụ / ACA.",5000);return}
+ if(chanAct("wow_them"))return;
  var sid=fldV("wg_stu");if(!sid){toast("Chọn học viên.");return}
  var n=num(fldV("wg_n"));if(n<=0){toast("Số lượt phải lớn hơn 0.");return}
  var cap=num(paramOf("wowGrantMax_perTime",3))||3;
@@ -9911,7 +10154,7 @@ function knResolve(id){var c=find("DL17","complaint_id",id)||{};var sevc=ecode(c
  h+=attachBox("knr","Ảnh/biên bản làm việc (không bắt buộc)");
  h+='<div class="fld full"><button class="btn primary" onclick="knResolveSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Đóng khiếu nại</button></div></div>';
  openDrawer("Xử lý khiếu nại",h)}
-function knResolveSave(id){var n=fldV("kr_note");if(!n.trim()){toast("Nhập cách xử lý.");return}
+function knResolveSave(id){if(chanAct("kn_duyet"))return;var n=fldV("kr_note");if(!n.trim()){toast("Nhập cách xử lý.");return}
  /* V9.40d: student_feedback_after là cột SOP mô tả mà app chưa bao giờ ghi. Đóng khiếu nại mà
     KHÔNG hỏi lại học viên có chấp nhận cách xử lý không thì mới đóng được cái phiếu, chưa đóng
     được cái bực - và trung tâm không biết em còn ấm ức hay đã nguôi. Để trống vẫn đóng được

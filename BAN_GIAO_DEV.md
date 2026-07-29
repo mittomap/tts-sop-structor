@@ -53,9 +53,24 @@ phép nhìn một mảng SOP rồi tự kết luận "cái này lệch trọng t
 về người giám hộ trong `DL09` nằm trong SOP, nằm sẵn trong dữ liệu, mà **không một dòng mã nào đọc
 tới** - loại sót này không ai thấy được bằng mắt, vì dữ liệu vẫn đủ và màn hình vẫn đẹp.
 
-`./verify.sh` có `check_sop.py` đọc thẳng file SOP gốc và đối chiếu **357 cột**. Cột nào app không
-dùng phải khai vào `BOQUA` trong file đó **kèm lý do**; "app không cần" không phải lý do - phải nói
-rõ app làm gì thay cho cột đó.
+`./verify.sh` có `check_sop.py` đọc thẳng file SOP gốc và đối chiếu **BỐN mặt**. Chỗ nào app không
+làm phải khai kèm **lý do đọc được**; "app không cần" không phải lý do - phải nói rõ app làm gì
+thay cho chỗ đó.
+
+| Soi cái gì | Số | Khai lý do ở |
+|---|---|---|
+| Cột dữ liệu 19 bảng DL | 357 | `BOQUA` |
+| Tình huống sổ trigger HD3 - **chạy thật `naFor()` trên mọi dòng** | 93 | `TRIG_BOQUA` |
+| Chỉ số bảng BC2 (công thức trong app + dòng ngưỡng trong CH6) | 51 | `KPI_BOQUA` |
+| Hành động bảng phân quyền CH3 - **đóng vai từng chức danh rồi hỏi lại** | 31 | `CH3_BOQUA` |
+
+Hai mặt giữa là chỗ đau nhất và cũng là chỗ dễ sót nhất: **cột chỉ nói "có chỗ để lưu"**, nó không
+nói app có nhắc việc không, có tính chỉ số không, có chặn đúng người không. Đo lần đầu: app sinh
+**50/93** tình huống trigger (`naFor()` không có nhánh nào cho DL09/DL11/DL12), tính **48/51** chỉ
+số, và canh thật **1/8** việc "Quản lý phê duyệt".
+
+Riêng CH3: mỗi việc SOP ghi "Quản lý phê duyệt" phải có **cửa ghi gọi `chanAct("...")`**. Khai vào
+bảng mà không chặn thì chỉ là tờ giấy dán tường - bộ kiểm bắt luôn chuyện đó.
 
 ### LUẬT 3 - Chạy `./verify.sh` trước khi giao. Đỏ thì không giao.
 
@@ -88,6 +103,9 @@ cd _src && python3 build_icons.py  # cần: pip install fonttools brotli
 | Hộp xác nhận bị chôn dưới ngăn kéo, phần tử bấm không tới (đo `elementFromPoint` trong Chromium) | Một việc "xong" mà thật ra chưa ai làm gì - phải tự nghĩ khi viết luật SLA |
 | Dữ liệu demo mâu thuẫn với luật nghiệp vụ | |
 | Cột SOP mô tả mà app không dùng (`check_sop.py`, 357 cột) | SOP mô tả một **quy trình** mà app làm thiếu bước - chỉ đọc SOP mới thấy |
+| Tình huống HD3 mà `naFor()` không sinh ra (chạy thật, 93 mã) | |
+| Chỉ số BC2 thiếu công thức hoặc thiếu ngưỡng CH6 (51 chỉ số) | |
+| Việc "Quản lý phê duyệt" mà cửa ghi không gọi `chanAct` (CH3, 31 hành động) | |
 
 Nói cách khác: nó chặn phần lớn tai nạn, **không** biến người bất cẩn thành an toàn. Đọc mã vẫn cần.
 

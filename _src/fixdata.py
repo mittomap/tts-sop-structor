@@ -680,6 +680,19 @@ for (_t, _c), _en in ENUM_COL.items():
 log.append("13. Nhãn enum: kéo %d ô về đúng nhãn CH1 | %d mã không có trong danh mục%s"
            % (norm, len(set(orphan)), (" -> " + "; ".join(sorted(set(orphan))[:5])) if orphan else ""))
 
+
+def eF(en, ma):
+    """Nhan enum lay NGUYEN VAN tu danh muc CH1 - dung cho cac khoi gieo o duoi.
+
+    Vi sao phai co: cac pass gieo tinh huong chay SAU §13 nen khong duoc chuan hoa nua. Go tay
+    chuoi nhan la sinh ra nhan la ngay trong du lieu - da can that: khoi gieo DL08 go
+    "in_progress (Đang làm)" va "confirmed (Đã xác nhận)" trong khi CH1 ghi "in_progress (Đang
+    thực hiện)" va "confirmed (Đồng ý)". Nhan la thi app hien ra chu la, va moi luat doc theo
+    nhan deu truot. Nhan la TAI SAN CUA CH1, khong phai chuoi go tay o tung khoi.
+    """
+    _n = (_emap.get(en) or {}).get(ma)
+    return "%s (%s)" % (ma, _n) if _n else ma
+
 # ═══ 14. KẸP MỐC THỜI GIAN PHỄU ══════════════════════════════════════════
 # lead -> test -> tư vấn -> chốt -> đăng ký -> thu tiền -> xếp lớp -> gửi info -> xác nhận.
 # Các pass §4/§7a/§7b chỉ kéo TỪNG CẶP mốc nên vẫn đẻ ra "chốt deal trước tư vấn",
@@ -1045,6 +1058,28 @@ for _c in CH2:
         _c["meaning"] = "Hotline của trung tâm - hiện trên cổng học viên, tin nhắn xác nhận và phiếu thu. Để trống thì app ẩn nút gọi."
 _p2set("centerHotline", "", "chữ", "Hotline của trung tâm - hiện trên cổng học viên, tin nhắn xác nhận và phiếu thu. Để trống thì app ẩn nút gọi.")
 _p2set("centerAddress", "12 Nguyễn Văn Bảo, phường 4, quận Gò Vấp, TP.HCM", "chữ", "Địa chỉ hiện trên phiếu thu và cổng học viên")
+
+# ═══ 14d-bis. BA NGƯỠNG KPI SOP MÔ TẢ MÀ CH6 CHƯA CÓ DÒNG (V9.41) ════════
+# Đo bằng máy: bảng BC2 của SOP liệt kê 51 chỉ số, bảng ngưỡng CH6 chỉ có 48 dòng - tức là bản
+# thân SOP đã lệch với chính nó, và app (đọc CH6 để dựng bảng KPI) thừa hưởng đúng chỗ hụt đó.
+# Anh Luân chốt: "nếu SOP chưa thoả đáng, em cứ sửa". Ngưỡng lấy NGUYÊN theo cột "Ngưỡng SOP"
+# ghi ngay trong BC2, không phải em tự nghĩ ra.
+CH6 = d.setdefault("config", {}).setdefault("ch6", [])
+
+
+def _p6set(code, name, th, dr, ph):
+    for c in CH6:
+        if str(c.get("code")) == code:
+            return 0
+    CH6.append({"code": code, "name": name, "threshold": th, "dir": dr, "phase": ph})
+    return 1
+
+
+_them6 = 0
+_them6 += _p6set("LFR", "Learning Followup Rate - Ghi chú theo dõi đầy đủ", 1.0, "≥", "P10")
+_them6 += _p6set("APR", "Approval Rate - Phê duyệt yêu cầu đúng hạn", 0.9, "≥", "P10")
+_them6 += _p6set("SS_ALL", "Satisfaction All - Điểm hài lòng toàn trung tâm", 4.5, "≥", "P10")
+log.append("14d-bis. Nguong KPI: them %d dong CH6 (BC2 co 51 chi so, CH6 goc chi co 48)" % _them6)
 _p2set("slaFeedbackClassify_hours", 24, "giờ", "Hạn tiếp nhận và phân loại phản hồi của học viên")
 _p2set("permGrace_hours", 48, "giờ", "Quyền tạm theo việc còn hiệu lực thêm bao lâu sau hạn việc")
 
@@ -1493,6 +1528,411 @@ for r in dl.get("DL03", []):
 log.append("14undecies. Test: kéo %d buổi ĐÃ điểm danh dự thi về quá khứ (chống trôi theo đồng hồ)"
            % _ttfix)
 
+# ═══ 14novodecies. CHÍN TÌNH HUỐNG SOP MÔ TẢ MÀ DEMO CHƯA CÓ CA (V9.41) ═
+# App ĐÃ có luật cho cả chín, nhưng dữ liệu demo không có ca nào nên chín màn đó không ai xem
+# được và bộ kiểm không chứng minh được luật có chạy. Đây đúng là loại "xanh vì không có gì để
+# đỏ" - nguy hiểm hơn đỏ thật, vì nó ru người ta ngủ.
+# Gieo TỐI THIỂU: đúng một ca mỗi loại, đủ để nhìn thấy và để bộ kiểm cắn được.
+_seed = []
+
+
+def _lay(ds, dk, n=1):
+    """lay n dong dau thoa dieu kien"""
+    return [x for x in ds if dk(x)][:n]
+
+
+# --- DL02: ba trang thai lead SOP mo ta ---
+_mo = [l for l in R("DL02") if code(l.get("lead_status")) in ("new", "contacted", "considering")]
+# so lan cham THAT cua tung lead - dem tu DL02b, khong gan tay vao contact_count. Truoc day em
+# gan thang contact_count = 6 de ep ra NA047, nhung bang cham chi co 5 dong: du lieu tu noi doi
+# voi chinh no va bo kiem bat dung ngay ("luot lien he lech so ban ghi cham"). Ep mot con so ma
+# khong ep cai sinh ra no la vet nut y het "vá hai nơi cho cùng một sự thật".
+_chamOf = {}
+for _tp in R("DL02b"):
+    _kl = str(_tp.get("lead_id") or "")
+    _chamOf.setdefault(_kl, []).append(_tp)
+_nguongCham = 5
+for _c2 in (d.get("config", {}).get("ch2") or []):
+    if _c2.get("name") == "thresholdContacted_attempts":
+        _nguongCham = int(n(_c2.get("value")) or 5)
+
+
+def _lanCham(l):
+    return len(_chamOf.get(str(l.get("lead_id") or ""), []))
+
+
+def _chamDauTien(l):
+    _ts = sorted([str(x.get("contact_time") or "") for x in _chamOf.get(str(l.get("lead_id") or ""), []) if x.get("contact_time")],
+                 key=lambda s: dt(s) or NOW)
+    return _ts[0] if _ts else ""
+
+
+def _themCham(l, can):
+    """Ghi THEM ban ghi cham cho mot lead cho du so lan, roi tra ve so lan that.
+
+    Khong duoc ep contact_count len ma khong ghi ban ghi: bo dem la SUY RA tu so cham, ep mot dau
+    ma bo dau kia thi du lieu tu mau thuan. Ngoai doi cung vay - goi 6 lan thi phai co 6 dong nhat
+    ky, khong the co con so 6 lo lung khong ai tra loi duoc "6 lan do goi luc nao".
+    """
+    _kl = str(l.get("lead_id") or "")
+    _ds = _chamOf.setdefault(_kl, [])
+    _no = 0
+    for _t in R("DL02b"):
+        _mn = re.match(r"TP-(\d+)$", str(_t.get("touchpoint_id") or ""))
+        if _mn:
+            _no = max(_no, int(_mn.group(1)))
+    _nv = (R("DL01") or [{}])[0]
+    _ndung = ["Gọi lại lần nữa, khách không bắt máy",
+              "Nhắn Zalo hỏi lịch rảnh để tư vấn, chưa thấy trả lời",
+              "Gọi giờ trưa, khách bận hẹn gọi lại",
+              "Gửi lộ trình + học phí qua Zalo, khách xem chưa phản hồi"]
+    while len(_ds) < can:
+        _no += 1
+        _k = len(_ds)
+        _ds.append({
+            "touchpoint_id": "TP-%03d" % _no, "lead_id": _kl,
+            "customer_name": l.get("full_name", ""),
+            "contact_time": fmt(NOW - datetime.timedelta(days=max(1, 12 - _k * 2), hours=_k)),
+            "channel": eF("enum_contact_channel", "phone" if _k % 2 else "zalo"),
+            "direction": eF("enum_contact_direction", "outbound"),
+            "content": _ndung[_k % len(_ndung)],
+            "staff_id": l.get("assigned_to") or _nv.get("staff_id", ""),
+            "result_note": "no_answer (Gọi - không nghe máy)" if _k % 2 else "sent_waiting (Đã nhắn - chưa trả lời)",
+            "staff_id_name": l.get("assigned_to_name") or _nv.get("full_name", ""),
+        })
+        R("DL02b").append(_ds[-1])
+    return len(_ds)
+
+
+if len(_mo) >= 3:
+    # NA047 - da goi du so lan nguong ma khach khong phan hoi. Uu tien lead DA CO du so ban ghi
+    # cham; khong co thi GHI THEM cham cho du - chu khong ep rieng con so.
+    _u47 = [l for l in _mo if _lanCham(l) >= _nguongCham] or _mo[1:2]
+    if _u47:
+        _l2 = _u47[0]
+        _l2["contact_count"] = _themCham(_l2, _nguongCham)
+        _l2["first_call_time"] = _chamDauTien(_l2) or fmt(NOW - datetime.timedelta(days=12))
+        _l2["next_followup_time"] = ""
+        _seed.append("NA047")
+    # NA048 - da lien he, qua so ngay chua chot. Chon lead it cham, giu contact_count dung thuc te.
+    _u48 = [l for l in _mo if 0 < _lanCham(l) < _nguongCham and l is not (_u47[0] if _u47 else None)]
+    if _u48:
+        _l3 = _u48[0]
+        _l3["contact_count"] = _lanCham(_l3)
+        _l3["first_call_time"] = fmt(NOW - datetime.timedelta(days=20))
+        _l3["next_followup_time"] = ""
+        _seed.append("NA048")
+
+# --- DL11: mot buoi DA DOI lich ---
+_sd = d.setdefault("enums", {}).setdefault("enum_session_status", [])
+if not any(str(x).startswith("rescheduled") for x in _sd):
+    _sd.append("rescheduled (Đã dời lịch)")
+_ss = [x for x in R("DL11") if code(x.get("session_status")) == "scheduled"]
+if _ss:
+    _ss[0]["session_status"] = "rescheduled (Đã dời lịch)"
+    _seed.append("NA024")
+
+def _dangHoc2(x):
+    return "active" in str(x.get("student_status") or "") or not str(x.get("student_status") or "").strip()
+
+
+# --- bon ca con lai, gieo o BUOC CUOI de khong bi cac pass tren de len ---
+# --- DL08: NAM trang thai xep lop / nhap hoc SOP mo ta, MOI TINH HUONG MOT DONG RIENG ---
+# Gieo trong MOT khoi duy nhat. Truoc do em gieo lam hai lan va lan sau de len lan truoc, lam
+# hai tinh huong bien mat - dung cai bay "vá hai nơi cho cùng một sự thật" da ghi trong 02.
+# CACH CHON HO SO (da sai hai lan, ghi lai cho ro):
+#  Lan 1 - lay bua nam ho so roi DOI HET sang mot lop "dang hoc": sinh ra "xep lop sau ngay khai
+#          giang", "diem danh o lop HV khong thuoc" (28 dong), "bai tap giao cho HV ngoai lop" (10).
+#  Lan 2 - siet lai thanh "lop chua khai giang + cung khoa + HV chua hoc buoi nao": dung nghiep vu
+#          nhung khong con du 5 ho so nao thoa, nen khoi gieo im lang KHONG CHAY, va ba tinh huong
+#          SOP bien mat ma bang tong ket van xanh. Dieu kien sach ma khong con ca nao thi cung la
+#          hong - bo kiem trigger bat duoc, con mat thuong thi khong.
+#  Nay - KHONG DOI LOP nua. Giu nguyen lop cua chinh ho so do, chi dung lai cac MOC THOI GIAN va
+#  trang thai. Khong doi lop thi khong the lech lop, khong the lech khoa, khong the lech diem danh.
+#  Chi uu tien nhung ho so cua HV chua hoc buoi nao, vi ho so onboarding dang do thi ngoai doi
+#  cung chua di hoc - va rieng ca NA063 (phai xoa lop khoi ho so) thi BAT BUOC nhu vay.
+_donCua = {str(e.get("enrollment_id") or ""): e for e in R("DL06")}
+_lopCua = {str(c.get("class_id") or ""): c for c in R("DL10")}
+_daHoc = {str(x.get("student_id") or "") for x in R("DL12")}
+_daHoc |= {str(x.get("student_id") or "") for x in R("DL13")}
+
+
+def _khoaCuaOB(o):
+    _e = _donCua.get(str(o.get("enrollment_id") or ""))
+    return str(_e.get("course_id") or "") if _e else ""
+
+
+def _tuoiDon(o):
+    """So gio ke tu luc dang ky - xep lop khong the xay ra TRUOC khi co don."""
+    _e = _donCua.get(str(o.get("enrollment_id") or ""))
+    _t = dt(_e.get("enrollment_time")) if _e else None
+    return (NOW - _t).total_seconds() / 3600.0 if _t else None
+
+
+def _lopChoOB(o):
+    """Lop cua chinh ho so do; neu ho so chua co lop thi lay lop CUNG KHOA sap khai giang."""
+    _c = _lopCua.get(str(o.get("class_id") or ""))
+    if _c:
+        return _c
+    _kh = _khoaCuaOB(o)
+    _ds = [c for c in R("DL10") if str(c.get("course_id") or "") == _kh
+           and (dt(c.get("class_start_date")) or NOW) > NOW]
+    _ds += [c for c in R("DL10") if str(c.get("course_id") or "") == _kh]
+    return _ds[0] if _ds else None
+
+
+_obAll = [o for o in R("DL08") if _tuoiDon(o) is not None and _lopChoOB(o)]
+# chua hoc buoi nao thi len truoc; trong moi nhom thi don CU NHAT len truoc (moc xa nhat can don cu)
+_obAll.sort(key=lambda o: (str(o.get("student_id") or "") in _daHoc,
+                           code(o.get("onboarding_status")) == "completed",
+                           -_tuoiDon(o)))
+_obGieo = set()
+if len(_obAll) >= 5:
+    def _dat08(o, cls, sent, cf, cft, tt):
+        o["class_id"] = str(cls.get("class_id") or "") if cls else ""
+        o["class_id_name"] = str(cls.get("class_name") or "") if cls else ""
+        o["class_info_sent_at"] = sent; o["class_confirmation_status"] = cf
+        o["confirmation_time"] = cft; o["onboarding_status"] = tt
+
+    _DD = eF("enum_onboarding_status", "in_progress")
+    _XN = eF("enum_class_confirmation_status", "confirmed")
+
+    def _moc(o, gio):
+        """Moc gio truoc day - nhung KHONG duoc som hon luc dang ky mot tieng.
+
+        Xep lop truoc khi co don la chuyen khong the xay ra ngoai doi; bo kiem logic bat dung
+        (13g). Ke ca khi phai keo mup lai, thu tu van con dung.
+        """
+        _t = NOW - datetime.timedelta(hours=gio)
+        _e = _donCua.get(str(o.get("enrollment_id") or ""))
+        _d = dt(_e.get("enrollment_time")) if _e else None
+        if _d and _t < _d + datetime.timedelta(hours=1):
+            _t = _d + datetime.timedelta(hours=1)
+        return _t
+
+    def _sau(t, gio):
+        """Moc SAU mot moc khac, nhung khong duoc vuot qua bay gio."""
+        return min(t + datetime.timedelta(hours=gio), NOW - datetime.timedelta(minutes=5))
+
+    # _obAll da sap theo TUOI DON giam dan, nen ho so nao can moc xa nhat thi nhan don cu nhat.
+    # Nguong CH2: chua xep lop qua slaPLR48_hours=48 -> NA063; xep roi chua gui info qua
+    # slaClassInfoZalo_hours=24 -> NA062; xac nhan roi qua slaOBT_hours=48 -> NA010.
+    # NA010 - HV da xac nhan ma QUA HAN chua hoan tat nhap hoc (can don CU NHAT)
+    _a0 = _moc(_obAll[0], 140); _s0 = _sau(_a0, 20); _c0 = _sau(_s0, 24)
+    _dat08(_obAll[0], _lopChoOB(_obAll[0]), fmt(_s0), _XN, fmt(_c0), _DD); _obAll[0]["assigned_at"] = fmt(_a0)
+    # NA063 - da xac nhan dang ky ma QUA HAN chua xep lop. Ho so nay bi XOA lop, nen phai chon
+    # nguoi CHUA HOC BUOI NAO - xoa lop cua mot em dang di hoc la de lai diem danh mo coi.
+    _u63 = [o for o in _obAll[1:] if str(o.get("student_id") or "") not in _daHoc] or _obAll[1:2]
+    _o63 = _u63[0]
+    _a1 = _moc(_o63, 96)
+    _dat08(_o63, None, "", "", "", _DD); _o63["assigned_at"] = fmt(_a1)
+    _con = [o for o in _obAll[1:] if o is not _o63]
+    # NA062 - da xep lop ma QUA HAN chua gui thong tin Zalo
+    _a2 = _moc(_con[0], 72)
+    _dat08(_con[0], _lopChoOB(_con[0]), "", "", "", _DD); _con[0]["assigned_at"] = fmt(_a2)
+    # NA011 - HV da xac nhan, nhap hoc dang do va CON trong han
+    _a3 = _moc(_con[1], 40); _s3 = _sau(_a3, 20); _c3 = _sau(_s3, 14)
+    _dat08(_con[1], _lopChoOB(_con[1]), fmt(_s3), _XN, fmt(_c3), _DD); _con[1]["assigned_at"] = fmt(_a3)
+    # NA090 - da gui thong tin lop, HV CHUA xac nhan
+    _a4 = _moc(_con[2], 30); _s4 = _sau(_a4, 10)
+    _dat08(_con[2], _lopChoOB(_con[2]), fmt(_s4), "", "", _DD); _con[2]["assigned_at"] = fmt(_a4)
+    # NA013 - moi xep lop, van CON TRONG HAN moi buoc (khong qua han gi ca)
+    if len(_con) >= 4:
+        _a5 = _moc(_con[3], 2)
+        _dat08(_con[3], _lopChoOB(_con[3]), "", "", "", _DD); _con[3]["assigned_at"] = fmt(_a5)
+        _seed.append("NA013")
+    _seed += ["NA063", "NA062", "NA090", "NA011", "NA010"]
+    _obGieo = {str(o.get("onboarding_id") or "") for o in ([_obAll[0], _o63] + _con[:4])}
+else:
+    # Khoi gieo KHONG CHAY = 6 tinh huong SOP bien mat. Truoc day no im lang bo qua va bang tong
+    # ket van xanh; chi bo kiem trigger moi bat duoc. Nay keu to ngay tai cho.
+    log.append("!!! 14novodecies KHONG GIEO DUOC: chi co %d ho so xep lop du dieu kien (can >=5)"
+               % len(_obAll))
+log.append("14novodecies. Gieo ca cho cac tinh huong SOP chua co trong demo: %s" % ", ".join(_seed))
+
+# ═══ 14octodecies. BA TÌNH HUỐNG ĐĂNG KÝ SOP MÔ TẢ MÀ DEMO CHƯA CÓ CA (V9.41) ═
+# Sổ trigger HD3 mô tả NA060 (đơn chờ quá lâu, nên hủy), NA087 (đã đủ cọc mà đơn còn treo) và
+# NA088 (đã đóng đủ mà chưa mở onboarding). Cả ba đều là việc THẬT ngoài đời, nhưng dữ liệu demo
+# không có ca nào - nên ba màn đó không ai xem được và bộ kiểm không chứng minh được luật có chạy.
+# Gieo ĐÚNG MỘT ca mỗi loại: đủ để nhìn thấy, không đủ để làm nhiễu phễu.
+_pend = [e for e in R("DL06") if code(e.get("enrollment_status")) == "pending"]
+_coc = 5000000
+for _c in (d.get("config", {}).get("ch2") or []):
+    if _c.get("name") == "thresholdDeposit_minimum":
+        _coc = int(n(_c.get("value")) or 5000000)
+def _raiDot(eid):
+    """Rai lai tien da dong cua MOT don xuong cac dot cua no.
+
+    Bang lich dot (DL06b) duoc dung o §14d tu paid_amount luc do. Khoi gieo nay doi paid_amount
+    SAU §14d, nen neu khong rai lai thi don ghi "da dong 5 trieu" con bang dot ghi 0 - hai noi
+    cung mot su that, lech nhau, va bo kiem hoc phi bat dung. Ai doi paid_amount sau §14d thi
+    PHAI goi ham nay.
+    """
+    _ls = [x for x in dl.get("DL06b", []) if str(x.get("enrollment_id")) == str(eid)]
+    if not _ls:
+        return
+    _ls.sort(key=lambda z: int(n(z.get("installment_no"))))
+    _e = IDX["DL06"].get(str(eid))
+    _con = n(_e.get("paid_amount")) if _e else 0
+    for _x in _ls:
+        _due = n(_x.get("due_amount"))
+        _tra = min(_due, max(0, _con))
+        _con -= _tra
+        _x["paid_amount"] = _tra
+        _x["remaining_amount"] = _due - _tra
+        _dd = dt(_x.get("due_date"))
+        if _tra >= _due - 1:
+            _x["status"] = "paid (Đã đóng đủ)"
+        elif _tra > 0:
+            _x["status"] = "partial (Đóng một phần)"
+            _x["paid_time"] = _x.get("paid_time") or fmt(NOW - datetime.timedelta(days=2))
+        elif _dd and _dd < NOW - datetime.timedelta(days=LATE):
+            _x["status"] = "overdue (Quá hạn)"
+        elif _dd and _dd < NOW:
+            _x["status"] = "due (Đến hạn)"
+        else:
+            _x["status"] = "upcoming (Chưa tới hạn)"
+        if _tra <= 0:
+            _x["paid_time"] = ""
+    _mo = [x for x in _ls if not str(x.get("status")).startswith("paid")]
+    if _e:
+        _e["next_payment_due"] = _mo[0]["due_date"] if _mo else ""
+
+
+def _lapPhieuThu(e, tien, ghichu, dot):
+    """Lap MOT phieu thu that cho khoan tien vua ghi vao don.
+
+    Tien vao thi phai co chung tu. Truoc day em chi nang paid_amount, thanh ra don ghi "da dong 5
+    trieu" ma so quy trong 0 dong - mot app quan ly hoc phi ma tien khong co phieu thi khong tin
+    duoc, va bo kiem tien bat dung ngay.
+    """
+    _tt = [x for x in R("DL01") if code(x.get("role")) in ("accountant", "ketoan")] or R("DL01")[:1]
+    _nv = _tt[0] if _tt else {}
+    _pn = 0
+    for _p in R("DL07"):
+        _m = re.match(r"PAY-\d{4}-(\d+)$", str(_p.get("payment_id") or ""))
+        if _m:
+            _pn = max(_pn, int(_m.group(1)))
+    R("DL07").append({
+        "payment_id": "PAY-2026-%03d" % (_pn + 1),
+        "enrollment_id": e.get("enrollment_id", ""),
+        "student_id": e.get("student_id", ""), "lead_id": e.get("lead_id", ""),
+        "student_id_name": e.get("student_id_name") or e.get("lead_id_name", ""),
+        "next_action": "",
+        "payment_time": fmt(NOW - datetime.timedelta(days=2)),
+        "payment_method": "bank_transfer (Chuyển khoản NH)",
+        "amount": tien, "transaction_fee": 0, "net_received": tien,
+        "bank_name": "ACB", "sender_name": e.get("lead_id_name", ""),
+        "transaction_ref": "THU-" + str(e.get("enrollment_id") or ""),
+        "received_by": _nv.get("staff_id", ""), "received_by_name": _nv.get("full_name", ""),
+        "verified_by": _nv.get("staff_id", ""), "verified_by_name": _nv.get("full_name", ""),
+        "payment_note": ghichu, "installment_no": str(dot),
+    })
+
+
+_g60 = _g87 = _g88 = 0
+if len(_pend) >= 2:
+    # NA060 - đơn chờ đã 10 ngày, chưa đóng đồng nào: nên hủy để dọn phễu
+    _e = _pend[0]
+    _e["enrollment_time"] = fmt(NOW - datetime.timedelta(days=10))
+    _e["paid_amount"] = 0
+    _e["remaining_amount"] = n(_e.get("final_fee")) or n(_e.get("total_fee"))
+    _raiDot(_e.get("enrollment_id"))
+    _g60 = 1
+    # NA087 - đã đủ cọc tối thiểu mà đơn vẫn treo ở "chờ": em đã đóng tiền mà chưa được xếp lớp
+    _e2 = _pend[1]
+    _e2["paid_amount"] = _coc
+    _tot2 = n(_e2.get("final_fee")) or n(_e2.get("total_fee"))
+    _e2["remaining_amount"] = max(0, _tot2 - _coc)
+    _e2["payment_status"] = eF("enum_payment_status", "partial")
+    # Tien vao thi PHAI co phieu thu. Truoc day em chi nang paid_amount ma khong lap phieu, thanh
+    # ra don ghi "da dong 5 trieu" nhung so quy trong 0 dong - bo kiem tien bat ngay, va dung la
+    # bat dung: mot cai app quan ly hoc phi ma tien khong co chung tu thi khong tin duoc.
+    _lapPhieuThu(_e2, _coc, "Đặt cọc giữ chỗ", 1)
+    _raiDot(_e2.get("enrollment_id"))
+    _g87 = 1
+# NA088 - đã đóng đủ mà chưa có hồ sơ xếp lớp: tiền vào rồi mà dịch vụ chưa bắt đầu.
+# Truoc day em gieo bang cach XOA ho so xep lop cua mot don da dong du. Sai hai duong: (1) xoa la
+# mot tinh huong SOP khac bien mat khong dau vet - da can dung, NA010 bay hoi vi vay; (2) don da
+# dong du deu la cua HOC VIEN THAT, xoa xong con lai mot em khong co bat ky ban ghi xep lop nao,
+# tuc la tao ra mot cai loi du lieu de gieo mot tinh huong. Nay gieo THUAN: lay mot don DANG CHO
+# (chua co ho so xep lop tu dau), cho dong du tien va xac nhan - dung cau chuyen "tien vao roi ma
+# hoc vu chua mo buoc xep lop".
+_obE = {str(o.get("enrollment_id") or "") for o in R("DL08")}
+_du = [e for e in _pend[2:]
+       if str(e.get("enrollment_id") or "") not in _obE
+       and (n(e.get("final_fee")) or n(e.get("total_fee"))) > 0]
+if _du:
+    _rm = _du[0]
+    _phi = n(_rm.get("final_fee")) or n(_rm.get("total_fee"))
+    _rm["paid_amount"] = _phi
+    _rm["remaining_amount"] = 0
+    _rm["payment_status"] = eF("enum_payment_status", "paid")
+    _rm["enrollment_status"] = eF("enum_enrollment_status", "confirmed")
+    _rm["enrollment_time"] = fmt(NOW - datetime.timedelta(days=3))
+    _lapPhieuThu(_rm, _phi, "Đóng đủ học phí", 1)
+    _raiDot(_rm.get("enrollment_id"))
+    _g88 = 1
+log.append("14octodecies. Dang ky: gieo %d ca cho qua han, %d ca du coc con treo, %d ca du tien chua mo onboarding"
+           % (_g60, _g87, _g88))
+
+# ═══ 14septdecies. NĂM MỨC CAN THIỆP HỌC VIÊN NGUY CƠ (V9.41) ════════════
+# SOP phân NĂM mức, mỗi mức một hành động khác hẳn (họp 4 bên / họp 3 bên trong 24h / họp 3 bên /
+# đặt buổi WOW kèm / gọi trong 24-48 giờ). Nhưng dữ liệu demo chỉ có ĐÚNG MỘT người mang cờ
+# off_track - và người đó đã bỏ học, nên năm màn can thiệp không có ca nào để xem, và bộ kiểm
+# không chứng minh được luật có chạy hay không.
+# Gieo từ chính nhóm MÁY ĐÃ THẤY vượt ngưỡng: máy thấy -> học vụ xác nhận -> gắn cờ. Như vậy dữ
+# liệu kể một câu chuyện nhất quán chứ không phải cờ rơi từ trên trời xuống.
+def _dangHoc(s):
+    return code(s.get("student_status")) in ("active", "studying", "") or "active" in str(s.get("student_status") or "")
+
+
+_absU = {}
+for _a in R("DL12"):
+    if code(_a.get("attendance_status")) != "no_show":
+        continue
+    if "unexcused" not in code(_a.get("absence_type")):
+        continue
+    _sid = str(_a.get("student_id") or "")
+    _absU[_sid] = _absU.get(_sid, 0) + 1
+_missHW = {}
+for _x in R("DL13"):
+    if code(_x.get("homework_status")) == "missing":
+        _sid2 = str(_x.get("student_id") or "")
+        _missHW[_sid2] = _missHW.get(_sid2, 0) + 1
+
+_ung = [_x2 for _x2 in R("DL09") if _dangHoc(_x2)
+        and (_absU.get(str(_x2.get("student_id") or ""), 0) >= 2
+             or _missHW.get(str(_x2.get("student_id") or ""), 0) >= 3)]
+# nặng nhất trước: ai vắng nhiều nhất thì rơi vào mức nặng nhất - đúng thứ tự đời thật
+_ung.sort(key=lambda _y: -(_absU.get(str(_y.get("student_id") or ""), 0)
+                           + _missHW.get(str(_y.get("student_id") or ""), 0)))
+_CC = {"on": "on_track (Đang đều đặn)", "at": "at_risk (Có nguy cơ)", "off": "off_track (Sa sút nặng)"}
+_HT = {"on": "on_track (Đang tiến bộ)", "at": "at_risk (Có nguy cơ)", "off": "off_track (Lệch tiến độ)"}
+# (số người, cờ chuyên cần, cờ học thuật, lý do) - phủ đủ 5 mức SOP mô tả
+_KE = [(1, "off", "off", "vừa yếu chuyên cần vừa yếu học thuật - mức nguy hiểm"),
+       (1, "on", "off", "tiến độ học thuật rớt khỏi lộ trình"),
+       (1, "off", "on", "chuyên cần sa sút nặng"),
+       (2, "on", "at", "học thuật có dấu hiệu rủi ro"),
+       (2, "at", "on", "chuyên cần có dấu hiệu rủi ro")]
+_i = 0
+_dat = 0
+for _n, _cc, _ht, _ly in _KE:
+    for _k in range(_n):
+        if _i >= len(_ung):
+            break
+        _s = _ung[_i]; _i += 1
+        if _cc != "on":
+            _s["attendance_progress_status"] = _CC[_cc]
+        if _ht != "on":
+            _s["academic_progress_status"] = _HT[_ht]
+        _s["learning_followup_note"] = ((_s.get("learning_followup_note") or "") and
+                                        (_s["learning_followup_note"] + " | ")) + \
+            fmt(NOW - datetime.timedelta(days=random.randint(1, 9))) + ": học vụ xác nhận " + _ly + " sau khi máy báo vượt ngưỡng"
+        _dat += 1
+log.append("14septdecies. Nguy co: gan co cho %d hoc vien phu du 5 muc can thiep SOP mo ta "
+           "(chon tu nhom may da thay vuot nguong)" % _dat)
+
 # ═══ 14sexdecies. NGƯỜI GIÁM HỘ / PHỤ HUYNH (V9.40d - anh Luân chốt 29/07) ═
 # "Trong sop a nhớ có quy định số đt phụ huynh hoặc người giám hộ, nên cho chọn ai thanh toán,
 #  ai liên hệ chính luôn."
@@ -1664,6 +2104,81 @@ for _s in dl.get("DL09", []):
     _s.setdefault("risk_ignore_reason", "")
 log.append("14duodecies. Nguy cơ: thêm cột risk_ignore_until/_reason cho %d học viên"
            % len(dl.get("DL09", [])))
+
+# ═══ 14vicies. HAI CA PHẢI GIEO SAU CÙNG (V9.41) ══════════════════════════
+# Hai tình huống này bị các pass phía trên ĐÈ LẠI nếu gieo sớm: pass "thứ tự thời gian" kéo ngày
+# tạo lead về quá khứ, và pass gắn cờ nguy cơ chiếm mất học viên. Gieo ở đây - sau mọi pass,
+# chỉ trước bước san phẳng cột. Đây đúng cái bẫy "vá hai nơi cho cùng một sự thật": gieo hai
+# lần ở hai chỗ thì lần sau đè lần trước, và tình huống biến mất mà không ai biết.
+_v = []
+_ln = [l for l in R("DL02") if code(l.get("lead_status")) == "new"]
+if _ln:
+    _ln.sort(key=lambda l: str(l.get("lead_created_time") or ""), reverse=True)
+    _l0 = _ln[0]
+    _l0["lead_created_time"] = fmt(NOW - datetime.timedelta(minutes=3))
+    _l0["first_call_time"] = ""
+    _l0["contact_count"] = 0
+    _l0["next_followup_time"] = ""
+    _v.append("NA050")
+_absV = {}
+for _a3 in R("DL12"):
+    if code(_a3.get("attendance_status")) == "no_show" and "unexcused" in code(_a3.get("absence_type")):
+        _kk = str(_a3.get("student_id") or "")
+        _absV[_kk] = _absV.get(_kk, 0) + 1
+for _c3 in R("DL09"):
+    _i3 = str(_c3.get("student_id") or "")
+    if _absV.get(_i3, 0) >= 2:
+        continue
+    if code(_c3.get("attendance_progress_status")) not in ("on_track", ""):
+        continue
+    if code(_c3.get("academic_progress_status")) not in ("on_track", ""):
+        continue
+    if "active" not in str(_c3.get("student_status") or ""):
+        continue
+    _bs = [x for x in R("DL13") if str(x.get("student_id") or "") == _i3]
+    if len(_bs) < 3:
+        continue
+    for _b3 in _bs[:3]:
+        # "khong nop" phai don SACH moi dau vet cua viec da nop - de sot gio nop / nhan xet lai
+        # thi dong du lieu tu mau thuan voi chinh no, va bo kiem du lieu bat dung ngay.
+        _b3["homework_status"] = "missing (Không nộp)"
+        _b3["homework_score"] = ""
+        _b3["graded_at"] = ""
+        _b3["homework_submitted_time"] = ""
+        _b3["is_late"] = ""
+        _b3["graded_within_48h"] = ""
+        _b3["teacher_feedback"] = ""
+    _v.append("NA065")
+    break
+# NA085 - phieu test DA CHAM nhung khong ai bam trang thai sau test. Day la loi nguoi that hay gap
+# (cham xong roi quen), SOP co ma nhac rieng cho no; truoc day du lieu demo khong he co ca nao nen
+# nhanh NA085 chua bao gio chay. Chon phieu chua co phieu tu van de khong dam vao NA002/NA086.
+_lidTV = set(str(c.get("lead_id") or "") for c in R("DL04"))
+for _t5 in R("DL03"):
+    if str(_t5.get("lead_id") or "") in _lidTV:
+        continue
+    try:
+        _sc = float(str(_t5.get("overall_score") or "0").replace(",", "."))
+    except ValueError:
+        _sc = 0.0
+    if _sc <= 0 or not str(_t5.get("post_test_status") or "").strip():
+        continue
+    _t5["post_test_status"] = ""
+    _v.append("NA085")
+    break
+log.append("14vicies. Gieo sau cung: %s" % (", ".join(_v) or "khong co"))
+
+# ═══ 14vicies-b. ĐẾM LẠI SĨ SỐ SAU KHI GIEO ══════════════════════════════
+# §8 đã đếm sĩ số một lần, nhưng các khối gieo tình huống ở §14novodecies chuyển học viên sang lớp
+# khác - đếm ở §8 lập tức lỗi thời. Bộ đếm phải chạy SAU cùng mọi thứ đụng vào DL08. Đây là bẫy
+# "thứ tự pass": một pass đúng đặt sai chỗ thì y như không có.
+_c8z = 0
+for _cz in R("DL10"):
+    _real = len([o for o in R("DL08") if str(o.get("class_id")) == str(_cz.get("class_id"))])
+    if int(n(_cz.get("current_enrollment"))) != _real:
+        _cz["current_enrollment"] = _real
+        _c8z += 1
+log.append("14vicies-b. Dem lai si so sau khi gieo: sua %d lop" % _c8z)
 
 # ═══ 15. SAN PHẲNG SƠ ĐỒ CỘT (UNION KEY) - PHẢI LÀ PASS CUỐI CÙNG ═════════
 # Cột chỉ có mặt ở vài dòng (referrer_name, referral_uses, net_received...) làm app render

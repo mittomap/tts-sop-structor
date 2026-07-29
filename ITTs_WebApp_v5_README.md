@@ -1683,3 +1683,48 @@ trang nói thẳng điều này - đó là kênh để các em nói thật, trun
 - **Thang điểm** hiện trên ô chấm bài và được ghi lại khi chấm.
 - **Học viên nói gì sau khi đóng khiếu nại** - có ô nhập khi đóng, và nếu để trống thì việc "hỏi
   lại học viên" vẫn nằm trong hàng chờ cho tới khi có câu trả lời.
+
+## Phân quyền tầng ba - "được LÀM việc gì" (V9.41)
+
+Trước đây app có hai tầng phân quyền: **thấy trang nào** và **thấy dữ liệu của ai**. Còn thiếu
+tầng quan trọng nhất: **được làm việc gì**. SOP có hẳn bảng **CH3. Phân quyền** với 31 hành động,
+trong đó 8 việc ghi rõ "Quản lý phê duyệt" - nhưng app chỉ khóa thật đúng một việc (duyệt chiết
+khấu). Bảy việc còn lại ai mở được trang là bấm xong.
+
+Nay tám việc đó bị chặn **ngay tại cửa ghi**, kèm câu nói rõ phải nhờ ai:
+
+| Việc | Ai duyệt |
+|---|---|
+| Bàn giao lead khi NV nghỉ đột xuất | TP Tư vấn · TP Marketing |
+| Áp dụng chiết khấu từ 1 triệu trở lên | TP Tư vấn |
+| Xác nhận hoàn tiền | TP Kế toán · TP Tư vấn |
+| Đổi lớp lần 2 trở đi (lần 1 miễn phí, Học vụ tự làm) | TP Học vụ |
+| Phê duyệt WOW bổ sung miễn phí | TP Học vụ · TP WOW |
+| Phê duyệt giải pháp khiếu nại | TP Học vụ |
+| Phê duyệt bảo lưu khóa học | TP Học vụ |
+| Cập nhật bảng giá khóa học | Ban Giám đốc |
+
+SOP viết người duyệt là "các *_manager". Đọc nguyên văn thì trưởng phòng HR cũng chốt được hoàn
+tiền - vô lý, nên mỗi việc khai rõ quản lý **nhóm nào** sở hữu nó.
+
+Bảng này xem được ở **Cài đặt > Phân quyền & Phạm vi**, cột cuối cho biết chức danh đang xem có
+được làm từng việc hay không.
+
+## Ba chỉ số KPI mới - đủ 51 chỉ số theo bảng BC2 (V9.41)
+
+- **LFR** - tỷ lệ học viên đang học có ghi chú theo dõi. Ngưỡng SOP: 100%.
+- **APR** - tỷ lệ yêu cầu cần duyệt được duyệt **đúng hạn**. Ngưỡng SOP: ≥ 90%. Hồ sơ chưa duyệt
+  mà còn trong hạn thì **không** bị tính là trượt - chưa vi phạm gì.
+- **SS_ALL** - điểm hài lòng toàn trung tâm, gộp cả khảo sát định kỳ lẫn phản hồi lẻ (chỉ số SS cũ
+  chỉ đọc khảo sát nên bỏ sót đúng nhóm khách chịu khó góp ý riêng). Ngưỡng SOP: ≥ 4.5.
+
+## App nhắc đủ 93 tình huống trong sổ trigger của SOP (V9.41)
+
+Sổ trigger HD3 mô tả 93 tình huống "khi nào thì phải nhắc việc gì". Trước V9.41 app sinh ra 50:
+bộ máy nhắc việc **không có nhánh nào** cho học viên, buổi học và điểm danh, nên 21 mã SOP viết
+cho ba bảng đó chưa bao giờ chạy. Nay app sinh 83 mã lúc chạy thật; 11 mã còn lại là nhãn trạng
+thái "đã xong" nên không có việc gì để nhắc, và đã khai lý do trong bộ kiểm.
+
+Đáng kể nhất là **năm mức can thiệp học viên nguy cơ** - SOP phân năm mức với năm hành động khác
+hẳn nhau (họp 4 bên gấp · họp 3 bên trong 24h · họp 3 bên · đặt buổi WOW kèm · gọi trong 24-48h),
+trước đây app gộp làm một "nguy cơ" chung. Một học viên chỉ nhận **một** việc - mức nặng nhất.

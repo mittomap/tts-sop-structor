@@ -149,7 +149,24 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.40 — BỘ PHẬN NGHIÊN CỨU SẢN PHẨM + 17 MẢNG NÂNG CẤP ✅ XONG (29/07).**
+> **Phiên bản: V9.41 — PHỦ TRỌN SOP ĐO BẰNG MÁY ✅ XONG (29/07 tối).**
+> Anh Luân: *"e biến app thành hoàn hảo nhé, các cổng, giao diện, cài đặt, phân quyền, các chức
+> năng… logic và tính thực tế cực cao. Nếu sop chưa thoả đáng, e cứ sửa."*
+> **`check_sop.py` nay soi SOP gốc ở BỐN mặt, không còn soi bằng trí nhớ:**
+> · **357 cột DL** — đủ (6 cột khai lý do cố ý bỏ qua).
+> · **93 tình huống sổ trigger HD3** — app sinh ra 83 lúc chạy thật, 11 khai lý do. *Trước V9.41
+> app chỉ sinh 50*: `naFor()` KHÔNG có nhánh nào cho DL09/DL11/DL12, nên 21 mã nhắc việc SOP viết
+> cho học viên - buổi học - điểm danh **chưa bao giờ chạy**, mà màn hình vẫn đầy đủ và vẫn đẹp.
+> · **51 chỉ số bảng BC2** — app tính 48, thiếu **LFR, APR, SS_ALL**. Thiếu ở CẢ hai nơi: không có
+> công thức trong app, cũng không có dòng ngưỡng trong CH6 (bản thân SOP lệch: BC2 51 dòng / CH6 48
+> dòng). Nay đủ 51, ngưỡng lấy nguyên cột "Ngưỡng SOP" của BC2.
+> · **31 hành động bảng phân quyền CH3** — SOP ghi **8 việc "Quản lý phê duyệt"**, app trước đây
+> canh thật đúng **1** (duyệt chiết khấu). 7 việc còn lại ai mở được trang là bấm xong: bàn giao
+> lead, hoàn tiền, đổi lớp lần 2+, cấp WOW miễn phí, chốt giải pháp khiếu nại, bảo lưu khóa, đổi
+> bảng giá. Nay có tầng `canAct`/`chanAct` đọc thẳng CH3, chặn ngay tại **cửa ghi**, và bộ kiểm
+> **đóng vai từng chức danh rồi hỏi lại** chứ không soi mã nguồn.
+>
+> **Phiên bản trước: V9.40 — BỘ PHẬN NGHIÊN CỨU SẢN PHẨM + 17 MẢNG NÂNG CẤP ✅ XONG (29/07).**
 > Anh Luân: *"giờ là lúc nâng cấp tiếp, cho bộ phận nghiên cứu sản phẩm vào đi em, rồi cho em toàn
 > quyền nâng cấp, báo cáo lại anh là được"*. Em lập 4 hướng soi song song (người dùng thật · dữ liệu ·
 > chỗ nghẽn trải nghiệm đo bằng trình duyệt · đối chiếu sản phẩm cùng ngành) + một vòng tự soi độc lập
@@ -246,13 +263,14 @@
 > quyền GHI trước, và giữ BƯỚC 0 "thử `git push --dry-run` trước khi làm bất cứ việc gì".
 >
 > **BỘ KIỂM HIỆN TẠI (phải XANH HẾT mới được giao) - một lệnh `./verify.sh`:**
-> node --check 2 file · `_tall` **38 trang 0 lỗi, 176 icon** (nay icon thiếu là ĐỎ THẬT) · `_check11`
-> **145** · `_check12` 37 · `_check13` 174 · `_check14` 111 · `_check15` 39 · **`_check16` 585** ·
-> `_check17` 393 · **`_check18` 177** (vẽ thật 79 trang/tab) · `_checktour` · `_checkdata` 27 luật /
-> **6.333 lượt kiểm - 0 lệch** · `check_logic.py` (nay tách "lỗi thật" khỏi "ca cố ý", in kết luận ổn
-> định) · `check_data.py` DAT · **`_checkui.js` 463 lượt mở THẬT trong Chromium** (thêm probe hộp xác
-> nhận bằng `elementFromPoint`).
-> **Tổng ~1.988 tiêu chí tự động + 463 lượt mở thật.**
+> node --check 2 file · `_tall` **38 trang 0 lỗi, 184 icon** (nay icon thiếu là ĐỎ THẬT) · `_check11`
+> **145** · `_check12` 37 · `_check13` 174 · `_check14` **122** · `_check15` 39 · **`_check16` 601** ·
+> `_check17` 393 · **`_check18` 177** (vẽ thật 80 trang/tab) · `_checktour` · `_checkdata` 27 luật /
+> **6.343 lượt kiểm - 0 lệch** · `check_logic.py` (nay tách "lỗi thật" khỏi "ca cố ý", in kết luận ổn
+> định) · `check_data.py` DAT · **`check_sop.py` đối chiếu SOP gốc BỐN mặt: 357 cột · 93 trigger HD3
+> (chạy thật `naFor`) · 51 chỉ số BC2 · 31 hành động phân quyền CH3 (đóng vai từng chức danh)** ·
+> **`_checkui.js` 466 lượt mở THẬT trong Chromium**.
+> **Tổng ~2.000 tiêu chí tự động + 466 lượt mở thật.**
 > **MỚI: `_src/build_icons.py`** - công thức dựng lại font icon trước đây nằm trong một khối ```bash```
 > giữa tài liệu, người nhận bàn giao gần như chắc chắn không tìm thấy. Nay là một lệnh.
 >
@@ -1706,6 +1724,17 @@ tiền, chia lại lịch, và **lái thật một lần thu tiền rồi soi l�
 hẹn thu có nhảy sang đợt kế tiếp, phiếu thu có được gắn số đợt.
 
 > **VIỆC TỒN web app (ưu tiên trên xuống):**
+> 0. **ĐANG LÀM - "biến app thành hoàn hảo" (anh Luân giao 29/07 tối).** Đã xong hai mảng đo được
+>    bằng máy: **U1** ba chỉ số BC2 còn thiếu (LFR, APR, SS_ALL) và **U2** tầng phân quyền CH3
+>    (8 việc "Quản lý phê duyệt", trước đó chỉ canh thật 1). Còn lại trong chỉ thị đó, theo đúng
+>    thứ tự anh Luân đọc ra - **các cổng · giao diện · cài đặt · phân quyền · các chức năng**:
+>    · **cổng** - cổng học viên / phụ huynh / giáo viên / WOW đã có; chưa đo bằng máy xem mỗi cổng
+>      có đủ thứ SOP mô tả cho vai đó không (VH0-VH11 của SOP là 12 màn tra cứu / việc theo vai -
+>      chưa có bộ kiểm nào đối chiếu).
+>    · **giao diện** - `_checkui` đã canh 466 lượt mở thật; chưa có ai thật ngồi dùng thử.
+>    · **cài đặt** - tham số chết / trùng đã dọn; nên soi tiếp "mọi thứ SOP cho phép trung tâm tự
+>      đổi thì phải có ô sửa".
+>    · **chức năng** - đối chiếu 9 bảng báo cáo BC1-BC9 với báo cáo app đang có.
 > 1. **CHỜ LUÂN NGHIỆM THU ĐỢT 9 + YÊU CẦU KẾ TIẾP** - 4 yêu cầu 28/07 (phòng 2 máy, cổng HV đúng vai, hồ sơ 360 superset, rà sidebar) đã trả xong trong V9.16. Luân cần THỬ THẬT phòng 2 máy trên 2 máy khác nhau (phiên cloud không tự test WebRTC được). Phiên sau: hỏi/đợi yêu cầu kế tiếp trước khi làm gì lớn.
 > 2. **HỘI ĐỒNG TỔNG KIỂM CUỐI (đang HOLD theo lệnh Luân)** - khi Luân bật đèn xanh: gom UX-39 (font Montserrat offline), UX-12 (thanh lọc kiểu cũ), UX-13 (đồng nhất stat-tile), UX-06 (quét hex -> token), CRM-09 (kỳ báo cáo áp vào phễu/bizSection) + 62 cảnh báo mức app còn lại trong _tester.js (baseline 64, trong đó 2 cảnh báo là bug của chính script tester - hardcode enum "paused" không có trong CH1).
 > 3. **2 file Word hướng dẫn** (Luân nói "chưa cần" - chờ lệnh): phụ lục NA085-094, quy tắc MATCH-link, CH4 2 lớp, CH6.
@@ -3225,3 +3254,112 @@ màn cổng nói rõ vì sao chứ không im lặng giấu nút.
 
 **Thêm thì được, bớt thì không.** Và đừng canh bằng trí nhớ: trí nhớ đã sót 9 cột mà không ai
 biết. `check_sop.py` canh hộ, mỗi lần `./verify.sh`.
+
+## V9.41 (29/07 tối) - PHỦ TRỌN SOP ĐO BẰNG MÁY: TRIGGER, CHỈ SỐ, PHÂN QUYỀN
+
+Anh Luân: *"e biến app thành hoàn hảo nhé, các cổng, giao diện, cài đặt, phân quyền, các chức
+năng… logic và tính thực tế cực cao. Nếu sop chưa thoả đáng, e cứ sửa."*
+
+LUẬT CỨNG SỐ 0 nói app phải phủ trọn SOP. V9.40d mới canh được **cột dữ liệu**. Cột chỉ nói "có
+chỗ để lưu"; nó không nói app **có nhắc việc không**, **có tính chỉ số không**, **có chặn đúng
+người không**. Ba mặt đó mới là nghiệp vụ thật. Nay `check_sop.py` soi cả bốn.
+
+### (1) Sổ trigger HD3 - app sinh 50/93, và 21 mã chưa bao giờ chạy
+
+Cách đo: viết một probe chạy **THẬT** `naFor()` trên MỌI dòng của MỌI bảng rồi xem app sinh ra
+những mã nào. Soi mã nguồn chỉ biết "có viết", chạy mới biết "có chạy".
+
+Kết quả đầu tiên: **50/93**. Gốc của 21 chỗ hụt nằm ở một chỗ: `naFor()` **không có nhánh nào**
+cho DL09 (học viên), DL11 (buổi học), DL12 (điểm danh). Mọi mã SOP viết cho ba bảng đó chưa bao
+giờ chạy - mà không ai phát hiện được, vì màn hình vẫn đầy đủ và vẫn đẹp. Đây đúng loại "xanh vì
+không có gì để đỏ".
+
+Riêng DL09, SOP phân **NĂM MỨC** can thiệp, mỗi mức một hành động khác hẳn: họp 4 bên gấp / họp
+3 bên trong 24h / họp 3 bên / đặt buổi WOW kèm / gọi trong 24-48h. Trộn năm mức làm một "nguy cơ"
+chung là mất đúng phần giá trị. Nay `RISKMUC` xếp theo mức nặng nhất - một học viên nhận **MỘT**
+việc, không réo năm lần.
+
+Nay: **83 mã sinh ra lúc chạy thật, 11 mã khai lý do cố ý không sinh.**
+
+### (2) Bảng chỉ số BC2 - thiếu 3 chỉ số, và SOP tự lệch với chính nó
+
+BC2 liệt kê **51** chỉ số; app tính **48**. Ba cái hụt - **LFR** (ghi chú theo dõi đầy đủ),
+**APR** (phê duyệt yêu cầu đúng hạn), **SS_ALL** (điểm hài lòng toàn trung tâm) - hụt ở **CẢ hai
+nơi**: không có công thức trong app, và cũng không có dòng ngưỡng trong CH6. Bản thân SOP đã lệch:
+BC2 51 dòng, CH6 48 dòng. App đọc CH6 để dựng bảng KPI nên thừa hưởng đúng chỗ hụt đó, và màn KPI
+vẫn hiện "đủ" theo CH6.
+
+Anh Luân đã chốt *"nếu SOP chưa thoả đáng, e cứ sửa"* - nên ngưỡng lấy **nguyên cột "Ngưỡng SOP"
+ghi ngay trong BC2** (LFR 100%, APR ≥90%, SS_ALL ≥4.5), không phải em tự nghĩ ra.
+
+Một chi tiết về APR đáng ghi: mẫu số **chỉ gồm hồ sơ đã ngã ngũ** - đã duyệt, hoặc chưa duyệt mà
+đã quá hạn. Hồ sơ chưa duyệt nhưng còn trong hạn thì chưa vi phạm gì; đếm nó là trượt thì chỉ số
+chửi oan người đang làm đúng, và ai nhìn cũng thấy bất công nên sẽ thôi tin cả bảng KPI.
+
+### (3) Bảng phân quyền CH3 - 8 việc "Quản lý phê duyệt", app canh thật đúng 1
+
+SOP có hẳn trang **CH3. Phân quyền**: 31 hành động x 5 vai, trong đó **8 hành động ghi rõ "Quản lý
+phê duyệt"**. App trước đây phân quyền theo **TRANG** (thấy trang nào) chứ không theo **HÀNH
+ĐỘNG**, và chỉ có đúng một cửa được canh thật là duyệt chiết khấu (V9.40b). Bảy việc còn lại - bàn
+giao lead, xác nhận hoàn tiền, đổi lớp lần 2 trở đi, cấp WOW miễn phí, chốt giải pháp khiếu nại,
+bảo lưu khóa học, đổi bảng giá khóa - **ai mở được trang là bấm xong**.
+
+Đây đúng bài học đã ghi: *phân quyền = giấu lối vào + tắt chuông + **CHẶN CHÍNH CỬA GHI***. Hai vế
+đầu app làm rồi; vế thứ ba mới là vế giữ được tiền.
+
+Nay có tầng `CH3` / `canAct(k)` / `chanAct(k)`: bảng chép **nguyên văn** tên hành động trong CH3,
+`chanAct` chặn ngay tại cửa ghi kèm câu nói rõ phải nhờ ai. Tám cửa ghi đã gắn: `reassignSave`,
+`duyetOK`/`duyetNo`, `duyetRefundRun`, `obChangeSave`, `wowGrantSave`, `knResolveSave`,
+`runDropoutSave`, và cửa ghi chung `saveForm` cho bảng khóa học DL05.
+
+**Một chỗ SOP nói chưa đủ, em sửa (báo anh Luân biết):** CH3 ghi người duyệt là "các *_manager".
+Đọc nguyên văn thì trưởng phòng HR cũng chốt được hoàn tiền và duyệt bảo lưu - vô lý. Nên mỗi việc
+cần duyệt khai rõ **quản lý NHÓM NÀO sở hữu nó**: hoàn tiền → TP Kế toán / TP Tư vấn; đổi lớp lần
+2+, WOW miễn phí, khiếu nại, bảo lưu → TP Học vụ; bàn giao lead → TP Tư vấn / TP Marketing; bảng
+giá khóa → **chỉ Ban Giám đốc**. Đo lại: TP Tư vấn duyệt được 3 việc, TP Học vụ 4, TP Kế toán 1,
+TP WOW 1, TP Marketing 1, **TP Hỗ trợ 0** - trước khi siết thì mọi trưởng phòng đều duyệt được cả 8.
+
+Bảng CH3 hiện luôn trong **Cài đặt > Phân quyền & Phạm vi**, cột cuối nói thẳng "chức danh đang
+xem có được làm việc này không".
+
+### BỐN CÁI BẪY CẮN TRONG ĐỢT NÀY
+
+**(a) Đọc file xlsx sai - và nó im lặng.** Hàm đọc shared string cắt theo `<t>`, trong khi một ô
+có định dạng (đậm một đoạn) bị Excel chia thành nhiều `<t>` trong **cùng một** `<si>`. Từ ô đó trở
+đi **mọi chỉ số đều lệch**, và lệch im lặng: đọc ra một chuỗi khác hẳn nhưng vẫn là chuỗi hợp lệ.
+Thêm một lỗi thứ hai cùng chỗ: regex ô `<c...>(.*?)</c>|<c.../>` cho `[^>]*` nuốt cả dấu `/`, nên
+ô rỗng tự đóng `<c r="B24"/>` khớp nhánh đầu và **nuốt luôn mấy ô kế tiếp**. Bảng CH3 đọc ra toàn
+số "1750, 1755" chính là vì vậy. Đã sửa cả hai; số cột/trigger/chỉ số không đổi (357/93/51) nên
+hai lỗi này chưa làm sai kết luận nào - nhưng nó là quả mìn hẹn giờ.
+
+**(b) Điều kiện gieo dữ liệu sạch quá thì khối gieo IM LẶNG KHÔNG CHẠY.** Khối gieo 6 tình huống
+xếp lớp có `if len(_obAll) >= 5`. Sau khi siết điều kiện chọn hồ sơ (cùng khóa + chưa học buổi
+nào) thì không còn đủ 5 hồ sơ nào thỏa - khối bỏ qua, **ba tình huống SOP biến mất**, và bảng tổng
+kết vẫn xanh. Chỉ bộ kiểm trigger mới bắt được. Nay khối đó **kêu to ngay tại chỗ** khi không gieo
+được, và cách chọn đổi hẳn: **KHÔNG ĐỔI LỚP nữa**, giữ nguyên lớp của chính hồ sơ đó, chỉ dựng lại
+mốc thời gian. Không đổi lớp thì không thể lệch lớp, lệch khóa, hay lệch điểm danh.
+
+**(c) Gieo tình huống bằng cách làm hỏng dữ liệu.** NA088 ("đã đóng đủ mà chưa mở xếp lớp") trước
+đây gieo bằng cách **XOÁ** hồ sơ xếp lớp của một đơn đã đóng đủ. Sai hai đường: xoá làm **một tình
+huống SOP khác biến mất không dấu vết** (NA010 bay hơi đúng vì vậy), và đơn đã đóng đủ đều là của
+**học viên thật**, xoá xong còn lại một em không có bản ghi xếp lớp nào - tạo ra một lỗi dữ liệu
+để gieo một tình huống. Nay gieo thuận: lấy một đơn **đang chờ** (vốn chưa có hồ sơ xếp lớp), cho
+đóng đủ tiền và xác nhận.
+
+**(d) Ép con số mà không ép cái sinh ra nó.** Gieo NA047 ("gọi đủ số lần, khách không phản hồi")
+bằng cách gán thẳng `contact_count = 6`, trong khi bảng lịch sử chạm chỉ có 5 dòng. Dữ liệu tự nói
+dối chính nó, và bộ kiểm bắt ngay ("lượt liên hệ lệch số bản ghi chạm"). Ngoài đời cũng vậy: gọi 6
+lần thì phải có 6 dòng nhật ký, không thể có con số 6 lơ lửng không ai trả lời được "6 lần đó gọi
+lúc nào". Nay **ghi thêm bản ghi chạm thật** rồi mới đếm. Cùng họ với bẫy này: khối gieo chạy SAU
+§13 nên gõ tay nhãn enum ("in_progress (Đang làm)" trong khi CH1 ghi "Đang thực hiện") - nay có
+`eF()` lấy nhãn nguyên văn từ danh mục.
+
+### Pipeline dữ liệu demo phải chạy được TỪ ĐẦU
+
+Chạy trọn `gen_demo → seed_giaoan → mkdemo → fixdata → seed_giaoviec` từ đầu ra **1 lỗi nặng + 6
+lỗi vừa**, trong khi file JSON đang nằm trong repo thì sạch. Nghĩa là file trong repo được vá bằng
+những lần chạy lẻ, còn pipeline - thứ mà người nhận bàn giao sẽ chạy - thì hỏng. Đã vá ở nguồn:
+phiếu thu cho mọi khoản tiền vừa ghi (`_lapPhieuThu`), rải lại lịch đợt khi đổi `paid_amount`
+(`_raiDot`), đếm lại sĩ số **sau** mọi khối gieo (§14vicies-b), và `check_data` so ngày xếp lớp
+với ngày khai giảng **theo NGÀY** thay vì theo giờ (xếp lớp 8h sáng đúng ngày khai giảng của lớp
+học 9h-12h đang bị kết oan).
