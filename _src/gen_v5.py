@@ -11282,12 +11282,18 @@ function tourPrev(){if(TOUR.i>0){TOUR.i--;tourShow()}}
    Viết màn mới thì gắn data-tour ngay lúc viết, đừng để dồn. */
 function tourSel(sel){sel=String(sel||"");
  return sel.charAt(0)==="@" ? '[data-tour="'+sel.slice(1)+'"]' : sel}
+/* Phần tử có nằm trong một khối position:fixed không - cuộn tới nó là vô nghĩa. */
+function tourFixed(el){
+ try{for(var p=el;p&&p!==document.body;p=p.parentElement){
+  var cs=getComputedStyle(p);if(cs.position==="fixed"||cs.position==="sticky")return true}}catch(e){}
+ return false}
 function tourFind(sel){sel=tourSel(sel);if(!sel)return null;
  try{var l=document.querySelectorAll(sel);
   for(var i=0;i<l.length;i++){var r=l[i].getBoundingClientRect&&l[i].getBoundingClientRect();
    if(r&&(r.width>4||r.height>4))return l[i]}
   return l[0]||null}catch(e){return null}}
 function tourShow(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
+ window.__tourScroll="";   /* sang bước mới thì được cuộn lại một lần */
  var st=T.steps[TOUR.i];if(!st){tourEnd();return}
  if(st.ctx)try{st.ctx()}catch(e){}
  if(st.p&&typeof go==="function"&&CUR!==st.p){try{go(st.p)}catch(e){}}
@@ -11331,8 +11337,15 @@ function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
  var r=el&&el.getBoundingClientRect?el.getBoundingClientRect():null;
  var vw=window.innerWidth||1200,vh=window.innerHeight||800;
  if(r&&(r.width>4||r.height>4)){
-  if(r.top<70||r.bottom>vh-70){try{el.scrollIntoView({block:"center",behavior:"smooth"});
-   setTimeout(tourPaint,320);return}catch(e){}}
+  /* V9.35 (anh Luân: "cái tham quan toàn cảnh chẳng được, đen thui"): chỗ cần trỏ nằm trong THANH
+     CỐ ĐỊNH (sidebar, thanh tiêu đề) thì cuộn kiểu gì nó cũng vẫn ở sát mép - điều kiện r.top<70
+     KHÔNG BAO GIỜ thoả, nên hàm vẽ cứ cuộn rồi thoát ra chờ vẽ lại, lặp vô hạn và KHÔNG BAO GIỜ vẽ.
+     Kết quả trên màn: vòng sáng chưa có kích thước, chỉ còn lớp phủ tối trùm cả màn hình - "đen thui".
+     Sửa hai lớp: (1) phần tử nằm trong khối position:fixed thì đừng cuộn, nó không đi đâu cả;
+     (2) mỗi bước chỉ cho cuộn ĐÚNG MỘT LẦN - cuộn xong vẫn chưa vừa thì cứ vẽ, thà lệch còn hơn đen. */
+  if((r.top<70||r.bottom>vh-70)&&!tourFixed(el)&&window.__tourScroll!==TOUR.key+"|"+TOUR.i){
+   window.__tourScroll=TOUR.key+"|"+TOUR.i;
+   try{el.scrollIntoView({block:"center",behavior:"smooth"});setTimeout(tourPaint,320);return}catch(e){}}
   s.style.display="";s.style.left=(r.left-6)+"px";s.style.top=(r.top-6)+"px";
   s.style.width=(r.width+12)+"px";s.style.height=(r.height+12)+"px";
  }else{ /* KHÔNG thấy phần tử cần trỏ: nói thẳng chứ đừng khoanh bừa giữa màn - khoanh bừa
@@ -12267,7 +12280,8 @@ function tthKey(){var me="";try{me=tkMeId()||CURSTAFF||""}catch(e){me=CURSTAFF||
  return "ITTS_TROTHU_"+(me||"guest")}
 function tthOn(){try{var v=localStorage.getItem(tthKey());return v===null?true:v==="1"}catch(e){return true}}
 function tthToggle(){try{localStorage.setItem(tthKey(),tthOn()?"0":"1")}catch(e){}
- tthBtn();reRender(CUR);toast(tthOn()?"Đã bật Trợ thủ - app sẽ nhắc việc ngay trên từng trang.":"Đã tắt Trợ thủ. Bật lại ở nút trên thanh tiêu đề.")}
+ tthBtn();asstTick();reRender(CUR);
+ toast(tthOn()?"Đã bật Trợ thủ - nút tròn ở góc dưới bên phải.":"Đã tắt Trợ thủ. Bật lại ở nút bóng đèn trên thanh tiêu đề.")}
 function tthBtn(){var b=document.getElementById("tthBtn");if(!b)return;
  var on=tthOn();
  b.className="tbtn"+(on?" on":"");
@@ -12322,6 +12336,7 @@ function asstNext(){var L=[];try{L=workAll()}catch(e){}return L[0]||null}
 var NHIPBUOI2=[["sang","Đầu ngày"],["ngay","Trong ngày"],["chieu","Cuối ngày"]];
 function asstBuoiSet(b){window.ASSTBUOI=(window.ASSTBUOI===b?"":b);asstPaint()}
 function asstPaint(){
+ if(!asstBat())return;
  var f=asstFabEl(),a=asstEl();
  var L=[],do_=0;
  try{L=workAll();do_=L.filter(function(x){return x.sev==="red"}).length}catch(e){}
@@ -12393,7 +12408,20 @@ function asstBoQua(){
  window.ASSTSKIP=window.ASSTSKIP||{};window.ASSTSKIP[slaKey(x)]=1;
  asstPaint()}
 /* Trợ thủ phải sống theo dữ liệu: mỗi lần vẽ lại màn hình là cập nhật con số và việc kế tiếp. */
-function asstTick(){try{if(tthCfg().on)asstPaint();else{var f=document.getElementById("asstfab");if(f)f.classList.remove("asstfab")}}catch(e){}}
+/* HAI công tắc, hai cấp: `tthCfg().on` là cấu hình của TRUNG TÂM (Cài đặt > Trợ thủ & Nhịp ngày),
+   `tthOn()` là công tắc RIÊNG của từng người (nút bóng đèn trên thanh tiêu đề). Tắt ở cấp nào
+   cũng phải tắt thật: ẩn nút góc, đóng tấm đang mở, và dừng luôn lượt dọn việc đang chạy.
+   V9.35 em dời trợ thủ về góc mà QUÊN nối công tắc riêng - bấm bóng đèn thì icon mờ đi nhưng nút
+   góc vẫn còn nguyên. Công tắc bấm mà không tắt gì là thứ làm người dùng hết tin cả app. */
+function asstBat(){try{return !!tthCfg().on&&tthOn()!==false}catch(e){return true}}
+function asstTick(){
+ try{
+  var f=document.getElementById("asstfab");
+  if(asstBat()){if(f)f.style.display="";asstPaint();return}
+  if(f)f.style.display="none";
+  var a=document.getElementById("asst");if(a)a.classList.remove("on");
+  if(TOUR.on&&(TOURS[TOUR.key]||{}).live)tourEnd();   /* tắt trợ thủ thì dừng luôn lượt dọn */
+ }catch(e){}}
 
 function renderCrumb(){var host=document.getElementById("pgCrumb");if(!host)return;
  var p=PBK[CUR]||{};var h=window.NAVHIST||[];var out="";

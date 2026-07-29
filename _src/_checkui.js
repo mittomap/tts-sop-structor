@@ -163,6 +163,52 @@ const PROBE = () => {
       try { await page.evaluate(() => asstClose()); } catch (e) {}
       await page.waitForTimeout(120);
     }
+    /* V9.35: CHAY THAT tung bai huong dan trong trinh duyet. Bo kiem chuoi (_checktour) goi tourPaint()
+       tren DOM gia nen KHONG THE thay loi that: buoc 1 cua bai "Toan canh app" tro vao logo nam trong
+       sidebar position:fixed, dieu kien r.top<70 KHONG BAO GIO thoa -> tourPaint cuon roi thoat ra cho
+       ve lai, LAP VO HAN va khong bao gio ve. Tren man hinh chi con lop phu toi trum ca man - anh Luan
+       goi la "den thui". Nay moi buoc deu phai: hop huong dan HIEN, va vong sang co KICH THUOC. */
+    if (C.ten === "cong nhan vien" && V.n === "maytinh") {
+      const bais = await page.evaluate(() => Object.keys(TOURS));
+      for (const k of bais) {
+        try { await page.evaluate(k => tourStart(k), k); } catch (e) { bad.push(nhan("bai " + k + " khong chay duoc")); continue; }
+        const n = await page.evaluate(k => TOURS[k].steps.length, k);
+        for (let i = 0; i < n; i++) {
+          await page.evaluate(i => { TOUR.i = i; tourShow(); }, i);
+          await page.waitForTimeout(420);
+          const r = await page.evaluate(() => {
+            const bx = document.getElementById("tourbox"), sp = document.getElementById("tourspot");
+            const T = TOURS[TOUR.key], st = T.steps[TOUR.i];
+            const tim = !!tourFind(st.sel);
+            return {hopHien: !!bx && bx.offsetHeight > 40 && getComputedStyle(bx).display !== "none",
+              timThay: tim, dock: !!st.dock,
+              vongCoKichThuoc: !!sp && !!sp.style.width && sp.style.width !== "0px",
+              vongAn: !!sp && sp.style.display === "none"};
+          });
+          if (!r.hopHien) bad.push(nhan("bai " + k + " buoc " + (i + 1) + ": HOP HUONG DAN KHONG HIEN"));
+          if (r.timThay && !r.dock && !r.vongCoKichThuoc && !r.vongAn)
+            bad.push(nhan("bai " + k + " buoc " + (i + 1) + ": vong sang KHONG CO KICH THUOC (lop phu trum ca man)"));
+        }
+        try { await page.evaluate(() => tourEnd()); } catch (e) {}
+        await page.waitForTimeout(80);
+        luot += n;
+      }
+      /* CONG TAC bat/tat tro thu phai TAT THAT - bam ma khong tat gi la thu lam nguoi dung het tin app */
+      const ct = await page.evaluate(() => {
+        const nut = () => { const f = document.getElementById("asstfab"); return !!f && getComputedStyle(f).display !== "none"; };
+        const truoc = nut();
+        tthToggle(); const sauTat = nut(); const coTat = tthOn();
+        tthToggle(); const sauBat = nut();
+        tthSet("on", 0); asstTick(); const sauTatCauHinh = nut();
+        tthSet("on", 1); asstTick();
+        return {truoc, sauTat, coTat, sauBat, sauTatCauHinh};
+      });
+      if (!ct.truoc) bad.push(nhan("mac dinh tro thu phai HIEN nut goc"));
+      if (ct.sauTat) bad.push(nhan("bam nut bong den TAT tro thu ma nut goc VAN CON"));
+      if (!ct.sauBat) bad.push(nhan("bat lai tro thu ma nut goc khong hien"));
+      if (ct.sauTatCauHinh) bad.push(nhan("tat tro thu o CAU HINH ma nut goc van con"));
+      luot++;
+    }
     for (const m of mans) {
       const ok = await page.evaluate(m => {
         try {
