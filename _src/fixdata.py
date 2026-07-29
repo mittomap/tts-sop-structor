@@ -1490,6 +1490,16 @@ for r in dl.get("DL03", []):
 log.append("14undecies. Test: kéo %d buổi ĐÃ điểm danh dự thi về quá khứ (chống trôi theo đồng hồ)"
            % _ttfix)
 
+# ═══ 14duodecies. HAI CỘT CHO "TẠM BỎ QUA CẢNH BÁO NGUY CƠ" (V9.40) ══════
+# Từ V9.40 máy tự đếm vắng/thiếu bài theo ngưỡng CH2 chứ không đợi ai bấm cờ. Học vụ xem
+# xong mà thấy KHÔNG phải nguy cơ thật thì phải gạt được - nhưng gạt VĨNH VIỄN thì việc
+# biến mất mà không ai biết vì sao, nên gạt CÓ HẠN và CÓ LÝ DO. Hai cột này giữ chỗ đó.
+for _s in dl.get("DL09", []):
+    _s.setdefault("risk_ignore_until", "")
+    _s.setdefault("risk_ignore_reason", "")
+log.append("14duodecies. Nguy cơ: thêm cột risk_ignore_until/_reason cho %d học viên"
+           % len(dl.get("DL09", [])))
+
 # ═══ 15. SAN PHẲNG SƠ ĐỒ CỘT (UNION KEY) - PHẢI LÀ PASS CUỐI CÙNG ═════════
 # Cột chỉ có mặt ở vài dòng (referrer_name, referral_uses, net_received...) làm app render
 # ô trống và bản Sheets lệch cột. LUẬT: mọi dòng trong cùng một bảng phải CÙNG BỘ CỘT.

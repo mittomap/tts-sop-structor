@@ -682,7 +682,13 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  /* hai chieu: tham so app DOC that thi phai co o sua */
  var used=(SRC.match(/param(?:Of|Str)\("[A-Za-z0-9_]+"/g)||[]).map(function(x){return x.slice(x.indexOf('"')+1,-1)});
  var decl={};APPPARAMS.forEach(function(p){decl[p[1]]=1});
- var thieu=used.filter(function(k,i){return used.indexOf(k)===i&&!decl[k]});
+ /* V9.40: ten app doc CO THE la ten cu, duoc PKEY dan ve dong cau hinh that. Nhu vay van la
+    "co o sua" - chi la o do mang ten khac. Truoc day check nay khong biet PKEY nen ep phai co
+    HAI dong cho cung mot su that, tuc la no dang CANH GAC dung cai benh tham so trung. */
+ var thieu=used.filter(function(k,i){
+  if(used.indexOf(k)!==i)return false;
+  if(decl[k])return false;
+  return !((PKEY[k]||[]).some(function(a){return decl[a]}))});
  t("khong con tham so app doc ma khong co o sua"+(thieu.length?(" ("+thieu.join(", ")+")"):""), thieu.length===0);
  window.SETTAB="ch2";
  var pg=RENDER["settings"]();
@@ -848,9 +854,29 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("moi viec sinh ra deu chi ro nguong lay tu tham so nao hoac khong ghi gi - khong bao gio nham sang o hanh dong",
    (function(){var xau=slaItems().filter(function(x){return x.act&&/^sla[A-Z]|^threshold[A-Z]|_days$|_hours$|_min$/.test(x.act)});
     return xau.length===0})());
- /* bon nguong moi phai co o sua that */
- ["slaDiscountApprove_hours","slaPaymentVerify_hours","slaClassInfoSend_hours","slaRiskFollowup_days"].forEach(function(k){
+ /* cac nguong phai co o sua that */
+ ["slaDiscountApprove_hours","slaPaymentVerify_hours","slaRiskFollowup_days",
+  "thresholdClassStart_days","classMinStudents","classDecide_days","riskIgnore_days"].forEach(function(k){
   t("tham so moi "+k+" co o sua", APPPARAMS.some(function(p){return p[1]===k}))});
+ /* V9.40 - THAM SO CHET: co dong trong Cai dat, chu trung tam sua duoc, nhung KHONG dong ma nao
+    doc. Nguoi dung sua xong khong co gi doi va khong biet vi sao. Do trong ban V9.39 co 3 tham so
+    nhu vay (slaPaymentVerify_hours, slaRiskFollowup_days, thresholdClassStart_days) - ca ba deu
+    chi duoc gan lam NHAN prm tren chip viec, tuc la chip bao "nguong lay tu day" ma chang lay gi.
+    Doc bang paramOf/paramStr/P(/slaChip deu tinh la co doc. */
+ (function(){
+  var chet=APPPARAMS.map(function(p){return p[1]}).filter(function(k){
+   /* apptH la ham doc rieng cua nhom tham so gio hen - khong ke vao day thi 5 tham so hen
+      nhanh bi bao chet oan. Them ham doc moi thi phai them ten vao danh sach nay. */
+   var re=new RegExp('(paramOf|paramStr|slaChip|kpiChip|apptH|\\bP)\\(\\s*"'+k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+'"');
+   return !re.test(SRC)});
+  t("khong con tham so CHET (co o sua ma khong dong ma nao doc)"+(chet.length?": "+chet.join(", "):""), chet.length===0)})();
+ /* V9.40 - THAM SO TRUNG: hai dong cung nghia trong Cai dat thi mot dong la MOI. Sua nham dong
+    moi thi khong co tac dung, va khong ai biet minh sua nham. Da tung co hai cap: ClassInfoSend
+    vs ClassInfoZalo, HomeworkGrade vs HomeworkGrading. */
+ (function(){
+  var ten=APPPARAMS.map(function(p){return p[1]});
+  var trung=ten.filter(function(k){return PKEY[k]&&ten.indexOf(PKEY[k][0])>=0});
+  t("khong con tham so TRUNG (ten cu va ten moi cung nam trong Cai dat)"+(trung.length?": "+trung.join(", "):""), trung.length===0)})();
  /* hotline: PHAI lay tu cau hinh, khong bia so */
  t("du lieu demo KHONG bia san so hotline", String(paramStr("centerHotline","")||"").replace(/\s/g,"")!=="19006789");
  t("chua cau hinh thi khong dung nut goi gia", (function(){

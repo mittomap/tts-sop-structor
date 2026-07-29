@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """KIEM SAU: mau thuan logic nghiep vu (bo sung cho check_data.py)."""
-import json, re, datetime, os, collections
+import json, re, datetime, os, sys, collections
 
 import os
 P = os.path.join(os.path.dirname(os.path.abspath(__file__)), "demo_data_big.json")
@@ -747,18 +747,38 @@ if SCH:
     rep("NANG", "17i Tham so cau hinh dong theo dot THIEU trong CH2", p9)
 
 # ══ IN KET QUA ═══════════════════════════════════════════════════════════
+# CA CO Y: nhung luat duoi day KHONG phai loi - du lieu demo co tinh dung nhu vay de man hinh
+# co canh bao ma xem. Truoc V9.40 chung bi cong chung vao "TONG BAN GHI LOI" va verify.sh doi
+# dung con so 4. Nhung so do TROI THEO NGAY: viec qua han hom nay it hon ngay mai, nen bo kiem
+# tu chuyen do ma khong ai dung vao ma. Mot bo kiem tu do la bo kiem bi bo qua. Nay tach hai
+# so: loi that (phai bang 0) va ca co y (bao nhieu cung duoc).
+COY = {
+    "10k Viec chua xong va DA QUA HAN (demo canh bao do)":
+        "co y - de trang Giao viec luon co viec qua han mau do; so nay tang dan theo ngay",
+}
 ORD = {"NANG":0,"VUA":1,"NHE":2}
 print("\n" + "="*90)
 tot = 0
+coy_tot = 0
 for sev in ("NANG","VUA","NHE"):
-    hits = [o for o in OUT if o[0]==sev and o[2]>0]
+    hits = [o for o in OUT if o[0]==sev and o[2]>0 and o[1] not in COY]
     print("\n##### %s (%d luat co loi)" % (sev, len(hits)))
     for _,name,cnt,ex,extra in sorted(hits, key=lambda o:-o[2]):
         tot += cnt
         print("  [%4d] %s" % (cnt, name))
         print("         vd: %s" % "; ".join(str(x) for x in ex))
         if extra: print("         (%s)" % extra)
+print("\n### CA CO Y (khong tinh la loi):")
+_coy_hit = [o for o in OUT if o[1] in COY and o[2] > 0]
+if not _coy_hit:
+    print("  (khong co)")
+for _,name,cnt,ex,_ in _coy_hit:
+    coy_tot += cnt
+    print("  [%4d] %s" % (cnt, name))
+    print("         %s" % COY[name])
 print("\n### SACH (khong loi):")
 for _,name,cnt,_,_ in OUT:
     if cnt==0: print("  OK -", name)
-print("\nTONG BAN GHI LOI:", tot)
+print("\nTONG BAN GHI LOI:", tot, "| ca co y:", coy_tot)
+print("KET QUA: %s" % ("DAT" if tot == 0 else "KHONG DAT"))
+sys.exit(0 if tot == 0 else 1)

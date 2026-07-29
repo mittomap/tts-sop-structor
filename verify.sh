@@ -80,7 +80,11 @@ chay "_checkdata du lieu vs luat" "CHECKDATA OK"         node _checkdata.js
 
 echo
 echo "${Dam}== 4. DU LIEU DEMO ==${Het}"
-chay "check_logic.py"  "TONG BAN GHI LOI: 4" python3 check_logic.py
+# V9.40: truoc day cho khop "TONG BAN GHI LOI: 4". So 4 do gom ca CA CO Y (viec demo de qua han
+# cho co canh bao mau do) - ma so ca co y TANG DAN THEO NGAY. Ngay 29/07 no thanh 5 va bo kiem tu
+# chuyen do du khong ai dung vao ma. Nay check_logic.py tach "loi that" khoi "ca co y" va in mot
+# dong ket luan on dinh.
+chay "check_logic.py"  "KET QUA: DAT"        python3 check_logic.py
 chay "check_data.py"   "KET QUA: DAT"        python3 check_data.py
 
 echo

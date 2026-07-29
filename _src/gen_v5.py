@@ -1055,7 +1055,14 @@ input[type=checkbox],input[type=radio]{width:17px;height:17px;flex:none;accent-c
 .pcard{cursor:pointer}
 .mask{position:fixed;inset:0;background:rgba(20,30,45,.42);z-index:170;display:none}
 .mask.on{display:block}
-.cfmask{position:fixed;inset:0;background:rgba(20,30,45,.5);z-index:95;display:none;align-items:center;justify-content:center;padding:20px}
+/* V9.40 - LỖI CHẶN ĐỨNG, đo bằng trình duyệt thật: hộp "Xác nhận thao tác" để z-index 95, thấp
+   hơn hẳn .mask (170), .drawer (171) và .asst (199). Nghĩa là mọi thao tác cần xác nhận mà bấm
+   TỪ TRONG ngăn kéo hoặc TỪ tấm Trợ thủ đều bật hộp lên rồi chôn nó xuống dưới - người dùng bấm
+   không tới nút "Xác nhận", màn hình trông như app hỏng. Đo elementFromPoint tại tâm nút ở 4 khổ
+   390/1024/1440/1920: không khổ nào bấm được. Luồng khiếu nại (Nhận - Bắt đầu xử lý - Leo thang,
+   cả ba đi qua confirmRun) vì thế KHÔNG hoàn thành được; nút "Làm ngay" của Trợ thủ ở khổ điện
+   thoại cũng vậy. Hộp xác nhận phải nằm TRÊN mọi thứ - nó là thứ cuối cùng chặn trước khi ghi. */
+.cfmask{position:fixed;inset:0;background:rgba(20,30,45,.5);z-index:210;display:none;align-items:center;justify-content:center;padding:20px}
 .cfmask.on{display:flex}
 .cfbox{background:#fff;border-radius:14px;max-width:410px;width:100%;padding:20px 22px;box-shadow:0 22px 60px rgba(0,0,0,.32)}
 .cfh{font-size:14px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:7px;margin-bottom:10px}
@@ -2085,7 +2092,7 @@ function isRisk(v){return /at_risk|off_track/.test(ecode(v))}
    còn đa số dừng ở ngăn kéo là đủ. */
 var LISTCFG={
 hocvien:{code:"DL09",filt:"student_status",ro:1,sub:"Học viên (DL09) - lọc theo trạng thái / nguy cơ / lớp / khóa",extra:"hvExtraFilter",
- qf:[["risk","Nguy cơ",function(s){return isRisk(s.attendance_progress_status)||isRisk(s.academic_progress_status)}]],
+ qf:[["risk","Nguy cơ",function(s){return stuRisk(s)}]],
  act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"student_id"},{lb:"Xem nhanh",ic:"ti-eye",fn:"openQuick",arg:"student_id"}],
  cols:[["student_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["student_status","Trạng thái","chip"],["attendance_progress_status","Chuyên cần","chip"],["academic_progress_status","Học thuật","chip"],["attendance_risk_reason","Lý do CC","enum"],["academic_risk_reason","Lý do HT","enum"],["wow_quota_remaining","WOW còn"]]},
 lop:{code:"DL10",filt:"class_status",ro:1,sub:"Lớp học (DL10)",
@@ -2679,18 +2686,126 @@ function stuAttStats(sid){var att=rows("DL12").filter(function(a){return a.stude
     oan là vắng không phép - lệch hẳn với ba chỗ khác trong app (đều dùng /unexcused/). */
  var absU=att.filter(function(a){return isc(a.attendance_status,"no_show")&&/unexcused/.test(ecode(a.absence_type))});
  return {n:att.length,pres:pres,rate:att.length?Math.round(pres/att.length*100):null,absU:absU}}
-function stuRiskReasons(s){var out=[];var sid=s.student_id;
- if(isRisk(s.attendance_progress_status)){var st=stuAttStats(sid);var t="Chuyên cần: "+(elabel(s.attendance_progress_status)||"nguy cơ");
-  if(s.attendance_risk_reason)t+=" — "+elabel(s.attendance_risk_reason);
+/* ===== NGUY CƠ: MÁY TỰ THẤY, KHÔNG ĐỢI AI BẤM CỜ ==================================
+   V9.40. Trước đây cờ nguy cơ là cờ TAY hoàn toàn: phải có người mở hồ sơ rồi bấm "Đánh
+   dấu nguy cơ" thì học viên đó mới vào hàng chờ. Hai ngưỡng thresholdAtRisk_absences và
+   thresholdAtRisk_hw_missing đã nằm sẵn trong CH2 từ lâu, nhưng CHỈ trang học viên tự xem
+   đọc tới - phía nhân viên không một dòng nào đọc. Chạy đúng luật của chính trung tâm trên
+   dữ liệu demo: 11 học viên đang học vi phạm, chỉ 2 người được gắn cờ. KPI ARR vì thế báo
+   3,7% (xanh) trong khi luật thật ra 16,2% (đỏ) - chỉ số quan trọng nhất về chất lượng học
+   đang báo an toàn sai.
+   Nay: cờ TAY vẫn giữ nguyên (người biết những chuyện máy không biết - hoàn cảnh gia đình,
+   thái độ trên lớp), nhưng máy đếm song song và nói ra. "Nguy cơ" = cờ tay HOẶC máy thấy.
+   Chú ý: đây là luật CHÍNH SÁCH của CH2, không phải mô hình dự báo. Đừng nói với ai là nó
+   đoán được ai sẽ bỏ học - nó chỉ chạy đúng cái ngưỡng anh Luân đã viết. */
+var _raC=null,_raV=-1;
+function riskTab(){
+ if(_raC&&_raV===DVER)return _raC;
+ var ab=num(paramOf("thresholdAtRisk_absences",2)),hw=num(paramOf("thresholdAtRisk_hw_missing",3));
+ var T={};
+ function slot(id){return T[id]||(T[id]={abs:0,miss:0,att:false,aca:false,any:false})}
+ rows("DL12").forEach(function(a){
+  if(!isc(a.attendance_status,"no_show"))return;
+  if(!/unexcused/.test(ecode(a.absence_type)))return;
+  if(absPending(a))return;   /* đang chờ duyệt phép thì chưa được tính là không phép */
+  slot(String(a.student_id||"")).abs++});
+ rows("DL13").forEach(function(x){if(hwMissing(x))slot(String(x.student_id||"")).miss++});
+ Object.keys(T).forEach(function(k){var r=T[k];
+  r.att=ab>0&&r.abs>=ab;r.aca=hw>0&&r.miss>=hw;r.any=r.att||r.aca});
+ _raV=DVER;return (_raC=T)}
+function riskAuto(sid){return riskTab()[String(sid||"")]||{abs:0,miss:0,att:false,aca:false,any:false}}
+/* Học viên đã rời thì không còn là "nguy cơ bỏ học" nữa - họ đã đi rồi. */
+function stuGone(s){return /dropped|graduated|transferred/.test(ecode(s&&s.student_status))}
+/* Cờ TAY luôn tính. Phần MÁY THẤY thì bỏ qua nếu học vụ đã xem và tạm gạt có lý do, có hạn. */
+function stuAtt(s){return !!s&&(isRisk(s.attendance_progress_status)||(!ignRisk(s)&&riskAuto(s.student_id).att))}
+function stuAca(s){return !!s&&(isRisk(s.academic_progress_status)||(!ignRisk(s)&&riskAuto(s.student_id).aca))}
+function stuRisk(s){return stuAtt(s)||stuAca(s)}
+function riskWhy(a){var w=[];
+ if(a.abs)w.push("vắng không phép "+a.abs+" buổi");
+ if(a.miss)w.push("thiếu "+a.miss+" bài");
+ return w.join(" · ")}
+/* MÁY THẤY mà NGƯỜI CHƯA GẮN CỜ - đây mới là danh sách đáng gọi hôm nay.
+   Trừ ra những em học vụ đã xem và bấm "tạm bỏ qua" (có lý do, có hạn) - việc lặp lại mỗi
+   ngày dù đã xử lý là thứ dạy người ta bỏ qua cả hàng chờ. */
+function riskUnflagged(){return rows("DL09").filter(function(s){
+ if(stuGone(s)||ignRisk(s))return false;
+ if(!riskAuto(s.student_id).any)return false;
+ return !(isRisk(s.attendance_progress_status)||isRisk(s.academic_progress_status))})}
+/* Lần chăm gần nhất: ghi chú theo dõi được ghi theo dạng "dd/mm/yyyy hh:mm: nội dung",
+   nhiều lần thì nối bằng " | ". Lấy mốc CUỐI CÙNG làm ngày chăm gần nhất. */
+function stuLastCare(s){var t=String((s&&s.learning_followup_note)||"");if(!t)return null;
+ var m=t.match(/\d{1,2}\/\d{1,2}\/\d{4}(\s+\d{1,2}:\d{2})?/g);
+ if(!m||!m.length)return null;return pvnd(m[m.length-1])}
+/* ===== MÀN CHĂM HỌC VIÊN NGUY CƠ ====================================================
+   Ngăn kéo, không phải trang - theo đúng nguyên tắc "đủ thông tin thì drawer tiện hơn
+   nhiều, drawer không đủ người ta tự khắc bấm xem 360". Ở đây phải đủ để QUYẾT ngay:
+   máy thấy gì, người đã gắn cờ chưa, lần chăm gần nhất bao lâu, còn mấy lượt WOW chưa
+   dùng - và ba lối ra ngay trong ngăn kéo. */
+function riskCare(sid){var s=find("DL09","student_id",sid);if(!s){toast("Không thấy học viên");return}
+ var A=riskAuto(sid),hand=isRisk(s.attendance_progress_status)||isRisk(s.academic_progress_status);
+ var care=stuLastCare(s),dd=care?Math.round((new Date().getTime()-care.getTime())/864e5):null;
+ var q=num(s.wow_quota_remaining);
+ var h='<div class="dcard"><h4><i class="ti ti-user-exclamation"></i>'+esc(s.full_name||sid)+'</h4>';
+ h+='<div style="margin-bottom:10px">'+(hand?'<span class="chip red">người đã gắn cờ</span> ':'')+
+  (A.any?'<span class="chip amber">máy thấy vượt ngưỡng</span> ':'')+
+  (ignRisk(s)?'<span class="chip gray">đang tạm bỏ qua tới '+esc(s.risk_ignore_until)+'</span>':'')+'</div>';
+ h+='<div class="notebar"><i class="ti ti-radar"></i>Vắng không phép <b>'+A.abs+'</b> buổi, ngưỡng '+
+  slaChip("thresholdAtRisk_absences",2)+' · thiếu <b>'+A.miss+'</b> bài, ngưỡng '+
+  slaChip("thresholdAtRisk_hw_missing",3)+' · còn <b>'+(String(s.wow_quota_remaining||"")===""?"-":q)+'</b> lượt WOW chưa dùng.</div>';
+ var why=stuRiskReasons(s);
+ if(why.length)h+='<div class="bwap">'+why.map(function(x){return '<div>· '+esc(x)+'</div>'}).join("")+'</div>';
+ h+='<div class="fld full"><label>Lần chăm gần nhất</label><div>'+
+  (care?esc(dd+" ngày trước ("+String(s.learning_followup_note).split(" | ").pop()+")"):'<span class="mut">chưa ghi lần chăm nào</span>')+
+  '<div class="fhint">Hạn chăm lại '+slaChip("slaRiskFollowup_days",3)+'</div></div></div>';
+ h+='<div class="fld full"><label>Ghi lần chăm này <i>*</i></label><textarea id="rc_note" rows="2" placeholder="vd: gọi phụ huynh, em bận thi học kỳ, hẹn đi học lại từ tuần sau"></textarea></div>';
+ h+='<div class="fld full" style="display:block">'+
+  '<button class="btn primary" onclick="riskCareSave(\''+esc(sid)+'\')"><i class="ti ti-phone-check"></i>Ghi lần chăm</button> '+
+  (q>0?'<button class="btn" onclick="wowAdd(\''+esc(sid)+'\')"><i class="ti ti-star"></i>Đặt buổi WOW ('+q+' lượt còn)</button> ':'')+
+  (hand?'':'<button class="btn danger" onclick="riskFlagRun(\''+esc(sid)+'\')"><i class="ti ti-flag"></i>Gắn cờ nguy cơ</button> ')+
+  '<button class="btn" onclick="openHoso(\''+esc(sid)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>'+
+  '</div>';
+ if(A.any&&!hand){
+  h+='<div class="fld full"><label>Hoặc: tạm bỏ qua (máy thấy nhưng thực tế không phải nguy cơ)</label>'+
+   '<input id="rc_ign" placeholder="lý do - vd: em xin nghỉ dài có phép miệng, đã hẹn học bù"></div>'+
+   '<div class="fld full"><button class="btn" onclick="riskIgnoreSave(\''+esc(sid)+'\')"><i class="ti ti-bell-off"></i>Tạm bỏ qua '+
+   num(paramOf("riskIgnore_days",14))+' ngày</button><div class="fhint">Hết hạn máy nhắc lại. Bỏ qua vĩnh viễn thì không có - việc biến mất mà không ai biết vì sao là thứ làm hỏng hàng chờ.</div></div>'}
+ h+='</div>';
+ openDrawer("Chăm học viên nguy cơ",h)}
+function ignRisk(s){var u=pvnd(s&&s.risk_ignore_until);return !!(u&&u.getTime()>Date.now())}
+function riskCareSave(sid){var s=find("DL09","student_id",sid)||{};var t=String(fldV("rc_note")||"").trim();
+ if(!t){toast("Ghi vài chữ đã làm gì - để người sau còn biết.");return}
+ markRow("DL09","student_id",sid,{learning_followup_note:(s.learning_followup_note?s.learning_followup_note+" | ":"")+nowStr()+": "+t+" ("+myName()+")"},
+  "Đã ghi lần chăm - việc lùi hạn "+(num(paramOf("slaRiskFollowup_days",3))||3)+" ngày.");closeModal()}
+function riskFlagRun(sid){var s=find("DL09","student_id",sid)||{};var A=riskAuto(sid);var v={};
+ if(A.att||!A.aca)v.attendance_progress_status=eFull("enum_attendance_progress_status","at_risk");
+ if(A.aca)v.academic_progress_status=eFull("enum_academic_progress_status","at_risk");
+ v.risk_ignore_until="";v.risk_ignore_reason="";
+ v.learning_followup_note=(s.learning_followup_note?s.learning_followup_note+" | ":"")+nowStr()+": gắn cờ nguy cơ theo ngưỡng ("+riskWhy(A)+") ("+myName()+")";
+ markRow("DL09","student_id",sid,v,"Đã gắn cờ nguy cơ - việc chuyển sang nhóm cần chăm.");closeModal()}
+function riskIgnoreSave(sid){var s=find("DL09","student_id",sid)||{};var r=String(fldV("rc_ign")||"").trim();
+ if(!r){toast("Phải ghi lý do bỏ qua - không thì tháng sau không ai hiểu vì sao.");return}
+ var n=num(paramOf("riskIgnore_days",14))||14;var d=new Date(Date.now()+n*864e5);
+ function p(x){return x<10?"0"+x:x}
+ markRow("DL09","student_id",sid,{risk_ignore_until:p(d.getDate())+"/"+p(d.getMonth()+1)+"/"+d.getFullYear(),risk_ignore_reason:r,
+  learning_followup_note:(s.learning_followup_note?s.learning_followup_note+" | ":"")+nowStr()+": tạm bỏ qua cảnh báo nguy cơ "+n+" ngày - "+r+" ("+myName()+")"},
+  "Đã tạm bỏ qua "+n+" ngày - hết hạn máy nhắc lại.");closeModal()}
+function stuRiskReasons(s){var out=[];var sid=s.student_id;var A=riskAuto(sid);
+ /* V9.40: nói RÕ nguồn của mỗi lý do. "Người gắn cờ" và "máy đếm vượt ngưỡng" là hai chuyện
+    khác nhau - trộn chung thì học vụ không biết nên tin cái nào, và không biết cái nào cần
+    xác nhận lại. */
+ if(isRisk(s.attendance_progress_status)){var st=stuAttStats(sid);var t="Chuyên cần: "+(elabel(s.attendance_progress_status)||"nguy cơ")+" (người gắn cờ)";
+  if(s.attendance_risk_reason)t+=" - "+elabel(s.attendance_risk_reason);
   if(st.absU.length)t+=" · vắng không phép "+st.absU.length+" buổi";out.push(t)}
+ else if(A.att)out.push("Chuyên cần: máy thấy vượt ngưỡng - vắng không phép "+A.abs+" buổi (ngưỡng "+num(paramOf("thresholdAtRisk_absences",2))+")");
  if(isRisk(s.academic_progress_status)){var miss=rows("DL13").filter(function(x){return x.student_id===sid&&hwMissing(x)}).length;
-  var t2="Học thuật: "+(elabel(s.academic_progress_status)||"nguy cơ");
-  if(s.academic_risk_reason)t2+=" — "+elabel(s.academic_risk_reason);
+  var t2="Học thuật: "+(elabel(s.academic_progress_status)||"nguy cơ")+" (người gắn cờ)";
+  if(s.academic_risk_reason)t2+=" - "+elabel(s.academic_risk_reason);
   if(miss)t2+=" · thiếu "+miss+" bài tập";out.push(t2)}
+ else if(A.aca)out.push("Học thuật: máy thấy vượt ngưỡng - thiếu "+A.miss+" bài (ngưỡng "+num(paramOf("thresholdAtRisk_hw_missing",3))+")");
  return out}
 function openStuQuick(sid){var s=find("DL09","student_id",sid);if(!s){toast("Không thấy học viên");return}
  var KL=stuKhoaLop(sid);var no=stuNoTong(sid);
- var st=stuAttStats(sid);var risk=isRisk(s.attendance_progress_status)||isRisk(s.academic_progress_status);
+ var st=stuAttStats(sid);var risk=stuRisk(s);
  var J=null;try{J=jInfo(sid)}catch(e){}
  function pch(v){return '<span class="chip '+(isRisk(v)?"red":(ecode(v)?"green":"gray"))+'">'+esc(elabel(v)||"-")+'</span>'}
  var h='<div style="margin-bottom:10px"><span class="chip '+(J&&J.S?J.S.cls:"gray")+'">'+esc(J&&J.S?J.S.t:(elabel(s.student_status)||"Học viên"))+'</span>'+(risk?' <span class="chip red"><i class="ti ti-alert-triangle" style="margin-right:3px"></i>Nguy cơ</span>':'')+'</div>';
@@ -2730,7 +2845,7 @@ function openLopQuick(cid){var c=find("DL10","class_id",cid);if(!c){toast("Khôn
  var taught=sess.filter(function(s){return isc(s.session_status,"completed")}).length;
  var totalSess=sess.length||num(c.total_sessions)||num(c.duration_sessions)||0;
  var sids={};enr.forEach(function(o){sids[o.student_id]=1});
- var risk=rows("DL09").filter(function(s){return sids[s.student_id]&&(isRisk(s.attendance_progress_status)||isRisk(s.academic_progress_status))});
+ var risk=rows("DL09").filter(function(s){return sids[s.student_id]&&stuRisk(s)});
  var noNote=sess.filter(function(s){return isc(s.session_status,"completed")&&!String(s.class_note||s.session_note||"").trim()}).length;
  var cap=num(c.class_capacity),si=num(c.current_enrollment)||enr.length,full=cap&&si>=cap;
  var stt=ecode(c.class_status);
@@ -3085,17 +3200,36 @@ function slaItems(){var out=jTasks();
   })})();
  /* (các luật lead cũ đã chuyển vào bộ máy hành trình - xem jTasks) */
  srows("DL04").forEach(function(c){if(isc(c.consultation_status,"not_consulted"))add("Tuyển sinh","Chờ tư vấn lộ trình","amber","ti-messages",c.customer_name_display||c.lead_id,"Chờ tư vấn lộ trình",null,"tuvan","todo",{act:"tvform",rid:c.consultation_id})});
- srows("DL06").forEach(function(e){if(num(e.discount_amount)>=ckThreshold()&&!String(e.discount_approved_by||"").trim()&&!isc(e.enrollment_status,"cancelled"))add("Tài chính","Duyệt chiết khấu","amber","ti-discount-check",e.student_id_name||e.student_id,"Chiết khấu "+vnd(num(e.discount_amount))+" chờ quản lý duyệt",hoursSince(e.enrollment_time),"duyet","",{rid:e.enrollment_id,prm:"slaDiscountApprove_hours"})});
+ /* V9.40: mức độ trước đây để CỨNG "amber" nên tham số slaDiscountApprove_hours chỉ là cái nhãn.
+    Đề nghị chiết khấu treo lâu là chặn cả luồng phía sau - khách chờ báo giá cuối để đóng tiền. */
+ (function(){var dl=paramOf("slaDiscountApprove_hours",24);
+  srows("DL06").forEach(function(e){
+   if(!(num(e.discount_amount)>=ckThreshold()))return;
+   if(String(e.discount_approved_by||"").trim()||isc(e.enrollment_status,"cancelled"))return;
+   var age=hoursSince(e.enrollment_time),over=age!=null&&age>dl;
+   add("Tài chính","Duyệt chiết khấu",over?"red":"amber","ti-discount-check",e.student_id_name||e.student_id,
+    (over?"QUÁ HẠN DUYỆT - ":"")+"Chiết khấu "+vnd(num(e.discount_amount))+" chờ quản lý duyệt (hạn "+dl+"h)",
+    age,"duyet","",{act:"ckduyet",rid:e.enrollment_id,prm:"slaDiscountApprove_hours"})})})();
  srows("DL03").forEach(function(r){var att=isc(r.test_attendance_status,"on_time","late"),graded=isc(r.test_status,"graded"),consulted=isc(r.post_test_status,"consulted");
   var age=hoursSince(r.test_attendance_time);var over=att&&!graded&&age!=null&&age>paramOf("slaTestResult_hours",48);
   if(over)add("WOW","Chấm test đầu vào","red","ti-file-text",r.lead_id_name||r.lead_id,"Test chưa chấm quá hạn",age,"test","grade",{act:"testgrade",rid:r.test_booking_id});
   else if(att&&!graded)add("WOW","Chấm test đầu vào","amber","ti-file-text",r.lead_id_name||r.lead_id,"Test chờ chấm điểm",age,"test","grade",{act:"testgrade",rid:r.test_booking_id});
   else if(graded&&!consulted)add("Tuyển sinh","Tư vấn sau test","amber","ti-messages",r.lead_id_name||r.lead_id,"Có KQ test, chờ tư vấn",null,"test","consult",{act:"testconsult",rid:r.test_booking_id})});
  srows("DL08").forEach(function(o){var s=obState(o);
-  if(s.infoOverdue)add("Học vụ","Gửi thông tin lớp","red","ti-send",o.student_id_name||o.student_id,"Chưa gửi thông tin lớp (quá hạn)",hoursSince(o.assigned_at),"xeplop","sendinfo",{act:"ob",rid:o.onboarding_id,prm:"slaClassInfoSend_hours"});
-  else if(o.class_id&&!s.sent)add("Học vụ","Gửi thông tin lớp","amber","ti-send",o.student_id_name||o.student_id,"Chờ gửi thông tin lớp",hoursSince(o.assigned_at),"xeplop","sendinfo",{act:"ob",rid:o.onboarding_id,prm:"slaClassInfoSend_hours"});
+  if(s.infoOverdue)add("Học vụ","Gửi thông tin lớp","red","ti-send",o.student_id_name||o.student_id,"Chưa gửi thông tin lớp (quá hạn)",hoursSince(o.assigned_at),"xeplop","sendinfo",{act:"ob",rid:o.onboarding_id,prm:"slaClassInfoZalo_hours"});
+  else if(o.class_id&&!s.sent)add("Học vụ","Gửi thông tin lớp","amber","ti-send",o.student_id_name||o.student_id,"Chờ gửi thông tin lớp",hoursSince(o.assigned_at),"xeplop","sendinfo",{act:"ob",rid:o.onboarding_id,prm:"slaClassInfoZalo_hours"});
   if(s.obOverdue)add("Học vụ","Hoàn tất onboarding","red","ti-layout-grid-add",o.student_id_name||o.student_id,"Onboarding quá hạn chưa hoàn tất",hoursSince(o.assigned_at),"xeplop","finish",{act:"ob",rid:o.onboarding_id})});
- srows("DL07").forEach(function(pp){if(!(pp.verified_by&&String(pp.verified_by).trim()))add("Tài chính","Xác nhận khoản thu","amber","ti-receipt",pp.student_id_name||pp.student_id,"Khoản thu chờ xác nhận "+vnd(pp.amount),null,"thanhtoan","verify",{act:"payverify",rid:pp.enrollment_id,prm:"slaPaymentVerify_hours"})});
+ /* ĐỐI SOÁT KHOẢN THU - V9.40: trước đây mức độ để CỨNG "amber" và tuổi việc để null, nên khoản
+    treo 77 ngày đứng cùng một màu với khoản vừa thu sáng nay, và không sắp xếp được theo tuổi.
+    Tham số slaPaymentVerify_hours thì có dòng trong Cài đặt nhưng KHÔNG dòng mã nào đọc - sửa
+    xong không có gì đổi. Nay nó quyết định màu và thứ tự thật. */
+ (function(){var vl=paramOf("slaPaymentVerify_hours",24);
+  srows("DL07").forEach(function(pp){
+   if(pp.verified_by&&String(pp.verified_by).trim())return;
+   var age=hoursSince(pp.payment_time);var over=age!=null&&age>vl;
+   add("Tài chính","Xác nhận khoản thu",over?"red":"amber","ti-receipt",pp.student_id_name||pp.student_id,
+    (over?"QUÁ HẠN ĐỐI SOÁT ("+Math.round(age/24)+" ngày) - ":"")+"Khoản thu chờ xác nhận "+vnd(pp.amount)+" (hạn "+vl+"h)",
+    age,"thanhtoan","verify",{act:"payverify",rid:pp.enrollment_id,prm:"slaPaymentVerify_hours"})})})();
  srows("DL06").forEach(function(e){if(/cancel/.test(ecode(e.enrollment_status)))return;var tot=num(e.final_fee)||num(e.total_fee);var rem=e.remaining_amount!==undefined&&e.remaining_amount!==""?num(e.remaining_amount):Math.max(0,tot-num(e.paid_amount));if(rem<=0)return;
   /* NHẮC TRƯỚC HẠN chứ không đợi quá hạn mới réo - gọi trước vài ngày thì đòi dễ hơn nhiều.
      Số ngày nhắc trước và ngưỡng chuyển đỏ đều lấy từ CH2. */
@@ -3120,14 +3254,62 @@ function slaItems(){var out=jTasks();
   else if(done&&!note)add("WOW","Ghi nội dung WOW","amber","ti-notes",w.student_name||w.student_id,"Buổi WOW chờ ghi nội dung",age,"wow","note",{act:"wownote",rid:w.wow_id})});
  srows("DL17").forEach(function(c){if(isc(c.complaint_status,"resolved"))return;var sev=ecode(c.complaint_severity);var lim=sev==="high"?paramOf("slaComplaintHigh_hours",24):sev==="medium"?paramOf("slaComplaintMed_hours",48):paramOf("slaComplaintLow_hours",72);var age=hoursSince(c.complaint_time);var over=age!=null&&age>lim;
   add("CSKH","Xử lý khiếu nại",over?"red":"amber","ti-alert-triangle",c.student_id_name||c.student_id,(over?"Khiếu nại quá hạn xử lý":"Khiếu nại đang mở")+" · "+(elabel(c.complaint_severity)||sev),age,"khieunai",over?"overdue":"work",{act:"complaint",rid:c.complaint_id})});
- srows("DL13").forEach(function(hw){if(hwSubmitted(hw)&&!hwGraded(hw)){var age=hoursSince(hw.homework_submitted_time||hw.homework_assigned_time);if(age!=null&&age>paramOf("slaHomeworkGrade_hours",48))add("Giảng viên (ACA)","Chấm bài tập","red","ti-book",hw.student_name,"Bài tập chưa chấm quá 48h",age,"baitap",null,{hoso:hw.student_id})}});
+ /* CHẤM BÀI - V9.40 gom theo (LỚP × BÀI), không phải mỗi học viên một dòng.
+    Trước đây: 120 bài chờ chấm đẻ ra 30 dòng việc, mỗi dòng chỉ có nút "Hồ sơ" trỏ sang hồ sơ
+    360 của học viên - mà trang đó KHÔNG có nút chấm bài nào, còn viết "HV đang học đều, không
+    cần làm gì thêm". Nghĩa là app chỉ ra đúng việc rồi dẫn vào ngõ cụt. Trong khi màn chấm thật
+    (btJumpGrade) mở một lượt là chấm cả lớp cùng một bài. Nay một dòng việc = một lượt mở màn. */
+ (function(){var lim=paramOf("slaHomeworkGrading_hours",48),G={};
+  srows("DL13").forEach(function(hw){
+   if(!hwSubmitted(hw)||hwGraded(hw))return;
+   var age=hoursSince(hw.homework_submitted_time||hw.homework_assigned_time);
+   var k=String(hw.class_id||"")+"|"+String(hw.homework_title||"");
+   if(!G[k])G[k]={cls:hw.class_id_name||hw.class_id||"",title:hw.homework_title||"(chưa đặt tên bài)",
+    cid:hw.class_id||"",n:0,over:0,age:null};
+   var g=G[k];g.n++;
+   if(age!=null){if(age>lim)g.over++;if(g.age==null||age>g.age)g.age=age}});
+  Object.keys(G).forEach(function(k){var g=G[k];if(!g.over)return;
+   add("Giảng viên (ACA)","Chấm bài tập","red","ti-book",g.cls,
+    "Bài \""+g.title+"\": "+g.over+"/"+g.n+" bài quá hạn chấm (hạn "+lim+"h) - mở một lượt chấm cả lớp",
+    g.age,"banglop",null,{act:"grade",rid:k,prm:"slaHomeworkGrading_hours"})})})();
+ /* ===== LỚP SẮP KHAI GIẢNG CÓ ĐỦ NGƯỜI KHÔNG =====================================
+    V9.40. Đo trên dữ liệu: 13 lớp đã lên lịch khai giảng với 174 ghế trống, trong đó 3 lớp
+    ĐANG TUYỂN SINH khai giảng trong 6-14 ngày với sĩ số 3/20, 0/14 và 0/12. Nhịp đăng ký thật
+    là ~19 đơn/tháng, tức cần hơn 9 tháng mới lấp hết số ghế đó. Vậy mà không màn hình nào của
+    app nói tới: kpiCompute CỐ Ý loại lớp "đang lên kế hoạch" khỏi chỉ số lấp đầy (đúng cho việc
+    đo), và "7 ngày tới" chỉ đếm hẹn gọi, test, buổi học, WOW - không có mục khai giảng.
+    Tham số thresholdClassStart_days ("cửa sổ lớp sắp khai giảng") đã nằm trong CH2 từ lâu mà
+    KHÔNG hàm nào đọc. Nay nó chạy thật.
+    Đây là quyết định tốn tiền nhất của trung tâm: giữ, dồn lớp, lùi ngày hay hủy sớm. Hủy muộn
+    thì phải hoàn 100% cho người đã đóng, cộng công giữ phòng và giữ giáo viên. */
+ (function(){var win=num(paramOf("thresholdClassStart_days",14))||14;
+  var minS=num(paramOf("classMinStudents",6)),dec=num(paramOf("classDecide_days",7))||7;
+  var t0=new Date();t0.setHours(0,0,0,0);
+  srows("DL10").forEach(function(c){
+   if(!/^(open|planning)$/.test(ecode(c.class_status)))return;
+   var d=pvnd(c.class_start_date);if(!d)return;
+   var left=Math.round((d.getTime()-t0.getTime())/864e5);
+   if(left<0||left>win)return;
+   var si=num(c.current_enrollment),cap=num(c.class_capacity);
+   var thieuGV=!String(c.main_teacher_id||"").trim();
+   var nhan=(c.class_name||c.class_id)+(clsOnline(c)?" (online)":(c.branch?" · "+(elabel(c.branch)||c.branch):""));
+   if(minS>0&&si<minS){
+    var red=left<=dec;
+    add("Học vụ","Lớp sắp khai giảng thiếu sĩ số",red?"red":"amber","ti-calendar-exclamation",nhan,
+     (red?"HẾT GIỜ CÂN NHẮC - ":"")+"Còn "+left+" ngày là khai giảng, sĩ số "+si+"/"+(cap||"?")+
+     " (tối thiểu "+minS+") - thiếu "+(minS-si)+" người. Quyết: dồn lớp, lùi ngày hay hủy sớm",
+     left*24,"xeplop",null,{act:"molop",rid:c.class_id,prm:"classMinStudents"})}
+   if(thieuGV)
+    add("Học vụ","Lớp sắp khai giảng chưa có giáo viên",left<=dec?"red":"amber","ti-user-question",nhan,
+     "Còn "+left+" ngày là khai giảng mà chưa gán giáo viên chính",
+     left*24,"xeplop",null,{act:"molop",rid:c.class_id,prm:"thresholdClassStart_days"})})})();
  /* Bảo lưu sắp hết hạn: gọi mời quay lại TRƯỚC thresholdPauseRemind_days ngày */
  (function(){var rmd=paramOf("thresholdPauseRemind_days",14);
   srows("DL09").forEach(function(x){if(!isc(x.student_status,"transferred","dropped"))return;
    var pu=pvnd(x.pause_until);if(!pu)return;
    var dl=(pu.getTime()-new Date().getTime())/864e5;
    if(dl<=rmd&&dl>-60)add("CSKH","Bảo lưu sắp hết hạn",dl<0?"red":"amber","ti-player-pause",x.full_name||x.student_id,
-    (dl<0?("QUÁ hạn bảo lưu "+Math.ceil(-dl)+" ngày"):("Hết hạn bảo lưu trong "+Math.ceil(dl)+" ngày"))+" - gọi mời quay lại học",null,"baoluu",null,{hoso:x.student_id,prm:"thresholdPauseRemind_days"})})})();
+    (dl<0?("QUÁ hạn bảo lưu "+Math.ceil(-dl)+" ngày"):("Hết hạn bảo lưu trong "+Math.ceil(dl)+" ngày"))+" - gọi mời quay lại học",null,"baoluu",null,{hoso:x.student_id,act:"blcall",rid:x.student_id,prm:"thresholdPauseRemind_days"})})})();
  /* Xin cảm nhận HV đạt mục tiêu (nguồn referral + social proof) */
  (function(){var tD=paramOf("slaTestimonialAsk_days",7);
   srows("DL18").forEach(function(x){if(!isc(x.achievement_status,"achieved"))return;
@@ -3136,7 +3318,7 @@ function slaItems(){var out=jTasks();
    var days=(new Date().getTime()-d.getTime())/864e5;
    if(days<0||days>60)return;
    add("CSKH","Xin cảm nhận học viên",days>tD?"red":"amber","ti-award",x.student_id_name||x.student_id,
-    "HV ĐẠT mục tiêu - xin cảm nhận/testimonial trong "+tD+" ngày sau kết thúc",days*24,"ketthuc",null,{hoso:x.student_id,prm:"slaTestimonialAsk_days"})})})();
+    "HV ĐẠT mục tiêu - xin cảm nhận/testimonial trong "+tD+" ngày sau kết thúc",days*24,"ketthuc",null,{hoso:x.student_id,act:"testi",rid:x.course_end_id,prm:"slaTestimonialAsk_days"})})})();
  /* Cuối vòng đời lớp: sắp kết thúc -> chuẩn bị; đã kết thúc mà thiếu hồ sơ đầu ra -> việc đỏ */
  (function(){var preD=paramOf("thresholdPreEnd_days",30);var nowD=new Date();
   srows("DL10").forEach(function(c){var end=pvnd(c.class_end_date);if(!end)return;
@@ -3188,8 +3370,31 @@ function slaItems(){var out=jTasks();
    if(age<0||age>96)return; /* chỉ quét 4 ngày gần - vắng cũ hơn đã thành chuyện của cờ nguy cơ */
    add("Học vụ","Gọi hỏi thăm HV vắng",age>absH?"red":"amber","ti-phone-off",a.student_name||a.student_id,
     "Vắng không phép buổi "+(ss.session_date||"")+" ("+(ss.class_id_name||ss.class_id||"")+") - gọi trong "+absH+"h rồi ghi chú vào buổi",
-    age,"banglop",null,{hoso:a.student_id})})})();
- srows("DL09").forEach(function(r){if(/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status)))add("Học vụ","Học viên nguy cơ","red","ti-user-exclamation",r.full_name,"Học viên nguy cơ cần can thiệp",null,null,null,{hoso:r.student_id,prm:"slaRiskFollowup_days"})});
+    age,"banglop",null,{hoso:a.student_id,act:"abscall",rid:a.attendance_id,prm:"slaAbsenceCall_hours"})})})();
+ /* HỌC VIÊN NGUY CƠ - V9.40 tách làm hai việc khác hẳn nhau về bản chất:
+    (a) đã gắn cờ rồi thì việc là CHĂM, và nó phải LEO THANG theo slaRiskFollowup_days - trước
+        đây tham số đó chỉ là cái nhãn trên chip, không dòng nào đọc, nên việc đỏ ngay từ giây
+        đầu và đỏ mãi, chăm rồi cũng vẫn đỏ y như chưa chăm;
+    (b) máy thấy vượt ngưỡng mà hồ sơ vẫn ghi đang đều đặn thì việc là XÁC NHẬN rồi gắn cờ -
+        đây là 9 người mà trước đây không màn hình nào của nhân viên nhắc tới. */
+ (function(){var fd=num(paramOf("slaRiskFollowup_days",3))||3;
+  srows("DL09").forEach(function(r){
+   if(stuGone(r))return;
+   var hand=isRisk(r.attendance_progress_status)||isRisk(r.academic_progress_status);
+   var A=riskAuto(r.student_id),why=riskWhy(A);
+   if(hand){
+    var care=stuLastCare(r),dh=care?(new Date().getTime()-care.getTime())/36e5:null;
+    var over=(dh==null)||dh>fd*24;
+    add("Học vụ","Học viên nguy cơ",over?"red":"amber","ti-user-exclamation",r.full_name,
+     (over?"QUÁ HẠN CHĂM - ":"")+"Nguy cơ cần can thiệp"+(why?" ("+why+")":"")+
+     (care?" · chăm gần nhất "+Math.round(dh/24)+" ngày trước":" · chưa ghi lần chăm nào")+
+     " - hạn chăm lại "+fd+" ngày",
+     dh,null,null,{hoso:r.student_id,act:"riskCare",rid:r.student_id,prm:"slaRiskFollowup_days"})}
+   else if(A.any&&!ignRisk(r))
+    add("Học vụ","Máy thấy nguy cơ - chưa gắn cờ","amber","ti-radar",r.full_name,
+     "Vượt ngưỡng của trung tâm ("+why+") mà hồ sơ vẫn ghi đang đều đặn - xác nhận rồi gắn cờ",
+     null,null,null,{hoso:r.student_id,act:"riskCare",rid:r.student_id,
+      prm:A.att?"thresholdAtRisk_absences":"thresholdAtRisk_hw_missing"})})})();
  return out}
 function jumpFlow(page,filter){if(filter){if(page==="xeplop")window.XLFILT=filter;else fset(page,filter)}go(page)}
 function slaAct(act,id){
@@ -3203,6 +3408,14 @@ function slaAct(act,id){
  if(!act){toast("Việc này chưa gắn thao tác - mở hồ sơ để xử lý tay.");return}
  if(act==="jRun")return jRun(id);
  if(act==="tkopen")return tkOpen(id);   /* mã viết thường, hàm viết hoa chữ O - lệch một chữ là im lặng */
+ if(act==="riskCare")return riskCare(id);
+ if(act==="molop")return moLop(id);
+ if(act==="abscall")return absCall(id);
+ if(act==="ckduyet")return ckDuyet(id);
+ if(act==="blcall")return blCallForm(id);
+ if(act==="testi")return ktTestiForm(id);
+ /* mã "grade" mang theo "mã lớp|tên bài" - một lượt mở là chấm cả lớp cùng một bài */
+ if(act==="grade"){var _g=String(id||"").split("|");return btJumpGrade(_g[0],_g[1]||"")}
  if(act==="absForm")return absForm(id);
  if(act==="bhNoteForm")return bhNoteForm(id);
  if(act==="tvform")return tvForm(id);
@@ -4372,7 +4585,7 @@ function naFor(sheet,r){
  if(sheet==="DL13"){                                   /* bài tập */
   if(hwGraded(r))return "NA030";
   if(hwSubmitted(r)){var hs=hSince(r.homework_submitted_time);
-   return (hs!=null&&hs>P("slaHomeworkGrade_hours",48))?"NA071":"NA072"}
+   return (hs!=null&&hs>P("slaHomeworkGrading_hours",48))?"NA071":"NA072"}
   if(hwMissing(r))return "NA029";
   var du=pvnd(r.homework_due_date);
   return (du&&du.getTime()<Date.now())?"NA029":"NA073"}
@@ -5239,7 +5452,7 @@ function renderBanlam(){
   '<div class="bwr"><div class="bwsearch"><i class="ti ti-search"></i><input placeholder="Tìm khách / học viên theo tên hoặc SĐT..." value="'+esc(window.CHAYSRCH||"")+'" oninput="chaySrch(this.value)" autocomplete="off"><div class="pkres" id="bwac" style="position:absolute;top:100%;left:0;right:0;z-index:30;background:#fff;color:var(--text);text-align:left;border-radius:0 0 10px 10px;box-shadow:0 8px 24px rgba(0,0,0,.18)"></div></div>'+
   '<span class="bwsrchhint" id="bwsrchhint"></span></div></div>'; /* V9.18b: hint phải nằm NGOÀI hộp tìm - nằm trong là chữ trắng trên nền trắng + bóp placeholder (Luân bắt lỗi) */
  function cS(k){return all0.filter(function(J){return J.k===k&&J.act}).length}
- var nRisk=rows("DL09").filter(function(s){return isRisk(s.attendance_progress_status)||isRisk(s.academic_progress_status)}).length;
+ var nRisk=rows("DL09").filter(stuRisk).length;
  var nDebt=rows("DL06").filter(function(e){return num(e.remaining_amount)>0&&!/cancel/.test(ecode(e.enrollment_status))}).length;
  var nApprove=rows("DL06").filter(function(e){return num(e.discount_amount)>=ckThreshold()&&!e.discount_approved_by}).length;
  var nWow=rows("DL14").filter(function(w){return isc(w.wow_status,"booked","confirmed")||(ecode(w.wow_status)==="completed"&&!(w.wow_content_note&&String(w.wow_content_note).trim()))}).length;
@@ -6033,7 +6246,7 @@ function renderBanglop(){
   var pres=att.filter(function(a){return isc(a.attendance_status,"on_time","late")}).length;
   var hw=rows("DL13").filter(function(x){return x.class_id===cid});
   var hwSub=hw.filter(hwSubmitted).length;
-  var risk=stu.filter(function(s){return isRisk(s.attendance_progress_status)||isRisk(s.academic_progress_status)}).length;
+  var risk=stu.filter(stuRisk).length;
   var sv=rows("DL15").filter(function(v){return String(v.class_id||"")===cid&&num(v.satisfaction_score)>0});
   var ss=sv.length?(sv.reduce(function(a,v){return a+num(v.satisfaction_score)},0)/sv.length):null;
   var cap=num(lop.class_capacity),cur=num(lop.current_enrollment)||nStu;
@@ -6177,8 +6390,8 @@ function kpiCompute(){
  /* P6 - chuyên cần */
  v.ATR=rate(cnt(AT,function(a){return isc(a.attendance_status,"on_time","late")}),AT.length);
  v.UAR=rate(cnt(AT,function(a){return isc(a.attendance_status,"no_show")&&/unexcused/.test(ecode(a.absence_type))}),AT.length);
- v.ARR=rate(cnt(S,function(s){return isRisk(s.attendance_progress_status)}),S.length);
- v.AIR=rate(cnt(S,function(s){return isRisk(s.academic_progress_status)}),S.length);
+ v.ARR=rate(cnt(S,stuAtt),S.length);
+ v.AIR=rate(cnt(S,stuAca),S.length);
  /* P7 - học thuật, bài tập, WOW */
  var hwSub=HW.filter(hwSubmitted);
  /* HCR đo "bài tới hạn thì HV có nộp không". Đếm cả bài CHƯA TỚI HẠN vào mẫu số là tự bôi
@@ -6244,7 +6457,7 @@ function kpiCompute(){
  /* P6 · RCR - HV từng vào diện nguy cơ mà nay đã ổn định lại */
  var everRisk=S.filter(function(s){return isRisk(s.attendance_progress_status)||isRisk(s.academic_progress_status)
   ||String(s.attendance_risk_reason||"").trim()||String(s.academic_risk_reason||"").trim()});
- v.RCR=rate(cnt(everRisk,function(s){return !isRisk(s.attendance_progress_status)&&!isRisk(s.academic_progress_status)}),everRisk.length);
+ v.RCR=rate(cnt(everRisk,function(s){return !stuRisk(s)}),everRisk.length);
  /* P7 · SPR - điểm đầu ra cao hơn điểm test đầu vào */
  var spr=[];CE.forEach(function(c){
   var fin=num(c.final_test_score);if(!fin)return;
@@ -6736,7 +6949,7 @@ function baocaoBranch(){
   if(isc(x.session_status,"completed")){k.ses++;if(bhState(x).note)k.note++}
   if(x.teacher_id)k.gv[x.teacher_id]=1});
  rows("DL09").forEach(function(st){var b=stuBr[st.student_id];if(b===undefined)return;
-  if(isRisk(st.attendance_progress_status)||isRisk(st.academic_progress_status))slot(b).risk++});
+  if(stuRisk(st))slot(b).risk++});
  /* tiền: quy về cơ sở của LỚP mà học viên đang học - không quy về cơ sở ghi trong hồ sơ HV,
     vì hồ sơ ghi nơi đăng ký còn tiền thì theo nơi học. */
  rows("DL06").forEach(function(e){var b=stuBr[e.student_id];if(b===undefined)return;
@@ -7642,7 +7855,7 @@ function btHub(embed){
    '<div class="mini">'+(mode2==="each"?'':'<button class="pill" onclick="btPickAll(true)">Chọn tất cả</button><button class="pill" onclick="btPickAll(false)">Bỏ chọn</button>')+'</div></div><div class="pbody">';
   if(!enr.length)h+='<div class="empty">Lớp chưa có học viên được xếp.</div>';
   enr.forEach(function(e){var s=find("DL09","student_id",e.student_id)||{};
-   var risk=isRisk(s.academic_progress_status)?'<span class="chip red" style="margin-left:6px">nguy cơ học thuật</span>':'';
+   var risk=stuAca(s)?'<span class="chip red" style="margin-left:6px">nguy cơ học thuật</span>':'';
    var wk=mode2==="each"?weakSkill(e.student_id):null;
    h+='<div class="rost'+(mode2==="each"?" btrow":"")+'" data-sid="'+esc(e.student_id)+'">'+
     (mode2==="each"?'':'<input type="checkbox" class="btck" checked style="margin-right:9px">')+
@@ -7779,7 +7992,7 @@ function chamLuu(){var rost=document.querySelectorAll("#content .rost[data-hwid]
    v.homework_status=eFull("enum_homework_status",u.late==="late"?"submitted_late":"submitted_on_time");
    if(u.late==="late")v.is_late="TRUE";
    if(!String(r.homework_submitted_time||"").trim())v.homework_submitted_time=nowStr()}
-  var sub=pvnd(r.homework_submitted_time);v.graded_within_48h=(sub&&(Date.now()-sub.getTime())<=paramOf("slaHomeworkGrade_hours",48)*3600000)?"Đúng hạn":"Trễ hạn";return v}
+  var sub=pvnd(r.homework_submitted_time);v.graded_within_48h=(sub&&(Date.now()-sub.getTime())<=paramOf("slaHomeworkGrading_hours",48)*3600000)?"Đúng hạn":"Trễ hạn";return v}
  function apply(){ups.forEach(function(u){var r=find("DL13","homework_id",u.id);if(r){var v=gradeVals(u);for(var k in v){if(v[k]!=="")r[k]=v[k]}if(u.score!=="")r.homework_score=u.score;if(u.fb!=="")r.teacher_feedback=u.fb}});toast("Đã chấm "+ups.length+" bài - đóng dấu giờ chấm, cảnh báo 48h tắt.");reRender(CUR)}
  if(SVR){var d=0;ups.forEach(function(u){google.script.run.withSuccessHandler(function(){d++;if(d===ups.length)apply()}).withFailureHandler(function(){d++;if(d===ups.length)apply()}).apiUpdate("DL13",u.id,gradeVals(u))})}else{apply()}}
 /* ===== THAM SỐ VẬN HÀNH =====
@@ -7789,7 +8002,7 @@ var PKEY={
  slaComplaintFirstResponse_hours:["slaKN_assignment_hours"],
  slaReenroll_days:["slaReenroll_contact_days"],
  slaTestResult_hours:["slaGLA_hours"],
- slaHomeworkGrade_hours:["slaHomeworkGrading_hours"],
+ slaHomeworkGrade_hours:["slaHomeworkGrading_hours"],   /* tên cũ - giữ để dữ liệu cũ còn tra được, KHÔNG khai lại vào APPPARAMS */
  slaComplaintHigh_hours:["slaKN_high_hours"],
  slaComplaintMed_hours:["slaKN_medium_hours"],
  slaComplaintLow_hours:["slaKN_low_hours"],
@@ -7860,13 +8073,10 @@ var APPPARAMS=[
  ["Xếp lịch & Giảng dạy","sessionSpan_hours","Một buổi chiếm chỗ của giáo viên bao lâu (dùng để soi trùng giờ và tìm người dạy thay)","giờ",2],
  ["Giao việc","slaTaskAccept_hours","Người nhận phải BẤM NHẬN việc trong bao lâu (quá hạn -> nhắc)","giờ",4],
  ["Giao việc","slaTaskConfirm_hours","Người giao phải xác nhận sau khi được báo xong trong bao lâu","giờ",24],
- ["Tuyển sinh - Lead","slaLeadResponse_min","Gọi/nhắn lead MỚI trong bao lâu (quá hạn -> cảnh báo đỏ)","phút",15],
  ["Tuyển sinh - Lead","slaRetryCall_hours","Gọi hụt bao lâu thì nhắc gọi lại (khi chưa đặt lịch hẹn)","giờ",4],
  ["Tuyển sinh - Lead","attemptsNoResponse","Gọi hụt liên tiếp bao nhiêu lần -> chuyển 'Không liên lạc được' + nhắc đổi kênh","lần",3],
  ["Tuyển sinh - Lead","attemptsUnreachable","Gọi hụt liên tiếp bao nhiêu lần -> chuyển 'Hết cách liên lạc'","lần",5],
- ["Tuyển sinh - Test & Tư vấn","slaTestResult_hours","Hạn chấm bài test đầu vào","giờ",24],
  ["Tuyển sinh - Test & Tư vấn","slaTestBookedRemind_hours","Sau khi đặt lịch test, quá bao lâu chưa ghi nhận dự test thì nhắc","giờ",24],
- ["Tuyển sinh - Test & Tư vấn","slaConsultAfterTest_hours","Có kết quả test rồi thì hạn tư vấn cho khách","giờ",24],
  ["Tài chính","thresholdDiscount_approval","Chiết khấu từ mức này trở lên phải trình quản lý duyệt","VND",1000000],
  ["Giới thiệu bạn bè","referralFriend_discountType","Kiểu ưu đãi cho bạn được giới thiệu","kiểu","percent",["percent","amount"]],
  ["Giới thiệu bạn bè","referralFriend_discount","Mức giảm cho bạn được giới thiệu (nếu percent thì nhập 10 = 10%, nếu amount thì nhập số tiền)","% hoặc VND",10],
@@ -7881,9 +8091,12 @@ var APPPARAMS=[
  ["Học vụ - Xếp lớp","slaClassInfoZalo_hours","Hạn gửi thông tin lớp cho HV sau khi xếp lớp","giờ",24],
  ["Học vụ - Xếp lớp","slaOBT_hours","Hạn hoàn tất onboarding cho HV mới","giờ",48],
  ["Học vụ - Lớp học","slaAttendanceGate_minutes","Cổng điểm danh mở bao nhiêu phút TRƯỚC giờ học (GV bấm Bắt đầu lớp trong khoảng này)","phút",20],
- ["Học vụ - Lớp học","slaHomeworkGrade_hours","Hạn giáo viên chấm bài sau khi HV nộp","giờ",48],
  ["Học vụ - Lớp học","thresholdAtRisk_absences","Vắng không phép bao nhiêu buổi -> HV có nguy cơ chuyên cần","buổi",2],
  ["Học vụ - Lớp học","thresholdAtRisk_hw_missing","Thiếu bài tập bao nhiêu lần -> HV có nguy cơ học thuật","lần",3],
+ ["Học vụ - Lớp học","riskIgnore_days","Học vụ xem rồi bấm 'tạm bỏ qua' thì máy im bao nhiêu ngày trước khi nhắc lại","ngày",14],
+ ["Học vụ - Lớp học","thresholdClassStart_days","Còn bao nhiêu ngày tới khai giảng thì lớp vào diện theo dõi sĩ số","ngày",14],
+ ["Học vụ - Lớp học","classMinStudents","Sĩ số tối thiểu để một lớp khai giảng - dưới mức này phải quyết dồn lớp, lùi ngày hoặc hủy sớm","học viên",6],
+ ["Học vụ - Lớp học","classDecide_days","Còn bao nhiêu ngày tới khai giảng mà vẫn thiếu sĩ số thì chuyển đỏ - hết giờ cân nhắc, phải quyết","ngày",7],
  ["WOW & CSKH","slaWowNote_hours","Hạn ghi nội dung sau buổi WOW 1-1","giờ",24],
  ["WOW & CSKH","thresholdSurveyFollowup_score","Điểm hài lòng (và số sao học viên chấm buổi học) từ mức này trở xuống thì tính là phản hồi tiêu cực, tự bật cờ cần gọi lại","điểm",3],
  ["Học vụ - Lớp học","wowPendingMax_perStudent","Học viên được để tối đa bao nhiêu buổi WOW chờ trung tâm xác nhận","buổi",1],
@@ -7894,10 +8107,10 @@ var APPPARAMS=[
     Người dùng vào Cài đặt tìm cũng không thấy - muốn đổi phải sửa code rồi build lại, đúng cái
     kiến trúc "cấu hình sống" của dự án này cấm. Mỗi dòng dưới đây tương ứng một paramOf/paramStr
     có thật trong code; _check18 canh hai chiều nên từ nay lệch một cái là đỏ. */
- ["Tuyển sinh - Lead","slaLRT_minutes","Ngưỡng KPI thời gian phản hồi lead mới (LRT)","phút",15],
+ ["Tuyển sinh - Lead","slaLRT_minutes","Gọi/nhắn lead MỚI trong bao lâu - quá hạn là cảnh báo đỏ, và cũng là ngưỡng KPI LRT","phút",15],
  ["Tuyển sinh - Lead","slaFollowup_grace_days","Quá hẹn liên hệ bao nhiêu ngày thì coi là bỏ rơi khách","ngày",2],
- ["Tuyển sinh - Test & Tư vấn","slaGLA_hours","Hạn chấm bài test đầu vào (GLA)","giờ",24],
- ["Tuyển sinh - Test & Tư vấn","slaCVT_hours","Hạn tư vấn sau khi có kết quả test (CVT)","giờ",24],
+ ["Tuyển sinh - Test & Tư vấn","slaGLA_hours","Hạn chấm bài test đầu vào - cũng là ngưỡng KPI GLA","giờ",24],
+ ["Tuyển sinh - Test & Tư vấn","slaCVT_hours","Có kết quả test rồi thì hạn tư vấn cho khách - cũng là ngưỡng KPI CVT","giờ",24],
  ["Tài chính","thresholdDeposit_minimum","Số tiền cọc tối thiểu để giữ chỗ","VND",2000000],
  ["Tài chính","refundFull_days","Rút trong bao nhiêu ngày đầu thì hoàn 100%","ngày",3],
  ["Tài chính","refundPartial_days","Rút trong bao nhiêu ngày thì hoàn một phần","ngày",14],
@@ -7921,7 +8134,6 @@ var APPPARAMS=[
     trước đây nằm trong đầu người viết code, nay thành tham số sửa được. */
  ["Tài chính","slaDiscountApprove_hours","Hạn quản lý duyệt một đề nghị chiết khấu","giờ",24],
  ["Tài chính","slaPaymentVerify_hours","Hạn kế toán đối soát một khoản vừa thu","giờ",24],
- ["Học vụ - Lớp","slaClassInfoSend_hours","Hạn gửi thông tin lớp cho học viên sau khi xếp lớp","giờ",24],
  ["Học vụ - Lớp","slaRiskFollowup_days","Học viên vào diện nguy cơ bao lâu thì phải có can thiệp","ngày",3]];
 function pvnd(s){var m=String(s||"").match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);if(!m)return null;return new Date(+m[3],+m[2]-1,+m[1],m[4]?+m[4]:0,m[5]?+m[5]:0)}
 function hoursSince(s){var d=pvnd(s);return d?(Date.now()-d.getTime())/3600000:null}
@@ -10429,7 +10641,7 @@ function renderHosoGV(){var id=window.GVID;var g=find("DL01","staff_id",id);
  var hwSub=hw.filter(hwSubmitted);
  var hwWait=hwSub.filter(function(x){return !hwGraded(x)});
  var stuIds={};rows("DL08").forEach(function(o){if(clsIds[o.class_id])stuIds[o.student_id]=1});var stu=rows("DL09").filter(function(s){return stuIds[s.student_id]});
- var risk=stu.filter(function(s){return isRisk(s.academic_progress_status)});
+ var risk=stu.filter(stuAca);
  var h='<div class="phead"><div><div class="t">'+esc(g.full_name)+' <span class="chip blue">Giảng viên</span></div>'+
   '<div class="s">'+esc(id)+(g.email?' · '+esc(g.email):'')+(g.phone?' · '+esc(g.phone):'')+' · '+esc(elabel(g.status)||g.status||"")+'</div></div>'+
   '<div class="sp">'+backBtn("giangvien","Danh sách giảng viên")+'</div></div>';
@@ -10532,7 +10744,7 @@ function renderHosoNV(){var id=window.NVID;var s=find("DL01","staff_id",id);
   h+='</tbody></table></div></div>'}
  if(isAca){
   var ob=rows("DL08").filter(function(o){return !isc(o.onboarding_status,"completed")});
-  var risk2=rows("DL09").filter(function(x){return isRisk(x.attendance_progress_status)||isRisk(x.academic_progress_status)});
+  var risk2=rows("DL09").filter(stuRisk);
   var fbNew=rows("DL16").filter(function(f){return isc(f.feedback_status,"new")});
   var knOpen=rows("DL17").filter(function(k){return !isc(k.complaint_status,"resolved")});
   h+=statStrip([["ti-layout-grid-add",ob.length,"Onboarding chưa xong","#E08A1E","SLA "+slaChip("slaOBT_hours",72)],
@@ -10607,7 +10819,7 @@ function clsHealth(c){var cid=c.class_id;
  var hw=rows("DL13").filter(function(x){return x.class_id===cid});
  var hs=hw.filter(hwSubmitted).length;
  var hcr=hw.length?hs/hw.length:null;
- var risk=rows("DL09").filter(function(x){return sids[x.student_id]&&(isRisk(x.attendance_progress_status)||isRisk(x.academic_progress_status))}).length;
+ var risk=rows("DL09").filter(function(x){return sids[x.student_id]&&stuRisk(x)}).length;
  var late=sesArr.filter(function(x){return num(x.teacher_late_minutes)>0}).length;
  var noNote=sesArr.filter(function(x){var st=bhState(x);return st.done&&!st.note}).length;
  var atrT=kpiTh(/^ATR/,0.8),hcrT=kpiTh(/^HCR/,0.7);
@@ -10647,7 +10859,7 @@ function renderHtToday(embed){
   gvs.map(function(g){return '<option value="'+esc(g.staff_id)+'"'+(g.staff_id===gid?" selected":"")+'>'+esc(g.staff_id+" - "+g.full_name)+'</option>'}).join("")+'</select></div>';
  h+=statStrip([["ti-calendar-check",ses.length,"Buổi dạy hôm nay","#2E5A88",""],
   ["ti-star",wowT.length,"Buổi WOW hôm nay","#DB2777",""],
-  ["ti-book",hwQ.length,"Bài chờ chấm","#7C3AED","SLA "+slaChip("slaHomeworkGrade_hours",48)],
+  ["ti-book",hwQ.length,"Bài chờ chấm","#7C3AED","SLA "+slaChip("slaHomeworkGrading_hours",48)],
   ["ti-message-2",owe.length,"Buổi nợ nhận xét","#E24B4A","SLA "+slaChip("slaTeacherNote_hours",48)]]);
  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-calendar-check" style="margin-right:6px"></i>Buổi dạy hôm nay ('+ses.length+')</b></div>';
  if(!ses.length)h+='<div class="empty">Hôm nay không có buổi nào'+(gid?' của GV này':'')+'.</div>';
@@ -11062,6 +11274,71 @@ function bhNoteSave(id){var v=(fldV("bh_note")||"").trim();
    Đổi GV cho MỘT buổi đã có (sesSetTeacher). Nhưng khi một giáo viên nghỉ hẳn / chuyển cơ sở thì
    phải đổi GV CHÍNH của lớp và của MỌI BUỔI CÒN LẠI - trước đây không có cửa nào, phải sửa tay
    từng buổi trong danh sách. Vẫn qua đúng luật cơ sở/hình thức học của gvBackup. */
+/* ===== MỞ LỚP: LỚP NÀY CÓ ĐỦ NGƯỜI ĐỂ KHAI GIẢNG KHÔNG =============================
+   V9.40. Ngăn kéo quyết định, không phải trang - phải đủ để chốt ngay: còn mấy ngày, thiếu
+   mấy người, ai đã ghi danh, có lớp nào cùng khóa để dồn vào, và ba lối ra. */
+function moLop(cid){var c=find("DL10","class_id",cid);if(!c){toast("Không thấy lớp");return}
+ var enr=rows("DL08").filter(function(o){return String(o.class_id||"")===cid});
+ var si=num(c.current_enrollment)||enr.length,cap=num(c.class_capacity);
+ var minS=num(paramOf("classMinStudents",6));
+ var t0=new Date();t0.setHours(0,0,0,0);
+ var d=pvnd(c.class_start_date),left=d?Math.round((d.getTime()-t0.getTime())/864e5):null;
+ var h='<div class="dcard"><h4><i class="ti ti-calendar-exclamation"></i>'+esc(c.class_name||cid)+'</h4>';
+ h+=ctxRows([["Trạng thái",esc(elabel(c.class_status)||c.class_status)],["Khóa",esc(c.course_id_name||c.course_id||"-")],
+  ["Khai giảng",esc(c.class_start_date||"-")+(left!=null?(left>=0?" · còn "+left+" ngày":" · đã qua "+(-left)+" ngày"):"")],
+  ["Sĩ số",si+"/"+(cap||"?")+" · tối thiểu "+minS+(si<minS?(' <span class="chip red">thiếu '+(minS-si)+' người</span>'):' <span class="chip green">đủ</span>')],
+  ["Giáo viên chính",c.main_teacher_id_name||c.main_teacher_id||'<span class="chip red">chưa gán</span>'],
+  ["Nơi học",clsOnline(c)?"online - không ràng buộc cơ sở":esc(c.venue_or_zoom_link||elabel(c.branch)||c.branch||"-")],
+  ["Lịch",esc(c.class_schedule||"-")]]);
+ h+='<div class="notebar"><i class="ti ti-info-circle"></i>Sĩ số tối thiểu lấy từ '+slaChip("classMinStudents",6)+
+  ', cửa sổ theo dõi '+slaChip("thresholdClassStart_days",14)+', hạn chót quyết '+slaChip("classDecide_days",7)+
+  '. Hủy sau khi đã khai giảng thì phải hoàn tiền theo chính sách - quyết sớm luôn rẻ hơn.</div>';
+ h+='<div class="dsec">Đã ghi danh ('+enr.length+')</div>';
+ if(!enr.length)h+='<div class="empty">Chưa có ai - lớp này đang trống hoàn toàn.</div>';
+ else{h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Onboarding</th><th></th></tr></thead><tbody>';
+  enr.forEach(function(o){h+='<tr><td>'+nguoiLnk(o.student_id,o.student_id_name,o.student_id)+'</td>'+
+   '<td>'+esc(elabel(o.onboarding_status)||"-")+'</td>'+
+   '<td><button class="btn sm" onclick="obChange(\''+esc(o.onboarding_id)+'\')"><i class="ti ti-transfer"></i>Chuyển lớp khác</button></td></tr>'});
+  h+='</tbody></table></div>'}
+ /* DỒN LỚP: lớp cùng khóa, chưa kết thúc, còn chỗ - đây là lối ra rẻ nhất khi thiếu người */
+ var same=rows("DL10").filter(function(x){return x.class_id!==cid&&String(x.course_id||"")===String(c.course_id||"")&&
+  !/finished|cancelled/.test(ecode(x.class_status))&&(!num(x.class_capacity)||num(x.current_enrollment)<num(x.class_capacity))});
+ h+='<div class="dsec">Lớp cùng khóa có thể dồn vào ('+same.length+')</div>';
+ if(!same.length)h+='<div class="empty">Không có lớp cùng khóa nào còn chỗ - dồn lớp không phải lối ra ở đây.</div>';
+ else{h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Sĩ số</th><th>Khai giảng</th><th>Cơ sở</th></tr></thead><tbody>';
+  same.forEach(function(x){h+='<tr><td>'+lopLnk(x.class_id,x.class_name,x.class_id)+'</td>'+
+   '<td>'+num(x.current_enrollment)+'/'+(num(x.class_capacity)||"?")+'</td><td>'+esc(x.class_start_date||"-")+'</td>'+
+   '<td>'+esc(clsOnline(x)?"online":(elabel(x.branch)||x.branch||"-"))+'</td></tr>'});
+  h+='</tbody></table></div>'}
+ h+='<div class="dsec">Quyết</div>';
+ h+='<div class="fld"><label>Lùi ngày khai giảng sang</label><input id="ml_date" type="date"></div>';
+ h+='<div class="fld"><label>Lý do (bắt buộc khi lùi ngày hoặc hủy)</label><input id="ml_why" placeholder="vd: chưa đủ sĩ số, dồn về lớp LOP-... khai giảng 20/09"></div>';
+ h+='<div class="fld full" style="display:block">'+
+  '<button class="btn primary" onclick="moLopDelay(\''+esc(cid)+'\')"><i class="ti ti-calendar-plus"></i>Lùi ngày khai giảng</button> '+
+  '<button class="btn" onclick="clsTeacherForm(\''+esc(cid)+'\')"><i class="ti ti-user-cog"></i>Gán / đổi giáo viên</button> '+
+  '<button class="btn" onclick="closeModal();openLop(\''+esc(cid)+'\')"><i class="ti ti-clipboard-list"></i>Mở vận hành lớp</button> '+
+  '<button class="btn danger" onclick="moLopCancel(\''+esc(cid)+'\')"><i class="ti ti-calendar-off"></i>Hủy lớp</button>'+
+  '</div></div>';
+ openDrawer("Lớp sắp khai giảng",h)}
+function moLopDelay(cid){var dv=(fldV("ml_date")||"").trim(),why=String(fldV("ml_why")||"").trim();
+ if(!dv){toast("Chọn ngày khai giảng mới.");return}
+ if(!why){toast("Ghi lý do lùi ngày - học viên và giáo viên sẽ hỏi.");return}
+ var p=dv.split("-");var moi=p[2]+"/"+p[1]+"/"+p[0];
+ var c=find("DL10","class_id",cid)||{};
+ markRow("DL10","class_id",cid,{class_start_date:moi,notes:(c.notes?c.notes+" | ":"")+nowStr()+": lùi khai giảng sang "+moi+" - "+why+" ("+myName()+")"},
+  "Đã lùi khai giảng sang "+moi+". Nhớ báo lại học viên đã ghi danh và giáo viên.");closeModal()}
+function moLopCancel(cid){var why=String(fldV("ml_why")||"").trim();
+ if(!why){toast("Hủy lớp phải có lý do - đây là việc phải giải thích với người đã đóng tiền.");return}
+ /* giữ lý do lại: hộp xác nhận bật lên là ô nhập không còn đọc được nữa */
+ window.__mlWhy=why;
+ var c=find("DL10","class_id",cid)||{};
+ var n=rows("DL08").filter(function(o){return String(o.class_id||"")===cid}).length;
+ confirmRun("Hủy lớp "+(c.class_name||cid)+"?"+(n?(" Đang có "+n+" học viên được xếp vào lớp này - họ sẽ phải chuyển lớp khác hoặc được hoàn tiền theo chính sách."):" Lớp đang trống."),
+  "moLopCancelRun",cid)}
+function moLopCancelRun(cid){var why=String(window.__mlWhy||"").trim();var c=find("DL10","class_id",cid)||{};
+ markRow("DL10","class_id",cid,{class_status:eFull("enum_class_status","cancelled"),
+  notes:(c.notes?c.notes+" | ":"")+nowStr()+": hủy lớp - "+(why||"không ghi lý do")+" ("+myName()+")"},
+  "Đã hủy lớp. Học viên đã xếp vào lớp này cần chuyển lớp hoặc hoàn tiền - xem hàng chờ Xếp lớp.");closeModal()}
 function clsTeacherForm(cid){
  var c=find("DL10","class_id",cid);if(!c){toast("Không thấy lớp");return}
  var future=rows("DL11").filter(function(x){var d=pvnd(x.session_date);
@@ -11204,6 +11481,37 @@ function renderBaoluu(embed){var p="baoluu",fil=fget(p);
   h+='<button class="btn sm" onclick="openHoso(\''+esc(id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button>';
   h+='</div></div>'});
  return h+'</div>'}
+/* ===== GỌI HỎI THĂM HV VẮNG - GHI NGAY VÀO DÒNG ĐIỂM DANH ======================
+   V9.40. Luật SLA coi "có ghi chú trên dòng điểm danh" là đã xử lý, nhưng trước đây việc này
+   KHÔNG có nút làm - chỉ có nút "Hồ sơ", mà hồ sơ 360 không có chỗ nào ghi vào dòng điểm danh.
+   Người dùng phải tự mò sang Vận hành lớp, tìm đúng buổi, tìm đúng em. Nay một cú bấm. */
+function absCall(aid){var a=find("DL12","attendance_id",aid);if(!a){toast("Không thấy dòng điểm danh");return}
+ var ss=find("DL11","session_id",a.session_id)||{};
+ var h='<div class="dcard"><h4><i class="ti ti-phone-off"></i>Gọi hỏi thăm - '+esc(a.student_name||a.student_id)+'</h4>';
+ h+=ctxRows([["Lớp",esc(ss.class_id_name||ss.class_id||a.class_id||"-")],["Buổi",esc(ss.session_number||"-")],
+  ["Ngày buổi",esc(ss.session_date||"-")],["Tình trạng",esc(elabel(a.attendance_status)||"-")+" · "+esc(elabel(a.absence_type)||"không phép")]]);
+ h+='<div class="notebar"><i class="ti ti-info-circle"></i>Gọi trong '+slaChip("slaAbsenceCall_hours",24)+
+  ' rồi ghi lại đây. Ghi xong việc này rời hàng chờ - và đó cũng là căn cứ nếu sau này em này thành nguy cơ.</div>';
+ h+='<div class="fld full"><label>Gọi được gì <i>*</i></label><textarea id="ac_note" rows="3" placeholder="vd: gọi 2 lần không nghe, đã nhắn Zalo / em bị ốm, xin học bù buổi 12"></textarea></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="absCallSave(\''+esc(aid)+'\')"><i class="ti ti-device-floppy"></i>Ghi và đóng việc</button>'+
+  '<button class="btn" onclick="closeModal();openStuQuick(\''+esc(a.student_id)+'\')"><i class="ti ti-eye"></i>Xem nhanh học viên</button></div></div>';
+ openDrawer("Gọi hỏi thăm HV vắng",h)}
+function absCallSave(aid){var n=String(fldV("ac_note")||"").trim();
+ if(!n){toast("Ghi lại gọi được gì - kể cả 'gọi không nghe' cũng là thông tin.");return}
+ markRow("DL12","attendance_id",aid,{note:nowStr()+": "+n+" ("+myName()+")"},"Đã ghi - việc rời hàng chờ.");closeModal()}
+/* ===== DUYỆT CHIẾT KHẤU NGAY TỪ HÀNG CHỜ ======================================== */
+function ckDuyet(eid){var r=find("DL06","enrollment_id",eid);if(!r){toast("Không thấy đăng ký");return}
+ var pct=num(r.total_fee)?Math.round(num(r.discount_amount)/num(r.total_fee)*100):0;
+ var h='<div class="dcard"><h4><i class="ti ti-discount-check"></i>Duyệt chiết khấu - '+esc(r.student_id_name||r.student_id)+'</h4>';
+ h+=ctxRows([["Đăng ký",esc(eid)],["Khóa",esc(r.course_id_name||r.course_id||"-")],
+  ["Học phí gốc",esc(vnd(num(r.total_fee)))],["Chiết khấu",'<b>'+esc(vnd(num(r.discount_amount)))+'</b> ('+pct+'%)'],
+  ["Còn phải đóng",esc(vnd(num(r.final_fee)))],["Loại",esc(elabel(r.discount_type)||"-")],["Lý do",esc(r.discount_reason||"-")]]);
+ h+='<div class="notebar"><i class="ti ti-info-circle"></i>Ngưỡng phải trình duyệt: '+slaChip("thresholdDiscount_approval",1000000)+'.</div>';
+ h+='<div class="dact">'+
+  '<button class="btn green" onclick="confirmRun(\'Duyệt chiết khấu '+esc(vnd(num(r.discount_amount)))+' cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi tên bạn là người duyệt.\',\'duyetOK\',\''+esc(eid)+'\')"><i class="ti ti-check"></i>Duyệt</button>'+
+  '<button class="btn danger" onclick="confirmRun(\'TỪ CHỐI chiết khấu này? Chiết khấu về 0 và học phí tính lại theo giá gốc.\',\'duyetNo\',\''+esc(eid)+'\')"><i class="ti ti-x"></i>Từ chối</button>'+
+  '<button class="btn" onclick="closeModal();openQuick(\''+esc(r.student_id||r.lead_id||"")+'\')"><i class="ti ti-eye"></i>Xem nhanh người này</button></div></div>';
+ openDrawer("Duyệt chiết khấu",h)}
 function blCallForm(id){var s=find("DL09","student_id",id)||{};
  var obL=rows("DL08").filter(function(o){return o.student_id===id&&String(o.class_id||"").trim()});
  var clsNm=obL.length?(obL[obL.length-1].class_id_name||obL[obL.length-1].class_id):"-";
@@ -12359,7 +12667,7 @@ var NHIP={
   ["ngay","Gửi thông tin lớp và chốt xác nhận","Học viên chưa xác nhận lớp là chưa chắc đi học","xeplop",
    function(){return rows("DL08").filter(function(o){var st=obState(o);return o.class_id&&!st.confirmed}).length}],
   ["ngay","Theo học viên nguy cơ","Bỏ học không báo trước - dấu hiệu luôn có trước cả tuần","hocvien",
-   function(){return rows("DL09").filter(function(x){return isRisk(x.attendance_progress_status)||isRisk(x.academic_progress_status)}).length}],
+   function(){return rows("DL09").filter(stuRisk).length}],
   ["chieu","Soi buổi chưa ghi nhận xét","Cuối ngày là lúc nhắc giáo viên, không phải sáng hôm sau","buoihoc",
    function(){return rows("DL11").filter(function(x){return bhState(x).noteOver}).length}]],
  giaovien:[
@@ -13287,10 +13595,10 @@ DOORS = {
  "DL06b":["insPlanSave"],
  "DL07":["duyetRefundRun","paySave","payVerifyRun","rfNeed"],
  "DL08":["hvClassConfirm","hvClassRejectSave","midSave","obMark","rfNeed","xepMoiLuu","obChangeSave","obFinish"],
- "DL09":["blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave"],
- "DL10":["xepMoiLuu","obChangeSave","rfNeed","clsSetTeacher"],
+ "DL09":["blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave","riskCareSave","riskFlagRun","riskIgnoreSave"],
+ "DL10":["xepMoiLuu","obChangeSave","rfNeed","clsSetTeacher","moLopDelay","moLopCancelRun"],
  "DL11":["bhCancelRun","bhDone","bhMakeupSave","bhNoteSave","ddSave","sessEnd","sessStart","sesSetTeacher","clsSetTeacher"],
- "DL12":["ddSave","hvAbsentSave","absReq","absReview","absMakeup"],
+ "DL12":["ddSave","hvAbsentSave","absReq","absReview","absMakeup","absCallSave"],
  "DL13":["chamLuu","giaoBaiCaLop","giaoBaiRieng","sesAssignRun","thuLuu"],
  "DL14":["hvWowSave","wowAddSave","wowCancelRun","wowConfirm","wowNoShow","wowNoteSave","wowRescheduleRun","wowTaught","wowUseQuota"],
  "DL15":["rvSend","svFollowDone","svResultSave","svSendSave"],

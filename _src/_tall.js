@@ -20,3 +20,8 @@ var used=new Set([].concat(
  (src.match(/"ti-[a-z0-9-]+"/g)||[]).map(s=>s.replace(/"/g,""))));
 var miss=[...used].filter(u=>css.indexOf("."+u+":before")<0);
 console.log("Icon dung:",used.size,"| thieu trong font:",miss.length?miss.join(","):"khong");
+/* V9.40: truoc day hai dong tren chi IN ra roi thoi - ma thoat luon bang 0. verify.sh cho khop
+   chuoi "0 loi" (nam o dong tren) nen icon thieu KHONG BAO GIO lam bo kiem do. Da thu that:
+   them 3 icon moi, harness in ro "thieu trong font: ti-radar,..." va bang tong ket van XANH HET.
+   Mot bo kiem chi in ra ma khong can duoc la bo kiem gia. Nay no thoat khac 0. */
+if(bad.length||miss.length)process.exit(1);
