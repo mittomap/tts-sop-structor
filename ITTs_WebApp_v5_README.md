@@ -1465,3 +1465,95 @@ nguy cơ. Cần sâu hơn thì ngay trong ngăn kéo có nút **Hồ sơ đầy 
 
 Áp dụng cho cả 21 nút ở các bảng danh sách và cho thẻ ở **Chờ duyệt** (chiết khấu, hoàn tiền) - duyệt
 xong khoản này là quyết được khoản kế, không phải đi ra đi vào.
+
+---
+
+## V9.40 - Máy tự thấy việc, không đợi ai bấm cờ (29/07)
+
+### Học viên nguy cơ: máy đếm song song với người
+
+Trước đây một học viên chỉ vào danh sách nguy cơ khi **có người mở hồ sơ và bấm gắn cờ**. Hai
+ngưỡng trong Cài đặt (vắng không phép mấy buổi, thiếu mấy bài) chỉ được trang học viên tự xem đọc
+tới - phía nhân viên không màn nào dùng. Chạy đúng luật đó trên dữ liệu thật: **19 em vượt ngưỡng,
+chỉ 2 em được gắn cờ**.
+
+Nay:
+- Cờ tay **vẫn giữ** - người biết những chuyện máy không biết (hoàn cảnh gia đình, thái độ trên lớp).
+- Máy đếm song song và nói ra. Việc mới **"Máy thấy nguy cơ - chưa gắn cờ"** hiện ở chuông, Trợ thủ
+  và Việc hôm nay.
+- Bấm vào ra **màn chăm học viên nguy cơ**: máy thấy gì (vắng mấy buổi / thiếu mấy bài, kèm ngưỡng
+  bấm sửa được), chăm gần nhất bao lâu, **còn mấy lượt WOW chưa dùng** - và ba lối ra ngay tại đó:
+  ghi lần chăm, đặt buổi WOW, gắn cờ.
+- Không phải nguy cơ thật thì **tạm bỏ qua có lý do và có hạn**. Hết hạn máy nhắc lại. Không có "bỏ
+  qua vĩnh viễn" - việc biến mất mà không ai biết vì sao là thứ làm hỏng cả hàng chờ.
+- Việc "học viên nguy cơ" nay **leo thang theo lần chăm cuối**, không còn đỏ mãi bất kể đã chăm hay chưa.
+
+### Lớp sắp khai giảng có đủ người không
+
+Màn mới trả lời câu tốn tiền nhất của trung tâm. Việc tự sinh khi lớp còn trong cửa sổ theo dõi mà
+sĩ số dưới mức tối thiểu (cả hai con số đều ở Cài đặt), và chuyển đỏ khi hết hạn cân nhắc.
+
+Bấm vào ra: còn mấy ngày, thiếu mấy người, ai đã ghi danh, **lớp cùng khóa nào còn chỗ để dồn vào**,
+và ba lối ra - lùi ngày khai giảng, gán/đổi giáo viên, hủy lớp (bắt ghi lý do, và cảnh báo trước số
+học viên sẽ phải chuyển lớp hoặc hoàn tiền).
+
+Kèm một việc nữa: **lớp sắp khai giảng mà chưa gán giáo viên chính**.
+
+### Cơ sở của học viên tính theo nơi HỌC
+
+Hồ sơ học viên ghi nơi **đăng ký** và không bao giờ đổi, nên lọc theo Cơ sở 3 ra 0 người dù cơ sở đó
+đang có 13 em. Nay một học viên thuộc **cả hai**: nơi đăng ký (người tư vấn cũ vẫn theo được) và nơi
+đang học (học vụ cơ sở đó thấy được). Ngăn kéo học viên nói rõ *"đăng ký Cơ sở 2 - đang học tại Cơ sở 1"*.
+Lớp online không ràng buộc cơ sở nên không tính vào.
+
+### Tải giảng viên cả đội (tab Giáo viên dự phòng)
+
+Bảng so ngang toàn đội theo kỳ 30/60/90 ngày: buổi trong kỳ, **so với mức chia đều**, lớp đang giữ,
+số cơ sở phải chạy, đã dạy tổng, trễ giờ, tỷ lệ buổi có nhận xét. Người **trống hoàn toàn** tô đỏ -
+đó là chỗ nhận được lớp mới mà không phải tuyển thêm ai.
+
+### Giáo viên WOW có việc thật
+
+Giáo viên WOW giữ toàn bộ buổi WOW của trung tâm nhưng mở app buổi sáng thì mọi dòng nhịp ngày đều
+bằng 0. Nay có nhịp ngày riêng (buổi WOW hôm nay · buổi mới đặt chờ xác nhận · buổi vừa dạy chưa ghi
+nội dung · em không đến chưa ghi lý do), có panel buổi WOW hôm nay trên màn Hôm nay, có hai luật việc
+mới, và **buổi WOW vào bảng công** với đơn giá riêng.
+
+### Giáo viên biết hôm nay dạy ở đâu
+
+Thẻ buổi dạy hôm nay nay in **cơ sở và phòng**; lớp online in **link phòng học bấm được**.
+
+### Khối tiền
+
+- **Nợ treo của học viên đã rời** tách khỏi Dự thu thành bảng riêng - tiền của người đã bỏ học không
+  phải "tiền sắp về". Ba lối ra: thu dứt, hủy đơn, để nguyên nếu đang thương lượng.
+- **Nhắc nợ có trí nhớ**: nút Copy tin Zalo ghi luôn lần nhắc. Khoản chưa tới hạn vừa nhắc thì tạm
+  lùi; khoản **quá hạn vẫn giữ** trong hàng chờ, chỉ ghi thêm đã nhắc bao lâu.
+- **Doanh thu nhân viên tư vấn** tính theo khách của người đó, không theo ai cầm tiền. Giữ thêm cột
+  "tự tay thu" để kế toán đối chiếu quỹ.
+- **Đối soát khoản thu** và **duyệt chiết khấu** nay leo thang theo thời gian chờ, không còn một màu.
+
+### Danh mục khóa nói được khóa nào bán được
+
+Thêm hai cột "Đơn đã bán" và "Doanh thu". Khóa chưa bán được đơn nào tô đỏ thay vì trông y hệt khóa
+đang chạy tốt.
+
+### Mọi việc đều bấm được
+
+Trước đây 41/181 việc chỉ có nút "Hồ sơ" - trỏ sang hồ sơ 360 mà trang đó không có thao tác đang cần.
+Nay **0/180**. Thêm màn cho: gọi hỏi thăm học viên vắng (ghi thẳng vào buổi), duyệt chiết khấu, giữ
+chân học viên bảo lưu, xin cảm nhận. Riêng **chấm bài gom theo lớp và bài** - một dòng việc là một
+lượt mở màn chấm cả lớp.
+
+### Sửa lỗi
+
+- **Hộp "Xác nhận thao tác" bị chôn dưới ngăn kéo** - mọi thao tác cần xác nhận mà bấm từ trong ngăn
+  kéo hoặc từ Trợ thủ đều không bấm tới được nút Xác nhận, ở mọi khổ màn. Luồng khiếu nại vì thế
+  không hoàn thành được.
+- **Một cú bấm đánh dấu "đã tư vấn" mà không lập phiếu nào** - nay mở phiếu tư vấn, dấu chỉ đóng khi
+  phiếu được lưu.
+- **Trợ thủ đổ vào form thô** (12 ô của bảng gốc) trong khi màn đúng (3 ô + 3 lối thoát) đã có sẵn.
+- **Hub Chờ duyệt có 3-4 ô thống kê bấm không tới** với hầu hết chức danh.
+- **Học vụ mở app thấy "0 việc"** dù trang Xếp lớp đang có 12 việc - nay đáp thẳng vào Xếp lớp và có
+  nút "chỉ việc của tôi".
+- **Điểm danh** bỏ 3 hộp xác nhận thừa, thêm nút Lưu ngay dưới ô nhận xét (trước đây cách nhau 573px).

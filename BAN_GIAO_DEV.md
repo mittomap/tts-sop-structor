@@ -51,17 +51,29 @@ thẳng số vào code là biến một thao tác 5 giây của họ thành mộ
 ./verify.sh --nhanh    # bỏ phần trình duyệt, ~2 phút
 ```
 
-Một lệnh, chạy hết: build → 14 bộ kiểm → ~1.975 tiêu chí + 462 lượt mở app thật trong Chromium.
+Một lệnh, chạy hết: build → 14 bộ kiểm → ~1.988 tiêu chí + 463 lượt mở app thật trong Chromium.
 Xanh hết mới được giao.
+
+Phần trình duyệt cần Playwright. Chưa cài thì `_checkui` **tự báo qua** chứ không báo đỏ giả:
+```bash
+cd _src && npm i playwright        # Chromium đã có sẵn ở /opt/pw-browsers
+```
+
+Thêm icon `ti-*` mới thì dựng lại font, cũng một lệnh:
+```bash
+cd _src && python3 build_icons.py  # cần: pip install fonttools brotli
+```
 
 **Bộ kiểm bắt được gì và KHÔNG bắt được gì** - nói trước để bạn không tin nhầm:
 
 | Bắt được | Không bắt được |
 |---|---|
 | Trang ném lỗi, nút bấm không ra gì, chữ bị cắt, layout vỡ, trang cuộn ngang | Bạn viết đúng cú pháp nhưng **sai ý nghiệp vụ** (ví dụ tính công nợ sai công thức) |
-| Tham số cấu hình **chết** hoặc bị gõ cứng ở **mọi** chỗ đọc nó | Gõ cứng ở **một trong nhiều** chỗ đọc - đã thử thật, nó **không** bắt được |
+| Tham số cấu hình **chết** (có ô sửa mà không dòng mã nào đọc) và tham số **trùng** (hai dòng cùng nghĩa, một dòng là mồi) | Gõ cứng ở **một trong nhiều** chỗ đọc - đã thử thật, nó **không** bắt được |
 | Viết hàm ghi dữ liệu mới mà quên khai vào `DOORS` | Bạn xoá một tính năng và quên xoá bộ kiểm của nó (thành bộ kiểm giả) |
-| Dữ liệu demo mâu thuẫn với luật nghiệp vụ | Trải nghiệm có dễ dùng không - cái đó phải có người thật ngồi thử |
+| Icon `ti-*` mới mà quên dựng lại font (từ V9.40 mới đỏ thật) | Trải nghiệm có dễ dùng không - cái đó phải có người thật ngồi thử |
+| Hộp xác nhận bị chôn dưới ngăn kéo, phần tử bấm không tới (đo `elementFromPoint` trong Chromium) | Một việc "xong" mà thật ra chưa ai làm gì - phải tự nghĩ khi viết luật SLA |
+| Dữ liệu demo mâu thuẫn với luật nghiệp vụ | |
 
 Nói cách khác: nó chặn phần lớn tai nạn, **không** biến người bất cẩn thành an toàn. Đọc mã vẫn cần.
 
@@ -121,6 +133,18 @@ cố ý.
 4. **Viết bộ kiểm xong phải BẺ LẠI xem nó có đỏ không.** Bộ kiểm giao diện đầu tiên chạy xanh, nhưng
    cố tình bẻ lại đúng cái lỗi đã sinh ra nó thì **vẫn xanh** - nó chẳng kiểm gì cả. Xanh ngay từ
    đầu nhiều khi chỉ nghĩa là bạn chưa kiểm đúng thứ.
+   Hỏi thêm hai câu: **cái nó khớp có TRÔI theo thời gian không?** (`verify.sh` từng chờ đúng con số
+   "4 ca cố ý", mà số đó tăng dần theo ngày → bộ kiểm tự đỏ dù không ai đụng mã), và **cái nó ép có
+   phải là bệnh không?** (một tiêu chí từng bắt buộc phải có HAI dòng cấu hình cho cùng một sự thật -
+   tức nó đang canh gác đúng cái lỗi tham số trùng).
+
+5. **Một việc chỉ được rời hàng chờ khi dữ liệu THẬT đổi theo đúng nghĩa của việc đó.** Không có nút
+   "tôi làm rồi". Đã cắn: một hàm ghi thẳng "đã tư vấn" trong một cú bấm - không phiếu tư vấn nào
+   được lập, không ai tư vấn gì cả, việc rời hàng chờ vĩnh viễn, và Trợ thủ vẫn báo "Xong việc này".
+
+6. **Cùng một danh sách đừng vẽ hai lần bằng hai nguồn.** Hub Chờ duyệt vẽ dải ô thống kê từ danh
+   sách đầy đủ nhưng vẽ dải tab từ danh sách đã lọc quyền → 3-4 ô hiện ra mà bấm không tới, bấm vào
+   thì im lặng nhảy đi chỗ khác. Vẽ cả hai từ **một** biến.
 
 ---
 

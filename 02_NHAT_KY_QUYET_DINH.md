@@ -149,38 +149,94 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.39 — (A)…(H) + (N1)…(N4) + ba việc anh Luân chốt 29/07 + KIỂM THỬ THẬT TRÊN
-> TRÌNH DUYỆT + VÁ "CHỜ DUYỆT BỊ ĐƠ" + TRỢ THỦ NHẬP VÀO GUIDE ĐỀU ✅ XONG.**
-> · **(1) Nhật ký thao tác (DL25)** - app từng có 115 cửa ghi mà không sổ nào ghi ai làm gì lúc nào.
-> · **(2) Hoàn tác** - 46 chỗ hỏi "Xác nhận?" mà không có đường lùi; nay lùi được theo LƯỢT BẤM.
-> · **(3) Tối ưu hiệu năng** - Trang bắt đầu 20ms → 7ms, cả 38 trang 164ms → 107ms.
-> · (A) dữ liệu demo khớp ga nghiệp vụ 218→0 · (B) bộ máy lọc phủ 16 trang · (C) xin nghỉ có phép
-> · (D) mảng 5: mọi hằng số nghiệp vụ đã ra khỏi code, dải số bấm được, hub Chờ duyệt, cấp lượt WOW
-> · (E) việc tồn đợt 2: GV dự phòng theo ngày, đổi GV chính của lớp, phòng & đụng lịch, bảng công
-> giảng dạy · (F) hội đồng audit thành `_check18` (bắt 4 lỗi thật) · (G) Trợ thủ thao tác
-> · (H) bài hướng dẫn neo bằng `@mã`.
+> **Phiên bản: V9.40 — BỘ PHẬN NGHIÊN CỨU SẢN PHẨM + 17 MẢNG NÂNG CẤP ✅ XONG (29/07).**
+> Anh Luân: *"giờ là lúc nâng cấp tiếp, cho bộ phận nghiên cứu sản phẩm vào đi em, rồi cho em toàn
+> quyền nâng cấp, báo cáo lại anh là được"*. Em lập 4 hướng soi song song (người dùng thật · dữ liệu ·
+> chỗ nghẽn trải nghiệm đo bằng trình duyệt · đối chiếu sản phẩm cùng ngành) + một vòng tự soi độc lập
+> để đối chiếu chứ không nghe một chiều. **17 mảng đã làm, mỗi mảng có số đo kèm theo:**
+>
+> · **P1 Cờ nguy cơ tự tính** - hai ngưỡng `thresholdAtRisk_*` nằm trong CH2 từ lâu mà CHỈ trang học
+> viên tự xem đọc tới; phía nhân viên không dòng nào đọc. Chạy đúng luật của chính trung tâm: **19 em
+> vượt ngưỡng, chỉ 2 được gắn cờ**; KPI ARR vì thế báo 3,7% (xanh) trong khi luật thật là 16,2% (đỏ).
+> Nay cờ tay VẪN GIỮ, máy đếm song song; có màn chăm `riskCare` và "tạm bỏ qua" **có lý do, có hạn**.
+> · **P2 Cơ sở học viên theo NƠI HỌC** - `DL09.branch` ghi đúng một lần lúc chuyển đổi rồi không bao
+> giờ đổi. **71/84 hồ sơ xếp lớp có cơ sở lớp khác cơ sở hồ sơ**; lọc Cơ sở 3 ra **0 người** dù CS3 có
+> 13 em và 4 lớp. Nay một học viên thuộc CẢ nơi đăng ký lẫn nơi đang học.
+> · **P3 Lớp sắp khai giảng** - 13 lớp đã lên lịch với **174 ghế trống**; 3 lớp đang tuyển sinh khai
+> giảng trong 6-14 ngày với sĩ số 3/20, 0/14, 0/12 - không màn hình nào nói tới. `thresholdClassStart_days`
+> có trong CH2 mà không hàm nào đọc. Nay có luật việc + màn `moLop` (dồn lớp / lùi ngày / hủy sớm).
+> · **P4 Bảng tải giảng viên cả đội** - NV005 ôm 25/67 buổi 30 ngày tới (37%); NV036 "đang làm việc"
+> từ 04/2025 mà **15 tháng không một buổi nào**. App xem được từng người và một ngày, không có chỗ so ngang.
+> · **P5 Nợ treo của người đã rời** - 5 đơn còn "đã xác nhận" của học viên đã bỏ học/chuyển giữ **43,1tr**,
+> nằm nguyên trong Dự thu. Nay tách riêng, dự thu sạch xuống 470,5tr.
+> · **P6 Dọn tham số chết và trùng** - chết (có ô sửa, không ai đọc): `slaPaymentVerify_hours`,
+> `slaDiscountApprove_hours`, `slaRiskFollowup_days`, `thresholdClassStart_days`. Trùng (hai dòng cùng
+> nghĩa, một dòng là mồi): ClassInfoSend/Zalo, HomeworkGrade/Grading, LeadResponse/LRT, TestResult/GLA,
+> ConsultAfterTest/CVT. **Bộ kiểm mới bắt cả hai bệnh** - đã bẻ lại để thử, cả hai đều đỏ.
+> · **P7 Khối WOW** - 4 tầng cùng hụt: nhịp ngày gộp WOW vào nhóm giáo viên (lọc DL11/DL13 nên coach
+> thấy 4 dòng đều 0, tức app nói "hôm nay anh hết việc"); màn Hôm nay đếm mà không liệt kê; bộ máy chỉ
+> sinh MỘT loại việc WOW; **51 buổi WOW đã dạy không vào bảng công nào**. Vá cả bốn.
+> · **P8 Giáo viên phải biết hôm nay dạy Ở ĐÂU** - 6/7 GV dạy nhiều hơn một cơ sở; thẻ buổi in giờ, lớp,
+> chủ đề, bài - mà không in cơ sở, không in phòng, lớp online không in link Zoom.
+> · **P9 Doanh thu NV tư vấn theo người CHỐT** - cũ cộng theo `received_by` (ai cầm tiền), lệch **2,4 lần**
+> (NV026: 79,6tr vs 188,8tr). 24/112 khoản do học vụ/kế toán nhận nên không rơi vào NV nào.
+> · **P10 Sản phẩm chết & thưởng treo** - 9/16 khóa 0 đơn suốt 10 tháng vẫn được xếp 4 lớp (56 ghế,
+> 3 giáo viên); 2 phần thưởng giới thiệu treo 47 và 67 ngày.
+> · **P11 LỖI CHẶN ĐỨNG: hộp xác nhận bị chôn dưới ngăn kéo** - `.cfmask` z-index 95 < `.mask` 170 <
+> `.drawer` 171 < `.asst` 199. Mọi thao tác qua `confirmRun` bấm TỪ TRONG ngăn kéo đều bật hộp rồi chôn
+> nó xuống dưới; đo `elementFromPoint` ở cả 4 khổ màn đều không bấm tới. **Luồng khiếu nại không hoàn
+> thành được**; nút "Làm ngay" của Trợ thủ ở khổ điện thoại cũng chết.
+> · **P12 LỖI GHI CÂM** - `testConsult()` ghi thẳng "đã tư vấn" trong một cú bấm: không phiếu tư vấn nào
+> được lập, không ai tư vấn gì cả, việc rời hàng chờ vĩnh viễn. Và Trợ thủ đổ vào form thô (12 ô) trong
+> khi màn tốt hơn (3 ô + 3 lối thoát) đã có sẵn trong app.
+> · **P13 41/181 việc chỉ có nút "Hồ sơ"** - trỏ sang hồ sơ 360 mà trang đó không có thao tác đang cần,
+> còn viết "HV đang học đều, không cần làm gì thêm". Nay **0/180**; và chấm bài gom theo (lớp × bài) nên
+> một dòng việc = một lượt mở màn chấm cả lớp.
+> · **P14 Hub Chờ duyệt có ô thống kê bấm chết** (NV007 3 ô, NV005 4 ô, NV001 4 ô).
+> · **P15 Học vụ mở app thấy 0 việc** - Trang bắt đầu dựng quanh phễu tuyển sinh mà học vụ không đụng
+> lead; cùng lúc trang Xếp lớp có 12 việc, nằm sau 2 lần bấm. Nay đáp thẳng vào Xếp lớp + bật nút
+> "chỉ việc của tôi" (76 việc toàn trung tâm → 11 việc của mình).
+> · **P16 Nhắc nợ có trí nhớ** - 25 dòng công nợ hiện y nguyên mỗi ngày vì không có mốc "đã nhắc".
+> Nay nút Copy tin Zalo ghi luôn lần nhắc; khoản chưa tới hạn tạm lùi, khoản QUÁ HẠN vẫn giữ.
+> · **P17 Điểm danh** - bỏ 3 hộp xác nhận thừa (đều hoàn tác được), thêm nút Lưu thứ hai ngay dưới ô
+> nhận xét (đo tọa độ: nút Lưu cũ cách ô nhận xét **573px**, phải cuộn ngược lên mới thấy).
+>
+> **BA CHỖ BỘ KIỂM TỰ ĐỎ MÀ KHÔNG AI BIẾT - đã vá:** (1) `_tall.js` in "thiếu trong font: ti-radar,…"
+> rồi vẫn thoát 0, tức icon thiếu KHÔNG BAO GIỜ làm bộ kiểm đỏ; (2) `verify.sh` chờ đúng chuỗi
+> "TONG BAN GHI LOI: 4" mà số đó **trôi theo ngày**; (3) `_check16` ép phải có HAI dòng cấu hình cho
+> cùng một sự thật, tức nó đang canh gác đúng cái bệnh tham số trùng.
+>
+> **CÒN LẠI - PHẢI HỎI ANH LUÂN, EM KHÔNG TỰ QUYẾT:**
+> · **Ai được duyệt chiết khấu?** Dữ liệu ghi NV012 (TP Tư vấn) duyệt 8 lần, cấu hình quyền lại cho
+> Kế toán. Một trong hai sai.
+> · **Trả công giáo viên theo BUỔI hay theo GIỜ?** Buổi dài từ 1,3 tới 3 giờ (8 buổi 3 giờ ở lớp
+> Foundation T7-CN) mà đang tính một giá. Nếu trả theo giờ thì `class_start_actual/end_actual` đã có
+> sẵn dữ liệu để tính.
+> · Bốn đề xuất **chưa duyệt** (nêu rồi để đó, đừng tự làm): thao tác hàng loạt, sửa tại chỗ trong bảng,
+> bản in cho phụ huynh, phím tắt bàn phím.
+> · Bốn mảng lớn bộ phận nghiên cứu nêu, **chưa làm vì cần anh Luân quyết trước**: gửi Zalo THẬT (Zalo OA)
+> + sổ tin đã gửi; **hồ sơ phụ huynh** (ai trả tiền, ai nhận báo cáo, ai được duyệt bảo lưu - nay chỉ có
+> ô "liên hệ khẩn cấp"); sổ quỹ + chi phí theo cơ sở (hiện chỉ có một chiều tiền vào nên không biết cơ sở
+> nào lãi); bảng lương giáo viên nhiều đơn giá.
+>
+> **Hai việc đã khuyên KHÔNG làm:** tách file 4MB (mất thế mạnh một-file-chạy-mọi-nơi) và biểu đồ trang trí.
+> **KHÔNG CÒN PHIÊN TỰ ĐỘNG.** Routine "Auto - Github ITTs-SOP-Demo" đã bị XOÁ theo lệnh anh Luân
+> (28/07 chiều) - phiên chạy lịch chỉ có quyền ĐỌC repo nên `git push` trả 403. Muốn bật lại phải cấp
+> quyền GHI trước, và giữ BƯỚC 0 "thử `git push --dry-run` trước khi làm bất cứ việc gì".
+>
+> **BỘ KIỂM HIỆN TẠI (phải XANH HẾT mới được giao) - một lệnh `./verify.sh`:**
+> node --check 2 file · `_tall` **38 trang 0 lỗi, 176 icon** (nay icon thiếu là ĐỎ THẬT) · `_check11`
+> **145** · `_check12` 37 · `_check13` 174 · `_check14` 111 · `_check15` 39 · **`_check16` 585** ·
+> `_check17` 393 · **`_check18` 177** (vẽ thật 79 trang/tab) · `_checktour` · `_checkdata` 27 luật /
+> **6.333 lượt kiểm - 0 lệch** · `check_logic.py` (nay tách "lỗi thật" khỏi "ca cố ý", in kết luận ổn
+> định) · `check_data.py` DAT · **`_checkui.js` 463 lượt mở THẬT trong Chromium** (thêm probe hộp xác
+> nhận bằng `elementFromPoint`).
+> **Tổng ~1.988 tiêu chí tự động + 463 lượt mở thật.**
+> **MỚI: `_src/build_icons.py`** - công thức dựng lại font icon trước đây nằm trong một khối ```bash```
+> giữa tài liệu, người nhận bàn giao gần như chắc chắn không tìm thấy. Nay là một lệnh.
+>
 > **RÀNG BUỘC XUYÊN SUỐT anh Luân nhắc:** trung tâm có **5 chi nhánh + học online** - mọi việc phải
 > soi qua lăng kính đó (xem mục V9.29o/r bên dưới).
-> **CÒN LẠI CHO PHIÊN SAU:** không còn việc tồn nào đã chốt. Bốn đề xuất anh Luân **chưa** duyệt
-> (nêu ra rồi để đó, đừng tự làm): thao tác hàng loạt (chọn nhiều dòng rồi xử một lượt), sửa tại chỗ
-> trong bảng, bản in cho phụ huynh, phím tắt bàn phím. Hai việc **đã khuyên KHÔNG làm**: tách file
-> 4MB (mất thế mạnh một-file-chạy-được-mọi-nơi) và thêm biểu đồ trang trí.
-> **KHÔNG CÒN PHIÊN TỰ ĐỘNG.** Routine "Auto - Github ITTs-SOP-Demo" đã bị XOÁ theo lệnh anh Luân
-> (28/07 chiều). Lý do: phiên chạy lịch chỉ có quyền ĐỌC repo, `git push` trả 403 "Not authorized to
-> access repository mittomap/tts-sop-structor". Chúng nó làm xong việc rồi mới phát hiện không đẩy
-> được, công sức nằm chết trong container. Muốn bật lại thì phải cấp quyền GHI cho môi trường chạy
-> lịch trước, và giữ nguyên BƯỚC 0 "thử `git push --dry-run` trước khi làm bất cứ việc gì". MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG.
-> **MỚI - `_checkui.js`:** mở app THẬT bằng Chromium, 396 lượt (2 cổng x 3 khổ màn hình). Bắt được
-> 6 lỗi mà 1930 tiêu chí kiểm chuỗi không thấy - trong đó có `.notebar` bẻ vụn câu văn (83 chỗ) và
-> ảnh đại diện kéo từ `ui-avatars.com` (gửi TÊN NGƯỜI THẬT ra máy chủ nước ngoài).
-> **Bộ kiểm hiện tại (phải XANH HẾT mới được giao):** node --check 2 file · `_tall` **38 trang** 0 lỗi
-> (170 icon) · `_check11` **144** · `_check12` 37 · `_check13` 174 · `_check14` **111** · `_check15`
-> **39** · **`_check16` 578** · `_check17` **394** · **`_check18` 176 (vẽ thật 79 trang/tab + 8 chức
-> danh + mọi hồ sơ cổng học viên + nhật ký/hoàn tác/bộ nhớ tạm)** · `_checktour` · `_checkdata.js`
-> 27 luật / **6289 lượt kiểm - 0 lệch** · `check_logic.py` (đúng 4 ca cố ý) · `check_data.py` DAT ·
-> **`_checkui.js` 462 lượt mở THẬT trong trình duyệt**.
-> **Tổng ~1975 tiêu chí tự động + 402 lượt mở thật.**
->
 > **VIỆC PHẢI LÀM TIẾP - THEO ĐÚNG THỨ TỰ NÀY (Luân chốt 28/07 khuya, rồi về nghỉ):**
 >
 > **(A) DỮ LIỆU DEMO KHỚP TOÀN BỘ - ✅ XONG 28/07 trưa (V9.28).** `_src/_checkdata.js` đã có và đã
@@ -2770,3 +2826,129 @@ khi có người NGỒI DÙNG, không phải khi có người ĐỌC CODE.
 đang nhập liệu, bấm vào đó sẽ thay nội dung drawer và mất form đang điền.
 **Dải chào Trang bắt đầu** từ 3 dòng + ô tìm to đứng → MỘT BĂNG: lời chào 22→17px, một dòng tóm tắt
 (việc / quá hạn / chip hẹn kế tiếp bấm được), ô tìm sang cột phải cùng hàng.
+
+---
+
+## V9.40 (29/07) - BỘ PHẬN NGHIÊN CỨU SẢN PHẨM: 17 MẢNG, VÀ 5 CÁI BẪY MỚI CẮN
+
+Anh Luân: *"giờ là lúc nâng cấp tiếp, cho bộ phận nghiên cứu sản phẩm vào đi em, rồi cho em toàn
+quyền nâng cấp, báo cáo lại anh là được"*.
+
+Cách làm: 4 hướng soi chạy song song (người dùng thật theo 5 chức danh · đào dữ liệu tìm cơ hội ·
+đo chỗ nghẽn bằng trình duyệt thật · đối chiếu sản phẩm cùng ngành), **cộng một vòng tự soi độc
+lập** để đối chiếu chứ không nghe một chiều. Vòng tự soi đã cứu một lần: em định báo "công nợ
+514tr là khủng hoảng", đào ra thì **414tr là đợt CHƯA tới hạn, chỉ 43tr thật sự quá hạn** - và
+app đã tính đúng chuyện đó từ trước (`insDueState` đọc `due_date` chứ không đọc cột `status`).
+Báo cáo phát hiện mà không kiểm lại là cách nhanh nhất để làm chủ dự án hoảng vì một con số sai.
+
+### BẪY 5 - MỘT SỰ THẬT NẰM Ở HAI CHỖ, LẦN NÀY LÀ THAM SỐ CẤU HÌNH
+
+Đây là **lần thứ tư** bẫy "cùng một sự thật khai ở hai nơi" cắn, và lần này nó ẩn kỹ nhất vì cả
+hai nơi đều **có thật, đều sửa được, đều nhìn như đúng**:
+
+| Tên trong Cài đặt | Tên còn lại | Chuyện gì xảy ra |
+|---|---|---|
+| `slaClassInfoSend_hours` | `slaClassInfoZalo_hours` | mã thật đọc cái sau; sửa cái trước không có tác dụng |
+| `slaHomeworkGrade_hours` | `slaHomeworkGrading_hours` | `cfEnsure` tạo cả hai, `paramOf` lấy cái đầu tiên tìm thấy |
+| `slaLeadResponse_min` | `slaLRT_minutes` | một dòng cho SLA, một dòng cho ngưỡng KPI, cùng nghĩa |
+| `slaTestResult_hours` | `slaGLA_hours` | như trên |
+| `slaConsultAfterTest_hours` | `slaCVT_hours` | như trên |
+
+Cách vá: **giữ đúng MỘT dòng** (dòng ở vế phải của `PKEY`), `PKEY` dẫn tên cũ về dòng còn lại nên
+mã cũ vẫn chạy. Và quan trọng hơn: **bộ kiểm cũ đang canh gác chính cái bệnh này** - nó bắt buộc
+"tên app đọc thì phải có ô sửa", tức là ép phải có hai dòng. Đã sửa để nó biết đọc `PKEY`.
+
+### BẪY 6 - THAM SỐ CHẾT: CÓ Ô SỬA, KHÔNG DÒNG MÃ NÀO ĐỌC
+
+`slaPaymentVerify_hours`, `slaDiscountApprove_hours`, `slaRiskFollowup_days`,
+`thresholdClassStart_days` đều có dòng trong Cài đặt và đều được gắn làm **nhãn `prm` trên chip
+việc** - tức chip nói "ngưỡng lấy từ đây" mà chẳng lấy gì. Chủ trung tâm sửa xong không có gì đổi
+và không biết vì sao. Nay cả bốn quyết định màu và thứ tự thật.
+
+**Bộ kiểm mới trong `_check16`:** quét mọi tên trong `APPPARAMS`, tên nào không xuất hiện trong
+`paramOf|paramStr|slaChip|kpiChip|apptH|P(` thì báo đỏ. Đã bẻ lại để thử (thêm một tham số giả),
+nó đỏ đúng. **Thêm hàm đọc tham số mới thì phải thêm tên hàm vào danh sách này**, không thì 5 tham
+số giờ hẹn bị báo chết oan.
+
+### BẪY 7 - BA BỘ KIỂM TỰ ĐỎ MÀ KHÔNG AI BIẾT
+
+1. **`_tall.js` in ra rồi thôi.** Nó in `thiếu trong font: ti-radar,...` nhưng **thoát 0**, còn
+   `verify.sh` khớp chuỗi `"0 loi"` nằm ở dòng TRÊN. Thêm 3 icon mới, harness báo rõ ràng, bảng
+   tổng kết vẫn **XANH HẾT**. Nay `process.exit(1)` khi thiếu icon hoặc trang lỗi.
+2. **`verify.sh` chờ một con số trôi theo ngày.** `check_logic.py` in `TONG BAN GHI LOI: 4`, trong
+   đó 4 là số **ca cố ý** (việc demo để quá hạn cho có cảnh báo đỏ) - mà số đó **tăng dần theo
+   thời gian**. Ngày 29/07 nó thành 5 và bộ kiểm tự chuyển đỏ dù không ai đụng vào mã. Một bộ kiểm
+   tự đỏ là một bộ kiểm bị bỏ qua. Nay `check_logic.py` tách "lỗi thật" khỏi "ca cố ý" (khai tên
+   trong `COY`) và in `KET QUA: DAT` - dòng ổn định.
+3. **`_check16` canh gác đúng cái bệnh** (xem bẫy 5).
+
+**Rút ra:** viết bộ kiểm xong phải bẻ lại - nhưng cũng phải hỏi thêm *"cái nó khớp có TRÔI theo
+thời gian không?"* và *"cái nó ép có phải là bệnh không?"*.
+
+### BẪY 8 - HỘP XÁC NHẬN BỊ CHÔN DƯỚI NGĂN KÉO
+
+`.cfmask` để `z-index:95`, thấp hơn `.mask` (170), `.drawer` (171) và `.asst` (199). Nghĩa là mọi
+thao tác cần xác nhận mà bấm **từ trong ngăn kéo** hoặc **từ tấm Trợ thủ** đều bật hộp lên rồi chôn
+nó xuống dưới. Đo `elementFromPoint` tại tâm nút "Xác nhận" ở 4 khổ màn 390/1024/1440/1920: **không
+khổ nào bấm được**. Hậu quả: luồng khiếu nại (Nhận - Bắt đầu xử lý - Leo thang, cả ba đi qua
+`confirmRun`) **không hoàn thành được**; nút "Làm ngay" của Trợ thủ ở khổ điện thoại cũng chết.
+
+HTML hoàn toàn đúng nên **1.980 tiêu chí kiểm chuỗi không thể thấy**. Chỉ trình duyệt thật mới thấy.
+`_checkui.js` nay có probe riêng: mở ngăn kéo → gọi `confirmRun` → `elementFromPoint` tại tâm nút
+phải rơi vào trong `#cfm`. Đã bẻ z-index về 95 để thử: nó đỏ đúng ("bấm vào trúng div.mask").
+
+### BẪY 9 - MỘT CÚ BẤM BIẾN VIỆC CHƯA LÀM THÀNH VIỆC ĐÃ LÀM
+
+`testConsult(id)` ghi thẳng `post_test_status = consulted` rồi báo "đã đánh dấu đã tư vấn". Không
+phiếu tư vấn nào được lập, không ai tư vấn gì cả, và việc **rời hàng chờ vĩnh viễn**. Lộ ra khi
+dùng Trợ thủ dọn từng bước: bấm "Làm việc này" là Trợ thủ báo *"Xong việc này. Còn 3 việc."* trong
+khi khách chưa được gọi.
+
+Nguyên tắc rút ra và ghi vào đây: **một việc chỉ được rời hàng chờ khi dữ liệu thật đổi theo đúng
+nghĩa của việc đó** - không có nút "tôi làm rồi". Nay `testConsult` mở phiếu tư vấn, và `tvSave`
+đóng luôn dấu "đã tư vấn sau test" (một sự thật thì một chỗ ghi).
+
+Hệ quả sang bộ kiểm: tiêu chí *"làm thật một việc thì bước đó đổi sang XONG"* trước đây bấm
+`testconsult` **chính vì nó xong bằng một cú bấm** - tức bộ kiểm đang lấy cái lỗi làm bằng chứng.
+Đã đổi cách chứng minh: ghi thật vào dữ liệu rồi đòi hàng chờ vứt việc đó ra, và **trả lại dữ liệu
+sau khi thử** (bộ kiểm không được để lại dấu vết).
+
+### BẪY 10 - CÙNG MỘT DANH SÁCH VẼ HAI LẦN BẰNG HAI NGUỒN
+
+`renderDuyet` vẽ dải ô thống kê từ `duyTabs()` **đầy đủ**, còn dải tab thì đi qua `scopeTabs` (đã
+lọc quyền). NV007 có 5 ô / 2 tab → **3 ô bấm không tới**; NV005 4 ô chết; NV001 4 ô chết. Bấm vào
+thì `duyTabSet` gặp key ngoài quyền, **im lặng** rơi về tab đầu. Nay dải thống kê vẽ từ chính
+`segs` đã lọc. `_check18` mục 28 canh: mọi ô/tab hiện ra phải thuộc quyền của vai đó.
+
+### CÁC MẢNG NGHIỆP VỤ - SỐ ĐO KÈM THEO
+
+Chi tiết từng mảng nằm trong mục **⭐ HIỆN TRẠNG** ở đầu file (P1…P17). Ba con số đáng nhớ nhất:
+
+- **19/82 học viên vượt ngưỡng nguy cơ của chính trung tâm, chỉ 2 được gắn cờ.** KPI ARR báo 3,7%
+  (xanh) trong khi luật thật ra 16,2% (đỏ). Đây đúng là câu mà `BAN_GIAO_DEV.md` gọi là giá trị
+  cốt lõi của hệ thống ("học viên nào đang có nguy cơ bỏ học") - và nó đang không tự trả lời được.
+- **71/84 hồ sơ xếp lớp có cơ sở của LỚP khác cơ sở ghi trong hồ sơ học viên.** Lọc Cơ sở 3 ra 0
+  người dù CS3 có 13 em và 4 lớp. Chính app đã biết luật đúng - `baocaoBranch()` ghi rõ trong chú
+  thích "quy về cơ sở của LỚP mà học viên đang học". Báo cáo làm đúng; tầng phân quyền dùng số kia.
+- **13 lớp đã lên lịch khai giảng với 174 ghế trống**, trong đó 3 lớp đang tuyển sinh khai giảng
+  trong 6-14 ngày với sĩ số 3/20, 0/14, 0/12. Nhịp đăng ký thật ~19 đơn/tháng.
+
+### HAI CÂU PHẢI HỎI ANH LUÂN - EM KHÔNG TỰ QUYẾT
+
+1. **Ai được duyệt chiết khấu?** Dữ liệu ghi NV012 (Trưởng phòng Tư vấn) duyệt 8 lần, cấu hình
+   quyền lại cho Kế toán. Một trong hai sai, em không biết cái nào.
+2. **Trả công giáo viên theo BUỔI hay theo GIỜ?** Buổi dài từ 1,3 tới 3 giờ (8 buổi 3 giờ ở lớp
+   Foundation T7-CN) mà đang tính một đơn giá. Nếu trả theo giờ thì `class_start_actual` /
+   `class_end_actual` đã có sẵn dữ liệu để tính - chỉ là em không được tự đổi cách trả lương.
+
+### BỐN MẢNG LỚN BỘ PHẬN NGHIÊN CỨU NÊU - CHƯA LÀM, CHỜ ANH LUÂN QUYẾT
+
+- **Gửi Zalo THẬT (Zalo OA/ZNS) + sổ tin đã gửi.** Hiện app dựng sẵn câu và có nút Copy, nhân viên
+  tự dán rồi quay lại tick "đã gửi". Nghĩa là **mọi SLA nhắn tin đang đo trên lời tự khai**.
+- **Hồ sơ phụ huynh.** Bảng học viên chỉ có "liên hệ khẩn cấp", không có người giám hộ đúng nghĩa:
+  ai trả tiền, ai nhận báo cáo, ai được duyệt bảo lưu. Ở thị trường Việt Nam, người quyết định
+  đóng tiền và người quyết định có học tiếp hay không thường là phụ huynh.
+- **Sổ quỹ + chi phí theo cơ sở.** Hiện chỉ có một chiều tiền vào, nên bảng so sánh 5 cơ sở mới trả
+  lời được nửa câu hỏi - chủ không bao giờ biết cơ sở nào thật sự có lãi.
+- **Bảng lương giáo viên nhiều đơn giá** (bản ngữ theo giờ, giáo viên Việt theo trình độ lớp, buổi
+  WOW, tiền chấm bài, dạy thay, trừ đi trễ). Nền tảng đã có sẵn số liệu, chỉ thiếu bảng đơn giá.
