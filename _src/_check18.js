@@ -590,6 +590,86 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
   t("man Nhat ky loc duoc theo bang va theo nguoi", /nkSet\('NKTB'/.test(o)&&/nkSet\('NKWHO'/.test(o));
   t("man Nhat ky noi thang gioi han giu bao nhieu dong", o.indexOf("dòng gần nhất")>=0);
   t("man Nhat ky goi ten bang bang tieng Viet", o.indexOf("Test đầu vào")>=0||o.indexOf("Buổi học")>=0)})();
+ /* ============ 23. TRO THU NHAP VAO GUIDE + CAU HINH DUOC (V9.34) ============
+    Anh Luan: "tro thu chua du dang cap... phai bao nguoi ta lam tung buoc luon de don sach se van
+    de dang cho ho lam" va "cach lam cua guide rat hop de lam tro thu".
+    Cai phai chung minh bang may, khong phai bang loi:
+     (1) buoc SINH TU HANG CHO that, khong phai viet san;
+     (2) mot buoc coi la xong khi viec BIEN MAT khoi hang cho - lam that mot viec phai thay doi;
+     (3) cau hinh la CAU HINH THAT: doi thu tu / doi so viec moi luot / tat di -> app di theo. */
+ (function(){
+  setRole("all");applyScope("");CURSTAFF="";
+  var C=tthCfg();
+  t("co tang thu tu 'Don viec hom nay' trong guide",
+    TOURLV.some(function(v){return v[0]==="donviec"&&v[1]==="Dọn việc hôm nay"}));
+  var T=tourWorkBuild();
+  t("dung duoc bai don viec tu hang cho that", !!T&&T.steps.length>0);
+  t("bai don viec la bai SONG (live), khong phai bai viet san", !!(T&&T.live));
+  t("so buoc dung bang so viec moi luot da cau hinh",
+    !!T&&T.steps.length===Math.min(C.batch,workAll().length));
+  t("moi buoc deu gan voi MOT viec that", !!T&&T.steps.every(function(st){return !!(st.item&&st.item.cat)}));
+  t("moi buoc deu co nut thao tac", !!T&&T.steps.every(function(st){return !!st.do}));
+  t("moi phep kiem cua bai don viec deu chay duoc", (function(){
+    if(!T)return false;
+    try{T.steps.forEach(function(st){st.chk()});return true}catch(e){return false}})());
+  t("viec dang trong hang cho thi phep kiem phai bao CHUA XONG",
+    !!T&&T.steps.every(function(st){return st.chk()===false}));
+  /* (2) LAM THAT mot viec -> phep kiem phai doi. Day la cho de viet mot bo kiem gia nhat:
+     chi kiem "co ham chk" thi luon xanh ma khong chung minh duoc gi. */
+  t("lam that mot viec thi buoc do doi sang XONG", (function(){
+    var L=workAll(),x=L.filter(function(y){return y.act==="testconsult"})[0];
+    if(!x)return false;
+    var key=slaKey(x);
+    var st={item:x,chk:function(){return !workAll().some(function(y){return slaKey(y)===key})}};
+    if(st.chk()!==false)return false;         /* truoc khi lam: phai la CHUA */
+    slaAct(x.act,x.rid);
+    return st.chk()===true})());               /* sau khi lam: phai la XONG */
+  /* (3) cau hinh hai chieu */
+  t("doi THU TU nhom viec thi viec dau tien doi theo", (function(){
+    var cu=C.order.slice(),ov=C.overdueFirst;
+    C.overdueFirst=0;
+    var cats=[];workAll().forEach(function(x){if(cats.indexOf(x.cat)<0)cats.push(x.cat)});
+    if(cats.length<2){C.order=cu;C.overdueFirst=ov;return false}
+    C.order=[cats[1],cats[0]].concat(cats.slice(2));
+    var a1=(workAll()[0]||{}).cat;
+    C.order=[cats[0],cats[1]].concat(cats.slice(2));
+    var a2=(workAll()[0]||{}).cat;
+    C.order=cu;C.overdueFirst=ov;
+    return a1!==a2})());
+  t("doi SO VIEC MOI LUOT thi so buoc doi theo", (function(){
+    var cu=C.batch;C.batch=2;var n2=(tourWorkBuild()||{steps:[]}).steps.length;
+    C.batch=4;var n4=(tourWorkBuild()||{steps:[]}).steps.length;C.batch=cu;
+    return n2===2&&n4===4})());
+  t("bat 'viec qua han len dau' thi viec dau tien PHAI la viec qua han", (function(){
+    var cu=C.overdueFirst;C.overdueFirst=1;
+    var L=workAll();var co=L.some(function(x){return x.sev==="red"});
+    var ok=!co||(L[0]&&L[0].sev==="red");
+    C.overdueFirst=cu;return ok})());
+  t("tat Tro thu o cau hinh thi khong trang nao con hien khoi tro thu", (function(){
+    var cu=C.on;C.on=0;var o=tthHTML("banlam");C.on=cu;
+    return o===""})());
+  t("man cau hinh Tro thu & Nhip ngay ve duoc", (function(){
+    window.SETTAB="tro";var o="";try{o=RENDER.settings()}catch(e){o=""}window.SETTAB="ch2";
+    return o.length>800&&o.indexOf("Mỗi lượt dọn bao nhiêu việc")>=0&&o.indexOf("Nhịp ngày theo chức danh")>=0})());
+  /* (4) nhip ngay: lop phu cau hinh phai an vao ket qua that */
+  t("tat mot dong nhip ngay thi dong do bien mat", (function(){
+    CURSTAFF="";var k=nhipKey();if(!k)return false;
+    var n0=nhipList().length;if(!n0)return false;
+    nhipSet(k,0,"on",0);var n1=nhipList().length;nhipSet(k,0,"on",1);
+    return n1===n0-1})());
+  t("sua chu trong nhip ngay thi man hinh hien chu moi", (function(){
+    var k=nhipKey();if(!k)return false;
+    nhipSet(k,0,"t","VIEC KIEM THU 12345");
+    var co=nhipList().some(function(x){return x.t==="VIEC KIEM THU 12345"});
+    delete nhipCfg()[nhipId(k,0)];
+    return co})());
+  t("them dong rieng cua trung tam thi no la THOI QUEN, khong bao gio bao 'sach'", (function(){
+    var k=nhipKey();if(!k)return false;
+    nhipAdd(k);
+    var L=nhipList(),x=L.filter(function(y){return y.tu})[0];
+    nhipDel(k,0);
+    return !!x&&x.hab===true})());
+ })();
  /* ============ 22. MOI VIEC TRONG HANG CHO DEU PHAI BAM DUOC (V9.33) ============
     Anh Luan: "a bam vao lam ngay con chua duoc". Do ra: 44/163 viec co ma thao tac ma slaAct KHONG
     biet ma do, nen bam xong khong lam gi VA khong bao gi. Cong them 3 viec khong co nut nao.

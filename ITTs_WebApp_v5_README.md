@@ -1398,3 +1398,24 @@ Lần đầu app được mở bằng trình duyệt thật để soi (396 lư�
 
 Kèm theo là bộ kiểm mới `_checkui.js` chạy trình duyệt thật trong quy trình kiểm - để những lỗi kiểu
 này không quay lại.
+
+## V9.34 (29/07) - TRỢ THỦ DẮT TỪNG BƯỚC, VÀ CẤU HÌNH ĐƯỢC
+
+**Trợ thủ giờ dọn việc cùng bạn, không chỉ nhắc.** Bấm **Dọn từng bước** trong khối Trợ thủ (hoặc
+vào Chạy hướng dẫn > *Dọn việc hôm nay*): app mở một hộp nhỏ neo ở góc dưới bên phải, đi theo bạn
+qua mọi trang, mỗi lần một việc thật trong hàng chờ của chính bạn. Bấm **Làm việc này** là app mở
+đúng màn thao tác; làm xong, việc rời khỏi hàng chờ thì app **tự nhảy sang việc kế** và đếm ngược
+"còn N việc" cho tới lúc sạch. Không có nút "tôi đã làm rồi" - app chỉ tính là xong khi việc thật
+sự biến mất khỏi hàng chờ.
+
+**Cấu hình ở Cài đặt > Trợ thủ & Nhịp ngày:**
+- Bật/tắt Trợ thủ cho cả trung tâm (từng người vẫn tự tắt riêng bằng nút bóng đèn).
+- Mỗi lượt dọn bao nhiêu việc - chia nhỏ để nhân viên thấy về đích thay vì nhìn 40 việc rồi nản.
+- Việc quá hạn có luôn xếp trước không.
+- **Thứ tự dọn theo nhóm việc** - bấm mũi tên đổi chỗ Tuyển sinh / Tài chính / Học vụ / Giảng viên...
+- **Nhịp ngày theo chức danh**: bật/tắt từng dòng, sửa lại câu chữ cho đúng cách gọi của trung tâm,
+  đổi buổi (đầu ngày / trong ngày / cuối ngày), đổi thứ tự, và **thêm dòng riêng của trung tâm**.
+  Dòng tự thêm được ghi rõ là "thói quen" - app không gắn mác đã xong cho nó, vì không có gì để đếm.
+
+Kèm hai chỗ vá anh Luân báo: nhóm **Chờ duyệt** giờ mở đúng 6 tab (trước đây bấm mục nào cũng ra một
+màn), và nút **Làm ngay** giờ chạy được ở cả 163/163 việc (trước đây 44 việc bấm không ra gì).

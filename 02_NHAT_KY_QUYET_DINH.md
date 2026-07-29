@@ -149,8 +149,8 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.32 — (A)…(H) + (N1)…(N4) + ba việc anh Luân chốt 29/07 + KIỂM THỬ THẬT TRÊN
-> TRÌNH DUYỆT (anh Luân chọn 29/07) ĐỀU ✅ XONG.**
+> **Phiên bản: V9.34 — (A)…(H) + (N1)…(N4) + ba việc anh Luân chốt 29/07 + KIỂM THỬ THẬT TRÊN
+> TRÌNH DUYỆT + VÁ "CHỜ DUYỆT BỊ ĐƠ" + TRỢ THỦ NHẬP VÀO GUIDE ĐỀU ✅ XONG.**
 > · **(1) Nhật ký thao tác (DL25)** - app từng có 115 cửa ghi mà không sổ nào ghi ai làm gì lúc nào.
 > · **(2) Hoàn tác** - 46 chỗ hỏi "Xác nhận?" mà không có đường lùi; nay lùi được theo LƯỢT BẤM.
 > · **(3) Tối ưu hiệu năng** - Trang bắt đầu 20ms → 7ms, cả 38 trang 164ms → 107ms.
@@ -174,12 +174,12 @@
 > 6 lỗi mà 1930 tiêu chí kiểm chuỗi không thấy - trong đó có `.notebar` bẻ vụn câu văn (83 chỗ) và
 > ảnh đại diện kéo từ `ui-avatars.com` (gửi TÊN NGƯỜI THẬT ra máy chủ nước ngoài).
 > **Bộ kiểm hiện tại (phải XANH HẾT mới được giao):** node --check 2 file · `_tall` **38 trang** 0 lỗi
-> (170 icon) · `_check11` **143** · `_check12` 37 · `_check13` 174 · `_check14` **111** · `_check15`
-> **39** · **`_check16` 577** · `_check17` **394** · **`_check18` 126 (vẽ thật 76 trang/tab + 8 chức
+> (170 icon) · `_check11` **144** · `_check12` 37 · `_check13` 174 · `_check14` **111** · `_check15`
+> **39** · **`_check16` 578** · `_check17` **394** · **`_check18` 152 (vẽ thật 77 trang/tab + 8 chức
 > danh + mọi hồ sơ cổng học viên + nhật ký/hoàn tác/bộ nhớ tạm)** · `_checktour` · `_checkdata.js`
 > 27 luật / **6289 lượt kiểm - 0 lệch** · `check_logic.py` (đúng 4 ca cố ý) · `check_data.py` DAT ·
-> **`_checkui.js` 396 lượt mở THẬT trong trình duyệt**.
-> **Tổng ~1930 tiêu chí tự động + 396 lượt mở thật.**
+> **`_checkui.js` 399 lượt mở THẬT trong trình duyệt**.
+> **Tổng ~1970 tiêu chí tự động + 399 lượt mở thật.**
 >
 > **VIỆC PHẢI LÀM TIẾP - THEO ĐÚNG THỨ TỰ NÀY (Luân chốt 28/07 khuya, rồi về nghỉ):**
 >
@@ -701,6 +701,66 @@
 > 23,9h tuổi ngay lúc build; vài tiếng sau nó vượt mốc. **Luật rút ra: dữ liệu demo neo theo NGÀY
 > CHẠY thì mọi cửa sổ thời gian phải chọn ở GIỮA, không sát mép.** Nay chỉ lấy buổi trong NỬA cửa
 > sổ, và nửa đó đọc từ chính `attendanceGrace_hours` chứ không gõ số.
+>
+> ### V9.33 - "BẤM VÔ MẤY TRANG CHỜ DUYỆT NÓ ĐƠ HẾT" + "BẤM LÀM NGAY CÒN CHƯA ĐƯỢC" (anh Luân báo 29/07)
+>
+> **(1) KHÔNG PHẢI ĐƠ - QUẢN TRỊ VIÊN ĐANG BỊ XẾP NHẦM VÀO NHÓM TẠP VỤ.**
+> Bấm mục nào trong nhóm Chờ duyệt cũng ra **đúng một màn** (Việc chờ nhận), hub chỉ còn **1/6 tab**.
+> Gốc: `applyScope("")` dựng Quản trị viên bằng cách gọi `buildScope("__quantri__")` - **chuỗi đó
+> không khớp nhóm chức danh nào**, nên nó rơi vào **nhóm MẶC ĐỊNH là `hotro`** (HR / tạp vụ / bảo vệ),
+> rồi chỉ vá đè vài ô. Ô `tabs` **không được vá**, thế là Quản trị viên toàn quyền thừa hưởng đúng
+> hạn chế của tạp vụ: `tabs.duyet=["duyetgiao"]`.
+> **Luật rút ra: đừng dựng một thứ bằng cách MƯỢN thứ khác rồi vá đè** - bỏ sót một ô là im lặng sai,
+> và người đọc mã sau không cách nào đoán ra. Nay dựng thẳng từ `ROLESCOPE.quantri`, cộng chốt chặn:
+> ai có `pages="*"` thì không thể bị chặn tab.
+>
+> **(2) 44/163 VIỆC BẤM "LÀM NGAY" KHÔNG RA GÌ - VÀ KHÔNG BÁO GÌ.**
+> Gốc: `add()` trong `slaItems` có **14 đối số theo THỨ TỰ**. Vài chỗ gọi thiếu ở giữa nên **TÊN
+> THAM SỐ rơi vào ô HÀNH ĐỘNG** (`act="slaTestimonialAsk_days"`). Cộng thêm `jRun` (38 việc) có hàm
+> hẳn hoi mà quên nối vào `slaAct`, và `tkopen` lệch đúng một chữ O so với `tkOpen`.
+> Vá 3 chỗ gọi lệch, rồi **chuyển 5 ô cuối sang GỌI THEO TÊN** ở cả 31 chỗ gọi - không ô nào trượt
+> được nữa. `slaAct` gặp mã lạ thì **KÊU LÊN**; im lặng là thứ làm người dùng tưởng app hỏng.
+> Thêm `slaBtn()` dùng chung: **163/163 việc đều bấm được**.
+>
+> **(3) TAB MẶC ĐỊNH CỦA HUB KHAI Ở BA NƠI, CẢ BA KHAI KHÁC NHAU** (hàm vẽ `"lop"`, `HUBTAB` `"today"`,
+> `navVis` `"today"`) - màn hình ra một đằng, sidebar và breadcrumb hiểu một nẻo. Nay chỉ `HUBTAB.d` nói.
+>
+> **VÌ SAO 1930 TIÊU CHÍ KHÔNG BẮT ĐƯỢC:** `_check18` vẽ từng tab bằng cách **tự đặt `window.DUYTAB`
+> rồi gọi hàm vẽ** - đi đường tắt, **không bao giờ đi qua `go()`**, mà lỗi nằm đúng ở đường `go()` +
+> phạm vi chức danh. Nay nó **bấm từng mục menu như người dùng** rồi đối chiếu màn nhận được.
+> **Luật rút ra: bộ kiểm đi đường tắt là bộ kiểm mù đúng chỗ người dùng đi.**
+>
+> ### V9.34 - TRỢ THỦ NHẬP VÀO GUIDE (anh Luân: *"cách làm của guide rất hợp để làm trợ thủ, e thêm tầng trợ thủ vào guide là đỉnh"*)
+>
+> Anh Luân chê đúng: *"trợ thủ chưa đủ đẳng cấp, phải bảo người ta làm từng bước luôn để dọn sạch sẽ
+> vấn đề đang chờ họ làm... nếu em chỉ giới hạn nó ở 1 cái session như vậy, nó không đủ cơ động"*.
+>
+> Trợ thủ cũ là **một khối chữ đứng yên** ở đầu trang. Guide thì đã có sẵn đúng ba thứ nó thiếu:
+> **nổi trên mọi trang và tự chuyển màn**, **`chk()` kiểm bằng dữ liệu chứ không nghe khai**, và
+> **tiến độ từng bước**. Cái guide thiếu là: các bước viết sẵn, không dính gì tới việc đang tồn của
+> người đang ngồi đó. Nên ghép — **tầng thứ tư của guide, các bước SINH TỪ HÀNG CHỜ THẬT.**
+>
+> - Mỗi bước = một việc thật, có nút **Làm việc này** ngay trong hộp (không bắt đi tìm nút trên trang).
+> - **XONG = VIỆC BIẾN MẤT KHỎI HÀNG CHỜ.** Không hỏi "bạn làm chưa", không có nút "tôi đã làm" -
+>   nói dối được thì kiểm làm gì.
+> - Làm xong app **tự nhảy việc kế**, đếm ngược "còn N việc" cho tới lúc sạch.
+> - Người làm tay không qua nút của guide thì `tourTick()` (gọi từ `reRender`) vẫn bắt được.
+> - Hộp guide **neo cố định góc dưới phải, nằm trên cả ngăn kéo** - bài này mở form liên tục, hộp mà
+>   bám theo phần tử là bị che ngay. Đây chính là chỗ "cơ động" anh Luân đòi.
+>
+> **CẤU HÌNH ĐƯỢC (anh Luân hỏi: "a có cấu hình được ko")** - `Cài đặt > Trợ thủ & Nhịp ngày`:
+> bật/tắt trợ thủ toàn trung tâm, **số việc mỗi lượt dọn**, quá hạn có lên đầu không, và **thứ tự dọn
+> theo nhóm việc** (bấm mũi tên đổi chỗ). Nhóm việc mới sinh ra trong app tự nối vào cuối - không
+> biến mất.
+> **Nhịp ngày** giữ danh mục trong mã (vì có **hàm đếm** - thứ không cất vào sheet được), cấu hình là
+> **LỚP PHỦ**: bật/tắt từng dòng, sửa chữ, đổi buổi, đổi thứ tự, thêm dòng riêng của trung tâm. Lớp
+> phủ gắn theo **mã dòng** chứ không theo vị trí, nên sửa danh mục thì cấu hình cũ vẫn khớp. Dòng tự
+> thêm **luôn là thói quen** - không có hàng chờ nào để cạn, gắn mác "xong" cho nó là nói láo.
+>
+> **Bộ kiểm phải CHỨNG MINH chứ không nghe kể** (`_check18` mục 23, 17 tiêu chí): làm THẬT một việc
+> rồi đòi `chk` đổi từ CHƯA sang XONG; đổi thứ tự nhóm rồi đòi việc đầu tiên đổi theo; đổi số việc
+> mỗi lượt rồi đòi số bước đổi theo; tắt trợ thủ rồi đòi không trang nào còn khối nhắc; tắt một dòng
+> nhịp ngày rồi đòi nó biến mất. Kiểm "có hàm `chk` không" thì luôn xanh mà chẳng chứng minh được gì.
 >
 > ### V9.32 - KIỂM THỬ THẬT TRÊN TRÌNH DUYỆT (anh Luân hỏi *"nên cho hội đồng chuyên gia vào test và nâng cấp không"*, rồi chọn hướng này)
 >

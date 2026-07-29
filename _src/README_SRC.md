@@ -39,19 +39,19 @@ Bộ kiểm gồm **14 phần, phải xanh HẾT mới được giao** (~1930 ti
 |---|---|
 | `node --check _APP.js` và `node --check _HV.js` | không báo gì |
 | `ITTS_OUT=<out> node _tall.js` | `Render 38 trang \| 0 loi` + `thieu trong font: khong` |
-| `ITTS_OUT=<out> node _check11.js` | `TONG: 143`, KHÔNG có dòng `FAIL` |
+| `ITTS_OUT=<out> node _check11.js` | `TONG: 144`, KHÔNG có dòng `FAIL` |
 | `ITTS_OUT=<out> node _check12.js` | `CHECK12 OK: 37 tieu chi` - một cửa vào, một luật |
 | `ITTS_OUT=<out> node _check13.js` | `CHECK13 OK: 174 tieu chi` - KPI biết nói |
 | `ITTS_OUT=<out> node _check14.js` | `CHECK14 OK: 111 tieu chi` - cổng học viên hai chiều |
 | `ITTS_OUT=<out> node _check15.js` | `CHECK15 OK: 39 tieu chi` - **kiểm kê cửa ghi + bất biến nghiệp vụ** (bản khai cửa ghi nay đọc thẳng `DOORTB` của app - xem V9.31) |
-| `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 577 tieu chi` - học phí theo đợt + vá V9.27 + bấm-tên-ra-drawer + địa chỉ từng trang |
+| `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 578 tieu chi` - học phí theo đợt + vá V9.27 + bấm-tên-ra-drawer + địa chỉ từng trang |
 | `ITTS_OUT=<out> node _checkdata.js` | `CHECKDATA OK: 27 luat ... 0 cho lech` - **dữ liệu demo có khớp ga nghiệp vụ không** |
 | `ITTS_OUT=<out> node _check17.js` | `CHECK17 OK: 394 tieu chi` - **bộ máy lọc chuyên sâu** (kết hợp trục, lưu theo người) |
-| `ITTS_OUT=<out> node _check18.js` | `CHECK18 OK: 126 tieu chi \| da ve 76 trang/tab` - **hội đồng audit tự động**: vẽ THẬT mọi trang/tab, mọi trang qua mắt 8 chức danh, cổng học viên qua mọi hồ sơ; từ V9.31 kiêm luôn **nhật ký thao tác + hoàn tác + bộ nhớ tạm bảng tra** (bấm cửa ghi thật, lùi lại thật, và bắt chốt chặn từ chối lùi) |
+| `ITTS_OUT=<out> node _check18.js` | `CHECK18 OK: 152 tieu chi \| da ve 77 trang/tab` - **hội đồng audit tự động**: vẽ THẬT mọi trang/tab, mọi trang qua mắt 8 chức danh, cổng học viên qua mọi hồ sơ; từ V9.31 kiêm luôn **nhật ký thao tác + hoàn tác + bộ nhớ tạm bảng tra** (bấm cửa ghi thật, lùi lại thật, và bắt chốt chặn từ chối lùi) |
 | `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` |
 | `python3 check_logic.py` | `TONG BAN GHI LOI: 4` (đúng 4 ca là việc quá hạn CỐ Ý để demo cảnh báo đỏ - xem luật 10k) |
 | `python3 check_data.py` | `KET QUA: DAT` |
-| `ITTS_OUT=<out> node _checkui.js` | `CHECKUI OK: da mo THAT 396 luot` - **kiểm thử trên trình duyệt thật** (cần `npm i playwright` một lần; máy không có Chromium thì tự BỎ QUA chứ không báo đỏ bậy) |
+| `ITTS_OUT=<out> node _checkui.js` | `CHECKUI OK: da mo THAT 399 luot` - **kiểm thử trên trình duyệt thật** (cần `npm i playwright` một lần; máy không có Chromium thì tự BỎ QUA chứ không báo đỏ bậy) |
 
 **`_check15.js` sinh ra vì cả hai hội đồng thẩm định đều bỏ lọt cùng một lớp lỗi:** người rà
 ĐỌC TỪNG ĐƯỜNG, mà lỗi nguy hiểm nhất nằm ở KHOẢNG GIỮA hai đường - mỗi đường đọc riêng đều hợp
@@ -105,6 +105,39 @@ ITTS_OUT="<mnt>/SOP ITTs" node _tall.js   # kỳ vọng: "Render 36 trang | 0 lo
 Cổng học viên: lặp lại `node --check` với script lớn nhất của `ITTs_TrangHocVien_demo.html`.
 
 ## DỰNG LẠI FONT ICON (khi thêm icon `ti-*` mới)
+## Trợ thủ nằm TRONG guide - tầng "Dọn việc hôm nay" (V9.34)
+
+Trợ thủ cũ là **một khối chữ đứng yên** ở đầu trang: nói "còn 12 việc, làm cái này trước" rồi thôi.
+Sang trang khác là mất, làm xong không ai biết, không dắt được ai qua việc thứ hai. Guide thì đã có
+sẵn đúng ba thứ trợ thủ thiếu: **nổi trên mọi trang**, có **`chk()` kiểm bằng dữ liệu**, và có
+**tiến độ**. Nên ghép: tầng thứ tư của guide, nhưng **các bước không viết sẵn - sinh từ hàng chờ thật**.
+
+- `workAll()` - việc đang tồn của chính người đang đăng nhập, đã lọc theo chuông của chức danh.
+- `workSort()` - xếp theo `tthCfg()`: quá hạn trước (bật/tắt được), rồi thứ tự nhóm việc, rồi việc cũ.
+- `tourWorkBuild()` - mỗi việc thành một bước `{item, do, chk}`; `do` là nút thao tác thật
+  (`slaBtn` dùng chung với trợ thủ và chuông).
+- **`chk` = việc BIẾN MẤT khỏi hàng chờ.** Không hỏi "bạn làm chưa", không có nút "tôi đã làm" -
+  nói dối được thì kiểm làm gì.
+- `tourDo()` chạy thao tác rồi `tourAfter()` tự kiểm; xong thì **tự nhảy việc kế**. `tourTick()` gọi
+  từ `reRender` để người làm tay (không qua nút của guide) thì guide vẫn biết.
+- Bước có `dock:1` thì hộp guide **neo cố định góc dưới phải, z-index trên cả ngăn kéo** - vì bài này
+  mở form liên tục, hộp mà bám theo phần tử là bị che ngay. Vòng sáng tắt (việc nằm trong hộp, không
+  nằm ở một ô nào trên trang), và cảnh báo "không thấy chỗ cần trỏ" cũng tắt.
+
+**Cấu hình** (`Cài đặt > Trợ thủ & Nhịp ngày`): bật/tắt trợ thủ toàn trung tâm, số việc mỗi lượt dọn,
+quá hạn có lên đầu không, và **thứ tự dọn theo nhóm việc**. Nhóm việc mới sinh ra trong app tự nối
+vào cuối `tthCfg().order` - không biến mất.
+
+**Nhịp ngày** giữ danh mục trong mã (vì có **hàm đếm** - thứ không cất vào sheet được), còn cấu hình
+là **lớp phủ** lên danh mục: bật/tắt từng dòng, sửa chữ, đổi buổi, đổi thứ tự, và thêm dòng riêng của
+trung tâm. Lớp phủ gắn theo **mã dòng** (`role:index`), không gắn theo vị trí, nên sửa danh mục thì
+cấu hình cũ vẫn khớp. Dòng tự thêm **luôn là thói quen** - không có hàng chờ nào để cạn, gắn mác
+"xong" cho nó là nói láo với người trực ca.
+
+**Bộ kiểm phải chứng minh, không được nghe kể** (`_check18` mục 23): làm THẬT một việc rồi đòi `chk`
+đổi từ CHƯA sang XONG; đổi thứ tự nhóm rồi đòi việc đầu tiên đổi theo; đổi số việc mỗi lượt rồi đòi
+số bước đổi theo; tắt trợ thủ rồi đòi không trang nào còn khối nhắc.
+
 ## Kiểm thử trên trình duyệt thật - `_checkui.js` (V9.31)
 
 Cả 13 phần còn lại đều **kiểm chuỗi HTML**, không có trình duyệt nào chạy. Chuỗi đúng tuyệt đối mà

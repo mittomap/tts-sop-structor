@@ -85,9 +85,14 @@ var KHUNG=[".pbody",".jgrid",".dt",".notebar","#chaybody"];
    doc du lieu that. Khong co chk = quay lai lam mot chuyen tham quan lan hai. */
 (function(){
  var lv=TOURLV.map(function(x){return x[0]});
- t2("dung 3 cap do", lv.length===3);
+ /* V9.34: them TANG THU TU "Don viec hom nay" - tro thu nhap vao guide (anh Luan: "cach lam cua
+    guide rat hop de lam tro thu, e them tang tro thu vao guide la dinh"). Ba cap dau van la bai
+    VIET SAN; cap thu tu KHONG viet san buoc nao - buoc sinh tu hang cho that. */
+ t2("dung 4 cap do (3 bai viet san + 1 tang don viec)", lv.length===4);
  t2("ten cap do dung loi anh Luan",
-   TOURLV[0][1]==="Tham quan"&&TOURLV[1][1]==="Thao tác mẫu"&&TOURLV[2][1]==="Cấu hình");
+   TOURLV[0][1]==="Tham quan"&&TOURLV[1][1]==="Thao tác mẫu"&&TOURLV[2][1]==="Cấu hình"&&TOURLV[3][1]==="Dọn việc hôm nay");
+ t2("tang don viec KHONG co bai viet san (buoc phai sinh tu hang cho)",
+   Object.keys(TOURS).filter(function(k){return TOURS[k].lv==="donviec"}).length===0);
  var tt=Object.keys(TOURS).filter(function(k){return TOURS[k].lv==="trainghiem"});
  t2("co bai thao tac mau cho tung vi tri", tt.length>=5);
  var nchk=0,ntot=0,thieu=[];
