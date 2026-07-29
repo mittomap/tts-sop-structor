@@ -1219,6 +1219,12 @@ body.drsz .drawer{transition:none}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:900px){.grid2{grid-template-columns:1fr}}
 .minibar{height:10px;background:var(--gray);border-radius:6px;overflow:hidden;margin-top:4px}.minibar>i{display:block;height:100%;background:var(--navy)}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#1E2A38;color:#fff;font-size:13px;font-weight:600;padding:11px 18px;border-radius:10px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:80}.toast.show{opacity:1}
+.undobar{position:fixed;bottom:22px;right:22px;display:none;align-items:center;gap:10px;background:#1E2A38;color:#fff;font-size:12.5px;font-weight:600;padding:9px 10px 9px 15px;border-radius:11px;box-shadow:0 8px 22px rgba(0,0,0,.28);z-index:82;max-width:min(92vw,430px)}
+.undobar.on{display:flex}
+.undobar span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.undobar .btn{background:#fff;color:#1E2A38;border-color:#fff;flex:none}
+.undobar .x{background:none;border:0;color:#9FB0C4;font-size:17px;line-height:1;cursor:pointer;padding:0 4px}
+.undobar .x:hover{color:#fff}
 .notis{position:fixed;right:16px;bottom:16px;z-index:96;display:flex;flex-direction:column;gap:9px;max-width:330px}
 .noti{background:#fff;border:1px solid var(--line);border-left:4px solid var(--navy);border-radius:11px;box-shadow:0 10px 28px rgba(15,30,50,.2);padding:11px 13px;display:flex;gap:10px;align-items:flex-start;cursor:pointer;animation:notiIn .22s ease}
 .noti.red{border-left-color:var(--red)}
@@ -1270,6 +1276,7 @@ body.drsz .drawer{transition:none}
   </div>
 </div>
 <div class="toast" id="toast"></div>
+<div class="undobar" id="undobar"></div>
 <div class="mask" id="mask" onclick="closeModal()"></div>
 <div class="cfmask" id="cfm"><div class="cfbox"><div class="cfh"><i class="ti ti-alert-triangle"></i> Xác nhận thao tác</div><div class="cfmsg" id="cfmMsg"></div><div class="cfa"><button class="btn" onclick="closeConfirm()">Huỷ</button><button class="btn primary" onclick="confirmYes()">Xác nhận</button></div></div></div>
 <div class="drawer" id="drawer" role="dialog" aria-modal="true"><div class="drszr" id="drszr" title="Kéo để đổi độ rộng - bấm đúp để về mặc định"></div><div class="dh"><b id="drawerTitle">Chi tiết</b><button class="x" onclick="closeModal()" aria-label="Đóng">&times;</button></div><div class="dbody" id="drawerBody"></div></div>
@@ -1388,7 +1395,7 @@ function demoSave(){if(!CANLS||SVR)return;
  var nm="";try{nm=(typeof myName==="function"&&!window.HVPORTAL)?myName():(window.HVPORTAL?"Trang học viên":"")}catch(e){}
  try{localStorage.setItem(LSKEY,JSON.stringify({sig:SEED_SIG,t:new Date().getTime(),by:nm,dl:DATA.dl,config:DATA.config,enums:DATA.enums}));__base=cur;try{roomCastState()}catch(e2){}}
  catch(e){if(!window.__swarn){window.__swarn=1;toastErr("KHÔNG lưu được thay đổi (trình duyệt chặn hoặc đầy bộ nhớ) - thao tác chỉ sống trong cửa sổ này.")}}}
-var __psT=null;function persistSoon(){if(SVR||!CANLS)return;clearTimeout(__psT);__psT=setTimeout(demoSave,350)}
+var __psT=null;function persistSoon(){try{dataChanged()}catch(e){}if(SVR||!CANLS)return;clearTimeout(__psT);__psT=setTimeout(demoSave,350)}
 function demoDirty(){if(!CANLS)return null;try{var raw=localStorage.getItem(LSKEY);if(!raw)return null;var st=JSON.parse(raw);return st.t||1}catch(e){return null}}
 /* V9.30 (anh Luân): Reset không chỉ là "xoá thay đổi" nữa - nó còn kéo dữ liệu về hiện tại, vì
    dữ liệu gốc neo theo ngày sinh, reset về gốc mà không kéo là quay lại đúng cái demo đã cũ. */
@@ -2680,7 +2687,8 @@ function cancelEdit(key){EDIT[key]=null;document.getElementById("content").inner
    (CUR === key) rlist ghi thẳng innerHTML nên không ai lưu, tắt trình duyệt là mất, và cửa sổ
    khác trong room cũng không hay biết. Luật của dự án: hàm nào ghi vào DATA thì TỰ gọi persistSoon. */
 function quickStatus(key,id,field,val){var cfg=LISTCFG[key];var rec=find(cfg.code,cfg.cols[0][0],id);if(!rec)return;var o={};o[field]=val;
- function _d(){rec[field]=val;persistSoon();
+ function _d(){var _b=logSnap(rec);rec[field]=val;
+  logAct("Đổi trạng thái",cfg.code,id,logDiff(_b,logSnap(rec)));persistSoon();
   /* nói rõ đổi xong thì chặng và việc kế tiếp thành gì - trước đây chỉ báo "đã đổi" nên nhìn như không có gì xảy ra */
   var extra="";try{var J=jInfo(id);if(J&&J.k)extra=" · chặng: "+((JBY[J.k]||{}).t||J.k)+((J.act&&J.act.lb)?(" · việc kế: "+J.act.lb):"")}catch(e){}
   toast("Đã đổi trạng thái "+id+extra,3600);rlist(key)}
@@ -3818,7 +3826,22 @@ var STAGES=[{k:"new",t:"Lead mới",cls:"gray",ic:"ti-user-plus"},{k:"contacted"
    cần dữ liệu gì mới được đi tiếp, và VIỆC KẾ TIẾP là gì.
    Mọi màn (bảng hành trình, hồ sơ, việc hôm nay, cảnh báo) đều đọc từ đây.
    ========================================================================== */
+/* ═══════════ V9.31 - NHỚ TẠM BẢNG TRA (jIndex) ═══════════
+   Vẽ MỘT lần Trang bắt đầu gọi jIndex 44 lần: mỗi lần duyệt lại 15 bảng để dựng đúng một bảng tra
+   giống hệt nhau. Với dữ liệu demo (5.1 nghìn dòng) là 11ms trong 20ms của cả trang; dữ liệu thật
+   gấp mười thì thành gánh nặng thấy được bằng mắt.
+   BẢNG TRA CHỈ PHỤ THUỘC DỮ LIỆU - không phụ thuộc người đang đăng nhập, không phụ thuộc tham số,
+   không phụ thuộc giờ. Nên nhớ tạm được, miễn là VỨT NGAY khi dữ liệu đổi. Hai lớp bảo hiểm:
+   (1) mọi lần ghi có vào nhật ký / gọi persistSoon / tính lại cột dẫn xuất đều vứt bảng nhớ;
+   (2) hết một nhịp trình duyệt cũng vứt - lỡ có cửa ghi nào không đi qua (1) thì cùng lắm sai
+   trong đúng nhịp đó, mà trong một nhịp thì màn hình chưa vẽ lại. */
+var DVER=0,_jixC=null,_jixV=-1,_jixT=false;
+function dataChanged(){DVER++;_jixC=null}
 function jIndex(){
+ if(_jixC&&_jixV===DVER)return _jixC;
+ if(!_jixT){_jixT=true;try{setTimeout(function(){_jixC=null;_jixT=false},0)}catch(e){_jixT=false}}
+ _jixV=DVER;return (_jixC=jIndexRaw())}
+function jIndexRaw(){
  var ix={lead:{},stu:{},tp:{},test:{},cons:{},enrL:{},enrS:{},pay:{},ob:{},att:{},hw:{},wow:{},sv:{},fb:{},kn:{},ce:{}};
  function push(o,k,v){if(!k)return;(o[k]=o[k]||[]).push(v)}
  rows("DL02").forEach(function(r){ix.lead[r.lead_id]=r});
@@ -3838,6 +3861,9 @@ function jIndex(){
  rows("DL18").forEach(function(r){push(ix.ce,r.student_id,r)});
  return ix}
 function jCtx(pid,ix){ix=ix||jIndex();
+ /* Ngữ cảnh của một người cũng chỉ phụ thuộc bảng tra - gắn bộ nhớ tạm VÀO CHÍNH bảng tra để
+    hai thứ sống chết cùng nhau, khỏi phải nhớ vứt riêng. */
+ var _c=(ix.__ctx||(ix.__ctx={}));if(_c[pid])return _c[pid];
  var L=null,S=null,sid="";
  if(ix.lead[pid]){L=ix.lead[pid];var es=ix.enrL[pid]||[];for(var i=0;i<es.length;i++)if(es[i].student_id){sid=es[i].student_id;break}}
  else if(ix.stu[pid]){sid=pid;var e2=ix.enrS[pid]||[];for(var j=0;j<e2.length;j++)if(e2[j].lead_id&&ix.lead[e2[j].lead_id]){L=ix.lead[e2[j].lead_id];break}}
@@ -3869,7 +3895,7 @@ function jCtx(pid,ix){ix=ix||jIndex();
   a.sort(function(x,y){var r=rank(y)-rank(x);if(r)return r;
    return (pvnd(y.test_date)||pvnd(y.booking_date)||0)-(pvnd(x.test_date)||pvnd(x.booking_date)||0)});
   return a[0]})();
- return C}
+ _c[pid]=C;return C}
 /* --- 14 chặng: 10 chặng chính + 4 nhánh rẽ --- */
 var JCOL=[["thu","Tuyển sinh","#3B82C4"],["hv","Học vụ","#7C3AED"],["tc","Tài chính","#0D9488"],["cs","CSKH","#DB2777"]];
 var JSTAGE=[
@@ -4283,12 +4309,16 @@ var JIDK={},JIDP={};
 function jIdInit(){for(var k in LISTCFG){var c=LISTCFG[k];if(c&&c.code&&c.cols&&c.cols[0]){JIDK[c.code]=c.cols[0][0];if(c.idp)JIDP[c.code]=c.idp}}}
 function jSaveRow(code,o,cb){jIdInit();
  var idk=JIDK[code]||"id";
- function done(id){o[idk]=id;rows(code).unshift(o);if(cb)cb(id)}
+ function done(id){o[idk]=id;rows(code).unshift(o);
+  logAct("Tạo mới",code,id,{},"Tạo dòng mới"+(o.full_name?(" - "+o.full_name):""),{kind:"add",sau:JSON.stringify(o)});
+  if(cb)cb(id)}
  if(SVR){google.script.run.withSuccessHandler(function(r){if(!r||!r.ok){toast("Lỗi ghi: "+((r&&r.error)||""));return}done(r.id)})
   .withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave(code,o)}
  else{done((JIDP[code]||(code+"-"))+seqNo(code,idk))}}
 function jUpdRow(code,id,vals,cb){jIdInit();var idk=JIDK[code]||"id";var r=find(code,idk,id);
+ var _b=logSnap(r);
  if(r)for(var k in vals)r[k]=vals[k];
+ logAct("Cập nhật",code,id,logDiff(_b,logSnap(r)));
  if(SVR)google.script.run.withSuccessHandler(function(){if(cb)cb()}).withFailureHandler(function(){if(cb)cb()}).apiUpdate(code,id,vals);
  else if(cb)cb()}
 /* --- form gọn cho từng bước --- */
@@ -5421,6 +5451,19 @@ function renderHoso(){
    '<div style="margin-top:8px"><button class="btn sm" onclick="hvCopy(\''+esc(_code)+'\',\'Đã sao chép mã '+esc(_code)+'\')"><i class="ti ti-copy"></i>Sao chép mã</button></div>');}
  h+='</div></div><div>';
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-timeline" style="margin-right:6px"></i>Dòng thời gian</b></div><div class="pbody">'+jTimeline(C)+'</div></div>';
+ /* V9.31: "AI ĐÃ SỬA HỒ SƠ NÀY" - dòng thời gian kể chuyện NGHIỆP VỤ (đã test, đã đóng tiền),
+    còn cái này kể chuyện THAO TÁC (ai bấm gì, đổi ô nào). Hai câu hỏi khác nhau, để cạnh nhau
+    thì lúc có tranh cãi không phải đi tìm. */
+ (function(){
+  var lg=[];[["DL02",C.L&&C.L.lead_id],["DL09",C.sid]].forEach(function(x){
+   if(x[1])lg=lg.concat(logForRow(x[0],x[1]))});
+  (C.enr||[]).forEach(function(e){lg=lg.concat(logForRow("DL06",e.enrollment_id))});
+  lg.sort(function(a2,b2){return String(b2.log_id).localeCompare(String(a2.log_id))});
+  h+='<div class="panel" style="margin-top:12px"><div class="ph"><b><i class="ti ti-history" style="margin-right:6px"></i>Ai đã sửa hồ sơ này</b>'+
+   '<button class="btn sm" onclick="window.SETTAB=\'nhatky\';window.NKQ=\''+esc(C.sid||(C.L&&C.L.lead_id)||"")+'\';go(\'settings\')" data-tip="Mở nhật ký thao tác đầy đủ"><i class="ti ti-external-link"></i>Nhật ký đầy đủ</button></div>'+
+   '<div class="pbody">'+
+   (lg.length?logRowHTML2(lg):'<div class="mut" style="font-size:12px">Chưa có thao tác nào trên hồ sơ này trong buổi làm việc hiện tại. Nhật ký chỉ ghi từ lúc mở app - nối sheet thật thì đây là bảng DL25 lưu vĩnh viễn.</div>')+
+   '</div></div>'})();
  h+='</div></div>';
  return h}
 function leadStage(L){var lid=L.lead_id;
@@ -6715,16 +6758,94 @@ function renderHealth(){var items=dataHealth();
     '<td>'+(x.jump?'<button class="btn sm" onclick="healthGo(window.healthJumps['+ji+'])"><i class="ti ti-arrow-right"></i>Tới sửa</button>':'<span class="mut">—</span>')+'</td></tr>'});
   h+='</tbody></table></div></div>';});
  return h}
+/* ═══════════ MÀN TRA NHẬT KÝ THAO TÁC ═══════════
+   Nhật ký chỉ có giá trị khi TRA ĐƯỢC. Ba câu hỏi thật hay phải trả lời: "ai sửa dòng này",
+   "hôm nay ai làm gì", "cái vừa rồi lùi lại được không". Màn này trả lời cả ba. */
+var SHEETVN={DL01:"Nhân sự",DL02:"Lead",DL02b:"Lượt chạm lead",DL03:"Test đầu vào",DL04:"Tư vấn",
+ DL05:"Khóa học",DL06:"Ghi danh",DL06b:"Đợt đóng học phí",DL07:"Thu - chi học phí",DL08:"Xếp lớp & Onboarding",
+ DL09:"Học viên",DL10:"Lớp học",DL11:"Buổi học",DL12:"Điểm danh",DL13:"Bài tập",DL14:"Buổi WOW",
+ DL15:"Khảo sát",DL16:"Ghi nhận phản hồi",DL17:"Khiếu nại",DL18:"Kết thúc khóa",DL19:"Nhật ký hệ thống",
+ DL20:"Giáo án - Buổi & Bài tập",DL21:"Giáo án chi tiết",DL22:"Tham số",DL23:"Việc được giao",
+ DL24:"Trao đổi trong việc",DL25:"Nhật ký thao tác"};
+function sheetVN(c){return SHEETVN[c]?(SHEETVN[c]+" ("+c+")"):(c||"")}
+function logForRow(code,id){return logRows().filter(function(e){
+ return e.sheet===code&&String(e.row_id)===String(id)})}
+/* Khối "ai đã sửa dòng này" - nhúng được vào ngăn kéo hồ sơ của bất kỳ bảng nào. */
+function logRowHTML2(L,lim){
+ L=(L||[]).slice(0,lim||6);
+ if(!L.length)return '<div class="mut" style="font-size:12px">Chưa có thao tác nào được ghi.</div>';
+ var h='<table class="tb sm"><thead><tr><th>Lúc</th><th>Người</th><th>Thao tác</th><th>Thay đổi</th></tr></thead><tbody>';
+ L.forEach(function(e){h+='<tr><td class="nw">'+esc(e.log_time)+'</td><td>'+esc(e.staff_name||e.staff_id||"-")+
+  '</td><td><span class="chip">'+esc(e.action)+'</span></td><td style="white-space:normal">'+esc(e.summary||"-")+'</td></tr>'});
+ return h+'</tbody></table>'}
+function logRowHTML(code,id,lim){return logRowHTML2(logForRow(code,id),lim)}
+function nkFilt(){
+ var q=String(window.NKQ||"").trim().toLowerCase(),tb=window.NKTB||"",who=window.NKWHO||"";
+ return logRows().filter(function(e){
+  if(tb&&e.sheet!==tb)return false;
+  if(who&&String(e.staff_id||"")!==who)return false;
+  if(!q)return true;
+  return [e.log_time,e.staff_name,e.action,e.sheet,sheetVN(e.sheet),e.row_id,e.summary,e.door]
+   .join(" ").toLowerCase().indexOf(q)>=0})}
+function nkSet(k,v){window[k]=v;reRender("settings")}
+function renderNhatky(){
+ var L=logRows(),F=nkFilt();
+ window.FLTLAST=window.FLTLAST||{};window.FLTLAST.nhatky=F.map(function(e){
+  return {luc:e.log_time,nguoi:e.staff_name||e.staff_id,thao_tac:e.action,bang:sheetVN(e.sheet),
+   dong:e.row_id,thay_doi:e.summary,cua_ghi:e.door,da_hoan_tac:e.undone}});
+ var h='<div class="notebar"><i class="ti ti-history"></i>Mọi lần ghi dữ liệu trong buổi làm việc này đều để lại một dòng ở đây: <b>ai</b>, <b>lúc nào</b>, <b>đổi ô nào từ gì sang gì</b>. Bản demo giữ <b>'+logMax()+' dòng gần nhất</b> ngay trong trình duyệt (đổi ở CH2 - <span class="mono">auditLogKeep_rows</span>); nối sheet thật thì đây là bảng <b>DL25</b>. Nhật ký <b>không tự có</b> - nó do các cửa ghi của app sinh ra, nên thao tác nào chưa hiện ở đây là cửa ghi đó chưa được khai.</div>';
+ var today=nowStr().slice(0,10);
+ var nToday=L.filter(function(e){return String(e.log_time||"").indexOf(today)===0}).length;
+ var whos={};L.forEach(function(e){if(e.staff_id)whos[e.staff_id]=e.staff_name||e.staff_id});
+ var nUndone=L.filter(function(e){return String(e.undone||"")==="yes"}).length;
+ h+=statStrip([
+  ["ti-history",L.length,"Thao tác đã ghi","#2E5A88","giữ tối đa "+logMax()+" dòng"],
+  ["ti-calendar",nToday,"Hôm nay","#16A34A",today],
+  ["ti-users",Object.keys(whos).length,"Người thao tác","#B45309",""],
+  ["ti-arrow-back-up",nUndone,"Dòng đã hoàn tác","#D51920",""]]);
+ var tbs={};L.forEach(function(e){if(e.sheet)tbs[e.sheet]=1});
+ var bar='<span class="pgq"><i class="ti ti-search"></i><input value="'+esc(window.NKQ||"")+'" placeholder="Tìm theo người, mã dòng, ô đổi..." oninput="nkSet(\'NKQ\',this.value)" aria-label="Tìm trong nhật ký"></span>';
+ bar+='<span class="tbdiv"></span><span class="lbl">Bảng</span><select class="sel qsel" onchange="nkSet(\'NKTB\',this.value)"><option value="">Tất cả</option>';
+ Object.keys(tbs).sort().forEach(function(c){bar+='<option value="'+esc(c)+'"'+(window.NKTB===c?" selected":"")+'>'+esc(sheetVN(c))+'</option>'});
+ bar+='</select><span class="lbl">Người</span><select class="sel qsel" onchange="nkSet(\'NKWHO\',this.value)"><option value="">Tất cả</option>';
+ Object.keys(whos).forEach(function(s){bar+='<option value="'+esc(s)+'"'+(window.NKWHO===s?" selected":"")+'>'+esc(whos[s])+'</option>'});
+ bar+='</select>';
+ h+=tbar(bar,'<span class="tbcnt">'+F.length+' dòng</span><button class="btn sm" onclick="pgExport(\'nhatky\')" data-tip="Tải '+F.length+' dòng đang hiện ra tệp CSV"><i class="ti ti-table"></i>Xuất</button>');
+ if(!F.length)return h+'<div class="tbwrap"><table class="tb"><tbody><tr><td class="empty">'+
+  (L.length?'Không có dòng nào khớp điều kiện lọc - bỏ bớt điều kiện rồi thử lại.':'Chưa có thao tác nào được ghi trong buổi làm việc này. Sửa một dữ liệu bất kỳ rồi quay lại đây.')+'</td></tr></tbody></table></div>';
+ var seenB={};
+ h+='<div class="tbwrap"><table class="tb"><thead><tr><th>Lúc</th><th>Người</th><th>Thao tác</th><th>Bảng · Dòng</th><th>Thay đổi</th><th>Lùi lại</th></tr></thead><tbody>';
+ F.forEach(function(e){
+  var b=String(e.batch||""),first=!seenB[b];seenB[b]=1;
+  var un=String(e.undone||"")==="yes";
+  h+='<tr'+(un?' style="opacity:.55"':'')+'><td class="nw">'+esc(e.log_time)+'</td>'+
+   '<td>'+esc(e.staff_name||e.staff_id||"-")+'</td>'+
+   '<td><span class="chip '+(e.kind==="add"?"ok":(e.kind==="del"?"bad":(e.kind==="undo"?"warn":"")))+'">'+esc(e.action)+'</span></td>'+
+   '<td class="nw">'+esc(sheetVN(e.sheet))+'<br><span class="mut mono">'+esc(e.row_id)+'</span></td>'+
+   '<td style="white-space:normal">'+esc(e.summary||"-")+(e.door?'<br><span class="mut" style="font-size:11px">cửa ghi: '+esc(e.door)+'</span>':'')+'</td>'+
+   '<td>'+(un?'<span class="mut">đã lùi</span>':(first&&e.kind!=="undo"&&!logCanUndo(b)?
+     '<button class="btn sm" onclick="logUndo(\''+esc(b)+'\')"><i class="ti ti-arrow-back-up"></i>Hoàn tác</button>':
+     '<span class="mut" data-tip="'+esc(logCanUndo(b)||"Nằm chung lượt với dòng phía trên")+'">—</span>'))+'</td></tr>'});
+ return h+'</tbody></table></div>'}
+/* Danh sách tab của Cài đặt để Ở NGOÀI hàm vẽ: bộ kiểm cũng phải biết có những tab nào, mà
+   trước đây nó tự chép lại một bản - thêm tab mới là bản chép cũ im lặng bỏ sót. */
+function setTabs(){
+ var nHealth=dataHealth().filter(function(x){return x.sev!=="ok"}).length;
+ return [["brand","Giao diện & Thương hiệu"],["menu","Menu sidebar"],["phanquyen","Phân quyền & Phạm vi dữ liệu"],
+  ["ch2","Ngưỡng & SLA (CH2)"],["ch6","Ngưỡng KPI (CH6)"],["ch4","Thông điệp nhắc việc (CH4)"],
+  ["ch1","Danh mục (CH1)"],["khoa","Khóa học"],["staff","Nhân viên & Email"],
+  ["health","Sức khỏe dữ liệu"+(nHealth?" ("+nHealth+")":"")],["nhatky","Nhật ký thao tác"]]
+  .concat(SVR?[]:[["demo","Dữ liệu demo"]])}
 function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch2:[],ch6:[]};
  var h='<div class="phead"><div><div class="t">Cài đặt hệ thống</div><div class="s">Cấu hình sống trong CH1-CH6 của sheet. Đổi 1 giá trị -> mọi nhắc việc/trạng thái/KPI phụ thuộc tự cập nhật.</div></div></div>';
  h+='<div class="settabs" data-tour="settabs">';
- var nHealth=dataHealth().filter(function(x){return x.sev!=="ok"}).length;
- var stabs=[["brand","Giao diện & Thương hiệu"],["menu","Menu sidebar"],["phanquyen","Phân quyền & Phạm vi dữ liệu"],["ch2","Ngưỡng & SLA (CH2)"],["ch6","Ngưỡng KPI (CH6)"],["ch4","Thông điệp nhắc việc (CH4)"],["ch1","Danh mục (CH1)"],["khoa","Khóa học"],["staff","Nhân viên & Email"],["health","Sức khỏe dữ liệu"+(nHealth?" ("+nHealth+")":"")]].concat(SVR?[]:[["demo","Dữ liệu demo"]]);
+ var stabs=setTabs();
  var rsS=SCOPE();if(rsS.tabs&&rsS.tabs.settings)stabs=stabs.filter(function(t){return rsS.tabs.settings.indexOf(t[0])>=0});
  if(!stabs.some(function(t){return t[0]===tab})){tab=(stabs[0]||["ch2"])[0];window.SETTAB=tab}
  stabs.forEach(function(t){h+='<button class="stab'+(tab===t[0]?" on":"")+'" onclick="window.SETTAB=\''+t[0]+'\';reRender(\'settings\')">'+t[1]+'</button>'});
  h+='</div>';
  if(tab==="health")return h+renderHealth();
+ if(tab==="nhatky")return h+renderNhatky();
  if(tab==="brand"){var u=UI();
   h+='<div class="notebar"><i class="ti ti-palette"></i>Đổi tên, logo và màu ở đây là <b>áp ngay</b> cho cả app - dùng khi mang demo đi giới thiệu cho trung tâm khác. Cấu hình lưu cùng dữ liệu demo nên các cửa sổ/máy trong room cùng đổi theo; bấm <b>Về mặc định</b> để trả lại nguyên bản.</div>';
   h+='<div class="jgrid"><div>';
@@ -7342,6 +7463,8 @@ var APPPARAMS=[
  /* V9.29o: một buổi chiếm chỗ của giáo viên bao lâu - dùng cho cảnh báo trùng giờ trên lịch tuần
     VÀ cho việc lọc người thay được. Trước đây con số 2 giờ nằm cắm cứng trong renderLichTuan. */
  ["Dữ liệu demo","demoAutoShift_days","Dữ liệu demo cũ hơn hôm nay bao nhiêu ngày thì app tự kéo về hiện tại (0 = không tự kéo)","ngày",14],
+ ["Nhật ký & Hoàn tác","auditLogKeep_rows","Nhật ký thao tác giữ lại bao nhiêu dòng gần nhất","dòng",500],
+ ["Nhật ký & Hoàn tác","undoWindow_seconds","Làm xong một thao tác thì nút Hoàn tác hiện bao lâu","giây",25],
  ["Xếp lịch & Giảng dạy","attendanceGrace_hours","Buổi dạy xong bao lâu thì BẮT BUỘC phải có điểm danh (trong khoảng này còn coi là hàng chờ)","giờ",24],
  ["Xếp lịch & Giảng dạy","homeworkDueFallback_days","Hạn nộp bài mặc định khi giáo án không ghi rõ (tính từ ngày học)","ngày",5],
  ["Tiền - Công giảng dạy","teacherPayPerSession","Tiền công một buổi dạy (dùng để tạm tính bảng công tháng)","đ/buổi",250000],
@@ -7639,7 +7762,196 @@ function kpiTh(re,fb){var c=(DATA.config&&DATA.config.ch6)||[];for(var i=0;i<c.l
 function ymOf(off){var d=new Date();d.setDate(1);d.setMonth(d.getMonth()+(off||0));return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)}
 function inYm(s,ym){var d=pvnd(s);return !!d&&(d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2))===ym}
 function inNextDays(s,days){var d=pvnd(s);if(!d)return false;var t0=new Date();t0.setHours(0,0,0,0);var t1=new Date(t0.getTime()+days*864e5);return d.getTime()>=t0.getTime()&&d.getTime()<t1.getTime()}
-function markRow(sheet,idf,id,vals,msg,page){var r=find(sheet,idf,id);function d(){if(r){for(var k in vals)r[k]=vals[k];r.updated_by=myName();r.updated_at=nowStr()}toast(msg);reRender(CUR)}
+/* ═══════════ V9.31 - NHẬT KÝ THAO TÁC (DL25) ═══════════
+   App có 115 CỬA GHI mà KHÔNG có sổ nào ghi ai làm gì lúc nào. Vết nằm rải rác trong cột `notes`
+   của từng bảng - muốn biết "ai xoá lớp này", "ai duyệt chiết khấu 5 triệu tuần trước" thì không
+   tra được. Với một hệ SOP đây là lỗ hổng đúng chỗ đau nhất: SOP là để quy trách nhiệm, mà không
+   truy được thì SOP chỉ còn là lời khuyên.
+
+   CÁCH LÀM: KHÔNG đi sửa 115 cửa ghi. Ghi nhật ký ở TẦNG DƯỚI - bốn hàm ghi dùng chung mà hầu hết
+   cửa ghi đều đi qua (markRow / jUpdRow / jSaveRow / quickStatus), cộng một hàm `logAct()` để cửa
+   nào ghi thẳng vào object thì gọi tay. Sửa 4 chỗ thay vì 115 chỗ, và cửa ghi mới viết sau này
+   cũng tự có nhật ký nếu dùng đúng hàm chung.
+
+   GHI CẢ TRƯỚC VÀ SAU: chỉ ghi "đã đổi trạng thái" thì tra ra cũng không biết đổi từ gì sang gì -
+   và không hoàn tác được. Ảnh chụp trước/sau chính là thứ nút Hoàn tác cần. */
+/* BẢN KHAI CỬA GHI: hàm nào ghi vào bảng nào. Sinh LÚC BUILD từ đúng bản khai mà _check15
+   vẫn dùng - một sự thật, một chỗ. Trước đây bản khai chỉ nằm trong bộ kiểm nên app không
+   biết gì về nó; giờ app đọc chính bản khai đó để biết phải chụp ảnh bảng nào. */
+var DOORTB=__DOOR_MAP__;
+var LOGDEPTH=0,LOGBATCH=0,LOGDOOR="",LOGSEEN={},LOGOFF=false,LOGTICK=false;
+/* Tên ô bằng tiếng Việt. Lấy TRƯỚC HẾT từ nhãn cột của chính bảng đó (LISTCFG đã khai rồi -
+   không khai lại), thiếu thì tra từ điển chung, cuối cùng mới trả tên kỹ thuật. Nhật ký mà ghi
+   "wow_quota_remaining" thì người trực ca đọc không ra. */
+var COLVN={updated_by:"Người sửa",updated_at:"Lúc sửa",notes:"Ghi chú",note:"Ghi chú",
+ full_name:"Họ tên",phone_number:"SĐT",email:"Email",branch:"Chi nhánh",
+ teacher_id:"Giáo viên",teacher_id_name:"Giáo viên",main_teacher_id:"GV chính",
+ main_teacher_id_name:"GV chính",class_id:"Lớp",class_id_name:"Lớp",course_id:"Khóa",
+ course_id_name:"Khóa",student_id:"Học viên",student_id_name:"Học viên",
+ assigned_to:"Người phụ trách",assigned_to_name:"Người phụ trách",
+ amount:"Số tiền",discount_amount:"Chiết khấu",payment_status:"Trạng thái thu",
+ session_date:"Ngày buổi học",attendance_status:"Điểm danh",room:"Phòng",
+ wow_quota_remaining:"Lượt WOW còn",wow_extra_approved:"Lượt WOW được cấp thêm",
+ learning_mode:"Hình thức học",zoom_link:"Link học online"};
+function colVN(code,k){
+ try{for(var key in LISTCFG){var c=LISTCFG[key];
+   if(!c||c.code!==code||!c.cols)continue;
+   for(var i=0;i<c.cols.length;i++)if(c.cols[i][0]===k)return c.cols[i][1]}}catch(e){}
+ return COLVN[k]||k}
+function logMax(){return num(paramOf("auditLogKeep_rows",500))||500}
+function logRows(){DATA.dl=DATA.dl||{};if(!DATA.dl.DL25)DATA.dl.DL25=[];return DATA.dl.DL25}
+function logSnap(r,keys){var o={};if(!r)return o;
+ (keys||Object.keys(r)).forEach(function(k){o[k]=r[k]});return o}
+function logDiff(a,b){var out={};
+ for(var k in b){var v1=String(a&&a[k]!=null?a[k]:""),v2=String(b[k]!=null?b[k]:"");
+  if(v1!==v2)out[k]={tu:v1,den:v2}}
+ return out}
+function logWhat(code,id,d){
+ var ks=Object.keys(d||{});
+ if(!ks.length)return "";
+ return ks.slice(0,3).map(function(k){
+  var t=(d[k].tu||"(trống)"),s=(d[k].den||"(trống)");
+  return colVN(code,k)+": "+String(t).slice(0,28)+" → "+String(s).slice(0,28)}).join(" · ")+
+  (ks.length>3?(" · +"+(ks.length-3)+" ô nữa"):"")}
+/* Nhớ những ô ĐÃ ghi nhật ký trong lượt bấm này, để lớp chụp-ảnh-bảng bên ngoài không ghi lại
+   lần hai. Nhớ theo TỪNG Ô chứ không theo cả dòng: cửa ghi chung biết rõ 2 ô, mà bản thân hàm
+   còn sửa thêm ô thứ 3 - bỏ cả dòng là mất ô thứ 3. */
+function logSeen(code,id,d){var k=code+"|"+id,o=LOGSEEN[k]||(LOGSEEN[k]={});
+ var ks=Object.keys(d||{});if(!ks.length){o["*"]=1;return}
+ ks.forEach(function(f){o[f]=1})}
+function logAct(act,code,id,d,note,ex){
+ try{
+  if(LOGOFF)return;
+  if(!d||!Object.keys(d).length){if(!note)return}
+  /* Ghi thẳng qua hàm ghi chung mà không nằm trong cửa ghi nào đã khai (LOGDEPTH=0): tự MỞ LƯỢT
+     MỚI. Không làm thế thì nó dính vào lượt của cú bấm TRƯỚC - và chốt chặn "sau đó đã có thay
+     đổi khác" của Hoàn tác sẽ mù, lùi đè mất việc người sau. */
+  if(LOGDEPTH===0&&!LOGTICK){LOGBATCH++;LOGSEEN={};LOGDOOR="";LOGTICK=true;
+   try{setTimeout(function(){LOGTICK=false},0)}catch(e0){LOGTICK=false}}
+  var L=logRows(),e={log_id:"LOG-"+String(Date.now()).slice(-8)+"-"+(L.length+1),
+   log_time:nowStr(),staff_id:CURSTAFF||"",staff_name:(typeof myName==="function"?myName():""),
+   action:act||"",sheet:code||"",row_id:String(id==null?"":id),
+   door:LOGDOOR||"",batch:String(LOGBATCH||0),
+   summary:note||logWhat(code,id,d),detail:JSON.stringify(d||{}),
+   kind:(ex&&ex.kind)||"upd",truoc:(ex&&ex.truoc)||"",sau:(ex&&ex.sau)||"",
+   undone:""};
+  L.unshift(e);logSeen(code,id,d);try{dataChanged()}catch(e3){}
+  var mx=logMax();if(L.length>mx)L.length=mx;
+  return e;
+ }catch(e2){}}
+/* ---- chụp ảnh cả BẢNG (dùng cho cửa ghi mutate thẳng object, không đi qua hàm ghi chung) ---- */
+function logPk(code){try{jIdInit()}catch(e){}
+ if(JIDK[code])return JIDK[code];
+ var a=(DATA.dl&&DATA.dl[code])||[];if(!a.length)return "";
+ var ks=Object.keys(a[0]);for(var i=0;i<ks.length;i++)if(/_id$/.test(ks[i]))return ks[i];
+ return ks[0]||""}
+function logSnapTb(code){var pk=logPk(code),a=(DATA.dl&&DATA.dl[code])||[],m={};
+ for(var i=0;i<a.length;i++){var id=String(pk&&a[i][pk]!=null?a[i][pk]:("#"+i));m[id]=JSON.stringify(a[i])}
+ return m}
+function logSnapSet(tbs){var o={};(tbs||[]).forEach(function(c){o[c]=logSnapTb(c)});return o}
+function logCmp(before){
+ Object.keys(before||{}).forEach(function(code){
+  var b=before[code],af=logSnapTb(code),id,sn;
+  for(id in af){
+   sn=LOGSEEN[code+"|"+id]||{};
+   if(!(id in b)){if(!sn["*"])logAct("Tạo mới",code,id,{},"Thêm dòng mới vào "+code,{kind:"add",sau:af[id]});continue}
+   if(b[id]===af[id])continue;
+   var d=logDiff(JSON.parse(b[id]),JSON.parse(af[id]));
+   for(var f in sn)delete d[f];
+   if(Object.keys(d).length)logAct("Cập nhật",code,id,d,"",{kind:"upd"})}
+  for(id in b){if(id in af)continue;
+   if((LOGSEEN[code+"|"+id]||{})["*"])continue;
+   logAct("Xoá",code,id,{},"Xoá dòng khỏi "+code,{kind:"del",truoc:b[id]})}})}
+/* Bọc TẤT CẢ cửa ghi đã khai: chụp trước - cho chạy - chụp sau - so. Làm một lần lúc khởi động,
+   không phải đi sửa từng cửa; cửa ghi viết sau này chỉ cần khai tên là tự có nhật ký. */
+function logArm(){
+ if(typeof DOORTB!=="object"||!DOORTB)return 0;
+ var n=0;
+ Object.keys(DOORTB).forEach(function(fn){
+  var f=window[fn];if(typeof f!=="function"||f.__log)return;
+  var tbs=DOORTB[fn];
+  var w=function(){
+   if(LOGOFF)return f.apply(this,arguments);
+   if(LOGDEPTH===0){LOGBATCH++;LOGSEEN={};LOGDOOR=fn;LOGTICK=true}
+   LOGDEPTH++;
+   var b=null;try{b=logSnapSet(tbs)}catch(e){}
+   var bt=LOGBATCH;
+   try{return f.apply(this,arguments)}
+   finally{try{if(b)logCmp(b)}catch(e2){}LOGDEPTH--;
+    if(LOGDEPTH<=0){LOGDEPTH=0;LOGTICK=false;try{undoOffer(bt)}catch(e3){}}}};
+  w.__log=1;w.__orig=f;w.__door=fn;window[fn]=w;n++});
+ return n}
+/* ═══════════ HOÀN TÁC (dựa thẳng lên nhật ký) ═══════════
+   Trước đây app có 46 chỗ hỏi "Xác nhận?" mà KHÔNG có đường lùi: bấm nhầm là xong, phải đi
+   sửa tay từng ô. Hỏi trước không thay được lối lùi - người ta bấm Xác nhận theo phản xạ.
+   Hoàn tác theo LƯỢT BẤM (batch) chứ không theo từng dòng: một lượt "Nhận học viên" đụng 4 bảng,
+   lùi nửa vời còn tệ hơn không lùi.
+   CHẶN AN TOÀN: nếu sau lượt đó đã có người khác sửa đúng dòng ấy thì KHÔNG cho lùi - lùi sẽ
+   đè mất việc của họ. Thà nói thẳng là không lùi được còn hơn lùi sai. */
+function logBatchRows(b){return logRows().filter(function(e){return String(e.batch||"")===String(b)})}
+function logNewerHit(b){
+ var mine={},hit=[];
+ logBatchRows(b).forEach(function(e){mine[e.sheet+"|"+e.row_id]=1});
+ logRows().forEach(function(e){
+  if(String(e.batch||"")===String(b))return;
+  if(Number(e.batch||0)<=Number(b))return;
+  if(String(e.undone||"")==="yes")return;
+  if(mine[e.sheet+"|"+e.row_id])hit.push(e.sheet+" "+e.row_id)});
+ return hit}
+function logCanUndo(b){
+ var L=logBatchRows(b);
+ if(!L.length)return "Không tìm thấy thao tác này trong nhật ký.";
+ if(L.some(function(e){return String(e.undone||"")==="yes"}))return "Thao tác này đã hoàn tác rồi.";
+ var hit=logNewerHit(b);
+ if(hit.length)return "Không hoàn tác được: sau đó đã có thay đổi khác trên "+hit.slice(0,3).join(", ")+(hit.length>3?" ...":"")+". Sửa tay để khỏi đè mất việc của người sau.";
+ return ""}
+function logUndoOne(e){
+ var code=e.sheet,pk=logPk(code),arr=(DATA.dl&&DATA.dl[code])||[];
+ if(e.kind==="add"){
+  for(var i=0;i<arr.length;i++)if(String(arr[i][pk])===String(e.row_id)){arr.splice(i,1);return true}
+  return false}
+ if(e.kind==="del"){
+  if(!e.truoc)return false;
+  arr.unshift(JSON.parse(e.truoc));return true}
+ var r=find(code,pk,e.row_id);if(!r)return false;
+ var d=JSON.parse(e.detail||"{}");
+ for(var k in d)r[k]=(d[k].tu===""?"":d[k].tu);
+ return true}
+function logUndo(b){
+ var why=logCanUndo(b);
+ if(why){toastErr(why);return}
+ var L=logBatchRows(b),done=0;
+ LOGOFF=true;
+ try{L.forEach(function(e){if(logUndoOne(e)){e.undone="yes";done++}})}finally{LOGOFF=false}
+ var e0=L[0]||{};
+ logAct("Hoàn tác",e0.sheet||"",e0.row_id||"",{},"Hoàn tác: "+(e0.summary||e0.door||"thao tác trước"),{kind:"undo"});
+ try{deriveAll()}catch(e2){}
+ persistSoon();undoHide();
+ toast("Đã hoàn tác "+done+" thay đổi.",2600);
+ try{if(window.HVPORTAL)hvReRender();else reRender(CUR)}catch(e3){}}
+/* --- thanh Hoàn tác hiện ngay sau khi làm xong --- */
+function undoHide(){var u=document.getElementById("undobar");if(u)u.classList.remove("on")}
+function undoShow(b,lb){
+ var u=document.getElementById("undobar");if(!u)return;
+ if(logCanUndo(b))return;
+ u.innerHTML='<i class="ti ti-history"></i><span>'+esc(lb||"Đã lưu thay đổi")+'</span>'+
+  '<button class="btn sm" onclick="logUndo(\''+b+'\')"><i class="ti ti-arrow-back-up"></i>Hoàn tác</button>'+
+  '<button class="x" onclick="undoHide()" aria-label="Đóng thanh hoàn tác">&times;</button>';
+ u.classList.add("on");
+ clearTimeout(window._ut);
+ window._ut=setTimeout(undoHide,(num(paramOf("undoWindow_seconds",25))||25)*1000)}
+/* Sau mỗi lượt bấm có ghi nhật ký thì mời hoàn tác. Gọi ở CUỐI wrapper, khi lượt đã đóng. */
+function undoOffer(b){
+ try{
+  var L=logBatchRows(b);if(!L.length)return;
+  if(L.length===1&&L[0].kind==="undo")return;
+  var n=L.length,e0=L[L.length-1];
+  undoShow(b,(e0.summary?String(e0.summary).slice(0,60):"Đã lưu thay đổi")+(n>1?(" (+"+(n-1)+" thay đổi khác)"):""));
+ }catch(e){}}
+function markRow(sheet,idf,id,vals,msg,page){var r=find(sheet,idf,id);
+ /* chụp CẢ DÒNG chứ không chỉ mấy ô trong vals: markRow còn tự đóng dấu updated_by/updated_at,
+    chụp thiếu thì hai ô đó rơi xuống lớp dưới và một cú bấm hoá ra hai dòng nhật ký. */
+ function d(){var b=logSnap(r);if(r){for(var k in vals)r[k]=vals[k];r.updated_by=myName();r.updated_at=nowStr()}logAct("Cập nhật",sheet,id,logDiff(b,logSnap(r)));toast(msg);reRender(CUR)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toastErr("KHÔNG LƯU ĐƯỢC: "+((res&&res.error)||"lỗi không rõ")+" - dữ liệu chưa ghi, thử lại.");return}d()}).withFailureHandler(function(e){toastErr("MẤT KẾT NỐI: "+e.message+" - dữ liệu chưa ghi, thử lại.")}).apiUpdate(sheet,id,vals)}else{d()}}
 /* ===== P2 Test đầu vào (DL03) ===== */
 /* ===== TÁC VỤ VƯỢT QUY TRÌNH =====
@@ -11946,6 +12258,7 @@ function derNames(){
  }
 }
 function deriveAll(){
+ try{dataChanged()}catch(e0){}   /* tính lại cột dẫn xuất = dữ liệu đổi -> vứt bảng nhớ tạm */
  try{
   derNames();
   // DL02: số lần liên hệ + lần gọi đầu/cuối (từ DL02b)
@@ -12142,6 +12455,7 @@ function demoBootHV(){window.HVPORTAL=1;
  try{cfEnsure()}catch(e){}try{tshAuto()}catch(e){}
  try{deriveAll();autoReturnHandovers()}catch(e){}
  if(__base===null)__base=demoPack();
+ try{logArm()}catch(e){}
  if(demoDirty())setTimeout(function(){toast("Đang dùng dữ liệu demo ĐÃ CHỈNH từ buổi trước - Reset ở màn cổng.",4200)},600);
  var who=ssGet("ITTS_WHO_HV");
  if(who===null||who===undefined){var ap=document.getElementById("hvapp");if(ap)ap.style.display="none";demoGateHV()}
@@ -12221,6 +12535,7 @@ function demoBoot(){
     là việc của HỆ THỐNG theo thời gian, không được tính là "thay đổi demo" (chip cam oan). */
  var db=document.getElementById("demoBadgeWrap");if(db)db.style.display="inline-flex";
  if(__base===null)__base=demoPack();
+ try{logArm()}catch(e){}   /* bọc cửa ghi SAU khi dựng xong dữ liệu nền - nếu không, việc dựng nền cũng bị ghi vào nhật ký */
  if(demoDirty())setTimeout(function(){toast("Đang dùng dữ liệu demo ĐÃ CHỈNH từ buổi trước - Reset ở màn cổng hoặc Cài đặt > Dữ liệu demo.",4200)},600);
  var who=ssGet("ITTS_WHO");
  if(who===null||who===undefined){demoGate()}
@@ -12245,10 +12560,53 @@ HV_SHELL = r"""
   </main>
 </div>
 <div class="toast" id="toast"></div>
+<div class="undobar" id="undobar"></div>
 <div class="mask" id="mask" onclick="closeModal()"></div>
 <div class="cfmask" id="cfm"><div class="cfbox"><div class="cfh"><i class="ti ti-alert-triangle"></i> Xác nhận thao tác</div><div class="cfmsg" id="cfmMsg"></div><div class="cfa"><button class="btn" onclick="closeConfirm()">Huỷ</button><button class="btn primary" onclick="confirmYes()">Xác nhận</button></div></div></div>
 <div class="drawer" id="drawer"><div class="drszr" id="drszr" title="Kéo để đổi độ rộng - bấm đúp để về mặc định"></div><div class="dh"><b id="drawerTitle">Chi tiết</b><button class="x" onclick="closeModal()">&times;</button></div><div class="dbody" id="drawerBody"></div></div>
 """
+# ===== BAN KHAI CUA GHI (V9.31) =====
+# Mot su that, mot cho. Truoc day ban khai nay chi nam trong _check15.js nen app khong biet gi
+# ve no; gio no o day, app nhan duoc de tu ghi nhat ky, con _check15 doc lai tu app da build.
+# Them mot ham ghi moi ma quen khai -> _check15 BAO DO (no tu do nguon ra ban khai that).
+DOORS = {
+ "DL01":["staffAdd","staffSave","gvBioSave"],
+ "DL02":["bgSplitOrphansRun","doHandoverRun","leadInboundSave","reassignSave","runGiveUpDo","runRejectSave","testQuickSave","touchLead","tvEnrollSave"],
+ "DL02b":["leadInboundSave","rfNeed","runRejectSave","runTouchSave","testQuickSave"],
+ "DL03":["rfNeed","testAttend","testBook","testConsult","testNoShowSave","testQuickSave","testRebookSave","testRefuse","testResultSave"],
+ "DL04":["rfNeed","runSkipTest","tvCloseSave","tvEnrollSave","tvQuickSave","tvSave"],
+ "DL06":["cancelEnrollRun","paySave","rfNeed","runCancelEnroll","tvEnrollSave","insSync"],
+ "DL06b":["insPlanSave"],
+ "DL07":["duyetRefundRun","paySave","payVerifyRun","rfNeed"],
+ "DL08":["hvClassConfirm","hvClassRejectSave","midSave","obMark","rfNeed","xepMoiLuu","obChangeSave","obFinish"],
+ "DL09":["blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave"],
+ "DL10":["xepMoiLuu","obChangeSave","rfNeed","clsSetTeacher"],
+ "DL11":["bhCancelRun","bhDone","bhMakeupSave","bhNoteSave","ddSave","sessEnd","sessStart","sesSetTeacher","clsSetTeacher"],
+ "DL12":["ddSave","hvAbsentSave","absReq","absReview","absMakeup"],
+ "DL13":["chamLuu","giaoBaiCaLop","giaoBaiRieng","sesAssignRun","thuLuu"],
+ "DL14":["hvWowSave","wowAddSave","wowCancelRun","wowConfirm","wowNoShow","wowNoteSave","wowRescheduleRun","wowTaught","wowUseQuota"],
+ "DL15":["rvSend","svFollowDone","svResultSave","svSendSave"],
+ "DL16":["fbClassifySave","fbResolveSave","fbToComplaintSave","ghSave","ghToKN","hvFeedbackSave","hvRateSes"],
+ "DL17":["fbToComplaintSave","ghToKN","knAddSave","knUpd"],
+ "DL18":["ktFollowSave","ktGenSave","ktInvite","ktMissSave","ktResultSave","ktTestiSave","rfNeed"],
+ "DL20":["hwbSave","sesSave"],
+ "DL21":["gaSave"],
+ "DL23":["hvReq","tkNewSave"],
+ "DL24":["hvAskSaySave","tkSay"],
+}
+_dmap = {}
+for _tb, _fns in DOORS.items():
+    for _fn in _fns:
+        _dmap.setdefault(_fn, [])
+        if _tb not in _dmap[_fn]:
+            _dmap[_fn].append(_tb)
+_DOORJS = "{" + ",".join(
+    '%s:[%s]' % (_k, ",".join('"%s"' % _t for _t in sorted(_dmap[_k])))
+    for _k in sorted(_dmap)) + "}"
+assert "__DOOR_MAP__" in HTML, "LAP RAP GAY: khong thay cho cam ban khai cua ghi"
+HTML = HTML.replace("__DOOR_MAP__", _DOORJS)
+print("Ban khai cua ghi: %d ham / %d bang" % (len(_dmap), len(DOORS)))
+
 _MH = "</style></head><body>"
 _i  = HTML.index(_MH) + len(_MH)
 _j  = HTML.index('<script src="ITTs_data.js"></script>')

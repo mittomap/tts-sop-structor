@@ -47,7 +47,8 @@ var TABS={
  khac:["KTAB",["baoluu","magioithieu"]],
  duyet:["DUYTAB",["duyetck","duyethoan","duyetnghi","duyetthu","duyetgiao","banggiao"]],
  dsthanhtoan:["STTAB",["da","du","cong"]],
- settings:["SETTAB",["brand","menu","phanquyen","ch2","ch6","ch4","ch1","khoa","staff","health","demo"]],
+ /* Lay THANG tu app (setTabs) - truoc day cho nay chep tay danh sach tab, them tab moi la bo kiem im lang bo sot. */
+ settings:["SETTAB",setTabs().map(function(t){return t[0]})],
  giaoan:["GATAB",["ga","kho"]],
  banlam:["BLVIEW",["list","board"]],
  giaoviec:["TKTAB",["mine","given","report"]],
@@ -501,6 +502,120 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
    if(!/pgExport\(/.test(o))thieu.push(x[0]+"#"+x[2]);window[x[1]]=undefined});
   t("hàng chờ quyết định và màn xếp lịch cũng xuất được"+(thieu.length?(" - thiếu: "+thieu.join(", ")):""), thieu.length===0)})();
  window.PGQ={};
+})();
+
+/* ============ 20. NHAT KY THAO TAC + HOAN TAC (V9.31) ============
+   Nhat ky la thu de QUY TRACH NHIEM, nen ban than no phai duoc kiem bang may: mot so kiem
+   "co ham logAct khong" thi luon xanh ma khong chung minh duoc gi. O day lam THAT: bam mot
+   cua ghi roi doi nhat ky phai co dong dung; lui lai roi doi du lieu phai ve nhu cu; va
+   QUAN TRONG NHAT - phai chung minh chot chan tu choi lui DUOC (mot chot chan luon dong y
+   thi khong phai chot chan). */
+(function(){
+ setRole("all");CURSTAFF=(rows("DL01")[0]||{}).staff_id||"";
+ t("app co bang nhat ky DL25", Array.isArray(logRows()));
+ t("moi cua ghi da khai deu duoc boc de tu ghi nhat ky", (function(){
+  logArm();
+  var ho=Object.keys(DOORTB||{}).filter(function(f){return typeof global[f]==="function"&&!global[f].__log});
+  if(ho.length)bad.push("  cua ghi chua boc: "+ho.slice(0,5).join(", "));
+  return ho.length===0})());
+ /* --- ve trang thi KHONG duoc sinh dong nhat ky nao (doc khong phai ghi) --- */
+ t("chi VE trang thi khong ghi nhat ky", (function(){
+  var n0=logRows().length;
+  ["banlam","hocvien","test","thanhtoan"].forEach(function(k){try{RENDER[k]()}catch(e){}});
+  return logRows().length===n0})());
+ /* --- cua ghi di qua ham ghi chung --- */
+ var tb=rows("DL03").filter(function(x){return ecode(x.booking_status)!=="booked"})[0];
+ t("co phieu test de thu cua ghi", !!tb);
+ if(tb){
+  var n0=logRows().length,truoc=tb.booking_status;
+  testBook(tb.test_booking_id);
+  var e=logRows()[0];
+  t("bam mot cua ghi -> nhat ky co them dong", logRows().length>n0);
+  t("dong nhat ky ghi du AI - LUC NAO - BANG - DONG",
+    !!(e&&e.staff_name&&/\d{2}\/\d{2}\/\d{4}/.test(e.log_time)&&e.sheet==="DL03"&&e.row_id===tb.test_booking_id));
+  t("dong nhat ky ghi ro doi TU GI SANG GI", (function(){
+    var d=JSON.parse((e&&e.detail)||"{}");
+    return !!(d.booking_status&&d.booking_status.tu===truoc&&/booked/.test(d.booking_status.den))})());
+  t("dong nhat ky nho CUA GHI nao gay ra", !!(e&&e.door==="testBook"));
+  t("tom tat dung TEN O TIENG VIET, khong phai ten ky thuat",
+    !!(e&&e.summary&&e.summary.indexOf("booking_status")<0&&/[À-ỹ]/.test(e.summary)));
+  /* --- hoan tac --- */
+  var b=e&&e.batch;
+  t("lo vua lam thi hoan tac duoc", !!b&&logCanUndo(b)==="");
+  logUndo(b);
+  t("hoan tac tra du lieu ve DUNG nhu truoc", tb.booking_status===truoc);
+  t("hoan tac roi thi khong lui lan hai", logCanUndo(b)!=="");
+  t("nhat ky co ghi lai chinh viec hoan tac", logRows().some(function(x){return x.kind==="undo"}));
+ }
+ /* --- CHOT CHAN: dong da bi nguoi khac sua sau do thi TU CHOI lui --- */
+ t("tu choi lui khi sau do dong do da bi sua tiep", (function(){
+  var t2=rows("DL03").filter(function(x){return ecode(x.booking_status)!=="booked"})[0];
+  if(!t2)return false;
+  testBook(t2.test_booking_id);
+  var bOld=logRows()[0].batch;
+  if(logCanUndo(bOld)!=="")return false;               /* luc nay phai lui duoc */
+  markRow("DL03","test_booking_id",t2.test_booking_id,
+   {booking_status:eFull("enum_booking_status","cancelled")},"thu");
+  return logCanUndo(bOld)!=="" })());                  /* sau khi bi sua tiep thi phai TU CHOI */
+ /* --- cua ghi mutate THANG object (khong qua ham ghi chung) cung phai duoc ghi --- */
+ t("cua ghi ghi thang vao object cung vao nhat ky", (function(){
+  var ids={};rows("DL11").forEach(function(x){if(x.teacher_id)ids[x.teacher_id]=1});
+  var gvs=Object.keys(ids),cand=rows("DL11").filter(function(x){return x.teacher_id});
+  for(var s0=0;s0<cand.length;s0++)for(var i=0;i<gvs.length;i++){
+   if(gvs[i]===cand[s0].teacher_id)continue;
+   var n1=logRows().length,cu=cand[s0].teacher_id;
+   sesSetTeacher(cand[s0].session_id,gvs[i],"bo kiem");
+   if(cand[s0].teacher_id!==gvs[i])continue;
+   var e2=logRows()[0],okk=(logRows().length>n1&&e2.sheet==="DL11"&&e2.door==="sesSetTeacher");
+   logUndo(e2.batch);
+   return okk&&cand[s0].teacher_id===cu;               /* lui xong phai ve dung GV cu */
+  }
+  return false})());
+ /* --- tham so hai chieu: doi so dong giu lai thi app phai di theo --- */
+ t("so dong nhat ky giu lai doc tu CH2 (doi tham so thi app di theo)", (function(){
+  var c=(DATA.config&&DATA.config.ch2)||[],r=null;
+  for(var i=0;i<c.length;i++)if(c[i].name==="auditLogKeep_rows")r=c[i];
+  if(!r)return false;
+  var cu=r.value;r.value="3";
+  var okk=(logMax()===3);
+  for(var j=0;j<8;j++)logAct("Thu","DL03","X"+j,{},"dong thu "+j);
+  okk=okk&&(logRows().length<=3);
+  r.value=cu;return okk})());
+ /* --- man tra nhat ky --- */
+ (function(){window.SETTAB="nhatky";var o="";try{o=RENDER.settings()}catch(e){o=""}
+  window.SETTAB="ch2";
+  t("man Nhat ky thao tac ve duoc", o.length>400);
+  t("man Nhat ky co o tim", /class="pgq"/.test(o));
+  t("man Nhat ky xuat duoc CSV", /pgExport\('nhatky'\)/.test(o));
+  t("man Nhat ky loc duoc theo bang va theo nguoi", /nkSet\('NKTB'/.test(o)&&/nkSet\('NKWHO'/.test(o));
+  t("man Nhat ky noi thang gioi han giu bao nhieu dong", o.indexOf("dòng gần nhất")>=0);
+  t("man Nhat ky goi ten bang bang tieng Viet", o.indexOf("Test đầu vào")>=0||o.indexOf("Buổi học")>=0)})();
+ /* --- NHO TAM BANG TRA: phai vua NHO that, vua VUT dung luc --- */
+ (function(){
+  var a1=jIndex(),a2=jIndex();
+  t("bang tra jIndex co nho tam (goi hai lan tra ve cung mot ban)", a1===a2);
+  var C1=jCtx(Object.keys(a1.lead)[0]),C2=jCtx(Object.keys(a1.lead)[0]);
+  t("ngu canh jCtx cung nho tam theo bang tra", C1===C2);
+  /* them mot dong that roi doi bang tra phai THAY dong do - neu khong, nho tam dang noi doi */
+  var lid="LEAD-KIEM-NHOTAM";
+  rows("DL02").push({lead_id:lid,full_name:"Kiem nho tam",lead_status:eFull("enum_lead_status","new")});
+  dataChanged();
+  var a3=jIndex();
+  t("dua du lieu moi vao thi bang tra duoc dung lai", a3!==a1&&!!a3.lead[lid]);
+  t("bang tra cu KHONG con duoc dung sau khi du lieu doi", !a1.lead[lid]);
+  rows("DL02").pop();dataChanged();
+  t("ghi qua nhat ky cung vut bang tra", (function(){
+    var b1=jIndex();
+    logAct("Thu","DL02","X",{a:{tu:"1",den:"2"}},"thu vut bang nho");
+    return jIndex()!==b1})());
+ })();
+ t("ho so 360 co khoi 'Ai da sua ho so nay'", (function(){
+   var L0=rows("DL02")[0];if(!L0)return false;
+   window.JPID=L0.lead_id;var o="";try{o=RENDER.hoso()}catch(e){o=""}
+   window.JPID="";
+   return o.indexOf("Ai đã sửa hồ sơ này")>=0&&/SETTAB=\\?'nhatky/.test(o)})());
+ t("khoi 'ai da sua dong nay' dung duoc cho bat ky bang nao",
+   typeof logRowHTML==="function"&&logRowHTML("DL03","KHONG-CO").indexOf("Chưa có thao tác")>=0);
 })();
 
 console.log(bad.length?("CHECK18 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK18 OK: "+ok+" tieu chi | da ve "+VIEWS.length+" trang/tab");

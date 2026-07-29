@@ -1355,3 +1355,27 @@ toàn app; hotline/địa chỉ dùng cho phiếu in và tin nhắn. Tab Menu si
 và đổi tên nhóm theo cách gọi của trung tâm. Có nút Về mặc định. Cấu hình đồng bộ sang các cửa sổ/máy khác.
 
 Verify: 38 trang 0 lỗi, node --check 2 file, **_check11 = 110 điểm**, icon 144.
+
+## V9.31 (29/07) - NHẬT KÝ THAO TÁC · HOÀN TÁC · TRANG NHANH HƠN
+
+**Nhật ký thao tác (Cài đặt > Nhật ký thao tác)** - mọi lần ghi dữ liệu đều để lại một dòng: **ai**,
+**lúc nào**, **bảng nào - dòng nào**, **ô nào đổi từ gì sang gì**, và **cửa ghi nào** gây ra. Lọc theo
+bảng, lọc theo người, tìm theo từ khoá, xuất CSV. Tên ô hiện bằng tiếng Việt chứ không phải tên cột kỹ
+thuật. Bản demo giữ 500 dòng gần nhất ngay trong trình duyệt (đổi ở Cài đặt > CH2, tham số
+`auditLogKeep_rows`); nối sheet thật thì đây là bảng **DL25**.
+
+**Ai đã sửa hồ sơ này** - ngay trong hồ sơ 360 của mỗi khách/học viên, cạnh Dòng thời gian. Dòng thời
+gian kể chuyện nghiệp vụ (đã test, đã đóng tiền); khối này kể chuyện thao tác (ai bấm gì). Có nút mở
+thẳng sang nhật ký đầy đủ đã lọc sẵn theo người đó.
+
+**Hoàn tác** - làm xong một thao tác là hiện thanh **Hoàn tác** ở góc dưới bên phải trong ít giây (đổi ở
+Cài đặt > CH2, tham số `undoWindow_seconds`); trong màn Nhật ký cũng lùi lại được bất kỳ lượt nào.
+Lùi theo **lượt bấm**: một lượt đụng nhiều bảng thì lùi trọn cả lượt, không lùi nửa vời.
+Nếu sau lượt đó đã có người sửa tiếp đúng dòng ấy, app **từ chối lùi** và nói rõ vì sao - để không đè
+mất việc của người sau.
+
+**Trang nhanh hơn** - Trang bắt đầu 20ms còn 7ms, Chạy quy trình 19ms còn 8ms, toàn bộ 38 trang 164ms
+còn 107ms (đo trên dữ liệu demo 5.142 dòng). Không đổi gì về giao diện hay số liệu hiển thị.
+
+Verify: `_tall` 38 trang 0 lỗi (170 icon), `_check15` 39, `_check17` 394, **`_check18` 126 (vẽ thật 76
+trang/tab)**, `_checkdata` 27 luật / 6.277 lượt kiểm 0 lệch, `check_data.py` ĐẠT.

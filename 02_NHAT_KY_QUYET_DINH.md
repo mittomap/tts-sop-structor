@@ -149,8 +149,11 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.29x — HẾT VIỆC TỒN. (A)(B)(C)(D)(E)(F)(G)(H) ĐỀU ✅ XONG** (28/07 đêm, anh Luân
-> giao toàn quyền chạy hết rồi đi ngủ).
+> **Phiên bản: V9.31 — (A)…(H) + (N1)…(N4) + ba việc anh Luân chốt ngày 29/07 ("3 việc đầu a thấy
+> hay đấy") ĐỀU ✅ XONG.**
+> · **(1) Nhật ký thao tác (DL25)** - app từng có 115 cửa ghi mà không sổ nào ghi ai làm gì lúc nào.
+> · **(2) Hoàn tác** - 46 chỗ hỏi "Xác nhận?" mà không có đường lùi; nay lùi được theo LƯỢT BẤM.
+> · **(3) Tối ưu hiệu năng** - Trang bắt đầu 20ms → 7ms, cả 38 trang 164ms → 107ms.
 > · (A) dữ liệu demo khớp ga nghiệp vụ 218→0 · (B) bộ máy lọc phủ 16 trang · (C) xin nghỉ có phép
 > · (D) mảng 5: mọi hằng số nghiệp vụ đã ra khỏi code, dải số bấm được, hub Chờ duyệt, cấp lượt WOW
 > · (E) việc tồn đợt 2: GV dự phòng theo ngày, đổi GV chính của lớp, phòng & đụng lịch, bảng công
@@ -158,19 +161,21 @@
 > · (H) bài hướng dẫn neo bằng `@mã`.
 > **RÀNG BUỘC XUYÊN SUỐT anh Luân nhắc:** trung tâm có **5 chi nhánh + học online** - mọi việc phải
 > soi qua lăng kính đó (xem mục V9.29o/r bên dưới).
-> **CÒN LẠI CHO PHIÊN SAU:** không còn việc tồn nào đã chốt. Có thể làm tiếp: viết lại NỘI DUNG các
-> bài hướng dẫn cho khớp app mới (neo đã sẵn), và soát lại 23 mục hội đồng đợt 2 xem còn mục nào
-> chưa đụng tới.
+> **CÒN LẠI CHO PHIÊN SAU:** không còn việc tồn nào đã chốt. Bốn đề xuất anh Luân **chưa** duyệt
+> (nêu ra rồi để đó, đừng tự làm): thao tác hàng loạt (chọn nhiều dòng rồi xử một lượt), sửa tại chỗ
+> trong bảng, bản in cho phụ huynh, phím tắt bàn phím. Hai việc **đã khuyên KHÔNG làm**: tách file
+> 4MB (mất thế mạnh một-file-chạy-được-mọi-nơi) và thêm biểu đồ trang trí.
 > **KHÔNG CÒN PHIÊN TỰ ĐỘNG.** Routine "Auto - Github ITTs-SOP-Demo" đã bị XOÁ theo lệnh anh Luân
 > (28/07 chiều). Lý do: phiên chạy lịch chỉ có quyền ĐỌC repo, `git push` trả 403 "Not authorized to
 > access repository mittomap/tts-sop-structor". Chúng nó làm xong việc rồi mới phát hiện không đẩy
 > được, công sức nằm chết trong container. Muốn bật lại thì phải cấp quyền GHI cho môi trường chạy
 > lịch trước, và giữ nguyên BƯỚC 0 "thử `git push --dry-run` trước khi làm bất cứ việc gì". MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG.
 > **Bộ kiểm hiện tại (phải XANH HẾT mới được giao):** node --check 2 file · `_tall` **38 trang** 0 lỗi
-> (170 icon) · `_check11` **143** · `_check12` 37 · `_check13` 174 · `_check14` **111** · `_check15` 37
-> · **`_check16` 577** · `_check17` 392 · **`_check18` 44 (vẽ thật 75 trang/tab + 8 chức danh + mọi hồ
-> sơ cổng học viên)** · `_checktour` · `_checkdata.js` 27 luật / **6327 lượt kiểm - 0 lệch** ·
-> `check_logic.py` (đúng 4 ca cố ý) · `check_data.py` DAT. **Tổng ~1900 tiêu chí tự động.**
+> (170 icon) · `_check11` **143** · `_check12` 37 · `_check13` 174 · `_check14` **111** · `_check15`
+> **39** · **`_check16` 577** · `_check17` **394** · **`_check18` 126 (vẽ thật 76 trang/tab + 8 chức
+> danh + mọi hồ sơ cổng học viên + nhật ký/hoàn tác/bộ nhớ tạm)** · `_checktour` · `_checkdata.js`
+> 27 luật / **6277 lượt kiểm - 0 lệch** · `check_logic.py` (đúng 4 ca cố ý) · `check_data.py` DAT.
+> **Tổng ~1930 tiêu chí tự động.**
 >
 > **VIỆC PHẢI LÀM TIẾP - THEO ĐÚNG THỨ TỰ NÀY (Luân chốt 28/07 khuya, rồi về nghỉ):**
 >
@@ -692,6 +697,63 @@
 > 23,9h tuổi ngay lúc build; vài tiếng sau nó vượt mốc. **Luật rút ra: dữ liệu demo neo theo NGÀY
 > CHẠY thì mọi cửa sổ thời gian phải chọn ở GIỮA, không sát mép.** Nay chỉ lấy buổi trong NỬA cửa
 > sổ, và nửa đó đọc từ chính `attendanceGrace_hours` chứ không gõ số.
+>
+> ### V9.31 - NHẬT KÝ THAO TÁC · HOÀN TÁC · HIỆU NĂNG (anh Luân chốt 29/07: *"3 việc đầu a thấy hay đấy"*)
+>
+> **(1) NHẬT KÝ THAO TÁC - BẢNG DL25.**
+> Chỗ đau: app có **115 cửa ghi** mà không sổ nào ghi *ai* làm *gì* *lúc nào*. Vết chỉ nằm rải rác
+> trong cột `notes` của từng bảng, nên "ai xoá lớp này", "ai duyệt chiết khấu 5 triệu tuần trước"
+> **tra không ra**. Với một hệ SOP đây là lỗ hổng đúng chỗ đau nhất: SOP sinh ra để quy trách nhiệm,
+> mà không truy được thì SOP chỉ còn là lời khuyên.
+>
+> **Cách làm - KHÔNG đi sửa 115 cửa ghi.** Ghi nhật ký ở TẦNG DƯỚI:
+> - bốn hàm ghi dùng chung (`markRow` / `jUpdRow` / `jSaveRow` / `quickStatus`) tự ghi ô nào đổi từ
+>   gì sang gì - chính xác đến từng ô;
+> - còn cửa ghi nào **mutate thẳng vào object** (như `sesSetTeacher`) thì `logArm()` **bọc tự động**
+>   lúc khởi động: chụp ảnh các bảng nó đụng - cho chạy - chụp lại - so.
+>
+> Muốn bọc thì phải biết cửa ghi nào đụng bảng nào. **Bản khai đó trước nay chỉ nằm trong
+> `_check15.js`**, app không hề biết. Nay nó nằm ở `gen_v5.py` (dict Python `DOORS`), lúc build đảo
+> thành `DOORTB` cắm vào app, còn `_check15` **đọc ngược lại từ app** - một sự thật, một chỗ. Ngay
+> lần đầu làm vậy đã lòi ra **2 tên ma**: `clsSave` và `gaAddSave` khai suốt mà **chưa từng có hàm
+> nào tên vậy** - bộ kiểm vẫn xanh trong khi đang canh gác hai cái tên không tồn tại.
+>
+> **Bẫy đã cắn (1): một cú bấm hoá hai dòng nhật ký.** `markRow` lúc đầu chỉ chụp mấy ô trong `vals`,
+> nhưng nó còn tự đóng dấu `updated_by`/`updated_at`. Hai ô đó rơi xuống lớp bọc bên ngoài, thành ra
+> một hành động sinh hai dòng. Sửa: chụp **cả dòng**, không chụp mấy ô mình biết trước.
+>
+> **Bẫy đã cắn (2): ranh giới LƯỢT BẤM.** Cửa ghi chưa khai mà gọi thẳng hàm ghi chung thì lúc đó
+> `LOGDEPTH=0`, dòng nhật ký **dính vào lượt của cú bấm TRƯỚC** - và chốt chặn "sau đó đã có ai sửa
+> tiếp không" của Hoàn tác **mù**, lùi sẽ đè mất việc người sau. Sửa: ghi ở độ sâu 0 thì **tự mở
+> lượt mới**.
+>
+> **(2) HOÀN TÁC.** App có 46 chỗ hỏi "Xác nhận?" mà không có đường lùi. **Hỏi trước không thay được
+> lối lùi** - người ta bấm Xác nhận theo phản xạ. Nay xong việc là hiện thanh **Hoàn tác** ở góc phải
+> (bao lâu thì đọc từ CH2 `undoWindow_seconds`), và màn Nhật ký cho lùi lại bất kỳ lượt nào.
+> Lùi **theo LƯỢT BẤM chứ không theo từng dòng**: một lượt "nhận học viên" đụng 4 bảng, lùi nửa vời
+> còn tệ hơn không lùi.
+> **CHỐT CHẶN:** nếu sau lượt đó đã có người sửa tiếp đúng dòng ấy thì **TỪ CHỐI lùi** và nói rõ lý
+> do - thà nói thẳng là không lùi được còn hơn lùi đè mất việc người khác. `_check18` **bắt chốt chặn
+> này phải từ chối được thật** (một chốt chặn luôn đồng ý thì không phải chốt chặn).
+>
+> **(3) HIỆU NĂNG - ĐO RỒI MỚI SỬA.** Vẽ **một lần** Trang bắt đầu gọi `jIndex()` **44 lần**: mỗi lần
+> duyệt lại 15 bảng để dựng đúng một bảng tra giống hệt nhau (11ms trong 20ms của cả trang). Bảng tra
+> đó **chỉ phụ thuộc dữ liệu** - không phụ thuộc người đăng nhập, không phụ thuộc tham số, không phụ
+> thuộc giờ - nên nhớ tạm được. `jCtx` cũng vậy, và bộ nhớ tạm của nó **gắn thẳng vào bảng tra** để
+> hai thứ sống chết cùng nhau, khỏi phải nhớ vứt riêng.
+> **Vứt bộ nhớ tạm khi nào:** mọi lần ghi có vào nhật ký, mọi `persistSoon()`, mọi `deriveAll()` -
+> cộng một lớp bảo hiểm là hết một nhịp trình duyệt cũng vứt.
+> **Kết quả:** Trang bắt đầu **20ms → 7ms**, Chạy quy trình 19ms → 8ms, cả 38 trang **164ms → 107ms**.
+> `_check18` kiểm cả hai chiều: gọi hai lần phải trả **cùng một bản** (chứng minh có nhớ), và thêm dữ
+> liệu vào rồi thì phải trả **bản mới** (chứng minh vứt đúng lúc) - nhớ tạm mà không ai kiểm chiều
+> thứ hai là mầm lỗi "màn hình không chịu cập nhật".
+>
+> **Tra ở đâu:** Cài đặt > **Nhật ký thao tác** (lọc theo bảng / theo người, tìm, xuất CSV), và ngay
+> trong **hồ sơ 360** có khối **"Ai đã sửa hồ sơ này"** - dòng thời gian kể chuyện *nghiệp vụ*, khối
+> này kể chuyện *thao tác*; hai câu hỏi khác nhau, để cạnh nhau thì lúc có tranh cãi khỏi đi tìm.
+>
+> **Giới hạn nói thẳng trên màn hình:** bản demo giữ **500 dòng gần nhất** (CH2 `auditLogKeep_rows`)
+> ngay trong trình duyệt; nối sheet thật thì đây là bảng **DL25** lưu vĩnh viễn.
 >
 > ### V9.30 - ĐỢT NÂNG CẤP HỆ THỐNG (anh Luân đặt: *"có chuyên gia chuyên nâng cấp hệ thống thì ngon"*)
 >

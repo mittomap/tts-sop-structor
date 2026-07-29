@@ -32,39 +32,17 @@ for(var i=0;i<funcs.length-1;i++){
  while((w=WRITE.exec(body))){var tb=w[1]||w[2]||w[3];(by[tb]=by[tb]||{})[funcs[i][1]]=1}}
 /* Ban khai: cua ghi DA BIET cua tung bang. Them mot ham ghi moi ma quen khai -> BAO DO,
    buoc nguoi viet doi chieu lai voi cac cua san co xem co lech luat khong. */
-var KHAI={
- DL01:["staffAdd","staffSave","gvBioSave"],
- DL02:["bgSplitOrphansRun","doHandoverRun","leadInboundSave","reassignSave","runGiveUpDo","runRejectSave","testQuickSave","touchLead","tvEnrollSave"],
- DL02b:["leadInboundSave","rfNeed","runRejectSave","runTouchSave","testQuickSave"],
- DL03:["rfNeed","testAttend","testBook","testConsult","testNoShowSave","testQuickSave","testRebookSave","testRefuse","testResultSave"],
- DL04:["rfNeed","runSkipTest","tvCloseSave","tvEnrollSave","tvQuickSave","tvSave"],
- DL06:["cancelEnrollRun","paySave","rfNeed","runCancelEnroll","tvEnrollSave","insSync"],
- DL07:["duyetRefundRun","paySave","payVerifyRun","rfNeed"],
- DL08:["hvClassConfirm","hvClassRejectSave","midSave","obMark","rfNeed","xepMoiLuu","obChangeSave","obFinish"],
- /* V9.29p: wowGrantSave = cua ghi CAP THEM LUOT WOW. Ghi wow_extra_approved/purchased roi tinh
-    lai wow_quota_remaining theo DUNG cong thuc cua deriveAll, kem ghi vet vao notes. */
- DL09:["blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave"],
- /* V9.29t: clsSetTeacher = cua ghi DOI GIAO VIEN CHINH cua lop. Ghi ca DL10 (GV chinh) lan DL11
-    (moi buoi CHUA day), chan sai co so, ghi vet vao notes cua lop. */
- DL10:["xepMoiLuu","obChangeSave","clsSave","rfNeed","clsSetTeacher"],
- /* V9.29p: sesSetTeacher = cua ghi DOI GIAO VIEN cua mot buoi (GV du phong). Chan trung gio va
-    chan sai co so voi lop hoc tai cho, ghi vet vao notes cua buoi. */
- DL11:["bhCancelRun","bhDone","bhMakeupSave","bhNoteSave","ddSave","sessEnd","sessStart","sesSetTeacher","clsSetTeacher"],
- /* V9.29: xin nghỉ có phép đi qua BA cửa lõi. hvAbsentSave (cổng học viên) nay chỉ GỌI absReq,
-    không tự ghi DL12 nữa - giữ tên trong sổ để nếu ai đó lại cho nó ghi tay thì lộ ra ngay. */
- DL12:["ddSave","hvAbsentSave","absReq","absReview","absMakeup"],
- DL13:["chamLuu","giaoBaiCaLop","giaoBaiRieng","sesAssignRun","thuLuu"],
- DL14:["hvWowSave","wowAddSave","wowCancelRun","wowConfirm","wowNoShow","wowNoteSave","wowRescheduleRun","wowTaught","wowUseQuota"],
- DL15:["rvSend","svFollowDone","svResultSave","svSendSave"],
- DL16:["fbClassifySave","fbResolveSave","fbToComplaintSave","ghSave","ghToKN","hvFeedbackSave","hvRateSes"],
- DL17:["fbToComplaintSave","ghToKN","knAddSave","knUpd"],
- DL18:["ktFollowSave","ktGenSave","ktInvite","ktMissSave","ktResultSave","ktTestiSave","rfNeed"],
- DL20:["hwbSave","sesSave"],
- DL21:["gaSave","gaAddSave"],
- DL23:["hvReq","tkNewSave"],
- DL24:["hvAskSaySave","tkSay"],
- DL06b:["insPlanSave"]
-};
+/* Ban khai nay GIO NAM TRONG APP (bien DOORTB, sinh luc build tu gen_v5.py) - app can no de tu
+   ghi nhat ky thao tac, nen no phai la ban khai THAT chu khong phai ban chep rieng cua bo kiem.
+   Truoc day cho nay giu mot ban chep: sua app ma quen sua ban chep thi bo kiem van xanh. */
+var KHAI=(function(){var o={};
+ Object.keys(DOORTB||{}).forEach(function(fn){(DOORTB[fn]||[]).forEach(function(tb){(o[tb]=o[tb]||[]).push(fn)})});
+ return o})();
+t("app co ban khai cua ghi DOORTB (de tu ghi nhat ky)", Object.keys(KHAI).length>15);
+t("moi ham trong ban khai cua ghi deu ton tai trong app", (function(){
+ var thieu=Object.keys(DOORTB||{}).filter(function(f){return typeof global[f]!=="function"});
+ if(thieu.length)bad.push("  ham khai ma khong co: "+thieu.join(", "));
+ return thieu.length===0})());
 Object.keys(by).forEach(function(tb){
  var have=Object.keys(by[tb]).sort();
  var khai=KHAI[tb]||[];

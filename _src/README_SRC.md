@@ -34,7 +34,7 @@ ITTS_OUT="<mnt>/SOP ITTs" python3 gen_v5.py
 ```
 
 ## VERIFY (bắt buộc sau mỗi build)
-Bộ kiểm gồm **13 phần, phải xanh HẾT mới được giao** (~1900 tiêu chí):
+Bộ kiểm gồm **13 phần, phải xanh HẾT mới được giao** (~1930 tiêu chí):
 | Lệnh | Kỳ vọng |
 |---|---|
 | `node --check _APP.js` và `node --check _HV.js` | không báo gì |
@@ -43,11 +43,11 @@ Bộ kiểm gồm **13 phần, phải xanh HẾT mới được giao** (~1900 ti
 | `ITTS_OUT=<out> node _check12.js` | `CHECK12 OK: 37 tieu chi` - một cửa vào, một luật |
 | `ITTS_OUT=<out> node _check13.js` | `CHECK13 OK: 174 tieu chi` - KPI biết nói |
 | `ITTS_OUT=<out> node _check14.js` | `CHECK14 OK: 111 tieu chi` - cổng học viên hai chiều |
-| `ITTS_OUT=<out> node _check15.js` | `CHECK15 OK: 37 tieu chi` - **kiểm kê cửa ghi + bất biến nghiệp vụ** |
+| `ITTS_OUT=<out> node _check15.js` | `CHECK15 OK: 39 tieu chi` - **kiểm kê cửa ghi + bất biến nghiệp vụ** (bản khai cửa ghi nay đọc thẳng `DOORTB` của app - xem V9.31) |
 | `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 577 tieu chi` - học phí theo đợt + vá V9.27 + bấm-tên-ra-drawer + địa chỉ từng trang |
 | `ITTS_OUT=<out> node _checkdata.js` | `CHECKDATA OK: 27 luat ... 0 cho lech` - **dữ liệu demo có khớp ga nghiệp vụ không** |
 | `ITTS_OUT=<out> node _check17.js` | `CHECK17 OK: 394 tieu chi` - **bộ máy lọc chuyên sâu** (kết hợp trục, lưu theo người) |
-| `ITTS_OUT=<out> node _check18.js` | `CHECK18 OK: 97 tieu chi \| da ve 75 trang/tab` - **hội đồng audit tự động**: vẽ THẬT mọi trang/tab, mọi trang qua mắt 8 chức danh, cổng học viên qua mọi hồ sơ |
+| `ITTS_OUT=<out> node _check18.js` | `CHECK18 OK: 126 tieu chi \| da ve 76 trang/tab` - **hội đồng audit tự động**: vẽ THẬT mọi trang/tab, mọi trang qua mắt 8 chức danh, cổng học viên qua mọi hồ sơ; từ V9.31 kiêm luôn **nhật ký thao tác + hoàn tác + bộ nhớ tạm bảng tra** (bấm cửa ghi thật, lùi lại thật, và bắt chốt chặn từ chối lùi) |
 | `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` |
 | `python3 check_logic.py` | `TONG BAN GHI LOI: 4` (đúng 4 ca là việc quá hạn CỐ Ý để demo cảnh báo đỏ - xem luật 10k) |
 | `python3 check_data.py` | `KET QUA: DAT` |
@@ -104,6 +104,26 @@ ITTS_OUT="<mnt>/SOP ITTs" node _tall.js   # kỳ vọng: "Render 36 trang | 0 lo
 Cổng học viên: lặp lại `node --check` với script lớn nhất của `ITTs_TrangHocVien_demo.html`.
 
 ## DỰNG LẠI FONT ICON (khi thêm icon `ti-*` mới)
+## Bản khai cửa ghi (`DOORS` trong gen_v5.py -> `DOORTB` trong app) - V9.31
+
+Trong `gen_v5.py`, gần cuối file (ngay trước `_MH = "</style></head><body>"`) có dict Python
+`DOORS = {bảng: [tên hàm ghi]}`. Lúc build nó được đảo thành `{hàm: [bảng]}` rồi thay vào chỗ
+`__DOOR_MAP__` trong chuỗi JS, ra biến `DOORTB` của app. Build sẽ **assert gãy** nếu chỗ cắm biến mất.
+
+App dùng bản khai này để **tự bọc mọi cửa ghi** (`logArm()` gọi ở cuối `demoBoot`/`demoBootHV`):
+chụp ảnh các bảng đó trước - cho hàm chạy - chụp lại - so, rồi ghi vào nhật ký DL25. Nghĩa là
+**thêm cửa ghi mới thì chỉ cần khai tên vào `DOORS`**, không phải đụng vào hàm đó.
+
+`_check15.js` KHÔNG còn giữ bản chép riêng: nó đọc thẳng `DOORTB` từ app đã build rồi đối chiếu với
+danh sách nó tự dò ra từ mã nguồn. Ba tình huống bị bắt:
+- khai tên một hàm **không tồn tại** (V9.31 bắt được 2 ca ma: `clsSave`, `gaAddSave` - khai suốt mà
+  chưa từng có hàm nào tên vậy);
+- viết hàm ghi mới mà **quên khai**;
+- khai rồi nhưng hàm không được bọc (`__log`).
+
+**Đừng thêm hàm chỉ ĐỌC vào `DOORS`**: mỗi lần gọi nó sẽ chụp ảnh cả bảng - hàm vẽ chạy liên tục thì
+thành gánh nặng thật.
+
 Harness báo `thieu trong font: ti-xxx` = phải dựng lại **CẢ HAI** phần trong `tabler_inline.css`:
 (1) payload woff2 base64 VÀ (2) rule `.ti-xxx:before{content}`. Công thức:
 ```bash
