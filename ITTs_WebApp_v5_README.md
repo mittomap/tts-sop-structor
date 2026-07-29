@@ -1436,3 +1436,22 @@ Bấm vào nút, tấm trợ thủ bung ra:
 Trong lúc đang dọn việc, bấm **Thu gọn** thì lượt dọn **vẫn còn nguyên** - nút góc dưới hiện "đang
 dọn, còn N", bấm lại là về đúng việc đang làm dở. Và nếu bạn tự nhảy đi làm việc khác không theo
 thứ tự, trợ thủ **tự cập nhật**: việc đã xong biến mất khỏi lượt, việc mới tự nối vào.
+
+## V9.37 (29/07) - CÀI ĐẶT CHIA NHÓM, VÀ DUYỆT THÌ XEM ĐƯỢC HỒ SƠ
+
+**Cài đặt hệ thống** trước đây là 13 tab xếp một hàng. Nay chia thành 5 nhóm theo đúng câu hỏi bạn
+mang tới: **Giao diện** · **Quy tắc nghiệp vụ** · **Dắt việc & Hướng dẫn** · **Người & Quyền** ·
+**Dữ liệu & Sổ sách**.
+
+Nhóm *Dắt việc & Hướng dẫn* gom đủ ba thứ, mỗi thứ một tab riêng:
+- **Trợ thủ** - bật/tắt, số việc mỗi lượt dọn, thứ tự dọn theo nhóm việc.
+- **Nhịp ngày** - sửa từng dòng nhắc theo chức danh, đổi buổi, đổi thứ tự, thêm dòng của riêng
+  trung tâm.
+- **Bài hướng dẫn** (mới) - bật/tắt nút Chạy hướng dẫn, bật/tắt từng cấp độ và từng bài, chạy thử
+  ngay tại chỗ. Bảng còn cho biết mỗi bài có **bao nhiêu bước app tự kiểm được** bạn đã làm hay
+  chưa; bài chỉ để đọc thì ghi rõ là "chỉ đọc".
+
+**Chỗ duyệt giờ xem được hồ sơ trước khi quyết.** Ba tab Chiết khấu / Hoàn tiền / Bàn giao lead
+trước đây chỉ có con số và nút Duyệt - không có cách nào mở hồ sơ ra xem. Nay tên học viên/khách
+bấm được ra ngăn kéo, và mỗi thẻ có nút **Hồ sơ 360** mở toàn bộ hành trình, tiền đã đóng, lớp,
+phản hồi - xem rồi hẵng quyết.

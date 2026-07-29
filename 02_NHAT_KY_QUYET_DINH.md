@@ -149,7 +149,7 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.36 — (A)…(H) + (N1)…(N4) + ba việc anh Luân chốt 29/07 + KIỂM THỬ THẬT TRÊN
+> **Phiên bản: V9.37 — (A)…(H) + (N1)…(N4) + ba việc anh Luân chốt 29/07 + KIỂM THỬ THẬT TRÊN
 > TRÌNH DUYỆT + VÁ "CHỜ DUYỆT BỊ ĐƠ" + TRỢ THỦ NHẬP VÀO GUIDE ĐỀU ✅ XONG.**
 > · **(1) Nhật ký thao tác (DL25)** - app từng có 115 cửa ghi mà không sổ nào ghi ai làm gì lúc nào.
 > · **(2) Hoàn tác** - 46 chỗ hỏi "Xác nhận?" mà không có đường lùi; nay lùi được theo LƯỢT BẤM.
@@ -175,10 +175,10 @@
 > ảnh đại diện kéo từ `ui-avatars.com` (gửi TÊN NGƯỜI THẬT ra máy chủ nước ngoài).
 > **Bộ kiểm hiện tại (phải XANH HẾT mới được giao):** node --check 2 file · `_tall` **38 trang** 0 lỗi
 > (170 icon) · `_check11` **144** · `_check12` 37 · `_check13` 174 · `_check14` **111** · `_check15`
-> **39** · **`_check16` 578** · `_check17` **394** · **`_check18` 160 (vẽ thật 77 trang/tab + 8 chức
+> **39** · **`_check16` 578** · `_check17` **394** · **`_check18` 169 (vẽ thật 79 trang/tab + 8 chức
 > danh + mọi hồ sơ cổng học viên + nhật ký/hoàn tác/bộ nhớ tạm)** · `_checktour` · `_checkdata.js`
 > 27 luật / **6289 lượt kiểm - 0 lệch** · `check_logic.py` (đúng 4 ca cố ý) · `check_data.py` DAT ·
-> **`_checkui.js` 456 lượt mở THẬT trong trình duyệt**.
+> **`_checkui.js` 462 lượt mở THẬT trong trình duyệt**.
 > **Tổng ~1975 tiêu chí tự động + 402 lượt mở thật.**
 >
 > **VIỆC PHẢI LÀM TIẾP - THEO ĐÚNG THỨ TỰ NÀY (Luân chốt 28/07 khuya, rồi về nghỉ):**
@@ -729,6 +729,35 @@
 > rồi gọi hàm vẽ** - đi đường tắt, **không bao giờ đi qua `go()`**, mà lỗi nằm đúng ở đường `go()` +
 > phạm vi chức danh. Nay nó **bấm từng mục menu như người dùng** rồi đối chiếu màn nhận được.
 > **Luật rút ra: bộ kiểm đi đường tắt là bộ kiểm mù đúng chỗ người dùng đi.**
+>
+> ### V9.37 - CÀI ĐẶT QUY HOẠCH LẠI + DUYỆT PHẢI XEM ĐƯỢC HỒ SƠ
+>
+> **(1) "TRỢ THỦ, NHỊP NGÀY VÀ TOUR GUIDE NÊN VÀO HẾT TRONG CẤU HÌNH... LÀM TRANG CẤU HÌNH THẬT
+> CHUẨN CHỈNH"** (anh Luân).
+> Trước đây **13 tab nằm một hàng phẳng**, không thứ tự nào: Thương hiệu đứng cạnh Ngưỡng SLA, Nhật
+> ký thao tác đứng cạnh Trợ thủ. Muốn tìm một thứ phải đọc hết 13 cái tên, và thêm tab mới thì hàng
+> dài thêm cho tới lúc không ai tìm nổi.
+> Nay chia theo **CÂU HỎI người ta mang tới**: *app trông thế nào* (Giao diện) · *app xử theo luật gì*
+> (Quy tắc nghiệp vụ) · *app dắt người ta ra sao* (Dắt việc & Hướng dẫn) · *ai được thấy gì*
+> (Người & Quyền) · *dữ liệu đang thế nào* (Dữ liệu & Sổ sách).
+> **Mỗi tab khai luôn nhóm của nó ở ô thứ ba** - thêm tab mới là buộc phải chọn nhóm, không có chỗ
+> cho tab vô chủ (và `_check18` bắt đúng điều đó).
+>
+> Tách **Trợ thủ** và **Nhịp ngày** thành hai tab riêng - hai thứ khác nhau (một cái xếp việc, một
+> cái nhắc thói quen theo buổi), nhét chung thì màn nào cũng dài mà chẳng cái nào rõ.
+>
+> Thêm tab **Bài hướng dẫn**. Nội dung bài nằm trong mã (có `chk()` đọc dữ liệu thật, không cất vào
+> sheet được), nhưng ba thứ trước nay trung tâm **không quyết được** thì nay quyết được: có hiện nút
+> "Chạy hướng dẫn" không · cấp độ nào cho ai thấy · bài nào tắt đi. Màn này cũng là chỗ **soi sức
+> khoẻ bài hướng dẫn**: mỗi bài bao nhiêu bước, bao nhiêu bước **kiểm chứng được**. Bài toàn "đọc rồi
+> bấm Tiếp" thì ghi thẳng là **"chỉ đọc"** - không tô vẽ.
+>
+> **(2) "MẤY CÁI CHỖ DUYỆT, KHÔNG CÓ DRAWER THÔNG TIN THÌ LÀM SAO BIẾT DUYỆT KIỂU GÌ"** (anh Luân).
+> Đúng, và đo ra thì đúng ba tab **dính tiền và dính khách** là ba chỗ thiếu: **Chiết khấu · Hoàn
+> tiền · Bàn giao lead** không có đường nào mở hồ sơ. Một hàng chờ quyết định mà không xem được hồ sơ
+> thì người duyệt chỉ còn cách **gật bừa** - mà đây lại là chỗ duyệt tiền.
+> Nay mỗi thẻ duyệt có **tên bấm ra ngăn kéo** và nút **Hồ sơ 360** (toàn bộ hành trình, tiền đã
+> đóng, lớp, phản hồi). Tiêu chí mới: **mọi tab Chờ duyệt đang có việc đều phải bấm ra được hồ sơ.**
 >
 > ### V9.36 - BẢNG DANH SÁCH THIẾU BA THỨ (anh Luân chụp trang Sổ khiếu nại)
 >

@@ -608,6 +608,26 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
   t("man Nhat ky loc duoc theo bang va theo nguoi", /nkSet\('NKTB'/.test(o)&&/nkSet\('NKWHO'/.test(o));
   t("man Nhat ky noi thang gioi han giu bao nhieu dong", o.indexOf("dòng gần nhất")>=0);
   t("man Nhat ky goi ten bang bang tieng Viet", o.indexOf("Test đầu vào")>=0||o.indexOf("Buổi học")>=0)})();
+ /* ============ 25. HANG CHO QUYET DINH PHAI XEM DUOC HO SO (V9.37) ============
+    Anh Luan: "may cai cho duyet, khong co drawer thong tin thi lam sao biet duyet kieu gi".
+    Do ra: tab Chiet khau / Hoan tien / Ban giao lead KHONG co duong nao mo ho so - dung ba tab
+    dinh tien va dinh khach, tuc la ba cho can nhin ky nhat. Nguoi duyet chi con cach gat bua. */
+ (function(){
+  setRole("all");applyScope("");CURSTAFF="";
+  var thieu=[],cuTab=window.DUYTAB;
+  duyTabs().forEach(function(t){
+   window.DUYTAB=t.k;var o="";try{o=RENDER.duyet()}catch(e){thieu.push(t.k+" (nem loi)");return}
+   if(!t.n)return;                      /* tab rong thi khong doi hoi gi */
+   if(!/class="lnk"/.test(o))thieu.push(t.k)});
+  window.DUYTAB=cuTab;
+  t("moi tab Cho duyet dang co viec deu bam ra duoc ho so"+(thieu.length?(" - thieu: "+thieu.join(", ")):""), thieu.length===0);
+  t("the duyet CHIET KHAU co nut Ho so 360 (quyet dinh dinh tien, phai xem ky)", (function(){
+    window.DUYTAB="duyetck";var o="";try{o=RENDER.duyet()}catch(e){o=""}window.DUYTAB=cuTab;
+    return /jOpen\(/.test(o)&&/Hồ sơ 360/.test(o)})());
+  t("the duyet HOAN TIEN co nut Ho so 360", (function(){
+    window.DUYTAB="duyethoan";var o="";try{o=RENDER.duyet()}catch(e){o=""}window.DUYTAB=cuTab;
+    return /jOpen\(/.test(o)})());
+ })();
  /* ============ 24. MOI BANG DANH SACH PHAI DU BA THU (V9.36) ============
     Anh Luan chup trang So khieu nai: "a nho em co lam drawer roi ma sao may trang nay chua co,
     cho viec can lam cung chua tro toi cau hinh (banh rang). Thao tac khieu nai cho nay ko chuan
@@ -725,9 +745,32 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
     var h=asstHTML();CURSTAFF=cu;
     var ten=String(st.full_name).trim().split(/\s+/).slice(-1)[0];
     return h.indexOf("Chào bu")>=0&&h.indexOf(ten)>=0})());
-  t("man cau hinh Tro thu & Nhip ngay ve duoc", (function(){
+  /* V9.37: Cai dat quy hoach lai theo NHOM, va tach "Tro thu / Nhip ngay / Bai huong dan" thanh
+     ba tab rieng - tieu chi cu dang doi ca hai thu nam chung mot man. */
+  t("man cau hinh Tro thu ve duoc", (function(){
     window.SETTAB="tro";var o="";try{o=RENDER.settings()}catch(e){o=""}window.SETTAB="ch2";
-    return o.length>800&&o.indexOf("Mỗi lượt dọn bao nhiêu việc")>=0&&o.indexOf("Nhịp ngày theo chức danh")>=0})());
+    return o.length>800&&o.indexOf("Mỗi lượt dọn bao nhiêu việc")>=0})());
+  t("man Nhip ngay ve duoc", (function(){
+    window.SETTAB="nhip";var o="";try{o=RENDER.settings()}catch(e){o=""}window.SETTAB="ch2";
+    return o.length>600&&o.indexOf("Nhịp ngày theo chức danh")>=0})());
+  t("man Bai huong dan ve duoc va noi ro bao nhieu buoc KIEM CHUNG duoc", (function(){
+    window.SETTAB="huongdan";var o="";try{o=RENDER.settings()}catch(e){o=""}window.SETTAB="ch2";
+    return o.length>800&&o.indexOf("Chạy thử")>=0&&o.indexOf("app tự kiểm được")>=0})());
+  t("moi tab Cai dat deu THUOC MOT NHOM (khong co tab vo chu)", (function(){
+    var g={};SETGRP.forEach(function(x){g[x[0]]=1});
+    return setTabs().every(function(t2){return !!g[t2[2]]})})());
+  t("tat cap do huong dan thi menu huong dan khong con cap do do", (function(){
+    var cu=tourCfg().lv.thamquan;tourLvSet("thamquan",0);
+    tourMenu();var o=(document.getElementById("drawerBody")||{}).innerHTML||"";
+    tourLvSet("thamquan",cu===0?0:1);
+    return o.indexOf("Tham quan")<0||o.length<50})());
+  t("tat mot bai thi bai do khong con trong danh sach", (function(){
+    var k=Object.keys(TOURS).filter(function(x){return x.indexOf("__")!==0})[0];
+    var truoc=tourBaiOn(k);tourBaiSet(k,false);
+    var off=!tourBaiOn(k);tourBaiSet(k,truoc);
+    return off})());
+  t("tat nut Chay huong dan thi nut do bi an", (function(){
+    return /function tourBtnSync/.test(SRC0)&&/tourCfg\(\)\.on\?"":"none"/.test(SRC0)})());
   /* (4) nhip ngay: lop phu cau hinh phai an vao ket qua that */
   t("tat mot dong nhip ngay thi dong do bien mat", (function(){
     CURSTAFF="";var k=nhipKey();if(!k)return false;

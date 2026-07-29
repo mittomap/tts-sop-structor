@@ -482,6 +482,13 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
  box-shadow:0 0 0 3px #5B9BD5,0 0 0 6px rgba(91,155,213,.35),0 0 0 9999px rgba(12,22,38,.62)}
 .tourbox.dock{z-index:200;box-shadow:0 20px 54px rgba(10,20,40,.42);border:1px solid var(--line)}
 .tdo{display:flex;gap:7px;margin:9px 0 2px}
+/* .settabs la mot dai flex - nhom phai chiem TRON chieu ngang, khong thi nhan nhom sau bi hut
+   len nam canh nut cua nhom truoc, doc ra thanh mot hang vo nghia. */
+.setgrp{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 0;width:100%;flex:1 0 100%}
+.setgrp+.setgrp{border-top:1px dashed var(--line)}
+.setglb{display:inline-flex;align-items:center;gap:5px;min-width:158px;font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.setglb i{font-size:14px}
+@media(max-width:820px){.setglb{min-width:100%}}
 /* ── TRỢ THỦ Ở GÓC (V9.35) ── */
 .asstfab{position:fixed;right:18px;bottom:18px;z-index:198;display:flex;align-items:center;gap:7px;
  background:var(--navy);color:#fff;border:0;border-radius:999px;padding:11px 17px;font-family:inherit;
@@ -1344,7 +1351,7 @@ body.drsz .drawer{transition:none}
   <div class="main">
     <div class="topbar">
       <button class="tbtn navtoggle" onclick="toggleNav()" aria-label="Menu"><i class="ti ti-menu-2"></i></button>
-      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div style="min-width:0"><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px;margin-left:auto"><span class="chip blue roomChip" id="demoBadge">Room demo</span><button class="btn sm" onclick="tourMenu()" title="Chạy hướng dẫn từng bước - chọn cấp độ rồi app chỉ tận nơi"><i class="ti ti-school"></i>Chạy hướng dẫn</button><button class="btn sm" onclick="demoReset()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ và mọi máy trong room cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
+      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div style="min-width:0"><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px;margin-left:auto"><span class="chip blue roomChip" id="demoBadge">Room demo</span><button class="btn sm" id="tourBtn" onclick="tourMenu()" title="Chạy hướng dẫn từng bước - chọn cấp độ rồi app chỉ tận nơi"><i class="ti ti-school"></i>Chạy hướng dẫn</button><button class="btn sm" onclick="demoReset()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ và mọi máy trong room cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
       <div class="rolesel">
 <!-- V9.29: bỏ ô chọn vai roleSel - luôn bị ẩn từ V9.9, giữ lại chỉ tổ rối -->
         <button class="tbtn" id="tthBtn" onclick="tthToggle()" aria-label="Bật/tắt Trợ thủ thao tác" data-tip="Trợ thủ thao tác - nhắc việc ngay trên từng trang"><i class="ti ti-bulb"></i></button>
@@ -3449,8 +3456,24 @@ function duyHoanHTML(){
  h+='<div class="panel"><div class="pbody">';
  if(!refund.length)h+='<div class="empty">Không có yêu cầu hoàn tiền.</div>';
  refund.forEach(function(r){var id=esc(r.enrollment_id);var sg=refundSuggest(r);
-  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+esc(r.student_id_name||r.student_id)+' - đã đóng '+vnd(num(r.paid_amount))+'</div><div class="amt" style="color:var(--amber)">Gợi ý hoàn '+vnd(sg.amt)+' ('+sg.pct+'%)</div><div class="rs">Lý do hủy: '+esc(r.cancellation_reason||"-")+' - '+esc(sg.why)+'</div></div><div class="act"><button class="btn primary" onclick="duyetRefund(\''+id+'\')"><i class="ti ti-cash"></i>Xử lý hoàn tiền</button></div></div>'});
+  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+duyWho(r)+' - đã đóng '+vnd(num(r.paid_amount))+'</div><div class="amt" style="color:var(--amber)">Gợi ý hoàn '+vnd(sg.amt)+' ('+sg.pct+'%)</div><div class="rs">Lý do hủy: '+esc(r.cancellation_reason||"-")+' - '+esc(sg.why)+'</div></div><div class="act">'+duyHosoBtn(r)+'<button class="btn primary" onclick="duyetRefund(\''+id+'\')"><i class="ti ti-cash"></i>Xử lý hoàn tiền</button></div></div>'});
  return h+'</div></div>'}
+/* ═══════════ V9.37 - DUYỆT PHẢI XEM ĐƯỢC HỒ SƠ (anh Luân) ═══════════
+   "Mấy cái chỗ duyệt, không có drawer thông tin thì làm sao biết duyệt kiểu gì."
+   Đúng: một hàng chờ quyết định mà không mở được hồ sơ thì người duyệt chỉ còn cách gật bừa.
+   Đo ra: tab Chiết khấu / Hoàn tiền / Bàn giao lead KHÔNG có đường nào mở hồ sơ - đúng ba tab
+   dính tiền và dính khách, tức là ba chỗ cần nhìn kỹ nhất.
+   Nay mỗi thẻ duyệt có: TÊN BẤM RA NGĂN KÉO, và một nút "Hồ sơ 360" mở toàn bộ hành trình. */
+function duyWho(r){
+ var sid=String(r.student_id||"").trim(),lid=String(r.lead_id||"").trim();
+ var ten=esc(r.student_id_name||r.student_id_name||r.student_id||r.full_name||lid||"-");
+ if(sid)return '<a class="lnk" onclick="openStuQuick(\''+esc(sid)+'\')">'+ten+'</a>';
+ if(lid)return '<a class="lnk" onclick="leadDetail(\''+esc(lid)+'\')">'+ten+'</a>';
+ return ten}
+function duyHosoBtn(r){
+ var pid=String(r.student_id||r.lead_id||"").trim();
+ if(!pid)return "";
+ return '<button class="btn" onclick="jOpen(\''+esc(pid)+'\')" data-tip="Mở hồ sơ 360: toàn bộ hành trình, tiền đã đóng, lớp, phản hồi - xem rồi hẵng quyết"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>'}
 function duyCkHTML(TH){
  var ck=rows("DL06").filter(function(r){return num(r.discount_amount)>=TH&&!r.discount_approved_by});
  var appr=rows("DL06").filter(function(r){return num(r.discount_amount)>=TH&&r.discount_approved_by});
@@ -3459,7 +3482,7 @@ function duyCkHTML(TH){
  h+='<div class="sechd">Chiết khấu chờ duyệt ('+ck.length+')</div><div class="panel"><div class="pbody">';
  if(!ck.length)h+='<div class="empty">Không có chiết khấu nào chờ duyệt.</div>';
  ck.forEach(function(r){var id=esc(r.enrollment_id);var pct=num(r.total_fee)?Math.round(num(r.discount_amount)/num(r.total_fee)*100):0;
-  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+esc(r.student_id_name||r.student_id)+' - '+esc(r.course_id_name||r.course_id)+'</div><div class="amt">'+money(r.discount_amount)+'đ <span style="font-size:12px;color:var(--muted);font-weight:600">('+pct+'% / học phí gốc '+money(r.total_fee)+'đ)</span></div><div class="rs">Loại: '+esc(elabel(r.discount_type)||"-")+' - Lý do: '+esc(r.discount_reason||"-")+'</div></div><div class="act"><button class="btn green" onclick="confirmRun(\'Duyệt chiết khấu '+money(r.discount_amount)+'đ cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi tên bạn là người duyệt.\',\'duyetOK\',\''+id+'\')"><i class="ti ti-check"></i>Duyệt</button><button class="btn danger" onclick="confirmRun(\'TỪ CHỐI chiết khấu này? Chiết khấu về 0 và học phí tính lại.\',\'duyetNo\',\''+id+'\')"><i class="ti ti-x"></i>Từ chối</button></div></div>'});
+  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+duyWho(r)+' - '+esc(r.course_id_name||r.course_id)+'</div><div class="amt">'+money(r.discount_amount)+'đ <span style="font-size:12px;color:var(--muted);font-weight:600">('+pct+'% / học phí gốc '+money(r.total_fee)+'đ)</span></div><div class="rs">Loại: '+esc(elabel(r.discount_type)||"-")+' - Lý do: '+esc(r.discount_reason||"-")+'</div></div><div class="act">'+duyHosoBtn(r)+'<button class="btn green" onclick="confirmRun(\'Duyệt chiết khấu '+money(r.discount_amount)+'đ cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi tên bạn là người duyệt.\',\'duyetOK\',\''+id+'\')"><i class="ti ti-check"></i>Duyệt</button><button class="btn danger" onclick="confirmRun(\'TỪ CHỐI chiết khấu này? Chiết khấu về 0 và học phí tính lại.\',\'duyetNo\',\''+id+'\')"><i class="ti ti-x"></i>Từ chối</button></div></div>'});
  h+='</div></div>';
  if(appr.length){h+='<div class="sechd">Đã quyết định gần đây</div><div class="panel"><div class="pbody">';
   appr.slice(0,8).forEach(function(r){var rej=/từ chối|tu choi/i.test(String(r.discount_approved_by));h+='<div class="appcard done"><div class="info"><div class="id">'+esc(r.enrollment_id)+'</div><div class="big">'+esc(r.student_id_name||r.student_id)+' - CK '+money(r.discount_amount)+'đ</div><div class="rs">'+esc(r.discount_approved_by)+(r.discount_approved_at?' · '+esc(r.discount_approved_at):'')+'</div></div><div class="act"><span class="chip '+(rej?"red":"green")+'" style="padding:6px 12px">'+(rej?"Đã từ chối":"Đã duyệt")+'</span></div></div>'});
@@ -6803,7 +6826,7 @@ function renderBanggiao(embed){
  h+='<div class="panel"><div class="ph"><b>Lead của '+esc(src)+' - hiện '+leads.length+'/'+allLeads.length+'</b><div class="mini"><button class="pill" onclick="bgAll(true)">Chọn tất cả (đang hiện)</button><button class="pill" onclick="bgAll(false)">Bỏ chọn</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th style="width:36px"></th><th>Mã</th><th>Họ tên</th><th>SĐT</th><th>Trạng thái</th><th>Việc cần làm</th></tr></thead><tbody>';
  if(!allLeads.length)h+='<tr><td class="empty" colspan="6">NV này không còn lead.</td></tr>';
  else if(!leads.length)h+='<tr><td class="empty" colspan="6">Không có lead nào khớp bộ lọc.</td></tr>';
- leads.forEach(function(l){h+='<tr><td><input type="checkbox" class="bgck" value="'+esc(l.lead_id)+'"></td><td>'+esc(l.lead_id)+'</td><td>'+esc(l.full_name)+'</td><td>'+esc(l.phone_number||"")+'</td><td><span class="chip '+stCls(l.lead_status)+'">'+esc(elabel(l.lead_status))+'</span></td><td style="font-size:11.5px;color:var(--muted)">'+esc(naLive("DL02",l)||"")+'</td></tr>'});
+ leads.forEach(function(l){h+='<tr><td><input type="checkbox" class="bgck" value="'+esc(l.lead_id)+'"></td><td>'+esc(l.lead_id)+'</td><td><a class="lnk" onclick="leadDetail(\''+esc(l.lead_id)+'\')">'+esc(l.full_name)+'</a></td><td>'+esc(l.phone_number||"")+'</td><td><span class="chip '+stCls(l.lead_status)+'">'+esc(elabel(l.lead_status))+'</span></td><td style="font-size:11.5px;color:var(--muted)">'+esc(naLive("DL02",l)||"")+'</td></tr>'});
  h+='</tbody></table></div></div>';return h}
 function bgAll(v){[].forEach.call(document.querySelectorAll(".bgck"),function(c){c.checked=v})}
 function bgSplitOrphans(){
@@ -6995,9 +7018,82 @@ function nhipAdd(role){
 function nhipDel(role,i){var C=nhipCfg(),k="+"+role;if(!C[k])return;C[k].splice(i,1);persistSoon();reRender("settings")}
 function nhipSetAdd(role,i,f,v){var C=nhipCfg(),k="+"+role;if(!C[k]||!C[k][i])return;C[k][i][f]=v;persistSoon()}
 var NHIPBUOIOPT=[["sang","Đầu ngày"],["ngay","Trong ngày"],["chieu","Cuối ngày"]];
+/* ═══════════ CẤU HÌNH BÀI HƯỚNG DẪN (V9.37) ═══════════
+   Anh Luân: "trợ thủ, nhịp ngày và tour guide nên vào hết trong cấu hình".
+   Nội dung từng bài nằm trong mã (có `chk()` đọc dữ liệu thật - không cất vào sheet được), nhưng
+   BA thứ dưới đây thì trung tâm phải tự quyết được, và trước nay không quyết được:
+     · có hiện nút "Chạy hướng dẫn" trên thanh tiêu đề không;
+     · cấp độ nào cho ai thấy (vd cấp "Cấu hình" chỉ dành người thiết lập, nhân viên thấy làm gì);
+     · bài nào tắt đi (bài của vị trí trung tâm mình không có).
+   Màn này cũng là chỗ SOI SỨC KHOẺ bài hướng dẫn: bài nào bao nhiêu bước, bao nhiêu bước KIỂM
+   CHỨNG được. Bài toàn "đọc rồi bấm Tiếp" thì nói thẳng ra như vậy. */
+var TOURCFGDEF={on:1,lv:{},off:{}};
+function tourCfg(){var c=(DATA.config=DATA.config||{});var t=(c.tour=c.tour||{});
+ for(var k in TOURCFGDEF)if(t[k]===undefined)t[k]=(typeof TOURCFGDEF[k]==="object"?{}:TOURCFGDEF[k]);
+ return t}
+function tourLvOn(lv){var o=tourCfg().lv;return o[lv]!==0}
+function tourBaiOn(k){return !tourCfg().off[k]}
+function tourCfgSet(k,v){tourCfg()[k]=v;persistSoon();reRender("settings");try{tourBtnSync()}catch(e){}}
+/* Tắt ở cấu hình thì nút trên thanh tiêu đề phải BIẾN MẤT - không thì cấu hình chỉ là lời nói. */
+function tourBtnSync(){var b=document.getElementById("tourBtn");if(!b)return;
+ b.style.display=tourCfg().on?"":"none"}
+function tourLvSet(lv,v){tourCfg().lv[lv]=v?1:0;persistSoon();reRender("settings")}
+function tourBaiSet(k,v){var o=tourCfg().off;if(v)delete o[k];else o[k]=1;persistSoon();reRender("settings")}
+function tourCfgReset(){var c=(DATA.config=DATA.config||{});c.tour=null;tourCfg();persistSoon();reRender("settings");
+ toast("Đã trả Bài hướng dẫn về mặc định.")}
+/* đếm bao nhiêu bước của bài KIỂM CHỨNG được - con số này nói thật về chất lượng bài */
+function tourChkCount(k){var T=TOURS[k]||{steps:[]};
+ return T.steps.filter(function(st){return typeof st.chk==="function"}).length}
+function renderHuongdan(){
+ var C=tourCfg();
+ var h='<div class="notebar"><i class="ti ti-help-circle"></i>Nội dung từng bài nằm trong mã (có bước tự kiểm bằng dữ liệu thật). Ở đây trung tâm quyết <b>ai thấy gì</b>: bật/tắt nút Chạy hướng dẫn, bật/tắt từng cấp độ và từng bài.</div>';
+ h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-help-circle" style="margin-right:6px"></i>Hướng dẫn trong app</b>'+
+  '<button class="btn sm" onclick="tourCfgReset()"><i class="ti ti-restore"></i>Về mặc định</button></div><div class="pbody">';
+ h+='<div class="fld full" style="max-width:520px"><label>Nút "Chạy hướng dẫn" trên thanh tiêu đề</label>'+
+  '<select onchange="tourCfgSet(\'on\',+this.value)">'+
+  '<option value="1"'+(C.on?" selected":"")+'>Hiện - ai cũng gọi được hướng dẫn</option>'+
+  '<option value="0"'+(C.on?"":" selected")+'>Ẩn - chỉ vào được qua dấu hỏi</option></select></div>';
+ h+='<div class="sechd">Cấp độ nào được bật</div>';
+ h+='<div class="tbwrap"><table class="tb sm"><tbody>';
+ TOURLV.forEach(function(V){
+  var n=(V[0]==="donviec")?0:Object.keys(TOURS).filter(function(k){return TOURS[k].lv===V[0]}).length;
+  var on=tourLvOn(V[0]);
+  h+='<tr'+(on?'':' style="opacity:.55"')+'><td style="width:26px"><i class="ti '+V[2]+'"></i></td>'+
+   '<td><b>'+esc(V[1])+'</b><div class="mut" style="font-size:11.5px">'+esc(V[3])+'</div></td>'+
+   '<td style="width:96px">'+(V[0]==="donviec"?'<span class="chip green">sinh từ hàng chờ</span>':('<span class="chip">'+n+' bài</span>'))+'</td>'+
+   '<td class="nw" style="width:96px"><button class="btn sm" onclick="tourLvSet(\''+esc(V[0])+'\','+(on?0:1)+')">'+
+    '<i class="ti '+(on?"ti-eye":"ti-eye-off")+'"></i>'+(on?"Đang bật":"Đang tắt")+'</button></td></tr>'});
+ h+='</tbody></table></div>';
+ h+='</div></div>';
+ /* danh sách bài + sức khoẻ */
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-book" style="margin-right:6px"></i>Các bài hướng dẫn</b>'+
+  '<span class="mut" style="font-size:11.5px">Bấm Chạy thử để xem đúng cái nhân viên sẽ thấy</span></div><div class="pbody">';
+ h+='<div class="tbwrap"><table class="tb"><thead><tr><th>Bài</th><th>Cấp độ</th><th>Dành cho</th><th style="width:120px">Số bước</th><th style="width:150px">Kiểm chứng được</th><th style="width:180px">Hiện / Chạy thử</th></tr></thead><tbody>';
+ var ks=Object.keys(TOURS);
+ ks.forEach(function(k){
+  var T=TOURS[k];if(k.indexOf("__")===0)return;
+  var lvName=(TOURLV.filter(function(x){return x[0]===T.lv})[0]||["","?"])[1];
+  var nchk=tourChkCount(k),n=T.steps.length;
+  var on=tourBaiOn(k)&&tourLvOn(T.lv);
+  h+='<tr'+(on?'':' style="opacity:.55"')+'>'+
+   '<td><b>'+esc(T.t)+'</b><div class="mut" style="font-size:11.5px">'+esc(T.d||"")+'</div></td>'+
+   '<td>'+esc(lvName)+'</td>'+
+   '<td>'+esc(T.role||"Mọi người")+'</td>'+
+   '<td>'+n+' bước</td>'+
+   '<td>'+(nchk?('<span class="chip green">'+nchk+'/'+n+' bước</span>')
+     :'<span class="chip">chỉ đọc</span>')+'</td>'+
+   '<td class="nw"><button class="btn sm" onclick="tourBaiSet(\''+esc(k)+'\','+(tourBaiOn(k)?0:1)+')" data-tip="'+(tourBaiOn(k)?"Ẩn bài này":"Hiện lại bài này")+'"><i class="ti '+(tourBaiOn(k)?"ti-eye":"ti-eye-off")+'"></i></button> '+
+    '<button class="btn sm primary" onclick="tourStart(\''+esc(k)+'\')"><i class="ti ti-player-play"></i>Chạy thử</button></td></tr>'});
+ h+='</tbody></table></div>';
+ var tong=ks.filter(function(k){return k.indexOf("__")!==0}).length;
+ var tongB=ks.filter(function(k){return k.indexOf("__")!==0}).reduce(function(a,k){return a+TOURS[k].steps.length},0);
+ var tongC=ks.filter(function(k){return k.indexOf("__")!==0}).reduce(function(a,k){return a+tourChkCount(k)},0);
+ h+='<div class="mut" style="font-size:11.5px;margin-top:9px">Tổng <b>'+tong+' bài · '+tongB+' bước</b>, trong đó <b>'+tongC+' bước app tự kiểm được</b> bạn đã làm hay chưa. Số bước còn lại chỉ để đọc - đó là điều bình thường với cấp Tham quan.</div>';
+ h+='</div></div>';
+ return h}
 function renderTro(){
  var C=tthCfg();
- var h='<div class="notebar"><i class="ti ti-bulb"></i><b>Trợ thủ</b> là thứ dắt nhân viên đi hết hàng chờ của họ: mở đúng màn thao tác, làm xong tự kiểm rồi nhảy việc kế. <b>Nhịp ngày</b> là bảng nhắc theo chức danh hiện ở trang đầu của mỗi người. Cả hai <b>sửa được ở đây</b> - đổi xong áp ngay, không cần build lại.</div>';
+ var h='<div class="notebar"><i class="ti ti-bulb"></i><b>Trợ thủ</b> là thứ dắt nhân viên đi hết hàng chờ của họ: mở đúng màn thao tác, làm xong tự kiểm rồi nhảy việc kế. Sửa ở đây <b>áp ngay</b>, không cần build lại. Nhịp ngày ở tab bên cạnh.</div>';
 
  /* ---- khối 1: trợ thủ ---- */
  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-checklist" style="margin-right:6px"></i>Trợ thủ - dọn việc từng bước</b>'+
@@ -7032,7 +7128,11 @@ function renderTro(){
   '<span class="mut" style="font-size:11.5px;align-self:center">Chạy đúng thứ tự bạn vừa đặt, trên dữ liệu thật của người đang đăng nhập.</span></div>';
  h+='</div></div>';
 
- /* ---- khối 2: nhịp ngày ---- */
+ return h}
+/* Nhịp ngày tách thành tab riêng: hai thứ khác nhau (một cái xếp việc, một cái nhắc thói quen theo
+   buổi), nhét chung một màn thì màn nào cũng dài mà chẳng cái nào rõ. */
+function renderNhip(){
+ var h='<div class="notebar"><i class="ti ti-calendar"></i><b>Nhịp ngày</b> là bảng nhắc theo chức danh, hiện trong tấm Trợ thủ ở góc dưới bên phải (3 ô: Đầu ngày / Trong ngày / Cuối ngày). Sửa ở đây áp ngay cho mọi người cùng chức danh.</div>';
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-calendar" style="margin-right:6px"></i>Nhịp ngày theo chức danh</b>'+
   '<button class="btn sm" onclick="nhipReset()"><i class="ti ti-restore"></i>Về mặc định</button></div><div class="pbody">';
  h+='<div class="mut" style="font-size:11.5px;margin:0 0 10px;line-height:1.6">Dòng có <b>hàng chờ</b> thì app đếm được và báo "sạch" khi về 0. Dòng <b>thói quen</b> (bạn tự thêm) không có gì để đếm nên app chỉ ghi "nên xem" - <b>không</b> gắn mác đã xong, vì gắn bừa là nói láo với người trực ca.</div>';
@@ -7066,24 +7166,53 @@ function renderTro(){
  if(!L.length&&!(nhipCfg()["+"+rSel]||[]).length)h+='<tr><td class="empty" colspan="5">Chức danh này chưa khai nhịp ngày nào.</td></tr>';
  h+='</tbody></table></div></div></div>';
  return h}
+/* ═══════════ V9.37 - CÀI ĐẶT QUY HOẠCH LẠI THEO NHÓM (anh Luân: "e làm trang cấu hình thật chuẩn chỉnh") ═══════════
+   Trước đây 13 tab nằm một hàng phẳng, không thứ tự nào cả: Thương hiệu đứng cạnh Ngưỡng SLA, Nhật ký
+   thao tác đứng cạnh Trợ thủ. Muốn tìm một thứ phải đọc hết 13 cái tên. Thêm tab mới thì hàng dài thêm
+   một chút, tới lúc nào đó không ai tìm nổi.
+   Nay chia theo CÂU HỎI người ta mang tới: "app trông thế nào", "app xử theo luật gì", "app dắt người
+   ta ra sao", "ai được thấy gì", "dữ liệu đang thế nào". Mỗi tab khai luôn nhóm của nó ở ô thứ ba -
+   thêm tab mới là phải chọn nhóm, không có chỗ cho tab vô chủ. */
+var SETGRP=[["giaodien","Giao diện","ti-palette"],["luat","Quy tắc nghiệp vụ","ti-adjustments"],
+ ["dat","Dắt việc & Hướng dẫn","ti-bulb"],["quyen","Người & Quyền","ti-users"],
+ ["dulieu","Dữ liệu & Sổ sách","ti-table"]];
 function setTabs(){
  var nHealth=dataHealth().filter(function(x){return x.sev!=="ok"}).length;
- return [["brand","Giao diện & Thương hiệu"],["menu","Menu sidebar"],["phanquyen","Phân quyền & Phạm vi dữ liệu"],
-  ["ch2","Ngưỡng & SLA (CH2)"],["ch6","Ngưỡng KPI (CH6)"],["ch4","Thông điệp nhắc việc (CH4)"],
-  ["ch1","Danh mục (CH1)"],["khoa","Khóa học"],["staff","Nhân viên & Email"],
-  ["health","Sức khỏe dữ liệu"+(nHealth?" ("+nHealth+")":"")],["nhatky","Nhật ký thao tác"],["tro","Trợ thủ & Nhịp ngày"]]
-  .concat(SVR?[]:[["demo","Dữ liệu demo"]])}
+ return [
+  ["brand","Thương hiệu & Màu","giaodien"],
+  ["menu","Menu sidebar","giaodien"],
+  ["ch2","Ngưỡng & SLA (CH2)","luat"],
+  ["ch6","Ngưỡng KPI (CH6)","luat"],
+  ["ch4","Thông điệp nhắc việc (CH4)","luat"],
+  ["ch1","Danh mục (CH1)","luat"],
+  ["tro","Trợ thủ","dat"],
+  ["nhip","Nhịp ngày","dat"],
+  ["huongdan","Bài hướng dẫn","dat"],
+  ["phanquyen","Phân quyền & Phạm vi","quyen"],
+  ["staff","Nhân viên & Email","quyen"],
+  ["khoa","Khóa học","dulieu"],
+  ["health","Sức khỏe dữ liệu"+(nHealth?" ("+nHealth+")":""),"dulieu"],
+  ["nhatky","Nhật ký thao tác","dulieu"]]
+  .concat(SVR?[]:[["demo","Dữ liệu demo","dulieu"]])}
 function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch2:[],ch6:[]};
  var h='<div class="phead"><div><div class="t">Cài đặt hệ thống</div><div class="s">Cấu hình sống trong CH1-CH6 của sheet. Đổi 1 giá trị -> mọi nhắc việc/trạng thái/KPI phụ thuộc tự cập nhật.</div></div></div>';
  h+='<div class="settabs" data-tour="settabs">';
  var stabs=setTabs();
  var rsS=SCOPE();if(rsS.tabs&&rsS.tabs.settings)stabs=stabs.filter(function(t){return rsS.tabs.settings.indexOf(t[0])>=0});
  if(!stabs.some(function(t){return t[0]===tab})){tab=(stabs[0]||["ch2"])[0];window.SETTAB=tab}
- stabs.forEach(function(t){h+='<button class="stab'+(tab===t[0]?" on":"")+'" onclick="window.SETTAB=\''+t[0]+'\';reRender(\'settings\')">'+t[1]+'</button>'});
+ /* vẽ theo NHÓM: mỗi nhóm một hàng có nhãn, thay vì 13 nút xếp hàng ngang không đầu không cuối */
+ SETGRP.forEach(function(g){
+  var L=stabs.filter(function(t){return (t[2]||"dulieu")===g[0]});
+  if(!L.length)return;
+  h+='<div class="setgrp"><span class="setglb"><i class="ti '+g[2]+'"></i>'+esc(g[1])+'</span>';
+  L.forEach(function(t){h+='<button class="stab'+(tab===t[0]?" on":"")+'" onclick="window.SETTAB=\''+t[0]+'\';reRender(\'settings\')">'+esc(t[1])+'</button>'});
+  h+='</div>'});
  h+='</div>';
  if(tab==="health")return h+renderHealth();
  if(tab==="nhatky")return h+renderNhatky();
  if(tab==="tro")return h+renderTro();
+ if(tab==="nhip")return h+renderNhip();
+ if(tab==="huongdan")return h+renderHuongdan();
  if(tab==="brand"){var u=UI();
   h+='<div class="notebar"><i class="ti ti-palette"></i>Đổi tên, logo và màu ở đây là <b>áp ngay</b> cho cả app - dùng khi mang demo đi giới thiệu cho trung tâm khác. Cấu hình lưu cùng dữ liệu demo nên các cửa sổ/máy trong room cùng đổi theo; bấm <b>Về mặc định</b> để trả lại nguyên bản.</div>';
   h+='<div class="jgrid"><div>';
@@ -11253,6 +11382,7 @@ function tourMenu(lv){var L=lv||window.TOURLVSEL||"";
   h+='<div class="mut" style="font-size:12.5px;line-height:1.65;margin-bottom:11px">Chọn cấp độ phù hợp với bạn. App sẽ mở đúng màn hình và chỉ tận nơi từng bước - vừa xem vừa bấm thử được.</div>';
   h+='<div class="tourmenu">';
   TOURLV.forEach(function(V){
+   if(!tourLvOn(V[0]))return;          /* cấp độ bị tắt ở Cài đặt thì không hiện ở đây */
    if(V[0]==="donviec"){var nv=0;try{nv=workAll().length}catch(e){}
     h+='<div class="tourmi" onclick="closeModal();tourWork()"><span class="tmi"><i class="ti '+V[2]+'"></i></span>'+
      '<div style="flex:1"><b>'+esc(V[1])+'</b><span>'+esc(V[3])+'</span></div>'+
@@ -11272,7 +11402,9 @@ function tourMenu(lv){var L=lv||window.TOURLVSEL||"";
  h+='<div class="mut" style="font-size:12px;margin-bottom:11px">'+esc(V[3])+'</div>';
  h+='<div class="tourmenu">';
  var any=false;
- Object.keys(TOURS).forEach(function(k){var T=TOURS[k];if(T.lv!==L)return;any=true;
+ Object.keys(TOURS).forEach(function(k){var T=TOURS[k];if(T.lv!==L)return;
+  if(!tourBaiOn(k))return;             /* bài bị tắt ở Cài đặt */
+  any=true;
   var mine=T.role&&me&&(elabel(me.role)||"").indexOf(T.role.split(" ")[0])>=0;
   h+='<div class="tourmi" onclick="tourAsk(\''+k+'\')"><span class="tmi"><i class="ti '+(T.ic||"ti-book")+'"></i></span>'+
    '<div style="flex:1"><b>'+esc(T.t)+(T.role?' <span class="chip '+(mine?"green":"gray")+'" style="font-size:9.5px">'+esc(T.role)+'</span>':'')+'</b>'+
@@ -12578,7 +12710,7 @@ function go(key,noHist){
  /* V9.35: Trợ thủ KHÔNG còn chen vào đầu thân trang nữa - nó ở nút góc dưới bên phải. Thân trang
     trả lại cho nội dung chính, thứ quan trọng nhất lên ngay đầu màn hình. */
  if(p.ty==="list")el.innerHTML=renderList(key);else el.innerHTML=RENDER[key]();
- asstTick();
+ asstTick();try{tourBtnSync()}catch(e){}
  if(!canSee(key)&&!SENSITIVE[key]&&SCOPE().pages!=="*")el.innerHTML='<div class="notebar" style="margin-bottom:12px"><i class="ti ti-info-circle"></i>Trang ngoài phạm vi chức danh của bạn - đang xem ở chế độ THAM KHẢO.</div>'+el.innerHTML;
  window.CURCTX=navSnap();   /* ngữ cảnh của TRANG NÀY, chụp sau khi đã render (dùng khi rời trang) */
  renderCrumb();
@@ -13097,7 +13229,7 @@ function demoBoot(){
  var who=ssGet("ITTS_WHO");
  if(who===null||who===undefined){demoGate()}
  else{window.GATE_SID=who||"";applyScope(who||"");enter("all")}
- try{asstTick()}catch(e){}}
+ try{asstTick();tourBtnSync()}catch(e){}}
 if(!SVR){demoBoot()}
 </script></body></html>"""
 
