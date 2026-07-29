@@ -149,7 +149,7 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.34 — (A)…(H) + (N1)…(N4) + ba việc anh Luân chốt 29/07 + KIỂM THỬ THẬT TRÊN
+> **Phiên bản: V9.35 — (A)…(H) + (N1)…(N4) + ba việc anh Luân chốt 29/07 + KIỂM THỬ THẬT TRÊN
 > TRÌNH DUYỆT + VÁ "CHỜ DUYỆT BỊ ĐƠ" + TRỢ THỦ NHẬP VÀO GUIDE ĐỀU ✅ XONG.**
 > · **(1) Nhật ký thao tác (DL25)** - app từng có 115 cửa ghi mà không sổ nào ghi ai làm gì lúc nào.
 > · **(2) Hoàn tác** - 46 chỗ hỏi "Xác nhận?" mà không có đường lùi; nay lùi được theo LƯỢT BẤM.
@@ -175,11 +175,11 @@
 > ảnh đại diện kéo từ `ui-avatars.com` (gửi TÊN NGƯỜI THẬT ra máy chủ nước ngoài).
 > **Bộ kiểm hiện tại (phải XANH HẾT mới được giao):** node --check 2 file · `_tall` **38 trang** 0 lỗi
 > (170 icon) · `_check11` **144** · `_check12` 37 · `_check13` 174 · `_check14` **111** · `_check15`
-> **39** · **`_check16` 578** · `_check17` **394** · **`_check18` 152 (vẽ thật 77 trang/tab + 8 chức
+> **39** · **`_check16` 578** · `_check17` **394** · **`_check18` 155 (vẽ thật 77 trang/tab + 8 chức
 > danh + mọi hồ sơ cổng học viên + nhật ký/hoàn tác/bộ nhớ tạm)** · `_checktour` · `_checkdata.js`
 > 27 luật / **6289 lượt kiểm - 0 lệch** · `check_logic.py` (đúng 4 ca cố ý) · `check_data.py` DAT ·
-> **`_checkui.js` 399 lượt mở THẬT trong trình duyệt**.
-> **Tổng ~1970 tiêu chí tự động + 399 lượt mở thật.**
+> **`_checkui.js` 402 lượt mở THẬT trong trình duyệt**.
+> **Tổng ~1975 tiêu chí tự động + 402 lượt mở thật.**
 >
 > **VIỆC PHẢI LÀM TIẾP - THEO ĐÚNG THỨ TỰ NÀY (Luân chốt 28/07 khuya, rồi về nghỉ):**
 >
@@ -729,6 +729,37 @@
 > rồi gọi hàm vẽ** - đi đường tắt, **không bao giờ đi qua `go()`**, mà lỗi nằm đúng ở đường `go()` +
 > phạm vi chức danh. Nay nó **bấm từng mục menu như người dùng** rồi đối chiếu màn nhận được.
 > **Luật rút ra: bộ kiểm đi đường tắt là bộ kiểm mù đúng chỗ người dùng đi.**
+>
+> ### V9.35 - TRỢ THỦ VỀ MỘT GÓC (anh Luân: *"cách hiển thị này a chưa thích lắm... chưa đủ hiện đại kiểu 1 trợ thủ"*)
+>
+> Anh Luân chê **bố cục**, không chê màu. Soi kỹ thì ba chỗ sai thật:
+> · **hai khối nói cùng một chuyện** - "Nhịp ngày" và "Trợ thủ" đều trả lời "hôm nay tôi làm gì",
+>   người ta phải đọc hai lượt rồi tự ghép;
+> · **khối Trợ thủ trình bày kiểu TỜ KHAI** - `TRANG NÀY ĐỂ LÀM GÌ` / `VIỆC CỦA BẠN Ở ĐÂY` /
+>   `LÀM CÁI NÀY TRƯỚC`, nhãn in hoa bên trái, giá trị bên phải. Đó là bố cục **bảng thông số**,
+>   không phải cách một trợ thủ nói chuyện. Trợ thủ thì nói một câu rồi đưa nút;
+> · **nền vàng là màu CẢNH BÁO** mà đây không phải cảnh báo - và hai khối đẩy nội dung chính của
+>   trang xuống dưới màn hình.
+>
+> **Nay gom về MỘT nút tròn góc dưới bên phải.** Bấm vào bung ra tấm trợ thủ: câu chào theo giờ +
+> **tên người** → thẻ **VIỆC KẾ TIẾP** (tên việc, người, hạn, nút Làm / Để sau) → **3 chip nhịp
+> ngày** bấm được → nút **Dọn từng bước**. Thân trang **sạch hoàn toàn**.
+> Đây cũng đúng chỗ anh Luân dặn ở lượt trước - *"đừng có đóng trợ thủ, chỉ là thu gọn thành 1 cái
+> nút ở góc dưới bên phải"* - nên trợ thủ chỉ còn **một nơi ở duy nhất**, không phải hai.
+>
+> **BẪY ĐÃ CẮN - XÓA TÍNH NĂNG MÀ ĐỂ LẠI BỘ KIỂM CỦA NÓ.** Bỏ hai khối khỏi thân trang xong,
+> `tthHTML` / `nhipHTML` / `tthItems` / `tthHasRule` thành **mã chết** - nhưng `_check18` vẫn còn
+> **9 tiêu chí soi chúng**. Chín tiêu chí đó từ giờ kiểm một thứ **không ai còn nhìn thấy**: luôn
+> xanh, chẳng bảo vệ được gì, mà đọc bảng kết quả vẫn tưởng trợ thủ đang được canh. Đã xóa mã chết
+> (~5.000 ký tự) và trỏ hết sang `asstHTML()`.
+> **Luật rút ra: xóa tính năng thì phải xóa hoặc trỏ lại bộ kiểm của nó - bằng không là tự để lại
+> một bộ kiểm giả.** (Cùng họ với bài học V9.32: bộ kiểm phải BẺ LẠI xem có đỏ không.)
+>
+> **Ba việc anh Luân dặn trong lượt này đều đã có và đã kiểm bằng trình duyệt thật:**
+> · **thu gọn chứ không đóng** - lượt dọn còn nguyên, mở lại đúng chỗ đang đứng;
+> · **làm không tuần tự vẫn đúng** - làm việc ở bước 3 trước thì bước đó tự biến mất khỏi lượt, chỗ
+>   đang đứng giữ nguyên, và việc mới tự nối vào bù (`tourWorkSync`, gọi mỗi nhịp vẽ lại màn hình);
+> · **`asstHTML()` tách khỏi `asstPaint()`** để bộ kiểm đọc được nội dung thật mà không cần DOM giả.
 >
 > ### V9.34 - TRỢ THỦ NHẬP VÀO GUIDE (anh Luân: *"cách làm của guide rất hợp để làm trợ thủ, e thêm tầng trợ thủ vào guide là đỉnh"*)
 >

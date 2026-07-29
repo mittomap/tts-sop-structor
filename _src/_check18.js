@@ -247,41 +247,46 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
 /* ---------- 14. TRỢ THỦ THAO TÁC (anh Luân đặt) ---------- */
 (function(){
  setRole("all");
- t("có trợ thủ + công tắc trên thanh tiêu đề", typeof tthHTML==="function"&&typeof tthToggle==="function"&&/id="tthBtn"/.test(fs.readFileSync(OUT+'/ITTs_WebApp_v5_demo.html','utf8')));
+ /* V9.35: tro thu ROI khoi than trang, ve NUT GOC duoi ben phai. Cac tieu chi duoi day truoc
+    day soi tthHTML() - ma tthHTML nay KHONG con duoc ve o dau ca. Kiem mot ham khong ai goi thi
+    luon xanh ma chang bao ve duoc gi: dung loai "kiem gia" du an nay van bat. Nay soi asstHTML(). */
+ var HTMLF=fs.readFileSync(OUT+'/ITTs_WebApp_v5_demo.html','utf8');
+ t("có trợ thủ + công tắc trên thanh tiêu đề", typeof asstHTML==="function"&&typeof tthToggle==="function"&&/id="tthBtn"/.test(HTMLF));
+ t("V9.35 tro thu co NUT rieng o goc trong ca hai cong", /id="asstfab"/.test(HTMLF)&&/id="asstfab"/.test(fs.readFileSync(OUT+'/ITTs_TrangHocVien_demo.html','utf8')));
  t("mặc định BẬT", tthOn()===true);
  /* LUẬT CỨNG: trợ thủ ĐỌC slaItems, KHÔNG khai lại việc lần thứ hai */
  var SRCn=SRC0.replace(/\/\*[\s\S]*?\*\//g,"");
- var i=SRCn.indexOf("function tthItems(");var body=SRCn.slice(i,i+700);
+ var i=SRCn.indexOf("function workAll(");var body=SRCn.slice(i,i+700);
  t("trợ thủ đọc slaItems chứ không tự khai việc", /slaItems\(\)/.test(body));
  /* tắt là biến mất sạch, không để lại khoảng trống */
- var was=tthOn();
- if(was)tthToggle();
- t("tắt thì không vẽ gì cả", tthHTML("banlam")==="");
- tthToggle();
- t("bật lại thì có", tthHTML("banlam").length>200);
- if(!was)tthToggle();
- /* KHÔNG ĐƯỢC NÓI LÁO: trang không gắn hàng chờ thì không được bảo "đã sạch" */
- t("trang tra cứu không bị bảo là 'đã sạch'", /không gắn hàng chờ riêng/.test(tthHTML("hocvien")));
- t("trang có hàng chờ thì đếm việc thật", /việc<\/b>/.test(tthHTML("buoihoc")));
+ t("tam tro thu ve ra co noi dung that", asstHTML().length>400);
+ /* KHÔNG ĐƯỢC NÓI LÁO: hết việc thì nói hết việc, còn việc thì đếm việc thật - không nói chung chung */
+ t("con viec thi noi ro con bao nhieu", (function(){
+   var n=workAll().length;return n===0||asstHTML().indexOf(n+" việc")>=0})());
+ t("het viec thi noi thang la het, khong ve the viec rong", (function(){
+   var cu=window.ASSTSKIP;window.ASSTSKIP={};
+   var h=asstHTML();window.ASSTSKIP=cu;
+   return workAll().length?(h.indexOf("Việc kế tiếp")>=0):(h.indexOf("Không còn việc nào")>=0)})());
  /* nói đúng việc của ĐÚNG người: đổi chức danh là đổi nội dung */
  (function(){
   var gv=rows("DL01").filter(isGVRole)[0];
   var ac=rows("DL01").filter(function(x){return /account/.test(ecode(x.role))})[0];
   function nhu(sid){window.GATE_SID=sid;applyScope(sid);setRole("all")}
-  nhu(gv.staff_id);var a=tthHTML(SCOPE().land||"banlam");
-  nhu(ac.staff_id);var b=tthHTML(SCOPE().land||"banlam");
+  nhu(gv.staff_id);var a=asstHTML();
+  nhu(ac.staff_id);var b=asstHTML();
   window.GATE_SID="";applyScope("");setRole("all");
   t("hai chức danh khác nhau thì trợ thủ nói khác nhau", a!==b&&a.length>200&&b.length>200)})();
  /* việc gấp nhất phải BẤM ĐƯỢC ngay, không chỉ đọc */
- t("việc gấp nhất có nút làm ngay", /slaAct\(|leadDetail\(|openQuick\(/.test(tthHTML("buoihoc")));
- /* trợ thủ đứng TRÊN nội dung trang, không rơi xuống đáy */
- t("trợ thủ chèn trước nội dung trang", /_tth\+renderList\(key\)/.test(SRCn)||/_tth\+RENDER\[key\]\(\)/.test(SRCn));
+ t("việc gấp nhất có nút làm ngay", /slaAct\(|leadDetail\(|openQuick\(|jumpFlow\(/.test(asstHTML()));
+ /* V9.35: tro thu KHONG con chen vao than trang - no o nut goc duoi ben phai. Tieu chi cu dang
+    canh gac dung cai da bo. */
+ t("V9.35 than trang KHONG con bi tro thu chen vao", !/_tth\+renderList\(key\)/.test(SRCn)&&!/_tth\+RENDER\[key\]\(\)/.test(SRCn));
 })();
 
 
 /* ---------- 15. NHỊP NGÀY THEO CHỨC DANH (N2) ---------- */
 (function(){
- t("có nhịp ngày", typeof nhipList==="function"&&typeof nhipHTML==="function");
+ t("có nhịp ngày", typeof nhipList==="function"&&typeof asstHTML==="function");
  t("đủ 5 nhóm vị trí", Object.keys(NHIP).length>=5);
  var xau=[],rong=[];
  function nhu(sid){window.GATE_SID=sid;applyScope(sid);setRole("all")}
@@ -306,20 +311,33 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
   var st=rows("DL01").filter(function(x){return /^ceo/.test(ecode(x.role))})[0];
   if(!st)return; nhu(st.staff_id);
   var L=nhipList(),hab=L.filter(function(x){return x.hab});
-  var html=nhipHTML();
-  window.GATE_SID="";applyScope("");setRole("all");
+  /* V9.35: nhip ngay nay hien trong tam tro thu. Chip cua mot buoi chi cong so cua HANG CHO;
+     buoi nao toan thoi quen thi chip ghi dau gach chu KHONG ghi so 0 - ghi 0 la nguoi ta doc
+     thanh "da xong het", ma thoi quen thi khong co gi de xong. */
+  window.ASSTBUOI="";var html=asstHTML();
   t("có phân biệt thói quen với hàng chờ", hab.length>0);
-  t("thói quen không bị gắn mác xong", hab.length===0||/nên xem/.test(html));
-  t("số 'đã sạch' chỉ đếm hàng chờ, không đếm thói quen",
-    html.indexOf("/"+L.filter(function(x){return !x.hab}).length+" hàng chờ đã sạch")>=0)})();
+  t("thoi quen KHONG bi gan mac xong - chip ghi dau gach", (function(){
+    var buois={};L.forEach(function(r){(buois[r.buoi]=buois[r.buoi]||[]).push(r)});
+    var toanThoiQuen=Object.keys(buois).filter(function(b){return buois[b].every(function(r){return r.hab})});
+    if(!toanThoiQuen.length)return true;
+    return html.indexOf("—")>=0})());
+  t("mo chip ra thi thoi quen ghi ro 'nen xem'", (function(){
+    var b0=(L.filter(function(r){return r.hab})[0]||{}).buoi;
+    if(!b0)return true;
+    window.ASSTBUOI=b0;var h2=asstHTML();window.ASSTBUOI="";
+    return /nên xem/.test(h2)})());
+  window.GATE_SID="";applyScope("");setRole("all")})();
  /* nhịp ngày chỉ ở TRANG ĐẦU - nhét vào mọi trang là nhiễu, nhiễu thì người ta tắt Trợ thủ luôn */
  (function(){var st=rows("DL01").filter(function(x){return /^account/.test(ecode(x.role))})[0];
   if(!st)return; nhu(st.staff_id);
   var land=SCOPE().land||"banlam";
-  var a=tthHTML(land),b=tthHTML(land==="hocvien"?"banlam":"hocvien");
+  var a=asstHTML();
+  go("hocvien");var b=asstHTML();
   window.GATE_SID="";applyScope("");setRole("all");
-  t("nhịp ngày hiện ở trang đầu", /class="nhip"/.test(a));
-  t("nhịp ngày KHÔNG lặp ở mọi trang", !/class="nhip"/.test(b))})();
+  /* V9.35: nhip ngay nay nam TRONG tam tro thu (3 chip) nen no di theo nguoi, khong con chuyen
+     "chi hien o trang dau" - va cung khong con lam nhieu trang nao vi trang da sach. */
+  t("nhip ngay nam trong tam tro thu, khong con o than trang", /asstChip/.test(a));
+  t("doi trang thi tam tro thu van co nhip ngay (di theo nguoi, khong theo trang)", /asstChip/.test(b))})();
 })();
 
 
@@ -645,9 +663,22 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
     var L=workAll();var co=L.some(function(x){return x.sev==="red"});
     var ok=!co||(L[0]&&L[0].sev==="red");
     C.overdueFirst=cu;return ok})());
-  t("tat Tro thu o cau hinh thi khong trang nao con hien khoi tro thu", (function(){
-    var cu=C.on;C.on=0;var o=tthHTML("banlam");C.on=cu;
-    return o===""})());
+  /* V9.35: tro thu khong con la KHOI TRONG THAN TRANG nua - no o NUT GOC duoi ben phai.
+     Nen tieu chi doi theo: than trang phai SACH, va nut goc phai hien dung so viec. */
+  t("V9.35 tro thu KHONG con chen vao than trang", (function(){
+    var o="";try{o=RENDER.banlam()}catch(e){}
+    return o.indexOf('class="tth"')<0&&o.indexOf('class="nhip"')<0})());
+  t("V9.35 tam tro thu goc ve duoc va co du 3 phan (viec ke tiep + nhip ngay + don tung buoc)", (function(){
+    var h=asstHTML();
+    return h.indexOf("Việc kế tiếp")>=0&&h.indexOf("asstChip")>=0&&h.indexOf("Dọn từng bước")>=0})());
+  t("V9.35 nut goc hien dung so viec dang cho", (function(){
+    var n=workAll().length;
+    return typeof asstPaint==="function"&&asstHTML().indexOf(String(n))>=0&&n>0})());
+  t("V9.35 tro thu goi TEN nguoi, khong goi chuc danh", (function(){
+    var cu=CURSTAFF;var st=rows("DL01")[0];CURSTAFF=st.staff_id;
+    var h=asstHTML();CURSTAFF=cu;
+    var ten=String(st.full_name).trim().split(/\s+/).slice(-1)[0];
+    return h.indexOf("Chào bu")>=0&&h.indexOf(ten)>=0})());
   t("man cau hinh Tro thu & Nhip ngay ve duoc", (function(){
     window.SETTAB="tro";var o="";try{o=RENDER.settings()}catch(e){o=""}window.SETTAB="ch2";
     return o.length>800&&o.indexOf("Mỗi lượt dọn bao nhiêu việc")>=0&&o.indexOf("Nhịp ngày theo chức danh")>=0})());

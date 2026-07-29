@@ -47,11 +47,11 @@ Bộ kiểm gồm **14 phần, phải xanh HẾT mới được giao** (~1930 ti
 | `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 578 tieu chi` - học phí theo đợt + vá V9.27 + bấm-tên-ra-drawer + địa chỉ từng trang |
 | `ITTS_OUT=<out> node _checkdata.js` | `CHECKDATA OK: 27 luat ... 0 cho lech` - **dữ liệu demo có khớp ga nghiệp vụ không** |
 | `ITTS_OUT=<out> node _check17.js` | `CHECK17 OK: 394 tieu chi` - **bộ máy lọc chuyên sâu** (kết hợp trục, lưu theo người) |
-| `ITTS_OUT=<out> node _check18.js` | `CHECK18 OK: 152 tieu chi \| da ve 77 trang/tab` - **hội đồng audit tự động**: vẽ THẬT mọi trang/tab, mọi trang qua mắt 8 chức danh, cổng học viên qua mọi hồ sơ; từ V9.31 kiêm luôn **nhật ký thao tác + hoàn tác + bộ nhớ tạm bảng tra** (bấm cửa ghi thật, lùi lại thật, và bắt chốt chặn từ chối lùi) |
+| `ITTS_OUT=<out> node _check18.js` | `CHECK18 OK: 155 tieu chi \| da ve 77 trang/tab` - **hội đồng audit tự động**: vẽ THẬT mọi trang/tab, mọi trang qua mắt 8 chức danh, cổng học viên qua mọi hồ sơ; từ V9.31 kiêm luôn **nhật ký thao tác + hoàn tác + bộ nhớ tạm bảng tra** (bấm cửa ghi thật, lùi lại thật, và bắt chốt chặn từ chối lùi) |
 | `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` |
 | `python3 check_logic.py` | `TONG BAN GHI LOI: 4` (đúng 4 ca là việc quá hạn CỐ Ý để demo cảnh báo đỏ - xem luật 10k) |
 | `python3 check_data.py` | `KET QUA: DAT` |
-| `ITTS_OUT=<out> node _checkui.js` | `CHECKUI OK: da mo THAT 399 luot` - **kiểm thử trên trình duyệt thật** (cần `npm i playwright` một lần; máy không có Chromium thì tự BỎ QUA chứ không báo đỏ bậy) |
+| `ITTS_OUT=<out> node _checkui.js` | `CHECKUI OK: da mo THAT 402 luot` - **kiểm thử trên trình duyệt thật** (cần `npm i playwright` một lần; máy không có Chromium thì tự BỎ QUA chứ không báo đỏ bậy) |
 
 **`_check15.js` sinh ra vì cả hai hội đồng thẩm định đều bỏ lọt cùng một lớp lỗi:** người rà
 ĐỌC TỪNG ĐƯỜNG, mà lỗi nguy hiểm nhất nằm ở KHOẢNG GIỮA hai đường - mỗi đường đọc riêng đều hợp
@@ -105,6 +105,31 @@ ITTS_OUT="<mnt>/SOP ITTs" node _tall.js   # kỳ vọng: "Render 36 trang | 0 lo
 Cổng học viên: lặp lại `node --check` với script lớn nhất của `ITTs_TrangHocVien_demo.html`.
 
 ## DỰNG LẠI FONT ICON (khi thêm icon `ti-*` mới)
+## Trợ thủ ở GÓC, thân trang sạch (V9.35)
+
+Bản trước có **hai khối trên đầu mọi trang** - "Nhịp ngày của bạn" và "Trợ thủ". Ba cái sai:
+hai khối trả lời **cùng một câu hỏi**; khối Trợ thủ trình bày kiểu **tờ khai** (nhãn in hoa trái,
+giá trị phải) chứ không phải cách một trợ thủ nói; và cả hai dùng **nền vàng - màu cảnh báo** trong
+khi đây không phải cảnh báo, lại đẩy nội dung chính xuống dưới màn hình.
+
+Nay gom về **một nút tròn góc dưới bên phải**. Bấm vào bung ra tấm trợ thủ:
+câu chào theo giờ + **tên người** (không phải chức danh) → thẻ **VIỆC KẾ TIẾP** (tên việc, người,
+hạn, nút Làm/Để sau) → **3 chip nhịp ngày** bấm được (Đầu ngày / Trong ngày / Cuối ngày) → nút
+**Dọn từng bước**. Thân trang sạch hoàn toàn.
+
+- `asstHTML()` **dựng chuỗi**, `asstPaint()` chỉ gắn vào DOM. Tách ra để bộ kiểm đọc được nội dung
+  thật mà không cần DOM giả - và để đọc mã là thấy ngay "tấm trợ thủ gồm những gì".
+- **Một nút, hai vai** (`asstFabClick`): đang dọn việc dở mà thu gọn thì mở lại đúng chỗ đang dọn;
+  còn lại thì bung tấm trợ thủ. Hai nút chồng nhau một góc là thứ chắc chắn sẽ che nhau.
+- `asstTick()` gọi từ mọi đường vẽ lại màn hình → con số trên nút và việc kế tiếp luôn đúng.
+- Chip của một buổi chỉ cộng số của **hàng chờ**; buổi toàn thói quen thì ghi **dấu gạch**, không ghi
+  số 0 - ghi 0 thì người ta đọc thành "đã xong hết".
+
+**Đã xóa mã chết:** `tthHTML` / `nhipHTML` / `tthItems` / `tthHasRule` (~5.000 ký tự). Quan trọng
+hơn: `_check18` còn **9 tiêu chí đang soi mấy hàm đó** - tức là kiểm một thứ **không ai còn nhìn
+thấy**, luôn xanh mà chẳng bảo vệ được gì. Đã trỏ hết sang `asstHTML()`. **Xóa tính năng thì phải
+xóa hoặc trỏ lại bộ kiểm của nó, nếu không là để lại một bộ kiểm giả.**
+
 ## Trợ thủ nằm TRONG guide - tầng "Dọn việc hôm nay" (V9.34)
 
 Trợ thủ cũ là **một khối chữ đứng yên** ở đầu trang: nói "còn 12 việc, làm cái này trước" rồi thôi.

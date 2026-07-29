@@ -28,7 +28,8 @@ const PROBE = () => {
   out.wide = Math.max(0, document.documentElement.scrollWidth - W);
   const dr = document.querySelector(".drawer");
   /* ngan keo dong thi no nam ngoai man theo THIET KE - do no la bao nham */
-  const scope = (dr && dr.classList.contains("on")) ? "#content *, .drawer *, #hvBody *" : "#content *, #hvBody *";
+  var asstOn = (document.getElementById("asst") || {classList: {contains: () => false}}).classList.contains("on");
+  const scope = ((dr && dr.classList.contains("on")) ? "#content *, .drawer *, #hvBody *" : "#content *, #hvBody *") + (asstOn ? ", #asst *" : "");
   const seen = new Set();
   for (const el of document.querySelectorAll(scope)) {
     const cs = getComputedStyle(el);
@@ -69,7 +70,7 @@ const PROBE = () => {
      item), roi gap day cac o ra xa nhau. Cau van dut thanh nhieu cot ma HTML khong sai mot dau nao,
      khong tran, khong bi cat, khong nut nho - nen sau phep do tren deu khong thay.
      Dau hieu chac chan: o flex vua co CHU TRAN vua co the con ben trong. */
-  for (const el of document.querySelectorAll("#content *, #hvBody *")) {
+  for (const el of document.querySelectorAll(scope)) {
     const cs = getComputedStyle(el);
     if (!/flex/.test(cs.display)) continue;
     if (cs.flexDirection.indexOf("column") === 0) continue;   /* xep doc thi xuong dong, khong be vun */
@@ -132,6 +133,36 @@ const PROBE = () => {
         return rows("DL09").map(s => "hv:" + s.student_id);
       return Object.keys(window.RENDER).concat(setTabs().map(t => "settings#" + t[0]));
     });
+    /* V9.35: tam TRO THU o goc mac dinh dang dong - phai MO no ra roi moi do duoc. Khong mo thi
+       bo kiem "quet 399 luot" van xanh trong khi cai moi lam chua ai soi lan nao. */
+    if (C.ten === "cong nhan vien") {
+      try { await page.evaluate(() => { go("banlam"); asstOpen(); }); } catch (e) {}
+      await page.waitForTimeout(220);
+      const pa = await page.evaluate(() => {
+        const a = document.getElementById("asst"); if (!a) return {loi: "khong co tam tro thu"};
+        const r = a.getBoundingClientRect();
+        const f = document.querySelector(".asstfab"); const rf = f && f.getBoundingClientRect();
+        return {hien: a.classList.contains("on") && r.height > 60,
+          troRaPhai: Math.round(r.right - window.innerWidth),
+          troRaTren: Math.round(0 - r.top),
+          cheNut: !!(rf && r.bottom > rf.top + 2),
+          cuonNgang: document.documentElement.scrollWidth - window.innerWidth};
+      });
+      if (pa.loi) bad.push(nhan("tam tro thu: " + pa.loi));
+      else {
+        if (!pa.hien) bad.push(nhan("tam tro thu mo ra ma khong hien"));
+        if (pa.troRaPhai > 1) bad.push(nhan("tam tro thu tho ra ngoai man " + pa.troRaPhai + "px"));
+        if (pa.troRaTren > 1) bad.push(nhan("tam tro thu tran len tren dinh man " + pa.troRaTren + "px"));
+        if (pa.cheNut) bad.push(nhan("tam tro thu de len chinh nut mo no"));
+        if (pa.cuonNgang > 1) bad.push(nhan("mo tam tro thu lam trang cuon ngang " + pa.cuonNgang + "px"));
+      }
+      const p2 = await page.evaluate(PROBE); luot++;
+      p2.clip.forEach(c => bad.push(nhan("tam tro thu: chu bi cat AM THAM " + c.thua + "px trong <" + c.tag + " class=\"" + c.cls + "\">")));
+      p2.tiny.forEach(c => bad.push(nhan("tam tro thu: nut qua nho " + c.w + "x" + c.h + "px <" + c.tag + " class=\"" + c.cls + "\">")));
+      p2.vun.forEach(c => bad.push(nhan("tam tro thu: cau van bi FLEX BE VUN - \"" + c.txt + "\"")));
+      try { await page.evaluate(() => asstClose()); } catch (e) {}
+      await page.waitForTimeout(120);
+    }
     for (const m of mans) {
       const ok = await page.evaluate(m => {
         try {

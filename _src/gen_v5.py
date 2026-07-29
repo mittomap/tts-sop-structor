@@ -482,6 +482,63 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
  box-shadow:0 0 0 3px #5B9BD5,0 0 0 6px rgba(91,155,213,.35),0 0 0 9999px rgba(12,22,38,.62)}
 .tourbox.dock{z-index:200;box-shadow:0 20px 54px rgba(10,20,40,.42);border:1px solid var(--line)}
 .tdo{display:flex;gap:7px;margin:9px 0 2px}
+/* ── TRỢ THỦ Ở GÓC (V9.35) ── */
+.asstfab{position:fixed;right:18px;bottom:18px;z-index:198;display:flex;align-items:center;gap:7px;
+ background:var(--navy);color:#fff;border:0;border-radius:999px;padding:11px 17px;font-family:inherit;
+ font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 12px 30px rgba(10,20,40,.32);transition:.14s}
+.asstfab:hover{transform:translateY(-1px);box-shadow:0 16px 36px rgba(10,20,40,.4)}
+.asstfab b{font-size:15px;line-height:1}
+.asstfab span{font-weight:500;opacity:.86}
+.asstfab em{font-style:normal;background:var(--red);color:#fff;font-size:10.5px;font-weight:700;
+ padding:2px 7px;border-radius:999px;margin-left:2px}
+.asstfab.run{background:#0F766E}
+.asst{position:fixed;right:18px;bottom:74px;z-index:199;width:min(360px,calc(100vw - 28px));
+ max-height:min(76vh,660px);overflow:auto;background:#fff;border:1px solid var(--line);border-radius:16px;
+ box-shadow:0 24px 60px rgba(10,20,40,.28);padding:0;display:none;font-size:13px}
+.asst.on{display:block;animation:asstIn .16s ease-out}
+@keyframes asstIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.asstH{display:flex;align-items:flex-start;gap:10px;padding:15px 16px 12px;border-bottom:1px solid var(--line)}
+.asstH>div{flex:1;min-width:0}
+.asstH b{display:block;font-size:14.5px;color:var(--navy);font-weight:800}
+.asstH span{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+.asstH span i{font-style:normal;color:var(--red);font-weight:700}
+.asstH .x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:16px;width:28px;height:28px;flex:none;display:flex;align-items:center;justify-content:center;padding:0;border-radius:8px}
+.asstH .x:hover{background:#EEF3F9;color:var(--navy)}
+.asstCard{margin:12px 13px;padding:13px 14px;border:1px solid var(--line);border-left:3px solid var(--navy);
+ border-radius:11px;background:#FBFCFE}
+.asstCard.done{border-left-color:var(--green);background:#F4FBF6}
+.asstCard .k{font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+.asstCard .t{font-size:14.5px;font-weight:800;color:var(--navy);margin:3px 0 1px;line-height:1.35}
+.asstCard .w{font-size:12px;font-weight:600;color:#4A5A6B}
+.asstCard .d{font-size:12px;color:var(--muted);line-height:1.55;margin-top:4px}
+.asstCard .c{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:8px}
+.asstCard .a{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.asstChips{display:flex;gap:6px;padding:0 13px;flex-wrap:wrap}
+.asstChip{flex:1;min-width:88px;background:#F4F7FB;border:1px solid var(--line);border-radius:9px;
+ padding:8px 6px;font-family:inherit;font-size:11px;font-weight:700;color:#4A5A6B;cursor:pointer;
+ display:flex;flex-direction:column;align-items:center;gap:3px;transition:.12s}
+.asstChip:hover{border-color:var(--navy)}
+.asstChip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.asstChip b{font-size:15px}
+.asstChip b.hot{color:var(--amber)}
+.asstChip.on b.hot{color:#FFD79A}
+.asstList{margin:9px 13px 0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.asstRow{display:flex;align-items:center;gap:8px;padding:9px 11px;font-size:12px;border-bottom:1px solid var(--line)}
+.asstRow:last-child{border-bottom:0}
+.asstRow .n{flex:1;min-width:0}
+.asstRow.clk{cursor:pointer}
+.asstRow.clk:hover{background:#F4F7FB}
+.asstFoot{display:flex;gap:7px;padding:12px 13px}
+.asstFoot .btn{flex:none}
+.asstFoot .btn.primary{flex:1;justify-content:center}
+.asstNote{padding:0 15px 14px;font-size:11.5px;color:var(--muted);line-height:1.6}
+.asstNote b{color:#4A5A6B}
+@media(max-width:600px){.asst{right:10px;left:10px;width:auto;bottom:70px}.asstfab{right:12px;bottom:12px}}
+.tourfab{position:fixed;right:16px;bottom:16px;z-index:200;display:none;align-items:center;gap:7px;background:var(--navy);color:#fff;border:0;border-radius:999px;padding:10px 15px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 10px 26px rgba(10,20,40,.3)}
+.tourfab.on{display:flex}
+.tourfab:hover{filter:brightness(1.12)}
+.tourfab b{font-size:14px}
+.tourfab span{font-weight:500;opacity:.85}
 /* Ô nhập nằm THẲNG trong bảng (màn cấu hình Nhịp ngày) không đi qua .fld nên không thừa hưởng
    kiểu ô nhập chuẩn - cao có 19px, bấm trượt liên tục trên điện thoại. */
 .tb td>input[type=text],.tb td>input:not([type]){padding:6px 8px;border:1px solid var(--line);border-radius:7px;font-family:inherit;font-size:12px;background:#fff;min-height:28px}
@@ -1301,6 +1358,8 @@ body.drsz .drawer{transition:none}
 </div>
 <div class="toast" id="toast"></div>
 <div class="undobar" id="undobar"></div>
+<div class="asst" id="asst"></div>
+<button class="asstfab" id="asstfab" aria-label="Mở Trợ thủ"></button>
 <div class="mask" id="mask" onclick="closeModal()"></div>
 <div class="cfmask" id="cfm"><div class="cfbox"><div class="cfh"><i class="ti ti-alert-triangle"></i> Xác nhận thao tác</div><div class="cfmsg" id="cfmMsg"></div><div class="cfa"><button class="btn" onclick="closeConfirm()">Huỷ</button><button class="btn primary" onclick="confirmYes()">Xác nhận</button></div></div></div>
 <div class="drawer" id="drawer" role="dialog" aria-modal="true"><div class="drszr" id="drszr" title="Kéo để đổi độ rộng - bấm đúp để về mặc định"></div><div class="dh"><b id="drawerTitle">Chi tiết</b><button class="x" onclick="closeModal()" aria-label="Đóng">&times;</button></div><div class="dbody" id="drawerBody"></div></div>
@@ -6908,9 +6967,9 @@ function renderTro(){
  h+='<div class="jgrid"><div>';
  h+='<div class="fld full"><label>Bật Trợ thủ cho mọi người</label>'+
   '<select onchange="tthSet(\'on\',+this.value);reRender(\'settings\')">'+
-  '<option value="1"'+(C.on?" selected":"")+'>Bật - mỗi trang hiện khối nhắc việc</option>'+
-  '<option value="0"'+(C.on?"":" selected")+'>Tắt - không hiện khối nào</option></select>'+
-  '<div class="mut" style="font-size:11.5px;margin-top:4px">Từng người vẫn tự tắt riêng được bằng nút bóng đèn trên thanh tiêu đề.</div></div>';
+  '<option value="1"'+(C.on?" selected":"")+'>Bật - nút Trợ thủ ở góc dưới bên phải</option>'+
+  '<option value="0"'+(C.on?"":" selected")+'>Tắt - không hiện nút nào</option></select>'+
+  '<div class="mut" style="font-size:11.5px;margin-top:4px">Trợ thủ nằm ở <b>một nút tròn góc dưới bên phải</b>, không chen vào thân trang. Bấm vào bung ra: việc kế tiếp, nhịp ngày, và nút dọn từng bước.</div></div>';
  h+='<div class="fld full"><label>Mỗi lượt dọn bao nhiêu việc</label>'+
   '<input type="number" min="1" max="50" value="'+esc(String(C.batch))+'" oninput="tthSet(\'batch\',Math.max(1,num(this.value)||1))">'+
   '<div class="mut" style="font-size:11.5px;margin-top:4px">Dọn hết một lượt rồi mở lại - chia nhỏ để người ta thấy về đích, thay vì nhìn 40 việc rồi nản.</div></div>';
@@ -11199,7 +11258,8 @@ function tourStart(k){if(!TOURS[k])return;
  try{closeModal()}catch(e){}          /* đóng hẳn ngăn kéo xác nhận trước khi phủ lớp tour */
  try{tourBase()}catch(e){}            /* chụp mốc số liệu để biết người học có thật sự làm gì không */
  TOUR={key:k,i:0,on:true};tourShow()}
-function tourEnd(){TOUR.on=false;TOUR.key="";
+function tourEnd(){TOUR.on=false;TOUR.key="";TOUR.min=0;
+ try{var f=document.getElementById("tourfab");if(f)f.classList.remove("on")}catch(e){}
  try{var s=document.getElementById("tourspot"),b=document.getElementById("tourbox");
   if(s)s.remove();if(b)b.remove()}catch(e){}
  try{window.removeEventListener("resize",tourReflow);window.removeEventListener("scroll",tourReflow,true)}catch(e){}}
@@ -11262,6 +11322,7 @@ function tourChkNow(){tourPaint();
  if(r===true)toast("Đúng rồi - bạn vừa làm được việc này.");
  else if(r===false)toast("App chưa thấy thay đổi nào. Làm theo dòng \"Việc cần làm\" rồi bấm Kiểm tra lại.",4600)}
 function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
+ if(TOUR.min){try{tourMin()}catch(e){}return}   /* đang thu gọn: chỉ cập nhật con số trên nút */
  var st=T.steps[TOUR.i];if(!st)return;
  var el=tourFind(st.sel);
  var s=document.getElementById("tourspot"),b=document.getElementById("tourbox");
@@ -11299,8 +11360,11 @@ function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
    (TOUR.i>0?'<button class="btn sm" onclick="tourPrev()"><i class="ti ti-chevron-left"></i>Quay lại</button>':'')+
    '<button class="btn sm primary" onclick="tourNext()">'+(TOUR.i>=n-1?'<i class="ti ti-check"></i>Hoàn tất':'Tiếp theo<i class="ti ti-chevron-right"></i>')+'</button>'+
    '<span class="sp"></span>'+
-   '<button class="btn sm" onclick="tourRestart()" title="Quay về bước 1"><i class="ti ti-restore"></i>Làm lại</button>'+
-   '<button class="btn sm" onclick="tourEnd()"><i class="ti ti-x"></i>Đóng</button>'+
+   (live?'':'<button class="btn sm" onclick="tourRestart()" title="Quay về bước 1"><i class="ti ti-restore"></i>Làm lại</button>')+
+   /* Bài dọn việc KHÔNG có nút Đóng: đóng hẳn là mất sạch lượt đang dọn. Chỉ thu gọn xuống nút góc
+      dưới phải, nhường chỗ màn hình mà vẫn giữ nguyên chỗ đang đứng. */
+   '<button class="btn sm" onclick="tourMin()" data-tip="'+(live?'Thu gọn xuống góc dưới phải - vẫn giữ nguyên lượt đang dọn':'Thu gọn - bấm nút góc dưới phải để mở lại')+'"><i class="ti ti-chevron-down"></i>Thu gọn</button>'+
+   (live?'<button class="btn sm" onclick="tourEnd()" data-tip="Dừng hẳn lượt dọn này"><i class="ti ti-x"></i></button>':'<button class="btn sm" onclick="tourEnd()"><i class="ti ti-x"></i>Đóng</button>')+
   '</div>';
  var bw=Math.min(330,vw-24),bh=b.offsetHeight||230;
  var left,top;
@@ -11373,7 +11437,7 @@ function tourWorkBuild(){
  if(!Q.length)return null;
  var steps=Q.map(function(x){
   var key=slaKey(x);
-  return {p:x.page||null,sel:x.page?"@phead":"@bstats",dock:1,
+  return {p:x.page||null,sel:x.page?"@phead":"@bstats",dock:1,key:key,
    t:(x.grp||x.cat||"Việc cần làm"),
    d:(x.who?(x.who+" - "):"")+String(x.what||""),
    hint:(x.sev==="red"?"Việc này ĐÃ QUÁ HẠN - làm trước. ":"")+"Bấm nút bên dưới, app mở đúng màn thao tác.",
@@ -11401,16 +11465,77 @@ function tourAfter(){
  var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
  var st=T.steps[TOUR.i];if(!st)return;
  if(tourChk(st)===true){
-  toast("Xong việc này. Còn "+tourWorkLeft()+" việc.",2200);
+  var con=tourWorkLeft()-1;
+  toast(con>0?("Xong việc này. Còn "+con+" việc."):"Xong việc cuối của lượt này.",2200);
+  tourWorkSync();
+  if(!T.steps.length){tourEnd();toast("Sạch hàng chờ. Không còn việc nào đang chờ bạn.",4200);return}
   tourNext();return}
- tourPaint()}
+ tourWorkSync();tourPaint()}
 /* Còn bao nhiêu việc CHƯA xong trong bài đang chạy - đếm thật, không đếm theo số bước đã bấm qua. */
 function tourWorkLeft(){
  var T=TOURS[TOUR.key];if(!T||!T.live)return 0;
  var n=0;T.steps.forEach(function(st){if(tourChk(st)!==true)n++});return n}
+/* ═══ TỰ CẬP NHẬT - anh Luân: "thực tế nhân viên có thể xử lý task không tuần tự" ═══
+   Danh sách bước chụp lúc bắt đầu sẽ SAI ngay sau vài phút: người ta nhảy xuống làm việc thứ 5
+   trước, đồng nghiệp làm hộ việc thứ 2, và việc mới thì cứ sinh ra. Guide mà bám danh sách cũ sẽ
+   bắt người ta làm lại việc đã xong và giấu mất việc vừa tới - tệ hơn là không có guide.
+   Nên mỗi nhịp đều SOI LẠI HÀNG CHỜ THẬT:
+     · việc đã ra khỏi hàng chờ (ai làm cũng được, làm ở đâu cũng được) -> bỏ khỏi lượt;
+     · việc mới xuất hiện -> nối vào cuối lượt nếu còn chỗ;
+     · giữ nguyên chỗ đang đứng theo MÃ VIỆC chứ không theo số thứ tự - danh sách ngắn đi mà vẫn
+       đếm theo số thứ tự thì nhảy lung tung.
+   KHÔNG xếp lại thứ tự các bước đang có: đổi chỗ dưới chân người đang làm là làm họ lạc. */
+function tourWorkSync(){
+ var T=TOURS[TOUR.key];if(!T||!T.live)return;
+ var C=tthCfg();
+ var cur=T.steps[TOUR.i]||null,curKey=cur&&cur.key;
+ var song={},L=workAll();
+ L.forEach(function(x){song[slaKey(x)]=x});
+ /* giữ lại bước còn trong hàng chờ; riêng bước ĐANG ĐỨNG thì giữ thêm một nhịp để người ta kịp
+    thấy dòng "việc này đã ra khỏi hàng chờ" trước khi nó biến mất */
+ var giu=T.steps.filter(function(st){return song[st.key]||st.key===curKey});
+ var co={};giu.forEach(function(st){co[st.key]=1});
+ var chua=C.batch>0?Math.max(0,C.batch-giu.length):L.length;
+ for(var i=0;i<L.length&&chua>0;i++){
+  var k=slaKey(L[i]);if(co[k])continue;
+  co[k]=1;chua--;
+  giu.push({p:L[i].page||null,sel:L[i].page?"@phead":"@bstats",dock:1,key:k,
+   t:(L[i].grp||L[i].cat||"Việc cần làm"),
+   d:(L[i].who?(L[i].who+" - "):"")+String(L[i].what||""),
+   hint:(L[i].sev==="red"?"Việc này ĐÃ QUÁ HẠN - làm trước. ":"")+"Bấm nút bên dưới, app mở đúng màn thao tác.",
+   item:L[i],do:slaBtn(L[i],"btn sm primary"),
+   chk:(function(kk){return function(){return !workAll().some(function(y){return slaKey(y)===kk})}})(k)})}
+ T.steps=giu;
+ var j=-1;for(var q=0;q<giu.length;q++)if(giu[q].key===curKey){j=q;break}
+ TOUR.i=(j>=0)?j:Math.min(TOUR.i,Math.max(0,giu.length-1))}
 /* Người dùng làm việc bằng tay (không qua nút của guide) thì guide cũng phải biết. Gọi sau mỗi
    lần vẽ lại màn hình. */
-function tourTick(){if(TOUR.on&&(TOURS[TOUR.key]||{}).live)try{tourAfter()}catch(e){}}
+function tourTick(){if(TOUR.on&&(TOURS[TOUR.key]||{}).live)try{tourWorkSync();tourPaint()}catch(e){}}
+/* ═══ THU GỌN, KHÔNG ĐÓNG - anh Luân: "đừng có đóng trợ thủ, chỉ là thu gọn thành 1 cái nút ở góc
+   dưới bên phải, phòng trường hợp nó che mấy cái khác" ═══
+   Đóng hẳn thì công dọn dở dang mất sạch và người ta phải mở lại từ đầu. Thu gọn giữ nguyên lượt
+   đang chạy, chỉ nhường chỗ trên màn hình. */
+function tourFab(){
+ var f=document.getElementById("tourfab");
+ if(!f){f=document.createElement("button");f.id="tourfab";f.className="tourfab";
+  f.setAttribute("aria-label","Mở lại Trợ thủ dọn việc");f.onclick=tourOpenBack;
+  document.body.appendChild(f)}
+ return f}
+function tourMin(){
+ var b=document.getElementById("tourbox"),s=document.getElementById("tourspot");
+ if(b)b.style.display="none";if(s)s.style.display="none";
+ TOUR.min=1;
+ var T=TOURS[TOUR.key]||{},n=0;try{n=T.live?tourWorkLeft():0}catch(e){}
+ var f=tourFab();
+ f.innerHTML='<i class="ti ti-checklist"></i>'+(T.live?('<b>'+n+'</b> <span>việc chờ</span>'):'<span>Hướng dẫn</span>');
+ f.setAttribute("data-tip",T.live?("Trợ thủ đang thu gọn - còn "+n+" việc. Bấm để mở lại."):"Hướng dẫn đang thu gọn. Bấm để mở lại.");
+ f.classList.add("on")}
+function tourOpenBack(){
+ TOUR.min=0;
+ var f=document.getElementById("tourfab");if(f)f.classList.remove("on");
+ var b=document.getElementById("tourbox");if(b)b.style.display="";
+ if((TOURS[TOUR.key]||{}).live)try{tourWorkSync()}catch(e){}
+ tourPaint()}
 
 /* ==================== V9.20 - CẤU HÌNH GIAO DIỆN & THƯƠNG HIỆU (Cài đặt > Giao diện) ====================
    Lưu trong DATA.config.ui -> tự đồng bộ đa cổng/đa máy như mọi dữ liệu demo và Reset demo đưa về gốc.
@@ -11943,10 +12068,10 @@ function dashJump(key){var m={urgent:"viec",newlead:"nhaplead",consider:"viec",c
 function reRender(k){try{setTimeout(tourTick,240)}catch(e){}   /* người dùng làm tay không qua nút của guide - guide vẫn phải biết */
  var el=document.getElementById("content");
  if(!el||!RENDER[k]){if(typeof hvReRender==="function")hvReRender();return}   /* cổng học viên: chỉ vẽ lại thân trang */
- var p=PBK[k];var sc=el.scrollTop;var _t="";try{_t=tthHTML(k)}catch(e){}
- el.innerHTML=_t+((p&&p.ty==="list")?renderList(k):RENDER[k]());el.scrollTop=sc;updateBellBadge();persistSoon()}
-function reRenderKeep(k){var el=document.getElementById("content");var sc=el.scrollTop;var p=PBK[k];var _t="";try{_t=tthHTML(k)}catch(e){}
- el.innerHTML=_t+((p&&p.ty==="list")?renderList(k):RENDER[k]());el.scrollTop=sc;var i=el.querySelector(".srch input");if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}persistSoon()}
+ var p=PBK[k];var sc=el.scrollTop;
+ el.innerHTML=((p&&p.ty==="list")?renderList(k):RENDER[k]());el.scrollTop=sc;updateBellBadge();asstTick();persistSoon()}
+function reRenderKeep(k){var el=document.getElementById("content");var sc=el.scrollTop;var p=PBK[k];
+ el.innerHTML=((p&&p.ty==="list")?renderList(k):RENDER[k]());asstTick();el.scrollTop=sc;var i=el.querySelector(".srch input");if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}persistSoon()}
 function toggleNav(){var s=document.getElementById("sidebar"),m=document.getElementById("navmask");if(!s)return;var open=s.classList.toggle("open");if(m)m.classList.toggle("on",open)}
 function closeNav(){var s=document.getElementById("sidebar"),m=document.getElementById("navmask");if(s)s.classList.remove("open");if(m)m.classList.remove("on")}
 function bellItems(){var rs=SCOPE();var items=slaItems();
@@ -12137,25 +12262,7 @@ function nhipList(){var k=nhipKey();if(!k)return [];
  (nhipCfg()["+"+k]||[]).forEach(function(o,i){
   L.push({buoi:o.buoi||"sang",t:o.t||"",vi:o.vi||"",page:o.page||"",ord:1000+i,n:0,hab:true,tu:1})});
  return L.sort(function(a,b){return a.ord-b.ord})}
-function nhipHTML(){
- var L=nhipList();if(!L.length)return "";
- var Q=L.filter(function(x){return !x.hab});          /* chỉ hàng chờ mới đếm được "sạch" */
- var xong=Q.filter(function(x){return !x.n}).length;
- var h='<div class="nhip"><div class="nhiph"><i class="ti ti-checklist"></i><b>Nhịp ngày của bạn</b>'+
-  '<span class="chip '+(xong===Q.length?"green":"amber")+'">'+xong+'/'+Q.length+' hàng chờ đã sạch</span>'+
-  '<span class="tthx" onclick="tthToggle()" data-tip="Tắt Trợ thủ - bật lại ở nút bóng đèn trên thanh tiêu đề">Tôi quen rồi, tắt đi</span></div>';
- ["sang","ngay","chieu"].forEach(function(b){
-  var g=L.filter(function(x){return x.buoi===b});if(!g.length)return;
-  h+='<div class="nhipg"><div class="nhipgt"><i class="ti '+NHIPBUOI[b][1]+'"></i>'+esc(NHIPBUOI[b][0])+'</div>';
-  g.forEach(function(x){
-   h+='<div class="nhipr'+(x.hab?" hab":(x.n?"":" ok"))+'" onclick="go(\''+esc(x.page)+'\')" data-tip="'+esc(x.vi)+'">'+
-    '<i class="ti '+(x.hab?"ti-eye":(x.n?"ti-clock":"ti-circle-check"))+'"></i>'+
-    '<span class="nhipt">'+esc(x.t)+'</span>'+
-    (x.hab?'<span class="chip gray">nên xem</span>'
-      :(x.n?'<span class="chip '+(x.n>9?"red":"amber")+'">'+x.n+'</span>':'<span class="chip green">xong</span>'))+
-    '</div>'});
-  h+='</div>'});
- return h+'</div>'}
+
 function tthKey(){var me="";try{me=tkMeId()||CURSTAFF||""}catch(e){me=CURSTAFF||""}
  return "ITTS_TROTHU_"+(me||"guest")}
 function tthOn(){try{var v=localStorage.getItem(tthKey());return v===null?true:v==="1"}catch(e){return true}}
@@ -12168,27 +12275,8 @@ function tthBtn(){var b=document.getElementById("tthBtn");if(!b)return;
  b.setAttribute("data-tip",on?"Trợ thủ đang BẬT - nhắc việc ngay trên từng trang. Bấm để tắt.":"Trợ thủ đang TẮT. Bấm để bật lại.");
  b.innerHTML='<i class="ti '+(on?"ti-bulb":"ti-bulb")+'"></i>'}
 /* Việc của TRANG NÀY, của CHÍNH người đang đăng nhập - lấy thẳng từ slaItems, không khai lại. */
-function tthItems(key){
- var rs=SCOPE(),items=[];
- try{items=slaItems()}catch(e){return []}
- if(Array.isArray(rs.bell))items=items.filter(function(x){return rs.bell.indexOf(x.cat)>=0});
- /* Ba trang TỔNG HỢP (Trang bắt đầu / Việc hôm nay / Bản đồ chặng) không có hàng chờ riêng - chúng
-    LÀ chỗ gom việc. Ở đó trợ thủ nói về toàn bộ việc đang tồn, không lọc theo trang. */
- if(["banlam","viec","chang","chay","hanhtrinh"].indexOf(key)>=0)return items;
- /* trang gộp: việc khai page="nhaplead" vẫn thuộc hub Tuyển sinh đang mở */
- var own=navOwner(key)||key;
- return items.filter(function(x){
-  if(!x.page)return false;
-  return x.page===key||navOwner(x.page)===own})}
-/* Trang này có luật SLA nào trỏ tới không? Không có thì câu "không còn việc nào" là NÓI LÁO -
-   phải nói đúng: trang này không gắn hàng chờ. */
-function tthHasRule(key){
- var own=navOwner(key)||key;
- try{return slaItems().some(function(x){return x.page&&(x.page===key||navOwner(x.page)===own)})}catch(e){return false}}
-/* MỘT nút cho MỘT việc - dùng chung cho Trợ thủ, chuông, và mọi chỗ khác hiện việc.
-   Trước đây mỗi nơi tự dựng nút theo cách riêng, nên việc nào không có mã thao tác thì có nơi ra
-   nút "Xem nhanh", có nơi KHÔNG RA NÚT NÀO - người dùng nhìn thấy việc mà không bấm vào đâu được.
-   Luật: mọi việc đều phải bấm được. Không có thao tác thì ít nhất phải mở đúng trang chứa nó. */
+
+
 function slaBtn(x,cls){
  if(!x)return "";
  cls=cls||"btn sm primary";
@@ -12197,40 +12285,116 @@ function slaBtn(x,cls){
  if(x.hoso)return '<button class="'+cls+'" onclick="openQuick(\''+esc(String(x.hoso))+'\')"><i class="ti ti-eye"></i>Xem nhanh</button>';
  if(x.page)return '<button class="btn sm" onclick="jumpFlow(\''+esc(x.page)+'\','+(x.filter?("'"+esc(x.filter)+"'"):"null")+')"><i class="ti ti-arrow-right"></i>Mở '+esc((PBK[x.page]||{}).t||x.page)+'</button>';
  return ""}
-function tthHTML(key){
- if(!tthCfg().on)return "";   /* tắt ở Cài đặt > Trợ thủ & Nhịp ngày thì tắt cho cả trung tâm */
- if(!tthOn())return "";
- var p=PBK[key]||{};
- var L=tthItems(key);
- var red=L.filter(function(x){return x.sev==="red"});
- var top=(red[0]||L[0]);
- var who="";try{who=(SCOPE().name||"")}catch(e){}
- /* Nhịp ngày chỉ hiện ở TRANG ĐẦU của người đó (nơi họ mở máy ra là thấy) - nhét vào mọi trang
-    thì thành nhiễu, mà nhiễu thì người ta tắt Trợ thủ luôn. */
- var nh=(key===(SCOPE().land||"banlam"))?nhipHTML():"";
- var h=nh+'<div class="tth"><div class="tthh"><i class="ti ti-bulb"></i><b>Trợ thủ</b>'+
-  '<span class="tthx" onclick="tthToggle()" data-tip="Tắt Trợ thủ - bật lại ở nút bóng đèn trên thanh tiêu đề">Tôi quen rồi, tắt đi</span></div>';
- h+='<div class="tthb"><div class="tthr"><span class="tthk">Trang này để làm gì</span><span>'+esc(p.c||p.t||"")+'</span></div>';
- if(!L.length){
-  h+='<div class="tthr"><span class="tthk">Việc của bạn ở đây</span><span>'+
-   (tthHasRule(key)
-    ?'<b style="color:var(--green)">Không còn việc nào đang chờ.</b> Trang này đang sạch - bạn có thể sang việc khác.'
-    :'Trang này không gắn hàng chờ riêng - vào đây để tra cứu / nhập liệu. Việc cần làm của bạn nằm ở <b>Trang bắt đầu</b> và cái chuông.')+'</span></div>';
+/* ═══════════════ V9.35 - TRỢ THỦ VỀ MỘT GÓC (anh Luân chốt) ═══════════════
+   Bản cũ có HAI khối nằm trên đầu MỌI trang: "Nhịp ngày của bạn" và "Trợ thủ". Ba cái sai:
+    · hai khối trả lời CÙNG một câu hỏi ("hôm nay tôi làm gì") - người ta phải đọc hai lượt rồi tự ghép;
+    · khối Trợ thủ trình bày kiểu TỜ KHAI (nhãn in hoa bên trái, giá trị bên phải) - đó là bố cục
+      bảng thông số, không phải cách một trợ thủ nói chuyện;
+    · cả hai dùng nền vàng - màu của CẢNH BÁO - trong khi đây không phải cảnh báo, và chúng đẩy nội
+      dung chính của trang xuống dưới màn hình.
+   Nay gom về MỘT chỗ ở góc dưới bên phải: một nút tròn luôn có mặt, bấm vào bung ra tấm trợ thủ.
+   Thân trang sạch hoàn toàn. Cũng đúng chỗ anh Luân dặn "thu gọn thành 1 cái nút ở góc dưới bên
+   phải" - một nơi ở duy nhất, không phải hai. */
+function asstEl(){
+ var a=document.getElementById("asst");
+ if(!a){a=document.createElement("div");a.id="asst";a.className="asst";document.body.appendChild(a)}
+ return a}
+function asstFabEl(){
+ var f=document.getElementById("asstfab");
+ if(!f){f=document.createElement("button");f.id="asstfab";f.className="asstfab";
+  f.setAttribute("aria-label","Mở Trợ thủ");document.body.appendChild(f)}
+ if(!f.onclick)f.onclick=asstFabClick;
+ return f}
+/* Một nút, hai vai: đang dọn việc dở mà thu gọn thì mở lại đúng chỗ đang dọn; còn lại thì bung tấm
+   trợ thủ. Hai nút chồng nhau một góc là thứ chắc chắn sẽ che nhau. */
+function asstFabClick(){
+ if(TOUR.on&&TOUR.min){tourOpenBack();return}
+ asstToggle()}
+function asstOn(){return !!(document.getElementById("asst")||{}).classList&&document.getElementById("asst").classList.contains("on")}
+function asstToggle(){var a=asstEl();if(a.classList.contains("on"))asstClose();else asstOpen()}
+function asstClose(){var a=document.getElementById("asst");if(a)a.classList.remove("on");asstPaint()}
+function asstOpen(){asstEl().classList.add("on");asstPaint()}
+function asstChao(){var h=new Date().getHours();
+ return h<11?"Chào buổi sáng":(h<14?"Chào buổi trưa":(h<18?"Chào buổi chiều":"Chào buổi tối"))}
+function asstNext(){var L=[];try{L=workAll()}catch(e){}return L[0]||null}
+/* Nhịp ngày thu thành BA CHIP bấm được thay vì năm dòng chạy hết chiều ngang. Bấm chip nào thì mở
+   đúng nhóm việc của buổi đó ngay trong tấm - không phải rời trang. */
+var NHIPBUOI2=[["sang","Đầu ngày"],["ngay","Trong ngày"],["chieu","Cuối ngày"]];
+function asstBuoiSet(b){window.ASSTBUOI=(window.ASSTBUOI===b?"":b);asstPaint()}
+function asstPaint(){
+ var f=asstFabEl(),a=asstEl();
+ var L=[],do_=0;
+ try{L=workAll();do_=L.filter(function(x){return x.sev==="red"}).length}catch(e){}
+ var chay=(TOUR.on&&TOUR.min);
+ f.className="asstfab"+(do_?" hot":"")+(chay?" run":"");
+ f.innerHTML=(chay?'<i class="ti ti-checklist"></i><b>'+tourWorkLeft()+'</b> <span>đang dọn</span>'
+  :'<i class="ti ti-bulb"></i><b>'+L.length+'</b> <span>việc</span>'+(do_?'<em>'+do_+' quá hạn</em>':''));
+ f.setAttribute("data-tip",chay?"Đang dọn việc dở - bấm để mở lại đúng chỗ đang làm"
+  :(L.length?("Trợ thủ - "+L.length+" việc đang chờ bạn"):"Trợ thủ - hàng chờ của bạn đã sạch"));
+ if(!a.classList.contains("on"))return;
+ a.innerHTML=asstHTML()}
+/* Dựng chuỗi tách khỏi chỗ gắn vào màn hình: bộ kiểm đọc được nội dung thật mà không cần DOM,
+   và ai đọc mã cũng thấy ngay "tấm trợ thủ gồm những gì". */
+function asstHTML(){
+ var L=[],do_=0;
+ try{L=workAll();do_=L.filter(function(x){return x.sev==="red"}).length}catch(e){}
+ /* Gọi TÊN người ta, không gọi chức danh. "Chào buổi sáng, Quản trị viên · toàn quyền" nghe như
+    máy đọc bảng phân quyền chứ không phải trợ thủ chào người. */
+ var me="";
+ try{var st=CURSTAFF&&find("DL01","staff_id",CURSTAFF);
+  if(st&&st.full_name)me=String(st.full_name).trim().split(/\s+/).slice(-1)[0];
+  else if(CURSTAFF==="ADMIN"||!CURSTAFF)me=""}catch(e){}
+ var x=asstNext(),p=PBK[CUR]||{};
+ var h='<div class="asstH"><div><b>'+esc(asstChao()+(me?(", "+me):""))+'</b>'+
+  '<span>'+(L.length?(L.length+' việc'+(do_?(' · <i>'+do_+' quá hạn</i>'):' · còn trong hạn')):'hàng chờ của bạn đã sạch')+'</span></div>'+
+  '<button class="x" onclick="asstClose()" aria-label="Thu gọn Trợ thủ"><i class="ti ti-chevron-down"></i></button></div>';
+ if(x){
+  h+='<div class="asstCard"><div class="k">Việc kế tiếp</div>'+
+   '<div class="t">'+esc(x.grp||x.cat||"")+'</div>'+
+   '<div class="w">'+esc(x.who||"")+'</div>'+
+   '<div class="d">'+esc(String(x.what||""))+'</div>'+
+   '<div class="c">'+(x.sev==="red"?'<span class="chip red">quá hạn</span>':'<span class="chip">còn trong hạn</span>')+
+    (x.prm?slaChip(x.prm,""):'')+'</div>'+
+   '<div class="a">'+slaBtn(x,"btn sm primary")+
+    '<button class="btn sm" onclick="asstBoQua()" data-tip="Để việc này lại, xem việc kế"><i class="ti ti-player-skip-forward"></i>Để sau</button></div></div>';
  }else{
-  h+='<div class="tthr"><span class="tthk">Việc của bạn ở đây</span><span><b>'+L.length+' việc</b>'+
-   (red.length?(' · <b style="color:var(--red)">'+red.length+' quá hạn</b>'):' · còn trong hạn')+'</span></div>';
-  if(top){
-   var btn=slaBtn(top);
-   var nAll=0;try{nAll=workAll().length}catch(e){}
-   h+='<div class="tthr"><span class="tthk">Làm cái này trước</span><span><b>'+esc(top.what||top.grp||"")+'</b>'+
-    (top.who?(' <span class="mut">· '+esc(top.who)+'</span>'):'')+
-    (top.prm?(' <span class="mut">· ngưỡng '+slaChip(top.prm,"")+'</span>'):'')+
-    '<div style="margin-top:6px;display:flex;gap:7px;flex-wrap:wrap">'+(btn||"")+
-    /* V9.34: lối vào "dọn từng bước" - trợ thủ không dừng ở một câu nhắc nữa, nó dắt đi hết hàng */
-    '<button class="btn sm" onclick="tourWork()" data-tip="Trợ thủ dắt bạn làm lần lượt, làm xong việc nào tự nhảy việc kế"><i class="ti ti-checklist"></i>Dọn từng bước'+(nAll?(" ("+nAll+")"):"")+'</button>'+
-    '</div></span></div>'}
+  h+='<div class="asstCard done"><div class="t"><i class="ti ti-circle-check"></i> Không còn việc nào đang chờ bạn.</div>'+
+   '<div class="d">Hàng chờ sạch. Có việc mới, con số ở nút này sẽ tự nhảy lên.</div></div>';
  }
- return h+'</div></div>'}
+ /* ba chip nhịp ngày */
+ var NL=[];try{NL=nhipList()}catch(e){}
+ if(NL.length){
+  h+='<div class="asstChips">';
+  NHIPBUOI2.forEach(function(b){
+   var R=NL.filter(function(r){return r.buoi===b[0]});
+   if(!R.length)return;
+   var n=R.reduce(function(a2,r){return a2+(r.hab?0:num(r.n))},0);
+   var coDem=R.some(function(r){return !r.hab});
+   h+='<button class="asstChip'+(window.ASSTBUOI===b[0]?" on":"")+'" onclick="asstBuoiSet(\''+b[0]+'\')">'+
+    esc(b[1])+' <b'+(n?' class="hot"':'')+'>'+(coDem?n:"—")+'</b></button>'});
+  h+='</div>';
+  if(window.ASSTBUOI){
+   var R2=NL.filter(function(r){return r.buoi===window.ASSTBUOI});
+   h+='<div class="asstList">';
+   R2.forEach(function(r){
+    h+='<div class="asstRow'+(r.page?' clk':'')+'"'+(r.page?(' onclick="asstClose();go(\''+esc(r.page)+'\')"'):'')+'>'+
+     '<span class="n">'+esc(r.t)+'</span>'+
+     (r.hab?'<span class="chip">nên xem</span>':'<span class="chip '+(r.n?"amber":"green")+'">'+r.n+'</span>')+'</div>'});
+   h+='</div>'}
+ }
+ h+='<div class="asstFoot">'+
+  (L.length?'<button class="btn sm primary" onclick="asstClose();tourWork()"><i class="ti ti-checklist"></i>Dọn từng bước ('+L.length+')</button>':'')+
+  '<button class="btn sm" onclick="asstClose();tourMenu()" data-tip="Các bài hướng dẫn"><i class="ti ti-help-circle"></i></button>'+
+  '</div>';
+ if(p.c)h+='<div class="asstNote"><b>Trang này để làm gì:</b> '+esc(p.c)+'</div>';
+ return h}
+function asstBoQua(){
+ var x=asstNext();if(!x)return;
+ window.ASSTSKIP=window.ASSTSKIP||{};window.ASSTSKIP[slaKey(x)]=1;
+ asstPaint()}
+/* Trợ thủ phải sống theo dữ liệu: mỗi lần vẽ lại màn hình là cập nhật con số và việc kế tiếp. */
+function asstTick(){try{if(tthCfg().on)asstPaint();else{var f=document.getElementById("asstfab");if(f)f.classList.remove("asstfab")}}catch(e){}}
+
 function renderCrumb(){var host=document.getElementById("pgCrumb");if(!host)return;
  var p=PBK[CUR]||{};var h=window.NAVHIST||[];var out="";
  if(h.length){var prev=h[h.length-1];
@@ -12345,10 +12509,10 @@ function go(key,noHist){
  buildNav();
  document.getElementById("pgTitle").textContent=p.t;
  var el=document.getElementById("content");
- /* V9.29w: Trợ thủ đứng NGAY TRÊN nội dung trang - nhắc việc rồi mới tới việc, không phải cuộn
-    xuống đáy mới thấy (đúng bài học "KPI của tôi rơi xuống đáy" anh Luân bắt ở V9.29). */
- var _tth="";try{_tth=tthHTML(key)}catch(e){}
- if(p.ty==="list")el.innerHTML=_tth+renderList(key);else el.innerHTML=_tth+RENDER[key]();
+ /* V9.35: Trợ thủ KHÔNG còn chen vào đầu thân trang nữa - nó ở nút góc dưới bên phải. Thân trang
+    trả lại cho nội dung chính, thứ quan trọng nhất lên ngay đầu màn hình. */
+ if(p.ty==="list")el.innerHTML=renderList(key);else el.innerHTML=RENDER[key]();
+ asstTick();
  if(!canSee(key)&&!SENSITIVE[key]&&SCOPE().pages!=="*")el.innerHTML='<div class="notebar" style="margin-bottom:12px"><i class="ti ti-info-circle"></i>Trang ngoài phạm vi chức danh của bạn - đang xem ở chế độ THAM KHẢO.</div>'+el.innerHTML;
  window.CURCTX=navSnap();   /* ngữ cảnh của TRANG NÀY, chụp sau khi đã render (dùng khi rời trang) */
  renderCrumb();
@@ -12863,7 +13027,8 @@ function demoBoot(){
  if(demoDirty())setTimeout(function(){toast("Đang dùng dữ liệu demo ĐÃ CHỈNH từ buổi trước - Reset ở màn cổng hoặc Cài đặt > Dữ liệu demo.",4200)},600);
  var who=ssGet("ITTS_WHO");
  if(who===null||who===undefined){demoGate()}
- else{window.GATE_SID=who||"";applyScope(who||"");enter("all")}}
+ else{window.GATE_SID=who||"";applyScope(who||"");enter("all")}
+ try{asstTick()}catch(e){}}
 if(!SVR){demoBoot()}
 </script></body></html>"""
 
@@ -12885,6 +13050,8 @@ HV_SHELL = r"""
 </div>
 <div class="toast" id="toast"></div>
 <div class="undobar" id="undobar"></div>
+<div class="asst" id="asst"></div>
+<button class="asstfab" id="asstfab" aria-label="Mở Trợ thủ"></button>
 <div class="mask" id="mask" onclick="closeModal()"></div>
 <div class="cfmask" id="cfm"><div class="cfbox"><div class="cfh"><i class="ti ti-alert-triangle"></i> Xác nhận thao tác</div><div class="cfmsg" id="cfmMsg"></div><div class="cfa"><button class="btn" onclick="closeConfirm()">Huỷ</button><button class="btn primary" onclick="confirmYes()">Xác nhận</button></div></div></div>
 <div class="drawer" id="drawer"><div class="drszr" id="drszr" title="Kéo để đổi độ rộng - bấm đúp để về mặc định"></div><div class="dh"><b id="drawerTitle">Chi tiết</b><button class="x" onclick="closeModal()">&times;</button></div><div class="dbody" id="drawerBody"></div></div>

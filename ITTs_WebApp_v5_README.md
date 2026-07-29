@@ -1419,3 +1419,20 @@ sự biến mất khỏi hàng chờ.
 
 Kèm hai chỗ vá anh Luân báo: nhóm **Chờ duyệt** giờ mở đúng 6 tab (trước đây bấm mục nào cũng ra một
 màn), và nút **Làm ngay** giờ chạy được ở cả 163/163 việc (trước đây 44 việc bấm không ra gì).
+
+## V9.35 (29/07) - TRỢ THỦ VỀ MỘT GÓC, TRANG SẠCH LẠI
+
+Hai khối "Nhịp ngày của bạn" và "Trợ thủ" trước đây nằm trên đầu mọi trang, đẩy nội dung chính
+xuống dưới. Nay cả hai gom về **một nút tròn ở góc dưới bên phải** - trên nút luôn hiện số việc
+đang chờ và số việc quá hạn.
+
+Bấm vào nút, tấm trợ thủ bung ra:
+- **Câu chào theo giờ, gọi đúng tên bạn**, kèm số việc đang chờ.
+- **Việc kế tiếp**: tên việc, tên khách/học viên, hạn - và hai nút **Làm ngay** / **Để sau**.
+- **Nhịp ngày rút thành 3 ô bấm được**: Đầu ngày / Trong ngày / Cuối ngày. Bấm ô nào thì mở danh
+  sách việc của buổi đó ngay trong tấm; bấm một dòng là nhảy tới đúng trang.
+- Nút **Dọn từng bước** để trợ thủ dắt bạn làm lần lượt cho tới khi hết việc.
+
+Trong lúc đang dọn việc, bấm **Thu gọn** thì lượt dọn **vẫn còn nguyên** - nút góc dưới hiện "đang
+dọn, còn N", bấm lại là về đúng việc đang làm dở. Và nếu bạn tự nhảy đi làm việc khác không theo
+thứ tự, trợ thủ **tự cập nhật**: việc đã xong biến mất khỏi lượt, việc mới tự nối vào.
