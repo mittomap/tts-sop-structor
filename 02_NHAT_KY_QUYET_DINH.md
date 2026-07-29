@@ -149,8 +149,8 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.31 — (A)…(H) + (N1)…(N4) + ba việc anh Luân chốt ngày 29/07 ("3 việc đầu a thấy
-> hay đấy") ĐỀU ✅ XONG.**
+> **Phiên bản: V9.32 — (A)…(H) + (N1)…(N4) + ba việc anh Luân chốt 29/07 + KIỂM THỬ THẬT TRÊN
+> TRÌNH DUYỆT (anh Luân chọn 29/07) ĐỀU ✅ XONG.**
 > · **(1) Nhật ký thao tác (DL25)** - app từng có 115 cửa ghi mà không sổ nào ghi ai làm gì lúc nào.
 > · **(2) Hoàn tác** - 46 chỗ hỏi "Xác nhận?" mà không có đường lùi; nay lùi được theo LƯỢT BẤM.
 > · **(3) Tối ưu hiệu năng** - Trang bắt đầu 20ms → 7ms, cả 38 trang 164ms → 107ms.
@@ -170,12 +170,16 @@
 > access repository mittomap/tts-sop-structor". Chúng nó làm xong việc rồi mới phát hiện không đẩy
 > được, công sức nằm chết trong container. Muốn bật lại thì phải cấp quyền GHI cho môi trường chạy
 > lịch trước, và giữ nguyên BƯỚC 0 "thử `git push --dry-run` trước khi làm bất cứ việc gì". MẢNG 1 + 2 + 3 + 4 của hội đồng 6 chuyên gia ĐÃ XONG.
+> **MỚI - `_checkui.js`:** mở app THẬT bằng Chromium, 396 lượt (2 cổng x 3 khổ màn hình). Bắt được
+> 6 lỗi mà 1930 tiêu chí kiểm chuỗi không thấy - trong đó có `.notebar` bẻ vụn câu văn (83 chỗ) và
+> ảnh đại diện kéo từ `ui-avatars.com` (gửi TÊN NGƯỜI THẬT ra máy chủ nước ngoài).
 > **Bộ kiểm hiện tại (phải XANH HẾT mới được giao):** node --check 2 file · `_tall` **38 trang** 0 lỗi
 > (170 icon) · `_check11` **143** · `_check12` 37 · `_check13` 174 · `_check14` **111** · `_check15`
 > **39** · **`_check16` 577** · `_check17` **394** · **`_check18` 126 (vẽ thật 76 trang/tab + 8 chức
 > danh + mọi hồ sơ cổng học viên + nhật ký/hoàn tác/bộ nhớ tạm)** · `_checktour` · `_checkdata.js`
-> 27 luật / **6277 lượt kiểm - 0 lệch** · `check_logic.py` (đúng 4 ca cố ý) · `check_data.py` DAT.
-> **Tổng ~1930 tiêu chí tự động.**
+> 27 luật / **6289 lượt kiểm - 0 lệch** · `check_logic.py` (đúng 4 ca cố ý) · `check_data.py` DAT ·
+> **`_checkui.js` 396 lượt mở THẬT trong trình duyệt**.
+> **Tổng ~1930 tiêu chí tự động + 396 lượt mở thật.**
 >
 > **VIỆC PHẢI LÀM TIẾP - THEO ĐÚNG THỨ TỰ NÀY (Luân chốt 28/07 khuya, rồi về nghỉ):**
 >
@@ -697,6 +701,60 @@
 > 23,9h tuổi ngay lúc build; vài tiếng sau nó vượt mốc. **Luật rút ra: dữ liệu demo neo theo NGÀY
 > CHẠY thì mọi cửa sổ thời gian phải chọn ở GIỮA, không sát mép.** Nay chỉ lấy buổi trong NỬA cửa
 > sổ, và nửa đó đọc từ chính `attendanceGrace_hours` chứ không gõ số.
+>
+> ### V9.32 - KIỂM THỬ THẬT TRÊN TRÌNH DUYỆT (anh Luân hỏi *"nên cho hội đồng chuyên gia vào test và nâng cấp không"*, rồi chọn hướng này)
+>
+> **QUYẾT ĐỊNH: KHÔNG lập thêm hội đồng bàn tính năng. Đổi sang chạy trình duyệt thật.**
+> Lý do nói thẳng: nhìn lại cả dự án, **mọi lỗi thật đều lòi ra từ đúng hai nguồn** - anh Luân nhìn
+> màn hình, và bộ kiểm chạy mã thật. **Không lỗi nào lòi ra từ "một chuyên gia đọc mã rồi nêu ý
+> kiến".** Hai đợt hội đồng trước (F và N) cho ra danh sách dài mà phần đáng làm đều là chỗ chạy thử
+> mới thấy. Trong khi đó có một lỗ hổng chưa ai đụng: **1930 tiêu chí đều kiểm CHUỖI HTML, chưa từng
+> có trình duyệt nào chạy.**
+>
+> **CÁI GIÁ CỦA VIỆC KHÔNG BAO GIỜ MỞ TRÌNH DUYỆT - 6 lỗi thật, phát hiện ngay lượt chạy đầu:**
+>
+> **(1) `.notebar` bẻ vụn câu văn - 83 chỗ trong app.** `.notebar` để `display:flex; gap:9px`. Trong
+> CSS, **mỗi đoạn chữ trần trong một ô flex trở thành MỘT Ô RIÊNG** (anonymous flex item), rồi `gap`
+> đẩy chúng ra xa. Ô nhắc nào ít thẻ thì chỉ hơi hở (dấu chấm bị đẩy ra); ô nhắc mới của màn Nhật ký
+> có 7 thẻ thì **vỡ hoàn toàn thành 7 cột**. HTML **không sai một dấu nào** - nên `_tall`, `_check18`
+> và mọi bộ kiểm khác đều xanh. Đây đúng là lớp lỗi mà kiểm chuỗi **về nguyên tắc** không thể thấy:
+> chuỗi đúng, CSS mới là thứ bẻ nó. Cùng bệnh: `.bwap` (chip "Hẹn kế" trên Trang bắt đầu) bẻ 3 mảnh.
+>
+> **(2) Ảnh đại diện giáo viên kéo từ `ui-avatars.com`.** Hai cái sai chồng nhau: mở demo không mạng
+> thì ảnh vỡ, và **TÊN GIÁO VIÊN bị gửi sang máy chủ nước ngoài mỗi lần mở trang** - dữ liệu người
+> thật, rò ra ngoài chỉ để vẽ một vòng tròn hai chữ cái. Nay tự vẽ bằng SVG nhúng thẳng, không gọi ai.
+> Vá **ở nguồn** (`gen_demo.py`) - và nhớ bẫy đường ống: `gen_demo` ĐỌC LẠI `demo_data_big.json` của
+> lần trước, nên phải vá cả dòng cũ chứ không chỉ "thiếu thì bù".
+>
+> **(3) Font Montserrat vẫn kéo từ Google Fonts.** Icon Tabler nhúng offline từ lâu, **font thì bỏ
+> quên**. Mạng chặn Google là app rơi về font hệ thống - mà LUẬT CỨNG của dự án ghi rõ "font
+> Montserrat". Nhúng nốt: 3 bộ ký tự (vietnamese / latin-ext / latin), font biến nên một file đủ
+> 400-800, tốn 163KB.
+>
+> **(4) Ô tìm chỉ cao 15px** trong khi khung cao 25px - phần còn lại bấm vào không ăn gì. Trên điện
+> thoại là gõ mãi không ra bàn phím. Có ở **mọi trang tác vụ** (60 lượt).
+>
+> **(5) Ô chọn hạn nộp bài bị bóp còn 15px trên điện thoại** - hàng giao bài từng người là một dải
+> flex không xuống dòng.
+>
+> **(6) Nút tròn 22px** (`.cfedit` bánh răng "sửa ở đây", `.jcr`) và ô tích 13px - dưới ngưỡng bấm
+> trúng. Nút <24px: **99 → 15**, phần còn lại là ô tích gốc của trình duyệt (17px) - **giữ nguyên và
+> nói thẳng**, ép lên 24px thì trông không còn giống ô tích nữa.
+>
+> **BẪY ĐÃ CẮN - BỘ KIỂM ĐẦU TIÊN VIẾT RA LÀ BỘ KIỂM GIẢ.** Viết xong `_checkui.js` với 6 phép đo,
+> chạy xanh. Nhưng khi **cố tình bẻ lại `.notebar`** để thử thì nó **vẫn xanh** - tức là nó không hề
+> kiểm được đúng cái lỗi đã sinh ra nó. Phải thêm phép đo thứ 7 (ô flex hàng ngang có **từ 2 đoạn chữ
+> trần trở lên**), và lần đầu viết luật này lại **báo đỏ 1716 lần** vì bắt cả `<button><i></i>Nhận
+> việc</button>` - khe 6px giữa icon và chữ là CỐ Ý. Siết còn "từ 2 đoạn chữ" thì ra đúng 9 ca, đều
+> là lỗi thật. **Luật rút ra: viết xong bộ kiểm phải BẺ LẠI để xem nó có đỏ không - xanh ngay từ đầu
+> nhiều khi chỉ nghĩa là nó chẳng kiểm gì.**
+>
+> **Việc còn để lại cho người, không phải cho máy:** chưa ai ngoài anh Luân và phiên làm việc nhìn
+> app. Máy đo được chữ có tràn không, **không đo được lễ tân có hiểu nút đó để làm gì không**. Bước
+> tiếp theo đúng nhất là để một lễ tân hoặc giáo viên thật ngồi trước màn hình 15 phút.
+>
+> `_checkui.js` nay nằm trong bộ verify bắt buộc. Máy nào chưa `npm i playwright` hoặc không có
+> Chromium thì nó tự báo **BỎ QUA**, không báo đỏ bậy.
 >
 > ### V9.31 - NHẬT KÝ THAO TÁC · HOÀN TÁC · HIỆU NĂNG (anh Luân chốt 29/07: *"3 việc đầu a thấy hay đấy"*)
 >

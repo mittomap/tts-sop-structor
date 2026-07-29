@@ -134,7 +134,7 @@ tr.cfhl{animation:cfhl 2.6s ease-out}
 @keyframes cfhl{0%,60%{background:#FFF6D8}100%{background:transparent}}
 /* V9.29: nut nho "sua o day" canh cau nhac / danh muc */
 .cfedit{display:inline-flex;align-items:center;justify-content:center;margin-left:6px;background:none;border:0;
- width:22px;height:22px;border-radius:50%;color:#98A4B3;cursor:pointer;font-family:inherit;padding:0;
+ width:24px;height:24px;flex:none;border-radius:50%;color:#98A4B3;cursor:pointer;font-family:inherit;padding:0;
  vertical-align:middle;transition:.12s}
 .cfedit:hover{background:#EEF3F9;color:var(--blue)}
 .cfedit i{font-size:14px}
@@ -284,8 +284,11 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .bwsub{font-size:12px;opacity:.9;margin-top:3px;line-height:1.5;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 .bwsub b{color:#fff}
 .bwdot{opacity:.45}
-.bwap{display:inline-flex;align-items:center;gap:5px;background:#ffffff1f;border-radius:999px;padding:2px 9px;
- cursor:pointer;transition:.12s;font-size:11.5px}
+/* V9.31: cung benh voi .notebar - inline-flex + gap:5px be cau "Hen ke: <b>19:30</b> - Ten khach"
+   thanh ba manh cach nhau. Chip nay la MOT CAU, khong phai mot hang o. */
+.bwap{display:inline-block;background:#ffffff1f;border-radius:999px;padding:3px 9px;
+ cursor:pointer;transition:.12s;font-size:11.5px;line-height:1.5}
+.bwap>i{margin-right:5px;vertical-align:-1px}
 .bwap:hover{background:#ffffff33}
 .bwover{color:#FFD3D3;font-weight:800}
 .bwsearch{position:relative;display:flex;align-items:center;gap:8px;background:#fff;border-radius:10px;padding:0 12px;max-width:none}
@@ -661,7 +664,11 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .pfoot .mut{font-size:11.5px;margin-right:auto}
 @media(max-width:700px){.pfoot{flex-wrap:wrap}.pfoot .btn{width:100%;justify-content:center}}
 .rost.btrow{flex-wrap:wrap;gap:8px}
-.bteach{display:flex;align-items:center;gap:8px;margin-left:auto;flex:none}
+/* V9.31 (kiem thu that): hang giao bai tung nguoi la mot dai flex khong xuong dong - tren dien
+   thoai o chon han nop bi bop con 15px, khong bam noi. Cho xuong dong va cam bop cac o nhap. */
+.bteach{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-left:auto;flex:none;max-width:100%}
+.bteach>*{flex:none}
+@media(max-width:700px){.bteach{margin-left:0;width:100%}.bteach select.bthw{min-width:0;width:100%;max-width:none}}
 .bteach select.bthw{min-width:250px;max-width:320px;height:32px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-family:inherit;font-size:12px;background:#fff}
 .bteach input.btdi{width:145px;height:32px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-family:inherit;font-size:12px}
 .btup{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 10px;border:1px dashed var(--line);border-radius:7px;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;max-width:160px;overflow:hidden}
@@ -777,7 +784,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .jcol{min-width:270px;max-width:290px;flex:0 0 auto;background:var(--bg);border:1px solid var(--line);border-radius:12px}
 .jch{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:2px solid var(--line);font-size:12.5px}
 .jci{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
-.jcr{margin-left:6px;border:1px solid var(--line);background:#fff;border-radius:6px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--blue);font-size:12px}
+.jcr{margin-left:6px;border:1px solid var(--line);background:#fff;border-radius:6px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--blue);font-size:12px}
 .jcr:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
 .jcn{margin-left:auto;background:#fff;border:1px solid var(--line);border-radius:20px;padding:1px 8px;font-size:11px;font-weight:700}
 .jcb{padding:8px;display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto}
@@ -845,7 +852,14 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .fld input,.fld select,.fld textarea{height:36px;border:1px solid var(--line);border-radius:8px;padding:0 10px;font-family:inherit;font-size:13px;background:#fff}
 .fld textarea{height:60px;padding:8px 10px;resize:vertical}
 .fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--navy)}
-.notebar{display:flex;align-items:center;gap:9px;background:var(--amberb);border:1px solid #F2D9AE;color:#7A4E0A;font-size:12px;font-weight:600;padding:10px 14px;border-radius:9px;margin-bottom:14px}
+/* V9.31 (kiem thu that tren trinh duyet): truoc day .notebar la display:flex + gap:9px. Flex bien
+   MOI doan chu va MOI the <b>/<span> thanh mot O RIENG co khe ho 9px - cau van bi be vun thanh
+   nhieu cot. Notebar it the thi chi thay hoi ho ra (dau cham bi day ra xa); notebar nhieu the thi
+   vo hoan toan. Bo kiem chuoi HTML khong bao gio thay duoc loi nay vi HTML hoan toan dung.
+   Nay cho chu chay theo dong binh thuong, icon nam inline o dau dong. */
+.notebar{display:block;background:var(--amberb);border:1px solid #F2D9AE;color:#7A4E0A;font-size:12px;font-weight:600;line-height:1.65;padding:10px 14px;border-radius:9px;margin-bottom:14px}
+.notebar>i{margin-right:8px;vertical-align:-2px}
+.notebar>.btn,.notebar>button{margin-left:8px;vertical-align:-3px}
 .sechd{font-size:12.5px;font-weight:800;color:#3A4756;margin:14px 4px 4px;text-transform:uppercase;letter-spacing:.4px}
 .appcard{border:1px solid var(--line);border-radius:11px;padding:14px 16px;margin:10px 4px;display:flex;gap:16px;align-items:center}
 .appcard .info{flex:1}.appcard .id{font-size:11px;color:var(--navy);font-weight:700}.appcard .big{font-size:14px;font-weight:700;margin:2px 0 4px}
@@ -910,9 +924,13 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .nhipr.ok>i{color:var(--green)}
 .nhipr .nhipt{flex:1;min-width:0}
 @media(max-width:560px){.nhipr .nhipt{white-space:normal}}
-.pgq{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:8px;padding:4px 9px;background:#fff;max-width:230px}
+.pgq{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:8px;padding:0 9px;background:#fff;max-width:230px}
 .pgq i{color:var(--muted);font-size:14px;flex:none}
-.pgq input{border:0;outline:0;font-family:inherit;font-size:12px;width:100%;min-width:0;background:transparent}
+/* V9.31: o tich mac dinh cua trinh duyet chi 13x13px - dung ngon tay bam truot lien tuc. */
+input[type=checkbox],input[type=radio]{width:17px;height:17px;flex:none;accent-color:var(--blue);cursor:pointer}
+/* V9.31: o nhap truoc day chi cao 15px trong khi khung cao 25px - phan con lai bam vao khong an gi.
+   Tren dien thoai la go mai khong ra ban phim. Cho o nhap an HET chieu cao khung. */
+.pgq input{border:0;outline:0;font-family:inherit;font-size:12px;width:100%;min-width:0;background:transparent;padding:6px 0}
 .tth{background:linear-gradient(180deg,#FFFBEB,#FFF);border:1px solid #F0D08A;border-left:3px solid var(--amber);border-radius:11px;padding:11px 14px;margin-bottom:14px}
 .tth .tthh{display:flex;align-items:center;gap:7px;font-size:12px;color:#8A5A0B;margin-bottom:7px}
 .tth .tthh i{font-size:15px}
@@ -923,7 +941,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .tth .tthk{flex:0 0 auto;white-space:nowrap;color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.3px;padding-top:1px}
 @media(max-width:560px){.tth .tthr{flex-direction:column;gap:2px}.tth .tthk{white-space:normal}}
 .tbtn.on{background:#FFF4D6;border-color:#F0D08A;color:#8A5A0B}
-.qsel{border:1px solid var(--line);border-radius:16px;padding:3px 22px 3px 9px;font-family:inherit;font-size:10.5px;font-weight:700;background:#fff;color:#5A6675;cursor:pointer;max-width:none;white-space:nowrap}
+.qsel{border:1px solid var(--line);border-radius:16px;min-height:26px;padding:4px 22px 4px 9px;font-family:inherit;font-size:10.5px;font-weight:700;background:#fff;color:#5A6675;cursor:pointer;max-width:none;white-space:nowrap}
 @media(max-width:820px){.qsel{max-width:150px;padding-right:18px}}
 .qsel.red{color:#A32D2D;border-color:#F0B4B4;background:var(--redb)}
 .qsel.amber{color:#854F0B;border-color:#F0D08A;background:var(--amberb)}
@@ -12636,6 +12654,23 @@ try:
         print("CANH BAO: khong thay the link Tabler de nhung")
 except Exception as e:
     print("CANH BAO: chua nhung duoc icon:", e)
+# ===== NHUNG FONT MONTSERRAT OFFLINE (V9.31) =====
+# Kiem thu that tren trinh duyet bat duoc: app van keo font tu fonts.googleapis.com. Mo demo o cho
+# khong co mang (hoac mang chan Google) thi font roi ve font he thong - sai nhan dien thuong hieu,
+# ma LUAT CUNG cua du an ghi ro "font Montserrat". Icon Tabler da nhung offline tu lau, con font thi
+# bo quen. Nhung not: 3 bo ky tu (vietnamese / latin-ext / latin), font bien nen mot file du 400-800.
+try:
+    _mont = open(os.path.join(_SD,"montserrat_inline.css"),"r",encoding="utf-8").read()
+    _pre  = '<link rel="preconnect" href="https://fonts.googleapis.com">'
+    _fnt  = '<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">'
+    if _fnt in out:
+        out    = out.replace(_pre,"").replace(_fnt, "<style>"+_mont+"</style>")
+        out_hv = out_hv.replace(_pre,"").replace(_fnt, "<style>"+_mont+"</style>")
+        print("Font Montserrat: da nhung offline", len(_mont), "bytes")
+    else:
+        print("CANH BAO: khong thay the link font de nhung")
+except Exception as e:
+    print("CANH BAO: chua nhung duoc font:", e)
 for p in [os.path.join(_OUT,"ITTs_WebApp_v5_demo.html")]:
     open(p,"w",encoding="utf-8").write(out)
     print("WROTE", p, len(out), "bytes")

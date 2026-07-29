@@ -34,7 +34,7 @@ ITTS_OUT="<mnt>/SOP ITTs" python3 gen_v5.py
 ```
 
 ## VERIFY (bắt buộc sau mỗi build)
-Bộ kiểm gồm **13 phần, phải xanh HẾT mới được giao** (~1930 tiêu chí):
+Bộ kiểm gồm **14 phần, phải xanh HẾT mới được giao** (~1930 tiêu chí tự động + 396 lượt mở thật trong trình duyệt):
 | Lệnh | Kỳ vọng |
 |---|---|
 | `node --check _APP.js` và `node --check _HV.js` | không báo gì |
@@ -51,6 +51,7 @@ Bộ kiểm gồm **13 phần, phải xanh HẾT mới được giao** (~1930 ti
 | `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` |
 | `python3 check_logic.py` | `TONG BAN GHI LOI: 4` (đúng 4 ca là việc quá hạn CỐ Ý để demo cảnh báo đỏ - xem luật 10k) |
 | `python3 check_data.py` | `KET QUA: DAT` |
+| `ITTS_OUT=<out> node _checkui.js` | `CHECKUI OK: da mo THAT 396 luot` - **kiểm thử trên trình duyệt thật** (cần `npm i playwright` một lần; máy không có Chromium thì tự BỎ QUA chứ không báo đỏ bậy) |
 
 **`_check15.js` sinh ra vì cả hai hội đồng thẩm định đều bỏ lọt cùng một lớp lỗi:** người rà
 ĐỌC TỪNG ĐƯỜNG, mà lỗi nguy hiểm nhất nằm ở KHOẢNG GIỮA hai đường - mỗi đường đọc riêng đều hợp
@@ -104,6 +105,36 @@ ITTS_OUT="<mnt>/SOP ITTs" node _tall.js   # kỳ vọng: "Render 36 trang | 0 lo
 Cổng học viên: lặp lại `node --check` với script lớn nhất của `ITTs_TrangHocVien_demo.html`.
 
 ## DỰNG LẠI FONT ICON (khi thêm icon `ti-*` mới)
+## Kiểm thử trên trình duyệt thật - `_checkui.js` (V9.31)
+
+Cả 13 phần còn lại đều **kiểm chuỗi HTML**, không có trình duyệt nào chạy. Chuỗi đúng tuyệt đối mà
+màn hình vẫn vỡ: HTML hợp lệ, **CSS mới là thứ bẻ nó**. `_checkui.js` mở app THẬT bằng Chromium,
+đi qua **396 lượt** (38 trang + 12 tab Cài đặt của cổng nhân viên, 82 hồ sơ học viên của cổng học
+viên, nhân 3 khổ màn hình: 390 / 834 / 1440px) và đo 7 thứ mắt người thấy được:
+
+1. trang cuộn ngang (luật dự án: không bao giờ được phép)
+2. chữ bị cắt **âm thầm** - `overflow:hidden` mà không có dấu `...`; có `text-overflow:ellipsis` là
+   cắt CÓ Ý, không tính
+3. phần tử thò ra ngoài khung nhìn
+4. nút/ô nhập nhỏ hơn 24px - trừ ô tích/nút tròn (control gốc của trình duyệt, ép to lên trông sai)
+5. hai thanh nổi che nhau (toast / thanh Hoàn tác / bong bóng)
+6. lỗi JS, và **tài nguyên tải từ mạng ngoài** - demo phải chạy được khi không có mạng
+7. **câu văn bị flex bẻ vụn**
+
+Điểm 7 là thứ đẻ ra bộ kiểm này. Trong CSS, mỗi đoạn chữ trần nằm trong một ô `display:flex` thành
+**một ô riêng** (anonymous flex item), rồi `gap` đẩy chúng ra xa. Câu văn đứt thành nhiều cột mà
+HTML **không sai một dấu nào** - sáu phép đo kia đều không thấy (không tràn, không cắt, không nút
+nhỏ). Luật dò: ô flex hàng ngang vừa có **từ 2 đoạn chữ trần trở lên** vừa có thẻ con. Một đoạn chữ
+thì bỏ qua - đó chính là kiểu nút chuẩn `<button><i icon></i>Nhận việc</button>`, khe 6px là cố ý.
+
+**Đã bắt được thật:** `.notebar` (83 chỗ trong app) bẻ vụn câu nhắc thành nhiều cột; `.bwap` (chip
+"Hẹn kế" trên Trang bắt đầu) bẻ thành 3 mảnh; font Montserrat vẫn kéo từ Google Fonts; ảnh đại diện
+giáo viên kéo từ `ui-avatars.com` (**gửi tên người thật ra máy chủ nước ngoài**); ô tìm chỉ cao 15px;
+ô chọn hạn nộp bài bị bóp còn 15px trên điện thoại.
+
+**Khi sửa xong nhớ thử ngược:** cố tình bẻ lại rồi chạy để chắc bộ kiểm **báo đỏ thật**. Lần đầu viết
+xong, 6 phép đo đầu đều xanh trên đúng cái bug đã sinh ra nó - một bộ kiểm luôn xanh là bộ kiểm giả.
+
 ## Bản khai cửa ghi (`DOORS` trong gen_v5.py -> `DOORTB` trong app) - V9.31
 
 Trong `gen_v5.py`, gần cuối file (ngay trước `_MH = "</style></head><body>"`) có dict Python

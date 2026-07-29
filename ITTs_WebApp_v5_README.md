@@ -1379,3 +1379,22 @@ còn 107ms (đo trên dữ liệu demo 5.142 dòng). Không đổi gì về giao
 
 Verify: `_tall` 38 trang 0 lỗi (170 icon), `_check15` 39, `_check17` 394, **`_check18` 126 (vẽ thật 76
 trang/tab)**, `_checkdata` 27 luật / 6.277 lượt kiểm 0 lệch, `check_data.py` ĐẠT.
+
+## V9.32 (29/07) - CHẠY THẬT TRÊN TRÌNH DUYỆT: 6 CHỖ ĐƯỢC VÁ
+
+Lần đầu app được mở bằng trình duyệt thật để soi (396 lượt: 2 cổng × 3 khổ màn hình - điện thoại
+390px, máy tính bảng 834px, máy tính 1440px). Sáu chỗ được sửa:
+
+- **Ô nhắc màu vàng (notebar) hết bị bẻ vụn.** Câu nhắc trước đây bị cắt thành nhiều mảnh cách xa
+  nhau; ô nhắc nào nhiều chữ đậm thì vỡ hẳn thành nhiều cột. Nay đọc liền mạch như một câu. Ảnh
+  hưởng 83 ô nhắc trong app. Chip "Hẹn kế" trên Trang bắt đầu cũng vậy.
+- **Mở demo không có mạng vẫn đúng font và đủ ảnh.** Font Montserrat và ảnh đại diện giáo viên
+  trước đây tải từ máy chủ ngoài; nay nằm luôn trong file. Quan trọng hơn: ảnh đại diện cũ **gửi tên
+  giáo viên ra máy chủ nước ngoài** mỗi lần mở trang - nay không gửi gì cả.
+- **Ô tìm bấm trúng dễ hơn.** Trước đây chỉ vùng cao 15px ở giữa mới ăn; nay cả khung đều ăn.
+- **Ô chọn hạn nộp bài không còn bị bóp trên điện thoại** (trước bị ép còn 15px, không bấm nổi).
+- **Nút bánh răng "sửa ở đây" và các nút tròn to lên đủ ngưỡng bấm trúng** (22px → 24px), ô tích
+  13px → 17px.
+
+Kèm theo là bộ kiểm mới `_checkui.js` chạy trình duyệt thật trong quy trình kiểm - để những lỗi kiểu
+này không quay lại.

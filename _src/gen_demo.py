@@ -66,14 +66,32 @@ _GVBIO=["Chuyên luyện Speaking và phát âm, 6 năm đứng lớp IELTS, IEL
         "Chuyên Writing Task 1 và mô tả số liệu, chấm bài rất kỹ."]
 for _s in STAFF:
     _s.setdefault("bio",""); _s.setdefault("avatar_url","")
+# ===== ANH DAI DIEN TU SINH, KHONG GOI RA MANG (V9.31) =====
+# Kiem thu that tren trinh duyet bat duoc: anh dai dien giao vien lay tu ui-avatars.com. Hai cai sai:
+#  (1) mo demo o cho khong co mang thi anh vo;
+#  (2) TEN GIAO VIEN bi gui sang may chu nuoc ngoai moi lan mo trang - du lieu nguoi that,
+#      khong duoc phep ro ri chi de ve mot vong tron co hai chu cai.
+# Nay ve thang bang SVG nhung trong dia chi anh, khong goi ai ca.
+def _avatar(name, bg="1E3A5F", fg="ffffff"):
+    import urllib.parse
+    parts = [p for p in str(name).split() if p]
+    ini = "".join(p[0] for p in parts[-2:]).upper() or "GV"
+    svg = ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'>"
+           "<rect width='96' height='96' rx='48' fill='#%s'/>"
+           "<text x='48' y='48' fill='#%s' font-family='Montserrat,Arial,sans-serif' font-size='38'"
+           " font-weight='700' text-anchor='middle' dominant-baseline='central'>%s</text></svg>"
+           % (bg, fg, ini))
+    return "data:image/svg+xml," + urllib.parse.quote(svg)
+
 _gi=0
 for _s in STAFF:
     if str(_s.get("role","")).startswith("teacher") or "wow_coach" in str(_s.get("role","")):
         if not _s.get("bio"):
             _s["bio"]=_GVBIO[_gi%len(_GVBIO)]; _gi+=1
-        if not _s.get("avatar_url"):
-            _s["avatar_url"]=("https://ui-avatars.com/api/?background=1E3A5F&color=fff&name="
-                              +"+".join(str(_s.get("full_name","GV")).split()[-2:]))
+        # BAY DUONG ONG: gen_demo DOC LAI demo_data_big.json cua lan truoc, nen dong cu van con
+        # dia chi ui-avatars. Khong chi "thieu thi bu" - phai VA ca dong cu tro ra mang.
+        if not _s.get("avatar_url") or str(_s["avatar_url"]).startswith("http"):
+            _s["avatar_url"]=_avatar(_s.get("full_name","GV"))
 for _tid,_tnm,_tml,_thr,_tsd in _NEW_TEACH:
     TEACH[_tid]=_tnm          # LUÔN ghi vào bảng GV, kể cả khi DL01 đã có sẵn từ lần chạy trước
     if any(x.get("staff_id")==_tid for x in STAFF): continue
