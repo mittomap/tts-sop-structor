@@ -1857,10 +1857,18 @@ var ROLESCOPE={
   tabs:{khac:["magioithieu"],duyet:["duyetgiao","banggiao"]},
   blocks:["appt","new","contacted","test_done","enrolled","reup"],
   mine:1,mineBtn:1,kpi:1,bell:["Tuyển sinh","Giao việc"]},
- hocvu:{match:/^(academic|aca_)/,land:"banlam",
+ /* V9.40 - Học vụ đáp thẳng vào XẾP LỚP, không đáp vào Trang bắt đầu. Đo bằng trình duyệt thật:
+    NV007 và NV013 mở app thấy "0 việc cần xử lý", 4 ô KPI đều 0/0, danh sách ghi "Không có hồ sơ
+    nào khớp" - vì Trang bắt đầu được dựng quanh phễu tuyển sinh, mà học vụ không đụng lead. Cùng
+    lúc đó trang Xếp lớp đang có 2 lớp chờ gửi thông tin, 3 HV chờ xác nhận, 6 onboarding chưa
+    xong, 1 quá hạn - và nó nằm sau 2 lần bấm. App đã làm đúng chuyện này cho kế toán (đáp vào
+    Thanh toán) và giáo viên (đáp vào Học tập); riêng học vụ thì sót.
+    Và mineBtn bật lên: "Việc hôm nay" đổ 76 việc toàn trung tâm, trong đó 50 là của giảng viên,
+    việc thật của học vụ là 11 - mà vai này không có nút "chỉ việc của tôi" để cắt xuống. */
+ hocvu:{match:/^(academic|aca_)/,land:"xeplop",
   pages:["viec","banlam","hanhtrinh","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ketthuc","khac","duyet"],
   tabs:{khac:["baoluu"],duyet:["duyetnghi","duyetgiao"]},
-  blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:0,kpi:1,bell:["Học vụ","CSKH","Giảng viên (ACA)","WOW","Giao việc"]},
+  blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:1,kpi:1,bell:["Học vụ","CSKH","Giảng viên (ACA)","WOW","Giao việc"]},
  giaovien:{match:/^teacher$/,land:"hoctap",ctx:{HTTAB:"today"},
   pages:["viec","banlam","hocvien","giangvien","banglop","hoctap","giaoan","duyet"],
   tabs:{duyet:["duyetgiao"]},blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:0,bell:["Giảng viên (ACA)","Học vụ","Giao việc"]},
@@ -3463,7 +3471,12 @@ function slaAct(act,id){
     Nay: nối jRun, và mã nào KHÔNG nối được thì PHẢI kêu lên chứ không im lặng. Im lặng là thứ làm
     người dùng tưởng app hỏng. */
  if(!act){toast("Việc này chưa gắn thao tác - mở hồ sơ để xử lý tay.");return}
- if(act==="jRun")return jRun(id);
+ /* V9.40: đưa về màn "Chạy quy trình" thay vì gọi thẳng jRun. Đo bằng trình duyệt thật, cùng
+    một khách ở cùng một chặng: qua Chạy quy trình thì form có 3 ô (ngày giờ test, hình thức,
+    ghi chú) kèm 3 lối thoát; qua jRun thì modalNext mở NGUYÊN BẢNG DL03 - 12 ô, 5 dropdown,
+    người dùng phải tự đoán ô nào cần đặt. Màn tốt hơn đã có sẵn trong app, chỉ là hàng chờ nối
+    nhầm vào lớp thao tác thô. Màn này còn có nút "Người tiếp theo" - đi hết hàng chờ tại chỗ. */
+ if(act==="jRun")return runStart(id);
  if(act==="tkopen")return tkOpen(id);   /* mã viết thường, hàm viết hoa chữ O - lệch một chữ là im lặng */
  if(act==="riskCare")return riskCare(id);
  if(act==="molop")return moLop(id);
@@ -3488,7 +3501,22 @@ function slaAct(act,id){
  var f=(typeof window!=="undefined")?window[act]:null;
  if(typeof f==="function")return f(id);
  toastErr('Thao tác "'+act+'" chưa được nối - báo IT. (Việc vẫn nằm nguyên trong hàng chờ.)')}
-function testConsult(id){markRow("DL03","test_booking_id",id,{post_test_status:eFull("enum_post_test_status","consulted")},"Đã đánh dấu đã tư vấn sau test.")}
+/* V9.40 - LỖI GHI CÂM, đo bằng trình duyệt thật. Trước đây hàm này GHI THẲNG
+   post_test_status = consulted rồi báo "đã đánh dấu đã tư vấn" - một cú bấm biến việc CHƯA LÀM
+   thành việc ĐÃ LÀM: không phiếu tư vấn nào được lập, không ai tư vấn gì cả, và việc rời hàng
+   chờ vĩnh viễn. Lộ ra khi dùng Trợ thủ dọn từng bước: bấm "Làm việc này" là Trợ thủ báo "Xong
+   việc này. Còn 3 việc." trong khi khách chưa được gọi.
+   Nay: mở PHIẾU TƯ VẤN. Dấu "đã tư vấn sau test" chỉ đóng khi phiếu được LƯU (xem tvSave). */
+function testConsult(id){var t=find("DL03","test_booking_id",id);
+ if(!t){toast("Không thấy phiếu test.");return}
+ var c=rows("DL04").filter(function(x){return String(x.test_booking_id||"")===String(id)})[0]
+   ||rows("DL04").filter(function(x){return String(x.lead_id||"")===String(t.lead_id||"")&&!isc(x.consultation_status,"consulted")})[0];
+ if(c)return tvForm(c.consultation_id);
+ /* chưa có phiếu thì lập phiếu rỗng rồi mở luôn - không bắt người dùng đi tìm nút "Thêm mới" */
+ var o={lead_id:t.lead_id||"",customer_name_display:t.lead_id_name||t.customer_name||"",
+  test_booking_id:id,consulted_by:CURSTAFF||"",
+  consultation_status:eFull("enum_consultation_status","not_consulted"),consultation_time:nowStr()};
+ jSaveRow("DL04",o,function(nid){tvForm(nid)})}
 function openOB(id){var o=find("DL08","onboarding_id",id);if(!o){toast("Không thấy hồ sơ.");return}var s=obState(o);
  var h='<div class="dcard"><h4><i class="ti ti-layout-grid-add"></i>Onboarding - '+esc(o.student_id_name||o.student_id)+'</h4>';
  h+=ctxRows([["Lớp",esc(o.class_id_name||o.class_id||"chưa xếp")],["Xếp lúc",esc(o.assigned_at||"-")],["HV xác nhận",esc(elabel(o.class_confirmation_status)||"-")]]);
@@ -3691,7 +3719,14 @@ function renderDuyet(){var TH=ckThreshold();
  var segs=scopeTabs("duyet",TB.map(function(x){return [x.k,x.t,x.n||"",x.n?"amber":""]}));
  if(!segs.length)return h+'<div class="panel"><div class="empty">Chức danh của bạn không có hàng chờ quyết định nào.</div></div>';
  if(!segs.some(function(t){return t[0]===tab})){tab=segs[0][0];window.DUYTAB=tab}
- h+=statStrip(TB.map(function(x){return [x.ic,x.n,x.t,x.n?"#E08A1E":"#16A34A",x.n?"đang chờ quyết định":"đã sạch","duyTabSet('"+x.k+"')"]}).slice(0,5));
+ /* V9.40 - Ô THỐNG KÊ BẤM CHẾT. Trước đây dải này vẽ từ duyTabs() ĐẦY ĐỦ trong khi dải tab đi
+    qua scopeTabs (đã lọc quyền). Đo: NV007 5 ô / 2 tab -> 3 ô bấm không tới; NV005 4 ô chết;
+    NV001 4 ô chết. Bấm vào thì duyTabSet gặp key ngoài quyền, im lặng rơi về tab đầu, không
+    một câu giải thích - người dùng tưởng app hỏng. Nay dải thống kê vẽ TỪ CHÍNH segs đã lọc,
+    nên mọi ô nhìn thấy đều bấm tới được. */
+ (function(){var co={};segs.forEach(function(t){co[t[0]]=1});
+  h+=statStrip(TB.filter(function(x){return co[x.k]}).map(function(x){
+   return [x.ic,x.n,x.t,x.n?"#E08A1E":"#16A34A",x.n?"đang chờ quyết định":"đã sạch","duyTabSet('"+x.k+"')"]}).slice(0,5))})();
  h+=tbar(segHTML(tab,segs,"duyTabSet('{k}')"),"");
  if(tab==="duyetnghi")return h+duyNghiHTML();
  if(tab==="duyetthu")return h+duyThuHTML();
@@ -3981,10 +4016,10 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
   if(punc)h+='<span class="chip '+punc.cls+'"><i class="ti '+punc.ic+'" style="margin-right:3px"></i>'+esc(punc.txt)+'</span>';
   h+='<span style="flex:1"></span>';
   if(!started){
-   if(gateOpen)h+='<button class="btn primary sm" onclick="confirmRun(\'Bắt đầu lớp = điểm danh giảng viên (ghi giờ vào lớp bây giờ). Sau đó mở điểm danh học viên?\',\'sessStart\',\''+esc(ses.session_id)+'\')"><i class="ti ti-player-play"></i>Bắt đầu lớp</button>';
+   if(gateOpen)h+='<button class="btn primary sm" onclick="sessStart(\''+esc(ses.session_id)+'\')"><i class="ti ti-player-play"></i>Bắt đầu lớp</button>';
    else h+='<span class="chip amber" title="Chỉ điểm danh được từ '+gateMin+' phút trước giờ học"><i class="ti ti-lock"></i> Cổng mở '+esc(hmMinus(ses.session_date,gateMin))+'</span>';
   }
-  else if(!ses.class_end_actual)h+='<button class="btn green sm" onclick="confirmRun(\'Ghi giờ KẾT THÚC buổi = bây giờ?\',\'sessEnd\',\''+esc(ses.session_id)+'\')"><i class="ti ti-player-stop"></i>Kết thúc buổi</button>';
+  else if(!ses.class_end_actual)h+='<button class="btn green sm" onclick="sessEnd(\''+esc(ses.session_id)+'\')"><i class="ti ti-player-stop"></i>Kết thúc buổi</button>';
   h+='</div>';
  } else if(real.length===0){h+='<div class="notebar"><i class="ti ti-info-circle"></i>Lớp này chưa có lịch buổi trong DL11 - đang dùng số buổi mặc định, điểm danh vẫn lưu bình thường.</div>'}
  var lop=find("DL10","class_id",cid)||{};
@@ -3999,7 +4034,7 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
    '</div></div></div>';
   return h;
  }
- h+='<div class="panel"><div class="ph"><b>'+esc(lop.class_name||cid)+'</b><span class="cnt" style="margin-left:8px">sĩ số '+(enr.length||lop.current_enrollment||0)+'/'+(lop.class_capacity||"-")+' · đã điểm danh '+done+'/'+enr.length+'</span><div class="mini"><button class="btn green sm" onclick="confirmRun(\'Lưu điểm danh + nhận xét buổi này? Bản ghi đã có sẽ cập nhật, chưa có sẽ thêm mới (không tạo trùng).\',\'ddSave\',\'\')"><i class="ti ti-device-floppy"></i>Lưu buổi học</button></div></div><div class="pbody">';
+ h+='<div class="panel"><div class="ph"><b>'+esc(lop.class_name||cid)+'</b><span class="cnt" style="margin-left:8px">sĩ số '+(enr.length||lop.current_enrollment||0)+'/'+(lop.class_capacity||"-")+' · đã điểm danh '+done+'/'+enr.length+'</span><div class="mini"><button class="btn green sm" onclick="ddSave()"><i class="ti ti-device-floppy"></i>Lưu buổi học</button></div></div><div class="pbody">';
  if(!enr.length)h+='<div class="empty">Lớp chưa có học viên được xếp.</div>';
  enr.forEach(function(e){var sid=e.student_id,s=find("DL09","student_id",sid)||{};
   var cur=rows("DL12").filter(function(r){return r.student_id===sid&&r.session_id===sess})[0];
@@ -4029,7 +4064,12 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
    (noteDone?'<span class="chip green" style="margin-left:2px">đã ghi</span>':'<span class="chip amber" style="margin-left:2px">chờ ghi · hạn '+paramOf("slaTeacherNote_hours",48)+'h</span>')+
    '<span class="mut" style="font-size:11.5px">học vụ đọc để phát hiện lớp/HV cần lưu ý</span></div>';
   h+='<div class="pbody"><div class="fld full" style="margin:0"><textarea id="dd_note" rows="3" placeholder="Lớp học thế nào, em nào yếu / tiến bộ, cần lưu ý gì cho buổi sau...">'+esc(ses.teacher_note_summary||"")+'</textarea>'+
-   (num(ses.teacher_late_minutes)>5?'<div class="fhint"><i class="ti ti-clock-exclamation"></i> Giờ vào lớp của GV (trễ '+esc(ses.teacher_late_minutes)+' phút) đã tự ghi khi bấm Bắt đầu lớp.</div>':'')+'</div></div>';
+   (num(ses.teacher_late_minutes)>5?'<div class="fhint"><i class="ti ti-clock-exclamation"></i> Giờ vào lớp của GV (trễ '+esc(ses.teacher_late_minutes)+' phút) đã tự ghi khi bấm Bắt đầu lớp.</div>':'')+'</div>'+
+   /* V9.40: nút Lưu THỨ HAI ngay dưới ô nhận xét. Đo tọa độ thật: nút Lưu ở đầu panel nằm cách
+      ô nhận xét 573px - giáo viên cuộn xuống viết xong phải cuộn ngược lên mới thấy nút lưu.
+      Dữ liệu demo có 20 buổi nợ nhận xét, con số đó khớp với chỗ nghẽn này. */
+   '<div class="fld full" style="margin:10px 0 0"><button class="btn green" onclick="ddSave()"><i class="ti ti-device-floppy"></i>Lưu buổi học</button>'+
+   '<div class="fhint">Lưu cả điểm danh lẫn nhận xét buổi. Lưu nhầm thì bấm Hoàn tác ở thanh dưới.</div></div></div>';
  }
  h+='</div>';return h}
 function ddSet(b){var g=b.parentNode;[].forEach.call(g.children,function(x){x.classList.remove("on")});b.classList.add("on");
@@ -8867,7 +8907,17 @@ function tvForm(id){var c=find("DL04","consultation_id",id)||{};var lead=c.lead_
  h+='<div class="fld full"><label>Nội dung tư vấn</label><textarea id="tv_note" rows="2"></textarea></div>';
  h+='<div class="fld full"><button class="btn primary" onclick="tvSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Lưu tư vấn</button></div></div>';
  openDrawer("Ghi nhận tư vấn",h)}
-function tvSave(id){var vals={consultation_status:eFull("enum_consultation_status","consulted"),consultation_time:nowStr(),recommended_course:fldV("tv_course"),recommended_duration:fldV("tv_dur"),recommended_schedule:fldV("tv_sch"),consultation_note:fldV("tv_note"),conversion_status:eFull("enum_conversion_status","interested")};markRow("DL04","consultation_id",id,vals,"Đã ghi nhận tư vấn.","tuvan");closeModal()}
+function tvSave(id){var vals={consultation_status:eFull("enum_consultation_status","consulted"),consultation_time:nowStr(),recommended_course:fldV("tv_course"),recommended_duration:fldV("tv_dur"),recommended_schedule:fldV("tv_sch"),consultation_note:fldV("tv_note"),conversion_status:eFull("enum_conversion_status","interested")};
+ markRow("DL04","consultation_id",id,vals,"Đã ghi nhận tư vấn.","tuvan");
+ /* V9.40: đóng luôn dấu "đã tư vấn sau test" trên phiếu test - trước đây dấu đó được bấm RIÊNG
+    ở một nút khác, nên tư vấn xong rồi việc vẫn treo, còn bấm nút kia thì việc mất mà chưa tư vấn.
+    Một sự thật thì chỉ được có một chỗ ghi. */
+ (function(){var c=find("DL04","consultation_id",id)||{};
+  var t=(c.test_booking_id&&find("DL03","test_booking_id",c.test_booking_id))
+   ||rows("DL03").filter(function(x){return String(x.lead_id||"")===String(c.lead_id||"")&&isc(x.test_status,"graded")})[0];
+  if(t&&!isc(t.post_test_status,"consulted"))
+   jUpdRow("DL03",t.test_booking_id,{post_test_status:eFull("enum_post_test_status","consulted")})})();
+ closeModal()}
 function tvClose(id){var c=find("DL04","consultation_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-target-arrow"></i>Cập nhật chốt - '+esc(c.customer_name_display||c.lead_id)+'</h4>';
  h+='<div class="fld"><label>Kết quả</label><select id="cv_st">'+enumOpts("enum_conversion_status")+'</select></div>';
@@ -13773,8 +13823,8 @@ DOORS = {
  "DL01":["staffAdd","staffSave","gvBioSave"],
  "DL02":["bgSplitOrphansRun","doHandoverRun","leadInboundSave","reassignSave","runGiveUpDo","runRejectSave","testQuickSave","touchLead","tvEnrollSave"],
  "DL02b":["leadInboundSave","rfNeed","runRejectSave","runTouchSave","testQuickSave"],
- "DL03":["rfNeed","testAttend","testBook","testConsult","testNoShowSave","testQuickSave","testRebookSave","testRefuse","testResultSave"],
- "DL04":["rfNeed","runSkipTest","tvCloseSave","tvEnrollSave","tvQuickSave","tvSave"],
+ "DL03":["rfNeed","testAttend","testBook","testNoShowSave","testQuickSave","testRebookSave","testRefuse","testResultSave","tvSave"],
+ "DL04":["rfNeed","runSkipTest","tvCloseSave","tvEnrollSave","tvQuickSave","tvSave","testConsult"],
  "DL06":["cancelEnrollRun","paySave","rfNeed","runCancelEnroll","tvEnrollSave","insSync"],
  "DL06b":["insPlanSave"],
  "DL07":["duyetRefundRun","paySave","payVerifyRun","rfNeed"],

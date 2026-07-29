@@ -4,3 +4,6 @@ _to_delete/
 
 node_modules/
 package-lock.json
+_src/node_modules/
+_src/package.json
+_src/package-lock.json

@@ -803,14 +803,24 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
     !!T&&T.steps.every(function(st){return st.chk()===false}));
   /* (2) LAM THAT mot viec -> phep kiem phai doi. Day la cho de viet mot bo kiem gia nhat:
      chi kiem "co ham chk" thi luon xanh ma khong chung minh duoc gi. */
+  /* V9.40: truoc day tieu chi nay bam act "testconsult" vi hoi do no GHI THANG mot phat la xong.
+     Chinh cai "mot phat la xong" do LA LOI - mot cu bam bien viec chua lam thanh viec da lam ma
+     khong phieu tu van nao duoc lap. Da vá: nay no mo phieu, va dau "da tu van" chi dong khi
+     phieu duoc luu. Nen tu V9.40 KHONG CON viec nao xong bang mot cu bam - dung nhu mong muon.
+     Tieu chi doi cach chung minh: ghi that vao du lieu (dung dung cai ma man hinh se ghi) roi
+     doi hang cho phai vut viec do ra. Van la "lam that", chi la khong con duong tat. */
   t("lam that mot viec thi buoc do doi sang XONG", (function(){
     var L=workAll(),x=L.filter(function(y){return y.act==="testconsult"})[0];
     if(!x)return false;
     var key=slaKey(x);
-    var st={item:x,chk:function(){return !workAll().some(function(y){return slaKey(y)===key})}};
-    if(st.chk()!==false)return false;         /* truoc khi lam: phai la CHUA */
-    slaAct(x.act,x.rid);
-    return st.chk()===true})());               /* sau khi lam: phai la XONG */
+    function conTrongHangCho(){return workAll().some(function(y){return slaKey(y)===key})}
+    if(!conTrongHangCho())return false;        /* truoc khi lam: phai CON trong hang cho */
+    var t0=find("DL03","test_booking_id",x.rid);if(!t0)return false;
+    var cu=t0.post_test_status;
+    t0.post_test_status=eFull("enum_post_test_status","consulted");dataChanged();
+    var het=!conTrongHangCho();
+    t0.post_test_status=cu;dataChanged();      /* tra lai du lieu - bo kiem khong duoc de lai dau vet */
+    return het})());
   /* (3) cau hinh hai chieu */
   t("doi THU TU nhom viec thi viec dau tien doi theo", (function(){
     var cu=C.order.slice(),ov=C.overdueFirst;
@@ -973,6 +983,25 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
     logAct("Thu","DL02","X",{a:{tu:"1",den:"2"}},"thu vut bang nho");
     return jIndex()!==b1})());
  })();
+ /* ===== 28. HUB CHO DUYET: O THONG KE PHAI BAM TOI DUOC (V9.40) =====================
+    Do bang trinh duyet that: dai o thong ke ve tu duyTabs() DAY DU trong khi dai tab di qua
+    scopeTabs (da loc quyen). NV007 5 o / 2 tab -> 3 o bam khong toi; NV005 4 o chet; NV001 4 o
+    chet. Bam vao thi duyTabSet gap key ngoai quyen, IM LANG roi ve tab dau - khong mot cau giai
+    thich. Mot o hien ra ma bam khong ra gi la thu lam nguoi dung tuong app hong. */
+ (function(){
+  var xau=[];
+  ["NV001","NV005","NV007","NV010","NV013","NV017"].forEach(function(sid){
+   if(!find("DL01","staff_id",sid))return;
+   window.GATE_SID=sid;applyScope(sid);setRole("all");window.DUYTAB="";
+   var o="";try{o=RENDER.duyet()}catch(e){return}
+   var TB=duyTabs();
+   var segs=scopeTabs("duyet",TB.map(function(x){return [x.k,x.t,x.n||"",""]}));
+   var quyen={};segs.forEach(function(s){quyen[s[0]]=1});
+   var hien={};(o.match(/duyTabSet\('([a-z]+)'/g)||[]).forEach(function(m){
+    hien[m.replace(/.*'([a-z]+)'.*/,"$1")]=1});
+   Object.keys(hien).forEach(function(k){if(!quyen[k])xau.push(sid+" bam duoc "+k+" ma khong co quyen")})});
+  window.GATE_SID="";applyScope("");setRole("all");
+  t("hub Cho duyet: moi o/tab hien ra deu thuoc quyen cua vai do"+(xau.length?": "+xau.join("; "):""), xau.length===0)})();
  t("ho so 360 co khoi 'Ai da sua ho so nay'", (function(){
    var L0=rows("DL02")[0];if(!L0)return false;
    window.JPID=L0.lead_id;var o="";try{o=RENDER.hoso()}catch(e){o=""}

@@ -203,6 +203,39 @@ const PROBE = () => {
         tthSet("on", 1); asstTick();
         return {truoc, sauTat, coTat, sauBat, sauTatCauHinh};
       });
+      /* V9.40 - HOP XAC NHAN PHAI BAM TOI DUOC KE CA KHI DANG MO NGAN KEO / TAM TRO THU.
+         Loi da xay ra that: .cfmask de z-index 95, thap hon .mask (170), .drawer (171) va .asst
+         (199). Moi thao tac qua confirmRun bam TU TRONG ngan keo deu bat hop len roi chon no
+         xuong duoi - luong khieu nai KHONG hoan thanh duoc o bat ky kho man nao, va nut "Lam
+         ngay" cua Tro thu o kho dien thoai cung chet. Ba lop chuoi khong the thay loi nay vi
+         HTML hoan toan dung; chi co elementFromPoint tren trinh duyet that moi thay. */
+      const cf = await page.evaluate(() => {
+        function tamNut() {
+          const b = document.querySelector("#cfm .cfa .btn.primary");
+          if (!b) return null;
+          const r = b.getBoundingClientRect();
+          return {x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2), r};
+        }
+        const kq = {};
+        openDrawer("Thu hop xac nhan", "<div class='dcard'><h4>thu</h4></div>");
+        confirmRun("Thu bam co toi khong?", function () {}, "");
+        let t = tamNut();
+        kq.coNut = !!t;
+        if (t) {
+          const el = document.elementFromPoint(t.x, t.y);
+          kq.trongNganKeo = !!(el && (el.closest("#cfm") || el.id === "cfm"));
+          kq.deLen = el ? (el.tagName.toLowerCase() + "." + String(el.className || "").split(" ")[0]) : "khong co gi";
+          kq.trongMan = t.r.top >= 0 && t.r.bottom <= window.innerHeight;
+        }
+        try { closeConfirm(); closeModal(); } catch (e) {}
+        return kq;
+      });
+      if (!cf.coNut) bad.push(nhan("hop xac nhan khong dung duoc nut Xac nhan"));
+      else {
+        if (!cf.trongNganKeo) bad.push(nhan("hop xac nhan bi CHON DUOI ngan keo - bam vao trung " + cf.deLen));
+        if (!cf.trongMan) bad.push(nhan("hop xac nhan nam ngoai vung nhin - phai cuon moi thay"));
+      }
+      luot++;
       if (!ct.truoc) bad.push(nhan("mac dinh tro thu phai HIEN nut goc"));
       if (ct.sauTat) bad.push(nhan("bam nut bong den TAT tro thu ma nut goc VAN CON"));
       if (!ct.sauBat) bad.push(nhan("bat lai tro thu ma nut goc khong hien"));
