@@ -210,7 +210,14 @@ t("co trang ngoai LISTCFG cung dung duoc (giao viec)", fltCode("giaoviec")==="DL
 
 /* ---- 8. AN TOAN ---- */
 (function(){
- t("trang chua khai truc thi khong ve gi (khong vo)", fltBarHTML("khongcotrangnay")==="");
+ /* V9.30: TIEU CHI NAY DOI. Truoc day trang chua khai truc loc sau thi fltBarHTML KHONG ve gi.
+    Nay o TIM KIEM va nut XUAT nam chung trong ham do (de moi trang tac vu deu co, khong phai sua
+    50 ham render), nen no van ve hai thu day. Cai phai canh gio la: KHONG duoc ve nut "Bo loc"
+    cho trang chua khai truc - ve ra thi bam vao la mot ngan keo trong. */
+ (function(){var h=fltBarHTML("khongcotrangnay");
+  t("trang chua khai truc: khong ve nut Bo loc", h.indexOf("fltOpen(")<0);
+  t("trang chua khai truc: van co o tim + nut xuat", /class="pgq"/.test(h)&&/pgExport\(/.test(h));
+  t("khong vo khi goi voi trang la", typeof h==="string")})();
  t("loc tren trang chua khai thi tra nguyen mang", fltApply("khongcotrangnay",[1,2,3]).length===3);
  reset("nhaplead");
  fltPick("nhaplead","lead_status","gia_tri_khong_ton_tai");

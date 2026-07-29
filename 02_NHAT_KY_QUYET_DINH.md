@@ -769,6 +769,28 @@
 >   đồng hồ qua ngày (luật 13d). Cùng lớp lỗi với §10b - dữ liệu neo theo ngày chạy thì **mọi mốc
 >   phải chọn cách xa mép**, không sát mép. Đã kéo về quá khứ 6 tiếng.
 >
+> **(N4) NÂNG CẤP TRANG CHO ĐỦ TÍNH NĂNG CỦA CHÍNH NÓ.**
+> Soi 59 trang/tab bằng máy: **46 trang CÓ DANH SÁCH mà KHÔNG có ô tìm kiếm**, và **0/59 xuất được
+> dữ liệu**. Trang 80 học viên không có ô tìm là người dùng phải cuộn bằng mắt; trung tâm nào cũng
+> hỏi "xuất ra Excel được không".
+> **Cách làm - đây là chỗ đáng ghi nhất:** nhét vào **ĐÚNG HAI HÀM DÙNG CHUNG** (`fltApply` lọc,
+> `fltBarHTML` vẽ thanh) thay vì sửa 50 hàm render. Trang nào đã gọi `fltApply` là **tự có cả hai**,
+> không phải đụng tới. Thêm 6 trang nữa (dự thu · xác nhận thu tiền · việc chờ nhận · bảng công ·
+> GV dự phòng · phòng & đụng lịch) chỉ bằng cách cho chúng đi qua `fltApply`. Còn 17 trang chưa có -
+> đa số là trang hồ sơ / bảng lịch, không phải danh sách.
+> **Bốn quyết định:**
+> · **Tìm quét MỌI Ô của bản ghi** (bỏ dấu tiếng Việt) - không khai danh sách cột, vì khai cột là
+>   thêm một bảng nữa phải nuôi và sớm muộn sót cột. Gõ "nguyen" ra "Nguyễn".
+> · **Xuất đúng những dòng ĐANG HIỆN**, không xuất cả bảng. `fltApply` giữ lại kết quả lọc gần nhất
+>   của từng trang; xuất cả bảng trong khi màn hình đang lọc là đưa cho người ta một tệp không
+>   giống thứ họ đang nhìn.
+> · **Có BOM trong tệp CSV** - thiếu nó thì Excel bản Việt mở ra vỡ hết dấu và người dùng nghĩ app
+>   xuất hỏng.
+> · Trang **chưa khai trục lọc sâu** vẫn có ô tìm + nút xuất, nhưng **không vẽ nút "Bộ lọc"** - vẽ ra
+>   thì bấm vào là một ngăn kéo trống. (Một tiêu chí `_check17` phải đổi theo cho đúng ý này.)
+> Bộ kiểm: gõ từ khoá thì danh sách **hẹp lại thật** (hiện ô tìm mà gõ vào không đổi gì thì tệ hơn
+> không có ô tìm), từ khoá vô nghĩa thì rỗng và **có dòng báo rỗng**, CSV bọc dấu nháy đúng chuẩn.
+>
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
 >
 > **(G) TRỢ THỦ THAO TÁC - anh Luân đặt 28/07, LÀM SAU ĐỢT AUDIT (F):** *"a muốn nghiên cứu trợ thủ

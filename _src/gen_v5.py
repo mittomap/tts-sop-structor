@@ -910,6 +910,9 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .nhipr.ok>i{color:var(--green)}
 .nhipr .nhipt{flex:1;min-width:0}
 @media(max-width:560px){.nhipr .nhipt{white-space:normal}}
+.pgq{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:8px;padding:4px 9px;background:#fff;max-width:230px}
+.pgq i{color:var(--muted);font-size:14px;flex:none}
+.pgq input{border:0;outline:0;font-family:inherit;font-size:12px;width:100%;min-width:0;background:transparent}
 .tth{background:linear-gradient(180deg,#FFFBEB,#FFF);border:1px solid #F0D08A;border-left:3px solid var(--amber);border-radius:11px;padding:11px 14px;margin-bottom:14px}
 .tth .tthh{display:flex;align-items:center;gap:7px;font-size:12px;color:#8A5A0B;margin-bottom:7px}
 .tth .tthh i{font-size:15px}
@@ -2190,9 +2193,33 @@ function fltDateOk(val,v){var d=pvnd(val);
  if(r[1]&&d>=r[1])return false;
  return true}
 /* LÕI: lọc một mảng theo trạng thái lọc của trang. Mọi trang dùng chung đúng hàm này. */
-function fltApply(pg,arr){var ax=fltAxes(pg);if(!ax.length)return arr;
+/* ═══ V9.30 (N4) - TÌM KIẾM + XUẤT DỮ LIỆU CHO MỌI TRANG TÁC VỤ ═══
+   Soi 59 trang/tab: 46 trang CÓ DANH SÁCH mà KHÔNG có ô tìm kiếm, và 0/59 xuất được dữ liệu.
+   Trang 80 học viên không có ô tìm là người dùng phải cuộn bằng mắt.
+   CÁCH LÀM: nhét vào ĐÚNG HAI HÀM DÙNG CHUNG (`fltApply` lọc, `fltBarHTML` vẽ thanh) thay vì sửa
+   50 hàm render. Trang nào đã gọi fltApply là tự có cả hai, không phải đụng tới.
+   Tìm kiếm quét MỌI Ô của bản ghi (bỏ dấu tiếng Việt) - không khai danh sách cột, vì khai cột là
+   thêm một bảng nữa phải nuôi và sớm muộn sót cột. */
+function pgqGet(pg){return (window.PGQ&&window.PGQ[pg])||""}
+function pgqSet(pg,v){window.PGQ=window.PGQ||{};window.PGQ[pg]=v;
+ var el=document.getElementById("content");if(!el)return;
+ var sc=el.scrollTop;reRenderKeep(CUR);el.scrollTop=sc;
+ var i=el.querySelector(".pgq input");if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}}
+function pgqHit(r,q){
+ for(var k in r){var v=r[k];
+  if(v==null||typeof v==="object")continue;
+  if(vnorm(v).indexOf(q)>=0)return true}
+ return false}
+/* Giữ lại kết quả lọc gần nhất của từng trang để nút Xuất biết phải xuất CÁI GÌ - xuất "toàn bộ
+   bảng" trong khi màn hình đang lọc là đưa cho người ta một tệp không giống thứ họ đang nhìn. */
+window.FLTLAST={};
+function fltApply(pg,arr){
+ var q=vnorm(pgqGet(pg)).trim();
+ if(q)arr=arr.filter(function(r){return pgqHit(r,q)});
+ var ax=fltAxes(pg);
+ if(!ax.length){window.FLTLAST[pg]=arr;return arr}
  var st=fltSt(pg);
- return arr.filter(function(r){
+ var out=arr.filter(function(r){
   for(var i=0;i<ax.length;i++){var a=ax[i],v=st[a.k];
    if(!v)continue;
    if(a.ty==="date"){if(!(v.p||v.from||v.to))continue; if(!fltDateOk(a.get(r),v))return false; continue}
@@ -2201,7 +2228,31 @@ function fltApply(pg,arr){var ax=fltAxes(pg);if(!ax.length)return arr;
    var hit=false;
    for(var j=0;j<g.length;j++)if(v.indexOf(String(g[j]))>=0){hit=true;break}
    if(!hit)return false}
-  return true})}
+  return true});
+ window.FLTLAST[pg]=out;
+ return out}
+/* ---- XUẤT CSV: xuất ĐÚNG những dòng đang hiện trên màn hình ---- */
+function csvCell(v){var s=String(v==null?"":v);
+ return /[",\n;]/.test(s)?('"'+s.split('"').join('""')+'"'):s}
+function csvOf(arr){
+ if(!arr||!arr.length)return "";
+ var cols=[];arr.forEach(function(r){for(var k in r)if(cols.indexOf(k)<0)cols.push(k)});
+ var out=[cols.join(",")];
+ arr.forEach(function(r){out.push(cols.map(function(c){return csvCell(r[c])}).join(","))});
+ return out.join("\n")}
+function pgExport(pg){
+ var arr=(window.FLTLAST&&window.FLTLAST[pg])||[];
+ if(!arr.length){toast("Không có dòng nào để xuất - bỏ bớt điều kiện lọc rồi thử lại.",4200);return}
+ /* BOM để Excel bản Việt mở ra không vỡ dấu - thiếu nó là người dùng nghĩ app xuất hỏng */
+ var csv="\ufeff"+csvOf(arr);
+ var nm=(PBK[pg]&&PBK[pg].t?slugify(PBK[pg].t):pg)+"-"+fmtYMD(new Date())+".csv";
+ try{
+  var b=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(b);a.download=nm;document.body.appendChild(a);a.click();
+  setTimeout(function(){try{document.body.removeChild(a);URL.revokeObjectURL(a.href)}catch(e){}},400);
+  toast("Đã xuất "+arr.length+" dòng ra tệp "+nm+" (mở được bằng Excel).",4600)}
+ catch(e){toast("Trình duyệt không cho tải tệp: "+e.message,5000)}}
 
 /* --- bộ lọc đã lưu: THEO TỪNG NGƯỜI, để trên máy người đó (thói quen cá nhân, không phải
        cấu hình trung tâm nên không ghi vào DATA.config) - cùng cách drwKey() đang làm --- */
@@ -2279,9 +2330,19 @@ function fltOpen(pg){var ax=fltAxes(pg);if(!ax.length){toast("Trang này chưa k
  openDrawer("Bộ lọc · "+esc((PBK[pg]||{}).t||pg),h)}
 function fltDropRun(arg){var i=String(arg).indexOf("|");fltDrop(String(arg).slice(0,i),String(arg).slice(i+1))}
 /* nút + chip trên thanh công cụ: lúc nào cũng thấy mình đang lọc những gì, gỡ được từng cái */
-function fltBarHTML(pg){if(!fltAxes(pg).length)return "";
+/* Thanh gọn cho trang KHÔNG có dải tab lọc: chỉ ô tìm + nút xuất + số dòng. Dùng lại đúng
+   fltBarHTML để hai kiểu trang không trôi khỏi nhau. */
+function pgBar(pg,cnt,extra){return tbar(fltBarHTML(pg),'<span class="tbcnt">'+cnt+' dòng</span>'+(extra||""))}
+function fltBarHTML(pg){
+ var q=pgqGet(pg);
+ var nRow=((window.FLTLAST&&window.FLTLAST[pg])||[]).length;
+ /* Ô tìm và nút Xuất có ở MỌI trang tác vụ, kể cả trang chưa khai trục lọc sâu. */
+ var h='<span class="pgq"><i class="ti ti-search"></i><input value="'+esc(q)+'" placeholder="Tìm trong trang này..." oninput="pgqSet(\''+esc(pg)+'\',this.value)" aria-label="Tìm trong trang này"></span>'+
+  (q?'<button class="pill" onclick="pgqSet(\''+esc(pg)+'\',\'\')" data-tip="Xoá từ khoá tìm"><i class="ti ti-x"></i></button>':'')+
+  '<button class="btn sm" onclick="pgExport(\''+esc(pg)+'\')" data-tip="Tải '+nRow+' dòng đang hiện ra tệp CSV - mở được bằng Excel"><i class="ti ti-table"></i>Xuất</button>';
+ if(!fltAxes(pg).length)return h;
  var n=fltOn(pg),st=fltSt(pg);
- var h='<span class="tbdiv"></span><button class="btn sm'+(n?" primary":"")+'" onclick="fltOpen(\''+esc(pg)+'\')" data-tip="Lọc sâu: người phụ trách, khoảng thời gian, lớp, khóa... kết hợp được và lưu được"><i class="ti ti-filter"></i>Bộ lọc'+(n?" ("+n+")":"")+'</button>';
+ h+='<span class="tbdiv"></span><button class="btn sm'+(n?" primary":"")+'" onclick="fltOpen(\''+esc(pg)+'\')" data-tip="Lọc sâu: người phụ trách, khoảng thời gian, lớp, khóa... kết hợp được và lưu được"><i class="ti ti-filter"></i>Bộ lọc'+(n?" ("+n+")":"")+'</button>';
  if(n){h+='<span class="fltchips">';
   fltAxes(pg).forEach(function(a){var v=st[a.k];if(!v)return;
    var txt="";
@@ -3191,8 +3252,9 @@ function duyNghiHTML(){var q=absQueue();
  if(!q.length)return '<div class="panel"><div class="empty">Không có đơn xin nghỉ nào chờ duyệt.</div></div>';
  return absQueueHTML(q,"Đơn xin nghỉ chờ duyệt");}
 /* --- tab XÁC NHẬN THU TIỀN: kế toán đối soát khoản đã ghi nhưng chưa xác nhận --- */
-function duyThuHTML(){var L=duyPayList();
+function duyThuHTML(){var L=fltApply("duyetthu",duyPayList());
  var h='<div class="notebar"><i class="ti ti-info-circle"></i>Khoản đã ghi vào sổ nhưng kế toán chưa đối soát. Xác nhận xong mới tính là tiền thật vào két.</div>';
+ h+=pgBar("duyetthu",L.length);
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Ngày thu</th><th>Học viên</th><th>Số tiền</th><th>Hình thức</th><th>Người thu</th><th></th></tr></thead><tbody>';
  if(!L.length)h+='<tr><td class="empty" colspan="6">Không còn khoản nào chờ đối soát.</td></tr>';
  L.slice(0,120).forEach(function(p){var e=find("DL06","enrollment_id",p.enrollment_id)||{};
@@ -3203,8 +3265,9 @@ function duyThuHTML(){var L=duyPayList();
    '<td><button class="btn sm green" onclick="payVerify(\''+esc(p.enrollment_id)+'\')"><i class="ti ti-check"></i>Đã đối soát</button></td></tr>'});
  return h+'</tbody></table></div></div>'}
 /* --- tab VIỆC CHỜ NHẬN: DL23 trạng thái "new" - người được giao chưa bấm nhận --- */
-function duyGiaoHTML(){var L=duyTaskList();
+function duyGiaoHTML(){var L=fltApply("duyetgiao",duyTaskList());
  var h='<div class="notebar"><i class="ti ti-info-circle"></i>Việc đã giao nhưng người nhận chưa bấm nhận. Để lâu là việc treo - chuông reo theo '+slaChip("slaTaskAccept_hours",8)+'.</div>';
+ h+=pgBar("duyetgiao",L.length);
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Việc</th><th>Giao cho</th><th>Người giao</th><th>Hạn</th><th>Mức</th><th></th></tr></thead><tbody>';
  if(!L.length)h+='<tr><td class="empty" colspan="6">Mọi việc đã giao đều có người nhận.</td></tr>';
  L.slice(0,120).forEach(function(t){
@@ -10106,6 +10169,8 @@ function renderGvdp(embed){
   '<button class="pill" onclick="gvdpSet(\''+esc(fmtYMD(new Date(day.getTime()-864e5)))+'\')"><i class="ti ti-chevron-left"></i>Hôm trước</button>'+
   '<button class="pill" onclick="gvdpSet(\''+esc(fmtYMD(new Date(day.getTime()+864e5)))+'\')">Hôm sau<i class="ti ti-chevron-right"></i></button>',
   '<span class="tbcnt">'+ses.length+' buổi</span>');
+ ses=fltApply("gvdp",ses);
+ h+=pgBar("gvdp",ses.length);
  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b>Buổi học trong ngày</b><span class="mut" style="font-size:11.5px">bấm "Đẩy người thay" để xem ai nhận được</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Lớp</th><th>Cơ sở / hình thức</th><th>GV đang phụ trách</th><th>Người thay được</th><th></th></tr></thead><tbody>';
  if(!ses.length)h+='<tr><td class="empty" colspan="6">Ngày này không có buổi học nào.</td></tr>';
  ses.forEach(function(x){var c=find("DL10","class_id",x.class_id)||{};
@@ -10159,7 +10224,7 @@ function noRoomList(){
   if(clsOnline(c)||isc(c.class_status,"finished","cancelled"))return false;
   return !roomOf(c)})}
 function renderPhong(embed){
- var cl=clashList(),nr=noRoomList();
+ var cl=fltApply("phong",clashList()),nr=noRoomList();
  var byT={phong:0,lop:0,gv:0};cl.forEach(function(x){byT[x.t]++});
  var onl=rows("DL10").filter(clsOnline).length;
  var h=embed?'':pageHead("Phòng học & đụng lịch","Soi đụng phòng, đụng giờ của lớp và của giáo viên trên toàn bộ lịch. Lớp online không tính đụng phòng - 'phòng' của nó là link riêng.","");
@@ -10170,6 +10235,7 @@ function renderPhong(embed){
   ["ti-map-pin",nr.length,"Lớp tại chỗ chưa có phòng","#7C3AED",nr.length?"tới giờ mới đi tìm phòng":"đủ phòng"],
   ["ti-user-exclamation",rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()}).length,"Lớp mở chưa có GV chính","#DB2777","giao lớp ngay"],
   ["ti-device-laptop",onl,"Lớp online","#0D9488","không ràng buộc phòng"]]);
+ h+=pgBar("phong",cl.length);
  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b>Các điểm đụng ('+cl.length+')</b><span class="mut" style="font-size:11.5px">hai mục cách nhau dưới '+slaChip("sessionSpan_hours",2,"giờ")+' thì coi là đụng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Loại</th><th>Ngày giờ</th><th>Chi tiết</th><th>Cơ sở</th><th></th></tr></thead><tbody>';
  if(!cl.length)h+='<tr><td class="empty" colspan="5">Không có điểm đụng nào - lịch sạch.</td></tr>';
  cl.slice(0,80).forEach(function(x){var d=pvnd(x.a.session_date);
@@ -11219,7 +11285,9 @@ function congSet(v){window.CONGM=v;reRender(CUR)}
 function renderCong(){
  var mo=congMonths();
  var ym=window.CONGM||mo[0]||"";
- var L=congThang(ym);
+ var L=fltApply("cong",congThang(ym).map(function(x){return {ma:x.g.staff_id,ten:x.g.full_name,
+   co_so:elabel(x.g.branch)||x.g.branch||"",buoi:x.n,online:x.onl,tre:x.late,chua_nhan_xet:x.noNote,
+   tien_cong:x.tien,_x:x}}).filter(function(r){return r.buoi})).map(function(r){return r._x});
  var tot=L.reduce(function(a,x){return a+x.n},0),tien=L.reduce(function(a,x){return a+x.tien},0);
  var noNote=L.reduce(function(a,x){return a+x.noNote},0);
  var h='<div class="notebar"><i class="ti ti-info-circle"></i><b>Bản demo chưa nối bảng lương</b> - màn này TÍNH và ĐỐI CHIẾU công, không ghi vào đâu cả. Đơn giá mỗi buổi lấy từ cấu hình: '+slaChip("teacherPayPerSession",250000,"đ/buổi")+'. Căn cứ tính: buổi có trạng thái <b>đã dạy xong</b> - đúng một định nghĩa với KPI và với hồ sơ giáo viên.</div>';
@@ -11231,6 +11299,7 @@ function renderCong(){
  h+=tbar('<span class="tblbl">Tháng</span><select class="sel" onchange="congSet(this.value)">'+
   mo.map(function(k){return '<option value="'+esc(k)+'"'+(k===ym?" selected":"")+'>'+esc(k.split("-")[1]+"/"+k.split("-")[0])+'</option>'}).join("")+'</select>',
   '<span class="tbcnt">'+L.filter(function(x){return x.n}).length+' GV có công</span>');
+ h+=pgBar("cong",L.filter(function(x){return x.n}).length);
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Giáo viên</th><th>Cơ sở</th><th>Buổi đã dạy</th><th>Chia theo cơ sở</th><th>Trong đó online</th><th>Vào trễ</th><th>Chưa ghi nhận xét</th><th>Tiền công tạm tính</th></tr></thead><tbody>';
  if(!L.filter(function(x){return x.n}).length)h+='<tr><td class="empty" colspan="8">Tháng này chưa có buổi dạy nào hoàn thành.</td></tr>';
  L.forEach(function(x){if(!x.n)return;
@@ -11258,7 +11327,7 @@ function duthuList(){var out=[];
  out.sort(function(a,b){return (a.d?a.d.getTime():9e15)-(b.d?b.d.getTime():9e15)});
  return out}
 function renderDuthu(){
- var L=duthuList();
+ var L=fltApply("duthu",duthuList());
  var late=L.filter(function(r){return r.st.k==="late"||r.st.k==="due"});
  var soon=L.filter(function(r){return r.st.k==="today"||r.st.k==="soon"});
  var far =L.filter(function(r){return r.st.k==="far"||r.st.k==="none"});
@@ -11280,6 +11349,7 @@ function renderDuthu(){
   h+='<tr><td><b>'+esc(k==="chua-hen"?"Chưa hẹn ngày":(k.split("-")[1]+"/"+k.split("-")[0]))+'</b></td><td>'+v.n+'</td><td style="font-variant-numeric:tabular-nums">'+vnd(v.v)+'</td></tr>'});
  h+='</tbody></table></div></div>';
  /* CHI TIẾT TỪNG ĐỢT - ai, đợt mấy, hạn nào, bao nhiêu, bấm thẳng vào thu tiền */
+ h+=pgBar("duthu",L.length);
  h+='<div class="panel"><div class="ph"><b>Từng đợt còn phải thu ('+L.length+')</b><div class="mini"><button class="pill" onclick="go(\'thanhtoan\')">Sang màn Thu học phí</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Hạn đóng</th><th>Học viên</th><th>Khóa</th><th>Đợt</th><th>Còn phải thu</th><th>Tình trạng</th><th></th></tr></thead><tbody>';
  if(!L.length)h+='<tr><td class="empty" colspan="7">Không còn khoản nào phải thu.</td></tr>';
  L.slice(0,120).forEach(function(r){

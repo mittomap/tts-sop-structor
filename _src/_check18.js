@@ -446,4 +446,61 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
   t("công nợ ở drawer là TỔNG các đơn", tong===0||seen.indexOf(vnd(tong))>=0)})();
 })();
 
+
+/* ---------- 19. TÌM KIẾM + XUẤT DỮ LIỆU CHO MỌI TRANG TÁC VỤ (N4) ---------- */
+(function(){
+ setRole("all");window.PGQ={};
+ t("có ô tìm và nút xuất dùng chung", typeof pgqSet==="function"&&typeof pgExport==="function"&&typeof csvOf==="function");
+ /* TÌM PHẢI LỌC THẬT - hiện ô tìm mà gõ vào không đổi gì là tệ hơn không có ô tìm */
+ (function(){
+  var pg="wow";
+  var a=(RENDER[pg]().match(/class="obcard"/g)||[]).length;
+  window.PGQ[pg]="nguyen";
+  var b=(RENDER[pg]().match(/class="obcard"/g)||[]).length;
+  window.PGQ[pg]="zzzkhongcogitrongdulieu";
+  var c0=RENDER[pg]();
+  window.PGQ={};
+  t("gõ từ khoá thì danh sách hẹp lại thật", a>0&&b>0&&b<a);
+  t("từ khoá vô nghĩa thì rỗng và có báo rỗng", (c0.match(/class="obcard"/g)||[]).length===0&&/class="empty"/.test(c0))})();
+ /* tìm phải BỎ DẤU - gõ "nguyen" phải ra "Nguyễn", nếu không thì ô tìm vô dụng với tiếng Việt */
+ (function(){
+  window.PGQ={hocvien:"nguyen"};
+  var n1=fltApply("hocvien",rows("DL09")).length;
+  window.PGQ={hocvien:"Nguyễn"};
+  var n2=fltApply("hocvien",rows("DL09")).length;
+  window.PGQ={};
+  t("tìm bỏ dấu tiếng Việt (gõ 'nguyen' ra 'Nguyễn')", n1>0&&n1===n2)})();
+ /* XUẤT phải xuất ĐÚNG những dòng đang hiện - xuất cả bảng trong khi màn hình đang lọc là đưa
+    cho người ta một tệp không giống thứ họ đang nhìn */
+ (function(){
+  RENDER.wow();var het=(window.FLTLAST.wow||[]).length;
+  window.PGQ={wow:"nguyen"};RENDER.wow();var loc=(window.FLTLAST.wow||[]).length;
+  window.PGQ={};
+  t("xuất theo đúng thứ đang hiện trên màn hình", het>0&&loc>0&&loc<het)})();
+ /* CSV phải đúng định dạng: có đủ cột, có bọc dấu nháy khi ô chứa dấu phẩy */
+ t("CSV có dòng tiêu đề cột", (csvOf([{a:"1",b:"2"}])||"").split("\n")[0]==="a,b");
+ t("CSV bọc ô có dấu phẩy", csvOf([{a:"x,y"}]).indexOf('"x,y"')>=0);
+ t("CSV nhân đôi dấu nháy trong ô", csvOf([{a:'he said "hi"'}]).indexOf('""hi""')>=0);
+ t("CSV rỗng thì trả rỗng, không vỡ", csvOf([])==="");
+ t("xuất kèm BOM cho Excel bản Việt không vỡ dấu", /\\ufeff/.test(SRC0)||SRC0.indexOf("\\ufeff")>=0);
+ /* PHỦ: các trang tác vụ chính đều phải có cả ô tìm lẫn nút xuất */
+ (function(){
+  var CAN=["test","tuvan","thanhtoan","wow","buoihoc","khieunai","ketthuc","baoluu","review","ghinhan","giaoviec","hocvien","nhaplead"];
+  var thieuTim=[],thieuXuat=[];
+  CAN.forEach(function(k){var o="";try{o=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){return}
+   if(!/class="pgq"/.test(o)&&!/class="srch"/.test(o))thieuTim.push(k);
+   if(!/pgExport\(/.test(o)&&!/class="srch"/.test(o))thieuXuat.push(k)});
+  t("trang tác vụ chính đều tìm được"+(thieuTim.length?(" - thiếu: "+thieuTim.join(", ")):""), thieuTim.length===0);
+  t("trang tác vụ chính đều xuất được"+(thieuXuat.length?(" - thiếu: "+thieuXuat.join(", ")):""), thieuXuat.length===0)})();
+ /* các hàng chờ quyết định + màn xếp lịch cũng phải xuất được (kế toán hay xin file) */
+ (function(){
+  var thieu=[];
+  [["duyet","DUYTAB","duyetthu"],["duyet","DUYTAB","duyetgiao"],["dsthanhtoan","STTAB","du"],
+   ["dsthanhtoan","STTAB","cong"],["hoctap","HTTAB","gvdp"],["hoctap","HTTAB","phong"]].forEach(function(x){
+   window[x[1]]=x[2];var o="";try{o=RENDER[x[0]]()}catch(e){}
+   if(!/pgExport\(/.test(o))thieu.push(x[0]+"#"+x[2]);window[x[1]]=undefined});
+  t("hàng chờ quyết định và màn xếp lịch cũng xuất được"+(thieu.length?(" - thiếu: "+thieu.join(", ")):""), thieu.length===0)})();
+ window.PGQ={};
+})();
+
 console.log(bad.length?("CHECK18 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK18 OK: "+ok+" tieu chi | da ve "+VIEWS.length+" trang/tab");
