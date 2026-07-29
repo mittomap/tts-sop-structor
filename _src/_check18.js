@@ -590,6 +590,67 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
   t("man Nhat ky loc duoc theo bang va theo nguoi", /nkSet\('NKTB'/.test(o)&&/nkSet\('NKWHO'/.test(o));
   t("man Nhat ky noi thang gioi han giu bao nhieu dong", o.indexOf("dòng gần nhất")>=0);
   t("man Nhat ky goi ten bang bang tieng Viet", o.indexOf("Test đầu vào")>=0||o.indexOf("Buổi học")>=0)})();
+ /* ============ 22. MOI VIEC TRONG HANG CHO DEU PHAI BAM DUOC (V9.33) ============
+    Anh Luan: "a bam vao lam ngay con chua duoc". Do ra: 44/163 viec co ma thao tac ma slaAct KHONG
+    biet ma do, nen bam xong khong lam gi VA khong bao gi. Cong them 3 viec khong co nut nao.
+    Im lang la thu lam nguoi dung tuong app hong - te hon la bao loi. */
+ (function(){
+  setRole("all");applyScope("");CURSTAFF="";
+  var L=[];try{L=slaItems()}catch(e){}
+  t("hang cho sinh ra duoc viec de kiem", L.length>0);
+  var khong=L.filter(function(x){return !slaBtn(x)});
+  t("MOI viec trong hang cho deu co nut bam"+(khong.length?(" - thieu "+khong.length):""), khong.length===0);
+  /* Ma thao tac nao cung phai duoc slaAct nhan - khong duoc roi xuong dat */
+  var SRCA=SRC0.slice(SRC0.indexOf("function slaAct("));SRCA=SRCA.slice(0,SRCA.indexOf("\nfunction ",10));
+  var la=[];
+  L.forEach(function(x){if(!x.act)return;
+   if(SRCA.indexOf('"'+x.act+'"')>=0)return;
+   if(typeof global[x.act]==="function")return;
+   if(la.indexOf(x.act)<0)la.push(x.act)});
+  t("moi ma thao tac deu duoc slaAct nhan"+(la.length?(" - la: "+la.join(", ")):""), la.length===0);
+  t("ma la thi slaAct PHAI keu len, khong duoc im lang", /chưa được nối - báo IT/.test(SRC0));
+  t("ten tham so khong bao gio roi vao o ma thao tac",
+    L.filter(function(x){return x.act&&/_days$|_hours$|_min$/.test(x.act)}).length===0);
+ })();
+ /* ============ 21. BAM MUC MENU PHAI RA DUNG MAN DO (V9.33) ============
+    Anh Luan: "bam vo may trang cho duyet no do het". That ra khong do - 6 muc trong nhom Cho duyet
+    bam vao deu ra CUNG MOT tab, nen nhin nhu trang khong phan ung.
+    Vi sao bo kiem cu khong thay: no VE tung tab bang cach TU DAT window.DUYTAB roi goi RENDER -
+    tuc la di duong tat, khong bao gio di qua go(). Ma loi nam dung o duong go() + pham vi chuc danh.
+    LUAT MOI: moi muc menu phai duoc mo BANG go() nhu nguoi dung bam, roi doi chieu man hinh nhan
+    duoc co dung la man cua muc do khong. */
+ (function(){
+  setRole("all");applyScope("");CURSTAFF="";
+  var HUBS={tuyensinh:"TSTAB",hoctap:"HTTAB",cskh:"CSTAB",khac:"KTAB",duyet:"DUYTAB"};
+  var lech=[],dem=0;
+  NAVTREE.forEach(function(g){(g.items||[]).forEach(function(k){
+   if(!PBK[k])return;
+   var truoc={};for(var v in HUBS)truoc[HUBS[v]]=window[HUBS[v]];
+   try{go(k)}catch(e){lech.push(k+" nem loi: "+e.message);return}
+   dem++;
+   var hub=null;for(var h in HUBS)if(CUR===h)hub=h;
+   if(!hub)return;                        /* trang doc lap: go() dua dung trang la du */
+   if(k===hub)return;                     /* bam chinh cai hub: ra tab mac dinh cua no la dung */
+   var sub=hubSubKey(hub);
+   if(sub!==k)lech.push(k+" -> "+hub+"#"+sub+" (le)")})});
+  /* Tab mac dinh phai khop giua ban khai va ham ve - lech la sidebar sang mot dang, man hinh mot dang */
+  var dmis=[];
+  Object.keys(HUBTAB).forEach(function(h){
+   var H=HUBTAB[h];window[H.v]=undefined;
+   var o="";try{o=RENDER[h]()}catch(e){dmis.push(h+" nem loi");return}
+   if(window[H.v]&&window[H.v]!==H.d)dmis.push(h+": ban khai '"+H.d+"' nhung ve ra '"+window[H.v]+"'");
+   window[H.v]=undefined});
+  t("tab mac dinh cua moi hub khai o MOT noi va khop voi ham ve"+(dmis.length?(" - "+dmis.join("; ")):""), dmis.length===0);
+  t("bam tung muc menu deu ra DUNG man cua muc do ("+dem+" muc)"+(lech.length?(" - lech: "+lech.slice(0,4).join(", ")):""), lech.length===0);
+  /* Quan tri vien TOAN QUYEN thi khong duoc bi chan tab o bat ky hub nao */
+  applyScope("");
+  var rs=SCOPE();
+  t("quan tri vien toan quyen khong bi chan tab o hub nao", rs.pages==="*"&&!rs.tabs);
+  t("hub Cho duyet ve du 6 tab cho quan tri vien", (function(){
+   window.DUYTAB="duyetck";var o=RENDER.duyet();
+   var n=(o.match(/duyTabSet\('/g)||[]).length;
+   return n>=6+5})());                    /* 6 tab + 5 o so bam duoc */
+ })();
  /* --- NHO TAM BANG TRA: phai vua NHO that, vua VUT dung luc --- */
  (function(){
   var a1=jIndex(),a2=jIndex();

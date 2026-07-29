@@ -841,7 +841,13 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("khong con cau 'theo luat SOP cua chang'", !/theo luật SOP của chặng/.test(SRC));
  t("chua khai nguong thi noi thang ra, khong noi vong vo", /chưa khai ngưỡng - báo kỹ thuật/.test(SRC));
  t("ten tham so doc THANG tu ham sla cua ga, khong khai lai lan hai", /function slaPrmOf\(fn\)/.test(SRC));
- t("add\\(\\) mang theo ten tham so", /function add\(cat,grp,sev,ic,who,what,age,page,filter,lead,hoso,act,rid,prm\)/.test(SRC));
+ /* V9.33: doi tu "add() co du 14 o theo thu tu" sang "add() goi 5 o cuoi THEO TEN". Chinh cai
+    signature 14 o theo thu tu la thu da de ra loi bam "Lam ngay" khong ra gi: vai cho goi thieu o
+    giua nen ten tham so roi vao o hanh dong. Tieu chi cu dang canh gac cai da gay ra loi. */
+ t("add() goi 5 o cuoi THEO TEN (khong o nao truot duoc)", /function add\(cat,grp,sev,ic,who,what,age,page,filter,o\)/.test(SRC));
+ t("moi viec sinh ra deu chi ro nguong lay tu tham so nao hoac khong ghi gi - khong bao gio nham sang o hanh dong",
+   (function(){var xau=slaItems().filter(function(x){return x.act&&/^sla[A-Z]|^threshold[A-Z]|_days$|_hours$|_min$/.test(x.act)});
+    return xau.length===0})());
  /* bon nguong moi phai co o sua that */
  ["slaDiscountApprove_hours","slaPaymentVerify_hours","slaClassInfoSend_hours","slaRiskFollowup_days"].forEach(function(k){
   t("tham so moi "+k+" co o sua", APPPARAMS.some(function(p){return p[1]===k}))});
