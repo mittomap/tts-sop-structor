@@ -329,4 +329,38 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
  window.HVID=rows("DL09")[0].student_id;
 })();
 
+/* ===== V9.40d - CONG PHU HUYNH (anh Luan: "Con cong phu huynh, cai do nen co") ==========
+   Phu huynh xem bang CHINH cong hoc vien o mot che do khac, khong dung file thu ba. Bo kiem
+   phai chung minh dung mot dieu: phan RIENG cua hoc vien khong bi lo. An o muc luc thoi la
+   CHUA DU - noi dung van nam trong trang va cuon xuong la doc duoc. */
+(function(){
+  var s=rows("DL09").filter(function(x){return ghSdt(x)})[0];
+  t("du lieu demo co hoc vien da khai so nguoi giam ho", !!s);
+  if(!s)return;
+  var cu=window.HVID,cuP=window.HVPHONE;
+  window.HVID=s.student_id;
+  window.HVPHONE="";var hv=renderTrangHV();
+  window.HVPHONE=ghSdt(s);var ph=renderTrangHV();
+  window.HVPHONE=cuP;window.HVID=cu;
+  t("hoc vien VAN thay muc trao doi rieng", hv.indexOf("s-hoidap")>=0);
+  t("hoc vien VAN thay muc gop y", hv.indexOf("s-gopy")>=0);
+  /* hai tieu chi duoi day la ly do ton tai cua ca khoi nay */
+  t("phu huynh KHONG doc duoc muc trao doi rieng cua hoc vien", ph.indexOf("s-hoidap")<0);
+  t("phu huynh KHONG doc duoc muc gop y rieng cua hoc vien", ph.indexOf("s-gopy")<0);
+  t("phu huynh VAN thay hoc phi", ph.indexOf("s-hocphi")>=0);
+  t("phu huynh VAN thay tien do hoc tap", ph.indexOf("s-tiendo")>=0);
+  t("phu huynh VAN thay nhat ky buoi hoc", ph.indexOf("s-buoihoc")>=0);
+  t("co bang nhan dien noi ro dang xem voi tu cach nguoi giam ho", (function(){
+    var p=window.HVPHONE;window.HVPHONE=ghSdt(s);var r=hvPHBar(s);window.HVPHONE=p;
+    return /tư cách/.test(r)&&/Không hiện/.test(r)})());
+  t("che do hoc vien KHONG hien bang nhan dien phu huynh", (function(){
+    var p=window.HVPHONE;window.HVPHONE="";var r=hvPHBar(s);window.HVPHONE=p;return r===""})());
+  t("ho so chua khai so nguoi giam ho thi KHONG mo cong phu huynh duoc", (function(){
+    var x=rows("DL09").filter(function(y){return !ghSdt(y)})[0];
+    if(!x)return true;
+    var p=window.HVPHONE;window.HVPHONE="";
+    try{gateEnterPH(x.student_id)}catch(e){}
+    var chan=!window.HVPHONE;window.HVPHONE=p;return chan})());
+})();
+
 console.log(bad.length?("CHECK14 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK14 OK: "+ok+" tieu chi");

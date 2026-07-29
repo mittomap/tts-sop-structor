@@ -3123,3 +3123,105 @@ nào, nay có công thật: ví dụ tháng 07 một coach có 14 buổi WOW + 1
   buổi thiếu đó;
 - bảng công vẫn tách riêng **buổi online** - ràng buộc 5 cơ sở + học online là luật xuyên suốt, thêm
   cột mới không được đẩy nó ra. (Bộ kiểm đã bắt em đúng chỗ này khi em lỡ bỏ cột online.)
+
+---
+
+## V9.40d (29/07 khuya) - LUẬT SỐ 0: APP PHẢI PHỦ TRỌN SOP
+
+Anh Luân, sau khi em xếp "hồ sơ phụ huynh" vào nhóm *lệch khỏi SOP* và bỏ qua:
+
+> *"Còn cổng phụ huynh, cái đó nên có. Trong sop a nhớ có quy định số đt phụ huynh hoặc người
+> giám hộ, nên cho chọn ai thanh toán, ai liên hệ chính luôn.
+> E đừng có quên, chúng ta viết app để phục vụ trọn vẹn SOP, nếu làm xong mà chưa thể hiện đủ
+> 100% sop tức là thất bại. Chúng ta có thể thêm, có thể bổ sung, có thể điều chỉnh để nó hợp lý
+> và logic hơn, thậm chí thêm chức năng mới để phục vụ công tác quản lý học viên tốt hơn. Nhưng
+> nếu chúng ta để thiếu sót những gì SOP đã từng mô tả, nếu chúng ta thấy nó không bị bất hợp lý,
+> mà chúng ta làm sót, nghĩa là chúng ta sai."*
+
+### Em đã sai về NGUYÊN TẮC, không phải về một chi tiết
+
+Ở V9.40 em lập một bảng "bốn mảng ERP không làm vì lệch khỏi SOP chăm sóc học viên", trong đó có
+**hồ sơ phụ huynh**. Nhưng SOP CÓ mô tả nó: `DL09` có sẵn ba cột `emergency_contact_name` /
+`_phone` / `_relation` ngay từ bản gốc, và dữ liệu mẫu của chính SOP ghi *"PH Anh · 0901110001 ·
+Phụ huynh"*.
+
+Em đã nhầm **"việc của phòng ban khác"** với **"việc SOP đã mô tả mà app chưa làm"**. Hai thứ đó
+khác hẳn nhau. Cái đầu được phép để lại; cái sau **không có quyền bỏ**.
+
+### Cái đáng sợ của loại sót này: không ai thấy bằng mắt
+
+Năm cột đó nằm trong dữ liệu, dữ liệu vẫn đủ, màn hình vẫn đẹp, mọi bộ kiểm vẫn xanh - chỉ là một
+mảng nghiệp vụ **biến mất khỏi giao diện** và không ai biết. Đo bằng máy mới thấy:
+`grep emergency_contact gen_v5.py` → **0 kết quả**.
+
+### Việc lâu dài quan trọng hơn việc vá: `_src/check_sop.py`
+
+Không vá xong rồi thôi. Em dựng một bộ kiểm **đọc thẳng `ITTs_Operations_Template_v4.xlsx`** -
+chính file SOP gốc - lấy tên cột của 19 bảng DL rồi đối chiếu với `gen_v5.py`.
+
+- **357 cột SOP mô tả.** Cột nào app không dùng phải khai vào `BOQUA` **kèm lý do đọc được**.
+- *"App không cần"* **không phải lý do** - phải nói rõ app làm gì **thay cho** cột đó.
+- Đã vào `./verify.sh`.
+
+Lần chạy đầu tiên nó chỉ ra **15 cột**: 9 sót thật và 6 cột "tự tính" của bản Google Sheets
+(`auto_trigger_hint` ×3, `sla_status` ×2, `teacher_note_within_sla`) mà app tính sống bằng
+`naLive`/`obState`/`bhState` - tốt hơn cột lưu sẵn vì cột lưu sẵn lỗi thời ngay khi trạng thái đổi.
+Sáu cột đó nay có lý do viết thành câu trong `BOQUA`, không còn im lặng bỏ qua.
+
+**Hiện: 357/357 cột SOP đều được app dùng hoặc đã khai lý do.**
+
+### Chín cột đã vá
+
+| Cột | Vá thế nào |
+|---|---|
+| `DL09.emergency_contact_name/_phone/_relation` | Khối người giám hộ trong ngăn kéo + form sửa; quan hệ chuẩn hoá về danh mục CH1 |
+| `DL09.gender`, `DL09.address` | Hiện trong ngăn kéo, sửa trong cùng form |
+| `DL10.class_level` | Cột "Trình độ" ở danh sách lớp + ngăn kéo lớp - xếp em Foundation vào lớp 7.0+ là hỏng cả lớp |
+| `DL11.class_start_scheduled` | Mốc chuẩn để tính giáo viên vào trễ (trước đây dùng `session_date`, có buổi hai mốc lệch nhau) |
+| `DL13.score_type` | Thang điểm hiện trên ô chấm và ghi lại khi chấm - thiếu nó thì điểm "7" không rõ band 7.0 hay 7/10 |
+| `DL17.student_feedback_after` | Ô "học viên nói gì sau đó" khi đóng khiếu nại + **luật SLA hỏi lại trong `slaComplaintFollowup_days`** |
+
+Riêng cột cuối đáng nói: đóng khiếu nại mà không hỏi lại em có chấp nhận cách xử lý không thì
+**mới đóng được cái phiếu, chưa đóng được cái bực** - và đây là nhóm khách dễ bỏ học nhất, cũng là
+nhóm dễ kể lại cho người khác nghe nhất.
+
+### Hai quyết định anh Luân yêu cầu thêm
+
+`contact_primary` (**ai là đầu mối liên hệ**) và `payer_side` (**ai đóng tiền**) - hai chuyện khác
+nhau và không suy ra được từ nhau: mẹ trả tiền nhưng vẫn có thể liên hệ thẳng em.
+
+Chúng không nằm im trong hồ sơ mà **đổi hành vi của app**:
+- màn gọi hỏi thăm HV vắng và màn chăm HV nguy cơ hiện đúng số cần gọi theo `contact_primary`;
+- **phiếu thu in đúng tên người nộp** (tên người giám hộ nếu họ là người đóng, kèm dòng tên học
+  viên riêng để không mất dấu);
+- **tin nhắn nhắc học phí đổi cả xưng hô**: gửi phụ huynh thì "kính gửi phụ huynh… cho cháu",
+  gửi em thì "bạn vui lòng…". Nhắn "Bạn vui lòng hoàn tất" cho phụ huynh một em cấp 3 là sai
+  xưng hô, mà nhắn cho em trong khi mẹ mới là người trả thì nhắc nhầm địa chỉ.
+
+Giá trị khởi đầu suy từ tuổi (dưới 18 thì người giám hộ là đầu mối và là người đóng), nhưng sửa
+được từng em - đó chỉ là điểm bắt đầu hợp lý, không phải luật.
+
+### Cổng phụ huynh - một CHẾ ĐỘ, không phải file thứ ba
+
+Cổng học viên đã 4,2MB. Thêm một file HTML nữa là thêm 4MB cho **cùng một bộ dữ liệu**, trong khi
+thứ phụ huynh cần là **tập con** của những gì em thấy. Nên cổng phụ huynh là một chế độ của chính
+cổng học viên, vào bằng số điện thoại người giám hộ đã khai trong hồ sơ.
+
+**Ẩn hai mục, và đây là quyết định về nguyên tắc chứ không phải về kỹ thuật:**
+"Trao đổi với trung tâm" và "Góp ý cho trung tâm" là chuyện **riêng giữa em và trung tâm**. Phụ
+huynh đọc được thì em sẽ không dám nói thật nữa, và trung tâm **mất kênh nghe em** - mất đúng thứ
+quý nhất của một hệ thống chăm sóc học viên. Băng đầu trang nói thẳng điều này với phụ huynh:
+*"đó là kênh để cháu nói thật, trung tâm xin phép giữ riêng."* Nói ra thì phụ huynh hiểu; giấu đi
+mới là thứ gây nghi ngờ.
+
+**Ẩn ở mục lục thôi là CHƯA ĐỦ** - nội dung vẫn nằm trong trang và cuộn xuống là đọc được. Phải
+không VẼ. Bộ kiểm `_check14` canh đúng chuyện đó, và đã bẻ lại (đổi `if(!hvPH())` thành `if(true)`)
+để chắc nó đỏ.
+
+Hồ sơ chưa khai số người giám hộ thì **không mở được** cổng phụ huynh - giống hệt ngoài đời, và
+màn cổng nói rõ vì sao chứ không im lặng giấu nút.
+
+### Rút ra - ghi vào `CLAUDE.md` thành LUẬT CỨNG SỐ 0
+
+**Thêm thì được, bớt thì không.** Và đừng canh bằng trí nhớ: trí nhớ đã sót 9 cột mà không ai
+biết. `check_sop.py` canh hộ, mỗi lần `./verify.sh`.

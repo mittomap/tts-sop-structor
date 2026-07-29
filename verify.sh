@@ -86,6 +86,11 @@ echo "${Dam}== 4. DU LIEU DEMO ==${Het}"
 # dong ket luan on dinh.
 chay "check_logic.py"  "KET QUA: DAT"        python3 check_logic.py
 chay "check_data.py"   "KET QUA: DAT"        python3 check_data.py
+# V9.40d (anh Luan chot): "neu chung ta de thieu sot nhung gi SOP da tung mo ta... nghia la
+# chung ta sai". Bo kiem nay doc THANG file SOP goc va doi chieu 357 cot voi app - cot nao app
+# khong dung phai khai ly do co y bo qua. Truoc do viec "da phu het SOP chua" chi dua vao tri nho,
+# va no da sot that: 5 cot ve nguoi giam ho nam chet trong du lieu, khong man hinh nao hien.
+chay "check_sop.py"    "KET QUA: DAT"        python3 check_sop.py
 
 echo
 echo "${Dam}== 5. KIEM THU TREN TRINH DUYET THAT ==${Het}"

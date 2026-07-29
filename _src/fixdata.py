@@ -630,6 +630,9 @@ ENUM_COL = {
     ("DL09", "academic_progress_status"): "enum_academic_progress_status",
     ("DL09", "attendance_risk_reason"): "enum_attendance_risk_reason",
     ("DL09", "academic_risk_reason"): "enum_academic_risk_reason",
+    ("DL09", "emergency_contact_relation"): "enum_guardian_relation",
+    ("DL09", "contact_primary"): "enum_contact_primary",
+    ("DL09", "payer_side"): "enum_payer_side",
     ("DL10", "class_status"): "enum_class_status", ("DL10", "class_level"): "enum_class_level",
     ("DL11", "session_status"): "enum_session_status",
     ("DL12", "attendance_status"): "enum_attendance_status",
@@ -1489,6 +1492,79 @@ for r in dl.get("DL03", []):
         _ttfix += 1
 log.append("14undecies. Test: kéo %d buổi ĐÃ điểm danh dự thi về quá khứ (chống trôi theo đồng hồ)"
            % _ttfix)
+
+# ═══ 14sexdecies. NGƯỜI GIÁM HỘ / PHỤ HUYNH (V9.40d - anh Luân chốt 29/07) ═
+# "Trong sop a nhớ có quy định số đt phụ huynh hoặc người giám hộ, nên cho chọn ai thanh toán,
+#  ai liên hệ chính luôn."
+# SOP DL09 CÓ sẵn emergency_contact_name / _phone / _relation (dữ liệu mẫu của SOP ghi
+# "PH Anh · 0901110001 · Phụ huynh") - nhưng app KHÔNG một dòng nào đọc tới, tức là ba cột đó
+# nằm chết trong dữ liệu suốt từ đầu. Đây là SÓT so với SOP, không phải tính năng mới.
+# Nay chuẩn hoá quan hệ về danh mục CH1 (đang là chữ tự do "Bố"/"Anh trai") và thêm HAI quyết
+# định mà anh Luân yêu cầu: ai đóng tiền, ai là đầu mối liên hệ chính.
+_rel = d.setdefault("enums", {}).setdefault("enum_guardian_relation", [])
+if not _rel:
+    _rel += ["mother (Mẹ)", "father (Bố)", "grandparent (Ông/Bà)", "sibling (Anh/Chị/Em)",
+             "spouse (Vợ/Chồng)", "guardian (Người bảo trợ)", "self (Tự lo - HV đã đi làm)",
+             "other (Người thân khác)"]
+if "enum_contact_primary" not in d["enums"]:
+    d["enums"]["enum_contact_primary"] = [
+        "student (Liên hệ thẳng học viên)",
+        "guardian (Liên hệ người giám hộ)",
+        "both (Liên hệ cả hai)"]
+if "enum_payer_side" not in d["enums"]:
+    d["enums"]["enum_payer_side"] = [
+        "student (Học viên tự đóng)",
+        "guardian (Người giám hộ đóng)",
+        "company (Công ty/đơn vị tài trợ)"]
+
+_RELMAP = {"mẹ": "mother (Mẹ)", "bố": "father (Bố)", "ba": "father (Bố)",
+           "ông": "grandparent (Ông/Bà)", "bà": "grandparent (Ông/Bà)",
+           "anh trai": "sibling (Anh/Chị/Em)", "chị gái": "sibling (Anh/Chị/Em)",
+           "anh": "sibling (Anh/Chị/Em)", "chị": "sibling (Anh/Chị/Em)", "em": "sibling (Anh/Chị/Em)",
+           "vợ/chồng": "spouse (Vợ/Chồng)", "vợ": "spouse (Vợ/Chồng)", "chồng": "spouse (Vợ/Chồng)",
+           "phụ huynh": "guardian (Người bảo trợ)"}
+
+
+def _tuoi(s):
+    """Tuổi suy từ ngày sinh - dùng để đoán mặc định ai là đầu mối liên hệ."""
+    _d = dt(s.get("dob"))
+    if not _d:
+        return None
+    return int((NOW - _d).days / 365.25)
+
+
+_gh = _pay = _ct = 0
+for _s in R("DL09"):
+    _s.setdefault("emergency_contact_name", "")
+    _s.setdefault("emergency_contact_phone", "")
+    _s.setdefault("emergency_contact_relation", "")
+    _s.setdefault("contact_primary", "")
+    _s.setdefault("payer_side", "")
+    # chuẩn hoá quan hệ về CH1
+    _r = str(_s.get("emergency_contact_relation") or "").strip()
+    if _r and "(" not in _r:
+        _s["emergency_contact_relation"] = _RELMAP.get(_r.lower(), "other (Người thân khác)")
+        _gh += 1
+    _tu = _tuoi(_s)
+    _co_gh = bool(str(_s.get("emergency_contact_phone") or "").strip())
+    # Mặc định hợp lý: HV dưới 18 thì người giám hộ là đầu mối và là người đóng tiền;
+    # từ 18 trở lên thì tự lo. Đây chỉ là giá trị KHỞI ĐẦU - trung tâm sửa được từng em.
+    if not str(_s.get("contact_primary") or "").strip():
+        if _tu is not None and _tu < 18 and _co_gh:
+            _s["contact_primary"] = "guardian (Liên hệ người giám hộ)"
+        elif _co_gh:
+            _s["contact_primary"] = "both (Liên hệ cả hai)"
+        else:
+            _s["contact_primary"] = "student (Liên hệ thẳng học viên)"
+        _ct += 1
+    if not str(_s.get("payer_side") or "").strip():
+        if _tu is not None and _tu < 18 and _co_gh:
+            _s["payer_side"] = "guardian (Người giám hộ đóng)"
+        else:
+            _s["payer_side"] = "student (Học viên tự đóng)"
+        _pay += 1
+log.append("14sexdecies. Nguoi giam ho: chuan hoa %d quan he ve CH1, dat mac dinh dau moi lien he "
+           "cho %d HV va nguoi dong tien cho %d HV" % (_gh, _ct, _pay))
 
 # ═══ 14quindecies. MỐC GIỜ BUỔI WOW + CA TEST (V9.40c - anh Luân chốt 29/07) ═
 # "Buổi wow cũng phải quản lý chặt" / "Test đầu vào thì tính theo lần nhưng vẫn phải ghi nhận

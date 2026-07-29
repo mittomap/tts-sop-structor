@@ -1638,3 +1638,48 @@ Trang WOW có thêm chỉ số **"Giờ kèm đã ghi nhận"**, kèm số buổ
 | Ca test đầu vào | theo lần |
 
 Giáo viên WOW từ chỗ không xuất hiện trong bảng công nào, nay có công thật.
+
+---
+
+## V9.40d - Người giám hộ và cổng phụ huynh
+
+### Hồ sơ học viên nay có người giám hộ
+
+SOP quy định phải ghi số điện thoại phụ huynh / người giám hộ. Ngăn kéo học viên nay hiện đủ:
+tên, quan hệ, số điện thoại bấm gọi được, cùng giới tính và địa chỉ.
+
+Kèm **hai quyết định** cho từng em:
+
+- **Ai là đầu mối liên hệ chính** - gọi thẳng học viên, gọi người giám hộ, hay gọi cả hai.
+- **Ai đóng học phí** - học viên tự đóng, người giám hộ đóng, hay công ty tài trợ.
+
+Hai lựa chọn này không nằm im trong hồ sơ mà đổi cách app làm việc:
+
+- Màn **gọi hỏi thăm học viên vắng** và màn **chăm học viên nguy cơ** hiện sẵn đúng số cần gọi.
+- **Phiếu thu in đúng tên người nộp** - nếu người giám hộ là người đóng thì phiếu ghi tên họ, kèm
+  dòng tên học viên riêng.
+- **Tin nhắn nhắc học phí đổi cả xưng hô** - gửi phụ huynh thì "kính gửi phụ huynh… cho cháu",
+  gửi học viên thì "bạn vui lòng…".
+
+Em nào chưa có người giám hộ thì ngăn kéo nói rõ và có nút thêm ngay tại đó.
+
+### Cổng phụ huynh
+
+Phụ huynh vào **cùng cổng học viên**, ở chế độ riêng, bằng số điện thoại đã khai trong hồ sơ.
+Ở màn chọn người, mỗi học viên có thêm nút **"Vào như phụ huynh"**.
+
+**Phụ huynh thấy:** tình hình học tập, chuyên cần, điểm số, nhật ký từng buổi học, nhật ký buổi
+WOW, học phí và lịch đóng đợt, khảo sát, chứng nhận.
+
+**Phụ huynh KHÔNG thấy:** phần con trao đổi riêng với trung tâm và phần con góp ý riêng. Băng đầu
+trang nói thẳng điều này - đó là kênh để các em nói thật, trung tâm giữ riêng.
+
+Đầu trang chào đúng tên phụ huynh và ghi rõ đang xem trang của em nào, với tư cách gì.
+
+### Bốn chỗ khác SOP có mà app còn thiếu
+
+- **Trình độ lớp** hiện ở danh sách lớp và ngăn kéo lớp.
+- **Giờ bắt đầu dự kiến của buổi** thành mốc chuẩn để tính giáo viên vào trễ.
+- **Thang điểm** hiện trên ô chấm bài và được ghi lại khi chấm.
+- **Học viên nói gì sau khi đóng khiếu nại** - có ô nhập khi đóng, và nếu để trống thì việc "hỏi
+  lại học viên" vẫn nằm trong hàng chờ cho tới khi có câu trả lời.

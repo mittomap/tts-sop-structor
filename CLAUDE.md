@@ -28,6 +28,24 @@ Chủ dự án: Luân. Mọi phiên làm việc (Claude Code hay Claude Cowork) 
   pipeline, không sửa tay JSON.
 - Thêm icon ti-* mới = dựng lại font subset theo công thức trong README_SRC (thiếu là _tall.js báo).
 
+## LUẬT CỨNG SỐ 0 - PHỦ TRỌN SOP (anh Luân chốt 29/07, cao hơn mọi luật khác)
+
+> *"Chúng ta viết app để phục vụ trọn vẹn SOP, nếu làm xong mà chưa thể hiện đủ 100% SOP tức là
+> thất bại. Chúng ta có thể thêm, có thể bổ sung, có thể điều chỉnh để nó hợp lý và logic hơn,
+> thậm chí thêm chức năng mới để phục vụ công tác quản lý học viên tốt hơn. Nhưng nếu chúng ta
+> để thiếu sót những gì SOP đã từng mô tả, nếu chúng ta thấy nó không bị bất hợp lý, mà chúng ta
+> làm sót, nghĩa là chúng ta sai."*
+
+- **THÊM thì được, BỚT thì không.** Thấy SOP mô tả một thứ mà app chưa có -> làm, không cần hỏi.
+  Thấy một thứ SOP không có mà nên có -> đề xuất rồi làm.
+- **Không được tự xếp một mảng SOP vào diện "lệch khỏi trọng tâm" rồi bỏ.** Đã cắn một lần:
+  hồ sơ phụ huynh bị xếp nhầm là "việc phòng ban khác" trong khi SOP có mô tả (DL09 có sẵn ba cột
+  `emergency_contact_*` từ đầu). "Việc của phòng ban khác" và "việc SOP đã mô tả mà chưa làm" là
+  hai chuyện khác hẳn nhau - cái sau không có quyền bỏ.
+- **Canh bằng máy, không bằng trí nhớ:** `_src/check_sop.py` đọc THẲNG `ITTs_Operations_Template_v4.xlsx`
+  và đối chiếu 357 cột với `gen_v5.py`. Cột nào app không dùng phải khai vào `BOQUA` **kèm lý do
+  đọc được**. Đã nằm trong `./verify.sh`.
+
 ## LUẬT CỨNG rút gọn (bản đầy đủ trong 00/01/02)
 
 - Tiếng Việt mộc, xưng hô "em - anh Luân" khi trò chuyện; KHÔNG emoji; dùng "-" không dùng

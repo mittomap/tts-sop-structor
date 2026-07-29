@@ -44,6 +44,19 @@ Mọi ngưỡng đi qua `paramOf` (CH2), mọi câu nhắc đi qua `msgText` (CH
 `kpiTh` (CH6). Lý do: chủ trung tâm phải tự đổi được trong màn Cài đặt mà không cần gọi bạn. Gõ
 thẳng số vào code là biến một thao tác 5 giây của họ thành một lần deploy của bạn.
 
+### LUẬT 2bis - App phải PHỦ TRỌN SOP. Thêm thì được, bớt thì không.
+
+Chủ dự án chốt: *"nếu chúng ta để thiếu sót những gì SOP đã từng mô tả... nghĩa là chúng ta sai."*
+
+Bạn được phép thêm chức năng mới, sửa cho hợp lý hơn, gộp hai màn làm một. Bạn **không** được
+phép nhìn một mảng SOP rồi tự kết luận "cái này lệch trọng tâm, bỏ qua". Đã có người cắn: năm cột
+về người giám hộ trong `DL09` nằm trong SOP, nằm sẵn trong dữ liệu, mà **không một dòng mã nào đọc
+tới** - loại sót này không ai thấy được bằng mắt, vì dữ liệu vẫn đủ và màn hình vẫn đẹp.
+
+`./verify.sh` có `check_sop.py` đọc thẳng file SOP gốc và đối chiếu **357 cột**. Cột nào app không
+dùng phải khai vào `BOQUA` trong file đó **kèm lý do**; "app không cần" không phải lý do - phải nói
+rõ app làm gì thay cho cột đó.
+
 ### LUẬT 3 - Chạy `./verify.sh` trước khi giao. Đỏ thì không giao.
 
 ```bash
@@ -74,6 +87,7 @@ cd _src && python3 build_icons.py  # cần: pip install fonttools brotli
 | Icon `ti-*` mới mà quên dựng lại font (từ V9.40 mới đỏ thật) | Trải nghiệm có dễ dùng không - cái đó phải có người thật ngồi thử |
 | Hộp xác nhận bị chôn dưới ngăn kéo, phần tử bấm không tới (đo `elementFromPoint` trong Chromium) | Một việc "xong" mà thật ra chưa ai làm gì - phải tự nghĩ khi viết luật SLA |
 | Dữ liệu demo mâu thuẫn với luật nghiệp vụ | |
+| Cột SOP mô tả mà app không dùng (`check_sop.py`, 357 cột) | SOP mô tả một **quy trình** mà app làm thiếu bước - chỉ đọc SOP mới thấy |
 
 Nói cách khác: nó chặn phần lớn tai nạn, **không** biến người bất cẩn thành an toàn. Đọc mã vẫn cần.
 
