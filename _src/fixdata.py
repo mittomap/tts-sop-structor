@@ -1426,6 +1426,70 @@ d["meta"]["anchor"] = fmt(NOW)
 d["meta"]["anchor_note"] = ("Ngày sinh dữ liệu demo. App dịch toàn bộ mốc thời gian theo BỘI SỐ 7 "
                             "NGÀY để giữ nguyên thứ trong tuần của lịch lớp.")
 
+# ═══ 14decies. XẾP LỚP PHẢI TRỎ ĐÚNG ĐƠN CỦA KHÓA ĐÓ (V9.30) ═══════════════
+# Do hàm stuKhoaLop() mới bắt được: học viên học 2 khóa thì dòng xếp lớp của khóa SAU vẫn trỏ vào
+# đơn của khóa TRƯỚC. Hệ quả trên màn hình: drawer xem nhanh khai một cặp "khóa 6.5 - lớp 7.0+"
+# KHÔNG CÓ THẬT, và tiền của đơn này bị treo lên lớp của đơn kia.
+# Vá: dòng xếp lớp nào có lớp thuộc khóa X thì nối vào đơn của CHÍNH khóa X của học viên đó.
+_clsIdx2 = {c.get("class_id"): c for c in dl.get("DL10", [])}
+_enrOf = {}
+for e in dl.get("DL06", []):
+    sid = str(e.get("student_id") or "").strip()
+    if sid:
+        _enrOf.setdefault(sid, []).append(e)
+_relink = 0
+for o in dl.get("DL08", []):
+    cid = str(o.get("class_id") or "").strip()
+    if not cid:
+        continue
+    c = _clsIdx2.get(cid)
+    if not c:
+        continue
+    cur = IDX["DL06"].get(str(o.get("enrollment_id") or ""))
+    if cur and str(cur.get("course_id") or "") == str(c.get("course_id") or ""):
+        continue                       # đã đúng cặp
+    for e in _enrOf.get(str(o.get("student_id") or ""), []):
+        if str(e.get("course_id") or "") == str(c.get("course_id") or "") \
+           and not code(e.get("enrollment_status", "")).startswith("cancelled"):
+            o["enrollment_id"] = e.get("enrollment_id")
+            _relink += 1
+            break
+# Nối lại xong thì lộ tiếp một chuyện: đơn "học tiếp" được gieo với ngày đăng ký SAU ngày em đó
+# đã được xếp vào lớp của chính khóa đó (luật 13g: xếp lớp trước khi đăng ký). Trước đây không ai
+# thấy vì dòng xếp lớp còn đang trỏ nhầm sang đơn cũ - vá một chỗ thì chỗ kia mới lộ ra.
+# Kéo ngày đăng ký về trước lần xếp lớp sớm nhất của chính đơn đó.
+_early = {}
+for o in dl.get("DL08", []):
+    eid = str(o.get("enrollment_id") or "")
+    a = dt(o.get("assigned_at"))
+    if eid and a and (eid not in _early or a < _early[eid]):
+        _early[eid] = a
+_dkfix = 0
+for e in dl.get("DL06", []):
+    a = _early.get(str(e.get("enrollment_id") or ""))
+    t0 = dt(e.get("enrollment_time"))
+    if a and t0 and t0 > a:
+        e["enrollment_time"] = fmt(a - datetime.timedelta(days=2))
+        _dkfix += 1
+log.append("14decies. Xếp lớp: nối lại %d dòng vào ĐÚNG đơn của khóa mà lớp đó thuộc về; "
+           "kéo %d ngày đăng ký về trước lần xếp lớp" % (_relink, _dkfix))
+
+# ═══ 14undecies. ĐÃ ĐIỂM DANH THI THÌ BUỔI TEST PHẢI Ở QUÁ KHỨ (V9.30) ═══
+# Lại là BẪY THỜI GIAN: pipeline gieo buổi test quanh "bây giờ", vài giờ sau đồng hồ chạy qua là
+# buổi đó nằm ở TƯƠNG LAI trong khi đã có điểm danh dự thi (luật 13d đỏ). Cùng một lớp lỗi với
+# §10b - dữ liệu neo theo ngày chạy thì mọi mốc phải chọn CÁCH XA mép, không sát mép.
+# Kéo buổi test đã có điểm danh về ít nhất 6 tiếng trước.
+_ttfix = 0
+for r in dl.get("DL03", []):
+    if not str(r.get("test_attendance_status") or "").strip():
+        continue
+    td = dt(r.get("test_date"))
+    if td and td > NOW - datetime.timedelta(hours=6):
+        r["test_date"] = fmt(NOW - datetime.timedelta(hours=6))
+        _ttfix += 1
+log.append("14undecies. Test: kéo %d buổi ĐÃ điểm danh dự thi về quá khứ (chống trôi theo đồng hồ)"
+           % _ttfix)
+
 # ═══ 15. SAN PHẲNG SƠ ĐỒ CỘT (UNION KEY) - PHẢI LÀ PASS CUỐI CÙNG ═════════
 # Cột chỉ có mặt ở vài dòng (referrer_name, referral_uses, net_received...) làm app render
 # ô trống và bản Sheets lệch cột. LUẬT: mọi dòng trong cùng một bảng phải CÙNG BỘ CỘT.

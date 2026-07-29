@@ -751,6 +751,24 @@
 > KHÔNG được tự dịch** vì đó là dữ liệu thật của trung tâm.
 > Bộ kiểm canh **đi rồi về phải khớp y nguyên**, thứ trong tuần không đổi, ghi chú không bị đụng.
 >
+> **(N3) CĂN CHỈNH CHO LOGIC Ở MỌI CỔNG - và cách kiểm nó.**
+> "Đồng bộ các cổng" không kiểm bằng cách đọc code được. Nay bộ kiểm **lấy CÙNG một học viên, đọc
+> số ở cổng nhân viên và số IN RA ở cổng học viên, rồi bắt chúng khớp** - trên 60 hồ sơ. Đây là kiểu
+> lỗi khó tin nhất khi đang demo trước mặt khách: hai màn hình cạnh nhau nói hai con số.
+> **Ba lỗi thật lộ ra từ lượt đối chiếu đầu tiên:**
+> · **Ghép sai cặp khóa - lớp.** Drawer xem nhanh lấy `stuCourse()` (đơn ĐẦU TIÊN) cho ô "Khóa" và
+>   lấy dòng xếp lớp đầu tiên cho ô "Lớp". Học viên học HAI khóa thì hai ô đó thuộc HAI đơn khác
+>   nhau - màn hình khai một cặp **KHÔNG CÓ THẬT**. Bắt tại HV060: ô Khóa ghi *IELTS 6.5* mà ô Lớp
+>   ghi *IELTS 7.0+*. Nay có `stuKhoaLop()` trả về đúng từng cặp, dùng chung mọi màn.
+> · **Công nợ chỉ đọc đơn đầu tiên** - em còn nợ 10 triệu ở đơn thứ hai mà drawer nói 0đ. Nay ô
+>   Công nợ là **TỔNG các đơn** và nói rõ "(cộng cả N đơn)".
+> · **Dữ liệu: 2 dòng xếp lớp trỏ vào đơn của khóa KHÁC** (`fixdata` §14decies). Vá xong chỗ này thì
+>   **lộ tiếp** một lỗi vốn bị che: đơn "học tiếp" có ngày đăng ký SAU ngày em đó đã được xếp lớp
+>   (luật 13g). Vá một chỗ thì chỗ kia mới lộ ra - lý do phải chạy lại TOÀN BỘ bộ kiểm sau mỗi lần vá.
+> · **Bẫy thời gian lần hai:** buổi test đã điểm danh dự thi mà `test_date` trôi sang tương lai khi
+>   đồng hồ qua ngày (luật 13d). Cùng lớp lỗi với §10b - dữ liệu neo theo ngày chạy thì **mọi mốc
+>   phải chọn cách xa mép**, không sát mép. Đã kéo về quá khứ 6 tiếng.
+>
 > **(E) Việc tồn đợt 2** (mục HỘI ĐỒNG ĐỢT 2 bên dưới): 23 mục NẶNG về giáo viên/xếp lịch/tiền.
 >
 > **(G) TRỢ THỦ THAO TÁC - anh Luân đặt 28/07, LÀM SAU ĐỢT AUDIT (F):** *"a muốn nghiên cứu trợ thủ

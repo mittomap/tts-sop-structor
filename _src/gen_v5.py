@@ -2472,13 +2472,19 @@ function stuRiskReasons(s){var out=[];var sid=s.student_id;
   if(miss)t2+=" · thiếu "+miss+" bài tập";out.push(t2)}
  return out}
 function openStuQuick(sid){var s=find("DL09","student_id",sid);if(!s){toast("Không thấy học viên");return}
- var cc=stuCourse(sid);var cls=rows("DL08").filter(function(o){return o.student_id===sid})[0];
- var clsName=cls?(cls.class_id_name||cls.class_id):"";
+ var KL=stuKhoaLop(sid);var no=stuNoTong(sid);
  var st=stuAttStats(sid);var risk=isRisk(s.attendance_progress_status)||isRisk(s.academic_progress_status);
  var J=null;try{J=jInfo(sid)}catch(e){}
  function pch(v){return '<span class="chip '+(isRisk(v)?"red":(ecode(v)?"green":"gray"))+'">'+esc(elabel(v)||"-")+'</span>'}
  var h='<div style="margin-bottom:10px"><span class="chip '+(J&&J.S?J.S.cls:"gray")+'">'+esc(J&&J.S?J.S.t:(elabel(s.student_status)||"Học viên"))+'</span>'+(risk?' <span class="chip red"><i class="ti ti-alert-triangle" style="margin-right:3px"></i>Nguy cơ</span>':'')+'</div>';
- h+=ctxRows([["SĐT",telHTML(s.phone_number)],["Khóa",cc.course_name||cc.course_id],["Lớp",clsName],
+ /* Học nhiều khóa thì liệt kê TỪNG CẶP khóa - lớp, không gộp bừa hai đơn thành một dòng. */
+ var klHTML=KL.length
+  ? KL.map(function(x){return '<div>'+esc(x.course||"(chưa gắn khóa)")+(x.cls?(' · '+lopLnk(x.cid,x.cls,"")):' · <span class="mut">chưa xếp lớp</span>')+
+     (x.rem>0?(' · <b style="color:var(--red)">còn '+vnd(x.rem)+'</b>'):'')+'</div>'}).join("")
+  : '<span class="mut">chưa có đăng ký</span>';
+ h+=ctxRows([["SĐT",telHTML(s.phone_number)],
+  [KL.length>1?("Khóa - lớp ("+KL.length+" đơn)"):"Khóa - lớp",klHTML],
+  ["Công nợ",no>0?('<b style="color:var(--red)">'+vnd(no)+'</b>'+(KL.length>1?' <span class="mut">(cộng cả '+KL.length+' đơn)</span>':'')):'<span class="chip green">đã đóng đủ</span>'],
   ["Chuyên cần",st.rate!=null?st.rate+"% ("+st.pres+"/"+st.n+" buổi)":"chưa có buổi"],
   ["Trạng thái chuyên cần",pch(s.attendance_progress_status)],["Trạng thái học thuật",pch(s.academic_progress_status)]]);
  if(risk){var rs=stuRiskReasons(s);
@@ -7353,6 +7359,29 @@ function hoursSince(s){var d=pvnd(s);return d?(Date.now()-d.getTime())/3600000:n
 function nowStr(){var d=new Date();function p(n){return n<10?"0"+n:n}return p(d.getDate())+"/"+p(d.getMonth()+1)+"/"+d.getFullYear()+" "+p(d.getHours())+":"+p(d.getMinutes())}
 function obState(o){var sent=!!(o.class_info_sent_at&&String(o.class_info_sent_at).trim());var confirmed=/confirmed/.test(ecode(o.class_confirmation_status));var rejected=ecode(o.class_confirmation_status)==="rejected";var done=/completed/.test(ecode(o.onboarding_status));var infoLim=paramOf("slaClassInfoZalo_hours",24),obLim=paramOf("slaOBT_hours",48);var hs=hoursSince(o.assigned_at);return {sent:sent,confirmed:confirmed,rejected:rejected,done:done,infoOverdue:!sent&&hs!=null&&hs>infoLim,obOverdue:!done&&hs!=null&&hs>obLim}}
 function stuCourse(sid){var e=rows("DL06").filter(function(x){return x.student_id===sid&&!/cancel/.test(ecode(x.enrollment_status))})[0]||rows("DL06").filter(function(x){return x.student_id===sid})[0]||{};return {course_id:e.course_id||"",course_name:e.course_id_name||""}}
+/* ═══ V9.30 (N3) - GHÉP ĐÚNG CẶP KHÓA - LỚP - TIỀN CỦA MỘT HỌC VIÊN ═══
+   Bẫy đã cắn: drawer xem nhanh lấy `stuCourse(sid)` (đơn ĐẦU TIÊN) cho ô "Khóa" và lấy dòng DL08
+   đầu tiên cho ô "Lớp". Học viên học HAI khóa thì hai ô đó thuộc HAI đơn khác nhau - màn hình khai
+   một cặp khóa-lớp KHÔNG CÓ THẬT. Đã bắt được tại HV060: ô Khóa ghi "IELTS 6.5" mà ô Lớp ghi
+   "IELTS 7.0+".
+   Và ô công nợ cũng vậy: lấy đơn đầu tiên là nói 0đ trong khi em đó còn nợ 10 triệu ở đơn kia.
+   Một hàm trả về ĐÚNG TỪNG CẶP + tổng tiền, mọi màn dùng chung. */
+function stuKhoaLop(sid){
+ var out=[],seen={};
+ rows("DL06").filter(function(e){return String(e.student_id||"")===String(sid)&&!isc(e.enrollment_status,"cancelled")})
+  .forEach(function(e){
+   var ob=rows("DL08").filter(function(o){return o.student_id===sid&&String(o.enrollment_id||"")===String(e.enrollment_id||"")})[0];
+   if(ob&&ob.onboarding_id)seen[ob.onboarding_id]=1;
+   out.push({enr:e,course:e.course_id_name||e.course_id||"",
+    cls:ob?(ob.class_id_name||ob.class_id||""):"",cid:ob?ob.class_id:"",
+    rem:num(e.remaining_amount),paid:num(e.paid_amount)})});
+ /* lớp đã xếp mà chưa nối được vào đơn nào - vẫn phải hiện, giấu đi là học viên "mất lớp" */
+ rows("DL08").filter(function(o){return o.student_id===sid&&String(o.class_id||"").trim()&&!seen[o.onboarding_id]})
+  .forEach(function(o){out.push({enr:{},course:"",cls:o.class_id_name||o.class_id,cid:o.class_id,rem:0,paid:0})});
+ return out}
+function stuNoTong(sid){return rows("DL06")
+ .filter(function(e){return String(e.student_id||"")===String(sid)&&!isc(e.enrollment_status,"cancelled")})
+ .reduce(function(a,e){return a+num(e.remaining_amount)},0)}
 function classOptsFor(sid,exceptCid){var cc=stuCourse(sid);var all=rows("DL10").filter(function(c){return c.class_id!==exceptCid&&!/finished|cancelled/.test(ecode(c.class_status))});
  var match=all.filter(function(c){return cc.course_id&&c.course_id===cc.course_id});var other=all.filter(function(c){return !(cc.course_id&&c.course_id===cc.course_id)});
  function opt(c,tag){var si=num(c.current_enrollment),cap=num(c.class_capacity);var full=cap&&si>=cap;return '<option value="'+esc(c.class_id)+'"'+(full?" disabled":"")+'>'+esc((tag?tag+" ":"")+c.class_id+" - "+c.class_name)+' ('+si+'/'+(cap||"?")+(full?" - đầy":"")+')</option>'}

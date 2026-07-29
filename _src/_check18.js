@@ -380,4 +380,70 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
   t("tab Dữ liệu demo nói rõ dữ liệu sinh ngày nào", /Dữ liệu sinh ngày/.test(o))})();
 })();
 
+
+/* ---------- 17. HAI CỔNG PHẢI NÓI CÙNG MỘT CON SỐ (N3) ----------
+   "Đồng bộ các cổng" không phải là nói suông: lấy CÙNG một học viên, đọc số ở cổng nhân viên và
+   số in ra ở cổng học viên, rồi bắt chúng khớp. Đây là kiểu lỗi khó tin nhất khi đang demo trước
+   mặt khách - hai màn hình cạnh nhau nói hai con số. */
+(function(){
+ var vm=require('vm');
+ var sb={console:console,require:require,Math:Math,JSON:JSON,Date:Date,RegExp:RegExp,
+  parseInt:parseInt,parseFloat:parseFloat,isNaN:isNaN,String:String,Number:Number,Object:Object,
+  Array:Array,setTimeout:function(){},clearTimeout:function(){}};
+ sb.window=sb;sb.document=global.document;sb.location={hash:"",search:"",pathname:"/cong-hoc-vien/"};
+ sb.history={replaceState:function(){}};sb.localStorage=global.localStorage;sb.sessionStorage=global.sessionStorage;
+ vm.createContext(sb);
+ try{vm.runInContext(fs.readFileSync('./_HV.js','utf8'),sb)}catch(e){t("nạp được cổng học viên để đối chiếu",false);return}
+ t("nạp được cổng học viên để đối chiếu", typeof sb.renderTrangHV==="function");
+ var lech=[],n=0;
+ rows("DL09").slice(0,60).forEach(function(s){
+  var sid=s.student_id;
+  var nv=stuAttStats(sid);
+  sb.window.HVID=sid;
+  var h="";try{h=sb.renderTrangHV()}catch(e){lech.push(sid+" vỡ: "+e.message);return}
+  n++;
+  var m=h.match(/Chuyên cần<\/span>[\s\S]{0,140}?(\d+)% \((\d+)\/(\d+) buổi\)/);
+  if(m){
+   if(nv.rate!=null&&+m[1]!==nv.rate)lech.push(sid+" chuyên cần "+nv.rate+"% vs "+m[1]+"%");
+   if(+m[2]!==nv.pres||+m[3]!==nv.n)lech.push(sid+" số buổi "+nv.pres+"/"+nv.n+" vs "+m[2]+"/"+m[3])}
+  var mn=h.match(/Còn phải đóng<\/span><b[^>]*>([\d.]+)đ/);
+  if(mn){
+   var noHV=+mn[1].replace(/\./g,"");
+   var ds=rows("DL06").filter(function(e){return e.student_id===sid&&!isc(e.enrollment_status,"cancelled")})
+    .map(function(e){return num(e.remaining_amount)});
+   if(!ds.some(function(v){return Math.abs(v-noHV)<=1}))lech.push(sid+" công nợ cổng HV "+noHV+" không khớp đơn nào ("+ds.join("/")+")")}});
+ t("đối chiếu được ít nhất 40 hồ sơ (đang "+n+")", n>=40);
+ t("hai cổng nói cùng một con số"+(lech.length?(" - "+lech.slice(0,3).join(" | ")):""), lech.length===0);
+})();
+
+/* ---------- 18. GHÉP ĐÚNG CẶP KHÓA - LỚP - TIỀN ----------
+   Học viên học 2 khóa mà màn hình ghép "khóa của đơn A" với "lớp của đơn B" là khai một cặp
+   KHÔNG CÓ THẬT. Đã bắt được tại HV060 (ô Khóa ghi 6.5, ô Lớp ghi 7.0+). */
+(function(){
+ t("có hàm ghép cặp dùng chung", typeof stuKhoaLop==="function"&&typeof stuNoTong==="function");
+ var sai=[];
+ rows("DL09").forEach(function(s){
+  stuKhoaLop(s.student_id).forEach(function(x){
+   if(!x.cid||!x.enr||!x.enr.course_id)return;
+   var c=find("DL10","class_id",x.cid);
+   if(c&&String(c.course_id||"")!==String(x.enr.course_id||""))
+    sai.push(s.student_id+": đơn "+x.enr.course_id+" ghép lớp khóa "+c.course_id)})});
+ t("không ghép khóa của đơn này với lớp của đơn kia"+(sai.length?(" - "+sai.slice(0,3).join(" | ")):""), sai.length===0);
+ /* công nợ ở drawer phải là TỔNG các đơn, không phải đơn đầu tiên */
+ (function(){
+  var cnt={};rows("DL06").forEach(function(e){if(isc(e.enrollment_status,"cancelled")||!e.student_id)return;
+   cnt[e.student_id]=(cnt[e.student_id]||0)+1});
+  var multi=Object.keys(cnt).filter(function(k){return cnt[k]>1});
+  t("có học viên học nhiều khóa để kiểm", multi.length>0);
+  if(!multi.length)return;
+  var sid=multi.filter(function(k){return stuNoTong(k)>0})[0]||multi[0];
+  var seen="";var od=global.openDrawer;global.openDrawer=function(a,b){seen=b};
+  try{openStuQuick(sid)}catch(e){}
+  global.openDrawer=od;
+  t("drawer xem nhanh có nói công nợ", /Công nợ/.test(seen));
+  t("drawer liệt kê đủ số đơn", seen.indexOf(stuKhoaLop(sid).length+" đơn")>=0||stuKhoaLop(sid).length<=1);
+  var tong=stuNoTong(sid);
+  t("công nợ ở drawer là TỔNG các đơn", tong===0||seen.indexOf(vnd(tong))>=0)})();
+})();
+
 console.log(bad.length?("CHECK18 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK18 OK: "+ok+" tieu chi | da ve "+VIEWS.length+" trang/tab");
