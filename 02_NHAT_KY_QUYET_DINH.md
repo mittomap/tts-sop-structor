@@ -149,7 +149,27 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.49 — MỘT TRỢ LÝ · TRẢ LỜI CÓ TRỌNG TÂM · ĐÁNH GIÁ TOÀN DIỆN FORM GHI ✅ (30/07).**
+> **Phiên bản: V9.50 — 6 GÓP Ý SOÁT TAY CỦA ANH LUÂN, MỖI CÁI MỘT LỖI THẬT ✅ (30/07 chiều).**
+> · **Sidebar nhảy theo tab hub** (reRender nay buildNav - vá tầng chung, badge menu cũng tươi).
+> · **Đổi nốt 19 nhãn "Trợ thủ" -> "Trợ lý"** còn sót từ V9.48; bộ kiểm vứt comment rồi soi, ngoài
+> comment không còn chữ nào.
+> · **Trợ lý hết tìm sai người**: kho tìm thêm DL01 (hỏi tên giáo viên/nhân viên ra đúng người,
+> thẻ riêng + nút mở hồ sơ GV/NV) · luật "thiếu chữ đệm" bắt buộc trúng chữ TÊN cuối · dedup khóa
+> theo MÃ chứ không theo tên. 100% tên NV + HV + SĐT ra đúng người. Vá kèm `elabel` ngoặc lồng.
+> · **Bỏ hết dải viền màu trang trí** (anh Luân: "kể cả viền dọc… chọn thiết kế chuyên nghiệp"):
+> 25 rule CSS + 16 chỗ inline; màu dồn vào icon/chip/vòng số, nền nhạt + viền 1px. Trang WOW một
+> bố cục thống nhất, hover đổi bóng. Chỉ còn 3 border-left cấu trúc (kẻ bảng, trục thời gian).
+> · **Người giám hộ -> "Người đồng hành"**: dòng hiển thị = quan hệ · SĐT; danh mục quan hệ đúng
+> 7 mục anh chốt (ông, bà, bố, mẹ, anh, chị, người giám hộ). Bẫy: gen_demo chép enums cũ sang nên
+> "gieo nếu trống" thành gieo-một-lần-trong-đời - fixdata nay ÁP THẲNG.
+> · **Bắt được bug im lặng nằm sẵn**: `ghForm`/`ghSave` định nghĩa HAI LẦN (người đồng hành vs
+> ghi nhận phản hồi) - bấm "Sửa người giám hộ" mở nhầm form phản hồi bấy lâu mà không ai hay.
+> Đổi thành `dhForm`/`dhSave`, xóa `goRisk` trùng, và `_checkux` CẤM hàm trùng tên vĩnh viễn.
+> · **Hết hiện ID trần**: nsLnk/nguoiLnk tự tra tên theo mã ở tầng chung; bộ kiểm vẽ mọi trang
+> soi link chỉ còn mã. · Trang index demo gọn lại theo góp ý "hơi rườm rà".
+> · Bộ kiểm: `_checkqa` **111** · `_checkux` **67** · 4 nhát bẻ đỏ đủ 4 · `./verify.sh` XANH HẾT.
+>
+> **Phiên bản trước: V9.49 — MỘT TRỢ LÝ · TRẢ LỜI CÓ TRỌNG TÂM · ĐÁNH GIÁ TOÀN DIỆN FORM GHI ✅ (30/07).**
 > · **Trợ thủ + Hỏi đáp gộp thành TRỢ LÝ** - một nút duy nhất (`asstfab`), tấm 420px có ô hỏi ngay
 > đầu. Hai nút cạnh nhau vốn đã là dấu hiệu sai: đứng từ phía người dùng cả hai đều là *hỏi rồi
 > được chỉ việc*. Khối `qaPan*` xoá sạch; suýt kéo theo ba hàm còn sống, `_check18` đỏ ngay và bắt được.
@@ -4036,3 +4056,89 @@ xoá một notebar · cắt `attachLine("rfd")` · cắm cứng "4 giờ" vào n
 có thật · để `_tsK` khai rồi bỏ - **cả sáu đều đỏ đúng chỗ**.
 
 `./verify.sh` nay **18 phần**. Toàn bộ XANH.
+
+---
+
+## V9.50 (30/07 chiều) - ANH LUÂN SOÁT TAY 6 PHÁT, PHÁT NÀO CŨNG TRÚNG
+
+Anh Luân mở bản V9.49 ra dùng thật và gửi liên tiếp 6 góp ý kèm ảnh. Mỗi cái lột ra một lỗi thật,
+trong đó có một con bug im lặng nằm sẵn từ lâu mà không bộ kiểm nào bắt được.
+
+### 50.1 - Bấm tab hub, sidebar đứng im
+
+`duyTabSet`/`csTabSet`/`tsTabSet`... chỉ `reRender` thân trang; `reRender` không `buildNav` nên
+mục đang sáng trên menu vẫn là tab cũ. Vá ở TẦNG CHUNG: `reRender`/`reRenderKeep` vẽ lại cả
+sidebar - con số badge trên menu cũng tươi lại sau mỗi lần ghi, một công đôi việc.
+
+### 50.2 - "Trợ lý chứ sao em để Trợ thủ?" - đổi tên SÓT 19 nhãn
+
+V9.48 gộp nút nhưng em chỉ đổi tên chỗ gộp, còn 19 chuỗi người dùng đọc được vẫn ghi "Trợ thủ"
+(nút bóng đèn topbar, tab Cài đặt, toast, tooltip, bài hướng dẫn). Đổi hết; 18 chỗ còn nhắc
+"Trợ thủ" đều là comment lịch sử. Bộ kiểm mới vứt comment khỏi nguồn rồi soi: ngoài comment
+không còn một chữ "Trợ thủ" nào.
+
+### 50.3 - Trợ lý tìm sai người - đo ra ba lỗ hổng
+
+> *"hình như nó tìm sai người đó"*
+
+Đo bằng máy trên toàn bộ tên trong dữ liệu:
+- **Kho tìm không có DL01**: gõ tên một nhân viên là app nhận vơ sang học viên trùng vài chữ
+  (NV004 "Nguyễn Tuấn Phong" -> trả HV069 "Cao Tuấn Phong"). Nay tìm được cả giáo viên / nhân
+  viên, có thẻ nhận dạng riêng (chức danh · chi nhánh · SĐT) và nút mở đúng hồ sơ GV/NV; nút
+  hỏi lại chỉ chìa hai mục có nghĩa, không chìa "Học phí" cho một giáo viên.
+- **Luật "thiếu một chữ đệm" không bắt buộc trúng chữ TÊN cuối**: trùng họ + chữ đệm (hai chữ
+  phổ biến nhất tiếng Việt) là dám trả lời. Nay chữ cuối của tên bắt buộc phải có trong câu hỏi.
+- **Dedup khóa theo TÊN**: hai người trùng tên thật thì người thứ hai bị vứt - đúng cái bẫy
+  "nhớ tạm phải khóa đủ mọi đầu vào" đổi vỏ. Khóa lại theo MÃ hồ sơ.
+Sau sửa: 100% tên nhân viên + 100% tên học viên + SĐT đều ra đúng người. Nhân tiện vá `elabel`:
+nhãn có ngoặc lồng như "sales_staff (NV Tư vấn (EC))" bị regex `[^)]+` bó tay nên cả app in mã
+thô - đổi sang regex tham ăn, một chỗ sửa cả app hưởng.
+
+### 50.4 - "Cùng 1 trang, 2 thiết kế?" + "a ko thích mấy cái kiểu bo viền này, kể cả viền dọc"
+
+Trang WOW: thẻ hover đổi màu viền xanh còn thẻ bên cạnh không, hộp chi tiết mỗi hàng trôi một
+chỗ theo lượng nội dung. Và tổng quát hơn: khắp app đầy dải viền màu trang trí - viền trên 4px
+ở thẻ KPI, viền dọc 3-4px ở task/notebar/ghi chú/sidebar. Dọn MỘT LƯỢT cả hệ:
+- **25 rule CSS + 16 chỗ cắm inline** bỏ dải viền màu; hệ màu chuyển sang **nền nhạt + viền 1px
+  cùng tông + màu dồn vào icon/chip/vòng số** (thẻ KPI đỏ nay đỏ ở vòng số thứ hạng, không phải
+  một vạch đỏ chạy ngang đầu thẻ).
+- `ctxContent(mau)` đổi API ngầm: màu -> class (`ccred/ccblue/ccgreen`), notebar/dnote có
+  `nbred/nbgreen`. Giữ nguyên chữ ký hàm, nơi gọi không phải sửa.
+- Trang WOW: hộp chi tiết chiếm TRỌN hàng (mọi thẻ cùng bố cục), hover đổi bóng chứ không đổi
+  màu viền. Sidebar: chặng nhận diện bằng CHẤM màu, hết vạch dọc. Trang index demo cũng bỏ dải
+  viền dọc lúc hover, đồng thời rút gọn chữ theo góp ý "hơi rườm rà".
+- Còn đúng 3 border-left trong toàn nguồn: kẻ bảng 1px, `border-left:0`, trục dòng thời gian
+  2px - là CẤU TRÚC, không phải trang trí. Bộ kiểm cấm mọi dải viền >=3px và `border-left-color`.
+
+### 50.5 - "Người đồng hành, rồi bố, rồi số điện thoại là đủ"
+
+Mục Người giám hộ đổi nhãn thành **Người đồng hành**, dòng hiển thị chỉ còn **quan hệ · SĐT**
+(họ tên vẫn lưu trong form vì phiếu thu cần). Quan hệ nhập bằng danh sách **7 mục anh Luân chốt:
+ông, bà, bố, mẹ, anh, chị, người giám hộ** - mỗi quan hệ một mục riêng, hết kiểu gộp "Ông/Bà".
+Bẫy đường ống cắn thêm phát nữa: `gen_demo` chép nguyên khối enums của file cũ sang nên kiểu
+"gieo nếu trống" trong fixdata chỉ chạy đúng một lần trong đời - danh mục cũ bám mãi. Đổi thành
+ÁP THẲNG. Và fixdata chạy HAI LẦN liên tiếp thì phiếu thu gieo bị nhân đôi (check_data bắt được
+ngay) - pipeline phải chạy trọn chuỗi từ gen_demo, không chạy lẻ khúc giữa.
+
+### 50.6 - CON BUG IM LẶNG NHẤT: hàm định nghĩa HAI LẦN
+
+Đo cho W6 thì lòi ra: **`ghForm`/`ghSave` tồn tại hai bản** - form Người đồng hành và form
+"Ghi nhận phản hồi" cùng tên, hàm nạp sau đè hàm nạp trước. Hậu quả chạy ngầm suốt từ khi có
+form phản hồi: **bấm "Sửa người giám hộ" là mở nhầm form phản hồi**, không lỗi JS, không ai hay.
+`goRisk` cũng trùng đôi (bản thua là code chết). Bản khai cửa ghi còn khai "ghSave" cho cả DL09
+lẫn DL16 - tức máy kiểm kê cũng bị lừa theo. Sửa: đổi cặp người đồng hành thành `dhForm`/`dhSave`,
+xóa `goRisk` chết, và `_checkux` thêm tiêu chí **cấm mọi hàm định nghĩa trùng tên** - loại bug
+này từ nay không thể tái phát mà không đỏ.
+
+### 50.7 - "Hiện tên chứ, người dùng mà hiện ID làm gì"
+
+Tab "Việc chờ nhận" hiện NV001/NV020 trần vì nơi gọi đưa sai trường (`assignee_name` trong khi
+dữ liệu là `assignee_id_name`). Vá ở TẦNG CHUNG: `nsLnk`/`nguoiLnk` quên đưa tên thì tự tra
+DL01/DL09/DL02 theo mã - mọi chỗ quên trong tương lai đều được cứu sẵn. Bộ kiểm vẽ THẬT mọi
+trang rồi soi: không link nào chỉ còn mã trần khi người đó có tên.
+
+### Số chốt phiên
+`_checkqa` 96 -> **111** · `_checkux` 50 -> **67** · `_check16`/`_check15` cập nhật hợp đồng
+theo thiết kế mới. Negative test đợt này: 4 nhát bẻ (bỏ DL01 khỏi kho tìm · bỏ buildNav khỏi
+reRender · trả elabel về regex cũ · bỏ tra tên khỏi nsLnk) - **đỏ đúng chỗ cả 4**, nhát bẻ kho
+tìm còn hiện lại nguyên văn cảnh tìm sai người anh Luân gặp. `./verify.sh` XANH HẾT.

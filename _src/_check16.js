@@ -223,10 +223,14 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  var nav2=document.getElementById("nav").innerHTML||"";
  t("quay lai trang co muc rieng thi khong con to mo nua", !/navitem[^"]*\bfrom\b/.test(nav2));
  t("va muc do sang han hoi", /navitem[^"]*\bon\b/.test(nav2));
- t("muc dang mo va muc dang dung khac kieu nhau", /\.navitem\.from\{[^}]*border-left:3px dashed/.test(CSS));
+ /* V9.50: het vien doc (anh Luan che "ke ca vien doc") - hai muc phan biet bang DO DAM NEN
+    + nhan ":after 'dang mo'", khong con vach trai */
+ t("muc dang mo va muc dang dung khac kieu nhau (nen dam khac nhau)",
+   /\.navitem\.from\{[^}]*background:#ffffff14/.test(CSS)&&/\.navitem\.on\{[^}]*background:#ffffff2e/.test(CSS)&&!/\.navitem\.from\{[^}]*border-left/.test(CSS));
  t("muc dang mo co nhan 'dang mo'", /\.navitem\.from:after\{content:"đang mở"/.test(CSS));
  t("tieu de chang khong con mang nen day", /\.navlbl\.isarc\{[^}]*background:none/.test(CSS));
- t("tieu de chang van co vach mau chang", /\.navlbl\.isarc\{[^}]*border-left:3px solid var\(--acol/.test(CSS));
+ t("tieu de chang van co CHAM mau chang (vach doc da bo theo lenh 30/07)",
+   /\.navlbl \.navarc\{[^}]*border-radius:50%/.test(CSS)&&/\.navlbl\.isarc \.navarc\{width:8px/.test(CSS)&&!/\.navlbl\.isarc\{[^}]*border-left/.test(CSS));
  t("tieu de chang nhat hon muc dang chon", (function(){
    var a=CSS.match(/\.navitem\.on\{[^}]*background:(#[0-9a-fA-F]+)/);
    return /\.navlbl\.isarc\{[^}]*background:none/.test(CSS)&&(!a||true)})());

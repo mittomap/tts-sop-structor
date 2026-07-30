@@ -271,7 +271,7 @@ t("khong ep y khi cau khong noi gi", qaYDinh("Nguyễn Văn A")==="");
  t("chon 'Hoc phi' thi ve dung phan tien", /class="ctxr"/.test(ht)&&!/Mở màn xử lý/.test(ht));
  asstYD("lienhe");
  var hl=document.getElementById("asst").innerHTML;
- t("chon 'Lien he' thi co so dien thoai va nguoi nha", /Số điện thoại/.test(hl)&&/Người nhà/.test(hl));
+ t("chon 'Lien he' thi co so dien thoai va nguoi dong hanh", /Số điện thoại/.test(hl)&&/Người đồng hành/.test(hl));
  /* hoi chuyen he thong / hoi bua - van chay trong cung mot tam */
  window.ASSTQ="đổi hotline ở đâu";window.ASSTYD="";asstPaint();
  t("hoi chuyen he thong thi chi cho trong cung tam", /Mở thẳng tới đó/.test(document.getElementById("asst").innerHTML));
@@ -312,6 +312,72 @@ t("khong ep y khi cau khong noi gi", qaYDinh("Nguyễn Văn A")==="");
 /* ---- 11. VAO DUOC TU DAU: trang co that, nam trong menu ---- */
 t("Hoi dap la mot trang co that", !!PBK["hoidap"]&&typeof RENDER.hoidap==="function");
 t("Hoi dap nam trong menu, khong bi giau", PBK["hoidap"]&&!PBK["hoidap"].hide);
+
+/* ---- 12. TIM NGUOI KHONG DUOC SAI NGUOI (V9.50 - anh Luan bat tai tran) ----
+   "hinh nhu no tim sai nguoi do". Do lai thi ra hai lo hong:
+   (a) kho tim KHONG co DL01 - go ten mot nhan vien la app nhan vo sang hoc vien trung vai chu;
+   (b) luat "thieu dung mot chu dem" khong bat buoc trung CHU TEN cuoi, nen trung ho + chu dem
+       (hai chu pho bien nhat tieng Viet) la dam tra loi. */
+(function(){
+ /* MOI nhan vien DL01: hoi nguyen ten phai ra dung nguoi do, dung dau danh sach */
+ var saiNV=[];
+ rows("DL01").forEach(function(s){if(String(s.staff_id)==="ADMIN")return;
+  var R=qaTimNguoi(s.full_name||"");
+  if(!R.length||R[0].ma!==s.staff_id)saiNV.push(s.staff_id+" -> "+(R.length?R[0].ma:"khong ai"))});
+ t("hoi ten nhan vien nao cung ra dung nguoi do"+(saiNV.length?" - SAI: "+saiNV.join(", "):""), saiNV.length===0);
+ /* MOI hoc vien: hoi nguyen ten van dung (khong duoc hong vi them DL01) */
+ var saiHV=[];
+ rows("DL09").forEach(function(s){var R=qaTimNguoi(s.full_name||"");
+  if(!R.some(function(x){return x.ma===s.student_id}))saiHV.push(s.student_id)});
+ t("hoi ten hoc vien nao cung van ra dung nguoi"+(saiHV.length?" - MAT: "+saiHV.join(", "):""), saiHV.length===0);
+ /* luat chu TEN cuoi: ten 3 chu chi trung 2 chu DAU thi KHONG duoc tra loi bua */
+ var A=rows("DL09").filter(function(s){return String(s.full_name||"").trim().split(/\s+/).length===3})[0];
+ if(A){var pt=A.full_name.trim().split(/\s+/);
+  var R2=qaTimNguoi(pt[0]+" "+pt[1]+" Xyzabc");
+  t("trung ho + chu dem ma sai chu ten thi khong nhan vo", !R2.some(function(x){return x.ma===A.student_id}));
+  var R3=qaTimNguoi(pt[1]+" "+pt[2]);
+  t("goi bang hai chu cuoi (cach goi doi thuong) van tim ra", R3.some(function(x){return x.ma===A.student_id}))}
+ /* dedup theo MA: hai nguoi TRUNG TEN that phai giu ca hai cho nguoi hoi tu chon */
+ var goc=rows("DL09")[0];
+ DL.DL09.push({student_id:"HVTRUNG9",full_name:goc.full_name,phone_number:"0900000009",student_status:goc.student_status});
+ var R4=qaTimNguoi(goc.full_name);
+ DL.DL09.pop();
+ t("hai nguoi trung ten that thi giu CA HAI, khong vut mot", R4.some(function(x){return x.ma===goc.student_id})&&R4.some(function(x){return x.ma==="HVTRUNG9"}));
+ /* tra loi cho nhan vien: co chuc danh, co nut mo ho so, KHONG chia nut "Hoc phi" */
+ var nv=rows("DL01").filter(function(s){return String(s.staff_id)!=="ADMIN"})[0];
+ if(nv){window.ASSTYD="";var hNV=asstTraLoi(nv.full_name);
+  t("tra loi nhan vien co the nhan dang + hoi lai muon xem gi", /qaWho/.test(hNV)&&/Bạn muốn xem gì/.test(hNV));
+  t("tra loi nhan vien khong chia nut Hoc phi", !/Học phí & công nợ/.test(hNV));
+  t("the nhan dang khong in ma enum tho (elabel boc duoc ngoac long)", !/qaWhoM">[^<]*sales_staff|qaWhoM">[^<]*_staff/.test(hNV));
+  window.ASSTYD="hientrang";var hNV2=asstTraLoi(nv.full_name);window.ASSTYD="";
+  t("chon muc xong co nut mo ho so nhan vien/giang vien", /Mở hồ sơ (giảng viên|nhân viên)/.test(hNV2))}
+})();
+
+/* ---- 13. BAM TAB HUB THI SIDEBAR PHAI NHAY THEO (V9.50 - anh Luan bat tai tran) ----
+   duyTabSet/csTabSet/tsTabSet chi reRender than trang; truoc day reRender khong buildNav nen
+   muc dang sang tren menu dung im o tab cu. Nay reRender ve lai ca sidebar - thu THAT o day. */
+(function(){
+ t("reRender co goi buildNav", /function reRender\(k\)\{[\s\S]{0,900}?buildNav\(\)/.test(SRC));
+ try{
+  go("duyet");duyTabSet("duyetnghi");
+  var nav=document.getElementById("nav").innerHTML;
+  t("bam tab Don xin nghi thi menu sang dung muc do", nav.indexOf('class="navitem on" data-k="duyetnghi"')>=0);
+  duyTabSet("duyetthu");nav=document.getElementById("nav").innerHTML;
+  t("doi sang tab khac thi vet sang nhay theo", nav.indexOf('class="navitem on" data-k="duyetthu"')>=0&&nav.indexOf('data-k="duyetnghi"')>=0&&nav.indexOf('class="navitem on" data-k="duyetnghi"')<0);
+ }catch(e){t("thu that tab hub khong vo: "+e.message,false)}
+})();
+
+/* ---- 14. TEN GOI LA "TRO LY" - KHONG CON NHAN "TRO THU" NAO NGUOI DUNG DOC DUOC ----
+   anh Luan: "de cai nut bat tat tro thu, thanh nut bat tat tro ly, a se goi cai nay la tro ly".
+   Cach do: vut het comment /* *\/ khoi nguon roi soi phan con lai - phan con lai chinh la ma
+   va chuoi nguoi dung se doc. */
+(function(){
+ var khongCmt=SRC.replace(/\/\*[\s\S]*?\*\//g,"");
+ var con=(khongCmt.match(/Trợ thủ|trợ thủ|TRỢ THỦ/g)||[]);
+ t("ngoai comment khong con chu 'Tro thu' nao ("+con.length+" cho)", con.length===0);
+ t("nut topbar gan nhan Tro ly", /aria-label="Bật\/tắt Trợ lý"/.test(SRC));
+ t("tab Cai dat ten Tro ly", /\["tro","Trợ lý","dat"\]/.test(SRC));
+})();
 
 console.log(bad.length?("CHECKQA FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECKQA OK: "+ok+" tieu chi");
 process.exit(bad.length?1:0);

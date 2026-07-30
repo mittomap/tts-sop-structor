@@ -41,6 +41,14 @@ var FN=[];
   FN.push({ten:L[a].match(/^function ([A-Za-z_$][\w$]*)\(/)[1],dong:a+1,than:L.slice(a,b).join("\n")})}})();
 t("cat duoc ham tu nguon (>800 ham)", FN.length>800);
 
+/* KHONG HAM NAO DINH NGHIA HAI LAN. Da cAn: ghForm/ghSave ton tai hai ban (nguoi dong hanh vs
+   ghi nhan phan hoi), ham sau de len ham truoc -> bam "Sua nguoi giam ho" mo nham form phan hoi,
+   khong loi JS, khong ai hay. goRisk cung trung doi. Loai bug im lang nhat co the co. */
+(function(){var dem={},trung=[];
+ FN.forEach(function(f){dem[f.ten]=(dem[f.ten]||0)+1});
+ Object.keys(dem).forEach(function(k){if(dem[k]>1)trung.push(k+" x"+dem[k])});
+ t("khong ham nao dinh nghia hai lan"+(trung.length?" - TRUNG: "+trung.join(", "):""), trung.length===0)})();
+
 /* Form ghi = ham co openDrawer( VA co o nhap. Loc bang chinh dinh nghia do, khong liet ke tay,
    de them form moi la bo kiem tu biet. */
 var FORM=FN.filter(function(f){return /openDrawer\(/.test(f.than)&&/<(input|textarea|select) /.test(f.than)});
@@ -181,6 +189,69 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
  FORM.forEach(function(f){var re=/(?:slaChip|paramOf|paramStr|kpiTh)\("([A-Za-z_][\w]*)"/g,m;
   while((m=re.exec(f.than)))if(!ma[m[1]]&&!/^(kpi|BC)/.test(m[1]))sai.push(f.ten+" -> "+m[1])});
  t("moi tham so goi trong form deu co that trong CH2"+(sai.length?" - MA: "+sai.join(", "):""), sai.length===0)})();
+
+/* ---- 6. KHONG CON DAI VIEN MAU TRANG TRI (V9.50 - anh Luan: "a ko thich may cai kieu bo vien
+   nay, nhin no xau lam, ke ca vien doc, e nen chon thiet ke chuyen nghiep") ----
+   Dai vien doc/vien tren day (>=3px) va border-left-color deu la ho mau bi cam. Con lai duy
+   nhat vien 1-2px trung tinh (ke bang, truc dong thoi gian) - do la cau truc, khong phai
+   trang tri. Ai them lai mot dai vien mau la do ngay tai day. */
+(function(){
+ var xau=[];
+ (SRC.match(/border-left:\s*[3-9]px[^;"'\}]*/g)||[]).forEach(function(m){if(!/transparent/.test(m))xau.push(m)});
+ (SRC.match(/border-top:\s*[3-9]px[^;"'\}]*/g)||[]).forEach(function(m){xau.push(m)});
+ (SRC.match(/border-left-color:[^;"'\}]*/g)||[]).forEach(function(m){xau.push(m)});
+ t("khong con dai vien mau >=3px hay border-left-color nao"+(xau.length?" - CON: "+xau.slice(0,5).join(" | "):""), xau.length===0);
+ t("to vang cau hinh chi con nen, khong thanh doc", /tr\.cfhl\{background:#FFF6D8\}/.test(SRC));
+ t("KPI card khong con vien tren, mau don vao vong so", /\.k3card\.red \.k3n\{background:#DC2626\}/.test(SRC));
+ t("hover the WOW doi bong, khong doi mau vien", /\.obcards\.rows \.obcard:hover\{box-shadow/.test(SRC));
+ t("hop chi tiet WOW chiem tron hang - moi hang cung mot bo cuc", /\.obcards\.rows \.wowinfo\{flex:1 1 100%/.test(SRC));
+})();
+
+/* ---- 6bis. HIEN TEN, KHONG HIEN MA THO (V9.50 - anh Luan: "hien ten chu, nguoi dung ma hien
+   ID lam gi, ai hieu dau") ----
+   Goc benh: noi goi dua sai truong (assignee_name thay vi assignee_id_name) -> nsLnk roi ve ID.
+   Da va o TANG CHUNG: nsLnk/nguoiLnk tu tra ten theo ma. O day canh ca hai lop:
+   (a) tang chung tu cuu duoc, (b) VE THAT moi trang roi soi - khong link nao chi con ma tran. */
+(function(){
+ var nv=rows("DL01").filter(function(x){return String(x.staff_id)!=="ADMIN"})[0];
+ t("nsLnk chi co ma van ra TEN", nv&&nsLnk(nv.staff_id).indexOf(esc(nv.full_name))>=0);
+ var hv=rows("DL09")[0];
+ t("nguoiLnk chi co ma van ra TEN", hv&&nguoiLnk(hv.student_id).indexOf(esc(hv.full_name))>=0);
+ /* ve THAT tung trang, soi link chi chua ma tran */
+ var xau=[],daVe=0;
+ Object.keys(RENDER).forEach(function(k){
+  var html="";try{html=RENDER[k]()}catch(e){return}
+  daVe++;
+  var m=html.match(/>((?:NV|HV)\d{2,4})<\/a>/g)||[];
+  m.forEach(function(hit){var ma=hit.slice(1,-4);
+   var nguoi=find("DL01","staff_id",ma)||find("DL09","student_id",ma);
+   if(nguoi&&nguoi.full_name)xau.push(k+": "+ma)});
+ });
+ t("da ve duoc >=25 trang de soi", daVe>=25);
+ t("khong trang nao con link chi hien ma tran"+(xau.length?" - THO: "+xau.slice(0,8).join(", "):""), xau.length===0);
+ /* tab Viec cho nhan - noi anh Luan chup - phai ra ten */
+ window.DUYTAB="duyetgiao";var hduy="";try{hduy=RENDER.duyet()}catch(e){hduy="LOI"}
+ t("tab Viec cho nhan hien ten nguoi giao / nguoi nhan", hduy.indexOf("LOI")!==0&&!/>(?:NV\d{2,4})<\/a>/.test(hduy));
+ window.DUYTAB="";
+})();
+
+/* ---- 7. NGUOI DONG HANH (V9.50 - anh Luan chot): dong hien thi = quan he + SDT la du,
+   quan he chon tu danh sach 7 muc: ong, ba, bo, me, anh, chi, nguoi giam ho ---- */
+(function(){
+ t("dong hien thi ten 'Nguoi dong hanh', khong con nhan 'Nguoi giam ho'",
+   SRC.indexOf('<span class="ctxk">Người đồng hành</span>')>=0&&SRC.indexOf('<span class="ctxk">Người giám hộ</span>')<0);
+ t("dong hien thi dan dau bang QUAN HE, khong bat dau bang ho ten",
+   /ctxk">Người đồng hành<\/span><span class="ctxv"><b>'\+esc\(ghQuanHe\(s\)/.test(SRC));
+ var mong=["grandfather (Ông)","grandmother (Bà)","father (Bố)","mother (Mẹ)","brother (Anh)","sister (Chị)","guardian (Người giám hộ)"];
+ var co=(ENUM.enum_guardian_relation||[]);
+ t("danh muc quan he dung 7 muc anh Luan chot", co.length===7&&mong.every(function(m){return co.indexOf(m)>=0}));
+ var s9=rows("DL09")[0];
+ var hGH=veDrawer(function(){dhForm(s9.student_id)});
+ t("form Nguoi dong hanh ve duoc", typeof hGH==="string"&&hGH.indexOf("LOI:")!==0);
+ if(typeof hGH==="string"&&hGH.indexOf("LOI:")!==0){
+  t("o quan he la SELECT co du 7 lua chon", mong.every(function(m){return hGH.indexOf(esc(elabel(m)))>=0})&&/id="gh_qh"/.test(hGH));
+  t("form van giu o ho ten (phieu thu can)", /id="gh_ten"/.test(hGH))}
+})();
 
 if(bad.length){console.log("CHECKUX DO ("+bad.length+"/"+(ok+bad.length)+"):");
  bad.forEach(function(b){console.log("  - "+b)});process.exit(1)}

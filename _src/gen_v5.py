@@ -40,7 +40,7 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 /* V9.27: bỏ mảng nền đầy của tiêu đề chặng - nền đầy làm nó trông như đang được chọn.
    Tiêu đề là TIÊU ĐỀ: chữ sáng, vạch màu chặng bên trái, một đường kẻ mảnh phía dưới. */
 .navlbl.isarc{color:#DCE9F7;font-size:11.5px;letter-spacing:.6px;background:none;
- border-left:3px solid var(--acol,#8CC5F2);border-bottom:1px solid #ffffff14;border-radius:0 8px 0 0;
+ border-bottom:1px solid #ffffff14;border-radius:0 8px 0 0;
  padding:9px 9px 7px;margin:14px 2px 3px}
 .navlbl.isarc:hover{background:#ffffff0d;color:#fff}
 .navlbl.isarc .navarc{width:8px;height:8px}
@@ -50,10 +50,10 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .navitem.chang i{color:var(--acol,#8CC5F2);opacity:1}
 .navitem.chang:after{content:"";width:6px;height:6px;border-radius:50%;background:var(--acol,#8CC5F2);
  margin-left:auto;flex:none;opacity:.85}
-.navitem.chang.on{background:#ffffff2e;color:#fff;border-left-color:var(--acol,#8CC5F2)}
+.navitem.chang.on{background:#ffffff2e;color:#fff}
 .navitem.chang.on i{color:var(--acol,#8CC5F2)}
 /* V9.27: mục đã mở ra trang hiện tại - sáng MỜ và có vạch đứt, phân biệt rõ với mục ĐANG đứng */
-.navitem.from{background:#ffffff14;color:#CFE0F2;border-left:3px dashed #7FA6D0}
+.navitem.from{background:#ffffff14;color:#CFE0F2}
 .navitem.from i{opacity:.95}
 .navitem.from:after{content:"đang mở";margin-left:auto;font-size:8.5px;font-weight:800;letter-spacing:.4px;
  text-transform:uppercase;color:#8FB2D8;background:#ffffff12;border-radius:5px;padding:1px 5px;flex:none}
@@ -109,7 +109,7 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .fltchip i:hover{opacity:1;color:var(--red)}
 .tbar2{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-4px 0 12px}
 /* ===== V9.29 XIN NGHI CHO DUYET ===== */
-.absq{margin-bottom:12px;border-left:3px solid var(--amber)}
+.absq{margin-bottom:12px}
 .absrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #F2F5F9;flex-wrap:wrap}
 .absrow:last-child{border-bottom:0}
 .absi{flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:2px}
@@ -121,7 +121,7 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .abschip i{margin-right:4px}
 /* V9.29: tieu de nhom theo do gap trong trang Viec hom nay */
 .viechd{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;letter-spacing:.3px;
- text-transform:uppercase;color:#5A6675;border-left:3px solid var(--line);padding:2px 0 2px 9px;margin:14px 0 7px}
+ text-transform:uppercase;color:#5A6675;margin:14px 0 7px}
 .viechd b{color:var(--navy)}
 /* V9.29: chip so SLA bam duoc + dong cau hinh duoc to sang khi nhay toi */
 .slachip{display:inline-flex;align-items:center;gap:4px;background:#EEF3F9;border:1px solid #DCE5EF;
@@ -134,7 +134,7 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
    Đúng: nó tự tắt sau 2,6 giây, mà người ta còn đang đọc để hiểu mình được dẫn tới ĐÂU. Vệt sáng
    mất đi là mất luôn câu trả lời "chỗ nào cơ". Nay giữ nguyên cho tới khi người ta rời màn Cài
    đặt hoặc bấm sang một dòng khác - tự chọn thời điểm tắt, không phải cái đồng hồ chọn hộ. */
-tr.cfhl{background:#FFF6D8;box-shadow:inset 3px 0 0 var(--amber)}
+tr.cfhl{background:#FFF6D8}
 tr.cfhl>td{background:#FFF6D8}
 @keyframes cfhl{0%,60%{background:#FFF6D8}100%{background:transparent}}
 /* V9.29: nut nho "sua o day" canh cau nhac / danh muc */
@@ -155,10 +155,10 @@ tr.cfhl>td{background:#FFF6D8}
 .btn.hvcall-dark{background:#ffffff1f;border-color:#ffffff4d;color:#fff}
 .btn.hvcall-dark:hover{background:#ffffff33;border-color:#ffffff80}
 .navgrp{margin-bottom:3px}
-.navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500;border-left:3px solid transparent}
+.navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
 .navitem:hover{background:#ffffff12;color:#fff}
-.navitem.on{background:#ffffff2e;color:#fff;border-left-color:#8CC5F2;font-weight:700;box-shadow:inset 0 0 0 1px #ffffff1f} /* V9.19: nền 10% quá mờ trên navy - Luân không thấy mục đang mở; đậm lên + icon sáng */
+.navitem.on{background:#ffffff2e;color:#fff;font-weight:700;box-shadow:inset 0 0 0 1px #ffffff1f} /* V9.19: nền 10% quá mờ trên navy - Luân không thấy mục đang mở; đậm lên + icon sáng */
 .navitem.on i{opacity:1;color:#A8D5F7}
 .navitem .dot{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px;flex:none}
 .me{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid #ffffff18}
@@ -218,8 +218,8 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .pbody{padding:6px 6px}
 .pill{height:29px;padding:0 12px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--muted);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer}
 .pill:hover{border-color:#B9C6D6}.pill.on{background:var(--navy);border-color:var(--navy);color:#fff}
-.task{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border-left:4px solid var(--amber);border-radius:0 8px 8px 0;margin:6px 4px;background:#fff}
-.task:hover{background:#FAFBFD}.task.red{border-left-color:var(--red)}.task.green{border-left-color:var(--green)}.task.gray{border-left-color:#B9C3CE}
+.task{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:9px;margin:6px 4px;background:#fff}
+.task:hover{background:#FAFBFD}
 .task .ti{flex:1;min-width:0}.task .id{font-size:11px;color:var(--navy);font-weight:700}
 .task .nm{font-size:13.5px;font-weight:700;margin:1px 0 3px}.task .mt{font-size:11.5px;color:var(--muted);font-weight:500}
 .task .na{font-size:12px;margin-top:7px;background:#F6F8FA;border:1px dashed #D5DEE8;border-radius:7px;padding:6px 9px;color:#3A4756}
@@ -382,7 +382,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .wowib{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.55;color:#4A5A6E}
 .wowib i{font-size:15px;color:#8FA6C2;flex:none;margin-top:2px}
 .wowib b{color:var(--navy);font-weight:700}
-.hvask{background:#F2F7FF;border:1px solid #CFE0F7;border-left:4px solid var(--blue);border-radius:12px;padding:13px 15px;margin-bottom:16px}
+.hvask{background:#F2F7FF;border:1px solid #CFE0F7;border-radius:12px;padding:13px 15px;margin-bottom:16px}
 .hvaskh{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--navy);margin-bottom:5px}
 .hvaskh i{font-size:19px;color:var(--blue)}
 .hvaskb{font-size:12.5px;line-height:1.65;color:#4A5A6E;margin-bottom:10px}
@@ -419,8 +419,9 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .svtpl b{font-size:11.5px;color:var(--navy);display:block;margin-bottom:5px}
 .svtpl ol{margin:0 0 7px;padding-left:19px}
 .svtpl li{font-size:11.5px;color:var(--text);line-height:1.6}
-.hvdan{display:flex;gap:8px;margin-top:6px;padding:8px 10px;background:#FFF8E9;border-left:3px solid var(--amber);border-radius:0 8px 8px 0;font-size:11.5px;color:#7A5B12;line-height:1.5}
-.hvdan.hw{background:var(--blueb);border-left-color:var(--blue);color:#2A5D8F}
+.hvdan{display:flex;gap:8px;margin-top:6px;padding:8px 10px;background:#FFF8E9;border:1px solid #F0DFB2;border-radius:8px;font-size:11.5px;color:#7A5B12;line-height:1.5}
+.hvdan.hw{background:var(--blueb);border-color:#CFE0F7;color:#2A5D8F}
+.hvdan.nbred{background:#FBF0EF;border-color:#EBC8C4;color:#7E3A32}
 .hvdan i{font-size:15px;flex:none;margin-top:1px;opacity:.85}
 .hvcrs{display:grid;grid-template-columns:repeat(auto-fit,minmax(275px,1fr));gap:12px;margin-bottom:18px}
 .hvcr{position:relative;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:14px 15px;cursor:pointer;transition:.15s}
@@ -519,9 +520,9 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .asstH span i{font-style:normal;color:var(--red);font-weight:700}
 .asstH .x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:16px;width:28px;height:28px;flex:none;display:flex;align-items:center;justify-content:center;padding:0;border-radius:8px}
 .asstH .x:hover{background:#EEF3F9;color:var(--navy)}
-.asstCard{margin:12px 13px;padding:13px 14px;border:1px solid var(--line);border-left:3px solid var(--navy);
+.asstCard{margin:12px 13px;padding:13px 14px;border:1px solid var(--line);
  border-radius:11px;background:#FBFCFE}
-.asstCard.done{border-left-color:var(--green);background:#F4FBF6}
+.asstCard.done{background:#F4FBF6;border-color:#BFE3C8}
 .asstCard .k{font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
 .asstCard .t{font-size:14.5px;font-weight:800;color:var(--navy);margin:3px 0 1px;line-height:1.35}
 .asstCard .w{font-size:12px;font-weight:600;color:#4A5A6B}
@@ -595,7 +596,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .tourbox .tnum{font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--blue)}
 .tourbox h5{font-size:14.5px;font-weight:800;color:var(--navy);margin:4px 0 6px;line-height:1.35}
 .tourbox p{font-size:12.5px;color:#4A5A6E;line-height:1.65;margin:0 0 11px}
-.tourbox .thint{background:#EAF3FC;border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:7px 10px;font-size:12px;color:var(--navy);margin:0 0 11px;line-height:1.55}
+.tourbox .thint{background:#EAF3FC;border-radius:8px;padding:7px 10px;font-size:12px;color:var(--navy);margin:0 0 11px;line-height:1.55}
 .tourbox .tchk{display:flex;align-items:center;gap:7px;background:#FFF8E6;border:1px dashed #F0D08A;border-radius:8px;padding:7px 10px;font-size:12px;color:#8A5A0B;margin:0 0 11px;line-height:1.5}
 .tourbox .tchk.ok{background:#EAF7F0;border-color:#A9DFC4;border-style:solid;color:#1E6A47}
 .tourbox .tchk i{font-size:15px;flex:none}
@@ -637,10 +638,10 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .hvselbox select{width:100%;height:32px;border-radius:8px;border:1px solid #ffffff26;background:#ffffff10;color:#fff;font-family:inherit;font-size:11.5px;padding:0 8px}
 .hvselbox select option{color:#1E2A38}
 .hvnav{flex:1;padding:9px 9px 18px}
-.hvni{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:12.5px;font-weight:500;border-left:3px solid transparent;transition:.12s}
+.hvni{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:12.5px;font-weight:500;transition:.12s}
 .hvni i{font-size:17px;width:19px;text-align:center;opacity:.85}
 .hvni:hover{background:#ffffff12;color:#fff}
-.hvni.on{background:#ffffff1a;color:#fff;border-left-color:#5B9BD5;font-weight:700}
+.hvni.on{background:#ffffff1a;color:#fff;font-weight:700}
 .hvmain{flex:1;overflow-y:auto;padding:20px 24px 60px;scroll-behavior:smooth}
 .hvtop{display:none}
 @media(max-width:900px){
@@ -690,7 +691,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .msw small{font-size:11px;color:var(--muted);line-height:1.35}
 .msw.on{border-color:var(--navy);background:#F4F8FD;box-shadow:0 0 0 3px rgba(46,90,136,.09)}
 .msw.on i,.msw.on b{color:var(--navy)}
-.substep{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:11px 16px;padding:14px 15px 16px;border:1px solid var(--line);border-left:3px solid var(--navy);border-radius:0 10px 10px 0;background:#FAFBFD}
+.substep{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:11px 16px;padding:14px 15px 16px;border:1px solid var(--line);border-radius:10px;background:#FAFBFD}
 .sst{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--navy);margin-bottom:1px}
 .sst i{font-size:13px}
 @media(max-width:760px){.mswrap,.substep{grid-template-columns:1fr}}
@@ -920,7 +921,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .jcb{padding:8px;display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto}
 .jcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 10px;cursor:pointer;transition:.15s}
 .jcard:hover{border-color:var(--blue);box-shadow:0 2px 10px rgba(0,0,0,.06)}
-.jcard.over{border-left:3px solid var(--red)}
+.jcard.over{background:#FFFBFA;border-color:#EBC8C4}
 .jn{font-size:12.5px;font-weight:700;color:var(--navy)}
 .jm{font-size:10.5px;color:var(--muted);margin-top:2px}
 .jmiss{font-size:10.5px;color:var(--amber);margin-top:4px;display:flex;gap:4px;align-items:flex-start}
@@ -936,7 +937,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .jsw{font-size:9.5px;color:#6B7887;margin-top:1px}
 .jsc{flex:1;min-width:14px;height:2px;background:var(--line);margin-top:15px}
 .jsc.done{background:var(--green)}
-.jnext{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;background:linear-gradient(180deg,#fff,#FAFBFC);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.jnext{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;background:linear-gradient(180deg,#fff,#FAFBFC);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
 /* V9.15 sopb - block nghiep vu chuan (dung chung khung .jnext) */
 .sopb .sopr{display:flex;gap:8px;padding:3px 0;font-size:12.5px;align-items:flex-start}
 /* V9.29 (anh Luân): "cố gắng trong thiết kế đừng để xuống dòng, khi mà không gian vẫn đang ổn".
@@ -948,7 +949,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .sopb .sopna{display:flex;gap:7px;margin-top:7px;font-size:11.5px;color:#575E68;background:#F7F9FC;border:1px dashed var(--line);border-radius:8px;padding:7px 9px;line-height:1.5}
 .sopb .sopna i{color:var(--blue);margin-top:1px;flex:none}
 .sopb .mstrip{margin-left:0;padding:0}
-.jnext.over{border-left-color:var(--red)}
+.jnext.over{background:#FFFBFA;border-color:#EBC8C4}
 .jnl{flex:1;min-width:260px}
 .jnt{font-size:10px;font-weight:800;letter-spacing:.6px;color:var(--blue)}
 .jnext.over .jnt{color:var(--red)}
@@ -988,6 +989,8 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    vo hoan toan. Bo kiem chuoi HTML khong bao gio thay duoc loi nay vi HTML hoan toan dung.
    Nay cho chu chay theo dong binh thuong, icon nam inline o dau dong. */
 .notebar{display:block;background:var(--amberb);border:1px solid #F2D9AE;color:#7A4E0A;font-size:12px;font-weight:600;line-height:1.65;padding:10px 14px;border-radius:9px;margin-bottom:14px}
+.notebar.nbred{background:#FBF0EF;border-color:#EBC8C4;color:#7E3A32}
+.notebar.nbgreen{background:#F0F8F2;border-color:#BFE3C8;color:#22633C}
 .notebar>i{margin-right:8px;vertical-align:-2px}
 .notebar>.btn,.notebar>button{margin-left:8px;vertical-align:-3px}
 .sechd{font-size:12.5px;font-weight:800;color:#3A4756;margin:14px 4px 4px;text-transform:uppercase;letter-spacing:.4px}
@@ -1061,7 +1064,7 @@ input[type=checkbox],input[type=radio]{width:17px;height:17px;flex:none;accent-c
 /* V9.31: o nhap truoc day chi cao 15px trong khi khung cao 25px - phan con lai bam vao khong an gi.
    Tren dien thoai la go mai khong ra ban phim. Cho o nhap an HET chieu cao khung. */
 .pgq input{border:0;outline:0;font-family:inherit;font-size:12px;width:100%;min-width:0;background:transparent;padding:6px 0}
-.tth{background:linear-gradient(180deg,#FFFBEB,#FFF);border:1px solid #F0D08A;border-left:3px solid var(--amber);border-radius:11px;padding:11px 14px;margin-bottom:14px}
+.tth{background:linear-gradient(180deg,#FFFBEB,#FFF);border:1px solid #F0D08A;border-radius:11px;padding:11px 14px;margin-bottom:14px}
 .tth .tthh{display:flex;align-items:center;gap:7px;font-size:12px;color:#8A5A0B;margin-bottom:7px}
 .tth .tthh i{font-size:15px}
 .tth .tthx{margin-left:auto;font-size:11px;color:var(--muted);cursor:pointer;border-bottom:1px dashed var(--line)}
@@ -1144,13 +1147,17 @@ body.drsz .drawer{transition:none}
 .dcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
 .dcard h4{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--navy);font-weight:800;margin-bottom:9px;display:flex;align-items:center;gap:6px}
 .dnote{background:var(--amberb);border:1px solid #F2D9AE;color:#7A4E0A;border-radius:9px;padding:9px 12px;font-size:12.5px;margin-bottom:12px}
+.dnote.nbred{background:#FBF0EF;border-color:#EBC8C4;color:#7E3A32}
 .dhist{background:#F7F9FB;border:1px solid var(--line);border-radius:9px;padding:9px 11px;margin-bottom:12px}
 .dhh{font-size:11px;font-weight:800;color:#5A6675;margin-bottom:5px;display:flex;align-items:center;gap:5px}
 .dhr{font-size:11.5px;color:var(--text);padding:4px 0;border-top:1px solid #EDF1F5;line-height:1.4}.dhr:first-of-type{border-top:none}.dhr.mut{color:var(--muted)}
 .ctxbox{background:#F7F9FB;border:1px solid var(--line);border-radius:9px;padding:2px 12px;margin-bottom:12px}
 .ctxr{display:flex;gap:10px;padding:7px 0;border-top:1px solid #EDF1F5;font-size:12px}.ctxr:first-child{border-top:none}
 .ctxk{color:var(--muted);min-width:96px;flex:0 0 auto;white-space:nowrap;font-weight:600}   /* V9.29: nhãn không bẻ đôi khi còn chỗ */.ctxv{color:var(--text);flex:1;font-weight:600}
-.ctxcontent{background:#fff;border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:8px;padding:9px 12px;margin-bottom:13px}
+.ctxcontent{background:#FDFCF8;border:1px solid #EBE3CF;border-radius:8px;padding:9px 12px;margin-bottom:13px}
+.ctxcontent.ccred{background:#FFF7F6;border-color:#EBC8C4}.ctxcontent.ccred .cch{color:var(--red)}
+.ctxcontent.ccblue{background:#F6FAFF;border-color:#CFE0F7}.ctxcontent.ccblue .cch{color:var(--blue)}
+.ctxcontent.ccgreen{background:#F4FAF5;border-color:#BFE3C8}.ctxcontent.ccgreen .cch{color:var(--green)}
 .cch{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:800;margin-bottom:4px}
 .ccb{font-size:12.5px;line-height:1.5;color:var(--text);white-space:pre-wrap}
 .tp{border-left:2px solid var(--line);padding:2px 0 10px 12px;margin-left:4px}
@@ -1167,7 +1174,8 @@ body.drsz .drawer{transition:none}
 /* V9.12 - "mỗi học viên/lead 1 DÒNG": .rows biến lưới thẻ thành danh sách hàng; bấm dòng nở chi tiết tại chỗ */
 .obcards.rows{display:block}
 .obcards.rows .obcard{display:flex;align-items:center;flex-wrap:wrap;gap:4px 12px;padding:7px 12px;margin-bottom:6px;cursor:pointer;transition:border-color .12s}
-.obcards.rows .obcard:hover{border-color:var(--blue)}
+.obcards.rows .obcard:hover{box-shadow:0 3px 14px rgba(16,32,58,.09)}
+.obcards.rows .wowinfo{flex:1 1 100%;width:100%}
 .obcards.rows .obcard .obh{flex:1 1 300px;margin:0;align-items:center}
 .obcards.rows .obcard .obh>div:first-child{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0}
 .obcards.rows .obcard .obm{margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
@@ -1310,17 +1318,17 @@ body.drsz .drawer{transition:none}
 .kpisev{font-size:9.5px;font-weight:800;letter-spacing:.3px;padding:2px 7px;border-radius:20px;white-space:nowrap;flex:none}
 .kpisev.green{background:#E7F6EC;color:#166534}.kpisev.amber{background:#FEF3C7;color:#92400E}
 .kpisev.red{background:#FEE2E2;color:#991B1B}.kpisev.gray{background:#EEF2F6;color:#64748B}
-.kpisay{font-size:11.5px;line-height:1.6;color:#4A5A6E;padding:6px 10px 8px 12px;margin:0 0 4px;border-left:3px solid var(--line);background:#FAFBFD;border-radius:0 8px 8px 0}
-.kpisay.amber{border-left-color:#E08A1E;background:#FFFBF2}.kpisay.red{border-left-color:#DC2626;background:#FFF6F6}
-.kpisay.green{border-left-color:#16A34A;background:#F4FBF6}
-.kpihero{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;background:#F7F9FC;border-left:4px solid var(--line);margin-bottom:12px}
-.kpihero.amber{border-left-color:#E08A1E}.kpihero.red{border-left-color:#DC2626}.kpihero.green{border-left-color:#16A34A}
+.kpisay{font-size:11.5px;line-height:1.6;color:#4A5A6E;padding:6px 10px 8px 12px;margin:0 0 4px;background:#FAFBFD;border-radius:8px}
+.kpisay.amber{background:#FFFBF2}.kpisay.red{background:#FFF6F6}
+.kpisay.green{background:#F4FBF6}
+.kpihero{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;background:#F7F9FC;margin-bottom:12px}
+.kpihero.amber{background:#FFF9EF}.kpihero.red{background:#FFF6F5}.kpihero.green{background:#F3FAF5}
 .kpihv{font-size:28px;font-weight:800;color:var(--navy);line-height:1}
 .kpihs{font-size:13px;font-weight:800;color:var(--navy)}
 .kpiacts{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
 .k3row{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:18px}
-.k3card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px;border-top:4px solid var(--line)}
-.k3card.amber{border-top-color:#E08A1E}.k3card.red{border-top-color:#DC2626}.k3card.green{border-top-color:#16A34A}
+.k3card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px}
+.k3card.amber .k3n{background:#E08A1E}.k3card.red .k3n{background:#DC2626}.k3card.green .k3n{background:#16A34A}
 .k3hd{display:flex;align-items:center;gap:9px;margin-bottom:7px;font-size:13px}
 .k3n{width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none}
 .k3v{font-size:19px;font-weight:800;color:var(--navy);margin-bottom:6px}
@@ -1381,8 +1389,8 @@ body.drsz .drawer{transition:none}
 .undobar .x{background:none;border:0;color:#9FB0C4;font-size:17px;line-height:1;cursor:pointer;padding:0 4px}
 .undobar .x:hover{color:#fff}
 .notis{position:fixed;right:16px;bottom:16px;z-index:96;display:flex;flex-direction:column;gap:9px;max-width:330px}
-.noti{background:#fff;border:1px solid var(--line);border-left:4px solid var(--navy);border-radius:11px;box-shadow:0 10px 28px rgba(15,30,50,.2);padding:11px 13px;display:flex;gap:10px;align-items:flex-start;cursor:pointer;animation:notiIn .22s ease}
-.noti.red{border-left-color:var(--red)}
+.noti{background:#fff;border:1px solid var(--line);border-radius:11px;box-shadow:0 10px 28px rgba(15,30,50,.2);padding:11px 13px;display:flex;gap:10px;align-items:flex-start;cursor:pointer;animation:notiIn .22s ease}
+.noti.red{background:#FFFBFA;border-color:#EBC8C4}
 .noti .nic{font-size:18px;color:var(--navy);margin-top:1px;flex:none}
 .noti.red .nic{color:var(--red)}
 .noti b{font-size:12.5px;display:block}
@@ -1421,7 +1429,7 @@ body.drsz .drawer{transition:none}
       <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div style="min-width:0"><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px;margin-left:auto"><span class="chip blue roomChip" id="demoBadge">Room demo</span><button class="btn sm" id="tourBtn" onclick="tourMenu()" title="Chạy hướng dẫn từng bước - chọn cấp độ rồi app chỉ tận nơi"><i class="ti ti-school"></i>Chạy hướng dẫn</button><button class="btn sm" onclick="demoReset()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ và mọi máy trong room cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
       <div class="rolesel">
 <!-- V9.29: bỏ ô chọn vai roleSel - luôn bị ẩn từ V9.9, giữ lại chỉ tổ rối -->
-        <button class="tbtn" id="tthBtn" onclick="tthToggle()" aria-label="Bật/tắt Trợ thủ thao tác" data-tip="Trợ thủ thao tác - nhắc việc ngay trên từng trang"><i class="ti ti-bulb"></i></button>
+        <button class="tbtn" id="tthBtn" onclick="tthToggle()" aria-label="Bật/tắt Trợ lý" data-tip="Trợ lý - hỏi đáp và nhắc việc, nút tròn góc dưới bên phải"><i class="ti ti-bulb"></i></button>
         <button class="tbtn" data-tour="help" onclick="tourMenu()" aria-label="Hướng dẫn sử dụng" title="Hướng dẫn từng bước"><i class="ti ti-help-circle"></i></button>
         <button class="tbtn" data-tour="bell" onclick="toggleBell(event)" aria-label="Thông báo"><i class="ti ti-bell"></i><span class="n" id="bellN" style="display:none">0</span></button>
         <div class="notif" id="notif"></div>
@@ -1837,7 +1845,10 @@ function rows(c){return DL[c]||[]}
 function find(c,f,v){var a=rows(c);for(var i=0;i<a.length;i++)if(a[i][f]===v)return a[i];return null}
 function where(c,fn){return rows(c).filter(fn)}
 function ecode(v){if(v==null)return"";var m=String(v).match(/^([^(]+?)\s*\(/);return m?m[1].trim():String(v).trim()}
-function elabel(v){if(v==null||v==="")return"";var m=String(v).match(/\(([^)]+)\)\s*$/);return m?m[1]:String(v)}
+/* Nhãn CH1 dạng "code (Nhãn tiếng Việt)". Regex phải THAM ĂN từ ngoặc mở ĐẦU TIÊN tới ngoặc
+   đóng cuối - nhãn có ngoặc lồng như "sales_staff (NV Tư vấn (EC))" mà bắt kiểu [^)]+ là không
+   khớp gì và cả app in nguyên mã thô ra màn hình. */
+function elabel(v){if(v==null||v==="")return"";var m=String(v).match(/\((.+)\)\s*$/);return m?m[1]:String(v)}
 function num(v){if(v==null||v==="")return 0;var n=parseFloat(String(v).replace(/[^0-9.\-]/g,""));return isNaN(n)?0:n}
 function money(v){var n=num(v);return n?n.toLocaleString("vi-VN"):"-"}
 /* esc PHAI escape ca nhay kep va nhay don: chuoi nay duoc nhet vao value="..." va onclick="...('..')".
@@ -2976,12 +2987,15 @@ function clearFilt(key){__clearHVF();FILT[key]=[];if(window.QF)window.QF[key]=nu
  if(window.FLT2)window.FLT2[key]={};   /* V9.28: xoá lọc là xoá CẢ bộ lọc chuyên sâu, không để sót điều kiện ẩn */
  PAGE[key]=0;rlist(key)}
 function qfToggle(key,k){window.QF=window.QF||{};window.QF[key]=(window.QF[key]===k)?null:k;PAGE[key]=0;rlist(key)}
-function goRisk(){window.QF=window.QF||{};window.QF.hocvien="risk";PAGE.hocvien=0;go("hocvien")}
 /* Bấm tên bất kỳ (Trang bắt đầu / Hành trình) -> MỞ DRAWER thông tin trước; muốn xử lý thì bấm nút. */
 /* V9.29 (anh Luân: "ở xếp lớp & onboarding, sao ko có drawer tóm tắt thông tin học viên em").
    Không riêng trang đó - 7 màn tác vụ đều in tên người thành CHỮ CHẾT. Một hàm dùng chung, cùng
    kiểu với lopLnk: bấm tên là ra drawer tóm tắt (chặng, việc kế, chuyên cần, tiền, liên hệ). */
-function nguoiLnk(pid,nm,fb){var t=nm||pid||fb||"-";
+function nguoiLnk(pid,nm,fb){
+ /* cùng luật với nsLnk: quên đưa tên thì tra DL09 rồi DL02 - không chìa mã HV/L- thô ra màn */
+ if(!nm&&pid){var _p0=find("DL09","student_id",pid)||find("DL02","lead_id",pid);
+  if(_p0&&_p0.full_name)nm=_p0.full_name}
+ var t=nm||pid||fb||"-";
  if(!pid)return esc(t);
  return '<a class="lnk" onclick="event.stopPropagation();openQuick(\''+esc(pid)+'\')" '+
   'data-tip="Xem nhanh hồ sơ - chặng, việc kế tiếp, chuyên cần, công nợ">'+esc(t)+'</a>'}
@@ -3100,15 +3114,15 @@ function riskCare(sid){var s=find("DL09","student_id",sid);if(!s){toast("Không 
  var h='<div class="dcard"><h4><i class="ti '+(M?M.ic:"ti-user-exclamation")+'"></i>'+esc(s.full_name||sid)+'</h4>';
  /* V9.41: nói RÕ em này đang ở mức nào và SOP yêu cầu làm gì ở mức đó - không để học vụ phải nhớ
     năm mức trong đầu rồi tự đoán nên họp mấy bên. */
- if(M)h+='<div class="notebar" style="margin:0 0 10px;border-left:3px solid var(--'+(M.sev==="red"?"red":"amber")+')">'+
+ if(M)h+='<div class="notebar'+(M.sev==="red"?" nbred":"")+'" style="margin:0 0 10px">'+
   '<i class="ti '+M.ic+'"></i><b>'+esc(M.grp.replace("Nguy cơ - ",""))+'</b> - '+esc(M.viec)+'. Hạn: <b>'+esc(M.han)+'</b>.</div>';
  h+='<div style="margin-bottom:10px">'+(hand?'<span class="chip red">người đã gắn cờ</span> ':'')+
   (A.any?'<span class="chip amber">máy thấy vượt ngưỡng</span> ':'')+
   (ignRisk(s)?'<span class="chip gray">đang tạm bỏ qua tới '+esc(s.risk_ignore_until)+'</span>':'')+'</div>';
  (function(){var im=hoursSince(s.last_learning_activity_time);
   var nd=num(paramOf("slaActivity_inactive_days",7))||7;
-  if(im==null)h+='<div class="notebar" style="border-left:3px solid var(--amber)"><i class="ti ti-zzz"></i>Hồ sơ chưa ghi hoạt động học nào - không biết em còn theo lớp không.</div>';
-  else if(im/24>nd)h+='<div class="notebar" style="border-left:3px solid var(--red)"><i class="ti ti-zzz"></i><b>Im lặng '+Math.round(im/24)+' ngày</b> - không nộp bài, không đặt WOW, không vào cổng (ngưỡng '+slaChip("slaActivity_inactive_days",7)+').</div>'})();
+  if(im==null)h+='<div class="notebar"><i class="ti ti-zzz"></i>Hồ sơ chưa ghi hoạt động học nào - không biết em còn theo lớp không.</div>';
+  else if(im/24>nd)h+='<div class="notebar nbred"><i class="ti ti-zzz"></i><b>Im lặng '+Math.round(im/24)+' ngày</b> - không nộp bài, không đặt WOW, không vào cổng (ngưỡng '+slaChip("slaActivity_inactive_days",7)+').</div>'})();
  h+='<div class="notebar"><i class="ti ti-radar"></i>Vắng không phép <b>'+A.abs+'</b> buổi, ngưỡng '+
   slaChip("thresholdAtRisk_absences",2)+' · thiếu <b>'+A.miss+'</b> bài, ngưỡng '+
   slaChip("thresholdAtRisk_hw_missing",3)+' · còn <b>'+(String(s.wow_quota_remaining||"")===""?"-":q)+'</b> lượt WOW chưa dùng.</div>';
@@ -3194,14 +3208,15 @@ function ghHTML(s){
  var dm=ghDauMoi(s),tra=ghNguoiTra(s);
  if(!ghCo(s))
   return '<div class="notebar" style="margin:8px 0"><i class="ti ti-user-question"></i>'+
-   '<b>Chưa có người giám hộ / phụ huynh.</b> SOP yêu cầu ghi số điện thoại người giám hộ - '+
+   '<b>Chưa có người đồng hành (phụ huynh / người giám hộ).</b> SOP yêu cầu ghi số điện thoại người nhà - '+
    'thiếu thì lúc em vắng học hay tới hạn đóng tiền không biết gọi ai. '+
-   '<button class="pill" onclick="ghForm(\''+esc(s.student_id)+'\')"><i class="ti ti-plus"></i>Thêm người giám hộ</button></div>';
+   '<button class="pill" onclick="dhForm(\''+esc(s.student_id)+'\')"><i class="ti ti-plus"></i>Thêm người đồng hành</button></div>';
  return '<div class="ctxbox">'+
-  '<div class="ctxr"><span class="ctxk">Người giám hộ</span><span class="ctxv"><b>'+esc(ghTen(s)||"(chưa ghi tên)")+'</b>'+
-   (ghQuanHe(s)?(' <span class="chip">'+esc(ghQuanHe(s))+'</span>'):'')+
+  /* anh Luân chốt 30/07: "Người đồng hành, rồi bố, rồi số điện thoại là đủ" - dòng này chỉ
+     QUAN HỆ + SĐT. Họ tên vẫn lưu (phiếu thu cần) nhưng nằm trong form sửa, không chiếm dòng. */
+  '<div class="ctxr"><span class="ctxk">Người đồng hành</span><span class="ctxv"><b>'+esc(ghQuanHe(s)||"(chưa chọn quan hệ)")+'</b>'+
    (ghSdt(s)?(' · '+telHTML(ghSdt(s))):' · <span class="mut">chưa có số</span>')+
-   ' <button class="cfedit" onclick="event.stopPropagation();ghForm(\''+esc(s.student_id)+'\')" aria-label="Sửa người giám hộ" data-tip="Sửa người giám hộ - tên, số điện thoại, quan hệ, ai đóng tiền, ai là đầu mối"><i class="ti ti-edit"></i></button></span></div>'+
+   ' <button class="cfedit" onclick="event.stopPropagation();dhForm(\''+esc(s.student_id)+'\')" aria-label="Sửa người đồng hành" data-tip="Sửa người đồng hành - quan hệ, số điện thoại, họ tên in phiếu thu, ai đóng tiền, ai là đầu mối"><i class="ti ti-edit"></i></button></span></div>'+
   '<div class="ctxr"><span class="ctxk">Đầu mối liên hệ</span><span class="ctxv">'+
    (dm==="guardian"?'<span class="chip amber">Gọi người giám hộ</span>':
     dm==="both"?'<span class="chip blue">Gọi cả hai</span>':'<span class="chip green">Gọi thẳng học viên</span>')+'</span></div>'+
@@ -3218,16 +3233,19 @@ function ghGoiHTML(s){
  var box='<div class="notebar" style="margin:8px 0"><i class="ti ti-phone"></i>Hồ sơ khai <b>gọi '+esc(ai)+'</b>. ';
  var nut=[];
  if(dm!=="guardian"&&sdtHV)nut.push('<span>Học viên: '+telHTML(sdtHV)+'</span>');
- if(dm!=="student"&&sdtGH)nut.push('<span>'+esc(ghQuanHe(s)||"Người giám hộ")+(ghTen(s)?(" "+esc(ghTen(s))):"")+': '+telHTML(sdtGH)+'</span>');
+ if(dm!=="student"&&sdtGH)nut.push('<span>'+esc(ghQuanHe(s)||"Người đồng hành")+': '+telHTML(sdtGH)+'</span>');
  if(dm!=="student"&&!sdtGH)nut.push('<span class="mut">chưa có số người giám hộ - '+
-  '<a class="lnk" onclick="ghForm(\''+esc(s.student_id)+'\')">bổ sung</a></span>');
+  '<a class="lnk" onclick="dhForm(\''+esc(s.student_id)+'\')">bổ sung</a></span>');
  if(!nut.length)nut.push('<span class="mut">hồ sơ chưa có số nào</span>');
  return box+nut.join(" &nbsp;·&nbsp; ")+'</div>'}
-function ghForm(sid){var s=find("DL09","student_id",sid);if(!s){toast("Không thấy học viên");return}
- var h='<div class="dcard"><h4><i class="ti ti-users"></i>Người giám hộ - '+esc(s.full_name||sid)+'</h4>';
+/* dhForm = form NGUOI DONG HANH. Truoc day ten la ghForm - TRUNG TEN voi ghForm cua "Ghi nhan
+   phan hoi" o phia duoi, ham sau de len ham truoc nen bam "Sua nguoi giam ho" la mo nham form
+   phan hoi. Trung ten ham la loai bug im lang nhat - _checkux nay cam viec dinh nghia trung. */
+function dhForm(sid){var s=find("DL09","student_id",sid);if(!s){toast("Không thấy học viên");return}
+ var h='<div class="dcard"><h4><i class="ti ti-users"></i>Người đồng hành - '+esc(s.full_name||sid)+'</h4>';
  h+='<div class="notebar"><i class="ti ti-info-circle"></i>SOP quy định phải có số điện thoại người giám hộ. '+
   'Hai lựa chọn bên dưới quyết định <b>app gọi ai</b> khi em vắng học và <b>phiếu thu ghi tên ai</b> khi đóng tiền.</div>';
- h+='<div class="fld"><label>Họ tên người giám hộ</label><input id="gh_ten" value="'+esc(ghTen(s))+'" placeholder="vd: Nguyễn Thị Lan"></div>';
+ h+='<div class="fld"><label>Họ tên người đồng hành</label><input id="gh_ten" value="'+esc(ghTen(s))+'" placeholder="vd: Nguyễn Thị Lan"><div class="fhint">Dùng để in phiếu thu khi người này đóng tiền - màn hình thường chỉ hiện quan hệ + số.</div></div>';
  h+='<div class="fld"><label>Số điện thoại</label><input id="gh_sdt" value="'+esc(ghSdt(s))+'" placeholder="09xxxxxxxx"><div class="fhint">Số này cũng là số đăng nhập cổng phụ huynh.</div></div>';
  h+='<div class="fld"><label>Quan hệ với học viên</label><select id="gh_qh"><option value="">-- chọn --</option>'+
   (ENUM.enum_guardian_relation||[]).map(function(o){return '<option value="'+esc(o)+'"'+(ecode(o)===ecode(s.emergency_contact_relation)?" selected":"")+'>'+esc(elabel(o))+'</option>'}).join("")+'</select></div>';
@@ -3240,16 +3258,16 @@ function ghForm(sid){var s=find("DL09","student_id",sid);if(!s){toast("Không th
  h+='<div class="fld"><label>Giới tính học viên</label><select id="gh_gt"><option value="">-- chưa ghi --</option>'+
   ["Nam","Nữ","Khác"].map(function(o){return '<option'+(String(s.gender||"")===o?" selected":"")+'>'+o+'</option>'}).join("")+'</select></div>';
  h+='<div class="fld full"><label>Địa chỉ</label><input id="gh_dc" value="'+esc(s.address||"")+'" placeholder="số nhà, đường, phường, quận"></div>';
- h+='<div class="fld full"><button class="btn primary" onclick="ghSave(\''+esc(sid)+'\')"><i class="ti ti-device-floppy"></i>Lưu</button></div></div>';
- openDrawer("Người giám hộ",h)}
-function ghSave(sid){var ten=String(fldV("gh_ten")||"").trim(),sdt=String(fldV("gh_sdt")||"").trim();
+ h+='<div class="fld full"><button class="btn primary" onclick="dhSave(\''+esc(sid)+'\')"><i class="ti ti-device-floppy"></i>Lưu</button></div></div>';
+ openDrawer("Người đồng hành",h)}
+function dhSave(sid){var ten=String(fldV("gh_ten")||"").trim(),sdt=String(fldV("gh_sdt")||"").trim();
  var dm=fldV("gh_dm"),tra=fldV("gh_tra");
  if(/guardian|both/.test(ecode(dm))&&!sdt){toast("Chọn liên hệ người giám hộ thì phải có số điện thoại của họ.");return}
  if(ecode(tra)==="guardian"&&!ten){toast("Người giám hộ đóng tiền thì phải có tên để in lên phiếu thu.");return}
  markRow("DL09","student_id",sid,{emergency_contact_name:ten,emergency_contact_phone:sdt,
   emergency_contact_relation:fldV("gh_qh"),contact_primary:dm,payer_side:tra,
   gender:fldV("gh_gt"),address:String(fldV("gh_dc")||"").trim()},
-  "Đã lưu người giám hộ."+(/guardian|both/.test(ecode(dm))?" App sẽ nhắc gọi người giám hộ khi có việc.":""));
+  "Đã lưu người đồng hành."+(/guardian|both/.test(ecode(dm))?" App sẽ nhắc gọi người giám hộ khi có việc.":""));
  closeModal()}
 function openStuQuick(sid){var s=find("DL09","student_id",sid);if(!s){toast("Không thấy học viên");return}
  var KL=stuKhoaLop(sid);var no=stuNoTong(sid);
@@ -3273,7 +3291,7 @@ function openStuQuick(sid){var s=find("DL09","student_id",sid);if(!s){toast("Kh�
  h+=ghHTML(s);   /* người giám hộ ngay dưới thông tin gốc - đây là người trung tâm gọi khi có việc */
  if(risk){var rs=stuRiskReasons(s);
   var dates=st.absU.slice(0,6).map(function(a){var ss=find("DL11","session_id",a.session_id);return (ss&&ss.session_date)?String(ss.session_date).split(" ")[0]:(a.check_in_time||"")}).filter(Boolean);
-  h+='<div class="ctxcontent" style="border-left-color:var(--red);background:#FFF5F5"><div class="cch" style="color:var(--red)"><i class="ti ti-alert-triangle"></i> Vì sao gắn cờ nguy cơ</div><div class="ccb"><ul style="margin:4px 0 0;padding-left:16px">'+
+  h+='<div class="ctxcontent ccred"><div class="cch"><i class="ti ti-alert-triangle"></i> Vì sao gắn cờ nguy cơ</div><div class="ccb"><ul style="margin:4px 0 0;padding-left:16px">'+
    (rs.length?rs.map(function(x){return '<li>'+esc(x)+'</li>'}).join(""):'<li>Được đánh dấu nguy cơ trong hồ sơ.</li>')+'</ul>'+
    (dates.length?'<div style="margin-top:6px;font-size:12px;color:#7A2E2E">Buổi vắng gần đây: '+esc(dates.join(", "))+'</div>':'')+
    (s.learning_followup_note?'<div style="margin-top:6px;font-size:12px">Ghi chú theo dõi: '+esc(s.learning_followup_note)+'</div>':'')+'</div></div>';
@@ -3319,7 +3337,11 @@ function openLopQuick(cid){var c=find("DL10","class_id",cid);if(!c){toast("Khôn
    nhân sự, khóa học - nếu chỉ sửa học viên thì ba loại kia lại lệch nhịp.
    isGVRole dùng chung với renderHosoGV/renderHosoNV: một định nghĩa "ai là giảng viên". */
 function isGVRole(s){if(!s)return false;return /teacher|giang/i.test(ecode(s.role)+" "+String(s.role||""))}
-function nsLnk(id,nm,fb){var t=nm||id||fb||"-";
+function nsLnk(id,nm,fb){
+ /* anh Luân (30/07): "hiện tên chứ, người dùng mà hiện ID làm gì, ai hiểu đâu". Nơi gọi quên
+    đưa tên (hoặc đưa sai trường) thì tầng chung tự tra DL01 - không màn nào được chìa mã thô. */
+ if(!nm&&id){var _s0=find("DL01","staff_id",id);if(_s0&&_s0.full_name)nm=_s0.full_name}
+ var t=nm||id||fb||"-";
  if(!id)return esc(t);
  return '<a class="lnk" onclick="event.stopPropagation();openNSQuick(\''+esc(id)+'\')" '+
   'data-tip="Xem nhanh nhân sự - vai trò, lớp/hồ sơ phụ trách">'+esc(t)+'</a>'}
@@ -4372,7 +4394,7 @@ function renderViec(){var items=bellItems();
  BUCK.forEach(function(B){
   var part=view.filter(function(it){return (it.sev||"")===B[0]});
   if(!part.length)return;
-  h+='<div class="viechd" style="border-left-color:'+B[3]+'"><i class="ti '+B[2]+'" style="color:'+B[3]+'"></i>'+
+  h+='<div class="viechd"><i class="ti '+B[2]+'" style="color:'+B[3]+'"></i>'+
    esc(B[1])+' <b>'+part.length+'</b></div>';
   h+='<div class="panel" style="margin-bottom:12px"><div class="pbody slalist">';
   var lim=Math.max(0,CAP-shown);
@@ -4462,7 +4484,7 @@ function duyGiaoHTML(){var L=fltApply("duyetgiao",duyTaskList());
  if(!L.length)h+='<tr><td class="empty" colspan="6">Mọi việc đã giao đều có người nhận.</td></tr>';
  L.slice(0,120).forEach(function(t){
   h+='<tr><td><b>'+esc(t.title||t.task_id||"")+'</b></td>'+
-   '<td>'+nsLnk(t.assignee_id,t.assignee_name,"-")+'</td><td>'+nsLnk(t.assigner_id,t.assigner_name,"-")+'</td>'+
+   '<td>'+nsLnk(t.assignee_id,t.assignee_id_name,"-")+'</td><td>'+nsLnk(t.assigner_id,t.assigner_id_name,"-")+'</td>'+
    '<td>'+esc(String(t.due_time||"").slice(0,16)||"-")+(tkOver(t)?' <span class="chip red">quá hạn</span>':'')+'</td>'+
    '<td>'+tkStChip(t)+'</td>'+
    '<td><button class="btn sm" onclick="go(\'giaoviec\')"><i class="ti ti-arrow-right"></i>Mở Giao việc</button></td></tr>'});
@@ -4930,7 +4952,7 @@ function leadDetail(lid){var L=find("DL02","lead_id",lid);if(!L){toast("Không t
  h+='<div class="dcard"><h4><i class="ti ti-user"></i>Thông tin lead</h4>'+kv("Họ tên",L.full_name)+kvRaw("SĐT",telHTML(L.phone_number))+kv("Zalo",L.zalo_id)+kv("Nguồn",elabel(L.lead_source))+kv("Đối tượng",elabel(L.student_type))+kv("Điểm mục tiêu",L.target_band)+kv("Mục tiêu học",elabel(L.learning_goal)||L.learning_goal)+kv("Lịch rảnh",L.availability_schedule)+kv("Dự kiến bắt đầu",L.expected_start_time)+kv("Phân loại",elabel(L.lead_qualification_status))+kv("Hình thức",elabel(L.learning_mode))+kv("Trạng thái",elabel(L.lead_status))+kv("NV phụ trách",L.assigned_to_name)+kv("Tạo lúc",L.lead_created_time)+kv("Hẹn liên hệ tiếp",L.next_followup_time)+kv("Số lần liên hệ",L.contact_count)+kv("Ghi chú",L.lead_note)+'</div>';
  if(L.next_action)h+='<div class="dnote"><b>Việc cần làm:</b> '+esc(L.next_action)+'</div>';
  var strk=failStreak(lid);
- if(strk>0)h+='<div class="dnote" style="border-left-color:var(--'+(strk>=paramOf("attemptsNoResponse",3)?"red":"amber")+')"><b>Đã thử '+strk+' lần chưa kết nối được.</b> '+(strk>=paramOf("attemptsNoResponse",3)?"Theo SOP nên đổi kênh (Zalo/SMS) hoặc chuyển trạng thái Không liên lạc được.":"Gọi lại theo lịch hẹn; ghi nhận kết quả mỗi lần gọi.")+'</div>';
+ if(strk>0)h+='<div class="dnote'+(strk>=paramOf("attemptsNoResponse",3)?" nbred":"")+'"><b>Đã thử '+strk+' lần chưa kết nối được.</b> '+(strk>=paramOf("attemptsNoResponse",3)?"Theo SOP nên đổi kênh (Zalo/SMS) hoặc chuyển trạng thái Không liên lạc được.":"Gọi lại theo lịch hẹn; ghi nhận kết quả mỗi lần gọi.")+'</div>';
  h+='<div class="dcard"><h4><i class="ti ti-history"></i>Lịch sử liên hệ ('+tps.length+')</h4>';
  if(!tps.length)h+='<div class="mut" style="font-size:12px">Chưa có lượt liên hệ nào.</div>';
  tps.forEach(function(t){var rc=ecode(t.result_note);var ok=cresOK(rc);
@@ -5277,7 +5299,7 @@ function mstripFor(pid,ix){if(!pid)return "";try{var J=jInfo(pid,ix);return mstr
 function mstripOpen(pid){var J,C;try{J=jInfo(pid);C=J.C}catch(e){return}
  var cur=JMAIN.indexOf(J.k);
  var h='<div class="dcard"><h4><i class="ti ti-route"></i>'+esc(J.name)+'</h4>';
- if(J.S&&J.S.branch)h+='<div class="dnote" style="border-left-color:var(--red)"><b>Đang ở nhánh rẽ: '+esc(J.S.t)+'.</b> '+esc(J.S.why||"")+'</div>';
+ if(J.S&&J.S.branch)h+='<div class="dnote nbred"><b>Đang ở nhánh rẽ: '+esc(J.S.t)+'.</b> '+esc(J.S.why||"")+'</div>';
  h+='<div class="hvj">';
  JMAIN.forEach(function(k,i){var S=JBY[k];var st=(cur<0)?"":(i<cur?"done":(i===cur?"now":""));
   var when=st?String(S.since(C)||""):"";
@@ -6648,7 +6670,7 @@ function jStepper(J,clickable){var cur=J.S.idx,h='<div class="jstep">';
   if(i<JMAIN.length-1)h+='<div class="jsc '+(i<cure?"done":"")+'"></div>'});
  h+='</div>';
  if(mode)h+='<div class="jshint"><i class="ti ti-hand-finger"></i>Bấm vào một bước để '+(mode==="hoso"?"vào xử lý / xem lại bước đó.":"xem lại / cập nhật bước đã qua, hoặc làm bước hiện tại bên dưới.")+'</div>';
- if(J.S.branch)h+='<div class="dnote" style="border-left-color:var(--red)"><b>Nhánh rẽ: '+esc(J.S.t)+'.</b> '+esc(J.S.why)+'</div>';
+ if(J.S.branch)h+='<div class="dnote nbred"><b>Nhánh rẽ: '+esc(J.S.t)+'.</b> '+esc(J.S.why)+'</div>';
  return h}
 function jTimeline(C){
  var ev=[];
@@ -7797,7 +7819,7 @@ function kpiOpen(code){
   ["Cỡ mẫu",esc(kpiMau(code))]]);
  var acts=(doc.viec&&(doc.viec[sev]||doc.viec.canhbao))||[];
  if(sev==="tot"||sev==="dat"){
-  h+='<div class="notebar" style="border-left-color:var(--green)"><i class="ti ti-check"></i>Chỉ số này đang ổn - chưa cần can thiệp. Giữ nhịp hiện tại và theo dõi tiếp.</div>'}
+  h+='<div class="notebar nbgreen"><i class="ti ti-check"></i>Chỉ số này đang ổn - chưa cần can thiệp. Giữ nhịp hiện tại và theo dõi tiếp.</div>'}
  else if(acts.length){
   h+='<div style="font-size:12.5px;font-weight:800;color:var(--navy);margin:12px 0 7px">Tuần này nên làm</div><div class="kpiacts">';
   acts.forEach(function(a){h+=kpiBtn(a[0],a[1],a[2],a[3])});
@@ -8236,17 +8258,17 @@ function renderHuongdan(){
  return h}
 function renderTro(){
  var C=tthCfg();
- var h='<div class="notebar"><i class="ti ti-bulb"></i><b>Trợ thủ</b> là thứ dắt nhân viên đi hết hàng chờ của họ: mở đúng màn thao tác, làm xong tự kiểm rồi nhảy việc kế. Sửa ở đây <b>áp ngay</b>, không cần build lại. Nhịp ngày ở tab bên cạnh.</div>';
+ var h='<div class="notebar"><i class="ti ti-bulb"></i><b>Trợ lý</b> là thứ dắt nhân viên đi hết hàng chờ của họ: mở đúng màn thao tác, làm xong tự kiểm rồi nhảy việc kế. Sửa ở đây <b>áp ngay</b>, không cần build lại. Nhịp ngày ở tab bên cạnh.</div>';
 
  /* ---- khối 1: trợ thủ ---- */
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-checklist" style="margin-right:6px"></i>Trợ thủ - dọn việc từng bước</b>'+
+ h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-checklist" style="margin-right:6px"></i>Trợ lý - dọn việc từng bước</b>'+
   '<button class="btn sm" onclick="tthReset()"><i class="ti ti-restore"></i>Về mặc định</button></div><div class="pbody">';
  h+='<div class="jgrid"><div>';
- h+='<div class="fld full"><label>Bật Trợ thủ cho mọi người</label>'+
+ h+='<div class="fld full"><label>Bật Trợ lý cho mọi người</label>'+
   '<select onchange="tthSet(\'on\',+this.value);reRender(\'settings\')">'+
-  '<option value="1"'+(C.on?" selected":"")+'>Bật - nút Trợ thủ ở góc dưới bên phải</option>'+
+  '<option value="1"'+(C.on?" selected":"")+'>Bật - nút Trợ lý ở góc dưới bên phải</option>'+
   '<option value="0"'+(C.on?"":" selected")+'>Tắt - không hiện nút nào</option></select>'+
-  '<div class="mut" style="font-size:11.5px;margin-top:4px">Trợ thủ nằm ở <b>một nút tròn góc dưới bên phải</b>, không chen vào thân trang. Bấm vào bung ra: việc kế tiếp, nhịp ngày, và nút dọn từng bước.</div></div>';
+  '<div class="mut" style="font-size:11.5px;margin-top:4px">Trợ lý nằm ở <b>một nút tròn góc dưới bên phải</b>, không chen vào thân trang. Bấm vào bung ra: việc kế tiếp, nhịp ngày, và nút dọn từng bước.</div></div>';
  h+='<div class="fld full"><label>Mỗi lượt dọn bao nhiêu việc</label>'+
   '<input type="number" min="1" max="50" value="'+esc(String(C.batch))+'" oninput="tthSet(\'batch\',Math.max(1,num(this.value)||1))">'+
   '<div class="mut" style="font-size:11.5px;margin-top:4px">Dọn hết một lượt rồi mở lại - chia nhỏ để người ta thấy về đích, thay vì nhìn 40 việc rồi nản.</div></div>';
@@ -8275,7 +8297,7 @@ function renderTro(){
 /* Nhịp ngày tách thành tab riêng: hai thứ khác nhau (một cái xếp việc, một cái nhắc thói quen theo
    buổi), nhét chung một màn thì màn nào cũng dài mà chẳng cái nào rõ. */
 function renderNhip(){
- var h='<div class="notebar"><i class="ti ti-calendar"></i><b>Nhịp ngày</b> là bảng nhắc theo chức danh, hiện trong tấm Trợ thủ ở góc dưới bên phải (3 ô: Đầu ngày / Trong ngày / Cuối ngày). Sửa ở đây áp ngay cho mọi người cùng chức danh.</div>';
+ var h='<div class="notebar"><i class="ti ti-calendar"></i><b>Nhịp ngày</b> là bảng nhắc theo chức danh, hiện trong tấm Trợ lý ở góc dưới bên phải (3 ô: Đầu ngày / Trong ngày / Cuối ngày). Sửa ở đây áp ngay cho mọi người cùng chức danh.</div>';
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-calendar" style="margin-right:6px"></i>Nhịp ngày theo chức danh</b>'+
   '<button class="btn sm" onclick="nhipReset()"><i class="ti ti-restore"></i>Về mặc định</button></div><div class="pbody">';
  h+='<div class="mut" style="font-size:11.5px;margin:0 0 10px;line-height:1.6">Dòng có <b>hàng chờ</b> thì app đếm được và báo "sạch" khi về 0. Dòng <b>thói quen</b> (bạn tự thêm) không có gì để đếm nên app chỉ ghi "nên xem" - <b>không</b> gắn mác đã xong, vì gắn bừa là nói láo với người trực ca.</div>';
@@ -8338,7 +8360,7 @@ var SETMOTA={
  ch6:["Ngưỡng ĐẠT của từng chỉ số KPI - app so số thực tế với ngưỡng ở đây để tô xanh/đỏ và viết câu khuyến nghị trên trang Báo cáo.",function(){return ((DATA.config||{}).ch6||[]).length+" chỉ số"},"ti-target"],
  ch4:["Câu chữ của mọi lời nhắc việc, cộng kịch bản chăm sóc gợi ý theo từng chặng. Sửa câu ở đây là mọi nơi đổi theo.",function(){return ch4List().length+" thông điệp"},"ti-message-2"],
  ch1:["Danh mục lựa chọn của mọi ô chọn trong app: trạng thái, nguồn lead, chi nhánh, lý do nghỉ… Thêm giá trị mới cho hợp với trung tâm.",function(){return Object.keys(ENUM||{}).length+" danh mục"},"ti-list"],
- tro:["Trợ thủ - thứ dắt nhân viên đi hết hàng chờ của họ. Bật/tắt, chia lượt dọn, xếp nhóm việc nào dọn trước.",function(){return (tthCfg().order||[]).length+" nhóm việc"},"ti-bulb"],
+ tro:["Trợ lý - thứ dắt nhân viên đi hết hàng chờ của họ. Bật/tắt, chia lượt dọn, xếp nhóm việc nào dọn trước.",function(){return (tthCfg().order||[]).length+" nhóm việc"},"ti-bulb"],
  nhip:["Nhịp ngày - danh sách việc theo giờ của từng chức danh, hiện ngay trang đầu khi họ mở app buổi sáng.",function(){return nhipRoles().length+" chức danh"},"ti-clock"],
  qa:["Hộp Hỏi đáp: bổ sung câu trả lời cho những câu app chưa biết, và xem sổ những câu app đang bí.",function(){return qaCfg().muc.length+" mục tự khai"},"ti-message-question"],
  huongdan:["Các bài hướng dẫn có sẵn trong app: tham quan màn hình, thao tác mẫu, cấu hình. Mỗi chức danh có bài riêng.",function(){return Object.keys(TOURS||{}).length+" bài"},"ti-school"],
@@ -8359,7 +8381,7 @@ function setTabs(){
   ["ch6","Ngưỡng KPI (CH6)","luat"],
   ["ch4","Thông điệp nhắc việc (CH4)","luat"],
   ["ch1","Danh mục (CH1)","luat"],
-  ["tro","Trợ thủ","dat"],
+  ["tro","Trợ lý","dat"],
   ["nhip","Nhịp ngày","dat"],
   ["huongdan","Bài hướng dẫn","dat"],
   ["qa","Hỏi đáp","dat"],
@@ -8861,7 +8883,7 @@ function enumDelAsk(en,i){
  if(!used){confirmRun("Xóa giá trị '"+lb+"' khỏi danh mục? (chưa dòng nào dùng)","enumDel",en+"|"+i+"|");return}
  var others=[];ENUM[en].forEach(function(v,j){if(j!==i)others.push(v)});
  var h='<div class="dcard"><h4><i class="ti ti-trash"></i>Xóa "'+esc(lb)+'"</h4>';
- h+='<div class="dnote" style="border-left-color:var(--red)"><b>'+used+' dòng dữ liệu đang dùng giá trị này.</b> Xóa xong các dòng đó sẽ mang giá trị không còn trong danh mục. Chọn cách xử lý dữ liệu:</div>';
+ h+='<div class="dnote nbred"><b>'+used+' dòng dữ liệu đang dùng giá trị này.</b> Xóa xong các dòng đó sẽ mang giá trị không còn trong danh mục. Chọn cách xử lý dữ liệu:</div>';
  h+=ctxRows([["Danh mục",esc(en)],["Mã",esc(cd)],["Đang dùng ở",(ENUMFIELD[en]||[]).map(function(p){var n=0;rows(p[0]).forEach(function(r){if(ecode(r[p[1]])===cd)n++});return n?(p[0]+"."+p[1]+": "+n):""}).filter(function(x){return x}).join(" · ")]]);
  h+='<div class="fld full"><label>Chuyển '+used+' dòng đó sang</label><select id="edl_to"><option value="">-- Để trống (xóa giá trị ở các dòng đó) --</option>'+others.map(function(v){return '<option value="'+esc(v)+'">'+esc(elabel(v)||v)+'</option>'}).join("")+'</select></div>';
  h+='<div class="fld full" style="flex-direction:row;gap:8px"><button class="btn danger" onclick="enumDelRun(\''+esc(en)+'\','+i+')"><i class="ti ti-trash"></i>Chuyển dữ liệu rồi xóa</button><button class="btn" onclick="closeModal()">Hủy</button></div></div>';
@@ -9513,7 +9535,9 @@ function enumOpts(name){var a=ENUM[name]||[];return a.map(function(f){return '<o
 function fldV(id){var el=document.getElementById(id);return el?el.value:""}
 function bandFld(id,lbl){return '<div class="fld"><label>'+lbl+'</label><input id="'+id+'" type="number" step="0.5" min="0" max="9"></div>'}
 function ctxRows(pairs){var r=pairs.filter(function(p){return p[1]!=null&&p[1]!==""&&p[1]!=="-"});if(!r.length)return '';return '<div class="ctxbox">'+r.map(function(p){return '<div class="ctxr"><span class="ctxk">'+esc(p[0])+'</span><span class="ctxv">'+p[1]+'</span></div>'}).join("")+'</div>'}
-function ctxContent(label,text,color){return '<div class="ctxcontent" style="border-left-color:'+(color||"var(--amber)")+'"><div class="cch">'+esc(label)+'</div><div class="ccb">'+esc(text&&String(text).trim()?text:"(không có nội dung)")+'</div></div>'}
+/* mau -> class: he mau di qua nen nhat + mau tieu de, khong con dai vien doc (anh Luan che) */
+function ctxContent(label,text,color){var c=String(color||"");var cls=/red/.test(c)?" ccred":/blue/.test(c)?" ccblue":/green/.test(c)?" ccgreen":"";
+ return '<div class="ctxcontent'+cls+'"><div class="cch">'+esc(label)+'</div><div class="ccb">'+esc(text&&String(text).trim()?text:"(không có nội dung)")+'</div></div>'}
 function vnd(x){var n=num(x);return (n?n.toLocaleString("vi-VN"):"0")+"đ"}
 function isc(v){var c=ecode(v);for(var i=1;i<arguments.length;i++)if(c===arguments[i])return true;return false}
 function hwGraded(x){return !!(String((x&&x.graded_at)||"").trim()||String((x&&x.homework_score)||"").trim())}
@@ -9800,7 +9824,7 @@ function dupWarnHTML(dup){if(!dup)return "";
  var r=dup.rec;var nm=r.full_name||"";var ph=r.phone_number||"";
  var who=(dup.type==="lead")?("lead "+(r.lead_id||"")+(r.assigned_to_name?" · NV phụ trách: "+r.assigned_to_name:"")):("học viên "+(r.student_id||""));
  var open="window.__liDraft={n:fldV(\'li_name\'),p:fldV(\'li_phone\'),t:fldV(\'li_note\')};"+((dup.type==="lead")?('leadDetail(\''+esc(r.lead_id)+'\')'):('openStuQuick(\''+esc(r.student_id)+'\')'));
- return '<div class="ctxcontent" style="border-left-color:var(--red);background:#FFF5F5;margin-bottom:10px"><div class="cch" style="color:var(--red)"><i class="ti ti-alert-triangle"></i> SỐ NÀY ĐÃ CÓ TRONG HỆ THỐNG</div><div class="ccb" style="font-size:12px">'+esc(nm)+' ('+esc(ph)+') - '+esc(who)+'.<br>Kiểm tra hồ sơ cũ trước khi tạo mới để không hai người cùng chăm một khách.<div style="margin-top:8px"><button class="btn sm" onclick="'+open+'"><i class="ti ti-id-badge-2"></i>Xem hồ sơ cũ</button> <span class="mut" style="font-size:10.5px">mở lại "Khách mới liên hệ đến" thì nội dung đang nhập vẫn còn</span></div></div></div>'}
+ return '<div class="ctxcontent ccred" style="margin-bottom:10px"><div class="cch"><i class="ti ti-alert-triangle"></i> SỐ NÀY ĐÃ CÓ TRONG HỆ THỐNG</div><div class="ccb" style="font-size:12px">'+esc(nm)+' ('+esc(ph)+') - '+esc(who)+'.<br>Kiểm tra hồ sơ cũ trước khi tạo mới để không hai người cùng chăm một khách.<div style="margin-top:8px"><button class="btn sm" onclick="'+open+'"><i class="ti ti-id-badge-2"></i>Xem hồ sơ cũ</button> <span class="mut" style="font-size:10.5px">mở lại "Khách mới liên hệ đến" thì nội dung đang nhập vẫn còn</span></div></div></div>'}
 function leadInbound(){window.__dupOK="";var dr=window.__liDraft||{};window.__liDraft=null;
  var h='<div class="dcard"><h4><i class="ti ti-message-plus"></i>Khách mới liên hệ đến</h4>';
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Khách lạ gọi tới / nhắn Zalo hỏi thông tin: ghi MỘT LẦN là có đủ lead + lượt liên hệ đầu (chiều: khách chủ động). Đừng để khách nhắn mà không được ghi lại.</div>';
@@ -11083,7 +11107,7 @@ function renderTrangHV(){
    '<div class="hvaskf"><button class="btn primary sm" onclick="hvClassConfirm(\''+esc(ob.onboarding_id)+'\',1)"><i class="ti ti-check"></i>Tôi nhận lớp này</button>'+
    '<button class="btn sm" onclick="hvClassReject(\''+esc(ob.onboarding_id)+'\')"><i class="ti ti-x"></i>Lịch này không hợp, xin đổi</button></div></div>'}
  if(isc(ob.class_confirmation_status,"rejected"))
-  h+='<div class="notebar" style="margin-bottom:16px;border-left-color:var(--amber)"><i class="ti ti-info-circle"></i>Bạn đã báo lịch lớp này không hợp. Trung tâm đang tìm lớp khác và sẽ liên hệ lại với bạn.</div>';
+  h+='<div class="notebar" style="margin-bottom:16px"><i class="ti ti-info-circle"></i>Bạn đã báo lịch lớp này không hợp. Trung tâm đang tìm lớp khác và sẽ liên hệ lại với bạn.</div>';
  /* HỌC PHÍ: tổng - ưu đãi - đã đóng - CÒN LẠI đặt cạnh nhau cho dễ đối chiếu */
  if(tot>0||paysC.length){
   h+='<div class="panel" id="s-hocphi" style="margin-bottom:16px"><div class="ph"><b>Học phí khóa '+esc(lop?lop.class_name:(enr.course_id_name||""))+'</b>'+
@@ -11241,7 +11265,7 @@ function renderTrangHV(){
   h+='<div class="hvup2'+(_huy?" off":"")+'"><b>'+(_huy?'<span class="chip red" style="margin-right:6px">Đã nghỉ</span>':(_bu?'<span class="chip blue" style="margin-right:6px">Học bù</span>':''))+
    'Buổi '+esc(s2.session_number||"")+' · '+esc(lop?lop.class_name:"")+(P&&P.topic?' — '+esc(P.topic):'')+'</b>'+
    '<span>'+esc(s2.session_date||"")+(_gvn?' · GV '+esc(_gvn):'')+(lop&&lop.venue_or_zoom_link?' · '+esc(lop.venue_or_zoom_link):'')+'</span>';
-  if(_huy){h+='<div class="hvdan" style="border-left-color:var(--red)"><i class="ti ti-calendar-x"></i><span><b>Buổi này KHÔNG diễn ra.</b> '+
+  if(_huy){h+='<div class="hvdan nbred"><i class="ti ti-calendar-x"></i><span><b>Buổi này KHÔNG diễn ra.</b> '+
    esc(String(s2.notes||"Trung tâm sẽ xếp buổi học bù và báo lại lịch cho bạn."))+'</span></div></div>';return}
   if(!_huy&&!isc(s2.session_status,"completed")){
    h+='<div class="hvaskf" style="margin-top:7px"><button class="btn sm" onclick="hvAbsentAsk(\''+esc(s2.session_id)+'\')"><i class="ti ti-user-off"></i>Báo nghỉ buổi này</button>'+
@@ -12323,7 +12347,7 @@ function renderLichTuan(embed){
   '<button class="pill" onclick="window.WKOFF=(window.WKOFF||0)+1;reRender(CUR)">Tuần sau<i class="ti ti-chevron-right"></i></button>'+
   (off!==0?' <button class="pill" onclick="window.WKOFF=0;reRender(CUR)">Về tuần này</button>':''),
   segHTML(mode,[["gv","Theo giảng viên"],["lop","Theo lớp"]],"window.WKMODE=\'{k}\';reRender(CUR)"));
- if(noGvCls.length)h+='<div class="notebar" style="border-left-color:var(--red)"><i class="ti ti-alert-triangle"></i><b>'+noGvCls.length+' lớp đang mở CHƯA GÁN giảng viên chính:</b> '+esc(noGvCls.map(function(c){return c.class_name||c.class_id}).join(", "))+' - gán ở Cài đặt / danh sách Lớp.</div>';
+ if(noGvCls.length)h+='<div class="notebar nbred"><i class="ti ti-alert-triangle"></i><b>'+noGvCls.length+' lớp đang mở CHƯA GÁN giảng viên chính:</b> '+esc(noGvCls.map(function(c){return c.class_name||c.class_id}).join(", "))+' - gán ở Cài đặt / danh sách Lớp.</div>';
  h+='<div class="panel"><div class="tbwrap"><table class="dt" style="table-layout:fixed;min-width:900px"><thead><tr><th style="width:150px">'+(mode==="gv"?"Giảng viên":"Lớp")+'</th>';
  var DNAMES=["T2","T3","T4","T5","T6","T7","CN"];
  days.forEach(function(d,i){var isToday=sameDay(d,new Date());
@@ -13138,7 +13162,7 @@ var TOURLV=[
  ["chuyennghiep","Cấu hình","ti-settings","Cho người thiết lập: ngưỡng, phân quyền, thương hiệu, câu nhắc việc"],
  /* V9.34: tầng thứ tư - KHÔNG viết sẵn bước nào. Các bước sinh ra từ hàng chờ THẬT của chính người
     đang ngồi đó, làm xong việc nào app tự kiểm rồi nhảy việc kế cho tới lúc sạch hàng. */
- ["donviec","Dọn việc hôm nay","ti-checklist","Trợ thủ dắt bạn làm từng việc đang chờ - hết việc mới dừng"]];
+ ["donviec","Dọn việc hôm nay","ti-checklist","Trợ lý dắt bạn làm từng việc đang chờ - hết việc mới dừng"]];
 var TOURS={
  /* ---------- CẤP 1: THAM QUAN ---------- */
  tq_tong:{lv:"thamquan",t:"Toàn cảnh app",ic:"ti-rocket",d:"7 bước - hiểu app chạy thế nào trong 2 phút",steps:[
@@ -13292,7 +13316,7 @@ function tourRestart(){if(!TOUR.key)return;TOUR.i=0;tourShow()}
 function tourNext(){var T=TOURS[TOUR.key];if(!T)return;
  if(TOUR.i>=T.steps.length-1){
   if(T.live){var con=tourWorkLeft();tourEnd();
-   if(con>0)toast("Hết lượt này. Còn "+con+" việc chưa xong - mở Trợ thủ để dọn tiếp.",5200);
+   if(con>0)toast("Hết lượt này. Còn "+con+" việc chưa xong - mở Trợ lý để dọn tiếp.",5200);
    else toast("Sạch hàng chờ. Không còn việc nào đang chờ bạn.",4200);
    return}
   tourEnd();toast("Đã xong hướng dẫn. Bấm dấu hỏi trên đầu để xem lại bất cứ lúc nào.",4200);return}
@@ -13383,7 +13407,7 @@ function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
  b.innerHTML=(live?'':'<div class="tourdots">'+dots+'</div>')+
   '<div class="tnum">'+esc(T.t)+' · '+(live?('việc '+(TOUR.i+1)+'/'+n+' của lượt này · <b style="color:var(--red)">còn '+tourWorkLeft()+'</b>'+(function(){var t=0;try{t=workAll().length}catch(e){}return t>n?(' · cả hàng chờ '+t):''})()):('bước '+(TOUR.i+1)+'/'+n))+'</div>'+
   '<h5>'+esc(st.t)+'</h5><p>'+esc(st.d)+'</p>'+
-  ((window.__tourMiss&&!st.dock)?'<div class="thint" style="border-left-color:var(--amber)"><i class="ti ti-alert-triangle" style="margin-right:5px"></i>Chỗ cần trỏ không có trên màn hình của bạn (khác chức danh, hoặc trang chưa có dữ liệu) - đọc phần mô tả rồi bấm Tiếp theo.</div>':'')+
+  ((window.__tourMiss&&!st.dock)?'<div class="thint" style="background:#FFF8E9;color:#7A5B12"><i class="ti ti-alert-triangle" style="margin-right:5px"></i>Chỗ cần trỏ không có trên màn hình của bạn (khác chức danh, hoặc trang chưa có dữ liệu) - đọc phần mô tả rồi bấm Tiếp theo.</div>':'')+
   (st.hint?'<div class="thint"><i class="ti ti-hand-finger" style="margin-right:5px"></i><b>Việc cần làm:</b> '+esc(st.hint)+'</div>':'')+
   /* Bài "dọn việc": nút thao tác nằm NGAY TRONG hộp guide - không bắt người ta đi tìm nút trên trang */
   (st.item?('<div class="tdo"><button class="btn sm primary" onclick="tourDo()"><i class="ti ti-tool"></i>Làm việc này</button>'+
@@ -13452,7 +13476,7 @@ function slaKey(x){
  if(x.lead)return "lead|"+x.lead;
  if(x.hoso)return "hoso|"+x.hoso+"|"+(x.grp||"");
  return (x.cat||"")+"|"+(x.who||"")+"|"+String(x.what||"").slice(0,40)}
-/* Thứ tự dọn: cấu hình được ở Cài đặt > Trợ thủ & Nhịp ngày (xem tthCfg). Mặc định là quá hạn
+/* Thứ tự dọn: cấu hình được ở Cài đặt > Trợ lý & Nhịp ngày (xem tthCfg). Mặc định là quá hạn
    trước, rồi theo thứ tự nhóm việc, rồi việc cũ trước. */
 function workSort(L){
  var C=tthCfg(),ord=C.order||[];
@@ -13582,7 +13606,7 @@ function tourTick(){if(TOUR.on&&(TOURS[TOUR.key]||{}).live)try{tourWorkSync();to
 function tourFab(){
  var f=document.getElementById("tourfab");
  if(!f){f=document.createElement("button");f.id="tourfab";f.className="tourfab";
-  f.setAttribute("aria-label","Mở lại Trợ thủ dọn việc");f.onclick=tourOpenBack;
+  f.setAttribute("aria-label","Mở lại Trợ lý dọn việc");f.onclick=tourOpenBack;
   document.body.appendChild(f)}
  return f}
 function tourMin(){
@@ -13592,7 +13616,7 @@ function tourMin(){
  var T=TOURS[TOUR.key]||{},n=0;try{n=T.live?tourWorkLeft():0}catch(e){}
  var f=tourFab();
  f.innerHTML='<i class="ti ti-checklist"></i>'+(T.live?('<b>'+n+'</b> <span>việc chờ</span>'):'<span>Hướng dẫn</span>');
- f.setAttribute("data-tip",T.live?("Trợ thủ đang thu gọn - còn "+n+" việc. Bấm để mở lại."):"Hướng dẫn đang thu gọn. Bấm để mở lại.");
+ f.setAttribute("data-tip",T.live?("Trợ lý đang thu gọn - còn "+n+" việc. Bấm để mở lại."):"Hướng dẫn đang thu gọn. Bấm để mở lại.");
  f.classList.add("on")}
 function tourOpenBack(){
  TOUR.min=0;
@@ -13838,7 +13862,7 @@ function tkDeclineSave(id){var t=find("DL23","task_id",id);if(!t)return;
 function tkDoneForm(id){var t=find("DL23","task_id",id);if(!t)return;
  var late=(function(){var d=pvnd(t.due_time);return d&&d.getTime()<Date.now()})();
  var h='<div class="dcard"><h4><i class="ti ti-flag-check"></i>Báo hoàn thành</h4>'+
-  (late?'<div class="notebar" style="border-left-color:var(--red)"><i class="ti ti-clock-exclamation"></i>Việc này đã <b>quá hạn</b> - ghi rõ lý do trễ để người giao nắm.</div>':'')+
+  (late?'<div class="notebar nbred"><i class="ti ti-clock-exclamation"></i>Việc này đã <b>quá hạn</b> - ghi rõ lý do trễ để người giao nắm.</div>':'')+
   '<div class="fld full"><label>Kết quả / cách bạn đã làm <i>*</i></label><textarea id="tk_dn" rows="3" placeholder="Mô tả ngắn kết quả, số liệu, chỗ lưu file..."></textarea></div>'+
   '<div class="dact"><button class="btn primary" onclick="tkDoneSave(\''+esc(id)+'\')"><i class="ti ti-send"></i>Gửi báo xong</button></div></div>';
  openDrawer("Báo hoàn thành",h)}
@@ -14381,7 +14405,7 @@ var QADEF=[
  {h:"app có gửi tin nhắn zalo sms email thật không",d:"Bản demo KHÔNG gửi thật. App soạn sẵn nội dung chuẩn theo CH4 và ghi nhận là đã gửi, còn việc gửi đi cần nối backend - 66 điểm nối đã chừa sẵn trong mã nguồn.",o:"Cài đặt > Thông điệp nhắc việc (CH4)",go:"window.SETTAB='ch4';go('settings')"},
  {h:"dữ liệu lưu ở đâu · mất dữ liệu không · reset có mất cấu hình không",d:"Bản demo lưu trong trình duyệt của máy đang mở. Cấu hình nằm ở ô nhớ RIÊNG nên bấm reset dữ liệu demo KHÔNG làm mất ngưỡng, câu nhắc, danh mục hay phân quyền.",o:"Cài đặt > Bắt đầu ở đây",go:"window.SETTAB='tongquan';go('settings')"},
  {h:"tại sao tôi không thấy trang này · bị ẩn menu · không có quyền",d:"Mỗi chức danh chỉ thấy phần việc của mình. Ba tầng: thấy trang nào, thấy dữ liệu của ai, được bấm nút gì. Vào bảng phân quyền rồi đóng vai đúng chức danh đó để xem họ thấy gì.",o:"Cài đặt > Phân quyền & Phạm vi",go:"window.SETTAB='phanquyen';go('settings')"},
- {h:"làm sao xem lại bài hướng dẫn tham quan · bật lại hướng dẫn",d:"Bài hướng dẫn không mất đi sau khi xem. Mở lại bất cứ lúc nào ở Cài đặt, hoặc bấm nút Trợ thủ ở góc dưới bên phải.",o:"Cài đặt > Bài hướng dẫn",go:"window.SETTAB='huongdan';go('settings')"}];
+ {h:"làm sao xem lại bài hướng dẫn tham quan · bật lại hướng dẫn",d:"Bài hướng dẫn không mất đi sau khi xem. Mở lại bất cứ lúc nào ở Cài đặt, hoặc bấm nút Trợ lý ở góc dưới bên phải.",o:"Cài đặt > Bài hướng dẫn",go:"window.SETTAB='huongdan';go('settings')"}];
 function qaCfg(){var c=(DATA.config=DATA.config||{});var q=(c.qa=c.qa||{});
  if(!q.muc)q.muc=QADEF.map(function(x){return {h:x.h,d:x.d,o:x.o,go:x.go}});
  if(!q.hut)q.hut=[];
@@ -14500,7 +14524,13 @@ function qaTimNguoi(q){
    var hit=pt.filter(function(w){return z.split(" ").indexOf(w)>=0}).length;
    if(!pt.length)return;
    if(hit===pt.length)d=80;                                   /* đủ mọi chữ của tên, khác thứ tự */
-   else if(hit>=2&&hit>=pt.length-1)d=52+hit;                 /* thiếu đúng một chữ đệm */
+   else if(hit>=2&&hit>=pt.length-1){
+    /* thiếu đúng một chữ thì chữ THIẾU phải là chữ đệm - chữ TÊN (chữ cuối) bắt buộc trúng.
+       Đã cắn: hỏi "Nguyễn Thanh Kiu" (nhân viên) mà app trả "Nguyễn Thanh Trang" (học viên)
+       chỉ vì trùng họ + chữ đệm, tức hai chữ phổ biến nhất tiếng Việt. Trả lời bừa còn tệ
+       hơn không trả lời. */
+    if(z.split(" ").indexOf(pt[pt.length-1])<0)return;
+    d=52+hit}
    else return;                                               /* thiếu nhiều hơn: KHÔNG nhận vơ */
   }
   /* tên có CHỮ SỐ (Demo 1, Lớp 2...) mà số trong câu hỏi không khớp thì loại thẳng */
@@ -14511,23 +14541,38 @@ function qaTimNguoi(q){
   out.push({r:r,ten:ten,ma:ma,loai:loai,d:d})}
  srows("DL09").forEach(function(s){xet(s,s.full_name||"",s.student_id,s.phone_number||s.phone,"hv")});
  srows("DL02").forEach(function(l){xet(l,l.full_name||"",l.lead_id,l.phone_number,"lead")});
+ /* DL01: hỏi tên GIÁO VIÊN / NHÂN VIÊN cũng phải ra đúng người đó. Trước đây kho tìm không có
+    DL01 nên gõ tên một nhân viên là app nhận vơ sang học viên nào trùng vài chữ - tìm sai người. */
+ srows("DL01").forEach(function(s){if(String(s.staff_id)!=="ADMIN")xet(s,s.full_name||"",s.staff_id,s.phone_number||s.phone,"nv")});
  out.sort(function(a,b){return b.d-a.d});
  /* Cùng một con người có thể vừa là lead vừa đã thành học viên - ưu tiên hồ sơ HỌC VIÊN, vì đó
-    là nơi có việc để làm. Trùng tên thật thì vẫn giữ cả hai để người hỏi tự chọn. */
+    là nơi có việc để làm. Trùng tên thật thì vẫn giữ cả hai để người hỏi tự chọn - vì thế khóa
+    trùng lặp phải là MÃ HỒ SƠ, không phải cái tên (khóa theo tên là hai người trùng tên thật
+    mất một người, đúng cái bẫy "nhớ tạm phải khóa đủ mọi đầu vào" đổi vỏ). */
  var thay={};
  out=out.filter(function(x){
-  var k=qaChuan(x.ten);
-  if(thay[k])return false;
-  if(x.loai==="lead"&&out.some(function(y){return y.loai==="hv"&&qaChuan(y.ten)===k}))return false;
-  thay[k]=1;return true});
+  if(thay[x.loai+"|"+x.ma])return false;
+  if(x.loai==="lead"&&out.some(function(y){return y.loai==="hv"&&qaChuan(y.ten)===qaChuan(x.ten)}))return false;
+  thay[x.loai+"|"+x.ma]=1;return true});
  return out.filter(function(x,i,a){return i===0||x.d>=a[0].d-8}).slice(0,5)}
 /* ── TRẢ LỜI VỀ MỘT CON NGƯỜI: hiện trạng · vì sao cảnh báo · làm gì tiếp · xem ở đâu ──────
    Không câu nào ở đây được viết tay hai lần. Mọi dòng đọc lại đúng bộ luật app đang chấp hành:
    `naFor` (mã trigger SOP) · `msgText` (câu chữ CH4) · `slaItems` (hàng chờ + hạn) ·
    `stuRiskReasons` (lý do nguy cơ + ngưỡng CH2) · `canAct` (ai được làm, theo CH3). */
 function qaHoSo(x){
- var r=x.r,hv=(x.loai==="hv"),sid=hv?r.student_id:r.lead_id;
+ var r=x.r,hv=(x.loai==="hv"),nv=(x.loai==="nv"),sid=hv?r.student_id:(nv?r.staff_id:r.lead_id);
  var K={ten:x.ten,ma:sid,loai:x.loai,dong:[],viec:[],canhbao:[],nut:[]};
+ if(nv){
+  /* Hồ sơ NHÂN VIÊN / GIÁO VIÊN: đủ để biết đây là ai và mở tiếp đúng trang. Việc / học phí /
+     cảnh báo là chuyện của hồ sơ học viên, không bịa mục tương đương cho nhân viên. */
+  K.gv=isGVRole(r);
+  K.dong.push(["Chức danh",elabel(r.role)||ecode(r.role)||"chưa khai"]);
+  if(r.branch)K.dong.push(["Chi nhánh / nơi làm",elabel(r.branch)||String(r.branch)]);
+  K.dong.push(["Trạng thái",elabel(r.status)||ecode(r.status)||"chưa khai"]);
+  try{var lopPT=rows("DL10").filter(function(c){return String(c.main_teacher_id||"")===String(sid)&&!/finished|cancelled/.test(ecode(c.class_status))});
+   if(lopPT.length)K.dong.push(["Lớp phụ trách",lopPT.map(function(c){return c.class_name||c.class_id}).join(" · ")])}catch(e){}
+  if(r.email)K.dong.push(["Email",String(r.email)]);
+  return K}
  if(hv){
   var ob=rows("DL08").filter(function(o){return o.student_id===sid}).slice(-1)[0]||null;
   var lop=ob&&ob.class_id?find("DL10","class_id",ob.class_id):null;
@@ -14613,6 +14658,11 @@ function qaGoiY(q){
   srows("DL09").forEach(function(s){var pt=qaChuan(s.full_name||"").split(" ");
    var d=tuTen.filter(function(w){return pt.indexOf(w)>=0}).length;
    if(d)dsN.push({ten:s.full_name,ma:s.student_id,loai:"hv",d:d})});
+  /* gợi ý cả NHÂN VIÊN / GIÁO VIÊN - kho tìm chính đã có DL01 thì kho gợi ý cũng phải có */
+  srows("DL01").forEach(function(s){if(String(s.staff_id)==="ADMIN")return;
+   var pt=qaChuan(s.full_name||"").split(" ");
+   var d=tuTen.filter(function(w){return pt.indexOf(w)>=0}).length;
+   if(d)dsN.push({ten:s.full_name,ma:s.staff_id,loai:"nv",d:d})});
   g.nguoi=dsN.sort(function(a,b){return b.d-a.d}).slice(0,4)}
  if(tu.length){
   /* nới lỏng: bỏ bớt từ, tìm lại từng từ một */
@@ -14650,11 +14700,11 @@ function renderHoidap(){
  var R=qaTraLoi(q);
  if(R.loai==="nguoi"&&R.nguoi.length>1){
   h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b>Có '+R.nguoi.length+' người khớp - chọn đúng người</b></div><div class="pbody"><div class="pickgrid">';
-  R.nguoi.forEach(function(x){h+='<button class="pickc" onclick="qaViDu('+JSON.stringify(x.ma).split('"').join("&quot;")+')"><i class="ti '+(x.loai==="hv"?"ti-user-check":"ti-user")+'"></i><span><b>'+esc(x.ten)+'</b><small>'+esc(x.ma)+' · '+(x.loai==="hv"?"học viên":"khách tiềm năng")+'</small></span></button>'});
+  R.nguoi.forEach(function(x){h+='<button class="pickc" onclick="qaViDu('+JSON.stringify(x.ma).split('"').join("&quot;")+')"><i class="ti '+(x.loai==="hv"?"ti-user-check":(x.loai==="nv"?"ti-id-badge":"ti-user"))+'"></i><span><b>'+esc(x.ten)+'</b><small>'+esc(x.ma)+' · '+(x.loai==="hv"?"học viên":(x.loai==="nv"?esc(elabel(x.r.role)||"nhân viên"):"khách tiềm năng"))+'</small></span></button>'});
   h+='</div></div></div>';return h}
  if(R.loai==="nguoi"&&R.nguoi.length){
   var K=qaHoSo(R.nguoi[0]);
-  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-user-check" style="margin-right:6px"></i>'+esc(K.ten)+'</b><span class="mut" style="font-size:11.5px">'+esc(K.ma)+' · '+(K.loai==="hv"?"học viên":"khách tiềm năng")+'</span></div><div class="pbody">';
+  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti '+(K.loai==="nv"?"ti-id-badge":"ti-user-check")+'" style="margin-right:6px"></i>'+esc(K.ten)+'</b><span class="mut" style="font-size:11.5px">'+esc(K.ma)+' · '+(K.loai==="hv"?"học viên":(K.loai==="nv"?"nhân viên trung tâm":"khách tiềm năng"))+'</span></div><div class="pbody">';
   /* Hiểu được ý thì NÓI RA đang hiểu gì; chưa rõ ý thì HỎI LẠI bằng nút, không đoán bừa. */
   var _yt=QAYDINH.filter(function(y){return y.k===R.yd})[0];
   h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-'+(_yt?"target-arrow":"help-circle")+'"></i>'+
@@ -14680,6 +14730,7 @@ function renderHoidap(){
   h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">'+
    (K.viec.length?'<button class="btn primary" onclick="qaDatTroThu('+JSON.stringify(K.ma).split('"').join("&quot;")+')"><i class="ti ti-checklist"></i>Dắt tôi làm từng bước ('+K.viec.length+' việc)</button>':'')+
    (K.loai==="hv"?'<button class="btn" onclick="window.HOSO='+JSON.stringify(K.ma).split('"').join("&quot;")+';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Mở hồ sơ 360 đầy đủ</button>':
+    K.loai==="nv"?'<button class="btn" onclick="'+(K.gv?"openGV":"openNV")+'('+JSON.stringify(K.ma).split('"').join("&quot;")+')"><i class="ti ti-id-badge"></i>Mở hồ sơ '+(K.gv?"giảng viên":"nhân viên")+'</button>':
      '<button class="btn" onclick="runStart('+JSON.stringify(K.ma).split('"').join("&quot;")+')"><i class="ti ti-player-play"></i>Chạy quy trình cho khách này</button>')+
    '</div>';
   h+='</div></div>';
@@ -14723,9 +14774,15 @@ function reRender(k){try{setTimeout(tourTick,240)}catch(e){}   /* người dùng
  var el=document.getElementById("content");
  if(!el||!RENDER[k]){if(typeof hvReRender==="function")hvReRender();return}   /* cổng học viên: chỉ vẽ lại thân trang */
  var p=PBK[k];var sc=el.scrollTop;
- el.innerHTML=((p&&p.ty==="list")?renderList(k):RENDER[k]());el.scrollTop=sc;updateBellBadge();asstTick();persistSoon()}
+ el.innerHTML=((p&&p.ty==="list")?renderList(k):RENDER[k]());el.scrollTop=sc;
+ /* vẽ lại cả SIDEBAR: đổi tab trong hub (duyTabSet, csTabSet...) thì mục đang sáng trên menu
+    phải nhảy theo - anh Luân bắt được cảnh bấm "Đơn xin nghỉ" mà menu vẫn sáng tab cũ. Vá ở đây
+    (tầng chung) chứ không vá từng hàm đổi tab; con số badge trên menu cũng tươi lại sau mỗi lần
+    ghi - một công đôi việc. */
+ try{buildNav()}catch(e){}
+ updateBellBadge();asstTick();persistSoon()}
 function reRenderKeep(k){var el=document.getElementById("content");var sc=el.scrollTop;var p=PBK[k];
- el.innerHTML=((p&&p.ty==="list")?renderList(k):RENDER[k]());asstTick();el.scrollTop=sc;var i=el.querySelector(".srch input");if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}persistSoon()}
+ el.innerHTML=((p&&p.ty==="list")?renderList(k):RENDER[k]());asstTick();el.scrollTop=sc;try{buildNav()}catch(e){}var i=el.querySelector(".srch input");if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}persistSoon()}
 function toggleNav(){var s=document.getElementById("sidebar"),m=document.getElementById("navmask");if(!s)return;var open=s.classList.toggle("open");if(m)m.classList.toggle("on",open)}
 function closeNav(){var s=document.getElementById("sidebar"),m=document.getElementById("navmask");if(s)s.classList.remove("open");if(m)m.classList.remove("on")}
 function bellItems(){var rs=SCOPE();var items=slaItems();
@@ -14915,7 +14972,7 @@ function tthMove(cat,d){var o=tthCfg().order;var i=o.indexOf(cat);if(i<0)return;
  var j=i+d;if(j<0||j>=o.length)return;
  var tmp=o[i];o[i]=o[j];o[j]=tmp;persistSoon();reRender("settings")}
 function tthReset(){var c=(DATA.config=DATA.config||{});c.tth=null;tthCfg();persistSoon();reRender("settings");
- toast("Đã trả Trợ thủ về mặc định.")}
+ toast("Đã trả Trợ lý về mặc định.")}
 /* --- lớp phủ cấu hình cho NHỊP NGÀY --- */
 function nhipId(role,i){return role+":"+i}
 function nhipCfg(){var c=(DATA.config=DATA.config||{});return (c.nhip=c.nhip||{})}
@@ -14974,12 +15031,12 @@ function tthKey(){var me="";try{me=tkMeId()||CURSTAFF||""}catch(e){me=CURSTAFF||
 function tthOn(){try{var v=localStorage.getItem(tthKey());return v===null?true:v==="1"}catch(e){return true}}
 function tthToggle(){try{localStorage.setItem(tthKey(),tthOn()?"0":"1")}catch(e){}
  tthBtn();asstTick();reRender(CUR);
- toast(tthOn()?"Đã bật Trợ thủ - nút tròn ở góc dưới bên phải.":"Đã tắt Trợ thủ. Bật lại ở nút bóng đèn trên thanh tiêu đề.")}
+ toast(tthOn()?"Đã bật Trợ lý - nút tròn ở góc dưới bên phải.":"Đã tắt Trợ lý. Bật lại ở nút bóng đèn trên thanh tiêu đề.")}
 function tthBtn(){var b=document.getElementById("tthBtn");if(!b)return;
  var on=tthOn();
  b.className="tbtn"+(on?" on":"");
- b.setAttribute("aria-label",on?"Tắt Trợ thủ thao tác":"Bật Trợ thủ thao tác");
- b.setAttribute("data-tip",on?"Trợ thủ đang BẬT - nhắc việc ngay trên từng trang. Bấm để tắt.":"Trợ thủ đang TẮT. Bấm để bật lại.");
+ b.setAttribute("aria-label",on?"Tắt Trợ lý":"Bật Trợ lý");
+ b.setAttribute("data-tip",on?"Trợ lý đang BẬT. Bấm để tắt.":"Trợ lý đang TẮT. Bấm để bật lại.");
  b.innerHTML='<i class="ti '+(on?"ti-bulb":"ti-bulb")+'"></i>'}
 /* Việc của TRANG NÀY, của CHÍNH người đang đăng nhập - lấy thẳng từ slaItems, không khai lại. */
 
@@ -15009,7 +15066,7 @@ function asstEl(){
 function asstFabEl(){
  var f=document.getElementById("asstfab");
  if(!f){f=document.createElement("button");f.id="asstfab";f.className="asstfab";
-  f.setAttribute("aria-label","Mở Trợ thủ");document.body.appendChild(f)}
+  f.setAttribute("aria-label","Mở Trợ lý");document.body.appendChild(f)}
  if(!f.onclick)f.onclick=asstFabClick;
  return f}
 /* Một nút, hai vai: đang dọn việc dở mà thu gọn thì mở lại đúng chỗ đang dọn; còn lại thì bung tấm
@@ -15071,13 +15128,14 @@ function asstQXoa(){window.ASSTQ="";window.ASSTYD="";asstPaint()}
 function asstYD(k){window.ASSTYD=(window.ASSTYD===k?"":k);asstPaint()}
 /* Thẻ nhận dạng: đủ để người ta CHẮC đây đúng người mình hỏi, không thừa một chữ nào. */
 function qaTheNguoi(x){
- var r=x.r,hv=(x.loai==="hv");
+ var r=x.r,hv=(x.loai==="hv"),nv=(x.loai==="nv");
  var lop="";try{var ob=rows("DL08").filter(function(o){return o.student_id===x.ma&&o.class_id}).slice(-1)[0];
   var c=ob&&find("DL10","class_id",ob.class_id);if(c)lop=c.class_name||c.class_id}catch(e){}
  var sdt=String(r.phone_number||r.phone||"").trim();
  return '<div class="qaWho"><div class="qaWhoN">'+esc(x.ten)+'</div>'+
-  '<div class="qaWhoM">'+esc(x.ma)+' · '+(hv?"học viên":"khách tiềm năng")+
-  (lop?' · '+esc(lop):(hv?' · chưa xếp lớp':''))+
+  '<div class="qaWhoM">'+esc(x.ma)+' · '+(nv?esc(elabel(r.role)||"nhân viên"):(hv?"học viên":"khách tiềm năng"))+
+  (nv?(r.branch?' · '+esc(elabel(r.branch)||String(r.branch)):'')
+     :(lop?' · '+esc(lop):(hv?' · chưa xếp lớp':'')))+
   (sdt?' · '+esc(sdt):' · chưa có SĐT')+'</div></div>'}
 function asstHTML(){
  var L=[],do_=0;
@@ -15156,7 +15214,9 @@ function asstTraLoi(q){
   h+='<div class="qaAskBack">'+(yd?('Đang xem <b>'+esc((QAPHAN[yd]||"").toLowerCase())+'</b> của '+esc(X.ten)+'. Đổi mục khác:')
                                   :('Bạn muốn xem gì về <b>'+esc(X.ten)+'</b>?'))+'</div>';
   h+='<div class="qaYD">';
-  QAYDINH.forEach(function(y){
+  /* nhân viên / giáo viên: chỉ hai mục có nghĩa - không chìa nút "Học phí" cho một giáo viên */
+  var YDS=(X.loai==="nv")?QAYDINH.filter(function(y){return y.k==="hientrang"||y.k==="lienhe"}):QAYDINH;
+  YDS.forEach(function(y){
    var n="";
    if(y.k==="viec"&&K.viec.length)n=String(K.viec.length);
    if(y.k==="canhbao"&&K.canhbao.length)n=String(K.canhbao.length);
@@ -15185,7 +15245,7 @@ function asstTraLoi(q){
    var r=X.r;
    h+=bang([["Số điện thoại",esc(String(r.phone_number||r.phone||"").trim()||"chưa có")],
     (r.email?["Email",esc(r.email)]:null),
-    (r.emergency_contact_name?["Người nhà",esc(r.emergency_contact_name)+(r.emergency_contact_phone?" · "+esc(r.emergency_contact_phone):"")+(r.emergency_contact_relationship?" ("+esc(elabel(r.emergency_contact_relationship))+")":"")]:["Người nhà","chưa khai"]),
+    ((r.emergency_contact_relation||r.emergency_contact_phone)?["Người đồng hành",esc(elabel(r.emergency_contact_relation)||"chưa chọn quan hệ")+(r.emergency_contact_phone?" · "+esc(r.emergency_contact_phone):"")]:["Người đồng hành","chưa khai"]),
     (r.assigned_to_name?["Phụ trách",esc(r.assigned_to_name)]:null),
     (r.next_followup_time?["Hẹn liên hệ lại",esc(r.next_followup_time)]:null)]);
   }
@@ -15193,6 +15253,7 @@ function asstTraLoi(q){
   /* đường ra: hồ sơ đầy đủ - chỉ hiện khi đã chọn một mục, để lúc mới hỏi màn còn gọn */
   if(yd)h+='<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line)">'+
    (K.loai==="hv"?'<button class="btn sm" onclick="asstClose();window.HOSO='+JSON.stringify(K.ma).split('"').join("&quot;")+';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Mở hồ sơ 360 đầy đủ</button>'
+     :K.loai==="nv"?'<button class="btn sm" onclick="asstClose();'+(K.gv?"openGV":"openNV")+'('+JSON.stringify(K.ma).split('"').join("&quot;")+')"><i class="ti ti-id-badge"></i>Mở hồ sơ '+(K.gv?"giảng viên":"nhân viên")+'</button>'
      :'<button class="btn sm" onclick="asstClose();runStart('+JSON.stringify(K.ma).split('"').join("&quot;")+')"><i class="ti ti-player-play"></i>Chạy quy trình cho khách này</button>')+'</div>';
   return h+'</div>'}
  if(R.loai==="hethong"&&R.hethong.length){
@@ -15217,7 +15278,7 @@ function asstBoQua(){
  window.ASSTSKIP=window.ASSTSKIP||{};window.ASSTSKIP[slaKey(x)]=1;
  asstPaint()}
 /* Trợ thủ phải sống theo dữ liệu: mỗi lần vẽ lại màn hình là cập nhật con số và việc kế tiếp. */
-/* HAI công tắc, hai cấp: `tthCfg().on` là cấu hình của TRUNG TÂM (Cài đặt > Trợ thủ & Nhịp ngày),
+/* HAI công tắc, hai cấp: `tthCfg().on` là cấu hình của TRUNG TÂM (Cài đặt > Trợ lý & Nhịp ngày),
    `tthOn()` là công tắc RIÊNG của từng người (nút bóng đèn trên thanh tiêu đề). Tắt ở cấp nào
    cũng phải tắt thật: ẩn nút góc, đóng tấm đang mở, và dừng luôn lượt dọn việc đang chạy.
    V9.35 em dời trợ thủ về góc mà QUÊN nối công tắc riêng - bấm bóng đèn thì icon mờ đi nhưng nút
@@ -15980,7 +16041,7 @@ DOORS = {
  "DL06b":["insPlanSave"],
  "DL07":["duyetRefundRun","paySave","payVerifyRun","rfNeed"],
  "DL08":["hvClassConfirm","hvClassRejectSave","midSave","obMark","rfNeed","xepMoiLuu","obChangeSave","obFinish"],
- "DL09":["blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave","riskCareSave","riskFlagRun","riskIgnoreSave","ghSave"],
+ "DL09":["blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave","riskCareSave","riskFlagRun","riskIgnoreSave","dhSave"],
  "DL10":["xepMoiLuu","obChangeSave","rfNeed","clsSetTeacher","moLopDelay","moLopCancelRun"],
  "DL11":["bhCancelRun","bhDone","bhMakeupSave","bhNoteSave","ddSave","sessEnd","sessStart","sesSetTeacher","clsSetTeacher"],
  "DL12":["ddSave","hvAbsentSave","absReq","absReview","absMakeup","absCallSave"],

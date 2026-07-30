@@ -1334,7 +1334,7 @@ for r in ces:
 for _i,r in enumerate(_ach):
     r["testimonial_given"]="" if _i==len(_ach)-1 else "Có"
 # hồ sơ HV đầy đặn: liên hệ khẩn, email, ghi chú theo dõi
-REL=["Bố","Mẹ","Anh trai","Chị gái","Vợ/Chồng"]
+REL=["Ông","Bà","Bố","Mẹ","Anh","Chị","Người giám hộ"]  # danh sách anh Luân chốt 30/07
 for s in students:
     if random.random()<0.65:
         s["emergency_contact_name"]="Người nhà "+s["full_name"].split()[-1]

@@ -1999,11 +1999,11 @@ log.append("14septdecies. Nguy co: gan co cho %d hoc vien phu du 5 muc can thiep
 # nằm chết trong dữ liệu suốt từ đầu. Đây là SÓT so với SOP, không phải tính năng mới.
 # Nay chuẩn hoá quan hệ về danh mục CH1 (đang là chữ tự do "Bố"/"Anh trai") và thêm HAI quyết
 # định mà anh Luân yêu cầu: ai đóng tiền, ai là đầu mối liên hệ chính.
-_rel = d.setdefault("enums", {}).setdefault("enum_guardian_relation", [])
-if not _rel:
-    _rel += ["mother (Mẹ)", "father (Bố)", "grandparent (Ông/Bà)", "sibling (Anh/Chị/Em)",
-             "spouse (Vợ/Chồng)", "guardian (Người bảo trợ)", "self (Tự lo - HV đã đi làm)",
-             "other (Người thân khác)"]
+# ÁP THẲNG, không "gieo nếu trống": gen_demo chép nguyên khối enums của file cũ sang, nên kiểu
+# "if not" chỉ chạy đúng một lần trong đời rồi danh mục cũ bám mãi - đã cắn khi đổi sang bộ 7 mục.
+d.setdefault("enums", {})["enum_guardian_relation"] = [
+    "grandfather (Ông)", "grandmother (Bà)", "father (Bố)", "mother (Mẹ)",
+    "brother (Anh)", "sister (Chị)", "guardian (Người giám hộ)"]
 if "enum_contact_primary" not in d["enums"]:
     d["enums"]["enum_contact_primary"] = [
         "student (Liên hệ thẳng học viên)",
@@ -2015,12 +2015,15 @@ if "enum_payer_side" not in d["enums"]:
         "guardian (Người giám hộ đóng)",
         "company (Công ty/đơn vị tài trợ)"]
 
+# Danh sách quan hệ anh Luân chốt 30/07: ông, bà, bố, mẹ, anh, chị, người giám hộ - mỗi quan hệ
+# MỘT mục riêng để lúc nhập chọn thẳng, không gộp "Ông/Bà" hay "Anh/Chị/Em" bắt người ta đoán.
+# Chữ tự do cũ (kể cả vợ/chồng, phụ huynh) quy về mục gần nhất; không khớp gì thì về "người giám hộ".
 _RELMAP = {"mẹ": "mother (Mẹ)", "bố": "father (Bố)", "ba": "father (Bố)",
-           "ông": "grandparent (Ông/Bà)", "bà": "grandparent (Ông/Bà)",
-           "anh trai": "sibling (Anh/Chị/Em)", "chị gái": "sibling (Anh/Chị/Em)",
-           "anh": "sibling (Anh/Chị/Em)", "chị": "sibling (Anh/Chị/Em)", "em": "sibling (Anh/Chị/Em)",
-           "vợ/chồng": "spouse (Vợ/Chồng)", "vợ": "spouse (Vợ/Chồng)", "chồng": "spouse (Vợ/Chồng)",
-           "phụ huynh": "guardian (Người bảo trợ)"}
+           "ông": "grandfather (Ông)", "bà": "grandmother (Bà)",
+           "anh trai": "brother (Anh)", "chị gái": "sister (Chị)",
+           "anh": "brother (Anh)", "chị": "sister (Chị)", "em": "sister (Chị)",
+           "vợ/chồng": "guardian (Người giám hộ)", "vợ": "guardian (Người giám hộ)", "chồng": "guardian (Người giám hộ)",
+           "phụ huynh": "guardian (Người giám hộ)", "người giám hộ": "guardian (Người giám hộ)"}
 
 
 def _tuoi(s):
@@ -2041,7 +2044,7 @@ for _s in R("DL09"):
     # chuẩn hoá quan hệ về CH1
     _r = str(_s.get("emergency_contact_relation") or "").strip()
     if _r and "(" not in _r:
-        _s["emergency_contact_relation"] = _RELMAP.get(_r.lower(), "other (Người thân khác)")
+        _s["emergency_contact_relation"] = _RELMAP.get(_r.lower(), "guardian (Người giám hộ)")
         _gh += 1
     _tu = _tuoi(_s)
     _co_gh = bool(str(_s.get("emergency_contact_phone") or "").strip())
