@@ -246,14 +246,20 @@ const PROBE = () => {
          Do that thi lo ra 3 loi: nut dong 13x22px (ngon tay khong bam trung), ngan keo 760px de
          len man iPad 834px chi chua lai 74px vo dung, va nut Tro ly noi TREN ngan keo che noi dung.
          Ba loi nay khong the thay bang cach doc ma nguon - phai mo that, o dung kho man. */
-      /* Dat lai trang ve trang thai SACH truoc khi do ngan keo. Khoi kiem trươc do (bai huong dan,
-         tam Tro ly, hop xac nhan) chi chay o kho "maytinh", va no de lai trang thai lam ngan keo
-         mo ra roi bi dong ngay - do ra dung 775px = 102% cua 760, tuc vi tri DONG. Da kiem rieng:
-         mo ngan keo TRONG LUC bai huong dan dang chay van dung (mep phai khit man), nen day la
-         viec don nha cua bo kiem, khong phai loi cua app. */
-      try { await page.evaluate(() => { try{tourEnd()}catch(e){} try{asstClose()}catch(e){}
-        try{closeConfirm()}catch(e){} try{closeModal()}catch(e){} }); } catch (e) {}
-      await page.waitForTimeout(250);
+      /* ĐO NGĂN KÉO TRÊN MỘT TRANG MỚI TINH.
+         Trang chinh da bi vai chuc phep kiem khac giam len (bai huong dan chay het buoc, tam Tro ly
+         mo/dong, hop xac nhan) - va rieng kho "maytinh" moi chay khoi huong dan. Do tren trang do
+         ra 775px = 102% cua 760, tuc ngan keo co class "on" ma van nam nguyen cho dong. Da kiem
+         RIENG ba lan: mo ngan keo luc chua chay huong dan, TRONG LUC dang chay, va SAU KHI chay
+         het roi ket thuc - ca ba lan deu dung (transform:none, mep phai khit man). Nghia la app
+         khong sai, chi la trang do da ban. Do mot thu can sach thi phai do tren nen sach. */
+      const pgNK = await ctx.newPage();
+      pgNK.on("pageerror", e => bad.push(nhan("ngan keo · LOI JS: " + String(e.message).slice(0,120))));
+      await pgNK.addInitScript(w => { try { sessionStorage.setItem(w, "");
+        localStorage.setItem("ITTS_HELLO_V1","1"); } catch (e) {} }, C.who);
+      await pgNK.goto("file://" + require("path").resolve(OUT) + "/" + C.f, {waitUntil: "load"});
+      await pgNK.waitForFunction(() => typeof window.go === "function", null, {timeout: 30000});
+      await pgNK.waitForTimeout(300);
       const NGKEO = [
         ["chang", `(function(){var J=jAll().filter(function(x){return x.k==="learning"})[0]||jAll()[0];jStagePop(J.C.pid,"test_done")})()`],
         ["hanh trinh", `(function(){var J=jAll().filter(function(x){return x.k==="learning"})[0]||jAll()[0];mstripOpen(J.C.pid)})()`],
@@ -264,8 +270,8 @@ const PROBE = () => {
         ["xem nhanh ho so", `(function(){var J=jAll()[0];openQuick(J.C.pid)})()`],
       ];
       for (const [ten, js] of NGKEO) {
-        try { await page.evaluate(`go("banlam")`); await page.waitForTimeout(60);
-              await page.evaluate(js); } catch (e) {
+        try { await pgNK.evaluate(`go("banlam")`); await pgNK.waitForTimeout(60);
+              await pgNK.evaluate(js); } catch (e) {
           bad.push(nhan("ngan keo " + ten + ": KHONG MO DUOC - " + String(e.message).slice(0, 80))); continue; }
         /* BAY DA CAN: ngan keo TRUOT VAO trong 0,22s (transition:none chi ap khi dang keo tay nam
            - selector that la "body.drsz .drawer"). Do sau 140ms la chup dung luc no dang truot,
@@ -277,9 +283,9 @@ const PROBE = () => {
           if (window.__nkTruoc === r) return true;
           window.__nkTruoc = r; return false;
         }, null, {timeout: 3000}).catch(() => {});
-        await page.evaluate(() => { window.__nkTruoc = null; });
+        await pgNK.evaluate(() => { window.__nkTruoc = null; });
         luot++;
-        const nk = await page.evaluate(() => {
+        const nk = await pgNK.evaluate(() => {
           const d = document.querySelector(".drawer");
           if (!d || !d.classList.contains("on")) return {loi: "mo ma khong hien"};
           const R = d.getBoundingClientRect(), W = window.innerWidth;
@@ -306,9 +312,10 @@ const PROBE = () => {
         if (V.w <= 900 && nk.rong < nk.man - 8) bad.push(nhan("ngan keo " + ten + " chi rong " + nk.rong + "/" + nk.man + "px - chua lai vet thua vo dung"));
         nk.nho.forEach(c => bad.push(nhan("ngan keo " + ten + ": nut qua nho " + c)));
         nk.tran.forEach(c => bad.push(nhan("ngan keo " + ten + ": noi dung TRAN RA KHOI ngan keo <" + c + ">")));
-        try { await page.evaluate(`closeModal()`); } catch (e) {}
-        await page.waitForTimeout(60);
+        try { await pgNK.evaluate(`closeModal()`); } catch (e) {}
+        await pgNK.waitForTimeout(60);
       }
+      await pgNK.close();
       if (!cf.coNut) bad.push(nhan("hop xac nhan khong dung duoc nut Xac nhan"));
       else {
         if (!cf.trongNganKeo) bad.push(nhan("hop xac nhan bi CHON DUOI ngan keo - bam vao trung " + cf.deLen));
