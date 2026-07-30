@@ -149,7 +149,16 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.42 — MÀN VH + BẢNG BC + BẢNG VIỆC THEO CHỨC DANH ✅ XONG (29/07 khuya).**
+> **Phiên bản: V9.43 — LỚP GOOGLE SHEETS ĐÃ NGHỈ HƯU ✅ (30/07).**
+> Anh Luân: *"vét sạch cái sheet cũ đi... từ nay ko cần quay lại sheet nữa, đỡ mệt đầu."*
+> Đã đối chiếu từng file trước khi xoá (13 file, ~7,6 MB) - **không mất luật nghiệp vụ nào**; thứ
+> duy nhất mất theo là cách GỬI theo lịch của `ITTs_Reminders.gs`, vốn là hạ tầng chứ không phải
+> luật. 66 chỗ `google.script.run` **giữ có chủ ý** làm đường nối ra backend tương lai, và
+> `check_gs.py` đổi việc thành canh cho lớp Sheets không lén quay lại.
+> **Từ nay chỉ còn MỘT nơi cấu hình: màn Cài đặt của app.** File SOP `.xlsx` giữ lại nhưng chỉ để
+> `check_sop.py` đối chiếu.
+>
+> **Phiên bản trước: V9.42 — MÀN VH + BẢNG BC + BẢNG VIỆC THEO CHỨC DANH ✅ XONG (29/07 khuya).**
 > Anh Luân giao **việc D** kèm tám nguyên tắc (phủ trọn SOP · tối ưu hơn SOP nếu cần · dữ liệu mẫu
 > chuẩn · **trợ thủ và hướng dẫn riêng từng chức danh - "chức năng quan trọng nhất"** · phân quyền
 > vững, màn hình từng vị trí không thiếu không dư · cài đặt phủ toàn bộ và có hướng dẫn · các cổng
@@ -3459,3 +3468,52 @@ sinh ra thật - và dòng khai cũ của nó còn ghi sai (bảo là nhãn bài
 **(b) Thêm icon mới mà quên dựng lại font.** `ti-arrow-up-right` cho ô "Khiếu nại đã leo thang" -
 `_tall.js` bắt đỏ ngay, đúng như đã sửa ở V9.40. Một lệnh `python3 build_icons.py` là xong. Luật
 này giờ tự bảo vệ được.
+
+## V9.43 (30/07) - CHO LỚP GOOGLE SHEETS NGHỈ HƯU
+
+Anh Luân: *"tốt nhất là em vét sạch cái sheet cũ đi, sau khi em đã cập nhật đầy đủ rồi thì em cứ
+tập trung lên phần cài đặt của app là xong mà phải ko, từ nay ko cần quay lại sheet nữa, đỡ mệt
+đầu. Miễn là em đã nắm đầy đủ."*
+
+Điều kiện anh đặt là **"miễn là em đã nắm đầy đủ"** - nên em đối chiếu từng file trước khi xoá,
+không xoá theo cảm giác.
+
+| File bỏ | Nó giữ gì | App có chưa |
+|---|---|---|
+| `ITTs_WebApp_v4.gs`, `ITTs_WebApp.gs` | bản web chạy trên Sheets; đọc 15 tham số | **Có đủ 15** - đo bằng máy sau khi chạy `cfEnsure()`, app có 114 ô cấu hình |
+| `ITTs_Reminders.gs` | quét nhắc việc theo lịch, 10 ngưỡng SLA | **10 ngưỡng nằm trọn trong 92 mã** của `naFor()` |
+| `ITTs_FixCotTinh.gs` | tính cột suy ra trên sheet | `deriveAll()` tính đủ mọi cột nó tính |
+| `ITTs_XuLyDuLieu.gs` | named range, hyperlink, checkbox, `onEdit` đóng dấu giờ | cơ chế của bảng tính; app tự đóng dấu giờ trong từng cửa ghi |
+| `ITTs_Form_NhapLieu.gs` | form nhập liệu sidebar | app có form đầy đủ hơn |
+| `ITTs_SeedDemo.gs` | gieo dữ liệu demo vào sheet | pipeline Python trong `_src` |
+
+Cộng bốn bản HTML nguyên mẫu cũ (`Full_v2`, `Full_v3` = `v3_offline`, `Prototype_v1`) và
+`ITTs_demo_data.json` - không script nào đọc, và chúng là bản cũ của chính app này. Tổng cộng
+**13 file, khoảng 7,6 MB**. Git giữ lại tất cả: `git log --diff-filter=D --name-only`.
+
+**Thứ duy nhất mất theo:** `ITTs_Reminders.gs` là nơi DUY NHẤT từng gửi được thứ gì theo lịch
+(`MailApp` + trigger theo giờ). Đó là **hạ tầng, không phải luật** - backend tương lai phải dựng
+lại từ đầu dù có giữ file hay không. Nói rõ ở đây để sau này không ai tưởng nó bị bỏ quên.
+
+### 66 chỗ `google.script.run` thì GIỮ - và đây là quyết định, không phải quên dọn
+
+Bỏ Sheets thì `SVR` luôn false, 63 nhánh `if(SVR)` trong app đều chạy nhánh `else`. Theo đúng
+**LUẬT 2ter** em vừa viết vào `BAN_GIAO_DEV.md` ("code chết còn nguy hiểm hơn code sai") thì đáng
+ra phải xoá. Em giữ, vì ba lẽ:
+
+- chúng **không phải code của Sheets** mà là **đường nối ra backend** - mỗi chỗ đánh dấu đúng một
+  cửa ghi sẽ phải gọi máy chủ khi anh chốt nền tảng;
+- xoá đi thì lúc dựng backend phải mò lại đủ 66 chỗ trong 14 nghìn dòng - **đó** mới là chỗ dễ sót;
+- giữ lại không tốn gì lúc chạy.
+
+Nhưng giữ code không chạy thì **phải khai**, không thì nó đúng là code chết. `check_gs.py` đổi
+việc: từ "canh khoảng cách giữa hai bản" thành "canh việc đã nghỉ hưu" - không file `.gs` nào
+được quay lại, và số chỗ gọi máy chủ phải đúng bằng bản khai (66). Thêm một cửa ghi mà quên nối
+ra máy chủ là **đỏ** - đúng lúc cần biết.
+
+### Trả lời câu anh hỏi: đúng, từ nay chỉ còn màn Cài đặt của app
+
+Cấu hình không còn nằm ở hai nơi nữa. CH1-CH6, trợ thủ, nhịp ngày, phân quyền, đơn giá giờ dạy -
+tất cả nằm trong màn **Cài đặt**, sửa là app đổi ngay. File SOP gốc `.xlsx` **vẫn giữ** nhưng đổi
+vai: nó là **nguồn sự thật để `check_sop.py` đối chiếu sáu mặt**, không phải nơi để chạy hay để
+sửa cấu hình.

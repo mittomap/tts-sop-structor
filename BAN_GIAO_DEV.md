@@ -73,6 +73,19 @@ số, và canh thật **1/8** việc "Quản lý phê duyệt".
 Riêng CH3: mỗi việc SOP ghi "Quản lý phê duyệt" phải có **cửa ghi gọi `chanAct("...")`**. Khai vào
 bảng mà không chặn thì chỉ là tờ giấy dán tường - bộ kiểm bắt luôn chuyện đó.
 
+### LUẬT 2bis-ter - Không còn Google Sheets. Đừng dựng lại.
+
+Lớp Google Sheets (7 file `.gs`) đã cho nghỉ hưu 30/07 theo lệnh anh Luân. Trước khi xoá đã đối
+chiếu từng file: 15 tham số bản `.gs` đọc đều có ô sửa trong CH2, 10 ngưỡng SLA của bộ quét theo
+lịch nằm trọn trong 92 mã `naFor()`, mọi cột suy ra `deriveAll()` đều tính. **Không mất luật nào.**
+
+Còn 66 chỗ `google.script.run` trong `gen_v5.py` - **giữ có chủ ý**, đó là đường nối ra backend
+tương lai, mỗi chỗ đánh dấu đúng một cửa ghi. `SVR` luôn false nên chúng không chạy. Khi bạn thêm
+một cửa ghi mới, hãy nối nó ra máy chủ theo đúng khuôn của các cửa ghi cũ rồi cập nhật `SVR_GOI`
+trong `check_gs.py` - bộ kiểm sẽ đỏ nếu bạn quên.
+
+Cấu hình nay chỉ có MỘT nơi: màn **Cài đặt** của app.
+
 ### LUẬT 2ter - Code chết còn nguy hiểm hơn code sai
 
 `kpiAll()` (14 ô chỉ số) và `ROLEKPI` (ô nào cho chức danh nào) nằm trong `gen_v5.py` chín phiên
@@ -118,7 +131,7 @@ cd _src && python3 build_icons.py  # cần: pip install fonttools brotli
 | Chỉ số BC2 thiếu công thức hoặc thiếu ngưỡng CH6 (51 chỉ số) | |
 | Việc "Quản lý phê duyệt" mà cửa ghi không gọi `chanAct` (CH3, 31 hành động) | |
 | Màn hình SOP mô tả mà app không vẽ ra (VH/BC, 22 màn) | Một tính năng **chưa bao giờ được gọi** - trừ khi nó là màn SOP mô tả; `kpiAll`/`ROLEKPI` chết 9 phiên bản mới bị bắt |
-| Bản `.gs` tụt lại so với app (`check_gs.py`) | |
+| File `.gs` quay lại kho, hoặc cửa ghi mới quên nối ra backend (`check_gs.py`) | |
 
 Nói cách khác: nó chặn phần lớn tai nạn, **không** biến người bất cẩn thành an toàn. Đọc mã vẫn cần.
 

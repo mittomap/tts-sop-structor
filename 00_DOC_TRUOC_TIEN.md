@@ -15,9 +15,6 @@ Số hóa SOP vận hành 10 giai đoạn của trung tâm thành một hệ Goo
 | `01_KIEN_TRUC_HE_THONG.md` | Kiến trúc 52 sheet + mọi cơ chế cốt lõi |
 | `02_NHAT_KY_QUYET_DINH.md` | Quyết định thiết kế + bẫy kỹ thuật + việc tồn |
 | `ITTs_Operations_Template_v4.xlsx` | SẢN PHẨM CHÍNH - bản chuẩn mới nhất |
-| `ITTs_XuLyDuLieu.gs` | Script chính: cài đặt, sửa link, dấu giờ tự động, menu |
-| `ITTs_Form_NhapLieu.gs` | Script form nhập liệu sidebar |
-| `ITTs_WebApp.gs` | Web app demo v3 (dashboard, việc hôm nay, nhập lead, tra cứu) |
 | `ITTs_WebApp_v5_demo.html` | **WEB APP nhân viên** (bản demo offline hiện hành, đang phát triển mạnh) |
 | `ITTs_TrangHocVien_demo.html` | **Cổng học viên** (sinh cùng generator, chung CSS/JS) |
 | `ITTs_data.js` | **Dữ liệu demo tách riêng** - app ưu tiên đọc file này; thay file = thay dữ liệu, không cần build |
@@ -63,9 +60,14 @@ làm trên máy Luân vẫn dùng `./push.sh` / `./update.sh` như cũ. Phiên C
 7. Tiếng Việt mộc, không màu mè. Nhãn enum lấy NGUYÊN VĂN từ CH1.
 
 ## 4. Quy trình giao nhận (bắt buộc)
-- Mỗi lần giao file: LUÔN gồm `ITTs_Operations_Template_v4.xlsx` + `ITTs_XuLyDuLieu.gs`
-  + `ITTs_Form_NhapLieu.gs` (WebApp.gs chỉ khi có thay đổi). Nhắc user: import xong chạy
-  menu "ITTs Cong cu > CAI DAT BAN DAU" (hoặc tối thiểu "Sua lien ket (hyperlink)").
+- **Lớp Google Sheets đã CHO NGHỈ HƯU (30/07)** theo lệnh anh Luân: *"tốt nhất là em vét sạch cái
+  sheet cũ đi... từ nay ko cần quay lại sheet nữa, đỡ mệt đầu."* Bảy file `.gs` và bốn bản HTML
+  nguyên mẫu cũ đã xoá; git giữ lại nếu cần tra. File SOP gốc `ITTs_Operations_Template_v4.xlsx`
+  **vẫn giữ** - nó là nguồn sự thật để `check_sop.py` đối chiếu, không phải để chạy.
+- Giao sản phẩm bây giờ = ba file app ở gốc repo (`ITTs_WebApp_v5_demo.html`,
+  `ITTs_TrangHocVien_demo.html`, `ITTs_data.js`) - hoặc chỉ cần đưa link demo online.
+- Mọi cấu hình nay nằm TRONG app ở màn **Cài đặt** (CH1-CH6 + trợ thủ + nhịp ngày + phân quyền),
+  không còn phải mở bảng tính để sửa named range.
 - **User upload xlsx = BASE MỚI** (user tự decor trên bản live: màu, viền, độ rộng...).
   Quy trình: audit tiếp nhận (52 sheet, ~141 named range, ~73 validation, 0 lỗi công thức)
   -> chấp nhận -> làm tiếp trên nền đó. KHÔNG BAO GIỜ rebuild từ bản cũ hơn.

@@ -1,6 +1,6 @@
 # ITTs Web App **V5** — bản gọn, xoay quanh LUỒNG HÀNH TRÌNH
 
-> `ITTs_WebApp_v5_demo.html` là bản demo offline (vai trò như V3 trước đây): mở bằng trình duyệt, mọi thao tác chạy trên dữ liệu demo trong phiên. Bản V4 (`ITTs_WebApp_v4.gs`) **vẫn giữ** để tái dùng code + tham khảo. V5 bản nối Sheets thật (`_v5.gs`) sẽ dựng sau khi anh chốt luồng.
+> `ITTs_WebApp_v5_demo.html` là bản app: mở bằng trình duyệt, mọi thao tác ghi thật vào bộ nhớ trình duyệt. **Lớp Google Sheets đã cho nghỉ hưu 30/07** - không còn bản `.gs` nào, mọi cấu hình nằm trong màn Cài đặt của chính app. Khi anh Luân chốt nền tảng backend, 66 chỗ ghi trong app đã có sẵn đường nối ra máy chủ (xem khối ghi chú tại `var SVR=` trong `gen_v5.py`).
 
 ## Triết lý V5: người dùng là trung tâm, đi theo luồng — không phải tra bảng
 

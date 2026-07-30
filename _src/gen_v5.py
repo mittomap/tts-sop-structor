@@ -1385,10 +1385,25 @@ var DATASRC=(typeof window!=="undefined"&&window.ITTS_DATA)?"file":"inline";
 if(!DATA.__gen)DATA.__gen="__GEN_STAMP__"+(DATASRC==="inline"?" - bản nhúng":"");
 var DL=DATA.dl, ENUM=DATA.enums;
 var PARAMS=(DATA&&DATA.params)||{}, MEINFO=null, EDIT={};
+/* ═══════════ CHỖ CẮM CHO BACKEND (V9.43) ═══════════════════════════════════════════════
+   `SVR` bật lên khi app chạy BÊN TRONG một backend có hàm ghi ở phía máy chủ. Trước 30/07 backend
+   đó là Google Apps Script; anh Luân đã cho **nghỉ hưu toàn bộ lớp Google Sheets** (30/07):
+   *"tốt nhất là em vét sạch cái sheet cũ đi... từ nay ko cần quay lại sheet nữa, đỡ mệt đầu."*
+
+   Vậy `SVR` bây giờ LUÔN LÀ false, và 64 nhánh `if(SVR){...}else{...}` trong app đang chạy nhánh
+   `else`. Em GIỮ chúng lại, và đây là một quyết định chứ không phải quên dọn:
+     - chúng không phải "code của Sheets" mà là ĐƯỜNG NỐI RA BACKEND - mỗi nhánh đánh dấu đúng một
+       chỗ mà app ghi dữ liệu và sẽ phải gọi máy chủ khi anh Luân chốt nền tảng;
+     - xoá đi thì lúc dựng backend phải đi tìm lại đủ 64 chỗ đó trong 14 nghìn dòng - việc đó mới
+       là chỗ dễ sót;
+     - giữ lại KHÔNG tốn gì lúc chạy: `SVR` false thì nhánh kia không bao giờ vào.
+   Nhưng giữ code không chạy thì phải KHAI, không thì nó thành code chết (luật 2ter trong
+   BAN_GIAO_DEV). Bộ kiểm `_src/check_gs.py` đếm số nhánh này và giữ nó đúng bằng bản khai:
+   thêm cửa ghi mới mà quên nối vào đây là ĐỎ - đúng cái ta cần khi backend xuất hiện. */
 var SVR=(typeof google!=="undefined"&&google.script&&google.script.run);
 
 /* ===== NỀN DEMO ĐA CỔNG (V9.7) =====
-   - Mọi thao tác ghi được LƯU THẬT vào localStorage (chỉ bản offline; bản .gs ghi sheet như cũ).
+   - Mọi thao tác ghi được LƯU THẬT vào localStorage (bản Google Sheets đã cho nghỉ hưu 30/07).
    - Nhiều cửa sổ/cổng mở cùng lúc tự ĐỒNG BỘ qua sự kiện storage (duyệt ở cổng này, cổng kia thấy).
    - "Reset dữ liệu demo" xóa phần lưu -> nạp lại dữ liệu gốc (file ITTs_data.js hoặc bản nhúng). */
 var LSKEY="ITTS_DEMO_STATE_V1";

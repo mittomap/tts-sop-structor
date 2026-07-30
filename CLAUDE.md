@@ -52,9 +52,14 @@ Chủ dự án: Luân. Mọi phiên làm việc (Claude Code hay Claude Cowork) 
   Chỗ nào app không làm phải khai **kèm lý do đọc được**. Đã nằm trong `./verify.sh`.
   Cột chỉ nói "có chỗ để lưu" - nó KHÔNG nói app có nhắc việc, có tính chỉ số, có chặn đúng người,
   có màn hình để xem.
-- **Bản Google Sheets (`.gs`) đang ở V9.15, đọc 19 bảng trong khi app dùng 26.** `_src/check_gs.py`
-  giữ khoảng cách đó thành BẢN KHAI - thêm bảng mới vào app mà không khai là đỏ. Chưa đồng bộ vì
-  anh Luân sẽ chốt nền tảng sau; nhưng không được để nó rộng thêm trong im lặng.
+- **LỚP GOOGLE SHEETS ĐÃ NGHỈ HƯU (anh Luân chốt 30/07):** *"tốt nhất là em vét sạch cái sheet cũ
+  đi... từ nay ko cần quay lại sheet nữa, đỡ mệt đầu."* Bảy file `.gs` + bốn bản HTML nguyên mẫu
+  đã xoá (git giữ). **Đừng dựng lại, đừng thêm file `.gs` mới** - `_src/check_gs.py` canh chuyện
+  đó. Mọi cấu hình nay nằm trong màn **Cài đặt** của app. File SOP gốc `.xlsx` vẫn giữ, nhưng chỉ
+  để `check_sop.py` đối chiếu - không phải để chạy.
+- 66 chỗ `google.script.run` trong `gen_v5.py` **giữ có chủ ý**: chúng là ĐƯỜNG NỐI RA BACKEND
+  tương lai, mỗi chỗ đánh dấu đúng một cửa ghi. `SVR` luôn false nên chúng không chạy.
+  `check_gs.py` đếm và giữ đúng bản khai - thêm cửa ghi mà quên nối là đỏ.
 
 ## LUẬT CỨNG rút gọn (bản đầy đủ trong 00/01/02)
 

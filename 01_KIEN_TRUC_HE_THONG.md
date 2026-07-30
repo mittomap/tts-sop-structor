@@ -32,7 +32,8 @@
 - **CH4 - mẫu câu 2 lớp**: cột C = TEXT THUẦN có chỗ trống `{1} {2}` (ô vàng, ai cũng sửa được);
   cột F = `{n} = tên tham số` (link CH2); cột G = công thức SUBSTITUTE tự ghép (xám, KHÔNG SỬA).
   MỌI consumer đọc cột G. Thêm câu mới: thêm dòng mã NAxxx mới + cập nhật HD3.
-- **Dấu giờ tự động (Apps Script onEdit, bảng AUTO_STAMP trong XuLyDuLieu.gs)**: 12 quy tắc -
+- **Dấu giờ tự động** (thời Google Sheets là `onEdit` + bảng AUTO_STAMP; từ 30/07 lớp Sheets đã
+  nghỉ hưu, app tự đóng dấu giờ ngay trong từng cửa ghi): 12 quy tắc -
   đổi trạng thái thì tự điền cột *_time nếu trống (graded->result_time, resolved->resolution_time,
   on_time/late->check_in_time...). Chỉ chạy khi sửa trực tiếp trên Google Sheets.
 - **Cột tự tính tiêu biểu** (không nhập tay): DL03 overall_score (TB 4 kỹ năng, tròn 0.5);
