@@ -225,5 +225,55 @@ t("co trang ngoai LISTCFG cung dung duoc (giao viec)", fltCode("giaoviec")==="DL
  reset("nhaplead");
 })();
 
+/* ---- THU TU NHOM VIEC PHAI THEO HANH TRINH SOP (V9.48, anh Luan) ----
+   "may nhom viec, e sap xep thu tu chuan ko nhi" - khong chuan. Thu tu cu la thu tu cac luat
+   TINH CO duoc viet trong slaItems(): "Moi tai ghi danh" (P10, chang CUOI) dung thu hai ngay sau
+   "Tat ca nhom", ba nhom P1 nam rai rac xen giua P4 va P2.
+   Nay VIECNHOM la HOP DONG. Sinh ra nhom viec moi ma khong khai vao do thi cho nay do - khong de
+   nhom moi lang le roi xuong cuoi dai roi khong ai thay. */
+(function(){
+ setRole("all");cfEnsure();
+ t("co bang khai thu tu nhom viec", typeof VIECNHOM!=="undefined"&&VIECNHOM.length>0&&typeof VIECNHOMBY==="object");
+ var that={};try{slaItems().forEach(function(x){if(x.grp)that[x.grp]=1})}catch(e){}
+ var chuaKhai=Object.keys(that).filter(function(g){return VIECNHOMBY[g]==null});
+ t("MOI nhom viec co that deu duoc khai thu tu"+(chuaKhai.length?": "+chuaKhai.slice(0,5).join(" | "):""), chuaKhai.length===0);
+ var khaiChet=VIECNHOM.filter(function(g){return !that[g]});
+ t("khong con khai thu tu cho nhom KHONG con ton tai"+(khaiChet.length?": "+khaiChet.slice(0,5).join(" | "):""), khaiChet.length===0);
+ t("khong khai trung mot nhom hai lan", VIECNHOM.length===Object.keys(VIECNHOMBY).length);
+ /* mot vai moc hanh trinh phai dung dung cho - bat nguoc thu tu la do */
+ function tr(g){return VIECNHOMBY[g]}
+ t("P1 Lead moi dung TRUOC P2 dat lich test", tr("Lead mới")<tr("Đã hẹn test"));
+ t("P2 test dung TRUOC P3 duyet chiet khau", tr("Đã hẹn test")<tr("Duyệt chiết khấu"));
+ t("P3 dang ky dung TRUOC P4 thu tien", tr("Duyệt chiết khấu")<tr("Thu công nợ"));
+ t("P4 thu tien dung TRUOC P5 xep lop", tr("Thu công nợ")<tr("Đã thu - chờ xếp lớp"));
+ t("P5 xep lop dung TRUOC P6 nhan xet buoi", tr("Đã thu - chờ xếp lớp")<tr("Ghi nhận xét buổi"));
+ t("P6 buoi hoc dung TRUOC P7 buoi WOW", tr("Ghi nhận xét buổi")<tr("Ghi nội dung WOW"));
+ t("P7 WOW dung TRUOC P8 khieu nai", tr("Ghi nội dung WOW")<tr("Xử lý khiếu nại"));
+ t("P10 moi tai ghi danh dung O CUOI, khong nhay len dau",
+   tr("Mời tái ghi danh")>tr("Lead mới")&&tr("Mời tái ghi danh")>tr("Xử lý khiếu nại"));
+ /* thang NAM MUC nguy co cua SOP: may thay truoc, roi gap nhat -> nhe nhat */
+ t("nguy co: may thay dung truoc moi muc can thiep",
+   tr("Máy thấy nguy cơ - chưa gắn cờ")<tr("Nguy cơ - HỌP 4 BÊN GẤP"));
+ t("nguy co: hop 4 ben GAP dung truoc hop 3 ben",
+   tr("Nguy cơ - HỌP 4 BÊN GẤP")<tr("Nguy cơ - HỌP 3 BÊN trong 24h"));
+ t("nguy co: hop 3 ben dung truoc dat WOW kem va goi",
+   tr("Nguy cơ - HỌP 3 BÊN gấp")<tr("Nguy cơ - ĐẶT BUỔI WOW KÈM")&&
+   tr("Nguy cơ - ĐẶT BUỔI WOW KÈM")<tr("Nguy cơ - GỌI trong 24-48h"));
+ /* VE THAT man Viec: dai chip phai ra dung thu tu do */
+ CUR="viec";window.VIECTEAM="all";window.VIECGRP="all";window.VIECSEV="";
+ segMo("viec_nhom");                       /* bung het de soi tron ven */
+ var h=RENDER["viec"]();
+ var seg=(h.split("Nhóm việc")[1]||"");
+ var ten=[];(seg.match(/>([^<>]+)<i class="segn">/g)||[]).forEach(function(x){
+  ten.push(x.slice(1,x.indexOf("<i")))});
+ segMo("viec_nhom");                       /* thu lai nhu cu */
+ var co=ten.filter(function(x){return VIECNHOMBY[x]!=null});
+ t("dai chip ve ra du moi nhom khi bung het", co.length===Object.keys(that).length);
+ var thuTu=co.map(function(x){return VIECNHOMBY[x]});
+ t("dai chip hien DUNG thu tu hanh trinh P1 -> P10",
+   thuTu.every(function(v,i){return i===0||v>thuTu[i-1]}));
+ t("nhom dau tien sau 'Tat ca' la viec cua chang P1", co.length>0&&VIECNHOMBY[co[0]]<=2);
+})();
+
 console.log(bad.length?("CHECK17 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK17 OK: "+ok+" tieu chi");
 process.exitCode=bad.length?1:0;

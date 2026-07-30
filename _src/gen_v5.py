@@ -3727,6 +3727,45 @@ function jTasks(){var out=[];
    age:J.ageH,page:null,filter:null,lead:(J.C.L?J.C.L.lead_id:null),hoso:(J.C.L?null:J.C.sid),
    act:"jRun",rid:J.C.pid,jpid:J.C.pid,prm:slaPrmOf(J.S.sla),slaV:J.sla})});
  return out}
+/* ═══════════ V9.48 - THỨ TỰ NHÓM VIỆC THEO HÀNH TRÌNH SOP ════════════════════════════════
+   Anh Luân nhìn màn Việc hôm nay rồi hỏi: *"mấy nhóm việc, e sắp xếp thứ tự chuẩn ko nhỉ"*.
+   Không chuẩn. Thứ tự cũ = thứ tự các luật tình cờ được viết trong `slaItems()`. Đọc trên màn
+   thấy ngay cái sai: "Mời tái ghi danh" là chặng P10 - CUỐI hành trình - mà đứng thứ hai.
+
+   Bảng này là BẢN KHAI thứ tự, xếp theo đúng mạch P1 → P10 mà cả app đang dùng (17 nhóm tham số
+   ở Cài đặt cũng xếp thế). Riêng khối HỌC VIÊN NGUY CƠ giữ đúng thang năm mức của SOP: máy thấy
+   trước (còn phải xác nhận), rồi tới gấp nhất -> nhẹ nhất.
+   Bộ kiểm bắt buộc: sinh ra nhóm việc mới mà không khai vào đây là ĐỎ - không để nhóm mới lặng
+   lẽ rơi xuống cuối dải rồi không ai thấy. */
+var VIECNHOM=[
+ /* P1 · Lead & chăm khách */
+ "Lead mới","Đang khai thác","Chưa gặp được",
+ /* P2 · Test đầu vào & tư vấn */
+ "Đã hẹn test","Chờ chấm test","Chấm test đầu vào","Có KQ, chờ tư vấn","Tư vấn sau test",
+ "Đang tư vấn","Chờ tư vấn lộ trình",
+ /* P3 · Đăng ký & chiết khấu */
+ "Duyệt chiết khấu","Đăng ký - chờ thu","Đăng ký đã hủy",
+ /* P4 · Học phí & công nợ */
+ "Xác nhận khoản thu","Thu công nợ",
+ /* P5 · Xếp lớp & nhập học */
+ "Đã thu - chờ xếp lớp","Lớp sắp khai giảng thiếu sĩ số","Onboarding","Gửi thông tin lớp",
+ "Hoàn tất onboarding",
+ /* P6 · Buổi học, điểm danh, bài tập */
+ "Ghi nhận xét buổi","Chấm bài tập","Duyệt đơn xin nghỉ","Gọi hỏi thăm HV vắng",
+ /* P6 · Học viên nguy cơ - năm mức của SOP, gấp nhất lên trước */
+ "Máy thấy nguy cơ - chưa gắn cờ","Nguy cơ - HỌP 4 BÊN GẤP","Nguy cơ - HỌP 3 BÊN trong 24h",
+ "Nguy cơ - HỌP 3 BÊN gấp","Nguy cơ - ĐẶT BUỔI WOW KÈM","Nguy cơ - GỌI trong 24-48h",
+ "Học viên im lặng quá lâu",
+ /* P7 · Buổi WOW 1-1 */
+ "Xác nhận buổi WOW mới đặt","Buổi WOW tới giờ chưa bấm bắt đầu","Buổi WOW thiếu mốc giờ",
+ "Ghi nội dung WOW",
+ /* P8-P9 · Khảo sát, phản hồi & khiếu nại */
+ "Xử lý khiếu nại","Hỏi lại HV sau khi đóng khiếu nại","Xin cảm nhận học viên",
+ /* P10 · Kết thúc khóa & tái đăng ký */
+ "Bảo lưu sắp hết hạn","Mời tái ghi danh",
+ /* Ngoài trục hành trình */
+ "Trao thưởng giới thiệu"];
+var VIECNHOMBY={};VIECNHOM.forEach(function(g,i){VIECNHOMBY[g]=i});
 function slaItems(){var out=jTasks();
  /* V9.29: tham số cuối = TÊN THAM SỐ CẤU HÌNH của luật này, để drawer xem nhanh chỉ đúng
     "ngưỡng lấy từ đâu" thay vì nói chung chung. */
@@ -4270,6 +4309,15 @@ function renderViec(){var items=bellItems();
  var teamC={};base.forEach(function(it){teamC[it.cat]=(teamC[it.cat]||0)+1});
  var scoped=base.filter(function(it){return team==="all"||it.cat===team});
  var grpC={},grpOrder=[];scoped.forEach(function(it){if(grpC[it.grp]==null){grpOrder.push(it.grp);grpC[it.grp]=0}grpC[it.grp]++});
+ /* V9.48 - anh Luân: *"mấy nhóm việc, e sắp xếp thứ tự chuẩn ko nhỉ"*. KHÔNG, và câu hỏi đúng
+    chỗ: thứ tự cũ là thứ tự các luật TÌNH CỜ được viết trong `slaItems()`, không ai chọn cả.
+    Hậu quả đọc thấy ngay trên màn: "Mời tái ghi danh" (P10, chặng CUỐI) đứng thứ hai ngay sau
+    "Tất cả nhóm", còn ba nhóm P1 thì nằm rải rác xen giữa P4 và P2.
+    Nay xếp theo ĐÚNG HÀNH TRÌNH P1 → P10 (`VIECNHOM`), cùng một mạch với 17 nhóm tham số ở Cài
+    đặt - người dùng chỉ phải học MỘT trật tự cho cả app. */
+ grpOrder.sort(function(a,b){
+  var x=VIECNHOMBY[a],y=VIECNHOMBY[b];
+  return (x==null?9999:x)-(y==null?9999:y)||(a<b?-1:a>b?1:0)});
  var view=scoped.filter(function(it){return grp==="all"||it.grp===grp});
  var h=pageHead("Việc hôm nay",
   "Mọi việc trung tâm đang nợ, gom từ toàn bộ luật SLA. Đây là chỗ dọn việc; muốn xử lý từng người thì vào Trang bắt đầu.",
