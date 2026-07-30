@@ -17,7 +17,12 @@
 const PATHS = ["/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
                "/opt/pw-browsers/chromium/chrome-linux/chrome"];
 const OUT = process.env.ITTS_OUT || ".";
-const VIEWS = [{n:"dienthoai",w:390,h:844},{n:"maytinhbang",w:834,h:1112},{n:"maytinh",w:1440,h:900}];
+/* V9.56 (anh Luan: "e kiem responsive tren ipad va mobile chua"): truoc chi co 3 kho DOC.
+   Xoay ngang la trang thai that su hay gap tren may tinh bang, va no doi han be rong (iPad 834
+   doc -> 1112 ngang) nen khong the suy tu kho doc ra duoc. */
+const VIEWS = [{n:"dienthoai",w:390,h:844},{n:"dienthoai-ngang",w:844,h:390},
+               {n:"maytinhbang",w:834,h:1112},{n:"maytinhbang-ngang",w:1112,h:834},
+               {n:"maytinh",w:1440,h:900}];
 /* Tai nguyen ngoai duoc PHEP that bai: tinh nang Room la P2P nhieu may, ban chat phai co mang.
    App da xu ly dung (im lang, luot sau thu lai). Moi URL ngoai KHAC deu la loi. */
 const NGOAI_OK = [/peerjs/];
@@ -234,6 +239,57 @@ const PROBE = () => {
         try { closeConfirm(); closeModal(); } catch (e) {}
         return kq;
       });
+      /* ═══ V9.56 - MO NGAN KEO THAT O TUNG KHO MAN ═══
+         Anh Luan: "e kiem responsive tren ipad va mobile chua". Co - moi TRANG deu duoc mo o
+         3 (nay 5) kho man. Nhung NGAN KEO thi chua: bo kiem chi mo dung mot ngan keo gia de thu
+         hop xac nhan, nen 6 ngan keo dung trong phien nay chua lan nao duoc nhin o kho dien thoai.
+         Do that thi lo ra 3 loi: nut dong 13x22px (ngon tay khong bam trung), ngan keo 760px de
+         len man iPad 834px chi chua lai 74px vo dung, va nut Tro ly noi TREN ngan keo che noi dung.
+         Ba loi nay khong the thay bang cach doc ma nguon - phai mo that, o dung kho man. */
+      const NGKEO = [
+        ["chang", `(function(){var J=jAll().filter(function(x){return x.k==="learning"})[0]||jAll()[0];jStagePop(J.C.pid,"test_done")})()`],
+        ["hanh trinh", `(function(){var J=jAll().filter(function(x){return x.k==="learning"})[0]||jAll()[0];mstripOpen(J.C.pid)})()`],
+        ["sua nguong CH2", `cfPop('slaLRT_minutes')`],
+        ["sua cau nhac CH4", `msgPop('NA050')`],
+        ["sua nguong KPI", `kpiPop('CVR')`],
+        ["sua danh muc CH1", `enumPop('enum_lead_status')`],
+        ["xem nhanh ho so", `(function(){var J=jAll()[0];openQuick(J.C.pid)})()`],
+      ];
+      for (const [ten, js] of NGKEO) {
+        try { await page.evaluate(`go("banlam")`); await page.waitForTimeout(60);
+              await page.evaluate(js); } catch (e) {
+          bad.push(nhan("ngan keo " + ten + ": KHONG MO DUOC - " + String(e.message).slice(0, 80))); continue; }
+        await page.waitForTimeout(140); luot++;
+        const nk = await page.evaluate(() => {
+          const d = document.querySelector(".drawer");
+          if (!d || !d.classList.contains("on")) return {loi: "mo ma khong hien"};
+          const R = d.getBoundingClientRect(), W = window.innerWidth;
+          const x = d.querySelector(".dh .x"); const rx = x && x.getBoundingClientRect();
+          const f = document.querySelector(".asstfab");
+          const nho = [];
+          d.querySelectorAll("button").forEach(el => { const r = el.getBoundingClientRect();
+            if (el.offsetParent !== null && r.width && (r.height < 28 || r.width < 24))
+              nho.push(String(el.className || el.tagName).slice(0, 22) + " " + Math.round(r.width) + "x" + Math.round(r.height)); });
+          const tran = [];
+          d.querySelectorAll("*").forEach(el => { const r = el.getBoundingClientRect();
+            if (r.width && (r.right > R.right + 1 || r.left < R.left - 1))
+              tran.push(String(el.className || el.tagName).slice(0, 22)); });
+          return {rong: Math.round(R.width), man: W, thoRa: Math.round(R.right - W),
+            nutDong: rx ? Math.round(rx.width) + "x" + Math.round(rx.height) : "khong co",
+            nutDongDu: !!(rx && rx.width >= 36 && rx.height >= 36),
+            troLyDeLen: !!(f && getComputedStyle(f).opacity !== "0" && getComputedStyle(f).display !== "none"),
+            nho: nho.slice(0, 3), tran: tran.slice(0, 3)};
+        });
+        if (nk.loi) { bad.push(nhan("ngan keo " + ten + ": " + nk.loi)); continue; }
+        if (nk.thoRa > 1) bad.push(nhan("ngan keo " + ten + " THO RA NGOAI MAN " + nk.thoRa + "px"));
+        if (!nk.nutDongDu) bad.push(nhan("ngan keo " + ten + ": nut dong chi " + nk.nutDong + " - ngon tay khong bam trung"));
+        if (nk.troLyDeLen) bad.push(nhan("ngan keo " + ten + ": nut Tro ly noi DE LEN ngan keo dang chan"));
+        if (V.w <= 900 && nk.rong < nk.man - 8) bad.push(nhan("ngan keo " + ten + " chi rong " + nk.rong + "/" + nk.man + "px - chua lai vet thua vo dung"));
+        nk.nho.forEach(c => bad.push(nhan("ngan keo " + ten + ": nut qua nho " + c)));
+        nk.tran.forEach(c => bad.push(nhan("ngan keo " + ten + ": noi dung TRAN RA KHOI ngan keo <" + c + ">")));
+        try { await page.evaluate(`closeModal()`); } catch (e) {}
+        await page.waitForTimeout(60);
+      }
       if (!cf.coNut) bad.push(nhan("hop xac nhan khong dung duoc nut Xac nhan"));
       else {
         if (!cf.trongNganKeo) bad.push(nhan("hop xac nhan bi CHON DUOI ngan keo - bam vao trung " + cf.deLen));

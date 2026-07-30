@@ -588,7 +588,12 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .qaYD{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
 .qaYD .pill b{background:var(--navy);color:#fff;border-radius:999px;padding:0 5px;font-size:10px;margin-left:3px}
 .qaYD .pill.on b{background:#fff;color:var(--navy)}
-@media(max-width:600px){.asst{right:10px;left:10px;width:auto;bottom:70px}.asstfab{right:12px;bottom:12px}}
+@media(max-width:600px){.asst{right:10px;left:10px;width:auto;bottom:70px}/* V9.56: nut Tro ly de z-index 198, cao hon ngan keo (171), nen no NOI TREN ngan keo. Tren man
+   1440px thi khong ai de y; tren dien thoai 390px no de len dung goc duoi phai cua ngan keo, che
+   mat noi dung. Ngan keo la lop CHAN (co man che 170) - da chan thi khong thu gi duoc noi len tren.
+   Chi bat duoc loi nay khi MO NGAN KEO THAT o kho dien thoai - do bang so tren man rong khong thay. */
+body.drwon .asstfab{opacity:0;pointer-events:none;transition:opacity .12s ease}
+.asstfab{right:12px;bottom:12px}}
 /* V9.52 (anh Luân: "nhìn hơi chìm khi rơi vào trường hợp này nhỉ"): nút thu gọn nằm ĐÈ lên
    danh sách nút "Xử lý" cùng tông navy nên lẫn hẳn vào nền. Nay có viền sáng tách khỏi nền,
    bóng đổ dày hơn và một vòng trắng mỏng - nhìn là biết nó nổi TRÊN trang, không thuộc trang. */
@@ -1167,10 +1172,22 @@ input[type=checkbox],input[type=radio]{width:17px;height:17px;flex:none;accent-c
 .drszr:hover:after,.drszr.drag:after{background:var(--blue);height:56px;margin-top:-28px}
 body.drsz{cursor:col-resize;user-select:none}
 body.drsz .drawer{transition:none}
+/* V9.56: tu 900px tro xuong (may tinh bang doc, dien thoai xoay ngang) ngan keo 760px de len man
+   834px chi chua lai 74px - khong con la "tam phu len trang" ma la mot man hinh kem mot vet thua.
+   Duoi nguong nay cho no chiem tron man - kieu ngan keo toan man quen thuoc tren cam ung.
+   BAY: dat rule nay TRUOC .drawer goc thi vo tac dung - cung do uu tien thi rule dung SAU thang. */
+@media(max-width:900px){.drawer{width:100%;max-width:100%}}
 .drawer.on{transform:none}
 .dh{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
 .dh b{flex:1;font-size:14px;font-weight:800}
-.dh .x{cursor:pointer;font-size:22px;line-height:1;color:var(--muted);border:none;background:none}
+/* V9.56: nut dong ngan keo do duoc la 13x22px - tren dien thoai ngon tay khong bam trung.
+   Chuan cham tay toi thieu la 44x44 (iOS) / 48x48 (Android). Chu X van co cu, chi noi rong
+   VUNG BAM quanh no. Do bang may moi thay: bo kiem cu khong bao gio mo ngan keo that nen
+   khong lan nao soi toi cai nut nay. */
+.dh .x{cursor:pointer;font-size:22px;line-height:1;color:var(--muted);border:none;background:none;
+ width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;flex:0 0 auto}
+.dh .x:hover{background:var(--bg);color:var(--text)}
+@media(pointer:coarse){.dh .x{width:44px;height:44px}}
 .dbody{flex:1;overflow-y:auto;padding:16px 18px}
 .dcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
 .dcard h4{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--navy);font-weight:800;margin-bottom:9px;display:flex;align-items:center;gap:6px}
@@ -4948,8 +4965,8 @@ function drwInit(){var g=document.getElementById("drszr");if(!g||g.__on)return;g
  g.addEventListener("touchstart",function(e){var d=document.getElementById("drawer");
   start(e.touches[0].clientX,d?d.getBoundingClientRect().width:DRW_DEF)},{passive:true});
  g.addEventListener("dblclick",drwReset)}
-function openDrawer(title,html){tourCleanup();drwInit();drwApply();document.getElementById("drawerTitle").textContent=title;document.getElementById("drawerBody").innerHTML=html;document.getElementById("mask").classList.add("on");document.getElementById("drawer").classList.add("on")}
-function closeModal(){document.getElementById("mask").classList.remove("on");document.getElementById("drawer").classList.remove("on");if(window.__pendSync)setTimeout(syncApply,50)}
+function openDrawer(title,html){tourCleanup();drwInit();drwApply();document.body.classList.add("drwon");document.getElementById("drawerTitle").textContent=title;document.getElementById("drawerBody").innerHTML=html;document.getElementById("mask").classList.add("on");document.getElementById("drawer").classList.add("on")}
+function closeModal(){document.body.classList.remove("drwon");document.getElementById("mask").classList.remove("on");document.getElementById("drawer").classList.remove("on");if(window.__pendSync)setTimeout(syncApply,50)}
 /* ===== V9.27 TOOLTIP HIEN NGAY =====
    Thuoc tinh title cua trinh duyet doi khoang 1 giay moi hien, lai bi cat khi nam trong khung cuon.
    Dung data-tip: mot the duy nhat gan vao body, hien ngay khi chuot vao, tu lat len/xuong cho vua man hinh.
