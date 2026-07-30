@@ -14754,12 +14754,32 @@ function hvRichTop(n){
  var RICH={HV061:9999,HV065:9998,HV002:9997};
  var all=rows("DL09").slice().sort(function(a,b){return (RICH[b.student_id]||sc[b.student_id]||0)-(RICH[a.student_id]||sc[a.student_id]||0)});
  window.__hvRich=all;return all.slice(0,n)}
+/* V9.45 (anh Luân hỏi 30/07: "cổng phụ huynh ở đâu nhỉ, a chưa thấy ở index.html").
+   Cổng phụ huynh vẫn luôn có, nhưng nó nấp một tầng: phải vào cổng học viên, rồi bấm nút nhỏ
+   "Vào như phụ huynh" trên từng thẻ. Người đi xem demo không tìm ra - mà không tìm ra thì coi
+   như KHÔNG CÓ. Nay có địa chỉ riêng `?phuhuynh`: mở thẳng màn chọn con ở chế độ phụ huynh, và
+   trang chủ demo có cửa thứ ba. Cùng một cổng, chỉ khác lối vào - không nhân đôi màn hình. */
+function hvPHmode(){return !!window.__hvPHM}
+function hvPHmodeRead(){
+ var q=String(location.search||"").replace(/^\?/,"").toLowerCase();
+ if(/(^|&)(phuhuynh|ph)(=|&|$)/.test(q))window.__hvPHM=1}
+function hvPHmodeSet(v){window.__hvPHM=v?1:0;
+ try{if(window.history&&history.replaceState)history.replaceState(null,"",location.pathname+(v?"?phuhuynh":""))}catch(e){}
+ demoGateHV()}
 function demoGateHV(){var el=document.getElementById("login");if(!el){bootHV();return}
+ var PH=hvPHmode();
  var q=vnorm(window.__hvgq||"").trim();
  var stu=q?rows("DL09").filter(function(x){return vnorm(x.full_name).indexOf(q)>=0||phoneHit(x.phone_number,q)||vnorm(x.student_id).indexOf(q)>=0}):hvRichTop(10);
+ /* ở chế độ phụ huynh chỉ hiện em nào ĐÃ KHAI số người giám hộ - em chưa khai thì ngoài đời
+    phụ huynh cũng không đăng nhập được, hiện ra rồi bấm không vào mới là đánh đố. */
+ if(PH)stu=stu.filter(function(x){return !!ghSdt(x)});
  var h='<div class="loginbox" style="max-width:760px;max-height:88vh;overflow:auto;text-align:left">';
- h+='<div style="text-align:center"><h2>IELTS The Tutors · Trang học viên</h2>'+
-  '<p>Chọn học viên để vào trang của bạn ấy, hoặc bấm <b>Vào như phụ huynh</b> để xem đúng những gì người giám hộ nhìn thấy. Bản demo - dữ liệu thật của trung tâm, trình bày theo cách dành cho người xem.</p>'+
+ h+='<div style="text-align:center"><h2>IELTS The Tutors · '+(PH?"Cổng phụ huynh":"Trang học viên")+'</h2>'+
+  '<p>'+(PH
+   ?'Chọn con của bạn để xem tình hình học tập, chuyên cần, học phí và nhật ký từng buổi. Phần <b>trao đổi riêng</b> và <b>góp ý riêng</b> của con thì trung tâm xin phép giữ kín - đó là kênh để cháu nói thật.'
+   :'Chọn học viên để vào trang của bạn ấy, hoặc bấm <b>Vào như phụ huynh</b> để xem đúng những gì người giám hộ nhìn thấy. Bản demo - dữ liệu thật của trung tâm, trình bày theo cách dành cho người xem.')+'</p>'+
+  '<div style="margin:2px 0 10px"><button class="pill'+(PH?"":" on")+'" onclick="hvPHmodeSet(0)"><i class="ti ti-user"></i>Tôi là học viên</button> '+
+  '<button class="pill'+(PH?" on":"")+'" onclick="hvPHmodeSet(1)"><i class="ti ti-users"></i>Tôi là phụ huynh</button></div>'+
   '<input placeholder="Tìm tên / SĐT / mã học viên..." value="'+esc(window.__hvgq||"")+'" oninput="window.__hvgq=this.value;demoGateHV();var i=document.querySelector(\'#login input\');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}" style="width:100%;max-width:380px;height:36px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-family:inherit;margin:4px 0 14px"></div>';
  if(!q)h+='<div style="font-size:11.5px;color:var(--muted);margin:-6px 0 10px">10 hồ sơ có dữ liệu đầy đủ nhất để demo - muốn người khác thì gõ tên vào ô tìm.</div>';
  h+='<div class="rgrid" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr))">';
@@ -14769,19 +14789,21 @@ function demoGateHV(){var el=document.getElementById("login");if(!el){bootHV();r
      không vào được, chứ không im lặng giấu nút. */
   var _gh=ghSdt(x);
   h+='<div class="rcard" style="padding:12px 10px">'+
-   '<div onclick="gateEnterHV(\''+esc(x.student_id)+'\')" style="cursor:pointer">'+
+   '<div onclick="'+(PH?'gateEnterPH':'gateEnterHV')+'(\''+esc(x.student_id)+'\')" style="cursor:pointer">'+
    '<div class="ri" style="width:38px;height:38px;font-size:16px;font-weight:800">'+esc(gateAv(x.full_name))+'</div>'+
    '<b style="font-size:12.5px">'+esc(x.full_name)+'</b><small>'+esc(x.student_id)+'</small>'+
    ({HV061:1,HV065:1,HV002:1}[x.student_id]?'<span class="chip blue" style="margin-top:5px">Hồ sơ demo - dữ liệu đầy đủ</span>':'')+'</div>'+
-   (_gh?('<button class="pill" style="margin-top:7px" onclick="event.stopPropagation();gateEnterPH(\''+esc(x.student_id)+'\')"><i class="ti ti-users"></i>Vào như phụ huynh</button>')
-       :('<div class="mut" style="font-size:10.5px;margin-top:7px">chưa khai số người giám hộ</div>'))+
+   (PH
+     ?('<button class="pill" style="margin-top:7px" onclick="event.stopPropagation();gateEnterHV(\''+esc(x.student_id)+'\')"><i class="ti ti-user"></i>Xem như học viên</button>')
+     :(_gh?('<button class="pill" style="margin-top:7px" onclick="event.stopPropagation();gateEnterPH(\''+esc(x.student_id)+'\')"><i class="ti ti-users"></i>Vào như phụ huynh</button>')
+          :('<div class="mut" style="font-size:10.5px;margin-top:7px">chưa khai số người giám hộ</div>')))+
    '</div>'});
  h+='</div>';
  if(q&&stu.length>12)h+='<div style="font-size:11.5px;color:var(--muted);text-align:center;margin-top:8px">... và '+(stu.length-12)+' kết quả nữa - gõ rõ hơn.</div>';
  h+='<div style="text-align:center;margin-top:16px;border-top:1px solid var(--line);padding-top:12px">'+
   '<div style="font-size:11.5px;color:var(--muted)">Cổng NHÂN VIÊN nằm ở file <b>ITTs_WebApp_v5_demo.html</b> cùng thư mục.</div>'+gateStatusHTML()+'</div></div>';
  el.innerHTML=h;el.style.display="flex"}
-function demoBootHV(){window.HVPORTAL=1;
+function demoBootHV(){window.HVPORTAL=1;try{hvPHmodeRead()}catch(e){}
  /* V9.30: cổng học viên PHẢI kéo thời gian y hệt cổng nhân viên. Bỏ sót ở đây thì hai cổng mở
     cạnh nhau hiện hai bộ ngày khác nhau - lỗi khó tin nhất khi đang demo trước mặt khách. */
  try{cfEnsure()}catch(e){}try{tshAuto()}catch(e){}

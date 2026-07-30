@@ -1786,3 +1786,13 @@ danh mục nên không thể sót lần nữa.
 nghiệm (một ngày của từng chức danh) · Chuyên nghiệp (người cấu hình). Cấp Trải nghiệm nay đủ tám
 chức danh, thêm ba bài mới: **Một ngày của Giáo viên WOW**, **Một ngày của Marketing**, **Một ngày
 của nhóm hỗ trợ**.
+
+## Cổng phụ huynh có lối vào riêng (V9.45)
+
+Phụ huynh và học viên **dùng chung một cổng**, khác nhau ở chế độ - nhưng nay chế độ phụ huynh có
+địa chỉ riêng để không phải đi mò:
+
+- Trang chủ demo có **ba cửa**: Cổng nhân viên · Trang học viên · **Cổng phụ huynh**.
+- Địa chỉ trực tiếp: `cong-hoc-vien/?phuhuynh`.
+- Màn chọn ở chế độ này chỉ hiện **những em đã khai số người giám hộ**, và có hai nút đổi vai
+  "Tôi là học viên" / "Tôi là phụ huynh" để xem qua lại ngay tại chỗ.

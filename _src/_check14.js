@@ -363,4 +363,34 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
     var chan=!window.HVPHONE;window.HVPHONE=p;return chan})());
 })();
 
+/* ═══ V9.45 - CONG PHU HUYNH PHAI CO LOI VAO RIENG ═══════════════════════════════════
+   Anh Luan 30/07: "cong phu huynh o dau nhi, a chua thay o index.html". Cong do van luon co,
+   nhung no nap mot tang: phai vao cong hoc vien roi bam mot nut nho tren tung the. Nguoi di xem
+   demo khong tim ra - ma khong tim ra thi coi nhu KHONG CO.
+   Nay co dia chi rieng `?phuhuynh`. Bo kiem giu cho loi vao do khong bien mat lan nua. */
+(function(){
+ /* Bo khung cua _check14 tra ve MOT El MOI moi lan goi getElementById, nen ghi innerHTML xong
+    doc lai se ra rong. Tam thay bang mot o nho duy nhat de doc lai duoc thu vua ve. */
+ var _oldGet=document.getElementById, _box={id:"login",innerHTML:"",style:{},
+  classList:{add:function(){},remove:function(){},contains:function(){return false}}};
+ document.getElementById=function(id){return id==="login"?_box:_oldGet(id)};
+ var luu=global.location.search, luuM=window.__hvPHM, luuQ=window.__hvgq;
+ window.__hvgq="";
+ global.location.search="?phuhuynh"; window.__hvPHM=0;
+ try{hvPHmodeRead()}catch(e){}
+ t("dia chi ?phuhuynh bat che do phu huynh", (typeof hvPHmode==="function")&&hvPHmode()===true);
+ var h="";try{_box.innerHTML="";demoGateHV();h=_box.innerHTML||""}catch(e){}
+ t("man chon o che do PH goi dung ten 'Cong phu huynh'", /Cổng phụ huynh/.test(h));
+ t("co nut doi qua lai hai vai ngay tai man chon", /Tôi là phụ huynh/.test(h)&&/Tôi là học viên/.test(h));
+ t("bam vao the la vao thang che do phu huynh", /gateEnterPH/.test(h));
+ var nPH=(h.match(/class="rcard"/g)||[]).length;
+ global.location.search=""; window.__hvPHM=0;
+ var h2="";try{_box.innerHTML="";demoGateHV();h2=_box.innerHTML||""}catch(e){}
+ var nHV=(h2.match(/class="rcard"/g)||[]).length;
+ t("che do PH chi hien em DA KHAI so nguoi giam ho (it hon danh sach hoc vien)", nPH>0&&nPH<=nHV);
+ t("khong co ?phuhuynh thi ve dung man hoc vien", /Trang học viên/.test(h2)&&!/Cổng phụ huynh/.test(h2));
+ global.location.search=luu; window.__hvPHM=luuM; window.__hvgq=luuQ;
+ document.getElementById=_oldGet;
+})();
+
 console.log(bad.length?("CHECK14 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK14 OK: "+ok+" tieu chi");

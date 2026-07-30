@@ -3556,3 +3556,28 @@ test), Marketing (giữ đầu vào của cả phễu), nhóm hỗ trợ.
   lỗi (a)). Đã bẻ lại cả hai vế để thử: xoá bài của WOW thì đỏ, xoá nhịp của nhóm hỗ trợ thì đỏ.
 
 Từ nay thêm một nhóm vai vào `ROLESCOPE` mà quên một trong ba thứ là **không giao được**.
+
+## V9.45 (30/07) - CỔNG PHỤ HUYNH CÓ LỐI VÀO RIÊNG
+
+Anh Luân hỏi: *"cho a hỏi, cổng phụ huynh ở đâu nhỉ, a chưa thấy ở index.html"*.
+
+Cổng đó **vẫn luôn có** từ V9.40d, nhưng nó nấp một tầng: phụ huynh và học viên dùng chung một
+cổng, muốn vào chế độ phụ huynh phải mở cổng học viên rồi bấm một nút nhỏ "Vào như phụ huynh"
+trên từng thẻ. Trang chủ demo chỉ có hai cửa nên không có cách nào biết cửa thứ ba tồn tại.
+
+**Đây là lỗi thật, không phải anh Luân nhìn sót.** Với một bản demo, *không tìm ra thì coi như
+không có* - và người đi xem demo sẽ không bao giờ mò tới nút đó.
+
+Đã làm, giữ nguyên nguyên tắc **một cổng hai chế độ** (không nhân đôi màn hình):
+- **Địa chỉ riêng `?phuhuynh`** mở thẳng màn chọn ở chế độ phụ huynh: tiêu đề "Cổng phụ huynh",
+  lời chào nói rõ phần trao đổi riêng và góp ý riêng của con thì trung tâm giữ kín, và **chỉ hiện
+  em nào đã khai số người giám hộ** (7/10 hồ sơ demo). Em chưa khai thì ngoài đời phụ huynh cũng
+  không đăng nhập được - hiện ra rồi bấm không vào mới là đánh đố.
+- **Hai nút đổi vai ngay tại màn chọn** - xem qua lại không phải quay ra.
+- **Cửa thứ ba trên `index.html`** của repo demo, kèm một dòng giải thích.
+- `_check14` thêm 6 tiêu chí (**128 tổng**) canh đúng lối vào đó. Bẻ lại để thử: bỏ hàm đọc địa
+  chỉ thì đỏ 2 chỗ.
+
+**Bẫy nhỏ đã cắn khi viết bộ kiểm:** bộ khung của `_check14` trả về MỘT phần tử MỚI mỗi lần gọi
+`getElementById`, nên ghi `innerHTML` xong đọc lại ra rỗng - bốn tiêu chí đầu đỏ oan. Phải thay
+tạm bằng một ô nhớ duy nhất mới đọc lại được thứ vừa vẽ.
