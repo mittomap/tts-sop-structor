@@ -2900,6 +2900,17 @@ function toISOdt(v,dateOnly){var d=pvnd(v);if(!d)return "";
  function p(n){return n<10?"0"+n:""+n}
  var s=d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate());
  return dateOnly?s:(s+"T"+p(d.getHours())+":"+p(d.getMinutes()))}
+/* NGÀY MẶC ĐỊNH CHO Ô CHỌN NGÀY - ô trống là bắt người dùng gõ lại từ đầu mỗi lần, nên mọi ô
+   ngày đều phải mở ra đã có sẵn một giá trị hợp lý; họ chỉ sửa khi khác thường.
+   isoDay(n)    : hôm nay + n ngày (yyyy-mm-dd)
+   isoCong(v,n) : mốc v (dd/mm/yyyy) + n ngày; nếu v hỏng hoặc kết quả không còn ở tương lai thì hôm nay + n
+   isoHen(v,n)  : giữ nguyên mốc v nếu còn ở tương lai; không thì hôm nay + n */
+function _isoP(d){function p(x){return x<10?"0"+x:""+x}return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())}
+function isoDay(n){var d=new Date();d.setHours(0,0,0,0);if(n)d.setDate(d.getDate()+(n|0));return _isoP(d)}
+function isoCong(v,n){var d=pvnd(v);if(!d)return isoDay(n);d.setHours(0,0,0,0);d.setDate(d.getDate()+(n|0));
+ var s=_isoP(d);return s<=isoDay(0)?isoDay(n):s}
+function isoHen(v,n){var d=pvnd(v);if(!d)return isoDay(n);d.setHours(0,0,0,0);
+ var s=_isoP(d);return s<isoDay(0)?isoDay(n):s}
 function fromISOdt(v){var s=String(v||"").trim();if(!s)return "";
  var m=s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?/);if(!m)return s;
  return m[3]+"/"+m[2]+"/"+m[1]+(m[4]?(" "+m[4]+":"+m[5]):"")}
@@ -4536,6 +4547,10 @@ function duyetRefund(id){var e=find("DL06","enrollment_id",id);if(!e){toast("Kh�
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Mức gợi ý theo 3 mốc CH2 (refundFull/Partial/Reduced_days). Sửa được số tiền trước khi chốt. Khoản hoàn ghi thành DÒNG THU ÂM trong sổ (DL07) để doanh thu trừ đúng.</div>';
  h+='<div class="fld"><label>Số tiền hoàn <i>*</i></label><input id="rf_amt" type="number" min="0" max="'+num(e.paid_amount)+'" value="'+sg.amt+'"></div>';
  h+='<div class="fld full"><label>Lý do / ghi chú</label><input id="rf_note" placeholder="vd: HV chuyển tỉnh, hoàn theo chính sách"></div>';
+ /* V9.48 - do bang may tren 90 form ghi (anh Luan: "phai danh gia toan dien day em, lam ko toi
+    thi ko ra gi ca"): BON form dung toi CHUNG TU ma khong co cho dinh kem. Thanh phan attachBox
+    da co san va 5 cua ghi khac dang dung - bon cho nay chi la bo quen. */
+ h+=attachBox("rfd","Chứng từ chuyển trả (ảnh uỷ nhiệm chi / màn hình chuyển khoản)");
  h+='<div class="dact"><button class="btn danger" onclick="duyetRefundRun(\''+esc(id)+'\')"><i class="ti ti-arrow-back-up"></i>Chốt hoàn tiền</button></div></div>';
  openDrawer("Xử lý hoàn tiền",h)}
 function duyetRefundRun(id){if(chanAct("hoantien"))return;var e=find("DL06","enrollment_id",id);if(!e)return;
@@ -4544,7 +4559,7 @@ function duyetRefundRun(id){if(chanAct("hoantien"))return;var e=find("DL06","enr
  duyetWrite(id,"refund",function(r){
   if(amt>0){var pay={enrollment_id:id,student_id:r.student_id,student_id_name:r.student_id_name,
    payment_time:nowStr(),payment_method:eFull("enum_payment_method","bank_transfer"),amount:-amt,net_received:-amt,
-   received_by:CURSTAFF||"",received_by_name:myName(),payment_note:"HOÀN TIỀN"+(note?" - "+note:"")};
+   received_by:CURSTAFF||"",received_by_name:myName(),payment_note:"HOÀN TIỀN"+(note?" - "+note:"")+attachLine("rfd")};
    pay.payment_id="PMT-"+seqNo("DL07","payment_id");rows("DL07").unshift(pay);
    if(SVR)google.script.run.apiSave("DL07",pay);
    try{insSync(id)}catch(e2){}
@@ -4934,6 +4949,7 @@ function reassignLead(lid){var L=find("DL02","lead_id",lid)||{};
  var staff=rows("DL01").filter(function(s){return /sales/.test(ecode(s.role))&&!/inactive/.test(ecode(s.status))&&s.staff_id!==String(L.assigned_to)});
  if(!staff.length)staff=rows("DL01").filter(function(s){return /sales/.test(ecode(s.role))&&s.staff_id!==String(L.assigned_to)});
  var h='<div class="dcard"><h4><i class="ti ti-arrows-exchange"></i>Giao lại lead - '+esc(L.full_name)+'</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Giao lại là chuyển hẳn quyền theo dõi sang NV mới - đồng hồ hạn liên hệ '+slaChip("slaLRT_minutes",30)+' tính lại từ lúc giao. Lần bàn giao này ghi vào lịch sử phía dưới, không xóa được.</div>';
  h+='<div class="kv"><span class="k">NV hiện tại</span><span class="v">'+esc(L.assigned_to_name||L.assigned_to||"-")+'</span></div>';
  h+=tempNote(L);
  if(L.next_action)h+='<div class="dnote" style="margin:8px 0"><b>Lý do:</b> '+esc(L.next_action)+'</div>';
@@ -5966,13 +5982,15 @@ function runFlagRisk(){var R=window.RUN;if(!R)return;var J=jInfo(R.pid);var S=J.
   R.msg="Đã đánh dấu học viên có nguy cơ - hiện ở Danh sách > Học viên nguy cơ.";reRender("chay")})}
 function runDropout(){var R=window.RUN;if(!R)return;var J=jInfo(R.pid);var S=J.C.S;if(!S)return;
  var h='<div class="dcard"><h4><i class="ti ti-player-pause"></i>Ghi nhận HV dừng học - '+esc(S.full_name)+'</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Bỏ học giữa chừng: phần học phí còn nợ vẫn treo, xử tiếp ở trang Học phí. Bảo lưu / chuyển khóa: cần Quản lý phê duyệt, và hệ thống sẽ nhắc gọi mời quay lại trước hạn '+slaChip("thresholdPauseRemind_days",14)+'.</div>';
  h+='<div class="fld"><label>Tình huống</label><select id="dp_type"><option value="dropped">Bỏ học giữa chừng</option><option value="transferred">Bảo lưu / chuyển khóa</option></select></div>';
  h+='<div class="fld full"><label>Lý do</label><input id="dp_reason" placeholder="vd: bận việc gia đình / chuyển tỉnh"></div>';
  h+='<div class="fld full"><button class="btn danger" onclick="runDropoutSave()"><i class="ti ti-check"></i>Ghi nhận</button></div></div>';
+ h+=attachBox("dpx","Đơn xin bảo lưu / nghỉ học (ảnh hoặc PDF)");
  openDrawer("Dừng học",h)}
 function runDropoutSave(){var R=window.RUN;var J=jInfo(R.pid);var S=J.C.S;var t=fldV("dp_type"),rs=fldV("dp_reason");
  if(t==="transferred"&&chanAct("baoluu"))return;   /* SOP: bảo lưu khóa cần Quản lý duyệt */
- jUpdRow("DL09",S.student_id,{student_status:eFull("enum_student_status",t),learning_followup_note:(S.learning_followup_note?S.learning_followup_note+" | ":"")+nowStr()+": "+(t==="dropped"?"bỏ học":"bảo lưu")+(rs?" - "+rs:"")},function(){
+ jUpdRow("DL09",S.student_id,{student_status:eFull("enum_student_status",t),learning_followup_note:(S.learning_followup_note?S.learning_followup_note+" | ":"")+nowStr()+": "+(t==="dropped"?"bỏ học":"bảo lưu")+(rs?" - "+rs:"")+attachLine("dpx")},function(){
   closeModal();R.msg="Đã ghi nhận HV "+(t==="dropped"?"bỏ học":"bảo lưu")+" - chuyển sang nhánh rẽ.";R.viewStep="";reRender("chay")})}
 function runSkipTest(){var R=window.RUN;if(!R)return;var J=jInfo(R.pid);
  var o={lead_id:J.C.L.lead_id,customer_name_display:J.C.L.full_name,consulted_by:CURSTAFF||"",
@@ -9274,6 +9292,9 @@ var APPPARAMS=[
  ["P10 · Kết thúc khóa & tái đăng ký","slaTestimonialAsk_days","Sau khi đạt mục tiêu bao nhiêu ngày thì xin cảm nhận","ngày",7],
  ["P8-P9 · Khảo sát, phản hồi & khiếu nại","slaComplaintFirstResponse_hours","Hạn phản hồi LẦN ĐẦU cho một khiếu nại","giờ",4],
  ["P8-P9 · Khảo sát, phản hồi & khiếu nại","slaFeedbackClassify_hours","Hạn phân loại một phản hồi mới nhận","giờ",24],
+ /* naFor (NA078) đã đọc tham số này từ lâu nhưng CH2 chưa khai - luật nhắc chạy bằng số cắm cứng
+    48 mà không ai đổi được. _checkux bắt được, khai ra đây cho đúng chỗ. */
+ ["P8-P9 · Khảo sát, phản hồi & khiếu nại","slaSurveyReport_hours","Khảo sát có trả lời rồi thì trong bao nhiêu giờ phải tổng hợp và xử lý","giờ",48],
  /* V9.29 (anh Luân: "nếu chưa có cụ thể thì đưa vào cài đặt rồi gọi ra chứ em") - ba ngưỡng
     trước đây nằm trong đầu người viết code, nay thành tham số sửa được. */
  ["P3 · Đăng ký & chiết khấu","slaDiscountApprove_hours","Hạn quản lý duyệt một đề nghị chiết khấu","giờ",24],
@@ -9412,6 +9433,7 @@ function xepFor(sid){var s=find("DL09","student_id",sid)||{};var e=rows("DL06").
 function openXepMoi(){var haveOb={};rows("DL08").forEach(function(o){haveOb[o.student_id]=1});
  var ready=rows("DL06").filter(function(e){return /confirmed/.test(ecode(e.enrollment_status))&&!haveOb[e.student_id]});var classes=rows("DL10");
  var h='<div class="dcard"><h4><i class="ti ti-layout-grid-add"></i>Xếp lớp cho học viên</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Danh sách chỉ hiện học viên đã đăng ký xác nhận mà chưa có hồ sơ xếp lớp ('+ready.length+' em). Chọn học viên trước thì ô lớp tự lọc theo đúng khóa của em đó - lớp đã đầy hoặc sai khóa sẽ bị chặn khi lưu.</div>';
  h+='<div class="fld"><label>Học viên (đã đăng ký, chưa xếp lớp)</label><select id="xm_stu" onchange="xmStuChanged(this.value)"><option value="">-- chọn --</option>'+ready.map(function(e){return '<option value="'+esc(e.student_id)+'">'+esc((e.student_id_name||e.student_id)+" - "+(e.course_id_name||""))+'</option>'}).join("")+'</select></div>';
  h+='<div class="fld"><label>Lớp (ưu tiên đúng khóa của học viên)</label><select id="xm_cls"><option value="">-- chọn học viên trước --</option></select></div>';
  h+='<div class="fld full"><button class="btn primary" onclick="xepMoiLuu()"><i class="ti ti-check"></i>Gán vào lớp</button></div></div>';
@@ -9954,6 +9976,7 @@ function testNoShowSave(id){var r=find("DL03","test_booking_id",id)||{};var reas
  markRow("DL03","test_booking_id",id,vals,nd?("Đã ghi vắng + hẹn lại "+nd+"."):"Đã ghi nhận vắng test - có thể đặt lại lịch sau.");closeModal()}
 function testRebook(id){var r=find("DL03","test_booking_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-calendar-plus"></i>Đặt lại lịch test - '+esc(r.lead_id_name||r.lead_id)+'</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Lịch cũ: '+esc(r.test_date||"chưa hẹn")+'. Đặt lại sẽ xóa trạng thái có mặt của lần hẹn cũ và tính lại hạn nhắc từ giờ hẹn mới. Nhập theo dạng dd/mm/yyyy hh:mm.</div>';
  h+='<div class="fld"><label>Ngày giờ test mới</label><input id="tb_date" placeholder="dd/mm/yyyy hh:mm"></div>';
  h+='<div class="fld"><label>Hình thức</label><select id="tb_fmt">'+enumOpts("enum_test_format")+'</select></div>';
  h+='<div class="fld full" style="flex-direction:row;gap:8px"><button class="btn primary" onclick="testRebookSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Đặt lịch</button>'+zaloBtn("test",{ten:r.lead_id_name||"",gio:r.test_date||"lịch đã hẹn"})+'</div></div>';
@@ -9968,8 +9991,10 @@ function testResult(id){var r=find("DL03","test_booking_id",id)||{};
  h+='<div class="fld"><label>Overall</label><input id="t_o" type="number" step="0.5" min="0" max="9" placeholder="vd 5.5"></div>';
  h+='<div class="fld full"><label>Nhận xét học thuật</label><textarea id="t_note" rows="2"></textarea></div>';
  h+='<div class="fld full"><button class="btn primary" onclick="testResultSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Lưu kết quả</button></div></div>';
+ h+=attachBox("tsr","Ảnh phiếu điểm / bài làm của thí sinh");
  openDrawer("Nhập kết quả test",h)}
-function testResultSave(id){var vals={test_status:eFull("enum_test_status","graded"),skill_listening:fldV("t_l"),skill_reading:fldV("t_r"),skill_writing:fldV("t_w"),skill_speaking:fldV("t_s"),overall_score:fldV("t_o"),academic_note:fldV("t_note"),result_time:nowStr(),post_test_status:eFull("enum_post_test_status","awaiting_consultation")};markRow("DL03","test_booking_id",id,vals,"Đã lưu kết quả test.","test");closeModal()}
+function testResultSave(id){var _tsK=attachLine("tsr");
+ var vals={test_status:eFull("enum_test_status","graded"),skill_listening:fldV("t_l"),skill_reading:fldV("t_r"),skill_writing:fldV("t_w"),skill_speaking:fldV("t_s"),overall_score:fldV("t_o"),academic_note:fldV("t_note")+_tsK,result_time:nowStr(),post_test_status:eFull("enum_post_test_status","awaiting_consultation")};markRow("DL03","test_booking_id",id,vals,"Đã lưu kết quả test.","test");closeModal()}
 /* ===== P3 Tư vấn & Đăng ký (DL04 -> DL06) ===== */
 function renderTuvan(embed){var p="tuvan",fil=fget(p);var all=rows("DL04");
  function enrolled(c){return rows("DL06").some(function(e){return (c.consultation_id&&e.consultation_id===c.consultation_id)||(c.lead_id&&e.lead_id===c.lead_id)})}
@@ -10022,6 +10047,7 @@ function tvSave(id){var vals={consultation_status:eFull("enum_consultation_statu
  closeModal()}
 function tvClose(id){var c=find("DL04","consultation_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-target-arrow"></i>Cập nhật chốt - '+esc(c.customer_name_display||c.lead_id)+'</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Chọn "confirmed_with_deposit" là mở đường sang bước Tạo đăng ký; chọn "dropped" thì hồ sơ ra khỏi hàng chờ chốt. Ghi chú ở đây là căn cứ khi rà lại tỷ lệ chốt của bạn.</div>';
  h+='<div class="fld"><label>Kết quả</label><select id="cv_st">'+enumOpts("enum_conversion_status")+'</select></div>';
  h+='<div class="fld full"><label>Ghi chú</label><textarea id="cv_note" rows="2"></textarea></div>';
  h+='<div class="fld full"><button class="btn primary" onclick="tvCloseSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Lưu</button></div></div>';
@@ -10029,6 +10055,7 @@ function tvClose(id){var c=find("DL04","consultation_id",id)||{};
 function tvCloseSave(id){markRow("DL04","consultation_id",id,{conversion_status:fldV("cv_st"),conversion_time:nowStr(),conversion_note:fldV("cv_note")},"Đã cập nhật kết quả chốt.","tuvan");closeModal()}
 function tvEnroll(id){var c=find("DL04","consultation_id",id)||{};var course=rows("DL05").filter(function(x){return x.course_name===c.recommended_course})[0]||{};
  var h='<div class="dcard"><h4><i class="ti ti-clipboard-check"></i>Tạo đăng ký - '+esc(c.customer_name_display||c.lead_id)+'</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Học phí điền sẵn theo bảng giá của khóa. Chiết khấu từ '+slaChip("thresholdDiscount_approval",1000000)+' trở lên phải có Quản lý phê duyệt - cứ nhập rồi lưu, hệ thống tự đẩy vào hàng chờ duyệt. Chia đợt đóng làm ở bước sau.</div>';
  h+='<div class="fld"><label>Khóa</label><select id="en_course">'+rows("DL05").map(function(x){return '<option value="'+esc(x.course_id)+'"'+(x.course_name===c.recommended_course?" selected":"")+'>'+esc(x.course_name)+'</option>'}).join("")+'</select></div>';
  h+='<div class="fld"><label>Học phí</label><input id="en_fee" type="number" value="'+(num(course.list_price)||0)+'"></div>';
  h+='<div class="fld"><label>Chiết khấu</label><input id="en_disc" type="number" value="0"></div>';
@@ -10176,7 +10203,7 @@ function insPlanForm(eid){
  if(lst.length)h+=insTableHTML(lst,false);
  h+='<div class="fld"><label>Chia thành mấy đợt</label><select id="ip_n">'+
   [1,2,3,4].map(function(n){return '<option value="'+n+'"'+(lst.length===n?" selected":"")+'>'+n+' đợt</option>'}).join("")+'</select></div>';
- h+='<div class="fld"><label>Ngày đóng đợt đầu</label><input id="ip_d0" type="date"></div>';
+ h+='<div class="fld"><label>Ngày đóng đợt đầu</label><input id="ip_d0" type="date" value="'+isoDay(0)+'"><div class="fhint">Mặc định là hôm nay - sửa lại nếu đã hẹn ngày khác.</div></div>';
  h+='<div class="fld"><label>Cách nhau bao nhiêu ngày</label><input id="ip_gap" type="number" min="1" value="'+paramOf("installmentGap_days",30)+'"></div>';
  h+='<div class="fld"><label>Đợt đầu chiếm bao nhiêu %</label><input id="ip_dep" type="number" min="1" max="100" value="'+paramOf("installmentDepositPercent",40)+'"></div>';
  h+='<div class="dact"><button class="btn primary" onclick="insPlanSave(\''+esc(eid)+'\')"><i class="ti ti-check"></i>Lưu lịch đợt</button>'+
@@ -10238,7 +10265,7 @@ function payForm(id){var e=find("DL06","enrollment_id",id)||{};var tot=num(e.fin
  h+='<div class="fld"><label>Người gửi</label><input id="pm_sender" value="'+esc(e.student_id_name||"")+'"></div>';
  h+='<div class="fld"><label>Mã giao dịch</label><input id="pm_ref"></div>';
  h+=attachBox("pay","Ảnh biên lai / màn hình chuyển khoản");
- h+='<div class="fld"><label>Hẹn thu phần còn lại (nếu chưa đủ)</label><input id="pm_due" type="date"><div class="fhint">Đến hẹn, hồ sơ tự nổi vào "Tới hẹn thu" thay vì chờ quá kỳ nhắc nợ.</div></div>';
+ h+='<div class="fld"><label>Hẹn thu phần còn lại (nếu chưa đủ)</label><input id="pm_due" type="date" min="'+isoDay(0)+'" value="'+(rem>0?isoHen(e.next_payment_due,paramOf("slaPayment_grace_days",7)):"")+'"><div class="fhint">Đến hẹn, hồ sơ tự nổi vào "Tới hẹn thu" thay vì chờ quá kỳ nhắc nợ.'+(rem>0?' Điền sẵn theo hẹn đang có của đơn, chưa hẹn thì lấy '+slaChip("slaPayment_grace_days",7)+' - đổi được.':'')+'</div></div>';
  if(rem>0)h+='<div class="fld full">'+zaloBtn("phi",{ten:e.student_id_name||"",tien:vnd(rem),khoa:e.course_id_name||"",han:e.next_payment_due||"hạn đã hẹn",
   gh:(function(){var _s=find("DL09","student_id",e.student_id)||{};return ghNguoiTra(_s)==="guardian"?ghTen(_s):""})()},e.enrollment_id)+'</div>';
  h+='<div class="fld full" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" onclick="paySave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Lưu khoản thu</button><button class="btn" onclick="printEnroll(\''+esc(id)+'\')"><i class="ti ti-file-text"></i>In xác nhận đăng ký</button>'+
@@ -10541,6 +10568,7 @@ function wowRescheduleRun(id,force){var d=(fldV("wr_date")||"").trim();
   notes:(w.notes?w.notes+" | ":"")+"Dời lịch "+nowStr()+" sang "+nd},"Đã dời buổi WOW sang "+nd+" (quota giữ nguyên).","wow");
  closeModal()}
 function wowAdd(psid){var h='<div class="dcard"><h4><i class="ti ti-star"></i>Đặt buổi WOW 1-1</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Buổi WOW trừ vào quota còn lại của học viên - hết quota thì phải cấp thêm ở màn Quota WOW trước. Chọn ngày giờ xong hệ thống báo ngay GV đó có trùng lịch không. GV được đặt có '+slaChip("slaWowConfirm_hours",24)+' để xác nhận.</div>';
  h+='<div class="fld"><label>Học viên (kèm quota WOW còn lại)</label><select id="wa_stu"><option value="">-- chọn --</option>'+rows("DL09").map(function(s){var q=String(s.wow_quota_remaining||"");return '<option value="'+esc(s.student_id)+'"'+(psid&&s.student_id===psid?" selected":"")+'>'+esc((s.full_name||s.student_id)+" · "+(s.phone_number||"")+(q!==""?" · quota "+q:""))+'</option>'}).join("")+'</select></div>';
  h+='<div class="fld"><label>Kỹ năng</label><select id="wa_skill">'+enumOpts("enum_homework_skill")+'</select></div>';
  h+='<div class="fld"><label>Loại buổi</label><select id="wa_type">'+enumOpts("enum_wow_session_type")+'</select></div>';
@@ -10601,6 +10629,7 @@ function svPick(v){var b=document.getElementById("sv_tplbox");if(b)b.innerHTML=s
  if(ta&&t)ta.value=t.q.join("\n")}
 function svSend(){var first=(ENUM.enum_survey_type||["week_1 (Tuần 1)"])[0];
  var h='<div class="dcard"><h4><i class="ti ti-send"></i>Gửi khảo sát</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Chọn đợt là có sẵn bộ câu chuẩn - sửa thoải mái trước khi gửi. Phiếu gửi đi nằm ở hàng chờ trả lời; có trả lời rồi thì phải tổng hợp trong '+slaChip("slaSurveyReport_hours",48)+', quá hạn tự nổi thành việc nhắc.</div>';
  h+='<div class="fld"><label>Học viên</label><select id="sv_stu"><option value="">-- chọn --</option>'+rows("DL09").filter(function(s){return /active/.test(ecode(s.student_status))}).map(function(s){return '<option value="'+esc(s.student_id)+'">'+esc((s.full_name||s.student_id)+" · "+(s.phone_number||""))+'</option>'}).join("")+'</select></div>';
  h+='<div class="fld"><label>Đợt khảo sát (chọn đợt là có sẵn bộ câu)</label><select id="sv_type" onchange="svPick(this.value)">'+enumOpts("enum_survey_type")+'</select></div>';
  h+='<div class="fld full" id="sv_tplbox">'+svTplBox(first)+'</div>';
@@ -10631,6 +10660,7 @@ function svFollowDone(id){var v=find("DL15","survey_id",id)||{};
 function fbClassify(id){var f=find("DL16","feedback_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-tags"></i>Tiếp nhận & phân loại - '+esc(f.student_id_name||f.student_id)+'</h4>';
  h+=ctxContent("Nội dung phản hồi",f.feedback_content,"var(--blue)");
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Tiếp nhận xong phản hồi chuyển sang Đang xử lý và ghi tên bạn là người nhận. Chọn đúng danh mục vì báo cáo phản hồi gom theo danh mục này - phân loại ẩu là báo cáo lệch.</div>';
  h+='<div class="fld"><label>Loại</label><select id="fb_type">'+enumOpts("enum_feedback_type")+'</select></div>';
  h+='<div class="fld"><label>Danh mục</label><select id="fb_cat">'+enumOpts("enum_feedback_category")+'</select></div>';
  h+='<div class="fld full"><button class="btn primary" onclick="fbClassifySave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Tiếp nhận</button></div></div>';
@@ -10639,6 +10669,7 @@ function fbClassifySave(id){markRow("DL16","feedback_id",id,{feedback_type:fldV(
 function fbResolve(id){var f=find("DL16","feedback_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-check"></i>Xử lý phản hồi - '+esc(f.student_id_name||f.student_id)+'</h4>';
  h+=ctxContent("Nội dung phản hồi",f.feedback_content,"var(--blue)");
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Đóng phản hồi thì phải ghi rõ đã xử lý thế nào - đây là phần cấp trên đọc lại khi rà. Nếu việc đã vượt mức góp ý thông thường, dùng nút Chuyển thành khiếu nại thay vì đóng ở đây.</div>';
  h+='<div class="fld full"><label>Đã xử lý thế nào</label><textarea id="fb_note" rows="3"></textarea></div>';
  h+='<div class="fld full"><button class="btn green" onclick="fbResolveSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Đóng phản hồi</button></div></div>';
  openDrawer("Xử lý phản hồi",h)}
@@ -10648,6 +10679,7 @@ var FB2KN={teacher_quality:"teacher",curriculum:"academic",schedule:"schedule",f
 function fbToComplaint(id){var f=find("DL16","feedback_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-alert-triangle"></i>Chuyển thành khiếu nại - '+esc(f.student_id_name||f.student_id)+'</h4>';
  h+=ctxContent("Nội dung phản hồi (sẽ thành nội dung khiếu nại)",f.feedback_content,"var(--red)");
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Nội dung ở trên chép nguyên sang khiếu nại, phản hồi gốc được đánh dấu đã chuyển - không phải gõ lại. Mức độ quyết định hạn xử lý: mức cao chỉ có '+slaChip("slaComplaintHigh_hours",4)+'.</div>';
  h+='<div class="fld"><label>Mức độ</label><select id="fk_sev">'+enumOpts("enum_complaint_severity")+'</select></div>';
  h+='<div class="fld full"><button class="btn danger" onclick="fbToComplaintSave(\''+esc(id)+'\')"><i class="ti ti-arrow-right"></i>Tạo khiếu nại</button></div></div>';
  openDrawer("Chuyển thành khiếu nại",h)}
@@ -10714,6 +10746,7 @@ function knResolveSave(id){if(chanAct("kn_duyet"))return;var n=fldV("kr_note");i
   student_feedback_after:String(fldV("kr_hv")||"").trim()},
   "Đã đóng khiếu nại - cảnh báo SLA tắt."+(String(fldV("kr_hv")||"").trim()?"":" CHƯA ghi phản hồi của học viên - việc hỏi lại vẫn còn trong hàng chờ."))}
 function knAdd(){var h='<div class="dcard"><h4><i class="ti ti-alert-triangle"></i>Tiếp nhận khiếu nại</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Nhận vào là bắt đầu chạy hạn xử lý theo mức độ - mức cao chỉ có '+slaChip("slaComplaintHigh_hours",4)+'. Chọn đúng mức thực tế, đừng chọn cao cho chắc: chọn cao mà không xử kịp thì hồ sơ đỏ oan.</div>';
  h+='<div class="fld"><label>Học viên</label><select id="ka_stu"><option value="">-- chọn --</option>'+rows("DL09").map(function(s){return '<option value="'+esc(s.student_id)+'">'+esc((s.full_name||s.student_id)+" · "+(s.phone_number||""))+'</option>'}).join("")+'</select></div>';
  h+='<div class="fld"><label>Kênh</label><select id="ka_ch">'+enumOpts("enum_complaint_channel")+'</select></div>';
  h+='<div class="fld"><label>Loại</label><select id="ka_type">'+enumOpts("enum_complaint_type")+'</select></div>';
@@ -10814,13 +10847,15 @@ function ktTestiForm(id){var r=find("DL18","course_end_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-award"></i>Xin cảm nhận - '+esc(r.student_id_name||r.student_id)+'</h4>';
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>HV đạt mục tiêu là nguồn giới thiệu + bằng chứng tốt nhất. Xin trong tuần đầu sau kết thúc, lúc niềm vui còn nóng.</div>';
  h+='<div class="fld full"><label>Cảm nhận / link video-bài đăng (nếu đã có)</label><textarea id="kt_testi" rows="3" placeholder="dán nội dung cảm nhận hoặc link bài đăng; để trống nếu mới XIN mà chưa nhận"></textarea></div>';
+ h+=attachBox("ktt","Ảnh / clip cảm nhận học viên gửi");
  h+='<div class="dact"><button class="btn primary" onclick="ktTestiSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Đánh dấu đã xin / đã nhận</button></div></div>';
  openDrawer("Xin cảm nhận",h)}
-function ktTestiSave(id){var t=(fldV("kt_testi")||"").trim();
+function ktTestiSave(id){var t=(fldV("kt_testi")||"").trim()+attachLine("ktt");
  markRow("DL18","course_end_id",id,{testimonial_given:"TRUE",notes:((find("DL18","course_end_id",id)||{}).notes?(find("DL18","course_end_id",id).notes+" | "):"")+"Testimonial "+nowStr()+(t?(": "+t):" (đã xin, chờ nhận)")},"Đã ghi nhận xin cảm nhận.","ketthuc");closeModal()}
 function ktInvite(id){markRow("DL18","course_end_id",id,{re_enrollment_status:eFull("enum_re_enrollment_status","contacted"),re_enrollment_contact_time:nowStr()},"Đã mời tái ghi danh.","ketthuc")}
 function ktFollow(id){var r=find("DL18","course_end_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-refresh"></i>Cập nhật tái ĐK - '+esc(r.student_id_name||r.student_id)+'</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Trạng thái ở đây quyết định em này còn nằm trong hàng mời tái đăng ký hay không. Chỉ "confirmed_with_deposit" mới tính vào tỷ lệ tái đăng ký của kỳ; "interested" thì vẫn phải gọi lại.</div>';
  h+='<div class="fld"><label>Trạng thái</label><select id="kf_st">'+enumOpts("enum_re_enrollment_status")+'</select></div>';
  h+='<div class="fld full"><label>Ghi chú</label><textarea id="kf_note" rows="2"></textarea></div>';
  h+='<div class="fld full">'+zaloBtn("taidk",{ten:r.student_id_name||"",khoa:r.class_id_name||""})+'</div>';
@@ -11492,6 +11527,7 @@ function hvSurveyView(id){var v=find("DL15","survey_id",id);if(!v)return;
  h+='</div>';openDrawer("Xem lại khảo sát",h)}
 function hvFeedbackForm(){
  var h='<div class="dcard"><h4><i class="ti ti-message-plus"></i>Gửi góp ý cho trung tâm</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Góp ý của bạn tới thẳng bộ phận chăm sóc, có người đọc và phản hồi lại. Nếu là chuyện gấp hoặc bức xúc, trung tâm sẽ chuyển thành khiếu nại để xử theo hạn thay vì để trôi.</div>';
  h+='<div class="fld"><label>Nội dung thuộc nhóm</label><select id="hf_cat">'+enumOpts("enum_feedback_category")+'</select></div>';
  h+='<div class="fld"><label>Sắc thái</label><select id="hf_type">'+enumOpts("enum_feedback_type")+'</select></div>';
  h+='<div class="fld"><label>Chấm điểm (1-5, nếu muốn)</label><input id="hf_score" type="number" min="1" max="5"></div>';
@@ -11645,7 +11681,7 @@ function hvWowAsk(){
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Buổi kèm riêng đã nằm trong gói học của bạn. Chọn kỹ năng yếu nhất và khung giờ - trung tâm xác nhận lại giảng viên và giờ chính thức.</div>';
  /* danh sách kỹ năng lấy NGUYÊN VĂN từ danh mục CH1, không gõ tay 4 chuỗi ở đây */
  h+='<div class="fld"><label>Kỹ năng muốn kèm <i>*</i></label><select id="hvw_skill">'+enumOpts("enum_homework_skill")+'</select></div>';
- h+='<div class="fld"><label>Ngày mong muốn <i>*</i></label><input id="hvw_date" type="date"></div>';
+ h+='<div class="fld"><label>Ngày mong muốn <i>*</i></label><input id="hvw_date" type="date" min="'+isoDay(1)+'" value="'+isoDay(1)+'"><div class="fhint">Mặc định là ngày mai - chọn xa hơn nếu bạn bận.</div></div>';
  h+='<div class="fld full"><label>Khung giờ mong muốn</label><input id="hvw_gio" placeholder="vd: sau 19h các ngày trong tuần"></div>';
  h+='<div class="fld full"><label>Bạn muốn tập trung vào phần nào</label><textarea id="hvw_focus" rows="2" placeholder="vd: em hay bí ý ở Speaking part 2"></textarea></div>';
  h+='<div class="dact"><button class="btn primary" onclick="hvWowSave()"><i class="ti ti-send"></i>Gửi yêu cầu đặt buổi</button>'+
@@ -11740,7 +11776,7 @@ function hvPaidNotify(eid){
   h+='<div class="fhint" style="margin:0 0 10px">Đăng ký này chưa có bảng đợt đóng - bạn cứ nhập số tiền đã chuyển, kế toán sẽ ghi đúng chỗ.</div>';
  }
  h+='<div class="fld"><label>Số tiền đã chuyển <i>*</i></label><input id="hvpn_amt" inputmode="numeric" value="'+esc(sch?String(hvPnConLai(sch)):"")+'"></div>';
- h+='<div class="fld"><label>Ngày chuyển</label><input id="hvpn_date" type="date"></div>';
+ h+='<div class="fld"><label>Ngày chuyển</label><input id="hvpn_date" type="date" max="'+isoDay(0)+'" value="'+isoDay(0)+'"><div class="fhint">Mặc định là hôm nay - lùi lại nếu bạn chuyển từ hôm trước.</div></div>';
  h+='<div class="fld full"><label>Nội dung chuyển khoản / mã giao dịch</label><input id="hvpn_ref" placeholder="vd: HV030 dong hoc phi dot 2"></div>';
  h+=attachBox("hvpn","Ảnh biên lai / màn hình chuyển khoản");
  h+='<div class="dact"><button class="btn primary" onclick="hvPaidNotifySave(\''+esc(eid)+'\')"><i class="ti ti-send"></i>Gửi cho kế toán</button>'+
@@ -11784,6 +11820,7 @@ function hvAskSave(){
  closeModal();toast("Đã gửi. Trung tâm sẽ trả lời ngay trong yêu cầu này.",4200);hvReRender()}
 function hvAskSay(tid){
  var h='<div class="dcard"><h4><i class="ti ti-message"></i>Nhắn thêm</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Tin nhắn này gắn vào đúng yêu cầu bạn đã gửi - người đang xử lý thấy ngay, không phải mở kênh mới.</div>';
  h+='<div class="fld full"><label>Nội dung <i>*</i></label><textarea id="hvsay_c" rows="3"></textarea></div>';
  h+='<div class="dact"><button class="btn primary" onclick="hvAskSaySave(\''+esc(tid)+'\')"><i class="ti ti-send"></i>Gửi</button>'+
   '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
@@ -11947,6 +11984,7 @@ function avatarColor(seed){var cs=["#3B82C4","#7C3AED","#0D9488","#DB2777","#E08
 function avatarBig(name,url){if(url&&/^https?:/.test(String(url)))return '<img class="avatarBig" src="'+esc(url)+'" alt="'+esc(name||"")+'">';var c=avatarColor(name);return '<div class="avatarBig" style="background:'+c+'22;color:'+c+'">'+esc(initialsOf(name))+'</div>'}
 function gvBioEdit(id){var g=find("DL01","staff_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-user"></i>Tiểu sử giảng viên</h4>'+
+  '<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Đoạn này hiện ở trang học viên và trong hồ sơ giảng viên - viết như lời giới thiệu cho học viên và phụ huynh đọc, không phải ghi chú nội bộ.</div>'+
   '<div class="fld full"><label>Giới thiệu · chuyên môn · kinh nghiệm</label><textarea id="gv_bio" rows="6" placeholder="VD: 8 năm luyện thi IELTS, thế mạnh Speaking &amp; Writing, đạt 8.5 overall, từng luyện 200+ HV đạt 7.0+...">'+esc(g.bio||g.teacher_bio||g.note||"")+'</textarea></div>'+
   '<div class="fld full"><label>Link ảnh đại diện (tuỳ chọn)</label><input id="gv_av" value="'+esc(g.avatar_url||"")+'" placeholder="https://..."></div>'+
   '<div class="fld full"><button class="btn primary" onclick="gvBioSave(\''+esc(id)+'\')"><i class="ti ti-device-floppy"></i>Lưu tiểu sử</button></div></div>';
@@ -12774,7 +12812,7 @@ function moLop(cid){var c=find("DL10","class_id",cid);if(!c){toast("Không thấ
    '<td>'+esc(clsOnline(x)?"online":(elabel(x.branch)||x.branch||"-"))+'</td></tr>'});
   h+='</tbody></table></div>'}
  h+='<div class="dsec">Quyết</div>';
- h+='<div class="fld"><label>Lùi ngày khai giảng sang</label><input id="ml_date" type="date"></div>';
+ h+='<div class="fld"><label>Lùi ngày khai giảng sang</label><input id="ml_date" type="date" min="'+isoDay(1)+'" value="'+isoCong(c.class_start_date,paramOf("classDecide_days",7))+'"><div class="fhint">Điền sẵn = khai giảng cũ lùi thêm '+slaChip("classDecide_days",7)+' - đủ một vòng quyết nữa, đổi được.</div></div>';
  h+='<div class="fld"><label>Lý do (bắt buộc khi lùi ngày hoặc hủy)</label><input id="ml_why" placeholder="vd: chưa đủ sĩ số, dồn về lớp LOP-... khai giảng 20/09"></div>';
  h+='<div class="fld full" style="display:block">'+
   '<button class="btn primary" onclick="moLopDelay(\''+esc(cid)+'\')"><i class="ti ti-calendar-plus"></i>Lùi ngày khai giảng</button> '+
@@ -13815,6 +13853,7 @@ function tkConfirmRun(id){var t=find("DL23","task_id",id);if(!t)return;
  if(!String(t.confirm_note||"").trim())t.confirm_note="Đã kiểm tra, đạt yêu cầu.";
  tkSay(id,"Đã xác nhận hoàn thành.",1);closeModal();toast("Đã xác nhận - việc khép lại.");tkAfter()}
 function tkReturnForm(id){var h='<div class="dcard"><h4><i class="ti ti-corner-down-left"></i>Trả lại làm tiếp</h4>'+
+ '<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Trả lại thì việc quay về Đang làm chứ không mất, người nhận vẫn là người cũ. Nội dung bạn ghi hiện ngay trong dòng trao đổi của việc.</div>'+
  '<div class="fld full"><label>Cần bổ sung gì <i>*</i></label><textarea id="tk_rr" rows="3" placeholder="Nói rõ phần chưa đạt để người nhận làm tiếp"></textarea></div>'+
  '<div class="dact"><button class="btn primary" onclick="tkReturnSave(\''+esc(id)+'\')"><i class="ti ti-send"></i>Trả lại</button></div></div>';
  openDrawer("Trả lại làm tiếp",h)}
@@ -14584,6 +14623,13 @@ function qaGoiY(q){
  return g}
 /* Câu gợi ý mở màn. Tên học viên lấy THẬT từ dữ liệu đang có - viết cứng một cái tên là tới ngày
    sinh lại dữ liệu thì gợi ý trỏ vào người không tồn tại. */
+/* V9.48 - BA HÀM NÀY BỊ XOÁ NHẦM khi dọn khối tấm Hỏi đáp cũ, trong khi TRANG Hỏi đáp vẫn gọi
+   chúng - nút bấm không ra gì. `_check18` bắt được ngay ("mọi hàm gọi trong onclick đều có thật
+   - thiếu: qaHoi, qaViDu"). Đúng loại lỗi bộ kiểm đó sinh ra để bắt: dọn code chết mà cắt nhầm
+   vào code đang sống. Trả lại, và giữ tách bạch với `asstQ*` của tấm Trợ lý. */
+function qaHoi(){window.QAQ=fldV("qa_q")||"";reRender("hoidap")}
+function qaViDu(s){window.QAQ=s;reRender("hoidap")}
+function qaXoa(){window.QAQ="";reRender("hoidap")}
 function qaViDuList(){
  var s=null;try{s=srows("DL09")[0]}catch(e){}
  return [(s&&s.full_name?s.full_name+" đang có cảnh báo gì":"học viên nào đang có cảnh báo"),

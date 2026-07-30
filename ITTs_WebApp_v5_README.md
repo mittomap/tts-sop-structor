@@ -1817,3 +1817,50 @@ tham số, nhóm đặt tên tùy hứng và xếp theo thứ tự ngẫu nhiên
 - Mỗi nhóm có hàng nút **"Đổi ở đây thì xem kết quả tại: …"** bấm sang thẳng màn hình sẽ đổi theo.
 - **Ô tìm tham số**: gõ "hoàn tiền", "nguy cơ", "chiết khấu"… là lọc ngay theo tên máy, câu nghĩa
   hoặc tên nhóm; nhóm không còn dòng nào thì ẩn hẳn.
+
+## Trợ lý - một nút, hỏi gì cũng ở đó (V9.48)
+
+Trước bản này có **hai** nút tròn cạnh nhau: Trợ thủ (nhịp việc trong ngày) và Hỏi đáp. Đứng từ
+phía người dùng thì cả hai đều là *hỏi cái gì đó rồi được chỉ việc* - không ai phân biệt được.
+Nay gộp làm **một nút Trợ lý** ở góc phải dưới, tấm mở ra có ô hỏi ngay đầu.
+
+**Hỏi về một học viên** - gõ tên hoặc số điện thoại:
+- Hiện **thẻ nhận dạng** trước (đúng ai · lớp nào · số nào) để xác nhận không nhầm người.
+- Rồi hỏi lại **bạn muốn biết gì**: hiện trạng · vì sao có cảnh báo · việc phải làm tiếp · học phí ·
+  lịch học · liên hệ. Bấm một cái là **chỉ trả lời phần đó** - không đổ tất cả ra một lượt.
+- Có nút **"Dắt tôi làm từng bước"** để chuyển thẳng sang chế độ hướng dẫn thao tác.
+
+**Hỏi về app** - "đổi hotline ở đâu", "chỉnh ngưỡng nợ quá hạn" - trả lời kèm nút mở thẳng tới ô
+đó, và **tô vàng đúng dòng** cho tới khi bạn rời màn (không tự tắt sau vài giây).
+
+**Không dùng AI.** Câu trả lời đọc lại chính bộ luật app đang chấp hành (`naFor`, `msgText`,
+`slaItems`, `stuRiskReasons`, `canAct`), nên không thể nói sai ngưỡng. Không hiểu câu hỏi thì nói
+thẳng là chưa hiểu, đưa gợi ý, và **ghi vào sổ** để người quản trị bổ sung trong **Cài đặt > Hỏi đáp**.
+
+## Form ghi: mở ra là dùng được ngay (V9.49)
+
+Rà cả **81 form ghi** của app bằng máy, không vá lẻ. Bốn thứ đã sửa:
+
+- **Ô chọn ngày không còn để trống.** Mỗi ô mở ra đã có sẵn giá trị **có nghĩa nghiệp vụ**, không
+  phải "hôm nay" cho có: hẹn thu phần còn lại lấy theo hẹn đang có của đơn (chưa hẹn thì lấy kỳ ân
+  hạn trong Cài đặt) · lùi khai giảng = ngày cũ cộng thêm một vòng quyết · đặt buổi WOW mặc định
+  ngày mai và **không cho chọn ngày đã qua** · ngày chuyển khoản mặc định hôm nay và **không cho
+  chọn ngày tương lai**.
+- **Không form nào còn câm.** Mỗi form có một dòng nói điều bạn cần biết TRƯỚC khi bấm lưu - lưu
+  xong chuyển gì, ai phải duyệt, hạn nào bắt đầu chạy. Ví dụ: giao lại lead thì đồng hồ SLA liên hệ
+  tính lại từ đầu · bảo lưu khóa cần Quản lý duyệt · chiết khấu từ ngưỡng nào trở lên tự vào hàng
+  chờ duyệt · chọn mức khiếu nại cao mà không xử kịp thì hồ sơ đỏ oan.
+- **Bốn form chứng từ có chỗ tải ảnh/PDF**: hoàn tiền · đơn xin bảo lưu / nghỉ học · phiếu điểm
+  test đầu vào · ảnh-clip cảm nhận học viên. File đính kèm được ghi vào đúng ghi chú của hồ sơ.
+- **Mọi con số trong dòng hướng dẫn đều đọc từ Cài đặt**, không cắm cứng - đổi ngưỡng thì câu chữ
+  đổi theo. (Nhân đó bắt được `slaSurveyReport_hours`: một luật nhắc việc chạy bằng số cắm cứng 48
+  giờ vì Cài đặt chưa bao giờ khai tham số đó. Nay khai rồi, đổi được.)
+
+## Học phí ở cổng học viên (V9.48)
+
+Nút **"Tôi đã chuyển khoản"** nay cho:
+- **Chọn đúng đợt** - danh sách liệt kê từng đợt kèm hạn · số tiền · nhãn ĐANG QUÁ HẠN; chọn đợt
+  nào thì ô số tiền tự nhảy đúng phần còn lại của đợt đó. Có thêm lựa chọn *"Đóng trước cho nhiều
+  đợt / số khác"*.
+- **Nhập số tiền đã chuyển** và **đính kèm ảnh biên lai / màn hình chuyển khoản**.
+- Đăng ký chưa chia đợt thì nói thẳng là chưa có bảng đợt, cứ nhập số tiền, kế toán ghi đúng chỗ.

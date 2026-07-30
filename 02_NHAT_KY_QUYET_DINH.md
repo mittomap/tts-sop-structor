@@ -149,7 +149,33 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.47 — CẤU HÌNH KHÔNG BAY THEO RESET · HỘP HỎI ĐÁP · CÀI ĐẶT GỌN LẠI ✅ (30/07).**
+> **Phiên bản: V9.49 — MỘT TRỢ LÝ · TRẢ LỜI CÓ TRỌNG TÂM · ĐÁNH GIÁ TOÀN DIỆN FORM GHI ✅ (30/07).**
+> · **Trợ thủ + Hỏi đáp gộp thành TRỢ LÝ** - một nút duy nhất (`asstfab`), tấm 420px có ô hỏi ngay
+> đầu. Hai nút cạnh nhau vốn đã là dấu hiệu sai: đứng từ phía người dùng cả hai đều là *hỏi rồi
+> được chỉ việc*. Khối `qaPan*` xoá sạch; suýt kéo theo ba hàm còn sống, `_check18` đỏ ngay và bắt được.
+> · **Trả lời có trọng tâm**: thẻ nhận dạng trước (đúng ai · lớp nào · số nào), rồi **6 ý định**
+> (hiện trạng · vì sao cảnh báo · việc phải làm · học phí · lịch học · liên hệ). Đoán được ý thì chỉ
+> trả lời phần đó; không đoán được thì **hiện dãy nút hỏi lại** chứ không đổ tất cả ra.
+> · **Tô vàng chỗ cấu hình bám cho tới khi rời màn**, không tự tắt sau vài giây.
+> · **41 nhóm việc xếp theo hành trình P1 → P10** (`VIECNHOM`) · dải chip cao 2 hàng thay vì 6.
+> · **"Tôi đã chuyển khoản"** chọn được đợt (kèm hạn · số tiền · ĐANG QUÁ HẠN, chọn đợt thì ô tiền
+> tự nhảy), nhập số tiền, **đính kèm ảnh biên lai**. · **Trang chủ bản demo vẽ lại** ba cửa.
+> · **Đánh giá toàn diện 81 form ghi, đo bằng máy** (V9.49): 5 ô chọn ngày để trống → điền sẵn giá
+> trị **có nghĩa nghiệp vụ** + chặn chọn ngày vô lý · 17 form câm → mỗi form một dòng nói điều cần
+> biết trước khi bấm lưu · 4 form chứng từ thiếu chỗ tải file → thêm, **và nối cả đường ghi đọc lại**
+> · bắt được **`slaSurveyReport_hours`**: một luật nhắc việc (`naFor` NA078) chạy bằng số cắm cứng 48
+> vì CH2 chưa bao giờ khai tham số đó. **Một báo động giả đã khai thật**: "51 form thiếu dấu sao" đo
+> lại chính xác thì là **0 chỗ lệch** - phép đo lỏng tay đẻ ra việc không có thật.
+> · Bộ kiểm: **`_checkux` MỚI 50** (bẻ 6 lần đỏ đủ 6) · `_check17` **411** · `_checkqa` **96** ·
+> `_check16` **661** · `_check14` **136** · verify **18 phần** · font **194 icon**. `./verify.sh` XANH HẾT.
+>
+> **CÒN LẠI trong việc D:** V6 màn hình từng chức danh (đã đo: `baocao` nằm trong menu HR và WOW
+> leader nhưng mở ra chỉ báo "ngoài phạm vi" = dư; WOW leader thiếu bảng BC6 của đội mình) ·
+> V7 màn chào phiên đầu + chọn bài tham quan · V8 "Xem tiếp" cho bảng dài (dải chip đã xong) ·
+> V12 các đoạn gợi ý/notebar sửa được tại chỗ trong Cài đặt (đã đo: 148 khối, 72 tách sạch được,
+> 76 khối có số nội suy sống nên không tách thô được).
+>
+> **Phiên bản trước: V9.47 — CẤU HÌNH KHÔNG BAY THEO RESET · HỘP HỎI ĐÁP · CÀI ĐẶT GỌN LẠI ✅ (30/07).**
 > Phiên này anh Luân góp liên tục trong lúc em làm; mỗi góp ý chỉ trúng một lỗi thật.
 > · **Cấu hình lưu ở ô nhớ RIÊNG** (`CFKEY`) - bấm reset dữ liệu demo KHÔNG còn làm bay hotline,
 > 83 ngưỡng CH2, 51 ngưỡng KPI, câu nhắc CH4, danh mục CH1, thương hiệu, phân quyền. Trước bản này
@@ -168,10 +194,6 @@
 > NA025); vá **bẫy im lặng** ở `riskTab` (khoá nhớ tạm thiếu hai ngưỡng cấu hình).
 > · Bộ kiểm: `_check16` **661** · `_check14` **136** · **`_checkqa` MỚI 83** · verify **17 phần** ·
 > font **194 icon**. `./verify.sh` XANH HẾT.
->
-> **CÒN LẠI trong việc D:** V6 màn hình từng chức danh (đã đo: `baocao` nằm trong menu HR và WOW
-> leader nhưng mở ra chỉ báo "ngoài phạm vi" = dư; WOW leader thiếu bảng BC6 của đội mình) ·
-> V7 màn chào phiên đầu + chọn bài tham quan · V8 "Xem tiếp" cho danh sách dài.
 >
 > **Phiên bản trước: V9.46 — CÀI ĐẶT KHÔNG ĐỂ AI TỰ BƠI ✅ (30/07). Việc D còn V5 + V6.**
 > Anh Luân: *"Cài đặt phải phủ toàn bộ… và phải có hướng dẫn cụ thể, ko để a tự bơi trong 1 đống
@@ -3891,3 +3913,126 @@ câu trả lời in *"centerHotline · đang đặt 0"*. In một cái hotline l
 khai rồi. Nay loại chữ đọc bằng `paramStr`, trống thì nói thẳng **"chưa khai"**.
 
 `_checkqa`: 65 → **83 tiêu chí**.
+
+---
+
+## V9.48 (30/07) - MỘT TRỢ LÝ THAY HAI NÚT · TRẢ LỜI CÓ TRỌNG TÂM · ĐÁNH GIÁ TOÀN DIỆN FORM GHI
+
+Anh Luân xem bản V9.47 xong góp một mạch, mỗi câu trúng một chỗ chưa tới.
+
+### 48.1 - Trợ thủ + Hỏi đáp gộp thành TRỢ LÝ (thay thế mục 47 cuối)
+
+> *"trợ thủ nên bỏ, kết hợp với khung tìm kiếm này nên nâng cấp khung tìm kiếm này lên 1 tầm cao.
+> Để ko chỉ hiển thị thông tin, mà còn hướng dẫn người ta tuần tự để dọn 1 task."*
+> *"để cái nút bật tắt trợ thủ, thành nút bật tắt trợ lý, a sẽ gọi cái này là trợ lý."*
+
+Mục cuối V9.47 ở trên viết *"hai nút KHÔNG chồng nhau một góc"* - **đoạn đó nay đã lỗi thời**,
+giữ lại để thấy đường đi. Hai nút cạnh nhau vốn đã là dấu hiệu sai: người dùng không phân biệt
+được "trợ thủ" với "hỏi đáp", vì đứng từ phía họ cả hai đều là *hỏi cái gì đó rồi được chỉ việc*.
+Nay chỉ còn **một nút Trợ lý** (`asstfab`, về lại mép phải `right:18px`), tấm rộng 420px, ô hỏi
+nằm ngay đầu tấm. Toàn bộ khối `qaPan*` đã xoá, CSS `.qafab`/`.qaPan` đi theo. Trang Hỏi đáp
+trong menu giữ nguyên - nó là chỗ đọc dài và chỗ sửa nguồn tri thức.
+
+Xoá khối chết suýt kéo theo ba hàm còn sống (`qaHoi`, `qaViDu`, `qaXoa` - `renderHoidap` vẫn gọi).
+`_check18` đỏ ngay: *"thiếu: qaHoi, qaViDu"*. **Lỗi thật do em gây, bộ kiểm bắt được** - đây đúng
+là lý do các bộ kiểm tồn tại.
+
+### 48.2 - Trả lời phải có TRỌNG TÂM, và phải HỎI LẠI khi chưa rõ ý
+
+> *"nó hiện tùm lum à, mà a thấy ko trọng tâm lắm á, a hỏi Trần Khánh Vy thì hãy nói các nghiệp vụ
+> liên quan đến Trần Khánh Vy thôi, với lại em nên hỏi lại để người dùng chọn, ví dụ hiện tên, hiện
+> lớp hay gì đó, hiện số điện thoại cùng."*
+
+Trước: gõ một cái tên là đổ ra tất cả mọi thứ biết về người đó. Nhiều thông tin không phải là
+nhiều giá trị - nó là bắt người đọc tự lọc. Nay:
+- **Thẻ nhận dạng** (`qaTheNguoi`) hiện trước: đúng ai, lớp nào, số nào - xác nhận đúng người
+  trước khi đọc tiếp.
+- **Sáu ý định** (`QAYDINH`): hiện trạng · vì sao cảnh báo · việc phải làm · học phí · lịch học ·
+  liên hệ. `qaYDinh` đoán ý từ câu hỏi; đoán được thì **chỉ trả lời phần đó**, không đoán được thì
+  hiện **dãy nút hỏi lại** để người dùng chọn.
+- Không hiểu thì **gợi ý** (`qaGoiY`) và **ghi vào sổ** câu app trả lời không nổi.
+
+### 48.3 - Tô vàng chỗ cấu hình thì để nguyên, đừng tự tắt
+
+> *"e cứ để cái tô vàng đi, ko cần tắt đâu, người ta thoát ra thì tắt."*
+
+Đúng: highlight tự tắt sau vài giây là thứ người ta vừa quay đi đã mất. Nay `.cfhl` bám cho tới
+khi rời màn (`cfHLXoa` gọi khi điều hướng).
+
+### 48.4 - Thứ tự nhóm việc, và dải chip đừng cao 6 hàng
+
+> *"mấy cái nhóm việc, e sắp xếp thứ tự chuẩn ko nhỉ"* (không) · *"kiểu thiết kế này nó bị ghê :("*
+
+`VIECNHOM` xếp 41 nhóm việc theo hành trình P1 → P10 (trước: thứ tự do mã nguồn tình cờ sinh ra).
+`segHTML` được viết lại có `SEGMAX=10` + nút "+N nhóm khác" nên dải chip cao 2 hàng thay vì 6.
+`_check17`: 393 → **411 tiêu chí**, thứ tự nhóm việc thành hợp đồng.
+
+### 48.5 - "Tôi đã chuyển khoản" phải chọn được đợt, nhập tiền, đính kèm ảnh
+
+> *"cái tôi đã chuyển khoản này, cho người ta chọn đợt luôn nhé, nhập số tiền và đính kèm được
+> ảnh/file nha."*
+
+Ô chọn đợt liệt kê từng đợt kèm **hạn · số tiền · ĐANG QUÁ HẠN**, chọn đợt thì ô số tiền tự nhảy
+đúng phần còn lại của đợt đó; thêm lựa chọn *"Đóng trước cho nhiều đợt / số khác"*; thêm ô đính
+kèm ảnh biên lai. Đăng ký chưa chia đợt thì nói thẳng *"chưa có bảng đợt đóng - bạn cứ nhập số
+tiền, kế toán sẽ ghi đúng chỗ"* thay vì hiện ô trống khó hiểu.
+
+### 48.6 - Trang chủ bản demo vẽ lại
+
+Ba cửa (nhân viên · học viên · phụ huynh) thành ba thẻ có màu nhấn riêng, mỗi thẻ nói **ai dùng**
+và **dùng để làm gì**; thêm khối "vài điều nên biết trước khi xem" (không cần đăng nhập · dữ liệu
+nằm trên máy bạn · **cấu hình giữ riêng, reset demo không mất** · đổi vai học viên ↔ phụ huynh
+ngay tại màn chọn người); có bản nền tối theo `prefers-color-scheme`.
+
+---
+
+## V9.49 (30/07) - ĐÁNH GIÁ TOÀN DIỆN FORM GHI, ĐO BẰNG MÁY TRÊN CẢ 81 FORM
+
+> *"những cái này nó liên quan đến trải nghiệm và tiện ích, chắc em phải đánh giá toàn diện đấy em,
+> làm ko tới thì ko ra gì cả."*
+
+Câu này chặn đúng thói quen xấu: vá chỗ anh Luân vừa chỉ rồi báo xong. Nên lần này em **đo trên
+toàn bộ 81 form ghi** (hàm vừa có `openDrawer(` vừa có ô nhập - lọc bằng chính định nghĩa đó, không
+liệt kê tay, để thêm form mới là phép đo tự biết), rồi mới sửa. Bốn nhóm khuyết tật đo được:
+
+**1. Ô chọn ngày để trống - 5 chỗ.** Mở form ra mà ô ngày trắng là bắt người ta gõ lại từ đầu mỗi
+lần. Thêm ba hàm: `isoDay(n)` (hôm nay + n), `isoCong(v,n)` (mốc v + n, không lùi về quá khứ),
+`isoHen(v,n)` (giữ mốc đã hẹn nếu còn tương lai, không thì hôm nay + n). Năm ô nay đều mở ra có
+sẵn giá trị **có nghĩa nghiệp vụ**, không phải "hôm nay" cho có: hẹn thu phần còn lại lấy theo hẹn
+đang có của đơn, chưa hẹn thì lấy `slaPayment_grace_days`; lùi khai giảng = khai giảng cũ +
+`classDecide_days` (đủ một vòng quyết nữa); ngày đặt WOW mặc định ngày mai và **chặn chọn ngày đã
+qua**; ngày chuyển khoản mặc định hôm nay và **chặn chọn ngày tương lai**.
+
+**2. Form câm - 17 chỗ.** Có ô nhập mà không một dòng nào nói lưu xong thì chuyển gì, luật nào áp
+dụng. (Con số 38 em đo lúc đầu là sai - phép đo đầu tiên lỏng tay, đếm cả form đã có `ctxRows`.
+Đo lại chặt thì còn 17.) Mỗi form nay có một dòng nói **điều người dùng thật sự cần biết trước khi
+bấm lưu**, không phải mô tả lại cái nút: giao lại lead thì đồng hồ SLA tính lại từ đầu · bảo lưu
+cần Quản lý duyệt · chiết khấu từ ngưỡng nào trở lên tự vào hàng chờ duyệt · đặt WOW trừ quota ·
+chọn mức khiếu nại cao mà không xử kịp thì hồ sơ đỏ oan · tiểu sử giảng viên là phụ huynh đọc chứ
+không phải ghi chú nội bộ.
+
+**3. Ô đính kèm chết.** Bốn form chứng từ thiếu chỗ tải file (hoàn tiền, đơn bảo lưu, phiếu điểm
+test, cảm nhận học viên). Thêm `attachBox` là nửa việc - nửa còn lại là **đường ghi phải đọc lại**.
+Em đã suýt để `var _tsK=attachLine("tsr")` khai rồi bỏ đó trong `testResultSave`: đúng loại **code
+chết** mà LUẬT 2ter cấm, và nguy hơn thiếu hẳn vì nhìn vào tưởng đã xong.
+
+**4. Dòng giải thích nói dối.** Notebar cắm số vào chuỗi ("quá 5 ngày") thì đổi cấu hình xong câu
+chữ nói sai. Mọi số phải đi qua `slaChip`/`paramOf`. Và tên tham số gọi ra phải **có thật trong
+CH2** - `slaChip` gọi tên sai thì im lặng trả về số mặc định, câu đọc vẫn xuôi mà sai. Phép đo này
+bắt được một chỗ có sẵn từ lâu: **`slaSurveyReport_hours`** đã được `naFor` (NA078) dùng để tính
+việc quá hạn nhưng **CH2 chưa bao giờ khai** - tức là một luật nhắc việc đang chạy bằng số cắm
+cứng 48 mà không ai đổi được. Nay khai vào nhóm P8-P9.
+
+**Một báo động giả, khai thật:** em đo được "51 form không đánh dấu ô bắt buộc `<i>*</i>`". Nghe
+như lỗi lớn. Đo lại cho chính xác - đối chiếu ô nào bị hàm lưu CHẶN với ô nào có dấu sao - thì ra
+**0 chỗ lệch**. Không sửa gì, và ghi lại đây: *phép đo lỏng tay đẻ ra việc không có thật cũng
+nguy hiểm như bỏ sót việc có thật.*
+
+### Bộ kiểm mới `_checkux.js` - 50 tiêu chí, bẻ 6 lần đỏ đủ 6
+
+Bốn nhóm trên thành hợp đồng máy canh, cộng một mục vẽ THẬT sáu drawer rồi soi HTML trả về (phòng
+trường hợp biểu thức đúng nhưng chạy ra rỗng). Negative test đã chạy đủ: bỏ `value` một ô ngày ·
+xoá một notebar · cắt `attachLine("rfd")` · cắm cứng "4 giờ" vào notebar · gọi tên tham số không
+có thật · để `_tsK` khai rồi bỏ - **cả sáu đều đỏ đúng chỗ**.
+
+`./verify.sh` nay **18 phần**. Toàn bộ XANH.
