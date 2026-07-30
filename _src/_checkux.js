@@ -286,6 +286,112 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
  t("khong o thong ke nao lap nut loc cung man"+(tong?" - LAP "+tong+": "+chi.join(", "):""), tong===0);
 })();
 
+/* ---- 6quinquies. MOT TRANG MOT O TIM (V9.52 - anh Luan: "trung tim kiem ne, voi lai em thiet
+   ke khong dong bo o cac trang, nen that su nhin rat roi mat") ----
+   renderList ve o tim cua chinh no roi con goi fltBarHTML - ham chung cung ve mot o tim nua.
+   Hai o, hai bo may loc khac nhau, cach nhau ba dong tren cung mot thanh. Canh bang may. */
+(function(){
+ var truoc=CUR,hai=[],khac=[];
+ Object.keys(RENDER).forEach(function(k){
+  CUR=k;var h="";try{h=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){return}
+  var o=(h.match(/<input[^>]*placeholder="Tìm[^"]*"/g)||[]);
+  if(o.length>1)hai.push(k+" ("+o.length+" o)");
+  o.forEach(function(x){var m=x.match(/placeholder="([^"]*)"/);
+   /* CHUAN: dung hai cach goi. "Tim trong trang nay..." cho o loc bang/trang;
+      "Tim ten, SDT hoac ma..." cho o tim MOT CON NGUOI / mot ho so. Them cach thu ba la do. */
+   if(m&&m[1]!=="Tìm trong trang này..."&&m[1]!=="Tìm tên, SĐT hoặc mã...")khac.push(k+": "+m[1])});
+ });
+ CUR=truoc;
+ t("khong trang nao co hai o tim"+(hai.length?" - HAI O: "+hai.join(", "):""), hai.length===0);
+ t("cach goi o tim thong nhat"+(khac.length?" - LAC: "+khac.slice(0,5).join(", "):""), khac.length===0);
+})();
+
+/* ---- 6novies. DEM BIEN THE - PHEP DO TAI HIEN DUOC CACH ANH LUAN TIM RA LOI (V9.52) ----
+   anh Luan hoi thang: *"em co thay, du em audit va kiem rat nhieu, nhung anh luon tim ra 1 cai
+   gi do bat hop ly khong, va khong he mat qua nhieu cong suc?"*
+   Ly do do duoc: moi bo kiem truoc day hoi "CAI NAY co dung khong" - tuc la kiem tung thu MOT
+   MINH NO. Anh Luan khong nhin nhu vay: anh nhin CA MAN HINH va so trang nay voi trang kia,
+   nen anh thay thu ma phep kiem don le khong the thay - hai nut cung lam mot viec, 12 kieu
+   thanh cong cu, 6 cach goi mot o tim, 20 cach ghi so dong. Tung cai deu "dung", ca bo thi sai.
+   Phep do nay dao nguoc cau hoi: "app dang lam viec nay bang MAY CACH?" - qua nguong la do. */
+(function(){
+ var truoc=CUR,H={};
+ Object.keys(RENDER).forEach(function(k){CUR=k;
+  try{H[k]=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){}});
+ CUR=truoc;
+ function bienThe(re,loc){var m={};
+  Object.keys(H).forEach(function(k){var x,r=new RegExp(re.source,"g");
+   while((x=r.exec(H[k]))){var v=(x[1]||"").replace(/\s+/g," ").trim();
+    if(!v||(loc&&!loc(v)))continue;m[v]=1}});
+  return Object.keys(m)}
+ /* don vi dem: chi duoc dung tu trong bang DVI (hoac "dòng"), khong duoc che them tu moi */
+ var dv=bienThe(/class="tbcnt">\d+ ([^<]{1,24})</);
+ var chuan={"dòng":1};Object.keys(DVI).forEach(function(k){chuan[DVI[k]]=1});
+ var la=dv.filter(function(v){return !chuan[v]});
+ t("don vi dem deu nam trong bang DVI"+(la.length?" - LA: "+la.slice(0,6).join(" | "):""), la.length===0);
+ t("co bang DVI khai don vi tung trang", typeof DVI==="object"&&Object.keys(DVI).length>=15);
+ /* nhan nut mo ho so: chi duoc mot cach goi */
+ var hs=bienThe(/<button[^>]*class="btn sm"[^>]*><i[^>]*><\/i>(Hồ sơ[^<]{0,20})</);
+ t("nhan nut mo ho so khong de ra nhieu cach goi ("+hs.length+")", hs.length<=2);
+})();
+
+/* ---- 6septies. THIET KE DONG BO GIUA CAC TRANG (V9.52 - anh Luan: "vi tri dat de, cach thiet
+   ke bo loc, noi chung chua dong bo trong thiet ke do em" / "gio la luc toi uu chuyen do roi") ----
+   Do duoc 12 KIEU thanh cong cu khac nhau tren 33 trang: o tim khi thi dung dau, khi thi tut
+   xuong hang hai sau dai chip. Chuan da chot, doc trai sang phai:
+      [o tim] [dai chip loc]  ······  [so dong] [Xuat] [Bo loc] [Cot]
+   Canh bang may: trang nao co CA o tim va chip loc thi O TIM PHAI DUNG TRUOC. */
+(function(){
+ var truoc=CUR,nguoc=[],dem=0;
+ Object.keys(RENDER).forEach(function(k){
+  CUR=k;var h="";try{h=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){return}
+  var iT=h.search(/<input[^>]*placeholder="Tìm trong trang/);
+  /* CHI so voi CHIP LOC. Dai tab cua HUB (Chờ duyệt, CSKH, Học tập...) la DIEU HUONG - no
+     dung tren cung la dung, giong nhau o moi hub, khong phai "khong dong bo". */
+  var iC=-1,reC=/<button class="(?:segb|fbtn)[^"]*"[^>]*onclick="([^"]*)"/g,mC;
+  while((mC=reC.exec(h))){if(/fset\(|toggleFilt\(|qfToggle\(|XLFILT|HTLOPQ|STFILT/.test(mC[1])){iC=mC.index;break}}
+  if(iT<0||iC<0)return;
+  dem++;
+  if(iT>iC)nguoc.push(k)});
+ CUR=truoc;
+ t("da do >=10 trang co ca o tim va chip loc", dem>=10);
+ t("o tim luon dung TRUOC dai chip loc"+(nguoc.length?" - NGUOC: "+nguoc.join(", "):""), nguoc.length===0);
+ t("co ham o tim dung chung timHTML", typeof timHTML==="function"&&/placeholder="Tìm trong trang này/.test(timHTML("test")));
+})();
+
+/* ---- 6octies. KHONG NUT NAO LAM DUNG VIEC MA BAM TEN DA LAM (V9.52 - anh Luan: "nut them
+   nhanh thua nhi, bam vao ten cung ra ma") ----
+   Do duoc 14 nut "Xem nhanh" mo DUNG ngan keo ma link ten trong cung hang da mo. Mot hang 5 nut
+   thi nut thu 5 chi to mat. */
+(function(){
+ var thua=[];
+ Object.keys(LISTCFG||{}).forEach(function(k){
+  var cfg=LISTCFG[k];if(!cfg||!cfg.act)return;
+  CUR=k;var h="";try{h=renderList(k)}catch(e){return}
+  var m=h.match(/<a class="lnk" onclick="([a-zA-Z]+)\('/);
+  if(!m)return;
+  var dich={openQuick:1,openStuQuick:1,leadDetail:1,openNSQuick:1,openLopQuick:1};
+  cfg.act.forEach(function(a){
+   if(!dich[a.fn]||!dich[m[1]])return;
+   /* cung ho ham mo ngan keo xem nhanh -> nut nay lam dung viec cua link ten */
+   if(a.fn==="openQuick"||a.fn===m[1])thua.push(k+": nút '"+a.lb+"'")})});
+ t("khong nut nao lam dung viec cua link ten"+(thua.length?" - THUA: "+thua.slice(0,6).join(", "):""), thua.length===0);
+})();
+
+/* ---- 6sexies. DOAN GOI Y PHAI BIET NO NAM O DAU (V9.52 - anh Luan: "dung no o dau con ko
+   biet, lam sao biet sua gi cho dung") ---- */
+(function(){
+ t("co bang GOIYO (doan nao hien o man nao)", typeof GOIYO==="object"&&Object.keys(GOIYO).length>=15);
+ t("co bang GOIYPG (nut Xem tai cho)", typeof GOIYPG==="object"&&Object.keys(GOIYPG).length>=10);
+ var thieu=Object.keys(GOIYDEF).filter(function(k){return !GOIYO[k]});
+ t("moi doan goi y deu khai duoc man hinh"+(thieu.length?" - THIEU: "+thieu.join(", "):""), thieu.length===0);
+ window.SETTAB="goiy";var hg="";try{hg=renderSettings()}catch(e){hg="LOI"}
+ t("tab Doan goi y dung CHINH CAU do lam nhan, khong dung ma may", hg.indexOf("gy_")<0||hg.indexOf(">gy_")<0);
+ t("tab Doan goi y co nut Xem tai cho", /Xem tại chỗ/.test(hg));
+ t("tab Doan goi y giai thich the in dam", /in đậm/.test(hg));
+ window.SETTAB="";
+})();
+
 /* ---- 7. NGUOI DONG HANH (V9.50 - anh Luan chot): dong hien thi = quan he + SDT la du,
    quan he chon tu danh sach 7 muc: ong, ba, bo, me, anh, chi, nguoi giam ho ---- */
 (function(){

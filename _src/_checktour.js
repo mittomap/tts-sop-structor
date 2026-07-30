@@ -38,6 +38,7 @@ var have={};(SRCPY.match(/data-tour="[A-Za-z0-9_.\-]+"/g)||[]).forEach(function(
 var want={};
 keys.forEach(function(k){TOURS[k].steps.forEach(function(st,i){
   var sl=String(st.sel||"");
+  if(sl.indexOf("@txt:")===0)return;   /* neo theo CHU tren nut - canh o khoi rieng ben duoi */
   if(sl.charAt(0)==="@"){var a=sl.slice(1);want[a]=1;
     if(!have[a])bad.push("bai "+k+" buoc "+(i+1)+": goi ma neo @"+a+" KHONG co trong ma nguon")}
 })});
@@ -73,12 +74,40 @@ var KHUNG=[".pbody",".jgrid",".dt",".notebar","#chaybody"];
  if(!HTML)return;
  var thieu=[];
  keys.forEach(function(k){TOURS[k].steps.forEach(function(st,i){
-  var sel=String(st.sel||"");if(sel.charAt(0)!=="@")return;
+  var sel=String(st.sel||"");if(sel.indexOf("@txt:")===0)return;
+  if(sel.charAt(0)!=="@")return;
   var ma=sel.slice(1);
   if(HTML.indexOf('data-tour="'+ma+'"')<0)thieu.push(ma)})});
  if(thieu.length)bad.push("neo @ma khong co that trong app: "+thieu.filter(function(v,i,a){return a.indexOf(v)===i}).join(", "));
 })();
 
+
+/* ---- V9.52: NEO THEO CHU TREN NUT (@txt:) - HUONG DAN PHAI TRO DUNG CHO ----
+   anh Luan: "em nen dim, boi cho tab ben sidebar nua, chu em huong dan vay rat kho nhan ra cho
+   nao can bam vao" va "sau moi phien cap nhat, em phai nang cap luon cai guide, chu no sai te le".
+   Do duoc: truoc ban nay 11 buoc noi "Bam X" nhung vong sang khoanh DONG MO TA TRANG. Nay:
+   1. chu trong @txt: PHAI co that tren trang cua buoc do (ve THAT roi tim);
+   2. hint noi "Bam X" thi X phai la chinh chu duoc khoanh - noi mot dang tro mot neo la sai. */
+(function(){
+ var xau=[],lech=[],dem=0;
+ keys.forEach(function(k){TOURS[k].steps.forEach(function(st,i){
+  var sel=String(st.sel||"");if(sel.indexOf("@txt:")!==0)return;
+  dem++;
+  var chu=sel.slice(5).trim();
+  var pg=st.p||"banlam";
+  if(st.ctx)try{st.ctx()}catch(e){}
+  var h="";try{CUR=pg;h=(PBK[pg]&&PBK[pg].ty==="list")?renderList(pg):(RENDER[pg]?RENDER[pg]():"")}catch(e){h=""}
+  var tho=String(h).replace(/&amp;/g,"&").replace(/<[^>]*>/g," ").replace(/\s+/g," ");
+  if(tho.indexOf(chu)<0)xau.push(k+"#"+(i+1)+" tro vao '"+chu+"' - trang "+pg+" khong co chu do");
+  var m=String(st.hint||"").match(/Bấm (?:(?:sang|vào|nút|chip|tab|lọc)\s+)*['"]?([^,.;'"]{2,40})/);
+  if(m){var noi=m[1].trim();
+   if(chu.indexOf(noi.split(" ")[0])<0&&noi.indexOf(chu.split(" ")[0])<0)
+    lech.push(k+"#"+(i+1)+" hint bao bam '"+noi+"' nhung khoanh '"+chu+"'")}
+ })});
+ console.log("Neo theo chu tren nut:",dem,"buoc");
+ if(xau.length)bad.push("neo @txt tro vao chu khong co tren trang: "+xau.join(" | "));
+ if(lech.length)bad.push("hint noi mot dang, vong sang khoanh mot neo: "+lech.join(" | "));
+})();
 
 /* ---- V9.30: CAP "THAO TAC MAU" PHAI KIEM CHUNG DUOC ----
    Huong dan chi NOI thi nguoi hoc gat gu roi quen. Buoc nao co viec phai lam thi phai co chk()

@@ -149,7 +149,26 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.51 — DỌN TRÙNG TOÀN APP · MONITOR TỪNG CHỨC DANH · NỐI AI MIỄN PHÍ ✅ (30/07 tối).**
+> **Phiên bản: V9.52 — GUIDE TRỎ ĐÚNG CHỖ · TỪ ĐIỂN THUẬT NGỮ · ĐỒNG BỘ THIẾT KẾ ✅ (30/07 khuya).**
+> · **Bài học lớn nhất phiên này** (anh Luân hỏi *"vì sao anh luôn tìm ra lỗi mà không mất mấy
+> công?"*): bộ kiểm cũ hỏi *"cái này có đúng không"* - kiểm từng thứ MỘT MÌNH NÓ. Anh Luân nhìn
+> CẢ MÀN và so trang với trang. Nay có phép **ĐẾM BIẾN THỂ**: hỏi ngược *"app làm việc này bằng
+> MẤY CÁCH?"* và bắt con số phải là 1. Chạy phát đầu đã lôi ra 20 cách ghi số dòng.
+> · **Guide**: 11 bước nói "Bấm X" mà khoanh chỗ khác → neo theo CHỮ TRÊN NÚT (`@txt:`); thêm
+> **vòng sáng thứ hai trên mục sidebar**; không tìm ra chỗ trỏ thì vòng phụ gánh lớp phủ (hết
+> cảnh không tô gì cả). `_checktour` cấm hint nói một đằng khoanh một nẻo.
+> · **Trợ lý**: "rer là gì" nay nhảy tới + tô vàng đúng dòng; thêm **từ điển 10 thuật ngữ**
+> (WOW/SOP/SLA/KPI/lead/at_risk/onboarding/quota/bảo lưu/chiết khấu) sửa được trong Cài đặt, câu
+> "X là gì" được nâng hạng để định nghĩa đứng đầu. Từ điển cũng là ngữ cảnh cho AI.
+> · **Đồng bộ thiết kế**: bỏ ô tìm trùng · 12 kiểu thanh công cụ → **một thứ tự duy nhất** ·
+> 6 cách gọi ô tìm → 2 · **bỏ 15 nút thừa** (Xem nhanh / Hồ sơ mở đúng ngăn kéo mà bấm tên đã mở)
+> · đơn vị đếm gọi đúng tên (hết cảnh buổi học bị gọi là "hồ sơ") · nút Trợ lý hết chìm · thẻ
+> Cài đặt hết bị bóp hẹp.
+> · **Tab Đoạn gợi ý**: nhãn là chính câu đó, nói rõ **hiện ở màn nào**, có nút **Xem tại chỗ**.
+> · Bộ kiểm: `_checkux` **92** · `_checkqa` **130** · font **199 icon** · 492 lượt mở thật.
+> `./verify.sh` XANH HẾT.
+>
+> **Phiên bản trước: V9.51 — DỌN TRÙNG TOÀN APP · MONITOR TỪNG CHỨC DANH · NỐI AI MIỄN PHÍ ✅ (30/07 tối).**
 > · **Một màn một bộ điều khiển**: đo được 13 trang / 48 ô thống kê lặp đúng nút lọc bên dưới -
 > dọn sạch, số dồn vào chip lọc. Đo sâu còn lòi ra **hai nguồn sự thật** cho hàng chờ hoàn tiền
 > (bảng việc đếm 1, chip hub đếm 2) - nay một hàm duy nhất.
@@ -4256,3 +4275,103 @@ màn hình**. Đoạn có số nội suy sống vẫn do máy ghép - sửa số
 `_checkui` **491 lượt mở thật**. Ba chỗ đỏ tự gây trong phiên (tham số `centerName` không tồn tại ·
 `kpiChip` nhét vào ô số bị escape thành HTML thô · hợp đồng hub cũ đếm cả dải ô đã bỏ) đều do bộ
 kiểm bắt, không phải do đọc lại mà thấy. `./verify.sh` XANH HẾT.
+
+---
+
+## V9.52 (30/07 khuya) - HƯỚNG DẪN TRỎ ĐÚNG CHỖ · TỪ ĐIỂN THUẬT NGỮ · ĐỒNG BỘ THIẾT KẾ
+## + CÂU HỎI ĐÁNG GIÁ NHẤT ANH LUÂN ĐÃ HỎI
+
+### 52.0 - "Vì sao anh luôn tìm ra lỗi mà không mất mấy công?"
+
+> *"em có thấy, dù em audit và kiểm rất nhiều, nhưng anh luôn tìm ra 1 cái gì đó bất hợp lý
+> không, và không hề mất quá nhiều công sức. Em có thấy là em nên nghiên cứu xem mình cần phải
+> xem xét gì để có thể nâng cấp tốt hơn ko"*
+
+Có, và lý do **đo được**, không phải cảm tính:
+
+1. **Bộ kiểm chỉ canh những lớp lỗi em ĐÃ BIẾT.** Mỗi bộ kiểm viết SAU khi hiểu một khuyết tật,
+   nên nó bắt được TÁI PHÁT chứ không bắt được LOẠI MỚI. Mọi thứ anh Luân chỉ ra đều là loại mới.
+2. **Em kiểm TỪNG THỨ MỘT; anh nhìn CẢ MÀN HÌNH và so trang này với trang kia.** Hai nút cùng
+   làm một việc, 12 kiểu thanh công cụ, 6 cách gọi một ô tìm, 20 cách ghi số dòng - **từng cái
+   đều đúng, cả bộ thì sai.** Không phép kiểm đơn lẻ nào thấy được.
+3. **Em kiểm "có chạy không"; anh hỏi "sao lại thế này".** Nút "Xem nhanh" chạy hoàn hảo - lỗi là
+   nó **không nên tồn tại**.
+4. **Em đo CHUỖI, anh nhìn PIXEL.** Thẻ bị bóp hẹp, nút chìm vào nền, vòng sáng khoanh sai ô -
+   `_checkui` mở trình duyệt thật nhưng chỉ hỏi những câu em đã nghĩ ra.
+5. **Em dừng khi xanh; anh bắt đầu khi xanh.**
+
+**Việc phải làm khác đi - và đã làm ngay trong mục 52.4 dưới đây: ĐẢO NGƯỢC CÂU HỎI.** Thay vì
+hỏi *"cái này có đúng không"*, hỏi *"app đang làm việc này bằng MẤY CÁCH?"* rồi bắt con số đó
+phải là 1. Phép đo đó vừa chạy đã lôi ra ngay 20 cách ghi số dòng và chuyện màn Buổi học gọi buổi
+học là "hồ sơ" - đúng loại lỗi anh Luân hay bắt, mà lần này máy bắt trước.
+
+### 52.1 - Hướng dẫn trỏ sai chỗ, và không tô gì cả
+
+> *"em nên dim, bôi chỗ tab bên sidebar nữa, chứ em hướng dẫn vầy rất khó nhận ra chỗ nào cần
+> bấm vào, vùng nào cần xem"* · *"sau mỗi phiên cập nhật, em phải nâng cấp luôn cái guide, chứ
+> nó sai tè le"*
+
+Đo: **66 bước, 31 bước neo vào `@phead` (dòng mô tả trang), 11 bước nói "Bấm X" mà vòng sáng
+khoanh chỗ khác.** Và khi không tìm ra chỗ trỏ thì app tắt LUÔN cả vòng sáng lẫn lớp phủ - màn
+hình y như bình thường, chẳng chỉ gì cả.
+- **Neo theo CHỮ TRÊN NÚT** (`@txt:Lớp học`): câu "Việc cần làm" nói bấm gì thì vòng sáng khoanh
+  đúng cái đó. 11 bước đã trỏ lại đúng nút, và **lời hint sửa theo đúng chữ in trên nút**.
+- **Hai vòng sáng, hai vai**: vòng chính = thứ phải bấm (mang lớp phủ tối, đục lỗ đúng chỗ);
+  **vòng phụ trên mục sidebar** = đang đứng ở mục nào. Không tìm ra thứ phải bấm thì vòng phụ
+  NHẬN lớp phủ - không bao giờ còn cảnh "không tối gì cả".
+- `_checktour` thêm hợp đồng: chữ trong `@txt:` phải có thật trên trang đó, **và** hint nói "Bấm X"
+  thì X phải là chính chữ được khoanh. Đây là câu trả lời cho *"sau mỗi phiên phải nâng cấp guide"*
+  - nay guide sai là verify đỏ, không chờ ai phát hiện.
+
+### 52.2 - Trợ lý: hỏi lý thuyết thì chịu
+
+> *"a gõ rer là gì, nó ko nhảy tới, và ko tô vàng ta"* · *"anh hỏi mấy câu lý thuyết kiểu: WOW là
+> gì? nó ko trả lời được, mà nó chỉ trỏ được tới mấy cái nơi có nhắc đến wow"*
+
+Hai lỗi khác nhau:
+- KPI trong kho hỏi mở tab CH6 rồi **bỏ đó giữa 51 dòng** - đúng là không nhảy tới. Nay đi qua
+  `kpiGoCf` (lọc đúng mã + tô vàng).
+- App biết mọi CHỖ có chữ WOW nhưng **không biết WOW LÀ GÌ** - tri thức tĩnh, không suy từ dữ
+  liệu được. Thêm **từ điển thuật ngữ 10 mục** (WOW, SOP, SLA, KPI, lead, at_risk, onboarding,
+  quota, bảo lưu, chiết khấu), sửa/thêm được trong Cài đặt > Hỏi đáp, và câu hỏi dạng "X là gì"
+  được **nâng hạng gấp 3.2 lần** để định nghĩa đứng đầu thay vì mấy tham số có chứa chữ đó.
+  Từ điển cũng là ngữ cảnh cho AI - đúng chỗ anh Luân nói *"đó là khác biệt cần áp dụng AI"*.
+
+### 52.3 - Thiết kế không đồng bộ
+
+> *"trùng tìm kiếm nè"* · *"vị trí đặt để, cách thiết kế bộ lọc, nói chung chưa đồng bộ"* ·
+> *"giờ là lúc tối ưu chuyện đó rồi đấy"* · *"nút thêm nhanh thừa nhỉ, bấm vào tên cũng ra mà"*
+
+Đo bằng máy, không đoán:
+- **Trùng ô tìm**: `renderList` vẽ ô tìm của nó rồi gọi `fltBarHTML` - hàm này vẽ thêm một ô nữa.
+  Hai ô, hai bộ máy lọc, cách nhau ba dòng trên cùng một thanh.
+- **12 kiểu thanh công cụ trên 33 trang** - ô tìm khi đứng đầu, khi tụt xuống hàng hai sau dải
+  chip. Nay MỘT thứ tự duy nhất: `[ô tìm] [chip lọc] ··· [số dòng] [Xuất] [Bộ lọc] [Cột]`, sửa ở
+  HÀM CHUNG nên mọi trang đổi cùng lúc. Dải tab của HUB vẫn nằm trên - đó là điều hướng, không
+  phải bộ lọc, và mọi hub đều giống nhau.
+- **6 cách gọi cho cùng một ô tìm** → còn hai: "Tìm trong trang này…" và "Tìm tên, SĐT hoặc mã…".
+- **15 nút thừa**: 14 nút "Xem nhanh" + 1 nút "Hồ sơ" mở ĐÚNG ngăn kéo mà bấm tên đã mở. Đo bằng
+  cách so hàm của nút với hàm của link tên trong cùng hàng - trùng 15/15.
+- **Nút Trợ lý thu gọn chìm vào nền** (đè lên dải nút navy cùng tông): thêm viền trắng + bóng dày.
+- **Thẻ bản đồ Cài đặt bị bóp hẹp**: chip đếm không co được nên bóp cột chữ thành dải hẹp, tiêu đề
+  gãy đôi. Nay chip tự tụt xuống hàng dưới khi cột chữ hẹp hơn 190px.
+
+### 52.4 - Tab "Đoạn gợi ý" không ai hiểu để mà sửa
+
+> *"khong hiểu gì để mà sửa đấy em"* · *"dùng nó ở đâu còn ko biết, làm sao biết sửa gì cho đúng"*
+
+Đúng: nhãn là **mã máy** (`gy_ay_la_cac_cau_3fed`), ô nhập chìa nguyên thẻ `<b>` ra. Nay nhãn là
+**chính câu đó** (rút gọn), có dòng **"Hiện ở: <màn hình>"**, có nút **"Xem tại chỗ"** mở thẳng màn
+đó, và một dòng giải thích cặp thẻ in đậm. Bảng vị trí `GOIYO`/`GOIYPG` **suy tự động từ mã nguồn**
+- thêm đoạn mới là tự có chỗ, không phải khai tay.
+
+### 52.5 - Đơn vị đếm gọi sai tên (phép đếm biến thể tìm ra)
+
+Màn Buổi học ghi "146 hồ sơ", màn Khiếu nại cũng "hồ sơ" - vì `filterBar` cắm cứng chữ "hồ sơ" cho
+mọi trang. Bảng `DVI` khai đơn vị đúng cho từng trang; bộ kiểm cấm chế thêm cách gọi mới.
+
+### Số chốt phiên
+`_checkux` 77 → **92** (thêm: một trang một ô tìm · thứ tự thanh công cụ · nút trùng việc với link
+tên · đoạn gợi ý biết mình ở đâu · **đếm biến thể**) · `_checkqa` **130** · `_checktour` thêm hợp
+đồng `@txt` · font **199 icon** · `_checkui` **492 lượt**. Ba chỗ đỏ tự gây (ngoặc ba ngôi nuốt nút
+Xuất · neo SOP VH0 đổi chuỗi · icon subset thiếu) đều do bộ kiểm bắt. `./verify.sh` XANH HẾT.

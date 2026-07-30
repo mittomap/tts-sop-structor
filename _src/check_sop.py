@@ -530,7 +530,9 @@ VHBC_BOQUA = {
            "van hanh hon moc dau thang - ngay mung 2 bao cao thang chi co hai ngay du lieu.",
 }
 VHBC = {
-    "VH0": {"t": "Tim kiem nhanh", "can": ["Tìm khách / học viên theo tên hoặc SĐT"]},
+    # V9.52: cach goi o tim da chuan hoa ve MOT kieu duy nhat cho o tim nguoi (anh Luan: "thiet ke
+    # khong dong bo o cac trang, nhin rat roi mat"). Neo lai theo chuoi chuan moi.
+    "VH0": {"t": "Tim kiem nhanh", "can": ["Tìm tên, SĐT hoặc mã"]},
     "VH1": {"t": "Tra cuu Lop", "can": ["Lớp học (DL10)"]},
     "VH2": {"t": "Tra cuu Hoc vien", "can": ["Học viên (DL09)"]},
     "VH3": {"t": "Tra cuu Giang vien", "can": ["Chỉ giảng viên lớp"]},
