@@ -1728,3 +1728,35 @@ thái "đã xong" nên không có việc gì để nhắc, và đã khai lý do 
 Đáng kể nhất là **năm mức can thiệp học viên nguy cơ** - SOP phân năm mức với năm hành động khác
 hẳn nhau (họp 4 bên gấp · họp 3 bên trong 24h · họp 3 bên · đặt buổi WOW kèm · gọi trong 24-48h),
 trước đây app gộp làm một "nguy cơ" chung. Một học viên chỉ nhận **một** việc - mức nặng nhất.
+
+## Bảng việc của tôi - mỗi chức danh bốn con số đầu ca (V9.42)
+
+SOP có năm bảng việc theo chức danh (BC5 NV Tư vấn · BC6 NV WOW · BC7 Giảng viên · BC8 Học vụ ·
+BC9 Quản lý). Mỗi người đăng nhập, ngay trên trang đầu tiên họ đáp vào, sẽ thấy **bốn con số của
+riêng mình** - bấm vào ô nào là mở đúng danh sách đó, không phải đi tìm.
+
+| Chức danh | Bốn ô |
+|---|---|
+| NV Tư vấn / Marketing | Lead mới chưa LH · Lead đang khai thác · Test sắp tới · Tư vấn cần làm |
+| NV WOW | Test chờ chấm · Test đã chấm · WOW sắp tới · WOW có tiến bộ (%) |
+| Giảng viên | Buổi đã hoàn thành · Cần viết nhận xét buổi · Bài tập chờ chấm · HV nguy cơ học thuật |
+| Học vụ | Nhập học chưa xong · Học viên nguy cơ · Phản hồi chờ phân loại · Khiếu nại đang xử lý |
+| Kế toán | Đơn còn nợ phí · Phiếu thu chờ đối soát · Hoàn tiền chờ duyệt · Chiết khấu chờ duyệt |
+| Nhóm hỗ trợ | Việc mới chờ nhận · Đang làm · Quá hạn · Chờ người giao xác nhận |
+| Quản lý | Bảng của nhóm mình, **cộng thêm** dải "Chờ bạn phê duyệt" chỉ gồm việc CH3 giao cho nhóm đó |
+
+Phụ chú mỗi ô ghi ngưỡng SOP kèm chip bánh răng mở thẳng ô cấu hình - thấy số xấu là sửa được ngay
+tại chỗ, không phải nhớ tên tham số.
+
+## Khối lượng việc theo nhân viên (V9.42)
+
+Trang Báo cáo có thêm bảng **ai đang ôm bao nhiêu việc** - đếm việc CÒN MỞ của toàn đội theo sáu
+cột: lead đang giữ, test chờ chấm, tư vấn dở, nhập học dở, khiếu nại, việc được giao. Ai vượt gần
+gấp đôi mức chia đều thì tổng của họ tô đỏ. Đây là màn VH11 của SOP; trước đây app chỉ có bảng tải
+riêng cho giảng viên.
+
+## Danh sách học viên nói rõ nguy cơ nặng nhẹ (V9.42)
+
+Ba cột mới theo bảng BC1 của SOP: **vắng mấy buổi · thiếu mấy bài · hoạt động cuối cách đây bao
+lâu**. Ba con số này phải đếm từ bảng khác nên trước đây không có; thiếu chúng thì cờ "nguy cơ" chỉ
+là một cái nhãn, người trực ca không biết chọn mức can thiệp nào trong năm mức SOP quy định.

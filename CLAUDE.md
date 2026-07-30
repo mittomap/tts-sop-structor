@@ -47,8 +47,14 @@ Chủ dự án: Luân. Mọi phiên làm việc (Claude Code hay Claude Cowork) 
   (`TRIG_BOQUA`, chạy thật `naFor()` trên mọi dòng) · **51 chỉ số** bảng BC2 (`KPI_BOQUA`, phải có
   cả công thức lẫn dòng ngưỡng CH6) · **31 hành động** bảng phân quyền CH3 (`CH3_BOQUA`, đóng vai
   từng chức danh rồi hỏi lại; việc "Quản lý phê duyệt" phải có cửa ghi gọi `chanAct`).
+  · **12 màn vận hành VH0-VH11 + 9 bảng báo cáo BC1-BC9** (`VHBC_BOQUA`, vẽ THẬT mọi trang/tab/
+  danh sách cộng bảng việc của từng chức danh rồi tìm chuỗi phải có).
   Chỗ nào app không làm phải khai **kèm lý do đọc được**. Đã nằm trong `./verify.sh`.
-  Cột chỉ nói "có chỗ để lưu" - nó KHÔNG nói app có nhắc việc, có tính chỉ số, có chặn đúng người.
+  Cột chỉ nói "có chỗ để lưu" - nó KHÔNG nói app có nhắc việc, có tính chỉ số, có chặn đúng người,
+  có màn hình để xem.
+- **Bản Google Sheets (`.gs`) đang ở V9.15, đọc 19 bảng trong khi app dùng 26.** `_src/check_gs.py`
+  giữ khoảng cách đó thành BẢN KHAI - thêm bảng mới vào app mà không khai là đỏ. Chưa đồng bộ vì
+  anh Luân sẽ chốt nền tảng sau; nhưng không được để nó rộng thêm trong im lặng.
 
 ## LUẬT CỨNG rút gọn (bản đầy đủ trong 00/01/02)
 

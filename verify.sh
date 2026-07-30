@@ -91,6 +91,10 @@ chay "check_data.py"   "KET QUA: DAT"        python3 check_data.py
 # khong dung phai khai ly do co y bo qua. Truoc do viec "da phu het SOP chua" chi dua vao tri nho,
 # va no da sot that: 5 cot ve nguoi giam ho nam chet trong du lieu, khong man hinh nao hien.
 chay "check_sop.py"    "KET QUA: DAT"        python3 check_sop.py
+# V9.42: ban chay tren Google Sheets (.gs) la ban DUY NHAT hien nay nhieu nguoi dung chung duoc,
+# ma no dang dung o V9.15 - doc 19 bang trong khi app dung 26. Khong bo kiem nao dung toi no, nen
+# khoang cach cu rong ra trong im lang. Bo kiem nay bien khoang cach do thanh con so DUOC KHAI.
+chay "check_gs.py"     "KET QUA: DAT"        python3 check_gs.py
 
 echo
 echo "${Dam}== 5. KIEM THU TREN TRINH DUYET THAT ==${Het}"

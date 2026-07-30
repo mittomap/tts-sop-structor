@@ -63,6 +63,7 @@ thay cho chỗ đó.
 | Tình huống sổ trigger HD3 - **chạy thật `naFor()` trên mọi dòng** | 93 | `TRIG_BOQUA` |
 | Chỉ số bảng BC2 (công thức trong app + dòng ngưỡng trong CH6) | 51 | `KPI_BOQUA` |
 | Hành động bảng phân quyền CH3 - **đóng vai từng chức danh rồi hỏi lại** | 31 | `CH3_BOQUA` |
+| Màn vận hành VH0-VH11 + bảng báo cáo BC1-BC9 - **vẽ thật mọi trang rồi soi** | 22 | `VHBC_BOQUA` |
 
 Hai mặt giữa là chỗ đau nhất và cũng là chỗ dễ sót nhất: **cột chỉ nói "có chỗ để lưu"**, nó không
 nói app có nhắc việc không, có tính chỉ số không, có chặn đúng người không. Đo lần đầu: app sinh
@@ -71,6 +72,16 @@ số, và canh thật **1/8** việc "Quản lý phê duyệt".
 
 Riêng CH3: mỗi việc SOP ghi "Quản lý phê duyệt" phải có **cửa ghi gọi `chanAct("...")`**. Khai vào
 bảng mà không chặn thì chỉ là tờ giấy dán tường - bộ kiểm bắt luôn chuyện đó.
+
+### LUẬT 2ter - Code chết còn nguy hiểm hơn code sai
+
+`kpiAll()` (14 ô chỉ số) và `ROLEKPI` (ô nào cho chức danh nào) nằm trong `gen_v5.py` chín phiên
+bản, đọc mã thì tưởng app đã có năm bảng việc theo chức danh mà SOP mô tả. Đếm bằng máy: **cả hai
+chưa bao giờ được gọi** - `grep` ra đúng một lần, là dòng định nghĩa.
+
+Code sai thì có ngày nó nổ. Code chết thì không bao giờ nổ - nó chỉ làm người đọc yên tâm nhầm, và
+làm người rà "thấy có rồi" rồi bỏ qua. Trước khi tin một khối mã là một tính năng, `grep` xem có ai
+gọi nó không. Bộ kiểm VH/BC nay bắt được lớp lỗi này cho phần màn hình.
 
 ### LUẬT 3 - Chạy `./verify.sh` trước khi giao. Đỏ thì không giao.
 
@@ -106,6 +117,8 @@ cd _src && python3 build_icons.py  # cần: pip install fonttools brotli
 | Tình huống HD3 mà `naFor()` không sinh ra (chạy thật, 93 mã) | |
 | Chỉ số BC2 thiếu công thức hoặc thiếu ngưỡng CH6 (51 chỉ số) | |
 | Việc "Quản lý phê duyệt" mà cửa ghi không gọi `chanAct` (CH3, 31 hành động) | |
+| Màn hình SOP mô tả mà app không vẽ ra (VH/BC, 22 màn) | Một tính năng **chưa bao giờ được gọi** - trừ khi nó là màn SOP mô tả; `kpiAll`/`ROLEKPI` chết 9 phiên bản mới bị bắt |
+| Bản `.gs` tụt lại so với app (`check_gs.py`) | |
 
 Nói cách khác: nó chặn phần lớn tai nạn, **không** biến người bất cẩn thành an toàn. Đọc mã vẫn cần.
 

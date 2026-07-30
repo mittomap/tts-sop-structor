@@ -2214,18 +2214,27 @@ var LISTCFG={
 hocvien:{code:"DL09",filt:"student_status",ro:1,sub:"Học viên (DL09) - lọc theo trạng thái / nguy cơ / lớp / khóa",extra:"hvExtraFilter",
  qf:[["risk","Nguy cơ",function(s){return stuRisk(s)}]],
  act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"student_id"},{lb:"Xem nhanh",ic:"ti-eye",fn:"openQuick",arg:"student_id"}],
- cols:[["student_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["student_status","Trạng thái","chip"],["attendance_progress_status","Chuyên cần","chip"],["academic_progress_status","Học thuật","chip"],["attendance_risk_reason","Lý do CC","enum"],["academic_risk_reason","Lý do HT","enum"],["wow_quota_remaining","WOW còn"]]},
+ cols:[["student_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["student_status","Trạng thái","chip"],["attendance_progress_status","Chuyên cần","chip"],["academic_progress_status","Học thuật","chip"],["attendance_risk_reason","Lý do CC","enum"],["academic_risk_reason","Lý do HT","enum"],["__vang","Vắng (buổi)","calcso"],["__thieubai","Thiếu bài","calcso"],["last_learning_activity_time","Hoạt động cuối","lau"],["wow_quota_remaining","WOW còn"]]},
 lop:{code:"DL10",filt:"class_status",ro:1,sub:"Lớp học (DL10)",
  act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openLopQuick",arg:"class_id"}],
  /* V9.40d: class_level là cột SOP mô tả từ đầu mà app chưa hiện ở đâu - xếp một em trình độ
     Foundation vào lớp IELTS 7.0+ là hỏng cả lớp, nên trình độ phải nhìn thấy ngay ở danh sách. */
  cols:[["class_id","Mã"],["class_name","Tên lớp"],["course_id_name","Khóa"],["class_level","Trình độ","enum"],["class_status","Trạng thái","chip"],["current_enrollment","Sĩ số"],["class_capacity","Sức chứa"],["main_teacher_id_name","GV chính"],["class_schedule","Lịch"],["class_start_date","Khai giảng"]]},
-giangvien:{code:"DL01",ro:1,sub:"Giảng viên (DL01)",act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openNSQuick",arg:"staff_id"}],
+/* V9.42 - SOP tách HAI màn tra cứu: VH3 Giảng viên và VH3b NV WOW. App gộp một danh sách cho gọn
+   (cùng bảng DL01, cùng cột) - hợp lý hơn hai màn giống hệt nhau - nhưng gộp mà không có đường
+   tách ra thì đúng là làm SÓT màn VH3b: trưởng phòng muốn xem riêng đội WOW phải tự dò cột Vai trò.
+   Nay hai chip lọc một chạm, và bộ kiểm SOP canh chúng còn sống. */
+giangvien:{code:"DL01",ro:1,sub:"Giảng viên & NV WOW (DL01) - lọc nhanh để tách riêng từng đội",
+ qf:[["wow","Chỉ NV WOW",function(x){return /wow/.test(ecode(x.role))},"blue"],
+     ["gv","Chỉ giảng viên lớp",function(x){return /teacher/.test(ecode(x.role))},"blue"]],
+ act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openNSQuick",arg:"staff_id"}],
  pre:function(s){return /teacher|wow|giảng|giang/.test(ecode(s.role))||/giảng|giang|teacher/i.test(String(s.role))},
  cols:[["staff_id","Mã"],["full_name","Họ tên"],["role","Vai trò","enum"],["phone","SĐT"],["email","Email"],["branch","Cơ sở","enum"],["status","Trạng thái","chip"]]},
 nhanvien:{code:"DL01",filt:"status",ro:1,sub:"Toàn bộ nhân sự (DL01)",act:[{lb:"Xem nhanh",ic:"ti-eye",fn:"openNSQuick",arg:"staff_id"}],
  cols:[["staff_id","Mã"],["full_name","Họ tên"],["role","Vai trò","enum"],["department","Bộ phận"],["email","Email"],["reports_to_name","Quản lý"],["status","Trạng thái","chip"]]},
-nhaplead:{code:"DL02",filt:"lead_status",act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"lead_id"},{lb:"Ghi liên hệ",ic:"ti-phone",fn:"openLienhe",arg:"lead_id"},{lb:"Xem nhanh",ic:"ti-eye",fn:"openQuick",arg:"lead_id"}],
+/* V9.42: mọi danh sách khác đều có dòng `sub` nói rõ nó là bảng nào, riêng bảng lead thì không -
+   người mới mở ra không biết mình đang xem DL02 hay một bảng lọc sẵn nào đó. */
+nhaplead:{code:"DL02",filt:"lead_status",sub:"Khách tiềm năng (DL02) - lọc theo trạng thái, nguồn, nhân viên phụ trách",act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"lead_id"},{lb:"Ghi liên hệ",ic:"ti-phone",fn:"openLienhe",arg:"lead_id"},{lb:"Xem nhanh",ic:"ti-eye",fn:"openQuick",arg:"lead_id"}],
  cols:[["lead_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["lead_created_time","Vào hệ thống"],["lead_status","Trạng thái","chip"],["contact_count","Lượt LH"],["next_followup_time","Hẹn liên hệ"],["assigned_to_name","NV phụ trách"],["next_action","Việc cần làm","na"]],
  form:[["full_name","Họ tên",0,1],["phone_number","SĐT",0,1],["zalo_id","Zalo (SĐT/nick)",0],["lead_source","Nguồn","enum_lead_source",1],["student_type","Đối tượng","enum_student_type"],["learning_goal","Mục tiêu học","enum_learning_goal_type"],["target_band","Điểm mục tiêu"],["learning_mode","Hình thức","enum_learning_mode"],["expected_start_time","Dự kiến bắt đầu"],["availability_schedule","Lịch rảnh"],["lead_qualification_status","Mức đủ ĐK","enum_lead_qualification_status"],["branch","Cơ sở","enum_branch"],["lead_note","Ghi chú trao đổi","ta"]],idp:"L-2026-"},
 lienhe:{code:"DL02b",filt:"channel",
@@ -2282,9 +2291,18 @@ function calcTab(){
   T[c].don++;T[c].tien+=num(e.final_fee)||num(e.total_fee)});
  _ccV=DVER;return (_ccC=T)}
 function calcCol(k,r,sheet){
- if(sheet!=="DL05")return 0;
- var t=calcTab()[String(r.course_id||"")]||{don:0,tien:0};
- return k==="__don"?t.don:(k==="__dt"?t.tien:0)}
+ if(sheet==="DL05"){
+  var t=calcTab()[String(r.course_id||"")]||{don:0,tien:0};
+  return k==="__don"?t.don:(k==="__dt"?t.tien:0)}
+ /* V9.42 - bảng BC1 của SOP liệt kê chín cột cho danh sách học viên nguy cơ; app thiếu ba cột
+    QUAN TRỌNG NHẤT vì chúng không nằm sẵn trong DL09 mà phải ĐẾM từ bảng khác: vắng mấy buổi,
+    thiếu mấy bài, lần cuối có hoạt động là bao giờ. Không có ba con số này thì cờ "nguy cơ" chỉ
+    là một cái nhãn - người trực ca không biết nặng nhẹ ra sao để chọn mức can thiệp. */
+ if(sheet==="DL09"){
+  var A=riskAuto(r.student_id)||{abs:0,miss:0};
+  if(k==="__vang")return A.abs||0;
+  if(k==="__thieubai")return A.miss||0;}
+ return 0}
 function cell(r,col,sheet){var k=col[0],ty=col[2],v=r[k];
  /* V9.22: tang CHE TRUONG - thay dong nhung che o nhay cam (tien / SDT / noi dung tu van) */
  if(dsMaskField(k))return '<span class="mut" title="Truong nay bi an theo phan quyen cua chuc danh ban">&#8226;&#8226;&#8226;</span>';
@@ -2297,7 +2315,14 @@ function cell(r,col,sheet){var k=col[0],ty=col[2],v=r[k];
  if(ty==="calc"||ty==="calcmoney"){
   var cv=calcCol(k,r,sheet);
   if(ty==="calcmoney")return cv?money(cv):'<span class="chip red">chưa bán được đồng nào</span>';
+  if(ty==="calcso")return cv?('<b style="color:var(--red)">'+cv+'</b>'):'<span class="mut">0</span>';
   return cv?('<b>'+cv+'</b>'):'<span class="chip red">0 đơn</span>'}
+ /* "lâu chưa" - mốc thời gian đọc thành "3 ngày trước", vì con số ngày mới là thứ dùng để quyết
+    định, còn chuỗi 29/07/2026 14:05 thì người đọc phải tự trừ trong đầu. */
+ if(ty==="lau"){var dd=pvnd(v);if(!dd)return '<span class="chip red">chưa có hoạt động nào</span>';
+  var ng=Math.floor((Date.now()-dd.getTime())/864e5);
+  var lim=num(paramOf("slaActivity_inactive_days",7));
+  return '<span class="'+(ng>lim?'chip red':'mut')+'" title="'+esc(String(v))+'">'+(ng<=0?"hôm nay":(ng+" ngày trước"))+'</span>'}
  if(ty==="na"){                       /* việc cần làm: tra CH4 theo trạng thái THẬT, không đọc chữ lưu sẵn */
   var live=sheet?naLive(sheet,r):v;
   if(!live)return"<span class=mut>-</span>";
@@ -2379,7 +2404,7 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
  data.forEach(function(r){var id=esc(String(r[pk]||""));h+='<tr>';
   cols.forEach(function(c){
     if(!cfg.ro&&cfg.filt&&c[0]===cfg.filt&&ENUMMAP[cfg.filt]&&ENUM[ENUMMAP[cfg.filt]]){h+='<td>'+qsel(key,id,cfg.filt,r[c[0]])+'</td>';return}
-    var lk=(c[2]==="chip"||c[2]==="enum"||c[2]==="money"||c[2]==="na")?null:cellLnk(r,c,cfg);
+    var lk=(c[2]==="chip"||c[2]==="enum"||c[2]==="money"||c[2]==="na"||c[2]==="calcso"||c[2]==="lau")?null:cellLnk(r,c,cfg);
     if(lk){h+='<td>'+lk+'</td>';return}
     h+='<td'+(c[2]==="money"?' style="text-align:right;font-variant-numeric:tabular-nums"':'')+'>'+cell(r,c,cfg.code)+'</td>'});
   h+='<td><div class="rowact">'+rowSlaBtn(r,pk)+(cfg.ro?'':'<button class="btn sm" onclick="openEdit(\''+key+'\',\''+id+'\')"><i class="ti ti-edit"></i>Sửa</button>')+
@@ -3285,29 +3310,131 @@ function bizGuard(sheet,o,opt){opt=opt||{};
    if(Math.abs(avg-ov)>0.5)return "Điểm tổng "+ov+" lệch trung bình 4 kỹ năng ("+avg+"). Kiểm lại điểm.";}}
  return ""}
 
-/* ---------- KPI catalog ---------- */
-function kpiAll(){
- var L=scopeList("DL02",rows("DL02")),S=rows("DL09"),E=rows("DL06"),C=rows("DL17"),H=scopeList("DL13",rows("DL13")),T=scopeList("DL03",rows("DL03")),W=scopeList("DL14",rows("DL14")),F=rows("DL07");
- function rk(v){return /at_risk|off_track/.test(ecode(v))}
+/* ═══════════ V9.42 - BẢNG VIỆC CỦA TÔI (BC5-BC9 của SOP) ═══════════════════════════════
+   SOP có NĂM bảng việc theo chức danh: BC5 NV Tư vấn · BC6 NV WOW · BC7 Giảng viên ·
+   BC8 Học vụ · BC9 Quản lý. Mỗi bảng quy định ĐÚNG BỐN con số phải nhìn thấy đầu ca, kèm
+   một danh sách việc chính.
+
+   App trước đây có `kpiAll()` (14 ô) và `ROLEKPI` (ô nào cho vai nào) trông rất giống thứ này -
+   nhưng đo bằng máy thì CẢ HAI CHƯA BAO GIỜ ĐƯỢC GỌI. Hai khối code chết nằm im 9 phiên bản,
+   đọc mã thì tưởng có, chạy thật thì không màn nào hiện. Đây đúng loại sót nguy hiểm nhất: nó
+   không đỏ, nó chỉ vắng mặt.
+   Và khi đối chiếu nội dung, bảng chết đó cũng SAI so với SOP: giảng viên được đưa ô "Test chờ
+   chấm" (việc của NV WOW), học vụ được đưa ô "Bài tập chưa chấm" (việc của giảng viên), còn ô
+   "Cần viết teacher_note" - việc SLA quan trọng nhất của giảng viên - thì không có. Vừa thiếu
+   vừa dư, đúng hai chữ anh Luân dặn.
+
+   Nay: một khối duy nhất, số lấy đúng theo SOP, mỗi ô BẤM ĐƯỢC để nhảy tới danh sách đã lọc,
+   và mỗi ô có phụ chú nói ngưỡng SOP là bao nhiêu (chip bánh răng mở thẳng ô cấu hình).
+   Khối này tự hiện ở TRANG ĐÁP của từng chức danh - không phải chép vào từng trang. */
+function bvSoLuong(fn){try{var n=fn();return isNaN(n)?0:n}catch(e){return 0}}
+function bvTest(){return scopeList("DL03",rows("DL03"))}
+function bvSes(){return scopeList("DL11",rows("DL11"))}
+function BANGVIEC(){
+ var T=bvTest(),W=scopeList("DL14",rows("DL14")),S=scopeList("DL09",rows("DL09")),
+     E=rows("DL06"),KN=scopeList("DL17",rows("DL17")),FB=scopeList("DL16",rows("DL16")),
+     OB=scopeList("DL08",rows("DL08")),HW=scopeList("DL13",rows("DL13")),SE=bvSes();
+ function dsTest(f){return T.filter(f).length}
+ var wDay=W.filter(function(w){return isc(w.wow_status,"completed")});
+ var wImp=wDay.filter(function(w){return isc(w.wow_outcome,"improved")});
  return {
-  newlead:{n:L.filter(function(r){return/^(new|contacted)/.test(ecode(r.lead_status))}).length,l:"Lead đang khai thác",cls:"blue",ic:"ti-user-plus"},
-  urgent:{n:L.filter(function(r){return naCls(r.next_action)==="red"}).length,l:"Lead cần gọi gấp",cls:"red",ic:"ti-phone-call"},
-  consider:{n:L.filter(function(r){return/considering/.test(ecode(r.lead_status))}).length,l:"Lead đang cân nhắc",cls:"amber",ic:"ti-clock"},
-  convert:{n:L.filter(function(r){return/converted/.test(ecode(r.lead_status))}).length,l:"Đã chuyển đổi",cls:"green",ic:"ti-user-check"},
-  risk:{n:S.filter(function(r){return rk(r.attendance_progress_status)||rk(r.academic_progress_status)}).length,l:"Học viên nguy cơ",cls:"red",ic:"ti-user-exclamation"},
-  onboard:{n:rows("DL08").filter(function(r){return!/completed/.test(ecode(r.onboarding_status))}).length,l:"Onboarding chưa xong",cls:"amber",ic:"ti-layout-grid-add"},
-  approve:{n:E.filter(function(r){return num(r.discount_amount)>=1000000&&!r.discount_approved_by}).length,l:"Chiết khấu chờ duyệt",cls:"amber",ic:"ti-discount"},
-  debt:{n:E.filter(function(r){return num(r.remaining_amount)>0}).length,l:"Đăng ký còn nợ phí",cls:"amber",ic:"ti-cash"},
-  complaint:{n:C.filter(function(r){return!/resolved/.test(ecode(r.complaint_status))}).length,l:"Khiếu nại đang mở",cls:"red",ic:"ti-message-circle"},
-  ungraded:{n:H.filter(function(r){return/assigned|submitted|pending/.test(ecode(r.homework_status))}).length,l:"Bài tập chưa chấm",cls:"amber",ic:"ti-book"},
-  testpend:{n:T.filter(function(r){return/pending/.test(ecode(r.test_status))}).length,l:"Test chờ chấm",cls:"amber",ic:"ti-file-text"},
-  wowbook:{n:W.filter(function(r){return/booked|scheduled/.test(ecode(r.wow_status))}).length,l:"Buổi WOW sắp tới",cls:"blue",ic:"ti-star"},
-  unverified:{n:F.filter(function(r){return!r.verified_by}).length,l:"Giao dịch chờ xác nhận",cls:"amber",ic:"ti-receipt"},
-  classes:{n:scopeList("DL10",rows("DL10")).length,l:"Lớp đang vận hành",cls:"blue",ic:"ti-users-group"}}}
-var ROLEKPI={sales:["newlead","urgent","consider","convert"],smanager:["newlead","convert","approve","debt"],
- academic:["risk","onboard","complaint","ungraded"],amanager:["risk","onboard","complaint","classes"],
- teacher:["classes","ungraded","risk","testpend"],wow:["wowbook","testpend","risk","convert"],
- accountant:["debt","unverified","approve","convert"],ceo:["newlead","convert","risk","debt","approve","complaint"],all:["newlead","urgent","risk","debt","approve","complaint"]};
+ tuvan:{bc:"BC5",t:"Bảng NV Tư vấn",d:"Việc hàng ngày: lead mới - chăm lead - test sắp tới - tư vấn sau test.",
+  o:[["ti-user-plus",dsLead("new"),"Lead mới (chưa LH)","#3B82C4","SLA gọi "+slaChip("slaLRT_minutes",15,"phút"),"goTS('lead')"],
+     ["ti-phone",dsLead("work"),"Lead đang khai thác","#B58A2B","đang chăm sóc","goTS('lead')"],
+     ["ti-file-text",dsTest(function(r){return isc(r.booking_status,"booked")&&!isc(r.test_status,"graded")}),"Test sắp tới","#6B4FA0","chuẩn bị tư vấn sau test","goTS('test')"],
+     ["ti-messages",dsTest(function(r){return num(r.overall_score)>0&&!isc(r.post_test_status,"consulted")}),"Tư vấn cần làm","#E24B4A","CVT "+slaChip("slaCVT_hours",24,"giờ"),"goTS('tuvan')"]]},
+ wow:{bc:"BC6",t:"Bảng NV WOW",d:"Việc của NV WOW: chấm test, viết academic_note, dạy buổi WOW 1-1.",
+  o:[["ti-file-text",dsTest(function(r){return isc(r.test_attendance_status,"on_time","late")&&!isc(r.test_status,"graded")}),"Test chờ chấm","#E24B4A","SLA chấm "+slaChip("slaGLA_hours",24,"giờ"),"goTS('test')"],
+     ["ti-checkbox",dsTest(function(r){return num(r.overall_score)>0}),"Test đã chấm","#16A34A","đã có điểm tổng","goTS('test')"],
+     ["ti-star",W.filter(function(r){return isc(r.wow_status,"booked","confirmed","scheduled")}).length,"WOW sắp tới","#3B82C4","buổi đã đặt","goHT('wow')"],
+     ["ti-trending-up",wDay.length?Math.round(wImp.length/wDay.length*100)+"%":"—","WOW có tiến bộ","#6B4FA0","WOR mục tiêu "+kpiChip(/^WOR/,0.6,1),"goHT('wow')"]]},
+ giaovien:{bc:"BC7",t:"Bảng Giảng viên",d:"Việc của giảng viên: buổi học, nhận xét buổi, bài tập, học viên yếu.",
+  o:[["ti-calendar-check",SE.filter(function(r){return isc(r.session_status,"completed")}).length,"Buổi đã hoàn thành","#16A34A","mọi lớp đang phụ trách","goHT('buoihoc')"],
+     /* Nhận xét buổi nằm ở has_teacher_note + teacher_note_summary, KHÔNG có cột teacher_note.
+        Gõ nhầm tên cột thì ô này báo 100% buổi thiếu nhận xét mà không ai nghi ngờ - nên hỏi
+        thẳng bhState(), là chỗ DUY NHẤT trong app biết luật này. */
+     ["ti-notes",SE.filter(function(r){var st=bhState(r);return st.done&&!st.note}).length,"Cần viết nhận xét buổi","#E24B4A","SLA "+slaChip("slaTeacherNote_hours",48,"giờ"),"goHT('buoihoc')"],
+     ["ti-book",HW.filter(function(r){return isc(r.homework_status,"submitted")&&!String(r.graded_at||"").trim()}).length,"Bài tập chờ chấm","#B58A2B","SLA "+slaChip("slaHomeworkGrading_hours",120,"giờ"),"go('baitap')"],
+     ["ti-user-exclamation",S.filter(stuAca).length,"HV nguy cơ học thuật","#6B4FA0","cần đặt WOW kèm","goRisk()"]]},
+ hocvu:{bc:"BC8",t:"Bảng Học vụ",d:"Việc của học vụ: xếp lớp - nhập học, học viên nguy cơ, phản hồi, khiếu nại.",
+  o:[["ti-layout-grid-add",OB.filter(function(r){return !isc(r.onboarding_status,"completed")}).length,"Nhập học chưa xong","#B58A2B","SLA "+slaChip("slaOBT_hours",48,"giờ"),"go('xeplop')"],
+     ["ti-user-exclamation",S.filter(stuRisk).length,"Học viên nguy cơ","#E24B4A","hai trục, có thể trùng","goRisk()"],
+     ["ti-message-2",FB.filter(function(r){return !String(r.classified_at||"").trim()}).length,"Phản hồi chờ phân loại","#3B82C4","SLA "+slaChip("slaFeedbackClassify_hours",24,"giờ"),"goCS('phanhoi')"],
+     ["ti-alert-triangle",KN.filter(function(r){return !isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại đang xử lý","#6B4FA0","SLA phân công "+slaChip("slaComplaintFirstResponse_hours",4,"giờ"),"goCS('khieunai')"]]},
+ quanly:{bc:"BC9",t:"Bảng Quản lý",d:"Việc cần cấp quản lý gật đầu, theo bảng phân quyền CH3.",
+  o:[["ti-discount-2",E.filter(function(r){return num(r.discount_amount)>=num(paramOf("thresholdDiscount_approval",1000000))&&!String(r.discount_approved_by||"").trim()}).length,"Chiết khấu cần duyệt","#B58A2B","từ "+money(num(paramOf("thresholdDiscount_approval",1000000)))+" trở lên","goDuyet('duyetck')"],
+     ["ti-transfer",OB.filter(function(r){return num(r.placement_change_count)>=2}).length,"Đổi lớp từ 2 lần","#6B4FA0","cần quản lý phê duyệt","go('xeplop')"],
+     ["ti-alert-triangle",KN.filter(function(r){return isc(r.complaint_severity,"high")&&!isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại mức CAO","#E24B4A","quản lý tham gia trong "+slaChip("slaComplaintHigh_hours",4,"giờ"),"goCS('khieunai')"],
+     ["ti-arrow-up-right",KN.filter(function(r){return String(r.escalated_to||"").trim()&&!isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại đã leo thang","#DB2777","HV không chấp nhận cách xử lý","goCS('khieunai')"],
+     /* SOP liệt kê 4 ô ở BC9, nhưng CH3 còn giao cho quản lý việc "Xác nhận hoàn tiền" - việc đó
+        CÓ hàng chờ đếm được, nên phải nhìn thấy chứ không để nằm khuất trong hub Chờ duyệt. */
+     ["ti-arrow-back-up",E.filter(function(r){return isc(r.enrollment_status,"cancelled")&&num(r.paid_amount)>0&&!rows("DL07").some(function(p){return String(p.enrollment_id||"")===String(r.enrollment_id||"")&&num(p.amount)<0})}).length,"Hoàn tiền chờ duyệt","#B58A2B","SLA "+slaChip("slaRefundProcess_days",7,"ngày"),"goDuyet('duyethoan')"]]},
+ /* SOP không có bảng cho nhóm hỗ trợ (HR, IT, bảo vệ) - họ chỉ chạm vào module Giao việc.
+    Bốn ô này em bổ sung để họ mở app cũng thấy ngay việc của mình, không phải đi tìm. */
+ hotro:{bc:"bổ sung",t:"Bảng việc của tôi",d:"Nhóm hỗ trợ chỉ làm việc qua module Giao việc - đây là bốn con số của bạn.",
+  o:[["ti-inbox",gvSo("new"),"Việc mới chờ nhận","#3B82C4","bấm Nhận để bắt đầu","go('giaoviec')"],
+     ["ti-player-play",gvSo("doing"),"Đang làm","#B58A2B","đã nhận, chưa báo xong","go('giaoviec')"],
+     ["ti-alert-triangle",gvSo("late"),"Quá hạn","#E24B4A","cần báo lại người giao","go('giaoviec')"],
+     ["ti-check",gvSo("done"),"Chờ người giao xác nhận","#16A34A","đã báo xong","go('giaoviec')"]]},
+ /* SOP không có bảng riêng cho Kế toán - em bổ sung, vì họ là chức danh có cửa ghi tiền. */
+ ketoan:{bc:"bổ sung",t:"Bảng Kế toán",d:"SOP chưa có bảng cho kế toán - đây là phần em bổ sung, giữ đúng tinh thần bốn con số đầu ca.",
+  o:[["ti-cash",E.filter(function(r){return num(r.remaining_amount)>0&&!isc(r.enrollment_status,"cancelled")}).length,"Đơn còn nợ phí","#B58A2B","nhắc trước hạn "+slaChip("installmentRemind_days",3,"ngày"),"goTS('thanhtoan')"],
+     ["ti-receipt",rows("DL07").filter(function(r){return !String(r.verified_by||"").trim()}).length,"Phiếu thu chờ đối soát","#3B82C4","kế toán xác nhận","goDuyet('duyetthu')"],
+     ["ti-arrow-back-up",E.filter(function(r){return isc(r.enrollment_status,"cancelled")&&num(r.paid_amount)>0&&!rows("DL07").some(function(p){return String(p.enrollment_id||"")===String(r.enrollment_id||"")&&num(p.amount)<0})}).length,"Hoàn tiền chờ duyệt","#E24B4A","SLA "+slaChip("slaRefundProcess_days",7,"ngày"),"goDuyet('duyethoan')"],
+     ["ti-discount-2",E.filter(function(r){return num(r.discount_amount)>0&&!String(r.discount_approved_by||"").trim()}).length,"Chiết khấu chờ duyệt","#6B4FA0","kế toán chỉ xác nhận và làm theo","goDuyet('duyetck')"]]}}}
+/* Số việc được giao cho tôi, theo trạng thái - dùng cho bảng của nhóm hỗ trợ. */
+function gvSo(k){var me=CURSTAFF||"";
+ var L=rows("DL23").filter(function(t){return String(t.assignee_id||"")===me});
+ if(k==="new")return L.filter(function(t){return isc(t.task_status,"new")}).length;
+ if(k==="doing")return L.filter(function(t){return isc(t.task_status,"accepted")}).length;
+ if(k==="done")return L.filter(function(t){return isc(t.task_status,"done")}).length;
+ return L.filter(function(t){var d=pvnd(t.due_time);
+  return d&&d.getTime()<Date.now()&&!isc(t.task_status,"done","confirmed","declined")}).length}
+function dsLead(k){var L=scopeList("DL02",rows("DL02"));
+ if(k==="new")return L.filter(function(r){return isc(r.lead_status,"new")&&!String(r.first_call_time||"").trim()}).length;
+ return L.filter(function(r){return isc(r.lead_status,"contacted","considering")}).length}
+function goTS(t){window.TSTAB=t;go("tuyensinh")}
+function goHT(t){window.HTTAB=t;go("hoctap")}
+function goCS(t){window.CSTAB=t;go("cskh")}
+function goDuyet(t){window.DUYTAB=t;go("duyet")}
+function goRisk(){fset("hocvien","risk");go("hocvien")}
+/* Chức danh nào đáp vào trang nào thì bảng của họ hiện ở đó - khai MỘT chỗ, không chép vào 6 trang. */
+var BVLAND={tuvan:["banlam",null],marketing:["tuyensinh","lead"],hocvu:["xeplop",null],
+ giaovien:["hoctap","today"],wow:["hoctap","wow"],ketoan:["tuyensinh","thanhtoan"],
+ hotro:["banlam",null],dieuhanh:["baocao",null],quantri:["banlam",null]};
+/* Nhóm vai -> bảng việc của chính nhóm đó. Marketing dùng chung bảng tuyển sinh (SOP không tách). */
+function bvKhoi(g){g=g||(SCOPE().group||"quantri");
+ if(g==="marketing")g="tuvan";
+ if(g==="dieuhanh"||g==="quantri")return "quanly";
+ return g}
+/* Mỗi ô "chờ duyệt" gắn với MỘT hành động trong bảng CH3 - ai sở hữu hành động đó mới thấy ô đó.
+   Trước bản này mọi trưởng phòng đều thấy cả bốn ô duyệt, kể cả TP Marketing thấy ô khiếu nại. */
+var BVDUYET=[["ck_lon",0],["doilop2",1],["kn_duyet",2],["kn_duyet",3],["hoantien",4]];
+function bvStrip(t,bc,d,o,tour){
+ if(!o.length)return "";
+ return '<div class="sechd"'+(tour?' data-tour="'+tour+'"':'')+'>'+esc(t)+
+  ' <span style="font-weight:600;text-transform:none;letter-spacing:0" class="mut">· '+esc(bc)+'</span></div>'+
+  '<div class="fhint" style="margin:-4px 0 8px">'+esc(d)+' Bấm vào một ô để mở đúng danh sách.</div>'+
+  statStrip(o)}
+function bangViecHTML(){
+ var rs=SCOPE(),g=rs.group||"quantri";
+ var L=BVLAND[g];if(!L||CUR!==L[0])return "";
+ if(L[1]){var tb=(L[0]==="tuyensinh")?window.TSTAB:(L[0]==="hoctap"?window.HTTAB:null);
+  if(tb&&tb!==L[1])return ""}
+ var T=BANGVIEC(),h="";
+ var B=T[bvKhoi(g)];
+ if(B)h+=bvStrip(B.t,"theo "+B.bc+" của SOP",B.d,B.o,"bangviec");
+ /* Quản lý: BẢNG CỦA NHÓM MÌNH TRƯỚC, rồi mới tới phần chờ mình gật đầu - và chỉ những việc
+    mà bảng phân quyền CH3 giao cho nhóm mình. Trưởng phòng vẫn là người của nhóm đó. */
+ if(rs.mgr&&T.quanly){
+  /* Không lặp ô: kế toán trưởng đã thấy "Hoàn tiền" trong bảng nhóm rồi thì đừng hiện lại. */
+  var daCo={};(B?B.o:[]).forEach(function(t){daCo[String(t[2])]=1});
+  var o=BVDUYET.filter(function(x){return canAct(x[0])}).map(function(x){return T.quanly.o[x[1]]})
+   .filter(function(t){return t&&!daCo[String(t[2])]});
+  var chua={};o=o.filter(function(t){if(chua[t[2]])return false;chua[t[2]]=1;return true});
+  h+=bvStrip("Chờ bạn phê duyệt","theo BC9 và bảng phân quyền CH3",
+   "Chỉ hiện những việc mà CH3 giao cho chức danh của bạn.",o,"bangduyet")}
+ return h}
 
 /* ---------- custom pages ---------- */
 /* Tổng quan đã GỘP vào Báo cáo & KPI - giữ khóa trang cũ để mọi liên kết cũ vẫn chạy */
@@ -7576,6 +7703,8 @@ function renderBaocao(){
  h+=bizSection();
  h+=upcomingSection();
  h+=kpiSection();
+ /* V9.42 - VH11 của SOP: ai đang ôm bao nhiêu việc. Đặt ở Báo cáo vì đây là câu hỏi của quản lý. */
+ h+='<div class="sechd">Khối lượng việc theo nhân viên · VH11</div>'+khoiLuongHTML();
  // funnel with stage conversion
  function uniqLead(code){var m={};rows(code).forEach(function(x){if(x.lead_id)m[x.lead_id]=1});return Object.keys(m).length}
  var funnel=[["Lead",L.length],["Đặt test",uniqLead("DL03")],["Tư vấn",uniqLead("DL04")],["Đăng ký",E.length],["Đang học",S.filter(function(r){return/active|studying/.test(ecode(r.student_status))}).length]];
@@ -8916,7 +9045,10 @@ function pageHead(t,s,btn){/* UX-23: tiêu đề đã có ở topbar (#pgTitle) 
     Nếu về sau cần nhúng dữ liệu người dùng vào đây thì phải esc() TẠI CHỖ GỌI. */
  /* V9.29x: NEO cho hướng dẫn. Bài hướng dẫn trỏ vào "@phead" chứ không vào ".phead" - đổi tên
     lớp CSS thì neo vẫn còn, mà neo là thứ duy nhất giữ cho 55 bước hướng dẫn không chết. */
- return '<div class="phead nohd" data-tour="phead"><div><div class="s" style="margin-top:0">'+s+'</div></div><div class="sp">'+(btn||"")+'</div></div>'}
+ /* V9.42: BẢNG VIỆC CỦA TÔI (BC5-BC9) gắn ngay sau đầu trang - gắn ở ĐÂY, một chỗ dùng chung,
+    chứ không chép vào sáu trang đáp. Nó tự biết im lặng ở trang không phải trang đáp của mình. */
+ var bv="";try{bv=bangViecHTML()}catch(e){bv=""}
+ return '<div class="phead nohd" data-tour="phead"><div><div class="s" style="margin-top:0">'+s+'</div></div><div class="sp">'+(btn||"")+'</div></div>'+bv}
 /* ===== THANH CÔNG CỤ CHUẨN =====
    segHTML(cur, opts, onTpl): opts = [mã, nhãn, (số đếm), (lớp màu)]; onTpl chứa {k} để thay mã.
    tbar(parts): ghép [tìm] [chip phân đoạn] ... đẩy [số dòng][Cột][nút] về BÊN PHẢI. */
@@ -11873,6 +12005,48 @@ function gvTaiRows(){
    lop:Object.keys(m.lop).length,noi:Object.keys(m.cs).length,
    tnr:m.coNX?Math.round(m.xongNX/m.coNX*100):null}})
   .sort(function(a,b){return b.toi-a.toi||b.daDay-a.daDay})}
+/* ═══════════ V9.42 - VH11: KHỐI LƯỢNG VIỆC THEO NHÂN VIÊN (toàn đội) ═══════════════════
+   SOP có màn VH11 "Khối lượng việc hiện tại theo NV": mỗi nhân viên đang GIỮ bao nhiêu việc,
+   chia theo lead - test chấm - tư vấn - onboarding - khiếu nại. App đã có bảng tải GIẢNG VIÊN
+   (P4) nhưng chỉ cho khối giảng dạy; người tư vấn, học vụ, WOW thì không có chỗ nào so ngang.
+   Thiếu màn này thì quản lý không trả lời được câu hỏi cơ bản nhất của một ca trực: ai đang
+   quá tải, ai đang rảnh, giao việc mới cho ai. */
+function khoiLuongRows(){
+ var L=rows("DL02"),T=rows("DL03"),C=rows("DL04"),OB=rows("DL08"),KN=rows("DL17"),TK=rows("DL23");
+ function mo(r,f){return !isc(r[f],"resolved","closed","completed")}
+ return rows("DL01").filter(staffActive).map(function(nv){
+  var id=String(nv.staff_id||"");
+  var lead=L.filter(function(r){return String(r.assigned_to||"")===id&&!isc(r.lead_status,"converted","rejected","lost")}).length;
+  var cham=T.filter(function(r){return String(r.graded_by||"")===id&&!isc(r.test_status,"graded")}).length
+   +T.filter(function(r){return !String(r.graded_by||"").trim()&&mapRoleCode(ecode(nv.role))==="wow"&&isc(r.test_attendance_status,"on_time","late")&&!isc(r.test_status,"graded")}).length;
+  var tuvan=C.filter(function(r){return String(r.consulted_by||"")===id&&!isc(r.consultation_status,"consulted")}).length;
+  var ob=OB.filter(function(r){return String(r.assigned_by||"")===id&&!isc(r.onboarding_status,"completed")}).length;
+  var kn=KN.filter(function(r){return String(r.assigned_handler||"")===id&&mo(r,"complaint_status")}).length;
+  var giao=TK.filter(function(r){return String(r.assignee_id||"")===id&&!isc(r.task_status,"done","confirmed","declined")}).length;
+  return {id:id,ten:nv.full_name||id,vai:elabel(nv.role)||"-",br:elabel(nv.branch)||"-",
+   lead:lead,cham:cham,tuvan:tuvan,ob:ob,kn:kn,giao:giao,tong:lead+cham+tuvan+ob+kn+giao}})
+  .filter(function(x){return x.tong>0||/sales|academic|wow|teacher/.test(vnorm(x.vai))})
+  .sort(function(a,b){return b.tong-a.tong})}
+function khoiLuongHTML(){
+ var L=khoiLuongRows();
+ if(!L.length)return "";
+ var tong=L.reduce(function(a,x){return a+x.tong},0);
+ var deu=L.length?tong/L.length:0;
+ var top=L[0],trong=L.filter(function(x){return !x.tong}).length;
+ var h='<div class="panel" style="margin-top:14px" data-tour="khoiluong"><div class="ph"><b><i class="ti ti-users" style="margin-right:6px"></i>Khối lượng việc theo nhân viên</b>'+
+  '<span class="mut" style="font-size:11.5px">'+tong+' việc đang mở · chia đều là '+(Math.round(deu*10)/10)+' việc/người'+
+  (top&&tong?(' · nhiều nhất '+esc(top.ten)+' giữ '+top.tong+' việc'):'')+
+  (trong?(' · '+trong+' người đang trống'):'')+'</span></div>'+
+  '<div class="fhint" style="padding:0 14px 6px">Theo màn VH11 của SOP. Chỉ đếm việc CÒN MỞ - đã xong thì không tính. Bấm tên để mở hồ sơ nhân viên.</div>'+
+  '<div class="tbwrap"><table class="dt"><thead><tr><th>Nhân viên</th><th>Chức danh</th><th>Cơ sở</th>'+
+  '<th>Lead đang giữ</th><th>Test chờ chấm</th><th>Tư vấn dở</th><th>Nhập học dở</th><th>Khiếu nại</th><th>Việc được giao</th><th>Tổng</th></tr></thead><tbody>';
+ L.forEach(function(x){
+  var qt=x.tong>=Math.max(6,deu*1.8);
+  function o(n){return n?('<b>'+n+'</b>'):'<span class="mut">0</span>'}
+  h+='<tr><td><a class="lnk" onclick="openNV(\''+esc(x.id)+'\')">'+esc(x.ten)+'</a></td><td>'+esc(x.vai)+'</td><td>'+esc(x.br)+'</td>'+
+   '<td>'+o(x.lead)+'</td><td>'+o(x.cham)+'</td><td>'+o(x.tuvan)+'</td><td>'+o(x.ob)+'</td><td>'+o(x.kn)+'</td><td>'+o(x.giao)+'</td>'+
+   '<td>'+(qt?'<span class="chip red">'+x.tong+'</span>':'<b>'+x.tong+'</b>')+'</td></tr>'});
+ return h+'</tbody></table></div></div>'}
 function gvTaiHTML(){
  var L=gvTaiRows(),ky=gvTaiKy();
  var tong=L.reduce(function(a,x){return a+x.toi},0);

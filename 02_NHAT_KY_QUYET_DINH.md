@@ -149,7 +149,25 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.41 — PHỦ TRỌN SOP ĐO BẰNG MÁY ✅ XONG (29/07 tối).**
+> **Phiên bản: V9.42 — MÀN VH + BẢNG BC + BẢNG VIỆC THEO CHỨC DANH ✅ XONG (29/07 khuya).**
+> Anh Luân giao **việc D** kèm tám nguyên tắc (phủ trọn SOP · tối ưu hơn SOP nếu cần · dữ liệu mẫu
+> chuẩn · **trợ thủ và hướng dẫn riêng từng chức danh - "chức năng quan trọng nhất"** · phân quyền
+> vững, màn hình từng vị trí không thiếu không dư · cài đặt phủ toàn bộ và có hướng dẫn · các cổng
+> mượt và chuyên nghiệp · mọi thứ nối nhau không lỗ hổng).
+> **Đã xong V1 + V2** (chi tiết ở mục V9.42 cuối file):
+> · `check_sop.py` nay soi SOP **SÁU mặt** - thêm **12 màn vận hành VH0-VH11** và **9 bảng báo cáo
+> BC1-BC9**, vẽ thật mọi trang rồi soi.
+> · **BC5-BC9 chưa bao giờ tồn tại**: `kpiAll()` và `ROLEKPI` trong mã nguồn trông y hệt năm bảng
+> việc theo chức danh nhưng **chưa bao giờ được gọi** - code chết nằm im chín phiên bản. Nay có
+> `BANGVIEC()` đúng theo SOP, mỗi ô bấm được, quản lý thấy bảng nhóm mình + chỉ những việc CH3 giao.
+> · **VH11** (khối lượng việc theo NV), **3 cột BC1** (vắng buổi / thiếu bài / hoạt động cuối),
+> **VH3b** (chip lọc chỉ NV WOW) - trước đây sót.
+> · **`check_gs.py`**: bản Google Sheets đang ở V9.15, đọc 19 bảng trong khi app dùng 26 - khoảng
+> cách đó nay là BẢN KHAI, rộng thêm là đỏ.
+> **CÒN LẠI trong việc D:** V3 trợ thủ + hướng dẫn từng chức danh (anh Luân nói quan trọng nhất) ·
+> V4 cài đặt phủ toàn bộ + có hướng dẫn · V5 soi kỹ các cổng · V6 màn hình từng vị trí.
+>
+> **Phiên bản trước: V9.41 — PHỦ TRỌN SOP ĐO BẰNG MÁY ✅ XONG (29/07 tối).**
 > Anh Luân: *"e biến app thành hoàn hảo nhé, các cổng, giao diện, cài đặt, phân quyền, các chức
 > năng… logic và tính thực tế cực cao. Nếu sop chưa thoả đáng, e cứ sửa."*
 > **`check_sop.py` nay soi SOP gốc ở BỐN mặt, không còn soi bằng trí nhớ:**
@@ -3363,3 +3381,81 @@ phiếu thu cho mọi khoản tiền vừa ghi (`_lapPhieuThu`), rải lại l�
 (`_raiDot`), đếm lại sĩ số **sau** mọi khối gieo (§14vicies-b), và `check_data` so ngày xếp lớp
 với ngày khai giảng **theo NGÀY** thay vì theo giờ (xếp lớp 8h sáng đúng ngày khai giảng của lớp
 học 9h-12h đang bị kết oan).
+
+## V9.42 (29/07 khuya) - MÀN VẬN HÀNH VH + BẢNG BÁO CÁO BC, VÀ MỘT TÍNH NĂNG CHẾT 9 PHIÊN BẢN
+
+Anh Luân giao việc D và kèm tám nguyên tắc: phủ trọn SOP · tối ưu hơn cả SOP nếu cần · dữ liệu mẫu
+chuẩn · trợ thủ và hướng dẫn riêng từng chức danh (*"đây chính là chức năng quan trọng nhất"*) ·
+phân quyền vững, màn hình từng vị trí **không thiếu không dư** · cài đặt phủ toàn bộ và có hướng
+dẫn · các cổng phải mượt và chuyên nghiệp · mọi thứ nối nhau không lỗ hổng.
+
+Đợt này làm xong hai mảng đo được bằng máy: **V1 (VH + BC)** và **V2 (bản .gs)**.
+
+### Phát hiện nặng nhất: BC5-BC9 chưa bao giờ tồn tại, mà mã nguồn trông như đã có
+
+`kpiAll()` (14 ô chỉ số) và `ROLEKPI` (ô nào cho chức danh nào) nằm trong `gen_v5.py` từ lâu, đọc
+mã thì tưởng đó chính là năm bảng việc theo chức danh mà SOP mô tả. Đếm bằng máy: **cả hai chưa
+bao giờ được gọi** - `grep` ra đúng một lần xuất hiện, là dòng định nghĩa. Hai khối code chết nằm
+im chín phiên bản. Loại sót này không đỏ, nó chỉ **vắng mặt**.
+
+Và nội dung của bảng chết đó cũng sai so với SOP: giảng viên được đưa ô "Test chờ chấm" (việc của
+NV WOW), học vụ được đưa ô "Bài tập chưa chấm" (việc của giảng viên), còn **"Cần viết
+teacher_note"** - việc SLA quan trọng nhất của giảng viên - thì không có ô nào. Đúng hai chữ anh
+Luân dặn: vừa **thiếu** vừa **dư**.
+
+Nay có `BANGVIEC()` + `bangViecHTML()`: mỗi chức danh một bảng bốn ô theo đúng BC5-BC9, ô nào cũng
+**bấm được** để mở danh sách đã lọc, phụ chú ghi ngưỡng SOP kèm chip bánh răng mở thẳng ô cấu
+hình. Gắn **một chỗ** trong `pageHead()` chứ không chép vào sáu trang đáp.
+
+**Quản lý:** thấy bảng của **nhóm mình trước**, rồi mới tới dải "Chờ bạn phê duyệt" - và dải đó chỉ
+hiện những việc mà **CH3 giao cho nhóm mình**. Trước khi siết, mọi trưởng phòng đều thấy cả bốn ô
+duyệt, kể cả TP Marketing thấy ô khiếu nại. Đo lại sau khi sửa: TP Tư vấn 2 việc duyệt, TP Học vụ
+3, TP Kế toán 1, TP WOW 0, **TP Hỗ trợ 0**.
+
+Bổ sung ngoài SOP (khai rõ là bổ sung): **Bảng Kế toán** (SOP không có bảng cho chức danh giữ cửa
+ghi tiền) và **Bảng việc của tôi** cho nhóm hỗ trợ (HR/IT/bảo vệ chỉ chạm module Giao việc).
+
+### Ba chỗ khác SOP mô tả mà app còn sót
+
+- **VH11 "Khối lượng việc theo nhân viên"** - không có màn nào. App có bảng tải *giảng viên* (P4)
+  nhưng người tư vấn, học vụ, WOW thì không có chỗ so ngang. Thiếu nó thì quản lý không trả lời
+  được câu hỏi cơ bản nhất của một ca trực: ai quá tải, ai đang rảnh, giao việc mới cho ai. Nay có
+  bảng đếm **việc CÒN MỞ** theo sáu cột (lead · test chờ chấm · tư vấn dở · nhập học dở · khiếu nại
+  · việc được giao), đặt ở trang Báo cáo. Đo thật: 19 người, người nhiều nhất đang giữ 21 việc.
+- **BC1 danh sách học viên nguy cơ thiếu ba cột quan trọng nhất** - vắng mấy buổi, thiếu mấy bài,
+  hoạt động cuối là bao giờ. Ba cột này không nằm sẵn trong DL09 mà phải **đếm từ bảng khác**, nên
+  chúng bị bỏ qua. Không có ba con số đó thì cờ "nguy cơ" chỉ là một cái nhãn - người trực ca không
+  biết nặng nhẹ ra sao để chọn mức can thiệp. Nay có, cột "Hoạt động cuối" đọc thành "3 ngày trước"
+  và tự đỏ khi quá `slaActivity_inactive_days`.
+- **VH3b "Tra cứu NV WOW"** - app gộp chung danh sách Giảng viên (hợp lý hơn hai màn giống hệt
+  nhau) nhưng gộp mà **không có đường tách ra** thì đúng là làm sót màn đó. Nay hai chip lọc một
+  chạm: "Chỉ NV WOW" / "Chỉ giảng viên lớp".
+
+**Khai lý do có ý khác SOP:** BC4 tính theo **tháng lịch**, app dùng **cửa sổ 30 ngày gần nhất**.
+Cửa sổ trượt phản ánh đúng nhịp vận hành hơn - ngày mùng 2 mà báo cáo tháng thì chỉ có hai ngày dữ
+liệu. Khai vào `VHBC_BOQUA` chứ không lặng lẽ làm khác.
+
+### Bản chạy trên Google Sheets đang lạc hậu - nay là một con số được khai báo
+
+`ITTs_WebApp_v4.gs` sửa lần cuối 28/07 (V9.15); app đã tới V9.42. Nó đọc **19 bảng**, app dùng
+**26** - thiếu DL06b, DL19, DL20, DL21, DL22, DL23, DL24. Bộ quét nhắc việc theo lịch biết **10**
+ngưỡng SLA trong khi app có **92** mã nhắc việc. Và không bộ kiểm nào đụng tới file `.gs`, nên
+khoảng cách cứ rộng ra trong im lặng.
+
+Anh Luân đã chốt sẽ quyết nền tảng sau, nên đợt này **không đồng bộ** - việc của bộ kiểm là không
+để khoảng cách lớn thêm mà không ai biết. `_src/check_gs.py` (đã vào `verify.sh`) biến khoảng cách
+thành **bản khai**: thêm một bảng mới vào app mà không khai là **đỏ**. Đã bẻ lại để thử (thêm bảng
+DL99 giả) - nó đỏ đúng. Đầu file `.gs` nay có khối cảnh báo ghi rõ nó đứng ở phiên bản nào và ai
+đem đi deploy sẽ mất những gì.
+
+### Hai cái bẫy cắn thêm
+
+**(a) Bộ kiểm trigger cũng dính bệnh "trôi theo giờ".** NA049 (lead mới quá 15 phút chưa gọi) chỉ
+sống trong cửa sổ từ phút thứ 15 đến giờ thứ 4; NA032 (buổi WOW tới giờ mà chưa chốt) thì ngược
+lại, chỉ xuất hiện sau khi mốc giờ trôi qua. Chạy buổi chiều xanh, chạy buổi tối đỏ, không ai đụng
+vào mã. Nay NA049 kiểm bằng **dòng dựng sẵn** như NA050, còn NA032 gỡ khỏi danh sách bỏ qua vì app
+sinh ra thật - và dòng khai cũ của nó còn ghi sai (bảo là nhãn bài tập, thực ra là buổi WOW).
+
+**(b) Thêm icon mới mà quên dựng lại font.** `ti-arrow-up-right` cho ô "Khiếu nại đã leo thang" -
+`_tall.js` bắt đỏ ngay, đúng như đã sửa ở V9.40. Một lệnh `python3 build_icons.py` là xong. Luật
+này giờ tự bảo vệ được.

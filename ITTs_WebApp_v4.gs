@@ -5,6 +5,19 @@
  * Cac file khac (ITTs_XuLyDuLieu.gs, ITTs_Form_NhapLieu.gs) GIU NGUYEN.
  * Deploy: Trien khai > Quan ly ban trien khai > (but chi) > Phien ban MOI > Trien khai.
  *
+ * ====================================================================
+ * PHIEN BAN: V9.15 (28/07/2026) - FILE NAY DANG LAC HAU SO VOI APP.
+ * Ban offline (gen_v5.py) da di toi V9.42. File nay CHI DOC 19 BANG, app dung 26.
+ * Thieu: DL06b (lich dong hoc phi theo dot) - DL19 (lich lam viec WOW) - DL20 (kho bai tap)
+ *        DL21 (giao an) - DL22 (gioi thieu) - DL23/DL24 (module Giao viec).
+ * Ngoai ra file nay CHUA CO tang phan quyen CH3 (canAct/chanAct) - moi chan quyen o day van
+ * la muc TRANG, chua chan tai cua ghi.
+ * => Dem file nay len chay THAT thi se mat dung nhung phan vua lam, ma man hinh van hien
+ *    binh thuong. Truoc khi deploy phai dong bo, hoac chap nhan mat cac phan tren.
+ * Bo kiem `_src/check_gs.py` (nam trong ./verify.sh) canh cho khoang cach nay khong am tham
+ * rong them: them mot bang moi vao app ma khong khai o do la BAO DO.
+ * ====================================================================
+ *
  * Kien truc:
  *  - Doc: apiAllData() doc thang cac sheet DL that -> tra ve cho frontend.
  *  - Ghi: apiSave() sinh ma, keo cong thuc dong tren, chi ghi cot NHAP (bo cot cong thuc),

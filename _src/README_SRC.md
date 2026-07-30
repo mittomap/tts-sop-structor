@@ -40,7 +40,7 @@ ITTS_OUT="<mnt>/SOP ITTs" python3 gen_v5.py
 >
 > `_APP.js` / `_HV.js` sinh bằng `_src/extract_js.py` - **không** phải mã nguồn, đừng sửa.
 
-Bộ kiểm gồm **15 phần, phải xanh HẾT mới được giao** (~2.000 tiêu chí tự động + 466 lượt mở thật trong trình duyệt):
+Bộ kiểm gồm **16 phần, phải xanh HẾT mới được giao** (~2.000 tiêu chí tự động + 466 lượt mở thật trong trình duyệt):
 | Lệnh | Kỳ vọng |
 |---|---|
 | `node --check _APP.js` và `node --check _HV.js` | không báo gì |
@@ -57,7 +57,8 @@ Bộ kiểm gồm **15 phần, phải xanh HẾT mới được giao** (~2.000 t
 | `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` |
 | `python3 check_logic.py` | `KET QUA: DAT` - từ V9.40 script tách "lỗi thật" khỏi "ca cố ý" (việc quá hạn để demo cảnh báo đỏ, số này TRÔI theo ngày) và in một dòng kết luận ổn định |
 | `python3 check_data.py` | `KET QUA: DAT` |
-| `python3 check_sop.py` | `KET QUA: DAT` - **đối chiếu SOP gốc, bốn mặt**: 357 cột DL · 93 tình huống sổ trigger HD3 (chạy THẬT `naFor()` trên mọi dòng) · 51 chỉ số bảng BC2 (phải có cả công thức lẫn dòng ngưỡng CH6) · 31 hành động bảng phân quyền CH3 (đóng vai từng chức danh rồi hỏi lại `canAct`, và mỗi việc "Quản lý phê duyệt" phải có cửa ghi gọi `chanAct`). Chỗ nào cố ý không làm phải khai vào `BOQUA` / `TRIG_BOQUA` / `KPI_BOQUA` / `CH3_BOQUA` **kèm lý do đọc được** |
+| `python3 check_gs.py` | `KET QUA: DAT` - **bản chạy trên Google Sheets (.gs) có còn theo kịp app không**. Nó đang ở V9.15: đọc 19 bảng trong khi app dùng 26. Bộ kiểm biến khoảng cách đó thành BẢN KHAI (`BANG_THIEU`) - thêm bảng mới vào app mà không khai là đỏ. Không phải lời kêu "đồng bộ ngay"; là chốt chặn để khoảng cách không âm thầm rộng thêm |
+| `python3 check_sop.py` | `KET QUA: DAT` - **đối chiếu SOP gốc, sáu mặt**: 357 cột DL · 93 tình huống sổ trigger HD3 (chạy THẬT `naFor()` trên mọi dòng) · 51 chỉ số bảng BC2 (phải có cả công thức lẫn dòng ngưỡng CH6) · 31 hành động bảng phân quyền CH3 (đóng vai từng chức danh rồi hỏi lại `canAct`, và mỗi việc "Quản lý phê duyệt" phải có cửa ghi gọi `chanAct`) · **12 màn vận hành VH0-VH11 và 9 bảng báo cáo BC1-BC9** (vẽ THẬT mọi trang, mọi tab, mọi danh sách, cộng bảng việc của từng chức danh, rồi tìm chuỗi phải có). Chỗ nào cố ý không làm phải khai vào `BOQUA` / `TRIG_BOQUA` / `KPI_BOQUA` / `CH3_BOQUA` / `VHBC_BOQUA` **kèm lý do đọc được** |
 | `ITTS_OUT=<out> node _checkui.js` | `CHECKUI OK: da mo THAT 466 luot` - **kiểm thử trên trình duyệt thật** (cần `npm i playwright` một lần; máy không có Chromium thì tự BỎ QUA chứ không báo đỏ bậy) |
 
 **`_check15.js` sinh ra vì cả hai hội đồng thẩm định đều bỏ lọt cùng một lớp lỗi:** người rà

@@ -182,8 +182,6 @@ print("KET QUA COT: DAT - moi cot SOP mo ta deu duoc app dung, hoac da khai ly d
 # Khong soi ma nguon - soi ma nguon chi biet "co viet" chu khong biet "co chay".
 
 TRIG_BOQUA = {
-    "NA032": "Nhan trang thai trung gian cua bai tap - app dung NA031/NA033 cho hai dau (chua giao / "
-             "da cham), khong can nhan giua.",
     "NA037": "Nhan 'buoi WOW da ghi noi dung' - trang thai XONG.",
     "NA039": "Nhan 'khao sat da tra loi' - trang thai XONG.",
     "NA045": "Nhan 'khieu nai da dong' - trang thai XONG, con viec hoi lai HV thi da co luat rieng "
@@ -208,6 +206,13 @@ TRIG_BOQUA = {
 #   ma -> (bang, mo ta vi sao phai dung san, cac cot cua dong)
 #   gia tri {"__ago_min": n} = "n phut truoc", quy ra chuoi dd/mm/yyyy hh:mm luc chay.
 SYNTH = {
+    "NA049": ("DL02",
+              "Chi dung tu phut thu 15 den gio thu 4 sau khi lead vao (slaLRT_minutes -> "
+              "slaLeadReassign_hours). Cua so ba tieng ruoi nay khong the gieo tinh vao du lieu: "
+              "sang hom sau moi lead deu da qua han, va bo kiem do ma khong ai dung vao ma.",
+              {"lead_id": "L-PROBE49", "lead_status": "new (Mới)", "full_name": "Dong dung san",
+               "lead_created_time": {"__ago_min": 60}, "first_call_time": "",
+               "contact_count": 0, "next_followup_time": ""}),
     "NA050": ("DL02",
               "Chi dung trong 15 phut dau sau khi lead vao (slaLRT_minutes) - du lieu demo tinh "
               "khong the giu duoc cua so nay.",
@@ -503,5 +508,94 @@ if _ch3loi:
     print("KET QUA: KHONG DAT")
     sys.exit(1)
 
+print("KET QUA CH3: DAT")
+
+
+# ═══ PHAN 5+6: 12 MAN VAN HANH (VH0-VH11) VA 9 BANG BAO CAO (BC1-BC9) ════════════════
+# Bon phan tren canh DU LIEU, LUAT NHAC VIEC, CHI SO va QUYEN. Con thieu mot mat: SOP con mo ta
+# MAN HINH - 12 man tra cuu/hang cho o nhom VH va 9 bang bao cao o nhom BC. Do bang may lan dau:
+#   - VH11 "Khoi luong viec theo NV" khong co man nao (app chi co bang tai GIANG VIEN);
+#   - VH3b "Tra cuu NV WOW" bi gop vao danh sach Giang vien ma khong co duong tach ra;
+#   - BC1 danh sach HV nguy co thieu ba cot QUAN TRONG NHAT (vang may buoi, thieu may bai,
+#     hoat dong cuoi) - vi ba cot do phai DEM tu bang khac chu khong nam san trong DL09;
+#   - BC5-BC9 (bang viec theo chuc danh) khong ton tai: hai khoi `kpiAll` va `ROLEKPI` trong ma
+#     nguon trong y het thu do nhung CHUA BAO GIO DUOC GOI - code chet nam im 9 phien ban.
+#
+# Cach do: VE THAT moi trang, moi tab, moi danh sach, cong them bang viec cua TUNG chuc danh
+# (dong vai tung nguoi), roi tim nhung chuoi PHAI CO. Chuoi chon la thu chi xuat hien khi man do
+# that su duoc dung - khong phai mot tu chung chung de bat gap o trang khac.
+VHBC_BOQUA = {
+    "BC4": "SOP tinh theo THANG LICH; app dung cua so 30 NGAY GAN NHAT (Lead moi 30 ngay, Dang ky "
+           "30 ngay, Doanh thu thang nay + so sanh thang truoc). Cua so truot phan anh dung nhip "
+           "van hanh hon moc dau thang - ngay mung 2 bao cao thang chi co hai ngay du lieu.",
+}
+VHBC = {
+    "VH0": {"t": "Tim kiem nhanh", "can": ["Tìm khách / học viên theo tên hoặc SĐT"]},
+    "VH1": {"t": "Tra cuu Lop", "can": ["Lớp học (DL10)"]},
+    "VH2": {"t": "Tra cuu Hoc vien", "can": ["Học viên (DL09)"]},
+    "VH3": {"t": "Tra cuu Giang vien", "can": ["Chỉ giảng viên lớp"]},
+    "VH3b": {"t": "Tra cuu NV WOW", "can": ["Chỉ NV WOW"]},
+    "VH4": {"t": "Tra cuu Khach tiem nang", "can": ["Khách tiềm năng (DL02)"]},
+    "VH5": {"t": "Viec - Cham khach", "can": ["Tư vấn cần làm"]},
+    "VH6": {"t": "Viec - Hoc vien nguy co", "can": ["Học viên nguy cơ"]},
+    "VH7": {"t": "Viec - Test cho cham", "can": ["Test chờ chấm"]},
+    "VH8": {"t": "Viec - Thu hoc phi", "can": ["Đơn còn nợ phí"]},
+    "VH9": {"t": "Viec - Lop sap khai giang", "can": ["sắp khai giảng"]},
+    "VH10": {"t": "Viec - Khieu nai", "can": ["Khiếu nại đang xử lý"]},
+    "VH11": {"t": "Khoi luong viec theo NV", "can": ["Khối lượng việc theo nhân viên",
+                                                     "Lead đang giữ", "Nhập học dở"]},
+    "BC1": {"t": "Bang HV nguy co 2 truc", "can": ["Vắng (buổi)", "Thiếu bài", "Hoạt động cuối"]},
+    "BC2": {"t": "Bang chi so KPI", "can": ["KPI theo SOP · CH6"]},
+    "BC3": {"t": "Pheu khach tiem nang", "can": ["Phễu"]},
+    "BC5": {"t": "Bang NV Tu van", "can": ["Bảng NV Tư vấn", "Lead mới (chưa LH)", "Test sắp tới"]},
+    "BC6": {"t": "Bang NV WOW", "can": ["Bảng NV WOW", "WOW có tiến bộ"]},
+    "BC7": {"t": "Bang Giang vien", "can": ["Bảng Giảng viên", "Cần viết nhận xét buổi"]},
+    "BC8": {"t": "Bang Hoc vu", "can": ["Bảng Học vụ", "Phản hồi chờ phân loại"]},
+    "BC9": {"t": "Bang Quan ly", "can": ["Chiết khấu cần duyệt", "Đổi lớp từ 2 lần",
+                                         "Khiếu nại mức CAO", "Khiếu nại đã leo thang"]},
+}
+
+_sopVH = sorted(set(n.split(".")[0] for n in _sh if re.match(r"^(VH|BC)\d", n)))
+_khaiThieu = [m for m in _sopVH if m not in VHBC and m not in VHBC_BOQUA]
+_khaiThua = [m for m in VHBC if m not in _sopVH]
 print()
-print("KET QUA: DAT - cot SOP, so trigger HD3, bang chi so BC2 va bang phan quyen CH3 deu khop.")
+print("MAN VAN HANH VH + BANG BAO CAO BC <-> APP")
+print("  SOP mo ta   : %d man/bang" % len(_sopVH))
+print("  app da khai : %d (%d khai ly do co y khac)" % (len(VHBC), len(VHBC_BOQUA)))
+_vhloi = []
+if _khaiThieu:
+    _vhloi += ["SOP co man/bang ma check nay chua khai: " + m for m in _khaiThieu]
+if _khaiThua:
+    _vhloi += ["Khai mot man/bang KHONG co trong SOP: " + m for m in _khaiThua]
+
+_spec = os.path.join(SD, "_vhbc_spec.json")
+open(_spec, "w", encoding="utf-8").write(json.dumps(VHBC, ensure_ascii=False))
+try:
+    _r5 = subprocess.run(["node", os.path.join(SD, "_probe_vhbc.js"), _spec],
+                         capture_output=True, text=True, cwd=SD, timeout=300)
+    _l5 = [l for l in (_r5.stdout or "").split("\n") if l.startswith("VHBC ")]
+    if _r5.returncode != 0 or not _l5:
+        _vhloi.append("KHONG CHAY DUOC probe VH/BC: " + (_r5.stderr or "")[-400:])
+    elif _l5[0][5:].strip() != "DU":
+        for _x in _l5[0][5:].split(" || "):
+            _vhloi.append(_x)
+    else:
+        print("  ve that      : moi man/bang deu hien ra duoc")
+finally:
+    try:
+        os.remove(_spec)
+    except OSError:
+        pass
+
+if _vhloi:
+    print()
+    for _x in _vhloi:
+        print("   X %s" % _x)
+    print()
+    print("Dung man/bang do trong gen_v5.py, HOAC khai vao VHBC_BOQUA KEM LY DO.")
+    print("KET QUA: KHONG DAT")
+    sys.exit(1)
+
+print()
+print("KET QUA: DAT - cot SOP, so trigger HD3, chi so BC2, phan quyen CH3, man VH va bang BC "
+      "deu duoc app phu, hoac da khai ly do.")
