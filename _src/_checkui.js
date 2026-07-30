@@ -177,6 +177,73 @@ const PROBE = () => {
        sidebar position:fixed, dieu kien r.top<70 KHONG BAO GIO thoa -> tourPaint cuon roi thoat ra cho
        ve lai, LAP VO HAN va khong bao gio ve. Tren man hinh chi con lop phu toi trum ca man - anh Luan
        goi la "den thui". Nay moi buoc deu phai: hop huong dan HIEN, va vong sang co KICH THUOC. */
+    /* ═══ V9.56 - ĐO NGĂN KÉO Ở MỌI KHỔ MÀN ═══
+       HAI LOI CHONG NHAU trong chinh phep do nay, mat vai vong moi lot:
+       (1) khoi nay luc dau bi dat LOT trong "if (... && V.n === 'maytinh')" - nen no chi chay o
+           DUNG MOT kho man, 4 kho con lai khong he duoc do. "4 kho nho deu xanh" that ra la
+           "4 kho nho chua bao gio duoc kiem". Bao cao xanh ma khong chay gi con te hon bao do.
+       (2) thu chuyen sang mot TRANG MOI (ctx.newPage) cho sach thi cang sai: tab moi nam o NEN,
+           ma Chromium KHONG chay chuyen dong tren tab nen - ngan keo dung nguyen cho dong, do ra
+           dung 775px = 102% cua 760, va hieu ung mo dan cua nut Tro ly cung khong chay not.
+       Nay do tren chinh trang dang o tien canh, va dat NGOAI moi dieu kien kho man. */
+    if (C.ten === "cong nhan vien") {
+      const NGKEO = [
+        ["chang", `(function(){var J=jAll().filter(function(x){return x.k==="learning"})[0]||jAll()[0];jStagePop(J.C.pid,"test_done")})()`],
+        ["hanh trinh", `(function(){var J=jAll().filter(function(x){return x.k==="learning"})[0]||jAll()[0];mstripOpen(J.C.pid)})()`],
+        ["sua nguong CH2", `cfPop('slaLRT_minutes')`],
+        ["sua cau nhac CH4", `msgPop('NA050')`],
+        ["sua nguong KPI", `kpiPop('CVR')`],
+        ["sua danh muc CH1", `enumPop('enum_lead_status')`],
+        ["xem nhanh ho so", `(function(){var J=jAll()[0];openQuick(J.C.pid)})()`],
+      ];
+      for (const [ten, js] of NGKEO) {
+        try { await page.evaluate(`go("banlam")`); await page.waitForTimeout(60);
+              await page.evaluate(js); } catch (e) {
+          bad.push(nhan("ngan keo " + ten + ": KHONG MO DUOC - " + String(e.message).slice(0, 80))); continue; }
+        /* BAY DA CAN: ngan keo TRUOT VAO trong 0,22s (transition:none chi ap khi dang keo tay nam
+           - selector that la "body.drsz .drawer"). Do sau 140ms la chup dung luc no dang truot,
+           ra so "tho ra ngoai man" nhay lung tung 37..131px o man rong. Phai CHO NO DUNG YEN:
+           doc vi tri hai lan lien tiep, bang nhau moi tinh. Do vat dang chuyen dong thi khong do. */
+        await page.waitForFunction(() => {
+          const d = document.querySelector(".drawer"); if (!d) return false;
+          const r = Math.round(d.getBoundingClientRect().right);
+          if (window.__nkTruoc === r) return true;
+          window.__nkTruoc = r; return false;
+        }, null, {timeout: 3000}).catch(() => {});
+        await page.evaluate(() => { window.__nkTruoc = null; });
+        luot++;
+        const nk = await page.evaluate(() => {
+          const d = document.querySelector(".drawer");
+          if (!d || !d.classList.contains("on")) return {loi: "mo ma khong hien"};
+          const R = d.getBoundingClientRect(), W = window.innerWidth;
+          const x = d.querySelector(".dh .x"); const rx = x && x.getBoundingClientRect();
+          const f = document.querySelector(".asstfab");
+          const nho = [];
+          d.querySelectorAll("button").forEach(el => { const r = el.getBoundingClientRect();
+            if (el.offsetParent !== null && r.width && (r.height < 28 || r.width < 24))
+              nho.push(String(el.className || el.tagName).slice(0, 22) + " " + Math.round(r.width) + "x" + Math.round(r.height)); });
+          const tran = [];
+          d.querySelectorAll("*").forEach(el => { const r = el.getBoundingClientRect();
+            if (r.width && (r.right > R.right + 1 || r.left < R.left - 1))
+              tran.push(String(el.className || el.tagName).slice(0, 22)); });
+          return {rong: Math.round(R.width), man: W, thoRa: Math.round(R.right - W),
+            nutDong: rx ? Math.round(rx.width) + "x" + Math.round(rx.height) : "khong co",
+            nutDongDu: !!(rx && rx.width >= 36 && rx.height >= 36),
+            troLyDeLen: !!(f && getComputedStyle(f).opacity !== "0" && getComputedStyle(f).display !== "none"),
+            nho: nho.slice(0, 3), tran: tran.slice(0, 3)};
+        });
+        if (nk.loi) { bad.push(nhan("ngan keo " + ten + ": " + nk.loi)); continue; }
+        if (nk.thoRa > 1) bad.push(nhan("ngan keo " + ten + " THO RA NGOAI MAN " + nk.thoRa + "px"));
+        if (!nk.nutDongDu) bad.push(nhan("ngan keo " + ten + ": nut dong chi " + nk.nutDong + " - ngon tay khong bam trung"));
+        if (nk.troLyDeLen) bad.push(nhan("ngan keo " + ten + ": nut Tro ly noi DE LEN ngan keo dang chan"));
+        if (V.w <= 900 && nk.rong < nk.man - 8) bad.push(nhan("ngan keo " + ten + " chi rong " + nk.rong + "/" + nk.man + "px - chua lai vet thua vo dung"));
+        nk.nho.forEach(c => bad.push(nhan("ngan keo " + ten + ": nut qua nho " + c)));
+        nk.tran.forEach(c => bad.push(nhan("ngan keo " + ten + ": noi dung TRAN RA KHOI ngan keo <" + c + ">")));
+        try { await page.evaluate(`closeModal()`); } catch (e) {}
+        await page.waitForTimeout(60);
+      }
+    }
+
     if (C.ten === "cong nhan vien" && V.n === "maytinh") {
       const bais = await page.evaluate(() => Object.keys(TOURS));
       for (const k of bais) {
@@ -246,76 +313,6 @@ const PROBE = () => {
          Do that thi lo ra 3 loi: nut dong 13x22px (ngon tay khong bam trung), ngan keo 760px de
          len man iPad 834px chi chua lai 74px vo dung, va nut Tro ly noi TREN ngan keo che noi dung.
          Ba loi nay khong the thay bang cach doc ma nguon - phai mo that, o dung kho man. */
-      /* ĐO NGĂN KÉO TRÊN MỘT TRANG MỚI TINH.
-         Trang chinh da bi vai chuc phep kiem khac giam len (bai huong dan chay het buoc, tam Tro ly
-         mo/dong, hop xac nhan) - va rieng kho "maytinh" moi chay khoi huong dan. Do tren trang do
-         ra 775px = 102% cua 760, tuc ngan keo co class "on" ma van nam nguyen cho dong. Da kiem
-         RIENG ba lan: mo ngan keo luc chua chay huong dan, TRONG LUC dang chay, va SAU KHI chay
-         het roi ket thuc - ca ba lan deu dung (transform:none, mep phai khit man). Nghia la app
-         khong sai, chi la trang do da ban. Do mot thu can sach thi phai do tren nen sach. */
-      const pgNK = await ctx.newPage();
-      pgNK.on("pageerror", e => bad.push(nhan("ngan keo · LOI JS: " + String(e.message).slice(0,120))));
-      await pgNK.addInitScript(w => { try { sessionStorage.setItem(w, "");
-        localStorage.setItem("ITTS_HELLO_V1","1"); } catch (e) {} }, C.who);
-      await pgNK.goto("file://" + require("path").resolve(OUT) + "/" + C.f, {waitUntil: "load"});
-      await pgNK.waitForFunction(() => typeof window.go === "function", null, {timeout: 30000});
-      await pgNK.waitForTimeout(300);
-      const NGKEO = [
-        ["chang", `(function(){var J=jAll().filter(function(x){return x.k==="learning"})[0]||jAll()[0];jStagePop(J.C.pid,"test_done")})()`],
-        ["hanh trinh", `(function(){var J=jAll().filter(function(x){return x.k==="learning"})[0]||jAll()[0];mstripOpen(J.C.pid)})()`],
-        ["sua nguong CH2", `cfPop('slaLRT_minutes')`],
-        ["sua cau nhac CH4", `msgPop('NA050')`],
-        ["sua nguong KPI", `kpiPop('CVR')`],
-        ["sua danh muc CH1", `enumPop('enum_lead_status')`],
-        ["xem nhanh ho so", `(function(){var J=jAll()[0];openQuick(J.C.pid)})()`],
-      ];
-      for (const [ten, js] of NGKEO) {
-        try { await pgNK.evaluate(`go("banlam")`); await pgNK.waitForTimeout(60);
-              await pgNK.evaluate(js); } catch (e) {
-          bad.push(nhan("ngan keo " + ten + ": KHONG MO DUOC - " + String(e.message).slice(0, 80))); continue; }
-        /* BAY DA CAN: ngan keo TRUOT VAO trong 0,22s (transition:none chi ap khi dang keo tay nam
-           - selector that la "body.drsz .drawer"). Do sau 140ms la chup dung luc no dang truot,
-           ra so "tho ra ngoai man" nhay lung tung 37..131px o man rong. Phai CHO NO DUNG YEN:
-           doc vi tri hai lan lien tiep, bang nhau moi tinh. Do vat dang chuyen dong thi khong do. */
-        await page.waitForFunction(() => {
-          const d = document.querySelector(".drawer"); if (!d) return false;
-          const r = Math.round(d.getBoundingClientRect().right);
-          if (window.__nkTruoc === r) return true;
-          window.__nkTruoc = r; return false;
-        }, null, {timeout: 3000}).catch(() => {});
-        await pgNK.evaluate(() => { window.__nkTruoc = null; });
-        luot++;
-        const nk = await pgNK.evaluate(() => {
-          const d = document.querySelector(".drawer");
-          if (!d || !d.classList.contains("on")) return {loi: "mo ma khong hien"};
-          const R = d.getBoundingClientRect(), W = window.innerWidth;
-          const x = d.querySelector(".dh .x"); const rx = x && x.getBoundingClientRect();
-          const f = document.querySelector(".asstfab");
-          const nho = [];
-          d.querySelectorAll("button").forEach(el => { const r = el.getBoundingClientRect();
-            if (el.offsetParent !== null && r.width && (r.height < 28 || r.width < 24))
-              nho.push(String(el.className || el.tagName).slice(0, 22) + " " + Math.round(r.width) + "x" + Math.round(r.height)); });
-          const tran = [];
-          d.querySelectorAll("*").forEach(el => { const r = el.getBoundingClientRect();
-            if (r.width && (r.right > R.right + 1 || r.left < R.left - 1))
-              tran.push(String(el.className || el.tagName).slice(0, 22)); });
-          return {rong: Math.round(R.width), man: W, thoRa: Math.round(R.right - W),
-            nutDong: rx ? Math.round(rx.width) + "x" + Math.round(rx.height) : "khong co",
-            nutDongDu: !!(rx && rx.width >= 36 && rx.height >= 36),
-            troLyDeLen: !!(f && getComputedStyle(f).opacity !== "0" && getComputedStyle(f).display !== "none"),
-            nho: nho.slice(0, 3), tran: tran.slice(0, 3)};
-        });
-        if (nk.loi) { bad.push(nhan("ngan keo " + ten + ": " + nk.loi)); continue; }
-        if (nk.thoRa > 1) bad.push(nhan("ngan keo " + ten + " THO RA NGOAI MAN " + nk.thoRa + "px"));
-        if (!nk.nutDongDu) bad.push(nhan("ngan keo " + ten + ": nut dong chi " + nk.nutDong + " - ngon tay khong bam trung"));
-        if (nk.troLyDeLen) bad.push(nhan("ngan keo " + ten + ": nut Tro ly noi DE LEN ngan keo dang chan"));
-        if (V.w <= 900 && nk.rong < nk.man - 8) bad.push(nhan("ngan keo " + ten + " chi rong " + nk.rong + "/" + nk.man + "px - chua lai vet thua vo dung"));
-        nk.nho.forEach(c => bad.push(nhan("ngan keo " + ten + ": nut qua nho " + c)));
-        nk.tran.forEach(c => bad.push(nhan("ngan keo " + ten + ": noi dung TRAN RA KHOI ngan keo <" + c + ">")));
-        try { await pgNK.evaluate(`closeModal()`); } catch (e) {}
-        await pgNK.waitForTimeout(60);
-      }
-      await pgNK.close();
       if (!cf.coNut) bad.push(nhan("hop xac nhan khong dung duoc nut Xac nhan"));
       else {
         if (!cf.trongNganKeo) bad.push(nhan("hop xac nhan bi CHON DUOI ngan keo - bam vao trung " + cf.deLen));
