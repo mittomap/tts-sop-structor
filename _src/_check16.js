@@ -894,6 +894,138 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
 })();
 
 
+/* ---- 24bis. MOI NHOM THAM SO PHAI TU GIOI THIEU (V9.46, anh Luan) ----
+   "Cai dat phai phu toan bo, a phai co quyen cau hinh, chinh sua bat cu thu gi anh muon, va phai
+    co huong dan cu the, ko de a tu boi trong 1 dong cac thong so cau hinh va cai dat."
+   Truoc ban nay: 83 tham so trong 20 nhom dat ten tuy hung (co ca "Hoc vu - Lop hoc" 10 tham so
+   NAM CANH "Hoc vu - Lop" 6 tham so), hien theo thu tu xuat hien trong ma nguon tuc la ngau nhien,
+   nhom khong co mot chu nao noi no lo viec gi, va doi mot so thi khong biet man nao doi theo.
+   Nay CFNHOM la HOP DONG: them mot nhom moi ma khong khai vao day thi cho nay do. */
+(function(){
+ setRole("all");cfEnsure();
+ t("co bang khai nhom tham so CFNHOM", typeof CFNHOM!=="undefined"&&CFNHOM.length>0&&typeof CFNHOMBY==="object");
+ var nhomThat={},thuTu=[];
+ APPPARAMS.forEach(function(p){if(!nhomThat[p[0]]){nhomThat[p[0]]=0;thuTu.push(p[0])}nhomThat[p[0]]++});
+ /* 1. moi nhom co that deu phai duoc khai */
+ var chuaKhai=thuTu.filter(function(g){return !CFNHOMBY[g]});
+ t("moi nhom tham so deu duoc khai trong CFNHOM"+(chuaKhai.length?": "+chuaKhai.join(" | "):""), chuaKhai.length===0);
+ /* 2. hai chieu - khai roi ma khong nhom nao dung la KHAI CHET (LUAT 2ter) */
+ var khaiChet=CFNHOM.map(function(x){return x[0]}).filter(function(g){return !nhomThat[g]});
+ t("khong con nhom khai trong CFNHOM ma khong tham so nao thuoc ve"+(khaiChet.length?": "+khaiChet.join(" | "):""), khaiChet.length===0);
+ /* 3. loi gioi thieu phai la mot CAU that, khong phai chep lai ten nhom */
+ var moTaXau=CFNHOM.filter(function(x){return !x[1]||x[1].length<40||x[1]===x[0]}).map(function(x){return x[0]});
+ t("moi nhom co mot cau noi no cai quan chuyen gi (>=40 ky tu)"+(moTaXau.length?": "+moTaXau.join(" | "):""), moTaXau.length===0);
+ /* 4. "xem ket qua o" phai tro toi TRANG CO THAT - tro vao khoang khong thi nut bam khong ra gi */
+ var trangSai=[];
+ CFNHOM.forEach(function(x){
+  if(!x[2]||!x[2].length){trangSai.push(x[0]+" (khong khai trang nao)");return}
+  x[2].forEach(function(k){if(!PBK[k])trangSai.push(x[0]+" -> "+k)})});
+ t("moi nhom chi toi it nhat mot trang CO THAT de xem ket qua"+(trangSai.length?": "+trangSai.join(" | "):""), trangSai.length===0);
+ /* 5. khong con cap ten gan trung nhau kieu "Hoc vu - Lop hoc" / "Hoc vu - Lop" */
+ var gonTen=CFNHOM.map(function(x){return x[0].toLowerCase().replace(/[^a-z0-9]/g,"")});
+ var long=gonTen.filter(function(a,i){return gonTen.some(function(b,j){return j!==i&&b.indexOf(a)===0})});
+ t("khong con hai ten nhom long nhau"+(long.length?": "+long.join(" | "):""), long.length===0);
+ /* 6. VE THAT man CH2: dung thu tu hanh trinh + co loi gioi thieu + co nut xem ket qua */
+ window.SETTAB="ch2";window.CFQ="";
+ var pg=RENDER["settings"]();
+ var viTri=CFNHOM.map(function(x){return pg.indexOf(">"+esc(x[0])+"</b>")}).filter(function(i){return i>=0});
+ t("man Cai dat ve DU "+CFNHOM.length+" nhom", viTri.length===CFNHOM.length);
+ t("nhom hien theo DUNG thu tu hanh trinh P1 -> P10 (khong theo thu tu ma nguon)",
+   viTri.every(function(v,i){return i===0||v>viTri[i-1]}));
+ var thieuMoTa=CFNHOM.filter(function(x){return pg.indexOf(esc(x[1]))<0}).map(function(x){return x[0]});
+ t("cau gioi thieu cua moi nhom hien THAT tren man"+(thieuMoTa.length?": "+thieuMoTa.join(" | "):""), thieuMoTa.length===0);
+ t("co dong 'xem ket qua tai' dan sang man hinh", (pg.match(/Đổi ở đây thì xem kết quả tại:/g)||[]).length===CFNHOM.length);
+ var thieuNut=CFNHOM.filter(function(x){return !x[2].some(function(k){return pg.indexOf("go('"+k+"')")>=0})}).map(function(x){return x[0]});
+ t("nut sang trang ket qua bam duoc that"+(thieuNut.length?": "+thieuNut.join(" | "):""), thieuNut.length===0);
+ /* 7. O TIM THAM SO - 83 dong thi viec dau tien phai la tim duoc no */
+ t("co o tim tham so tren tab CH2", /window\.CFQ=this\.value/.test(pg));
+ window.CFQ="hoàn tiền";
+ var loc=RENDER["settings"]();
+ var conO=(loc.match(/id="cfrow_/g)||[]).length, tatCa=(pg.match(/id="cfrow_/g)||[]).length;
+ t("go tu khoa thi so dong GIAM that (khong phai o tim gia)", conO>0&&conO<tatCa);
+ t("dong con lai dung la dong khop tu khoa", loc.indexOf('id="cfrow_refundFull_days"')>=0);
+ t("nhom khong con dong nao thi an han, khong de panel rong", loc.indexOf(">Giao việc nội bộ</b>")<0);
+ window.CFQ="zzz-khong-co-gi-khop-zzz";
+ var rong=RENDER["settings"]();
+ t("khong khop gi thi noi ro, khong de man trang", /Không thấy tham số nào khớp/.test(rong));
+ /* 8. bam banh rang tu mot man khac PHAI xoa o loc - neu khong dong can toi bi chinh o loc giau */
+ t("cfGo xoa o tim truoc khi nhay", /function cfGo\(name\)\{[^}]*window\.CFQ=""/.test(SRC));
+ /* 9. o tim phai duoc don khi dieu huong - neu khong, lan sau vao Cai dat van thay ban loc cu
+       ma khong hieu vi sao thieu tham so. Tung dinh dung benh nay: NAVCTX ghi "MGQ" (khong ton tai)
+       thay vi "MSGQ", nen o tim thong diep CH4 khong bao gio duoc don. */
+ t("NAVCTX khai dung ten o tim CH4", NAVCTX.indexOf("MSGQ")>=0&&NAVCTX.indexOf("MGQ")<0);
+ t("NAVCTX khai o tim CH2", NAVCTX.indexOf("CFQ")>=0);
+ var moCoi=NAVCTX.filter(function(k){return !(new RegExp("window\\."+k+"\\s*=")).test(SRC)});
+ t("khong con ten mo coi trong NAVCTX"+(moCoi.length?": "+moCoi.join(" | "):""), moCoi.length===0);
+ window.CFQ="";
+})();
+
+
+/* ---- 24ter. MAN CAI DAT PHAI CO BAN DO (V9.46) ----
+   Nhom tham so tu gioi thieu roi, nhung nguoi mo Cai dat lan dau van roi THANG vao bang 83 tham so
+   CH2 ma khong ai noi cho ho biet 15 tab con lai moi tab lo chuyen gi. SETMOTA la ban khai cua
+   tung tab; tab "tongquan" ve ban do do. Them tab moi ma khong khai la do. */
+(function(){
+ setRole("all");cfEnsure();
+ var tabs=setTabs().map(function(t){return t[0]});
+ t("Cai dat mo ra la vao tab ban do, khong roi thang vao bang tham so", /var tab=window\.SETTAB\|\|"tongquan"/.test(SRC));
+ t("co tab ban do trong danh sach tab", tabs.indexOf("tongquan")>=0);
+ var chuaKhai=tabs.filter(function(k){return !SETMOTA[k]});
+ t("moi tab Cai dat deu duoc khai trong SETMOTA"+(chuaKhai.length?": "+chuaKhai.join(" | "):""), chuaKhai.length===0);
+ var khaiChet=Object.keys(SETMOTA).filter(function(k){return tabs.indexOf(k)<0});
+ t("khong con khai SETMOTA cho tab khong ton tai"+(khaiChet.length?": "+khaiChet.join(" | "):""), khaiChet.length===0);
+ var cut=Object.keys(SETMOTA).filter(function(k){return !SETMOTA[k][0]||SETMOTA[k][0].length<40});
+ t("moi tab co mot cau noi no cai quan chuyen gi (>=40 ky tu)"+(cut.length?": "+cut.join(" | "):""), cut.length===0);
+ /* moi tab deu phai co nhom - khong co tab vo chu roi ra ngoai ban do */
+ var nhomCo={};SETGRP.forEach(function(g){nhomCo[g[0]]=1});
+ var voChu=setTabs().filter(function(x){return !nhomCo[x[2]||"dulieu"]}).map(function(x){return x[0]});
+ t("khong con tab vo chu (nhom khong co trong SETGRP)"+(voChu.length?": "+voChu.join(" | "):""), voChu.length===0);
+ /* HAM DEM phai chay that va ra so - so chet se lech ngay lan them du lieu ke tiep */
+ var demHong=Object.keys(SETMOTA).filter(function(k){
+  var v;try{v=SETMOTA[k][1]()}catch(e){return true}
+  return v==null||String(v)===""});
+ t("ham dem cua moi tab chay duoc va tra ve chu"+(demHong.length?": "+demHong.join(" | "):""), demHong.length===0);
+ t("so tham so tren ban do la dem THAT, khong viet cung",
+   SETMOTA.ch2[1]().indexOf(String(APPPARAMS.length))===0);
+ /* VE THAT ban do */
+ window.SETTAB="tongquan";
+ var bd=RENDER["settings"]();
+ var thieu=setTabs().filter(function(x){return x[0]!=="tongquan"&&bd.indexOf(esc(SETMOTA[x[0]][0]))<0}).map(function(x){return x[0]});
+ t("ban do ke DU moi tab kem cau mo ta"+(thieu.length?": "+thieu.join(" | "):""), thieu.length===0);
+ t("ban do co nut sang tung tab", setTabs().every(function(x){
+   return x[0]==="tongquan"||bd.indexOf("window.SETTAB='"+x[0]+"'")>=0}));
+ t("ban do co khoi 'Viec hay lam nhat'", /Việc hay làm nhất/.test(bd)&&SETNHANH.length>=6);
+ /* moi tab mot icon RIENG - 16 the giong het nhau thi mat khong bam duoc vao dau */
+ var khongIcon=Object.keys(SETMOTA).filter(function(k){return !/^ti-[a-z0-9-]+$/.test(String(SETMOTA[k][2]||""))});
+ t("moi tab khai mot icon rieng"+(khongIcon.length?": "+khongIcon.join(" | "):""), khongIcon.length===0);
+ t("ban do khong con dung icon mac dinh cho tab nao", bd.indexOf("ti-settings-2")<0);
+ /* dau vet thoi chay Google Sheets: man Cai dat khong duoc noi cau hinh "song trong sheet" nua */
+ t("tieu de man Cai dat khong con noi cau hinh nam tren sheet", bd.indexOf("CH1-CH6 của sheet")<0);
+ t("ban do dung dung thanh phan the chon cua he thiet ke", (bd.match(/class="pickc wrap"/g)||[]).length>=SETNHANH.length);
+ t("the co cau mo ta dai thi phai xuong dong duoc", /\.pickc\.wrap small\{white-space:normal/.test(CSS));
+ /* moi loi tat phai tro toi mot cua CO THAT - cfGo tham so co that, hoac tab co that */
+ var tatSai=SETNHANH.filter(function(x){
+  var m=/^cfGo\('([^']+)'\)$/.exec(x[3]);
+  if(m)return !APPPARAMS.some(function(p){return p[1]===m[1]});
+  var m2=/^window\.SETTAB='([^']+)'/.exec(x[3]);
+  if(m2)return tabs.indexOf(m2[1])<0;
+  return true}).map(function(x){return x[0]});
+ t("moi loi tat dan toi mot cua CO THAT"+(tatSai.length?": "+tatSai.join(" | "):""), tatSai.length===0);
+ /* HR bi bo hep tab van phai co ban do - dung de ho roi vao mot bang khong loi gioi thieu */
+ (function(){
+  var hr=(DATA.dl.DL01||[]).filter(function(x){return /^hr_/.test(String(ecode(x.role)||""))})[0];
+  if(!hr){t("co nhan vien HR de thu (bo qua neu khong co)", true);return}
+  applyScope(hr.staff_id);
+  var st=SCOPE().tabs&&SCOPE().tabs.settings;
+  t("HR bi bo hep tab nhung van co tab ban do", !!st&&st.indexOf("tongquan")>=0);
+  window.SETTAB="tongquan";
+  var pg=RENDER["settings"]();
+  t("ban do cua HR chi ke tab HR duoc vao", pg.indexOf("window.SETTAB='staff'")>=0&&pg.indexOf("window.SETTAB='ch2'")<0);
+  applyScope("");setRole("all")})();
+ window.SETTAB="ch2";
+})();
+
+
 /* ---- 31. COT "KHI NAO HIEN" cung phai lay so tu cau hinh (V9.29, anh Luan) ----
    "cai doan khi nao hien, con so 3 ngay do, e cung lay tu cau hinh chu dau phai gan cung phai ko,
     gan cung ko duoc dau nhe" - dung: cau mau (tmpl) da dung {1}, nhung cau mo ta (when) viet thang

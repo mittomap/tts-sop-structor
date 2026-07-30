@@ -40,26 +40,26 @@ ITTS_OUT="<mnt>/SOP ITTs" python3 gen_v5.py
 >
 > `_APP.js` / `_HV.js` sinh bằng `_src/extract_js.py` - **không** phải mã nguồn, đừng sửa.
 
-Bộ kiểm gồm **16 phần, phải xanh HẾT mới được giao** (~2.000 tiêu chí tự động + 466 lượt mở thật trong trình duyệt):
+Bộ kiểm gồm **16 phần, phải xanh HẾT mới được giao** (~2.000 tiêu chí tự động + 479 lượt mở thật trong trình duyệt):
 | Lệnh | Kỳ vọng |
 |---|---|
 | `node --check _APP.js` và `node --check _HV.js` | không báo gì |
-| `ITTS_OUT=<out> node _tall.js` | `Render 38 trang \| 0 loi` + `Icon dung: 184 \| thieu trong font: khong` (từ V9.40 icon thiếu là ĐỎ THẬT) |
+| `ITTS_OUT=<out> node _tall.js` | `Render 38 trang \| 0 loi` + `Icon dung: 192 \| thieu trong font: khong` (từ V9.40 icon thiếu là ĐỎ THẬT) |
 | `ITTS_OUT=<out> node _check11.js` | `TONG: 145`, KHÔNG có dòng `FAIL` |
 | `ITTS_OUT=<out> node _check12.js` | `CHECK12 OK: 37 tieu chi` - một cửa vào, một luật |
 | `ITTS_OUT=<out> node _check13.js` | `CHECK13 OK: 174 tieu chi` - KPI biết nói |
-| `ITTS_OUT=<out> node _check14.js` | `CHECK14 OK: 122 tieu chi` - cổng học viên hai chiều |
+| `ITTS_OUT=<out> node _check14.js` | `CHECK14 OK: 128 tieu chi` - cổng học viên hai chiều |
 | `ITTS_OUT=<out> node _check15.js` | `CHECK15 OK: 39 tieu chi` - **kiểm kê cửa ghi + bất biến nghiệp vụ** (bản khai cửa ghi nay đọc thẳng `DOORTB` của app - xem V9.31) |
-| `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 601 tieu chi` - học phí theo đợt + vá V9.27 + bấm-tên-ra-drawer + địa chỉ từng trang |
+| `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 640 tieu chi` - học phí theo đợt + vá V9.27 + bấm-tên-ra-drawer + địa chỉ từng trang + **màn Cài đặt tự giới thiệu** (mục 24bis `CFNHOM`, 24ter `SETMOTA`) |
 | `ITTS_OUT=<out> node _checkdata.js` | `CHECKDATA OK: 27 luat ... 0 cho lech` - **dữ liệu demo có khớp ga nghiệp vụ không** |
 | `ITTS_OUT=<out> node _check17.js` | `CHECK17 OK: 393 tieu chi` - **bộ máy lọc chuyên sâu** (kết hợp trục, lưu theo người) |
-| `ITTS_OUT=<out> node _check18.js` | `CHECK18 OK: 177 tieu chi \| da ve 80 trang/tab` - **hội đồng audit tự động**: vẽ THẬT mọi trang/tab, mọi trang qua mắt 8 chức danh, cổng học viên qua mọi hồ sơ; từ V9.31 kiêm luôn **nhật ký thao tác + hoàn tác + bộ nhớ tạm bảng tra** (bấm cửa ghi thật, lùi lại thật, và bắt chốt chặn từ chối lùi) |
+| `ITTS_OUT=<out> node _check18.js` | `CHECK18 OK: 177 tieu chi \| da ve 81 trang/tab` - **hội đồng audit tự động**: vẽ THẬT mọi trang/tab, mọi trang qua mắt 8 chức danh, cổng học viên qua mọi hồ sơ; từ V9.31 kiêm luôn **nhật ký thao tác + hoàn tác + bộ nhớ tạm bảng tra** (bấm cửa ghi thật, lùi lại thật, và bắt chốt chặn từ chối lùi) |
 | `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` - 12 bài / 66 bước, mọi neo `@ma` phải trỏ trúng. Từ V9.44 kiêm luôn **lời hứa "mỗi chức danh một trợ thủ và một hướng dẫn riêng"**: đóng vai từng nhóm vai rồi hỏi ba câu (có bài hướng dẫn riêng · có nhịp ngày ≥3 dòng · có bảng việc ở trang đáp), cộng một câu nữa - mọi nhịp có thật đều phải sửa được trong Cài đặt (nhịp của NV WOW từng tồn tại mà ô chọn không liệt kê, nên không ai với tới) |
 | `python3 check_logic.py` | `KET QUA: DAT` - từ V9.40 script tách "lỗi thật" khỏi "ca cố ý" (việc quá hạn để demo cảnh báo đỏ, số này TRÔI theo ngày) và in một dòng kết luận ổn định |
 | `python3 check_data.py` | `KET QUA: DAT` |
 | `python3 check_gs.py` | `KET QUA: DAT` - **lớp Google Sheets đã nghỉ hưu (30/07), canh cho nó không lén quay lại**: không file `.gs` nào trong kho, và 66 chỗ gọi máy chủ trong `gen_v5.py` đúng bằng bản khai. 66 chỗ đó giữ CÓ CHỦ Ý - chúng là đường nối ra backend tương lai, mỗi chỗ một cửa ghi; thêm cửa ghi mà quên nối là đỏ. Đầu file `check_gs.py` ghi rõ đã đối chiếu từng file `.gs` trước khi xoá, không mất luật nghiệp vụ nào |
 | `python3 check_sop.py` | `KET QUA: DAT` - **đối chiếu SOP gốc, sáu mặt**: 357 cột DL · 93 tình huống sổ trigger HD3 (chạy THẬT `naFor()` trên mọi dòng) · 51 chỉ số bảng BC2 (phải có cả công thức lẫn dòng ngưỡng CH6) · 31 hành động bảng phân quyền CH3 (đóng vai từng chức danh rồi hỏi lại `canAct`, và mỗi việc "Quản lý phê duyệt" phải có cửa ghi gọi `chanAct`) · **12 màn vận hành VH0-VH11 và 9 bảng báo cáo BC1-BC9** (vẽ THẬT mọi trang, mọi tab, mọi danh sách, cộng bảng việc của từng chức danh, rồi tìm chuỗi phải có). Chỗ nào cố ý không làm phải khai vào `BOQUA` / `TRIG_BOQUA` / `KPI_BOQUA` / `CH3_BOQUA` / `VHBC_BOQUA` **kèm lý do đọc được** |
-| `ITTS_OUT=<out> node _checkui.js` | `CHECKUI OK: da mo THAT 466 luot` - **kiểm thử trên trình duyệt thật** (cần `npm i playwright` một lần; máy không có Chromium thì tự BỎ QUA chứ không báo đỏ bậy) |
+| `ITTS_OUT=<out> node _checkui.js` | `CHECKUI OK: da mo THAT 479 luot` - **kiểm thử trên trình duyệt thật** (cần `npm i playwright` một lần; máy không có Chromium thì tự BỎ QUA chứ không báo đỏ bậy) |
 
 **`_check15.js` sinh ra vì cả hai hội đồng thẩm định đều bỏ lọt cùng một lớp lỗi:** người rà
 ĐỌC TỪNG ĐƯỜNG, mà lỗi nguy hiểm nhất nằm ở KHOẢNG GIỮA hai đường - mỗi đường đọc riêng đều hợp

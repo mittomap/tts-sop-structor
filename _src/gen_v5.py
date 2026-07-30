@@ -686,6 +686,12 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .pickc b{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pickc small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pickc .chip{flex:none}
+/* V9.46: thẻ chọn có câu giải thích DÀI (bản đồ màn Cài đặt) - phải xuống dòng, không cắt cụt.
+   Vá vào chính thành phần dùng chung chứ không dựng một loại thẻ thứ hai cho một màn. */
+.pickc.wrap{align-items:flex-start}
+.pickc.wrap i{margin-top:2px}
+.pickc.wrap b{white-space:normal;overflow:visible;line-height:1.4}
+.pickc.wrap small{white-space:normal;overflow:visible;line-height:1.55;margin-top:2px}
 /* Dải thẻ buổi (Vận hành lớp) - gọn, bấm chọn buổi để điểm danh ngay dưới */
 .tbdiv{display:inline-block;width:1px;height:20px;background:var(--line);margin:0 4px;vertical-align:middle}
 .tsfun{display:flex;align-items:stretch;gap:2px;overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:14px}
@@ -1928,7 +1934,9 @@ function buildScope(code){
  /* ngoại lệ khai báo nhóm hỗ trợ */
  if(gk==="hotro"){
   if(/^it_/.test(code)){eff.pages.push("settings")}
-  if(/^hr_/.test(code)){eff.pages.push("settings");eff.tabs={settings:["staff"]}}}
+  /* HR chỉ có việc với danh sách nhân viên - nhưng vẫn cho họ tab "Bắt đầu ở đây" để biết
+     mình đang đứng ở đâu, thay vì rơi thẳng vào một bảng không lời giới thiệu. */
+  if(/^hr_/.test(code)){eff.pages.push("settings");eff.tabs={settings:["tongquan","staff"]}}}
  return eff}
 function SCOPE(){return window.SCOPEEFF||ROLESCOPE.quantri}
 function applyScope(sid){var eff;
@@ -8138,12 +8146,42 @@ function renderNhip(){
    Nay chia theo CÂU HỎI người ta mang tới: "app trông thế nào", "app xử theo luật gì", "app dắt người
    ta ra sao", "ai được thấy gì", "dữ liệu đang thế nào". Mỗi tab khai luôn nhóm của nó ở ô thứ ba -
    thêm tab mới là phải chọn nhóm, không có chỗ cho tab vô chủ. */
-var SETGRP=[["giaodien","Giao diện","ti-palette"],["luat","Quy tắc nghiệp vụ","ti-adjustments"],
+var SETGRP=[["batdau","Mở đầu","ti-compass"],
+ ["giaodien","Giao diện","ti-palette"],["luat","Quy tắc nghiệp vụ","ti-adjustments"],
  ["dat","Dắt việc & Hướng dẫn","ti-bulb"],["quyen","Người & Quyền","ti-users"],
  ["dulieu","Dữ liệu & Sổ sách","ti-table"]];
+/* ═══════════ V9.46 - MÀN CÀI ĐẶT PHẢI TỰ GIỚI THIỆU ────────────────────────────────────────
+   Anh Luân: *"Cài đặt phải phủ toàn bộ… và phải có hướng dẫn cụ thể, ko để a tự bơi trong 1 đống
+   các thông số cấu hình và cài đặt."*
+   Nhóm tab (ở trên) đã trả lời được "tìm ở đâu". Nhưng người mở Cài đặt lần đầu rơi thẳng vào
+   bảng 83 tham số CH2 - không ai nói cho họ biết 16 tab kia mỗi tab cai quản chuyện gì, tab nào
+   đang có bao nhiêu thứ, và việc hay làm nhất thì bấm vào đâu.
+   SETMOTA là BẢN KHAI của từng tab: một câu nói nó lo việc gì, và một hàm đếm nói nó đang giữ bao
+   nhiêu thứ (đếm THẬT, không viết số chết - số chết sẽ lệch ngay lần thêm dữ liệu kế tiếp).
+   Bộ kiểm bắt buộc: thêm tab mới mà không khai vào đây là đỏ. */
+function _sdem(f){try{var v=f();return v==null?"":String(v)}catch(e){return ""}}
+var SETMOTA={
+ tongquan:["Trang này - bản đồ toàn bộ Cài đặt: mỗi tab lo chuyện gì, đang giữ bao nhiêu thứ, và lối tắt tới việc hay làm nhất.",function(){return setTabs().length+" tab"},"ti-compass"],
+ brand:["Tên trung tâm, logo, màu chủ đạo và tiêu đề tab trình duyệt - đổi ở đây là cả app đổi theo ngay, dùng khi mang demo đi giới thiệu.",function(){return Object.keys(UIDEF).filter(function(k){return typeof UIDEF[k]!=="object"}).length+" mục"},"ti-palette"],
+ menu:["Bật/tắt và xếp lại thứ tự các mục trong menu bên trái - giấu bớt trang không dùng cho đỡ rối.",function(){return PAGES.filter(function(p){return !p.hide}).length+" trang trong menu"},"ti-menu-2"],
+ ch2:["Toàn bộ ngưỡng và hạn (SLA) mà app dùng để nhắc việc, tô đỏ, chặn duyệt. Đây là tab hay vào nhất.",function(){return APPPARAMS.length+" tham số · "+CFNHOM.length+" nhóm"},"ti-adjustments"],
+ ch6:["Ngưỡng ĐẠT của từng chỉ số KPI - app so số thực tế với ngưỡng ở đây để tô xanh/đỏ và viết câu khuyến nghị trên trang Báo cáo.",function(){return ((DATA.config||{}).ch6||[]).length+" chỉ số"},"ti-target"],
+ ch4:["Câu chữ của mọi lời nhắc việc, cộng kịch bản chăm sóc gợi ý theo từng chặng. Sửa câu ở đây là mọi nơi đổi theo.",function(){return ch4List().length+" thông điệp"},"ti-message-2"],
+ ch1:["Danh mục lựa chọn của mọi ô chọn trong app: trạng thái, nguồn lead, chi nhánh, lý do nghỉ… Thêm giá trị mới cho hợp với trung tâm.",function(){return Object.keys(ENUM||{}).length+" danh mục"},"ti-list"],
+ tro:["Trợ thủ - thứ dắt nhân viên đi hết hàng chờ của họ. Bật/tắt, chia lượt dọn, xếp nhóm việc nào dọn trước.",function(){return (tthCfg().order||[]).length+" nhóm việc"},"ti-bulb"],
+ nhip:["Nhịp ngày - danh sách việc theo giờ của từng chức danh, hiện ngay trang đầu khi họ mở app buổi sáng.",function(){return nhipRoles().length+" chức danh"},"ti-clock"],
+ huongdan:["Các bài hướng dẫn có sẵn trong app: tham quan màn hình, thao tác mẫu, cấu hình. Mỗi chức danh có bài riêng.",function(){return Object.keys(TOURS||{}).length+" bài"},"ti-school"],
+ phanquyen:["Ai thấy trang nào, ai bấm được nút nào, ai duyệt được việc gì - đối chiếu thẳng với bảng phân quyền CH3 của SOP.",function(){return CH3.length+" hành động"},"ti-shield-lock"],
+ staff:["Danh sách nhân viên, chức danh, chi nhánh và email đăng nhập - nguồn của mọi việc phân công và mọi phạm vi quyền.",function(){return rows("DL01").length+" người"},"ti-id-badge"],
+ giagio:["Bảng đơn giá giờ dạy theo giảng viên x loại ngày x ca - bảng công tháng của giảng viên tính thẳng từ đây.",function(){return rows("DL01").filter(isCongRole).length+" giảng viên"},"ti-clock-dollar"],
+ khoa:["Danh mục khóa học: học phí, số buổi, quota WOW. Đây là cấu hình sản phẩm, không phải lớp đang chạy.",function(){return rows("DL05").length+" khóa"},"ti-school"],
+ health:["Máy tự soi dữ liệu đang có và chỉ ra chỗ thiếu, chỗ lệch, chỗ mâu thuẫn - vào đây trước khi tin một con số báo cáo.",function(){var n=dataHealth().filter(function(x){return x.sev!=="ok"}).length;return n?(n+" chỗ cần xem"):"không có cảnh báo"},"ti-stethoscope"],
+ nhatky:["Ai đổi ô nào, từ gì sang gì, lúc mấy giờ, qua cửa nào - mọi lần ghi dữ liệu đều để lại một dòng.",function(){return logRows().length+" dòng"},"ti-history"],
+ demo:["Dựng lại dữ liệu demo, kéo ngày tháng về hôm nay, xoá sạch làm lại - chỉ có ở bản demo chạy trong trình duyệt.",function(){return "bản demo"},"ti-table"]};
 function setTabs(){
  var nHealth=dataHealth().filter(function(x){return x.sev!=="ok"}).length;
  return [
+  ["tongquan","Bắt đầu ở đây","batdau"],
   ["brand","Thương hiệu & Màu","giaodien"],
   ["menu","Menu sidebar","giaodien"],
   ["ch2","Ngưỡng & SLA (CH2)","luat"],
@@ -8160,8 +8198,46 @@ function setTabs(){
   ["health","Sức khỏe dữ liệu"+(nHealth?" ("+nHealth+")":""),"dulieu"],
   ["nhatky","Nhật ký thao tác","dulieu"]]
   .concat(SVR?[]:[["demo","Dữ liệu demo","dulieu"]])}
-function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch2:[],ch6:[]};
- var h='<div class="phead"><div><div class="t">Cài đặt hệ thống</div><div class="s">Cấu hình sống trong CH1-CH6 của sheet. Đổi 1 giá trị -> mọi nhắc việc/trạng thái/KPI phụ thuộc tự cập nhật.</div></div></div>';
+/* Lối tắt tới việc hay làm nhất trong Cài đặt. [nhãn, icon, câu giải thích, hành động]. Mọi hành
+   động ở đây phải là một cửa CÓ THẬT trong app - bộ kiểm gọi lại từng cái để chắc là không dẫn
+   người dùng vào khoảng không. */
+var SETNHANH=[
+ ["Đổi hotline trung tâm","ti-phone","Số hiện trong tin nhắn xác nhận và trên phiếu thu.","cfGo('centerHotline')"],
+ ["Đổi ngưỡng nợ quá hạn","ti-cash-off","Quá hạn đóng đợt bao nhiêu ngày thì chuyển thành nợ quá hạn.","cfGo('installmentLate_days')"],
+ ["Chiết khấu tới mức nào phải duyệt","ti-discount","Từ mức này trở lên thì đơn treo lại chờ quản lý gật.","cfGo('thresholdDiscount_approval')"],
+ ["Đổi đơn giá giờ dạy","ti-clock-dollar","Bảng giá theo giảng viên x loại ngày x ca - bảng công tính từ đây.","window.SETTAB='giagio';reRender('settings')"],
+ ["Thêm / sửa nhân viên","ti-id-badge","Chức danh và chi nhánh của một người quyết định họ thấy gì.","window.SETTAB='staff';reRender('settings')"],
+ ["Đổi tên & logo trung tâm","ti-palette","Dùng khi mang app đi giới thiệu cho trung tâm khác.","window.SETTAB='brand';reRender('settings')"],
+ ["Sửa lời nhắc việc","ti-message-2","Câu chữ app nhắc nhân viên - sửa một chỗ là mọi nơi đổi theo.","window.SETTAB='ch4';reRender('settings')"],
+ ["Xem ai được làm gì","ti-lock-check","Bảng phân quyền CH3 - đóng vai một chức danh để thử.","window.SETTAB='phanquyen';reRender('settings')"]];
+function renderSetTongquan(){
+ var stabs=setTabs(),rs=SCOPE();
+ if(rs.tabs&&rs.tabs.settings)stabs=stabs.filter(function(t){return rs.tabs.settings.indexOf(t[0])>=0});
+ var h='<div class="notebar"><i class="ti ti-compass"></i>Đây là <b>bản đồ của màn Cài đặt</b>. Mỗi ô dưới đây là một tab: nó cai quản chuyện gì, đang giữ bao nhiêu thứ, bấm vào là sang thẳng. Không cần nhớ tên tab - cứ đọc câu mô tả rồi bấm.</div>';
+ /* việc hay làm nhất - đi trước, vì phần lớn lần mở Cài đặt là để làm một trong số này */
+ h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-bolt" style="margin-right:6px"></i>Việc hay làm nhất</b><span class="mut" style="font-size:11.5px">bấm là tới thẳng đúng ô, không phải dò</span></div><div class="pbody"><div class="pickgrid">';
+ SETNHANH.forEach(function(x){
+  h+='<button class="pickc wrap" onclick="'+x[3].split('"').join("&quot;")+'">'+
+   '<i class="ti '+esc(x[1])+'"></i><span><b>'+esc(x[0])+'</b><small>'+esc(x[2])+'</small></span>'+
+   '<i class="ti ti-chevron-right"></i></button>'});
+ h+='</div></div></div>';
+ /* toàn bộ tab, xếp theo đúng 5 nhóm của thanh tab bên trên */
+ SETGRP.forEach(function(g){
+  var L=stabs.filter(function(t){return (t[2]||"dulieu")===g[0]&&t[0]!=="tongquan"});
+  if(!L.length)return;
+  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti '+g[2]+'" style="margin-right:6px"></i>'+esc(g[1])+'</b><span class="mut" style="font-size:11.5px">'+L.length+' tab</span></div><div class="pbody"><div class="pickgrid">';
+  L.forEach(function(t){
+   var M=SETMOTA[t[0]];
+   var dem=M?_sdem(M[1]):"";
+   h+='<button class="pickc wrap" onclick="window.SETTAB=\''+esc(t[0])+'\';reRender(\'settings\')">'+
+    '<i class="ti '+esc((M&&M[2])||"ti-settings-2")+'"></i><span><b>'+esc(t[1])+'</b>'+
+    '<small>'+esc(M?M[0]:"Tab này chưa được khai trong bảng SETMOTA - báo kỹ thuật khai vào.")+'</small></span>'+
+    (dem?'<span class="chip gray">'+esc(dem)+'</span>':'')+'</button>'});
+  h+='</div></div></div>'});
+ h+='<div class="notebar"><i class="ti ti-shield-half"></i>Đổi cấu hình là <b>áp ngay cho cả app</b>, không cần build lại và không cần khởi động lại. Mỗi lần lưu đều để lại một dòng ở tab <b>Nhật ký thao tác</b> - lỡ tay thì vào đó xem đã đổi gì.</div>';
+ return h}
+function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)||{ch2:[],ch6:[]};
+ var h='<div class="phead"><div><div class="t">Cài đặt hệ thống</div><div class="s">Nơi DUY NHẤT cấu hình cả app - đổi 1 giá trị là mọi nhắc việc, trạng thái và KPI phụ thuộc tự cập nhật theo, không cần build lại.</div></div></div>';
  h+='<div class="settabs" data-tour="settabs">';
  var stabs=setTabs();
  var rsS=SCOPE();if(rsS.tabs&&rsS.tabs.settings)stabs=stabs.filter(function(t){return rsS.tabs.settings.indexOf(t[0])>=0});
@@ -8174,6 +8250,7 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
   L.forEach(function(t){h+='<button class="stab'+(tab===t[0]?" on":"")+'" onclick="window.SETTAB=\''+t[0]+'\';reRender(\'settings\')">'+esc(t[1])+'</button>'});
   h+='</div>'});
  h+='</div>';
+ if(tab==="tongquan")return h+renderSetTongquan();
  if(tab==="health")return h+renderHealth();
  if(tab==="nhatky")return h+renderNhatky();
  if(tab==="tro")return h+renderTro();
@@ -8333,7 +8410,11 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
  if(tab==="ch2"){
   h+='<div class="notebar"><i class="ti ti-alert-triangle"></i>Chỉ Quản lý / Giám đốc sửa được. Nhập số -> Lưu -> áp dụng ngay cho mọi nhắc việc & trạng thái tự động.</div>';
   var used={}; APPPARAMS.forEach(function(p){used[paramSheetName(p[1])]=1});
+  /* V9.46: nhóm xếp theo ĐÚNG HÀNH TRÌNH SOP (CFNHOM), không theo thứ tự xuất hiện trong mã. */
   var grps=[]; APPPARAMS.forEach(function(p){if(grps.indexOf(p[0])<0)grps.push(p[0])});
+  grps.sort(function(a,b){var x=CFNHOMBY[a],y=CFNHOMBY[b];
+   return (x?x.ord:998)-(y?y.ord:998)||(a<b?-1:a>b?1:0)});
+  var cq=(window.CFQ||"").toLowerCase().trim();
   function prow(name,meaning,unit,val,miss,sheetName,ptype){
    var inp;
    if(Object.prototype.toString.call(ptype)==="[object Array]"){        /* danh sách chọn */
@@ -8349,14 +8430,39 @@ function renderSettings(){var tab=window.SETTAB||"ch2";var cf=(DATA.config)||{ch
     '<td>'+inp+'</td>'+
     '<td style="font-size:11.5px">'+esc(unit)+'</td>'+
     '<td><button class="btn sm" onclick="saveParam(\''+esc(name)+'\')"><i class="ti ti-device-floppy"></i>Lưu</button></td></tr>'}
+  /* V9.46 - ô tìm tham số. Anh Luân: "ko để a tự bơi trong 1 đống các thông số". 83 tham số thì
+     việc đầu tiên phải là TÌM ĐƯỢC nó. Tìm theo tên máy, theo câu nghĩa, hay theo tên nhóm. */
+  function hopKhop(p){return !cq||((p[0]+" "+p[1]+" "+p[2]).toLowerCase().indexOf(cq)>=0)}
+  var soKhop=APPPARAMS.filter(hopKhop).length;
+  h+='<div class="fbar"><span class="lbl">Tìm tham số</span>'+
+   '<input class="sel" style="min-width:280px" value="'+esc(window.CFQ||"")+'" placeholder="vd: hoàn tiền, nguy cơ, chiết khấu, giờ..." oninput="window.CFQ=this.value;reRender(\'settings\')">'+
+   (cq?'<button class="btn sm" onclick="window.CFQ=\'\';reRender(\'settings\')"><i class="ti ti-x"></i>Bỏ lọc</button><span class="mut" style="font-size:11.5px">'+soKhop+'/'+APPPARAMS.length+' tham số khớp</span>':
+       '<span class="mut" style="font-size:11.5px">'+APPPARAMS.length+' tham số trong '+grps.length+' nhóm, xếp theo hành trình P1 → P10</span>')+'</div>';
+  if(cq&&!soKhop)h+='<div class="panel"><div class="empty">Không thấy tham số nào khớp "'+esc(window.CFQ||"")+'".</div></div>';
   grps.forEach(function(g){
-   h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-adjustments" style="margin-right:6px"></i>'+esc(g)+'</b><span class="mut" style="font-size:11.5px">app đang dùng trực tiếp</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Tham số</th><th>Ý nghĩa</th><th>Giá trị</th><th>Đơn vị</th><th></th></tr></thead><tbody>';
-   APPPARAMS.filter(function(p){return p[0]===g}).forEach(function(p){
+   var ps=APPPARAMS.filter(function(p){return p[0]===g&&hopKhop(p)});
+   if(!ps.length)return;
+   var N=CFNHOMBY[g];
+   h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-adjustments" style="margin-right:6px"></i>'+esc(g)+'</b><span class="mut" style="font-size:11.5px">'+ps.length+' tham số'+(cq&&ps.length<APPPARAMS.filter(function(p){return p[0]===g}).length?' khớp':'')+'</span></div>';
+   /* Mỗi nhóm tự giới thiệu: nó cai quản chuyện gì, và đổi số ở đây thì MÀN NÀO đổi theo. */
+   if(N){
+    h+='<div style="padding:10px 14px 0"><div class="mut" style="font-size:12px;line-height:1.65">'+esc(N.d)+'</div>';
+    if(N.pg&&N.pg.length){
+     h+='<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px"><span class="mut" style="font-size:11px">Đổi ở đây thì xem kết quả tại:</span>';
+     N.pg.forEach(function(k){var P=PBK[k];if(!P)return;
+      h+='<button class="btn sm" onclick="go(\''+esc(k)+'\')"><i class="ti '+esc(P.ic||"ti-arrow-right")+'"></i>'+esc(P.t)+'</button>'});
+     h+='</div>'}
+    h+='</div>';
+   }else{
+    h+='<div style="padding:10px 14px 0"><div class="notebar" style="margin:0"><i class="ti ti-alert-triangle"></i>Nhóm này chưa được khai trong bảng CFNHOM nên chưa có lời giới thiệu - báo kỹ thuật khai vào.</div></div>';
+   }
+   h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Tham số</th><th>Ý nghĩa</th><th>Giá trị</th><th>Đơn vị</th><th></th></tr></thead><tbody>';
+   ps.forEach(function(p){
     var sn=paramSheetName(p[1]);var onSheet=false,uv=p[3];
     for(var i=0;i<cf.ch2.length;i++)if(cf.ch2[i].name===sn){onSheet=true;if(cf.ch2[i].unit)uv=cf.ch2[i].unit}
     h+=prow(p[1],p[2],uv,paramOf(p[1],p[4]),!onSheet,sn,p[5])});
    h+='</tbody></table></div></div>'});
-  var rest=cf.ch2.filter(function(p){return !used[p.name]});
+  var rest=cf.ch2.filter(function(p){return !used[p.name]&&(!cq||((p.name+" "+(p.meaning||"")).toLowerCase().indexOf(cq)>=0))});
   h+='<div class="panel"><div class="ph"><b><i class="ti ti-list-details" style="margin-right:6px"></i>Tham số khác trong CH2 ('+rest.length+')</b><span class="mut" style="font-size:11.5px">dùng cho quy trình/báo cáo, app chưa tự nhắc</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Tham số</th><th>Ý nghĩa</th><th>Giá trị</th><th>Đơn vị</th><th></th></tr></thead><tbody>';
   rest.forEach(function(p){h+=prow(p.name,p.meaning,p.unit,p.value,false,null)});
   if(!cf.ch2.length)h+='<tr><td class="empty" colspan="5">Chưa nạp được CH2 (bản v3 dùng cấu hình trong file demo; v4 đọc trực tiếp CH2 trên sheet).</td></tr>';
@@ -8768,7 +8874,9 @@ var PKEY={
    Trước đây app in "hạn 24h" khắp nơi mà không nói 24 lấy từ đâu; muốn đổi thì phải mò trong Cài đặt
    giữa hơn 60 dòng. slaChip in con số + một bánh răng bấm vào là nhảy thẳng tới ĐÚNG DÒNG đó và tô
    sáng. Dùng ở mọi chỗ đang in số SLA. */
-function cfGo(name){window.SETTAB="ch2";window.CFHL=name;go("settings");
+/* V9.46: PHẢI xoá ô tìm trước khi nhảy - nếu người dùng đang lọc "hoàn tiền" mà bấm bánh răng của
+   một tham số khác thì dòng đó bị ô lọc giấu đi, cfGo sẽ báo nhầm là "chưa có ô sửa". */
+function cfGo(name){window.SETTAB="ch2";window.CFHL=name;window.CFQ="";go("settings");
  setTimeout(function(){var el=document.getElementById("cfrow_"+name);
   if(el){if(el.scrollIntoView)el.scrollIntoView({block:"center"});el.classList.add("cfhl");
    setTimeout(function(){el.classList.remove("cfhl")},2600)}
@@ -8809,100 +8917,132 @@ function paramSheetName(name){var c=(DATA.config&&DATA.config.ch2)||[];
  for(var j=0;j<names.length;j++)for(var i=0;i<c.length;i++)if(c[i].name===names[j])return names[j];
  return (PKEY[name]&&PKEY[name][0])||name}
 /* Danh mục THAM SỐ APP ĐANG DÙNG: [nhóm, tên app, ý nghĩa, đơn vị, mặc định] */
+/* ═══════════ V9.46 - MỖI NHÓM THAM SỐ PHẢI TỰ GIỚI THIỆU ═══════════════════════════════
+   Anh Luân: *"Cài đặt phải phủ toàn bộ, a phải có quyền cấu hình, chỉnh sửa bất cứ thứ gì anh
+   muốn, và phải có hướng dẫn cụ thể, ko để a tự bơi trong 1 đống các thông số cấu hình."*
+
+   Trước bản này màn CH2 có 83 tham số trong **20 nhóm đặt tên tuỳ hứng** - trong đó có những cặp
+   trùng nghĩa mà chỉ khác một chữ: "Học vụ - Lớp học" (10 tham số) và "Học vụ - Lớp" (6), "CSKH"
+   và "CSKH & Kết thúc" và "WOW & CSKH". Người vào tìm một ngưỡng không biết nhìn nhóm nào. Nhóm
+   lại hiện theo thứ tự xuất hiện trong mã nguồn, tức là ngẫu nhiên.
+   Từng tham số thì ĐÃ có câu giải nghĩa - nhưng "có mô tả từng dòng" không phải là "không phải
+   tự bơi". Thiếu hai thứ: nhóm này cai quản chuyện gì, và đổi số ở đây thì MÀN NÀO đổi theo.
+
+   Nay 17 nhóm xếp theo đúng hành trình SOP (P1 → P10), mỗi nhóm có một câu nói nó lo việc gì và
+   danh sách trang bấm thẳng sang để xem kết quả. Bộ kiểm bắt buộc nhóm mới phải khai vào đây. */
+var CFNHOM=[
+ ["Trung tâm","Thông tin nhận dạng của trung tâm - hiện trên cổng học viên, phiếu thu và mọi tin nhắn gửi khách.",["dsthanhtoan","thanhtoan"]],
+ ["P1 · Lead & chăm khách","Bao lâu phải gọi khách mới, gọi mấy lần không được thì coi như mất, quá hẹn bao lâu thì tính là bỏ rơi. Đây là nhóm quyết định cảnh báo đỏ của đội tư vấn.",["tuyensinh","viec"]],
+ ["P2 · Test đầu vào & tư vấn","Hạn nhắc lịch test, hạn chấm bài, và có kết quả rồi thì bao lâu phải tư vấn cho khách.",["tuyensinh","viec"]],
+ ["P3 · Đăng ký & chiết khấu","Chiết khấu tới mức nào phải trình quản lý, quản lý duyệt trong bao lâu, cọc tối thiểu bao nhiêu, đơn treo bao lâu thì nên hủy.",["tuyensinh","duyet"]],
+ ["P4 · Học phí, đợt đóng & công nợ","Chia học phí thành mấy đợt, nhắc trước hạn mấy ngày, quá hạn bao lâu thành nợ đỏ, và nhắc rồi thì tạm lùi bao lâu.",["tuyensinh","dsthanhtoan","viec"]],
+ ["P4 · Hoàn tiền khi hủy","Chính sách hoàn tiền theo số ngày đã học - ba mốc và hai mức phần trăm. Màn duyệt hoàn tiền gợi ý số tiền dựa đúng vào đây.",["duyet"]],
+ ["Công giảng dạy & đơn giá giờ","Đơn giá mặc định theo ca, ranh giới giờ sáng - chiều - tối, giá buổi WOW và ca test. Bảng công tháng tính từ đây.",["settings","hoctap"]],
+ ["P5 · Xếp lớp & nhập học","Đóng tiền xong bao lâu phải xếp lớp, xếp rồi bao lâu phải gửi thông tin, và lớp sắp khai giảng thiếu sĩ số thì khi nào phải quyết.",["xeplop","viec"]],
+ ["P6 · Buổi học, điểm danh & bài tập","Cổng điểm danh mở trước giờ học bao lâu, điểm danh muộn tới đâu còn nhận, hạn ghi nhận xét buổi và hạn chấm bài.",["banglop","hoctap","baitap"]],
+ ["P6 · Học viên nguy cơ","Vắng mấy buổi hoặc thiếu mấy bài thì máy tự coi là có nguy cơ, bao lâu phải can thiệp, và 'tạm bỏ qua' thì máy im mấy ngày.",["hocvien","viec"]],
+ ["P7 · Buổi WOW 1-1","Hạn xác nhận buổi mới đặt, hạn ghi nội dung sau buổi, mỗi lần cấp thêm tối đa mấy lượt, và bao lâu không bấm kết thúc thì máy tự chốt.",["hoctap","dswow"]],
+ ["P8-P9 · Khảo sát, phản hồi & khiếu nại","Điểm hài lòng dưới mức nào thì phải hỏi lại, hạn phân loại phản hồi, và ba mức hạn xử lý khiếu nại theo độ nghiêm trọng.",["cskh","viec"]],
+ ["P10 · Kết thúc khóa & tái đăng ký","Trước khi hết khóa bao nhiêu ngày thì chuẩn bị, bao lâu phải mời tái đăng ký, và học viên bảo lưu bao lâu thì nhắc lại.",["ketthuc","viec"]],
+ ["Giới thiệu bạn bè","Người giới thiệu được thưởng bao nhiêu, bạn được giới thiệu giảm bao nhiêu, và trao thưởng trong bao lâu.",["magioithieu"]],
+ ["Giao việc nội bộ","Việc giao xuống bao lâu phải bấm nhận, báo xong rồi bao lâu người giao phải xác nhận.",["giaoviec"]],
+ ["Hẹn giờ mặc định","Khi app tự đặt lịch hẹn thì lấy mấy giờ làm mặc định cho sáng - trưa - chiều - tối, và bao lâu nữa thì tính là 'sắp tới'.",["viec","tuyensinh"]],
+ ["Hệ thống & dữ liệu demo","Nhật ký thao tác giữ bao nhiêu dòng, hoàn tác được trong bao nhiêu giây, và dữ liệu demo cũ bao nhiêu ngày thì tự kéo về hiện tại.",["settings"]]];
+var CFNHOMBY={};CFNHOM.forEach(function(x,i){CFNHOMBY[x[0]]={d:x[1],pg:x[2],ord:i}});
 var APPPARAMS=[
  /* V9.29o: một buổi chiếm chỗ của giáo viên bao lâu - dùng cho cảnh báo trùng giờ trên lịch tuần
     VÀ cho việc lọc người thay được. Trước đây con số 2 giờ nằm cắm cứng trong renderLichTuan. */
- ["Dữ liệu demo","demoAutoShift_days","Dữ liệu demo cũ hơn hôm nay bao nhiêu ngày thì app tự kéo về hiện tại (0 = không tự kéo)","ngày",14],
- ["Nhật ký & Hoàn tác","auditLogKeep_rows","Nhật ký thao tác giữ lại bao nhiêu dòng gần nhất","dòng",500],
- ["Nhật ký & Hoàn tác","undoWindow_seconds","Làm xong một thao tác thì nút Hoàn tác hiện bao lâu","giây",25],
- ["Xếp lịch & Giảng dạy","attendanceGrace_hours","Buổi dạy xong bao lâu thì BẮT BUỘC phải có điểm danh (trong khoảng này còn coi là hàng chờ)","giờ",24],
- ["Xếp lịch & Giảng dạy","homeworkDueFallback_days","Hạn nộp bài mặc định khi giáo án không ghi rõ (tính từ ngày học)","ngày",5],
- ["Tiền - Công giảng dạy","teacherPayPerSession","Tiền công một buổi dạy (dùng để tạm tính bảng công tháng)","đ/buổi",250000],
- ["Tiền - Công giảng dạy","teacherPayPerHour","Đơn giá GIỜ dạy dùng khi bảng đơn giá chưa khai ô nào khớp","đ/giờ",180000],
- ["Tiền - Công giảng dạy","shiftNoon_hour","Buổi bắt đầu từ giờ này trở đi tính là CA CHIỀU","giờ trong ngày",12],
- ["Tiền - Công giảng dạy","shiftEvening_hour","Buổi bắt đầu từ giờ này trở đi tính là CA TỐI","giờ trong ngày",17],
- ["Tiền - Công giảng dạy","testPayPerCase","Tiền công một CA TEST đầu vào (coi + chấm) - tính theo LẦN, không theo giờ","đ/lần",120000],
- ["Tiền - Công giảng dạy","wowPayPerSession","Tiền công một buổi WOW 1-1 (buổi kèm riêng, tính tách khỏi buổi lớp)","đ/buổi",250000],
- ["Học tập - WOW","wowGrantMax_perTime","Mỗi lần cấp thêm tối đa bao nhiêu lượt WOW cho một học viên","lượt",3],
- ["Hẹn & Chăm sóc","apptSoon_hours","Nút hẹn nhanh \"N tiếng nữa\" - N là bao nhiêu","giờ",2],
- ["Hẹn & Chăm sóc","apptMorning_hour","Giờ hẹn buổi sáng dùng cho các nút gợi ý","giờ trong ngày",9],
- ["Hẹn & Chăm sóc","apptNoon_hour","Giờ hẹn đầu giờ chiều dùng cho các nút gợi ý","giờ trong ngày",14],
- ["Hẹn & Chăm sóc","apptAfternoon_hour","Giờ hẹn chiều dùng cho các nút gợi ý","giờ trong ngày",15],
- ["Hẹn & Chăm sóc","apptEvening_hour","Giờ hẹn ca tối dùng cho các nút gợi ý","giờ trong ngày",19],
- ["Xếp lịch & Giảng dạy","sessionSpan_hours","Một buổi chiếm chỗ của giáo viên bao lâu (dùng để soi trùng giờ và tìm người dạy thay)","giờ",2],
- ["Giao việc","slaTaskAccept_hours","Người nhận phải BẤM NHẬN việc trong bao lâu (quá hạn -> nhắc)","giờ",4],
- ["Giao việc","slaTaskConfirm_hours","Người giao phải xác nhận sau khi được báo xong trong bao lâu","giờ",24],
- ["Tuyển sinh - Lead","slaRetryCall_hours","Gọi hụt bao lâu thì nhắc gọi lại (khi chưa đặt lịch hẹn)","giờ",4],
- ["Tuyển sinh - Lead","attemptsNoResponse","Gọi hụt liên tiếp bao nhiêu lần -> chuyển 'Không liên lạc được' + nhắc đổi kênh","lần",3],
- ["Tuyển sinh - Lead","attemptsUnreachable","Gọi hụt liên tiếp bao nhiêu lần -> chuyển 'Hết cách liên lạc'","lần",5],
- ["Tuyển sinh - Test & Tư vấn","slaTestBookedRemind_hours","Sau khi đặt lịch test, quá bao lâu chưa ghi nhận dự test thì nhắc","giờ",24],
- ["Tài chính","thresholdDiscount_approval","Chiết khấu từ mức này trở lên phải trình quản lý duyệt","VND",1000000],
+ ["Hệ thống & dữ liệu demo","demoAutoShift_days","Dữ liệu demo cũ hơn hôm nay bao nhiêu ngày thì app tự kéo về hiện tại (0 = không tự kéo)","ngày",14],
+ ["Hệ thống & dữ liệu demo","auditLogKeep_rows","Nhật ký thao tác giữ lại bao nhiêu dòng gần nhất","dòng",500],
+ ["Hệ thống & dữ liệu demo","undoWindow_seconds","Làm xong một thao tác thì nút Hoàn tác hiện bao lâu","giây",25],
+ ["P6 · Buổi học, điểm danh & bài tập","attendanceGrace_hours","Buổi dạy xong bao lâu thì BẮT BUỘC phải có điểm danh (trong khoảng này còn coi là hàng chờ)","giờ",24],
+ ["P6 · Buổi học, điểm danh & bài tập","homeworkDueFallback_days","Hạn nộp bài mặc định khi giáo án không ghi rõ (tính từ ngày học)","ngày",5],
+ ["Công giảng dạy & đơn giá giờ","teacherPayPerSession","Tiền công một buổi dạy (dùng để tạm tính bảng công tháng)","đ/buổi",250000],
+ ["Công giảng dạy & đơn giá giờ","teacherPayPerHour","Đơn giá GIỜ dạy dùng khi bảng đơn giá chưa khai ô nào khớp","đ/giờ",180000],
+ ["Công giảng dạy & đơn giá giờ","shiftNoon_hour","Buổi bắt đầu từ giờ này trở đi tính là CA CHIỀU","giờ trong ngày",12],
+ ["Công giảng dạy & đơn giá giờ","shiftEvening_hour","Buổi bắt đầu từ giờ này trở đi tính là CA TỐI","giờ trong ngày",17],
+ ["Công giảng dạy & đơn giá giờ","testPayPerCase","Tiền công một CA TEST đầu vào (coi + chấm) - tính theo LẦN, không theo giờ","đ/lần",120000],
+ ["Công giảng dạy & đơn giá giờ","wowPayPerSession","Tiền công một buổi WOW 1-1 (buổi kèm riêng, tính tách khỏi buổi lớp)","đ/buổi",250000],
+ ["P7 · Buổi WOW 1-1","wowGrantMax_perTime","Mỗi lần cấp thêm tối đa bao nhiêu lượt WOW cho một học viên","lượt",3],
+ ["Hẹn giờ mặc định","apptSoon_hours","Nút hẹn nhanh \"N tiếng nữa\" - N là bao nhiêu","giờ",2],
+ ["Hẹn giờ mặc định","apptMorning_hour","Giờ hẹn buổi sáng dùng cho các nút gợi ý","giờ trong ngày",9],
+ ["Hẹn giờ mặc định","apptNoon_hour","Giờ hẹn đầu giờ chiều dùng cho các nút gợi ý","giờ trong ngày",14],
+ ["Hẹn giờ mặc định","apptAfternoon_hour","Giờ hẹn chiều dùng cho các nút gợi ý","giờ trong ngày",15],
+ ["Hẹn giờ mặc định","apptEvening_hour","Giờ hẹn ca tối dùng cho các nút gợi ý","giờ trong ngày",19],
+ ["P6 · Buổi học, điểm danh & bài tập","sessionSpan_hours","Một buổi chiếm chỗ của giáo viên bao lâu (dùng để soi trùng giờ và tìm người dạy thay)","giờ",2],
+ ["Giao việc nội bộ","slaTaskAccept_hours","Người nhận phải BẤM NHẬN việc trong bao lâu (quá hạn -> nhắc)","giờ",4],
+ ["Giao việc nội bộ","slaTaskConfirm_hours","Người giao phải xác nhận sau khi được báo xong trong bao lâu","giờ",24],
+ ["P1 · Lead & chăm khách","slaRetryCall_hours","Gọi hụt bao lâu thì nhắc gọi lại (khi chưa đặt lịch hẹn)","giờ",4],
+ ["P1 · Lead & chăm khách","attemptsNoResponse","Gọi hụt liên tiếp bao nhiêu lần -> chuyển 'Không liên lạc được' + nhắc đổi kênh","lần",3],
+ ["P1 · Lead & chăm khách","attemptsUnreachable","Gọi hụt liên tiếp bao nhiêu lần -> chuyển 'Hết cách liên lạc'","lần",5],
+ ["P2 · Test đầu vào & tư vấn","slaTestBookedRemind_hours","Sau khi đặt lịch test, quá bao lâu chưa ghi nhận dự test thì nhắc","giờ",24],
+ ["P3 · Đăng ký & chiết khấu","thresholdDiscount_approval","Chiết khấu từ mức này trở lên phải trình quản lý duyệt","VND",1000000],
  ["Giới thiệu bạn bè","referralFriend_discountType","Kiểu ưu đãi cho bạn được giới thiệu","kiểu","percent",["percent","amount"]],
  ["Giới thiệu bạn bè","referralFriend_discount","Mức giảm cho bạn được giới thiệu (nếu percent thì nhập 10 = 10%, nếu amount thì nhập số tiền)","% hoặc VND",10],
  ["Giới thiệu bạn bè","referralReferrer_reward","Phần thưởng cho học viên giới thiệu (mô tả tự do)","chữ","1 buổi WOW 1-1 miễn phí cho mỗi bạn đăng ký thành công","text"],
  ["Trung tâm","centerHotline","Hotline hiện trong tin nhắn xác nhận và phiếu thu","chữ","","text"],
- ["CSKH & Kết thúc","thresholdPauseRemind_days","Nhắc gọi mời HV bảo lưu quay lại TRƯỚC hạn bao nhiêu ngày","ngày",14],
- ["Tài chính","refundPartial_percent","Mức hoàn (%) khi hủy trong cửa sổ refundPartial_days","%",70],
- ["Tài chính","refundReduced_percent","Mức hoàn (%) khi hủy trong cửa sổ refundReduced_days","%",50],
+ ["P10 · Kết thúc khóa & tái đăng ký","thresholdPauseRemind_days","Nhắc gọi mời HV bảo lưu quay lại TRƯỚC hạn bao nhiêu ngày","ngày",14],
+ ["P4 · Hoàn tiền khi hủy","refundPartial_percent","Mức hoàn (%) khi hủy trong cửa sổ refundPartial_days","%",70],
+ ["P4 · Hoàn tiền khi hủy","refundReduced_percent","Mức hoàn (%) khi hủy trong cửa sổ refundReduced_days","%",50],
  ["Trung tâm","centerAddress","Địa chỉ hiện trên phiếu thu","chữ","","text"],
- ["Tài chính","thresholdDebtAlert","Còn nợ từ mức này trở lên thì hiện cảnh báo thu công nợ","VND",3000000],
- ["Tài chính","slaPayment_grace_days","Sau đăng ký bao nhiêu ngày mới bắt đầu nhắc nợ","ngày",7],
- ["Học vụ - Xếp lớp","slaClassInfoZalo_hours","Hạn gửi thông tin lớp cho HV sau khi xếp lớp","giờ",24],
- ["Học vụ - Xếp lớp","slaOBT_hours","Hạn hoàn tất onboarding cho HV mới","giờ",48],
- ["Học vụ - Lớp học","slaAttendanceGate_minutes","Cổng điểm danh mở bao nhiêu phút TRƯỚC giờ học (GV bấm Bắt đầu lớp trong khoảng này)","phút",20],
- ["Học vụ - Lớp học","thresholdAtRisk_absences","Vắng không phép bao nhiêu buổi -> HV có nguy cơ chuyên cần","buổi",2],
- ["Học vụ - Lớp học","thresholdAtRisk_hw_missing","Thiếu bài tập bao nhiêu lần -> HV có nguy cơ học thuật","lần",3],
- ["Tài chính","referralRewardGrant_days","Bạn được giới thiệu đã đăng ký thì phải trao thưởng cho người giới thiệu trong bao nhiêu ngày","ngày",7],
- ["Tài chính","debtRemindGap_days","Nhắc thu nợ rồi thì việc tạm lùi bao nhiêu ngày trước khi hiện lại (khoản quá hạn vẫn giữ)","ngày",3],
- ["CSKH","slaComplaintFollowup_days","Đóng khiếu nại rồi thì trong bao nhiêu ngày phải hỏi lại học viên đã ổn chưa","ngày",3],
- ["Tuyển sinh - Đăng ký","slaENR_stale_hours","Đăng ký để ở trạng thái chờ quá bao nhiêu giờ thì cân nhắc hủy để dọn dữ liệu","giờ",168],
- ["Học vụ - Lớp học","wowMaxHours","Buổi WOW bấm bắt đầu quá bao nhiêu giờ mà chưa bấm kết thúc thì nhắc","giờ",3],
- ["Học vụ - Lớp học","slaWowConfirm_hours","Hạn giáo viên WOW xác nhận một buổi vừa được đặt","giờ",24],
- ["Học vụ - Lớp học","riskIgnore_days","Học vụ xem rồi bấm 'tạm bỏ qua' thì máy im bao nhiêu ngày trước khi nhắc lại","ngày",14],
- ["Học vụ - Lớp học","thresholdClassStart_days","Còn bao nhiêu ngày tới khai giảng thì lớp vào diện theo dõi sĩ số","ngày",14],
- ["Học vụ - Lớp học","classMinStudents","Sĩ số tối thiểu để một lớp khai giảng - dưới mức này phải quyết dồn lớp, lùi ngày hoặc hủy sớm","học viên",6],
- ["Học vụ - Lớp học","classDecide_days","Còn bao nhiêu ngày tới khai giảng mà vẫn thiếu sĩ số thì chuyển đỏ - hết giờ cân nhắc, phải quyết","ngày",7],
- ["WOW & CSKH","slaWowNote_hours","Hạn ghi nội dung sau buổi WOW 1-1","giờ",24],
- ["WOW & CSKH","thresholdSurveyFollowup_score","Điểm hài lòng (và số sao học viên chấm buổi học) từ mức này trở xuống thì tính là phản hồi tiêu cực, tự bật cờ cần gọi lại","điểm",3],
- ["Học vụ - Lớp học","wowPendingMax_perStudent","Học viên được để tối đa bao nhiêu buổi WOW chờ trung tâm xác nhận","buổi",1],
- ["WOW & CSKH","slaComplaintHigh_hours","Hạn xử lý khiếu nại mức CAO","giờ",4],
- ["WOW & CSKH","slaComplaintMed_hours","Hạn xử lý khiếu nại mức TRUNG BÌNH","giờ",48],
- ["WOW & CSKH","slaComplaintLow_hours","Hạn xử lý khiếu nại mức THẤP","giờ",168],
+ ["P4 · Học phí, đợt đóng & công nợ","thresholdDebtAlert","Còn nợ từ mức này trở lên thì hiện cảnh báo thu công nợ","VND",3000000],
+ ["P4 · Học phí, đợt đóng & công nợ","slaPayment_grace_days","Sau đăng ký bao nhiêu ngày mới bắt đầu nhắc nợ","ngày",7],
+ ["P5 · Xếp lớp & nhập học","slaClassInfoZalo_hours","Hạn gửi thông tin lớp cho HV sau khi xếp lớp","giờ",24],
+ ["P5 · Xếp lớp & nhập học","slaOBT_hours","Hạn hoàn tất onboarding cho HV mới","giờ",48],
+ ["P6 · Buổi học, điểm danh & bài tập","slaAttendanceGate_minutes","Cổng điểm danh mở bao nhiêu phút TRƯỚC giờ học (GV bấm Bắt đầu lớp trong khoảng này)","phút",20],
+ ["P6 · Học viên nguy cơ","thresholdAtRisk_absences","Vắng không phép bao nhiêu buổi -> HV có nguy cơ chuyên cần","buổi",2],
+ ["P6 · Học viên nguy cơ","thresholdAtRisk_hw_missing","Thiếu bài tập bao nhiêu lần -> HV có nguy cơ học thuật","lần",3],
+ ["Giới thiệu bạn bè","referralRewardGrant_days","Bạn được giới thiệu đã đăng ký thì phải trao thưởng cho người giới thiệu trong bao nhiêu ngày","ngày",7],
+ ["P4 · Học phí, đợt đóng & công nợ","debtRemindGap_days","Nhắc thu nợ rồi thì việc tạm lùi bao nhiêu ngày trước khi hiện lại (khoản quá hạn vẫn giữ)","ngày",3],
+ ["P8-P9 · Khảo sát, phản hồi & khiếu nại","slaComplaintFollowup_days","Đóng khiếu nại rồi thì trong bao nhiêu ngày phải hỏi lại học viên đã ổn chưa","ngày",3],
+ ["P3 · Đăng ký & chiết khấu","slaENR_stale_hours","Đăng ký để ở trạng thái chờ quá bao nhiêu giờ thì cân nhắc hủy để dọn dữ liệu","giờ",168],
+ ["P7 · Buổi WOW 1-1","wowMaxHours","Buổi WOW bấm bắt đầu quá bao nhiêu giờ mà chưa bấm kết thúc thì nhắc","giờ",3],
+ ["P7 · Buổi WOW 1-1","slaWowConfirm_hours","Hạn giáo viên WOW xác nhận một buổi vừa được đặt","giờ",24],
+ ["P6 · Học viên nguy cơ","riskIgnore_days","Học vụ xem rồi bấm 'tạm bỏ qua' thì máy im bao nhiêu ngày trước khi nhắc lại","ngày",14],
+ ["P5 · Xếp lớp & nhập học","thresholdClassStart_days","Còn bao nhiêu ngày tới khai giảng thì lớp vào diện theo dõi sĩ số","ngày",14],
+ ["P5 · Xếp lớp & nhập học","classMinStudents","Sĩ số tối thiểu để một lớp khai giảng - dưới mức này phải quyết dồn lớp, lùi ngày hoặc hủy sớm","học viên",6],
+ ["P5 · Xếp lớp & nhập học","classDecide_days","Còn bao nhiêu ngày tới khai giảng mà vẫn thiếu sĩ số thì chuyển đỏ - hết giờ cân nhắc, phải quyết","ngày",7],
+ ["P7 · Buổi WOW 1-1","slaWowNote_hours","Hạn ghi nội dung sau buổi WOW 1-1","giờ",24],
+ ["P8-P9 · Khảo sát, phản hồi & khiếu nại","thresholdSurveyFollowup_score","Điểm hài lòng (và số sao học viên chấm buổi học) từ mức này trở xuống thì tính là phản hồi tiêu cực, tự bật cờ cần gọi lại","điểm",3],
+ ["P7 · Buổi WOW 1-1","wowPendingMax_perStudent","Học viên được để tối đa bao nhiêu buổi WOW chờ trung tâm xác nhận","buổi",1],
+ ["P8-P9 · Khảo sát, phản hồi & khiếu nại","slaComplaintHigh_hours","Hạn xử lý khiếu nại mức CAO","giờ",4],
+ ["P8-P9 · Khảo sát, phản hồi & khiếu nại","slaComplaintMed_hours","Hạn xử lý khiếu nại mức TRUNG BÌNH","giờ",48],
+ ["P8-P9 · Khảo sát, phản hồi & khiếu nại","slaComplaintLow_hours","Hạn xử lý khiếu nại mức THẤP","giờ",168],
  /* ═══ V9.29 (mảng 5): 23 tham số app ĐANG ĐỌC THẬT mà trước đây không có ô sửa nào ═══
     Người dùng vào Cài đặt tìm cũng không thấy - muốn đổi phải sửa code rồi build lại, đúng cái
     kiến trúc "cấu hình sống" của dự án này cấm. Mỗi dòng dưới đây tương ứng một paramOf/paramStr
     có thật trong code; _check18 canh hai chiều nên từ nay lệch một cái là đỏ. */
- ["Tuyển sinh - Lead","slaLRT_minutes","Gọi/nhắn lead MỚI trong bao lâu - quá hạn là cảnh báo đỏ, và cũng là ngưỡng KPI LRT","phút",15],
- ["Tuyển sinh - Lead","slaFollowup_grace_days","Quá hẹn liên hệ bao nhiêu ngày thì coi là bỏ rơi khách","ngày",2],
- ["Tuyển sinh - Test & Tư vấn","slaGLA_hours","Hạn chấm bài test đầu vào - cũng là ngưỡng KPI GLA","giờ",24],
- ["Tuyển sinh - Test & Tư vấn","slaCVT_hours","Có kết quả test rồi thì hạn tư vấn cho khách - cũng là ngưỡng KPI CVT","giờ",24],
- ["Tài chính","thresholdDeposit_minimum","Số tiền cọc tối thiểu để giữ chỗ","VND",2000000],
- ["Tài chính","refundFull_days","Rút trong bao nhiêu ngày đầu thì hoàn 100%","ngày",3],
- ["Tài chính","refundPartial_days","Rút trong bao nhiêu ngày thì hoàn một phần","ngày",14],
- ["Tài chính","refundReduced_days","Quá bao nhiêu ngày thì chỉ hoàn mức thấp nhất","ngày",30],
- ["Tài chính","slaRefundProcess_days","Hạn xử lý xong một yêu cầu hoàn tiền","ngày",7],
- ["Tài chính","installmentGap_days","Khoảng cách giữa hai đợt đóng học phí","ngày",30],
- ["Tài chính","installmentDepositPercent","Đợt đầu chiếm bao nhiêu phần trăm học phí","%",40],
- ["Tài chính","installmentRemind_days","Nhắc trước hạn đóng đợt bao nhiêu ngày","ngày",3],
- ["Tài chính","installmentLate_days","Quá hạn bao nhiêu ngày thì chuyển thành nợ quá hạn","ngày",3],
- ["Học vụ - Lớp","slaTeacherNote_hours","Hạn giáo viên ghi nhận xét sau buổi dạy","giờ",24],
- ["Học vụ - Lớp","slaHomeworkGrading_hours","Hạn chấm bài tập cho học viên","giờ",48],
- ["Học vụ - Lớp","slaAbsenceCall_hours","Học viên vắng thì phải gọi hỏi thăm trong bao lâu","giờ",24],
- ["Học vụ - Lớp","slaPLR48_hours","Hạn phản hồi phụ huynh / học viên khi có việc phát sinh","giờ",48],
- ["Học vụ - Kết thúc khóa","thresholdPreEnd_days","Trước khi khóa kết thúc bao nhiêu ngày thì bắt đầu mời tái ghi danh","ngày",14],
- ["Học vụ - Kết thúc khóa","slaFinalTest_days","Hạn nhập kết quả đầu ra sau khi khóa kết thúc","ngày",3],
- ["Học vụ - Kết thúc khóa","slaReenroll_contact_days","Hạn liên hệ mời tái ghi danh","ngày",7],
- ["Học vụ - Kết thúc khóa","slaTestimonialAsk_days","Sau khi đạt mục tiêu bao nhiêu ngày thì xin cảm nhận","ngày",7],
- ["WOW & CSKH","slaComplaintFirstResponse_hours","Hạn phản hồi LẦN ĐẦU cho một khiếu nại","giờ",4],
- ["WOW & CSKH","slaFeedbackClassify_hours","Hạn phân loại một phản hồi mới nhận","giờ",24],
+ ["P1 · Lead & chăm khách","slaLRT_minutes","Gọi/nhắn lead MỚI trong bao lâu - quá hạn là cảnh báo đỏ, và cũng là ngưỡng KPI LRT","phút",15],
+ ["P1 · Lead & chăm khách","slaFollowup_grace_days","Quá hẹn liên hệ bao nhiêu ngày thì coi là bỏ rơi khách","ngày",2],
+ ["P2 · Test đầu vào & tư vấn","slaGLA_hours","Hạn chấm bài test đầu vào - cũng là ngưỡng KPI GLA","giờ",24],
+ ["P2 · Test đầu vào & tư vấn","slaCVT_hours","Có kết quả test rồi thì hạn tư vấn cho khách - cũng là ngưỡng KPI CVT","giờ",24],
+ ["P3 · Đăng ký & chiết khấu","thresholdDeposit_minimum","Số tiền cọc tối thiểu để giữ chỗ","VND",2000000],
+ ["P4 · Hoàn tiền khi hủy","refundFull_days","Rút trong bao nhiêu ngày đầu thì hoàn 100%","ngày",3],
+ ["P4 · Hoàn tiền khi hủy","refundPartial_days","Rút trong bao nhiêu ngày thì hoàn một phần","ngày",14],
+ ["P4 · Hoàn tiền khi hủy","refundReduced_days","Quá bao nhiêu ngày thì chỉ hoàn mức thấp nhất","ngày",30],
+ ["P4 · Hoàn tiền khi hủy","slaRefundProcess_days","Hạn xử lý xong một yêu cầu hoàn tiền","ngày",7],
+ ["P4 · Học phí, đợt đóng & công nợ","installmentGap_days","Khoảng cách giữa hai đợt đóng học phí","ngày",30],
+ ["P4 · Học phí, đợt đóng & công nợ","installmentDepositPercent","Đợt đầu chiếm bao nhiêu phần trăm học phí","%",40],
+ ["P4 · Học phí, đợt đóng & công nợ","installmentRemind_days","Nhắc trước hạn đóng đợt bao nhiêu ngày","ngày",3],
+ ["P4 · Học phí, đợt đóng & công nợ","installmentLate_days","Quá hạn bao nhiêu ngày thì chuyển thành nợ quá hạn","ngày",3],
+ ["P6 · Buổi học, điểm danh & bài tập","slaTeacherNote_hours","Hạn giáo viên ghi nhận xét sau buổi dạy","giờ",24],
+ ["P6 · Buổi học, điểm danh & bài tập","slaHomeworkGrading_hours","Hạn chấm bài tập cho học viên","giờ",48],
+ ["P6 · Buổi học, điểm danh & bài tập","slaAbsenceCall_hours","Học viên vắng thì phải gọi hỏi thăm trong bao lâu","giờ",24],
+ ["P5 · Xếp lớp & nhập học","slaPLR48_hours","Hạn phản hồi phụ huynh / học viên khi có việc phát sinh","giờ",48],
+ ["P10 · Kết thúc khóa & tái đăng ký","thresholdPreEnd_days","Trước khi khóa kết thúc bao nhiêu ngày thì bắt đầu mời tái ghi danh","ngày",14],
+ ["P10 · Kết thúc khóa & tái đăng ký","slaFinalTest_days","Hạn nhập kết quả đầu ra sau khi khóa kết thúc","ngày",3],
+ ["P10 · Kết thúc khóa & tái đăng ký","slaReenroll_contact_days","Hạn liên hệ mời tái ghi danh","ngày",7],
+ ["P10 · Kết thúc khóa & tái đăng ký","slaTestimonialAsk_days","Sau khi đạt mục tiêu bao nhiêu ngày thì xin cảm nhận","ngày",7],
+ ["P8-P9 · Khảo sát, phản hồi & khiếu nại","slaComplaintFirstResponse_hours","Hạn phản hồi LẦN ĐẦU cho một khiếu nại","giờ",4],
+ ["P8-P9 · Khảo sát, phản hồi & khiếu nại","slaFeedbackClassify_hours","Hạn phân loại một phản hồi mới nhận","giờ",24],
  /* V9.29 (anh Luân: "nếu chưa có cụ thể thì đưa vào cài đặt rồi gọi ra chứ em") - ba ngưỡng
     trước đây nằm trong đầu người viết code, nay thành tham số sửa được. */
- ["Tài chính","slaDiscountApprove_hours","Hạn quản lý duyệt một đề nghị chiết khấu","giờ",24],
- ["Tài chính","slaPaymentVerify_hours","Hạn kế toán đối soát một khoản vừa thu","giờ",24],
- ["Học vụ - Lớp","slaRiskFollowup_days","Học viên vào diện nguy cơ bao lâu thì phải có can thiệp","ngày",3],
+ ["P3 · Đăng ký & chiết khấu","slaDiscountApprove_hours","Hạn quản lý duyệt một đề nghị chiết khấu","giờ",24],
+ ["P4 · Học phí, đợt đóng & công nợ","slaPaymentVerify_hours","Hạn kế toán đối soát một khoản vừa thu","giờ",24],
+ ["P6 · Học viên nguy cơ","slaRiskFollowup_days","Học viên vào diện nguy cơ bao lâu thì phải có can thiệp","ngày",3],
  /* V9.41: SOP có mã nhắc riêng cho "học viên im ắng quá lâu" (NA067) - naFor đọc tham số này để
     quyết định. Thêm luật mà quên ô sửa là lại đẻ ra hằng số cắm cứng; _check16 canh hai chiều. */
- ["Học vụ - Lớp","slaActivity_inactive_days","Học viên không có hoạt động nào (điểm danh, bài tập, WOW) quá bao nhiêu ngày thì phải hỏi thăm","ngày",7]];
+ ["P6 · Học viên nguy cơ","slaActivity_inactive_days","Học viên không có hoạt động nào (điểm danh, bài tập, WOW) quá bao nhiêu ngày thì phải hỏi thăm","ngày",7]];
 function pvnd(s){var m=String(s||"").match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);if(!m)return null;return new Date(+m[3],+m[2]-1,+m[1],m[4]?+m[4]:0,m[5]?+m[5]:0)}
 function hoursSince(s){var d=pvnd(s);return d?(Date.now()-d.getTime())/3600000:null}
 function nowStr(){var d=new Date();function p(n){return n<10?"0"+n:n}return p(d.getDate())+"/"+p(d.getMonth()+1)+"/"+d.getFullYear()+" "+p(d.getHours())+":"+p(d.getMinutes())}
@@ -13829,7 +13969,10 @@ document.addEventListener("click",function(e){var n=document.getElementById("not
 /* ===== BREADCRUMB + LỊCH SỬ ĐIỀU HƯỚNG =====
    Mỗi lần go() sang trang khác thì đẩy trang đang rời vào lịch sử (kèm ngữ cảnh của
    nó lúc đang xem). Breadcrumb hiện nút Quay lại + đường dẫn bấm được để nhảy lui. */
-var NAVCTX=["HOSO","JPID","GVID","NVID","KHID","BLCLASS","GACRS","GATAB","BTCLASS","BTSESS","DDCLASS","SETTAB","MGQ"];
+/* V9.46: ô này từng ghi "MGQ" - một cái tên KHÔNG TỒN TẠI ở đâu khác trong app (biến thật tên là
+   MSGQ). Nghĩa là suốt thời gian qua ô tìm thông điệp CH4 không hề được dọn khi điều hướng. Sửa
+   đúng tên, và khai thêm CFQ (ô tìm tham số CH2 mới) để nó cũng được dọn theo. */
+var NAVCTX=["HOSO","JPID","GVID","NVID","KHID","BLCLASS","GACRS","GATAB","BTCLASS","BTSESS","DDCLASS","SETTAB","MSGQ","CFQ"];
 function navSnap(){var s={};NAVCTX.forEach(function(k){if(window[k]!=null&&window[k]!=="")s[k]=window[k]});return s}
 function navApply(s){s=s||{};NAVCTX.forEach(function(k){window[k]=s[k]!=null?s[k]:null});}
 function crumbLabel(key,ctx){ctx=ctx||{};var p=PBK[key];var t=p?p.t:key;

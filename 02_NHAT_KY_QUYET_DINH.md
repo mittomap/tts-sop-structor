@@ -149,7 +149,25 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.43 — LỚP GOOGLE SHEETS ĐÃ NGHỈ HƯU ✅ (30/07).**
+> **Phiên bản: V9.46 — CÀI ĐẶT KHÔNG ĐỂ AI TỰ BƠI ✅ (30/07). Việc D còn V5 + V6.**
+> Anh Luân: *"Cài đặt phải phủ toàn bộ… và phải có hướng dẫn cụ thể, ko để a tự bơi trong 1 đống
+> các thông số cấu hình và cài đặt."*
+> · **17 nhóm tham số xếp theo hành trình SOP P1 → P10** (trước: 20 nhóm tên tùy hứng, có cặp trùng
+> nghĩa chỉ khác một chữ, hiện theo thứ tự ngẫu nhiên trong mã nguồn). Mỗi nhóm có **một câu nói nó
+> cai quản chuyện gì** + hàng nút *"Đổi ở đây thì xem kết quả tại: …"*.
+> · **Ô tìm tham số** trên tab CH2 · **tab mới "Bắt đầu ở đây"** là bản đồ cả màn Cài đặt và là tab
+> mặc định: 8 lối tắt việc hay làm nhất + 16 tab kèm câu mô tả và **con số đếm thật**.
+> · Bắt được **hai chỗ code chết**: `NAVCTX` khai `"MGQ"` (tên không tồn tại - ô tìm CH4 chưa bao
+> giờ được dọn khi điều hướng) và `cfGo` không xóa ô lọc nên báo nhầm *"tham số chưa có ô sửa"*.
+> · `_check16`: 601 → **640 tiêu chí**. `CFNHOM` và `SETMOTA` là **hợp đồng** - thêm nhóm/tab mới
+> mà không khai là đỏ. Bẻ lại 5 lần, đỏ đủ 5.
+>
+> **Phiên bản trước: V9.45 — cổng phụ huynh có lối vào riêng `?phuhuynh`** + cửa thứ ba trên trang
+> chủ demo (`_check14`: 128 tiêu chí).
+> **V9.44 — mỗi chức danh một trợ thủ và một hướng dẫn riêng** (12 bài / 66 bước, `_checktour` giữ
+> lời hứa đó).
+>
+> **Phiên bản trước: V9.43 — LỚP GOOGLE SHEETS ĐÃ NGHỈ HƯU ✅ (30/07).**
 > Anh Luân: *"vét sạch cái sheet cũ đi... từ nay ko cần quay lại sheet nữa, đỡ mệt đầu."*
 > Đã đối chiếu từng file trước khi xoá (13 file, ~7,6 MB) - **không mất luật nghiệp vụ nào**; thứ
 > duy nhất mất theo là cách GỬI theo lịch của `ITTs_Reminders.gs`, vốn là hạ tầng chứ không phải
@@ -173,8 +191,10 @@
 > **VH3b** (chip lọc chỉ NV WOW) - trước đây sót.
 > · **`check_gs.py`**: bản Google Sheets đang ở V9.15, đọc 19 bảng trong khi app dùng 26 - khoảng
 > cách đó nay là BẢN KHAI, rộng thêm là đỏ.
-> **CÒN LẠI trong việc D:** V3 trợ thủ + hướng dẫn từng chức danh (anh Luân nói quan trọng nhất) ·
-> V4 cài đặt phủ toàn bộ + có hướng dẫn · V5 soi kỹ các cổng · V6 màn hình từng vị trí.
+> **CÒN LẠI trong việc D (tính tới V9.46):** ~~V3 trợ thủ + hướng dẫn~~ xong ở V9.44 ·
+> ~~V4 cài đặt phủ toàn bộ + có hướng dẫn~~ xong ở V9.46 · **V5 soi kỹ các cổng** (HV, PH, GV,
+> WOW, NV - dùng thử thật, mượt và chuyên nghiệp) · **V6 màn hình từng chức danh** (không thiếu,
+> không dư - đối chiếu VH + CH3).
 >
 > **Phiên bản trước: V9.41 — PHỦ TRỌN SOP ĐO BẰNG MÁY ✅ XONG (29/07 tối).**
 > Anh Luân: *"e biến app thành hoàn hảo nhé, các cổng, giao diện, cài đặt, phân quyền, các chức
@@ -3581,3 +3601,84 @@ không có* - và người đi xem demo sẽ không bao giờ mò tới nút đ�
 **Bẫy nhỏ đã cắn khi viết bộ kiểm:** bộ khung của `_check14` trả về MỘT phần tử MỚI mỗi lần gọi
 `getElementById`, nên ghi `innerHTML` xong đọc lại ra rỗng - bốn tiêu chí đầu đỏ oan. Phải thay
 tạm bằng một ô nhớ duy nhất mới đọc lại được thứ vừa vẽ.
+
+---
+
+## V9.46 (30/07) - CÀI ĐẶT KHÔNG ĐỂ AI TỰ BƠI (việc D · mảng V4)
+
+Anh Luân: *"Cài đặt phải phủ toàn bộ, a phải có quyền cấu hình, chỉnh sửa bất cứ thứ gì anh muốn,
+và phải có hướng dẫn cụ thể, ko để a tự bơi trong 1 đống các thông số cấu hình và cài đặt."*
+
+### Đo trước khi sửa
+
+Không phải app thiếu chỗ cấu hình - **83 tham số CH2, 16 tab, và mọi tham số ĐỀU đã có một câu
+giải nghĩa** (bộ kiểm cũ đã canh chuyện đó từ V9.40). Nhưng "có mô tả từng dòng" **không phải là**
+"không phải tự bơi". Đo ra ba chỗ hở:
+
+1. **20 nhóm tham số đặt tên tùy hứng**, trong đó có những cặp trùng nghĩa chỉ khác một chữ:
+   "Học vụ - Lớp học" (10 tham số) nằm cạnh "Học vụ - Lớp" (6); "CSKH" / "CSKH & Kết thúc" /
+   "WOW & CSKH". Người vào tìm một ngưỡng không biết nhìn nhóm nào.
+2. **Nhóm hiện theo thứ tự xuất hiện trong mã nguồn**, tức là ngẫu nhiên - và **không nhóm nào có
+   một chữ nói nó cai quản chuyện gì**, cũng không nói đổi số ở đây thì màn nào đổi theo.
+3. **Mở Cài đặt là rơi thẳng vào bảng 83 tham số**. 15 tab còn lại không ai giới thiệu.
+
+### Đã làm
+
+- **17 nhóm xếp theo đúng hành trình SOP P1 → P10** (Trung tâm · P1 Lead · P2 Test · P3 Đăng ký &
+  chiết khấu · P4 Học phí · P4 Hoàn tiền · Công giảng dạy · P5 Xếp lớp · P6 Buổi học · P6 Nguy cơ ·
+  P7 WOW · P8-P9 Khảo sát & khiếu nại · P10 Kết thúc · Giới thiệu · Giao việc · Hẹn giờ · Hệ thống).
+  Bảng khai `CFNHOM`: mỗi nhóm = `[tên, câu nói nó lo việc gì, danh sách trang xem kết quả]`.
+  Trên màn, mỗi nhóm có câu giới thiệu + hàng nút **"Đổi ở đây thì xem kết quả tại: …"** bấm sang
+  thẳng trang đó.
+- **Ô tìm tham số** trên tab CH2 (83 dòng thì việc đầu tiên phải là tìm được nó) - tìm theo tên máy,
+  theo câu nghĩa, hay theo tên nhóm; nhóm không còn dòng nào thì ẩn hẳn chứ không để panel rỗng.
+- **Tab mới "Bắt đầu ở đây"** - bản đồ của cả màn Cài đặt, và là **tab mặc định khi mở**:
+  · khối **"Việc hay làm nhất"** - 8 lối tắt bấm là tới thẳng đúng ô (đổi hotline, ngưỡng nợ quá
+  hạn, mức chiết khấu phải duyệt, đơn giá giờ dạy, thêm nhân viên, đổi tên & logo, sửa lời nhắc,
+  xem ai được làm gì);
+  · **cả 16 tab xếp theo 5 nhóm**, mỗi tab một câu nói nó cai quản chuyện gì + **con số đếm THẬT**
+  ("83 tham số · 17 nhóm", "51 chỉ số", "Object.keys(ENUM) danh mục"…). Số đếm là hàm chạy lúc vẽ,
+  không viết cứng - số cứng sẽ lệch ngay lần thêm dữ liệu kế tiếp.
+  · HR bị bó hẹp chỉ còn tab Nhân viên **vẫn được giữ tab bản đồ** - đừng để ai rơi vào một bảng
+  không lời giới thiệu.
+- Dùng lại thành phần thẻ chọn `pickc` của hệ thiết kế thay vì dựng loại thẻ thứ hai cho một màn;
+  chỉ vá thêm biến thể `.pickc.wrap` cho câu mô tả dài xuống dòng được.
+
+### Bẫy đã cắn - hai chỗ code chết
+
+- **`NAVCTX` khai `"MGQ"`** - một cái tên **không tồn tại ở đâu khác trong app** (biến thật là
+  `MSGQ`). Nghĩa là suốt nhiều phiên bản, ô tìm thông điệp CH4 **không hề được dọn khi điều hướng**:
+  rời trang rồi vào lại vẫn thấy bản lọc cũ mà không hiểu vì sao thiếu thông điệp. Đúng **LUẬT 2ter**
+  (code chết còn nguy hiểm hơn code sai). Nay sửa đúng tên, khai thêm `CFQ`, và bộ kiểm bắt mọi tên
+  mồ côi trong `NAVCTX`.
+- **`cfGo` không xóa ô lọc**: đang lọc "hoàn tiền" mà bấm bánh răng của một tham số khác thì dòng
+  đó bị ô lọc giấu đi, `cfGo` báo nhầm *"tham số chưa có ô sửa"*. Đây là lỗi do chính ô tìm mới
+  sinh ra - viết ô tìm xong phải đi hỏi lại mọi cửa đang nhảy vào màn đó.
+
+### Bộ kiểm
+
+`_check16` thêm **39 tiêu chí** (601 → **640**), chia hai khối:
+
+- **24bis - CFNHOM là hợp đồng**: mọi nhóm có thật phải được khai · khai rồi mà không tham số nào
+  thuộc về là khai chết · câu giới thiệu phải là câu thật (≥40 ký tự, không chép lại tên nhóm) ·
+  mọi trang "xem kết quả" phải **có thật trong PBK** · không còn hai tên nhóm lồng nhau · vẽ THẬT
+  màn CH2 rồi soi thứ tự hành trình, soi câu giới thiệu, soi nút · gõ từ khóa thì số dòng **giảm
+  thật** (không phải ô tìm giả).
+- **24ter - SETMOTA là hợp đồng**: mọi tab phải được khai · khai cho tab không tồn tại là đỏ ·
+  **hàm đếm phải chạy được và ra chữ** · số tham số trên bản đồ phải là đếm thật · mọi lối tắt
+  phải dẫn tới **một cửa có thật** (tham số có trong APPPARAMS, hoặc tab có trong setTabs) · HR
+  vẫn có bản đồ và bản đồ đó chỉ kê tab HR được vào.
+
+**Bẻ lại để thử (5 lần, đỏ đủ 5):** đổi tên một nhóm thành nhóm chưa khai · thêm một nhóm khai mà
+không tham số nào dùng · đổi tên biến ô tìm · cắt cụt một câu giới thiệu · trả `NAVCTX` về `"MGQ"`.
+
+### Hai chỗ dọn thêm
+
+- **Mỗi tab một icon riêng** khai trong `SETMOTA[k][2]` - 16 thẻ giống hệt nhau thì mắt không bám
+  được vào đâu. Bộ kiểm bắt tab nào còn dùng icon mặc định.
+- **Tiêu đề màn Cài đặt vẫn nói *"Cấu hình sống trong CH1-CH6 của sheet"*** - dấu vết thời chạy
+  Google Sheets, sai từ V9.43 (lớp Sheets đã nghỉ hưu). Nay ghi đúng: *"Nơi DUY NHẤT cấu hình cả
+  app"*, và bộ kiểm canh câu cũ không quay lại.
+
+Thêm 6 icon vào font subset (`ti-compass`, `ti-bolt`, `ti-settings-2`, `ti-shield-half`,
+`ti-cash-off`, `ti-lock-check`) - **192 icon**. Quên dựng lại font là `_tall.js` báo đỏ ngay.

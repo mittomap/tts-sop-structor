@@ -1796,3 +1796,24 @@ Phụ huynh và học viên **dùng chung một cổng**, khác nhau ở chế �
 - Địa chỉ trực tiếp: `cong-hoc-vien/?phuhuynh`.
 - Màn chọn ở chế độ này chỉ hiện **những em đã khai số người giám hộ**, và có hai nút đổi vai
   "Tôi là học viên" / "Tôi là phụ huynh" để xem qua lại ngay tại chỗ.
+
+## Màn Cài đặt tự giới thiệu - không ai phải tự bơi (V9.46)
+
+App có **83 tham số nghiệp vụ trong 16 tab cài đặt**. Trước V9.46 mở Cài đặt là rơi thẳng vào bảng
+tham số, nhóm đặt tên tùy hứng và xếp theo thứ tự ngẫu nhiên. Nay:
+
+**Tab "Bắt đầu ở đây"** là tab mặc định - bản đồ của cả màn Cài đặt:
+- **Việc hay làm nhất** - 8 lối tắt bấm là tới thẳng đúng ô: đổi hotline · ngưỡng nợ quá hạn ·
+  mức chiết khấu phải duyệt · đơn giá giờ dạy · thêm nhân viên · đổi tên & logo · sửa lời nhắc
+  việc · xem ai được làm gì.
+- **Cả 16 tab xếp theo 5 nhóm**, mỗi tab một câu nói nó cai quản chuyện gì kèm **con số đếm thật**
+  (83 tham số · 51 chỉ số KPI · số thông điệp · số danh mục · số nhân viên · số khóa…). Số đếm là
+  hàm chạy lúc vẽ nên không bao giờ lệch với dữ liệu.
+
+**Tab Ngưỡng & SLA (CH2)** - 83 tham số nay chia **17 nhóm xếp theo đúng hành trình SOP P1 → P10**:
+- Mỗi nhóm có **một câu nói nó lo việc gì** (ví dụ nhóm *P6 · Học viên nguy cơ*: "Vắng mấy buổi
+  hoặc thiếu mấy bài thì máy tự coi là có nguy cơ, bao lâu phải can thiệp, và 'tạm bỏ qua' thì máy
+  im mấy ngày").
+- Mỗi nhóm có hàng nút **"Đổi ở đây thì xem kết quả tại: …"** bấm sang thẳng màn hình sẽ đổi theo.
+- **Ô tìm tham số**: gõ "hoàn tiền", "nguy cơ", "chiết khấu"… là lọc ngay theo tên máy, câu nghĩa
+  hoặc tên nhóm; nhóm không còn dòng nào thì ẩn hẳn.
