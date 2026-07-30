@@ -149,7 +149,20 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.54 — SỬA TẠI CHỖ · SẢN PHẨM TỪNG CHẶNG · MỌI CON SỐ TỰ KHAI CÁCH TÍNH ✅ (30/07 khuya).**
+> **Phiên bản: V9.55 — THANG THIẾT KẾ: MỘT VIỆC MỘT CÁCH ✅ (30/07 khuya).**
+> · Anh Luân: *"kiểm qua từng trang, từng màn hình xem có thể tối ưu thiết kế không"* - và câu
+> trả lời đo được là: **app chưa hề có một cái thang nào.** Màu **202 → 94** (118 mã từng chỉ dùng
+> ĐÚNG MỘT LẦN; 26 sắc trắng cho cùng một việc) · cỡ chữ **28 → 17** · bo góc **17 → 8** · nhịp dọc
+> giữa các khối **4 kiểu → 1** · `.fbar` và `.tbar` nay cùng một bộ đo · class nút một thứ tự.
+> · Gom màu **theo khoảng cách cảm nhận**, lệch lớn nhất **10/255** (dưới ngưỡng mắt thấy), có hai
+> chốt chặn: không trộn khác góc màu >22°, không nuốt màu có sắc vào xám.
+> · **Không sửa** 8 bảng 10-11 cột (thu cột = bỏ dữ liệu = đụng chức năng) và không gộp bậc chữ
+> 11/11.5/12/12.5 (đổi nhiều mà không thấy khác, chỉ được rủi ro).
+> · Bài học: *"16 kiểu thứ tự khối đầu trang"* hoá ra phần lớn là **phép đo sai** - trang hub nhúng
+> trang con nên dải số của con đo ra thành nằm sau tab. **Không sửa cái mà phép đo tưởng là hỏng.**
+> · Bộ kiểm: `_checkux` **155** (thêm 9 tiêu chí chốt thang thiết kế). `./verify.sh` XANH HẾT.
+>
+> **Phiên bản trước: V9.54 — SỬA TẠI CHỖ · SẢN PHẨM TỪNG CHẶNG · MỌI CON SỐ TỰ KHAI CÁCH TÍNH ✅ (30/07 khuya).**
 > · **Bánh răng không quăng người dùng đi nữa.** Anh Luân: *"đang ở 1 nơi nào đó, vẫn còn phải ở
 > đó để làm, mà bị điều hướng đi thì cũng hơi mệt."* Cả bốn loại bánh răng (ngưỡng CH2 · câu nhắc
 > CH4 · ngưỡng KPI CH6 · danh mục CH1) nay mở **ngăn kéo sửa tại chỗ**: sửa - Lưu & áp dụng - màn
@@ -4525,3 +4538,75 @@ tên của người khác thì phải mang theo vai trò.
 ### Số chốt phiên
 `_checkux` 105 → **143** · `_check16` **665** · `_checkqa` 130 · font **201 icon** · 304/304 con số
 % tự khai cách tính · 0 ô nói dối · 0 tên bấm-là-đổi-trang. `./verify.sh` XANH HẾT.
+
+## V9.55 (30/07 khuya, đợt cuối) - THANG THIẾT KẾ: APP CHƯA HỀ CÓ MỘT CÁI THANG NÀO
+
+> Anh Luân: *"Tạm thời ko đụng đến chức năng. Em kiểm qua từng trang, từng màn hình xem có thể
+> tối ưu thiết kế không nhé"*
+
+Đo trước, không nhìn bằng mắt rồi đoán. Vẽ thật 39 trang, bóc CSS ra đếm. Kết quả cho thấy vấn đề
+không nằm ở trang nào cả - nó nằm ở chỗ **app chưa hề có một cái thang nào**:
+
+| Thứ | Trước | Sau | Vì sao đó là lỗi |
+|---|---|---|---|
+| Mã màu | **202** (118 mã dùng ĐÚNG 1 LẦN) | **94** | 26 sắc trắng khác nhau cho cùng một việc: hai tấm panel cạnh nhau ra hai màu nền lệch nhau |
+| Cỡ chữ | **28** bậc | **17** | 11 / 11.5 / 12 / 12.5 / 13 - năm bậc trong vòng 2px, mắt không phân biệt được nhưng tay phải nhớ cả năm |
+| Bo góc | **17** bậc | **8** | 5px cạnh 6px cạnh 7px - nhìn ra ngay là làm ẩu |
+| Nhịp dọc | 4 kiểu (không / 12 / 14 / 16px) | **1** | cùng một trang, khe giữa các khối lúc 14 lúc 16 |
+| Thanh công cụ | `.fbar` và `.tbar` lệch bo góc, đệm, khe | **một bộ đo** | trang Bàn giao có cả hai, đặt cạnh nhau là thấy so le |
+| Class nút | `btn sm primary` và `btn primary sm` | **một thứ tự** | cùng một nút, hai cách viết |
+
+### Vì sao đây mới là câu trả lời đúng cho câu hỏi "tối ưu thiết kế"
+
+Nhìn app thấy "hơi lộn xộn" mà không chỉ ra được chỗ nào sai - vì **không chỗ nào sai hẳn, cả
+trăm chỗ lệch nhẹ**. Mắt người rất giỏi bắt cái lệch nhẹ đó nhưng rất dở gọi tên nó. Máy thì
+ngược lại: nó không thấy đẹp xấu, nhưng nó đếm được "một việc đang làm bằng 202 cách".
+
+Cách gom màu: **gom tham lam theo khoảng cách cảm nhận**, lấy mã dùng nhiều nhất làm chuẩn, hút
+các mã cách nó ≤10/255 mỗi kênh. Có hai chốt chặn để không gom bừa:
+- hai màu đều có độ tươi ≥12% thì góc màu phải cách nhau ≤22° - **không trộn đỏ với cam, xanh
+  với tím**;
+- màu xám không bao giờ gom với màu có sắc - **hồng nhạt báo lỗi vẫn phải là hồng**, không bị nuốt
+  thành xám.
+
+Lệch lớn nhất sau khi gom là **10/255** - dưới ngưỡng mắt thường phân biệt được trên nền sáng.
+
+### Cái KHÔNG sửa, và lý do
+
+- **8 bảng có 10-11 cột.** Nhìn thì dày, nhưng thu bớt cột là **bỏ dữ liệu** - tức đụng chức năng,
+  đúng cái anh Luân dặn đừng đụng. `_checkui` đã xác nhận không bảng nào tràn ngang trên màn hẹp
+  (đều nằm trong khung cuộn riêng). Ghi vào đây để đợt sau bàn: giấu cột theo vai trò, chứ không
+  xoá cột.
+- **Bậc cỡ chữ 11 / 11.5 / 12 / 12.5** giữ nguyên. Gộp chúng lại thì hàng trăm khối đổi chiều cao
+  cùng lúc - đổi nhiều mà anh Luân không thấy gì khác, chỉ được cái rủi ro. Chỉ dọn phần đuôi lẻ
+  loi (8.5 / 9.5 / 13.5 / 14.5 / 15.5 / 16.5 / 19 / 21 / 24 / 28 / 29).
+- **16 kiểu thứ tự khối đầu trang** hoá ra phần lớn là **ảo**: các trang hub nhúng trang con vào
+  trong tab nên dải số của trang con đo ra thành "nằm sau tab". Đo sai thì kết luận sai - đã kiểm
+  lại từng trang một trước khi định sửa. *Không sửa cái mà phép đo tưởng là hỏng.*
+
+### Bẫy đã cắn: bộ kiểm canh MÃ MÀU CỤ THỂ là bộ kiểm gãy
+
+Gom màu xong thì ba tiêu chí đỏ ngay - và cả ba đều **không phải lỗi thật**:
+
+- `_check16` canh `.tsstep{... border:1px solid #E6ECF3}` - mã đó vừa gộp thành `#E3E9F0` (lệch 5/255).
+- `_check16` canh `.stp.done{... background:#EDF8F1}` - gộp thành `#F4FBF6`, vẫn là xanh nhạt.
+- `_check17` canh chuỗi `class="btn sm primary"` - vừa đổi thứ tự thành `btn primary sm`.
+
+Cả ba **gãy vì lý do không liên quan gì đến cái nó định canh**. Tiêu chí thứ nhất muốn canh "bước
+này trông như bấm được" - thứ làm nên điều đó là *có viền* và *nhấc lên khi rê chuột*, chứ không
+phải viền đúng mã `#E6ECF3`. Nay canh Ý ĐỊNH: có viền (mã nào cũng được) + có `translateY` khi
+hover; bước đã xong phải đổi *cả nền lẫn viền*; nút lọc phải *có* `primary`, thứ tự class là
+chuyện của người viết.
+
+Luật rút ra: **hợp đồng của bộ kiểm phải neo vào điều mình thật sự cần, không neo vào cách viết
+hiện tại.** Neo vào cách viết thì mỗi lần dọn dẹp là một lần đỏ giả - mà đỏ giả nhiều lần thì
+người ta bắt đầu bỏ qua màu đỏ, và đó là lúc bộ kiểm chết hẳn.
+
+### Bộ kiểm chốt lại (để không trôi ngược)
+`_checkux` thêm 9 tiêu chí: trần số mã màu (≤110) · trần bậc cỡ chữ (≤20) · trần bậc bo góc (≤10)
+· `.fbar` và `.tbar` phải cùng bo góc / đệm / khe / gap · không trang nào tự đặt khoảng cách dưới
+panel · class nút chỉ một thứ tự. **146 → 155 tiêu chí.**
+
+### Số chốt phiên
+Màu 202→**94** · cỡ chữ 28→**17** · bo góc 17→**8** · nhịp dọc 4→**1** · `_checkux` **155**.
+Hai cổng (nhân viên / học viên) dùng chung một thang - đo ra cùng 94/17/8. `./verify.sh` XANH HẾT.

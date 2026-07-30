@@ -177,7 +177,10 @@ t("co trang ngoai LISTCFG cung dung duoc (giao viec)", fltCode("giaoviec")==="DL
  var v=ecode(all[0].lead_status);
  fltPick(pg,"lead_status",v);
  var bar=fltBarHTML(pg);
- t("dang loc thi nut sang len", /class="btn sm primary"[^>]*fltOpen/.test(bar));
+ /* V9.55: class nut nay doi thu tu ("btn sm primary" -> "btn primary sm") khi dong bo mot kieu
+    viet duy nhat cho toan app. Canh "co primary" chu khong canh dung chuoi - thu tu class la
+    chuyen cua nguoi viet, cai phai canh la NUT CO SANG LEN hay khong. */
+ t("dang loc thi nut sang len", /class="btn[^"]*\bprimary\b[^"]*"[^>]*fltOpen/.test(bar));
  t("hien chip cho biet dang loc gi", bar.indexOf("fltchip")>=0&&bar.indexOf("Trạng thái lead")>=0);
  t("chip co nut gỡ rieng tung dieu kien", /fltAxClear\('nhaplead','lead_status'\)/.test(bar));
  CUR=pg;

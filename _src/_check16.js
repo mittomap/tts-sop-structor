@@ -200,11 +200,15 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
     "luon tinh" ma la "tinh KHI VA CHI KHI khong co hanh dong". */
  t("o dai so tinh khi va chi khi khong co hanh dong", SRC.indexOf("(act?'':' static')")>=0);
  t("van con o tinh that su tren app", /class="bstat static"/.test(RENDER.banglop())||/class="bstat static"/.test(RENDER.chang()));
- t("buoc phieu tuyen sinh trong nhu the bam duoc", /\.tsstep\{[^}]*border:1px solid #E6ECF3/.test(CSS)&&/\.tsstep:hover\{[^}]*transform:translateY/.test(CSS));
+ /* V9.55: hop dong nay tung ghi CHET mot ma mau. Bang mau vua duoc gom lai (202 -> 94) nen no do,
+    trong khi hanh vi khong doi ti nao. Bo kiem canh MA MAU CU THE la bo kiem gay: cu chinh bang mau
+    la no gay, ma no gay vi ly do khong lien quan gi den cai no dinh canh. Canh Y DINH: buoc phai CO
+    vien va CO nhac len khi ro chuot - do moi la thu lam no "trong nhu bam duoc". */
+ t("buoc phieu tuyen sinh trong nhu the bam duoc", /\.tsstep\{[^}]*border:1px solid #[0-9A-Fa-f]{6}/.test(CSS)&&/\.tsstep:hover\{[^}]*transform:translateY/.test(CSS));
  /* day buoc onboarding khong con dinh chu vao cham */
  t("cac buoc onboarding co khoang cach", /\.stp\+\.stp\{margin-left:2\dpx\}/.test(CSS));
  t("giua hai buoc co doan gach noi", /\.stp\+\.stp:before\{content:""/.test(CSS));
- t("buoc da xong doi mau ca vien thuoc", /\.stp\.done\{[^}]*background:#EDF8F1/.test(CSS));
+ t("buoc da xong doi mau ca vien thuoc", /\.stp\.done\{[^}]*background:#[0-9A-Fa-f]{6}[^}]*border-color:#[0-9A-Fa-f]{6}/.test(CSS));
  /* ten lop bam duoc de xem nhanh */
  t("co ham lopLnk", typeof lopLnk==="function");
  t("lopLnk mo drawer xem nhanh lop", /openLopQuick/.test(lopLnk("LOP-X","Lop X")));

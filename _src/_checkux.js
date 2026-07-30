@@ -579,6 +579,43 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
  t("bang khoi luong viec lay nguong tu CH2", !/p\.ontime>=90\b/.test(SRC));
  t("bang so sanh co so lay nguong nguy co tu CH2", !/rr>=20\b/.test(SRC));
 })();
+/* ═══════ V9.55 - THANG THIET KE: MOT VIEC MOT CACH ═══════
+   Anh Luan: "kiem qua tung trang, tung man hinh xem co the toi uu thiet ke khong".
+   Do bang may thay app khong co THANG nao ca: 202 ma mau (118 ma chi dung DUNG MOT LAN,
+   26 sac trang khac nhau cho cung mot viec), 28 co chu (11 / 11.5 / 12 / 12.5 / 13 - nam buoc
+   trong vong 2px, mat khong phan biet duoc nhung tay phai nho ca nam), 17 bo goc.
+   Do la ly do nhin app "hoi lon xon" ma khong chi ra duoc cho nao sai: khong cho nao sai han,
+   ca tram cho lech nhe. Gom ve thang chuan roi CHOT LAI o day. */
+(function(){
+ var CSS_ALL=require("fs").readFileSync(process.env.ITTS_OUT+"/ITTs_WebApp_v5_demo.html","utf8");
+ function tap(re){var m={};(CSS_ALL.match(re)||[]).forEach(function(x){m[x]=1});return Object.keys(m)}
+ var mau=tap(/#[0-9A-Fa-f]{6}/g).map(function(x){return x.toUpperCase()});
+ var uniq={};mau.forEach(function(x){uniq[x]=1});
+ var soMau=Object.keys(uniq).length;
+ var soChu=tap(/font-size:\s*[0-9.]+px/g).length;
+ var soGoc=tap(/border-radius:\s*[0-9]+px/g).length;
+ t("bang mau khong phinh tro lai (<=110 ma, truoc 202): "+soMau, soMau<=110);
+ t("thang co chu giu gon (<=20 buoc, truoc 28): "+soChu, soChu<=20);
+ t("thang bo goc giu gon (<=10 buoc, truoc 17): "+soGoc, soGoc<=10);
+ /* hai thanh cong cu phai cung mot bo do - dat canh nhau moi khong so le */
+ var f=(CSS_ALL.match(/\.fbar\{([^}]*)\}/)||[])[1]||"";
+ var tb=(CSS_ALL.match(/\.tbar\{([^}]*)\}/)||[])[1]||"";
+ function lay(css,k){var m=css.match(new RegExp(k+":([^;]+)"));return m?m[1].trim():""}
+ ["border-radius","padding","margin-bottom","gap"].forEach(function(k){
+  t("thanh cong cu .fbar va .tbar cung "+k, lay(f,k)===lay(tb,k)&&lay(f,k)!=="")});
+ /* nhip doc: panel khong duoc tu dat khoang cach, de CSS lo - moi trang mot nhip la thay lech */
+ var tuDat=[];
+ Object.keys(RENDER).forEach(function(k){CUR=k;var h="";
+  try{h=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){return}
+  if(/class="panel"[^>]*style="[^"]*margin-bottom/.test(h))tuDat.push(k)});
+ t("khong trang nao tu dat khoang cach duoi panel"+(tuDat.length?" - CON: "+tuDat.slice(0,5).join(", "):""), tuDat.length===0);
+ /* mot kieu viet class nut - hai thu tu khac nhau la hai bien the cho cung mot nut */
+ var loanNut=0;
+ Object.keys(RENDER).forEach(function(k){CUR=k;var h="";
+  try{h=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){return}
+  loanNut+=(h.match(/class="btn sm (primary|danger|green)"/g)||[]).length});
+ t("class nut viet mot thu tu duy nhat (btn <mau> sm)", loanNut===0);
+})();
 if(bad.length){console.log("CHECKUX DO ("+bad.length+"/"+(ok+bad.length)+"):");
  bad.forEach(function(b){console.log("  - "+b)});process.exit(1)}
 console.log("CHECKUX OK: "+ok+" tieu chi | "+FORM.length+" form ghi deu co loi giai thich, khong o ngay nao de trong");

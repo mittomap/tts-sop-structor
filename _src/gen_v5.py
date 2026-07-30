@@ -14,23 +14,23 @@ HTML = r"""<!DOCTYPE html>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.47.0/tabler-icons.min.css">
 <style>
-:root{--navy:#2E5A88;--navyd:#1E3E5F;--sidebar:#1B3350;--bg:#EDF1F6;--card:#fff;--line:#E3E9F0;--text:#1E2A38;--muted:#6B7887;--ink:#1E2A38;
---red:#E24B4A;--redb:#FCEBEB;--amber:#E08A1E;--amberb:#FBEEDA;--green:#2E9E6B;--greenb:#E4F5EC;--blue:#3B82C4;--blueb:#E7F1FB;--gray:#EEF1F5}
+:root{--navy:#2E5A88;--navyd:#1E3A5F;--sidebar:#1B3350;--bg:#EEF2F6;--card:#fff;--line:#E3E9F0;--text:#1E2A38;--muted:#6B7887;--ink:#1E2A38;
+--red:#E24B4A;--redb:#FBF0EF;--amber:#E08A1E;--amberb:#FFF6D8;--green:#2E9E6B;--greenb:#E4F5EC;--blue:#3B82C4;--blueb:#EEF2F6;--gray:#EEF2F6}
 *{box-sizing:border-box;margin:0;padding:0}html,body{height:100%}
 body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:var(--bg);font-size:14px;-webkit-font-smoothing:antialiased}
 .app{display:flex;height:100vh;overflow:hidden}
 .sidebar{width:246px;flex-shrink:0;background:var(--sidebar);color:#C4D2E4;display:flex;flex-direction:column}
 .brand{display:flex;align-items:center;gap:10px;padding:15px 18px;border-bottom:1px solid #ffffff18}
-.brand .logo{width:38px;height:38px;border-radius:9px;background:#fff;color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
+.brand .logo{width:38px;height:38px;border-radius:8px;background:#fff;color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
 .brand b{color:#fff;font-size:14px;font-weight:700;line-height:1.1}.brand small{display:block;color:#93A7C2;font-size:10px;font-weight:500;letter-spacing:.3px;margin-top:2px}
 .nav{flex:1;overflow-y:auto;padding:8px 10px 18px}
 .nav::-webkit-scrollbar{width:6px}.nav::-webkit-scrollbar-thumb{background:#ffffff22;border-radius:3px}
 .navlbl{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:#7E93B2;margin:9px 2px 2px;display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;cursor:pointer;user-select:none;transition:.12s}
-.navlbl:hover{background:#ffffff10;color:#AFC3DC}
+.navlbl:hover{background:#ffffff10;color:#B9C6D6}
 .navlbl>span{flex:1;min-width:0}
 .navchev{font-size:13px;flex:none;transition:transform .15s;opacity:.75}
 .navlbl.open .navchev{transform:rotate(90deg)}
-.navlbl .dot{background:var(--red);color:#fff;font-size:8.5px;font-weight:800;min-width:14px;height:14px;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:0 3px;letter-spacing:0;flex:none} /* V9.18: badge nhỏ lại - nhóm thu gọn không bị bóp chữ */
+.navlbl .dot{background:var(--red);color:#fff;font-size:9px;font-weight:800;min-width:14px;height:14px;border-radius:6px;display:flex;align-items:center;justify-content:center;padding:0 3px;letter-spacing:0;flex:none} /* V9.18: badge nhỏ lại - nhóm thu gọn không bị bóp chữ */
 .navlbl .navarc{width:7px;height:7px;border-radius:50%;flex:none;opacity:.9}
 /* V9.23 (Luân): 4 CHẶNG vòng đời phải nổi hẳn so với trang nghiệp vụ - chặng là "bản đồ",
    nghiệp vụ là "chỗ làm việc". Nhóm chặng: chữ sáng hơn + vạch màu chặng chạy dọc mép trái.
@@ -39,43 +39,43 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
    trong chặng, phải nhỏ hơn và nhẹ hơn tên chặng, nếu không con trông to hơn cha, nhìn kỳ. */
 /* V9.27: bỏ mảng nền đầy của tiêu đề chặng - nền đầy làm nó trông như đang được chọn.
    Tiêu đề là TIÊU ĐỀ: chữ sáng, vạch màu chặng bên trái, một đường kẻ mảnh phía dưới. */
-.navlbl.isarc{color:#DCE9F7;font-size:11.5px;letter-spacing:.6px;background:none;
+.navlbl.isarc{color:#E3E9F0;font-size:11.5px;letter-spacing:.6px;background:none;
  border-bottom:1px solid #ffffff14;border-radius:0 8px 0 0;
  padding:9px 9px 7px;margin:14px 2px 3px}
 .navlbl.isarc:hover{background:#ffffff0d;color:#fff}
 .navlbl.isarc .navarc{width:8px;height:8px}
 /* mục Tổng quan chặng: cùng cỡ chữ với mục nghiệp vụ, chỉ khác ở chấm màu chặng và chữ nghiêng
    nhẹ - đủ để biết "đây là bản đồ", không giành chỗ với tên chặng. */
-.navitem.chang{font-weight:600;color:#BFD3EA}
+.navitem.chang{font-weight:600;color:#C4D2E4}
 .navitem.chang i{color:var(--acol,#8CC5F2);opacity:1}
 .navitem.chang:after{content:"";width:6px;height:6px;border-radius:50%;background:var(--acol,#8CC5F2);
  margin-left:auto;flex:none;opacity:.85}
 .navitem.chang.on{background:#ffffff2e;color:#fff}
 .navitem.chang.on i{color:var(--acol,#8CC5F2)}
 /* V9.27: mục đã mở ra trang hiện tại - sáng MỜ và có vạch đứt, phân biệt rõ với mục ĐANG đứng */
-.navitem.from{background:#ffffff14;color:#CFE0F2}
+.navitem.from{background:#ffffff14;color:#CFE0F7}
 .navitem.from i{opacity:.95}
-.navitem.from:after{content:"đang mở";margin-left:auto;font-size:8.5px;font-weight:800;letter-spacing:.4px;
- text-transform:uppercase;color:#8FB2D8;background:#ffffff12;border-radius:5px;padding:1px 5px;flex:none}
-.navitem.chang.from:after{content:"đang mở";width:auto;height:auto;border-radius:5px;background:#ffffff12;opacity:1}
+.navitem.from:after{content:"đang mở";margin-left:auto;font-size:9px;font-weight:800;letter-spacing:.4px;
+ text-transform:uppercase;color:#8FB2D8;background:#ffffff12;border-radius:6px;padding:1px 5px;flex:none}
+.navitem.chang.from:after{content:"đang mở";width:auto;height:auto;border-radius:6px;background:#ffffff12;opacity:1}
 /* ===== V9.27 CAI DAT > MENU: danh sach checklist go duoc =====
    Truoc day moi muc la mot "vien thuoc" mau xanh dam - dep thi khong dep ma con khong go lai duoc ten.
    Nay moi muc mot dong: o tick - icon - o CHU GO DUOC - ma trang. */
 .mnbox{border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden;background:#fff}
 .mnbox.off{opacity:.6}
-.mnhd{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F7F9FC;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.mnhd{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#FAFBFD;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .mnct{margin-left:auto;font-size:11px;color:#8A94A0;font-weight:700;white-space:nowrap}
 .mnck{display:flex;align-items:center;cursor:pointer;flex:none}
 .mnck input{width:16px;height:16px;cursor:pointer;accent-color:var(--navy)}
 .mnin{height:32px;border:1px solid transparent;border-radius:8px;padding:0 9px;font-family:inherit;font-size:12.5px;
  color:var(--text);background:transparent;flex:1 1 180px;min-width:0;transition:.12s}
-.mnin:hover{border-color:#DFE6EE;background:#fff}
+.mnin:hover{border-color:#E3E9F0;background:#fff}
 .mnin:focus{border-color:var(--blue);background:#fff;outline:none;box-shadow:0 0 0 3px rgba(59,130,196,.14)}
 .mnin.big{font-size:13px;font-weight:800;color:var(--navy);flex:0 1 260px}
 .mnlist{padding:4px 0}
-.mnrow{display:flex;align-items:center;gap:9px;padding:5px 12px;border-bottom:1px solid #F4F7FA}
+.mnrow{display:flex;align-items:center;gap:9px;padding:5px 12px;border-bottom:1px solid #FAFBFD}
 .mnrow:last-child{border-bottom:0}
-.mnrow:hover{background:#FAFCFE}
+.mnrow:hover{background:#FAFBFD}
 .mnrow.off .mnin,.mnrow.off .mnic{opacity:.5}
 .mnic{font-size:16px;color:#7A8694;flex:none;width:18px;text-align:center}
 .mnrs{flex:none;height:26px;padding:0 8px;font-size:11px}
@@ -98,11 +98,11 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .fltrow label{font-size:11.5px;color:#7A8694;font-weight:700}
 .fltrow input{height:32px;border:1px solid var(--line);border-radius:8px;padding:0 9px;font-family:inherit;font-size:12.5px}
 .pill.fltrm{font-size:10px;padding:1px 7px;color:#A32D2D;border-color:#F0B4B4;background:var(--redb)}
-.pill.fltsv{background:#F0F6FF;border-color:#BBD3F0;color:var(--navy);font-weight:700}
+.pill.fltsv{background:#FAFBFD;border-color:#BBD3F0;color:var(--navy);font-weight:700}
 .pill.fltsv .fltx{margin-left:6px;opacity:.5;font-size:13px}
 .pill.fltsv .fltx:hover{opacity:1;color:var(--red)}
 .fltchips{display:inline-flex;flex-wrap:wrap;gap:5px;align-items:center}
-.fltchip{display:inline-flex;align-items:center;gap:5px;font-size:11px;background:#EEF3F9;border:1px solid #DCE5EF;
+.fltchip{display:inline-flex;align-items:center;gap:5px;font-size:11px;background:#EEF2F6;border:1px solid #E3E9F0;
  border-radius:999px;padding:3px 9px;color:#5A6675;white-space:nowrap}
 .fltchip b{color:var(--navy);font-weight:800}
 .fltchip i{font-size:13px;opacity:.55;cursor:pointer}
@@ -110,7 +110,7 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .tbar2{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-4px 0 12px}
 /* ===== V9.29 XIN NGHI CHO DUYET ===== */
 .absq{margin-bottom:12px}
-.absrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #F2F5F9;flex-wrap:wrap}
+.absrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #FAFBFD;flex-wrap:wrap}
 .absrow:last-child{border-bottom:0}
 .absi{flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:2px}
 .absi b{font-size:13px}
@@ -124,10 +124,10 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
  text-transform:uppercase;color:#5A6675;margin:14px 0 7px}
 .viechd b{color:var(--navy)}
 /* V9.29: chip so SLA bam duoc + dong cau hinh duoc to sang khi nhay toi */
-.slachip{display:inline-flex;align-items:center;gap:4px;background:#EEF3F9;border:1px solid #DCE5EF;
+.slachip{display:inline-flex;align-items:center;gap:4px;background:#EEF2F6;border:1px solid #E3E9F0;
  border-radius:999px;padding:1px 4px 1px 8px;font-size:11.5px;font-weight:700;color:var(--navy);
  cursor:pointer;transition:.12s;white-space:nowrap}
-.slachip:hover{background:#E2ECF7;border-color:var(--blue)}
+.slachip:hover{background:#E3E9F0;border-color:var(--blue)}
 .slachip i{font-size:12px;opacity:.55}
 .slachip:hover i{opacity:1;color:var(--blue)}
 /* V9.48 - anh Luân: *"e cứ để cái tô vàng đi, ko cần tắt đâu, người ta thoát ra thì tắt."*
@@ -139,23 +139,23 @@ tr.cfhl>td{background:#FFF6D8}
 @keyframes cfhl{0%,60%{background:#FFF6D8}100%{background:transparent}}
 /* V9.29: nut nho "sua o day" canh cau nhac / danh muc */
 .cfedit{display:inline-flex;align-items:center;justify-content:center;margin-left:6px;background:none;border:0;
- width:24px;height:24px;flex:none;border-radius:50%;color:#98A4B3;cursor:pointer;font-family:inherit;padding:0;
+ width:24px;height:24px;flex:none;border-radius:50%;color:#9AA5B1;cursor:pointer;font-family:inherit;padding:0;
  vertical-align:middle;transition:.12s}
-.cfedit:hover{background:#EEF3F9;color:var(--blue)}
+.cfedit:hover{background:#EEF2F6;color:var(--blue)}
 .cfedit i{font-size:14px}
 /* chip số cũng bớt ồn: bánh răng chỉ hiện rõ khi rê vào */
 .slachip i{opacity:.4}
 .slachip:hover i{opacity:1}
 /* V9.29: dong viec bam duoc -> drawer xem nhanh */
 .slarow.clk{cursor:pointer;transition:background .12s,box-shadow .12s}
-.slarow.clk:hover{background:#FAFCFE}
+.slarow.clk:hover{background:#FAFBFD}
 /* V9.29: man hinh that su hep thi moi cho nhan xuong dong */
 @media(max-width:560px){.sopb .soprk,.ctxk,.cbl{white-space:normal}}
 /* V9.29: nut goi tren nen toi cua sidebar cong hoc vien */
 .btn.hvcall-dark{background:#ffffff1f;border-color:#ffffff4d;color:#fff}
 .btn.hvcall-dark:hover{background:#ffffff33;border-color:#ffffff80}
 .navgrp{margin-bottom:3px}
-.navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500}
+.navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
 .navitem:hover{background:#ffffff12;color:#fff}
 .navitem.on{background:#ffffff2e;color:#fff;font-weight:700;box-shadow:inset 0 0 0 1px #ffffff1f} /* V9.19: nền 10% quá mờ trên navy - Luân không thấy mục đang mở; đậm lên + icon sáng */
@@ -169,42 +169,42 @@ tr.cfhl>td{background:#FFF6D8}
 .topbar h1{font-size:17px;font-weight:700}.topbar .crumb{font-size:11px;color:var(--muted);font-weight:500;margin-top:1px}
 .crumb{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .crbback{border:1px solid var(--line);background:#fff;color:var(--navy);width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;margin-right:3px;flex:none}
-.crbback:hover{background:#F4F8FD;border-color:var(--navy)}.crbback i{font-size:14px}
+.crbback:hover{background:#FAFBFD;border-color:var(--navy)}.crbback i{font-size:14px}
 .crb{font-size:11px;color:var(--muted);font-weight:500}
 a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-decoration:underline}
 .crb.cur{color:var(--ink);font-weight:600}
-.crbsep{color:#C2CAD4;font-size:11px}
+.crbsep{color:#B9C6D6;font-size:11px}
 .rolesel{margin-left:auto;display:flex;align-items:center;gap:8px;position:relative}
 .notif{position:absolute;top:46px;right:0;width:372px;max-height:74vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 44px #0000002e;z-index:80;display:none}
 .notif.on{display:block}
 .nhd{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff}
-.nhd b{font-size:13.5px;color:var(--navy)}.nhd .nc{font-size:11.5px;color:var(--muted);font-weight:700}
+.nhd b{font-size:13px;color:var(--navy)}.nhd .nc{font-size:11.5px;color:var(--muted);font-weight:700}
 .nsec{font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:11px 15px 4px;display:flex;align-items:center;gap:6px}
-.nrow{display:flex;align-items:center;gap:11px;padding:9px 15px;cursor:pointer;border-bottom:1px solid #F0F3F7}
-.nrow:hover{background:#F7F9FB}
+.nrow{display:flex;align-items:center;gap:11px;padding:9px 15px;cursor:pointer;border-bottom:1px solid #FAFBFD}
+.nrow:hover{background:#FAFBFD}
 .nic{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex:0 0 auto}
 .ntx{flex:1;min-width:0}.ntt{font-size:12.5px;font-weight:700;color:var(--navy)}.nts{font-size:11px;color:var(--muted);margin-top:1px}
 .nft{padding:11px 15px;position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;gap:8px}
 .nempty{padding:26px 15px;text-align:center;color:var(--muted);font-size:12px}
 .rolesel span{font-size:11px;color:var(--muted);font-weight:600}
-.sel{height:36px;border:1px solid var(--line);border-radius:9px;padding:0 10px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--text);background:#fff}
-.tbtn{width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:#fff;color:#5A6675;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;position:relative}
+.sel{height:36px;border:1px solid var(--line);border-radius:8px;padding:0 10px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--text);background:#fff}
+.tbtn{width:38px;height:38px;border-radius:8px;border:1px solid var(--line);background:#fff;color:#5A6675;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;position:relative}
 .tbtn .n{position:absolute;top:-5px;right:-5px;background:var(--red);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:999px;padding:0 4px;box-sizing:border-box;line-height:1;white-space:nowrap;display:flex;align-items:center;justify-content:center}
 .content{flex:1;overflow-y:auto;padding:22px 26px}
 .phead{display:flex;align-items:flex-end;gap:14px;margin-bottom:18px}
-.phead .t{font-size:19px;font-weight:800;letter-spacing:-.2px}.phead .s{font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}
+.phead .t{font-size:18px;font-weight:800;letter-spacing:-.2px}.phead .s{font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}
 .phead .sp{margin-left:auto;display:flex;gap:9px}
 a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi điện, mở link) không được ăn gạch chân của link */
 .btn{height:36px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--text);font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
-.btn i{font-size:16px;flex-shrink:0}.btn:hover{border-color:#B9C6D6;background:#F7F9FB}
+.btn i{font-size:16px;flex-shrink:0}.btn:hover{border-color:#B9C6D6;background:#FAFBFD}
 .btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}.btn.primary:hover{background:var(--navyd)}
-.btn.green{background:var(--green);border-color:var(--green);color:#fff}.btn.danger{background:#fff;border-color:#E8B4B4;color:var(--red)}.btn.danger:hover{background:var(--redb)}
+.btn.green{background:var(--green);border-color:var(--green);color:#fff}.btn.danger{background:#fff;border-color:#F0B4B4;color:var(--red)}.btn.danger:hover{background:var(--redb)}
 .btn.sm{height:30px;padding:0 10px;font-size:11.5px}
 .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px;margin-bottom:20px}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px;cursor:pointer}
-.kpi:hover{border-color:#C6D2E0}
-.kpi .ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:10px}
-.kpi .num{font-size:29px;font-weight:800;line-height:1}.kpi .lbl{font-size:12px;color:var(--muted);font-weight:600;margin-top:5px}
+.kpi:hover{border-color:#C4D2E4}
+.kpi .ic{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px}
+.kpi .num{font-size:30px;font-weight:800;line-height:1}.kpi .lbl{font-size:12px;color:var(--muted);font-weight:600;margin-top:5px}
 .kpi .sub{font-size:11px;font-weight:600;margin-top:6px;display:inline-flex;align-items:center;gap:4px}
 .ic.red{background:var(--redb);color:var(--red)}.num.red{color:var(--red)}.sub.red{color:var(--red)}
 .ic.amber{background:var(--amberb);color:var(--amber)}.num.amber{color:var(--amber)}.sub.amber{color:var(--amber)}
@@ -218,11 +218,11 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .pbody{padding:6px 6px}
 .pill{height:29px;padding:0 12px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--muted);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer}
 .pill:hover{border-color:#B9C6D6}.pill.on{background:var(--navy);border-color:var(--navy);color:#fff}
-.task{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:9px;margin:6px 4px;background:#fff}
+.task{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:8px;margin:6px 4px;background:#fff}
 .task:hover{background:#FAFBFD}
 .task .ti{flex:1;min-width:0}.task .id{font-size:11px;color:var(--navy);font-weight:700}
-.task .nm{font-size:13.5px;font-weight:700;margin:1px 0 3px}.task .mt{font-size:11.5px;color:var(--muted);font-weight:500}
-.task .na{font-size:12px;margin-top:7px;background:#F6F8FA;border:1px dashed #D5DEE8;border-radius:7px;padding:6px 9px;color:#3A4756}
+.task .nm{font-size:13px;font-weight:700;margin:1px 0 3px}.task .mt{font-size:11.5px;color:var(--muted);font-weight:500}
+.task .na{font-size:12px;margin-top:7px;background:#FAFBFD;border:1px dashed #D5DEE8;border-radius:6px;padding:6px 9px;color:#3A4756}
 .task .ac{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
 .chip{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;display:inline-block}
 .chip.red{background:var(--redb);color:#A32D2D}.chip.amber{background:var(--amberb);color:#854F0B}.chip.green{background:var(--greenb);color:#1E6A47}.chip.gray{background:var(--gray);color:#5A6675}.chip.blue{background:var(--blueb);color:#185FA5}
@@ -230,14 +230,17 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .alert .ab{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .alert .at{flex:1}.alert .at b{font-size:13px;font-weight:600}.alert .at small{display:block;color:var(--muted);font-size:11px}.alert .av{font-size:18px;font-weight:800}
 .dt{width:100%;border-collapse:collapse;font-size:12.5px}
-.dt th{text-align:left;padding:9px 11px;background:#F4F7FA;color:#5A6675;font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--line);position:sticky;top:0}
+.dt th{text-align:left;padding:9px 11px;background:#FAFBFD;color:#5A6675;font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--line);position:sticky;top:0}
 .dt td{padding:9px 11px;border-bottom:1px solid #EEF2F6;vertical-align:middle}
 .dt tr:hover td{background:#FAFBFD}.mut{color:var(--muted)}.empty{text-align:center;color:var(--muted);padding:24px}
 .tbwrap{max-height:none;overflow:auto}
-.fbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:11px;padding:10px 12px;margin-bottom:14px}
+/* V9.55: .fbar va .tbar la HAI thanh cong cu cho CUNG mot viec, ma lech nhau bo goc 10/12,
+   dem 10-12/9-11, khe duoi 14/12. Dat canh nhau (trang Ban giao co ca hai) la thay so le ngay.
+   Gop metric ve mot bo - sua o tang chung, khong di sua 12 cho goi. */
+.fbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;margin-bottom:12px}
 .fbar .sep{width:1px;height:22px;background:var(--line)}
 .srch{position:relative}.srch i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px}
-.srch input{height:34px;width:240px;border:1px solid var(--line);border-radius:8px;padding:0 10px 0 32px;font-family:inherit;font-size:12.5px;background:#F7F9FB}
+.srch input{height:34px;width:240px;border:1px solid var(--line);border-radius:8px;padding:0 10px 0 32px;font-family:inherit;font-size:12.5px;background:#FAFBFD}
 .srch input:focus{outline:none;border-color:var(--navy);background:#fff}
 :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .cnt{font-size:12px;color:var(--muted);font-weight:600}
@@ -252,24 +255,24 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .rwn{font-size:18px;font-weight:800;color:var(--navy)}
 .rwm{font-size:11.5px;color:var(--muted);margin-top:2px}
 .runact{display:flex;gap:8px;flex-wrap:wrap}
-.runcard{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 2px 14px rgba(16,32,58,.06)}
-.runh{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#FBFCFD,#fff)}
-.runi{width:40px;height:40px;border-radius:11px;background:var(--blueb);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:21px;flex:0 0 auto}
-.runt{font-size:19px;font-weight:800;color:var(--navy);line-height:1.2}
+.runcard{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 2px 14px rgba(16,32,58,.06)}
+.runh{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#FAFBFD,#fff)}
+.runi{width:40px;height:40px;border-radius:10px;background:var(--blueb);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:20px;flex:0 0 auto}
+.runt{font-size:18px;font-weight:800;color:var(--navy);line-height:1.2}
 .runs{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5}
 .runctx{display:flex;gap:8px;flex-wrap:wrap;padding:10px 18px;background:var(--bg);border-bottom:1px solid var(--line)}
 .brok{margin:14px 18px;padding:14px 16px;border:1.5px dashed var(--green);border-radius:12px;background:var(--greenb)}
 .brokh{font-size:11.5px;font-weight:800;color:#1B7A50;text-transform:uppercase;letter-spacing:.3px;display:flex;align-items:center;gap:7px;margin-bottom:9px}
-.brok .btn.primary{background:var(--green);border-color:var(--green)}.brok .btn.primary:hover{background:#237A52}
+.brok .btn.primary{background:var(--green);border-color:var(--green)}.brok .btn.primary:hover{background:#1B7A50}
 .brokn{font-size:11px;color:#3D7A5E;margin-top:8px;line-height:1.5}
-.runsop{display:flex;gap:10px;padding:11px 18px;background:#FFF8E9;border-bottom:1px solid #F1E2BE;color:#7A5B12;font-size:12px;line-height:1.5}
+.runsop{display:flex;gap:10px;padding:11px 18px;background:#FFFBF2;border-bottom:1px solid #F1E2BE;color:#7A5B12;font-size:12px;line-height:1.5}
 .runsop i{font-size:17px;color:#C98A12;flex:none;margin-top:1px}.runsop b{display:block;color:#6A4E0E;font-size:11px;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
 .rcx{font-size:11.5px;color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:20px;padding:3px 10px}
 .rcx b{color:var(--muted);font-weight:600}
 .rform{display:flex;flex-wrap:wrap;gap:14px}
 .rform .fld{flex:1 1 260px;display:flex;flex-direction:column;gap:5px}
 .rform .fld.full{flex:1 1 100%}
-.rform input,.rform select,.rform textarea{height:38px;border:1px solid var(--line);border-radius:9px;padding:0 11px;font-family:inherit;font-size:13.5px;background:#fff}
+.rform input,.rform select,.rform textarea{height:38px;border:1px solid var(--line);border-radius:8px;padding:0 11px;font-family:inherit;font-size:13px;background:#fff}
 .rform textarea{height:auto;padding:9px 11px}
 .rseg{display:flex;gap:8px;flex-wrap:wrap}
 .rsb{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 14px;font-family:inherit;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer}
@@ -282,7 +285,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 /* V9.27: dai chao cu chiem gan nua man hinh cho 3 dong chu + mot o tim to dung. Nay gon lai
    MOT BANG: ben trai loi chao + mot dong tom tat, ben phai o tim - cung mot hang. */
 .bwhero{display:flex;gap:16px;flex-wrap:wrap;align-items:center;background:linear-gradient(120deg,#0F2A4A,#1E4A7A);
- border-radius:14px;padding:14px 18px;margin-bottom:14px;color:#fff}
+ border-radius:12px;padding:14px 18px;margin-bottom:14px;color:#fff}
 .bwl{flex:1 1 300px;min-width:0}
 .bwr{flex:0 1 400px;min-width:240px}
 .bwg{font-size:17px;font-weight:800;line-height:1.3}
@@ -318,9 +321,9 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    Chi de xem = nen xam nhat, vien DUT, khong doi gi khi ro chuot vao. */
 [onclick]{cursor:pointer}
 .ronly,.bstat.static{cursor:default}
-.bstat.static{background:#FAFBFD;border-style:dashed;border-color:#DFE6EE}
-.bstat.static:hover{border-color:#DFE6EE;box-shadow:none;transform:none}
-.bstat.static .bsn{color:#41506A}
+.bstat.static{background:#FAFBFD;border-style:dashed;border-color:#E3E9F0}
+.bstat.static:hover{border-color:#E3E9F0;box-shadow:none;transform:none}
+.bstat.static .bsn{color:#4A5A6E}
 .bsic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex:0 0 auto}
 .bsn{font-size:20px;font-weight:800;color:var(--navy);line-height:1.1}
 .bsl{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
@@ -332,33 +335,33 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .hvjr:before{content:"";position:absolute;left:15px;top:0;bottom:0;width:2px;background:var(--line)}
 .hvjr:first-child:before{top:50%}
 .hvjr:last-child:before{bottom:50%}
-.hvjd{width:32px;height:32px;border-radius:50%;background:#fff;border:2px solid var(--line);color:#B6C0CC;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none;position:relative;z-index:1}
+.hvjd{width:32px;height:32px;border-radius:50%;background:#fff;border:2px solid var(--line);color:#B9C6D6;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none;position:relative;z-index:1}
 .hvjr.on .hvjd{border-color:var(--green);color:var(--green);background:var(--greenb)}
 .hvjc{flex:1;min-width:0}
 .hvjc b{display:block;font-size:12.5px;color:var(--text)}
-.hvjr:not(.on) .hvjc b{color:#A6AFBA}
+.hvjr:not(.on) .hvjc b{color:#AAB4C0}
 .hvjc span{font-size:11.5px;color:var(--muted)}
 .hvjt{font-size:11.5px;color:var(--muted);font-weight:700;white-space:nowrap;flex:none;text-align:right;min-width:118px}
 @media(max-width:700px){.hvjt{min-width:0;font-size:10.5px}}
 /* V9.25 - cổng học viên: hộp hỏi hai chiều + lịch đóng theo đợt */
-.hvreq{border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:10px;background:#fff}
+.hvreq{border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:10px;background:#fff}
 .hvreqh{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--navy);margin-bottom:3px}
 .hvreqh b{flex:1;min-width:0}
-.hvreqm{font-size:11px;color:#8A98A8;margin-bottom:6px}
+.hvreqm{font-size:11px;color:#8A94A0;margin-bottom:6px}
 .hvreqc{font-size:12.5px;line-height:1.6;color:#4A5A6E;margin-bottom:7px}
-.hvcmt{background:#F5F8FC;border-radius:9px;padding:7px 10px;margin-bottom:5px;font-size:12px;line-height:1.55}
-.hvcmt.me{background:#EAF3FF}
+.hvcmt{background:#FAFBFD;border-radius:8px;padding:7px 10px;margin-bottom:5px;font-size:12px;line-height:1.55}
+.hvcmt.me{background:#EEF2F6}
 .hvcmt b{display:block;font-size:11px;color:var(--navy)}
-.hvcmt i{display:block;font-size:10px;color:#9AA7B5;font-style:normal;margin-top:2px}
+.hvcmt i{display:block;font-size:10px;color:#9AA5B1;font-style:normal;margin-top:2px}
 .hvstars{display:inline-flex;gap:2px;vertical-align:middle}
-.hvstars i{font-size:18px;color:#D3DBE4;cursor:pointer;transition:.12s}
+.hvstars i{font-size:18px;color:#D5DEE8;cursor:pointer;transition:.12s}
 .hvstars i:hover{color:#F0B429;transform:scale(1.12)}
 .hvstars i.on{color:#F0B429}
 .hvstars.done i{cursor:default}
-.hvgrph{font-size:9.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:#8FA6C2;padding:11px 12px 4px}
+.hvgrph{font-size:10px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:#93A7C2;padding:11px 12px 4px}
 .hvlopg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:11px;margin-bottom:12px}
 .hvlopi{display:flex;gap:10px;align-items:flex-start;font-size:12.5px}
-.hvlopi i{font-size:19px;color:var(--blue);flex:none;margin-top:1px}
+.hvlopi i{font-size:18px;color:var(--blue);flex:none;margin-top:1px}
 .hvlopi b{display:block;color:var(--navy);font-size:12px}
 .hvlopi span{color:#4A5A6E;line-height:1.5}
 .hvgvw{display:flex;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:12px}
@@ -366,35 +369,35 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .hvgva{width:44px;height:44px;border-radius:50%;flex:none;object-fit:cover;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px}
 .hvgv b{display:block;color:var(--navy);font-size:13px}
 .hvgvb{margin-top:3px;color:#4A5A6E;line-height:1.55;font-size:11.5px}
-.hvcert{background:linear-gradient(135deg,#FFFDF5,#FFF7E6);border:1px solid #F0DFAE;border-radius:14px;padding:15px 17px;margin-bottom:16px}
+.hvcert{background:linear-gradient(135deg,#FFFBF2,#FFF7E6);border:1px solid #F2D9AE;border-radius:12px;padding:15px 17px;margin-bottom:16px}
 .hvcerth{display:flex;gap:11px;align-items:center;margin-bottom:11px}
 .hvcerth i{font-size:30px;color:#C8912A}
-.hvcerth b{display:block;font-size:15px;color:#7A5A10}
+.hvcerth b{display:block;font-size:15px;color:#7A5B12}
 .hvcerth span{font-size:12px;color:#96793C}
 .hvcertg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.hvcertg>div{background:#ffffffaa;border-radius:9px;padding:8px 10px}
+.hvcertg>div{background:#ffffffaa;border-radius:8px;padding:8px 10px}
 .hvcertg span{display:block;font-size:10.5px;color:#96793C;text-transform:uppercase;letter-spacing:.4px}
-.hvcertg b{font-size:14px;color:#7A5A10}
-.wowinfo{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:6px 14px;background:#F7F9FC;border-radius:10px;padding:10px 12px;margin:8px 0}
-.wowinfo.self{background:#F2F7FF;box-shadow:inset 0 0 0 1px #CFE0F7}
+.hvcertg b{font-size:14px;color:#7A5B12}
+.wowinfo{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:6px 14px;background:#FAFBFD;border-radius:10px;padding:10px 12px;margin:8px 0}
+.wowinfo.self{background:#FAFBFD;box-shadow:inset 0 0 0 1px #CFE0F7}
 .wowself{grid-column:1/-1;display:flex;gap:8px;align-items:center;font-size:12px;font-weight:700;color:var(--blue);padding-bottom:4px}
 .wowself i{font-size:17px}
 .wowib{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.55;color:#4A5A6E}
-.wowib i{font-size:15px;color:#8FA6C2;flex:none;margin-top:2px}
+.wowib i{font-size:15px;color:#93A7C2;flex:none;margin-top:2px}
 .wowib b{color:var(--navy);font-weight:700}
-.hvask{background:#F2F7FF;border:1px solid #CFE0F7;border-radius:12px;padding:13px 15px;margin-bottom:16px}
+.hvask{background:#FAFBFD;border:1px solid #CFE0F7;border-radius:12px;padding:13px 15px;margin-bottom:16px}
 .hvaskh{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--navy);margin-bottom:5px}
-.hvaskh i{font-size:19px;color:var(--blue)}
+.hvaskh i{font-size:18px;color:var(--blue)}
 .hvaskb{font-size:12.5px;line-height:1.65;color:#4A5A6E;margin-bottom:10px}
 .hvaskf{display:flex;gap:8px;flex-wrap:wrap}
 .hvschd{border-top:1px solid var(--line);margin-top:4px;padding-top:10px}
 .hvschh{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--navy);padding:0 14px 8px}
 .hvschh i{font-size:17px;color:var(--blue)}.hvschh .mut{font-weight:500;font-size:11px;margin-left:auto}
-.hvschr{display:grid;grid-template-columns:76px 1fr auto 118px;gap:10px;align-items:center;padding:9px 14px;border-top:1px solid #F0F3F7;font-size:12.5px}
-.hvschr.ok{background:#F6FBF7}.hvschr.soon{background:#FFFBF0}.hvschr.due{background:#FFF7ED}.hvschr.late{background:#FFF5F5}
+.hvschr{display:grid;grid-template-columns:76px 1fr auto 118px;gap:10px;align-items:center;padding:9px 14px;border-top:1px solid #FAFBFD;font-size:12.5px}
+.hvschr.ok{background:#F4FBF6}.hvschr.soon{background:#FFFBF2}.hvschr.due{background:#FFFBF2}.hvschr.late{background:#FBF0EF}
 .hvschn{font-weight:800;color:var(--navy);font-size:11.5px}
 .hvschd2{color:#4A5A6E}.hvscha{text-align:right}
-.hvschs{text-align:right;font-size:11.5px;font-weight:700;color:#64748B}
+.hvschs{text-align:right;font-size:11.5px;font-weight:700;color:#6B7887}
 .hvschr.ok .hvschs{color:#16A34A}.hvschr.soon .hvschs,.hvschr.due .hvschs{color:#B45309}.hvschr.late .hvschs{color:#DC2626}
 .hvup2.off{opacity:.72}
 .hvup2.off b{text-decoration:line-through;text-decoration-color:#DC262666}
@@ -402,12 +405,12 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .hvfee{display:flex;flex-wrap:wrap;gap:0}
 .hvf{flex:1;min-width:130px;padding:8px 14px;border-right:1px solid var(--line)}
 .hvf:last-child{border-right:0}
-.hvf.hi{background:var(--bg);border-radius:9px}
+.hvf.hi{background:var(--bg);border-radius:8px}
 .hvf span{display:block;font-size:10.5px;font-weight:700;color:#8A94A0;text-transform:uppercase;letter-spacing:.3px}
 .hvf b{font-size:15px}
-.hvbar{height:8px;background:var(--bg);border-radius:5px;overflow:hidden;margin-top:12px}
-.hvbar i{display:block;height:100%;background:var(--green);border-radius:5px}
-.hvgt{display:flex;align-items:center;gap:10px;padding:11px 0 6px;border-top:1px solid #F2F5F9;margin-top:6px}
+.hvbar{height:8px;background:var(--bg);border-radius:6px;overflow:hidden;margin-top:12px}
+.hvbar i{display:block;height:100%;background:var(--green);border-radius:6px}
+.hvgt{display:flex;align-items:center;gap:10px;padding:11px 0 6px;border-top:1px solid #FAFBFD;margin-top:6px}
 .hvgt:first-child{border-top:0;margin-top:0;padding-top:0}
 .hvgt b{font-size:12.5px;flex:1}
 .hvup2{padding:5px 0 5px 45px}
@@ -419,22 +422,22 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .svtpl b{font-size:11.5px;color:var(--navy);display:block;margin-bottom:5px}
 .svtpl ol{margin:0 0 7px;padding-left:19px}
 .svtpl li{font-size:11.5px;color:var(--text);line-height:1.6}
-.hvdan{display:flex;gap:8px;margin-top:6px;padding:8px 10px;background:#FFF8E9;border:1px solid #F0DFB2;border-radius:8px;font-size:11.5px;color:#7A5B12;line-height:1.5}
-.hvdan.hw{background:var(--blueb);border-color:#CFE0F7;color:#2A5D8F}
+.hvdan{display:flex;gap:8px;margin-top:6px;padding:8px 10px;background:#FFFBF2;border:1px solid #F2D9AE;border-radius:8px;font-size:11.5px;color:#7A5B12;line-height:1.5}
+.hvdan.hw{background:var(--blueb);border-color:#CFE0F7;color:#2E5A88}
 .hvdan.nbred{background:#FBF0EF;border-color:#EBC8C4;color:#7E3A32}
 .hvdan i{font-size:15px;flex:none;margin-top:1px;opacity:.85}
 .hvcrs{display:grid;grid-template-columns:repeat(auto-fit,minmax(275px,1fr));gap:12px;margin-bottom:18px}
-.hvcr{position:relative;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:14px 15px;cursor:pointer;transition:.15s}
+.hvcr{position:relative;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:14px 15px;cursor:pointer;transition:.15s}
 .hvcr:hover{border-color:#B9C6D6;transform:translateY(-1px);box-shadow:0 4px 16px rgba(16,32,58,.08)}
-.hvcr.on{border-color:var(--navy);background:linear-gradient(180deg,#F4F8FC,#fff);box-shadow:0 4px 18px rgba(46,90,136,.16)}
+.hvcr.on{border-color:var(--navy);background:linear-gradient(180deg,#FAFBFD,#fff);box-shadow:0 4px 18px rgba(46,90,136,.16)}
 .hvcr.on:before{content:"";position:absolute;left:-1.5px;top:14px;bottom:14px;width:4px;border-radius:3px;background:var(--navy)}
 .hvcrh{display:flex;align-items:flex-start;gap:11px}
 .hvcri{width:38px;height:38px;border-radius:10px;background:var(--bg);color:#8A94A0;display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
 .hvcr.on .hvcri{background:var(--navy);color:#fff}
 .hvcrt{flex:1;min-width:0}
-.hvcrt b{display:block;font-size:13.5px;color:var(--text);line-height:1.35}
+.hvcrt b{display:block;font-size:13px;color:var(--text);line-height:1.35}
 .hvcrt span{font-size:11px;color:var(--muted)}
-.hvcrok{font-size:19px;color:var(--navy);flex:none}
+.hvcrok{font-size:18px;color:var(--navy);flex:none}
 .hvcrb{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:10px 0 9px}
 .hvcrd{font-size:11px;color:var(--muted);font-weight:600}
 .hvcrf{display:flex;gap:14px;flex-wrap:wrap;padding-top:9px;border-top:1px dashed var(--line)}
@@ -443,10 +446,10 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .hvcrf b{color:var(--text);font-weight:700}
 .hvses{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
 .hvtl{position:relative;padding-left:26px}
-.hvtl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line);border-radius:2px}
+.hvtl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--line);border-radius:3px}
 .hvtlr{position:relative;margin-bottom:12px}
 .hvtlr:before{content:"";position:absolute;left:-24px;top:5px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--navy);z-index:1}
-.hvtlr.past:before{border-color:#B9C6D2}
+.hvtlr.past:before{border-color:#B9C6D6}
 .hvtlr .hvtld{font-size:11px;font-weight:800;color:var(--navy);margin:0 0 5px 0;letter-spacing:.2px}
 .hvtlr.past .hvtld{color:var(--muted)}
 .hvtlr .hvses{margin-bottom:0}
@@ -455,12 +458,12 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .chip.fill-gray{background:#6B7887;border-color:#6B7887;color:#fff}
 .mstrip.clk{cursor:pointer}
 /* ===== V9.20 GIAO VIỆC ===== */
-.tkrow{display:flex;gap:12px;align-items:flex-start;padding:12px 4px;border-bottom:1px solid #EEF2F7;cursor:pointer;transition:.12s}
+.tkrow{display:flex;gap:12px;align-items:flex-start;padding:12px 4px;border-bottom:1px solid #EEF2F6;cursor:pointer;transition:.12s}
 .tkrow:last-child{border-bottom:0}
-.tkrow:hover{background:#F7FAFE}
-.tkrow.over{background:#FFF7F7}
-.tkic{width:32px;height:32px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;background:var(--blueb);color:var(--blue);font-size:16px}
-.tkrow.over .tkic{background:#FDECEC;color:var(--red)}
+.tkrow:hover{background:#FAFBFD}
+.tkrow.over{background:#FBF0EF}
+.tkic{width:32px;height:32px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;background:var(--blueb);color:var(--blue);font-size:16px}
+.tkrow.over .tkic{background:#FBF0EF;color:var(--red)}
 .tkmain{flex:1;min-width:0}
 .tktt{font-size:13px;font-weight:700;color:var(--navy);line-height:1.4}
 .tkmeta{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.6}
@@ -471,13 +474,13 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .tkcm:last-child{margin-bottom:0}
 .tkcmh{display:flex;gap:8px;align-items:baseline;font-size:11px;color:var(--muted)}
 .tkcmh b{font-size:11.5px;color:var(--navy)}
-.tkcmb{background:#fff;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:12.5px;line-height:1.55;margin-top:3px}
-.tkcm.me .tkcmb{background:#EAF3FC;border-color:#CFE3F7}
+.tkcmb{background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:12.5px;line-height:1.55;margin-top:3px}
+.tkcm.me .tkcmb{background:#EEF2F6;border-color:#CFE0F7}
 /* V9.27: thanh nut hanh dong tach han khoi luong trao doi, khong con dinh sat gay cam giac de nhau */
 .tkact{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px;padding:12px 0 0;border-top:1px solid var(--line)}
 .tkchd{margin-top:18px}
 .tksay{display:flex;gap:7px;align-items:center;margin-top:10px}
-.tksay input{flex:1;height:36px;border:1px solid var(--line);border-radius:9px;padding:0 11px;font-family:inherit;font-size:12.5px}
+.tksay input{flex:1;height:36px;border:1px solid var(--line);border-radius:8px;padding:0 11px;font-family:inherit;font-size:12.5px}
 .tksay input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,196,.14)}
 .tkhint{display:flex;align-items:flex-start;gap:6px;font-size:11px;color:#7A8694;margin:7px 0 2px;line-height:1.5}
 .tkhint i{font-size:13px;flex:none;margin-top:1px}
@@ -519,23 +522,23 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 @keyframes asstIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .asstH{display:flex;align-items:flex-start;gap:10px;padding:15px 16px 12px;border-bottom:1px solid var(--line)}
 .asstH>div{flex:1;min-width:0}
-.asstH b{display:block;font-size:14.5px;color:var(--navy);font-weight:800}
+.asstH b{display:block;font-size:14px;color:var(--navy);font-weight:800}
 .asstH span{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
 .asstH span i{font-style:normal;color:var(--red);font-weight:700}
 .asstH .x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:16px;width:28px;height:28px;flex:none;display:flex;align-items:center;justify-content:center;padding:0;border-radius:8px}
-.asstH .x:hover{background:#EEF3F9;color:var(--navy)}
+.asstH .x:hover{background:#EEF2F6;color:var(--navy)}
 .asstCard{margin:12px 13px;padding:13px 14px;border:1px solid var(--line);
- border-radius:11px;background:#FBFCFE}
+ border-radius:10px;background:#FAFBFD}
 .asstCard.done{background:#F4FBF6;border-color:#BFE3C8}
 .asstCard .k{font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
-.asstCard .t{font-size:14.5px;font-weight:800;color:var(--navy);margin:3px 0 1px;line-height:1.35}
-.asstCard .w{font-size:12px;font-weight:600;color:#4A5A6B}
+.asstCard .t{font-size:14px;font-weight:800;color:var(--navy);margin:3px 0 1px;line-height:1.35}
+.asstCard .w{font-size:12px;font-weight:600;color:#4A5A6E}
 .asstCard .d{font-size:12px;color:var(--muted);line-height:1.55;margin-top:4px}
 .asstCard .c{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:8px}
 .asstCard .a{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
 .asstChips{display:flex;gap:6px;padding:0 13px;flex-wrap:wrap}
-.asstChip{flex:1;min-width:88px;background:#F4F7FB;border:1px solid var(--line);border-radius:9px;
- padding:8px 6px;font-family:inherit;font-size:11px;font-weight:700;color:#4A5A6B;cursor:pointer;
+.asstChip{flex:1;min-width:88px;background:#FAFBFD;border:1px solid var(--line);border-radius:8px;
+ padding:8px 6px;font-family:inherit;font-size:11px;font-weight:700;color:#4A5A6E;cursor:pointer;
  display:flex;flex-direction:column;align-items:center;gap:3px;transition:.12s}
 .asstChip:hover{border-color:var(--navy)}
 .asstChip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
@@ -547,19 +550,19 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .asstRow:last-child{border-bottom:0}
 .asstRow .n{flex:1;min-width:0}
 .asstRow.clk{cursor:pointer}
-.asstRow.clk:hover{background:#F4F7FB}
+.asstRow.clk:hover{background:#FAFBFD}
 .asstFoot{display:flex;gap:7px;padding:12px 13px}
 .asstFoot .btn{flex:none}
 .asstFoot .btn.primary{flex:1;justify-content:center}
 .asstNote{padding:0 15px 14px;font-size:11.5px;color:var(--muted);line-height:1.6}
-.asstNote b{color:#4A5A6B}
+.asstNote b{color:#4A5A6E}
 /* ── HỎI ĐÁP Ở GÓC (V9.47) - anh Luân: *"sao em ko đưa nó lên gần chỗ trợ thủ, bấm icon hiện
    khung nhập"*. Đúng: một trang riêng thì phải nhớ đường mà vào; thứ người ta cần HỎI GIỮA CHỪNG
    phải ở ngay trong tầm tay, không bắt rời việc đang làm.
    Nút tròn nhỏ đứng CẠNH nút Trợ thủ (không chồng lên - hai nút chồng nhau một góc là thứ chắc
    chắn sẽ che nhau, đã ghi thành luật từ V9.35). Tấm trả lời dùng lại đúng khung `.asst`. */
 .qaAsk{display:flex;gap:7px;padding:12px 13px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2}
-.qaAsk input{flex:1;min-width:0;height:36px;border:1px solid var(--line);border-radius:9px;padding:0 11px;font-family:inherit;font-size:12.5px}
+.qaAsk input{flex:1;min-width:0;height:36px;border:1px solid var(--line);border-radius:8px;padding:0 11px;font-family:inherit;font-size:12.5px}
 .qaAsk input:focus{outline:0;border-color:var(--navy)}
 .qaBody{padding:12px 13px}
 .qaBody .sechd{margin:12px 0 6px;font-size:10.5px}
@@ -574,14 +577,14 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    tên, hiện lớp hay gì đó, hiện số điện thoại cùng, để người dùng bấm vào thì mình hướng dẫn cho
    chuẩn." Trước hết phải CHẮC đúng người, rồi mới nói chuyện nghiệp vụ. */
 .qaWho{flex:1;min-width:0;text-align:left}
-.qaWhoN{font-size:14.5px;font-weight:800;color:var(--navy);line-height:1.3}
+.qaWhoN{font-size:14px;font-weight:800;color:var(--navy);line-height:1.3}
 .qaWhoM{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.45}
 .qaPick{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:10px 11px;
- border:1px solid var(--line);border-radius:11px;background:#fff;cursor:pointer;font-family:inherit;
+ border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-family:inherit;
  margin-bottom:7px;transition:.12s}
-.qaPick:hover{border-color:var(--navy);background:#F4F8FD}
+.qaPick:hover{border-color:var(--navy);background:#FAFBFD}
 .qaPick>i{color:var(--muted);flex:none}
-.qaAskBack{font-size:12px;color:#4A5A6B;line-height:1.55;margin:11px 0 7px}
+.qaAskBack{font-size:12px;color:#4A5A6E;line-height:1.55;margin:11px 0 7px}
 .qaYD{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
 .qaYD .pill b{background:var(--navy);color:#fff;border-radius:999px;padding:0 5px;font-size:10px;margin-left:3px}
 .qaYD .pill.on b{background:#fff;color:var(--navy)}
@@ -597,30 +600,30 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .tourfab span{font-weight:500;opacity:.85}
 /* Ô nhập nằm THẲNG trong bảng (màn cấu hình Nhịp ngày) không đi qua .fld nên không thừa hưởng
    kiểu ô nhập chuẩn - cao có 19px, bấm trượt liên tục trên điện thoại. */
-.tb td>input[type=text],.tb td>input:not([type]){padding:6px 8px;border:1px solid var(--line);border-radius:7px;font-family:inherit;font-size:12px;background:#fff;min-height:28px}
+.tb td>input[type=text],.tb td>input:not([type]){padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:12px;background:#fff;min-height:28px}
 .tb td>input:focus{outline:none;border-color:var(--navy)}
-.tourbox{position:fixed;z-index:160;width:330px;max-width:calc(100vw - 24px);background:#fff;border-radius:14px;
+.tourbox{position:fixed;z-index:160;width:330px;max-width:calc(100vw - 24px);background:#fff;border-radius:12px;
  box-shadow:0 18px 48px rgba(10,20,40,.35);padding:15px 16px 13px;font-size:13px;transition:all .22s cubic-bezier(.4,0,.2,1)}
 .tourbox .tnum{font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--blue)}
-.tourbox h5{font-size:14.5px;font-weight:800;color:var(--navy);margin:4px 0 6px;line-height:1.35}
+.tourbox h5{font-size:14px;font-weight:800;color:var(--navy);margin:4px 0 6px;line-height:1.35}
 .tourbox p{font-size:12.5px;color:#4A5A6E;line-height:1.65;margin:0 0 11px}
-.tourbox .thint{background:#EAF3FC;border-radius:8px;padding:7px 10px;font-size:12px;color:var(--navy);margin:0 0 11px;line-height:1.55}
-.tourbox .tchk{display:flex;align-items:center;gap:7px;background:#FFF8E6;border:1px dashed #F0D08A;border-radius:8px;padding:7px 10px;font-size:12px;color:#8A5A0B;margin:0 0 11px;line-height:1.5}
-.tourbox .tchk.ok{background:#EAF7F0;border-color:#A9DFC4;border-style:solid;color:#1E6A47}
+.tourbox .thint{background:#EEF2F6;border-radius:8px;padding:7px 10px;font-size:12px;color:var(--navy);margin:0 0 11px;line-height:1.55}
+.tourbox .tchk{display:flex;align-items:center;gap:7px;background:#FFF7E6;border:1px dashed #F0D08A;border-radius:8px;padding:7px 10px;font-size:12px;color:#8A5A0B;margin:0 0 11px;line-height:1.5}
+.tourbox .tchk.ok{background:#F4FBF6;border-color:#A9DFC4;border-style:solid;color:#1E6A47}
 .tourbox .tchk i{font-size:15px;flex:none}
 .tourbox .tfoot{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 .tourbox .tfoot .sp{margin-left:auto}
 .tourdots{display:flex;gap:4px;margin-bottom:10px}
-.tourdots i{width:100%;height:3px;border-radius:2px;background:#DDE5EE;display:block}
+.tourdots i{width:100%;height:3px;border-radius:3px;background:#E3E9F0;display:block}
 .tourdots i.on{background:var(--blue)}
 .tourdots i.done{background:#9FC7EA}
 .tourmenu{display:grid;gap:9px}
 .tourmi{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:12px 13px;cursor:pointer;transition:.13s}
-.tourmi:hover{border-color:var(--blue);background:#F6FAFE}
-.tourmi .tmi{width:34px;height:34px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;background:var(--blueb);color:var(--blue);font-size:17px}
+.tourmi:hover{border-color:var(--blue);background:#FAFBFD}
+.tourmi .tmi{width:34px;height:34px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;background:var(--blueb);color:var(--blue);font-size:17px}
 .tourmi b{font-size:13px;color:var(--navy);display:block}
 .tourmi span{font-size:11.5px;color:var(--muted);line-height:1.5;display:block;margin-top:2px}
-.hvsh{display:flex;align-items:center;gap:12px;padding:10px 13px;background:linear-gradient(180deg,#FBFCFD,#fff);border-bottom:1px solid var(--line)}
+.hvsh{display:flex;align-items:center;gap:12px;padding:10px 13px;background:linear-gradient(180deg,#FAFBFD,#fff);border-bottom:1px solid var(--line)}
 .hvsn{min-width:62px;height:28px;border-radius:8px;background:var(--blueb);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;flex:none}
 .hvst{flex:1;min-width:0}
 .hvst b{display:block;font-size:12.5px}
@@ -628,25 +631,25 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .hvsb{padding:8px 13px}
 .hvev{display:flex;gap:9px;align-items:flex-start;padding:6px 0;font-size:11.5px;line-height:1.55;border-bottom:1px dashed #EEF2F6}
 .hvev:last-child{border-bottom:0}
-.hvev i{font-size:15px;color:#9AA6B4;flex:none;margin-top:2px}
+.hvev i{font-size:15px;color:#9AA5B1;flex:none;margin-top:2px}
 .hvev span{flex:1;min-width:0}
 /* ===== CỔNG HỌC VIÊN (file riêng) ===== */
 .hvapp{display:flex;height:100vh;overflow:hidden}
 .hvmask{display:none}
 .hvside{width:262px;flex-shrink:0;background:var(--sidebar);color:#C4D2E4;display:flex;flex-direction:column;overflow-y:auto}
 .hvbrand{display:flex;align-items:center;gap:11px;padding:16px 15px;border-bottom:1px solid #ffffff14}
-.hvbrand b{font-size:13.5px;color:#fff;display:block}
-.hvbrand small{font-size:10.5px;color:#8FA6C4}
+.hvbrand b{font-size:13px;color:#fff;display:block}
+.hvbrand small{font-size:10.5px;color:#93A7C2}
 .hvme{display:flex;align-items:center;gap:11px;padding:14px 15px;border-bottom:1px solid #ffffff14}
 .hvme .av{width:38px;height:38px;border-radius:50%;background:#ffffff1f;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex:none}
 .hvme b{font-size:13px;color:#fff;display:block}
-.hvme small{font-size:10.5px;color:#8FA6C4}
+.hvme small{font-size:10.5px;color:#93A7C2}
 .hvselbox{padding:11px 13px;border-bottom:1px solid #ffffff14}
-.hvselbox label{font-size:9.5px;font-weight:800;color:#7E93B2;text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px}
+.hvselbox label{font-size:10px;font-weight:800;color:#7E93B2;text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px}
 .hvselbox select{width:100%;height:32px;border-radius:8px;border:1px solid #ffffff26;background:#ffffff10;color:#fff;font-family:inherit;font-size:11.5px;padding:0 8px}
 .hvselbox select option{color:#1E2A38}
 .hvnav{flex:1;padding:9px 9px 18px}
-.hvni{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;color:#C4D2E4;font-size:12.5px;font-weight:500;transition:.12s}
+.hvni{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;cursor:pointer;color:#C4D2E4;font-size:12.5px;font-weight:500;transition:.12s}
 .hvni i{font-size:17px;width:19px;text-align:center;opacity:.85}
 .hvni:hover{background:#ffffff12;color:#fff}
 .hvni.on{background:#ffffff1a;color:#fff;font-weight:700}
@@ -661,29 +664,29 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 }
 .hvpick{display:flex;align-items:center;gap:9px;margin-bottom:14px}
 .hvpick span{font-size:11px;font-weight:700;color:#8A94A0;text-transform:uppercase;letter-spacing:.3px}
-.hvhero{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,var(--navy),#3E7BB5);color:#fff;border-radius:14px;padding:20px 22px;margin-bottom:18px}
-.hvg{font-size:21px;font-weight:800}
+.hvhero{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,var(--navy),#3E7BB5);color:#fff;border-radius:12px;padding:20px 22px;margin-bottom:18px}
+.hvg{font-size:20px;font-weight:800}
 .hvsub{font-size:12.5px;opacity:.95;margin-top:4px}
 .hvav{margin-left:auto;width:52px;height:52px;border-radius:50%;background:#ffffff28;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;flex:none}
 .hvconf{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:11px;margin-bottom:16px}
 .hvc{display:flex;gap:11px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px}
-.hvc i{font-size:21px;color:#B6C0CC;flex:none}
+.hvc i{font-size:20px;color:#B9C6D6;flex:none}
 .hvc.ok i{color:var(--green)}
 .hvc b{display:block;font-size:12.5px;color:var(--text)}
 .hvc span{font-size:11.5px;color:var(--muted)}
 .hvskill{display:flex;flex-direction:column;gap:10px}
 .hvsk{display:flex;align-items:center;gap:12px}
 .hvskl{width:150px;font-size:12px;flex:none}
-.hvskb{flex:1;height:9px;background:var(--bg);border-radius:5px;overflow:hidden}
-.hvskb i{display:block;height:100%;border-radius:5px}
+.hvskb{flex:1;height:9px;background:var(--bg);border-radius:6px;overflow:hidden}
+.hvskb i{display:block;height:100%;border-radius:6px}
 .hvsk b{width:34px;text-align:right;font-size:12.5px}
-.hvup{display:flex;gap:11px;align-items:center;padding:9px 0;border-bottom:1px solid #F2F5F9}
+.hvup{display:flex;gap:11px;align-items:center;padding:9px 0;border-bottom:1px solid #FAFBFD}
 .hvup:last-child{border-bottom:0}
-.hvui{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none}
+.hvui{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none}
 .hvup b{display:block;font-size:12.5px}.hvup span{font-size:11.5px;color:var(--muted)}
-.hvrec{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-bottom:1px solid #F2F5F9}
+.hvrec{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-bottom:1px solid #FAFBFD}
 .hvrec:last-child{border-bottom:0}
-.hvrec i{font-size:19px;flex:none;margin-top:1px}
+.hvrec i{font-size:18px;flex:none;margin-top:1px}
 .hvrec.red i{color:var(--red)}.hvrec.amber i{color:var(--amber)}.hvrec.green i{color:var(--green)}
 .hvrec b{display:block;font-size:12.5px}.hvrec span{font-size:11.5px;color:var(--muted);line-height:1.5}
 .cols2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -693,11 +696,11 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .mslb{grid-column:1/-1;font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--navy)}
 .msw{display:flex;align-items:flex-start;gap:10px;text-align:left;padding:12px 13px;border:1.5px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-family:inherit;transition:.12s}
 .msw:hover{border-color:#9BB2CC}
-.msw i{font-size:19px;color:#8A94A0;line-height:1;margin-top:1px}
+.msw i{font-size:18px;color:#8A94A0;line-height:1;margin-top:1px}
 .msw span{display:flex;flex-direction:column;gap:2px}
 .msw b{font-size:13px;font-weight:700;color:var(--ink)}
 .msw small{font-size:11px;color:var(--muted);line-height:1.35}
-.msw.on{border-color:var(--navy);background:#F4F8FD;box-shadow:0 0 0 3px rgba(46,90,136,.09)}
+.msw.on{border-color:var(--navy);background:#FAFBFD;box-shadow:0 0 0 3px rgba(46,90,136,.09)}
 .msw.on i,.msw.on b{color:var(--navy)}
 .substep{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:11px 16px;padding:14px 15px 16px;border:1px solid var(--line);border-radius:10px;background:#FAFBFD}
 .sst{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--navy);margin-bottom:1px}
@@ -705,30 +708,30 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 @media(max-width:760px){.mswrap,.substep{grid-template-columns:1fr}}
 /* Giới thiệu bạn bè (trang học viên) */
 .hvrefbox{display:flex;gap:14px;align-items:center}
-.hvrefico{width:52px;height:52px;flex:none;border-radius:13px;background:linear-gradient(135deg,#FFE7E7,#FFF3E0);display:flex;align-items:center;justify-content:center}
+.hvrefico{width:52px;height:52px;flex:none;border-radius:12px;background:linear-gradient(135deg,#FBF0EF,#FFF6D8);display:flex;align-items:center;justify-content:center}
 .hvrefico i{font-size:26px;color:var(--red)}
 .hvrefmn b{font-size:14px}.hvrefmn p{font-size:12.5px;color:var(--muted);margin:4px 0 10px;line-height:1.5}
-.hvrefcard{border:1.5px dashed #E5A6A6;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#FFFBFB,#fff)}
+.hvrefcard{border:1.5px dashed #E5A6A6;border-radius:12px;overflow:hidden;background:linear-gradient(180deg,#FFFBFA,#fff)}
 .hvrefhd{background:linear-gradient(135deg,#D51920,#B3141A);color:#fff;padding:14px 16px;text-align:center}
 .hvrefhd span{font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:.9}
-.hvrefcode{font-size:24px;font-weight:800;letter-spacing:2px;margin-top:4px;font-family:ui-monospace,Menlo,Consolas,monospace}
+.hvrefcode{font-size:22px;font-weight:800;letter-spacing:2px;margin-top:4px;font-family:ui-monospace,Menlo,Consolas,monospace}
 .hvrefrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px}
 .hvrefofr{display:flex;gap:9px;align-items:flex-start}
-.hvrefofr i{font-size:19px;color:var(--red);flex:none;margin-top:1px}
+.hvrefofr i{font-size:18px;color:var(--red);flex:none;margin-top:1px}
 .hvrefofr b{font-size:12.5px;display:block}.hvrefofr small{font-size:11px;color:var(--muted);line-height:1.4}
 .hvrefact{display:flex;gap:8px;padding:0 16px 14px;flex-wrap:wrap}
-.hvrefnote{display:flex;gap:7px;align-items:flex-start;background:#F7F9FC;border-top:1px solid var(--line);padding:11px 16px;font-size:11.5px;color:var(--muted)}
+.hvrefnote{display:flex;gap:7px;align-items:flex-start;background:#FAFBFD;border-top:1px solid var(--line);padding:11px 16px;font-size:11.5px;color:var(--muted)}
 .hvrefnote i{color:var(--navy);flex:none;margin-top:1px}
 @media(max-width:600px){.hvrefrow{grid-template-columns:1fr}.hvrefbox{flex-direction:column;text-align:center}}
 .hstat{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
-.hs{background:#fff;border:1px solid var(--line);border-radius:11px;padding:14px;text-align:center}
+.hs{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center}
 .hs b{display:block;font-size:26px;font-weight:800;line-height:1}
 .hs span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:700}
 .hs.red b{color:var(--red)}.hs.amber b{color:var(--amber)}.hs.blue b{color:#3B82C4}.hs.green b{color:var(--green)}
 @media(max-width:700px){.hstat{grid-template-columns:repeat(2,1fr)}}
 .pickgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
-.pickc{display:flex;align-items:center;gap:10px;text-align:left;padding:12px 13px;border:1px solid var(--line);border-radius:11px;background:#fff;cursor:pointer;font-family:inherit;transition:.12s}
-.pickc:hover{border-color:var(--navy);background:#F4F8FD;transform:translateY(-1px);box-shadow:0 3px 10px rgba(16,32,58,.07)}
+.pickc{display:flex;align-items:center;gap:10px;text-align:left;padding:12px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-family:inherit;transition:.12s}
+.pickc:hover{border-color:var(--navy);background:#FAFBFD;transform:translateY(-1px);box-shadow:0 3px 10px rgba(16,32,58,.07)}
 .pickc i{font-size:18px;color:#8A94A0;flex:none}
 .pickc:hover i{color:var(--navy)}
 .pickc span{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
@@ -750,7 +753,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 /* V9.47 - núm vặn hay chỉnh: ô nhập NGAY TẠI CHỖ. Anh Luân: "đã đổi nhanh thì cho nhập luôn
    được chứ bấm nhảy đi chỗ khác thì cũng như không." */
 .cfnhanh{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:9px}
-.cfnr{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#fff}
+.cfnr{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
 .cfnr>i{font-size:18px;color:#8A94A0;flex:none}
 .cfnt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .cfnt b{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.35}
@@ -761,20 +764,20 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 /* Dải thẻ buổi (Vận hành lớp) - gọn, bấm chọn buổi để điểm danh ngay dưới */
 .tbdiv{display:inline-block;width:1px;height:20px;background:var(--line);margin:0 4px;vertical-align:middle}
 .tsfun{display:flex;align-items:stretch;gap:2px;overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:14px}
-.tsstep{display:flex;align-items:center;gap:9px;flex:1;min-width:150px;padding:9px 12px;border-radius:10px;cursor:pointer;background:#fff;border:1px solid #E6ECF3;transition:.15s}
+.tsstep{display:flex;align-items:center;gap:9px;flex:1;min-width:150px;padding:9px 12px;border-radius:10px;cursor:pointer;background:#fff;border:1px solid #EEF2F6;transition:.15s}
 .tsstep:hover{border-color:var(--blue);box-shadow:0 3px 14px rgba(46,90,136,.12);transform:translateY(-1px)}
-.tsstep.on{background:#F0F6FF;border-color:#BBD3F0}
-.tssic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex:0 0 34px}
+.tsstep.on{background:#FAFBFD;border-color:#BBD3F0}
+.tssic{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex:0 0 34px}
 .tssn{font-size:18px;font-weight:800;color:var(--navy);line-height:1}
 .tssl{font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap}
 .tsstep.on .tssl{color:var(--navy);font-weight:700}
-.tsarr{display:flex;align-items:center;color:#C2CDDA;flex:0 0 auto}
+.tsarr{display:flex;align-items:center;color:#B9C6D6;flex:0 0 auto}
 .csway{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:12px;display:flex;flex-direction:column;gap:6px}
 .cwrow{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .cwdir{display:inline-flex;align-items:center;gap:5px;font-weight:800;font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap}
-.cwdir.out{background:#E7F1FB;color:#2E5A88}
-.cwdir.in{background:#FCEBEB;color:#B4433F}
-.guidebox{border:1px solid var(--line);background:linear-gradient(180deg,#F7FAFF,#fff);border-radius:10px;padding:12px;margin-bottom:12px}
+.cwdir.out{background:#EEF2F6;color:#2E5A88}
+.cwdir.in{background:#FBF0EF;color:#B4433F}
+.guidebox{border:1px solid var(--line);background:linear-gradient(180deg,#FAFBFD,#fff);border-radius:10px;padding:12px;margin-bottom:12px}
 .guidebox .gbh{font-weight:800;font-size:12.5px;color:var(--navy);display:flex;align-items:center;gap:6px;margin-bottom:8px}
 .guidebox .gbrow{display:flex;gap:8px;align-items:flex-start;padding:3px 0;font-size:12.5px}
 .guidebox .gbk{flex:0 0 64px;color:var(--muted);font-weight:600}
@@ -782,15 +785,15 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .avatarBig{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;flex:0 0 64px;object-fit:cover;border:1px solid var(--line)}
 .bioBox{font-size:12.5px;line-height:1.5;color:var(--text);white-space:pre-wrap}
 .bstat{position:relative}
-.bstat .bsarr{position:absolute;right:9px;bottom:7px;font-size:13px;color:#B7C0CC;transition:.12s}
+.bstat .bsarr{position:absolute;right:9px;bottom:7px;font-size:13px;color:#B9C6D6;transition:.12s}
 .bstat:hover .bsarr{color:var(--navy);transform:translateY(2px)}
 /* V9.27: dong goi y duoi o tim chi hien KHI DANG GO - luc chua go no la chu thua. */
 .bwsrchhint{display:block;font-size:10.5px;color:rgba(255,255,255,.75);margin-top:4px;min-height:0}
 .bwsrchhint:empty{display:none}
 .sesstrip{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:6px}
-.sespill{flex:none;position:relative;border:1.5px solid var(--line);border-radius:9px;padding:6px 11px 6px 22px;cursor:pointer;background:#fff;font-family:inherit;text-align:left;min-width:70px;transition:.12s}
+.sespill{flex:none;position:relative;border:1.5px solid var(--line);border-radius:8px;padding:6px 11px 6px 22px;cursor:pointer;background:#fff;font-family:inherit;text-align:left;min-width:70px;transition:.12s}
 .sespill:hover{border-color:#9BB2CC;background:#FAFBFD}
-.sespill.on{border-color:var(--navy);background:#F4F8FD;box-shadow:0 0 0 3px rgba(46,90,136,.09)}
+.sespill.on{border-color:var(--navy);background:#FAFBFD;box-shadow:0 0 0 3px rgba(46,90,136,.09)}
 .sespill b{font-size:12px;font-weight:700;color:var(--ink);display:block;line-height:1.2}
 .sespill small{font-size:10px;color:var(--muted)}
 .sespill .sdot{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:8px;height:8px;border-radius:50%}
@@ -811,22 +814,22 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .bteach{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-left:auto;flex:none;max-width:100%}
 .bteach>*{flex:none}
 @media(max-width:700px){.bteach{margin-left:0;width:100%}.bteach select.bthw{min-width:0;width:100%;max-width:none}}
-.bteach select.bthw{min-width:250px;max-width:320px;height:32px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-family:inherit;font-size:12px;background:#fff}
-.bteach input.btdi{width:145px;height:32px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-family:inherit;font-size:12px}
-.btup{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 10px;border:1px dashed var(--line);border-radius:7px;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;max-width:160px;overflow:hidden}
+.bteach select.bthw{min-width:250px;max-width:320px;height:32px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:12px;background:#fff}
+.bteach input.btdi{width:145px;height:32px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:12px}
+.btup{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 10px;border:1px dashed var(--line);border-radius:6px;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;max-width:160px;overflow:hidden}
 .btup:hover{border-color:var(--navy);color:var(--navy)}
-.btup.on{border-style:solid;border-color:#16A34A;color:#16A34A;background:#F0FDF4}
+.btup.on{border-style:solid;border-color:#16A34A;color:#16A34A;background:#F4FBF6}
 .btup .btupn{overflow:hidden;text-overflow:ellipsis}
 @media(max-width:900px){.bteach{margin-left:0;width:100%}.bteach select.bthw{flex:1;min-width:0}}
-.ckline{display:flex!important;align-items:center;gap:8px;font-size:12px;color:var(--ink);font-weight:600;background:#F7F9FC;border:1px solid var(--line);border-radius:8px;padding:8px 10px;cursor:pointer;text-transform:none;letter-spacing:0}
+.ckline{display:flex!important;align-items:center;gap:8px;font-size:12px;color:var(--ink);font-weight:600;background:#FAFBFD;border:1px solid var(--line);border-radius:8px;padding:8px 10px;cursor:pointer;text-transform:none;letter-spacing:0}
 .ckline input{width:15px;height:15px;flex:none;margin:0}
 /* V9.27: thanh thong tin lop chia 3 tang - ten lop rieng mot dong, roi 2 khoi:
    khoi tren "day gi - ai day - o dau", khoi duoi "thoi gian - quy mo".
    Truoc day 11 o chay mot mach roi tu xuong dong nen cat khuc lung tung. */
 .classbar{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 8px 10px;margin-bottom:12px}
 .cbhead{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:0 8px 10px;border-bottom:1px solid var(--line)}
-.cbname{font-size:15.5px;font-weight:800;color:var(--navy);line-height:1.3}
-.cbcode{font-size:11px;font-weight:700;color:#7A8694;background:#F2F5F9;border-radius:6px;padding:2px 7px;letter-spacing:.3px}
+.cbname{font-size:15px;font-weight:800;color:var(--navy);line-height:1.3}
+.cbcode{font-size:11px;font-weight:700;color:#7A8694;background:#FAFBFD;border-radius:6px;padding:2px 7px;letter-spacing:.3px}
 .cbgrid{display:grid;grid-template-columns:repeat(var(--cbn,5),minmax(0,1fr));gap:2px 0;padding-top:9px}
 .cbgrid+.cbgrid{margin-top:9px;border-top:1px dashed var(--line)}
 .cbit{display:flex;flex-direction:column;gap:3px;padding:2px 14px;min-width:0;border-right:1px solid var(--line)}
@@ -839,11 +842,11 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 @media(max-width:860px){.cbit{min-width:46%;border-right:0}}
 .tbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;margin-bottom:12px}
 .tbar .srch{margin:0}
-.seg{display:inline-flex;background:var(--bg);border-radius:9px;padding:3px;gap:2px;flex-wrap:wrap}
-.segb{border:0;background:transparent;color:#5A6675;font-family:inherit;font-size:11.5px;font-weight:700;padding:0 11px;height:28px;border-radius:7px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.12s}
+.seg{display:inline-flex;background:var(--bg);border-radius:8px;padding:3px;gap:2px;flex-wrap:wrap}
+.segb{border:0;background:transparent;color:#5A6675;font-family:inherit;font-size:11.5px;font-weight:700;padding:0 11px;height:28px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.12s}
 /* V9.47: nút mở/thu dải chip dài - phải KHÁC hẳn các chip lọc để mắt không nhầm nó là một nhóm */
 .segb.segmo{color:var(--navy);border:1px dashed var(--line);font-weight:800}
-.segb.segmo:hover{border-color:var(--navy);background:#F4F8FD}
+.segb.segmo:hover{border-color:var(--navy);background:#FAFBFD}
 .segb:hover{color:var(--navy)}
 .segb.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(16,32,58,.14)}
 .segb.on.red{color:#A32D2D}.segb.on.amber{color:#854F0B}.segb.on.green{color:#1E6A47}
@@ -869,37 +872,37 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .rvqnm{font-size:13px;font-weight:700;color:var(--navy)}
 .rvqp{font-size:11px;color:var(--muted)}
 .rvqa{flex:1;font-size:11.5px;color:var(--muted)}
-.bwrow{display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:9px;cursor:pointer}
+.bwrow{display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:8px;cursor:pointer}
 .bwrow:hover{background:var(--bg)}
 .bwd{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
 .bwd.red{background:var(--red)}.bwd.amber{background:var(--amber)}
 .bwn{font-size:13px;font-weight:700;color:var(--navy);min-width:150px}
 .bww{flex:1;font-size:11.5px;color:var(--muted)}
-.bwgo{border:1px solid var(--line);background:#fff;border-radius:7px;padding:5px 11px;font-family:inherit;font-size:11px;font-weight:700;color:var(--blue);cursor:pointer;display:flex;align-items:center;gap:5px;flex:0 0 auto}
+.bwgo{border:1px solid var(--line);background:#fff;border-radius:6px;padding:5px 11px;font-family:inherit;font-size:11px;font-weight:700;color:var(--blue);cursor:pointer;display:flex;align-items:center;gap:5px;flex:0 0 auto}
 .bwrow:hover .bwgo{background:var(--blue);color:#fff;border-color:var(--blue)}
 @media(max-width:640px){.bwn{min-width:100px}.bww{display:none}}
 .jshint{font-size:10.5px;color:var(--muted);text-align:center;margin:-6px 0 12px;display:flex;align-items:center;justify-content:center;gap:5px}
 .jsi.clk{cursor:pointer;border-radius:8px;transition:.12s}
 .jsi.clk:hover{background:var(--blueb)}
 .jsi.sel .jsd{outline:3px solid var(--amber);outline-offset:1px}
-.jnext2{margin:14px 2px 0;border:1px dashed var(--line);border-radius:12px;padding:12px 14px;background:#FAFBFC}
-.jn2t{font-size:9.5px;font-weight:800;letter-spacing:.6px;color:var(--muted)}
+.jnext2{margin:14px 2px 0;border:1px dashed var(--line);border-radius:12px;padding:12px 14px;background:#FAFBFD}
+.jn2t{font-size:10px;font-weight:800;letter-spacing:.6px;color:var(--muted)}
 .jn2b{display:flex;gap:11px;align-items:flex-start;margin-top:6px}
-.jn2i{width:32px;height:32px;border-radius:9px;flex:0 0 auto;background:var(--blueb);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:17px}
+.jn2i{width:32px;height:32px;border-radius:8px;flex:0 0 auto;background:var(--blueb);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:17px}
 .jn2n{font-size:14px;font-weight:800;color:var(--navy)}
 .jn2w{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.5}
-.jn2m{font-size:11px;color:#8A6D1F;background:var(--amberb);border-radius:7px;padding:5px 9px;margin-top:6px;display:inline-flex;gap:5px;align-items:center}
+.jn2m{font-size:11px;color:#8A6D1F;background:var(--amberb);border-radius:6px;padding:5px 9px;margin-top:6px;display:inline-flex;gap:5px;align-items:center}
 .jn2o{font-size:10.5px;color:var(--muted);margin-top:5px}
 .rvgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
-.rvi{border:1px solid var(--line);border-radius:9px;padding:9px 12px;background:#fff}
+.rvi{border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:#fff}
 .rvk{font-size:10px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted)}
-.rvv{font-size:13.5px;font-weight:700;color:var(--navy);margin-top:2px}
+.rvv{font-size:13px;font-weight:700;color:var(--navy);margin-top:2px}
 .runtabs{display:flex;gap:0;border-bottom:1px solid var(--line);background:var(--bg)}
 .rtb{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;border:0;background:transparent;padding:13px 14px;font-family:inherit;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent}
 .rtb:hover{color:var(--navy);background:#fff}
 .rtb.on{color:var(--blue);background:#fff;border-bottom-color:var(--blue)}
 .rtsum{display:flex;align-items:center;gap:7px;padding:9px 18px;background:var(--amberb);color:#8A6D1F;font-size:11.5px;border-bottom:1px solid var(--line)}
-.rtlist{padding:10px 18px;border-bottom:1px solid var(--line);background:#FCFDFE;display:flex;flex-direction:column;gap:7px;max-height:200px;overflow-y:auto}
+.rtlist{padding:10px 18px;border-bottom:1px solid var(--line);background:#FAFBFD;display:flex;flex-direction:column;gap:7px;max-height:200px;overflow-y:auto}
 .rtlh{font-size:10.5px;font-weight:800;letter-spacing:.4px;color:var(--muted);text-transform:uppercase}
 .rtli{display:flex;gap:9px;align-items:flex-start}
 .rtd{width:22px;height:22px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:12px}
@@ -924,11 +927,11 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .jfn{font-size:18px;font-weight:800;color:var(--navy);line-height:1.1}
 .jft{font-size:10.5px;color:var(--muted);line-height:1.3;margin-top:2px}
 .jfo{font-size:10px;font-weight:700;color:var(--red);margin-top:2px}
-.jfa{display:flex;align-items:center;color:#C8D0DA;font-size:14px}
+.jfa{display:flex;align-items:center;color:#C4D2E4;font-size:14px}
 .jboard{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;align-items:flex-start}
 .jcol{min-width:270px;max-width:290px;flex:0 0 auto;background:var(--bg);border:1px solid var(--line);border-radius:12px}
 .jch{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:2px solid var(--line);font-size:12.5px}
-.jci{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.jci{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px}
 .jcr{margin-left:6px;border:1px solid var(--line);background:#fff;border-radius:6px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--blue);font-size:12px}
 .jcr:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
 .jcn{margin-left:auto;background:#fff;border:1px solid var(--line);border-radius:20px;padding:1px 8px;font-size:11px;font-weight:700}
@@ -939,7 +942,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .jn{font-size:12.5px;font-weight:700;color:var(--navy)}
 .jm{font-size:10.5px;color:var(--muted);margin-top:2px}
 .jmiss{font-size:10.5px;color:var(--amber);margin-top:4px;display:flex;gap:4px;align-items:flex-start}
-.jgo{margin-top:7px;width:100%;border:1px solid var(--line);background:var(--bg);border-radius:7px;padding:5px 8px;font-family:inherit;font-size:11px;font-weight:700;color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
+.jgo{margin-top:7px;width:100%;border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:5px 8px;font-family:inherit;font-size:11px;font-weight:700;color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
 .jgo:hover{background:var(--blue);border-color:var(--blue);color:#fff}
 .jstep{display:flex;align-items:flex-start;gap:0;overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 10px;margin-bottom:14px}
 .jsi{min-width:74px;text-align:center;flex:0 0 auto}
@@ -948,10 +951,10 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .jsi.now .jsd{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 0 0 4px var(--blueb)}
 .jsl{font-size:10.5px;margin-top:5px;color:var(--muted);line-height:1.25}
 .jsi.now .jsl{color:var(--navy);font-weight:700}
-.jsw{font-size:9.5px;color:#6B7887;margin-top:1px}
+.jsw{font-size:10px;color:#6B7887;margin-top:1px}
 .jsc{flex:1;min-width:14px;height:2px;background:var(--line);margin-top:15px}
 .jsc.done{background:var(--green)}
-.jnext{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;background:linear-gradient(180deg,#fff,#FAFBFC);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.jnext{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;background:linear-gradient(180deg,#fff,#FAFBFD);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
 /* V9.15 sopb - block nghiep vu chuan (dung chung khung .jnext) */
 .sopb .sopr{display:flex;gap:8px;padding:3px 0;font-size:12.5px;align-items:flex-start}
 /* V9.29 (anh Luân): "cố gắng trong thiết kế đừng để xuống dòng, khi mà không gian vẫn đang ổn".
@@ -960,7 +963,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .sopb .soprk{flex:0 0 auto;min-width:66px;white-space:nowrap;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.4px;padding-top:3px}
 .sopb .soprv{flex:1;color:var(--text);min-width:0}
 .sopb .sopw{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.5}
-.sopb .sopna{display:flex;gap:7px;margin-top:7px;font-size:11.5px;color:#575E68;background:#F7F9FC;border:1px dashed var(--line);border-radius:8px;padding:7px 9px;line-height:1.5}
+.sopb .sopna{display:flex;gap:7px;margin-top:7px;font-size:11.5px;color:#575E68;background:#FAFBFD;border:1px dashed var(--line);border-radius:8px;padding:7px 9px;line-height:1.5}
 .sopb .sopna i{color:var(--blue);margin-top:1px;flex:none}
 .sopb .mstrip{margin-left:0;padding:0}
 .jnext.over{background:#FFFBFA;border-color:#EBC8C4}
@@ -1002,45 +1005,45 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    nhieu cot. Notebar it the thi chi thay hoi ho ra (dau cham bi day ra xa); notebar nhieu the thi
    vo hoan toan. Bo kiem chuoi HTML khong bao gio thay duoc loi nay vi HTML hoan toan dung.
    Nay cho chu chay theo dong binh thuong, icon nam inline o dau dong. */
-.notebar{display:block;background:var(--amberb);border:1px solid #F2D9AE;color:#7A4E0A;font-size:12px;font-weight:600;line-height:1.65;padding:10px 14px;border-radius:9px;margin-bottom:14px}
+.notebar{display:block;background:var(--amberb);border:1px solid #F2D9AE;color:#7A4E0A;font-size:12px;font-weight:600;line-height:1.65;padding:10px 14px;border-radius:8px;margin-bottom:14px}
 .hellomask{position:fixed;inset:0;background:rgba(15,25,40,.45);z-index:340;display:flex;align-items:center;justify-content:center;padding:20px}
 .hellobox{background:#fff;border-radius:16px;max-width:480px;width:100%;padding:26px 26px 20px;text-align:center;box-shadow:0 24px 60px rgba(10,22,40,.28)}
-.helloic{width:52px;height:52px;border-radius:50%;background:#EEF4FB;color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 12px}
-.hellobox h3{font-size:16.5px;font-weight:800;color:var(--ink);margin-bottom:8px}
+.helloic{width:52px;height:52px;border-radius:50%;background:#EEF2F6;color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 12px}
+.hellobox h3{font-size:16px;font-weight:800;color:var(--ink);margin-bottom:8px}
 .hellobox p{font-size:12.5px;color:var(--muted);line-height:1.65;margin-bottom:14px}
 .helloacts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
-.hellonote{text-align:left;background:#F7F9FC;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:11.5px;color:#4A5A6E;line-height:1.65}
+.hellonote{text-align:left;background:#FAFBFD;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:11.5px;color:#4A5A6E;line-height:1.65}
 .hellonote i{margin-right:5px;color:var(--amber)}
-.aiBox{background:#F7F5FF;border:1px solid #DCD4F2;border-radius:11px;padding:10px 13px;margin-top:10px}
+.aiBox{background:#F7F5FF;border:1px solid #DCD4F2;border-radius:10px;padding:10px 13px;margin-top:10px}
 .aiHd{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#6B4FD3;margin-bottom:6px}
 .aiTx{font-size:12.5px;line-height:1.7;color:var(--ink)}
 .notebar.nbred{background:#FBF0EF;border-color:#EBC8C4;color:#7E3A32}
-.notebar.nbgreen{background:#F0F8F2;border-color:#BFE3C8;color:#22633C}
+.notebar.nbgreen{background:#F4FBF6;border-color:#BFE3C8;color:#22633C}
 .notebar>i{margin-right:8px;vertical-align:-2px}
 .notebar>.btn,.notebar>button{margin-left:8px;vertical-align:-3px}
 .sechd{font-size:12.5px;font-weight:800;color:#3A4756;margin:14px 4px 4px;text-transform:uppercase;letter-spacing:.4px}
-.appcard{border:1px solid var(--line);border-radius:11px;padding:14px 16px;margin:10px 4px;display:flex;gap:16px;align-items:center}
+.appcard{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:10px 4px;display:flex;gap:16px;align-items:center}
 .appcard .info{flex:1}.appcard .id{font-size:11px;color:var(--navy);font-weight:700}.appcard .big{font-size:14px;font-weight:700;margin:2px 0 4px}
 .appcard .amt{font-size:20px;font-weight:800;color:var(--navy)}.appcard .rs{font-size:12px;color:var(--muted);margin-top:3px}
 .appcard .act{display:flex;gap:8px;flex-shrink:0}.appcard.done{opacity:.5}
 .bcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-.bcard{background:#fff;border:1px solid var(--line);border-radius:11px;padding:13px 15px}
+.bcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 15px}
 .bcard h4{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--navy);font-weight:800;margin-bottom:9px;display:flex;align-items:center;gap:6px}
 .kv{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;padding:3px 0}.kv .k{color:var(--muted)}.kv .v{font-weight:600;text-align:right}
 .rost{display:flex;align-items:center;gap:10px;padding:9px 6px;border-bottom:1px solid #EEF2F6}
 .rost .rn{flex:1;font-weight:600;font-size:13px}
-.att{display:flex;gap:5px}.attb{height:28px;padding:0 10px;border-radius:7px;border:1px solid var(--line);background:#fff;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;color:#5A6675}
+.att{display:flex;gap:5px}.attb{height:28px;padding:0 10px;border-radius:6px;border:1px solid var(--line);background:#fff;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;color:#5A6675}
 .attb.p.on{background:var(--green);border-color:var(--green);color:#fff}.attb.l.on{background:var(--amber);border-color:var(--amber);color:#fff}.attb.a.on{background:var(--red);border-color:var(--red);color:#fff}.attb.mk.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .ddrow{flex-wrap:wrap}
 .ddrow .rn{min-width:200px}
-.cintag{display:inline-block;font-size:10px;font-weight:700;color:var(--green);background:var(--greenb);border-radius:5px;padding:1px 6px;margin-left:6px}
+.cintag{display:inline-block;font-size:10px;font-weight:700;color:var(--green);background:var(--greenb);border-radius:6px;padding:1px 6px;margin-left:6px}
 .pfseg{display:flex;gap:3px}
-.pfb{width:26px;height:28px;border-radius:7px;border:1px solid var(--line);background:#fff;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;color:#8A94A0}
+.pfb{width:26px;height:28px;border-radius:6px;border:1px solid var(--line);background:#fff;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;color:#8A94A0}
 .pfb.g.on{background:var(--green);border-color:var(--green);color:#fff}
 .pfb.av.on{background:#6B7887;border-color:#6B7887;color:#fff}
 .pfb.w.on{background:var(--red);border-color:var(--red);color:#fff}
-.ddnote{width:170px;height:28px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-family:inherit;font-size:11.5px}
-.sesbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:11px;padding:10px 14px;margin-bottom:14px}
+.ddnote{width:170px;height:28px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:11.5px}
+.sesbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:14px}
 .sesi{display:flex;align-items:center;gap:8px;font-size:12px}
 .sesi i{font-size:17px;color:var(--navy)}
 .sesi b{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted)}
@@ -1050,7 +1053,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .pkres{margin-top:2px}
 .pkitem{padding:8px 11px;border:1px solid var(--line);border-top:0;font-size:12.5px;cursor:pointer;background:#fff}
 .pkitem:first-child{border-top:1px solid var(--line)}
-.pkitem:hover{background:#F1F7FC}.pkitem b{font-weight:600}
+.pkitem:hover{background:#FAFBFD}.pkitem b{font-weight:600}
 .pgbar{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:14px}
 .rowact{display:flex;gap:6px}
 .btn.sm[disabled]{opacity:.4;cursor:default}
@@ -1060,13 +1063,13 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .fchip:hover{border-color:#B9C6D6}
 .fchip.on{color:#fff;border-color:transparent;background:var(--navy)}
 .fchip.on.red{background:var(--red)}.fchip.on.amber{background:var(--amber)}.fchip.on.green{background:var(--green)}.fchip.on.gray{background:#6B7887}.fchip.on.blue{background:var(--blue)}
-.fchip.clr{color:var(--red);border-color:#E8B4B4;font-weight:700}
+.fchip.clr{color:var(--red);border-color:#F0B4B4;font-weight:700}
 .fbar .lbl{font-size:11.5px;font-weight:700;color:#8A94A0;text-transform:uppercase;letter-spacing:.3px}
 /* V9.29l (anh Luân: "kéo ra tí em, khuyết chữ quá"): ô trạng thái bị cắt cụt vì max-width 170px -
    "Đã chuyển đổi - đã thành HV" hiện thành "...đã thành H" và mũi tên đè lên chữ. Nhãn enum phải
    đọc được NGUYÊN VĂN theo CH1, cắt chữ là đọc sai nghiệp vụ. Nay ô nở theo nhãn dài nhất, chừa
    chỗ cho mũi tên; màn hình thật hẹp mới cắt lại. */
-.nhip{background:#fff;border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-bottom:12px}
+.nhip{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:12px}
 .nhip .nhiph{display:flex;align-items:center;gap:8px;font-size:12.5px;margin-bottom:9px;flex-wrap:wrap}
 .nhip .nhiph i{font-size:16px;color:var(--blue)}
 .nhip .nhiph .tthx{margin-left:auto;font-size:11px;color:var(--muted);cursor:pointer;border-bottom:1px dashed var(--line)}
@@ -1075,7 +1078,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .nhipg:last-child{margin-bottom:0}
 .nhipgt{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);display:flex;align-items:center;gap:5px;margin:6px 0 4px}
 .nhipr{display:flex;align-items:center;gap:8px;padding:6px 9px;border:1px solid var(--line);border-radius:8px;margin-bottom:5px;cursor:pointer;font-size:12.5px;transition:.12s}
-.nhipr:hover{border-color:var(--blue);background:#F7FAFE;transform:translateY(-1px)}
+.nhipr:hover{border-color:var(--blue);background:#FAFBFD;transform:translateY(-1px)}
 .nhipr>i{font-size:15px;color:var(--amber);flex:none}
 .nhipr.ok{opacity:.68}
 .nhipr.hab>i{color:var(--muted)}
@@ -1089,7 +1092,7 @@ input[type=checkbox],input[type=radio]{width:17px;height:17px;flex:none;accent-c
 /* V9.31: o nhap truoc day chi cao 15px trong khi khung cao 25px - phan con lai bam vao khong an gi.
    Tren dien thoai la go mai khong ra ban phim. Cho o nhap an HET chieu cao khung. */
 .pgq input{border:0;outline:0;font-family:inherit;font-size:12px;width:100%;min-width:0;background:transparent;padding:6px 0}
-.tth{background:linear-gradient(180deg,#FFFBEB,#FFF);border:1px solid #F0D08A;border-radius:11px;padding:11px 14px;margin-bottom:14px}
+.tth{background:linear-gradient(180deg,#FFFBF2,#FFF);border:1px solid #F0D08A;border-radius:10px;padding:11px 14px;margin-bottom:14px}
 .tth .tthh{display:flex;align-items:center;gap:7px;font-size:12px;color:#8A5A0B;margin-bottom:7px}
 .tth .tthh i{font-size:15px}
 .tth .tthx{margin-left:auto;font-size:11px;color:var(--muted);cursor:pointer;border-bottom:1px dashed var(--line)}
@@ -1098,7 +1101,7 @@ input[type=checkbox],input[type=radio]{width:17px;height:17px;flex:none;accent-c
 .tth .tthr{display:flex;gap:10px;font-size:12px;line-height:1.55;align-items:flex-start}
 .tth .tthk{flex:0 0 auto;white-space:nowrap;color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.3px;padding-top:1px}
 @media(max-width:560px){.tth .tthr{flex-direction:column;gap:2px}.tth .tthk{white-space:normal}}
-.tbtn.on{background:#FFF4D6;border-color:#F0D08A;color:#8A5A0B}
+.tbtn.on{background:#FFF6D8;border-color:#F0D08A;color:#8A5A0B}
 .qsel{border:1px solid var(--line);border-radius:16px;min-height:26px;padding:4px 22px 4px 9px;font-family:inherit;font-size:10.5px;font-weight:700;background:#fff;color:#5A6675;cursor:pointer;max-width:none;white-space:nowrap}
 @media(max-width:820px){.qsel{max-width:150px;padding-right:18px}}
 .qsel.red{color:#A32D2D;border-color:#F0B4B4;background:var(--redb)}
@@ -1106,12 +1109,12 @@ input[type=checkbox],input[type=radio]{width:17px;height:17px;flex:none;accent-c
 .qsel.green{color:#1E6A47;border-color:#A9DFC4;background:var(--greenb)}
 #formPanel .ph b{color:var(--navy)}
 .content:has(#formPanel:not(.hidden)) > *:not(#formPanel){opacity:.32;transition:opacity .15s ease}
-.content:has(#formPanel:not(.hidden)) #formPanel{box-shadow:0 12px 36px rgba(20,30,45,.16);border-color:#C6D2E0}
+.content:has(#formPanel:not(.hidden)) #formPanel{box-shadow:0 12px 36px rgba(20,30,45,.16);border-color:#C4D2E4}
 .pipe{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px}
-.pcol{flex:0 0 232px;background:#F4F7FA;border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;max-height:74vh}
+.pcol{flex:0 0 232px;background:#FAFBFD;border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;max-height:74vh}
 .pcolh{display:flex;align-items:center;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line);border-radius:12px 12px 0 0}
 .pcolh b{flex:1;font-weight:700;font-size:12px}.pcolh span{background:#fff;border:1px solid var(--line);border-radius:10px;padding:1px 8px;font-weight:700;font-size:11px}
-.pcolh.red{background:var(--redb)}.pcolh.amber{background:var(--amberb)}.pcolh.green{background:var(--greenb)}.pcolh.blue{background:var(--blueb)}.pcolh.gray{background:#EAEEF3}
+.pcolh.red{background:var(--redb)}.pcolh.amber{background:var(--amberb)}.pcolh.green{background:var(--greenb)}.pcolh.blue{background:var(--blueb)}.pcolh.gray{background:#EEF2F6}
 .pcards{padding:8px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
 .pcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 10px}
 .pcn{font-weight:700;font-size:12.5px}.pcm{font-size:11px;color:var(--muted);margin-top:2px}
@@ -1119,13 +1122,13 @@ input[type=checkbox],input[type=radio]{width:17px;height:17px;flex:none;accent-c
 .pempty{color:var(--muted);text-align:center;padding:14px;font-size:12px}.pmore{color:var(--muted);font-size:11px;text-align:center;padding:6px}
 .pipesum{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px;margin-bottom:14px}
 .psum{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-.psic{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 auto}
+.psic{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 auto}
 .psv{font-size:18px;font-weight:800;color:var(--navy);line-height:1.1}.psl{font-size:11px;color:var(--muted);margin-top:2px}
 .pcolv{font-size:11px;font-weight:700;color:var(--muted);padding:6px 12px 2px;display:flex;align-items:center;gap:4px}
 .pctop{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
 .pcval{font-size:11px;font-weight:800;color:var(--green);white-space:nowrap}
 .pcchips{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
-.pchip{font-size:9.5px;background:#EEF2F6;color:#5A6675;border-radius:5px;padding:1px 6px;display:inline-flex;align-items:center;gap:3px}.pchip i{font-size:11px}
+.pchip{font-size:10px;background:#EEF2F6;color:#5A6675;border-radius:6px;padding:1px 6px;display:inline-flex;align-items:center;gap:3px}.pchip i{font-size:11px}
 .pcage{font-size:10px;color:#6B7887;margin-top:6px;display:flex;align-items:center;gap:4px}.pcage.bad{color:var(--red);font-weight:700}
 .pcard.stale{box-shadow:inset 3px 0 0 var(--red)}
 .jpanel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
@@ -1136,7 +1139,7 @@ input[type=checkbox],input[type=radio]{width:17px;height:17px;flex:none;accent-c
 .jlstep.done .jldot{background:var(--greenb);color:var(--green);border-color:var(--green)}
 .jlt{font-size:10.5px;margin-top:5px;color:var(--muted);line-height:1.25}
 .jlstep.done .jlt{color:var(--navy);font-weight:700}
-.jld{font-size:9.5px;color:#9AA5B1;margin-top:2px}
+.jld{font-size:10px;color:#9AA5B1;margin-top:2px}
 .jlc{flex:1;min-width:10px;height:2px;background:var(--line);margin-top:13px}
 .jlc.done{background:var(--green)}
 .jd{font-size:11px;color:var(--muted)}
@@ -1152,7 +1155,7 @@ input[type=checkbox],input[type=radio]{width:17px;height:17px;flex:none;accent-c
    thoại cũng vậy. Hộp xác nhận phải nằm TRÊN mọi thứ - nó là thứ cuối cùng chặn trước khi ghi. */
 .cfmask{position:fixed;inset:0;background:rgba(20,30,45,.5);z-index:210;display:none;align-items:center;justify-content:center;padding:20px}
 .cfmask.on{display:flex}
-.cfbox{background:#fff;border-radius:14px;max-width:410px;width:100%;padding:20px 22px;box-shadow:0 22px 60px rgba(0,0,0,.32)}
+.cfbox{background:#fff;border-radius:12px;max-width:410px;width:100%;padding:20px 22px;box-shadow:0 22px 60px rgba(0,0,0,.32)}
 .cfh{font-size:14px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:7px;margin-bottom:10px}
 .cfmsg{font-size:13px;color:var(--text);line-height:1.55;margin-bottom:18px}
 .cfa{display:flex;justify-content:flex-end;gap:9px}
@@ -1160,39 +1163,39 @@ input[type=checkbox],input[type=radio]{width:17px;height:17px;flex:none;accent-c
 /* V9.27: keo mep trai de doi do rong drawer, moi nguoi mot so do rieng (luu tren may cua nguoi do) */
 .drszr{position:absolute;left:0;top:0;bottom:0;width:8px;cursor:col-resize;z-index:5;background:transparent;transition:background .12s}
 .drszr:hover,.drszr.drag{background:linear-gradient(90deg,rgba(59,130,196,.28),transparent)}
-.drszr:after{content:"";position:absolute;left:2px;top:50%;margin-top:-18px;width:3px;height:36px;border-radius:2px;background:#CBD5E1;transition:.12s}
+.drszr:after{content:"";position:absolute;left:2px;top:50%;margin-top:-18px;width:3px;height:36px;border-radius:3px;background:#C4D2E4;transition:.12s}
 .drszr:hover:after,.drszr.drag:after{background:var(--blue);height:56px;margin-top:-28px}
 body.drsz{cursor:col-resize;user-select:none}
 body.drsz .drawer{transition:none}
 .drawer.on{transform:none}
 .dh{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
-.dh b{flex:1;font-size:14.5px;font-weight:800}
-.dh .x{cursor:pointer;font-size:24px;line-height:1;color:var(--muted);border:none;background:none}
+.dh b{flex:1;font-size:14px;font-weight:800}
+.dh .x{cursor:pointer;font-size:22px;line-height:1;color:var(--muted);border:none;background:none}
 .dbody{flex:1;overflow-y:auto;padding:16px 18px}
 .dcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
 .dcard h4{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--navy);font-weight:800;margin-bottom:9px;display:flex;align-items:center;gap:6px}
-.dnote{background:var(--amberb);border:1px solid #F2D9AE;color:#7A4E0A;border-radius:9px;padding:9px 12px;font-size:12.5px;margin-bottom:12px}
+.dnote{background:var(--amberb);border:1px solid #F2D9AE;color:#7A4E0A;border-radius:8px;padding:9px 12px;font-size:12.5px;margin-bottom:12px}
 .dnote.nbred{background:#FBF0EF;border-color:#EBC8C4;color:#7E3A32}
-.dhist{background:#F7F9FB;border:1px solid var(--line);border-radius:9px;padding:9px 11px;margin-bottom:12px}
+.dhist{background:#FAFBFD;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin-bottom:12px}
 .dhh{font-size:11px;font-weight:800;color:#5A6675;margin-bottom:5px;display:flex;align-items:center;gap:5px}
-.dhr{font-size:11.5px;color:var(--text);padding:4px 0;border-top:1px solid #EDF1F5;line-height:1.4}.dhr:first-of-type{border-top:none}.dhr.mut{color:var(--muted)}
+.dhr{font-size:11.5px;color:var(--text);padding:4px 0;border-top:1px solid #EEF2F6;line-height:1.4}.dhr:first-of-type{border-top:none}.dhr.mut{color:var(--muted)}
 .hvjo{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--muted);margin-top:3px}
 .hvjo .ti{font-size:13px;opacity:.75}
 .hvjr.clk{cursor:pointer}
-.hvjr.clk:hover{background:#F4F8FB}
+.hvjr.clk:hover{background:#FAFBFD}
 .msd.clk{cursor:pointer}
 .msd.clk:hover{transform:scale(1.45)}
 .cfpline{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 12px}
 .cfpk{font-size:12px;color:var(--muted);min-width:76px}
 .enpl{max-height:52vh;overflow:auto;padding-right:4px}
 .enpl .cfpline{margin-bottom:8px}
-.ctxbox{background:#F7F9FB;border:1px solid var(--line);border-radius:9px;padding:2px 12px;margin-bottom:12px}
-.ctxr{display:flex;gap:10px;padding:7px 0;border-top:1px solid #EDF1F5;font-size:12px}.ctxr:first-child{border-top:none}
+.ctxbox{background:#FAFBFD;border:1px solid var(--line);border-radius:8px;padding:2px 12px;margin-bottom:12px}
+.ctxr{display:flex;gap:10px;padding:7px 0;border-top:1px solid #EEF2F6;font-size:12px}.ctxr:first-child{border-top:none}
 .ctxk{color:var(--muted);min-width:96px;flex:0 0 auto;white-space:nowrap;font-weight:600}   /* V9.29: nhãn không bẻ đôi khi còn chỗ */.ctxv{color:var(--text);flex:1;font-weight:600}
-.ctxcontent{background:#FDFCF8;border:1px solid #EBE3CF;border-radius:8px;padding:9px 12px;margin-bottom:13px}
-.ctxcontent.ccred{background:#FFF7F6;border-color:#EBC8C4}.ctxcontent.ccred .cch{color:var(--red)}
-.ctxcontent.ccblue{background:#F6FAFF;border-color:#CFE0F7}.ctxcontent.ccblue .cch{color:var(--blue)}
-.ctxcontent.ccgreen{background:#F4FAF5;border-color:#BFE3C8}.ctxcontent.ccgreen .cch{color:var(--green)}
+.ctxcontent{background:#FFFBF2;border:1px solid #EBE3CF;border-radius:8px;padding:9px 12px;margin-bottom:13px}
+.ctxcontent.ccred{background:#FBF0EF;border-color:#EBC8C4}.ctxcontent.ccred .cch{color:var(--red)}
+.ctxcontent.ccblue{background:#FAFBFD;border-color:#CFE0F7}.ctxcontent.ccblue .cch{color:var(--blue)}
+.ctxcontent.ccgreen{background:#F4FBF6;border-color:#BFE3C8}.ctxcontent.ccgreen .cch{color:var(--green)}
 .cch{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:800;margin-bottom:4px}
 .ccb{font-size:12.5px;line-height:1.5;color:var(--text);white-space:pre-wrap}
 .tp{border-left:2px solid var(--line);padding:2px 0 10px 12px;margin-left:4px}
@@ -1227,10 +1230,10 @@ body.drsz .drawer{transition:none}
    V9.27: hat to hon + gian ra cho de tro chuot, va co phan hoi hover ngay lap tuc. */
 .mstrip{display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;margin-left:auto;padding:4px 8px;border-radius:999px;transition:background .12s ease}
 .mstrip.clk{cursor:pointer}
-.mstrip.clk:hover{background:#EEF3F9;box-shadow:inset 0 0 0 1px #DCE5EF}
-.mstrip .msarc{font-size:10px;font-weight:800;letter-spacing:.4px;color:var(--mscol,#2E5A88);border:1px solid currentColor;border-radius:5px;padding:1px 5px;line-height:1.5;opacity:.85;margin-right:3px;transition:opacity .12s ease}
+.mstrip.clk:hover{background:#EEF2F6;box-shadow:inset 0 0 0 1px #E3E9F0}
+.mstrip .msarc{font-size:10px;font-weight:800;letter-spacing:.4px;color:var(--mscol,#2E5A88);border:1px solid currentColor;border-radius:6px;padding:1px 5px;line-height:1.5;opacity:.85;margin-right:3px;transition:opacity .12s ease}
 .mstrip.clk:hover .msarc{opacity:1}
-.mstrip .msd{width:11px;height:11px;border-radius:50%;background:#E3E8EF;flex:0 0 auto;position:relative;transition:transform .12s ease,background .12s ease}
+.mstrip .msd{width:11px;height:11px;border-radius:50%;background:#E3E9F0;flex:0 0 auto;position:relative;transition:transform .12s ease,background .12s ease}
 .mstrip .msd:after{content:"";position:absolute;inset:-5px} /* noi rong vung bat chuot, hat nho van de tro */
 .mstrip .msd:hover{transform:scale(1.5)!important;box-shadow:0 0 0 3px rgba(46,90,136,.14)}
 .mstrip .msd.br:hover{transform:rotate(45deg) scale(1.5)!important}
@@ -1246,27 +1249,27 @@ body.drsz .drawer{transition:none}
 @media(max-width:640px){.mstrip{display:none}}
 /* ===== V9.27 TOOLTIP HIEN NGAY - title cua trinh duyet cho ~1 giay moi hien va bi cat boi overflow.
    tipbox nam trong body nen khong bao gio bi cat, va hien ngay khi chuot vao. ===== */
-.tipbox{position:fixed;z-index:400;display:none;max-width:340px;background:#26313F;color:#fff;font-size:12.5px;
- line-height:1.5;padding:8px 11px;border-radius:9px;box-shadow:0 8px 24px rgba(16,24,40,.24);pointer-events:none;font-weight:500}
+.tipbox{position:fixed;z-index:400;display:none;max-width:340px;background:#1E2A38;color:#fff;font-size:12.5px;
+ line-height:1.5;padding:8px 11px;border-radius:8px;box-shadow:0 8px 24px rgba(16,24,40,.24);pointer-events:none;font-weight:500}
 .tipbox.on{display:block;animation:tipin .1s ease-out}
 @keyframes tipin{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
-.tipbox:after{content:"";position:absolute;left:var(--tipx,50%);margin-left:-6px;border:6px solid transparent;border-top-color:#26313F;bottom:-12px}
-.tipbox.below:after{bottom:auto;top:-12px;border-top-color:transparent;border-bottom-color:#26313F}
+.tipbox:after{content:"";position:absolute;left:var(--tipx,50%);margin-left:-6px;border:6px solid transparent;border-top-color:#1E2A38;bottom:-12px}
+.tipbox.below:after{bottom:auto;top:-12px;border-top-color:transparent;border-bottom-color:#1E2A38}
 /* ===== V9.15 NODE TANG 1 - nrail: duong ray ga tren trang CHANG ===== */
-.nrail{display:flex;align-items:flex-start;overflow-x:auto;padding:16px 10px 12px;background:linear-gradient(180deg,#fff,#FAFBFD);border:1px solid var(--line);border-radius:14px;margin-bottom:12px}
+.nrail{display:flex;align-items:flex-start;overflow-x:auto;padding:16px 10px 12px;background:linear-gradient(180deg,#fff,#FAFBFD);border:1px solid var(--line);border-radius:12px;margin-bottom:12px}
 .nst{display:flex;flex-direction:column;align-items:center;gap:7px;min-width:88px;cursor:pointer;position:relative;padding:0 5px;flex:0 0 auto}
-.nsd{width:44px;height:44px;border-radius:50%;background:#F1F4F8;color:#7A8694;display:flex;align-items:center;justify-content:center;font-size:20px;position:relative;border:2px solid transparent;transition:.15s}
+.nsd{width:44px;height:44px;border-radius:50%;background:#FAFBFD;color:#7A8694;display:flex;align-items:center;justify-content:center;font-size:20px;position:relative;border:2px solid transparent;transition:.15s}
 .nst:hover .nsd{border-color:var(--mscol,#2E5A88);color:var(--mscol,#2E5A88)}
 .nst.has .nsd{background:#fff;border-color:var(--mscol,#2E5A88);color:var(--mscol,#2E5A88)}
 .nst.on .nsd{background:var(--mscol,#2E5A88);border-color:var(--mscol,#2E5A88);color:#fff;box-shadow:0 5px 16px rgba(16,32,58,.22)}
 .nsn{position:absolute;top:-7px;right:-9px;background:#5A6675;color:#fff;border-radius:20px;font-size:10px;font-weight:800;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;padding:0 5px;border:2px solid #fff}
 .nsn.hot{background:var(--red)}
 .nsl{font-size:10.5px;font-weight:700;color:var(--navy);text-align:center;max-width:96px;line-height:1.25}
-.nst .nso{font-size:9.5px;font-weight:700;color:var(--red)}
+.nst .nso{font-size:10px;font-weight:700;color:var(--red)}
 .nscw{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-width:34px;flex:1 0 34px;padding-top:20px}
-.nsc{height:3px;width:100%;min-width:24px;background:#E3E8EF;border-radius:2px}
-.nscp{font-size:9.5px;font-weight:800;color:var(--muted);margin-top:4px;white-space:nowrap}
-.nst.ghost .nsd{border:2px dashed #C7CFDA;background:#fff;color:#A9B4C0}
+.nsc{height:3px;width:100%;min-width:24px;background:#E3E9F0;border-radius:3px}
+.nscp{font-size:10px;font-weight:800;color:var(--muted);margin-top:4px;white-space:nowrap}
+.nst.ghost .nsd{border:2px dashed #C4D2E4;background:#fff;color:#AAB4C0}
 .nst.ghost .nsl{color:var(--muted);font-weight:600}
 .nst.br .nsd{border-radius:12px;transform:rotate(45deg);width:38px;height:38px;margin:3px}
 .nst.br .nsd i{transform:rotate(-45deg)}
@@ -1276,27 +1279,27 @@ body.drsz .drawer{transition:none}
 .arcjobs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-bottom:12px}
 .arcjob{display:flex;gap:11px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 13px;cursor:pointer;transition:.13s}
 .arcjob:hover{border-color:var(--mscol,#2E5A88);box-shadow:0 3px 12px rgba(16,32,58,.08)}
-.arcjob .aji{width:34px;height:34px;border-radius:9px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--blueb);color:var(--blue)}
+.arcjob .aji{width:34px;height:34px;border-radius:8px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--blueb);color:var(--blue)}
 .arcjob .ajt{font-size:12.5px;font-weight:800;color:var(--navy)}
 .arcjob .ajm{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.45}
 .arcjob .ajn{margin-left:auto;flex:0 0 auto;font-size:11px;font-weight:800;background:var(--bg);border-radius:20px;padding:2px 8px;color:var(--navy)}
-.arcjob .ajn.hot{background:#FDECEC;color:var(--red)}
+.arcjob .ajn.hot{background:#FBF0EF;color:var(--red)}
 @media(max-width:640px){.nsl{max-width:74px}.nst{min-width:72px}}
 @media(max-width:820px){.obcards.rows .obcard .obm{max-width:200px}.obcards.rows .obcard .obact{margin-left:0}}
 .obcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
 .obh{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
-.obh b{font-size:13.5px;font-weight:700}.obm{font-size:11px;color:var(--muted);margin-top:2px}
+.obh b{font-size:13px;font-weight:700}.obm{font-size:11px;color:var(--muted);margin-top:2px}
 /* V9.27: truoc day cac buoc khong co khoang cach nen chu buoc nay dinh vao cham buoc kia.
    Nay moi buoc la mot vien thuoc, noi nhau bang mot doan gach ngan. */
 .steps{display:flex;align-items:center;gap:0;margin-bottom:12px;flex-wrap:nowrap;overflow-x:auto;padding:2px 0 4px}
 .stp{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600;color:#8A94A0;white-space:nowrap;flex:0 0 auto;
- background:#F6F8FA;border:1px solid #E6ECF3;border-radius:999px;padding:3px 13px 3px 3px;position:relative}
+ background:#FAFBFD;border:1px solid #EEF2F6;border-radius:999px;padding:3px 13px 3px 3px;position:relative}
 .stp+.stp{margin-left:22px}
 .stp+.stp:before{content:"";position:absolute;left:-22px;top:50%;margin-top:-1px;width:22px;height:2px;background:#E3E9F0}
-.stpdot{width:20px;height:20px;border-radius:50%;background:#E7ECF1;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;flex:0 0 auto}
+.stpdot{width:20px;height:20px;border-radius:50%;background:#EEF2F6;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;flex:0 0 auto}
 .stpdot i{font-size:11px}
 .stp.done .stpdot{background:var(--green)}
-.stp.done{color:#1E3A5F;font-weight:700;background:#EDF8F1;border-color:#CBE9D6}
+.stp.done{color:#1E3A5F;font-weight:700;background:#F4FBF6;border-color:#CBE9D6}
 .stp.done+.stp:before{background:#9FD9B4}
 .stpc{flex:1 1 auto;min-width:16px;height:2px;background:#E3E9F0;margin:0 6px}
 .stpc.done{background:var(--green)}
@@ -1310,7 +1313,7 @@ body.drsz .drawer{transition:none}
 .fchip i{font-size:15px;vertical-align:-2px}
 .gcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:18px}
 .gcard{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px;cursor:pointer}
-.gcard:hover{border-color:#C6D2E0}
+.gcard:hover{border-color:#C4D2E4}
 .gci{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex:0 0 auto}
 .gcn{flex:1;min-width:0}
 .gcnum{font-size:20px;font-weight:800;color:var(--navy);line-height:1}
@@ -1332,33 +1335,33 @@ body.drsz .drawer{transition:none}
 .dsl{font-size:10.5px;color:var(--muted);margin-top:2px}
 @media(max-width:900px){.bizrow{flex-direction:column}.bizchart{width:auto}}
 .slarow:last-child{border-bottom:none}
-.slaic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex:0 0 auto}
+.slaic{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex:0 0 auto}
 .slaic.red{background:var(--redb);color:var(--red)}.slaic.amber{background:var(--amberb);color:var(--amber)}
 .slat{flex:1;min-width:0}
 .slaw{font-size:13px;font-weight:700;color:var(--navy)}
 .slad{font-size:11.5px;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.slacat{display:inline-block;font-size:10px;background:#EEF2F6;color:#5A6675;border-radius:5px;padding:1px 6px;margin-left:4px;white-space:nowrap}
-.agebadge{display:inline-block;font-size:10px;font-weight:700;border-radius:5px;padding:1px 6px;margin-left:6px}
+.slacat{display:inline-block;font-size:10px;background:#EEF2F6;color:#5A6675;border-radius:6px;padding:1px 6px;margin-left:4px;white-space:nowrap}
+.agebadge{display:inline-block;font-size:10px;font-weight:700;border-radius:6px;padding:1px 6px;margin-left:6px}
 .agebadge.red{background:var(--redb);color:var(--red)}.agebadge.amber{background:var(--amberb);color:var(--amber)}
 .slaa{flex:0 0 auto}
-.fbar.sub{margin-top:-6px;background:#F7F9FB}
-.fbar.sub .lbl{color:#9AA4AF}
+.fbar.sub{margin-top:-6px;background:#FAFBFD}
+.fbar.sub .lbl{color:#9AA5B1}
 .rkpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:14px}
 .rkpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
 .rkpi .v{font-size:22px;font-weight:800;line-height:1.1}
 .rkpi .l{font-size:11.5px;color:var(--muted);margin-top:3px}
 .rkpi .g{margin-top:9px;display:flex;align-items:center;gap:6px}
 /* V9.23 - KPI biết nói: nhãn 5 bậc, dòng nhận xét, thẻ 3 việc nên làm */
-.kpirow.hasdoc:hover{background:#F3F7FF}
-.kpisev{font-size:9.5px;font-weight:800;letter-spacing:.3px;padding:2px 7px;border-radius:20px;white-space:nowrap;flex:none}
-.kpisev.green{background:#E7F6EC;color:#166534}.kpisev.amber{background:#FEF3C7;color:#92400E}
-.kpisev.red{background:#FEE2E2;color:#991B1B}.kpisev.gray{background:#EEF2F6;color:#64748B}
+.kpirow.hasdoc:hover{background:#FAFBFD}
+.kpisev{font-size:10px;font-weight:800;letter-spacing:.3px;padding:2px 7px;border-radius:20px;white-space:nowrap;flex:none}
+.kpisev.green{background:#E4F5EC;color:#166534}.kpisev.amber{background:#FEF3C7;color:#92400E}
+.kpisev.red{background:#FEE2E2;color:#991B1B}.kpisev.gray{background:#EEF2F6;color:#6B7887}
 .kpisay{font-size:11.5px;line-height:1.6;color:#4A5A6E;padding:6px 10px 8px 12px;margin:0 0 4px;background:#FAFBFD;border-radius:8px}
-.kpisay.amber{background:#FFFBF2}.kpisay.red{background:#FFF6F6}
+.kpisay.amber{background:#FFFBF2}.kpisay.red{background:#FBF0EF}
 .kpisay.green{background:#F4FBF6}
-.kpihero{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;background:#F7F9FC;margin-bottom:12px}
-.kpihero.amber{background:#FFF9EF}.kpihero.red{background:#FFF6F5}.kpihero.green{background:#F3FAF5}
-.kpihv{font-size:28px;font-weight:800;color:var(--navy);line-height:1}
+.kpihero{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;background:#FAFBFD;margin-bottom:12px}
+.kpihero.amber{background:#FFFBF2}.kpihero.red{background:#FBF0EF}.kpihero.green{background:#F4FBF6}
+.kpihv{font-size:26px;font-weight:800;color:var(--navy);line-height:1}
 .kpihs{font-size:13px;font-weight:800;color:var(--navy)}
 .kpiacts{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
 .k3row{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:18px}
@@ -1366,29 +1369,29 @@ body.drsz .drawer{transition:none}
 .k3card.amber .k3n{background:#E08A1E}.k3card.red .k3n{background:#DC2626}.k3card.green .k3n{background:#16A34A}
 .k3hd{display:flex;align-items:center;gap:9px;margin-bottom:7px;font-size:13px}
 .k3n{width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none}
-.k3v{font-size:19px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.k3v{font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px}
 .k3d{font-size:12px;line-height:1.6;color:#4A5A6E;margin-bottom:5px}
 .k3q{font-size:11.5px;line-height:1.55;margin-bottom:2px}
 .kpiph{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:12px;margin-bottom:16px}
 .kpipanel{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.kpiphh{font-size:11.5px;font-weight:800;color:var(--navy);padding:10px 14px;background:linear-gradient(180deg,#FBFCFD,#fff);border-bottom:1px solid var(--line)}
-.kpirow{display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:1px solid #F2F5F9}
+.kpiphh{font-size:11.5px;font-weight:800;color:var(--navy);padding:10px 14px;background:linear-gradient(180deg,#FAFBFD,#fff);border-bottom:1px solid var(--line)}
+.kpirow{display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:1px solid #FAFBFD}
 .kpirow:last-child{border-bottom:0}
 .kpil{flex:1;min-width:0;display:flex;align-items:center;gap:7px}
-.kpic{font-size:9.5px;font-weight:800;color:#8A94A0;background:var(--bg);border-radius:4px;padding:2px 5px;flex:none}
+.kpic{font-size:10px;font-weight:800;color:#8A94A0;background:var(--bg);border-radius:3px;padding:2px 5px;flex:none}
 .kpin{font-size:11.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .kpiv{font-size:12.5px;font-weight:800;flex:none;min-width:52px;text-align:right}
 .kpiv.green{color:var(--green)}.kpiv.red{color:var(--red)}.kpiv.gray{color:#8A94A0}
 .kpig{font-size:10px;color:var(--muted);flex:none;min-width:64px;text-align:right;white-space:nowrap}
 .kdot{width:7px;height:7px;border-radius:50%;flex:none}
-.kdot.green{background:var(--green)}.kdot.red{background:var(--red)}.kdot.gray{background:#D3D9E0}
+.kdot.green{background:var(--green)}.kdot.red{background:var(--red)}.kdot.gray{background:#D5DEE8}
 .chartrow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .chartp{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
 .chartp h4{font-size:12.5px;margin:0 0 12px;color:var(--navy);font-weight:700}
 .funrow{margin-bottom:10px}
 .funh{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--navy)}
-.funbar{height:16px;background:#EEF2F6;border-radius:5px;overflow:hidden}
-.funbar i{display:block;height:100%;background:linear-gradient(90deg,#2F6BFF,#5B8DEF);border-radius:5px}
+.funbar{height:16px;background:#EEF2F6;border-radius:6px;overflow:hidden}
+.funbar i{display:block;height:100%;background:linear-gradient(90deg,#2F6BFF,#5B8DEF);border-radius:6px}
 .funpct{font-size:10px;color:#8A94A0;font-weight:500}
 .navtoggle{display:none}
 .navmask{display:none}
@@ -1417,14 +1420,14 @@ body.drsz .drawer{transition:none}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:900px){.grid2{grid-template-columns:1fr}}
 .minibar{height:10px;background:var(--gray);border-radius:6px;overflow:hidden;margin-top:4px}.minibar>i{display:block;height:100%;background:var(--navy)}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#1E2A38;color:#fff;font-size:13px;font-weight:600;padding:11px 18px;border-radius:10px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:80}.toast.show{opacity:1}
-.undobar{position:fixed;bottom:22px;right:22px;display:none;align-items:center;gap:10px;background:#1E2A38;color:#fff;font-size:12.5px;font-weight:600;padding:9px 10px 9px 15px;border-radius:11px;box-shadow:0 8px 22px rgba(0,0,0,.28);z-index:82;max-width:min(92vw,430px)}
+.undobar{position:fixed;bottom:22px;right:22px;display:none;align-items:center;gap:10px;background:#1E2A38;color:#fff;font-size:12.5px;font-weight:600;padding:9px 10px 9px 15px;border-radius:10px;box-shadow:0 8px 22px rgba(0,0,0,.28);z-index:82;max-width:min(92vw,430px)}
 .undobar.on{display:flex}
 .undobar span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
 .undobar .btn{background:#fff;color:#1E2A38;border-color:#fff;flex:none}
-.undobar .x{background:none;border:0;color:#9FB0C4;font-size:17px;line-height:1;cursor:pointer;padding:0 4px}
+.undobar .x{background:none;border:0;color:#9BB2CC;font-size:17px;line-height:1;cursor:pointer;padding:0 4px}
 .undobar .x:hover{color:#fff}
 .notis{position:fixed;right:16px;bottom:16px;z-index:96;display:flex;flex-direction:column;gap:9px;max-width:330px}
-.noti{background:#fff;border:1px solid var(--line);border-radius:11px;box-shadow:0 10px 28px rgba(15,30,50,.2);padding:11px 13px;display:flex;gap:10px;align-items:flex-start;cursor:pointer;animation:notiIn .22s ease}
+.noti{background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 28px rgba(15,30,50,.2);padding:11px 13px;display:flex;gap:10px;align-items:flex-start;cursor:pointer;animation:notiIn .22s ease}
 .noti.red{background:#FFFBFA;border-color:#EBC8C4}
 .noti .nic{font-size:18px;color:var(--navy);margin-top:1px;flex:none}
 .noti.red .nic{color:var(--red)}
@@ -1433,13 +1436,13 @@ body.drsz .drawer{transition:none}
 .noti .nx{margin-left:4px;border:0;background:none;cursor:pointer;color:var(--muted);font-size:15px;line-height:1;padding:0 2px;flex:none}
 @keyframes notiIn{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
 .login{position:fixed;inset:0;background:linear-gradient(160deg,#1B3350,#2E5A88);display:flex;align-items:center;justify-content:center;z-index:90;padding:20px}
-.loginbox{background:#fff;border-radius:18px;padding:34px;max-width:720px;width:100%}
-.loginbox h2{font-size:21px;font-weight:800}.loginbox p{font-size:13px;color:var(--muted);margin:6px 0 20px}
+.loginbox{background:#fff;border-radius:16px;padding:34px;max-width:720px;width:100%}
+.loginbox h2{font-size:20px;font-weight:800}.loginbox p{font-size:13px;color:var(--muted);margin:6px 0 20px}
 .rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}@media(max-width:640px){.rgrid{grid-template-columns:1fr 1fr}}
-.rcard{border:1px solid var(--line);border-radius:13px;padding:16px;cursor:pointer;text-align:center}
-.rcard:hover{border-color:var(--navy);background:#F5F9FD}
-.rcard .ri{width:46px;height:46px;border-radius:12px;background:var(--blueb);color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 10px}
-.rcard b{font-size:13.5px;font-weight:700;display:block}.rcard small{font-size:11px;color:var(--muted)}
+.rcard{border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;text-align:center}
+.rcard:hover{border-color:var(--navy);background:#FAFBFD}
+.rcard .ri{width:46px;height:46px;border-radius:12px;background:var(--blueb);color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 10px}
+.rcard b{font-size:13px;font-weight:700;display:block}.rcard small{font-size:11px;color:var(--muted)}
 .rcard{border-radius:12px}
 .toast{z-index:95!important}
 .toast.err{background:#A32D2D!important}
@@ -2558,7 +2561,7 @@ function rowActMap(){
 function rowSlaBtn(r,pk){
  var x=rowActMap()[String(r[pk]==null?"":r[pk])];
  if(!x||!x.act)return "";
- return '<button class="btn sm primary" onclick="slaAct(\''+esc(x.act)+'\',\''+esc(String(x.rid||""))+'\')" data-tip="'+esc(String(x.what||"").slice(0,90))+'"><i class="ti ti-tool"></i>Làm ngay</button>'}
+ return '<button class="btn primary sm" onclick="slaAct(\''+esc(x.act)+'\',\''+esc(String(x.rid||""))+'\')" data-tip="'+esc(String(x.what||"").slice(0,90))+'"><i class="ti ti-tool"></i>Làm ngay</button>'}
 function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
  hideInit(key);var cols=cfg.cols.filter(function(c){return colVisible(key,c[0])});if(!cols.length)cols=[cfg.cols[0]];
  var h='<div class="tbwrap"><table class="dt"><thead><tr>';
@@ -2859,7 +2862,7 @@ function fltBarHTML(pg,daCoTim){
   '<button class="btn sm" onclick="pgExport(\''+esc(pg)+'\')" data-tip="Tải '+nRow+' dòng đang hiện ra tệp CSV - mở được bằng Excel"><i class="ti ti-table"></i>Xuất</button>';
  if(!fltAxes(pg).length)return h;
  var n=fltOn(pg),st=fltSt(pg);
- h+='<span class="tbdiv"></span><button class="btn sm'+(n?" primary":"")+'" onclick="fltOpen(\''+esc(pg)+'\')" data-tip="Lọc sâu: người phụ trách, khoảng thời gian, lớp, khóa... kết hợp được và lưu được"><i class="ti ti-filter"></i>Bộ lọc'+(n?" ("+n+")":"")+'</button>';
+ h+='<span class="tbdiv"></span><button class="btn'+(n?" primary":"")+' sm" onclick="fltOpen(\''+esc(pg)+'\')" data-tip="Lọc sâu: người phụ trách, khoảng thời gian, lớp, khóa... kết hợp được và lưu được"><i class="ti ti-filter"></i>Bộ lọc'+(n?" ("+n+")":"")+'</button>';
  if(n){h+='<span class="fltchips">';
   fltAxes(pg).forEach(function(a){var v=st[a.k];if(!v)return;
    var txt="";
@@ -2923,7 +2926,7 @@ function renderList(key,emb){
  var _f2=fltOn(key);
  var right='<span class="tbcnt">'+total+' dòng'+(fa.length||q||qk||hvF||_f2?" (đã lọc)":"")+'</span>'+
   (fa.length||q||qk||hvF||_f2?'<button class="btn sm" onclick="clearFilt(\''+key+'\')"><i class="ti ti-x"></i>Xóa lọc</button>':'')+
-  '<div class="colwrap"><button class="btn sm'+(nHid?" primary":"")+'" onclick="colMenuToggle(\''+key+'\')"><i class="ti ti-columns"></i>Cột'+(nHid?" ("+(cfg.cols.length-1-nHid)+"/"+(cfg.cols.length-1)+")":"")+'</button>'+colMenuHTML(key)+'</div>';
+  '<div class="colwrap"><button class="btn'+(nHid?" primary":"")+' sm" onclick="colMenuToggle(\''+key+'\')"><i class="ti ti-columns"></i>Cột'+(nHid?" ("+(cfg.cols.length-1-nHid)+"/"+(cfg.cols.length-1)+")":"")+'</button>'+colMenuHTML(key)+'</div>';
  h+=tbar(left,right);
  h+='<div class="panel">'+tableHTML(cfg,view,key)+'</div>';
  if(pages>1||total>20)h+='<div class="pgbar"><button class="btn sm" '+(pg<=0?"disabled":"")+' onclick="pageGo(\''+key+'\','+(pg-1)+')"><i class="ti ti-chevron-left"></i>Trước</button><span class="cnt">Trang '+(pg+1)+' / '+pages+'</span><button class="btn sm" '+(pg>=pages-1?"disabled":"")+' onclick="pageGo(\''+key+'\','+(pg+1)+')">Sau<i class="ti ti-chevron-right"></i></button>'+
@@ -3688,7 +3691,7 @@ function srcPerfSection(){var R=repRange();
  rows("DL06").forEach(function(e){if(isc(e.enrollment_status,"cancelled"))return;var k=leadSrc[e.lead_id];if(by[k]&&inRep(e.enrollment_time))by[k].enr++});
  rows("DL07").forEach(function(p){if(!inRep(p.payment_time))return;var e=find("DL06","enrollment_id",p.enrollment_id);var k=e?leadSrc[e.lead_id]:null;if(k&&by[k])by[k].rev+=num(p.amount)});
  order.sort(function(a,b){return by[b].rev-by[a].rev||by[b].n-by[a].n});
- var h='<div class="panel" style="margin-bottom:16px"><div class="ph"><b><i class="ti ti-broadcast" style="margin-right:6px"></i>Hiệu quả theo NGUỒN lead ('+R.lb+')</b><span class="mut" style="font-size:11.5px">nguồn nào đáng đổ tiền - nhìn doanh thu trên số lead</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Nguồn</th><th>Lead</th><th>Đã test</th><th>Đăng ký</th><th>Tỷ lệ chốt</th><th>Doanh thu</th></tr></thead><tbody>';
+ var h='<div class="panel"><div class="ph"><b><i class="ti ti-broadcast" style="margin-right:6px"></i>Hiệu quả theo NGUỒN lead ('+R.lb+')</b><span class="mut" style="font-size:11.5px">nguồn nào đáng đổ tiền - nhìn doanh thu trên số lead</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Nguồn</th><th>Lead</th><th>Đã test</th><th>Đăng ký</th><th>Tỷ lệ chốt</th><th>Doanh thu</th></tr></thead><tbody>';
  if(!order.length)h+='<tr><td class="empty" colspan="6">Không có lead nào trong kỳ.</td></tr>';
  order.forEach(function(k){var v=by[k];
   h+='<tr><td><b>'+esc(v.lb)+'</b></td><td>'+v.n+'</td><td>'+v.test+'</td><td>'+v.enr+'</td><td'+(v.n?' data-tip="'+esc(pctG(v.enr,v.n,"lead từ nguồn này đã đăng ký"))+'"':' data-tip="Nguồn này chưa có lead nào trong kỳ"')+'>'+(v.n?Math.round(v.enr*100/v.n)+"%":"—")+'</td><td style="text-align:right;font-variant-numeric:tabular-nums">'+vnd(v.rev)+'</td></tr>'});
@@ -3696,7 +3699,7 @@ function srcPerfSection(){var R=repRange();
 function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sales/.test(ecode(x.role))&&!/inactive|nghỉ/i.test(String(x.status||""))});
  if(!sales.length)return "";
  var w0=new Date();w0.setHours(0,0,0,0);w0=new Date(w0.getTime()-6*864e5);
- var h='<div class="panel" style="margin-bottom:16px"><div class="ph"><b><i class="ti ti-users" style="margin-right:6px"></i>Hiệu suất đội tư vấn</b><span class="mut" style="font-size:11.5px">liên hệ &amp; kết nối: 7 ngày gần nhất · đăng ký &amp; doanh thu: toàn kỳ dữ liệu</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Nhân viên</th><th>Lead phụ trách</th><th>Liên hệ (7 ngày)</th><th>Kết nối (7 ngày)</th><th>ĐK (7 ngày)</th><th>ĐK toàn kỳ</th><th>Doanh thu khách của mình</th><th>Trong đó tự tay thu</th></tr></thead><tbody>';
+ var h='<div class="panel"><div class="ph"><b><i class="ti ti-users" style="margin-right:6px"></i>Hiệu suất đội tư vấn</b><span class="mut" style="font-size:11.5px">liên hệ &amp; kết nối: 7 ngày gần nhất · đăng ký &amp; doanh thu: toàn kỳ dữ liệu</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Nhân viên</th><th>Lead phụ trách</th><th>Liên hệ (7 ngày)</th><th>Kết nối (7 ngày)</th><th>ĐK (7 ngày)</th><th>ĐK toàn kỳ</th><th>Doanh thu khách của mình</th><th>Trong đó tự tay thu</th></tr></thead><tbody>';
  sales.forEach(function(sv){var id=sv.staff_id;
   var myL={};var nL=0;rows("DL02").forEach(function(l){if(String(l.assigned_to||"")===id){myL[l.lead_id]=1;nL++}});
   var tp=rows("DL02b").filter(function(t){if(String(t.staff_id||"")!==id)return false;var d=pvnd(t.contact_time);return d&&d>=w0});
@@ -3725,7 +3728,7 @@ function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sa
   var myE2={};rows("DL06").forEach(function(e){if(myL[e.lead_id]&&!isc(e.enrollment_status,"cancelled"))myE2[e.enrollment_id]=1});
   rows("DL07").forEach(function(p){if(myE2[p.enrollment_id])tR+=num(p.amount);
    if(String(p.received_by||"")===id)tRt+=num(p.amount)})});
- h+='<tr style="font-weight:700;background:#F7F9FC"><td>Cả đội</td><td>'+tL+'</td><td>'+tT+'</td><td'+(tT?' data-tip="'+esc(pctG(tO,tT,"lượt liên hệ của cả đội 7 ngày qua là gặp được khách"))+'"':'')+'>'+(tT?Math.round(tO*100/tT)+"%":"—")+'</td><td>'+tE7+'</td><td>'+tE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums">'+vnd(tR)+'</td>'+
+ h+='<tr style="font-weight:700;background:#FAFBFD"><td>Cả đội</td><td>'+tL+'</td><td>'+tT+'</td><td'+(tT?' data-tip="'+esc(pctG(tO,tT,"lượt liên hệ của cả đội 7 ngày qua là gặp được khách"))+'"':'')+'>'+(tT?Math.round(tO*100/tT)+"%":"—")+'</td><td>'+tE7+'</td><td>'+tE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums">'+vnd(tR)+'</td>'+
   '<td style="text-align:right;font-variant-numeric:tabular-nums" class="mut">'+vnd(tRt)+'</td></tr>';
  h+='</tbody></table></div><div class="mut" style="font-size:11.5px;padding:11px 16px;line-height:1.7">'+
   '<b>Doanh thu khách của mình</b> = mọi khoản đã thu của các đơn thuộc lead người đó phụ trách - đây là con số dùng để đánh giá và để họp. '+
@@ -4337,7 +4340,7 @@ function openComplaint(id){var c=find("DL17","complaint_id",id);if(!c){toast("Kh
  else{h+='<div class="fld"><label>Kết quả xử lý</label><select id="kr_res">'+enumOpts("enum_complaint_result")+'</select></div><div class="fld full"><label>Cách xử lý / phản hồi học viên</label><textarea id="kr_note" rows="3" placeholder="Mô tả hướng giải quyết, cam kết, đền bù (nếu có)..."></textarea></div><div class="dact"><button class="btn green" onclick="knResolveSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Đóng khiếu nại</button><button class="btn danger" onclick="confirmRun(\'Leo thang khiếu nại này lên quản lý cấp cao?\',\'knEscalate\',\''+esc(id)+'\')"><i class="ti ti-arrow-up"></i>Leo thang</button></div>';}
  h+='</div>';openDrawer("Khiếu nại · "+(c.student_id_name||c.student_id),h)}
 function slaRow(it){var age=it.age!=null?'<span class="agebadge '+it.sev+'">'+esc(fmtAge(it.age))+'</span>':'';
- var btn=it.lead?'<button class="btn sm" onclick="leadDetail(\''+esc(it.lead)+'\')"><i class="ti ti-external-link"></i> Xử lý</button>':(it.act?'<button class="btn sm primary" onclick="slaAct(\''+it.act+'\',\''+esc(String(it.rid))+'\')"><i class="ti ti-tool"></i> Xử lý</button>':(it.hoso?'<button class="btn sm" onclick="openHoso(\''+esc(it.hoso)+'\')"><i class="ti ti-id-badge-2"></i> Hồ sơ</button>':(it.page?'<button class="btn sm" onclick="jumpFlow(\''+it.page+'\',\''+(it.filter||"")+'\')"><i class="ti ti-arrow-right"></i> Xử lý</button>':'')));
+ var btn=it.lead?'<button class="btn sm" onclick="leadDetail(\''+esc(it.lead)+'\')"><i class="ti ti-external-link"></i> Xử lý</button>':(it.act?'<button class="btn primary sm" onclick="slaAct(\''+it.act+'\',\''+esc(String(it.rid))+'\')"><i class="ti ti-tool"></i> Xử lý</button>':(it.hoso?'<button class="btn sm" onclick="openHoso(\''+esc(it.hoso)+'\')"><i class="ti ti-id-badge-2"></i> Hồ sơ</button>':(it.page?'<button class="btn sm" onclick="jumpFlow(\''+it.page+'\',\''+(it.filter||"")+'\')"><i class="ti ti-arrow-right"></i> Xử lý</button>':'')));
  var gc=grpColor(it.cat);
  /* V9.29 (anh Luân): dòng việc trước đây chỉ có nút "Xử lý" - bấm là nhảy thẳng vào màn xử lý,
     không có bước xem nhanh "việc này là gì, của ai, trễ bao lâu, ngưỡng lấy ở đâu". Nay bấm vào
@@ -4424,7 +4427,7 @@ function renderViec(){var items=bellItems();
  var tsegs=[["all","Tất cả",base.length,""]];
  teams.forEach(function(t){if(teamC[t])tsegs.push([t,t,teamC[t],""])});
  h+=tbar('<span class="tblbl">Bộ phận</span>'+segHTML(team,tsegs,"viecTeam('{k}')","viec_bophan"),
-  '<button class="btn sm'+(od?" primary":"")+'" onclick="viecOnly(\''+(od?"":"red")+'\')"><i class="ti ti-alert-triangle"></i>Chỉ quá hạn</button>');
+  '<button class="btn'+(od?" primary":"")+' sm" onclick="viecOnly(\''+(od?"":"red")+'\')"><i class="ti ti-alert-triangle"></i>Chỉ quá hạn</button>');
  var gsegs=[["all","Tất cả nhóm",scoped.length,""]];
  grpOrder.forEach(function(g){gsegs.push([String(g).replace(/'/g,""),g,grpC[g],""])});
  h+=tbar('<span class="tblbl">Nhóm việc</span>'+segHTML(grp,gsegs,"window.VIECGRP='{k}';reRender('viec')","viec_nhom"),
@@ -4439,7 +4442,7 @@ function renderViec(){var items=bellItems();
   if(!part.length)return;
   h+='<div class="viechd"><i class="ti '+B[2]+'" style="color:'+B[3]+'"></i>'+
    esc(B[1])+' <b>'+part.length+'</b></div>';
-  h+='<div class="panel" style="margin-bottom:12px"><div class="pbody slalist">';
+  h+='<div class="panel"><div class="pbody slalist">';
   var lim=Math.max(0,CAP-shown);
   part.slice(0,lim).forEach(function(it){h+=slaRow(it)});
   shown+=Math.min(part.length,lim);
@@ -4759,7 +4762,7 @@ function absQueueHTML(list,tit){
    '<span>'+esc((c.class_name||s2.class_id||"")+" · buổi "+(s2.session_number||"?")+" · "+(s2.session_date||""))+'</span>'+
    '<span class="absw">'+esc(hvSelfWhy(a)||a.note||"")+'</span></div>'+
    (a.absence_want_makeup?'<span class="chip blue">xin học bù</span>':'')+
-   '<button class="btn sm primary" onclick="absForm(\''+esc(a.attendance_id)+'\')"><i class="ti ti-gavel"></i>Duyệt</button></div>'});
+   '<button class="btn primary sm" onclick="absForm(\''+esc(a.attendance_id)+'\')"><i class="ti ti-gavel"></i>Duyệt</button></div>'});
  return h+'</div></div>'}
 function ddHub(opt){opt=opt||{};var embed=opt.embed;
  var cls=rows("DL10");
@@ -5040,7 +5043,7 @@ function reassignLead(lid){var L=find("DL02","lead_id",lid)||{};
  h+='<div class="fld"><label>Tự quay về sau ngày <span style="font-weight:500;color:var(--muted)">(để trống = bàn giao vĩnh viễn)</span></label><input id="ra_until" placeholder="dd/mm/yyyy - vd 25/07/2026"></div>';
  h+='<div class="fld full"><button class="btn primary" onclick="reassignSave(\''+esc(lid)+'\')"><i class="ti ti-check"></i>Giao lại lead</button></div></div>';
  openDrawer("Giao lại lead", h)}
-function tempNote(L){if(!(L&&L.handover_until&&L.handover_return_to))return '';var rt=find("DL01","staff_id",L.handover_return_to)||{};return '<div class="dnote" style="background:var(--blueb);border-color:#B6D4EF;color:#1E5A88;margin:8px 0"><i class="ti ti-clock"></i> Bàn giao tạm - lead sẽ <b>tự quay về '+esc(rt.full_name||L.handover_return_to)+'</b> từ ngày '+esc(L.handover_until)+'.</div>'}
+function tempNote(L){if(!(L&&L.handover_until&&L.handover_return_to))return '';var rt=find("DL01","staff_id",L.handover_return_to)||{};return '<div class="dnote" style="background:var(--blueb);border-color:#BBD3F0;color:#1E5A88;margin:8px 0"><i class="ti ti-clock"></i> Bàn giao tạm - lead sẽ <b>tự quay về '+esc(rt.full_name||L.handover_return_to)+'</b> từ ngày '+esc(L.handover_until)+'.</div>'}
 function autoReturnHandovers(){var n=0;rows("DL02").forEach(function(L){if(!L.handover_return_to||!L.handover_until)return;var d=pvnd(L.handover_until);if(!d)return;if(Date.now()>d.getTime()+864e5){var rt=find("DL01","staff_id",L.handover_return_to)||{};var oldName=L.assigned_to_name||L.assigned_to;var backName=rt.full_name||L.handover_return_to;var entry=nowStr()+": "+oldName+" → "+backName+" (Hệ thống) · Tự quay về khi hết hạn bàn giao tạm ("+L.handover_until+")";L.assigned_to=L.handover_return_to;L.assigned_to_name=backName;L.view_history=entry+(L.view_history?"\n"+L.view_history:"");L.handover_return_to="";L.handover_until="";n++}});return n}
 function reassignSave(lid){if(chanAct("lead_giao"))return;var e=document.getElementById("ra_nv");var dest=e?e.value:"";if(!dest){toast("Chọn NV để giao.");return}
  var dn=find("DL01","staff_id",dest);var note=(document.getElementById("ra_note")||{}).value||"";
@@ -6303,7 +6306,7 @@ function jBranchCard(J){var C=J.C,pid=C.pid,S=J.S;
    alt:[["Xử lý hoàn tiền","ti-arrow-back-up","jGoRefund"]],
    danger:null}
  }[J.k]||{col:"var(--muted)",fact:S.why,okT:"",okB:"",okFn:"",alt:[],danger:null};
- var h='<div class="runcard"><div class="runh" style="background:linear-gradient(180deg,#FFF6F6,#fff)">'+
+ var h='<div class="runcard"><div class="runh" style="background:linear-gradient(180deg,#FBF0EF,#fff)">'+
   '<span class="runi" style="background:'+G.col+'18;color:'+G.col+'"><i class="ti '+S.ic+'"></i></span>'+
   '<div><div class="runt">Nhánh rẽ · '+esc(S.t)+'</div><div class="runs">'+esc(S.why)+'</div></div>'+
   '<span class="chip red" style="margin-left:auto">ngoài luồng chính</span></div>';
@@ -6510,7 +6513,7 @@ function myKpiHTML(){var me=find("DL01","staff_id",CURSTAFF);if(!me)return "";
  var myL={};rows("DL02").forEach(function(l){if(String(l.assigned_to||"")===CURSTAFF)myL[l.lead_id]=1});
  var enrW=rows("DL06").filter(function(e){var d=pvnd(e.enrollment_time);return d&&d>=w0&&myL[e.lead_id]&&!isc(e.enrollment_status,"cancelled")});
  var revW=0;rows("DL07").forEach(function(p){var d=pvnd(p.payment_time);if(d&&d>=w0&&String(p.received_by||"")===CURSTAFF)revW+=num(p.amount)});
- return '<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-chart-line" style="margin-right:6px"></i>KPI của tôi</b><span class="mut" style="font-size:11.5px">tính theo tài khoản đang vào cổng - '+esc(myName())+'</span></div>'+
+ return '<div class="panel"><div class="ph"><b><i class="ti ti-chart-line" style="margin-right:6px"></i>KPI của tôi</b><span class="mut" style="font-size:11.5px">tính theo tài khoản đang vào cổng - '+esc(myName())+'</span></div>'+
   statStrip([["ti-phone",cT.length+" / "+cW.length,"Lượt liên hệ hôm nay / 7 ngày","#3B82C4",""],
   ["ti-phone-call",(cW.length?Math.round(okW.length*100/cW.length)+"%":"—"),"Tỷ lệ kết nối 7 ngày","#2E9E6B",okW.length+"/"+cW.length+" lượt gặp được"],
   ["ti-clipboard-check",enrW.length,"Đăng ký mới 7 ngày","#7C3AED","khách tôi phụ trách"],
@@ -6649,7 +6652,7 @@ function renderReview(embed){var p="review",fil=fget(p);
    '<td>'+(i.ss==null?'<span class="mut">—</span>':'<span class="chip '+scls+'">'+i.ss.toFixed(1)+'/5</span>')+'</td>'+
    '<td>'+(i.fu.length?'<span class="chip red">'+i.fu.length+'</span>':'<span class="mut">0</span>')+'</td>'+
    '<td>'+(i.last?esc(vnd2(i.last)):'<span class="chip red">chưa gửi</span>')+'</td>'+
-   '<td><div class="rowact"><button class="btn sm primary" onclick="rvForm(\''+esc(c.class_id)+'\')"><i class="ti ti-send"></i>Gửi đợt</button>'+
+   '<td><div class="rowact"><button class="btn primary sm" onclick="rvForm(\''+esc(c.class_id)+'\')"><i class="ti ti-send"></i>Gửi đợt</button>'+
    '<button class="btn sm" onclick="openLop(\''+esc(c.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Bảng lớp</button></div></td></tr>'});
  h+='</tbody></table></div></div>';
  var recent=sv.slice().sort(function(a,b){return (pvnd(b.sent_date)||0)-(pvnd(a.sent_date)||0)}).slice(0,12);
@@ -6815,7 +6818,7 @@ function renderHanhtrinh(embed){ /* V9.18: thân trang dùng được cả khi N
  if(F.stage!=="all"){var SS=JBY[F.stage];
   h+='<div class="notebar" style="display:flex;align-items:center;gap:10px"><i class="ti '+(SS?SS.ic:"ti-point")+'"></i>Đang xem chặng <b>'+esc(SS?SS.t:F.stage)+'</b> · '+list.length+' hồ sơ'+
    '<button class="btn sm" style="margin-left:auto" onclick="jStage(\'all\')"><i class="ti ti-x"></i>Xem tất cả chặng</button>'+
-   (SS&&!SS.branch?'<button class="btn sm primary" onclick="runQueueStage(\''+esc(F.stage)+'\')"><i class="ti ti-player-play"></i>Chạy cả chặng này</button>':'')+'</div>'}
+   (SS&&!SS.branch?'<button class="btn primary sm" onclick="runQueueStage(\''+esc(F.stage)+'\')"><i class="ti ti-player-play"></i>Chạy cả chặng này</button>':'')+'</div>'}
  /* các cột chặng */
  h+='<div class="jboard">';
  JSTAGE.forEach(function(S){var arr=byK[S.k];if(!arr.length)return;
@@ -6960,7 +6963,7 @@ function renderHoso(){
    if(x[1])lg=lg.concat(logForRow(x[0],x[1]))});
   (C.enr||[]).forEach(function(e){lg=lg.concat(logForRow("DL06",e.enrollment_id))});
   lg.sort(function(a2,b2){return String(b2.log_id).localeCompare(String(a2.log_id))});
-  h+='<div class="panel" style="margin-top:12px"><div class="ph"><b><i class="ti ti-history" style="margin-right:6px"></i>Ai đã sửa hồ sơ này</b>'+
+  h+='<div class="panel" style="margin-top:16px"><div class="ph"><b><i class="ti ti-history" style="margin-right:6px"></i>Ai đã sửa hồ sơ này</b>'+
    '<button class="btn sm" onclick="window.SETTAB=\'nhatky\';window.NKQ=\''+esc(C.sid||(C.L&&C.L.lead_id)||"")+'\';go(\'settings\')" data-tip="Mở nhật ký thao tác đầy đủ"><i class="ti ti-external-link"></i>Nhật ký đầy đủ</button></div>'+
    '<div class="pbody">'+
    (lg.length?logRowHTML2(lg):'<div class="mut" style="font-size:12px">Chưa có thao tác nào trên hồ sơ này trong buổi làm việc hiện tại. Nhật ký chỉ ghi từ lúc mở app - nối sheet thật thì đây là bảng DL25 lưu vĩnh viễn.</div>')+
@@ -7300,7 +7303,7 @@ function midForm(cid){var obs=rows("DL08").filter(function(o){return o.class_id=
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Điểm giữa khóa là mốc đo học thuật GIỮA hành trình (SOP khuyến nghị quanh buổi giữa khóa). Nhập band 0-9 bước 0.5; bỏ trống em chưa thi. Học viên thấy ngay ở cột "Giữa khóa" trên Trang học viên.</div>';
  h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>L</th><th>R</th><th>W</th><th>S</th><th>Overall</th></tr></thead><tbody>';
  obs.forEach(function(o){
-  function inp(k){return '<input class="mid_'+k+'" type="number" min="0" max="9" step="0.5" value="'+esc(o["mid_"+k]||"")+'" style="width:56px;height:30px;border:1px solid var(--line);border-radius:7px;padding:0 6px;font-family:inherit">'}
+  function inp(k){return '<input class="mid_'+k+'" type="number" min="0" max="9" step="0.5" value="'+esc(o["mid_"+k]||"")+'" style="width:56px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 6px;font-family:inherit">'}
   h+='<tr data-oid="'+esc(o.onboarding_id)+'"><td>'+esc(o.student_id_name||o.student_id)+'</td><td>'+inp("listening")+'</td><td>'+inp("reading")+'</td><td>'+inp("writing")+'</td><td>'+inp("speaking")+'</td><td>'+inp("overall")+'</td></tr>'});
  h+='</tbody></table></div>';
  h+='<div class="dact"><button class="btn primary" onclick="midSave(\''+esc(cid)+'\')"><i class="ti ti-device-floppy"></i>Lưu điểm giữa khóa</button></div></div>';
@@ -7364,7 +7367,7 @@ function renderBanglop(){
    /* dải THẺ BUỔI: gọn, chấm màu theo trạng thái, dấu ✓ khi đã ghi nhận xét */
    h+='<div class="panel"><div class="ph"><b>Chọn buổi để điểm danh</b><span class="mut" style="font-size:11.5px">'+ses.length+' buổi · chấm màu = trạng thái, ✓ = đã ghi nhận xét</span></div><div class="pbody"><div class="sesstrip">';
    ses.forEach(function(s){var st=ecode(s.session_status);
-    var col=st==="completed"?"var(--green)":st==="in_progress"?"var(--amber)":st==="cancelled"?"var(--red)":"#C2CAD4";
+    var col=st==="completed"?"var(--green)":st==="in_progress"?"var(--amber)":st==="cancelled"?"var(--red)":"#B9C6D6";
     var noteDone=yesv(s.has_teacher_note)||!!String(s.teacher_note_summary||"").trim();
     var isSel=(window.DDSESS===s.session_id);
     h+='<button class="sespill'+(isSel?" on":"")+'" onclick="window.DDSESS=\''+esc(s.session_id)+'\';reRender(CUR)">'+
@@ -7412,7 +7415,7 @@ function svgBarsV(items,opt){opt=opt||{};var n=items.length,step=52,W=Math.max(n
  var s='<svg viewBox="0 0 '+W+' '+(H+26)+'" width="100%" preserveAspectRatio="xMidYMid meet" style="max-height:'+(H+26)+'px">';
  items.forEach(function(it,i){var bh=Math.max(1,Math.round((it[1]/mx)*(H-24)));var x=14+i*step,y=H-bh;
   s+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+bh+'" rx="4" fill="'+(opt.color||'#2F6BFF')+'"/>';
-  s+='<text x="'+(x+bw/2)+'" y="'+(y-4)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#33404F">'+esc(opt.fmt?opt.fmt(it[1]):it[1])+'</text>';
+  s+='<text x="'+(x+bw/2)+'" y="'+(y-4)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#3A4756">'+esc(opt.fmt?opt.fmt(it[1]):it[1])+'</text>';
   s+='<text x="'+(x+bw/2)+'" y="'+(H+15)+'" text-anchor="middle" font-size="9.5" fill="#8A94A0">'+esc(it[0])+'</text>';});
  return s+'</svg>'}
 function svgDonut(segs){var tot=segs.reduce(function(a,b){return a+b[1]},0)||1;var R=52,r=31,cx=60,cy=64,a0=-Math.PI/2;
@@ -7421,8 +7424,8 @@ function svgDonut(segs){var tot=segs.reduce(function(a,b){return a+b[1]},0)||1;v
   var x0=(cx+R*Math.cos(a0)).toFixed(1),y0=(cy+R*Math.sin(a0)).toFixed(1),x1=(cx+R*Math.cos(a1)).toFixed(1),y1=(cy+R*Math.sin(a1)).toFixed(1);
   var xi1=(cx+r*Math.cos(a1)).toFixed(1),yi1=(cy+r*Math.sin(a1)).toFixed(1),xi0=(cx+r*Math.cos(a0)).toFixed(1),yi0=(cy+r*Math.sin(a0)).toFixed(1);
   s+='<path d="M'+x0+' '+y0+' A'+R+' '+R+' 0 '+big+' 1 '+x1+' '+y1+' L'+xi1+' '+yi1+' A'+r+' '+r+' 0 '+big+' 0 '+xi0+' '+yi0+' Z" fill="'+g[2]+'"/>';a0=a1;});
- s+='<text x="60" y="60" text-anchor="middle" font-size="18" font-weight="800" fill="#1B2733">'+tot+'</text><text x="60" y="77" text-anchor="middle" font-size="9" fill="#8A94A0">tổng</text>';
- var ly=20;segs.forEach(function(g){s+='<rect x="126" y="'+(ly-9)+'" width="10" height="10" rx="2" fill="'+g[2]+'"/><text x="141" y="'+ly+'" font-size="10.5" fill="#33404F">'+esc(g[0])+' ('+g[1]+')</text>';ly+=19;});
+ s+='<text x="60" y="60" text-anchor="middle" font-size="18" font-weight="800" fill="#1E2A38">'+tot+'</text><text x="60" y="77" text-anchor="middle" font-size="9" fill="#8A94A0">tổng</text>';
+ var ly=20;segs.forEach(function(g){s+='<rect x="126" y="'+(ly-9)+'" width="10" height="10" rx="2" fill="'+g[2]+'"/><text x="141" y="'+ly+'" font-size="10.5" fill="#3A4756">'+esc(g[0])+' ('+g[1]+')</text>';ly+=19;});
  return s+'</svg>'}
 /* ===== KPI THEO SOP: tính thẳng từ dữ liệu vận hành, so với ngưỡng CH6 ===== */
 /* Lọc một bảng theo KỲ SỐ LIỆU đang chọn trên trang (window.REPKY). Trước đây kpiCompute
@@ -8075,7 +8078,7 @@ function baocaoBranch(){
   if(!isc(e.enrollment_status,"cancelled"))k.debt+=num(e.remaining_amount)});
  var list=Object.keys(K).map(function(b){return K[b]}).sort(function(a,b){return b.stu-a.stu});
  if(!list.length)return "";
- var h='<div class="panel" style="margin-bottom:16px"><div class="ph"><b><i class="ti ti-building" style="margin-right:6px"></i>So sánh theo cơ sở</b><span class="mut" style="font-size:11.5px">tính theo cơ sở của LỚP - nơi việc học thật sự diễn ra; lớp online tách riêng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Cơ sở</th><th>Lớp</th><th>Trong đó online</th><th>Học viên</th><th>HV nguy cơ</th><th>Giáo viên</th><th>Buổi đã dạy</th><th>Tỷ lệ có nhận xét</th><th>Đã thu</th><th>Còn nợ</th></tr></thead><tbody>';
+ var h='<div class="panel"><div class="ph"><b><i class="ti ti-building" style="margin-right:6px"></i>So sánh theo cơ sở</b><span class="mut" style="font-size:11.5px">tính theo cơ sở của LỚP - nơi việc học thật sự diễn ra; lớp online tách riêng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Cơ sở</th><th>Lớp</th><th>Trong đó online</th><th>Học viên</th><th>HV nguy cơ</th><th>Giáo viên</th><th>Buổi đã dạy</th><th>Tỷ lệ có nhận xét</th><th>Đã thu</th><th>Còn nợ</th></tr></thead><tbody>';
  list.forEach(function(k){
   var tnr=k.ses?Math.round(k.note/k.ses*100):null;
   var rr=k.stu?Math.round(k.risk/k.stu*100):0;
@@ -8117,7 +8120,7 @@ function renderBaocao(){
  // lead status donut + attendance/academic bars
  var lsCount={};["new","contacted","considering","converted","no_response","unreachable","rejected"].forEach(function(k){lsCount[k]=0});
  L.forEach(function(r){var c=ecode(r.lead_status);if(lsCount[c]==null)lsCount[c]=0;lsCount[c]++});
- var lsSeg=[["Mới",lsCount.new||0,"#94A3B8"],["Đã LH",lsCount.contacted||0,"#2F6BFF"],["Cân nhắc",lsCount.considering||0,"#F59E0B"],["Chuyển đổi",lsCount.converted||0,"#16A34A"],["Mất",(lsCount.no_response||0)+(lsCount.unreachable||0)+(lsCount.rejected||0),"#DC2626"]];
+ var lsSeg=[["Mới",lsCount.new||0,"#9AA5B1"],["Đã LH",lsCount.contacted||0,"#2F6BFF"],["Cân nhắc",lsCount.considering||0,"#F59E0B"],["Chuyển đổi",lsCount.converted||0,"#16A34A"],["Mất",(lsCount.no_response||0)+(lsCount.unreachable||0)+(lsCount.rejected||0),"#DC2626"]];
  function cnt(arr,re){return arr.filter(function(r){return re.test(ecode(r))}).length}
  var att=[["Đều",cnt(S.map(function(r){return r.attendance_progress_status}),/on_track/),],["Nguy cơ",cnt(S.map(function(r){return r.attendance_progress_status}),/at_risk/)],["Sa sút",cnt(S.map(function(r){return r.attendance_progress_status}),/off_track/)]];
  var aca=[["Tiến bộ",cnt(S.map(function(r){return r.academic_progress_status}),/on_track/)],["Nguy cơ",cnt(S.map(function(r){return r.academic_progress_status}),/at_risk/)],["Lệch",cnt(S.map(function(r){return r.academic_progress_status}),/off_track/)]];
@@ -8398,7 +8401,7 @@ function tourChkCount(k){var T=TOURS[k]||{steps:[]};
 function renderHuongdan(){
  var C=tourCfg();
  var h='<div class="notebar"><i class="ti ti-help-circle"></i>Nội dung từng bài nằm trong mã (có bước tự kiểm bằng dữ liệu thật). Ở đây trung tâm quyết <b>ai thấy gì</b>: bật/tắt nút hướng dẫn "?" trên thanh tiêu đề, bật/tắt từng cấp độ và từng bài.</div>';
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-help-circle" style="margin-right:6px"></i>Hướng dẫn trong app</b>'+
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-help-circle" style="margin-right:6px"></i>Hướng dẫn trong app</b>'+
   '<button class="btn sm" onclick="tourCfgReset()"><i class="ti ti-restore"></i>Về mặc định</button></div><div class="pbody">';
  h+='<div class="fld full" style="max-width:520px"><label>Nút hướng dẫn "?" trên thanh tiêu đề</label>'+
   '<select onchange="tourCfgSet(\'on\',+this.value)">'+
@@ -8434,7 +8437,7 @@ function renderHuongdan(){
    '<td>'+(nchk?('<span class="chip green">'+nchk+'/'+n+' bước</span>')
      :'<span class="chip">chỉ đọc</span>')+'</td>'+
    '<td class="nw"><button class="btn sm" onclick="tourBaiSet(\''+esc(k)+'\','+(tourBaiOn(k)?0:1)+')" data-tip="'+(tourBaiOn(k)?"Ẩn bài này":"Hiện lại bài này")+'"><i class="ti '+(tourBaiOn(k)?"ti-eye":"ti-eye-off")+'"></i></button> '+
-    '<button class="btn sm primary" onclick="tourStart(\''+esc(k)+'\')"><i class="ti ti-player-play"></i>Chạy thử</button></td></tr>'});
+    '<button class="btn primary sm" onclick="tourStart(\''+esc(k)+'\')"><i class="ti ti-player-play"></i>Chạy thử</button></td></tr>'});
  h+='</tbody></table></div>';
  var tong=ks.filter(function(k){return k.indexOf("__")!==0}).length;
  var tongB=ks.filter(function(k){return k.indexOf("__")!==0}).reduce(function(a,k){return a+TOURS[k].steps.length},0);
@@ -8447,7 +8450,7 @@ function renderTro(){
  var h='<div class="notebar"><i class="ti ti-bulb"></i><b>Trợ lý</b> là thứ dắt nhân viên đi hết hàng chờ của họ: mở đúng màn thao tác, làm xong tự kiểm rồi nhảy việc kế. Sửa ở đây <b>áp ngay</b>, không cần build lại. Nhịp ngày ở tab bên cạnh.</div>';
 
  /* ---- khối 1: trợ thủ ---- */
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-checklist" style="margin-right:6px"></i>Trợ lý - dọn việc từng bước</b>'+
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-checklist" style="margin-right:6px"></i>Trợ lý - dọn việc từng bước</b>'+
   '<button class="btn sm" onclick="tthReset()"><i class="ti ti-restore"></i>Về mặc định</button></div><div class="pbody">';
  h+='<div class="jgrid"><div>';
  h+='<div class="fld full"><label>Bật Trợ lý cho mọi người</label>'+
@@ -8619,7 +8622,7 @@ function renderSetTongquan(){
  var h='<div class="notebar"><i class="ti ti-compass"></i>Đây là <b>bản đồ của màn Cài đặt</b>. Mỗi ô dưới đây là một tab: nó cai quản chuyện gì, đang giữ bao nhiêu thứ, bấm vào là sang thẳng. Không cần nhớ tên tab - cứ đọc câu mô tả rồi bấm.</div>';
  /* việc hay làm nhất - đi trước, vì phần lớn lần mở Cài đặt là để làm một trong số này */
  /* NÚM VẶN HAY CHỈNH - sửa ngay tại đây, không phải nhảy đi đâu cả */
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-bolt" style="margin-right:6px"></i>Núm vặn hay chỉnh</b><span class="mut" style="font-size:11.5px">gõ số rồi bấm Lưu - áp ngay, không rời trang</span></div><div class="pbody"><div class="cfnhanh">';
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-bolt" style="margin-right:6px"></i>Núm vặn hay chỉnh</b><span class="mut" style="font-size:11.5px">gõ số rồi bấm Lưu - áp ngay, không rời trang</span></div><div class="pbody"><div class="cfnhanh">';
  SETNHANH.forEach(function(x){
   var P=null;for(var i=0;i<APPPARAMS.length;i++)if(APPPARAMS[i][1]===x[0])P=APPPARAMS[i];
   if(!P)return;
@@ -8630,7 +8633,7 @@ function renderSetTongquan(){
    '<button class="btn primary sm" onclick="cfNhanhLuu(\''+esc(x[0])+'\')"><i class="ti ti-device-floppy"></i>Lưu</button></div></div>'});
  h+='</div><div class="mut" style="font-size:11.5px;margin-top:10px">Còn '+(APPPARAMS.length-SETNHANH.length)+' tham số khác nằm ở tab <b>Ngưỡng &amp; SLA (CH2)</b>, chia 16 nhóm theo hành trình SOP và có ô tìm.</div></div></div>';
  /* CÀI LẦN ĐẦU - làm một lần rồi thôi, tách hẳn khỏi núm vặn vận hành */
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-flag" style="margin-right:6px"></i>Cài lần đầu</b><span class="mut" style="font-size:11.5px">dựng xong trung tâm thì hầu như không đụng lại</span></div><div class="pbody"><div class="pickgrid">';
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-flag" style="margin-right:6px"></i>Cài lần đầu</b><span class="mut" style="font-size:11.5px">dựng xong trung tâm thì hầu như không đụng lại</span></div><div class="pbody"><div class="pickgrid">';
  SETLANDAU.forEach(function(x){
   if(stabs.length&&!stabs.some(function(t){return t[0]===x[3]}))return;
   h+='<button class="pickc wrap" onclick="window.SETTAB=\''+esc(x[3])+'\';reRender(\'settings\')">'+
@@ -8641,7 +8644,7 @@ function renderSetTongquan(){
  SETGRP.forEach(function(g){
   var L=stabs.filter(function(t){return (t[2]||"dulieu")===g[0]&&t[0]!=="tongquan"});
   if(!L.length)return;
-  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti '+g[2]+'" style="margin-right:6px"></i>'+esc(g[1])+'</b><span class="mut" style="font-size:11.5px">'+L.length+' tab</span></div><div class="pbody"><div class="pickgrid">';
+  h+='<div class="panel"><div class="ph"><b><i class="ti '+g[2]+'" style="margin-right:6px"></i>'+esc(g[1])+'</b><span class="mut" style="font-size:11.5px">'+L.length+' tab</span></div><div class="pbody"><div class="pickgrid">';
   L.forEach(function(t){
    var M=SETMOTA[t[0]];
    var dem=M?_sdem(M[1]):"";
@@ -8651,7 +8654,7 @@ function renderSetTongquan(){
     (dem?'<span class="chip gray">'+esc(dem)+'</span>':'')+'</button>'});
   h+='</div></div></div>'});
  /* V9.47 - phải nói THẲNG chuyện cấu hình sống ở đâu, vì đây là thứ người ta sợ mất nhất */
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-device-floppy" style="margin-right:6px"></i>Cấu hình được giữ ở đâu</b></div><div class="pbody">';
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-device-floppy" style="margin-right:6px"></i>Cấu hình được giữ ở đâu</b></div><div class="pbody">';
  h+='<div class="mut" style="font-size:12px;line-height:1.75">Sửa xong là <b>lưu ngay và áp ngay cho cả app</b> - không cần build lại, không cần khởi động lại. Mỗi lần lưu để lại một dòng ở tab <b>Nhật ký thao tác</b>, lỡ tay thì vào đó xem đã đổi gì.<br>'+
   '<b>Cấu hình nằm ở ô nhớ RIÊNG, tách khỏi dữ liệu demo.</b> Bấm <b>Xóa dữ liệu demo</b> ở tab Dữ liệu demo <b>không làm mất cấu hình</b> - ngưỡng, câu nhắc, danh mục, thương hiệu và phân quyền vẫn còn nguyên. Muốn bỏ cấu hình thì phải bấm đúng nút dưới đây.</div>';
  var __cfd=cfgDirty();
@@ -8784,7 +8787,7 @@ function renderSetQA(){
  var h='<div class="notebar"><i class="ti ti-message-question"></i>Hộp <b>Hỏi đáp</b> tự trả lời được phần lớn câu hỏi bằng cách đọc chính cấu hình và dữ liệu đang chạy - <b>'+qaKhoHeThong().length+' mục tự dựng</b>. Tab này là chỗ <b>bổ sung những câu nó chưa biết</b>, và là chỗ xem <b>app đang bí câu nào</b>.</div>';
  /* SỔ CÂU BÍ - phần quan trọng nhất của tab này. Anh Luân: "a sợ hỏi nhiều chỉ số hay gì đó mà
     nó ko trả lời được, phải có cách cập nhật." Đây là cách: app tự khai ra chỗ nó dốt. */
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-help-circle" style="margin-right:6px"></i>Câu hỏi app chưa trả lời được ('+Q.hut.length+')</b><span class="mut" style="font-size:11.5px">app tự ghi mỗi lần bí - không phải đoán xem còn thiếu gì</span></div>';
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-help-circle" style="margin-right:6px"></i>Câu hỏi app chưa trả lời được ('+Q.hut.length+')</b><span class="mut" style="font-size:11.5px">app tự ghi mỗi lần bí - không phải đoán xem còn thiếu gì</span></div>';
  if(!Q.hut.length)h+='<div class="pbody"><div class="empty">Chưa có câu nào bị bí. Mọi câu hỏi từ trước tới nay app đều trả lời được.</div></div>';
  else{h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Câu người ta đã hỏi</th><th style="width:80px">Số lần</th><th style="width:150px">Lần gần nhất</th><th style="width:210px"></th></tr></thead><tbody>';
   Q.hut.forEach(function(x,i){
@@ -8799,7 +8802,7 @@ function renderSetQA(){
  h+='<div class="fhint" style="margin:0 0 12px">Ô <b>Từ khoá</b> là những chữ người ta có thể gõ - ngăn nhau bằng dấu <b>·</b>, càng nhiều cách nói càng dễ trúng (app tự bỏ dấu tiếng Việt khi so, nên không cần khai cả bản có dấu lẫn không dấu). Mục tự khai luôn <b>đứng trước</b> câu trả lời app tự dựng.</div>';
  if(!Q.muc.length)h+='<div class="empty">Chưa khai mục nào.</div>';
  Q.muc.forEach(function(m,i){
-  h+='<div style="border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-bottom:10px">'+
+  h+='<div style="border:1px solid var(--line);border-radius:10px;padding:11px 12px;margin-bottom:10px">'+
    '<div class="fld full"><label>Từ khoá người ta có thể gõ</label><input id="qah_'+i+'" value="'+esc(m.h||"")+'" placeholder="vd: đổi hotline · số tổng đài · sđt trung tâm"></div>'+
    '<div class="fld full"><label>Câu trả lời</label><textarea id="qad_'+i+'" rows="2" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:12.5px">'+esc(m.d||"")+'</textarea></div>'+
    '<div class="fld full"><label>Chỉ chỗ (hiện kèm câu trả lời)</label><input id="qao_'+i+'" value="'+esc(m.o||"")+'" placeholder="vd: Cài đặt > Thương hiệu & Màu"></div>'+
@@ -8810,19 +8813,19 @@ function renderSetQA(){
  h+='</div></div>';
  /* ---- TỪ ĐIỂN THUẬT NGỮ (V9.52) ---- */
  var TD=qaTuDien();
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-book" style="margin-right:6px"></i>Từ điển thuật ngữ ('+TD.length+')</b><span class="mut" style="font-size:11.5px">trả lời câu "WOW là gì", "SLA là gì"</span></div><div class="pbody">';
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-book" style="margin-right:6px"></i>Từ điển thuật ngữ ('+TD.length+')</b><span class="mut" style="font-size:11.5px">trả lời câu "WOW là gì", "SLA là gì"</span></div><div class="pbody">';
  h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>App biết mọi CHỖ có chữ "WOW", nhưng <b>WOW nghĩa là gì</b> thì phải khai ra - không suy từ dữ liệu được. Sửa nghĩa ở đây là Trợ lý trả lời theo bản của trung tâm mình, và AI (nếu bật) cũng đọc bản này.</div>';
  TD.forEach(function(x,i){
   h+='<div class="fld full" style="margin-bottom:10px"><label>'+esc(x.t)+(x.o?' <span class="mut" style="font-weight:500;text-transform:none;letter-spacing:0">· '+esc(x.o)+'</span>':'')+'</label>'+
    '<textarea rows="2" id="td_'+i+'" style="width:100%">'+esc(x.d)+'</textarea>'+
-   '<div style="margin-top:5px"><button class="btn sm primary" onclick="tudienLuu('+JSON.stringify(x.t).split('"').join("&quot;")+',fldV(\'td_'+i+'\'));reRender(\'settings\')"><i class="ti ti-device-floppy"></i>Lưu nghĩa</button></div></div>'});
+   '<div style="margin-top:5px"><button class="btn primary sm" onclick="tudienLuu('+JSON.stringify(x.t).split('"').join("&quot;")+',fldV(\'td_'+i+'\'));reRender(\'settings\')"><i class="ti ti-device-floppy"></i>Lưu nghĩa</button></div></div>'});
  h+='<div class="fld full" style="border-top:1px solid var(--line);padding-top:10px"><label>Thêm thuật ngữ mới</label>'+
   '<input id="td_ten" placeholder="vd: reup" style="margin-bottom:6px"><textarea id="td_ngh" rows="2" placeholder="Nghĩa của thuật ngữ này ở trung tâm mình..."></textarea>'+
-  '<div style="margin-top:5px"><button class="btn sm primary" onclick="tudienLuu(fldV(\'td_ten\'),fldV(\'td_ngh\'));reRender(\'settings\')"><i class="ti ti-plus"></i>Thêm vào từ điển</button></div></div>';
+  '<div style="margin-top:5px"><button class="btn primary sm" onclick="tudienLuu(fldV(\'td_ten\'),fldV(\'td_ngh\'));reRender(\'settings\')"><i class="ti ti-plus"></i>Thêm vào từ điển</button></div></div>';
  h+='</div></div>';
  /* ---- NỐI AI MIỄN PHÍ (V9.51) ---- */
  var A=aiCfg(),P=AIPROV[A.prov];
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-sparkles" style="margin-right:6px"></i>Nối Trợ lý với một AI miễn phí</b>'+
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-sparkles" style="margin-right:6px"></i>Nối Trợ lý với một AI miễn phí</b>'+
   (aiOn()?'<span class="chip green">đang BẬT · '+esc(P.t)+'</span>':'<span class="chip">đang tắt</span>')+'</div><div class="pbody">';
  h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>Máy vẫn trả lời TRƯỚC bằng chính bộ luật app (số liệu, nút hành động, dắt từng bước). '+
   'AI chỉ <b>diễn giải thêm bằng lời người</b> - hợp với câu kiểu "vì sao SOP bắt gọi trong 15 phút", "giải thích quy trình bảo lưu cho em". '+
@@ -8861,7 +8864,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
  if(tab==="brand"){var u=UI();
   h+='<div class="notebar"><i class="ti ti-palette"></i>'+goiy("gy_oi_ten_logo_va_844c",'Đổi tên, logo và màu ở đây là <b>áp ngay</b> cho cả app - dùng khi mang demo đi giới thiệu cho trung tâm khác. Cấu hình lưu cùng dữ liệu demo nên các cửa sổ/máy trong room cùng đổi theo; bấm <b>Về mặc định</b> để trả lại nguyên bản.')+'</div>';
   h+='<div class="jgrid"><div>';
-  h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-signature" style="margin-right:6px"></i>Tên hiển thị</b></div><div class="pbody">';
+  h+='<div class="panel"><div class="ph"><b><i class="ti ti-signature" style="margin-right:6px"></i>Tên hiển thị</b></div><div class="pbody">';
   h+='<div class="fld full"><label>Tên trên đầu menu</label><input value="'+esc(u.brand)+'" oninput="uiSet(\'brand\',this.value)" placeholder="'+esc(UIDEF.brand)+'"></div>';
   h+='<div class="fld full"><label>Dòng phụ dưới tên</label><input value="'+esc(u.sub)+'" oninput="uiSet(\'sub\',this.value)" placeholder="'+esc(UIDEF.sub)+'"></div>';
   h+='<div class="fld full"><label>Tên trung tâm (dùng trong tin nhắn gửi khách, phiếu in)</label><input value="'+esc(u.center)+'" oninput="uiSet(\'center\',this.value)" placeholder="'+esc(UIDEF.center)+'"></div>';
@@ -8888,7 +8891,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   h+='<div class="fld full"><label>Hoặc dán đường dẫn ảnh / gõ 1-2 chữ tắt</label><input value="'+esc(/^data:/.test(u.logo)?"":u.logo)+'" oninput="uiSet(\'logo\',this.value)" placeholder="https://... hoặc TT"></div>';
   h+='<div style="padding-top:4px"><button class="btn sm" onclick="uiSet(\'logo\',\'\');reRender(CUR)"><i class="ti ti-restore"></i>Dùng logo mặc định</button></div>';
   h+='</div></div></div><div>';
-  h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-palette" style="margin-right:6px"></i>Màu thương hiệu</b></div><div class="pbody">';
+  h+='<div class="panel"><div class="ph"><b><i class="ti ti-palette" style="margin-right:6px"></i>Màu thương hiệu</b></div><div class="pbody">';
   h+='<div class="fld"><label>Màu nền menu (chủ đạo)</label><input type="color" value="'+esc(u.navy)+'" oninput="uiSet(\'navy\',this.value)" style="height:38px;padding:2px"></div>';
   h+='<div class="fld"><label>Màu nhấn (logo, cảnh báo)</label><input type="color" value="'+esc(u.red)+'" oninput="uiSet(\'red\',this.value)" style="height:38px;padding:2px"></div>';
   h+='<div class="mut" style="font-size:11.5px;padding:6px 2px 0">Đổi màu áp ngay lên toàn app. Nhớ chọn màu nền menu đủ TỐI để chữ trắng còn đọc được.</div>';
@@ -8910,7 +8913,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   /* V9.41 - BẢNG CH3: tầng thứ ba, trước đây app không có. SOP ghi 8 việc "Quản lý phê duyệt",
      app chỉ canh thật đúng 1 (duyệt chiết khấu) - 7 việc còn lại ai mở được trang là bấm xong. */
   h+='<div class="sechd">Được làm việc gì · bảng phân quyền CH3 của SOP</div>';
-  h+='<div class="panel" style="margin-bottom:14px"><div class="pbody">';
+  h+='<div class="panel"><div class="pbody">';
   h+='<div class="fhint" style="margin:0 0 10px">Bảng này chép nguyên văn từ trang <b>CH3. Phân quyền</b> của file SOP. Bộ kiểm <code>check_sop.py</code> đọc thẳng file SOP và đối chiếu từng dòng - lệch một dòng là đỏ, nên bảng ở đây không thể trôi khỏi SOP mà không ai biết. Cột cuối cho biết <b>chức danh đang xem</b> có được làm việc đó không.</div>';
   h+='<div class="tbwrap"><table class="tb"><thead><tr><th>Hành động (theo SOP)</th><th style="width:230px">Ai được làm</th><th style="width:120px">Bạn</th></tr></thead><tbody>';
   CH3.forEach(function(a){
@@ -8919,12 +8922,12 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
     '<td>'+esc(ch3Vai(a))+'</td>'+
     '<td>'+(ok?'<span class="chip green">được</span>':'<span class="chip red">không</span>')+'</td></tr>'});
   h+='</tbody></table></div></div></div>';
-  h+='<div class="panel" style="margin-bottom:12px"><div class="pbody" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">';
+  h+='<div class="panel"><div class="pbody" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">';
   h+='<label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox"'+(P.on?" checked":"")+' onchange="dsCfg().on=this.checked?1:0;persistSoon();reRender(CUR)" style="width:17px;height:17px"><b>Áp phạm vi dữ liệu</b></label>';
   h+='<span class="chip '+(P.on?"green":"gray")+'">'+(P.on?"Đang bật - mỗi người chỉ thấy phần được giao":"Đang tắt - mọi người thấy toàn bộ")+'</span>';
   h+='<button class="btn sm" style="margin-left:auto" onclick="dsCfg().m={};dsCfg().ex=[];persistSoon();toast(\'Đã về ma trận khuyến nghị.\');reRender(CUR)"><i class="ti ti-restore"></i>Về mặc định khuyến nghị</button></div>';
   h+='<div class="mut" style="font-size:11.5px;padding:0 16px 13px">Bản demo chạy trên trình duyệt nên đây là phân quyền GIAO DIỆN + DỮ LIỆU HIỂN THỊ. Khi nối Google Sheets thật, khóa cứng nằm ở quyền chia sẻ sheet - bảng này là bản thiết kế để áp sang đó.</div></div>';
-  h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-table" style="margin-right:6px"></i>Ma trận: chức danh thấy dữ liệu của ai</b></div>';
+  h+='<div class="panel"><div class="ph"><b><i class="ti ti-table" style="margin-right:6px"></i>Ma trận: chức danh thấy dữ liệu của ai</b></div>';
   h+='<div class="tbwrap"><table class="dt"><thead><tr><th style="min-width:190px">Chức danh</th>';
   ["lead","hocvien","lop","tien","baocao","viec","nhansu"].forEach(function(d){h+='<th title="'+esc(DSDOMT[d])+'">'+esc(DSDOMT[d])+'</th>'});
   h+='</tr></thead><tbody>';
@@ -8964,7 +8967,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   [["noidung","Nội dung tư vấn &amp; ghi chú khách","đang che với: Giáo viên, Kế toán, Marketing"],
    ["lienhe","Số điện thoại / email đầy đủ","đang che với: Marketing"],
    ["tien","Số tiền &amp; chiết khấu","đang che với: Giáo viên"]].forEach(function(m){
-   h+='<label style="display:flex;align-items:flex-start;gap:9px;cursor:pointer;padding:7px 0;border-bottom:1px solid #F2F5F9">'+
+   h+='<label style="display:flex;align-items:flex-start;gap:9px;cursor:pointer;padding:7px 0;border-bottom:1px solid #FAFBFD">'+
     '<input type="checkbox"'+(P.mask[m[0]]?" checked":"")+' onchange="dsCfg().mask[\''+m[0]+'\']=this.checked?1:0;persistSoon();reRender(CUR)" style="width:16px;height:16px;margin-top:2px">'+
     '<span><b style="font-size:12.5px">'+m[1]+'</b><br><span class="mut" style="font-size:11px">'+m[2]+'</span></span></label>'});
   h+='<div class="mut" style="font-size:11.5px;padding-top:10px">Ô bị che hiện dấu ba chấm trên bảng - người dùng vẫn thấy dòng dữ liệu, chỉ không đọc được giá trị nhạy cảm.</div>';
@@ -9007,7 +9010,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   h+='Các cửa sổ trên máy này và các MÁY KHÁC mở cùng bản demo tự đồng bộ với nhau. Dữ liệu hiện tại: '+(d?'<span class="chip amber">đang có thay đổi demo</span>':'<span class="chip green">nguyên bản</span>')+(CANLS?'':' · <span class="chip red">trình duyệt chặn lưu - dùng Chrome hoặc http.server</span>')+'</div>';
   h+='<div style="padding:0 16px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn danger" onclick="demoReset()"><i class="ti ti-refresh"></i>Reset demo (về nguyên bản)</button>'+roomBtnHTML()+'<button class="btn sm" onclick="demoPing()"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ</button></div></div>';
   /* V9.30 (anh Luân): "để demo lúc nào cũng ổn... điều chỉnh thời gian để lúc nào nó cũng hợp lý" */
-  h+='<div class="panel" style="max-width:640px;margin-top:14px"><div class="ph"><b><i class="ti ti-calendar-event" style="margin-right:6px"></i>Mốc thời gian của dữ liệu demo</b></div><div class="pbody">';
+  h+='<div class="panel" style="max-width:640px;margin-top:16px"><div class="ph"><b><i class="ti ti-calendar-event" style="margin-right:6px"></i>Mốc thời gian của dữ liệu demo</b></div><div class="pbody">';
   h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Dữ liệu demo neo theo <b>ngày sinh ra nó</b>. Để lâu không mở thì mọi việc thành "quá hạn 90 ngày" và lịch tuần trống trơn - app trông như hỏng dù không sai gì. Nút dưới kéo toàn bộ mốc thời gian về hiện tại.</div>';
   h+=tshInfoHTML();
   h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn primary" onclick="tshNow()"><i class="ti ti-calendar-event"></i>Kéo dữ liệu về hôm nay</button>'+
@@ -9059,7 +9062,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
    var ps=APPPARAMS.filter(function(p){return p[0]===g&&hopKhop(p)});
    if(!ps.length)return;
    var N=CFNHOMBY[g];
-   h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-adjustments" style="margin-right:6px"></i>'+esc(g)+'</b><span class="mut" style="font-size:11.5px">'+ps.length+' tham số'+(cq&&ps.length<APPPARAMS.filter(function(p){return p[0]===g}).length?' khớp':'')+'</span></div>';
+   h+='<div class="panel"><div class="ph"><b><i class="ti ti-adjustments" style="margin-right:6px"></i>'+esc(g)+'</b><span class="mut" style="font-size:11.5px">'+ps.length+' tham số'+(cq&&ps.length<APPPARAMS.filter(function(p){return p[0]===g}).length?' khớp':'')+'</span></div>';
    /* Mỗi nhóm tự giới thiệu: nó cai quản chuyện gì, và đổi số ở đây thì MÀN NÀO đổi theo. */
    if(N){
     h+='<div style="padding:10px 14px 0"><div class="mut" style="font-size:12px;line-height:1.65">'+esc(N.d)+'</div>';
@@ -9095,7 +9098,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
      hiện ở màn hình nào, và mấy cái dấu ngoặc nhọn kia là gì. Nay: nhãn là CHÍNH CÂU ĐÓ (rút
      gọn), có nói đoạn này hiện ở TRANG NÀO, và có một dòng giải thích thẻ in đậm. */
   h+='<div class="notebar"><i class="ti ti-blockquote"></i>Đây là những <b>dòng hướng dẫn màu vàng</b> bạn thấy trên các màn hình. Sửa ở đây là áp ngay khắp app và <b>không mất khi reset dữ liệu demo</b>. Dòng nào có CON SỐ sống (ngưỡng, hạn) thì không nằm ở đây - số đó sửa ở <b>Ngưỡng &amp; SLA</b> hoặc <b>Thông điệp CH4</b>.</div>';
-  h+='<div class="notebar" style="background:#F4F8FD;border-color:#CFE0F7;color:#2A5D8F"><i class="ti ti-code"></i>Trong ô có thể gặp <b>&lt;b&gt;chữ&lt;/b&gt;</b> - đó là cách đánh dấu <b>in đậm</b>. Cứ giữ nguyên cặp dấu đó nếu muốn phần chữ ở giữa in đậm, hoặc xoá cả cặp nếu muốn chữ thường.</div>';
+  h+='<div class="notebar" style="background:#FAFBFD;border-color:#CFE0F7;color:#2E5A88"><i class="ti ti-code"></i>Trong ô có thể gặp <b>&lt;b&gt;chữ&lt;/b&gt;</b> - đó là cách đánh dấu <b>in đậm</b>. Cứ giữ nguyên cặp dấu đó nếu muốn phần chữ ở giữa in đậm, hoặc xoá cả cặp nếu muốn chữ thường.</div>';
   h+='<div class="panel"><div class="pbody">';
   Object.keys(GOIYDEF).sort().forEach(function(k){
    var g=(DATA.config&&DATA.config.goiy)||{};var sua=!!g[k];
@@ -9108,7 +9111,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
     (noi?('<div class="fhint" style="margin:-2px 0 6px;display:flex;align-items:center;gap:7px;flex-wrap:wrap"><span><i class="ti ti-map-pin" style="margin-right:4px"></i>Hiện ở: <b>'+esc(noi)+'</b></span>'+
       (GOIYPG[k]?'<button class="pill" onclick="'+esc(GOIYPG[k])+'" data-tip="Mở màn đó để xem dòng này đang nằm ở đâu"><i class="ti ti-external-link"></i>Xem tại chỗ</button>':'')+'</div>'):'')+
     '<textarea rows="3" id="gy_'+esc(k)+'" style="width:100%">'+esc(vb)+'</textarea>'+
-    '<div style="margin-top:5px;display:flex;gap:6px"><button class="btn sm primary" onclick="goiyLuu(\''+esc(k)+'\',fldV(\'gy_'+esc(k)+'\'));reRender(\'settings\')"><i class="ti ti-device-floppy"></i>Lưu</button>'+
+    '<div style="margin-top:5px;display:flex;gap:6px"><button class="btn primary sm" onclick="goiyLuu(\''+esc(k)+'\',fldV(\'gy_'+esc(k)+'\'));reRender(\'settings\')"><i class="ti ti-device-floppy"></i>Lưu</button>'+
     (sua?'<button class="btn sm" onclick="goiyLuu(\''+esc(k)+'\',\'\');reRender(\'settings\')"><i class="ti ti-restore"></i>Về mặc định</button>':'')+'</div></div>'});
   h+='</div></div>';
  }
@@ -9121,7 +9124,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   list.forEach(function(m){if(!bySheet[m.sheet]){bySheet[m.sheet]=[];order.push(m.sheet)}bySheet[m.sheet].push(m)});
   if(!order.length)h+='<div class="panel"><div class="empty">Không thấy thông điệp nào khớp.</div></div>';
   order.forEach(function(sh){
-   h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-file-text" style="margin-right:6px"></i>'+esc(sh)+'</b><span class="mut" style="font-size:11.5px">'+bySheet[sh].length+' thông điệp</span></div><div class="tbwrap"><table class="dt"><thead><tr><th style="width:74px">Mã</th><th>Mẫu câu (sửa ở đây)</th><th style="width:150px">Khi nào hiện</th><th style="width:110px">Ai làm</th><th style="width:80px"></th></tr></thead><tbody>';
+   h+='<div class="panel"><div class="ph"><b><i class="ti ti-file-text" style="margin-right:6px"></i>'+esc(sh)+'</b><span class="mut" style="font-size:11.5px">'+bySheet[sh].length+' thông điệp</span></div><div class="tbwrap"><table class="dt"><thead><tr><th style="width:74px">Mã</th><th>Mẫu câu (sửa ở đây)</th><th style="width:150px">Khi nào hiện</th><th style="width:110px">Ai làm</th><th style="width:80px"></th></tr></thead><tbody>';
    bySheet[sh].forEach(function(m){var idx=ch4List().indexOf(m);var pv=msgText(m.code);/* V9.29: neo de msgGo nhay toi */
     h+='<tr><td><code style="font-size:11px">'+esc(m.code)+'</code>'+(m.params&&m.params.length?'<div class="mut" style="font-size:10px">'+esc(m.params.join(", "))+'</div>':'')+'</td>'+
      '<td><textarea id="msg_'+idx+'" rows="2" style="width:100%;min-width:280px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-family:inherit;font-size:11.5px">'+esc(m.tmpl)+'</textarea>'+(pv&&pv!==m.tmpl?'<div class="mut" style="font-size:10.5px;margin-top:2px">→ '+esc(pv)+'</div>':'')+'</td>'+
@@ -9149,7 +9152,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   var ks=Object.keys(ENUM||{}).filter(function(k){return !q||k.toLowerCase().indexOf(q)>=0});
   if(!ks.length)h+='<div class="panel"><div class="empty">Không thấy danh mục nào khớp.</div></div>';
   ks.forEach(function(en){var arr=ENUM[en]||[];
-   h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-list" style="margin-right:6px"></i>'+esc(en.replace("enum_",""))+'</b><span class="mut" style="font-size:11.5px">'+arr.length+' giá trị · '+esc(en)+'</span></div><div class="tbwrap"><table class="dt"><thead><tr><th style="width:180px">Mã (không đổi)</th><th>Nhãn hiển thị</th><th style="width:150px"></th></tr></thead><tbody>';
+   h+='<div class="panel"><div class="ph"><b><i class="ti ti-list" style="margin-right:6px"></i>'+esc(en.replace("enum_",""))+'</b><span class="mut" style="font-size:11.5px">'+arr.length+' giá trị · '+esc(en)+'</span></div><div class="tbwrap"><table class="dt"><thead><tr><th style="width:180px">Mã (không đổi)</th><th>Nhãn hiển thị</th><th style="width:150px"></th></tr></thead><tbody>';
    arr.forEach(function(v,i){var cd=ecode(v),lb=elabel(v)||v;var used=enumUsage(en,cd);
     h+='<tr><td><code style="font-size:11px">'+esc(cd)+'</code>'+(used?'<div class="mut" style="font-size:10.5px">đang dùng ở '+used+' dòng</div>':'<div class="mut" style="font-size:10.5px">chưa dùng</div>')+'</td>'+
      '<td><input id="en_'+esc(en)+'_'+i+'" value="'+esc(lb)+'" style="width:100%;max-width:420px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit">'+
@@ -9166,7 +9169,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
  else if(tab==="giagio"){h+=giaGioHTML()}
  else if(tab==="staff"){
   h+='<div class="notebar"><i class="ti ti-mail"></i>'+goiy("gy_email_dung_e_ang_eb0e",'Email dùng để đăng nhập tự nhận vai trò + nhận nhắc việc SLA. Thiếu email -> không đăng nhập/nhắc được. Sửa xong bấm Lưu từng dòng.')+'</div>';
-  h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-user-plus" style="margin-right:6px"></i>Thêm nhân viên</b></div><div class="form">';
+  h+='<div class="panel"><div class="ph"><b><i class="ti ti-user-plus" style="margin-right:6px"></i>Thêm nhân viên</b></div><div class="form">';
   h+='<div class="fld"><label>Họ tên <i>*</i></label><input id="nv_name"></div>';
   h+='<div class="fld"><label>Email đăng nhập</label><input id="nv_email" placeholder="ten@ieltsthetutors.edu.vn"></div>';
   h+='<div class="fld"><label>Vai trò <i>*</i></label><select id="nv_role">'+(ENUM.enum_staff_role||ENUM.enum_role||[]).map(function(o){return '<option>'+esc(o)+'</option>'}).join("")+'</select></div>';
@@ -9362,7 +9365,7 @@ function btHub(embed){
        '<label class="btup" title="Tải đề riêng cho em này"><i class="ti ti-upload"></i><span class="btupn">Tải đề</span>'+
        '<input type="file" class="btfi" onchange="btRowFile(this)" style="display:none"></label>'+
        '<input type="date" class="btdi" value="'+esc(preDue)+'" title="Hạn nộp riêng"></div>'
-     :'<div class="btdue" style="display:none;margin-left:auto"><input type="date" class="btdi" value="'+esc(preDue)+'" style="height:30px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-family:inherit"></div>')+
+     :'<div class="btdue" style="display:none;margin-left:auto"><input type="date" class="btdi" value="'+esc(preDue)+'" style="height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit"></div>')+
     '</div>'});
   h+='</div>'+
    '<div class="pfoot"><span class="mut">'+(mode2==="each"
@@ -9393,8 +9396,8 @@ function btHub(embed){
   var list=(titles[pick]||[]).slice().sort(function(a,b){return (hwGraded(a)?1:0)-(hwGraded(b)?1:0)});
   h+='<div class="panel"><div class="ph"><b>Chấm: '+esc(pick||"—")+'</b><div class="mini"><button class="btn green sm" onclick="chamLuu()"><i class="ti ti-device-floppy"></i>Lưu chấm bài</button></div></div><div class="pbody">';
   if(!list.length)h+='<div class="empty">Lớp này chưa có bài để chấm. Sang tab Giao bài để giao trước.</div>';
-  list.forEach(function(r){h+='<div class="rost" data-hwid="'+esc(r.homework_id)+'"><div class="rn">'+esc(r.student_name||r.student_id)+' '+hwChip(r)+(hwSubmitted(r)?' <span class="mut" style="font-weight:500">nộp '+esc(r.homework_submitted_time||"")+'</span>':'')+'</div><div class="att"><input class="hwscore" type="number" min="0" max="9" step="0.5" placeholder="'+esc(hwThang(r))+'" value="'+esc(r.homework_score||"")+'" style="width:64px;height:30px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-family:inherit">'+
-(hwSubmitted(r)?'':'<select class="hwlate" title="Bài chưa thu - em này nộp thế nào?" style="height:30px;border:1px solid var(--line);border-radius:7px;font-family:inherit;font-size:11px"><option value="on">nộp đúng hạn</option><option value="late">nộp trễ</option></select>')+'<input class="hwfb" placeholder="Nhận xét" value="'+esc(r.teacher_feedback||"")+'" style="width:230px;height:30px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-family:inherit"></div></div>'});
+  list.forEach(function(r){h+='<div class="rost" data-hwid="'+esc(r.homework_id)+'"><div class="rn">'+esc(r.student_name||r.student_id)+' '+hwChip(r)+(hwSubmitted(r)?' <span class="mut" style="font-weight:500">nộp '+esc(r.homework_submitted_time||"")+'</span>':'')+'</div><div class="att"><input class="hwscore" type="number" min="0" max="9" step="0.5" placeholder="'+esc(hwThang(r))+'" value="'+esc(r.homework_score||"")+'" style="width:64px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit">'+
+(hwSubmitted(r)?'':'<select class="hwlate" title="Bài chưa thu - em này nộp thế nào?" style="height:30px;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:11px"><option value="on">nộp đúng hạn</option><option value="late">nộp trễ</option></select>')+'<input class="hwfb" placeholder="Nhận xét" value="'+esc(r.teacher_feedback||"")+'" style="width:230px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit"></div></div>'});
   h+='</div></div>';
  }
  return h}
@@ -9891,7 +9894,7 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=rows("DL08");
  /* HÀNG ĐỢI CHỜ XẾP LỚP - trước đây bị giấu sau nút, nay thành danh sách như trong hành trình */
  if(wait.length&&(fil==="all")){
   h+='<div class="sechd" style="display:flex;align-items:center;gap:8px"><i class="ti ti-user-plus" style="color:var(--red)"></i>Đã đóng đủ tiền · chờ xếp lớp ('+wait.length+')</div>';
-  h+='<div class="panel" style="margin-bottom:16px"><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Khóa đã đăng ký</th><th>Ngày đóng đủ</th><th></th></tr></thead><tbody>';
+  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Khóa đã đăng ký</th><th>Ngày đóng đủ</th><th></th></tr></thead><tbody>';
   wait.forEach(function(e){var lastPay="";var ps=rows("DL07").filter(function(p){return String(p.enrollment_id)===String(e.enrollment_id)&&num(p.amount)>0});if(ps.length)lastPay=ps[ps.length-1].payment_time||"";
    h+='<tr><td>'+nguoiLnk(e.student_id,e.student_id_name,e.student_id)+'</td>'+
     '<td>'+esc(e.course_id_name||e.course_id||"-")+'</td><td>'+esc(String(lastPay).slice(0,10)||"-")+'</td>'+
@@ -11542,7 +11545,7 @@ function hvCopy(t,msg){t=String(t||"");
 function hvReferral(S){var off=hvRefOffer();
  var reward=paramStr("referralReferrer_reward","1 buổi WOW 1-1 miễn phí cho mỗi bạn đăng ký thành công");
  var h='<div class="sechd" id="s-gioithieu">Giới thiệu bạn bè</div>';
- h+='<div class="panel" style="margin-bottom:16px"><div class="pbody">';
+ h+='<div class="panel"><div class="pbody">';
  if(!window.HVREFON){
   h+='<div class="hvrefbox"><div class="hvrefico"><i class="ti ti-gift"></i></div>'+
    '<div class="hvrefmn"><b>Giới thiệu bạn - cùng nhận ưu đãi</b>'+
@@ -11791,7 +11794,7 @@ function renderTrangHV(){
  JR=JR.map(function(x,i){return {r:x,d:pvnd(x[2]),i:i}})
   .sort(function(a,b){if(a.d&&b.d)return a.d-b.d;if(a.d)return -1;if(b.d)return 1;return a.i-b.i})
   .map(function(x){return x.r});
- h+='<div class="panel" style="margin-bottom:16px"><div class="pbody"><div class="hvj">';
+ h+='<div class="panel"><div class="pbody"><div class="hvj">';
  JR.forEach(function(r,i){var has=!!r[2];
   h+='<div class="hvjr'+(has?" on":"")+'"><span class="hvjd"><i class="ti '+r[0]+'"></i></span>'+
    '<div class="hvjc"><b>'+esc(r[1])+'</b>'+(r[3]?'<span>'+esc(r[3])+'</span>':'')+'</div>'+
@@ -11816,7 +11819,7 @@ function renderTrangHV(){
  if(t.overall_score){
   var sk=[["Listening",num(t.skill_listening)],["Reading",num(t.skill_reading)],["Writing",num(t.skill_writing)],["Speaking",num(t.skill_speaking)]].filter(function(x){return x[1]>0});
   if(sk.length){var low=sk.slice().sort(function(a,b){return a[1]-b[1]})[0];
-   h+='<div class="panel" style="margin-bottom:16px"><div class="ph"><b>Kết quả test đầu vào · Overall '+esc(t.overall_score)+'</b>'+(ce.final_test_score?'<span class="chip green">Đầu ra: '+esc(ce.final_test_score)+'</span>':'')+'</div><div class="pbody"><div class="hvskill">'+
+   h+='<div class="panel"><div class="ph"><b>Kết quả test đầu vào · Overall '+esc(t.overall_score)+'</b>'+(ce.final_test_score?'<span class="chip green">Đầu ra: '+esc(ce.final_test_score)+'</span>':'')+'</div><div class="pbody"><div class="hvskill">'+
     sk.map(function(x){var w=Math.min(100,x[1]/9*100);var isLow=(x[0]===low[0]);
      return '<div class="hvsk"><div class="hvskl">'+esc(x[0])+(isLow?' <span class="chip amber">cần cải thiện</span>':'')+'</div><div class="hvskb"><i style="width:'+w+'%;background:'+(isLow?"var(--amber)":"var(--blue)")+'"></i></div><b>'+x[1]+'</b></div>'}).join("")+
     '</div></div></div>'}}
@@ -11830,7 +11833,7 @@ function renderTrangHV(){
  var dueHw=hwC.filter(function(x){var d=pvnd(x.homework_due_date);return d&&d.getTime()>=now&&!hwSubmitted(x)&&!hwMissing(x)});
  /* luôn hiện ĐỦ NHÓM kể cả khi trống, để học viên biết chỗ này có những gì */
  var upSv=C.sv.filter(function(v){return !String(v.submitted_date||"").trim()});
- h+='<div class="sechd" id="s-saptoi">Sắp tới</div><div class="panel" style="margin-bottom:16px"><div class="pbody">';
+ h+='<div class="sechd" id="s-saptoi">Sắp tới</div><div class="panel"><div class="pbody">';
  function upGrp(ic,col,title,items,render,emptyTxt){
   h+='<div class="hvgt"><span class="hvui" style="background:'+col+'18;color:'+col+'"><i class="ti '+ic+'"></i></span>'+
    '<b>'+esc(title)+'</b><span class="chip'+(items.length?"":" ")+'">'+items.length+'</span></div>';
@@ -11880,7 +11883,7 @@ function renderTrangHV(){
  if(isRisk(S.academic_progress_status))rec.push(["ti-chart-line","amber","Tiến độ học thuật đang chậm so với lộ trình","Trung tâm sẽ liên hệ để sắp buổi kèm thêm cho bạn."]);
  if(ce.course_end_id&&!isc(ce.re_enrollment_status,"confirmed_with_deposit"))rec.push(["ti-refresh","green","Khóa học của bạn đã kết thúc","Đăng ký khóa tiếp theo trong 30 ngày để giữ ưu đãi học viên cũ."+(ce.next_course_recommendation?" Gợi ý: "+ce.next_course_recommendation:"")]);
  if(!rec.length)rec.push(["ti-thumb-up","green","Bạn đang học rất tốt","Giữ nhịp chuyên cần và nộp bài đúng hạn nhé."]);
- h+='<div class="sechd" id="s-khuyennghi">Khuyến nghị dành cho bạn</div><div class="panel" style="margin-bottom:16px"><div class="pbody">';
+ h+='<div class="sechd" id="s-khuyennghi">Khuyến nghị dành cho bạn</div><div class="panel"><div class="pbody">';
  rec.forEach(function(r){h+='<div class="hvrec '+r[1]+'"><i class="ti '+r[0]+'"></i><div><b>'+esc(r[2])+'</b><span>'+esc(r[3])+'</span></div></div>'});
  h+='</div></div>';
  /* ---- 5b. GIỚI THIỆU BẠN BÈ ---- */
@@ -11891,7 +11894,7 @@ function renderTrangHV(){
  var hasIn=!!(t&&t.overall_score), hasOut=!!(ce&&ce.final_test_score);
  if(hasIn||hasOut){
   h+='<div class="sechd" id="s-diem">Hành trình điểm số · từ đầu vào đến đầu ra</div>';
-  h+='<div class="panel" style="margin-bottom:16px"><div class="tbwrap"><table class="dt"><thead><tr><th>Kỹ năng</th><th>Đầu vào'+(t.result_time?' <span class="mut">('+esc(String(t.result_time).slice(0,10))+')</span>':'')+'</th><th>Giữa khóa'+(ob.mid_test_date?' <span class="mut">('+esc(ob.mid_test_date)+')</span>':'')+'</th><th>Đầu ra'+(ce.course_completion_time?' <span class="mut">('+esc(String(ce.course_completion_time).slice(0,10))+')</span>':'')+'</th><th>Tăng</th><th>Mục tiêu</th></tr></thead><tbody>';
+  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Kỹ năng</th><th>Đầu vào'+(t.result_time?' <span class="mut">('+esc(String(t.result_time).slice(0,10))+')</span>':'')+'</th><th>Giữa khóa'+(ob.mid_test_date?' <span class="mut">('+esc(ob.mid_test_date)+')</span>':'')+'</th><th>Đầu ra'+(ce.course_completion_time?' <span class="mut">('+esc(String(ce.course_completion_time).slice(0,10))+')</span>':'')+'</th><th>Tăng</th><th>Mục tiêu</th></tr></thead><tbody>';
   function bandRow(lb,vin,vmid,vout,tg,bold){
    var last=(vout>0?vout:(vmid>0?vmid:0));
    var d=(vin>0&&last>0)?(last-vin):null;
@@ -11915,7 +11918,7 @@ function renderTrangHV(){
  var bySk={};hwC.forEach(function(x){var v=num(x.homework_score);if(!(v>0))return;var k=elabel(x.skill)||x.skill||"Khác";(bySk[k]=bySk[k]||[]).push({v:v,d:pvnd(x.graded_at||x.homework_submitted_time)})});
  var skKeys=Object.keys(bySk);
  if(skKeys.length){
-  h+='<div class="panel" style="margin-bottom:16px"><div class="ph"><b>Điểm bài tập theo kỹ năng (trong khóa)</b><span class="mut" style="font-size:11.5px">so sánh nửa đầu và nửa sau để thấy xu hướng</span></div><div class="pbody"><div class="hvskill">';
+  h+='<div class="panel"><div class="ph"><b>Điểm bài tập theo kỹ năng (trong khóa)</b><span class="mut" style="font-size:11.5px">so sánh nửa đầu và nửa sau để thấy xu hướng</span></div><div class="pbody"><div class="hvskill">';
   skKeys.forEach(function(k){var arr=bySk[k].slice().sort(function(a,b){return (a.d||0)-(b.d||0)});
    var avg=arr.reduce(function(a,b){return a+b.v},0)/arr.length;
    var half=Math.floor(arr.length/2);
@@ -11936,7 +11939,7 @@ function renderTrangHV(){
  if(lop)rows("DL11").forEach(function(s2){if(s2.class_id===lop.class_id)mySes.push(s2)});
  mySes.sort(function(a,b){return (pvnd(b.session_date)||0)-(pvnd(a.session_date)||0)});
  var shown=mySes.filter(function(s2){return attBySes[s2.session_id]||hwBySes[s2.session_id]||isc(s2.session_status,"completed")});
- h+='<div class="panel" style="margin-bottom:16px"><div class="pbody">';
+ h+='<div class="panel"><div class="pbody">';
  if(!shown.length)h+='<div class="empty">Chưa có buổi học nào được ghi nhận.</div>';
  if(shown.length)h+=hvTLopen(); /* V9.18: rail + node thời gian - đúng nghĩa timeline, hết cảnh block hòa lẫn */
  shown.slice(0,12).forEach(function(s2){
@@ -11955,7 +11958,7 @@ function renderTrangHV(){
    (a.in_class_performance?' · thái độ trong lớp: <b>'+esc(elabel(a.in_class_performance))+'</b>':'')+
    /* (m) DL12.note là ghi chú NỘI BỘ (vd "đã gọi hỏi thăm, HV hứa đi học lại") - in nguyên
       văn cho học viên đọc là lộ chuyện chăm sóc nội bộ. Chỉ hiện phần HỌC VIÊN TỰ GHI. */
-   (hvSelfWhy(a)?' · lý do bạn báo: '+esc(hvSelfWhy(a)):'')+/* V9.29: nói rõ đơn của em đang ở đâu - trước đây báo xong là im, em không biết đã được duyệt chưa */(absPending(a)?' · <b style="color:#8A6D1B">trung tâm đang xem xét</b>':(ecode(a.absence_type)==="excused"?' · <b style="color:#1E6A47">đã được duyệt: vắng có phép</b>':(ecode(a.absence_type)==="unexcused"?' · <b style="color:#A32D2D">không được chấp nhận</b>':'')))+(a.makeup_session_id?(function(){var t=find("DL11","session_id",a.makeup_session_id)||{};return ' · <b style="color:var(--navy)">đã xếp học bù: buổi '+esc(t.session_number||'')+' ngày '+esc(t.session_date||'')+'</b>'})():'')+'</span></div>'}
+   (hvSelfWhy(a)?' · lý do bạn báo: '+esc(hvSelfWhy(a)):'')+/* V9.29: nói rõ đơn của em đang ở đâu - trước đây báo xong là im, em không biết đã được duyệt chưa */(absPending(a)?' · <b style="color:#8A6D1F">trung tâm đang xem xét</b>':(ecode(a.absence_type)==="excused"?' · <b style="color:#1E6A47">đã được duyệt: vắng có phép</b>':(ecode(a.absence_type)==="unexcused"?' · <b style="color:#A32D2D">không được chấp nhận</b>':'')))+(a.makeup_session_id?(function(){var t=find("DL11","session_id",a.makeup_session_id)||{};return ' · <b style="color:var(--navy)">đã xếp học bù: buổi '+esc(t.session_number||'')+' ngày '+esc(t.session_date||'')+'</b>'})():'')+'</span></div>'}
   if(s2.teacher_note_summary)the+='<div class="hvev"><i class="ti ti-notes"></i><span><b>Nhận xét của giảng viên:</b> '+esc(s2.teacher_note_summary)+'</span></div>';
   /* (g) ĐÁNH GIÁ TỪNG BUỔI bằng hàng sao - ghi vào DL16 kèm session_id để học vụ biết buổi nào
      bị chấm thấp, thay vì đợi tới phiếu khảo sát cuối khóa mới biết. */
@@ -11983,7 +11986,7 @@ function renderTrangHV(){
  h+='</div></div>';
  /* ---- 8. NHẬT KÝ BUỔI WOW ---- */
  if(C.wow.length){
-  h+='<div class="sechd" id="s-wow">Nhật ký buổi WOW 1-1</div><div class="panel" style="margin-bottom:16px"><div class="pbody">';
+  h+='<div class="sechd" id="s-wow">Nhật ký buổi WOW 1-1</div><div class="panel"><div class="pbody">';
   /* V9.47: dùng ĐÚNG dòng thời gian của nhật ký buổi học ngay phía trên - hai mục nằm sát nhau,
      cùng là chuyện đã xảy ra theo thứ tự, không có lý do gì trình bày hai kiểu. */
   h+=hvTLopen();
@@ -12015,7 +12018,7 @@ function renderTrangHV(){
  var svOld=C.sv.filter(function(v){return String(v.submitted_date||"").trim()})
    .sort(function(a,b){return (pvnd(b.submitted_date)||0)-(pvnd(a.submitted_date)||0)});
  h+='<div class="sechd" id="s-khaosat">Khảo sát của bạn'+(svNew.length?' <span class="chip amber" style="text-transform:none">'+svNew.length+' phiếu mới</span>':'')+'</div>';
- h+='<div class="panel" style="margin-bottom:16px"><div class="pbody">';
+ h+='<div class="panel"><div class="pbody">';
  h+='<div class="hvgt"><span class="hvui" style="background:#E08A1E18;color:#E08A1E"><i class="ti ti-inbox"></i></span><b>Phiếu mới gửi, chờ bạn trả lời</b><span class="chip">'+svNew.length+'</span></div>';
  if(!svNew.length)h+='<div class="hvempty">Hiện không có phiếu nào chờ bạn.</div>';
  svNew.forEach(function(v){
@@ -12041,7 +12044,7 @@ function renderTrangHV(){
     nội dung vẫn nằm trong trang và cuộn xuống là đọc được. */
  if(!hvPH()){
  h+='<div class="sechd" id="s-hoidap">Trao đổi với trung tâm'+(openReq?' <span class="chip amber" style="text-transform:none">'+openReq+' đang xử lý</span>':'')+'</div>';
- h+='<div class="panel" style="margin-bottom:16px"><div class="pbody">';
+ h+='<div class="panel"><div class="pbody">';
  h+='<div class="hvaskf" style="margin-bottom:10px"><button class="btn primary sm" onclick="hvAskNew()"><i class="ti ti-message-plus"></i>Gửi câu hỏi / yêu cầu</button>'+
   '<button class="btn sm" onclick="hvReqSpecial(\'baoluu\')"><i class="ti ti-player-pause"></i>Xin bảo lưu</button>'+
   '<button class="btn sm" onclick="hvReqSpecial(\'doilop\')"><i class="ti ti-arrows-exchange"></i>Xin đổi lớp</button>'+
@@ -12068,7 +12071,7 @@ function renderTrangHV(){
   h+='</div>'});
  h+='</div></div>';
  h+='<div class="sechd" id="s-gopy">Góp ý cho trung tâm</div>';
- h+='<div class="panel" style="margin-bottom:16px"><div class="ph"><b>Bạn muốn góp ý điều gì?</b>'+
+ h+='<div class="panel"><div class="ph"><b>Bạn muốn góp ý điều gì?</b>'+
   '<button class="btn primary sm" onclick="hvFeedbackForm()"><i class="ti ti-message-plus"></i>Gửi góp ý</button></div><div class="pbody">';
  h+='<div class="mut" style="font-size:11.5px;margin-bottom:10px">Khen, chê hay đề xuất đều được. Góp ý tiêu cực sẽ được chuyển thành phiếu xử lý và trung tâm phản hồi bạn theo cam kết.</div>';
  var myFb=C.fb.slice().sort(function(a,b){return (pvnd(b.feedback_time)||0)-(pvnd(a.feedback_time)||0)});
@@ -12188,7 +12191,7 @@ function hvCallHTML(lb,cls){var p=hvHotline();
     (chỉ hiện số, viền trắng) nên hai chỗ trông khác hẳn nhau.
     Chưa cấu hình hotline thì KHÔNG dựng nút gọi giả - người quản trị thấy lời nhắc để đi điền. */
  if(!p)return (window.HVPORTAL?'':'<span class="chip amber" data-tip="Vào Cài đặt > Giao diện & Thương hiệu để điền hotline">chưa có hotline · <b>cấu hình</b></span>');
- return '<a class="btn sm '+(cls||"")+'" href="tel:'+esc(phoneKey(p))+'" data-tip="Bấm để gọi '+esc(p)+'"><i class="ti ti-phone"></i>'+esc(lb||("Gọi trung tâm "+p))+'</a>'}
+ return '<a class="btn '+(cls||"")+' sm" href="tel:'+esc(phoneKey(p))+'" data-tip="Bấm để gọi '+esc(p)+'"><i class="ti ti-phone"></i>'+esc(lb||("Gọi trung tâm "+p))+'</a>'}
 /* Dòng điểm danh do CHÍNH học viên tự báo. Đánh dấu bằng tiền tố thay vì đẻ cột mới:
    DL12 chỉ có 10 cột, thêm cột lạ thì bản chạy trên Google Sheets ghi xong RƠI MẤT dữ liệu
    mà không ai biết. Phần sau dấu ":" là lời học viên - chỉ phần đó mới được hiện ra cổng. */
@@ -12655,7 +12658,7 @@ function renderHosoGV(){var id=window.GVID;var g=find("DL01","staff_id",id);
   '<div class="s">'+esc(id)+(g.email?' · '+esc(g.email):'')+(g.phone?' · '+esc(g.phone):'')+' · '+esc(elabel(g.status)||g.status||"")+'</div></div>'+
   '<div class="sp">'+backBtn("giangvien","Danh sách giảng viên")+'</div></div>';
  var bioText=g.bio||g.teacher_bio||g.note||"";
- h+='<div class="panel" style="margin-bottom:14px"><div class="pbody" style="display:flex;gap:14px;align-items:flex-start">'+
+ h+='<div class="panel"><div class="pbody" style="display:flex;gap:14px;align-items:flex-start">'+
   avatarBig(g.full_name,g.avatar_url)+
   '<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:15px">'+esc(g.full_name)+'</div>'+
   '<div class="mut" style="font-size:12px;margin:2px 0 8px">'+esc(elabel(g.role)||"Giảng viên")+(g.branch?' · '+esc(elabel(g.branch)||g.branch):'')+(g.email?' · '+esc(g.email):'')+'</div>'+
@@ -12673,14 +12676,14 @@ function renderHosoGV(){var id=window.GVID;var g=find("DL01","staff_id",id);
   ["TNR","Tỷ lệ buổi có nhận xét đầy đủ",tnrV==null?"—":Math.round(tnrV*100)+"%",tnrV==null?null:(tnrV>=kpiTh(/^TNR/,0.9)),"≥ "+kpiChip(/^TNR/,0.9,1)],
   ["GCR7","Tỷ lệ bài đã chấm",gcrV==null?"—":Math.round(gcrV*100)+"%",gcrV==null?null:(gcrV>=kpiTh(/^GCR7/,1)),"≥ "+kpiChip(/^GCR7/,1,1)],
   ["ADC","Kỷ luật vào lớp đúng giờ",adcV==null?"—":Math.round(adcV*100)+"%",adcV==null?null:(adcV>=kpiTh(/^ADC/,0.95)),"≥ "+kpiChip(/^ADC/,0.95,1)]]);
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b>Lớp đang phụ trách ('+cls.length+')</b></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Tên lớp</th><th>Trạng thái</th><th>Sĩ số</th><th>Lịch</th><th>Khai giảng</th><th>Thao tác</th></tr></thead><tbody>';
+ h+='<div class="panel"><div class="ph"><b>Lớp đang phụ trách ('+cls.length+')</b></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Tên lớp</th><th>Trạng thái</th><th>Sĩ số</th><th>Lịch</th><th>Khai giảng</th><th>Thao tác</th></tr></thead><tbody>';
  if(!cls.length)h+='<tr><td class="empty" colspan="7">Chưa phụ trách lớp nào.</td></tr>';
  cls.forEach(function(c){h+='<tr><td>'+esc(c.class_id)+'</td><td>'+esc(c.class_name)+'</td><td><span class="chip '+stCls(c.class_status)+'">'+esc(elabel(c.class_status))+'</span></td><td>'+esc(c.current_enrollment||0)+'/'+esc(c.class_capacity||0)+'</td><td>'+esc(c.class_schedule||"")+'</td><td>'+esc(c.class_start_date||"")+'</td><td><button class="btn sm" onclick="openLop(\''+esc(c.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Bảng lớp</button></td></tr>'});
  h+='</tbody></table></div></div>';
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b>Buổi cần ghi nhận xét ('+noNote.length+')</b><div class="mini"><button class="pill" onclick="go(\'buoihoc\')">Mở trang Buổi học</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Buổi</th><th>Ngày</th><th>Tình trạng</th><th>Thao tác</th></tr></thead><tbody>';
+ h+='<div class="panel"><div class="ph"><b>Buổi cần ghi nhận xét ('+noNote.length+')</b><div class="mini"><button class="pill" onclick="go(\'buoihoc\')">Mở trang Buổi học</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Buổi</th><th>Ngày</th><th>Tình trạng</th><th>Thao tác</th></tr></thead><tbody>';
  if(!noNote.length)h+='<tr><td class="empty" colspan="5">Đã ghi nhận xét đầy đủ - tốt!</td></tr>';
  noNote.slice(0,25).forEach(function(s){var st=bhState(s);
-  h+='<tr><td>'+lopLnk(s.class_id,s.class_id_name,"")+'</td><td>'+esc(s.session_number||"")+'</td><td>'+esc(s.session_date||"")+'</td><td>'+(st.noteOver?'<span class="chip red">Quá hạn</span>':'<span class="chip amber">Chờ ghi</span>')+'</td><td><button class="btn sm primary" onclick="bhNoteForm(\''+esc(s.session_id)+'\')"><i class="ti ti-writing"></i>Ghi nhận xét</button></td></tr>'});
+  h+='<tr><td>'+lopLnk(s.class_id,s.class_id_name,"")+'</td><td>'+esc(s.session_number||"")+'</td><td>'+esc(s.session_date||"")+'</td><td>'+(st.noteOver?'<span class="chip red">Quá hạn</span>':'<span class="chip amber">Chờ ghi</span>')+'</td><td><button class="btn primary sm" onclick="bhNoteForm(\''+esc(s.session_id)+'\')"><i class="ti ti-writing"></i>Ghi nhận xét</button></td></tr>'});
  h+='</tbody></table></div></div>';
  /* CÔNG THÁNG: số buổi đã dạy theo tháng - căn cứ chốt công trả lương buổi */
  (function(){var byM={},mo=[];
@@ -12690,14 +12693,14 @@ function renderHosoGV(){var id=window.GVID;var g=find("DL01","staff_id",id);
    byM[k].n++;if(num(x.teacher_late_minutes)>0)byM[k].late++;
    byM[k].cls[x.class_id_name||x.class_id]=(byM[k].cls[x.class_id_name||x.class_id]||0)+1});
   mo.sort().reverse();
-  h+='<div class="panel" style="margin-bottom:16px"><div class="ph"><b><i class="ti ti-report-money" style="margin-right:6px"></i>Công giảng dạy theo tháng</b><span class="mut" style="font-size:11.5px">buổi đã dạy xong - căn cứ chốt công; buổi trễ để đối chiếu</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Tháng</th><th>Buổi đã dạy</th><th>Trong đó trễ giờ</th><th>Chia theo lớp</th></tr></thead><tbody>';
+  h+='<div class="panel"><div class="ph"><b><i class="ti ti-report-money" style="margin-right:6px"></i>Công giảng dạy theo tháng</b><span class="mut" style="font-size:11.5px">buổi đã dạy xong - căn cứ chốt công; buổi trễ để đối chiếu</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Tháng</th><th>Buổi đã dạy</th><th>Trong đó trễ giờ</th><th>Chia theo lớp</th></tr></thead><tbody>';
   if(!mo.length)h+='<tr><td class="empty" colspan="4">Chưa có buổi hoàn thành nào.</td></tr>';
   mo.slice(0,6).forEach(function(k){var v=byM[k];
    h+='<tr><td><b>'+k.split("-")[1]+"/"+k.split("-")[0]+'</b></td><td>'+v.n+'</td><td>'+(v.late?'<span class="chip amber">'+v.late+'</span>':'0')+'</td><td style="font-size:11.5px">'+esc(Object.keys(v.cls).map(function(c){return c+" ("+v.cls[c]+")"}).join(" · "))+'</td></tr>'});
   h+='</tbody></table></div></div>'})();
  h+='<div class="panel"><div class="ph"><b>Bài tập chờ chấm ('+hwWait.length+')</b><div class="mini"><button class="pill" onclick="go(\'baitap\')">Mở trang Bài tập</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Bài</th><th>Kỹ năng</th><th>Nộp lúc</th><th>Trạng thái</th></tr></thead><tbody>';
  if(!hwWait.length)h+='<tr><td class="empty" colspan="5">Không còn bài chờ chấm.</td></tr>';
- hwWait.slice(0,25).forEach(function(x){h+='<tr><td>'+esc(x.student_name||x.student_id)+'</td><td>'+esc(x.homework_title||"")+'</td><td>'+esc(elabel(x.skill)||"")+'</td><td>'+esc(x.homework_submitted_time||"")+'</td><td>'+hwChip(x)+' <button class="btn sm primary" onclick="btJumpGrade(\''+esc(x.class_id||"")+'\',\''+esc(String(x.homework_title||"").replace(/'/g,""))+'\')"><i class="ti ti-writing"></i>Chấm</button></td></tr>'});
+ hwWait.slice(0,25).forEach(function(x){h+='<tr><td>'+esc(x.student_name||x.student_id)+'</td><td>'+esc(x.homework_title||"")+'</td><td>'+esc(elabel(x.skill)||"")+'</td><td>'+esc(x.homework_submitted_time||"")+'</td><td>'+hwChip(x)+' <button class="btn primary sm" onclick="btJumpGrade(\''+esc(x.class_id||"")+'\',\''+esc(String(x.homework_title||"").replace(/'/g,""))+'\')"><i class="ti ti-writing"></i>Chấm</button></td></tr>'});
  return h+'</tbody></table></div></div>'}
 /* ---------- HỒ SƠ NHÂN VIÊN theo vai trò (BC5 tư vấn / BC6 WOW / BC8 học vụ) ---------- */
 function openNV(id){window.NVID=id;go("hosonv")}
@@ -12731,7 +12734,7 @@ function renderHosoNV(){var id=window.NVID;var s=find("DL01","staff_id",id);
    ["CVR","Tỷ lệ chuyển đổi lead",cvrV==null?"—":Math.round(cvrV*100)+"%",cvrV==null?null:(cvrV>=kpiTh(/^CVR/,0.4)),"≥ "+kpiChip(/^CVR/,0.4,1)]]);
   h+='<div class="panel"><div class="ph"><b>Lead cần liên hệ ('+due.length+')</b><div class="mini"><button class="pill" onclick="go(\'nhaplead\')">Mở danh sách Lead</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Họ tên</th><th>SĐT</th><th>Trạng thái</th><th>Hẹn liên hệ</th><th>Thao tác</th></tr></thead><tbody>';
   if(!due.length)h+='<tr><td class="empty" colspan="6">Không có lead nào tới hẹn.</td></tr>';
-  due.slice(0,25).forEach(function(l){h+='<tr><td>'+esc(l.lead_id)+'</td><td>'+esc(l.full_name)+'</td><td>'+esc(l.phone_number||"")+'</td><td><span class="chip '+stCls(l.lead_status)+'">'+esc(elabel(l.lead_status))+'</span></td><td>'+esc(l.next_followup_time||"")+'</td><td><button class="btn sm primary" onclick="runStart(\''+esc(l.lead_id)+'\')"><i class="ti ti-player-play"></i>Xử lý</button></td></tr>'});
+  due.slice(0,25).forEach(function(l){h+='<tr><td>'+esc(l.lead_id)+'</td><td>'+esc(l.full_name)+'</td><td>'+esc(l.phone_number||"")+'</td><td><span class="chip '+stCls(l.lead_status)+'">'+esc(elabel(l.lead_status))+'</span></td><td>'+esc(l.next_followup_time||"")+'</td><td><button class="btn primary sm" onclick="runStart(\''+esc(l.lead_id)+'\')"><i class="ti ti-player-play"></i>Xử lý</button></td></tr>'});
   h+='</tbody></table></div></div>'}
  if(isWow){
   var tAll=rows("DL03").filter(function(t){return String(t.graded_by||"")===id||!t.graded_by});
@@ -12875,7 +12878,7 @@ function renderHtToday(embed){
   ["ti-star",wowT.length,"Buổi WOW hôm nay","#DB2777",""],
   ["ti-book",hwQ.length,"Bài chờ chấm","#7C3AED","SLA "+slaChip("slaHomeworkGrading_hours",48)],
   ["ti-message-2",owe.length,"Buổi nợ nhận xét","#E24B4A","SLA "+slaChip("slaTeacherNote_hours",48)]]);
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-calendar-check" style="margin-right:6px"></i>Buổi dạy hôm nay ('+ses.length+')</b></div>';
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-calendar-check" style="margin-right:6px"></i>Buổi dạy hôm nay ('+ses.length+')</b></div>';
  if(!ses.length)h+='<div class="empty">Hôm nay không có buổi nào'+(gid?' của GV này':'')+'.</div>';
  h+='<div class="obcards" style="padding:12px">';
  ses.forEach(function(x){var sp=sesPlan(x);var d=pvnd(x.session_date);
@@ -12903,7 +12906,7 @@ function renderHtToday(embed){
     kê và không có nút nào bấm - ba panel bên dưới đều lọc DL11/DL13 theo teacher_id, mà giáo
     viên WOW (wow_coach) có 0 dòng ở cả hai bảng đó. Nghĩa là coach mở app buổi sáng thì màn
     hình nói với họ "hôm nay anh hết việc", trong khi họ sở hữu toàn bộ 70 buổi WOW của trung tâm. */
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-star" style="margin-right:6px"></i>Buổi WOW hôm nay ('+wowT.length+')</b><div class="mini"><button class="pill" onclick="go(\'wow\')">Mở trang WOW</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Học viên</th><th>Kỹ năng</th><th>Trọng tâm</th><th>Trạng thái</th><th></th></tr></thead><tbody>';
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-star" style="margin-right:6px"></i>Buổi WOW hôm nay ('+wowT.length+')</b><div class="mini"><button class="pill" onclick="go(\'wow\')">Mở trang WOW</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Học viên</th><th>Kỹ năng</th><th>Trọng tâm</th><th>Trạng thái</th><th></th></tr></thead><tbody>';
  if(!wowT.length)h+='<tr><td class="empty" colspan="6">Hôm nay không có buổi WOW nào'+(gid?' của người này':'')+'.</td></tr>';
  wowT.sort(function(a,b){return (pvnd(a.wow_session_date)||0)-(pvnd(b.wow_session_date)||0)});
  wowT.forEach(function(w){var d=pvnd(w.wow_session_date);
@@ -12911,13 +12914,13 @@ function renderHtToday(embed){
    '<td>'+esc(elabel(w.wow_skill)||w.wow_skill||"-")+'</td>'+
    '<td style="white-space:normal">'+esc(w.wow_content_focus||w.notes||"-")+'</td>'+
    '<td><span class="chip '+stCls(w.wow_status)+'">'+esc(elabel(w.wow_status)||"")+'</span></td>'+
-   '<td><button class="btn sm primary" onclick="wowNote(\''+esc(w.wow_id)+'\')"><i class="ti ti-writing"></i>Ghi nội dung buổi</button></td></tr>'});
+   '<td><button class="btn primary sm" onclick="wowNote(\''+esc(w.wow_id)+'\')"><i class="ti ti-writing"></i>Ghi nội dung buổi</button></td></tr>'});
  h+='</tbody></table></div></div>';
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-book" style="margin-right:6px"></i>Bài chờ chấm ('+hwQ.length+')</b></div><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Bài</th><th>Lớp</th><th>Nộp lúc</th><th></th></tr></thead><tbody>';
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-book" style="margin-right:6px"></i>Bài chờ chấm ('+hwQ.length+')</b></div><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Bài</th><th>Lớp</th><th>Nộp lúc</th><th></th></tr></thead><tbody>';
  if(!hwQ.length)h+='<tr><td class="empty" colspan="5">Không còn bài chờ chấm - tốt!</td></tr>';
  hwQ.slice(0,12).forEach(function(x){
   h+='<tr><td>'+esc(x.student_name||x.student_id)+'</td><td>'+esc(x.homework_title||"")+'</td><td>'+lopLnk(x.class_id,x.class_id_name,"")+'</td><td>'+esc(x.homework_submitted_time||"")+'</td>'+
-   '<td><button class="btn sm primary" onclick="btJumpGrade(\''+esc(x.class_id||"")+'\',\''+esc(String(x.homework_title||"").replace(/'/g,""))+'\')"><i class="ti ti-writing"></i>Chấm</button></td></tr>'});
+   '<td><button class="btn primary sm" onclick="btJumpGrade(\''+esc(x.class_id||"")+'\',\''+esc(String(x.homework_title||"").replace(/'/g,""))+'\')"><i class="ti ti-writing"></i>Chấm</button></td></tr>'});
  if(hwQ.length>12)h+='<tr><td colspan="5" class="mut" style="font-size:11px;padding:6px">... còn '+(hwQ.length-12)+' bài - vào trang Bài tập để chấm tiếp.</td></tr>';
  h+='</tbody></table></div></div>';
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-message-2" style="margin-right:6px"></i>Buổi nợ nhận xét ('+owe.length+')</b></div><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Buổi</th><th>Ngày dạy</th><th></th></tr></thead><tbody>';
@@ -12973,7 +12976,7 @@ function renderLichTuan(embed){
  h+='<div class="panel"><div class="tbwrap"><table class="dt" style="table-layout:fixed;min-width:900px"><thead><tr><th style="width:150px">'+(mode==="gv"?"Giảng viên":"Lớp")+'</th>';
  var DNAMES=["T2","T3","T4","T5","T6","T7","CN"];
  days.forEach(function(d,i){var isToday=sameDay(d,new Date());
-  h+='<th'+(isToday?' style="background:#EAF2FB"':'')+'>'+DNAMES[i]+' '+fmtD(d)+(isToday?' · hôm nay':'')+'</th>'});
+  h+='<th'+(isToday?' style="background:#EEF2F6"':'')+'>'+DNAMES[i]+' '+fmtD(d)+(isToday?' · hôm nay':'')+'</th>'});
  h+='</tr></thead><tbody>';
  if(!order.length)h+='<tr><td class="empty" colspan="8">Tuần này không có buổi học / WOW / test nào.</td></tr>';
  order.forEach(function(k){var list=rowsK[k];
@@ -13088,7 +13091,7 @@ function gvBackupForm(sesId){
  if(!okL.length)h+='<div class="empty">Không còn ai rảnh và hợp cơ sở cho buổi này.</div>';
  okL.forEach(function(r){
   h+='<div class="absrow"><div class="absi"><b>'+esc(r.g.full_name)+'</b><span>'+esc(r.why||"rảnh giờ này")+'</span></div>'+
-   '<div class="absa"><button class="btn sm primary" onclick="sesSetTeacher(\''+esc(sesId)+'\',\''+esc(r.g.staff_id)+'\',(document.getElementById(\'f_gvly\')||{}).value||\'\')"><i class="ti ti-check"></i>Đẩy người này</button></div></div>'});
+   '<div class="absa"><button class="btn primary sm" onclick="sesSetTeacher(\''+esc(sesId)+'\',\''+esc(r.g.staff_id)+'\',(document.getElementById(\'f_gvly\')||{}).value||\'\')"><i class="ti ti-check"></i>Đẩy người này</button></div></div>'});
  h+='</div>';
  if(noL.length){h+='<div class="dsec">Không thay được ('+noL.length+')</div><div class="pbody" style="padding:0">';
   noL.forEach(function(r){h+='<div class="absrow" style="opacity:.7"><div class="absi"><b>'+esc(r.g.full_name)+'</b><span>'+esc(r.no)+'</span></div></div>'});
@@ -13118,7 +13121,7 @@ function renderGvdp(embed){
   '<span class="tbcnt">'+ses.length+' buổi</span>');
  ses=fltApply("gvdp",ses);
  h+=pgBar("gvdp",ses.length);
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b>Buổi học trong ngày</b><span class="mut" style="font-size:11.5px">bấm "Đẩy người thay" để xem ai nhận được</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Lớp</th><th>Cơ sở / hình thức</th><th>GV đang phụ trách</th><th>Người thay được</th><th></th></tr></thead><tbody>';
+ h+='<div class="panel"><div class="ph"><b>Buổi học trong ngày</b><span class="mut" style="font-size:11.5px">bấm "Đẩy người thay" để xem ai nhận được</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Lớp</th><th>Cơ sở / hình thức</th><th>GV đang phụ trách</th><th>Người thay được</th><th></th></tr></thead><tbody>';
  if(!ses.length)h+='<tr><td class="empty" colspan="6">Ngày này không có buổi học nào.</td></tr>';
  ses.forEach(function(x){var c=find("DL10","class_id",x.class_id)||{};
   var d=pvnd(x.session_date);var n=gvBackup(x).filter(function(r){return r.ok}).length;
@@ -13126,7 +13129,7 @@ function renderGvdp(embed){
    '<td>'+(clsOnline(c)?'<span class="chip blue">Online</span>':'<span class="chip">'+esc(elabel(c.branch)||c.branch||"-")+'</span> <span class="mut" style="font-size:11px">'+esc(elabel(c.learning_mode)||"")+'</span>')+'</td>'+
    '<td>'+(String(x.teacher_id||"").trim()?nsLnk(x.teacher_id,x.teacher_id_name,""):'<span class="chip red">chưa gán</span>')+'</td>'+
    '<td>'+(n?'<span class="chip green">'+n+' người</span>':'<span class="chip red">không có ai</span>')+'</td>'+
-   '<td><button class="btn sm primary" onclick="gvBackupForm(\''+esc(x.session_id)+'\')"><i class="ti ti-user-plus"></i>Đẩy người thay</button></td></tr>'});
+   '<td><button class="btn primary sm" onclick="gvBackupForm(\''+esc(x.session_id)+'\')"><i class="ti ti-user-plus"></i>Đẩy người thay</button></td></tr>'});
  h+='</tbody></table></div></div>';
  h+='<div class="panel"><div class="ph"><b>Giáo viên trống lịch hôm nay ('+free.length+')</b><span class="mut" style="font-size:11.5px">không có buổi nào trong ngày - nguồn dự phòng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giáo viên</th><th>Cơ sở</th><th>Đã dạy ở</th><th>Buổi hôm nay</th></tr></thead><tbody>';
  if(!free.length)h+='<tr><td class="empty" colspan="4">Hôm nay giáo viên nào cũng có lịch - không còn người dự phòng.</td></tr>';
@@ -13199,7 +13202,7 @@ function khoiLuongHTML(){
  var tong=L.reduce(function(a,x){return a+x.tong},0);
  var deu=L.length?tong/L.length:0;
  var top=L[0],trong=L.filter(function(x){return !x.tong}).length;
- var h='<div class="panel" style="margin-top:14px" data-tour="khoiluong"><div class="ph"><b><i class="ti ti-users" style="margin-right:6px"></i>Khối lượng việc theo nhân viên</b>'+
+ var h='<div class="panel" style="margin-top:16px" data-tour="khoiluong"><div class="ph"><b><i class="ti ti-users" style="margin-right:6px"></i>Khối lượng việc theo nhân viên</b>'+
   '<span class="mut" style="font-size:11.5px">'+tong+' việc đang mở · chia đều là '+(Math.round(deu*10)/10)+' việc/người'+
   (top&&tong?(' · nhiều nhất '+esc(top.ten)+' giữ '+top.tong+' việc'):'')+
   (trong?(' · '+trong+' người đang trống'):'')+'</span></div>'+
@@ -13221,7 +13224,7 @@ function gvTaiHTML(){
  var deu=L.length?tong/L.length:0;
  var trong=L.filter(function(x){return !x.toi}).length;
  var top=L[0];
- var h='<div class="panel" style="margin-top:14px"><div class="ph"><b><i class="ti ti-scale" style="margin-right:6px"></i>Tải giảng viên '+ky+' ngày tới</b>'+
+ var h='<div class="panel" style="margin-top:16px"><div class="ph"><b><i class="ti ti-scale" style="margin-right:6px"></i>Tải giảng viên '+ky+' ngày tới</b>'+
   '<span class="mut" style="font-size:11.5px">chia đều là '+(Math.round(deu*10)/10)+' buổi/người'+
   (top&&tong?(' · nhiều nhất '+esc(top.ten)+' ôm '+Math.round(top.toi/tong*100)+'%'):'')+
   (trong?(' · '+trong+' người không có buổi nào'):'')+'</span>'+
@@ -13292,7 +13295,7 @@ function renderPhong(embed){
   ["ti-user-exclamation",rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()}).length,"Lớp mở chưa có GV chính","#DB2777","giao lớp ngay"],
   ["ti-device-laptop",onl,"Lớp online","#0D9488","không ràng buộc phòng"]]);
  h+=pgBar("phong",cl.length);
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b>Các điểm đụng ('+cl.length+')</b><span class="mut" style="font-size:11.5px">hai mục cách nhau dưới '+slaChip("sessionSpan_hours",2,"giờ")+' thì coi là đụng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Loại</th><th>Ngày giờ</th><th>Chi tiết</th><th>Cơ sở</th><th></th></tr></thead><tbody>';
+ h+='<div class="panel"><div class="ph"><b>Các điểm đụng ('+cl.length+')</b><span class="mut" style="font-size:11.5px">hai mục cách nhau dưới '+slaChip("sessionSpan_hours",2,"giờ")+' thì coi là đụng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Loại</th><th>Ngày giờ</th><th>Chi tiết</th><th>Cơ sở</th><th></th></tr></thead><tbody>';
  if(!cl.length)h+='<tr><td class="empty" colspan="5">Không có điểm đụng nào - lịch sạch.</td></tr>';
  cl.slice(0,80).forEach(function(x){var d=pvnd(x.a.session_date);
   var ca=find("DL10","class_id",x.a.class_id)||{};
@@ -13301,18 +13304,18 @@ function renderPhong(embed){
    '<td style="white-space:normal">'+esc(x.msg)+'</td>'+
    '<td>'+esc(clsOnline(ca)?"online":(elabel(ca.branch)||ca.branch||"-"))+'</td>'+
    '<td><button class="btn sm" onclick="goDD(\''+esc(x.a.class_id)+'\',\''+esc(x.a.session_id)+'\')"><i class="ti ti-arrow-right"></i>Mở buổi</button>'+
-   (x.t==="gv"?' <button class="btn sm primary" onclick="gvBackupForm(\''+esc(x.b.session_id)+'\')"><i class="ti ti-user-plus"></i>Đổi GV</button>':'')+'</td></tr>'});
+   (x.t==="gv"?' <button class="btn primary sm" onclick="gvBackupForm(\''+esc(x.b.session_id)+'\')"><i class="ti ti-user-plus"></i>Đổi GV</button>':'')+'</td></tr>'});
  h+='</tbody></table></div></div>';
  /* Lớp đang mở mà CHƯA CÓ GV CHÍNH: trước đây chỉ là một dòng chữ đỏ trên lịch tuần, không có
     lối nào để xử lý ngay. Nay có danh sách + nút giao lớp. */
  var noGv=rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()});
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b>Lớp đang mở chưa có giáo viên chính ('+noGv.length+')</b><span class="mut" style="font-size:11.5px">giao lớp ngay tại đây</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Cơ sở</th><th>Hình thức</th><th>Lịch</th><th>Sĩ số</th><th></th></tr></thead><tbody>';
+ h+='<div class="panel"><div class="ph"><b>Lớp đang mở chưa có giáo viên chính ('+noGv.length+')</b><span class="mut" style="font-size:11.5px">giao lớp ngay tại đây</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Cơ sở</th><th>Hình thức</th><th>Lịch</th><th>Sĩ số</th><th></th></tr></thead><tbody>';
  if(!noGv.length)h+='<tr><td class="empty" colspan="6">Lớp đang mở nào cũng đã có giáo viên chính.</td></tr>';
  noGv.forEach(function(c){
   h+='<tr><td>'+lopLnk(c.class_id,c.class_name,"")+'</td><td>'+esc(elabel(c.branch)||c.branch||"-")+'</td>'+
    '<td>'+esc(elabel(c.learning_mode)||"-")+'</td><td>'+esc(c.class_schedule||"-")+'</td>'+
    '<td>'+esc(num(c.current_enrollment))+'/'+esc(c.class_capacity||"?")+'</td>'+
-   '<td><button class="btn sm primary" onclick="clsTeacherForm(\''+esc(c.class_id)+'\')"><i class="ti ti-user-cog"></i>Giao lớp</button></td></tr>'});
+   '<td><button class="btn primary sm" onclick="clsTeacherForm(\''+esc(c.class_id)+'\')"><i class="ti ti-user-cog"></i>Giao lớp</button></td></tr>'});
  h+='</tbody></table></div></div>';
  h+='<div class="panel"><div class="ph"><b>Lớp học tại chỗ chưa ghi phòng ('+nr.length+')</b><span class="mut" style="font-size:11.5px">lớp online không cần phòng nên không nằm trong danh sách này</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Cơ sở</th><th>Hình thức</th><th>Lịch</th><th>Đang ghi gì</th></tr></thead><tbody>';
  if(!nr.length)h+='<tr><td class="empty" colspan="5">Lớp tại chỗ nào cũng đã có phòng.</td></tr>';
@@ -13503,7 +13506,7 @@ function clsTeacherForm(cid){
  if(!okL.length)h+='<div class="empty">Không có ai vừa hợp cơ sở vừa trống lịch của lớp này.</div>';
  okL.forEach(function(r){
   h+='<div class="absrow"><div class="absi"><b>'+esc(r.g.full_name)+'</b><span>'+esc(r.why||"")+'</span></div>'+
-   '<div class="absa"><button class="btn sm primary" onclick="clsSetTeacher(\''+esc(cid)+'\',\''+esc(r.g.staff_id)+'\',(document.getElementById(\'ct_why\')||{}).value||\'\')"><i class="ti ti-check"></i>Giao lớp này</button></div></div>'});
+   '<div class="absa"><button class="btn primary sm" onclick="clsSetTeacher(\''+esc(cid)+'\',\''+esc(r.g.staff_id)+'\',(document.getElementById(\'ct_why\')||{}).value||\'\')"><i class="ti ti-check"></i>Giao lớp này</button></div></div>'});
  h+='</div>';
  var noL=L.filter(function(r){return !r.ok});
  if(noL.length){h+='<div class="dsec">Không nhận được ('+noL.length+')</div><div class="pbody" style="padding:0">';
@@ -13913,7 +13916,7 @@ function tourMenu(lv){var L=lv||window.TOURLVSEL||"";
   any=true;
   var mine=T.role&&me&&(elabel(me.role)||"").indexOf(T.role.split(" ")[0])>=0;
   h+='<div class="tourmi" onclick="tourAsk(\''+k+'\')"><span class="tmi"><i class="ti '+(T.ic||"ti-book")+'"></i></span>'+
-   '<div style="flex:1"><b>'+esc(T.t)+(T.role?' <span class="chip '+(mine?"green":"gray")+'" style="font-size:9.5px">'+esc(T.role)+'</span>':'')+'</b>'+
+   '<div style="flex:1"><b>'+esc(T.t)+(T.role?' <span class="chip '+(mine?"green":"gray")+'" style="font-size:10px">'+esc(T.role)+'</span>':'')+'</b>'+
    '<span>'+esc(T.d)+'</span></div><span class="chip" style="align-self:center">'+T.steps.length+' bước</span></div>'});
  if(!any)h+='<div class="empty">Chưa có bài hướng dẫn ở cấp độ này.</div>';
  h+='</div>';
@@ -14082,10 +14085,10 @@ function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
  b.innerHTML=(live?'':'<div class="tourdots">'+dots+'</div>')+
   '<div class="tnum">'+esc(T.t)+' · '+(live?('việc '+(TOUR.i+1)+'/'+n+' của lượt này · <b style="color:var(--red)">còn '+tourWorkLeft()+'</b>'+(function(){var t=0;try{t=workAll().length}catch(e){}return t>n?(' · cả hàng chờ '+t):''})()):('bước '+(TOUR.i+1)+'/'+n))+'</div>'+
   '<h5>'+esc(st.t)+'</h5><p>'+esc(st.d)+'</p>'+
-  ((window.__tourMiss&&!st.dock&&!st.mo)?'<div class="thint" style="background:#FFF8E9;color:#7A5B12"><i class="ti ti-alert-triangle" style="margin-right:5px"></i>Chỗ cần trỏ không có trên màn hình của bạn (khác chức danh, hoặc trang chưa có dữ liệu) - đọc phần mô tả rồi bấm Tiếp theo.</div>':'')+
+  ((window.__tourMiss&&!st.dock&&!st.mo)?'<div class="thint" style="background:#FFFBF2;color:#7A5B12"><i class="ti ti-alert-triangle" style="margin-right:5px"></i>Chỗ cần trỏ không có trên màn hình của bạn (khác chức danh, hoặc trang chưa có dữ liệu) - đọc phần mô tả rồi bấm Tiếp theo.</div>':'')+
   (st.hint?'<div class="thint"><i class="ti ti-hand-finger" style="margin-right:5px"></i><b>Việc cần làm:</b> '+esc(st.hint)+'</div>':'')+
   /* Bài "dọn việc": nút thao tác nằm NGAY TRONG hộp guide - không bắt người ta đi tìm nút trên trang */
-  (st.item?('<div class="tdo"><button class="btn sm primary" onclick="tourDo()"><i class="ti ti-tool"></i>Làm việc này</button>'+
+  (st.item?('<div class="tdo"><button class="btn primary sm" onclick="tourDo()"><i class="ti ti-tool"></i>Làm việc này</button>'+
     '<button class="btn sm" onclick="tourNext()" data-tip="Để lại việc này, sang việc kế"><i class="ti ti-player-skip-forward"></i>Để sau</button></div>'):'')+
   (function(){var r=tourChk(st);if(r===null)return "";
    if(live)return '<div class="tchk '+(r?"ok":"")+'"><i class="ti '+(r?"ti-circle-check":"ti-clock")+'"></i>'+
@@ -14095,7 +14098,7 @@ function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
     (r?'':'<button class="btn sm" style="margin-left:auto" onclick="tourChkNow()"><i class="ti ti-refresh"></i>Kiểm tra lại</button>')+'</div>'})()+
   '<div class="tfoot">'+
    (TOUR.i>0?'<button class="btn sm" onclick="tourPrev()"><i class="ti ti-chevron-left"></i>Quay lại</button>':'')+
-   '<button class="btn sm primary" onclick="tourNext()">'+(TOUR.i>=n-1?'<i class="ti ti-check"></i>Hoàn tất':'Tiếp theo<i class="ti ti-chevron-right"></i>')+'</button>'+
+   '<button class="btn primary sm" onclick="tourNext()">'+(TOUR.i>=n-1?'<i class="ti ti-check"></i>Hoàn tất':'Tiếp theo<i class="ti ti-chevron-right"></i>')+'</button>'+
    '<span class="sp"></span>'+
    (live?'':'<button class="btn sm" onclick="tourRestart()" title="Quay về bước 1"><i class="ti ti-restore"></i>Làm lại</button>')+
    /* Bài dọn việc KHÔNG có nút Đóng: đóng hẳn là mất sạch lượt đang dọn. Chỉ thu gọn xuống nút góc
@@ -14206,7 +14209,7 @@ function tourWorkBuild(){
    d:(x.who?(x.who+" - "):"")+String(x.what||""),
    hint:(x.sev==="red"?"Việc này ĐÃ QUÁ HẠN - làm trước. ":"")+"Bấm nút bên dưới, app mở đúng màn thao tác.",
    item:x,
-   do:slaBtn(x,"btn sm primary"),
+   do:slaBtn(x,"btn primary sm"),
    /* xong = việc BIẾN MẤT khỏi hàng chờ. Không có nút "tôi đã làm". */
    chk:function(){return !workAll().some(function(y){return slaKey(y)===key})}}});
  return {lv:"donviec",t:"Dọn việc của bạn",ic:"ti-checklist",dock:1,live:1,
@@ -14226,7 +14229,7 @@ function tourWorkBuildFor(sid){
    t:(x.grp||x.cat||"Việc cần làm"),
    d:String(x.what||""),
    hint:(x.sev==="red"?"Việc này ĐÃ QUÁ HẠN - làm trước. ":"")+"Bấm nút bên dưới, app mở đúng màn thao tác.",
-   item:x,do:slaBtn(x,"btn sm primary"),
+   item:x,do:slaBtn(x,"btn primary sm"),
    chk:function(){return !workAll().some(function(y){return slaKey(y)===key})}}});
  return {lv:"donviec",t:"Xử lý việc của "+(ten||sid),ic:"ti-user-check",dock:1,live:1,
   d:Q.length+" việc đang chờ trên hồ sơ này",steps:steps}}
@@ -14293,7 +14296,7 @@ function tourWorkSync(){
    t:(L[i].grp||L[i].cat||"Việc cần làm"),
    d:(L[i].who?(L[i].who+" - "):"")+String(L[i].what||""),
    hint:(L[i].sev==="red"?"Việc này ĐÃ QUÁ HẠN - làm trước. ":"")+"Bấm nút bên dưới, app mở đúng màn thao tác.",
-   item:L[i],do:slaBtn(L[i],"btn sm primary"),
+   item:L[i],do:slaBtn(L[i],"btn primary sm"),
    chk:(function(kk){return function(){return !workAll().some(function(y){return slaKey(y)===kk})}})(k)})}
  T.steps=giu;
  var j=-1;for(var q=0;q<giu.length;q++)if(giu[q].key===curKey){j=q;break}
@@ -14469,8 +14472,8 @@ function tkCard(t,side){var s=tkSt(t),TY=TKTYPE[tkType(t)]||TKTYPE.assign,P=TKPR
  var h='<div class="tkrow'+(tkOver(t)?" over":"")+'" onclick="tkOpen(\''+esc(t.task_id)+'\')">';
  h+='<span class="tkic" title="'+esc(TY.d)+'"><i class="ti '+TY.ic+'"></i></span>';
  h+='<div class="tkmain"><div class="tktt">'+esc(t.title||"(không tiêu đề)")+
-  (tkReq(t)?' <span class="chip red" style="font-size:9.5px">BẮT BUỘC</span>':' <span class="chip gray" style="font-size:9.5px">không bắt buộc</span>')+
-  (P.c?' <span class="chip '+P.c+'" style="font-size:9.5px">'+esc(P.t)+'</span>':'')+'</div>';
+  (tkReq(t)?' <span class="chip red" style="font-size:10px">BẮT BUỘC</span>':' <span class="chip gray" style="font-size:10px">không bắt buộc</span>')+
+  (P.c?' <span class="chip '+P.c+'" style="font-size:10px">'+esc(P.t)+'</span>':'')+'</div>';
  h+='<div class="tkmeta">'+esc(TY.t)+' · '+who+' · <b'+(tkOver(t)?' style="color:var(--red)"':'')+'>'+esc(tkDueTxt(t))+'</b>'+
   (t.related_id?' · <a class="lnk" '+tkRelGo(t)+'>'+esc(tkRelLabel(t))+'</a>':'')+
   (nc?' · <i class="ti ti-message-circle" style="font-size:12px"></i> '+nc:'')+'</div></div>';
@@ -14480,12 +14483,12 @@ function tkBtns(t,side){var s=tkSt(t),me=tkMeId(),h='<div class="tkacts" onclick
  var amAssignee=(String(t.assignee_id||"")===me)||!tkIsStaff();
  var amAssigner=(String(t.assigner_id||"")===me)||!tkIsStaff();
  if(side==="mine"&&amAssignee){
-  if(s==="new"){h+='<button class="btn sm primary" onclick="tkAccept(\''+esc(t.task_id)+'\')"><i class="ti ti-check"></i>Nhận việc</button>';
+  if(s==="new"){h+='<button class="btn primary sm" onclick="tkAccept(\''+esc(t.task_id)+'\')"><i class="ti ti-check"></i>Nhận việc</button>';
    if(!tkReq(t))h+='<button class="btn sm" onclick="tkDeclineForm(\''+esc(t.task_id)+'\')"><i class="ti ti-x"></i>Từ chối</button>'}
-  else if(s==="accepted")h+='<button class="btn sm primary" onclick="tkDoneForm(\''+esc(t.task_id)+'\')"><i class="ti ti-flag-check"></i>Báo xong</button>';
+  else if(s==="accepted")h+='<button class="btn primary sm" onclick="tkDoneForm(\''+esc(t.task_id)+'\')"><i class="ti ti-flag-check"></i>Báo xong</button>';
  }
  if(side==="given"&&amAssigner){
-  if(s==="done"){h+='<button class="btn sm primary" onclick="tkConfirm(\''+esc(t.task_id)+'\')"><i class="ti ti-circle-check"></i>Xác nhận</button>'+
+  if(s==="done"){h+='<button class="btn primary sm" onclick="tkConfirm(\''+esc(t.task_id)+'\')"><i class="ti ti-circle-check"></i>Xác nhận</button>'+
    '<button class="btn sm" onclick="tkReturnForm(\''+esc(t.task_id)+'\')"><i class="ti ti-corner-down-left"></i>Trả lại</button>'}
   else if(tkLive(t)){h+='<button class="btn sm" onclick="tkRemind(\''+esc(t.task_id)+'\')" title="Gửi nhắc tới người nhận"><i class="ti ti-bell-ringing"></i>Nhắc</button>'+
    '<button class="btn sm" onclick="tkCancel(\''+esc(t.task_id)+'\')"><i class="ti ti-trash"></i>Hủy</button>'}
@@ -14719,7 +14722,7 @@ function tkReport(){var all=srows("DL23");
   ["ti-circle-check",totDone,"Đã hoàn thành","#16A34A",tot?Math.round(totDone/tot*100)+"% tổng việc":""],
   ["ti-clock-exclamation",totOver,"Đang quá hạn","#E24B4A",totOver?"cần đốc thúc":"không có"],
   ["ti-history",doneAll?Math.round((doneAll-totLate)/doneAll*100)+"%":"-","Xong đúng hạn","#0D9488",totLate?(totLate+" việc trễ"):"không có việc trễ"]]);
- h+='<div class="panel" style="margin-bottom:12px"><div class="ph"><b><i class="ti ti-users" style="margin-right:6px"></i>Theo người nhận việc</b></div>';
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-users" style="margin-right:6px"></i>Theo người nhận việc</b></div>';
  h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Nhân viên</th><th>Được giao</th><th>Đang làm</th><th>Quá hạn</th><th>Đã xong</th><th>Trễ hạn</th><th>Đúng hạn</th></tr></thead><tbody>';
  if(!arr.length)h+='<tr><td class="empty" colspan="7">Chưa có việc nào.</td></tr>';
  arr.forEach(function(p){
@@ -14885,11 +14888,11 @@ function giaGioHTML(){
   '(giờ vào lớp tới giờ kết thúc buổi), nhân đơn giá tra theo <b>giảng viên x loại ngày x ca</b>. '+
   'Ranh giới ca: trước '+slaChip("shiftNoon_hour",12,"h")+' là ca sáng, tới '+slaChip("shiftEvening_hour",17,"h")+' là ca chiều, sau đó là ca tối. '+
   'Ô nào chưa khai thì dùng mức mặc định; mặc định cũng chưa khai thì dùng '+slaChip("teacherPayPerHour",180000,"đ/giờ")+'.</div>';
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-table" style="margin-right:6px"></i>Mức mặc định - áp cho mọi giảng viên chưa có mức riêng</b>'+
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-table" style="margin-right:6px"></i>Mức mặc định - áp cho mọi giảng viên chưa có mức riêng</b>'+
   '<span class="mut" style="font-size:11.5px">đơn vị: đồng/giờ · sửa xong bấm ra ngoài ô là lưu</span></div>'+
   giaGioBang("")+'</div>';
  var co=GV.filter(function(g){return DAYK.some(function(d){return SHIFTK.some(function(k){return rateGet(g.staff_id,d[0],k[0])!=null})})});
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-user-dollar" style="margin-right:6px"></i>Mức riêng của từng giảng viên ('+co.length+'/'+GV.length+' người đã khai)</b>'+
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-user-dollar" style="margin-right:6px"></i>Mức riêng của từng giảng viên ('+co.length+'/'+GV.length+' người đã khai)</b>'+
   '<span class="mut" style="font-size:11.5px">để trống một ô = người này ăn theo mức mặc định của ca đó</span></div><div class="pbody">'+
   '<div class="fld" style="max-width:420px"><label>Chọn giảng viên</label><select onchange="window.GGSTAFF=this.value;reRender(\'settings\')">'+
   '<option value="">-- chọn để khai mức riêng --</option>'+
@@ -14964,7 +14967,7 @@ function renderCong(){
    '<td>'+(x.late?'<span class="chip amber">'+x.late+'</span>':'0')+'</td>'+
    '<td>'+(x.noNote?'<span class="chip red">'+x.noNote+'</span>':'<span class="chip green">0</span>')+'</td>'+
    '<td style="font-variant-numeric:tabular-nums"><b>'+vnd(x.tien)+'</b></td></tr>'});
- h+='<tr style="background:#F4F7FA;font-weight:800"><td colspan="2">TỔNG</td><td>'+tot+'</td><td>'+(Math.round(totG*10)/10)+'h</td><td colspan="2"></td><td>'+totW+'</td><td>'+totT+'</td><td></td><td>'+noNote+'</td><td style="font-variant-numeric:tabular-nums">'+vnd(tien)+'</td></tr>';
+ h+='<tr style="background:#FAFBFD;font-weight:800"><td colspan="2">TỔNG</td><td>'+tot+'</td><td>'+(Math.round(totG*10)/10)+'h</td><td colspan="2"></td><td>'+totW+'</td><td>'+totT+'</td><td></td><td>'+noNote+'</td><td style="font-variant-numeric:tabular-nums">'+vnd(tien)+'</td></tr>';
  return h+'</tbody></table></div></div>'}
 /* ===== SỔ THU HỌC PHÍ: tab ĐÃ THU (DL07) + tab DỰ THU (DL06b) ===== */
 function sothuTab(k){window.STTAB=k;reRender("dsthanhtoan")}
@@ -15014,7 +15017,7 @@ function renderDuthu(){
   if(!byM[k]){byM[k]={n:0,v:0};mo.push(k)}
   byM[k].n++;byM[k].v+=r.left});
  mo.sort();
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-report-money" style="margin-right:6px"></i>Dự thu theo tháng</b><span class="mut" style="font-size:11.5px">theo hạn từng đợt - tiền chưa vào, không phải doanh thu đã ghi nhận</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Tháng đến hạn</th><th>Số đợt</th><th>Dự thu</th></tr></thead><tbody>';
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-report-money" style="margin-right:6px"></i>Dự thu theo tháng</b><span class="mut" style="font-size:11.5px">theo hạn từng đợt - tiền chưa vào, không phải doanh thu đã ghi nhận</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Tháng đến hạn</th><th>Số đợt</th><th>Dự thu</th></tr></thead><tbody>';
  if(!mo.length)h+='<tr><td class="empty" colspan="3">Không còn khoản nào phải thu - sạch nợ.</td></tr>';
  mo.forEach(function(k){var v=byM[k];
   h+='<tr><td><b>'+esc(k==="chua-hen"?"Chưa hẹn ngày":(k.split("-")[1]+"/"+k.split("-")[0]))+'</b></td><td>'+v.n+'</td><td style="font-variant-numeric:tabular-nums">'+vnd(v.v)+'</td></tr>'});
@@ -15022,7 +15025,7 @@ function renderDuthu(){
  /* NỢ TREO CỦA NGƯỜI ĐÃ RỜI - tách khỏi dự thu vì đây KHÔNG phải tiền sắp về */
  (function(){var T=noTreoList();if(!T.length)return;
   var tong=T.reduce(function(a,r){return a+r.left},0);
-  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-user-off" style="margin-right:6px"></i>Nợ treo của học viên đã rời ('+T.length+' đơn · '+vnd(tong)+')</b>'+
+  h+='<div class="panel"><div class="ph"><b><i class="ti ti-user-off" style="margin-right:6px"></i>Nợ treo của học viên đã rời ('+T.length+' đơn · '+vnd(tong)+')</b>'+
    '<span class="mut" style="font-size:11.5px">đơn vẫn để "đã xác nhận" mà người thì đã bỏ học hoặc đã chuyển - KHÔNG tính vào dự thu ở trên</span></div>'+
    '<div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Tình trạng</th><th>Đơn</th><th>Khóa</th><th>Còn nợ</th><th>Quyết</th></tr></thead><tbody>';
   T.forEach(function(r){
@@ -15030,7 +15033,7 @@ function renderDuthu(){
     '<td><span class="chip red">'+esc(elabel(r.s.student_status)||r.s.student_status||"-")+'</span></td>'+
     '<td>'+esc(r.e.enrollment_id)+'</td><td>'+esc(r.e.course_id_name||r.e.course_id||"-")+'</td>'+
     '<td style="font-variant-numeric:tabular-nums"><b style="color:var(--red)">'+vnd(r.left)+'</b></td>'+
-    '<td><button class="btn sm primary" onclick="payForm(\''+esc(r.e.enrollment_id)+'\')"><i class="ti ti-cash"></i>Thu dứt</button> '+
+    '<td><button class="btn primary sm" onclick="payForm(\''+esc(r.e.enrollment_id)+'\')"><i class="ti ti-cash"></i>Thu dứt</button> '+
     '<button class="btn sm" onclick="cancelEnroll(\''+esc(r.e.enrollment_id)+'\')"><i class="ti ti-file-x"></i>Hủy đơn</button></td></tr>'});
   h+='</tbody></table></div><div class="mut" style="font-size:11.5px;padding:11px 16px;line-height:1.7">'+
    'Ba lối ra: <b>thu dứt</b> (em vẫn nợ thật, gọi đòi), <b>hủy đơn</b> (viết off, phần đã đóng xử theo chính sách hoàn tiền), '+
@@ -15046,7 +15049,7 @@ function renderDuthu(){
    '<td>đợt '+esc(r.x.installment_no||"?")+'</td>'+
    '<td style="font-variant-numeric:tabular-nums"><b>'+vnd(r.left)+'</b></td>'+
    '<td><span class="chip '+(r.st.cls||"gray")+'">'+esc(r.st.lbl)+'</span></td>'+
-   '<td><button class="btn sm primary" onclick="payForm(\''+esc(r.e.enrollment_id)+'\')"><i class="ti ti-cash"></i>Thu tiền</button></td></tr>'});
+   '<td><button class="btn primary sm" onclick="payForm(\''+esc(r.e.enrollment_id)+'\')"><i class="ti ti-cash"></i>Thu tiền</button></td></tr>'});
  if(L.length>120)h+='<tr><td class="empty" colspan="7">... còn '+(L.length-120)+' đợt nữa.</td></tr>';
  return h+'</tbody></table></div>'+xemTiepBtn("duthu",L.length,30)+'</div>'}
 function renderSothu(){var tab=window.STTAB||"da";
@@ -15441,8 +15444,8 @@ function renderHoidap(){
  var q=window.QAQ||"";
  var h=pageHead("Hỏi đáp","Hỏi bằng tiếng Việt - về một học viên, hoặc về chỗ cấu hình trong app");
  h+='<div class="notebar"><i class="ti ti-message-question"></i>'+goiy("gy_hop_nay_tra_loi_5ff9",'Hộp này trả lời <b>hai loại câu hỏi</b>. Gõ <b>tên một học viên hay khách</b> thì nó đọc hồ sơ và trả lời <b>hiện trạng - vì sao có cảnh báo - việc phải làm tiếp theo SOP</b>. Gõ <b>chuyện của app</b> ("đổi hotline ở đâu") thì nó <b>chỉ đúng chỗ và mở thẳng tới đó</b>. Mọi câu trả lời đọc lại chính bộ luật app đang chấp hành, không phải văn tự nghĩ ra.')+'</div>';
- h+='<div class="panel" style="margin-bottom:14px"><div class="pbody">';
- h+='<div style="display:flex;gap:8px;flex-wrap:wrap"><input id="qa_q" value="'+esc(q)+'" placeholder="vd: bạn Minh Anh có cảnh báo gì, giờ phải làm gì?" style="flex:1;min-width:260px;height:38px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-family:inherit;font-size:13px" onkeydown="if(event.key===\'Enter\')qaHoi()">'+
+ h+='<div class="panel"><div class="pbody">';
+ h+='<div style="display:flex;gap:8px;flex-wrap:wrap"><input id="qa_q" value="'+esc(q)+'" placeholder="vd: bạn Minh Anh có cảnh báo gì, giờ phải làm gì?" style="flex:1;min-width:260px;height:38px;border:1px solid var(--line);border-radius:8px;padding:0 12px;font-family:inherit;font-size:13px" onkeydown="if(event.key===\'Enter\')qaHoi()">'+
   '<button class="btn primary" onclick="qaHoi()"><i class="ti ti-search"></i>Hỏi</button>'+
   (q?'<button class="btn" onclick="qaXoa()"><i class="ti ti-x"></i>Xoá</button>':'')+'</div>';
  h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px"><span class="mut" style="font-size:11px;align-self:center">Thử:</span>';
@@ -15452,12 +15455,12 @@ function renderHoidap(){
  h+=aiKhoiHTML(q);   /* AI dien giai (neu bat) - dung tren, cau tra loi may ngay duoi */
  var R=qaTraLoi(q);
  if(R.loai==="nguoi"&&R.nguoi.length>1){
-  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b>Có '+R.nguoi.length+' người khớp - chọn đúng người</b></div><div class="pbody"><div class="pickgrid">';
+  h+='<div class="panel"><div class="ph"><b>Có '+R.nguoi.length+' người khớp - chọn đúng người</b></div><div class="pbody"><div class="pickgrid">';
   R.nguoi.forEach(function(x){h+='<button class="pickc" onclick="qaViDu('+JSON.stringify(x.ma).split('"').join("&quot;")+')"><i class="ti '+(x.loai==="hv"?"ti-user-check":(x.loai==="nv"?"ti-id-badge":"ti-user"))+'"></i><span><b>'+esc(x.ten)+'</b><small>'+esc(x.ma)+' · '+(x.loai==="hv"?"học viên":(x.loai==="nv"?esc(elabel(x.r.role)||"nhân viên"):"khách tiềm năng"))+'</small></span></button>'});
   h+='</div></div></div>';return h}
  if(R.loai==="nguoi"&&R.nguoi.length){
   var K=qaHoSo(R.nguoi[0]);
-  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti '+(K.loai==="nv"?"ti-id-badge":"ti-user-check")+'" style="margin-right:6px"></i>'+esc(K.ten)+'</b><span class="mut" style="font-size:11.5px">'+esc(K.ma)+' · '+(K.loai==="hv"?"học viên":(K.loai==="nv"?"nhân viên trung tâm":"khách tiềm năng"))+'</span></div><div class="pbody">';
+  h+='<div class="panel"><div class="ph"><b><i class="ti '+(K.loai==="nv"?"ti-id-badge":"ti-user-check")+'" style="margin-right:6px"></i>'+esc(K.ten)+'</b><span class="mut" style="font-size:11.5px">'+esc(K.ma)+' · '+(K.loai==="hv"?"học viên":(K.loai==="nv"?"nhân viên trung tâm":"khách tiềm năng"))+'</span></div><div class="pbody">';
   /* Hiểu được ý thì NÓI RA đang hiểu gì; chưa rõ ý thì HỎI LẠI bằng nút, không đoán bừa. */
   var _yt=QAYDINH.filter(function(y){return y.k===R.yd})[0];
   h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-'+(_yt?"target-arrow":"help-circle")+'"></i>'+
@@ -15489,7 +15492,7 @@ function renderHoidap(){
   h+='</div></div>';
   return h}
  if(R.loai==="hethong"&&R.hethong.length){
-  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-bulb" style="margin-right:6px"></i>'+R.hethong.length+' chỗ khớp câu hỏi của bạn</b></div><div class="pbody">';
+  h+='<div class="panel"><div class="ph"><b><i class="ti ti-bulb" style="margin-right:6px"></i>'+R.hethong.length+' chỗ khớp câu hỏi của bạn</b></div><div class="pbody">';
   R.hethong.forEach(function(k,i){
    h+='<div style="padding:10px 0'+(i?';border-top:1px solid var(--line)':'')+'">'+
     '<div style="font-size:13px;font-weight:700;color:var(--ink)">'+esc(k.t)+(k.tay?' <span class="chip gray">tự khai</span>':'')+'</div>'+
@@ -15796,7 +15799,7 @@ function tthBtn(){var b=document.getElementById("tthBtn");if(!b)return;
 
 function slaBtn(x,cls){
  if(!x)return "";
- cls=cls||"btn sm primary";
+ cls=cls||"btn primary sm";
  if(x.act)return '<button class="'+cls+'" onclick="slaAct(\''+esc(x.act)+'\',\''+esc(String(x.rid||""))+'\')"><i class="ti ti-tool"></i>Làm ngay</button>';
  if(x.lead)return '<button class="'+cls+'" onclick="leadDetail(\''+esc(String(x.lead))+'\')"><i class="ti ti-player-play"></i>Xử lý</button>';
  if(x.hoso)return '<button class="'+cls+'" onclick="openQuick(\''+esc(String(x.hoso))+'\')"><i class="ti ti-eye"></i>Xem nhanh</button>';
@@ -15916,7 +15919,7 @@ function asstHTML(){
    '<div class="d">'+esc(String(x.what||""))+'</div>'+
    '<div class="c">'+(x.sev==="red"?'<span class="chip red">quá hạn</span>':'<span class="chip">còn trong hạn</span>')+
     (x.prm?slaChip(x.prm,""):'')+'</div>'+
-   '<div class="a">'+slaBtn(x,"btn sm primary")+
+   '<div class="a">'+slaBtn(x,"btn primary sm")+
     '<button class="btn sm" onclick="asstBoQua()" data-tip="Để việc này lại, xem việc kế"><i class="ti ti-player-skip-forward"></i>Để sau</button></div></div>';
  }else{
   h+='<div class="asstCard done"><div class="t"><i class="ti ti-circle-check"></i> Không còn việc nào đang chờ bạn.</div>'+
@@ -15944,7 +15947,7 @@ function asstHTML(){
    h+='</div>'}
  }
  h+='<div class="asstFoot">'+
-  (L.length?'<button class="btn sm primary" onclick="asstClose();tourWork()"><i class="ti ti-checklist"></i>Dọn từng bước ('+L.length+')</button>':'')+
+  (L.length?'<button class="btn primary sm" onclick="asstClose();tourWork()"><i class="ti ti-checklist"></i>Dọn từng bước ('+L.length+')</button>':'')+
   '<button class="btn sm" onclick="asstClose();tourMenu()" data-tip="Các bài hướng dẫn"><i class="ti ti-help-circle"></i></button>'+
   '</div>';
  if(p.c)h+='<div class="asstNote"><b>Trang này để làm gì:</b> '+esc(p.c)+'</div>';
@@ -16671,7 +16674,7 @@ function demoGateHV(){var el=document.getElementById("login");if(!el){bootHV();r
    :'Chọn học viên để vào trang của bạn ấy, hoặc bấm <b>Vào như phụ huynh</b> để xem đúng những gì người giám hộ nhìn thấy. Bản demo - dữ liệu thật của trung tâm, trình bày theo cách dành cho người xem.')+'</p>'+
   '<div style="margin:2px 0 10px"><button class="pill'+(PH?"":" on")+'" onclick="hvPHmodeSet(0)"><i class="ti ti-user"></i>Tôi là học viên</button> '+
   '<button class="pill'+(PH?" on":"")+'" onclick="hvPHmodeSet(1)"><i class="ti ti-users"></i>Tôi là phụ huynh</button></div>'+
-  '<input placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.__hvgq||"")+'" oninput="window.__hvgq=this.value;demoGateHV();var i=document.querySelector(\'#login input\');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}" style="width:100%;max-width:380px;height:36px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-family:inherit;margin:4px 0 14px"></div>';
+  '<input placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.__hvgq||"")+'" oninput="window.__hvgq=this.value;demoGateHV();var i=document.querySelector(\'#login input\');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}" style="width:100%;max-width:380px;height:36px;border:1px solid var(--line);border-radius:8px;padding:0 12px;font-family:inherit;margin:4px 0 14px"></div>';
  if(!q)h+='<div style="font-size:11.5px;color:var(--muted);margin:-6px 0 10px">10 hồ sơ có dữ liệu đầy đủ nhất để demo - muốn người khác thì gõ tên vào ô tìm.</div>';
  h+='<div class="rgrid" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr))">';
  stu.slice(0,q?12:10).forEach(function(x){
@@ -16794,7 +16797,7 @@ HV_SHELL = r"""
 <div class="hvapp" id="hvapp">
   <div class="hvmask" id="hvMask" onclick="hvCloseSide()"></div>
   <aside class="hvside" id="hvSide">
-    <div class="hvbrand"><div class="logo" style="width:34px;height:34px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 40 40" width="22" height="22" aria-hidden="true"><g fill="none" stroke="#D51920" stroke-width="3.2"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="7.5"/></g><circle cx="20" cy="20" r="3.4" fill="#D51920"/><g stroke="#D51920" stroke-width="3.2"><line x1="20" y1="1.5" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="38.5"/><line x1="1.5" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="38.5" y2="20"/></g></svg></div><div><b>IELTS The Tutors</b><small>Trang học viên</small></div></div>
+    <div class="hvbrand"><div class="logo" style="width:34px;height:34px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 40 40" width="22" height="22" aria-hidden="true"><g fill="none" stroke="#D51920" stroke-width="3.2"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="7.5"/></g><circle cx="20" cy="20" r="3.4" fill="#D51920"/><g stroke="#D51920" stroke-width="3.2"><line x1="20" y1="1.5" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="38.5"/><line x1="1.5" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="38.5" y2="20"/></g></svg></div><div><b>IELTS The Tutors</b><small>Trang học viên</small></div></div>
     <div class="hvme"><div class="av" id="hvAv">?</div><div><b id="hvWho">-</b><small id="hvWho2">-</small></div></div>
     <div class="hvselbox">
      <button class="btn sm" style="width:100%;justify-content:center" onclick="gateSwitchHV()"><i class="ti ti-arrows-exchange"></i>Đổi người / màn cổng</button></div>
