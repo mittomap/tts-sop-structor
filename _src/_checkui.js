@@ -259,7 +259,18 @@ const PROBE = () => {
         try { await page.evaluate(`go("banlam")`); await page.waitForTimeout(60);
               await page.evaluate(js); } catch (e) {
           bad.push(nhan("ngan keo " + ten + ": KHONG MO DUOC - " + String(e.message).slice(0, 80))); continue; }
-        await page.waitForTimeout(140); luot++;
+        /* BAY DA CAN: ngan keo TRUOT VAO trong 0,22s (transition:none chi ap khi dang keo tay nam
+           - selector that la "body.drsz .drawer"). Do sau 140ms la chup dung luc no dang truot,
+           ra so "tho ra ngoai man" nhay lung tung 37..131px o man rong. Phai CHO NO DUNG YEN:
+           doc vi tri hai lan lien tiep, bang nhau moi tinh. Do vat dang chuyen dong thi khong do. */
+        await page.waitForFunction(() => {
+          const d = document.querySelector(".drawer"); if (!d) return false;
+          const r = Math.round(d.getBoundingClientRect().right);
+          if (window.__nkTruoc === r) return true;
+          window.__nkTruoc = r; return false;
+        }, null, {timeout: 3000}).catch(() => {});
+        await page.evaluate(() => { window.__nkTruoc = null; });
+        luot++;
         const nk = await page.evaluate(() => {
           const d = document.querySelector(".drawer");
           if (!d || !d.classList.contains("on")) return {loi: "mo ma khong hien"};

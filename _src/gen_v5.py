@@ -509,6 +509,13 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .asstfab{position:fixed;right:18px;bottom:18px;z-index:198;display:flex;align-items:center;gap:7px;
  background:var(--navy);color:#fff;border:0;border-radius:999px;padding:11px 17px;font-family:inherit;
  font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 12px 30px rgba(10,20,40,.32);transition:.14s}
+/* V9.56: nut Tro ly de z-index 198, cao hon ngan keo (171), nen no NOI TREN ngan keo. Tren man
+   1440px it ai de y; tren dien thoai no de dung goc duoi phai cua ngan keo, che mat noi dung.
+   Ngan keo la lop CHAN (co man che 170) - da chan thi khong thu gi duoc noi len tren.
+   BAY DA CAN: lan dau dat rule nay canh ".asstfab{right:12px}" - ma dong do nam LOT trong
+   @media(max-width:600px), nen no chi chay o man hep, dung khuc 1440 lai ho. Neo vao mot chuoi
+   ma khong nhin xem chuoi do dang nam trong khoi nao la bay cu, cua CSS cung nhu cua Python. */
+body.drwon .asstfab{opacity:0;pointer-events:none;transition:opacity .12s ease}
 .asstfab:hover{transform:translateY(-1px);box-shadow:0 16px 36px rgba(10,20,40,.4)}
 .asstfab b{font-size:15px;line-height:1}
 .asstfab span{font-weight:500;opacity:.86}
@@ -588,12 +595,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .qaYD{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
 .qaYD .pill b{background:var(--navy);color:#fff;border-radius:999px;padding:0 5px;font-size:10px;margin-left:3px}
 .qaYD .pill.on b{background:#fff;color:var(--navy)}
-@media(max-width:600px){.asst{right:10px;left:10px;width:auto;bottom:70px}/* V9.56: nut Tro ly de z-index 198, cao hon ngan keo (171), nen no NOI TREN ngan keo. Tren man
-   1440px thi khong ai de y; tren dien thoai 390px no de len dung goc duoi phai cua ngan keo, che
-   mat noi dung. Ngan keo la lop CHAN (co man che 170) - da chan thi khong thu gi duoc noi len tren.
-   Chi bat duoc loi nay khi MO NGAN KEO THAT o kho dien thoai - do bang so tren man rong khong thay. */
-body.drwon .asstfab{opacity:0;pointer-events:none;transition:opacity .12s ease}
-.asstfab{right:12px;bottom:12px}}
+@media(max-width:600px){.asst{right:10px;left:10px;width:auto;bottom:70px}.asstfab{right:12px;bottom:12px}}
 /* V9.52 (anh Luân: "nhìn hơi chìm khi rơi vào trường hợp này nhỉ"): nút thu gọn nằm ĐÈ lên
    danh sách nút "Xử lý" cùng tông navy nên lẫn hẳn vào nền. Nay có viền sáng tách khỏi nền,
    bóng đổ dày hơn và một vòng trắng mỏng - nhìn là biết nó nổi TRÊN trang, không thuộc trang. */

@@ -149,7 +149,21 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.55 — THANG THIẾT KẾ: MỘT VIỆC MỘT CÁCH ✅ (30/07 khuya).**
+> **Phiên bản: V9.56 — RESPONSIVE: CÓ KIỂM, NHƯNG PHỦ CHƯA TỚI ✅ (30/07 khuya).**
+> · Anh Luân hỏi *"e kiểm responsive trên ipad và mobile chưa"*. Có - `_checkui` vốn mở thật ở
+> 390×844 và 834×1112. Nhưng **ngăn kéo chưa lần nào được mở ở khổ nhỏ** (harness chỉ mở một ngăn
+> kéo giả), và **chỉ có khổ DỌC**. Vá cả hai: nay **5 khổ** (thêm 844×390 và 1112×834) và mỗi khổ
+> **mở thật 7 ngăn kéo**.
+> · Ba lỗi responsive thật: nút đóng ngăn kéo **13×22px** (chuẩn chạm tay ≥44×44) → 40×40 · ngăn
+> kéo 760px trên iPad 834px chừa **74px vệt thừa** → từ 900px xuống chiếm trọn màn · **nút Trợ lý
+> nổi đè lên ngăn kéo** (z-index 198 > 171) → mờ đi khi ngăn kéo mở.
+> · **Ba lần phép đo của em nói dối trong cùng một đợt**, cả ba suýt làm em sửa cái không hỏng:
+> so `position:fixed` với `clientWidth` (đã trừ thanh cuộn) · đo ngăn kéo **đang trượt vào** (0,22s,
+> vì `transition:none` thật ra là `body.drsz .drawer`, chỉ áp khi kéo tay nắm) · neo rule CSS vào
+> một chuỗi **nằm lọt trong `@media(max-width:600px)`**. Luật mới: **đo ra số lạ thì nghi cái
+> thước trước, đừng nghi cái app.**
+>
+> **Phiên bản trước: V9.55 — THANG THIẾT KẾ: MỘT VIỆC MỘT CÁCH ✅ (30/07 khuya).**
 > · Anh Luân: *"kiểm qua từng trang, từng màn hình xem có thể tối ưu thiết kế không"* - và câu
 > trả lời đo được là: **app chưa hề có một cái thang nào.** Màu **202 → 94** (118 mã từng chỉ dùng
 > ĐÚNG MỘT LẦN; 26 sắc trắng cho cùng một việc) · cỡ chữ **28 → 17** · bo góc **17 → 8** · nhịp dọc
@@ -4610,3 +4624,59 @@ panel · class nút chỉ một thứ tự. **146 → 155 tiêu chí.**
 ### Số chốt phiên
 Màu 202→**94** · cỡ chữ 28→**17** · bo góc 17→**8** · nhịp dọc 4→**1** · `_checkux` **155**.
 Hai cổng (nhân viên / học viên) dùng chung một thang - đo ra cùng 94/17/8. `./verify.sh` XANH HẾT.
+
+## V9.56 (30/07 khuya) - RESPONSIVE: CÓ KIỂM, NHƯNG PHỦ CHƯA TỚI
+
+> Anh Luân: *"E kiểm responsive trên ipad và mobile chưa"*
+
+**Có.** `_checkui` vốn đã mở THẬT ở 390×844 (điện thoại) và 834×1112 (iPad dọc), cả hai cổng, mọi
+trang - 493 lượt, xanh. **Nhưng phủ chưa tới ở hai chỗ**, và cả hai đều lộ ra lỗi thật:
+
+### Lỗ hổng 1: ngăn kéo chưa lần nào được mở ở khổ nhỏ
+
+Harness chỉ mở đúng **một ngăn kéo giả** (`openDrawer("Thu hop xac nhan")`) để thử z-index của hộp
+xác nhận. Sáu ngăn kéo dựng trong V9.54 chưa lần nào được nhìn ở 390px. Mở thật thì ra ba lỗi:
+
+| Lỗi | Đo được | Sửa |
+|---|---|---|
+| Nút đóng ngăn kéo quá nhỏ | **13×22px** - ngón tay không bấm trúng (chuẩn chạm tay ≥44×44) | 40×40, và 44×44 khi `pointer:coarse` |
+| Ngăn kéo để lại vệt thừa vô dụng | trên iPad dọc 834px, ngăn kéo 760px chừa 74px | từ 900px trở xuống chiếm trọn màn |
+| Nút Trợ lý nổi ĐÈ LÊN ngăn kéo | z-index 198 > 171 | mờ đi khi ngăn kéo mở |
+
+Cái thứ ba đáng nói: ngăn kéo là **lớp chặn** (có màn che ở 170). Đã chặn thì không thứ gì được
+nổi lên trên - nếu không nó vừa che nội dung vừa mời người ta bấm vào chỗ không nên bấm.
+
+### Lỗ hổng 2: chỉ có khổ DỌC
+
+Xoay ngang là trạng thái thật sự hay gặp trên máy tính bảng, và nó **đổi hẳn bề rộng** (iPad
+834 dọc → 1112 ngang) nên không suy từ khổ dọc ra được. Thêm 2 khổ: 844×390 và 1112×834.
+`_checkui` nay chạy **5 khổ**, và mỗi khổ mở thật **7 ngăn kéo**.
+
+### Ba lần phép đo của em nói dối trong cùng một đợt
+
+Đây mới là phần đáng ghi nhất. Cả ba lần đều suýt làm em đi sửa cái không hỏng:
+
+1. **"Ngăn kéo thò ra ngoài màn 14px"** ở mọi khổ. Đo trực tiếp: ngăn kéo nằm đúng `0..390` trên
+   màn 390 - không thò ra chút nào. Sai ở mốc so sánh: thẻ `position:fixed` phải so với
+   `window.innerWidth`, còn `documentElement.clientWidth` đã trừ mất bề rộng thanh cuộn.
+2. **"Thò ra 37..131px"** ở màn 1440, con số nhảy lung tung theo từng ngăn kéo. Hoá ra ngăn kéo
+   **trượt vào trong 0,22 giây** - `transition:none` mà em tưởng là chung thật ra là
+   `body.drsz .drawer`, chỉ áp KHI ĐANG KÉO tay nắm. Harness chụp đúng lúc nó đang trượt.
+   Sửa: đọc vị trí hai lần liên tiếp, bằng nhau mới tính. **Vật đang chuyển động thì không đo.**
+3. **Rule ẩn nút Trợ lý chỉ chạy ở màn hẹp.** Em neo nó cạnh `.asstfab{right:12px}` - mà dòng đó
+   nằm LỌT trong `@media(max-width:600px)`. Ở 390 thì đúng, ở 1440 thì hở. Cùng một họ bẫy với
+   lần chèn `pn` vào nhầm mảng `STAGES`: **neo vào một chuỗi mà không nhìn xem chuỗi đó đang nằm
+   trong khối nào.**
+
+Và một bẫy CSS thuần: rule `@media(max-width:900px){.drawer{width:100%}}` đặt **trước** rule gốc
+`.drawer{width:760px}` thì vô tác dụng - cùng độ ưu tiên thì rule đứng SAU thắng.
+
+Luật rút ra, dán chung với luật "canh ý định chứ đừng canh cách viết":
+**phép đo cũng là một thứ phải kiểm.** Đo ra con số lạ thì việc đầu tiên là nghi cái thước, không
+phải nghi cái app. Ba lần trong một đợt, cả ba lần cái thước sai.
+
+### Số chốt phiên
+`_checkui` 3 khổ → **5 khổ** (thêm 2 khổ xoay ngang), thêm **7 ngăn kéo mở thật mỗi khổ** với
+5 phép canh: thò ra ngoài · nút đóng đủ to · có gì nổi đè lên · có chừa vệt thừa · nội dung có
+tràn khỏi ngăn kéo. Ba lỗi responsive đã sửa, đo lại xác nhận: nút đóng 40×40, ngăn kéo `0..390`
+trên màn 390 và `0..834` trên iPad, nút Trợ lý mờ hẳn khi ngăn kéo mở.
