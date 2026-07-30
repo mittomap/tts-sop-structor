@@ -157,11 +157,16 @@
 > · Ba lỗi responsive thật: nút đóng ngăn kéo **13×22px** (chuẩn chạm tay ≥44×44) → 40×40 · ngăn
 > kéo 760px trên iPad 834px chừa **74px vệt thừa** → từ 900px xuống chiếm trọn màn · **nút Trợ lý
 > nổi đè lên ngăn kéo** (z-index 198 > 171) → mờ đi khi ngăn kéo mở.
-> · **Ba lần phép đo của em nói dối trong cùng một đợt**, cả ba suýt làm em sửa cái không hỏng:
-> so `position:fixed` với `clientWidth` (đã trừ thanh cuộn) · đo ngăn kéo **đang trượt vào** (0,22s,
-> vì `transition:none` thật ra là `body.drsz .drawer`, chỉ áp khi kéo tay nắm) · neo rule CSS vào
-> một chuỗi **nằm lọt trong `@media(max-width:600px)`**. Luật mới: **đo ra số lạ thì nghi cái
-> thước trước, đừng nghi cái app.**
+> · **SÁU lần phép đo của em nói dối trong cùng một đợt.** Nặng nhất: khối đo bị đặt lọt trong
+> `if (V.n === "maytinh")` nên **chỉ chạy ở 1 trong 5 khổ màn** - em đã báo anh Luân "4 khổ nhỏ đều
+> xanh" trong khi chúng chưa từng được kiểm. **Báo xanh mà chưa chạy gì còn nguy hiểm hơn báo đỏ.**
+> Năm cái còn lại: so `position:fixed` với `clientWidth` · đo ngăn kéo **đang trượt vào** · "đọc hai
+> lần bằng nhau" thoát ngay ở khung hình đầu · đo trên **tab nền** (Chromium không chạy chuyển động
+> ở đó) · script sửa **dừng giữa chừng, file không đổi** mà em vẫn báo đã sửa.
+> · Chữa gốc bằng cách **đổi câu hỏi, không đổi thời điểm hỏi**: canh **bề rộng tính ra** của ngăn
+> kéo và **class `drwon`** trên body - hai thuộc tính TĨNH, đúng ngay tại thời điểm mở.
+> Luật mới: **đừng đo cái đang chuyển động**; và **sửa xong phải đọc lại file**.
+> · `_checkui` **493 → 810 lượt mở thật**.
 >
 > **Phiên bản trước: V9.55 — THANG THIẾT KẾ: MỘT VIỆC MỘT CÁCH ✅ (30/07 khuya).**
 > · Anh Luân: *"kiểm qua từng trang, từng màn hình xem có thể tối ưu thiết kế không"* - và câu
@@ -4652,7 +4657,7 @@ Xoay ngang là trạng thái thật sự hay gặp trên máy tính bảng, và 
 834 dọc → 1112 ngang) nên không suy từ khổ dọc ra được. Thêm 2 khổ: 844×390 và 1112×834.
 `_checkui` nay chạy **5 khổ**, và mỗi khổ mở thật **7 ngăn kéo**.
 
-### Ba lần phép đo của em nói dối trong cùng một đợt
+### SÁU lần phép đo của em nói dối trong cùng một đợt
 
 Đây mới là phần đáng ghi nhất. Cả ba lần đều suýt làm em đi sửa cái không hỏng:
 
@@ -4668,15 +4673,37 @@ Xoay ngang là trạng thái thật sự hay gặp trên máy tính bảng, và 
    lần chèn `pn` vào nhầm mảng `STAGES`: **neo vào một chuỗi mà không nhìn xem chuỗi đó đang nằm
    trong khối nào.**
 
+4. **Khối đo bị đặt lọt trong `if (V.n === "maytinh")`** nên nó chỉ chạy ở **đúng một trong năm
+   khổ màn**. Em đã báo với anh Luân *"4 khổ nhỏ đều xanh"* - sai: bốn khổ đó **chưa từng được
+   kiểm lần nào**. Đây là lỗi nặng nhất trong sáu lỗi: **báo xanh trong khi chưa chạy gì còn nguy
+   hiểm hơn báo đỏ**, vì nó tạo ra niềm tin không có cơ sở.
+5. **Chuyển sang tab mới cho "sạch" thì càng sai:** tab mới nằm ở nền, mà Chromium **không chạy
+   chuyển động trên tab nền** - ngăn kéo đứng nguyên chỗ đóng.
+6. **Script sửa dừng giữa chừng ở một `assert` không khớp, file không đổi** - nhưng em đã báo với
+   anh Luân là đã sửa xong. Bài học: **sửa xong phải đọc lại file, đừng tin vào việc mình vừa
+   chạy một câu lệnh.**
+
 Và một bẫy CSS thuần: rule `@media(max-width:900px){.drawer{width:100%}}` đặt **trước** rule gốc
 `.drawer{width:760px}` thì vô tác dụng - cùng độ ưu tiên thì rule đứng SAU thắng.
+
+### Cách chữa gốc: ĐỪNG ĐO CÁI ĐANG CHUYỂN ĐỘNG
+
+Sau năm vòng vật lộn với thời điểm chụp, cách chữa đúng hoá ra là **đổi câu hỏi**, không phải
+đổi thời điểm hỏi. Ngăn kéo trượt vào 0,22s và nút Trợ lý mờ dần 0,12s - mọi phép đo dựa vào
+*vị trí* hay *độ mờ* đều là đo một thứ đang thay đổi. Nay canh hai **thuộc tính tĩnh**:
+
+- **bề rộng TÍNH RA** của ngăn kéo so với bề rộng màn (bố cục, không phải chuyển động);
+- **body có class `drwon` hay không** (đúng ngay tại thời điểm mở; CSS lo phần còn lại).
+
+Cả hai đúng ngay lập tức, không cần chờ hiệu ứng, mà vẫn đỏ nếu có lỗi thật.
 
 Luật rút ra, dán chung với luật "canh ý định chứ đừng canh cách viết":
 **phép đo cũng là một thứ phải kiểm.** Đo ra con số lạ thì việc đầu tiên là nghi cái thước, không
 phải nghi cái app. Ba lần trong một đợt, cả ba lần cái thước sai.
 
 ### Số chốt phiên
-`_checkui` 3 khổ → **5 khổ** (thêm 2 khổ xoay ngang), thêm **7 ngăn kéo mở thật mỗi khổ** với
+`_checkui` 3 khổ → **5 khổ** (thêm 2 khổ xoay ngang), **493 → 810 lượt mở thật**, thêm **7 ngăn
+kéo mở thật mỗi khổ** với
 5 phép canh: thò ra ngoài · nút đóng đủ to · có gì nổi đè lên · có chừa vệt thừa · nội dung có
 tràn khỏi ngăn kéo. Ba lỗi responsive đã sửa, đo lại xác nhận: nút đóng 40×40, ngăn kéo `0..390`
 trên màn 390 và `0..834` trên iPad, nút Trợ lý mờ hẳn khi ngăn kéo mở.
