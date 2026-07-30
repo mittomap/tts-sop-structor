@@ -149,7 +149,30 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.46 — CÀI ĐẶT KHÔNG ĐỂ AI TỰ BƠI ✅ (30/07). Việc D còn V5 + V6.**
+> **Phiên bản: V9.47 — CẤU HÌNH KHÔNG BAY THEO RESET · HỘP HỎI ĐÁP · CÀI ĐẶT GỌN LẠI ✅ (30/07).**
+> Phiên này anh Luân góp liên tục trong lúc em làm; mỗi góp ý chỉ trúng một lỗi thật.
+> · **Cấu hình lưu ở ô nhớ RIÊNG** (`CFKEY`) - bấm reset dữ liệu demo KHÔNG còn làm bay hotline,
+> 83 ngưỡng CH2, 51 ngưỡng KPI, câu nhắc CH4, danh mục CH1, thương hiệu, phân quyền. Trước bản này
+> tất cả nằm chung một ô mà `demoResetRun` xoá nguyên - **đó là mất dữ liệu người dùng**.
+> · **Hộp Hỏi đáp** (trang mới, có trong menu): MỘT hộp trả lời HAI loại câu hỏi - gõ tên học viên
+> thì trả lời *hiện trạng · vì sao cảnh báo · việc phải làm tiếp theo SOP* kèm nút **"Dắt tôi làm
+> từng bước"**; gõ chuyện app thì chỉ đúng chỗ và mở thẳng tới đó. **Không dùng AI** - đọc lại
+> chính `naFor`/`msgText`/`slaItems`/`stuRiskReasons`, nên không thể nói sai ngưỡng.
+> Sửa được trong **Cài đặt > Hỏi đáp**, kèm **sổ câu hỏi app trả lời không nổi**.
+> · **Cài đặt gọn lại**: thanh tab 6 hàng → 2; hotline/địa chỉ ra khỏi CH2 về tab Thương hiệu;
+> "núm vặn hay chỉnh" **nhập và lưu ngay tại chỗ** thay vì nút nhảy đi nơi khác.
+> · **Dải chip dài tự cuộn** (`segHTML`): màn Việc hôm nay từ 6 hàng chip còn 2, có "+N nhóm khác".
+> · **Cổng học viên: một kiểu dòng thời gian duy nhất** - node giữ NGÀY, thẻ chỉ giữ GIỜ.
+> · Dữ liệu demo bỏ tên "Demo 1/2/3" → tên thật; gieo lại 3 tình huống SOP bị rơi (NA032, NA003,
+> NA025); vá **bẫy im lặng** ở `riskTab` (khoá nhớ tạm thiếu hai ngưỡng cấu hình).
+> · Bộ kiểm: `_check16` **661** · `_check14` **136** · **`_checkqa` MỚI 65** · verify **17 phần** ·
+> font **194 icon**. `./verify.sh` XANH HẾT.
+>
+> **CÒN LẠI trong việc D:** V6 màn hình từng chức danh (đã đo: `baocao` nằm trong menu HR và WOW
+> leader nhưng mở ra chỉ báo "ngoài phạm vi" = dư; WOW leader thiếu bảng BC6 của đội mình) ·
+> V7 màn chào phiên đầu + chọn bài tham quan · V8 "Xem tiếp" cho danh sách dài.
+>
+> **Phiên bản trước: V9.46 — CÀI ĐẶT KHÔNG ĐỂ AI TỰ BƠI ✅ (30/07). Việc D còn V5 + V6.**
 > Anh Luân: *"Cài đặt phải phủ toàn bộ… và phải có hướng dẫn cụ thể, ko để a tự bơi trong 1 đống
 > các thông số cấu hình và cài đặt."*
 > · **17 nhóm tham số xếp theo hành trình SOP P1 → P10** (trước: 20 nhóm tên tùy hứng, có cặp trùng
@@ -3682,3 +3705,164 @@ không tham số nào dùng · đổi tên biến ô tìm · cắt cụt một c
 
 Thêm 6 icon vào font subset (`ti-compass`, `ti-bolt`, `ti-settings-2`, `ti-shield-half`,
 `ti-cash-off`, `ti-lock-check`) - **192 icon**. Quên dựng lại font là `_tall.js` báo đỏ ngay.
+
+---
+
+## V9.47 (30/07) - CẤU HÌNH KHÔNG BAY THEO RESET · HỘP HỎI ĐÁP · CÀI ĐẶT GỌN LẠI
+
+Phiên này anh Luân góp liên tục trong lúc em đang làm, mỗi góp ý đều chỉ trúng một lỗi thật.
+
+### 1. Cấu hình lưu riêng - reset dữ liệu demo KHÔNG được cuốn theo
+
+> *"cài đặt thì lưu là lưu luôn á, chứ ko phải như dữ liệu demo mà bấm reset là mất nha"*
+
+**Đúng, và app đang sai.** Cả dữ liệu demo lẫn cấu hình nằm chung một ô nhớ `LSKEY`, mà
+`demoResetRun` xoá nguyên ô đó. Bấm "Xóa mọi thay đổi của buổi demo" là bay sạch hotline, 83
+ngưỡng CH2, 51 ngưỡng KPI, mọi câu nhắc CH4, nhãn danh mục CH1, thương hiệu, ma trận phân quyền,
+cấu hình Trợ thủ, nhịp ngày. **Đó là mất dữ liệu người dùng**, không phải phiền toái nhỏ.
+
+Cấu hình và dữ liệu là hai thứ khác hẳn nhau: dữ liệu demo là thứ để nghịch, hỏng thì reset;
+cấu hình là **LUẬT của trung tâm**. Nay:
+- Ô nhớ riêng `CFKEY`, ghi mỗi lần lưu. `demoResetRun` chỉ đụng `LSKEY`.
+- Nạp `cfgLoad()` **trước** `demoLoad()` - còn `LSKEY` thì bản trong đó mới hơn nên đè lên; vừa
+  reset thì `LSKEY` mất và cấu hình trong `CFKEY` sống sót.
+- `LSKEY` **vẫn** mang theo cấu hình để Room demo hai máy không lệch luật nhau.
+- Muốn bỏ cấu hình phải bấm đúng nút **"Về mặc định TOÀN BỘ cấu hình"** - hành động riêng, có hỏi lại.
+- Câu xác nhận reset dữ liệu nay nói thẳng: cấu hình được giữ nguyên.
+
+### 2. Hộp Hỏi đáp - một hộp, hai loại câu hỏi
+
+> *"làm 1 cái Q&A về hệ thống, để người dùng có thể hỏi, mà em có thể chỉ chỗ, thậm chí gửi link
+> trực tiếp. Cái đó khó đưa vào hệ thống ko em, hơi giống AI"* · *"bạn học viên tên gì đó, thấy có
+> cảnh báo gì đó, vậy bây giờ hiện trạng của bạn đó là gì, cần làm gì tiếp theo... mà hộp đó có
+> thể rep vanh vách chuẩn sop thì ngon quá em"*
+
+**Không cần AI, và ở đây không-AI còn đúng hơn AI.** Câu trả lời nghiệp vụ không phải thứ cần bịa
+ra bằng văn phong - nó là thứ app ĐÃ BIẾT, chỉ chưa ai hỏi nó:
+
+| App đã có sẵn | Cho ra phần nào của câu trả lời |
+|---|---|
+| `naFor()` | đúng mã trigger SOP |
+| `msgText()` | đúng câu chữ CH4 |
+| `slaItems()` | đúng hàng chờ + đã treo bao nhiêu giờ |
+| `stuRiskReasons()` | đúng lý do nguy cơ **kèm ngưỡng CH2 đang đặt** |
+| `canAct()` | đúng người được làm, theo CH3 |
+
+Hộp Hỏi đáp chỉ **ghép** chúng lại, nên nó **không thể nói sai ngưỡng** - đọc cùng một bộ luật mà
+chuông báo và Trợ thủ đang dùng. Bộ kiểm chứng minh: đổi `thresholdAtRisk_hw_missing` từ 1 sang 99
+thì câu cảnh báo phải đổi theo - ai lỡ viết tay một đoạn mô tả là đỏ ngay.
+Một mô hình ngôn ngữ đặt ngoài sẽ nói trôi chảy hơn nhưng có ngày nói sai một con số học phí; cái
+đó đắt hơn nhiều so với câu văn hơi khô. `SVR` để dành nếu sau này muốn thêm một tầng diễn đạt.
+
+**Phần thật sự khó - hiểu ý người hỏi.** Anh Luân chỉ đúng: *"cái khó là làm sao để app hiểu chính
+xác người ta muốn gì á, hoặc nếu chưa hiểu rõ có thể đưa gợi ý."* Cách xử lý:
+- Tách hai trục: **hỏi về AI** (`qaTimNguoi`) và **muốn biết GÌ** (`qaYDinh`, 6 ý định).
+- Hiểu được ý thì **nói ra đang hiểu gì** + 6 nút đổi ý. Chưa rõ thì nói thẳng là chưa chắc.
+- Trùng tên → hiện danh sách chọn. Bí hẳn → **nói thẳng chưa hiểu**, gợi ý người/chỗ gần giống.
+- Nút **"Dắt tôi làm từng bước"** chạy đúng cỗ máy Trợ thủ nhưng lọc theo một con người
+  (`tourWorkBuildFor`) - vì câu "hướng dẫn tôi xử lý task của người này" đòi được DẮT ĐI, không
+  đòi một bản liệt kê.
+
+**Q&A phải cập nhật được** (*"a sợ hỏi nhiều chỉ số hay gì đó mà nó ko trả lời được, phải có cách
+cập nhật"*): tab **Cài đặt > Hỏi đáp** có bảng câu trả lời tự khai (đứng TRƯỚC kho tự dựng), và
+**sổ câu hỏi app trả lời không nổi** - app tự ghi mỗi lần bí, kèm nút "Soạn câu trả lời" ngay tại
+dòng đó. Không phải ngồi đoán còn thiếu câu nào.
+
+### 3. Ba lỗi lòi ra khi chạy thật (không phải đọc mã mà thấy)
+
+- **"Demo 1" khớp cả "Demo 2" và "Demo 3"** - chấm điểm cũ bỏ qua chữ số, hỏi một em ra năm em.
+  Nay họ tên phải nằm nguyên trong câu, hoặc mọi chữ phải có mặt; tên có chữ số mà số không khớp
+  thì loại thẳng.
+- **So chuỗi con làm chữ "nợ" khớp vào "phòng", "không"** - câu "đổi ngưỡng nợ quá hạn ở đâu" trả
+  về toàn tham số của chặng test. Nay so **theo từ**, cộng trọng số **nghịch tần suất** (chữ có mặt
+  ở khắp nơi thì gần như vô giá trị) và bắt buộc **trúng được một nửa câu hỏi**.
+- **Câu vô nghĩa trả về 6 kết quả trông rất tự tin.** Đây là lỗi nguy hiểm nhất: một hộp hỏi đáp
+  nói bừa thì không ai dám tin nó nữa. Nay có ngưỡng tin - dưới mức đó là "chưa hiểu".
+  **Luật mới: trả lời bừa còn tệ hơn không trả lời.**
+
+### 4. Dữ liệu demo: bỏ ba cái tên "Demo 1/2/3"
+
+Ba hồ sơ trưng bày đầy nhất mang tên "Demo 1", "Demo 2", "Demo 3". Với bản đem đi giới thiệu cho
+trung tâm khác thì cái tên đó đọc ra là "chưa làm xong". Nay là **Trần Khánh Vy / Lê Gia Bảo /
+Phạm Ngọc Hân**, vẫn giữ nguyên vai trò (đầy nhất, đứng đầu bảng). Sửa ở `mkdemo.py`, chạy lại
+trọn pipeline - `check_data` và `check_logic` đều DAT.
+
+### 5. Màn Cài đặt gọn lại (anh Luân xem ảnh rồi góp)
+
+> *"cách thiết kế này dễ hiểu nhưng hơi choáng chỗ em ạ"* · *"những chỗ mà dễ thay đổi thì em mới
+> cho nó thành việc hay làm, chứ như hotline thì mấy khi đổi đâu. Mà đã đổi nhanh, thì em cho nhập
+> luôn được chứ em bấm nhảy đi chỗ khác thì cũng như không."* · *"đổi hotline mà nằm ở Ngưỡng & SLA
+> là chết rồi, ko đúng nhóm"*
+
+Ba lỗi, cả ba đều đúng:
+- **Choáng chỗ**: mỗi nhóm tab chiếm trọn một hàng ngang nên 6 nhóm ăn 6 hàng, đẩy nội dung thật
+  xuống quá nửa màn hình. Nay các nhóm chảy tiếp nhau, ngăn bằng nhãn nhỏ - gọn còn 2 hàng.
+- **Sai tiêu chí "hay làm"**: hotline/logo là việc **cài lần đầu**. Nay tách hai khối: **Núm vặn
+  hay chỉnh** (8 ngưỡng vận hành) và **Cài lần đầu** (6 việc dựng trung tâm).
+- **Lối tắt mà chỉ cuộn màn hình thì vô nghĩa**: mỗi núm vặn nay có **ô nhập + nút Lưu ngay tại
+  chỗ**, sửa xong áp liền, không rời trang.
+- **Sai nhóm**: `centerHotline` và `centerAddress` là thông tin nhận dạng, cùng họ với tên và logo
+  - không phải ngưỡng nghiệp vụ. Nay chúng nằm ở tab **Thương hiệu & Màu**, và nhóm "Trung tâm"
+  bị loại khỏi tab CH2 để không có hai chỗ sửa cùng một thứ.
+
+### 6. Cổng học viên: một kiểu dòng thời gian duy nhất
+
+> *"có chỗ thiết kế timeline, có chỗ lại chưa, ví dụ như buổi học và buổi wow, mà timeline lại
+> hiện 2 lần thời gian cơ, nhìn hơi kỳ cục"*
+
+Đúng cả hai vế: node trên đường kẻ in NGÀY rồi trong thẻ lại in `session_date` nguyên văn (cả ngày
+lẫn giờ); và nhật ký WOW không có đường kẻ dù nằm sát nhật ký buổi học. Nay cả hai đi qua cùng một
+hàm `hvTLrow`, luật chia việc rõ ràng: **node giữ NGÀY, thẻ chỉ giữ GIỜ**.
+
+### Bộ kiểm
+
+- `_check16`: 640 → **661** (thêm mục 24quater canh cấu hình lưu riêng - chạy THẬT: ghi cấu hình,
+  xoá ô dữ liệu, đọc lại, ngưỡng phải còn).
+- `_check14`: 128 → **136** (canh dòng thời gian một kiểu, không in hai lần thời gian).
+- **`_checkqa.js` MỚI: 65 tiêu chí** - canh đúng thứ tự nguy hiểm: (1) câu vô nghĩa PHẢI ra "chưa
+  hiểu"; (2) câu trả lời nghiệp vụ phải đọc lại chính bộ luật (đổi ngưỡng CH2 thì câu trả lời phải
+  đổi theo); (3) bí thì phải có gợi ý và phải ghi sổ.
+- `verify.sh` nay **17 phần**. Font subset: **192 icon**.
+
+### 7. Dải chip dài phải tự cuộn lại (anh Luân xem màn Việc hôm nay)
+
+> *"kiểu thiết kế này nó bị ghê :("*
+
+Dải **Nhóm việc** có hơn 40 chip trải **sáu hàng**, đẩy danh sách việc thật xuống dưới màn hình.
+Người ta vào đây để LÀM VIỆC, không phải để đọc menu lọc. Cùng một bệnh với thanh tab Cài đặt,
+nên chữa ở **chính thành phần dùng chung `segHTML`** - mọi dải chip trong app cùng gọn theo, không
+phải đi vá từng màn.
+
+Luật: quá 10 mục thì chỉ hiện những mục **đông việc nhất**, phần còn lại nằm sau nút **"+N nhóm
+khác"**. Hai điều bắt buộc: **mục đang chọn không bao giờ bị giấu**, và khi mở ra thì **giữ đúng
+thứ tự gốc** để mắt không phải học lại vị trí mỗi lần số việc đổi. Đo: 6 hàng → 2 hàng
+(18 chip hiện, "+32 nhóm khác").
+
+### 8. Bẫy im lặng trong bảng nguy cơ - bắt được nhờ viết bộ kiểm
+
+`riskTab()` nhớ tạm kết quả theo `DVER` (phiên bản **dữ liệu**), nhưng kết quả của nó còn phụ
+thuộc **hai ngưỡng cấu hình** `thresholdAtRisk_absences` và `thresholdAtRisk_hw_missing`. Nghĩa là
+nếu đổi ngưỡng qua một đường không bump `DVER`, máy giữ kết luận cũ trong khi nhãn bên cạnh in
+ngưỡng MỚI - màn hình đọc ra **"thiếu 3 bài (ngưỡng 99)" mà vẫn tô đỏ là nguy cơ**.
+
+Hôm nay chưa lộ vì `saveParam` đi qua `persistSoon` → `dataChanged` → bump. Nhưng **khoá nhớ tạm
+phải phủ đủ mọi thứ mà kết quả phụ thuộc vào** - không thì bẫy chỉ nằm chờ một đường ghi mới. Nay
+khoá gồm cả hai ngưỡng.
+
+> **LUẬT rút ra:** nhớ tạm cái gì thì khoá phải gồm ĐỦ mọi đầu vào của cái đó. Khoá thiếu một đầu
+> vào không làm app chậm - nó làm app **nói dối một cách im lặng**.
+
+### 9. Ba tình huống SOP rơi mất khi sinh lại dữ liệu
+
+`check_sop` báo đỏ lần lượt NA032 → NA003 → NA025. Không phải luật sai, mà **dữ liệu không còn ca
+nào khớp**. Nguyên nhân chung: seed ngẫu nhiên đã cố định từ lâu, nhưng pipeline **neo theo
+`datetime.now()`** - chạy lại vào giờ khác thì "ai đang quá hạn" đổi theo, và một luật CÓ THẬT
+nằm im mà không ai biết.
+
+Gieo lại ở nguồn (`fixdata.py` §14octodecies-bis/ter/quater), **neo tương đối theo NOW** chứ không
+neo ngày tuyệt đối, và gieo THUẬN (không xoá dữ liệu của ai):
+- **NA032** buổi WOW đã xác nhận mà qua giờ hẹn - kéo một buổi lùi 5 giờ.
+- **NA003** phiếu tư vấn "Quan tâm" quá hạn chăm lại - kéo một phiếu lùi 5 ngày.
+- **NA025** vắng không phép mà học vụ ĐÃ gọi hỏi thăm - ghi ghi chú cho một lượt.
+
+Sau ba khối này: **83/93 trigger sinh ra lúc chạy thật**, 10 khai lý do cố ý - `check_sop` DAT.

@@ -40,20 +40,21 @@ ITTS_OUT="<mnt>/SOP ITTs" python3 gen_v5.py
 >
 > `_APP.js` / `_HV.js` sinh bằng `_src/extract_js.py` - **không** phải mã nguồn, đừng sửa.
 
-Bộ kiểm gồm **16 phần, phải xanh HẾT mới được giao** (~2.000 tiêu chí tự động + 479 lượt mở thật trong trình duyệt):
+Bộ kiểm gồm **17 phần, phải xanh HẾT mới được giao** (~2.000 tiêu chí tự động + 479 lượt mở thật trong trình duyệt):
 | Lệnh | Kỳ vọng |
 |---|---|
 | `node --check _APP.js` và `node --check _HV.js` | không báo gì |
-| `ITTS_OUT=<out> node _tall.js` | `Render 38 trang \| 0 loi` + `Icon dung: 192 \| thieu trong font: khong` (từ V9.40 icon thiếu là ĐỎ THẬT) |
+| `ITTS_OUT=<out> node _tall.js` | `Render 39 trang \| 0 loi` + `Icon dung: 194 \| thieu trong font: khong` (từ V9.40 icon thiếu là ĐỎ THẬT) |
 | `ITTS_OUT=<out> node _check11.js` | `TONG: 145`, KHÔNG có dòng `FAIL` |
 | `ITTS_OUT=<out> node _check12.js` | `CHECK12 OK: 37 tieu chi` - một cửa vào, một luật |
 | `ITTS_OUT=<out> node _check13.js` | `CHECK13 OK: 174 tieu chi` - KPI biết nói |
-| `ITTS_OUT=<out> node _check14.js` | `CHECK14 OK: 128 tieu chi` - cổng học viên hai chiều |
+| `ITTS_OUT=<out> node _check14.js` | `CHECK14 OK: 136 tieu chi` - cổng học viên hai chiều |
 | `ITTS_OUT=<out> node _check15.js` | `CHECK15 OK: 39 tieu chi` - **kiểm kê cửa ghi + bất biến nghiệp vụ** (bản khai cửa ghi nay đọc thẳng `DOORTB` của app - xem V9.31) |
-| `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 640 tieu chi` - học phí theo đợt + vá V9.27 + bấm-tên-ra-drawer + địa chỉ từng trang + **màn Cài đặt tự giới thiệu** (mục 24bis `CFNHOM`, 24ter `SETMOTA`) |
+| `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 661 tieu chi` - học phí theo đợt + vá V9.27 + bấm-tên-ra-drawer + địa chỉ từng trang + **màn Cài đặt tự giới thiệu** (mục 24bis `CFNHOM`, 24ter `SETMOTA`) |
 | `ITTS_OUT=<out> node _checkdata.js` | `CHECKDATA OK: 27 luat ... 0 cho lech` - **dữ liệu demo có khớp ga nghiệp vụ không** |
 | `ITTS_OUT=<out> node _check17.js` | `CHECK17 OK: 393 tieu chi` - **bộ máy lọc chuyên sâu** (kết hợp trục, lưu theo người) |
 | `ITTS_OUT=<out> node _check18.js` | `CHECK18 OK: 177 tieu chi \| da ve 81 trang/tab` - **hội đồng audit tự động**: vẽ THẬT mọi trang/tab, mọi trang qua mắt 8 chức danh, cổng học viên qua mọi hồ sơ; từ V9.31 kiêm luôn **nhật ký thao tác + hoàn tác + bộ nhớ tạm bảng tra** (bấm cửa ghi thật, lùi lại thật, và bắt chốt chặn từ chối lùi) |
+| `ITTS_OUT=<out> node _checkqa.js` | `CHECKQA OK: 65 tieu chi` - **hộp Hỏi đáp**. Canh theo đúng thứ tự nguy hiểm: (1) câu vô nghĩa PHẢI ra "chưa hiểu" - trả lời bừa còn tệ hơn không trả lời; (2) câu trả lời nghiệp vụ phải đọc lại CHÍNH bộ luật app đang chấp hành (đổi ngưỡng CH2 thì câu cảnh báo phải đổi theo - ai viết tay một đoạn mô tả là đỏ); (3) bí thì phải có gợi ý và phải ghi vào sổ câu hỏi chưa trả lời được |
 | `ITTS_OUT=<out> node _checktour.js` | `TOUR OK: menu cap do + moi bai chay het buoc, 0 loi` - 12 bài / 66 bước, mọi neo `@ma` phải trỏ trúng. Từ V9.44 kiêm luôn **lời hứa "mỗi chức danh một trợ thủ và một hướng dẫn riêng"**: đóng vai từng nhóm vai rồi hỏi ba câu (có bài hướng dẫn riêng · có nhịp ngày ≥3 dòng · có bảng việc ở trang đáp), cộng một câu nữa - mọi nhịp có thật đều phải sửa được trong Cài đặt (nhịp của NV WOW từng tồn tại mà ô chọn không liệt kê, nên không ai với tới) |
 | `python3 check_logic.py` | `KET QUA: DAT` - từ V9.40 script tách "lỗi thật" khỏi "ca cố ý" (việc quá hạn để demo cảnh báo đỏ, số này TRÔI theo ngày) và in một dòng kết luận ổn định |
 | `python3 check_data.py` | `KET QUA: DAT` |

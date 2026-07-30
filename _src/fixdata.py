@@ -1876,6 +1876,64 @@ if _du:
 log.append("14octodecies. Dang ky: gieo %d ca cho qua han, %d ca du coc con treo, %d ca du tien chua mo onboarding"
            % (_g60, _g87, _g88))
 
+# ═══ 14octodecies-bis. NA032 - BUỔI WOW ĐÃ XÁC NHẬN MÀ QUA GIỜ HẸN (V9.47) ════════════
+# SOP mô tả tình huống này (HD3 NA032) và app CÓ luật cho nó, nhưng sau khi sinh lại dữ liệu thì
+# 12 buổi booked/confirmed đều nằm ở TƯƠNG LAI - không còn ca nào quá giờ, nên luật không bao giờ
+# chạy và check_sop báo đỏ.
+# Đây đúng là loại bẫy đã ghi trong nhật ký: DỮ LIỆU DEMO PHẢI DIỄN ĐỦ MỌI TÌNH HUỐNG SOP, nếu
+# không thì một luật có thật cũng nằm im mà không ai biết. Gieo THUẬN chứ không xoá gì: lấy một
+# buổi đã xác nhận, kéo giờ hẹn lùi lại quá khứ - đúng câu chuyện "giờ hẹn qua rồi mà chưa ai bấm
+# bắt đầu, buổi có diễn ra không?".
+_wCf = [w for w in R("DL14")
+        if str(w.get("wow_status") or "").startswith("confirmed")
+        and not str(w.get("wow_content_note") or "").strip()]
+_g32 = 0
+if _wCf:
+    _w32 = _wCf[0]
+    _w32["wow_session_date"] = fmt(NOW - datetime.timedelta(hours=5))
+    _g32 = 1
+else:
+    # không có buổi nào đã xác nhận thì nâng một buổi đã đặt lên "đã xác nhận" rồi kéo lùi giờ -
+    # vẫn là câu chuyện thuận, không xoá dữ liệu của ai.
+    _wBk = [w for w in R("DL14") if str(w.get("wow_status") or "").startswith("booked")]
+    if _wBk:
+        _w32 = _wBk[0]
+        _w32["wow_status"] = eF("enum_wow_status", "confirmed")
+        _w32["wow_session_date"] = fmt(NOW - datetime.timedelta(hours=5))
+        _g32 = 1
+log.append("14octodecies-bis. WOW: gieo %d ca da xac nhan ma qua gio hen (NA032)" % _g32)
+
+# NA003 - phiếu tư vấn "Quan tâm, chưa chốt" ĐÃ QUÁ hạn chăm lại (slaFollowup_grace_days = 3
+# ngày). Mọi phiếu còn mở trong bản sinh mới đều chỉ 1-2 ngày tuổi nên chưa ai quá hạn, và luật
+# NA003 nằm im. Kéo lùi một phiếu về 5 ngày trước - đúng câu chuyện "khách nói để suy nghĩ, rồi
+# không ai gọi lại".
+_tv = [x for x in R("DL04")
+       if str(x.get("conversion_status") or "").startswith("interested")
+       and str(x.get("consultation_time") or "").strip()]
+_g03 = 0
+if _tv:
+    _tv[0]["consultation_time"] = fmt(NOW - datetime.timedelta(days=5, hours=2))
+    _g03 = 1
+log.append("14octodecies-ter. Tu van: gieo %d phieu quan tam da qua han cham lai (NA003)" % _g03)
+
+# NA025 - vắng KHÔNG PHÉP mà học vụ ĐÃ gọi hỏi thăm và có ghi chú. Dữ liệu có 75 lượt vắng không
+# phép nhưng buổi nào cũng quá 24h và không lượt nào có ghi chú, nên tất cả đều rơi vào NA070
+# ("quá hạn gọi") - NA025 không bao giờ chạy.
+# Ba khối gieo này (NA032, NA003, NA025) sinh ra vì MỘT nguyên nhân chung, phải ghi lại:
+# pipeline neo theo `datetime.now()`, nên chạy lại vào giờ khác là "ai đang quá hạn" đổi theo, và
+# một luật CÓ THẬT có thể nằm im chỉ vì hôm nay không ai rơi vào ca đó. Seed ngẫu nhiên đã cố
+# định từ lâu; thứ trôi là THỜI GIAN. Cách chữa: gieo neo theo NOW (không neo theo ngày tuyệt
+# đối) cho mọi tình huống SOP mà dữ liệu tự nhiên hay bỏ sót.
+_ns = [x for x in R("DL12")
+       if str(x.get("attendance_status") or "").startswith("no_show")
+       and "unexcused" in str(x.get("absence_type") or "")
+       and not str(x.get("note") or "").strip()]
+_g25 = 0
+if _ns:
+    _ns[0]["note"] = "Đã gọi hỏi thăm, HV báo bận việc gia đình và hứa đi học lại buổi tới."
+    _g25 = 1
+log.append("14octodecies-quater. Diem danh: gieo %d ca vang khong phep DA goi hoi tham (NA025)" % _g25)
+
 # ═══ 14septdecies. NĂM MỨC CAN THIỆP HỌC VIÊN NGUY CƠ (V9.41) ════════════
 # SOP phân NĂM mức, mỗi mức một hành động khác hẳn (họp 4 bên / họp 3 bên trong 24h / họp 3 bên /
 # đặt buổi WOW kèm / gọi trong 24-48 giờ). Nhưng dữ liệu demo chỉ có ĐÚNG MỘT người mang cờ

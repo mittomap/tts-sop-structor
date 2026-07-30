@@ -928,13 +928,23 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  /* 6. VE THAT man CH2: dung thu tu hanh trinh + co loi gioi thieu + co nut xem ket qua */
  window.SETTAB="ch2";window.CFQ="";
  var pg=RENDER["settings"]();
- var viTri=CFNHOM.map(function(x){return pg.indexOf(">"+esc(x[0])+"</b>")}).filter(function(i){return i>=0});
- t("man Cai dat ve DU "+CFNHOM.length+" nhom", viTri.length===CFNHOM.length);
+ var _dsCH2=CFNHOM.filter(function(x){return x[0]!==CFTRUNGTAM});
+ var viTri=_dsCH2.map(function(x){return pg.indexOf(">"+esc(x[0])+"</b>")}).filter(function(i){return i>=0});
+ t("man Cai dat ve DU "+_dsCH2.length+" nhom nghiep vu", viTri.length===_dsCH2.length);
  t("nhom hien theo DUNG thu tu hanh trinh P1 -> P10 (khong theo thu tu ma nguon)",
    viTri.every(function(v,i){return i===0||v>viTri[i-1]}));
- var thieuMoTa=CFNHOM.filter(function(x){return pg.indexOf(esc(x[1]))<0}).map(function(x){return x[0]});
+ var thieuMoTa=_dsCH2.filter(function(x){return pg.indexOf(esc(x[1]))<0}).map(function(x){return x[0]});
  t("cau gioi thieu cua moi nhom hien THAT tren man"+(thieuMoTa.length?": "+thieuMoTa.join(" | "):""), thieuMoTa.length===0);
- t("co dong 'xem ket qua tai' dan sang man hinh", (pg.match(/Đổi ở đây thì xem kết quả tại:/g)||[]).length===CFNHOM.length);
+ /* V9.47: nhom "Trung tam" khong ve o tab CH2 nua - no da chuyen sang tab Thuong hieu, vi
+    hotline/dia chi la thong tin nhan dang chu khong phai nguong nghiep vu (anh Luan chi ra). */
+ var nhomCH2=CFNHOM.filter(function(x){return x[0]!==CFTRUNGTAM});
+ t("co dong 'xem ket qua tai' dan sang man hinh", (pg.match(/Đổi ở đây thì xem kết quả tại:/g)||[]).length===nhomCH2.length);
+ t("nhom Trung tam KHONG con o tab Nguong & SLA", pg.indexOf('>'+esc(CFTRUNGTAM)+'</b>')<0);
+ (function(){window.SETTAB="brand";var b=RENDER["settings"]();
+  var ts=APPPARAMS.filter(function(p){return p[0]===CFTRUNGTAM});
+  t("hotline va dia chi nam o tab Thuong hieu, canh ten trung tam",
+    ts.length>0&&ts.every(function(p){return b.indexOf('id="cf_'+p[1]+'"')>=0}));
+  window.SETTAB="ch2"})();
  var thieuNut=CFNHOM.filter(function(x){return !x[2].some(function(k){return pg.indexOf("go('"+k+"')")>=0})}).map(function(x){return x[0]});
  t("nut sang trang ket qua bam duoc that"+(thieuNut.length?": "+thieuNut.join(" | "):""), thieuNut.length===0);
  /* 7. O TIM THAM SO - 83 dong thi viec dau tien phai la tim duoc no */
@@ -994,7 +1004,18 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("ban do ke DU moi tab kem cau mo ta"+(thieu.length?": "+thieu.join(" | "):""), thieu.length===0);
  t("ban do co nut sang tung tab", setTabs().every(function(x){
    return x[0]==="tongquan"||bd.indexOf("window.SETTAB='"+x[0]+"'")>=0}));
- t("ban do co khoi 'Viec hay lam nhat'", /Việc hay làm nhất/.test(bd)&&SETNHANH.length>=6);
+ /* V9.47 - anh Luan: "nhung cho ma de thay doi thi em moi cho no thanh viec hay lam, chu nhu
+    hotline thi may khi doi dau. Ma da doi nhanh, thi em cho nhap luon duoc chu em bam nhay di
+    cho khac thi cung nhu khong." Hai luat moi: chi giu NUM VAN VAN HANH, va phai SUA TAI CHO. */
+ t("ban do co khoi num van hay chinh", /Núm vặn hay chỉnh/.test(bd)&&SETNHANH.length>=6);
+ t("moi num van co O NHAP ngay tai cho, khong phai nut nhay di", SETNHANH.every(function(x){
+   return bd.indexOf('id="cf_'+x[0]+'"')>=0}));
+ t("moi num van co nut Luu ngay tai cho", SETNHANH.every(function(x){
+   return bd.indexOf("cfNhanhLuu('"+x[0]+"')")>=0}));
+ t("num van hay chinh KHONG lan thong tin nhan dang (hotline, logo...)",
+   !SETNHANH.some(function(x){var P=null;APPPARAMS.forEach(function(p){if(p[1]===x[0])P=p});
+    return P&&P[0]===CFTRUNGTAM}));
+ t("viec CAI LAN DAU tach thanh khoi rieng", /Cài lần đầu/.test(bd)&&SETLANDAU.length>=4);
  /* moi tab mot icon RIENG - 16 the giong het nhau thi mat khong bam duoc vao dau */
  var khongIcon=Object.keys(SETMOTA).filter(function(k){return !/^ti-[a-z0-9-]+$/.test(String(SETMOTA[k][2]||""))});
  t("moi tab khai mot icon rieng"+(khongIcon.length?": "+khongIcon.join(" | "):""), khongIcon.length===0);
@@ -1004,13 +1025,10 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("ban do dung dung thanh phan the chon cua he thiet ke", (bd.match(/class="pickc wrap"/g)||[]).length>=SETNHANH.length);
  t("the co cau mo ta dai thi phai xuong dong duoc", /\.pickc\.wrap small\{white-space:normal/.test(CSS));
  /* moi loi tat phai tro toi mot cua CO THAT - cfGo tham so co that, hoac tab co that */
- var tatSai=SETNHANH.filter(function(x){
-  var m=/^cfGo\('([^']+)'\)$/.exec(x[3]);
-  if(m)return !APPPARAMS.some(function(p){return p[1]===m[1]});
-  var m2=/^window\.SETTAB='([^']+)'/.exec(x[3]);
-  if(m2)return tabs.indexOf(m2[1])<0;
-  return true}).map(function(x){return x[0]});
- t("moi loi tat dan toi mot cua CO THAT"+(tatSai.length?": "+tatSai.join(" | "):""), tatSai.length===0);
+ var tatSai=SETNHANH.filter(function(x){return !APPPARAMS.some(function(p){return p[1]===x[0]})}).map(function(x){return x[0]});
+ t("moi num van tro toi mot tham so CO THAT"+(tatSai.length?": "+tatSai.join(" | "):""), tatSai.length===0);
+ var ldSai=SETLANDAU.filter(function(x){return tabs.indexOf(x[3])<0}).map(function(x){return x[0]});
+ t("moi viec cai lan dau tro toi mot tab CO THAT"+(ldSai.length?": "+ldSai.join(" | "):""), ldSai.length===0);
  /* HR bi bo hep tab van phai co ban do - dung de ho roi vao mot bang khong loi gioi thieu */
  (function(){
   var hr=(DATA.dl.DL01||[]).filter(function(x){return /^hr_/.test(String(ecode(x.role)||""))})[0];
@@ -1022,6 +1040,50 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
   var pg=RENDER["settings"]();
   t("ban do cua HR chi ke tab HR duoc vao", pg.indexOf("window.SETTAB='staff'")>=0&&pg.indexOf("window.SETTAB='ch2'")<0);
   applyScope("");setRole("all")})();
+ window.SETTAB="ch2";
+})();
+
+
+/* ---- 24quater. CAU HINH LUU RIENG - RESET DU LIEU DEMO KHONG DUOC CUON THEO (V9.47) ----
+   Anh Luan: "cai dat thi luu la luu luon a, chu ko phai nhu du lieu demo ma bam reset la mat".
+   Truoc ban nay ca hai nam chung MOT o nho LSKEY, ma demoResetRun xoa nguyen o do - bam "Xoa moi
+   thay doi cua buoi demo" la bay sach hotline, 83 nguong CH2, 51 nguong KPI, moi cau nhac CH4,
+   nhan danh muc CH1, thuong hieu, ma tran phan quyen. Do la MAT DU LIEU NGUOI DUNG. */
+(function(){
+ setRole("all");cfEnsure();
+ t("co o nho RIENG cho cau hinh", /var CFKEY="ITTS_CONFIG_V1"/.test(SRC));
+ t("co ham ghi va ham doc cau hinh rieng", typeof cfgSave==="function"&&typeof cfgLoad==="function");
+ /* THUC SU chay: ghi cau hinh, xoa o du lieu, doc lai - cau hinh phai con */
+ var kho={},luuThat=global.localStorage,cuCANLS=CANLS;
+ global.localStorage={getItem:function(k){return kho[k]===undefined?null:kho[k]},
+  setItem:function(k,v){kho[k]=String(v)},removeItem:function(k){delete kho[k]}};
+ CANLS=true;
+ var moc=paramOf("slaRetryCall_hours",4);
+ function dat(v){(DATA.config.ch2||[]).forEach(function(c){if(c.name==="slaRetryCall_hours")c.value=String(v)})}
+ dat(99); __cfbase=null; cfgSave();          /* lan dau chi ghi moc so sanh */
+ dat(77); cfgSave();
+ t("cfgSave ghi that vao o nho rieng", !!kho["ITTS_CONFIG_V1"]);
+ t("o nho rieng KHONG chua du lieu DL (chi cau hinh)", String(kho["ITTS_CONFIG_V1"]||"").indexOf('"dl":')<0);
+ kho["ITTS_DEMO_STATE_V1"]="{}";              /* gia lap dang giua buoi demo */
+ try{global.localStorage.removeItem("ITTS_DEMO_STATE_V1")}catch(e){}   /* dung viec ma demoResetRun lam */
+ t("reset du lieu demo KHONG dung toi o nho cau hinh", !!kho["ITTS_CONFIG_V1"]);
+ dat(moc);
+ t("cfgLoad doc lai duoc", cfgLoad()===true);
+ t("nguong da sua SONG SOT qua mot lan reset du lieu", String(paramOf("slaRetryCall_hours",4))==="77");
+ dat(moc);
+ global.localStorage=luuThat; CANLS=cuCANLS; __cfbase=null;
+ /* ma nguon: duong reset du lieu chi duoc dung LSKEY, khong duoc dung CFKEY */
+ var resetFn=(SRC.match(/function demoResetRun\(\)\{[\s\S]*?\n\}/)||[""])[0];
+ t("demoResetRun khong he dung toi CFKEY", !!resetFn&&resetFn.indexOf("CFKEY")<0&&resetFn.indexOf("ITTS_CONFIG")<0);
+ t("moi lan luu deu ghi ca hai o nho", /persistSoon\(\)\{[\s\S]{0,220}demoSave\(\);cfgSave\(\)/.test(SRC));
+ t("nap cau hinh TRUOC khi nap du lieu", SRC.indexOf("\ncfgLoad();")>=0&&SRC.indexOf("\ncfgLoad();")<SRC.indexOf("\ndemoLoad();"));
+ /* nguoi dung phai DOC DUOC chuyen do, va phai co duong bo cau hinh mot cach CO Y */
+ window.SETTAB="tongquan";
+ var bd=RENDER["settings"]();
+ t("ban do noi ro cau hinh khong mat khi reset du lieu", /không làm mất cấu hình/.test(bd));
+ t("co nut bo cau hinh mot cach co y", /cfgResetAsk\(\)/.test(bd)&&typeof cfgResetAsk==="function");
+ t("nut do hoi lai truoc khi xoa", /confirmRun\([^)]*"cfgResetRun"\)/.test(SRC));
+ t("cau xac nhan reset DU LIEU noi ro cau hinh duoc giu", /CẤU HÌNH TRONG CÀI ĐẶT ĐƯỢC GIỮ NGUYÊN/.test(SRC));
  window.SETTAB="ch2";
 })();
 

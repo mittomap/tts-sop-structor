@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Dựng 3 hồ sơ demo ĐẦY ĐỦ: Demo 1 / Demo 2 / Demo 3.
+Dựng 3 hồ sơ demo ĐẦY ĐỦ (Trần Khánh Vy / Lê Gia Bảo / Phạm Ngọc Hân).
 
 Cách làm: KHÔNG tạo học viên mới từ đầu (sẽ phải sinh lại toàn bộ điểm danh, bài tập,
 buổi học... và rất dễ đứt liên kết). Thay vào đó lấy 3 hồ sơ giàu dữ liệu nhất, đổi tên
-thành Demo 1/2/3 rồi VÁ ĐÚNG những mục còn thiếu để cả 3 đều sáng đủ 12 mục trên trang
-học viên. Cuối cùng đẩy 3 hồ sơ lên đầu bảng DL09 để mặc định mở ra là Demo 1, và ở app
+đặt tên chuẩn rồi VÁ ĐÚNG những mục còn thiếu để cả 3 đều sáng đủ 12 mục trên trang
+học viên. Cuối cùng đẩy 3 hồ sơ lên đầu bảng DL09 để mặc định mở ra là hồ sơ đầy nhất, và ở app
 nhân viên cũng đứng đầu danh sách.
 
 CHẠY LẠI SAU MỖI LẦN SINH LẠI DEMO:  python3 gen_demo.py && python3 mkdemo.py && python3 gen_v5.py
@@ -16,7 +16,11 @@ P = os.path.join(os.path.dirname(os.path.abspath(__file__)), "demo_data_big.json
 d = json.load(open(P, encoding="utf-8"))
 dl = d["dl"]
 
-TARGETS = [("HV061", "Demo 1"), ("HV065", "Demo 2"), ("HV002", "Demo 3")]
+# V9.47 (anh Luan: cong "dep va chuyen nghiep, khong duoc qua loa"): ba ho so trung bay nay tung
+# mang ten "Demo 1/2/3". Voi mot ban demo dem di gioi thieu cho trung tam khac thi cai ten do doc
+# ra la "chua lam xong" - nguoi xem nhin thay chu Demo la biet minh dang xem do gia. Ba ho so van
+# giu nguyen vai tro (day nhat, dung dau bang) nhung mang TEN THAT nhu moi hoc vien khac.
+TARGETS = [("HV061", "Tr\u1ea7n Kh\u00e1nh Vy"), ("HV065", "L\u00ea Gia B\u1ea3o"), ("HV002", "Ph\u1ea1m Ng\u1ecdc H\u00e2n")]
 NOW = dt.datetime.now()
 def F(x):  return x.strftime("%d/%m/%Y %H:%M")
 def FD(x): return x.strftime("%d/%m/%Y")
@@ -219,12 +223,12 @@ def unverify_one_payment(sid):
     if ps and all(str(p.get("verified_by") or "").strip() for p in ps):
         ps[-1]["verified_by"] = ""
 
-# --- Demo 1 (HV061): đủ nhất, chỉ thiếu hộp phê duyệt ---
+# --- Ho so 1 (HV061): đủ nhất, chỉ thiếu hộp phê duyệt ---
 add_discount("HV061", 1500000, "Ưu đãi học viên tái ghi danh")
 add_survey_pending("HV061")
 unverify_one_payment("HV061")
 
-# --- Demo 2 (HV065): có phê duyệt sẵn, thiếu WOW ---
+# --- Ho so 2 (HV065): có phê duyệt sẵn, thiếu WOW ---
 add_wow("HV065", [
     dict(ago=21, type="academic_support (Hỗ trợ học thuật)", by="academic_hv (Học vụ)",
          skill="Writing (Viết)", focus="Task 2 - cấu trúc bài luận",
@@ -242,7 +246,7 @@ add_survey_pending("HV065")
 add_feedback("HV065", "teacher_quality (Chất lượng giảng dạy)", "positive (Tích cực)",
              "Thầy chữa bài rất kỹ, em hiểu lỗi sai của mình.")
 
-# --- Demo 3 (HV002): thiếu phê duyệt + điểm số ---
+# --- Ho so 3 (HV002): thiếu phê duyệt + điểm số ---
 add_discount("HV002", 2000000, "Ưu đãi giới thiệu bạn")
 add_test("HV002", "5.0", ["5.0", "5.5", "4.5", "5.0"])
 add_survey_pending("HV002")
@@ -294,7 +298,7 @@ def enrs_of(sid):
     es.sort(key=lambda e: p2(e.get("enrollment_time")) or NOW)
     return es
 
-# --- Demo 1 (HV061): ưu đãi phải nằm ở khóa MỚI đăng ký (7.0), không nằm ở khóa cũ đã đóng đủ ---
+# --- Ho so 1 (HV061): ưu đãi phải nằm ở khóa MỚI đăng ký (7.0), không nằm ở khóa cũ đã đóng đủ ---
 _e61s = enrs_of("HV061")
 e_old = _e61s[0] if _e61s else None                      # khóa 6.5 đã học xong, đã đóng đủ
 e_new = _e61s[-1] if len(_e61s) > 1 else None            # khóa 7.0 vừa tái đăng ký
@@ -337,7 +341,7 @@ for ob in rows("DL08"):
     if e_new and cl and str(cl.get("course_id")) == str(e_new.get("course_id")):
         ob["enrollment_id"] = e_new["enrollment_id"]
 
-# --- Demo 2 (HV065): khóa cũ chưa đóng đồng nào -> cho đóng cọc + đợt 2, còn nợ đuôi có hẹn thu ---
+# --- Ho so 2 (HV065): khóa cũ chưa đóng đồng nào -> cho đóng cọc + đợt 2, còn nợ đuôi có hẹn thu ---
 _e65s = enrs_of("HV065")
 e05 = _e65s[0] if _e65s else None
 if e05 and not [x for x in rows("DL07") if x.get("enrollment_id") == e05["enrollment_id"]]:
@@ -353,7 +357,7 @@ for ob in rows("DL08"):
         if kg:
             _ob_anchor(ob, kg)
 
-# --- Demo 3 (HV002): test đầu vào không được nằm TRƯỚC ngày lead vào hệ thống ---
+# --- Ho so 3 (HV002): test đầu vào không được nằm TRƯỚC ngày lead vào hệ thống ---
 _e02s = enrs_of("HV002")
 e61 = _e02s[0] if _e02s else None
 if e61 and e61.get("lead_id"):

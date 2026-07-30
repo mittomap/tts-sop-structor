@@ -76,6 +76,7 @@ chay "_check16 hoc phi & drawer"  "CHECK16 OK"           node _check16.js
 chay "_check17 bo may loc"        "CHECK17 OK"           node _check17.js
 chay "_check18 hoi dong audit"    "CHECK18 OK"           node _check18.js
 chay "_checktour huong dan"       "TOUR OK"              node _checktour.js
+chay "_checkqa  hop hoi dap"     "CHECKQA OK"           node _checkqa.js
 chay "_checkdata du lieu vs luat" "CHECKDATA OK"         node _checkdata.js
 
 echo

@@ -482,13 +482,16 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
  box-shadow:0 0 0 3px #5B9BD5,0 0 0 6px rgba(91,155,213,.35),0 0 0 9999px rgba(12,22,38,.62)}
 .tourbox.dock{z-index:200;box-shadow:0 20px 54px rgba(10,20,40,.42);border:1px solid var(--line)}
 .tdo{display:flex;gap:7px;margin:9px 0 2px}
-/* .settabs la mot dai flex - nhom phai chiem TRON chieu ngang, khong thi nhan nhom sau bi hut
-   len nam canh nut cua nhom truoc, doc ra thanh mot hang vo nghia. */
-.setgrp{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 0;width:100%;flex:1 0 100%}
-.setgrp+.setgrp{border-top:1px dashed var(--line)}
-.setglb{display:inline-flex;align-items:center;gap:5px;min-width:158px;font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
-.setglb i{font-size:14px}
-@media(max-width:820px){.setglb{min-width:100%}}
+/* V9.47 - anh Luân: *"cách thiết kế này dễ hiểu nhưng hơi choáng chỗ em ạ."* Đúng: mỗi nhóm
+   chiếm TRỌN một hàng ngang nên 6 nhóm ăn 6 hàng, đẩy nội dung thật xuống quá nửa màn hình.
+   Nay các nhóm CHẢY TIẾP NHAU trên cùng dải, ngăn bằng một nhãn nhỏ - vẫn đọc ra nhóm nào là
+   nhóm nào, nhưng gói gọn trong 2 hàng thay vì 6. */
+.setgrp{display:inline-flex;align-items:center;gap:5px;flex-wrap:wrap;padding:0}
+.setgrp+.setgrp{margin-left:4px;padding-left:10px;border-left:1px solid var(--line)}
+.setglb{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.setglb i{font-size:13px}
+@media(max-width:820px){.setgrp+.setgrp{border-left:0;padding-left:0;margin-left:0}
+ .setglb{min-width:100%}}
 /* ── TRỢ THỦ Ở GÓC (V9.35) ── */
 .asstfab{position:fixed;right:18px;bottom:18px;z-index:198;display:flex;align-items:center;gap:7px;
  background:var(--navy);color:#fff;border:0;border-radius:999px;padding:11px 17px;font-family:inherit;
@@ -692,6 +695,17 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .pickc.wrap i{margin-top:2px}
 .pickc.wrap b{white-space:normal;overflow:visible;line-height:1.4}
 .pickc.wrap small{white-space:normal;overflow:visible;line-height:1.55;margin-top:2px}
+/* V9.47 - núm vặn hay chỉnh: ô nhập NGAY TẠI CHỖ. Anh Luân: "đã đổi nhanh thì cho nhập luôn
+   được chứ bấm nhảy đi chỗ khác thì cũng như không." */
+.cfnhanh{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:9px}
+.cfnr{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#fff}
+.cfnr>i{font-size:18px;color:#8A94A0;flex:none}
+.cfnt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.cfnt b{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.35}
+.cfnt small{font-size:10.5px;color:var(--muted);line-height:1.45}
+.cfni{display:flex;align-items:center;gap:6px;flex:none}
+.cfni input{width:76px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;text-align:right}
+.cfnu{font-size:10.5px;color:var(--muted);min-width:38px}
 /* Dải thẻ buổi (Vận hành lớp) - gọn, bấm chọn buổi để điểm danh ngay dưới */
 .tbdiv{display:inline-block;width:1px;height:20px;background:var(--line);margin:0 4px;vertical-align:middle}
 .tsfun{display:flex;align-items:stretch;gap:2px;overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:14px}
@@ -775,6 +789,9 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .tbar .srch{margin:0}
 .seg{display:inline-flex;background:var(--bg);border-radius:9px;padding:3px;gap:2px;flex-wrap:wrap}
 .segb{border:0;background:transparent;color:#5A6675;font-family:inherit;font-size:11.5px;font-weight:700;padding:0 11px;height:28px;border-radius:7px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.12s}
+/* V9.47: nút mở/thu dải chip dài - phải KHÁC hẳn các chip lọc để mắt không nhầm nó là một nhóm */
+.segb.segmo{color:var(--navy);border:1px dashed var(--line);font-weight:800}
+.segb.segmo:hover{border-color:var(--navy);background:#F4F8FD}
 .segb:hover{color:var(--navy)}
 .segb.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(16,32,58,.14)}
 .segb.on.red{color:#A32D2D}.segb.on.amber{color:#854F0B}.segb.on.green{color:#1E6A47}
@@ -1413,6 +1430,39 @@ var SVR=(typeof google!=="undefined"&&google.script&&google.script.run);
    - Nhiều cửa sổ/cổng mở cùng lúc tự ĐỒNG BỘ qua sự kiện storage (duyệt ở cổng này, cổng kia thấy).
    - "Reset dữ liệu demo" xóa phần lưu -> nạp lại dữ liệu gốc (file ITTs_data.js hoặc bản nhúng). */
 var LSKEY="ITTS_DEMO_STATE_V1";
+/* ═══════ V9.47 - CẤU HÌNH LƯU RIÊNG, RESET DỮ LIỆU DEMO KHÔNG ĐỤNG TỚI ═══════════════════
+   Anh Luân: *"cài đặt thì lưu là lưu luôn á, chứ ko phải như dữ liệu demo mà bấm reset là mất."*
+
+   ĐÚNG, VÀ TRƯỚC BẢN NÀY APP SAI: cả dữ liệu demo lẫn cấu hình nằm chung MỘT ô nhớ `LSKEY`, mà
+   `demoResetRun` xoá nguyên ô đó. Nghĩa là bấm "Xóa mọi thay đổi của buổi demo" là bay sạch
+   hotline, 83 ngưỡng CH2, 51 ngưỡng KPI, mọi câu nhắc CH4, nhãn danh mục CH1, thương hiệu, ma
+   trận phân quyền, cấu hình Trợ thủ, nhịp ngày - những thứ người ta ngồi cả buổi để khai.
+
+   Cấu hình và dữ liệu là HAI THỨ KHÁC HẲN NHAU:
+   - Dữ liệu demo là thứ để nghịch, hỏng thì reset.
+   - Cấu hình là LUẬT của trung tâm, không ai muốn nó bay theo một nút reset dữ liệu.
+   Nay cấu hình có ô nhớ RIÊNG `CFKEY`, ghi mỗi lần lưu, và `demoResetRun` chỉ đụng `LSKEY`.
+   Muốn bỏ cấu hình thì phải bấm đúng nút "Về mặc định TOÀN BỘ cấu hình" - một hành động riêng,
+   có hỏi lại. `LSKEY` vẫn mang theo cấu hình để Room demo hai máy không lệch luật nhau. */
+var CFKEY="ITTS_CONFIG_V1";
+function cfgPack(){return JSON.stringify({config:DATA.config,enums:DATA.enums})}
+var __cfbase=null;
+function cfgSave(){if(!CANLS||SVR)return;
+ var cur=cfgPack();
+ if(__cfbase===null){__cfbase=cur;return}
+ if(cur===__cfbase)return;
+ try{localStorage.setItem(CFKEY,JSON.stringify({sig:SEED_SIG,t:new Date().getTime(),config:DATA.config,enums:DATA.enums}));__cfbase=cur}
+ catch(e){}}
+function cfgLoad(){if(!CANLS||SVR)return false;
+ try{var raw=localStorage.getItem(CFKEY);if(!raw)return false;var st=JSON.parse(raw);
+  if(st.sig!==SEED_SIG)return false;
+  if(st.config){DATA.config=st.config}
+  if(st.enums){DATA.enums=st.enums;ENUM=DATA.enums}
+  return true}catch(e){return false}}
+function cfgDirty(){if(!CANLS)return null;try{var raw=localStorage.getItem(CFKEY);if(!raw)return null;return (JSON.parse(raw).t)||1}catch(e){return null}}
+function cfgResetAsk(){confirmRun("Trả TOÀN BỘ cấu hình về mặc định? Mất hết ngưỡng, câu nhắc, danh mục, thương hiệu và phân quyền đã sửa. Dữ liệu demo KHÔNG bị đụng tới.","cfgResetRun")}
+function cfgResetRun(){if(CANLS)try{localStorage.removeItem(CFKEY)}catch(e){}
+ location.reload()}
 function lsOK(){try{var t="__itts_t";localStorage.setItem(t,"1");localStorage.removeItem(t);return true}catch(e){return false}}
 var CANLS=(typeof localStorage!=="undefined")&&lsOK();
 function ssGet(k){try{return sessionStorage.getItem(k)}catch(e){return null}}
@@ -1513,14 +1563,18 @@ function demoSave(){if(!CANLS||SVR)return;
  var nm="";try{nm=(typeof myName==="function"&&!window.HVPORTAL)?myName():(window.HVPORTAL?"Trang học viên":"")}catch(e){}
  try{localStorage.setItem(LSKEY,JSON.stringify({sig:SEED_SIG,t:new Date().getTime(),by:nm,dl:DATA.dl,config:DATA.config,enums:DATA.enums}));__base=cur;try{roomCastState()}catch(e2){}}
  catch(e){if(!window.__swarn){window.__swarn=1;toastErr("KHÔNG lưu được thay đổi (trình duyệt chặn hoặc đầy bộ nhớ) - thao tác chỉ sống trong cửa sổ này.")}}}
-var __psT=null;function persistSoon(){try{dataChanged()}catch(e){}if(SVR||!CANLS)return;clearTimeout(__psT);__psT=setTimeout(demoSave,350)}
+/* V9.47: mỗi lần lưu ghi CẢ HAI ô nhớ - `LSKEY` (dữ liệu + cấu hình, để Room demo đồng bộ) và
+   `CFKEY` (chỉ cấu hình, để reset dữ liệu không cuốn theo luật của trung tâm). */
+var __psT=null;function persistSoon(){try{dataChanged()}catch(e){}if(SVR||!CANLS)return;clearTimeout(__psT);__psT=setTimeout(function(){demoSave();cfgSave()},350)}
 function demoDirty(){if(!CANLS)return null;try{var raw=localStorage.getItem(LSKEY);if(!raw)return null;var st=JSON.parse(raw);return st.t||1}catch(e){return null}}
 /* V9.30 (anh Luân): Reset không chỉ là "xoá thay đổi" nữa - nó còn kéo dữ liệu về hiện tại, vì
    dữ liệu gốc neo theo ngày sinh, reset về gốc mà không kéo là quay lại đúng cái demo đã cũ. */
 function demoReset(){
  var d=tshDays();
- confirmRun("Xóa MỌI thay đổi của buổi demo và quay về dữ liệu gốc?"+
+ confirmRun("Xóa MỌI thay đổi DỮ LIỆU của buổi demo và quay về dữ liệu gốc?"+
   (d?(" Đồng thời KÉO dữ liệu "+(d>0?"tới":"lùi")+" "+Math.abs(d)+" ngày để lịch và hạn xử lý hợp lý với hôm nay."):"")+
+  " CẤU HÌNH TRONG CÀI ĐẶT ĐƯỢC GIỮ NGUYÊN - ngưỡng, câu nhắc, danh mục, thương hiệu, phân quyền"+
+  " không mất; muốn bỏ thì bấm riêng nút 'Về mặc định toàn bộ cấu hình'."+
   " (mọi cổng đang mở cũng nạp lại)","demoResetRun")}
 function demoResetRun(){if(CANLS)try{localStorage.removeItem(LSKEY)}catch(e){};
  if(ROOM.on){try{roomCast({t:"reset"})}catch(e){};setTimeout(function(){location.reload()},250);return}
@@ -1736,6 +1790,10 @@ function notiDiff(by){var pre=window.__preBell;window.__preBell=null;if(!pre)ret
  var tt=fresh.length===1?((f0.grp||f0.cat||"Việc mới cần xử lý")+(by?" - từ "+by:"")):("Có "+fresh.length+" việc mới cần xử lý"+(by?" - từ "+by:""));
  var sub=fresh.slice(0,2).map(function(x){return (x.who?x.who+": ":"")+(x.what||"")}).join("  ·  ")+(fresh.length>2?"  ·  +"+(fresh.length-2)+" việc khác":"");
  notiShow(tt,sub,f0.page||"banlam",red)}
+/* V9.47: nạp CẤU HÌNH trước, DỮ LIỆU sau. Thứ tự này quan trọng - nếu còn `LSKEY` (đang giữa buổi
+   demo) thì bản cấu hình trong đó mới nhất nên được đè lên; nếu vừa reset dữ liệu thì `LSKEY` đã
+   mất, và cấu hình trong `CFKEY` sống sót đúng như anh Luân muốn. */
+cfgLoad();
 demoLoad();
 function rows(c){return DL[c]||[]}
 function find(c,f,v){var a=rows(c);for(var i=0;i<a.length;i++)if(a[i][f]===v)return a[i];return null}
@@ -1846,6 +1904,7 @@ var PAGES=[
 {k:"duyetnghi",g:"_",hide:1,ic:"ti-user-question",t:"Duyệt đơn xin nghỉ",c:"Học viên báo nghỉ chờ học vụ duyệt",ty:"custom"},
 {k:"duyetthu",g:"_",hide:1,ic:"ti-receipt",t:"Xác nhận thu tiền",c:"Kế toán đối soát khoản đã ghi",ty:"custom"},
 {k:"duyetgiao",g:"_",hide:1,ic:"ti-inbox",t:"Việc chờ nhận",c:"Việc đã giao chưa ai bấm nhận",ty:"custom"},
+{k:"hoidap",g:"Quản lý",ic:"ti-message-question",t:"Hỏi đáp",c:"Hỏi về một học viên, hoặc hỏi chỗ cấu hình",ty:"custom"},
 {k:"khac",g:"Quản lý",ic:"ti-adjustments",t:"Tính năng khác",c:"Bảo lưu · Mã giới thiệu · Bàn giao lead",ty:"custom"},
 {k:"banggiao",g:"_",ic:"ti-arrows-exchange",t:"Bàn giao lead",c:"Trong Tính năng khác",ty:"custom",hide:1},
 {k:"settings",g:"Quản lý",ic:"ti-settings",t:"Cài đặt hệ thống",c:"Cấu hình",ty:"custom"},
@@ -2902,9 +2961,16 @@ function stuAttStats(sid){var att=rows("DL12").filter(function(a){return a.stude
    Chú ý: đây là luật CHÍNH SÁCH của CH2, không phải mô hình dự báo. Đừng nói với ai là nó
    đoán được ai sẽ bỏ học - nó chỉ chạy đúng cái ngưỡng anh Luân đã viết. */
 var _raC=null,_raV=-1;
+/* V9.47 - BẪY IM LẶNG đã bắt được khi viết bộ kiểm Hỏi đáp: bảng này nhớ tạm theo `DVER` (phiên
+   bản DỮ LIỆU), nhưng kết quả của nó còn phụ thuộc HAI NGƯỠNG CẤU HÌNH. Đổi ngưỡng mà không đi
+   qua đường bump DVER thì máy vẫn giữ kết luận cũ, trong khi nhãn bên cạnh in ngưỡng MỚI - màn
+   hình đọc ra "thiếu 3 bài (ngưỡng 99)" mà vẫn tô đỏ là nguy cơ. Hôm nay `saveParam` có bump nên
+   không lộ, nhưng khoá nhớ tạm phải phủ ĐỦ mọi thứ mà kết quả phụ thuộc vào - không thì bẫy chỉ
+   nằm chờ một đường ghi mới. Nay khoá gồm cả hai ngưỡng. */
 function riskTab(){
- if(_raC&&_raV===DVER)return _raC;
  var ab=num(paramOf("thresholdAtRisk_absences",2)),hw=num(paramOf("thresholdAtRisk_hw_missing",3));
+ var khoa=DVER+"|"+ab+"|"+hw;
+ if(_raC&&_raV===khoa)return _raC;
  var T={};
  function slot(id){return T[id]||(T[id]={abs:0,miss:0,att:false,aca:false,any:false})}
  rows("DL12").forEach(function(a){
@@ -2915,7 +2981,7 @@ function riskTab(){
  rows("DL13").forEach(function(x){if(hwMissing(x))slot(String(x.student_id||"")).miss++});
  Object.keys(T).forEach(function(k){var r=T[k];
   r.att=ab>0&&r.abs>=ab;r.aca=hw>0&&r.miss>=hw;r.any=r.att||r.aca});
- _raV=DVER;return (_raC=T)}
+ _raV=khoa;return (_raC=T)}
 function riskAuto(sid){return riskTab()[String(sid||"")]||{abs:0,miss:0,att:false,aca:false,any:false}}
 /* Học viên đã rời thì không còn là "nguy cơ bỏ học" nữa - họ đã đi rồi. */
 function stuGone(s){return /dropped|graduated|transferred/.test(ecode(s&&s.student_status))}
@@ -4195,11 +4261,11 @@ function renderViec(){var items=bellItems();
   '</div>';
  var tsegs=[["all","Tất cả",base.length,""]];
  teams.forEach(function(t){if(teamC[t])tsegs.push([t,t,teamC[t],""])});
- h+=tbar('<span class="tblbl">Bộ phận</span>'+segHTML(team,tsegs,"viecTeam('{k}')"),
+ h+=tbar('<span class="tblbl">Bộ phận</span>'+segHTML(team,tsegs,"viecTeam('{k}')","viec_bophan"),
   '<button class="btn sm'+(od?" primary":"")+'" onclick="viecOnly(\''+(od?"":"red")+'\')"><i class="ti ti-alert-triangle"></i>Chỉ quá hạn</button>');
  var gsegs=[["all","Tất cả nhóm",scoped.length,""]];
  grpOrder.forEach(function(g){gsegs.push([String(g).replace(/'/g,""),g,grpC[g],""])});
- h+=tbar('<span class="tblbl">Nhóm việc</span>'+segHTML(grp,gsegs,"window.VIECGRP='{k}';reRender('viec')"),
+ h+=tbar('<span class="tblbl">Nhóm việc</span>'+segHTML(grp,gsegs,"window.VIECGRP='{k}';reRender('viec')","viec_nhom"),
   '<span class="tbcnt">'+view.length+' việc</span>');
  /* GOM THEO ĐỘ GẤP - trước đây đổ một danh sách phẳng, đỏ lẫn vàng lẫn xám, không biết bắt đầu từ đâu */
  var BUCK=[["red","Quá hạn - làm ngay","ti-alert-triangle","var(--red)"],
@@ -8170,6 +8236,7 @@ var SETMOTA={
  ch1:["Danh mục lựa chọn của mọi ô chọn trong app: trạng thái, nguồn lead, chi nhánh, lý do nghỉ… Thêm giá trị mới cho hợp với trung tâm.",function(){return Object.keys(ENUM||{}).length+" danh mục"},"ti-list"],
  tro:["Trợ thủ - thứ dắt nhân viên đi hết hàng chờ của họ. Bật/tắt, chia lượt dọn, xếp nhóm việc nào dọn trước.",function(){return (tthCfg().order||[]).length+" nhóm việc"},"ti-bulb"],
  nhip:["Nhịp ngày - danh sách việc theo giờ của từng chức danh, hiện ngay trang đầu khi họ mở app buổi sáng.",function(){return nhipRoles().length+" chức danh"},"ti-clock"],
+ qa:["Hộp Hỏi đáp: bổ sung câu trả lời cho những câu app chưa biết, và xem sổ những câu app đang bí.",function(){return qaCfg().muc.length+" mục tự khai"},"ti-message-question"],
  huongdan:["Các bài hướng dẫn có sẵn trong app: tham quan màn hình, thao tác mẫu, cấu hình. Mỗi chức danh có bài riêng.",function(){return Object.keys(TOURS||{}).length+" bài"},"ti-school"],
  phanquyen:["Ai thấy trang nào, ai bấm được nút nào, ai duyệt được việc gì - đối chiếu thẳng với bảng phân quyền CH3 của SOP.",function(){return CH3.length+" hành động"},"ti-shield-lock"],
  staff:["Danh sách nhân viên, chức danh, chi nhánh và email đăng nhập - nguồn của mọi việc phân công và mọi phạm vi quyền.",function(){return rows("DL01").length+" người"},"ti-id-badge"],
@@ -8191,6 +8258,7 @@ function setTabs(){
   ["tro","Trợ thủ","dat"],
   ["nhip","Nhịp ngày","dat"],
   ["huongdan","Bài hướng dẫn","dat"],
+  ["qa","Hỏi đáp","dat"],
   ["phanquyen","Phân quyền & Phạm vi","quyen"],
   ["staff","Nhân viên & Email","quyen"],
   ["giagio","Đơn giá giờ dạy","quyen"],
@@ -8201,23 +8269,56 @@ function setTabs(){
 /* Lối tắt tới việc hay làm nhất trong Cài đặt. [nhãn, icon, câu giải thích, hành động]. Mọi hành
    động ở đây phải là một cửa CÓ THẬT trong app - bộ kiểm gọi lại từng cái để chắc là không dẫn
    người dùng vào khoảng không. */
+/* V9.47 - anh Luân sửa hai chỗ em làm sai ở bản trước:
+   1. *"những chỗ mà dễ thay đổi thì em mới cho nó thành việc hay làm, chứ như hotline thì mấy khi
+      đổi đâu."* Đúng. Hotline, logo, tên trung tâm là việc CÀI LẦN ĐẦU, không phải việc hay làm.
+      Danh sách dưới đây nay chỉ giữ các NÚM VẶN VẬN HÀNH - thứ tháng nào cũng có thể phải chỉnh
+      khi lớp đông lên, khi chính sách giá đổi, khi đội ngũ than hạn gấp quá.
+   2. *"Mà đã đổi nhanh, thì em cho nhập luôn được chứ em bấm nhảy đi chỗ khác thì cũng như
+      không."* Đúng nốt - một lối tắt mà chỉ cuộn màn hình thì không tiết kiệm được gì. Nay mỗi
+      dòng có Ô NHẬP + nút Lưu ngay tại đây, sửa xong áp liền, không rời trang. */
 var SETNHANH=[
- ["Đổi hotline trung tâm","ti-phone","Số hiện trong tin nhắn xác nhận và trên phiếu thu.","cfGo('centerHotline')"],
- ["Đổi ngưỡng nợ quá hạn","ti-cash-off","Quá hạn đóng đợt bao nhiêu ngày thì chuyển thành nợ quá hạn.","cfGo('installmentLate_days')"],
- ["Chiết khấu tới mức nào phải duyệt","ti-discount","Từ mức này trở lên thì đơn treo lại chờ quản lý gật.","cfGo('thresholdDiscount_approval')"],
- ["Đổi đơn giá giờ dạy","ti-clock-dollar","Bảng giá theo giảng viên x loại ngày x ca - bảng công tính từ đây.","window.SETTAB='giagio';reRender('settings')"],
- ["Thêm / sửa nhân viên","ti-id-badge","Chức danh và chi nhánh của một người quyết định họ thấy gì.","window.SETTAB='staff';reRender('settings')"],
- ["Đổi tên & logo trung tâm","ti-palette","Dùng khi mang app đi giới thiệu cho trung tâm khác.","window.SETTAB='brand';reRender('settings')"],
- ["Sửa lời nhắc việc","ti-message-2","Câu chữ app nhắc nhân viên - sửa một chỗ là mọi nơi đổi theo.","window.SETTAB='ch4';reRender('settings')"],
- ["Xem ai được làm gì","ti-lock-check","Bảng phân quyền CH3 - đóng vai một chức danh để thử.","window.SETTAB='phanquyen';reRender('settings')"]];
+ ["installmentLate_days","Nợ quá hạn tính từ ngày thứ mấy","ti-cash-off"],
+ ["thresholdDiscount_approval","Chiết khấu từ mức nào phải trình quản lý","ti-discount"],
+ ["classMinStudents","Sĩ số tối thiểu để mở lớp","ti-users-group"],
+ ["thresholdAtRisk_absences","Vắng mấy buổi thì coi là có nguy cơ","ti-alert-triangle"],
+ ["teacherPayPerHour","Đơn giá giờ dạy mặc định","ti-clock-dollar"],
+ ["slaHomeworkGrading_hours","Hạn chấm một bài tập","ti-book"],
+ ["slaLRT_minutes","Khách mới bao lâu phải liên hệ lần đầu","ti-phone-call"],
+ ["wowGrantMax_perTime","Mỗi lần cấp thêm tối đa mấy lượt WOW","ti-star"]];
+/* Việc CÀI LẦN ĐẦU - làm một lần lúc dựng trung tâm rồi hầu như không đụng lại. Tách hẳn ra để
+   không lẫn với núm vặn vận hành. */
+var SETLANDAU=[
+ ["Tên, logo, màu, hotline, địa chỉ","ti-palette","Toàn bộ nhận dạng của trung tâm - dùng khi mang app đi giới thiệu cho nơi khác.","brand"],
+ ["Nhân viên, chức danh, chi nhánh","ti-id-badge","Chức danh và chi nhánh của một người quyết định họ thấy gì và làm được gì.","staff"],
+ ["Danh mục khóa học","ti-school","Học phí, số buổi, quota WOW của từng khóa.","khoa"],
+ ["Phân quyền & phạm vi dữ liệu","ti-lock-check","Ai thấy trang nào, ai thấy dữ liệu của ai, ai được duyệt việc gì.","phanquyen"],
+ ["Bảng đơn giá giờ dạy chi tiết","ti-clock-dollar","Theo từng giảng viên x loại ngày x ca.","giagio"],
+ ["Câu chữ lời nhắc việc","ti-message-2","Sửa một câu là mọi nơi trong app đổi theo.","ch4"]];
+/* Lưu một tham số ngay tại bản đồ, không rời trang. Dùng chung `saveParam` để đi đúng cửa ghi
+   (có nhật ký, có persistSoon) chứ không tự ghi tắt vào cấu hình. */
+function cfNhanhLuu(name){saveParam(name);reRender("settings")}
 function renderSetTongquan(){
  var stabs=setTabs(),rs=SCOPE();
  if(rs.tabs&&rs.tabs.settings)stabs=stabs.filter(function(t){return rs.tabs.settings.indexOf(t[0])>=0});
  var h='<div class="notebar"><i class="ti ti-compass"></i>Đây là <b>bản đồ của màn Cài đặt</b>. Mỗi ô dưới đây là một tab: nó cai quản chuyện gì, đang giữ bao nhiêu thứ, bấm vào là sang thẳng. Không cần nhớ tên tab - cứ đọc câu mô tả rồi bấm.</div>';
  /* việc hay làm nhất - đi trước, vì phần lớn lần mở Cài đặt là để làm một trong số này */
- h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-bolt" style="margin-right:6px"></i>Việc hay làm nhất</b><span class="mut" style="font-size:11.5px">bấm là tới thẳng đúng ô, không phải dò</span></div><div class="pbody"><div class="pickgrid">';
+ /* NÚM VẶN HAY CHỈNH - sửa ngay tại đây, không phải nhảy đi đâu cả */
+ h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-bolt" style="margin-right:6px"></i>Núm vặn hay chỉnh</b><span class="mut" style="font-size:11.5px">gõ số rồi bấm Lưu - áp ngay, không rời trang</span></div><div class="pbody"><div class="cfnhanh">';
  SETNHANH.forEach(function(x){
-  h+='<button class="pickc wrap" onclick="'+x[3].split('"').join("&quot;")+'">'+
+  var P=null;for(var i=0;i<APPPARAMS.length;i++)if(APPPARAMS[i][1]===x[0])P=APPPARAMS[i];
+  if(!P)return;
+  h+='<div class="cfnr"><i class="ti '+esc(x[2])+'"></i>'+
+   '<div class="cfnt"><b>'+esc(x[1])+'</b><small>'+esc(P[2])+'</small></div>'+
+   '<div class="cfni"><input id="cf_'+esc(x[0])+'" value="'+esc(paramOf(x[0],P[4]))+'" inputmode="numeric" aria-label="'+esc(x[1])+'">'+
+   '<span class="cfnu">'+esc(P[3]||"")+'</span>'+
+   '<button class="btn primary sm" onclick="cfNhanhLuu(\''+esc(x[0])+'\')"><i class="ti ti-device-floppy"></i>Lưu</button></div></div>'});
+ h+='</div><div class="mut" style="font-size:11.5px;margin-top:10px">Còn '+(APPPARAMS.length-SETNHANH.length)+' tham số khác nằm ở tab <b>Ngưỡng &amp; SLA (CH2)</b>, chia 16 nhóm theo hành trình SOP và có ô tìm.</div></div></div>';
+ /* CÀI LẦN ĐẦU - làm một lần rồi thôi, tách hẳn khỏi núm vặn vận hành */
+ h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-flag" style="margin-right:6px"></i>Cài lần đầu</b><span class="mut" style="font-size:11.5px">dựng xong trung tâm thì hầu như không đụng lại</span></div><div class="pbody"><div class="pickgrid">';
+ SETLANDAU.forEach(function(x){
+  if(stabs.length&&!stabs.some(function(t){return t[0]===x[3]}))return;
+  h+='<button class="pickc wrap" onclick="window.SETTAB=\''+esc(x[3])+'\';reRender(\'settings\')">'+
    '<i class="ti '+esc(x[1])+'"></i><span><b>'+esc(x[0])+'</b><small>'+esc(x[2])+'</small></span>'+
    '<i class="ti ti-chevron-right"></i></button>'});
  h+='</div></div></div>';
@@ -8234,7 +8335,46 @@ function renderSetTongquan(){
     '<small>'+esc(M?M[0]:"Tab này chưa được khai trong bảng SETMOTA - báo kỹ thuật khai vào.")+'</small></span>'+
     (dem?'<span class="chip gray">'+esc(dem)+'</span>':'')+'</button>'});
   h+='</div></div></div>'});
- h+='<div class="notebar"><i class="ti ti-shield-half"></i>Đổi cấu hình là <b>áp ngay cho cả app</b>, không cần build lại và không cần khởi động lại. Mỗi lần lưu đều để lại một dòng ở tab <b>Nhật ký thao tác</b> - lỡ tay thì vào đó xem đã đổi gì.</div>';
+ /* V9.47 - phải nói THẲNG chuyện cấu hình sống ở đâu, vì đây là thứ người ta sợ mất nhất */
+ h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-device-floppy" style="margin-right:6px"></i>Cấu hình được giữ ở đâu</b></div><div class="pbody">';
+ h+='<div class="mut" style="font-size:12px;line-height:1.75">Sửa xong là <b>lưu ngay và áp ngay cho cả app</b> - không cần build lại, không cần khởi động lại. Mỗi lần lưu để lại một dòng ở tab <b>Nhật ký thao tác</b>, lỡ tay thì vào đó xem đã đổi gì.<br>'+
+  '<b>Cấu hình nằm ở ô nhớ RIÊNG, tách khỏi dữ liệu demo.</b> Bấm <b>Xóa dữ liệu demo</b> ở tab Dữ liệu demo <b>không làm mất cấu hình</b> - ngưỡng, câu nhắc, danh mục, thương hiệu và phân quyền vẫn còn nguyên. Muốn bỏ cấu hình thì phải bấm đúng nút dưới đây.</div>';
+ var __cfd=cfgDirty();
+ h+='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px">'+
+  '<span class="chip '+(__cfd?"green":"gray")+'">'+(__cfd?("Đã lưu cấu hình riêng lúc "+esc(fmtDT(new Date(__cfd)))):"Đang dùng nguyên bản, chưa sửa gì")+'</span>'+
+  '<button class="btn danger sm" onclick="cfgResetAsk()"><i class="ti ti-restore"></i>Về mặc định TOÀN BỘ cấu hình</button></div>';
+ h+='</div></div>';
+ return h}
+function renderSetQA(){
+ var Q=qaCfg();
+ var h='<div class="notebar"><i class="ti ti-message-question"></i>Hộp <b>Hỏi đáp</b> tự trả lời được phần lớn câu hỏi bằng cách đọc chính cấu hình và dữ liệu đang chạy - <b>'+qaKhoHeThong().length+' mục tự dựng</b>. Tab này là chỗ <b>bổ sung những câu nó chưa biết</b>, và là chỗ xem <b>app đang bí câu nào</b>.</div>';
+ /* SỔ CÂU BÍ - phần quan trọng nhất của tab này. Anh Luân: "a sợ hỏi nhiều chỉ số hay gì đó mà
+    nó ko trả lời được, phải có cách cập nhật." Đây là cách: app tự khai ra chỗ nó dốt. */
+ h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-help-circle" style="margin-right:6px"></i>Câu hỏi app chưa trả lời được ('+Q.hut.length+')</b><span class="mut" style="font-size:11.5px">app tự ghi mỗi lần bí - không phải đoán xem còn thiếu gì</span></div>';
+ if(!Q.hut.length)h+='<div class="pbody"><div class="empty">Chưa có câu nào bị bí. Mọi câu hỏi từ trước tới nay app đều trả lời được.</div></div>';
+ else{h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Câu người ta đã hỏi</th><th style="width:80px">Số lần</th><th style="width:150px">Lần gần nhất</th><th style="width:210px"></th></tr></thead><tbody>';
+  Q.hut.forEach(function(x,i){
+   h+='<tr><td style="white-space:normal;font-size:12px">'+esc(x.h)+'</td>'+
+    '<td style="text-align:center">'+(x.n>1?'<span class="chip amber">'+x.n+'</span>':x.n)+'</td>'+
+    '<td style="font-size:11.5px">'+esc(x.t||"-")+'</td>'+
+    '<td class="nw"><button class="btn primary sm" onclick="qaMucThemTuHut('+i+')"><i class="ti ti-plus"></i>Soạn câu trả lời</button> '+
+    '<button class="btn sm" onclick="qaHutXoa('+i+')" aria-label="Bỏ qua câu hỏi này" data-tip="Bỏ qua - không cần trả lời"><i class="ti ti-x"></i></button></td></tr>'});
+  h+='</tbody></table></div>'}
+ h+='</div>';
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-book" style="margin-right:6px"></i>Câu trả lời tự khai ('+Q.muc.length+')</b><button class="btn primary sm" onclick="qaMucThem()"><i class="ti ti-plus"></i>Thêm mục</button></div><div class="pbody">';
+ h+='<div class="fhint" style="margin:0 0 12px">Ô <b>Từ khoá</b> là những chữ người ta có thể gõ - ngăn nhau bằng dấu <b>·</b>, càng nhiều cách nói càng dễ trúng (app tự bỏ dấu tiếng Việt khi so, nên không cần khai cả bản có dấu lẫn không dấu). Mục tự khai luôn <b>đứng trước</b> câu trả lời app tự dựng.</div>';
+ if(!Q.muc.length)h+='<div class="empty">Chưa khai mục nào.</div>';
+ Q.muc.forEach(function(m,i){
+  h+='<div style="border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-bottom:10px">'+
+   '<div class="fld full"><label>Từ khoá người ta có thể gõ</label><input id="qah_'+i+'" value="'+esc(m.h||"")+'" placeholder="vd: đổi hotline · số tổng đài · sđt trung tâm"></div>'+
+   '<div class="fld full"><label>Câu trả lời</label><textarea id="qad_'+i+'" rows="2" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:12.5px">'+esc(m.d||"")+'</textarea></div>'+
+   '<div class="fld full"><label>Chỉ chỗ (hiện kèm câu trả lời)</label><input id="qao_'+i+'" value="'+esc(m.o||"")+'" placeholder="vd: Cài đặt > Thương hiệu & Màu"></div>'+
+   '<div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">'+
+   '<button class="btn primary sm" onclick="qaMucLuu('+i+')"><i class="ti ti-device-floppy"></i>Lưu</button>'+
+   '<button class="btn danger sm" onclick="qaMucXoa('+i+')" aria-label="Xoá mục hỏi đáp này"><i class="ti ti-trash"></i>Xoá</button>'+
+   (m.go?'<span class="mut" style="font-size:11px">có nút mở thẳng tới nơi</span>':'')+'</div></div>'});
+ h+='</div></div>';
+ h+='<div class="sp" style="margin-top:12px"><button class="btn" onclick="go(\'hoidap\')"><i class="ti ti-message-question"></i>Mở hộp Hỏi đáp để thử</button></div>';
  return h}
 function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)||{ch2:[],ch6:[]};
  var h='<div class="phead"><div><div class="t">Cài đặt hệ thống</div><div class="s">Nơi DUY NHẤT cấu hình cả app - đổi 1 giá trị là mọi nhắc việc, trạng thái và KPI phụ thuộc tự cập nhật theo, không cần build lại.</div></div></div>';
@@ -8251,6 +8391,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   h+='</div>'});
  h+='</div>';
  if(tab==="tongquan")return h+renderSetTongquan();
+ if(tab==="qa")return h+renderSetQA();
  if(tab==="health")return h+renderHealth();
  if(tab==="nhatky")return h+renderNhatky();
  if(tab==="tro")return h+renderTro();
@@ -8264,6 +8405,12 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   h+='<div class="fld full"><label>Dòng phụ dưới tên</label><input value="'+esc(u.sub)+'" oninput="uiSet(\'sub\',this.value)" placeholder="'+esc(UIDEF.sub)+'"></div>';
   h+='<div class="fld full"><label>Tên trung tâm (dùng trong tin nhắn gửi khách, phiếu in)</label><input value="'+esc(u.center)+'" oninput="uiSet(\'center\',this.value)" placeholder="'+esc(UIDEF.center)+'"></div>';
   h+='<div class="fld full"><label>Tiêu đề tab trình duyệt</label><input value="'+esc(u.title)+'" oninput="uiSet(\'title\',this.value)" placeholder="'+esc(UIDEF.title)+'"></div>';
+  /* V9.47 - anh Luân: *"đổi hotline mà nằm ở Ngưỡng & SLA là chết rồi, ko đúng nhóm."* Đúng.
+     Hotline và địa chỉ là THÔNG TIN NHẬN DẠNG của trung tâm, cùng họ với tên và logo - không
+     phải ngưỡng nghiệp vụ. Nay chúng ở đây, ngay cạnh tên trung tâm. Nhóm "Trung tâm" bị loại
+     khỏi tab CH2 để không có hai chỗ sửa cùng một thứ. */
+  APPPARAMS.filter(function(p){return p[0]==="Trung tâm"}).forEach(function(p){
+   h+='<div class="fld full"><label>'+esc(p[2])+'</label><input id="cf_'+esc(p[1])+'" value="'+esc(paramOf(p[1],p[4]))+'" placeholder="chưa khai" onchange="saveParam(\''+esc(p[1])+'\')"></div>'});
   h+='</div></div>';
   h+='<div class="panel"><div class="ph"><b><i class="ti ti-photo" style="margin-right:6px"></i>Logo</b></div><div class="pbody">';
   h+='<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px"><div style="width:54px;height:54px;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;justify-content:center;background:#fff">'+uiLogoHTML(34)+'</div>';
@@ -8411,7 +8558,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   h+='<div class="notebar"><i class="ti ti-alert-triangle"></i>Chỉ Quản lý / Giám đốc sửa được. Nhập số -> Lưu -> áp dụng ngay cho mọi nhắc việc & trạng thái tự động.</div>';
   var used={}; APPPARAMS.forEach(function(p){used[paramSheetName(p[1])]=1});
   /* V9.46: nhóm xếp theo ĐÚNG HÀNH TRÌNH SOP (CFNHOM), không theo thứ tự xuất hiện trong mã. */
-  var grps=[]; APPPARAMS.forEach(function(p){if(grps.indexOf(p[0])<0)grps.push(p[0])});
+  var grps=[]; APPPARAMS.forEach(function(p){if(p[0]===CFTRUNGTAM)return;if(grps.indexOf(p[0])<0)grps.push(p[0])});
   grps.sort(function(a,b){var x=CFNHOMBY[a],y=CFNHOMBY[b];
    return (x?x.ord:998)-(y?y.ord:998)||(a<b?-1:a>b?1:0)});
   var cq=(window.CFQ||"").toLowerCase().trim();
@@ -8930,6 +9077,9 @@ function paramSheetName(name){var c=(DATA.config&&DATA.config.ch2)||[];
 
    Nay 17 nhóm xếp theo đúng hành trình SOP (P1 → P10), mỗi nhóm có một câu nói nó lo việc gì và
    danh sách trang bấm thẳng sang để xem kết quả. Bộ kiểm bắt buộc nhóm mới phải khai vào đây. */
+/* V9.47: nhóm này KHÔNG hiện ở tab CH2 nữa - nó là thông tin nhận dạng, thuộc tab Thương hiệu,
+   nằm ngay cạnh tên và logo trung tâm. Giữ tên trong một hằng số để hai nơi không lệch nhau. */
+var CFTRUNGTAM="Trung tâm";
 var CFNHOM=[
  ["Trung tâm","Thông tin nhận dạng của trung tâm - hiện trên cổng học viên, phiếu thu và mọi tin nhắn gửi khách.",["dsthanhtoan","thanhtoan"]],
  ["P1 · Lead & chăm khách","Bao lâu phải gọi khách mới, gọi mấy lần không được thì coi như mất, quá hẹn bao lâu thì tính là bỏ rơi. Đây là nhóm quyết định cảnh báo đỏ của đội tư vấn.",["tuyensinh","viec"]],
@@ -9207,13 +9357,38 @@ function pageHead(t,s,btn){/* UX-23: tiêu đề đã có ở topbar (#pgTitle) 
 /* ===== THANH CÔNG CỤ CHUẨN =====
    segHTML(cur, opts, onTpl): opts = [mã, nhãn, (số đếm), (lớp màu)]; onTpl chứa {k} để thay mã.
    tbar(parts): ghép [tìm] [chip phân đoạn] ... đẩy [số dòng][Cột][nút] về BÊN PHẢI. */
-function segHTML(cur,opts,onTpl){
+/* ═══════ V9.47 - DẢI CHIP DÀI PHẢI TỰ CUỘN LẠI ═══════════════════════════════════════════
+   Anh Luân xem màn Việc hôm nay rồi nói: *"kiểu thiết kế này nó bị ghê :("* - và đúng. Dải
+   "Nhóm việc" có hơn 40 chip, trải SÁU HÀNG, đẩy danh sách việc thật xuống dưới màn hình. Người
+   ta vào đây để LÀM VIỆC, không phải để đọc menu lọc.
+   Cùng một bệnh với thanh tab Cài đặt, nên chữa ở CHÍNH thành phần dùng chung `segHTML` - mọi
+   dải chip trong app cùng gọn theo, không phải đi vá từng màn.
+   Luật: quá `SEGMAX` mục thì chỉ hiện những mục ĐÔNG VIỆC NHẤT (cộng mục đang chọn - không bao
+   giờ giấu thứ người ta đang xem), phần còn lại nằm sau nút "+N nhóm khác" bấm ra. */
+var SEGMAX=10;
+var SEGMO={};
+function segMo(id){SEGMO[id]=!SEGMO[id];reRender(CUR)}
+function segHTML(cur,opts,onTpl,id){
  var isArr=(Object.prototype.toString.call(cur)==="[object Array]");
- return '<div class="seg">'+opts.map(function(o){
-  var on=isArr?(cur.indexOf(o[0])>=0):(cur===o[0]);
-  var cls=(on?" on":"")+(o[3]?" "+o[3]:"");
+ function chon(o){return isArr?(cur.indexOf(o[0])>=0):(cur===o[0])}
+ function nut(o){
+  var cls=(chon(o)?" on":"")+(o[3]?" "+o[3]:"");
   return '<button class="segb'+cls+'" onclick="'+onTpl.split("{k}").join(o[0])+'">'+esc(o[1])+
-   (o[2]!=null&&o[2]!==""?'<i class="segn">'+o[2]+'</i>':'')+'</button>'}).join("")+'</div>'}
+   (o[2]!=null&&o[2]!==""?'<i class="segn">'+o[2]+'</i>':'')+'</button>'}
+ id=id||("seg"+opts.length);
+ if(opts.length<=SEGMAX||SEGMO[id])
+  return '<div class="seg">'+opts.map(nut).join("")+
+   (opts.length>SEGMAX?'<button class="segb segmo" onclick="segMo(\''+esc(id)+'\')"><i class="ti ti-chevron-up"></i>Thu gọn</button>':'')+'</div>';
+ /* Mục ĐẦU TIÊN luôn giữ (thường là "Tất cả"), mục đang chọn luôn giữ, còn lại xếp theo số việc. */
+ var giu=[],con=[];
+ opts.forEach(function(o,i){if(i===0||chon(o))giu.push(o);else con.push(o)});
+ con.sort(function(a,b){return (num(b[2])||0)-(num(a[2])||0)});
+ var hien=giu.concat(con.slice(0,Math.max(0,SEGMAX-giu.length)));
+ var an=opts.length-hien.length;
+ /* giữ đúng thứ tự gốc để mắt không phải học lại vị trí mỗi lần số việc đổi */
+ hien.sort(function(a,b){return opts.indexOf(a)-opts.indexOf(b)});
+ return '<div class="seg">'+hien.map(nut).join("")+
+  '<button class="segb segmo" onclick="segMo(\''+esc(id)+'\')"><i class="ti ti-dots"></i>+'+an+' nhóm khác</button></div>'}
 function tbar(left,right){return '<div class="tbar" data-tour="tbar">'+(left||"")+'<div class="tbsp"></div>'+(right||"")+'</div>'}
 function srchHTML(val,fn,ph,w){return '<div class="srch" style="max-width:'+(w||300)+'px"><i class="ti ti-search"></i><input placeholder="'+esc(ph||"Tìm...")+'" value="'+esc(val||"")+'" oninput="'+fn+'" autocomplete="off"></div>'}
 /* giữ nguyên chữ ký cũ để 8 trang tác vụ tự lên giao diện mới; opts có thể kèm số đếm ở phần tử [2] */
@@ -10579,6 +10754,28 @@ function hvOpenHw(id){var x=find("DL13","homework_id",id)||{};
  h+='</div>';openDrawer("Bài đã nộp",h)}
 function hvDays(d){var x=pvnd(d);return x?Math.max(0,Math.round((Date.now()-x.getTime())/864e5)):0}
 function hvT0(){var d=new Date();d.setHours(0,0,0,0);return d.getTime()} /* 0h hôm nay */
+/* ═══════ V9.47 - MỘT KIỂU DÒNG THỜI GIAN DUY NHẤT CHO CỔNG HỌC VIÊN ═══════════════════════
+   Anh Luân: *"ở cái cổng học viên, có chỗ thiết kế timeline, có chỗ lại chưa, ví dụ như buổi học
+   và buổi wow, mà timeline lại hiện 2 lần thời gian cơ, nhìn hơi kỳ cục."*
+
+   Đúng cả hai vế:
+   1. **Hai lần thời gian** - node trên đường kẻ in NGÀY, rồi ngay trong thẻ lại in `session_date`
+      NGUYÊN VĂN (cả ngày lẫn giờ). Đọc thành "30/07/2026" xong lại "30/07/2026 18:00".
+   2. **Không nhất quán** - nhật ký buổi học có đường kẻ timeline, nhật ký buổi WOW thì không,
+      dù hai mục nằm sát nhau và cùng là "chuyện đã xảy ra theo thứ tự thời gian".
+
+   Nay cả hai đi qua CÙNG MỘT hàm. Luật chia việc rõ ràng: **node giữ NGÀY, thẻ chỉ giữ GIỜ** -
+   không chỗ nào in lại thứ chỗ kia đã nói. */
+function hvNgay(s){var t=String(s||"").trim();if(!t)return "";
+ var m=t.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return m[3]+"/"+m[2]+"/"+m[1];
+ var m2=t.match(/^(\d{2})\/(\d{2})\/(\d{4})/);return m2?m2[0]:t.slice(0,10)}
+function hvGio(s){var m=String(s||"").match(/(\d{1,2}):(\d{2})/);return m?(("0"+m[1]).slice(-2)+":"+m[2]):""}
+/* Một dòng trên đường kẻ. `d` là mốc thời gian gốc, `inner` là thẻ nội dung đã dựng sẵn. */
+function hvTLrow(d,inner){var dt=pvnd(d);
+ return '<div class="hvtlr'+(dt&&dt.getTime()<hvT0()?" past":"")+'">'+
+  '<div class="hvtld">'+esc(hvNgay(d)||"chưa có ngày")+'</div>'+inner+'</div>'}
+function hvTLopen(){return '<div class="hvtl">'}
+function hvTLclose(){return '</div>'}
 function hvPct(a,b){return b>0?Math.round(a/b*100):null}
 /* ===== GIỚI THIỆU BẠN BÈ (trang học viên) =====
    Học viên tự tạo mã giới thiệu cá nhân; bạn được giới thiệu giảm theo chính sách
@@ -11015,68 +11212,77 @@ function renderTrangHV(){
  var shown=mySes.filter(function(s2){return attBySes[s2.session_id]||hwBySes[s2.session_id]||isc(s2.session_status,"completed")});
  h+='<div class="panel" style="margin-bottom:16px"><div class="pbody">';
  if(!shown.length)h+='<div class="empty">Chưa có buổi học nào được ghi nhận.</div>';
- if(shown.length)h+='<div class="hvtl">'; /* V9.18: rail + node thời gian - đúng nghĩa timeline, hết cảnh block hòa lẫn */
+ if(shown.length)h+=hvTLopen(); /* V9.18: rail + node thời gian - đúng nghĩa timeline, hết cảnh block hòa lẫn */
  shown.slice(0,12).forEach(function(s2){
   var a=attBySes[s2.session_id], hws=hwBySes[s2.session_id]||[];
   var acls=a?stCls(a.attendance_status):"";
-  var _sd=pvnd(s2.session_date);
-  h+='<div class="hvtlr'+(_sd&&_sd.getTime()<hvT0()?" past":"")+'"><div class="hvtld">'+esc(String(s2.session_date||"").slice(0,10)||"-")+'</div>';
-  h+='<div class="hvses"><div class="hvsh">'+
+  /* V9.47: node đã in NGÀY - trong thẻ chỉ in GIỜ, không lặp lại ngày lần thứ hai */
+  var _g=hvGio(s2.session_date), the="";
+  the+='<div class="hvses"><div class="hvsh">'+
    '<span class="hvsn">Buổi '+esc(s2.session_number||"?")+'</span>'+
-   '<div class="hvst"><b>'+esc(s2.session_date||"")+'</b><span>GV '+esc(s2.teacher_id_name||s2.teacher_id||"-")+'</span></div>'+ /* V9.17: "GV vào trễ" là chỉ số QA nội bộ - không hiện cho học viên */
+   '<div class="hvst"><b>'+(_g?esc(_g):'chưa xếp giờ')+'</b><span>GV '+esc(s2.teacher_id_name||s2.teacher_id||"-")+'</span></div>'+ /* V9.17: "GV vào trễ" là chỉ số QA nội bộ - không hiện cho học viên */
    (a?'<span class="chip '+acls+'">'+esc(elabel(a.attendance_status))+'</span>':'<span class="chip">chưa điểm danh</span>')+'</div>';
-  h+='<div class="hvsb">';
-  if(a){h+='<div class="hvev"><i class="ti ti-user-check"></i><span><b>Điểm danh:</b> '+esc(elabel(a.attendance_status))+
+  the+='<div class="hvsb">';
+  if(a){the+='<div class="hvev"><i class="ti ti-user-check"></i><span><b>Điểm danh:</b> '+esc(elabel(a.attendance_status))+
    (a.check_in_time?' · vào lúc '+esc(String(a.check_in_time).slice(-5)):'')+
    (a.absence_type?' · '+esc(elabel(a.absence_type)):'')+
    (a.in_class_performance?' · thái độ trong lớp: <b>'+esc(elabel(a.in_class_performance))+'</b>':'')+
    /* (m) DL12.note là ghi chú NỘI BỘ (vd "đã gọi hỏi thăm, HV hứa đi học lại") - in nguyên
       văn cho học viên đọc là lộ chuyện chăm sóc nội bộ. Chỉ hiện phần HỌC VIÊN TỰ GHI. */
    (hvSelfWhy(a)?' · lý do bạn báo: '+esc(hvSelfWhy(a)):'')+/* V9.29: nói rõ đơn của em đang ở đâu - trước đây báo xong là im, em không biết đã được duyệt chưa */(absPending(a)?' · <b style="color:#8A6D1B">trung tâm đang xem xét</b>':(ecode(a.absence_type)==="excused"?' · <b style="color:#1E6A47">đã được duyệt: vắng có phép</b>':(ecode(a.absence_type)==="unexcused"?' · <b style="color:#A32D2D">không được chấp nhận</b>':'')))+(a.makeup_session_id?(function(){var t=find("DL11","session_id",a.makeup_session_id)||{};return ' · <b style="color:var(--navy)">đã xếp học bù: buổi '+esc(t.session_number||'')+' ngày '+esc(t.session_date||'')+'</b>'})():'')+'</span></div>'}
-  if(s2.teacher_note_summary)h+='<div class="hvev"><i class="ti ti-notes"></i><span><b>Nhận xét của giảng viên:</b> '+esc(s2.teacher_note_summary)+'</span></div>';
+  if(s2.teacher_note_summary)the+='<div class="hvev"><i class="ti ti-notes"></i><span><b>Nhận xét của giảng viên:</b> '+esc(s2.teacher_note_summary)+'</span></div>';
   /* (g) ĐÁNH GIÁ TỪNG BUỔI bằng hàng sao - ghi vào DL16 kèm session_id để học vụ biết buổi nào
      bị chấm thấp, thay vì đợi tới phiếu khảo sát cuối khóa mới biết. */
   if(isc(s2.session_status,"completed")){
    var _fb=rows("DL16").filter(function(f){return String(f.session_id||"")===String(s2.session_id||"")&&String(f.student_id||"")===sid})[0];
    var _sc=_fb?num(_fb.feedback_score):0;
-   h+='<div class="hvev"><i class="ti ti-star"></i><span><b>Bạn thấy buổi này thế nào?</b> '+
+   the+='<div class="hvev"><i class="ti ti-star"></i><span><b>Bạn thấy buổi này thế nào?</b> '+
     (_sc?('<span class="hvstars done">'+[1,2,3,4,5].map(function(i){return '<i class="ti '+(i<=_sc?"ti-star-filled on":"ti-star")+'"></i>'}).join("")+'</span> <span class="mut">bạn đã chấm '+_sc+'/5</span>')
         :('<span class="hvstars">'+[1,2,3,4,5].map(function(i){return '<i class="ti ti-star" onclick="hvRateSes(\''+esc(s2.session_id)+'\','+i+')" title="'+i+' sao"></i>'}).join("")+'</span> <span class="mut">bấm sao để chấm</span>'))+
     '</span></div>'}
   /* (k) trước đây in link dạng CHỮ THÔ - học viên phải bôi đen copy dán, trên điện thoại gần
      như không dùng được. Nay là liên kết bấm được. */
-  if(s2.materials_link)h+='<div class="hvev"><i class="ti ti-paperclip"></i><span><b>Tài liệu buổi học:</b> '+hvLink(s2.materials_link,"Mở tài liệu")+'</span></div>';
+  if(s2.materials_link)the+='<div class="hvev"><i class="ti ti-paperclip"></i><span><b>Tài liệu buổi học:</b> '+hvLink(s2.materials_link,"Mở tài liệu")+'</span></div>';
   hws.forEach(function(x){
-   h+='<div class="hvev"><i class="ti ti-book"></i><span><b>Bài tập:</b> '+esc(x.homework_title||"")+' ('+esc(elabel(x.skill)||"")+')'+
+   the+='<div class="hvev"><i class="ti ti-book"></i><span><b>Bài tập:</b> '+esc(x.homework_title||"")+' ('+esc(elabel(x.skill)||"")+')'+
     ' · hạn '+esc(x.homework_due_date||"-")+' · '+hwChip(x)+
     (hwSubmitted(x)?' · nộp lúc '+esc(x.homework_submitted_time||"-"):'')+
     (x.homework_score?' · điểm <b>'+esc(x.homework_score)+'</b>':(hwSubmitted(x)?' · <span class="mut">chờ chấm</span>':''))+
     (hwSubmitted(x)?' · <a class="lnk" onclick="hvOpenHw(\''+esc(x.homework_id)+'\')">Xem bài đã nộp</a>':'')+
     (x.teacher_feedback?'<br><i style="color:var(--muted)">GV nhận xét: '+esc(x.teacher_feedback)+'</i>':'')+'</span></div>'});
-  h+='</div></div></div>'});
- if(shown.length)h+='</div>';
+  the+='</div></div>';
+  h+=hvTLrow(s2.session_date,the)});
+ if(shown.length)h+=hvTLclose();
  if(shown.length>12)h+='<div class="mut" style="font-size:11.5px;padding:8px 0">... còn '+(shown.length-12)+' buổi trước đó.</div>';
  h+='</div></div>';
  /* ---- 8. NHẬT KÝ BUỔI WOW ---- */
  if(C.wow.length){
   h+='<div class="sechd" id="s-wow">Nhật ký buổi WOW 1-1</div><div class="panel" style="margin-bottom:16px"><div class="pbody">';
+  /* V9.47: dùng ĐÚNG dòng thời gian của nhật ký buổi học ngay phía trên - hai mục nằm sát nhau,
+     cùng là chuyện đã xảy ra theo thứ tự, không có lý do gì trình bày hai kiểu. */
+  h+=hvTLopen();
   C.wow.slice().sort(function(a,b){return (pvnd(b.wow_session_date)||0)-(pvnd(a.wow_session_date)||0)}).forEach(function(w){
    var oc=ecode(w.wow_outcome);
    var ocls=oc==="improved"?"green":(oc==="needs_more"?"amber":"");
-   h+='<div class="hvses"><div class="hvsh">'+
+   var _g=hvGio(w.wow_session_date), the="";
+   the+='<div class="hvses"><div class="hvsh">'+
     '<span class="hvsn" style="background:#DB277718;color:#DB2777"><i class="ti ti-star"></i></span>'+
     '<div class="hvst"><b>'+esc(elabel(w.wow_skill)||"")+(w.wow_content_focus?' · '+esc(w.wow_content_focus):'')+'</b>'+
-    '<span>Đặt '+esc(w.booking_date||"-")+' → học '+esc(w.wow_session_date||"-")+' · '+esc(elabel(w.wow_session_type)||"")+'</span></div>'+
+    '<span>'+(_g?esc(_g)+' · ':'')+esc(elabel(w.wow_session_type)||"")+'</span></div>'+
     '<span class="chip '+stCls(w.wow_status)+'">'+esc(elabel(w.wow_status))+'</span></div>';
-   h+='<div class="hvsb">';
-   h+='<div class="hvev"><i class="ti ti-user-check"></i><span><b>Người đặt:</b> '+esc(elabel(w.wow_booked_by)||w.wow_booked_by||"-")+' · <b>Người kèm:</b> '+esc(w.staff_name||w.staff_id||"-")+'</span></div>';
-   if(w.wow_content_note)h+='<div class="hvev"><i class="ti ti-notes"></i><span><b>Nội dung buổi:</b> '+esc(w.wow_content_note)+'</span></div>';
-   if(oc)h+='<div class="hvev"><i class="ti ti-chart-line"></i><span><b>Kết quả sau buổi:</b> <span class="chip '+ocls+'">'+esc(elabel(w.wow_outcome))+'</span>'+
+   the+='<div class="hvsb">';
+   the+='<div class="hvev"><i class="ti ti-user-check"></i><span><b>Người đặt:</b> '+esc(elabel(w.wow_booked_by)||w.wow_booked_by||"-")+
+    (w.booking_date?' (đặt ngày '+esc(hvNgay(w.booking_date))+')':'')+
+    ' · <b>Người kèm:</b> '+esc(w.staff_name||w.staff_id||"-")+'</span></div>';
+   if(w.wow_content_note)the+='<div class="hvev"><i class="ti ti-notes"></i><span><b>Nội dung buổi:</b> '+esc(w.wow_content_note)+'</span></div>';
+   if(oc)the+='<div class="hvev"><i class="ti ti-chart-line"></i><span><b>Kết quả sau buổi:</b> <span class="chip '+ocls+'">'+esc(elabel(w.wow_outcome))+'</span>'+
     (oc==="needs_more"?' — nên đặt thêm buổi cho kỹ năng này':(oc==="improved"?' — tiến bộ rõ, giữ nhịp luyện':''))+'</span></div>';
-   if(w.wow_no_show_reason)h+='<div class="hvev"><i class="ti ti-alert-triangle"></i><span><b>Vắng:</b> '+esc(w.wow_no_show_reason)+'</span></div>';
+   if(w.wow_no_show_reason)the+='<div class="hvev"><i class="ti ti-alert-triangle"></i><span><b>Vắng:</b> '+esc(w.wow_no_show_reason)+'</span></div>';
    /* (m) "đã trừ 1 lượt quota" là ngôn ngữ sổ sách nội bộ - học viên chỉ cần biết còn mấy buổi */
-   h+='<div class="hvev"><i class="ti ti-star"></i><span><b>Buổi kèm riêng:</b> '+(String(w.quota_deducted||"").toLowerCase()==="yes"?"đã tính vào gói của bạn":"chưa tính vào gói")+'</span></div>';
-   h+='</div></div>'});
+   the+='<div class="hvev"><i class="ti ti-star"></i><span><b>Buổi kèm riêng:</b> '+(String(w.quota_deducted||"").toLowerCase()==="yes"?"đã tính vào gói của bạn":"chưa tính vào gói")+'</span></div>';
+   the+='</div></div>';
+   h+=hvTLrow(w.wow_session_date,the)});
+  h+=hvTLclose();
   h+='</div></div>'}
  /* ---- 9. KHẢO SÁT CỦA BẠN: phiếu mới gửi + xem lại phiếu cũ ---- */
  var svNew=C.sv.filter(function(v){return !String(v.submitted_date||"").trim()});
@@ -13120,6 +13326,32 @@ function tourWorkBuild(){
    chk:function(){return !workAll().some(function(y){return slaKey(y)===key})}}});
  return {lv:"donviec",t:"Dọn việc của bạn",ic:"ti-checklist",dock:1,live:1,
   d:Q.length+" việc đang chờ bạn",steps:steps}}
+/* V9.47 - anh Luân hỏi: *"học viên Ngô Thanh Tú, hướng dẫn tôi xử lý task của người này, thì em
+   định làm hệ thống trả lời ra sao"*. Câu đó không đòi một BẢN LIỆT KÊ - nó đòi được DẮT ĐI.
+   Máy dắt việc đã có sẵn (`tourWorkBuild`), chỉ thiếu đường lọc theo một con người. Nay hộp Hỏi
+   đáp trả lời xong thì có nút bấm vào là chạy đúng cỗ máy đó, nhưng chỉ trên việc của người này:
+   mở đúng màn thao tác từng bước, và một bước chỉ được tính là xong khi việc BIẾN MẤT khỏi hàng
+   chờ thật - không có nút "tôi đã làm" cho ai tự khai. */
+function tourWorkBuildFor(sid){
+ var Q=workAll().filter(function(x){return String(x.hoso||"")===String(sid)||String(x.lead||"")===String(sid)});
+ if(!Q.length)return null;
+ var ten="";var s=find("DL09","student_id",sid)||find("DL02","lead_id",sid);if(s)ten=s.full_name||sid;
+ var steps=Q.map(function(x){var key=slaKey(x);
+  return {p:x.page||null,sel:x.page?"@phead":"@bstats",dock:1,key:key,
+   t:(x.grp||x.cat||"Việc cần làm"),
+   d:String(x.what||""),
+   hint:(x.sev==="red"?"Việc này ĐÃ QUÁ HẠN - làm trước. ":"")+"Bấm nút bên dưới, app mở đúng màn thao tác.",
+   item:x,do:slaBtn(x,"btn sm primary"),
+   chk:function(){return !workAll().some(function(y){return slaKey(y)===key})}}});
+ return {lv:"donviec",t:"Xử lý việc của "+(ten||sid),ic:"ti-user-check",dock:1,live:1,
+  d:Q.length+" việc đang chờ trên hồ sơ này",steps:steps}}
+function qaDatTroThu(sid){
+ var T=tourWorkBuildFor(sid);
+ if(!T){toast("Hồ sơ này không còn việc nào đang chờ.",3600);return}
+ TOURS.__donviec=T;
+ try{closeModal()}catch(e){}
+ try{tourBase()}catch(e){}
+ TOUR={key:"__donviec",i:0,on:true};tourShow()}
 function tourWork(){
  var T=tourWorkBuild();
  if(!T){toast("Không còn việc nào đang chờ bạn - hàng đợi đã sạch.",3600);return}
@@ -13932,7 +14164,385 @@ function renderSothu(){var tab=window.STTAB||"da";
  h+=tbar(segHTML(tab,[["da","Đã thu",rows("DL07").length],["du","Dự thu",nDu],["cong","Công giảng dạy",""]],"sothuTab('{k}')"),"");
  h+=(tab==="du")?renderDuthu():(tab==="cong"?renderCong():renderList("dsthanhtoan",1));
  return h}
-var RENDER={giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
+/* ═══════════ V9.47 - HỎI ĐÁP: HỎI BẰNG TIẾNG VIỆT, TRẢ LỜI KÈM ĐƯỜNG BẤM THẲNG ═══════════
+   Anh Luân đặt hai việc, và chúng là hai loại câu hỏi khác hẳn nhau:
+
+   (1) *"làm 1 cái Q&A về hệ thống, để người dùng có thể hỏi, mà em có thể chỉ chỗ, thậm chí gửi
+       link trực tiếp."* — hỏi VỀ APP: "đổi hotline ở đâu", "ngưỡng nợ đỏ chỉnh chỗ nào".
+   (2) *"bạn học viên tên gì đó, thấy có cảnh báo gì đó, vậy bây giờ hiện trạng của bạn đó là gì,
+       cần làm gì tiếp theo... mà hộp đó có thể rep vanh vách chuẩn sop thì ngon quá em"* — hỏi
+       VỀ MỘT CON NGƯỜI CỤ THỂ.
+
+   Anh Luân hỏi "cái đó khó đưa vào hệ thống ko em, hơi giống AI". Trả lời thẳng: **không cần AI,
+   và ở đây không-AI còn ĐÚNG HƠN AI.** Câu trả lời loại (2) không phải thứ cần bịa ra bằng văn
+   phong - nó là thứ app ĐÃ BIẾT: `naFor()` cho ra đúng mã trigger SOP, `msgText()` cho ra đúng
+   câu chữ CH4, `slaItems()` cho ra đúng hàng chờ kèm hạn, `stuRiskReasons()` cho ra đúng lý do
+   nguy cơ kèm ngưỡng, `canAct()` cho ra đúng người được làm. Ghép lại là đã "vanh vách chuẩn
+   SOP" - và luôn khớp với thứ app thực sự đang chấp hành, vì nó đọc CÙNG MỘT bộ luật. Một mô
+   hình ngôn ngữ đặt ngoài sẽ nói trôi chảy hơn nhưng có ngày nói sai ngưỡng, mà sai ngưỡng
+   trong chuyện học phí thì đắt hơn nhiều so với việc câu văn hơi khô.
+
+   Phần "giống AI" thật sự - hiểu câu hỏi lỏng lẻo - giải bằng khớp từ khoá BỎ DẤU + kho từ đồng
+   nghĩa tiếng Việt, chạy hẳn trong trình duyệt, không gọi mạng. `SVR` để dành cho ngày nối
+   backend nếu muốn thêm một tầng mô hình ngôn ngữ ở trên. */
+function qaChuan(s){return String(s==null?"":s).toLowerCase()
+ .replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g,"a").replace(/[èéẹẻẽêềếệểễ]/g,"e")
+ .replace(/[ìíịỉĩ]/g,"i").replace(/[òóọỏõôồốộổỗơờớợởỡ]/g,"o")
+ .replace(/[ùúụủũưừứựửữ]/g,"u").replace(/[ỳýỵỷỹ]/g,"y").replace(/đ/g,"d")
+ .replace(/\s+/g," ").trim()}
+/* Kho từ đồng nghĩa - người ta không gõ đúng chữ app dùng. Mỗi dòng: [chữ người gõ, chữ app dùng] */
+var QATUDONGNGHIA=[
+ ["no do","quá hạn nợ"],["no xau","quá hạn nợ"],["cong no","còn nợ học phí"],
+ ["giam gia","chiết khấu"],["sale","chiết khấu"],
+ ["so dien thoai trung tam","hotline"],["sdt trung tam","hotline"],["tong dai","hotline"],
+ ["luong giao vien","đơn giá giờ dạy"],["tra luong","đơn giá giờ dạy"],["tinh cong","đơn giá giờ dạy"],
+ ["bo hoc","bảo lưu bỏ học"],["nghi hoc","bảo lưu bỏ học"],
+ ["hoan tien","hoàn tiền"],["tra lai tien","hoàn tiền"],
+ ["hoc bu","học bù"],["diem danh","điểm danh"],
+ ["nguy co","học viên nguy cơ"],["canh bao","học viên nguy cơ"],
+ ["khach moi","lead khách tiềm năng"],["khach hang","lead khách tiềm năng"],
+ ["mo lop","sĩ số mở lớp"],["si so","sĩ số mở lớp"],
+ ["doi mat khau","đăng nhập tài khoản"],["tai khoan","đăng nhập tài khoản"],
+ ["phan quyen","phân quyền"],["quyen han","phân quyền"],
+ ["bao cao","báo cáo KPI"],["chi so","báo cáo KPI"],
+ ["logo","thương hiệu logo màu"],["mau sac","thương hiệu logo màu"],["doi ten","thương hiệu logo màu"]];
+function qaMoRong(q){var z=qaChuan(q);
+ QATUDONGNGHIA.forEach(function(p){if(z.indexOf(p[0])>=0)z+=" "+qaChuan(p[1])});
+ return z}
+/* ── Q&A TỰ KHAI + SỔ CÂU HỎI KHÔNG TRẢ LỜI ĐƯỢC ──────────────────────────────────────────
+   Anh Luân: *"mấy cái q&a này cũng phải đưa vào cấu hình nghen em, tại a sợ hỏi nhiều chỉ số hay
+   gì đó mà nó ko trả lời được, phải có cách cập nhật."*
+   Đúng - một hộp hỏi đáp không sửa được thì tới ngày nó trả lời trượt là hết đường. Hai tầng:
+   1. `qaCfg().muc` - bảng câu hỏi tự khai, sửa ngay trong Cài đặt, ĐỨNG TRƯỚC kho tự dựng.
+   2. `qaCfg().hut` - SỔ CÂU HỎI APP TRẢ LỜI KHÔNG NỔI. App tự ghi vào đây mỗi lần bí. Không phải
+      để trách app, mà để người quản trị biết CHÍNH XÁC phải bổ sung câu nào - thay vì ngồi đoán. */
+var QADEF=[
+ {h:"đổi hotline trung tâm ở đâu · số điện thoại tổng đài",d:"Hotline và địa chỉ trung tâm nằm cùng chỗ với tên và logo, vì chúng đều là thông tin nhận dạng chứ không phải ngưỡng nghiệp vụ.",o:"Cài đặt > Thương hiệu & Màu",go:"window.SETTAB='brand';go('settings')"},
+ {h:"app có gửi tin nhắn zalo sms email thật không",d:"Bản demo KHÔNG gửi thật. App soạn sẵn nội dung chuẩn theo CH4 và ghi nhận là đã gửi, còn việc gửi đi cần nối backend - 66 điểm nối đã chừa sẵn trong mã nguồn.",o:"Cài đặt > Thông điệp nhắc việc (CH4)",go:"window.SETTAB='ch4';go('settings')"},
+ {h:"dữ liệu lưu ở đâu · mất dữ liệu không · reset có mất cấu hình không",d:"Bản demo lưu trong trình duyệt của máy đang mở. Cấu hình nằm ở ô nhớ RIÊNG nên bấm reset dữ liệu demo KHÔNG làm mất ngưỡng, câu nhắc, danh mục hay phân quyền.",o:"Cài đặt > Bắt đầu ở đây",go:"window.SETTAB='tongquan';go('settings')"},
+ {h:"tại sao tôi không thấy trang này · bị ẩn menu · không có quyền",d:"Mỗi chức danh chỉ thấy phần việc của mình. Ba tầng: thấy trang nào, thấy dữ liệu của ai, được bấm nút gì. Vào bảng phân quyền rồi đóng vai đúng chức danh đó để xem họ thấy gì.",o:"Cài đặt > Phân quyền & Phạm vi",go:"window.SETTAB='phanquyen';go('settings')"},
+ {h:"làm sao xem lại bài hướng dẫn tham quan · bật lại hướng dẫn",d:"Bài hướng dẫn không mất đi sau khi xem. Mở lại bất cứ lúc nào ở Cài đặt, hoặc bấm nút Trợ thủ ở góc dưới bên phải.",o:"Cài đặt > Bài hướng dẫn",go:"window.SETTAB='huongdan';go('settings')"}];
+function qaCfg(){var c=(DATA.config=DATA.config||{});var q=(c.qa=c.qa||{});
+ if(!q.muc)q.muc=QADEF.map(function(x){return {h:x.h,d:x.d,o:x.o,go:x.go}});
+ if(!q.hut)q.hut=[];
+ return q}
+function qaGhiHut(cau){var q=qaCfg();var z=qaChuan(cau);if(!z)return;
+ for(var i=0;i<q.hut.length;i++)if(qaChuan(q.hut[i].h)===z){q.hut[i].n=(q.hut[i].n||1)+1;q.hut[i].t=nowStr();persistSoon();return}
+ q.hut.unshift({h:String(cau).slice(0,200),n:1,t:nowStr()});
+ if(q.hut.length>50)q.hut.length=50;persistSoon()}
+function qaHutXoa(i){var q=qaCfg();q.hut.splice(i,1);persistSoon();reRender("settings")}
+function qaMucXoa(i){var q=qaCfg();q.muc.splice(i,1);persistSoon();toast("Đã xoá một mục hỏi đáp.");reRender("settings")}
+function qaMucLuu(i){var q=qaCfg();var m=q.muc[i];if(!m)return;
+ m.h=fldV("qah_"+i)||m.h;m.d=fldV("qad_"+i)||"";m.o=fldV("qao_"+i)||"";
+ persistSoon();toast("Đã lưu mục hỏi đáp.")}
+function qaMucThem(hoi){var q=qaCfg();
+ q.muc.unshift({h:String(hoi||"")||"câu hỏi mới - gõ các từ khoá, ngăn bằng dấu ·",d:"",o:"",go:""});
+ persistSoon();window.SETTAB="qa";reRender("settings")}
+function qaMucThemTuHut(i){var q=qaCfg();var x=q.hut[i];if(!x)return;
+ qaMucThem(x.h);q.hut.splice(i,1);persistSoon()}
+/* Kho tri thức về HỆ THỐNG - dựng từ chính các bản khai đã có, không chép tay lần hai.
+   Mỗi mục: {t: tiêu đề, d: giải nghĩa, o: chỗ nó nằm, go: hành động mở thẳng, tag: chữ để tìm} */
+function qaKhoHeThong(){
+ var K=[];
+ /* mục TỰ KHAI đứng trước - người quản trị nói gì thì đó là câu trả lời đúng nhất */
+ qaCfg().muc.forEach(function(m){
+  K.push({t:String(m.h||"").split("·")[0].trim()||"Hỏi đáp",d:m.d||"",o:m.o||"",go:m.go||"",tag:(m.h||"")+" "+(m.d||""),tay:1})});
+ APPPARAMS.forEach(function(p){
+  K.push({t:p[2],d:"Tham số "+p[1]+(p[3]?" · đơn vị "+p[3]:"")+" · đang đặt "+paramOf(p[1],p[4]),
+   o:(p[0]===CFTRUNGTAM?"Cài đặt > Thương hiệu & Màu":("Cài đặt > Ngưỡng & SLA (CH2) > nhóm "+p[0])),
+   go:(p[0]===CFTRUNGTAM?"window.SETTAB='brand';go('settings')":("cfGo('"+p[1]+"')")),
+   tag:p[0]+" "+p[1]+" "+p[2]})});
+ CFNHOM.forEach(function(g){
+  K.push({t:"Nhóm cấu hình: "+g[0],d:g[1],o:"Cài đặt > Ngưỡng & SLA (CH2)",
+   go:"window.SETTAB='ch2';window.CFQ="+JSON.stringify(g[0])+";go('settings')",tag:g[0]+" "+g[1]})});
+ setTabs().forEach(function(x){var M=SETMOTA[x[0]];if(!M)return;
+  K.push({t:"Màn Cài đặt: "+x[1],d:M[0],o:"Cài đặt > "+x[1],
+   go:"window.SETTAB='"+x[0]+"';go('settings')",tag:x[1]+" "+M[0]})});
+ PAGES.forEach(function(p){if(p.hide)return;
+  K.push({t:"Trang: "+p.t,d:p.c||"",o:"Menu > "+(p.g&&p.g!=="_"?p.g+" > ":"")+p.t,
+   go:"go('"+p.k+"')",tag:p.t+" "+(p.c||"")+" "+(p.g||"")})});
+ try{ch4List().forEach(function(m){
+  K.push({t:"Câu nhắc "+m.code,d:m.tmpl,o:"Cài đặt > Thông điệp nhắc việc (CH4)",
+   go:"window.SETTAB='ch4';window.MSGQ='"+m.code+"';go('settings')",tag:m.code+" "+m.tmpl+" "+(m.when||"")})})}catch(e){}
+ try{CH3.forEach(function(a){
+  K.push({t:"Ai được: "+a.t,d:"Theo bảng phân quyền CH3 của SOP - "+ch3Vai(a)+(a.duyet?" (việc này cần duyệt)":""),
+   o:"Cài đặt > Phân quyền & Phạm vi",go:"window.SETTAB='phanquyen';go('settings')",tag:a.t+" "+ch3Vai(a)})})}catch(e){}
+ try{((DATA.config||{}).ch6||[]).forEach(function(k){
+  K.push({t:"Chỉ số "+k.code+": "+k.name,d:"Ngưỡng đạt đang đặt: "+k.threshold+" ("+k.dir+")",
+   o:"Cài đặt > Ngưỡng KPI (CH6)",go:"window.SETTAB='ch6';go('settings')",tag:k.code+" "+k.name})})}catch(e){}
+ return K}
+/* Từ đệm tiếng Việt - có mặt trong hầu hết câu hỏi nên KHÔNG nói lên điều gì. Để lọt vào là
+   câu vô nghĩa cũng khớp mọi thứ: đã đo thật, "abcxyz gì đó không có thật" từng trả về 6 kết
+   quả trông rất tự tin. Một hộp hỏi đáp trả lời bừa còn tệ hơn hộp nói thẳng là chưa hiểu. */
+var QATUDEM={cai:1,cho:1,nao:1,o:1,la:1,gi:1,the:1,thi:1,va:1,cua:1,toi:1,minh:1,muon:1,lam:1,
+ sao:1,duoc:1,co:1,khong:1,xem:1,tim:1,chinh:1,sua:1,doi:1,do:1,that:1,mot:1,cac:1,nhung:1,
+ nay:1,kia:1,ay:1,anh:1,em:1,ban:1,hay:1,ve:1,cho1:1,voi:1,tren:1,duoi:1,trong:1,ngoai:1,
+ hoi:1,noi:1,biet:1,can:1,phai:1,nen:1,them:1,bot:1,ra:1,vao:1,di:1,den:1,tu:1,khi:1,neu:1};
+function qaTachTu(q){
+ return qaMoRong(q).split(" ").filter(function(w){return w.length>=2&&!QATUDEM[w]})
+  .filter(function(w,i,a){return a.indexOf(w)===i})}
+/* Chấm điểm có TRỌNG SỐ NGƯỢC TẦN SUẤT: chữ nào xuất hiện ở khắp mọi mục thì gần như vô giá trị
+   ("hạn", "ngưỡng" có trong nửa số tham số), chữ nào hiếm thì đáng tin ("hotline", "chiết khấu").
+   Nhờ vậy "đổi ngưỡng nợ quá hạn ở đâu" mới đẩy đúng `installmentLate_days` lên đầu thay vì
+   xếp thứ ba sau hai tham số chỉ tình cờ có chữ "hạn". */
+function qaTimHeThong(q,n,nguong){
+ var tu=qaTachTu(q);
+ if(!tu.length)return [];
+ var K=qaKhoHeThong();
+ /* So THEO TỪ, không so chuỗi con. Đã đo thật: so chuỗi con làm chữ "nợ" khớp cả "phòng" lẫn
+    "không", nên câu "đổi ngưỡng nợ quá hạn ở đâu" trả về toàn tham số của chặng test. */
+ function bo(s){var o={};qaChuan(s).split(" ").forEach(function(w){if(w)o[w]=1});return o}
+ function co(t,w){if(t[w])return true;
+  if(w.length>=5){for(var k in t)if(k.length>=5&&(k.indexOf(w)===0||w.indexOf(k)===0))return true}
+  return false}
+ var zs=K.map(function(k){return {k:k,tAll:bo(k.t+" "+k.d+" "+k.tag+" "+k.o),tTen:bo(k.t+" "+k.tag)}});
+ var df={};tu.forEach(function(w){df[w]=zs.filter(function(x){return co(x.tAll,w)}).length});
+ var out=zs.map(function(x){
+  var d=0,trung=0;
+  tu.forEach(function(w){
+   if(!co(x.tAll,w))return;
+   trung++;
+   var w8=Math.log(1+K.length/(1+df[w]));            /* hiếm thì nặng, phổ thông thì nhẹ */
+   d+=w8*(co(x.tTen,w)?2.2:1)});
+  /* phải phủ được một phần đáng kể câu hỏi, không phải trúng một chữ rồi nhận vơ */
+  d*=(trung/tu.length);
+  return {k:x.k,d:d,trung:trung}}).filter(function(x){return x.trung>0});
+ if(!out.length)return [];
+ /* NGƯỠNG TIN: dưới mức này coi như chưa hiểu. Mục tự khai được nới vì đó là lời người quản
+    trị đã cố ý viết ra để bắt đúng câu hỏi này. */
+ var sanh=(nguong==null?1.15:nguong);
+ /* Và phải TRÚNG ĐƯỢC MỘT NỬA câu hỏi. Chỉ một chữ lẻ trúng thì đó là trùng hợp, không phải
+    hiểu: "zzzz khong the hieu noi qqqq" từng khớp hàng loạt mục chỉ vì chữ "nơi"/"nội". */
+ var phu=(tu.length>=2?0.5:1);
+ out=out.filter(function(x){return (x.d>=sanh&&x.trung/tu.length>=phu)||(x.k.tay&&x.trung/tu.length>=phu)});
+ return out.sort(function(a,b){return b.d-a.d}).slice(0,n||6).map(function(x){return x.k})}
+/* Tìm ĐÚNG MỘT con người trong câu hỏi - học viên (DL09) hoặc khách tiềm năng (DL02). */
+/* Tìm người: khớp TRỌN VẸN mới được điểm cao. Từng đo thật - kiểu chấm cũ cho "Demo 1" khớp cả
+   "Demo 2" và "Demo 3" (vì chữ "demo" trúng, chữ số bị bỏ qua), tức là hỏi về một em mà app đưa
+   ra năm em. Nay HỌ TÊN phải nằm nguyên trong câu hỏi, hoặc MỌI chữ của tên phải có mặt. */
+function qaTimNguoi(q){
+ var z=qaChuan(q);if(!z)return [];
+ var soCau=z.replace(/[^0-9]/g," ").split(" ").filter(Boolean);
+ var out=[];
+ function xet(r,ten,ma,sdt,loai){
+  var zt=qaChuan(ten);if(!zt)return;
+  var d=0;
+  var zsdt=String(sdt||"").replace(/\D/g,""), zq=z.replace(/\D/g,"");
+  if(ma&&z.indexOf(qaChuan(ma))>=0)d=100;                     /* gõ thẳng mã - chắc chắn nhất */
+  else if(zsdt.length>=8&&zq.indexOf(zsdt)>=0)d=95;           /* gõ số điện thoại */
+  else if(z.indexOf(zt)>=0)d=88;                              /* họ tên nằm nguyên trong câu */
+  else{
+   var pt=zt.split(" ").filter(function(w){return w.length>=1});
+   var hit=pt.filter(function(w){return z.split(" ").indexOf(w)>=0}).length;
+   if(!pt.length)return;
+   if(hit===pt.length)d=80;                                   /* đủ mọi chữ của tên, khác thứ tự */
+   else if(hit>=2&&hit>=pt.length-1)d=52+hit;                 /* thiếu đúng một chữ đệm */
+   else return;                                               /* thiếu nhiều hơn: KHÔNG nhận vơ */
+  }
+  /* tên có CHỮ SỐ (Demo 1, Lớp 2...) mà số trong câu hỏi không khớp thì loại thẳng */
+  var soTen=zt.replace(/[^0-9]/g," ").split(" ").filter(Boolean);
+  if(soTen.length&&d<95){
+   var khop=soTen.every(function(n){return soCau.indexOf(n)>=0});
+   if(!khop)return}
+  out.push({r:r,ten:ten,ma:ma,loai:loai,d:d})}
+ srows("DL09").forEach(function(s){xet(s,s.full_name||"",s.student_id,s.phone_number||s.phone,"hv")});
+ srows("DL02").forEach(function(l){xet(l,l.full_name||"",l.lead_id,l.phone_number,"lead")});
+ out.sort(function(a,b){return b.d-a.d});
+ /* Cùng một con người có thể vừa là lead vừa đã thành học viên - ưu tiên hồ sơ HỌC VIÊN, vì đó
+    là nơi có việc để làm. Trùng tên thật thì vẫn giữ cả hai để người hỏi tự chọn. */
+ var thay={};
+ out=out.filter(function(x){
+  var k=qaChuan(x.ten);
+  if(thay[k])return false;
+  if(x.loai==="lead"&&out.some(function(y){return y.loai==="hv"&&qaChuan(y.ten)===k}))return false;
+  thay[k]=1;return true});
+ return out.filter(function(x,i,a){return i===0||x.d>=a[0].d-8}).slice(0,5)}
+/* ── TRẢ LỜI VỀ MỘT CON NGƯỜI: hiện trạng · vì sao cảnh báo · làm gì tiếp · xem ở đâu ──────
+   Không câu nào ở đây được viết tay hai lần. Mọi dòng đọc lại đúng bộ luật app đang chấp hành:
+   `naFor` (mã trigger SOP) · `msgText` (câu chữ CH4) · `slaItems` (hàng chờ + hạn) ·
+   `stuRiskReasons` (lý do nguy cơ + ngưỡng CH2) · `canAct` (ai được làm, theo CH3). */
+function qaHoSo(x){
+ var r=x.r,hv=(x.loai==="hv"),sid=hv?r.student_id:r.lead_id;
+ var K={ten:x.ten,ma:sid,loai:x.loai,dong:[],viec:[],canhbao:[],nut:[]};
+ if(hv){
+  var ob=rows("DL08").filter(function(o){return o.student_id===sid}).slice(-1)[0]||null;
+  var lop=ob&&ob.class_id?find("DL10","class_id",ob.class_id):null;
+  var en=rows("DL06").filter(function(e){return e.student_id===sid});
+  var enM=en.slice(-1)[0]||null;
+  K.dong.push(["Trạng thái",elabel(r.student_status)||ecode(r.student_status)||"chưa khai"]);
+  K.dong.push(["Lớp đang học",lop?(lop.class_name||lop.class_id):"chưa xếp lớp"]);
+  if(lop)K.dong.push(["Nơi học",elabel(lop.branch)||elabel(lop.learning_mode)||"chưa khai"]);
+  if(enM){var tot=num(enM.final_fee)||num(enM.total_fee),paid=num(enM.paid_amount);
+   var rem=enM.remaining_amount!==undefined&&enM.remaining_amount!==""?num(enM.remaining_amount):Math.max(0,tot-paid);
+   K.dong.push(["Học phí",vnd(paid)+" / "+vnd(tot)+(rem>0?" · còn nợ "+vnd(rem):" · đã đủ")])}
+  var st=null;try{st=stuAttStats(sid)}catch(e){}
+  if(st)K.dong.push(["Chuyên cần","vắng không phép "+(st.absU||[]).length+" buổi"]);
+  var miss=rows("DL13").filter(function(z){return z.student_id===sid&&hwMissing(z)}).length;
+  K.dong.push(["Bài tập",miss?("thiếu "+miss+" bài"):"không thiếu bài nào"]);
+  var wq=0,wu=0;try{wq=num(r.wow_quota_total);wu=rows("DL14").filter(function(w){return w.student_id===sid&&isc(w.wow_status,"completed")}).length}catch(e){}
+  if(wq)K.dong.push(["Buổi WOW","đã dùng "+wu+"/"+wq+" lượt"]);
+  try{K.canhbao=stuRiskReasons(r)||[]}catch(e){}
+  var na=null;try{na=naFor("DL09",r)}catch(e){}
+  if(na)K.viec.push({ma:na,cau:msgText(na)||"",ai:"",han:"",go:"go('hoso')",hoso:sid});
+ }else{
+  K.dong.push(["Trạng thái",elabel(r.lead_status)||ecode(r.lead_status)||"chưa khai"]);
+  K.dong.push(["Nguồn",elabel(r.lead_source)||"chưa khai"]);
+  K.dong.push(["Phụ trách",r.assigned_to_name||r.assigned_to||"chưa giao"]);
+  K.dong.push(["Số lượt liên hệ",String(num(r.contact_count)||0)]);
+  if(r.next_followup_time)K.dong.push(["Hẹn liên hệ lại",r.next_followup_time]);
+  var na2=null;try{na2=naFor("DL02",r)}catch(e){}
+  if(na2)K.viec.push({ma:na2,cau:msgText(na2)||"",ai:"",han:"",go:"go('nhaplead')",hoso:null});
+ }
+ /* hàng chờ THẬT của người này - cùng nguồn với chuông và với Trợ thủ, không dựng lại luật */
+ var L=[];try{L=slaItems()}catch(e){}
+ L.forEach(function(it){
+  if(String(it.hoso||"")!==String(sid)&&String(it.lead||"")!==String(sid))return;
+  K.viec.push({ma:"",cau:(it.grp||"")+(it.what?" - "+it.what:""),sev:it.sev,cat:it.cat,
+   ai:it.cat||"",han:(it.age!=null?("đã "+Math.round(it.age)+" giờ"):""),
+   go:(it.page?"go('"+it.page+"')":""),hoso:it.hoso||null,act:it.act||"",rid:it.rid});
+ });
+ return K}
+/* ── HIỂU Ý: một câu hỏi = [HỎI VỀ AI] + [MUỐN BIẾT GÌ] ───────────────────────────────────
+   Anh Luân: *"cái khó là làm sao để app hiểu chính xác người ta muốn gì á, hoặc nếu chưa hiểu rõ
+   có thể đưa gợi ý."* Đúng là chỗ khó nhất, và cách xử lý phải là: **đoán thì nói rõ là đang
+   đoán, không chắc thì HỎI LẠI bằng nút bấm chứ đừng trả lời bừa.**
+   Hai trục tách rời nhau: tên người tìm bằng `qaTimNguoi`, ý định tìm bằng bảng dưới đây. Thiếu
+   một trong hai thì bù bằng gợi ý, không bao giờ im lặng trả sai. */
+var QAYDINH=[
+ {k:"viec",t:"Việc cần làm tiếp",ic:"ti-checklist",
+  tu:["viec","task","xu ly","xu li","lam gi","can lam","tiep theo","huong dan","dat toi","buoc","giai quyet","xu"]},
+ {k:"canhbao",t:"Vì sao có cảnh báo",ic:"ti-alert-triangle",
+  tu:["canh bao","nguy co","bao do","co van de","tai sao","vi sao","bi gi","risk"]},
+ {k:"tien",t:"Học phí & công nợ",ic:"ti-cash",
+  tu:["hoc phi","tien","no","cong no","dong tien","thanh toan","dot","hoan tien","chiet khau"]},
+ {k:"hoctap",t:"Chuyên cần & bài tập",ic:"ti-school",
+  tu:["di hoc","chuyen can","vang","diem danh","bai tap","bai","diem","tien do","buoi hoc","wow"]},
+ {k:"lienhe",t:"Liên hệ & chăm sóc",ic:"ti-phone",
+  tu:["lien he","goi","cham soc","zalo","so dien thoai","sdt","hen","phu huynh"]},
+ {k:"hientrang",t:"Toàn cảnh hồ sơ",ic:"ti-id-badge-2",
+  tu:["hien trang","tinh hinh","ho so","the nao","ra sao","thong tin","toan canh","dang o dau"]}];
+function qaYDinh(q){var z=qaMoRong(q),hit=[];
+ QAYDINH.forEach(function(y){var d=0;y.tu.forEach(function(w){if(z.indexOf(w)>=0)d++});if(d)hit.push({y:y,d:d})});
+ hit.sort(function(a,b){return b.d-a.d});
+ return hit.length?hit[0].y.k:""}
+function qaTraLoi(cau){
+ var q=String(cau||"").trim();
+ if(!q)return null;
+ var ng=qaTimNguoi(q);
+ var ht=qaTimHeThong(q,6);
+ var yd=qaYDinh(q);
+ /* Ưu tiên NGƯỜI khi câu hỏi khớp một cái tên đủ chắc - đó là loại câu hỏi anh Luân mô tả. */
+ var loai=(ng.length&&ng[0].d>=70)?"nguoi":(ht.length?"hethong":(ng.length?"nguoi":"bi"));
+ if(loai==="bi")qaGhiHut(q);
+ return {q:q,loai:loai,nguoi:ng,hethong:ht,yd:yd}}
+/* Khi bí: đừng trả về màn trắng. Gợi ý những thứ GẦN NHẤT mà app có - vài cái tên hao hao, vài
+   chỗ cấu hình hao hao - để người hỏi bấm tiếp thay vì bỏ cuộc. */
+function qaGoiY(q){
+ var g={nguoi:[],hethong:[]};
+ var z=qaChuan(q);
+ /* Tên người Việt đầy chữ HAI KÝ TỰ - Vy, An, Hà, Tú. Lọc từ ngắn ở đây là chính chỗ cần gợi ý
+    lại không gợi được. Nhánh tìm NGƯỜI nhận từ 2 ký tự; nhánh tìm chỗ cấu hình vẫn từ 3. */
+ var tuTen=z.split(" ").filter(function(w){return w.length>=2&&!QATUDEM[w]});
+ var tu=z.split(" ").filter(function(w){return w.length>=3&&!QATUDEM[w]});
+ if(tuTen.length){
+  var dsN=[];
+  srows("DL09").forEach(function(s){var pt=qaChuan(s.full_name||"").split(" ");
+   var d=tuTen.filter(function(w){return pt.indexOf(w)>=0}).length;
+   if(d)dsN.push({ten:s.full_name,ma:s.student_id,loai:"hv",d:d})});
+  g.nguoi=dsN.sort(function(a,b){return b.d-a.d}).slice(0,4)}
+ if(tu.length){
+  /* nới lỏng: bỏ bớt từ, tìm lại từng từ một */
+  var seen={};
+  tu.forEach(function(w){qaTimHeThong(w,3).forEach(function(k){
+   if(seen[k.t])return;seen[k.t]=1;g.hethong.push(k)})});
+  g.hethong=g.hethong.slice(0,6)}
+ return g}
+var QAVIDU=["Nguyễn Minh Anh đang có cảnh báo gì","đổi ngưỡng nợ quá hạn ở đâu",
+ "sĩ số tối thiểu mở lớp chỉnh chỗ nào","ai được duyệt hoàn tiền","hạn chấm bài là bao lâu"];
+function qaHoi(){window.QAQ=fldV("qa_q")||"";reRender("hoidap")}
+function qaViDu(s){window.QAQ=s;reRender("hoidap")}
+function qaXoa(){window.QAQ="";reRender("hoidap")}
+function renderHoidap(){
+ var q=window.QAQ||"";
+ var h=pageHead("Hỏi đáp","Hỏi bằng tiếng Việt - về một học viên, hoặc về chỗ cấu hình trong app");
+ h+='<div class="notebar"><i class="ti ti-message-question"></i>Hộp này trả lời <b>hai loại câu hỏi</b>. Gõ <b>tên một học viên hay khách</b> thì nó đọc hồ sơ và trả lời <b>hiện trạng - vì sao có cảnh báo - việc phải làm tiếp theo SOP</b>. Gõ <b>chuyện của app</b> ("đổi hotline ở đâu") thì nó <b>chỉ đúng chỗ và mở thẳng tới đó</b>. Mọi câu trả lời đọc lại chính bộ luật app đang chấp hành, không phải văn tự nghĩ ra.</div>';
+ h+='<div class="panel" style="margin-bottom:14px"><div class="pbody">';
+ h+='<div style="display:flex;gap:8px;flex-wrap:wrap"><input id="qa_q" value="'+esc(q)+'" placeholder="vd: bạn Minh Anh có cảnh báo gì, giờ phải làm gì?" style="flex:1;min-width:260px;height:38px;border:1px solid var(--line);border-radius:9px;padding:0 12px;font-family:inherit;font-size:13px" onkeydown="if(event.key===\'Enter\')qaHoi()">'+
+  '<button class="btn primary" onclick="qaHoi()"><i class="ti ti-search"></i>Hỏi</button>'+
+  (q?'<button class="btn" onclick="qaXoa()"><i class="ti ti-x"></i>Xoá</button>':'')+'</div>';
+ h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px"><span class="mut" style="font-size:11px;align-self:center">Thử:</span>';
+ QAVIDU.forEach(function(s){h+='<button class="pill" onclick="qaViDu('+JSON.stringify(s).split('"').join("&quot;")+')">'+esc(s)+'</button>'});
+ h+='</div></div></div>';
+ if(!q)return h;
+ var R=qaTraLoi(q);
+ if(R.loai==="nguoi"&&R.nguoi.length>1){
+  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b>Có '+R.nguoi.length+' người khớp - chọn đúng người</b></div><div class="pbody"><div class="pickgrid">';
+  R.nguoi.forEach(function(x){h+='<button class="pickc" onclick="qaViDu('+JSON.stringify(x.ma).split('"').join("&quot;")+')"><i class="ti '+(x.loai==="hv"?"ti-user-check":"ti-user")+'"></i><span><b>'+esc(x.ten)+'</b><small>'+esc(x.ma)+' · '+(x.loai==="hv"?"học viên":"khách tiềm năng")+'</small></span></button>'});
+  h+='</div></div></div>';return h}
+ if(R.loai==="nguoi"&&R.nguoi.length){
+  var K=qaHoSo(R.nguoi[0]);
+  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-user-check" style="margin-right:6px"></i>'+esc(K.ten)+'</b><span class="mut" style="font-size:11.5px">'+esc(K.ma)+' · '+(K.loai==="hv"?"học viên":"khách tiềm năng")+'</span></div><div class="pbody">';
+  /* Hiểu được ý thì NÓI RA đang hiểu gì; chưa rõ ý thì HỎI LẠI bằng nút, không đoán bừa. */
+  var _yt=QAYDINH.filter(function(y){return y.k===R.yd})[0];
+  h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-'+(_yt?"target-arrow":"help-circle")+'"></i>'+
+   (_yt?('Em hiểu anh đang hỏi về <b>'+esc(_yt.t.toLowerCase())+'</b> của '+esc(K.ten)+'. Không đúng ý thì bấm một mục khác bên dưới.')
+       :('Em chưa chắc anh muốn biết gì về '+esc(K.ten)+' nên trình bày <b>toàn cảnh</b>. Bấm một mục dưới đây để hỏi đúng thứ anh cần.'))+
+   '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">';
+  QAYDINH.forEach(function(y){
+   h+='<button class="pill'+(R.yd===y.k?" on":"")+'" onclick="qaViDu('+JSON.stringify(K.ten+" - "+y.t.toLowerCase()).split('"').join("&quot;")+')"><i class="ti '+y.ic+'"></i>'+esc(y.t)+'</button>'});
+  h+='</div></div>';
+  h+='<div class="sechd" style="margin-top:0">Hiện trạng</div>'+ctxRows(K.dong.map(function(d){return [d[0],esc(d[1])]}));
+  if(K.canhbao.length){
+   h+='<div class="sechd">Vì sao có cảnh báo</div>';
+   K.canhbao.forEach(function(c){h+='<div class="hvev" style="padding:6px 0"><i class="ti ti-alert-triangle" style="color:var(--red)"></i><span>'+esc(c)+'</span></div>'})}
+  else h+='<div class="sechd">Cảnh báo</div><div class="mut" style="font-size:12px;padding:2px 0 6px">Không có cảnh báo nào đang bật cho hồ sơ này.</div>';
+  h+='<div class="sechd">Việc cần làm tiếp theo SOP</div>';
+  if(!K.viec.length)h+='<div class="mut" style="font-size:12px;padding:2px 0 6px">Không có việc nào đang chờ - hồ sơ này đang sạch hàng chờ.</div>';
+  K.viec.forEach(function(v){
+   h+='<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)">'+
+    '<span class="chip '+(v.sev==="red"?"red":(v.sev==="amber"?"amber":"gray"))+'" style="flex:none">'+esc(v.ma||v.cat||"việc")+'</span>'+
+    '<div style="flex:1;min-width:0;font-size:12.5px;line-height:1.6">'+esc(v.cau||"")+
+    (v.han?'<div class="mut" style="font-size:11px">'+esc(v.han)+'</div>':'')+'</div>'+
+    (v.go?'<button class="btn sm" style="flex:none" onclick="'+v.go.split('"').join("&quot;")+'"><i class="ti ti-arrow-right"></i>Mở màn xử lý</button>':'')+'</div>'});
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">'+
+   (K.viec.length?'<button class="btn primary" onclick="qaDatTroThu('+JSON.stringify(K.ma).split('"').join("&quot;")+')"><i class="ti ti-checklist"></i>Dắt tôi làm từng bước ('+K.viec.length+' việc)</button>':'')+
+   (K.loai==="hv"?'<button class="btn" onclick="window.HOSO='+JSON.stringify(K.ma).split('"').join("&quot;")+';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Mở hồ sơ 360 đầy đủ</button>':
+     '<button class="btn" onclick="runStart('+JSON.stringify(K.ma).split('"').join("&quot;")+')"><i class="ti ti-player-play"></i>Chạy quy trình cho khách này</button>')+
+   '</div>';
+  h+='</div></div>';
+  return h}
+ if(R.loai==="hethong"&&R.hethong.length){
+  h+='<div class="panel" style="margin-bottom:14px"><div class="ph"><b><i class="ti ti-bulb" style="margin-right:6px"></i>'+R.hethong.length+' chỗ khớp câu hỏi của bạn</b></div><div class="pbody">';
+  R.hethong.forEach(function(k,i){
+   h+='<div style="padding:10px 0'+(i?';border-top:1px solid var(--line)':'')+'">'+
+    '<div style="font-size:13px;font-weight:700;color:var(--ink)">'+esc(k.t)+(k.tay?' <span class="chip gray">tự khai</span>':'')+'</div>'+
+    (k.d?'<div class="mut" style="font-size:12px;line-height:1.6;margin-top:3px">'+esc(k.d)+'</div>':'')+
+    '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px">'+
+    (k.o?'<span class="mut" style="font-size:11.5px"><i class="ti ti-map-pin" style="margin-right:3px"></i>'+esc(k.o)+'</span>':'')+
+    (k.go?'<button class="btn sm" onclick="'+k.go.split('"').join("&quot;")+'"><i class="ti ti-arrow-right"></i>Mở thẳng tới đó</button>':'')+
+    '</div></div>'});
+  h+='</div></div>';
+  return h}
+ /* BÍ - nhưng không được trả về màn trắng. Nói thật là chưa hiểu, rồi đưa những thứ GẦN NHẤT. */
+ var G=qaGoiY(q);
+ h+='<div class="panel"><div class="pbody">';
+ h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-help-circle"></i><b>Em chưa hiểu rõ câu này.</b> Câu hỏi đã được ghi vào <b>sổ câu hỏi chưa trả lời được</b> trong Cài đặt - quản trị viên soạn câu trả lời một lần là lần sau app trả lời được ngay.</div>';
+ if(G.nguoi.length){
+  h+='<div class="sechd" style="margin-top:0">Có phải anh hỏi về một trong những người này?</div><div class="pickgrid">';
+  G.nguoi.forEach(function(x){h+='<button class="pickc" onclick="qaViDu('+JSON.stringify(x.ten).split('"').join("&quot;")+')"><i class="ti ti-user-check"></i><span><b>'+esc(x.ten)+'</b><small>'+esc(x.ma)+'</small></span></button>'});
+  h+='</div>'}
+ if(G.hethong.length){
+  h+='<div class="sechd">Hay anh đang tìm một trong những chỗ này?</div><div class="pickgrid">';
+  G.hethong.forEach(function(k){h+='<button class="pickc wrap" onclick="'+(k.go?k.go.split('"').join("&quot;"):"")+'"><i class="ti ti-map-pin"></i><span><b>'+esc(k.t)+'</b><small>'+esc(k.o||"")+'</small></span></button>'});
+  h+='</div>'}
+ if(!G.nguoi.length&&!G.hethong.length)
+  h+='<div class="empty" style="padding:18px 12px">Không tìm thấy gì gần với câu này. Thử gõ ngắn hơn - một cái tên, hoặc một từ khoá như "nợ", "nguy cơ", "chiết khấu".</div>';
+ h+='<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">'+
+  '<button class="btn primary" onclick="qaMucThem('+JSON.stringify(q).split('"').join("&quot;")+')"><i class="ti ti-plus"></i>Soạn câu trả lời cho câu này</button>'+
+  '<button class="btn" onclick="window.SETTAB=\'qa\';go(\'settings\')"><i class="ti ti-settings"></i>Mở sổ câu hỏi trong Cài đặt</button></div>';
+ h+='</div></div>';
+ return h}
+var RENDER={hoidap:renderHoidap,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
 function dashJump(key){var m={urgent:"viec",newlead:"nhaplead",consider:"viec",convert:"tuvan",risk:"viec",onboard:"xeplop",approve:"duyet",debt:"thanhtoan",complaint:"khieunai",ungraded:"baitap",testpend:"test",wowbook:"wow",unverified:"thanhtoan",classes:"banglop"};var pg=m[key];if(pg&&RBK[CURROLE].pages.indexOf(pg)>=0)go(pg);else go("viec")}
 
 /* ---------- router ---------- */

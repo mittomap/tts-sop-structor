@@ -393,4 +393,50 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
  document.getElementById=_oldGet;
 })();
 
+
+/* ---- MOT KIEU DONG THOI GIAN DUY NHAT, KHONG IN HAI LAN THOI GIAN (V9.47, anh Luan) ----
+   "co cho thiet ke timeline, co cho lai chua, vi du nhu buoi hoc va buoi wow, ma timeline lai
+    hien 2 lan thoi gian co, nhin hoi ky cuc."
+   Hai loi that: (1) node tren duong ke in NGAY roi trong the in lai session_date NGUYEN VAN (ca
+   ngay lan gio) - doc thanh "30/07/2026" xong lai "30/07/2026 18:00"; (2) nhat ky buoi hoc co
+   duong ke, nhat ky WOW thi khong, du hai muc nam sat nhau.
+   Luat tu nay: NODE giu NGAY, THE chi giu GIO. */
+(function(){
+ t("co ham dung chung cho dong thoi gian", typeof hvTLrow==="function"&&typeof hvTLopen==="function"&&typeof hvGio==="function"&&typeof hvNgay==="function");
+ /* hvGio/hvNgay phai tach dung, ke ca khi thieu gio */
+ t("hvNgay doi dung sang dd/mm/yyyy", hvNgay("2026-07-30 18:00")==="30/07/2026");
+ t("hvGio lay dung phan gio", hvGio("2026-07-30 18:00")==="18:00");
+ t("khong co gio thi hvGio tra ve rong, khong bia so", hvGio("2026-07-30")==="");
+ /* tim mot ho so CO CA buoi hoc LAN buoi WOW de soi that */
+ var hs=null;
+ rows("DL09").forEach(function(s){ if(hs)return;
+  var coW=rows("DL14").some(function(w){return w.student_id===s.student_id});
+  var coB=rows("DL08").some(function(o){return o.student_id===s.student_id&&o.class_id});
+  if(coW&&coB)hs=s});
+ if(!hs){t("co ho so demo vua co buoi hoc vua co buoi WOW de soi", false);}
+ else{
+  window.HVID=hs.student_id;
+  var h=renderTrangHV();
+  var nRail=(h.match(/class="hvtl"/g)||[]).length;
+  var nRow=(h.match(/class="hvtlr/g)||[]).length;
+  var nThe=(h.match(/class="hvses"/g)||[]).length;
+  t("co it nhat HAI duong ke - nhat ky buoi hoc VA nhat ky WOW", nRail>=2);
+  t("MOI the buoi deu nam trong mot dong cua duong ke (khong the nao dung ngoai)", nThe>0&&nRow===nThe);
+  /* khong the nao in lai NGAY ma node cua no da in */
+  var xau=[];
+  var kh=h.split('class="hvtlr');
+  kh.slice(1).forEach(function(seg,i){
+   var nd=(seg.match(/class="hvtld">([^<]*)</)||[])[1]||"";
+   if(!/^\d{2}\/\d{2}\/\d{4}$/.test(nd))return;
+   var than=seg.slice(seg.indexOf('class="hvses"'));
+   than=than.slice(0,than.indexOf('class="hvtlr')>=0?than.indexOf('class="hvtlr'):than.length);
+   /* ngay o dang ISO (2026-07-30) hay dang VN deu tinh la in lai */
+   var p=nd.split("/"), iso=p[2]+"-"+p[1]+"-"+p[0];
+   if(than.indexOf(iso)>=0||than.split(nd).length>2)xau.push("dong "+(i+1)+" node="+nd)});
+  t("the KHONG in lai ngay ma node da in"+(xau.length?" - lap o: "+xau.slice(0,4).join(", "):""), xau.length===0);
+  /* nhung van phai co GIO o dau do, khong duoc mat thong tin */
+  t("gio buoi hoc van hien (chi doi cho, khong bo)", /class="hvst"><b>\d{2}:\d{2}<\/b>/.test(h)||/chưa xếp giờ/.test(h));
+ }
+})();
+
 console.log(bad.length?("CHECK14 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK14 OK: "+ok+" tieu chi");
