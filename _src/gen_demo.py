@@ -453,7 +453,7 @@ for L in leads:
             L["next_action"]="Đã gọi %d lần chưa kết nối được. Việc cần làm: gọi lại theo lịch hẹn, quá 3 lần thì đổi kênh Zalo/SMS."%_fail
         elif L["next_followup_time"] and dt.datetime.strptime(L["next_followup_time"],"%d/%m/%Y %H:%M")<NOW:
             L["next_action"]="Lead đã giao cho NV nhưng quá 4 giờ (cấu hình slaLeadReassign_hours) chưa gọi. Việc cần làm: gọi gấp hoặc giao lại cho NV khác."
-        else: L["next_action"]="Gọi lần đầu trong 15 phút (slaLeadResponse) - giới thiệu và mời test miễn phí."
+        else: L["next_action"]="Gọi lần đầu trong 15 phút (slaLRT_minutes) - giới thiệu và mời test miễn phí."
     elif st=="contacted": L["next_action"]="Gọi lại theo lịch hẹn, mời đặt lịch test đầu vào."
     elif st=="considering": L["next_action"]="Gửi thêm lộ trình + học phí, hẹn chốt trong tuần."
     elif st=="no_response": L["next_action"]="Đã gọi %d lần không gặp. Việc cần làm: thử kênh Zalo/SMS khung giờ khác (3 lần theo SOP)."%max(_fail,3)
@@ -1388,16 +1388,16 @@ for r in ces:
 # next_action hiển thị cho v3 (trên sheet cột này là ARRAYFORMULA tự tính, seed bỏ qua)
 for t in tests:
     bs=t["booking_status"];att=t["test_attendance_status"]
-    if bs.startswith("pending"): t["next_action"]="Gọi chốt lịch test trong hôm nay (slaTestBooking)."
+    if bs.startswith("pending"): t["next_action"]="Gọi chốt lịch test trong hôm nay (slaTestBookedRemind_hours)."
     elif bs.startswith("rejected"): t["next_action"]="Khách từ chối test - chuyển tư vấn thẳng lộ trình."
     elif bs.startswith("cancelled"): t["next_action"]="Liên hệ đặt lại lịch test mới cho khách."
     elif att.startswith("no_show"): t["next_action"]="Gọi hỏi lý do vắng + hẹn lại lịch test."
-    elif att and t["test_status"].startswith("pending"): t["next_action"]="Chấm bài + trả kết quả trong 48h (slaTestResult)."
+    elif att and t["test_status"].startswith("pending"): t["next_action"]="Chấm bài + trả kết quả trong 48h (slaGLA_hours)."
     elif t["test_status"].startswith("graded") and t["post_test_status"].startswith("awaiting"): t["next_action"]="Đặt lịch tư vấn kết quả với khách."
     elif not att: t["next_action"]="Nhắc lịch test trước 1 ngày qua Zalo."
     else: t["next_action"]=""
 for c in cons_rows:
-    if c["consultation_status"].startswith("not_"): c["next_action"]="Tư vấn lộ trình theo KQ test (slaConsult)."
+    if c["consultation_status"].startswith("not_"): c["next_action"]="Tư vấn lộ trình theo KQ test (slaCVT_hours)."
     elif c["conversion_status"].startswith("interested"): c["next_action"]="Theo đuổi chốt cọc trong 3 ngày."
     elif c["conversion_status"].startswith("undecided"): c["next_action"]="Gửi bảng học phí + ưu đãi, hẹn phản hồi."
     else: c["next_action"]=""
@@ -1423,14 +1423,14 @@ for srow in sessions:
 for h in hws:
     hs=h["homework_status"]
     if hs.startswith("assigned"): h["next_action"]="Thu bài khi đến hạn "+h["homework_due_date"]+"."
-    elif hs.startswith("submitted") and not str(h["graded_at"]).strip(): h["next_action"]="Chấm bài trong 48h (slaHomeworkGrading)."
+    elif hs.startswith("submitted") and not str(h["graded_at"]).strip(): h["next_action"]="Chấm bài trong 48h (slaHomeworkGrading_hours)."
     elif hs.startswith("missing"): h["next_action"]="Nhắc HV nộp bù + báo học vụ nếu tái diễn."
     else: h["next_action"]=""
 for w in wows:
     ws_=w["wow_status"]
     if ws_.startswith("booked"): w["next_action"]="Xác nhận buổi với HV + GV."
     elif ws_.startswith("confirmed"): w["next_action"]="Dạy buổi theo trọng tâm đã hẹn."
-    elif ws_.startswith("completed") and not w["wow_content_note"]: w["next_action"]="Ghi nội dung buổi trong 24h (slaWowNote)."
+    elif ws_.startswith("completed") and not w["wow_content_note"]: w["next_action"]="Ghi nội dung buổi trong 24h (slaWowNote_hours)."
     elif ws_.startswith("no_show"): w["next_action"]="Liên hệ HV sắp xếp lại buổi (không trừ thêm quota)."
     else: w["next_action"]=""
 for v in surveys:
@@ -1451,7 +1451,7 @@ for kkn in kns:
     else: kkn["next_action"]=""
 for r in ces:
     st_=r["re_enrollment_status"]
-    if not str(r["final_test_score"]).strip() and "completed" in r["student_status"]: r["next_action"]="Nhập kết quả đầu ra trong 3 ngày (slaFinalTest)."
+    if not str(r["final_test_score"]).strip() and "completed" in r["student_status"]: r["next_action"]="Nhập kết quả đầu ra trong 3 ngày (slaFinalTest_days)."
     elif st_.startswith("not_contacted"): r["next_action"]="Mời tái ghi danh trong cửa sổ ưu đãi."
     elif st_.startswith("contacted") or st_.startswith("interested"): r["next_action"]="Theo đuổi chốt tái ghi danh."
     else: r["next_action"]=""

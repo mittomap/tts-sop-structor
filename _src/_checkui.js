@@ -119,7 +119,11 @@ const PROBE = () => {
     const nhan = (t) => V.n + " · " + C.ten + " · " + t;
     page.on("pageerror", e => bad.push(nhan("LOI JS: " + String(e.message).slice(0,140))));
     page.on("requestfailed", r => { const u = r.url(); if (!NGOAI_OK.some(re => re.test(u))) net.add(u.slice(0,110)); });
-    await page.addInitScript(w => { try { sessionStorage.setItem(w, ""); } catch (e) {} }, C.who);
+    await page.addInitScript(w => { try { sessionStorage.setItem(w, "");
+      /* V9.51: man chao phien dau (helloMaybe) chi hien voi NGUOI THAT lan dau - harness phai
+         tu nhan "da chao roi", khong thi tam chao che moi phep do bam nut. Man chao co bo kiem
+         rieng trong _checkqa (hop dong nguon + ve that). */
+      localStorage.setItem("ITTS_HELLO_V1","1"); } catch (e) {} }, C.who);
     await page.goto("file://" + require("path").resolve(OUT) + "/" + C.f, {waitUntil: "load"});
     await page.waitForFunction(() => typeof window.go === "function" || typeof window.renderTrangHV === "function", null, {timeout: 30000});
     await page.waitForTimeout(400);

@@ -149,7 +149,27 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.50 — 6 GÓP Ý SOÁT TAY CỦA ANH LUÂN, MỖI CÁI MỘT LỖI THẬT ✅ (30/07 chiều).**
+> **Phiên bản: V9.51 — DỌN TRÙNG TOÀN APP · MONITOR TỪNG CHỨC DANH · NỐI AI MIỄN PHÍ ✅ (30/07 tối).**
+> · **Một màn một bộ điều khiển**: đo được 13 trang / 48 ô thống kê lặp đúng nút lọc bên dưới -
+> dọn sạch, số dồn vào chip lọc. Đo sâu còn lòi ra **hai nguồn sự thật** cho hàng chờ hoàn tiền
+> (bảng việc đếm 1, chip hub đếm 2) - nay một hàm duy nhất.
+> · **Monitor 22 mã chức danh** (vào đúng đường gateEnter như người thật): bắt 4 chức danh bị
+> **mời rồi đuổi** - menu hiện "Báo cáo" mà bấm vào chỉ nhận câu từ chối. `navVis` nay hỏi đúng
+> hai chốt mà `go()` sẽ hỏi.
+> · **Bánh răng thay tên tham số máy**: 85 dòng dữ liệu còn chìa `(slaLeadResponse)` ra màn hình.
+> `naDecor` đổi hết thành bánh răng nhảy tới đúng dòng CH2, giải tên qua 3 nấc.
+> · **Nút "Chạy hướng dẫn" và nút "?" trùng việc** - gộp còn một.
+> · **V8 "Xem tiếp"** cho 6 bảng từng cắt cứng · **V7 màn chào phiên đầu** (một lần mỗi trình
+> duyệt, giới thiệu Trợ lý + chỗ bật lại hướng dẫn) · **V12** 17 đoạn gợi ý sửa tại chỗ trong
+> **Cài đặt > Đoạn gợi ý trên màn hình**.
+> · **NỐI AI MIỄN PHÍ** (Gemini / Groq / OpenRouter / Ollama): **máy trả lời trước**, AI chỉ diễn
+> giải theo gói ngữ cảnh app tự soạn (hồ sơ · ngưỡng CH2 kèm giá trị đang chạy · CH4 · **phân
+> quyền CH3** · CH1). Trả lời được câu "em không hiểu SOP quy định thế nào, ai được duyệt".
+> **Mặc định TẮT - chưa bật thì không gói tin nào rời máy.** Key nằm trên máy người dùng.
+> · Bộ kiểm: `_checkqa` **130** · `_checkux` **77** · font **198 icon** · 491 lượt mở thật.
+> `./verify.sh` XANH HẾT.
+>
+> **Phiên bản trước: V9.50 — 6 GÓP Ý SOÁT TAY CỦA ANH LUÂN, MỖI CÁI MỘT LỖI THẬT ✅ (30/07 chiều).**
 > · **Sidebar nhảy theo tab hub** (reRender nay buildNav - vá tầng chung, badge menu cũng tươi).
 > · **Đổi nốt 19 nhãn "Trợ thủ" -> "Trợ lý"** còn sót từ V9.48; bộ kiểm vứt comment rồi soi, ngoài
 > comment không còn chữ nào.
@@ -4142,3 +4162,97 @@ trang rồi soi: không link nào chỉ còn mã trần khi người đó có t�
 theo thiết kế mới. Negative test đợt này: 4 nhát bẻ (bỏ DL01 khỏi kho tìm · bỏ buildNav khỏi
 reRender · trả elabel về regex cũ · bỏ tra tên khỏi nsLnk) - **đỏ đúng chỗ cả 4**, nhát bẻ kho
 tìm còn hiện lại nguyên văn cảnh tìm sai người anh Luân gặp. `./verify.sh` XANH HẾT.
+
+---
+
+## V9.51 (30/07 tối) - DỌN TRÙNG LẶP TOÀN APP · MONITOR TỪNG CHỨC DANH · NỐI AI MIỄN PHÍ
+
+Anh Luân giao ba việc lớn cùng lúc, kèm một câu định hướng đáng ghi lại:
+
+> *"1 người dùng bình thường sẽ có cảm nhận kiểu: nó đẹp, nó xấu, nó rườm rà, phức tạp, sao thiếu
+> nút này, bấm cái này rồi xem lại ở đâu, rồi chỗ duyệt ở chỗ nào... Em phải hậu kiểm kiểu như vậy
+> thì mới có cơ hội làm cho app hoàn thiện được."*
+
+### 51.1 - Hai nút hướng dẫn trùng việc
+
+Thanh tiêu đề có nút "Chạy hướng dẫn" TO cạnh "Reset demo", và nút "?" bên phải - **cả hai gọi
+đúng `tourMenu()`**. Bỏ nút to, dồn `id=tourBtn` về nút "?" để công tắc bật/tắt trong Cài đặt vẫn
+điều khiển được.
+
+### 51.2 - Câu việc còn chìa tên tham số máy ra màn hình
+
+> *"ủa vẫn còn câu kiểu này à: Gọi lần đầu trong 15 phút (slaLeadResponse)... a nhớ chỗ này chỉ cần
+> thêm bánh răng để có thể nhảy tới nơi điều chỉnh là được mà, tất cả các câu dạng như vậy?"*
+
+Đúng, và không chỉ một câu - **85 dòng dữ liệu** mang dấu `(tênThamSố)` thô. Thêm `cfGear(tên)`
+(bánh răng trần, không in lại số) và `naDecor(chuỗi)` - tầng hiển thị tự đổi mọi dấu `(...)` thành
+bánh răng nhảy tới đúng dòng CH2. Giải tên qua **ba nấc**: tên thật trong CH2 → bí danh dữ liệu cũ
+→ bảng gộp `PKEY`. Tên lạ (kiểu "(quận Cầu Giấy)" người ta gõ tay) giữ nguyên chữ. Nhân đây phát
+hiện marker gieo trong `gen_demo.py` dùng **tên không tồn tại** (`slaLeadResponse` thay vì
+`slaLRT_minutes`, `slaTestResult` thay vì `slaGLA_hours`) - sửa ở nguồn pipeline.
+
+### 51.3 - AUDIT TRÙNG LẶP: một màn một bộ điều khiển
+
+> *"rất nhiều thẻ và tab trùng nhau ở rất nhiều trang, em chủ động tạo audit toàn diện"*
+
+Đo bằng máy trên mọi trang: **13 trang / 48 ô thống kê lặp đúng nút lọc ngay bên dưới nó** - cùng
+con số, cùng đích bấm. Hub Chờ duyệt (anh chụp) nặng nhất: dải 5 ô vẽ TỪ CHÍNH `segs` nên lặp
+nguyên dải chip. Chuẩn đã chốt: **ô nào chỉ lặp một nút lọc cùng màn thì bỏ, số dồn vào chính chip
+lọc; ô mang thông tin khác (tổng tiền, tỷ lệ, giờ kèm) thì giữ.** Còn 0 chỗ lặp.
+
+Đo sâu thêm một tầng thì lòi ra thứ tệ hơn trùng lặp: **hai nguồn sự thật cho cùng một hàng chờ.**
+Ô "Hoàn tiền" ở bảng việc quản lý đếm 1 trong khi chip hub đếm 2 - hai con số mâu thuẫn ngay trước
+mắt người có quyền duyệt. Nay `duyCkList()`/`duyRefundList()` là nguồn duy nhất, cả ba nơi cùng gọi.
+
+### 51.4 - MONITOR TỪNG CHỨC DANH: ngồi vào ghế của họ mà kiểm
+
+> *"chủ động thêm monitor của từng chức danh, là người mà ngồi làm việc trực tiếp trước màn hình
+> để kiểm, xem thử có gì bất hợp lý, có gì cần sửa, cần bổ sung ko, thì tiến hành luôn nha"*
+
+Đóng vai **22 mã chức danh có thật trong DL01**, vào đúng đường `gateEnter` như người thật, rồi mở
+từng mục menu. Bắt được: **4 chức danh bị MỜI RỒI ĐUỔI** - HR manager, IT manager, HR leader, WOW
+leader thấy mục "Báo cáo" (WOW leader thêm "Bảng lớp") trên menu, bấm vào chỉ nhận một câu từ chối
+"ngoài phạm vi". Mời rồi đuổi còn tệ hơn không mời. `navVis` nay hỏi **đúng hai chốt mà `go()` sẽ
+hỏi** (`canSee` cho trang nhạy cảm, `dsLevel` cho báo cáo) - menu và cửa vào nói cùng một lời.
+
+### 51.5 - "Xem tiếp" cho bảng dài (V8) và màn chào phiên đầu (V7)
+
+`catXem`/`xemTiepBtn`: 6 bảng từng cắt cứng ở 30-120 dòng nay sổ dần **30 dòng mỗi lần**, nói rõ
+còn bao nhiêu dòng nữa. Cột bảng chặng sổ theo từng cột riêng. Trạng thái xem không lưu - rời
+trang là về khúc đầu.
+
+Màn chào phiên đầu: hiện **đúng một lần cho mỗi trình duyệt** (khóa `ITTS_HELLO_V1` riêng, reset
+dữ liệu demo không làm nó hiện lại), mời chọn bài tham quan hoặc tự khám phá, và **giới thiệu nút
+Trợ lý + chỗ bật lại hướng dẫn** đúng như anh dặn từ V7.
+
+### 51.6 - Đoạn gợi ý sửa được tại chỗ (V12)
+
+`goiy(khóa, vănbản)`: **17 đoạn tĩnh** tự cải hoán, mặc định nằm trong mã, bản sửa nằm ở
+`config.goiy` (đi theo CFKEY - reset dữ liệu demo không mất). Tab mới **Cài đặt > Đoạn gợi ý trên
+màn hình**. Đoạn có số nội suy sống vẫn do máy ghép - sửa số đó là sửa ở CH2/CH4, không tách thô.
+
+### 51.7 - NỐI TRỢ LÝ VỚI AI MIỄN PHÍ
+
+> *"nếu em ko kết nối với 1 AI, sẽ khó mà hiểu ngữ cảnh... rồi sử dụng cái mà em đang thiết lập để
+> nó hiểu và hướng dẫn lại khi được hỏi"* · *"chỉ dùng AI miễn phí em nhé"* · *"anh muốn nhân viên
+> còn có thể hỏi SOP nữa, nhiều khi họ ko hiểu SOP thì phải giải thích"*
+
+**Cách chia vai - luật cứng của khối này:**
+- **Máy trả lời TRƯỚC**, tức thì, không chờ mạng. Mọi con số, mọi nút hành động, chế độ "dắt tôi
+  làm từng bước" đều từ bộ luật app. **AI không được quyền bịa nút hay bịa số.**
+- **AI chỉ DIỄN GIẢI** - nhận câu hỏi + gói ngữ cảnh do CHÍNH APP soạn: hồ sơ người được hỏi ·
+  ngưỡng CH2 **kèm giá trị đang chạy** · câu nhắc CH4 · **bảng phân quyền CH3** (ai được làm, ai
+  phải duyệt) · danh mục CH1 · chỗ cấu hình khớp câu hỏi. Đây đúng là chỗ trả lời câu "em không
+  hiểu SOP quy định thế": AI giải thích **vì sao** và **bằng đúng con số trung tâm đang áp**, chứ
+  không nói theo sách chung chung.
+- **Bốn nhà cung cấp miễn phí**: Gemini (free tier), Groq, OpenRouter (mẫu `:free`), Ollama chạy
+  tại máy (không cần key, không gửi dữ liệu đi đâu).
+- **MẶC ĐỊNH TẮT.** Chưa bật + chưa có key thì **không một gói tin nào rời máy** - bộ kiểm "không
+  phụ thuộc mạng" vẫn đúng nguyên. Key nằm trong cấu hình trên máy người dùng, không nhúng vào
+  build, không đẩy lên repo.
+
+### Số chốt phiên
+`_checkqa` 111 → **130** · `_checkux` 62 → **77** · `_check18` 84 trang/tab · font **198 icon** ·
+`_checkui` **491 lượt mở thật**. Ba chỗ đỏ tự gây trong phiên (tham số `centerName` không tồn tại ·
+`kpiChip` nhét vào ô số bị escape thành HTML thô · hợp đồng hub cũ đếm cả dải ô đã bỏ) đều do bộ
+kiểm bắt, không phải do đọc lại mà thấy. `./verify.sh` XANH HẾT.

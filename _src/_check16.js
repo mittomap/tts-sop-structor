@@ -1438,7 +1438,10 @@ function stripOf(o){var i=o.indexOf('<div class="bstats"');if(i<0)return "";   /
  (function(){var o=RENDER.giaoan();
   t("giao an: dai so bam duoc", /class="bstat"[^>]*onclick/.test(o)&&/window\.GATAB='kho'/.test(o))})();
  (function(){window.DUYTAB="duyetck";var o=RENDER.duyet();
-  t("hub Cho duyet: dai so bam sang dung tab", /class="bstat"[^>]*onclick="duyTabSet\('duyet/.test(o))})();
+  /* V9.51 (anh Luan chup): dai o thong ke lap nguyen dai chip da BO - nay hop dong nguoc lai:
+     khong con bstat nao goi duyTabSet, va chip tab phai TU mang con so */
+  t("hub Cho duyet: mot bo dieu khien duy nhat - chip mang so, khong con dai o lap",
+    !/class="bstat"[^>]*onclick="duyTabSet\(/.test(o)&&/onclick="duyTabSet\('duyetck'\)">[\s\S]{0,60}?<i class="segn">\d/.test(o))})();
  /* 3 trang truoc day KHONG co dai so nao */
  ["giaoan","banggiao","duyet"].forEach(function(k){
   t("trang "+k+" da co dai so", /class="bstats"/.test(RENDER[k]()))});

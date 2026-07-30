@@ -1864,3 +1864,44 @@ Nút **"Tôi đã chuyển khoản"** nay cho:
   đợt / số khác"*.
 - **Nhập số tiền đã chuyển** và **đính kèm ảnh biên lai / màn hình chuyển khoản**.
 - Đăng ký chưa chia đợt thì nói thẳng là chưa có bảng đợt, cứ nhập số tiền, kế toán ghi đúng chỗ.
+
+## Trợ lý nối AI miễn phí - hỏi cả nghiệp vụ lẫn SOP (V9.51)
+
+Trợ lý vốn trả lời bằng chính bộ luật app. Nay nối thêm được **một AI miễn phí** để giải thích
+bằng lời người - hợp với câu kiểu *"vì sao SOP bắt gọi khách trong 15 phút"*, *"bảo lưu khóa thì
+ai được duyệt"*, *"giải thích quy trình này cho em"*.
+
+**Cách chia vai:**
+- **Máy trả lời trước**, ngay lập tức, không chờ mạng. Mọi con số, mọi nút bấm, chế độ dắt từng
+  bước đều từ bộ luật app - AI không được bịa nút hay bịa số.
+- **AI chỉ diễn giải** phần bên dưới, đọc gói ngữ cảnh do chính app soạn: hồ sơ người được hỏi,
+  ngưỡng SOP **kèm giá trị trung tâm đang áp**, câu nhắc việc, **bảng phân quyền** (ai được làm,
+  ai phải duyệt), danh mục trạng thái.
+
+**Bật ở Cài đặt > Hỏi đáp.** Bốn nhà cung cấp đều miễn phí:
+| Nhà cung cấp | Lấy key ở đâu |
+|---|---|
+| Google Gemini | aistudio.google.com/apikey - tài khoản Google là đủ, không cần thẻ |
+| Groq | console.groq.com/keys |
+| OpenRouter | openrouter.ai/keys - chỉ dùng mẫu đuôi `:free` |
+| Ollama (chạy tại máy) | không cần key - cài ollama.com, chạy `ollama run llama3.2` |
+
+**Mặc định TẮT.** Chưa bật thì app không gửi gì ra ngoài. Key lưu trên máy bạn, không nhúng vào
+bản demo. Muốn dữ liệu tuyệt đối không rời máy thì chọn Ollama.
+
+## Màn chào phiên đầu (V9.51)
+
+Lần đầu vào app trên một trình duyệt, màn chào mời bạn **chọn bài tham quan** hoặc **tự khám phá**,
+và chỉ luôn hai thứ dễ bỏ sót: nút **Trợ lý** góc dưới bên phải, và nút **?** trên thanh tiêu đề để
+xem lại hướng dẫn bất cứ lúc nào. Chỉ hiện một lần - reset dữ liệu demo không làm nó hiện lại.
+
+## Bảng dài có "Xem tiếp" (V9.51)
+
+Sáu bảng từng cắt cứng (chờ xác nhận thu tiền, việc chờ nhận, từng đợt còn phải thu, học viên nguy
+cơ trong báo cáo, cột bảng chặng) nay **sổ dần 30 dòng một lần** và nói rõ còn bao nhiêu dòng nữa.
+
+## Sửa đoạn gợi ý tại chỗ (V9.51)
+
+**Cài đặt > Đoạn gợi ý trên màn hình**: 17 đoạn hướng dẫn tĩnh trong app sửa được, áp ngay khắp
+nơi, đi theo cấu hình nên reset dữ liệu demo không mất. Đoạn nào có con số sống (ngưỡng, hạn) thì
+không nằm ở đây - số đó sửa ở Ngưỡng & SLA hoặc Thông điệp CH4.

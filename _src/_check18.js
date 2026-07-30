@@ -962,7 +962,8 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
   t("hub Cho duyet ve du 6 tab cho quan tri vien", (function(){
    window.DUYTAB="duyetck";var o=RENDER.duyet();
    var n=(o.match(/duyTabSet\('/g)||[]).length;
-   return n>=6+5})());                    /* 6 tab + 5 o so bam duoc */
+   /* V9.51: dai 5 o thong ke da BO (lap nguyen dai chip - anh Luan chup). Nay dung 6 tab. */
+   return n>=6})());
  })();
  /* --- NHO TAM BANG TRA: phai vua NHO that, vua VUT dung luc --- */
  (function(){

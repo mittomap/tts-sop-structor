@@ -379,5 +379,54 @@ t("Hoi dap nam trong menu, khong bi giau", PBK["hoidap"]&&!PBK["hoidap"].hide);
  t("tab Cai dat ten Tro ly", /\["tro","Trợ lý","dat"\]/.test(SRC));
 })();
 
+/* ---- 15. NOI AI MIEN PHI (V9.51 - anh Luan: "noi voi 1 con AI nao do di... chi dung AI mien
+   phi"; "nhan vien con co the hoi SOP nua, nhieu khi ho ko hieu SOP thi phai giai thich") ----
+   Bon dieu song con:
+   1. MAC DINH TAT + tat thi KHONG mot goi tin nao roi may (bo kiem "khong phu thuoc mang").
+   2. May tra loi TRUOC - AI chi dien giai, khong duoc quyen bia nut hay bia so.
+   3. Goi ngu canh phai do CHINH app soan: ho so nguoi duoc hoi, nguong CH2 kem GIA TRI DANG
+      CHAY, cau nhac CH4 - de AI giai thich SOP bang dung con so trung tam dang ap.
+   4. Prompt phai cam bia ("KHONG bia"). */
+(function(){
+ t("co du bo ham AI", typeof aiCfg==="function"&&typeof aiOn==="function"&&typeof aiGoi==="function"&&typeof aiNguCanh==="function"&&typeof aiKhoiHTML==="function");
+ t("mac dinh TAT", !aiOn()&&!aiCfg().on);
+ t("du 4 nha cung cap mien phi", ["gemini","groq","openrouter","ollama"].every(function(k){return !!AIPROV[k]}));
+ /* tat thi khong fetch, khong khoi AI */
+ var goi=[];var fetchCu=global.fetch;
+ global.fetch=function(u,o){goi.push([u,o]);
+  var kq={then:function(){return kq},"catch":function(){return kq}};return kq};
+ var hv=rows("DL09")[0];
+ window.ASSTYD="";asstTraLoi(hv.full_name);
+ t("AI tat: khoi AI trong asstHTML rong", aiKhoiHTML("cau hoi thu")==="");
+ t("AI tat: khong mot goi tin nao roi may", goi.length===0);
+ /* bat gia lap: goi dung nha cung cap, prompt mang ngu canh that */
+ var a=aiCfg();a.on=1;a.prov="gemini";a.key="KEY_THU";
+ t("bat co key thi aiOn", aiOn());
+ t("khoi AI xuat hien khi bat", /aiTraLoi/.test(aiKhoiHTML("thu")));
+ var pr=aiPrompt("học phí của "+hv.full_name);
+ t("prompt cam bia", /KHÔNG bịa/.test(pr));
+ t("ngu canh mang HO SO nguoi duoc hoi", pr.indexOf(hv.full_name)>=0&&/HỒ SƠ LIÊN QUAN/.test(pr));
+ var pr2=aiPrompt("vì sao phải gọi lead trong 15 phút, giải thích sla giúp em");
+ t("hoi SOP thi ngu canh mang NGUONG DANG AP (co gia tri that)", /NGƯỠNG SOP ĐANG ÁP DỤNG/.test(pr2)&&/\d/.test(pr2.split("NGƯỠNG SOP")[1]||""));
+ /* anh Luan: "nhan vien con co the hoi SOP nua, nhieu khi ho ko hieu SOP thi phai giai thich" -
+    hoi "ai duoc duyet" thi ngu canh PHAI mang dung dong bang phan quyen CH3 */
+ var pr3=aiPrompt("ai được phê duyệt bảo lưu khóa học, em không rõ quy định");
+ t("hoi ve quyen thi ngu canh mang bang CH3", /BẢNG PHÂN QUYỀN SOP \(CH3\)/.test(pr3)&&/phê duyệt/i.test(pr3));
+ t("CH3 noi ro AI so huu viec do", /quản lý nhóm:|Ban Giám đốc|chức danh được làm/.test(pr3));
+ t("prompt yeu cau giai thich VI SAO + ai duyet", /VÌ SAO/.test(pr3)&&/AI ĐƯỢC LÀM/.test(pr3));
+ aiGoi("thu",function(){});
+ t("goi dung Gemini kem key", goi.length===1&&/generativelanguage\.googleapis\.com/.test(goi[0][0])&&/KEY_THU/.test(goi[0][0]));
+ t("than goi tin mang prompt", /NGỮ CẢNH/.test(String((goi[0][1]||{}).body||"")));
+ a.prov="groq";aiGoi("thu",function(){});
+ t("doi nha cung cap thi doi dung dia chi", /api\.groq\.com/.test(goi[1][0])&&/Bearer KEY_THU/.test(JSON.stringify(goi[1][1].headers)));
+ /* man Cai dat co du 4 lua chon + o key kieu password */
+ window.SETTAB="qa";var hSet=renderSetQA();
+ t("Cai dat co khoi noi AI + 4 nha cung cap", /Nối Trợ lý với một AI miễn phí/.test(hSet)&&Object.keys(AIPROV).every(function(k){return hSet.indexOf(esc(AIPROV[k].t))>=0}));
+ t("o key la password, khong chia chu thuong", /id="ai_key" type="password"/.test(hSet));
+ /* tra lai mac dinh - khong de trang thai thu lam ban cac bo kiem sau */
+ a.on=0;a.key="";a.prov="gemini";global.fetch=fetchCu;
+ t("tra ve mac dinh sach", !aiOn());
+})();
+
 console.log(bad.length?("CHECKQA FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECKQA OK: "+ok+" tieu chi");
 process.exit(bad.length?1:0);

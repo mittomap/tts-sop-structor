@@ -235,6 +235,57 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
  window.DUYTAB="";
 })();
 
+/* ---- 6ter. KHONG CAU NAO CHIA TEN THAM SO MAY RA MAN HINH (V9.51 - anh Luan: "a nho cho nay
+   chi can them banh rang de co the nhay toi noi dieu chinh la duoc ma, tat ca cac cau dang nhu
+   vay?") ----
+   Cau "viec can lam" trong DU LIEU mang dau "(tenThamSo)". Tang hien thi (naDecor) phai doi no
+   thanh banh rang nhay toi CH2 - nguoi dung khong bao gio thay ma may. */
+(function(){
+ t("co naDecor va cfGear", typeof naDecor==="function"&&typeof cfGear==="function");
+ t("naDecor doi ten that thanh banh rang, chu tho bien mat", /cfedit/.test(naDecor("Goi trong 15 phut (slaLRT_minutes)"))&&naDecor("Goi trong 15 phut (slaLRT_minutes)").indexOf("(slaLRT_minutes)")<0);
+ t("naDecor hieu ca ten cu qua bi danh", /cfedit/.test(naDecor("Goi ngay (slaLeadResponse)")));
+ t("naDecor khong pha chu nguoi ta go tay", naDecor("hen gap (quan Cau Giay)").indexOf("(quan Cau Giay)")>=0);
+ /* moi marker trong du lieu phai GIAI duoc ra mot tham so co that - marker mo coi la se lo ma may */
+ var moCoi=[];
+ Object.keys(DL).forEach(function(tb){(DL[tb]||[]).forEach(function(r){Object.keys(r).forEach(function(k){
+  var v=r[k];if(typeof v!=="string")return;
+  var re=/\((sla[A-Za-z0-9_]*|threshold[A-Za-z0-9_]*)\)/g,m;
+  while((m=re.exec(v))){var w=m[1];
+   if(!window.__PSET)naDecor("");
+   if(!window.__PSET[w]&&!NAALIAS[w])moCoi.push(tb+"."+k+": "+w)}})})});
+ t("moi marker tham so trong du lieu deu giai duoc"+(moCoi.length?" - MO COI: "+moCoi.slice(0,5).join(", "):""), moCoi.length===0);
+ /* ve THAT: moi trang + drawer lead - khong dau vet "(sla...)" tho nao con hien ra */
+ var tho=[];
+ Object.keys(RENDER).forEach(function(k){var html="";try{html=RENDER[k]()}catch(e){return}
+  if(/\((?:sla|threshold)[A-Za-z0-9_]+\)/.test(html))tho.push(k)});
+ var ld=rows("DL02").filter(function(x){return /slaLeadResponse/.test(String(x.next_action||""))})[0];
+ if(ld){var hLd=veDrawer(function(){leadOpen?leadOpen(ld.lead_id):openQuick(ld.lead_id)});
+  if(typeof hLd==="string"&&/\((?:sla|threshold)[A-Za-z0-9_]+\)/.test(hLd))tho.push("drawer lead")}
+ t("khong trang/drawer nao con chia '(slaXxx)' tho"+(tho.length?" - THO: "+tho.join(", "):""), tho.length===0);
+})();
+
+/* ---- 6quater. MOT MAN MOT BO DIEU KHIEN - O THONG KE KHONG DUOC LAP NUT LOC (V9.51) ----
+   anh Luan chup hub Cho duyet: 5 o thong ke + 6 chip tab cung MOT bo so tren cung man. Do toan
+   app: 13 trang / 48 o lap. Chuan da chot: o nao chi lap mot nut loc cung man thi bo - so don
+   vao chinh chip loc; o mang thong tin khac (tong tien, ty le, gio kem) thi giu.
+   Do THAT: dat CUR = trang roi ve (bangViec cua vai chi hien o trang dap - thieu buoc nay la
+   harness tu bia ra trung lap gia). */
+(function(){
+ var truoc=CUR,tong=0,chi=[];
+ function dich(oc){var x=String(oc||"").match(/(?:duyTabSet|goDuyet|tsTabSet|goTS|csTabSet|csGo|htTabSet|htGo|kcTabSet|fset)\('([^']+)'(?:,'([^']+)')?\)/);return x?(x[1]+(x[2]?("/"+x[2]):"")):null}
+ Object.keys(RENDER).forEach(function(k){
+  CUR=k;var h="";try{h=RENDER[k]()}catch(e){return}
+  var bs=[],m,re=/<div class="bstat"[^>]*onclick="([^"]*)"[\s\S]*?<div class="bsn">/g;
+  while((m=re.exec(h)))bs.push(m[1]);
+  if(!bs.length)return;
+  var tabDich={};re=/<button class="(?:segb|fbtn)[^"]*"[^>]*onclick="([^"]*)"/g;
+  while((m=re.exec(h))){var d=dich(m[1]);if(d)tabDich[d]=1}
+  bs.forEach(function(oc){var d=dich(oc);if(d&&tabDich[d]){tong++;if(chi.length<6)chi.push(k+":"+d)}});
+ });
+ CUR=truoc;
+ t("khong o thong ke nao lap nut loc cung man"+(tong?" - LAP "+tong+": "+chi.join(", "):""), tong===0);
+})();
+
 /* ---- 7. NGUOI DONG HANH (V9.50 - anh Luan chot): dong hien thi = quan he + SDT la du,
    quan he chon tu danh sach 7 muc: ong, ba, bo, me, anh, chi, nguoi giam ho ---- */
 (function(){
@@ -251,6 +302,36 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
  if(typeof hGH==="string"&&hGH.indexOf("LOI:")!==0){
   t("o quan he la SELECT co du 7 lua chon", mong.every(function(m){return hGH.indexOf(esc(elabel(m)))>=0})&&/id="gh_qh"/.test(hGH));
   t("form van giu o ho ten (phieu thu can)", /id="gh_ten"/.test(hGH))}
+})();
+
+/* ---- 8. MONITOR TUNG CHUC DANH (V9.51 - anh Luan: "chu dong them monitor cua tung chuc danh,
+   la nguoi ma ngoi lam viec truc tiep truoc man hinh de kiem... 1 nguoi dung binh thuong se co
+   cam nhan kieu: sao thieu nut nay, bam cai nay roi xem lai o dau") ----
+   Dong vai TUNG MA CHUC DANH co that trong DL01, vao dung duong gateEnter:
+   (a) menu khong duoc MOI vao trang ma mo ra chi nhan cau tu choi "ngoai pham vi" - moi roi
+       duoi con te hon khong moi (da do duoc 4 chuc danh dinh: HR/IT manager, HR leader,
+       WOW leader);
+   (b) khong muc menu nao mo ra mot trang trong tron. */
+(function(){
+ var daiDien={};
+ rows("DL01").forEach(function(st){if(String(st.staff_id)==="ADMIN")return;
+  var ma=ecode(st.role)||String(st.role);if(!daiDien[ma])daiDien[ma]=st});
+ var moiDuoi=[],trong=[],soVai=0;
+ Object.keys(daiDien).forEach(function(ma){
+  var st=daiDien[ma];
+  window.BLCLASS=null;window.HOSO=null;window.GVID=null;window.NVID=null;window.DUYTAB="";
+  try{window.GATE_SID=st.staff_id;applyScope(st.staff_id);setRole("all")}catch(e){return}
+  soVai++;
+  NAVTREE.forEach(function(G){G.items.forEach(function(k){
+   if(!navVis(k)||goAlias(k))return;
+   CUR=k;var h="";
+   try{h=(PBK[k]&&PBK[k].ty==="list")?renderList(k):(RENDER[k]?RENDER[k]():"")}catch(e){return}
+   if(/ngoài phạm vi/.test(h))moiDuoi.push(ma+":"+k);
+   if(h.replace(/<[^>]*>/g,"").trim().length<80)trong.push(ma+":"+k)})})});
+ window.GATE_SID="";applyScope("");setRole("all");
+ t("da dong vai >=20 ma chuc danh", soVai>=20);
+ t("menu khong moi vao trang tu choi 'ngoai pham vi'"+(moiDuoi.length?" - MOI DUOI: "+moiDuoi.slice(0,6).join(", "):""), moiDuoi.length===0);
+ t("khong muc menu nao mo ra trang trong tron"+(trong.length?" - TRONG: "+trong.slice(0,6).join(", "):""), trong.length===0);
 })();
 
 if(bad.length){console.log("CHECKUX DO ("+bad.length+"/"+(ok+bad.length)+"):");
