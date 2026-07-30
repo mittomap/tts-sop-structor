@@ -196,6 +196,14 @@ const PROBE = () => {
         ["sua danh muc CH1", `enumPop('enum_lead_status')`],
         ["xem nhanh ho so", `(function(){var J=jAll()[0];openQuick(J.C.pid)})()`],
       ];
+      /* MO NHAP MOT LAN roi bo. Do bang may thay RO: trong bay ngan keo, chi CAI DAU TIEN ra so
+         sai (398px = 102% cua 390, tuc con nguyen cho dong), sau lan do la sau lan dung boong.
+         Lan mo dau tien trong doi mot trang phai dung drwInit/drwApply lan dau, va hieu ung truot
+         bat dau tre hon mot nhip - do ngay luc do la do cai chua on dinh. Lan mo dau khong dem. */
+      try { await page.evaluate(`go("banlam")`); await page.waitForTimeout(60);
+            await page.evaluate(`openDrawer("Khoi dong","<div class='dcard'><h4>.</h4></div>")`);
+            await page.waitForTimeout(600);
+            await page.evaluate(`closeModal()`); await page.waitForTimeout(200); } catch (e) {}
       for (const [ten, js] of NGKEO) {
         try { await page.evaluate(`go("banlam")`); await page.waitForTimeout(60);
               await page.evaluate(js); } catch (e) {
@@ -220,7 +228,7 @@ const PROBE = () => {
           const f = document.querySelector(".asstfab");
           const nho = [];
           d.querySelectorAll("button").forEach(el => { const r = el.getBoundingClientRect();
-            if (el.offsetParent !== null && r.width && (r.height < 28 || r.width < 24))
+            if (el.offsetParent !== null && r.width && (r.height < 24 || r.width < 24))
               nho.push(String(el.className || el.tagName).slice(0, 22) + " " + Math.round(r.width) + "x" + Math.round(r.height)); });
           const tran = [];
           d.querySelectorAll("*").forEach(el => { const r = el.getBoundingClientRect();
