@@ -7,3 +7,6 @@ package-lock.json
 _src/node_modules/
 _src/package.json
 _src/package-lock.json
+
+# file tam do check_sop.py sinh ra moi lan chay - khong phai nguon
+_src/_vhbc_spec.json
