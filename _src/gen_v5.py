@@ -139,8 +139,12 @@ tr.cfhl>td{background:#FFF6D8}
 @keyframes cfhl{0%,60%{background:#FFF6D8}100%{background:transparent}}
 /* V9.29: nut nho "sua o day" canh cau nhac / danh muc */
 .cfedit{display:inline-flex;align-items:center;justify-content:center;margin-left:6px;background:none;border:0;
- width:24px;height:24px;flex:none;border-radius:50%;color:#9AA5B1;cursor:pointer;font-family:inherit;padding:0;
+ width:26px;height:26px;flex:none;border-radius:50%;color:#9AA5B1;cursor:pointer;font-family:inherit;padding:0;
  vertical-align:middle;transition:.12s}
+/* V9.56: banh rang 24x24 la du tren chuot, nhung tren cam ung dau ngon tay rong ~9mm - phai noi
+   vung bam ra. Khong phong to CAI ICON (phong to la no doi vai voi noi dung chinh), chi noi VUNG
+   BAM. Do bang may khi mo ngan keo o kho dien thoai moi thay. */
+@media(pointer:coarse){.cfedit{width:38px;height:38px}}
 .cfedit:hover{background:#EEF2F6;color:var(--blue)}
 .cfedit i{font-size:14px}
 /* chip số cũng bớt ồn: bánh răng chỉ hiện rõ khi rê vào */
