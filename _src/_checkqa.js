@@ -11,7 +11,9 @@
 //   3. Chua hieu thi phai CO GOI Y va phai GHI SO, khong duoc de man trang.
 function El(id){return {id:id||"",innerHTML:"",textContent:"",value:"",checked:false,
  style:{setProperty(){},removeProperty(){},getPropertyValue(){return ""}},offsetHeight:230,
- classList:{add(){},remove(){},contains(){return false},toggle(){return false}},
+ classList:{_s:{},add:function(c){this._s[c]=1},remove:function(c){delete this._s[c]},
+  contains:function(c){return !!this._s[c]},toggle:function(c,v){if(v===undefined)v=!this._s[c];
+  if(v)this._s[c]=1;else delete this._s[c];return v}},
  querySelector(){return El()},querySelectorAll(){return []},getAttribute(){return ""},setAttribute(){},
  appendChild(){},remove(){},focus(){},addEventListener(){},
  getBoundingClientRect(){return {left:10,top:10,width:100,height:30,bottom:40,right:110}},files:[]}}
@@ -24,6 +26,7 @@ global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
 global.innerWidth=1400;global.innerHeight=900;
 require('vm').runInThisContext(require('fs').readFileSync('./_APP.js','utf8'));
 var SRC=require('fs').readFileSync('./gen_v5.py','utf8');
+var CSS=(SRC.match(/\.asstfab\{[\s\S]*?\.tourfab\{/)||[""])[0];
 var ok=0,bad=[];
 function t(n,c){if(c)ok++;else bad.push(n)}
 setRole("all");cfEnsure();
@@ -73,7 +76,12 @@ function trung(q,phai){
  t("MOI tham so deu hoi duoc"+(thieu.length?": thieu "+thieu.slice(0,4).join(","):""), thieu.length===0);
  var trangThieu=PAGES.filter(function(p){return !p.hide&&!tenTS["Trang: "+p.t]}).map(function(p){return p.k});
  t("MOI trang deu hoi duoc"+(trangThieu.length?": thieu "+trangThieu.slice(0,4).join(","):""), trangThieu.length===0);
- t("kho lay tham so tu APPPARAMS chu khong chep tay", /APPPARAMS\.forEach\(function\(p\)\{\s*K\.push/.test(SRC));
+ /* Kho phai DUNG tu ban khai co san. Neu ai do chep tay mot danh sach vao day thi ngay mai them
+    tham so se khong hoi duoc, ma khong co gi bao. Bat quan he "duyet APPPARAMS roi day vao kho". */
+ t("kho lay tham so tu APPPARAMS chu khong chep tay",
+   /APPPARAMS\.forEach\(function\(p\)\{[\s\S]{0,600}?K\.push/.test(SRC));
+ t("kho lay trang tu PAGES chu khong chep tay",
+   /PAGES\.forEach\(function\(p\)\{[\s\S]{0,300}?K\.push/.test(SRC));
 })();
 
 /* ---- 5. HIEU Y: tach "hoi ve ai" khoi "muon biet gi" ---- */
@@ -207,6 +215,57 @@ t("khong ep y khi cau khong noi gi", qaYDinh("Nguyễn Văn A")==="");
  t("bi nhung van co duong di tiep", /qaMucThem\(/.test(h3));
  t("khong bao gio de man trang", h3.length>800);
  window.QAQ="";
+})();
+
+/* ---- 10bis. NUT HOI DAP O GOC, CANH TRO THU (V9.47, anh Luan) ----
+   "sao em ko dua no len gan cho tro thu, bam icon hien khung nhap" - thu nguoi ta can hoi GIUA
+   CHUNG ma bat roi trang dang lam de di tim mot trang khac thi hau nhu khong ai dung. */
+(function(){
+ t("co nut Hoi dap o goc", /id="qafab"/.test(SRC)&&typeof qaFabClick==="function");
+ t("nut Hoi dap va nut Tro thu KHONG chong nhau mot cho",
+   /\.asstfab\{position:fixed;right:74px/.test(CSS)&&/\.qafab\{position:fixed;right:18px/.test(CSS));
+ t("nut Hoi dap co nhan cho nguoi doc man hinh", /id="qafab"[^>]*aria-label="[^"]+"/.test(SRC));
+ /* bam la MO, bam nua la DONG */
+ qaFabClick();
+ var e=document.getElementById("qaPan");
+ t("bam icon thi hien khung nhap", e.classList.contains("on")&&/id="qap_q"/.test(e.innerHTML));
+ t("chua go gi van co cau goi y de bam thu", /qaPanVD\(/.test(e.innerHTML));
+ t("cau goi y lay TEN THAT tu du lieu, khong viet cung", (function(){
+   var v=qaViDuList()[0];
+   return srows("DL09").some(function(x){return v.indexOf(x.full_name)===0})})());
+ /* tam nay khong duoc TU TRA LOI theo kieu rieng - phai goi dung bo may cua trang */
+ var s=rows("DL09").filter(function(x){return String(x.full_name||"").split(" ").length>=3})[0];
+ window.QAPQ=s.full_name+" cần làm gì tiếp"; qaPanVe();
+ var h=document.getElementById("qaPan").innerHTML;
+ t("hoi ve mot nguoi thi tam ra dung ho so do", h.indexOf(esc(s.full_name))>=0);
+ t("tam co du ba phan: hien trang - canh bao - viec theo SOP",
+   /Hiện trạng/.test(h)&&/Vì sao có cảnh báo/.test(h)&&/Việc cần làm tiếp theo SOP/.test(h));
+ t("tam co day nut doi y nhu trang", QAYDINH.every(function(y){return h.indexOf(esc(y.t))>=0}));
+ t("tam co duong sang trang Hoi dap day du", /go\('hoidap'\)/.test(h));
+ window.QAPQ="đổi hotline ở đâu"; qaPanVe();
+ t("hoi chuyen he thong thi tam chi dung cho", /Mở thẳng tới đó/.test(document.getElementById("qaPan").innerHTML));
+ window.QAPQ="zzzqqq wwweee rrrttt"; qaPanVe();
+ t("bi thi tam cung noi thang la chua hieu", /Em chưa hiểu rõ câu này/.test(document.getElementById("qaPan").innerHTML));
+ qaPanDong();
+ t("bam lan nua thi dong", !document.getElementById("qaPan").classList.contains("on"));
+ /* hai tam cung mot goc - mo cai nay phai dong cai kia, khong duoc de che nhau */
+ t("mo Tro thu thi tam Hoi dap tu dong", /function asstOpen\(\)\{try\{qaPanDong\(\)/.test(SRC));
+ t("mo Hoi dap thi tam Tro thu tu dong", /function qaFabClick\(\)[\s\S]{0,240}asstClose\(\)/.test(SRC));
+ /* CONG HOC VIEN khong duoc co hop nay - no doc du lieu noi bo cua trung tam */
+ t("cong hoc vien KHONG co nut Hoi dap", (SRC.match(/id="qafab"/g)||[]).length===1);
+ window.QAPQ="";
+})();
+
+/* ---- 10ter. THAM SO CHU CHUA KHAI KHONG DUOC IN RA SO 0 ---- */
+(function(){
+ var chu=APPPARAMS.filter(function(p){return p[5]==="text"});
+ if(!chu.length){t("co tham so dang chu de thu", true);return}
+ var K=qaKhoHeThong(),xau=[];
+ chu.forEach(function(p){
+  var m=K.filter(function(k){return k.t===p[2]})[0];if(!m)return;
+  var v=String(paramStr(p[1],p[4])||"").trim();
+  if(!v&&/đang đặt 0/.test(m.d))xau.push(p[1])});
+ t("tham so chu chua khai thi noi 'chua khai', khong in so 0"+(xau.length?": "+xau.join(","):""), xau.length===0);
 })();
 
 /* ---- 11. VAO DUOC TU DAU: trang co that, nam trong menu ---- */

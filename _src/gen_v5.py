@@ -493,7 +493,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 @media(max-width:820px){.setgrp+.setgrp{border-left:0;padding-left:0;margin-left:0}
  .setglb{min-width:100%}}
 /* ── TRỢ THỦ Ở GÓC (V9.35) ── */
-.asstfab{position:fixed;right:18px;bottom:18px;z-index:198;display:flex;align-items:center;gap:7px;
+.asstfab{position:fixed;right:74px;bottom:18px;z-index:198;display:flex;align-items:center;gap:7px;
  background:var(--navy);color:#fff;border:0;border-radius:999px;padding:11px 17px;font-family:inherit;
  font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 12px 30px rgba(10,20,40,.32);transition:.14s}
 .asstfab:hover{transform:translateY(-1px);box-shadow:0 16px 36px rgba(10,20,40,.4)}
@@ -543,7 +543,34 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .asstFoot .btn.primary{flex:1;justify-content:center}
 .asstNote{padding:0 15px 14px;font-size:11.5px;color:var(--muted);line-height:1.6}
 .asstNote b{color:#4A5A6B}
-@media(max-width:600px){.asst{right:10px;left:10px;width:auto;bottom:70px}.asstfab{right:12px;bottom:12px}}
+/* ── HỎI ĐÁP Ở GÓC (V9.47) - anh Luân: *"sao em ko đưa nó lên gần chỗ trợ thủ, bấm icon hiện
+   khung nhập"*. Đúng: một trang riêng thì phải nhớ đường mà vào; thứ người ta cần HỎI GIỮA CHỪNG
+   phải ở ngay trong tầm tay, không bắt rời việc đang làm.
+   Nút tròn nhỏ đứng CẠNH nút Trợ thủ (không chồng lên - hai nút chồng nhau một góc là thứ chắc
+   chắn sẽ che nhau, đã ghi thành luật từ V9.35). Tấm trả lời dùng lại đúng khung `.asst`. */
+.qafab{position:fixed;right:18px;bottom:18px;z-index:198;width:46px;height:46px;border-radius:999px;
+ background:#fff;color:var(--navy);border:1px solid var(--line);cursor:pointer;display:flex;
+ align-items:center;justify-content:center;font-size:21px;box-shadow:0 10px 26px rgba(10,20,40,.18);transition:.14s}
+.qafab:hover{transform:translateY(-1px);border-color:var(--navy);box-shadow:0 14px 32px rgba(10,20,40,.26)}
+.qafab.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.qaPan{position:fixed;right:18px;bottom:74px;z-index:199;width:min(420px,calc(100vw - 28px));
+ max-height:min(76vh,660px);overflow:auto;background:#fff;border:1px solid var(--line);border-radius:16px;
+ box-shadow:0 24px 60px rgba(10,20,40,.28);display:none;font-size:13px}
+.qaPan.on{display:block;animation:asstIn .16s ease-out}
+.qaAsk{display:flex;gap:7px;padding:12px 13px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2}
+.qaAsk input{flex:1;min-width:0;height:36px;border:1px solid var(--line);border-radius:9px;padding:0 11px;font-family:inherit;font-size:12.5px}
+.qaAsk input:focus{outline:0;border-color:var(--navy)}
+.qaBody{padding:12px 13px}
+.qaBody .sechd{margin:12px 0 6px;font-size:10.5px}
+.qaBody .sechd:first-child{margin-top:0}
+.qaHit{padding:9px 0;border-top:1px solid var(--line)}
+.qaHit:first-of-type{border-top:0}
+.qaHit .t{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.4}
+.qaHit .d{font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:2px}
+.qaHit .o{font-size:11px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:4px}
+.qaVD{display:flex;gap:5px;flex-wrap:wrap;padding:0 13px 12px}
+@media(max-width:600px){.asst{right:10px;left:10px;width:auto;bottom:70px}.asstfab{right:66px;bottom:12px}
+ .qaPan{right:10px;left:10px;width:auto;bottom:70px}.qafab{right:12px;bottom:12px}}
 .tourfab{position:fixed;right:16px;bottom:16px;z-index:200;display:none;align-items:center;gap:7px;background:var(--navy);color:#fff;border:0;border-radius:999px;padding:10px 15px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 10px 26px rgba(10,20,40,.3)}
 .tourfab.on{display:flex}
 .tourfab:hover{filter:brightness(1.12)}
@@ -1397,6 +1424,8 @@ body.drsz .drawer{transition:none}
 <div class="undobar" id="undobar"></div>
 <div class="asst" id="asst"></div>
 <button class="asstfab" id="asstfab" aria-label="Mở Trợ thủ"></button>
+<div class="qaPan" id="qaPan"></div>
+<button class="qafab" id="qafab" aria-label="Mở hộp Hỏi đáp" data-tip="Hỏi đáp - hỏi về một học viên, hoặc hỏi chỗ cấu hình" onclick="qaFabClick()"><i class="ti ti-message-question"></i></button>
 <div class="mask" id="mask" onclick="closeModal()"></div>
 <div class="cfmask" id="cfm"><div class="cfbox"><div class="cfh"><i class="ti ti-alert-triangle"></i> Xác nhận thao tác</div><div class="cfmsg" id="cfmMsg"></div><div class="cfa"><button class="btn" onclick="closeConfirm()">Huỷ</button><button class="btn primary" onclick="confirmYes()">Xác nhận</button></div></div></div>
 <div class="drawer" id="drawer" role="dialog" aria-modal="true"><div class="drszr" id="drszr" title="Kéo để đổi độ rộng - bấm đúp để về mặc định"></div><div class="dh"><b id="drawerTitle">Chi tiết</b><button class="x" onclick="closeModal()" aria-label="Đóng">&times;</button></div><div class="dbody" id="drawerBody"></div></div>
@@ -14248,7 +14277,11 @@ function qaKhoHeThong(){
  qaCfg().muc.forEach(function(m){
   K.push({t:String(m.h||"").split("·")[0].trim()||"Hỏi đáp",d:m.d||"",o:m.o||"",go:m.go||"",tag:(m.h||"")+" "+(m.d||""),tay:1})});
  APPPARAMS.forEach(function(p){
-  K.push({t:p[2],d:"Tham số "+p[1]+(p[3]?" · đơn vị "+p[3]:"")+" · đang đặt "+paramOf(p[1],p[4]),
+  /* tham số CHỮ đọc bằng paramOf sẽ ra số 0 khi chưa khai - in "đang đặt 0" cho một cái hotline
+     là nói sai. Loại chữ phải đọc bằng paramStr, và trống thì nói thẳng là chưa khai. */
+  var _l=(p[5]==="text"||Object.prototype.toString.call(p[5])==="[object Array]");
+  var _v=_l?String(paramStr(p[1],p[4])||"").trim():paramOf(p[1],p[4]);
+  K.push({t:p[2],d:"Tham số "+p[1]+(p[3]?" · đơn vị "+p[3]:"")+(_v===""?" · chưa khai":" · đang đặt "+_v),
    o:(p[0]===CFTRUNGTAM?"Cài đặt > Thương hiệu & Màu":("Cài đặt > Ngưỡng & SLA (CH2) > nhóm "+p[0])),
    go:(p[0]===CFTRUNGTAM?"window.SETTAB='brand';go('settings')":("cfGo('"+p[1]+"')")),
    tag:p[0]+" "+p[1]+" "+p[2]})});
@@ -14457,8 +14490,100 @@ function qaGoiY(q){
    if(seen[k.t])return;seen[k.t]=1;g.hethong.push(k)})});
   g.hethong=g.hethong.slice(0,6)}
  return g}
-var QAVIDU=["Nguyễn Minh Anh đang có cảnh báo gì","đổi ngưỡng nợ quá hạn ở đâu",
- "sĩ số tối thiểu mở lớp chỉnh chỗ nào","ai được duyệt hoàn tiền","hạn chấm bài là bao lâu"];
+/* Câu gợi ý mở màn. Tên học viên lấy THẬT từ dữ liệu đang có - viết cứng một cái tên là tới ngày
+   sinh lại dữ liệu thì gợi ý trỏ vào người không tồn tại. */
+function qaViDuList(){
+ var s=null;try{s=srows("DL09")[0]}catch(e){}
+ return [(s&&s.full_name?s.full_name+" đang có cảnh báo gì":"học viên nào đang có cảnh báo"),
+  "đổi ngưỡng nợ quá hạn ở đâu","sĩ số tối thiểu mở lớp chỉnh chỗ nào",
+  "ai được duyệt hoàn tiền","hạn chấm bài là bao lâu"]}
+/* ── TẤM HỎI ĐÁP Ở GÓC (V9.47) ──────────────────────────────────────────────────────────────
+   Anh Luân: *"sao em ko đưa nó lên gần chỗ trợ thủ, bấm icon hiện khung nhập"*. Đúng - thứ người
+   ta cần hỏi GIỮA CHỪNG mà bắt phải rời trang đang làm để đi tìm một trang khác thì hầu như
+   không ai dùng. Nay có nút tròn đứng cạnh Trợ thủ, bấm là hiện ngay ô nhập.
+   Tấm này KHÔNG dựng lại logic trả lời - nó gọi đúng `qaTraLoi` / `qaHoSo` mà trang Hỏi đáp dùng.
+   Hai nơi trình bày khác nhau là chuyện giao diện; hai nơi TRẢ LỜI KHÁC NHAU thì là bệnh. */
+function qaPanEl(){var e=document.getElementById("qaPan");
+ if(!e){e=document.createElement("div");e.id="qaPan";e.className="qaPan";document.body.appendChild(e)}
+ return e}
+function qaFabClick(){var e=qaPanEl();
+ if(e.classList.contains("on"))return qaPanDong();
+ try{asstClose()}catch(x){}          /* hai tấm cùng góc - mở cái này thì đóng cái kia */
+ e.classList.add("on");
+ var f=document.getElementById("qafab");if(f)f.classList.add("on");
+ qaPanVe();
+ setTimeout(function(){var i=document.getElementById("qap_q");if(i&&i.focus)i.focus()},60)}
+function qaPanDong(){var e=document.getElementById("qaPan");if(e)e.classList.remove("on");
+ var f=document.getElementById("qafab");if(f)f.classList.remove("on")}
+function qaPanHoi(){window.QAPQ=fldV("qap_q")||"";qaPanVe()}
+function qaPanVD(s){window.QAPQ=s;qaPanVe();
+ setTimeout(function(){var i=document.getElementById("qap_q");if(i)i.value=s},20)}
+function qaPanVe(){
+ var e=document.getElementById("qaPan");if(!e||!e.classList.contains("on"))return;
+ var q=window.QAPQ||"";
+ var h='<div class="qaAsk"><input id="qap_q" value="'+esc(q)+'" placeholder="Hỏi: tên học viên, hoặc &quot;đổi hotline ở đâu&quot;" onkeydown="if(event.key===\'Enter\')qaPanHoi()">'+
+  '<button class="btn primary sm" onclick="qaPanHoi()"><i class="ti ti-search"></i></button>'+
+  '<button class="btn sm" onclick="qaPanDong()" aria-label="Đóng hộp Hỏi đáp"><i class="ti ti-x"></i></button></div>';
+ if(!q){
+  h+='<div class="qaBody"><div class="mut" style="font-size:11.5px;line-height:1.65">Hỏi bằng tiếng Việt. Gõ <b>tên một học viên</b> thì em trả lời hiện trạng, vì sao có cảnh báo và việc cần làm tiếp theo SOP. Gõ <b>chuyện của app</b> thì em chỉ đúng chỗ và mở thẳng tới đó.</div></div>';
+  h+='<div class="qaVD">';
+  qaViDuList().forEach(function(s){h+='<button class="pill" onclick="qaPanVD('+JSON.stringify(s).split('"').join("&quot;")+')">'+esc(s)+'</button>'});
+  h+='</div>';
+  e.innerHTML=h;return}
+ var R=qaTraLoi(q);
+ h+='<div class="qaBody">';
+ if(R.loai==="nguoi"&&R.nguoi.length>1){
+  h+='<div class="sechd">Có '+R.nguoi.length+' người khớp - chọn đúng người</div>';
+  R.nguoi.forEach(function(x){
+   h+='<div class="qaHit"><button class="btn sm" style="width:100%;justify-content:flex-start" onclick="qaPanVD('+JSON.stringify(x.ma).split('"').join("&quot;")+')"><i class="ti ti-user-check"></i>'+esc(x.ten)+' · '+esc(x.ma)+'</button></div>'});
+ }else if(R.loai==="nguoi"&&R.nguoi.length){
+  var K=qaHoSo(R.nguoi[0]);
+  var _y=QAYDINH.filter(function(y){return y.k===R.yd})[0];
+  h+='<div style="font-size:14px;font-weight:800;color:var(--navy)">'+esc(K.ten)+'</div>'+
+   '<div class="mut" style="font-size:11px">'+esc(K.ma)+' · '+(K.loai==="hv"?"học viên":"khách tiềm năng")+
+   (_y?' · đang xem <b>'+esc(_y.t.toLowerCase())+'</b>':'')+'</div>';
+  h+='<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px">';
+  QAYDINH.forEach(function(y){h+='<button class="pill'+(R.yd===y.k?" on":"")+'" onclick="qaPanVD('+JSON.stringify(K.ten+" - "+y.t.toLowerCase()).split('"').join("&quot;")+')"><i class="ti '+y.ic+'"></i>'+esc(y.t)+'</button>'});
+  h+='</div>';
+  h+='<div class="sechd">Hiện trạng</div>'+ctxRows(K.dong.map(function(d){return [d[0],esc(d[1])]}));
+  h+='<div class="sechd">Vì sao có cảnh báo</div>';
+  if(!K.canhbao.length)h+='<div class="mut" style="font-size:11.5px">Không có cảnh báo nào đang bật.</div>';
+  K.canhbao.forEach(function(c){h+='<div class="qaHit"><div class="d"><i class="ti ti-alert-triangle" style="color:var(--red);margin-right:4px"></i>'+esc(c)+'</div></div>'});
+  h+='<div class="sechd">Việc cần làm tiếp theo SOP</div>';
+  if(!K.viec.length)h+='<div class="mut" style="font-size:11.5px">Hồ sơ này đang sạch hàng chờ.</div>';
+  K.viec.slice(0,6).forEach(function(v){
+   h+='<div class="qaHit"><div class="t">'+
+    '<span class="chip '+(v.sev==="red"?"red":(v.sev==="amber"?"amber":"gray"))+'" style="margin-right:5px">'+esc(v.ma||v.cat||"việc")+'</span>'+
+    esc(v.cau||"")+'</div>'+
+    (v.han?'<div class="o"><i class="ti ti-clock"></i>'+esc(v.han)+'</div>':'')+
+    (v.go?'<div style="margin-top:6px"><button class="btn sm" onclick="qaPanDong();'+v.go.split('"').join("&quot;")+'"><i class="ti ti-arrow-right"></i>Mở màn xử lý</button></div>':'')+
+    '</div>'});
+  if(K.viec.length>6)h+='<div class="mut" style="font-size:11px;padding-top:6px">... còn '+(K.viec.length-6)+' việc nữa - mở trang Hỏi đáp để xem hết.</div>';
+  h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">'+
+   (K.viec.length?'<button class="btn primary sm" onclick="qaPanDong();qaDatTroThu('+JSON.stringify(K.ma).split('"').join("&quot;")+')"><i class="ti ti-checklist"></i>Dắt tôi làm từng bước</button>':'')+
+   (K.loai==="hv"?'<button class="btn sm" onclick="qaPanDong();window.HOSO='+JSON.stringify(K.ma).split('"').join("&quot;")+';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>':'')+
+   '</div>';
+ }else if(R.loai==="hethong"&&R.hethong.length){
+  h+='<div class="sechd">'+R.hethong.length+' chỗ khớp câu hỏi</div>';
+  R.hethong.forEach(function(k){
+   h+='<div class="qaHit"><div class="t">'+esc(k.t)+(k.tay?' <span class="chip gray">tự khai</span>':'')+'</div>'+
+    (k.d?'<div class="d">'+esc(k.d)+'</div>':'')+
+    (k.o?'<div class="o"><i class="ti ti-map-pin"></i>'+esc(k.o)+'</div>':'')+
+    (k.go?'<div style="margin-top:6px"><button class="btn sm" onclick="qaPanDong();'+k.go.split('"').join("&quot;")+'"><i class="ti ti-arrow-right"></i>Mở thẳng tới đó</button></div>':'')+
+    '</div>'});
+ }else{
+  var G=qaGoiY(q);
+  h+='<div class="mut" style="font-size:12px;line-height:1.65"><b>Em chưa hiểu rõ câu này.</b> Đã ghi vào sổ câu hỏi chưa trả lời được trong Cài đặt.</div>';
+  if(G.nguoi.length){h+='<div class="sechd">Có phải anh hỏi về?</div>';
+   G.nguoi.forEach(function(x){h+='<div class="qaHit"><button class="btn sm" style="width:100%;justify-content:flex-start" onclick="qaPanVD('+JSON.stringify(x.ten).split('"').join("&quot;")+')"><i class="ti ti-user-check"></i>'+esc(x.ten)+'</button></div>'})}
+  if(G.hethong.length){h+='<div class="sechd">Hay đang tìm chỗ này?</div>';
+   G.hethong.forEach(function(k){h+='<div class="qaHit"><div class="t">'+esc(k.t)+'</div>'+(k.o?'<div class="o"><i class="ti ti-map-pin"></i>'+esc(k.o)+'</div>':'')+
+    (k.go?'<div style="margin-top:6px"><button class="btn sm" onclick="qaPanDong();'+k.go.split('"').join("&quot;")+'"><i class="ti ti-arrow-right"></i>Mở thẳng</button></div>':'')+'</div>'})}
+  h+='<div style="margin-top:12px"><button class="btn sm" onclick="qaPanDong();window.SETTAB=\'qa\';go(\'settings\')"><i class="ti ti-settings"></i>Soạn câu trả lời cho câu này</button></div>';
+ }
+ h+='<div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--line)"><button class="btn sm" onclick="qaPanDong();window.QAQ='+JSON.stringify(q).split('"').join("&quot;")+';go(\'hoidap\')"><i class="ti ti-external-link"></i>Mở trang Hỏi đáp đầy đủ</button></div>';
+ h+='</div>';
+ e.innerHTML=h}
 function qaHoi(){window.QAQ=fldV("qa_q")||"";reRender("hoidap")}
 function qaViDu(s){window.QAQ=s;reRender("hoidap")}
 function qaXoa(){window.QAQ="";reRender("hoidap")}
@@ -14471,7 +14596,7 @@ function renderHoidap(){
   '<button class="btn primary" onclick="qaHoi()"><i class="ti ti-search"></i>Hỏi</button>'+
   (q?'<button class="btn" onclick="qaXoa()"><i class="ti ti-x"></i>Xoá</button>':'')+'</div>';
  h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px"><span class="mut" style="font-size:11px;align-self:center">Thử:</span>';
- QAVIDU.forEach(function(s){h+='<button class="pill" onclick="qaViDu('+JSON.stringify(s).split('"').join("&quot;")+')">'+esc(s)+'</button>'});
+ qaViDuList().forEach(function(s){h+='<button class="pill" onclick="qaViDu('+JSON.stringify(s).split('"').join("&quot;")+')">'+esc(s)+'</button>'});
  h+='</div></div></div>';
  if(!q)return h;
  var R=qaTraLoi(q);
@@ -14847,7 +14972,7 @@ function asstFabClick(){
 function asstOn(){return !!(document.getElementById("asst")||{}).classList&&document.getElementById("asst").classList.contains("on")}
 function asstToggle(){var a=asstEl();if(a.classList.contains("on"))asstClose();else asstOpen()}
 function asstClose(){var a=document.getElementById("asst");if(a)a.classList.remove("on");asstPaint()}
-function asstOpen(){asstEl().classList.add("on");asstPaint()}
+function asstOpen(){try{qaPanDong()}catch(e){}asstEl().classList.add("on");asstPaint()}
 function asstChao(){var h=new Date().getHours();
  return h<11?"Chào buổi sáng":(h<14?"Chào buổi trưa":(h<18?"Chào buổi chiều":"Chào buổi tối"))}
 function asstNext(){var L=[];try{L=workAll()}catch(e){}return L[0]||null}

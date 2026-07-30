@@ -154,7 +154,8 @@
 > · **Cấu hình lưu ở ô nhớ RIÊNG** (`CFKEY`) - bấm reset dữ liệu demo KHÔNG còn làm bay hotline,
 > 83 ngưỡng CH2, 51 ngưỡng KPI, câu nhắc CH4, danh mục CH1, thương hiệu, phân quyền. Trước bản này
 > tất cả nằm chung một ô mà `demoResetRun` xoá nguyên - **đó là mất dữ liệu người dùng**.
-> · **Hộp Hỏi đáp** (trang mới, có trong menu): MỘT hộp trả lời HAI loại câu hỏi - gõ tên học viên
+> · **Hộp Hỏi đáp** - có **nút tròn ngay cạnh Trợ thủ** (bấm icon là hiện khung nhập, không phải
+> rời trang đang làm), và một trang đầy đủ trong menu: MỘT hộp trả lời HAI loại câu hỏi - gõ tên học viên
 > thì trả lời *hiện trạng · vì sao cảnh báo · việc phải làm tiếp theo SOP* kèm nút **"Dắt tôi làm
 > từng bước"**; gõ chuyện app thì chỉ đúng chỗ và mở thẳng tới đó. **Không dùng AI** - đọc lại
 > chính `naFor`/`msgText`/`slaItems`/`stuRiskReasons`, nên không thể nói sai ngưỡng.
@@ -165,7 +166,7 @@
 > · **Cổng học viên: một kiểu dòng thời gian duy nhất** - node giữ NGÀY, thẻ chỉ giữ GIỜ.
 > · Dữ liệu demo bỏ tên "Demo 1/2/3" → tên thật; gieo lại 3 tình huống SOP bị rơi (NA032, NA003,
 > NA025); vá **bẫy im lặng** ở `riskTab` (khoá nhớ tạm thiếu hai ngưỡng cấu hình).
-> · Bộ kiểm: `_check16` **661** · `_check14` **136** · **`_checkqa` MỚI 65** · verify **17 phần** ·
+> · Bộ kiểm: `_check16` **661** · `_check14` **136** · **`_checkqa` MỚI 83** · verify **17 phần** ·
 > font **194 icon**. `./verify.sh` XANH HẾT.
 >
 > **CÒN LẠI trong việc D:** V6 màn hình từng chức danh (đã đo: `baocao` nằm trong menu HR và WOW
@@ -3866,3 +3867,27 @@ neo ngày tuyệt đối, và gieo THUẬN (không xoá dữ liệu của ai):
 - **NA025** vắng không phép mà học vụ ĐÃ gọi hỏi thăm - ghi ghi chú cho một lượt.
 
 Sau ba khối này: **83/93 trigger sinh ra lúc chạy thật**, 10 khai lý do cố ý - `check_sop` DAT.
+
+### 10. Hộp Hỏi đáp lên góc màn hình, cạnh Trợ thủ
+
+> *"cái hộp đó, sao em ko đưa nó lên gần chỗ trợ thủ, bấm icon hiện khung nhập"*
+
+Đúng: thứ người ta cần hỏi **giữa chừng** mà bắt rời trang đang làm để đi tìm một trang khác thì
+hầu như không ai dùng. Nay có **nút tròn đứng cạnh nút Trợ thủ**, bấm là hiện ngay ô nhập; tấm trả
+lời có đủ ba phần (hiện trạng · vì sao cảnh báo · việc theo SOP), dãy nút đổi ý, và nút **"Dắt tôi
+làm từng bước"**.
+
+Ba quyết định nhỏ nhưng đáng ghi:
+- **Hai nút KHÔNG chồng nhau một góc.** Nút Trợ thủ dịch sang trái 56px; nút Hỏi đáp giữ mép phải.
+  Hai nút chồng nhau một góc là thứ chắc chắn sẽ che nhau - luật này đã ghi từ V9.35, nay áp lại.
+- **Mở tấm này thì đóng tấm kia** (cả hai chiều). Hai tấm cùng góc mà cùng bung là hỏng.
+- **Tấm nổi KHÔNG dựng lại logic trả lời** - nó gọi đúng `qaTraLoi` / `qaHoSo` mà trang Hỏi đáp
+  dùng. Hai nơi trình bày khác nhau là chuyện giao diện; hai nơi TRẢ LỜI khác nhau thì là bệnh.
+- **Cổng học viên không có hộp này** - nó đọc dữ liệu nội bộ của trung tâm. Bộ kiểm đếm đúng MỘT
+  nút `qafab` trong mã nguồn, thêm nút thứ hai vào cổng học viên là đỏ.
+
+Bắt thêm một lỗi nhỏ khi chạy thật: tham số **dạng CHỮ chưa khai** bị `paramOf` đọc thành số 0, nên
+câu trả lời in *"centerHotline · đang đặt 0"*. In một cái hotline là số 0 thì người đọc tin là đã
+khai rồi. Nay loại chữ đọc bằng `paramStr`, trống thì nói thẳng **"chưa khai"**.
+
+`_checkqa`: 65 → **83 tiêu chí**.
