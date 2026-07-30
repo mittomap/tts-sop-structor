@@ -128,4 +128,47 @@ var KHUNG=[".pbody",".jgrid",".dt",".notebar","#chaybody"];
   rows("DL02").shift()})();
 })();
 
+/* ═══ V9.44 - MOI CHUC DANH PHAI CO DU BA THU: NHIP NGAY, BAI HUONG DAN, BANG VIEC ═══
+   Anh Luan 30/07: "Moi 1 chuc danh deu co 1 huong dan va tro ly rieng phu hop voi ho, cho nen
+   em phai build that chac tay."
+   Do lan dau: 8 nhom vai, nhung chi 6 nhom co nhip ngay (Marketing va nhom ho tro khong co dong
+   nao - Marketing con doc nham nhip cua QUAN LY), va chi 5 nhom co bai huong dan (thieu NV WOW,
+   Marketing, nhom ho tro). Nang hon nua: NHIP co khoa `wow` voi 4 dong nhung o chon trong Cai dat
+   khong liet ke no - nhip cua NV WOW TON TAI ma khong ai voi toi de sua.
+   Bo kiem nay giu cho chuyen do khong tai dien: them mot nhom vai moi vao ROLESCOPE ma quen mot
+   trong ba thu la DO. */
+(function(){
+ var nhom=Object.keys(ROLESCOPE);
+ var coBai={};Object.keys(TOURS).forEach(function(k){if(TOURS[k].lv==="trainghiem")coBai[k.replace(/^tn_/,"")]=1});
+ /* mot so nhom dung chung bai/nhip voi nhom khac - khai ro o day, khong de im lang */
+ var DUNGCHUNG={quantri:"quanly",dieuhanh:"quanly",tuvan:"sale"};
+ function bai(g){return coBai[DUNGCHUNG[g]||g]||coBai[g]}
+ nhom.forEach(function(g){
+  t2("nhom vai '"+g+"' co BAI HUONG DAN rieng", !!bai(g));
+ });
+ /* nhip ngay: hoi that nhipKey() bang cach dong vai mot nguoi cua nhom do */
+ var nvTheoNhom={};
+ DATA.dl.DL01.forEach(function(x){
+  if(!/active|working/.test(String(x.status||"")))return;
+  try{applyScope(x.staff_id)}catch(e){return}
+  var rs=SCOPE();if(!nvTheoNhom[rs.group])nvTheoNhom[rs.group]=x.staff_id});
+ nhom.forEach(function(g){
+  var sid=nvTheoNhom[g];
+  if(!sid){t2("nhom vai '"+g+"' co nhan vien de thu nhip ngay (bo qua neu khong co)", true);return}
+  window.GATE_SID=sid;setRole("all");applyScope(sid);
+  var L=[];try{L=nhipList()}catch(e){}
+  t2("nhom vai '"+g+"' co NHIP NGAY (>=3 dong)", L.length>=3);
+  var B="";try{CUR=(BVLAND[g]||[])[0]||"";
+   var tab=(BVLAND[g]||[])[1];
+   if(tab){if(CUR==="tuyensinh")window.TSTAB=tab;if(CUR==="hoctap")window.HTTAB=tab}
+   B=bangViecHTML()}catch(e){}
+  t2("nhom vai '"+g+"' co BANG VIEC o trang dap", (B||"").indexOf("bsn")>=0);
+ });
+ window.GATE_SID="";setRole("all");applyScope("");
+ /* o chon chuc danh trong Cai dat phai liet ke DU moi nhip co that - khong de nhip mo coi */
+ var oChon={};nhipRoles().forEach(function(r){oChon[r[0]]=1});
+ var mocoi=Object.keys(NHIP).filter(function(k){return k!=="order"&&Array.isArray(NHIP[k])&&!oChon[k]});
+ t2("moi nhip ngay deu sua duoc trong Cai dat"+(mocoi.length?(" - mo coi: "+mocoi.join(",")):""), mocoi.length===0);
+})();
+
 console.log(bad.length?("TOUR FAIL:\n  "+bad.join("\n  ")):"TOUR OK: menu cap do + moi bai chay het buoc, 0 loi");

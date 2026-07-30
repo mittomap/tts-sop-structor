@@ -1760,3 +1760,29 @@ riêng cho giảng viên.
 Ba cột mới theo bảng BC1 của SOP: **vắng mấy buổi · thiếu mấy bài · hoạt động cuối cách đây bao
 lâu**. Ba con số này phải đếm từ bảng khác nên trước đây không có; thiếu chúng thì cờ "nguy cơ" chỉ
 là một cái nhãn, người trực ca không biết chọn mức can thiệp nào trong năm mức SOP quy định.
+
+## Mỗi chức danh một trợ thủ và một hướng dẫn riêng (V9.44)
+
+**Nhịp ngày** - danh sách "hôm nay tôi phải làm gì", chia theo Đầu ngày / Trong ngày / Cuối ngày,
+mỗi dòng có số việc còn tồn và nút đi thẳng tới đúng trang. Nay **đủ 8 nhóm vai**, 33 dòng:
+
+| Nhóm | Số dòng | Ví dụ dòng |
+|---|---|---|
+| NV Tư vấn | 5 | gọi khách đã hẹn · nhận lead mới về trong đêm · chốt khách đã có kết quả test |
+| Marketing | 5 | *(mới)* lead đêm qua về từ nguồn nào · lead chưa ai nhận · khơi lại kho khách cũ |
+| Học vụ - CSKH | 5 | duyệt đơn xin nghỉ · xếp lớp cho HV đã đóng đủ · theo học viên nguy cơ |
+| Giáo viên đứng lớp | 4 | buổi dạy hôm nay · điểm danh ngay khi vào lớp · ghi nhận xét buổi |
+| Giáo viên WOW 1-1 | 4 | buổi WOW hôm nay · xác nhận buổi mới đặt · ghi nội dung buổi vừa dạy |
+| Kế toán | 4 | đối soát khoản thu hôm qua · thu các đợt tới hạn · hàng chờ duyệt |
+| Quản lý - Giám đốc | 5 | việc quá hạn toàn trung tâm · hàng chờ duyệt · KPI dưới ngưỡng |
+| Nhóm hỗ trợ | 3 | *(mới)* nhận việc mới · làm và báo xong · việc quá hạn phải báo lại |
+
+Mọi dòng **sửa được trong Cài đặt > Nhịp ngày**: đổi chữ, đổi buổi, đổi thứ tự, tắt dòng không hợp
+với trung tâm mình, hoặc thêm dòng của riêng trung tâm. Trước V9.44 nhịp của NV WOW tồn tại nhưng
+ô chọn chức danh không liệt kê nó nên **không có đường nào để sửa** - nay ô chọn sinh thẳng từ
+danh mục nên không thể sót lần nữa.
+
+**Bài hướng dẫn** - nay **12 bài / 66 bước**, ba cấp: Tham quan (hiểu app trong 2 phút) · Trải
+nghiệm (một ngày của từng chức danh) · Chuyên nghiệp (người cấu hình). Cấp Trải nghiệm nay đủ tám
+chức danh, thêm ba bài mới: **Một ngày của Giáo viên WOW**, **Một ngày của Marketing**, **Một ngày
+của nhóm hỗ trợ**.

@@ -12668,6 +12668,27 @@ var TOURS={
   {p:"banglop",sel:'@phead',t:"Giao bài tập",d:"Giao một bài chung cho cả lớp hoặc bài riêng cho từng em. Hạn nộp tự tính theo giáo án khóa, sửa được.",hint:"Bấm tab Bài tập rồi Giao bài."},
   {p:"buoihoc",sel:'@phead',t:"Ghi nhận xét buổi học",d:"Cuối buổi ghi nhận xét chung - học viên và phụ huynh đọc được trong cổng học viên. Quá hạn sẽ bị nhắc.",hint:"Bấm Ghi nhận xét cho buổi vừa dạy."},
   {p:"giaoviec",sel:'@phead',t:"Việc được giao",d:"Học vụ hoặc tổ trưởng giao việc cho bạn ở đây: chuẩn bị đề, dự giờ, viết giáo án bổ sung.",hint:"Xong một ngày của giáo viên!"}]},
+ /* V9.44 - BA BÀI CÒN THIẾU. Cấp "trải nghiệm" trước đây có 5 bài cho 5 chức danh, nhưng app
+    có TÁM nhóm vai. NV WOW - người giữ toàn bộ buổi kèm 1-1 và việc chấm test - không có bài
+    nào; Marketing giữ đầu vào của cả phễu cũng không; nhóm hỗ trợ thì mở app ra không biết mình
+    làm gì ở đây. Anh Luân: "Mỗi 1 chức danh đều có 1 hướng dẫn và trợ lý riêng phù hợp với họ."
+    Bộ kiểm mới canh chuyện này: thêm nhóm vai mà quên bài hướng dẫn là ĐỎ. */
+ tn_wow:{lv:"trainghiem",role:"Giáo viên WOW 1-1",t:"Một ngày của Giáo viên WOW",ic:"ti-star",d:"5 bước - chấm test, dạy kèm 1-1, ghi kết quả",steps:[
+  {p:"hoctap",ctx:function(){window.HTTAB="wow"},sel:'@phead',t:"Buổi WOW hôm nay của bạn",d:"Vào app là thấy ngay buổi kèm 1-1 hôm nay: em nào, yếu kỹ năng gì, lần trước kèm tới đâu. Buổi mới học viên đặt mà bạn chưa xác nhận thì hiện chip hổ phách.",hint:"Xem danh sách buổi WOW của bạn."},
+  {p:"tuyensinh",ctx:function(){window.TSTAB="test"},sel:'@phead',t:"Chấm test đầu vào",d:"Chấm bài test là việc của NV WOW chứ không phải giáo viên đứng lớp - bảng phân quyền CH3 của SOP ghi rõ. Nhập bốn kỹ năng, điểm tổng tự tính trung bình.",hint:"Mở một phiếu test chờ chấm."},
+  {p:"tuyensinh",ctx:function(){window.TSTAB="test"},sel:'@tbar',t:"Viết academic_note",d:"Nhận xét học thuật là thứ nhân viên tư vấn dùng để tư vấn lộ trình. Chấm điểm mà không viết nhận xét thì người sau không biết nói gì với khách.",hint:"Nhìn chip Chờ chấm và Đã chấm."},
+  {p:"hoctap",ctx:function(){window.HTTAB="wow"},sel:'@tbar',t:"Ghi nội dung và kết quả buổi kèm",d:"Dạy xong ghi ngay: kèm gì, em tiến bộ hay chưa. Chỉ số WOR (tỷ lệ buổi có tiến bộ) tính từ đúng ô này, và giáo viên chủ nhiệm đọc nó để biết đã kèm gì.",hint:"Bấm chip Chờ ghi nội dung."},
+  {p:"hocvien",sel:'@tbar',t:"Học viên nào cần đặt buổi kèm",d:"Em nào yếu học thuật thì SOP bảo đặt buổi WOW kèm. Lọc nhanh Nguy cơ cho ra đúng nhóm đó, kèm số buổi vắng và số bài thiếu để biết nặng nhẹ.",hint:"Xong một ngày của giáo viên WOW!"}]},
+ tn_marketing:{lv:"trainghiem",role:"Marketing",t:"Một ngày của Marketing",ic:"ti-speakerphone",d:"5 bước - nguồn lead, chất lượng lead, kho khách cũ",steps:[
+  {p:"tuyensinh",ctx:function(){window.TSTAB="lead"},sel:'@phead',t:"Đêm qua lead về từ đâu",d:"Mỗi lead ghi rõ nguồn. Nguồn nào đang đổ về nhiều mà chất lượng kém thì phải biết trong ngày, không đợi cuối tháng mới cộng sổ.",hint:"Nhìn cột Nguồn trong danh sách lead."},
+  {p:"tuyensinh",ctx:function(){window.TSTAB="lead"},sel:'@tbar',t:"Lead chưa ai nhận",d:"Lead không có người phụ trách là lead sẽ nguội. Lọc ra rồi đẩy về đội tư vấn - tiền quảng cáo đã tiêu rồi, đừng để mất ở khâu này.",hint:"Lọc theo trạng thái Mới."},
+  {p:"reup",sel:'@phead',t:"Kho khách cũ để chăm lại",d:"Khách đã mất, không phản hồi, không liên lạc được - vẫn rẻ hơn khách mới rất nhiều. Mỗi ngày chạm lại một ít thay vì để nằm im.",hint:"Xem danh sách khách cần chăm lại."},
+  {p:"magioithieu",sel:'@phead',t:"Mã giới thiệu và thưởng",d:"Khách cũ giới thiệu là nguồn rẻ nhất. Ai đang giới thiệu được nhiều, thưởng nào còn treo chưa trả - trả chậm là lần sau không ai giới thiệu nữa.",hint:"Xem thưởng đang chờ."},
+  {p:"baocao",sel:'@phead',t:"Phễu và tỷ lệ chuyển đổi",d:"Phễu cho biết mất khách ở bước nào. Marketing đổ nhiều lead mà tắc ở khâu gọi thì vấn đề không nằm ở quảng cáo.",hint:"Xong một ngày của marketing!"}]},
+ tn_hotro:{lv:"trainghiem",role:"Nhóm hỗ trợ (HR, IT...)",t:"Một ngày của nhóm hỗ trợ",ic:"ti-tool",d:"3 bước - nhận việc, làm, báo xong",steps:[
+  {p:"banlam",sel:'@phead',t:"Bảng việc của bạn",d:"Nhóm hỗ trợ không đụng vào phễu hay lớp học - bạn làm việc qua module Giao việc. Bốn con số đầu trang cho biết việc mới, đang làm, quá hạn và việc chờ người giao xác nhận.",hint:"Nhìn bốn ô đầu trang."},
+  {p:"giaoviec",sel:'@phead',t:"Nhận việc được giao",d:"Bấm Nhận là người giao biết việc đã tới tay bạn. Việc bắt buộc thì không từ chối được; việc thường thì từ chối phải ghi lý do.",hint:"Mở một việc mới và bấm Nhận."},
+  {p:"giaoviec",sel:'@tbar',t:"Báo xong ngay lúc làm xong",d:"Báo xong kèm ghi chú, người giao xác nhận là việc đóng. Không làm kịp thì báo lại sớm - im lặng mới là vấn đề.",hint:"Xong một ngày của nhóm hỗ trợ!"}]},
  tn_ketoan:{lv:"trainghiem",role:"Kế toán",t:"Một ngày của Kế toán",ic:"ti-cash",d:"5 bước - thu, đối soát, công nợ, hoàn tiền",steps:[
   {p:"thanhtoan",sel:'@phead',t:"Thu học phí",d:"Thu tiền mặt hay chuyển khoản đều ghi ở đây, in phiếu thu ngay. Đóng theo đợt thì ghi hẹn thu đợt sau.",hint:"Bấm Thu tiền trên một đăng ký còn nợ, nhập số tiền rồi Lưu.",chk:function(){return tourMore("thu")}},
   {p:"thanhtoan",sel:'@obcards',t:"Đối soát khoản thu",d:"Tư vấn viên thu hộ thì kế toán phải xác nhận lại. Khoản chưa xác nhận hiện chip hổ phách.",hint:"Bấm chip Chờ xác nhận, mở một khoản và bấm Xác nhận đã nhận.",chk:function(){return (window.TOURB&&rows("DL07").filter(function(x){return String(x.verified_by||"").trim()}).length>(window.TOURB.xacnhan||0))}},
@@ -13911,6 +13932,29 @@ var NHIP={
    function(){return duyTabs().filter(function(x){return x.k==="duyetck"||x.k==="duyethoan"}).reduce(function(a,x){return a+x.n},0)}],
   ["chieu","Nhìn dự thu tháng","Biết tháng sau về bao nhiêu mới lên kế hoạch được","dsthanhtoan",
    null]],
+ /* V9.44 - NHỊP NGÀY CHO MARKETING. Trước đây nhóm này không có dòng nào: họ mở app ra là một
+    trang trắng về mặt "hôm nay tôi phải làm gì", trong khi họ chính là người giữ đầu vào của cả
+    phễu. Bốn dòng dưới đây bám đúng việc của họ - nguồn lead, chất lượng lead, kho khách cũ. */
+ marketing:[
+  ["sang","Soi lead đêm qua về từ nguồn nào","Nguồn nào đang đổ lead xấu thì phải biết trong ngày, không đợi cuối tháng","tuyensinh",
+   function(){var h=24;return rows("DL02").filter(function(l){var t=hoursSince(l.lead_created_time);return t!=null&&t<=h}).length}],
+  ["sang","Lead mới chưa ai nhận","Lead không có người phụ trách là lead sẽ nguội - đẩy về đội tư vấn ngay","tuyensinh",
+   function(){return rows("DL02").filter(function(l){return isc(l.lead_status,"new")&&!String(l.assigned_to||"").trim()}).length}],
+  ["ngay","Lead bị đánh dấu không đạt chuẩn","Tỷ lệ lead xấu cao là tiền quảng cáo đang chảy sai chỗ","tuyensinh",
+   function(){return rows("DL02").filter(function(l){return /not_qualified|unqualified/.test(ecode(l.lead_qualification_status))}).length}],
+  ["chieu","Khơi lại kho khách cũ","Khách đã nguội vẫn rẻ hơn khách mới - mỗi ngày chạm lại một ít","reup",
+   function(){return rows("DL02").filter(function(l){return isc(l.lead_status,"lost","no_response","unreachable")}).length}],
+  ["chieu","Xem mã giới thiệu ai đang chạy","Khách cũ giới thiệu là nguồn rẻ nhất, đừng để thưởng treo","magioithieu",
+   function(){return rows("DL19").filter(function(r){return isc(r.reward_status,"pending")}).length}]],
+ /* V9.44 - NHỊP NGÀY CHO NHÓM HỖ TRỢ (HR, IT, bảo vệ, tạp vụ). Họ không đụng vào phễu hay lớp
+    học, chỉ làm việc qua module Giao việc - nhưng "không có nhịp" khác hẳn "nhịp ngắn". */
+ hotro:[
+  ["sang","Nhận việc mới được giao","Người giao đang đợi bạn bấm Nhận để biết việc đã tới tay","giaoviec",
+   function(){return gvSo("new")}],
+  ["ngay","Làm và báo xong việc đang giữ","Báo xong ngay lúc làm xong, đừng để dồn cuối tuần","giaoviec",
+   function(){return gvSo("doing")}],
+  ["chieu","Việc quá hạn phải báo lại","Không làm kịp thì nói sớm - im lặng mới là vấn đề","giaoviec",
+   function(){return gvSo("late")}]],
  quanly:[
   ["sang","Xem việc quá hạn toàn trung tâm","Số đỏ hôm nay là vấn đề tuần sau","viec",
    function(){return slaItems().filter(function(x){return x.sev==="red"}).length}],
@@ -13961,20 +14005,26 @@ function nhipMove(role,i,d){
  reRender("settings")}
 function nhipReset(){var c=(DATA.config=DATA.config||{});c.nhip={};persistSoon();reRender("settings");
  toast("Đã trả Nhịp ngày về mặc định.")}
-function nhipRoles(){return [["tuvan","NV Tư vấn"],["hocvu","Học vụ"],["giaovien","Giáo viên / WOW"],
- ["ketoan","Kế toán"],["quanly","Quản lý"]]}
+/* V9.44 - DANH SÁCH CHỨC DANH TRONG Ô CHỌN CỦA CÀI ĐẶT. Trước bản này hàm trả về 5 mục và gộp
+   nhãn thành "Giáo viên / WOW" trỏ vào khoá `giaovien` - trong khi NHIP có hẳn khoá `wow` riêng
+   với 4 dòng. Hậu quả: nhịp ngày của NV WOW TỒN TẠI mà không ai với tới để sửa, vì ô chọn không
+   có mục đó. Sinh ra đúng từ khoá của NHIP thì thêm nhóm vai mới là ô chọn tự có, không phải nhớ
+   sửa hai nơi - và không thể lệch lần nữa. */
+var NHIPTEN={tuvan:"NV Tư vấn",marketing:"Marketing",hocvu:"Học vụ - CSKH",giaovien:"Giáo viên đứng lớp",
+ wow:"Giáo viên WOW 1-1",ketoan:"Kế toán",quanly:"Quản lý - Giám đốc",hotro:"Nhóm hỗ trợ (HR, IT...)"};
+function nhipRoles(){return Object.keys(NHIP).filter(function(k){return k!=="order"&&Array.isArray(NHIP[k])})
+ .map(function(k){return [k,NHIPTEN[k]||k]})}
 function nhipKey(){
- var r=mapRoleCode(ecode((find("DL01","staff_id",CURSTAFF)||{}).role))||"";
- if(/ceo|smanager|amanager/.test(r))return "quanly";
- if(/^sales/.test(r))return "tuvan";
- if(/academic/.test(r))return "hocvu";
- /* V9.40: giáo viên WOW TÁCH RIÊNG. Trước đây gộp vào nhóm "giaovien", nhưng cả 4 dòng nhịp của
-    nhóm đó đều lọc DL11/DL13 theo teacher_id - mà wow_coach có 0 dòng ở cả hai bảng. Kết quả:
-    mở app buổi sáng thấy 4 dòng đều bằng 0, tức app nói "hôm nay anh hết việc" với đúng người
-    đang giữ toàn bộ 70 buổi WOW của trung tâm. */
- if(/wow/.test(r))return "wow";
- if(/teacher/.test(r))return "giaovien";
- if(/account/.test(r))return "ketoan";
+ /* V9.44 - HỎI THẲNG TẦNG PHÂN QUYỀN, không tự phân loại lần hai.
+    Trước bản này hàm tự dò bằng mapRoleCode() - mà mapRoleCode gom mọi vai lạ về "ceo", nên
+    Marketing và nhóm hỗ trợ rơi vào nhánh cuối và đọc nhịp của QUẢN LÝ: toàn việc không phải
+    của họ. Hai chỗ cùng phân loại chức danh thì kiểu gì cũng có ngày lệch nhau - nay chỉ còn
+    MỘT chỗ là buildScope(), cái mà phân quyền và bảng việc cũng đang dùng. */
+ var g=(SCOPE()||{}).group||"";
+ var mgr=!!(SCOPE()||{}).mgr;
+ if(g==="dieuhanh"||g==="quantri")return "quanly";
+ if(mgr&&(g==="tuvan"||g==="hocvu"||g==="marketing"))return "quanly";
+ if(NHIP[g])return g;
  return CURSTAFF?"":"quanly"}          /* chưa gắn nhân viên (quản trị demo) -> xem nhịp quản lý */
 /* Hai loại nhịp - KHÔNG được trộn:
    · HÀNG CHỜ (có hàm đếm): đếm được nên "0 = xong" là câu nói thật;

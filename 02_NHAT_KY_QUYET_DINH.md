@@ -3517,3 +3517,42 @@ Cấu hình không còn nằm ở hai nơi nữa. CH1-CH6, trợ thủ, nhịp n
 tất cả nằm trong màn **Cài đặt**, sửa là app đổi ngay. File SOP gốc `.xlsx` **vẫn giữ** nhưng đổi
 vai: nó là **nguồn sự thật để `check_sop.py` đối chiếu sáu mặt**, không phải nơi để chạy hay để
 sửa cấu hình.
+
+## V9.44 (30/07) - MỖI CHỨC DANH MỘT TRỢ THỦ VÀ MỘT HƯỚNG DẪN RIÊNG
+
+Anh Luân: *"Phải cập nhật liên tục chức năng trợ thủ và hướng dẫn... đây chính là chức năng quan
+trọng nhất, anh muốn em đào sâu. Mỗi 1 chức danh đều có 1 hướng dẫn và trợ lý riêng phù hợp với
+họ, cho nên em phải build thật chắc tay."*
+
+Đo trước khi làm: app có **8 nhóm vai**, nhưng chỉ **6 nhóm có nhịp ngày** và **5 nhóm có bài
+hướng dẫn**. Ba chỗ hụt, trong đó một chỗ là lỗi thật sự khó thấy:
+
+**(a) Nhịp ngày của NV WOW tồn tại mà không ai với tới.** `NHIP` có hẳn khoá `wow` với 4 dòng -
+làm từ V9.40. Nhưng ô chọn chức danh trong Cài đặt lấy từ `nhipRoles()`, hàm này **chép tay** 5
+mục và gộp nhãn thành "Giáo viên / WOW" trỏ vào khoá `giaovien`. Nghĩa là bốn dòng nhịp của NV WOW
+chạy được trên màn hình nhưng **không có đường nào để sửa** - đúng cái bẫy "một sự thật hai nơi"
+đã ghi trong file này. Nay `nhipRoles()` **sinh thẳng từ khoá của `NHIP`**: thêm nhóm vai mới là ô
+chọn tự có, không thể lệch lần nữa.
+
+**(b) Marketing đọc nhịp của QUẢN LÝ.** `nhipKey()` tự phân loại chức danh bằng `mapRoleCode()` -
+mà hàm đó gom mọi vai lạ về `"ceo"`, nên Marketing rơi vào nhánh cuối và nhận nhịp quản lý: toàn
+việc duyệt, KPI, đụng lịch - không một dòng nào là việc của họ. Đây là **chỗ phân loại chức danh
+thứ hai** trong app; hai chỗ cùng làm một việc thì kiểu gì cũng có ngày lệch. Nay `nhipKey()` hỏi
+thẳng `SCOPE().group` - cùng cái mà phân quyền và bảng việc đang dùng.
+
+**(c) Ba nhóm không có bài hướng dẫn nào:** NV WOW (người giữ toàn bộ buổi kèm 1-1 và việc chấm
+test), Marketing (giữ đầu vào của cả phễu), nhóm hỗ trợ.
+
+### Đã làm
+
+- **Nhịp ngày mới cho Marketing** (5 dòng: lead đêm qua về từ nguồn nào · lead chưa ai nhận · lead
+  bị đánh dấu không đạt chuẩn · khơi lại kho khách cũ · mã giới thiệu còn treo thưởng) và **cho
+  nhóm hỗ trợ** (3 dòng quanh module Giao việc). Tổng nay **8/8 nhóm có nhịp**, 33 dòng.
+- **Ba bài hướng dẫn mới**: `tn_wow` (5 bước), `tn_marketing` (5 bước), `tn_hotro` (3 bước). Tổng
+  **12 bài / 66 bước**.
+- **Bộ kiểm giữ lời hứa đó**: `_checktour.js` nay đóng vai từng nhóm vai rồi hỏi ba câu - nhóm này
+  **có bài hướng dẫn riêng không**, **có nhịp ngày ít nhất 3 dòng không**, **có bảng việc ở trang
+  đáp không** - cộng một câu nữa: **mọi nhịp có thật đều phải sửa được trong Cài đặt** (chính là
+  lỗi (a)). Đã bẻ lại cả hai vế để thử: xoá bài của WOW thì đỏ, xoá nhịp của nhóm hỗ trợ thì đỏ.
+
+Từ nay thêm một nhóm vai vào `ROLESCOPE` mà quên một trong ba thứ là **không giao được**.
