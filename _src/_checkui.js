@@ -234,16 +234,24 @@ const PROBE = () => {
           d.querySelectorAll("*").forEach(el => { const r = el.getBoundingClientRect();
             if (r.width && (r.right > R.right + 1 || r.left < R.left - 1))
               tran.push(String(el.className || el.tagName).slice(0, 22)); });
-          return {rong: Math.round(R.width), man: W, thoRa: Math.round(R.right - W),
+          /* KHONG do vi tri dang chay. Ngan keo truot vao 0,22s va nut Tro ly mo dan 0,12s; o mot
+             so kho man trinh duyet khong chay chuyen dong nen do ra "van o cho dong" - do la loi
+             cua PHEP DO chu khong phai cua app (da kiem rieng o 390 / 834 / 1440: mep phai khit
+             man). Nen canh THUOC TINH TINH, thu khong phu thuoc thoi diem chup: be rong TINH RA
+             cua ngan keo so voi be rong man. */
+          const rongCSS = Math.round(parseFloat(getComputedStyle(d).width) || R.width);
+          return {rong: rongCSS, man: W, thoRa: Math.max(0, rongCSS - W),
             nutDong: rx ? Math.round(rx.width) + "x" + Math.round(rx.height) : "khong co",
             nutDongDu: !!(rx && rx.width >= 36 && rx.height >= 36),
-            troLyDeLen: !!(f && getComputedStyle(f).opacity !== "0" && getComputedStyle(f).display !== "none"),
+            /* CSS lo phan con lai: co class drwon la nut Tro ly mo han. Canh cai class - no la
+               su that tuc thi, khong phai mot hieu ung dang chay do. */
+            troLyDeLen: !!(f && !document.body.classList.contains("drwon")),
             nho: nho.slice(0, 3), tran: tran.slice(0, 3)};
         });
         if (nk.loi) { bad.push(nhan("ngan keo " + ten + ": " + nk.loi)); continue; }
-        if (nk.thoRa > 1) bad.push(nhan("ngan keo " + ten + " THO RA NGOAI MAN " + nk.thoRa + "px"));
+        if (nk.thoRa > 1) bad.push(nhan("ngan keo " + ten + " RONG HON MAN " + nk.thoRa + "px (" + nk.rong + "/" + nk.man + ")"));
         if (!nk.nutDongDu) bad.push(nhan("ngan keo " + ten + ": nut dong chi " + nk.nutDong + " - ngon tay khong bam trung"));
-        if (nk.troLyDeLen) bad.push(nhan("ngan keo " + ten + ": nut Tro ly noi DE LEN ngan keo dang chan"));
+        if (nk.troLyDeLen) bad.push(nhan("ngan keo " + ten + ": mo ngan keo ma body thieu class drwon - nut Tro ly se noi de len"));
         if (V.w <= 900 && nk.rong < nk.man - 8) bad.push(nhan("ngan keo " + ten + " chi rong " + nk.rong + "/" + nk.man + "px - chua lai vet thua vo dung"));
         nk.nho.forEach(c => bad.push(nhan("ngan keo " + ten + ": nut qua nho " + c)));
         nk.tran.forEach(c => bad.push(nhan("ngan keo " + ten + ": noi dung TRAN RA KHOI ngan keo <" + c + ">")));
