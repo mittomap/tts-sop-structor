@@ -246,6 +246,14 @@ const PROBE = () => {
          Do that thi lo ra 3 loi: nut dong 13x22px (ngon tay khong bam trung), ngan keo 760px de
          len man iPad 834px chi chua lai 74px vo dung, va nut Tro ly noi TREN ngan keo che noi dung.
          Ba loi nay khong the thay bang cach doc ma nguon - phai mo that, o dung kho man. */
+      /* Dat lai trang ve trang thai SACH truoc khi do ngan keo. Khoi kiem trươc do (bai huong dan,
+         tam Tro ly, hop xac nhan) chi chay o kho "maytinh", va no de lai trang thai lam ngan keo
+         mo ra roi bi dong ngay - do ra dung 775px = 102% cua 760, tuc vi tri DONG. Da kiem rieng:
+         mo ngan keo TRONG LUC bai huong dan dang chay van dung (mep phai khit man), nen day la
+         viec don nha cua bo kiem, khong phai loi cua app. */
+      try { await page.evaluate(() => { try{tourEnd()}catch(e){} try{asstClose()}catch(e){}
+        try{closeConfirm()}catch(e){} try{closeModal()}catch(e){} }); } catch (e) {}
+      await page.waitForTimeout(250);
       const NGKEO = [
         ["chang", `(function(){var J=jAll().filter(function(x){return x.k==="learning"})[0]||jAll()[0];jStagePop(J.C.pid,"test_done")})()`],
         ["hanh trinh", `(function(){var J=jAll().filter(function(x){return x.k==="learning"})[0]||jAll()[0];mstripOpen(J.C.pid)})()`],
