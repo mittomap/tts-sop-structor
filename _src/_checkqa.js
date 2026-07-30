@@ -217,43 +217,84 @@ t("khong ep y khi cau khong noi gi", qaYDinh("Nguyễn Văn A")==="");
  window.QAQ="";
 })();
 
-/* ---- 10bis. NUT HOI DAP O GOC, CANH TRO THU (V9.47, anh Luan) ----
-   "sao em ko dua no len gan cho tro thu, bam icon hien khung nhap" - thu nguoi ta can hoi GIUA
-   CHUNG ma bat roi trang dang lam de di tim mot trang khac thi hau nhu khong ai dung. */
+/* ---- 10bis. TRO THU + HOI DAP GOP THANH **TRO LY** (V9.48, anh Luan) ----
+   "tro thu nen bo, ket hop voi khung tim kiem nay nen nang cap khung tim kiem nay len 1 tam cao.
+    De ko chi hien thi thong tin, ma con huong dan nguoi ta tuan tu de don 1 task."
+   "de cai nut bat tat tro thu, thanh nut bat tat tro ly, a se goi cai nay la tro ly"
+   Va: "no hien tum lum a... a hoi Tran Khanh Vy thi hay noi cac nghiep vu lien quan den Tran
+   Khanh Vy thoi, voi lai em nen hoi lai de nguoi dung chon, vi du hien ten, hien lop hay gi do,
+   hien so dien thoai cung."
+   Ba dieu bo kiem nay canh:
+     1. MOT nut, MOT tam - khong con nut Hoi dap rieng lac lai (code chet la benh, LUAT 2ter).
+     2. Hoi mot cai ten thi RA THE NHAN DANG + HOI LAI, KHONG do het moi thu ra cung luc.
+     3. Chon mot muc thi chi ve DUNG muc do, va duong ra cuoi cung la DAT DI DON TUNG BUOC. */
 (function(){
- t("co nut Hoi dap o goc", /id="qafab"/.test(SRC)&&typeof qaFabClick==="function");
- t("nut Hoi dap va nut Tro thu KHONG chong nhau mot cho",
-   /\.asstfab\{position:fixed;right:74px/.test(CSS)&&/\.qafab\{position:fixed;right:18px/.test(CSS));
- t("nut Hoi dap co nhan cho nguoi doc man hinh", /id="qafab"[^>]*aria-label="[^"]+"/.test(SRC));
- /* bam la MO, bam nua la DONG */
- qaFabClick();
- var e=document.getElementById("qaPan");
- t("bam icon thi hien khung nhap", e.classList.contains("on")&&/id="qap_q"/.test(e.innerHTML));
- t("chua go gi van co cau goi y de bam thu", /qaPanVD\(/.test(e.innerHTML));
- t("cau goi y lay TEN THAT tu du lieu, khong viet cung", (function(){
-   var v=qaViDuList()[0];
-   return srows("DL09").some(function(x){return v.indexOf(x.full_name)===0})})());
- /* tam nay khong duoc TU TRA LOI theo kieu rieng - phai goi dung bo may cua trang */
+ setRole("all");cfEnsure();CUR="banlam";
+ t("chi con MOT nut o goc (khong con nut Hoi dap rieng)",
+   (SRC.match(/id="qafab"/g)||[]).length===0&&(SRC.match(/id="asstfab"/g)||[]).length>=1);
+ t("khong con code chet cua tam Hoi dap cu", typeof qaPanVe==="undefined"&&typeof qaFabClick==="undefined");
+ t("nut goc goi dung ten Tro ly", /aria-label="Mở Trợ lý"/.test(SRC)&&/Trợ lý - hỏi bất cứ gì/.test(SRC));
+ /* mo tam: phai co O HOI ngay tren cung, VA van con phan viec trong ngay */
+ asstOpen();
+ var h=document.getElementById("asst").innerHTML;
+ t("tam Tro ly co o hoi ngay tren cung", /id="asst_q"/.test(h));
+ t("chua hoi gi thi van la tro thu nhu cu (viec ke tiep + don tung buoc)",
+   /Việc kế tiếp|Không còn việc nào/.test(h)&&/tourWork\(\)/.test(h));
+ /* HOI MOT CAI TEN - phai ra THE NHAN DANG, va KHONG duoc do het */
  var s=rows("DL09").filter(function(x){return String(x.full_name||"").split(" ").length>=3})[0];
- window.QAPQ=s.full_name+" cần làm gì tiếp"; qaPanVe();
- var h=document.getElementById("qaPan").innerHTML;
- t("hoi ve mot nguoi thi tam ra dung ho so do", h.indexOf(esc(s.full_name))>=0);
- t("tam co du ba phan: hien trang - canh bao - viec theo SOP",
-   /Hiện trạng/.test(h)&&/Vì sao có cảnh báo/.test(h)&&/Việc cần làm tiếp theo SOP/.test(h));
- t("tam co day nut doi y nhu trang", QAYDINH.every(function(y){return h.indexOf(esc(y.t))>=0}));
- t("tam co duong sang trang Hoi dap day du", /go\('hoidap'\)/.test(h));
- window.QAPQ="đổi hotline ở đâu"; qaPanVe();
- t("hoi chuyen he thong thi tam chi dung cho", /Mở thẳng tới đó/.test(document.getElementById("qaPan").innerHTML));
- window.QAPQ="zzzqqq wwweee rrrttt"; qaPanVe();
- t("bi thi tam cung noi thang la chua hieu", /Em chưa hiểu rõ câu này/.test(document.getElementById("qaPan").innerHTML));
- qaPanDong();
- t("bam lan nua thi dong", !document.getElementById("qaPan").classList.contains("on"));
- /* hai tam cung mot goc - mo cai nay phai dong cai kia, khong duoc de che nhau */
- t("mo Tro thu thi tam Hoi dap tu dong", /function asstOpen\(\)\{try\{qaPanDong\(\)/.test(SRC));
- t("mo Hoi dap thi tam Tro thu tu dong", /function qaFabClick\(\)[\s\S]{0,240}asstClose\(\)/.test(SRC));
- /* CONG HOC VIEN khong duoc co hop nay - no doc du lieu noi bo cua trung tam */
- t("cong hoc vien KHONG co nut Hoi dap", (SRC.match(/id="qafab"/g)||[]).length===1);
- window.QAPQ="";
+ window.ASSTQ=s.full_name;window.ASSTYD="";asstPaint();
+ var h2=document.getElementById("asst").innerHTML;
+ t("hoi mot cai ten thi ra THE NHAN DANG", /class="qaWho"/.test(h2)&&h2.indexOf(esc(s.full_name))>=0);
+ t("the nhan dang co MA de phan biet", h2.indexOf(esc(s.student_id))>=0);
+ t("the nhan dang co LOP hoac noi ro chua xep lop", /IELTS|Foundation|Pre-|Combo|chưa xếp lớp/.test(h2));
+ t("the nhan dang co SO DIEN THOAI", (function(){
+   var sd=String(s.phone_number||s.phone||"").trim();
+   return sd?h2.indexOf(esc(sd))>=0:/chưa có SĐT/.test(h2)})());
+ t("HOI LAI de nguoi dung chon, khong doan bua", /Bạn muốn xem gì về/.test(h2));
+ t("co du day muc de chon", Object.keys(QAPHAN).every(function(k){return h2.indexOf(esc(QAPHAN[k]))>=0}));
+ /* KHONG DO TUM LUM: chua chon muc nao thi khong duoc ve san noi dung cua bat ky muc nao */
+ t("chua chon muc nao thi KHONG do san hien trang", h2.indexOf("Toàn cảnh hồ sơ")>=0&&!/class="ctxr"/.test(h2));
+ t("chua chon muc nao thi KHONG do san danh sach viec", !/Mở màn xử lý/.test(h2));
+ t("chua chon muc nao thi KHONG do san ly do canh bao", !/ti-alert-triangle" style="color:var\(--red\)/.test(h2));
+ /* CHON MOT MUC -> chi ve DUNG muc do */
+ asstYD("viec");
+ var hv=document.getElementById("asst").innerHTML;
+ t("chon 'Viec can lam' thi noi ro dang xem gi", /Đang xem/.test(hv));
+ var K=qaHoSo({r:s,ten:s.full_name,ma:s.student_id,loai:"hv",d:100});
+ if(K.viec.length){
+  t("chon 'Viec can lam' thi ve danh sach viec", /Mở màn xử lý/.test(hv));
+  t("duong ra cuoi cung la DAT DI DON TUNG BUOC", /Dắt tôi dọn từng bước/.test(hv)&&/qaDatTroThu\(/.test(hv));
+ }else{t("khong co viec thi noi thang la sach hang cho", /sạch hàng chờ/.test(hv))}
+ t("chon 'Viec' thi KHONG ve kem hien trang", !/class="ctxr"/.test(hv));
+ asstYD("tien");
+ var ht=document.getElementById("asst").innerHTML;
+ t("chon 'Hoc phi' thi ve dung phan tien", /class="ctxr"/.test(ht)&&!/Mở màn xử lý/.test(ht));
+ asstYD("lienhe");
+ var hl=document.getElementById("asst").innerHTML;
+ t("chon 'Lien he' thi co so dien thoai va nguoi nha", /Số điện thoại/.test(hl)&&/Người nhà/.test(hl));
+ /* hoi chuyen he thong / hoi bua - van chay trong cung mot tam */
+ window.ASSTQ="đổi hotline ở đâu";window.ASSTYD="";asstPaint();
+ t("hoi chuyen he thong thi chi cho trong cung tam", /Mở thẳng tới đó/.test(document.getElementById("asst").innerHTML));
+ window.ASSTQ="zzzqqq wwweee rrrttt";asstPaint();
+ t("bi thi noi thang chua hieu", /Em chưa hiểu rõ câu này/.test(document.getElementById("asst").innerHTML));
+ window.ASSTQ="";window.ASSTYD="";asstPaint();
+ t("xoa cau hoi thi tam quay ve la tro thu",
+   /Việc kế tiếp|Không còn việc nào/.test(document.getElementById("asst").innerHTML));
+ asstClose();
+})();
+
+/* ---- 10quater. TO VANG CHI CHO PHAI GIU, KHONG TU TAT (V9.48, anh Luan) ----
+   "e cu de cai to vang di, ko can tat dau, nguoi ta thoat ra thi tat."
+   No tu tat sau 2,6 giay ma nguoi ta con dang doc de hieu minh duoc dan toi DAU. Vet sang mat di
+   la mat luon cau tra loi "cho nao co". */
+(function(){
+ t("vet to vang khong con la hoat hinh tu tat", !/tr\.cfhl\{animation:cfhl/.test(SRC));
+ t("vet to vang giu nguyen mau nen", /tr\.cfhl\{background:#FFF6D8/.test(SRC));
+ t("khong con hen gio go vet sang", !/setTimeout\(function\(\)\{el\.classList\.remove\("cfhl"\)\}/.test(SRC));
+ t("co ham dat va ham xoa vet sang", typeof cfHLDat==="function"&&typeof cfHLXoa==="function");
+ t("chi MOT dong duoc to tai mot thoi diem", /function cfHLDat\(el\)\{cfHLXoa\(\)/.test(SRC));
+ t("cfGo va kpiGoCf deu di qua cfHLDat",
+   /function cfGo\([\s\S]{0,400}?cfHLDat\(el\)/.test(SRC)&&/function kpiGoCf\([\s\S]{0,400}?cfHLDat\(el\)/.test(SRC));
 })();
 
 /* ---- 10ter. THAM SO CHU CHUA KHAI KHONG DUOC IN RA SO 0 ---- */

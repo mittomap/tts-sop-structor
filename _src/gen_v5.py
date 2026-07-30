@@ -130,7 +130,12 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .slachip:hover{background:#E2ECF7;border-color:var(--blue)}
 .slachip i{font-size:12px;opacity:.55}
 .slachip:hover i{opacity:1;color:var(--blue)}
-tr.cfhl{animation:cfhl 2.6s ease-out}
+/* V9.48 - anh Luân: *"e cứ để cái tô vàng đi, ko cần tắt đâu, người ta thoát ra thì tắt."*
+   Đúng: nó tự tắt sau 2,6 giây, mà người ta còn đang đọc để hiểu mình được dẫn tới ĐÂU. Vệt sáng
+   mất đi là mất luôn câu trả lời "chỗ nào cơ". Nay giữ nguyên cho tới khi người ta rời màn Cài
+   đặt hoặc bấm sang một dòng khác - tự chọn thời điểm tắt, không phải cái đồng hồ chọn hộ. */
+tr.cfhl{background:#FFF6D8;box-shadow:inset 3px 0 0 var(--amber)}
+tr.cfhl>td{background:#FFF6D8}
 @keyframes cfhl{0%,60%{background:#FFF6D8}100%{background:transparent}}
 /* V9.29: nut nho "sua o day" canh cau nhac / danh muc */
 .cfedit{display:inline-flex;align-items:center;justify-content:center;margin-left:6px;background:none;border:0;
@@ -493,7 +498,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 @media(max-width:820px){.setgrp+.setgrp{border-left:0;padding-left:0;margin-left:0}
  .setglb{min-width:100%}}
 /* ── TRỢ THỦ Ở GÓC (V9.35) ── */
-.asstfab{position:fixed;right:74px;bottom:18px;z-index:198;display:flex;align-items:center;gap:7px;
+.asstfab{position:fixed;right:18px;bottom:18px;z-index:198;display:flex;align-items:center;gap:7px;
  background:var(--navy);color:#fff;border:0;border-radius:999px;padding:11px 17px;font-family:inherit;
  font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 12px 30px rgba(10,20,40,.32);transition:.14s}
 .asstfab:hover{transform:translateY(-1px);box-shadow:0 16px 36px rgba(10,20,40,.4)}
@@ -502,7 +507,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .asstfab em{font-style:normal;background:var(--red);color:#fff;font-size:10.5px;font-weight:700;
  padding:2px 7px;border-radius:999px;margin-left:2px}
 .asstfab.run{background:#0F766E}
-.asst{position:fixed;right:18px;bottom:74px;z-index:199;width:min(360px,calc(100vw - 28px));
+.asst{position:fixed;right:18px;bottom:74px;z-index:199;width:min(420px,calc(100vw - 28px));
  max-height:min(76vh,660px);overflow:auto;background:#fff;border:1px solid var(--line);border-radius:16px;
  box-shadow:0 24px 60px rgba(10,20,40,.28);padding:0;display:none;font-size:13px}
 .asst.on{display:block;animation:asstIn .16s ease-out}
@@ -548,15 +553,6 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    phải ở ngay trong tầm tay, không bắt rời việc đang làm.
    Nút tròn nhỏ đứng CẠNH nút Trợ thủ (không chồng lên - hai nút chồng nhau một góc là thứ chắc
    chắn sẽ che nhau, đã ghi thành luật từ V9.35). Tấm trả lời dùng lại đúng khung `.asst`. */
-.qafab{position:fixed;right:18px;bottom:18px;z-index:198;width:46px;height:46px;border-radius:999px;
- background:#fff;color:var(--navy);border:1px solid var(--line);cursor:pointer;display:flex;
- align-items:center;justify-content:center;font-size:21px;box-shadow:0 10px 26px rgba(10,20,40,.18);transition:.14s}
-.qafab:hover{transform:translateY(-1px);border-color:var(--navy);box-shadow:0 14px 32px rgba(10,20,40,.26)}
-.qafab.on{background:var(--navy);color:#fff;border-color:var(--navy)}
-.qaPan{position:fixed;right:18px;bottom:74px;z-index:199;width:min(420px,calc(100vw - 28px));
- max-height:min(76vh,660px);overflow:auto;background:#fff;border:1px solid var(--line);border-radius:16px;
- box-shadow:0 24px 60px rgba(10,20,40,.28);display:none;font-size:13px}
-.qaPan.on{display:block;animation:asstIn .16s ease-out}
 .qaAsk{display:flex;gap:7px;padding:12px 13px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2}
 .qaAsk input{flex:1;min-width:0;height:36px;border:1px solid var(--line);border-radius:9px;padding:0 11px;font-family:inherit;font-size:12.5px}
 .qaAsk input:focus{outline:0;border-color:var(--navy)}
@@ -569,8 +565,22 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .qaHit .d{font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:2px}
 .qaHit .o{font-size:11px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:4px}
 .qaVD{display:flex;gap:5px;flex-wrap:wrap;padding:0 13px 12px}
-@media(max-width:600px){.asst{right:10px;left:10px;width:auto;bottom:70px}.asstfab{right:66px;bottom:12px}
- .qaPan{right:10px;left:10px;width:auto;bottom:70px}.qafab{right:12px;bottom:12px}}
+/* V9.48 - THẺ NHẬN DẠNG + CÂU HỎI LẠI. Anh Luân: "em nên hỏi lại để người dùng chọn, ví dụ hiện
+   tên, hiện lớp hay gì đó, hiện số điện thoại cùng, để người dùng bấm vào thì mình hướng dẫn cho
+   chuẩn." Trước hết phải CHẮC đúng người, rồi mới nói chuyện nghiệp vụ. */
+.qaWho{flex:1;min-width:0;text-align:left}
+.qaWhoN{font-size:14.5px;font-weight:800;color:var(--navy);line-height:1.3}
+.qaWhoM{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.45}
+.qaPick{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:10px 11px;
+ border:1px solid var(--line);border-radius:11px;background:#fff;cursor:pointer;font-family:inherit;
+ margin-bottom:7px;transition:.12s}
+.qaPick:hover{border-color:var(--navy);background:#F4F8FD}
+.qaPick>i{color:var(--muted);flex:none}
+.qaAskBack{font-size:12px;color:#4A5A6B;line-height:1.55;margin:11px 0 7px}
+.qaYD{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.qaYD .pill b{background:var(--navy);color:#fff;border-radius:999px;padding:0 5px;font-size:10px;margin-left:3px}
+.qaYD .pill.on b{background:#fff;color:var(--navy)}
+@media(max-width:600px){.asst{right:10px;left:10px;width:auto;bottom:70px}.asstfab{right:12px;bottom:12px}}
 .tourfab{position:fixed;right:16px;bottom:16px;z-index:200;display:none;align-items:center;gap:7px;background:var(--navy);color:#fff;border:0;border-radius:999px;padding:10px 15px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 10px 26px rgba(10,20,40,.3)}
 .tourfab.on{display:flex}
 .tourfab:hover{filter:brightness(1.12)}
@@ -1423,9 +1433,8 @@ body.drsz .drawer{transition:none}
 <div class="toast" id="toast"></div>
 <div class="undobar" id="undobar"></div>
 <div class="asst" id="asst"></div>
-<button class="asstfab" id="asstfab" aria-label="Mở Trợ thủ"></button>
-<div class="qaPan" id="qaPan"></div>
-<button class="qafab" id="qafab" aria-label="Mở hộp Hỏi đáp" data-tip="Hỏi đáp - hỏi về một học viên, hoặc hỏi chỗ cấu hình" onclick="qaFabClick()"><i class="ti ti-message-question"></i></button>
+<button class="asstfab" id="asstfab" aria-label="Mở Trợ lý"></button>
+
 <div class="mask" id="mask" onclick="closeModal()"></div>
 <div class="cfmask" id="cfm"><div class="cfbox"><div class="cfh"><i class="ti ti-alert-triangle"></i> Xác nhận thao tác</div><div class="cfmsg" id="cfmMsg"></div><div class="cfa"><button class="btn" onclick="closeConfirm()">Huỷ</button><button class="btn primary" onclick="confirmYes()">Xác nhận</button></div></div></div>
 <div class="drawer" id="drawer" role="dialog" aria-modal="true"><div class="drszr" id="drszr" title="Kéo để đổi độ rộng - bấm đúp để về mặc định"></div><div class="dh"><b id="drawerTitle">Chi tiết</b><button class="x" onclick="closeModal()" aria-label="Đóng">&times;</button></div><div class="dbody" id="drawerBody"></div></div>
@@ -9102,9 +9111,12 @@ var PKEY={
    một tham số khác thì dòng đó bị ô lọc giấu đi, cfGo sẽ báo nhầm là "chưa có ô sửa". */
 function cfGo(name){window.SETTAB="ch2";window.CFHL=name;window.CFQ="";go("settings");
  setTimeout(function(){var el=document.getElementById("cfrow_"+name);
-  if(el){if(el.scrollIntoView)el.scrollIntoView({block:"center"});el.classList.add("cfhl");
-   setTimeout(function(){el.classList.remove("cfhl")},2600)}
+  if(el){if(el.scrollIntoView)el.scrollIntoView({block:"center"});cfHLDat(el)}
   else toast("Tham số "+name+" chưa có ô sửa - báo kỹ thuật khai vào bảng APPPARAMS.",5000)},60)}
+/* Chỉ MỘT dòng được tô tại một thời điểm - hai vệt vàng cùng lúc thì không còn là "chỉ chỗ" nữa. */
+function cfHLDat(el){cfHLXoa();if(el)el.classList.add("cfhl")}
+function cfHLXoa(){window.CFHL="";window.KPIQ="";
+ try{var a=document.querySelectorAll(".cfhl");for(var i=0;i<a.length;i++)a[i].classList.remove("cfhl")}catch(e){}}
 function slaChip(name,fb,unit){
  var v=paramOf(name,fb);
  var u=unit||(function(){for(var i=0;i<APPPARAMS.length;i++)if(APPPARAMS[i][1]===name)return APPPARAMS[i][3];return ""})();
@@ -9515,8 +9527,7 @@ function kpiRowOf(rex){var c=(DATA.config&&DATA.config.ch6)||[];
  return null}
 function kpiGoCf(code){window.SETTAB="ch6";window.KPIQ=code||"";go("settings");
  setTimeout(function(){var el=document.getElementById("kpirow_"+code);
-  if(el){if(el.scrollIntoView)el.scrollIntoView({block:"center"});el.classList.add("cfhl");
-   setTimeout(function(){el.classList.remove("cfhl")},2600)}},60)}
+  if(el){if(el.scrollIntoView)el.scrollIntoView({block:"center"});cfHLDat(el)}},60)}
 function kpiChip(rex,fb,pct){
  var r=kpiRowOf(rex), v=kpiTh(rex,fb);
  var txt=pct?(Math.round(v*100)+"%"):String(v);
@@ -11695,16 +11706,43 @@ function hvDueOne(enr,rem){
  if(!due)h+='<div class="hvreqc" style="margin:6px 14px 0">Trung tâm chưa chốt ngày cho lần đóng tiếp theo. '+
   'Bạn bấm <b>Tôi đã chuyển khoản</b> nếu đã chuyển, hoặc gọi trung tâm để hẹn ngày.</div>';
  return h+'</div>'}
+/* V9.48 - anh Luân: *"cái tôi đã chuyển khoản này, cho người ta chọn đợt luôn nhé, nhập số tiền
+   và đính kèm được ảnh/file nha"*. Đúng ba chỗ thiếu:
+   1. Bản cũ TỰ ĐOÁN đợt (lấy đợt chưa đóng nhỏ nhất) rồi chỉ ghi một dòng chữ. Em đóng đợt 3
+      trước đợt 2 thì kế toán đối soát nhầm đợt - mà đây là tiền.
+   2. Số tiền có sẵn nhưng không đổi được theo đợt vừa chọn.
+   3. KHÔNG có chỗ đính ảnh biên lai - thứ kế toán cần nhất để đối soát. Thành phần `attachBox`
+      đã có sẵn và các cửa ghi nội bộ đều dùng, riêng cổng học viên thì bỏ quên. */
+function hvPnDot(eid){
+ return rows("DL06b").filter(function(x){return String(x.enrollment_id||"")===eid&&!isc(x.status,"paid")})
+  .sort(function(a,b){return num(a.installment_no)-num(b.installment_no)})}
+function hvPnConLai(s){return num(s.remaining_amount)||num(s.due_amount)}
+/* Chọn đợt nào thì ô số tiền tự nhảy theo đợt đó - không bắt người ta tự cộng trừ. */
+function hvPnChon(eid){
+ var v=fldV("hvpn_dot")||"";
+ var a=document.getElementById("hvpn_amt");if(!a)return;
+ if(v==="__khac"){a.value="";a.focus();return}
+ var s=hvPnDot(eid).filter(function(x){return String(x.installment_no)===String(v)})[0];
+ if(s)a.value=String(hvPnConLai(s))}
 function hvPaidNotify(eid){
  var e=find("DL06","enrollment_id",eid)||{};
- var sch=rows("DL06b").filter(function(x){return String(x.enrollment_id||"")===eid&&!isc(x.status,"paid")})
-  .sort(function(a,b){return num(a.installment_no)-num(b.installment_no)})[0];
+ var ds=hvPnDot(eid), sch=ds[0];
  var h='<div class="dcard"><h4><i class="ti ti-upload"></i>Báo đã chuyển khoản</h4>';
- h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Báo ở đây để kế toán đối soát nhanh, bạn không cần gọi điện. Khi đối soát xong, mục Học phí của bạn sẽ tự cập nhật.'+
-  (sch?' Đợt đang chờ: <b>đợt '+esc(sch.installment_no)+'</b> hạn <b>'+esc(sch.due_date)+'</b>, số tiền <b>'+vnd(num(sch.remaining_amount)||num(sch.due_amount))+'</b>.':'')+'</div>';
- h+='<div class="fld"><label>Số tiền đã chuyển <i>*</i></label><input id="hvpn_amt" inputmode="numeric" value="'+esc(sch?String(num(sch.remaining_amount)||num(sch.due_amount)):"")+'"></div>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Báo ở đây để kế toán đối soát nhanh, bạn không cần gọi điện. Khi đối soát xong, mục Học phí của bạn sẽ tự cập nhật. <b>Trung tâm chỉ ghi tiền vào sổ sau khi đối soát</b> - báo ở đây chưa phải là đã thu.</div>';
+ if(ds.length){
+  h+='<div class="fld full"><label>Bạn đóng cho đợt nào <i>*</i></label><select id="hvpn_dot" onchange="hvPnChon(\''+esc(eid)+'\')">';
+  ds.forEach(function(s,i){
+   var qh=pvnd(s.due_date), tre=(qh&&qh.getTime()<Date.now());
+   h+='<option value="'+esc(s.installment_no)+'"'+(i===0?" selected":"")+'>Đợt '+esc(s.installment_no)+
+    ' · hạn '+esc(s.due_date||"chưa hẹn")+' · '+vnd(hvPnConLai(s))+(tre?" · ĐANG QUÁ HẠN":"")+'</option>'});
+  h+='<option value="__khac">Đóng trước cho nhiều đợt / số khác</option></select></div>';
+ }else{
+  h+='<div class="fhint" style="margin:0 0 10px">Đăng ký này chưa có bảng đợt đóng - bạn cứ nhập số tiền đã chuyển, kế toán sẽ ghi đúng chỗ.</div>';
+ }
+ h+='<div class="fld"><label>Số tiền đã chuyển <i>*</i></label><input id="hvpn_amt" inputmode="numeric" value="'+esc(sch?String(hvPnConLai(sch)):"")+'"></div>';
  h+='<div class="fld"><label>Ngày chuyển</label><input id="hvpn_date" type="date"></div>';
  h+='<div class="fld full"><label>Nội dung chuyển khoản / mã giao dịch</label><input id="hvpn_ref" placeholder="vd: HV030 dong hoc phi dot 2"></div>';
+ h+=attachBox("hvpn","Ảnh biên lai / màn hình chuyển khoản");
  h+='<div class="dact"><button class="btn primary" onclick="hvPaidNotifySave(\''+esc(eid)+'\')"><i class="ti ti-send"></i>Gửi cho kế toán</button>'+
   '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
  openDrawer("Tôi đã chuyển khoản",h)}
@@ -11714,15 +11752,21 @@ function hvPaidNotifySave(eid){
  var e=find("DL06","enrollment_id",eid)||{};
  var rem=num(e.remaining_amount);
  if(rem>0&&amt>rem+1){toast("Số tiền lớn hơn phần còn phải đóng ("+vnd(rem)+") - kiểm lại giúp bạn nhé.",4600);return}
+ var dot=(fldV("hvpn_dot")||"").trim();
+ var sDot=(dot&&dot!=="__khac")?hvPnDot(eid).filter(function(x){return String(x.installment_no)===dot})[0]:null;
+ var moTaDot=sDot?("đợt "+sDot.installment_no+" (hạn "+(sDot.due_date||"chưa hẹn")+", cần "+vnd(hvPnConLai(sDot))+")")
+   :(dot==="__khac"?"đóng trước cho nhiều đợt / số khác":"");
  /* KHÔNG tự ghi phiếu thu: tiền chỉ vào sổ khi kế toán đối soát. Đây là BÁO, không phải THU. */
- hvReq("Học viên báo đã chuyển khoản "+vnd(amt),
+ hvReq("Học viên báo đã chuyển khoản "+vnd(amt)+(sDot?(" - đợt "+sDot.installment_no):""),
   "Đăng ký: "+eid+"\nSố tiền báo: "+vnd(amt)+
+  (moTaDot?"\nBáo cho: "+moTaDot:"")+
   ((fldV("hvpn_date")||"").trim()?"\nNgày chuyển: "+fromISOdt(fldV("hvpn_date")).split(" ")[0]:"")+
   ((fldV("hvpn_ref")||"").trim()?"\nNội dung/mã GD: "+(fldV("hvpn_ref")||"").trim():"")+
+  attachLine("hvpn").replace(" | ","\n")+
   "\nKế toán đối soát rồi ghi phiếu thu - cổng KHÔNG tự ghi tiền vào sổ.",
   "tien",["enrollment",eid,"Đăng ký "+eid]);
  closeModal();
- toast("Đã báo kế toán. Sau khi đối soát, mục Học phí của bạn sẽ tự cập nhật.",4600);hvReRender()}
+ toast("Đã báo kế toán"+(sDot?(" cho đợt "+sDot.installment_no):"")+". Sau khi đối soát, mục Học phí của bạn sẽ tự cập nhật.",4600);hvReRender()}
 
 /* ---- (e) HỎI ĐÁP HAI CHIỀU ---- */
 function hvAskNew(){
@@ -14545,96 +14589,6 @@ function qaViDuList(){
  return [(s&&s.full_name?s.full_name+" đang có cảnh báo gì":"học viên nào đang có cảnh báo"),
   "đổi ngưỡng nợ quá hạn ở đâu","sĩ số tối thiểu mở lớp chỉnh chỗ nào",
   "ai được duyệt hoàn tiền","hạn chấm bài là bao lâu"]}
-/* ── TẤM HỎI ĐÁP Ở GÓC (V9.47) ──────────────────────────────────────────────────────────────
-   Anh Luân: *"sao em ko đưa nó lên gần chỗ trợ thủ, bấm icon hiện khung nhập"*. Đúng - thứ người
-   ta cần hỏi GIỮA CHỪNG mà bắt phải rời trang đang làm để đi tìm một trang khác thì hầu như
-   không ai dùng. Nay có nút tròn đứng cạnh Trợ thủ, bấm là hiện ngay ô nhập.
-   Tấm này KHÔNG dựng lại logic trả lời - nó gọi đúng `qaTraLoi` / `qaHoSo` mà trang Hỏi đáp dùng.
-   Hai nơi trình bày khác nhau là chuyện giao diện; hai nơi TRẢ LỜI KHÁC NHAU thì là bệnh. */
-function qaPanEl(){var e=document.getElementById("qaPan");
- if(!e){e=document.createElement("div");e.id="qaPan";e.className="qaPan";document.body.appendChild(e)}
- return e}
-function qaFabClick(){var e=qaPanEl();
- if(e.classList.contains("on"))return qaPanDong();
- try{asstClose()}catch(x){}          /* hai tấm cùng góc - mở cái này thì đóng cái kia */
- e.classList.add("on");
- var f=document.getElementById("qafab");if(f)f.classList.add("on");
- qaPanVe();
- setTimeout(function(){var i=document.getElementById("qap_q");if(i&&i.focus)i.focus()},60)}
-function qaPanDong(){var e=document.getElementById("qaPan");if(e)e.classList.remove("on");
- var f=document.getElementById("qafab");if(f)f.classList.remove("on")}
-function qaPanHoi(){window.QAPQ=fldV("qap_q")||"";qaPanVe()}
-function qaPanVD(s){window.QAPQ=s;qaPanVe();
- setTimeout(function(){var i=document.getElementById("qap_q");if(i)i.value=s},20)}
-function qaPanVe(){
- var e=document.getElementById("qaPan");if(!e||!e.classList.contains("on"))return;
- var q=window.QAPQ||"";
- var h='<div class="qaAsk"><input id="qap_q" value="'+esc(q)+'" placeholder="Hỏi: tên học viên, hoặc &quot;đổi hotline ở đâu&quot;" onkeydown="if(event.key===\'Enter\')qaPanHoi()">'+
-  '<button class="btn primary sm" onclick="qaPanHoi()"><i class="ti ti-search"></i></button>'+
-  '<button class="btn sm" onclick="qaPanDong()" aria-label="Đóng hộp Hỏi đáp"><i class="ti ti-x"></i></button></div>';
- if(!q){
-  h+='<div class="qaBody"><div class="mut" style="font-size:11.5px;line-height:1.65">Hỏi bằng tiếng Việt. Gõ <b>tên một học viên</b> thì em trả lời hiện trạng, vì sao có cảnh báo và việc cần làm tiếp theo SOP. Gõ <b>chuyện của app</b> thì em chỉ đúng chỗ và mở thẳng tới đó.</div></div>';
-  h+='<div class="qaVD">';
-  qaViDuList().forEach(function(s){h+='<button class="pill" onclick="qaPanVD('+JSON.stringify(s).split('"').join("&quot;")+')">'+esc(s)+'</button>'});
-  h+='</div>';
-  e.innerHTML=h;return}
- var R=qaTraLoi(q);
- h+='<div class="qaBody">';
- if(R.loai==="nguoi"&&R.nguoi.length>1){
-  h+='<div class="sechd">Có '+R.nguoi.length+' người khớp - chọn đúng người</div>';
-  R.nguoi.forEach(function(x){
-   h+='<div class="qaHit"><button class="btn sm" style="width:100%;justify-content:flex-start" onclick="qaPanVD('+JSON.stringify(x.ma).split('"').join("&quot;")+')"><i class="ti ti-user-check"></i>'+esc(x.ten)+' · '+esc(x.ma)+'</button></div>'});
- }else if(R.loai==="nguoi"&&R.nguoi.length){
-  var K=qaHoSo(R.nguoi[0]);
-  var _y=QAYDINH.filter(function(y){return y.k===R.yd})[0];
-  h+='<div style="font-size:14px;font-weight:800;color:var(--navy)">'+esc(K.ten)+'</div>'+
-   '<div class="mut" style="font-size:11px">'+esc(K.ma)+' · '+(K.loai==="hv"?"học viên":"khách tiềm năng")+
-   (_y?' · đang xem <b>'+esc(_y.t.toLowerCase())+'</b>':'')+'</div>';
-  h+='<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px">';
-  QAYDINH.forEach(function(y){h+='<button class="pill'+(R.yd===y.k?" on":"")+'" onclick="qaPanVD('+JSON.stringify(K.ten+" - "+y.t.toLowerCase()).split('"').join("&quot;")+')"><i class="ti '+y.ic+'"></i>'+esc(y.t)+'</button>'});
-  h+='</div>';
-  h+='<div class="sechd">Hiện trạng</div>'+ctxRows(K.dong.map(function(d){return [d[0],esc(d[1])]}));
-  h+='<div class="sechd">Vì sao có cảnh báo</div>';
-  if(!K.canhbao.length)h+='<div class="mut" style="font-size:11.5px">Không có cảnh báo nào đang bật.</div>';
-  K.canhbao.forEach(function(c){h+='<div class="qaHit"><div class="d"><i class="ti ti-alert-triangle" style="color:var(--red);margin-right:4px"></i>'+esc(c)+'</div></div>'});
-  h+='<div class="sechd">Việc cần làm tiếp theo SOP</div>';
-  if(!K.viec.length)h+='<div class="mut" style="font-size:11.5px">Hồ sơ này đang sạch hàng chờ.</div>';
-  K.viec.slice(0,6).forEach(function(v){
-   h+='<div class="qaHit"><div class="t">'+
-    '<span class="chip '+(v.sev==="red"?"red":(v.sev==="amber"?"amber":"gray"))+'" style="margin-right:5px">'+esc(v.ma||v.cat||"việc")+'</span>'+
-    esc(v.cau||"")+'</div>'+
-    (v.han?'<div class="o"><i class="ti ti-clock"></i>'+esc(v.han)+'</div>':'')+
-    (v.go?'<div style="margin-top:6px"><button class="btn sm" onclick="qaPanDong();'+v.go.split('"').join("&quot;")+'"><i class="ti ti-arrow-right"></i>Mở màn xử lý</button></div>':'')+
-    '</div>'});
-  if(K.viec.length>6)h+='<div class="mut" style="font-size:11px;padding-top:6px">... còn '+(K.viec.length-6)+' việc nữa - mở trang Hỏi đáp để xem hết.</div>';
-  h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">'+
-   (K.viec.length?'<button class="btn primary sm" onclick="qaPanDong();qaDatTroThu('+JSON.stringify(K.ma).split('"').join("&quot;")+')"><i class="ti ti-checklist"></i>Dắt tôi làm từng bước</button>':'')+
-   (K.loai==="hv"?'<button class="btn sm" onclick="qaPanDong();window.HOSO='+JSON.stringify(K.ma).split('"').join("&quot;")+';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>':'')+
-   '</div>';
- }else if(R.loai==="hethong"&&R.hethong.length){
-  h+='<div class="sechd">'+R.hethong.length+' chỗ khớp câu hỏi</div>';
-  R.hethong.forEach(function(k){
-   h+='<div class="qaHit"><div class="t">'+esc(k.t)+(k.tay?' <span class="chip gray">tự khai</span>':'')+'</div>'+
-    (k.d?'<div class="d">'+esc(k.d)+'</div>':'')+
-    (k.o?'<div class="o"><i class="ti ti-map-pin"></i>'+esc(k.o)+'</div>':'')+
-    (k.go?'<div style="margin-top:6px"><button class="btn sm" onclick="qaPanDong();'+k.go.split('"').join("&quot;")+'"><i class="ti ti-arrow-right"></i>Mở thẳng tới đó</button></div>':'')+
-    '</div>'});
- }else{
-  var G=qaGoiY(q);
-  h+='<div class="mut" style="font-size:12px;line-height:1.65"><b>Em chưa hiểu rõ câu này.</b> Đã ghi vào sổ câu hỏi chưa trả lời được trong Cài đặt.</div>';
-  if(G.nguoi.length){h+='<div class="sechd">Có phải anh hỏi về?</div>';
-   G.nguoi.forEach(function(x){h+='<div class="qaHit"><button class="btn sm" style="width:100%;justify-content:flex-start" onclick="qaPanVD('+JSON.stringify(x.ten).split('"').join("&quot;")+')"><i class="ti ti-user-check"></i>'+esc(x.ten)+'</button></div>'})}
-  if(G.hethong.length){h+='<div class="sechd">Hay đang tìm chỗ này?</div>';
-   G.hethong.forEach(function(k){h+='<div class="qaHit"><div class="t">'+esc(k.t)+'</div>'+(k.o?'<div class="o"><i class="ti ti-map-pin"></i>'+esc(k.o)+'</div>':'')+
-    (k.go?'<div style="margin-top:6px"><button class="btn sm" onclick="qaPanDong();'+k.go.split('"').join("&quot;")+'"><i class="ti ti-arrow-right"></i>Mở thẳng</button></div>':'')+'</div>'})}
-  h+='<div style="margin-top:12px"><button class="btn sm" onclick="qaPanDong();window.SETTAB=\'qa\';go(\'settings\')"><i class="ti ti-settings"></i>Soạn câu trả lời cho câu này</button></div>';
- }
- h+='<div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--line)"><button class="btn sm" onclick="qaPanDong();window.QAQ='+JSON.stringify(q).split('"').join("&quot;")+';go(\'hoidap\')"><i class="ti ti-external-link"></i>Mở trang Hỏi đáp đầy đủ</button></div>';
- h+='</div>';
- e.innerHTML=h}
-function qaHoi(){window.QAQ=fldV("qa_q")||"";reRender("hoidap")}
-function qaViDu(s){window.QAQ=s;reRender("hoidap")}
-function qaXoa(){window.QAQ="";reRender("hoidap")}
 function renderHoidap(){
  var q=window.QAQ||"";
  var h=pageHead("Hỏi đáp","Hỏi bằng tiếng Việt - về một học viên, hoặc về chỗ cấu hình trong app");
@@ -15038,11 +14992,47 @@ function asstPaint(){
  f.innerHTML=(chay?'<i class="ti ti-checklist"></i><b>'+tourWorkLeft()+'</b> <span>đang dọn</span>'
   :'<i class="ti ti-bulb"></i><b>'+L.length+'</b> <span>việc</span>'+(do_?'<em>'+do_+' quá hạn</em>':''));
  f.setAttribute("data-tip",chay?"Đang dọn việc dở - bấm để mở lại đúng chỗ đang làm"
-  :(L.length?("Trợ thủ - "+L.length+" việc đang chờ bạn"):"Trợ thủ - hàng chờ của bạn đã sạch"));
+  :(L.length?("Trợ lý - hỏi bất cứ gì, hoặc dọn "+L.length+" việc đang chờ"):"Trợ lý - hỏi bất cứ gì, hàng chờ của bạn đã sạch"));
  if(!a.classList.contains("on"))return;
  a.innerHTML=asstHTML()}
 /* Dựng chuỗi tách khỏi chỗ gắn vào màn hình: bộ kiểm đọc được nội dung thật mà không cần DOM,
    và ai đọc mã cũng thấy ngay "tấm trợ thủ gồm những gì". */
+/* ═══════════ V9.48 - TRỢ THỦ + HỎI ĐÁP GỘP THÀNH **TRỢ LÝ** ══════════════════════════════
+   Anh Luân: *"trợ thủ nên bỏ, kết hợp với khung tìm kiếm này nên nâng cấp khung tìm kiếm này lên
+   1 tầm cao. Để ko chỉ hiển thị thông tin, mà còn hướng dẫn người ta tuần tự để dọn 1 task."*
+   Và: *"để cái nút bật tắt trợ thủ, thành nút bật tắt trợ lý, a sẽ gọi cái này là trợ lý."*
+
+   Hai nút ở cùng một góc, làm hai nửa của cùng một việc - đó là em chia sai ngay từ đầu. Trợ thủ
+   biết HÀNG CHỜ nhưng không tra được ai; hộp Hỏi đáp tra được ai nhưng đứng ngoài hàng chờ.
+   Nay MỘT nút, MỘT tấm, tên là **Trợ lý**: ô hỏi nằm trên cùng, dưới nó là việc trong ngày khi
+   chưa hỏi gì, và là câu trả lời khi đã hỏi. Không hỏi thì nó là trợ thủ; hỏi thì nó là người
+   tra cứu; và cả hai đường đều kết thúc ở cùng một chỗ - **dắt đi dọn từng bước**.
+
+   ── TRẢ LỜI PHẢI CÓ TRỌNG TÂM ──
+   Anh Luân: *"nó hiện tùm lum à, mà a thấy ko trọng tâm lắm... a hỏi Trần Khánh Vy thì hãy nói
+   các nghiệp vụ liên quan đến Trần Khánh Vy thôi, với lại em nên hỏi lại để người dùng chọn."*
+   Bản trước đổ MỌI THỨ ra cùng lúc - hiện trạng, cảnh báo, việc, tất cả. Đọc xong không biết nhìn
+   đâu. Nay: gõ một cái tên thì trước hết ra **THẺ NHẬN DẠNG** (tên · mã · lớp · SĐT) để người ta
+   xác nhận đúng người, rồi **HỎI LẠI** muốn xem gì, và **chỉ vẽ đúng phần được chọn**.
+   Chưa chọn thì không vẽ gì thêm - im lặng còn hơn đổ bừa. */
+var QAPHAN={
+ viec:"Việc cần làm",canhbao:"Vì sao cảnh báo",tien:"Học phí & công nợ",
+ hoctap:"Chuyên cần & bài tập",lienhe:"Liên hệ & người nhà",hientrang:"Toàn cảnh hồ sơ"};
+function asstQHoi(){window.ASSTQ=fldV("asst_q")||"";window.ASSTYD="";asstPaint()}
+function asstQDat(s){window.ASSTQ=s;window.ASSTYD="";asstPaint();
+ setTimeout(function(){var i=document.getElementById("asst_q");if(i)i.value=s},20)}
+function asstQXoa(){window.ASSTQ="";window.ASSTYD="";asstPaint()}
+function asstYD(k){window.ASSTYD=(window.ASSTYD===k?"":k);asstPaint()}
+/* Thẻ nhận dạng: đủ để người ta CHẮC đây đúng người mình hỏi, không thừa một chữ nào. */
+function qaTheNguoi(x){
+ var r=x.r,hv=(x.loai==="hv");
+ var lop="";try{var ob=rows("DL08").filter(function(o){return o.student_id===x.ma&&o.class_id}).slice(-1)[0];
+  var c=ob&&find("DL10","class_id",ob.class_id);if(c)lop=c.class_name||c.class_id}catch(e){}
+ var sdt=String(r.phone_number||r.phone||"").trim();
+ return '<div class="qaWho"><div class="qaWhoN">'+esc(x.ten)+'</div>'+
+  '<div class="qaWhoM">'+esc(x.ma)+' · '+(hv?"học viên":"khách tiềm năng")+
+  (lop?' · '+esc(lop):(hv?' · chưa xếp lớp':''))+
+  (sdt?' · '+esc(sdt):' · chưa có SĐT')+'</div></div>'}
 function asstHTML(){
  var L=[],do_=0;
  try{L=workAll();do_=L.filter(function(x){return x.sev==="red"}).length}catch(e){}
@@ -15055,7 +15045,13 @@ function asstHTML(){
  var x=asstNext(),p=PBK[CUR]||{};
  var h='<div class="asstH"><div><b>'+esc(asstChao()+(me?(", "+me):""))+'</b>'+
   '<span>'+(L.length?(L.length+' việc'+(do_?(' · <i>'+do_+' quá hạn</i>'):' · còn trong hạn')):'hàng chờ của bạn đã sạch')+'</span></div>'+
-  '<button class="x" onclick="asstClose()" aria-label="Thu gọn Trợ thủ"><i class="ti ti-chevron-down"></i></button></div>';
+  '<button class="x" onclick="asstClose()" aria-label="Thu gọn Trợ lý"><i class="ti ti-chevron-down"></i></button></div>';
+ /* Ô HỎI đứng trên cùng - đây là cửa vào chính của Trợ lý, không phải một tính năng phụ. */
+ var _q=window.ASSTQ||"";
+ h+='<div class="qaAsk"><input id="asst_q" value="'+esc(_q)+'" placeholder="Hỏi tên học viên, hoặc chỗ cấu hình…" onkeydown="if(event.key===\'Enter\')asstQHoi()">'+
+  '<button class="btn primary sm" onclick="asstQHoi()" aria-label="Hỏi"><i class="ti ti-search"></i></button>'+
+  (_q?'<button class="btn sm" onclick="asstQXoa()" aria-label="Xoá câu hỏi"><i class="ti ti-x"></i></button>':'')+'</div>';
+ if(_q)return h+asstTraLoi(_q);
  if(x){
   h+='<div class="asstCard"><div class="k">Việc kế tiếp</div>'+
    '<div class="t">'+esc(x.grp||x.cat||"")+'</div>'+
@@ -15096,6 +15092,80 @@ function asstHTML(){
   '</div>';
  if(p.c)h+='<div class="asstNote"><b>Trang này để làm gì:</b> '+esc(p.c)+'</div>';
  return h}
+/* Trả lời TRONG TẤM TRỢ LÝ. Luật: một lần chỉ vẽ MỘT phần. Chưa chọn phần nào thì chỉ có thẻ
+   nhận dạng + câu hỏi lại - không đổ sẵn thứ người ta chưa hỏi. */
+function asstTraLoi(q){
+ var R=qaTraLoi(q),h="";
+ /* nhiều người trùng: cho chọn, kèm đủ LỚP và SĐT để phân biệt - tên không đủ */
+ if(R.loai==="nguoi"&&R.nguoi.length>1){
+  h+='<div class="qaBody"><div class="sechd" style="margin-top:0">Có '+R.nguoi.length+' người khớp - chọn đúng người</div>';
+  R.nguoi.forEach(function(x){
+   h+='<button class="qaPick" onclick="asstQDat('+JSON.stringify(x.ma).split('"').join("&quot;")+')">'+
+    qaTheNguoi(x)+'<i class="ti ti-chevron-right"></i></button>'});
+  return h+'</div>'}
+ if(R.loai==="nguoi"&&R.nguoi.length){
+  var X=R.nguoi[0],K=qaHoSo(X);
+  var yd=window.ASSTYD||R.yd||"";
+  h+='<div class="qaBody">'+qaTheNguoi(X);
+  h+='<div class="qaAskBack">'+(yd?('Đang xem <b>'+esc((QAPHAN[yd]||"").toLowerCase())+'</b> của '+esc(X.ten)+'. Đổi mục khác:')
+                                  :('Bạn muốn xem gì về <b>'+esc(X.ten)+'</b>?'))+'</div>';
+  h+='<div class="qaYD">';
+  QAYDINH.forEach(function(y){
+   var n="";
+   if(y.k==="viec"&&K.viec.length)n=String(K.viec.length);
+   if(y.k==="canhbao"&&K.canhbao.length)n=String(K.canhbao.length);
+   h+='<button class="pill'+(yd===y.k?" on":"")+'" onclick="asstYD(\''+y.k+'\')"><i class="ti '+y.ic+'"></i>'+
+    esc(QAPHAN[y.k]||y.t)+(n?' <b>'+n+'</b>':'')+'</button>'});
+  h+='</div>';
+  /* chỉ vẽ ĐÚNG phần được chọn */
+  function dong(ten){var d=K.dong.filter(function(z){return z[0]===ten})[0];return d?[d[0],esc(d[1])]:null}
+  function bang(ds){ds=ds.filter(Boolean);return ds.length?ctxRows(ds):'<div class="mut" style="font-size:11.5px">Chưa có dữ liệu cho mục này.</div>'}
+  if(yd==="viec"){
+   if(!K.viec.length)h+='<div class="mut" style="font-size:12px">Hồ sơ này đang sạch hàng chờ - không có việc nào phải làm.</div>';
+   K.viec.slice(0,8).forEach(function(v){
+    h+='<div class="qaHit"><div class="t"><span class="chip '+(v.sev==="red"?"red":(v.sev==="amber"?"amber":"gray"))+'" style="margin-right:5px">'+esc(v.ma||v.cat||"việc")+'</span>'+esc(v.cau||"")+'</div>'+
+     (v.han?'<div class="o"><i class="ti ti-clock"></i>'+esc(v.han)+'</div>':'')+
+     (v.go?'<div style="margin-top:6px"><button class="btn sm" onclick="asstClose();'+v.go.split('"').join("&quot;")+'"><i class="ti ti-arrow-right"></i>Mở màn xử lý</button></div>':'')+'</div>'});
+   if(K.viec.length>8)h+='<div class="mut" style="font-size:11px;padding-top:6px">… còn '+(K.viec.length-8)+' việc nữa.</div>';
+   if(K.viec.length)h+='<div style="margin-top:12px"><button class="btn primary sm" style="width:100%;justify-content:center" onclick="asstClose();qaDatTroThu('+JSON.stringify(K.ma).split('"').join("&quot;")+')"><i class="ti ti-checklist"></i>Dắt tôi dọn từng bước ('+K.viec.length+' việc)</button></div>';
+  }
+  else if(yd==="canhbao"){
+   if(!K.canhbao.length)h+='<div class="mut" style="font-size:12px">Không có cảnh báo nào đang bật cho hồ sơ này.</div>';
+   K.canhbao.forEach(function(c){h+='<div class="qaHit"><div class="d"><i class="ti ti-alert-triangle" style="color:var(--red);margin-right:4px"></i>'+esc(c)+'</div></div>'});
+  }
+  else if(yd==="tien")h+=bang([dong("Học phí")]);
+  else if(yd==="hoctap")h+=bang([dong("Chuyên cần"),dong("Bài tập"),dong("Buổi WOW"),dong("Lớp đang học")]);
+  else if(yd==="lienhe"){
+   var r=X.r;
+   h+=bang([["Số điện thoại",esc(String(r.phone_number||r.phone||"").trim()||"chưa có")],
+    (r.email?["Email",esc(r.email)]:null),
+    (r.emergency_contact_name?["Người nhà",esc(r.emergency_contact_name)+(r.emergency_contact_phone?" · "+esc(r.emergency_contact_phone):"")+(r.emergency_contact_relationship?" ("+esc(elabel(r.emergency_contact_relationship))+")":"")]:["Người nhà","chưa khai"]),
+    (r.assigned_to_name?["Phụ trách",esc(r.assigned_to_name)]:null),
+    (r.next_followup_time?["Hẹn liên hệ lại",esc(r.next_followup_time)]:null)]);
+  }
+  else if(yd==="hientrang")h+=ctxRows(K.dong.map(function(d){return [d[0],esc(d[1])]}));
+  /* đường ra: hồ sơ đầy đủ - chỉ hiện khi đã chọn một mục, để lúc mới hỏi màn còn gọn */
+  if(yd)h+='<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line)">'+
+   (K.loai==="hv"?'<button class="btn sm" onclick="asstClose();window.HOSO='+JSON.stringify(K.ma).split('"').join("&quot;")+';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Mở hồ sơ 360 đầy đủ</button>'
+     :'<button class="btn sm" onclick="asstClose();runStart('+JSON.stringify(K.ma).split('"').join("&quot;")+')"><i class="ti ti-player-play"></i>Chạy quy trình cho khách này</button>')+'</div>';
+  return h+'</div>'}
+ if(R.loai==="hethong"&&R.hethong.length){
+  h+='<div class="qaBody"><div class="sechd" style="margin-top:0">'+R.hethong.length+' chỗ khớp câu hỏi</div>';
+  R.hethong.forEach(function(k){
+   h+='<div class="qaHit"><div class="t">'+esc(k.t)+(k.tay?' <span class="chip gray">tự khai</span>':'')+'</div>'+
+    (k.d?'<div class="d">'+esc(k.d)+'</div>':'')+
+    (k.o?'<div class="o"><i class="ti ti-map-pin"></i>'+esc(k.o)+'</div>':'')+
+    (k.go?'<div style="margin-top:6px"><button class="btn sm" onclick="asstClose();'+k.go.split('"').join("&quot;")+'"><i class="ti ti-arrow-right"></i>Mở thẳng tới đó</button></div>':'')+'</div>'});
+  return h+'</div>'}
+ var G=qaGoiY(q);
+ h+='<div class="qaBody"><div class="mut" style="font-size:12px;line-height:1.65"><b>Em chưa hiểu rõ câu này.</b> Đã ghi vào sổ câu hỏi chưa trả lời được trong Cài đặt.</div>';
+ if(G.nguoi.length){h+='<div class="sechd">Có phải anh hỏi về?</div>';
+  G.nguoi.forEach(function(z){h+='<button class="qaPick" onclick="asstQDat('+JSON.stringify(z.ten).split('"').join("&quot;")+')"><div class="qaWho"><div class="qaWhoN">'+esc(z.ten)+'</div><div class="qaWhoM">'+esc(z.ma)+'</div></div><i class="ti ti-chevron-right"></i></button>'})}
+ if(G.hethong.length){h+='<div class="sechd">Hay đang tìm chỗ này?</div>';
+  G.hethong.forEach(function(k){h+='<div class="qaHit"><div class="t">'+esc(k.t)+'</div>'+(k.o?'<div class="o"><i class="ti ti-map-pin"></i>'+esc(k.o)+'</div>':'')+
+   (k.go?'<div style="margin-top:6px"><button class="btn sm" onclick="asstClose();'+k.go.split('"').join("&quot;")+'"><i class="ti ti-arrow-right"></i>Mở thẳng</button></div>':'')+'</div>'})}
+ h+='<div style="margin-top:12px"><button class="btn sm" onclick="asstClose();window.SETTAB=\'qa\';go(\'settings\')"><i class="ti ti-settings"></i>Soạn câu trả lời cho câu này</button></div>';
+ return h+'</div>'}
 function asstBoQua(){
  var x=asstNext();if(!x)return;
  window.ASSTSKIP=window.ASSTSKIP||{};window.ASSTSKIP[slaKey(x)]=1;
@@ -15842,8 +15912,10 @@ HV_SHELL = r"""
 </div>
 <div class="toast" id="toast"></div>
 <div class="undobar" id="undobar"></div>
-<div class="asst" id="asst"></div>
-<button class="asstfab" id="asstfab" aria-label="Mở Trợ thủ"></button>
+<!-- V9.48: cong hoc vien KHONG co Tro ly. Anh Luan nhin thay "cai nut gi a ta, goc duoi ben
+     phai" - do la nut Tro ly lot sang day: rong tuech, khong chu khong icon (vi asstPaint chi
+     chay o cong nhan vien), bam khong ra gi. Tro ly doc hang cho va du lieu NOI BO cua trung
+     tam nen no khong duoc phep co mat o cong hoc vien - khong phai an di, ma la khong dung. -->
 <div class="mask" id="mask" onclick="closeModal()"></div>
 <div class="cfmask" id="cfm"><div class="cfbox"><div class="cfh"><i class="ti ti-alert-triangle"></i> Xác nhận thao tác</div><div class="cfmsg" id="cfmMsg"></div><div class="cfa"><button class="btn" onclick="closeConfirm()">Huỷ</button><button class="btn primary" onclick="confirmYes()">Xác nhận</button></div></div></div>
 <div class="drawer" id="drawer"><div class="drszr" id="drszr" title="Kéo để đổi độ rộng - bấm đúp để về mặc định"></div><div class="dh"><b id="drawerTitle">Chi tiết</b><button class="x" onclick="closeModal()">&times;</button></div><div class="dbody" id="drawerBody"></div></div>
