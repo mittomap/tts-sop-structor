@@ -306,6 +306,44 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
  t("cach goi o tim thong nhat"+(khac.length?" - LAC: "+khac.slice(0,5).join(", "):""), khac.length===0);
 })();
 
+/* ---- 6decies. BANH RANG TRO CAU HINH - BAT/TAT DUOC, VA CHAY CA O CONG (V9.53) ----
+   anh Luan: "may cai banh rang de dan toi toan bo cau hinh, e lam cho anh nhe, SLA nay no o may
+   cong do, do dang demo ma, tao dieu kien de moi nguoi co the sua thong so theo thuc te. em co
+   the lam them 1 cai trong cai dat de bat tat hien thi banh rang tro cau hinh."
+   Ba dieu phai dung:
+   1. MOT cong tac duy nhat (UI().gear) chi phoi MOI loai banh rang - CH2, CH6, CH4, CH1;
+   2. Tat thi con so VAN CON, chi mat nut nhay (khong duoc nuot mat so);
+   3. O CONG HOC VIEN khong co man Cai dat - banh rang phai mo tam giai thich, khong duoc goi
+      cfGo roi chet cam. */
+(function(){
+ var u=UI();
+ t("co cong tac gear trong UI, mac dinh BAT", typeof gearOn==="function"&&gearOn());
+ var co=slaChip("slaLRT_minutes",15);
+ t("bat thi co banh rang", /ti-settings/.test(co)&&/15/.test(co));
+ /* V9.54: bat banh rang thi phai BAM DUOC - nhung bam la mo ngan keo sua tai cho, khong nhay trang. */
+ t("bat thi bam duoc, mo ngan keo sua tai cho", /cfPop\('slaLRT_minutes'\)/.test(co));
+ u.gear=0;
+ var tat=slaChip("slaLRT_minutes",15);
+ t("tat thi MAT banh rang", !/ti-settings/.test(tat));
+ t("tat nhung CON SO van con", /15/.test(tat));
+ t("tat thi kpiChip cung sach", !/ti-settings/.test(kpiChip(/^RER/,0.4,1)));
+ t("tat thi nut sua cau nhac cung an", msgEditBtn("NA001")==="");
+ t("tat thi cfGear cung an", cfGear("slaLRT_minutes")==="");
+ u.gear=1;
+ /* o CONG hoc vien: banh rang mo tam giai thich chu khong goi cfGo */
+ window.HVPORTAL=1;
+ var cong=slaChip("slaLRT_minutes",15);
+ window.HVPORTAL=0;
+ t("o cong hoc vien banh rang KHONG goi cfGo/cfPop", !/cfGo\(/.test(cong)&&!/cfPop\(/.test(cong));
+ t("o cong hoc vien banh rang mo tam giai thich", /gearNoi\('slaLRT_minutes'\)/.test(cong));
+ t("co ham gearNoi", typeof gearNoi==="function");
+ var hg=veDrawer(function(){gearNoi("slaLRT_minutes")});
+ t("tam giai thich noi ten thong so + gia tri + sua o dau",
+   typeof hg==="string"&&/slaLRT_minutes/.test(hg)&&/Sửa ở đâu/.test(hg)&&/Ngưỡng &amp; SLA/.test(hg));
+ t("cong tac nam trong man Cai dat", (function(){window.SETTAB="brand";var h="";
+   try{h=renderSettings()}catch(e){}window.SETTAB="";return /Bánh răng trỏ cấu hình/.test(h)})());
+})();
+
 /* ---- 6novies. DEM BIEN THE - PHEP DO TAI HIEN DUOC CACH ANH LUAN TIM RA LOI (V9.52) ----
    anh Luan hoi thang: *"em co thay, du em audit va kiem rat nhieu, nhung anh luon tim ra 1 cai
    gi do bat hop ly khong, va khong he mat qua nhieu cong suc?"*
@@ -440,6 +478,107 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
  t("khong muc menu nao mo ra trang trong tron"+(trong.length?" - TRONG: "+trong.slice(0,6).join(", "):""), trong.length===0);
 })();
 
+/* ═══════ V9.54 - MỌI CON SỐ DẪN XUẤT PHẢI TỰ KHAI CÁCH TÍNH ═══════
+   Anh Luân: "mấy con số như kiểu 95% là tính như thế nào, e ghi chú cụ thể ở hover cho anh".
+   Lúc đo lần đầu: 305 con số phần trăm hiện trên màn thì 293 con không nói mình ở đâu ra.
+   Bộ kiểm này vẽ THẬT mọi trang, tìm mọi con số %, và đòi mỗi con phải có chú thích - hoặc trên
+   chính nó, hoặc trên ô bao nó. Chú thích tính-lúc-rê (data-tipfn) thì GỌI THẬT hàm rồi đọc kết
+   quả: đếm thuộc tính chỉ biết có, không biết nó nói gì. */
+(function(){
+ var thieu=[],tong=0;
+ Object.keys(RENDER).forEach(function(k){CUR=k;var h="";
+  try{h=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){return}
+  var re=/<([a-z]+)([^>]*)>([^<]{0,30}?\d{1,3}%)/g,m;
+  while((m=re.exec(h))){
+   var attr=m[2]||"",truoc=h.slice(Math.max(0,m.index-420),m.index+60);tong++;
+   var co=/data-tip="[^"]{10,}|title="[^"]{10,}/.test(attr)||/data-tip="[^"]{10,}"/.test(truoc);
+   if(!co){var fn=(attr.match(/data-tipfn="([^"]+)"/)||[])[1],ta=(attr.match(/data-tipa="([^"]*)"/)||[])[1]||"";
+    if(fn&&TIPFNS[fn]){try{co=String(TIPFNS[fn](ta.replace(/&quot;/g,'"').replace(/&amp;/g,"&").split("|"))||"").length>=15}catch(e){}}}
+   if(!co)thieu.push(k+": "+m[3].trim())}});
+ t("co du con so % de kiem (>=200)", tong>=200);
+ t("moi con so % deu noi duoc cach tinh"+(thieu.length?" - THIEU "+thieu.length+": "+thieu.slice(0,6).join(", "):" ("+tong+" con)"), thieu.length===0);
+ /* ba ham chung phai co that va tra dung dang - khong co chung thi 300 cho lai moi cho mot kieu */
+ t("co ham chung sinh cau giai thich ty le", typeof pctG==="function"&&/^84% = 42\/50 buổi$/.test(pctG(42,50,"buổi")));
+ t("mau so bang 0 thi noi ro chua tinh duoc", /chưa tính được/.test(pctG(0,0,"buổi")));
+ t("co ham giai thich chi so KPI", typeof kpiGiai==="function"&&/Cách tính|Đang là/.test(kpiGiai("CVR")||""));
+ t("co ham noi ro day la NGUONG chu khong phai so do", typeof nguongGiai==="function"&&/NGƯỠNG PHẢI ĐẠT/.test(nguongGiai("SRR","x")));
+})();
+/* ═══════ V9.54 - BÁNH RĂNG SỬA TẠI CHỖ, KHÔNG QUĂNG NGƯỜI DÙNG ĐI ═══════
+   Anh Luân: "nếu đang ở 1 nơi nào đó, vẫn còn phải ở đó để làm, mà bị điều hướng đi thì hơi mệt."
+   Bốn loại bánh răng phải mở ngăn kéo sửa tại chỗ, và ngăn kéo phải có ô sửa thật + nút Lưu. */
+(function(){
+ t("banh rang nguong CH2 mo ngan keo tai cho", /cfPop\('/.test(cfGear("slaLRT_minutes")));
+ t("banh rang cau nhac CH4 mo ngan keo tai cho", /msgPop\('/.test(msgEditBtn("NA050")));
+ t("banh rang danh muc CH1 mo ngan keo tai cho", /enumPop\('/.test(enumEditBtn("enum_lead_status")));
+ t("chip SLA mo ngan keo tai cho", /cfPop\('/.test(slaChip("slaLRT_minutes",15)));
+ t("chip nguong KPI mo ngan keo tai cho", /kpiPop\('/.test(kpiChip(/^CVR/,0.4,1)));
+ ["cfPop","msgPop","kpiPop","enumPop","cfPopSave","msgPopSave","kpiPopSave","enumPopSave"].forEach(function(f){
+  t("co ham "+f, typeof global[f]==="function")});
+ t("ngan keo CH2 van chua loi mo trang Cai dat cho ai muon xem ca nhom", /cfGo\(/.test(String(cfPop)));
+ t("luu xong thi ve lai dung man dang dung", /reRender\(CUR\)/.test(String(cfPopXong)));
+})();
+/* ═══════ V9.54 - MỖI CHẶNG PHẢI KHAI SẢN PHẨM ĐẦU RA ═══════
+   Anh Luân: "hover vào a thấy chặng đã qua, nhưng qua là qua cái gì?" Mọi chặng chính phải khai
+   được sản phẩm; hồ sơ đi tới đâu thì chặng đó phải kể ra được cái gì đã ghi lại. */
+(function(){
+ var chuaKhai=[];
+ JMAIN.concat(JBRANCH).forEach(function(k){
+  var co=false;
+  jAll().slice(0,400).forEach(function(J){if(co)return;
+   try{if(jReviewRows(J.C,k).length)co=true}catch(e){}});
+  if(!co)chuaKhai.push(k)});
+ t("moi chang deu khai duoc san pham dau ra"+(chuaKhai.length?" - CHUA KHAI: "+chuaKhai.join(", "):""), chuaKhai.length===0);
+ var J0=jAll().filter(function(J){return J.k==="learning"})[0]||jAll()[0];
+ if(J0){
+  var d=jStagePop?null:null;
+  t("co ngan keo tung chang", typeof jStagePop==="function");
+  t("co ham tom tat san pham cho chu thich", typeof jOutSum==="function"&&jOutSum(J0.C,J0.k,2).length>0);
+  t("co ham tinh thoi gian nam o mot chang", typeof jStageSpan==="function");
+  /* Banh rang tro vao tham so KHONG CO THAT la banh rang chet - bam vao khong sua duoc gi.
+     Da cắn: 3 chang khai ten CU (co trong PKEY) chu khong phai ten that trong CH2. */
+  var khai={};APPPARAMS.forEach(function(pp){khai[pp[1]]=1});
+  var pnLoi=JSTAGE.filter(function(sx){return sx.pn&&!khai[sx.pn]}).map(function(sx){return sx.k+"->"+sx.pn});
+  t("chang nao khai han SLA thi ten tham so phai co that trong CH2"+(pnLoi.length?" - LOI: "+pnLoi.join(", "):""), pnLoi.length===0);
+  var soPn=JSTAGE.filter(function(sx){return !!sx.pn}).length;
+  t("it nhat 12 chang khai duoc han SLA cua minh", soPn>=12);
+  /* Chang da qua ma khong tim ra moc ke tiep thi im, khong duoc noi "(toi gio)" */
+  t("khong noi lao '(toi gio)' cho chang da roi tu lau", !/\(tới giờ\)/.test(jStageSpan(J0.C,"new",J0.k)||"")||J0.k==="new");
+  var hj=(function(){var g="";openDrawer=function(t2,h2){g=h2};try{mstripOpen(J0.C.pid)}catch(e){}return g})();
+  t("drawer hanh trinh ke san pham tung chang", /hvjo/.test(hj));
+  t("drawer hanh trinh bam duoc vao tung chang", /jStagePop\(/.test(hj));
+ }
+})();
+/* ═══════ V9.54 - Ô BẤM PHẢI NÓI THẬT NÓ SẼ LÀM GÌ ═══════
+   Anh Luân: "nhiều cái thẻ, bấm vào nhảy trang khác, a thấy cũng bất tiện dữ lắm". Nhảy trang
+   không phải lúc nào cũng sai - có ô bấm vào đúng là để sang chỗ làm việc. Cái sai là NÓI DỐI:
+   ô ghi "bấm để lọc danh sách bên dưới" rồi lại đổi trang. Đo: ô nào onclick có go( mà chú thích
+   vẫn hứa lọc tại chỗ. Thêm: tên người trong bảng phải mở ngăn kéo, không đổi trang. */
+(function(){
+ var doi=[],tenDoiTrang=[];
+ Object.keys(RENDER).forEach(function(k){CUR=k;var h="";
+  try{h=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){return}
+  var re=/<div class="bstat[^>]*onclick="([^"]*)"[^>]*data-tip="([^"]*)"/g,m;
+  while((m=re.exec(h)))if(/go\(/.test(m[1])&&/lọc danh sách bên dưới/.test(m[2]))doi.push(k+": "+m[1]);
+  var re2=/<a class="lnk"[^>]*onclick="(?:event\.stopPropagation\(\);)?(openNV|openGV|openKhoa|openLop|openHoso|jOpen)\(/g,m2;
+  while((m2=re2.exec(h)))tenDoiTrang.push(k+": "+m2[1])});
+ t("khong o thong ke nao hua loc tai cho roi lai doi trang"+(doi.length?" - NOI DOI: "+doi.slice(0,4).join(", "):""), doi.length===0);
+ t("bam TEN trong bang thi mo ngan keo, khong doi trang"+(tenDoiTrang.length?" - CON: "+tenDoiTrang.slice(0,4).join(", "):""), tenDoiTrang.length===0);
+ t("co ham doc onclick de noi dung no dan di dau", typeof bamDiDau==="function"&&/mở trang/.test(bamDiDau("go('wow')")));
+ t("ham do phan biet duoc mo ngan keo vs doi trang", /ngay tại đây/.test(bamDiDau("openNSQuick('NV001')")));
+})();
+/* ═══════ V9.54 - HẰNG SỐ NGHIỆP VỤ KHÔNG ĐƯỢC CẮM CỨNG ═══════
+   Anh Luân: "mọi thứ trên app phải tuân thủ cấu hình phải ko em". Đúng - và ba chỗ từng tự đặt
+   số riêng trong mã (cổng học viên 85/80, bảng khối lượng việc 90/70, bảng cơ sở 20%). */
+(function(){
+ ["tkOntimeGood_pct","tkOntimeWarn_pct","riskRateRed_pct"].forEach(function(n){
+  var co=false;APPPARAMS.forEach(function(p){if(p[1]===n)co=true});
+  t("tham so "+n+" da khai trong CH2", co)});
+ var src=String(RENDER.tranghv||"")+String(global.hvTienDo||"");
+ t("cong hoc vien lay nguong chuyen can tu CH6 chu khong cam 85", !/attP>=85\b/.test(SRC));
+ t("cong hoc vien lay nguong nop bai tu CH6 chu khong cam 80", !/hwP>=80\b/.test(SRC));
+ t("bang khoi luong viec lay nguong tu CH2", !/p\.ontime>=90\b/.test(SRC));
+ t("bang so sanh co so lay nguong nguy co tu CH2", !/rr>=20\b/.test(SRC));
+})();
 if(bad.length){console.log("CHECKUX DO ("+bad.length+"/"+(ok+bad.length)+"):");
  bad.forEach(function(b){console.log("  - "+b)});process.exit(1)}
 console.log("CHECKUX OK: "+ok+" tieu chi | "+FORM.length+" form ghi deu co loi giai thich, khong o ngay nao de trong");

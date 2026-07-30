@@ -350,7 +350,7 @@ lead_of={}
 for s in students:
     joined=pvj=dt.datetime.strptime(s["joined_at"],"%d/%m/%Y %H:%M")
     off=int((pvj-TODAY).days)-random.randint(10,21)
-    L=mk_lead(s["full_name"],s["phone_number"],"converted (Đã chuyển đổi - đã thành HV)",off,random.choice(SALES))
+    L=mk_lead(s["full_name"],s["phone_number"],"converted (Đã thành học viên)",off,random.choice(SALES))
     leads.append(L); lead_of[s["student_id"]]=L
 # pipeline chưa chuyển đổi
 def batch(n,status,co_range,fu=None,note=""):
@@ -756,7 +756,7 @@ _ob_rej["assigned_at"]=F(NOW-dt.timedelta(hours=14)); _ob_rej["class_info_sent_a
 f_ov1=mk_student(take_name(),"active (Đang học)",-2,"CRS-PRE-01"); students.append(f_ov1); SBY[f_ov1["student_id"]]=f_ov1
 f_ov2=mk_student(take_name(),"active (Đang học)",-5,"CRS-PRE-01"); students.append(f_ov2); SBY[f_ov2["student_id"]]=f_ov2
 for s_ in (f_ov1,f_ov2):
-    L_=mk_lead(s_["full_name"],s_["phone_number"],"converted (Đã chuyển đổi - đã thành HV)",-random.randint(12,20),random.choice(SALES))
+    L_=mk_lead(s_["full_name"],s_["phone_number"],"converted (Đã thành học viên)",-random.randint(12,20),random.choice(SALES))
     leads.append(L_); lead_of[s_["student_id"]]=L_; LBY[L_["lead_id"]]=L_
     e_=add_enr(L_,s_,"CRS-PRE-01",created=NOW-days(6)); add_pay(e_,NOW-days(6),int(e_["final_fee"]))
     enr_of[s_["student_id"]]=e_; s_["first_enrollment_id"]=e_["enrollment_id"]; s_["first_enrollment_date"]=e_["enrollment_time"]

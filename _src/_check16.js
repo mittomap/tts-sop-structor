@@ -168,15 +168,25 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  var all=jAll();for(var i=0;i<all.length&&!J;i++)if((ARCRAIL[arcOf(all[i].k)]||[]).length>2)J=all[i];
  if(!J){t("co ho so de kiem dai hat",false);return}
  var H=mstrip(J.k,J.over,J.C&&J.C.pid);
- var tips=H.match(/data-tip="[^"]*"/g)||[];
+ /* V9.54: chu thich cua hat nay TINH LUC RE (data-tipfn) chu khong dung san - vi no phai doc ca
+    ho so de ke ra san pham cua chang. Nen bo kiem khong dem chuoi nua ma GOI THAT ham tinh chu
+    thich roi doc ket qua: dem chuoi thi chi biet co thuoc tinh, khong biet no noi gi. */
+ var tips=H.match(/data-tip="[^"]*"|data-tipfn="[^"]*"/g)||[];
  var dots=(H.match(/class="msd/g)||[]).length;
  t("moi hat deu co chu thich rieng", tips.length>=dots+1);
- t("chu thich hat ghi ro so buoc", /data-tip="Bước 1\//.test(H));
+ var tipa=(H.match(/data-tipa="([^"]*)"/)||[])[1]||"";
+ var tip1=tipa?TIPFNS.mstripTip(tipa.replace(/&quot;/g,'"').replace(/&amp;/g,"&").split("|")):"";
+ t("chu thich hat ghi ro so buoc", /^Bước 1\//.test(tip1));
+ t("chu thich hat noi luon chang do de lai gi", /để lại: |chưa để lại dữ liệu nào/.test(tip1));
+ t("chu thich hat moi nguoi ta bam xem chi tiet", /bấm để xem chi tiết/.test(tip1));
  t("chu thich hat ghi ro trang thai da qua / dang o / chua toi",
    /(đã qua|ĐANG Ở ĐÂY|chưa tới|đã rẽ nhánh)/.test(H));
  t("hat dang dung ghi ĐANG Ở ĐÂY", /ĐANG Ở ĐÂY/.test(H));
  t("chip chang cung co chu thich rieng", /class="msarc" data-tip="Chặng /.test(H));
  t("khong hat nao con thieu chu thich", (H.match(/class="msd[^"]*"(?! data-tip)/g)||[]).length===0);
+ /* V9.54 - bam mot hat phai mo dung ngan keo cua CHANG DO, khong phai ca dai */
+ t("bam vao hat mo ngan keo dung chang", /jStagePop\('[^']+','new'\)/.test(H));
+ t("co ham ngan keo tung chang", typeof jStagePop==="function");
  t("ro chuot vao tung hat thi hat do phong to", /\.mstrip \.msd:hover\{[^}]*transform:scale/.test(CSS));
  t("hat co vung bat chuot rong hon chinh no", /\.mstrip \.msd:after\{[^}]*inset:-\dpx/.test(CSS));
  /* bam duoc vs chi de xem */
@@ -702,7 +712,10 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  var v=paramOf("slaTeacherNote_hours",48);
  var chip=slaChip("slaTeacherNote_hours",48);
  t("slaChip in dung con so dang cau hinh", chip.indexOf(">"+v)>=0);
- t("slaChip bam duoc va tro dung tham so", /cfGo\('slaTeacherNote_hours'\)/.test(chip));
+ /* V9.54: banh rang KHONG con quang nguoi dung sang trang Cai dat - no mo ngan keo sua tai cho
+    (anh Luan: "dang o 1 noi nao do, van con phai o do de lam, ma bi dieu huong di thi hoi met").
+    Hop dong moi: chip phai goi cfPop dung ten tham so, va cfPop phai co that. */
+ t("slaChip bam duoc va tro dung tham so", /cfPop\('slaTeacherNote_hours'\)/.test(chip)&&/function cfPop\(name\)/.test(SRC));
  t("slaChip noi ro y nghia khi ro chuot", /data-tip="[^"]*bấm để sửa/.test(chip));
  t("app da dung slaChip o cac cho in so SLA", (SRC.match(/slaChip\(/g)||[]).length>=3);
  t("co ham nhay toi dong cau hinh va to sang", /function cfGo\(name\)\{[\s\S]{0,400}?cfrow_/.test(SRC)&&/cfhl/.test(SRC));
@@ -745,7 +758,7 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  /* kpiChip phai tro dung dong CH6 va in dung nguong dang cau hinh */
  var r=kpiRowOf(/^ATR/);
  if(r){var chip=kpiChip(/^ATR/,0.85,1);
-  t("kpiChip tro dung ma KPI", chip.indexOf("kpiGoCf('"+r.code+"')")>=0);
+  t("kpiChip tro dung ma KPI", chip.indexOf("kpiPop('"+r.code+"')")>=0);
   t("kpiChip in dung nguong dang cau hinh", chip.indexOf(Math.round(kpiTh(/^ATR/,0.85)*100)+"%")>=0);
   var cu=r.threshold;r.threshold="0.7";
   t("doi nguong CH6 thi chip doi theo ngay", kpiChip(/^ATR/,0.85,1).indexOf("70%")>=0);
@@ -758,7 +771,7 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  var L0=rows("DL02")[0];var J=jInfo(L0.lead_id);
  var sb=sopBlock(J);
  if(J.naMsg){
-  t("cau nhac SOP co loi sua", sb.indexOf("msgGo(")>=0);
+  t("cau nhac SOP co loi sua", sb.indexOf("msgPop(")>=0);
   /* V9.29b: chi de BANH RANG, khong con chu "Sua cau nay" - chu thich hien khi ro chuot */
   t("nut sua la banh rang tran, khong co chu", sb.indexOf("Sửa câu này")<0&&/class="cfedit"[\s\S]{0,200}?ti-settings"><\/i><\/button>/.test(sb));
   t("van co chu thich khi ro chuot", /class="cfedit"[^>]*data-tip="[^"]{10,}"/.test(sb));

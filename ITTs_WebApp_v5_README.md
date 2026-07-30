@@ -1905,3 +1905,60 @@ cơ trong báo cáo, cột bảng chặng) nay **sổ dần 30 dòng một lần
 **Cài đặt > Đoạn gợi ý trên màn hình**: 17 đoạn hướng dẫn tĩnh trong app sửa được, áp ngay khắp
 nơi, đi theo cấu hình nên reset dữ liệu demo không mất. Đoạn nào có con số sống (ngưỡng, hạn) thì
 không nằm ở đây - số đó sửa ở Ngưỡng & SLA hoặc Thông điệp CH4.
+
+## Bấm bánh răng là sửa ngay tại chỗ (V9.54)
+
+Từ trước tới nay bấm cái bánh răng nhỏ bên cạnh một con số (hạn SLA, ngưỡng KPI, câu nhắc việc,
+danh mục lựa chọn) là app đưa bạn sang trang **Cài đặt**. Sửa xong lại phải tự tìm đường về chỗ
+đang làm dở.
+
+Nay bấm bánh răng mở một **ngăn kéo ngay trên màn hình đang đứng**:
+
+- Ngăn kéo nói rõ đang sửa cái gì, số đó chi phối chuyện gì, đổi xong màn nào tính lại theo.
+- Sửa - bấm **Lưu & áp dụng** - ngăn kéo đóng, màn hình cũ vẽ lại với số mới. Bạn không đi đâu cả.
+- Ai muốn xem cả nhóm tham số thì trong ngăn kéo vẫn có nút **Mở trang Cài đặt**.
+
+Bốn loại bánh răng đều vậy: **ngưỡng & SLA** (CH2) · **câu nhắc việc** (CH4) · **ngưỡng chỉ số
+KPI** (CH6) · **danh mục lựa chọn** (CH1). Riêng danh mục, ngăn kéo chỉ cho đổi *nhãn* - thêm hay
+xoá một giá trị thì vẫn phải sang trang Cài đặt, vì ở đó app còn hỏi bạn "có đổi luôn N dòng dữ
+liệu đang dùng giá trị này không".
+
+Không muốn thấy bánh răng ở đâu cả? **Cài đặt > Giao diện > Hiện bánh răng trỏ cấu hình** - tắt
+là mọi bánh răng biến mất, chỉ còn con số.
+
+## Mỗi chặng để lại cái gì - và cách xem trọn hành trình một người (V9.54)
+
+Dải hạt tròn cạnh tên mỗi người là **bản đồ vòng đời** của người đó. Trước đây rê chuột vào chỉ
+biết "bước 3/7 - đã qua". Nay:
+
+- **Rê vào một hạt**: câu chú thích kể luôn chặng đó *để lại gì thật trong hồ sơ* - ví dụ
+  "Bước 5/7 · Có KQ, chờ tư vấn - đã qua · để lại: Điểm tổng (overall): 6.0 · L/R/W/S: 6/6.5/5.5/6".
+- **Bấm vào một hạt**: mở ngăn kéo của **đúng chặng đó** - chặng này để làm gì, bước vào lúc nào,
+  nằm ở đó bao lâu, hạn theo SOP là bao nhiêu (bấm bánh răng sửa được ngay), **toàn bộ sản phẩm**
+  chặng đó để lại, và việc cần làm tiếp theo SOP.
+- **Bấm vào chữ C1/C2/C3/C4 đầu dải**: mở **cả hành trình** - mọi chặng từ đầu tới cuối, chặng nào
+  đã qua thì kể sản phẩm và thời gian nằm ở đó, bấm một dòng là xem chi tiết chặng đó.
+
+Cả 17 chặng đều khai sản phẩm, kể cả các nhánh rẽ (chưa gặp được, đã mất, bảo lưu/bỏ học, đăng ký
+đã hủy) - nhánh rẽ cũng có sản phẩm: một quyết định và lý do của nó.
+
+## Con số nào cũng nói được nó ở đâu ra (V9.54)
+
+Mọi con số phần trăm trên app - trên thẻ thống kê, trong bảng, trên lưới KPI, trong phễu chuyển
+đổi - **rê chuột vào là biết cách tính**:
+
+- "84% = 42/50 lượt điểm danh có mặt"
+- "Tỷ lệ chuyển đổi lead · Đang là 43% (81/190 lead đã thành học viên) · Ngưỡng đạt: ≥ 40% · Cách
+  tính: DL02 lead_status = converted trên tổng lead trong kỳ"
+- Mẫu số bằng 0 thì nói thẳng "Chưa có buổi nào nên chưa tính được tỷ lệ", không hiện số giả.
+
+Ô nào in **ngưỡng** (mức phải đạt) thay vì số đo thì chú thích nói rõ "Đây là NGƯỠNG PHẢI ĐẠT,
+không phải số đo hiện tại" - để không ai đọc nhầm thành hiện trạng.
+
+## Bấm vào thẻ thì biết trước nó dẫn đi đâu (V9.54)
+
+Thẻ thống kê nay nói đúng việc nó làm khi bấm: *"Bấm để lọc danh sách bên dưới"* (ở lại trang) hay
+*"Bấm để mở trang Buổi WOW 1-1"* (đổi trang) hay *"Bấm để xem nhanh ngay tại đây"* (mở ngăn kéo).
+
+Và **bấm vào TÊN người ở bất kỳ bảng nào cũng mở ngăn kéo xem nhanh**, không đổi trang nữa. Muốn
+mở hồ sơ đầy đủ thì bấm nút trong ngăn kéo.

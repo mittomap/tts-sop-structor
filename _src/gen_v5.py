@@ -486,6 +486,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 /* ===== V9.21 TOUR HƯỚNG DẪN TỪNG BƯỚC ===== */
 .tourspot{position:fixed;border-radius:12px;pointer-events:none;z-index:150;transition:all .22s cubic-bezier(.4,0,.2,1);
  box-shadow:0 0 0 3px #5B9BD5,0 0 0 6px rgba(91,155,213,.35),0 0 0 9999px rgba(12,22,38,.62)}
+.tourdim{position:fixed;inset:0;background:rgba(12,22,38,.62);z-index:149;pointer-events:none}
 .tournav{position:fixed;border-radius:10px;pointer-events:none;z-index:151;transition:all .22s cubic-bezier(.4,0,.2,1);
  box-shadow:0 0 0 2px #8FD0FF,0 0 0 5px rgba(143,208,255,.28)}
 .tournav.solo{box-shadow:0 0 0 3px #5B9BD5,0 0 0 6px rgba(91,155,213,.35),0 0 0 9999px rgba(12,22,38,.62)}
@@ -1175,6 +1176,16 @@ body.drsz .drawer{transition:none}
 .dhist{background:#F7F9FB;border:1px solid var(--line);border-radius:9px;padding:9px 11px;margin-bottom:12px}
 .dhh{font-size:11px;font-weight:800;color:#5A6675;margin-bottom:5px;display:flex;align-items:center;gap:5px}
 .dhr{font-size:11.5px;color:var(--text);padding:4px 0;border-top:1px solid #EDF1F5;line-height:1.4}.dhr:first-of-type{border-top:none}.dhr.mut{color:var(--muted)}
+.hvjo{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--muted);margin-top:3px}
+.hvjo .ti{font-size:13px;opacity:.75}
+.hvjr.clk{cursor:pointer}
+.hvjr.clk:hover{background:#F4F8FB}
+.msd.clk{cursor:pointer}
+.msd.clk:hover{transform:scale(1.45)}
+.cfpline{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 12px}
+.cfpk{font-size:12px;color:var(--muted);min-width:76px}
+.enpl{max-height:52vh;overflow:auto;padding-right:4px}
+.enpl .cfpline{margin-bottom:8px}
 .ctxbox{background:#F7F9FB;border:1px solid var(--line);border-radius:9px;padding:2px 12px;margin-bottom:12px}
 .ctxr{display:flex;gap:10px;padding:7px 0;border-top:1px solid #EDF1F5;font-size:12px}.ctxr:first-child{border-top:none}
 .ctxk{color:var(--muted);min-width:96px;flex:0 0 auto;white-space:nowrap;font-weight:600}   /* V9.29: nhãn không bẻ đôi khi còn chỗ */.ctxv{color:var(--text);flex:1;font-weight:600}
@@ -3643,7 +3654,7 @@ function upcomingSection(){var D=7;
  var ww=rows("DL14").filter(function(w){return isc(w.wow_status,"booked","confirmed")&&inNextDays(w.wow_session_date,D)}).length;
  var items=[["Hẹn gọi lại",call,"ti-phone-call","#3B82C4","nhaplead"],["Test đầu vào",tst,"ti-file-text","#7C3AED","test"],["Buổi học",ses,"ti-school","#0D9488","banglop"],["Buổi WOW",ww,"ti-star","#DB2777","wow"]];
  var h='<div class="sechd">Sắp diễn ra trong 7 ngày</div><div class="biztiles" style="margin-bottom:18px">';
- items.forEach(function(t){h+='<div class="biztile" style="cursor:pointer" onclick="go(\''+t[4]+'\')"><div class="bti" style="color:'+t[3]+'"><i class="ti '+t[2]+'"></i></div><div class="btv">'+t[1]+'</div><div class="btl">'+esc(t[0])+'</div></div>'});
+ items.forEach(function(t){h+='<div class="biztile" style="cursor:pointer" onclick="go(\''+t[4]+'\')" data-tip="'+esc((t[5]?t[5]+" · ":"")+bamDiDau("go('"+t[4]+"')"))+'"><div class="bti" style="color:'+t[3]+'"><i class="ti '+t[2]+'"></i></div><div class="btv">'+t[1]+'</div><div class="btl">'+esc(t[0])+'</div></div>'});
  return h+'</div>'}
 function bizSection(){var pay=rows("DL07"),L=rows("DL02"),E=rows("DL06"),S=rows("DL09");
  var revTotal=pay.reduce(function(a,b){return a+num(b.amount)},0);
@@ -3655,9 +3666,9 @@ function bizSection(){var pay=rows("DL07"),L=rows("DL02"),E=rows("DL06"),S=rows(
  var enr30=E.filter(function(r){return in30(r.enrollment_time)}).length;
  var revPrev=pay.filter(function(p){return inYm(p.payment_time,ymOf(-1))}).reduce(function(a,b){return a+num(b.amount)},0);
  var trend="";if(revPrev>0){var pctc=Math.round((revMonth-revPrev)/revPrev*100);trend=(pctc>=0?'<span style="color:#16A34A">▲ +':'<span style="color:#DC2626">▼ ')+Math.abs(pctc)+'%</span> so tháng trước'}
- var tiles=[["Doanh thu đã thu",vnd(revTotal),"ti-cash","#16A34A"],["Doanh thu tháng này",vnd(revMonth),"ti-report-money","#0D9488",trend],["Lead mới 30 ngày",String(lead30),"ti-user-plus","#3B82C4"],["Tỷ lệ chuyển đổi",cvr+"%","ti-trending-up",cvr>=40?"#16A34A":cvr>=25?"#D97706":"#DC2626"],["Đăng ký 30 ngày",String(enr30),"ti-clipboard-check","#7C3AED"],["Công nợ tồn",vnd(debt),"ti-alert-triangle",debt>0?"#D97706":"#16A34A"],["HV đang học",String(learning),"ti-users-group","#3B82C4"]];
+ var tiles=[["Doanh thu đã thu",vnd(revTotal),"ti-cash","#16A34A"],["Doanh thu tháng này",vnd(revMonth),"ti-report-money","#0D9488",trend,"Tổng tiền đã thu trong tháng này = "+vnd(revMonth)+(revPrev>0?("; tháng trước "+vnd(revPrev)+" -> chênh "+(revMonth>=revPrev?"+":"")+Math.round((revMonth-revPrev)/revPrev*100)+"%"):"; tháng trước chưa có số để so")],["Lead mới 30 ngày",String(lead30),"ti-user-plus","#3B82C4"],["Tỷ lệ chuyển đổi",cvr+"%","ti-trending-up",cvr>=40?"#16A34A":cvr>=25?"#D97706":"#DC2626","",pctG(conv,L.length,"lead đã thành học viên")],["Đăng ký 30 ngày",String(enr30),"ti-clipboard-check","#7C3AED"],["Công nợ tồn",vnd(debt),"ti-alert-triangle",debt>0?"#D97706":"#16A34A"],["HV đang học",String(learning),"ti-users-group","#3B82C4"]];
  var h='<div class="sechd">Tình hình kinh doanh</div><div class="bizrow"><div class="biztiles">';
- tiles.forEach(function(t){h+='<div class="biztile"><div class="bti" style="color:'+t[3]+'"><i class="ti '+t[2]+'"></i></div><div class="btv">'+esc(t[1])+'</div><div class="btl">'+esc(t[0])+(t[4]?' · '+t[4]:'')+'</div></div>'});
+ tiles.forEach(function(t){h+='<div class="biztile"'+(t[5]?' data-tip="'+esc(t[5])+'"':'')+'><div class="bti" style="color:'+t[3]+'"><i class="ti '+t[2]+'"></i></div><div class="btv">'+esc(t[1])+'</div><div class="btl">'+esc(t[0])+(t[4]?' · '+t[4]:'')+'</div></div>'});
  h+='</div>';var rev=revByMonth();
  h+='<div class="bizchart"><div class="bch">Doanh thu theo tháng (triệu đ)</div>'+(rev.length?svgBarsV(rev,{color:"#16A34A",h:118}):'<div class="empty">Chưa có dữ liệu.</div>')+'</div></div>';
  return h}
@@ -3680,7 +3691,7 @@ function srcPerfSection(){var R=repRange();
  var h='<div class="panel" style="margin-bottom:16px"><div class="ph"><b><i class="ti ti-broadcast" style="margin-right:6px"></i>Hiệu quả theo NGUỒN lead ('+R.lb+')</b><span class="mut" style="font-size:11.5px">nguồn nào đáng đổ tiền - nhìn doanh thu trên số lead</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Nguồn</th><th>Lead</th><th>Đã test</th><th>Đăng ký</th><th>Tỷ lệ chốt</th><th>Doanh thu</th></tr></thead><tbody>';
  if(!order.length)h+='<tr><td class="empty" colspan="6">Không có lead nào trong kỳ.</td></tr>';
  order.forEach(function(k){var v=by[k];
-  h+='<tr><td><b>'+esc(v.lb)+'</b></td><td>'+v.n+'</td><td>'+v.test+'</td><td>'+v.enr+'</td><td>'+(v.n?Math.round(v.enr*100/v.n)+"%":"—")+'</td><td style="text-align:right;font-variant-numeric:tabular-nums">'+vnd(v.rev)+'</td></tr>'});
+  h+='<tr><td><b>'+esc(v.lb)+'</b></td><td>'+v.n+'</td><td>'+v.test+'</td><td>'+v.enr+'</td><td'+(v.n?' data-tip="'+esc(pctG(v.enr,v.n,"lead từ nguồn này đã đăng ký"))+'"':' data-tip="Nguồn này chưa có lead nào trong kỳ"')+'>'+(v.n?Math.round(v.enr*100/v.n)+"%":"—")+'</td><td style="text-align:right;font-variant-numeric:tabular-nums">'+vnd(v.rev)+'</td></tr>'});
  return h+'</tbody></table></div></div>'}
 function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sales/.test(ecode(x.role))&&!/inactive|nghỉ/i.test(String(x.status||""))});
  if(!sales.length)return "";
@@ -3705,7 +3716,7 @@ function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sa
   rows("DL07").forEach(function(p){
    if(myE[p.enrollment_id])rev+=num(p.amount);
    if(String(p.received_by||"")===id)revTay+=num(p.amount)});
-  h+='<tr><td><a class="lnk" onclick="openNSQuick(\''+esc(id)+'\')"><b>'+esc(sv.full_name)+'</b></a><div class="mut" style="font-size:10.5px">'+esc(id)+'</div></td><td>'+nL+'</td><td>'+tp.length+'</td><td>'+(tp.length?Math.round(ok*100/tp.length)+"%":"—")+'</td><td>'+nE7+'</td><td>'+nE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums"><b>'+vnd(rev)+'</b></td>'+
+  h+='<tr><td><a class="lnk" onclick="openNSQuick(\''+esc(id)+'\')"><b>'+esc(sv.full_name)+'</b></a><div class="mut" style="font-size:10.5px">'+esc(id)+'</div></td><td>'+nL+'</td><td>'+tp.length+'</td><td'+(tp.length?' data-tip="'+esc(pctG(ok,tp.length,"lượt liên hệ 7 ngày qua là gặp được khách"))+'"':' data-tip="7 ngày qua chưa có lượt liên hệ nào"')+'>'+(tp.length?Math.round(ok*100/tp.length)+"%":"—")+'</td><td>'+nE7+'</td><td>'+nE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums"><b>'+vnd(rev)+'</b></td>'+
    '<td style="text-align:right;font-variant-numeric:tabular-nums" class="mut">'+vnd(revTay)+'</td></tr>'});
  var tL=0,tT=0,tO=0,tE7=0,tE=0,tR=0,tRt=0;
  sales.forEach(function(sv){var id=sv.staff_id;var myL={};rows("DL02").forEach(function(l){if(String(l.assigned_to||"")===id){myL[l.lead_id]=1;tL++}});
@@ -3714,7 +3725,7 @@ function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sa
   var myE2={};rows("DL06").forEach(function(e){if(myL[e.lead_id]&&!isc(e.enrollment_status,"cancelled"))myE2[e.enrollment_id]=1});
   rows("DL07").forEach(function(p){if(myE2[p.enrollment_id])tR+=num(p.amount);
    if(String(p.received_by||"")===id)tRt+=num(p.amount)})});
- h+='<tr style="font-weight:700;background:#F7F9FC"><td>Cả đội</td><td>'+tL+'</td><td>'+tT+'</td><td>'+(tT?Math.round(tO*100/tT)+"%":"—")+'</td><td>'+tE7+'</td><td>'+tE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums">'+vnd(tR)+'</td>'+
+ h+='<tr style="font-weight:700;background:#F7F9FC"><td>Cả đội</td><td>'+tL+'</td><td>'+tT+'</td><td'+(tT?' data-tip="'+esc(pctG(tO,tT,"lượt liên hệ của cả đội 7 ngày qua là gặp được khách"))+'"':'')+'>'+(tT?Math.round(tO*100/tT)+"%":"—")+'</td><td>'+tE7+'</td><td>'+tE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums">'+vnd(tR)+'</td>'+
   '<td style="text-align:right;font-variant-numeric:tabular-nums" class="mut">'+vnd(tRt)+'</td></tr>';
  h+='</tbody></table></div><div class="mut" style="font-size:11.5px;padding:11px 16px;line-height:1.7">'+
   '<b>Doanh thu khách của mình</b> = mọi khoản đã thu của các đơn thuộc lead người đó phụ trách - đây là con số dùng để đánh giá và để họp. '+
@@ -3740,16 +3751,16 @@ function deptSection(){var L=rows("DL02"),S=rows("DL09"),E=rows("DL06"),pay=rows
  var satV=SV.map(function(x){return num(x.satisfaction_score)}).filter(function(v){return v>0});var satAvg=satV.length?(satV.reduce(function(a,b){return a+b},0)/satV.length).toFixed(1):"-";
  var posFb=cnt(FB,function(x){return/positive/.test(ecode(x.feedback_type))});
  var depts=[
-  {n:"Tư vấn",ic:"ti-user-plus",c:"#3B82C4",s:[["Lead mới",cnt(L,function(r){return isc(r.lead_status,"new")})],["Đã liên hệ",cnt(L,function(r){return isc(r.lead_status,"contacted")})],["Đang cân nhắc",cnt(L,function(r){return isc(r.lead_status,"considering")})],["Chuyển đổi",cvr+"%"]]},
-  {n:"Học vụ",ic:"ti-school",c:"#7C3AED",s:[["HV đang học",cnt(S,function(r){return/active|studying/.test(ecode(r.student_status))})],["Onboarding chưa xong",cnt(OB,function(r){return!/completed/.test(ecode(r.onboarding_status))})],["HV nguy cơ",risk],["Điểm danh 30 ngày",pct(attP,att30.length)]]},
-  {n:"ACA (chuyên môn)",ic:"ti-book",c:"#0D9488",s:[["Bài đã chấm",hwGr+"/"+HW.length],["Chấm đúng 48h",pct(hw48,hwGr||1)],["Test đã chấm",testGr],["Bài chờ chấm",cnt(HW,function(x){return hwSubmitted(x)&&!hwGraded(x)})]]},
-  {n:"WOW",ic:"ti-star",c:"#DB2777",s:[["Buổi hoàn thành",wowDone],["Chờ ghi nội dung",wowNote],["HV vắng",wowNo],["Tỷ lệ dự",pct(wowDone,wowDone+wowNo)]]},
+  {n:"Tư vấn",ic:"ti-user-plus",c:"#3B82C4",s:[["Lead mới",cnt(L,function(r){return isc(r.lead_status,"new")})],["Đã liên hệ",cnt(L,function(r){return isc(r.lead_status,"contacted")})],["Đang cân nhắc",cnt(L,function(r){return isc(r.lead_status,"considering")})],["Chuyển đổi",cvr+"%",pctG(conv,L.length,"lead đã thành học viên")]]},
+  {n:"Học vụ",ic:"ti-school",c:"#7C3AED",s:[["HV đang học",cnt(S,function(r){return/active|studying/.test(ecode(r.student_status))})],["Onboarding chưa xong",cnt(OB,function(r){return!/completed/.test(ecode(r.onboarding_status))})],["HV nguy cơ",risk],["Điểm danh 30 ngày",pct(attP,att30.length),pctG(attP,att30.length,"lượt điểm danh 30 ngày qua là có mặt")]]},
+  {n:"ACA (chuyên môn)",ic:"ti-book",c:"#0D9488",s:[["Bài đã chấm",hwGr+"/"+HW.length],["Chấm đúng 48h",pct(hw48,hwGr||1),pctG(hw48,hwGr,"bài đã chấm được chấm trong "+paramOf("slaHomeworkGrading_hours",48)+" giờ")],["Test đã chấm",testGr],["Bài chờ chấm",cnt(HW,function(x){return hwSubmitted(x)&&!hwGraded(x)})]]},
+  {n:"WOW",ic:"ti-star",c:"#DB2777",s:[["Buổi hoàn thành",wowDone],["Chờ ghi nội dung",wowNote],["HV vắng",wowNo],["Tỷ lệ dự",pct(wowDone,wowDone+wowNo),pctG(wowDone,wowDone+wowNo,"buổi WOW đã đặt mà học viên có đi")]]},
   {n:"Tài chính",ic:"ti-cash",c:"#16A34A",s:[["Doanh thu tháng",vnd(revMonth)],["Công nợ tồn",vnd(debt)],["Chờ xác nhận",unverif],["CK chờ duyệt",discPend]]},
   {n:"CSKH",ic:"ti-headset",c:"#D85A30",s:[["Khiếu nại mở",knOpen],["Đã xử lý",knRes],["Hài lòng TB",satAvg],["Phản hồi tích cực",posFb]]}
  ];
  var h='<div class="sechd">Chỉ số quan trọng theo phòng ban</div><div class="deptgrid">';
  depts.forEach(function(d){h+='<div class="deptc"><div class="depth" style="box-shadow:inset 4px 0 0 '+d.c+'"><div class="depti" style="background:'+d.c+'18;color:'+d.c+'"><i class="ti '+d.ic+'"></i></div><b>'+esc(d.n)+'</b></div><div class="deptb">';
-  d.s.forEach(function(x){h+='<div class="dstat"><div class="dsv">'+esc(String(x[1]))+'</div><div class="dsl">'+esc(x[0])+'</div></div>'});
+  d.s.forEach(function(x){h+='<div class="dstat"'+(x[2]?' data-tip="'+esc(x[2])+'"':'')+'><div class="dsv">'+esc(String(x[1]))+'</div><div class="dsl">'+esc(x[0])+'</div></div>'});
   h+='</div></div>'});
  return h+'</div>'}
 function alertsHTML(){var out=[];
@@ -4532,7 +4543,7 @@ function duyHoanHTML(){
  h+='<div class="panel"><div class="pbody">';
  if(!refund.length)h+='<div class="empty">Không có yêu cầu hoàn tiền.</div>';
  refund.forEach(function(r){var id=esc(r.enrollment_id);var sg=refundSuggest(r);
-  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+duyWho(r)+' - đã đóng '+vnd(num(r.paid_amount))+'</div><div class="amt" style="color:var(--amber)">Gợi ý hoàn '+vnd(sg.amt)+' ('+sg.pct+'%)</div><div class="rs">Lý do hủy: '+esc(r.cancellation_reason||"-")+' - '+esc(sg.why)+'</div></div><div class="act">'+duyXemBtn(r)+'<button class="btn primary" onclick="duyetRefund(\''+id+'\')"><i class="ti ti-cash"></i>Xử lý hoàn tiền</button></div></div>'});
+  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+duyWho(r)+' - đã đóng '+vnd(num(r.paid_amount))+'</div><div class="amt" style="color:var(--amber)" data-tip="'+esc(pctG(sg.amt,num(r.paid_amount),"đồng đề xuất hoàn trên số tiền học viên đã đóng")+" · "+sg.why)+'">Gợi ý hoàn '+vnd(sg.amt)+' ('+sg.pct+'%)</div><div class="rs">Lý do hủy: '+esc(r.cancellation_reason||"-")+' - '+esc(sg.why)+'</div></div><div class="act">'+duyXemBtn(r)+'<button class="btn primary" onclick="duyetRefund(\''+id+'\')"><i class="ti ti-cash"></i>Xử lý hoàn tiền</button></div></div>'});
  return h+'</div></div>'}
 /* ═══════════ V9.37 - DUYỆT PHẢI XEM ĐƯỢC HỒ SƠ (anh Luân) ═══════════
    "Mấy cái chỗ duyệt, không có drawer thông tin thì làm sao biết duyệt kiểu gì."
@@ -4565,7 +4576,7 @@ function duyCkHTML(TH){
  h+='<div class="sechd">Chiết khấu chờ duyệt ('+ck.length+')</div><div class="panel"><div class="pbody">';
  if(!ck.length)h+='<div class="empty">Không có chiết khấu nào chờ duyệt.</div>';
  ck.forEach(function(r){var id=esc(r.enrollment_id);var pct=num(r.total_fee)?Math.round(num(r.discount_amount)/num(r.total_fee)*100):0;
-  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+duyWho(r)+' - '+esc(r.course_id_name||r.course_id)+'</div><div class="amt">'+money(r.discount_amount)+'đ <span style="font-size:12px;color:var(--muted);font-weight:600">('+pct+'% / học phí gốc '+money(r.total_fee)+'đ)</span></div><div class="rs">Loại: '+esc(elabel(r.discount_type)||"-")+' - Lý do: '+esc(r.discount_reason||"-")+'</div></div><div class="act">'+duyXemBtn(r)+'<button class="btn green" onclick="confirmRun(\'Duyệt chiết khấu '+money(r.discount_amount)+'đ cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi tên bạn là người duyệt.\',\'duyetOK\',\''+id+'\')"><i class="ti ti-check"></i>Duyệt</button><button class="btn danger" onclick="confirmRun(\'TỪ CHỐI chiết khấu này? Chiết khấu về 0 và học phí tính lại.\',\'duyetNo\',\''+id+'\')"><i class="ti ti-x"></i>Từ chối</button></div></div>'});
+  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+duyWho(r)+' - '+esc(r.course_id_name||r.course_id)+'</div><div class="amt">'+money(r.discount_amount)+'đ <span style="font-size:12px;color:var(--muted);font-weight:600" data-tip="'+esc(pctG(num(r.discount_amount),num(r.total_fee),"đồng chiết khấu trên học phí gốc"))+'">('+pct+'% / học phí gốc '+money(r.total_fee)+'đ)</span></div><div class="rs">Loại: '+esc(elabel(r.discount_type)||"-")+' - Lý do: '+esc(r.discount_reason||"-")+'</div></div><div class="act">'+duyXemBtn(r)+'<button class="btn green" onclick="confirmRun(\'Duyệt chiết khấu '+money(r.discount_amount)+'đ cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi tên bạn là người duyệt.\',\'duyetOK\',\''+id+'\')"><i class="ti ti-check"></i>Duyệt</button><button class="btn danger" onclick="confirmRun(\'TỪ CHỐI chiết khấu này? Chiết khấu về 0 và học phí tính lại.\',\'duyetNo\',\''+id+'\')"><i class="ti ti-x"></i>Từ chối</button></div></div>'});
  h+='</div></div>';
  if(appr.length){h+='<div class="sechd">Đã quyết định gần đây</div><div class="panel"><div class="pbody">';
   appr.slice(0,8).forEach(function(r){var rej=/từ chối|tu choi/i.test(String(r.discount_approved_by));h+='<div class="appcard done"><div class="info"><div class="id">'+esc(r.enrollment_id)+'</div><div class="big">'+esc(r.student_id_name||r.student_id)+' - CK '+money(r.discount_amount)+'đ</div><div class="rs">'+esc(r.discount_approved_by)+(r.discount_approved_at?' · '+esc(r.discount_approved_at):'')+'</div></div><div class="act"><span class="chip '+(rej?"red":"green")+'" style="padding:6px 12px">'+(rej?"Đã từ chối":"Đã duyệt")+'</span></div></div>'});
@@ -4943,7 +4954,17 @@ function closeModal(){document.getElementById("mask").classList.remove("on");doc
 var TIPCUR=null;
 function tipEl(){var t=document.getElementById("tipbox");
  if(!t){t=document.createElement("div");t.id="tipbox";t.className="tipbox";document.body.appendChild(t)}return t}
-function tipShow(el){var s=el.getAttribute("data-tip");if(!s){tipHide();return}
+/* V9.54 - CHÚ THÍCH TÍNH LÚC RÊ. Có câu chỉ dựng được khi đọc cả hồ sơ (sản phẩm của một chặng
+   chẳng hạn); dựng sẵn cho 100 dòng x 7 hạt là phí công vô ích. data-tipfn khai TÊN một hàm trong
+   sổ TIPFNS (không phải eval chuỗi - eval là cửa mở cho mã lạ), rê vào mới tính, tính xong ghi
+   thẳng vào data-tip nên lần sau khỏi tính lại. */
+var TIPFNS={};
+function tipCalc(el){var fn=el.getAttribute("data-tipfn");if(!fn)return "";
+ var f=TIPFNS[fn];if(typeof f!=="function")return "";
+ try{return String(f(String(el.getAttribute("data-tipa")||"").split("|"))||"")}catch(e){return ""}}
+function tipShow(el){var s=el.getAttribute("data-tip");
+ if(!s){s=tipCalc(el);if(s)el.setAttribute("data-tip",s)}
+ if(!s){tipHide();return}
  if(TIPCUR===el)return; TIPCUR=el;
  var t=tipEl();t.textContent=s;t.className="tipbox on";t.style.left="-9999px";t.style.top="0px";
  var r=el.getBoundingClientRect(),tw=t.offsetWidth,th=t.offsetHeight;
@@ -5188,50 +5209,50 @@ function jCtx(pid,ix){ix=ix||jIndex();
 /* --- 14 chặng: 10 chặng chính + 4 nhánh rẽ --- */
 var JCOL=[["thu","Tuyển sinh","#3B82C4"],["hv","Học vụ","#7C3AED"],["tc","Tài chính","#0D9488"],["cs","CSKH","#DB2777"]];
 var JSTAGE=[
- {k:"new",t:"Lead mới",col:"thu",ic:"ti-user-plus",cls:"gray",owner:"NV Tư vấn",
+ {k:"new",t:"Lead mới",col:"thu",pn:"slaLRT_minutes",ic:"ti-user-plus",cls:"gray",owner:"NV Tư vấn",
   since:function(C){return C.L&&C.L.lead_created_time},sla:function(){return paramOf("slaLeadResponse_min",15)/60},
   need:function(C){return C.phone?[]:["Số điện thoại"]},
   act:function(C){return {lb:"Gọi & ghi kết quả",ic:"ti-phone",fn:"jGoContact",arg:C.pid}},
   why:"Chưa ai liên hệ lần nào. Phải gọi/nhắn trong hạn phản hồi lead mới."},
- {k:"contacted",t:"Đang khai thác",col:"thu",ic:"ti-phone",cls:"blue",owner:"NV Tư vấn",
+ {k:"contacted",t:"Đang khai thác",col:"thu",pn:"slaFollowup_grace_days",ic:"ti-phone",cls:"blue",owner:"NV Tư vấn",
   since:function(C){return (C.L&&(C.L.last_contact_time||C.L.first_call_time))||(C.L&&C.L.lead_created_time)},
   sla:function(){return paramOf("slaFollowup_grace_days",3)*24},
   need:function(C){return []},
   act:function(C){return {lb:"Đặt lịch test đầu vào",ic:"ti-file-text",fn:"jGoTest",arg:C.pid}},
   why:"Đã nói chuyện được. Bước tiếp theo là mời làm test đầu vào để có căn cứ tư vấn."},
- {k:"test_booked",t:"Đã hẹn test",col:"thu",ic:"ti-calendar-check",cls:"blue",owner:"NV Tư vấn",
+ {k:"test_booked",t:"Đã hẹn test",col:"thu",pn:"slaTestBookedRemind_hours",ic:"ti-calendar-check",cls:"blue",owner:"NV Tư vấn",
   since:function(C){return C.testMain&&(C.testMain.booking_date||C.testMain.test_date)},sla:function(){return paramOf("slaTestBookedRemind_hours",24)},
   need:function(C){return (C.testMain&&C.testMain.test_date)?[]:["Ngày giờ test"]},
   act:function(C){return {lb:"Ghi nhận HV dự test",ic:"ti-user-check",fn:"jGoAttend",arg:C.pid}},
   why:"Đã có lịch test. Đến giờ thì ghi nhận HV có dự hay vắng."},
- {k:"test_grading",t:"Chờ chấm test",col:"hv",ic:"ti-file-text",cls:"amber",owner:"GV/Học vụ",
+ {k:"test_grading",t:"Chờ chấm test",col:"hv",pn:"slaGLA_hours",ic:"ti-file-text",cls:"amber",owner:"GV/Học vụ",
   since:function(C){return C.testMain&&C.testMain.test_attendance_time},sla:function(){return paramOf("slaTestResult_hours",24)},
   need:function(C){return []},
   act:function(C){return {lb:"Nhập kết quả test",ic:"ti-writing",fn:"jGoGrade",arg:C.pid}},
   why:"HV đã làm bài. Chấm và trả kết quả đúng hạn để giữ nhiệt."},
- {k:"test_done",t:"Có KQ, chờ tư vấn",col:"thu",ic:"ti-message-2",cls:"amber",owner:"NV Tư vấn",
+ {k:"test_done",t:"Có KQ, chờ tư vấn",col:"thu",pn:"slaCVT_hours",ic:"ti-message-2",cls:"amber",owner:"NV Tư vấn",
   since:function(C){return C.testMain&&(C.testMain.result_time||C.testMain.test_attendance_time)},
   sla:function(){return paramOf("slaConsultAfterTest_hours",24)},
   need:function(C){return (C.testMain&&String(C.testMain.overall_score||"").trim())?[]:["Điểm tổng bài test"]},
   act:function(C){return {lb:"Tư vấn lộ trình",ic:"ti-messages",fn:"jGoConsult",arg:C.pid}},
   why:"Đã có điểm. Tư vấn lộ trình + báo giá ngay khi khách còn quan tâm."},
- {k:"consult",t:"Đang tư vấn",col:"thu",ic:"ti-messages",cls:"amber",owner:"NV Tư vấn",
+ {k:"consult",t:"Đang tư vấn",col:"thu",pn:"slaFollowup_grace_days",ic:"ti-messages",cls:"amber",owner:"NV Tư vấn",
   since:function(C){return C.cons.length&&(C.cons[0].consultation_time||C.cons[0].conversion_time)},
   sla:function(){return paramOf("slaFollowup_grace_days",3)*24},
   need:function(C){return C.cons.length&&String(C.cons[0].recommended_course||"").trim()?[]:["Khóa học đề xuất"]},
   act:function(C){return {lb:"Tạo đăng ký",ic:"ti-clipboard-check",fn:"jGoEnroll",arg:C.pid}},
   why:"Khách đã nghe tư vấn. Chốt khóa và tạo phiếu đăng ký."},
- {k:"enrolled",t:"Đăng ký - chờ thu",col:"tc",ic:"ti-clipboard-check",cls:"amber",owner:"NV Tư vấn / Kế toán",
+ {k:"enrolled",t:"Đăng ký - chờ thu",col:"tc",pn:"slaPayment_grace_days",ic:"ti-clipboard-check",cls:"amber",owner:"NV Tư vấn / Kế toán",
   since:function(C){return C.enrMain&&C.enrMain.enrollment_time},sla:function(){return paramOf("slaPayment_grace_days",7)*24},
   need:function(C){return (C.enrMain&&num(C.enrMain.total_fee)>0)?[]:["Học phí gốc"]},
   act:function(C){return {lb:"Ghi nhận thanh toán",ic:"ti-cash",fn:"jGoPay",arg:C.pid}},
   why:"Đã có phiếu đăng ký nhưng chưa thu đủ tiền."},
- {k:"paid",t:"Đã thu - chờ xếp lớp",col:"hv",ic:"ti-circle-check",cls:"blue",owner:"Học vụ",
+ {k:"paid",t:"Đã thu - chờ xếp lớp",col:"hv",pn:"slaPLR48_hours",ic:"ti-circle-check",cls:"blue",owner:"Học vụ",
   since:function(C){return C.pays.length&&C.pays[C.pays.length-1].payment_time},sla:function(){return paramOf("slaPLR48_hours",48)},
   need:function(C){return []},
   act:function(C){return {lb:"Xếp lớp cho học viên",ic:"ti-layout-grid-add",fn:"jGoPlace",arg:C.pid}},
   why:"Đã đóng đủ tiền. Xếp lớp ngay để HV không phải chờ."},
- {k:"onboarding",t:"Onboarding",col:"hv",ic:"ti-send",cls:"amber",owner:"Học vụ",
+ {k:"onboarding",t:"Onboarding",col:"hv",pn:"slaClassInfoZalo_hours",ic:"ti-send",cls:"amber",owner:"Học vụ",
   since:function(C){return C.obMain&&C.obMain.assigned_at},
   sla:function(){return paramOf("slaClassInfoZalo_hours",24)},
   need:function(C){var o=C.obMain;if(!o)return ["Hồ sơ xếp lớp"];return o.class_id?[]:["Lớp học"]},
@@ -5246,12 +5267,12 @@ var JSTAGE=[
   need:function(C){return []},
   act:function(C){return {lb:"Xem tiến độ học",ic:"ti-chart-line",fn:"jGoProgress",arg:C.pid}},
   why:"Đang học bình thường. Theo dõi chuyên cần, bài tập, WOW và nguy cơ."},
- {k:"ending",t:"Kết thúc khóa",col:"hv",ic:"ti-flag",cls:"amber",owner:"Học vụ",
+ {k:"ending",t:"Kết thúc khóa",col:"hv",pn:"slaFinalTest_days",ic:"ti-flag",cls:"amber",owner:"Học vụ",
   since:function(C){return C.ceMain&&C.ceMain.course_completion_time},sla:function(){return paramOf("slaFinalTest_days",3)*24},
   need:function(C){var r=C.ceMain;return (r&&String(r.final_test_score||"").trim())?[]:["Điểm test cuối khóa"]},
   act:function(C){return {lb:"Nhập kết quả đầu ra",ic:"ti-writing",fn:"ktResult",arg:(C.ceMain||{}).course_end_id}},
   why:"Khóa đã xong. Nhập kết quả đầu ra để đánh giá và mời tái ghi danh."},
- {k:"reenroll",t:"Mời tái ghi danh",col:"cs",ic:"ti-refresh",cls:"amber",owner:"NV Tư vấn",
+ {k:"reenroll",t:"Mời tái ghi danh",col:"cs",pn:"slaReenroll_contact_days",ic:"ti-refresh",cls:"amber",owner:"NV Tư vấn",
   since:function(C){return C.ceMain&&(C.ceMain.re_enrollment_contact_time||C.ceMain.course_completion_time)},
   sla:function(){return paramOf("slaReenroll_contact_days",3)*24},
   need:function(C){return []},
@@ -5262,7 +5283,7 @@ var JSTAGE=[
   need:function(C){return []},act:function(C){return null},
   why:"Hành trình đã trọn vẹn - giữ liên hệ để giới thiệu bạn bè."},
  /* --- nhánh rẽ --- */
- {k:"no_contact",t:"Chưa gặp được",col:"thu",ic:"ti-phone-off",cls:"red",owner:"NV Tư vấn",branch:1,
+ {k:"no_contact",t:"Chưa gặp được",col:"thu",pn:"slaRetryCall_hours",ic:"ti-phone-off",cls:"red",owner:"NV Tư vấn",branch:1,
   since:function(C){return C.L&&C.L.last_contact_time},sla:function(){return paramOf("slaRetryCall_hours",4)},
   need:function(C){return []},
   act:function(C){return {lb:"Gọi lại / đổi kênh",ic:"ti-phone-call",fn:"jGoContact",arg:C.pid}},
@@ -5277,7 +5298,7 @@ var JSTAGE=[
   need:function(C){return []},
   act:function(C){return {lb:"Gọi HV quay lại",ic:"ti-phone",fn:"jGoProgress",arg:C.pid}},
   why:"HV đang dừng học. Cần liên hệ để giữ chân hoặc chốt bảo lưu."},
- {k:"cancelled",t:"Đăng ký đã hủy",col:"tc",ic:"ti-receipt-off",cls:"red",owner:"Kế toán",branch:1,
+ {k:"cancelled",t:"Đăng ký đã hủy",col:"tc",pn:"slaRefundProcess_days",ic:"ti-receipt-off",cls:"red",owner:"Kế toán",branch:1,
   since:function(C){return C.enrMain&&C.enrMain.enrollment_time},sla:function(){return paramOf("slaRefundProcess_days",7)*24},
   need:function(C){return []},
   act:function(C){return {lb:"Xử lý hoàn tiền",ic:"ti-arrow-back-up",fn:"jGoRefund",arg:C.pid}},
@@ -5321,33 +5342,93 @@ function goArc(a){window.ARC=a;window.CHANGK="";go("chang")}
    Hat to = dang dung o day; hat mo = da qua; hat xam = chua toi; hinh thoi do = re nhanh. */
 function mstrip(k,over,pid){var S=JBY[k];if(!S)return "";
  var a=arcOf(k),A=ARCBK[a],rail=ARCRAIL[a]||[],ci=rail.indexOf(k),br=ci<0;
- var tt="Chặng "+A.n+" · "+A.t+" - đang ở: "+S.t+(br?" (rẽ nhánh)":" (bước "+(ci+1)+"/"+rail.length+")")+(over?" · QUÁ HẠN":"")+(pid?" - bấm xem từng chặng":"");
+ var tt="Chặng "+A.n+" · "+A.t+" - đang ở: "+S.t+(br?" (rẽ nhánh)":" (bước "+(ci+1)+"/"+rail.length+")")+(over?" · QUÁ HẠN":"")+(pid?" - bấm một hạt để xem chặng đó để lại gì":"");
  var oc=pid?' onclick="event.stopPropagation();mstripOpen(\''+esc(pid)+'\')"':''; /* V9.18: node bấm được - mở chi tiết từng chặng */
  var h='<span class="mstrip'+(pid?" clk":"")+'" style="--mscol:'+A.col+'" data-tip="'+esc(tt)+'"'+oc+'><span class="msarc" data-tip="'+esc("Chặng "+A.n+" · "+A.t)+'">C'+A.n+'</span>';
  /* V9.27: MỖI HẠT có chú thích riêng - rê vào hạt nào biết ngay đó là bước gì, đã qua hay chưa tới.
-    Trước đây cả dải chỉ có một câu chung nên rê vào hạt khác cũng ra đúng câu đó. */
+    V9.54 (anh Luân): "qua là qua cái gì?" - chú thích phải kể luôn SẢN PHẨM chặng đó để lại, và
+    bấm vào hạt là mở ngăn kéo của đúng chặng đó. Sản phẩm tính lúc rê (data-tipfn) chứ không dựng
+    sẵn: một trang danh sách có cả trăm dòng, mỗi dòng bảy hạt, dựng sẵn là đọc lại hồ sơ 700 lần. */
  rail.forEach(function(rk,i){var st=JBY[rk]||{};
   var tr=br?"đã rẽ nhánh khỏi đường chính":(i<ci?"đã qua":(i===ci?("ĐANG Ở ĐÂY"+(over?" · QUÁ HẠN":"")):"chưa tới"));
-  h+='<span class="msd'+(br?"":(i<ci?" done":(i===ci?" now"+(over?" over":""):"")))+'" data-tip="'+esc("Bước "+(i+1)+"/"+rail.length+" · "+(st.t||rk)+" - "+tr)+'"></span>'});
- if(br)h+='<span class="msd br'+(over?" over":"")+'" data-tip="'+esc("Rẽ nhánh · "+S.t+(over?" - QUÁ HẠN":""))+'"></span>';
+  var cls="msd"+(br?"":(i<ci?" done":(i===ci?" now"+(over?" over":""):"")));
+  var nen="Bước "+(i+1)+"/"+rail.length+" · "+(st.t||rk)+" - "+tr;
+  if(pid)h+='<span class="'+cls+' clk" data-tipfn="mstripTip" data-tipa="'+esc(pid+"|"+rk+"|"+nen)+'" onclick="event.stopPropagation();jStagePop(\''+esc(pid)+'\',\''+esc(rk)+'\')"></span>';
+  else h+='<span class="'+cls+'" data-tip="'+esc(nen)+'"></span>'});
+ if(br)h+=pid?('<span class="msd br clk'+(over?" over":"")+'" data-tipfn="mstripTip" data-tipa="'+esc(pid+"|"+k+"|Rẽ nhánh · "+S.t+(over?" - QUÁ HẠN":""))+'" onclick="event.stopPropagation();jStagePop(\''+esc(pid)+'\',\''+esc(k)+'\')"></span>')
+  :('<span class="msd br'+(over?" over":"")+'" data-tip="'+esc("Rẽ nhánh · "+S.t+(over?" - QUÁ HẠN":""))+'"></span>');
  return h+'</span>'}
+TIPFNS.mstripTip=function(a){var pid=a[0],k=a[1],nen=a.slice(2).join("|");
+ var sp="";try{sp=jOutSum(jCtx(pid),k,2)}catch(e){}
+ return nen+(sp?(" · để lại: "+sp):" · chặng này chưa để lại dữ liệu nào")+" - bấm để xem chi tiết"};
 function mstripFor(pid,ix){if(!pid)return "";try{var J=jInfo(pid,ix);return mstrip(J.k,J.over,pid)}catch(e){return ""}}
-/* V9.18: bấm dải hạt -> drawer "hành trình từng chặng" của đúng người đó */
+/* Khoảng thời gian một người NẰM Ở một chặng: từ lúc vào chặng đó tới lúc vào chặng kế tiếp
+   (chặng hiện tại thì tính tới bây giờ). Không có mốc thì thôi, không bịa. */
+function jStageSpan(C,k,dangO){
+ var i=JMAIN.indexOf(k);if(i<0)return "";
+ var d0=pvnd((JBY[k]&&JBY[k].since(C))||"");if(!d0)return "";
+ var d1=null;
+ for(var j=i+1;j<JMAIN.length;j++){var d=pvnd((JBY[JMAIN[j]].since(C))||"");if(d&&d.getTime()>=d0.getTime()){d1=d;break}}
+ /* Chặng ĐÃ QUA mà không tìm ra mốc chặng kế (dữ liệu ghi lệch ngày) thì THÔI, không nói gì -
+    nói "(tới giờ)" cho một chặng người ta rời từ lâu là nói sai, mà nói sai thì thà im. */
+ if(!d1&&dangO!==k)return "";
+ var ms=(d1?d1.getTime():Date.now())-d0.getTime();if(ms<0)return "";
+ var gio=ms/36e5;
+ return (gio<1?"dưới 1 giờ":(gio<24?(Math.round(gio)+" giờ"):(Math.round(gio/24)+" ngày")))+(d1?"":" (tới giờ)")}
+/* ═══ V9.54 - NGĂN KÉO MỘT CHẶNG. Anh Luân: "bấm vào nút đó thì có hiện ra drawer mô tả lại từ
+   chặng đó họ có thông tin gì không, các sản phẩm ở chặng đó như nào?" Bốn câu hỏi một chặng phải
+   trả lời được: chặng này ĐỂ LÀM GÌ · đã ĐI QUA CHƯA và lúc nào · để lại SẢN PHẨM gì · giờ LÀM GÌ
+   tiếp. Mọi con số hạn đều đi qua slaChip nên bấm bánh răng là sửa được ngay trong ngăn kéo này. */
+function jStagePop(pid,k){var J,C;try{J=jInfo(pid);C=J.C}catch(e){return}
+ var S=JBY[k];if(!S){toast("Không thấy chặng "+k);return}
+ var A=ARCBK[arcOf(k)];
+ var cur=JMAIN.indexOf(J.k),me=JMAIN.indexOf(k);
+ var tt=(k===J.k)?"đang ở đây":((me>=0&&cur>=0&&me<cur)?"đã qua":(me<0?"nhánh rẽ":"chưa tới"));
+ var tcls=(tt==="đang ở đây")?"blue":(tt==="đã qua"?"green":(tt==="nhánh rẽ"?"red":"gray"));
+ var luc="";try{luc=String(S.since(C)||"")}catch(e){}
+ var sp=jReviewRows(C,k);
+ var h='<div class="dcard"><h4><i class="ti '+S.ic+'"></i>'+esc(S.t)+' <span class="chip '+tcls+'" style="margin-left:6px">'+tt+'</span></h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>'+esc(S.why||"")+'</div>';
+ var ct=[["Thuộc chặng lớn","C"+A.n+" · "+esc(A.t)],["Của ai",esc(J.owner||S.owner||"-")]];
+ if(luc)ct.push([(tt==="chưa tới"?"Mốc":"Bước vào lúc"),esc(luc.slice(0,16))]);
+ var span=jStageSpan(C,k,J.k);if(span)ct.push(["Nằm ở chặng này",esc(span)]);
+ if(S.pn)ct.push(["Hạn theo SOP",slaChip(S.pn)]);
+ h+=ctxRows(ct);
+ /* SẢN PHẨM - phần chính của ngăn kéo này */
+ h+='<div class="ph" style="border:0;padding:0 0 6px"><b><i class="ti ti-package" style="margin-right:6px"></i>Sản phẩm chặng này để lại</b></div>';
+ if(sp.length)h+='<div class="rvgrid">'+sp.map(function(pr){return '<div class="rvi"><div class="rvk">'+esc(pr[0])+'</div><div class="rvv">'+esc(pr[1])+'</div></div>'}).join("")+'</div>';
+ else h+='<div class="empty" style="padding:14px">'+(tt==="chưa tới"?"Chưa tới chặng này nên chưa có sản phẩm nào.":"Chặng này chưa để lại dữ liệu nào trong hồ sơ - có thể mới đi qua mà chưa ai ghi lại.")+'</div>';
+ /* việc cần làm theo SOP của chính chặng này (CH4) */
+ var na=(JNA[k]||[])[0]||"";
+ if(na&&msgText(na))h+='<div class="sopna" style="margin-top:10px"><i class="ti ti-checklist"></i><span><b>Việc cần làm theo SOP · '+esc(na)+':</b> '+esc(msgText(na))+'</span>'+msgEditBtn(na)+'</div>';
+ h+='<div class="dact">';
+ if(k===J.k&&J.act)h+='<button class="btn primary" onclick="closeModal();runStart(\''+esc(pid)+'\')"><i class="ti '+(J.act.ic||"ti-player-play")+'"></i>'+esc(J.act.lb)+'</button>';
+ h+='<button class="btn" onclick="mstripOpen(\''+esc(pid)+'\')"><i class="ti ti-route"></i>Xem cả hành trình</button>'+
+  '<button class="btn" onclick="closeModal();jOpen(\''+esc(pid)+'\')"><i class="ti ti-id-badge-2"></i>Mở hồ sơ</button></div></div>';
+ openDrawer(C.name+" · "+S.t,h)}
+/* V9.18: bấm dải hạt -> drawer "hành trình từng chặng" của đúng người đó
+   V9.54: mỗi dòng nay kể luôn SẢN PHẨM và thời gian nằm ở chặng, bấm dòng là mở ngăn kéo chặng đó.
+   Anh Luân: "rõ ràng là thiếu cách để chúng ta xem hành trình của 1 học viên một cách tiện dụng". */
 function mstripOpen(pid){var J,C;try{J=jInfo(pid);C=J.C}catch(e){return}
  var cur=JMAIN.indexOf(J.k);
  var h='<div class="dcard"><h4><i class="ti ti-route"></i>'+esc(J.name)+'</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Cả vòng đời của một người, chặng nào để lại gì. Bấm một chặng để xem đầy đủ sản phẩm của chặng đó.</div>';
  if(J.S&&J.S.branch)h+='<div class="dnote nbred"><b>Đang ở nhánh rẽ: '+esc(J.S.t)+'.</b> '+esc(J.S.why||"")+'</div>';
  h+='<div class="hvj">';
  JMAIN.forEach(function(k,i){var S=JBY[k];var st=(cur<0)?"":(i<cur?"done":(i===cur?"now":""));
   var when=st?String(S.since(C)||""):"";
   var A=ARCBK[arcOf(k)];
-  h+='<div class="hvjr'+(st?" on":"")+'"><span class="hvjd"'+(st==="now"?' style="background:'+A.col+';color:#fff"':'')+'><i class="ti '+(st==="done"?"ti-check":S.ic)+'"></i></span>'+
-   '<div class="hvjc"><b>'+esc(S.t)+(st==="now"?' <span class="chip blue">đang ở đây</span>':'')+'</b><span>Chặng '+A.n+' · '+esc(A.t)+'</span></div>'+
+  var sum=st?jOutSum(C,k,2):"";
+  var span=st?jStageSpan(C,k,J.k):"";
+  h+='<div class="hvjr'+(st?" on":"")+' clk" onclick="jStagePop(\''+esc(pid)+'\',\''+esc(k)+'\')" data-tip="Bấm để xem đầy đủ sản phẩm chặng '+esc(S.t)+'">'+
+   '<span class="hvjd"'+(st==="now"?' style="background:'+A.col+';color:#fff"':'')+'><i class="ti '+(st==="done"?"ti-check":S.ic)+'"></i></span>'+
+   '<div class="hvjc"><b>'+esc(S.t)+(st==="now"?' <span class="chip blue">đang ở đây</span>':'')+'</b><span>Chặng '+A.n+' · '+esc(A.t)+(span?(' · nằm ở đây '+esc(span)):'')+'</span>'+
+   (sum?'<span class="hvjo"><i class="ti ti-package"></i>'+esc(sum)+'</span>':(st?'<span class="hvjo mut"><i class="ti ti-package-off"></i>chưa ghi lại gì ở chặng này</span>':''))+'</div>'+
    '<div class="hvjt">'+(when?esc(when.slice(0,16)):'<span class="mut">-</span>')+'</div></div>'});
  h+='</div>';
  h+='<div class="dact">'+(J.act?'<button class="btn primary" onclick="closeModal();runStart(\''+esc(pid)+'\')"><i class="ti '+((J.act&&J.act.ic)||"ti-player-play")+'"></i>'+esc(J.act?J.act.lb:"Chạy quy trình")+'</button>':'')+
   '<button class="btn" onclick="closeModal();openQuick(\''+esc(pid)+'\')"><i class="ti ti-eye"></i>Xem hồ sơ</button></div></div>';
- openDrawer("Hành trình từng chặng",h)}
+ openDrawer("Hành trình của "+C.name,h)}
 /* ===== V9.15 NODE TANG 3 - sopBlock: BLOCK NGHIEP VU CAN THIET tren moi trang chi tiet =====
    4 dong chuan: Chang (arc + ga + dai hat) / Viec ke / Thoi han / Phu trach
    + canh bao thieu du lieu + cau nhan chuan CH4. btns=false -> khong ve cot nut. */
@@ -5382,15 +5463,15 @@ function msgGo(code){window.SETTAB="ch4";window.MSGQ=code||"";go("settings");
   if(el&&el.scrollIntoView)el.scrollIntoView({block:"center"})},60)}
 /* V9.29b (anh Luân): bỏ chữ "Sửa câu này" - chỉ để BÁNH RĂNG, chú thích hiện khi rê chuột.
    Cùng một ngôn ngữ với slaChip/kpiChip: thấy bánh răng là biết chỗ đó sửa được. */
-function msgEditBtn(code){if(!code)return "";
- return '<button class="cfedit" onclick="event.stopPropagation();msgGo(\''+esc(code)+'\')" '+
+function msgEditBtn(code){if(!code||!gearOn())return "";
+ return '<button class="cfedit" onclick="event.stopPropagation();msgPop(\''+esc(code)+'\')" '+
   'aria-label="Sửa câu nhắc '+esc(code)+'" '+
-  'data-tip="Câu nhắc '+esc(code)+' · lấy từ Cài đặt > CH4 - bấm để sửa"><i class="ti ti-settings"></i></button>'}
+  'data-tip="Câu nhắc '+esc(code)+' · lấy từ CH4 - bấm để sửa ngay tại đây"><i class="ti ti-settings"></i></button>'}
 function enumGo(name){window.SETTAB="ch1";window.ENUMQ=name||"";go("settings")}
 function enumEditBtn(name){if(!name)return "";
- return '<button class="cfedit" onclick="event.stopPropagation();enumGo(\''+esc(name)+'\')" '+
+ return '<button class="cfedit" onclick="event.stopPropagation();enumPop(\''+esc(name)+'\')" '+
   'aria-label="Sửa danh mục '+esc(name)+'" '+
-  'data-tip="Danh mục '+esc(name)+' · lấy từ Cài đặt > CH1 - bấm để sửa"><i class="ti ti-settings"></i></button>'}
+  'data-tip="Danh mục '+esc(name)+' · lấy từ CH1 - bấm để sửa ngay tại đây"><i class="ti ti-settings"></i></button>'}
 function ch4Get(code){if(!code)return null;var a=ch4List();for(var i=0;i<a.length;i++)if(a[i].code===code)return a[i];return null}
 /* V9.29 (anh Luân): CỘT "KHI NÀO HIỆN" cũng phải lấy số từ cấu hình, không cắm cứng.
    Một hàm thay chỗ trống dùng chung cho cả câu mẫu lẫn câu mô tả - hai chỗ mà hai cách thay
@@ -5969,7 +6050,7 @@ function renderRunPreview(){var R=window.RUN;var list=R.q||[];
  h+='<div class="panel"><div class="pbody"><div class="rvq">';
  list.forEach(function(pid,i){var J=jInfo(pid);
   h+='<div class="rvqi" onclick="runPick('+i+')"><span class="rvqn">'+(i+1)+'</span>'+
-   '<div class="rvqm"><div class="rvqnm">'+esc(J.name)+'</div><div class="rvqp">'+esc(J.phone||"")+(J.owner?" · "+esc(J.owner):"")+'</div></div>'+mstrip(J.k,J.over)+
+   '<div class="rvqm"><div class="rvqnm">'+esc(J.name)+'</div><div class="rvqp">'+esc(J.phone||"")+(J.owner?" · phụ trách "+esc(J.owner):"")+'</div></div>'+mstrip(J.k,J.over)+
    '<span class="chip '+J.S.cls+'">'+esc(J.S.t)+'</span>'+
    '<div class="rvqa">'+(J.over?'<span class="chip red" style="margin-right:6px">quá hạn</span>':'')+esc(J.act?J.act.lb:"—")+'</div>'+
    '<button class="btn primary sm" onclick="event.stopPropagation();runPick('+i+')" aria-label="Chạy quy trình cho '+esc(J.name)+'"><i class="ti ti-player-play"></i>Xử lý</button></div>'});
@@ -5982,7 +6063,7 @@ function runFind(q){var el=document.getElementById("runres");if(!el)return;
  var L=jAll().filter(function(J){return String(J.name||"").toLowerCase().indexOf(q)>=0||String(J.phone||"").indexOf(q)>=0}).slice(0,8);
  el.innerHTML=L.length?L.map(function(J){
   return '<div class="rfi" onclick="runStart(\''+esc(J.C.pid)+'\')"><div><div class="rfn">'+esc(J.name)+'</div>'+
-   '<div class="rfm">'+esc(J.phone||"")+' · '+esc(J.C.pid)+(J.owner?' · '+esc(J.owner):'')+'</div></div>'+
+   '<div class="rfm">'+esc(J.phone||"")+' · '+esc(J.C.pid)+(J.owner?' · phụ trách '+esc(J.owner):'')+'</div></div>'+
    '<span class="chip '+J.S.cls+'">'+esc(J.S.t)+'</span>'+
    '<button class="btn primary sm" onclick="event.stopPropagation();runStart(\''+esc(J.C.pid)+'\')" aria-label="'+esc(J.act?J.act.lb:"Xem")+' cho '+esc(J.name)+'"><i class="ti ti-player-play"></i>'+esc(J.act?J.act.lb:"Xem")+'</button></div>'}).join("")
   :'<div class="mut" style="font-size:11.5px;padding:6px 0">Không tìm thấy ai khớp.</div>'}
@@ -6103,7 +6184,7 @@ function chayListHTML(list,qfn){list=list||chayList();qfn=qfn||"chayList";
  list.slice(0,60).forEach(function(J,i){
   var age=J.ageH==null?"":(J.ageH<24?Math.round(J.ageH)+"h":Math.floor(J.ageH/24)+"n");
   h+='<div class="rvqi" onclick="openQuick(\''+esc(J.C.pid)+'\')" title="Xem thông tin"><span class="rvqn">'+(i+1)+'</span>'+
-   '<div class="rvqm"><div class="rvqnm">'+esc(J.name)+'</div><div class="rvqp">'+esc(J.phone||"")+(J.owner?" · "+esc(J.owner):"")+(age?" · "+age:"")+
+   '<div class="rvqm"><div class="rvqnm">'+esc(J.name)+'</div><div class="rvqp">'+esc(J.phone||"")+(J.owner?" · phụ trách "+esc(J.owner):"")+(age?" · "+age:"")+
     (function(){var nf=jNF(J);if(!nf)return "";var td=new Date();var same=nf.getDate()===td.getDate()&&nf.getMonth()===td.getMonth()&&nf.getFullYear()===td.getFullYear();
      if(!same&&nf<td)return ' · <span style="color:var(--red);font-weight:700">trễ hẹn khách '+("0"+nf.getDate()).slice(-2)+"/"+("0"+(nf.getMonth()+1)).slice(-2)+'</span>';
      if(same)return ' · <b style="color:var(--navy)">hẹn '+("0"+nf.getHours()).slice(-2)+":"+("0"+nf.getMinutes()).slice(-2)+' hôm nay</b>';return ""})()+'</div></div>'+mstrip(J.k,J.over)+
@@ -6135,7 +6216,7 @@ function renderChay(){
  var qtxt=R.q?(" · hồ sơ "+(R.i+1)+"/"+R.q.length):"";
  var h='<div class="runwrap">';
  /* thanh trên: ai + lộ trình */
- h+='<div class="runtop"><div class="runwho"><div class="rwn">'+esc(C.name)+'</div><div class="rwm">'+esc(C.phone||"")+(C.sid?" · "+esc(C.sid):"")+(J.owner?" · "+esc(J.owner):"")+esc(qtxt)+'</div></div>';
+ h+='<div class="runtop"><div class="runwho"><div class="rwn">'+esc(C.name)+'</div><div class="rwm">'+esc(C.phone||"")+(C.sid?" · "+esc(C.sid):"")+(J.owner?" · phụ trách "+esc(J.owner):"")+esc(qtxt)+'</div></div>';
  h+='<div class="runact"><button class="btn" onclick="jOpen(\''+esc(R.pid)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button>';
  if(R.q)h+='<button class="btn" onclick="runNext()"><i class="ti ti-player-skip-forward"></i>Bỏ qua người này</button>';
  h+='<button class="btn" onclick="go(\'hanhtrinh\')"><i class="ti ti-x"></i>Thoát</button></div></div>';
@@ -6313,19 +6394,86 @@ function jStageReview(J,k){var S=JBY[k],C=J.C;var live=(k===J.k);
  if(C.L)h+='<button class="btn" onclick="modalNext(\'lienhe\',\'lead_id='+esc(C.L.lead_id)+'\')"><i class="ti ti-phone-plus"></i>Ghi thêm điểm chạm</button>';
  h+='<button class="btn primary" onclick="runBackNow()"><i class="ti ti-arrow-right"></i>Tiếp tục bước hiện tại</button></div></div>';
  return h}
+/* ═══════════ V9.54 - SẢN PHẨM ĐẦU RA CỦA TỪNG CHẶNG ═══════════
+   Anh Luân (30/07): "sản phẩm đầu ra của mỗi chặng là gì? hover vào a lại thấy thông báo là chặng
+   đã qua, nhưng qua là qua cái gì?". Đúng - một chặng không phải cái mốc thời gian, nó là một MẺ
+   VIỆC để lại sản phẩm cụ thể trong hồ sơ: một số gọi được, một phiếu test có điểm, một phiếu thu,
+   một lớp đã xác nhận. Không kể ra thì "đã qua" chỉ là một hạt màu xám vô nghĩa.
+   ĐÂY LÀ NƠI DUY NHẤT khai sản phẩm của từng chặng. Dải hạt (chú thích + ngăn kéo từng chặng),
+   màn Chạy quy trình và trang Hành trình đều đọc bảng này - thêm chặng mà quên khai là _checkux đỏ. */
 function jReviewRows(C,k){var a=[];function ad(x,y){a.push([x,y])}
- var t=C.testMain||{},cs=C.cons[0]||{},e=C.enrMain||{},o=C.obMain||{},r=C.ceMain||{};
- if(k==="new"||k==="contacted")ad("Số lượt liên hệ",(C.L||{}).contact_count),ad("Lần gần nhất",(C.L||{}).last_contact_time),ad("Trạng thái lead",elabel((C.L||{}).lead_status));
- else if(k==="test_booked")ad("Lịch test",t.test_date),ad("Hình thức",elabel(t.test_format)),ad("Trạng thái đặt",elabel(t.booking_status));
- else if(k==="test_grading"||k==="test_done")ad("Dự test",elabel(t.test_attendance_status)),ad("Overall",t.overall_score),ad("L/R/W/S",[t.skill_listening,t.skill_reading,t.skill_writing,t.skill_speaking].join(" / ")),ad("Nhận xét GV",t.academic_note);
- else if(k==="consult")ad("Khóa đề xuất",cs.recommended_course),ad("Lịch đề xuất",cs.recommended_schedule),ad("Phản hồi",elabel(cs.conversion_status)),ad("Ghi chú",cs.consultation_note);
- else if(k==="enrolled")ad("Khóa",e.course_id_name),ad("Tổng phí",vnd(num(e.final_fee)||num(e.total_fee))),ad("Chiết khấu",vnd(num(e.discount_amount))),ad("Trạng thái ĐK",elabel(e.enrollment_status));
- else if(k==="paid")ad("Đã thu",vnd(num(e.paid_amount))),ad("Còn lại",vnd(num(e.remaining_amount))),ad("Số phiếu thu",C.pays.length);
- else if(k==="onboarding")ad("Lớp",o.class_id_name||o.class_id),ad("Gửi info lớp",o.class_info_sent_at||"chưa"),ad("HV xác nhận",elabel(o.class_confirmation_status)),ad("Onboarding",elabel(o.onboarding_status));
- else if(k==="learning")ad("Lớp",o.class_id_name||o.class_id),ad("Chuyên cần",(C.att||[]).filter(function(x){return isc(x.attendance_status,"on_time","late")}).length+"/"+(C.att||[]).length),ad("Bài đã chấm",(C.hw||[]).filter(hwGraded).length+"/"+(C.hw||[]).length),ad("WOW còn",(C.S||{}).wow_quota_remaining);
- else if(k==="ending")ad("Điểm cuối",r.final_test_score),ad("Chuyên cần",r.attendance_rate),ad("Đạt mục tiêu",elabel(r.achievement_status));
- else if(k==="reenroll")ad("Tái ĐK",elabel(r.re_enrollment_status)),ad("Liên hệ lúc",r.re_enrollment_contact_time);
- return a.filter(function(p){return p[1]!==undefined&&p[1]!==null&&String(p[1]).trim()!==""&&String(p[1])!=="/ / /"})}
+ var L=C.L||{},t=C.testMain||{},cs=C.cons[0]||{},e=C.enrMain||{},o=C.obMain||{},r=C.ceMain||{},S=C.S||{};
+ var lrws=[t.skill_listening,t.skill_reading,t.skill_writing,t.skill_speaking];
+ if(k==="new"){ad("Nguồn lead",elabel(L.lead_source));ad("Số điện thoại",L.phone_number);
+  ad("Vào hệ thống lúc",L.lead_created_time);ad("Giao cho",L.assigned_to_name||L.assigned_to);
+  ad("Điểm mục tiêu",L.target_band);ad("Đối tượng",elabel(L.student_type))}
+ else if(k==="contacted"){ad("Số lượt liên hệ",L.contact_count);ad("Lần gần nhất",L.last_contact_time);
+  var tp0=(C.tps||[])[0]||{};ad("Kênh gần nhất",elabel(tp0.channel));ad("Kết quả gần nhất",cresLabel(ecode(tp0.result_note)));
+  ad("Trạng thái lead",elabel(L.lead_status));ad("Mục tiêu học",elabel(L.learning_goal)||L.learning_goal);
+  ad("Lịch rảnh",L.availability_schedule);ad("Hình thức mong muốn",elabel(L.learning_mode))}
+ else if(k==="test_booked"){ad("Lịch test",t.test_date);ad("Hình thức",elabel(t.test_format));
+  ad("Trạng thái đặt",elabel(t.booking_status));ad("Ghi chú đặt lịch",t.booking_note)}
+ else if(k==="test_grading"){ad("Dự test",elabel(t.test_attendance_status));ad("Vào phòng lúc",t.test_attendance_time);
+  ad("Bắt đầu / kết thúc",[t.test_start_actual,t.test_end_actual].filter(function(x){return x}).join(" → "));
+  ad("Người chấm",t.graded_by);ad("Trạng thái chấm",elabel(t.test_status))}
+ else if(k==="test_done"){ad("Điểm tổng (overall)",t.overall_score);
+  ad("L/R/W/S",lrws.filter(function(x){return x!==""&&x!=null}).length?lrws.join(" / "):"");
+  ad("Nhận xét GV",t.academic_note);ad("Trả kết quả lúc",t.result_time)}
+ else if(k==="consult"){ad("Khóa đề xuất",cs.recommended_course);ad("Thời lượng đề xuất",cs.recommended_duration);
+  ad("Lịch đề xuất",cs.recommended_schedule);ad("Phản hồi khách",elabel(cs.conversion_status));
+  ad("Tư vấn lúc",cs.consultation_time);ad("Người tư vấn",cs.consulted_by);ad("Ghi chú tư vấn",cs.consultation_note)}
+ else if(k==="enrolled"){ad("Mã đăng ký",e.enrollment_id);ad("Khóa",e.course_id_name);
+  ad("Học phí gốc",num(e.total_fee)?vnd(num(e.total_fee)):"");
+  ad("Chiết khấu",num(e.discount_amount)?(vnd(num(e.discount_amount))+(e.discount_reason?(" · "+e.discount_reason):"")):"");
+  ad("Phải thu",num(e.final_fee)?vnd(num(e.final_fee)):"");ad("Trạng thái đăng ký",elabel(e.enrollment_status));
+  ad("Đăng ký lúc",e.enrollment_time)}
+ else if(k==="paid"){ad("Đã thu",vnd(num(e.paid_amount)));ad("Còn lại",vnd(num(e.remaining_amount)));
+  ad("Số phiếu thu",C.pays.length?(C.pays.length+" phiếu"):"");
+  var pl=C.pays[C.pays.length-1]||{};ad("Lần thu gần nhất",pl.payment_time);ad("Hình thức",elabel(pl.payment_method));
+  ad("Trạng thái thu",elabel(e.payment_status))}
+ else if(k==="onboarding"){ad("Lớp được xếp",o.class_id_name||o.class_id);ad("Xếp lớp lúc",o.assigned_at);
+  ad("Người xếp",o.assigned_by);ad("Gửi thông tin lớp",o.class_info_sent_at||"chưa gửi");
+  ad("HV xác nhận",elabel(o.class_confirmation_status));ad("Trạng thái onboarding",elabel(o.onboarding_status));
+  ad("Số lần đổi lớp",num(o.placement_change_count)?o.placement_change_count:"")}
+ else if(k==="learning"){ad("Lớp đang học",o.class_id_name||o.class_id);
+  var att=C.att||[],co=att.filter(function(x){return isc(x.attendance_status,"on_time","late")}).length;
+  ad("Buổi đã ghi nhận",att.length?att.length+" buổi":"");
+  ad("Chuyên cần",att.length?(co+"/"+att.length+" buổi có mặt · "+Math.round(co/att.length*100)+"%"):"");
+  var hw=C.hw||[],hg=hw.filter(hwGraded).length;
+  ad("Bài tập",hw.length?(hg+"/"+hw.length+" bài đã chấm"):"");
+  ad("Buổi WOW đã dùng",(C.wow||[]).length?((C.wow||[]).length+" buổi"):"");
+  ad("WOW còn lại",S.wow_quota_remaining);ad("Điểm giữa khóa",o.mid_overall);
+  ad("Hoạt động học gần nhất",S.last_learning_activity_time)}
+ else if(k==="ending"){ad("Điểm đầu ra",r.final_test_score);
+  ad("L/R/W/S cuối",[r.final_listening,r.final_reading,r.final_writing,r.final_speaking].filter(function(x){return x!==""&&x!=null}).length?[r.final_listening,r.final_reading,r.final_writing,r.final_speaking].join(" / "):"");
+  ad("Mục tiêu ban đầu",r.target_band);ad("Đạt mục tiêu",elabel(r.achievement_status));
+  ad("Chuyên cần cả khóa",r.attendance_rate);ad("Tỷ lệ hoàn thành",r.completion_rate);
+  ad("Kết thúc khóa lúc",r.course_completion_time)}
+ else if(k==="reenroll"){ad("Trạng thái tái ghi danh",elabel(r.re_enrollment_status));
+  ad("Liên hệ mời lúc",r.re_enrollment_contact_time);ad("Khóa đề xuất tiếp",r.next_course_recommendation);
+  ad("Ghi chú",r.re_enrollment_note)}
+ else if(k==="alumni"){ad("Hoàn tất khóa lúc",r.course_completion_time);ad("Điểm đầu ra",r.final_test_score);
+  ad("Đạt mục tiêu",elabel(r.achievement_status));ad("Đăng ký kế tiếp",r.next_enrollment_id);
+  ad("Đã cho cảm nhận",r.testimonial_given);ad("Mã giới thiệu",S.referral_code);
+  ad("Đã giới thiệu được",num(S.referral_enrolled)?(S.referral_enrolled+" bạn"):"")}
+ /* --- nhánh rẽ cũng có sản phẩm: một quyết định và lý do của nó --- */
+ else if(k==="no_contact"){ad("Số lượt đã gọi",L.contact_count);ad("Gọi hụt liên tiếp",(function(){try{return L.lead_id?(failStreak(L.lead_id)+" lần"):""}catch(x){return ""}})());
+  ad("Lần thử gần nhất",L.last_contact_time);
+  ad("Kênh đã thử",(function(){var m={};(C.tps||[]).forEach(function(x){var c=elabel(x.channel);if(c)m[c]=1});return Object.keys(m).join(", ")})());
+  ad("Ghi chú",L.lead_note)}
+ else if(k==="lost"){ad("Trạng thái lead",elabel(L.lead_status));ad("Lần liên hệ cuối",L.last_contact_time);
+  ad("Tổng số lượt đã chạm",L.contact_count);ad("Lý do / ghi chú",L.lead_note)}
+ else if(k==="paused"){ad("Trạng thái học viên",elabel(S.student_status));
+  ad("Hoạt động học gần nhất",S.last_learning_activity_time);ad("Bảo lưu tới",S.pause_until);
+  ad("Lý do chuyên cần",S.attendance_risk_reason);ad("Lý do học lực",S.academic_risk_reason);
+  ad("Ghi chú chăm sóc",S.learning_followup_note)}
+ else if(k==="cancelled"){ad("Trạng thái đăng ký",elabel(e.enrollment_status));ad("Lý do hủy",e.cancellation_reason);
+  ad("Đã thu",num(e.paid_amount)?vnd(num(e.paid_amount)):"");
+  ad("Phải hoàn",num(e.paid_amount)?vnd(num(e.paid_amount)):"");ad("Ghi chú",e.notes)}
+ return a.filter(function(p){return p[1]!==undefined&&p[1]!==null&&String(p[1]).trim()!==""&&String(p[1])!=="/ / /"&&String(p[1])!==" / / / "})}
+/* Một dòng tóm tắt sản phẩm - dùng cho chú thích khi rê vào hạt (chỗ chỉ đủ chỗ cho một câu). */
+function jOutSum(C,k,n){var a=jReviewRows(C,k);if(!a.length)return "";
+ return a.slice(0,n||2).map(function(p){return p[0]+": "+p[1]}).join(" · ")}
 function runTouchList(tps,J){
  if(!tps.length)return '<div class="rtlist"><div class="mut" style="font-size:11.5px">Chưa có điểm chạm nào ở chặng "'+esc(J.S.t)+'".</div></div>';
  return '<div class="rtlist"><div class="rtlh">'+tps.length+' lần chạm ở chặng này</div>'+
@@ -6402,7 +6550,7 @@ function renderBanlam(){
  var nWow=rows("DL14").filter(function(w){return isc(w.wow_status,"booked","confirmed")||(ecode(w.wow_status)==="completed"&&!(w.wow_content_note&&String(w.wow_content_note).trim()))}).length;
  var reupN=cS("lost")+cS("no_contact");
  function stat(ic,n,lb,col,act,org){var dim=(window.MINEONLY&&org);
-  return '<div class="bstat'+(n?"":" z")+(dim?" z":"")+'" onclick="'+act+'" title="'+(dim?"Đếm TOÀN trung tâm - không lọc theo bạn":"Bấm để lọc danh sách bên dưới")+'"><span class="bsic" style="background:'+col+'18;color:'+col+'"><i class="ti '+ic+'"></i></span><div><div class="bsn">'+n+'</div><div class="bsl">'+esc(lb)+'</div></div>'+(n?'<i class="ti ti-chevron-down bsarr"></i>':'')+'</div>'}
+  return '<div class="bstat'+(n?"":" z")+(dim?" z":"")+'" onclick="'+act+'" data-tip="'+esc((dim?"Đếm TOÀN trung tâm - không lọc theo bạn · ":"")+bamDiDau(act))+'"><span class="bsic" style="background:'+col+'18;color:'+col+'"><i class="ti '+ic+'"></i></span><div><div class="bsn">'+n+'</div><div class="bsl">'+esc(lb)+'</div></div>'+(n?'<i class="ti ti-chevron-down bsarr"></i>':'')+'</div>'}
  /* V9.18c (Luân xác nhận THỪA): bỏ 8 khối đếm-theo-chặng - trùng chip lọc "Nhóm" ngay dưới và
     Bảng chặng đã gộp vào trang. Chỉ giữ khối có GIÁ TRỊ RIÊNG (lối tắt sang trang khác / tập đặc biệt). */
  var blocks=[
@@ -6487,7 +6635,7 @@ function renderReview(embed){var p="review",fil=fget(p);
  /* V9.51: 3 o loc doi lot chip ben duoi (chip da mang so) - bo; giu o thong tin thuan */
  h+=statStrip([
   ["ti-clipboard-text",waiting,"Phiếu chờ trả lời","#E08A1E","nhắc HV nộp"],
-  ["ti-target",Math.round(kpiTh(/^SRR/,0.6)*100)+"%","Ngưỡng tỷ lệ trả lời (SRR)","#7C3AED","lớp dưới ngưỡng nằm ở chip lọc"]]);
+  ["ti-target",Math.round(kpiTh(/^SRR/,0.6)*100)+"%","Ngưỡng tỷ lệ trả lời (SRR)","#7C3AED","lớp dưới ngưỡng nằm ở chip lọc","",nguongGiai("SRR","tỷ lệ học viên trả lời khảo sát")]]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả lớp",all.length],["none","Chưa gửi đợt nào",nNone,"red"],["low","Trả lời kém",nLow,"amber"],["fu","Có phiếu cần follow-up",nFu?nFu:"","amber"]],view.length);
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>HV</th><th>Đã gửi</th><th>Đã trả lời</th><th>Tỷ lệ (SRR)</th><th>Hài lòng TB</th><th>Cần follow-up</th><th>Đợt gần nhất</th><th>Thao tác</th></tr></thead><tbody>';
@@ -6497,7 +6645,7 @@ function renderReview(embed){var p="review",fil=fget(p);
   var scls=i.ss==null?"":(i.ss>=kpiTh(/^SS/,4.5)?"green":"amber");
   h+='<tr><td><b>'+esc(c.class_name||c.class_id)+'</b><div class="mut" style="font-size:10.5px">'+esc(c.class_id)+'</div></td>'+
    '<td>'+i.stu+'</td><td>'+i.mine.length+'</td><td>'+i.sub.length+'</td>'+
-   '<td>'+(i.rate==null?'<span class="mut">—</span>':'<span class="chip '+rcls+'">'+Math.round(i.rate*100)+'%</span>')+'</td>'+
+   '<td>'+(i.rate==null?'<span class="mut" data-tip="Lớp này chưa gửi phiếu khảo sát nào nên chưa tính được">—</span>':'<span class="chip '+rcls+'" data-tip="'+esc(pctG(i.sub.length,i.mine.length,"phiếu đã gửi được học viên trả lời")+" · ngưỡng đạt "+Math.round(kpiTh(/^SRR/,0.6)*100)+"% (CH6 · SRR)")+'">'+Math.round(i.rate*100)+'%</span>')+'</td>'+
    '<td>'+(i.ss==null?'<span class="mut">—</span>':'<span class="chip '+scls+'">'+i.ss.toFixed(1)+'/5</span>')+'</td>'+
    '<td>'+(i.fu.length?'<span class="chip red">'+i.fu.length+'</span>':'<span class="mut">0</span>')+'</td>'+
    '<td>'+(i.last?esc(vnd2(i.last)):'<span class="chip red">chưa gửi</span>')+'</td>'+
@@ -6679,7 +6827,7 @@ function renderHanhtrinh(embed){ /* V9.18: thân trang dùng được cả khi N
    var age=J.ageH==null?"":(J.ageH<24?(Math.round(J.ageH)+"h"):(Math.floor(J.ageH/24)+"n"));
    h+='<div class="jcard'+(J.over?" over":"")+'" onclick="openQuick(\''+esc(J.C.pid)+'\')" title="Xem thông tin">';
    h+='<div class="jn">'+esc(J.name)+'</div>';
-   h+='<div class="jm">'+esc(J.phone||"")+(J.owner?' · '+esc(J.owner):'')+(age?' · <b>'+age+'</b>':'')+'</div>';
+   h+='<div class="jm">'+esc(J.phone||"")+(J.owner?' · phụ trách '+esc(J.owner):'')+(age?' · <b>'+age+'</b>':'')+'</div>';
    h+='<div style="display:flex;margin:4px 0 1px">'+mstrip(J.k,J.over,J.C.pid)+'</div>';
    if(J.miss.length)h+='<div class="jmiss"><i class="ti ti-file-alert"></i>Thiếu: '+esc(J.miss.join(", "))+'</div>';
    if(J.act)h+='<button class="jgo" onclick="event.stopPropagation();runStart(\''+esc(J.C.pid)+'\')"><i class="ti '+J.act.ic+'"></i>'+esc(J.act.lb)+'</button>';
@@ -6763,6 +6911,8 @@ function renderHoso(){
  /* 2 cột: dữ liệu + timeline */
  h+='<div class="jgrid"><div>';
  function kv(k,v){return '<div class="kv"><span class="k">'+k+'</span><span class="v">'+(v==null||v===""?"-":v)+'</span></div>'}
+ /* V9.54: dòng nào là CON SỐ DẪN XUẤT thì phải nói được nó ở đâu ra - kvT là kv có chú thích. */
+ function kvT(k,v,gt){return '<div class="kv"'+(gt?' data-tip="'+esc(gt)+'"':'')+'><span class="k">'+k+'</span><span class="v">'+(v==null||v===""?"-":v)+'</span></div>'}
  function card(icon,title,body){return '<div class="bcard"><h4><i class="ti '+icon+'"></i>'+title+'</h4>'+body+'</div>'}
  var S=C.S||{},L=C.L||{};
  var paid=C.pays.reduce(function(a,b){return a+num(b.amount)},0);
@@ -6792,12 +6942,12 @@ function renderHoso(){
  if(C.enr.length)h+=card("ti-cash","Học phí",kv("Số đăng ký",C.enr.length)+kv("Tổng phí",vnd(totFee))+kv("Đã thu",vnd(paid))+kv("Còn lại",'<b style="color:'+(rem>0?"var(--red)":"var(--green)")+'">'+vnd(rem)+'</b>')+kv("Trạng thái",esc(elabel((C.enrMain||{}).payment_status)||"-"))+((C.enrMain||{}).next_payment_due?kv("Hẹn thu tiếp",esc(C.enrMain.next_payment_due)):""));
  if(C.ob.length){var o=C.obMain;h+=card("ti-school","Lớp & học tập",kv("Lớp",lopLnk(o.class_id,o.class_id_name,"-"))+kv("Onboarding",esc(elabel(o.onboarding_status)||"-"))+kv("Chuyên cần",present+"/"+C.att.length+" buổi")+kv("Bài tập",C.hw.filter(hwGraded).length+"/"+C.hw.length+" đã chấm")+kv("WOW còn",esc(S.wow_quota_remaining||"-")))}
  if(C.sv.length||C.kn.length)h+=card("ti-message-2","Cảm nhận & khiếu nại",kv("Khảo sát",C.sv.length)+kv("Phản hồi",C.fb.length)+kv("Khiếu nại",C.kn.length)+C.kn.slice(0,3).map(function(k){return kv(esc(elabel(k.complaint_type)),'<span class="chip '+stCls(k.complaint_status)+'">'+esc(elabel(k.complaint_status))+'</span>')}).join(""));
- if(C.ceMain)h+=card("ti-flag","Kết thúc & tái ĐK",kv("Điểm cuối",esc(C.ceMain.final_test_score||"-"))+kv("Chuyên cần",esc(C.ceMain.attendance_rate||"-"))+kv("Đạt mục tiêu",esc(elabel(C.ceMain.achievement_status)||"-"))+kv("Tái ĐK",esc(elabel(C.ceMain.re_enrollment_status)||"-")));
+ if(C.ceMain)h+=card("ti-flag","Kết thúc & tái ĐK",kv("Điểm cuối",esc(C.ceMain.final_test_score||"-"))+kvT("Chuyên cần",esc(C.ceMain.attendance_rate||"-"),"Tỷ lệ buổi có mặt tính cho CẢ KHÓA, chốt lúc kết thúc khóa (DL18 · attendance_rate) - không phải số đang chạy của lớp hiện tại")+kv("Đạt mục tiêu",esc(elabel(C.ceMain.achievement_status)||"-"))+kv("Tái ĐK",esc(elabel(C.ceMain.re_enrollment_status)||"-")));
  /* Mã giới thiệu - để tư vấn viên đọc/gửi cho học viên (đọc nhanh, không sửa) */
  if(S&&S.student_id){var _off=hvRefOffer(),_code=hvRefCode(S),_used=hvRefUsed(S);
   h+=card("ti-gift","Giới thiệu bạn bè",
    kv("Mã của HV",'<b style="font-family:ui-monospace,Menlo,monospace;letter-spacing:1px">'+esc(_code)+'</b>')+
-   kv("Bạn bè giảm",'<b style="color:var(--red)">'+esc(_off.txt)+'</b>')+
+   kvT("Bạn bè giảm",'<b style="color:var(--red)">'+esc(_off.txt)+'</b>',"Mức giảm cho người được giới thiệu khi đăng ký khóa đầu - lấy từ Cài đặt > CH2 (chính sách giới thiệu), không cắm cứng trong app")+
    kv("Đã giới thiệu",_used>0?('<span class="chip green">'+_used+' bạn</span>'):'<span class="mut">chưa có</span>')+
    '<div style="margin-top:8px"><button class="btn sm" onclick="hvCopy(\''+esc(_code)+'\',\'Đã sao chép mã '+esc(_code)+'\')"><i class="ti ti-copy"></i>Sao chép mã</button></div>');}
  h+='</div></div><div>';
@@ -7193,9 +7343,9 @@ function renderBanglop(){
   var cap=num(lop.class_capacity),cur=num(lop.current_enrollment)||nStu;
   var curP=cap>0?cur/cap:null, attP=att.length?pres/att.length:null, hcrP=hw.length?hwSub/hw.length:null;
   h+=statStrip([
-   ["ti-users-group",cur+(cap?"/"+cap:""),"Sĩ số","#3B82C4",curP==null?"":Math.round(curP*100)+"% sức chứa"],
-   ["ti-checkbox",attP==null?"—":Math.round(attP*100)+"%","Chuyên cần (ATR)",(attP!=null&&attP>=kpiTh(/^ATR/,0.85))?"#16A34A":"#E24B4A","mục tiêu ≥ "+kpiChip(/^ATR/,0.85,1)],
-   ["ti-book",hcrP==null?"—":Math.round(hcrP*100)+"%","Nộp bài (HCR)",(hcrP!=null&&hcrP>=kpiTh(/^HCR/,0.8))?"#16A34A":"#E08A1E","mục tiêu ≥ "+kpiChip(/^HCR/,0.8,1)],
+   ["ti-users-group",cur+(cap?"/"+cap:""),"Sĩ số","#3B82C4",curP==null?"":Math.round(curP*100)+"% sức chứa","",cap?pctG(cur,cap,"chỗ đã có người"):"Lớp chưa khai sức chứa nên chưa tính được tỷ lệ lấp đầy"],
+   ["ti-checkbox",attP==null?"—":Math.round(attP*100)+"%","Chuyên cần (ATR)",(attP!=null&&attP>=kpiTh(/^ATR/,0.85))?"#16A34A":"#E24B4A","mục tiêu ≥ "+kpiChip(/^ATR/,0.85,1),"",attP==null?"Lớp chưa có buổi nào được điểm danh":pctG(pres,att.length,"lượt điểm danh có mặt (đúng giờ hoặc đi trễ)")],
+   ["ti-book",hcrP==null?"—":Math.round(hcrP*100)+"%","Nộp bài (HCR)",(hcrP!=null&&hcrP>=kpiTh(/^HCR/,0.8))?"#16A34A":"#E08A1E","mục tiêu ≥ "+kpiChip(/^HCR/,0.8,1),"",hcrP==null?"Lớp chưa giao bài nào":pctG(hwSub,hw.length,"bài đã nộp")],
    ["ti-user-exclamation",risk,"HV nguy cơ",risk?"#DB2777":"#16A34A",risk?"cần can thiệp":"ổn"],
    ["ti-thumb-up",ss==null?"—":ss.toFixed(1)+"/5","Hài lòng (SS)",(ss!=null&&ss>=kpiTh(/^SS/,4.5))?"#16A34A":"#E08A1E","mục tiêu ≥ "+kpiTh(/^SS/,4.5)]]);
  })();
@@ -7824,8 +7974,8 @@ function kpiSection(){var comp=kpiCompute();var ch6=(DATA.config&&DATA.config.ch
       TẦNG 3: bung chi tiết khi bấm. */
    h+='<div class="kpirow'+(doc?" hasdoc":"")+'" title="'+esc(k.name)+'"'+(doc?' onclick="kpiOpen(\''+k.code+'\')" style="cursor:pointer"':'')+'>'+
     '<div class="kpil"><span class="kpic">'+esc(k.code)+'</span><span class="kpin">'+esc(kpiShort(k.name))+'</span></div>'+
-    '<div class="kpiv '+SL[1]+'">'+esc(kpiFmt(k.code,na?null:c))+'</div>'+
-    '<div class="kpig">'+esc(k.dir||"")+' '+esc(kpiFmt(k.code,th))+'</div>'+
+    '<div class="kpiv '+SL[1]+'" data-tipfn="kpiTip" data-tipa="'+esc(k.code)+'">'+esc(kpiFmt(k.code,na?null:c))+'</div>'+
+    '<div class="kpig" data-tipfn="kpiTip" data-tipa="'+esc(k.code)+'">'+esc(k.dir||"")+' '+esc(kpiFmt(k.code,th))+'</div>'+
     '<span class="kpisev '+SL[1]+'">'+esc(SL[0])+'</span></div>';
    if(doc&&!na&&sev!=="tot"&&sev!=="dat"){
     var d=kpiNum(k.code);
@@ -7891,7 +8041,7 @@ function kpiTop3Section(){
   h+='<div class="k3card '+SL[1]+'"><div class="k3hd"><span class="k3n">'+(i+1)+'</span>'+
    '<div><b>'+esc(x.name)+'</b><span class="mut"> · '+esc(x.code)+'</span></div>'+
    '<span class="kpisev '+SL[1]+'" style="margin-left:auto">'+esc(SL[0])+'</span></div>'+
-   '<div class="k3v">'+esc(kpiFmt(x.code,x.v))+' <span class="mut" style="font-size:11px">mục tiêu '+esc(x.dir||"")+' '+esc(kpiFmt(x.code,x.th))+'</span></div>'+
+   '<div class="k3v" data-tipfn="kpiTip" data-tipa="'+esc(x.code)+'">'+esc(kpiFmt(x.code,x.v))+' <span class="mut" style="font-size:11px" data-tipfn="kpiTip" data-tipa="'+esc(x.code)+'">mục tiêu '+esc(x.dir||"")+' '+esc(kpiFmt(x.code,x.th))+'</span></div>'+
    '<div class="k3d">'+esc(doc.doc[x.sev]||"")+(d.lbl?' <b>'+esc(d.lbl)+'</b>.':'')+'</div>'+
    '<div class="k3q mut">'+esc(kpiQuy(x.code,x.v,x.th,x.dir))+'</div><div class="kpiacts">';
   acts.slice(0,2).forEach(function(a){h+=kpiBtn(a[0],a[1],a[2],a[3])});
@@ -7932,9 +8082,9 @@ function baocaoBranch(){
   h+='<tr><td><b>'+esc(brOf(k.b))+'</b></td><td>'+k.cls+'</td>'+
    '<td>'+(k.on?'<span class="chip blue">'+k.on+'</span>':'<span class="mut">0</span>')+'</td>'+
    '<td><b>'+k.stu+'</b></td>'+
-   '<td>'+(k.risk?'<span class="chip '+(rr>=20?"red":"amber")+'">'+k.risk+' ('+rr+'%)</span>':'<span class="chip green">0</span>')+'</td>'+
+   '<td>'+(k.risk?'<span class="chip '+(rr>=paramOf("riskRateRed_pct",20)?"red":"amber")+'" data-tip="'+esc(pctG(k.risk,k.stu,"học viên của cơ sở này đang bị đánh dấu nguy cơ (chuyên cần hoặc học lực)"))+'">'+k.risk+' ('+rr+'%)</span>':'<span class="chip green" data-tip="Không có học viên nào bị đánh dấu nguy cơ">0</span>')+'</td>'+
    '<td>'+Object.keys(k.gv).length+'</td><td>'+k.ses+'</td>'+
-   '<td>'+(tnr==null?'<span class="mut">—</span>':'<span class="chip '+(tnr>=Math.round(kpiTh(/^TNR/,0.9)*100)?"green":"red")+'">'+tnr+'%</span>')+'</td>'+
+   '<td>'+(tnr==null?'<span class="mut" data-tip="Cơ sở này chưa dạy buổi nào nên chưa tính được">—</span>':'<span class="chip '+(tnr>=Math.round(kpiTh(/^TNR/,0.9)*100)?"green":"red")+'" data-tip="'+esc(pctG(k.note,k.ses,"buổi đã dạy có nhận xét của giảng viên")+" · ngưỡng đạt "+Math.round(kpiTh(/^TNR/,0.9)*100)+"% (CH6 · TNR)")+'">'+tnr+'%</span>')+'</td>'+
    '<td style="font-variant-numeric:tabular-nums">'+vnd(k.rev)+'</td>'+
    '<td style="font-variant-numeric:tabular-nums">'+(k.debt>0?'<b style="color:var(--red)">'+vnd(k.debt)+'</b>':vnd(0))+'</td></tr>'});
  h+='</tbody></table></div><div class="mut" style="font-size:11.5px;padding:11px 16px;line-height:1.7">Cột <b>Trong đó online</b> đếm lớp có hình thức học trực tuyến - những lớp này KHÔNG ràng buộc cơ sở khi tìm giáo viên dạy thay. Ngưỡng tỷ lệ có nhận xét lấy từ '+kpiChip(/^TNR/,0.9,1)+'.</div></div>';
@@ -7960,7 +8110,9 @@ function renderBaocao(){
  var fmax=funnel[0][1]||1;
  h+='<div class="chartrow"><div class="chartp" style="grid-column:1/-1"><h4>Phễu chuyển đổi</h4>';
  funnel.forEach(function(f,i){var pct=Math.round(f[1]/fmax*100);var conv2=i>0&&funnel[i-1][1]?Math.round(f[1]/funnel[i-1][1]*100):null;
-  h+='<div class="funrow"><div class="funh"><span>'+f[0]+'</span><span>'+f[1]+(conv2!=null?' <span class="funpct">('+conv2+'% từ bước trước)</span>':'')+'</span></div><div class="funbar"><i style="width:'+pct+'%"></i></div></div>'});
+  var gt=(conv2!=null?pctG(f[1],funnel[i-1][1],funnel[i-1][0].toLowerCase()+" đi tiếp được tới bước \""+f[0]+"\""):"")
+   +(conv2!=null?" · ":"")+"So với tổng đầu phễu: "+pctG(f[1],fmax,"lead");
+  h+='<div class="funrow" data-tip="'+esc(gt)+'"><div class="funh"><span>'+f[0]+'</span><span>'+f[1]+(conv2!=null?' <span class="funpct">('+conv2+'% từ bước trước)</span>':'')+'</span></div><div class="funbar"><i style="width:'+pct+'%"></i></div></div>'});
  h+='</div></div>';
  // lead status donut + attendance/academic bars
  var lsCount={};["new","contacted","considering","converted","no_response","unreachable","rejected"].forEach(function(k){lsCount[k]=0});
@@ -8714,6 +8866,14 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   h+='<div class="fld full"><label>Dòng phụ dưới tên</label><input value="'+esc(u.sub)+'" oninput="uiSet(\'sub\',this.value)" placeholder="'+esc(UIDEF.sub)+'"></div>';
   h+='<div class="fld full"><label>Tên trung tâm (dùng trong tin nhắn gửi khách, phiếu in)</label><input value="'+esc(u.center)+'" oninput="uiSet(\'center\',this.value)" placeholder="'+esc(UIDEF.center)+'"></div>';
   h+='<div class="fld full"><label>Tiêu đề tab trình duyệt</label><input value="'+esc(u.title)+'" oninput="uiSet(\'title\',this.value)" placeholder="'+esc(UIDEF.title)+'"></div>';
+  /* V9.53 (anh Luân): "mấy cái bánh răng để dẫn tới toàn bộ cấu hình... do đang demo mà, tạo
+     điều kiện để mọi người có thể sửa thông số theo thực tế. em có thể làm thêm 1 cái trong cài
+     đặt để bật tắt hiển thị bánh răng trỏ cấu hình." */
+  h+='<div class="fld full"><label>Bánh răng trỏ cấu hình</label>'+
+   '<select onchange="uiSet(\'gear\',this.value===\'1\'?1:0);reRender(\'settings\')">'+
+   '<option value="1"'+(gearOn()?" selected":"")+'>Hiện - bấm vào con số nào cũng sửa được ngay tại chỗ</option>'+
+   '<option value="0"'+(gearOn()?"":" selected")+'>Ẩn - chỉ hiện con số, gọn màn hình</option></select>'+
+   '<div class="fhint">Mọi ngưỡng, hạn giờ, câu nhắc trong app đều là <b>thông số của trung tâm</b>, không phải số cố định của phần mềm. Bật bánh răng thì bấm thẳng vào con số là mở <b>ngăn kéo sửa ngay trên màn hình đang đứng</b> - sửa, Lưu &amp; áp dụng, màn cũ tính lại theo, không bị quăng sang trang khác (trong ngăn kéo vẫn có nút mở trang Cài đặt cho ai muốn xem cả nhóm). Rất hợp lúc chạy demo cho trung tâm khác xem. Ở <b>cổng học viên / phụ huynh</b> bánh răng mở một tấm nói rõ số đó tên gì, đang đặt bao nhiêu, sửa ở đâu.</div></div>';
   /* V9.47 - anh Luân: *"đổi hotline mà nằm ở Ngưỡng & SLA là chết rồi, ko đúng nhóm."* Đúng.
      Hotline và địa chỉ là THÔNG TIN NHẬN DẠNG của trung tâm, cùng họ với tên và logo - không
      phải ngưỡng nghiệp vụ. Nay chúng ở đây, ngay cạnh tên trung tâm. Nhóm "Trung tâm" bị loại
@@ -9024,7 +9184,8 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
     '<td><button class="btn sm" onclick="staffSave('+i+')"><i class="ti ti-device-floppy"></i>Lưu</button></td></tr>'});
   h+='</tbody></table></div></div>';}
  return h}
-function saveParam(name){var e=document.getElementById("cf_"+name);if(!e)return;var v=e.value;
+function saveParam(name,raw){var v;
+ if(raw!==undefined)v=raw;else{var e=document.getElementById("cf_"+name);if(!e)return;v=e.value}
  var sn=paramSheetName(name);
  var meta=null;for(var k=0;k<APPPARAMS.length;k++)if(APPPARAMS[k][1]===name)meta=APPPARAMS[k];
  var ptype=meta&&meta[5];
@@ -9366,10 +9527,14 @@ function cfHLXoa(){window.CFHL="";window.KPIQ="";
 /* BÁNH RĂNG TRẦN - anh Luân (30/07): "chỉ cần thêm bánh răng để có thể nhảy tới nơi điều chỉnh
    là được". Khác slaChip: không in lại con số (câu chữ đã nói số rồi, in nữa là lặp), chỉ một
    bánh răng nhỏ có tooltip, bấm là nhảy đúng dòng CH2. */
-function cfGear(name){if(!name)return "";
+/* Một cửa duy nhất quyết định "có hiện bánh răng không" - mọi loại bánh răng (ngưỡng CH2,
+   ngưỡng KPI CH6, câu nhắc CH4, danh mục CH1) đều hỏi qua đây. Cổng học viên KHÔNG có màn Cài
+   đặt nên bánh răng ở đó không nhảy trang mà mở một tấm nói rõ số này lấy từ đâu. */
+function gearOn(){try{var u=UI();return u.gear===undefined?true:!!u.gear}catch(e){return true}}
+function cfGear(name){if(!name)return "";if(!gearOn())return "";
  var mean=(function(){for(var i=0;i<APPPARAMS.length;i++)if(APPPARAMS[i][1]===name)return APPPARAMS[i][2];return name})();
- return '<button class="cfedit" onclick="event.stopPropagation();cfGo(\''+esc(name)+'\')" '+
-  'aria-label="Chỉnh ngưỡng '+esc(name)+'" data-tip="'+esc(mean)+' - bấm để chỉnh ở Cài đặt"><i class="ti ti-settings"></i></button>'}
+ return '<button class="cfedit" onclick="event.stopPropagation();cfPop(\''+esc(name)+'\')" '+
+  'aria-label="Chỉnh ngưỡng '+esc(name)+'" data-tip="'+esc(mean)+' - bấm để sửa ngay tại đây"><i class="ti ti-settings"></i></button>'}
 /* naDecor: câu "việc cần làm" trong DỮ LIỆU mang dấu "(tênThamSố)" - người dùng không được thấy
    mã máy đó. Tên có thật trong CH2 (hoặc tên cũ có bí danh) thì thay bằng bánh răng; tên lạ thì
    giữ nguyên chữ - không phá nội dung người ta gõ tay. */
@@ -9387,9 +9552,122 @@ function slaChip(name,fb,unit){
  var v=paramOf(name,fb);
  var u=unit||(function(){for(var i=0;i<APPPARAMS.length;i++)if(APPPARAMS[i][1]===name)return APPPARAMS[i][3];return ""})();
  var mean=(function(){for(var i=0;i<APPPARAMS.length;i++)if(APPPARAMS[i][1]===name)return APPPARAMS[i][2];return name})();
- return '<span class="slachip" onclick="event.stopPropagation();cfGo(\''+esc(name)+'\')" '+
-  'data-tip="'+esc(mean+" · đang đặt "+v+" "+u+" - bấm để sửa ở Cài đặt")+'">'+
-  esc(String(v))+(u?(" "+esc(u)):"")+'<i class="ti ti-settings"></i></span>'}
+ var so=esc(String(v))+(u?(" "+esc(u)):"");
+ if(!gearOn())return '<b>'+so+'</b>';
+ /* CỔNG HỌC VIÊN không có màn Cài đặt - bấm cfGo ở đó là chết câm. Nên ở cổng, bánh răng mở một
+    tấm nói rõ: số này tên gì, đang đặt bao nhiêu, sửa ở đâu bên cổng nhân viên. */
+ var bam=window.HVPORTAL?("gearNoi('"+esc(name)+"')"):("cfPop('"+esc(name)+"')");
+ return '<span class="slachip" onclick="event.stopPropagation();'+bam+'" '+
+  'data-tip="'+esc(mean+" · đang đặt "+v+" "+u+" - bấm để "+(window.HVPORTAL?"xem sửa ở đâu":"sửa ngay tại đây"))+'">'+
+  so+'<i class="ti ti-settings"></i></span>'}
+/* Tấm giải thích cho cổng học viên / phụ huynh: nói thẳng con số này là tham số nào, trung tâm
+   đang đặt bao nhiêu, và sửa ở đâu. Không giả vờ bấm được sang màn Cài đặt của cổng nhân viên. */
+function gearNoi(name){
+ var P=null;for(var i=0;i<APPPARAMS.length;i++)if(APPPARAMS[i][1]===name)P=APPPARAMS[i];
+ if(!P){toast("Không thấy tham số "+name);return}
+ var _l=(P[5]==="text"||Object.prototype.toString.call(P[5])==="[object Array]");
+ var v=_l?(paramStr(P[1],P[4])||"chưa khai"):paramOf(P[1],P[4]);
+ var h='<div class="dcard"><h4><i class="ti ti-settings"></i>'+esc(P[2])+'</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Con số bạn vừa bấm là một <b>thông số vận hành</b> của trung tâm - không phải số cố định của phần mềm. Trung tâm đổi được bất cứ lúc nào, đổi xong mọi màn hình tính lại theo ngay.</div>';
+ h+=ctxRows([["Tên thông số",esc(P[1])],["Trung tâm đang đặt","<b>"+esc(String(v))+"</b>"+(P[3]?(" "+esc(P[3])):"")],
+  ["Ý nghĩa",esc(P[2])],["Sửa ở đâu","Cổng nhân viên &gt; Cài đặt &gt; Ngưỡng &amp; SLA (CH2) &gt; nhóm "+esc(P[0])]]);
+ h+='<div class="dact"><button class="btn" onclick="closeModal()">Đã hiểu</button></div></div>';
+ openDrawer("Thông số vận hành",h)}
+/* ═══════════ V9.54 - SỬA TẠI CHỖ, KHÔNG QUĂNG NGƯỜI DÙNG ĐI ═══════════
+   Anh Luân (30/07): "bấm bánh răng để sửa, em gọi popup thay vì nhảy qua trang cấu hình được ko
+   nhỉ... nếu đang ở 1 nơi nào đó, vẫn còn phải ở đó để làm, mà bị điều hướng đi thì cũng hơi mệt."
+   Đúng: bánh răng là việc PHỤ (đổi một con số) chen vào giữa một việc CHÍNH (đang xử lý hồ sơ).
+   Việc phụ mà cướp cả màn hình thì xong việc phụ là mất dấu việc chính - phải nhớ mình vừa ở đâu,
+   bấm về, cuộn lại đúng chỗ. Nay MỌI bánh răng mở NGĂN KÉO ngay trên màn đang đứng: sửa - lưu -
+   đóng, màn cũ vẽ lại với số mới, không đi đâu cả. Ai muốn xem cả nhóm tham số thì vẫn còn nút
+   "Mở trang Cài đặt" trong ngăn kéo - đi hay ở là người dùng chọn, không phải app ép.
+   Bốn loại bánh răng (CH2 ngưỡng · CH4 câu nhắc · CH6 ngưỡng KPI · CH1 danh mục) đi chung một
+   khuôn: tiêu đề nói rõ đang sửa cái gì, một dòng nói số này chi phối chuyện gì, ô sửa, nút Lưu. */
+function cfPopKhung(tieude,than,nutPhu){
+ return '<div class="dcard"><h4><i class="ti ti-settings"></i>'+tieude+'</h4>'+than+
+  '<div class="dact">'+nutPhu+'<button class="btn" onclick="closeModal()">Đóng</button></div></div>'}
+/* Sau khi lưu: đóng ngăn kéo rồi vẽ lại ĐÚNG màn đang đứng - số mới hiện ngay tại chỗ vừa bấm. */
+function cfPopXong(){closeModal();try{reRender(CUR)}catch(e){}}
+function cfPop(name){
+ if(window.HVPORTAL)return gearNoi(name);
+ var P=null;for(var i=0;i<APPPARAMS.length;i++)if(APPPARAMS[i][1]===name)P=APPPARAMS[i];
+ if(!P){toast("Không thấy tham số "+name+" trong bảng CH2.");return}
+ var ptype=P[5],val=(ptype==="text"||Object.prototype.toString.call(ptype)==="[object Array]")?paramStr(P[1],P[4]):paramOf(P[1],P[4]);
+ var inp;
+ if(Object.prototype.toString.call(ptype)==="[object Array]")
+  inp='<select id="cfp_'+esc(name)+'" class="sel" style="min-width:180px">'+ptype.map(function(o){return '<option'+(String(val)===o?" selected":"")+'>'+esc(o)+'</option>'}).join("")+'</select>';
+ else if(ptype==="text")
+  inp='<input id="cfp_'+esc(name)+'" class="sel" style="min-width:280px" value="'+esc(String(val))+'">';
+ else
+  inp='<input id="cfp_'+esc(name)+'" class="sel" style="width:110px" inputmode="numeric" value="'+esc(String(val))+'">';
+ var N=CFNHOMBY[P[0]];
+ var h='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>'+esc(P[2])+(N&&N.d?(' - '+N.d):'')+'</div>';
+ h+='<div class="cfpline"><span class="cfpk">Giá trị</span>'+inp+(P[3]?'<span class="mut" style="font-size:12px">'+esc(P[3])+'</span>':'')+
+  '<button class="btn primary sm" onclick="cfPopSave(\''+esc(name)+'\')"><i class="ti ti-device-floppy"></i>Lưu &amp; áp dụng</button></div>';
+ h+=ctxRows([["Tên tham số",esc(P[1])],["Nhóm",esc(P[0])],["Mặc định gốc",esc(String(P[4]))+(P[3]?(" "+esc(P[3])):"")]]);
+ if(N&&N.pg&&N.pg.length){var t=[];N.pg.forEach(function(k){var Q=PBK[k];if(Q)t.push(Q.t)});
+  if(t.length)h+='<div class="mut" style="font-size:11.5px;margin-top:8px">Đổi số này thì các màn sau tính lại theo: '+esc(t.join(", "))+'.</div>'}
+ openDrawer("Sửa thông số vận hành",cfPopKhung(esc(P[2]),h,
+  '<button class="btn" onclick="closeModal();cfGo(\''+esc(name)+'\')"><i class="ti ti-external-link"></i>Mở trang Cài đặt</button>'))}
+function cfPopSave(name){var e=document.getElementById("cfp_"+name);if(!e)return;
+ saveParam(name,e.value);cfPopXong()}
+/* CH4 - câu nhắc việc. Sửa ngay tại màn đang đọc câu đó, không phải mò trong 70 dòng CH4. */
+function msgPop(code){
+ var a=ch4List(),idx=-1;for(var i=0;i<a.length;i++)if(a[i].code===code)idx=i;
+ if(idx<0){toast("Không thấy câu nhắc "+code);return}
+ var m=a[idx];
+ var h='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Đây là <b>câu nhắc việc</b> app đọc lên cho nhân viên ở chặng này. Sửa ở đây là mọi màn dùng mã '+esc(code)+' đổi theo.</div>';
+ h+='<textarea id="msgp" class="sel" style="width:100%;min-height:90px;padding:8px;line-height:1.6">'+esc(m.tmpl||"")+'</textarea>';
+ h+='<div class="cfpline" style="justify-content:flex-end"><button class="btn primary sm" onclick="msgPopSave('+idx+')"><i class="ti ti-device-floppy"></i>Lưu &amp; áp dụng</button></div>';
+ var ct=[["Mã câu",esc(code)]];
+ if(m.when)ct.push(["Khi nào hiện",esc(msgWhen(code))]);
+ if(m.params&&m.params.length)ct.push(["Số lấy từ tham số",esc(m.params.join(", "))]);
+ ct.push(["Đang đọc ra",esc(msgText(code))]);
+ h+=ctxRows(ct);
+ if(m.params&&m.params.length)h+='<div class="mut" style="font-size:11.5px;margin-top:8px">Giữ nguyên các chỗ trống {1}, {2}... - app thay số từ CH2 vào đó.</div>';
+ openDrawer("Sửa câu nhắc việc",cfPopKhung("Câu nhắc "+esc(code),h,
+  '<button class="btn" onclick="closeModal();msgGo(\''+esc(code)+'\')"><i class="ti ti-external-link"></i>Mở trang Cài đặt</button>'))}
+function msgPopSave(idx){var e=document.getElementById("msgp");if(!e)return;
+ var a=ch4List(),m=a[idx];if(!m)return;
+ var v=String(e.value||"").trim();if(!v){toast("Câu nhắc không được để trống.");return}
+ m.tmpl=v;persistSoon();toast("Đã lưu câu nhắc "+m.code);cfPopXong()}
+/* CH6 - ngưỡng KPI. */
+function kpiPop(code){
+ var c=(DATA.config&&DATA.config.ch6)||[],r=null;
+ for(var i=0;i<c.length;i++)if(c[i].code===code)r=c[i];
+ if(!r){toast("Không thấy chỉ số "+code);return}
+ var h='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Ngưỡng là <b>mức tối thiểu coi là đạt</b> của chỉ số này. Đổi ngưỡng thì màu xanh/đỏ trên mọi bảng báo cáo đổi theo, số liệu thật không đổi.</div>';
+ h+='<div class="cfpline"><span class="cfpk">Ngưỡng đạt</span><input id="kpip" class="sel" style="width:110px" inputmode="decimal" value="'+esc(String(r.threshold))+'">'+
+  (r.unit?'<span class="mut" style="font-size:12px">'+esc(r.unit)+'</span>':'')+
+  '<button class="btn primary sm" onclick="kpiPopSave(\''+esc(code)+'\')"><i class="ti ti-device-floppy"></i>Lưu &amp; áp dụng</button></div>';
+ h+=ctxRows([["Mã chỉ số",esc(code)],["Tên chỉ số",esc(r.name||"")],["Cách tính",esc(r.formula||((KPIDOC[code]||{}).nguon)||"chưa khai - báo kỹ thuật bổ sung vào KPIDOC")]].concat(r.owner?[["Ai chịu trách nhiệm",esc(r.owner)]]:[]));
+ openDrawer("Sửa ngưỡng chỉ số",cfPopKhung(esc(r.name||code),h,
+  '<button class="btn" onclick="closeModal();kpiGoCf(\''+esc(code)+'\')"><i class="ti ti-external-link"></i>Mở trang Cài đặt</button>'))}
+function kpiPopSave(code){var e=document.getElementById("kpip");if(!e)return;
+ var v=e.value;if(v===""||isNaN(Number(v))){toast("Ngưỡng phải là số.");return}
+ var c=(DATA.config&&DATA.config.ch6)||[];
+ for(var i=0;i<c.length;i++)if(c[i].code===code)c[i].threshold=Number(v);
+ persistSoon();toast("Đã lưu ngưỡng "+code+" = "+v);cfPopXong()}
+/* CH1 - danh mục. Ở ngăn kéo chỉ cho ĐỔI NHÃN (việc hay làm nhất); thêm/xoá giá trị đụng tới dữ
+   liệu cũ nên vẫn phải sang trang Cài đặt - ở đó có màn hỏi "đổi luôn N dòng đang dùng không". */
+function enumPop(name){
+ var a=ENUM[name]||[];
+ if(!a.length){toast("Không thấy danh mục "+name);return}
+ var h='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Đây là <b>danh mục lựa chọn</b> '+esc(name)+'. Sửa nhãn ở đây là mọi ô chọn và mọi bảng hiện nhãn mới. Mã bên trái không đổi - đổi mã là hỏng dữ liệu cũ.</div>';
+ h+='<div class="enpl">'+a.map(function(v,i){
+  return '<div class="cfpline"><span class="cfpk" style="min-width:120px;font-size:11px">'+esc(ecode(v))+'</span>'+
+   '<input id="enp_'+esc(name)+'_'+i+'" class="sel" style="flex:1;min-width:160px" value="'+esc(elabel(v)||ecode(v))+'">'+
+   '<button class="btn sm" onclick="enumPopSave(\''+esc(name)+'\','+i+')"><i class="ti ti-device-floppy"></i>Lưu</button></div>'}).join("")+'</div>';
+ openDrawer("Sửa danh mục",cfPopKhung(esc(name)+" ("+a.length+" giá trị)",h,
+  '<button class="btn" onclick="closeModal();enumGo(\''+esc(name)+'\')"><i class="ti ti-external-link"></i>Mở trang Cài đặt (thêm/xoá giá trị)</button>'))}
+function enumPopSave(name,i){var e=document.getElementById("enp_"+name+"_"+i);if(!e)return;
+ var lb=String(e.value||"").trim();if(!lb){toast("Nhãn không được để trống.");return}
+ var cd=ecode(ENUM[name][i]),full=cd+" ("+lb+")";
+ if(full===ENUM[name][i]){toast("Nhãn không đổi.");return}
+ var used=enumUsage(name,cd);
+ ENUM[name][i]=full;
+ if(used>0)enumMigrate(name,cd,full,function(n){persistSoon();toast("Đã đổi nhãn + cập nhật "+n+" dòng dữ liệu.");cfPopXong()});
+ else{persistSoon();toast("Đã đổi nhãn.");cfPopXong()}}
 /* V9.29 (anh Luân): màn Cài đặt còn hiện "chưa có trên sheet" - dấu vết thời chạy Google Sheets.
    Nay dữ liệu nằm trong chính app, nên tham số nào app khai là phải CÓ SẴN một dòng cấu hình thật:
    sửa được, lưu được, không còn trạng thái lấp lửng. Chạy một lần lúc khởi động; nguồn duy nhất
@@ -9455,6 +9733,14 @@ var CFNHOM=[
  ["Hệ thống & dữ liệu demo","Nhật ký thao tác giữ bao nhiêu dòng, hoàn tác được trong bao nhiêu giây, và dữ liệu demo cũ bao nhiêu ngày thì tự kéo về hiện tại.",["settings"]]];
 var CFNHOMBY={};CFNHOM.forEach(function(x,i){CFNHOMBY[x[0]]={d:x[1],pg:x[2],ord:i}});
 var APPPARAMS=[
+ /* V9.54 (anh Luân: "mọi thứ trên app phải tuân thủ cấu hình phải ko em") - đúng, và ba con số
+    dưới đây từng cắm cứng trong mã: cổng học viên tự đặt 85%/80% cho màu chuyên cần & bài tập
+    (trong khi CH6 đã có ATR/HCR), bảng khối lượng việc tự đặt 90%/70%, bảng cơ sở tự đặt 20%.
+    Cắm cứng nghĩa là trung tâm đổi ngưỡng ở Cài đặt mà màn hình vẫn tô màu theo số cũ - hai
+    nguồn sự thật, và cái sai lại là cái người dùng nhìn thấy. */
+ ["Giao việc nội bộ","tkOntimeGood_pct","Tỷ lệ việc xong đúng hạn từ bao nhiêu phần trăm trở lên thì tô XANH","%",90],
+ ["Giao việc nội bộ","tkOntimeWarn_pct","Dưới mức xanh, còn từ bao nhiêu phần trăm trở lên thì tô VÀNG (thấp hơn nữa là đỏ)","%",70],
+ ["P6 · Học viên nguy cơ","riskRateRed_pct","Một cơ sở có bao nhiêu phần trăm học viên nguy cơ trở lên thì tô ĐỎ trong bảng so sánh cơ sở","%",20],
  /* V9.29o: một buổi chiếm chỗ của giáo viên bao lâu - dùng cho cảnh báo trùng giờ trên lịch tuần
     VÀ cho việc lọc người thay được. Trước đây con số 2 giờ nằm cắm cứng trong renderLichTuan. */
  ["Hệ thống & dữ liệu demo","demoAutoShift_days","Dữ liệu demo cũ hơn hôm nay bao nhiêu ngày thì app tự kéo về hiện tại (0 = không tự kéo)","ngày",14],
@@ -9827,10 +10113,49 @@ function kpiGoCf(code){window.SETTAB="ch6";window.KPIQ=code||"";go("settings");
 function kpiChip(rex,fb,pct){
  var r=kpiRowOf(rex), v=kpiTh(rex,fb);
  var txt=pct?(Math.round(v*100)+"%"):String(v);
- if(!r)return esc(txt);
- return '<span class="slachip" onclick="event.stopPropagation();kpiGoCf(\''+esc(r.code||"")+'\')" '+
-  'data-tip="'+esc((r.name||r.code||"Ngưỡng KPI")+" · đang đặt "+txt+" - bấm để sửa ở Cài đặt > CH6")+'">'+
+ if(!r||!gearOn())return esc(txt);
+ return '<span class="slachip" onclick="event.stopPropagation();kpiPop(\''+esc(r.code||"")+'\')" '+
+  'data-tip="'+esc((r.name||r.code||"Ngưỡng KPI")+" · đang đặt "+txt+" - bấm để sửa ngay tại đây")+'">'+
   esc(txt)+'<i class="ti ti-settings"></i></span>'}
+/* ═══════════ V9.54 - CON SỐ DẪN XUẤT PHẢI TỰ KHAI CÁCH TÍNH ═══════════
+   Anh Luân (30/07): "mấy con số như kiểu 95% là tính như thế nào, e ghi chú cụ thể ở hover cho anh."
+   Đo bằng máy: 305 con số phần trăm hiện trên màn thì 293 con không nói mình ở đâu ra. Một con số
+   dẫn xuất mà giấu tử số / mẫu số thì người đọc không kiểm được; không kiểm được thì không dám lấy
+   nó mà ra quyết định - trong khi app này sinh ra chỉ để ra quyết định.
+   Ba hàm dùng chung, mọi nơi in phần trăm phải đi qua một trong ba:
+   - pctG : câu giải thích thuần chữ ("84% = 42/50 buổi có mặt") cho chỗ chỉ nhận text
+   - pctX : trả về {v, g} - con số và câu giải thích, cho chỗ ô/thẻ tự gắn chú thích lên cả ô
+   - pctT : thẳng ra HTML có sẵn data-tip, cho chỗ nhận HTML */
+function pctG(tu,mau,dvi){
+ if(!mau)return "Chưa có "+(dvi||"dữ liệu")+" nào nên chưa tính được tỷ lệ";
+ return Math.round(tu/mau*100)+"% = "+tu+"/"+mau+(dvi?(" "+dvi):"")}
+function pctX(tu,mau,dvi){return mau?{v:Math.round(tu/mau*100)+"%",g:pctG(tu,mau,dvi)}:{v:"-",g:pctG(0,0,dvi)}}
+function pctT(tu,mau,dvi,cls){var X=pctX(tu,mau,dvi);
+ return '<span class="pctx'+(cls?" "+cls:"")+'" data-tip="'+esc(X.g)+'">'+esc(X.v)+'</span>'}
+/* Giải thích một chỉ số KPI: đang là bao nhiêu, con số con thật đứng sau, cách tính lấy từ cột nào,
+   ngưỡng đạt là bao nhiêu. Tính LÚC RÊ (TIPFNS) chứ không dựng sẵn: một trang có 51 chỉ số, mỗi lần
+   giải thích lại quét vài bảng dữ liệu - dựng sẵn cả 51 câu là làm chậm cả trang để phục vụ một
+   cái chú thích mà đa số lần không ai rê tới. */
+function kpiGiai(code){
+ var ch6=(DATA.config&&DATA.config.ch6)||[],k=null;
+ for(var i=0;i<ch6.length;i++)if(ch6[i].code===code)k=ch6[i];
+ if(!k)return "";
+ var v=null;try{v=kpiCompute()[code]}catch(e){}
+ var d={};try{d=kpiNum(code)||{}}catch(e){}
+ var doc=KPIDOC[code];
+ var a=[esc0(k.name||code)];
+ a.push("Đang là: "+((v==null||isNaN(v))?"chưa đủ dữ liệu":kpiFmt(code,v))+(d.lbl?(" ("+d.lbl+")"):""));
+ a.push("Ngưỡng đạt: "+(k.dir||"")+" "+kpiFmt(code,Number(k.threshold))+" - đặt ở Cài đặt > CH6");
+ if(doc&&doc.nguon)a.push("Cách tính: "+doc.nguon);
+ return a.join(" · ")}
+function esc0(x){return String(x==null?"":x)}
+TIPFNS.kpiTip=function(a){return kpiGiai(a[0])||"Chỉ số "+a[0]};
+/* Ô chỉ in NGƯỠNG (không phải số đo): phải nói rõ đây là mức phải đạt, không phải hiện trạng -
+   người đọc thấy "60%" mà tưởng đang đạt 60% thì hiểu ngược hẳn. */
+function nguongGiai(code,ten){var k=null,c6=(DATA.config&&DATA.config.ch6)||[];
+ for(var i=0;i<c6.length;i++)if(c6[i].code===code)k=c6[i];
+ return "Đây là NGƯỠNG PHẢI ĐẠT của "+(ten||code)+", không phải số đo hiện tại"+
+  (k?(" · đang đặt "+(k.dir||"")+" "+kpiFmt(code,Number(k.threshold))):"")+" · sửa ở Cài đặt > CH6 ("+code+")"}
 function kpiTh(re,fb){var c=(DATA.config&&DATA.config.ch6)||[];for(var i=0;i<c.length;i++){var t=String(c[i].code||"")+" "+String(c[i].name||"");if(re.test(t)){var n=parseFloat(String(c[i].threshold).replace(/[^0-9.]/g,""));if(!isNaN(n))return n}}return fb}
 function ymOf(off){var d=new Date();d.setDate(1);d.setMonth(d.getMonth()+(off||0));return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)}
 function inYm(s,ym){var d=pvnd(s);return !!d&&(d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2))===ym}
@@ -10747,7 +11072,7 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=rows("DL14");
     return n?((Math.round(g*10)/10)+"h"):"—"})(),"Giờ kèm đã ghi nhận","#7C3AED",
    (function(){var thieu=_done.filter(function(w){return !wowHours(w)}).length;
     return thieu?(thieu+" buổi thiếu mốc giờ"):"đủ mốc vào - ra"})()],
-  ["ti-target",(_wor==null?"—":_wor+"%"),"Tỷ lệ tiến bộ (WOR)",(_wor!=null&&_wor>=Math.round(kpiTh(/^WOR/,0.6)*100))?"#16A34A":"#E24B4A","mục tiêu ≥ "+kpiChip(/^WOR/,0.6,1)],
+  ["ti-target",(_wor==null?"—":_wor+"%"),"Tỷ lệ tiến bộ (WOR)",(_wor!=null&&_wor>=Math.round(kpiTh(/^WOR/,0.6)*100))?"#16A34A":"#E24B4A","mục tiêu ≥ "+kpiChip(/^WOR/,0.6,1),"",_done.length?pctG(_imp,_done.length,"buổi WOW đã dạy xong có ghi nhận HV tiến bộ"):"Chưa có buổi WOW nào dạy xong nên chưa tính được"],
   ["ti-player-stop",rows("DL09").filter(function(x){return String(x.wow_quota_remaining||"")!==""&&wowQuotaOf(x.student_id).free<=0}).length,"HV đã hết lượt WOW","#6B7887","cấp thêm nếu có căn cứ"]]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả",all.length],["confirm","Chờ xác nhận lịch",_w.filter(function(x){return x.booked&&!x.confirmed&&!x.noshow}).length,"amber"],["upcoming","Đã xác nhận, sắp dạy",_w.filter(function(x){return x.confirmed&&!x.done&&!x.noshow}).length],["note","Chờ ghi nội dung",_w.filter(function(x){return x.done&&!x.note}).length,"amber"],["overdue","Quá hạn ghi chú",_w.filter(function(x){return x.overdue}).length,"red"]],view.length);
@@ -11483,8 +11808,8 @@ function renderTrangHV(){
  var wowLeft=num(S.wow_quota_remaining), wowUsed=num(S.wow_quota_used);
  h+='<div class="sechd" id="s-tiendo">Tiến độ của bạn</div>';
  h+=statStrip([
-  ["ti-checkbox",attP==null?"—":attP+"%","Chuyên cần",(attP!=null&&attP>=85)?"#16A34A":"#E24B4A",attOK+"/"+attAll+" buổi có mặt"],
-  ["ti-book",hwP==null?"—":hwP+"%","Bài tập đã nộp",(hwP!=null&&hwP>=80)?"#16A34A":"#E08A1E",hwSub+"/"+hwAll+" bài"],
+  ["ti-checkbox",attP==null?"—":attP+"%","Chuyên cần",(attP!=null&&attP>=Math.round(kpiTh(/^ATR/,0.85)*100))?"#16A34A":"#E24B4A",attOK+"/"+attAll+" buổi có mặt","",pctG(attOK,attAll,"buổi có mặt (tính cả đi trễ)")],
+  ["ti-book",hwP==null?"—":hwP+"%","Bài tập đã nộp",(hwP!=null&&hwP>=Math.round(kpiTh(/^HCR/,0.8)*100))?"#16A34A":"#E08A1E",hwSub+"/"+hwAll+" bài","",pctG(hwSub,hwAll,"bài đã nộp trên tổng số bài được giao")],
   ["ti-writing",scAvg||"—","Điểm bài tập TB",scAvg?"#3B82C4":"#6B7887",sc.length?("từ "+sc.length+" bài đã chấm"):"chưa có điểm"],
   ["ti-star",wowLeft,"Buổi WOW còn lại","#DB2777","đã dùng "+wowUsed+" buổi"]]);
  /* điểm test đầu vào theo kỹ năng */
@@ -12204,11 +12529,11 @@ function renderMaGioiThieu(embed){
  var h=embed?'':pageHead("Mã giới thiệu","Học viên giới thiệu bạn bè - theo dõi lượt dùng, bạn được liên kết và ưu đãi đã cấp",
   '<button class="btn" onclick="window.SETTAB=\'ch2\';go(\'settings\')"><i class="ti ti-settings"></i>Cấu hình chính sách</button>');
  /* chính sách hiện hành */
- h+='<div class="notebar"><i class="ti ti-discount-2"></i>Chính sách hiện tại (Cài đặt → CH2): bạn được giới thiệu <b>giảm '+esc(off.txt)+'</b> khi đăng ký khóa đầu · người giới thiệu nhận <b>'+esc(reward)+'</b>.</div>';
+ h+='<div class="notebar"><i class="ti ti-discount-2"></i>Chính sách hiện tại (Cài đặt → CH2): bạn được giới thiệu <b data-tip="Mức giảm cho người ĐƯỢC giới thiệu, áp dụng cho khóa đầu tiên - lấy từ Cài đặt > CH2 (chính sách giới thiệu), không cắm cứng trong app">giảm '+esc(off.txt)+'</b> khi đăng ký khóa đầu · người giới thiệu nhận <b>'+esc(reward)+'</b>.</div>';
  h+=statStrip([
   ["ti-users",String(amb.length),"HV đã tạo mã dùng","#3B82C4"],
   ["ti-ticket",String(totUses),"Lượt bạn dùng mã","#7C3AED"],
-  ["ti-user-check",String(totEnr),"Bạn đã đăng ký","#16A34A",Math.round(totEnr*100/(totUses||1))+"% chuyển đổi"],
+  ["ti-user-check",String(totEnr),"Bạn đã đăng ký","#16A34A",Math.round(totEnr*100/(totUses||1))+"% chuyển đổi","",pctG(totEnr,totUses,"lượt dùng mã giới thiệu đã thành đăng ký thật")],
   ["ti-discount-2",vnd(totDisc),"Ưu đãi đã cấp cho bạn bè","#E08A1E"]]);
  var q=vnorm(window.MGQ||"");
  var list=amb.filter(function(g){return !q||vnorm(g.name+" "+g.code).indexOf(q)>=0});
@@ -12268,9 +12593,22 @@ function goiyLuu(k,v){var c=(DATA.config=DATA.config||{});c.goiy=c.goiy||{};
  v=String(v||"").trim();
  if(!v||v===GOIYDEF[k])delete c.goiy[k];else c.goiy[k]=v;
  persistSoon();toast(c.goiy[k]?"Đã lưu đoạn gợi ý - áp ngay khắp app.":"Đã trả đoạn này về mặc định.")}
+/* V9.54 (anh Luân: "nhiều cái thẻ, bấm vào nhảy trang khác, a thấy cũng bất tiện dữ lắm").
+   Không cấm nhảy trang - có ô bấm vào đúng là để SANG CHỖ LÀM VIỆC thật. Cấm việc NÓI DỐI:
+   ô stat trước đây ô nào cũng ghi "Bấm để lọc danh sách bên dưới", trong khi 6 ô lại nhảy sang
+   trang khác. Người dùng bấm với một kỳ vọng, nhận về một chuyện khác - đó mới là cái bực.
+   Nay một hàm đọc chính lệnh onclick rồi nói đúng nó sẽ làm gì. */
+function bamDiDau(act){var m=String(act||"").match(/go(?:HT|Arc)?\('([a-z0-9_]+)'/i);
+ if(m){var P=PBK[m[1]];return "Bấm để mở trang "+((P&&P.t)||m[1])}
+ if(/openDrawer|Quick\(|Pop\(|Open\(/.test(act))return "Bấm để xem nhanh ngay tại đây";
+ return "Bấm để lọc danh sách bên dưới"}
 function statStrip(items){return '<div class="bstats" data-tour="bstats">'+items.map(function(t){
  var act=t[5]||"";
- return '<div class="bstat'+(act?'':' static')+'"'+(act?' onclick="'+act+'" data-tip="Bấm để lọc danh sách bên dưới"':' style="cursor:default"')+'><span class="bsic" style="background:'+t[3]+'18;color:'+t[3]+'"><i class="ti '+t[0]+'"></i></span>'+
+ /* V9.54: ô thứ 7 = CÂU GIẢI THÍCH con số này ở đâu ra. Anh Luân: "mấy con số như kiểu 95% là
+    tính như thế nào, e ghi chú cụ thể ở hover cho anh". Chú thích gắn lên CẢ Ô chứ không riêng
+    con số - người ta rê vào ô, không rê trúng ba chữ số. */
+ var gi=t[6]||"";
+ return '<div class="bstat'+(act?'':' static')+'"'+(act?' onclick="'+act+'" data-tip="'+esc(gi?(gi+" · "+bamDiDau(act)):bamDiDau(act))+'"':(gi?' data-tip="'+esc(gi)+'" style="cursor:default"':' style="cursor:default"'))+'><span class="bsic" style="background:'+t[3]+'18;color:'+t[3]+'"><i class="ti '+t[0]+'"></i></span>'+
   /* V9.29: phần phụ chú (t[4]) là chuỗi do lập trình viên viết, không phải dữ liệu người dùng nhập,
      nên KHÔNG esc để gắn được chip bánh răng "sửa ở đây". Tên và số vẫn esc như cũ. */
   '<div><div class="bsn">'+esc(String(t[1]))+'</div><div class="bsl">'+esc(t[2])+(t[4]?' · '+t[4]:'')+'</div></div></div>'}).join("")+'</div>'}
@@ -12278,7 +12616,7 @@ function kpiMini(rows2){/* rows2 = [mã, tên, giá trị, đạt?, mục tiêu]
  return '<div class="kpipanel" style="margin-bottom:16px"><div class="kpiphh">KPI & SLA của riêng người này (ngưỡng CH6)</div>'+
   rows2.map(function(r){var cls=(r[3]==null?"gray":(r[3]?"green":"red"));
    return '<div class="kpirow"><div class="kpil"><span class="kpic">'+esc(r[0])+'</span><span class="kpin">'+esc(r[1])+'</span></div>'+
-    '<div class="kpiv '+cls+'">'+esc(r[2])+'</div><div class="kpig">'+(r[4]||"")+'</div><span class="kdot '+cls+'"></span></div>'}).join("")+'</div>'}
+    '<div class="kpiv '+cls+'" data-tipfn="kpiTip" data-tipa="'+esc(r[0])+'">'+esc(r[2])+'</div><div class="kpig" data-tipfn="kpiTip" data-tipa="'+esc(r[0])+'">'+(r[4]||"")+'</div><span class="kdot '+cls+'"></span></div>'}).join("")+'</div>'}
 function backBtn(pg,lb){return '<button class="btn" onclick="go(\''+pg+'\')"><i class="ti ti-arrow-left"></i>'+esc(lb)+'</button>'}
 function pctS(a,b){return b>0?Math.round(a/b*100)+"%":"—"}
 /* ---------- HỒ SƠ GIẢNG VIÊN (BC7) ---------- */
@@ -12495,7 +12833,10 @@ function clsHealth(c){var cid=c.class_id;
  var noNote=sesArr.filter(function(x){var st=bhState(x);return st.done&&!st.note}).length;
  var atrT=kpiTh(/^ATR/,0.8),hcrT=kpiTh(/^HCR/,0.7);
  var bad=(atr!=null&&atr<atrT)||(hcr!=null&&hcr<hcrT)||risk>0||noNote>0;
- return {atr:atr,hcr:hcr,risk:risk,late:late,noNote:noNote,atrT:atrT,hcrT:hcrT,bad:bad,si:obs.length}}
+ /* V9.54: giữ luôn TỬ SỐ và MẪU SỐ, không chỉ giữ tỷ lệ - có tử mẫu thì bảng mới giải thích được
+    "84% là 42/50 buổi", không có thì con số 84% treo lơ lửng không ai kiểm được. */
+ return {atr:atr,hcr:hcr,risk:risk,late:late,noNote:noNote,atrT:atrT,hcrT:hcrT,bad:bad,si:obs.length,
+  attCo:pr,attTong:att.length,hwNop:hs,hwTong:hw.length}}
 function renderHtLop(embed){var fil=window.HTLOPQ||"all";
  var cls=rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))});
  var hs=cls.map(function(c){var m=clsHealth(c);m.c=c;return m});
@@ -12506,11 +12847,13 @@ function renderHtLop(embed){var fil=window.HTLOPQ||"all";
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Giảng viên</th><th>Sĩ số</th><th>Chuyên cần</th><th>Nộp bài</th><th>HV nguy cơ</th><th>GV trễ</th><th>Nợ nhận xét</th><th></th></tr></thead><tbody>';
  if(!view.length)h+='<tr><td class="empty" colspan="9">Không có lớp nào'+(fil==="bad"?" dưới ngưỡng - tốt!":".")+'</td></tr>';
  view.forEach(function(m){var c=m.c;
-  function pchip(v,t){if(v==null)return '<span class="mut">—</span>';var p=Math.round(v*100)+"%";return '<span class="chip '+(v>=t?"green":"red")+'">'+p+'</span>'}
+  function pchip(v,t,tu,mau,dvi){if(v==null)return '<span class="mut" data-tip="Chưa có '+esc(dvi||"dữ liệu")+' nào nên chưa tính được">—</span>';
+   var p=Math.round(v*100)+"%";
+   return '<span class="chip '+(v>=t?"green":"red")+'" data-tip="'+esc(pctG(tu,mau,dvi)+" · ngưỡng đạt "+Math.round(t*100)+"% (Cài đặt > CH6)")+'">'+p+'</span>'}
   h+='<tr><td><a class="lnk" onclick="openLopQuick(\''+esc(c.class_id)+'\')"><b>'+esc(c.class_name||c.class_id)+'</b></a><div class="mut" style="font-size:10.5px">'+esc(c.class_id)+'</div></td>'+
    '<td>'+esc(c.main_teacher_id?((find("DL01","staff_id",c.main_teacher_id)||{}).full_name||c.main_teacher_id):"chưa gán")+'</td>'+
    '<td>'+m.si+'/'+esc(c.class_capacity||"?")+'</td>'+
-   '<td>'+pchip(m.atr,m.atrT)+'</td><td>'+pchip(m.hcr,m.hcrT)+'</td>'+
+   '<td>'+pchip(m.atr,m.atrT,m.attCo,m.attTong,"lượt điểm danh có mặt")+'</td><td>'+pchip(m.hcr,m.hcrT,m.hwNop,m.hwTong,"bài đã nộp")+'</td>'+
    '<td>'+(m.risk?'<span class="chip red">'+m.risk+'</span>':'<span class="mut">0</span>')+'</td>'+
    '<td>'+(m.late?'<span class="chip amber">'+m.late+' buổi</span>':'<span class="mut">0</span>')+'</td>'+
    '<td>'+(m.noNote?'<span class="chip red">'+m.noNote+'</span>':'<span class="mut">0</span>')+'</td>'+
@@ -12866,7 +13209,9 @@ function khoiLuongHTML(){
  L.forEach(function(x){
   var qt=x.tong>=Math.max(6,deu*1.8);
   function o(n){return n?('<b>'+n+'</b>'):'<span class="mut">0</span>'}
-  h+='<tr><td><a class="lnk" onclick="openNV(\''+esc(x.id)+'\')">'+esc(x.ten)+'</a></td><td>'+esc(x.vai)+'</td><td>'+esc(x.br)+'</td>'+
+  /* V9.54: bấm tên trong bảng thì mở NGĂN KÉO xem nhanh, không quăng người ta sang trang hồ sơ -
+     đang dò một bảng mà bị đổi trang là mất chỗ đang dò (ngăn kéo vẫn có nút mở hồ sơ đầy đủ). */
+  h+='<tr><td>'+nsLnk(x.id,x.ten)+'</td><td>'+esc(x.vai)+'</td><td>'+esc(x.br)+'</td>'+
    '<td>'+o(x.lead)+'</td><td>'+o(x.cham)+'</td><td>'+o(x.tuvan)+'</td><td>'+o(x.ob)+'</td><td>'+o(x.kn)+'</td><td>'+o(x.giao)+'</td>'+
    '<td>'+(qt?'<span class="chip red">'+x.tong+'</span>':'<b>'+x.tong+'</b>')+'</td></tr>'});
  return h+'</tbody></table></div></div>'}
@@ -13390,8 +13735,9 @@ function renderChang(){
    '<span class="nsd"><i class="ti '+S.ic+'"></i>'+(n?'<span class="nsn'+(ov?" hot":"")+'">'+n+'</span>':'')+'</span>'+
    '<span class="nsl">'+esc(S.t)+'</span>'+(ov?'<span class="nso">'+ov+' quá hạn</span>':'')+'</div>';
   if(i<rail.length-1){var pc=(a!=="changC"&&reached[i]>=5&&reached[i+1]>0)?Math.round(reached[i+1]/reached[i]*100):null;
+   var pcg=(pc==null)?"":(pctG(reached[i+1],reached[i],'hồ sơ đã tới "'+(JBY[rail[i]]||{}).t+'" đi tiếp được tới "'+(JBY[rail[i+1]]||{}).t+'"'));
    /* changC: bảo lưu và hủy ĐK là 2 ngả riêng, không phải dòng chảy - không vẽ %% chuyển đổi */
-   h+='<div class="nscw"><span class="nsc"></span>'+(pc!=null?'<span class="nscp">'+pc+'%</span>':'')+'</div>'}});
+   h+='<div class="nscw"><span class="nsc"></span>'+(pc!=null?'<span class="nscp" data-tip="'+esc(pcg)+'">'+pc+'%</span>':'')+'</div>'}});
  if(brs.length){h+='<div class="nrsep"></div>';
   brs.forEach(function(k,i){var S=JBY[k],n=cnt[k]||0,ov=ovr[k]||0;
    h+='<div class="nst br'+(n?" has":"")+(sel===k?" on":"")+'" onclick="changPick(\''+k+'\')" title="Rẽ nhánh: '+esc(S.why||S.t)+'">'+
@@ -13412,7 +13758,7 @@ function renderChang(){
  var jobs=arcJobs(a).filter(function(jb){return canSee(jb[0])||PBK[jb[0]]==null});
  if(jobs.length){h+='<div class="ph" style="padding:0 2px 8px"><b><i class="ti ti-briefcase" style="margin-right:6px"></i>Nghiệp vụ trong chặng</b></div><div class="arcjobs" style="--mscol:'+A.col+'">';
   jobs.forEach(function(jb){var n=0;try{n=jb[4]()}catch(e){}
-   h+='<div class="arcjob" onclick="go(\''+jb[0]+'\')"><span class="aji" style="background:'+A.col+'14;color:'+A.col+'"><i class="ti '+jb[1]+'"></i></span><div style="min-width:0"><div class="ajt">'+esc(jb[2])+'</div><div class="ajm">'+esc(jb[3])+'</div></div>'+(n?'<span class="ajn'+(n>=10?" hot":"")+'">'+n+'</span>':'')+'</div>'});
+   h+='<div class="arcjob" onclick="go(\''+jb[0]+'\')" data-tip="'+esc(bamDiDau("go('"+jb[0]+"')"))+'"><span class="aji" style="background:'+A.col+'14;color:'+A.col+'"><i class="ti '+jb[1]+'"></i></span><div style="min-width:0"><div class="ajt">'+esc(jb[2])+'</div><div class="ajm">'+esc(jb[3])+'</div></div>'+(n?'<span class="ajn'+(n>=10?" hot":"")+'">'+n+'</span>':'')+'</div>'});
   h+='</div>'}
  /* --- SỔ TRỰC CHẶNG --- */
  var LT=changList();
@@ -13439,10 +13785,13 @@ var TOURLV=[
 var TOURS={
  /* ---------- CẤP 1: THAM QUAN ---------- */
  tq_tong:{lv:"thamquan",t:"Toàn cảnh app",ic:"ti-rocket",d:"7 bước - hiểu app chạy thế nào trong 2 phút",steps:[
-  {sel:'@brand',t:"Đây là bàn làm việc của trung tâm",d:"App gom mọi việc về một chỗ: khách quan tâm, học viên đang học, lớp, tiền và việc được giao. Menu bên trái xếp theo đúng hành trình của khách.",hint:"Bấm Tiếp theo để đi từng phần."},
+  /* V9.53 (anh Luân: "bàn làm việc mà nó trỏ vào logo, chẳng hiểu kiểu gì"): bước này nói về
+     CẢ APP chứ không về một ô nào - neo vào logo là sai hẳn. `mo:1` = bước mở đầu: không khoanh
+     gì, màn tối đều, hộp ra giữa. Trỏ bừa vào một ô còn tệ hơn không trỏ. */
+  {mo:1,sel:'',t:"Đây là bàn làm việc của trung tâm",d:"App gom mọi việc về một chỗ: khách quan tâm, học viên đang học, lớp, tiền và việc được giao. Menu bên trái xếp theo đúng hành trình của khách.",hint:"Bấm Tiếp theo để đi từng phần."},
   {p:"banlam",sel:'@navlbl',t:"Menu theo 4 chặng vòng đời",d:"C1 Khách tiềm năng - C2 Đang học - C3 Tạm dừng - C4 Kết thúc & Học tiếp. Chấm màu là chặng, số đỏ là việc quá hạn.",hint:"Bấm một nhóm chặng để mở ra."},
   {p:"banlam",sel:'@bstats',t:"Việc cần xử lý hôm nay",d:"Mỗi ô là một nhóm việc đang chờ. Bấm ô nào thì danh sách bên dưới lọc đúng nhóm đó.",hint:"Bấm thử ô Tới hẹn hôm nay."},
-  {p:"banlam",sel:'#chaybody',t:"Danh sách người cần xử lý",d:"Mỗi dòng là một người kèm việc kế tiếp. Dải hạt màu cho biết họ đang ở chặng nào - bấm vào dải hạt mở toàn bộ hành trình.",hint:"Bấm vào dải hạt của một dòng."},
+  {p:"banlam",sel:'#chaybody',t:"Danh sách người cần xử lý",d:"Mỗi dòng là một người kèm việc kế tiếp. Dải hạt màu cho biết họ đang ở chặng nào. Rê vào MỘT HẠT là biết chặng đó đã để lại gì trong hồ sơ; bấm vào hạt mở ngăn kéo riêng của chặng đó; bấm chữ C1/C2 đầu dải mở cả hành trình.",hint:"Rê vào một hạt rồi bấm thử - ngăn kéo kể đủ sản phẩm của chặng đó."},
   {p:"changA",sel:'@nrail',t:"Bản đồ một chặng",d:"Đường ray hiện số người ở từng ga và phần trăm chuyển đổi thật giữa các ga - nhìn là biết đang tắc ở đâu.",hint:"Bấm một ga để lọc người ở ga đó."},
   {sel:'[data-tour="bell"]',t:"Chuông cảnh báo",d:"Mọi việc trễ hẹn theo quy trình chuẩn dồn về đây, chia theo bộ phận. Việc mới từ máy khác còn nổ bong bóng góc màn hình.",hint:"Bấm chuông xem thử."},
   {sel:'@me',t:"Mỗi chức danh một màn hình riêng",d:"Bấm ô tên ở đáy menu để đổi người. Sale, học vụ, giáo viên, kế toán mỗi người thấy một giao diện và một phạm vi dữ liệu khác nhau.",hint:"Xong phần tham quan. Thử cấp độ Trải nghiệm để làm việc thật."}]},
@@ -13510,7 +13859,9 @@ var TOURS={
   {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'.pbody',t:"Tên và logo",d:"Đổi tên hiển thị, tên trung tâm dùng trong tin nhắn gửi khách, tiêu đề tab trình duyệt, và logo - tải ảnh lên hoặc gõ chữ tắt.",hint:"Gõ tên trung tâm của bạn vào ô Tên trên đầu menu.",chk:function(){return (window.TOURB&&((UI().brand||"")+"|"+(UI().navy||""))!==window.TOURB.brand)}},
   {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'.jgrid',t:"Màu thương hiệu",d:"Đổi màu nền menu và màu nhấn - áp ngay lập tức lên toàn app. Nhớ chọn màu nền đủ tối để chữ trắng còn đọc được.",hint:"Đổi màu nền menu và xem app đổi ngay.",chk:function(){return (window.TOURB&&((UI().brand||"")+"|"+(UI().navy||""))!==window.TOURB.brand)}},
   {p:"settings",ctx:function(){window.SETTAB="menu"},sel:'.pbody',t:"Bật tắt và đổi tên menu",d:"Trung tâm nhỏ không dùng hết chức năng thì tắt bớt cho menu gọn. Đổi tên nhóm theo cách gọi quen của bạn.",hint:"Tắt thử một mục rồi nhìn menu bên trái."},
-  {p:"settings",ctx:function(){window.SETTAB="demo"},sel:'@settabs',t:"Dữ liệu demo",d:"Các máy mở bản demo tự đồng bộ nhau qua Room. Hết buổi bấm Reset là về nguyên bản.",hint:"Xong phần thương hiệu!"}]},
+  /* V9.54: bước này từng khoanh CẢ thanh tab - thanh rộng hết màn nên hộp hướng dẫn không còn
+     chỗ nào đứng mà không chạm vùng sáng. Neo vào đúng nút tab (chữ ngắn) thì hộp có chỗ. */
+  {p:"settings",ctx:function(){window.SETTAB="demo"},sel:'@txt:Dữ liệu demo',t:"Dữ liệu demo",d:"Các máy mở bản demo tự đồng bộ nhau qua Room. Hết buổi bấm Reset là về nguyên bản.",hint:"Xong phần thương hiệu!"}]},
  cn_phanquyen:{lv:"chuyennghiep",t:"Phân quyền: ai thấy dữ liệu của ai",ic:"ti-shield-lock",d:"5 bước - thiết lập và kiểm chứng",steps:[
   {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'.notebar',t:"Hai tầng phân quyền",d:"Tầng một: chức danh thấy trang nào. Tầng hai: thấy dữ liệu của ai. Tầng hai mới là thứ quan trọng khi nhiều nhân viên cùng dùng.",hint:"Bấm Tiếp theo."},
   {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'.dt',t:"Ma trận chức danh và dữ liệu",d:"Mỗi ô chọn 1 trong 4 mức: Không xem - Chỉ của tôi - Nhóm/cơ sở - Toàn trung tâm. Mặc định đã đặt theo thông lệ: sale chỉ thấy khách của mình, giáo viên chỉ thấy lớp mình dạy.",hint:"Thử đổi mức của một ô."},
@@ -13523,7 +13874,9 @@ var TOURS={
   {p:"settings",ctx:function(){window.SETTAB="ch2"},sel:'.pbody',t:"Ngưỡng tiền và chính sách",d:"Chiết khấu bao nhiêu thì phải duyệt, nợ bao lâu thì cảnh báo, hoàn tiền theo mốc nào - đều là tham số.",hint:"Cuộn tìm nhóm Tài chính."},
   {p:"settings",ctx:function(){window.SETTAB="ch6"},sel:'@settabs',t:"Ngưỡng KPI",d:"Chuyên cần bao nhiêu là đạt, tỷ lệ chuyển đổi bao nhiêu là tốt. Báo cáo chấm xanh đỏ dựa trên các ngưỡng này.",hint:"Xem bảng ngưỡng."},
   {p:"settings",ctx:function(){window.SETTAB="ch4"},sel:'@settabs',t:"Câu nhắc việc",d:"Toàn bộ câu chữ nhắc nhân viên làm gì nằm ở đây - sửa được, không cần lập trình viên. Câu có tham số tự điền số từ ngưỡng.",hint:"Sửa thử một câu và xem bản xem trước."},
-  {p:"settings",ctx:function(){window.SETTAB="ch1"},sel:'@settabs',t:"Danh mục",d:"Mọi nhãn trạng thái trong app lấy từ danh mục này: nguồn khách, trạng thái lớp, hình thức thanh toán...",hint:"Xong phần cấu hình quy trình!"}]},
+  {p:"settings",ctx:function(){window.SETTAB="ch1"},sel:'@settabs',t:"Danh mục",d:"Mọi nhãn trạng thái trong app lấy từ danh mục này: nguồn khách, trạng thái lớp, hình thức thanh toán...",hint:"Còn một mẹo cuối - bấm Tiếp."},
+  /* V9.54: dạy luôn đường tắt, không thì người dùng cứ nghĩ muốn đổi ngưỡng là phải mò vào đây. */
+  {p:"banlam",sel:'#chaybody',t:"Không cần vào Cài đặt mới sửa được",d:"Ở bất kỳ màn nào, thấy cái bánh răng nhỏ cạnh một con số hay một câu nhắc là bấm được: nó mở ngăn kéo sửa NGAY TẠI CHỖ, lưu xong màn đang xem tính lại theo, bạn không phải rời chỗ đang làm. Trong ngăn kéo vẫn có nút mở trang Cài đặt nếu muốn xem cả nhóm.",hint:"Tìm một bánh răng trên màn và bấm thử. Không thích thấy bánh răng thì tắt ở Cài đặt > Giao diện."}]},
  /* ---------- CẤP 4: DEV ---------- */
 
 };
@@ -13584,7 +13937,7 @@ function tourStart(k){if(!TOURS[k])return;
 function tourEnd(){TOUR.on=false;TOUR.key="";TOUR.min=0;
  try{var f=document.getElementById("tourfab");if(f)f.classList.remove("on")}catch(e){}
  try{var s=document.getElementById("tourspot"),b=document.getElementById("tourbox"),nv=document.getElementById("tournav");
-  if(s)s.remove();if(b)b.remove();if(nv)nv.remove()}catch(e){}
+  if(s)s.remove();if(b)b.remove();if(nv)nv.remove();var dm=document.getElementById("tourdim");if(dm)dm.remove()}catch(e){}
  try{window.removeEventListener("resize",tourReflow);window.removeEventListener("scroll",tourReflow,true)}catch(e){}}
 function tourRestart(){if(!TOUR.key)return;TOUR.i=0;tourShow()}
 function tourNext(){var T=TOURS[TOUR.key];if(!T)return;
@@ -13681,6 +14034,12 @@ function tourNavRing(st,coChinh){
  try{el=document.querySelector('.navitem[data-k="'+pg+'"]')||document.querySelector('.hvni[data-k="'+pg+'"]')}catch(e){}
  var r=el&&el.getBoundingClientRect?el.getBoundingClientRect():null;
  if(!r||(r.width<4&&r.height<4)){nv.style.display="none";return}
+ /* Vòng chính đang khoanh CHÍNH mục sidebar này (hoặc một ô sát ngay nó) thì đừng vẽ vòng
+    thứ hai - hai khung lồng nhau trông như viền đôi, anh Luân bắt được ở bước 2/7. */
+ if(coChinh){var sp=document.getElementById("tourspot");
+  var sr=sp&&sp.style.display!=="none"&&sp.getBoundingClientRect?sp.getBoundingClientRect():null;
+  if(sr&&sr.width>4&&!(sr.left>r.right+8||sr.right<r.left-8||sr.top>r.bottom+8||sr.bottom<r.top-8)){
+   nv.style.display="none";return}}
  nv.style.display="";nv.style.left=(r.left-4)+"px";nv.style.top=(r.top-4)+"px";
  nv.style.width=(r.width+8)+"px";nv.style.height=(r.height+8)+"px";
  nv.classList.toggle("solo",!coChinh);   /* không có vòng chính thì vòng này gánh lớp phủ */
@@ -13688,8 +14047,13 @@ function tourNavRing(st,coChinh){
 function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
  if(TOUR.min){try{tourMin()}catch(e){}return}   /* đang thu gọn: chỉ cập nhật con số trên nút */
  var st=T.steps[TOUR.i];if(!st)return;
- var el=tourFind(st.sel);
+ var el=st.mo?null:tourFind(st.sel);
  var s=document.getElementById("tourspot"),b=document.getElementById("tourbox");
+ var dim=document.getElementById("tourdim");
+ if(st.mo){   /* bước mở đầu: màn tối đều, không vòng sáng nào */
+  if(!dim){dim=document.createElement("div");dim.id="tourdim";dim.className="tourdim";document.body.appendChild(dim)}
+  dim.style.display="";
+ }else if(dim)dim.style.display="none";
  if(!s){s=document.createElement("div");s.id="tourspot";s.className="tourspot";document.body.appendChild(s)}
  if(!b){b=document.createElement("div");b.id="tourbox";b.className="tourbox";document.body.appendChild(b)}
  var r=el&&el.getBoundingClientRect?el.getBoundingClientRect():null;
@@ -13710,14 +14074,15 @@ function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
           làm người xem tưởng app đang chỉ sai chỗ. Ẩn vòng sáng, chỉ để lại hộp lời. */
   s.style.display="none";window.__tourMiss=1}
  if(el)window.__tourMiss=0;
- tourNavRing(st,!!(r&&(r.width>4||r.height>4)));
+ if(st.mo)window.__tourMiss=0;
+ if(!st.mo)tourNavRing(st,!!(r&&(r.width>4||r.height>4)));
  var n=T.steps.length;
  var dots="";for(var i=0;i<n;i++)dots+='<i class="'+(i===TOUR.i?"on":(i<TOUR.i?"done":""))+'"></i>';
  var live=!!T.live;
  b.innerHTML=(live?'':'<div class="tourdots">'+dots+'</div>')+
   '<div class="tnum">'+esc(T.t)+' · '+(live?('việc '+(TOUR.i+1)+'/'+n+' của lượt này · <b style="color:var(--red)">còn '+tourWorkLeft()+'</b>'+(function(){var t=0;try{t=workAll().length}catch(e){}return t>n?(' · cả hàng chờ '+t):''})()):('bước '+(TOUR.i+1)+'/'+n))+'</div>'+
   '<h5>'+esc(st.t)+'</h5><p>'+esc(st.d)+'</p>'+
-  ((window.__tourMiss&&!st.dock)?'<div class="thint" style="background:#FFF8E9;color:#7A5B12"><i class="ti ti-alert-triangle" style="margin-right:5px"></i>Chỗ cần trỏ không có trên màn hình của bạn (khác chức danh, hoặc trang chưa có dữ liệu) - đọc phần mô tả rồi bấm Tiếp theo.</div>':'')+
+  ((window.__tourMiss&&!st.dock&&!st.mo)?'<div class="thint" style="background:#FFF8E9;color:#7A5B12"><i class="ti ti-alert-triangle" style="margin-right:5px"></i>Chỗ cần trỏ không có trên màn hình của bạn (khác chức danh, hoặc trang chưa có dữ liệu) - đọc phần mô tả rồi bấm Tiếp theo.</div>':'')+
   (st.hint?'<div class="thint"><i class="ti ti-hand-finger" style="margin-right:5px"></i><b>Việc cần làm:</b> '+esc(st.hint)+'</div>':'')+
   /* Bài "dọn việc": nút thao tác nằm NGAY TRONG hộp guide - không bắt người ta đi tìm nút trên trang */
   (st.item?('<div class="tdo"><button class="btn sm primary" onclick="tourDo()"><i class="ti ti-tool"></i>Làm việc này</button>'+
@@ -13743,14 +14108,41 @@ function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
  /* Bài dọn việc mở form và ngăn kéo liên tục - hộp guide mà bám theo phần tử thì bị che ngay.
     Nên NEO CỐ ĐỊNH góc dưới bên phải và nâng lên trên ngăn kéo: nó là người điều phối, phải luôn
     thấy được. Vòng sáng cũng tắt - việc cần làm nằm trong hộp, không nằm ở một ô nào trên trang. */
- if(st.dock){
+ if(st.mo){
+  b.classList.remove("dock");s.style.display="none";
+  var nv0=document.getElementById("tournav");if(nv0)nv0.style.display="none";
+  left=vw/2-bw/2;top=Math.max(10,vh/2-bh/2);
+ }else if(st.dock){
   b.classList.add("dock");s.style.display="none";
   left=vw-bw-16;top=Math.max(10,vh-bh-16);
  }else{
   b.classList.remove("dock");
   if(r&&(r.width>4||r.height>4)){
-   top=r.bottom+14;if(top+bh>vh-10)top=Math.max(10,r.top-bh-14);
-   left=r.left+r.width/2-bw/2;
+   /* V9.53 (anh Luân: "a vẫn thấy lỗi mà em") - HỘP KHÔNG ĐƯỢC ĐÈ LÊN CHỖ NÓ ĐANG KHOANH.
+      Cách cũ luôn đặt hộp NGAY DƯỚI phần tử rồi căn giữa theo nó. Với phần tử nằm trong SIDEBAR
+      (cột hẹp, sát mép trái) thì hộp rộng 330px căn giữa lập tức trùm lên chính cái vòng sáng -
+      đúng cảnh anh chụp: đọc được chữ nhưng không còn thấy chỗ cần bấm.
+      Nay chọn chỗ đặt theo thứ tự: BÊN PHẢI phần tử (hợp với sidebar) -> DƯỚI -> TRÊN -> BÊN
+      TRÁI, lấy chỗ đầu tiên KHÔNG chạm vào vòng sáng và còn nằm trong màn hình. */
+   var ke=10;                                    /* khoảng hở giữa hộp và vòng sáng */
+   var cho=[
+    [r.right+ke, Math.max(10,Math.min(r.top-6,vh-bh-10))],        /* bên phải */
+    [Math.max(12,Math.min(r.left+r.width/2-bw/2,vw-bw-12)), r.bottom+ke+6],  /* dưới */
+    [Math.max(12,Math.min(r.left+r.width/2-bw/2,vw-bw-12)), r.top-bh-ke-6],  /* trên */
+    [r.left-bw-ke, Math.max(10,Math.min(r.top-6,vh-bh-10))]];     /* bên trái */
+   function vua(x,y){
+    if(x<12||y<10||x+bw>vw-12||y+bh>vh-10)return false;
+    /* không chạm vòng sáng (nới thêm 6px cho quầng sáng), và không chạm vòng phụ trên sidebar */
+    if(!(x>r.right+2||x+bw<r.left-2||y>r.bottom+2||y+bh<r.top-2))return false;
+    var nvE=document.getElementById("tournav");
+    if(nvE&&nvE.style.display!=="none"){var nr=nvE.getBoundingClientRect&&nvE.getBoundingClientRect();
+     if(nr&&nr.width>4&&!(x>nr.right+2||x+bw<nr.left-2||y>nr.bottom+2||y+bh<nr.top-2))return false}
+    return true}
+   var chon=null;
+   for(var ci=0;ci<cho.length;ci++)if(vua(cho[ci][0],cho[ci][1])){chon=cho[ci];break}
+   /* không chỗ nào lọt thì thà đặt xa hẳn ở góc còn hơn đè lên chỗ cần nhìn */
+   if(!chon)chon=(r.left+r.width/2<vw/2)?[vw-bw-16,vh-bh-16]:[16,vh-bh-16];
+   left=chon[0];top=chon[1];
   }else{top=vh/2+70;left=vw/2-bw/2}}
  b.style.left=Math.max(12,Math.min(left,vw-bw-12))+"px";
  b.style.top=Math.max(10,Math.min(top,vh-bh-10))+"px";
@@ -13921,7 +14313,7 @@ function tourFab(){
  return f}
 function tourMin(){
  var b=document.getElementById("tourbox"),s=document.getElementById("tourspot"),nv=document.getElementById("tournav");
- if(b)b.style.display="none";if(s)s.style.display="none";if(nv)nv.style.display="none";
+ if(b)b.style.display="none";if(s)s.style.display="none";if(nv)nv.style.display="none";var dm2=document.getElementById("tourdim");if(dm2)dm2.style.display="none";
  TOUR.min=1;
  var T=TOURS[TOUR.key]||{},n=0;try{n=T.live?tourWorkLeft():0}catch(e){}
  var f=tourFab();
@@ -13940,7 +14332,12 @@ function tourOpenBack(){
    Áp bằng uiApply(): đổi biến màu CSS, tên + logo trên sidebar, tiêu đề tab trình duyệt.
    Menu: ẩn/hiện nhóm & mục, đổi tên nhóm - buildNav đọc UI().menu (KHÔNG sửa NAVTREE gốc). */
 var UIDEF={brand:"ITTs - SOP TEMP",sub:"Hệ thống tuân thủ SOP",center:"IELTS The Tutors",
- title:"IELTS The Tutors · Cổng làm việc",logo:"",navy:"#1E3A5F",red:"#D51920",menu:{},mlabel:{},ilabel:{}};
+ title:"IELTS The Tutors · Cổng làm việc",logo:"",navy:"#1E3A5F",red:"#D51920",
+ /* V9.53 (anh Luân): công tắc hiện/ẩn BÁNH RĂNG trỏ cấu hình. Bản demo để BẬT - ai xem cũng
+    sửa được thông số theo thực tế của trung tâm mình ngay tại chỗ thấy con số. Trung tâm chạy
+    thật thì tắt đi cho gọn, số vẫn đúng, chỉ không còn nút nhảy. */
+ gear:1,
+ menu:{},mlabel:{},ilabel:{}};
 function UI(){var c=(DATA.config=DATA.config||{});var u=(c.ui=c.ui||{});
  for(var k in UIDEF)if(u[k]===undefined)u[k]=(typeof UIDEF[k]==="object"?JSON.parse(JSON.stringify(UIDEF[k])):UIDEF[k]);
  return u}
@@ -14329,7 +14726,7 @@ function tkReport(){var all=srows("DL23");
   h+='<tr><td><b>'+esc(p.nm)+'</b></td><td>'+p.n+'</td><td>'+p.live+'</td>'+
    '<td>'+(p.over?'<span class="chip red">'+p.over+'</span>':'-')+'</td><td>'+p.done+'</td>'+
    '<td>'+(p.late?'<span class="chip amber">'+p.late+'</span>':'-')+'</td>'+
-   '<td>'+(p.ontime==null?'<span class="mut">-</span>':('<span class="chip '+(p.ontime>=90?"green":(p.ontime>=70?"amber":"red"))+'">'+p.ontime+'%</span>'))+'</td></tr>'});
+   '<td>'+(p.ontime==null?'<span class="mut">-</span>':('<span class="chip '+(p.ontime>=paramOf("tkOntimeGood_pct",90)?"green":(p.ontime>=paramOf("tkOntimeWarn_pct",70)?"amber":"red"))+'" data-tip="'+esc(pctG(p.done-p.late,p.done,"việc đã xong được xong đúng hạn")+" · xanh từ "+paramOf("tkOntimeGood_pct",90)+"%, vàng từ "+paramOf("tkOntimeWarn_pct",70)+"% (Cài đặt > CH2)")+'">'+p.ontime+'%</span>'))+'</td></tr>'});
  h+='</tbody></table></div></div>';
  /* theo loại việc + theo mức bắt buộc */
  var byT={};all.forEach(function(t){var k=tkType(t);(byT[k]=byT[k]||{n:0,done:0,over:0}).n++;

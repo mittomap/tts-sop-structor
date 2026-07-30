@@ -2001,6 +2001,16 @@ log.append("14septdecies. Nguy co: gan co cho %d hoc vien phu du 5 muc can thiep
 # định mà anh Luân yêu cầu: ai đóng tiền, ai là đầu mối liên hệ chính.
 # ÁP THẲNG, không "gieo nếu trống": gen_demo chép nguyên khối enums của file cũ sang, nên kiểu
 # "if not" chỉ chạy đúng một lần trong đời rồi danh mục cũ bám mãi - đã cắn khi đổi sang bộ 7 mục.
+# anh Luân 30/07: *"Đã chuyển đổi - đã thành HV là 1 đúng ko, vậy để lại 1 chữ thôi cho đúng
+# bản chất, ko cần kẹp chung ở trạng thái đâu."* Đúng - hai vế nói CÙNG một ý, nhãn tự lặp lại
+# chính nó. ÁP THẲNG (không "gieo nếu trống") vì gen_demo chép nguyên khối enums của file cũ sang.
+_ls = d.setdefault("enums", {}).get("enum_lead_status") or []
+d["enums"]["enum_lead_status"] = [
+    ("converted (Đã thành học viên)" if str(x).startswith("converted") else x) for x in _ls]
+for _r in R("DL02"):
+    if str(_r.get("lead_status", "")).startswith("converted"):
+        _r["lead_status"] = "converted (Đã thành học viên)"
+
 d.setdefault("enums", {})["enum_guardian_relation"] = [
     "grandfather (Ông)", "grandmother (Bà)", "father (Bố)", "mother (Mẹ)",
     "brother (Anh)", "sister (Chị)", "guardian (Người giám hộ)"]

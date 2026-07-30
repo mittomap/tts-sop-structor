@@ -149,7 +149,30 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.52 — GUIDE TRỎ ĐÚNG CHỖ · TỪ ĐIỂN THUẬT NGỮ · ĐỒNG BỘ THIẾT KẾ ✅ (30/07 khuya).**
+> **Phiên bản: V9.54 — SỬA TẠI CHỖ · SẢN PHẨM TỪNG CHẶNG · MỌI CON SỐ TỰ KHAI CÁCH TÍNH ✅ (30/07 khuya).**
+> · **Bánh răng không quăng người dùng đi nữa.** Anh Luân: *"đang ở 1 nơi nào đó, vẫn còn phải ở
+> đó để làm, mà bị điều hướng đi thì cũng hơi mệt."* Cả bốn loại bánh răng (ngưỡng CH2 · câu nhắc
+> CH4 · ngưỡng KPI CH6 · danh mục CH1) nay mở **ngăn kéo sửa tại chỗ**: sửa - Lưu & áp dụng - màn
+> cũ vẽ lại với số mới. Nút "Mở trang Cài đặt" vẫn nằm trong ngăn kéo cho ai muốn xem cả nhóm.
+> · **Mỗi chặng phải khai SẢN PHẨM ĐẦU RA.** Anh Luân: *"hover vào a thấy chặng đã qua, nhưng qua
+> là qua cái gì?"* Bảng `jReviewRows` nay phủ **cả 17 chặng** (trước 11, thiếu hẳn 4 nhánh rẽ và
+> alumni): rê vào một hạt là biết chặng đó **để lại gì thật trong hồ sơ**, bấm vào hạt mở **ngăn
+> kéo của đúng chặng đó** (ý nghĩa · thời điểm · nằm ở đó bao lâu · sản phẩm · hạn có bánh răng ·
+> việc cần làm CH4). Ngăn kéo Hành trình thành **cách xem trọn vòng đời một người**.
+> · **304/304 con số phần trăm tự khai cách tính.** Đo lần đầu: 305 con thì **293 con không nói
+> mình ở đâu ra**. Ba hàm chung `pctG / pctX / pctT` + chú thích **tính lúc rê** (`data-tipfn`,
+> gọi hàm qua sổ `TIPFNS` chứ không eval) nên 51 chỉ số KPI không phải quét dữ liệu khi vẽ.
+> · **Ô bấm phải nói thật nó sẽ làm gì**: 6 ô ghi "bấm để lọc danh sách bên dưới" mà thực ra đổi
+> trang. `bamDiDau()` đọc chính lệnh onclick rồi nói đúng đích. **38 chỗ bấm TÊN bị đổi trang**
+> nay mở ngăn kéo xem nhanh.
+> · **"Mọi thứ phải tuân thủ cấu hình" - đúng, và 3 chỗ đang phạm**: cổng học viên tự đặt 85%/80%
+> trong khi CH6 đã có ATR/HCR; bảng khối lượng việc tự đặt 90%/70%; bảng cơ sở tự đặt 20%. Ba
+> tham số mới vào CH2, mã hết cắm cứng.
+> · **Hai tên đứng cạnh nhau không nhãn** (anh Luân: *"sao có 2 tên xuất hiện nhỉ"*) - 5 chỗ in
+> tên NV phụ trách sát tên khách; nay đều có chữ "phụ trách".
+> · Bộ kiểm: `_checkux` **143** · `_check16` **665** · font **201 icon**. `./verify.sh` XANH HẾT.
+>
+> **Phiên bản trước: V9.52 — GUIDE TRỎ ĐÚNG CHỖ · TỪ ĐIỂN THUẬT NGỮ · ĐỒNG BỘ THIẾT KẾ ✅ (30/07 khuya).**
 > · **Bài học lớn nhất phiên này** (anh Luân hỏi *"vì sao anh luôn tìm ra lỗi mà không mất mấy
 > công?"*): bộ kiểm cũ hỏi *"cái này có đúng không"* - kiểm từng thứ MỘT MÌNH NÓ. Anh Luân nhìn
 > CẢ MÀN và so trang với trang. Nay có phép **ĐẾM BIẾN THỂ**: hỏi ngược *"app làm việc này bằng
@@ -4375,3 +4398,130 @@ mọi trang. Bảng `DVI` khai đơn vị đúng cho từng trang; bộ kiểm c
 tên · đoạn gợi ý biết mình ở đâu · **đếm biến thể**) · `_checkqa` **130** · `_checktour` thêm hợp
 đồng `@txt` · font **199 icon** · `_checkui` **492 lượt**. Ba chỗ đỏ tự gây (ngoặc ba ngôi nuốt nút
 Xuất · neo SOP VH0 đổi chuỗi · icon subset thiếu) đều do bộ kiểm bắt. `./verify.sh` XANH HẾT.
+
+## V9.53-V9.54 (30/07 khuya, đợt sau) - SỬA TẠI CHỖ · SẢN PHẨM TỪNG CHẶNG · MỌI CON SỐ TỰ KHAI CÁCH TÍNH
+
+Sáu góp ý rời của anh Luân trong một mạch, nhưng đọc kỹ thì cả sáu cùng một gốc: **app bắt người
+dùng tin nó mà không cho họ kiểm.** Số phần trăm không nói tử/mẫu. Hạt chặng bảo "đã qua" mà không
+nói qua cái gì. Bánh răng hứa cho sửa rồi quăng người ta sang trang khác. Ô thống kê hứa lọc tại
+chỗ rồi đổi trang. Tên người thứ hai hiện lên mà không nói là ai. Mỗi cái nhỏ, cộng lại là cảm
+giác "app này nói gì mình cũng phải đoán".
+
+### 1. Bánh răng mở NGĂN KÉO SỬA TẠI CHỖ, không nhảy trang
+
+> *"ví dụ a bấm dấu bánh răng để sửa, e gọi popup thay vì nhảy qua trang cấu hình được ko nhỉ...
+> nếu đang ở 1 nơi nào đó, vẫn còn phải ở đó để làm, mà bị điều hướng đi thì cũng hơi mệt."*
+
+Bánh răng là **việc phụ** (đổi một con số) chen vào giữa **việc chính** (đang xử lý một hồ sơ).
+Việc phụ mà cướp cả màn hình thì xong việc phụ là mất dấu việc chính.
+
+Bốn loại bánh răng đi chung một khuôn `cfPopKhung`: `cfPop` (ngưỡng CH2) · `msgPop` (câu nhắc CH4)
+· `kpiPop` (ngưỡng KPI CH6) · `enumPop` (danh mục CH1). Mỗi ngăn kéo nói rõ đang sửa cái gì, số
+này chi phối chuyện gì, đổi xong màn nào tính lại - rồi mới tới ô sửa. Lưu xong `cfPopXong()`
+đóng ngăn kéo và `reRender(CUR)` nên số mới hiện ngay tại chỗ vừa bấm.
+
+**Không bỏ đường cũ:** trong mỗi ngăn kéo vẫn có nút "Mở trang Cài đặt" cho ai muốn xem cả nhóm
+tham số. Đi hay ở là người dùng chọn, không phải app ép.
+
+`enumPop` cố tình CHỈ cho đổi nhãn - thêm/xoá giá trị đụng dữ liệu cũ nên vẫn phải sang trang Cài
+đặt, ở đó có màn hỏi "đổi luôn N dòng đang dùng không".
+
+### 2. Mỗi chặng phải khai SẢN PHẨM ĐẦU RA
+
+> *"sản phẩm đầu ra của mỗi chặng là gì, hiện giờ mỗi khi hover vào a lại thấy thông báo là chặng
+> đã qua, nhưng qua là qua cái gì... rõ ràng là thiếu cách để chúng ta xem hành trình của 1 học
+> viên 1 cách tiện dụng"*
+
+Một chặng không phải cái mốc thời gian - nó là một **mẻ việc để lại sản phẩm cụ thể**: một số gọi
+được, một phiếu test có điểm, một phiếu thu, một lớp đã xác nhận. Không kể ra thì "đã qua" chỉ là
+một hạt màu xám vô nghĩa.
+
+- `jReviewRows(C,k)` từ 11 chặng nâng lên **đủ 17** (trước thiếu hẳn `alumni` và cả 4 nhánh rẽ -
+  nhánh rẽ cũng có sản phẩm: một quyết định và lý do của nó).
+- Rê vào một hạt: chú thích kể luôn `để lại: <sản phẩm>`. Tính **lúc rê** chứ không dựng sẵn -
+  một trang danh sách có cả trăm dòng, mỗi dòng bảy hạt, dựng sẵn là đọc lại hồ sơ 700 lần.
+- Bấm một hạt: `jStagePop(pid,k)` - ngăn kéo của **đúng chặng đó**. Bốn câu hỏi nó phải trả lời:
+  chặng này để làm gì · đã đi qua chưa và lúc nào · để lại sản phẩm gì · giờ làm gì tiếp.
+- `jStageSpan(C,k)`: nằm ở chặng đó bao lâu (tới chặng kế, hoặc tới bây giờ nếu đang đứng).
+- Ngăn kéo Hành trình cũ chỉ có tên chặng + ngày; nay mỗi dòng kể sản phẩm, thời gian nằm ở đó,
+  và bấm được vào từng chặng - thành **cách xem trọn vòng đời một người**.
+- Mỗi chặng khai thêm `pn` = tên tham số SLA của nó, để ngăn kéo hiện hạn qua `slaChip` (có bánh
+  răng sửa tại chỗ) thay vì in một con số trần.
+
+### 3. Mọi con số dẫn xuất phải tự khai cách tính
+
+> *"mấy con số như kiểu 95% là tính như thế nào, e ghi chú cụ thể ở hover cho anh"*
+
+Đo bằng máy trước khi sửa: **305 con số phần trăm hiện trên màn, 293 con không nói mình ở đâu ra.**
+Một con số dẫn xuất mà giấu tử/mẫu thì người đọc không kiểm được; không kiểm được thì không dám
+lấy nó ra quyết định - mà app này sinh ra chỉ để ra quyết định.
+
+Ba hàm chung: `pctG` (câu chữ "84% = 42/50 buổi") · `pctX` (`{v,g}` cho ô tự gắn chú thích lên cả
+ô) · `pctT` (thẳng ra HTML có `data-tip`). Vá ở **tầng sinh ra số**, không đi vá 293 chỗ:
+`statStrip` và `biztile` nhận thêm ô "câu giải thích" · `clsHealth` nhớ luôn tử/mẫu chứ không chỉ
+nhớ tỷ lệ · `kv` có anh em `kvT`.
+
+**Chú thích tính lúc rê** (`data-tipfn` + sổ `TIPFNS`): lưới 51 chỉ số KPI mà dựng sẵn 51 câu giải
+thích thì mỗi câu phải quét vài bảng dữ liệu - làm chậm cả trang để phục vụ cái chú thích mà đa số
+lần không ai rê tới. Dùng **sổ tên hàm chứ không eval chuỗi** - eval là cửa mở cho mã lạ.
+
+Kết quả: **304/304**. Bộ kiểm mới trong `_checkux` vẽ thật mọi trang, tìm mọi con số %, và với
+chú thích tính-lúc-rê thì **gọi thật hàm rồi đọc kết quả** - đếm thuộc tính chỉ biết có, không
+biết nó nói gì.
+
+### 4. Ô bấm phải nói thật nó sẽ làm gì
+
+> *"Cũng có nhiều cái thẻ, bấm vào nhảy trang khác, a thấy cũng bất tiện dữ lắm"*
+
+Đo: 58 thẻ/ô bấm là đổi trang. Nhưng đọc từng cái thì **nhảy trang không phải lúc nào cũng sai** -
+ô "Buổi học 7 ngày tới" bấm vào để sang chỗ làm việc thật thì đúng là phải sang. Cái sai là **nói
+dối**: 6 ô ghi "Bấm để lọc danh sách bên dưới" rồi lại đổi trang. Người dùng bấm với một kỳ vọng,
+nhận về chuyện khác - đó mới là cái bực.
+
+- `bamDiDau(act)` đọc chính lệnh onclick rồi nói đúng: "Bấm để mở trang X" / "xem nhanh ngay tại
+  đây" / "lọc danh sách bên dưới". Dùng cho cả `statStrip`, ô stat Trang bắt đầu, `biztile`, `arcjob`.
+- **38 chỗ bấm TÊN bị đổi trang** (bảng hiệu suất đội tư vấn) nay đi qua `nsLnk` -> ngăn kéo xem
+  nhanh, trong ngăn kéo có nút mở hồ sơ đầy đủ. Ranh giới chốt lại: **bấm tên = xem tại chỗ; bấm
+  nút hành động = sang chỗ làm việc.**
+
+### 5. "Mọi thứ trên app phải tuân thủ cấu hình phải ko em" - đúng, và 3 chỗ đang phạm
+
+Quét hằng số nghiệp vụ cắm cứng, lọc bỏ các số kỹ thuật (px, index, chuyển đổi giờ/ngày):
+
+| Chỗ | Cắm cứng | Nay lấy từ |
+|---|---|---|
+| Cổng học viên - màu ô Chuyên cần | `attP>=85` | `kpiTh(/^ATR/)` (CH6) |
+| Cổng học viên - màu ô Bài tập | `hwP>=80` | `kpiTh(/^HCR/)` (CH6) |
+| Bảng khối lượng việc - xanh/vàng/đỏ | `>=90` / `>=70` | `tkOntimeGood_pct` / `tkOntimeWarn_pct` (CH2 mới) |
+| Bảng so sánh cơ sở - đỏ khi nguy cơ cao | `rr>=20` | `riskRateRed_pct` (CH2 mới) |
+
+Cắm cứng nghĩa là trung tâm đổi ngưỡng trong Cài đặt mà màn hình vẫn tô màu theo số cũ - **hai
+nguồn sự thật, và cái sai lại là cái người dùng nhìn thấy.**
+
+Bậc mức độ KPI (`kpiSev`: 0.98/0.95/0.90/0.75) giữ nguyên trong mã có chủ ý - đó là **thang trình
+bày** (khoảng cách tới ngưỡng quy ra 5 mức), không phải ngưỡng nghiệp vụ ai đó muốn chỉnh.
+
+### 6. Hai tên đứng cạnh nhau mà không nhãn
+
+> *"sao có 2 tên xuất hiện nhỉ"* (ảnh: "Ngô Quỳnh Giang / 0986051821 · Huỳnh Quốc Khánh · hồ sơ 1/104")
+
+Tên NV phụ trách in sát tên khách, không nhãn, nên đọc ra thành hai người. 5 chỗ, nay đều có chữ
+"phụ trách". Bài học chung: **một cái tên đứng một mình luôn được đọc là chủ thể của dòng đó** -
+tên của người khác thì phải mang theo vai trò.
+
+### Bẫy đã cắn trong đợt này
+
+- **Chèn `pn` vào JSTAGE bằng script khớp `{k:"new",t:`** - 4 chặng rơi nhầm vào mảng `STAGES` cũ
+  (cùng dạng chữ, nằm trước trong file). Bài học cũ lặp lại: **script sửa hàng loạt phải neo vào
+  chuỗi ĐỘC NHẤT, không neo vào hình dạng.** Đếm lại số chỗ chèn mới lòi ra 13 ≠ 13-đúng-chỗ.
+- **Bộ kiểm cũ đếm chuỗi `data-tip=` để kết luận "mỗi hạt có chú thích"** - đổi sang chú thích
+  tính-lúc-rê là đỏ ngay dù hành vi tốt lên. Sửa hợp đồng thành **gọi thật hàm rồi đọc chữ**, và
+  nhân đó siết thêm: chú thích phải có số bước, phải kể sản phẩm, phải mời bấm.
+- **Cửa sổ đo 260 ký tự quá hẹp**: chú thích gắn trên ô bao cách con số 268 ký tự nên bị tính là
+  thiếu. Phép đo sai thì kết luận sai - nới lên 420. *Đo cũng là một thứ phải kiểm.*
+- `nguongGiai` phải nói **"đây là NGƯỠNG PHẢI ĐẠT, không phải số đo hiện tại"**: ô in "60%" cạnh
+  chữ SRR rất dễ bị đọc thành "đang đạt 60%" - hiểu ngược hẳn.
+
+### Số chốt phiên
+`_checkux` 105 → **143** · `_check16` **665** · `_checkqa` 130 · font **201 icon** · 304/304 con số
+% tự khai cách tính · 0 ô nói dối · 0 tên bấm-là-đổi-trang. `./verify.sh` XANH HẾT.
