@@ -79,6 +79,10 @@ chay "_checktour huong dan"       "TOUR OK"              node _checktour.js
 chay "_checkqa  hop hoi dap"     "CHECKQA OK"           node _checkqa.js
 chay "_checkux  trai nghiem form" "CHECKUX OK"          node _checkux.js
 chay "_checkdata du lieu vs luat" "CHECKDATA OK"         node _checkdata.js
+# V9.64b - bo kiem dung theo CACH ANH LUAN TIM RA LOI (8 phuong phap rut tu 43 phat hien cua anh):
+# doi xung giua cac trang cung ho, luong hai dau, du thua & rong, so phai sua duoc, cho dung,
+# nga cut cua nguoi dung, dong bo tai lieu. Chi tiet o dau file _checkaudit.js.
+chay "_checkaudit doi xung & nga cut" "CHECKAUDIT OK"    node _checkaudit.js
 
 echo
 echo "${Dam}== 4. DU LIEU DEMO ==${Het}"

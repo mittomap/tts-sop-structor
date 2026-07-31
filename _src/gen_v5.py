@@ -2644,7 +2644,7 @@ giangvien:{code:"DL01",ro:1,sub:"Giảng viên & NV WOW (DL01) - lọc nhanh đ�
  
  pre:function(s){return /teacher|wow|giảng|giang/.test(ecode(s.role))||/giảng|giang|teacher/i.test(String(s.role))},
  cols:[["staff_id","Mã"],["full_name","Họ tên"],["role","Vai trò","enum"],["phone","SĐT"],["email","Email"],["branch","Cơ sở","enum"],["status","Trạng thái","chip"]]},
-nhanvien:{code:"DL01",filt:"status",ro:1,sub:"Toàn bộ nhân sự (DL01)",
+nhanvien:{code:"DL01",filt:"status",ro:1,lam:"nhansu",sub:"Toàn bộ nhân sự (DL01)",
  cols:[["staff_id","Mã"],["full_name","Họ tên"],["role","Vai trò","enum"],["department","Bộ phận"],["email","Email"],["reports_to_name","Quản lý"],["status","Trạng thái","chip"]]},
 /* V9.42: mọi danh sách khác đều có dòng `sub` nói rõ nó là bảng nào, riêng bảng lead thì không -
    người mới mở ra không biết mình đang xem DL02 hay một bảng lọc sẵn nào đó. */
@@ -2801,7 +2801,7 @@ function colMenuHTML(key){var cfg=LISTCFG[key];if(window.COLMENU!==key)return ''
    số thẻ vẽ ra thật cũng đỏ; thẻ nào còn onclick cũng đỏ. */
 var THEDEF={
  viec:{t:"Việc hôm nay",the:[
-  ["vc_red","Quá hạn","Đếm những việc đã QUÁ hạn SLA - mỗi việc một luật hạn riêng (lead 15 phút, chấm test 24 giờ...). Muốn xem danh sách: bấm chip 'Quá hạn' ở thanh Mức độ ngay dưới."],
+  ["vc_red","Quá hạn","Đếm những việc đã QUÁ hạn SLA - mỗi loại việc một luật hạn riêng, tất cả đặt ở Cài đặt nhóm Ngưỡng &amp; SLA. Muốn xem danh sách: bấm chip 'Quá hạn' ở thanh Mức độ ngay dưới."],
   ["vc_amber","Sắp tới hạn","Đếm những việc CHƯA quá hạn nhưng sắp tới nơi - còn kịp làm hôm nay. Muốn xem danh sách: bấm chip 'Sắp tới hạn' ở thanh Mức độ ngay dưới."],
   ["vc_old","Nợ quá N ngày","Trong số việc quá hạn, đếm riêng những việc đã để mốc quá số ngày khai ở Ngưỡng & SLA (viecOldAlert_days). Nợ càng lâu càng khó cứu. Muốn xem danh sách: bấm chip 'Quá hạn' ở thanh Mức độ rồi nhìn phần ghi số ngày trễ của từng dòng."],
   ["vc_team","Quá hạn nhiều nhất","Bộ phận đang ôm nhiều việc QUÁ HẠN nhất (xếp theo quá hạn chứ không theo tổng việc) - hôm nay nên dồn người sang đó. Muốn xem danh sách: chọn đúng bộ phận đó ở thanh Bộ phận ngay dưới."]]},
@@ -2846,10 +2846,10 @@ var THEDEF={
   ["bl0_duyet","Chiết khấu chờ duyệt","Đăng ký có mức chiết khấu vượt ngưỡng phải trình quản lý mà chưa ai duyệt. Muốn xem danh sách: mở trang Chờ duyệt ở menu trái."],
   ["bl0_debt","Đăng ký còn nợ","Đăng ký còn hiệu lực mà vẫn còn số tiền chưa thu. Muốn xem danh sách: mở trang Thanh toán, chip 'Còn nợ'."]]},
  mykpi:{t:"Bảng số của tôi (trang cá nhân)",the:[
-  ["mk_lh","Lượt liên hệ hôm nay / 7 ngày","Số lần tôi đã gọi/nhắn cho khách: vế trái là hôm nay, vế phải là 7 ngày qua. Muốn xem danh sách: mở trang Lead và lọc theo tên mình."],
-  ["mk_kn","Tỷ lệ kết nối 7 ngày","Trong các lượt liên hệ 7 ngày qua, bao nhiêu phần trăm gặp được khách thật (không phải máy bận, không nghe). Rê chuột vào con số để thấy phép chia."],
-  ["mk_dk","Đăng ký mới 7 ngày","Số khách tôi phụ trách đã chốt đăng ký trong 7 ngày qua. Muốn xem danh sách: mở trang Đăng ký & Học phí."],
-  ["mk_tien","Tiền thu 7 ngày","Tổng tiền các khoản do chính tôi ghi nhận trong 7 ngày qua. Muốn xem danh sách: mở trang Thanh toán."]]},
+  ["mk_lh","Lượt liên hệ hôm nay / N ngày","Số lần tôi đã gọi/nhắn cho khách: vế trái là hôm nay, vế phải là cửa sổ nhìn lại (đặt ở Cài đặt, tham số statsLookback_days). Muốn xem danh sách: mở trang Lead và lọc theo tên mình."],
+  ["mk_kn","Tỷ lệ kết nối N ngày","Trong các lượt liên hệ của cửa sổ nhìn lại, bao nhiêu phần trăm gặp được khách thật (không phải máy bận, không nghe). Rê chuột vào con số để thấy phép chia."],
+  ["mk_dk","Đăng ký mới N ngày","Số khách tôi phụ trách đã chốt đăng ký trong cửa sổ nhìn lại. Muốn xem danh sách: mở trang Đăng ký & Học phí."],
+  ["mk_tien","Tiền thu N ngày","Tổng tiền các khoản do chính tôi ghi nhận trong cửa sổ nhìn lại. Muốn xem danh sách: mở trang Thanh toán."]]},
  review:{t:"Khảo sát & phản hồi lớp",the:[
   ["rv_cho","Phiếu chờ trả lời","Số phiếu khảo sát đã gửi mà học viên chưa điền. Muốn xem danh sách: bảng 'Phiếu gần đây' ngay dưới, cột Trạng thái là 'chờ'."],
   ["rv_quen","Gửi quá N ngày chưa ai trả lời","Trong số phiếu chờ, đếm riêng phiếu đã gửi quá số ngày khai ở Ngưỡng & SLA (svNudge_days) - đó là lớp cần gọi nhắc. Muốn xem danh sách: bấm chip 'Trả lời kém' ở thanh lọc dưới."]]},
@@ -3431,7 +3431,7 @@ function renderList(key,emb){
  var h=emb?'':('<div class="phead" data-tour="phead"><div><div class="t">'+esc(p.t)+'</div><div class="s">'+esc(cfg.sub||("Nguồn "+cfg.code))+' - '+all.length+' bản ghi</div>'+
    /* V9.63 (bài học X2): sổ chỉ-xem có ghi "nghiệp vụ làm ở hub CSKH" nhưng đó là CHỮ, người đọc
       phải tự đi tìm. Nay là NÚT bấm sang thẳng chỗ làm việc. */
-   (cfg.lam&&PBK[cfg.lam]?('<button class="btn sm" style="margin-top:7px" onclick="go(\''+esc(cfg.lam)+'\')" data-tip="Sổ này chỉ để tra cứu - bấm để sang chỗ làm việc thật"><i class="ti ti-arrow-right"></i>Sang '+esc(PBK[cfg.lam].t)+' để làm</button>'):'')+'</div>'+
+   '</div>'+
  '<div class="sp">'+(cfg.ro?'':'<button class="btn primary" onclick="newForm(\''+key+'\')"><i class="ti ti-plus"></i>Thêm mới</button>')+'</div></div>');
  if(!cfg.ro)h+='<div class="panel'+(pf?'':' hidden')+'" id="formPanel"><div class="ph"><b>'+(ed?("Sửa "+esc(String(ed[cfg.cols[0][0]]))):"Thêm bản ghi mới")+'</b><div class="mini">'+(ed?'<button class="pill" onclick="cancelEdit(\''+key+'\')">Hủy sửa</button>':'')+'<button class="pill" onclick="toggleForm(\''+key+'\')">Đóng</button></div></div>'+formHTML(key)+'</div>';
  /* THANH CÔNG CỤ CHUẨN: [tìm] [chip lọc có số đếm] ...... [số dòng] [Xóa lọc] [Cột] */
@@ -3456,10 +3456,15 @@ function renderList(key,emb){
  var _f2=fltOn(key);
  /* V9.64: bộ CÔNG CỤ của trang xuống thanh phụ, đứng cố định - không còn trôi theo dải chip lọc.
     Số dòng đứng đầu (nó là kết quả của mọi thứ ở tầng trên), rồi tới Xuất / Bộ lọc / Cột. */
+ /* V9.64b (bộ kiểm audit bắt): nút "Sang X để làm" trước đây nằm trong `phead` - mà `phead`
+    KHÔNG được vẽ khi danh sách được NHÚNG vào một hub (Sổ thu học phí là hub hai tab). Kết quả:
+    LISTCFG.dsthanhtoan khai `lam:"thanhtoan"` mà nút không bao giờ hiện ra - một khai báo chết,
+    im lặng. Nay nút nằm ở tầng công cụ, vẽ ở cả hai trường hợp. */
  var duoi='<span class="tbcnt">'+total+' dòng'+(fa.length||q||qk||hvF||_f2?" (đã lọc)":"")+'</span>'+
   fltBarHTML(key,1)+   /* trang danh sách đã có ô tìm riêng ở tầng trên */
   (fa.length||q||qk||hvF||_f2?'<button class="btn sm" onclick="clearFilt(\''+key+'\')"><i class="ti ti-x"></i>Xóa lọc</button>':'')+
-  '<div class="colwrap"><button class="btn'+(nHid?" primary":"")+' sm" onclick="colMenuToggle(\''+key+'\')"><i class="ti ti-columns"></i>Cột'+(nHid?" ("+(cfg.cols.length-1-nHid)+"/"+(cfg.cols.length-1)+")":"")+'</button>'+colMenuHTML(key)+'</div>';
+  '<div class="colwrap"><button class="btn'+(nHid?" primary":"")+' sm" onclick="colMenuToggle(\''+key+'\')"><i class="ti ti-columns"></i>Cột'+(nHid?" ("+(cfg.cols.length-1-nHid)+"/"+(cfg.cols.length-1)+")":"")+'</button>'+colMenuHTML(key)+'</div>'+
+  (cfg.lam&&PBK[cfg.lam]?('<button class="btn sm" onclick="go(\''+esc(cfg.lam)+'\')" data-tip="Sổ này chỉ để tra cứu - bấm để sang chỗ làm việc thật"><i class="ti ti-arrow-right"></i>Sang '+esc(PBK[cfg.lam].t)+' để làm</button>'):'');
  h+=tbar2(left,duoi);
  h+='<div class="panel">'+tableHTML(cfg,view,key)+'</div>';
  if(pages>1||total>20)h+='<div class="pgbar"><button class="btn sm" '+(pg<=0?"disabled":"")+' onclick="pageGo(\''+key+'\','+(pg-1)+')"><i class="ti ti-chevron-left"></i>Trước</button><span class="cnt">Trang '+(pg+1)+' / '+pages+'</span><button class="btn sm" '+(pg>=pages-1?"disabled":"")+' onclick="pageGo(\''+key+'\','+(pg+1)+')">Sau<i class="ti ti-chevron-right"></i></button>'+
@@ -3842,7 +3847,7 @@ function dhForm(sid){var s=find("DL09","student_id",sid);if(!s){toast("Không th
 function dhSave(sid){var ten=String(fldV("gh_ten")||"").trim(),sdt=String(fldV("gh_sdt")||"").trim();
  var dm=fldV("gh_dm"),tra=fldV("gh_tra");
  if(/guardian|both/.test(ecode(dm))&&!sdt){toast("Chọn liên hệ người giám hộ thì phải có số điện thoại của họ.");return}
- if(ecode(tra)==="guardian"&&!ten){toast("Người giám hộ đóng tiền thì phải có tên để in lên phiếu thu.");return}
+ if(ecode(tra)==="guardian"&&!ten){toast("Người đồng hành đóng tiền thì phải có tên để in lên phiếu thu.");return}
  markRow("DL09","student_id",sid,{emergency_contact_name:ten,emergency_contact_phone:sdt,
   emergency_contact_relation:fldV("gh_qh"),contact_primary:dm,payer_side:tra,
   gender:fldV("gh_gt"),address:String(fldV("gh_dc")||"").trim()},
@@ -4219,14 +4224,16 @@ function goViecTeam(t){window.VIECTEAM=t;window.VIECGRP="all";window.VIECSEV="";
 function goViecOverdue(){window.VIECTEAM="all";window.VIECGRP="all";window.VIECSEV="red";window.VIECOD=true;go("viec")}
 function ymNow(){var d=new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)}
 function inMonth(s){var d=pvnd(s);return d&&(d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2))===ymNow()}
-function in30(s){var d=pvnd(s);return d&&(Date.now()-d.getTime())<30*864e5}
-function upcomingSection(){var D=7;
+/* V9.64b: "30 ngày" là cửa sổ đếm của Tổng quan - lựa chọn của trung tâm, không phải hằng số. */
+function mkMoiNgay(){return Math.max(1,num(paramOf("statsNewWindow_days",30)))}
+function in30(s){var d=pvnd(s);return d&&(Date.now()-d.getTime())<mkMoiNgay()*864e5}
+function upcomingSection(){var D=Math.max(1,num(paramOf("statsUpcoming_days",7)));
  var call=rows("DL02").filter(function(l){return isc(l.lead_status,"new","contacted","considering","no_response")&&inNextDays(l.next_followup_time,D)}).length;
  var tst=rows("DL03").filter(function(t){return !isc(t.test_attendance_status,"on_time","late","no_show")&&inNextDays(t.test_date,D)}).length;
  var ses=rows("DL11").filter(function(s){return !isc(s.session_status,"cancelled","completed")&&inNextDays(s.session_date,D)}).length;
  var ww=rows("DL14").filter(function(w){return isc(w.wow_status,"booked","confirmed")&&inNextDays(w.wow_session_date,D)}).length;
  var items=[["Hẹn gọi lại",call,"ti-phone-call","#3B82C4","nhaplead"],["Test đầu vào",tst,"ti-file-text","#7C3AED","test"],["Buổi học",ses,"ti-school","#0D9488","banglop"],["Buổi WOW",ww,"ti-star","#DB2777","wow"]];
- var h='<div class="sechd">Sắp diễn ra trong 7 ngày</div><div class="biztiles" style="margin-bottom:18px">';
+ var h='<div class="sechd">Sắp diễn ra trong '+D+' ngày</div><div class="biztiles" style="margin-bottom:18px">';
  items.forEach(function(t){h+='<div class="biztile" style="cursor:pointer" onclick="go(\''+t[4]+'\')" data-tip="'+esc((t[5]?t[5]+" · ":"")+bamDiDau("go('"+t[4]+"')"))+'"><div class="bti" style="color:'+t[3]+'"><i class="ti '+t[2]+'"></i></div><div class="btv">'+t[1]+'</div><div class="btl">'+esc(t[0])+'</div></div>'});
  return h+'</div>'}
 function bizSection(){
@@ -4243,7 +4250,7 @@ function bizSection(){
  var enr30=E.filter(function(r){return in30(r.enrollment_time)}).length;
  var revPrev=pay.filter(function(p){return inYm(p.payment_time,ymOf(-1))}).reduce(function(a,b){return a+num(b.amount)},0);
  var trend="";if(revPrev>0){var pctc=Math.round((revMonth-revPrev)/revPrev*100);trend=(pctc>=0?'<span style="color:#16A34A">▲ +':'<span style="color:#DC2626">▼ ')+Math.abs(pctc)+'%</span> so tháng trước'}
- var tiles=[["Doanh thu đã thu",vnd(revTotal),"ti-cash","#16A34A"],["Doanh thu tháng này",vnd(revMonth),"ti-report-money","#0D9488",trend,"Tổng tiền đã thu trong tháng này = "+vnd(revMonth)+(revPrev>0?("; tháng trước "+vnd(revPrev)+" -> chênh "+(revMonth>=revPrev?"+":"")+Math.round((revMonth-revPrev)/revPrev*100)+"%"):"; tháng trước chưa có số để so")],["Lead mới 30 ngày",String(lead30),"ti-user-plus","#3B82C4"],["Tỷ lệ chuyển đổi",cvr+"%","ti-trending-up",cvr>=40?"#16A34A":cvr>=25?"#D97706":"#DC2626","",pctG(conv,L.length,"lead đã thành học viên")],["Đăng ký 30 ngày",String(enr30),"ti-clipboard-check","#7C3AED"],["Công nợ tồn",vnd(debt),"ti-alert-triangle",debt>0?"#D97706":"#16A34A"],["HV đang học",String(learning),"ti-users-group","#3B82C4"]];
+ var tiles=[["Doanh thu đã thu",vnd(revTotal),"ti-cash","#16A34A"],["Doanh thu tháng này",vnd(revMonth),"ti-report-money","#0D9488",trend,"Tổng tiền đã thu trong tháng này = "+vnd(revMonth)+(revPrev>0?("; tháng trước "+vnd(revPrev)+" -> chênh "+(revMonth>=revPrev?"+":"")+Math.round((revMonth-revPrev)/revPrev*100)+"%"):"; tháng trước chưa có số để so")],["Lead mới "+mkMoiNgay()+" ngày",String(lead30),"ti-user-plus","#3B82C4"],["Tỷ lệ chuyển đổi",cvr+"%","ti-trending-up",cvr>=40?"#16A34A":cvr>=25?"#D97706":"#DC2626","",pctG(conv,L.length,"lead đã thành học viên")],["Đăng ký "+mkMoiNgay()+" ngày",String(enr30),"ti-clipboard-check","#7C3AED"],["Công nợ tồn",vnd(debt),"ti-alert-triangle",debt>0?"#D97706":"#16A34A"],["HV đang học",String(learning),"ti-users-group","#3B82C4"]];
  var h='<div class="sechd">Tình hình kinh doanh</div><div class="bizrow"><div class="biztiles">';
  tiles.forEach(function(t){h+='<div class="biztile"'+(t[5]?' data-tip="'+esc(t[5])+'"':'')+'><div class="bti" style="color:'+t[3]+'"><i class="ti '+t[2]+'"></i></div><div class="btv">'+esc(t[1])+'</div><div class="btl">'+esc(t[0])+(t[4]?' · '+t[4]:'')+'</div></div>'});
  h+='</div>';var rev=revByMonth();
@@ -4272,8 +4279,11 @@ function srcPerfSection(){var R=repRange();
  return h+'</tbody></table></div></div>'}
 function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sales/.test(ecode(x.role))&&!/inactive|nghỉ/i.test(String(x.status||""))});
  if(!sales.length)return "";
- var w0=new Date();w0.setHours(0,0,0,0);w0=new Date(w0.getTime()-6*864e5);
- var h='<div class="panel"><div class="ph"><b><i class="ti ti-users" style="margin-right:6px"></i>Hiệu suất đội tư vấn</b><span class="mut" style="font-size:11.5px">liên hệ &amp; kết nối: 7 ngày gần nhất · đăng ký &amp; doanh thu: toàn kỳ dữ liệu</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Nhân viên</th><th>Lead phụ trách</th><th>Liên hệ (7 ngày)</th><th>Kết nối (7 ngày)</th><th>ĐK (7 ngày)</th><th>ĐK toàn kỳ</th><th>Doanh thu khách của mình</th><th>Trong đó tự tay thu</th></tr></thead><tbody>';
+ /* Cùng cửa sổ nhìn lại với bảng số cá nhân - hai bảng nói về cùng một quãng thời gian thì
+    phải đọc cùng một tham số, không thì đội trưởng và nhân viên nhìn hai con số khác nhau. */
+ var _ng=mkNgay();
+ var w0=new Date();w0.setHours(0,0,0,0);w0=new Date(w0.getTime()-(_ng-1)*864e5);
+ var h='<div class="panel"><div class="ph"><b><i class="ti ti-users" style="margin-right:6px"></i>Hiệu suất đội tư vấn</b><span class="mut" style="font-size:11.5px">liên hệ &amp; kết nối: '+_ng+' ngày gần nhất · đăng ký &amp; doanh thu: toàn kỳ dữ liệu</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Nhân viên</th><th>Lead phụ trách</th><th>Liên hệ ('+_ng+' ngày)</th><th>Kết nối ('+_ng+' ngày)</th><th>ĐK ('+_ng+' ngày)</th><th>ĐK toàn kỳ</th><th>Doanh thu khách của mình</th><th>Trong đó tự tay thu</th></tr></thead><tbody>';
  sales.forEach(function(sv){var id=sv.staff_id;
   var myL={};var nL=0;rows("DL02").forEach(function(l){if(String(l.assigned_to||"")===id){myL[l.lead_id]=1;nL++}});
   var tp=rows("DL02b").filter(function(t){if(String(t.staff_id||"")!==id)return false;var d=pvnd(t.contact_time);return d&&d>=w0});
@@ -4293,7 +4303,7 @@ function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sa
   rows("DL07").forEach(function(p){
    if(myE[p.enrollment_id])rev+=num(p.amount);
    if(String(p.received_by||"")===id)revTay+=num(p.amount)});
-  h+='<tr><td><a class="lnk" onclick="openNSQuick(\''+esc(id)+'\')"><b>'+esc(sv.full_name)+'</b></a><div class="mut" style="font-size:10.5px">'+esc(id)+'</div></td><td>'+nL+'</td><td>'+tp.length+'</td><td'+(tp.length?' data-tip="'+esc(pctG(ok,tp.length,"lượt liên hệ 7 ngày qua là gặp được khách"))+'"':' data-tip="7 ngày qua chưa có lượt liên hệ nào"')+'>'+(tp.length?Math.round(ok*100/tp.length)+"%":"—")+'</td><td>'+nE7+'</td><td>'+nE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums"><b>'+vnd(rev)+'</b></td>'+
+  h+='<tr><td><a class="lnk" onclick="openNSQuick(\''+esc(id)+'\')"><b>'+esc(sv.full_name)+'</b></a><div class="mut" style="font-size:10.5px">'+esc(id)+'</div></td><td>'+nL+'</td><td>'+tp.length+'</td><td'+(tp.length?' data-tip="'+esc(pctG(ok,tp.length,"lượt liên hệ "+_ng+" ngày qua là gặp được khách"))+'"':' data-tip="'+_ng+' ngày qua chưa có lượt liên hệ nào"')+'>'+(tp.length?Math.round(ok*100/tp.length)+"%":"—")+'</td><td>'+nE7+'</td><td>'+nE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums"><b>'+vnd(rev)+'</b></td>'+
    '<td style="text-align:right;font-variant-numeric:tabular-nums" class="mut">'+vnd(revTay)+'</td></tr>'});
  var tL=0,tT=0,tO=0,tE7=0,tE=0,tR=0,tRt=0;
  sales.forEach(function(sv){var id=sv.staff_id;var myL={};rows("DL02").forEach(function(l){if(String(l.assigned_to||"")===id){myL[l.lead_id]=1;tL++}});
@@ -4302,7 +4312,7 @@ function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sa
   var myE2={};rows("DL06").forEach(function(e){if(myL[e.lead_id]&&!isc(e.enrollment_status,"cancelled"))myE2[e.enrollment_id]=1});
   rows("DL07").forEach(function(p){if(myE2[p.enrollment_id])tR+=num(p.amount);
    if(String(p.received_by||"")===id)tRt+=num(p.amount)})});
- h+='<tr style="font-weight:700;background:#FAFBFD"><td>Cả đội</td><td>'+tL+'</td><td>'+tT+'</td><td'+(tT?' data-tip="'+esc(pctG(tO,tT,"lượt liên hệ của cả đội 7 ngày qua là gặp được khách"))+'"':'')+'>'+(tT?Math.round(tO*100/tT)+"%":"—")+'</td><td>'+tE7+'</td><td>'+tE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums">'+vnd(tR)+'</td>'+
+ h+='<tr style="font-weight:700;background:#FAFBFD"><td>Cả đội</td><td>'+tL+'</td><td>'+tT+'</td><td'+(tT?' data-tip="'+esc(pctG(tO,tT,"lượt liên hệ của cả đội "+_ng+" ngày qua là gặp được khách"))+'"':'')+'>'+(tT?Math.round(tO*100/tT)+"%":"—")+'</td><td>'+tE7+'</td><td>'+tE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums">'+vnd(tR)+'</td>'+
   '<td style="text-align:right;font-variant-numeric:tabular-nums" class="mut">'+vnd(tRt)+'</td></tr>';
  h+='</tbody></table></div><div class="mut" style="font-size:11.5px;padding:11px 16px;line-height:1.7">'+
   '<b>Doanh thu khách của mình</b> = mọi khoản đã thu của các đơn thuộc lead người đó phụ trách - đây là con số dùng để đánh giá và để họp. '+
@@ -7252,8 +7262,13 @@ function runCtx(J,sk){var C=J.C;var a=[];
  if(!a.length)return '';
  return a.map(function(p){return '<span class="rcx"><b>'+esc(p[0])+':</b> '+esc(p[1])+'</span>'}).join("")}
 /* ===== TRANG CHỦ: BÀN LÀM VIỆC ===== */
+/* V9.64b (bộ kiểm audit M7 bắt): ba ô thẻ này ghi cứng "7 ngày" ngay trong TÊN Ô, và con số 7
+   cũng cắm cứng trong phép tính. Trung tâm muốn nhìn 14 ngày thì phải sửa mã - trong khi "nhìn
+   lại bao nhiêu ngày" đúng là một lựa chọn của trung tâm. Nay cả tên ô lẫn phép tính đọc CH2. */
+function mkNgay(){return Math.max(1,num(paramOf("statsLookback_days",7)))}
 function myKpiHTML(){var me=find("DL01","staff_id",CURSTAFF);if(!me)return "";
- var d0=new Date();d0.setHours(0,0,0,0);var w0=new Date(d0.getTime()-6*864e5);
+ var _ng=mkNgay(), _nhan=_ng+" ngày";
+ var d0=new Date();d0.setHours(0,0,0,0);var w0=new Date(d0.getTime()-(_ng-1)*864e5);
  var tps=rows("DL02b").filter(function(t){return String(t.staff_id||"")===CURSTAFF});
  function inR(t,from){var d=pvnd(t.contact_time);return d&&d>=from}
  var cT=tps.filter(function(t){return inR(t,d0)}),cW=tps.filter(function(t){return inR(t,w0)});
@@ -7262,10 +7277,10 @@ function myKpiHTML(){var me=find("DL01","staff_id",CURSTAFF);if(!me)return "";
  var enrW=rows("DL06").filter(function(e){var d=pvnd(e.enrollment_time);return d&&d>=w0&&myL[e.lead_id]&&!isc(e.enrollment_status,"cancelled")});
  var revW=0;rows("DL07").forEach(function(p){var d=pvnd(p.payment_time);if(d&&d>=w0&&String(p.received_by||"")===CURSTAFF)revW+=num(p.amount)});
  return '<div class="panel"><div class="ph"><b><i class="ti ti-chart-line" style="margin-right:6px"></i>KPI của tôi</b><span class="mut" style="font-size:11.5px">tính theo tài khoản đang vào cổng - '+esc(myName())+'</span></div>'+
-  statStrip([["ti-phone",cT.length+" / "+cW.length,"Lượt liên hệ hôm nay / 7 ngày","#3B82C4",""],
-  ["ti-phone-call",(cW.length?Math.round(okW.length*100/cW.length)+"%":"—"),"Tỷ lệ kết nối 7 ngày","#2E9E6B",okW.length+"/"+cW.length+" lượt gặp được"],
-  ["ti-clipboard-check",enrW.length,"Đăng ký mới 7 ngày","#7C3AED","khách tôi phụ trách"],
-  ["ti-cash",vnd(revW),"Tiền thu 7 ngày","#0D9488","khoản tôi ghi nhận"]],"mykpi")+'</div>'}
+  statStrip([["ti-phone",cT.length+" / "+cW.length,"Lượt liên hệ hôm nay / "+_nhan,"#3B82C4",""],
+  ["ti-phone-call",(cW.length?Math.round(okW.length*100/cW.length)+"%":"—"),"Tỷ lệ kết nối "+_nhan,"#2E9E6B",okW.length+"/"+cW.length+" lượt gặp được"],
+  ["ti-clipboard-check",enrW.length,"Đăng ký mới "+_nhan,"#7C3AED","khách tôi phụ trách"],
+  ["ti-cash",vnd(revW),"Tiền thu "+_nhan,"#0D9488","khoản tôi ghi nhận"]],"mykpi")+'</div>'}
 function renderBanlam(){
  var meId=CURSTAFF||"", meNm=myName();
  var hour=new Date().getHours();var greet=hour<11?"Chào buổi sáng":hour<14?"Chào buổi trưa":hour<18?"Chào buổi chiều":"Chào buổi tối";
@@ -10713,6 +10728,12 @@ var APPPARAMS=[
     biết chỗ nào: ô thẻ Bảng Quản lý đếm `>=2`, cửa chặn obChangeSave hỏi `>=1`, còn nhãn CH3 ghi
     chữ "lần 2 trở đi". Ba chỗ cùng nói một luật thì sớm muộn lệch nhau, và vì không phải tham số
     nên không có bánh răng nào trỏ tới được. Nay một tham số duy nhất, ba chỗ đọc lại. */
+ /* V9.64b - CỬA SỔ NHÌN LẠI của các ô thẻ cá nhân. Ba ô thẻ của nhân viên tư vấn ghi cứng
+    "7 ngày" ngay trong TÊN Ô. Trung tâm muốn nhìn 14 ngày thì phải sửa mã - trong khi đây đúng là
+    một lựa chọn của trung tâm, không phải hằng số của phần mềm. */
+ ["P2 · Liên hệ & khai thác lead","statsLookback_days","Các ô thẻ cá nhân nhìn lại bao nhiêu ngày (lượt liên hệ, tỷ lệ kết nối, đăng ký mới)","ngày",7],
+ ["P2 · Liên hệ & khai thác lead","statsUpcoming_days","Dải \"Sắp diễn ra\" ở Tổng quan nhìn tới bao nhiêu ngày","ngày",7],
+ ["P2 · Liên hệ & khai thác lead","statsNewWindow_days","Ô \"Lead mới\" và \"Đăng ký\" ở Tổng quan đếm trong bao nhiêu ngày gần nhất","ngày",30],
  ["P5 · Xếp lớp & nhập học","placementChange_free_times","Học viên được đổi lớp mấy lần trước khi phải trình quản lý phê duyệt","lần",1],
  ["P5 · Xếp lớp & nhập học","slaClassInfoZalo_hours","Hạn gửi thông tin lớp cho HV sau khi xếp lớp","giờ",24],
  ["P5 · Xếp lớp & nhập học","slaOBT_hours","Hạn hoàn tất onboarding cho HV mới","giờ",48],
@@ -10759,6 +10780,10 @@ var APPPARAMS=[
  ["P10 · Kết thúc khóa & tái đăng ký","thresholdPreEnd_days","Trước khi khóa kết thúc bao nhiêu ngày thì bắt đầu mời tái ghi danh","ngày",14],
  ["P10 · Kết thúc khóa & tái đăng ký","slaFinalTest_days","Hạn nhập kết quả đầu ra sau khi khóa kết thúc","ngày",3],
  ["P10 · Kết thúc khóa & tái đăng ký","slaReenroll_contact_days","Hạn liên hệ mời tái ghi danh","ngày",7],
+ /* V9.64b (bộ kiểm audit M7 bắt): app HỨA VỚI HỌC VIÊN "đăng ký trong 30 ngày để giữ ưu đãi"
+    mà số 30 cắm cứng trong câu. Đây là một cam kết với khách - trung tâm đổi chính sách thì câu
+    hứa phải đổi theo, không phải đi sửa mã. */
+ ["P10 · Kết thúc khóa & tái đăng ký","reEnrollGrace_days","Học viên cũ được giữ ưu đãi nếu đăng ký khóa tiếp theo trong bao nhiêu ngày sau khi kết thúc","ngày",30],
  ["P10 · Kết thúc khóa & tái đăng ký","slaTestimonialAsk_days","Sau khi đạt mục tiêu bao nhiêu ngày thì xin cảm nhận","ngày",7],
  ["P8-P9 · Khảo sát, phản hồi & khiếu nại","slaComplaintFirstResponse_hours","Hạn phản hồi LẦN ĐẦU cho một khiếu nại","giờ",4],
  ["P8-P9 · Khảo sát, phản hồi & khiếu nại","slaFeedbackClassify_hours","Hạn phân loại một phản hồi mới nhận","giờ",24],
@@ -12883,7 +12908,7 @@ function renderTrangHV(){
  if(miss>=paramOf("thresholdAtRisk_hw_missing",3))rec.push(["ti-book","red","Còn "+miss+" bài tập chưa nộp","Nộp bù sớm để giảng viên kịp chấm và chữa cho bạn."]);
  if(wowLeft>0)rec.push(["ti-star","green","Bạn còn "+wowLeft+" buổi WOW 1-1","Buổi kèm riêng miễn phí trong gói - nên dùng cho kỹ năng yếu nhất"+(t.overall_score&&typeof low!=="undefined"?" ("+low[0]+")":"")+"."]);
  if(isRisk(S.academic_progress_status))rec.push(["ti-chart-line","amber","Tiến độ học thuật đang chậm so với lộ trình","Trung tâm sẽ liên hệ để sắp buổi kèm thêm cho bạn."]);
- if(ce.course_end_id&&!isc(ce.re_enrollment_status,"confirmed_with_deposit"))rec.push(["ti-refresh","green","Khóa học của bạn đã kết thúc","Đăng ký khóa tiếp theo trong 30 ngày để giữ ưu đãi học viên cũ."+(ce.next_course_recommendation?" Gợi ý: "+ce.next_course_recommendation:"")]);
+ if(ce.course_end_id&&!isc(ce.re_enrollment_status,"confirmed_with_deposit"))rec.push(["ti-refresh","green","Khóa học của bạn đã kết thúc","Đăng ký khóa tiếp theo trong "+num(paramOf("reEnrollGrace_days",30))+" ngày để giữ ưu đãi học viên cũ."+(ce.next_course_recommendation?" Gợi ý: "+ce.next_course_recommendation:"")]);
  if(!rec.length)rec.push(["ti-thumb-up","green","Bạn đang học rất tốt","Giữ nhịp chuyên cần và nộp bài đúng hạn nhé."]);
  h+='<div class="sechd" id="s-khuyennghi">Khuyến nghị dành cho bạn</div><div class="panel"><div class="pbody">';
  rec.forEach(function(r){h+='<div class="hvrec '+r[1]+'"><i class="ti '+r[0]+'"></i><div><b>'+esc(r[2])+'</b><span>'+esc(r[3])+'</span></div></div>'});
@@ -14666,7 +14691,7 @@ function renderBaoluu(embed){var p="baoluu",fil=fget(p);
   return true});
  var nDrop=all.filter(function(s){return isc(s.student_status,"dropped")}).length;
  var nHold=all.length-nDrop;
- var h=embed?'':pageHead("Bảo lưu / Bỏ học","Học viên đang dừng học - liên hệ giữ chân, chốt bảo lưu hoặc mời quay lại. SOP: nhắc trước khi hết hạn bảo lưu 2 tuần.",
+ var h=embed?'':pageHead("Bảo lưu / Bỏ học","Học viên đang dừng học - liên hệ giữ chân, chốt bảo lưu hoặc mời quay lại. SOP: nhắc trước khi hết hạn bảo lưu "+num(paramOf("thresholdPauseRemind_days",14))+" ngày.",
   '<span class="chip amber">'+nHold+' bảo lưu</span> <span class="chip red">'+nDrop+' bỏ học</span>');
  /* V9.51: 4/4 o thong ke la nut loc doi lot - bo dai, so don vao chip loc */
  view=fltApply(p,view);
@@ -17433,12 +17458,12 @@ LISTCFG.dsbuoihoc={code:"DL11",filt:"session_status",ro:1,lam:"hoctap",sub:"Sổ
  cols:[["session_id","Mã"],["class_id_name","Lớp"],["session_number","Buổi"],["session_date","Ngày giờ"],["teacher_id_name","GV"],["session_status","Trạng thái","chip"]]};
 LISTCFG.dsdiemdanh={code:"DL12",filt:"attendance_status",ro:1,lam:"banglop",sub:"Sổ điểm danh (DL12) - chỉ xem; điểm danh ở Vận hành lớp",
  cols:[["attendance_id","Mã"],["student_name","Học viên"],["session_id","Buổi"],["attendance_status","Điểm danh","chip"],["check_in_time","Giờ vào"],["in_class_performance","Trong lớp","enum"]]};
-LISTCFG.dsbaitap=mkRO(LISTCFG.baitap,"Sổ bài tập (DL13) - chỉ xem; giao/chấm ở Vận hành lớp");
+LISTCFG.dsbaitap=mkRO(LISTCFG.baitap,"Sổ bài tập (DL13) - chỉ xem; giao/chấm ở Vận hành lớp");LISTCFG.dsbaitap.lam="baitap";
 LISTCFG.dswow=mkRO(LISTCFG.wow,"Sổ WOW 1-1 (DL14) - chỉ xem; đặt/xử lý ở hub Học tập");
 LISTCFG.dsketthuc=mkRO(LISTCFG.ketthuc,"Sổ kết thúc khóa (DL18) - chỉ xem; xử lý ở C4");
 LISTCFG.dskhaosat={code:"DL15",filt:"survey_type",ro:1,lam:"cskh",sub:"Sổ khảo sát định kỳ (DL15) - chỉ xem; gửi/xử lý ở hub CSKH",
  cols:[["survey_id","Mã"],["student_name","Học viên"],["survey_type","Đợt","enum"],["sent_date","Gửi"],["submitted_date","Trả lời"],["satisfaction_score","Hài lòng"],["follow_up_needed","Cần follow-up","enum"]]};
-LISTCFG.dsphanhoi=mkRO(LISTCFG.khaosat,"Sổ phản hồi / góp ý (DL16) - chỉ xem; xử lý ở hub CSKH");
+LISTCFG.dsphanhoi=mkRO(LISTCFG.khaosat,"Sổ phản hồi / góp ý (DL16) - chỉ xem; xử lý ở hub CSKH");LISTCFG.dsphanhoi.lam="cskh";
 LISTCFG.dskhieunai=mkRO(LISTCFG.khieunai,"Sổ khiếu nại (DL17) - chỉ xem; xử lý ở hub CSKH");
 
 var NAVTREE=[
@@ -17591,15 +17616,31 @@ function derNames(){
  function look(idk,idv){if(!idv)return "";var m=DERREF[idk];if(!m)return "";var ck=m[0]+"|"+idv;
   if(cache[ck]===undefined){var pk=Object.keys(rows(m[0])[0]||{})[0]||"";var r=pk?find(m[0],pk,idv):null;cache[ck]=(r&&r[m[1]])||""}
   return cache[ck]}
+ /* V9.64b (bộ kiểm audit M4 bắt "cột chết"): trước đây vòng lặp này chỉ đi theo các cột ĐÃ CÓ
+    đuôi _name. Bảng nào có cột mã mà KHÔNG có sẵn cột tên thì không bao giờ được điền - và danh
+    sách nào lỡ hiện cột tên đó sẽ trống vĩnh viễn, im lặng.
+    Đo được: DL10 có `main_teacher_id` ở 21/22 lớp, nhưng không có cột `main_teacher_id_name`,
+    nên bảng Lớp học hiện cột "GV chính" TRỐNG TRƠN ở cả 22 dòng. Không ai báo, vì không có gì
+    sai - chỉ là không có gì cả.
+    Nay đi theo HAI CHIỀU: cột tên đã có thì điền như cũ; cột MÃ nào mà DERREF biết cách tra thì
+    tự sinh luôn cột tên tương ứng. Thêm cột mã mới vào bảng là tự có tên đi kèm. */
+ function nenTen(base){
+  if(base==="student")return "student_id"; if(base==="customer")return "lead_id";
+  if(base==="teacher")return "teacher_id"; return base}
  for(var code in DL){var arr=rows(code);if(!arr.length)continue;
   var keys=Object.keys(arr[0]);
   for(var i=0;i<arr.length;i++){var o=arr[i];
    for(var j=0;j<keys.length;j++){var k=keys[j];
-    if(!/_name$/.test(k))continue;
-    var base=k.replace(/_name$/,"");
-    if(base==="student")base="student_id"; if(base==="customer")base="lead_id"; if(base==="teacher")base="teacher_id";
-    if(!DERREF[base])continue;
-    derFill(o,k,look(base,o[base]));
+    if(/_name$/.test(k)){
+     var base=nenTen(k.replace(/_name$/,""));
+     if(!DERREF[base])continue;
+     derFill(o,k,look(base,o[base]));
+     continue}
+    /* chiều ngược: cột MÃ có bảng tra thì bảo đảm có cột TÊN đi kèm */
+    if(!DERREF[k])continue;
+    var tk=k+"_name";
+    if(String(o[tk]==null?"":o[tk]).trim()!=="")continue;
+    var v=look(k,o[k]); if(v)o[tk]=v;
    }
   }
  }
@@ -17820,7 +17861,7 @@ function hvRender(){
     tên em thì phụ huynh tưởng mình đang đăng nhập bằng tài khoản của con. */
  var _ph=hvPH()?hvPHof(S.student_id):null;
  document.getElementById("hvWho").textContent=(_ph&&_ph.ten)||S.full_name||"-";
- document.getElementById("hvWho2").textContent=_ph?((_ph.qh||"Người giám hộ")+" của "+(S.full_name||"")):(S.student_id||"");
+ document.getElementById("hvWho2").textContent=_ph?((_ph.qh||"Người đồng hành")+" của "+(S.full_name||"")):(S.student_id||"");
  document.getElementById("hvAv").textContent=String(S.full_name||"?").trim().split(" ").pop().slice(0,1).toUpperCase();
  hvNav();hvTopPaint();try{cfBarSync()}catch(e){}var box=document.getElementById("hvMain");if(box)box.scrollTop=0;hvSpy()}
 /* (n) Trên điện thoại, mở mục lục xong bấm ra ngoài KHÔNG đóng được - phải bấm đúng nút.
