@@ -94,9 +94,24 @@ t("tu van: khong thay bao luu (tab khac bi khoa)", !navVis("baoluu"));
 var gv=rows("DL01").filter(function(x){return /^teacher$/.test(ecode(x.role))})[0];
 applyScope(gv.staff_id);
 t("giao vien: thay wow/banglop, khong thay nhaplead/thanhtoan", navVis("wow")&&navVis("banglop")&&!navVis("nhaplead")&&!navVis("thanhtoan"));
-var ht=rows("DL01").filter(function(x){return /^(hr_|it_|janitor|security)/.test(ecode(x.role))})[0];
-if(ht){applyScope(ht.staff_id);
- t("ho tro gon: khong thay tong quan chang", !navVis("changA"));}
+/* V9.60 (anh Luân gom cổng nhân viên về đúng bộ phận SOP): IT / bảo vệ / tạp vụ đã ra khỏi
+   demo, Nhân sự có nhóm riêng `nhansu`. Hợp đồng cũ neo vào nhóm "hỗ trợ gọn" - nhóm đó nay
+   chỉ còn là chỗ dự phòng cho chức danh app chưa biết. Canh lại theo đúng vai còn sống. */
+var hr=rows("DL01").filter(function(x){return /^hr_/.test(ecode(x.role))})[0];
+if(hr){applyScope(hr.staff_id);
+ t("nhan su: dung nhom rieng", SCOPE().group==="nhansu");
+ t("nhan su: khong thay ban do chang (khong cham hoc vien)", !navVis("changA")&&!navVis("changB"));
+ t("nhan su: khong thay hoc vien / tuyen sinh / thanh toan", !navVis("hocvien")&&!navVis("tuyensinh")&&!navVis("thanhtoan"));
+ t("nhan su: khong vao duoc Cai dat va Bao cao", !navVis("settings")&&!navVis("baocao"));
+ t("nhan su: CO man cua chinh ho (nhan su, bang cong, giao viec)", navVis("nhansu")&&navVis("bangcong")&&navVis("giaoviec"));}
+/* Marketing khong duoc xem tien - do that tren trang Bao cao thay vi tin loi khai */
+var mk=rows("DL01").filter(function(x){return /^marketing_(manager|leader)/.test(ecode(x.role))})[0];
+if(mk){applyScope(mk.staff_id);
+ t("marketing (quan ly) khong duoc moi vao Bao cao", !navVis("baocao"));
+ t("marketing bi cam tien trong pham vi", SCOPE().noTien===1);}
+/* IT / bao ve / tap vu da ra khoi cong nhan vien */
+t("cong nhan vien khong con IT / bao ve / tap vu",
+  rows("DL01").filter(function(x){return /^(it_|janitor|security)/.test(ecode(x.role))}).length===0);
 applyScope("");
 /* navCur: highlight dung muc con theo tab */
 window.TSTAB="test";CUR="tuyensinh";

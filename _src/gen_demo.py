@@ -17,7 +17,27 @@ P = os.path.join(os.path.dirname(os.path.abspath(__file__)), "demo_data_big.json
 old = json.load(open(P, encoding="utf-8"))
 odl = old["dl"] if "dl" in old else old
 
-STAFF = odl["DL01"]
+# ── V9.60: CỔNG NHÂN VIÊN CHỈ GIỮ CÁC BỘ PHẬN CÓ TRONG SOP ────────────────────────────────
+# Anh Luân 31/07: *"chỗ cổng nhân viên, em để quá nhiều chức danh ko liên quan"* · *"tạp vụ thì
+# có liên quan gì đến các nghiệp vụ với học viên đâu, bảo vệ???"* · *"nhân viên IT thì hiện là
+# quản trị hệ thống, là admin rồi, nói chung đây là demo, em gom lại mấy bộ phận quan trọng thôi"*.
+# Đo bằng máy trước khi cắt: bảng phân quyền CH3 của SOP có 31 hành động, chia cho ĐÚNG SÁU chức
+# danh - tuvan, hocvu, giaovien, wow, ketoan, marketing. Nhóm IT / Nhân sự / Bảo vệ / Tạp vụ
+# (7 người) KHÔNG có một hành động nào. Họ vẫn là nhân sự của trung tâm ngoài đời, nhưng trong
+# một app vận hành SOP thì họ không có việc gì để làm, mà vẫn chiếm chỗ ở màn chọn người đăng
+# nhập và vẫn mở được vài trang rỗng.
+# CẮT Ở NGUỒN chứ không giấu ở giao diện: giấu thì dữ liệu vẫn còn, bảng lương và bảng giao việc
+# vẫn trỏ tới họ, và bản sau lại thấy họ ló ra ở một màn nào đó.
+# Vai trò quản trị hệ thống (IT) đã có sẵn tài khoản "Quản trị viên" - không cần người riêng.
+# Giữ: 6 bộ phận có tên trong CH3 + Giám đốc + Nhân sự (anh Luân chốt giữ, có màn riêng: danh
+# sách nhân viên, bảng công giảng dạy, việc nội bộ - không đụng học viên, không đụng doanh thu).
+# Bỏ: IT (đã có sẵn tài khoản Quản trị viên), Bảo vệ, Tạp vụ.
+BOPHAN_SOP = ("sales", "marketing", "academic", "aca_", "teacher", "wow", "account", "ceo", "hr_")
+_bo = [s for s in odl["DL01"] if not str(s.get("role", "")).startswith(BOPHAN_SOP)]
+STAFF = [s for s in odl["DL01"] if str(s.get("role", "")).startswith(BOPHAN_SOP)]
+if _bo:
+    print("Da bo %d nhan su ngoai SOP khoi cong nhan vien: %s"
+          % (len(_bo), ", ".join(sorted({str(x.get("role", "")).split(" (")[0] for x in _bo}))))
 COURSES = odl["DL05"]
 CBY = {c["course_id"]: c for c in COURSES}
 def staff_name(sid):
