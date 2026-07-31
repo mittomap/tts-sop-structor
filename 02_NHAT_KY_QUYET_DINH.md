@@ -4921,6 +4921,11 @@ trôi. Mật khẩu để trong `DATA.config.matKhau` (mặc định `mittomap`)
 | Trang Cài đặt | vào thẳng, sửa gì lưu nấy | **hỏi chế độ ngay tại CỬA VÀO**: *Chỉ trải nghiệm* (sửa thoải mái, thấy ngay kết quả, không lưu) hoặc *Cổng thực* (cần mật khẩu). Dải báo chế độ nằm suốt ở đầu trang, kèm nút đổi chế độ. |
 | Nút Reset demo | hộp xác nhận thường | **hộp nhập mật khẩu**, cả 3 cửa vào (thanh tiêu đề, Cài đặt, màn đăng nhập) |
 
+**Sửa ngay sau khi anh Luân xem** (*"cổng vào cài đặt em làm phức tạp quá, cho người ta 2 cái
+button, thêm description ở dưới, chứ e gắn vậy nhìn rối"*): hộp chọn chế độ ban đầu em dựng bằng
+hai khối thẻ to có icon + tiêu đề + đoạn chữ dài. Nay còn **đúng hai cái nút** và mấy dòng giải
+thích bên dưới. *Người ta mở hộp này ra để bấm một cái rồi đi tiếp, không phải để đọc.*
+
 Hai quyết định thiết kế đáng ghi:
 - **Chặn ở CỬA VÀO, không chặn trong trang.** Chặn trong trang thì người ta đã nhìn thấy hết rồi
   mới bị hỏi - vô nghĩa. `go("settings")` không có chế độ thì mở hộp hỏi và **không điều hướng**.

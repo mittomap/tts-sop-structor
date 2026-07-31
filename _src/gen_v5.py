@@ -4719,14 +4719,19 @@ function pwXacNhan(){
  var f=window.__pwXong;closeModal();
  var g=cfnGet(f);if(g)g(); else toastErr("Không chạy được thao tác này - báo IT (thiếu hàm xử lý).")}
 /* ── Cổng vào trang Cài đặt: chọn chế độ trước ── */
+/* V9.62b (anh Luân: *"cổng vào cài đặt em làm phức tạp quá, cho người ta 2 cái button, thêm
+   description ở dưới, chứ e gắn vậy nhìn rối"*): bỏ hai khối thẻ to, còn đúng HAI CÁI NÚT và
+   mấy dòng giải thích bên dưới. Người ta vào đây để bấm một cái rồi đi tiếp, không phải để đọc. */
 function cfHoiCheDo(){
  var h='<div class="dcard"><h4><i class="ti ti-settings"></i>Vào trang Cài đặt theo cách nào?</h4>'+
-  '<div class="fhint" style="margin:0 0 12px">Cài đặt là nơi đổi <b>luật vận hành của cả trung tâm</b> - ngưỡng, câu nhắc, danh mục, phân quyền. Chọn một trong hai:</div>'+
-  '<div class="pickc wrap" onclick="cfChon(\'xem\')" style="margin-bottom:10px">'+
-   '<i class="ti ti-eye"></i><div><b>Chỉ trải nghiệm</b><small>Xem và thử mọi thứ, thấy ngay kết quả trên màn - nhưng <b>không lưu lại</b>. Đóng trình duyệt là mọi thay đổi mất. Ai cũng vào được.</small></div></div>'+
-  '<div class="pickc wrap" onclick="cfChon(\'that\')">'+
-   '<i class="ti ti-lock"></i><div><b>Cổng thực</b><small>Sửa và <b>lưu lại thật</b>. Cần mật khẩu quản trị.</small></div></div>'+
-  '</div>';
+  '<div style="display:flex;gap:10px;flex-wrap:wrap;margin:2px 0 14px">'+
+   '<button class="btn primary" onclick="cfChon(\'xem\')"><i class="ti ti-eye"></i>Chỉ trải nghiệm</button>'+
+   '<button class="btn" onclick="cfChon(\'that\')"><i class="ti ti-lock"></i>Cổng thực</button>'+
+  '</div>'+
+  '<div class="fhint" style="line-height:1.8">'+
+   '<b>Chỉ trải nghiệm</b> - xem và thử mọi thứ, kết quả hiện ngay trên màn, nhưng <b>không lưu lại</b>. Ai cũng vào được.<br>'+
+   '<b>Cổng thực</b> - sửa và <b>lưu lại thật</b>, cần mật khẩu quản trị.'+
+  '</div></div>';
  openDrawer("Trang Cài đặt",h)}
 function cfChon(m){
  if(m==="xem"){cfSetMode("xem");closeModal();go("settings");return}
