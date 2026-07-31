@@ -149,6 +149,18 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.61 — MỘT LUẬT CHO CẢ APP + BẬT TẮT ĐƯỢC BẤT CỨ TRANG NÀO ✅ (31/07).**
+> · **Dải bảng việc theo chức danh vào chung hệ thẻ.** Đo trước khi quyết: **15/32 ô bấm ra đúng
+> cùng một chỗ với một ô khác** trong chính dải đó (hai ô khác số, một danh sách y hệt). Nay
+> không còn ngoại lệ: **thẻ là đồng hồ, không phải cái nút** - 29 ô có mã, có chú thích, ẩn/hiện
+> được.
+> · **Tầng 1 phân quyền sửa được trong Cài đặt** (anh Luân: *"để sau này IT hiểu ý đồ của anh là
+> có thể bật tắt bất cứ thứ gì"*): bảng **11 nhóm × 30 trang = 330 ô tích**, ô khác mặc định có
+> viền vàng, có nút về mặc định từng nhóm và toàn bộ. Tắt trang đáp thì app tự lùi, không để ai
+> rơi vào khoảng không. Ghi vào `CFKEY`.
+> · Bẫy neo hướng dẫn **tái phát ngay sau một bản** - dải bảng việc dùng chung `statStrip` nên
+> mang luôn mã `bstats`, thành hai chỗ một mã trên Trang bắt đầu. Nay có mã riêng `bvstats`.
+>
 > **Phiên bản: V9.60 — CỔNG NHÂN VIÊN: ĐÚNG BỘ PHẬN, ĐÚNG MÀN, ĐÚNG GIỌNG ✅ (31/07).**
 > · Anh Luân: *"em để quá nhiều chức danh ko liên quan... tạp vụ thì có liên quan gì đến nghiệp vụ
 > với học viên đâu, bảo vệ???"* Đo: **CH3 của SOP chỉ giao việc cho 6 chức danh**; IT/HR/bảo vệ/
@@ -4875,6 +4887,62 @@ bảng VIỆC · hai tham số ngưỡng mới phải nằm trong CH2. **155 →
 ### Số chốt phiên
 Thẻ **137 → 84** · Tổng quan **35 → 11** thẻ đầu trang, khối phòng ban 24 ô đọc chơi → 18 ô việc
 bấm được · 2 tham số mới vào CH2 (`viecOldAlert_days`, `svNudge_days`) · `_checkux` **161**.
+
+## V9.61 (31/07) - DẢI BẢNG VIỆC VÀO CHUNG HỆ THẺ + TẦNG 1 PHÂN QUYỀN SỬA ĐƯỢC
+
+> Anh Luân: *"bảng việc theo chức danh, e cứ phân tích đi rồi toàn quyền quyết định. Cái cài đặt
+> ai thấy trang nào, trước hết mặc định như ý em đã, rồi đưa mấy cái đó vào cài đặt đi, để sau này
+> IT hiểu ý đồ của anh là có thể bật tắt bất cứ thứ gì."*
+
+### A. DẢI BẢNG VIỆC: ĐO TRƯỚC, QUYẾT SAU
+
+Câu hỏi: dải "Bảng NV Tư vấn / Bảng Kế toán…" có nên giữ bấm được không? Dùng đúng phép thử anh
+Luân đã đặt cho thẻ - **ô này có trùng với một nút khác trên cùng trang không?**
+
+Đo trên 8 dải, 32 ô: **15 ô bấm ra ĐÚNG CÙNG MỘT CHỖ với một ô khác trong chính dải đó.**
+"Lead mới (chưa LH)" và "Lead đang khai thác" cùng mở tab Lead, **không mang theo bộ lọc nào** -
+bấm hai ô khác số, nhận về một danh sách y hệt. Đó chính là kiểu nói dối đã cấm ở V9.59.
+
+Hai đường chữa: (a) viết 32 bộ lọc riêng cho từng ô; (b) cho nó vào chung hệ thẻ. Chọn **(b)**,
+vì (a) để lại **hai loại ô trong cùng một app** - thẻ không bấm được, ô bảng việc bấm được - và
+người dùng phải học phân biệt. Luật đếm biến thể: **app làm một việc theo mấy cách? Đáp án phải
+là 1.** Nay: **THẺ LÀ ĐỒNG HỒ, KHÔNG PHẢI CÁI NÚT** - không còn ngoại lệ nào.
+
+29 ô của 8 dải vào `THEDEF.bangviec`, mỗi ô một mã cố định, mỗi ô một câu chú thích nói rõ nó đếm
+gì và mở trang/tab nào để xem danh sách. Ẩn/hiện được như mọi thẻ khác. Vì mỗi chức danh chỉ thấy
+một tập con, dải này dùng đường `ids` của `statStrip` - khai mã thẳng cho từng ô còn lại thay vì
+đếm theo số thứ tự.
+
+Dọn kèm: **"Chiết khấu cần duyệt"** (bảng Quản lý) và **"Chiết khấu chờ duyệt"** (bảng Kế toán) là
+MỘT việc mang hai tên - thống nhất còn một.
+
+**Bẫy neo lại tái phát ngay trong bản này:** dải bảng việc dùng chung `statStrip`, nên nó mang
+luôn mã neo `bstats` - trên Trang bắt đầu thành **hai chỗ cùng một mã**, đúng lỗi tô sáng nhầm mà
+V9.60 vừa chữa. Dải này nay mang mã riêng `bvstats`. Và literal `data-tour="bstats"` phải **viết
+thẳng** chứ không ghép biến, vì bộ kiểm quét mã nguồn - ghép biến là neo tàng hình với nó (bẫy đã
+ghi ở V9.60, tự cắn lại sau đúng một bản).
+
+### B. TẦNG 1 PHÂN QUYỀN: TỪ MÃ CỨNG THÀNH Ô TÍCH
+
+Anh Luân hỏi *"trong phần cài đặt của admin có quyết định được mấy cái đó không em"* - câu trả lời
+đo được là **không**. Màn Cài đặt khai rõ phân quyền có BA tầng, nhưng chỉ sửa được hai: phạm vi
+dữ liệu (tầng 2) và bảng CH3 (tầng 3, chỉ xem vì chép từ SOP). **Tầng 1 - ai thấy trang nào - nằm
+cứng trong `ROLESCOPE`**, tức là mỗi lần đổi ý phải sửa mã. Trái luật cứng của dự án.
+
+Nay: `ROLESCOPE` là **mặc định**, `DATA.config.quyenTrang` là **bản anh Luân đắp lên**. Bảng trong
+Cài đặt → Phân quyền: **cột là 11 nhóm chức danh, dòng là 30 trang, 330 ô tích**. Ô nào khác mặc
+định có viền vàng; có nút trả về mặc định cho từng nhóm và cho toàn bộ. Ghi vào `CFKEY` nên reset
+dữ liệu demo không cuốn đi.
+
+Ba thứ phải giữ, đã canh bằng bộ kiểm **chạy thật** (bấm ô rồi đo lại phạm vi, không đọc chữ):
+1. **Tắt trang đáp thì không được để chức danh rơi vào khoảng không** - app tự lùi về trang đầu
+   tiên còn bật; rê chuột vào ô sẽ thấy dòng "ĐÂY LÀ TRANG ĐÁP của chức danh này".
+2. **Bật một trang không có nghĩa là được ghi** - cửa ghi vẫn do CH3 chặn. Câu này đã in trên màn
+   từ V9.41 và nay in lại ngay trên bảng mới.
+3. **Luôn có đường về mặc định.**
+
+Bài hướng dẫn `cn_phanquyen` đổi từ *"Hai tầng phân quyền"* thành **ba tầng**, thêm một bước neo
+thẳng vào bảng mới (13 bài · **73 bước**).
 
 ## V9.60 (31/07) - CỔNG NHÂN VIÊN: ĐÚNG BỘ PHẬN, ĐÚNG MÀN, ĐÚNG GIỌNG
 

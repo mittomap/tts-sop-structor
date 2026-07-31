@@ -1067,6 +1067,34 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("moi num van tro toi mot tham so CO THAT"+(tatSai.length?": "+tatSai.join(" | "):""), tatSai.length===0);
  var ldSai=SETLANDAU.filter(function(x){return tabs.indexOf(x[3])<0}).map(function(x){return x[0]});
  t("moi viec cai lan dau tro toi mot tab CO THAT"+(ldSai.length?": "+ldSai.join(" | "):""), ldSai.length===0);
+ /* ═══ V9.61 - TANG 1 PHAN QUYEN PHAI SUA DUOC TRONG CAI DAT ═══════════════════════════════
+    Anh Luan: *"cai cai dat ai thay trang nao... dua may cai do vao cai dat di, de sau nay IT
+    hieu y do cua anh la co the bat tat bat cu thu gi."* Canh CHAY THAT chu khong doc chu:
+    bam mot o thi phai doi duoc pham vi that, va tra ve mac dinh phai sach. */
+ (function(){
+  CUR="settings";window.SETTAB="phanquyen";
+  var pg="";try{pg=RENDER.settings()}catch(e){}
+  var soO=(pg.match(/onclick="qtToggle\(/g)||[]).length;
+  t("Cai dat co bang bat/tat tung trang cho tung chuc danh ("+soO+" o)", soO>=200&&/Thấy trang nào/.test(pg));
+  t("bang co neo rieng cho bai huong dan", /data-tour="quyentrang"/.test(pg));
+  /* BAT mot trang dang tat: Marketing von KHONG duoc xem Bao cao */
+  t("mac dinh: Marketing khong xem Bao cao", qtOn("marketing","baocao")===false);
+  qtToggle("marketing","baocao");
+  t("bam o thi pham vi THAT doi theo", buildScope("marketing_manager").pages.indexOf("baocao")>=0);
+  t("o khac mac dinh duoc danh dau", qtSua("marketing","baocao")===true&&qtSoSua("marketing")===1);
+  qtVeMacDinh("marketing");
+  t("tra ve mac dinh thi sach han", qtSua("marketing","baocao")===false&&qtSoSua("marketing")===0
+    &&buildScope("marketing_manager").pages.indexOf("baocao")<0);
+  /* TAT trang dap: khong duoc de chuc danh do roi vao khoang khong */
+  var dap=ROLESCOPE.hocvu.land;
+  qtToggle("hocvu",dap);
+  var e2=buildScope("academic_staff");
+  t("tat trang dap thi app tu lui ve trang khac con bat", e2.land!==dap&&e2.pages.indexOf(e2.land)>=0);
+  qtVeMacDinh("hocvu");
+  t("tra lai thi trang dap ve cho cu", buildScope("academic_staff").land===dap);
+  t("lua chon ghi vao DATA.config (khong mat khi reset du lieu demo)", /c\.quyenTrang=c\.quyenTrang\|\|\{\}/.test(String(qtCfg)));
+  window.SETTAB="ch2";CUR="banlam";
+ })();
  /* V9.60 (anh Luan gom cong nhan vien): HR truoc day duoc DAY THEM trang Cai dat roi bop tab -
     tuc la van dua ho vao cho sua LUAT cua ca trung tam, chi la sua duoc it hon. Nay ho co nhom
     rieng `nhansu` voi man cua chinh ho, va KHONG con cua nao vao Cai dat. Hop dong doi theo:

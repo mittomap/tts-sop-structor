@@ -2023,3 +2023,28 @@ Mỗi chức danh đều có **bảng việc riêng** ngay trên trang đáp c�
 Ban Giám đốc không thấy bảng của họ), có **nhịp ngày** và có **bài hướng dẫn riêng**.
 
 Trên trang Tuyển sinh và Học tập & Giảng dạy: **hàng chọn chặng nằm trên**, thẻ của chặng nằm dưới.
+
+## Bật/tắt được bất cứ trang nào, cho bất cứ chức danh nào (V9.61)
+
+**Cài đặt → Phân quyền & Phạm vi** nay có đủ **ba tầng**, và cả ba đều nhìn thấy được:
+
+1. **Thấy trang nào** - bảng mới: cột là nhóm chức danh, dòng là trang, bỏ tích là chức danh đó
+   mất mục đó trên menu (mở thẳng địa chỉ cũng bị chặn). Ô nào bạn sửa khác mặc định sẽ có **viền
+   vàng**, và luôn có nút **trả về mặc định** cho từng nhóm hoặc cho toàn bộ.
+2. **Thấy dữ liệu của ai** - phạm vi: cả trung tâm / chi nhánh / chỉ của tôi.
+3. **Được làm việc gì** - bảng CH3 chép nguyên văn từ SOP.
+
+Ba điều nên nhớ khi chỉnh tầng 1:
+- Rê chuột vào ô sẽ thấy ô đó có phải **trang đáp** của chức danh không. Tắt trang đáp thì app tự
+  cho họ đáp vào trang khác còn bật - không ai bị rơi vào màn trắng.
+- **Bật một trang không có nghĩa là được ghi.** Cửa ghi vẫn do bảng CH3 chặn.
+- Lựa chọn nằm trong cấu hình nên **reset dữ liệu demo không xoá mất**.
+
+## Thẻ là đồng hồ, không phải cái nút (V9.61)
+
+Từ bản này **không còn ô nào trên app bấm được để lọc** - kể cả dải "Bảng NV Tư vấn / Bảng Kế
+toán…" theo chức danh. Lý do đo được: 15 trong 32 ô của dải đó bấm ra đúng cùng một chỗ với một ô
+khác trong chính dải đó (hai ô khác số, một danh sách y hệt).
+
+Đổi lại, **rê chuột vào ô nào cũng có câu chú thích** nói nó đếm gì và mở trang/tab nào để xem
+danh sách; và mọi ô đều **ẩn/hiện được** qua nút "Thẻ (n/N)" hoặc Cài đặt → Thẻ trên các trang.

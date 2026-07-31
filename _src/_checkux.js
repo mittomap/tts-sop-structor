@@ -713,6 +713,23 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
    else D.the.forEach(function(t){VE[t[0]]=1})}
   return _ss(items,key,ids)};
  function ve(f){try{f()}catch(e){}}
+ /* Đóng vai THẬT từng nhóm chức danh: `setRole("tuvan")` không đổi phạm vi (nó nhận mã vai của
+    bộ chọn demo, không phải nhóm), nên vòng cũ chỉ chạy đi chạy lại với quyền quản trị và dải
+    bảng việc của 7 nhóm kia CHƯA TỪNG được vẽ. Dựng phạm vi bằng chính hàm app dùng. */
+ var daNhom={};
+ rows("DL01").forEach(function(st){var eff;try{eff=buildScope(ecode(st.role))}catch(e){return}
+  if(!eff||daNhom[eff.group])return;daNhom[eff.group]=1;
+  window.SCOPEEFF=eff;CURSTAFF=st.staff_id;
+  var Ld=BVLAND[eff.group];
+  if(Ld&&Ld[1]){if(Ld[0]==="tuyensinh")window.TSTAB=Ld[1];if(Ld[0]==="hoctap")window.HTTAB=Ld[1]}
+  Object.keys(RENDER).forEach(function(p){CUR=p;ve(function(){RENDER[p]()})})});
+ /* Nhom DU PHONG: khong nhan su nao mang vai do (IT/bao ve/tap vu da bo khoi cong), nhung
+    duong ma van song - mot trung tam them vai moi ngay mai la roi vao day. Dong vai no bang
+    mot ma vai chua khai, de dai the cua no cung duoc ve THAT. */
+ (function(){var eff=buildScope("vai_chua_khai_bao");window.SCOPEEFF=eff;
+  CURSTAFF=(rows("DL01")[0]||{}).staff_id;
+  Object.keys(RENDER).forEach(function(p){CUR=p;ve(function(){RENDER[p]()})})})();
+ window.SCOPEEFF=null;
  ["quantri","tuvan","hocvu","giaovien","wow","ketoan","marketing","hotro","dieuhanh"].forEach(function(r){
   try{setRole(r)}catch(e){}
   try{CURSTAFF=(rows("DL01")[0]||{}).staff_id}catch(e){}

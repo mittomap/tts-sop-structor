@@ -2141,6 +2141,48 @@ var ROLESCOPE={
  if(Array.isArray(r.pages)&&r.pages.indexOf("giaoviec")<0)r.pages.push("giaoviec");
  if(Array.isArray(r.bell)&&r.bell.indexOf("Giao việc")<0)r.bell.push("Giao việc")}})();
 /* Lớp phủ QUẢN LÝ: leader/manager trong nhóm được cộng thêm quyền */
+/* ═══════════ V9.61 - TẦNG 1 CỦA PHÂN QUYỀN NAY SỬA ĐƯỢC TRONG CÀI ĐẶT ═══════════════════════
+   Anh Luân 31/07: *"cái cài đặt ai thấy trang nào, trước hết mặc định như ý em đã, rồi đưa mấy
+   cái đó vào cài đặt đi, để sau này IT hiểu ý đồ của anh là có thể bật tắt bất cứ thứ gì."*
+
+   Trước bản này màn Cài đặt khai rõ phân quyền có BA tầng, nhưng chỉ sửa được hai: phạm vi dữ
+   liệu (tầng 2) và bảng CH3 (tầng 3, chép từ SOP). Tầng 1 - chức danh nào thấy trang nào - nằm
+   cứng trong `ROLESCOPE`, muốn đổi phải sửa mã. Trái luật cứng của dự án.
+
+   Nay `ROLESCOPE` là MẶC ĐỊNH, `DATA.config.quyenTrang` là bản anh Luân sửa đè lên. Ghi vào
+   `CFKEY` nên reset dữ liệu demo không cuốn đi. Ba điều phải giữ, đã canh bằng bộ kiểm:
+   1. Trang đáp (`land`) bị tắt thì chức danh đó rơi vào khoảng không - app tự lùi về trang đầu
+      tiên còn bật, và màn Cài đặt cảnh báo ngay tại dòng đó.
+   2. Bật một trang KHÔNG có nghĩa là được ghi: cửa ghi vẫn do CH3 chặn. Giấu lối vào mà không
+      khoá cửa ghi thì phân quyền chỉ là trang trí - câu này đã ghi trên màn từ V9.41.
+   3. Luôn có nút trả về mặc định, từng chức danh và toàn bộ. */
+function qtCfg(){var c=(DATA.config=DATA.config||{});c.quyenTrang=c.quyenTrang||{};return c.quyenTrang}
+function qtMoiTrang(){return PAGES.filter(function(p){return !p.hide}).map(function(p){return p.k})}
+/* Mặc định theo ROLESCOPE; nhóm khai "*" nghĩa là thấy hết. */
+function qtMacDinh(g,k){var b=ROLESCOPE[g];if(!b)return false;
+ return b.pages==="*"?true:(b.pages.indexOf(k)>=0)}
+function qtOn(g,k){var o=qtCfg()[g];
+ if(o&&o[k]!=null)return !!o[k];
+ return qtMacDinh(g,k)}
+function qtSua(g,k){var o=qtCfg()[g];return !!(o&&o[k]!=null&&(!!o[k])!==qtMacDinh(g,k))}
+function qtSoSua(g){var n=0;qtMoiTrang().forEach(function(k){if(qtSua(g,k))n++});return n}
+function qtToggle(g,k){var C=qtCfg();C[g]=C[g]||{};
+ var moi=!qtOn(g,k);
+ if(moi===qtMacDinh(g,k))delete C[g][k];else C[g][k]=moi?1:0;
+ if(!Object.keys(C[g]).length)delete C[g];
+ cfgSave();try{applyScope(window.GATE_SID||"");buildNav()}catch(e){}
+ reRender("settings")}
+function qtVeMacDinh(g){var C=qtCfg();if(g)delete C[g];else{for(var k in C)delete C[k]}
+ cfgSave();try{applyScope(window.GATE_SID||"");buildNav()}catch(e){}
+ reRender("settings")}
+/* Danh sách trang CUỐI CÙNG của một nhóm, sau khi đắp bản sửa của anh Luân lên mặc định. */
+function qtPages(g,base){
+ var C=qtCfg()[g];
+ if(!C||!Object.keys(C).length)return base;              /* chưa sửa gì - giữ nguyên, kể cả "*" */
+ var moi=qtMoiTrang().filter(function(k){return qtOn(g,k)});
+ /* trang ẩn (chỉ tới được từ nơi khác) mà mặc định có thì giữ - đừng để bản sửa làm mất lối */
+ if(base!=="*")base.forEach(function(k){if(moi.indexOf(k)<0&&qtMoiTrang().indexOf(k)<0)moi.push(k)});
+ return moi}
 function buildScope(code){
  var gk="hotro";for(var k in ROLESCOPE){var m=ROLESCOPE[k].match;if(m&&m.test(code)){gk=k;break}}
  var base=ROLESCOPE[gk];var eff={group:gk};
@@ -2163,6 +2205,10 @@ function buildScope(code){
     là chỗ sửa LUẬT của cả trung tâm. Vai trò quản trị hệ thống nay là tài khoản Quản trị viên
     riêng; Nhân sự có nhóm `nhansu` với màn của chính họ. Nhóm dự phòng thì không được với tới
     Cài đặt trong mọi trường hợp - một chức danh app chưa biết là chức danh chưa ai duyệt quyền. */
+ /* V9.61: bản sửa của anh Luân trong Cài đặt đắp lên CUỐI cùng - sau mọi luật tự động ở trên,
+    để cái anh bấm luôn là cái thắng. */
+ eff.pages=qtPages(gk,eff.pages);
+ if(eff.pages!=="*"&&eff.pages.indexOf(eff.land)<0)eff.land=eff.pages[0]||"viec";
  return eff}
 function SCOPE(){return window.SCOPEEFF||ROLESCOPE.quantri}
 function applyScope(sid){var eff;
@@ -2627,6 +2673,39 @@ var THEDEF={
   ["vc_amber","Sắp tới hạn","Đếm những việc CHƯA quá hạn nhưng sắp tới nơi - còn kịp làm hôm nay. Muốn xem danh sách: bấm chip 'Sắp tới hạn' ở thanh Mức độ ngay dưới."],
   ["vc_old","Nợ quá N ngày","Trong số việc quá hạn, đếm riêng những việc đã để mốc quá số ngày khai ở Ngưỡng & SLA (viecOldAlert_days). Nợ càng lâu càng khó cứu. Muốn xem danh sách: bấm chip 'Quá hạn' ở thanh Mức độ rồi nhìn phần ghi số ngày trễ của từng dòng."],
   ["vc_team","Quá hạn nhiều nhất","Bộ phận đang ôm nhiều việc QUÁ HẠN nhất (xếp theo quá hạn chứ không theo tổng việc) - hôm nay nên dồn người sang đó. Muốn xem danh sách: chọn đúng bộ phận đó ở thanh Bộ phận ngay dưới."]]},
+ /* `neo` khác "bstats": dải này nằm CÙNG TRANG với dải thẻ của trang (Trang bắt đầu có cả hai).
+    Hai chỗ cùng mang một mã neo thì bài hướng dẫn tô sáng nhầm chỗ - đúng lỗi anh Luân vừa chụp
+    được. Dải này đã có neo riêng `bangviec` ở dòng tiêu đề, nên phần thẻ mang mã khác. */
+ bangviec:{t:"Bảng việc theo chức danh (dải dưới thanh chọn)",neo:"bvstats",the:[
+  ["bv_lead_new","Lead mới (chưa LH)","Lead đã vào hệ thống mà chưa ai gọi lần nào - đồng hồ SLA phản hồi đang chạy. Muốn xem danh sách: mở trang Tuyển sinh ở menu trái rồi chọn bước Lead."],
+  ["bv_lead_work","Lead đang khai thác","Lead đã liên hệ và đang trong quá trình chăm. Muốn xem danh sách: trang Tuyển sinh, bước Lead, lọc theo trạng thái Đã liên hệ."],
+  ["bv_test_up","Test sắp tới","Ca test đầu vào đã đặt lịch, chưa thi hoặc chưa chấm. Muốn xem danh sách: trang Tuyển sinh, bước Test đầu vào."],
+  ["bv_tv_can","Tư vấn cần làm","Khách đã có điểm test mà chưa được tư vấn - hạn tính theo CVT. Muốn xem danh sách: trang Tuyển sinh, bước Tư vấn & ĐK."],
+  ["bv_test_wait","Test chờ chấm","Ca test đã thi mà chưa ai chấm điểm - hạn tính theo GLA. Muốn xem danh sách: trang Tuyển sinh, bước Test đầu vào."],
+  ["bv_test_done","Test đã chấm","Ca test đã có điểm tổng. Muốn xem danh sách: trang Tuyển sinh, bước Test đầu vào, lọc trạng thái đã chấm."],
+  ["bv_wow_up","WOW sắp tới","Buổi WOW 1-1 đã đặt lịch, chưa dạy. Muốn xem danh sách: trang Học tập & Giảng dạy, tab Buổi WOW 1-1."],
+  ["bv_wow_imp","WOW có tiến bộ","Buổi WOW đã dạy và ghi nhận học viên tiến bộ - tử số của chỉ số WOR. Muốn xem danh sách: trang Học tập & Giảng dạy, tab Buổi WOW 1-1."],
+  ["bv_ses_done","Buổi đã hoàn thành","Buổi lớp tôi đã dạy xong. Muốn xem danh sách: trang Học tập & Giảng dạy, tab Nhận xét buổi."],
+  ["bv_ses_note","Cần viết nhận xét buổi","Buổi đã dạy mà chưa ghi nhận xét - hạn tính theo slaTeacherNote_hours. Muốn xem danh sách: trang Học tập & Giảng dạy, tab Nhận xét buổi."],
+  ["bv_hw_wait","Bài tập chờ chấm","Bài học viên đã nộp mà chưa chấm - hạn tính theo slaHomeworkGrading_hours. Muốn xem danh sách: mở trang Giao & chấm Bài tập ở menu trái."],
+  ["bv_risk_aca","HV nguy cơ học thuật","Học viên trong lớp tôi đang bị đánh dấu nguy cơ học thuật - nên đề xuất buổi WOW. Muốn xem danh sách: mở trang Học viên nguy cơ ở menu trái."],
+  ["bv_ob_open","Nhập học chưa xong","Hồ sơ onboarding còn dở bước - hạn tính theo slaOBT_hours. Muốn xem danh sách: bảng hồ sơ ngay dưới trên chính trang này."],
+  ["bv_risk_stu","Học viên nguy cơ","Học viên bị đánh dấu nguy cơ trên trục chuyên cần hoặc học thuật. Muốn xem danh sách: mở trang Học viên nguy cơ ở menu trái."],
+  ["bv_fb_new","Phản hồi chờ phân loại","Phản hồi mới nhận, chưa ai xếp loại. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Phản hồi / Góp ý."],
+  ["bv_kn_open","Khiếu nại đang xử lý","Khiếu nại chưa đóng. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Khiếu nại."],
+  ["bv_ck_duyet","Chiết khấu chờ duyệt","Đăng ký có mức chiết khấu vượt ngưỡng phải trình quản lý mà chưa ai duyệt. Muốn xem danh sách: mở trang Chờ duyệt ở menu trái, tab Duyệt chiết khấu."],
+  ["bv_doilop2","Đổi lớp từ 2 lần","Học viên đã đổi lớp từ 2 lần trở lên - theo CH3 phải có quản lý phê duyệt. Muốn xem danh sách: mở trang Xếp lớp & Onboarding ở menu trái."],
+  ["bv_kn_high","Khiếu nại mức CAO","Khiếu nại xếp mức cao còn đang mở - quản lý phải tham gia trong hạn khai ở Ngưỡng & SLA. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Khiếu nại."],
+  ["bv_kn_esc","Khiếu nại đã leo thang","Khiếu nại đã đẩy lên cấp trên vì học viên không chấp nhận cách xử lý. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Khiếu nại."],
+  ["bv_hoan","Hoàn tiền chờ duyệt","Khoản hoàn tiền đang chờ người có thẩm quyền gật đầu - hạn tính theo slaRefundProcess_days. Muốn xem danh sách: mở trang Chờ duyệt ở menu trái, tab Duyệt hoàn tiền."],
+  ["bv_tk_new","Việc mới chờ nhận","Việc người khác giao cho tôi mà tôi chưa bấm Nhận. Muốn xem danh sách: mở trang Giao việc ở menu trái, tab Việc của tôi."],
+  ["bv_tk_doing","Đang làm","Việc tôi đã nhận và chưa báo xong. Muốn xem danh sách: mở trang Giao việc ở menu trái, tab Việc của tôi."],
+  ["bv_tk_late","Quá hạn","Việc của tôi đã qua hạn mà chưa xong - cần báo lại người giao. Muốn xem danh sách: mở trang Giao việc ở menu trái, tab Việc của tôi."],
+  ["bv_tk_wait","Chờ người giao xác nhận","Việc tôi đã báo xong, đang chờ người giao gật đầu. Muốn xem danh sách: mở trang Giao việc ở menu trái, tab Việc của tôi."],
+  ["bv_hs_thieu","Hồ sơ nhân sự còn thiếu","Nhân viên chưa điền đủ chức danh, cơ sở hoặc email đăng nhập - thiếu thì phân quyền và phân công đều sai. Muốn xem danh sách: bảng nhân sự ngay dưới trên chính trang này."],
+  ["bv_gio_thieu","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy mà chưa ghi giờ vào hoặc giờ ra - thiếu mốc thì bảng công tính sai. Muốn xem danh sách: mở trang Bảng công giảng dạy ở menu trái."],
+  ["bv_no_phi","Đơn còn nợ phí","Đăng ký còn hiệu lực mà vẫn còn tiền chưa thu. Muốn xem danh sách: trang Tuyển sinh, bước Thanh toán."],
+  ["bv_thu_soat","Phiếu thu chờ đối soát","Phiếu thu đã ghi mà kế toán chưa xác nhận. Muốn xem danh sách: mở trang Chờ duyệt ở menu trái, tab Xác nhận thu tiền."]]},
  banlam:{t:"Trang bắt đầu",the:[
   ["bl0_appt","Tới hẹn hôm nay","Số hồ sơ có lịch hẹn liên hệ rơi vào hôm nay, cộng phần đã quá hẹn từ hôm trước. Muốn xem danh sách: bấm chip 'Tới hẹn / quá hẹn' ở thanh Nhóm ngay dưới."],
   ["bl0_risk","Học viên nguy cơ","Học viên đang bị đánh dấu nguy cơ trên trục chuyên cần hoặc trục học thuật, toàn trung tâm. Muốn xem danh sách: mở trang Học viên nguy cơ ở menu trái."],
@@ -2802,8 +2881,13 @@ function theSync(key){var box=document.querySelector('.bstatsw[data-thekey="'+ke
 function theBoxIn(key){var parts=THEHTML[key]||[];
  var hien=0,tong=parts.length,body="";
  parts.forEach(function(p){if(theHidden(p[0]))return;hien++;body+=p[1]});
+ var neo=(THEDEF[key]&&THEDEF[key].neo)||"bstats";
  return '<div class="thewrap"><button class="btn'+(hien<tong?" primary":"")+' sm" onclick="theMenuToggle(\''+esc(key)+'\')" data-tip="Chọn thẻ nào hiện trên trang này - giống nút Cột của bảng. Lựa chọn được nhớ lại và không mất khi reset dữ liệu demo."><i class="ti ti-layout-cards"></i>Thẻ ('+hien+'/'+tong+')</button>'+theMenuHTML(key)+'</div>'+
-  '<div class="bstats" data-tour="bstats">'+body+'</div>'}
+  (neo==="bstats"
+  /* Viết THẲNG chuỗi `data-tour="bstats"` cho trường hợp mặc định: bộ kiểm hướng dẫn quét MÃ
+     NGUỒN tìm literal, ghép biến là neo "tàng hình" với nó - đúng cái bẫy đã ghi ở V9.60. */
+  ?'<div class="bstats" data-tour="bstats">'
+  :'<div class="bstats" data-tour="bvstats">')+body+'</div>'}
 /* ═══════════ V9.36 - BẤM TÊN LÀ RA NGĂN KÉO, Ở MỌI BẢNG ═══════════
    (anh Luân: "a nhớ em có làm drawer rồi mà sao mấy trang này chưa có")
    Trước đây tableHTML nối ngăn kéo bằng cách LIỆT KÊ TÊN TRANG - đúng 6 trang được nối tay, 23
@@ -3850,7 +3934,7 @@ function BANGVIEC(){
      ["ti-message-2",FB.filter(function(r){return !String(r.classified_at||"").trim()}).length,"Phản hồi chờ phân loại","#3B82C4","SLA "+slaChip("slaFeedbackClassify_hours",24,"giờ"),"goCS('phanhoi')"],
      ["ti-alert-triangle",KN.filter(function(r){return !isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại đang xử lý","#6B4FA0","SLA phân công "+slaChip("slaComplaintFirstResponse_hours",4,"giờ"),"goCS('khieunai')"]]},
  quanly:{bc:"BC9",t:"Bảng Quản lý",d:"Việc cần cấp quản lý gật đầu, theo bảng phân quyền CH3.",
-  o:[["ti-discount-2",duyCkList().length,"Chiết khấu cần duyệt","#B58A2B","từ "+money(ckThreshold())+" trở lên","goDuyet('duyetck')"],
+  o:[["ti-discount-2",duyCkList().length,"Chiết khấu chờ duyệt","#B58A2B","từ "+money(ckThreshold())+" trở lên","goDuyet('duyetck')"],
      ["ti-transfer",OB.filter(function(r){return num(r.placement_change_count)>=2}).length,"Đổi lớp từ 2 lần","#6B4FA0","cần quản lý phê duyệt","go('xeplop')"],
      ["ti-alert-triangle",KN.filter(function(r){return isc(r.complaint_severity,"high")&&!isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại mức CAO","#E24B4A","quản lý tham gia trong "+slaChip("slaComplaintHigh_hours",4,"giờ"),"goCS('khieunai')"],
      ["ti-arrow-up-right",KN.filter(function(r){return String(r.escalated_to||"").trim()&&!isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại đã leo thang","#DB2777","HV không chấp nhận cách xử lý","goCS('khieunai')"],
@@ -3908,12 +3992,22 @@ function bvKhoi(g){g=g||(SCOPE().group||"quantri");
 /* Mỗi ô "chờ duyệt" gắn với MỘT hành động trong bảng CH3 - ai sở hữu hành động đó mới thấy ô đó.
    Trước bản này mọi trưởng phòng đều thấy cả bốn ô duyệt, kể cả TP Marketing thấy ô khiếu nại. */
 var BVDUYET=[["ck_lon",0],["doilop2",1],["kn_duyet",2],["kn_duyet",3],["hoantien",4]];
+/* V9.61 (anh Luân giao toàn quyền quyết): dải bảng việc theo chức danh nay CƯ XỬ ĐÚNG NHƯ MỌI
+   THẺ KHÁC - không bấm được, có chú thích đầy đủ, ẩn/hiện được. Lý do đo được, không phải cảm
+   tính: 15 trong 32 ô của dải này bấm ra ĐÚNG CÙNG MỘT CHỖ với một ô khác trong chính dải đó.
+   "Lead mới (chưa LH)" và "Lead đang khai thác" cùng mở tab Lead, không mang theo bộ lọc nào -
+   bấm hai ô khác số, nhận về một danh sách y hệt. Đó là kiểu nói dối anh Luân đã cấm ở thẻ.
+   Giữ nó bấm được thì phải viết 32 bộ lọc riêng, mà lúc đó app lại có HAI loại ô (thẻ không bấm,
+   ô bảng việc bấm được) và người dùng phải học phân biệt. Một luật cho cả app: THẺ LÀ ĐỒNG HỒ.
+   Đường tới danh sách không mất - nó chuyển vào câu chú thích, và bộ kiểm canh câu đó không
+   được chỉ vào chỗ không có. */
+var BVMA={"Lead mới (chưa LH)":"bv_lead_new","Lead đang khai thác":"bv_lead_work","Test sắp tới":"bv_test_up","Tư vấn cần làm":"bv_tv_can","Test chờ chấm":"bv_test_wait","Test đã chấm":"bv_test_done","WOW sắp tới":"bv_wow_up","WOW có tiến bộ":"bv_wow_imp","Buổi đã hoàn thành":"bv_ses_done","Cần viết nhận xét buổi":"bv_ses_note","Bài tập chờ chấm":"bv_hw_wait","HV nguy cơ học thuật":"bv_risk_aca","Nhập học chưa xong":"bv_ob_open","Học viên nguy cơ":"bv_risk_stu","Phản hồi chờ phân loại":"bv_fb_new","Khiếu nại đang xử lý":"bv_kn_open","Chiết khấu chờ duyệt":"bv_ck_duyet","Đổi lớp từ 2 lần":"bv_doilop2","Khiếu nại mức CAO":"bv_kn_high","Khiếu nại đã leo thang":"bv_kn_esc","Hoàn tiền chờ duyệt":"bv_hoan","Việc mới chờ nhận":"bv_tk_new","Đang làm":"bv_tk_doing","Quá hạn":"bv_tk_late","Chờ người giao xác nhận":"bv_tk_wait","Hồ sơ nhân sự còn thiếu":"bv_hs_thieu","Buổi thiếu mốc giờ vào/ra":"bv_gio_thieu","Đơn còn nợ phí":"bv_no_phi","Phiếu thu chờ đối soát":"bv_thu_soat"};
 function bvStrip(t,bc,d,o,tour){
  if(!o.length)return "";
  return '<div class="sechd"'+(tour?' data-tour="'+tour+'"':'')+'>'+esc(t)+
   ' <span style="font-weight:600;text-transform:none;letter-spacing:0" class="mut">· '+esc(bc)+'</span></div>'+
-  '<div class="fhint" style="margin:-4px 0 8px">'+esc(d)+' Bấm vào một ô để mở đúng danh sách.</div>'+
-  statStrip(o)}
+  '<div class="fhint" style="margin:-4px 0 8px">'+esc(d)+' Rê chuột vào một ô để biết nó đếm gì và xem danh sách ở đâu.</div>'+
+  statStrip(o,"bangviec",o.map(function(x){return BVMA[String(x[2])]||""}))}
 function bangViecHTML(){
  var rs=SCOPE(),g=rs.group||"quantri";
  var L=BVLAND[g];if(!L||CUR!==L[0])return "";
@@ -9285,6 +9379,37 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   h+='<div class="notebar"><i class="ti ti-shield-lock"></i>'+goiy("gy_phan_quyen_co_ba_7c33",'<b>Phân quyền có BA tầng.</b> (1) <b>Thấy trang nào</b> - theo chức danh. (2) <b>Thấy dữ liệu của ai</b> - bảng phạm vi bên dưới. (3) <b>Được LÀM việc gì</b> - bảng CH3 của SOP, chặn ngay tại cửa ghi. Giấu lối vào mà không khóa cửa ghi thì phân quyền chỉ là trang trí.')+'</div>';
   /* V9.41 - BẢNG CH3: tầng thứ ba, trước đây app không có. SOP ghi 8 việc "Quản lý phê duyệt",
      app chỉ canh thật đúng 1 (duyệt chiết khấu) - 7 việc còn lại ai mở được trang là bấm xong. */
+  /* ═══ V9.61 - TẦNG 1: THẤY TRANG NÀO (anh Luân: "để sau này IT hiểu ý đồ của anh là có thể
+     bật tắt bất cứ thứ gì") ═══ */
+  h+='<div class="sechd">Thấy trang nào · bật/tắt từng trang cho từng chức danh</div>';
+  var QG=Object.keys(ROLESCOPE);
+  var qDaSua=QG.reduce(function(a,g){return a+qtSoSua(g)},0);
+  h+='<div class="panel"><div class="pbody">';
+  h+='<div class="fhint" style="margin:0 0 10px">Cột là <b>nhóm chức danh</b>, dòng là <b>trang</b>. Bỏ tích là chức danh đó không còn mục đó trên menu và mở thẳng địa chỉ cũng bị chặn. '
+   +'Mặc định là bản đang chạy; ô nào bạn sửa khác mặc định sẽ có <b>viền vàng</b>. '
+   +'<b>Bật một trang không có nghĩa là được ghi</b> - cửa ghi vẫn do bảng CH3 bên dưới chặn.</div>';
+  if(qDaSua)h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-pencil"></i>Đang có <b>'+qDaSua+' ô</b> khác mặc định. '
+   +'<button class="btn sm" onclick="qtVeMacDinh(\'\')"><i class="ti ti-restore"></i>Trả toàn bộ về mặc định</button></div>';
+  h+='<div class="tbwrap" data-tour="quyentrang"><table class="tb"><thead><tr><th style="min-width:190px">Trang</th>';
+  QG.forEach(function(g){h+='<th style="text-align:center;font-size:10.5px;line-height:1.3">'+esc(GRPT[g]||g)+'<br><span class="mut" style="font-weight:600">'+(CNT[g]||0)+' người</span></th>'});
+  h+='</tr></thead><tbody>';
+  var qNhom="";
+  PAGES.filter(function(pg){return !pg.hide}).forEach(function(pg){
+   if(pg.g!==qNhom){qNhom=pg.g;
+    h+='<tr><td colspan="'+(QG.length+1)+'" style="background:var(--bg);font-weight:800;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)">'+esc(qNhom)+'</td></tr>'}
+   h+='<tr><td style="font-size:12px"><i class="ti '+esc(pg.ic||"ti-file")+'" style="margin-right:6px;color:var(--muted)"></i>'+esc(pg.t)+'</td>';
+   QG.forEach(function(g){var on=qtOn(g,pg.k),sua=qtSua(g,pg.k);
+    var laDap=(ROLESCOPE[g].land===pg.k);
+    h+='<td style="text-align:center'+(sua?';outline:2px solid var(--amber);outline-offset:-2px':'')+'">'
+     +'<input type="checkbox" '+(on?"checked":"")+' onclick="qtToggle(\''+esc(g)+'\',\''+esc(pg.k)+'\')"'
+     +' data-tip="'+esc((GRPT[g]||g)+" · "+pg.t+(laDap?" · ĐÂY LÀ TRANG ĐÁP của chức danh này - tắt thì họ sẽ đáp vào trang khác":"")+(sua?" · đang khác mặc định":""))+'"'
+     +' style="width:16px;height:16px'+(laDap?";accent-color:var(--blue)":"")+'"></td>'});
+   h+='</tr>'});
+  h+='</tbody></table></div>';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">';
+  QG.forEach(function(g){if(qtSoSua(g))h+='<button class="btn sm" onclick="qtVeMacDinh(\''+esc(g)+'\')"><i class="ti ti-restore"></i>Trả '+esc(GRPT[g]||g)+' về mặc định</button>'});
+  h+='</div>';
+  h+='</div></div>';
   h+='<div class="sechd">Được làm việc gì · bảng phân quyền CH3 của SOP</div>';
   h+='<div class="panel"><div class="pbody">';
   h+='<div class="fhint" style="margin:0 0 10px">Bảng này chép nguyên văn từ trang <b>CH3. Phân quyền</b> của file SOP. Bộ kiểm <code>check_sop.py</code> đọc thẳng file SOP và đối chiếu từng dòng - lệch một dòng là đỏ, nên bảng ở đây không thể trôi khỏi SOP mà không ai biết. Cột cuối cho biết <b>chức danh đang xem</b> có được làm việc đó không.</div>';
@@ -14351,8 +14476,9 @@ var TOURS={
   /* V9.54: bước này từng khoanh CẢ thanh tab - thanh rộng hết màn nên hộp hướng dẫn không còn
      chỗ nào đứng mà không chạm vùng sáng. Neo vào đúng nút tab (chữ ngắn) thì hộp có chỗ. */
   {p:"settings",ctx:function(){window.SETTAB="demo"},sel:'@txt:Dữ liệu demo',t:"Dữ liệu demo",d:"Các máy mở bản demo tự đồng bộ nhau qua Room. Hết buổi bấm Reset là về nguyên bản.",hint:"Xong phần thương hiệu!"}]},
- cn_phanquyen:{lv:"chuyennghiep",t:"Phân quyền: ai thấy dữ liệu của ai",ic:"ti-shield-lock",d:"5 bước - thiết lập và kiểm chứng",steps:[
-  {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'.notebar',t:"Hai tầng phân quyền",d:"Tầng một: chức danh thấy trang nào. Tầng hai: thấy dữ liệu của ai. Tầng hai mới là thứ quan trọng khi nhiều nhân viên cùng dùng.",hint:"Bấm Tiếp theo."},
+ cn_phanquyen:{lv:"chuyennghiep",t:"Phân quyền: ai thấy gì, ai làm được gì",ic:"ti-shield-lock",d:"6 bước - ba tầng, thiết lập và kiểm chứng",steps:[
+  {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'.notebar',t:"Ba tầng phân quyền",d:"Tầng 1: chức danh thấy TRANG nào. Tầng 2: thấy DỮ LIỆU của ai. Tầng 3: được LÀM việc gì, theo bảng CH3 của SOP. Giấu lối vào mà không khoá cửa ghi thì phân quyền chỉ là trang trí - nên phải đủ cả ba.",hint:"Bấm Tiếp theo."},
+  {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'@quyentrang',t:"Tầng 1 - bật/tắt từng trang",d:"Cột là nhóm chức danh, dòng là trang. Bỏ tích là chức danh đó mất mục đó trên menu, mở thẳng địa chỉ cũng bị chặn. Ô nào bạn sửa khác mặc định sẽ có viền vàng, và luôn có nút trả về mặc định.",hint:"Rê chuột vào một ô để biết nó là trang đáp của ai."},
   {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'.dt',t:"Ma trận chức danh và dữ liệu",d:"Mỗi ô chọn 1 trong 4 mức: Không xem - Chỉ của tôi - Nhóm/cơ sở - Toàn trung tâm. Mặc định đã đặt theo thông lệ: sale chỉ thấy khách của mình, giáo viên chỉ thấy lớp mình dạy.",hint:"Thử đổi mức của một ô."},
   {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'.jgrid',t:"Xem thử bằng mắt người khác",d:"Chọn một nhân viên là biết ngay họ thấy bao nhiêu khách, bao nhiêu học viên, có xem được báo cáo không - kiểm chứng trước khi giao máy cho nhân viên.",hint:"Chọn một nhân viên tư vấn trong danh sách."},
   {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'.jgrid',t:"Che thông tin nhạy cảm",d:"Thấy dòng nhưng không đọc được ô: giáo viên không thấy tiền, marketing không thấy số điện thoại đầy đủ, kế toán không đọc nội dung tư vấn.",hint:"Xem 3 công tắc bên phải."},
