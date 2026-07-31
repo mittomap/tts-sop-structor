@@ -658,6 +658,130 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
   var co=false;APPPARAMS.forEach(function(p){if(p[1]===n)co=true});
   t("tham so "+n+" da khai trong CH2", co)});
 })();
+/* ═══ V9.59 - HỆ THẺ CƯ XỬ NHƯ CỘT (anh Luân 31/07) ═══════════════════════════════════════
+   *"mấy cái thẻ kia tại sao lại cố định nhỉ, sao ko phải như các cột... nó đâu cần phải bấm
+   nhỉ... em làm tooltip ghi chú đầy đủ... Đưa nó vào cấu hình... Còn ẩn hiện, thì vừa có ở cài
+   đặt, vừa có ở trực tiếp trang nhé."*
+   Bốn lời hứa, canh cả bốn - và canh bằng cách CHẠY THẬT chứ không đọc chữ trong nguồn:
+   1. mọi dải thẻ có mã khai trong THEDEF, số thẻ khai khớp số thẻ vẽ ra;
+   2. thẻ không còn onclick;
+   3. mỗi thẻ có chú thích, sửa được, sửa xong đọc lại đúng bản đã sửa;
+   4. tắt một thẻ thì nó BIẾN MẤT thật, và nút "Thẻ (n/N)" đếm lại đúng. */
+(function(){
+ /* (1) trong NGUỒN: mọi lần gọi statStrip phải truyền mã dải - trừ bvStrip (hàng chờ việc theo
+    chức danh, mỗi ô là một danh sách phải mở ra làm, không có bộ lọc nào thay được). */
+ var thieuMa=[],curFn=null,fnDong=[];
+ for(var i=0;i<L.length;i++){var mf=/^function ([A-Za-z0-9_]+)/.exec(L[i]);if(mf)curFn=mf[1];fnDong[i]=curFn}
+ (function(){var re=/statStrip\(/g,m;
+  while((m=re.exec(SRC))){
+   var i=m.index;
+   if(SRC.slice(Math.max(0,i-9),i)==="function ")continue;
+   var dong=SRC.slice(0,i).split("\n").length-1;
+   if(fnDong[dong]==="bvStrip")continue;
+   /* dò tới ngoặc đóng CÂN BẰNG rồi soi đối số cuối - lời gọi trải nhiều dòng, không cắt theo dòng được */
+   var j=SRC.indexOf("(",i),d=0,k=j;
+   while(k<SRC.length){if(SRC[k]==="(")d++;else if(SRC[k]===")"){d--;if(!d)break}k++}
+   var than=SRC.slice(j+1,k);
+   if(!/,\s*"[a-z_0-9]+"\s*(,[\s\S]*)?$/.test(than.trim()))thieuMa.push(fnDong[dong]+" (dong "+(dong+1)+")")}})();
+ t("moi lan goi statStrip deu truyen ma dai"+(thieuMa.length?" - THIEU: "+thieuMa.slice(0,4).join(", "):""), thieuMa.length===0);
+
+ /* (2) bản khai: mã duy nhất, thẻ nào cũng có chú thích */
+ var all=theAll(),seen={},dup=[],noTip=[];
+ all.forEach(function(x){var id=x[1][0];if(seen[id])dup.push(id);seen[id]=1;
+  if(!theTip(id))noTip.push(id)});
+ t("ma the duy nhat toan app ("+all.length+" the)"+(dup.length?" - TRUNG: "+dup.join(","):""), dup.length===0);
+ t("the nao cung co cau chu thich"+(noTip.length?" - THIEU: "+noTip.slice(0,4).join(","):""), noTip.length===0);
+ t("moi the co ten doc duoc de bay o Cai dat", all.every(function(x){return String(x[1][1]||"").trim().length>2}));
+ /* chú thích phải nói được CÁCH XEM DANH SÁCH - đó là cái thay cho việc bấm vào thẻ */
+ var khongChiCho=all.filter(function(x){return !/(Muốn xem|Rê chuột|Muốn chi tiết)/i.test(theTip(x[1][0]))}).map(function(x){return x[1][0]});
+ t("chu thich the co chi cho xem danh sach o dau"+(khongChiCho.length?" - THIEU: "+khongChiCho.slice(0,4).join(","):""), khongChiCho.length===0);
+
+ /* (3) CHẠY THẬT: đếm thẻ vẽ ra so với thẻ khai, ở mọi chức danh + mọi màn chi tiết */
+ var LECH={},SEEN={},VE={},_ss=statStrip;
+ global.statStrip=function(items,key,ids){
+  if(key){SEEN[key]=1;var D=THEDEF[key];
+   if(!D)LECH[key]="khong khai trong THEDEF";
+   else if(ids){/* dải cắt bớt thẻ theo chức danh: mọi mã vẽ ra phải nằm trong bản khai */
+    var kh={};D.the.forEach(function(t){kh[t[0]]=1});
+    var la=ids.filter(function(x){return !kh[x]});
+    if(la.length)LECH[key]="ma la: "+la.join(",");
+    ids.forEach(function(x){VE[x]=1})}
+   else if(D.the.length!==items.length)LECH[key]=items.length+" ve ra / "+D.the.length+" khai";
+   else D.the.forEach(function(t){VE[t[0]]=1})}
+  return _ss(items,key,ids)};
+ function ve(f){try{f()}catch(e){}}
+ ["quantri","tuvan","hocvu","giaovien","wow","ketoan","marketing","hotro","dieuhanh"].forEach(function(r){
+  try{setRole(r)}catch(e){}
+  try{CURSTAFF=(rows("DL01")[0]||{}).staff_id}catch(e){}
+  Object.keys(RENDER).forEach(function(p){CUR=p;ve(function(){RENDER[p]()})})});
+ try{setRole("all")}catch(e){}
+ rows("DL01").forEach(function(s){CURSTAFF=s.staff_id;ve(function(){myKpiHTML()});
+  window.GVID=s.staff_id;ve(function(){renderHosoGV()});
+  window.NVID=s.staff_id;ve(function(){renderHosoNV()})});
+ rows("DL05").forEach(function(c){window.KHID=c.course_id;ve(function(){renderHosoKhoa()})});
+ /* các dải nằm trong TAB con, không gọi tới qua RENDER[trang] - phải gọi thẳng hàm vẽ tab */
+ ["renderNhatky","renderReupTab","renderTrangHV","renderHtToday","tkReport","renderCong","renderDuthu"]
+  .forEach(function(f){ve(function(){global[f]()})});
+ Object.keys(RENDER).forEach(function(p){CUR=p;ve(function(){RENDER[p]()})});
+ var chuaChay=Object.keys(THEDEF).filter(function(k){return !SEEN[k]});
+ t("so the khai khop so the ve ra o moi dai"+(Object.keys(LECH).length?" - LECH: "+JSON.stringify(LECH):" ("+Object.keys(SEEN).length+" dai)"), Object.keys(LECH).length===0);
+ t("khong co dai the khai thua (dai nao cung chay that)"+(chuaChay.length?" - CHUA CHAY: "+chuaChay.join(","):""), chuaChay.length===0);
+ var theChet=all.filter(function(x){return !VE[x[1][0]]}).map(function(x){return x[1][0]});
+ t("khong co THE khai ma khong bao gio ve ra"+(theChet.length?" - CHET: "+theChet.slice(0,6).join(","):" ("+Object.keys(VE).length+" the)"), theChet.length===0);
+ global.statStrip=_ss;
+
+ /* (4) thẻ trên trang KHÔNG bấm được, và dải nào cũng có nút "Thẻ (n/N)" */
+ var coOnclick=[],thieuNut=[],soDai=0;
+ Object.keys(RENDER).forEach(function(k){CUR=k;var h="";
+  try{h=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){return}
+  var re=/<div class="bstatsw" data-thekey="([a-z_]+)">([\s\S]*?)<div class="bstats"/g,m;
+  while((m=re.exec(h))){soDai++;
+   if(!/Thẻ \(\d+\/\d+\)/.test(m[2]))thieuNut.push(k+"/"+m[1])}
+  var re2=/<div class="bstat ro"[^>]*>/g,m2;
+  while((m2=re2.exec(h)))if(/onclick/.test(m2[0]))coOnclick.push(k)});
+ t("dai the tren trang deu co nut Thẻ (n/N) de an/hien ("+soDai+" dai)"+(thieuNut.length?" - THIEU: "+thieuNut.slice(0,4).join(","):""), soDai>0&&thieuNut.length===0);
+ t("the tren trang khong con bam duoc"+(coOnclick.length?" - CON BAM: "+coOnclick.slice(0,4).join(","):""), coOnclick.length===0);
+
+ /* (5) TẮT một thẻ thì nó biến mất THẬT và nút đếm lại đúng - không tin lời khai, đo trên HTML */
+ (function(){
+  var k="viec",id=THEDEF[k].the[0][0],tong=THEDEF[k].the.length;
+  CUR=k;var truoc="";try{truoc=RENDER[k]()}catch(e){}
+  var coTruoc=truoc.indexOf('data-the="'+id+'"')>=0;
+  var demTruoc=/Thẻ \((\d+)\/(\d+)\)/.exec(truoc);
+  DATA.config=DATA.config||{};DATA.config.theHide=DATA.config.theHide||{};
+  DATA.config.theHide[id]=1;
+  var sau="";try{sau=RENDER[k]()}catch(e){}
+  var coSau=sau.indexOf('data-the="'+id+'"')>=0;
+  var demSau=/Thẻ \((\d+)\/(\d+)\)/.exec(sau);
+  delete DATA.config.theHide[id];
+  t("truoc khi tat: the co mat va nut dem du "+tong, coTruoc&&demTruoc&&+demTruoc[1]===tong&&+demTruoc[2]===tong);
+  t("tat mot the thi the do BIEN MAT khoi trang that", coTruoc&&!coSau);
+  t("tat mot the thi nut dem lui mot ("+(demSau?demSau[1]+"/"+demSau[2]:"?")+")", !!demSau&&+demSau[1]===tong-1&&+demSau[2]===tong);
+ })();
+
+ /* (6) sửa chú thích ở Cài đặt là đọc lại đúng bản đã sửa, và trả về mặc định được */
+ (function(){
+  var id=THEDEF.viec.the[0][0],goc=theTip(id);
+  theTipLuu(id,"CAU THU CUA ANH LUAN");
+  t("sua chu thich the thi doc lai dung ban da sua", theTip(id)==="CAU THU CUA ANH LUAN");
+  t("app biet the nay da bi sua chu thich", theTipSua(id)===true);
+  theTipLuu(id,"");
+  t("tra chu thich the ve mac dinh duoc", theTip(id)===goc&&theTipSua(id)===false);
+ })();
+
+ /* (7) hai nửa "vừa có ở cài đặt, vừa có ở trực tiếp trang" phải cùng tồn tại */
+ var stTabs=setTabs().map(function(x){return x[0]});
+ t("Cai dat co tab The", stTabs.indexOf("the")>=0);
+ t("tab The co ban khai gioi thieu (SETMOTA)", !!SETMOTA.the);
+ CUR="settings";window.SETTAB="the";var hs="";try{hs=RENDER.settings()}catch(e){}
+ t("tab The trong Cai dat liet ke duoc the", (hs.match(/id="the_[a-z_]+"/g)||[]).length>=40);
+ t("tab The trong Cai dat co o tich an/hien tung the", (hs.match(/onclick="theToggle\(/g)||[]).length>=40);
+ t("tab The trong Cai dat co nut Luu chu thich", /theTipLuu\(/.test(hs));
+ window.SETTAB="";
+ /* (8) lựa chọn ẩn/hiện phải nằm trong CẤU HÌNH (đi theo CFKEY) chứ không nằm trong dữ liệu demo */
+ t("an/hien the ghi vao DATA.config (khong mat khi reset du lieu demo)", /c\.theHide=c\.theHide\|\|\{\}/.test(String(theToggle)));
+ t("chu thich the ghi vao DATA.config", /c\.theTip=c\.theTip\|\|\{\}/.test(String(theTipLuu)));
+})();
 if(bad.length){console.log("CHECKUX DO ("+bad.length+"/"+(ok+bad.length)+"):");
  bad.forEach(function(b){console.log("  - "+b)});process.exit(1)}
 console.log("CHECKUX OK: "+ok+" tieu chi | "+FORM.length+" form ghi deu co loi giai thich, khong o ngay nao de trong");

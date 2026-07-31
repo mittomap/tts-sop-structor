@@ -193,13 +193,18 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("bat cu thu gi co onclick deu co con tro tay", /\[onclick\]\{cursor:pointer\}/.test(CSS));
  t("o chi de xem dung vien DUT de phan biet", /\.bstat\.static\{[^}]*border-style:dashed/.test(CSS));
  t("o chi de xem khong doi gi khi ro chuot", /\.bstat\.static:hover\{[^}]*box-shadow:none/.test(CSS));
+ /* V9.59: THE tren cac trang khong bam duoc nua - lop .ro, con tro mac dinh */
+ t("the tren trang co lop .ro va con tro mac dinh", /\.bstat\.ro\{cursor:default\}/.test(CSS));
  t("o bam duoc nhac len khi ro chuot", /\.bstat\[onclick\]:hover\{[^}]*transform:translateY/.test(CSS));
  t("chi o bam duoc moi co con tro tay", /\.bstat\[onclick\]\{cursor:pointer\}/.test(CSS));
  /* V9.29p: TIEU CHI NAY BI DAO. Truoc day statStrip LUON in "bstat static" - dai so chi de xem.
     Nay o nao co cho de di thi bam duoc, o nao khong thi van vien dut. Cai phai canh khong con la
     "luon tinh" ma la "tinh KHI VA CHI KHI khong co hanh dong". */
  t("o dai so tinh khi va chi khi khong co hanh dong", SRC.indexOf("(act?'':' static')")>=0);
- t("van con o tinh that su tren app", /class="bstat static"/.test(RENDER.banglop())||/class="bstat static"/.test(RENDER.chang()));
+ /* V9.59 (anh Luan): the tren trang KHONG bam duoc nua. Hop dong doi theo: thu phai thay tren
+    app la o CHI DE XEM (.bstat ro) chu khong phai o gach dut cua ban cu. */
+ t("the tren trang la o chi de xem that su", /class="bstat ro"/.test(RENDER.banglop())&&/class="bstat ro"/.test(RENDER.chang()));
+ t("the tren trang khong con onclick", !/<div class="bstat ro"[^>]*onclick/.test(RENDER.banglop()+RENDER.chang()));
  /* V9.55: hop dong nay tung ghi CHET mot ma mau. Bang mau vua duoc gom lai (202 -> 94) nen no do,
     trong khi hanh vi khong doi ti nao. Bo kiem canh MA MAU CU THE la bo kiem gay: cu chinh bang mau
     la no gay, ma no gay vi ly do khong lien quan gi den cai no dinh canh. Canh Y DINH: buoc phai CO
@@ -567,7 +572,11 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  setRole("all");
  window.VIECTEAM="all";window.VIECGRP="all";window.VIECSEV="";window.VIECOD=false;
  var o=RENDER["viec"]();
- t("co dai so bam duoc", (o.match(/class="bstat[^"]*" onclick="viecOnly/g)||[]).length>=3);
+ /* V9.59: dai the o day khong bam duoc nua; viec loc chuyen han sang thanh "Muc do" ngay duoi. */
+ t("co dai the chi de xem", (o.match(/class="bstat ro"/g)||[]).length>=4);
+ t("the khong con bam de loc", !/class="bstat[^"]*" onclick="viecOnly/.test(o));
+ t("co thanh loc Muc do de thay cho viec bam the", /Mức độ<\/span>/.test(o)&&/viecOnly\('red'\)/.test(o)&&/viecOnly\('amber'\)/.test(o));
+ t("moi the deu co nut an\/hien nhu cot", /Thẻ \(\d+\/\d+\)/.test(o));
  t("gom viec theo DO GAP chu khong do mot dong phang", (o.match(/class="viechd"/g)||[]).length>=1);
  t("co nhom 'Qua han - lam ngay'", /Quá hạn - làm ngay/.test(o));
  t("noi ro con bao nhieu viec bi cat, khong cat cam", /còn \d+ việc nữa|class="pmore"/.test(o)||true);
@@ -576,17 +585,21 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  viecOnly("red");
  t("bam o Qua han thi chi con muc do do", bellItems().filter(function(x){return x.sev==="red"}).length>0);
  var o2=RENDER["viec"]();
- t("loc do: khong con nhom 'Sap toi han'", !/Sắp tới hạn - còn kịp/.test(o2));
- t("dang loc thi co nut bo loc", /Bỏ lọc mức độ/.test(o2));
+ /* Neo vao chinh CAI TIEU DE NHOM (.viechd), khong neo vao chu tran lan tren trang: tu V9.59
+    cau chu thich cua the co nhac ten nhom ("cuon xuong nhom 'Sap toi han - con kip'"), neo vao
+    chu se an theo chu thich va bao xanh gia. */
+ function nhomTrong(h){return (h.match(/class="viechd"[^>]*>[\s\S]*?<\/div>/g)||[]).join(" ")}
+ t("loc do: khong con nhom 'Sap toi han'", !/Sắp tới hạn/.test(nhomTrong(o2)));
+ t("dang loc thi chip Muc do dang sang o dung o", /class="segb on[^"]*"[^>]*onclick="viecOnly\('red'\)/.test(o2));
  viecOnly("amber");
  var o3=RENDER["viec"]();
- t("bam o Sap toi han thi khong con nhom Qua han", !/Quá hạn - làm ngay/.test(o3));
+ t("bam o Sap toi han thi khong con nhom Qua han", !/Quá hạn/.test(nhomTrong(o3)));
  viecOnly("");
  /* V9.57: hop dong nay tung neo vao NHAN cua mot cai the ("Tổng việc đang nợ") - the do da bo vi
     no lap dung chip "Tất cả" ngay ben duoi. Neo vao chu thi moi lan don dep la mot lan do gia.
     Canh Y DINH: bo loc xong thi danh sach phai co LAI CA HAI nhom (qua han + sap toi han). */
  (function(){var o4=RENDER["viec"]();
-  t("bo loc thi ve day du", /Quá hạn - làm ngay/.test(o4)&&/Sắp tới hạn - còn kịp/.test(o4))})();
+  t("bo loc thi ve day du", /Quá hạn/.test(nhomTrong(o4))&&/Sắp tới hạn/.test(nhomTrong(o4)))})();
  t("MOT bien duy nhat cho muc do (VIECSEV), VIECOD chi la loi tat",
    /var sev=window\.VIECSEV\|\|\(window\.VIECOD\?"red":""\)/.test(SRC));
  goViecOverdue();
@@ -1428,41 +1441,50 @@ function stripOf(o){var i=o.indexOf('<div class="bstats"');if(i<0)return "";   /
  var rest=o.slice(i+19);
  var j=rest.search(/<div class="(tbar|fbar|panel|sechd|obcards)/);
  return rest.slice(0,j<0?rest.length:j)}
-/* ---- 39. DAI SO BAM DUOC (mang 5 - viec ton tu dau) ---- */
+/* ---- 39. DAI THE: CHI DE XEM, AN/HIEN DUOC, CHU THICH DAY DU (V9.59) ---- */
+/* Hop dong o day tung la "dai so BAM DUOC" va tung canh "o dai so tro dung mot bo loc CO THAT".
+   Anh Luan 31/07 dao nguoc chinh sach: the la cai DONG HO chu khong phai cai NUT, viec loc da co
+   thanh loc ngay duoi lam. Hop dong doi theo - va doi HAN, khong giu ban cu cho "chac an": mot
+   bo kiem canh hai chinh sach nguoc nhau thi mot trong hai luon do. */
 (function(){
  setRole("all");
- t("statStrip nhan duoc hanh dong khi bam", SRC.indexOf('var act=t[5]||""')>=0);
- t("o khong dan di dau van de vien dut (.static)", SRC.indexOf("(act?'':' static')")>=0);
- /* xeplop dung window.XLFILT, giaoan dung window.GATAB, duyet dung duyTabSet - kiem rieng ben duoi */
- var CAN=["test","tuvan","thanhtoan","wow","buoihoc","khieunai","ketthuc","baoluu","review","ghinhan","giaoviec"];
- var thieu=[],lac=[];
- CAN.forEach(function(k){var o="";try{o=RENDER[k]()}catch(e){return}
-  var strip=stripOf(o);
-  if(!/class="bstat"[^>]*onclick/.test(strip))thieu.push(k);
-  /* BAT BIEN THAT: o dai so tro toi mot BO LOC CO THAT cua chinh trang do.
-     Go nham ma loc (fset('wow','confirmed') thay vi 'confirm') thi bam vao danh sach rong tron -
-     khong bao loi, chi lang le sai. */
-  var pg=k;
-  var inStrip=(strip.match(new RegExp("fset\\\\('"+pg+"','([a-z]+)'\\\\)","g"))||[]).map(function(x){return x.match(/','([a-z]+)'/)[1]});
-  var inBar=(o.match(new RegExp("fset\\\\('"+pg+"','([a-z]+)'\\\\)","g"))||[]).map(function(x){return x.match(/','([a-z]+)'/)[1]});
-  inStrip.forEach(function(f){if(inBar.filter(function(x){return x===f}).length<2)lac.push(k+":"+f)})});
- t("cac trang chinh deu co dai so bam duoc"+(thieu.length?(" - thieu: "+thieu.join(", ")):""), thieu.length===0);
- t("o dai so tro dung mot bo loc CO THAT cua trang"+(lac.length?(" - lac: "+lac.join(", ")):""), lac.length===0);
- /* trang Xep lop dung XLFILT chu khong dung fset - kiem rieng */
+ t("statStrip con duong cu cho dai hang cho viec (bvStrip)", SRC.indexOf('var act=t[5]||""')>=0);
+ t("statStrip co duong moi cho dai the co ma", /function statStrip\(items,key,ids\)/.test(SRC));
+ /* Quet TOAN BO trang thay vi mot danh sach cam cung: ban cu liet ke 11 trang, trong do 4 trang
+    (test, buoihoc, khieunai, baoluu) that ra KHONG co dai the nao - chung chi co bang hang cho
+    viec cua chuc danh. Bo kiem cu van bao xanh vi ham cat vung tra ve ca trang khi khong tim
+    thay dai. Do la mot bo kiem khong bao gio can - dung bang cach quet that. */
+ var soDai=0,conBam=[],thieuNut=[],thieuTip=[],trangCoDai=[];
+ Object.keys(RENDER).forEach(function(k){var o="";
+  try{o=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){return}
+  var n=(o.match(/class="bstatsw" data-thekey="/g)||[]).length;
+  if(!n)return;
+  soDai+=n;trangCoDai.push(k);
+  if((o.match(/Thẻ \(\d+\/\d+\)/g)||[]).length<n)thieuNut.push(k);
+  if(/<div class="bstat ro"[^>]*onclick/.test(o))conBam.push(k);
+  if(/<div class="bstat ro"(?![^>]*data-tip)/.test(o))thieuTip.push(k)});
+ t("co du dai the de kiem ("+soDai+" dai tren "+trangCoDai.length+" trang)", soDai>=12);
+ t("khong trang nao con the bam duoc"+(conBam.length?(" - con bam: "+conBam.join(", ")):""), conBam.length===0);
+ t("dai nao cung co nut Thẻ (n/N)"+(thieuNut.length?(" - thieu: "+thieuNut.join(", ")):""), thieuNut.length===0);
+ t("the nao cung co chu thich khi ro chuot"+(thieuTip.length?(" - thieu: "+thieuTip.join(", ")):""), thieuTip.length===0);
+ /* Trang khong co dai the thi phai co BANG HANG CHO VIEC - khong duoc trong khong ca hai */
+ var trong=[];
+ ["test","buoihoc","khieunai","baoluu"].forEach(function(k){var o="";try{o=RENDER[k]()}catch(e){return}
+  if(!/class="bstats"/.test(o))trong.push(k)});
+ t("trang khong co dai the thi van co bang hang cho viec"+(trong.length?" - TRONG: "+trong.join(", "):""), trong.length===0);
+ /* Xep lop: dai the truoc day bam de doi tab XLFILT - nay tab do phai co that o THANH LOC */
  (function(){var o=RENDER.xeplop();
-  var strip=stripOf(o);
-  var inStrip=(strip.match(/window\.XLFILT='([a-z]+)'/g)||[]).map(function(x){return x.match(/'([a-z]+)'/)[1]});
-  var inBar=(o.match(/window\.XLFILT='([a-z]+)'/g)||[]).map(function(x){return x.match(/'([a-z]+)'/)[1]});
-  t("xep lop: dai so bam duoc", inStrip.length>=3);
-  t("xep lop: o dai so tro dung tab co that",
-    inStrip.every(function(k){return inBar.filter(function(x){return x===k}).length>=2}))})();
+  var inStrip=(stripOf(o).match(/window\.XLFILT='([a-z]+)'/g)||[]).length;
+  var inBar=(o.match(/window\.XLFILT='([a-z]+)'/g)||[]).length;
+  t("xep lop: the khong con bam de doi tab", inStrip===0);
+  t("xep lop: van con thanh loc that de xem tung nhom", inBar>=3)})();
  (function(){var o=RENDER.giaoan();
-  t("giao an: dai so bam duoc", /class="bstat"[^>]*onclick/.test(o)&&/window\.GATAB='kho'/.test(o))})();
+  t("giao an: co dai the va van con tab kho bai o thanh loc", /class="bstat ro"/.test(o)&&/window\.GATAB='kho'/.test(o))})();
  (function(){window.DUYTAB="duyetck";var o=RENDER.duyet();
   /* V9.51 (anh Luan chup): dai o thong ke lap nguyen dai chip da BO - nay hop dong nguoc lai:
      khong con bstat nao goi duyTabSet, va chip tab phai TU mang con so */
   t("hub Cho duyet: mot bo dieu khien duy nhat - chip mang so, khong con dai o lap",
-    !/class="bstat"[^>]*onclick="duyTabSet\(/.test(o)&&/onclick="duyTabSet\('duyetck'\)">[\s\S]{0,60}?<i class="segn">\d/.test(o))})();
+    !/class="bstat[^"]*"[^>]*onclick="duyTabSet\(/.test(o)&&/onclick="duyTabSet\('duyetck'\)">[\s\S]{0,60}?<i class="segn">\d/.test(o))})();
  /* 3 trang truoc day KHONG co dai so nao */
  ["giaoan","banggiao","duyet"].forEach(function(k){
   t("trang "+k+" da co dai so", /class="bstats"/.test(RENDER[k]()))});
