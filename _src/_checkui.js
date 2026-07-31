@@ -341,7 +341,15 @@ const PROBE = () => {
       if (ct.sauTatCauHinh) bad.push(nhan("tat tro thu o CAU HINH ma nut goc van con"));
       luot++;
     }
+    /* V9.62: tu ban nay `go("settings")` HOI CHE DO truoc (chi trai nghiem / cong thuc) va KHONG
+       dieu huong cho toi khi nguoi dung chon. Bo kiem phai dong vai nguoi dung DA CHON - neu
+       khong thi 19 tab Cai dat khong tab nao duoc do, ma ngan keo hoi che do con nam mo suot cac
+       trang sau, keo theo mot loat bao "tho ra ngoai man" hoan toan gia.
+       Chon "cong thuc" de do duoc ca nhung o chi hien khi ghi duoc. */
+    try { await page.evaluate(() => { if (typeof cfSetMode === "function") cfSetMode("that"); }); } catch (e) {}
     for (const m of mans) {
+      /* dong ngan keo con sot lai tu buoc truoc - moi man phai duoc do tren mot trang SACH */
+      try { await page.evaluate(() => { if (typeof closeModal === "function") closeModal(); }); } catch (e) {}
       const ok = await page.evaluate(m => {
         try {
           if (m.indexOf("settings#") === 0) { window.SETTAB = m.slice(9); go("settings"); }

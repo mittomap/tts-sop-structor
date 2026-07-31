@@ -4928,6 +4928,16 @@ Hai quyết định thiết kế đáng ghi:
   đổi vẫn áp lên màn hình ngay để người xem thấy được kết quả, chỉ là không ghi xuống ô nhớ.
   *Một cửa thì không có cửa nào quên khoá.*
 
+**Và một hậu quả dây chuyền mà chỉ bộ kiểm TRÌNH DUYỆT THẬT mới thấy:** `go("settings")` nay
+không điều hướng nữa mà mở popup hỏi chế độ. Bộ kiểm quét 41 màn bằng cách gọi `go(...)` từng
+trang - tới `settings` thì nó mở popup, **không vào trang**, và **ngăn kéo popup nằm mở suốt các
+trang sau**, kéo theo một loạt báo "thò ra ngoài màn 52px" hoàn toàn giả. Đồng thời **19 tab Cài
+đặt không tab nào được đo lần nào**.
+Vá đúng chỗ: bộ kiểm đóng vai người dùng ĐÃ CHỌN chế độ trước khi quét, và **đóng ngăn kéo còn
+sót trước mỗi màn** - mỗi màn phải được đo trên một trang sạch.
+**Luật rút ra: thêm một cửa chặn thì phải hỏi lại - bộ kiểm có biết gõ cửa không?** Không thì nó
+đứng ngoài, và cái nó báo về là tiếng vọng của chính cánh cửa vừa đóng.
+
 **Bộ kiểm thang màu cắn ngay trong bản này:** em tự chế **3 mã màu mới** cho dải "cổng thực" màu
 xanh (`#EDF8F1` / `#BFE3CC` / `#1E7A46`), trong khi bảng màu ĐÃ CÓ đúng ba sắc gần y hệt
 (`#E4F5EC` / `#BFE3C8` / `#1E6A47`). Vượt trần 110 mã, đỏ. Đó chính là cách một app đi từ 94 mã
