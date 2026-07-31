@@ -10,3 +10,8 @@ _src/package-lock.json
 
 # file tam do check_sop.py sinh ra moi lan chay - khong phai nguon
 _src/_vhbc_spec.json
+
+# ban build cu ket lai trong _src - che ban that khi chay cong cu khong dat ITTS_OUT (V9.64)
+_src/ITTs_WebApp_v5_demo.html
+_src/ITTs_TrangHocVien_demo.html
+_src/ITTs_data.js

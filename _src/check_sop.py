@@ -567,7 +567,10 @@ VHBC = {
     "BC6": {"t": "Bang NV WOW", "can": ["Bảng NV WOW", "WOW có tiến bộ"]},
     "BC7": {"t": "Bang Giang vien", "can": ["Bảng Giảng viên", "Cần viết nhận xét buổi"]},
     "BC8": {"t": "Bang Hoc vu", "can": ["Bảng Học vụ", "Phản hồi chờ phân loại"]},
-    "BC9": {"t": "Bang Quan ly", "can": ["Chiết khấu cần duyệt", "Đổi lớp từ 2 lần",
+    # V9.64: truoc day cho khop nguyen van "Doi lop tu 2 lan". So 2 nay nay la THAM SO CH2
+    # (placementChange_free_times + 1) - anh Luan doi thanh 3 la o the doi chu, con bo kiem thi do
+    # va do vi mot ly do khong lien quan gi toi chat luong app. Neo vao phan DUNG YEN cua ten o.
+    "BC9": {"t": "Bang Quan ly", "can": ["Chiết khấu cần duyệt", "Đổi lớp từ",
                                          "Khiếu nại mức CAO", "Khiếu nại đã leo thang"]},
 }
 

@@ -54,24 +54,114 @@ console.log("So bai huong dan:",keys.length,"| tong buoc:",keys.reduce((a,k)=>a+
    13 buoc con lai tro vao CAC KHOI KHUNG dung chung cua he thiet ke; giu nguyen nhung phai
    KHAI RO O DAY. Ai doi ten mot trong nhung lop nay se thay ngay minh dang lam gay cai gi. */
 function t2(n,c){if(!c)bad.push(n)}
-var KHUNG=[".pbody",".jgrid",".dt",".notebar","#chaybody"];
+/* ---- V9.64 (anh Luan: "tro tam bay tam ba, em nen tao co che de no tro chinh xac") ----
+   Ban truoc CHO PHEP 13 buoc tro bang lop CSS dung chung, chi bat khai ra trong danh sach KHUNG.
+   Do la mot bo kiem KHONG BAO GIO CAN: khai roi thi no xanh, ma cai sai van con nguyen - buoc
+   "Ba tang phan quyen" tro ".notebar" van roi vao dai nhac XEM THU o dau trang, dung nhu anh Luan
+   chup lai. Khai mot cai sai khong lam no thanh dung.
+   Nay luat cung: MOI buoc phai tro bang @ma-neo (data-tour) hoac @txt: (chu tren nut). Khong con
+   danh sach mien tru - vi bat cu lop CSS nao cung se co ngay thu hai xuat hien tren cung mot man. */
 (function(){
- var xau=[],neo=0,css=0;
+ var xau=[],neo=0;
  keys.forEach(function(k){TOURS[k].steps.forEach(function(st,i){
   var sel=String(st.sel||"");
   if(!sel)return;
-  if(sel.charAt(0)==="@"||/^\[data-tour=/.test(sel)){neo++;return}
-  css++;
-  if(KHUNG.indexOf(sel)<0)xau.push(k+"["+i+"]="+sel)})});
- if(xau.length)bad.push("buoc huong dan neo bang CSS selector khong khai truoc: "+xau.join(", "));
- if(neo<40)bad.push("qua it buoc neo bang @ma (dang "+neo+", ky vong >=40)");
- console.log("Neo cua buoc huong dan: @ma",neo,"| khoi khung da khai",css,"| neo la",xau.length);
+  if(sel.charAt(0)==="@"){neo++;return}
+  xau.push(k+"["+i+"]="+sel)})});
+ if(xau.length)bad.push("buoc huong dan con tro bang CSS selector (phai dung @ma-neo hoac @txt:): "+xau.join(", "));
+ if(neo<70)bad.push("qua it buoc neo bang @ (dang "+neo+", ky vong >=70)");
+ console.log("Neo cua buoc huong dan: @ma/@txt",neo,"| CSS tho",xau.length);
+})();
+/* MOI ma neo phai LA DUY NHAT tren mot man. Neo trung ten o hai cho thi tourFind lay cai dau
+   tien trong DOM - va vo app (menu, thanh tren, dai nhac) luon dung truoc than trang, nen cai
+   thang luon la cai sai. Do THAT: ve tung trang roi dem so lan ma neo xuat hien. */
+(function(){
+ var trung=[];
+ setRole("all");
+ keys.forEach(function(k){TOURS[k].steps.forEach(function(st,i){
+  var sel=String(st.sel||"");
+  if(sel.charAt(0)!=="@"||sel.indexOf("@txt:")===0)return;
+  var ma=sel.slice(1), pg=st.p;
+  if(!pg||!PBK[pg])return;
+  if(st.ctx)try{st.ctx()}catch(e){}
+  var h="";try{CUR=pg;h=(PBK[pg].ty==="list")?renderList(pg):(RENDER[pg]?RENDER[pg]():"")}catch(e){return}
+  if(!h||/ngo[aà]i ph[aạ]m vi/i.test(h))return;
+  var n=(h.match(new RegExp('data-tour="'+ma+'"',"g"))||[]).length;
+  if(n>1)trung.push(k+"["+i+"] @"+ma+" x"+n+" tren trang "+pg)})});
+ if(trung.length)bad.push("neo cua buoc xuat hien NHIEU LAN tren trang cua no (tourFind lay cai dau tien = tuy hen): "+trung.slice(0,6).join(" | "));
+ console.log("Neo cua buoc la duy nhat tren trang cua no:",trung.length?("LECH "+trung.length):"dat");
+})();
+/* LUAT MANH NHAT, va la cai truc tiep bat "tro tam bay": buoc khai `p:"<trang>"` thi ma neo cua
+   no phai co MAT TREN CHINH TRANG DO. Truoc day chi doi chieu "ma nay co ton tai o dau do trong
+   app khong" - nen mot buoc dung o trang A ma tro ma neo chi co o trang B van xanh, con tren man
+   that thi tourFind khong tim ra, vong sang roi ve goc man. Nay ve THAT tung trang roi hoi lai.
+   Ma neo cua VO app (menu, thanh tren, chuong) khong nam trong than trang -> khai o day. */
+var NEO_VO={navlbl:1,navarc:1,navarcx:1,bell:1,me:1,help:1,doicong:1,brand:1,hvnav:1,hvtools:1};
+(function(){
+ var lech=[];
+ setRole("all");
+ keys.forEach(function(k){TOURS[k].steps.forEach(function(st,i){
+  var sel=String(st.sel||"");
+  if(sel.charAt(0)!=="@"||sel.indexOf("@txt:")===0)return;
+  var ma=sel.slice(1); if(NEO_VO[ma])return;
+  var pg=st.p; if(!pg||!PBK[pg])return;
+  if(st.ctx)try{st.ctx()}catch(e){}
+  var h="";try{CUR=pg;h=(PBK[pg].ty==="list")?renderList(pg):(RENDER[pg]?RENDER[pg]():"")}catch(e){return}
+  if(!h||/ngo[aà]i ph[aạ]m vi/i.test(h))return;
+  if(h.indexOf('data-tour="'+ma+'"')<0)lech.push(k+"["+i+"] @"+ma+" khong co tren trang "+pg)})});
+ if(lech.length)bad.push("BUOC TRO VAO MA NEO KHONG CO TREN TRANG CUA NO: "+lech.slice(0,8).join(" | "));
+ console.log("Neo co mat tren dung trang cua buoc:",lech.length?("LECH "+lech.length):"dat");
+})();
+/* ---- CO CHE CAP NHAT TOUR (anh Luan: "he thong cung lon ma tour so sai qua em") ----
+   Trang moi them vao app khong tu bao "tui chua co ai huong dan". Bo kiem nay dem: trang nao
+   NGUOI DUNG VAO DUOC tu menu ma khong bai huong dan nao he di qua. Khong bat phu 100% - co
+   trang chi la so tra cuu - nhung phai KHAI RO trang nao co y de ngoai, de lan sau them trang
+   moi thi no do len chu khong im lang. */
+var TOUR_BOQUA={
+ hoso:"man ho so mo tu bat ky danh sach nao - khong phai mot trang de di toi",
+ hosogv:"nhu tren", hosonv:"nhu tren", hosokhoa:"nhu tren",
+ chay:"man chay quy trinh, tour bai 'Khong can vao Cai dat' da di qua bang neo @chaybody",
+ hanhtrinh:"da gop vao banlam (go() remap)",
+ bangcong:"da gop vao trang Giang vien (go() remap)",
+ dslienhe:"so tra cuu - cung mot khuon voi trang nghiep vu da co trong tour",
+ dstest:"so tra cuu", dstuvan:"so tra cuu", dsdangky:"so tra cuu", dsthanhtoan:"so tra cuu",
+ dsbuoihoc:"so tra cuu", dsdiemdanh:"so tra cuu", dsbaitap:"so tra cuu", dswow:"so tra cuu",
+ dsketthuc:"so tra cuu", dskhaosat:"so tra cuu", dsphanhoi:"so tra cuu", dskhieunai:"so tra cuu",
+ nhanvien:"so tra cuu", khoahoc:"so tra cuu", lop:"tab trong hub Hoc tap - tour di qua hub",
+ phong:"tab trong hub Hoc tap", gvdp:"tab trong hub Hoc tap",
+ reup:"tab trong hub Tuyen sinh", khaosat:"tab trong hub CSKH", ghinhan:"tab trong hub CSKH",
+ review:"tab trong hub CSKH", magioithieu:"tab trong hub Khac", baoluu:"tab trong hub Khac",
+ duyetck:"tab trong hub Cho duyet", duyethoan:"tab trong hub Cho duyet",
+ duyetnghi:"tab trong hub Cho duyet", duyetthu:"tab trong hub Cho duyet",
+ duyetgiao:"tab trong hub Cho duyet", banggiao:"tab trong hub Cho duyet",
+ chang:"vo cua 4 chang - bai 'Ban do mot chang' di qua day",
+ ketthuc:"tab trong nhom chang C4, mo tu bang viec; luong ket thuc khoa da co trong bai hoc vu",
+ viec:"man Viec hom nay - moi bai chuc danh deu bat dau tu banlam roi bam sang, khong can buoc rieng",
+ giaoan:"kho bai tap - luong giao/thu/cham, tour bai giao vien di qua banglop",
+ hoidap:"hop Tro ly, co bai gioi thieu rieng trong man chao phien dau",
+ khac:"vo hub", duyet:"vo hub - cac tab ben trong deu da khai", hocvien:"co trong tour hoc vu"};
+(function(){
+ var coTour={};
+ keys.forEach(function(k){TOURS[k].steps.forEach(function(st){if(st.p)coTour[st.p]=1})});
+ var thieu=Object.keys(PBK).filter(function(pg){
+  if(coTour[pg]||TOUR_BOQUA[pg])return false;
+  return !PBK[pg].hide});
+ var thuaKhai=Object.keys(TOUR_BOQUA).filter(function(pg){return !PBK[pg]});
+ if(thieu.length)bad.push("TRANG KHONG BAI HUONG DAN NAO DI QUA (them vao tour, hoac khai ly do o TOUR_BOQUA): "+thieu.join(", "));
+ if(thuaKhai.length)bad.push("TOUR_BOQUA khai trang khong con ton tai: "+thuaKhai.join(", "));
+ console.log("Phu cua tour: "+Object.keys(coTour).length+" trang co bai di qua · "
+  +Object.keys(TOUR_BOQUA).length+" trang khai ly do bo qua · thieu "+thieu.length);
 })();
 /* Moi @ma dung trong bai huong dan phai co data-tour THAT trong file HTML da build */
 (function(){
  var HTML="";
- try{HTML=require('fs').readFileSync((process.env.ITTS_OUT||'.')+'/ITTs_WebApp_v5_demo.html','utf8')}catch(e){}
- if(!HTML)return;
+ var duong=(process.env.ITTS_OUT||'.')+'/ITTs_WebApp_v5_demo.html';
+ try{HTML=require('fs').readFileSync(duong,'utf8')}catch(e){}
+ /* V9.64 - TRUOC DAY: doc khong duoc thi `return` - im lang bo qua ca mot muc kiem. Da can that
+    trong phien nay: mot ban build CU ngay 30/07 nam ket trong _src/ che ban that, moi lan chay
+    tay khong dat ITTS_OUT la doi chieu voi file cu; con khi file bien mat han thi muc kiem nay
+    tu tat, bang tong ket van XANH. Bo kiem tu tat la bo kiem gia - nay doc khong duoc thi DO. */
+ if(!HTML){bad.push("khong doc duoc ban build de doi chieu neo: "+duong+" (dat ITTS_OUT roi chay lai)");return}
  var thieu=[];
  keys.forEach(function(k){TOURS[k].steps.forEach(function(st,i){
   var sel=String(st.sel||"");if(sel.indexOf("@txt:")===0)return;
@@ -234,6 +324,13 @@ var KHUNG=[".pbody",".jgrid",".dt",".notebar","#chaybody"];
    3. Buoc mo mot trang ma chinh chuc danh cua bai KHONG duoc vao -> moi roi duoi.
    4. Buoc thieu chu: khong tieu de, khong mo ta, hoac khong cau "Viec can lam".
    5. Ham `chk` (dieu kien lam xong) nem loi -> nut Tiep theo khong bao gio sang. */
+/* V9.64 - VA CAI THUOC TRUOC. `applyScope(sid)` chi dat PHAM VI (SCOPEEFF), khong dat CURSTAFF -
+   tren man that thi `gateEnter` goi them `enter()` va chinh `enter()` moi gan CURSTAFF. Bo kiem
+   goi moi applyScope nen CURSTAFF con la "ADMIN": moi danh sach loc theo "lead cua toi" deu ra
+   0 dong, roi bo kiem ket luan "nut Ghi lien he khong co tren trang" - do la loi cua cai thuoc,
+   khong phai cua app. Do that: NV001 co 31 lead, ma renderList ra 0 ban ghi.
+   Nay dong vai cho tron: dat ca pham vi lan danh tinh nguoi dang ngoi. */
+function dongVai(sid){applyScope(sid||"");CURSTAFF=sid||""}
 (function(){
  var chuBay=[],ngoaiPham=[],thieuChu=[],chkLoi=[];
  var TS=(typeof TOURS!=="undefined"?TOURS:{});
@@ -248,14 +345,14 @@ var KHUNG=[".pbody",".jgrid",".dt",".notebar","#chaybody"];
    var ma=k+"#"+(i+1);
    if(!String(st.t||"").trim()||String(st.d||"").trim().length<20)thieuChu.push(ma+" (tieu de/mo ta)");
    if(!String(st.hint||"").trim())thieuChu.push(ma+" (thieu cau Viec can lam)");
-   if(st.chk){try{applyScope(dai[nhom]||"");st.chk()}catch(e){chkLoi.push(ma+": "+e.message)}}
+   if(st.chk){try{dongVai(dai[nhom]||"");st.chk()}catch(e){chkLoi.push(ma+": "+e.message)}}
    var pg=st.p||"";
    if(pg&&nhom&&nhom!=="quantri"&&dai[nhom]){
-    applyScope(dai[nhom]);var rs=SCOPE();
+    dongVai(dai[nhom]);var rs=SCOPE();
     if(rs.pages!=="*"&&rs.pages.indexOf(pg)<0&&!VIEW_ALWAYS[pg])ngoaiPham.push(ma+" -> "+pg+" ("+nhom+" khong vao duoc)")}
    var sel=String(st.sel||"");
    if(sel.indexOf("@txt:")===0&&pg){
-    var chu=sel.slice(5);applyScope(dai[nhom]||"");
+    var chu=sel.slice(5);dongVai(dai[nhom]||"");
     /* Vai trang chi bay day du thanh tab SAU KHI da chon mot lop / mot hoc vien - dung cai
        nguoi dung co sau buoc truoc do. Khong gieo san thi bo kiem doi mot cai chua the co, roi
        keu oan; ma bo kiem keu oan vai lan la lan sau khong ai doc no nua. */
@@ -276,7 +373,7 @@ var KHUNG=[".pbody",".jgrid",".dt",".notebar","#chaybody"];
     var tho=h.replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&nbsp;/g," ");
     if(h&&tho.indexOf(chu)<0)chuBay.push(ma+' @txt:"'+chu+'" ('+pg+")")}
   })});
- applyScope("");setRole("all");
+ dongVai("");setRole("all");
  if(chuBay.length)bad.push("NEO THEO CHU ma chu khong co tren trang: "+chuBay.slice(0,6).join(" | "));
  if(ngoaiPham.length)bad.push("BUOC MOI VAO TRANG NGOAI PHAM VI: "+ngoaiPham.slice(0,6).join(" | "));
  if(thieuChu.length)bad.push("BUOC THIEU CHU: "+thieuChu.slice(0,6).join(" | "));

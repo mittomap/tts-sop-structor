@@ -503,7 +503,7 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("GIAO VIEN thay truoc gio day ai da bao nghi", bh.indexOf("đã báo nghỉ các buổi sắp tới")>=0);
  a.absence_reported_at="01/01/2026 08:00";
  t("de lau khong duyet thi chuong reo do",
-   slaItems().some(function(x){return /Duyệt đơn xin nghỉ/.test(x.grp||"")&&x.sev==="red"}));
+   slaItems().some(function(x){return /Duyệt xin nghỉ học/.test(x.grp||"")&&x.sev==="red"}));
  a.absence_reported_at=nowStr();
  /* (3) duyet */
  reset();setF({ab_note:"da goi xac nhan voi phu huynh"});
@@ -607,7 +607,7 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
    /var sev=window\.VIECSEV\|\|\(window\.VIECOD\?"red":""\)/.test(SRC));
  goViecOverdue();
  t("loi vao 'chi qua han' tu noi khac van dat dung bien", window.VIECSEV==="red");
- bellGo("Học vụ","Duyệt đơn xin nghỉ");
+ bellGo("Học vụ","Duyệt xin nghỉ học");
  t("chuong dan toi day thi khong keo theo bo loc muc do cu", window.VIECSEV==="");
  window.VIECTEAM="all";window.VIECGRP="all";window.VIECSEV="";window.VIECOD=false;
  /* KPI cua toi phai nam TREN, khong roi xuong day trang */
