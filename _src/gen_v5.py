@@ -1578,7 +1578,7 @@ function cfgSave(){if(!CANLS||SVR)return;
  /* V9.62 - MỘT CHỖ CHẶN DUY NHẤT cho chế độ "chỉ trải nghiệm". Thay đổi vẫn áp lên màn hình ngay
     (để người xem thấy được kết quả), chỉ là không ghi xuống ô nhớ - đóng trình duyệt là mất.
     Chặn ở đây thay vì đi sửa 20 hàm lưu: một cửa thì không có cửa nào quên khoá. */
- if(cfMode()==="xem"){toast("Đang ở chế độ CHỈ TRẢI NGHIỆM - thay đổi hiện ngay trên màn nhưng không được lưu lại.",3600);return}
+ if(cfMode()!=="that"){toast("Đang ở chế độ XEM THỬ - thay đổi hiện ngay trên màn nhưng không được lưu lại. Mở quyền quản trị ở đầu trang Cài đặt.",3800);return}
  var cur=cfgPack();
  if(__cfbase===null){__cfbase=cur;return}
  if(cur===__cfbase)return;
@@ -4718,31 +4718,19 @@ function pwXacNhan(){
   return}
  var f=window.__pwXong;closeModal();
  var g=cfnGet(f);if(g)g(); else toastErr("Không chạy được thao tác này - báo IT (thiếu hàm xử lý).")}
-/* ── Cổng vào trang Cài đặt: chọn chế độ trước ── */
-/* V9.62b (anh Luân: *"cổng vào cài đặt em làm phức tạp quá, cho người ta 2 cái button, thêm
-   description ở dưới, chứ e gắn vậy nhìn rối"*): bỏ hai khối thẻ to, còn đúng HAI CÁI NÚT và
-   mấy dòng giải thích bên dưới. Người ta vào đây để bấm một cái rồi đi tiếp, không phải để đọc. */
-function cfHoiCheDo(){
- var h='<div class="dcard"><h4><i class="ti ti-settings"></i>Vào trang Cài đặt theo cách nào?</h4>'+
-  '<div style="display:flex;gap:10px;flex-wrap:wrap;margin:2px 0 14px">'+
-   '<button class="btn primary" onclick="cfChon(\'xem\')"><i class="ti ti-eye"></i>Chỉ trải nghiệm</button>'+
-   '<button class="btn" onclick="cfChon(\'that\')"><i class="ti ti-lock"></i>Cổng thực</button>'+
-  '</div>'+
-  '<div class="fhint" style="line-height:1.8">'+
-   '<b>Chỉ trải nghiệm</b> - xem và thử mọi thứ, kết quả hiện ngay trên màn, nhưng <b>không lưu lại</b>. Ai cũng vào được.<br>'+
-   '<b>Cổng thực</b> - sửa và <b>lưu lại thật</b>, cần mật khẩu quản trị.'+
-  '</div></div>';
- openDrawer("Trang Cài đặt",h)}
-function cfChon(m){
- if(m==="xem"){cfSetMode("xem");closeModal();go("settings");return}
- closeModal();
- setTimeout(function(){pwHoi("Mở quyền ghi cấu hình",
-  "Nhập mật khẩu quản trị để vào Cài đặt ở chế độ có thể lưu.","cfMoKhoa")},180)}
-function cfMoKhoa(){cfSetMode("that");toast("Đã mở quyền ghi cấu hình cho phiên làm việc này.");go("settings")}
-function cfDoiCheDo(){cfSetMode("");cfHoiCheDo()}
-/* ── Reset demo: cũng phải qua mật khẩu ── */
-function demoResetHoi(){pwHoi("Dựng lại dữ liệu demo",
- "Thao tác này xoá MỌI thay đổi dữ liệu của buổi demo và quay về dữ liệu gốc (cấu hình giữ nguyên). Nhập mật khẩu quản trị để tiếp tục.","demoReset")}
+/* ── Đổi chế độ giữa chừng: từ "xem thử" lên "quản trị thật" ── */
+function cfMoKhoa(){cfSetMode("that");toast("Đã mở quyền quản trị cho phiên làm việc này.");reRender(CUR)}
+function cfDoiCheDo(){
+ if(cfGhiDuoc()){cfSetMode("xem");toast("Đã chuyển về chế độ xem thử - từ giờ cấu hình không lưu lại.");reRender(CUR);return}
+ pwHoi("Mở quyền quản trị","Nhập mật khẩu quản trị để sửa và lưu được cấu hình.","cfMoKhoa")}
+/* ── Reset demo: chỉ chế độ quản trị thật mới làm được ──
+   Đang ở quản trị thật thì KHÔNG hỏi mật khẩu lần hai - người ta vừa nhập lúc vào cổng, hỏi lại
+   là đúng cái "rắc rối" anh Luân vừa bảo bỏ. Chỉ còn hộp xác nhận như cũ. */
+function demoResetHoi(){
+ if(cfGhiDuoc()){demoReset();return}
+ pwHoi("Dựng lại dữ liệu demo",
+  "Thao tác này xoá MỌI thay đổi dữ liệu của buổi demo và quay về dữ liệu gốc (cấu hình giữ nguyên). Cần mật khẩu quản trị.","demoResetMo")}
+function demoResetMo(){cfSetMode("that");demoReset()}
 function confirmRun(msg,fn,arg){var m=document.getElementById("cfm");if(!m){var g0=cfnGet(fn);if(g0)g0(arg);return}window.__cfn=fn;window.__carg=arg;document.getElementById("cfmMsg").textContent=msg;m.classList.add("on")}
 function confirmYes(){var f=window.__cfn,a=window.__carg;closeConfirm();var g=cfnGet(f);
  if(g)g(a); else toastErr("Không chạy được thao tác này - báo IT (thiếu hàm xử lý).")}
@@ -9385,8 +9373,8 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
  /* V9.62: dải báo chế độ nằm NGAY ĐẦU trang và ở LẠI suốt - người ta sửa mười phút rồi mới biết
     không lưu được thì tệ hơn là không cho vào. Kèm luôn nút đổi chế độ. */
  if(!SVR)h+=(cfGhiDuoc()
-  ?'<div class="notebar" style="background:#E4F5EC;border-color:#BFE3C8;color:#1E6A47;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><i class="ti ti-lock-open"></i><span>Đang ở <b>CỔNG THỰC</b> - mọi thay đổi được lưu lại.</span><button class="btn sm" onclick="cfDoiCheDo()"><i class="ti ti-eye"></i>Chuyển sang chỉ trải nghiệm</button></div>'
-  :'<div class="notebar" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><i class="ti ti-eye"></i><span>Đang ở <b>CHẾ ĐỘ CHỈ TRẢI NGHIỆM</b> - cứ sửa thoải mái, kết quả hiện ngay trên màn, nhưng <b>không lưu lại</b>: đóng trình duyệt là mọi thứ về như cũ.</span><button class="btn primary sm" onclick="cfDoiCheDo()"><i class="ti ti-lock"></i>Vào cổng thực để lưu được</button></div>');
+  ?'<div class="notebar" style="background:#E4F5EC;border-color:#BFE3C8;color:#1E6A47;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><i class="ti ti-lock-open"></i><span>Đang ở chế độ <b>QUẢN TRỊ THẬT</b> - mọi thay đổi được lưu lại.</span><button class="btn sm" onclick="cfDoiCheDo()"><i class="ti ti-eye"></i>Chuyển về xem thử</button></div>'
+  :'<div class="notebar" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><i class="ti ti-eye"></i><span>Đang ở chế độ <b>XEM THỬ</b> - cứ sửa thoải mái, kết quả hiện ngay trên màn, nhưng <b>không lưu lại</b>: đóng trình duyệt là mọi thứ về như cũ.</span><button class="btn primary sm" onclick="cfDoiCheDo()"><i class="ti ti-lock"></i>Mở quyền quản trị để lưu được</button></div>');
  h+='<div class="settabs" data-tour="settabs">';
  var stabs=setTabs();
  var rsS=SCOPE();if(rsS.tabs&&rsS.tabs.settings)stabs=stabs.filter(function(t){return rsS.tabs.settings.indexOf(t[0])>=0});
@@ -16846,9 +16834,6 @@ function hashApply(){var k=hashKey();
  if(!hashOK(k))return;
  go(k)}
 function go(key,noHist){
- /* V9.62: vào Cài đặt phải chọn chế độ trước - chặn ngay ở CỬA VÀO chứ không chặn trong trang,
-    vì chặn trong trang thì người ta đã nhìn thấy hết rồi mới bị hỏi. */
- if(key==="settings"&&!SVR&&!cfMode()){cfHoiCheDo();return}
  /* V9.27: nhớ lại mục menu đang sáng TRƯỚC khi rời đi. Trang nào không có mục riêng trên menu
     (vd "Chạy quy trình" mở ra từ Chăm lại / Reup) thì menu vẫn giữ mục cũ sáng mờ, để người dùng
     biết mình đang đứng ở nhánh nào - trước đây cả menu tối thui, không biết đang ở đâu. */
@@ -17488,7 +17473,16 @@ function demoGate(){var el=document.getElementById("login");if(!el)return;
   h+='<p>'+(khoaVai
     ?'Bản demo đang mở sẵn ở <b>tài khoản Quản trị viên</b> để xem được toàn bộ chức năng. Các chức danh bên dưới cho biết app phân vai thế nào - tạm khoá trong buổi demo này.'
     :'Chọn CHỨC DANH rồi chọn tên bạn. Mỗi cửa sổ một người - các cổng dùng chung một nguồn dữ liệu, thao tác bên này bên kia thấy ngay.')+'</p>';
-  h+='<div style="margin:2px 0 14px"><button class="btn primary" onclick="gateEnter(\'\')"><i class="ti ti-shield-check"></i>Vào Quản trị viên (toàn quyền)</button></div>';
+  /* V9.62c (anh Luân: *"nếu vậy, lúc chọn cổng nhân viên, chỉ cần cho người ta chọn chế độ trải
+     nghiệm, hoặc chọn chế độ quản trị thật được mà ta, cần gì rắc rối như hiện tại nhỉ"*). Đúng.
+     Trước đó em hỏi chế độ ở CỬA VÀO CÀI ĐẶT - tức người ta phải quyết hai lần, ở hai chỗ, cho
+     cùng một chuyện. Nay hỏi ĐÚNG MỘT LẦN, đúng lúc bước vào app. */
+  h+='<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:2px 0 10px">'+
+   '<button class="btn primary" onclick="gateEnter(\'\',\'xem\')"><i class="ti ti-eye"></i>Vào xem thử</button>'+
+   '<button class="btn" onclick="gateHoiPass()"><i class="ti ti-lock"></i>Vào quản trị thật</button></div>';
+  h+='<div class="fhint" style="line-height:1.8;margin-bottom:14px">'+
+   '<b>Xem thử</b> - dùng được mọi chức năng, ghi chép trong buổi demo vẫn chạy bình thường; riêng <b>Cài đặt thì không lưu lại</b> và không dựng lại được dữ liệu demo.<br>'+
+   '<b>Quản trị thật</b> - sửa cấu hình và dựng lại dữ liệu demo được, cần mật khẩu quản trị.</div>';
   h+='<div class="rgrid" style="grid-template-columns:repeat(auto-fill,minmax(190px,1fr))">';
   roles.forEach(function(r){
    var mo=esc(r).replace(/'/g,"\\'");
@@ -17524,7 +17518,13 @@ function mkLuu(){var v="";try{v=String((document.getElementById("mk_in")||{}).va
  if(v.length<4){toastErr("Mật khẩu phải từ 4 ký tự trở lên.");return}
  var c=(DATA.config=DATA.config||{});c.matKhau=v;cfgSave();
  if(cfGhiDuoc())toast("Đã lưu mật khẩu quản trị.");reRender("settings")}
-function gateEnter(sid){window.__gateRole="";window.GATE_SID=sid||"";ssSet("ITTS_WHO",sid||"");applyScope(sid||"");enter("all")}
+function gateEnter(sid,mode){window.__gateRole="";window.GATE_SID=sid||"";ssSet("ITTS_WHO",sid||"");
+ if(mode)cfSetMode(mode);
+ applyScope(sid||"");enter("all")}
+/* Vào quản trị thật: hỏi mật khẩu ngay tại cổng, đúng một lần cho cả phiên. */
+function gateHoiPass(){pwHoi("Vào quản trị thật",
+ "Chế độ này sửa được cấu hình và dựng lại được dữ liệu demo. Nhập mật khẩu quản trị.","gateVaoThat")}
+function gateVaoThat(){gateEnter("","that")}
 function gateSwitch(){ssSet("ITTS_WHO",null);location.reload()}
 function demoBoot(){
  /* V9.30: kéo dữ liệu về hiện tại TRƯỚC khi tính cột dẫn xuất - deriveAll đọc ngày để suy trạng

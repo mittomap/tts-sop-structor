@@ -1075,7 +1075,6 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
     hien hop chon che do, "cong thuc" phai co mat khau; (3) nut Reset demo cung phai nhap pass.
     Canh CHAY THAT: bam vao Cai dat thi CUR khong duoc doi; nhap sai pass thi khong duoc mo. */
  (function(){
-  var luuMode=cfMode();
   /* (1) cong nhan vien */
   t("mac dinh khoa chon chuc danh o cong nhan vien", gateKhoaVai()===true);
   demoGate();
@@ -1087,29 +1086,37 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
   t("van con cua vao Quan tri vien", /gateEnter\(''\)/.test(gt)||gt.indexOf("Quản trị viên")>=0);
   t("the bi khoa noi ro vi sao va mo lai o dau", /Tạm khoá trong buổi demo/.test(gt));
   t("cong tac mo lai nam trong cau hinh, khong cam cung", /c\.gateKhoaVai=/.test(String(gateKhoaToggle)));
-  /* (2) cua vao Cai dat */
-  cfSetMode("");CUR="banlam";
-  go("settings");
-  t("chua chon che do thi bam Cai dat KHONG vao thang", CUR==="banlam");
-  t("hien hop chon hai che do", /Vào trang Cài đặt theo cách nào/.test((document.getElementById("drawerBody").innerHTML)||""));
-  cfChon("xem");
-  t("chon 'chi trai nghiem' thi vao duoc va KHONG ghi duoc", cfMode()==="xem"&&cfGhiDuoc()===false);
-  t("che do xem chan ngay tai cua ghi cau hinh", /cfMode\(\)==="xem"/.test(String(cfgSave)));
+  /* (2) CHON CHE DO NGAY TAI CONG VAO - anh Luan 31/07: *"chi can cho nguoi ta chon che do trai
+     nghiem, hoac chon che do quan tri that duoc ma ta, can gi rac roi nhu hien tai."* Hop dong cu
+     ("bam Cai dat thi hien popup") BO HAN chu khong giu lai: mot viec chi duoc hoi o MOT CHO. */
+  t("cong nhan vien co ca hai nut che do", /gateEnter\('','xem'\)/.test(gt)&&/gateHoiPass\(\)/.test(gt));
+  t("cong nhan vien noi ro hai che do khac nhau cho nao", /không lưu lại/.test(gt)&&/mật khẩu quản trị/.test(gt));
+  t("khong con hoi che do o cua vao Cai dat nua", typeof window.cfHoiCheDo==="undefined"&&(SRC.indexOf("cfHoiCheDo")<0));
+  gateEnter("","xem");
+  CUR="banlam";go("settings");
+  t("vao 'xem thu' thi bam Cai dat vao THANG, khong hoi lai", CUR==="settings");
+  t("che do xem thu thi KHONG ghi duoc cau hinh", cfMode()==="xem"&&cfGhiDuoc()===false);
+  t("che do xem thu chan ngay tai cua ghi cau hinh", /cfMode\(\)!=="that"/.test(String(cfgSave)));
   /* nhap sai mat khau thi khong duoc mo */
   cfSetMode("");
-  pwHoi("thu","thu","cfMoKhoa");
+  gateHoiPass();
   document.getElementById("pw_in").value="sai-mat-khau";pwXacNhan();
-  t("nhap SAI mat khau thi khong mo duoc quyen ghi", cfMode()==="");
+  t("nhap SAI mat khau thi khong vao duoc quan tri that", cfMode()!=="that");
   t("bao loi ro rang khi sai mat khau", /Sai mật khẩu/.test((document.getElementById("pw_loi").textContent)||""));
   document.getElementById("pw_in").value=matKhau();pwXacNhan();
-  t("nhap DUNG mat khau thi mo duoc quyen ghi", cfMode()==="that"&&cfGhiDuoc()===true);
+  t("nhap DUNG mat khau thi vao duoc quan tri that", cfMode()==="that"&&cfGhiDuoc()===true);
   t("mat khau lay tu cau hinh, doi duoc", matKhau()==="mittomap"&&/DATA\.config&&DATA\.config\.matKhau/.test(String(matKhau)));
   /* (3) Reset demo */
   t("moi cua vao Reset demo deu di qua hop mat khau",
     (SRC.match(/onclick="demoReset\(\)/g)||[]).length===0&&(SRC.match(/demoResetHoi\(\)/g)||[]).length>=3);
-  demoResetHoi();
-  t("bam Reset demo thi hien hop mat khau", /Dựng lại dữ liệu demo/.test((document.getElementById("drawerBody").innerHTML)||""));
-  cfSetMode(luuMode);CUR="banlam";
+  /* Reset demo: dang o quan tri that thi KHONG hoi lai lan hai (vua nhap luc vao cong) */
+  cfSetMode("xem");demoResetHoi();
+  t("o xem thu, bam Reset demo thi phai nhap mat khau", /Dựng lại dữ liệu demo/.test((document.getElementById("drawerBody").innerHTML)||""));
+  cfSetMode("that");
+  t("o quan tri that thi Reset demo khong hoi mat khau lan hai", /if\(cfGhiDuoc\(\)\)\{demoReset\(\);return\}/.test(String(demoResetHoi)));
+  /* Tra lai che do QUAN TRI THAT cho cac muc kiem phia sau: chung do viec ghi cau hinh, ma o
+     che do xem thu thi cau hinh co y KHONG ghi - de nguyen se do gia mot loat. */
+  cfSetMode("that");CUR="banlam";
  })();
  /* ═══ V9.61 - TANG 1 PHAN QUYEN PHAI SUA DUOC TRONG CAI DAT ═══════════════════════════════
     Anh Luan: *"cai cai dat ai thay trang nao... dua may cai do vao cai dat di, de sau nay IT

@@ -152,10 +152,10 @@
 > **Phiên bản: V9.62 — KHOÁ BA CHỖ SỬA ĐƯỢC ✅ (31/07).**
 > · **Cổng nhân viên**: 17 thẻ chức danh **mờ đi, có ổ khoá, không bấm được**; vào thẳng Quản trị
 > viên. Công tắc mở lại nằm trong Cài đặt → Phân quyền.
-> · **Trang Cài đặt**: hỏi chế độ **ngay tại cửa vào** - *Chỉ trải nghiệm* (không lưu) hoặc *Cổng
-> thực* (mật khẩu `mittomap`, đổi được trong Cài đặt). Chế độ xem chặn tại **đúng một cửa** là
-> `cfgSave`, không đi sửa 20 hàm lưu.
-> · **Nút Reset demo**: cả 3 cửa vào đều phải nhập mật khẩu.
+> · **Chọn chế độ NGAY TẠI CỔNG VÀO, một lần cho cả phiên**: nút *Vào xem thử* và *Vào quản trị
+> thật* (mật khẩu `mittomap`). Bấm Cài đặt vào thẳng, không hỏi lại. Chế độ xem thử chặn tại
+> **đúng một cửa** là `cfgSave`, không đi sửa 20 hàm lưu.
+> · **Nút Reset demo**: ở xem thử thì phải nhập mật khẩu; ở quản trị thật thì không hỏi lần hai.
 > · **Ghi rõ trên màn**: mật khẩu nằm trong file demo nên nó là *cái chốt cửa*, không phải khoá an
 > ninh - có backend thật thì phải kiểm ở máy chủ.
 > · Bắt được một **bộ kiểm xanh giả**: stub `sessionStorage` trả về `null` vĩnh viễn nên ba tiêu
@@ -4921,10 +4921,26 @@ trôi. Mật khẩu để trong `DATA.config.matKhau` (mặc định `mittomap`)
 | Trang Cài đặt | vào thẳng, sửa gì lưu nấy | **hỏi chế độ ngay tại CỬA VÀO**: *Chỉ trải nghiệm* (sửa thoải mái, thấy ngay kết quả, không lưu) hoặc *Cổng thực* (cần mật khẩu). Dải báo chế độ nằm suốt ở đầu trang, kèm nút đổi chế độ. |
 | Nút Reset demo | hộp xác nhận thường | **hộp nhập mật khẩu**, cả 3 cửa vào (thanh tiêu đề, Cài đặt, màn đăng nhập) |
 
-**Sửa ngay sau khi anh Luân xem** (*"cổng vào cài đặt em làm phức tạp quá, cho người ta 2 cái
-button, thêm description ở dưới, chứ e gắn vậy nhìn rối"*): hộp chọn chế độ ban đầu em dựng bằng
-hai khối thẻ to có icon + tiêu đề + đoạn chữ dài. Nay còn **đúng hai cái nút** và mấy dòng giải
-thích bên dưới. *Người ta mở hộp này ra để bấm một cái rồi đi tiếp, không phải để đọc.*
+**Anh Luân xem xong và gỡ luôn cả cái khung em dựng** - hai lần, mỗi lần một nấc:
+
+1. *"cổng vào cài đặt em làm phức tạp quá, cho người ta 2 cái button, thêm description ở dưới,
+   chứ e gắn vậy nhìn rối"* → bỏ hai khối thẻ to, còn đúng hai cái nút.
+2. *"ủa, nếu vậy, lúc chọn cổng nhân viên, chỉ cần cho người ta chọn chế độ trải nghiệm, hoặc
+   chọn chế độ quản trị thật được mà ta, cần gì rắc rối như hiện tại nhỉ"* → **bỏ luôn cái hộp
+   đó.**
+
+Nấc hai mới là nấc đúng, và nó chỉ ra em sai từ đầu: em bắt người dùng quyết **hai lần, ở hai
+chỗ, cho cùng một chuyện** - chọn người ở cổng, rồi lại chọn chế độ khi bấm vào Cài đặt. Trong khi
+chỉ cần hỏi **đúng một lần, đúng lúc bước vào app**.
+
+Nay cổng nhân viên có hai nút: **Vào xem thử** và **Vào quản trị thật** (hỏi mật khẩu ngay tại đó).
+Chọn xong là xong cho cả phiên: bấm Cài đặt vào thẳng, không hỏi lại; nút Reset demo ở chế độ quản
+trị thật cũng **không hỏi mật khẩu lần hai** - vừa nhập lúc vào cổng rồi. `cfHoiCheDo` và `cfChon`
+**xoá hẳn**, không để lại hàm chết.
+
+**Luật rút ra: đếm xem người dùng phải quyết mấy lần cho MỘT chuyện. Đáp án phải là một.** Đây
+đúng là luật "đếm biến thể" mà dự án đã có, chỉ là lần này em đếm ở phía mã nguồn (một cơ chế
+khoá, không viết ba lần - đúng) mà quên đếm ở phía người dùng (một câu hỏi, hỏi hai nơi - sai).
 
 Hai quyết định thiết kế đáng ghi:
 - **Chặn ở CỬA VÀO, không chặn trong trang.** Chặn trong trang thì người ta đã nhìn thấy hết rồi
