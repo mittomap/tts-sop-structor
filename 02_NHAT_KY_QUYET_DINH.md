@@ -163,7 +163,8 @@
 > · 13 trang được sửa thẻ; 2 tham số ngưỡng mới vào CH2 (`viecOldAlert_days`, `svNudge_days`).
 > · Bộ kiểm cũ bắt được ngay một lỗi của em: thẻ "Đến hạn thu" lặp chip lọc bên dưới. Nay thẻ làm
 > việc chip không làm được - nói ra **số tiền**; chip đếm dòng, thẻ đếm tiền.
-> · Bộ kiểm: `_checkux` **161**.
+> · Bộ kiểm: `_checkux` **161**; `check_sop` thêm dòng dựng sẵn cho NA076 - luật có CỬA SỔ THỜI
+> GIAN mà kiểm bằng dữ liệu tĩnh thì xanh/đỏ tuỳ giờ chạy, tức là xúc xắc chứ không phải bộ kiểm.
 >
 > **Phiên bản trước: V9.56 — RESPONSIVE: CÓ KIỂM, NHƯNG PHỦ CHƯA TỚI ✅ (30/07 khuya).**
 > · Anh Luân hỏi *"e kiểm responsive trên ipad và mobile chưa"*. Có - `_checkui` vốn mở thật ở
@@ -4792,6 +4793,26 @@ KHÔNG làm được: nói ra **số tiền**. Chip đếm dòng, thẻ đếm t
 Bản kê thẻ đầu tiên báo "thẻ đầu tiên của mỗi trang KHÔNG BẤM ĐƯỢC". Kiểm lại HTML thô thì nó bấm
 được - biểu thức tìm của em bỏ sót thẻ đầu mỗi dải. Lại một lần nữa: **đo ra số lạ thì nghi cái
 thước trước.** Lần này em kiểm trước khi sửa, nên không mất công sửa cái không hỏng.
+
+### Bẫy "đo cái đang chuyển động" - lần thứ bảy, lần này ở bộ kiểm SOP
+
+Sau khi đẩy xong, `check_sop.py` đỏ: *"NA076 Còn hạn ghi kết quả - app không sinh ra"*. Nhưng
+không dòng mã nào liên quan bị đụng trong đợt này.
+
+Lý do: **NA076 là nhánh "buổi WOW xong, CÒN TRONG HẠN ghi kết quả"**; quá hạn thì đổi sang NA075.
+Cửa sổ đó dài đúng `slaWowNote_hours` (24 giờ). Bộ kiểm chạy `naFor()` trên dữ liệu demo tĩnh, nên
+nó chỉ bắt được NA076 khi tình cờ có một buổi WOW kết thúc trong vòng 24 giờ trước lúc chạy. Chạy
+lúc chiều thì còn, chạy lúc khuya thì hết - **xanh hay đỏ tuỳ vào GIỜ chạy, không liên quan gì đến
+mã nguồn.**
+
+Cơ chế chữa đã có sẵn trong chính file đó từ trước (`SYNTH` - dựng một dòng dữ liệu tại chỗ với mốc
+thời gian tính theo "bây giờ", rồi đòi `naFor()` trả về đúng mã), vốn dựng cho NA049/NA050 vì cùng
+một bệnh. Nay khai thêm NA076 vào đó. Vẫn là chạy THẬT `naFor()`, chỉ khác là tình huống được dựng
+lên thay vì chờ nó tình cờ có sẵn.
+
+Đây là lần thứ bảy trong hai đợt liền một phép đo đánh lừa em, và là lần đầu nó nằm trong bộ kiểm
+quan trọng nhất. Ghi lại cho rõ: **một bộ kiểm phụ thuộc vào giờ chạy thì không phải bộ kiểm, nó
+là xúc xắc.** Bất cứ luật nào có CỬA SỔ THỜI GIAN đều phải kiểm bằng dòng dựng sẵn.
 
 ### Bộ kiểm chốt lại
 `_checkux` thêm 6 tiêu chí: cấm ba lớp thẻ hỏng theo danh sách mẫu câu (số tích luỹ · ngưỡng cấu

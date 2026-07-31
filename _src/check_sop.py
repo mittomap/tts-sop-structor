@@ -219,6 +219,19 @@ SYNTH = {
               {"lead_id": "L-PROBE", "lead_status": "new (Mới)", "full_name": "Dong dung san",
                "lead_created_time": {"__ago_min": 2}, "first_call_time": "",
                "contact_count": 0, "next_followup_time": ""}),
+    # V9.57: cung mot benh, bat duoc trong dot lam the. NA076 la nhanh "buoi WOW xong, CON TRONG
+    # HAN ghi ket qua"; qua han thi thanh NA075. Cua so do dai dung slaWowNote_hours (24 gio), nen
+    # no chi dung khi du lieu demo tinh co co mot buoi WOW xong trong vong 24 gio truoc luc chay.
+    # Chay luc 14h thi con, chay luc 20h thi het - bo kiem do luc do se bao "app khong sinh ra
+    # NA076" trong khi app khong he doi mot dong nao. Dung dong dung san cho chac tay.
+    "NA076": ("DL14",
+              "Chi dung tu luc buoi WOW ket thuc den het han ghi ket qua (slaWowNote_hours). Qua "
+              "han la doi sang NA075, nen du lieu demo tinh khong giu duoc tinh huong nay - bo "
+              "kiem se do do hay xanh tuy vao GIO chay, khong lien quan gi den ma nguon.",
+              {"wow_id": "W-PROBE76", "student_id": "HV001", "student_name": "Dong dung san",
+               "wow_status": "completed (Đã hoàn thành)", "wow_content_note": "",
+               "wow_outcome": "", "quota_deducted": "",
+               "wow_session_date": {"__ago_min": 60}}),
 }
 
 
