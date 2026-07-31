@@ -741,6 +741,22 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
   while((m2=re2.exec(h)))if(/onclick/.test(m2[0]))coOnclick.push(k)});
  t("dai the tren trang deu co nut Thẻ (n/N) de an/hien ("+soDai+" dai)"+(thieuNut.length?" - THIEU: "+thieuNut.slice(0,4).join(","):""), soDai>0&&thieuNut.length===0);
  t("the tren trang khong con bam duoc"+(coOnclick.length?" - CON BAM: "+coOnclick.slice(0,4).join(","):""), coOnclick.length===0);
+ /* CHÚ THÍCH KHÔNG ĐƯỢC CHỈ VÀO CHỖ KHÔNG CÓ. Câu chú thích thay hẳn cho việc bấm thẻ, nên nó
+    phải gọi đúng tên cái chip / cái nhóm CÓ THẬT trên chính trang đó. Đã cắn ngay trong bản này:
+    bỏ nút "Chỉ quá hạn" đi mà chú thích vẫn bảo người ta bấm nó. Chỉ người ta tới một cái nút
+    không tồn tại còn tệ hơn không chú thích gì. */
+ var chiBay=[];
+ Object.keys(RENDER).forEach(function(k){var o="";
+  try{o=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){return}
+  /* Phải BÓC HẾT data-tip ra trước khi tìm: chính câu chú thích cũng nằm trong HTML của trang,
+     nên tìm trên nguyên trang thì câu nào cũng tự chứng minh được cho mình. Thử phá lần đầu
+     không nổ chính vì cái bẫy này - một bộ kiểm không bao giờ cắn thì không phải bộ kiểm. */
+  var oSach=o.replace(/data-tip="[^"]*"/g,"");
+  var re=/data-the="([a-z0-9_]+)"/g,m;
+  while((m=re.exec(o))){var tip=theTip(m[1]);
+   var q=/(?:bấm chip|bấm nút|nhóm) ['\u2018]([^'\u2019]{2,40})['\u2019]/g,mm;
+   while((mm=q.exec(tip)))if(oSach.indexOf(mm[1])<0)chiBay.push(k+"/"+m[1]+': "'+mm[1]+'"')}});
+ t("chu thich the khong chi vao chip/nhom KHONG CO tren trang"+(chiBay.length?" - CHI BAY: "+chiBay.slice(0,5).join(" | "):""), chiBay.length===0);
 
  /* (5) TẮT một thẻ thì nó biến mất THẬT và nút đếm lại đúng - không tin lời khai, đo trên HTML */
  (function(){
@@ -781,6 +797,31 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
  /* (8) lựa chọn ẩn/hiện phải nằm trong CẤU HÌNH (đi theo CFKEY) chứ không nằm trong dữ liệu demo */
  t("an/hien the ghi vao DATA.config (khong mat khi reset du lieu demo)", /c\.theHide=c\.theHide\|\|\{\}/.test(String(theToggle)));
  t("chu thich the ghi vao DATA.config", /c\.theTip=c\.theTip\|\|\{\}/.test(String(theTipLuu)));
+})();
+/* ═══ V9.59 - CHỮ "ROOM" KHÔNG ĐƯỢC HIỆN RA NỮA ═══════════════════════════════════════════
+   Anh Luân: *"lát e bỏ hết mấy cái thông tin liên quan đến room đi, mặc định thì vẫn có thể kết
+   nối demo trên nhiều máy, e ko cần hiện ra làm gì nữa."*
+   Hai vế, canh cả hai: KHÔNG hiện ra chữ nào, nhưng cỗ máy đồng bộ phải CÒN SỐNG và còn tự bật.
+   Canh cả hai mới đúng - bỏ hiển thị mà tiện tay bỏ luôn cơ chế thì lần sau mở hai máy không
+   thấy đồng bộ, và không ai biết vì sao. */
+(function(){
+ /* KHÔNG được nuốt lỗi vẽ. Đã cắn ngay trong bản này: bỏ `roomBtnHTML` mà sót một chỗ gọi ->
+    màn Cài đặt ném lỗi -> `catch` nuốt -> HTML rỗng -> "không còn chữ room" BÁO XANH trong khi
+    màn đó đang gãy. Trang vẽ lỗi phải tính là ĐỎ, không phải là sạch. */
+ var bay=[];
+ Object.keys(RENDER).forEach(function(k){var o="";
+  try{o=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){bay.push(k+" VE LOI: "+e.message);return}
+  if(/[Rr]oom/.test(o))bay.push(k)});
+ ["demo","tongquan"].forEach(function(tb){window.SETTAB=tb;var o="";
+  try{o=RENDER.settings()}catch(e){bay.push("settings/"+tb+" VE LOI: "+e.message)}
+  if(/[Rr]oom/.test(o))bay.push("settings/"+tb)});
+ window.SETTAB="";
+ try{if(/[Rr]oom/.test(gateStatusHTML()))bay.push("man dang nhap")}catch(e){}
+ t("khong man nao con hien chu 'room'"+(bay.length?" - CON: "+bay.slice(0,5).join(", "):""), bay.length===0);
+ t("ham ve chip/nut room da xoa han, khong de lai code chet",
+   typeof roomStatus==="undefined"&&typeof roomBtnHTML==="undefined");
+ t("co che dong bo nhieu may VAN CON va van tu bat",
+   typeof roomAuto==="function"&&typeof roomCast==="function"&&typeof roomCastState==="function"&&roomOffFlag()===false);
 })();
 if(bad.length){console.log("CHECKUX DO ("+bad.length+"/"+(ok+bad.length)+"):");
  bad.forEach(function(b){console.log("  - "+b)});process.exit(1)}

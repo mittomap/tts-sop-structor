@@ -1501,7 +1501,7 @@ body.drsz .drawer{transition:none}
   <div class="main">
     <div class="topbar">
       <button class="tbtn navtoggle" onclick="toggleNav()" aria-label="Menu"><i class="ti ti-menu-2"></i></button>
-      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div style="min-width:0"><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px;margin-left:auto"><span class="chip blue roomChip" id="demoBadge">Room demo</span><button class="btn sm" onclick="demoReset()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ và mọi máy trong room cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
+      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div style="min-width:0"><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px;margin-left:auto"><button class="btn sm" onclick="demoReset()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ đang mở cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
       <div class="rolesel">
 <!-- V9.29: bỏ ô chọn vai roleSel - luôn bị ẩn từ V9.9, giữ lại chỉ tổ rối -->
         <button class="tbtn" id="tthBtn" onclick="tthToggle()" aria-label="Bật/tắt Trợ lý" data-tip="Trợ lý - hỏi đáp và nhắc việc, nút tròn góc dưới bên phải"><i class="ti ti-bulb"></i></button>
@@ -1667,7 +1667,10 @@ function tshAuto(){
  if(SVR)return 0;                       /* bản chạy trên Sheets là dữ liệu THẬT - không đụng vào */
  var ep=false;try{ep=localStorage.getItem(FORCESHIFT)==="1"}catch(e){}
  if(ep)try{localStorage.removeItem(FORCESHIFT)}catch(e){}
- var lim=num(paramOf("demoAutoShift_days",14))||14;
+ /* V9.59: hạ 14 -> 7. Mốc kéo đi theo bội số 7 ngày, nên ngưỡng 14 để dữ liệu trôi tới 13
+    ngày mới kéo - đo được: việc quá hạn leo từ 108 lên 230 trong quãng đó. Ngưỡng 7 thì lệch
+    tối đa 6 ngày. Vẫn là tham số CH2, anh Luân đổi được. */
+ var lim=num(paramOf("demoAutoShift_days",7))||7;
  var d=tshDays();
  if(!ep&&Math.abs(d)<lim)return 0;
  if(!d)return 0;
@@ -1690,7 +1693,7 @@ function tshInfoHTML(){
   ["So với hôm nay",(lech===0?"cùng ngày":(lech>0?("cũ hơn "+lech+" ngày"):("mới hơn "+Math.abs(lech)+" ngày")))],
   ["Sẽ dịch",d?((d>0?"+":"")+d+" ngày (bội số 7 để giữ nguyên thứ trong tuần)"):"không cần dịch"],
   ["Số mốc sẽ đổi",d?tshCount(d):0],
-  ["Tự dịch khi lệch quá",slaChip("demoAutoShift_days",14,"ngày")]])}
+  ["Tự dịch khi lệch quá",slaChip("demoAutoShift_days",7,"ngày")]])}
 function demoSave(){if(!CANLS||SVR)return;
  var cur=demoPack();
  if(__base===null){__base=cur;return}   /* lần đầu sau boot: chỉ ghi mốc so sánh */
@@ -1759,8 +1762,8 @@ function demoPing(){if(!CANLS){toast("Trình duyệt đang chặn lưu trữ - k
  try{localStorage.setItem("ITTS_PING_V1",String(new Date().getTime()))}catch(e){}
  if(ROOM.on&&roomN()){var nm="";try{nm=window.HVPORTAL?"Trang học viên":(typeof myName==="function"?myName():"")}catch(e){}
   try{roomCast({t:"ping",by:nm})}catch(e){}
-  toast("Đã phát tín hiệu tới các cửa sổ máy này VÀ "+roomN()+" máy trong Room demo - bên kia phải hiện thông báo trong 1-2 giây.",5200);return}
- toast("Đã phát tín hiệu - cửa sổ kia phải hiện thông báo trong 1-2 giây. Không hiện = đồng bộ không chạy (dùng Chrome hoặc http.server). Máy khác mở cùng bản demo sẽ TỰ vào Room demo khi có mạng.",5200)}
+  toast("Đã phát tín hiệu tới các cửa sổ trên máy này VÀ "+roomN()+" máy khác đang mở cùng bản demo - bên kia phải hiện thông báo trong 1-2 giây.",5200);return}
+ toast("Đã phát tín hiệu - cửa sổ kia phải hiện thông báo trong 1-2 giây. Không hiện = đồng bộ không chạy (dùng Chrome hoặc http.server). Máy khác mở cùng bản demo sẽ tự nối khi có mạng.",5200)}
 
 /* ===== ROOM DEMO (V9.17): TỰ ĐỘNG đồng bộ giữa các MÁY KHÁC NHAU qua WebRTC (PeerJS) =====
    - KHÔNG cần mã phòng: mọi máy mở bản demo (cùng bộ dữ liệu) tự vào chung MỘT room.
@@ -1770,17 +1773,14 @@ function demoPing(){if(!CANLS){toast("Trình duyệt đang chặn lưu trữ - k
      syncApply như thể một cổng khác trên máy vừa lưu -> chuông/badge/toast/last-write-wins tự chạy.
    - Thư viện PeerJS tải NGẦM khi có mạng; máy offline thì room im lặng đứng ngoài, app chạy như cũ.
    - Cầu nối bắt tay là dịch vụ PeerJS công cộng miễn phí - đủ cho demo, không dùng dữ liệu thật.
-   - LƯU Ý: ai mở link demo cùng phiên bản cũng vào chung room (kể cả người lạ). Cần demo riêng tư
-     thì bấm "Ngắt room"; muốn cả room về dữ liệu gốc thì bấm "Reset demo". */
+   - LƯU Ý: ai mở link demo cùng phiên bản cũng vào chung room (kể cả người lạ). Từ V9.59 KHÔNG
+     còn nút "Ngắt room" trên giao diện (anh Luân bỏ phần hiển thị) - cờ `ITTS_ROOM_OFF` trong
+     sessionStorage vẫn có tác dụng nếu về sau cần dựng lại một cửa tắt. Muốn mọi máy về dữ liệu
+     gốc thì bấm "Reset demo". */
 var ROOM={p:null,conns:[],code:"AUTO",host:false,on:false,lastRaw:null};
 function roomOffFlag(){return ssGet("ITTS_ROOM_OFF")==="1"}
 function roomN(){var n=ROOM.conns.filter(function(c){return c&&c.open}).length;
  return ROOM.host?n:(ROOM.remoteN!=null?ROOM.remoteN:n)} /* khách lấy sĩ số do trạm phát ({t:"n"}) */
-function roomStatus(){
- if(roomOffFlag())return "Room demo: đã ngắt";
- if(!ROOM.on)return "Room demo: đang dò máy khác...";
- var n=roomN();
- return "Room demo: "+(n?("nối "+n+" máy khác"):"chỉ máy này")}
 function roomLib(cb){if(window.Peer){cb();return}
  if(window.__peerLoading){setTimeout(function(){roomLib(cb)},400);return}
  window.__peerLoading=1;
@@ -1838,12 +1838,12 @@ function roomDown(){ /* mất trạm trung chuyển: nghỉ ngẫu nhiên rồi 
 function roomRetry(){roomUiRefresh();clearTimeout(window.__roomRt);window.__roomRt=setTimeout(roomAuto,15000)}
 function roomToggle(){ /* Ngắt / nối lại room (nhớ theo TAB) */
  if(roomOffFlag()){ssSet("ITTS_ROOM_OFF",null);window.__roomGen++;window.__roomBusy=0;clearTimeout(window.__roomRt);
-  roomUiRefresh();roomAuto();toast("Đang nối lại Room demo...",2500)}
+  roomUiRefresh();roomAuto();toast("Đang nối lại đồng bộ nhiều máy...",2500)}
  else{ssSet("ITTS_ROOM_OFF","1");window.__roomGen++;window.__roomBusy=0;clearTimeout(window.__roomRt);
   try{if(window.__roomPend)window.__roomPend.destroy()}catch(e){}
   try{if(ROOM.p)ROOM.p.destroy()}catch(e){}
   ROOM={p:null,conns:[],code:"AUTO",host:false,on:false,lastRaw:null,remoteN:null};roomUiRefresh();
-  toast("Đã ngắt máy này khỏi Room demo - chỉ còn đồng bộ giữa các cửa sổ trên máy.",3200)}}
+  toast("Đã ngắt máy này khỏi đồng bộ nhiều máy - chỉ còn đồng bộ giữa các cửa sổ trên máy.",3200)}}
 function roomWire(c){ /* trạm nhận thêm máy khách */
  ROOM.conns.push(c);
  c.on("open",function(){roomUiRefresh();roomCastN();
@@ -1855,7 +1855,7 @@ function roomWire(c){ /* trạm nhận thêm máy khách */
 function roomCastN(){if(ROOM.host)try{roomCast({t:"n",n:roomN()})}catch(e){}} /* trạm phát sĩ số room cho khách */
 function roomWireData(c){c.on("data",function(m){roomRecv(m,c)})}
 function roomRecv(m,from){if(!m||!m.t)return;
- if(m.t==="ping")toast("Nhận tín hiệu từ máy khác"+(m.by?" ("+m.by+")":"")+" - Room demo HOẠT ĐỘNG.",3200);
+ if(m.t==="ping")toast("Nhận tín hiệu từ máy khác"+(m.by?" ("+m.by+")":"")+" - đồng bộ ĐANG CHẠY.",3200);
  else if(m.t==="n"){ROOM.remoteN=m.n;roomUiRefresh();return}
  else if(m.t==="reset"){
   if(ROOM.host)roomRelay(m,from);
@@ -1887,16 +1887,18 @@ function roomCastState(){if(!ROOM.on||window.__fromRoom)return;
  ROOM.lastRaw=raw;roomCast({t:"state",raw:raw})}
 function roomUiRefresh(){
  var __rc=roomOffFlag()?"gray":(ROOM.on?(roomN()?"blue":"gray"):"amber");
- try{[].forEach.call(document.querySelectorAll(".roomChip"),function(n){n.textContent=roomStatus();n.className="chip roomChip "+__rc})}catch(e){}
+ /* V9.59: không còn chip trạng thái room trên giao diện nữa - không có gì để vẽ lại. */
  var lg=document.getElementById("login");
  if(lg&&lg.style.display!=="none"&&lg.innerHTML){try{if(window.HVPORTAL)demoGateHV();else demoGate()}catch(e){}}
  if(!window.HVPORTAL&&typeof CUR!=="undefined"&&CUR==="settings"&&typeof reRender==="function")try{reRender("settings")}catch(e){}}
-function roomBtnHTML(){
- var n=roomN();
- var cls=roomOffFlag()?"gray":(ROOM.on?(n?"blue":"gray"):"amber");
- return '<span class="chip '+cls+'">'+esc(roomStatus())+'</span>'+
-  '<button class="btn sm" onclick="roomToggle()" title="'+(roomOffFlag()?"Cho máy này vào lại Room demo":"Tách máy này khỏi Room demo (demo riêng tư trên máy)")+'">'+
-  (roomOffFlag()?'<i class="ti ti-devices"></i>Nối lại room':'<i class="ti ti-plug-x"></i>Ngắt room')+'</button>'}
+/* V9.59 (anh Luân 31/07): *"lát e bỏ hết mấy cái thông tin liên quan đến room đi, mặc định thì
+   vẫn có thể kết nối demo trên nhiều máy, e ko cần hiện ra làm gì nữa."*
+   Cỗ máy đồng bộ giữ nguyên và vẫn TỰ BẬT - chỉ phần HIỆN RA cho người dùng là bỏ hết: chip
+   trạng thái ở thanh tiêu đề, dòng "Room demo: chỉ máy này", nút Ngắt/Nối lại room, và tên
+   "room" trong mọi câu thông báo. Người xem demo không cần biết bên dưới có cái gì đang chạy.
+   `roomStatus()` và `roomBtnHTML()` XOÁ HẲN chứ không để lại trả về rỗng - hàm không ai gọi là
+   code chết, mà code chết còn nguy hiểm hơn code sai: bản sau đọc thấy tưởng còn dùng.
+   `roomToggle()` giữ lại (cờ ITTS_ROOM_OFF vẫn chạy) nhưng không còn cửa bấm nào trên giao diện. */
 /* TỰ VÀO ROOM khi mở app; có mạng trở lại cũng tự nối */
 if(!SVR&&CANLS&&typeof window.addEventListener==="function"&&typeof document!=="undefined"){
  setTimeout(function(){try{roomAuto()}catch(e){}},600);
@@ -2596,9 +2598,9 @@ function colMenuHTML(key){var cfg=LISTCFG[key];if(window.COLMENU!==key)return ''
    số thẻ vẽ ra thật cũng đỏ; thẻ nào còn onclick cũng đỏ. */
 var THEDEF={
  viec:{t:"Việc hôm nay",the:[
-  ["vc_red","Quá hạn","Đếm những việc đã QUÁ hạn SLA - mỗi việc một luật hạn riêng (lead 15 phút, chấm test 24 giờ...). Muốn xem danh sách: bấm nút 'Chỉ quá hạn' ở thanh Bộ phận, hoặc đọc thẳng nhóm 'Quá hạn - làm ngay' ở dưới."],
-  ["vc_amber","Sắp tới hạn","Đếm những việc CHƯA quá hạn nhưng sắp tới nơi - còn kịp làm hôm nay. Muốn xem danh sách: cuộn xuống nhóm 'Sắp tới hạn - còn kịp' ở dưới."],
-  ["vc_old","Nợ quá N ngày","Trong số việc quá hạn, đếm riêng những việc đã để mốc quá số ngày khai ở Ngưỡng & SLA (viecOldAlert_days). Nợ càng lâu càng khó cứu. Muốn xem danh sách: bấm 'Chỉ quá hạn' rồi nhìn cột Trễ."],
+  ["vc_red","Quá hạn","Đếm những việc đã QUÁ hạn SLA - mỗi việc một luật hạn riêng (lead 15 phút, chấm test 24 giờ...). Muốn xem danh sách: bấm chip 'Quá hạn' ở thanh Mức độ ngay dưới."],
+  ["vc_amber","Sắp tới hạn","Đếm những việc CHƯA quá hạn nhưng sắp tới nơi - còn kịp làm hôm nay. Muốn xem danh sách: bấm chip 'Sắp tới hạn' ở thanh Mức độ ngay dưới."],
+  ["vc_old","Nợ quá N ngày","Trong số việc quá hạn, đếm riêng những việc đã để mốc quá số ngày khai ở Ngưỡng & SLA (viecOldAlert_days). Nợ càng lâu càng khó cứu. Muốn xem danh sách: bấm chip 'Quá hạn' ở thanh Mức độ rồi nhìn phần ghi số ngày trễ của từng dòng."],
   ["vc_team","Quá hạn nhiều nhất","Bộ phận đang ôm nhiều việc QUÁ HẠN nhất (xếp theo quá hạn chứ không theo tổng việc) - hôm nay nên dồn người sang đó. Muốn xem danh sách: chọn đúng bộ phận đó ở thanh Bộ phận ngay dưới."]]},
  banlam:{t:"Trang bắt đầu",the:[
   ["bl0_appt","Tới hẹn hôm nay","Số hồ sơ có lịch hẹn liên hệ rơi vào hôm nay, cộng phần đã quá hẹn từ hôm trước. Muốn xem danh sách: bấm chip 'Tới hẹn / quá hẹn' ở thanh Nhóm ngay dưới."],
@@ -2637,11 +2639,11 @@ var THEDEF={
   ["nk_nguoi","Người thao tác","Số người khác nhau đã ghi dữ liệu trong sổ này. Muốn xem: cột Người ở bảng dưới."],
   ["nk_undo","Dòng đã hoàn tác","Số thao tác đã bị bấm hoàn tác - dữ liệu đã trả về giá trị cũ. Muốn xem: bảng dưới, dòng có dấu hoàn tác."]]},
  xeplop:{t:"Xếp lớp & onboarding",the:[
-  ["xl_cho","Đã thu · chờ xếp lớp","Học viên đã đóng tiền nhưng chưa được xếp vào lớp nào - đây là bước đầu tiên phải làm. Muốn xem danh sách: bấm chip 'Chờ xếp lớp' ở thanh lọc dưới."],
-  ["xl_send","Chờ gửi thông tin lớp","Đã xếp lớp nhưng chưa gửi thông tin lớp cho học viên, hạn theo slaClassInfoZalo_hours. Muốn xem danh sách: chip 'Chờ gửi thông tin'."],
-  ["xl_cfm","Chờ HV xác nhận lớp","Đã gửi thông tin mà học viên chưa xác nhận sẽ đi học. Muốn xem danh sách: chip 'Chờ xác nhận'."],
-  ["xl_ob","Onboarding chưa xong","Số hồ sơ onboarding chưa đủ bước, hạn theo slaOBT_hours. Muốn xem danh sách: chip 'Onboarding chưa xong'."],
-  ["xl_over","Quá hạn","Số hồ sơ đã vi phạm hạn gửi thông tin hoặc hạn onboarding. Muốn xem danh sách: chip 'Quá hạn'."]]},
+  ["xl_cho","Đã thu · chờ xếp lớp","Học viên đã đóng tiền nhưng chưa được xếp vào lớp nào - đây là bước đầu tiên phải làm. Muốn xem danh sách: bấm chip 'Chưa hoàn tất' ở thanh lọc dưới rồi nhìn cột Lớp còn trống."],
+  ["xl_send","Chờ gửi thông tin lớp","Đã xếp lớp nhưng chưa gửi thông tin lớp cho học viên, hạn theo slaClassInfoZalo_hours. Muốn xem danh sách: bấm chip 'Chờ gửi thông tin lớp' ở thanh lọc dưới."],
+  ["xl_cfm","Chờ HV xác nhận lớp","Đã gửi thông tin mà học viên chưa xác nhận sẽ đi học. Muốn xem danh sách: bấm chip 'Chờ HV xác nhận' ở thanh lọc dưới."],
+  ["xl_ob","Onboarding chưa xong","Số hồ sơ onboarding chưa đủ bước, hạn theo slaOBT_hours. Muốn xem danh sách: bấm chip 'Chưa hoàn tất' ở thanh lọc dưới."],
+  ["xl_over","Quá hạn","Số hồ sơ đã vi phạm hạn gửi thông tin hoặc hạn onboarding. Muốn xem danh sách: bấm chip 'Quá hạn' ở thanh lọc dưới."]]},
  reup:{t:"Chăm lại khách cũ",the:[
   ["ru_nc","Chưa gặp được","Lead đã gọi nhưng không liên lạc được - nên đổi kênh Zalo/SMS. Muốn xem danh sách: bấm chip 'Chưa gặp được' ở thanh lọc dưới."],
   ["ru_lost","Đã mất / từ chối","Khách đã từ chối hoặc bỏ cuộc - vẫn nên chăm lại định kỳ. Muốn xem danh sách: chip 'Đã mất'."],
@@ -9333,9 +9335,9 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
  if(tab==="demo"){
   var d=demoDirty();
   /* V9.18 (Luân): room mặc định đã thông với nhau - tab này chỉ cần trạng thái 1 dòng + Reset */
-  h+='<div class="panel" style="max-width:640px"><div class="ph"><b><i class="ti ti-devices" style="margin-right:6px"></i>Room demo</b></div><div style="padding:14px 16px;font-size:12.5px;line-height:1.9">';
-  h+='Các cửa sổ trên máy này và các MÁY KHÁC mở cùng bản demo tự đồng bộ với nhau. Dữ liệu hiện tại: '+(d?'<span class="chip amber">đang có thay đổi demo</span>':'<span class="chip green">nguyên bản</span>')+(CANLS?'':' · <span class="chip red">trình duyệt chặn lưu - dùng Chrome hoặc http.server</span>')+'</div>';
-  h+='<div style="padding:0 16px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn danger" onclick="demoReset()"><i class="ti ti-refresh"></i>Reset demo (về nguyên bản)</button>'+roomBtnHTML()+'<button class="btn sm" onclick="demoPing()"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ</button></div></div>';
+  h+='<div class="panel" style="max-width:640px"><div class="ph"><b><i class="ti ti-devices" style="margin-right:6px"></i>Dữ liệu demo</b></div><div style="padding:14px 16px;font-size:12.5px;line-height:1.9">';
+  h+='Các cửa sổ trên máy này và các máy khác mở cùng bản demo tự đồng bộ với nhau. Dữ liệu hiện tại: '+(d?'<span class="chip amber">đang có thay đổi demo</span>':'<span class="chip green">nguyên bản</span>')+(CANLS?'':' · <span class="chip red">trình duyệt chặn lưu - dùng Chrome hoặc http.server</span>')+'</div>';
+  h+='<div style="padding:0 16px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn danger" onclick="demoReset()"><i class="ti ti-refresh"></i>Reset demo (về nguyên bản)</button><button class="btn sm" onclick="demoPing()"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ</button></div></div>';
   /* V9.30 (anh Luân): "để demo lúc nào cũng ổn... điều chỉnh thời gian để lúc nào nó cũng hợp lý" */
   h+='<div class="panel" style="max-width:640px;margin-top:16px"><div class="ph"><b><i class="ti ti-calendar-event" style="margin-right:6px"></i>Mốc thời gian của dữ liệu demo</b></div><div class="pbody">';
   h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Dữ liệu demo neo theo <b>ngày sinh ra nó</b>. Để lâu không mở thì mọi việc thành "quá hạn 90 ngày" và lịch tuần trống trơn - app trông như hỏng dù không sai gì. Nút dưới kéo toàn bộ mốc thời gian về hiện tại.</div>';
@@ -10106,7 +10108,7 @@ var APPPARAMS=[
  ["P6 · Học viên nguy cơ","riskRateRed_pct","Một cơ sở có bao nhiêu phần trăm học viên nguy cơ trở lên thì tô ĐỎ trong bảng so sánh cơ sở","%",20],
  /* V9.29o: một buổi chiếm chỗ của giáo viên bao lâu - dùng cho cảnh báo trùng giờ trên lịch tuần
     VÀ cho việc lọc người thay được. Trước đây con số 2 giờ nằm cắm cứng trong renderLichTuan. */
- ["Hệ thống & dữ liệu demo","demoAutoShift_days","Dữ liệu demo cũ hơn hôm nay bao nhiêu ngày thì app tự kéo về hiện tại (0 = không tự kéo)","ngày",14],
+ ["Hệ thống & dữ liệu demo","demoAutoShift_days","Dữ liệu demo cũ hơn hôm nay bao nhiêu ngày thì app tự kéo về hiện tại (0 = không tự kéo)","ngày",7],
  ["Hệ thống & dữ liệu demo","auditLogKeep_rows","Nhật ký thao tác giữ lại bao nhiêu dòng gần nhất","dòng",500],
  ["Hệ thống & dữ liệu demo","undoWindow_seconds","Làm xong một thao tác thì nút Hoàn tác hiện bao lâu","giây",25],
  ["P6 · Buổi học, điểm danh & bài tập","attendanceGrace_hours","Buổi dạy xong bao lâu thì BẮT BUỘC phải có điểm danh (trong khoảng này còn coi là hàng chờ)","giờ",24],
@@ -17143,7 +17145,7 @@ function gateStatusHTML(){var d=demoDirty();
   '<span>'+src+'</span>'+st+
   (d?'<button class="btn sm" onclick="demoReset()"><i class="ti ti-refresh"></i>Reset dữ liệu demo</button>':'')+
   '<button class="btn sm" onclick="demoPing()" title="Bấm ở một cửa sổ, cửa sổ kia phải hiện thông báo"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ</button>'+
-  roomBtnHTML()+'</div>'}
+  '</div>'}
 function gateRole(x){var m=String(x.role||"").match(/^[^(]*\((.+)\)\s*$/);return m?m[1]:(String(x.role||"").trim()||"Khác")}
 function gateRoleIcon(r){
  if(/Giám đốc|CEO/i.test(r))return "ti-shield-check";

@@ -1962,3 +1962,47 @@ Thẻ thống kê nay nói đúng việc nó làm khi bấm: *"Bấm để lọc
 
 Và **bấm vào TÊN người ở bất kỳ bảng nào cũng mở ngăn kéo xem nhanh**, không đổi trang nữa. Muốn
 mở hồ sơ đầy đủ thì bấm nút trong ngăn kéo.
+
+## Thẻ số ở đầu trang: chọn hiện/ẩn, và ghi chú sửa được (V9.59)
+
+**Thẻ chỉ để XEM, không bấm.** Việc lọc danh sách đã có thanh lọc ngay dưới thẻ lo - hai chỗ cùng
+làm một việc chỉ làm rối. Đổi lại, **rê chuột vào thẻ là có câu chú thích đầy đủ**: con số đó đếm
+cái gì, và muốn xem danh sách thì bấm vào đâu.
+
+**Chọn thẻ nào hiện, y như chọn cột của bảng.** Trên mỗi dải thẻ có nút **"Thẻ (n/N)"** ở góc phải:
+bấm ra danh sách, tích/bỏ tích từng thẻ. Trang tự cập nhật ngay, không nhảy đi đâu, không mất bộ
+lọc đang chọn.
+
+**Sửa câu chú thích:** Cài đặt → **Thẻ trên các trang**. Ở đó liệt kê đủ 104 thẻ theo từng trang,
+mỗi thẻ có ô tích hiện/ẩn và ô nhập câu chú thích. Sửa xong bấm Lưu là áp ngay khắp app; muốn quay
+lại thì bấm "Về mặc định".
+
+Cả hai thứ - **thẻ nào hiện** và **chú thích ghi gì** - nằm trong cấu hình, nên **reset dữ liệu
+demo không xoá mất**.
+
+> Riêng dải **"Việc cần xử lý hôm nay"** theo chức danh thì vẫn bấm được - đó không phải thẻ, đó là
+> **hàng chờ việc**: mỗi ô là một danh sách phải mở ra làm.
+
+## Dữ liệu demo sống ở mọi cơ sở và mọi ngày (V9.59)
+
+Bấm **Reset dữ liệu demo** là dữ liệu trở lại như vừa tạo: mốc thời gian được kéo về hôm nay, và
+**cấu hình thì giữ nguyên** (cấu hình không phải dữ liệu demo).
+
+Từ bản này dữ liệu nền cũng được gieo lại cho đủ:
+- **Cả 5 chi nhánh và lớp online** đều có học viên đang học và lớp đang chạy - trước đây chỉ Cơ sở
+  1, Cơ sở 2 và Online có người, nên quản lý Cơ sở 3/4/5 mở app ra là màn trắng.
+- **Học viên đứng đúng cơ sở của lớp mình học**, nên lọc theo cơ sở ra đúng người.
+- **Mọi ngày trong hai tuần tới đều có việc**: hẹn liên hệ, buổi WOW, ca test - trước đây chỉ gieo
+  trong 6 ngày, mở demo sau một tuần là bàn trực trống trơn.
+- App tự kéo mốc thời gian khi dữ liệu cũ hơn **7 ngày** (trước là 14). Ngưỡng này ở Cài đặt →
+  Ngưỡng & SLA, tên `demoAutoShift_days`.
+
+## Đồng bộ nhiều máy: cứ chạy, không bày ra nữa (V9.59)
+
+Mở bản demo trên nhiều máy thì các máy **tự đồng bộ dữ liệu với nhau** như trước - không cần mã
+phòng, không cần bật gì. Khác biệt của bản này: **app không còn hiện thông tin về việc đó nữa** -
+không còn chip "Room demo" ở thanh tiêu đề, không còn dòng trạng thái, không còn nút Ngắt/Nối lại.
+
+Trong Cài đặt → **Dữ liệu demo** vẫn còn: nút **Reset demo**, nút **Kiểm tra đồng bộ** (bấm ở một
+cửa sổ, cửa sổ/máy kia phải hiện thông báo trong 1-2 giây) và phần **Mốc thời gian của dữ liệu
+demo**.

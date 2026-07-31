@@ -357,6 +357,52 @@ if need("DL08", "mid_overall"):
     if not mids:
         bad(NHE, "14 trường sống", "chưa có điểm giữa khóa mid_* nào (màn midForm trống)")
 
+# ── 15. DEMO PHẢI SỐNG Ở MỌI NƠI HỌC VÀ MỌI NGÀY (V9.59) ─────────────────────────────────
+# Anh Luân 31/07: *"khi a bấm reset, như là dữ liệu demo vừa tạo, ở toàn bộ các cổng, đều phải
+# hợp lý."* Hai lỗ hổng đo được trước bản này, cả hai đều KHÔNG có bộ kiểm nào bắt:
+#   1. Học viên và lead chỉ được gieo vào Cơ sở 1, Cơ sở 2 và Online -> quản lý Cơ sở 3, 4, 5 mở
+#      app ra là màn trắng, trong khi ràng buộc xuyên suốt của dự án là 5 chi nhánh + học online.
+#   2. Hẹn liên hệ / buổi WOW / ca test chỉ gieo trong 6 ngày tới -> mở demo sau một tuần là bàn
+#      trực, cổng coach và cổng học viên đều trống trơn.
+# Bộ kiểm này canh cả hai, và canh THEO NGÀY chứ không canh tổng - tổng đẹp mà dồn cục một ngày
+# thì sáu ngày còn lại vẫn trống.
+_BR = ["branch_1", "branch_2", "branch_3", "branch_4", "branch_5", "online"]
+if need("DL09", "branch", "student_status") and need("DL10", "branch", "class_status"):
+    _hv = {}
+    for _s in R("DL09"):
+        if code(_s.get("student_status")) in ("active", "studying"):
+            _hv[code(_s.get("branch"))] = _hv.get(code(_s.get("branch")), 0) + 1
+    _lop = {}
+    for _c in R("DL10"):
+        if code(_c.get("class_status")) in ("in_progress", "open"):
+            _lop[code(_c.get("branch"))] = _lop.get(code(_c.get("branch")), 0) + 1
+    for _b in _BR:
+        if not _hv.get(_b):
+            bad(VUA, "15 phủ nơi học", "%s không có học viên nào đang học - cổng của cơ sở đó trống" % _b)
+        if not _lop.get(_b):
+            bad(VUA, "15 phủ nơi học", "%s không có lớp nào đang chạy/đang tuyển" % _b)
+if need("DL02", "next_followup_time") and need("DL14", "wow_session_date"):
+    def _theongay(rowsx, field):
+        m = {}
+        for _r in rowsx:
+            _d = dt(_r.get(field))
+            if _d:
+                m[_d.date()] = m.get(_d.date(), 0) + 1
+        return m
+    _hen = _theongay(R("DL02"), "next_followup_time")
+    _wow = _theongay(R("DL14"), "wow_session_date")
+    _trongHen, _trongWow = [], []
+    for _i in range(0, 15):
+        _d = (NOW + datetime.timedelta(days=_i)).date()
+        if not _hen.get(_d):
+            _trongHen.append(_d.strftime("%d/%m"))
+        if not _wow.get(_d):
+            _trongWow.append(_d.strftime("%d/%m"))
+    if _trongHen:
+        bad(VUA, "15 demo sống mọi ngày", "14 ngày tới có ngày KHÔNG hẹn liên hệ nào: " + ", ".join(_trongHen))
+    if _trongWow:
+        bad(VUA, "15 demo sống mọi ngày", "14 ngày tới có ngày KHÔNG buổi WOW nào: " + ", ".join(_trongWow))
+
 # ── KẾT ──────────────────────────────────────────────────────────────────
 print("=" * 74)
 print("KIEM DU LIEU · %d bang · %d dong" % (len(dl), sum(len(v) for v in dl.values())))

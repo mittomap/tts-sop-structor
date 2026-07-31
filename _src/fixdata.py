@@ -1344,6 +1344,29 @@ for _i, st in enumerate(_free):
     if not _brs:
         break
     st["branch"] = _brs[_i % len(_brs)]; _setbr += 1
+# ── HỌC VIÊN PHẢI ĐỨNG ĐÚNG NƠI HỌ HỌC (V9.59) ─────────────────────────────────────────────
+# Cột branch của học viên trước đây gieo NGẪU NHIÊN, không đối chiếu với lớp họ đang học. Hệ quả
+# đo được sau khi mở rộng ra đủ 6 nơi học: 70/84 học viên có lớp mà cột nơi học ghi một cơ sở
+# KHÁC. Bộ lọc theo cơ sở vì thế trả về sai người, và phạm vi quyền của quản lý cơ sở cũng sai.
+# Luật: có lớp thì nơi học của học viên = nơi học của LỚP. Chưa có lớp thì giữ nguyên (họ đang
+# chờ xếp lớp - cột đó nói nguyện vọng, không nói sự thật đã xảy ra).
+_stuCls = {}
+for _o in dl.get("DL08", []):
+    if _o.get("student_id") and _o.get("class_id"):
+        _stuCls[_o["student_id"]] = _o["class_id"]
+for _e in dl.get("DL06", []):
+    if _e.get("student_id") and _e.get("class_id") and _e["student_id"] not in _stuCls:
+        _stuCls[_e["student_id"]] = _e["class_id"]
+_stubr = 0
+for _s in dl.get("DL09", []):
+    _b = _clsBr.get(_stuCls.get(_s.get("student_id")), "")
+    if _b and _s.get("branch") != _b:
+        _s["branch"] = _b; _stubr += 1
+_lech = sum(1 for _s in dl.get("DL09", [])
+            if _stuCls.get(_s.get("student_id")) and _clsBr.get(_stuCls[_s["student_id"]], "")
+            and _s.get("branch") != _clsBr[_stuCls[_s["student_id"]]])
+print("  16. Noi hoc cua HV bam theo LOP: con lech %d ho so" % _lech)
+
 # BÁO SỐ HIỆN TRẠNG, KHÔNG BÁO SỐ VỪA SỬA. Bẫy: gen_demo.py ĐỌC LẠI chính demo_data_big.json
 # (DL01/DL05/DL10 là fixture mang theo qua mỗi lượt chạy), nên thứ pass này vá hôm nay sẽ thành
 # ĐẦU VÀO của lượt chạy ngày mai - đếm "vừa sửa mấy dòng" thì lần thứ hai luôn ra số nhỏ hơn và

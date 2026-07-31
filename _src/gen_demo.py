@@ -161,6 +161,12 @@ def sched_hour(s):
 def sched_dur(s):
     return 3.0 if "9H-12" in s.upper().replace(" ","") else (2.5 if "14H-16H30" in s.upper().replace(" ","") else 1.5)
 
+# V9.59 (anh Luân: "khi a bấm reset ... ở toàn bộ các cổng, đều phải hợp lý"): trước bản này
+# học viên và lead chỉ được gieo vào Cơ sở 1, Cơ sở 2 và Online. Hệ quả đo được: quản lý Cơ sở 3,
+# 4, 5 mở app ra là MÀN TRẮNG - không một học viên, không một lead. Ràng buộc xuyên suốt của dự án
+# là 5 chi nhánh + học online, nên đây là lỗi gieo dữ liệu chứ không phải "demo nhỏ".
+BRANCHES=["branch_1 (Cơ sở 1)","branch_2 (Cơ sở 2)","branch_3 (Cơ sở 3)",
+          "branch_4 (Cơ sở 4)","branch_5 (Cơ sở 5)","online (Cơ sở Online)"]
 CLS = [dict(c) for c in odl["DL10"]]
 def setc(cid,**kw):
     for c in CLS:
@@ -184,8 +190,12 @@ def span_days(c):
     per=len(sched_days(c["class_schedule"])) or 2
     return (-(-ses_target(c)//per))*7
 
-for cid,off in run_start.items():
-    _c=setc(cid,class_status="in_progress (Đang học)",class_start_date=FD(TODAY+days(off)))
+# V9.59: SÁU lớp đang chạy, SÁU nơi học - mỗi cơ sở đúng một lớp đang chạy, kể cả Cơ sở 5 và
+# lớp online. Trước bản này Cơ sở 5 không có lớp nào đang chạy, nên quản lý cơ sở đó mở app ra là
+# trắng trơn. Chỗ học của lớp (phòng / link Zoom) và hình thức học do fixdata.py chỉnh cho khớp.
+for _i,(cid,off) in enumerate(run_start.items()):
+    _c=setc(cid,class_status="in_progress (Đang học)",class_start_date=FD(TODAY+days(off)),
+            branch=BRANCHES[_i%len(BRANCHES)])
     _c["class_end_date"]=FD(TODAY+days(off+span_days(_c)))
 # chia lại GV chủ nhiệm để CẢ 4 GV đều đứng lớp đang chạy (NV032 trước đây không có lớp)
 setc("LOP-PRE-06",main_teacher_id="NV032")
@@ -224,7 +234,8 @@ for c in CLS:
     cls_off[c["class_id"]]=(_a,max(_b,_a))
 ROOMS=["Phòng 202 - Cơ sở 1","Phòng 203 - Cơ sở 1","Phòng 201 - Cơ sở 1","Phòng 103 - Cơ sở 2",
        "Phòng 105 - Cơ sở 2","Phòng 102 - Cơ sở 2","Phòng 305 - Cơ sở 3","Phòng 302 - Cơ sở 3",
-       "Phòng 303 - Cơ sở 3","Phòng 401 - Cơ sở 4","Phòng 402 - Cơ sở 4","Phòng 403 - Cơ sở 4"]
+       "Phòng 303 - Cơ sở 3","Phòng 401 - Cơ sở 4","Phòng 402 - Cơ sở 4","Phòng 403 - Cơ sở 4",
+       "Phòng 501 - Cơ sở 5","Phòng 502 - Cơ sở 5"]
 def cls_slots(c):
     a,b=cls_off.get(c["class_id"],(None,None))
     if a is None: return []
@@ -281,7 +292,7 @@ def mk_student(name, status, joined_off, course_id):
             "gender":random.choice(["Nam","Nữ"]),"student_type":random.choice(["school_student (Học sinh)","university_student (Sinh viên)","working_people (Người đi làm)"]),
             "address":"","emergency_contact_name":"","emergency_contact_phone":"","emergency_contact_relation":"",
             "first_enrollment_id":"","first_enrollment_date":"","total_enrollments":"1",
-            "student_status":status,"joined_at":F(TODAY+days(joined_off)),"branch":random.choice(["branch_1 (Cơ sở 1)","branch_2 (Cơ sở 2)","online (Cơ sở Online)"]),
+            "student_status":status,"joined_at":F(TODAY+days(joined_off)),"branch":random.choice(BRANCHES),
             "attendance_progress_status":"on_track (Đang đều đặn)","academic_progress_status":"on_track (Đang tiến bộ)",
             "attendance_risk_reason":"","academic_risk_reason":"","last_learning_activity_time":"","learning_followup_note":"","notes":"",
             "pause_until":"",
@@ -332,7 +343,7 @@ def mk_lead(name,ph,status,created_off,assigned,followup=None,note=""):
         "expected_start_time":"Tháng "+str(random.choice([8,9,10]))+"/2026","availability_schedule":random.choice(["Tối T2-4-6","Tối T3-5-7","Cuối tuần"]),
         "learning_mode":random.choice(MODE),"lead_source":random.choice(SRC),
         "lead_qualification_status":"qualified (Đủ điều kiện)","lead_status":status,
-        "next_followup_time":followup or "","branch":random.choice(["branch_1 (Cơ sở 1)","branch_2 (Cơ sở 2)","online (Cơ sở Online)"]),
+        "next_followup_time":followup or "","branch":random.choice(BRANCHES),
         "lead_note":note,"next_action":"","contact_count":"0","last_contact_time":"","view_history":"",
         "handover_return_to":"","handover_until":"","assigned_to_name":staff_name(assigned)}
 # Ngô Thanh Tú - ca mẫu bàn giao tạm
@@ -358,7 +369,13 @@ def batch(n,status,co_range,fu=None,note=""):
     for i in range(n):
         f=None
         if fu=="overdue": f=F(TODAY+days(-random.randint(1,3))+dt.timedelta(hours=9))
-        elif fu=="soon": f=F(TODAY+days(random.randint(0,6))+dt.timedelta(hours=random.choice([9,14,19])))
+        # V9.59: cửa sổ hẹn cũ chỉ 0..6 ngày. Demo mở sau đúng một tuần là bàn trực SẠCH hẹn
+        # (đo được: T5, T6, T7, CN đều 0 hẹn liên hệ). Nay trải 0..16 ngày và trải bằng cách CHIA
+        # ĐỀU chứ không bốc ngẫu nhiên - bốc ngẫu nhiên vẫn để lọt ngày trống, mà một ngày trống
+        # là một ngày bàn trực nhìn vào thấy "0 việc" đúng lúc đang mở cho khách xem.
+        # Trải cả về TRƯỚC mốc (-3 ngày): mốc thời gian được kéo theo bội số 7 nên "hôm nay" có
+        # thể rơi vào 1-3 ngày TRƯỚC mốc gieo; không có hẹn ở vùng âm là ngày đó bàn trực trống.
+        elif fu=="soon": f=F(TODAY+days(i%20-3)+dt.timedelta(hours=random.choice([9,14,19])))
         L=mk_lead(take_name(),phone(),status,-random.randint(*co_range),random.choice(SALES),followup=f,note=note)
         leads.append(L); out.append(L)
     return out
@@ -510,7 +527,7 @@ def add_test(L, kind):
             result_time=F(d+days(1)),post_test_status="consulted (Đã tư vấn xong)",graded_by=gv[0])
     elif kind=="pending_book": t.update(booking_status="pending (Chưa đặt lịch)")
     elif kind=="future":
-        d=TODAY+days(random.choice([1,2,3]) if random.random()<0.55 else random.randint(1,6)); d=d.replace(hour=random.choice([9,14,19]))
+        d=TODAY+days(tb_n%18+1); d=d.replace(hour=random.choice([9,14,19]))   # V9.59: chia đều 18 ngày tới, không bốc ngẫu nhiên
         t.update(test_date=F(d))
     elif kind=="await_grade":
         d=NOW-dt.timedelta(hours=random.choice([5,8,11,14,18,20]));
@@ -560,7 +577,7 @@ for s in conv_students[:52]:
 pipe=[L for L in leads if L["lead_status"].startswith(("contacted","considering"))]
 random.shuffle(pipe)
 pi=iter(pipe)
-for kind,n in [("pending_book",6),("future",8),("await_grade",6),("graded_wait_consult",5),("noshow",2),("rebooked",2),("refused",3),("late",3),("cancelled_bk",2),("today_wait",1),("today_attended",1),("today_later",1)]:
+for kind,n in [("pending_book",6),("future",18),("await_grade",6),("graded_wait_consult",5),("noshow",2),("rebooked",2),("refused",3),("late",3),("cancelled_bk",2),("today_wait",1),("today_attended",1),("today_later",1)]:
     for _ in range(n): add_test(next(pi),kind)
 # nối test_booking_id vào phiếu tư vấn (khi lead có test)
 tb_of={}
@@ -1126,7 +1143,9 @@ def add_wow(s,kind,off=None):
 active=[s for s in students if s["student_status"].startswith("active")]
 for _ in range(38): add_wow(random.choice(active),"done")
 for _ in range(2): add_wow(random.choice(active),"done_nonote")
-for i in range(9): add_wow(random.choice(active),"upcoming",off=(i%6)+1)
+# V9.59: 9 buổi rải đúng 6 ngày tới - sang ngày thứ 7 là lịch WOW trống trơn ở mọi cổng
+# (coach, học viên, phụ huynh). Nay 26 buổi rải đều 18 ngày.
+for i in range(26): add_wow(random.choice(active),"upcoming",off=(i%18)+1)
 # 2 buổi WOW ngay HÔM NAY chưa dạy (1 đã đặt + 1 đã xác nhận, xếp giờ chiều tối)
 _w_td1=add_wow(random.choice(active),"upcoming",off=0); _w_td1["wow_session_date"]=F(TODAY+dt.timedelta(hours=17)); _w_td1["wow_status"]="booked (Đã đặt)"
 _w_td2=add_wow(random.choice(active),"upcoming",off=0); _w_td2["wow_session_date"]=F(TODAY+dt.timedelta(hours=19)); _w_td2["wow_status"]="confirmed (Đã xác nhận)"

@@ -149,15 +149,38 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.58 — NÚT RESET NAY GIỮ ĐÚNG LỜI HỨA ✅ (30/07).**
+> **Phiên bản: V9.59 — THẺ CƯ XỬ ĐÚNG NHƯ CỘT + DEMO SỐNG Ở MỌI CƠ SỞ, MỌI NGÀY ✅ (31/07).**
+> · Anh Luân: *"mấy cái thẻ kia tại sao lại cố định nhỉ, sao ko phải như các cột... nó đâu cần
+> phải bấm nhỉ."* Ba bản liền em chữa cái thẻ theo hướng "cho nó bấm đúng chỗ hơn"; anh nhìn ra
+> cái em không nhìn ra: **vấn đề không phải nó bấm sai, mà là nó KHÔNG NÊN BẤM** - bộ lọc ngay
+> dưới đã làm việc lọc rồi.
+> · **104 thẻ / 29 dải** vào bản khai `THEDEF`, mỗi thẻ một **mã cố định**. Thẻ **không bấm được**
+> (`.bstat.ro`) · **chú thích đầy đủ** (đếm gì + muốn xem danh sách bấm đâu), sửa được ở **Cài đặt
+> → Thẻ trên các trang** · **ẩn/hiện từng thẻ ở CẢ HAI NƠI**: nút **"Thẻ (n/N)"** ngay trên dải và
+> tab Cài đặt. Lựa chọn nằm trong `CFKEY` nên **reset dữ liệu demo không cuốn đi**.
+> · Đổi kèm để không "mời rồi đuổi": **Việc hôm nay** có **thanh lọc Mức độ** thật; **Trang bắt
+> đầu** 5 khối thôi nhảy trang. **Cố ý giữ bấm được**: dải **bảng việc theo chức danh** - đó là
+> HÀNG CHỜ VIỆC, không phải thẻ, và dưới nó không có thanh lọc nào thay được.
+> · **Demo sống ở mọi cơ sở, mọi ngày**: HV đang học ở Cơ sở 3/4/5 **0/0/0 → 9/12/9** · lớp đang
+> chạy ở Cơ sở 5 **0 → 1** (mỗi cơ sở đúng 1) · HV đứng đúng cơ sở của lớp mình **14/84 → 80/84** ·
+> ngày còn buổi WOW và còn hẹn liên hệ trong 14 ngày tới **6/14 → 14/14**. Ngưỡng tự kéo mốc thời
+> gian hạ **14 → 7** ngày.
+> · Bộ kiểm: `_checkux` **188** · `_check16` **673** · `check_data` thêm **quy tắc 15** (phủ nơi
+> học + demo sống mọi ngày, canh THEO TỪNG NGÀY chứ không canh tổng).
+> · **Bỏ hết chữ "Room demo" khỏi giao diện** (anh Luân): chip ở thanh tiêu đề, dòng trạng thái,
+> nút Ngắt/Nối lại room, tiêu đề panel trong Cài đặt. **Cơ chế đồng bộ nhiều máy vẫn chạy và vẫn
+> tự bật** - bộ kiểm canh cả hai vế. Mất đi: nút "Ngắt room" (cách duy nhất demo riêng tư) - cần
+> thì em dựng lại chỗ kín.
+> · Gỡ được **một bộ kiểm giả** sống lâu nay: đòi 11 trang có dải số bấm được, trong đó 4 trang
+> chưa từng có dải nào - nó xanh chỉ vì hàm cắt vùng trả về cả trang khi không tìm thấy dải.
+>
+> **Phiên bản trước: V9.58 — NÚT RESET NAY GIỮ ĐÚNG LỜI HỨA ✅ (30/07).**
 > · Anh Luân hỏi *"bấm reset demo là dữ liệu sẽ hợp lý liền đúng ko?"* - đo ra là **KHÔNG**. Hộp
 > xác nhận hứa *"đồng thời KÉO dữ liệu tới N ngày"* nhưng việc kéo chỉ chạy khi lệch VƯỢT ngưỡng
 > 14 ngày. Mở app sau đúng một tuần: bấm reset xong vẫn lệch 7, **211/292 việc quá hạn** - màn
 > hình đỏ rực đúng lúc đang mở cho khách xem. Nay Reset đặt cờ, boot kéo bằng mọi giá (đo lại:
 > lệch 0, quá hạn 125).
-> · **Việc tồn mới**: chất lượng demo phụ thuộc THỨ trong tuần - T3/T4 có **0 hẹn liên hệ**, T3
-> **0 buổi WOW**, T6 **0 test**. Gốc ở pipeline gieo dồn vào T5; sửa phải gieo lại dữ liệu nền nên
-> để anh Luân quyết. **Trước mắt demo vào T5 hoặc T6 là đẹp nhất.**
+> · (Việc tồn ghi ở đây - "demo phụ thuộc thứ trong tuần" - **đã xử lý xong ở V9.59**.)
 >
 > **Phiên bản trước: V9.57 — THẺ PHẢI LÀ MỘT VIỆC PHẢI QUYẾT HÔM NAY ✅ (30/07).**
 > · Anh Luân chỉ ra thẻ *"63 của Tuyển sinh, bộ phận đông việc nhất"* và đặt ra **phép thử mới**:
@@ -4832,6 +4855,145 @@ bảng VIỆC · hai tham số ngưỡng mới phải nằm trong CH2. **155 →
 ### Số chốt phiên
 Thẻ **137 → 84** · Tổng quan **35 → 11** thẻ đầu trang, khối phòng ban 24 ô đọc chơi → 18 ô việc
 bấm được · 2 tham số mới vào CH2 (`viecOldAlert_days`, `svNudge_days`) · `_checkux` **161**.
+
+## V9.59 (31/07) - THẺ CƯ XỬ ĐÚNG NHƯ CỘT + DEMO PHẢI SỐNG Ở MỌI CƠ SỞ, MỌI NGÀY
+
+> Anh Luân: *"mấy cái thẻ kia tại sao lại cố định nhỉ, sao ko phải như các cột, cho phép chọn
+> hiển thị cái nào ở mỗi trang? với lại nó đâu cần phải bấm nhỉ, bởi vì hoàn toàn có thể sử dụng
+> bộ chọn bên dưới. Chứ như hiện tại, có thẻ thì trùng với tab, có thẻ thì bấm nhảy trang khác,
+> nó cứ trùng chức năng kiểu gì, thay vì vậy, em làm tooltip ghi chú đầy đủ hướng dẫn về ý nghĩa
+> và cách xem danh sách là được. Đưa nó vào cấu hình, để khi cần thì anh ghi chú lại được. Còn
+> ẩn hiện, thì vừa có ở cài đặt, vừa có ở trực tiếp trang nhé, giống ẩn hiện cột ấy."*
+>
+> Và: *"Nói chung em làm sao, mà khi a bấm reset, như là dữ liệu demo vừa tạo, ở toàn bộ các cổng
+> á nhé, đều phải hợp lý. Tất nhiên, cài đặt thì giữ nguyên nhé em, cài đặt ko phải là demo."*
+
+### A. THẺ KHÔNG PHẢI CÁI NÚT, NÓ LÀ CÁI ĐỒNG HỒ
+
+Ba bản gần đây em vẫn chữa cái thẻ theo hướng *"cho nó bấm đúng chỗ hơn"*: V9.54 bắt nó nói thật
+sẽ đi đâu, V9.57 dọn nội dung cho nó đáng nhìn. Anh Luân nhìn ra cái em không nhìn ra: **vấn đề
+không phải nó bấm sai chỗ, mà là nó KHÔNG NÊN BẤM.** Bên dưới mỗi dải thẻ đã có một thanh lọc làm
+đúng việc lọc. Hai chỗ cùng làm một việc thì một trong hai là chỗ thừa - và chỗ thừa là cái thẻ,
+vì thẻ còn phải làm việc riêng của nó: **nói cho người ta biết con số kia có nghĩa gì.**
+
+Ba luật của một cái thẻ, từ bản này:
+
+1. **Thẻ không bấm được.** Lớp `.bstat.ro`, không `onclick`, con trỏ mặc định.
+2. **Thẻ nào cũng có chú thích đầy đủ**: con số đếm cái gì, và **muốn xem danh sách thì bấm vào
+   đâu**. Câu đó nằm trong `DATA.config.theTip` - anh Luân sửa được trong Cài đặt.
+3. **Ẩn/hiện từng thẻ, ở CẢ HAI NƠI**: nút **"Thẻ (n/N)"** ngay trên dải (đúng kiểu nút "Cột" của
+   bảng) và tab **Cài đặt → Thẻ trên các trang**. Một chỗ nhớ duy nhất (`DATA.config.theHide`),
+   đi theo `CFKEY` nên **reset dữ liệu demo không cuốn đi**.
+
+**Số liệu:** `THEDEF` khai **104 thẻ / 29 dải**, mỗi thẻ một mã cố định (không đánh theo số thứ tự
+- đổi chỗ thẻ thì lựa chọn của anh Luân vẫn còn). 28 lời gọi `statStrip` được gắn mã dải; dải
+trang "Việc hôm nay" và dải "Trang bắt đầu" viết lại hẳn.
+
+**Hai thứ bị đổi kèm, vì nếu không thì bỏ thẻ đi là mất đường tới danh sách** (*"mời rồi đuổi còn
+tệ hơn không mời"*):
+- **Trang Việc hôm nay** nay có **thanh lọc "Mức độ"** thật (Tất cả / Quá hạn / Sắp tới hạn). Nút
+  "Chỉ quá hạn" và nút "Bỏ lọc mức độ" bỏ đi - ba lối vào cho một việc là hai lối thừa.
+- **Trang bắt đầu**: 5 khối thống kê trước đây bốn cái nhảy sang trang khác. Nay là thẻ chỉ để
+  xem, chú thích ghi rõ mở trang nào ở menu trái.
+
+**Chỗ CỐ Ý giữ nguyên - và lý do:** dải **bảng việc theo chức danh** (`bvStrip`) vẫn bấm được. Nó
+không phải dải thẻ, nó là **hàng chờ việc**: mỗi ô là một danh sách phải mở ra làm, và dưới nó
+không có thanh lọc nào thay thế được. `statStrip` vì thế có hai đường: có mã dải = thẻ, không mã
+dải = hàng chờ. Nếu anh Luân muốn dải này cũng thành thẻ thì nói em, nhưng khi đó phải dựng thanh
+lọc thay cho nó trước.
+
+### B. BỘ KIỂM PHẢI ĐỔI THEO, VÀ ĐỔI HẲN
+
+`_check16` có nguyên một mục 39 tên là *"DẢI SỐ BẤM ĐƯỢC"*, canh đúng cái chính sách vừa bị đảo.
+**Một bộ kiểm canh hai chính sách ngược nhau thì một trong hai luôn đỏ** - nên mục đó viết lại
+hẳn chứ không giữ bản cũ cho "chắc ăn".
+
+Viết lại xong mới lòi ra một **bộ kiểm giả** đã sống lâu nay: bản cũ liệt kê cứng 11 trang rồi đòi
+mỗi trang có dải số bấm được, trong đó **4 trang (test, buoihoc, khieunai, baoluu) chưa từng có
+dải thẻ nào**. Nó vẫn báo xanh vì hàm cắt vùng `stripOf` khi không tìm thấy dải thì trả về **cả
+trang**, và cả trang thì bao giờ chẳng có một cái `bstat` bấm được ở đâu đó. Nay quét thật: đi hết
+`RENDER`, trang nào có `data-thekey` thì soi trang đó.
+
+Hai lần đo nói dối nữa trong đợt này, ghi lại để lần sau khỏi mất thì giờ:
+- Ba hợp đồng cũ của trang Việc hôm nay neo vào **chuỗi chữ tràn lan trên trang** (`"Sắp tới hạn -
+  còn kịp"`). Từ bản này chính **câu chú thích của thẻ** có nhắc tên nhóm, nên bộ kiểm ăn theo chú
+  thích và báo xanh giả. Nay neo vào đúng thẻ tiêu đề nhóm `.viechd`.
+- Biểu thức tìm mã dải trong nguồn viết `,"key"` sát nhau, trong khi lời gọi thật xuống dòng thành
+  `,\n  "banlam"`. Sai một dấu cách, báo thiếu mã ở chỗ có mã.
+
+`_checkux` **161 → 188 tiêu chí**; `_check16` **665 → 673**.
+
+### C. DEMO PHẢI SỐNG Ở MỌI CƠ SỞ VÀ MỌI NGÀY
+
+Đo trước khi sửa, không đoán. Ba lỗ hổng, **không lỗ nào có bộ kiểm bắt**:
+
+| Đo được | Trước | Sau |
+|---|---|---|
+| Học viên đang học ở Cơ sở 3, 4, 5 | **0 / 0 / 0** | 9 / 12 / 9 |
+| Lớp đang chạy ở Cơ sở 5 | **0** | 1 (mỗi cơ sở đúng 1 lớp) |
+| Học viên đứng đúng cơ sở của lớp mình học | 14/84 | **80/84** |
+| Ngày còn buổi WOW trong 14 ngày tới | 6/14 | **14/14** |
+| Ngày còn hẹn liên hệ trong 14 ngày tới | 6/14 | **14/14** |
+
+- **Nơi học:** `gen_demo.py` gieo học viên và lead vào đúng **ba** nơi (Cơ sở 1, Cơ sở 2, Online).
+  Quản lý Cơ sở 3, 4, 5 mở app ra là **màn trắng** - trong khi ràng buộc xuyên suốt của dự án ghi
+  rõ **5 chi nhánh + học online**. Nay có bảng `BRANCHES` đủ 6, sáu lớp đang chạy rải đều sáu nơi,
+  và `ROOMS` thêm phòng Cơ sở 5.
+- **Nơi học của học viên phải bám theo LỚP:** mở rộng ra 6 nơi xong thì lòi ra 70/84 học viên đứng
+  ở cơ sở khác với lớp mình học - bộ lọc theo cơ sở trả về sai người. `fixdata.py` thêm **bước
+  16**: có lớp thì nơi học của học viên = nơi học của lớp; chưa có lớp thì giữ nguyên (cột đó đang
+  nói nguyện vọng, không nói sự thật đã xảy ra).
+- **Cửa sổ thời gian quá hẹp:** hẹn liên hệ chỉ gieo 0-6 ngày tới, buổi WOW 1-6 ngày, ca test 1-6
+  ngày. Mở demo sau đúng một tuần là bàn trực, cổng coach và cổng học viên **trống trơn**. Nay
+  hẹn liên hệ **-3..+16 ngày**, WOW **+1..+18**, test **+1..+18**, và **chia đều** chứ không bốc
+  ngẫu nhiên - bốc ngẫu nhiên vẫn để lọt ngày trống, mà một ngày trống là một ngày mở cho khách
+  xem thấy "0 việc".
+  Trải cả về **trước mốc** vì mốc thời gian được kéo theo **bội số 7 ngày**, nên "hôm nay" có thể
+  rơi vào 1-3 ngày TRƯỚC mốc gieo.
+- **Ngưỡng tự kéo `demoAutoShift_days` hạ 14 → 7.** Mốc kéo theo bội số 7, nên ngưỡng 14 để dữ
+  liệu trôi tới 13 ngày mới kéo; đo được việc quá hạn leo từ **108 lên 230** trong quãng đó.
+  Ngưỡng 7 thì lệch tối đa 6 ngày. Vẫn là tham số CH2.
+
+**Bộ kiểm mới `check_data.py` quy tắc 15** canh cả hai mặt, và canh **theo từng ngày** chứ không
+canh tổng - tổng đẹp mà dồn cục một ngày thì sáu ngày còn lại vẫn trống. Đã thử phá để chắc nó
+cắn: đổi danh sách cơ sở và nới cửa sổ ra 400 ngày thì nó báo đỏ đúng chỗ.
+
+**Luật rút ra:** *dữ liệu demo là một SẢN PHẨM, không phải một lần gieo.* Nó phải chịu được hai
+thứ mà không ai nghĩ tới lúc gieo: **người xem đứng ở cơ sở nào** và **người xem mở app vào ngày
+thứ mấy sau lần gieo cuối.*
+
+### D. BỎ HẾT CHỮ "ROOM" KHỎI GIAO DIỆN
+
+> Anh Luân: *"lát e bỏ hết mấy cái thông tin liên quan đến room đi, mặc định thì vẫn có thể kết
+> nối demo trên nhiều máy, e ko cần hiện ra làm gì nữa."*
+
+Cơ chế đồng bộ nhiều máy (WebRTC/PeerJS, V9.17) **giữ nguyên và vẫn tự bật**. Chỉ phần hiện ra
+cho người dùng là bỏ hết: chip *"Room demo: chỉ máy này"* ở thanh tiêu đề · dòng trạng thái ·
+nút **Ngắt room / Nối lại room** · tiêu đề panel *"Room demo"* trong Cài đặt (đổi thành **"Dữ liệu
+demo"**) · tên "room" trong mọi câu thông báo. Người xem demo không cần biết bên dưới có gì chạy.
+
+`roomStatus()` và `roomBtnHTML()` **xoá hẳn** chứ không để lại hàm trả về rỗng - *code chết còn
+nguy hiểm hơn code sai*, bản sau đọc thấy tưởng còn dùng. `roomToggle()` giữ lại và cờ
+`ITTS_ROOM_OFF` vẫn có tác dụng, nhưng **không còn cửa bấm nào trên giao diện**.
+
+**Nói rõ cái mất đi:** nút "Ngắt room" là cách duy nhất để tách máy mình ra khi cần demo riêng tư
+(ai mở cùng link, cùng phiên bản dữ liệu đều vào chung). Nay không còn cửa đó. Nếu anh Luân cần
+lại thì em dựng một chỗ kín trong Cài đặt.
+
+Bộ kiểm canh **cả hai vế**: không màn nào còn hiện chữ "room", **và** `roomAuto`/`roomCast`/
+`roomCastState` phải còn sống và còn tự bật. Canh một vế thôi thì lần sau có người tiện tay bỏ
+luôn cơ chế, mở hai máy không thấy đồng bộ mà không ai biết vì sao.
+
+**Lần đo nói dối thứ tám** (cùng họ với sáu lần ở V9.56 và một lần ở V9.57), cắn ngay trong đợt
+này và cắn hai nhát liền:
+- Script sửa file có `assert` đặt SAU lệnh thay chuỗi nhưng TRƯỚC lệnh ghi, và điều kiện assert
+  quá chặt (chuỗi còn nằm trong một dòng chú thích) - assert ném, **file không được ghi**, mà em
+  đã đi tiếp như thể đã sửa. Đúng luật đã ghi ở V9.56: **sửa xong phải đọc lại file.**
+- Vì sót một chỗ gọi `roomBtnHTML()`, màn Cài đặt **ném lỗi khi vẽ**. Cả bộ kiểm lẫn công cụ đo
+  của em đều bọc `try{...}catch(e){return}` nên nuốt lỗi, HTML trả về rỗng, và câu hỏi "còn chữ
+  room không" nhận được câu trả lời **"không"** - xanh giả trên một màn đang gãy. Nay trang vẽ
+  lỗi tính là ĐỎ. **Nuốt lỗi để đếm tiếp thì cái đếm được không còn nghĩa gì.**
+  (`_check11` bắt được lỗi thật này trước - đúng vai của một bộ kiểm vẽ thật mọi màn.)
 
 ## V9.58 (30/07) - NÚT RESET HỨA MÀ KHÔNG GIỮ LỜI
 
