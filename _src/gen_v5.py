@@ -2706,9 +2706,17 @@ function qsel(key,id,field,val){var em=ENUMMAP[field];var opts=(em&&ENUM[em])||[
 /* ẩn/hiện cột danh sách: HIDECOL[key] = {colKey:1} */
 var HIDECOL={};
 /* mặc định ẩn: mã, SĐT, lượt liên hệ, NV phụ trách (theo yêu cầu - vẫn bật lại được ở nút Cột) */
-var DEFHIDE={lead_id:1,student_id:1,staff_id:1,class_id:1,course_end_id:1,phone_number:1,phone:1,contact_count:1,assigned_to_name:1};
+/* V9.63 (anh Luân: *"mấy cái cột mã, id, em mặc định ẩn, người ta thích hiện thì người ta tự
+   vào cột mà chọn"*): trước đây đây là DANH SÁCH GÕ TAY nên cột mã mới thêm vào bảng nào là lọt
+   ra ngoài danh sách, hiện lù lù. Nay thành LUẬT: cột nào là mã thì mặc định ẩn - hết đuôi _id,
+   _code, hoặc chính là cột khoá của bảng. Cột *_id_name là TÊN người/lớp, không phải mã - vẫn hiện.
+   Ai cần mã thì bật lại ở nút "Cột" trên thanh công cụ. */
+var DEFHIDE={phone_number:1,phone:1,contact_count:1,assigned_to_name:1};
+function laCotMa(ck){ck=String(ck||"");
+ if(/_id_name$/.test(ck))return false;
+ return /_id$/.test(ck)||/_code$/.test(ck)||/^ma_/.test(ck)}
 var HIDEINIT={};
-function hideInit(key){if(HIDEINIT[key])return;HIDEINIT[key]=1;var cfg=LISTCFG[key];if(!cfg)return;HIDECOL[key]=HIDECOL[key]||{};cfg.cols.forEach(function(c){if(DEFHIDE[c[0]])HIDECOL[key][c[0]]=1})}
+function hideInit(key){if(HIDEINIT[key])return;HIDEINIT[key]=1;var cfg=LISTCFG[key];if(!cfg)return;HIDECOL[key]=HIDECOL[key]||{};cfg.cols.forEach(function(c){if(DEFHIDE[c[0]]||laCotMa(c[0]))HIDECOL[key][c[0]]=1})}
 function colVisible(key,ck){return !(HIDECOL[key]&&HIDECOL[key][ck])}
 function colToggle(key,ck){HIDECOL[key]=HIDECOL[key]||{};if(HIDECOL[key][ck])delete HIDECOL[key][ck];else HIDECOL[key][ck]=1;rlist(key)}
 function colMenuToggle(key){window.COLMENU=(window.COLMENU===key)?"":key;rlist(key)}
@@ -2961,7 +2969,7 @@ function theBoxIn(key){var parts=THEHTML[key]||[];
   ?'<div class="bstats" data-tour="bstats">'
   :'<div class="bstats" data-tour="bvstats">')+body+'</div>'}
 /* ═══════════ V9.36 - BẤM TÊN LÀ RA NGĂN KÉO, Ở MỌI BẢNG ═══════════
-   (anh Luân: "a nhớ em có làm drawer rồi mà sao mấy trang này chưa có")
+   (anh Luân: "a nhớ học viên có làm drawer rồi mà sao mấy trang này chưa có")
    Trước đây tableHTML nối ngăn kéo bằng cách LIỆT KÊ TÊN TRANG - đúng 6 trang được nối tay, 23
    trang còn lại tên người/lớp/khóa chỉ là chữ chết. Đó là kiểu vá từng trang mà dự án này đã cấm:
    thêm trang mới là quên, và không ai biết mình quên.
@@ -3608,7 +3616,7 @@ function riskCare(sid){var s=find("DL09","student_id",sid);if(!s){toast("Không 
   (ignRisk(s)?'<span class="chip gray">đang tạm bỏ qua tới '+esc(s.risk_ignore_until)+'</span>':'')+'</div>';
  (function(){var im=hoursSince(s.last_learning_activity_time);
   var nd=num(paramOf("slaActivity_inactive_days",7))||7;
-  if(im==null)h+='<div class="notebar"><i class="ti ti-zzz"></i>'+goiyG("gy_ho_so_chua_ghi_1990",'Hồ sơ chưa ghi hoạt động học nào - không biết em còn theo lớp không.')+'</div>';
+  if(im==null)h+='<div class="notebar"><i class="ti ti-zzz"></i>'+goiyG("gy_ho_so_chua_ghi_1990",'Hồ sơ chưa ghi hoạt động học nào - không biết học viên còn theo lớp không.')+'</div>';
   else if(im/24>nd)h+='<div class="notebar nbred"><i class="ti ti-zzz"></i><b>Im lặng '+Math.round(im/24)+' ngày</b> - không nộp bài, không đặt WOW, không vào cổng (ngưỡng '+slaChip("slaActivity_inactive_days",7)+').</div>'})();
  h+='<div class="notebar"><i class="ti ti-radar"></i>Vắng không phép <b>'+A.abs+'</b> buổi, ngưỡng '+
   slaChip("thresholdAtRisk_absences",2)+' · thiếu <b>'+A.miss+'</b> bài, ngưỡng '+
@@ -3619,7 +3627,7 @@ function riskCare(sid){var s=find("DL09","student_id",sid);if(!s){toast("Không 
  h+='<div class="fld full"><label>Lần chăm gần nhất</label><div>'+
   (care?esc(dd+" ngày trước ("+String(s.learning_followup_note).split(" | ").pop()+")"):'<span class="mut">chưa ghi lần chăm nào</span>')+
   '<div class="fhint">Hạn chăm lại '+slaChip("slaRiskFollowup_days",3)+'</div></div></div>';
- h+='<div class="fld full"><label>Ghi lần chăm này <i>*</i></label><textarea id="rc_note" rows="2" placeholder="vd: gọi phụ huynh, em bận thi học kỳ, hẹn đi học lại từ tuần sau"></textarea></div>';
+ h+='<div class="fld full"><label>Ghi lần chăm này <i>*</i></label><textarea id="rc_note" rows="2" placeholder="vd: gọi phụ huynh, học viên bận thi học kỳ, hẹn đi học lại từ tuần sau"></textarea></div>';
  h+='<div class="fld full" style="display:block">'+
   '<button class="btn primary" onclick="riskCareSave(\''+esc(sid)+'\')"><i class="ti ti-phone-check"></i>Ghi lần chăm'+(M?(" ("+esc(M.lam)+")"):"")+'</button> '+
   (q>0?'<button class="btn" onclick="wowAdd(\''+esc(sid)+'\')"><i class="ti ti-star"></i>Đặt buổi WOW ('+q+' lượt còn)</button> ':'')+
@@ -3628,7 +3636,7 @@ function riskCare(sid){var s=find("DL09","student_id",sid);if(!s){toast("Không 
   '</div>';
  if(A.any&&!hand){
   h+='<div class="fld full"><label>Hoặc: tạm bỏ qua (máy thấy nhưng thực tế không phải nguy cơ)</label>'+
-   '<input id="rc_ign" placeholder="lý do - vd: em xin nghỉ dài có phép miệng, đã hẹn học bù"></div>'+
+   '<input id="rc_ign" placeholder="lý do - vd: học viên xin nghỉ dài có phép miệng, đã hẹn học bù"></div>'+
    '<div class="fld full"><button class="btn" onclick="riskIgnoreSave(\''+esc(sid)+'\')"><i class="ti ti-bell-off"></i>Tạm bỏ qua '+
    num(paramOf("riskIgnore_days",14))+' ngày</button><div class="fhint">Hết hạn máy nhắc lại. Bỏ qua vĩnh viễn thì không có - việc biến mất mà không ai biết vì sao là thứ làm hỏng hàng chờ.</div></div>'}
  h+='</div>';
@@ -3696,7 +3704,7 @@ function ghHTML(s){
  if(!ghCo(s))
   return '<div class="notebar" style="margin:8px 0"><i class="ti ti-user-question"></i>'+
    '<b>Chưa có người đồng hành (phụ huynh / người giám hộ).</b> SOP yêu cầu ghi số điện thoại người nhà - '+
-   'thiếu thì lúc em vắng học hay tới hạn đóng tiền không biết gọi ai. '+
+   'thiếu thì lúc học viên vắng học hay tới hạn đóng tiền không biết gọi ai. '+
    '<button class="pill" onclick="dhForm(\''+esc(s.student_id)+'\')"><i class="ti ti-plus"></i>Thêm người đồng hành</button></div>';
  return '<div class="ctxbox">'+
   /* anh Luân chốt 30/07: "Người đồng hành, rồi bố, rồi số điện thoại là đủ" - dòng này chỉ
@@ -3731,14 +3739,14 @@ function ghGoiHTML(s){
 function dhForm(sid){var s=find("DL09","student_id",sid);if(!s){toast("Không thấy học viên");return}
  var h='<div class="dcard"><h4><i class="ti ti-users"></i>Người đồng hành - '+esc(s.full_name||sid)+'</h4>';
  h+='<div class="notebar"><i class="ti ti-info-circle"></i>SOP quy định phải có số điện thoại người giám hộ. '+
-  'Hai lựa chọn bên dưới quyết định <b>app gọi ai</b> khi em vắng học và <b>phiếu thu ghi tên ai</b> khi đóng tiền.</div>';
+  'Hai lựa chọn bên dưới quyết định <b>app gọi ai</b> khi học viên vắng học và <b>phiếu thu ghi tên ai</b> khi đóng tiền.</div>';
  h+='<div class="fld"><label>Họ tên người đồng hành</label><input id="gh_ten" value="'+esc(ghTen(s))+'" placeholder="vd: Nguyễn Thị Lan"><div class="fhint">Dùng để in phiếu thu khi người này đóng tiền - màn hình thường chỉ hiện quan hệ + số.</div></div>';
  h+='<div class="fld"><label>Số điện thoại</label><input id="gh_sdt" value="'+esc(ghSdt(s))+'" placeholder="09xxxxxxxx"><div class="fhint">Số này cũng là số đăng nhập cổng phụ huynh.</div></div>';
  h+='<div class="fld"><label>Quan hệ với học viên</label><select id="gh_qh"><option value="">-- chọn --</option>'+
   (ENUM.enum_guardian_relation||[]).map(function(o){return '<option value="'+esc(o)+'"'+(ecode(o)===ecode(s.emergency_contact_relation)?" selected":"")+'>'+esc(elabel(o))+'</option>'}).join("")+'</select></div>';
  h+='<div class="fld"><label>Ai là đầu mối liên hệ chính</label><select id="gh_dm">'+
   (ENUM.enum_contact_primary||[]).map(function(o){return '<option value="'+esc(o)+'"'+(ecode(o)===ghDauMoi(s)?" selected":"")+'>'+esc(elabel(o))+'</option>'}).join("")+
-  '</select><div class="fhint">Quyết định app nhắc gọi ai khi em vắng học hoặc tới hạn thu.</div></div>';
+  '</select><div class="fhint">Quyết định app nhắc gọi ai khi học viên vắng học hoặc tới hạn thu.</div></div>';
  h+='<div class="fld"><label>Ai đóng học phí</label><select id="gh_tra">'+
   (ENUM.enum_payer_side||[]).map(function(o){return '<option value="'+esc(o)+'"'+(ecode(o)===ghNguoiTra(s)?" selected":"")+'>'+esc(elabel(o))+'</option>'}).join("")+
   '</select><div class="fhint">Quyết định tên in trên phiếu thu.</div></div>';
@@ -4010,7 +4018,7 @@ function BANGVIEC(){
      ["ti-alert-triangle",KN.filter(function(r){return !isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại đang xử lý","#6B4FA0","SLA phân công "+slaChip("slaComplaintFirstResponse_hours",4,"giờ"),"goCS('khieunai')"],
      ["ti-inbox",ycHVSo(),"Học viên liên hệ","#3B82C4","SLA nhận việc "+slaChip("slaTaskAccept_hours",4,"giờ"),"goCS('ychv')"]]},
  quanly:{bc:"BC9",t:"Bảng Quản lý",d:"Việc cần cấp quản lý gật đầu, theo bảng phân quyền CH3.",
-  o:[["ti-discount-2",duyCkList().length,"Chiết khấu cần duyệt","#B58A2B","từ "+money(ckThreshold())+" trở lên","goDuyet('duyetck')"],
+  o:[["ti-discount-2",duyCkList().length,"Chiết khấu cần duyệt","#B58A2B","từ "+slaChip("thresholdDiscount_approval",1000000,"đ")+" trở lên","goDuyet('duyetck')"],
      ["ti-transfer",OB.filter(function(r){return num(r.placement_change_count)>=2}).length,"Đổi lớp từ 2 lần","#6B4FA0","cần quản lý phê duyệt","go('xeplop')"],
      ["ti-alert-triangle",KN.filter(function(r){return isc(r.complaint_severity,"high")&&!isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại mức CAO","#E24B4A","quản lý tham gia trong "+slaChip("slaComplaintHigh_hours",4,"giờ"),"goCS('khieunai')"],
      ["ti-arrow-up-right",KN.filter(function(r){return String(r.escalated_to||"").trim()&&!isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại đã leo thang","#DB2777","HV không chấp nhận cách xử lý","goCS('khieunai')"],
@@ -4183,7 +4191,7 @@ function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sa
   var nE7=rows("DL06").filter(function(e){if(!myL[e.lead_id]||isc(e.enrollment_status,"cancelled"))return false;var d=pvnd(e.enrollment_time);return d&&d>=w0}).length;
   /* V9.40 - DOANH THU THEO NGƯỜI CHỐT, KHÔNG PHẢI NGƯỜI CẦM TIỀN. Trước đây cột này cộng
      DL07 theo received_by, tức tổng tiền người đó TRỰC TIẾP NHẬN. Đo lệch tới 2,4 lần: NV026
-     app ghi 79,6tr trong khi khách của em ấy đóng 188,8tr. 24/112 khoản thu do học vụ và kế
+     app ghi 79,6tr trong khi khách của học viên đó đóng 188,8tr. 24/112 khoản thu do học vụ và kế
      toán nhận nên không rơi vào NV tư vấn nào. Ở mô hình 5 cơ sở đây là chuyện thường ngày:
      khách chuyển khoản thẳng, hoặc đóng ở quầy cơ sở khác nơi NV ngồi. Đây là bảng DUY NHẤT
      nói NV tư vấn làm được bao nhiêu - sai 2,4 lần thì không họp bằng nó được, nên ai cũng
@@ -4501,7 +4509,7 @@ function slaItems(){var out=jTasks();
      hoursSince(w.wow_session_date),"wow","",{act:"wowmoc",rid:w.wow_id,hoso:w.student_id});
    if(isc(w.wow_status,"no_show")&&!String(w.wow_no_show_reason||"").trim())
     add("WOW","HV không đến buổi WOW","amber","ti-user-x",w.student_name||w.student_id,
-     "Buổi "+(w.wow_session_date||"")+" em không đến mà chưa ghi lý do - quota đã trừ, hỏi rồi xếp bù",
+     "Buổi "+(w.wow_session_date||"")+" học viên không đến mà chưa ghi lý do - quota đã trừ, hỏi rồi xếp bù",
      hoursSince(w.wow_session_date),"wow","",{act:"wownote",rid:w.wow_id,hoso:w.student_id})})})();
  srows("DL17").forEach(function(c){if(isc(c.complaint_status,"resolved"))return;var sev=ecode(c.complaint_severity);var lim=sev==="high"?paramOf("slaComplaintHigh_hours",24):sev==="medium"?paramOf("slaComplaintMed_hours",48):paramOf("slaComplaintLow_hours",72);var age=hoursSince(c.complaint_time);var over=age!=null&&age>lim;
   add("CSKH","Xử lý khiếu nại",over?"red":"amber","ti-alert-triangle",c.student_id_name||c.student_id,(over?"Khiếu nại quá hạn xử lý":"Khiếu nại đang mở")+" · "+(elabel(c.complaint_severity)||sev),age,"khieunai",over?"overdue":"work",{act:"complaint",rid:c.complaint_id})});
@@ -4578,7 +4586,7 @@ function slaItems(){var out=jTasks();
    add("CSKH","Hỏi lại HV sau khi đóng khiếu nại",ah>kd*24?"red":"amber","ti-mood-search",
     c.student_id_name||c.student_id,
     (ah>kd*24?("QUÁ HẠN "+Math.round(ah/24)+" ngày - "):"")+"Đã đóng khiếu nại "+(c.resolution_time||"")+
-    " mà chưa ghi em nói gì - gọi lại xác nhận em đã ổn (hạn "+kd+" ngày)",
+    " mà chưa ghi học viên nói gì - gọi lại xác nhận học viên đã ổn (hạn "+kd+" ngày)",
     ah,"khieunai","",{act:"complaint",rid:c.complaint_id,hoso:c.student_id,prm:"slaComplaintFollowup_days"})})})();
  /* Bảo lưu sắp hết hạn: gọi mời quay lại TRƯỚC thresholdPauseRemind_days ngày */
  (function(){var rmd=paramOf("thresholdPauseRemind_days",14);
@@ -4681,7 +4689,7 @@ function slaItems(){var out=jTasks();
      var nd=num(paramOf("slaActivity_inactive_days",7))||7;
      if(im==null||im/24<=nd)return false;
      add("Học vụ","Học viên im lặng quá lâu",im/24>nd*2?"red":"amber","ti-zzz",r.full_name,
-      "Không có hoạt động học nào "+Math.round(im/24)+" ngày (ngưỡng "+nd+" ngày) - gọi kiểm tra xem em còn học không",
+      "Không có hoạt động học nào "+Math.round(im/24)+" ngày (ngưỡng "+nd+" ngày) - gọi kiểm tra xem học viên còn học không",
       im,null,null,{hoso:r.student_id,act:"riskCare",rid:r.student_id,prm:"slaActivity_inactive_days"});
      return true})()){}
    else if(A.any&&!ignRisk(r))
@@ -4923,7 +4931,7 @@ function openComplaint(id){var c=find("DL17","complaint_id",id);if(!c){toast("Kh
  h+=ctxContent("Nội dung khiếu nại",c.complaint_content,sevc==="high"?"var(--red)":"var(--amber)");
  h+=stepBar([["Tiếp nhận",true],["Phân công",!isNew],["Xử lý",working],["Đóng",resolved]]);
  if(resolved){h+=ctxContent("Cách xử lý đã thực hiện",c.resolution_note,"var(--green)");
-  h+=ctxContent("Học viên nói gì sau đó",c.student_feedback_after||"CHƯA hỏi lại học viên - khiếu nại đóng nhưng chưa biết em đã nguôi chưa.",
+  h+=ctxContent("Học viên nói gì sau đó",c.student_feedback_after||"CHƯA hỏi lại học viên - khiếu nại đóng nhưng chưa biết học viên đã nguôi chưa.",
    String(c.student_feedback_after||"").trim()?"var(--blue)":"var(--amber)");h+=ctxRows([["Kết quả",esc(elabel(c.complaint_result)||c.complaint_result||"-")],["Đóng lúc",esc(c.resolution_time||"-")]]);}
  else if(isNew){h+='<div class="dact"><button class="btn primary" onclick="confirmRun(\'Bạn nhận xử lý khiếu nại này? Khiếu nại sẽ được gán cho bạn và chuyển sang Đang xử lý.\',\'knClaim\',\''+esc(id)+'\')"><i class="ti ti-user-check"></i>Nhận khiếu nại</button><button class="btn danger" onclick="confirmRun(\'Leo thang khiếu nại này lên quản lý cấp cao?\',\'knEscalate\',\''+esc(id)+'\')"><i class="ti ti-arrow-up"></i>Leo thang</button></div>';}
  else if(!working){h+='<div class="dact"><button class="btn primary" onclick="confirmRun(\'Bắt đầu xử lý khiếu nại này?\',\'knStart\',\''+esc(id)+'\')"><i class="ti ti-tool"></i>Bắt đầu xử lý</button><button class="btn danger" onclick="confirmRun(\'Leo thang khiếu nại này lên quản lý cấp cao?\',\'knEscalate\',\''+esc(id)+'\')"><i class="ti ti-arrow-up"></i>Leo thang</button></div>';}
@@ -5312,7 +5320,7 @@ function absReview(attId,kind,note){
  return a}
 
 /* (3) XẾP BÙ CHO MỘT HỌC VIÊN - khác hẳn bhMakeup (buổi bị hủy CẢ LỚP).
-   Không đẻ buổi mới: gắn em đó vào một buổi CÓ SẴN trong tương lai, ghi ngay trên dòng vắng. */
+   Không đẻ buổi mới: gắn học viên đó vào một buổi CÓ SẴN trong tương lai, ghi ngay trên dòng vắng. */
 function absMakeup(attId,target,note){
  var a=find("DL12","attendance_id",attId); if(!a)return null;
  var t=find("DL11","session_id",target); if(!t)return null;
@@ -5346,13 +5354,13 @@ function absForm(attId){
   ["HV báo lúc",esc(a.absence_reported_at||"-")],
   ["Xin học bù",a.absence_want_makeup?'<b style="color:var(--navy)">Có</b>':"không"]]);
  h+=ctxContent("Lý do học viên nêu",hvSelfWhy(a)||a.note||"(không ghi)","var(--navy)");
- h+='<div class="notebar" style="margin:10px 0"><i class="ti ti-info-circle"></i>Chuyên cần của em chỉ được chốt khi bạn duyệt. Trước lúc đó buổi này <b>chưa</b> tính là vắng không phép.</div>';
+ h+='<div class="notebar" style="margin:10px 0"><i class="ti ti-info-circle"></i>Chuyên cần của học viên chỉ được chốt khi bạn duyệt. Trước lúc đó buổi này <b>chưa</b> tính là vắng không phép.</div>';
  h+='<div class="fld full"><label>Ghi chú của bạn</label><textarea id="ab_note" rows="2" placeholder="vd: đã gọi xác nhận với phụ huynh"></textarea></div>';
  h+='<div class="dact"><button class="btn primary" onclick="absRun(\''+esc(attId)+'\',\'excused\')"><i class="ti ti-check"></i>Duyệt - vắng CÓ PHÉP</button>'+
   '<button class="btn danger" onclick="absRun(\''+esc(attId)+'\',\'unexcused\')"><i class="ti ti-x"></i>Không chấp nhận - vắng KHÔNG PHÉP</button></div>';
  if(a.absence_want_makeup){
   var opts=absMakeupOpts(a);
-  h+='<div class="sechd" style="margin-top:14px">Xếp buổi học bù cho riêng em này</div>';
+  h+='<div class="sechd" style="margin-top:14px">Xếp buổi học bù cho riêng học viên này</div>';
   if(!opts.length)h+='<div class="mut" style="font-size:12px">Chưa có buổi nào phía trước để xếp bù.</div>';
   else{h+='<div class="fld full"><label>Chọn buổi học bù</label><select id="ab_mk">'+
    opts.map(function(x){var c=find("DL10","class_id",x.class_id)||{};
@@ -5372,7 +5380,7 @@ function absMkRun(attId){
  var t=fldV("ab_mk"); if(!t){toast("Chọn buổi học bù đã.");return}
  var a=absMakeup(attId,t);
  if(!a)return;
- closeModal();toast("Đã xếp buổi học bù cho em này.",3800);reRender(CUR)}
+ closeModal();toast("Đã xếp buổi học bù cho học viên này.",3800);reRender(CUR)}
 /* hàng đợi duyệt - dùng ở trang Điểm danh và trang Buổi học */
 function absQueueHTML(list,tit){
  if(!list.length)return "";
@@ -5393,7 +5401,7 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
  if(!sessList.length){for(var k=1;k<=12;k++){var n=(k<10?"0"+k:k);sessList.push({id:cid+"-S"+n,label:"Buổi "+k,obj:null})}}
  var sess=window.DDSESS;if(!sessList.some(function(x){return x.id===sess})){sess=sessList[0].id;window.DDSESS=sess}
  var sel=null;sessList.forEach(function(x){if(x.id===sess)sel=x});var ses=sel&&sel.obj;
- var h=embed?'':'<div class="phead" data-tour="phead"><div><div class="t">Điểm danh & nhận xét buổi</div><div class="s">Dạy xong làm một chỗ: điểm danh + đánh giá từng em + nhận xét chung cả lớp (gộp từ trang Buổi học)</div></div></div>';
+ var h=embed?'':'<div class="phead" data-tour="phead"><div><div class="t">Điểm danh & nhận xét buổi</div><div class="s">Dạy xong làm một chỗ: điểm danh + đánh giá từng học viên + nhận xét chung cả lớp (gộp từ trang Buổi học)</div></div></div>';
  if(!embed)h+=classBar(cid);
  if(opt.noSessUI){/* trang Lớp học đã có dải thẻ buổi riêng - không lặp bộ chọn */}
  else if(opt.hideSess){                         /* bảng phía trên đã là bộ chọn buổi */
@@ -5468,7 +5476,7 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
    '<button class="pfb g'+(perf==="good"?" on":"")+'" onclick="pfSet(this)" title="Tốt">T</button>'+
    '<button class="pfb av'+(perf==="average"?" on":"")+'" onclick="pfSet(this)" title="Bình thường">B</button>'+
    '<button class="pfb w'+(perf==="weak"?" on":"")+'" onclick="pfSet(this)" title="Yếu">Y</button></div>';
-  h+='<input class="ddnote" placeholder="Ghi chú riêng em này" value="'+esc(cur&&cur.note?cur.note:"")+'">';
+  h+='<input class="ddnote" placeholder="Ghi chú riêng học viên này" value="'+esc(cur&&cur.note?cur.note:"")+'">';
   h+='</div>'});
  h+='</div>';
  /* ===== NHẬN XÉT CHUNG CẢ LỚP (gộp từ trang Buổi học) - chỉ khi buổi có trong lịch DL11 ===== */
@@ -5476,7 +5484,7 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
   h+='<div class="psub"><span class="stepn">Cả lớp</span><b>Nhận xét chung buổi học</b>'+
    (noteDone?'<span class="chip green" style="margin-left:2px">đã ghi</span>':'<span class="chip amber" style="margin-left:2px">chờ ghi · hạn '+paramOf("slaTeacherNote_hours",48)+'h</span>')+
    '<span class="mut" style="font-size:11.5px">học vụ đọc để phát hiện lớp/HV cần lưu ý</span></div>';
-  h+='<div class="pbody"><div class="fld full" style="margin:0"><textarea id="dd_note" rows="3" placeholder="Lớp học thế nào, em nào yếu / tiến bộ, cần lưu ý gì cho buổi sau...">'+esc(ses.teacher_note_summary||"")+'</textarea>'+
+  h+='<div class="pbody"><div class="fld full" style="margin:0"><textarea id="dd_note" rows="3" placeholder="Lớp học thế nào, học viên nào yếu / tiến bộ, cần lưu ý gì cho buổi sau...">'+esc(ses.teacher_note_summary||"")+'</textarea>'+
    (num(ses.teacher_late_minutes)>5?'<div class="fhint"><i class="ti ti-clock-exclamation"></i> Giờ vào lớp của GV (trễ '+esc(ses.teacher_late_minutes)+' phút) đã tự ghi khi bấm Bắt đầu lớp.</div>':'')+'</div>'+
    /* V9.40: nút Lưu THỨ HAI ngay dưới ô nhận xét. Đo tọa độ thật: nút Lưu ở đầu panel nằm cách
       ô nhận xét 573px - giáo viên cuộn xuống viết xong phải cuộn ngược lên mới thấy nút lưu.
@@ -5490,7 +5498,7 @@ function ddSet(b){var g=b.parentNode;[].forEach.call(g.children,function(x){x.cl
  if(b.classList.contains("ap")||b.classList.contains("au")){
   ne.placeholder=b.classList.contains("ap")?"Lý do vắng (BẮT BUỘC với vắng phép)":"Lý do vắng - ốm? bận? không liên lạc được?";
   ne.style.borderColor="var(--amber)";if(!ne.value)ne.focus()}
- else{ne.placeholder="Ghi chú riêng em này";ne.style.borderColor=""}}
+ else{ne.placeholder="Ghi chú riêng học viên này";ne.style.borderColor=""}}
 function pfSet(b){var g=b.parentNode;var was=b.classList.contains("on");[].forEach.call(g.children,function(x){x.classList.remove("on")});if(!was)b.classList.add("on")}
 function hmMinus(sd,min){var d=pvnd(sd);if(!d)return "-";var t=new Date(d.getTime()-min*60000);function p(n){return n<10?"0"+n:n}return p(t.getHours())+":"+p(t.getMinutes())}
 function sessStart(id){var s=find("DL11","session_id",id)||{};
@@ -5516,7 +5524,7 @@ function ddSave(){var sess=window.DDSESS;if(!sess){toast("Chưa chọn buổi.")
  var sesLate=lateEl?String(lateEl.value||"").trim():"";
  if(!recs.length&&sesNote==null){toast("Không có gì để lưu.");return}
  var missR=recs.filter(function(rc){return rc.attendance_status==="no_show"&&/excused/.test(rc.absence_type)&&!/unexcused/.test(rc.absence_type)&&!String(rc.note||"").trim()});
- if(missR.length){toast("Vắng CÓ PHÉP phải ghi lý do ("+missR.length+" em chưa có) - phép của ai, vì sao.",4500);return}
+ if(missR.length){toast("Vắng CÓ PHÉP phải ghi lý do ("+missR.length+" học viên chưa có) - phép của ai, vì sao.",4500);return}
  function saveSesNote(){if(sesNote==null)return "";var srow=find("DL11","session_id",sess);if(!srow)return "";
   srow.teacher_note_summary=sesNote;   /* teacher_late_minutes tự ghi khi Bắt đầu lớp - KHÔNG đụng vào */
   if(sesNote){srow.has_teacher_note="TRUE";srow.teacher_note_completed_at=nowStr();if(!isc(srow.session_status,"completed"))srow.session_status=eFull("enum_session_status","completed")}
@@ -7997,7 +8005,7 @@ function classBar(cid){var c=find("DL10","class_id",cid);if(!c)return '';
 function midForm(cid){var obs=rows("DL08").filter(function(o){return o.class_id===cid});
  if(!obs.length){toast("Lớp chưa có học viên.");return}
  var h='<div class="dcard"><h4><i class="ti ti-writing"></i>Điểm mock test giữa khóa - '+esc(cid)+'</h4>';
- h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Điểm giữa khóa là mốc đo học thuật GIỮA hành trình (SOP khuyến nghị quanh buổi giữa khóa). Nhập band 0-9 bước 0.5; bỏ trống em chưa thi. Học viên thấy ngay ở cột "Giữa khóa" trên Cổng học viên.</div>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Điểm giữa khóa là mốc đo học thuật GIỮA hành trình (SOP khuyến nghị quanh buổi giữa khóa). Nhập band 0-9 bước 0.5; bỏ trống học viên chưa thi. Học viên thấy ngay ở cột "Giữa khóa" trên Cổng học viên.</div>';
  h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>L</th><th>R</th><th>W</th><th>S</th><th>Overall</th></tr></thead><tbody>';
  obs.forEach(function(o){
   function inp(k){return '<input class="mid_'+k+'" type="number" min="0" max="9" step="0.5" value="'+esc(o["mid_"+k]||"")+'" style="width:56px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 6px;font-family:inherit">'}
@@ -8015,7 +8023,7 @@ function midSave(cid){var trs=document.querySelectorAll("#drawerBody tr[data-oid
   if(any){v.mid_test_date=nowStr().split(" ")[0];for(var k2 in v)o[k2]=v[k2];n++;
    if(SVR)google.script.run.apiUpdate("DL08",oid,v)}});
  if(bad){toast("Có điểm ngoài 0-9 / lệch bước 0.5 - kiểm lại.");return}
- if(!n){toast("Chưa nhập điểm cho em nào.");return}
+ if(!n){toast("Chưa nhập điểm cho học viên nào.");return}
  closeModal();toast("Đã lưu điểm giữa khóa cho "+n+" học viên."+(SVR?"":" (Bản Sheets: nhớ thêm 6 cột mid_* vào DL08.)"));reRender(CUR)}
 function renderBanglop(){
  if(window.BLCLASS&&!canRow("DL10",find("DL10","class_id",window.BLCLASS)))return dsDeny("Lớp này");
@@ -8275,7 +8283,7 @@ function kpiCompute(){
     Đo bằng máy: bảng BC2 của SOP liệt kê 51 chỉ số, app tính 48. Ba cái hụt là LFR, APR,
     SS_ALL - và chúng hụt ở CẢ hai nơi: không có công thức trong app, cũng không có dòng
     ngưỡng trong CH6. Bản thân SOP cũng lệch (BC2 có 51 dòng, CH6 chỉ có 48 ngưỡng) - anh
-    Luân chốt "nếu SOP chưa thoả đáng, em cứ sửa", nên em lấy ngưỡng ghi ngay trong BC2. */
+    Luân chốt "nếu SOP chưa thoả đáng, học viên cứ sửa", nên em lấy ngưỡng ghi ngay trong BC2. */
  /* P10 · LFR - học viên đang học phải có ghi chú theo dõi, không để ai trôi không dấu vết */
  var hvHoc=S.filter(function(s){return isc(s.student_status,"active")});
  v.LFR=rate(cnt(hvHoc,function(s){return String(s.learning_followup_note||"").trim()}),hvHoc.length);
@@ -9529,7 +9537,7 @@ function renderSetQA(){
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-sparkles" style="margin-right:6px"></i>Nối Trợ lý với một AI miễn phí</b>'+
   (aiOn()?'<span class="chip green">đang BẬT · '+esc(P.t)+'</span>':'<span class="chip">đang tắt</span>')+'</div><div class="pbody">';
  h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>Máy vẫn trả lời TRƯỚC bằng chính bộ luật app (số liệu, nút hành động, dắt từng bước). '+
-  'AI chỉ <b>diễn giải thêm bằng lời người</b> - hợp với câu kiểu "vì sao SOP bắt gọi trong 15 phút", "giải thích quy trình bảo lưu cho em". '+
+  'AI chỉ <b>diễn giải thêm bằng lời người</b> - hợp với câu kiểu "vì sao SOP bắt gọi trong 15 phút", "giải thích quy trình bảo lưu cho học viên". '+
   'Khi bật, câu hỏi + phần ngữ cảnh liên quan sẽ được gửi tới nhà cung cấp AI; key nằm trên máy này, không nhúng vào bản build.</div>';
  h+='<div class="fld"><label>Bật / tắt</label><select id="ai_on"><option value="0"'+(A.on?"":" selected")+'>Tắt - chỉ trả lời bằng máy</option><option value="1"'+(A.on?" selected":"")+'>Bật - máy trả lời trước, AI diễn giải thêm</option></select></div>';
  h+='<div class="fld"><label>Nhà cung cấp (đều miễn phí)</label><select id="ai_prov" onchange="aiCfg().prov=this.value;reRender(\'settings\')">'+
@@ -10078,7 +10086,7 @@ function btHub(embed){
  var cid=window.BTCLASS||(cls[0]&&cls[0].class_id)||"";
  var lop=find("DL10","class_id",cid)||{};var mode=window.BTMODE||"giao";
  var enr=rows("DL08").filter(function(e){return e.class_id===cid});
- var h=embed?'':'<div class="phead" data-tour="phead"><div><div class="t">Bài tập</div><div class="s">Chọn lớp và buổi, rồi giao bài cho cả lớp hoặc chấm bài từng em - đúng cách giáo viên làm việc</div></div></div>';
+ var h=embed?'':'<div class="phead" data-tour="phead"><div><div class="t">Bài tập</div><div class="s">Chọn lớp và buổi, rồi giao bài cho cả lớp hoặc chấm bài từng học viên - đúng cách giáo viên làm việc</div></div></div>';
  h+='<div class="fbar">';
  if(!embed)h+='<span class="lbl">Lớp</span><select class="sel" onchange="window.BTCLASS=this.value;reRender(CUR)">'+(cls.length?cls.map(function(c){return '<option value="'+esc(c.class_id)+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id+" - "+c.class_name)+'</option>'}).join(""):'<option>(không có lớp)</option>')+'</select>';
  var sesL=ddSessions(cid);
@@ -10095,17 +10103,17 @@ function btHub(embed){
   var bsrc=window.BTSRC||"bank";
   var preT=(SP&&SP.hw)?SP.hw.title:"", preDue=SP?toISOdt(SP.dueDate,true):"";
   var mode2=window.BTWHO==="each"?"each":"all";
-  h+='<div class="panel"><div class="ph"><b>Giao bài - '+esc(lop.class_name||cid)+'</b><span class="mut" style="font-size:11.5px">lớp cá nhân hóa: một bài chung cho các em được chọn, hoặc mỗi em một bài riêng</span></div><div class="form">';
+  h+='<div class="panel"><div class="ph"><b>Giao bài - '+esc(lop.class_name||cid)+'</b><span class="mut" style="font-size:11.5px">lớp cá nhân hóa: một bài chung cho học viên được chọn, hoặc mỗi học viên một bài riêng</span></div><div class="form">';
   if(SP)h+='<div class="notebar" style="grid-column:1/-1;margin:0 0 4px"><i class="ti ti-notes"></i>Buổi '+esc(curSes.session_number)+(curSes.session_date?' ('+esc(curSes.session_date)+')':'')+' theo giáo án: '+
    (SP.hw?'<b>'+esc(SP.hw.title)+'</b> '+planSrcChip(SP.hwFrom):'<i>chưa đặt bài</i>')+' · hạn nộp '+dueChip(SP)+'.'+(mode2==="each"?'':' Đã điền sẵn bên dưới, sửa được trước khi giao.')+'</div>';
   /* CẤP 1: cách giao - quyết định toàn bộ bố cục bên dưới */
   h+='<div class="mswrap"><div class="mslb">Bước 1 · Cách giao</div>'+
-   [["all","ti-users-group","Một bài chung","Các em được tick nhận cùng một bài, cùng hạn nộp"],
-    ["each","ti-user-cog","Giao bài tập riêng","Mỗi em một bài trong kho hoặc đề tải lên, hạn riêng"]]
+   [["all","ti-users-group","Một bài chung","Các học viên được tick nhận cùng một bài, cùng hạn nộp"],
+    ["each","ti-user-cog","Giao bài tập riêng","Mỗi học viên một bài trong kho hoặc đề tải lên, hạn riêng"]]
    .map(function(o){return '<button class="msw'+(mode2===o[0]?" on":"")+'" onclick="window.BTWHO=\''+o[0]+'\';reRender(CUR)">'+
     '<i class="ti '+o[1]+'"></i><span><b>'+esc(o[2])+'</b><small>'+esc(o[3])+'</small></span></button>'}).join("")+'</div>';
   if(mode2==="each"){
-   h+='<div class="fhint" style="grid-column:1/-1">Chọn bài cho từng em ở danh sách bên dưới — trong <b>kho bài tập</b> hoặc <b>tải đề riêng</b> lên. Hạn nộp cũng đặt riêng từng em.</div>';
+   h+='<div class="fhint" style="grid-column:1/-1">Chọn bài cho từng học viên ở danh sách bên dưới — trong <b>kho bài tập</b> hoặc <b>tải đề riêng</b> lên. Hạn nộp cũng đặt riêng từng học viên.</div>';
   }else{
   /* CẤP 2: nội dung bài chung - khối con lồng trong bước 1 */
   h+='<div class="substep"><div class="sst"><i class="ti ti-corner-down-right"></i>Bước 2 · Bài tập giao chung</div>';
@@ -10122,13 +10130,13 @@ function btHub(embed){
   h+='<div class="fld"><label>Kỹ năng</label><select id="bt_skill"><option value="">-- chọn --</option>'+(ENUM.enum_homework_skill||[]).map(function(o){return '<option'+(o===preSk?" selected":"")+'>'+esc(o)+'</option>'}).join("")+'</select></div>';
   h+='<div class="fld"><label>Hạn nộp chung</label><input id="bt_due" type="date" value="'+esc(preDue)+'">'+
    (SP&&SP.dueDays?'<div class="fhint">Lấy theo giáo án: ngày học + '+SP.dueDays+' ngày. Sửa ở đây chỉ đổi cho lần giao này.</div>':'')+'</div>';
-  h+='<div class="fld full"><label class="ckline"><input type="checkbox" id="bt_perdue" onchange="btTogglePerDue(this.checked)">Đặt hạn nộp riêng cho từng em</label></div>';
+  h+='<div class="fld full"><label class="ckline"><input type="checkbox" id="bt_perdue" onchange="btTogglePerDue(this.checked)">Đặt hạn nộp riêng cho từng học viên</label></div>';
   h+='</div>';
   }
   h+='</div>';
   /* 3. DANH SÁCH HỌC VIÊN - nằm CÙNG panel với cấu hình, chỉ ngăn bằng tiêu đề phụ */
-  h+='<div class="psub"><span class="stepn">Bước '+(mode2==="each"?"2":"3")+'</span><b>'+(mode2==="each"?"Bài riêng từng em":"Học viên nhận bài")+' ('+enr.length+')</b>'+
-   '<span class="mut" style="font-size:11.5px">'+(mode2==="each"?"để trống ô bài = em đó không nhận bài lần này":"bỏ tick em nào không nhận bài lần này")+'</span>'+
+  h+='<div class="psub"><span class="stepn">Bước '+(mode2==="each"?"2":"3")+'</span><b>'+(mode2==="each"?"Bài riêng từng học viên":"Học viên nhận bài")+' ('+enr.length+')</b>'+
+   '<span class="mut" style="font-size:11.5px">'+(mode2==="each"?"để trống ô bài = học viên đó không nhận bài lần này":"bỏ tick học viên nào không nhận bài lần này")+'</span>'+
    '<div class="mini">'+(mode2==="each"?'':'<button class="pill" onclick="btPickAll(true)">Chọn tất cả</button><button class="pill" onclick="btPickAll(false)">Bỏ chọn</button>')+'</div></div><div class="pbody">';
   if(!enr.length)h+='<div class="empty">Lớp chưa có học viên được xếp.</div>';
   enr.forEach(function(e){var s=find("DL09","student_id",e.student_id)||{};
@@ -10140,15 +10148,15 @@ function btHub(embed){
     (wk?'<span class="chip amber" style="margin-left:6px" title="Kỹ năng có điểm bài tập trung bình thấp nhất ('+wk.n+' bài đã chấm)">yếu '+esc(String(wk.skill).replace(/\s*\(.*/,""))+' · '+wk.avg.toFixed(1)+'</span>':'')+'</div>'+
     (mode2==="each"
      ?'<div class="bteach"><select class="bthw">'+hwbOpts("","-- không giao bài --")+'</select>'+
-       '<label class="btup" title="Tải đề riêng cho em này"><i class="ti ti-upload"></i><span class="btupn">Tải đề</span>'+
+       '<label class="btup" title="Tải đề riêng cho học viên này"><i class="ti ti-upload"></i><span class="btupn">Tải đề</span>'+
        '<input type="file" class="btfi" onchange="btRowFile(this)" style="display:none"></label>'+
        '<input type="date" class="btdi" value="'+esc(preDue)+'" title="Hạn nộp riêng"></div>'
      :'<div class="btdue" style="display:none;margin-left:auto"><input type="date" class="btdi" value="'+esc(preDue)+'" style="height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit"></div>')+
     '</div>'});
   h+='</div>'+
    '<div class="pfoot"><span class="mut">'+(mode2==="each"
-    ?'Chọn xong bài cho từng em rồi bấm Giao bài.'
-    :'Bài và hạn nộp lấy ở khối phía trên; danh sách này quyết định em nào nhận.')+'</span>'+
+    ?'Chọn xong bài cho từng học viên rồi bấm Giao bài.'
+    :'Bài và hạn nộp lấy ở khối phía trên; danh sách này quyết định học viên nào nhận.')+'</span>'+
    '<button class="btn primary lg" onclick="giaoBaiCaLop()"><i class="ti ti-send"></i>Giao bài</button></div></div>';
  } else if(mode==="thu"){
   var hw2=rows("DL13").filter(function(x){return x.class_id===cid});var t2={};hw2.forEach(function(r){var t=r.homework_title||"(không tên)";(t2[t]=t2[t]||[]).push(r)});
@@ -10175,7 +10183,7 @@ function btHub(embed){
   h+='<div class="panel"><div class="ph"><b>Chấm: '+esc(pick||"—")+'</b><div class="mini"><button class="btn green sm" onclick="chamLuu()"><i class="ti ti-device-floppy"></i>Lưu chấm bài</button></div></div><div class="pbody">';
   if(!list.length)h+='<div class="empty">Lớp này chưa có bài để chấm. Sang tab Giao bài để giao trước.</div>';
   list.forEach(function(r){h+='<div class="rost" data-hwid="'+esc(r.homework_id)+'"><div class="rn">'+esc(r.student_name||r.student_id)+' '+hwChip(r)+(hwSubmitted(r)?' <span class="mut" style="font-weight:500">nộp '+esc(r.homework_submitted_time||"")+'</span>':'')+'</div><div class="att"><input class="hwscore" type="number" min="0" max="9" step="0.5" placeholder="'+esc(hwThang(r))+'" value="'+esc(r.homework_score||"")+'" style="width:64px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit">'+
-(hwSubmitted(r)?'':'<select class="hwlate" title="Bài chưa thu - em này nộp thế nào?" style="height:30px;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:11px"><option value="on">nộp đúng hạn</option><option value="late">nộp trễ</option></select>')+'<input class="hwfb" placeholder="Nhận xét" value="'+esc(r.teacher_feedback||"")+'" style="width:230px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit"></div></div>'});
+(hwSubmitted(r)?'':'<select class="hwlate" title="Bài chưa thu - học viên này nộp thế nào?" style="height:30px;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:11px"><option value="on">nộp đúng hạn</option><option value="late">nộp trễ</option></select>')+'<input class="hwfb" placeholder="Nhận xét" value="'+esc(r.teacher_feedback||"")+'" style="width:230px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit"></div></div>'});
   h+='</div></div>';
  }
  return h}
@@ -10212,7 +10220,7 @@ function giaoBaiCaLop(){var cid=window.BTCLASS;var te=document.getElementById("b
   var ck=r.querySelector(".btck");if(ck&&!ck.checked)return;
   var di=r.querySelector(".btdi");
   picks.push({sid:r.getAttribute("data-sid"),due:(perDue&&di&&di.value)?fromISOdt(di.value,true):(due?fromISOdt(due,true):"")})});
- if(!picks.length){toast(rows("DL08").filter(function(e){return e.class_id===cid}).length?"Chưa tick em nào để giao bài.":"Lớp chưa có học viên.");return}
+ if(!picks.length){toast(rows("DL08").filter(function(e){return e.class_id===cid}).length?"Chưa tick học viên nào để giao bài.":"Lớp chưa có học viên.");return}
  var note=[desc?("Đề: "+desc):"",file?("Tệp: "+file):"",link?("Link: "+link):""].filter(Boolean).join(" | ");
  var sesId=String(window.BTSESS||"");
  if(sesId&&(find("DL11","session_id",sesId)||{}).class_id!==cid)sesId="";
@@ -10233,9 +10241,9 @@ function giaoBaiRieng(cid){var lopn=(find("DL10","class_id",cid)||{}).class_name
   var bid=sel?String(sel.value||"").trim():"";
   var fn=(fi&&fi.files&&fi.files[0])?String(fi.files[0].name||""):"";
   var b=bid?hwB(bid):null;
-  if(!b&&!fn)return;   /* không chọn bài, không tải đề -> em này không nhận bài lần này */
+  if(!b&&!fn)return;   /* không chọn bài, không tải đề -> học viên này không nhận bài lần này */
   picks.push({sid:sid,b:b,file:fn,due:(di&&di.value)?fromISOdt(di.value,true):""})});
- if(!picks.length){toast("Chưa chọn bài hoặc tải đề cho em nào.");return}
+ if(!picks.length){toast("Chưa chọn bài hoặc tải đề cho học viên nào.");return}
  var recs=picks.map(function(p){var s=find("DL09","student_id",p.sid)||{};
   var title=p.b?p.b.title:String(p.file).replace(/\.[a-z0-9]{1,5}$/i,"");
   var note=[p.b?(p.b.description||""):"",p.file?("Tệp đề riêng: "+p.file):"","Bài giao riêng cho học viên"].filter(Boolean).join(" | ");
@@ -10632,7 +10640,7 @@ function stuCourse(sid){var e=rows("DL06").filter(function(x){return x.student_i
    đầu tiên cho ô "Lớp". Học viên học HAI khóa thì hai ô đó thuộc HAI đơn khác nhau - màn hình khai
    một cặp khóa-lớp KHÔNG CÓ THẬT. Đã bắt được tại HV060: ô Khóa ghi "IELTS 6.5" mà ô Lớp ghi
    "IELTS 7.0+".
-   Và ô công nợ cũng vậy: lấy đơn đầu tiên là nói 0đ trong khi em đó còn nợ 10 triệu ở đơn kia.
+   Và ô công nợ cũng vậy: lấy đơn đầu tiên là nói 0đ trong khi học viên đó còn nợ 10 triệu ở đơn kia.
    Một hàm trả về ĐÚNG TỪNG CẶP + tổng tiền, mọi màn dùng chung. */
 function stuKhoaLop(sid){
  var out=[],seen={};
@@ -10754,7 +10762,7 @@ function xepFor(sid){var s=find("DL09","student_id",sid)||{};var e=rows("DL06").
 function openXepMoi(){var haveOb={};rows("DL08").forEach(function(o){haveOb[o.student_id]=1});
  var ready=rows("DL06").filter(function(e){return /confirmed/.test(ecode(e.enrollment_status))&&!haveOb[e.student_id]});var classes=rows("DL10");
  var h='<div class="dcard"><h4><i class="ti ti-layout-grid-add"></i>Xếp lớp cho học viên</h4>';
- h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Danh sách chỉ hiện học viên đã đăng ký xác nhận mà chưa có hồ sơ xếp lớp ('+ready.length+' em). Chọn học viên trước thì ô lớp tự lọc theo đúng khóa của em đó - lớp đã đầy hoặc sai khóa sẽ bị chặn khi lưu.</div>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Danh sách chỉ hiện học viên đã đăng ký xác nhận mà chưa có hồ sơ xếp lớp ('+ready.length+' học viên). Chọn học viên trước thì ô lớp tự lọc theo đúng khóa của học viên đó - lớp đã đầy hoặc sai khóa sẽ bị chặn khi lưu.</div>';
  h+='<div class="fld"><label>Học viên (đã đăng ký, chưa xếp lớp)</label><select id="xm_stu" onchange="xmStuChanged(this.value)"><option value="">-- chọn --</option>'+ready.map(function(e){return '<option value="'+esc(e.student_id)+'">'+esc((e.student_id_name||e.student_id)+" - "+(e.course_id_name||""))+'</option>'}).join("")+'</select></div>';
  h+='<div class="fld"><label>Lớp (ưu tiên đúng khóa của học viên)</label><select id="xm_cls"><option value="">-- chọn học viên trước --</option></select></div>';
  h+='<div class="fld full"><button class="btn primary" onclick="xepMoiLuu()"><i class="ti ti-check"></i>Gán vào lớp</button></div></div>';
@@ -11932,7 +11940,7 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=rows("DL14");
   if(w.wow_no_show_reason)_bits.push(["ti-user-x","Lý do vắng",elabel(w.wow_no_show_reason)||w.wow_no_show_reason]);
   if(w.wow_outcome)_bits.push(["ti-trending-up","Kết quả buổi",elabel(w.wow_outcome)||w.wow_outcome]);
   h+='<div class="wowinfo'+(_self?" self":"")+'">';
-  if(_self)h+='<div class="wowself"><i class="ti ti-device-mobile"></i>Học viên TỰ ĐẶT qua cổng - cần xác nhận giảng viên và giờ chính thức rồi báo lại em ấy.</div>';
+  if(_self)h+='<div class="wowself"><i class="ti ti-device-mobile"></i>Học viên TỰ ĐẶT qua cổng - cần xác nhận giảng viên và giờ chính thức rồi báo lại học viên đó.</div>';
   _bits.forEach(function(b){h+='<div class="wowib"><i class="ti '+b[0]+'"></i><span><b>'+esc(b[1])+':</b> '+esc(b[2])+'</span></div>'});
   if(_req)h+='<div class="wowib"><i class="ti ti-message"></i><span><b>Yêu cầu gốc của học viên:</b> '+
    esc(String(_req.content||"").split("\n").join(" · "))+' <button class="pill" onclick="tkOpen(\''+esc(_req.task_id)+'\')">Mở yêu cầu</button></span></div>';
@@ -12222,7 +12230,7 @@ function renderKetthuc(){var p="ketthuc",fil=fget(p);var all=rows("DL18");
  h+='</div>';return h}
 function ktGen(){var cands=rows("DL10").filter(function(c){return /in_progress|finished/.test(ecode(c.class_status))});
  var h='<div class="dcard"><h4><i class="ti ti-school-off"></i>Tạo hồ sơ kết thúc cho cả lớp</h4>';
- h+='<div class="notebar" style="margin-bottom:12px"><i class="ti ti-info-circle"></i>Tạo 1 hồ sơ kết thúc (DL18) cho mỗi HV trong lớp CHƯA có hồ sơ - sau đó nhập kết quả đầu ra từng em.</div>';
+ h+='<div class="notebar" style="margin-bottom:12px"><i class="ti ti-info-circle"></i>Tạo 1 hồ sơ kết thúc (DL18) cho mỗi HV trong lớp CHƯA có hồ sơ - sau đó nhập kết quả đầu ra từng học viên.</div>';
  h+='<div class="fld"><label>Lớp (đang học / đã kết thúc)</label><select id="kg_cls" onchange="ktGenPreview(this.value)"><option value="">-- chọn lớp --</option>'+cands.map(function(c){return '<option value="'+esc(c.class_id)+'">'+esc(c.class_id+" - "+c.class_name+" ("+(elabel(c.class_status)||"")+")")+'</option>'}).join("")+'</select></div>';
  h+='<div id="kg_prev" class="mut" style="font-size:12px;margin:4px 0 10px">Chọn lớp để xem số HV sẽ tạo.</div>';
  h+='<div class="fld full"><button class="btn primary" onclick="ktGenSave()"><i class="ti ti-check"></i>Tạo hồ sơ kết thúc</button></div></div>';
@@ -12243,7 +12251,7 @@ function ktGenSave(){var cid=fldV("kg_cls");if(!cid){toast("Chọn lớp.");retu
    var c2=find("DL10","class_id",o2.class_id);return c2&&/in_progress|open/.test(ecode(c2.class_status))});
   if(others)return;
   s.student_status=eFull("enum_student_status","completed");if(SVR)google.script.run.apiUpdate("DL09",sid,{student_status:s.student_status})}
- function done(n){toast("Đã tạo "+n+" hồ sơ kết thúc cho lớp "+(c.class_name||cid)+". Nhập kết quả đầu ra từng em.");closeModal();fset("ketthuc","score");reRender("ketthuc")}
+ function done(n){toast("Đã tạo "+n+" hồ sơ kết thúc cho lớp "+(c.class_name||cid)+". Nhập kết quả đầu ra từng học viên.");closeModal();fset("ketthuc","score");reRender("ketthuc")}
  if(SVR){var d=0,ok=0;recs.forEach(function(o){google.script.run.withSuccessHandler(function(res){d++;if(res&&res.ok){ok++;o.course_end_id=res.id;rows("DL18").unshift(o);markStu(o.student_id)}if(d===recs.length)done(ok)}).withFailureHandler(function(){d++;if(d===recs.length)done(ok)}).apiSave("DL18",o)})}
  else{recs.forEach(function(o){o.course_end_id="CE-"+seqNo("DL18","course_end_id");rows("DL18").unshift(o);markStu(o.student_id)});done(recs.length)}}
 function ktResult(id){var r=find("DL18","course_end_id",id)||{};
@@ -12258,7 +12266,7 @@ function ktSuggest(tg){var ov=num(fldV("k_o"));var hint=document.getElementById(
  if(!ov||!tg){if(hint)hint.textContent="";return}
  var okv=ov>=tg;
  if(sel)sel.value=eFull("enum_achievement_status",okv?"achieved":"not_achieved")||sel.value;
- if(hint)hint.textContent=okv?("Gợi ý: ĐẠT ("+ov+" ≥ mục tiêu "+tg+") - xác nhận lại rồi lưu."):("Gợi ý: CHƯA ĐẠT ("+ov+" < mục tiêu "+tg+") - lưu xong sẽ hỏi lộ trình tiếp cho em này.")}
+ if(hint)hint.textContent=okv?("Gợi ý: ĐẠT ("+ov+" ≥ mục tiêu "+tg+") - xác nhận lại rồi lưu."):("Gợi ý: CHƯA ĐẠT ("+ov+" < mục tiêu "+tg+") - lưu xong sẽ hỏi lộ trình tiếp cho học viên này.")}
 function ktResultSave(id){var r=find("DL18","course_end_id",id)||{};
  var sk=["k_l","k_r","k_w","k_s"].map(function(k){return num(fldV(k))}).filter(function(x){return x>0});
  var ov=num(fldV("k_o"));
@@ -12291,7 +12299,7 @@ function ktTestiSave(id){var t=(fldV("kt_testi")||"").trim()+attachLine("ktt");
 function ktInvite(id){markRow("DL18","course_end_id",id,{re_enrollment_status:eFull("enum_re_enrollment_status","contacted"),re_enrollment_contact_time:nowStr()},"Đã mời tái ghi danh.","ketthuc")}
 function ktFollow(id){var r=find("DL18","course_end_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-refresh"></i>Cập nhật tái ĐK - '+esc(r.student_id_name||r.student_id)+'</h4>';
- h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Trạng thái ở đây quyết định em này còn nằm trong hàng mời tái đăng ký hay không. Chỉ "confirmed_with_deposit" mới tính vào tỷ lệ tái đăng ký của kỳ; "interested" thì vẫn phải gọi lại.</div>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Trạng thái ở đây quyết định học viên này còn nằm trong hàng mời tái đăng ký hay không. Chỉ "confirmed_with_deposit" mới tính vào tỷ lệ tái đăng ký của kỳ; "interested" thì vẫn phải gọi lại.</div>';
  h+='<div class="fld"><label>Trạng thái</label><select id="kf_st">'+enumOpts("enum_re_enrollment_status")+'</select></div>';
  h+='<div class="fld full"><label>Ghi chú</label><textarea id="kf_note" rows="2"></textarea></div>';
  h+='<div class="fld full">'+zaloBtn("taidk",{ten:r.student_id_name||"",khoa:r.class_id_name||""})+'</div>';
@@ -12464,7 +12472,7 @@ function renderTrangHV(){
     không bao giờ chào người nhà bằng tên của em học viên. */
  var _chaoAi=_p?(_p.ten||(_p.qh||"Quý phụ huynh")):S.full_name;
  h+='<div class="hvhero"><div style="flex:1"><div class="hvg">'+esc(greet)+', '+esc(_chaoAi)+'</div>'+
-  (_p?('<div class="hvsub" style="margin-bottom:2px">'+esc(_p.qh||"Người đồng hành")+' của <b>'+esc(S.full_name||"")+'</b> - bạn đang xem trang học của em</div>'):'')+
+  (_p?('<div class="hvsub" style="margin-bottom:2px">'+esc(_p.qh||"Người đồng hành")+' của <b>'+esc(S.full_name||"")+'</b> - bạn đang xem trang học của học viên</div>'):'')+
   '<div class="hvsub">'+esc(S.student_id)+(lop?' · Lớp <b>'+esc(lop.class_name)+'</b>':'')+(lop&&lop.course_id_name?' · '+esc(lop.course_id_name):'')+
   ' · <span class="chip '+stCls(S.student_status)+'">'+esc(elabel(S.student_status))+'</span></div>'+
   (nextSes?('<div class="hvsub" style="margin-top:6px"><i class="ti ti-calendar-check" style="margin-right:5px"></i>Buổi học tiếp theo: <b>'+esc(nextSes.session_date)+'</b>'+(nextSes.teacher_id_name?' · GV '+esc(nextSes.teacher_id_name):'')+'</div>'):'')+
@@ -12797,7 +12805,7 @@ function renderTrangHV(){
    (a.in_class_performance?' · thái độ trong lớp: <b>'+esc(elabel(a.in_class_performance))+'</b>':'')+
    /* (m) DL12.note là ghi chú NỘI BỘ (vd "đã gọi hỏi thăm, HV hứa đi học lại") - in nguyên
       văn cho học viên đọc là lộ chuyện chăm sóc nội bộ. Chỉ hiện phần HỌC VIÊN TỰ GHI. */
-   (hvSelfWhy(a)?' · lý do bạn báo: '+esc(hvSelfWhy(a)):'')+/* V9.29: nói rõ đơn của em đang ở đâu - trước đây báo xong là im, em không biết đã được duyệt chưa */(absPending(a)?' · <b style="color:#8A6D1F">trung tâm đang xem xét</b>':(ecode(a.absence_type)==="excused"?' · <b style="color:#1E6A47">đã được duyệt: vắng có phép</b>':(ecode(a.absence_type)==="unexcused"?' · <b style="color:#A32D2D">không được chấp nhận</b>':'')))+(a.makeup_session_id?(function(){var t=find("DL11","session_id",a.makeup_session_id)||{};return ' · <b style="color:var(--navy)">đã xếp học bù: buổi '+esc(t.session_number||'')+' ngày '+esc(t.session_date||'')+'</b>'})():'')+'</span></div>'}
+   (hvSelfWhy(a)?' · lý do bạn báo: '+esc(hvSelfWhy(a)):'')+/* V9.29: nói rõ đơn của học viên đang ở đâu - trước đây báo xong là im, học viên không biết đã được duyệt chưa */(absPending(a)?' · <b style="color:#8A6D1F">trung tâm đang xem xét</b>':(ecode(a.absence_type)==="excused"?' · <b style="color:#1E6A47">đã được duyệt: vắng có phép</b>':(ecode(a.absence_type)==="unexcused"?' · <b style="color:#A32D2D">không được chấp nhận</b>':'')))+(a.makeup_session_id?(function(){var t=find("DL11","session_id",a.makeup_session_id)||{};return ' · <b style="color:var(--navy)">đã xếp học bù: buổi '+esc(t.session_number||'')+' ngày '+esc(t.session_date||'')+'</b>'})():'')+'</span></div>'}
   if(s2.teacher_note_summary)the+='<div class="hvev"><i class="ti ti-notes"></i><span><b>Nhận xét của giảng viên:</b> '+esc(s2.teacher_note_summary)+'</span></div>';
   /* (g) ĐÁNH GIÁ TỪNG BUỔI bằng hàng sao - ghi vào DL16 kèm session_id để học vụ biết buổi nào
      bị chấm thấp, thay vì đợi tới phiếu khảo sát cuối khóa mới biết. */
@@ -14305,7 +14313,7 @@ function bhCancelRun(id){var reason=(fldV("bc_reason")||"").trim();
 function bhNoteForm(id){var s=find("DL11","session_id",id);if(!s){toast("Không thấy buổi học.");return}
  var h='<div class="dcard"><h4><i class="ti ti-writing"></i>Nhận xét buổi - '+esc(s.class_id_name||s.class_id)+' buổi '+esc(s.session_number||"")+'</h4>';
  h+=ctxRows([["Ngày học",esc(s.session_date||"-")],["Giảng viên",esc(s.teacher_id_name||s.teacher_id||"-")],["Hạn ghi nhận xét",slaChip("slaTeacherNote_hours",48)+" giờ sau buổi"]]);
- h+='<div class="fld full"><label>Nhận xét buổi học <i>*</i></label><textarea id="bh_note" rows="4" placeholder="Lớp học thế nào, em nào yếu/tiến bộ, cần lưu ý gì cho buổi sau...">'+esc(s.teacher_note_summary||"")+'</textarea></div>';
+ h+='<div class="fld full"><label>Nhận xét buổi học <i>*</i></label><textarea id="bh_note" rows="4" placeholder="Lớp học thế nào, học viên nào yếu/tiến bộ, cần lưu ý gì cho buổi sau...">'+esc(s.teacher_note_summary||"")+'</textarea></div>';
  h+='<div class="fld"><label>GV vào trễ (phút, để trống nếu đúng giờ)</label><input id="bh_late" value="'+esc(s.teacher_late_minutes||"")+'"></div>';
  h+='<div class="dact"><button class="btn primary" onclick="bhNoteSave(\''+esc(id)+'\')"><i class="ti ti-device-floppy"></i>Lưu nhận xét</button></div></div>';
  openDrawer("Nhận xét buổi học",h)}
@@ -14537,8 +14545,8 @@ function absCall(aid){var a=find("DL12","attendance_id",aid);if(!a){toast("Khôn
     nhân viên phải tự mở hồ sơ tìm số phụ huynh; mà với em dưới 18 thì gọi thẳng em nhiều khi vô ích. */
  h+=ghGoiHTML(_s);
  h+='<div class="notebar"><i class="ti ti-info-circle"></i>Gọi trong '+slaChip("slaAbsenceCall_hours",24)+
-  ' rồi ghi lại đây. Ghi xong việc này rời hàng chờ - và đó cũng là căn cứ nếu sau này em này thành nguy cơ.</div>';
- h+='<div class="fld full"><label>Gọi được gì <i>*</i></label><textarea id="ac_note" rows="3" placeholder="vd: gọi 2 lần không nghe, đã nhắn Zalo / em bị ốm, xin học bù buổi 12"></textarea></div>';
+  ' rồi ghi lại đây. Ghi xong việc này rời hàng chờ - và đó cũng là căn cứ nếu sau này học viên này thành nguy cơ.</div>';
+ h+='<div class="fld full"><label>Gọi được gì <i>*</i></label><textarea id="ac_note" rows="3" placeholder="vd: gọi 2 lần không nghe, đã nhắn Zalo / học viên bị ốm, xin học bù buổi 12"></textarea></div>';
  h+='<div class="dact"><button class="btn primary" onclick="absCallSave(\''+esc(aid)+'\')"><i class="ti ti-device-floppy"></i>Ghi và đóng việc</button>'+
   '<button class="btn" onclick="closeModal();openStuQuick(\''+esc(a.student_id)+'\')"><i class="ti ti-eye"></i>Xem nhanh học viên</button></div></div>';
  openDrawer("Gọi hỏi thăm HV vắng",h)}
@@ -14736,15 +14744,15 @@ var TOURS={
   {p:"ychv",sel:'@phead',t:"Học viên nhắn gì cho trung tâm",d:"Học viên gửi yêu cầu từ Cổng học viên - xin nghỉ, xin học bù, hỏi lịch, báo đã chuyển khoản. Hệ thống tự chuyển tới bạn kèm hạn nhận việc; yêu cầu về tiền thì sang kế toán.",hint:"Bấm Nhận việc ở một thẻ rồi trả lời ngay trong thẻ đó."},
   {p:"xeplop",sel:'@txt:Xếp vào lớp',t:"Xếp lớp cho học viên mới",d:"Học viên đóng tiền xong về đây. Chọn lớp phù hợp trình độ và lịch học, gửi thông tin lớp, chờ học viên xác nhận rồi hoàn tất nhập học.",hint:"Bấm Xếp lớp trên một học viên đang chờ, chọn lớp rồi Lưu.",chk:function(){return tourMore("ob")}},
   {p:"hoctap",sel:'@txt:Lớp học',t:"Bức tranh dạy và học",d:"Tab Hôm nay là việc của giáo viên trong ngày, tab Lớp học là sức khỏe từng lớp, tab Lịch tuần là toàn bộ lịch dạy.",hint:"Bấm sang tab Lớp học."},
-  {p:"banglop",sel:'@txt:Vận hành',t:"Vận hành một lớp",d:"Điểm danh, giao bài, ghi nhận xét buổi, nhập điểm giữa khóa - tất cả trong một màn hình của lớp đó.",hint:"Chọn một lớp, mở tab Điểm danh, đánh dấu vài em rồi bấm Lưu buổi học.",chk:function(){return tourMore("dd")}},
+  {p:"banglop",sel:'@txt:Vận hành',t:"Vận hành một lớp",d:"Điểm danh, giao bài, ghi nhận xét buổi, nhập điểm giữa khóa - tất cả trong một màn hình của lớp đó.",hint:"Chọn một lớp, mở tab Điểm danh, đánh dấu vài học viên rồi bấm Lưu buổi học.",chk:function(){return tourMore("dd")}},
   {p:"buoihoc",sel:'@txt:Chờ ghi nhận xét',t:"Nhắc giáo viên ghi nhận xét",d:"Buổi dạy xong mà quá hạn chưa có nhận xét sẽ hiện đỏ ở đây. Đây là việc học vụ phải đốc thúc hằng tuần.",hint:"Bấm chip 'Chờ ghi nhận xét' để lọc, rồi ghi nhận xét cho một buổi trong danh sách.",chk:function(){return (window.TOURB&&rows("DL11").filter(function(x){return bhState(x).note}).length>(window.TOURB.nx||0))}},
-  {p:"hocvien",sel:'@txt:Nguy cơ',t:"Học viên nguy cơ",d:"Lọc nhanh những em vắng nhiều hoặc tiến bộ chậm để gọi hỏi thăm trước khi phụ huynh phàn nàn.",hint:"Bấm chip lọc 'Nguy cơ', mở một em rồi ghi lần chăm."},
+  {p:"hocvien",sel:'@txt:Nguy cơ',t:"Học viên nguy cơ",d:"Lọc nhanh những học viên vắng nhiều hoặc tiến bộ chậm để gọi hỏi thăm trước khi phụ huynh phàn nàn.",hint:"Bấm chip lọc 'Nguy cơ', mở một học viên rồi ghi lần chăm."},
   {p:"cskh",sel:'@phead',t:"Khảo sát và phản hồi",d:"Gửi khảo sát định kỳ theo lớp, tiếp nhận góp ý, xử lý khiếu nại. Điểm hài lòng thấp sẽ tự bật việc follow-up.",hint:"Xem tab Khảo sát."},
   {p:"baoluu",sel:'@phead',t:"Giữ chân học viên muốn nghỉ",d:"Học viên xin bảo lưu hoặc có ý bỏ học nằm ở đây - gọi giữ chân, hẹn ngày quay lại, hoặc chốt bảo lưu có hạn.",hint:"Xong một ngày của học vụ!"}]},
  tn_giaovien:{lv:"trainghiem",role:"Giáo viên",t:"Một ngày của Giáo viên",ic:"ti-chalkboard",d:"5 bước - dạy, điểm danh, chấm bài",steps:[
   {p:"hoctap",sel:'@phead',t:"Hôm nay bạn dạy gì",d:"Vào app là thấy ngay buổi dạy hôm nay, chủ đề buổi, bài tập sẽ giao và lời dặn từ giáo án khóa.",hint:"Xem thẻ buổi học của bạn."},
-  {p:"banglop",sel:'@txt:Buổi học & điểm danh',t:"Vào lớp và điểm danh",d:"Bấm Bắt đầu lớp để mở cổng điểm danh. Vắng có phép hay không phép đều ghi rõ, vắng phải ghi lý do.",hint:"Bấm tab 'Buổi học & điểm danh' của lớp, đánh dấu vài em rồi Lưu buổi học."},
-  {p:"banglop",sel:'@txt:Giao & chấm bài tập',t:"Giao bài tập",d:"Giao một bài chung cho cả lớp hoặc bài riêng cho từng em. Hạn nộp tự tính theo giáo án khóa, sửa được.",hint:"Bấm tab 'Giao & chấm bài tập' rồi giao một bài mới."},
+  {p:"banglop",sel:'@txt:Buổi học & điểm danh',t:"Vào lớp và điểm danh",d:"Bấm Bắt đầu lớp để mở cổng điểm danh. Vắng có phép hay không phép đều ghi rõ, vắng phải ghi lý do.",hint:"Bấm tab 'Buổi học & điểm danh' của lớp, đánh dấu vài học viên rồi Lưu buổi học."},
+  {p:"banglop",sel:'@txt:Giao & chấm bài tập',t:"Giao bài tập",d:"Giao một bài chung cho cả lớp hoặc bài riêng cho từng học viên. Hạn nộp tự tính theo giáo án khóa, sửa được.",hint:"Bấm tab 'Giao & chấm bài tập' rồi giao một bài mới."},
   {p:"buoihoc",sel:'@txt:Chờ ghi nhận xét',t:"Ghi nhận xét buổi học",d:"Cuối buổi ghi nhận xét chung - học viên và phụ huynh đọc được trong cổng học viên. Quá hạn sẽ bị nhắc.",hint:"Bấm chip 'Chờ ghi nhận xét', mở buổi vừa dạy rồi ghi nhận xét."},
   {p:"giaoviec",sel:'@phead',t:"Việc được giao",d:"Học vụ hoặc tổ trưởng giao việc cho bạn ở đây: chuẩn bị đề, dự giờ, viết giáo án bổ sung.",hint:"Xong một ngày của giáo viên!"}]},
  /* V9.44 - BA BÀI CÒN THIẾU. Cấp "trải nghiệm" trước đây có 5 bài cho 5 chức danh, nhưng app
@@ -14753,10 +14761,10 @@ var TOURS={
     làm gì ở đây. Anh Luân: "Mỗi 1 chức danh đều có 1 hướng dẫn và trợ lý riêng phù hợp với họ."
     Bộ kiểm mới canh chuyện này: thêm nhóm vai mà quên bài hướng dẫn là ĐỎ. */
  tn_wow:{lv:"trainghiem",role:"Giáo viên WOW 1-1",t:"Một ngày của Giáo viên WOW",ic:"ti-star",d:"5 bước - chấm test, dạy kèm 1-1, ghi kết quả",steps:[
-  {p:"hoctap",ctx:function(){window.HTTAB="wow"},sel:'@phead',t:"Buổi WOW hôm nay của bạn",d:"Vào app là thấy ngay buổi kèm 1-1 hôm nay: em nào, yếu kỹ năng gì, lần trước kèm tới đâu. Buổi mới học viên đặt mà bạn chưa xác nhận thì hiện chip hổ phách.",hint:"Xem danh sách buổi WOW của bạn."},
+  {p:"hoctap",ctx:function(){window.HTTAB="wow"},sel:'@phead',t:"Buổi WOW hôm nay của bạn",d:"Vào app là thấy ngay buổi kèm 1-1 hôm nay: học viên nào, yếu kỹ năng gì, lần trước kèm tới đâu. Buổi mới học viên đặt mà bạn chưa xác nhận thì hiện chip hổ phách.",hint:"Xem danh sách buổi WOW của bạn."},
   {p:"tuyensinh",ctx:function(){window.TSTAB="test"},sel:'@phead',t:"Chấm test đầu vào",d:"Chấm bài test là việc của NV WOW chứ không phải giáo viên đứng lớp - bảng phân quyền CH3 của SOP ghi rõ. Nhập bốn kỹ năng, điểm tổng tự tính trung bình.",hint:"Mở một phiếu test chờ chấm."},
   {p:"tuyensinh",ctx:function(){window.TSTAB="test"},sel:'@tbar',t:"Viết academic_note",d:"Nhận xét học thuật là thứ nhân viên tư vấn dùng để tư vấn lộ trình. Chấm điểm mà không viết nhận xét thì người sau không biết nói gì với khách.",hint:"Nhìn chip Chờ chấm và Đã chấm."},
-  {p:"hoctap",ctx:function(){window.HTTAB="wow"},sel:'@txt:Chờ ghi nội dung',t:"Ghi nội dung và kết quả buổi kèm",d:"Dạy xong ghi ngay: kèm gì, em tiến bộ hay chưa. Chỉ số WOR (tỷ lệ buổi có tiến bộ) tính từ đúng ô này, và giáo viên chủ nhiệm đọc nó để biết đã kèm gì.",hint:"Bấm chip Chờ ghi nội dung."},
+  {p:"hoctap",ctx:function(){window.HTTAB="wow"},sel:'@txt:Chờ ghi nội dung',t:"Ghi nội dung và kết quả buổi kèm",d:"Dạy xong ghi ngay: kèm gì, học viên tiến bộ hay chưa. Chỉ số WOR (tỷ lệ buổi có tiến bộ) tính từ đúng ô này, và giáo viên chủ nhiệm đọc nó để biết đã kèm gì.",hint:"Bấm chip Chờ ghi nội dung."},
   {p:"hocvien",sel:'@tbar',t:"Học viên nào cần đặt buổi kèm",d:"Em nào yếu học thuật thì SOP bảo đặt buổi WOW kèm. Lọc nhanh Nguy cơ cho ra đúng nhóm đó, kèm số buổi vắng và số bài thiếu để biết nặng nhẹ.",hint:"Xong một ngày của giáo viên WOW!"}]},
  tn_marketing:{lv:"trainghiem",role:"Marketing",t:"Một ngày của Marketing",ic:"ti-speakerphone",d:"5 bước - nguồn lead, chất lượng lead, kho khách cũ",steps:[
   {p:"tuyensinh",ctx:function(){window.TSTAB="lead"},sel:'@phead',t:"Đêm qua lead về từ đâu",d:"Mỗi lead ghi rõ nguồn. Nguồn nào đang đổ về nhiều mà chất lượng kém thì phải biết trong ngày, không đợi cuối tháng mới cộng sổ.",hint:"Nhìn cột Nguồn trong danh sách lead."},
@@ -15800,7 +15808,7 @@ function congMonths(){
  return Object.keys(m).sort().reverse()}
 /* Chia theo ca: nói rõ giờ nào ăn đơn giá nào - kế toán đối chiếu được mà không phải mở bảng giá. */
 /* ===== MÀN CẤU HÌNH ĐƠN GIÁ GIỜ DẠY =================================================
-   Anh Luân: "em nên cho cấu hình để sau này bên nhân sự họ tự sửa". Nên màn này phải tự giải
+   Anh Luân: "học viên nên cho cấu hình để sau này bên nhân sự họ tự sửa". Nên màn này phải tự giải
    thích được, không cần ai hướng dẫn: một bảng mặc định 6 ô, và bảng riêng cho từng người -
    ô nào để trống thì tự động dùng mặc định, hiện luôn số mặc định mờ bên dưới. */
 function giaGioSave(sid,day,shift,el){rateSet(sid,day,shift,el.value);
@@ -15975,7 +15983,7 @@ function renderDuthu(){
     '<td><button class="btn primary sm" onclick="payForm(\''+esc(r.e.enrollment_id)+'\')"><i class="ti ti-cash"></i>Thu dứt</button> '+
     '<button class="btn sm" onclick="cancelEnroll(\''+esc(r.e.enrollment_id)+'\')"><i class="ti ti-file-x"></i>Hủy đơn</button></td></tr>'});
   h+='</tbody></table></div><div class="mut" style="font-size:11.5px;padding:11px 16px;line-height:1.7">'+
-   'Ba lối ra: <b>thu dứt</b> (em vẫn nợ thật, gọi đòi), <b>hủy đơn</b> (viết off, phần đã đóng xử theo chính sách hoàn tiền), '+
+   'Ba lối ra: <b>thu dứt</b> (học viên vẫn nợ thật, gọi đòi), <b>hủy đơn</b> (viết off, phần đã đóng xử theo chính sách hoàn tiền), '+
    'hoặc để nguyên nếu đang thương lượng - nhưng để nguyên thì tháng nào cũng phải trả lời câu này.</div></div>'})();
  /* CHI TIẾT TỪNG ĐỢT - ai, đợt mấy, hạn nào, bao nhiêu, bấm thẳng vào thu tiền */
  h+=pgBar("duthu",L.length);
@@ -16014,7 +16022,7 @@ function renderSothu(){var tab=window.STTAB||"da";
        cần làm gì tiếp theo... mà hộp đó có thể rep vanh vách chuẩn sop thì ngon quá em"* — hỏi
        VỀ MỘT CON NGƯỜI CỤ THỂ.
 
-   Anh Luân hỏi "cái đó khó đưa vào hệ thống ko em, hơi giống AI". Trả lời thẳng: **không cần AI,
+   Anh Luân hỏi "cái đó khó đưa vào hệ thống ko học viên, hơi giống AI". Trả lời thẳng: **không cần AI,
    và ở đây không-AI còn ĐÚNG HƠN AI.** Câu trả lời loại (2) không phải thứ cần bịa ra bằng văn
    phong - nó là thứ app ĐÃ BIẾT: `naFor()` cho ra đúng mã trigger SOP, `msgText()` cho ra đúng
    câu chữ CH4, `slaItems()` cho ra đúng hàng chờ kèm hạn, `stuRiskReasons()` cho ra đúng lý do
@@ -16129,12 +16137,12 @@ function qaKhoHeThong(){
  return K}
 /* Nghĩa MẶC ĐỊNH nằm trong mã; trung tâm sửa/thêm thì bản của họ đè lên (config.tudien). */
 var QATUDIENDEF=[
- ["WOW","buổi wow 1-1 kèm riêng","Buổi kèm RIÊNG 1 thầy - 1 trò, nằm trong gói học viên đã mua (mỗi gói có một số lượt gọi là quota). Dùng để chữa đúng kỹ năng em đang yếu, tách hẳn khỏi buổi học lớp. Đặt buổi thì trừ quota; hết quota phải được duyệt cấp thêm. Giáo viên WOW phải xác nhận lịch, bấm mốc giờ vào - ra, và ghi nội dung sau buổi.","Menu > C2 Đang học > Buổi WOW 1-1","go('wow')"],
+ ["WOW","buổi wow 1-1 kèm riêng","Buổi kèm RIÊNG 1 thầy - 1 trò, nằm trong gói học viên đã mua (mỗi gói có một số lượt gọi là quota). Dùng để chữa đúng kỹ năng học viên đang yếu, tách hẳn khỏi buổi học lớp. Đặt buổi thì trừ quota; hết quota phải được duyệt cấp thêm. Giáo viên WOW phải xác nhận lịch, bấm mốc giờ vào - ra, và ghi nội dung sau buổi.","Menu > C2 Đang học > Buổi WOW 1-1","go('wow')"],
  ["SOP","standard operating procedure quy trinh chuan","Bộ quy trình chuẩn của trung tâm: mỗi việc làm theo thứ tự nào, ai làm, trong bao lâu. App này là SOP chạy được - mọi cảnh báo và hạn giờ đều lấy từ đó.","Cài đặt > Ngưỡng & SLA (CH2)","window.SETTAB='ch2';go('settings')"],
  ["SLA","service level agreement han xu ly","Hạn thời gian cam kết cho một việc: gọi khách mới trong bao lâu, chấm bài trong bao lâu, xử khiếu nại trong bao lâu. Quá hạn là app tô đỏ và đẩy vào hàng chờ. Mọi mốc SLA sửa được ở Cài đặt.","Cài đặt > Ngưỡng & SLA (CH2)","window.SETTAB='ch2';go('settings')"],
  ["KPI","chi so do luong","Chỉ số đo kết quả vận hành (tỷ lệ chốt, tỷ lệ chấm bài đúng hạn, tỷ lệ tái đăng ký…). Mỗi chỉ số có một NGƯỠNG ĐẠT - app so số thực tế với ngưỡng để tô xanh hay đỏ.","Cài đặt > Ngưỡng KPI (CH6)","window.SETTAB='ch6';go('settings')"],
  ["lead","khach tiem nang","Khách mới hỏi thông tin, chưa đăng ký học. Vào hệ thống là bắt đầu đếm giờ phản hồi; chăm tới khi thành học viên hoặc đóng lại.","Menu > C1 Khách tiềm năng","goTS('lead')"],
- ["at_risk","hoc vien nguy co","Cờ đánh dấu học viên đang có nguy cơ bỏ học: vắng quá số buổi cho phép, hoặc thiếu quá nhiều bài tập. App tự bật cờ theo ngưỡng trong Cài đặt, và đẩy em đó vào hàng chờ chăm sóc.","Menu > C2 Đang học > Học viên (chip Nguy cơ)","goRisk()"],
+ ["at_risk","hoc vien nguy co","Cờ đánh dấu học viên đang có nguy cơ bỏ học: vắng quá số buổi cho phép, hoặc thiếu quá nhiều bài tập. App tự bật cờ theo ngưỡng trong Cài đặt, và đẩy học viên đó vào hàng chờ chăm sóc.","Menu > C2 Đang học > Học viên (chip Nguy cơ)","goRisk()"],
  ["onboarding","nhap hoc xep lop","Chặng từ lúc học viên đóng đủ tiền tới lúc thật sự ngồi trong lớp: xếp lớp, gửi thông tin lớp, học viên xác nhận, hoàn tất nhập học.","Menu > C2 Đang học > Xếp lớp & Onboarding","go('xeplop')"],
  ["quota","luot wow con lai","Số lượt buổi WOW 1-1 học viên còn được dùng. Bằng lượt của gói + lượt trung tâm cấp thêm + lượt mua thêm - lượt đã dùng.","Cài đặt > Ngưỡng & SLA (CH2)","cfGo('wowGrantMax_perTime')"],
  ["bảo lưu","tam dung khoa hoc","Học viên tạm dừng khóa, giữ quyền lợi để quay lại sau. Việc này phải có quản lý phê duyệt; app nhắc gọi mời quay lại trước khi hết hạn bảo lưu.","Menu > C3 Tạm dừng > Bảo lưu","go('baoluu')"],
@@ -16592,13 +16600,13 @@ var NHIP={
      return !rows("DL12").some(function(y){return y.session_id===x.session_id})}).length}],
   ["chieu","Ghi nhận xét buổi vừa dạy","Trong hạn thì viết còn nhớ; để hôm sau là viết cho có","buoihoc",
    function(){return rows("DL11").filter(function(x){return String(x.teacher_id||"")===(CURSTAFF||"")&&bhState(x).done&&!bhState(x).note}).length}],
-  ["chieu","Chấm bài học viên đã nộp","Bài nộp mà không chấm thì lần sau các em không nộp nữa","baitap",
+  ["chieu","Chấm bài học viên đã nộp","Bài nộp mà không chấm thì lần sau học viên không nộp nữa","baitap",
    function(){return rows("DL13").filter(function(x){return String(x.teacher_id||"")===(CURSTAFF||"")&&hwSubmitted(x)&&!hwGraded(x)}).length}]],
  /* V9.40 - NHỊP NGÀY CỦA GIÁO VIÊN WOW. Trước đây họ dùng chung nhịp với giáo viên đứng lớp,
     mà mọi dòng ở đó lọc DL11/DL13 theo teacher_id nên với họ dòng nào cũng bằng 0. Bốn dòng
     dưới đây lọc DL14 theo staff_id - đúng bảng họ thật sự làm việc. */
  wow:[
-  ["sang","Xem buổi WOW hôm nay","Buổi 1-1 mà không xem trước thì vào lớp mới biết em này yếu gì","hoctap",
+  ["sang","Xem buổi WOW hôm nay","Buổi 1-1 mà không xem trước thì vào lớp mới biết học viên này yếu gì","hoctap",
    function(){var t=new Date();return rows("DL14").filter(function(w){var d=pvnd(w.wow_session_date);
     return d&&sameDay(d,t)&&String(w.staff_id||"")===(CURSTAFF||"")&&!isc(w.wow_status,"cancelled")}).length}],
   ["sang","Xác nhận các buổi mới được đặt","Chưa xác nhận thì học viên không biết có buổi hay không","wow",
@@ -16606,7 +16614,7 @@ var NHIP={
   ["chieu","Ghi nội dung buổi vừa dạy","Không ghi thì giáo viên chủ nhiệm không biết đã kèm gì","wow",
    function(){return rows("DL14").filter(function(w){return String(w.staff_id||"")===(CURSTAFF||"")&&
     isc(w.wow_status,"completed")&&!String(w.wow_content_note||"").trim()}).length}],
-  ["chieu","Gọi lại học viên không đến buổi WOW","Buổi đã trừ quota mà em không đến - hỏi rồi xếp bù","wow",
+  ["chieu","Gọi lại học viên không đến buổi WOW","Buổi đã trừ quota mà học viên không đến - hỏi rồi xếp bù","wow",
    function(){return rows("DL14").filter(function(w){return String(w.staff_id||"")===(CURSTAFF||"")&&
     isc(w.wow_status,"no_show")&&!String(w.wow_no_show_reason||"").trim()}).length}]],
  ketoan:[
@@ -17626,7 +17634,7 @@ function gateEnterHV(sid){window.HVPHONE="";ssSet("ITTS_WHO_PH",null);ssSet("ITT
    đã khai trong hồ sơ; bản demo bấm thẳng cho nhanh nhưng vẫn đi qua đúng số đó, nên hồ sơ chưa
    khai số thì KHÔNG vào được - giống hệt ngoài đời. */
 function gateEnterPH(sid){var S=find("DL09","student_id",sid)||{};
- if(!ghSdt(S)){toast("Hồ sơ em này chưa khai số điện thoại người giám hộ - chưa mở cổng phụ huynh được.",4200);return}
+ if(!ghSdt(S)){toast("Hồ sơ học viên này chưa khai số điện thoại người giám hộ - chưa mở cổng phụ huynh được.",4200);return}
  window.HVPHONE=ghSdt(S);ssSet("ITTS_WHO_PH",ghSdt(S));ssSet("ITTS_WHO_HV",sid);bootHV(sid)}
 function gateSwitchHV(){ssSet("ITTS_WHO_HV",null);location.reload()}
 function hvRichTop(n){
@@ -17823,7 +17831,7 @@ function congDangO(){if(!window.HVPORTAL)return "nv";
 var CONGDS=[
  ["nv","Cổng nhân viên","ti-home","Việc hôm nay theo SOP, hồ sơ học viên, báo cáo KPI, cấu hình hệ thống."],
  ["hv","Cổng học viên","ti-school","Lịch học, bài tập, buổi WOW 1-1, học phí theo đợt, trao đổi với trung tâm."],
- ["ph","Cổng phụ huynh","ti-users","Theo dõi việc học của con - ẩn phần trao đổi riêng tư của các em."]];
+ ["ph","Cổng phụ huynh","ti-users","Theo dõi việc học của con - ẩn phần trao đổi riêng tư của học viên."]];
 function congHTML(){var cur=congDangO(),h="";
  h+='<div class="fhint" style="margin:0 0 12px">Ba cổng dùng chung một bộ dữ liệu demo - đổi qua lại bao nhiêu lần thì số liệu vẫn là một.</div>';
  CONGDS.forEach(function(c){var here=(c[0]===cur);

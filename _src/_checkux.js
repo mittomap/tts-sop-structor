@@ -886,6 +886,10 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
    /* V9.63 (anh Luan: *"chua ban duoc la chua ban duoc, em la app ma em gan cam than vao sao
       duoc"*): app noi SU THAT, khong binh luan, khong dua. "chua ban duoc dong nao" / "Nhe
       nhang!" la giong nguoi ke chuyen chu khong phai giong mot he thong van hanh. */
+   /* V9.63 (anh Luan: *"dung dung chu em, ma dung hoc vien"*): app khong goi hoc vien la "em" -
+      goi dung danh xung nghiep vu. Chu "em" trong NOI DUNG do chinh hoc vien viet thi khong tinh,
+      nen chi soi chu cua APP: nhan, cau nhac, loi giai thich. */
+
    /\u0111[o\u1ed3]ng n[a\u00e0]o/i, /Nh[e\u1eb9] nh[a\u00e0]ng!/i, /g[i\u00ec] c[a\u1ea3]!/i,
    /ngon l[a\u00e0]nh/i, /th[a\u1ea3]nh th[o\u01a1]i/i, /kh[o\u1ecf]e re/i, /s[a\u1ea1]ch bong/i];
  var bay=[];
@@ -907,6 +911,22 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
  window.SCOPEEFF=null;
  t("khong cau ghi chu noi bo nao lot ra man hinh"+(bay.length?" - CON: "+bay.slice(0,4).join(" | "):""), bay.length===0);
 })();
+ /* V9.63 (anh Luan: *"dung dung chu em, ma dung hoc vien"*) - canh o MA NGUON chu khong tren
+    man hinh: tren man hinh co ca chu do CHINH HOC VIEN viet (noi dung yeu cau ho gui len), bo
+    kiem khong tach duoc hai thu do. Trong ma nguon thi tach duoc: chuoi nao la chu cua app.
+    Tru 6 o goi y trong cong hoc vien - do la vi du ve loi CUA HOC VIEN, "em" o do la dung. */
+ (function(){
+  /* doc THANG gen_v5.py: _APP.js co ca DU LIEU demo nhung day (loi hoc vien tu viet, cam nhan
+     hoc vien...) - quet o do thi khong tach duoc chu cua APP voi chu cua NGUOI DUNG. */
+  var SRCV=require('fs').readFileSync('./gen_v5.py','utf8').replace(/\/\*[\s\S]*?\*\//g,"");
+  SRCV=SRCV.split("\n").filter(function(l){return l.trim().charAt(0)!=="#"}).join("\n");
+  var xau=[],re=/"([^"\\\n]{4,400})"/g,m;
+  while((m=re.exec(SRCV))){var ch=m[1];
+   if(/vd: em |vd: e/.test(ch))continue;   /* vi du ve LOI CUA HOC VIEN trong o nhap - "em" o day la dung */
+   if(/(^|[\s(])em([\s.,;:)]|$)/.test(ch))xau.push(ch.slice(0,70))}
+  t("app KHONG goi hoc vien la 'em' trong bat ky chuoi nao"+(xau.length?" - CON "+xau.length+": "+xau.slice(0,2).join(" | "):""), xau.length===0);
+ })();
+
 if(bad.length){console.log("CHECKUX DO ("+bad.length+"/"+(ok+bad.length)+"):");
  bad.forEach(function(b){console.log("  - "+b)});process.exit(1)}
 console.log("CHECKUX OK: "+ok+" tieu chi | "+FORM.length+" form ghi deu co loi giai thich, khong o ngay nao de trong");
