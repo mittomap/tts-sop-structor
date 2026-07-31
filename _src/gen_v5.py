@@ -2102,9 +2102,12 @@ var ROLESCOPE={
  giaovien:{match:/^teacher$/,land:"hoctap",ctx:{HTTAB:"today"},
   pages:["viec","banlam","hocvien","giangvien","banglop","hoctap","giaoan","duyet"],
   tabs:{duyet:["duyetgiao"]},blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:0,bell:["Giảng viên (ACA)","Học vụ","Giao việc"]},
+ /* V9.60: CH3 giao cho NV WOW việc CHẤM TEST ĐẦU VÀO, mà phạm vi trang lại không có màn test -
+    bài hướng dẫn của chính họ dẫn sang Tuyển sinh rồi bị chặn. Mở đúng một tab test, không mở
+    cả hub tuyển sinh. */
  wow:{match:/^wow/,land:"hoctap",ctx:{HTTAB:"wow"},
-  pages:["viec","banlam","hocvien","giangvien","hoctap","banglop","duyet"],
-  tabs:{duyet:["duyetgiao"]},blocks:["test_grading","wowq","risk"],mine:0,mineBtn:0,kpi:0,bell:["WOW","Giảng viên (ACA)","Giao việc"]},
+  pages:["viec","banlam","hocvien","giangvien","hoctap","banglop","tuyensinh","duyet"],
+  tabs:{duyet:["duyetgiao"],tuyensinh:["test"]},blocks:["test_grading","wowq","risk"],mine:0,mineBtn:0,kpi:0,bell:["WOW","Giảng viên (ACA)","Giao việc"]},
  /* V9.40 (anh Luân chốt 29/07): "Duyệt chiết khấu là trưởng phòng tư vấn, kế toán luôn chỉ xác
     nhận và làm theo thôi." Trước đây cấu hình quyền cho Kế toán duyệt, trong khi DỮ LIỆU ghi
     NV012 - Trưởng phòng Tư vấn - là người duyệt cả 8 lần. Cấu hình sai, dữ liệu đúng. */
@@ -2116,7 +2119,7 @@ var ROLESCOPE={
     Báo cáo với 36 con số doanh thu và công nợ toàn trung tâm - trong khi CH3 chỉ giao cho
     marketing hai việc: nhập lead mới và chăm lại khách cũ. `noTien` cắt mọi khối tiền. */
  marketing:{match:/^marketing/,land:"tuyensinh",ctx:{TSTAB:"lead"},
-  pages:["viec","banlam","tuyensinh","khac","hocvien","duyet"],
+  pages:["viec","banlam","tuyensinh","khac","hocvien","reup","duyet"],
   tabs:{khac:["magioithieu"],duyet:["banggiao","duyetgiao"]},
   blocks:["new","reup"],mine:0,mineBtn:0,kpi:0,noTien:1,bell:["Tuyển sinh","Giao việc"]},
  /* V9.60 - NHÂN SỰ (anh Luân chốt giữ bộ phận này). SOP không giao cho họ hành động nào với
@@ -3179,7 +3182,7 @@ function renderList(key,emb){
  var total=data.length, pages=Math.max(1,Math.ceil(total/psz)), pg=Math.min(PAGE[key]||0,pages-1);
  var view=data.slice(pg*psz, pg*psz+psz);
  var pf=(window.PREFILL&&window.PREFILL[key])||EDIT[key], ed=EDIT[key];
- var h=emb?'':('<div class="phead"><div><div class="t">'+esc(p.t)+'</div><div class="s">'+esc(cfg.sub||("Nguồn "+cfg.code))+' - '+all.length+' bản ghi</div></div>'+
+ var h=emb?'':('<div class="phead" data-tour="phead"><div><div class="t">'+esc(p.t)+'</div><div class="s">'+esc(cfg.sub||("Nguồn "+cfg.code))+' - '+all.length+' bản ghi</div></div>'+
  '<div class="sp">'+(cfg.ro?'':'<button class="btn primary" onclick="newForm(\''+key+'\')"><i class="ti ti-plus"></i>Thêm mới</button>')+'</div></div>');
  if(!cfg.ro)h+='<div class="panel'+(pf?'':' hidden')+'" id="formPanel"><div class="ph"><b>'+(ed?("Sửa "+esc(String(ed[cfg.cols[0][0]]))):"Thêm bản ghi mới")+'</b><div class="mini">'+(ed?'<button class="pill" onclick="cancelEdit(\''+key+'\')">Hủy sửa</button>':'')+'<button class="pill" onclick="toggleForm(\''+key+'\')">Đóng</button></div></div>'+formHTML(key)+'</div>';
  /* THANH CÔNG CỤ CHUẨN: [tìm] [chip lọc có số đếm] ...... [số dòng] [Xóa lọc] [Cột] */
@@ -3864,6 +3867,13 @@ function BANGVIEC(){
      ["ti-player-play",gvSo("doing"),"Đang làm","#B58A2B","đã nhận, chưa báo xong","go('giaoviec')"],
      ["ti-alert-triangle",gvSo("late"),"Quá hạn","#E24B4A","cần báo lại người giao","go('giaoviec')"],
      ["ti-check",gvSo("done"),"Chờ người giao xác nhận","#16A34A","đã báo xong","go('giaoviec')"]]},
+ /* Bộ phận Nhân sự: SOP không giao cho họ việc nào với học viên, nên bảng của họ nói về CON
+    NGƯỜI và về việc nội bộ - đúng phạm vi họ được xem. */
+ nhansu:{bc:"nhân sự",t:"Bảng Nhân sự",d:"Bốn con số đầu ca: hồ sơ nhân sự còn thiếu, buổi dạy thiếu mốc giờ, và việc nội bộ của bạn.",
+  o:[["ti-id-badge",rows("DL01").filter(function(x){return !String(x.branch||"").trim()||!String(x.role||"").trim()}).length,"Hồ sơ nhân sự còn thiếu","#B58A2B","thiếu chức danh hoặc cơ sở","go('nhansu')"],
+     ["ti-clock-exclamation",rows("DL11").filter(function(x){return isc(x.session_status,"completed")&&!(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())}).length,"Buổi thiếu mốc giờ vào/ra","#E24B4A","thiếu mốc là tính công sai","go('bangcong')"],
+     ["ti-inbox",gvSo("new"),"Việc mới chờ nhận","#3B82C4","bấm Nhận để bắt đầu","go('giaoviec')"],
+     ["ti-player-play",gvSo("doing"),"Đang làm","#0D9488","đã nhận, chưa báo xong","go('giaoviec')"]]},
  /* SOP chưa dựng bảng riêng cho Kế toán; bảng này dựng theo cùng khuôn bốn con số đầu ca. */
  ketoan:{bc:"tiền & học phí",t:"Bảng Kế toán",d:"Bốn con số đầu ca của kế toán: nợ phí, phiếu thu chờ đối soát, hoàn tiền và chiết khấu chờ duyệt.",
   o:[["ti-cash",E.filter(function(r){return num(r.remaining_amount)>0&&!isc(r.enrollment_status,"cancelled")}).length,"Đơn còn nợ phí","#B58A2B","nhắc trước hạn "+slaChip("installmentRemind_days",3,"ngày"),"goTS('thanhtoan')"],
@@ -3889,7 +3899,7 @@ function goRisk(){fset("hocvien","risk");go("hocvien")}
 /* Chức danh nào đáp vào trang nào thì bảng của họ hiện ở đó - khai MỘT chỗ, không chép vào 6 trang. */
 var BVLAND={tuvan:["banlam",null],marketing:["tuyensinh","lead"],hocvu:["xeplop",null],
  giaovien:["hoctap","today"],wow:["hoctap","wow"],ketoan:["tuyensinh","thanhtoan"],
- hotro:["banlam",null],dieuhanh:["baocao",null],quantri:["banlam",null]};
+ hotro:["giaoviec",null],nhansu:["nhansu",null],dieuhanh:["baocao",null],quantri:["banlam",null]};
 /* Nhóm vai -> bảng việc của chính nhóm đó. Marketing dùng chung bảng tuyển sinh (SOP không tách). */
 function bvKhoi(g){g=g||(SCOPE().group||"quantri");
  if(g==="marketing")g="tuvan";
@@ -5107,7 +5117,7 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
  if(!sessList.length){for(var k=1;k<=12;k++){var n=(k<10?"0"+k:k);sessList.push({id:cid+"-S"+n,label:"Buổi "+k,obj:null})}}
  var sess=window.DDSESS;if(!sessList.some(function(x){return x.id===sess})){sess=sessList[0].id;window.DDSESS=sess}
  var sel=null;sessList.forEach(function(x){if(x.id===sess)sel=x});var ses=sel&&sel.obj;
- var h=embed?'':'<div class="phead"><div><div class="t">Điểm danh & nhận xét buổi</div><div class="s">Dạy xong làm một chỗ: điểm danh + đánh giá từng em + nhận xét chung cả lớp (gộp từ trang Buổi học)</div></div></div>';
+ var h=embed?'':'<div class="phead" data-tour="phead"><div><div class="t">Điểm danh & nhận xét buổi</div><div class="s">Dạy xong làm một chỗ: điểm danh + đánh giá từng em + nhận xét chung cả lớp (gộp từ trang Buổi học)</div></div></div>';
  if(!embed)h+=classBar(cid);
  if(opt.noSessUI){/* trang Lớp học đã có dải thẻ buổi riêng - không lặp bộ chọn */}
  else if(opt.hideSess){                         /* bảng phía trên đã là bộ chọn buổi */
@@ -7241,7 +7251,7 @@ function renderHoso(){
  var pid=window.JPID||window.HOSO||(rows("DL09")[0]&&rows("DL09")[0].student_id)||(rows("DL02")[0]&&rows("DL02")[0].lead_id);
  if(!ix.lead[pid]&&!ix.stu[pid]){pid=(rows("DL02")[0]||{}).lead_id}
  var J=jInfo(pid,ix),C=J.C;
- var h='<div class="phead"><div><div class="t">'+esc(C.name)+' <span class="chip '+J.S.cls+'" style="margin-left:6px">'+esc(J.S.t)+'</span></div>'+
+ var h='<div class="phead" data-tour="phead"><div><div class="t">'+esc(C.name)+' <span class="chip '+J.S.cls+'" style="margin-left:6px">'+esc(J.S.t)+'</span></div>'+
   '<div class="s">'+esc(C.phone||"")+(C.sid?' · HV '+esc(C.sid):'')+(C.L?' · Lead '+esc(C.L.lead_id):'')+(J.owner?' · phụ trách: '+esc(J.owner):'')+'</div></div>'+
   '<div class="sp"><button class="btn primary" onclick="runStart(\''+esc(pid)+'\')"><i class="ti ti-player-play"></i>Chạy quy trình</button><button class="btn" onclick="go(\'hanhtrinh\')"><i class="ti ti-arrow-left"></i>Bảng hành trình</button></div></div>';
  /* V9.16: hồ sơ 360 có 2 tab - nội bộ + "Trang của học viên" (nhúng NGUYÊN renderTrangHV,
@@ -7684,7 +7694,7 @@ function renderBanglop(){
  var cls=rows("DL10"),cid=window.BLCLASS||(cls[0]&&cls[0].class_id),lop=find("DL10","class_id",cid)||{};
  window.BLCLASS=cid;
  var tab=window.BLTAB||"buoi";
- var h='<div class="phead"><div><div class="t">Vận hành lớp · '+esc(lop.class_name||cid)+'</div><div class="s">Buổi học · điểm danh · nhận xét · giao & chấm bài tập — tất cả cho lớp này ở một chỗ</div></div>'+
+ var h='<div class="phead" data-tour="phead"><div><div class="t">Vận hành lớp · '+esc(lop.class_name||cid)+'</div><div class="s">Buổi học · điểm danh · nhận xét · giao & chấm bài tập — tất cả cho lớp này ở một chỗ</div></div>'+
  '<div class="sp"><select class="sel" onchange="window.BLCLASS=this.value;window.DDSESS=null;window.BTSESS=null;reRender(CUR)">';
  cls.forEach(function(c){h+='<option value="'+c.class_id+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id)+' - '+esc(c.class_name)+'</option>'});
  h+='</select></div></div>';
@@ -8455,7 +8465,7 @@ function renderBaocao(){
  if(dsLevel("baocao")==="none")return dsDeny("Báo cáo & KPI");
  var L=rows("DL02"),S=rows("DL09"),E=rows("DL06");
  var risk=S.filter(function(r){return/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status))}).length;
- var h='<div class="phead"><div><div class="t">Tổng quan · Báo cáo & KPI</div><div class="s">Bức tranh điều hành + toàn bộ chỉ số KPI theo SOP. Số liệu tính thẳng từ dữ liệu vận hành; ngưỡng chỉnh ở Cài đặt (CH6).</div></div>'+
+ var h='<div class="phead" data-tour="phead"><div><div class="t">Tổng quan · Báo cáo & KPI</div><div class="s">Bức tranh điều hành + toàn bộ chỉ số KPI theo SOP. Số liệu tính thẳng từ dữ liệu vận hành; ngưỡng chỉnh ở Cài đặt (CH6).</div></div>'+
   '<div class="sp"><button class="btn" onclick="go(\'banlam\')"><i class="ti ti-checklist"></i>Trang bắt đầu</button><button class="btn" onclick="window.SETTAB=\'ch6\';go(\'settings\')"><i class="ti ti-adjustments"></i>Ngưỡng KPI</button></div></div>';
  h+=tbar('<span class="tblbl">Kỳ số liệu</span>'+segHTML(window.REPKY||"all",[["m0","Tháng này"],["30","30 ngày"],["90","90 ngày"],["all","Toàn kỳ"]],"window.REPKY='{k}';reRender(CUR)")+
   '<span class="mut" style="font-size:11px;margin-left:10px">Kỳ này áp cho TOÀN BỘ chỉ số bên dưới, không riêng bảng nguồn lead.</span>',"");
@@ -8502,7 +8512,7 @@ function renderBanggiao(embed){
  var staff=rows("DL01").filter(function(s){return /sales/.test(ecode(s.role))});
  var src=window.BGSRC||(staff[0]&&staff[0].staff_id)||"";
  var others=staff.filter(function(s){return s.staff_id!==src});
- var h=embed?'':'<div class="phead"><div><div class="t">Bàn giao lead</div><div class="s">Chuyển lead từ một NV sang NV khác (khi nghỉ / quá tải). NV nhận mới thấy lead, NV cũ không còn thấy.</div></div></div>';
+ var h=embed?'':'<div class="phead" data-tour="phead"><div><div class="t">Bàn giao lead</div><div class="s">Chuyển lead từ một NV sang NV khác (khi nghỉ / quá tải). NV nhận mới thấy lead, NV cũ không còn thấy.</div></div></div>';
  h+='<div class="fbar"><span class="lbl">Từ NV</span><select class="sel" onchange="window.BGSRC=this.value;reRender(CUR)">'+staff.map(function(s){return '<option value="'+esc(s.staff_id)+'"'+(s.staff_id===src?" selected":"")+'>'+esc(s.staff_id+" - "+s.full_name)+'</option>'}).join("")+'</select>';
  h+='<span class="lbl">Sang NV</span><select class="sel" id="bgDest">'+others.map(function(s){return '<option value="'+esc(s.staff_id)+'">'+esc(s.staff_id+" - "+s.full_name)+'</option>'}).join("")+'</select>';
  h+='<button class="btn primary" onclick="doHandover()"><i class="ti ti-arrows-exchange"></i>Bàn giao đã chọn</button>';
@@ -9204,7 +9214,7 @@ function renderSetQA(){
  h+='<div class="sp" style="margin-top:12px"><button class="btn" onclick="go(\'hoidap\')"><i class="ti ti-message-question"></i>Mở hộp Hỏi đáp để thử</button></div>';
  return h}
 function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)||{ch2:[],ch6:[]};
- var h='<div class="phead"><div><div class="t">Cài đặt hệ thống</div><div class="s">Nơi DUY NHẤT cấu hình cả app - đổi 1 giá trị là mọi nhắc việc, trạng thái và KPI phụ thuộc tự cập nhật theo, không cần build lại.</div></div></div>';
+ var h='<div class="phead" data-tour="phead"><div><div class="t">Cài đặt hệ thống</div><div class="s">Nơi DUY NHẤT cấu hình cả app - đổi 1 giá trị là mọi nhắc việc, trạng thái và KPI phụ thuộc tự cập nhật theo, không cần build lại.</div></div></div>';
  h+='<div class="settabs" data-tour="settabs">';
  var stabs=setTabs();
  var rsS=SCOPE();if(rsS.tabs&&rsS.tabs.settings)stabs=stabs.filter(function(t){return rsS.tabs.settings.indexOf(t[0])>=0});
@@ -9692,7 +9702,7 @@ function btHub(embed){
  var cid=window.BTCLASS||(cls[0]&&cls[0].class_id)||"";
  var lop=find("DL10","class_id",cid)||{};var mode=window.BTMODE||"giao";
  var enr=rows("DL08").filter(function(e){return e.class_id===cid});
- var h=embed?'':'<div class="phead"><div><div class="t">Bài tập</div><div class="s">Chọn lớp và buổi, rồi giao bài cho cả lớp hoặc chấm bài từng em - đúng cách giáo viên làm việc</div></div></div>';
+ var h=embed?'':'<div class="phead" data-tour="phead"><div><div class="t">Bài tập</div><div class="s">Chọn lớp và buổi, rồi giao bài cho cả lớp hoặc chấm bài từng em - đúng cách giáo viên làm việc</div></div></div>';
  h+='<div class="fbar">';
  if(!embed)h+='<span class="lbl">Lớp</span><select class="sel" onchange="window.BTCLASS=this.value;reRender(CUR)">'+(cls.length?cls.map(function(c){return '<option value="'+esc(c.class_id)+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id+" - "+c.class_name)+'</option>'}).join(""):'<option>(không có lớp)</option>')+'</select>';
  var sesL=ddSessions(cid);
@@ -10280,7 +10290,7 @@ function xlWaiting(){/* Đăng ký đã xác nhận (đã cọc/đóng) nhưng C
 function renderXeplop(){var fil=window.XLFILT||"all";var obs=rows("DL08");
  var wait=xlWaiting();
  var view=obs.filter(function(o){var s=obState(o);if(fil==="all")return true;if(fil==="sendinfo")return !s.sent;if(fil==="confirm")return s.sent&&!s.confirmed;if(fil==="finish")return !s.done;if(fil==="overdue")return s.infoOverdue||s.obOverdue;return true});
- var h='<div class="phead"><div><div class="t">Xếp lớp & Onboarding</div><div class="s">Từ lúc đóng đủ tiền → xếp lớp → gửi thông tin → HV xác nhận → hoàn tất. Mỗi bước có dấu hoàn thành để tắt cảnh báo</div></div><div class="sp"><button class="btn primary" onclick="openXepMoi()"><i class="ti ti-plus"></i>Xếp lớp học viên</button></div></div>';
+ var h='<div class="phead" data-tour="phead"><div><div class="t">Xếp lớp & Onboarding</div><div class="s">Từ lúc đóng đủ tiền → xếp lớp → gửi thông tin → HV xác nhận → hoàn tất. Mỗi bước có dấu hoàn thành để tắt cảnh báo</div></div><div class="sp"><button class="btn primary" onclick="openXepMoi()"><i class="ti ti-plus"></i>Xếp lớp học viên</button></div></div>';
  h+=bvSau();   /* V9.60: ba trang đáp này KHÔNG gọi pageHead nên bảng việc của Tư vấn, Học vụ và
                  Quản lý CHƯA TỪNG hiện ra - gắn tay tại đây, và bộ kiểm canh từ nay. */
  h+=statStrip([
@@ -10460,7 +10470,8 @@ function timHTML(pg){var q=pgqGet(pg);
 var DVI={chay:"hồ sơ",giaoan:"lớp",buoihoc:"buổi",diemdanh:"buổi",baitap:"bài",wow:"buổi WOW",khieunai:"khiếu nại",
  ghinhan:"phản hồi",review:"lớp",khaosat:"phiếu",banglop:"lớp",hocvien:"học viên",
  nhaplead:"khách",giaoviec:"việc",viec:"việc",baoluu:"học viên",ketthuc:"học viên",
- test:"lượt test",tuvan:"phiếu tư vấn",thanhtoan:"đăng ký",xeplop:"hồ sơ",magioithieu:"mã"};
+ test:"lượt test",tuvan:"phiếu tư vấn",thanhtoan:"đăng ký",xeplop:"hồ sơ",magioithieu:"mã",
+ bangcong:"giảng viên",nhansu:"người"};
 function dvi(p){return DVI[p]||"dòng"}
 function filterBar(p,cur,opts,cnt){
  /* V9.28: bộ lọc chuyên sâu gắn vào ĐÂY - một chỗ sửa, mọi trang tác vụ dùng filterBar đều có.
@@ -13062,7 +13073,9 @@ function statStrip(items,key,ids){
     '<div><div class="bsn">'+esc(String(t[1]))+'</div><div class="bsl">'+esc(t[2])+(t[4]?' · '+t[4]:'')+'</div></div></div>']});
   THEHTML[key]=parts;
   return '<div class="bstatsw" data-thekey="'+esc(key)+'">'+theBoxIn(key)+'</div>'}
- return '<div class="bstats" data-tour="bstats">'+items.map(function(t){
+ /* Dải hàng chờ việc KHÔNG mang neo `bstats` - neo của nó là tiêu đề `bangviec`. Trước bản này
+    cả hai dải cùng mang một neo nên bài hướng dẫn tô sáng nhầm dải. */
+ return '<div class="bstats">'+items.map(function(t){
  var act=t[5]||"";
  /* V9.54: ô thứ 7 = CÂU GIẢI THÍCH con số này ở đâu ra. Anh Luân: "mấy con số như kiểu 95% là
     tính như thế nào, e ghi chú cụ thể ở hover cho anh". Chú thích gắn lên CẢ Ô chứ không riêng
@@ -13111,7 +13124,7 @@ function renderHosoGV(){var id=window.GVID;var g=find("DL01","staff_id",id);
  var hwWait=hwSub.filter(function(x){return !hwGraded(x)});
  var stuIds={};rows("DL08").forEach(function(o){if(clsIds[o.class_id])stuIds[o.student_id]=1});var stu=rows("DL09").filter(function(s){return stuIds[s.student_id]});
  var risk=stu.filter(stuAca);
- var h='<div class="phead"><div><div class="t">'+esc(g.full_name)+' <span class="chip blue">Giảng viên</span></div>'+
+ var h='<div class="phead" data-tour="phead"><div><div class="t">'+esc(g.full_name)+' <span class="chip blue">Giảng viên</span></div>'+
   '<div class="s">'+esc(id)+(g.email?' · '+esc(g.email):'')+(g.phone?' · '+esc(g.phone):'')+' · '+esc(elabel(g.status)||g.status||"")+'</div></div>'+
   '<div class="sp">'+backBtn("giangvien","Danh sách giảng viên")+'</div></div>';
  var bioText=g.bio||g.teacher_bio||g.note||"";
@@ -13168,7 +13181,7 @@ function renderHosoNV(){var id=window.NVID;var s=find("DL01","staff_id",id);
   "openNV('{id}')","NVQ");
  var role=ecode(s.role)||String(s.role||"");
  var isSales=/sales|tu_van|tuvan|consult/i.test(role), isWow=/wow/i.test(role), isAca=/academic|hoc_vu|hocvu/i.test(role), isTeach=/teacher|giang/i.test(role);
- var h='<div class="phead"><div><div class="t">'+esc(s.full_name)+' <span class="chip blue">'+esc(elabel(s.role)||role)+'</span></div>'+
+ var h='<div class="phead" data-tour="phead"><div><div class="t">'+esc(s.full_name)+' <span class="chip blue">'+esc(elabel(s.role)||role)+'</span></div>'+
   '<div class="s">'+esc(id)+(s.email?' · '+esc(s.email):'')+(s.phone?' · '+esc(s.phone):'')+' · '+esc(elabel(s.status)||s.status||"")+'</div></div>'+
   '<div class="sp">'+(isTeach?'<button class="btn" onclick="openGV(\''+esc(id)+'\')"><i class="ti ti-chalkboard"></i>Xem bảng giảng viên</button>':'')+backBtn("settings","Cài đặt")+'</div></div>';
  if(isTeach&&!isSales&&!isWow&&!isAca){h+='<div class="notebar"><i class="ti ti-info-circle"></i>'+goiy("gy_nguoi_nay_la_giang_ade7",'Người này là giảng viên - bảng việc chi tiết nằm ở Hồ sơ giảng viên.')+'</div>';return h}
@@ -13245,7 +13258,7 @@ function renderHosoKhoa(){var id=window.KHID;var c=find("DL05","course_id",id);
  var ce=rows("DL18").filter(function(x){return clsIds[x.class_id]});
  var doneN=ce.filter(function(x){return isc(x.student_status,"completed")}).length;
  var achN=ce.filter(function(x){return isc(x.achievement_status,"achieved")}).length;
- var h='<div class="phead"><div><div class="t">'+esc(c.course_name)+' <span class="chip '+stCls(c.status)+'">'+esc(elabel(c.status)||c.status||"")+'</span></div>'+
+ var h='<div class="phead" data-tour="phead"><div><div class="t">'+esc(c.course_name)+' <span class="chip '+stCls(c.status)+'">'+esc(elabel(c.status)||c.status||"")+'</span></div>'+
   '<div class="s">'+esc(id)+' · '+esc(elabel(c.course_level)||c.course_level||"")+' · '+esc(c.duration_sessions||"?")+' buổi / '+esc(c.duration_months||"?")+' tháng · quota WOW '+esc(c.wow_quota_default||0)+' · '+esc(c.learning_mode_supported||"")+'</div></div>'+
   '<div class="sp">'+backBtn("khoahoc","Danh sách khóa học")+'</div></div>';
  if(c.description)h+='<div class="notebar"><i class="ti ti-info-circle"></i>'+esc(c.description)+'</div>';
@@ -14258,7 +14271,7 @@ var TOURS={
      CẢ APP chứ không về một ô nào - neo vào logo là sai hẳn. `mo:1` = bước mở đầu: không khoanh
      gì, màn tối đều, hộp ra giữa. Trỏ bừa vào một ô còn tệ hơn không trỏ. */
   {mo:1,sel:'',t:"Đây là bàn làm việc của trung tâm",d:"App gom mọi việc về một chỗ: khách quan tâm, học viên đang học, lớp, tiền và việc được giao. Menu bên trái xếp theo đúng hành trình của khách.",hint:"Bấm Tiếp theo để đi từng phần."},
-  {p:"banlam",sel:'@navlbl',t:"Menu theo 4 chặng vòng đời",d:"C1 Khách tiềm năng - C2 Đang học - C3 Tạm dừng - C4 Kết thúc & Học tiếp. Chấm màu là chặng, số đỏ là việc quá hạn.",hint:"Bấm một nhóm chặng để mở ra."},
+  {p:"banlam",sel:'@navarc',t:"Menu theo 4 chặng vòng đời",d:"C1 Khách tiềm năng - C2 Đang học - C3 Tạm dừng - C4 Kết thúc & Học tiếp. Chấm màu là chặng, số đỏ là việc quá hạn.",hint:"Bấm một nhóm chặng để mở ra."},
   {p:"banlam",sel:'@bstats',t:"Việc cần xử lý hôm nay",d:"Mỗi ô là một con số phải nhìn mỗi sáng. Ô chỉ để XEM, không bấm - rê chuột vào ô sẽ có câu chú thích nói con số đó đếm gì và muốn xem danh sách thì bấm chip nào ở dưới. Nút Thẻ ở góc phải cho bạn tắt bớt ô không cần.",hint:"Rê chuột vào ô Tới hẹn hôm nay để đọc chú thích."},
   {p:"banlam",sel:'#chaybody',t:"Danh sách người cần xử lý",d:"Mỗi dòng là một người kèm việc kế tiếp. Dải hạt màu cho biết họ đang ở chặng nào. Rê vào MỘT HẠT là biết chặng đó đã để lại gì trong hồ sơ; bấm vào hạt mở ngăn kéo riêng của chặng đó; bấm chữ C1/C2 đầu dải mở cả hành trình.",hint:"Rê vào một hạt rồi bấm thử - ngăn kéo kể đủ sản phẩm của chặng đó."},
   {p:"changA",sel:'@nrail',t:"Bản đồ một chặng",d:"Đường ray hiện số người ở từng ga và phần trăm chuyển đổi thật giữa các ga - nhìn là biết đang tắc ở đâu.",hint:"Bấm một ga để lọc người ở ga đó."},
@@ -14284,7 +14297,7 @@ var TOURS={
   {p:"baoluu",sel:'@phead',t:"Giữ chân học viên muốn nghỉ",d:"Học viên xin bảo lưu hoặc có ý bỏ học nằm ở đây - gọi giữ chân, hẹn ngày quay lại, hoặc chốt bảo lưu có hạn.",hint:"Xong một ngày của học vụ!"}]},
  tn_giaovien:{lv:"trainghiem",role:"Giáo viên",t:"Một ngày của Giáo viên",ic:"ti-chalkboard",d:"5 bước - dạy, điểm danh, chấm bài",steps:[
   {p:"hoctap",sel:'@phead',t:"Hôm nay bạn dạy gì",d:"Vào app là thấy ngay buổi dạy hôm nay, chủ đề buổi, bài tập sẽ giao và lời dặn từ giáo án khóa.",hint:"Xem thẻ buổi học của bạn."},
-  {p:"banglop",sel:'@txt:Buổi học',t:"Vào lớp và điểm danh",d:"Bấm Bắt đầu lớp để mở cổng điểm danh. Vắng có phép hay không phép đều ghi rõ, vắng phải ghi lý do.",hint:"Bấm tab 'Buổi học & điểm danh' của lớp, đánh dấu vài em rồi Lưu buổi học."},
+  {p:"banglop",sel:'@txt:Buổi học & điểm danh',t:"Vào lớp và điểm danh",d:"Bấm Bắt đầu lớp để mở cổng điểm danh. Vắng có phép hay không phép đều ghi rõ, vắng phải ghi lý do.",hint:"Bấm tab 'Buổi học & điểm danh' của lớp, đánh dấu vài em rồi Lưu buổi học."},
   {p:"banglop",sel:'@txt:Giao & chấm bài tập',t:"Giao bài tập",d:"Giao một bài chung cho cả lớp hoặc bài riêng cho từng em. Hạn nộp tự tính theo giáo án khóa, sửa được.",hint:"Bấm tab 'Giao & chấm bài tập' rồi giao một bài mới."},
   {p:"buoihoc",sel:'@txt:Chờ ghi nhận xét',t:"Ghi nhận xét buổi học",d:"Cuối buổi ghi nhận xét chung - học viên và phụ huynh đọc được trong cổng học viên. Quá hạn sẽ bị nhắc.",hint:"Bấm chip 'Chờ ghi nhận xét', mở buổi vừa dạy rồi ghi nhận xét."},
   {p:"giaoviec",sel:'@phead',t:"Việc được giao",d:"Học vụ hoặc tổ trưởng giao việc cho bạn ở đây: chuẩn bị đề, dự giờ, viết giáo án bổ sung.",hint:"Xong một ngày của giáo viên!"}]},
@@ -14297,18 +14310,25 @@ var TOURS={
   {p:"hoctap",ctx:function(){window.HTTAB="wow"},sel:'@phead',t:"Buổi WOW hôm nay của bạn",d:"Vào app là thấy ngay buổi kèm 1-1 hôm nay: em nào, yếu kỹ năng gì, lần trước kèm tới đâu. Buổi mới học viên đặt mà bạn chưa xác nhận thì hiện chip hổ phách.",hint:"Xem danh sách buổi WOW của bạn."},
   {p:"tuyensinh",ctx:function(){window.TSTAB="test"},sel:'@phead',t:"Chấm test đầu vào",d:"Chấm bài test là việc của NV WOW chứ không phải giáo viên đứng lớp - bảng phân quyền CH3 của SOP ghi rõ. Nhập bốn kỹ năng, điểm tổng tự tính trung bình.",hint:"Mở một phiếu test chờ chấm."},
   {p:"tuyensinh",ctx:function(){window.TSTAB="test"},sel:'@tbar',t:"Viết academic_note",d:"Nhận xét học thuật là thứ nhân viên tư vấn dùng để tư vấn lộ trình. Chấm điểm mà không viết nhận xét thì người sau không biết nói gì với khách.",hint:"Nhìn chip Chờ chấm và Đã chấm."},
-  {p:"hoctap",ctx:function(){window.HTTAB="wow"},sel:'@tbar',t:"Ghi nội dung và kết quả buổi kèm",d:"Dạy xong ghi ngay: kèm gì, em tiến bộ hay chưa. Chỉ số WOR (tỷ lệ buổi có tiến bộ) tính từ đúng ô này, và giáo viên chủ nhiệm đọc nó để biết đã kèm gì.",hint:"Bấm chip Chờ ghi nội dung."},
+  {p:"hoctap",ctx:function(){window.HTTAB="wow"},sel:'@txt:Chờ ghi nội dung',t:"Ghi nội dung và kết quả buổi kèm",d:"Dạy xong ghi ngay: kèm gì, em tiến bộ hay chưa. Chỉ số WOR (tỷ lệ buổi có tiến bộ) tính từ đúng ô này, và giáo viên chủ nhiệm đọc nó để biết đã kèm gì.",hint:"Bấm chip Chờ ghi nội dung."},
   {p:"hocvien",sel:'@tbar',t:"Học viên nào cần đặt buổi kèm",d:"Em nào yếu học thuật thì SOP bảo đặt buổi WOW kèm. Lọc nhanh Nguy cơ cho ra đúng nhóm đó, kèm số buổi vắng và số bài thiếu để biết nặng nhẹ.",hint:"Xong một ngày của giáo viên WOW!"}]},
  tn_marketing:{lv:"trainghiem",role:"Marketing",t:"Một ngày của Marketing",ic:"ti-speakerphone",d:"5 bước - nguồn lead, chất lượng lead, kho khách cũ",steps:[
   {p:"tuyensinh",ctx:function(){window.TSTAB="lead"},sel:'@phead',t:"Đêm qua lead về từ đâu",d:"Mỗi lead ghi rõ nguồn. Nguồn nào đang đổ về nhiều mà chất lượng kém thì phải biết trong ngày, không đợi cuối tháng mới cộng sổ.",hint:"Nhìn cột Nguồn trong danh sách lead."},
   {p:"tuyensinh",ctx:function(){window.TSTAB="lead"},sel:'@tbar',t:"Lead chưa ai nhận",d:"Lead không có người phụ trách là lead sẽ nguội. Lọc ra rồi đẩy về đội tư vấn - tiền quảng cáo đã tiêu rồi, đừng để mất ở khâu này.",hint:"Lọc theo trạng thái Mới."},
   {p:"reup",sel:'@phead',t:"Kho khách cũ để chăm lại",d:"Khách đã mất, không phản hồi, không liên lạc được - vẫn rẻ hơn khách mới rất nhiều. Mỗi ngày chạm lại một ít thay vì để nằm im.",hint:"Xem danh sách khách cần chăm lại."},
   {p:"magioithieu",sel:'@phead',t:"Mã giới thiệu và thưởng",d:"Khách cũ giới thiệu là nguồn rẻ nhất. Ai đang giới thiệu được nhiều, thưởng nào còn treo chưa trả - trả chậm là lần sau không ai giới thiệu nữa.",hint:"Xem thưởng đang chờ."},
-  {p:"baocao",sel:'@phead',t:"Phễu và tỷ lệ chuyển đổi",d:"Phễu cho biết mất khách ở bước nào. Marketing đổ nhiều lead mà tắc ở khâu gọi thì vấn đề không nằm ở quảng cáo.",hint:"Xong một ngày của marketing!"}]},
+  /* V9.60: bước này từng dẫn sang trang Báo cáo - nay Marketing không xem tiền nên không có
+     trang đó nữa. Phễu chuyển đổi xem ngay trên trang Tuyển sinh, đúng chỗ họ làm việc. */
+  {p:"tuyensinh",ctx:function(){window.TSTAB="lead"},sel:'@phead',t:"Phễu và tỷ lệ chuyển đổi",d:"Phễu trên đầu trang cho biết mất khách ở bước nào. Marketing đổ nhiều lead mà tắc ở khâu gọi thì vấn đề không nằm ở quảng cáo.",hint:"Xong một ngày của marketing!"}]},
  tn_hotro:{lv:"trainghiem",role:"Nhóm hỗ trợ (HR, IT...)",t:"Một ngày của nhóm hỗ trợ",ic:"ti-tool",d:"3 bước - nhận việc, làm, báo xong",steps:[
   {p:"banlam",sel:'@phead',t:"Bảng việc của bạn",d:"Nhóm hỗ trợ không đụng vào phễu hay lớp học - bạn làm việc qua module Giao việc. Bốn con số đầu trang cho biết việc mới, đang làm, quá hạn và việc chờ người giao xác nhận.",hint:"Nhìn bốn ô đầu trang."},
   {p:"giaoviec",sel:'@txt:Nhận việc',t:"Nhận việc được giao",d:"Bấm Nhận là người giao biết việc đã tới tay bạn. Việc bắt buộc thì không từ chối được; việc thường thì từ chối phải ghi lý do.",hint:"Bấm 'Nhận việc' trên một việc mới được giao."},
   {p:"giaoviec",sel:'@tbar',t:"Báo xong ngay lúc làm xong",d:"Báo xong kèm ghi chú, người giao xác nhận là việc đóng. Không làm kịp thì báo lại sớm - im lặng mới là vấn đề.",hint:"Xong một ngày của nhóm hỗ trợ!"}]},
+ tn_nhansu:{lv:"trainghiem",role:"Nhân sự",t:"Một ngày của Nhân sự",ic:"ti-id-badge",d:"4 bước - hồ sơ người, bảng công, việc nội bộ",steps:[
+  {p:"nhansu",sel:'@phead',t:"Danh sách người của trung tâm",d:"Toàn bộ nhân sự đang làm việc: chức danh, cơ sở, email đăng nhập và tình trạng. Đây là màn chính của bạn - Nhân sự không đụng vào hồ sơ học viên hay doanh thu.",hint:"Nhìn qua danh sách, để ý ai chưa có cơ sở."},
+  {p:"nhansu",sel:'@tbar',t:"Lọc theo chức danh và cơ sở",d:"Cần soát riêng một bộ phận hay một chi nhánh thì lọc ở thanh này. Bấm tên một người để mở hồ sơ đầy đủ.",hint:"Chọn một chức danh ở bộ lọc."},
+  {p:"bangcong",sel:'@phead',t:"Bảng công giảng dạy",d:"Giờ đứng lớp, ca WOW 1-1 và ca test đầu vào của từng giảng viên trong tháng. Buổi nào thiếu mốc giờ vào - giờ ra thì tính công sai, phải soát trước khi chốt lương.",hint:"Xem cột giờ dạy và cột buổi thiếu mốc giờ."},
+  {p:"giaoviec",sel:'@txt:Nhận việc',t:"Việc nội bộ",d:"Việc người khác giao cho bạn nằm ở đây. Bấm Nhận là người giao biết việc đã tới tay; báo xong ngay lúc làm xong.",hint:"Xong một ngày của Nhân sự!"}]},
  tn_ketoan:{lv:"trainghiem",role:"Kế toán",t:"Một ngày của Kế toán",ic:"ti-cash",d:"5 bước - thu, đối soát, công nợ, hoàn tiền",steps:[
   {p:"thanhtoan",sel:'@txt:Ghi nhận khoản thu',t:"Thu học phí",d:"Thu tiền mặt hay chuyển khoản đều ghi ở đây, in phiếu thu ngay. Đóng theo đợt thì ghi hẹn thu đợt sau.",hint:"Bấm 'Ghi nhận khoản thu' ở đầu trang, chọn đăng ký còn nợ, nhập số tiền rồi Lưu.",chk:function(){return tourMore("thu")}},
   {p:"thanhtoan",sel:'@obcards',t:"Đối soát khoản thu",d:"Tư vấn viên thu hộ thì kế toán phải xác nhận lại. Khoản chưa xác nhận hiện chip hổ phách.",hint:"Bấm chip Chờ xác nhận, mở một khoản và bấm Xác nhận đã nhận.",chk:function(){return (window.TOURB&&rows("DL07").filter(function(x){return String(x.verified_by||"").trim()}).length>(window.TOURB.xacnhan||0))}},
@@ -15406,9 +15426,9 @@ function renderCong(){
  var totT=L.reduce(function(a,x){return a+x.test},0);
  var totWG=L.reduce(function(a,x){return a+x.gioWow},0),totWThieu=L.reduce(function(a,x){return a+x.thieuWow},0);
  var noNote=L.reduce(function(a,x){return a+x.noNote},0);
- var h='<div class="notebar"><i class="ti ti-info-circle"></i><b>Bản demo chưa nối bảng lương</b> - màn này TÍNH và ĐỐI CHIẾU công, không ghi vào đâu cả. Tính theo <b>giờ dạy thật</b> (giờ vào lớp tới giờ kết thúc), đơn giá tra theo <b>giảng viên x loại ngày x ca</b> - sửa ở <a class="lnk" onclick="window.SETTAB=\'giagio\';go(\'settings\')">Cài đặt &gt; Đơn giá giờ dạy</a>. Buổi WOW 1-1 tính theo BUỔI ('+slaChip("wowPayPerSession",250000,"đ/buổi")+') và ca test đầu vào tính theo LẦN ('+slaChip("testPayPerCase",120000,"đ/lần")+') - anh Luân chốt 29/07. Giờ vào - ra của hai loại này VẪN ghi nhận, nhưng để quản lý ca chứ không nhân vào tiền. Căn cứ tính: buổi <b>đã dạy xong</b> - đúng một định nghĩa với KPI và hồ sơ giáo viên.</div>';
+ var h='<div class="notebar"><i class="ti ti-info-circle"></i><b>Bản demo chưa nối bảng lương</b> - màn này TÍNH và ĐỐI CHIẾU công, không ghi vào đâu cả. Tính theo <b>giờ dạy thật</b> (giờ vào lớp tới giờ kết thúc), đơn giá tra theo <b>giảng viên x loại ngày x ca</b> - sửa ở <a class="lnk" onclick="window.SETTAB=\'giagio\';go(\'settings\')">Cài đặt &gt; Đơn giá giờ dạy</a>. Buổi WOW 1-1 tính theo BUỔI ('+slaChip("wowPayPerSession",250000,"đ/buổi")+') và ca test đầu vào tính theo LẦN ('+slaChip("testPayPerCase",120000,"đ/lần")+'). Giờ vào - ra của hai loại này VẪN ghi nhận, nhưng để quản lý ca chứ không nhân vào tiền. Căn cứ tính: buổi <b>đã dạy xong</b> - đúng một định nghĩa với KPI và hồ sơ giáo viên.</div>';
  h+=statStrip([
-  ["ti-school",tot,"Buổi lớp đã dạy trong tháng","#3B82C4",L.length+" người có công"],
+  ["ti-school",tot,"Buổi lớp đã dạy trong tháng","#3B82C4",L.length+" giảng viên"],
   ["ti-clock-hour-4",(Math.round(totG*10)/10)+"h","Tổng giờ dạy","#2E5A88",totThieu?(totThieu+" buổi thiếu giờ vào/ra"):"đủ giờ vào - giờ ra"],
   ["ti-star",totW,"Buổi WOW 1-1 đã dạy","#DB2777",vnd(wowRate())+"/buổi · "+(Math.round(totWG*10)/10)+"h kèm"+(totWThieu?(" · "+totWThieu+" buổi thiếu mốc"):"")],
   ["ti-file-text",totT,"Ca test đầu vào","#7C3AED",vnd(testRate())+"/lần"],
@@ -15417,7 +15437,7 @@ function renderCong(){
   ["ti-clock",L.reduce(function(a,x){return a+x.late},0),"Buổi vào trễ giờ","#E24B4A","ảnh hưởng KPI ADC"]],"cong");
  h+=tbar('<span class="tblbl">Tháng</span><select class="sel" onchange="congSet(this.value)">'+
   mo.map(function(k){return '<option value="'+esc(k)+'"'+(k===ym?" selected":"")+'>'+esc(k.split("-")[1]+"/"+k.split("-")[0])+'</option>'}).join("")+'</select>',
-  '<span class="tbcnt">'+L.filter(function(x){return x.n||x.wow||x.test}).length+' người có công</span>');
+  '<span class="tbcnt">'+L.filter(function(x){return x.n||x.wow||x.test}).length+' giảng viên</span>');
  h+=pgBar("cong",L.filter(function(x){return x.n||x.wow||x.test}).length);
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Người dạy</th><th>Cơ sở</th><th>Buổi lớp</th><th>Giờ dạy</th><th>Chia theo ca</th><th>Trong đó online</th><th>Buổi WOW (giờ kèm)</th><th>Ca test</th><th>Vào trễ</th><th>Chưa ghi nội dung</th><th>Tiền công tạm tính</th></tr></thead><tbody>';
  if(!L.filter(function(x){return x.n||x.wow||x.test}).length)h+='<tr><td class="empty" colspan="11">Tháng này chưa có buổi dạy nào hoàn thành.</td></tr>';
@@ -16168,6 +16188,15 @@ var NHIP={
    function(){return gvSo("doing")}],
   ["chieu","Việc quá hạn phải báo lại","Không làm kịp thì nói sớm - im lặng mới là vấn đề","giaoviec",
    function(){return gvSo("late")}]],
+ nhansu:[
+  ["sang","Nhận việc mới được giao","Người giao đang đợi bạn bấm Nhận để biết việc đã tới tay","giaoviec",
+   function(){return gvSo("new")}],
+  ["sang","Soát danh sách nhân sự","Ai mới vào, ai đã nghỉ, ai chưa có chức danh hoặc chưa gắn cơ sở","nhansu",
+   function(){return rows("DL01").filter(function(x){return !String(x.branch||"").trim()||!String(x.role||"").trim()}).length}],
+  ["ngay","Đối chiếu bảng công giảng viên","Buổi thiếu mốc giờ vào/ra thì tính công sai - soát trước khi chốt","bangcong",
+   function(){try{return rows("DL11").filter(function(x){return isc(x.session_status,"completed")&&!(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())}).length}catch(e){return 0}}],
+  ["chieu","Làm và báo xong việc đang giữ","Báo xong ngay lúc làm xong, đừng để dồn cuối tuần","giaoviec",
+   function(){return gvSo("doing")}]],
  quanly:[
   ["sang","Xem việc quá hạn toàn trung tâm","Số đỏ hôm nay là vấn đề tuần sau","viec",
    function(){return slaItems().filter(function(x){return x.sev==="red"}).length}],
@@ -16828,6 +16857,7 @@ function navGroupOf(k){for(var i=0;i<NAVTREE.length;i++){var G=NAVTREE[i];
   for(var j=0;j<G.items.length;j++)if(navOwner(G.items[j])===k)return G.g}
  return null}
 function buildNav(){
+ window.__navarc1=0;   /* neo @navarc chi gan cho nhom chặng ĐẦU TIÊN - neo trùng là tô sáng nhầm chỗ */
  window.__NAVJ=null;try{window.__NAVJ=jAll()}catch(e){}   /* tính 1 lần cho mọi badge */
  var h="";
  var ORPHAN=!navAnyCur();   /* trang hiện tại không có mục riêng trên menu */
@@ -16838,7 +16868,13 @@ function buildNav(){
   var open=navIsOpen(G.g),gb=0;
   items.forEach(function(k){gb+=navBadge(k)});
   var A=G.arc?ARCBK[G.arc]:null;
-  h+='<div class="navlbl'+(open?" open":"")+(A?" isarc":"")+'" data-tour="navlbl"'+(A?' style="--acol:'+A.col+'"':'')+' onclick="navToggle(\''+esc(G.g).split("'").join("")+'\')">'+
+  /* V9.60 (anh Luân chụp màn: bước "Menu theo 4 chặng vòng đời" tô sáng nhóm LÀM VIỆC): MỌI
+     nhãn nhóm đều mang cùng một neo `navlbl`, mà `querySelector` lấy CÁI ĐẦU TIÊN - nên bài
+     hướng dẫn nói về C1-C4 lại khoanh vào nhóm đầu bảng. Nhóm theo CHẶNG có neo riêng. */
+  /* Viết THẲNG chuỗi `data-tour="..."` chứ không ghép biến: bộ kiểm quét mã nguồn tìm literal
+     đó để biết neo nào có thật - ghép biến là neo "tàng hình" với bộ kiểm. */
+  var _neo=A?(window.__navarc1?' data-tour="navarcx"':(window.__navarc1=1,' data-tour="navarc"')):' data-tour="navlbl"';
+  h+='<div class="navlbl'+(open?" open":"")+(A?" isarc":"")+'"'+_neo+' '+(A?' style="--acol:'+A.col+'"':'')+' onclick="navToggle(\''+esc(G.g).split("'").join("")+'\')">'+
    '<i class="ti ti-chevron-right navchev"></i>'+(A?'<span class="navarc" style="background:'+A.col+'"></span>':'')+'<span>'+esc(uiGroupLabel(G.g))+'</span>'+
    (!open&&gb?'<span class="dot">'+(gb>99?"99+":gb)+'</span>':'')+'</div>';
   if(!open)return;

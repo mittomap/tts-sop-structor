@@ -1067,16 +1067,23 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("moi num van tro toi mot tham so CO THAT"+(tatSai.length?": "+tatSai.join(" | "):""), tatSai.length===0);
  var ldSai=SETLANDAU.filter(function(x){return tabs.indexOf(x[3])<0}).map(function(x){return x[0]});
  t("moi viec cai lan dau tro toi mot tab CO THAT"+(ldSai.length?": "+ldSai.join(" | "):""), ldSai.length===0);
- /* HR bi bo hep tab van phai co ban do - dung de ho roi vao mot bang khong loi gioi thieu */
+ /* V9.60 (anh Luan gom cong nhan vien): HR truoc day duoc DAY THEM trang Cai dat roi bop tab -
+    tuc la van dua ho vao cho sua LUAT cua ca trung tam, chi la sua duoc it hon. Nay ho co nhom
+    rieng `nhansu` voi man cua chinh ho, va KHONG con cua nao vao Cai dat. Hop dong doi theo:
+    khong con canh "bop tab cho khon" ma canh "khong duoc vao". */
  (function(){
   var hr=(DATA.dl.DL01||[]).filter(function(x){return /^hr_/.test(String(ecode(x.role)||""))})[0];
   if(!hr){t("co nhan vien HR de thu (bo qua neu khong co)", true);return}
   applyScope(hr.staff_id);
-  var st=SCOPE().tabs&&SCOPE().tabs.settings;
-  t("HR bi bo hep tab nhung van co tab ban do", !!st&&st.indexOf("tongquan")>=0);
-  window.SETTAB="tongquan";
-  var pg=RENDER["settings"]();
-  t("ban do cua HR chi ke tab HR duoc vao", pg.indexOf("window.SETTAB='staff'")>=0&&pg.indexOf("window.SETTAB='ch2'")<0);
+  var rs=SCOPE();
+  t("Nhan su dung nhom rieng, khong con roi vao nhom du phong", rs.group==="nhansu");
+  t("Nhan su KHONG co cua nao vao Cai dat", rs.pages!=="*"&&rs.pages.indexOf("settings")<0);
+  t("Nhan su co man cua chinh ho (nhan su + bang cong)",
+    rs.pages.indexOf("nhansu")>=0&&rs.pages.indexOf("bangcong")>=0);
+  t("Nhan su khong cham vao hoc vien / tien",
+    rs.pages.indexOf("hocvien")<0&&rs.pages.indexOf("thanhtoan")<0&&rs.pages.indexOf("baocao")<0);
+  CUR="nhansu";var pg="";try{pg=RENDER["nhansu"]()}catch(e){}
+  t("man Nhan su ve duoc va co danh sach nguoi", pg.length>500&&/Danh s|nhân sự|Chức danh/i.test(pg));
   applyScope("");setRole("all")})();
  window.SETTAB="ch2";
 })();

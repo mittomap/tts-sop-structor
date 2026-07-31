@@ -473,7 +473,10 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
    if(/ngoài phạm vi/.test(h))moiDuoi.push(ma+":"+k);
    if(h.replace(/<[^>]*>/g,"").trim().length<80)trong.push(ma+":"+k)})})});
  window.GATE_SID="";applyScope("");setRole("all");
- t("da dong vai >=20 ma chuc danh", soVai>=20);
+ /* V9.60: cổng nhân viên gom về đúng bộ phận của SOP nên số mã chức danh còn 18 (bỏ IT x2,
+    bảo vệ, tạp vụ). Ngưỡng hạ theo, nhưng vẫn phải đủ lớn để chắc là đã đóng vai KHẮP các
+    bộ phận chứ không phải chạy vài vai cho có. */
+ t("da dong vai >=16 ma chuc danh ("+soVai+")", soVai>=16);
  t("menu khong moi vao trang tu choi 'ngoai pham vi'"+(moiDuoi.length?" - MOI DUOI: "+moiDuoi.slice(0,6).join(", "):""), moiDuoi.length===0);
  t("khong muc menu nao mo ra trang trong tron"+(trong.length?" - TRONG: "+trong.slice(0,6).join(", "):""), trong.length===0);
 })();
@@ -822,6 +825,38 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
    typeof roomStatus==="undefined"&&typeof roomBtnHTML==="undefined");
  t("co che dong bo nhieu may VAN CON va van tu bat",
    typeof roomAuto==="function"&&typeof roomCast==="function"&&typeof roomCastState==="function"&&roomOffFlag()===false);
+})();
+/* ═══ V9.60 - GIỌNG GHI CHÚ NỘI BỘ KHÔNG ĐƯỢC LỌT RA MÀN HÌNH ═════════════════════════════
+   Anh Luân 31/07: *"e đừng có viết ghi chú riêng của em vào thẳng app: 'SOP chưa có bảng cho kế
+   toán - đây là phần em bổ sung, giữ đúng tinh thần bốn con số đầu ca.' viết thế này lúc demo
+   nó kỳ lắm."*
+   Đúng. Chữ trên màn là để NGƯỜI DÙNG làm việc, không phải chỗ ghi lại người viết đã nghĩ gì.
+   Bản khai vì sao làm thế thì để ở chú thích mã nguồn và ở nhật ký - hai chỗ đó không ai demo.
+   Danh sách dưới đây bắt ĐÚNG giọng đó, không bắt từ đơn lẻ: "em" nằm trong "Xem", "bổ sung"
+   nằm trong một câu hướng dẫn bình thường - bắt rộng quá thì bộ kiểm thành phiền nhiễu rồi bị
+   tắt, mà một bộ kiểm bị tắt thì bằng không có. */
+(function(){
+ var GIONG=[/\bem\s+(?:bổ sung|thêm|làm|viết|để|dựng)/i, /phần em\b/i, /của em\b/i,
+   /anh Lu[\u00e2a]n/i, /SOP ch[u\u01b0]a c[o\u00f3] b[a\u1ea3]ng/i, /SOP kh[o\u00f4]ng c[o\u00f3] b[a\u1ea3]ng/i,
+   /b[o\u1ed9] ki[e\u1ec3]m/i, /\bV9\.\d/, /gen_v5/i, /_check\d/i, /demo_data_big/i];
+ var bay=[];
+ function soi(nhan,h){
+  if(!h)return;
+  var txt=String(h).replace(/<script[\s\S]*?<\/script>/g,"").replace(/<[^>]*>/g," ");
+  var tip=(String(h).match(/data-tip="([^"]*)"/g)||[]).join(" ");
+  [txt,tip].forEach(function(t){t.replace(/\s+/g," ").split(/(?<=[.!?])\s+/).forEach(function(c){
+   c=c.trim(); if(c.length<10)return;
+   GIONG.forEach(function(r){if(r.test(c)){var k=c.slice(0,90);if(bay.indexOf(nhan+": "+k)<0)bay.push(nhan+": "+k)}})})});
+ }
+ var xong={};
+ rows("DL01").forEach(function(st){var eff;try{eff=buildScope(ecode(st.role))}catch(e){return}
+  if(!eff||xong[eff.group])return;xong[eff.group]=1;
+  window.SCOPEEFF=eff;CURSTAFF=st.staff_id;
+  var vis=PAGES.filter(function(p){return !p.hide&&(eff.pages==="*"||eff.pages.indexOf(p.k)>=0)});
+  vis.forEach(function(p){CUR=p.k;
+   try{soi(eff.group+"/"+p.k,(PBK[p.k]&&PBK[p.k].ty==="list")?renderList(p.k):(RENDER[p.k]?RENDER[p.k]():""))}catch(e){}})});
+ window.SCOPEEFF=null;
+ t("khong cau ghi chu noi bo nao lot ra man hinh"+(bay.length?" - CON: "+bay.slice(0,4).join(" | "):""), bay.length===0);
 })();
 if(bad.length){console.log("CHECKUX DO ("+bad.length+"/"+(ok+bad.length)+"):");
  bad.forEach(function(b){console.log("  - "+b)});process.exit(1)}

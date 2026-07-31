@@ -200,4 +200,90 @@ var KHUNG=[".pbody",".jgrid",".dt",".notebar","#chaybody"];
  t2("moi nhip ngay deu sua duoc trong Cai dat"+(mocoi.length?(" - mo coi: "+mocoi.join(",")):""), mocoi.length===0);
 })();
 
+/* ═══ V9.60 - NEO CUA TOUR PHAI TRO DUNG MOT CHO ══════════════════════════════════════════
+   Anh Luan 31/07 (kem anh chup): buoc "Menu theo 4 chang vong doi" NOI ve C1-C4 nhung VONG SANG
+   lai nam o nhom "LAM VIEC". Goc: moi nhan nhom tren sidebar deu mang cung mot neo `navlbl`, ma
+   `querySelector` lay CAI DAU TIEN - neo khong duy nhat thi no im lang tro nham, khong bao loi.
+   Luat tu day: mot neo `@x` phai chi ra DUNG MOT phan tu tren man co buoc do. Neo trung nhau la
+   DO - khong doi den luc co nguoi nhin thay moi biet. */
+(function(){
+ var trung=[],thieu=[];
+ var TS=(typeof TOURS!=="undefined"?TOURS:{});
+ /* sidebar + trang: dem tren CA HAI vi neo cua tour co the nam o hai noi */
+ var nav="";try{buildNav();nav=STORE["nav"]?STORE["nav"].innerHTML:""}catch(e){}
+ Object.keys(TS).forEach(function(k){
+  (TS[k].steps||TS[k]||[]).forEach(function(st,i){
+   var sel=String((st&&st.sel)||"");
+   if(sel.charAt(0)!=="@"||sel.indexOf("@txt:")===0)return;
+   var ten=sel.slice(1);
+   var pg=st.p||"banlam",h="";
+   try{CUR=pg;h=(PBK[pg]&&PBK[pg].ty==="list")?renderList(pg):(RENDER[pg]?RENDER[pg]():"")}catch(e){}
+   var n=((h+nav).match(new RegExp('data-tour="'+ten+'"',"g"))||[]).length;
+   if(!n)thieu.push(k+"#"+(i+1)+" @"+ten+" ("+pg+")");
+   else if(n>1)trung.push(k+"#"+(i+1)+" @"+ten+" x"+n+" ("+pg+")")})});
+ /* KHONG bao "khong tim thay": khoi tren da canh chuyen do bang cach quet ma nguon, con o day
+    trang co the la bi danh (changA) hoac neo nam trong khung app tinh - do o day se ra bao dong
+    gia. Mot bo kiem keu oan vai lan la lan sau khong ai doc no nua. */
+ if(trung.length)bad.push("NEO TRUNG NHAU (to sang nham cho): "+trung.slice(0,8).join(" | "));
+})();
+
+/* ═══ V9.60 - SOAT TOAN BO CHUC NANG TOUR (anh Luan: "nho kiem toan bo chuc nang tour em") ══
+   Khong chi canh cai neo. Mot bai huong dan hong theo NAM cach, canh du nam:
+   1. Neo tro nham cho (khoi tren - neo trung nhau).
+   2. Neo theo CHU ma chu do khong co tren trang -> vong sang bien mat, nguoi dung ngo ngac.
+   3. Buoc mo mot trang ma chinh chuc danh cua bai KHONG duoc vao -> moi roi duoi.
+   4. Buoc thieu chu: khong tieu de, khong mo ta, hoac khong cau "Viec can lam".
+   5. Ham `chk` (dieu kien lam xong) nem loi -> nut Tiep theo khong bao gio sang. */
+(function(){
+ var chuBay=[],ngoaiPham=[],thieuChu=[],chkLoi=[];
+ var TS=(typeof TOURS!=="undefined"?TOURS:{});
+ var VAI={tn_sale:"tuvan",tn_hocvu:"hocvu",tn_giaovien:"giaovien",tn_wow:"wow",
+   tn_ketoan:"ketoan",tn_marketing:"marketing",tn_nhansu:"nhansu",tn_hotro:"hotro",tn_quanly:"quantri"};
+ /* mot nhan vien dai dien cho tung nhom, de hoi dung pham vi that */
+ var dai={};rows("DL01").forEach(function(x){var e;try{e=buildScope(ecode(x.role))}catch(err){return}
+  if(e&&!dai[e.group])dai[e.group]=x.staff_id});
+ Object.keys(TS).forEach(function(k){
+  var nhom=VAI[k]||"";
+  (TS[k].steps||[]).forEach(function(st,i){
+   var ma=k+"#"+(i+1);
+   if(!String(st.t||"").trim()||String(st.d||"").trim().length<20)thieuChu.push(ma+" (tieu de/mo ta)");
+   if(!String(st.hint||"").trim())thieuChu.push(ma+" (thieu cau Viec can lam)");
+   if(st.chk){try{applyScope(dai[nhom]||"");st.chk()}catch(e){chkLoi.push(ma+": "+e.message)}}
+   var pg=st.p||"";
+   if(pg&&nhom&&nhom!=="quantri"&&dai[nhom]){
+    applyScope(dai[nhom]);var rs=SCOPE();
+    if(rs.pages!=="*"&&rs.pages.indexOf(pg)<0&&!VIEW_ALWAYS[pg])ngoaiPham.push(ma+" -> "+pg+" ("+nhom+" khong vao duoc)")}
+   var sel=String(st.sel||"");
+   if(sel.indexOf("@txt:")===0&&pg){
+    var chu=sel.slice(5);applyScope(dai[nhom]||"");
+    /* Vai trang chi bay day du thanh tab SAU KHI da chon mot lop / mot hoc vien - dung cai
+       nguoi dung co sau buoc truoc do. Khong gieo san thi bo kiem doi mot cai chua the co, roi
+       keu oan; ma bo kiem keu oan vai lan la lan sau khong ai doc no nua. */
+    /* Chon lop/hoc vien mà CHINH chuc danh nay duoc xem - gieo dai mot lop bat ky thi trang
+       tra ve man "ngoai pham vi" dai 604 ky tu, va bo kiem lai keu oan mot cai vo can. */
+    try{var _l=rows("DL10").filter(function(c){return canRow("DL10",c)})[0];
+        window.BLCLASS=_l?_l.class_id:(rows("DL10")[0]||{}).class_id;
+        var _h=rows("DL09").filter(function(x){return canRow("DL09",x)})[0];
+        window.HVID=_h?_h.student_id:(rows("DL09")[0]||{}).student_id}catch(e){}
+    if(st.ctx)try{st.ctx()}catch(e){}
+    var h="";try{CUR=pg;h=(PBK[pg]&&PBK[pg].ty==="list")?renderList(pg):(RENDER[pg]?RENDER[pg]():"")}catch(e){}
+    /* Phai GO MA HOA HTML truoc khi so: tren man that `tourTimChu` doc `el.textContent` (da go
+       roi), con o day ta doc chuoi HTML tho nen "&" van la "&amp;" - so thang la bao dong gia. */
+    /* Nguoi dai dien cua nhom co the khong phu trach lop nao -> trang tra ve man "ngoai pham vi",
+       khong con thanh tab de soi. Do la chuyen cua bo kiem pham vi du lieu, khong phai cua neo;
+       o day bo qua, con khong thi bo kiem nay bao do vi mot ly do khong lien quan gi den no. */
+    if(/ngo[aà]i ph[aạ]m vi/i.test(h))return;
+    var tho=h.replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&nbsp;/g," ");
+    if(h&&tho.indexOf(chu)<0)chuBay.push(ma+' @txt:"'+chu+'" ('+pg+")")}
+  })});
+ applyScope("");setRole("all");
+ if(chuBay.length)bad.push("NEO THEO CHU ma chu khong co tren trang: "+chuBay.slice(0,6).join(" | "));
+ if(ngoaiPham.length)bad.push("BUOC MOI VAO TRANG NGOAI PHAM VI: "+ngoaiPham.slice(0,6).join(" | "));
+ if(thieuChu.length)bad.push("BUOC THIEU CHU: "+thieuChu.slice(0,6).join(" | "));
+ if(chkLoi.length)bad.push("HAM chk NEM LOI: "+chkLoi.slice(0,4).join(" | "));
+ console.log("Soat toan dien tour: "+Object.keys(TS).length+" bai · "
+  +Object.keys(TS).reduce(function(a,k){return a+(TS[k].steps||[]).length},0)+" buoc · "
+  +"neo theo chu, pham vi trang, du chu, ham chk - deu da chay");
+})();
+
 console.log(bad.length?("TOUR FAIL:\n  "+bad.join("\n  ")):"TOUR OK: menu cap do + moi bai chay het buoc, 0 loi");

@@ -149,7 +149,27 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.59 — THẺ CƯ XỬ ĐÚNG NHƯ CỘT + DEMO SỐNG Ở MỌI CƠ SỞ, MỌI NGÀY ✅ (31/07).**
+> **Phiên bản: V9.60 — CỔNG NHÂN VIÊN: ĐÚNG BỘ PHẬN, ĐÚNG MÀN, ĐÚNG GIỌNG ✅ (31/07).**
+> · Anh Luân: *"em để quá nhiều chức danh ko liên quan... tạp vụ thì có liên quan gì đến nghiệp vụ
+> với học viên đâu, bảo vệ???"* Đo: **CH3 của SOP chỉ giao việc cho 6 chức danh**; IT/HR/bảo vệ/
+> tạp vụ **không có một hành động nào**. Bỏ IT, bảo vệ, tạp vụ khỏi cổng (vai quản trị hệ thống đã
+> là tài khoản Admin); **giữ Nhân sự** và dựng màn riêng cho họ.
+> · **Nhân sự**: trang Nhân sự + Bảng công giảng dạy + Giao việc. Trước đó họ **mở được cả trang
+> Cài đặt** và thấy bản đồ vòng đời học viên - nay không.
+> · **Marketing không xem tiền**: TP Marketing từng thấy **36 con số doanh thu/công nợ** ở Báo cáo.
+> · **Bảng việc của Tư vấn, Học vụ và Ban Giám đốc CHƯA TỪNG HIỆN RA** - V9.42 gắn vào `pageHead`
+> mà ba trang đáp của họ không hề gọi `pageHead`. Nay 7/7 chức danh có, mỗi trang đúng một lần.
+> · **Thứ tự hai hàng** (anh Luân chụp): thanh chọn chặng lên trên, thẻ của chặng xuống dưới.
+> · **Giọng ghi chú nội bộ** lọt ra màn hình đã dọn (2 câu) + bộ kiểm canh vĩnh viễn.
+> · **VIỆC TỒN mới - AH**: tầng 1 phân quyền (ai thấy TRANG nào) vẫn nằm cứng trong mã, chưa sửa
+> được trong Cài đặt. Anh Luân đã hỏi đúng chỗ này.
+> · **Tour chỉ sai vị trí** (anh Luân chụp): mọi nhãn nhóm sidebar dùng chung một mã neo nên bài
+> nói về C1-C4 lại khoanh vào nhóm LÀM VIỆC. Soát toàn bộ **13 bài / 72 bước theo 5 mặt**, tìm
+> thêm 6 lỗi - trong đó **2 lỗ phân quyền**: SOP giao WOW chấm test mà app không cho họ màn test;
+> Marketing được giao chăm lại khách cũ mà không có màn đó.
+> · Bộ kiểm: `_checkux` **189** · `_check11` **152** · `_check16` **672** · `_checktour` soát 5 mặt.
+>
+> **Phiên bản trước: V9.59 — THẺ CƯ XỬ ĐÚNG NHƯ CỘT + DEMO SỐNG Ở MỌI CƠ SỞ, MỌI NGÀY ✅ (31/07).**
 > · Anh Luân: *"mấy cái thẻ kia tại sao lại cố định nhỉ, sao ko phải như các cột... nó đâu cần
 > phải bấm nhỉ."* Ba bản liền em chữa cái thẻ theo hướng "cho nó bấm đúng chỗ hơn"; anh nhìn ra
 > cái em không nhìn ra: **vấn đề không phải nó bấm sai, mà là nó KHÔNG NÊN BẤM** - bộ lọc ngay
@@ -4855,6 +4875,129 @@ bảng VIỆC · hai tham số ngưỡng mới phải nằm trong CH2. **155 →
 ### Số chốt phiên
 Thẻ **137 → 84** · Tổng quan **35 → 11** thẻ đầu trang, khối phòng ban 24 ô đọc chơi → 18 ô việc
 bấm được · 2 tham số mới vào CH2 (`viecOldAlert_days`, `svNudge_days`) · `_checkux` **161**.
+
+## V9.60 (31/07) - CỔNG NHÂN VIÊN: ĐÚNG BỘ PHẬN, ĐÚNG MÀN, ĐÚNG GIỌNG
+
+> Anh Luân: *"chỗ cổng nhân viên, em để quá nhiều chức danh ko liên quan, và các chức danh liên
+> quan, thì em lại chưa thiết kế giao diện riêng đúng ko, vào thấy rất nhiều thông tin, dù họ ko
+> có quyền"* · *"tạp vụ thì có liên quan gì đến các nghiệp vụ với học viên đâu, bảo vệ???"* ·
+> *"nhân viên IT thì hiện là quản trị hệ thống, là admin rồi, nói chung đây là demo, em gom lại
+> mấy bộ phận quan trọng thôi em"*
+
+### A. ĐO TRƯỚC KHI CẮT
+
+Bảng phân quyền **CH3 của SOP có 31 hành động, chia cho đúng SÁU chức danh**: tuvan · hocvu ·
+giaovien · wow · ketoan · marketing. Nhóm IT / Nhân sự / Bảo vệ / Tạp vụ (**7 người**) **không có
+một hành động nào**. Đó là câu trả lời bằng số cho câu hỏi của anh Luân, không phải cảm tính.
+
+**Bỏ khỏi cổng:** NV IT, TP IT (vai quản trị hệ thống đã là tài khoản Quản trị viên), NV Bảo vệ,
+NV Tạp vụ. **Giữ:** Nhân sự - anh Luân chốt giữ, và họ có màn riêng (mục B).
+
+Cắt **ở nguồn** (`gen_demo.py`) chứ không giấu ở giao diện: giấu thì dữ liệu vẫn còn, bảng lương
+và bảng giao việc vẫn trỏ tới họ, bản sau lại thấy họ ló ra ở một màn nào đó.
+
+### B. NHỮNG GÌ ĐO ĐƯỢC KHI ĐÓNG VAI TỪNG NGƯỜI
+
+| Đo được | Trước | Sau |
+|---|---|---|
+| Nhân sự mở được trang **Cài đặt** (chỗ sửa luật cả trung tâm) | **CÓ** | không |
+| Nhân sự thấy bản đồ vòng đời học viên | **CÓ** | không |
+| Nhân sự có màn của chính họ | **0 trang** | Nhân sự · Bảng công · Giao việc |
+| TP Marketing thấy con số tiền ở Báo cáo | **36 con số** | 0 |
+| Chức danh có bảng việc riêng hiện ra | **4/7** | **7/7** |
+| Nhóm dự phòng (chức danh lạ) với tới Cài đặt | **CÓ** | không |
+
+**Bảng việc của Tư vấn, Học vụ và Ban Giám đốc CHƯA TỪNG HIỆN RA.** V9.42 gắn nó vào `pageHead`
+với lý do *"khai MỘT chỗ, không chép vào sáu trang"* - đúng nguyên tắc, nhưng **ba trong năm trang
+đáp không hề gọi `pageHead`** (Trang bắt đầu, Xếp lớp, Báo cáo dựng `.phead` bằng tay). Một chỗ
+dùng chung chỉ dùng chung được với ai chịu gọi nó.
+**Luật rút ra: gom về một chỗ thì phải có bộ kiểm đếm xem một chỗ đó có thật sự chạm tới tất cả
+những nơi cần không - nếu không, "một chỗ" chỉ là một chỗ bị quên ở ba nơi khác.**
+
+### C. THỨ TỰ HAI HÀNG (anh Luân chụp màn)
+
+> *"thứ tự của 2 hàng bị sai phải ko em, ở trong chặng, dòng trên bấm để thay đổi chặng, dòng dưới
+> là các thẻ chuyên biệt của chặng đúng ko?"*
+
+Đúng: người ta **chọn** chặng trước rồi mới đọc số của chặng đó. Hai trang có thanh chọn chặng
+(Tuyển sinh, Học tập & Giảng dạy) nay đưa thanh chọn lên trên, bảng việc xuống dưới - qua tham số
+`hoan` của `pageHead` cộng hàm `bvSau()`.
+
+### D. GIỌNG GHI CHÚ NỘI BỘ KHÔNG ĐƯỢC LỌT RA MÀN HÌNH
+
+> *"e đừng có viết ghi chú riêng của em vào thẳng app: 'SOP chưa có bảng cho kế toán - đây là phần
+> em bổ sung, giữ đúng tinh thần bốn con số đầu ca.' viết thế này lúc demo nó kỳ lắm."*
+
+Đúng, và không chỉ một chỗ. Quét toàn bộ chữ hiện ra ở mọi chức danh, tìm thấy hai câu:
+- Bảng Kế toán: *"SOP chưa có bảng cho kế toán - đây là phần em bổ sung…"* → **"Bốn con số đầu ca
+  của kế toán: nợ phí, phiếu thu chờ đối soát, hoàn tiền và chiết khấu chờ duyệt."**
+- Bảng công giảng dạy: *"…tính theo LẦN (120.000 đ/lần) - **anh Luân chốt 29/07**."* → bỏ vế sau.
+
+Cộng thêm `bc:"bổ sung"` ghép thành câu vô nghĩa *"theo bổ sung của SOP"* - nay chỉ bảng nào CÓ
+trong SOP mới ghi "theo BC… của SOP".
+
+**Chỗ để ghi lý do là chú thích mã nguồn và nhật ký này - hai chỗ không ai demo.** Bộ kiểm mới bắt
+đúng GIỌNG đó (`em bổ sung`, `phần em`, `anh Luân`, `SOP chưa có bảng`, `bộ kiểm`, `V9.x`,
+`gen_v5`), không bắt từ đơn lẻ - bắt rộng quá thì bộ kiểm thành phiền nhiễu rồi bị tắt, mà một bộ
+kiểm bị tắt thì bằng không có.
+
+### E. BẪY ĐÃ CẮN: FIXTURE TỰ ĂN CHÍNH MÌNH
+
+`gen_demo.py` **đọc lại chính `demo_data_big.json`** (DL01/DL05/DL10 là fixture mang theo qua mỗi
+lượt chạy). Em thêm bộ lọc bỏ 7 người, chạy một lượt - rồi anh Luân bảo giữ Nhân sự. Sửa bộ lọc
+xong chạy lại thì **3 người Nhân sự đã biến mất vĩnh viễn**, vì lượt trước đã ghi đè fixture.
+Phải `git checkout HEAD -- _src/demo_data_big.json` rồi mới chạy lại.
+**Luật: sửa một bộ lọc ở nguồn thì phải khôi phục fixture từ git TRƯỚC khi chạy lại - nếu không,
+lần chạy đầu tiên là lần duy nhất bộ lọc có đủ dữ liệu để lọc.**
+
+### G. TOUR CHỈ SAI VỊ TRÍ - VÀ SOÁT TOÀN BỘ CHỨC NĂNG TOUR
+
+> Anh Luân (kèm ảnh chụp): *"cái phần tour của em vẫn bị chỉ sai vị trí á"* · *"nhớ kiểm toàn bộ
+> chức năng tour em"*
+
+Ảnh chụp: bước 2/7 **"Menu theo 4 chặng vòng đời"** nói về C1-C4, nhưng vòng sáng khoanh vào nhóm
+**"LÀM VIỆC"**. Gốc: **mọi nhãn nhóm trên sidebar đều mang cùng một mã neo `navlbl`**, mà
+`querySelector` trả về **phần tử đầu tiên**. Neo không duy nhất thì nó **im lặng trỏ nhầm** - không
+báo lỗi, không ai biết cho tới khi có người nhìn thấy.
+
+Nhóm theo chặng nay có mã neo riêng `navarc`, và **chỉ nhóm ĐẦU TIÊN** mang nó (các nhóm sau mang
+`navarcx`). Mã neo viết THẲNG thành chuỗi `data-tour="navarc"` chứ không ghép biến - bộ kiểm quét
+mã nguồn tìm literal đó, ghép biến là neo "tàng hình" với bộ kiểm.
+
+**Soát toàn bộ 13 bài / 72 bước theo NĂM mặt**, tìm thêm 6 lỗi cùng họ:
+
+| Mặt canh | Bắt được |
+|---|---|
+| Neo trỏ đúng **một** chỗ | `@bstats` x2 trên Trang bắt đầu (dải thẻ và dải hàng chờ việc cùng mang một mã) · `@tbar` x2 trên Học tập |
+| Neo theo CHỮ thì chữ phải có thật | 2 bước neo sai nhãn tab của Vận hành lớp |
+| Bước không dẫn vào trang **ngoài phạm vi** | Bài **Giáo viên WOW** dẫn sang Tuyển sinh chấm test - mà phạm vi của họ **không có màn test**, dù CH3 ghi rõ chấm test là việc của WOW · Bài **Marketing** dẫn sang Chăm lại và Báo cáo, cả hai ngoài phạm vi |
+| Bước đủ chữ (tiêu đề + mô tả + "Việc cần làm") | không thiếu |
+| Hàm `chk` không ném lỗi | không lỗi |
+
+Hai cái đầu là lỗi neo. **Hai cái ở mặt thứ ba mới đáng nói**: chúng không phải lỗi của tour, mà là
+**lỗ phân quyền mà tour vô tình phát hiện ra** - SOP giao việc cho một chức danh mà app không cho
+họ màn hình để làm. Đã mở đúng một tab test cho WOW và màn Chăm lại cho Marketing, không mở rộng
+hơn.
+
+**Luật rút ra: một bài hướng dẫn là bản kiểm kê phân quyền dùng được. Nó đi đúng đường người ta
+làm việc, nên chỗ nào nó bị chặn là chỗ đó phân quyền sai - không phải bài viết sai.**
+
+**Hai lần đo nói dối của em trong đợt này** (lần thứ chín và mười của chuỗi từ V9.56):
+- So chuỗi HTML **thô** (`&amp;`) với chữ đã giải mã (`&`) - trên màn thật `textContent` đã giải mã
+  rồi, nên bộ kiểm kêu oan hai bước hoàn toàn đúng.
+- Gieo một lớp bất kỳ cho giáo viên rồi render: trang trả về màn "ngoài phạm vi" dài 604 ký tự, và
+  em trách nhầm cái neo. **Bộ kiểm kêu oan vài lần là lần sau không ai đọc nó nữa** - nên nay nó
+  gieo đúng lớp mà chính chức danh đó được xem, và bỏ qua khi trang trả về màn từ chối.
+
+### F. CÒN LẠI - anh Luân hỏi và em trả lời thẳng
+
+> *"khi em cấu hình, cổng của ai được thấy gì, thì trong phần cài đặt của admin có quyết định được
+> mấy cái đó không em"* · *"có phải nó là ở chỗ phân quyền ko nhỉ"*
+
+Đúng chỗ, nhưng **chưa sửa được**. Cài đặt → Phân quyền khai ba tầng, thực tế sửa được hai:
+tầng 2 (thấy dữ liệu của ai) sửa được · tầng 3 (được làm gì - CH3) chỉ xem, đối chiếu file SOP ·
+**tầng 1 (thấy TRANG nào) nằm cứng trong `ROLESCOPE`** - chính chỗ em vừa chỉnh tay cho Marketing
+và Nhân sự. Trái luật cứng "mọi thứ nghiệp vụ đi qua cấu hình". Ghi thành việc **AH**.
 
 ## V9.59 (31/07) - THẺ CƯ XỬ ĐÚNG NHƯ CỘT + DEMO PHẢI SỐNG Ở MỌI CƠ SỞ, MỌI NGÀY
 

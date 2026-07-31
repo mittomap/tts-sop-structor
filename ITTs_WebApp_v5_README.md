@@ -2006,3 +2006,20 @@ không còn chip "Room demo" ở thanh tiêu đề, không còn dòng trạng th
 Trong Cài đặt → **Dữ liệu demo** vẫn còn: nút **Reset demo**, nút **Kiểm tra đồng bộ** (bấm ở một
 cửa sổ, cửa sổ/máy kia phải hiện thông báo trong 1-2 giây) và phần **Mốc thời gian của dữ liệu
 demo**.
+
+## Cổng nhân viên: đúng bộ phận, đúng màn (V9.60)
+
+Cổng nhân viên nay chỉ còn các bộ phận **thật sự có việc trong SOP**: Tư vấn · Marketing · Học vụ ·
+Giáo viên ACA · Giáo viên WOW · Kế toán · Nhân sự · Ban Giám đốc, cộng tài khoản **Quản trị viên**
+(vai quản trị hệ thống). IT, Bảo vệ, Tạp vụ không còn trong danh sách đăng nhập.
+
+Mỗi chức danh chỉ thấy màn của mình:
+- **Nhân sự**: Danh sách nhân viên · Bảng công giảng dạy · Giao việc nội bộ. Không thấy học viên,
+  không thấy doanh thu, không vào Cài đặt.
+- **Marketing**: lead, chăm lại khách cũ, mã giới thiệu. Không thấy trang Báo cáo tài chính.
+- **Giáo viên WOW**: thêm tab Test đầu vào - vì SOP giao việc chấm test cho họ.
+
+Mỗi chức danh đều có **bảng việc riêng** ngay trên trang đáp của mình (trước đây Tư vấn, Học vụ và
+Ban Giám đốc không thấy bảng của họ), có **nhịp ngày** và có **bài hướng dẫn riêng**.
+
+Trên trang Tuyển sinh và Học tập & Giảng dạy: **hàng chọn chặng nằm trên**, thẻ của chặng nằm dưới.
