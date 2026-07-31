@@ -123,11 +123,17 @@ var TOUR_BOQUA={
  chay:"man chay quy trinh, tour bai 'Khong can vao Cai dat' da di qua bang neo @chaybody",
  hanhtrinh:"da gop vao banlam (go() remap)",
  bangcong:"da gop vao trang Giang vien (go() remap)",
- dslienhe:"so tra cuu - cung mot khuon voi trang nghiep vu da co trong tour",
- dstest:"so tra cuu", dstuvan:"so tra cuu", dsdangky:"so tra cuu", dsthanhtoan:"so tra cuu",
- dsbuoihoc:"so tra cuu", dsdiemdanh:"so tra cuu", dsbaitap:"so tra cuu", dswow:"so tra cuu",
- dsketthuc:"so tra cuu", dskhaosat:"so tra cuu", dsphanhoi:"so tra cuu", dskhieunai:"so tra cuu",
- nhanvien:"so tra cuu", khoahoc:"so tra cuu", lop:"tab trong hub Hoc tap - tour di qua hub",
+ /* V9.66: ho SO TRA CUU nay co bai rieng - "tq_sotracuu" di qua 4 so (khieu nai, bai tap,
+    diem danh, WOW) va noi ro ca ho dung CHUNG mot bo cong cu. May so con lai khai o day khong
+    phai vi bo qua, ma vi day mot so la day duoc ca ho - di het 13 so chi lam bai dai ra ma
+    khong them mot chu kien thuc nao. */
+ dslienhe:"so tra cuu - bai tq_sotracuu day chung bo cong cu cho ca ho",
+ dstest:"so tra cuu - xem tq_sotracuu", dstuvan:"so tra cuu - xem tq_sotracuu",
+ dsdangky:"so tra cuu - xem tq_sotracuu", dsthanhtoan:"so tra cuu - xem tq_sotracuu",
+ dsbuoihoc:"so tra cuu - xem tq_sotracuu", dsketthuc:"so tra cuu - xem tq_sotracuu",
+ dskhaosat:"so tra cuu - xem tq_sotracuu", dsphanhoi:"so tra cuu - xem tq_sotracuu",
+ nhanvien:"so tra cuu - xem tq_sotracuu", khoahoc:"so tra cuu - xem tq_sotracuu",
+ lop:"tab trong hub Hoc tap - tour di qua hub",
  phong:"tab trong hub Hoc tap", gvdp:"tab trong hub Hoc tap",
  reup:"tab trong hub Tuyen sinh", khaosat:"tab trong hub CSKH", ghinhan:"tab trong hub CSKH",
  review:"tab trong hub CSKH", magioithieu:"tab trong hub Khac", baoluu:"tab trong hub Khac",
@@ -138,7 +144,6 @@ var TOUR_BOQUA={
  ketthuc:"tab trong nhom chang C4, mo tu bang viec; luong ket thuc khoa da co trong bai hoc vu",
  viec:"man Viec hom nay - moi bai chuc danh deu bat dau tu banlam roi bam sang, khong can buoc rieng",
  giaoan:"kho bai tap - luong giao/thu/cham, tour bai giao vien di qua banglop",
- hoidap:"hop Tro ly, co bai gioi thieu rieng trong man chao phien dau",
  khac:"vo hub", duyet:"vo hub - cac tab ben trong deu da khai", hocvien:"co trong tour hoc vu"};
 (function(){
  var coTour={};

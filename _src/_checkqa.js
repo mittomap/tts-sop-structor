@@ -428,5 +428,45 @@ t("Hoi dap nam trong menu, khong bi giau", PBK["hoidap"]&&!PBK["hoidap"].hide);
  t("tra ve mac dinh sach", !aiOn());
 })();
 
+/* ═══ V9.66 - CAU HOI VAN HANH PHAI RA SO, KHONG RA "CHO CHINH NGUONG" ════════════════════
+   Do that truoc khi lam: cho hop Hoi dap 15 cau mot quan ly hoi moi ngay, no tra loi DUNG 1.
+   Muoi bon cau con lai roi vao nhanh "cho cau hinh" - hoi "co bao nhieu hoc vien nguy co" thi
+   no chi vao o chinh NGUONG nguy co, khong noi con so. Co cau con tra loi sai han: "han cham
+   bai la bao lau" ra nguong goi lead, chi vi chu "lau" hiem trong kho nen duoc cham diem cao.
+   Bang duoi day la HOP DONG: moi dong ghi cau hoi + nhanh tra loi BAT BUOC. Doi cach cham diem
+   ma lam tut mot dong nao la do ngay - do la cach duy nhat giu Tro ly khong tu tho lai. */
+(function(){
+ var BANG=[
+  ["có bao nhiêu học viên nguy cơ","so"],
+  ["ai chưa đóng học phí","so"],
+  ["hôm nay tôi phải làm gì","so"],
+  ["buổi học hôm nay có mấy buổi","so"],
+  ["giáo viên nào chưa viết nhận xét","so"],
+  ["doanh thu tháng này","so"],
+  ["ai đang quá tải","so"],
+  ["bài tập nào chờ chấm","so"],
+  ["CVR đang bao nhiêu","kpi"],
+  ["LRT hiện tại thế nào","kpi"],
+  ["đổi ngưỡng nợ quá hạn ở đâu","hethong"],
+  ["hạn chấm bài là bao lâu","hethong"],
+  ["sĩ số tối thiểu mở lớp chỉnh chỗ nào","hethong"]];
+ BANG.forEach(function(r){
+  var R=null;try{R=qaTraLoi(r[0])}catch(e){}
+  t("hoi '"+r[0]+"' -> nhanh "+r[1]+(R?(" (dang ra: "+R.loai+")"):" (khong tra ve gi)"),
+    !!R&&R.loai===r[1])});
+ /* Hoi ten mot LOP va mot KHOA phai ra dung ho so do, khong duoc roi ve chi cho cau hinh */
+ var cl=null,kh=null;try{cl=srows("DL10")[0];kh=rows("DL05")[0]}catch(e){}
+ if(cl){var Rl=qaTraLoi("lớp "+cl.class_id+" thế nào rồi");
+  t("hoi ma lop ra dung ho so lop", !!Rl&&Rl.loai==="nguoi"&&Rl.nguoi.length&&Rl.nguoi[0].loai==="lop")}
+ if(kh){var Rk=qaTraLoi(kh.course_name+" con bao nhieu lop");
+  t("hoi ten khoa ra dung ho so khoa", !!Rk&&Rk.loai==="nguoi"&&Rk.nguoi.length&&Rk.nguoi[0].loai==="khoa")}
+ /* Moi muc so lieu phai chay duoc VA phai co nut mo man lam viec - biet so ma khong toi duoc
+    cho xu thi van la ngo cut. */
+ QASO.forEach(function(m){
+  var k=null;try{k=m.fn()}catch(e){}
+  t("muc so lieu '"+m.k+"' chay duoc", !!k);
+  if(k)t("muc so lieu '"+m.k+"' co nut mo man lam viec va co loi giai thich", !!k.go&&!!k.giai)});
+})();
+
 console.log(bad.length?("CHECKQA FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECKQA OK: "+ok+" tieu chi");
 process.exit(bad.length?1:0);

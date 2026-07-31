@@ -149,7 +149,29 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.65 — BA VIỆC TỒN XONG: TỪ ĐIỂN TỰ ĐỌC NGUỒN · HUY HIỆU VIỆC Ở CỔNG HV · BẢNG MARKETING ✅ (31/07 tối).**
+> **Phiên bản: V9.66 — DEMO CHUẨN MỌI THỨ TRONG TUẦN · TRỢ LÝ TRẢ LỜI BẰNG SỐ · TOUR +2 BÀI ✅ (31/07 khuya).**
+> · **Bộ kiểm thứ 21 `_checkdemo`**: nạp lại app **7 lần**, mỗi lần giả `Date` lệch thêm một ngày
+> (đặt ở tuần thứ tư để phép kéo THẬT SỰ chạy), đặt đúng lá cờ nút Reset đặt, rồi **đóng vai từng
+> nhân viên có thật** hỏi bảng việc của chính họ. Mọi bộ kiểm cũ đều chạy vào ĐÚNG MỘT NGÀY - mà
+> app kéo dữ liệu theo bội số 7 ngày nên mỗi thứ nhìn một lát cắt khác; chỗ trống ở lát cắt nào
+> thì mãi mãi trống đúng thứ đó. Đo trước khi sửa: "Buổi WOW hôm nay" **thứ Ba = 0**.
+> · **Hai chỗ sửa cho demo chuẩn**: `tshDays` đổi `round` → `floor` (mốc neo luôn ở hoặc TRƯỚC hôm
+> nay, nên "hôm nay" không rơi vào phần quá khứ của dữ liệu), và `_phuDeu` trong `gen_demo.py` dời
+> ngày để mỗi ngày 0..+7 đều có hẹn / buổi WOW / test. **Hai chỗ này là MỘT HỢP ĐỒNG** - đổi một
+> bên mà quên bên kia là demo lại có ngày trống; `_checkdemo` canh đúng hợp đồng đó.
+> · **Bốn lỗi "mã ma" bắt được**: câu lọc bằng mã KHÔNG CÓ trong CH1 chạy êm ru, không lỗi JS, chỉ
+> trả về false mãi mãi. `homework_status "submitted"` → ô "Bài tập chờ chấm" đọc 0 suốt nhiều bản
+> trong khi có 188 bài chờ · `enrollment_status "active"` → chỉ số TCR của BC2 đọc 0% vĩnh viễn ·
+> `re_enrollment_status "declined"` (đúng là `rejected`) · `class_status "completed"/"closed"` (đúng
+> là `finished`). Nay có luật **M4b** trong `_checkaudit` canh chuyện này.
+> · **Trợ lý: 1/15 → 13/15**. Thêm hẳn nhánh trả lời thứ ba và thứ tư - **SỐ LIỆU** (12 mục, mỗi mục
+> gọi đúng hàm app đang dùng để vẽ con số đó, kèm danh sách cụ thể và nút mở màn xử) và **CHỈ SỐ**
+> (gõ mã CH6 ra giá trị + ngưỡng + mức đạt). Kho tìm hồ sơ thêm **LỚP và KHÓA**. `_checkqa` nay giữ
+> một BẢNG HỢP ĐỒNG câu hỏi → nhánh bắt buộc.
+> · **Tour 13 → 15 bài, 75 → 84 bước, phủ 20 → 28 trang**: bài "Sổ tra cứu - tìm gì cũng ra" (dạy
+> một sổ là dùng được cả 13 sổ) và bài "Hỏi Trợ lý - nhanh hơn đi tìm".
+>
+> **Phiên bản trước: V9.65 — BA VIỆC TỒN XONG: TỪ ĐIỂN TỰ ĐỌC NGUỒN · HUY HIỆU VIỆC Ở CỔNG HV · BẢNG MARKETING ✅ (31/07 tối).**
 > · **Từ điển 10 → 107 mục**, không gõ tay mục nào: đọc thẳng CH6 (51 chỉ số) + SHEETVN (26 bảng)
 > + mã cấu trúc SOP. Thêm chỉ số vào CH6 là có ngay mục từ điển.
 > · **Cổng học viên có huy hiệu việc**: mỗi mục mang số, thanh trên mang tổng, bấm là nhảy tới
@@ -5876,3 +5898,131 @@ Ghi lại vì chúng cùng một họ - **đo ra số lạ thì nghi cái thư�
 Tham số CH2 thêm: `statsLookback_days`, `statsUpcoming_days`, `statsNewWindow_days`,
 `reEnrollGrace_days`, `placementChange_free_times`, `sourceMinLeads` - nhóm mới
 **"Bảng số & cửa sổ nhìn lại"**.
+
+---
+
+## V9.66 - DEMO CHUẨN MỌI THỨ TRONG TUẦN, TRỢ LÝ TRẢ LỜI BẰNG SỐ (31/07 khuya)
+
+> Anh Luân: *"Có, nhớ cấu hình nút reset demo để luôn có 1 bộ demo chuẩn ngay sau khi reset.
+> Thực sự chuẩn. Sau đó em nên nâng cấp tour và trợ lý lên tầm cao mới, chính xác và thực dụng."*
+
+### 1. "Thực sự chuẩn" nghĩa là gì - và vì sao 20 bộ kiểm cũ đều xanh mà demo vẫn hụt
+
+Mọi bộ kiểm cũ chạy vào **đúng một ngày**: hôm nay. Chúng xanh, và xanh thật. Nhưng app kéo dữ
+liệu demo theo **bội số 7 ngày** (giữ nguyên thứ trong tuần - chủ ý đúng), nên **mỗi thứ trong
+tuần nhìn thấy một lát cắt KHÁC** của cùng một bộ dữ liệu. Chỗ trống ở lát cắt nào thì mãi mãi
+trống ở đúng thứ đó, và không bộ kiểm nào biết.
+
+Đo thật trước khi sửa - số trên thẻ khi mở app từng ngày:
+
+```
+Tới hẹn hôm nay   T2=1   T3=7  T4=6  T5=5  T6=15  T7=4  CN=4
+Buổi WOW hôm nay  T2=1   T3=0  T4=3  T5=2  T6=3   T7=2  CN=2
+Test hôm nay      T2=1   T3=1  T4=6  T5=9  T6=3   T7=1  CN=2
+```
+
+Thứ Ba mở app: không có buổi WOW nào. Thứ Hai: đúng 1 cái hẹn trong khi thứ Sáu 15 cái.
+App không hỏng. Người xem demo sẽ nghĩ nó hỏng - hoặc nghĩ trung tâm không có việc gì làm.
+
+### 2. Nguyên nhân KHÔNG phải ở dữ liệu, mà ở HƯỚNG của phép kéo
+
+Ban đầu em nghĩ dữ liệu gieo lệch. Đo cả bộ theo thứ trong tuần thì thấy khá đều - nên nghi tiếp,
+và ra chỗ thật: `tshDays()` dùng `Math.round(d/7)*7`. `round` làm tròn **LÊN** khi lệch 4-6 ngày,
+tức đẩy mốc neo lên **TRƯỚC hôm nay** tới 3 ngày. Khi đó "hôm nay" rơi vào phần **QUÁ KHỨ** của dữ
+liệu - nơi mọi buổi học đã dạy xong, mọi hẹn đã gọi. Không phải thiếu dữ liệu; phép kéo chỉ vào
+chỗ trống.
+
+Đổi sang `floor`: mốc neo **luôn ở hoặc trước hôm nay**, nên hôm nay luôn nằm trong phần TƯƠNG LAI
+của dữ liệu (0-6 ngày sau mốc). Đánh đổi: lệch tối đa 6 ngày thay vì 3 - nhưng **lệch đúng hướng
+thì hơn hẳn lệch ít mà sai hướng**.
+
+Cộng với `_phuDeu()` trong `gen_demo.py`: dời ngày (KHÔNG thêm dòng - thêm dòng là lệch mọi con số
+đếm của 21 bộ kiểm) để mỗi ngày trong cửa sổ **0..+7** đều có đủ hẹn liên hệ, buổi WOW, phiếu test.
+
+> **LUẬT MỚI - HAI CHỖ NÀY LÀ MỘT HỢP ĐỒNG.** Cửa sổ gieo trong `gen_demo.py` và hướng làm tròn
+> trong `tshDays` phải khớp nhau. Đổi một bên mà quên bên kia là demo lại có ngày trống, im lặng.
+> Đã cắn ngay trong phiên: bản đầu để cửa sổ `-3..+7` theo lối nghĩ `round` cũ, ra 6 buổi WOW
+> "Đã đặt" mà ngày dạy đã qua - `check_logic` bắt ngay.
+
+### 3. Bộ kiểm thứ 21 - `_checkdemo.js`
+
+Nạp lại `_APP.js` **bảy lần**, mỗi lần giả `Date` lệch thêm một ngày, **đặt ở tuần thứ tư (28-34)**
+để phép kéo thật sự chạy - chọn 0-6 thì `tshDays` trả 0 suốt, tức bộ kiểm xanh mà **chưa hề thử
+cái nó định thử**. Đặt đúng lá cờ `ITTS_DEMO_FORCESHIFT` mà nút Reset đặt rồi để `demoBoot()` tự
+kéo (mô phỏng thật cái nút, không tự gọi tay rồi tin rằng nút cũng làm y thế).
+
+Ba luật của chính bộ kiểm này:
+- **Hỏi bằng hàm của app** (`BANGVIEC`, `RENDER`) - không chép lại phép đếm sang bộ kiểm.
+- **Ô được phép rỗng phải khai `RONGDUOC` kèm lý do đọc được.** "Quá hạn" là ô ta MUỐN bằng 0;
+  "Nguồn đang kém" bằng 0 nghĩa là mọi nguồn trên ngưỡng CVR - tin tốt, bẻ một nguồn cho xấu đi
+  chỉ để thẻ sáng là bịa dữ liệu.
+- **Ô "của riêng tôi" phải ĐÓNG VAI mới đo được.** Đã cắn: đo bằng quyền toàn quyền thì `gvSo("doing")`
+  luôn ra 0 → báo đỏ oan sáu chức danh. Đỏ oan vài lần là lần sau không ai tin bộ kiểm nữa.
+- Và một lần cầm sai thước nữa: cột "kéo bao nhiêu ngày" ra **29** trong khi phép kéo luôn là bội
+  của 7 - vì mốc neo có kèm giờ (18:01) còn mốc gốc dựng ở 00:00. **Số lạ thì nghi cái thước trước.**
+
+### 4. MÃ MA - loại lỗi độc nhất, vì nó không bao giờ báo gì
+
+`isc(x.homework_status,"submitted")` chạy êm ru: không lỗi JS, không đỏ ở đâu, chỉ trả về `false`
+mãi mãi. Enum thật là `submitted_on_time` / `submitted_late` - **chính chú thích của `hwSubmitted`
+đã ghi rõ "KHÔNG có mã submitted"**, mà ô bảng việc vẫn tự chép lại luật rồi chép sai. Ô "Bài tập
+chờ chấm" của giảng viên đọc **0** suốt nhiều bản trong khi dữ liệu có **188 bài đã nộp chưa chấm**.
+Số 0 trông rất hợp lý ("hôm nay chấm hết rồi") nên không ai nghi.
+
+Quét toàn bộ (đọc `ENUMMAP` + `DATA.enums` của chính app, chỉ xét cột NÀO CÓ khai danh mục - cột
+không khai thì không có quyền phán): **8 chỗ, 4 chỗ sai thật**:
+
+| Chỗ | Mã ma | Hậu quả |
+|---|---|---|
+| `kpiCompute` TCR | `enrollment_status "active"` | chỉ số TCR của BC2 đọc **0% vĩnh viễn** |
+| ô "Xong khóa, chưa ai mời" | `re_enrollment_status "declined"` (đúng: `rejected`) | giục nhân viên mời lại người **đã nói không** |
+| chip trạng thái lớp | `class_status "completed"/"closed"` (đúng: `finished`) | lớp đã kết thúc vẫn ăn chip xanh "Đang học" |
+| ô "Bài tập chờ chấm" | `homework_status "submitted"` | luôn bằng 0 |
+
+Bốn chỗ còn lại là mã thừa vô hại (`"lost"`, `"closed"`, `"scheduled"`) - đã dọn để luật không phải
+nuôi ngoại lệ. Nay có nhóm **M4b** trong `_checkaudit` canh.
+
+Một chuyện đi kèm: "lead còn sống" từng có **hai định nghĩa** - bảng khối lượng coi lead
+`unreachable` là còn sống, bảng Marketing thì không. Cùng một người, hai màn hình đếm ra hai số.
+Nay cả hai gọi `mkLeadSong`.
+
+### 5. Trợ lý: 1/15 → 13/15
+
+Đo trước khi làm - cho hộp Hỏi đáp **15 câu một quản lý hỏi mỗi ngày**, nó trả lời đúng **1**.
+Mười bốn câu còn lại rơi hết vào nhánh "chỗ cấu hình": hỏi *"có bao nhiêu học viên nguy cơ"* thì nó
+chỉ vào ô chỉnh **ngưỡng** nguy cơ, không nói con số 23. Có câu sai hẳn: *"hạn chấm bài là bao lâu"*
+ra ngưỡng gọi lead.
+
+Nguyên nhân: hộp chỉ có **hai nhánh** - một CON NGƯỜI, hoặc một CHỖ CẤU HÌNH. Thiếu hẳn nhánh
+người ta hỏi nhiều nhất khi đang vận hành: **HỎI SỐ**.
+
+- Thêm nhánh **SỐ LIỆU** (`QASO`, 12 mục): mỗi mục trả lời bằng **đúng hàm app đang dùng để vẽ con
+  số đó trên màn** - không viết lại phép đếm, vì hai nơi đếm là hai nơi sẽ lệch. Mỗi câu trả lời có
+  danh sách cụ thể là ai và **nút mở thẳng màn xử** (biết số mà không tới được chỗ xử thì vẫn là ngõ cụt).
+- Thêm nhánh **CHỈ SỐ**: gõ mã CH6 (CVR, LRT...) ra giá trị + ngưỡng + mức đạt + nút mở phần diễn giải.
+- Kho tìm hồ sơ thêm **LỚP (DL10) và KHÓA (DL05)**, và so mã sau khi bỏ dấu nối - `LOP-IELTS-6.5-04`
+  với "lớp IELTS 6.5-04" là một thứ, khác đúng một dấu gạch mà so nguyên văn thì trượt.
+- Nhánh số liệu **tự từ chối** khi câu có "ở đâu / chỗ nào / bao lâu / ngưỡng" nên không cướp câu
+  của nhánh cấu hình.
+
+Và một phát hiện đáng nhớ về cách chấm điểm: *"hạn chấm bài là bao lâu"* ra ngưỡng gọi lead vì chữ
+**"lâu"** hiếm trong kho (gần như chỉ câu "trong bao lâu" của tham số lead có), nên trọng số ngược
+tần suất cho nó điểm rất cao - còn "chấm"/"bài" phổ thông nên nhẹ. **Một chữ không mang nghĩa chủ
+đề nào lại quyết định câu trả lời.** Chữ dạng câu hỏi (bao, lâu, mấy, đâu, ai, nhiều...) nay nằm
+ngoài phép chấm điểm.
+
+`_checkqa` giữ một **bảng hợp đồng**: mỗi câu hỏi + nhánh trả lời BẮT BUỘC. Đổi cách chấm điểm mà
+làm tụt một dòng là đỏ ngay - cách duy nhất giữ Trợ lý không tự thụt lại.
+
+### 6. Tour: 13 → 15 bài, 75 → 84 bước, phủ 20 → 28 trang
+
+Đo: 13 sổ tra cứu **không có một bước nào** - mà đó chính là chỗ anh Luân vừa bắt lỗi thiếu bộ lọc.
+Thêm bài **"Sổ tra cứu - tìm gì cũng ra"** (dạy một sổ là dùng được cả họ, vì chúng chung một bộ
+công cụ) và **"Hỏi Trợ lý - nhanh hơn đi tìm"** (hộp trả lời nhanh nhất trong app, trước nay chỉ
+được giới thiệu một dòng ở màn chào). Cả hai qua được luật ngặt của `_checktour`: neo bằng `@mã`,
+neo phải có mặt **trên đúng trang của bước** và **duy nhất** trên trang đó.
+
+### Số chốt phiên
+**21 bộ kiểm xanh hết.** Trợ lý 1/15 → **13/15**. Tour 13 → **15 bài** / 75 → **84 bước** / phủ
+20 → **28 trang**. Icon 209 → **213**. `_checkqa` 130 → **169 tiêu chí**. `_checkaudit` 27 → **29**.
+Bốn ô bảng việc chết sống lại; bốn câu lọc bằng mã không tồn tại được sửa.
