@@ -187,7 +187,13 @@ tr.cfhl>td{background:#FFF6D8}
 .cfbar.on{display:flex}
 .segb.mul::before{content:"";display:inline-block;width:13px;height:13px;flex:none;margin-right:6px;vertical-align:-2px;border:1.5px solid #B9C6D6;border-radius:3px}
 .segb.mul.on::before{background:var(--navy);border-color:var(--navy)}
-.gearbtn{background:none;border:0;color:#9AA5B1;cursor:pointer;font-size:13px;padding:0 3px;line-height:1;vertical-align:baseline}
+.setgrp.setg1{border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:8px}
+.setgrp.setg1 .stab{font-weight:700}
+.setgrp.setg2{padding-left:2px}
+/* Vung bam phai du 24x24 - bo kiem trinh duyet that bat dung: banh rang 19x14px thi tren may
+   tinh bang khong ai bam trung. Icon van nho, chi vung cham la rong ra. */
+.gearbtn{background:none;border:0;color:#9AA5B1;cursor:pointer;font-size:13px;line-height:1;
+ width:24px;height:24px;padding:0;display:inline-flex;align-items:center;justify-content:center;vertical-align:-6px}
 .gearbtn:hover{color:var(--navy)}
 .cfbar.demo{background:var(--bg);border-bottom-color:var(--line);color:var(--navyd)}
 .cfbar i{font-size:15px;flex:none}
@@ -9560,13 +9566,21 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
  var stabs=setTabs();
  var rsS=SCOPE();if(rsS.tabs&&rsS.tabs.settings)stabs=stabs.filter(function(t){return rsS.tabs.settings.indexOf(t[0])>=0});
  if(!stabs.some(function(t){return t[0]===tab})){tab=(stabs[0]||["ch2"])[0];window.SETTAB=tab}
- /* vẽ theo NHÓM: mỗi nhóm một hàng có nhãn, thay vì 13 nút xếp hàng ngang không đầu không cuối */
+ /* V9.63 (anh Luân: *"hay em làm 2 tầng tab đi, 1 tab chính chứa các tab con, nó sẽ gọn hơn"*):
+    trước đây 6 nhóm x N tab đổ hết ra màn thành 5-6 hàng nút - mở Cài đặt là một bức tường.
+    Nay TẦNG 1 là 6 nhóm, TẦNG 2 chỉ hiện tab của nhóm đang mở. Nhóm đang mở suy ra từ chính tab
+    đang đứng, nên bấm từ chỗ khác nhảy thẳng vào một tab thì tầng 1 tự sáng đúng nhóm. */
+ var gcur=(stabs.filter(function(t){return t[0]===tab})[0]||[])[2]||"dulieu";
+ h+='<div class="setgrp setg1">';
  SETGRP.forEach(function(g){
   var L=stabs.filter(function(t){return (t[2]||"dulieu")===g[0]});
   if(!L.length)return;
-  h+='<div class="setgrp"><span class="setglb"><i class="ti '+g[2]+'"></i>'+esc(g[1])+'</span>';
-  L.forEach(function(t){h+='<button class="stab'+(tab===t[0]?" on":"")+'" onclick="window.SETTAB=\''+t[0]+'\';reRender(\'settings\')">'+esc(t[1])+'</button>'});
-  h+='</div>'});
+  h+='<button class="stab'+(gcur===g[0]?" on":"")+'" onclick="window.SETTAB=\''+L[0][0]+'\';reRender(\'settings\')"><i class="ti '+g[2]+'" style="margin-right:5px"></i>'+esc(g[1])+'<i class="segn">'+L.length+'</i></button>'});
+ h+='</div>';
+ var Lc=stabs.filter(function(t){return (t[2]||"dulieu")===gcur});
+ if(Lc.length>1){h+='<div class="setgrp setg2">';
+  Lc.forEach(function(t){h+='<button class="stab'+(tab===t[0]?" on":"")+'" onclick="window.SETTAB=\''+t[0]+'\';reRender(\'settings\')">'+esc(t[1])+'</button>'});
+  h+='</div>'}
  h+='</div>';
  if(tab==="tongquan")return h+renderSetTongquan();
  if(tab==="qa")return h+renderSetQA();
