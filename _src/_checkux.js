@@ -616,6 +616,48 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
   loanNut+=(h.match(/class="btn sm (primary|danger|green)"/g)||[]).length});
  t("class nut viet mot thu tu duy nhat (btn <mau> sm)", loanNut===0);
 })();
+/* ═══════ V9.57 - THẺ PHẢI LÀ MỘT VIỆC PHẢI QUYẾT HÔM NAY ═══════
+   Anh Luân: "thẻ phải đại diện cho 1 vấn đề quan trọng, xem nhanh và NGÀY NÀO CŨNG PHẢI XEM,
+   nội dung quan trọng". Ví dụ ông chỉ ra: "63 của Tuyển sinh, bộ phận đông việc nhất" - xếp hạng
+   theo TỔNG việc thì tháng nào cũng ra Tuyển sinh (đội đông nhất), một con số không đổi thì
+   không có gì để quyết, mà nó vẫn chiếm chỗ của một thẻ đáng xem.
+   Đo lần đầu: 137 thẻ, dọn còn 84. Ba lớp hỏng, nay cấm vĩnh viễn: */
+(function(){
+ /* (1) SỐ TÍCH LUỸ TRỌN ĐỜI - chỉ tăng, không bao giờ đòi một quyết định */
+ var CAM_TICHLUY=[/^Tổng đã /i,/đã dạy xong/i,/đã soạn giáo án/i,/^Đã xử lý xong/i,
+   /^Đã tái ghi danh/i,/ưu đãi đã cấp/i,/^HV đã tạo mã/i,/^Buổi hoàn thành/i,/^Bài đã chấm/i,
+   /^Test đã chấm/i,/giờ kèm đã ghi nhận/i];
+ /* (2) NGƯỠNG CẤU HÌNH đem làm thẻ - số này chỉ đổi khi có người vào Cài đặt sửa nó */
+ var CAM_NGUONG=[/^Ngưỡng /i];
+ /* (3) XẾP HẠNG THEO TỔNG - "đông việc nhất" luôn ra cùng một đội, vô nghĩa
+        (xếp hạng theo QUÁ HẠN thì được: nó đổi mỗi ngày) */
+ var CAM_XEPHANG=[/đông .* nhất/i,/nhiều nhất/i];
+ var xau=[],tong=0;
+ Object.keys(RENDER).forEach(function(k){CUR=k;var h="";
+  try{h=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){return}
+  var re=/<div class="bsn">([^<]*)<\/div><div class="bsl">([\s\S]*?)<\/div>/g,m;
+  while((m=re.exec(h))){
+   tong++;
+   var nhan=String(m[2]||"").replace(/<[^>]*>/g,"").split("·")[0].trim();
+   if(!nhan)continue;
+   CAM_TICHLUY.forEach(function(r){if(r.test(nhan))xau.push(k+": SỐ TÍCH LUỸ \""+nhan+"\"")});
+   CAM_NGUONG.forEach(function(r){if(r.test(nhan))xau.push(k+": NGƯỠNG CẤU HÌNH \""+nhan+"\"")});
+   CAM_XEPHANG.forEach(function(r){if(r.test(nhan)&&!/quá hạn/i.test(nhan))xau.push(k+": XẾP HẠNG THEO TỔNG \""+nhan+"\"")});
+  }});
+ t("co du the de kiem (>=60)", tong>=60);
+ t("khong the nao la so tich luy / nguong / xep hang vo nghia"+(xau.length?" - CON: "+xau.slice(0,5).join(" | "):" ("+tong+" the)"), xau.length===0);
+ /* Ô việc theo phòng ban phải BẤM ĐƯỢC - thấy "10 HV nguy cơ" mà không tới được danh sách
+    thì con số đó chỉ làm người ta lo, không giúp người ta làm. */
+ CUR="dashboard";var hd="";try{hd=RENDER.dashboard()}catch(e){}
+ var oPb=(hd.match(/<div class="dstat[^"]*"/g)||[]).length;
+ var oPbBam=(hd.match(/<div class="dstat[^"]*" onclick=/g)||[]).length;
+ t("o viec theo phong ban deu bam duoc ("+oPbBam+"/"+oPb+")", oPb>0&&oPbBam===oPb);
+ t("khoi phong ban da doi ten thanh bang VIEC, khong con la bang thanh tich", /Việc đang nợ theo phòng ban/.test(hd));
+ /* Hai tham so nguong moi phai nam trong CH2, khong cam cung */
+ ["viecOldAlert_days","svNudge_days"].forEach(function(n){
+  var co=false;APPPARAMS.forEach(function(p){if(p[1]===n)co=true});
+  t("tham so "+n+" da khai trong CH2", co)});
+})();
 if(bad.length){console.log("CHECKUX DO ("+bad.length+"/"+(ok+bad.length)+"):");
  bad.forEach(function(b){console.log("  - "+b)});process.exit(1)}
 console.log("CHECKUX OK: "+ok+" tieu chi | "+FORM.length+" form ghi deu co loi giai thich, khong o ngay nao de trong");

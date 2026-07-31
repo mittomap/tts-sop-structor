@@ -149,7 +149,23 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.56 — RESPONSIVE: CÓ KIỂM, NHƯNG PHỦ CHƯA TỚI ✅ (30/07 khuya).**
+> **Phiên bản: V9.57 — THẺ PHẢI LÀ MỘT VIỆC PHẢI QUYẾT HÔM NAY ✅ (30/07).**
+> · Anh Luân chỉ ra thẻ *"63 của Tuyển sinh, bộ phận đông việc nhất"* và đặt ra **phép thử mới**:
+> **con số này có đổi từ hôm nay sang ngày mai không?** Không đổi thì không đáng chiếm một cái thẻ.
+> Đo thật: xếp theo TỔNG luôn ra "Tuyển sinh 57" (bất biến); xếp theo **quá hạn** ra "Học vụ 31" -
+> phòng khác hẳn và đổi mỗi ngày.
+> · **137 thẻ → 84.** Ba lớp hỏng bị cấm vĩnh viễn: **số tích luỹ trọn đời** ("Tổng đã thu", "Đã
+> dạy xong", "640 buổi đã soạn") · **ngưỡng cấu hình đem làm thẻ** ("60% Ngưỡng SRR") · **xếp hạng
+> theo tổng**. Cộng thông tin nền và ô trùng chỗ khác.
+> · **Khối "Chỉ số theo phòng ban" đổi vai**: 24 ô đọc chơi, không ô nào bấm được → **18 ô VIỆC
+> ĐANG NỢ**, bấm tới đúng danh sách, ô bằng 0 thì mờ đi. Tiêu đề đổi thành "Việc đang nợ theo
+> phòng ban". Tổng quan từ **35 → 11** thẻ đầu trang.
+> · 13 trang được sửa thẻ; 2 tham số ngưỡng mới vào CH2 (`viecOldAlert_days`, `svNudge_days`).
+> · Bộ kiểm cũ bắt được ngay một lỗi của em: thẻ "Đến hạn thu" lặp chip lọc bên dưới. Nay thẻ làm
+> việc chip không làm được - nói ra **số tiền**; chip đếm dòng, thẻ đếm tiền.
+> · Bộ kiểm: `_checkux` **161**.
+>
+> **Phiên bản trước: V9.56 — RESPONSIVE: CÓ KIỂM, NHƯNG PHỦ CHƯA TỚI ✅ (30/07 khuya).**
 > · Anh Luân hỏi *"e kiểm responsive trên ipad và mobile chưa"*. Có - `_checkui` vốn mở thật ở
 > 390×844 và 834×1112. Nhưng **ngăn kéo chưa lần nào được mở ở khổ nhỏ** (harness chỉ mở một ngăn
 > kéo giả), và **chỉ có khổ DỌC**. Vá cả hai: nay **5 khổ** (thêm 844×390 và 1112×834) và mỗi khổ
@@ -4707,3 +4723,81 @@ kéo mở thật mỗi khổ** với
 5 phép canh: thò ra ngoài · nút đóng đủ to · có gì nổi đè lên · có chừa vệt thừa · nội dung có
 tràn khỏi ngăn kéo. Ba lỗi responsive đã sửa, đo lại xác nhận: nút đóng 40×40, ngăn kéo `0..390`
 trên màn 390 và `0..834` trên iPad, nút Trợ lý mờ hẳn khi ngăn kéo mở.
+
+## V9.57 (30/07) - THẺ PHẢI LÀ MỘT VIỆC PHẢI QUYẾT HÔM NAY
+
+> Anh Luân: *"E cân nhắc lại các thẻ ở các trang, xem các thẻ đó có chứa nội dung cần thiết hoặc
+> quan trọng không. Ví dụ thẻ ở việc hôm nay: 63 của tuyển sinh, bộ phận đông việc nhất. Theo anh
+> thẻ phải đại diện cho 1 vấn đề quan trọng, xem nhanh và ngày nào cũng phải xem, nội dung quan trọng."*
+
+Ví dụ anh đưa ra đúng chỗ đau nhất, và nó chỉ ra một **phép thử** mà trước đây app không có:
+
+> **Con số này có đổi từ hôm nay sang ngày mai không? Nếu không, nó không đáng chiếm một cái thẻ.**
+
+"Của Tuyển sinh · bộ phận đông việc nhất" xếp hạng theo TỔNG việc. Tuyển sinh là đội đông nhất nên
+tháng nào cũng ra Tuyển sinh. Một con số bất biến thì không có gì để quyết - mà nó vẫn chiếm chỗ
+của một thẻ đáng xem. Đo trên dữ liệu thật: xếp theo tổng ra **"Tuyển sinh 57"**; xếp theo **quá
+hạn** ra **"Học vụ 31"** - một bộ phận khác hẳn, và con số này nhúc nhích mỗi ngày.
+
+### Đo toàn bộ: 137 thẻ → 84
+
+Vẽ thật 39 trang, bóc từng thẻ ra soi theo bốn tiêu chí anh đặt. Ba lớp hỏng:
+
+| Lớp hỏng | Ví dụ | Vì sao hỏng |
+|---|---|---|
+| **Số tích luỹ trọn đời** | "Tổng đã thu 1.141.283.332đ" · "Đã dạy xong 50" · "640 buổi đã soạn giáo án" · "Ưu đãi đã cấp 10.500.000đ" | chỉ tăng, sáng mai đọc lại vẫn gần y hệt, không đòi hỏi quyết định nào |
+| **Ngưỡng cấu hình đem làm thẻ** | "60% Ngưỡng tỷ lệ trả lời (SRR)" | chỉ đổi khi có người vào Cài đặt sửa nó, tức gần như không bao giờ |
+| **Xếp hạng theo tổng** | "Của Tuyển sinh · bộ phận đông việc nhất" | luôn ra cùng một đội |
+
+Cộng thêm hai lỗi phụ: **thông tin nền** ("5 cơ sở đang có lead sống", "11 nhân viên tư vấn",
+"8 lớp online không ràng buộc phòng") và **trùng chỗ khác** (Doanh thu tháng / Công nợ tồn nằm cả
+ở khối Tình hình kinh doanh lẫn khối phòng ban).
+
+### Chỗ nặng nhất: khối "Chỉ số theo phòng ban" - 24 ô, không ô nào bấm được
+
+Soi lại thì trong 24 ô chỉ có **7 ô là việc phải làm**. 6 ô là số trạng thái, 2 ô trùng khối ngay
+trên, 5 ô là chỉ số đã có nhà riêng ở lưới KPI bên dưới kèm ngưỡng và diễn giải. Và thấy "10 HV
+nguy cơ" xong thì phải tự đi tìm họ ở đâu.
+
+Nay khối này **đổi vai**: từ *bảng thành tích đọc chơi* thành **BẢNG VIỆC đầu ngày** - mỗi phòng ban
+chỉ còn đúng những việc đang nợ, ô nào cũng bấm tới đúng danh sách, ô nào bằng 0 thì mờ đi để mắt
+dồn vào chỗ khác 0. Tiêu đề đổi theo: "Việc đang nợ theo phòng ban".
+
+### Từng trang đã sửa
+
+| Trang | Bỏ / đổi | Thay bằng |
+|---|---|---|
+| Việc hôm nay | "Tổng việc đang nợ" (lặp chip "Tất cả") · "Của Tuyển sinh, đông việc nhất" | **"Nợ quá N ngày"** (ngưỡng qua CH2) · **"Quá hạn nhiều nhất: <phòng>"** - hôm nay dồn người sang đâu |
+| Tổng quan / Báo cáo | 24 ô đọc chơi | 18 ô việc đang nợ, bấm được hết |
+| Thu & thanh toán | "Tổng đã thu toàn hệ thống" | **"Đến hạn thu, tính tới hôm nay"** (số tiền, không phải số dòng) |
+| Ghi nhận phản hồi | "Đã xử lý xong" | **"Phản hồi xấu đang mở"** - để lâu là thành khiếu nại |
+| Khảo sát | "Ngưỡng tỷ lệ trả lời 60%" | **"Gửi quá N ngày chưa ai trả lời"** (ngưỡng qua CH2) |
+| Buổi WOW | "Đã dạy xong" · "Giờ kèm đã ghi nhận" · "Tỷ lệ tiến bộ (WOR)" | **"Buổi WOW hôm nay"** · **"Buổi thiếu mốc giờ"** · **"Đã đặt, chờ HV xác nhận"** |
+| Giáo án | "640 buổi đã soạn" | **"Buổi 7 ngày tới chưa có giáo án"** |
+| Bàn giao lead | "Cơ sở đang có lead sống" · "Nhân viên tư vấn" | **"Quá hẹn liên hệ của NV này"** |
+| GV dự phòng | "Cơ sở có lớp hôm nay" · "Buổi học online" | **"Buổi hôm nay chưa có GV"** · **"Buổi đã huỷ hôm nay"** |
+| Xếp phòng | "Lớp online không ràng buộc phòng" | bỏ hẳn - trên trang xếp phòng, đếm lớp KHÔNG cần phòng là thông tin nền |
+| Bảng chặng | "Hồ sơ trong chặng" | bỏ - đường ray ngay dưới đã đếm từng ga |
+| Kết thúc khóa | "Đã tái ghi danh" (thành tích + chỉ số) | **"Xong khóa, chưa ai mời học tiếp"** |
+| Mã giới thiệu | 4 ô tích luỹ | 2 ô: quy mô + **"Dùng mã nhưng chưa đăng ký"** - họ đã quan tâm sẵn, gọi là chốt |
+
+### Một chỗ bộ kiểm cũ bắt được ngay
+
+Thẻ mới "Đến hạn thu" em gắn luôn hành động lọc - và `_checkux` đỏ ngay: **lặp đúng chip "Đến hạn"
+ngay bên dưới** (luật "một màn một bộ điều khiển" từ V9.51). Đúng. Nay thẻ làm việc mà chip
+KHÔNG làm được: nói ra **số tiền**. Chip đếm dòng, thẻ đếm tiền - hai sự thật khác nhau.
+
+### Bẫy đã cắn trong phép đo
+
+Bản kê thẻ đầu tiên báo "thẻ đầu tiên của mỗi trang KHÔNG BẤM ĐƯỢC". Kiểm lại HTML thô thì nó bấm
+được - biểu thức tìm của em bỏ sót thẻ đầu mỗi dải. Lại một lần nữa: **đo ra số lạ thì nghi cái
+thước trước.** Lần này em kiểm trước khi sửa, nên không mất công sửa cái không hỏng.
+
+### Bộ kiểm chốt lại
+`_checkux` thêm 6 tiêu chí: cấm ba lớp thẻ hỏng theo danh sách mẫu câu (số tích luỹ · ngưỡng cấu
+hình · xếp hạng theo tổng) · ô việc phòng ban phải bấm được 100% · khối phòng ban phải mang tên
+bảng VIỆC · hai tham số ngưỡng mới phải nằm trong CH2. **155 → 161 tiêu chí.**
+
+### Số chốt phiên
+Thẻ **137 → 84** · Tổng quan **35 → 11** thẻ đầu trang, khối phòng ban 24 ô đọc chơi → 18 ô việc
+bấm được · 2 tham số mới vào CH2 (`viecOldAlert_days`, `svNudge_days`) · `_checkux` **161**.

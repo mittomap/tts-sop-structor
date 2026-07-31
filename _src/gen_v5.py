@@ -1353,7 +1353,13 @@ body.drsz .drawer{transition:none}
 .depth b{font-size:13px;color:var(--navy)}
 .depti{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex:0 0 auto}
 .deptb{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+/* V9.57: o viec phong ban nay bam duoc - thay so roi phai toi duoc dung danh sach do.
+   O nao dang 0 (khong con viec) thi lam nhat di, de mat luot ngay den cho con so khac 0. */
 .dstat{background:#fff;padding:10px 13px}
+.dstat.clk{cursor:pointer;transition:.12s}
+.dstat.clk:hover{background:#F7F9FC}
+.dstat.z .dsv{color:var(--muted);font-weight:600}
+.dstat.z{opacity:.62}
 .dsv{font-size:16px;font-weight:800;color:var(--navy);line-height:1.15}
 .dsl{font-size:10.5px;color:var(--muted);margin-top:2px}
 @media(max-width:900px){.bizrow{flex-direction:column}.bizchart{width:auto}}
@@ -3776,17 +3782,46 @@ function deptSection(){var L=rows("DL02"),S=rows("DL09"),E=rows("DL06"),pay=rows
  var knOpen=cnt(KN,function(x){return!/resolved/.test(ecode(x.complaint_status))});var knRes=cnt(KN,function(x){return/resolved/.test(ecode(x.complaint_status))});
  var satV=SV.map(function(x){return num(x.satisfaction_score)}).filter(function(v){return v>0});var satAvg=satV.length?(satV.reduce(function(a,b){return a+b},0)/satV.length).toFixed(1):"-";
  var posFb=cnt(FB,function(x){return/positive/.test(ecode(x.feedback_type))});
+ /* ═══ V9.57 (anh Luân): "thẻ phải đại diện cho 1 vấn đề quan trọng, xem nhanh và NGÀY NÀO CŨNG
+    PHẢI XEM, nội dung quan trọng". Khối này từng có 24 ô, soi lại thì chỉ 7 ô là VIỆC PHẢI LÀM:
+    · 6 ô là số trạng thái thuần (Lead mới · Đã liên hệ · Đang cân nhắc · HV đang học · Bài đã
+      chấm · Test đã chấm · Buổi hoàn thành · Đã xử lý · Phản hồi tích cực) - biết rồi thì làm gì?
+    · 2 ô TRÙNG hẳn khối "Tình hình kinh doanh" ngay phía trên (Doanh thu tháng · Công nợ tồn).
+    · 5 ô là CHỈ SỐ (43% chuyển đổi, 89% điểm danh, 84% chấm đúng hạn, 91% tỷ lệ dự, 4.1 hài
+      lòng) - chúng có nhà riêng là lưới KPI ngay bên dưới, kèm ngưỡng và diễn giải.
+    Và không ô nào bấm được: thấy "10 HV nguy cơ" xong phải tự đi tìm họ ở đâu.
+    Nay mỗi phòng ban chỉ còn ĐÚNG NHỮNG VIỆC ĐANG NỢ của phòng đó, ô nào cũng bấm tới đúng
+    danh sách. Khối này đổi vai: từ bảng thành tích đọc chơi thành BẢNG VIỆC đầu ngày. */
  var depts=[
-  {n:"Tư vấn",ic:"ti-user-plus",c:"#3B82C4",s:[["Lead mới",cnt(L,function(r){return isc(r.lead_status,"new")})],["Đã liên hệ",cnt(L,function(r){return isc(r.lead_status,"contacted")})],["Đang cân nhắc",cnt(L,function(r){return isc(r.lead_status,"considering")})],["Chuyển đổi",cvr+"%",pctG(conv,L.length,"lead đã thành học viên")]]},
-  {n:"Học vụ",ic:"ti-school",c:"#7C3AED",s:[["HV đang học",cnt(S,function(r){return/active|studying/.test(ecode(r.student_status))})],["Onboarding chưa xong",cnt(OB,function(r){return!/completed/.test(ecode(r.onboarding_status))})],["HV nguy cơ",risk],["Điểm danh 30 ngày",pct(attP,att30.length),pctG(attP,att30.length,"lượt điểm danh 30 ngày qua là có mặt")]]},
-  {n:"ACA (chuyên môn)",ic:"ti-book",c:"#0D9488",s:[["Bài đã chấm",hwGr+"/"+HW.length],["Chấm đúng 48h",pct(hw48,hwGr||1),pctG(hw48,hwGr,"bài đã chấm được chấm trong "+paramOf("slaHomeworkGrading_hours",48)+" giờ")],["Test đã chấm",testGr],["Bài chờ chấm",cnt(HW,function(x){return hwSubmitted(x)&&!hwGraded(x)})]]},
-  {n:"WOW",ic:"ti-star",c:"#DB2777",s:[["Buổi hoàn thành",wowDone],["Chờ ghi nội dung",wowNote],["HV vắng",wowNo],["Tỷ lệ dự",pct(wowDone,wowDone+wowNo),pctG(wowDone,wowDone+wowNo,"buổi WOW đã đặt mà học viên có đi")]]},
-  {n:"Tài chính",ic:"ti-cash",c:"#16A34A",s:[["Doanh thu tháng",vnd(revMonth)],["Công nợ tồn",vnd(debt)],["Chờ xác nhận",unverif],["CK chờ duyệt",discPend]]},
-  {n:"CSKH",ic:"ti-headset",c:"#D85A30",s:[["Khiếu nại mở",knOpen],["Đã xử lý",knRes],["Hài lòng TB",satAvg],["Phản hồi tích cực",posFb]]}
- ];
- var h='<div class="sechd">Chỉ số quan trọng theo phòng ban</div><div class="deptgrid">';
+  {n:"Tư vấn",ic:"ti-user-plus",c:"#3B82C4",s:[
+   ["Lead chưa ai gọi",cnt(L,function(r){return isc(r.lead_status,"new")}),"go('nhaplead')"],
+   ["Quá hẹn liên hệ lại",cnt(L,function(r){var d=pvnd(r.next_followup_time);return d&&d.getTime()<Date.now()&&!isc(r.lead_status,"converted","rejected","unreachable")}),"go('nhaplead')"],
+   ["Có KQ test, chờ tư vấn",cnt(T,function(r){return isc(r.test_status,"graded")&&!rows("DL04").some(function(c){return c.lead_id===r.lead_id&&!isc(c.consultation_status,"not_consulted")})}),"go('tuvan')"]]},
+  {n:"Học vụ",ic:"ti-school",c:"#7C3AED",s:[
+   ["Đã thu, chưa xếp lớp",cnt(E,function(r){return num(r.paid_amount)>0&&!OB.some(function(o){return o.student_id===r.student_id})}),"go('xeplop')"],
+   ["Onboarding chưa xong",cnt(OB,function(r){return!/completed/.test(ecode(r.onboarding_status))}),"go('xeplop')"],
+   ["Học viên nguy cơ",risk,"goRisk()"]]},
+  {n:"ACA (chuyên môn)",ic:"ti-book",c:"#0D9488",s:[
+   ["Bài chờ chấm",cnt(HW,function(x){return hwSubmitted(x)&&!hwGraded(x)}),"go('baitap')"],
+   ["Buổi nợ nhận xét",cnt(rows("DL11"),function(x){var st=bhState(x);return st.done&&!st.note}),"go('buoihoc')"],
+   ["Test chờ chấm",cnt(T,function(r){return isc(r.test_attendance_status,"on_time","late")&&!isc(r.test_status,"graded")}),"go('test')"]]},
+  {n:"WOW",ic:"ti-star",c:"#DB2777",s:[
+   ["Chờ ghi nội dung",wowNote,"go('wow')"],
+   ["Buổi HV vắng",wowNo,"go('wow')"],
+   ["Chờ xác nhận buổi",cnt(W,function(x){return isc(x.wow_status,"booked")}),"go('wow')"]]},
+  {n:"Tài chính",ic:"ti-cash",c:"#16A34A",s:[
+   ["Đơn còn nợ",cnt(E,function(r){return num(r.remaining_amount)>0&&!isc(r.enrollment_status,"cancelled")}),"fset('thanhtoan','debt');go('thanhtoan')"],
+   ["Phiếu thu chờ đối soát",unverif,"go('thanhtoan')"],
+   ["Chiết khấu chờ duyệt",discPend,"go('duyet')"]]},
+  {n:"CSKH",ic:"ti-headset",c:"#D85A30",s:[
+   ["Khiếu nại đang mở",knOpen,"go('khieunai')"],
+   ["Phản hồi chưa xử lý",cnt(FB,function(x){return !isc(x.feedback_status,"resolved")}),"go('ghinhan')"],
+   ["Phiếu khảo sát chưa trả lời",cnt(SV,function(v){return !String(v.submitted_date||"").trim()}),"go('review')"]]}
+ ];;
+ var h='<div class="sechd">Việc đang nợ theo phòng ban</div><div class="deptgrid">';
  depts.forEach(function(d){h+='<div class="deptc"><div class="depth" style="box-shadow:inset 4px 0 0 '+d.c+'"><div class="depti" style="background:'+d.c+'18;color:'+d.c+'"><i class="ti '+d.ic+'"></i></div><b>'+esc(d.n)+'</b></div><div class="deptb">';
-  d.s.forEach(function(x){h+='<div class="dstat"'+(x[2]?' data-tip="'+esc(x[2])+'"':'')+'><div class="dsv">'+esc(String(x[1]))+'</div><div class="dsl">'+esc(x[0])+'</div></div>'});
+  d.s.forEach(function(x){var act=x[2]||"";
+   h+='<div class="dstat'+(num(x[1])?"":" z")+(act?" clk":"")+'"'+(act?' onclick="'+act+'" data-tip="'+esc(bamDiDau(act))+'"':'')+'><div class="dsv">'+esc(String(x[1]))+'</div><div class="dsl">'+esc(x[0])+'</div></div>'});
   h+='</div></div>'});
  return h+'</div>'}
 function alertsHTML(){var out=[];
@@ -4442,10 +4477,28 @@ function renderViec(){var items=bellItems();
  h+='<div class="bstats">'+
   vstat("ti-alert-triangle",redn,"Quá hạn","#E24B4A","làm ngay","viecOnly('red')")+
   vstat("ti-clock",ambn,"Sắp tới hạn","#E08A1E","còn kịp","viecOnly('amber')")+
-  vstat("ti-checklist",items.length,"Tổng việc đang nợ","#2E5A88","toàn trung tâm","viecOnly('')")+
-  (function(){var cc={};items.forEach(function(x){cc[x.cat]=(cc[x.cat]||0)+1});
+  /* ═══ V9.57 (anh Luân): "thẻ phải đại diện cho 1 vấn đề quan trọng, xem nhanh và NGÀY NÀO CŨNG
+     PHẢI XEM". Hai thẻ cũ ở đây trượt cả hai vế:
+     · "Tổng việc đang nợ · toàn trung tâm" LẶP đúng chip "Tất cả" ngay bên dưới - hai chỗ nói
+       một con số, mà chip lại còn lọc được.
+     · "Của Tuyển sinh · bộ phận đông việc nhất" xếp hạng theo TỔNG việc, nên tháng nào cũng ra
+       Tuyển sinh (đội đông nhất). Một con số không đổi từ ngày này sang ngày khác thì không có
+       gì để quyết - nó chiếm chỗ của một thẻ đáng xem.
+     Thay bằng hai câu hỏi người quản lý hỏi THẬT mỗi sáng:
+     · việc cũ nhất đang nợ bao nhiêu ngày rồi (nợ càng lâu càng khó cứu);
+     · hôm nay nên dồn người sang bộ phận nào - xếp theo QUÁ HẠN chứ không theo tổng.
+     Đo trên dữ liệu thật: xếp theo tổng ra "Tuyển sinh 57" (bất biến), xếp theo quá hạn ra
+     "Học vụ 31" - một bộ phận khác hẳn, và con số này nhúc nhích mỗi ngày. */
+  /* Ban dau tinh "viec no lau nhat" theo so ngay - nhung do ra 276 ngay: mot con so to va gan
+     nhu bat bien, tuc lai roi vao dung cai bay vua go. Dem SO VIEC de qua nguong moi la thu
+     nhuc nhich hang ngay va dat duoc muc tieu ("hom nay dep bao nhieu cai?"). Nguong qua CH2. */
+  (function(){var lim=paramOf("viecOldAlert_days",3)*24;
+   var n=items.filter(function(x){return x.sev==="red"&&x.age>lim}).length;
+   return vstat("ti-hourglass-high",n,"Nợ quá "+paramOf("viecOldAlert_days",3)+" ngày","#B45309",
+    n?"để lâu nữa là mất khách, dọn trước":"không có việc nào để mốc","viecOnly('red')")})()+
+  (function(){var cc={};items.forEach(function(x){if(x.sev==="red")cc[x.cat]=(cc[x.cat]||0)+1});
    var top=Object.keys(cc).sort(function(a,b){return cc[b]-cc[a]})[0];
-   return top?vstat("ti-user-check",cc[top],"Của "+top,"#0D9488","bộ phận đông việc nhất","viecTeam('"+String(top).replace(/'/g,"")+"')"):""})()+
+   return top?vstat("ti-users-group",cc[top],"Quá hạn nhiều nhất: "+top,"#0D9488","hôm nay nên dồn người sang đây","viecTeam('"+String(top).replace(/'/g,"")+"')"):""})()+
   '</div>';
  var tsegs=[["all","Tất cả",base.length,""]];
  teams.forEach(function(t){if(teamC[t])tsegs.push([t,t,teamC[t],""])});
@@ -6661,7 +6714,14 @@ function renderReview(embed){var p="review",fil=fget(p);
  /* V9.51: 3 o loc doi lot chip ben duoi (chip da mang so) - bo; giu o thong tin thuan */
  h+=statStrip([
   ["ti-clipboard-text",waiting,"Phiếu chờ trả lời","#E08A1E","nhắc HV nộp"],
-  ["ti-target",Math.round(kpiTh(/^SRR/,0.6)*100)+"%","Ngưỡng tỷ lệ trả lời (SRR)","#7C3AED","lớp dưới ngưỡng nằm ở chip lọc","",nguongGiai("SRR","tỷ lệ học viên trả lời khảo sát")]]);
+  /* V9.57: o cu in NGUONG cau hinh (60%) - mot con so chi doi khi co nguoi vao Cai dat sua no,
+     tuc gan nhu khong bao gio. Thay bang phieu gui lau ma van chua ai tra loi: do la viec goi
+     nhac trong ngay. Nguong "bao lau la lau" lay tu CH2. */
+  (function(){var lim=paramOf("svNudge_days",5),now=Date.now(),n=0;
+   sv.forEach(function(v){if(String(v.submitted_date||"").trim())return;
+    var d=pvnd(v.sent_date);if(d&&(now-d.getTime())/864e5>lim)n++});
+   return ["ti-bell-ringing",n,"Gửi quá "+lim+" ngày chưa ai trả lời","#E24B4A",
+    n?"gọi nhắc, để lâu là mất tiếng nói của lớp":"không có phiếu nào bị bỏ quên"]})()]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả lớp",all.length],["none","Chưa gửi đợt nào",nNone,"red"],["low","Trả lời kém",nLow,"amber"],["fu","Có phiếu cần follow-up",nFu?nFu:"","amber"]],view.length);
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>HV</th><th>Đã gửi</th><th>Đã trả lời</th><th>Tỷ lệ (SRR)</th><th>Hài lòng TB</th><th>Cần follow-up</th><th>Đợt gần nhất</th><th>Thao tác</th></tr></thead><tbody>';
@@ -6734,7 +6794,10 @@ function renderGhinhan(embed){var p="ghinhan",fil=fget(p);
   '<button class="btn primary" onclick="ghForm()"><i class="ti ti-message-plus"></i>Ghi nhận phản hồi mới</button>');
  /* V9.51: 3 o loc doi lot chip ben duoi (chip da mang so) - bo; giu o tong ket */
  h+=statStrip([
-  ["ti-checks",fb.length-nOpen,"Đã xử lý xong","#16A34A","tổng "+fb.length+" phản hồi"]]);
+  /* V9.57: o cu dem viec DA LAM XONG - doc cho vui chu khong ai lam gi voi no. Doi sang phan
+     hoi XAU dang mo: do la thu phai xu ly trong ngay, de lau la thanh khieu nai. */
+  (function(){var n=fb.filter(function(x){return !isc(x.feedback_status,"resolved")&&/negative|complaint/.test(ecode(x.feedback_type))}).length;
+   return ["ti-mood-sad",n,"Phản hồi xấu đang mở","#E24B4A",n?"để lâu là thành khiếu nại":"không có cái nào"]})()]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả",fb.length],["new","Chờ phân loại",nNew,"amber"],["over","Quá hạn",nOver,"red"],["neg","Tiêu cực chưa xử lý",nNeg,"red"],["open","Chưa đóng",nOpen]],view.length);
  h+='<div class="obcards rows" data-tour="obcards">';
@@ -7098,7 +7161,13 @@ function renderGiaoan(){var tab=window.GATAB||"ga";
   var noHw=pl.filter(function(x){return !String(x.hw_bank_id||"").trim()}).length;
   var orphan=bank.filter(function(b){return !pl.some(function(x){return String(x.hw_bank_id||"")===String(b.id||b.hw_bank_id)})}).length;
   h+=statStrip([
-   ["ti-notes",pl.length,"Buổi đã soạn giáo án","#3B82C4",crs.length+" khóa đang mở"],
+   /* V9.57: "Buoi da soan giao an" la so tich luy - 640 hay 641 thi hom nay cung khong lam gi
+      khac. Doi sang buoi SAP DAY ma chua co giao an: do moi la viec phai chay. */
+   (function(){var t0=new Date();t0.setHours(0,0,0,0);var t7=new Date(t0.getTime()+7*864e5);
+    var n=rows("DL11").filter(function(x){var d=pvnd(x.session_date);
+     if(!d||d<t0||d>=t7||isc(x.session_status,"cancelled","completed"))return false;
+     return !pl.some(function(g){return String(g.session_id||"")===String(x.session_id)})}).length;
+    return ["ti-notes",n,"Buổi 7 ngày tới chưa có giáo án","#E24B4A",n?"soạn trước, đừng để tới giờ dạy":"đã soạn đủ cả tuần"]})(),
    ["ti-file-alert",noPlan,"Khóa chưa có giáo án nào","#E24B4A",noPlan?"soạn để lớp có bài":"đủ cả"],
    ["ti-book",bank.length,"Bài trong kho","#0D9488",orphan?(orphan+" bài chưa dùng ở đâu"):"đều đang dùng","window.GATAB='kho';reRender('giaoan')"],
    ["ti-clipboard-x",noHw,"Buổi chưa gắn bài tập","#E08A1E","học viên không có bài về nhà","window.GATAB='ga';reRender('giaoan')"]])})();
@@ -8183,8 +8252,9 @@ function renderBanggiao(embed){
   h+=statStrip([
    ["ti-users",mine.length,"Lead NV này đang ôm","#3B82C4",due.length?(due.length+" quá hẹn liên hệ"):"đúng hẹn"],
    ["ti-user-off",orph.length,"Lead chưa có ai phụ trách","#E24B4A",orph.length?"chia ngay kẻo nguội":"không còn"],
-   ["ti-building",Object.keys(perBr).length,"Cơ sở đang có lead sống","#7C3AED","bàn giao nên ưu tiên cùng cơ sở"],
-   ["ti-arrows-exchange",staff.length,"Nhân viên tư vấn","#0D9488","nguồn nhận bàn giao"]])})();
+   /* V9.57: bo o "Co so dang co lead song" va "Nhan vien tu van" - ca hai la thong tin nen,
+      biet roi cung khong ban giao khac di. Giu lai dung cai phai quyet: lead qua han lien he. */
+   ["ti-clock-exclamation",due.length,"Quá hẹn liên hệ của NV này","#E24B4A",due.length?"bàn giao gấp hoặc nhắc người ta gọi":"không có ai quá hẹn"]])})();
  var allLeads=rows("DL02").filter(function(l){return String(l.assigned_to||"")===src});
  var q=vnorm(window.BGQ||"").trim();var stf=window.BGST||"all";
  var stCount={};allLeads.forEach(function(l){var c=ecode(l.lead_status);if(c)stCount[c]=(stCount[c]||0)+1});
@@ -9759,6 +9829,10 @@ var CFNHOM=[
  ["Hệ thống & dữ liệu demo","Nhật ký thao tác giữ bao nhiêu dòng, hoàn tác được trong bao nhiêu giây, và dữ liệu demo cũ bao nhiêu ngày thì tự kéo về hiện tại.",["settings"]]];
 var CFNHOMBY={};CFNHOM.forEach(function(x,i){CFNHOMBY[x[0]]={d:x[1],pg:x[2],ord:i}});
 var APPPARAMS=[
+ ["P8-P9 · Khảo sát, phản hồi & khiếu nại","svNudge_days","Phiếu khảo sát gửi quá bao nhiêu ngày mà chưa ai trả lời thì phải gọi nhắc","ngày",5],
+ /* V9.57: thẻ "Nợ quá N ngày" trên Việc hôm nay - N là quyết định của trung tâm, không phải
+    con số của phần mềm. Trung tâm nhịp nhanh đặt 2 ngày, trung tâm nhịp chậm đặt 5. */
+ ["Giao việc nội bộ","viecOldAlert_days","Việc quá hạn bao nhiêu ngày trở lên thì coi là để mốc, phải dọn trước","ngày",3],
  /* V9.54 (anh Luân: "mọi thứ trên app phải tuân thủ cấu hình phải ko em") - đúng, và ba con số
     dưới đây từng cắm cứng trong mã: cổng học viên tự đặt 85%/80% cho màu chuyên cần & bài tập
     (trong khi CH6 đã có ATR/HCR), bảng khối lượng việc tự đặt 90%/70%, bảng cơ sở tự đặt 20%.
@@ -10721,7 +10795,17 @@ function renderThanhtoan(embed){var p="thanhtoan",fil=fget(p);var enr=rows("DL06
     khong phai so ho so) va tong da thu - hai con so nay khong co chip nao noi. */
  h+=statStrip([
   ["ti-cash",vnd(enr.reduce(function(a,e){return a+(isc(e.enrollment_status,"cancelled")?0:pinfo(e).rem)},0)),"Tổng còn nợ","#E08A1E","toàn hệ thống"],
-  ["ti-report-money",vnd(rows("DL07").reduce(function(a,x){return a+num(x.amount)},0)),"Tổng đã thu","#0D9488","toàn hệ thống"]]);
+  /* V9.57: o cu la "Tong da thu toan he thong" - con so tich luy TRON DOI, thang nao cung chi
+     tang, khong bao gio doi hoi mot quyet dinh nao. Thay bang tien DEN HAN HOM NAY: do moi la
+     thu ke toan phai nhin moi sang, va no doi moi ngay. */
+  (function(){var n=0,ti=0;enr.forEach(function(e){if(isc(e.enrollment_status,"cancelled"))return;
+    var st=pinfo(e),du=pvnd(e.next_payment_due);
+    if(st.rem>0&&du&&du.getTime()<=endToday()){n++;ti+=st.rem}});
+   /* KHONG gan hanh dong: chip "Den han" ngay ben duoi da loc dung tap nay roi - hai cua vao
+      cho cung mot viec la thua (luat "mot man mot bo dieu khien"). O nay lam viec CHIP KHONG
+      LAM DUOC: noi ra SO TIEN. Chip dem dong, o dem tien - hai su that khac nhau. */
+   return ["ti-calendar-dollar",vnd(ti),"Đến hạn thu, tính tới hôm nay","#E24B4A",
+    n?(n+" đăng ký - lọc bằng chip \"Đến hạn\" bên dưới"):"không còn khoản nào tới hạn"]})()]);
  var nDue=enr.filter(function(e2){var s2=pinfo(e2);var du=pvnd(e2.next_payment_due);return s2.rem>0&&du&&du<=endToday()&&!isc(e2.enrollment_status,"cancelled")}).length;
  view=fltApply(p,view);
  h+=filterBar(p,fil,[["all","Tất cả",enr.length],["due","Tới hẹn thu",nDue,nDue?"red":""],
@@ -11093,12 +11177,21 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=rows("DL14");
  var _imp=_done.filter(function(w){return isc(w.wow_outcome,"improved")}).length;
  var _wor=_done.length?Math.round(_imp/_done.length*100):null;
  h+=statStrip([
-  ["ti-thumb-up",_done.length,"Đã dạy xong","#0D9488",_imp+" tiến bộ"],
-  ["ti-clock-play",(function(){var g=0,n=0;_done.forEach(function(w){var x=wowHours(w);if(x){g+=x;n++}});
-    return n?((Math.round(g*10)/10)+"h"):"—"})(),"Giờ kèm đã ghi nhận","#7C3AED",
-   (function(){var thieu=_done.filter(function(w){return !wowHours(w)}).length;
-    return thieu?(thieu+" buổi thiếu mốc giờ"):"đủ mốc vào - ra"})()],
-  ["ti-target",(_wor==null?"—":_wor+"%"),"Tỷ lệ tiến bộ (WOR)",(_wor!=null&&_wor>=Math.round(kpiTh(/^WOR/,0.6)*100))?"#16A34A":"#E24B4A","mục tiêu ≥ "+kpiChip(/^WOR/,0.6,1),"",_done.length?pctG(_imp,_done.length,"buổi WOW đã dạy xong có ghi nhận HV tiến bộ"):"Chưa có buổi WOW nào dạy xong nên chưa tính được"],
+  /* V9.57: o cu la "Da day xong" - so tich luy tron doi, chi tang, khong doi hoi quyet dinh gi.
+     Doi sang buoi CUA HOM NAY: do la thu WOW coach phai nhin dau ca. */
+  (function(){var t0=new Date();var n=all.filter(function(w){var d=pvnd(w.wow_session_date);
+    return d&&sameDay(d,t0)&&!isc(w.wow_status,"cancelled")}).length;
+   return ["ti-calendar-star",n,"Buổi WOW hôm nay","#0D9488",n?"chuẩn bị nội dung trước giờ":"hôm nay không có buổi nào"]})(),
+  /* V9.57: o cu la "Gio kem da ghi nhan 47h" - so tich luy tron doi, khong ai quyet gi tu no.
+     Thu dang gia lai nam o cau phu ben duoi ("3 buoi thieu moc gio"). Dua no len lam so chinh. */
+  (function(){var thieu=_done.filter(function(w){return !wowHours(w)}).length;
+   return ["ti-clock-play",thieu,"Buổi thiếu mốc giờ vào/ra","#E08A1E",
+    thieu?"thiếu mốc thì không tính công được":"đủ mốc vào - ra cả"]})(),
+  /* V9.57: "Ty le tien bo (WOR)" la CHI SO - co nha rieng o luoi KPI kem nguong va dien giai.
+     Tren the no chi la con so nhuc nhich rat cham, khong doi hoi quyet dinh trong ngay. Doi sang
+     buoi da dat ma HV chua xac nhan - goi chot gio moi la viec cua hom nay. */
+  (function(){var n=all.filter(function(w){return isc(w.wow_status,"booked")}).length;
+   return ["ti-phone-check",n,"Đã đặt, chờ HV xác nhận","#7C3AED",n?"gọi chốt giờ kẻo HV quên":"đã xác nhận hết"]})(),
   ["ti-player-stop",rows("DL09").filter(function(x){return String(x.wow_quota_remaining||"")!==""&&wowQuotaOf(x.student_id).free<=0}).length,"HV đã hết lượt WOW","#6B7887","cấp thêm nếu có căn cứ"]]);
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả",all.length],["confirm","Chờ xác nhận lịch",_w.filter(function(x){return x.booked&&!x.confirmed&&!x.noshow}).length,"amber"],["upcoming","Đã xác nhận, sắp dạy",_w.filter(function(x){return x.confirmed&&!x.done&&!x.noshow}).length],["note","Chờ ghi nội dung",_w.filter(function(x){return x.done&&!x.note}).length,"amber"],["overdue","Quá hạn ghi chú",_w.filter(function(x){return x.overdue}).length,"red"]],view.length);
@@ -11393,7 +11486,12 @@ function renderKetthuc(){var p="ketthuc",fil=fget(p);var all=rows("DL18");
  var h=pageHead("Kết thúc khóa & Tái ghi danh","Nhập kết quả đầu ra - đánh giá mục tiêu - mời & chốt tái ghi danh",'<button class="btn primary" onclick="ktGen()"><i class="ti ti-school-off"></i>Tạo hồ sơ kết thúc cho lớp</button>');
  /* V9.51: 3 o loc doi lot bo, so don vao chip; giu o "Da tai ghi danh" vi mang muc tieu RER */
  h+=statStrip([
-  ["ti-award",all.filter(function(x){return isc(x.re_enrollment_status,"confirmed_with_deposit")}).length,"Đã tái ghi danh","#16A34A","mục tiêu RER ≥ "+kpiChip(/^RER/,0.4,1)]]);
+  /* V9.57: o cu dem nguoi DA tai ghi danh - thanh tich, khong phai viec. Nguoi da xong khoa ma
+     CHUA AI MOI moi la thu de lau se nguoi. Chi so RER van con nguyen o luoi KPI. */
+  (function(){var n=all.filter(function(x){return String(x.course_completion_time||"").trim()&&
+     !String(x.re_enrollment_contact_time||"").trim()&&!isc(x.re_enrollment_status,"confirmed_with_deposit","declined")}).length;
+   return ["ti-mail-forward",n,"Xong khóa, chưa ai mời học tiếp","#E24B4A",
+    n?"mời trong lúc còn nhiệt, để nguội là mất":"đã mời hết"]})()]);
  view=fltApply(p,view);
  h+=filterBar(p,fil,[["all","Tất cả",all.length],
   ["score","Chờ nhập KQ",all.filter(function(x){return !String(x.final_test_score||"").trim()}).length,"amber"],
@@ -12557,10 +12655,15 @@ function renderMaGioiThieu(embed){
  /* chính sách hiện hành */
  h+='<div class="notebar"><i class="ti ti-discount-2"></i>Chính sách hiện tại (Cài đặt → CH2): bạn được giới thiệu <b data-tip="Mức giảm cho người ĐƯỢC giới thiệu, áp dụng cho khóa đầu tiên - lấy từ Cài đặt > CH2 (chính sách giới thiệu), không cắm cứng trong app">giảm '+esc(off.txt)+'</b> khi đăng ký khóa đầu · người giới thiệu nhận <b>'+esc(reward)+'</b>.</div>';
  h+=statStrip([
-  ["ti-users",String(amb.length),"HV đã tạo mã dùng","#3B82C4"],
-  ["ti-ticket",String(totUses),"Lượt bạn dùng mã","#7C3AED"],
-  ["ti-user-check",String(totEnr),"Bạn đã đăng ký","#16A34A",Math.round(totEnr*100/(totUses||1))+"% chuyển đổi","",pctG(totEnr,totUses,"lượt dùng mã giới thiệu đã thành đăng ký thật")],
-  ["ti-discount-2",vnd(totDisc),"Ưu đãi đã cấp cho bạn bè","#E08A1E"]]);
+  /* ═══ V9.57 (anh Luân): bốn ô cũ ở đây đều là SỐ TÍCH LUỸ - "HV đã tạo mã", "lượt bạn dùng mã",
+     "bạn đã đăng ký", "ưu đãi đã cấp". Đọc thì vui, nhưng sáng mai đọc lại vẫn gần y hệt và
+     không ô nào bảo mình phải làm gì. Giữ đúng hai ô: một ô nói QUY MÔ (để biết chương trình có
+     sống không) và một ô nói VIỆC CÒN NỢ - lượt dùng mã chưa thành đăng ký, tức người đã quan
+     tâm mà chưa ai chốt. Đó mới là thứ cần nhìn mỗi ngày. */
+  ["ti-ticket",String(totUses),"Lượt bạn dùng mã","#7C3AED",totEnr+" bạn đã đăng ký","",pctG(totEnr,totUses,"lượt dùng mã đã thành đăng ký thật")],
+  (function(){var con=Math.max(0,totUses-totEnr);
+   return ["ti-phone-call",String(con),"Dùng mã nhưng chưa đăng ký","#E24B4A",
+    con?"gọi chốt - họ đã quan tâm sẵn rồi":"đã chốt hết"]})()]);
  var q=vnorm(window.MGQ||"");
  var list=amb.filter(function(g){return !q||vnorm(g.name+" "+g.code).indexOf(q)>=0});
  h+=tbar(srchHTML(window.MGQ||"","window.MGQ=this.value;reRenderKeep(CUR)","Tìm tên, SĐT hoặc mã...",300),
@@ -13136,8 +13239,12 @@ function renderGvdp(embed){
  h+=statStrip([
   ["ti-calendar",ses.length,"Buổi trong ngày","#3B82C4",noGv.length?(noGv.length+" buổi chưa có GV"):"đã có GV đủ"],
   ["ti-user-check",free.length+"/"+GV.length,"Giáo viên trống lịch cả ngày","#16A34A","có thể nhận thay"],
-  ["ti-building",Object.keys(ses.reduce(function(m,x){var c=find("DL10","class_id",x.class_id);if(c&&c.branch)m[c.branch]=1;return m},{})).length,"Cơ sở có lớp hôm nay","#7C3AED","lớp online không ràng buộc cơ sở"],
-  ["ti-device-laptop",ses.filter(function(x){return clsOnline(find("DL10","class_id",x.class_id)||{})}).length,"Buổi học online","#0D9488","ai cũng dạy thay được"]]);
+  /* V9.57: hai o cuoi cu la "Co so co lop hom nay" va "Buoi hoc online" - thong tin nen, biet
+     roi cung khong xep GV thay khac di. Doi sang hai cau hoi that su cua nguoi truc hom nay. */
+  ["ti-user-off",ses.filter(function(x){return !String(x.teacher_id||"").trim()}).length,"Buổi hôm nay chưa có GV","#E24B4A","giao người ngay, đừng để tới giờ"],
+  ["ti-calendar-off",(function(){var t0=new Date();t0.setHours(0,0,0,0);
+    return rows("DL11").filter(function(x){var d=pvnd(x.session_date);
+     return d&&sameDay(d,t0)&&isc(x.session_status,"cancelled")}).length})(),"Buổi đã huỷ hôm nay","#E08A1E","báo học viên chưa?"]]);
  h+=tbar('<span class="tblbl">Ngày</span><input type="date" class="sel" value="'+esc(ymd)+'" onchange="gvdpSet(this.value)">'+
   '<button class="pill" onclick="gvdpSet(\''+esc(fmtYMD(new Date(day.getTime()-864e5)))+'\')"><i class="ti ti-chevron-left"></i>Hôm trước</button>'+
   '<button class="pill" onclick="gvdpSet(\''+esc(fmtYMD(new Date(day.getTime()+864e5)))+'\')">Hôm sau<i class="ti ti-chevron-right"></i></button>',
@@ -13316,7 +13423,9 @@ function renderPhong(embed){
   ["ti-user-exclamation",byT.gv,"Giáo viên trùng giờ","#E08A1E",byT.gv?"cần đổi người hoặc đổi giờ":"không có"],
   ["ti-map-pin",nr.length,"Lớp tại chỗ chưa có phòng","#7C3AED",nr.length?"tới giờ mới đi tìm phòng":"đủ phòng"],
   ["ti-user-exclamation",rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()}).length,"Lớp mở chưa có GV chính","#DB2777","giao lớp ngay"],
-  ["ti-device-laptop",onl,"Lớp online","#0D9488","không ràng buộc phòng"]]);
+  /* V9.57: bo o "Lop online - khong rang buoc phong": tren mot trang ve XEP PHONG, dem lop
+     KHONG can phong la thong tin nen, khong ai quyet gi tu no. Cau da noi ro o dong ghi chu. */
+  ]);
  h+=pgBar("phong",cl.length);
  h+='<div class="panel"><div class="ph"><b>Các điểm đụng ('+cl.length+')</b><span class="mut" style="font-size:11.5px">hai mục cách nhau dưới '+slaChip("sessionSpan_hours",2,"giờ")+' thì coi là đụng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Loại</th><th>Ngày giờ</th><th>Chi tiết</th><th>Cơ sở</th><th></th></tr></thead><tbody>';
  if(!cl.length)h+='<tr><td class="empty" colspan="5">Không có điểm đụng nào - lịch sạch.</td></tr>';
@@ -13776,7 +13885,9 @@ function renderChang(){
  var nMiss=mine.filter(function(J){return J.miss.length}).length;
  var t0=new Date();t0.setHours(0,0,0,0);
  var nApt=mine.filter(function(J){var nf=jNF(J);return nf&&nf>=t0&&nf<=endToday()}).length;
- h+=statStrip([["ti-users",mine.length,"Hồ sơ trong chặng",A.col,""],
+ /* V9.57: bo o "Ho so trong chang" - duong ray ngay ben duoi da dem tung ga, cong lai la ra.
+    Giu lai dung ba o DOI HANH DONG: qua han, co hen hom nay, thieu du lieu. */
+ h+=statStrip([
   ["ti-alert-triangle",nOver,"Quá hạn SLA","#E24B4A",nOver?"xử lý trước":""],
   ["ti-calendar-event",nApt,"Có hẹn hôm nay","#2E5A88",""],
   ["ti-file-alert",nMiss,"Thiếu dữ liệu","#E08A1E",""]]);
