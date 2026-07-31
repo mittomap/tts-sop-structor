@@ -169,8 +169,8 @@
 > học + demo sống mọi ngày, canh THEO TỪNG NGÀY chứ không canh tổng).
 > · **Bỏ hết chữ "Room demo" khỏi giao diện** (anh Luân): chip ở thanh tiêu đề, dòng trạng thái,
 > nút Ngắt/Nối lại room, tiêu đề panel trong Cài đặt. **Cơ chế đồng bộ nhiều máy vẫn chạy và vẫn
-> tự bật** - bộ kiểm canh cả hai vế. Mất đi: nút "Ngắt room" (cách duy nhất demo riêng tư) - cần
-> thì em dựng lại chỗ kín.
+> tự bật** - bộ kiểm canh cả hai vế. Nút "Ngắt room" bỏ luôn, **anh Luân chốt không dựng lại**:
+> *"mặc định cứ để người ta demo với nhau, e cứ để như hiện tại ko cần ngắt đâu."*
 > · Gỡ được **một bộ kiểm giả** sống lâu nay: đòi 11 trang có dải số bấm được, trong đó 4 trang
 > chưa từng có dải nào - nó xanh chỉ vì hàm cắt vùng trả về cả trang khi không tìm thấy dải.
 >
@@ -4976,9 +4976,11 @@ demo"**) · tên "room" trong mọi câu thông báo. Người xem demo không c
 nguy hiểm hơn code sai*, bản sau đọc thấy tưởng còn dùng. `roomToggle()` giữ lại và cờ
 `ITTS_ROOM_OFF` vẫn có tác dụng, nhưng **không còn cửa bấm nào trên giao diện**.
 
-**Nói rõ cái mất đi:** nút "Ngắt room" là cách duy nhất để tách máy mình ra khi cần demo riêng tư
-(ai mở cùng link, cùng phiên bản dữ liệu đều vào chung). Nay không còn cửa đó. Nếu anh Luân cần
-lại thì em dựng một chỗ kín trong Cài đặt.
+**Nói rõ cái mất đi, và anh Luân đã chốt:** nút "Ngắt room" là cách duy nhất để tách máy mình ra
+khi cần demo riêng tư (ai mở cùng link, cùng phiên bản dữ liệu đều vào chung). Em hỏi lại, anh
+Luân chốt 31/07: *"cái room thì mặc định cứ để người ta demo với nhau, e cứ để như hiện tại ko
+cần ngắt đâu."* -> **KHÔNG dựng lại nút ngắt.** Cờ `ITTS_ROOM_OFF` vẫn nằm trong mã nhưng không
+có cửa bấm, và đó là trạng thái được duyệt chứ không phải việc còn tồn.
 
 Bộ kiểm canh **cả hai vế**: không màn nào còn hiện chữ "room", **và** `roomAuto`/`roomCast`/
 `roomCastState` phải còn sống và còn tự bật. Canh một vế thôi thì lần sau có người tiện tay bỏ
