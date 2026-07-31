@@ -14593,6 +14593,14 @@ function renderChang(){
  var h=pageHead("Chặng "+A.n+" · "+A.t,A.d,
   (mine.filter(function(J){return J.act}).length?'<button class="btn primary" onclick="window.CHANGK=\'\';runQueue(changList().filter(function(J){return J.act}).map(function(J){return J.C.pid}))"><i class="ti ti-player-play"></i>Chạy cả chặng</button>':''));
  /* --- ĐƯỜNG RAY GA --- */
+ /* V9.63 (anh Luân: *"mà 2 cái này khác gì nhau ko em?"*) - hỏi đúng chỗ dễ nhầm: trên cùng một
+    trang có HAI dải ngang trông na ná nhau, mà dải ray thì KHÔNG có tiêu đề nên không ai biết nó
+    trả lời câu hỏi gì. Hai dải trả lời hai câu khác hẳn:
+      ray  -> NGƯỜI đang đứng ở đâu trong chặng, bấm một ga là LỌC sổ trực ngay bên dưới
+      nghiệp vụ -> MÀN HÌNH để làm việc của chặng, bấm là SANG TRANG khác
+    Nay mỗi dải có tiêu đề nói thẳng nó là gì và bấm vào thì chuyện gì xảy ra. */
+ h+='<div class="ph" style="padding:0 2px 8px"><b><i class="ti ti-route" style="margin-right:6px"></i>Người đang ở đâu trong chặng</b>'+
+  '<span class="mut" style="margin-left:auto;font-size:11px">bấm một ga để lọc sổ trực bên dưới</span></div>';
  h+='<div class="nrail" data-tour="nrail" style="--mscol:'+A.col+'">';
  var prev=ARCS[A.n-2],next=ARCS[A.n];
  if(prev)h+='<div class="nst ghost" onclick="goArc(\''+prev.k+'\')" title="Sang '+esc(prev.t)+'"><span class="nsd"><i class="ti '+prev.ic+'"></i></span><span class="nsl">← C'+prev.n+' '+esc(prev.t)+'</span></div><div class="nscw"><span class="nsc"></span></div>';
@@ -14626,7 +14634,7 @@ function renderChang(){
   ["ti-file-alert",nMiss,"Thiếu dữ liệu","#E08A1E",""]],"chang");
  /* --- NGHIỆP VỤ TRONG CHẶNG --- */
  var jobs=arcJobs(a).filter(function(jb){return canSee(jb[0])||PBK[jb[0]]==null});
- if(jobs.length){h+='<div class="ph" style="padding:0 2px 8px"><b><i class="ti ti-briefcase" style="margin-right:6px"></i>Nghiệp vụ trong chặng</b></div><div class="arcjobs" style="--mscol:'+A.col+'">';
+ if(jobs.length){h+='<div class="ph" style="padding:0 2px 8px"><b><i class="ti ti-briefcase" style="margin-right:6px"></i>Nghiệp vụ trong chặng</b><span class="mut" style="margin-left:auto;font-size:11px">bấm để mở màn hình làm việc</span></div><div class="arcjobs" style="--mscol:'+A.col+'">';
   jobs.forEach(function(jb){var n=0;try{n=jb[4]()}catch(e){}
    h+='<div class="arcjob" onclick="go(\''+jb[0]+'\')" data-tip="'+esc(jb[3]+" — "+bamDiDau("go('"+jb[0]+"')"))+'"><span class="aji" style="background:'+A.col+'14;color:'+A.col+'"><i class="ti '+jb[1]+'"></i></span><div class="ajt" style="min-width:0">'+esc(jb[2])+'</div>' +(n?'<span class="ajn'+(n>=10?" hot":"")+'">'+n+'</span>':'')+'</div>'});
   h+='</div>'}
