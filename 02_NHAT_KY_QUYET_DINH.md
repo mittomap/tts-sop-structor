@@ -149,7 +149,17 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.57 — THẺ PHẢI LÀ MỘT VIỆC PHẢI QUYẾT HÔM NAY ✅ (30/07).**
+> **Phiên bản: V9.58 — NÚT RESET NAY GIỮ ĐÚNG LỜI HỨA ✅ (30/07).**
+> · Anh Luân hỏi *"bấm reset demo là dữ liệu sẽ hợp lý liền đúng ko?"* - đo ra là **KHÔNG**. Hộp
+> xác nhận hứa *"đồng thời KÉO dữ liệu tới N ngày"* nhưng việc kéo chỉ chạy khi lệch VƯỢT ngưỡng
+> 14 ngày. Mở app sau đúng một tuần: bấm reset xong vẫn lệch 7, **211/292 việc quá hạn** - màn
+> hình đỏ rực đúng lúc đang mở cho khách xem. Nay Reset đặt cờ, boot kéo bằng mọi giá (đo lại:
+> lệch 0, quá hạn 125).
+> · **Việc tồn mới**: chất lượng demo phụ thuộc THỨ trong tuần - T3/T4 có **0 hẹn liên hệ**, T3
+> **0 buổi WOW**, T6 **0 test**. Gốc ở pipeline gieo dồn vào T5; sửa phải gieo lại dữ liệu nền nên
+> để anh Luân quyết. **Trước mắt demo vào T5 hoặc T6 là đẹp nhất.**
+>
+> **Phiên bản trước: V9.57 — THẺ PHẢI LÀ MỘT VIỆC PHẢI QUYẾT HÔM NAY ✅ (30/07).**
 > · Anh Luân chỉ ra thẻ *"63 của Tuyển sinh, bộ phận đông việc nhất"* và đặt ra **phép thử mới**:
 > **con số này có đổi từ hôm nay sang ngày mai không?** Không đổi thì không đáng chiếm một cái thẻ.
 > Đo thật: xếp theo TỔNG luôn ra "Tuyển sinh 57" (bất biến); xếp theo **quá hạn** ra "Học vụ 31" -
@@ -4822,3 +4832,59 @@ bảng VIỆC · hai tham số ngưỡng mới phải nằm trong CH2. **155 →
 ### Số chốt phiên
 Thẻ **137 → 84** · Tổng quan **35 → 11** thẻ đầu trang, khối phòng ban 24 ô đọc chơi → 18 ô việc
 bấm được · 2 tham số mới vào CH2 (`viecOldAlert_days`, `svNudge_days`) · `_checkux` **161**.
+
+## V9.58 (30/07) - NÚT RESET HỨA MÀ KHÔNG GIỮ LỜI
+
+> Anh Luân: *"vậy giờ khi a cần demo, bấm reset demo là dữ liệu sẽ hợp lý liền đúng ko, trước đó
+> nhớ em có làm khai báo lại thời gian hay gì đó nữa"*
+
+Anh nhớ đúng - cơ chế có thật (`tshAuto`/`tshNow`, ngưỡng `demoAutoShift_days`). Nhưng đo ra thì
+**câu trả lời là KHÔNG**, và lỗi nằm đúng chỗ đau: hộp xác nhận của nút Reset ghi rõ
+
+> *"Đồng thời KÉO dữ liệu tới N ngày để lịch và hạn xử lý hợp lý với hôm nay."*
+
+...trong khi việc kéo chỉ chạy khi lệch **VƯỢT** ngưỡng tự dịch (mặc định 14 ngày). Mở app sau
+đúng một tuần thì lệch 7 < 14 - hộp thoại hứa, bấm xong không kéo gì cả.
+
+| Mở app sau 7 ngày, bấm Reset | Trước | Sau khi sửa |
+|---|---|---|
+| Độ lệch còn lại | **7 ngày** | 0 |
+| Việc đang nợ | 292 | 213 |
+| **Quá hạn** | **211** | 125 |
+
+211 việc quá hạn nghĩa là màn hình đỏ rực - trung tâm trông như đang sập, **đúng lúc đang mở cho
+khách xem**. Đây là lớp lỗi "mời rồi đuổi" quen thuộc, chỉ khác là lời mời nằm trong chính hộp
+xác nhận.
+
+**Cách sửa:** Reset đặt một lá cờ (`ITTS_DEMO_FORCESHIFT`) trước khi nạp lại; boot thấy cờ thì kéo
+bằng mọi giá rồi xoá cờ. Ngưỡng `demoAutoShift_days` giữ nguyên vai cũ - nó chỉ nói *"TỰ ĐỘNG kéo
+khi nào"*. Người dùng **bấm** Reset là một mệnh lệnh rõ ràng, không phải một gợi ý để cân nhắc.
+
+### Đo tiếp: chất lượng bộ demo phụ thuộc vào THỨ trong tuần
+
+Đo 14 ngày liên tiếp (mỗi ngày đều đã kéo về hôm nay), kết quả lặp theo chu kỳ 7 ngày:
+
+| Thứ | Buổi học | Hẹn liên hệ | WOW | Test | Quá hạn |
+|---|---|---|---|---|---|
+| T2 | 2 | 1 | 3 | 2 | 63 |
+| **T3** | 2 | **0** | **0** | 5 | 64 |
+| T4 | 2 | **0** | 2 | 7 | 78 |
+| **T5** | 4 | **22** | 3 | 5 | 82 |
+| T6 | 2 | 12 | 1 | **0** | 125 |
+| T7 | 2 | 7 | 2 | 4 | 152 |
+| CN | 2 | 8 | 2 | 4 | 179 |
+
+Lịch học ngày nào cũng có. Nhưng **thứ Ba/thứ Tư 0 hẹn liên hệ**, thứ Ba **0 buổi WOW**, thứ Sáu
+**0 test**. Demo vào thứ Ba thì hai thẻ đầu trang đọc số 0.
+
+Gốc: pipeline gieo hẹn dồn vào thứ Năm, còn phép kéo **giữ nguyên thứ trong tuần** (bội số 7) để
+lớp "T2-T4-T6" không bị đổi sang thứ khác - đó là chủ ý đúng, không phải lỗi.
+
+**Chưa sửa, và nói rõ vì sao:** rải lại hẹn/WOW/test đều các thứ phải làm **ở nguồn pipeline** rồi
+gieo lại `demo_data_big.json` - việc này đụng dữ liệu nền và sẽ làm lệch số đếm của khá nhiều bộ
+kiểm. Đó là một quyết định có đánh đổi (dữ liệu xáo trộn nhiều đổi lấy demo đẹp mọi ngày), nên
+để anh Luân chọn thay vì tự làm. **Trước mắt: demo vào thứ Năm hoặc thứ Sáu là đẹp nhất.**
+
+### Số chốt phiên
+Reset nay giữ đúng lời hứa ở MỌI độ lệch (đo lại: lệch 7 → sau reset còn 0, quá hạn 211 → 125).
+Ghi vào VIỆC TỒN: rải đều hẹn/WOW/test theo thứ trong tuần ở nguồn pipeline.

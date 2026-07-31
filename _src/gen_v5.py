@@ -1646,11 +1646,23 @@ function tshApply(days){
  return n}
 /* Tự dịch lúc khởi động khi dữ liệu đã quá cũ. Ngưỡng lấy từ cấu hình - trung tâm nào demo liên
    tục thì để nhỏ, ai chỉ mở thỉnh thoảng thì để lớn. */
+/* V9.58 (anh Luân hỏi: "bấm reset demo là dữ liệu sẽ hợp lý liền đúng ko?"). ĐO RA LÀ KHÔNG:
+   hộp xác nhận của nút Reset HỨA "đồng thời KÉO dữ liệu tới N ngày cho hợp lý với hôm nay",
+   nhưng sau khi nạp lại, tshAuto chỉ kéo khi lệch VƯỢT ngưỡng tự dịch (mặc định 14 ngày). Mở app
+   sau đúng một tuần thì lệch 7 < 14: lời hứa không được giữ, và màn hình ra 211/292 việc quá hạn
+   - trung tâm trông như đang sập, đúng lúc đang demo cho khách xem.
+   Nay Reset đặt một lá cờ trước khi nạp lại; boot thấy cờ thì kéo BẰNG MỌI GIÁ rồi xoá cờ.
+   Ngưỡng tự dịch vẫn giữ nguyên vai trò cũ: nó chỉ nói "tự động kéo khi nào", còn người dùng
+   BẤM RESET là một mệnh lệnh rõ ràng, không phải một gợi ý để cân nhắc. */
+var FORCESHIFT="ITTS_DEMO_FORCESHIFT";
 function tshAuto(){
  if(SVR)return 0;                       /* bản chạy trên Sheets là dữ liệu THẬT - không đụng vào */
+ var ep=false;try{ep=localStorage.getItem(FORCESHIFT)==="1"}catch(e){}
+ if(ep)try{localStorage.removeItem(FORCESHIFT)}catch(e){}
  var lim=num(paramOf("demoAutoShift_days",14))||14;
  var d=tshDays();
- if(Math.abs(d)<lim)return 0;
+ if(!ep&&Math.abs(d)<lim)return 0;
+ if(!d)return 0;
  var n=tshApply(d);
  if(n)setTimeout(function(){toast("Dữ liệu demo đã được kéo về hiện tại ("+(d>0?"+":"")+d+" ngày, "+n+" mốc thời gian) để lịch và hạn xử lý còn hợp lý.",6000)},900);
  return n}
@@ -1692,6 +1704,8 @@ function demoReset(){
   " không mất; muốn bỏ thì bấm riêng nút 'Về mặc định toàn bộ cấu hình'."+
   " (mọi cổng đang mở cũng nạp lại)","demoResetRun")}
 function demoResetRun(){if(CANLS)try{localStorage.removeItem(LSKEY)}catch(e){};
+ /* giữ đúng lời hộp xác nhận vừa hứa: kéo dữ liệu về hôm nay, kể cả khi chưa tới ngưỡng tự dịch */
+ if(CANLS)try{if(tshDays())localStorage.setItem(FORCESHIFT,"1")}catch(e){};
  if(ROOM.on){try{roomCast({t:"reset"})}catch(e){};setTimeout(function(){location.reload()},250);return}
  location.reload()}
 window.__pendSync=0;
