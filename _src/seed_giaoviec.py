@@ -247,26 +247,6 @@ def main():
         add(a, b, random.choice(pool), "support", st, req, due_h, cr_h,
             done_note="Đã xem giúp, có ghi chú lại vài điểm cần sửa.")
 
-    # ---- 3b. QUYỀN TẠM THEO VIỆC (câu hỏi của Luân 28/07) ----
-    # Việc dính hồ sơ học viên thì người nhận PHẢI được mở quyền, nhưng quyền là thứ đi mượn:
-    # có MỨC rõ (chỉ xem / xem và sửa), có HẠN rõ (mặc định = hạn việc + số ngày ân hạn),
-    # và tự tắt khi việc được xác nhận xong. Không có hạn thì quyền mở ra là mở mãi.
-    GRACE_H = 48        # ân hạn sau hạn việc - app đọc qua tham số CH2 permGrace_hours
-    for r in rows:
-        if not r["related_id"]:
-            continue
-        st = r["task_status"].split("(")[0].strip()
-        due = datetime.strptime(r["due_time"], "%d/%m/%Y %H:%M")
-        # việc chỉ đi xem thông tin thì cho XEM; việc phải nhập liệu vào hồ sơ mới cho SỬA
-        need_edit = r["task_type"].startswith("assign") and r["required"] == "Có"
-        r["perm_level"] = "edit (Xem và sửa)" if need_edit else "view (Chỉ xem)"
-        r["perm_until"] = fmt(due + timedelta(hours=GRACE_H))
-        r["perm_note"] = ("Quyền tạm mở theo việc %s, tự thu hồi khi việc được xác nhận xong "
-                          "hoặc khi quá hạn quyền." % r["task_id"])
-        if st in ("confirmed", "declined", "cancelled"):
-            r["perm_revoked_at"] = r.get("confirm_time") or r["done_time"] or fmt(NOW - timedelta(hours=1))
-            r["perm_level"] = "none (Đã thu hồi)"
-
     # ---- 3bis. YEU CAU DO CHINH HOC VIEN GUI LEN (V9.63) ----
     # Anh Luan mo tab "Yeu cau tu hoc vien" o hub CSKH va thay TRONG - vi du lieu demo khong co
     # dong nao loai student_request. Mot kenh co man hinh ma khong co du lieu thi lúc demo nhin
@@ -321,6 +301,26 @@ def main():
         r["task_type"] = "student_request (Yêu cầu từ học viên)"
         r["perm_level"] = "view (Chỉ xem)"
         r["perm_note"] = "Quyền tạm mở theo yêu cầu của chính học viên."
+
+    # ---- 3b. QUYỀN TẠM THEO VIỆC (câu hỏi của Luân 28/07) ----
+    # Việc dính hồ sơ học viên thì người nhận PHẢI được mở quyền, nhưng quyền là thứ đi mượn:
+    # có MỨC rõ (chỉ xem / xem và sửa), có HẠN rõ (mặc định = hạn việc + số ngày ân hạn),
+    # và tự tắt khi việc được xác nhận xong. Không có hạn thì quyền mở ra là mở mãi.
+    GRACE_H = 48        # ân hạn sau hạn việc - app đọc qua tham số CH2 permGrace_hours
+    for r in rows:
+        if not r["related_id"]:
+            continue
+        st = r["task_status"].split("(")[0].strip()
+        due = datetime.strptime(r["due_time"], "%d/%m/%Y %H:%M")
+        # việc chỉ đi xem thông tin thì cho XEM; việc phải nhập liệu vào hồ sơ mới cho SỬA
+        need_edit = r["task_type"].startswith("assign") and r["required"] == "Có"
+        r["perm_level"] = "edit (Xem và sửa)" if need_edit else "view (Chỉ xem)"
+        r["perm_until"] = fmt(due + timedelta(hours=GRACE_H))
+        r["perm_note"] = ("Quyền tạm mở theo việc %s, tự thu hồi khi việc được xác nhận xong "
+                          "hoặc khi quá hạn quyền." % r["task_id"])
+        if st in ("confirmed", "declined", "cancelled"):
+            r["perm_revoked_at"] = r.get("confirm_time") or r["done_time"] or fmt(NOW - timedelta(hours=1))
+            r["perm_level"] = "none (Đã thu hồi)"
 
     dl["DL23"] = rows
 

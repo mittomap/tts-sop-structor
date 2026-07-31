@@ -474,14 +474,28 @@ REFS = [("DL02b","lead_id","DL02"),("DL02b","staff_id","DL01"),("DL03","lead_id"
         ("DL19","referral_id","DL22"),("DL19","referrer_student_id","DL09"),
         ("DL21","course_id","DL05"),("DL21","hw_bank_id","DL20"),
         ("DL22","referrer_student_id","DL09"),("DL22","referred_lead_id","DL02"),("DL22","referred_enrollment_id","DL06"),
-        ("DL23","assigner_id","DL01"),("DL23","assignee_id","DL01"),
-        ("DL24","task_id","DL23"),("DL24","staff_id","DL01")]
+        ("DL23","assignee_id","DL01"),
+        ("DL24","task_id","DL23")]
 dead = []
 for t, f, ref in REFS:
     if not R(t) or f not in R(t)[0]:
         dead.append("!! %s.%s KHONG TON TAI (luat vo hieu)" % (t,f)); continue
     b = sorted({s(r,f) for r in R(t) if s(r,f) and s(r,f) not in IDX[ref]})
     if b: dead.append("%s.%s->%s: %d ma chet (%s)" % (t,f,ref,len(b), ", ".join(b[:3])))
+# DL23.assigner_id va DL24.staff_id: BINH THUONG tro toi DL01, NHUNG voi yeu cau do chinh hoc
+# vien gui len (student_request) thi nguoi gui la HOC VIEN - tra sang DL09. Mot cot tro toi hai
+# bang tuy loai dong, nen phai tach ra kiem chu khong nhet chung vao bang REFS.
+_ycid = {s(x,"task_id") for x in R("DL23") if s(x,"task_type").startswith("student_request")}
+for f, lbl in [("assigner_id", "DL23.assigner_id")]:
+    b1 = sorted({s(r,f) for r in R("DL23")
+                 if s(r,f) and s(r,"task_id") not in _ycid and s(r,f) not in IDX["DL01"]})
+    if b1: dead.append("%s->DL01: %d ma chet (%s)" % (lbl, len(b1), ", ".join(b1[:3])))
+    b2_ = sorted({s(r,f) for r in R("DL23")
+                  if s(r,f) and s(r,"task_id") in _ycid and s(r,f) not in IDX["DL09"]})
+    if b2_: dead.append("%s (yeu cau hoc vien)->DL09: %d ma chet (%s)" % (lbl, len(b2_), ", ".join(b2_[:3])))
+_b3 = sorted({s(r,"staff_id") for r in R("DL24")
+              if s(r,"staff_id") and s(r,"staff_id") not in IDX["DL01"] and s(r,"staff_id") not in IDX["DL09"]})
+if _b3: dead.append("DL24.staff_id->DL01/DL09: %d ma chet (%s)" % (len(_b3), ", ".join(_b3[:3])))
 rep("NANG", "11a Ma tham chieu CHET o cot *_id", dead)
 # 11b. DL23.related_id
 rel = []

@@ -4329,6 +4329,10 @@ var VIECNHOM=[
  "Xử lý khiếu nại","Hỏi lại HV sau khi đóng khiếu nại","Xin cảm nhận học viên",
  /* P10 · Kết thúc khóa & tái đăng ký */
  "Bảo lưu sắp hết hạn","Mời tái ghi danh",
+ /* V9.63: yêu cầu do học viên gửi lên - xuyên chặng, xếp ngay sau khối CSKH vì cùng là việc
+    "học viên đang chờ trung tâm"; nhóm nội bộ Giao việc xuống sau cùng. */
+ "Yêu cầu học viên quá hạn nhận","Yêu cầu học viên gửi tới","Yêu cầu học viên tới hạn hôm nay",
+ "Việc được giao quá hạn",
  /* Ngoài trục hành trình */
  "Trao thưởng giới thiệu"];
 var VIECNHOMBY={};VIECNHOM.forEach(function(g,i){VIECNHOMBY[g]=i});
@@ -4903,7 +4907,19 @@ function slaRow(it){var age=it.age!=null?'<span class="agebadge '+it.sev+'">'+es
 var SLAPRM={"Gọi hỏi thăm HV vắng":["slaAbsenceCall_hours",24],"Duyệt đơn xin nghỉ":["slaTaskAccept_hours",4],
  "Ghi nhận xét buổi":["slaTeacherNote_hours",48],"Chấm bài tập":["slaHomeworkGrading_hours",48],
  "Chấm test đầu vào":["slaGLA_hours",24],"Chờ chấm test":["slaTestResult_hours",24],
- "Ghi nội dung WOW":["slaWowNote_hours",24],"Xử lý khiếu nại":["slaComplaintHigh_hours",4]};
+ "Ghi nội dung WOW":["slaWowNote_hours",24],"Xử lý khiếu nại":["slaComplaintHigh_hours",4],
+ /* V9.63: các nhóm việc sinh từ bảng DL23 - hạn đều tính từ ngưỡng trong CH2, khai vào đây để
+    ô việc chỉ được ra CHỖ SỬA ngưỡng thay vì nói suông "theo luật SOP". */
+ "Yêu cầu học viên gửi tới":["slaTaskAccept_hours",4],
+ "Yêu cầu học viên chưa nhận":["slaTaskAccept_hours",4],
+ "Yêu cầu học viên quá hạn nhận":["slaTaskAccept_hours",4],
+ "Yêu cầu học viên quá hạn xử lý":["slaTaskAccept_hours",4],
+ "Yêu cầu học viên tới hạn hôm nay":["slaTaskAccept_hours",4],
+ "Việc được giao quá hạn":["slaTaskAccept_hours",4],
+ "Việc mới chưa bấm nhận":["slaTaskAccept_hours",4],
+ "Việc mới được giao":["slaTaskAccept_hours",4],
+ "Việc tới hạn hôm nay":["slaTaskAccept_hours",4],
+ "Việc chờ tôi xác nhận":["slaTaskConfirm_hours",24]};
 function slaOpen(key){
  var k=String(key||"").split("|"), rid=k[0], grp=k.slice(1).join("|");
  var it=bellItems().filter(function(x){
@@ -12940,10 +12956,15 @@ function hvReq(tieude,noidung,kind,rel){
   priority:eFull("enum_task_priority",kind==="tien"?"high":"normal"),
   required:"Có",title:tieude,content:noidung,
   related_type:"student",related_id:S.student_id,related_name:S.full_name,
-  perm_level:"view (Chỉ xem)",perm_until:"",perm_revoked_at:"",
-  perm_note:"Quyền tạm mở theo yêu cầu của chính học viên.",
+  perm_level:"view (Chỉ xem)",perm_revoked_at:"",
+  perm_note:"Quyền tạm mở theo yêu cầu của chính học viên - tự hết hạn, không mở vĩnh viễn.",
   /* hạn nhận việc lấy từ CH2, không cắm cứng "ngày mai" */
   due_time:(function(){var hrs=num(paramOf("slaTaskAccept_hours",4))||4;
+   var d=new Date(Date.now()+hrs*36e5);function z(n){return n<10?"0"+n:n}
+   return z(d.getDate())+"/"+z(d.getMonth()+1)+"/"+d.getFullYear()+" "+z(d.getHours())+":"+z(d.getMinutes())})(),
+  /* Quyền tạm PHẢI CÓ HẠN: mở quyền xem hồ sơ mà không ghi hạn thì mở ra là mở mãi. Hạn =
+     hạn nhận việc + cửa sổ xác nhận (cả hai đều là tham số CH2, không cắm cứng số nào). */
+  perm_until:(function(){var hrs=(num(paramOf("slaTaskAccept_hours",4))||4)+(num(paramOf("slaTaskConfirm_hours",24))||24);
    var d=new Date(Date.now()+hrs*36e5);function z(n){return n<10?"0"+n:n}
    return z(d.getDate())+"/"+z(d.getMonth()+1)+"/"+d.getFullYear()+" "+z(d.getHours())+":"+z(d.getMinutes())})(),
   task_status:eFull("enum_task_status","new"),

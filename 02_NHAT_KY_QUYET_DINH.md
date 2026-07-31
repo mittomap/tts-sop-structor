@@ -5149,6 +5149,40 @@ việc nội bộ **đã quá hạn**; việc nội bộ còn trong hạn thì k
 Bộ kiểm mới đóng cả ba vai: quản trị viên phải thấy, đúng người nhận phải thấy, **người khác
 không được thấy**. `_check14` 196 → **201 tiêu chí**.
 
+### N. Ba chỗ đỏ sau khi dời yêu cầu học viên vào dải việc - và một hợp đồng đo cái đang chuyển động
+
+Bật xong thì bộ kiểm đỏ ba chỗ. Cả ba đều là hệ quả thật, không phải nhiễu.
+
+**1. `check_logic` - quyền tạm.** Tám dòng gieo mới dính hồ sơ học viên mà không ghi mức quyền /
+hạn quyền. Nguyên nhân buồn cười: khối gieo của em nằm **sau** khối "quyền tạm theo việc" trong
+cùng file, nên khối đó chạy xong rồi mới có dòng mới. Đảo thứ tự - gieo trước, quyền tạm sau -
+là xong, và các dòng mới hưởng đúng luật sẵn có thay vì em tự viết lại một bản riêng.
+
+Kèm theo: `hvReq()` trong app cũng để `perm_until` rỗng. Nay tính từ **hạn nhận việc + cửa sổ xác
+nhận**, cả hai đều là tham số CH2. *Mở quyền xem hồ sơ mà không ghi hạn thì mở ra là mở mãi.*
+
+**2. `check_logic` - mã tham chiếu chết.** Luật 11a khai `DL23.assigner_id -> DL01`. Nhưng với
+yêu cầu học viên, **người gửi là học viên** nên nó trỏ sang DL09; luật kêu 8 mã chết. Cùng một
+cột trỏ tới hai bảng tuỳ loại dòng - phải tách ra kiểm riêng chứ không nhét chung vào bảng REFS.
+Tương tự `DL24.staff_id` (dòng trao đổi do học viên viết).
+
+**3. `_check17` - hợp đồng thứ tự nhóm việc.** Bốn nhóm mới chưa khai: đã khai. Nhưng nửa sau
+của hợp đồng đỏ vì một lý do khác hẳn: nó báo *"khai thứ tự cho nhóm KHÔNG còn tồn tại: Mời tái
+ghi danh"*. Nhóm đó **vẫn hợp lệ** - chỉ là hôm nay không có học viên nào tới hạn mời lại.
+
+Nửa sau ấy đang **đo cái đang chuyển động**: đối chiếu bản khai với *nhóm có thật hôm nay*. Hôm
+nay đỏ, mai lại xanh, không ai sửa gì cả. Ý định thật của nó là *cấm khai tên một nhóm mà không
+luật nào sinh ra được* - nên nay nó đối chiếu với **nguồn**: tên nhóm nằm trong lời gọi `add(...)`
+của `slaItems` cộng tên các chặng hành trình.
+
+> **LUẬT (nhắc lại lần thứ hai trong một phiên):** *hợp đồng phải neo vào cái đứng yên.* Bản khai
+> là thứ đứng yên trong mã; số dòng hôm nay là thứ chuyển động. Neo vào cái chuyển động thì bộ
+> kiểm biến thành máy báo động giả, mà máy báo động giả thì người ta tắt.
+
+**4. `_check16` - ngưỡng phải chỉ được chỗ sửa.** Các nhóm việc mới không khai vào `SLAPRM` nên
+ô việc chỉ nói suông. Đã khai đủ 10 nhóm sinh từ DL23 (yêu cầu học viên + giao việc nội bộ) trỏ
+về `slaTaskAccept_hours` / `slaTaskConfirm_hours`.
+
 ### L. Trang chủ bản demo
 
 Bỏ câu dẫn "Ba cổng dùng chung một bộ dữ liệu..." theo yêu cầu, chỉ giữ logo + ba thẻ. Nền: bỏ hẳn

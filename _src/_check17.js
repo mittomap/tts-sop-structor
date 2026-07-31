@@ -240,8 +240,21 @@ t("co trang ngoai LISTCFG cung dung duoc (giao viec)", fltCode("giaoviec")==="DL
  var that={};try{slaItems().forEach(function(x){if(x.grp)that[x.grp]=1})}catch(e){}
  var chuaKhai=Object.keys(that).filter(function(g){return VIECNHOMBY[g]==null});
  t("MOI nhom viec co that deu duoc khai thu tu"+(chuaKhai.length?": "+chuaKhai.slice(0,5).join(" | "):""), chuaKhai.length===0);
- var khaiChet=VIECNHOM.filter(function(g){return !that[g]});
- t("khong con khai thu tu cho nhom KHONG con ton tai"+(khaiChet.length?": "+khaiChet.slice(0,5).join(" | "):""), khaiChet.length===0);
+ /* V9.63 - NUA SAU CUA HOP DONG NAY TUNG DO CAI DANG CHUYEN DONG. Truoc day no doi chieu ban
+    khai voi NHOM CO THAT HOM NAY: mot nhom hop le nhung hom nay khong co dong nao (vi du
+    "Moi tai ghi danh" - ngay nao khong co hoc vien nao toi han moi lai) lien bi ket la khai
+    thua. Do la do cai dang chuyen dong - hom nay do, mai lai xanh, khong sua gi ca.
+    Y DINH that su: cam khai ten mot nhom ma KHONG luat nao sinh ra duoc. Vay thi doi chieu voi
+    NGUON: ten nhom nam trong loi goi add(...) cua slaItems, cong ten cac chang hanh trinh. */
+ var SRC=require('fs').readFileSync('./_APP.js','utf8');
+ var CONHAM={};
+ (SRC.match(/add\((?:CAT|"[^"]*")\s*,\s*"([^"]*)"/g)||[]).forEach(function(m){
+  var g=m.replace(/^add\((?:CAT|"[^"]*")\s*,\s*"/,"").replace(/"$/,"");if(g)CONHAM[g]=1});
+ (SRC.match(/add\(CAT,_yc\?"([^"]*)":"([^"]*)"/g)||[]).forEach(function(m){
+  var mm=m.match(/add\(CAT,_yc\?"([^"]*)":"([^"]*)"/);if(mm){CONHAM[mm[1]]=1;CONHAM[mm[2]]=1}});
+ try{JSTAGE.forEach(function(x){if(x&&x.t)CONHAM[x.t]=1})}catch(e){}
+ var khaiChet=VIECNHOM.filter(function(g){return !that[g]&&!CONHAM[g]});
+ t("khong con khai thu tu cho nhom KHONG luat nao sinh ra duoc"+(khaiChet.length?": "+khaiChet.slice(0,5).join(" | "):""), khaiChet.length===0);
  t("khong khai trung mot nhom hai lan", VIECNHOM.length===Object.keys(VIECNHOMBY).length);
  /* mot vai moc hanh trinh phai dung dung cho - bat nguoc thu tu la do */
  function tr(g){return VIECNHOMBY[g]}
