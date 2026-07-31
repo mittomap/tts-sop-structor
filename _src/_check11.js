@@ -378,4 +378,46 @@ console.log(bad.length?("FAIL:\n  "+bad.join("\n  ")):"OK: "+ok);
  t("V9.22 tab Phan quyen render du 3 khoi", (function(){window.SETTAB="phanquyen";var o=RENDER.settings();window.SETTAB="ch2";
   return o.indexOf("Ma trận")>=0&&o.indexOf("Xem thử bằng mắt của")>=0&&o.indexOf("Che thông tin nhạy cảm")>=0})());
 })();
+
+/* ==========================================================================================
+   V9.63 - HAI DAI NGANG TREN TRANG CHANG KHONG DUOC DAM CHAN NHAU (anh Luan: "ban do chang va
+   nghiep vu trong chang neu ko co cau truc tot rat de du thua")
+   Do ra that: o "Xep lop & Onboarding" tung dem 6 = y het ga "Onboarding"; o "Bao luu / Bo hoc"
+   trung KHIT ca ten lan so voi ga cung ten. Luat tach bach:
+     GA  = dem NGUOI dang dung o trang thai do
+     O   = dem VIEC dang tre han cua man hinh do
+   Bo kiem nay canh ca hai mat: khong trung TEN, va khong trung SO voi bat ky ga nao cung chang.
+   ========================================================================================== */
+(function(){
+ setRole("all");cfEnsure();CURSTAFF="";
+ var J=[];try{J=jAll()}catch(e){}
+ var xauTen=[],xauSo=[];
+ ["changA","changB","changC","changD"].forEach(function(a){
+  var cnt={};J.forEach(function(x){if(arcOf(x.k)===a)cnt[x.k]=(cnt[x.k]||0)+1});
+  var ga=(ARCRAIL[a]||[]).map(function(k){return {t:String((JBY[k]||{}).t||k),n:(cnt[k]||0)}});
+  var jobs=[];try{jobs=arcJobs(a)||[]}catch(e){}
+  jobs.forEach(function(jb){
+   var ten=String(jb[2]||""),n=0;try{n=jb[4]()}catch(e){n=-1}
+   ga.forEach(function(g){
+    if(g.t===ten)xauTen.push(a+": o va ga cung ten '"+ten+"'");
+    if(g.t===ten&&g.n===n)xauSo.push(a+": '"+ten+"' ga="+g.n+" o="+n)})})});
+ t("o nghiep vu KHONG trung ten voi ga nao cung chang"+(xauTen.length?": "+xauTen.slice(0,3).join(" | "):""), xauTen.length===0);
+ t("o nghiep vu KHONG lap lai dung con so cua ga"+(xauSo.length?": "+xauSo.slice(0,3).join(" | "):""), xauSo.length===0);
+ /* Va o phai dem duoc THAT - dem nham ten cot thi ra 0 vinh vien ma khong ai biet (bay da can) */
+ var chet=[];
+ ["changA","changB","changC","changD"].forEach(function(a){
+  (arcJobs(a)||[]).forEach(function(jb){var n=-1;try{n=jb[4]()}catch(e){n=-1}
+   if(n<0)chet.push(a+"/"+jb[2]+" nem loi")})});
+ t("moi o nghiep vu deu dem duoc (khong nem loi)"+(chet.length?": "+chet.join(", "):""), chet.length===0);
+ /* Moi dai phai co tieu de noi no tra loi cau gi - truoc day dai ray khong co tieu de nen hai
+    dai nhin y het nhau. */
+ /* changA..D dung CHUNG mot ham ve (renderChang), khong co RENDER.changB rieng - goi nham thi
+    ba tieu chi duoi bao do ma that ra man hinh van dung. Goi dung cua vao. */
+ var hA="";try{window.CHANGK="";hA=(typeof renderChang==="function")?renderChang("changB"):(RENDER["changB"]?RENDER["changB"]():"")}catch(e){hA="LOI:"+e.message}
+ t("dai ray co tieu de noi no la BAN DO NGUOI", hA.indexOf("Người đang ở đâu trong chặng")>=0);
+ t("dai nghiep vu co tieu de rieng", hA.indexOf("Nghiệp vụ trong chặng")>=0);
+ t("moi dai noi ro bam vao thi chuyen gi xay ra",
+   hA.indexOf("bấm một ga để lọc")>=0&&hA.indexOf("bấm để mở màn hình")>=0);
+})();
+
 console.log(bad.length?("FAIL2:\n  "+bad.join("\n  ")):"TONG: "+ok);

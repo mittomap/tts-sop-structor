@@ -882,7 +882,12 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
 (function(){
  var GIONG=[/\bem\s+(?:bổ sung|thêm|làm|viết|để|dựng)/i, /phần em\b/i, /của em\b/i,
    /anh Lu[\u00e2a]n/i, /SOP ch[u\u01b0]a c[o\u00f3] b[a\u1ea3]ng/i, /SOP kh[o\u00f4]ng c[o\u00f3] b[a\u1ea3]ng/i,
-   /b[o\u1ed9] ki[e\u1ec3]m/i, /\bV9\.\d/, /gen_v5/i, /_check\d/i, /demo_data_big/i];
+   /b[o\u1ed9] ki[e\u1ec3]m/i, /\bV9\.\d/, /gen_v5/i, /_check\d/i, /demo_data_big/i,
+   /* V9.63 (anh Luan: *"chua ban duoc la chua ban duoc, em la app ma em gan cam than vao sao
+      duoc"*): app noi SU THAT, khong binh luan, khong dua. "chua ban duoc dong nao" / "Nhe
+      nhang!" la giong nguoi ke chuyen chu khong phai giong mot he thong van hanh. */
+   /\u0111[o\u1ed3]ng n[a\u00e0]o/i, /Nh[e\u1eb9] nh[a\u00e0]ng!/i, /g[i\u00ec] c[a\u1ea3]!/i,
+   /ngon l[a\u00e0]nh/i, /th[a\u1ea3]nh th[o\u01a1]i/i, /kh[o\u1ecf]e re/i, /s[a\u1ea1]ch bong/i];
  var bay=[];
  function soi(nhan,h){
   if(!h)return;
