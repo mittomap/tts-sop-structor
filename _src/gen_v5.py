@@ -1348,13 +1348,18 @@ body.drsz .drawer{transition:none}
 .nst.br.has .nsd{border-color:var(--red);color:var(--red)}
 .nst.br.on .nsd{background:var(--red);border-color:var(--red);color:#fff}
 .nrsep{width:1px;background:var(--line);align-self:stretch;margin:4px 12px;flex:0 0 auto}
-.arcjobs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-bottom:12px}
-.arcjob{display:flex;gap:11px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 13px;cursor:pointer;transition:.13s}
+/* V9.63 (anh Luân: *"mấy cái nghiệp vụ trong chặng, em thiết kế cho nó cùng 1 dòng được ko, bị
+   rớt xuống 1 block hơi xấu"*): trước đây là lưới thẻ tối thiểu 250px nên 9 nghiệp vụ của C2 rớt
+   thành ba hàng, nhìn như một khối riêng chứ không phải một dải điều hướng. Nay một hàng ngang,
+   các ô chia đều và co lại vừa màn; câu mô tả dời vào chú thích rê chuột (không bỏ chữ nào).
+   Điện thoại thì cho xuống hàng lại - ép một dòng ở màn hẹp là chữ nhỏ tới mức không đọc được. */
+.arcjobs{display:flex;flex-wrap:nowrap;gap:8px;margin-bottom:12px}
+.arcjob{display:flex;gap:8px;align-items:center;flex:1 1 0;min-width:0;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 11px;cursor:pointer;transition:.13s}
 .arcjob:hover{border-color:var(--mscol,#2E5A88);box-shadow:0 3px 12px rgba(16,32,58,.08)}
-.arcjob .aji{width:34px;height:34px;border-radius:8px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--blueb);color:var(--blue)}
-.arcjob .ajt{font-size:12.5px;font-weight:800;color:var(--navy)}
-.arcjob .ajm{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.45}
-.arcjob .ajn{margin-left:auto;flex:0 0 auto;font-size:11px;font-weight:800;background:var(--bg);border-radius:20px;padding:2px 8px;color:var(--navy)}
+.arcjob .aji{width:30px;height:30px;border-radius:8px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--blueb);color:var(--blue)}
+.arcjob .ajt{font-size:12px;font-weight:800;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.arcjob .ajn{margin-left:auto;flex:0 0 auto;font-size:11px;font-weight:800;background:var(--bg);border-radius:20px;padding:2px 7px;color:var(--navy)}
+@media(max-width:820px){.arcjobs{flex-wrap:wrap}.arcjob{flex:1 1 44%}}
 .arcjob .ajn.hot{background:#FBF0EF;color:var(--red)}
 @media(max-width:640px){.nsl{max-width:74px}.nst{min-width:72px}}
 @media(max-width:820px){.obcards.rows .obcard .obm{max-width:200px}.obcards.rows .obcard .obact{margin-left:0}}
@@ -14623,7 +14628,7 @@ function renderChang(){
  var jobs=arcJobs(a).filter(function(jb){return canSee(jb[0])||PBK[jb[0]]==null});
  if(jobs.length){h+='<div class="ph" style="padding:0 2px 8px"><b><i class="ti ti-briefcase" style="margin-right:6px"></i>Nghiệp vụ trong chặng</b></div><div class="arcjobs" style="--mscol:'+A.col+'">';
   jobs.forEach(function(jb){var n=0;try{n=jb[4]()}catch(e){}
-   h+='<div class="arcjob" onclick="go(\''+jb[0]+'\')" data-tip="'+esc(bamDiDau("go('"+jb[0]+"')"))+'"><span class="aji" style="background:'+A.col+'14;color:'+A.col+'"><i class="ti '+jb[1]+'"></i></span><div style="min-width:0"><div class="ajt">'+esc(jb[2])+'</div><div class="ajm">'+esc(jb[3])+'</div></div>'+(n?'<span class="ajn'+(n>=10?" hot":"")+'">'+n+'</span>':'')+'</div>'});
+   h+='<div class="arcjob" onclick="go(\''+jb[0]+'\')" data-tip="'+esc(jb[3]+" — "+bamDiDau("go('"+jb[0]+"')"))+'"><span class="aji" style="background:'+A.col+'14;color:'+A.col+'"><i class="ti '+jb[1]+'"></i></span><div class="ajt" style="min-width:0">'+esc(jb[2])+'</div>' +(n?'<span class="ajn'+(n>=10?" hot":"")+'">'+n+'</span>':'')+'</div>'});
   h+='</div>'}
  /* --- SỔ TRỰC CHẶNG --- */
  var LT=changList();
