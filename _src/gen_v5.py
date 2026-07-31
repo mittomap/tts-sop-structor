@@ -2693,7 +2693,7 @@ var THEDEF={
   ["bv_risk_stu","Học viên nguy cơ","Học viên bị đánh dấu nguy cơ trên trục chuyên cần hoặc học thuật. Muốn xem danh sách: mở trang Học viên nguy cơ ở menu trái."],
   ["bv_fb_new","Phản hồi chờ phân loại","Phản hồi mới nhận, chưa ai xếp loại. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Phản hồi / Góp ý."],
   ["bv_kn_open","Khiếu nại đang xử lý","Khiếu nại chưa đóng. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Khiếu nại."],
-  ["bv_ck_duyet","Chiết khấu chờ duyệt","Đăng ký có mức chiết khấu vượt ngưỡng phải trình quản lý mà chưa ai duyệt. Muốn xem danh sách: mở trang Chờ duyệt ở menu trái, tab Duyệt chiết khấu."],
+  ["bv_ck_duyet","Chiết khấu cần duyệt","Đăng ký có mức chiết khấu vượt ngưỡng phải trình quản lý mà chưa ai duyệt. Muốn xem danh sách: mở trang Chờ duyệt ở menu trái, tab Duyệt chiết khấu."],
   ["bv_doilop2","Đổi lớp từ 2 lần","Học viên đã đổi lớp từ 2 lần trở lên - theo CH3 phải có quản lý phê duyệt. Muốn xem danh sách: mở trang Xếp lớp & Onboarding ở menu trái."],
   ["bv_kn_high","Khiếu nại mức CAO","Khiếu nại xếp mức cao còn đang mở - quản lý phải tham gia trong hạn khai ở Ngưỡng & SLA. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Khiếu nại."],
   ["bv_kn_esc","Khiếu nại đã leo thang","Khiếu nại đã đẩy lên cấp trên vì học viên không chấp nhận cách xử lý. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Khiếu nại."],
@@ -3934,7 +3934,7 @@ function BANGVIEC(){
      ["ti-message-2",FB.filter(function(r){return !String(r.classified_at||"").trim()}).length,"Phản hồi chờ phân loại","#3B82C4","SLA "+slaChip("slaFeedbackClassify_hours",24,"giờ"),"goCS('phanhoi')"],
      ["ti-alert-triangle",KN.filter(function(r){return !isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại đang xử lý","#6B4FA0","SLA phân công "+slaChip("slaComplaintFirstResponse_hours",4,"giờ"),"goCS('khieunai')"]]},
  quanly:{bc:"BC9",t:"Bảng Quản lý",d:"Việc cần cấp quản lý gật đầu, theo bảng phân quyền CH3.",
-  o:[["ti-discount-2",duyCkList().length,"Chiết khấu chờ duyệt","#B58A2B","từ "+money(ckThreshold())+" trở lên","goDuyet('duyetck')"],
+  o:[["ti-discount-2",duyCkList().length,"Chiết khấu cần duyệt","#B58A2B","từ "+money(ckThreshold())+" trở lên","goDuyet('duyetck')"],
      ["ti-transfer",OB.filter(function(r){return num(r.placement_change_count)>=2}).length,"Đổi lớp từ 2 lần","#6B4FA0","cần quản lý phê duyệt","go('xeplop')"],
      ["ti-alert-triangle",KN.filter(function(r){return isc(r.complaint_severity,"high")&&!isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại mức CAO","#E24B4A","quản lý tham gia trong "+slaChip("slaComplaintHigh_hours",4,"giờ"),"goCS('khieunai')"],
      ["ti-arrow-up-right",KN.filter(function(r){return String(r.escalated_to||"").trim()&&!isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại đã leo thang","#DB2777","HV không chấp nhận cách xử lý","goCS('khieunai')"],
@@ -3963,7 +3963,7 @@ function BANGVIEC(){
   o:[["ti-cash",E.filter(function(r){return num(r.remaining_amount)>0&&!isc(r.enrollment_status,"cancelled")}).length,"Đơn còn nợ phí","#B58A2B","nhắc trước hạn "+slaChip("installmentRemind_days",3,"ngày"),"goTS('thanhtoan')"],
      ["ti-receipt",rows("DL07").filter(function(r){return !String(r.verified_by||"").trim()}).length,"Phiếu thu chờ đối soát","#3B82C4","kế toán xác nhận","goDuyet('duyetthu')"],
      ["ti-arrow-back-up",E.filter(function(r){return isc(r.enrollment_status,"cancelled")&&num(r.paid_amount)>0&&!rows("DL07").some(function(p){return String(p.enrollment_id||"")===String(r.enrollment_id||"")&&num(p.amount)<0})}).length,"Hoàn tiền chờ duyệt","#E24B4A","SLA "+slaChip("slaRefundProcess_days",7,"ngày"),"goDuyet('duyethoan')"],
-     ["ti-discount-2",E.filter(function(r){return num(r.discount_amount)>0&&!String(r.discount_approved_by||"").trim()}).length,"Chiết khấu chờ duyệt","#6B4FA0","kế toán chỉ xác nhận và làm theo","goDuyet('duyetck')"]]}}}
+     ["ti-discount-2",E.filter(function(r){return num(r.discount_amount)>0&&!String(r.discount_approved_by||"").trim()}).length,"Chiết khấu cần duyệt","#6B4FA0","kế toán chỉ xác nhận và làm theo","goDuyet('duyetck')"]]}}}
 /* Số việc được giao cho tôi, theo trạng thái - dùng cho bảng của nhóm hỗ trợ. */
 function gvSo(k){var me=CURSTAFF||"";
  var L=rows("DL23").filter(function(t){return String(t.assignee_id||"")===me});
@@ -4001,7 +4001,7 @@ var BVDUYET=[["ck_lon",0],["doilop2",1],["kn_duyet",2],["kn_duyet",3],["hoantien
    ô bảng việc bấm được) và người dùng phải học phân biệt. Một luật cho cả app: THẺ LÀ ĐỒNG HỒ.
    Đường tới danh sách không mất - nó chuyển vào câu chú thích, và bộ kiểm canh câu đó không
    được chỉ vào chỗ không có. */
-var BVMA={"Lead mới (chưa LH)":"bv_lead_new","Lead đang khai thác":"bv_lead_work","Test sắp tới":"bv_test_up","Tư vấn cần làm":"bv_tv_can","Test chờ chấm":"bv_test_wait","Test đã chấm":"bv_test_done","WOW sắp tới":"bv_wow_up","WOW có tiến bộ":"bv_wow_imp","Buổi đã hoàn thành":"bv_ses_done","Cần viết nhận xét buổi":"bv_ses_note","Bài tập chờ chấm":"bv_hw_wait","HV nguy cơ học thuật":"bv_risk_aca","Nhập học chưa xong":"bv_ob_open","Học viên nguy cơ":"bv_risk_stu","Phản hồi chờ phân loại":"bv_fb_new","Khiếu nại đang xử lý":"bv_kn_open","Chiết khấu chờ duyệt":"bv_ck_duyet","Đổi lớp từ 2 lần":"bv_doilop2","Khiếu nại mức CAO":"bv_kn_high","Khiếu nại đã leo thang":"bv_kn_esc","Hoàn tiền chờ duyệt":"bv_hoan","Việc mới chờ nhận":"bv_tk_new","Đang làm":"bv_tk_doing","Quá hạn":"bv_tk_late","Chờ người giao xác nhận":"bv_tk_wait","Hồ sơ nhân sự còn thiếu":"bv_hs_thieu","Buổi thiếu mốc giờ vào/ra":"bv_gio_thieu","Đơn còn nợ phí":"bv_no_phi","Phiếu thu chờ đối soát":"bv_thu_soat"};
+var BVMA={"Lead mới (chưa LH)":"bv_lead_new","Lead đang khai thác":"bv_lead_work","Test sắp tới":"bv_test_up","Tư vấn cần làm":"bv_tv_can","Test chờ chấm":"bv_test_wait","Test đã chấm":"bv_test_done","WOW sắp tới":"bv_wow_up","WOW có tiến bộ":"bv_wow_imp","Buổi đã hoàn thành":"bv_ses_done","Cần viết nhận xét buổi":"bv_ses_note","Bài tập chờ chấm":"bv_hw_wait","HV nguy cơ học thuật":"bv_risk_aca","Nhập học chưa xong":"bv_ob_open","Học viên nguy cơ":"bv_risk_stu","Phản hồi chờ phân loại":"bv_fb_new","Khiếu nại đang xử lý":"bv_kn_open","Chiết khấu cần duyệt":"bv_ck_duyet","Đổi lớp từ 2 lần":"bv_doilop2","Khiếu nại mức CAO":"bv_kn_high","Khiếu nại đã leo thang":"bv_kn_esc","Hoàn tiền chờ duyệt":"bv_hoan","Việc mới chờ nhận":"bv_tk_new","Đang làm":"bv_tk_doing","Quá hạn":"bv_tk_late","Chờ người giao xác nhận":"bv_tk_wait","Hồ sơ nhân sự còn thiếu":"bv_hs_thieu","Buổi thiếu mốc giờ vào/ra":"bv_gio_thieu","Đơn còn nợ phí":"bv_no_phi","Phiếu thu chờ đối soát":"bv_thu_soat"};
 function bvStrip(t,bc,d,o,tour){
  if(!o.length)return "";
  return '<div class="sechd"'+(tour?' data-tour="'+tour+'"':'')+'>'+esc(t)+

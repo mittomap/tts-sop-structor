@@ -182,7 +182,8 @@ print("KET QUA COT: DAT - moi cot SOP mo ta deu duoc app dung, hoac da khai ly d
 # Khong soi ma nguon - soi ma nguon chi biet "co viet" chu khong biet "co chay".
 
 TRIG_BOQUA = {
-    "NA037": "Nhan 'buoi WOW da ghi noi dung' - trang thai XONG.",
+    # NA037 da bo khoi danh sach nay 31/07: sau khi gieo lai du lieu demo (WOW trai deu 18
+    # ngay), app CO sinh ra tinh huong nay that - giu trong danh sach bo qua la khai gian.
     "NA039": "Nhan 'khao sat da tra loi' - trang thai XONG.",
     "NA045": "Nhan 'khieu nai da dong' - trang thai XONG, con viec hoi lai HV thi da co luat rieng "
              "(slaComplaintFollowup_days).",

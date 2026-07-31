@@ -4914,7 +4914,16 @@ một tập con, dải này dùng đường `ids` của `statStrip` - khai mã t
 đếm theo số thứ tự.
 
 Dọn kèm: **"Chiết khấu cần duyệt"** (bảng Quản lý) và **"Chiết khấu chờ duyệt"** (bảng Kế toán) là
-MỘT việc mang hai tên - thống nhất còn một.
+MỘT việc mang hai tên - thống nhất còn một. **Và em thống nhất SAI CHIỀU:** chọn "chờ duyệt" cho
+gọn, `check_sop.py` đỏ ngay - vì bảng BC9 của **file SOP viết là "Chiết khấu cần duyệt"**. Bộ kiểm
+đọc thẳng file SOP nên nó biết, còn em thì đang dọn theo cảm giác.
+
+**Luật rút ra: dọn tên cho nhất quán là tốt, nhưng chỗ nào SOP đã đặt tên thì SOP là chuẩn - mình
+đổi theo nó, không bắt nó đổi theo mình.** Bảng Kế toán là phần tự dựng nên nó phải mượn chữ của
+SOP, chứ không phải ngược lại.
+
+Đồng thời `TRIG_BOQUA` bỏ được **NA037**: sau khi gieo lại dữ liệu demo (WOW trải đều 18 ngày),
+app SINH RA tình huống đó thật - giữ trong danh sách bỏ qua là khai gian.
 
 **Bẫy neo lại tái phát ngay trong bản này:** dải bảng việc dùng chung `statStrip`, nên nó mang
 luôn mã neo `bstats` - trên Trang bắt đầu thành **hai chỗ cùng một mã**, đúng lỗi tô sáng nhầm mà
