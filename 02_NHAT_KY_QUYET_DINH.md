@@ -149,6 +149,18 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.62 — KHOÁ BA CHỖ SỬA ĐƯỢC ✅ (31/07).**
+> · **Cổng nhân viên**: 17 thẻ chức danh **mờ đi, có ổ khoá, không bấm được**; vào thẳng Quản trị
+> viên. Công tắc mở lại nằm trong Cài đặt → Phân quyền.
+> · **Trang Cài đặt**: hỏi chế độ **ngay tại cửa vào** - *Chỉ trải nghiệm* (không lưu) hoặc *Cổng
+> thực* (mật khẩu `mittomap`, đổi được trong Cài đặt). Chế độ xem chặn tại **đúng một cửa** là
+> `cfgSave`, không đi sửa 20 hàm lưu.
+> · **Nút Reset demo**: cả 3 cửa vào đều phải nhập mật khẩu.
+> · **Ghi rõ trên màn**: mật khẩu nằm trong file demo nên nó là *cái chốt cửa*, không phải khoá an
+> ninh - có backend thật thì phải kiểm ở máy chủ.
+> · Bắt được một **bộ kiểm xanh giả**: stub `sessionStorage` trả về `null` vĩnh viễn nên ba tiêu
+> chí về khoá không bao giờ cắn. Nay stub nhớ thật.
+>
 > **Phiên bản: V9.61 — MỘT LUẬT CHO CẢ APP + BẬT TẮT ĐƯỢC BẤT CỨ TRANG NÀO ✅ (31/07).**
 > · **Dải bảng việc theo chức danh vào chung hệ thẻ.** Đo trước khi quyết: **15/32 ô bấm ra đúng
 > cùng một chỗ với một ô khác** trong chính dải đó (hai ô khác số, một danh sách y hệt). Nay
@@ -4887,6 +4899,39 @@ bảng VIỆC · hai tham số ngưỡng mới phải nằm trong CH2. **155 →
 ### Số chốt phiên
 Thẻ **137 → 84** · Tổng quan **35 → 11** thẻ đầu trang, khối phòng ban 24 ô đọc chơi → 18 ô việc
 bấm được · 2 tham số mới vào CH2 (`viecOldAlert_days`, `svNudge_days`) · `_checkux` **161**.
+
+## V9.62 (31/07) - KHOÁ BA CHỖ SỬA ĐƯỢC
+
+> Anh Luân: *"cổng nhân viên, tạm thời em làm mờ ko cho bấm mấy chỗ khác, để mặc định vào admin
+> nhé. Với lại trang cấu hình quan trọng, a sợ người ta sửa lung tung, nên tạm thời khi bấm vào
+> trang cài đặt, em hiện ra popup 2 lựa chọn, chỉ trải nghiệm (không lưu được) và cổng thực (có
+> thể lưu nhưng phải có pass là mittomap)"* · *"nút reset demo cũng phải có popup bắt nhập pass"*
+
+**Nói thẳng một điều để sau này không ai hiểu nhầm:** đây là bản demo chạy HẲN trong trình duyệt,
+mật khẩu nằm ngay trong file - ai mở mã nguồn ra là thấy. Nó là **cái chốt cửa** để người xem demo
+không lỡ tay sửa, **không phải khoá an ninh**. Khi nối backend thật thì việc kiểm mật khẩu phải
+chuyển hẳn sang máy chủ. Câu này in luôn trên màn Cài đặt, không giấu.
+
+**Một cơ chế cho cả ba chỗ**, không viết ba lần - ba bản sao thì đổi mật khẩu một chỗ, hai chỗ kia
+trôi. Mật khẩu để trong `DATA.config.matKhau` (mặc định `mittomap`), đổi được ngay trong Cài đặt.
+
+| Chỗ | Trước | Nay |
+|---|---|---|
+| Cổng nhân viên | 17 thẻ chức danh bấm được | thẻ **mờ đi, có ổ khoá, không bấm được**, nói rõ "tạm khoá trong buổi demo - mở lại ở Cài đặt → Phân quyền". Vào thẳng Quản trị viên. Công tắc mở lại nằm trong cấu hình, không cắm cứng. |
+| Trang Cài đặt | vào thẳng, sửa gì lưu nấy | **hỏi chế độ ngay tại CỬA VÀO**: *Chỉ trải nghiệm* (sửa thoải mái, thấy ngay kết quả, không lưu) hoặc *Cổng thực* (cần mật khẩu). Dải báo chế độ nằm suốt ở đầu trang, kèm nút đổi chế độ. |
+| Nút Reset demo | hộp xác nhận thường | **hộp nhập mật khẩu**, cả 3 cửa vào (thanh tiêu đề, Cài đặt, màn đăng nhập) |
+
+Hai quyết định thiết kế đáng ghi:
+- **Chặn ở CỬA VÀO, không chặn trong trang.** Chặn trong trang thì người ta đã nhìn thấy hết rồi
+  mới bị hỏi - vô nghĩa. `go("settings")` không có chế độ thì mở hộp hỏi và **không điều hướng**.
+- **Chế độ "chỉ trải nghiệm" chặn tại ĐÚNG MỘT CỬA** (`cfgSave`), không đi sửa 20 hàm lưu. Thay
+  đổi vẫn áp lên màn hình ngay để người xem thấy được kết quả, chỉ là không ghi xuống ô nhớ.
+  *Một cửa thì không có cửa nào quên khoá.*
+
+**Lần đo nói dối thứ mười một:** bộ kiểm báo "cổng thực vẫn không ghi được". Thước sai, không phải
+app sai - `cfgSave` lần gọi đầu tiên chỉ **lấy mốc so sánh** rồi thoát (đúng thiết kế), lần thứ hai
+mới ghi. Và một cái thật: stub `sessionStorage` trong `_check16` trả về `null` vĩnh viễn, nên mọi
+phép đo về chế độ đều ra "chưa chọn" - **ba tiêu chí về khoá sẽ xanh giả**. Nay stub nhớ thật.
 
 ## V9.61 (31/07) - DẢI BẢNG VIỆC VÀO CHUNG HỆ THẺ + TẦNG 1 PHÂN QUYỀN SỬA ĐƯỢC
 

@@ -2048,3 +2048,24 @@ khác trong chính dải đó (hai ô khác số, một danh sách y hệt).
 
 Đổi lại, **rê chuột vào ô nào cũng có câu chú thích** nói nó đếm gì và mở trang/tab nào để xem
 danh sách; và mọi ô đều **ẩn/hiện được** qua nút "Thẻ (n/N)" hoặc Cài đặt → Thẻ trên các trang.
+
+## Khoá những chỗ sửa được (V9.62)
+
+Bản demo mở sẵn ở **tài khoản Quản trị viên** để xem được toàn bộ chức năng. Các chức danh khác
+vẫn hiện ra ở cổng đăng nhập - để biết app phân vai thế nào - nhưng **mờ đi và tạm khoá**. Muốn mở
+lại: Cài đặt → Phân quyền & Phạm vi → bỏ tích **"Khoá chọn chức danh ở cổng nhân viên"**.
+
+**Bấm vào trang Cài đặt sẽ được hỏi vào theo cách nào:**
+- **Chỉ trải nghiệm** - sửa thoải mái, kết quả hiện ngay trên màn, nhưng **không lưu lại**. Đóng
+  trình duyệt là mọi thứ về như cũ. Ai cũng vào được.
+- **Cổng thực** - sửa và lưu thật, cần **mật khẩu quản trị** (mặc định `mittomap`).
+
+Đang ở chế độ nào thì có dải báo ngay đầu trang Cài đặt, kèm nút đổi chế độ.
+
+**Nút Reset dữ liệu demo** cũng phải nhập mật khẩu quản trị.
+
+Đổi mật khẩu: Cài đặt → Phân quyền & Phạm vi → ô **Mật khẩu quản trị**.
+
+> Lưu ý thật lòng: bản demo này chạy hẳn trong trình duyệt nên mật khẩu nằm ngay trong file - nó là
+> **cái chốt cửa** để người xem không lỡ tay sửa, **không phải khoá an ninh**. Khi nối máy chủ thật
+> thì việc kiểm mật khẩu sẽ chuyển sang máy chủ.

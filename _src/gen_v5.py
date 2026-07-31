@@ -323,6 +323,10 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    trắng như cũ - cái phân biệt bấm được hay không là con trỏ và cái nhấc lên khi rê chuột, do
    .bstat[onclick] lo. Nút "Thẻ (n/N)" đứng trên dải, canh phải, y như nút "Cột" của bảng. */
 .bstat.ro{cursor:default}
+/* V9.62: thẻ chức danh bị tạm khoá ở cổng nhân viên - mờ, không con trỏ tay, có ổ khoá góc phải */
+.rcard.khoa{position:relative;opacity:.45;cursor:default;filter:grayscale(.7)}
+.rcard.khoa:hover{border-color:var(--line);box-shadow:none;transform:none}
+.rcard .gklock{position:absolute;top:8px;right:9px;font-size:13px;color:var(--muted)}
 .bstatsw{position:relative;margin-bottom:16px}
 .bstatsw .bstats{margin-bottom:0}
 .thewrap{position:relative;display:flex;justify-content:flex-end;margin-bottom:6px}
@@ -1501,7 +1505,7 @@ body.drsz .drawer{transition:none}
   <div class="main">
     <div class="topbar">
       <button class="tbtn navtoggle" onclick="toggleNav()" aria-label="Menu"><i class="ti ti-menu-2"></i></button>
-      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div style="min-width:0"><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px;margin-left:auto"><button class="btn sm" onclick="demoReset()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ đang mở cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
+      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div style="min-width:0"><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px;margin-left:auto"><button class="btn sm" onclick="demoResetHoi()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ đang mở cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
       <div class="rolesel">
 <!-- V9.29: bỏ ô chọn vai roleSel - luôn bị ẩn từ V9.9, giữ lại chỉ tổ rối -->
         <button class="tbtn" id="tthBtn" onclick="tthToggle()" aria-label="Bật/tắt Trợ lý" data-tip="Trợ lý - hỏi đáp và nhắc việc, nút tròn góc dưới bên phải"><i class="ti ti-bulb"></i></button>
@@ -1571,6 +1575,10 @@ var CFKEY="ITTS_CONFIG_V1";
 function cfgPack(){return JSON.stringify({config:DATA.config,enums:DATA.enums})}
 var __cfbase=null;
 function cfgSave(){if(!CANLS||SVR)return;
+ /* V9.62 - MỘT CHỖ CHẶN DUY NHẤT cho chế độ "chỉ trải nghiệm". Thay đổi vẫn áp lên màn hình ngay
+    (để người xem thấy được kết quả), chỉ là không ghi xuống ô nhớ - đóng trình duyệt là mất.
+    Chặn ở đây thay vì đi sửa 20 hàm lưu: một cửa thì không có cửa nào quên khoá. */
+ if(cfMode()==="xem"){toast("Đang ở chế độ CHỈ TRẢI NGHIỆM - thay đổi hiện ngay trên màn nhưng không được lưu lại.",3600);return}
  var cur=cfgPack();
  if(__cfbase===null){__cfbase=cur;return}
  if(cur===__cfbase)return;
@@ -4670,6 +4678,66 @@ function knClaim(id){knUpd(id,{assigned_handler:myName(),assigned_at:nowStr(),co
    3 cho truyen thang ham (huy dang ky, doi buoi WOW, dat WOW trung lich) bam Xac nhan xong
    IM LANG khong luu gi - nguoi dung tuong da xong. */
 function cfnGet(f){return (typeof f==="function")?f:((f&&typeof window[f]==="function")?window[f]:null)}
+/* ═══════════ V9.62 - KHOÁ NHỮNG CHỖ SỬA ĐƯỢC ═══════════════════════════════════════════════
+   Anh Luân 31/07: *"trang cấu hình quan trọng, a sợ người ta sửa lung tung, nên tạm thời khi bấm
+   vào trang cài đặt, em hiện ra popup 2 lựa chọn, chỉ trải nghiệm (không lưu được) và cổng thực
+   (có thể lưu nhưng phải có pass là mittomap)"* · *"nút reset demo cũng phải có popup bắt nhập
+   pass mới được nha em"*.
+
+   NÓI THẲNG MỘT ĐIỀU để sau này không ai hiểu nhầm: đây là bản demo chạy HẲN trong trình duyệt,
+   mật khẩu nằm ngay trong file - ai mở mã nguồn ra là thấy. Nó là CÁI CHỐT CỬA để người xem demo
+   không lỡ tay sửa, KHÔNG PHẢI khoá an ninh. Khi có backend thật thì việc kiểm mật khẩu phải
+   chuyển hẳn sang máy chủ.
+
+   MỘT cơ chế cho cả ba chỗ (trang Cài đặt · nút Reset demo · và về sau nếu cần thêm), chứ không
+   viết ba lần - ba bản sao thì sửa mật khẩu một chỗ, hai chỗ kia trôi.
+   Mật khẩu để trong cấu hình (`DATA.config.matKhau`) nên anh Luân đổi được, mặc định "mittomap". */
+var CFMODEKEY="ITTS_CFMODE";
+function matKhau(){return String((DATA.config&&DATA.config.matKhau)||"mittomap")}
+function cfMode(){try{return ssGet(CFMODEKEY)||""}catch(e){return ""}}
+function cfSetMode(m){try{ssSet(CFMODEKEY,m)}catch(e){}}
+function cfGhiDuoc(){return cfMode()==="that"}
+/* Hộp hỏi mật khẩu dùng chung. `xong` là TÊN hàm (chuỗi) - đi qua cfnGet như confirmRun, để
+   không phải nhét hàm vào thuộc tính onclick. */
+function pwHoi(tieude,mota,xong){
+ window.__pwXong=xong;
+ var h='<div class="dcard"><h4><i class="ti ti-lock"></i>'+esc(tieude)+'</h4>'+
+  '<div class="fhint" style="margin:0 0 10px">'+esc(mota)+'</div>'+
+  '<div class="fld full"><label>Mật khẩu</label>'+
+  '<input type="password" id="pw_in" placeholder="nhập mật khẩu" onkeydown="if(event.key===\'Enter\')pwXacNhan()"></div>'+
+  '<div id="pw_loi" class="fhint" style="color:var(--red);min-height:16px"></div>'+
+  '<div style="display:flex;gap:8px;margin-top:6px">'+
+  '<button class="btn primary" onclick="pwXacNhan()"><i class="ti ti-lock-open"></i>Mở khoá</button>'+
+  '<button class="btn" onclick="closeModal()"><i class="ti ti-x"></i>Huỷ</button></div></div>';
+ openDrawer("Cần mật khẩu",h);
+ setTimeout(function(){var e=document.getElementById("pw_in");if(e&&e.focus)e.focus()},120)}
+function pwXacNhan(){
+ var v="";try{v=String((document.getElementById("pw_in")||{}).value||"")}catch(e){}
+ if(v!==matKhau()){var L=document.getElementById("pw_loi");
+  if(L)L.textContent="Sai mật khẩu. Hỏi người quản trị nếu bạn cần quyền ghi.";
+  return}
+ var f=window.__pwXong;closeModal();
+ var g=cfnGet(f);if(g)g(); else toastErr("Không chạy được thao tác này - báo IT (thiếu hàm xử lý).")}
+/* ── Cổng vào trang Cài đặt: chọn chế độ trước ── */
+function cfHoiCheDo(){
+ var h='<div class="dcard"><h4><i class="ti ti-settings"></i>Vào trang Cài đặt theo cách nào?</h4>'+
+  '<div class="fhint" style="margin:0 0 12px">Cài đặt là nơi đổi <b>luật vận hành của cả trung tâm</b> - ngưỡng, câu nhắc, danh mục, phân quyền. Chọn một trong hai:</div>'+
+  '<div class="pickc wrap" onclick="cfChon(\'xem\')" style="margin-bottom:10px">'+
+   '<i class="ti ti-eye"></i><div><b>Chỉ trải nghiệm</b><small>Xem và thử mọi thứ, thấy ngay kết quả trên màn - nhưng <b>không lưu lại</b>. Đóng trình duyệt là mọi thay đổi mất. Ai cũng vào được.</small></div></div>'+
+  '<div class="pickc wrap" onclick="cfChon(\'that\')">'+
+   '<i class="ti ti-lock"></i><div><b>Cổng thực</b><small>Sửa và <b>lưu lại thật</b>. Cần mật khẩu quản trị.</small></div></div>'+
+  '</div>';
+ openDrawer("Trang Cài đặt",h)}
+function cfChon(m){
+ if(m==="xem"){cfSetMode("xem");closeModal();go("settings");return}
+ closeModal();
+ setTimeout(function(){pwHoi("Mở quyền ghi cấu hình",
+  "Nhập mật khẩu quản trị để vào Cài đặt ở chế độ có thể lưu.","cfMoKhoa")},180)}
+function cfMoKhoa(){cfSetMode("that");toast("Đã mở quyền ghi cấu hình cho phiên làm việc này.");go("settings")}
+function cfDoiCheDo(){cfSetMode("");cfHoiCheDo()}
+/* ── Reset demo: cũng phải qua mật khẩu ── */
+function demoResetHoi(){pwHoi("Dựng lại dữ liệu demo",
+ "Thao tác này xoá MỌI thay đổi dữ liệu của buổi demo và quay về dữ liệu gốc (cấu hình giữ nguyên). Nhập mật khẩu quản trị để tiếp tục.","demoReset")}
 function confirmRun(msg,fn,arg){var m=document.getElementById("cfm");if(!m){var g0=cfnGet(fn);if(g0)g0(arg);return}window.__cfn=fn;window.__carg=arg;document.getElementById("cfmMsg").textContent=msg;m.classList.add("on")}
 function confirmYes(){var f=window.__cfn,a=window.__carg;closeConfirm();var g=cfnGet(f);
  if(g)g(a); else toastErr("Không chạy được thao tác này - báo IT (thiếu hàm xử lý).")}
@@ -9309,6 +9377,11 @@ function renderSetQA(){
  return h}
 function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)||{ch2:[],ch6:[]};
  var h='<div class="phead" data-tour="phead"><div><div class="t">Cài đặt hệ thống</div><div class="s">Nơi DUY NHẤT cấu hình cả app - đổi 1 giá trị là mọi nhắc việc, trạng thái và KPI phụ thuộc tự cập nhật theo, không cần build lại.</div></div></div>';
+ /* V9.62: dải báo chế độ nằm NGAY ĐẦU trang và ở LẠI suốt - người ta sửa mười phút rồi mới biết
+    không lưu được thì tệ hơn là không cho vào. Kèm luôn nút đổi chế độ. */
+ if(!SVR)h+=(cfGhiDuoc()
+  ?'<div class="notebar" style="background:#EDF8F1;border-color:#BFE3CC;color:#1E7A46;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><i class="ti ti-lock-open"></i><span>Đang ở <b>CỔNG THỰC</b> - mọi thay đổi được lưu lại.</span><button class="btn sm" onclick="cfDoiCheDo()"><i class="ti ti-eye"></i>Chuyển sang chỉ trải nghiệm</button></div>'
+  :'<div class="notebar" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><i class="ti ti-eye"></i><span>Đang ở <b>CHẾ ĐỘ CHỈ TRẢI NGHIỆM</b> - cứ sửa thoải mái, kết quả hiện ngay trên màn, nhưng <b>không lưu lại</b>: đóng trình duyệt là mọi thứ về như cũ.</span><button class="btn primary sm" onclick="cfDoiCheDo()"><i class="ti ti-lock"></i>Vào cổng thực để lưu được</button></div>');
  h+='<div class="settabs" data-tour="settabs">';
  var stabs=setTabs();
  var rsS=SCOPE();if(rsS.tabs&&rsS.tabs.settings)stabs=stabs.filter(function(t){return rsS.tabs.settings.indexOf(t[0])>=0});
@@ -9381,6 +9454,18 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
      app chỉ canh thật đúng 1 (duyệt chiết khấu) - 7 việc còn lại ai mở được trang là bấm xong. */
   /* ═══ V9.61 - TẦNG 1: THẤY TRANG NÀO (anh Luân: "để sau này IT hiểu ý đồ của anh là có thể
      bật tắt bất cứ thứ gì") ═══ */
+  /* V9.62: công tắc mở lại cổng chọn chức danh + đổi mật khẩu quản trị - đặt ngay đầu tab
+     Phân quyền vì cả hai đều là chuyện "ai được vào đâu". */
+  h+='<div class="sechd">Cổng vào & mật khẩu quản trị</div>';
+  h+='<div class="panel"><div class="pbody" style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">';
+  h+='<label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox"'+(gateKhoaVai()?" checked":"")+' onclick="gateKhoaToggle()" style="width:17px;height:17px"><b>Khoá chọn chức danh ở cổng nhân viên</b></label>';
+  h+='<span class="chip '+(gateKhoaVai()?"amber":"green")+'">'+(gateKhoaVai()?"Đang khoá - mọi người vào bằng Quản trị viên":"Đang mở - ai cũng chọn được chức danh")+'</span>';
+  h+='<div class="fld" style="min-width:250px;margin:0"><label>Mật khẩu quản trị</label>'
+   +'<input id="mk_in" value="'+esc(matKhau())+'" placeholder="mittomap">'
+   +'<div class="fhint" style="margin-top:4px">Dùng cho: vào Cài đặt ở chế độ ghi được, và nút Reset demo.</div></div>';
+  h+='<button class="btn primary sm" onclick="mkLuu()"><i class="ti ti-device-floppy"></i>Lưu mật khẩu</button>';
+  h+='</div></div>';
+  h+='<div class="notebar" style="background:#FAFBFD;border-color:#CFE0F7;color:#2E5A88"><i class="ti ti-info-circle"></i>Đây là bản demo chạy hẳn trong trình duyệt nên mật khẩu nằm ngay trong file - nó là <b>cái chốt cửa</b> để người xem không lỡ tay sửa, <b>không phải khoá an ninh</b>. Khi nối backend thật thì việc kiểm mật khẩu chuyển sang máy chủ.</div>';
   h+='<div class="sechd">Thấy trang nào · bật/tắt từng trang cho từng chức danh</div>';
   var QG=Object.keys(ROLESCOPE);
   var qDaSua=QG.reduce(function(a,g){return a+qtSoSua(g)},0);
@@ -9506,7 +9591,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   /* V9.18 (Luân): room mặc định đã thông với nhau - tab này chỉ cần trạng thái 1 dòng + Reset */
   h+='<div class="panel" style="max-width:640px"><div class="ph"><b><i class="ti ti-devices" style="margin-right:6px"></i>Dữ liệu demo</b></div><div style="padding:14px 16px;font-size:12.5px;line-height:1.9">';
   h+='Các cửa sổ trên máy này và các máy khác mở cùng bản demo tự đồng bộ với nhau. Dữ liệu hiện tại: '+(d?'<span class="chip amber">đang có thay đổi demo</span>':'<span class="chip green">nguyên bản</span>')+(CANLS?'':' · <span class="chip red">trình duyệt chặn lưu - dùng Chrome hoặc http.server</span>')+'</div>';
-  h+='<div style="padding:0 16px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn danger" onclick="demoReset()"><i class="ti ti-refresh"></i>Reset demo (về nguyên bản)</button><button class="btn sm" onclick="demoPing()"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ</button></div></div>';
+  h+='<div style="padding:0 16px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn danger" onclick="demoResetHoi()"><i class="ti ti-lock"></i>Reset demo (về nguyên bản)</button><button class="btn sm" onclick="demoPing()"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ</button></div></div>';
   /* V9.30 (anh Luân): "để demo lúc nào cũng ổn... điều chỉnh thời gian để lúc nào nó cũng hợp lý" */
   h+='<div class="panel" style="max-width:640px;margin-top:16px"><div class="ph"><b><i class="ti ti-calendar-event" style="margin-right:6px"></i>Mốc thời gian của dữ liệu demo</b></div><div class="pbody">';
   h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Dữ liệu demo neo theo <b>ngày sinh ra nó</b>. Để lâu không mở thì mọi việc thành "quá hạn 90 ngày" và lịch tuần trống trơn - app trông như hỏng dù không sai gì. Nút dưới kéo toàn bộ mốc thời gian về hiện tại.</div>';
@@ -16756,6 +16841,9 @@ function hashApply(){var k=hashKey();
  if(!hashOK(k))return;
  go(k)}
 function go(key,noHist){
+ /* V9.62: vào Cài đặt phải chọn chế độ trước - chặn ngay ở CỬA VÀO chứ không chặn trong trang,
+    vì chặn trong trang thì người ta đã nhìn thấy hết rồi mới bị hỏi. */
+ if(key==="settings"&&!SVR&&!cfMode()){cfHoiCheDo();return}
  /* V9.27: nhớ lại mục menu đang sáng TRƯỚC khi rời đi. Trang nào không có mục riêng trên menu
     (vd "Chạy quy trình" mở ra từ Chăm lại / Reup) thì menu vẫn giữ mục cũ sáng mờ, để người dùng
     biết mình đang đứng ở nhánh nào - trước đây cả menu tối thui, không biết đang ở đâu. */
@@ -17363,7 +17451,7 @@ function gateStatusHTML(){var d=demoDirty();
  if(!CANLS)st='<span class="chip red">trình duyệt chặn lưu/đồng bộ - mở bằng Chrome hoặc chạy http.server</span>';
  return '<div style="font-size:11.5px;color:var(--muted);margin-top:14px;display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap">'+
   '<span>'+src+'</span>'+st+
-  (d?'<button class="btn sm" onclick="demoReset()"><i class="ti ti-refresh"></i>Reset dữ liệu demo</button>':'')+
+  (d?'<button class="btn sm" onclick="demoResetHoi()"><i class="ti ti-lock"></i>Reset dữ liệu demo</button>':'')+
   '<button class="btn sm" onclick="demoPing()" title="Bấm ở một cửa sổ, cửa sổ kia phải hiện thông báo"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ</button>'+
   '</div>'}
 function gateRole(x){var m=String(x.role||"").match(/^[^(]*\((.+)\)\s*$/);return m?m[1]:(String(x.role||"").trim()||"Khác")}
@@ -17387,13 +17475,26 @@ function demoGate(){var el=document.getElementById("login");if(!el)return;
  var h='<div class="loginbox" style="max-width:720px;max-height:88vh;overflow:auto;text-align:center">';
  h+='<h2>IELTS The Tutors · Cổng làm việc</h2>';
  if(!pick){
-  h+='<p>Chọn CHỨC DANH rồi chọn tên bạn. Mỗi cửa sổ một người - các cổng dùng chung một nguồn dữ liệu, thao tác bên này bên kia thấy ngay.</p>';
-  h+='<div style="margin:2px 0 14px"><button class="btn primary" onclick="gateEnter(\'\')"><i class="ti ti-shield-check"></i>Vào nhanh - Quản trị viên (toàn quyền)</button></div>';
+  /* V9.62 (anh Luân 31/07): *"cổng nhân viên, tạm thời em làm mờ ko cho bấm mấy chỗ khác, để
+     mặc định vào admin nhé."* Các chức danh vẫn HIỆN RA - để người xem biết app có phân vai và
+     mỗi vai một màn - nhưng mờ đi và không bấm được. Nói rõ vì sao ngay tại đó, chứ mờ mà im
+     lặng thì người ta tưởng app hỏng. Mở lại bằng một công tắc trong Cài đặt → Phân quyền. */
+  var khoaVai=gateKhoaVai();
+  h+='<p>'+(khoaVai
+    ?'Bản demo đang mở sẵn ở <b>tài khoản Quản trị viên</b> để xem được toàn bộ chức năng. Các chức danh bên dưới cho biết app phân vai thế nào - tạm khoá trong buổi demo này.'
+    :'Chọn CHỨC DANH rồi chọn tên bạn. Mỗi cửa sổ một người - các cổng dùng chung một nguồn dữ liệu, thao tác bên này bên kia thấy ngay.')+'</p>';
+  h+='<div style="margin:2px 0 14px"><button class="btn primary" onclick="gateEnter(\'\')"><i class="ti ti-shield-check"></i>Vào Quản trị viên (toàn quyền)</button></div>';
   h+='<div class="rgrid" style="grid-template-columns:repeat(auto-fill,minmax(190px,1fr))">';
   roles.forEach(function(r){
-   h+='<div class="rcard" onclick="window.__gateRole=\''+esc(r).replace(/'/g,"\\'")+'\';demoGate()">'+
-    '<div class="ri"><i class="ti '+gateRoleIcon(r)+'"></i></div>'+
-    '<b>'+esc(r)+'</b><small>'+byRole[r].length+' người</small></div>'});
+   var mo=esc(r).replace(/'/g,"\\'");
+   h+=khoaVai
+    ?('<div class="rcard khoa" data-tip="Tạm khoá trong buổi demo - mở lại ở Cài đặt → Phân quyền &amp; Phạm vi">'+
+      '<div class="ri"><i class="ti '+gateRoleIcon(r)+'"></i></div>'+
+      '<b>'+esc(r)+'</b><small>'+byRole[r].length+' người</small>'+
+      '<i class="ti ti-lock gklock"></i></div>')
+    :('<div class="rcard" onclick="window.__gateRole=\''+mo+'\';demoGate()">'+
+      '<div class="ri"><i class="ti '+gateRoleIcon(r)+'"></i></div>'+
+      '<b>'+esc(r)+'</b><small>'+byRole[r].length+' người</small></div>')});
   h+='</div>';
  }else{
   h+='<p style="margin-bottom:6px"><button class="pill" onclick="window.__gateRole=\'\';demoGate()"><i class="ti ti-arrow-left"></i>Chọn chức danh khác</button></p>';
@@ -17409,6 +17510,15 @@ function demoGate(){var el=document.getElementById("login");if(!el)return;
   '<div style="font-size:11.5px;color:var(--muted)">Mở thêm phía học viên: file <b>ITTs_TrangHocVien_demo.html</b> cùng thư mục.</div>'+
   gateStatusHTML()+'</div></div>';
  el.innerHTML=h;el.style.display="flex"}
+/* Công tắc "khoá chức danh ở cổng nhân viên" - mặc định BẬT theo yêu cầu 31/07, tắt được trong
+   Cài đặt → Phân quyền. Để trong cấu hình chứ không cắm cứng, vì anh Luân nói "tạm thời". */
+function gateKhoaVai(){var c=DATA.config||{};return c.gateKhoaVai==null?true:!!c.gateKhoaVai}
+function gateKhoaToggle(){var c=(DATA.config=DATA.config||{});
+ c.gateKhoaVai=gateKhoaVai()?0:1;cfgSave();reRender("settings")}
+function mkLuu(){var v="";try{v=String((document.getElementById("mk_in")||{}).value||"").trim()}catch(e){}
+ if(v.length<4){toastErr("Mật khẩu phải từ 4 ký tự trở lên.");return}
+ var c=(DATA.config=DATA.config||{});c.matKhau=v;cfgSave();
+ if(cfGhiDuoc())toast("Đã lưu mật khẩu quản trị.");reRender("settings")}
 function gateEnter(sid){window.__gateRole="";window.GATE_SID=sid||"";ssSet("ITTS_WHO",sid||"");applyScope(sid||"");enter("all")}
 function gateSwitch(){ssSet("ITTS_WHO",null);location.reload()}
 function demoBoot(){

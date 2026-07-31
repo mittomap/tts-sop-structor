@@ -8,7 +8,10 @@ global.document={getElementById:(id)=>ST[id]||(ST[id]=El(id)),querySelector:()=>
 global.window=global;global.location={hash:"",search:"",pathname:"/cong-nhan-vien/"};
 global.history={replaceState:function(a,b,u){var i=String(u).indexOf("?");
  location.search=i<0?"":String(u).slice(i);location.pathname=i<0?String(u):String(u).slice(0,i)}};
-var _LS={};global.localStorage={getItem:k=>_LS[k]===undefined?null:_LS[k],setItem(k,v){_LS[k]=String(v)},removeItem(k){delete _LS[k]}};global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
+var _LS={};global.localStorage={getItem:k=>_LS[k]===undefined?null:_LS[k],setItem(k,v){_LS[k]=String(v)},removeItem(k){delete _LS[k]}};/* V9.62: sessionStorage phai NHO THAT - che do vao Cai dat (chi trai nghiem / cong thuc) luu
+   o day. Stub tra ve null mai mai thi bo kiem do cai gi cung ra "chua chon", va ba tieu chi
+   ve khoa se xanh gia. */
+var _SS={};global.sessionStorage={getItem:k=>_SS[k]===undefined?null:_SS[k],setItem(k,v){_SS[k]=String(v)},removeItem(k){delete _SS[k]}};
 var SRC0=require('fs').readFileSync('./_APP.js','utf8');
 /* Khung trang (navbar, #pgTitle) nam trong PHAN HTML chu khong nam trong <script> - kiem tra
    markup phai doc file HTML that, doc _APP.js thi luat nao cung "fail" ma khong phai loi app. */
@@ -1067,6 +1070,47 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("moi num van tro toi mot tham so CO THAT"+(tatSai.length?": "+tatSai.join(" | "):""), tatSai.length===0);
  var ldSai=SETLANDAU.filter(function(x){return tabs.indexOf(x[3])<0}).map(function(x){return x[0]});
  t("moi viec cai lan dau tro toi mot tab CO THAT"+(ldSai.length?": "+ldSai.join(" | "):""), ldSai.length===0);
+ /* ═══ V9.62 - BA CHO KHOA (anh Luan 31/07) ═══════════════════════════════════════════════
+    (1) cong nhan vien mac dinh vao Admin, cac chuc danh khac lam mo; (2) bam vao Cai dat thi
+    hien hop chon che do, "cong thuc" phai co mat khau; (3) nut Reset demo cung phai nhap pass.
+    Canh CHAY THAT: bam vao Cai dat thi CUR khong duoc doi; nhap sai pass thi khong duoc mo. */
+ (function(){
+  var luuMode=cfMode();
+  /* (1) cong nhan vien */
+  t("mac dinh khoa chon chuc danh o cong nhan vien", gateKhoaVai()===true);
+  demoGate();
+  var gt=(document.getElementById("login").innerHTML)||"";
+  var soKhoa=(gt.match(/class="rcard khoa"/g)||[]).length;
+  var soBam=(gt.match(/<div class="rcard" onclick/g)||[]).length;
+  t("the chuc danh deu bi lam mo ("+soKhoa+" the)", soKhoa>0);
+  t("khong the chuc danh nao con bam duoc ("+soBam+")", soBam===0);
+  t("van con cua vao Quan tri vien", /gateEnter\(''\)/.test(gt)||gt.indexOf("Quản trị viên")>=0);
+  t("the bi khoa noi ro vi sao va mo lai o dau", /Tạm khoá trong buổi demo/.test(gt));
+  t("cong tac mo lai nam trong cau hinh, khong cam cung", /c\.gateKhoaVai=/.test(String(gateKhoaToggle)));
+  /* (2) cua vao Cai dat */
+  cfSetMode("");CUR="banlam";
+  go("settings");
+  t("chua chon che do thi bam Cai dat KHONG vao thang", CUR==="banlam");
+  t("hien hop chon hai che do", /Vào trang Cài đặt theo cách nào/.test((document.getElementById("drawerBody").innerHTML)||""));
+  cfChon("xem");
+  t("chon 'chi trai nghiem' thi vao duoc va KHONG ghi duoc", cfMode()==="xem"&&cfGhiDuoc()===false);
+  t("che do xem chan ngay tai cua ghi cau hinh", /cfMode\(\)==="xem"/.test(String(cfgSave)));
+  /* nhap sai mat khau thi khong duoc mo */
+  cfSetMode("");
+  pwHoi("thu","thu","cfMoKhoa");
+  document.getElementById("pw_in").value="sai-mat-khau";pwXacNhan();
+  t("nhap SAI mat khau thi khong mo duoc quyen ghi", cfMode()==="");
+  t("bao loi ro rang khi sai mat khau", /Sai mật khẩu/.test((document.getElementById("pw_loi").textContent)||""));
+  document.getElementById("pw_in").value=matKhau();pwXacNhan();
+  t("nhap DUNG mat khau thi mo duoc quyen ghi", cfMode()==="that"&&cfGhiDuoc()===true);
+  t("mat khau lay tu cau hinh, doi duoc", matKhau()==="mittomap"&&/DATA\.config&&DATA\.config\.matKhau/.test(String(matKhau)));
+  /* (3) Reset demo */
+  t("moi cua vao Reset demo deu di qua hop mat khau",
+    (SRC.match(/onclick="demoReset\(\)/g)||[]).length===0&&(SRC.match(/demoResetHoi\(\)/g)||[]).length>=3);
+  demoResetHoi();
+  t("bam Reset demo thi hien hop mat khau", /Dựng lại dữ liệu demo/.test((document.getElementById("drawerBody").innerHTML)||""));
+  cfSetMode(luuMode);CUR="banlam";
+ })();
  /* ═══ V9.61 - TANG 1 PHAN QUYEN PHAI SUA DUOC TRONG CAI DAT ═══════════════════════════════
     Anh Luan: *"cai cai dat ai thay trang nao... dua may cai do vao cai dat di, de sau nay IT
     hieu y do cua anh la co the bat tat bat cu thu gi."* Canh CHAY THAT chu khong doc chu:
