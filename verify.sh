@@ -83,6 +83,10 @@ chay "_checkdata du lieu vs luat" "CHECKDATA OK"         node _checkdata.js
 # doi xung giua cac trang cung ho, luong hai dau, du thua & rong, so phai sua duoc, cho dung,
 # nga cut cua nguoi dung, dong bo tai lieu. Chi tiet o dau file _checkaudit.js.
 chay "_checkaudit doi xung & nga cut" "CHECKAUDIT OK"    node _checkaudit.js
+# V9.66 - MO APP VAO BAY THU TRONG TUAN. Moi bo kiem khac chi chay vao DUNG MOT NGAY (hom nay);
+# app keo du lieu demo theo boi so 7 ngay nen moi thu trong tuan nhin thay mot lat cat KHAC.
+# Cho trong o lat cat nao thi mai mai trong o dung thu do - va khong bo kiem nao thay.
+chay "_checkdemo bay thu trong tuan" "CHECKDEMO OK"     node _checkdemo.js
 
 echo
 echo "${Dam}== 4. DU LIEU DEMO ==${Het}"

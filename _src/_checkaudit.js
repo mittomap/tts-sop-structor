@@ -252,6 +252,35 @@ setRole("all");
  t("không trang nào có hai khối trùng tên", !trung.length, trung.slice(0,5).join(" · "));
 })();
 
+/* ═════════ M4b · MÃ MA - CÂU LỌC BẰNG MÃ KHÔNG CÓ TRONG DANH MỤC CH1 ════════════════════
+   Loại lỗi ĐỘC NHẤT trong app này, vì nó không bao giờ báo gì: `isc(x.homework_status,"submitted")`
+   chạy êm ru, không lỗi JS, không đỏ ở đâu - chỉ trả về false mãi mãi. Ô "Bài tập chờ chấm" của
+   giảng viên đọc số 0 suốt nhiều bản trong khi dữ liệu có 188 bài đã nộp chưa chấm. Số 0 trông
+   rất hợp lý ("hôm nay chấm hết rồi"), nên không ai nghi.
+   Đợt quét đầu tiên (31/07) ra 8 chỗ như vậy, trong đó bốn chỗ sai THẬT:
+     · enrollment_status "active"  -> chỉ số TCR của BC2 đọc 0% vĩnh viễn
+     · re_enrollment_status "declined" (đúng là "rejected") -> giục mời lại người đã từ chối
+     · class_status "completed"/"closed" (đúng là "finished") -> lớp đã xong vẫn ăn chip "Đang học"
+     · homework_status "submitted" -> ô bài chờ chấm luôn bằng 0
+   CÁCH ĐO: đọc ENUMMAP (cột -> danh mục) và DATA.enums (danh mục -> mã) của CHÍNH APP, rồi soi
+   mọi lời gọi isc(<gì đó>.cột, "mã", ...) trong mã nguồn. Chỉ xét cột NÀO CÓ trong CH1 - cột
+   không khai danh mục thì ta không có quyền phán, đoán bừa là bộ kiểm nói dối. */
+(function(){
+ var hople={},co=0;
+ Object.keys(ENUMMAP||{}).forEach(function(col){
+  var arr=(DATA.enums||{})[ENUMMAP[col]];if(!arr||!arr.length)return;
+  co++;hople[col]={};arr.forEach(function(it){hople[col][String(it).split(" ")[0]]=1})});
+ t("đọc được danh mục CH1 để soi mã ma",co>10,"chỉ dựng được "+co+" cột - không đủ để kết luận");
+ var rx=/isc\(\s*[A-Za-z_$][\w.$]*\.(\w+)\s*,((?:\s*"[^"]*"\s*,?)+)\)/g,m,ma=[];
+ while((m=rx.exec(SRC))){
+  var col=m[1];if(!hople[col])continue;
+  (m[2].match(/"[^"]*"/g)||[]).forEach(function(q){
+   var c=q.slice(1,-1);
+   if(!hople[col][c])ma.push(col+' = "'+c+'" (CH1 có: '+Object.keys(hople[col]).join("/")+")")})}
+ var chua={};ma=ma.filter(function(x){if(chua[x])return false;chua[x]=1;return true});
+ t("không câu lọc nào dùng mã không có trong CH1",!ma.length,ma.slice(0,4).join(" · "));
+})();
+
 /* ═════════ M7 · SỐ PHẢI SỬA ĐƯỢC - "cái này cấu hình ở đâu đấy?" ═════════════════════════
    Anh Luân bấm vào một con số trên màn rồi hỏi sửa ở đâu. Nếu không sửa được thì đó là hằng số
    của phần mềm chứ không phải thông số của trung tâm - trái LUẬT CỨNG.

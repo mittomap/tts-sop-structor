@@ -1549,6 +1549,116 @@ for e in enrs:
     chk(int(e["paid_amount"])+int(e["remaining_amount"])==int(e["final_fee"]) or e["payment_status"].startswith("refunded"),"ENR balance "+e["enrollment_id"])
 for L in leads:
     chk(int(L["contact_count"])==sum(1 for t in tps if t["lead_id"]==L["lead_id"]),"lead count "+L["lead_id"])
+# ═══════════════════════════════════════════════════════════════════════════════════════════
+# V9.66 - PHỦ ĐỀU TỪNG NGÀY, KHÔNG CHỈ ĐỦ TRONG TUẦN (anh Luân đặt 31/07)
+# ═══════════════════════════════════════════════════════════════════════════════════════════
+# Bản trước chỉ canh "≥5 buổi WOW trong 7 ngày tới". Nhưng 5 cái rải trên 7 ngày thì vẫn có ngày
+# TRỐNG - và app kéo dữ liệu theo BỘI SỐ 7 NGÀY (giữ nguyên thứ trong tuần, chủ ý đúng) nên chỗ
+# trống ấy KHÔNG BAO GIỜ tan ra: mở app đúng thứ đó là mãi mãi thấy số 0.
+# Đo thật trước khi sửa - số hiện trên thẻ khi mở app từng ngày trong tuần:
+#     Tới hẹn hôm nay   T2=1   T3=7  T4=6  T5=5  T6=15  T7=4  CN=4
+#     Buổi WOW hôm nay  T2=1   T3=0  T4=3  T5=2  T6=3   T7=2  CN=2
+#     Test hôm nay      T2=1   T3=1  T4=6  T5=9  T6=3   T7=1  CN=2
+# Thứ Ba mở app: KHÔNG có buổi WOW nào. Thứ Hai: đúng 1 cái hẹn, trong khi thứ Sáu 15 cái.
+# App không hỏng, nhưng người xem demo sẽ nghĩ nó hỏng - hoặc nghĩ trung tâm không có việc gì làm.
+#
+# CỬA SỔ PHẢI PHỦ LÀ 0..+7 NGÀY. Phép kéo (`tshDays` trong app) dùng floor bội số 7, nên mốc neo
+# LUÔN nằm ở hoặc TRƯỚC hôm nay: "hôm nay" thật rơi vào khoảng 0..6 ngày SAU mốc neo. Dòng gieo ở
+# ngày +k của bản gốc sẽ hiện ra cách hôm nay k-(0..6) ngày, tức phủ đủ từ hôm nay tới +7.
+# ĐỪNG phủ ngày ÂM: dòng "Đã đặt/Đã xác nhận" mà ngày dạy trước ngày gieo là dữ liệu tự mâu thuẫn -
+# check_logic bắt ngay (7h). Đã cắn: bản đầu để tu=-3 theo lối nghĩ round cũ, ra 6 buổi WOW quá hạn.
+#
+# CÁCH LÀM: không gieo thêm dòng mới (thêm dòng là lệch mọi con số đếm của 20 bộ kiểm). Chỉ DỜI
+# NGÀY của những dòng đã có sang các ngày đang trống, và chỉ dời dòng ở TƯƠNG LAI/gần hiện tại -
+# không đụng vào dòng lịch sử đã hoàn thành.
+# Dời ngày thì phải KÉO THEO CÁC MỐC PHỤ THUỘC (`truoc`): ngày đặt lịch phải trước ngày dạy, dời
+# buổi dạy lên sớm mà quên ngày đặt là đẻ ra lỗi 7f.
+def _ngay(v):
+    try: return dt.datetime.strptime(v,"%d/%m/%Y %H:%M")
+    except Exception: return None
+def _phuDeu(arr, cot, dieukien, gio, moiNgay, tu=0, den=7, truoc=()):
+    """Dời ngày các dòng khớp `dieukien` sao cho mỗi ngày trong [tu..den] có ít nhất `moiNgay` dòng."""
+    def _keo(r):
+        """Sau khi dời `cot`, kéo các mốc trong `truoc` về trước nó nếu bị vượt."""
+        m=_ngay(r.get(cot,""))
+        if not m: return
+        for c in truoc:
+            v=_ngay(r.get(c,""))
+            if v and v>=m: r[c]=F((m-days(1)).replace(hour=10,minute=0))
+    ung=[r for r in arr if dieukien(r) and _ngay(r.get(cot,""))]
+    if not ung: return 0
+    dem={}
+    for r in ung:
+        k=(_ngay(r[cot]).date()-TODAY.date()).days
+        if tu<=k<=den: dem[k]=dem.get(k,0)+1
+    thieu=[k for k in range(tu,den+1) for _ in range(max(0,moiNgay-dem.get(k,0)))]
+    if not thieu: return 0
+    # Ưu tiên lấy dòng ở ngày ĐANG DƯ nhất để lấp - giữ tổng không đổi, chỉ san phẳng.
+    def _du(r):
+        k=(_ngay(r[cot]).date()-TODAY.date()).days
+        return -(dem.get(k,0) if tu<=k<=den else 99)
+    kho=sorted([r for r in ung if dem.get((_ngay(r[cot]).date()-TODAY.date()).days,0)>moiNgay
+                or not (tu<=(_ngay(r[cot]).date()-TODAY.date()).days<=den)], key=_du)
+    doi=0
+    for k in thieu:
+        if not kho: break
+        r=kho.pop(0)
+        cu=(_ngay(r[cot]).date()-TODAY.date()).days
+        if tu<=cu<=den:
+            dem[cu]=dem.get(cu,1)-1
+        d=(TODAY+days(k)).replace(hour=random.choice(gio),minute=0)
+        r[cot]=F(d); _keo(r); dem[k]=dem.get(k,0)+1; doi+=1
+    # PHA 2 - HẠ ĐỈNH. Chỉ nâng sàn thì hết ngày trống nhưng vẫn còn ngày dồn cục: đo sau pha 1
+    # ra thứ Sáu 15 cái hẹn còn thứ Hai 3 - lệch 5 lần, nhìn vẫn không ra một trung tâm chạy đều.
+    # Đỉnh đó là CỐ Ý cũ: pipeline gieo ">=6 lead hẹn ĐÚNG HÔM NAY" để bàn trực luôn có việc. Ý
+    # đó đúng, nhưng nay sàn từng ngày đã lo việc ấy rồi, nên cái đỉnh chỉ còn là chỗ lệch.
+    tran=max(moiNgay+1,int(round(moiNgay*1.8)))
+    for _ in range(60):
+        cao=max(range(tu,den+1),key=lambda k:dem.get(k,0))
+        thap=min(range(tu,den+1),key=lambda k:dem.get(k,0))
+        if dem.get(cao,0)<=tran or dem.get(cao,0)-dem.get(thap,0)<=1: break
+        cand=[r for r in ung if (_ngay(r[cot]).date()-TODAY.date()).days==cao]
+        if not cand: break
+        r=cand[0]
+        d=(TODAY+days(thap)).replace(hour=random.choice(gio),minute=0)
+        r[cot]=F(d); _keo(r); dem[cao]-=1; dem[thap]=dem.get(thap,0)+1; doi+=1
+    return doi
+_sanphang={}
+_sanphang["hẹn liên hệ"]=_phuDeu(leads,"next_followup_time",
+    lambda L: L["lead_status"].split(" ")[0] in ("new","contacted","considering","no_response"),
+    [9,10,14,16,19], 3)
+_sanphang["buổi WOW"]=_phuDeu(wows,"wow_session_date",
+    lambda w: w["wow_status"].split(" ")[0] in ("booked","confirmed"),
+    [9,15,19], 2, truoc=("booking_date",))
+_sanphang["test đầu vào"]=_phuDeu(tests,"test_date",
+    lambda t: t["booking_status"].startswith("booked") and not t["test_attendance_status"],
+    [9,14,19], 2)
+print("SAN PHANG THEO NGAY (doi ngay, khong them dong):",
+      ", ".join("%s %d dong"%(k,v) for k,v in _sanphang.items()))
+
+# ═══════════════════════════════════════════════════════════════════════════════════════════
+# Ô CHẾT - THẺ CÓ TRÊN BẢNG VIỆC MÀ KHÔNG NGÀY NÀO SÁNG (V9.66)
+# ═══════════════════════════════════════════════════════════════════════════════════════════
+# `_checkdemo.js` đóng vai từng nhân viên mở app suốt 7 thứ trong tuần rồi hỏi từng ô một. Ba ô
+# dưới đây chưa bao giờ có số - không phải app hỏng mà là DỮ LIỆU DEMO không có tình huống đó,
+# nên người xem demo không bao giờ thấy tính năng đứng sau ô ấy.
+# Ô nào ĐÚNG là nên bằng 0 (kiểu "Quá hạn", "Nguồn đang kém") thì khai ở RONGDUOC trong bộ kiểm
+# kèm lý do, chứ không gieo bừa dữ liệu xấu cho thẻ sáng lên.
+_ochet=[]
+# 1. Lead chưa ai phụ trách - để trình được nút "Chia đều cho đội tư vấn" ở màn Bàn giao lead.
+_songs=[L for L in leads if L["lead_status"].split(" ")[0] in ("new","contacted") and L.get("assigned_to")]
+for L in _songs[:3]:
+    L["assigned_to"]=""; L["assigned_to_name"]=""
+    L["lead_note"]=(L.get("lead_note") or "").strip()
+    _ochet.append("lead chua ai phu trach")
+# 2. Buổi đã dạy còn thiếu mốc giờ vào/ra - việc Nhân sự phải đi đòi trước khi chốt bảng công.
+_xong=[s for s in sessions if s["session_status"].startswith("completed")
+       and s.get("class_start_actual") and s.get("class_end_actual")]
+for s_ in _xong[-2:]:
+    s_["class_end_actual"]=""; s_["teacher_late_minutes"]=""
+    s_["notes"]=(s_.get("notes") or "").strip() or "GV quên bấm giờ ra - nhân sự nhắc bổ sung"
+    _ochet.append("buoi thieu moc gio")
+print("O CHET DA GIEO TINH HUONG:", ", ".join(sorted(set(_ochet))) or "khong con")
 # feature coverage
 def cnt(pred,arr): return sum(1 for x in arr if pred(x))
 cov={

@@ -302,6 +302,30 @@ def main():
         r["perm_level"] = "view (Chỉ xem)"
         r["perm_note"] = "Quyền tạm mở theo yêu cầu của chính học viên."
 
+    # ---- 3bis-b. MỌI BỘ PHẬN ĐỀU PHẢI CÓ VIỆC ĐANG LÀM (V9.66) ----
+    # `_checkdemo.js` đóng vai từng nhân viên mở app suốt bảy thứ trong tuần: bộ phận Nhân sự chỉ
+    # được chia hai việc và cả hai đều ở trạng thái "Mới giao", nên ô "Đang làm" trên bảng việc
+    # của họ chưa bao giờ có số. Nguyên nhân là bảng trạng thái `plan_down` chạy VÒNG QUA TOÀN BỘ
+    # danh sách: bộ phận nào ít người thì rơi trúng vài ô đầu rồi hết lượt - đúng kiểu thiếu sót
+    # không ai nhìn ra khi đọc mã, chỉ lộ khi ĐÓNG VAI người ngồi làm việc.
+    # Sửa ở đây thay vì đổi vòng lặp trên: thêm việc thì chắc chắn đủ, còn xoay bảng trạng thái
+    # thì bộ phận sau lại hụt cái khác.
+    for dep in DEPTS:
+        ng = by_dep.get(dep, [])
+        if not ng:
+            continue
+        ids_dep = {x["staff_id"] for x in ng}
+        dang = [r for r in rows if r["assignee_id"] in ids_dep
+                and r["task_status"].split("(")[0].strip() == "accepted"]
+        if dang:
+            continue
+        who = next((x for x in ng if boss_of(x) and boss_of(x)["staff_id"] != x["staff_id"]), None)
+        if not who:
+            continue
+        pool = [x for x in SCEN if x[2] == dep] or SCEN
+        add(boss_of(who), who, random.choice(pool), "assign", "accepted", True, 28, -20,
+            related=pick_related())
+
     # ---- 3b. QUYỀN TẠM THEO VIỆC (câu hỏi của Luân 28/07) ----
     # Việc dính hồ sơ học viên thì người nhận PHẢI được mở quyền, nhưng quyền là thứ đi mượn:
     # có MỨC rõ (chỉ xem / xem và sửa), có HẠN rõ (mặc định = hạn việc + số ngày ân hạn),

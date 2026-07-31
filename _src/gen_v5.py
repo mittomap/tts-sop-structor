@@ -1744,7 +1744,19 @@ function tshAnchor(){var m=(DATA.meta&&DATA.meta.anchor)||"";return pvnd(m)}
 function tshDays(){var a=tshAnchor();if(!a)return 0;
  var t=new Date();t.setHours(0,0,0,0);var a0=new Date(a.getFullYear(),a.getMonth(),a.getDate());
  var d=Math.round((t.getTime()-a0.getTime())/864e5);
- return Math.round(d/7)*7}                       /* bội số 7 - giữ nguyên thứ trong tuần */
+ /* V9.66 (anh Luân: *"nhớ cấu hình nút reset demo để luôn có 1 bộ demo chuẩn... Thực sự chuẩn"*).
+    ĐỔI round THÀNH floor, và đây là chỗ sửa quan trọng nhất của việc "demo chuẩn mọi ngày".
+    `round` làm tròn LÊN khi lệch 4-6 ngày, tức đẩy mốc neo lên TRƯỚC hôm nay tới 3 ngày. Khi đó
+    "hôm nay" rơi vào phần QUÁ KHỨ của dữ liệu - nơi mọi buổi học đã dạy xong, mọi hẹn đã gọi.
+    Đo thật: mở app vào 3/7 ngày trong tuần thì ô "Buổi học hôm nay" đọc số 0, dù dữ liệu có 206
+    buổi chưa dạy trải đủ cả 7 thứ. Không phải dữ liệu thiếu - phép kéo chỉ vào chỗ trống.
+    `floor` giữ mốc neo LUÔN ở hoặc trước hôm nay, nên hôm nay luôn nằm trong phần TƯƠNG LAI của
+    dữ liệu (0-6 ngày sau mốc). Đánh đổi: độ lệch tối đa 6 ngày thay vì 3 - nhưng lệch về ĐÚNG
+    HƯỚNG thì hơn hẳn lệch ít mà sai hướng. Dữ liệu nay đã gieo phủ đều 0..+7 (xem `_phuDeu` trong
+    gen_demo.py) nên khoảng 0..+6 mà floor tạo ra nằm trọn trong phần đã phủ. Hai chỗ này là MỘT
+    HỢP ĐỒNG: đổi floor/round ở đây mà không đổi cửa sổ gieo ở kia là demo lại có ngày trống.
+    `_checkdemo.js` canh đúng hợp đồng đó - nó đóng vai người mở app 7 thứ trong tuần. */
+ return Math.floor(d/7)*7}                      /* bội số 7 - giữ nguyên thứ trong tuần */
 var TSHRE=/^\s*(\d{1,2})\/(\d{1,2})\/(\d{4})(\s+(\d{1,2}):(\d{2})(:\d{2})?)?\s*$/;
 function tshOne(v,days){
  var m=String(v==null?"":v).match(TSHRE);if(!m)return null;
@@ -2495,7 +2507,14 @@ function dsLevel(dom){var p=dsCfg();
  var base=DSDEF[g]||DSDEF[(g||"").replace(/_mgr$/,"")]||DSDEF.quantri;
  return base[dom]||"none"}
 var __dsTeam=null,__dsBr=null;
-function dsReset(){__dsTeam=null;__dsBr=null}
+var __dsWow=null;
+/* Danh sách người của đội WOW - dùng cho hàng chờ chấm test chung. Nhớ lại kết quả vì recOwners
+   chạy trên từng dòng của mọi bảng; quét lại DL01 mỗi dòng là bảng 370 phiếu quét 370 lần. */
+function doiWOW(){if(__dsWow)return __dsWow;
+ __dsWow=rows("DL01").filter(function(s){return mapRoleCode(ecode(s.role))==="wow"&&staffActive(s)})
+  .map(function(s){return String(s.staff_id||"")});
+ return __dsWow}
+function dsReset(){__dsTeam=null;__dsBr=null;__dsWow=null}
 function myTeam(){if(__dsTeam)return __dsTeam;var o={};
  if(CURSTAFF){o[CURSTAFF]=1;
   var st=find("DL01","staff_id",CURSTAFF);
@@ -2514,7 +2533,17 @@ function recOwners(code,r){if(!r)return [];
  switch(code){
   case "DL02":return [r.assigned_to];
   case "DL02b":{var L=r.lead_id&&find("DL02","lead_id",r.lead_id);return [r.staff_id,L&&L.assigned_to]}
-  case "DL03":{var L3=r.lead_id&&find("DL02","lead_id",r.lead_id);return [r.graded_by,r.created_by,L3&&L3.assigned_to]}
+  /* V9.66: phiếu test ĐÃ THI MÀ CHƯA CHẤM là HÀNG CHỜ CHUNG của đội WOW, chưa thuộc về ai.
+     Trước bản này chủ sở hữu chỉ có graded_by / created_by / người phụ trách lead - mà phiếu
+     chưa chấm thì graded_by còn trống, nên NV WOW mở app ra thấy ô "Test chờ chấm" bằng 0 đúng
+     vào lúc có 7 phiếu đang chờ chính họ chấm. Bảng khối lượng công việc đã hiểu luật này từ
+     lâu (nó cộng riêng phần "chưa ai nhận chấm" cho người vai WOW); nay phạm vi dữ liệu hiểu
+     giống hệt, để hai nơi không nói hai chuyện. */
+  case "DL03":{var L3=r.lead_id&&find("DL02","lead_id",r.lead_id);
+   var o3=[r.graded_by,r.created_by,L3&&L3.assigned_to];
+   if(!String(r.graded_by||"").trim()&&isc(r.test_attendance_status,"on_time","late")&&!isc(r.test_status,"graded"))
+    o3=o3.concat(doiWOW());
+   return o3}
   case "DL04":{var L4=r.lead_id&&find("DL02","lead_id",r.lead_id);return [r.consulted_by,L4&&L4.assigned_to]}
   case "DL09":return stuOwners(r.student_id);
   case "DL08":return [r.assigned_by].concat(stuOwners(r.student_id));
@@ -3948,7 +3977,11 @@ function openNSQuick(id){var s=find("DL01","staff_id",id);if(!s){toast("Không t
  var clsIds={};cls.forEach(function(c){clsIds[c.class_id]=1});
  var done=rows("DL11").filter(function(x){return isc(x.session_status,"completed")&&(String(x.teacher_id||"")===id||clsIds[x.class_id])});
  var lead=rows("DL02").filter(function(l){return String(l.assigned_to||"")===id});
- var leadOpen=lead.filter(function(l){return !isc(l.lead_status,"converted","rejected","lost")});
+ /* V9.66: "lost" không có trong CH1. Và quan trọng hơn: "lead còn sống" là MỘT khái niệm,
+    nên phải có MỘT định nghĩa - `mkLeadSong`. Trước bản này có hai bản: chỗ này và bảng khối
+    lượng coi lead unreachable là còn sống, còn bảng Marketing thì không. Cùng một người, hai
+    màn hình đếm ra hai số. */
+ var leadOpen=lead.filter(mkLeadSong);
  var h='<div style="margin-bottom:10px"><span class="chip '+stCls(s.status)+'">'+esc(elabel(s.status)||"-")+'</span> <span class="chip '+(gv?"blue":"gray")+'">'+esc(elabel(s.role)||s.role||"-")+'</span></div>';
  h+=ctxRows([["Bộ phận",elabel(s.department)||s.department],["Chi nhánh",elabel(s.branch)||s.branch],
   ["Điện thoại",telHTML(s.phone)],["Email",s.email],["Quản lý trực tiếp",s.reports_to_name||s.reports_to],
@@ -4120,7 +4153,7 @@ function BANGVIEC(){
  wow:{bc:"BC6",t:"Bảng NV WOW",d:"Việc của NV WOW: chấm test đầu vào, ghi nhận xét học thuật, dạy buổi WOW 1-1.",
   o:[["ti-file-text",dsTest(function(r){return isc(r.test_attendance_status,"on_time","late")&&!isc(r.test_status,"graded")}),"Test chờ chấm","#E24B4A","SLA chấm "+slaChip("slaGLA_hours",24,"giờ"),"goTS('test')"],
      ["ti-checkbox",dsTest(function(r){return num(r.overall_score)>0}),"Test đã chấm","#16A34A","đã có điểm tổng","goTS('test')"],
-     ["ti-star",W.filter(function(r){return isc(r.wow_status,"booked","confirmed","scheduled")}).length,"WOW sắp tới","#3B82C4","buổi đã đặt","goHT('wow')"],
+     ["ti-star",W.filter(function(r){return isc(r.wow_status,"booked","confirmed")}).length,"WOW sắp tới","#3B82C4","buổi đã đặt","goHT('wow')"],
      ["ti-trending-up",wDay.length?Math.round(wImp.length/wDay.length*100)+"%":"—","WOW có tiến bộ","#6B4FA0","WOR mục tiêu "+kpiChip(/^WOR/,0.6,1),"goHT('wow')"]]},
  giaovien:{bc:"BC7",t:"Bảng Giảng viên",d:"Việc của giảng viên: buổi học, nhận xét buổi, bài tập, học viên yếu.",
   o:[["ti-calendar-check",SE.filter(function(r){return isc(r.session_status,"completed")}).length,"Buổi đã hoàn thành","#16A34A","mọi lớp đang phụ trách","goHT('buoihoc')"],
@@ -4128,19 +4161,26 @@ function BANGVIEC(){
         Gõ nhầm tên cột thì ô này báo 100% buổi thiếu nhận xét mà không ai nghi ngờ - nên hỏi
         thẳng bhState(), là chỗ DUY NHẤT trong app biết luật này. */
      ["ti-notes",SE.filter(function(r){var st=bhState(r);return st.done&&!st.note}).length,"Cần viết nhận xét buổi","#E24B4A","SLA "+slaChip("slaTeacherNote_hours",48,"giờ"),"goHT('buoihoc')"],
-     ["ti-book",HW.filter(function(r){return isc(r.homework_status,"submitted")&&!String(r.graded_at||"").trim()}).length,"Bài tập chờ chấm","#B58A2B","SLA "+slaChip("slaHomeworkGrading_hours",120,"giờ"),"go('baitap')"],
+     /* V9.66: ô này TỪNG LUÔN ĐỌC SỐ 0 suốt nhiều bản, mà không ai thấy vì 0 trông rất hợp lý.
+        Nó lọc `isc(homework_status,"submitted")` - một mã KHÔNG HỀ TỒN TẠI: enum thật là
+        submitted_on_time / submitted_late (chính chú thích của `hwSubmitted` đã ghi rõ). Trong
+        dữ liệu có 188 bài đã nộp chưa chấm mà bảng việc của giảng viên báo 0.
+        Đúng cái luật đã cắn nhiều lần: MỘT SỰ THẬT VIẾT Ở HAI CHỖ thì sẽ lệch. Màn "Hôm nay"
+        của giảng viên hỏi `hwSubmitted()/hwGraded()` - bộ hàm DUY NHẤT biết luật này - còn ô này
+        tự chép lại luật rồi chép sai. Nay hỏi đúng bộ hàm đó. */
+     ["ti-book",HW.filter(function(r){return hwSubmitted(r)&&!hwGraded(r)}).length,"Bài tập chờ chấm","#B58A2B","SLA "+slaChip("slaHomeworkGrading_hours",120,"giờ"),"go('baitap')"],
      ["ti-user-exclamation",S.filter(stuAca).length,"HV nguy cơ học thuật","#6B4FA0","cần đặt WOW kèm","goRisk()"]]},
  hocvu:{bc:"BC8",t:"Bảng Học vụ",d:"Việc của học vụ: xếp lớp - nhập học, học viên nguy cơ, phản hồi, khiếu nại.",
   o:[["ti-layout-grid-add",OB.filter(function(r){return !isc(r.onboarding_status,"completed")}).length,"Nhập học chưa xong","#B58A2B","SLA "+slaChip("slaOBT_hours",48,"giờ"),"go('xeplop')"],
      ["ti-user-exclamation",S.filter(stuRisk).length,"Học viên nguy cơ","#E24B4A","hai trục, có thể trùng","goRisk()"],
      ["ti-message-2",FB.filter(function(r){return !String(r.classified_at||"").trim()}).length,"Phản hồi chờ phân loại","#3B82C4","SLA "+slaChip("slaFeedbackClassify_hours",24,"giờ"),"goCS('phanhoi')"],
-     ["ti-alert-triangle",KN.filter(function(r){return !isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại đang xử lý","#6B4FA0","SLA phân công "+slaChip("slaComplaintFirstResponse_hours",4,"giờ"),"goCS('khieunai')"],
+     ["ti-alert-triangle",KN.filter(function(r){return !isc(r.complaint_status,"resolved")}).length,"Khiếu nại đang xử lý","#6B4FA0","SLA phân công "+slaChip("slaComplaintFirstResponse_hours",4,"giờ"),"goCS('khieunai')"],
      ["ti-inbox",ycHVSo(),"Học viên liên hệ","#3B82C4","SLA nhận việc "+slaChip("slaTaskAccept_hours",4,"giờ"),"goCS('ychv')"]]},
  quanly:{bc:"BC9",t:"Bảng Quản lý",d:"Việc cần cấp quản lý gật đầu, theo bảng phân quyền CH3.",
   o:[["ti-discount-2",duyCkList().length,"Chiết khấu cần duyệt","#B58A2B","từ "+slaChip("thresholdDiscount_approval",1000000,"đ")+" trở lên","goDuyet('duyetck')"],
      ["ti-transfer",OB.filter(function(r){return num(r.placement_change_count)>=dlNguong()}).length,"Đổi lớp từ "+dlNguong()+" lần","#6B4FA0","quá "+slaChip("placementChange_free_times",1,"lần")+" miễn duyệt - cần quản lý phê duyệt","go('xeplop')"],
-     ["ti-alert-triangle",KN.filter(function(r){return isc(r.complaint_severity,"high")&&!isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại mức CAO","#E24B4A","quản lý tham gia trong "+slaChip("slaComplaintHigh_hours",4,"giờ"),"goCS('khieunai')"],
-     ["ti-arrow-up-right",KN.filter(function(r){return String(r.escalated_to||"").trim()&&!isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại đã leo thang","#DB2777","HV không chấp nhận cách xử lý","goCS('khieunai')"],
+     ["ti-alert-triangle",KN.filter(function(r){return isc(r.complaint_severity,"high")&&!isc(r.complaint_status,"resolved")}).length,"Khiếu nại mức CAO","#E24B4A","quản lý tham gia trong "+slaChip("slaComplaintHigh_hours",4,"giờ"),"goCS('khieunai')"],
+     ["ti-arrow-up-right",KN.filter(function(r){return String(r.escalated_to||"").trim()&&!isc(r.complaint_status,"resolved")}).length,"Khiếu nại đã leo thang","#DB2777","HV không chấp nhận cách xử lý","goCS('khieunai')"],
      /* SOP liệt kê 4 ô ở BC9, nhưng CH3 còn giao cho quản lý việc "Xác nhận hoàn tiền" - việc đó
         CÓ hàng chờ đếm được, nên phải nhìn thấy chứ không để nằm khuất trong hub Chờ duyệt. */
      ["ti-arrow-back-up",duyRefundList().length,"Hoàn tiền chờ duyệt","#B58A2B","SLA "+slaChip("slaRefundProcess_days",7,"ngày"),"goDuyet('duyethoan')"]]},
@@ -8436,7 +8476,10 @@ function kpiCompute(){
  v.RTR=rate(cnt(CE,function(c){var x=hb(c.course_completion_time,c.re_enrollment_contact_time);return x!=null&&x>=0&&x<=72}),CE.length);
  /* P10 · TCR - HV bảo lưu đã quay lại học */
  var paused=S.filter(function(s){return isc(s.student_status,"transferred")});   /* danh mục ghi: transferred (Bảo lưu/chuyển khóa) */
- var backIds={};rows("DL06").forEach(function(e){if(isc(e.enrollment_status,"active"))backIds[String(e.student_id||"")]=1});
+ /* V9.66: mã "active" KHÔNG CÓ trong danh mục CH1 của enrollment_status (chỉ có pending /
+    confirmed / cancelled), nên câu lọc này chưa bao giờ đúng một dòng nào - TCR đọc 0% vĩnh viễn
+    mà nhìn vẫn rất hợp lý ("chưa ai bảo lưu quay lại"). Đơn còn hiệu lực = đơn chưa huỷ. */
+ var backIds={};rows("DL06").forEach(function(e){if(!isc(e.enrollment_status,"cancelled"))backIds[String(e.student_id||"")]=1});
  v.TCR=rate(cnt(paused,function(s){return backIds[String(s.student_id||"")]}),paused.length);
  /* P10 · WRR - buổi WOW đề xuất đúng chỗ: dạy xong và có tiến bộ */
  var wReal=W.filter(function(w){return !isc(w.wow_status,"cancelled")});
@@ -12447,7 +12490,10 @@ function renderKetthuc(){var p="ketthuc",fil=fget(p);var all=rows("DL18");
   /* V9.57: o cu dem nguoi DA tai ghi danh - thanh tich, khong phai viec. Nguoi da xong khoa ma
      CHUA AI MOI moi la thu de lau se nguoi. Chi so RER van con nguyen o luoi KPI. */
   (function(){var n=all.filter(function(x){return String(x.course_completion_time||"").trim()&&
-     !String(x.re_enrollment_contact_time||"").trim()&&!isc(x.re_enrollment_status,"confirmed_with_deposit","declined")}).length;
+     /* V9.66: mã đúng theo CH1 là "rejected", không phải "declined" - viết sai thì HV đã từ chối
+        tái đăng ký vẫn bị đếm vào ô "chưa ai mời", tức là giục nhân viên đi mời lại người đã nói
+        không. Số sai mà không ai nghi, vì nó chỉ lớn hơn sự thật một chút. */
+     !String(x.re_enrollment_contact_time||"").trim()&&!isc(x.re_enrollment_status,"confirmed_with_deposit","rejected")}).length;
    return ["ti-mail-forward",n,"Xong khóa, chưa ai mời học tiếp","#E24B4A",
     n?"mời trong lúc còn nhiệt, để nguội là mất":"đã mời hết"]})()],"ketthuc");
  view=fltApply(p,view);
@@ -12748,7 +12794,9 @@ function renderTrangHV(){
       '<span>'+esc(cl.course_id_name||cl.course_id||"")+(cl.class_schedule?' · '+esc(cl.class_schedule):'')+'</span></div>'+
      (on?'<i class="ti ti-circle-check hvcrok"></i>':'')+'</div>'+
     '<div class="hvcrb">'+ /* V9.18: chip ĐẶC màu nổi - hết nhầm Đang học / Đã hoàn thành / Đã kết thúc */
-     '<span class="chip fill-'+(ceo?"green":(isc(cl.class_status,"completed","closed","cancelled")?"gray":"blue"))+'">'+esc(ceo?"Đã hoàn thành":(elabel(cl.class_status)||"Đang học"))+'</span>'+
+     /* V9.66: CH1 ghi lớp đã xong là "finished"; hai mã "completed"/"closed" ở đây không tồn tại,
+        nên lớp đã kết thúc vẫn ăn chip xanh dương "Đang học". */
+     '<span class="chip fill-'+(ceo?"green":(isc(cl.class_status,"finished","cancelled")?"gray":"blue"))+'">'+esc(ceo?"Đã hoàn thành":(elabel(cl.class_status)||"Đang học"))+'</span>'+
      (cl.class_start_date?'<span class="hvcrd">'+esc(String(cl.class_start_date).slice(0,10))+(cl.class_end_date?' → '+esc(String(cl.class_end_date).slice(0,10)):'')+'</span>':'')+
     '</div>'+
     '<div class="hvcrf">'+
@@ -14337,10 +14385,10 @@ function gvTaiRows(){
    quá tải, ai đang rảnh, giao việc mới cho ai. */
 function khoiLuongRows(){
  var L=rows("DL02"),T=rows("DL03"),C=rows("DL04"),OB=rows("DL08"),KN=rows("DL17"),TK=rows("DL23");
- function mo(r,f){return !isc(r[f],"resolved","closed","completed")}
+ function mo(r,f){return !isc(r[f],"resolved")}
  return rows("DL01").filter(staffActive).map(function(nv){
   var id=String(nv.staff_id||"");
-  var lead=L.filter(function(r){return String(r.assigned_to||"")===id&&!isc(r.lead_status,"converted","rejected","lost")}).length;
+  var lead=L.filter(function(r){return String(r.assigned_to||"")===id&&mkLeadSong(r)}).length;
   var cham=T.filter(function(r){return String(r.graded_by||"")===id&&!isc(r.test_status,"graded")}).length
    +T.filter(function(r){return !String(r.graded_by||"").trim()&&mapRoleCode(ecode(nv.role))==="wow"&&isc(r.test_attendance_status,"on_time","late")&&!isc(r.test_status,"graded")}).length;
   var tuvan=C.filter(function(r){return String(r.consulted_by||"")===id&&!isc(r.consultation_status,"consulted")}).length;
@@ -16989,7 +17037,7 @@ var NHIP={
   ["ngay","Lead bị đánh dấu không đạt chuẩn","Tỷ lệ lead xấu cao là tiền quảng cáo đang chảy sai chỗ","tuyensinh",
    function(){return rows("DL02").filter(function(l){return /not_qualified|unqualified/.test(ecode(l.lead_qualification_status))}).length}],
   ["chieu","Khơi lại kho khách cũ","Khách đã nguội vẫn rẻ hơn khách mới - mỗi ngày chạm lại một ít","reup",
-   function(){return rows("DL02").filter(function(l){return isc(l.lead_status,"lost","no_response","unreachable")}).length}],
+   function(){return rows("DL02").filter(function(l){return isc(l.lead_status,"no_response","unreachable")}).length}],
   ["chieu","Xem mã giới thiệu ai đang chạy","Khách cũ giới thiệu là nguồn rẻ nhất, đừng để thưởng treo","magioithieu",
    function(){return rows("DL19").filter(function(r){return isc(r.reward_status,"pending")}).length}]],
  /* V9.44 - NHỊP NGÀY CHO NHÓM HỖ TRỢ (HR, IT, bảo vệ, tạp vụ). Họ không đụng vào phễu hay lớp
