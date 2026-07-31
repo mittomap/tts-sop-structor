@@ -488,8 +488,14 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
   t("khai hotline roi thi thanh tren CO nut goi dung so", h1.indexOf('href="tel:028 7300 1234'.replace(/ /g,""))>=0||/href="tel:0287300 ?1234/.test(h1)||/href="tel:02873001234/.test(h1));
   t("nut goi tren thanh tren di qua hvCallHTML", /hvCallHTML\(/.test(_tools));
  })();
- t("moi nut tren thanh deu co loi giai thich (data-tip)",
-   (_tools.match(/<button class="tbtn"/g)||[]).length===(_tools.match(/data-tip=/g)||[]).length-((_tools.match(/<a class="tbtn"/g)||[]).length));
+ /* V9.65: dem `class="tbtn"` NGUYEN VAN thi mot nut co them lop phu (class="tbtn hvviec")
+    khong duoc dem, va bo kiem do vi mot ly do khong lien quan gi den loi giai thich. Canh Y
+    DINH: moi nut/lien ket tren thanh deu phai co data-tip. */
+ (function(){
+  var nut=(_tools.match(/<(?:button|a)\s[^>]*class="tbtn[^"]*"/g)||[]).length;
+  var tip=(_tools.match(/data-tip=/g)||[]).length;
+  t("moi nut tren thanh deu co loi giai thich (data-tip)", nut>0&&tip>=nut);
+ })();
 
  /* --- 4. dia chi tinh ra phai dung ca hai cach bay --- */
  var CA=[

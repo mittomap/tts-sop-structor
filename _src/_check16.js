@@ -658,7 +658,7 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
 (function(){
  setRole("all");
  var c={};slaItems().forEach(function(x){c[x.cat]=(c[x.cat]||0)+1});
- t("co bo phan Giang vien (ACA) rieng", (c["Giảng viên (ACA)"]||0)>0);
+ t("co bo phan Giang vien chuyen mon rieng", (c["Giảng viên chuyên môn"]||c["Giảng viên (ACA)"]||0)>0);
  t("co bo phan WOW rieng", ("WOW" in c));
  /* anh Luân chốt 28/07: CHẤM BÀI TEST ĐẦU VÀO là việc của TEAM WOW, không phải giảng viên ACA */
  t("viec cham test thuoc nhom WOW", /add\("WOW","Chấm test đầu vào"/.test(SRC));
@@ -676,9 +676,12 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  var gv=rows("DL01").filter(function(x){return ecode(x.role)==="teacher"})[0];
  if(gv){CURSTAFF=gv.staff_id;applyScope(gv.staff_id);
   var cc={};bellItems().forEach(function(x){cc[x.cat]=(cc[x.cat]||0)+1});
-  t("giao vien thay viec nhom ACA trong chuong cua minh", (cc["Giảng viên (ACA)"]||0)>0);
+  t("giao vien thay viec nhom cua minh trong chuong", (cc["Giảng viên chuyên môn"]||cc["Giảng viên (ACA)"]||0)>0);
   window.VIECTEAM="all";window.VIECGRP="all";window.VIECSEV="";window.VIECOD=false;
-  t("trang Viec hom nay cua giao vien co chip ACA", RENDER["viec"]().indexOf("Giảng viên (ACA)")>=0);
+  /* V9.65: nhan doi tu "Giang vien (ACA)" sang "Giang vien chuyen mon" - ACA la tieng Anh viet
+    tat cho mot chuc danh tieng Viet, bat nguoi dung tra nghia mot cach vo co. Bo kiem canh Y
+    DINH (co nhom viec cua giang vien tren man Viec hom nay) chu khong canh nguyen van cai nhan. */
+ t("trang Viec hom nay co nhom viec cua giang vien", /Gi[aả]ng vi[eê]n/.test(RENDER["viec"]()));
   CURSTAFF="";applyScope("")}
  setRole("all");
 })();
@@ -689,7 +692,7 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
 (function(){
  setRole("all");
  var m={};slaItems().forEach(function(x){(m[x.cat]=m[x.cat]||{})[x.grp]=1});
- var ACA=m["Giảng viên (ACA)"]||{}, WOW=m["WOW"]||{};
+ var ACA=m["Giảng viên chuyên môn"]||m["Giảng viên (ACA)"]||{}, WOW=m["WOW"]||{};
  t("ACA giu viec CHAM BAI TAP trong lop", !!ACA["Chấm bài tập"]);
  t("ACA giu viec GHI NHAN XET BUOI", !!ACA["Ghi nhận xét buổi"]);
  t("WOW giu viec CHAM TEST dau vao", !!WOW["Chấm test đầu vào"]||!!WOW["Chờ chấm test"]);
