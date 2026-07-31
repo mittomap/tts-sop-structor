@@ -48,7 +48,7 @@ Bộ kiểm gồm **18 phần, phải xanh HẾT mới được giao** (~2.100 t
 | `ITTS_OUT=<out> node _check11.js` | `TONG: 145`, KHÔNG có dòng `FAIL` |
 | `ITTS_OUT=<out> node _check12.js` | `CHECK12 OK: 37 tieu chi` - một cửa vào, một luật |
 | `ITTS_OUT=<out> node _check13.js` | `CHECK13 OK: 174 tieu chi` - KPI biết nói |
-| `ITTS_OUT=<out> node _check14.js` | `CHECK14 OK: 136 tieu chi` - cổng học viên hai chiều |
+| `ITTS_OUT=<out> node _check14.js` | `CHECK14 OK: 179 tieu chi` - cổng học viên hai chiều + đổi cổng + thanh trên |
 | `ITTS_OUT=<out> node _check15.js` | `CHECK15 OK: 39 tieu chi` - **kiểm kê cửa ghi + bất biến nghiệp vụ** (bản khai cửa ghi nay đọc thẳng `DOORTB` của app - xem V9.31) |
 | `ITTS_OUT=<out> node _check16.js` | `CHECK16 OK: 665 tieu chi` - học phí theo đợt + vá V9.27 + bấm-tên-ra-drawer + địa chỉ từng trang + **màn Cài đặt tự giới thiệu** (mục 24bis `CFNHOM`, 24ter `SETMOTA`) |
 | `ITTS_OUT=<out> node _checkdata.js` | `CHECKDATA OK: 27 luat ... 0 cho lech` - **dữ liệu demo có khớp ga nghiệp vụ không** |

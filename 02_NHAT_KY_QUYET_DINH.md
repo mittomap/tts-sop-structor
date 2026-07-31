@@ -149,6 +149,38 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.63 — BA CỔNG ĐI LẠI ĐƯỢC VỚI NHAU + CỔNG HỌC VIÊN CÓ THANH TRÊN ✅ (31/07).**
+> · **Một cổng một tên.** Đo được **12 chỗ gọi "Trang học viên" / 5 chỗ gọi "Cổng học viên"** trong
+> cùng một app - anh Luân nhìn trang chủ demo là thấy ngay (*"sao ko dùng cổng học viên luôn"*).
+> Nay tất cả là **Cổng học viên**; chỉ "trang Học viên nguy cơ" (trang của cổng nhân viên) giữ
+> nguyên vì đó là tên khác hẳn.
+> · **Nút Đổi cổng ở CẢ BA cổng** (anh Luân đặt), mở ngăn kéo liệt kê ba cổng, cổng đang đứng thì
+> mờ và không bấm được. Địa chỉ **tính theo cách trang đang được mở**, không cắm cứng: mở file
+> `.html` trên máy thì đi theo tên file, mở qua thư mục (GitHub Pages) thì đi theo thư mục.
+> Bẫy đã cắn: canh bằng đuôi `.html` thì địa chỉ `.../cong-hoc-vien/index.html` bị tính nhầm sang
+> kiểu file rồi trỏ tới một nơi không tồn tại - nay canh **đúng tên hai file build**.
+> · **Cổng học viên có thanh trên thật** (anh Luân: *"để chứa mấy công cụ phù hợp"*). Trước đây
+> thanh này chỉ hiện trên điện thoại. Nay hiện ở mọi khổ màn: đang ở cổng nào, **đang đọc mục nào**
+> (cuộn tới đâu đổi tới đó), người đang xem là ai; bên phải là gọi trung tâm (chỉ vẽ khi đã khai
+> hotline), Đổi cổng, Đổi người, Reset demo. Nút "Đổi người" **rời khỏi sidebar** - một việc một chỗ.
+> · **Giọng nội bộ lọt ra cổng học viên** (anh Luân bắt): học viên gửi yêu cầu xong thì hiện dòng
+> *"Thêm dòng mới vào DL23"*. Đó là **thanh Hoàn tác của nhật ký thao tác nội bộ** - nó không được
+> phép có mặt ở cổng học viên/phụ huynh (và cho học viên lùi một dòng nghiệp vụ thì càng sai).
+> Nay: cổng học viên không vẽ thanh đó; câu trong nhật ký cũng đổi sang tiếng người
+> (*"Thêm mới ở bảng Việc được giao (DL23)"*).
+> · **Yêu cầu học viên gửi lên có chỗ đứng rõ ràng** (anh Luân: *"nghiệp vụ này nên ở đâu nhỉ"*).
+> Nó gửi được từ lúc học viên có cổng vào và ở **bất kỳ chặng nào**, nên không thuộc C1-C4. Đưa về
+> **hub CSKH** - nơi đã khai hai chiều Trung tâm ↔ Học viên - thành **kênh vào thứ ba**, tab
+> *Yêu cầu từ học viên*. Dữ liệu vẫn một chỗ (DL23) và vẽ lại đúng thẻ việc của module Giao việc,
+> không dựng bản sao. Bảng việc đầu ca của **học vụ và kế toán** có thêm ô *Yêu cầu học viên gửi tới*.
+> · **Cột menu cổng nhân viên kéo được**: mặc định 246 → **262px**, tay kéo ở mép phải (210-420px),
+> nhớ theo từng người, bấm đúp về mặc định; dưới 820px tắt hẳn. **Chip CSKH** ở Việc hôm nay dời
+> lên cạnh Học vụ.
+> · **Trang chủ bản demo**: bỏ câu dẫn, nền đổi sang **tông ITTs sáng** (đỏ - navy) và **không còn
+> bị hệ điều hành kéo về nền đen**.
+> · Bẫy cũ tái phát: khối kiểm mới nối vào **sau** dòng in kết quả nên chạy mà không được đếm -
+> `_check14` vẫn báo 136 y như cũ. Dời lên trước: **179**.
+>
 > **Phiên bản: V9.62 — KHOÁ BA CHỖ SỬA ĐƯỢC ✅ (31/07).**
 > · **Cổng nhân viên**: 17 thẻ chức danh **mờ đi, có ổ khoá, không bấm được**; vào thẳng Quản trị
 > viên. Công tắc mở lại nằm trong Cài đặt → Phân quyền.
@@ -4899,6 +4931,131 @@ bảng VIỆC · hai tham số ngưỡng mới phải nằm trong CH2. **155 →
 ### Số chốt phiên
 Thẻ **137 → 84** · Tổng quan **35 → 11** thẻ đầu trang, khối phòng ban 24 ô đọc chơi → 18 ô việc
 bấm được · 2 tham số mới vào CH2 (`viecOldAlert_days`, `svNudge_days`) · `_checkux` **161**.
+
+## V9.63 (31/07) - BA CỔNG ĐI LẠI ĐƯỢC VỚI NHAU
+
+**Anh Luân, bốn câu trong một phiên:** *"sao ko dùng cổng học viên luôn"* · *"em thêm chức năng
+đổi cổng, thành 1 cái nút gì đó lên navbar ở tất cả các cổng"* · *"cổng học viên em cũng nên làm
+navbar đi, để chứa mấy công cụ phù hợp"* · *"tại sao lúc học viên gửi, nó lại hiện cái dòng này:
+Thêm dòng mới vào DL23"* · *"học viên gửi yêu cầu là nó ở bất cứ chặng nào đúng ko em... thế thì
+nghiệp vụ này nên ở đâu nhỉ"*.
+
+### A. Một cổng một tên
+
+Đo trước khi sửa: `gen_v5.py` có **12 chỗ "Trang học viên"** và **5 chỗ "Cổng học viên"**. Không ai
+quyết định điều đó cả - nó trôi dần qua từng bản. Anh Luân nhìn trang chủ demo (ba thẻ: *Cổng nhân
+viên · Trang học viên · Cổng phụ huynh*) là thấy ngay.
+
+Đổi hết sang **Cổng học viên**. Cạm bẫy khi đổi hàng loạt: bốn chỗ viết *"trang Học viên nguy cơ"*
+- đó là **trang của cổng nhân viên**, tên khác hẳn, không được đụng. Tách bằng chữ hoa: thay
+`Trang học viên` và `trang học viên` (viết thường), chừa `trang Học viên`.
+
+### B. Đổi cổng - một nút ở cả ba cổng
+
+Ba cổng là ba địa chỉ. Trước đây muốn nhảy qua lại phải quay ra trang chủ demo. Nay có nút trên
+thanh trên của cả ba, mở ngăn kéo liệt kê ba cổng; **cổng đang đứng thì mờ, không bấm được**
+(mời rồi để người ta bấm lại chính chỗ đang đứng là đùa với người dùng).
+
+Chỗ dễ sai nhất là **địa chỉ**, vì bản demo được bày theo hai cách khác nhau:
+- trên máy: hai file `.html` nằm cạnh nhau ở gốc repo
+- trên GitHub Pages: hai thư mục `cong-nhan-vien/` và `cong-hoc-vien/`
+
+Nên `congURL()` **tính theo địa chỉ đang mở** chứ không cắm cứng. Bẫy đã cắn: bản đầu canh bằng
+đuôi `.html`, nên `.../cong-hoc-vien/index.html` (địa chỉ đầy đủ hoàn toàn hợp lệ trên Pages) bị
+tính nhầm sang kiểu file rồi trỏ tới `.../cong-hoc-vien/ITTs_WebApp_v5_demo.html` - không tồn tại.
+Sửa: canh **đúng tên hai file build**. Sáu dạng địa chỉ nay đều có tiêu chí kiểm riêng.
+
+Cổng phụ huynh không phải file thứ ba - nó là cổng học viên mở kèm `?phuhuynh`.
+
+### C. Cổng học viên có thanh trên thật
+
+`.hvtop` trước đây `display:none`, chỉ bật ở màn ≤900px để chứa nút mở mục lục. Tức là trên máy
+tính cổng học viên **không có thanh trên nào cả** - không có chỗ đặt công cụ, và người đọc cuộn
+giữa một trang dài thì không còn biết mình đang ở mục nào.
+
+Nay thanh hiện ở mọi khổ màn, dáng giống `.topbar` của cổng nhân viên để hai cổng nhìn là một hệ:
+- trái: nút mở mục lục (chỉ trên điện thoại, lớp riêng `.hvtoggle` - **không dùng chung
+  `.navtoggle`** vì cổng nhân viên gãy ở 820px còn cổng học viên gãy ở 900px, dùng chung thì
+  khoảng 820-900px không có nút nào)
+- giữa: tên cổng + **mục đang đọc** + tên người đang xem; `hvSpy` cuộn tới đâu đổi tới đó
+- phải: gọi trung tâm (**chỉ vẽ khi đã khai hotline** - không có số mà bày nút gọi là hứa suông),
+  Đổi cổng, Đổi người, Reset demo
+
+Nút "Đổi người / màn cổng" **rời khỏi sidebar** cùng lúc: để hai nơi là bắt đầu trôi.
+
+### D. Giọng nội bộ lọt ra cổng học viên
+
+Anh Luân gửi yêu cầu thử ở cổng học viên và thấy dòng **"Thêm dòng mới vào DL23"**.
+
+Truy ra: đó là **thanh Hoàn tác** của nhật ký thao tác. `logCmp` thấy có dòng mới thì ghi
+`summary = "Thêm dòng mới vào " + code`, rồi `undoOffer` lấy đúng câu đó bày lên thanh.
+
+Hai chỗ sai, không phải một:
+1. **Câu**: "DL23" là tên bảng dữ liệu, không phải tiếng người. Đã có sẵn `sheetVN()` dịch ra
+   *"Việc được giao (DL23)"* - dùng nó.
+2. **Chỗ**: thanh Hoàn tác là **công cụ nội bộ của người quản trị** - nó lùi được cả một dòng
+   nghiệp vụ. Cho học viên thấy đã kỳ, cho học viên bấm còn nguy hiểm hơn. Cổng học viên và cổng
+   phụ huynh **không vẽ thanh này**. Học viên muốn rút yêu cầu thì dùng nút Huỷ của chính yêu cầu
+   đó - đúng cửa của nó.
+
+> **LUẬT:** *chữ hiện ra cho người ngoài phải đi qua một lớp dịch.* Mã bảng, tên cột, tên hàm là
+> ngôn ngữ của người làm app; ai không làm app mà đọc thấy nó tức là có một chỗ chưa dịch.
+
+### E. Yêu cầu từ học viên nên nằm ở đâu
+
+Anh Luân hỏi đúng câu kiến trúc: yêu cầu gửi được **từ lúc học viên có cổng vào, ở bất kỳ chặng
+nào** - vậy nó thuộc về đâu?
+
+Đo trước: `hvReq()` đã làm đúng phần khó - chọn người nhận **theo mã vai trò CH1** (học vụ; riêng
+chuyện tiền thì kế toán), đặt hạn nhận theo `slaTaskAccept_hours` của CH2, trạng thái `new`. Người
+nhận thấy nó ở menu **Giao việc** (có số), hàng **Việc chờ nhận** (có số), và chuông.
+
+Chỗ hụt: **bảng việc đầu ca** của học vụ/kế toán - thứ họ nhìn khi mở app buổi sáng - không có ô
+nào cho nó. Và trang CSKH, nơi app đã tự khai là chỗ của kênh hai chiều Trung tâm ↔ Học viên, cũng
+không nhắc gì tới nó.
+
+Quyết định: **nó không thuộc chặng nào, nên nó về chỗ dành cho việc xuyên chặng** - hub CSKH, thành
+**kênh vào thứ ba** bên cạnh Góp ý và Khiếu nại, tab *Yêu cầu từ học viên*.
+
+Giữ đúng luật một sự thật một chỗ:
+- **dữ liệu** vẫn chỉ ở DL23, không sinh bảng mới
+- tab mới **vẽ lại đúng `tkCard`** của module Giao việc, không dựng bản sao giao diện
+- ô mới trên bảng việc của học vụ và kế toán trỏ **về tab này**, không trỏ về Giao việc
+
+### F. Bẫy đã cắn - bộ kiểm xanh giả, lần thứ hai theo một kiểu mới
+
+Nối 43 tiêu chí mới vào **cuối** `_check14.js`. Chạy: `CHECK14 OK: 136 tieu chi` - **đúng bằng số
+cũ**. Dòng `console.log` tổng kết nằm ở cuối file, nên khối mới chạy *sau* khi đã in xong: mọi tiêu
+chí đều thật sự chạy, nhưng không cái nào được đếm, và nếu có cái đỏ thì nó rơi vào `bad` sau lúc
+in - im lặng hoàn toàn.
+
+Dời khối lên trước dòng in: **179 tiêu chí**. Con số không đổi sau khi thêm việc là dấu hiệu phải
+nghi ngay, y như *"đo ra số lạ thì nghi cái thước trước"*.
+
+### G. Ba việc nhỏ cùng phiên
+
+- **Cột menu cổng nhân viên kéo được** (anh Luân: *"tăng độ rộng thêm 1 tí, hoặc cho người ta tự
+  kéo có ảnh hưởng gì ko em"* - không ảnh hưởng gì, vì chỉ cột menu đổi rộng còn phần nội dung co
+  theo `flex`). Làm cả hai: mặc định **246 → 262px**, và có tay kéo ở mép phải đúng lối của ngăn
+  kéo - giới hạn 210-420px, nhớ theo từng người trong `localStorage`, **bấm đúp về mặc định**.
+  Dưới 820px sidebar là lớp phủ trượt ra nên tay kéo tắt hẳn.
+- **Chip CSKH đứng cạnh Học vụ** ở Việc hôm nay (anh Luân). Hai nhóm cùng một bộ phận mà đang bị
+  Giảng viên / WOW / Tài chính chen vào giữa.
+- **Nút gọi trên thanh trên đi qua đúng một cửa.** Bản đầu em tự dựng thẻ `<a href="tel:">` riêng
+  cho thanh trên; `_check16` bắt ngay - đã có `hvCallHTML()` là cửa duy nhất cho mọi nút gọi. Sửa:
+  thêm kiểu "chỉ icon" **vào trong** hàm đó. Rồi bộ kiểm vẫn đỏ vì nó đếm số lần chuỗi `href="tel:`
+  xuất hiện trong mã, mà hai nhánh của cùng một hàm là hai lần. Gộp phần dựng liên kết thành một
+  biến rồi hai nhánh cùng dùng - vừa qua bộ kiểm vừa đỡ lặp thật.
+
+### H. Trang chủ bản demo
+
+Bỏ câu dẫn "Ba cổng dùng chung một bộ dữ liệu..." theo yêu cầu, chỉ giữ logo + ba thẻ. Nền: bỏ hẳn
+khối `@media (prefers-color-scheme: dark)` - chính nó kéo trang về `#121822` gần như đen khi máy
+anh Luân đang ở chế độ tối. Nay một tông cố định theo màu ITTs: nền sáng `#EEF2F6` như app, vệt
+loang navy + vệt đỏ, viền trên chuyển đỏ → navy, và **logo dùng đúng dấu ngắm của app** thay cho
+hình tròn đặc.
+
+---
 
 ## V9.62 (31/07) - KHOÁ BA CHỖ SỬA ĐƯỢC
 

@@ -388,7 +388,7 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
  var h2="";try{_box.innerHTML="";demoGateHV();h2=_box.innerHTML||""}catch(e){}
  var nHV=(h2.match(/class="rcard"/g)||[]).length;
  t("che do PH chi hien em DA KHAI so nguoi giam ho (it hon danh sach hoc vien)", nPH>0&&nPH<=nHV);
- t("khong co ?phuhuynh thi ve dung man hoc vien", /Trang học viên/.test(h2)&&!/Cổng phụ huynh/.test(h2));
+ t("khong co ?phuhuynh thi ve dung man hoc vien", /Cổng học viên/.test(h2)&&!/Cổng phụ huynh/.test(h2));
  global.location.search=luu; window.__hvPHM=luuM; window.__hvgq=luuQ;
  document.getElementById=_oldGet;
 })();
@@ -437,6 +437,99 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
   /* nhung van phai co GIO o dau do, khong duoc mat thong tin */
   t("gio buoi hoc van hien (chi doi cho, khong bo)", /class="hvst"><b>\d{2}:\d{2}<\/b>/.test(h)||/chưa xếp giờ/.test(h));
  }
+})();
+
+/* ============================================================================
+   V9.63 - DOI CONG + THANH TREN CUA CONG HOC VIEN (anh Luan dat)
+   Ba cong la ba dia chi. Nut "Doi cong" phai co o CA BA, va dia chi no tinh ra
+   phai dung voi CA HAI cach bay ban demo (mo file .html tren may / mo qua thu
+   muc tren GitHub Pages). Ten cong cung phai la MOT: "Cong hoc vien".
+   ============================================================================ */
+(function(){
+ var HTMLNV=require('fs').readFileSync((process.env.ITTS_OUT||'.')+'/ITTs_WebApp_v5_demo.html','utf8');
+
+ /* --- 1. mot cong mot ten --- */
+ t("khong con ten cu 'Trang hoc vien' o cong hoc vien", HTMLHV.indexOf("Trang học viên")<0);
+ t("khong con ten cu 'Trang hoc vien' o cong nhan vien", HTMLNV.indexOf("Trang học viên")<0);
+ t("tieu de file cong hoc vien la 'Cong hoc vien'", HTMLHV.indexOf("Cổng học viên</title>")>=0);
+
+ /* --- 2. thanh tren that cua cong hoc vien --- */
+ t("cong hoc vien co thanh tren .hvtop", HTMLHV.indexOf('<div class="hvtop">')>=0);
+ t("thanh tren co o ten cong (hvTopT)", HTMLHV.indexOf('id="hvTopT"')>=0);
+ t("thanh tren co o muc dang doc (hvTopS)", HTMLHV.indexOf('id="hvTopS"')>=0);
+ t("thanh tren co cho gan cong cu (hvTools)", HTMLHV.indexOf('id="hvTools"')>=0);
+ t("hvtop KHONG con bi giau di o man rong (display:none)", !/\.hvtop\{display:none\}/.test(HTMLHV));
+ t("nut mo muc luc chi hien tren dien thoai (.hvtoggle)", /\.hvtoggle\{display:none\}/.test(HTMLHV)&&/\.hvtoggle\{display:flex\}/.test(HTMLHV));
+ t("nut 'Doi nguoi' KHONG con nam o hai cho (hvselbox da bo)", HTMLHV.indexOf("hvselbox")<0);
+ t("hvRender co goi hvTopPaint", /function hvRender\(\)[\s\S]{0,900}?hvTopPaint\(\)/.test(SRC));
+ t("hvMark co goi hvTopTitle (cuon toi dau thanh tren doi toi do)", /function hvMark\([\s\S]{0,400}?hvTopTitle\(/.test(SRC));
+
+ /* --- 3. cong cu tren thanh: dung nut, khong hua suong --- */
+ var _tools=String(hvTopPaint.toString());
+ t("thanh tren co nut Doi cong", _tools.indexOf("congDoiMo()")>=0);
+ t("thanh tren co nut Doi nguoi dang xem", _tools.indexOf("gateSwitchHV()")>=0);
+ t("thanh tren co nut Reset demo", _tools.indexOf("demoResetHoi()")>=0);
+ /* Canh HANH VI chu khong canh cach viet: doi hotline trong cau hinh roi xem thanh tren ve gi.
+    Ban truoc tieu chi nay do bang /if\(hot\)/ tren ma nguon - sua hvTopPaint cho di qua
+    hvCallHTML mot cua la no do, trong khi hanh vi van dung y het. */
+ (function(){
+  var cu=null;(DATA.config.ch2||[]).forEach(function(c){if(c.name==="centerHotline"){cu=c.value;c.value=""}});
+  var rong=hvTopPaint.call(null),h0="";
+  try{h0=(function(){var t={innerHTML:""};var old=document.getElementById;
+   document.getElementById=function(id){return id==="hvTools"?t:old(id)};
+   hvTopPaint();document.getElementById=old;return t.innerHTML})()}catch(e){h0="LOI"}
+  (DATA.config.ch2||[]).forEach(function(c){if(c.name==="centerHotline")c.value="028 7300 1234"});
+  var h1="";
+  try{h1=(function(){var t={innerHTML:""};var old=document.getElementById;
+   document.getElementById=function(id){return id==="hvTools"?t:old(id)};
+   hvTopPaint();document.getElementById=old;return t.innerHTML})()}catch(e){h1="LOI"}
+  (DATA.config.ch2||[]).forEach(function(c){if(c.name==="centerHotline")c.value=cu});
+  t("chua khai hotline thi thanh tren KHONG ve nut goi", h0.indexOf('href="tel:')<0);
+  t("khai hotline roi thi thanh tren CO nut goi dung so", h1.indexOf('href="tel:028 7300 1234'.replace(/ /g,""))>=0||/href="tel:0287300 ?1234/.test(h1)||/href="tel:02873001234/.test(h1));
+  t("nut goi tren thanh tren di qua hvCallHTML", /hvCallHTML\(/.test(_tools));
+ })();
+ t("moi nut tren thanh deu co loi giai thich (data-tip)",
+   (_tools.match(/<button class="tbtn"/g)||[]).length===(_tools.match(/data-tip=/g)||[]).length-((_tools.match(/<a class="tbtn"/g)||[]).length));
+
+ /* --- 4. dia chi tinh ra phai dung ca hai cach bay --- */
+ var CA=[
+  ["/itts-sop-demo/cong-hoc-vien/",        "/itts-sop-demo/cong-nhan-vien/","/itts-sop-demo/cong-hoc-vien/","/itts-sop-demo/cong-hoc-vien/?phuhuynh"],
+  ["/itts-sop-demo/cong-nhan-vien/",       "/itts-sop-demo/cong-nhan-vien/","/itts-sop-demo/cong-hoc-vien/","/itts-sop-demo/cong-hoc-vien/?phuhuynh"],
+  ["/itts-sop-demo/cong-hoc-vien/index.html","/itts-sop-demo/cong-nhan-vien/","/itts-sop-demo/cong-hoc-vien/","/itts-sop-demo/cong-hoc-vien/?phuhuynh"],
+  ["/cong-nhan-vien/",                     "/cong-nhan-vien/","/cong-hoc-vien/","/cong-hoc-vien/?phuhuynh"],
+  ["/nha/ITTs_TrangHocVien_demo.html",     "/nha/ITTs_WebApp_v5_demo.html","/nha/ITTs_TrangHocVien_demo.html","/nha/ITTs_TrangHocVien_demo.html?phuhuynh"],
+  ["/nha/ITTs_WebApp_v5_demo.html",        "/nha/ITTs_WebApp_v5_demo.html","/nha/ITTs_TrangHocVien_demo.html","/nha/ITTs_TrangHocVien_demo.html?phuhuynh"]];
+ var _p0=global.location.pathname;
+ CA.forEach(function(c){
+  global.location.pathname=c[0];
+  t("dia chi dung khi dang o "+c[0], congURL("nv")===c[1]&&congURL("hv")===c[2]&&congURL("ph")===c[3])});
+ global.location.pathname=_p0;
+
+ /* --- 5. dang o dau thi biet, va khong moi minh di lai cho minh dang dung --- */
+ var _hp=window.HVPORTAL,_ph=window.HVPHONE;
+ window.HVPORTAL=0;window.HVPHONE="";
+ t("o cong nhan vien thi congDangO()=nv", congDangO()==="nv");
+ var hNV=congHTML();
+ window.HVPORTAL=1;
+ t("o cong hoc vien thi congDangO()=hv", congDangO()==="hv");
+ var hHV=congHTML();
+ window.HVPHONE="0900000000";
+ t("o cong phu huynh thi congDangO()=ph", congDangO()==="ph");
+ var hPH=congHTML();
+ window.HVPORTAL=_hp;window.HVPHONE=_ph;
+ [["cong nhan vien",hNV,"Cổng nhân viên"],["cong hoc vien",hHV,"Cổng học viên"],["cong phu huynh",hPH,"Cổng phụ huynh"]].forEach(function(x){
+  var n3=(x[1].match(/class="congr/g)||[]).length;
+  var nHere=(x[1].match(/class="congr here"/g)||[]).length;
+  var seg=x[1].split('class="congr here"')[1]||"";
+  t("("+x[0]+") ngan keo liet ke du ba cong", n3===3);
+  t("("+x[0]+") danh dau DUNG MOT cong dang dung", nHere===1);
+  t("("+x[0]+") cong dang dung la "+x[2], seg.indexOf(x[2])>=0&&seg.indexOf(x[2])<seg.indexOf("</div>")+400);
+  t("("+x[0]+") cong dang dung khong bam duoc nua", seg.slice(0,seg.indexOf("congr")>=0?seg.indexOf("congr"):seg.length).indexOf("congDi(")<0);
+  t("("+x[0]+") hai cong con lai deu bam duoc", (x[1].match(/congDi\('/g)||[]).length===2)});
+
+ /* --- 6. cong nhan vien cung phai co nut --- */
+ t("cong nhan vien co nut Doi cong tren thanh tren", HTMLNV.indexOf('id="congBtn"')>=0&&HTMLNV.indexOf('congDoiMo()')>=0);
+ t("nut Doi cong o cong nhan vien co loi giai thich", /id="congBtn"[^>]*data-tip="[^"]{20,}"/.test(HTMLNV));
 })();
 
 console.log(bad.length?("CHECK14 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK14 OK: "+ok+" tieu chi");

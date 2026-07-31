@@ -19,7 +19,15 @@ HTML = r"""<!DOCTYPE html>
 *{box-sizing:border-box;margin:0;padding:0}html,body{height:100%}
 body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:var(--bg);font-size:14px;-webkit-font-smoothing:antialiased}
 .app{display:flex;height:100vh;overflow:hidden}
-.sidebar{width:246px;flex-shrink:0;background:var(--sidebar);color:#C4D2E4;display:flex;flex-direction:column}
+/* V9.63 (anh Luân: *"tăng độ rộng thêm 1 tí, hoặc cho người ta tự kéo"*): làm cả hai - rộng mặc
+   định nhích lên 262px, và có tay kéo ở mép phải như ngăn kéo. Chỉ đổi độ rộng của CỘT MENU, phần
+   nội dung tự co theo (flex), nên không có gì bị đẩy ra ngoài màn. Dưới 820px sidebar là lớp phủ
+   trượt ra nên tay kéo tắt hẳn. */
+.sidebar{width:var(--sbw,262px);flex-shrink:0;background:var(--sidebar);color:#C4D2E4;display:flex;flex-direction:column;position:relative}
+.sbszr{position:absolute;right:0;top:0;bottom:0;width:8px;cursor:col-resize;z-index:5;background:transparent;transition:background .12s}
+.sbszr:hover,.sbszr.drag{background:linear-gradient(270deg,rgba(59,130,196,.28),transparent)}
+.sbszr:after{content:"";position:absolute;right:2px;top:50%;margin-top:-18px;width:3px;height:36px;border-radius:3px;background:#4A6280;transition:.12s}
+.sbszr:hover:after,.sbszr.drag:after{background:var(--blue);height:56px;margin-top:-28px}
 .brand{display:flex;align-items:center;gap:10px;padding:15px 18px;border-bottom:1px solid #ffffff18}
 .brand .logo{width:38px;height:38px;border-radius:8px;background:#fff;color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
 .brand b{color:#fff;font-size:14px;font-weight:700;line-height:1.1}.brand small{display:block;color:#93A7C2;font-size:10px;font-weight:500;letter-spacing:.3px;margin-top:2px}
@@ -667,24 +675,40 @@ body.drwon .asstfab{opacity:0;pointer-events:none;transition:opacity .12s ease}
 .hvme .av{width:38px;height:38px;border-radius:50%;background:#ffffff1f;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex:none}
 .hvme b{font-size:13px;color:#fff;display:block}
 .hvme small{font-size:10.5px;color:#93A7C2}
-.hvselbox{padding:11px 13px;border-bottom:1px solid #ffffff14}
-.hvselbox label{font-size:10px;font-weight:800;color:#7E93B2;text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px}
-.hvselbox select{width:100%;height:32px;border-radius:8px;border:1px solid #ffffff26;background:#ffffff10;color:#fff;font-family:inherit;font-size:11.5px;padding:0 8px}
-.hvselbox select option{color:#1E2A38}
 .hvnav{flex:1;padding:9px 9px 18px}
 .hvni{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;cursor:pointer;color:#C4D2E4;font-size:12.5px;font-weight:500;transition:.12s}
 .hvni i{font-size:17px;width:19px;text-align:center;opacity:.85}
 .hvni:hover{background:#ffffff12;color:#fff}
 .hvni.on{background:#ffffff1a;color:#fff;font-weight:700}
 .hvmain{flex:1;overflow-y:auto;padding:20px 24px 60px;scroll-behavior:smooth}
-.hvtop{display:none}
+/* V9.63: cổng học viên có THANH TRÊN thật (trước đây chỉ hiện trên điện thoại). Thanh này giữ
+   ba thứ người học cần mà mục lục bên trái không kham: đang đọc mục nào, gọi trung tâm, và
+   đổi cổng. Cùng dáng .topbar của cổng nhân viên để hai cổng nhìn là một hệ. */
+.hvtop{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:30;background:#fff;
+ border-bottom:1px solid var(--line);padding:9px 24px;margin:-20px -24px 16px}
+.hvtoggle{display:none}
+.hvtt{min-width:0;flex:1}
+.hvtt b{display:block;font-size:14px;font-weight:700;color:var(--text);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hvtt small{display:block;font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hvtools{display:flex;align-items:center;gap:7px;flex:none}
+.hvtools .tbtn{text-decoration:none}
 @media(max-width:900px){
  .hvside{position:fixed;left:0;top:0;bottom:0;z-index:60;transform:translateX(-100%);transition:.2s}
  .hvside.open{transform:none}
  .hvmask.on{display:block;position:fixed;inset:0;background:#0006;z-index:55}
  .hvmain{padding:14px}
- .hvtop{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--line);padding:10px 12px;margin:-14px -14px 12px}
+ .hvtoggle{display:flex}
+ .hvtop{padding:9px 12px;margin:-14px -14px 12px;gap:8px}
+ .hvtools{gap:5px}
 }
+/* Ngăn kéo ĐỔI CỔNG - dùng chung cho cả ba cổng */
+.congr{display:flex;align-items:center;gap:12px;padding:12px 13px;border:1px solid var(--line);border-radius:12px;margin-bottom:9px;cursor:pointer;background:#fff;transition:.14s}
+.congr:hover{border-color:var(--navy);box-shadow:0 6px 18px rgba(16,32,58,.09);transform:translateY(-1px)}
+.congr.here{cursor:default;background:var(--bg)}
+.congr.here:hover{border-color:var(--line);box-shadow:none;transform:none}
+.congr b{display:block;font-size:13.5px;color:var(--text)}
+.congr small{display:block;font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:2px}
+.congi{width:36px;height:36px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--navyd);font-size:18px}
 .hvpick{display:flex;align-items:center;gap:9px;margin-bottom:14px}
 .hvpick span{font-size:11px;font-weight:700;color:#8A94A0;text-transform:uppercase;letter-spacing:.3px}
 .hvhero{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,var(--navy),#3E7BB5);color:#fff;border-radius:12px;padding:20px 22px;margin-bottom:18px}
@@ -729,7 +753,7 @@ body.drwon .asstfab{opacity:0;pointer-events:none;transition:opacity .12s ease}
 .sst{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--navy);margin-bottom:1px}
 .sst i{font-size:13px}
 @media(max-width:760px){.mswrap,.substep{grid-template-columns:1fr}}
-/* Giới thiệu bạn bè (trang học viên) */
+/* Giới thiệu bạn bè (cổng học viên) */
 .hvrefbox{display:flex;gap:14px;align-items:center}
 .hvrefico{width:52px;height:52px;flex:none;border-radius:12px;background:linear-gradient(135deg,#FBF0EF,#FFF6D8);display:flex;align-items:center;justify-content:center}
 .hvrefico i{font-size:26px;color:var(--red)}
@@ -1440,6 +1464,7 @@ body.drsz .drawer{transition:none}
  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:60;transform:translateX(-100%);transition:transform .22s ease;box-shadow:0 12px 40px #00000055}
  .sidebar.open{transform:none}
  .navtoggle{display:flex}
+ .sbszr{display:none}
  .navmask.on{display:block;position:fixed;inset:0;background:#0006;z-index:55}
  .content{padding:16px 14px}
  .topbar{padding:0 14px;gap:10px}
@@ -1497,6 +1522,7 @@ body.drsz .drawer{transition:none}
 
 <div class="app" id="app" style="display:none">
   <aside class="sidebar" id="sidebar">
+    <div class="sbszr" id="sbszr" title="Kéo để đổi độ rộng menu - bấm đúp để về mặc định"></div>
     <div class="brand" data-tour="brand"><div class="logo" id="brandLogo"><svg viewBox="0 0 40 40" width="26" height="26" aria-hidden="true"><g fill="none" stroke="#D51920" stroke-width="3.2"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="7.5"/></g><circle cx="20" cy="20" r="3.4" fill="#D51920"/><g stroke="#D51920" stroke-width="3.2"><line x1="20" y1="1.5" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="38.5"/><line x1="1.5" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="38.5" y2="20"/></g></svg></div><div><b id="brandName">ITTs - SOP TEMP</b><small id="brandSub">Hệ thống tuân thủ SOP</small></div></div>
     <nav class="nav" id="nav"></nav>
     <div class="me" data-tour="me" onclick="gateSwitch()" title="Đổi người / về màn cổng" style="cursor:pointer"><div class="av" id="meAv">M</div><div><b id="meName">-</b><small id="meRole">-</small></div><i class="ti ti-arrows-exchange" style="margin-left:auto;opacity:.6"></i></div>
@@ -1508,6 +1534,7 @@ body.drsz .drawer{transition:none}
       <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div style="min-width:0"><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px;margin-left:auto"><button class="btn sm" onclick="demoResetHoi()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ đang mở cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
       <div class="rolesel">
 <!-- V9.29: bỏ ô chọn vai roleSel - luôn bị ẩn từ V9.9, giữ lại chỉ tổ rối -->
+        <button class="tbtn" id="congBtn" data-tour="doicong" onclick="congDoiMo()" aria-label="Đổi cổng" data-tip="Đổi cổng - sang cổng học viên hoặc cổng phụ huynh, dữ liệu vẫn là một"><i class="ti ti-arrows-exchange"></i></button>
         <button class="tbtn" id="tthBtn" onclick="tthToggle()" aria-label="Bật/tắt Trợ lý" data-tip="Trợ lý - hỏi đáp và nhắc việc, nút tròn góc dưới bên phải"><i class="ti ti-bulb"></i></button>
         <!-- V9.51: nut "Chay huong dan" to o demoBadgeWrap da bo - trung viec voi nut "?" nay
      (anh Luan bat). id=tourBtn don ve day de tourBtnSync (an/hien theo Cai dat) van chay. -->
@@ -1706,7 +1733,7 @@ function demoSave(){if(!CANLS||SVR)return;
  var cur=demoPack();
  if(__base===null){__base=cur;return}   /* lần đầu sau boot: chỉ ghi mốc so sánh */
  if(cur===__base)return;
- var nm="";try{nm=(typeof myName==="function"&&!window.HVPORTAL)?myName():(window.HVPORTAL?"Trang học viên":"")}catch(e){}
+ var nm="";try{nm=(typeof myName==="function"&&!window.HVPORTAL)?myName():(window.HVPORTAL?"Cổng học viên":"")}catch(e){}
  try{localStorage.setItem(LSKEY,JSON.stringify({sig:SEED_SIG,t:new Date().getTime(),by:nm,dl:DATA.dl,config:DATA.config,enums:DATA.enums}));__base=cur;try{roomCastState()}catch(e2){}}
  catch(e){if(!window.__swarn){window.__swarn=1;toastErr("KHÔNG lưu được thay đổi (trình duyệt chặn hoặc đầy bộ nhớ) - thao tác chỉ sống trong cửa sổ này.")}}}
 /* V9.47: mỗi lần lưu ghi CẢ HAI ô nhớ - `LSKEY` (dữ liệu + cấu hình, để Room demo đồng bộ) và
@@ -1768,7 +1795,7 @@ if(CANLS&&!SVR&&typeof window.addEventListener==="function"){
 }
 function demoPing(){if(!CANLS){toast("Trình duyệt đang chặn lưu trữ - không đồng bộ được.");return}
  try{localStorage.setItem("ITTS_PING_V1",String(new Date().getTime()))}catch(e){}
- if(ROOM.on&&roomN()){var nm="";try{nm=window.HVPORTAL?"Trang học viên":(typeof myName==="function"?myName():"")}catch(e){}
+ if(ROOM.on&&roomN()){var nm="";try{nm=window.HVPORTAL?"Cổng học viên":(typeof myName==="function"?myName():"")}catch(e){}
   try{roomCast({t:"ping",by:nm})}catch(e){}
   toast("Đã phát tín hiệu tới các cửa sổ trên máy này VÀ "+roomN()+" máy khác đang mở cùng bản demo - bên kia phải hiện thông báo trong 1-2 giây.",5200);return}
  toast("Đã phát tín hiệu - cửa sổ kia phải hiện thông báo trong 1-2 giây. Không hiện = đồng bộ không chạy (dùng Chrome hoặc http.server). Máy khác mở cùng bản demo sẽ tự nối khi có mạng.",5200)}
@@ -2700,6 +2727,7 @@ var THEDEF={
   ["bv_ob_open","Nhập học chưa xong","Hồ sơ onboarding còn dở bước - hạn tính theo slaOBT_hours. Muốn xem danh sách: bảng hồ sơ ngay dưới trên chính trang này."],
   ["bv_risk_stu","Học viên nguy cơ","Học viên bị đánh dấu nguy cơ trên trục chuyên cần hoặc học thuật. Muốn xem danh sách: mở trang Học viên nguy cơ ở menu trái."],
   ["bv_fb_new","Phản hồi chờ phân loại","Phản hồi mới nhận, chưa ai xếp loại. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Phản hồi / Góp ý."],
+  ["bv_ychv","Yêu cầu học viên gửi tới","Yêu cầu học viên gửi lên từ Cổng học viên mà bạn chưa bấm Nhận - hạn nhận tính theo slaTaskAccept_hours. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Yêu cầu từ học viên."],
   ["bv_kn_open","Khiếu nại đang xử lý","Khiếu nại chưa đóng. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Khiếu nại."],
   ["bv_ck_duyet","Chiết khấu cần duyệt","Đăng ký có mức chiết khấu vượt ngưỡng phải trình quản lý mà chưa ai duyệt. Muốn xem danh sách: mở trang Chờ duyệt ở menu trái, tab Duyệt chiết khấu."],
   ["bv_doilop2","Đổi lớp từ 2 lần","Học viên đã đổi lớp từ 2 lần trở lên - theo CH3 phải có quản lý phê duyệt. Muốn xem danh sách: mở trang Xếp lớp & Onboarding ở menu trái."],
@@ -2772,7 +2800,7 @@ var THEDEF={
   ["ww_het","HV đã hết lượt WOW","Học viên đã dùng hết quota WOW của khóa - cấp thêm nếu có căn cứ. Muốn xem danh sách: tab Quota."]]},
  ketthuc:{t:"Kết thúc khóa & tái ghi danh",the:[
   ["kt_chuamoi","Học xong mà chưa ai mời tái ghi danh","Học viên đã hoàn thành khóa nhưng chưa có ai liên hệ mời học tiếp - để lâu là nguội. Muốn xem danh sách: chip 'Chưa liên hệ' ở thanh lọc dưới."]]},
- tranghv:{t:"Trang học viên (xem hộ)",the:[
+ tranghv:{t:"Cổng học viên (xem hộ)",the:[
   ["hv_att","Chuyên cần","Tỷ lệ buổi có mặt của riêng học viên này. Muốn xem chi tiết: mục Điểm danh trong hồ sơ."],
   ["hv_hw","Bài tập đã nộp","Tỷ lệ bài đã nộp trên tổng bài được giao của học viên này. Muốn xem chi tiết: mục Bài tập."],
   ["hv_diem","Điểm bài tập TB","Điểm trung bình các bài đã được chấm của học viên này. Muốn xem chi tiết: mục Bài tập."],
@@ -3434,7 +3462,7 @@ function stuAttStats(sid){var att=rows("DL12").filter(function(a){return a.stude
 /* ===== NGUY CƠ: MÁY TỰ THẤY, KHÔNG ĐỢI AI BẤM CỜ ==================================
    V9.40. Trước đây cờ nguy cơ là cờ TAY hoàn toàn: phải có người mở hồ sơ rồi bấm "Đánh
    dấu nguy cơ" thì học viên đó mới vào hàng chờ. Hai ngưỡng thresholdAtRisk_absences và
-   thresholdAtRisk_hw_missing đã nằm sẵn trong CH2 từ lâu, nhưng CHỈ trang học viên tự xem
+   thresholdAtRisk_hw_missing đã nằm sẵn trong CH2 từ lâu, nhưng CHỈ cổng học viên tự xem
    đọc tới - phía nhân viên không một dòng nào đọc. Chạy đúng luật của chính trung tâm trên
    dữ liệu demo: 11 học viên đang học vi phạm, chỉ 2 người được gắn cờ. KPI ARR vì thế báo
    3,7% (xanh) trong khi luật thật ra 16,2% (đỏ) - chỉ số quan trọng nhất về chất lượng học
@@ -3940,7 +3968,8 @@ function BANGVIEC(){
   o:[["ti-layout-grid-add",OB.filter(function(r){return !isc(r.onboarding_status,"completed")}).length,"Nhập học chưa xong","#B58A2B","SLA "+slaChip("slaOBT_hours",48,"giờ"),"go('xeplop')"],
      ["ti-user-exclamation",S.filter(stuRisk).length,"Học viên nguy cơ","#E24B4A","hai trục, có thể trùng","goRisk()"],
      ["ti-message-2",FB.filter(function(r){return !String(r.classified_at||"").trim()}).length,"Phản hồi chờ phân loại","#3B82C4","SLA "+slaChip("slaFeedbackClassify_hours",24,"giờ"),"goCS('phanhoi')"],
-     ["ti-alert-triangle",KN.filter(function(r){return !isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại đang xử lý","#6B4FA0","SLA phân công "+slaChip("slaComplaintFirstResponse_hours",4,"giờ"),"goCS('khieunai')"]]},
+     ["ti-alert-triangle",KN.filter(function(r){return !isc(r.complaint_status,"resolved","closed")}).length,"Khiếu nại đang xử lý","#6B4FA0","SLA phân công "+slaChip("slaComplaintFirstResponse_hours",4,"giờ"),"goCS('khieunai')"],
+     ["ti-inbox",ycHVSo(),"Yêu cầu học viên gửi tới","#3B82C4","SLA nhận việc "+slaChip("slaTaskAccept_hours",4,"giờ"),"goCS('ychv')"]]},
  quanly:{bc:"BC9",t:"Bảng Quản lý",d:"Việc cần cấp quản lý gật đầu, theo bảng phân quyền CH3.",
   o:[["ti-discount-2",duyCkList().length,"Chiết khấu cần duyệt","#B58A2B","từ "+money(ckThreshold())+" trở lên","goDuyet('duyetck')"],
      ["ti-transfer",OB.filter(function(r){return num(r.placement_change_count)>=2}).length,"Đổi lớp từ 2 lần","#6B4FA0","cần quản lý phê duyệt","go('xeplop')"],
@@ -3972,6 +4001,13 @@ function BANGVIEC(){
      ["ti-receipt",rows("DL07").filter(function(r){return !String(r.verified_by||"").trim()}).length,"Phiếu thu chờ đối soát","#3B82C4","kế toán xác nhận","goDuyet('duyetthu')"],
      ["ti-arrow-back-up",E.filter(function(r){return isc(r.enrollment_status,"cancelled")&&num(r.paid_amount)>0&&!rows("DL07").some(function(p){return String(p.enrollment_id||"")===String(r.enrollment_id||"")&&num(p.amount)<0})}).length,"Hoàn tiền chờ duyệt","#E24B4A","SLA "+slaChip("slaRefundProcess_days",7,"ngày"),"goDuyet('duyethoan')"],
      ["ti-discount-2",E.filter(function(r){return num(r.discount_amount)>0&&!String(r.discount_approved_by||"").trim()}).length,"Chiết khấu cần duyệt","#6B4FA0","kế toán chỉ xác nhận và làm theo","goDuyet('duyetck')"]]}}}
+/* V9.63: yêu cầu học viên gửi từ cổng học viên đi vào ĐÚNG bảng DL23 với loại student_request.
+   Nó vốn đã hiện ở menu Giao việc và hàng Chờ nhận, nhưng bảng việc đầu ca của người nhận
+   (học vụ, kế toán) lại không có ô nào cho nó - mở app buổi sáng không thấy học viên đang hỏi
+   gì. Đếm đúng phần CHƯA NHẬN của chính mình. */
+function ycHVSo(){var me=CURSTAFF||"";
+ return rows("DL23").filter(function(t){
+  return isc(t.task_type,"student_request")&&isc(t.task_status,"new")&&String(t.assignee_id||"")===me}).length}
 /* Số việc được giao cho tôi, theo trạng thái - dùng cho bảng của nhóm hỗ trợ. */
 function gvSo(k){var me=CURSTAFF||"";
  var L=rows("DL23").filter(function(t){return String(t.assignee_id||"")===me});
@@ -4009,7 +4045,7 @@ var BVDUYET=[["ck_lon",0],["doilop2",1],["kn_duyet",2],["kn_duyet",3],["hoantien
    ô bảng việc bấm được) và người dùng phải học phân biệt. Một luật cho cả app: THẺ LÀ ĐỒNG HỒ.
    Đường tới danh sách không mất - nó chuyển vào câu chú thích, và bộ kiểm canh câu đó không
    được chỉ vào chỗ không có. */
-var BVMA={"Lead mới (chưa LH)":"bv_lead_new","Lead đang khai thác":"bv_lead_work","Test sắp tới":"bv_test_up","Tư vấn cần làm":"bv_tv_can","Test chờ chấm":"bv_test_wait","Test đã chấm":"bv_test_done","WOW sắp tới":"bv_wow_up","WOW có tiến bộ":"bv_wow_imp","Buổi đã hoàn thành":"bv_ses_done","Cần viết nhận xét buổi":"bv_ses_note","Bài tập chờ chấm":"bv_hw_wait","HV nguy cơ học thuật":"bv_risk_aca","Nhập học chưa xong":"bv_ob_open","Học viên nguy cơ":"bv_risk_stu","Phản hồi chờ phân loại":"bv_fb_new","Khiếu nại đang xử lý":"bv_kn_open","Chiết khấu cần duyệt":"bv_ck_duyet","Đổi lớp từ 2 lần":"bv_doilop2","Khiếu nại mức CAO":"bv_kn_high","Khiếu nại đã leo thang":"bv_kn_esc","Hoàn tiền chờ duyệt":"bv_hoan","Việc mới chờ nhận":"bv_tk_new","Đang làm":"bv_tk_doing","Quá hạn":"bv_tk_late","Chờ người giao xác nhận":"bv_tk_wait","Hồ sơ nhân sự còn thiếu":"bv_hs_thieu","Buổi thiếu mốc giờ vào/ra":"bv_gio_thieu","Đơn còn nợ phí":"bv_no_phi","Phiếu thu chờ đối soát":"bv_thu_soat"};
+var BVMA={"Yêu cầu học viên gửi tới":"bv_ychv","Lead mới (chưa LH)":"bv_lead_new","Lead đang khai thác":"bv_lead_work","Test sắp tới":"bv_test_up","Tư vấn cần làm":"bv_tv_can","Test chờ chấm":"bv_test_wait","Test đã chấm":"bv_test_done","WOW sắp tới":"bv_wow_up","WOW có tiến bộ":"bv_wow_imp","Buổi đã hoàn thành":"bv_ses_done","Cần viết nhận xét buổi":"bv_ses_note","Bài tập chờ chấm":"bv_hw_wait","HV nguy cơ học thuật":"bv_risk_aca","Nhập học chưa xong":"bv_ob_open","Học viên nguy cơ":"bv_risk_stu","Phản hồi chờ phân loại":"bv_fb_new","Khiếu nại đang xử lý":"bv_kn_open","Chiết khấu cần duyệt":"bv_ck_duyet","Đổi lớp từ 2 lần":"bv_doilop2","Khiếu nại mức CAO":"bv_kn_high","Khiếu nại đã leo thang":"bv_kn_esc","Hoàn tiền chờ duyệt":"bv_hoan","Việc mới chờ nhận":"bv_tk_new","Đang làm":"bv_tk_doing","Quá hạn":"bv_tk_late","Chờ người giao xác nhận":"bv_tk_wait","Hồ sơ nhân sự còn thiếu":"bv_hs_thieu","Buổi thiếu mốc giờ vào/ra":"bv_gio_thieu","Đơn còn nợ phí":"bv_no_phi","Phiếu thu chờ đối soát":"bv_thu_soat"};
 function bvStrip(t,bc,d,o,tour){
  if(!o.length)return "";
  return '<div class="sechd"'+(tour?' data-tour="'+tour+'"':'')+'>'+esc(t)+
@@ -4167,7 +4203,8 @@ function deptSection(){var L=rows("DL02"),S=rows("DL09"),E=rows("DL06"),pay=rows
   {n:"Tư vấn",ic:"ti-user-plus",c:"#3B82C4",s:[
    ["Lead chưa ai gọi",cnt(L,function(r){return isc(r.lead_status,"new")}),"go('nhaplead')"],
    ["Quá hẹn liên hệ lại",cnt(L,function(r){var d=pvnd(r.next_followup_time);return d&&d.getTime()<Date.now()&&!isc(r.lead_status,"converted","rejected","unreachable")}),"go('nhaplead')"],
-   ["Có KQ test, chờ tư vấn",cnt(T,function(r){return isc(r.test_status,"graded")&&!rows("DL04").some(function(c){return c.lead_id===r.lead_id&&!isc(c.consultation_status,"not_consulted")})}),"go('tuvan')"]]},
+   ["Có KQ test, chờ tư vấn",cnt(T,function(r){return isc(r.test_status,"graded")&&!rows("DL04").some(function(c){return c.lead_id===r.lead_id&&!isc(c.consultation_status,"not_consulted")})}),"go('tuvan')"],
+     ["ti-inbox",ycHVSo(),"Yêu cầu học viên gửi tới","#3B82C4","SLA nhận việc "+slaChip("slaTaskAccept_hours",4,"giờ"),"goCS('ychv')"]]},
   {n:"Học vụ",ic:"ti-school",c:"#7C3AED",s:[
    ["Đã thu, chưa xếp lớp",cnt(E,function(r){return num(r.paid_amount)>0&&!OB.some(function(o){return o.student_id===r.student_id})}),"go('xeplop')"],
    ["Onboarding chưa xong",cnt(OB,function(r){return!/completed/.test(ecode(r.onboarding_status))}),"go('xeplop')"],
@@ -4866,7 +4903,9 @@ function renderViec(){var items=bellItems();
     slaItems còn sinh việc nhóm "Giao việc" - việc đó nằm trong danh sách nhưng KHÔNG có chip để lọc
     tới. Nay lấy thẳng từ dữ liệu: bộ phận nào thật sự có việc thì có chip, thứ tự ưu tiên giữ
     nguyên cho quen mắt, nhóm lạ xuống cuối. Thêm luật SLA nhóm mới là chip tự mọc. */
- var TORD=["Tuyển sinh","Học vụ","Giảng viên (ACA)","WOW","Tài chính","CSKH","Giao việc"];
+ /* V9.63 (anh Luân): CSKH đứng ngay sau Học vụ - hai nhóm này cùng một bộ phận, xếp cạnh nhau
+    thì mắt đi một mạch, không phải nhảy qua Giảng viên/WOW/Tài chính rồi vòng lại. */
+ var TORD=["Tuyển sinh","Học vụ","CSKH","Giảng viên (ACA)","WOW","Tài chính","Giao việc"];
  var teams=[];items.forEach(function(x){if(x.cat&&teams.indexOf(x.cat)<0)teams.push(x.cat)});
  teams.sort(function(a,b){var ia=TORD.indexOf(a),ib=TORD.indexOf(b);
   if(ia<0)ia=99;if(ib<0)ib=99;if(ia!==ib)return ia-ib;return String(a).localeCompare(String(b),"vi")});
@@ -5420,6 +5459,34 @@ function tourCleanup(){if(TOUR&&TOUR.on)return;
 /* ===== V9.27 KEO DOI DO RONG DRAWER =====
    So do luu tren MAY CUA TUNG NGUOI (localStorage theo ma nhan vien), khong dua vao dữ liệu demo
    chung - vi day la thoi quen ca nhan, khong phai cau hinh cua trung tam. */
+/* ===== ĐỘ RỘNG CỘT MENU (V9.63) - cùng lối với ngăn kéo: nhớ theo từng người, bấm đúp về mặc định ===== */
+var SB_MIN=210,SB_DEF=262,SB_MAX=420;
+function sbKey(){var me="";try{me=tkMeId()||CURSTAFF||""}catch(e){me=CURSTAFF||""}
+ return "ITTS_SIDEBAR_W_"+(me||"guest")}
+function sbGet(){try{var v=parseInt(localStorage.getItem(sbKey())||"",10);
+ if(v&&v>=SB_MIN)return Math.min(v,SB_MAX)}catch(e){}return SB_DEF}
+function sbSet(px,save){var d=document.getElementById("sidebar");if(!d)return;
+ px=Math.max(SB_MIN,Math.min(Math.round(px),SB_MAX));
+ d.style.setProperty("--sbw",px+"px");
+ if(save)try{localStorage.setItem(sbKey(),String(px))}catch(e){}}
+function sbApply(){sbSet(sbGet(),0)}
+function sbReset(){try{localStorage.removeItem(sbKey())}catch(e){}sbSet(SB_DEF,0);toast("Đã về độ rộng menu mặc định.")}
+function sbInit(){var g=document.getElementById("sbszr");if(!g||g.__on)return;g.__on=1;
+ function start(x0,w0){
+  document.body.classList.add("drsz");g.classList.add("drag");
+  function mv(ev){var cx=(ev.touches&&ev.touches[0])?ev.touches[0].clientX:ev.clientX;
+   sbSet(w0+(cx-x0),0);if(ev.cancelable)ev.preventDefault()}
+  function up(){document.body.classList.remove("drsz");g.classList.remove("drag");
+   document.removeEventListener("mousemove",mv);document.removeEventListener("mouseup",up);
+   document.removeEventListener("touchmove",mv);document.removeEventListener("touchend",up);
+   var d=document.getElementById("sidebar");sbSet(d?d.getBoundingClientRect().width:SB_DEF,1)}
+  document.addEventListener("mousemove",mv);document.addEventListener("mouseup",up);
+  document.addEventListener("touchmove",mv,{passive:false});document.addEventListener("touchend",up)}
+ g.addEventListener("mousedown",function(e){var d=document.getElementById("sidebar");
+  start(e.clientX,d?d.getBoundingClientRect().width:SB_DEF);e.preventDefault()});
+ g.addEventListener("touchstart",function(e){var d=document.getElementById("sidebar");
+  start(e.touches[0].clientX,d?d.getBoundingClientRect().width:SB_DEF)},{passive:true});
+ g.addEventListener("dblclick",sbReset)}
 var DRW_MIN=420,DRW_DEF=760;
 function drwKey(){var me="";try{me=tkMeId()||CURSTAFF||""}catch(e){me=CURSTAFF||""}
  return "ITTS_DRAWER_W_"+(me||"guest")}
@@ -7101,21 +7168,45 @@ function renderBanlam(){
 /* ===== HUB CSKH 2 CHIỀU: Khảo sát (TT→HV) · Phản hồi/Góp ý & Khiếu nại (HV→TT) ===== */
 function csGo(tab){window.CSTAB=tab;go("cskh")}
 function csTabSet(tab){window.CSTAB=tab;reRender(CUR)}
+/* ===== YÊU CẦU TỪ HỌC VIÊN (V9.63 - anh Luân hỏi "nghiệp vụ này nên ở đâu") =====
+   Học viên gửi yêu cầu được từ lúc được cấp cổng vào, và gửi được ở BẤT KỲ chặng nào - nó không
+   thuộc C1/C2/C3/C4. Vậy nó phải nằm ở chỗ dành cho việc xuyên chặng, và đúng chỗ đó là hub CSKH:
+   trang này đã là nơi khai hai chiều Trung tâm <-> Học viên (khảo sát đi ra, góp ý / khiếu nại đi
+   vào). Yêu cầu từ cổng học viên chính là kênh vào thứ ba, nên nó về đây.
+   Dữ liệu vẫn chỉ có MỘT chỗ: bảng DL23 - vì nó được LÀM như mọi việc khác (nhận, làm, báo xong),
+   nên tab này vẽ lại đúng thẻ việc của module Giao việc chứ không dựng bản sao. */
+function ychvList(){return srows("DL23").filter(function(t){return isc(t.task_type,"student_request")})}
+function ychvCho(){return ychvList().filter(function(t){return isc(t.task_status,"new")}).length}
+function renderYcHV(){
+ var L=ychvList().slice().sort(function(a,b){
+  var na=isc(a.task_status,"new")?0:1,nb=isc(b.task_status,"new")?0:1;if(na!==nb)return na-nb;
+  return (pvnd(b.created_time)||0)-(pvnd(a.created_time)||0)});
+ var h='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>'+
+  'Yêu cầu học viên gửi từ Cổng học viên. Hệ thống tự chuyển tới học vụ, riêng yêu cầu về tiền thì chuyển kế toán, hạn nhận việc lấy theo <b>'+
+  slaChip("slaTaskAccept_hours",4,"giờ")+'</b>. Nhận và trả lời ngay trong thẻ dưới đây.</div>';
+ h+='<div class="panel"><div class="pbody">';
+ if(!L.length)h+='<div class="empty">Chưa có yêu cầu nào gửi lên từ Cổng học viên.</div>';
+ L.forEach(function(t){h+=tkCard(t,"mine")});
+ h+='</div></div>';
+ return h}
 function renderCskh(){
  var tab=window.CSTAB||"khaosat";
  var sv=rows("DL15"),fb=rows("DL16"),kn=rows("DL17");
  var nSvWait=sv.filter(function(v){return !String(v.submitted_date||"").trim()}).length;
  var nFbOpen=fb.filter(function(f){return !isc(f.feedback_status,"resolved")}).length;
  var nKnOpen=kn.filter(function(c){return !isc(c.complaint_status,"resolved")}).length;
+ var nYcWait=ychvCho();
  var actBtn=(tab==="khaosat")?'<button class="btn primary" onclick="rvForm()"><i class="ti ti-send"></i>Gửi đợt khảo sát</button>':(tab==="phanhoi")?'<button class="btn primary" onclick="ghForm()"><i class="ti ti-message-plus"></i>Ghi nhận phản hồi</button>':'<button class="btn primary" onclick="knAdd()"><i class="ti ti-plus"></i>Tiếp nhận khiếu nại</button>';
- var h=pageHead("CSKH · Khảo sát & Phản hồi","Hai chiều rõ ràng: Trung tâm gửi khảo sát cho học viên; học viên gửi góp ý / khiếu nại từ Trang học viên. Mọi phiếu đều theo dõi trạng thái tới khi đóng.",actBtn);
+ var h=pageHead("CSKH · Khảo sát & Phản hồi","Hai chiều rõ ràng: Trung tâm gửi khảo sát cho học viên; học viên gửi góp ý / khiếu nại từ Cổng học viên. Mọi phiếu đều theo dõi trạng thái tới khi đóng.",actBtn);
  h+='<div class="csway">'+
-  '<div class="cwrow"><span class="cwdir out"><i class="ti ti-arrow-right"></i> Trung tâm → Học viên</span> <b>Khảo sát</b> định kỳ — HV nhận &amp; trả lời trong Trang học viên.</div>'+
-  '<div class="cwrow"><span class="cwdir in"><i class="ti ti-arrow-left"></i> Học viên → Trung tâm</span> <b>Góp ý &amp; Khiếu nại</b> — HV gửi từ Trang học viên (hoặc NV ghi hộ khi nhận qua gọi/nhắn), trung tâm xử lý &amp; phản hồi lại.</div>'+
+  '<div class="cwrow"><span class="cwdir out"><i class="ti ti-arrow-right"></i> Trung tâm → Học viên</span> <b>Khảo sát</b> định kỳ — HV nhận &amp; trả lời trong Cổng học viên.</div>'+
+  '<div class="cwrow"><span class="cwdir in"><i class="ti ti-arrow-left"></i> Học viên → Trung tâm</span> <b>Góp ý &amp; Khiếu nại</b> — HV gửi từ Cổng học viên (hoặc NV ghi hộ khi nhận qua gọi/nhắn), trung tâm xử lý &amp; phản hồi lại.</div>'+
+  '<div class="cwrow"><span class="cwdir in"><i class="ti ti-arrow-left"></i> Học viên → Trung tâm</span> <b>Yêu cầu &amp; câu hỏi</b> — HV gửi từ Cổng học viên, hệ thống tự chuyển tới học vụ (hoặc kế toán nếu là chuyện tiền) kèm hạn nhận việc.</div>'+
   '</div>';
- h+=tbar(segHTML(tab,[["khaosat","Khảo sát (TT→HV)",nSvWait||"",nSvWait?"amber":""],["phanhoi","Phản hồi / Góp ý",nFbOpen||"",nFbOpen?"amber":""],["khieunai","Khiếu nại",nKnOpen||"",nKnOpen?"red":""]],"csTabSet('{k}')"),"");
+ h+=tbar(segHTML(tab,[["khaosat","Khảo sát (TT→HV)",nSvWait||"",nSvWait?"amber":""],["phanhoi","Phản hồi / Góp ý",nFbOpen||"",nFbOpen?"amber":""],["khieunai","Khiếu nại",nKnOpen||"",nKnOpen?"red":""],["ychv","Yêu cầu từ học viên",nYcWait||"",nYcWait?"amber":""]],"csTabSet('{k}')"),"");
  if(tab==="khaosat")h+=renderReview(1);
  else if(tab==="phanhoi")h+=renderGhinhan(1);
+ else if(tab==="ychv")h+=renderYcHV();
  else h+=renderKhieunai(1);
  return h}
 function renderReview(embed){var p="review",fil=fget(p);
@@ -7443,7 +7534,7 @@ function renderHoso(){
  h+='<div class="bcards">';
  h+=card("ti-user","Thông tin",kv("SĐT",esc(C.phone))+kv("Zalo",esc(L.zalo_id||"-"))+kv("Nguồn",esc(elabel(L.lead_source)||"-"))+kv("Mục tiêu",esc(L.target_band||"-"))+kv("Đối tượng",esc(elabel(S.student_type||L.student_type)||"-"))+kv("Cơ sở",esc(elabel(S.branch||L.branch)||"-")));
  if(C.tests.length){var t=C.testMain;h+=card("ti-file-text","Test đầu vào",kv("Ngày test",esc(t.test_date||"-"))+kv("Dự test",esc(elabel(t.test_attendance_status)||"-"))+kv("Overall",esc(t.overall_score||"-"))+(C.sid?"":kv("L/R/W/S",esc([t.skill_listening,t.skill_reading,t.skill_writing,t.skill_speaking].join(" / "))))+kv("Nhận xét",esc(t.academic_note||"-")))}
- /* V9.16: bảng điểm 3 mốc - hồ sơ nội bộ không được ÍT thông tin hơn trang học viên.
+ /* V9.16: bảng điểm 3 mốc - hồ sơ nội bộ không được ÍT thông tin hơn cổng học viên.
     V9.17 (tester): cột Giữa/Ra phải CÙNG MỘT KHÓA (theo lớp của ob chính) - không trộn điểm 2 khóa;
     điểm 0 là điểm hợp lệ, không được rơi thành "-". */
  if(C.sid&&(C.tests.length||C.ceMain||(C.obMain&&(C.obMain.mid_overall||C.obMain.mid_listening)))){
@@ -7824,7 +7915,7 @@ function classBar(cid){var c=find("DL10","class_id",cid);if(!c)return '';
 function midForm(cid){var obs=rows("DL08").filter(function(o){return o.class_id===cid});
  if(!obs.length){toast("Lớp chưa có học viên.");return}
  var h='<div class="dcard"><h4><i class="ti ti-writing"></i>Điểm mock test giữa khóa - '+esc(cid)+'</h4>';
- h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Điểm giữa khóa là mốc đo học thuật GIỮA hành trình (SOP khuyến nghị quanh buổi giữa khóa). Nhập band 0-9 bước 0.5; bỏ trống em chưa thi. Học viên thấy ngay ở cột "Giữa khóa" trên Trang học viên.</div>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Điểm giữa khóa là mốc đo học thuật GIỮA hành trình (SOP khuyến nghị quanh buổi giữa khóa). Nhập band 0-9 bước 0.5; bỏ trống em chưa thi. Học viên thấy ngay ở cột "Giữa khóa" trên Cổng học viên.</div>';
  h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>L</th><th>R</th><th>W</th><th>S</th><th>Overall</th></tr></thead><tbody>';
  obs.forEach(function(o){
   function inp(k){return '<input class="mid_'+k+'" type="number" min="0" max="9" step="0.5" value="'+esc(o["mid_"+k]||"")+'" style="width:56px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 6px;font-family:inherit">'}
@@ -10877,14 +10968,14 @@ function logCmp(before){
   var b=before[code],af=logSnapTb(code),id,sn;
   for(id in af){
    sn=LOGSEEN[code+"|"+id]||{};
-   if(!(id in b)){if(!sn["*"])logAct("Tạo mới",code,id,{},"Thêm dòng mới vào "+code,{kind:"add",sau:af[id]});continue}
+   if(!(id in b)){if(!sn["*"])logAct("Tạo mới",code,id,{},"Thêm mới ở bảng "+sheetVN(code),{kind:"add",sau:af[id]});continue}
    if(b[id]===af[id])continue;
    var d=logDiff(JSON.parse(b[id]),JSON.parse(af[id]));
    for(var f in sn)delete d[f];
    if(Object.keys(d).length)logAct("Cập nhật",code,id,d,"",{kind:"upd"})}
   for(id in b){if(id in af)continue;
    if((LOGSEEN[code+"|"+id]||{})["*"])continue;
-   logAct("Xoá",code,id,{},"Xoá dòng khỏi "+code,{kind:"del",truoc:b[id]})}})}
+   logAct("Xoá",code,id,{},"Xoá một dòng ở bảng "+sheetVN(code),{kind:"del",truoc:b[id]})}})}
 /* Bọc TẤT CẢ cửa ghi đã khai: chụp trước - cho chạy - chụp sau - so. Làm một lần lúc khởi động,
    không phải đi sửa từng cửa; cửa ghi viết sau này chỉ cần khai tên là tự có nhật ký. */
 function logArm(){
@@ -10955,6 +11046,12 @@ function logUndo(b){
 /* --- thanh Hoàn tác hiện ngay sau khi làm xong --- */
 function undoHide(){var u=document.getElementById("undobar");if(u)u.classList.remove("on")}
 function undoShow(b,lb){
+ /* V9.63 (anh Luan bat): thanh Hoan tac la CONG CU NOI BO cua nhat ky thao tac - noi bang giong
+    cua nguoi quan tri ("Them moi o bang Viec duoc giao (DL23)") va lui duoc ca dong du lieu.
+    No khong duoc phep tho ra o cong hoc vien / phu huynh: hoc vien gui yeu cau xong ma thay ten
+    bang du lieu la kỳ, va cho ho lui mot dong nghiep vu cua trung tam thi cang sai. Hoc vien
+    muon rut lai thi dung dung nut Huy cua chinh yeu cau do. */
+ if(window.HVPORTAL)return;
  var u=document.getElementById("undobar");if(!u)return;
  if(logCanUndo(b))return;
  u.innerHTML='<i class="ti ti-history"></i><span>'+esc(lb||"Đã lưu thay đổi")+'</span>'+
@@ -12153,7 +12250,7 @@ function hvTLrow(d,inner){var dt=pvnd(d);
 function hvTLopen(){return '<div class="hvtl">'}
 function hvTLclose(){return '</div>'}
 function hvPct(a,b){return b>0?Math.round(a/b*100):null}
-/* ===== GIỚI THIỆU BẠN BÈ (trang học viên) =====
+/* ===== GIỚI THIỆU BẠN BÈ (cổng học viên) =====
    Học viên tự tạo mã giới thiệu cá nhân; bạn được giới thiệu giảm theo chính sách
    (CH2: referralFriend_discount + đơn vị), người giới thiệu nhận thưởng riêng. */
 function hvRefCode(S){if(S&&S.referral_code)return S.referral_code;   /* ưu tiên mã đã lưu */
@@ -12741,7 +12838,7 @@ function renderTrangHV(){
    (k.resolution_note?'<br>Trung tâm phản hồi: '+esc(k.resolution_note):'')+'</span></div>'})}
  h+='</div></div>';
  }   /* hết khối chỉ dành cho học viên (trao đổi riêng + góp ý) */
- /* V9.18 (Luân): BỎ khối "Gửi phụ huynh" - ngữ cảnh không hợp với trang học viên tự xem.
+ /* V9.18 (Luân): BỎ khối "Gửi phụ huynh" - ngữ cảnh không hợp với cổng học viên tự xem.
     V9.40d: nay có CỔNG PHỤ HUYNH riêng, nên phụ huynh xem bằng chính cổng này ở chế độ của họ
     chứ không cần một khối "gửi phụ huynh" nhét vào trang của em. */
  return h}
@@ -12832,13 +12929,17 @@ function hvLink(u,lb){u=String(u||"").trim();if(!u)return "";
 /* (p) CẢ TRANG trước đây không có một số điện thoại nào dù khuyên "liên hệ trung tâm" 3-4 lần.
    Số lấy từ CH2 (centerHotline) - không cắm cứng. */
 function hvHotline(){return String(paramStr("centerHotline","")||"").trim()}
-function hvCallHTML(lb,cls){var p=hvHotline();
+function hvCallHTML(lb,cls,chiIcon){var p=hvHotline();
  if(!p)return "";
  /* V9.29: một hàm duy nhất cho MỌI nút gọi - trước đây sidebar cổng HV tự dựng một kiểu riêng
     (chỉ hiện số, viền trắng) nên hai chỗ trông khác hẳn nhau.
     Chưa cấu hình hotline thì KHÔNG dựng nút gọi giả - người quản trị thấy lời nhắc để đi điền. */
  if(!p)return (window.HVPORTAL?'':'<span class="chip amber" data-tip="Vào Cài đặt > Giao diện & Thương hiệu để điền hotline">chưa có hotline · <b>cấu hình</b></span>');
- return '<a class="btn '+(cls||"")+' sm" href="tel:'+esc(phoneKey(p))+'" data-tip="Bấm để gọi '+esc(p)+'"><i class="ti ti-phone"></i>'+esc(lb||("Gọi trung tâm "+p))+'</a>'}
+ /* chiIcon: nút gọn chỉ có icon, dùng cho thanh trên cổng học viên. Vẫn ĐI QUA hàm này chứ không
+    tự dựng thẻ liên kết gọi riêng - một cửa cho mọi nút gọi. */
+ var goi=' href="tel:'+esc(phoneKey(p))+'" data-tip="Bấm để gọi '+esc(p)+'"';
+ if(chiIcon)return '<a class="tbtn"'+goi+' aria-label="Gọi trung tâm"><i class="ti ti-phone"></i></a>';
+ return '<a class="btn '+(cls||"")+' sm"'+goi+'><i class="ti ti-phone"></i>'+esc(lb||("Gọi trung tâm "+p))+'</a>'}
 /* Dòng điểm danh do CHÍNH học viên tự báo. Đánh dấu bằng tiền tố thay vì đẻ cột mới:
    DL12 chỉ có 10 cột, thêm cột lạ thì bản chạy trên Google Sheets ghi xong RƠI MẤT dữ liệu
    mà không ai biết. Phần sau dấu ":" là lời học viên - chỉ phần đó mới được hiện ra cổng. */
@@ -13301,7 +13402,7 @@ function avatarColor(seed){var cs=["#3B82C4","#7C3AED","#0D9488","#DB2777","#E08
 function avatarBig(name,url){if(url&&/^https?:/.test(String(url)))return '<img class="avatarBig" src="'+esc(url)+'" alt="'+esc(name||"")+'">';var c=avatarColor(name);return '<div class="avatarBig" style="background:'+c+'22;color:'+c+'">'+esc(initialsOf(name))+'</div>'}
 function gvBioEdit(id){var g=find("DL01","staff_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-user"></i>Tiểu sử giảng viên</h4>'+
-  '<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Đoạn này hiện ở trang học viên và trong hồ sơ giảng viên - viết như lời giới thiệu cho học viên và phụ huynh đọc, không phải ghi chú nội bộ.</div>'+
+  '<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Đoạn này hiện ở cổng học viên và trong hồ sơ giảng viên - viết như lời giới thiệu cho học viên và phụ huynh đọc, không phải ghi chú nội bộ.</div>'+
   '<div class="fld full"><label>Giới thiệu · chuyên môn · kinh nghiệm</label><textarea id="gv_bio" rows="6" placeholder="VD: 8 năm luyện thi IELTS, thế mạnh Speaking &amp; Writing, đạt 8.5 overall, từng luyện 200+ HV đạt 7.0+...">'+esc(g.bio||g.teacher_bio||g.note||"")+'</textarea></div>'+
   '<div class="fld full"><label>Link ảnh đại diện (tuỳ chọn)</label><input id="gv_av" value="'+esc(g.avatar_url||"")+'" placeholder="https://..."></div>'+
   '<div class="fld full"><button class="btn primary" onclick="gvBioSave(\''+esc(id)+'\')"><i class="ti ti-device-floppy"></i>Lưu tiểu sử</button></div></div>';
@@ -14469,7 +14570,7 @@ var TOURLV=[
  ["donviec","Dọn việc hôm nay","ti-checklist","Trợ lý dắt bạn làm từng việc đang chờ - hết việc mới dừng"]];
 var TOURS={
  /* ---------- CẤP 1: THAM QUAN ---------- */
- tq_tong:{lv:"thamquan",t:"Toàn cảnh app",ic:"ti-rocket",d:"7 bước - hiểu app chạy thế nào trong 2 phút",steps:[
+ tq_tong:{lv:"thamquan",t:"Toàn cảnh app",ic:"ti-rocket",d:"8 bước - hiểu app chạy thế nào trong 2 phút",steps:[
   /* V9.53 (anh Luân: "bàn làm việc mà nó trỏ vào logo, chẳng hiểu kiểu gì"): bước này nói về
      CẢ APP chứ không về một ô nào - neo vào logo là sai hẳn. `mo:1` = bước mở đầu: không khoanh
      gì, màn tối đều, hộp ra giữa. Trỏ bừa vào một ô còn tệ hơn không trỏ. */
@@ -14479,7 +14580,8 @@ var TOURS={
   {p:"banlam",sel:'#chaybody',t:"Danh sách người cần xử lý",d:"Mỗi dòng là một người kèm việc kế tiếp. Dải hạt màu cho biết họ đang ở chặng nào. Rê vào MỘT HẠT là biết chặng đó đã để lại gì trong hồ sơ; bấm vào hạt mở ngăn kéo riêng của chặng đó; bấm chữ C1/C2 đầu dải mở cả hành trình.",hint:"Rê vào một hạt rồi bấm thử - ngăn kéo kể đủ sản phẩm của chặng đó."},
   {p:"changA",sel:'@nrail',t:"Bản đồ một chặng",d:"Đường ray hiện số người ở từng ga và phần trăm chuyển đổi thật giữa các ga - nhìn là biết đang tắc ở đâu.",hint:"Bấm một ga để lọc người ở ga đó."},
   {sel:'[data-tour="bell"]',t:"Chuông cảnh báo",d:"Mọi việc trễ hẹn theo quy trình chuẩn dồn về đây, chia theo bộ phận. Việc mới từ máy khác còn nổ bong bóng góc màn hình.",hint:"Bấm chuông xem thử."},
-  {sel:'@me',t:"Mỗi chức danh một màn hình riêng",d:"Bấm ô tên ở đáy menu để đổi người. Sale, học vụ, giáo viên, kế toán mỗi người thấy một giao diện và một phạm vi dữ liệu khác nhau.",hint:"Xong phần tham quan. Thử cấp độ Trải nghiệm để làm việc thật."}]},
+  {sel:'@me',t:"Mỗi chức danh một màn hình riêng",d:"Bấm ô tên ở đáy menu để đổi người. Sale, học vụ, giáo viên, kế toán mỗi người thấy một giao diện và một phạm vi dữ liệu khác nhau.",hint:"Bấm ô tên ở đáy menu để xem danh sách người."},
+  {sel:'[data-tour="doicong"]',t:"Ba cổng, một bộ dữ liệu",d:"Ngoài cổng nhân viên còn cổng học viên và cổng phụ huynh. Nút này mở thẳng sang cổng kia - ghi ở cổng này thì cổng kia thấy ngay, vì cả ba đọc chung một bộ dữ liệu.",hint:"Xong phần tham quan. Thử cấp độ Trải nghiệm để làm việc thật."}]},
  /* ---------- CẤP 2: TRẢI NGHIỆM THEO VỊ TRÍ ---------- */
  tn_sale:{lv:"trainghiem",role:"Nhân viên Tư vấn",t:"Một ngày của Nhân viên Tư vấn",ic:"ti-phone",d:"8 bước - từ khách mới tới lúc thu tiền",steps:[
   {p:"banlam",sel:'@bstats',t:"Mở máy là nhìn 5 ô này",d:"Tới hẹn hôm nay là việc gấp nhất - khách đã hẹn mà không gọi là mất. Sau đó tới học viên nguy cơ và đăng ký còn nợ. Ô chỉ để xem; muốn ra danh sách thì bấm chip Tới hẹn / quá hẹn ở thanh Nhóm.",hint:"Bấm chip Tới hẹn / quá hẹn ở thanh Nhóm."},
@@ -17214,6 +17316,7 @@ function enter(k){try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{rtEnsur
  try{if(!window.__hashOn){window.__hashOn=1;
   window.addEventListener("hashchange",function(){try{hashApply()}catch(e){}});
   window.addEventListener("popstate",function(){try{hashApply()}catch(e){}})}}catch(e){}
+ try{sbInit();sbApply()}catch(e){}
  try{tourOfferOnce()}catch(e){}}
 
 /* ============ CỔNG HỌC VIÊN (file HTML riêng) ============
@@ -17268,7 +17371,24 @@ function hvGo(id){hvCloseSide();var el=document.getElementById(id);if(!el)return
  hvMark(id);
  var sd=document.getElementById("hvSide");if(sd)sd.classList.remove("open")}
 function hvMark(id){[].forEach.call(document.querySelectorAll("#hvNav .hvni"),function(n){
- n.classList.toggle("on",n.getAttribute("data-s")===id)})}
+ n.classList.toggle("on",n.getAttribute("data-s")===id)});
+ try{hvTopTitle(id)}catch(e){}}
+/* Thanh trên nói ĐANG Ở ĐÂU: tên cổng + mục đang đọc + tên người đang xem. Cuộn tới mục nào
+   thì dòng dưới đổi theo mục đó (hvSpy gọi hvMark, hvMark gọi hàm này). */
+function hvTopTitle(id){
+ var b=document.getElementById("hvTopT"),s=document.getElementById("hvTopS");if(!b||!s)return;
+ b.textContent=hvPH()?"Cổng phụ huynh":"Cổng học viên";
+ var nm="";HVSEC.forEach(function(x){if(x[0]===id)nm=x[1]});
+ var who="";try{var S=find("DL09","student_id",window.HVID)||{};who=S.full_name||""}catch(e){}
+ s.textContent=(nm||"")+(nm&&who?" · ":"")+(who||"")||"-"}
+/* Công cụ trên thanh: chỉ những thứ người học/phụ huynh thật sự dùng tới. Gọi trung tâm lấy
+   từ hotline trong Cài đặt - chưa khai hotline thì không vẽ nút gọi (không hứa suông). */
+function hvTopPaint(){var t=document.getElementById("hvTools");if(!t)return;
+ var h="";try{h+=hvCallHTML("","",1)}catch(e){}
+ h+='<button class="tbtn" onclick="congDoiMo()" aria-label="Đổi cổng" data-tip="Đổi cổng - sang cổng nhân viên hoặc cổng phụ huynh, dữ liệu vẫn là một"><i class="ti ti-arrows-exchange"></i></button>';
+ h+='<button class="tbtn" onclick="gateSwitchHV()" aria-label="Đổi người đang xem" data-tip="Đổi người đang xem - quay về màn chọn của cổng này"><i class="ti ti-user-check"></i></button>';
+ if(CANLS&&!SVR)h+='<button class="tbtn" onclick="demoResetHoi()" aria-label="Reset demo" data-tip="Dựng lại dữ liệu demo về nguyên bản - cấu hình đã chỉnh vẫn giữ"><i class="ti ti-refresh"></i></button>';
+ t.innerHTML=h}
 function hvNav(){var h="",BK={};
  HVSEC.forEach(function(x){BK[x[0]]=x});
  /* (n) xếp theo 3 NHÓM nhu cầu thay vì 12 mục phẳng; mục nào không có trên trang thì bỏ nhóm luôn */
@@ -17327,7 +17447,7 @@ function hvRender(){
  document.getElementById("hvWho").textContent=(_ph&&_ph.ten)||S.full_name||"-";
  document.getElementById("hvWho2").textContent=_ph?((_ph.qh||"Người giám hộ")+" của "+(S.full_name||"")):(S.student_id||"");
  document.getElementById("hvAv").textContent=String(S.full_name||"?").trim().split(" ").pop().slice(0,1).toUpperCase();
- hvNav();var box=document.getElementById("hvMain");if(box)box.scrollTop=0;hvSpy()}
+ hvNav();hvTopPaint();var box=document.getElementById("hvMain");if(box)box.scrollTop=0;hvSpy()}
 /* (n) Trên điện thoại, mở mục lục xong bấm ra ngoài KHÔNG đóng được - phải bấm đúng nút.
    Thêm lớp mờ phủ: bấm đâu cũng đóng, đúng phản xạ người dùng. */
 function hvToggleSide(){var s=document.getElementById("hvSide");if(!s)return;
@@ -17384,7 +17504,7 @@ function demoGateHV(){var el=document.getElementById("login");if(!el){bootHV();r
     phụ huynh cũng không đăng nhập được, hiện ra rồi bấm không vào mới là đánh đố. */
  if(PH)stu=stu.filter(function(x){return !!ghSdt(x)});
  var h='<div class="loginbox" style="max-width:760px;max-height:88vh;overflow:auto;text-align:left">';
- h+='<div style="text-align:center"><h2>IELTS The Tutors · '+(PH?"Cổng phụ huynh":"Trang học viên")+'</h2>'+
+ h+='<div style="text-align:center"><h2>IELTS The Tutors · '+(PH?"Cổng phụ huynh":"Cổng học viên")+'</h2>'+
   '<p>'+(PH
    ?'Chọn con của bạn để xem tình hình học tập, chuyên cần, học phí và nhật ký từng buổi. Phần <b>trao đổi riêng</b> và <b>góp ý riêng</b> của con thì trung tâm xin phép giữ kín - đó là kênh để cháu nói thật.'
    :'Chọn học viên để vào trang của bạn ấy, hoặc bấm <b>Vào như phụ huynh</b> để xem đúng những gì người giám hộ nhìn thấy. Bản demo - dữ liệu thật của trung tâm, trình bày theo cách dành cho người xem.')+'</p>'+
@@ -17526,6 +17646,45 @@ function gateHoiPass(){pwHoi("Vào quản trị thật",
  "Chế độ này sửa được cấu hình và dựng lại được dữ liệu demo. Nhập mật khẩu quản trị.","gateVaoThat")}
 function gateVaoThat(){gateEnter("","that")}
 function gateSwitch(){ssSet("ITTS_WHO",null);location.reload()}
+/* ===== ĐỔI CỔNG (V9.63 - anh Luân đặt) =====
+   Ba cổng là ba địa chỉ khác nhau. Trước đây muốn nhảy sang cổng kia phải quay ra trang chủ
+   bản demo rồi bấm lại - nay có nút ngay trên thanh trên của CẢ BA cổng.
+   Địa chỉ tính theo cách trang đang được mở, không cắm cứng:
+   - mở thẳng file .html (trên máy) -> đi theo TÊN FILE cạnh nhau
+   - mở qua thư mục (bản demo GitHub Pages) -> đi theo THƯ MỤC cong-nhan-vien / cong-hoc-vien
+   Cổng phụ huynh không phải file thứ ba: nó là cổng học viên mở kèm ?phuhuynh. */
+/* Canh ĐÚNG TÊN HAI FILE BUILD, không canh đuôi .html: bản trên GitHub Pages cũng có thể được
+   mở bằng địa chỉ đầy đủ .../cong-hoc-vien/index.html - canh đuôi là tính nhầm sang kiểu file
+   rồi trỏ đi một nơi không tồn tại. */
+function congKieuFile(){return /\/ITTs_(WebApp_v5|TrangHocVien)_demo\.html?$/i.test(location.pathname)}
+function congURL(w){
+ var p=location.pathname;
+ if(congKieuFile()){var d=p.replace(/[^\/]*$/,"");
+  return w==="nv"?(d+"ITTs_WebApp_v5_demo.html"):(d+"ITTs_TrangHocVien_demo.html"+(w==="ph"?"?phuhuynh":""))}
+ var b=p.replace(/(cong-nhan-vien|cong-hoc-vien)\/?[^\/]*$/,"");
+ if(b===p)b=p.replace(/[^\/]*$/,"");
+ if(b.slice(-1)!=="/")b+="/";
+ return w==="nv"?(b+"cong-nhan-vien/"):(b+"cong-hoc-vien/"+(w==="ph"?"?phuhuynh":""))}
+function congDangO(){if(!window.HVPORTAL)return "nv";
+ var ph=false;try{ph=hvPH()}catch(e){}
+ return ph?"ph":"hv"}
+var CONGDS=[
+ ["nv","Cổng nhân viên","ti-home","Việc hôm nay theo SOP, hồ sơ học viên, báo cáo KPI, cấu hình hệ thống."],
+ ["hv","Cổng học viên","ti-school","Lịch học, bài tập, buổi WOW 1-1, học phí theo đợt, trao đổi với trung tâm."],
+ ["ph","Cổng phụ huynh","ti-users","Theo dõi việc học của con - ẩn phần trao đổi riêng tư của các em."]];
+function congHTML(){var cur=congDangO(),h="";
+ h+='<div class="fhint" style="margin:0 0 12px">Ba cổng dùng chung một bộ dữ liệu demo - đổi qua lại bao nhiêu lần thì số liệu vẫn là một.</div>';
+ CONGDS.forEach(function(c){var here=(c[0]===cur);
+  h+='<div class="congr'+(here?" here":"")+'"'+(here?"":' onclick="congDi(\''+c[0]+'\')"')+'>'+
+   '<div class="congi"><i class="ti '+c[2]+'"></i></div>'+
+   '<div style="min-width:0"><b>'+esc(c[1])+'</b><small>'+esc(c[3])+'</small></div>'+
+   (here?'<span class="chip" style="margin-left:auto;flex:none">Đang ở đây</span>'
+        :'<i class="ti ti-arrow-right" style="margin-left:auto;opacity:.55;flex:none"></i>')+'</div>'});
+ return h}
+function congDoiMo(){openDrawer("Đổi cổng",congHTML())}
+function congDi(w){if(w===congDangO())return;
+ try{closeModal()}catch(e){}
+ location.href=congURL(w)}
 function demoBoot(){
  /* V9.30: kéo dữ liệu về hiện tại TRƯỚC khi tính cột dẫn xuất - deriveAll đọc ngày để suy trạng
     thái, chạy sau khi dịch mới ra số đúng. */
@@ -17550,14 +17709,16 @@ HV_SHELL = r"""
 <div class="hvapp" id="hvapp">
   <div class="hvmask" id="hvMask" onclick="hvCloseSide()"></div>
   <aside class="hvside" id="hvSide">
-    <div class="hvbrand"><div class="logo" style="width:34px;height:34px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 40 40" width="22" height="22" aria-hidden="true"><g fill="none" stroke="#D51920" stroke-width="3.2"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="7.5"/></g><circle cx="20" cy="20" r="3.4" fill="#D51920"/><g stroke="#D51920" stroke-width="3.2"><line x1="20" y1="1.5" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="38.5"/><line x1="1.5" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="38.5" y2="20"/></g></svg></div><div><b>IELTS The Tutors</b><small>Trang học viên</small></div></div>
+    <div class="hvbrand"><div class="logo" style="width:34px;height:34px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 40 40" width="22" height="22" aria-hidden="true"><g fill="none" stroke="#D51920" stroke-width="3.2"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="7.5"/></g><circle cx="20" cy="20" r="3.4" fill="#D51920"/><g stroke="#D51920" stroke-width="3.2"><line x1="20" y1="1.5" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="38.5"/><line x1="1.5" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="38.5" y2="20"/></g></svg></div><div><b>IELTS The Tutors</b><small>Cổng học viên</small></div></div>
     <div class="hvme"><div class="av" id="hvAv">?</div><div><b id="hvWho">-</b><small id="hvWho2">-</small></div></div>
-    <div class="hvselbox">
-     <button class="btn sm" style="width:100%;justify-content:center" onclick="gateSwitchHV()"><i class="ti ti-arrows-exchange"></i>Đổi người / màn cổng</button></div>
     <nav class="hvnav" id="hvNav"></nav>
   </aside>
   <main class="hvmain" id="hvMain">
-    <div class="hvtop"><button class="tbtn" onclick="hvToggleSide()" aria-label="Mục lục"><i class="ti ti-menu-2"></i></button><b style="font-size:13px">Trang học viên</b></div>
+    <div class="hvtop">
+      <button class="tbtn hvtoggle" onclick="hvToggleSide()" aria-label="Mục lục"><i class="ti ti-menu-2"></i></button>
+      <div class="hvtt"><b id="hvTopT">Cổng học viên</b><small id="hvTopS">-</small></div>
+      <div class="hvtools" id="hvTools"></div>
+    </div>
     <div id="hvBody"></div>
   </main>
 </div>
@@ -17617,7 +17778,7 @@ _MH = "</style></head><body>"
 _i  = HTML.index(_MH) + len(_MH)
 _j  = HTML.index('<script src="ITTs_data.js"></script>')
 _head, _script = HTML[:_i], HTML[_j:]
-HTML_HV = (_head.replace("<title>IELTS The Tutors · Cổng làm việc</title>", "<title>IELTS The Tutors · Trang học viên</title>").replace("fill='%23D51920'/%3E%3Ccircle cx='20' cy='20' r='7' fill='%23fff'", "fill='%232E5A88'/%3E%3Ccircle cx='20' cy='20' r='7' fill='%23fff'")
+HTML_HV = (_head.replace("<title>IELTS The Tutors · Cổng làm việc</title>", "<title>IELTS The Tutors · Cổng học viên</title>").replace("fill='%23D51920'/%3E%3Ccircle cx='20' cy='20' r='7' fill='%23fff'", "fill='%232E5A88'/%3E%3Ccircle cx='20' cy='20' r='7' fill='%23fff'")
            + HV_SHELL
            + _script.replace('if(!SVR){demoBoot()}', 'if(!SVR){demoBootHV()}'))
 
@@ -17627,7 +17788,7 @@ import datetime as _dt
 _GEN=_dt.datetime.now().strftime("%d/%m/%Y %H:%M")
 out=out.replace("__GEN_STAMP__",_GEN); out_hv=out_hv.replace("__GEN_STAMP__",_GEN)
 assert "demoBootHV()" in out_hv and 'id="login"' in out_hv, "LAP RAP HV GAY: boot/gate khong dung cho"
-assert "Trang học viên</title>" in out_hv, "LAP RAP HV GAY: title"
+assert "Cổng học viên</title>" in out_hv, "LAP RAP HV GAY: title"
 _pd = os.path.join(_OUT,"ITTs_data.js")
 open(_pd,"w",encoding="utf-8").write("/* DU LIEU DEMO ITTs - sinh boi gen_demo.py -> gen_v5.py luc "+_GEN+". Thay file nay la app doc du lieu moi, khong can build lai app. */\nwindow.ITTS_DATA = "+DATA+";\nwindow.ITTS_DATA.__gen=\""+_GEN+"\";\n")
 print("WROTE", _pd, "(app se uu tien doc file nay; thieu file thi dung ban nhung trong HTML)")

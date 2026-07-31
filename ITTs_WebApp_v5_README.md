@@ -2069,3 +2069,44 @@ lại: Cài đặt → Phân quyền & Phạm vi → bỏ tích **"Khoá chọn 
 > Lưu ý thật lòng: bản demo này chạy hẳn trong trình duyệt nên mật khẩu nằm ngay trong file - nó là
 > **cái chốt cửa** để người xem không lỡ tay sửa, **không phải khoá an ninh**. Khi nối máy chủ thật
 > thì việc kiểm mật khẩu sẽ chuyển sang máy chủ.
+
+## Ba cổng đi lại được với nhau (V9.63)
+
+Bản demo có ba cổng: **Cổng nhân viên**, **Cổng học viên**, **Cổng phụ huynh**. Trước đây muốn
+nhảy qua lại phải quay ra trang chủ bản demo.
+
+Nay trên thanh trên của **cả ba cổng** có nút **Đổi cổng** (biểu tượng hai mũi tên). Bấm vào mở
+ngăn kéo liệt kê ba cổng, kèm một dòng mô tả mỗi cổng làm gì; cổng bạn đang đứng thì mờ đi và
+không bấm được. Ba cổng dùng chung một bộ dữ liệu demo nên đổi qua lại bao nhiêu lần số liệu vẫn
+là một.
+
+Địa chỉ được tính theo cách trang đang mở, nên nút chạy đúng cả khi bạn mở file trên máy lẫn khi
+mở bản demo trên mạng.
+
+## Cổng học viên có thanh trên (V9.63)
+
+Trước đây thanh trên của cổng học viên chỉ hiện trên điện thoại. Nay hiện ở mọi khổ màn:
+
+- **Bên trái**: nút mở mục lục (chỉ trên điện thoại).
+- **Ở giữa**: tên cổng, **mục bạn đang đọc** (cuộn tới đâu đổi tới đó) và tên người đang xem.
+- **Bên phải**: gọi trung tâm (chỉ hiện khi đã điền hotline trong Cài đặt), Đổi cổng, Đổi người
+  đang xem, Reset demo.
+
+Nút "Đổi người" đã rời khỏi mục lục bên trái để không nằm hai chỗ.
+
+## Yêu cầu học viên gửi lên nằm ở đâu (V9.63)
+
+Học viên gửi yêu cầu / câu hỏi được từ lúc có cổng vào, ở bất kỳ chặng nào - nên nghiệp vụ này
+không thuộc chặng C1-C4. Nó nằm ở **hub CSKH · Khảo sát & Phản hồi**, tab **Yêu cầu từ học viên**,
+bên cạnh hai kênh vào sẵn có là Góp ý và Khiếu nại.
+
+Hệ thống tự chuyển yêu cầu tới **học vụ**, riêng yêu cầu về tiền thì tới **kế toán**, kèm hạn nhận
+việc lấy theo tham số `slaTaskAccept_hours`. Người nhận thấy nó ở bốn chỗ: ô **Yêu cầu học viên gửi
+tới** trên bảng việc đầu ca, tab nói trên, menu **Giao việc** và hàng **Việc chờ nhận**, cùng
+chuông cảnh báo khi quá hạn. Nhận và trả lời ngay trên thẻ việc.
+
+## Cột menu kéo được (V9.63)
+
+Cột menu bên trái của cổng nhân viên rộng 262px. Rê chuột vào mép phải của nó sẽ thấy tay kéo -
+kéo để đổi độ rộng (trong khoảng 210-420px), **bấm đúp để về mặc định**. Độ rộng nhớ theo từng
+người trên máy đó. Trên điện thoại menu là lớp phủ trượt ra nên không có tay kéo.
