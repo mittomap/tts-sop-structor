@@ -1755,7 +1755,12 @@ function stripOf(o){var i=o.indexOf('<div class="bstats"');if(i<0)return "";   /
    t("khai muc rieng cho mot nguoi KHONG dung toi nguoi khac", t2[khac]===t1[khac])})();
  })();
  /* tach theo ca + lop online - lang kinh chi nhanh */
- (function(){window.STTAB="cong";var o=RENDER.dsthanhtoan();
+ /* V9.64: bang cong da roi khoi So thu hoc phi sang tab cua trang Giang vien (anh Luan:
+    "cong giang day tu nhien lai nam trong so thu hoc phi, vo ly" -> "phai nam o Giang vien").
+    Bo kiem phai di theo NGHIEP VU chu khong bam vao cho cu; do dung cho no dang o. */
+ (function(){window.GVTAB="cong";var o=RENDER.giangvien();
+  t("bang cong dung trong trang Giang vien, khong con trong So thu hoc phi",
+    /Chia theo ca/.test(o)&&!/Chia theo ca/.test((function(){window.STTAB="cong";return RENDER.dsthanhtoan()})()));
   t("bang cong tach theo ca", /Chia theo ca/.test(o));
   t("bang cong noi ro dang tinh theo GIO", /giờ dạy thật/.test(o));
   t("bang cong co loi sang man don gia gio day", /SETTAB=.?giagio/.test(o));

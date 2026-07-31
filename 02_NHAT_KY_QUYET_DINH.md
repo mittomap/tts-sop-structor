@@ -149,7 +149,19 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.63 — BA CỔNG ĐI LẠI ĐƯỢC VỚI NHAU + CỔNG HỌC VIÊN CÓ THANH TRÊN ✅ (31/07).**
+> **Phiên bản: V9.64 — VÁ Ở GỐC: TIỀN CÓ DẤU CHẤM · MỌI SỔ CÓ BỘ LỌC · TOUR TRỎ ĐÚNG CHỖ ✅ (31/07 chiều).**
+> · **13 việc anh Luân đặt liên tiếp** - chi tiết ở mục V9.64 cuối file. Điểm chung: cái sai hiện
+> ra một chỗ nhưng nguyên nhân ở một hàm dùng chung, nên vá đúng đó là hết cả loạt.
+> · **Tiền**: 38 chỗ in "1000000đ" → 0. Luật ở `slaChip`: đơn vị có `đ`/`VND` thì qua `money()`.
+> · **Bộ lọc**: 13/13 sổ Tra cứu có **0 trục lọc** vì `FLTDEF` khai theo tên trang. Nay sổ mượn
+> trục của trang nghiệp vụ + tự sinh trục từ cột đang hiện → **32/32 trang có trục**.
+> · **Tour**: 13/75 bước còn trỏ bằng lớp CSS dùng chung → 0/75. Thêm cơ chế canh tour lạc hậu.
+> · **Bảng công giảng dạy** rời Sổ thu học phí về trang **Giảng viên**; **bàn giao lead** hàng loạt
+> nay có mốc trả lại (nghiệp vụ vốn đã có, chỉ thiếu đường nối vào màn hàng loạt).
+> · **Ba bẫy đắt**: bộ kiểm cho khai cái sai vào danh sách miễn trừ thì hết là bộ kiểm · bản build
+> cũ kẹt trong `_src/` che bản thật · `applyScope` không đặt `CURSTAFF` nên bộ kiểm đo ra 0 dòng.
+>
+> **Phiên bản trước: V9.63 — BA CỔNG ĐI LẠI ĐƯỢC VỚI NHAU + CỔNG HỌC VIÊN CÓ THANH TRÊN (31/07).**
 > · **Một cổng một tên.** Đo được **12 chỗ gọi "Trang học viên" / 5 chỗ gọi "Cổng học viên"** trong
 > cùng một app - anh Luân nhìn trang chủ demo là thấy ngay (*"sao ko dùng cổng học viên luôn"*).
 > Nay tất cả là **Cổng học viên**; chỉ "trang Học viên nguy cơ" (trang của cổng nhân viên) giữ
@@ -5693,3 +5705,93 @@ kiểm. Đó là một quyết định có đánh đổi (dữ liệu xáo trộ
 ### Số chốt phiên
 Reset nay giữ đúng lời hứa ở MỌI độ lệch (đo lại: lệch 7 → sau reset còn 0, quá hạn 211 → 125).
 Ghi vào VIỆC TỒN: rải đều hẹn/WOW/test theo thứ trong tuần ở nguồn pipeline.
+
+## V9.64 (31/07 chiều) - 13 VIỆC ANH LUÂN ĐẶT LIÊN TIẾP, VÁ Ở GỐC CHỨ KHÔNG VÁ TỪNG CHỖ
+
+Phiên này anh Luân bắn liên tiếp 13 yêu cầu. Điểm chung của **gần hết** chúng: cái sai hiện ra ở
+một chỗ, nhưng nguyên nhân nằm ở một hàm dùng chung - nên vá đúng chỗ đó là hết cả loạt, còn đi
+sửa từng chỗ thì chỗ thứ N+1 thêm sau lại lọt.
+
+### Đo trước, sửa sau - những con số của phiên
+| Việc | Đo ra trước khi sửa | Sau khi sửa |
+|---|---|---|
+| Số tiền không có dấu chấm | 38 chỗ trên 20 trang in "1000000đ" | 0 |
+| Sổ Tra cứu không có bộ lọc | **13/13 sổ có 0 trục lọc** | 32/32 trang có trục |
+| Bước hướng dẫn trỏ CSS thô | 13/75 | 0/75 |
+| Bánh răng đứng rời khỏi chữ của nó | 108 chỗ | 0 |
+| Đoạn gợi ý lòi thẻ `<b>` ra màn hình | 10/21 | 0 |
+
+### Bốn cái vá ở GỐC
+1. **Tiền qua `slaChip`** - đặt luật: đơn vị có `đ`/`₫`/`VND` thì con số là tiền, đi qua `money()`.
+   Tham số tiền thêm vào CH2 mai này **tự có** dấu chấm, không phải nhớ khai gì.
+2. **Trục lọc**: `FLTDEF` khai theo TÊN TRANG nên `dskhieunai` tra không ra trục của `khieunai`
+   dù hai trang đọc cùng bảng DL17 và hiện cùng cột. Nay ba nguồn gộp lại: khai tay → soi trang
+   nghiệp vụ gốc (`FLTGUONG`) → **tự sinh từ cột đang hiện** (`fltAuto`). Thêm cột vào bảng là tự
+   có trục, bỏ cột đi là trục tự mất.
+3. **Số lần đổi lớp**: số 2 nằm cắm cứng ở **ba** chỗ không chỗ nào biết chỗ nào (ô thẻ đếm `>=2`,
+   cửa chặn hỏi `>=1`, nhãn CH3 ghi chữ). Nay một tham số CH2 `placementChange_free_times`.
+4. **Neo hướng dẫn**: `tourFind` nay ưu tiên tìm trong `#content`. Vỏ app (menu, thanh trên, dải
+   nhắc) luôn đứng TRƯỚC thân trang trong DOM - hễ một mã neo có mặt cả hai nơi thì bản ở vỏ luôn
+   thắng, và đó luôn là bản sai.
+
+### BẪY MỚI - bốn cái, cái nào cũng đắt
+
+**B-a. Một bộ kiểm cho phép "khai cái sai vào danh sách miễn trừ" thì nó không còn là bộ kiểm.**
+Từ V9.29x, `_checktour` bắt 13 bước trỏ CSS thô phải **khai ra** trong mảng `KHUNG`. Khai xong thì
+nó xanh - suốt từ đó tới nay. Nhưng cái sai không hề mất: bước "Ba tầng phân quyền" trỏ `.notebar`
+vẫn khoanh vào dải nhắc XEM THỬ ở đầu trang, đúng như anh Luân chụp lại. **Khai một cái sai không
+làm nó thành đúng.** Nay luật cứng: mọi bước phải trỏ bằng `@mã-neo` hoặc `@txt:`, không còn danh
+sách miễn trừ - vì bất cứ lớp CSS nào cũng sẽ có ngày thứ hai xuất hiện trên cùng một màn.
+
+**B-b. Bản build cũ nằm cạnh mã nguồn nguy hiểm hơn không có bản build nào.**
+`_src/` có bản build **ngày 30/07** và nó đã được commit vào git. Mọi công cụ chạy mà quên đặt
+`ITTS_OUT` đều đối chiếu với file cũ đó. Không có file thì công cụ báo lỗi ngay; **có file cũ thì
+nó chạy êm và trả lời về một thứ khác** - đúng loại "báo xanh mà chưa chạy gì". Đã xoá + gitignore.
+Và `_checktour` sửa lại: đọc không được bản build thì **ĐỎ**, chứ trước đây nó `return` im lặng,
+tự tắt cả một mục kiểm mà bảng tổng kết vẫn xanh.
+
+**B-c. Đo ra số lạ thì nghi CÁI THƯỚC trước - lần này thước sai thật.**
+`_checktour` đóng vai nhân viên bằng `applyScope(sid)`. Hàm đó đặt phạm vi nhưng **không đặt
+`CURSTAFF`** (trên màn thật `gateEnter` gọi thêm `enter()` mới gán). Hậu quả: NV001 có 31 lead mà
+`renderList("nhaplead")` ra **0 bản ghi**, rồi bộ kiểm kết luận "nút Ghi liên hệ không có trên
+trang". Suýt nữa đi sửa app cho một lỗi không tồn tại. Nay có `dongVai(sid)` đặt cả hai.
+
+**B-d. Dời một màn đi thì phải dời bộ kiểm theo - nếu không nó đo cái chỗ trống.**
+Chuyển bảng công từ Sổ thu học phí sang trang Giảng viên, `_check16` vẫn vẽ `RENDER.dsthanhtoan()`
+với `STTAB="cong"` và đỏ 3 tiêu chí. Đã sửa, **và thêm một tiêu chí mới**: bảng công phải có ở
+trang Giảng viên **và không được còn** ở Sổ thu học phí - hợp đồng canh cả hai đầu, không cho nó
+lẳng lặng quay về chỗ cũ.
+
+### Ba quyết định về CHỖ ĐỨNG của nghiệp vụ
+· **Bảng công giảng dạy về trang Giảng viên** (anh Luân: *"công giảng dạy tự nhiên lại nằm trong
+sổ thu học phí, vô lý"* → *"phải nằm ở Giảng viên chứ"*). Lý do gộp cũ là một lý do sai: "cùng là
+tiền". Nhưng sổ thu là tiền **học viên đóng vào**, bảng công là giờ dạy của **giảng viên** - khác
+người, khác việc, khác người dùng. `go('bangcong')` remap chứ không đi sửa 4 chỗ gọi tên cũ.
+· **Bàn giao lead có mốc trả lại.** Cái sót ở đây khó thấy hơn một tính năng chưa làm: nghiệp vụ
+**đã có sẵn** - hai cột `DL02.handover_return_to` / `handover_until`, hàm `autoReturnHandovers()`
+tự trả lead về chủ cũ, dòng nhắc `tempNote()`. Nhưng nó chỉ nối vào ngăn kéo giao lại **từng** lead;
+màn bàn giao **hàng loạt** - đúng cái màn người ta dùng khi một NV nghỉ phép - lại không có ô đó.
+Hai đường cùng làm một việc mà một đường thiếu mất nửa nghiệp vụ. Nay chung một cửa ghi `bgGhi()`.
+· **Cơ chế cập nhật tour** (anh Luân: *"hệ thống cũng lớn mà tour sơ sài quá em"*). Ba luật máy:
+neo phải có mặt **đúng trên trang của bước đó**; chỉ **một lần** trên trang đó; và trang nào người
+dùng vào được từ menu mà **không bài nào đi qua** thì phải khai lý do, không thì đỏ. Trang mới thêm
+vào app từ nay không im lặng thiếu người hướng dẫn được nữa.
+
+### Thiết kế
+· Thanh công cụ **hai tầng**: tầng trên là thứ đổi theo dữ liệu (ô tìm, dải chip lọc - hôm nay 4
+chip, mai 11 chip), tầng dưới là bộ công cụ cố định (Xuất, số dòng, Cột). Trước đây tất cả nằm một
+hàng flex-wrap nên chip đẩy tới đâu công cụ trôi tới đó, mỗi trang một chỗ.
+· **Tab Cài đặt hai tầng ra thứ bậc**: hai tầng vẽ cùng một kiểu nút thì mắt không đọc ra tầng nào
+bao tầng nào. Tầng 1 nút đặc + số đếm; tầng 2 chữ trần, gạch chân khi đang mở.
+· **Tên nhóm sidebar 10px → 12px**: nhóm nhỏ hơn mục con nó chứa là ngược thứ bậc.
+· **Chân thẻ ngăn kéo**: hàng nút cuối trước đây dính sát đoạn chữ trên nó (8px) mà cách mép dưới
+tới 24px - đọc ra như nút thuộc về câu chữ. Nay có kẻ mảnh tách, thở đều hai bên.
+· **Chữ hiện ra cho người ngoài phải đi qua một lớp dịch - nhưng lớp dịch phải biết chừa cái gì.**
+Lần trước đưa 21 đoạn gợi ý qua `goiy()` thì bọc `esc()` lên **toàn bộ** chuỗi, trong khi 10/21 đoạn
+có `<b>` để nhấn ý - người dùng đọc thấy `<b>Phân quyền có BA tầng.</b>` nguyên xi trên màn hình.
+Không thể thả nguyên chuỗi ra HTML (đoạn này **sửa được ở Cài đặt**, tức nội dung do người ngoài gõ).
+Nay: escape sạch trước, rồi **mở lại đúng một nhúm thẻ định dạng vô hại** (`b i u em strong small br`).
+
+### Số chốt phiên
+19 bộ kiểm xanh hết. `_check16` 701 → **702** tiêu chí, `_checkux` 196 → **197**, `_checktour` thêm
+3 luật mới. `_checkui` mở thật **837 lượt** trang. 42 trang vẽ được, 208 icon đủ.

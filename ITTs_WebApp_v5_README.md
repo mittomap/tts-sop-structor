@@ -2126,3 +2126,56 @@ Bấm ở chỗ nào cũng mở đúng một thẻ việc, nhận và trả lờ
 
 Ai thấy gì: người được chuyển yêu cầu thấy yêu cầu của mình; quản trị viên thấy tất cả yêu cầu
 học viên cộng các việc nội bộ đã quá hạn.
+
+## Bộ lọc: mọi danh sách đều lọc được (V9.64)
+
+Trước đây chỉ trang nghiệp vụ mới có nút **Bộ lọc**; 13 sổ trong nhóm *Tra cứu* chỉ có ô tìm chữ.
+Nay **mọi trang danh sách đều có**, và trục lọc sinh ra theo ba nấc:
+
+1. **Trục khai riêng** cho trang đó - giàu nhất, có trục tính chéo bảng (vd lọc học viên theo
+   *nơi đang học* chứ không chỉ nơi đăng ký).
+2. **Trục mượn của trang nghiệp vụ cùng bảng** - *Sổ khiếu nại* mượn trục của trang *Xử lý khiếu
+   nại*, nên lọc được theo **loại khiếu nại**, mức độ, kênh, lớp, ngày tiếp nhận.
+3. **Trục tự sinh từ cột đang hiện** - cột nào là trạng thái/phân loại hoặc mốc thời gian thì lọc
+   được theo cột đó. Thêm cột vào bảng là **tự có** trục lọc, bỏ cột đi thì trục tự mất.
+
+Cột mã không sinh trục (lọc theo mã thì mỗi giá trị đúng một dòng, vô nghĩa).
+
+## Thanh công cụ hai tầng (V9.64)
+
+Trang danh sách nay có hai tầng, ngăn cách rõ:
+- **Tầng trên** - thứ thay đổi theo dữ liệu: ô tìm và dải chip lọc trạng thái (hôm nay 4 chip,
+  mai 11 chip).
+- **Tầng dưới** - bộ công cụ cố định: số dòng, **Xuất**, **Bộ lọc**, **Xóa lọc**, **Cột**.
+
+Trước đây tất cả nằm chung một hàng nên chip đẩy tới đâu thì nút Xuất trôi tới đó - mỗi trang một
+chỗ khác nhau. Nay công cụ đứng yên ở mọi trang, mọi cỡ dữ liệu.
+
+## Bảng công giảng dạy nằm ở trang Giảng viên (V9.64)
+
+Trước đây nó là tab thứ ba của **Sổ thu học phí**, gộp vì "cùng là tiền". Nhưng sổ thu là tiền
+**học viên đóng vào**, còn bảng công là **giờ dạy của giảng viên** - khác người, khác việc, khác
+người dùng. Nay bảng công là tab của trang **Giảng viên**, đứng cạnh chính những người nó tính
+công. Các lối vào cũ (ô thẻ *Buổi thiếu mốc giờ vào/ra*, Trợ lý, nhịp ngày, hướng dẫn) tự dẫn
+tới đúng chỗ mới.
+
+## Bàn giao lead: chuyển hẳn hay bàn giao tạm (V9.64)
+
+Màn **Bàn giao lead** có thêm ô **Trả lại ngày**:
+- **Để trống** = chuyển hẳn, lead thuộc về người mới.
+- **Điền ngày** = bàn giao **tạm** (dùng khi nhân viên nghỉ phép, nghỉ ốm). Hết ngày đó lead
+  **tự quay về** nhân viên cũ, không ai phải nhớ. Trong lúc đang tạm, hồ sơ lead hiện một dòng
+  nhắc nói rõ sẽ quay về ai và từ ngày nào.
+
+Mọi lần bàn giao đều ghi một dòng lịch sử: ai chuyển, chuyển cho ai, lúc nào, tạm hay hẳn.
+Giao lại **từng lead** (trong hồ sơ lead) và giao **hàng loạt** (màn này) dùng chung một cửa ghi.
+
+## Số tiền và số cấu hình (V9.64)
+
+Mọi số tiền hiện trên app đều có **dấu chấm phân nhóm nghìn** (1.000.000đ). Quy tắc nằm ở một chỗ:
+tham số nào khai đơn vị là `đ` / `VND` thì con số tự được định dạng - thêm tham số tiền mới vào
+Cài đặt không phải làm gì thêm.
+
+Số **lần đổi lớp được miễn duyệt** nay là tham số (Cài đặt, nhóm *P5 · Xếp lớp & nhập học*).
+Đổi số này thì cả ba nơi đổi theo cùng lúc: ô thẻ *Đổi lớp từ N lần* ở Bảng Quản lý, cửa chặn khi
+học vụ bấm đổi lớp, và câu giải thích trên thẻ.
