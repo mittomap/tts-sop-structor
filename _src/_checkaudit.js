@@ -127,10 +127,15 @@ setRole("all");
    với mỗi cặp tên đồng nghĩa đã biết, đếm số lần xuất hiện trong CHỮ HIỆN RA; phải nghiêng hẳn
    về một bên, không được cả hai cùng sống. Đếm trên MÃ NGUỒN vì đó là nơi tên được đặt. */
 (function(){
+ /* SO KHONG PHAN BIET HOA THUONG. Ban truoc chi tim "Nguoi giam ho" viet hoa chu N nen bo lot
+    15 dong viet thuong ("goi nguoi giam ho", "chua co so nguoi giam ho") - dung loai chu nguoi
+    dung doc nhieu nhat. Mot bo kiem bat chu hoa ma bo chu thuong thi no canh dung mot nua. */
  var CAP=[
-  {dung:"Cổng học viên", sai:"Trang học viên", tru:/trang H[oọ]c vi[eê]n nguy c[oơ]/gi},
-  {dung:"Trợ lý",        sai:"Trợ thủ",        tru:null},
-  {dung:"Người đồng hành",sai:"Người giám hộ", tru:null}];
+  {dung:"Cổng học viên", sai:"trang học viên", tru:/trang H[oọ]c vi[eê]n nguy c[oơ]/gi},
+  {dung:"Trợ lý",        sai:"trợ thủ",        tru:null},
+  /* Cum "(phu huynh / nguoi giam ho)" la cau GIAI NGHIA - noi ro "nguoi dong hanh" la ai, nen
+     giu lai co chu dich. Tru truoc khi dem. */
+  {dung:"Người đồng hành",sai:"người giám hộ", tru:/ph[uụ] huynh \s*\/\s*ng[uư][oờ]i gi[aá]m h[oộ]/gi}];
  /* CHI DEM CHU HIEN RA, khong dem chu thich ma nguon. Do that: 18/18 cho con chu "Tro thu"
     deu nam trong khoi chu thich ke lai lich su vi sao doi ten - do la ho so cua quyet dinh, xoa
     di la mat tri nho cua du an. Bo kiem dem ca chu thich thi no bat mot cai khong phai loi, va
@@ -144,7 +149,7 @@ setRole("all");
  CAP.forEach(function(c){
   var s=SRCH;
   if(c.tru)s=s.replace(c.tru,"");
-  var nSai=(s.match(new RegExp(c.sai,"g"))||[]).length;
+  var nSai=(s.match(new RegExp(c.sai,"gi"))||[]).length;
   if(nSai>0)lech.push('"'+c.sai+'" còn '+nSai+" chỗ hiện ra (phải là \""+c.dung+"\")")});
  t("một việc chỉ có MỘT tên - không còn tên cũ sống song song", !lech.length, lech.join(" · "));
 })();
@@ -375,6 +380,80 @@ setRole("all");
   if(h.indexOf("__LOI__")===0){cam.push(pg+" NÉM LỖI khi rỗng");return}
   if(!/class="empty"/.test(h))cam.push(pg)});
  t("danh sách ra 0 dòng thì nói rõ vì sao, không để màn trắng", !cam.length, cam.slice(0,6).join(", "));
+})();
+
+/* ═════════ M6b · TỪ VIẾT TẮT HIỆN RA MÀ KHÔNG TRA ĐƯỢC ══════════════════════════════════
+   Anh Luân: *"trợ lý có đọc được định nghĩa mấy từ viết tắt mà ta, sao giờ a tra thử ko thấy"*.
+   Đo bằng máy: vẽ THẬT mọi trang, đếm từ viết tắt hiện ra, rồi hỏi từ điển từng cái.
+   Đo ra lần đầu: **118 từ hiện ra, từ điển định nghĩa 10**. Nay từ điển đọc thẳng CH6 + SHEETVN
+   nên nó tự lớn theo app - thêm một chỉ số vào CH6 là có ngay mục từ điển, không phải nhớ. */
+var TAT_BOQUA={
+ HV:"viết tắt của Học viên - đã có mục 'lead' và 'at_risk' giải nghĩa ngữ cảnh xung quanh",
+ NV:"viết tắt của Nhân viên - hiểu được ngay trong câu, không cần tra",
+ GV:"viết tắt của Giáo viên - hiểu được ngay trong câu",
+ ITTs:"tên trung tâm", IELTS:"tên kỳ thi", VND:"đơn vị tiền Việt Nam",
+ OK:"từ thông dụng", ID:"từ thông dụng", CSV:"định dạng tệp, hiện trong câu 'mở được bằng Excel'",
+ AI:"đã giải thích ngay tại khối cấu hình AI trong Cài đặt", API:"đi liền chữ 'API key' ở màn cấu hình",
+ SMS:"kênh nhắn tin - hiểu được ngay trong câu", FB:"Facebook - hiện trong tên nguồn lead",
+ TG:"cột Thời gian trong bảng - có tiêu đề cột đứng ngay trên",
+ /* Ten khoa/lop trong DU LIEU demo da bi luat pham vi loc - khong can khai o day nua. */
+ };
+(function(){
+ var chu="";
+ setRole("all");
+ Object.keys(PBK).forEach(function(pg){var h=veTrang(pg);if(h.indexOf("__LOI__")!==0)chu+=" "+h});
+ var tho=chuThay(chu);
+ /* THUOC PHAI DUNG - do lan dau bat 10 tu, 6 trong so do la em do sai:
+    · QU / CH / NH la MANH cua "QUÁ HẠN", "CHẶNG", "VẬN HÀNH" - chu Viet viet hoa bi cat doi
+      boi nguyen am co dau (Á, Ặ, À) vi chung khong nam trong [A-Z];
+    · ENR / LOP / PAY la TIEN TO MA dong (ENR-2026-001), khong phai tu viet tat;
+    · PLA nam trong TEN LOP cua du lieu demo ("Foundation PLA T7-CN"), khong phai tu vung cua app;
+    · CN / T7 la thu trong tuan.
+    Nen loc ba nhom do truoc khi ket luan. Doi dinh nghia cho mot manh chu la doi mot thu vo
+    nghia, va bo kiem doi thu vo nghia thi lan sau khong ai doc no. */
+ var THU={CN:1,T2:1,T3:1,T4:1,T5:1,T6:1,T7:1};
+ var dem={};
+ /* ĐỌC NGỮ CẢNH THEO VỊ TRÍ, KHÔNG BẮT BẰNG NHÓM. Bẫy vừa cắn: viết `(.?)\b(...)\b(.?)` thì
+    nhóm đuôi ĂN MẤT ký tự đứng sau - khớp "CH" nuốt luôn "Ặ", nên lần khớp kế tiếp thấy "NG"
+    với ngữ cảnh trước là RỖNG và bộ lọc "mảnh cụm viết hoa" không cắn được. Đo ra mới thấy:
+    cả hai bộ lọc em vừa thêm đều im lặng không làm gì. */
+ var HOAVN=/[A-Z\u00C0-\u00DD\u0102\u0110\u0128\u0168\u01A0\u01AF\u1EA0-\u1EF8]/;
+ var reT=/\b(CH[1-9]|BC[1-9]|VH\d{1,2}|DL\d{2}[a-z]?|NA\d{3}|[A-Z]{2,6}\d{0,2})\b/g,mT;
+ function tuKe(txt,i,lui){         /* từ liền kề (cách bởi đúng một khoảng trắng) */
+  var m=lui?txt.slice(0,i).match(/(\S+)\s?$/):txt.slice(i).match(/^\s?(\S+)/);
+  return m?m[1]:""}
+ while((mT=reT.exec(tho))){
+  var w=mT[1], i0=mT.index, i1=i0+w.length;
+  var truoc=i0>0?tho.charAt(i0-1):"", sau=tho.charAt(i1);
+  if(THU[w])continue;
+  if(sau==="-"||truoc==="-")continue;                          /* tiền tố mã: KN-2026, T7-CN */
+  if(HOAVN.test(truoc)||HOAVN.test(sau))continue;              /* mảnh của một cụm viết hoa */
+  /* Chữ Việt VIẾT HOA để nhấn mạnh ("GỌI NGAY", "VẬN HÀNH LỚP") - từ liền kề cũng viết hoa thì
+     đây là câu nhấn giọng chứ không phải từ viết tắt cần tra nghĩa. */
+  var t1=tuKe(tho,i0,1), t2=tuKe(tho,i1,0);
+  function laHoa(x){return x.length>=2&&x===x.toUpperCase()&&/[A-Z\u00C0-\u1EF9]/.test(x)}
+  if(laHoa(t1)||laHoa(t2))continue;
+  dem[w]=(dem[w]||0)+1}
+ var tudien={};
+ try{qaTuDien().forEach(function(m){tudien[String(m.t).toUpperCase()]=1})}catch(e){}
+ /* Mã có tiền tố (DL09, BC7, NA050, VH3) tra được qua mục tiền tố - không đòi từng mã một. */
+ function traDuoc(w){
+  if(tudien[w])return true;
+  var m=w.match(/^(DL|BC|VH|NA|CH)\d/);
+  return !!(m&&tudien[m[1]])}
+ /* PHAM VI DUNG: chi doi dinh nghia cho tu viet tat do CHINH APP viet ra. Chay lan dau moi
+    thay minh dang duoi theo ca ten khoa hoc va ten lop trong DU LIEU demo (GOLD, PRIME, EVO,
+    MASTER, ELITE, CN4...) - app khong chiu trach nhiem dinh nghia ten san pham cua trung tam,
+    va neu doi thi danh sach mien tru se phinh mai khong het. Loc bang cach hoi: tu nay co xuat
+    hien nhu MOT CHUOI trong ma nguon app khong. */
+ var chuApp=SRC.replace(/\/\*[\s\S]*?\*\//g," ").replace(/^\s*#.*$/gm," ");
+ function laCuaApp(w){
+  var re=new RegExp("['\"][^'\"\\n]{0,120}\\b"+w+"\\b");
+  try{return re.test(chuApp)}catch(e){return true}}
+ var thieu=Object.keys(dem).filter(function(w){
+  return dem[w]>=2&&!TAT_BOQUA[w]&&!traDuoc(w)&&laCuaApp(w)}).sort(function(a,b){return dem[b]-dem[a]});
+ t("từ viết tắt hiện trên màn đều tra được ở từ điển ("+Object.keys(dem).length+" từ)",
+   !thieu.length, thieu.slice(0,10).join(", ")+" => them vao CH6/QATUDIENDEF, hoac khai TAT_BOQUA kem ly do");
 })();
 
 /* ═════════ ĐỒNG BỘ - thứ phụ thuộc phải theo kịp ════════════════════════════════════════
