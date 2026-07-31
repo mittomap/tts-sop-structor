@@ -181,6 +181,9 @@
 > Trang chủ nay có **bản nguồn trong repo chính** để bộ kiểm với tới được.
 > · **Chế độ xem thử**: thay toast nhảy liên tục bằng **dải vàng thường trực** dưới thanh trên,
 > mang sẵn nút mở quyền quản trị.
+> · **"Học viên liên hệ" có mục riêng trên menu trái** (nhóm Làm việc, có badge) + dải **DỮ LIỆU
+> DEMO** thường trực ở cả ba cổng + thanh trên cổng học viên hết lửng lơ + lời chào phụ huynh gọi
+> đúng tên và quan hệ.
 > · **Yêu cầu học viên hiện ở BA chỗ**: dải Việc hôm nay (bộ phận CSKH, 3 nhóm riêng), bảng việc
 > đầu ca của học vụ/kế toán, và tab CSKH. Lòi ra bug im lặng từ V9.20: nhánh *"quản trị viên thấy
 > hết"* chưa bao giờ chạy vì mã của Admin là `"ADMIN"` chứ không rỗng - cả khối Giao việc vô hình
@@ -5182,6 +5185,49 @@ của `slaItems` cộng tên các chặng hành trình.
 **4. `_check16` - ngưỡng phải chỉ được chỗ sửa.** Các nhóm việc mới không khai vào `SLAPRM` nên
 ô việc chỉ nói suông. Đã khai đủ 10 nhóm sinh từ DL23 (yêu cầu học viên + giao việc nội bộ) trỏ
 về `slaTaskAccept_hours` / `slaTaskConfirm_hours`.
+
+### P. Anh Luân mở Admin và không thấy gì - bốn chỗ em làm thiếu
+
+> *"a đang ở admin đây em, ko thấy mấy cái em thay đổi ở đâu cả... rồi cái tab trên sidebar
+> thông báo từ học viên đâu?"*
+
+**1. Menu trái không có đường vào.** Em để nó thành tab thứ tư bên trong trang CSKH - đúng về
+kiến trúc nhưng sai về đường đi: không ai nhớ được rằng nó nằm trong tab thứ tư của một trang.
+Nay có mục riêng **Học viên liên hệ** kèm số việc đang chờ. Không đẻ trang mới - khoá `ychv` là
+bí danh, `go()` đưa về đúng hub CSKH mở sẵn tab đó, y như cách các hàng Chờ duyệt đang làm.
+
+Đặt lần đầu vào nhóm chặng **C2 - và vẫn không thấy**, vì nhóm chặng mặc định GẬP LẠI. Đo mới ra
+(`navIsOpen` trả về false). Dời lên nhóm **Làm việc**, cạnh Việc hôm nay và Giao việc - đúng chỗ
+của nó, vì học viên liên hệ được ở bất kỳ chặng nào.
+
+> **LUẬT:** *thêm một mục vào menu chưa phải là làm cho người ta thấy nó.* Phải hỏi tiếp: nhóm
+> chứa nó có đang mở không, phạm vi vai có cho thấy không, badge có chạy không.
+
+**2. Hai nhãn nhóm việc giống nhau** (anh Luân chụp): *"Yêu cầu học viên quá hạn nhận"* và
+*"Yêu cầu học viên quá hạn xử lý"* - đọc lướt là một. Và anh chốt luôn tên gọi đúng cho cả nghiệp
+vụ này: **"Học viên liên hệ"**. Đổi hết một lượt (mục menu, tab, thẻ việc, ô bảng việc, 4 nhóm
+trong dải Việc hôm nay, bản khai thứ tự, bản khai ngưỡng): *Học viên liên hệ mới* · *chưa ai nhận*
+· *xử lý quá hạn* · *tới hạn hôm nay*.
+
+**3. Thông báo đang dùng dữ liệu demo** - em làm thiếu thật, chỉ mới làm dải cho chế độ xem thử.
+Nay dải đó có **hai trạng thái** và luôn có mặt ở cả ba cổng: vàng khi đang XEM THỬ (kèm nút mở
+quyền), xanh nhạt khi đã mở quyền - *"Đang chạy trên DỮ LIỆU DEMO - mọi thao tác chạy thật nhưng
+chỉ lưu trên máy này"* kèm nút dựng lại dữ liệu.
+
+**4. Thanh trên cổng học viên nhìn lửng lơ** (anh Luân). Đo: thanh nằm ở `y=20` chứ không phải 0,
+và nội dung bên dưới **đè lên nó 4px**. Nguyên nhân: em đặt thanh NẰM TRONG vùng cuộn rồi kéo lên
+bằng `margin:-20px`, mà `position:sticky` **không cho phần tử vượt lên trên khối chứa nó** - nên
+margin âm bị vô hiệu. Dựng lại đúng kiểu vỏ app của cổng nhân viên: thanh là **anh em** của vùng
+cuộn, không nằm trong nó. Nay `y=0`, không đè, không hở.
+
+**5. Lời chào không phân biệt phụ huynh với học viên.** Có phân biệt nhưng đọc lên rất kỳ:
+*"Chào buổi sáng, phụ huynh Người nhà Hiếu"* - vì tên người đồng hành trong dữ liệu demo là chuỗi
+lấp chỗ trống `"Người nhà " + tên con`. Hai chỗ sửa: (a) `gen_demo` sinh **tên thật**, giới tính
+của tên khớp quan hệ đã khai (Bố/Ông/Anh → tên nam, Mẹ/Bà/Chị → tên nữ); (b) lời chào gọi bằng
+**tên**, còn quan hệ nói ở dòng dưới: *"Anh của Lê Gia Bảo - bạn đang xem trang học của em"*.
+
+`_check14` 201 → **211 tiêu chí** (mục menu có thật, nằm đúng nhóm không bị gập, badge đúng số,
+đang ở tab nào thì sáng đúng mục, dải dữ liệu demo có ở cả hai cổng).
 
 ### L. Trang chủ bản demo
 

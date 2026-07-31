@@ -1374,10 +1374,27 @@ for _i,r in enumerate(_ach):
     r["testimonial_given"]="" if _i==len(_ach)-1 else "Có"
 # hồ sơ HV đầy đặn: liên hệ khẩn, email, ghi chú theo dõi
 REL=["Ông","Bà","Bố","Mẹ","Anh","Chị","Người giám hộ"]  # danh sách anh Luân chốt 30/07
+# V9.63: tên người đồng hành trước đây là chuỗi lấp chỗ trống "Người nhà <tên con>" - mở cổng phụ
+# huynh ra là lời chào đọc thành "Chào ... Người giám hộ Người nhà Hiếu". Nay tên THẬT, và giới
+# tính của tên khớp quan hệ đã khai (Bố/Ông/Anh -> tên nam, Mẹ/Bà/Chị -> tên nữ).
+_HO=["Nguyễn","Trần","Lê","Phạm","Hoàng","Vũ","Đặng","Bùi","Đỗ","Ngô","Dương","Lý"]
+_DEM_NAM=["Văn","Hữu","Đức","Quang","Minh","Thanh","Công","Xuân"]
+_DEM_NU=["Thị","Thu","Ngọc","Kim","Thanh","Minh","Phương","Hồng"]
+_TEN_NAM=["Hùng","Dũng","Sơn","Tuấn","Bình","Nam","Long","Khánh","Trung","Thắng","Hải","Cường"]
+_TEN_NU=["Lan","Hoa","Mai","Hạnh","Thuý","Nga","Yến","Vân","Trang","Loan","Hương","Thảo"]
+_NAM=("Ông","Bố","Anh")
+def _ten_nguoi_nha(rel):
+    nam = rel in _NAM
+    if rel == "Người giám hộ":
+        nam = random.random() < 0.5
+    dem = random.choice(_DEM_NAM if nam else _DEM_NU)
+    ten = random.choice(_TEN_NAM if nam else _TEN_NU)
+    return "%s %s %s" % (random.choice(_HO), dem, ten)
 for s in students:
     if random.random()<0.65:
-        s["emergency_contact_name"]="Người nhà "+s["full_name"].split()[-1]
-        s["emergency_contact_phone"]=phone(); s["emergency_contact_relation"]=random.choice(REL)
+        _rel=random.choice(REL)
+        s["emergency_contact_name"]=_ten_nguoi_nha(_rel)
+        s["emergency_contact_phone"]=phone(); s["emergency_contact_relation"]=_rel
     if random.random()<0.55:
         s["email"]=("hv"+s["student_id"][-3:]+"@gmail.com")
     if "at_risk" in s["attendance_progress_status"]+s["academic_progress_status"]:

@@ -544,12 +544,12 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
     yc.filter(function(x){return String(x.related_type||"")==="student"&&_co09[String(x.related_id)]}).length>=5);
   window.CSTAB="ychv";
   var h=renderCskh();
-  t("hub CSKH co tab Yeu cau tu hoc vien", h.indexOf("Yêu cầu từ học viên")>=0);
+  t("hub CSKH co tab Hoc vien lien he", h.indexOf("Học viên liên hệ")>=0);
   t("tab do liet ke dung so yeu cau", (h.match(/onclick="tkOpen\(/g)||[]).length>=yc.length);
   t("bang hai chieu khai them kenh vao thu ba", h.indexOf("Yêu cầu &amp; câu hỏi")>=0||h.indexOf("Yêu cầu & câu hỏi")>=0);
   var one=yc[0];
   var card=tkCard(one,"mine");
-  t("the goi dung ten loai - KHONG goi la 'Giao viec'", card.indexOf("Yêu cầu từ học viên")>=0);
+  t("the goi dung ten loai - KHONG goi la 'Giao viec'", card.indexOf("Học viên liên hệ")>=0);
   t("the goi dung vai - 'Nguoi gui' chu khong phai 'Nguoi giao'", card.indexOf("Người gửi:")>=0&&card.indexOf("Người giao:")<0);
   t("ham dem yeu cau chua nhan chay duoc", typeof ycHVSo==="function"&&ycHVSo()>=0);
   window.CSTAB="khaosat";
@@ -560,7 +560,7 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
   var cu=CURSTAFF;
   CURSTAFF="ADMIN";                       /* quan tri vien: ma khong nam trong DL01 */
   var it=slaItems()||[];
-  var yc=it.filter(function(x){return /^Yêu cầu học viên/.test(String(x.grp||""))});
+  var yc=it.filter(function(x){return /^Học viên liên hệ/.test(String(x.grp||""))});
   t("quan tri vien thay yeu cau hoc vien trong dai Viec hom nay", yc.length>=1);
   t("yeu cau hoc vien nam o bo phan CSKH chu khong phai 'Giao viec'", yc.length>0&&yc.every(function(x){return x.cat==="CSKH"}));
   t("bam vao la mo dung the viec do", yc.length>0&&yc.every(function(x){return x.act==="tkopen"&&!!x.rid}));
@@ -569,7 +569,7 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
    CURSTAFF=one.assignee_id;
    var it2=slaItems()||[];
    t("nguoi duoc chuyen yeu cau thay no trong dai viec cua minh",
-     it2.some(function(x){return /^Yêu cầu học viên/.test(String(x.grp||""))&&x.rid===one.task_id}));
+     it2.some(function(x){return /^Học viên liên hệ/.test(String(x.grp||""))&&x.rid===one.task_id}));
    var nk=((DATA.dl&&DATA.dl.DL01)||[]).filter(function(x){return String(x.staff_id)!==String(one.assignee_id)})[0];
    if(nk){CURSTAFF=nk.staff_id;
     t("nguoi khac KHONG thay yeu cau khong phai cua minh",
@@ -578,12 +578,30 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
   CURSTAFF=cu;
  })();
 
- /* --- 5ter. DAI VANG XEM THU (V9.63) --- */
+ /* --- 5quinq. MUC RIENG TREN MENU TRAI (V9.63) --- */
+ (function(){
+  t("co khoa trang rieng cho Hoc vien lien he", PAGES.some(function(x){return x.k==="ychv"}));
+  var G=NAVTREE.filter(function(x){return x.items.indexOf("ychv")>=0})[0];
+  t("muc nam tren menu trai", !!G);
+  t("muc nam o nhom LAM VIEC (khong chon trong nhom chang dang gap)", !!G&&G.g==="Làm việc");
+  t("muc co so viec dang cho", navBadge("ychv")===ychvCho());
+  t("bam vao muc la mo dung hub CSKH o tab do", CSMAP["ychv"]==="ychv");
+  var cu=CUR,cs=window.CSTAB;
+  CUR="cskh";window.CSTAB="ychv";
+  t("dang o tab do thi muc tren menu sang", navCur("ychv")===true);
+  t("dang o tab khac thi muc do KHONG sang", (window.CSTAB="khaosat",navCur("ychv")===false));
+  CUR=cu;window.CSTAB=cs;
+ })();
+
+ /* --- 5ter. DAI VANG XEM THU + DAI DU LIEU DEMO (V9.63) --- */
  (function(){
   t("co dai vang bao che do xem thu tren thanh tren", HTMLNV.indexOf('id="cfBar"')>=0&&/\.cfbar\{/.test(HTMLNV));
   t("cua ghi cau hinh KHONG con ban toast moi lan cham vao", !/function cfgSave\(\)[\s\S]{0,400}?toast\("Đang ở chế độ XEM THỬ/.test(SRC));
   t("dai vang mang san nut mo quyen quan tri", /function cfBarSync[\s\S]{0,600}?cfDoiCheDo\(\)/.test(SRC));
   t("doi che do la ve lai dai ngay", /function cfSetMode[\s\S]{0,120}?cfBarSync\(\)/.test(SRC));
+  t("o che do quan tri that van co dai bao DANG DUNG DU LIEU DEMO", /cfbar on demo/.test(SRC)&&/DỮ LIỆU DEMO/.test(SRC));
+  t("dai du lieu demo co nut dung lai du lieu", /function cfBarSync[\s\S]{0,900}?demoResetHoi\(\)/.test(SRC));
+  t("cong hoc vien cung co dai nay", HTMLHV.indexOf('id="cfBar"')>=0);
  })();
 
  /* --- 6. cong nhan vien cung phai co nut --- */
