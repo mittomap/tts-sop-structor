@@ -10668,6 +10668,10 @@ var CFNHOM=[
  ["P7 · Buổi WOW 1-1","Hạn xác nhận buổi mới đặt, hạn ghi nội dung sau buổi, mỗi lần cấp thêm tối đa mấy lượt, và bao lâu không bấm kết thúc thì máy tự chốt.",["hoctap","dswow"]],
  ["P8-P9 · Khảo sát, phản hồi & khiếu nại","Điểm hài lòng dưới mức nào thì phải hỏi lại, hạn phân loại phản hồi, và ba mức hạn xử lý khiếu nại theo độ nghiêm trọng.",["cskh","viec"]],
  ["P10 · Kết thúc khóa & tái đăng ký","Trước khi hết khóa bao nhiêu ngày thì chuẩn bị, bao lâu phải mời tái đăng ký, và học viên bảo lưu bao lâu thì nhắc lại.",["ketthuc","viec"]],
+ /* V9.64b: ba tham số cửa sổ thời gian của các bảng số là MỘT HỌ thật - chúng cùng trả lời một
+    câu "nhìn lại / nhìn tới bao nhiêu ngày". Nhét vào nhóm P1 (SLA gọi khách) là xếp nhầm họ, mà
+    xếp nhầm họ thì người đi tìm không bao giờ mò ra. */
+ ["Bảng số & cửa sổ nhìn lại","Các ô thẻ và bảng hiệu suất nhìn lại bao nhiêu ngày, dải \"Sắp diễn ra\" nhìn tới bao nhiêu ngày. Đổi ở đây là mọi con số trên Tổng quan và trang cá nhân tính lại theo, số liệu gốc không đổi.",["banlam","baocao"]],
  ["Giới thiệu bạn bè","Người giới thiệu được thưởng bao nhiêu, bạn được giới thiệu giảm bao nhiêu, và trao thưởng trong bao lâu.",["magioithieu"]],
  ["Giao việc nội bộ","Việc giao xuống bao lâu phải bấm nhận, báo xong rồi bao lâu người giao phải xác nhận.",["giaoviec"]],
  ["Hẹn giờ mặc định","Khi app tự đặt lịch hẹn thì lấy mấy giờ làm mặc định cho sáng - trưa - chiều - tối, và bao lâu nữa thì tính là 'sắp tới'.",["viec","tuyensinh"]],
@@ -10731,9 +10735,9 @@ var APPPARAMS=[
  /* V9.64b - CỬA SỔ NHÌN LẠI của các ô thẻ cá nhân. Ba ô thẻ của nhân viên tư vấn ghi cứng
     "7 ngày" ngay trong TÊN Ô. Trung tâm muốn nhìn 14 ngày thì phải sửa mã - trong khi đây đúng là
     một lựa chọn của trung tâm, không phải hằng số của phần mềm. */
- ["P2 · Liên hệ & khai thác lead","statsLookback_days","Các ô thẻ cá nhân nhìn lại bao nhiêu ngày (lượt liên hệ, tỷ lệ kết nối, đăng ký mới)","ngày",7],
- ["P2 · Liên hệ & khai thác lead","statsUpcoming_days","Dải \"Sắp diễn ra\" ở Tổng quan nhìn tới bao nhiêu ngày","ngày",7],
- ["P2 · Liên hệ & khai thác lead","statsNewWindow_days","Ô \"Lead mới\" và \"Đăng ký\" ở Tổng quan đếm trong bao nhiêu ngày gần nhất","ngày",30],
+ ["Bảng số & cửa sổ nhìn lại","statsLookback_days","Các ô thẻ cá nhân nhìn lại bao nhiêu ngày (lượt liên hệ, tỷ lệ kết nối, đăng ký mới)","ngày",7],
+ ["Bảng số & cửa sổ nhìn lại","statsUpcoming_days","Dải \"Sắp diễn ra\" ở Tổng quan nhìn tới bao nhiêu ngày","ngày",7],
+ ["Bảng số & cửa sổ nhìn lại","statsNewWindow_days","Ô \"Lead mới\" và \"Đăng ký\" ở Tổng quan đếm trong bao nhiêu ngày gần nhất","ngày",30],
  ["P5 · Xếp lớp & nhập học","placementChange_free_times","Học viên được đổi lớp mấy lần trước khi phải trình quản lý phê duyệt","lần",1],
  ["P5 · Xếp lớp & nhập học","slaClassInfoZalo_hours","Hạn gửi thông tin lớp cho HV sau khi xếp lớp","giờ",24],
  ["P5 · Xếp lớp & nhập học","slaOBT_hours","Hạn hoàn tất onboarding cho HV mới","giờ",48],
