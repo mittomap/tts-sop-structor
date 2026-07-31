@@ -403,6 +403,29 @@ if need("DL02", "next_followup_time") and need("DL14", "wow_session_date"):
     if _trongWow:
         bad(VUA, "15 demo sống mọi ngày", "14 ngày tới có ngày KHÔNG buổi WOW nào: " + ", ".join(_trongWow))
 
+# ── 16. KENH "YEU CAU TU HOC VIEN" PHAI CO DU LIEU THAT ──────────────────
+# Anh Luan mo tab "Yeu cau tu hoc vien" o hub CSKH va thay TRONG: man hinh co, luat co, nhung
+# demo khong co dong nao loai student_request nen nhin nhu chua lam. Mot kenh co man hinh ma
+# khong co du lieu thi luc demo bang khong. Canh o day de no khong lang le mat lai.
+_yc = [t for t in dl.get("DL23", []) if str(t.get("task_type", "")).startswith("student_request")]
+_sid = set(str(x.get("student_id", "")) for x in dl.get("DL09", []))
+_nv = {str(x.get("staff_id", "")): str(x.get("role", "")) for x in dl.get("DL01", [])}
+if len(_yc) < 5:
+    bad(VUA, "16 yeu cau tu hoc vien", "chi co %d yeu cau hoc vien gui len - tab CSKH nhin nhu trong" % len(_yc))
+else:
+    _st = set(str(t.get("task_status", "")).split("(")[0].strip() for t in _yc)
+    if len(_st) < 3:
+        bad(VUA, "16 yeu cau tu hoc vien", "moi yeu cau deu cung mot trang thai (%s) - khong thay duoc vong doi" % ", ".join(sorted(_st)))
+    for t in _yc:
+        ag = str(t.get("assigner_id", ""))
+        if ag not in _sid:
+            bad(NANG, "16 yeu cau tu hoc vien", "%s: nguoi gui '%s' khong phai hoc vien trong DL09" % (t.get("task_id"), ag))
+        rl = _nv.get(str(t.get("assignee_id", "")), "")
+        if not (rl.startswith("academic_") or rl.startswith("account")):
+            bad(VUA, "16 yeu cau tu hoc vien", "%s: chuyen toi '%s' (%s) - phai la hoc vu hoac ke toan" % (t.get("task_id"), t.get("assignee_id_name"), rl or "khong ro"))
+    if not any(str(t.get("task_status", "")).startswith("new") for t in _yc):
+        bad(VUA, "16 yeu cau tu hoc vien", "khong co yeu cau nao dang CHO NHAN - man hinh khong co viec that de bam")
+
 # ── KẾT ──────────────────────────────────────────────────────────────────
 print("=" * 74)
 print("KIEM DU LIEU · %d bang · %d dong" % (len(dl), sum(len(v) for v in dl.values())))

@@ -177,6 +177,14 @@ tr.cfhl>td{background:#FFF6D8}
 .me .av{width:34px;height:34px;border-radius:50%;background:#5B9BD5;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
 .me b{color:#fff;font-size:12px;font-weight:600}.me small{display:block;color:#93A7C2;font-size:10.5px}
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
+/* V9.63 (anh Luân: *"cái câu đang ở chế độ xem thử cứ nhảy ra hoài"*): trạng thái THƯỜNG TRỰC
+   thì phải nói bằng một dải thường trực, không phải bắn toast mỗi lần chạm vào cấu hình. Dải
+   nằm ngay dưới thanh trên, luôn ở đó chừng nào còn ở chế độ xem thử, và mang sẵn nút mở khoá. */
+.cfbar{display:none;align-items:center;gap:9px;background:#FFF6D8;border-bottom:1px solid #F0D08A;
+ color:#8A5A0B;font-size:12px;font-weight:600;padding:7px 22px;flex-shrink:0}
+.cfbar.on{display:flex}
+.cfbar i{font-size:15px;flex:none}
+.cfbar span{flex:1;min-width:0}
 .topbar{height:60px;flex-shrink:0;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 22px}
 .topbar h1{font-size:17px;font-weight:700}.topbar .crumb{font-size:11px;color:var(--muted);font-weight:500;margin-top:1px}
 .crumb{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
@@ -1468,6 +1476,7 @@ body.drsz .drawer{transition:none}
  .navmask.on{display:block;position:fixed;inset:0;background:#0006;z-index:55}
  .content{padding:16px 14px}
  .topbar{padding:0 14px;gap:10px}
+ .cfbar{padding:7px 14px}
  .topbar h1{font-size:15px}
  .rolesel span{display:none}
  .phead{flex-wrap:wrap;align-items:flex-start}
@@ -1543,6 +1552,7 @@ body.drsz .drawer{transition:none}
         <div class="notif" id="notif"></div>
       </div>
     </div>
+    <div class="cfbar" id="cfBar"></div>
     <div class="content" id="content"></div>
   </div>
 </div>
@@ -1605,7 +1615,9 @@ function cfgSave(){if(!CANLS||SVR)return;
  /* V9.62 - MỘT CHỖ CHẶN DUY NHẤT cho chế độ "chỉ trải nghiệm". Thay đổi vẫn áp lên màn hình ngay
     (để người xem thấy được kết quả), chỉ là không ghi xuống ô nhớ - đóng trình duyệt là mất.
     Chặn ở đây thay vì đi sửa 20 hàm lưu: một cửa thì không có cửa nào quên khoá. */
- if(cfMode()!=="that"){toast("Đang ở chế độ XEM THỬ - thay đổi hiện ngay trên màn nhưng không được lưu lại. Mở quyền quản trị ở đầu trang Cài đặt.",3800);return}
+ /* Không bắn toast ở đây: cửa này bị gọi mỗi lần chạm vào cấu hình nên toast nhảy liên tục.
+    Việc báo trạng thái do dải vàng thường trực trên thanh trên lo. */
+ if(cfMode()!=="that")return;
  var cur=cfgPack();
  if(__cfbase===null){__cfbase=cur;return}
  if(cur===__cfbase)return;
@@ -4332,18 +4344,33 @@ function slaItems(){var out=jTasks();
  /* V9.20 GIAO VIỆC - chỉ việc CỦA CHÍNH NGƯỜI ĐANG ĐĂNG NHẬP (khác các mục dưới: toàn trung tâm).
     Quản trị viên (không gắn NV) thì thấy mọi việc quá hạn để giám sát khi demo. */
  (function(){var me=CURSTAFF||"";
+  /* V9.63 - CHÚ THÍCH CŨ HỨA MỘT ĐẰNG, MÃ LÀM MỘT NẺO: dòng này vốn viết `me?...:true` với ý
+     "quản trị viên không gắn nhân sự thì thấy hết". Nhưng mã nhân sự của Admin là chuỗi "ADMIN"
+     chứ không rỗng, nên nhánh đó CHƯA BAO GIỜ chạy - Admin mở Việc hôm nay thì cả khối Giao việc
+     lẫn yêu cầu học viên đều vô hình. Hỏi đúng câu: người đang đăng nhập có trong DL01 không. */
+  var laNV=!!find("DL01","staff_id",me);
   srows("DL23").forEach(function(t){
-   var mineT=me?String(t.assignee_id||"")===me:true, gaveT=me?String(t.assigner_id||"")===me:false;
    var st=tkSt(t);
+   /* V9.63 (anh Luân: *"lúc đầu anh nghĩ, ở trong cái nhóm việc xuất hiện thêm cái chỗ học viên
+      liên hệ đấy"*): yêu cầu do học viên gửi lên vốn cũng là một dòng DL23 nên nó vẫn rơi vào
+      dải Việc hôm nay - nhưng rơi vào bộ phận "Giao việc" với nhãn "Việc mới được giao", đọc
+      lên không ai biết là học viên đang chờ. Cùng một dòng dữ liệu, chỉ đổi CHỖ ĐỨNG và TÊN:
+      về bộ phận CSKH, gọi đúng tên là yêu cầu học viên. Bấm vào vẫn mở đúng thẻ việc đó. */
+   var _yc=(tkType(t)==="student_request"), CAT=_yc?"CSKH":"Giao việc";
+   /* Người có hồ sơ nhân sự: chỉ việc của chính mình. Quản trị viên (không gắn nhân sự): thấy
+      MỌI yêu cầu học viên - anh Luân: *"học viên liên hệ là quan trọng lắm á"* - cộng mọi việc
+      nội bộ đã quá hạn để giám sát; việc nội bộ còn trong hạn thì không dồn vào màn của Admin. */
+   var mineT=laNV?(String(t.assignee_id||"")===me):(_yc||tkOver(t));
+   var gaveT=laNV?(String(t.assigner_id||"")===me):false;
    if(mineT&&st==="new"){
     var ah=hoursSince(t.created_time),lim=paramOf("slaTaskAccept_hours",4);
-    if(tkOver(t))add("Giao việc","Việc được giao quá hạn","red","ti-clipboard-x",t.assigner_id_name||"",("QUÁ HẠN: "+(t.title||"")),ah,"giaoviec","",{lead:"",hoso:"",act:"tkopen",rid:t.task_id});
-    else if(ah!=null&&ah>lim)add("Giao việc","Việc mới chưa bấm nhận","amber","ti-clipboard-list",t.assigner_id_name||"",("Chưa nhận việc: "+(t.title||"")),ah,"giaoviec","",{lead:"",hoso:"",act:"tkopen",rid:t.task_id});
-    else add("Giao việc","Việc mới được giao","amber","ti-clipboard-list",t.assigner_id_name||"",(t.title||""),ah,"giaoviec","",{lead:"",hoso:"",act:"tkopen",rid:t.task_id})}
+    if(tkOver(t))add(CAT,_yc?"Yêu cầu học viên quá hạn nhận":"Việc được giao quá hạn","red",_yc?"ti-school":"ti-clipboard-x",t.assigner_id_name||"",((_yc?"QUÁ HẠN nhận yêu cầu: ":"QUÁ HẠN: ")+(t.title||"")),ah,"giaoviec","",{lead:"",hoso:"",act:"tkopen",rid:t.task_id});
+    else if(ah!=null&&ah>lim)add(CAT,_yc?"Yêu cầu học viên chưa nhận":"Việc mới chưa bấm nhận","amber",_yc?"ti-school":"ti-clipboard-list",t.assigner_id_name||"",((_yc?"Chưa nhận yêu cầu: ":"Chưa nhận việc: ")+(t.title||"")),ah,"giaoviec","",{lead:"",hoso:"",act:"tkopen",rid:t.task_id});
+    else add(CAT,_yc?"Yêu cầu học viên gửi tới":"Việc mới được giao","amber",_yc?"ti-school":"ti-clipboard-list",t.assigner_id_name||"",(t.title||""),ah,"giaoviec","",{lead:"",hoso:"",act:"tkopen",rid:t.task_id})}
    else if(mineT&&st==="accepted"){
-    if(tkOver(t))add("Giao việc","Việc được giao quá hạn","red","ti-clipboard-x",t.assigner_id_name||"",("QUÁ HẠN: "+(t.title||"")),hoursSince(t.due_time),"giaoviec","",{lead:"",hoso:"",act:"tkopen",rid:t.task_id});
+    if(tkOver(t))add(CAT,_yc?"Yêu cầu học viên quá hạn xử lý":"Việc được giao quá hạn","red",_yc?"ti-school":"ti-clipboard-x",t.assigner_id_name||"",((_yc?"QUÁ HẠN xử lý yêu cầu: ":"QUÁ HẠN: ")+(t.title||"")),hoursSince(t.due_time),"giaoviec","",{lead:"",hoso:"",act:"tkopen",rid:t.task_id});
     else{var d9=pvnd(t.due_time);
-     if(d9&&(d9.getTime()-Date.now())/36e5<=24)add("Giao việc","Việc tới hạn hôm nay","amber","ti-clipboard-check",t.assigner_id_name||"",(t.title||""),null,"giaoviec","",{lead:"",hoso:"",act:"tkopen",rid:t.task_id})}}
+     if(d9&&(d9.getTime()-Date.now())/36e5<=24)add(CAT,_yc?"Yêu cầu học viên tới hạn hôm nay":"Việc tới hạn hôm nay","amber",_yc?"ti-school":"ti-clipboard-check",t.assigner_id_name||"",(t.title||""),null,"giaoviec","",{lead:"",hoso:"",act:"tkopen",rid:t.task_id})}}
    if(gaveT&&st==="done"){var ch=hoursSince(t.done_time),cl=paramOf("slaTaskConfirm_hours",24);
     add("Giao việc","Việc chờ tôi xác nhận",(ch!=null&&ch>cl)?"red":"amber","ti-inbox",t.assignee_id_name||"",("Đã báo xong: "+(t.title||"")),ch,"giaoviec","",{lead:"",hoso:"",act:"tkopen",rid:t.task_id})}
   })})();
@@ -4732,7 +4759,13 @@ function cfnGet(f){return (typeof f==="function")?f:((f&&typeof window[f]==="fun
 var CFMODEKEY="ITTS_CFMODE";
 function matKhau(){return String((DATA.config&&DATA.config.matKhau)||"mittomap")}
 function cfMode(){try{return ssGet(CFMODEKEY)||""}catch(e){return ""}}
-function cfSetMode(m){try{ssSet(CFMODEKEY,m)}catch(e){}}
+function cfSetMode(m){try{ssSet(CFMODEKEY,m)}catch(e){}try{cfBarSync()}catch(e){}}
+/* Dải vàng thường trực dưới thanh trên - chỉ hiện khi đang XEM THỬ. */
+function cfBarSync(){var b=document.getElementById("cfBar");if(!b)return;
+ if(cfGhiDuoc()){b.className="cfbar";b.innerHTML="";return}
+ b.className="cfbar on";
+ b.innerHTML='<i class="ti ti-eye"></i><span>Đang ở chế độ XEM THỬ - chỉnh Cài đặt thì thấy ngay trên màn nhưng KHÔNG lưu lại.</span>'+
+  '<button class="btn sm" onclick="cfDoiCheDo()"><i class="ti ti-lock-open"></i>Mở quyền quản trị</button>'}
 function cfGhiDuoc(){return cfMode()==="that"}
 /* Hộp hỏi mật khẩu dùng chung. `xong` là TÊN hàm (chuỗi) - đi qua cfnGet như confirmRun, để
    không phải nhét hàm vào thuộc tính onclick. */
@@ -15215,7 +15248,11 @@ function taskRel(fromId,toId){var a=find("DL01","staff_id",fromId),b=find("DL01"
  return "support"}
 var TKTYPE={assign:{t:"Giao việc",ic:"ti-arrow-down-circle",d:"Cấp trên giao xuống - mặc định bắt buộc"},
  peer:{t:"Phối hợp",ic:"ti-arrows-exchange",d:"Ngang cấp cùng làm"},
- support:{t:"Nhờ hỗ trợ",ic:"ti-heart-handshake",d:"Nhờ giúp - người nhận có thể từ chối"}};
+ support:{t:"Nhờ hỗ trợ",ic:"ti-heart-handshake",d:"Nhờ giúp - người nhận có thể từ chối"},
+ /* V9.63: yêu cầu do CHÍNH học viên gửi lên. Trước đây loại này không có trong sổ nên thẻ rơi
+    về nhãn mặc định "Giao việc · Người giao" - đọc lên như thể học viên đang giao việc cho nhân
+    viên. Khai riêng để thẻ nói đúng chuyện gì đang xảy ra. */
+ student_request:{t:"Yêu cầu từ học viên",ic:"ti-school",d:"Học viên gửi lên từ Cổng học viên - hệ thống tự chuyển tới đúng bộ phận"}};
 var TKST={new:{t:"Mới giao",c:"amber"},accepted:{t:"Đang làm",c:"blue"},done:{t:"Báo xong - chờ xác nhận",c:"amber"},
  confirmed:{t:"Hoàn thành",c:"green"},declined:{t:"Từ chối",c:"red"},cancelled:{t:"Đã hủy",c:"gray"}};
 var TKPRI={low:{t:"Thấp",c:"gray"},normal:{t:"Bình thường",c:""},high:{t:"Cao",c:"amber"},urgent:{t:"Gấp",c:"red"}};
@@ -15260,7 +15297,9 @@ function tkRelGo(t){if(!t.related_id)return "";
 /* ---------- THẺ MỘT VIỆC (dùng chung ở mọi tab) ---------- */
 function tkCard(t,side){var s=tkSt(t),TY=TKTYPE[tkType(t)]||TKTYPE.assign,P=TKPRI[tkPri(t)]||TKPRI.normal;
  var nc=tkCmts(t.task_id).length;
- var who=(side==="mine")?("Người giao: "+esc(t.assigner_id_name||t.assigner_id||"-")):("Giao cho: "+esc(t.assignee_id_name||t.assignee_id||"-"));
+ /* việc do học viên gửi thì người ở đầu kia là NGƯỜI GỬI, không phải người giao việc */
+ var _hv=(tkType(t)==="student_request");
+ var who=(side==="mine")?((_hv?"Người gửi: ":"Người giao: ")+esc(t.assigner_id_name||t.assigner_id||"-")):((_hv?"Gửi tới: ":"Giao cho: ")+esc(t.assignee_id_name||t.assignee_id||"-"));
  var h='<div class="tkrow'+(tkOver(t)?" over":"")+'" onclick="tkOpen(\''+esc(t.task_id)+'\')">';
  h+='<span class="tkic" title="'+esc(TY.d)+'"><i class="ti '+TY.ic+'"></i></span>';
  h+='<div class="tkmain"><div class="tktt">'+esc(t.title||"(không tiêu đề)")+
@@ -17317,6 +17356,7 @@ function enter(k){try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{rtEnsur
   window.addEventListener("hashchange",function(){try{hashApply()}catch(e){}});
   window.addEventListener("popstate",function(){try{hashApply()}catch(e){}})}}catch(e){}
  try{sbInit();sbApply()}catch(e){}
+ try{cfBarSync()}catch(e){}
  try{tourOfferOnce()}catch(e){}}
 
 /* ============ CỔNG HỌC VIÊN (file HTML riêng) ============

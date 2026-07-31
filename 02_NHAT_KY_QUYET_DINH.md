@@ -176,8 +176,17 @@
 > · **Cột menu cổng nhân viên kéo được**: mặc định 246 → **262px**, tay kéo ở mép phải (210-420px),
 > nhớ theo từng người, bấm đúp về mặc định; dưới 820px tắt hẳn. **Chip CSKH** ở Việc hôm nay dời
 > lên cạnh Học vụ.
-> · **Trang chủ bản demo**: bỏ câu dẫn, nền đổi sang **tông ITTs sáng** (đỏ - navy) và **không còn
-> bị hệ điều hành kéo về nền đen**.
+> · **Trang chủ bản demo**: bỏ câu dẫn, nền đổi sang **tông ITTs sáng** (đỏ - navy), **không còn
+> bị hệ điều hành kéo về nền đen**, và **bỏ hai dải viền màu** em lỡ bày lại (anh Luân bắt).
+> Trang chủ nay có **bản nguồn trong repo chính** để bộ kiểm với tới được.
+> · **Chế độ xem thử**: thay toast nhảy liên tục bằng **dải vàng thường trực** dưới thanh trên,
+> mang sẵn nút mở quyền quản trị.
+> · **Yêu cầu học viên hiện ở BA chỗ**: dải Việc hôm nay (bộ phận CSKH, 3 nhóm riêng), bảng việc
+> đầu ca của học vụ/kế toán, và tab CSKH. Lòi ra bug im lặng từ V9.20: nhánh *"quản trị viên thấy
+> hết"* chưa bao giờ chạy vì mã của Admin là `"ADMIN"` chứ không rỗng - cả khối Giao việc vô hình
+> với Admin suốt từ đó.
+> · **Dữ liệu demo có 8 yêu cầu học viên gửi lên** (trước đó 0 - tab mới nhìn như chưa làm);
+> `check_data` có luật 16 canh việc này. Thẻ việc gọi đúng tên: *Yêu cầu từ học viên · Người gửi*.
 > · Bẫy cũ tái phát: khối kiểm mới nối vào **sau** dòng in kết quả nên chạy mà không được đếm -
 > `_check14` vẫn báo 136 y như cũ. Dời lên trước: **179**.
 >
@@ -5047,7 +5056,100 @@ nghi ngay, y như *"đo ra số lạ thì nghi cái thước trước"*.
   xuất hiện trong mã, mà hai nhánh của cùng một hàm là hai lần. Gộp phần dựng liên kết thành một
   biến rồi hai nhánh cùng dùng - vừa qua bộ kiểm vừa đỡ lặp thật.
 
-### H. Trang chủ bản demo
+### H. Anh Luân bắt lại đúng lỗi cũ - và bộ kiểm W5 có hai lỗ
+
+> *"a đã từng nói ko được thiết kế border rồi mà, e quên rồi à, chỗ chọn cổng mắc lại lỗi cũ"*
+
+Đúng. Trang chủ bản demo em vừa dựng có **dải gradient đỏ→navy 4px** chạy ngang đỉnh trang và
+**dải màu 3px** trên đầu mỗi thẻ cổng - y hệt thứ đã dọn sạch ở V9.50 (mục 50.4).
+
+Đáng nói hơn là **vì sao bộ kiểm không kêu**. Nó có hai lỗ:
+
+1. **Nó chỉ soi mã app.** Trang chủ bản demo là một file nằm ở repo `itts-sop-demo`, `_checkux`
+   không với tới. Luật thiết kế là luật của cả dự án, mà thước đo lại chỉ đo được một nửa.
+   Nay trang chủ có **bản nguồn trong repo chính** (`_src/trangchu_demo.html`) và bị soi cùng
+   một thước; bước đồng bộ chép nó sang repo demo.
+2. **Nó chỉ canh thuộc tính `border`.** Dải màu dựng bằng `::before` (một khối `content:""` cao
+   vài px, kéo hết chiều ngang, có `background` màu) lọt qua toàn bộ. Nay canh cả kiểu đó, trên
+   cả hai nguồn.
+
+Đã thử phá để chắc chắn nó cắn: gắn lại một dải `::before` 3px → đỏ ngay, in đúng dòng vi phạm.
+`_checkux` 189 → **196 tiêu chí**.
+
+> **LUẬT:** *một luật thiết kế mà bộ kiểm chỉ với tới một nửa số file thì nửa còn lại chắc chắn
+> sẽ trôi.* Chỗ nào nằm ngoài tầm thước đo, hoặc kéo nó vào tầm, hoặc đừng coi là đã canh.
+
+### I. Chế độ xem thử: dải vàng thường trực thay cho toast nhảy hoài
+
+> *"cái câu đang ở chế độ xem thử cứ nhảy ra hoài, e cho nó 1 dòng màu vàng lên navbar là xong mà"*
+
+`cfgSave` là cửa duy nhất chặn ghi ở chế độ xem thử, mà nó bị gọi mỗi lần chạm vào cấu hình -
+nên toast bắn liên tục. **Trạng thái thường trực phải nói bằng thứ thường trực**: nay có dải
+vàng ngay dưới thanh trên, luôn ở đó chừng nào còn xem thử, mang sẵn nút *Mở quyền quản trị*.
+Bỏ hẳn toast ở `cfgSave`.
+
+### K. "Ủa sao chưa thấy chỗ nào chứa câu hỏi học viên gửi vậy"
+
+Em vừa dựng tab *Yêu cầu từ học viên* xong ở mục E, anh Luân mở ra thì **trống trơn**. Đo:
+`DL23` có 27 việc, **0 dòng** loại `student_request`.
+
+Màn hình có, luật có, nhưng dữ liệu demo không có - và một kênh có màn hình mà không có dữ liệu
+thì lúc demo **bằng không**. Đây là biến thể mới của bẫy cũ "báo xanh mà chưa chạy gì".
+
+Sửa ở nguồn pipeline (`seed_giaoviec.py`), gieo **8 yêu cầu** theo đúng luật của `hvReq()`:
+người gửi là học viên thật, người nhận chọn theo mã vai trò CH1 (học vụ lo chuyện học, kế toán
+lo chuyện tiền), trải đủ vòng đời - chờ nhận (có một cái quá hạn để màn có việc đỏ thật), đang
+làm, báo xong chờ xác nhận, đã hoàn thành.
+
+Kèm hai chỗ nữa lộ ra khi có dữ liệu thật:
+- Thẻ việc gọi loại này là **"Giao việc · Người giao: <tên học viên>"** - đọc lên như thể học
+  viên đang giao việc cho nhân viên. `TKTYPE` chưa khai `student_request` nên nó rơi về nhãn
+  mặc định. Nay khai riêng: **"Yêu cầu từ học viên · Người gửi:"**.
+- `check_data.py` có **luật 16** mới: demo phải có ≥5 yêu cầu, trải ≥3 trạng thái, người gửi
+  phải là học viên có thật, người nhận phải là học vụ hoặc kế toán, và phải có ít nhất một cái
+  đang chờ nhận. Đã thử phá (xoá hết yêu cầu) → đỏ đúng chỗ.
+
+Một tiêu chí em viết ban đầu quá chặt - *"mọi yêu cầu đều neo vào hồ sơ học viên"* - hoá ra sai:
+các test chạy trước trong cùng file **tự tạo yêu cầu thật** neo vào buổi học. Nới đúng ý định:
+mọi dòng phải có người gửi là học viên thật và phải neo vào một đối tượng nào đó; riêng phần
+gieo sẵn thì phải có ít nhất 5 dòng neo vào hồ sơ học viên.
+
+### M. "Lúc đầu anh nghĩ, ở trong cái nhóm việc xuất hiện thêm cái chỗ học viên liên hệ đấy"
+
+Anh Luân nghĩ đúng chỗ hơn em. Yêu cầu học viên vốn **đã** là một dòng DL23 nên nó vẫn chạy qua
+bộ máy SLA của Việc hôm nay - nhưng rơi vào bộ phận **"Giao việc"** với nhãn *"Việc mới được
+giao"*: đọc lên không ai biết là có học viên đang chờ. Cùng một dòng dữ liệu, chỉ sai **chỗ đứng**
+và **tên gọi**.
+
+Nay nó về bộ phận **CSKH** với ba nhóm nói đúng chuyện: *Yêu cầu học viên gửi tới* · *Yêu cầu học
+viên quá hạn nhận* · *Yêu cầu học viên tới hạn hôm nay*. Bấm vào vẫn mở đúng thẻ việc đó -
+không đẻ màn thứ hai. Anh Luân chốt: *"nhiều chỗ cũng tốt, tại học viên liên hệ là quan trọng
+lắm á"* - nên nó hiện cả ở dải Việc hôm nay, cả ở bảng việc đầu ca, cả ở tab CSKH.
+
+**Và lòi ra một con bug im lặng đã nằm đó từ lâu.** Đo lần đầu: bật lên mà **không có gì hiện**.
+Truy ra dòng này:
+
+```js
+var mineT = me ? String(t.assignee_id||"")===me : true;   // "quản trị viên thì thấy hết"
+```
+
+Chú thích ngay bên trên hứa *"Quản trị viên (không gắn NV) thì thấy mọi việc quá hạn để giám
+sát"*. Nhưng mã nhân sự của Admin là chuỗi **`"ADMIN"`**, không phải chuỗi rỗng - nên `me` luôn
+truthy và **nhánh đó chưa bao giờ chạy**. Admin mở Việc hôm nay thì toàn bộ khối Giao việc vô
+hình, suốt từ V9.20 tới giờ.
+
+Sửa: hỏi đúng câu - *người đang đăng nhập có hồ sơ trong DL01 không* - thay vì *mã có rỗng không*.
+Người có hồ sơ: chỉ thấy việc của mình. Quản trị viên: thấy **mọi yêu cầu học viên** cộng mọi
+việc nội bộ **đã quá hạn**; việc nội bộ còn trong hạn thì không dồn vào màn của Admin.
+
+> **LUẬT:** *một điều kiện "nếu không có X" phải hỏi đúng thứ định hỏi.* `me` rỗng và `me` không
+> phải nhân sự là hai chuyện khác nhau; viết nhầm thì nhánh dự phòng nằm chết mà chú thích vẫn
+> khẳng định nó đang chạy - và chú thích thì bộ kiểm không đọc được.
+
+Bộ kiểm mới đóng cả ba vai: quản trị viên phải thấy, đúng người nhận phải thấy, **người khác
+không được thấy**. `_check14` 196 → **201 tiêu chí**.
+
+### L. Trang chủ bản demo
 
 Bỏ câu dẫn "Ba cổng dùng chung một bộ dữ liệu..." theo yêu cầu, chỉ giữ logo + ba thẻ. Nền: bỏ hẳn
 khối `@media (prefers-color-scheme: dark)` - chính nó kéo trang về `#121822` gần như đen khi máy

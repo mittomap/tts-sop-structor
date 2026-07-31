@@ -2110,3 +2110,19 @@ chuông cảnh báo khi quá hạn. Nhận và trả lời ngay trên thẻ vi�
 Cột menu bên trái của cổng nhân viên rộng 262px. Rê chuột vào mép phải của nó sẽ thấy tay kéo -
 kéo để đổi độ rộng (trong khoảng 210-420px), **bấm đúp để về mặc định**. Độ rộng nhớ theo từng
 người trên máy đó. Trên điện thoại menu là lớp phủ trượt ra nên không có tay kéo.
+
+## Yêu cầu học viên hiện ở đâu (V9.63)
+
+Học viên liên hệ được ở bất kỳ chặng nào, nên yêu cầu của họ xuất hiện ở **ba chỗ**, cùng đọc
+một bảng dữ liệu:
+
+1. **Việc hôm nay** - bộ phận **CSKH**, ba nhóm riêng: *Yêu cầu học viên gửi tới*, *Yêu cầu học
+   viên quá hạn nhận*, *Yêu cầu học viên tới hạn hôm nay*. Quá hạn thì nhảy lên đầu danh sách
+   "Quá hạn - làm ngay" như mọi việc trễ khác.
+2. **Bảng việc đầu ca** của học vụ và kế toán - ô *Yêu cầu học viên gửi tới*.
+3. **Hub CSKH**, tab *Yêu cầu từ học viên* - xem cả kênh theo ngữ cảnh hai chiều.
+
+Bấm ở chỗ nào cũng mở đúng một thẻ việc, nhận và trả lời ngay tại đó.
+
+Ai thấy gì: người được chuyển yêu cầu thấy yêu cầu của mình; quản trị viên thấy tất cả yêu cầu
+học viên cộng các việc nội bộ đã quá hạn.

@@ -527,6 +527,65 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
   t("("+x[0]+") cong dang dung khong bam duoc nua", seg.slice(0,seg.indexOf("congr")>=0?seg.indexOf("congr"):seg.length).indexOf("congDi(")<0);
   t("("+x[0]+") hai cong con lai deu bam duoc", (x[1].match(/congDi\('/g)||[]).length===2)});
 
+ /* --- 5bis. KENH YEU CAU TU HOC VIEN (V9.63) --- */
+ (function(){
+  /* doc THANG bang goc: rows() co the dang bi thu hep theo pham vi cua vai vua dong o test truoc */
+  var _t23=(DATA.dl&&DATA.dl.DL23)||[],_t09=(DATA.dl&&DATA.dl.DL09)||[];
+  var _co09={};_t09.forEach(function(x){_co09[String(x.student_id)]=1});
+  var yc=_t23.filter(function(t){return isc(t.task_type,"student_request")});
+  t("demo co yeu cau hoc vien gui len (khong thi tab nhin nhu trong)", yc.length>=5);
+  t("co yeu cau dang CHO NHAN de man hinh co viec that de bam", yc.some(function(x){return isc(x.task_status,"new")}));
+  /* Cac test o tren CO TAO them yeu cau that (hvReq) va neo vao buoi hoc / lop, nen khong doi
+     moi dong deu neo vao ho so hoc vien. Cai phai dung voi MOI dong la: nguoi gui phai la mot
+     hoc vien co that, va yeu cau phai neo vao MOT thu gi do chu khong bo trong. */
+  t("moi yeu cau deu co nguoi gui la hoc vien that", yc.every(function(x){return !!_co09[String(x.assigner_id)]}));
+  t("moi yeu cau deu neo vao mot doi tuong (khong bo trong)", yc.every(function(x){return !!String(x.related_type||"").trim()&&!!String(x.related_id||"").trim()}));
+  t("bo du lieu demo gieo san it nhat 5 yeu cau neo vao ho so hoc vien",
+    yc.filter(function(x){return String(x.related_type||"")==="student"&&_co09[String(x.related_id)]}).length>=5);
+  window.CSTAB="ychv";
+  var h=renderCskh();
+  t("hub CSKH co tab Yeu cau tu hoc vien", h.indexOf("Yêu cầu từ học viên")>=0);
+  t("tab do liet ke dung so yeu cau", (h.match(/onclick="tkOpen\(/g)||[]).length>=yc.length);
+  t("bang hai chieu khai them kenh vao thu ba", h.indexOf("Yêu cầu &amp; câu hỏi")>=0||h.indexOf("Yêu cầu & câu hỏi")>=0);
+  var one=yc[0];
+  var card=tkCard(one,"mine");
+  t("the goi dung ten loai - KHONG goi la 'Giao viec'", card.indexOf("Yêu cầu từ học viên")>=0);
+  t("the goi dung vai - 'Nguoi gui' chu khong phai 'Nguoi giao'", card.indexOf("Người gửi:")>=0&&card.indexOf("Người giao:")<0);
+  t("ham dem yeu cau chua nhan chay duoc", typeof ycHVSo==="function"&&ycHVSo()>=0);
+  window.CSTAB="khaosat";
+ })();
+
+ /* --- 5quat. YEU CAU HOC VIEN PHAI CO MAT TRONG DAI VIEC HOM NAY (V9.63) --- */
+ (function(){
+  var cu=CURSTAFF;
+  CURSTAFF="ADMIN";                       /* quan tri vien: ma khong nam trong DL01 */
+  var it=slaItems()||[];
+  var yc=it.filter(function(x){return /^Yêu cầu học viên/.test(String(x.grp||""))});
+  t("quan tri vien thay yeu cau hoc vien trong dai Viec hom nay", yc.length>=1);
+  t("yeu cau hoc vien nam o bo phan CSKH chu khong phai 'Giao viec'", yc.length>0&&yc.every(function(x){return x.cat==="CSKH"}));
+  t("bam vao la mo dung the viec do", yc.length>0&&yc.every(function(x){return x.act==="tkopen"&&!!x.rid}));
+  var one=((DATA.dl&&DATA.dl.DL23)||[]).filter(function(x){return isc(x.task_type,"student_request")&&isc(x.task_status,"new")})[0];
+  if(one){
+   CURSTAFF=one.assignee_id;
+   var it2=slaItems()||[];
+   t("nguoi duoc chuyen yeu cau thay no trong dai viec cua minh",
+     it2.some(function(x){return /^Yêu cầu học viên/.test(String(x.grp||""))&&x.rid===one.task_id}));
+   var nk=((DATA.dl&&DATA.dl.DL01)||[]).filter(function(x){return String(x.staff_id)!==String(one.assignee_id)})[0];
+   if(nk){CURSTAFF=nk.staff_id;
+    t("nguoi khac KHONG thay yeu cau khong phai cua minh",
+      !(slaItems()||[]).some(function(x){return x.rid===one.task_id}))}
+  }
+  CURSTAFF=cu;
+ })();
+
+ /* --- 5ter. DAI VANG XEM THU (V9.63) --- */
+ (function(){
+  t("co dai vang bao che do xem thu tren thanh tren", HTMLNV.indexOf('id="cfBar"')>=0&&/\.cfbar\{/.test(HTMLNV));
+  t("cua ghi cau hinh KHONG con ban toast moi lan cham vao", !/function cfgSave\(\)[\s\S]{0,400}?toast\("Đang ở chế độ XEM THỬ/.test(SRC));
+  t("dai vang mang san nut mo quyen quan tri", /function cfBarSync[\s\S]{0,600}?cfDoiCheDo\(\)/.test(SRC));
+  t("doi che do la ve lai dai ngay", /function cfSetMode[\s\S]{0,120}?cfBarSync\(\)/.test(SRC));
+ })();
+
  /* --- 6. cong nhan vien cung phai co nut --- */
  t("cong nhan vien co nut Doi cong tren thanh tren", HTMLNV.indexOf('id="congBtn"')>=0&&HTMLNV.indexOf('congDoiMo()')>=0);
  t("nut Doi cong o cong nhan vien co loi giai thich", /id="congBtn"[^>]*data-tip="[^"]{20,}"/.test(HTMLNV));

@@ -267,6 +267,61 @@ def main():
             r["perm_revoked_at"] = r.get("confirm_time") or r["done_time"] or fmt(NOW - timedelta(hours=1))
             r["perm_level"] = "none (Đã thu hồi)"
 
+    # ---- 3bis. YEU CAU DO CHINH HOC VIEN GUI LEN (V9.63) ----
+    # Anh Luan mo tab "Yeu cau tu hoc vien" o hub CSKH va thay TRONG - vi du lieu demo khong co
+    # dong nao loai student_request. Mot kenh co man hinh ma khong co du lieu thi lúc demo nhin
+    # nhu chua lam. Gieo o DAY chu khong sua tay JSON, va gieo theo DUNG luat cua hvReq():
+    # nguoi gui la HOC VIEN (assigner = student_id), nguoi nhan chon theo MA VAI TRO - hoc vu lo
+    # chuyen hoc, ke toan lo chuyen tien - kem han nhan viec va quyen tam chi-xem.
+    YC = [
+        ("Em xin nghỉ buổi tối thứ Năm tuần này",
+         "Dạ em bị trùng lịch thi ở trường buổi tối thứ Năm, em xin phép nghỉ và xin học bù ạ.",
+         "hoc", "normal", "new", -3, 1),
+        ("Em muốn đặt thêm một buổi WOW về Speaking",
+         "Em thấy phần Speaking Part 2 còn yếu, em muốn xin một buổi kèm riêng trước kỳ thi ạ.",
+         "hoc", "normal", "new", -30, -26),
+        ("Cho em hỏi lịch học tuần sau có đổi phòng không ạ",
+         "Em nghe bạn nói lớp mình chuyển phòng từ tuần sau, em muốn xác nhận lại cho chắc ạ.",
+         "hoc", "low", "accepted", -20, 4),
+        ("Em đã chuyển khoản đợt 2 học phí",
+         "Dạ em vừa chuyển khoản đợt 2, nội dung ghi đúng mã học viên. Nhờ trung tâm xác nhận giúp em ạ.",
+         "tien", "high", "accepted", -14, 2),
+        ("Em xin xác nhận biên lai đợt 1 để công ty thanh toán",
+         "Công ty em cần biên lai có dấu để hoàn tiền học, nhờ trung tâm xuất giúp em ạ.",
+         "tien", "normal", "done", -46, -20),
+        ("Em muốn đổi sang lớp buổi sáng",
+         "Em vừa đổi ca làm nên buổi tối không đi học được nữa, em xin chuyển sang lớp sáng ạ.",
+         "hoc", "high", "done", -62, -34),
+        ("Cho em xin lại tài liệu buổi 5",
+         "Buổi đó em nghỉ nên chưa có tài liệu, nhờ trung tâm gửi lại giúp em ạ.",
+         "hoc", "low", "confirmed", -90, -60),
+        ("Em hỏi về chứng nhận hoàn thành khóa",
+         "Em học xong khóa 6.5 rồi, em muốn xin giấy chứng nhận hoàn thành ạ.",
+         "hoc", "normal", "confirmed", -120, -80),
+    ]
+    def nguoi_nhan(kind):
+        want = ["accountant", "accounting_manager"] if kind == "tien" else ["academic_staff", "academic_manager"]
+        for rc in want:
+            for x in staff:
+                if role_of(x) == rc:
+                    return x
+        return staff[0]
+
+    hv = [x for x in dl.get("DL09", []) if str(x.get("student_id", "")).strip()]
+    for i, (tieu, noi, kind, pri, st, created_off, due_off) in enumerate(YC):
+        if not hv:
+            break
+        S = hv[(i * 7) % len(hv)]
+        nn = nguoi_nhan(kind)
+        r = add({"staff_id": S.get("student_id", ""), "full_name": S.get("full_name", "")},
+                nn, (tieu, noi, "", pri, ""), "assign", st, True, due_off, created_off,
+                related=("student", S.get("student_id", ""), S.get("full_name", "")),
+                done_note="Đã liên hệ và xử lý xong theo yêu cầu của học viên.",
+                confirm_note="Học viên xác nhận đã ổn.")
+        r["task_type"] = "student_request (Yêu cầu từ học viên)"
+        r["perm_level"] = "view (Chỉ xem)"
+        r["perm_note"] = "Quyền tạm mở theo yêu cầu của chính học viên."
+
     dl["DL23"] = rows
 
     # ---- 4. DL24: TRAO DOI TRONG TUNG VIEC (de thong tin khong troi nhu nhan Zalo) ----

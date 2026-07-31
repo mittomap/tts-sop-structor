@@ -14,6 +14,9 @@ Chủ dự án: Luân. Mọi phiên làm việc (Claude Code hay Claude Cowork) 
 
 ## Web app (phần quan trọng nhất)
 
+- Trang chủ bản demo (màn chọn 3 cổng) có nguồn ở `_src/trangchu_demo.html` - KHÔNG sửa tay
+  `index.html` ở repo demo; `_checkux` soi file nguồn này cùng thước với mã app (luật W5: cấm
+  dải viền màu trang trí, kể cả dải dựng bằng `::before`).
 - NGUỒN DUY NHẤT: `_src/gen_v5.py` (generator Python chứa toàn bộ HTML/CSS/JS trong chuỗi).
   KHÔNG BAO GIỜ sửa tay 3 file build ở gốc repo: `ITTs_WebApp_v5_demo.html`,
   `ITTs_TrangHocVien_demo.html`, `ITTs_data.js` - sửa gen_v5.py rồi build lại.
@@ -75,7 +78,8 @@ Chủ dự án: Luân. Mọi phiên làm việc (Claude Code hay Claude Cowork) 
    "⭐ HIỆN TRẠNG" + VIỆC TỒN. App đổi tính năng thì thêm mục vào `ITTs_WebApp_v5_README.md`.
 2. Đẩy repo này: phiên cloud Claude Code tự `git add -A` + commit `cap nhat <ngay gio>` + push
    (từ 28/07 chiều phiên cloud có quyền ghi cả 2 repo); làm trên máy Luân thì chạy `./push.sh`.
-3. Nếu 3 file app ở gốc có bản mới: chép 3 file sang gốc repo `mittomap/itts-sop-demo` rồi
+3. Nếu 3 file app ở gốc có bản mới: chép 3 file **cộng `_src/trangchu_demo.html` -> `index.html`**
+   sang gốc repo `mittomap/itts-sop-demo` rồi
    commit + push (phiên cloud tự làm; trên máy Luân thì chạy `./update.sh` trong
    `~/Claude/itts-sop-demo`). Demo online: https://mittomap.github.io/itts-sop-demo/
    (Pages deploy mất 1-2 phút; xem lại nhớ Cmd+Shift+R để bỏ cache).

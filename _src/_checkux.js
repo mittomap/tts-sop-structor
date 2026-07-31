@@ -205,6 +205,33 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
  t("KPI card khong con vien tren, mau don vao vong so", /\.k3card\.red \.k3n\{background:#DC2626\}/.test(SRC));
  t("hover the WOW doi bong, khong doi mau vien", /\.obcards\.rows \.obcard:hover\{box-shadow/.test(SRC));
  t("hop chi tiet WOW chiem tron hang - moi hang cung mot bo cuc", /\.obcards\.rows \.wowinfo\{flex:1 1 100%/.test(SRC));
+
+ /* V9.63 - HAI LO HONG CUA CHINH BO KIEM NAY, anh Luan bat lai dung loi cu:
+    (1) no chi soi MA APP, khong voi toi trang chu ban demo (file nam o repo kia) - nen em bay
+        lai dai mau 4px o day ma khong co gi keu. Nay trang chu co BAN NGUON trong repo chinh
+        (_src/trangchu_demo.html) va bi soi cung mot thuoc do.
+    (2) no chi canh thuoc tinh `border` - dai mau dung bang ::before/::after (mot khoi content:""
+        cao vai px, keo het chieu ngang, co background mau) thi lot het. Nay canh ca kieu do. */
+ var DAI=/(::before|::after)\{content:"";[^}]*height:[1-6](\.\d+)?px[^}]*background[^}]*\}/g;
+ (function(){
+  var fs=require('fs');
+  var TC="";try{TC=fs.readFileSync('./trangchu_demo.html','utf8')}catch(e){TC=""}
+  t("co ban nguon trang chu ban demo de soi (_src/trangchu_demo.html)", TC.length>500);
+  [["ma app",SRC],["trang chu ban demo",TC]].forEach(function(x){
+   var ten=x[0],ma=x[1];if(!ma)return;
+   var b1=(ma.match(/border-left:\s*[3-9]px[^;"'\}]*/g)||[]).filter(function(m){return !/transparent/.test(m)});
+   var b2=(ma.match(/border-top:\s*[3-9]px[^;"'\}]*/g)||[]);
+   var b3=(ma.match(/border-left-color:[^;"'\}]*/g)||[]);
+   var b4=(ma.match(DAI)||[]);
+   var xau2=b1.concat(b2,b3,b4);
+   t("("+ten+") khong co dai vien mau, ke ca dai dung bang ::before"+(xau2.length?" - CON: "+xau2.slice(0,3).join(" | ").slice(0,160):""), xau2.length===0)});
+  t("(trang chu) the cong hover doi BONG chu khong doi mau vien",
+    !TC||(/\.door:hover\{[^}]*box-shadow/.test(TC)&&!/\.door:hover\{[^}]*border-color/.test(TC)));
+  t("(trang chu) mau don vao o icon chu khong thanh dai", !TC||/\.dic\{[^}]*background:var\(--accent/.test(TC));
+  t("(trang chu) ba the deu tro dung ba cong",
+    !TC||(/href="cong-nhan-vien\/"/.test(TC)&&/href="cong-hoc-vien\/"/.test(TC)&&/href="cong-hoc-vien\/\?phuhuynh"/.test(TC)));
+  t("(trang chu) khong con ten cu 'Trang hoc vien'", !TC||TC.indexOf("Trang học viên")<0);
+ })();
 })();
 
 /* ---- 6bis. HIEN TEN, KHONG HIEN MA THO (V9.50 - anh Luan: "hien ten chu, nguoi dung ma hien
