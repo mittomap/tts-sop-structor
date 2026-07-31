@@ -9380,7 +9380,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
  /* V9.62: dải báo chế độ nằm NGAY ĐẦU trang và ở LẠI suốt - người ta sửa mười phút rồi mới biết
     không lưu được thì tệ hơn là không cho vào. Kèm luôn nút đổi chế độ. */
  if(!SVR)h+=(cfGhiDuoc()
-  ?'<div class="notebar" style="background:#EDF8F1;border-color:#BFE3CC;color:#1E7A46;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><i class="ti ti-lock-open"></i><span>Đang ở <b>CỔNG THỰC</b> - mọi thay đổi được lưu lại.</span><button class="btn sm" onclick="cfDoiCheDo()"><i class="ti ti-eye"></i>Chuyển sang chỉ trải nghiệm</button></div>'
+  ?'<div class="notebar" style="background:#E4F5EC;border-color:#BFE3C8;color:#1E6A47;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><i class="ti ti-lock-open"></i><span>Đang ở <b>CỔNG THỰC</b> - mọi thay đổi được lưu lại.</span><button class="btn sm" onclick="cfDoiCheDo()"><i class="ti ti-eye"></i>Chuyển sang chỉ trải nghiệm</button></div>'
   :'<div class="notebar" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><i class="ti ti-eye"></i><span>Đang ở <b>CHẾ ĐỘ CHỈ TRẢI NGHIỆM</b> - cứ sửa thoải mái, kết quả hiện ngay trên màn, nhưng <b>không lưu lại</b>: đóng trình duyệt là mọi thứ về như cũ.</span><button class="btn primary sm" onclick="cfDoiCheDo()"><i class="ti ti-lock"></i>Vào cổng thực để lưu được</button></div>');
  h+='<div class="settabs" data-tour="settabs">';
  var stabs=setTabs();

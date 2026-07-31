@@ -4928,6 +4928,12 @@ Hai quyết định thiết kế đáng ghi:
   đổi vẫn áp lên màn hình ngay để người xem thấy được kết quả, chỉ là không ghi xuống ô nhớ.
   *Một cửa thì không có cửa nào quên khoá.*
 
+**Bộ kiểm thang màu cắn ngay trong bản này:** em tự chế **3 mã màu mới** cho dải "cổng thực" màu
+xanh (`#EDF8F1` / `#BFE3CC` / `#1E7A46`), trong khi bảng màu ĐÃ CÓ đúng ba sắc gần y hệt
+(`#E4F5EC` / `#BFE3C8` / `#1E6A47`). Vượt trần 110 mã, đỏ. Đó chính là cách một app đi từ 94 mã
+lên 202 mã: không ai cố tình, chỉ là mỗi lần thêm một khối mới thì gõ đại một mã trông "hợp hợp".
+**Cái trần chỉ có nghĩa khi nó chặn được đúng lúc mình đang lười.**
+
 **Lần đo nói dối thứ mười một:** bộ kiểm báo "cổng thực vẫn không ghi được". Thước sai, không phải
 app sai - `cfgSave` lần gọi đầu tiên chỉ **lấy mốc so sánh** rồi thoát (đúng thiết kế), lần thứ hai
 mới ghi. Và một cái thật: stub `sessionStorage` trong `_check16` trả về `null` vĩnh viễn, nên mọi
