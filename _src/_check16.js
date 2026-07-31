@@ -582,7 +582,11 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  var o3=RENDER["viec"]();
  t("bam o Sap toi han thi khong con nhom Qua han", !/Quá hạn - làm ngay/.test(o3));
  viecOnly("");
- t("bo loc thi ve day du", RENDER["viec"]().indexOf("Tổng việc đang nợ")>=0);
+ /* V9.57: hop dong nay tung neo vao NHAN cua mot cai the ("Tổng việc đang nợ") - the do da bo vi
+    no lap dung chip "Tất cả" ngay ben duoi. Neo vao chu thi moi lan don dep la mot lan do gia.
+    Canh Y DINH: bo loc xong thi danh sach phai co LAI CA HAI nhom (qua han + sap toi han). */
+ (function(){var o4=RENDER["viec"]();
+  t("bo loc thi ve day du", /Quá hạn - làm ngay/.test(o4)&&/Sắp tới hạn - còn kịp/.test(o4))})();
  t("MOT bien duy nhat cho muc do (VIECSEV), VIECOD chi la loi tat",
    /var sev=window\.VIECSEV\|\|\(window\.VIECOD\?"red":""\)/.test(SRC));
  goViecOverdue();
