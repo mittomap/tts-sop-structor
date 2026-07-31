@@ -149,7 +149,16 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.64 — VÁ Ở GỐC: TIỀN CÓ DẤU CHẤM · MỌI SỔ CÓ BỘ LỌC · TOUR TRỎ ĐÚNG CHỖ ✅ (31/07 chiều).**
+> **Phiên bản: V9.65 — BA VIỆC TỒN XONG: TỪ ĐIỂN TỰ ĐỌC NGUỒN · HUY HIỆU VIỆC Ở CỔNG HV · BẢNG MARKETING ✅ (31/07 tối).**
+> · **Từ điển 10 → 107 mục**, không gõ tay mục nào: đọc thẳng CH6 (51 chỉ số) + SHEETVN (26 bảng)
+> + mã cấu trúc SOP. Thêm chỉ số vào CH6 là có ngay mục từ điển.
+> · **Cổng học viên có huy hiệu việc**: mỗi mục mang số, thanh trên mang tổng, bấm là nhảy tới
+> việc đầu tiên. Đo 40 học viên: 37 em có việc thật.
+> · **Marketing có bảng riêng**: trước đó họ nhìn "Bảng NV Tư vấn" - không ô nào làm được gì.
+> · **Bài học lớn nhất phiên này**: 2/3 chỗ đỏ là do BỘ KIỂM BÁM CÁCH VIẾT chứ không bám ý định,
+> và 4 lần cầm sai thước. Chi tiết ở mục V9.65 cuối file.
+>
+> **Phiên bản trước: V9.64 — VÁ Ở GỐC: TIỀN CÓ DẤU CHẤM · MỌI SỔ CÓ BỘ LỌC · TOUR TRỎ ĐÚNG CHỖ ✅ (31/07 chiều).**
 > · **13 việc anh Luân đặt liên tiếp** - chi tiết ở mục V9.64 cuối file. Điểm chung: cái sai hiện
 > ra một chỗ nhưng nguyên nhân ở một hàm dùng chung, nên vá đúng đó là hết cả loạt.
 > · **Tiền**: 38 chỗ in "1000000đ" → 0. Luật ở `slaChip`: đơn vị có `đ`/`VND` thì qua `money()`.
@@ -5795,3 +5804,75 @@ Nay: escape sạch trước, rồi **mở lại đúng một nhúm thẻ định
 ### Số chốt phiên
 19 bộ kiểm xanh hết. `_check16` 701 → **702** tiêu chí, `_checkux` 196 → **197**, `_checktour` thêm
 3 luật mới. `_checkui` mở thật **837 lượt** trang. 42 trang vẽ được, 208 icon đủ.
+
+## V9.65 (31/07 tối) - BA VIỆC TỒN + BÀI HỌC "BỘ KIỂM BÁM CÁCH VIẾT"
+
+### 1. Từ điển từ viết tắt: 10 → 107 mục, và không gõ tay mục nào
+Anh Luân từng hỏi *"trợ lý có đọc được định nghĩa mấy từ viết tắt mà ta, sao giờ a tra thử ko
+thấy"*. Đo bằng máy: vẽ thật mọi trang, đếm từ viết tắt HIỆN RA - **118 từ, từ điển định nghĩa 10**.
+
+Nhưng gõ tay 108 mục còn lại là **sai cách**: 51 trong số đó là mã chỉ số đã có đủ tên, công thức
+và ngưỡng ở CH6; 26 mã là tên bảng đã có ở `SHEETVN`. Chép sang từ điển là dựng bản sao thứ hai
+của cùng một sự thật - đổi tên chỉ số ở CH6 thì từ điển nói tên cũ, mà nói sai một cách rất tự tin.
+
+Nay từ điển **ghép bốn nguồn** và tự lớn theo app: thêm một chỉ số vào CH6 là có ngay mục từ điển,
+không phải nhớ gì.
+
+Trên đường đó phát hiện app tự viết tắt tiếng Việt ở 8 chỗ, bắt người dùng đoán: `Chưa LH`,
+`- CK`, `Chờ KQ`, `CT sáng`, `Hài lòng TB`, `TREO 40 NGÀY`, `KQ đầu ra`, `Giảng viên (ACA)`.
+Đã viết trọn hết. Riêng `ACA`, `EC`, `CSKH`, `HR`, `LH`, `TB`, `NH`, `KN` là chữ trong CH1/CH6 của
+SOP - **luật cứng bắt ghi nguyên văn** nên chỉ được giải nghĩa, không được đổi.
+
+### 2. Huy hiệu "Việc cần bạn xử lý" ở cổng học viên
+Nhóm đó có từ lâu nhưng chỉ là **một cái tên**: mở cổng ra không biết trong đó có việc hay không,
+phải bấm vào từng mục mới thấy. Đúng cái bẫy đã ghi: *thêm một mục vào menu chưa phải là làm cho
+người ta thấy nó.*
+Nay mỗi mục mang số, thanh trên mang tổng, bấm là nhảy thẳng tới mục đầu tiên có việc. Đo trên 40
+học viên: **37 em có việc thật, tổng 75 việc**. Không có việc thì KHÔNG vẽ nút - một huy hiệu lúc
+nào cũng hiện số 0 là rác thị giác và nó dạy người dùng bỏ qua chính chỗ đáng lẽ phải làm họ chú ý.
+
+### 3. Bảng việc từng chức danh - đóng vai 8 nhóm
+WOW coach và giảng viên **khác nhau đúng** (thoạt nhìn cùng 8 ô nên tưởng trùng - đếm số ô rồi kết
+luận là một cách đo dở). Ban Giám đốc ổn.
+
+Chỗ lệch thật: **Marketing đang nhìn "Bảng NV Tư vấn"** - bốn ô là *Lead đang khai thác*, *Test sắp
+tới*, *Tư vấn cần làm*. Không ô nào Marketing làm được gì: gọi lead là việc của tư vấn, đặt lịch
+test là việc của học vụ. Mã cũ có hẳn dòng `if(g==="marketing")g="tuvan"` kèm lý do *"SOP không
+tách"* - đúng về SOP nhưng **sai về người dùng**, và LUẬT CỨNG SỐ 0 nói rõ trường hợp này.
+Nay Marketing có bảng riêng 5 ô đều tự quyết được, cộng tham số `sourceMinLeads`.
+
+### BẪY MỚI - hai loại chỗ đỏ khác hẳn nhau
+Verify sau đợt sửa ra 3 chỗ đỏ. Phân biệt được hai loại mới là cái đáng học:
+
+**Loại 1 - BỘ KIỂM BÁM CÁCH VIẾT, KHÔNG BÁM Ý ĐỊNH (2/3).**
+· `_check14` đếm `class="tbtn"` **nguyên văn**. Nút mới có thêm lớp phụ (`class="tbtn hvviec"`) là
+không được đếm, rồi báo đỏ vì *"nút thiếu lời giải thích"* - trong khi nút có đủ.
+· `_check16` tìm chuỗi `"Giảng viên (ACA)"` ở ba chỗ. Đổi nhãn sang *"Giảng viên chuyên môn"* -
+một cải thiện thật - lại bị báo đỏ.
+Cả hai vi phạm đúng cái luật đã ghi ở mục trên: **canh Ý ĐỊNH chứ đừng canh CÁCH VIẾT**. Và cả hai
+bộ kiểm đó do chính phiên trước viết ra.
+
+**Loại 2 - LỖI THẬT (1/3).** `_checkux` bắt đúng: 5 ô thẻ Marketing vừa dựng **chưa khai chú thích
+và mã**. Không có luật đó thì rê chuột vào ô "Nguồn đang kém" sẽ không có gì hiện ra.
+
+### BỐN LẦN CẦM SAI THƯỚC trong cùng một phiên
+Ghi lại vì chúng cùng một họ - **đo ra số lạ thì nghi cái thước trước**:
+1. Bộ kiểm viết `(.?)\b(...)\b(.?)`: nhóm đuôi **ăn mất** ký tự có dấu, nên khớp "CH" nuốt luôn "Ặ"
+   và lần khớp sau thấy "NG" với ngữ cảnh rỗng - cả hai bộ lọc vừa thêm đều im lặng không làm gì.
+2. Dải chữ hoa `À-Ỹ` **không phủ khối Unicode thứ ba** (U+1EA0-U+1EF9) nên "CHẶNG" vẫn bị cắt đôi.
+3. Luật "một việc một tên" so chữ **có phân biệt hoa/thường** nên bỏ lọt 15 dòng viết thường
+   ("gọi người giám hộ") - đúng loại chữ người dùng đọc nhiều nhất.
+4. Luật từ viết tắt **đuổi theo cả tên khóa học trong dữ liệu demo** (GOLD, PRIME, EVO) - sai phạm
+   vi; app không chịu trách nhiệm định nghĩa tên sản phẩm của trung tâm.
+
+### HAI LỖI SUÝT LỌT khi dựng bảng Marketing - cả hai "trông vẫn hợp lý"
+· `kpiTh("CVR")` truyền **chuỗi** trong khi hàm nhận **biểu thức chính quy** → ném lỗi ngay dòng
+  đầu, cả bảng biến mất im lặng.
+· Đọc cột `reward_granted_at` trong khi cột thật tên `granted_at` → ô sẽ luôn đếm sai mà không ai
+  nghi ngờ, vì con số vẫn trông hợp lý. Cùng họ với bẫy `placement_time` đã cắn phiên trước.
+
+### Số chốt phiên
+20 bộ kiểm xanh hết. Từ điển 10 → **107 mục**. Icon 208 → **209**. `_checkaudit` **27 tiêu chí**.
+Tham số CH2 thêm: `statsLookback_days`, `statsUpcoming_days`, `statsNewWindow_days`,
+`reEnrollGrace_days`, `placementChange_free_times`, `sourceMinLeads` - nhóm mới
+**"Bảng số & cửa sổ nhìn lại"**.
