@@ -2442,10 +2442,18 @@ function buildScope(code){
     Anh Luân đã dạy em một luật ở phiên trước và nó áp thẳng vào đây: **thêm một mục vào menu
     chưa phải là làm cho người ta thấy nó.** Bàn làm việc ở v5 là một mục trong menu - ai không
     bấm thì không biết. Ở v6 nó là chỗ người ta rơi vào. */
- if(typeof V6==="function"&&V6()){
-  if(eff.pages==="*"||eff.pages.indexOf("ban")>=0)eff.land="ban";
-  else if(eff.pages!=="*"){eff.pages=["ban"].concat(eff.pages);eff.land="ban"}}
+ v6Dap(eff);
  if(eff.pages!=="*"&&eff.pages.indexOf(eff.land)<0)eff.land=eff.pages[0]||"viec";
+ return eff}
+/* Luật trang đáp của v6 tách thành hàm riêng vì nó phải áp cho MỌI lối dựng phạm vi, không
+   riêng lối buildScope theo chức danh. Đã cắn: Quản trị viên không đi qua buildScope (applyScope
+   dựng thẳng một object), nên bản v6 mở ra vẫn rơi vào Trang bắt đầu y hệt v5 - đúng cái thay đổi
+   dễ thấy nhất của v6 thì người mở demo lại không thấy, vì demo mặc định mở bằng Quản trị viên.
+   Bộ kiểm cũng không thấy: nó đóng vai từng chức danh, mà Quản trị viên không phải chức danh. */
+function v6Dap(eff){
+ if(!(typeof V6==="function"&&V6()))return eff;
+ if(eff.pages==="*"||eff.pages.indexOf("ban")>=0)eff.land="ban";
+ else{eff.pages=["ban"].concat(eff.pages);eff.land="ban"}
  return eff}
 function SCOPE(){return window.SCOPEEFF||ROLESCOPE.quantri}
 function applyScope(sid){var eff;
@@ -2457,8 +2465,8 @@ function applyScope(sid){var eff;
     cùng một tab - nhìn y như trang bị đơ.
     Nay dựng THẲNG từ ROLESCOPE.quantri chứ không mượn nhóm khác rồi vá: mượn rồi vá thì bỏ sót
     một ô là im lặng sai, và không ai đọc ra được. */
- if(!sid){eff={group:"quantri",land:"banlam",pages:"*",blocks:"*",bell:"*",tabs:null,
-   lite:0,kpi:0,mine:0,mineBtn:0,name:"Quản trị viên · toàn quyền"}}
+ if(!sid){eff=v6Dap({group:"quantri",land:"banlam",pages:"*",blocks:"*",bell:"*",tabs:null,
+   lite:0,kpi:0,mine:0,mineBtn:0,name:"Quản trị viên · toàn quyền"})}
  else{var st=find("DL01","staff_id",sid);eff=buildScope(st?ecode(st.role):"")}
  window.SCOPEEFF=eff;window.MINEONLY=eff.mine?1:0;
  try{dsReset()}catch(e){}   /* V9.22: đổi người là xóa memo nhóm/cơ sở, không thừa hưởng phạm vi người trước */
@@ -19257,15 +19265,22 @@ function gateSwitch(){ssSet("ITTS_WHO",null);location.reload()}
 /* Canh ĐÚNG TÊN HAI FILE BUILD, không canh đuôi .html: bản trên GitHub Pages cũng có thể được
    mở bằng địa chỉ đầy đủ .../cong-hoc-vien/index.html - canh đuôi là tính nhầm sang kiểu file
    rồi trỏ đi một nơi không tồn tại. */
-function congKieuFile(){return /\/ITTs_(WebApp_v5|TrangHocVien)_demo\.html?$/i.test(location.pathname)}
+function congKieuFile(){return /\/ITTs_(WebApp_v5|WebApp_v6|TrangHocVien)_demo\.html?$/i.test(location.pathname)}
+/* Cổng nhân viên có HAI bản build ở hai địa chỉ. Đang xem bản nào thì "về cổng nhân viên" phải
+   về ĐÚNG bản đó - đưa người đang xem v6 về v5 là lặng lẽ đổi bản demo dưới chân họ. Bản học
+   viên chỉ có một, và từ đó không biết khách vào bằng cửa nào, nên về v5 (cửa chính). */
+function congTenNV(){return (typeof V6==="function"&&V6())?"cong-nhan-vien-v6":"cong-nhan-vien"}
+function congFileNV(){return (typeof V6==="function"&&V6())?"ITTs_WebApp_v6_demo.html":"ITTs_WebApp_v5_demo.html"}
 function congURL(w){
  var p=location.pathname;
  if(congKieuFile()){var d=p.replace(/[^\/]*$/,"");
-  return w==="nv"?(d+"ITTs_WebApp_v5_demo.html"):(d+"ITTs_TrangHocVien_demo.html"+(w==="ph"?"?phuhuynh":""))}
- var b=p.replace(/(cong-nhan-vien|cong-hoc-vien)\/?[^\/]*$/,"");
+  return w==="nv"?(d+congFileNV()):(d+"ITTs_TrangHocVien_demo.html"+(w==="ph"?"?phuhuynh":""))}
+ /* Tên dài đứng TRƯỚC trong nhánh chọn: để "cong-nhan-vien" đứng trước thì đường dẫn
+    .../cong-nhan-vien-v6/ không cắt được đuôi, gốc tính sai và cổng kia ra 404. */
+ var b=p.replace(/(cong-nhan-vien-v6|cong-nhan-vien|cong-hoc-vien)\/?[^\/]*$/,"");
  if(b===p)b=p.replace(/[^\/]*$/,"");
  if(b.slice(-1)!=="/")b+="/";
- return w==="nv"?(b+"cong-nhan-vien/"):(b+"cong-hoc-vien/"+(w==="ph"?"?phuhuynh":""))}
+ return w==="nv"?(b+congTenNV()+"/"):(b+"cong-hoc-vien/"+(w==="ph"?"?phuhuynh":""))}
 function congDangO(){if(!window.HVPORTAL)return "nv";
  var ph=false;try{ph=hvPH()}catch(e){}
  return ph?"ph":"hv"}

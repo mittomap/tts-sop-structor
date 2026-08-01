@@ -340,6 +340,54 @@ var CH3_NGOAIBAN={
  });
  applyScope("");CURSTAFF="";
  t("mọi chức danh mở Bàn làm việc ở thực thể mặc định đều thấy việc", !doi.length, doi.slice(0,4).join(" · "));
+
+ /* (4) TRANG ĐÁP CỦA BẢN V6 - đo qua applyScope, tức đúng con đường app dùng lúc mở ra.
+    Đã cắn: luật trang đáp nằm trong buildScope, mà Quản trị viên KHÔNG đi qua buildScope
+    (applyScope dựng thẳng một object cho nhánh không có staff_id). Bản v6 mở ra vẫn rơi vào
+    Trang bắt đầu y hệt v5 - đúng cái thay đổi dễ thấy nhất thì người mở demo lại không thấy,
+    vì demo mặc định mở bằng Quản trị viên. Bộ kiểm cũ đóng vai từng CHỨC DANH nên không thấy:
+    Quản trị viên không phải một chức danh trong DL01.
+    Luật rút ra: đo trên hàm con là đo một nhánh; phải đo trên CỬA VÀO THẬT mới đủ mọi nhánh. */
+ (function(){
+  var cu=window.ITTS_V6, xau=[];
+  function dap(sid){applyScope(sid);return SCOPE().land}
+  window.ITTS_V6=1;
+  if(dap("")!=="ban")xau.push("Quản trị viên -> "+dap(""));
+  var daG={};
+  rows("DL01").filter(function(x){return staffActive(x)}).forEach(function(nv){
+   var g;try{applyScope(nv.staff_id);g=SCOPE().group||"?"}catch(e){return}
+   if(daG[g])return;daG[g]=1;
+   if(SCOPE().land!=="ban")xau.push(g+" -> "+SCOPE().land)});
+  window.ITTS_V6=0;
+  var v5dap=dap("");
+  window.ITTS_V6=cu;applyScope("");CURSTAFF="";
+  t("bản v6: MỌI lối vào (kể cả Quản trị viên) đều đáp xuống Bàn làm việc",
+    !xau.length, xau.slice(0,4).join(" · "));
+  t("bản v5 không bị kéo theo - vẫn đáp xuống Trang bắt đầu",
+    v5dap==="banlam", "đang đáp xuống "+v5dap);
+ })();
+
+ /* (5) ĐỔI CỔNG phải trỏ đúng khi có BA thư mục cổng. Đã cắn: hàm cắt gốc đường dẫn chỉ biết
+    hai tên cong-nhan-vien / cong-hoc-vien, nên đứng ở .../cong-nhan-vien-v6/ thì cắt không
+    được, gốc tính ra chính thư mục đang đứng và nút "Cổng học viên" trỏ tới một chỗ 404.
+    Đo bằng cách đặt chân vào từng địa chỉ thật rồi đọc hai đường ra. */
+ (function(){
+  var cuP=location.pathname, cuV=window.ITTS_V6, xau=[];
+  function thu(p,v6,mongNV,mongHV){
+   location.pathname=p;window.ITTS_V6=v6;
+   var nv=congURL("nv"), hv=congURL("hv");
+   if(nv!==mongNV)xau.push(p+" -> nv="+nv+" (mong "+mongNV+")");
+   if(hv!==mongHV)xau.push(p+" -> hv="+hv+" (mong "+mongHV+")")}
+  thu("/itts-sop-demo/cong-nhan-vien/",0,"/itts-sop-demo/cong-nhan-vien/","/itts-sop-demo/cong-hoc-vien/");
+  thu("/itts-sop-demo/cong-nhan-vien-v6/",1,"/itts-sop-demo/cong-nhan-vien-v6/","/itts-sop-demo/cong-hoc-vien/");
+  thu("/itts-sop-demo/cong-nhan-vien-v6/index.html",1,"/itts-sop-demo/cong-nhan-vien-v6/","/itts-sop-demo/cong-hoc-vien/");
+  thu("/itts-sop-demo/cong-hoc-vien/",0,"/itts-sop-demo/cong-nhan-vien/","/itts-sop-demo/cong-hoc-vien/");
+  thu("/ITTs_WebApp_v6_demo.html",1,"/ITTs_WebApp_v6_demo.html","/ITTs_TrangHocVien_demo.html");
+  thu("/ITTs_WebApp_v5_demo.html",0,"/ITTs_WebApp_v5_demo.html","/ITTs_TrangHocVien_demo.html");
+  location.pathname=cuP;window.ITTS_V6=cuV;
+  t("nút Đổi cổng trỏ đúng ở cả ba thư mục cổng và cả khi mở thẳng file",
+    !xau.length, xau.slice(0,3).join(" · "));
+ })();
  /* ĐỘ HOÀN THÀNH CỦA BẢN V6 - in ra mỗi lần chạy để nó không nằm im.
     Ba trạng thái, và phải tách bạch: có form trong ngăn kéo · là việc hàng loạt (khai lý do) ·
     CHƯA CHUYỂN. Gộp nhóm ba vào nhóm hai là giấu phần việc còn nợ - nhìn màn hình tưởng xong. */

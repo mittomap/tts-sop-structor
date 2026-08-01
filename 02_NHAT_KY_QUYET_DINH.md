@@ -149,7 +149,17 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.70 — BẢN V6 RIÊNG: MỘT NGUỒN, HAI BẢN BUILD ✅ (01/08).**
+> **Phiên bản: V9.71 — BẢN V6 ĐÃ LÊN DEMO ONLINE ✅ (01/08).**
+> · Cửa thứ tư của trang chủ nay mở được: **https://mittomap.github.io/itts-sop-demo/cong-nhan-vien-v6/**
+> · **Hai lỗi thật chỉ lộ ra khi mở app bằng trình duyệt và đi đúng đường người dùng đi**, cả 21
+> bộ kiểm đều mù: (1) bản v6 mở ra **vẫn rơi vào Trang bắt đầu** vì luật trang đáp nằm trong
+> `buildScope()` mà Quản trị viên - tài khoản demo mặc định - không đi qua hàm đó; (2) nút **Đổi
+> cổng** trong v6 trỏ tới một chỗ **404** vì hàm cắt gốc đường dẫn chỉ biết hai tên thư mục.
+> · **Luật rút ra:** *đo trên hàm con là đo MỘT NHÁNH; phải đo trên CỬA VÀO THẬT mới đủ mọi nhánh.*
+> · `_checkaudit` 39 → **42 tiêu chí**; hai bộ kiểm mới đã **thử ngược trên bản build cũ và chúng
+> đỏ đúng chỗ**. `update.sh` của repo demo nay chép đủ bốn cửa + **chốt cửa 404**.
+>
+> **Phiên bản trước: V9.70 — BẢN V6 RIÊNG: MỘT NGUỒN, HAI BẢN BUILD ✅ (01/08).**
 > · **Anh Luân:** *"Nếu em build, thì xuất ra v2 nhé, bản hiện tại cũng đang ổn"* → đổi tên thành
 > **v6** cho khớp mạch phiên bản (app đang v5). *"Ko cần nhảy đi đâu, drawer xử lý được hết. Có
 > khả thi ko ta... Hạn chế hay ưu thế của giải pháp này là gì nhỉ."*
@@ -162,7 +172,7 @@
 > · **Trả lời câu "drawer có làm hết được không": KHÔNG, và ranh giới là:** việc trên MỘT hồ sơ →
 > ngăn kéo; việc trên NHIỀU hồ sơ cùng lúc → trang. Sáu việc thuộc vế sau (điểm danh cả lớp, chấm
 > nhiều bài, xếp lớp, chia lead, bảng công, báo cáo) - ép vào ngăn kéo 760px là lùi.
-> · **Nói thật phần còn nợ:** 29 việc thì mới **5 có form trong ngăn kéo**, 5 khai lý do hàng
+> · **Nói thật phần còn nợ:** 29 việc thì mới **4 có form trong ngăn kéo**, 6 khai lý do hàng
 > loạt, **19 CHƯA CHUYỂN**. Ngăn kéo của 19 việc đó nói thẳng "việc này chưa chuyển vào ngăn kéo
 > ở bản thử" chứ không giả vờ là việc hàng loạt - và `_checkaudit` in con số ấy mỗi lần chạy để
 > nó không nằm im.
@@ -6373,14 +6383,14 @@ Sáu việc thuộc vế sau, và mỗi cái khai lý do đọc được ngay tr
 ### 4. Ba trạng thái, không được gộp
 
 Mỗi dòng việc rơi vào đúng một trong ba:
-1. **Có `keo`** - form dựng sẵn trong ngăn kéo. Hiện **5/29**: ghi liên hệ (thao tác lặp nhiều
+1. **Có `keo`** - form dựng sẵn trong ngăn kéo. Hiện **4/29**: ghi liên hệ (thao tác lặp nhiều
    nhất cả app), tới hẹn liên hệ lại, chấm bài test, tư vấn sau test.
-2. **Có `vichung`** - việc hàng loạt, khai rõ vì sao. Hiện **5/29**.
+2. **Có `vichung`** - việc hàng loạt, khai rõ vì sao. Hiện **6/29**.
 3. **Không có gì** - **CHƯA CHUYỂN**. Hiện **19/29**.
 
 > **Luật: không được gộp nhóm 3 vào nhóm 2.** Nếu gộp, màn hình sẽ nói "việc này cần màn rộng" -
 > một lời nói dối - và phần việc còn nợ biến mất khỏi mọi phép đo. Ngăn kéo của nhóm 3 nói thẳng
-> *"việc này chưa chuyển vào ngăn kéo ở bản thử"*, và `_checkaudit` **in con số 5/5/19 ra mỗi lần
+> *"việc này chưa chuyển vào ngăn kéo ở bản thử"*, và `_checkaudit` **in con số 4/6/19 ra mỗi lần
 > chạy** để nó không nằm im.
 
 ### 5. Ưu thế và hạn chế - bản khai đầy đủ cho anh Luân
@@ -6395,5 +6405,67 @@ không so sánh nhiều hồ sơ cạnh nhau được · không mở song song n
 in và xuất file phải là trang · và chi phí thật: còn 19 việc phải viết lại.
 
 ### Số chốt phiên
-21 bộ kiểm xanh hết cho **cả hai bản**. Menu v6 **5 nhóm / 31 mục**. Việc vào ngăn kéo **5/29**,
-hàng loạt đã khai **5/29**, còn nợ **19/29**. `_checkaudit` 38 → **39 tiêu chí**.
+21 bộ kiểm xanh hết cho **cả hai bản**. Menu v6 **5 nhóm / 31 mục**. Việc vào ngăn kéo **4/29**,
+hàng loạt đã khai **6/29**, còn nợ **19/29**. `_checkaudit` 38 → **39 tiêu chí**.
+
+---
+
+## V9.71 - ĐƯA BẢN V6 LÊN DEMO, VÀ HAI LỖI CHỈ LỘ RA KHI ĐI ĐÚNG CỬA NGƯỜI DÙNG ĐI (01/08)
+
+Phiên trước dựng xong bản v6, 21 bộ kiểm xanh hết, trang chủ đã có cửa thứ tư. Việc còn lại
+tưởng chỉ là chép file sang repo demo. Nhưng chép xong, **mở thử bằng trình duyệt như một người
+đi xem demo**, thì lộ ra hai lỗi mà cả 21 bộ kiểm đều không thấy.
+
+### 1. Bản v6 mở ra vẫn rơi vào Trang bắt đầu - đúng thứ dễ thấy nhất của v6 thì không thấy
+
+Luật trang đáp của v6 (`eff.land="ban"`) nằm trong `buildScope()`. Mà **Quản trị viên KHÔNG đi
+qua `buildScope()`**: từ V9.33, `applyScope("")` dựng thẳng một object cho nhánh không có
+`staff_id`, vì trước đó mượn nhóm khác rồi vá đè đã sinh lỗi im lặng. Object dựng thẳng ấy cắm
+cứng `land:"banlam"`.
+
+Bản demo **mặc định mở bằng Quản trị viên** ("Bản demo đang mở sẵn ở tài khoản Quản trị viên").
+Nên anh Luân bấm vào cửa thứ tư sẽ thấy... đúng màn hình của v5. Cả một phiên làm việc để lật
+trục tổ chức của app, và người mở ra không thấy gì khác.
+
+**Vì sao bộ kiểm không thấy:** `_checkaudit` M10 đóng vai **từng chức danh** trong DL01 rồi đo -
+mà Quản trị viên không phải một chức danh trong DL01. Nó là nhánh thứ hai của `applyScope`.
+
+> **Luật (bẫy đã cắn):** *đo trên hàm con là đo MỘT NHÁNH; phải đo trên CỬA VÀO THẬT mới đủ mọi
+> nhánh.* Bộ kiểm gọi `buildScope(vai)` thì mãi mãi mù với nhánh không đi qua `buildScope`.
+
+**Sửa:** tách luật thành hàm `v6Dap(eff)` và gọi ở **cả hai** nhánh của `applyScope`. Bộ kiểm
+mới đo qua `applyScope` (cửa vào thật), cho cả Quản trị viên lẫn mọi chức danh, và kiểm thêm
+chiều ngược lại: **bản v5 không được bị kéo theo** - vẫn phải đáp xuống Trang bắt đầu.
+
+### 2. Nút "Đổi cổng" trong bản v6 trỏ tới một chỗ 404
+
+`congURL()` tính gốc đường dẫn bằng cách cắt đuôi `(cong-nhan-vien|cong-hoc-vien)`. Đứng ở
+`.../cong-nhan-vien-v6/` thì **cắt không được** (sau "cong-nhan-vien" còn "-v6/"), gốc tính ra
+chính thư mục đang đứng, nên "Cổng học viên" trỏ tới `.../cong-nhan-vien-v6/cong-hoc-vien/`.
+
+Hai chi tiết phải làm đúng, không chỉ thêm một tên:
+- **Tên dài đứng TRƯỚC trong nhánh chọn** của biểu thức: để `cong-nhan-vien` đứng trước thì
+  `cong-nhan-vien-v6` vẫn không cắt được.
+- **"Về cổng nhân viên" phải về ĐÚNG BẢN đang xem.** Đưa người đang xem v6 về v5 là lặng lẽ đổi
+  bản demo dưới chân họ. Cổng học viên chỉ có một bản và từ đó không biết khách vào bằng cửa
+  nào, nên về v5 - cửa chính.
+
+**Bộ kiểm mới:** đặt chân vào **sáu địa chỉ thật** (ba thư mục cổng, cả `index.html`, cả kiểu mở
+thẳng file) rồi đọc hai đường ra. Cả hai bộ kiểm mới đã được **thử ngược trên bản build cũ và
+chúng đỏ đúng chỗ** - một bộ kiểm chưa từng đỏ thì chưa chứng minh được điều gì.
+
+### 3. `update.sh` của repo demo - cửa mới mà kịch bản chép không biết
+
+Trang chủ thêm cửa thứ tư, nhưng `update.sh` chỉ chép hai thư mục cổng, và cũng chưa hề chép
+`index.html`. Nay chép đủ, **cộng một chốt cửa**: đọc mọi `href` trong trang chủ, cửa nào không
+có file thật thì dừng và báo. Cùng một mạch với luật trên - thêm một cửa vào menu chưa phải là
+làm cho người ta tới được nó.
+
+Bản v6 **không chép ra gốc repo demo**: nó mới tinh, không có link cũ nào trỏ tới, mà mỗi lần
+chép là thêm 5MB vĩnh viễn vào `.git` (repo demo đã 165MB).
+
+### Số chốt phiên
+21 bộ kiểm xanh hết. `_checkaudit` 39 → **42 tiêu chí**. Hai lỗi thật, cả hai đều **chỉ lộ ra khi
+mở app bằng trình duyệt và đi đúng đường người dùng đi** - không lỗi nào lộ ra qua 21 bộ kiểm
+chạy trên hàm. Bản khai còn nợ giữ nguyên: ngăn kéo **4/29**, hàng loạt **6/29**, chưa chuyển
+**19/29** (con số cũ ghi trong tài liệu là 5/5/19 - sai, nay sửa theo máy đếm).
