@@ -149,7 +149,22 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.72 — TRANG CHỦ HAI BƯỚC: CHỌN BẢN, RỒI CHỌN CỔNG ✅ (01/08).**
+> **Phiên bản: V9.73 — "DRAWER XỬ LÝ ĐƯỢC HẾT": TRẢ NỐT CỐT LÕI CỦA Ý TƯỞNG V6 ✅ (01/08).**
+> · **Anh Luân:** *"Ý tưởng ban đầu khi tạo V6, chưa làm được à em, cần nâng cấp gì em cứ làm đi."*
+> · Làm được tại chỗ **4/29 → 23/29**; 6 việc còn lại là hàng loạt cố ý. **Không còn việc nào nói
+> "chưa chuyển vào ngăn kéo".**
+> · **Hai trong bốn form cũ thực ra HỎNG:** DL03 khoá `test_booking_id` mà mã đọc `r.test_id`, nút
+> Lưu sinh ra `bkLuuTest('')`. 21 bộ kiểm mù vì chúng đếm `typeof v.keo==="function"`.
+> · **Luật:** *khai một form không phải là có một form* - bộ kiểm phải MỞ THẬT rồi soi.
+> · **13 việc không viết form mới:** app đã có ~90 ngăn kéo chạy tốt, chỉ đang mở từ trang khác;
+> khai thêm `keoMo:` để mở thẳng. Chỉ **6 form viết mới**.
+> · `_checkaudit` 43 → **44 tiêu chí**, đổi từ ĐẾM KHAI sang CHẠY THỬ; việc nào hôm nay không có
+> hồ sơ thật thì **mượn hồ sơ** để vẫn chạy hết đường mã. Thử ngược: đỏ đúng chỗ.
+> · **`check_logic.py` từng 09:12 xanh - 14:11 đỏ cùng một ngày** dù không ai đụng dữ liệu: nó đo
+> bản mẫu đứng yên bằng đồng hồ đang chạy. Nay neo vào `meta.anchor` (ngày sinh của dữ liệu) -
+> lỗi thật 1 → **0**, "ca có ý" thôi trôi 11 → **4 ổn định**.
+>
+> **Phiên bản trước: V9.72 — TRANG CHỦ HAI BƯỚC: CHỌN BẢN, RỒI CHỌN CỔNG ✅ (01/08).**
 > · **Anh Luân:** *"Trang index cứ chia ra em, chọn v5 hoặc v6, chọn xong thì chọn tiếp 3 cổng,
 > thiếu gì làm cho đủ đi em."*
 > · Bốn cửa phẳng trộn **hai câu hỏi khác loại** vào một hàng - *"xem bản nào"* và *"vào bằng
@@ -6565,3 +6580,90 @@ chưa có). Bỏ một dòng của bản vá đi thì bộ kiểm **đỏ đúng
 
 > **Luật:** *một lỗi đã vá ở một lối đi thì phải đi thử NHỮNG LỐI CÒN LẠI tới cùng chỗ đó.* Vá
 > `congURL` cho cổng nhân viên xong mà không hỏi "còn ai gọi hàm này nữa", là để nguyên nửa lỗi.
+
+
+---
+
+## V9.73 - "DRAWER XỬ LÝ ĐƯỢC HẾT" - TRẢ NỐT PHẦN CỐT LÕI CỦA Ý TƯỞNG V6 (01/08)
+
+> **Anh Luân:** *"Ý tưởng ban đầu khi tạo V6, chưa làm được à em, cần nâng cấp gì em cứ làm đi."*
+
+Ý tưởng gốc có một câu là cốt lõi: ***"Ko cần nhảy đi đâu, drawer xử lý được hết."*** Chỗ đó mới
+làm được **4/29**. Nay **23/29**, 6 việc còn lại là hàng loạt cố ý. **Không còn việc nào phải nói
+"chưa chuyển vào ngăn kéo".**
+
+### 1. Trước hết: hai trong bốn form "đã chạy" thực ra HỎNG
+
+Bảng DL03 khoá là `test_booking_id`, mã lại đọc `r.test_id`. Hậu quả: nút Lưu của form Chấm bài
+test sinh ra `bkLuuTest('')` - **khoá rỗng**, mã phiếu in trên dải nhắc cũng rỗng. Form Tư vấn sau
+test cũng vậy ở bước đánh dấu phiếu đã tư vấn, nên việc ấy sẽ **nằm lại trên bàn mãi** dù đã làm.
+
+**Vì sao 21 bộ kiểm không thấy:** chúng đếm `typeof v.keo==="function"`. Câu đó chỉ nói *có khai
+một hàm*, không nói *hàm ấy chạy được*.
+
+> **Luật (bẫy đã cắn):** *khai một form không phải là có một form.* Bộ kiểm phải **mở thật** rồi
+> soi, chứ không đếm bản khai.
+
+### 2. Mười ba việc KHÔNG viết form mới - dùng lại ngăn kéo có sẵn
+
+Đo trước khi viết: app đã có **~90 ngăn kéo** chạy tốt (`riskCare`, `payForm`, `openOB`,
+`openComplaint`, `fbClassify`, `bhNoteForm`, `wowAdd`, `blCallForm`...). Chúng chỉ đang được mở từ
+trang khác. Viết lại 19 form là **nhân đôi mã và nhân đôi chỗ hỏng**.
+
+Nay mỗi dòng việc khai thêm `keoMo:` - hàm mở thẳng ngăn kéo cũ, không bọc thêm một lớp vỏ v6.
+Vẫn là ngăn kéo, vẫn không rời màn. Bọc thêm vỏ chỉ để "trông giống v6" là thêm một tầng người
+dùng phải đọc mà không thêm thông tin gì.
+
+**Sáu form viết mới** (thật sự chưa có chỗ nào làm): nhắc lịch test · điểm danh buổi test · nhập
+kết quả đầu ra · mời học tiếp · mốc giờ vào/ra của buổi · hồ sơ giảng viên (chức danh/cơ sở, email).
+
+Hai chi tiết phải làm đúng, không chỉ "mở được form":
+- **Nhắc lịch test phải ĐÓNG DẤU vào phiếu.** Không đóng dấu thì nhắc mười lần việc vẫn nằm đó,
+  màn hình vẫn nói "chưa nhắc".
+- **Điểm danh buổi test không phải một nút.** Trang cũ có ba nút rời (có mặt · vắng · khách từ
+  chối). Ban đầu em nối thẳng vào `testAttend` - tức là **ghi luôn "có mặt" mà không hỏi ai**, làm
+  hỏng đúng cái tỷ lệ dự test của báo cáo. Ngăn kéo nay bày đủ ba đường.
+
+### 3. Bộ kiểm: đổi từ ĐẾM KHAI sang CHẠY THỬ
+
+`_checkaudit` nay **mở thật từng việc trên một hồ sơ thật**, rồi soi bốn mặt: có ra HTML không ·
+có nút bấm được không · nút có truyền **khoá rỗng** không · hàm nó gọi có **tồn tại** không.
+
+Việc nào hôm nay không có hồ sơ thật thì **mượn một hồ sơ cùng bảng** để vẫn chạy hết đường mã -
+6/29 việc rơi vào diện này. Bỏ qua nghĩa là chỗ dữ liệu mỏng thành chỗ không ai canh, mà đó là chỗ
+dễ gãy nhất.
+
+Thử ngược: trả `test_booking_id` về `test_id` như bản cũ thì bộ kiểm **đỏ đúng chỗ**
+(*"Chấm bài test: nút truyền KHOÁ RỖNG"*). Một bộ kiểm chưa từng đỏ thì chưa chứng minh được gì.
+
+Một lần nữa máy đo sai trước app: bản đầu của nó bắt lỗi 9 việc vì đòi `event.stopPropagation()`
+phải là hàm toàn cục. Sửa máy đo, không sửa app.
+
+### 4. Bộ kiểm dữ liệu đang đo bằng một cái thước ĐANG CHẠY
+
+Giữa phiên, `check_logic.py` đỏ. Nhưng: **09:12 xanh, 14:11 đỏ, cùng một ngày, không ai đụng vào
+dữ liệu** giữa hai lần chạy. Nguyên do: luật 7h cho ân hạn 1 ngày, mà một buổi WOW hẹn 31/07 13:01
+vượt mốc 25 tiếng đúng vào khoảng giữa trưa. Tức là **kết quả bộ kiểm phụ thuộc vào GIỜ người ta
+bấm chạy nó**.
+
+`demo_data_big.json` là một **bản mẫu có ngày sinh ghi sẵn** trong `meta.anchor`; app dịch mọi mốc
+thời gian theo bội số 7 ngày lúc chạy nên bản mẫu không bao giờ "cũ" trong app. Vậy bộ kiểm phải
+soi tính **nhất quán nội bộ của bản mẫu so với chính ngày sinh của nó**, chứ không so với đồng hồ
+treo tường. Nay `NOW` của `check_logic.py` lấy từ `meta.anchor`.
+
+Kết quả: lỗi thật **1 → 0**, và số "ca có ý" thôi trôi (**11 → 4 ổn định**) - chính cái trôi mà
+`verify.sh` từng phải viết cả đoạn chú thích để giải thích.
+
+> **Luật (đã có, nay áp đúng chỗ):** *không đo cái đang đứng yên bằng một cái thước đang chạy.*
+
+### 5. Ba chỗ đỏ còn lại - đều do em, đều là loại "thêm cái mới mà quên khai"
+
+- **`ti-ban`** dùng trong form điểm danh test mà chưa dựng lại font subset (`build_icons.py`) -
+  219 → **220 icon**.
+- **Sáu cửa ghi mới** chưa khai trong bản khai `DOORS` của `gen_v5.py`, nên `_check15` báo đỏ.
+  Đây đúng là việc của nó: thêm hàm ghi mà quên khai thì phải đỏ.
+
+### Số chốt phiên
+Làm được tại chỗ **4/29 → 23/29** (11 form riêng + 12 ngăn kéo dùng lại), hàng loạt cố ý **6/29**,
+**còn nợ 0**. `_checkaudit` 43 → **44 tiêu chí**, đổi từ đếm khai sang chạy thử. `check_logic.py`
+nay tất định, không còn phụ thuộc giờ chạy. Font subset 219 → **220 icon**. 21 bộ kiểm xanh hết.

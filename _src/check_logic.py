@@ -4,8 +4,27 @@ import json, re, datetime, os, sys, collections
 
 import os
 P = os.path.join(os.path.dirname(os.path.abspath(__file__)), "demo_data_big.json")
-NOW = datetime.datetime.now()
 d = json.load(open(P, encoding="utf-8"))
+
+# ── MOC THOI GIAN: NGAY SINH CUA DU LIEU, KHONG PHAI GIO CHAY BO KIEM (V9.73) ──────────────
+# Bay da can: 01/08 luc 09:12 bo kiem XANH, cung ngay luc 14:11 no DO - khong ai dung vao du
+# lieu lan ma nguon giua hai lan chay. Ly do: luat 7h cho an han 1 ngay, ma mot buoi WOW hen
+# 31/07 13:01 vuot moc 25 tieng dung vao khoang giua trua. Tuc la ket qua bo kiem phu thuoc
+# vao GIO nguoi ta bam chay no.
+#
+# demo_data_big.json la mot BAN MAU co ngay sinh ghi san trong meta.anchor; app dich toan bo
+# moc thoi gian theo boi so 7 ngay luc chay nen ban mau khong bao gio bi "cu" trong app.
+# Vay bo kiem nay phai soi tinh NHAT QUAN NOI BO cua ban mau so voi CHINH NGAY SINH cua no.
+# Dung dong ho treo tuong la do mot thu dang dung yen bang mot cai thuoc dang chay.
+# (Dung luat cua du an: "khong do cai dang chuyen dong".)
+_anchor = str((d.get("meta") or {}).get("anchor") or "").strip()
+_m = re.search(r"(\d{1,2})/(\d{1,2})/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?", _anchor)
+if _m:
+    NOW = datetime.datetime(int(_m.group(3)), int(_m.group(2)), int(_m.group(1)),
+                            int(_m.group(4) or 0), int(_m.group(5) or 0))
+else:
+    NOW = datetime.datetime.now()
+    print("CANH BAO: demo_data_big.json khong khai meta.anchor - dang do bang gio chay, ket qua se troi theo ngay.")
 dl, EN = d["dl"], d.get("enums", {})
 R = lambda t: dl.get(t, [])
 

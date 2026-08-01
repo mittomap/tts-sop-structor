@@ -409,18 +409,85 @@ var CH3_NGOAIBAN={
  /* ĐỘ HOÀN THÀNH CỦA BẢN V6 - in ra mỗi lần chạy để nó không nằm im.
     Ba trạng thái, và phải tách bạch: có form trong ngăn kéo · là việc hàng loạt (khai lý do) ·
     CHƯA CHUYỂN. Gộp nhóm ba vào nhóm hai là giấu phần việc còn nợ - nhìn màn hình tưởng xong. */
+ /* ĐỘ HOÀN THÀNH THẬT CỦA BẢN V6 - và bài học vì sao chỗ này phải CHẠY THỬ chứ không ĐẾM KHAI.
+    Bản đếm cũ chỉ hỏi `typeof v.keo==="function"`. Nó nói 4/29 việc đã vào ngăn kéo - xanh, yên
+    tâm. Nhưng hai trong bốn form ấy HỎNG: bảng DL03 khoá là `test_booking_id`, mã lại đọc
+    `r.test_id`, nên nút Lưu sinh ra `bkLuuTest('')` và mã phiếu in ra rỗng. Khai một form không
+    có nghĩa là có một form chạy được.
+    Nay mỗi việc bị MỞ THẬT trên một hồ sơ thật, rồi soi: có ra HTML không · có nút bấm được
+    không · nút có truyền khoá RỖNG không · hàm nó gọi có tồn tại không.
+    Việc nào hôm nay không có hồ sơ thật thì MƯỢN một hồ sơ cùng bảng để vẫn chạy hết đường mã -
+    bỏ qua nghĩa là chỗ dữ liệu mỏng thành chỗ không ai canh, mà đó là chỗ dễ gãy nhất. */
  (function(){
-  var co=0,hl=0,chua=[];
-  (VIECTT||[]).forEach(function(v){
-   if(typeof v.keo==="function")co++;
-   else if(v.vichung)hl++;
+  var MO=0, TOASTED="", drawerCu=openDrawer, toastCu=toast;
+  openDrawer=function(t,h){MO++;window.__bkH=String(h||"")};
+  toast=function(m){TOASTED=String(m||"")};
+
+  function hoSoThu(v){
+   var T=TTBK[v.tt], ds=[];
+   try{ds=rows(T.bang)}catch(e){}
+   if(v.tt==="giangvien")ds=ds.filter(function(x){try{return isGVRole(x)&&staffActive(x)}catch(e){return false}});
+   var r=ds.filter(function(x){try{return v.khi(x)}catch(e){return false}})[0];
+   return r?{r:r,that:true}:{r:ds[0],that:false}}
+
+  function soiForm(h){
+   h=String(h||"");
+   var nut=h.match(/onclick="[^"]+"/g)||[];
+   if(!nut.length)return "không có nút nào bấm được";
+   var goi=[];
+   nut.forEach(function(x){
+    /* bỏ qua lời gọi PHƯƠNG THỨC (có dấu chấm đứng trước): event.stopPropagation() không phải
+       hàm toàn cục, đòi nó tồn tại là chấm nhầm máy đo thành lỗi của app. */
+    (x.match(/(\.?)\b([a-zA-Z_$][\w$]*)\(([^)]*)\)/g)||[]).forEach(function(g){
+     if(g.charAt(0)===".")return;
+     var m=g.match(/^([a-zA-Z_$][\w$]*)\(([^)]*)\)$/); if(!m)return;
+     if(/^(closeModal|reRender|esc|event|return|if|for)$/.test(m[1]))return;
+     goi.push(m)})});
+   if(!goi.length)return "không nút nào gọi một hàm ghi";
+   var rong=goi.filter(function(m){
+    if(!m[2].trim())return false;
+    return m[2].split(",").some(function(t){return /^\s*(''|"")\s*$/.test(t.trim())})});
+   if(rong.length)return "nút truyền KHOÁ RỖNG: "+rong[0][0]+"("+rong[0][2]+")";
+   var thieu=goi.filter(function(m){return typeof global[m[1]]!=="function"});
+   if(thieu.length)return "gọi hàm không tồn tại: "+thieu[0][1];
+   return ""}
+
+  var xau=[], keo=0, mo=0, hl=0, chua=[], muon=0;
+  VIECTT.forEach(function(v){
+   var t=hoSoThu(v);
+   if(!t.r){xau.push(v.t+": bảng "+TTBK[v.tt].bang+" không có dòng nào");return}
+   if(!t.that)muon++;
+   if(typeof v.keo==="function"){
+    var h="";try{h=v.keo(t.r)}catch(e){xau.push(v.t+": keo() ném lỗi "+e.message);return}
+    if(/class="empty"/.test(String(h))){
+     if(t.that)xau.push(v.t+": mở ra màn rỗng dù hồ sơ đang có việc thật");
+     else keo++; return}
+    var l1=soiForm(h); if(l1){xau.push(v.t+": "+l1);return}
+    keo++;
+   }else if(typeof v.keoMo==="function"){
+    MO=0;TOASTED="";window.__bkH="";
+    try{v.keoMo(t.r)}catch(e){xau.push(v.t+": keoMo() ném lỗi "+e.message);return}
+    if(!MO){
+     if(t.that)xau.push(v.t+": keoMo() KHÔNG mở ngăn kéo nào"+(TOASTED?(" (toast: "+TOASTED+")"):""));
+     else mo++; return}
+    var hh=String(window.__bkH||"");
+    if(hh.length<120){xau.push(v.t+": ngăn kéo mở ra gần như rỗng");return}
+    var l2=soiForm(hh); if(l2){xau.push(v.t+": (ngăn kéo dùng lại) "+l2);return}
+    mo++;
+   }else if(v.vichung)hl++;
    else chua.push(v.tt+" · "+v.t)});
-  console.log("  V6 - viec da vao ngan keo: "+co+"/"+VIECTT.length+
-   " | viec hang loat da khai ly do: "+hl+" | CHUA CHUYEN: "+chua.length);
-  if(chua.length)console.log("     con no: "+chua.slice(0,8).join(" · ")+(chua.length>8?(" ... +"+(chua.length-8)):""));
-  t("mọi việc hàng loạt đều khai được vì sao không vào ngăn kéo",
-    true, "");   /* luôn đạt - dòng này chỉ để con số trên được in ra cùng bảng kết quả */
+
+  openDrawer=drawerCu; toast=toastCu;
+  console.log("  V6 - lam TAI CHO: "+(keo+mo)+"/"+VIECTT.length+
+   " (form rieng "+keo+" + ngan keo dung lai "+mo+") | hang loat da khai ly do: "+hl+
+   " | CHUA CHUYEN: "+chua.length+" | muon ho so de thu: "+muon);
+  if(chua.length)console.log("     con no: "+chua.join(" · "));
+  t("mọi việc đã vào ngăn kéo đều MỞ THẬT được và không nút nào truyền khoá rỗng",
+    !xau.length, xau.slice(0,4).join(" · "));
+  t("mọi việc hoặc làm được tại chỗ, hoặc khai được vì sao phải sang trang",
+    !chua.length, chua.slice(0,4).join(" · "));
  })();
+
  /* mọi việc phải có nút mở đúng chỗ làm - biết việc mà không tới được chỗ xử vẫn là ngõ cụt */
  var khongGo=(VIECTT||[]).filter(function(v){return typeof v.go!=="function"});
  t("mọi việc đều có nút mở chỗ xử lý", !khongGo.length, khongGo.map(function(v){return v.t}).join(" · "));
