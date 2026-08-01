@@ -1151,6 +1151,23 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 /* V9.68: dấu chấm hỏi nhỏ sau đoạn ngắn - báo là còn phần giải thích khi rê chuột. */
 .gytip{border-bottom:1px dotted var(--muted);cursor:help}
 .gyti{font-size:12px;margin-left:4px;opacity:.65;vertical-align:1px}
+/* ── Bàn làm việc theo thực thể (V9.69) ── */
+.banrow{display:flex;align-items:center;gap:11px;padding:10px 4px;border-top:1px solid var(--line);cursor:pointer}
+.banrow:first-child{border-top:0}
+.banrow:hover{background:#FAFBFD}
+.bani{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none}
+.banmain{flex:1;min-width:0}
+.bant{font-size:13px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.banm{font-size:11px;color:var(--muted);margin-top:1px}
+.banviec{flex:none;display:flex;align-items:center;max-width:52%}
+.banch{color:var(--muted);flex:none;font-size:16px}
+.banjob{display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid var(--line)}
+.banji{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none;background:var(--gray);color:#5A6675}
+.banji.do{background:var(--redb);color:var(--red)}
+.banji.ho{background:var(--amberb);color:var(--amber)}
+.banjt{flex:1;min-width:0;font-size:12.5px;font-weight:700;color:var(--ink)}
+.segn{margin-left:6px;background:var(--navy);color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700}
+@media(max-width:560px){.banviec{max-width:100%;flex:1 1 100%;margin-left:45px}.banrow{flex-wrap:wrap}}
 .notebar{display:block;background:var(--amberb);border:1px solid #F2D9AE;color:#7A4E0A;font-size:12px;font-weight:600;line-height:1.65;padding:10px 14px;border-radius:8px;margin-bottom:14px}
 .hellomask{position:fixed;inset:0;background:rgba(15,25,40,.45);z-index:340;display:flex;align-items:center;justify-content:center;padding:20px}
 .hellobox{background:#fff;border-radius:16px;max-width:480px;width:100%;padding:26px 26px 20px;text-align:center;box-shadow:0 24px 60px rgba(10,22,40,.28)}
@@ -2176,6 +2193,7 @@ complaint_status:"enum_complaint_status",achievement_status:"enum_achievement_st
 var PAGES=[
 /* ===== V5.2 - trang chủ Bàn làm việc ===== */
 {k:"banlam",g:"Vận hành",ic:"ti-home",t:"Trang bắt đầu",c:"Việc hôm nay + bảng chặng hành trình",ty:"custom"},
+{k:"ban",g:"Vận hành",ic:"ti-focus-2",t:"Bàn làm việc",c:"Mở một khách, học viên hay lớp là thấy trọn việc của bạn với họ",ty:"custom"},
 {k:"giaoviec",g:"Vận hành",ic:"ti-clipboard-list",t:"Giao việc",c:"Giao - phối hợp - nhờ hỗ trợ",ty:"custom"},
 {k:"chay",g:"_",hide:1,ic:"ti-player-play",t:"Chạy quy trình",c:"Dắt từng bước theo hành trình",ty:"custom"},
 {k:"chang",g:"_",hide:1,ic:"ti-route",t:"Tổng quan chặng",c:"Bản đồ một chặng vòng đời",ty:"custom"},
@@ -2895,6 +2913,10 @@ function colMenuHTML(key){var cfg=LISTCFG[key];if(window.COLMENU!==key)return ''
    Bộ kiểm _checkux canh: dải nào gọi statStrip mà không khai ở đây là đỏ; số thẻ khai lệch với
    số thẻ vẽ ra thật cũng đỏ; thẻ nào còn onclick cũng đỏ. */
 var THEDEF={
+ ban:{t:"Bàn làm việc",the:[
+  ["ban_co","Còn việc của tôi","Số hồ sơ trong phạm vi của bạn mà chức danh của bạn còn việc phải làm với họ. Muốn xem danh sách: chính bảng ngay dưới dải này."],
+  ["ban_gap","Có việc gấp","Trong số hồ sơ còn việc, đếm riêng những hồ sơ có ít nhất một việc mức ĐỎ - làm trước. Muốn xem danh sách: bảng dưới xếp hồ sơ có việc gấp lên đầu."],
+  ["ban_sach","Đang sạch việc","Hồ sơ bạn thấy nhưng không còn việc nào của bạn - không cần đụng tới. Đây là con số ta MUỐN nó lớn. Muốn xem danh sách: bảng dưới chỉ liệt kê hồ sơ CÒN việc, nên phần còn lại chính là nhóm này."]]},
  viec:{t:"Việc hôm nay",the:[
   ["vc_red","Quá hạn","Đếm những việc đã QUÁ hạn SLA - mỗi loại việc một luật hạn riêng, tất cả đặt ở Cài đặt nhóm Ngưỡng &amp; SLA. Muốn xem danh sách: bấm chip 'Quá hạn' ở thanh Mức độ ngay dưới."],
   ["vc_amber","Sắp tới hạn","Đếm những việc CHƯA quá hạn nhưng sắp tới nơi - còn kịp làm hôm nay. Muốn xem danh sách: bấm chip 'Sắp tới hạn' ở thanh Mức độ ngay dưới."],
@@ -13792,7 +13814,7 @@ var GOIYDEF={};
 /* Đoạn nào hiện ở màn nào - để người sửa biết mình đang sửa dòng ở đâu. */
 /* Bấm 'Xem tại chỗ' thì mở đúng màn đang chứa dòng đó. */
 var GOIYPG={gy_ay_la_cac_cau_3fed:"window.SETTAB='ch4';reRender('settings')",gy_ay_la_nguong_at_f276:"window.SETTAB='ch6';reRender('settings')",gy_cau_nhac_viec_chuan_281e:"window.SETTAB='ch4';reRender('settings')",gy_chi_quan_ly_giam_63c5:"window.SETTAB='ch2';reRender('settings')",gy_danh_muc_lua_chon_293d:"window.SETTAB='ch1';reRender('settings')",gy_email_dung_e_ang_eb0e:"window.SETTAB='staff';reRender('settings')",gy_hop_nay_tra_loi_5ff9:"go('hoidap')",gy_khoa_hoc_la_cau_1eb3:"window.SETTAB='khoa';reRender('settings')",gy_lop_nay_chua_co_a916:"go('banglop')",gy_nguoi_nay_la_giang_ade7:"go('hosonv')",gy_oi_ten_logo_va_844c:"window.SETTAB='brand';reRender('settings')",gy_phan_quyen_co_ba_7c33:"window.SETTAB='phanquyen';reRender('settings')",gy_ung_nhung_gi_hoc_ef1d:"go('hoso')"};
-var GOIYO={gy_chua_ban_duoc_dong_4b71:"Bảng danh mục - cột tính tiền",gy_khoa_chua_co_don_9c28:"Bảng danh mục - cột đếm đơn",gy_chua_co_hoat_dong_3e05:"Bảng danh mục - cột lâu chưa hoạt động",gy_ay_la_cac_cau_3fed:"Cài đặt",gy_ay_la_nguong_at_f276:"Cài đặt",gy_cau_nhac_viec_chuan_281e:"Cài đặt",gy_chi_quan_ly_giam_63c5:"Cài đặt",gy_chon_mot_muc_ben_d524:"Màn pickerPage",gy_chon_nguoi_nhan_app_6ef8:"Màn tkNew",gy_danh_muc_lua_chon_293d:"Cài đặt",gy_email_dung_e_ang_eb0e:"Cài đặt",gy_ho_so_chua_ghi_1990:"Màn riskCare",gy_hop_nay_tra_loi_5ff9:"Trang Hỏi đáp",gy_khach_ngung_khong_phai_0425:"Màn ReupTab",gy_khoa_hoc_la_cau_1eb3:"Cài đặt",gy_lop_nay_chua_co_a916:"Vận hành lớp",gy_nguoi_nay_la_giang_ade7:"Hồ sơ Nhân viên",gy_oi_ten_logo_va_844c:"Cài đặt",gy_phan_quyen_co_ba_7c33:"Cài đặt",gy_ung_nhung_gi_hoc_ef1d:"Hồ sơ 360 học viên"};
+var GOIYO={gy_ban_lam_viec_tt01:"Trang Bàn làm việc",gy_chua_ban_duoc_dong_4b71:"Bảng danh mục - cột tính tiền",gy_khoa_chua_co_don_9c28:"Bảng danh mục - cột đếm đơn",gy_chua_co_hoat_dong_3e05:"Bảng danh mục - cột lâu chưa hoạt động",gy_ay_la_cac_cau_3fed:"Cài đặt",gy_ay_la_nguong_at_f276:"Cài đặt",gy_cau_nhac_viec_chuan_281e:"Cài đặt",gy_chi_quan_ly_giam_63c5:"Cài đặt",gy_chon_mot_muc_ben_d524:"Màn pickerPage",gy_chon_nguoi_nhan_app_6ef8:"Màn tkNew",gy_danh_muc_lua_chon_293d:"Cài đặt",gy_email_dung_e_ang_eb0e:"Cài đặt",gy_ho_so_chua_ghi_1990:"Màn riskCare",gy_hop_nay_tra_loi_5ff9:"Trang Hỏi đáp",gy_khach_ngung_khong_phai_0425:"Màn ReupTab",gy_khoa_hoc_la_cau_1eb3:"Cài đặt",gy_lop_nay_chua_co_a916:"Vận hành lớp",gy_nguoi_nay_la_giang_ade7:"Hồ sơ Nhân viên",gy_oi_ten_logo_va_844c:"Cài đặt",gy_phan_quyen_co_ba_7c33:"Cài đặt",gy_ung_nhung_gi_hoc_ef1d:"Hồ sơ 360 học viên"};
 function goiy(k,vb){if(!(k in GOIYDEF))GOIYDEF[k]=vb;
  var g=(DATA.config&&DATA.config.goiy)||{};
  var v=g[k];return (v==null||v==="")?vb:String(v)}
@@ -15109,6 +15131,13 @@ var TOURS={
     ("anh muốn xem có bao nhiêu khiếu nại về lịch học"). Dạy một sổ là dạy được cả họ: chúng
     dùng chung một bộ công cụ. Và hộp Trợ lý - thứ trả lời nhanh nhất trong app - trước nay chỉ
     được giới thiệu một dòng ở màn chào, không có bài nào. */
+ /* V9.69 - bài đầu tiên của app. Bàn làm việc là TRỤC MỚI, mà trục mới thì phải dạy trước
+    mọi thứ khác - nếu không người dùng vẫn quay về thói quen đi tìm theo trang. */
+ tq_ban:{lv:"thamquan",t:"Bàn làm việc - mở một người, làm hết việc",ic:"ti-focus-2",d:"4 bước - thực thể trung tâm của từng giai đoạn",steps:[
+  {p:"ban",sel:'@phead',t:"Mỗi giai đoạn có một thực thể trung tâm",d:"Khi chưa học, KHÁCH là trung tâm - mọi việc nhằm đưa họ vào lớp. Khi đã học, LỚP và HỌC VIÊN là trung tâm. Khối Nhân sự thì làm việc với GIẢNG VIÊN. Bàn làm việc gom theo đúng cách đó.",hint:"Bấm Tiếp theo."},
+  {p:"ban",sel:'@bantt',t:"Chọn thực thể bạn đang làm việc cùng",d:"App tự mở sẵn thực thể hợp với chức danh của bạn: tư vấn thì Khách, học vụ và giảng viên thì Lớp, nhân sự thì Giảng viên. Con số trên mỗi nút là số hồ sơ còn việc của riêng bạn.",hint:"Bấm thử một thực thể khác để so."},
+  {p:"ban",sel:'@bstats',t:"Ba con số của bàn",d:"Bao nhiêu hồ sơ còn việc của tôi, bao nhiêu có việc gấp, bao nhiêu đang sạch. Hồ sơ sạch là hồ sơ không cần đụng tới - đó mới là đích.",hint:"Nhìn ba ô."},
+  {p:"ban",sel:'@phead',t:"Mở một hồ sơ là thấy trọn việc",d:"Bấm một dòng: app hiện hồ sơ gọn và TẤT CẢ việc mà chức danh của bạn được làm với người đó, theo bảng phân quyền CH3 của SOP. Mỗi việc một nút - làm ngay, không phải đi tìm trang.",hint:"Xong phần Bàn làm việc!"}]},
  tq_sotracuu:{lv:"thamquan",t:"Sổ tra cứu - tìm gì cũng ra",ic:"ti-list-search",d:"5 bước - bộ lọc nhiều trục, chọn cột, xuất file",steps:[
   {p:"dskhieunai",sel:'@phead',t:"Sổ tra cứu là gì",d:"Mỗi bảng dữ liệu của SOP có một sổ tra cứu riêng: khiếu nại, bài tập, điểm danh, buổi WOW, phiếu thu... Sổ là nơi TRA, còn nơi LÀM là các trang nghiệp vụ - nút đầu trang luôn chỉ sang đó.",hint:"Nhìn dòng phụ đề: nó ghi rõ sổ này đọc bảng DL nào."},
   {p:"dskhieunai",sel:'@tbarct',t:"Lọc nhiều trục cùng lúc",d:"Muốn biết có bao nhiêu khiếu nại về lịch học? Bấm Bộ lọc rồi chọn Loại khiếu nại. Mỗi sổ tự dựng trục lọc theo đúng cột của bảng đó - trạng thái, loại, mức độ, cơ sở, khoảng ngày - nên không sổ nào thiếu đường tìm.",hint:"Bấm nút Bộ lọc, chọn một giá trị rồi xem số dòng đổi."},
@@ -16999,6 +17028,15 @@ var QASO=[
    return {so:L.length?num(L[0].tong):0,don:"đầu việc của người đứng đầu",go:"go('nhansu')",nut:"Mở màn Nhân sự",
     giai:"Cộng lead đang chăm, phiếu chờ chấm, tư vấn, nhập học, khiếu nại và việc nội bộ của từng người.",
     hang:qaHang(L,function(r){return r.ten},function(r){return r.vai+" · "+r.tong+" đầu việc"},null,5)}}},
+ {k:"banlv",t:"Hồ sơ còn việc của tôi",ic:"ti-focus-2",
+  tu:["ban lam viec","ho so con viec","ai con viec","con viec cua toi","toi phu trach ai","danh sach cua toi"],
+  fn:function(){var k=ttMacDinh(),T=TTBK[k],ds=[];try{ds=ttDanhSach(k)}catch(e){}
+   var cv=ds.filter(function(z){return z.viec.length});
+   return {so:cv.length,don:T.t.toLowerCase()+" còn việc",phu:"trong "+ds.length+" hồ sơ bạn thấy",
+    go:"go('ban')",nut:"Mở Bàn làm việc",
+    giai:"Thực thể trung tâm của chức danh bạn là "+T.t+". Chỉ đếm việc mà bảng phân quyền CH3 giao cho bạn.",
+    hang:qaHang(cv,function(z){return z.ten},function(z){return z.gd+" · "+z.viec.length+" việc: "+z.viec[0].t},
+     function(z){return "window.BANTT='"+k+"';window.BANMO='"+z.ma+"';go('ban')"})}}},
  {k:"viectoi",t:"Việc của tôi hôm nay",ic:"ti-checklist",
   tu:["toi phai lam gi","viec cua toi","hom nay lam gi","toi lam gi","viec hom nay","dau viec cua toi"],
   fn:function(){var L=[];try{L=bellItems()}catch(e){}
@@ -17240,7 +17278,339 @@ function renderHoidap(){
   '<button class="btn" onclick="window.SETTAB=\'qa\';go(\'settings\')"><i class="ti ti-settings"></i>Mở sổ câu hỏi trong Cài đặt</button></div>';
  h+='</div></div>';
  return h}
-var RENDER={hoidap:renderHoidap,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+   BÀN LÀM VIỆC THEO THỰC THỂ (V9.69) - anh Luân đặt 01/08
+   ═══════════════════════════════════════════════════════════════════════════════════════════
+   > *"Có các chủ thể: học viên, phụ huynh, lớp học, giảng viên, các team khác. Em có thấy, mỗi
+   > một giai đoạn đều có 1 thực thể là trung tâm ko? Khi chưa học, lead là trung tâm... giai đoạn
+   > khi họ là học viên, hầu như toàn bộ nghiệp vụ là cho lớp học và học viên... Ngoài ra, mỗi một
+   > cổng của từng team, lại gom tất cả nghiệp vụ riêng của họ cho từng thực thể và giai đoạn."*
+
+   VÌ SAO ĐÂY LÀ THAY ĐỔI LỚN NHẤT VỀ CÁCH TỔ CHỨC APP:
+   Đo hiện trạng trước khi làm - app đang gom màn hình theo ĐỘNG TỪ (nghiệp vụ):
+       Tra cứu 15 trang · Chặng·Tuyển sinh 1 · Chặng·Học tập 4 · Chặng·CSKH 2 · Quản lý 6
+   15 sổ Tra cứu là 15 BẢNG DỮ LIỆU, không phải 15 thực thể. Và một nhân viên tư vấn phải biết
+   BẢY trang (nhaplead · test · tuvan · thanhtoan · xeplop · hoso · chay) chỉ để phục vụ trọn vẹn
+   MỘT người khách. Mỗi lần đổi việc là một lần đổi trang, và mỗi lần đổi trang là một lần phải
+   tìm lại đúng người đó.
+
+   Màn này lật ngược trục: gom theo DANH TỪ. Mở MỘT thực thể ra là thấy TẤT CẢ việc mà CHỨC DANH
+   CỦA TÔI phải làm với nó, ở đúng giai đoạn nó đang đứng - làm ngay tại chỗ, không đổi trang.
+
+   BA CHỖ NEO, không dựng lại luật nào:
+   · AI ĐƯỢC LÀM  -> `canAct` đọc bảng CH3 của SOP (31 hành động x chức danh).
+   · CÒN PHẢI LÀM -> hàm điều kiện đọc thẳng dữ liệu, cùng phép đếm với thẻ và chuông.
+   · ĐANG Ở ĐÂU   -> `jInfo`/`jStageOf` cho người, `class_status` cho lớp.
+
+   LUẬT CỦA CHÍNH KHỐI NÀY: **giai đoạn để NHÌN, điều kiện để LỌC.** Việc hiện ra hay không do
+   ĐIỀU KIỆN quyết định, không do giai đoạn - vì cùng một giai đoạn vẫn có người cần việc này,
+   người không. Lọc theo giai đoạn là dựng thêm một sự thật thứ hai cạnh điều kiện, và hai sự
+   thật cạnh nhau thì sẽ trôi khỏi nhau. Giai đoạn chỉ dùng để hiện cái chip cho người đọc biết
+   mình đang đứng ở đâu trong hành trình.
+   ═══════════════════════════════════════════════════════════════════════════════════════════ */
+var TTHE=[
+ {k:"khach",  t:"Khách",     ic:"ti-user-plus",  bang:"DL02", ma:"lead_id",    ten:"full_name",
+  col:"#3B82C4", d:"Giai đoạn chưa học. Mọi việc đều nhằm một đích: đưa họ vào lớp."},
+ {k:"hocvien",t:"Học viên",  ic:"ti-user-check", bang:"DL09", ma:"student_id", ten:"full_name",
+  col:"#0D9488", d:"Giai đoạn đang học, tạm dừng hoặc đã xong khóa. Việc xoay quanh chính người học."},
+ {k:"lop",    t:"Lớp",       ic:"ti-chalkboard", bang:"DL10", ma:"class_id",   ten:"class_name",
+  col:"#6B4FA0", d:"Đơn vị vận hành hằng ngày của giảng dạy - buổi, điểm danh, bài tập, nhận xét."},
+ /* Anh Luân kể tên cả "giảng viên" và "các team khác" trong danh sách chủ thể. Giảng viên là
+    thực thể của khối Nhân sự và Quản lý - họ không làm việc với học viên, họ làm việc với NGƯỜI
+    DẠY. Thiếu thực thể này thì Nhân sự mở Bàn làm việc ra thấy màn trống, mà họ vẫn có việc. */
+ {k:"giangvien",t:"Giảng viên",ic:"ti-user-star",bang:"DL01",ma:"staff_id",ten:"full_name",
+  col:"#B58A2B", d:"Người dạy - hồ sơ, bảng công, khối lượng lớp đang gánh."}];
+var TTBK={};TTHE.forEach(function(x){TTBK[x.k]=x});
+/* Chức danh nào mở app ra thì đứng ở thực thể nào trước - đúng thứ họ làm cả ngày. */
+var TTMAC={tuvan:"khach",marketing:"khach",hocvu:"lop",giaovien:"lop",wow:"khach",ketoan:"hocvien",
+ hotro:"hocvien",nhansu:"giangvien",dieuhanh:"khach",quantri:"khach"};
+function ttMacDinh(){var g=(SCOPE().group||"quantri");var v=TTMAC[g]||"khach";
+ return TTBK[v]?v:"hocvien"}
+
+/* ── BẢNG VIỆC THEO THỰC THỂ ────────────────────────────────────────────────────────────────
+   Mỗi dòng: {tt, act, vai, t, ic, sev, khi, go}
+   · `act` = mã hành động trong CH3 -> quyền lấy thẳng từ SOP, không khai lại.
+   · `vai` chỉ dùng cho việc SOP KHÔNG xếp vào CH3 (tư vấn sau test, nhập kết quả đầu ra...) -
+     khai thẳng ai làm, để không có việc nào rơi vào diện "ai cũng thấy".
+   · `khi(r)` trả về true khi hồ sơ NÀY còn phải làm việc đó. Đọc thẳng dữ liệu.
+   · `go(r)` trả về chuỗi onclick - mở đúng chỗ làm việc đó, mang theo hồ sơ. */
+function ttSo(bang,fn){try{return rows(bang).filter(fn)}catch(e){return []}}
+function ttTestCua(lid){return ttSo("DL03",function(r){return String(r.lead_id||"")===String(lid)})}
+function ttDonCua(sid){return ttSo("DL06",function(e){return String(e.student_id||"")===String(sid)&&!isc(e.enrollment_status,"cancelled")})}
+function ttBuoiLop(cid){return ttSo("DL11",function(x){return String(x.class_id||"")===String(cid)})}
+var VIECTT=[
+ /* ─── KHÁCH · chặng C1 ─────────────────────────────────────────────────────────────────── */
+ {tt:"khach",act:"lead_edit",t:"Gọi / nhắn lần đầu",ic:"ti-phone",sev:"red",
+  khi:function(l){return isc(l.lead_status,"new")},
+  go:function(l){return "runStart('"+esc(l.lead_id)+"')"}},
+ {tt:"khach",act:"lead_edit",t:"Tới hẹn liên hệ lại",ic:"ti-phone-call",sev:"amber",
+  khi:function(l){var d=pvnd(l.next_followup_time);
+   return !!d&&d.getTime()<=endToday().getTime()&&isc(l.lead_status,"contacted","considering","no_response")},
+  go:function(l){return "runStart('"+esc(l.lead_id)+"')"}},
+ {tt:"khach",act:"test_book",t:"Đặt lịch test đầu vào",ic:"ti-calendar-plus",sev:"amber",
+  khi:function(l){return isc(l.lead_status,"contacted","considering")&&!ttTestCua(l.lead_id).length},
+  go:function(l){return "goTS('test')"}},
+ {tt:"khach",act:"test_nhac",t:"Nhắc lịch test",ic:"ti-bell-ringing",sev:"",
+  khi:function(l){var t0=new Date();
+   return ttTestCua(l.lead_id).some(function(r){var d=pvnd(r.test_date);
+    return isc(r.booking_status,"booked")&&!String(r.test_attendance_status||"").trim()&&d&&d>t0})},
+  go:function(l){return "goTS('test')"}},
+ {tt:"khach",act:"test_att",t:"Điểm danh buổi test",ic:"ti-user-check",sev:"amber",
+  khi:function(l){var t0=new Date();
+   return ttTestCua(l.lead_id).some(function(r){var d=pvnd(r.test_date);
+    return isc(r.booking_status,"booked")&&!String(r.test_attendance_status||"").trim()&&d&&d<=t0})},
+  go:function(l){return "goTS('test')"}},
+ {tt:"khach",act:"test_grade",t:"Chấm bài test",ic:"ti-file-check",sev:"red",
+  khi:function(l){return ttTestCua(l.lead_id).some(function(r){
+    return isc(r.test_attendance_status,"on_time","late")&&!isc(r.test_status,"graded")})},
+  go:function(l){return "goTS('test')"}},
+ {tt:"khach",act:"test_rebook",t:"Đặt lại test sau khi vắng",ic:"ti-calendar-repeat",sev:"amber",
+  khi:function(l){var T=ttTestCua(l.lead_id);
+   return T.some(function(r){return isc(r.test_attendance_status,"no_show")})&&
+    !T.some(function(r){return isc(r.booking_status,"booked")&&!String(r.test_attendance_status||"").trim()})},
+  go:function(l){return "goTS('test')"}},
+ {tt:"khach",vai:["tuvan"],t:"Tư vấn sau khi có kết quả",ic:"ti-messages",sev:"red",
+  khi:function(l){return ttTestCua(l.lead_id).some(function(r){
+    return num(r.overall_score)>0&&!isc(r.post_test_status,"consulted")})},
+  go:function(l){return "runStart('"+esc(l.lead_id)+"')"}},
+ {tt:"khach",act:"pay_ghi",t:"Thu học phí / đặt cọc",ic:"ti-cash",sev:"amber",
+  khi:function(l){return ttSo("DL06",function(e){return String(e.lead_id||"")===String(l.lead_id)&&
+    num(e.remaining_amount)>0&&!isc(e.enrollment_status,"cancelled")}).length>0},
+  go:function(l){return "goTS('thanhtoan')"}},
+
+ /* ─── HỌC VIÊN · chặng C2-C4 ───────────────────────────────────────────────────────────── */
+ {tt:"hocvien",act:"xeplop",t:"Xếp lớp cho học viên",ic:"ti-layout-grid-add",sev:"red",
+  khi:function(S){return ttDonCua(S.student_id).length>0&&
+   !ttSo("DL08",function(o){return String(o.student_id||"")===String(S.student_id)}).length},
+  go:function(S){return "go('xeplop')"}},
+ {tt:"hocvien",act:"xeplop",t:"Nhập học chưa xong",ic:"ti-progress",sev:"amber",
+  khi:function(S){return ttSo("DL08",function(o){return String(o.student_id||"")===String(S.student_id)&&
+   !isc(o.onboarding_status,"completed")}).length>0},
+  go:function(S){return "go('xeplop')"}},
+ {tt:"hocvien",act:"risk_flag",t:"Học viên đang có nguy cơ",ic:"ti-user-exclamation",sev:"red",
+  khi:function(S){return stuRisk(S)},
+  go:function(S){return "window.HOSO='"+esc(S.student_id)+"';go('hoso')"}},
+ {tt:"hocvien",act:"wow_book",t:"Đặt buổi WOW kèm riêng",ic:"ti-star",sev:"amber",
+  khi:function(S){var q=null;try{q=wowQuotaOf(S.student_id)}catch(e){}
+   return stuAca(S)&&!!q&&num(q.free)>0},
+  go:function(S){return "goHT('wow')"}},
+ {tt:"hocvien",act:"wow_ban",t:"Đã hết lượt WOW - mời mua thêm",ic:"ti-shopping-cart",sev:"",
+  khi:function(S){var q=null;try{q=wowQuotaOf(S.student_id)}catch(e){}
+   return stuAca(S)&&!!q&&num(q.free)<=0},
+  go:function(S){return "goHT('wow')"}},
+ {tt:"hocvien",act:"fb_ghi",t:"Phản hồi chưa phân loại",ic:"ti-message-2",sev:"amber",
+  khi:function(S){return ttSo("DL16",function(f){return String(f.student_id||"")===String(S.student_id)&&
+   !String(f.classified_at||"").trim()}).length>0},
+  go:function(S){return "goCS('phanhoi')"}},
+ {tt:"hocvien",act:"kn_mo",t:"Khiếu nại đang xử lý",ic:"ti-alert-triangle",sev:"red",
+  khi:function(S){return ttSo("DL17",function(c){return String(c.student_id||"")===String(S.student_id)&&
+   !isc(c.complaint_status,"resolved")}).length>0},
+  go:function(S){return "goCS('khieunai')"}},
+ {tt:"hocvien",act:"pay_ghi",t:"Còn nợ học phí",ic:"ti-cash",sev:"amber",
+  khi:function(S){return ttDonCua(S.student_id).some(function(e){return num(e.remaining_amount)>0})},
+  go:function(S){return "goTS('thanhtoan')"}},
+ {tt:"hocvien",act:"baoluu",t:"Bảo lưu chờ phê duyệt",ic:"ti-player-pause",sev:"amber",
+  khi:function(S){return isc(S.student_status,"transferred")},
+  go:function(S){return "go('baoluu')"}},
+ {tt:"hocvien",vai:["hocvu"],t:"Nhập kết quả đầu ra",ic:"ti-award",sev:"amber",
+  khi:function(S){return ttSo("DL18",function(x){return String(x.student_id||"")===String(S.student_id)&&
+   String(x.course_completion_time||"").trim()&&!String(x.final_test_score||"").trim()}).length>0},
+  go:function(S){return "go('ketthuc')"}},
+ {tt:"hocvien",vai:["tuvan"],t:"Mời học tiếp",ic:"ti-mail-forward",sev:"amber",
+  khi:function(S){return ttSo("DL18",function(x){return String(x.student_id||"")===String(S.student_id)&&
+   String(x.course_completion_time||"").trim()&&!String(x.re_enrollment_contact_time||"").trim()&&
+   !isc(x.re_enrollment_status,"confirmed_with_deposit","rejected")}).length>0},
+  go:function(S){return "go('ketthuc')"}},
+
+ /* ─── LỚP · chặng C2 ───────────────────────────────────────────────────────────────────── */
+ {tt:"lop",act:"diemdanh",t:"Buổi hôm nay chưa điểm danh",ic:"ti-checkbox",sev:"red",
+  khi:function(C){var t0=new Date();
+   return ttBuoiLop(C.class_id).some(function(x){var d=pvnd(x.session_date);
+    return d&&sameDay(d,t0)&&!isc(x.session_status,"cancelled")&&
+     !ttSo("DL12",function(a){return String(a.session_id||"")===String(x.session_id)}).length})},
+  go:function(C){return "openLop('"+esc(C.class_id)+"')"}},
+ {tt:"lop",act:"tnote",t:"Buổi còn nợ nhận xét",ic:"ti-notes",sev:"amber",
+  khi:function(C){return ttBuoiLop(C.class_id).some(function(x){var st=bhState(x);return st.done&&!st.note})},
+  go:function(C){return "openLop('"+esc(C.class_id)+"')"}},
+ {tt:"lop",act:"baitap",t:"Bài tập chờ chấm",ic:"ti-book",sev:"amber",
+  khi:function(C){return ttSo("DL13",function(r){return String(r.class_id||"")===String(C.class_id)&&
+   hwSubmitted(r)&&!hwGraded(r)}).length>0},
+  go:function(C){return "go('baitap')"}},
+ {tt:"lop",vai:["hocvu"],t:"Sắp khai giảng mà thiếu sĩ số",ic:"ti-users",sev:"red",
+  khi:function(C){if(!isc(C.class_status,"open","planning"))return false;
+   var d=pvnd(C.class_start_date);if(!d)return false;
+   var con=(d.getTime()-Date.now())/864e5, ngay=num(paramOf("thresholdClassStart_days",21))||21;
+   return con>=0&&con<=ngay&&num(C.current_enrollment)<num(paramOf("classMinStudents",6))},
+  go:function(C){return "go('banglop')"}},
+ /* ─── GIẢNG VIÊN · thực thể của khối Nhân sự & Quản lý ─────────────────────────────────── */
+ {tt:"giangvien",vai:["nhansu"],t:"Hồ sơ còn thiếu chức danh / cơ sở",ic:"ti-id-badge",sev:"amber",
+  khi:function(G){return !String(G.branch||"").trim()||!String(G.role||"").trim()},
+  go:function(G){return "go('nhansu')"}},
+ {tt:"giangvien",vai:["nhansu"],t:"Buổi đã dạy còn thiếu mốc giờ",ic:"ti-clock-exclamation",sev:"amber",
+  khi:function(G){return ttSo("DL11",function(x){return String(x.teacher_id||"")===String(G.staff_id)&&
+   isc(x.session_status,"completed")&&
+   !(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())}).length>0},
+  go:function(G){return "window.GVTAB='cong';go('giangvien')"}},
+ {tt:"giangvien",vai:["nhansu"],t:"Chưa có email đăng nhập",ic:"ti-mail",sev:"",
+  khi:function(G){return !String(G.email||"").trim()},
+  go:function(G){return "go('nhansu')"}},
+ {tt:"giangvien",act:"tnote",t:"Đang nợ nhận xét buổi",ic:"ti-notes",sev:"red",
+  khi:function(G){return ttSo("DL11",function(x){return String(x.teacher_id||"")===String(G.staff_id)&&
+   (function(){var st=bhState(x);return st.done&&!st.note})()}).length>0},
+  go:function(G){return "window.GVTAB='ds';go('giangvien')"}},
+ {tt:"lop",act:"tnote",t:"Buổi thiếu mốc giờ vào/ra",ic:"ti-clock-exclamation",sev:"",
+  khi:function(C){return ttBuoiLop(C.class_id).some(function(x){return isc(x.session_status,"completed")&&
+   !(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())})},
+  go:function(C){return "window.GVTAB='cong';go('giangvien')"}}];
+
+/* Ai được làm việc này: có mã CH3 thì hỏi CH3, không có thì hỏi bản khai `vai`. Một trong hai,
+   không bao giờ để trống - việc không khai ai làm là việc mọi người cùng thấy và không ai nhận. */
+function ttDuocLam(v){
+ if(v.act)return canAct(v.act);
+ var g=SCOPE().group||"quantri";
+ if(g==="quantri"||g==="dieuhanh")return true;
+ return (v.vai||[]).indexOf(g)>=0}
+/* Việc CỦA TÔI với hồ sơ này. Thứ tự: đỏ trước, rồi hổ phách, rồi thường. */
+var TTSEV={red:0,amber:1,"":2};
+function ttViec(ttk,r){
+ var out=[];
+ VIECTT.forEach(function(v){
+  if(v.tt!==ttk||!ttDuocLam(v))return;
+  var co=false;try{co=!!v.khi(r)}catch(e){co=false}
+  if(co)out.push(v)});
+ return out.sort(function(a,b){return (TTSEV[a.sev||""]-TTSEV[b.sev||""])})}
+/* Giai đoạn - CHỈ ĐỂ NHÌN. Người thì hỏi bộ máy chặng, lớp thì đọc trạng thái lớp. */
+function ttGiaiDoan(ttk,r){
+ try{
+  if(ttk==="lop")return elabel(r.class_status)||ecode(r.class_status)||"chưa khai";
+  var pid=(ttk==="khach")?r.lead_id:r.student_id;
+  var J=jInfo(pid);return (J&&J.S&&J.S.t)||"-";
+ }catch(e){return "-"}}
+function ttTen(ttk,r){var T=TTBK[ttk];return String((T&&r[T.ten])||"")||"(chưa đặt tên)"}
+function ttMa(ttk,r){var T=TTBK[ttk];return String((T&&r[T.ma])||"")}
+/* Danh sách thực thể TRONG PHẠM VI CỦA TÔI, xếp việc nhiều lên trước. */
+function ttDanhSach(ttk){
+ var T=TTBK[ttk];if(!T)return [];
+ /* V9.69 - PHẠM VI KHÔNG PHẢI LÀ ĐIỀU KIỆN DUY NHẤT ĐỂ HỒ SƠ LÊN BÀN.
+    Đã cắn ngay lần đo đầu: NV WOW mở Bàn làm việc ra TRỐNG TRƠN ở cả ba thực thể, vì phạm vi dữ
+    liệu của họ là "chỉ của tôi" mà họ không sở hữu lead nào - trong khi việc thật của họ là CHẤM
+    PHIẾU TEST của những lead ấy. Hồ sơ phải lên bàn khi: nó thuộc phạm vi của tôi, HOẶC tôi có
+    việc phải làm với nó. Vế sau mới là vế đúng nghiệp vụ - việc tìm tới người, không phải người
+    đi tìm việc. */
+ var tat=[];try{tat=rows(T.bang)}catch(e){tat=[]}
+ if(ttk==="giangvien")tat=tat.filter(function(x){try{return isGVRole(x)&&staffActive(x)}catch(e){return false}});
+ var ds=tat.filter(function(r){
+  var trong=false;try{trong=canRow(T.bang,r)}catch(e){trong=true}
+  if(trong)return true;
+  return ttViec(ttk,r).length>0});
+ return ds.map(function(r){var v=ttViec(ttk,r);
+   return {r:r,ma:ttMa(ttk,r),ten:ttTen(ttk,r),gd:ttGiaiDoan(ttk,r),viec:v,
+     do_:v.filter(function(x){return x.sev==="red"}).length}})
+  .sort(function(a,b){return (b.do_-a.do_)||(b.viec.length-a.viec.length)||a.ten.localeCompare(b.ten)})}
+
+
+/* ── MÀN BÀN LÀM VIỆC ──────────────────────────────────────────────────────────────────────
+   Hai mức, không hơn: DANH SÁCH thực thể của tôi -> MỞ MỘT thực thể ra làm.
+   Không làm mức thứ ba: mỗi lần thêm một mức là thêm một lần người dùng phải nhớ mình đang ở
+   đâu, mà cả màn này sinh ra để bớt đúng chuyện đó. */
+function banChon(k){window.BANTT=k;window.BANMO="";reRender("ban")}
+function banMo(ma){window.BANMO=ma;reRender("ban")}
+function banDong(){window.BANMO="";reRender("ban")}
+function banTT(){var k=window.BANTT||ttMacDinh();return TTBK[k]?k:"khach"}
+function renderBan(){
+ var ttk=banTT(), T=TTBK[ttk];
+ var h=pageHead("Bàn làm việc","Mở một "+T.t.toLowerCase()+" là thấy trọn việc của bạn với người đó",
+  '<button class="btn" onclick="go(\'hanhtrinh\')"><i class="ti ti-route"></i>Xem theo chặng</button>');
+ h+='<div class="notebar"><i class="ti ti-focus-2"></i>'+goiyG("gy_ban_lam_viec_tt01",
+  'Mỗi giai đoạn có <b>một thực thể trung tâm</b>. Chọn thực thể, mở một hồ sơ, làm hết việc của bạn ngay tại đó.||'+
+  'Chưa học thì khách là trung tâm; đang học thì lớp và học viên là trung tâm. App chỉ hiện những việc mà chức danh của bạn được làm theo bảng phân quyền CH3, và chỉ những việc hồ sơ đó còn thiếu.')+'</div>';
+ /* chọn thực thể */
+ h+='<div class="tbar" data-tour="bantt">'+TTHE.map(function(x){
+  var n=0;try{n=ttDanhSach(x.k).filter(function(z){return z.viec.length}).length}catch(e){}
+  return '<button class="seg'+(x.k===ttk?" on":"")+'" onclick="banChon(\''+x.k+'\')" data-tip="'+esc(x.d)+'">'+
+   '<i class="ti '+x.ic+'"></i>'+esc(x.t)+(n?'<span class="segn">'+n+'</span>':'')+'</button>'}).join("")+'</div>';
+ var DS=ttDanhSach(ttk);
+ var coViec=DS.filter(function(z){return z.viec.length});
+ var mo=window.BANMO||"";
+ var one=mo?DS.filter(function(z){return z.ma===mo})[0]:null;
+ if(one)return h+banThe(ttk,one);
+ /* dải số của chính màn này - đếm trên tập đang đứng, không mượn số nơi khác */
+ h+=statStrip([
+  ["ti-inbox",coViec.length,T.t+" còn việc của tôi",T.col,"trong "+DS.length+" hồ sơ tôi thấy"],
+  ["ti-alert-triangle",coViec.filter(function(z){return z.do_}).length,"Có việc gấp","#E24B4A","làm trước"],
+  ["ti-checks",DS.length-coViec.length,"Đang sạch việc","#16A34A","không cần đụng tới"]],"ban",
+  ["ban_co","ban_gap","ban_sach"]);
+ h+='<div class="panel"><div class="ph"><b><i class="ti '+T.ic+'" style="margin-right:6px"></i>'+
+  esc(T.t)+' còn việc của tôi ('+coViec.length+')</b><span class="mut" style="margin-left:auto;font-size:11px">bấm một dòng để mở bàn làm việc</span></div><div class="pbody">';
+ if(!coViec.length)h+='<div class="empty">Không còn '+esc(T.t.toLowerCase())+' nào cần bạn xử lý. '+
+  (DS.length?('Cả '+DS.length+' hồ sơ trong phạm vi của bạn đều sạch việc.'):'Phạm vi của bạn chưa có hồ sơ nào.')+'</div>';
+ coViec.slice(0,40).forEach(function(z){
+  var v0=z.viec[0];
+  h+='<div class="banrow" onclick="banMo(\''+esc(z.ma)+'\')">'+
+   '<span class="bani" style="background:'+T.col+'18;color:'+T.col+'"><i class="ti '+T.ic+'"></i></span>'+
+   '<div class="banmain"><div class="bant">'+esc(z.ten)+'</div>'+
+   '<div class="banm">'+esc(z.ma)+' · '+esc(z.gd)+'</div></div>'+
+   '<div class="banviec"><span class="chip '+(v0.sev==="red"?"red":(v0.sev==="amber"?"amber":"gray"))+'">'+esc(v0.t)+'</span>'+
+   (z.viec.length>1?'<span class="mut" style="font-size:11px;margin-left:6px">+'+(z.viec.length-1)+' việc</span>':'')+'</div>'+
+   '<i class="ti ti-chevron-right banch"></i></div>'});
+ if(coViec.length>40)h+='<div class="mut" style="font-size:11.5px;padding-top:8px">... và '+(coViec.length-40)+' hồ sơ nữa.</div>';
+ h+='</div></div>';
+ return h}
+/* Thẻ một thực thể: hồ sơ gọn + trọn việc của tôi, mỗi việc một nút làm ngay. */
+function banThe(ttk,z){
+ var T=TTBK[ttk], r=z.r;
+ var h='<div class="panel"><div class="ph">'+
+  '<button class="btn sm" onclick="banDong()"><i class="ti ti-arrow-left"></i>Danh sách</button>'+
+  '<b style="margin-left:10px"><i class="ti '+T.ic+'" style="margin-right:6px"></i>'+esc(z.ten)+'</b>'+
+  '<span class="chip" style="margin-left:8px">'+esc(z.gd)+'</span>'+
+  '<span class="mut" style="margin-left:auto;font-size:11.5px">'+esc(z.ma)+'</span></div><div class="pbody">';
+ h+=ctxRows(banHoSo(ttk,r));
+ h+='<div class="sechd">Việc của bạn với '+esc(T.t.toLowerCase())+' này ('+z.viec.length+')</div>';
+ if(!z.viec.length)h+='<div class="mut" style="font-size:12px;padding:2px 0 6px">Không còn việc nào - hồ sơ này đang sạch.</div>';
+ z.viec.forEach(function(v){
+  h+='<div class="banjob">'+
+   '<span class="banji '+(v.sev==="red"?"do":(v.sev==="amber"?"ho":""))+'"><i class="ti '+v.ic+'"></i></span>'+
+   '<div class="banjt">'+esc(v.t)+
+    '<div class="mut" style="font-size:11px">'+esc(v.act?("theo CH3 · "+((CH3BY[v.act]||{}).t||v.act)):("việc của "+(v.vai||[]).join(", ")))+'</div></div>'+
+   '<button class="btn primary sm" onclick="'+v.go(r).split('"').join("&quot;")+'"><i class="ti ti-arrow-right"></i>Làm</button></div>'});
+ h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">'+banNutHoSo(ttk,r)+'</div>';
+ h+='</div></div>';
+ return h}
+function banHoSo(ttk,r){
+ try{
+  if(ttk==="khach")return [["Trạng thái",esc(elabel(r.lead_status)||"-")],["Nguồn",esc(elabel(r.lead_source)||"-")],
+   ["Phụ trách",esc(r.assigned_to_name||r.assigned_to||"chưa giao")],["Điện thoại",telHTML(r.phone_number)],
+   ["Hẹn liên hệ lại",esc(r.next_followup_time||"chưa đặt")]];
+  if(ttk==="hocvien"){
+   var ob=ttSo("DL08",function(o){return String(o.student_id||"")===String(r.student_id)}).slice(-1)[0];
+   var lop=ob&&ob.class_id?find("DL10","class_id",ob.class_id):null;
+   return [["Trạng thái",esc(elabel(r.student_status)||"-")],
+    ["Lớp đang học",esc(lop?(lop.class_name||lop.class_id):"chưa xếp lớp")],
+    ["Nơi học",esc(lop?(elabel(lop.branch)||elabel(lop.learning_mode)||"-"):"-")],
+    ["Điện thoại",telHTML(r.phone_number)],
+    ["Người đồng hành",esc(r.emergency_contact_name||"chưa khai")]]}
+  if(ttk==="giangvien"){
+   var lop=ttSo("DL10",function(c){return String(c.main_teacher_id||"")===String(r.staff_id)&&
+    !isc(c.class_status,"finished","cancelled")});
+   return [["Chức danh",esc(elabel(r.role)||ecode(r.role)||"chưa khai")],
+    ["Cơ sở",esc(elabel(r.branch)||"chưa khai")],
+    ["Trạng thái",esc(elabel(r.status)||"-")],
+    ["Lớp đang phụ trách",esc(lop.length?lop.map(function(c){return c.class_name||c.class_id}).join(" · "):"chưa có lớp")],
+    ["Email đăng nhập",esc(r.email||"chưa khai")]]}
+  return [["Trạng thái",esc(elabel(r.class_status)||"-")],
+   ["Giảng viên chủ nhiệm",esc(r.main_teacher_id_name||r.main_teacher_id||"chưa phân")],
+   ["Nơi học",esc(elabel(r.branch)||elabel(r.learning_mode)||"-")],
+   ["Sĩ số",esc(num(r.current_enrollment)+"/"+(num(r.max_capacity)||"?"))],
+   ["Khai giảng - kết thúc",esc(String(r.class_start_date||"?")+" - "+String(r.class_end_date||"?"))]];
+ }catch(e){return [["Hồ sơ","không đọc được: "+esc(e.message)]]}}
+function banNutHoSo(ttk,r){
+ if(ttk==="giangvien")return '<button class="btn" onclick="openGV(\''+esc(r.staff_id)+'\')"><i class="ti ti-user-star"></i>Hồ sơ giảng viên</button>';
+ if(ttk==="khach")return '<button class="btn" onclick="runStart(\''+esc(r.lead_id)+'\')"><i class="ti ti-player-play"></i>Chạy quy trình</button>';
+ if(ttk==="hocvien")return '<button class="btn" onclick="window.HOSO=\''+esc(r.student_id)+'\';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>';
+ return '<button class="btn" onclick="openLop(\''+esc(r.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Mở lớp</button>'}
+
+var RENDER={ban:renderBan,hoidap:renderHoidap,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
 function dashJump(key){var m={urgent:"viec",newlead:"nhaplead",consider:"viec",convert:"tuvan",risk:"viec",onboard:"xeplop",approve:"duyet",debt:"thanhtoan",complaint:"khieunai",ungraded:"baitap",testpend:"test",wowbook:"wow",unverified:"thanhtoan",classes:"banglop"};var pg=m[key];if(pg&&RBK[CURROLE].pages.indexOf(pg)>=0)go(pg);else go("viec")}
 
 /* ---------- router ---------- */

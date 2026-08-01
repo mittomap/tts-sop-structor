@@ -281,6 +281,70 @@ setRole("all");
  t("không câu lọc nào dùng mã không có trong CH1",!ma.length,ma.slice(0,4).join(" · "));
 })();
 
+/* ═════════ M10 · BÀN LÀM VIỆC THEO THỰC THỂ - KHÔNG CHỨC DANH NÀO NGỒI KHÔNG ═════════════
+   Anh Luân 01/08: *"mỗi một giai đoạn đều có 1 thực thể là trung tâm... mỗi một cổng của từng
+   team, lại gom tất cả nghiệp vụ riêng của họ cho từng thực thể và giai đoạn."*
+   Ba luật canh cho trục tổ chức mới này:
+   (1) MỌI hành động trong bảng CH3 của SOP phải được xếp vào một thực thể, hoặc khai lý do vì
+       sao không - nếu không thì Bàn làm việc chỉ là một cái mục lục nữa, thiếu đúng những việc
+       không ai nhớ. Đây là LUẬT SỐ 0 (phủ trọn SOP) áp cho màn này.
+   (2) MỌI dòng việc phải khai AI LÀM: hoặc bằng mã CH3, hoặc bằng `vai`. Việc không khai ai làm
+       là việc mọi người cùng thấy và không ai nhận.
+   (3) MỌI chức danh, khi mở Bàn làm việc ở thực thể MẶC ĐỊNH của mình, phải thấy việc. Đã cắn
+       ngay lần đo đầu: NV WOW thấy màn trống ở cả ba thực thể vì phạm vi dữ liệu của họ là "chỉ
+       của tôi" mà họ không sở hữu lead nào - trong khi việc thật của họ là chấm phiếu test của
+       chính những lead ấy. */
+var CH3_NGOAIBAN={
+ lead_new:"tạo hồ sơ mới - việc của nút Thêm ở danh sách, chưa có thực thể để mở ra",
+ lead_giao:"bàn giao hàng loạt khi nhân viên nghỉ - làm ở hub Chờ duyệt, không phải việc với một khách",
+ ck_nho:"chiết khấu ghi ngay trong form đăng ký, không phải một việc riêng đứng chờ",
+ ck_lon:"như trên, cộng thêm một cửa duyệt ở hub Chờ duyệt",
+ hoantien:"hàng chờ phê duyệt của quản lý - nằm ở hub Chờ duyệt",
+ kn_duyet:"phê duyệt giải pháp khiếu nại - hàng chờ của quản lý ở hub Chờ duyệt",
+ wow_them:"phê duyệt WOW bổ sung - hàng chờ của quản lý",
+ doilop1:"đổi lớp làm ngay trong màn Xếp lớp, đi kèm hồ sơ nhập học",
+ doilop2:"như trên, cộng cửa duyệt của quản lý",
+ wow_auto:"máy tự tạo từ cảnh báo - không phải việc của người",
+ wow_lms:"học viên tự đặt ở cổng học viên - không phải việc của nhân viên trung tâm",
+ wow_day:"dạy buổi WOW - làm ở sổ buổi WOW theo LỊCH, không theo từng học viên",
+ gia_khoa:"cập nhật bảng giá khóa - là cấu hình sản phẩm, nằm ở Cài đặt",
+ fb_xau:"xử lý phản hồi tiêu cực - đã gộp vào việc 'Phản hồi chưa phân loại' của cùng thực thể"};
+(function(){
+ t("bảng việc theo thực thể có đủ bốn thực thể", (TTHE||[]).length>=4,
+   "đang khai "+((TTHE||[]).length)+" - anh Luân kể tên khách, học viên, lớp, giảng viên");
+ /* (2) mọi dòng phải khai ai làm */
+ var mo=(VIECTT||[]).filter(function(v){return !v.act&&!(v.vai&&v.vai.length)});
+ t("mọi dòng việc đều khai ai làm (mã CH3 hoặc vai)", !mo.length,
+   mo.map(function(v){return v.t}).slice(0,4).join(" · "));
+ /* mã CH3 khai trong bảng phải có thật */
+ var ma=(VIECTT||[]).filter(function(v){return v.act&&!CH3BY[v.act]});
+ t("mã CH3 dùng trong bảng việc đều có thật", !ma.length,
+   ma.map(function(v){return v.act}).slice(0,4).join(" · "));
+ /* (1) phủ trọn CH3 */
+ var dung={};(VIECTT||[]).forEach(function(v){if(v.act)dung[v.act]=1});
+ var sot=CH3.filter(function(a){return !dung[a.k]&&!CH3_NGOAIBAN[a.k]});
+ t("mọi hành động CH3 hoặc lên Bàn làm việc, hoặc khai lý do đọc được ("+CH3.length+" hành động)",
+   !sot.length, sot.map(function(a){return a.k+" ("+a.t+")"}).slice(0,5).join(" · "));
+ var thuaKhai=Object.keys(CH3_NGOAIBAN).filter(function(k){return !CH3BY[k]});
+ t("bản khai ngoài-Bàn-làm-việc không nhắc mã đã biến mất", !thuaKhai.length, thuaKhai.join(", "));
+ /* (3) mọi chức danh mở Bàn làm việc ở thực thể mặc định phải thấy việc */
+ var doi=[], daXet={};
+ rows("DL01").filter(function(x){return staffActive(x)}).forEach(function(nv){
+  applyScope(nv.staff_id);CURSTAFF=nv.staff_id;
+  var g=SCOPE().group||"?";
+  if(daXet[g])return; daXet[g]=1;
+  var k=ttMacDinh(), ds=[];
+  try{ds=ttDanhSach(k)}catch(e){doi.push(g+": lỗi "+e.message);return}
+  var cv=ds.filter(function(z){return z.viec.length});
+  if(!cv.length)doi.push(g+" mở Bàn làm việc ("+k+") ra trống");
+ });
+ applyScope("");CURSTAFF="";
+ t("mọi chức danh mở Bàn làm việc ở thực thể mặc định đều thấy việc", !doi.length, doi.slice(0,4).join(" · "));
+ /* mọi việc phải có nút mở đúng chỗ làm - biết việc mà không tới được chỗ xử vẫn là ngõ cụt */
+ var khongGo=(VIECTT||[]).filter(function(v){return typeof v.go!=="function"});
+ t("mọi việc đều có nút mở chỗ xử lý", !khongGo.length, khongGo.map(function(v){return v.t}).join(" · "));
+})();
+
 /* ═════════ M9 · GIỌNG VĂN CHUYÊN NGHIỆP & CHỮ NGẮN GỌN ══════════════════════════════════
    Anh Luân 01/08: *"Việc cần cấp quản lý gật đầu? Ai lại dùng mấy từ như gật đầu trong app hả
    em? Chuyên nghiệp?"* và *"chỉ cần nói: Chế độ xem thử, rồi muốn giải thích thì dùng tooltip

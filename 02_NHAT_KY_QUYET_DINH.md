@@ -149,7 +149,31 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.68 — CẢI TỔ CÂU CHỮ: NGẮN GỌN VÀ CHUYÊN NGHIỆP ✅ (01/08).**
+> **Phiên bản: V9.69 — BÀN LÀM VIỆC THEO THỰC THỂ: LẬT TRỤC TỔ CHỨC CỦA APP ✅ (01/08).**
+> · **Anh Luân:** *"mỗi một giai đoạn đều có 1 thực thể là trung tâm ko? Khi chưa học, lead là
+> trung tâm... giai đoạn khi họ là học viên, hầu như toàn bộ nghiệp vụ là cho lớp học và học
+> viên... mỗi một cổng của từng team, lại gom tất cả nghiệp vụ riêng của họ cho từng thực thể và
+> giai đoạn. Đó mới là thứ a hay nói: chuyên nghiệp, tiện dụng."*
+> · **Đo hiện trạng**: app gom màn hình theo ĐỘNG TỪ - 15 sổ Tra cứu là 15 BẢNG DỮ LIỆU, và một
+> nhân viên tư vấn phải biết **BẢY trang** chỉ để phục vụ trọn vẹn **MỘT** người khách. Mỗi lần
+> đổi việc là một lần đổi trang, mỗi lần đổi trang là một lần phải tìm lại đúng người đó.
+> · **Màn mới lật ngược trục: gom theo DANH TỪ.** Bốn thực thể - Khách · Học viên · Lớp · Giảng
+> viên. Mở MỘT thực thể ra là thấy TẤT CẢ việc mà chức danh của mình phải làm với nó, làm ngay
+> tại chỗ. `VIECTT` 29 dòng, mỗi dòng neo vào một mã CH3 của SOP hoặc khai thẳng `vai`.
+> · **Ba chỗ neo, không dựng lại luật nào**: ai được làm → `canAct` đọc CH3 · còn phải làm →
+> điều kiện đọc thẳng dữ liệu · đang ở đâu → `jInfo`/`class_status`.
+> · **Luật của khối này: giai đoạn để NHÌN, điều kiện để LỌC.** Lọc theo giai đoạn là dựng thêm
+> một sự thật thứ hai cạnh điều kiện, và hai sự thật cạnh nhau sẽ trôi khỏi nhau.
+> · **Bẫy cắn ngay lần đo đầu**: NV WOW mở Bàn làm việc ra **trống trơn** ở cả ba thực thể, vì
+> phạm vi dữ liệu của họ là "chỉ của tôi" mà họ không sở hữu lead nào - trong khi việc thật của
+> họ là chấm phiếu test **của chính những lead ấy**. Luật đúng: hồ sơ lên bàn khi nó thuộc phạm vi
+> của tôi **HOẶC** tôi có việc với nó. Vế sau mới đúng nghiệp vụ - việc tìm tới người.
+> · **Nhóm M10 trong `_checkaudit`** canh: mọi hành động CH3 hoặc lên bàn hoặc khai lý do (31/31)
+> · mọi dòng việc khai được ai làm · mọi chức danh mở bàn ở thực thể mặc định đều thấy việc.
+> · Tour thêm bài **"Bàn làm việc"** đặt trước mọi bài khác; Trợ lý trả lời được "hồ sơ nào còn
+> việc của tôi".
+>
+> **Phiên bản trước: V9.68 — CẢI TỔ CÂU CHỮ: NGẮN GỌN VÀ CHUYÊN NGHIỆP ✅ (01/08).**
 > · **Anh Luân:** *"Việc cần cấp quản lý gật đầu? Ai lại dùng mấy từ như gật đầu trong app hả em?
 > Chuyên nghiệp?"* và *"chỉ cần nói: Chế độ xem thử, rồi muốn giải thích thì dùng tooltip nó
 > không gọn hơn à em."*
@@ -6180,3 +6204,95 @@ người sửa app đọc, dài bao nhiêu cũng được.
 ### Số chốt phiên
 21 bộ kiểm xanh hết. Dải nhắc dài quá 110 ký tự: **19 → 4**. Từ suồng sã hiện ra màn: **0**.
 `_checkaudit` 29 → **31 tiêu chí**.
+
+---
+
+## V9.69 - BÀN LÀM VIỆC THEO THỰC THỂ: LẬT TRỤC TỔ CHỨC CỦA APP (01/08)
+
+> Anh Luân: *"Em có thấy a rất hay yêu cầu làm sao để người ta không bị rối không. Có các chủ thể:
+> học viên, phụ huynh, lớp học, giảng viên, các team khác. Em có thấy, mỗi một giai đoạn đều có 1
+> thực thể là trung tâm ko? ... Nếu lấy 1 thực thể làm trung tâm, rõ ràng chúng ta có thể build
+> tập trung và phân loại nghiệp vụ rất dễ dàng."*
+
+### 1. Vì sao đây là thay đổi lớn nhất về cách tổ chức app
+
+Đo hiện trạng trước khi làm - app đang gom màn hình theo **ĐỘNG TỪ** (nghiệp vụ):
+
+```
+Vận hành 3 trang · Tra cứu 15 · Chặng·Tuyển sinh 1 · Chặng·Học tập 4 · Chặng·CSKH 2 · Quản lý 6
+```
+
+15 sổ Tra cứu là **15 bảng dữ liệu**, không phải 15 thực thể. Và một nhân viên tư vấn phải biết
+**bảy trang** (`nhaplead · test · tuvan · thanhtoan · xeplop · hoso · chay`) chỉ để phục vụ trọn
+vẹn **một** người khách. Mỗi lần đổi việc là một lần đổi trang, và mỗi lần đổi trang là một lần
+phải tìm lại đúng người đó. Đó chính là cái "rối" anh Luân nói suốt bao phiên.
+
+App đã có **chặng** (4 chặng, 17 ga) - nhưng chặng đang là một **trang để xem**, và "nghiệp vụ
+trong chặng" chỉ là một cái mục lục dẫn về đúng bộ trang cũ. Người dùng vẫn phải nhảy trang.
+
+### 2. Thiết kế: gom theo DANH TỪ
+
+| Giai đoạn | Thực thể trung tâm | Ai làm việc với nó |
+|---|---|---|
+| Chưa học (C1) | **Khách** | Tư vấn · Marketing · WOW (chấm test) · Kế toán (thu cọc) |
+| Đang học (C2) | **Lớp** và **Học viên** | Học vụ · Giảng viên · WOW · CSKH · Kế toán |
+| Tạm dừng (C3) | **Học viên** | Học vụ · Kế toán |
+| Kết thúc (C4) | **Học viên** | Học vụ · Tư vấn |
+| (xuyên suốt) | **Giảng viên** | Nhân sự · Quản lý |
+
+Mở một thực thể ra là thấy **tất cả** việc mà chức danh của mình phải làm với nó - làm ngay tại
+chỗ, không đổi trang. Bảng `VIECTT` 29 dòng, mỗi dòng neo vào một mã CH3 của SOP hoặc khai thẳng
+`vai` khi SOP không xếp việc đó vào CH3.
+
+**Ba chỗ neo, không dựng lại luật nào:**
+- **Ai được làm** → `canAct` đọc bảng CH3 của SOP (31 hành động × chức danh).
+- **Còn phải làm** → hàm điều kiện đọc thẳng dữ liệu, cùng phép đếm với thẻ và chuông.
+- **Đang ở đâu** → `jInfo`/`jStageOf` cho người, `class_status` cho lớp.
+
+### 3. LUẬT MỚI: giai đoạn để NHÌN, điều kiện để LỌC
+
+Việc hiện ra hay không do **điều kiện** quyết định, không do giai đoạn - vì cùng một giai đoạn vẫn
+có người cần việc này, người không. Lọc theo giai đoạn là dựng thêm **một sự thật thứ hai** cạnh
+điều kiện, và hai sự thật cạnh nhau thì sẽ trôi khỏi nhau. Giai đoạn chỉ dùng để hiện cái chip cho
+người đọc biết mình đang đứng ở đâu trong hành trình.
+
+### 4. Bẫy cắn ngay lần đo đầu: PHẠM VI KHÔNG PHẢI ĐIỀU KIỆN DUY NHẤT
+
+Lần chạy thử đầu tiên, đóng vai tám chức danh:
+
+```
+wow (NV003) | Khách 0/0 hs · 0 viec | Học viên 0/0 · 0 | Lớp 0/0 · 0
+```
+
+**NV WOW mở Bàn làm việc ra trống trơn ở cả ba thực thể.** Vì phạm vi dữ liệu của họ là "chỉ của
+tôi" mà họ không sở hữu lead nào - trong khi việc thật của họ là **chấm phiếu test của chính những
+lead ấy**.
+
+> **Luật đúng:** hồ sơ lên bàn khi nó **thuộc phạm vi của tôi** HOẶC **tôi có việc phải làm với
+> nó**. Vế sau mới là vế đúng nghiệp vụ - việc tìm tới người, không phải người đi tìm việc.
+
+Sau khi sửa: `wow | Khách 9/9 hs · 9 viec` - đúng 9 phiếu test đang chờ chính họ chấm.
+
+Bẫy thứ hai cùng họ: **Nhân sự** mở bàn ra trống, vì họ không làm việc với học viên. Nhưng anh
+Luân đã kể tên "giảng viên" và "các team khác" trong danh sách chủ thể - nên thiếu thực thể
+**Giảng viên** là thiếu thật, không phải Nhân sự không có việc.
+
+### 5. Nhóm M10 trong `_checkaudit`
+
+- Mọi hành động CH3 **hoặc** lên Bàn làm việc, **hoặc** khai lý do đọc được (31/31 - 17 lên bàn,
+  14 khai lý do như "làm ngay trong form đăng ký", "máy tự tạo", "học viên tự làm ở cổng").
+- Mọi dòng việc phải khai **ai làm** - việc không khai ai làm là việc mọi người cùng thấy và không
+  ai nhận.
+- Mọi chức danh, mở bàn ở thực thể **mặc định của mình**, phải thấy việc.
+- Mọi việc phải có **nút mở chỗ xử lý** - biết việc mà không tới được chỗ xử vẫn là ngõ cụt.
+
+### 6. Còn phải làm tiếp
+
+Đây mới là **trục thứ nhất**. Chưa làm: thực thể **Phụ huynh** (anh Luân có kể tên); gộp bớt 15 sổ
+Tra cứu về theo thực thể; và đưa Bàn làm việc thành trang đáp mặc định của từng chức danh thay cho
+Trang bắt đầu.
+
+### Số chốt phiên
+21 bộ kiểm xanh hết. `VIECTT` **29 dòng việc** · **4 thực thể** · **17/31** hành động CH3 lên bàn,
+14 khai lý do. Tour 15 → **16 bài** / 84 → **88 bước**. `_checkaudit` 31 → **38 tiêu chí**.
+Icon 213 → **219**.
