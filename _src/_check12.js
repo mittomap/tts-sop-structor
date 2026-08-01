@@ -11,7 +11,7 @@ global.window=global;global.location={hash:""};
 global.localStorage={getItem:()=>null,setItem(){},removeItem(){}};
 global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
 global.innerWidth=1400;global.innerHeight=900;
-var SRC=require('fs').readFileSync('./_APP.js','utf8');
+var SRC=require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8');
 var HTML=require('fs').readFileSync((process.env.ITTS_OUT||'.')+'/ITTs_WebApp_v5_demo.html','utf8');
 var CSS=(HTML.match(/<style>[\s\S]*?<\/style>/g)||[]).join("\n");
 var CODE=SRC.replace(/\/\*[\s\S]*?\*\//g,"").replace(/^\s*\/\/.*$/gm,"");   /* bo chu thich truoc khi soi ma */

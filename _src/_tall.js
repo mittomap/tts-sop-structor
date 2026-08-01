@@ -2,7 +2,7 @@ function El(){return {innerHTML:"",value:"",checked:false,style:{setProperty(){}
  querySelector(){return El()},querySelectorAll(){return []},getAttribute(){return ""},setAttribute(){},appendChild(){},focus(){},addEventListener(){},files:[]}}
 global.document={getElementById:()=>El(),querySelector:()=>El(),querySelectorAll:()=>[],createElement:()=>El(),body:El(),addEventListener(){}};
 global.window=global;global.location={hash:""};global.localStorage={getItem:()=>null,setItem(){}};
-require('vm').runInThisContext(require('fs').readFileSync('./_APP.js','utf8'));
+require('vm').runInThisContext(require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8'));
 setRole("all");
 var bad=[],n=0;
 Object.keys(RENDER).forEach(function(k){n++;try{var o=RENDER[k]();

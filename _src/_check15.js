@@ -14,7 +14,7 @@ function El(id){return {id:id||"",innerHTML:"",textContent:"",value:(FIELDS[id]|
 global.document={getElementById:(id)=>El(id),querySelector:()=>El(),querySelectorAll:()=>[],createElement:()=>El(),body:El(),addEventListener(){}};
 global.window=global;global.location={hash:""};
 global.localStorage={getItem:()=>null,setItem(){},removeItem(){}};global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
-var SRC=require('fs').readFileSync('./_APP.js','utf8');
+var SRC=require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8');
 require('vm').runInThisContext(SRC);
 setRole("all");
 var bad=[],ok=0;

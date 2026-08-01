@@ -58,7 +58,7 @@ global.innerWidth=1400;global.innerHeight=900;
 
 var FS=require('fs');
 var OUT=process.env.ITTS_OUT||'.';
-require('vm').runInThisContext(FS.readFileSync('./_APP.js','utf8'));
+require('vm').runInThisContext(FS.readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8'));
 var SRC=FS.readFileSync('./gen_v5.py','utf8');
 
 var bad=[], n=0;
@@ -111,7 +111,7 @@ setRole("all");
  try{HV=FS.readFileSync('./_HV.js','utf8')}catch(e){}
  t("đọc được mã cổng học viên để đối chiếu", !!HV, "thiếu _HV.js - chạy extract_js.py trước");
  if(!HV)return;
- var NV=FS.readFileSync('./_APP.js','utf8');
+ var NV=FS.readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8');
  var CHUNG=[
   ["nút Đổi cổng",        /congDoiMo\(/],
   ["đường sang cổng kia", /function congURL/],
@@ -747,7 +747,9 @@ var CH3_NGOAIBAN={
   applyScope(dai[g].id);CURSTAFF=dai[g].id;
   var h=veTrang(dai[g].land||"banlam");
   if(h.indexOf("__LOI__")===0){tay.push(g+" NÉM LỖI");return}
-  var noi=/class="(bstat|dstat|slarow|obcard|sechd)"/.test(h);
+  /* Khớp TOKEN lớp CSS chứ không khớp cả chuỗi class: thẻ thật viết `class="bstat ro"` nên
+    mẫu `class="bstat"` trượt. Bẫy này nằm im vì trang đáp của v5 tình cờ viết đúng một lớp. */
+ var noi=/class="[^"]*\b(bstat|dstat|slarow|obcard|sechd|banrow|banjob)\b/.test(h);
   if(!noi)tay.push(g+" (trang đáp "+dai[g].land+" không nói được việc nào)")});
  applyScope("");CURSTAFF="";setRole("all");
  t("mọi chức danh mở app lên đều thấy việc ở trang đáp của mình ("+Object.keys(dai).length+" nhóm)",

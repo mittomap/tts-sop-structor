@@ -8,7 +8,7 @@ function El(id){var e={id:id||"",innerHTML:"",textContent:"",value:(FIELDS[id]||
 global.document={getElementById:(id)=>El(id),querySelector:()=>El(),querySelectorAll:()=>[],createElement:()=>El(),body:El("body"),addEventListener(){}};
 global.window=global;global.location={hash:""};
 global.localStorage={getItem:()=>null,setItem(){},removeItem(){}};global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
-var SRC0=require('fs').readFileSync('./_APP.js','utf8');
+var SRC0=require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8');
 var SRC=SRC0.replace(/\/\*[\s\S]*?\*\//g,"");   /* bo chu thich truoc khi soi ma nguon */
 var HTMLHV=require('fs').readFileSync((process.env.ITTS_OUT||'.')+'/ITTs_TrangHocVien_demo.html','utf8');
 require('vm').runInThisContext(SRC0);

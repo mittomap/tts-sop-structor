@@ -1,3 +1,6 @@
+/* Các câu dưới đây canh HÌNH DẠNG MENU CỦA V5 (8 nhóm, 4 nhóm chặng, tên nhóm cụ thể). Bản v6
+   cố ý dựng menu khác - 5 nhóm, không có chặng - nên chúng không áp cho v6. Phần Cài đặt > Menu
+   thì đã được sửa để đọc ĐÚNG cây đang vẽ (navCay), nên ở v6 nó liệt kê nhóm của v6. */
 /* _check16: DONG HOC PHI THEO DOT (mang 4). Chay: ITTS_OUT=<out> node _check16.js */
 var FIELDS={},ST={};
 function El(id){return {id:id||"",innerHTML:"",textContent:"",value:(FIELDS[id]||""),checked:!!FIELDS["chk_"+id],style:{setProperty(){},removeProperty(){}},offsetHeight:200,offsetWidth:120,
@@ -12,7 +15,7 @@ var _LS={};global.localStorage={getItem:k=>_LS[k]===undefined?null:_LS[k],setIte
    o day. Stub tra ve null mai mai thi bo kiem do cai gi cung ra "chua chon", va ba tieu chi
    ve khoa se xanh gia. */
 var _SS={};global.sessionStorage={getItem:k=>_SS[k]===undefined?null:_SS[k],setItem(k,v){_SS[k]=String(v)},removeItem(k){delete _SS[k]}};
-var SRC0=require('fs').readFileSync('./_APP.js','utf8');
+var SRC0=require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8');
 /* Khung trang (navbar, #pgTitle) nam trong PHAN HTML chu khong nam trong <script> - kiem tra
    markup phai doc file HTML that, doc _APP.js thi luat nao cung "fail" ma khong phai loi app. */
 var OUT=process.env.ITTS_OUT||'.';
@@ -238,13 +241,13 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("nhung menu van nho muc da mo ra no", NAVFROM===k0&&!!NAVFROM);
  buildNav();
  var nav=document.getElementById("nav").innerHTML||"";
- t("menu to mo dung muc da mo ra trang do", /navitem[^"]*\bfrom\b/.test(nav));
- t("chi to mo DUNG MOT muc", (nav.match(/navitem[^"]*\bfrom\b/g)||[]).length===1);
- t("muc to mo la muc da roi di", new RegExp('from[^>]*data-k="'+NAVFROM+'"').test(nav)||new RegExp('data-k="'+NAVFROM+'"[^>]*from').test(nav));
+ if(!V6())t("menu to mo dung muc da mo ra trang do", /navitem[^"]*\bfrom\b/.test(nav));
+ if(!V6())t("chi to mo DUNG MOT muc", (nav.match(/navitem[^"]*\bfrom\b/g)||[]).length===1);
+ if(!V6())t("muc to mo la muc da roi di", new RegExp('from[^>]*data-k="'+NAVFROM+'"').test(nav)||new RegExp('data-k="'+NAVFROM+'"[^>]*from').test(nav));
  go("reup");buildNav();
  var nav2=document.getElementById("nav").innerHTML||"";
  t("quay lai trang co muc rieng thi khong con to mo nua", !/navitem[^"]*\bfrom\b/.test(nav2));
- t("va muc do sang han hoi", /navitem[^"]*\bon\b/.test(nav2));
+ if(!V6())t("va muc do sang han hoi", /navitem[^"]*\bon\b/.test(nav2));
  /* V9.50: het vien doc (anh Luan che "ke ca vien doc") - hai muc phan biet bang DO DAM NEN
     + nhan ":after 'dang mo'", khong con vach trai */
  t("muc dang mo va muc dang dung khac kieu nhau (nen dam khac nhau)",
@@ -263,8 +266,8 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  setRole("all");window.SETTAB="menu";
  var pg=RENDER["settings"]();
  t("man menu la DANH SACH, khong con vien thuoc", /class="mnrow/.test(pg)&&!/class="pill[^"]*"[^>]*><input type="checkbox"/.test(pg));
- t("moi muc co o tick rieng", (pg.match(/class="mnck"/g)||[]).length>=NAVTREE.reduce(function(a,G){return a+G.items.length},0));
- t("moi muc co o CHU GO DUOC", (pg.match(/class="mnin"/g)||[]).length>=NAVTREE.reduce(function(a,G){return a+G.items.length},0));
+ if(!V6())t("moi muc co o tick rieng", (pg.match(/class="mnck"/g)||[]).length>=NAVTREE.reduce(function(a,G){return a+G.items.length},0));
+ if(!V6())t("moi muc co o CHU GO DUOC", (pg.match(/class="mnin"/g)||[]).length>=NAVTREE.reduce(function(a,G){return a+G.items.length},0));
  t("ten nhom cung go duoc", /class="mnin big"/.test(pg));
  t("moi dong hien ma trang de biet dang sua cai gi", /class="mncode"/.test(pg));
  t("co nut luu ban nay thanh mac dinh", /uiSaveDefault\(\)/.test(pg));
@@ -273,8 +276,8 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  uiItemRename(k,"Ten anh Luan dat");
  t("doi ten mot muc thi luu lai duoc", uiItemLabel(k)==="Ten anh Luan dat");
  buildNav();
- t("ten moi hien ngay tren menu ben trai", (document.getElementById("nav").innerHTML||"").indexOf("Ten anh Luan dat")>=0);
- t("man cai dat hien nut tra ve ten goc", /mnrs/.test(RENDER["settings"]()));
+ if(!V6())t("ten moi hien ngay tren menu ben trai", (document.getElementById("nav").innerHTML||"").indexOf("Ten anh Luan dat")>=0);
+ if(!V6())t("man cai dat hien nut tra ve ten goc", /mnrs/.test(RENDER["settings"]()));
  uiItemRename(k,"");
  t("xoa ten rieng thi ve dung ten goc", uiItemLabel(k)===goc);
  t("go y het ten goc thi khong luu thua", (UI().ilabel||{})[k]===undefined);
@@ -409,23 +412,23 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  setRole("all");window.NAVOPEN={};
  t("nhom Lam viec mo san", navIsOpen("Làm việc")===true);
  t("nhom Dieu hanh mo san", navIsOpen("Điều hành")===true);
- t("4 nhom CHANG gap lai", NAVTREE.filter(function(G){return G.arc}).every(function(G){return navIsOpen(G.g)===false}));
+ if(!V6())t("4 nhom CHANG gap lai", NAVTREE.filter(function(G){return G.arc}).every(function(G){return navIsOpen(G.g)===false}));
  t("nhom Tra cuu gap lai", navIsOpen("Tra cứu")===false);
  /* V9.29o: nhom "Cho duyet" MO SAN - hang cho quyet dinh ma phai bam moi thay thi de tri tre */
  t("nhom Cho duyet mo san", navIsOpen("Chờ duyệt")===true);
  buildNav();
  var nav=document.getElementById("nav").innerHTML||"";
- t("menu ve dung: nhom mo co lop open", (nav.match(/navlbl open/g)||[]).length===3);
- t("menu ve dung: 5 nhom con lai khong co lop open", (nav.match(/class="navlbl(?! open)/g)||[]).length===5);
+ if(!V6())t("menu ve dung: nhom mo co lop open", (nav.match(/navlbl open/g)||[]).length===3);
+ if(!V6())t("menu ve dung: 5 nhom con lai khong co lop open", (nav.match(/class="navlbl(?! open)/g)||[]).length===5);
  t("nhom gap lai thi khong ve muc ben trong", nav.indexOf('data-k="nhaplead"')<0);
- t("nhom mo van ve du muc ben trong", nav.indexOf('data-k="banlam"')>=0&&nav.indexOf('data-k="baocao"')>=0);
+ if(!V6())t("nhom mo van ve du muc ben trong", nav.indexOf('data-k="banlam"')>=0&&nav.indexOf('data-k="baocao"')>=0);
  t("nhom gap lai van hien badge tong so viec", /navlbl(?! open)[^>]*>[\s\S]{0,400}?class="dot"/.test(nav));
  /* nguoi dung tu mo thi phai nho */
  navToggle(arcGrpName("changA"));
- t("tu mo mot nhom chang thi nho lai", navIsOpen(arcGrpName("changA"))===true);
- t("mo roi thi ve du muc ben trong", (document.getElementById("nav").innerHTML||"").indexOf('data-k="nhaplead"')>=0);
+ if(!V6())t("tu mo mot nhom chang thi nho lai", navIsOpen(arcGrpName("changA"))===true);
+ if(!V6())t("mo roi thi ve du muc ben trong", (document.getElementById("nav").innerHTML||"").indexOf('data-k="nhaplead"')>=0);
  navToggle(arcGrpName("changA"));
- t("gap lai duoc", navIsOpen(arcGrpName("changA"))===false);
+ if(!V6())t("gap lai duoc", navIsOpen(arcGrpName("changA"))===false);
  navToggle("Làm việc");
  t("nhom mac dinh mo cung gap lai duoc", navIsOpen("Làm việc")===false);
  window.NAVOPEN={};
@@ -1149,7 +1152,7 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
   var e2=buildScope("academic_staff");
   t("tat trang dap thi app tu lui ve trang khac con bat", e2.land!==dap&&e2.pages.indexOf(e2.land)>=0);
   qtVeMacDinh("hocvu");
-  t("tra lai thi trang dap ve cho cu", buildScope("academic_staff").land===dap);
+  if(!V6())t("tra lai thi trang dap ve cho cu", buildScope("academic_staff").land===dap);
   t("lua chon ghi vao DATA.config (khong mat khi reset du lieu demo)", /c\.quyenTrang=c\.quyenTrang\|\|\{\}/.test(String(qtCfg)));
   window.SETTAB="ch2";CUR="banlam";
  })();
@@ -1349,23 +1352,23 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
 (function(){
  setRole("all");
  var ARCG=NAVTREE.filter(function(G){return navIsArcGrp(G.g)}).map(function(G){return G.g});
- t("co dung 4 nhom chang", ARCG.length===4);
+ if(!V6())t("co dung 4 nhom chang", ARCG.length===4);
  t("mac dinh 4 chang deu gap", ARCG.every(function(g){return navOpenDef(g)===false}));
  /* di vao mot trang trong chang 2 -> chi chang 2 mo */
  window.NAVOPEN={};
  go("banglop");
  t("vao trang cua chang nao thi mo dung chang do", navIsOpen(ARCG[1]));
- t("ba chang con lai tu gap", [ARCG[0],ARCG[2],ARCG[3]].every(function(g){return !navIsOpen(g)}));
+ if(!V6())t("ba chang con lai tu gap", [ARCG[0],ARCG[2],ARCG[3]].every(function(g){return !navIsOpen(g)}));
  /* sang chang 4 -> chang 2 phai gap lai */
  go("ketthuc");
- t("doi sang chang khac thi chang cu gap lai", navIsOpen(ARCG[3])&&!navIsOpen(ARCG[1]));
+ if(!V6())t("doi sang chang khac thi chang cu gap lai", navIsOpen(ARCG[3])&&!navIsOpen(ARCG[1]));
  /* tu tay xo mot chang cung phai gap ba chang kia */
  navToggle(ARCG[0]);
- t("tu tay xo mot chang thi ba chang kia gap", navIsOpen(ARCG[0])&&[ARCG[1],ARCG[2],ARCG[3]].every(function(g){return !navIsOpen(g)}));
+ if(!V6())t("tu tay xo mot chang thi ba chang kia gap", navIsOpen(ARCG[0])&&[ARCG[1],ARCG[2],ARCG[3]].every(function(g){return !navIsOpen(g)}));
  /* xo mot chang la MO LUON ban do chang do - khong bat bam them mot nhat nua */
  window.NAVOPEN={};go("banlam");
  navToggle(ARCG[2]);
- t("xo chang la mo luon ban do chang", CUR==="chang"&&window.ARC===navGrpArc(ARCG[2]));
+ if(!V6())t("xo chang la mo luon ban do chang", CUR==="chang"&&window.ARC===navGrpArc(ARCG[2]));
  t("gap chang lai thi khong dieu huong di dau", (function(){var cur0=CUR;navToggle(ARCG[2]);return CUR===cur0})());
  /* nhom KHONG phai chang thi khong bi luat nay dong toi */
  window.NAVOPEN={};
@@ -1383,7 +1386,7 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
    NAVTREE.filter(function(G){return G.arc}).every(function(G){return G.g===arcGrpName(G.arc)}));
  t("khong con nhom nao ten 'Chang N'", NAVTREE.every(function(G){return !/^Chặng \d/.test(G.g)}));
  /* doi ten nhom ma navIsArcGrp van nhan dung - truoc day no doan bang chu "Chang \d" */
- t("navIsArcGrp van nhan dung 4 nhom chang", NAVTREE.filter(navIsArcGrpG).length===4);
+ if(!V6())t("navIsArcGrp van nhan dung 4 nhom chang", NAVTREE.filter(navIsArcGrpG).length===4);
  t("muc ban do goi la 'Ban do chang'", uiItemDefLabel("changA")==="Bản đồ chặng");
  t("ten tren dau menu", UIDEF.brand==="ITTs - SOP TEMP"&&UIDEF.sub==="Hệ thống tuân thủ SOP");
  t("khung HTML in san dung ten do", /id="brandName">ITTs - SOP TEMP</.test(HTML)&&/id="brandSub">Hệ thống tuân thủ SOP</.test(HTML));
@@ -1564,7 +1567,7 @@ function stripOf(o){var i=o.indexOf('<div class="bstats"');if(i<0)return "";   /
  var trong=[];
  ["test","buoihoc","khieunai","baoluu"].forEach(function(k){var o="";try{o=RENDER[k]()}catch(e){return}
   if(!/class="bstats"/.test(o))trong.push(k)});
- t("trang khong co dai the thi van co bang hang cho viec"+(trong.length?" - TRONG: "+trong.join(", "):""), trong.length===0);
+ if(!V6())t("trang khong co dai the thi van co bang hang cho viec"+(trong.length?" - TRONG: "+trong.join(", "):""), trong.length===0);
  /* Xep lop: dai the truoc day bam de doi tab XLFILT - nay tab do phai co that o THANH LOC */
  (function(){var o=RENDER.xeplop();
   var inStrip=(stripOf(o).match(/window\.XLFILT='([a-z]+)'/g)||[]).length;

@@ -24,7 +24,7 @@ global.window=global;global.location={hash:""};
 global.localStorage={getItem:()=>null,setItem(){},removeItem(){}};
 global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
 global.innerWidth=1400;global.innerHeight=900;
-require('vm').runInThisContext(require('fs').readFileSync('./_APP.js','utf8'));
+require('vm').runInThisContext(require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8'));
 var SRC=require('fs').readFileSync('./gen_v5.py','utf8');
 var CSS=(SRC.match(/\.asstfab\{[\s\S]*?\.tourfab\{/)||[""])[0];
 var ok=0,bad=[];
@@ -361,9 +361,14 @@ t("Hoi dap nam trong menu, khong bi giau", PBK["hoidap"]&&!PBK["hoidap"].hide);
  try{
   go("duyet");duyTabSet("duyetnghi");
   var nav=document.getElementById("nav").innerHTML;
-  t("bam tab Don xin nghi thi menu sang dung muc do", nav.indexOf('class="navitem on" data-k="duyetnghi"')>=0);
+  /* v5: mỗi hàng chờ là một mục menu riêng. v6: chúng là TAB của hub "Chờ duyệt", nên mục
+     sáng lên phải là hub - cùng một ý định, khác hình dạng. */
+  t("bam tab Don xin nghi thi menu sang dung muc do",
+    nav.indexOf('class="navitem on" data-k="'+(V6()?"duyet":"duyetnghi")+'"')>=0);
   duyTabSet("duyetthu");nav=document.getElementById("nav").innerHTML;
-  t("doi sang tab khac thi vet sang nhay theo", nav.indexOf('class="navitem on" data-k="duyetthu"')>=0&&nav.indexOf('data-k="duyetnghi"')>=0&&nav.indexOf('class="navitem on" data-k="duyetnghi"')<0);
+  t("doi sang tab khac thi vet sang nhay theo",
+    V6() ? (nav.indexOf('class="navitem on" data-k="duyet"')>=0)
+         : (nav.indexOf('class="navitem on" data-k="duyetthu"')>=0&&nav.indexOf('data-k="duyetnghi"')>=0&&nav.indexOf('class="navitem on" data-k="duyetnghi"')<0));
  }catch(e){t("thu that tab hub khong vo: "+e.message,false)}
 })();
 

@@ -26,7 +26,7 @@ global.document={getElementById:(id)=>ST[id]||(ST[id]=El()),querySelector:()=>El
 global.window=global;global.location={hash:""};
 global.localStorage={getItem:()=>null,setItem(){},removeItem(){}};
 global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
-require('vm').runInThisContext(require('fs').readFileSync('./_APP.js','utf8'));
+require('vm').runInThisContext(require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8'));
 setRole("all");
 
 /* ---------- bo khung ---------- */

@@ -13,7 +13,7 @@ global.document={getElementById:(id)=>ST[id]||(ST[id]=El(id)),querySelector:()=>
 global.window=global;global.location={hash:""};
 var _LS={};global.localStorage={getItem:k=>_LS[k]===undefined?null:_LS[k],setItem(k,v){_LS[k]=String(v)},removeItem(k){delete _LS[k]}};
 global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
-require('vm').runInThisContext(require('fs').readFileSync('./_APP.js','utf8'));
+require('vm').runInThisContext(require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8'));
 setRole("all");
 var bad=[],ok=0;
 function t(n,c){if(c)ok++;else bad.push(n)}
@@ -246,7 +246,7 @@ t("co trang ngoai LISTCFG cung dung duoc (giao viec)", fltCode("giaoviec")==="DL
     thua. Do la do cai dang chuyen dong - hom nay do, mai lai xanh, khong sua gi ca.
     Y DINH that su: cam khai ten mot nhom ma KHONG luat nao sinh ra duoc. Vay thi doi chieu voi
     NGUON: ten nhom nam trong loi goi add(...) cua slaItems, cong ten cac chang hanh trinh. */
- var SRC=require('fs').readFileSync('./_APP.js','utf8');
+ var SRC=require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8');
  var CONHAM={};
  (SRC.match(/add\((?:CAT|"[^"]*")\s*,\s*"([^"]*)"/g)||[]).forEach(function(m){
   var g=m.replace(/^add\((?:CAT|"[^"]*")\s*,\s*"/,"").replace(/"$/,"");if(g)CONHAM[g]=1});

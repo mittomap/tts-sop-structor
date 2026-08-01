@@ -28,7 +28,7 @@ var SVR=(typeof google!=="undefined"&&google.script&&google.script.run);
    Vì sao không tách nguồn: hai nguồn cạnh nhau thì sẽ trôi khỏi nhau. Mọi bản vá chung sau này
    (bộ lọc, câu chữ, phân quyền) phải làm hai lần, và tới lần thứ ba là quên một bên - đúng cái
    bẫy "một sự thật ở hai chỗ" mà dự án này đã cắn nhiều lần. */
-window.ITTS_V6=0;
+window.ITTS_V6=1;
 function V6(){return !!window.ITTS_V6}
 
 /* ===== NỀN DEMO ĐA CỔNG (V9.7) =====
@@ -17985,4 +17985,4 @@ function demoBoot(){
  if(who===null||who===undefined){demoGate()}
  else{window.GATE_SID=who||"";applyScope(who||"");enter("all")}
  try{asstTick();tourBtnSync()}catch(e){}}
-if(!SVR){demoBootHV()}
+if(!SVR){demoBoot()}

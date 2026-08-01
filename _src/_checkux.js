@@ -25,7 +25,7 @@ global.window=global;global.location={hash:""};
 global.localStorage={getItem:()=>null,setItem(){},removeItem(){}};
 global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
 global.innerWidth=1400;global.innerHeight=900;
-require('vm').runInThisContext(require('fs').readFileSync('./_APP.js','utf8'));
+require('vm').runInThisContext(require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8'));
 var SRC=require('fs').readFileSync('./gen_v5.py','utf8');
 var L=SRC.split("\n");
 var ok=0,bad=[];

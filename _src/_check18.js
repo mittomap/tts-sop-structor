@@ -26,7 +26,7 @@ global.window=global;global.location={hash:"",search:"",pathname:"/cong-nhan-vie
 global.history={replaceState:function(){}};
 var _LS={};global.localStorage={getItem:k=>_LS[k]===undefined?null:_LS[k],setItem(k,v){_LS[k]=String(v)},removeItem(k){delete _LS[k]}};
 global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
-var SRC0=fs.readFileSync('./_APP.js','utf8');
+var SRC0=fs.readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8');
 require('vm').runInThisContext(SRC0);
 setRole("all");
 try{cfEnsure();rtEnsure()}catch(e){}

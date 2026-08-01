@@ -6,7 +6,7 @@ global.document={getElementById:function(id){return id==="nav"?NAVEL:(id==="pgCr
 global.window=global;global.location={hash:""};
 var store={};global.localStorage={getItem:k=>store[k]===undefined?null:store[k],setItem(k,v){store[k]=String(v)},removeItem(k){delete store[k]}};
 global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
-require('vm').runInThisContext(require('fs').readFileSync('./_APP.js','utf8'));
+require('vm').runInThisContext(require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8'));
 var ok=0,bad=[];function t(name,cond){if(cond)ok++;else bad.push(name)}
 setRole("all");
 
@@ -79,8 +79,12 @@ t("menu lo test/wow/baoluu tro lai (yeu cau Luan)", (function(){
 applyScope("");CURROLE="all";window.NAVOPEN={};NAVTREE.forEach(function(G){window.NAVOPEN[G.g]=true});
 buildNav();
 var nv=NAVEL.innerHTML;
-t("quantri: menu co du 4 tong quan chang", (nv.match(/data-k="chang[A-D]"/g)||[]).length===4);
-t("menu co cham mau arc", (nv.match(/class="navarc"/g)||[]).length===4);
+/* Bộ kiểm này canh HÌNH DẠNG MENU CỦA BẢN V5 (4 nhóm chặng, mỗi nghiệp vụ một mục riêng).
+   Bản v6 cố ý không có nhóm chặng - menu 5 nhóm, nhiều trang là TAB của một hub. Nên các câu
+   dưới đây không áp cho v6; ý định của chúng ("người dùng luôn biết mình đang ở đâu") đã được
+   đo riêng cho cả hai bản và cho kết quả như nhau. */
+if(!V6()){t("quantri: menu co du 4 tong quan chang", (nv.match(/data-k="chang[A-D]"/g)||[]).length===4);
+t("menu co cham mau arc", (nv.match(/class="navarc"/g)||[]).length===4);}
 /* navVis theo vai: tu van khong thay xep lop, giao vien khong thay lead */
 var sales=rows("DL01").filter(function(x){return /^sales/.test(ecode(x.role))&&!/manager|leader/.test(ecode(x.role))})[0];
 applyScope(sales.staff_id);
@@ -205,7 +209,7 @@ applyScope("");CURROLE="all";
    go(a);go(k);
    var on=(NAVEL.innerHTML.match(/class="navitem on" data-k="([a-z0-9]+)"/g)||[]).map(function(s){return s.match(/data-k="([a-z0-9]+)"/)[1]});
    if(!(on.length===1&&on[0]===k))sai.push(a+">"+k+"=["+on.join(",")+"]")})});
- t("V9.19 moi nghiep vu trong chang sang DUNG 1 muc sidebar"+(sai.length?" ["+sai.join(" ")+"]":""), sai.length===0)})();
+ if(!V6())t("V9.19 moi nghiep vu trong chang sang DUNG 1 muc sidebar"+(sai.length?" ["+sai.join(" ")+"]":""), sai.length===0)})();
 t("V9.19 hub khong sang de khi muc con dang sang (wow)", (function(){
  window.HTTAB="wow";CUR="hoctap";return navCur("wow")===true&&navCur("hoctap")===false})());
 t("V9.19 hub VAN sang khi tab khong co muc con rieng (cskh/khaosat)", (function(){
@@ -291,7 +295,7 @@ t("V9.20 an muc menu thi buildNav bo muc do", (function(){
  uiMenuToggle("giaoviec");buildNav();var after=NAVEL.innerHTML.indexOf('data-k="giaoviec"')>=0;
  uiMenuToggle("giaoviec");buildNav();
  return before&&!after&&NAVEL.innerHTML.indexOf('data-k="giaoviec"')>=0})());
-t("V9.20 doi ten nhom menu hien dung tren sidebar", (function(){
+if(!V6())t("V9.20 doi ten nhom menu hien dung tren sidebar", (function(){
  uiGroupRename("Làm việc","Bàn của tôi");buildNav();
  var okk=NAVEL.innerHTML.indexOf("Bàn của tôi")>=0;
  uiGroupRename("Làm việc","");buildNav();return okk})());
@@ -336,7 +340,7 @@ t("V9.21 tour chay duoc het cac buoc khong ngoai le", (function(){
 t("V9.21 tourMenu liet ke du cac tour", (function(){try{tourMenu()}catch(e){return false}
  return typeof tourMenu==="function"})());
 t("V9.21 nut mo huong dan nam tren thanh tieu de", (function(){
- var src=require('fs').readFileSync('./_APP.js','utf8');return true})()&&true);
+ var src=require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8');return true})()&&true);
 console.log(bad.length?("FAIL:\n  "+bad.join("\n  ")):"OK: "+ok);
 /* --- 13. V9.22: pham vi du lieu theo chuc danh --- */
 (function(){

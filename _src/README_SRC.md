@@ -326,3 +326,22 @@ Nay tất cả đều là `/unexcused/`.
 (số dòng điểm danh vượt số buổi đã dạy). Kèm theo là 4 luật mới canh chính đơn xin nghỉ:
 `4a-bis` (thiếu giờ HV báo) · `4a-ter` (chờ duyệt mà không ghi là vắng) ·
 `4a-quater` (chưa duyệt mà đã có người/giờ duyệt) · `E7` (dòng cho buổi chưa dạy phải là đơn xin nghỉ).
+
+## Chay bo kiem tren BAN V6 (them 01/08)
+
+`extract_js.py` nay trich BA file: `_APP.js` (v5), `_APP6.js` (v6), `_HV.js` (cong hoc vien).
+Moi bo kiem JS doc bien `ITTS_APP` nen chay duoc tren ban nao cung duoc:
+
+    ITTS_APP=./_APP6.js ITTS_OUT="$(cd .. && pwd)" node _checkaudit.js
+
+Vi sao co: truoc 01/08, `extract_js.py` chi trich tu ban v5, nen **20/21 bo kiem chua tung soi
+ban v6**. Ban v6 duoc giao ma khong bo kiem nao chay qua no. Chay lan dau tren v6 lien ra mot
+loi that: `navCurKey/navGroupOf/navInTree/navGrpArc` duyet CAM CUNG `NAVTREE` (cay menu v5), nen
+o v6 chung do nham cay - mo trang ra thi tren man hinh khong muc nao sang, nguoi dung mat dau
+minh dang dung dau. Nay ca bon hoi `navCay()`.
+
+Cac tieu chi canh HINH DANG MENU CUA V5 (4 nhom chang, ten nhom cu the) duoc khoanh `if(!V6())`
+trong `_check11`, `_check16`, `_checkqa` - v6 co y dung menu khac, khong phai loi.
+
+CON NO: chay tren v6, `_check16` con **1 tieu chi do** chua giai thich duoc ("trang duyet da co
+dai so"). Chua vao verify.sh vi the.

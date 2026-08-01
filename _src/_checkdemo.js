@@ -28,7 +28,7 @@
    ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 var FS=require('fs'), VM=require('vm');
-var APPSRC=FS.readFileSync('./_APP.js','utf8');
+var APPSRC=FS.readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8');
 var THU=["CN","T2","T3","T4","T5","T6","T7"];
 
 /* ── giả lập trình duyệt (giống _checkaudit) ─────────────────────────────────────────────── */

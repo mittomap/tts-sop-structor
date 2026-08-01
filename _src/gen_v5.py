@@ -10082,7 +10082,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
  if(tab==="menu"){
   h+='<div class="notebar" data-tour="cfmenu"><i class="ti ti-menu-2"></i><span data-tip="Đường dẫn trong app vẫn vào được và không mất dữ liệu. Tên nhóm và tên từng mục gõ lại được - gõ xong bấm ra ngoài là áp ngay. Chỉnh vừa ý thì bấm Lưu bản này.">Bỏ tick là <b>ẩn khỏi menu</b>; tên nhóm và tên mục gõ lại được.<i class="ti ti-info-circle gyti"></i></span></div>';
   h+='<div class="panel"><div class="pbody">';
-  NAVTREE.forEach(function(G){var gon=uiMenuOn("g:"+G.g);
+  navCay().forEach(function(G){var gon=uiMenuOn("g:"+G.g);
    var gkey=esc(G.g).split("'").join("");
    var non=G.items.filter(function(k){return uiMenuOn(k)}).length;
    h+='<div class="mnbox'+(gon?'':' off')+'">';
@@ -18880,12 +18880,12 @@ function navIsOpen(g){window.NAVOPEN=window.NAVOPEN||{};
    nguyên - chúng không phải các giai đoạn loại trừ nhau của cùng một vòng đời. */
 function navArcOnly(g){window.NAVOPEN=window.NAVOPEN||{};
  if(!navIsArcGrp(g))return;
- NAVTREE.forEach(function(G){if(navIsArcGrp(G.g)&&G.g!==g)window.NAVOPEN[G.g]=false})}
+ navCay().forEach(function(G){if(navIsArcGrp(G.g)&&G.g!==g)window.NAVOPEN[G.g]=false})}
 /* V9.29m (anh Luân): "bấm vào một chặng, nó nên mặc định mở bản đồ chặng luôn cho nhanh".
    Trước đây bấm tên chặng chỉ XỔ danh sách rồi đứng im - phải bấm thêm một nhát vào mục đầu tiên
    mới thấy bản đồ. Nay xổ chặng nào là mở luôn bản đồ chặng đó. Đang đứng sẵn trong chặng đó thì
    không nhảy lại (đỡ mất chỗ đang xem); gập lại thì tuyệt nhiên không điều hướng đi đâu. */
-function navGrpArc(g){for(var i=0;i<NAVTREE.length;i++)if(NAVTREE[i].g===g)return NAVTREE[i].arc||"";return ""}
+function navGrpArc(g){var T=navCay();for(var i=0;i<T.length;i++)if(T[i].g===g)return T[i].arc||"";return ""}
 function navToggle(g){window.NAVOPEN=window.NAVOPEN||{};
  var open=!navIsOpen(g);window.NAVOPEN[g]=open;
  if(!open){buildNav();return}
@@ -19014,7 +19014,11 @@ var HUBTAB={tuyensinh:{v:"TSTAB",d:"lead",m:{lead:"nhaplead",test:"test",tuvan:"
 function hubDef(hub){var H=HUBTAB[hub];return (H&&H.d)||""}
 function hubTab(hub){return window[(HUBTAB[hub]||{}).v]||hubDef(hub)}
 function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)]||""}
-function navInTree(k){for(var i=0;i<NAVTREE.length;i++)if(NAVTREE[i].items.indexOf(k)>=0)return true;return false}
+function navCay(){return (typeof V6==="function"&&V6())?NAVTREE6:NAVTREE}
+/* Cùng bệnh với navCurKey: phải hỏi ĐÚNG cây đang được vẽ. Hỏi nhầm cây thì navCur() tưởng
+   mục con có mặt trên menu rồi nhường sáng cho nó - mà mục con ấy không tồn tại ở v6, thành ra
+   cả menu không có gì sáng. */
+function navInTree(k){var T=navCay();for(var i=0;i<T.length;i++)if(T[i].items.indexOf(k)>=0)return true;return false}
 function navCur(k){
  /* mục con phải THỰC SỰ đứng trên menu mới nhường sáng cho nó (vd tab Khảo sát của CSKH không có
     mục riêng -> chính mục CSKH phải sáng, nếu không cả menu không có gì sáng - bẫy đã cắn) */
@@ -19030,11 +19034,19 @@ function navCur(k){
  return false}
 /* V9.27: quét menu xem có mục nào đang sáng không, và mục nào */
 var NAVFROM="";
-function navCurKey(){for(var i=0;i<NAVTREE.length;i++){var G=NAVTREE[i];
+/* Hai hàm này trước đây duyệt CẮM CỨNG `NAVTREE` - cây menu của bản v5. Bản v6 dựng menu từ
+   `NAVTREE6`, nên chúng dò nhầm cây: mở một trang ra, hàm tìm thấy mục trong cây KHÔNG ĐƯỢC VẼ
+   rồi báo "đang sáng", trong khi trên màn hình không mục nào sáng cả. Người dùng mất dấu mình
+   đang đứng đâu - đúng con bệnh W1 đã chữa cho v5, tái phát ở v6 vì quên hỏi "hàm này còn dùng
+   cây nào nữa không".
+   Phép đo đầu tiên của em cũng trượt vì cùng lý do: nó gọi `navAnyCur()`, mà hàm ấy đang soi
+   NAVTREE nên trả lời cho v5 dù đang chạy v6. Bộ kiểm bắt được là nhờ nó soi CHUỖI HTML thật
+   của thanh menu chứ không hỏi lại hàm của app. */
+function navCurKey(){var T=navCay();for(var i=0;i<T.length;i++){var G=T[i];
   for(var j=0;j<G.items.length;j++){var k=G.items[j];if(navVis(k)&&navCur(k))return k}}
  return ""}
 function navAnyCur(){return !!navCurKey()}
-function navGroupOf(k){for(var i=0;i<NAVTREE.length;i++){var G=NAVTREE[i];
+function navGroupOf(k){var T=navCay();for(var i=0;i<T.length;i++){var G=T[i];
   if(G.items.indexOf(k)>=0)return G.g;
   for(var j=0;j<G.items.length;j++)if(navOwner(G.items[j])===k)return G.g}
  return null}
