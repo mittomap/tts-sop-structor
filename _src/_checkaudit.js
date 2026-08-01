@@ -310,8 +310,62 @@ var CH3_NGOAIBAN={
  gia_khoa:"cập nhật bảng giá khóa - là cấu hình sản phẩm, nằm ở Cài đặt",
  fb_xau:"xử lý phản hồi tiêu cực - đã gộp vào việc 'Phản hồi chưa phân loại' của cùng thực thể"};
 (function(){
- t("bảng việc theo thực thể có đủ bốn thực thể", (TTHE||[]).length>=4,
-   "đang khai "+((TTHE||[]).length)+" - anh Luân kể tên khách, học viên, lớp, giảng viên");
+ /* ═══ LUẬT TRỤC (anh Luân 01/08) ═══════════════════════════════════════════════════════
+    *"Bất kể bộ phận nào, nghiệp vụ gì, miễn là phục vụ cho KHÁCH, cho HỌC VIÊN, cho PHỤ HUYNH,
+    cho LỚP HỌC. Các luồng thiết kế để chạy cho các đối tượng này, đều phải tham gia, và tham
+    gia cùng nhau, chứ ko rời rạc."*
+    Hai vế, canh cả hai:
+    (a) TRỤC LÀ NGƯỜI ĐƯỢC PHỤC VỤ - đúng bốn thực thể ấy, không thêm thực thể theo PHÒNG BAN.
+        Đã cắn: em đề xuất thêm "đợt thu" cho kế toán và "chiến dịch" cho marketing - lấy phòng
+        ban làm trung tâm là quay đúng về chỗ rời rạc cũ.
+    (b) THAM GIA CÙNG NHAU - mở một hồ sơ ra phải thấy việc của MỌI bộ phận, không chỉ của mình.
+        Đo trước khi sửa: 48% việc đang treo bị giấu khỏi người mở hồ sơ (marketing thấy 27%,
+        nhân sự 0%). Quyền phải chặn TAY, không che MẮT. */
+ (function(){
+  var PHAI=["khach","hocvien","phuhuynh","lop"];
+  var dang=(TTHE||[]).map(function(x){return x.k});
+  t("trục đúng bốn thực thể anh Luân chốt: khách · học viên · phụ huynh · lớp",
+    PHAI.length===dang.length&&PHAI.every(function(k){return dang.indexOf(k)>=0}),
+    "đang khai: "+dang.join(", "));
+  /* Không thực thể nào được đặt theo tên một phòng ban */
+  var BOPHAN=["ketoan","marketing","nhansu","tuvan","hocvu","wow","giaovien","hotro","dieuhanh"];
+  var pb=dang.filter(function(k){return BOPHAN.indexOf(k)>=0});
+  t("không thực thể nào lấy PHÒNG BAN làm trung tâm", !pb.length, pb.join(", "));
+
+  /* (b) mở hồ sơ ra là thấy việc của mọi bộ phận - đo bằng cách VẼ THẬT thẻ hồ sơ */
+  var giau=[], tongMinh=0, tongKhac=0;
+  rows("DL01").filter(function(x){return staffActive(x)}).forEach(function(nv){
+   applyScope(nv.staff_id);CURSTAFF=nv.staff_id;
+   var g=SCOPE().group; if(!g)return;
+   TTHE.forEach(function(T){
+    var d=[];try{d=ttDanhSach(T.k)}catch(e){d=[]}
+    d.slice(0,6).forEach(function(z){
+     var tat=[];try{tat=ttViecAll(T.k,z.r)}catch(e){return}
+     if(!tat.length)return;
+     var h="";try{h=banThe(T.k,z)}catch(e){giau.push(g+"/"+T.k+": không vẽ được thẻ");return}
+     var hien=(h.match(/class="banjob/g)||[]).length;
+     tongMinh+=z.viec.length; tongKhac+=(tat.length-z.viec.length);
+     if(hien<tat.length)giau.push(g+" mở "+T.k+" "+z.ma+": treo "+tat.length+" việc mà chỉ hiện "+hien)})})});
+  applyScope("");CURSTAFF="";
+  t("mở một hồ sơ ra là thấy việc của MỌI bộ phận, không chỉ của mình",
+    !giau.length, giau.slice(0,3).join(" · "));
+  console.log("  V6 - mot ho so, moi bo phan: "+tongMinh+" viec cua toi + "+tongKhac+
+   " viec cua bo phan khac deu HIEN (truoc day "+tongKhac+" viec nay bi giau)");
+  /* và việc của bộ phận khác phải nói RÕ đang chờ ai - thấy mà không biết chờ ai thì vô dụng */
+  var thieuAi=[];
+  rows("DL01").filter(function(x){return staffActive(x)}).slice(0,12).forEach(function(nv){
+   applyScope(nv.staff_id);CURSTAFF=nv.staff_id;
+   TTHE.forEach(function(T){
+    var d=[];try{d=ttDanhSach(T.k)}catch(e){d=[]}
+    d.slice(0,4).forEach(function(z){
+     var k2=[];try{k2=ttViecKhac(T.k,z.r)}catch(e){return}
+     if(!k2.length)return;
+     var h="";try{h=banThe(T.k,z)}catch(e){return}
+     var noi=(h.match(/đang chờ <b>/g)||[]).length;
+     if(noi<k2.length)thieuAi.push(T.k+" "+z.ma+": "+k2.length+" việc mà chỉ "+noi+" chỗ ghi đang chờ ai")})})});
+  applyScope("");CURSTAFF="";
+  t("việc của bộ phận khác đều ghi rõ đang chờ bộ phận nào", !thieuAi.length, thieuAi.slice(0,3).join(" · "));
+ })();
  /* (2) mọi dòng phải khai ai làm */
  var mo=(VIECTT||[]).filter(function(v){return !v.act&&!(v.vai&&v.vai.length)});
  t("mọi dòng việc đều khai ai làm (mã CH3 hoặc vai)", !mo.length,
@@ -327,7 +381,17 @@ var CH3_NGOAIBAN={
    !sot.length, sot.map(function(a){return a.k+" ("+a.t+")"}).slice(0,5).join(" · "));
  var thuaKhai=Object.keys(CH3_NGOAIBAN).filter(function(k){return !CH3BY[k]});
  t("bản khai ngoài-Bàn-làm-việc không nhắc mã đã biến mất", !thuaKhai.length, thuaKhai.join(", "));
- /* (3) mọi chức danh mở Bàn làm việc ở thực thể mặc định phải thấy việc */
+ /* (3) mọi chức danh mở Bàn làm việc ở thực thể mặc định phải thấy việc CỦA MÌNH - hoặc khai
+    được lý do đọc được vì sao không.
+    Anh Luân 01/08 chốt trục: bốn thực thể trung tâm là KHÁCH · HỌC VIÊN · PHỤ HUYNH · LỚP -
+    những NGƯỜI ĐƯỢC PHỤC VỤ. Hệ quả trung thực: có chức danh mà công việc gần như không chạm
+    tới bốn đối tượng ấy. Nhân sự là một - tuyển người, chấm công, hồ sơ lao động đều là việc
+    nội bộ. Đo ra đúng thế: nhân sự có 0 hành động CH3 nào ngoài mấy việc máy tự làm.
+    Bịa thêm việc cho ô khỏi trống là nói dối; giấu đi cũng là nói dối. Nên khai ra. */
+ var BANTRONG={
+  nhansu:"việc chính của Nhân sự (tuyển người, chấm công, hồ sơ lao động) là việc nội bộ, không "+
+   "phục vụ trực tiếp khách/học viên/phụ huynh/lớp. Phần có chạm tới người học - lớp phải có "+
+   "giáo viên chính - đã nằm trên Bàn làm việc ở thực thể Lớp, nhưng có ngày không lớp nào thiếu."};
  var doi=[], daXet={};
  rows("DL01").filter(function(x){return staffActive(x)}).forEach(function(nv){
   applyScope(nv.staff_id);CURSTAFF=nv.staff_id;
@@ -336,8 +400,10 @@ var CH3_NGOAIBAN={
   var k=ttMacDinh(), ds=[];
   try{ds=ttDanhSach(k)}catch(e){doi.push(g+": lỗi "+e.message);return}
   var cv=ds.filter(function(z){return z.viec.length});
-  if(!cv.length)doi.push(g+" mở Bàn làm việc ("+k+") ra trống");
+  if(!cv.length&&!BANTRONG[g])doi.push(g+" mở Bàn làm việc ("+k+") ra trống mà không khai lý do");
  });
+ var thuaKhaiBT=Object.keys(BANTRONG).filter(function(g){return !daXet[g]});
+ t("bản khai chức danh-bàn-trống không nhắc chức danh đã biến mất", !thuaKhaiBT.length, thuaKhaiBT.join(", "));
  applyScope("");CURSTAFF="";
  t("mọi chức danh mở Bàn làm việc ở thực thể mặc định đều thấy việc", !doi.length, doi.slice(0,4).join(" · "));
 
@@ -425,8 +491,9 @@ var CH3_NGOAIBAN={
 
   function hoSoThu(v){
    var T=TTBK[v.tt], ds=[];
-   try{ds=rows(T.bang)}catch(e){}
-   if(v.tt==="giangvien")ds=ds.filter(function(x){try{return isGVRole(x)&&staffActive(x)}catch(e){return false}});
+   /* Thuc the co the duoc DUNG SAN tu du lieu khac (phu huynh dung tu ba cot nguoi giam ho
+      cua DL09) - hoi T.nguon truoc, dung rows(T.bang) la ra bang rong. */
+   try{ds=T.nguon?T.nguon():rows(T.bang)}catch(e){}
    var r=ds.filter(function(x){try{return v.khi(x)}catch(e){return false}})[0];
    return r?{r:r,that:true}:{r:ds[0],that:false}}
 

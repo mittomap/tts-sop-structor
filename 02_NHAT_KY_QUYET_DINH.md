@@ -149,7 +149,23 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.73 — "DRAWER XỬ LÝ ĐƯỢC HẾT": TRẢ NỐT CỐT LÕI CỦA Ý TƯỞNG V6 ✅ (01/08).**
+> **Phiên bản: V9.74 — TRỤC LÀ NGƯỜI ĐƯỢC PHỤC VỤ, MỌI BỘ PHẬN CÙNG ĐỨNG TRÊN MỘT HỒ SƠ ✅ (01/08).**
+> · **Anh Luân:** *"Phục vụ cả kế toán là sai, a muốn hay không cũng sai... miễn là phục vụ cho
+> khách, cho học viên, cho phụ huynh, cho lớp học... đều phải tham gia, và tham gia cùng nhau,
+> chứ ko rời rạc."*
+> · Câu này **bác bỏ đề xuất sai của em** ở phiên trước (thêm thực thể "đợt thu" cho kế toán,
+> "chiến dịch" cho marketing) - lấy PHÒNG BAN làm trung tâm là quay về chỗ rời rạc cũ.
+> · Trục nay đúng **bốn**: khách · học viên · **phụ huynh (mới, dựng từ ba cột người đồng hành
+> của DL09 - 50 người)** · lớp. **Giảng viên rời khỏi trục** - là người phục vụ, không phải người
+> được phục vụ; việc dạy dỗ về Lớp, việc hồ sơ về Nhân sự, sổ Giảng viên vẫn nguyên ở Tra cứu.
+> · **48% việc trên hồ sơ đang bị giấu** khỏi người mở nó (marketing 27%, nhân sự 0%). Gốc bệnh:
+> một hàm gánh hai câu hỏi. Nay tách **THẤY** khỏi **LÀM** - *quyền chặn TAY, không che MẮT*.
+> Sau sửa: **100% việc hiện**, việc bộ phận khác ghi rõ **đang chờ ai**.
+> · Nhân sự mở bàn ra trống: em **không bịa việc để lấp** - cho họ một việc thật (lớp chưa có
+> giáo viên chính) và **khai lý do** rằng việc chính của họ là nội bộ.
+> · `_checkaudit` 44 → **48 tiêu chí**.
+>
+> **Phiên bản trước: V9.73 — "DRAWER XỬ LÝ ĐƯỢC HẾT": TRẢ NỐT CỐT LÕI CỦA Ý TƯỞNG V6 ✅ (01/08).**
 > · **Anh Luân:** *"Ý tưởng ban đầu khi tạo V6, chưa làm được à em, cần nâng cấp gì em cứ làm đi."*
 > · Làm được tại chỗ **4/29 → 23/29**; 6 việc còn lại là hàng loạt cố ý. **Không còn việc nào nói
 > "chưa chuyển vào ngăn kéo".**
@@ -6667,3 +6683,83 @@ Kết quả: lỗi thật **1 → 0**, và số "ca có ý" thôi trôi (**11 �
 Làm được tại chỗ **4/29 → 23/29** (11 form riêng + 12 ngăn kéo dùng lại), hàng loạt cố ý **6/29**,
 **còn nợ 0**. `_checkaudit` 43 → **44 tiêu chí**, đổi từ đếm khai sang chạy thử. `check_logic.py`
 nay tất định, không còn phụ thuộc giờ chạy. Font subset 219 → **220 icon**. 21 bộ kiểm xanh hết.
+
+
+---
+
+## V9.74 - TRỤC LÀ NGƯỜI ĐƯỢC PHỤC VỤ, VÀ MỌI BỘ PHẬN CÙNG ĐỨNG TRÊN MỘT HỒ SƠ (01/08)
+
+> **Anh Luân:** *"Phục vụ cả kế toán là sai, a muốn hay không cũng sai. Bất kể bộ phận nào,
+> nghiệp vụ gì, miễn là phục vụ cho khách, cho học viên, cho phụ huynh, cho lớp học. Các luồng
+> thiết kế để chạy cho các đối tượng này, đều phải tham gia, và tham gia cùng nhau, chứ ko rời rạc."*
+
+Câu này sửa một sai lầm em vừa đề xuất ở phiên trước: thấy kế toán và marketing "không được lợi
+gì từ v6", em đề xuất **thêm thực thể cho họ** - "đợt thu", "chiến dịch". Đó là lấy **PHÒNG BAN**
+làm trung tâm, tức là quay đúng về chỗ rời rạc cũ, chỉ khác cái tên. Trung tâm phải là **NGƯỜI
+ĐƯỢC PHỤC VỤ**.
+
+### 1. Trục: đúng bốn thực thể, và Giảng viên rời khỏi trục
+
+**Khách · Học viên · Phụ huynh · Lớp học.**
+
+- **Phụ huynh - thực thể mới.** Không có bảng riêng trong SOP: họ nằm trong ba cột người đồng
+  hành của DL09, nên thực thể này được **dựng từ dữ liệu ấy**, gom theo số điện thoại - một số
+  là một người, kèm danh sách con. Hiện có **50 phụ huynh**. Ba việc: con đang có nguy cơ (cần
+  báo/họp), con còn nợ học phí, chưa khai quan hệ.
+- **Giảng viên rời khỏi trục.** Giảng viên là người **phục vụ**, không phải người **được phục
+  vụ**. Bốn dòng việc cũ: hai việc dạy dỗ (nhận xét buổi, mốc giờ) phục vụ LỚP nên nằm ở lớp -
+  mà lớp đã có sẵn cả hai, giữ ở giảng viên chỉ là kể hai lần cùng một việc; hai việc hồ sơ nhân
+  sự (chức danh/cơ sở, email) không phục vụ ai trong bốn đối tượng nên về trang Nhân sự.
+  **Bỏ khỏi trục không phải là bỏ khỏi app** - sổ Giảng viên vẫn nguyên trong Tra cứu.
+
+### 2. "Tham gia cùng nhau, chứ không rời rạc" - chỗ hỏng nặng nhất
+
+Bàn làm việc bản đầu lọc việc theo chức danh **ngay từ khi HIỆN**. Đo ra:
+
+| Chức danh | Việc của tôi | Việc bộ phận khác **bị giấu** | Thấy được |
+|---|---|---|---|
+| Marketing | 31 | 85 | **27%** |
+| Nhân sự | 1 | 236 | **0%** |
+| Kế toán | 74 | 72 | 51% |
+| **Tổng** | **608** | **554** | **52%** |
+
+Gần một nửa sự thật trên hồ sơ bị giấu khỏi chính người đang mở nó. Ba bộ phận cùng làm trên một
+học viên mà không ai thấy hai người kia - đó đúng là "rời rạc".
+
+**Gốc bệnh:** một hàm `ttViec` gánh hai câu hỏi khác nhau. Nay tách:
+
+> **THẤY** - mọi việc đang treo trên hồ sơ này, bất kể của ai.
+> **LÀM** - chỉ việc mà bảng CH3 giao cho chức danh tôi.
+>
+> **Luật: quyền chặn TAY, không che MẮT.**
+
+Thẻ hồ sơ nay có hai khối: *"Việc của bạn (n)"* với nút Làm, và *"Bộ phận khác đang làm trên hồ
+sơ này (m)"* - thấy được, không bấm được, và **ghi rõ đang chờ bộ phận nào**. Dòng danh sách cũng
+hiện thêm *"· k việc của bộ phận khác"*.
+
+Sau khi sửa: **1162 dòng việc đều hiện, 0 bị giấu**; số làm được vẫn đúng 608.
+
+### 3. Nhân sự mở Bàn làm việc ra trống - và em không bịa việc để lấp
+
+Chuyển nhân sự từ thực thể "giảng viên" sang "lớp" thì họ trống. Số liệu nói thật: **nhân sự có 0
+hành động CH3** ngoài mấy việc máy tự làm - việc chính của họ (tuyển người, chấm công, hồ sơ lao
+động) **là việc nội bộ, không phục vụ trực tiếp bốn đối tượng**.
+
+Bịa thêm việc cho ô khỏi trống là nói dối; giấu đi cũng là nói dối. Nên:
+- cho họ đúng **một việc thật họ sở hữu và có chạm tới người học**: *lớp chưa có giáo viên chính*;
+- và **khai ra** trong `BANTRONG` rằng có ngày ô này trống, kèm lý do đọc được.
+
+### 4. Bộ kiểm
+
+`_checkaudit` 44 → **48 tiêu chí**, canh cả hai vế của luật: trục đúng bốn thực thể · **không
+thực thể nào lấy tên phòng ban** · mở hồ sơ ra là thấy việc của mọi bộ phận (vẽ THẬT thẻ hồ sơ
+rồi đếm dòng) · việc bộ phận khác đều ghi rõ đang chờ ai · chức danh nào bàn trống phải khai lý do.
+
+Ba chỗ đỏ dọn kèm, đều là loại "thêm cái mới mà quên khai": hai cửa ghi mới chưa vào `DOORS` ·
+bảng màu phình 110 → 112 vì em thêm một mã tím và một mã nền (đổi sang hai mã đã có) · tên
+"người giám hộ" lọt vào tooltip trong khi app đã thống nhất gọi "người đồng hành".
+
+### Số chốt phiên
+Trục **4 thực thể** (bỏ giảng viên, thêm phụ huynh). Việc **29 dòng**. Làm được tại chỗ **24/29**,
+hàng loạt cố ý **5/29**, còn nợ **0**. Hồ sơ hiện **100% việc đang treo** (trước 52%).
+`_checkaudit` 44 → **48 tiêu chí**. 21 bộ kiểm xanh hết.

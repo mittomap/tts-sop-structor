@@ -1162,6 +1162,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .banviec{flex:none;display:flex;align-items:center;max-width:52%}
 .banch{color:var(--muted);flex:none;font-size:16px}
 .banjob{display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid var(--line)}
+.banjob.bankhac{opacity:.72;background:#FAFBFD}
 .banji{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none;background:var(--gray);color:#5A6675}
 .banji.do{background:var(--redb);color:var(--red)}
 .banji.ho{background:var(--amberb);color:var(--amber)}
@@ -17339,22 +17340,49 @@ function renderHoidap(){
    thật cạnh nhau thì sẽ trôi khỏi nhau. Giai đoạn chỉ dùng để hiện cái chip cho người đọc biết
    mình đang đứng ở đâu trong hành trình.
    ═══════════════════════════════════════════════════════════════════════════════════════════ */
+/* ═══ BỐN THỰC THỂ TRUNG TÂM ═══════════════════════════════════════════════════════════════
+   Anh Luân 01/08: *"Bất kể bộ phận nào, nghiệp vụ gì, miễn là phục vụ cho KHÁCH, cho HỌC VIÊN,
+   cho PHỤ HUYNH, cho LỚP HỌC."*
+
+   Đây là câu chốt trục, và nó loại bỏ đúng cái em đã đề xuất sai: thêm thực thể "đợt thu" cho
+   kế toán, "chiến dịch" cho marketing. Lấy PHÒNG BAN làm trung tâm là quay về đúng chỗ cũ - mỗi
+   phòng một góc riêng, rời rạc. Trung tâm phải là NGƯỜI ĐƯỢC PHỤC VỤ.
+
+   Vì thế **Giảng viên không còn là thực thể trung tâm**: giảng viên là người phục vụ, không phải
+   người được phục vụ. Việc dạy dỗ của họ phục vụ LỚP nên nằm ở lớp (nhận xét buổi, mốc giờ - lớp
+   đã có sẵn cả hai). Còn hồ sơ nhân sự (chức danh, cơ sở, email) là việc nội bộ, ở trang Nhân sự.
+   Danh sách giảng viên vẫn còn nguyên trong Tra cứu - bỏ khỏi trục KHÔNG phải là bỏ khỏi app. */
 var TTHE=[
- {k:"khach",  t:"Khách",     ic:"ti-user-plus",  bang:"DL02", ma:"lead_id",    ten:"full_name",
-  col:"#3B82C4", d:"Giai đoạn chưa học. Mọi việc đều nhằm một đích: đưa họ vào lớp."},
- {k:"hocvien",t:"Học viên",  ic:"ti-user-check", bang:"DL09", ma:"student_id", ten:"full_name",
-  col:"#0D9488", d:"Giai đoạn đang học, tạm dừng hoặc đã xong khóa. Việc xoay quanh chính người học."},
- {k:"lop",    t:"Lớp",       ic:"ti-chalkboard", bang:"DL10", ma:"class_id",   ten:"class_name",
-  col:"#6B4FA0", d:"Đơn vị vận hành hằng ngày của giảng dạy - buổi, điểm danh, bài tập, nhận xét."},
- /* Anh Luân kể tên cả "giảng viên" và "các team khác" trong danh sách chủ thể. Giảng viên là
-    thực thể của khối Nhân sự và Quản lý - họ không làm việc với học viên, họ làm việc với NGƯỜI
-    DẠY. Thiếu thực thể này thì Nhân sự mở Bàn làm việc ra thấy màn trống, mà họ vẫn có việc. */
- {k:"giangvien",t:"Giảng viên",ic:"ti-user-star",bang:"DL01",ma:"staff_id",ten:"full_name",
-  col:"#B58A2B", d:"Người dạy - hồ sơ, bảng công, khối lượng lớp đang gánh."}];
+ {k:"khach",  t:"Khách",  ic:"ti-user-plus",  bang:"DL02", ma:"lead_id",    ten:"full_name", col:"#3B82C4",
+  d:"Chưa học - trung tâm của chặng tuyển sinh."},
+ {k:"hocvien",t:"Học viên",ic:"ti-user-check", bang:"DL09", ma:"student_id", ten:"full_name", col:"#0D9488",
+  d:"Đang học - trung tâm của mọi nghiệp vụ vận hành."},
+ {k:"phuhuynh",t:"Phụ huynh",ic:"ti-users",   bang:"__PH", ma:"ph_id",      ten:"full_name", col:"#7C3AED",
+  nguon:function(){return phDS()},
+  d:"Người đồng hành của học viên - dựng từ ba cột người đồng hành trong hồ sơ."},
+ {k:"lop",    t:"Lớp",     ic:"ti-chalkboard", bang:"DL10", ma:"class_id",   ten:"class_name",col:"#6B4FA0",
+  d:"Đang học - trung tâm của giảng dạy và điểm danh."}];
+/* Phụ huynh KHÔNG có bảng riêng trong SOP - họ nằm trong ba cột người giám hộ của DL09. Nên
+   thực thể này được DỰNG từ dữ liệu ấy, gom theo số điện thoại: một số là một người, kèm danh
+   sách con. Dựng lại mỗi lần vẽ thì tốn, nên nhớ tạm và xoá khi dữ liệu đổi. */
+function phDS(){
+ if(window.__phDS)return window.__phDS;
+ var m={},out=[];
+ rows("DL09").forEach(function(s2){
+  var sdt=ghSdt(s2); if(!sdt)return;
+  if(!m[sdt]){m[sdt]={ph_id:sdt,full_name:ghTen(s2)||("Người đồng hành "+sdt),
+   phone_number:sdt,quanhe:ghQuanHe(s2),con:[]};out.push(m[sdt])}
+  m[sdt].con.push(s2)});
+ window.__phDS=out;return out}
+function phQuen(){window.__phDS=null}
+function phCon(P){return (P&&P.con)||[]}
 var TTBK={};TTHE.forEach(function(x){TTBK[x.k]=x});
 /* Chức danh nào mở app ra thì đứng ở thực thể nào trước - đúng thứ họ làm cả ngày. */
+/* Nhân sự trước đây đáp vào thực thể "giảng viên"; nay giảng viên không còn là thực thể trung
+   tâm nên nhân sự đáp vào LỚP - chỗ việc của họ chạm tới người được phục vụ (lớp có đủ giáo
+   viên, buổi có nhận xét). Hồ sơ nhân sự thuần tuý vẫn ở trang Nhân sự. */
 var TTMAC={tuvan:"khach",marketing:"khach",hocvu:"lop",giaovien:"lop",wow:"khach",ketoan:"hocvien",
- hotro:"hocvien",nhansu:"giangvien",dieuhanh:"khach",quantri:"khach"};
+ hotro:"hocvien",nhansu:"lop",dieuhanh:"khach",quantri:"khach"};
 function ttMacDinh(){var g=(SCOPE().group||"quantri");var v=TTMAC[g]||"khach";
  return TTBK[v]?v:"hocvien"}
 
@@ -17517,29 +17545,39 @@ var VIECTT=[
    return con>=0&&con<=ngay&&num(C.current_enrollment)<num(paramOf("classMinStudents",6))},
   vichung:"Quyết dồn lớp hay lùi ngày phải nhìn nhiều lớp cạnh nhau mới quyết được.",
   go:function(C){return "go('banglop')"}},
- /* ─── GIẢNG VIÊN · thực thể của khối Nhân sự & Quản lý ─────────────────────────────────── */
- {tt:"giangvien",vai:["nhansu"],t:"Hồ sơ còn thiếu chức danh / cơ sở",ic:"ti-id-badge",sev:"amber",
-  khi:function(G){return !String(G.branch||"").trim()||!String(G.role||"").trim()},
-  keo:function(G){return bkHoSoGV(G)},
-  go:function(G){return "go('nhansu')"}},
- {tt:"giangvien",vai:["nhansu"],t:"Buổi đã dạy còn thiếu mốc giờ",ic:"ti-clock-exclamation",sev:"amber",
-  khi:function(G){return ttSo("DL11",function(x){return String(x.teacher_id||"")===String(G.staff_id)&&
-   isc(x.session_status,"completed")&&
-   !(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())}).length>0},
-  vichung:"Soát mốc giờ là đối chiếu cả tháng của nhiều giảng viên - phải là bảng.",
-  go:function(G){return "window.GVTAB='cong';go('giangvien')"}},
- {tt:"giangvien",vai:["nhansu"],t:"Chưa có email đăng nhập",ic:"ti-mail",sev:"",
-  khi:function(G){return !String(G.email||"").trim()},
-  keo:function(G){return bkEmailGV(G)},
-  go:function(G){return "go('nhansu')"}},
- {tt:"giangvien",act:"tnote",t:"Đang nợ nhận xét buổi",ic:"ti-notes",sev:"red",
-  khi:function(G){return ttSo("DL11",function(x){return String(x.teacher_id||"")===String(G.staff_id)&&
-   (function(){var st=bhState(x);return st.done&&!st.note})()}).length>0},
-  keoMo:function(G){var x=ttSo("DL11",function(y){return String(y.teacher_id||"")===String(G.staff_id)&&
-    (function(){var st=bhState(y);return st.done&&!st.note})()})[0];
-   if(!x){toast("Giảng viên này vừa nộp đủ nhận xét.");reRender(CUR);return}
-   bhNoteForm(x.session_id)},
-  go:function(G){return "window.GVTAB='ds';go('giangvien')"}},
+ /* ─── PHỤ HUYNH · người đồng hành của học viên ────────────────────────────────────────────
+    Bốn dòng việc giảng viên cũ đã rời khỏi đây: hai việc dạy dỗ (nhận xét buổi, mốc giờ) phục vụ
+    LỚP nên nằm ở lớp - lớp đã có sẵn cả hai, giữ lại ở giảng viên chỉ là kể hai lần cùng một
+    việc. Hai việc hồ sơ nhân sự (chức danh/cơ sở, email) không phục vụ ai trong bốn đối tượng,
+    nên về đúng trang Nhân sự. */
+ {tt:"phuhuynh",vai:["hocvu","giaovien"],t:"Con đang có nguy cơ - cần báo phụ huynh",ic:"ti-alert-triangle",sev:"red",
+  khi:function(P){return phCon(P).some(function(c){return stuRisk(c)})},
+  keo:function(P){return bkPHNguyCo(P)},
+  go:function(P){var c=phCon(P).filter(function(x){return stuRisk(x)})[0]||phCon(P)[0]||{};
+   return "window.HOSO='"+esc(c.student_id||"")+"';go('hoso')"}},
+ {tt:"phuhuynh",act:"pay_ghi",t:"Con còn nợ học phí",ic:"ti-cash",sev:"amber",
+  khi:function(P){return phCon(P).some(function(c){
+   return ttDonCua(c.student_id).some(function(e){return num(e.remaining_amount)>0})})},
+  keoMo:function(P){
+   var e=null;
+   phCon(P).forEach(function(c){if(e)return;
+    e=ttDonCua(c.student_id).filter(function(x){return num(x.remaining_amount)>0})[0]||null});
+   if(!e){toast("Các con đã đóng đủ học phí.");reRender(CUR);return}
+   payForm(e.enrollment_id)},
+  go:function(P){return "goTS('thanhtoan')"}},
+ {tt:"phuhuynh",vai:["hocvu"],t:"Chưa khai quan hệ với học viên",ic:"ti-id-badge",sev:"",
+  khi:function(P){return !String(P.quanhe||"").trim()},
+  keo:function(P){return bkPHQuanHe(P)},
+  go:function(P){var c=phCon(P)[0]||{};return "window.HOSO='"+esc(c.student_id||"")+"';go('hoso')"}},
+
+ /* Việc của Nhân sự chạm tới người được phục vụ: lớp phải có giáo viên chính. Đây là việc
+    THẬT của họ, không phải việc bịa ra cho ô khỏi trống - lớp thiếu giáo viên là lớp không dạy
+    được. Hôm nay dữ liệu demo chỉ có 1 lớp thiếu và lớp đó chưa mở, nên ô này có thể trống; điều
+    đó được khai rõ ở `BANTRONG` thay vì giấu đi. */
+ {tt:"lop",vai:["nhansu","hocvu"],t:"Lớp chưa có giáo viên chính",ic:"ti-user-star",sev:"red",
+  khi:function(C){return isc(C.class_status,"open","planning","ongoing")&&!String(C.main_teacher_id||"").trim()},
+  keoMo:function(C){clsSetTeacher(C.class_id)},
+  go:function(C){return "openLop('"+esc(C.class_id)+"')"}},
  {tt:"lop",act:"tnote",t:"Buổi thiếu mốc giờ vào/ra",ic:"ti-clock-exclamation",sev:"",
   khi:function(C){return ttBuoiLop(C.class_id).some(function(x){return isc(x.session_status,"completed")&&
    !(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())})},
@@ -17553,19 +17591,48 @@ function ttDuocLam(v){
  var g=SCOPE().group||"quantri";
  if(g==="quantri"||g==="dieuhanh")return true;
  return (v.vai||[]).indexOf(g)>=0}
-/* Việc CỦA TÔI với hồ sơ này. Thứ tự: đỏ trước, rồi hổ phách, rồi thường. */
+/* ═══ MỘT HỒ SƠ, MỌI BỘ PHẬN ═══════════════════════════════════════════════════════════════
+   Anh Luân 01/08: *"Bất kể bộ phận nào, nghiệp vụ gì, miễn là phục vụ cho khách, cho học viên,
+   cho phụ huynh, cho lớp học. Các luồng thiết kế để chạy cho các đối tượng này, đều phải tham
+   gia, và tham gia cùng nhau, chứ ko rời rạc."*
+
+   Bản đầu của Bàn làm việc lọc việc theo chức danh NGAY TỪ KHI HIỆN: mở một hồ sơ ra, tôi chỉ
+   thấy phần của tôi. Đo ra: **48% việc đang treo trên hồ sơ bị giấu khỏi người đang mở nó** -
+   marketing chỉ thấy 27%, nhân sự thấy 0%. Đó đúng là "rời rạc": ba bộ phận cùng làm trên một
+   học viên mà không ai thấy hai người kia.
+
+   Tách làm hai câu hỏi khác nhau - trước đây bị gộp làm một:
+       THẤY  - mọi việc đang treo trên hồ sơ này, bất kể của ai.
+       LÀM   - chỉ việc mà bảng CH3 giao cho chức danh tôi.
+   Quyền không phải là bức tường che mắt; nó là bức tường chặn tay. */
 var TTSEV={red:0,amber:1,"":2};
-function ttViec(ttk,r){
+/* MỌI việc đang treo trên hồ sơ, kèm cờ `minh` (tôi có làm được không) và `bp` (bộ phận nào giữ). */
+function ttViecAll(ttk,r){
  var out=[];
  VIECTT.forEach(function(v){
-  if(v.tt!==ttk||!ttDuocLam(v))return;
+  if(v.tt!==ttk)return;
   var co=false;try{co=!!v.khi(r)}catch(e){co=false}
-  if(co)out.push(v)});
- return out.sort(function(a,b){return (TTSEV[a.sev||""]-TTSEV[b.sev||""])})}
+  if(!co)return;
+  var bp=v.act?((CH3BY[v.act]||{}).vai||[]):(v.vai||[]);
+  out.push({v:v,minh:ttDuocLam(v),bp:bp})});
+ return out.sort(function(a,b){
+  return (a.minh===b.minh)?(TTSEV[a.v.sev||""]-TTSEV[b.v.sev||""]):(a.minh?-1:1)})}
+/* Việc TÔI LÀM ĐƯỢC - vẫn cần riêng, vì đếm "hồ sơ cần tôi xử lý" phải đếm bằng tay tôi. */
+function ttViec(ttk,r){
+ return ttViecAll(ttk,r).filter(function(x){return x.minh}).map(function(x){return x.v})}
+/* Việc của bộ phận KHÁC đang treo trên hồ sơ này - tôi thấy, nhưng không bấm được. */
+function ttViecKhac(ttk,r){return ttViecAll(ttk,r).filter(function(x){return !x.minh})}
+function bpTen(g){return (typeof NHIPTEN!=="undefined"&&NHIPTEN[g])||({quantri:"Quản trị",dieuhanh:"Ban Giám đốc",
+ nhansu:"Nhân sự",hotro:"Nhóm hỗ trợ"}[g])||g}
+function bpTenDS(bp){
+ if(!bp||!bp.length)return "quản lý";
+ return bp.map(bpTen).join(" hoặc ")}
 /* Giai đoạn - CHỈ ĐỂ NHÌN. Người thì hỏi bộ máy chặng, lớp thì đọc trạng thái lớp. */
 function ttGiaiDoan(ttk,r){
  try{
   if(ttk==="lop")return elabel(r.class_status)||ecode(r.class_status)||"chưa khai";
+  if(ttk==="phuhuynh"){var n=phCon(r).length;
+   return n>1?(n+" con đang theo học"):(r.quanhe||"người đồng hành")}
   var pid=(ttk==="khach")?r.lead_id:r.student_id;
   var J=jInfo(pid);return (J&&J.S&&J.S.t)||"-";
  }catch(e){return "-"}}
@@ -17580,14 +17647,21 @@ function ttDanhSach(ttk){
     PHIẾU TEST của những lead ấy. Hồ sơ phải lên bàn khi: nó thuộc phạm vi của tôi, HOẶC tôi có
     việc phải làm với nó. Vế sau mới là vế đúng nghiệp vụ - việc tìm tới người, không phải người
     đi tìm việc. */
- var tat=[];try{tat=rows(T.bang)}catch(e){tat=[]}
- if(ttk==="giangvien")tat=tat.filter(function(x){try{return isGVRole(x)&&staffActive(x)}catch(e){return false}});
+ var tat=[];
+ try{tat=T.nguon?T.nguon():rows(T.bang)}catch(e){tat=[]}
  var ds=tat.filter(function(r){
-  var trong=false;try{trong=canRow(T.bang,r)}catch(e){trong=true}
+  var trong=false;
+  try{
+   /* Phụ huynh không có dòng riêng để hỏi phạm vi - hỏi qua CON của họ: con nào thuộc phạm vi
+      tôi thì phụ huynh ấy thuộc phạm vi tôi. */
+   trong=T.nguon?phCon(r).some(function(c){return canRow("DL09",c)}):canRow(T.bang,r);
+  }catch(e){trong=true}
   if(trong)return true;
   return ttViec(ttk,r).length>0});
- return ds.map(function(r){var v=ttViec(ttk,r);
+ return ds.map(function(r){var tat=ttViecAll(ttk,r);
+   var v=tat.filter(function(x){return x.minh}).map(function(x){return x.v});
    return {r:r,ma:ttMa(ttk,r),ten:ttTen(ttk,r),gd:ttGiaiDoan(ttk,r),viec:v,
+     khac:tat.length-v.length,
      do_:v.filter(function(x){return x.sev==="red"}).length}})
   .sort(function(a,b){return (b.do_-a.do_)||(b.viec.length-a.viec.length)||a.ten.localeCompare(b.ten)})}
 
@@ -17740,6 +17814,59 @@ function bkLuuNhacTest(lid,tid){
   jUpdRow("DL03",tid,{booking_note:(r.booking_note?r.booking_note+" | ":"")+nowStr()+": đã nhắc ("+myName()+")"},
    function(){closeModal();toast("Đã ghi lượt nhắc lịch test cho "+(L.full_name||lid)+".");reRender(CUR)})})}
 
+/* ── HAI FORM CỦA PHỤ HUYNH ──────────────────────────────────────────────────────────────── */
+/* Báo phụ huynh khi con có nguy cơ. SOP mô tả họp 3 bên / 4 bên tuỳ mức - mà cả hai đều cần
+   phụ huynh có mặt, nên đây là việc đứng ở hồ sơ phụ huynh chứ không phải hồ sơ học viên. */
+function bkPHNguyCo(P){
+ var con=phCon(P).filter(function(c){return stuRisk(c)});
+ if(!con.length)return '<div class="empty">Các con hiện không còn ở diện nguy cơ.</div>';
+ var h='<div class="notebar nbred"><i class="ti ti-alert-triangle"></i>'+
+  (con.length>1?('<b>'+con.length+' con</b> đang ở diện nguy cơ: '):'Con đang ở diện nguy cơ: ')+
+  esc(con.map(function(c){return c.full_name||c.student_id}).join(", "))+'.</div>';
+ con.forEach(function(c){
+  var M=null;try{M=riskMuc(c)}catch(e){}
+  if(M)h+='<div class="fhint" style="margin:0 0 8px"><b>'+esc(c.full_name||c.student_id)+'</b>: '+
+   esc(M.grp.replace("Nguy cơ - ",""))+' - '+esc(M.viec)+'. Hạn '+esc(M.han)+'.</div>'});
+ h+='<div class="rform">'+
+  bkSel("bk_phk","Kênh đã liên hệ","enum_contact_channel","phone")+
+  bkO("bk_phhen","Hẹn họp với phụ huynh","datetime-local","","Để trống nếu chỉ mới trao đổi, chưa chốt lịch họp.")+
+  bkO("bk_phnoi","Nội dung đã trao đổi","ta","","Phụ huynh nói gì, đã thống nhất cam kết gì.")+
+  '</div>';
+ h+=bkLuu("bkLuuPHNguyCo('"+esc(P.ph_id)+"')","Ghi lượt báo phụ huynh");
+ return h}
+function bkLuuPHNguyCo(pid){
+ var P=null;phDS().forEach(function(x){if(String(x.ph_id)===String(pid))P=x});
+ if(!P){toast("Không thấy phụ huynh này.");return}
+ var noi=(fldV("bk_phnoi")||"").trim();
+ if(!noi){toast("Cần ghi lại nội dung đã trao đổi với phụ huynh.");return}
+ var hen=(fldV("bk_phhen")||"").trim();
+ var con=phCon(P).filter(function(c){return stuRisk(c)});
+ var xong=0;
+ con.forEach(function(c){
+  var cu=String(c.learning_followup_note||"");
+  jUpdRow("DL09",c.student_id,{
+   learning_followup_note:(cu?cu+" | ":"")+nowStr()+": báo phụ huynh qua "+
+    (elabel(fldV("bk_phk"))||fldV("bk_phk"))+" - "+noi+(hen?(" · hẹn họp "+dtVN(hen)):""),
+   last_followup_time:nowStr()},function(){
+   if(++xong===con.length){closeModal();
+    toast("Đã ghi lượt báo phụ huynh cho "+con.length+" con.");reRender(CUR)}})})}
+/* Quan hệ với học viên - SOP có sẵn cột, để trống thì không biết đang nói chuyện với ai. */
+function bkPHQuanHe(P){
+ var h='<div class="notebar"><i class="ti ti-id-badge"></i>Đang đồng hành cùng <b>'+
+  esc(phCon(P).map(function(c){return c.full_name||c.student_id}).join(", "))+'</b>.</div>';
+ h+='<div class="rform">'+bkSel("bk_phqh","Quan hệ với học viên","enum_guardian_relation")+'</div>';
+ h+=bkLuu("bkLuuPHQuanHe('"+esc(P.ph_id)+"')","Lưu quan hệ");
+ return h}
+function bkLuuPHQuanHe(pid){
+ var P=null;phDS().forEach(function(x){if(String(x.ph_id)===String(pid))P=x});
+ if(!P){toast("Không thấy phụ huynh này.");return}
+ var qh=fldV("bk_phqh");
+ if(!qh){toast("Chọn quan hệ với học viên.");return}
+ var con=phCon(P), xong=0;
+ con.forEach(function(c){jUpdRow("DL09",c.student_id,{emergency_contact_relation:qh},function(){
+  if(++xong===con.length){phQuen();closeModal();
+   toast("Đã ghi quan hệ cho "+(P.full_name||pid)+".");reRender(CUR)}})})}
+
 /* Điểm danh buổi test - KHÔNG phải một nút. Trang Test đầu vào có ba nút rời (có mặt · vắng ·
    khách từ chối); ngăn kéo phải bày đủ ba, vì chọn sai thì tỷ lệ dự test trong báo cáo lệch theo.
    Mỗi nhánh gọi lại đúng hàm cũ của trang - không chép lại phần ghi. */
@@ -17869,7 +17996,10 @@ function bkLuuEmailGV(sid){
    rồi tới form. Đóng lại là về đúng chỗ đang đứng. */
 function bkMo(ttk,ma,mavc){
  var T=TTBK[ttk];if(!T)return;
- var r=find(T.bang,T.ma,ma);if(!r){toast("Không thấy hồ sơ "+ma);return}
+ var r=null;
+ if(T.nguon){var _ds=T.nguon();for(var _i=0;_i<_ds.length;_i++)if(String(_ds[_i][T.ma])===String(ma)){r=_ds[_i];break}}
+ else r=find(T.bang,T.ma,ma);
+ if(!r){toast("Không thấy hồ sơ "+ma);return}
  var v=null;
  ttViec(ttk,r).forEach(function(x){if((x.act||"")+"|"+x.t===mavc)v=x});
  if(!v){toast("Việc này vừa xong hoặc không còn thuộc về bạn.");reRender(CUR);return}
@@ -17944,7 +18074,8 @@ function renderBan(){
    '<div class="banmain"><div class="bant">'+esc(z.ten)+'</div>'+
    '<div class="banm">'+esc(z.ma)+' · '+esc(z.gd)+'</div></div>'+
    '<div class="banviec"><span class="chip '+(v0.sev==="red"?"red":(v0.sev==="amber"?"amber":"gray"))+'">'+esc(v0.t)+'</span>'+
-   (z.viec.length>1?'<span class="mut" style="font-size:11px;margin-left:6px">+'+(z.viec.length-1)+' việc</span>':'')+'</div>'+
+   (z.viec.length>1?'<span class="mut" style="font-size:11px;margin-left:6px">+'+(z.viec.length-1)+' việc</span>':'')+
+   (z.khac?'<span class="mut" style="font-size:11px;margin-left:6px">· '+z.khac+' việc của bộ phận khác</span>':'')+'</div>'+
    '<i class="ti ti-chevron-right banch"></i></div>'});
  if(coViec.length>40)h+='<div class="mut" style="font-size:11.5px;padding-top:8px">... và '+(coViec.length-40)+' hồ sơ nữa.</div>';
  h+='</div></div>';
@@ -17971,6 +18102,19 @@ function banThe(ttk,z){
    (V6()?("bkMo('"+esc(ttk)+"','"+esc(ttMa(ttk,r))+"','"+esc((v.act||"")+"|"+v.t)+"')")
         :v.go(r)).split('"').join("&quot;")+
    '"><i class="ti '+(V6()?"ti-pencil":"ti-arrow-right")+'"></i>Làm</button></div>'});
+ /* CÁC BỘ PHẬN KHÁC đang làm gì trên chính hồ sơ này. Không có khối này thì mỗi người mở hồ sơ
+    ra chỉ thấy góc của mình - ba bộ phận cùng làm trên một học viên mà không ai biết hai người
+    kia. Thấy được, nhưng KHÔNG có nút Làm: quyền chặn tay, không che mắt. */
+ var khac=ttViecKhac(ttk,r);
+ if(khac.length){
+  h+='<div class="sechd">Bộ phận khác đang làm trên hồ sơ này ('+khac.length+')</div>';
+  khac.forEach(function(x){
+   h+='<div class="banjob bankhac">'+
+    '<span class="banji"><i class="ti '+x.v.ic+'"></i></span>'+
+    '<div class="banjt">'+esc(x.v.t)+
+     '<div class="mut" style="font-size:11px">đang chờ <b>'+esc(bpTenDS(x.bp))+'</b></div></div>'+
+    '<span class="chip gray" style="flex:none">không thuộc phần của bạn</span></div>'});
+ }
  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">'+banNutHoSo(ttk,r)+'</div>';
  h+='</div></div>';
  return h}
@@ -17987,6 +18131,13 @@ function banHoSo(ttk,r){
     ["Nơi học",esc(lop?(elabel(lop.branch)||elabel(lop.learning_mode)||"-"):"-")],
     ["Điện thoại",telHTML(r.phone_number)],
     ["Người đồng hành",esc(r.emergency_contact_name||"chưa khai")]]}
+  if(ttk==="phuhuynh"){
+   var con=phCon(r);
+   return [["Quan hệ",esc(r.quanhe||"chưa khai")],
+    ["Điện thoại",telHTML(r.phone_number)],
+    ["Đang đồng hành",esc(con.map(function(c){return c.full_name||c.student_id}).join(", ")||"-")],
+    ["Con đang có nguy cơ",esc(String(con.filter(function(c){return stuRisk(c)}).length))],
+    ["Cổng phụ huynh",r.phone_number?"mở được (đăng nhập bằng số này)":"chưa mở được"]]}
   if(ttk==="giangvien"){
    var lop=ttSo("DL10",function(c){return String(c.main_teacher_id||"")===String(r.staff_id)&&
     !isc(c.class_status,"finished","cancelled")});
@@ -19583,7 +19734,7 @@ DOORS = {
  "DL06b":["insPlanSave"],
  "DL07":["duyetRefundRun","paySave","payVerifyRun","rfNeed"],
  "DL08":["hvClassConfirm","hvClassRejectSave","midSave","obMark","rfNeed","xepMoiLuu","obChangeSave","obFinish"],
- "DL09":["blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave","riskCareSave","riskFlagRun","riskIgnoreSave","dhSave"],
+ "DL09":["bkLuuPHNguyCo","bkLuuPHQuanHe","blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave","riskCareSave","riskFlagRun","riskIgnoreSave","dhSave"],
  "DL10":["xepMoiLuu","obChangeSave","rfNeed","clsSetTeacher","moLopDelay","moLopCancelRun"],
  "DL11":["bhCancelRun","bhDone","bhMakeupSave","bhNoteSave","bkLuuMocGio","ddSave","sessEnd","sessStart","sesSetTeacher","clsSetTeacher"],
  "DL12":["ddSave","hvAbsentSave","absReq","absReview","absMakeup","absCallSave"],
