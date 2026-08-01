@@ -149,7 +149,24 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.66 — DEMO CHUẨN MỌI THỨ TRONG TUẦN · TRỢ LÝ TRẢ LỜI BẰNG SỐ · TOUR +2 BÀI ✅ (31/07 khuya).**
+> **Phiên bản: V9.67 — SỬA MÀN HÌNH ĐIỆN THOẠI & MÁY TÍNH BẢNG ✅ (01/08).**
+> · **Anh Luân:** *"A thấy trên di động nhiều lỗi hiển thị lắm. Navbar, cái tour thì bao lỗi vì
+> bị mất cái sidebar mà."* Mở app thật ở 390px rồi chụp lại - bốn chỗ hỏng, đều thật.
+> · **Thanh trên vỡ**: sáu nút và tiêu đề chen chung một hàng, nút "Reset demo" mang nguyên chữ
+> chiếm ~200px nên tiêu đề bị bóp còn vài ký tự. Nay khổ điện thoại nút Reset chỉ còn icon.
+> · **Tour trỏ ra ngoài màn**: từ 820px xuống, sidebar là ngăn kéo `translateX(-100%)`. Phần tử
+> vẫn tồn tại, `tourFind` vẫn thấy, kích thước vẫn đúng - chỉ toạ độ là **x = -250**. 3/83 bước.
+> Nay bước nào trỏ vào sidebar thì app TỰ MỞ ngăn kéo, bước nào không thì tự đóng.
+> · **7 trang cuộn ngang** ở điện thoại/iPad: dải nút trong thẻ dòng dài 526px, ô chọn tên lớp
+> 477px, phễu 6 bước x 150px, dải nút cạnh tiêu đề không xuống dòng.
+> · **Nút Trợ lý nổi che chân sidebar** - bấm tưởng mở hồ sơ, hoá ra mở Trợ lý.
+> · **BÀI HỌC LỚN NHẤT: cái thước đo nhầm chỗ.** `_checkui` báo "không cuộn ngang" suốt, vì nó
+> đo `documentElement.scrollWidth` - mà tràn ngang xảy ra BÊN TRONG khung cuộn `#content`, khung
+> đó có thanh cuộn riêng nên không đội `<html>` rộng thêm chút nào. Sửa thước xong nó tự tìm thêm
+> 6 trang nữa tràn ở khổ iPad mà trước giờ không ai biết. Thêm luật: chạy hết mọi bài hướng dẫn
+> ở khổ điện thoại, bước nào trỏ ra ngoài màn là đỏ.
+>
+> **Phiên bản trước: V9.66 — DEMO CHUẨN MỌI THỨ TRONG TUẦN · TRỢ LÝ TRẢ LỜI BẰNG SỐ · TOUR +2 BÀI ✅ (31/07 khuya).**
 > · **Bộ kiểm thứ 21 `_checkdemo`**: nạp lại app **7 lần**, mỗi lần giả `Date` lệch thêm một ngày
 > (đặt ở tuần thứ tư để phép kéo THẬT SỰ chạy), đặt đúng lá cờ nút Reset đặt, rồi **đóng vai từng
 > nhân viên có thật** hỏi bảng việc của chính họ. Mọi bộ kiểm cũ đều chạy vào ĐÚNG MỘT NGÀY - mà
@@ -6026,3 +6043,53 @@ neo phải có mặt **trên đúng trang của bước** và **duy nhất** tr�
 **21 bộ kiểm xanh hết.** Trợ lý 1/15 → **13/15**. Tour 13 → **15 bài** / 75 → **84 bước** / phủ
 20 → **28 trang**. Icon 209 → **213**. `_checkqa` 130 → **169 tiêu chí**. `_checkaudit` 27 → **29**.
 Bốn ô bảng việc chết sống lại; bốn câu lọc bằng mã không tồn tại được sửa.
+
+---
+
+## V9.67 - MÀN HÌNH ĐIỆN THOẠI & MÁY TÍNH BẢNG (01/08)
+
+> Anh Luân: *"A thấy trên di động nhiều lỗi hiển thị lắm. Navbar, cái tour thì bao lỗi vì bị mất
+> cái sidebar mà."*
+
+### 1. Bốn chỗ hỏng, đo bằng cách mở app thật ở 390px rồi chụp lại
+
+| Chỗ | Đo được | Sửa |
+|---|---|---|
+| Thanh trên | 6 nút + tiêu đề chen một hàng; nút "Reset demo" mang nguyên chữ chiếm ~200px nên tiêu đề còn vài ký tự, chữ chồng nhau, huy hiệu "99+" thò khỏi mép | khổ ≤560px: nút Reset chỉ còn icon, tiêu đề một dòng cắt đuôi, nút và huy hiệu thu nhỏ |
+| Bài hướng dẫn | 3/83 bước neo vào phần tử **trong sidebar đang đóng**, toạ độ x = **-250** | `tourPaint` tự mở ngăn kéo khi neo nằm trong sidebar, tự đóng khi không |
+| Cuộn ngang | 7 trang: dải nút thẻ dòng **526px**, ô chọn tên lớp **477px**, phễu 6 bước x 150px = **900px**, dải nút cạnh tiêu đề không xuống dòng | cho xuống dòng và co lại; `nowrap` chỉ giữ từ 1200px trở lên |
+| Nút Trợ lý nổi | nằm đúng chỗ chân sidebar - bấm tưởng mở hồ sơ mình, hoá ra mở Trợ lý | mở menu là nút tự ẩn (`body.navon`, cùng lối đã có cho ngăn kéo hồ sơ) |
+
+### 2. Bài học lớn nhất: CÁI THƯỚC ĐO NHẦM CHỖ
+
+`_checkui` đã mở thật ở khổ 390px từ V9.56 và luôn báo **"không cuộn ngang"**. Nhưng nó đo
+`document.documentElement.scrollWidth`. Tràn ngang trong app này xảy ra **BÊN TRONG khung cuộn
+`#content`** - khung đó có thanh cuộn riêng, nên phần thò ra không đội `<html>` rộng thêm chút
+nào. Máy báo xanh, mà mở điện thoại lên là phải vuốt ngang mới đọc hết.
+
+> **LUẬT: đo đúng cái khung mà nội dung thật sự sống trong đó.** Trang có khung cuộn riêng thì
+> `documentElement` không biết gì về nó. Sửa thước xong, chính nó tự tìm thêm **6 trang nữa** tràn
+> ở khổ iPad mà trước giờ không ai biết - đúng dấu hiệu của một bộ kiểm vừa được chữa mắt.
+
+> **LUẬT: một luật giao diện chỉ sai ở MỘT khổ màn thì phải đo Ở CHÍNH khổ đó.** Bài hướng dẫn
+> chạy đúng tuyệt đối trên máy tính vì sidebar luôn hiện. Nay `_checkui` chạy hết mọi bài ở khổ
+> điện thoại, bước nào trỏ ra ngoài màn là đỏ.
+
+Và một lần nữa **đừng đo cái đang chuyển động**: bản đầu bộ kiểm đợi 620ms rồi chụp, báo đỏ 2 bước.
+Đo lại với 950ms thì sạch - vì chính app cần cuộn mượt ~300ms + vẽ lại 320ms + trượt ngăn kéo
+260ms. Đỏ kiểu đó là đỏ của cái thước, và **một bộ kiểm chập chờn còn tệ hơn không có**.
+
+### 3. Chỗ chặn theo điểm gãy là chặn sai
+
+Mấy luật cũ chặn ở `max-width:820px`. Nhưng ở iPad dọc (834px) sidebar VẪN hiện, nên khung nội
+dung chỉ còn **572px** - hẹp hơn cả điện thoại xoay ngang. Bề rộng màn hình không nói lên bề rộng
+chỗ làm việc. Nên `.phead` và `.obact` nay **xuống dòng ở mọi khổ**, chỉ từ 1200px trở lên - nơi
+chắc chắn còn chỗ - mới giữ một hàng.
+
+### Số chốt phiên
+21 bộ kiểm xanh hết, `_checkui` mở thật **1012 lượt** (trước 837). Tràn ngang ở khổ điện
+thoại/máy tính bảng: **10 trang → 0** (cứ sửa một đợt là thước lại lòi ra đợt sau: 7 trang đầu,
+rồi 6 trang khổ iPad, rồi 3 trang Cài đặt/Thu học phí - chỗ cuối chỉ 14px, do số tiền dài
+"149.450.000đ" không xuống dòng được nên thẻ nở 29px và đội cả khung nội dung). Bài hướng dẫn
+trỏ ra ngoài màn ở điện thoại: **3/83 → 0**. `_checkui` thêm một mặt kiểm mới (bài hướng dẫn ở
+khổ điện thoại) và chữa được một chỗ đo nhầm đã im lặng nhiều bản.

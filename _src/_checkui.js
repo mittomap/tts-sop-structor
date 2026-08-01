@@ -31,6 +31,15 @@ const PROBE = () => {
   const out = {wide:0, clip:[], over:[], tiny:[], cover:[], vun:[]};
   const W = window.innerWidth;
   out.wide = Math.max(0, document.documentElement.scrollWidth - W);
+  /* V9.67 - ĐO NHẦM CHỖ SUỐT MẤY BẢN. `documentElement.scrollWidth` không bắt được tràn ngang
+     xảy ra BÊN TRONG khung cuộn `#content`: khung đó có thanh cuộn riêng nên phần thò ra không
+     đội `<html>` rộng thêm chút nào. Bộ kiểm báo "không cuộn ngang" trong khi mở app trên điện
+     thoại, 4 trang (xeplop, banglop, ketthuc, khac) phải vuốt ngang mới đọc hết - anh Luân thấy
+     ngay còn máy thì không. Nay đo THÊM chính khung cuộn. */
+  var _ct=document.getElementById("content");
+  if(_ct)out.wide=Math.max(out.wide, Math.max(0,_ct.scrollWidth-_ct.clientWidth));
+  var _hv=document.getElementById("hvBody");
+  if(_hv)out.wide=Math.max(out.wide, Math.max(0,_hv.scrollWidth-_hv.clientWidth));
   const dr = document.querySelector(".drawer");
   /* ngan keo dong thi no nam ngoai man theo THIET KE - do no la bao nham */
   var asstOn = (document.getElementById("asst") || {classList: {contains: () => false}}).classList.contains("on");
@@ -367,6 +376,47 @@ const PROBE = () => {
       p.tiny.forEach(c => bad.push(nhan(m + ": nut qua nho " + c.w + "x" + c.h + "px <" + c.tag + " class=\"" + c.cls + "\"> \"" + c.txt + "\"")));
       p.cover.forEach(c => bad.push(nhan(m + ": hai thanh noi che nhau - " + c)));
       p.vun.forEach(c => bad.push(nhan(m + ": cau van bi FLEX BE VUN thanh " + c.n + " cot trong <" + c.tag + " class=\"" + c.cls + "\"> - \"" + c.txt + "\"")));
+    }
+    /* ═══ V9.67 - BÀI HƯỚNG DẪN TRÊN ĐIỆN THOẠI ═══════════════════════════════════════════
+       Anh Luân: *"cái tour thì bao lỗi vì bị mất cái sidebar mà."* Từ 820px trở xuống sidebar
+       thành NGĂN KÉO đóng. Phần tử trong đó vẫn tồn tại, `tourFind` vẫn trả về nó, kích thước
+       vẫn đúng - chỉ có toạ độ là x âm, tức vòng sáng vẽ NGOÀI MÀN HÌNH. Người dùng đọc "nhìn
+       mục này trên menu" mà không có menu nào. Không bộ kiểm nào bắt được vì tất cả đo ở khổ
+       máy tính - nơi sidebar luôn hiện. Đây là bài học chung: một luật giao diện chỉ sai ở MỘT
+       khổ màn thì phải đo Ở CHÍNH khổ đó. */
+    if (V.n === "dienthoai") {
+      try {
+        const tt = await page.evaluate(async () => {
+          var xau = [], tong = 0, keys = Object.keys(TOURS);
+          for (var ki = 0; ki < keys.length; ki++) {
+            var k = keys[ki], steps = TOURS[k].steps || [];
+            tourStart(k);
+            for (var i = 0; i < steps.length; i++) {
+              /* Đợi ĐỦ nhịp của chính app: cuộn mượt ~300ms + vẽ lại 320ms + trượt ngăn kéo 260ms.
+                 Đo non hơn thì bộ kiểm báo đỏ vì mình bấm nhanh hơn hiệu ứng - đỏ kiểu đó là đỏ
+                 của cái thước, và một bộ kiểm chập chờn còn tệ hơn không có. */
+              await new Promise(r => setTimeout(r, 950));
+              var st = steps[TOUR.i];
+              if (st && st.sel) {
+                tong++;
+                var el = null; try { el = tourFind(st.sel) } catch (e) {}
+                if (el) {
+                  var r = el.getBoundingClientRect();
+                  if (r.right < 1 || r.left > innerWidth - 1 || r.bottom < 1 || r.top > innerHeight - 1)
+                    xau.push(k + " buoc " + (TOUR.i + 1) + " (" + st.sel + ")");
+                }
+              }
+              if (TOUR.i >= steps.length - 1) break;
+              tourNext();
+            }
+            try { tourEnd() } catch (e) {}
+          }
+          return { tong: tong, xau: xau };
+        });
+        if (tt.xau.length) bad.push(nhan("BAI HUONG DAN tro ra NGOAI MAN o kho dien thoai (" +
+          tt.xau.length + "/" + tt.tong + " buoc): " + tt.xau.slice(0, 6).join(" · ")));
+        luot += tt.tong;
+      } catch (e) { bad.push(nhan("khong chay duoc bai huong dan tren dien thoai: " + e.message)) }
     }
     await ctx.close();
   }

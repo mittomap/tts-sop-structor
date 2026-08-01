@@ -250,9 +250,18 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .tbtn{width:38px;height:38px;border-radius:8px;border:1px solid var(--line);background:#fff;color:#5A6675;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;position:relative}
 .tbtn .n{position:absolute;top:-5px;right:-5px;background:var(--red);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:999px;padding:0 4px;box-sizing:border-box;line-height:1;white-space:nowrap;display:flex;align-items:center;justify-content:center}
 .content{flex:1;overflow-y:auto;padding:22px 26px}
-.phead{display:flex;align-items:flex-end;gap:14px;margin-bottom:18px}
+/* V9.67: tiêu đề trang + dải nút phải XUỐNG DÒNG được ở mọi khổ, không chỉ dưới 820px. Đo ở
+   iPad dọc (834px, sidebar vẫn hiện nên khung nội dung chỉ còn 572px): nút "Khách mới liên hệ
+   đến" thò ra 94px, kéo cả trang cuộn ngang - 6 trang bị. Khổ nào cũng có thể hẹp, tuỳ sidebar
+   rộng bao nhiêu, nên chặn theo ĐIỂM GÃY là canh sai chỗ; để nó tự xuống dòng mới đúng. */
+.phead{display:flex;align-items:flex-end;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.phead>div:first-child{min-width:0}
 .phead .t{font-size:18px;font-weight:800;letter-spacing:-.2px}.phead .s{font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}
-.phead .sp{margin-left:auto;display:flex;gap:9px}
+/* V9.67: dải nút bên phải tiêu đề trang phải XUỐNG DÒNG và co được. Ô chọn lớp mang tên đầy đủ
+   ("LOP-FOUND-PLA-01 - Foundation PLA T7-CN sáng (06/2026)") dài 477px, đẩy trang Bảng lớp cuộn
+   ngang ở cả iPad dọc lẫn điện thoại xoay ngang. */
+.phead .sp{margin-left:auto;display:flex;gap:9px;flex-wrap:wrap;min-width:0;max-width:100%}
+.phead .sp .sel{max-width:100%}
 a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi điện, mở link) không được ăn gạch chân của link */
 .btn{height:36px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--text);font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
 .btn i{font-size:16px;flex-shrink:0}.btn:hover{border-color:#B9C6D6;background:#FAFBFD}
@@ -371,6 +380,9 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .bwcta2:hover{background:rgba(255,255,255,.22)}
 .bstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin-bottom:16px}
 .bstat{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 13px;transition:.15s}
+/* V9.67: cùng lý do với `.jgrid>*` - khối chữ trong thẻ phải chịu hẹp lại, nếu không một câu phụ
+   chú dài ("Đến hạn thu, tính tới hôm nay") đẩy cả trang Thu học phí cuộn ngang trên điện thoại. */
+.bstat>*{min-width:0}
 .bstat[onclick]{cursor:pointer}
 .bstat[onclick]:hover{border-color:var(--blue);box-shadow:0 3px 14px rgba(46,90,136,.12);transform:translateY(-1px)}
 .bstat.z{opacity:.5}.bstat.z:hover{opacity:1}
@@ -396,7 +408,10 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .bstat.static:hover{border-color:#E3E9F0;box-shadow:none;transform:none}
 .bstat.static .bsn{color:#4A5A6E}
 .bsic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex:0 0 auto}
-.bsn{font-size:20px;font-weight:800;color:var(--navy);line-height:1.1}
+/* V9.67: số tiền dài ("149.450.000đ") không xuống dòng được thì thẻ nở ra 29px, mà thẻ lại
+   `overflow:visible` nên phần thò ra đội cả khung nội dung cuộn ngang 14px trên điện thoại.
+   `.bsl` đã có `overflow-wrap:anywhere` từ trước - thiếu đúng dòng SỐ, tức nửa cái luật. */
+.bsn{font-size:20px;font-weight:800;color:var(--navy);line-height:1.1;overflow-wrap:anywhere}
 .bsl{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
 .bwgh{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.3px;color:var(--muted);text-transform:uppercase;margin:12px 0 6px}
 .bwgc{background:var(--bg);border-radius:20px;padding:0 8px;font-size:10.5px}
@@ -586,7 +601,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    BAY DA CAN: lan dau dat rule nay canh ".asstfab{right:12px}" - ma dong do nam LOT trong
    @media(max-width:600px), nen no chi chay o man hep, dung khuc 1440 lai ho. Neo vao mot chuoi
    ma khong nhin xem chuoi do dang nam trong khoi nao la bay cu, cua CSS cung nhu cua Python. */
-body.drwon .asstfab{opacity:0;pointer-events:none;transition:opacity .12s ease}
+body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition:opacity .12s ease}
 .asstfab:hover{transform:translateY(-1px);box-shadow:0 16px 36px rgba(10,20,40,.4)}
 .asstfab b{font-size:15px;line-height:1}
 .asstfab span{font-weight:500;opacity:.86}
@@ -869,8 +884,15 @@ body.drwon .asstfab{opacity:0;pointer-events:none;transition:opacity .12s ease}
 .cfnu{font-size:10.5px;color:var(--muted);min-width:38px}
 /* Dải thẻ buổi (Vận hành lớp) - gọn, bấm chọn buổi để điểm danh ngay dưới */
 .tbdiv{display:inline-block;width:1px;height:20px;background:var(--line);margin:0 4px;vertical-align:middle}
+/* V9.67: trên điện thoại phễu XUỐNG DÒNG thay vì cuộn ngang. Một khung cuộn ngang lồng trong
+   khung cuộn dọc là thứ khó dùng nhất trên cảm ứng - vuốt một cái không biết mình đang cuộn cái
+   nào; và đo được là chính nó làm khung nội dung cuộn thêm 14px. Sáu bước xếp hai hàng vẫn đọc
+   được hết mà không phải vuốt. */
+@media(max-width:560px){.tsfun{overflow-x:visible;flex-wrap:wrap}}
 .tsfun{display:flex;align-items:stretch;gap:2px;overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:14px}
-.tsstep{display:flex;align-items:center;gap:9px;flex:1;min-width:150px;padding:9px 12px;border-radius:10px;cursor:pointer;background:#fff;border:1px solid #EEF2F6;transition:.15s}
+/* V9.67: `min-width:150px` x 6 bước = 900px, rộng hơn cả iPad dọc -> phễu đẩy trang cuộn ngang.
+   Cho phép co lại và xuống dòng; dưới 150px chữ vẫn đọc được vì mỗi bước chỉ có số + tên ngắn. */
+.tsstep{display:flex;align-items:center;gap:9px;flex:1 1 128px;min-width:0;padding:9px 12px;border-radius:10px;cursor:pointer;background:#fff;border:1px solid #EEF2F6;transition:.15s}
 .tsstep:hover{border-color:var(--blue);box-shadow:0 3px 14px rgba(46,90,136,.12);transform:translateY(-1px)}
 .tsstep.on{background:#FAFBFD;border-color:#BBD3F0}
 .tssic{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex:0 0 34px}
@@ -1095,7 +1117,11 @@ body.drwon .asstfab{opacity:0;pointer-events:none;transition:opacity .12s ease}
 .jnr{display:flex;flex-direction:column;gap:8px;min-width:190px}
 .jnr .btn{justify-content:flex-start}
 .btn.ghost{opacity:.65}
+/* V9.67: ô của lưới mặc định `min-width:auto`, nghĩa là nó KHÔNG chịu hẹp hơn nội dung rộng nhất
+   bên trong. Lưới đã gãy còn một cột ở 900px mà cột đó vẫn nở 412px trên màn 390px, đẩy cả trang
+   Cài đặt cuộn ngang. `min-width:0` là chốt chặn phải có ở MỌI ô lưới/flex chứa chữ dài. */
 .jgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.jgrid>*{min-width:0}
 .jtl{display:flex;flex-direction:column;gap:0}
 .jtli{display:flex;gap:10px;padding-bottom:12px;position:relative}
 .jtli:before{content:"";position:absolute;left:13px;top:26px;bottom:0;width:2px;background:var(--line)}
@@ -1351,11 +1377,17 @@ body.drsz .drawer{transition:none}
 .obcards.rows .obcard{display:flex;align-items:center;flex-wrap:wrap;gap:4px 12px;padding:7px 12px;margin-bottom:6px;cursor:pointer;transition:border-color .12s}
 .obcards.rows .obcard:hover{box-shadow:0 3px 14px rgba(16,32,58,.09)}
 .obcards.rows .wowinfo{flex:1 1 100%;width:100%}
-.obcards.rows .obcard .obh{flex:1 1 300px;margin:0;align-items:center}
+.obcards.rows .obcard .obh{flex:1 1 300px;margin:0;align-items:center;flex-wrap:wrap;min-width:0}
 .obcards.rows .obcard .obh>div:first-child{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0}
 .obcards.rows .obcard .obm{margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
 .obcards.rows .obcard .steps,.obcards.rows .obcard .obm2{display:none}
-.obcards.rows .obcard .obact{margin-left:auto;flex-wrap:nowrap}
+/* V9.67: `nowrap` chỉ đúng khi màn ĐỦ RỘNG. Đo ở 834px (iPad dọc): dải nút của một buổi WOW dài
+   694px, cộng phần tên và giờ ở bên trái là trang phải cuộn ngang. Nay mặc định XUỐNG DÒNG, chỉ
+   từ 1200px trở lên - nơi chắc chắn còn chỗ - mới giữ một hàng gọn bên phải. */
+.obcards.rows .obcard .obact{margin-left:auto;flex-wrap:wrap}
+@media(min-width:1200px){.obcards.rows .obcard .obact{flex-wrap:nowrap}}
+.obcards.rows .obcard{flex-wrap:wrap}
+.obcards.rows .obcard>*{min-width:0}
 .obcards.rows .obcard.open{display:block;cursor:pointer;padding:14px 16px}
 .obcards.rows .obcard.open .obh{margin-bottom:12px}
 .obcards.rows .obcard.open .obh>div:first-child{display:block}
@@ -1427,7 +1459,16 @@ body.drsz .drawer{transition:none}
 @media(max-width:820px){.arcjobs{flex-wrap:wrap}.arcjob{flex:1 1 44%}}
 .arcjob .ajn.hot{background:#FBF0EF;color:var(--red)}
 @media(max-width:640px){.nsl{max-width:74px}.nst{min-width:72px}}
-@media(max-width:820px){.obcards.rows .obcard .obm{max-width:200px}.obcards.rows .obcard .obact{margin-left:0}}
+/* V9.67: trên điện thoại thẻ dòng phải ĐƯỢC XUỐNG DÒNG. Luật `flex-wrap:nowrap` ở trên đúng cho
+   màn rộng (giữ dải nút thành một hàng gọn bên phải), nhưng ở 390px một dải ba nút dài 526px đẩy
+   cả trang tràn ngang - đo được ở 4 trang: xeplop, banglop, ketthuc, khac. Người dùng phải vuốt
+   ngang mới đọc hết, thứ tệ nhất trên điện thoại. */
+@media(max-width:820px){.obcards.rows .obcard .obm{max-width:200px}
+ .obcards.rows .obcard .obact{margin-left:0;flex-wrap:wrap}
+ .obcards.rows .obcard{flex-wrap:wrap}
+ .obact .btn{max-width:100%}}
+/* Ô chọn dài (tên lớp đầy đủ) không được đẩy trang rộng ra - cắt đuôi trong khung là đủ. */
+@media(max-width:560px){.sel{max-width:100%}.fbar,.tbar{flex-wrap:wrap}}
 .obcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
 .obh{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
 .obh b{font-size:13px;font-weight:700}.obm{font-size:11px;color:var(--muted);margin-top:2px}
@@ -1559,7 +1600,21 @@ body.drsz .drawer{transition:none}
  .chartrow{grid-template-columns:1fr}
  .cols{grid-template-columns:1fr}
 }
+/* ═══ V9.67 - THANH TRÊN TRÊN ĐIỆN THOẠI (anh Luân: "trên di động nhiều lỗi hiển thị lắm") ═══
+   Đo thật ở 390px: cả sáu nút nằm cùng MỘT hàng với tiêu đề trang, mà nút "Reset demo" mang
+   nguyên chữ nên chiếm ~200px. Tiêu đề bị bóp còn vài ký tự, chữ tràn lên nhau, huy hiệu "99+"
+   của chuông thò lên khỏi mép trên. Trên máy tính không ai thấy vì thừa chỗ.
+   Cách sửa: ở khổ điện thoại thì nút Reset chỉ còn ICON (chữ giấu đi, `title` vẫn còn để rê/giữ
+   là biết), tiêu đề được một dòng riêng có cắt đuôi, và huy hiệu chuông kéo vào trong khung. */
 @media(max-width:560px){
+ .topbar{gap:6px;padding:0 10px}
+ .topbar .tbl{display:none}
+ .topbar #demoBadgeWrap .btn{padding:0 9px;gap:0}
+ .topbar h1{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .topbar .crumb{display:none}
+ .rolesel{gap:5px}
+ .tbtn{width:34px;height:34px;font-size:17px}
+ .tbtn .n{top:-3px;right:-3px;font-size:9px;min-width:14px;height:14px}
  .kgrid{grid-template-columns:1fr 1fr}
  .rkpis{grid-template-columns:1fr 1fr}
  .obcards{grid-template-columns:1fr}
@@ -1615,7 +1670,7 @@ body.drsz .drawer{transition:none}
   <div class="main">
     <div class="topbar">
       <button class="tbtn navtoggle" onclick="toggleNav()" aria-label="Menu"><i class="ti ti-menu-2"></i></button>
-      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div style="min-width:0"><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px;margin-left:auto"><button class="btn sm" onclick="demoResetHoi()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ đang mở cùng nạp lại"><i class="ti ti-refresh"></i>Reset demo</button></span></div>
+      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div style="min-width:0"><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px;margin-left:auto"><button class="btn sm" onclick="demoResetHoi()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ đang mở cùng nạp lại"><i class="ti ti-refresh"></i><span class="tbl">Reset demo</span></button></span></div>
       <div class="rolesel">
 <!-- V9.29: bỏ ô chọn vai roleSel - luôn bị ẩn từ V9.9, giữ lại chỉ tổ rối -->
         <button class="tbtn" id="congBtn" data-tour="doicong" onclick="congDoiMo()" aria-label="Đổi cổng" data-tip="Đổi cổng - sang cổng học viên hoặc cổng phụ huynh, dữ liệu vẫn là một"><i class="ti ti-arrows-exchange"></i></button>
@@ -15334,6 +15389,24 @@ function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
  }else if(dim)dim.style.display="none";
  if(!s){s=document.createElement("div");s.id="tourspot";s.className="tourspot";document.body.appendChild(s)}
  if(!b){b=document.createElement("div");b.id="tourbox";b.className="tourbox";document.body.appendChild(b)}
+ /* ═══ V9.67 - TRÊN ĐIỆN THOẠI, SIDEBAR LÀ NGĂN KÉO ĐANG ĐÓNG ════════════════════════════
+    Anh Luân: *"cái tour thì bao lỗi vì bị mất cái sidebar mà."* Đúng, và đo được: ở khổ 390px
+    có 3 bước neo vào phần tử NẰM TRONG sidebar - mà từ 820px trở xuống sidebar là ngăn kéo
+    `translateX(-100%)`. Phần tử vẫn tồn tại nên `tourFind` vẫn trả về nó, `getBoundingClientRect`
+    vẫn ra kích thước - chỉ có điều toạ độ là x=-250, tức vòng sáng được vẽ NGOÀI MÀN HÌNH. Người
+    dùng thấy hộp lời nói "nhìn mục này trên menu" mà không có menu nào.
+    Không bộ kiểm nào bắt được vì tất cả đều đo ở khổ máy tính - nơi sidebar luôn hiện.
+    Sửa: bước nào trỏ vào sidebar thì TỰ MỞ ngăn kéo ra; bước nào không thì tự đóng lại để không
+    che mất chỗ cần nhìn. Mở/đóng xong phải vẽ lại (đợi hết 220ms hiệu ứng trượt) và xoá cờ
+    chống-cuộn-lặp, vì toạ độ vừa đổi hết. */
+ var sb=document.getElementById("sidebar");
+ var nganKeo=(window.innerWidth||1200)<=820;
+ if(sb&&nganKeo&&!st.mo){
+  var trongSb=!!(el&&sb.contains(el)), dangMo=sb.classList.contains("open");
+  if(trongSb!==dangMo){
+   try{toggleNav()}catch(e){}
+   window.__tourScroll="";
+   setTimeout(tourPaint,260);return}}
  var r=el&&el.getBoundingClientRect?el.getBoundingClientRect():null;
  var vw=window.innerWidth||1200,vh=window.innerHeight||800;
  if(r&&(r.width>4||r.height>4)){
@@ -17166,8 +17239,12 @@ function reRender(k){try{setTimeout(tourTick,240)}catch(e){}   /* người dùng
  updateBellBadge();asstTick();persistSoon()}
 function reRenderKeep(k){var el=document.getElementById("content");var sc=el.scrollTop;var p=PBK[k];
  el.innerHTML=((p&&p.ty==="list")?renderList(k):RENDER[k]());asstTick();el.scrollTop=sc;try{buildNav()}catch(e){}var i=el.querySelector(".srch input");if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}persistSoon()}
-function toggleNav(){var s=document.getElementById("sidebar"),m=document.getElementById("navmask");if(!s)return;var open=s.classList.toggle("open");if(m)m.classList.toggle("on",open)}
-function closeNav(){var s=document.getElementById("sidebar"),m=document.getElementById("navmask");if(s)s.classList.remove("open");if(m)m.classList.remove("on")}
+/* V9.67: mở ngăn kéo menu thì GIẤU nút Trợ lý nổi. Trên điện thoại nút đó nằm đúng chỗ chân
+   sidebar (dòng tên người đăng nhập) nên che mất - và bấm vào là trúng nút Trợ lý chứ không
+   trúng hồ sơ. Dùng đúng lối đã có sẵn cho ngăn kéo hồ sơ (`body.drwon`), thêm một lớp anh em. */
+function navBody(open){try{document.body.classList.toggle("navon",!!open)}catch(e){}}
+function toggleNav(){var s=document.getElementById("sidebar"),m=document.getElementById("navmask");if(!s)return;var open=s.classList.toggle("open");if(m)m.classList.toggle("on",open);navBody(open)}
+function closeNav(){var s=document.getElementById("sidebar"),m=document.getElementById("navmask");if(s)s.classList.remove("open");if(m)m.classList.remove("on");navBody(false)}
 function bellItems(){var rs=SCOPE();var items=slaItems();
  if(rs.bell==="*")return items;
  return items.filter(function(x){return rs.bell.indexOf(x.cat)>=0})}
