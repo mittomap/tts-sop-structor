@@ -149,7 +149,18 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.74 — TRỤC LÀ NGƯỜI ĐƯỢC PHỤC VỤ, MỌI BỘ PHẬN CÙNG ĐỨNG TRÊN MỘT HỒ SƠ ✅ (01/08).**
+> **Phiên bản: V9.75 — ĐO LẠI V6 vs V5, VÀ TÌM RA MỘT LỖ CỦA V6 ✅ (01/08).**
+> · v6 hơn v5 ở đúng **ba chỗ đo được**: trang đáp (8 màn → 1) · menu (49 → **35 mục**) · nút Làm
+> (**150/150 nhảy trang → 150/150 mở ngăn kéo**).
+> · **Lỗ tìm ra khi đo:** menu v6 gọn hơn bằng cách **làm mất đường** - 6 trang gốc không còn tới
+> được, gồm bốn hub vận hành thật (lịch test, lịch WOW/phòng học, khảo sát/phản hồi, kết thúc
+> khoá). *Bỏ khỏi menu gần như là làm cho người ta không thấy.* Đã trả bốn hub về nhóm Làm hàng
+> loạt; hai trang còn lại khai lý do. `_checkaudit` 48 → **50 tiêu chí**.
+> · **Nói sòng phẳng:** phần lớn việc hôm nay nằm ở chỗ CHUNG của cả hai bản (Bàn làm việc, bốn
+> thực thể, phụ huynh, việc mọi bộ phận, 24/29 form) - một nguồn, hai bản build, nên v5 cũng
+> hưởng. Cái riêng của v6 chỉ là trang đáp · menu · ngăn kéo thay vì nhảy trang.
+>
+> **Phiên bản trước: V9.74 — TRỤC LÀ NGƯỜI ĐƯỢC PHỤC VỤ, MỌI BỘ PHẬN CÙNG ĐỨNG TRÊN MỘT HỒ SƠ ✅ (01/08).**
 > · **Anh Luân:** *"Phục vụ cả kế toán là sai, a muốn hay không cũng sai... miễn là phục vụ cho
 > khách, cho học viên, cho phụ huynh, cho lớp học... đều phải tham gia, và tham gia cùng nhau,
 > chứ ko rời rạc."*
@@ -6763,3 +6774,51 @@ bảng màu phình 110 → 112 vì em thêm một mã tím và một mã nền (
 Trục **4 thực thể** (bỏ giảng viên, thêm phụ huynh). Việc **29 dòng**. Làm được tại chỗ **24/29**,
 hàng loạt cố ý **5/29**, còn nợ **0**. Hồ sơ hiện **100% việc đang treo** (trước 52%).
 `_checkaudit` 44 → **48 tiêu chí**. 21 bộ kiểm xanh hết.
+
+
+---
+
+## V9.75 - "V6 TỐT HƠN V5 CHƯA?" - ĐO XONG MỚI TRẢ LỜI, VÀ TÌM RA MỘT LỖ (01/08)
+
+Anh Luân hỏi thẳng. Đo lại trên bản build hôm nay chứ không nói theo trí nhớ, và **phép đo tìm ra
+một lỗ thật của v6**.
+
+### Ba chỗ v6 hơn - đo được
+
+| | v5 | v6 |
+|---|---|---|
+| Mở app ra đứng ở đâu | 8 chức danh rơi vào **8 màn khác nhau** | tất cả vào **Bàn làm việc** |
+| Menu (người thấy nhiều nhất) | 8 nhóm / 49 mục | 5 nhóm / **35 mục** |
+| Bấm nút "Làm" | **150/150 nhảy sang trang khác** | **150/150 mở ngăn kéo tại chỗ** |
+
+### Lỗ tìm ra khi đo: gọn hơn bằng cách LÀM MẤT ĐƯỜNG
+
+Menu v6 bỏ 25 mục so với v5. Phần lớn là tab của hub đã gộp nên vẫn tới được. Nhưng đo tới cùng
+thì **6 trang gốc không còn tới được từ menu**, trong đó có **bốn hub vận hành thật**: Tuyển sinh
+(lịch test cả tuần), Học tập & Giảng dạy (lịch WOW, phòng học, GV dự phòng), CSKH (khảo sát và
+phản hồi), Kết thúc & Tái ĐK. Chúng chỉ còn tới được bằng một cái nút nằm **trong ngăn kéo** -
+tức là gần như không ai tìm ra.
+
+> **Luật cũ của dự án, đọc ngược lại vẫn đúng:** *thêm một mục vào menu chưa phải là làm cho người
+> ta thấy nó* - và **bỏ khỏi menu thì gần như là làm cho người ta không thấy.**
+
+**Vá:** bốn hub ấy là MÀN RỘNG đúng nghĩa, cùng loại với xếp lớp và chấm bài, nên vào nhóm *Làm
+hàng loạt*. Menu v6 31 → **35 mục** - vẫn gọn hơn v5 (49) 29%, mà không mất đường.
+Hai trang còn lại (Trang bắt đầu, Hành trình) **khai lý do**: v6 cố ý thay Trang bắt đầu bằng Bàn
+làm việc - đó là điểm khác lớn nhất của bản này - và vẫn mở được bằng nút "Xem theo chặng".
+
+`_checkaudit` 48 → **50 tiêu chí**: mọi trang phải tới được từ menu v6, hoặc khai lý do đọc được.
+
+### Câu trả lời cho anh Luân
+
+**Về đường đi thì v6 hơn hẳn, đo được ở ba chỗ trên.** Nhưng phải nói cho sòng phẳng: **phần lớn
+việc làm hôm nay nằm ở chỗ CHUNG của cả hai bản** - Bàn làm việc, bốn thực thể, phụ huynh, việc
+của mọi bộ phận, 24/29 form ngăn kéo, 21 bộ kiểm. Một nguồn, hai bản build, nên v5 cũng được
+hưởng. Cái riêng của v6 chỉ là **trang đáp · menu · nút Làm mở ngăn kéo thay vì nhảy trang**.
+
+Ba chỗ ấy đủ để nói v6 tốt hơn cho người ngồi làm việc cả ngày. Chưa đủ để nói "thay v5 ngay":
+nó mới chạy vài giờ, và lỗ vừa tìm ra là bằng chứng bản này còn non hơn v5 về mặt đã được dùng.
+
+### Số chốt phiên
+Menu v6 **35 mục** (v5: 49), trang không tới được **0**, khai lý do **2**. `_checkaudit` 48 →
+**50 tiêu chí**. 21 bộ kiểm xanh hết.

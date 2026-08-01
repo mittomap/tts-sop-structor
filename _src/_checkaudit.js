@@ -433,6 +433,37 @@ var CH3_NGOAIBAN={
     v5dap==="banlam", "đang đáp xuống "+v5dap);
  })();
 
+ /* (4b) BẢN V6 GỌN HƠN - NHƯNG KHÔNG ĐƯỢC GỌN BẰNG CÁCH LÀM MẤT ĐƯỜNG.
+    Menu v6 có 5 nhóm thay vì 8. Đo ra: 6 trang không còn tới được từ menu, trong đó có bốn hub
+    vận hành thật (lịch test cả tuần, lịch WOW và phòng học, khảo sát/phản hồi, kết thúc khoá) -
+    chúng chỉ còn tới được bằng một cái nút nằm trong ngăn kéo, tức là gần như không ai tìm ra.
+    Luật cũ của dự án đọc ngược lại vẫn đúng: *thêm một mục vào menu chưa phải là làm cho người
+    ta thấy nó* - và bỏ khỏi menu thì gần như là làm cho người ta không thấy.
+    Nay: mọi trang phải tới được từ menu v6 (thẳng hoặc là tab của một hub có trong menu), hoặc
+    khai lý do đọc được. */
+ (function(){
+  var V6NGOAIMENU={
+   banlam:"bản v6 thay Trang bắt đầu bằng Bàn làm việc - đó là điểm khác lớn nhất của bản này. "+
+    "Vẫn mở được bằng nút 'Xem theo chặng' trên Bàn làm việc.",
+   hanhtrinh:"góc nhìn bảng chặng của Trang bắt đầu - cùng một trang, mở bằng nút 'Xem theo chặng'."};
+  function tap(t){var o={};t.forEach(function(g){g.items.forEach(function(k){o[k]=1})});return o}
+  var M=tap(NAVTREE6);
+  var HUB=[[TSMAP,"tuyensinh"],[HTMAP,"hoctap"],[CSMAP,"cskh"],[DUYMAP,"duyet"],[KMAP,"khac"],[ARCMAP,"chang"]];
+  var mat=[];
+  PAGES.forEach(function(pg){
+   var k=pg.k; if(pg.hide||M[k]||V6NGOAIMENU[k])return;
+   var ok=false;
+   HUB.forEach(function(H){if(H[0]&&H[0][k]!==undefined&&M[H[1]])ok=true});
+   if(!ok)mat.push(k+" (\""+(pg.t||"?")+"\")")});
+  t("bản v6 không làm mất đường tới trang nào - hoặc khai được lý do",
+    !mat.length, mat.slice(0,5).join(" · "));
+  var thua=Object.keys(V6NGOAIMENU).filter(function(k){return !PBK[k]});
+  t("bản khai trang-ngoài-menu-v6 không nhắc trang đã biến mất", !thua.length, thua.join(", "));
+  var soV5=tap(NAVTREE), soV6=M;
+  console.log("  V6 - menu: "+Object.keys(soV6).length+" muc (v5: "+Object.keys(soV5).length+
+   ") | trang khong toi duoc tu menu: "+mat.length+" | khai ly do: "+Object.keys(V6NGOAIMENU).length);
+ })();
+
  /* (5) ĐỔI CỔNG phải trỏ đúng khi có BA thư mục cổng. Đã cắn: hàm cắt gốc đường dẫn chỉ biết
     hai tên cong-nhan-vien / cong-hoc-vien, nên đứng ở .../cong-nhan-vien-v6/ thì cắt không
     được, gốc tính ra chính thư mục đang đứng và nút "Cổng học viên" trỏ tới một chỗ 404.

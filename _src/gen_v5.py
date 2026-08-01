@@ -19048,7 +19048,14 @@ function navGroupOf(k){for(var i=0;i<NAVTREE.length;i++){var G=NAVTREE[i];
 var NAVTREE6=[
  {g:"Bàn làm việc",items:["ban"]},
  {g:"Việc & hàng chờ",items:["viec","ychv","giaoviec","duyet"]},
- {g:"Làm hàng loạt",items:["xeplop","banglop","baitap","banggiao","bangcong","giaoan"]},
+ /* Bốn hub vận hành theo chặng (lịch test cả tuần · lịch WOW và phòng học · khảo sát và phản
+    hồi · kết thúc khoá) là MÀN RỘNG đúng nghĩa - cùng loại với xếp lớp và chấm bài, nên nằm ở
+    nhóm này. Bỏ chúng khỏi menu cho gọn thì gọn thật, nhưng người dùng mất đường: đo ra 6 trang
+    chỉ còn tới được bằng một cái nút nằm trong ngăn kéo. Luật cũ của dự án đọc ngược lại vẫn
+    đúng: *thêm một mục vào menu chưa phải là làm cho người ta thấy nó* - và bỏ khỏi menu thì
+    gần như là làm cho người ta không thấy. */
+ {g:"Làm hàng loạt",items:["xeplop","banglop","baitap","banggiao","bangcong","giaoan",
+   "tuyensinh","hoctap","cskh","ketthuc"]},
  {g:"Tra cứu",items:["hocvien","giangvien","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan",
    "dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai"]},
  {g:"Quản lý",items:["baocao","nhansu","hoidap","khac","settings"]}];
