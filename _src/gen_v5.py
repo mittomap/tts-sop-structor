@@ -1182,6 +1182,9 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .aiTx{font-size:12.5px;line-height:1.7;color:var(--ink)}
 .notebar.nbred{background:#FBF0EF;border-color:#EBC8C4;color:#7E3A32}
 .notebar.nbgreen{background:#F4FBF6;border-color:#BFE3C8;color:#22633C}
+/* V6: dải nhắc "việc này chưa chuyển vào ngăn kéo" - dùng lại đúng bộ màu hổ phách đã có trong
+   thang màu, không đẻ mã mới (trần bảng màu là 110 mã, thêm ba mã lẻ là vượt trần ngay). */
+.notebar.nbamber{background:#FFFBF2;border-color:#F2D9AE;color:#7A5B12}
 .notebar>i{margin-right:8px;vertical-align:-2px}
 .notebar>.btn,.notebar>button{margin-left:8px;vertical-align:-3px}
 .sechd{font-size:12.5px;font-weight:800;color:#3A4756;margin:14px 4px 4px;text-transform:uppercase;letter-spacing:.4px}
@@ -1738,6 +1741,16 @@ var PARAMS=(DATA&&DATA.params)||{}, MEINFO=null, EDIT={};
    BAN_GIAO_DEV). Bộ kiểm `_src/check_gs.py` đếm số nhánh này và giữ nó đúng bằng bản khai:
    thêm cửa ghi mới mà quên nối vào đây là ĐỎ - đúng cái ta cần khi backend xuất hiện. */
 var SVR=(typeof google!=="undefined"&&google.script&&google.script.run);
+
+/* ═══ CỜ BẢN V6 - TRỤC THỰC THỂ ═══════════════════════════════════════════════════════════
+   Dòng dưới đây là ĐIỂM KHÁC DUY NHẤT giữa hai bản build. `gen_v5.py` ghi ra hai file: bản v5
+   giữ nguyên chữ số 0, bản v6 thay thành 1. Mọi chỗ trong app hỏi `V6()` để biết mình đang chạy
+   ở trục nào - không có nhánh nào khác, không có file nguồn thứ hai.
+   Vì sao không tách nguồn: hai nguồn cạnh nhau thì sẽ trôi khỏi nhau. Mọi bản vá chung sau này
+   (bộ lọc, câu chữ, phân quyền) phải làm hai lần, và tới lần thứ ba là quên một bên - đúng cái
+   bẫy "một sự thật ở hai chỗ" mà dự án này đã cắn nhiều lần. */
+window.ITTS_V6=0;
+function V6(){return !!window.ITTS_V6}
 
 /* ===== NỀN DEMO ĐA CỔNG (V9.7) =====
    - Mọi thao tác ghi được LƯU THẬT vào localStorage (bản Google Sheets đã cho nghỉ hưu 30/07).
@@ -2423,6 +2436,15 @@ function buildScope(code){
  /* V9.61: bản sửa của anh Luân trong Cài đặt đắp lên CUỐI cùng - sau mọi luật tự động ở trên,
     để cái anh bấm luôn là cái thắng. */
  eff.pages=qtPages(gk,eff.pages);
+ /* ═══ BẢN V6: TRANG ĐÁP LÀ BÀN LÀM VIỆC ═══════════════════════════════════════════════════
+    Ở v5, mở app ra là Trang bắt đầu - một bảng số liệu, đọc xong vẫn phải tự đi tìm trang để
+    làm. Ở v6, mở app ra là ĐANG ĐỨNG TRƯỚC hồ sơ của mình, việc bày sẵn.
+    Anh Luân đã dạy em một luật ở phiên trước và nó áp thẳng vào đây: **thêm một mục vào menu
+    chưa phải là làm cho người ta thấy nó.** Bàn làm việc ở v5 là một mục trong menu - ai không
+    bấm thì không biết. Ở v6 nó là chỗ người ta rơi vào. */
+ if(typeof V6==="function"&&V6()){
+  if(eff.pages==="*"||eff.pages.indexOf("ban")>=0)eff.land="ban";
+  else if(eff.pages!=="*"){eff.pages=["ban"].concat(eff.pages);eff.land="ban"}}
  if(eff.pages!=="*"&&eff.pages.indexOf(eff.land)<0)eff.land=eff.pages[0]||"viec";
  return eff}
 function SCOPE(){return window.SCOPEEFF||ROLESCOPE.quantri}
@@ -17343,13 +17365,16 @@ var VIECTT=[
  /* ─── KHÁCH · chặng C1 ─────────────────────────────────────────────────────────────────── */
  {tt:"khach",act:"lead_edit",t:"Gọi / nhắn lần đầu",ic:"ti-phone",sev:"red",
   khi:function(l){return isc(l.lead_status,"new")},
+  keo:function(l){return bkGhiLienHe(l,"Gọi lần đầu theo SLA "+slaChip("slaLRT_minutes",15,"phút")+".")},
   go:function(l){return "runStart('"+esc(l.lead_id)+"')"}},
  {tt:"khach",act:"lead_edit",t:"Tới hẹn liên hệ lại",ic:"ti-phone-call",sev:"amber",
   khi:function(l){var d=pvnd(l.next_followup_time);
    return !!d&&d.getTime()<=endToday().getTime()&&isc(l.lead_status,"contacted","considering","no_response")},
+  keo:function(l){return bkGhiLienHe(l,"Đã tới hẹn liên hệ lại - gọi rồi ghi kết quả, app tự đặt hẹn kế theo CH2.")},
   go:function(l){return "runStart('"+esc(l.lead_id)+"')"}},
  {tt:"khach",act:"test_book",t:"Đặt lịch test đầu vào",ic:"ti-calendar-plus",sev:"amber",
   khi:function(l){return isc(l.lead_status,"contacted","considering")&&!ttTestCua(l.lead_id).length},
+  vichung:"Đặt lịch test phải nhìn lịch phòng và ca trống của cả tuần - việc này thuộc màn Test đầu vào.",
   go:function(l){return "goTS('test')"}},
  {tt:"khach",act:"test_nhac",t:"Nhắc lịch test",ic:"ti-bell-ringing",sev:"",
   khi:function(l){var t0=new Date();
@@ -17364,6 +17389,7 @@ var VIECTT=[
  {tt:"khach",act:"test_grade",t:"Chấm bài test",ic:"ti-file-check",sev:"red",
   khi:function(l){return ttTestCua(l.lead_id).some(function(r){
     return isc(r.test_attendance_status,"on_time","late")&&!isc(r.test_status,"graded")})},
+  keo:function(l){return bkChamTest(l)},
   go:function(l){return "goTS('test')"}},
  {tt:"khach",act:"test_rebook",t:"Đặt lại test sau khi vắng",ic:"ti-calendar-repeat",sev:"amber",
   khi:function(l){var T=ttTestCua(l.lead_id);
@@ -17373,6 +17399,7 @@ var VIECTT=[
  {tt:"khach",vai:["tuvan"],t:"Tư vấn sau khi có kết quả",ic:"ti-messages",sev:"red",
   khi:function(l){return ttTestCua(l.lead_id).some(function(r){
     return num(r.overall_score)>0&&!isc(r.post_test_status,"consulted")})},
+  keo:function(l){return bkTuVan(l)},
   go:function(l){return "runStart('"+esc(l.lead_id)+"')"}},
  {tt:"khach",act:"pay_ghi",t:"Thu học phí / đặt cọc",ic:"ti-cash",sev:"amber",
   khi:function(l){return ttSo("DL06",function(e){return String(e.lead_id||"")===String(l.lead_id)&&
@@ -17383,6 +17410,7 @@ var VIECTT=[
  {tt:"hocvien",act:"xeplop",t:"Xếp lớp cho học viên",ic:"ti-layout-grid-add",sev:"red",
   khi:function(S){return ttDonCua(S.student_id).length>0&&
    !ttSo("DL08",function(o){return String(o.student_id||"")===String(S.student_id)}).length},
+  vichung:"Xếp lớp phải so nhiều lớp cùng lúc - sĩ số, lịch, giảng viên, nơi học - nên cần một màn rộng chứ không phải ngăn kéo.",
   go:function(S){return "go('xeplop')"}},
  {tt:"hocvien",act:"xeplop",t:"Nhập học chưa xong",ic:"ti-progress",sev:"amber",
   khi:function(S){return ttSo("DL08",function(o){return String(o.student_id||"")===String(S.student_id)&&
@@ -17429,6 +17457,7 @@ var VIECTT=[
    return ttBuoiLop(C.class_id).some(function(x){var d=pvnd(x.session_date);
     return d&&sameDay(d,t0)&&!isc(x.session_status,"cancelled")&&
      !ttSo("DL12",function(a){return String(a.session_id||"")===String(x.session_id)}).length})},
+  vichung:"Điểm danh cả lớp 10-20 học viên trong một ngăn kéo là lùi - việc này cần một màn rộng, mỗi học viên một dòng.",
   go:function(C){return "openLop('"+esc(C.class_id)+"')"}},
  {tt:"lop",act:"tnote",t:"Buổi còn nợ nhận xét",ic:"ti-notes",sev:"amber",
   khi:function(C){return ttBuoiLop(C.class_id).some(function(x){var st=bhState(x);return st.done&&!st.note})},
@@ -17436,12 +17465,14 @@ var VIECTT=[
  {tt:"lop",act:"baitap",t:"Bài tập chờ chấm",ic:"ti-book",sev:"amber",
   khi:function(C){return ttSo("DL13",function(r){return String(r.class_id||"")===String(C.class_id)&&
    hwSubmitted(r)&&!hwGraded(r)}).length>0},
+  vichung:"Chấm bài là chấm nhiều bài cùng một đề, liên tay - mở từng ngăn kéo cho từng bài là chậm hơn hẳn.",
   go:function(C){return "go('baitap')"}},
  {tt:"lop",vai:["hocvu"],t:"Sắp khai giảng mà thiếu sĩ số",ic:"ti-users",sev:"red",
   khi:function(C){if(!isc(C.class_status,"open","planning"))return false;
    var d=pvnd(C.class_start_date);if(!d)return false;
    var con=(d.getTime()-Date.now())/864e5, ngay=num(paramOf("thresholdClassStart_days",21))||21;
    return con>=0&&con<=ngay&&num(C.current_enrollment)<num(paramOf("classMinStudents",6))},
+  vichung:"Quyết dồn lớp hay lùi ngày phải nhìn nhiều lớp cạnh nhau mới quyết được.",
   go:function(C){return "go('banglop')"}},
  /* ─── GIẢNG VIÊN · thực thể của khối Nhân sự & Quản lý ─────────────────────────────────── */
  {tt:"giangvien",vai:["nhansu"],t:"Hồ sơ còn thiếu chức danh / cơ sở",ic:"ti-id-badge",sev:"amber",
@@ -17451,6 +17482,7 @@ var VIECTT=[
   khi:function(G){return ttSo("DL11",function(x){return String(x.teacher_id||"")===String(G.staff_id)&&
    isc(x.session_status,"completed")&&
    !(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())}).length>0},
+  vichung:"Soát mốc giờ là đối chiếu cả tháng của nhiều giảng viên - phải là bảng.",
   go:function(G){return "window.GVTAB='cong';go('giangvien')"}},
  {tt:"giangvien",vai:["nhansu"],t:"Chưa có email đăng nhập",ic:"ti-mail",sev:"",
   khi:function(G){return !String(G.email||"").trim()},
@@ -17509,6 +17541,151 @@ function ttDanhSach(ttk){
      do_:v.filter(function(x){return x.sev==="red"}).length}})
   .sort(function(a,b){return (b.do_-a.do_)||(b.viec.length-a.viec.length)||a.ten.localeCompare(b.ten)})}
 
+
+/* ═══ NGĂN KÉO LÀM VIỆC (V6) ══════════════════════════════════════════════════════════════
+   Anh Luân: *"Ko cần nhảy đi đâu, drawer xử lý được hết. Có khả thi ko ta."*
+   Đo trước khi trả lời: app đã có **111 lời gọi `openDrawer`** - ngăn kéo vốn đã là bề mặt làm
+   việc chính. Còn Bàn làm việc bản đầu thì **27/29 việc vẫn nhảy trang**: em mới gom được cái
+   DANH SÁCH việc, chưa gom được cái LÀM. Đây là chỗ sửa.
+   Kích thước ủng hộ: nhiều nhất 4 việc/hồ sơ, trung bình 1.1-1.7 - một ngăn kéo chứa từng ấy là
+   NGẮN. Nếu con số ấy là 15-20 thì hướng này đã sai từ đầu.
+
+   RANH GIỚI - và đây là phần em phải nói thật với anh Luân thay vì hứa "drawer làm được hết":
+       Việc trên MỘT hồ sơ  -> NGĂN KÉO.
+       Việc trên NHIỀU hồ sơ cùng lúc -> TRANG.
+   Sáu việc thuộc vế sau: điểm danh cả lớp · chấm nhiều bài · xếp lớp (phải so nhiều lớp) · chia
+   đều lead · bảng công cả tháng · báo cáo KPI. Ép chúng vào một ngăn kéo 760px là lùi.
+   Mỗi dòng trong `VIECTT` nay khai thêm `keo:` - hàm dựng nội dung ngăn kéo. Dòng nào KHÔNG khai
+   `keo` nghĩa là việc hàng loạt, và phải khai `vichung:` nói vì sao - không có dòng nào được im
+   lặng nhảy trang. */
+function bkTieu(t,ic){return '<div class="dcard"><h4><i class="ti '+ic+'"></i>'+esc(t)+'</h4>'}
+/* Ô chọn dựng từ danh mục CH1 - không gõ tay lựa chọn nào, thêm giá trị ở Cài đặt là ô này có ngay. */
+function bkSel(id,lb,en,mac){
+ var a=ENUM[en]||[];
+ return '<div class="fld"><label>'+esc(lb)+'</label><select id="'+id+'">'+
+  a.map(function(x){return '<option value="'+esc(x)+'"'+(mac&&ecode(x)===mac?" selected":"")+'>'+esc(elabel(x)||x)+'</option>'}).join("")+
+  '</select></div>'}
+function bkO(id,lb,ty,val,hint){
+ return '<div class="fld'+(ty==="ta"?" full":"")+'"><label>'+esc(lb)+'</label>'+
+  (ty==="ta"?('<textarea id="'+id+'" rows="3">'+esc(val||"")+'</textarea>')
+   :('<input id="'+id+'" type="'+(ty||"text")+'" value="'+esc(val||"")+'">'))+
+  (hint?'<i class="fhint">'+hint+'</i>':'')+'</div>'}
+function bkLuu(fn,nhan){
+ return '<div class="dact"><button class="btn" onclick="closeModal()"><i class="ti ti-x"></i>Đóng</button>'+
+  '<button class="btn primary" onclick="'+fn+'"><i class="ti ti-device-floppy"></i>'+esc(nhan||"Lưu")+'</button></div>'}
+
+/* ── VIỆC 1: GHI LIÊN HỆ - thao tác lặp nhiều nhất trong cả app ──────────────────────────── */
+function bkGhiLienHe(l,vs){
+ var h='<div class="notebar"><i class="ti ti-phone"></i>'+esc(vs||"")+'</div>';
+ h+='<div class="rform">'+
+  bkSel("bk_kenh","Kênh liên hệ","enum_contact_channel","call")+
+  bkSel("bk_cres","Kết quả","enum_lead_status","contacted")+
+  bkO("bk_noi","Nội dung trao đổi","ta","")+
+  bkO("bk_hen","Hẹn liên hệ lại","datetime-local","","Để trống thì app tự đặt hẹn theo kết quả, dùng ngưỡng ở CH2.")+
+  '</div>';
+ h+=bkLuu("bkLuuLienHe('"+esc(l.lead_id)+"')","Lưu lượt liên hệ");
+ return h}
+function bkLuuLienHe(lid){
+ var L=find("DL02","lead_id",lid);if(!L){toast("Không thấy khách");return}
+ var noi=(fldV("bk_noi")||"").trim();
+ if(!noi){toast("Cần ghi lại nội dung trao đổi trước khi lưu.");return}
+ var hen=(fldV("bk_hen")||"").trim();
+ var o={lead_id:lid,customer_name:L.full_name,contact_time:nowStr(),
+  channel:fldV("bk_kenh"),direction:eFull("enum_contact_direction","outbound"),
+  content:noi,staff_id:CURSTAFF||"",staff_id_name:myName(),
+  __cres:fldV("bk_cres"),next_followup_time:hen?dtVN(hen):""};
+ normLienhe(o);
+ jSaveRow("DL02b",o,function(){touchLead(o);closeModal();
+  toast("Đã ghi lượt liên hệ với "+(L.full_name||lid)+".");reRender(CUR)})}
+/* Ô datetime-local trả về "2026-08-05T14:30" - dữ liệu app dùng "05/08/2026 14:30". Đổi ở ĐÚNG
+   một chỗ này, không rải phép đổi ra từng form. */
+function dtVN(v){var m=String(v||"").match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+ return m?(m[3]+"/"+m[2]+"/"+m[1]+" "+m[4]+":"+m[5]):""}
+
+/* ── VIỆC 2: CHẤM BÀI TEST ĐẦU VÀO ──────────────────────────────────────────────────────── */
+function bkChamTest(l){
+ var T=ttTestCua(l.lead_id).filter(function(r){
+  return isc(r.test_attendance_status,"on_time","late")&&!isc(r.test_status,"graded")});
+ if(!T.length)return '<div class="empty">Không còn phiếu test nào chờ chấm.</div>';
+ var r=T[0];
+ var h='<div class="notebar"><i class="ti ti-file-check"></i>Phiếu <b>'+esc(r.test_id||"")+'</b> · thi ngày '+
+  esc(String(r.test_date||"").slice(0,10))+'. Hạn trả kết quả '+slaChip("slaGLA_hours",24,"giờ")+'.</div>';
+ h+='<div class="rform">'+
+  bkO("bk_l","Listening","number",r.skill_listening)+bkO("bk_r","Reading","number",r.skill_reading)+
+  bkO("bk_w","Writing","number",r.skill_writing)+bkO("bk_s","Speaking","number",r.skill_speaking)+
+  bkO("bk_note","Nhận xét học thuật","ta",r.academic_note,"Nhận xét này đi thẳng vào buổi tư vấn sau test.")+
+  '</div><div class="fhint">Điểm tổng app tự tính bằng trung bình bốn kỹ năng, làm tròn 0.5 - đúng luật của bộ kiểm dữ liệu.</div>';
+ h+=bkLuu("bkLuuTest('"+esc(r.test_id)+"')","Lưu kết quả");
+ return h}
+function bkLuuTest(tid){
+ var g=["bk_l","bk_r","bk_w","bk_s"].map(function(x){return parseFloat(fldV(x))});
+ if(g.some(function(x){return isNaN(x)||x<0||x>9})){toast("Bốn kỹ năng phải có điểm trong khoảng 0-9.");return}
+ var tb=Math.round((g[0]+g[1]+g[2]+g[3])/4*2)/2;
+ jUpdRow("DL03",tid,{skill_listening:g[0],skill_reading:g[1],skill_writing:g[2],skill_speaking:g[3],
+  overall_score:tb,academic_note:(fldV("bk_note")||"").trim(),
+  test_status:eFull("enum_test_status","graded"),graded_by:CURSTAFF||"",graded_by_name:myName(),
+  result_time:nowStr()},function(){closeModal();
+  toast("Đã chấm xong phiếu "+tid+" - điểm tổng "+tb+".");reRender(CUR)})}
+
+/* ── VIỆC 3: TƯ VẤN SAU TEST ────────────────────────────────────────────────────────────── */
+function bkTuVan(l){
+ var T=ttTestCua(l.lead_id).filter(function(r){return num(r.overall_score)>0});
+ var r=T.slice(-1)[0]||{};
+ var h='<div class="notebar"><i class="ti ti-messages"></i>Điểm đầu vào <b>'+esc(String(r.overall_score||"-"))+
+  '</b>. Hạn tư vấn sau khi có kết quả: '+slaChip("slaCVT_hours",24,"giờ")+'.</div>';
+ if(r.academic_note)h+='<div class="fhint" style="margin:0 0 10px">Nhận xét của người chấm: '+esc(r.academic_note)+'</div>';
+ h+='<div class="rform">'+
+  bkO("bk_tvnoi","Nội dung tư vấn","ta","","Lộ trình đề xuất, khóa phù hợp, mối bận tâm của khách.")+
+  bkSel("bk_tvkq","Kết quả buổi tư vấn","enum_conversion_status","considering")+
+  bkO("bk_tvhen","Hẹn chốt lại","datetime-local","")+
+  '</div>';
+ h+=bkLuu("bkLuuTuVan('"+esc(l.lead_id)+"')","Lưu buổi tư vấn");
+ return h}
+function bkLuuTuVan(lid){
+ var L=find("DL02","lead_id",lid);if(!L){toast("Không thấy khách");return}
+ var noi=(fldV("bk_tvnoi")||"").trim();
+ if(!noi){toast("Cần ghi lại nội dung tư vấn trước khi lưu.");return}
+ var hen=(fldV("bk_tvhen")||"").trim();
+ jSaveRow("DL04",{lead_id:lid,lead_id_name:L.full_name,consultation_time:nowStr(),
+  consulted_by:CURSTAFF||"",consulted_by_name:myName(),consultation_content:noi,
+  conversion_status:fldV("bk_tvkq"),
+  consultation_status:eFull("enum_consultation_status","consulted")},function(){
+  /* Đánh dấu phiếu test đã được tư vấn - nếu không thì việc này còn nằm trên bàn mãi. */
+  ttTestCua(lid).forEach(function(t2){if(num(t2.overall_score)>0&&!isc(t2.post_test_status,"consulted"))
+   jUpdRow("DL03",t2.test_id,{post_test_status:eFull("enum_post_test_status","consulted")})});
+  if(hen)jUpdRow("DL02",lid,{next_followup_time:dtVN(hen)});
+  closeModal();toast("Đã ghi buổi tư vấn cho "+(L.full_name||lid)+".");reRender(CUR)})}
+
+/* Ngăn kéo cho MỘT việc trên MỘT hồ sơ. Mở ra là thấy: hồ sơ nào, việc gì, luật SOP nào áp,
+   rồi tới form. Đóng lại là về đúng chỗ đang đứng. */
+function bkMo(ttk,ma,mavc){
+ var T=TTBK[ttk];if(!T)return;
+ var r=find(T.bang,T.ma,ma);if(!r){toast("Không thấy hồ sơ "+ma);return}
+ var v=null;
+ ttViec(ttk,r).forEach(function(x){if((x.act||"")+"|"+x.t===mavc)v=x});
+ if(!v){toast("Việc này vừa xong hoặc không còn thuộc về bạn.");reRender(CUR);return}
+ var h=bkTieu(v.t,v.ic);
+ h+='<div class="fhint" style="margin:0 0 10px">'+esc(T.t)+': <b>'+esc(ttTen(ttk,r))+'</b> · '+
+  esc(ttMa(ttk,r))+' · giai đoạn <b>'+esc(ttGiaiDoan(ttk,r))+'</b></div>';
+ if(v.act&&CH3BY[v.act])h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-shield-check"></i>'+
+  'Theo bảng phân quyền CH3 của SOP: <b>'+esc(CH3BY[v.act].t)+'</b>.</div>';
+ if(typeof v.keo==="function"){
+  var than="";try{than=v.keo(r)}catch(e){than='<div class="empty">Không dựng được nội dung: '+esc(e.message)+'</div>'}
+  h+=than;
+ }else if(v.vichung){
+  /* Việc HÀNG LOẠT - đã khai rõ vì sao nó không thuộc về ngăn kéo. */
+  h+='<div class="notebar"><i class="ti ti-table"></i>'+esc(v.vichung)+'</div>'+
+   '<div class="dact"><button class="btn primary" onclick="closeModal();'+v.go(r).split('"').join("&quot;")+'"><i class="ti ti-arrow-right"></i>Mở màn làm việc</button></div>';
+ }else{
+  /* CHƯA CHUYỂN - nói thật. Việc này KHÔNG phải việc hàng loạt, chỉ là chưa có form trong ngăn
+     kéo. Gộp nó chung với nhóm hàng loạt là nói dối người dùng và giấu luôn phần việc còn nợ:
+     nhìn màn hình sẽ tưởng đã xong, mà số đo thì không ai đếm nữa. `_checkaudit` đếm đúng con số
+     này và in ra mỗi lần chạy, nên nó không thể nằm im. */
+  h+='<div class="notebar nbamber"><i class="ti ti-progress"></i>'+
+   '<b>Việc này chưa chuyển vào ngăn kéo</b> ở bản thử - mở màn cũ để làm. Bản 5 vẫn làm bình thường.</div>'+
+   '<div class="dact"><button class="btn primary" onclick="closeModal();'+v.go(r).split('"').join("&quot;")+'"><i class="ti ti-arrow-right"></i>Mở màn làm việc</button></div>';
+ }
+ openDrawer(v.t,h+'</div>')}
 
 /* ── MÀN BÀN LÀM VIỆC ──────────────────────────────────────────────────────────────────────
    Hai mức, không hơn: DANH SÁCH thực thể của tôi -> MỞ MỘT thực thể ra làm.
@@ -17573,7 +17750,12 @@ function banThe(ttk,z){
    '<span class="banji '+(v.sev==="red"?"do":(v.sev==="amber"?"ho":""))+'"><i class="ti '+v.ic+'"></i></span>'+
    '<div class="banjt">'+esc(v.t)+
     '<div class="mut" style="font-size:11px">'+esc(v.act?("theo CH3 · "+((CH3BY[v.act]||{}).t||v.act)):("việc của "+(v.vai||[]).join(", ")))+'</div></div>'+
-   '<button class="btn primary sm" onclick="'+v.go(r).split('"').join("&quot;")+'"><i class="ti ti-arrow-right"></i>Làm</button></div>'});
+   /* V6: nút Làm mở NGĂN KÉO ngay tại chỗ. v5 giữ nguyên lối cũ - nhảy sang trang nghiệp vụ,
+      để hai bản khác nhau đúng một chuyện và anh Luân so được sòng phẳng. */
+   '<button class="btn primary sm" onclick="'+
+   (V6()?("bkMo('"+esc(ttk)+"','"+esc(ttMa(ttk,r))+"','"+esc((v.act||"")+"|"+v.t)+"')")
+        :v.go(r)).split('"').join("&quot;")+
+   '"><i class="ti '+(V6()?"ti-pencil":"ti-arrow-right")+'"></i>Làm</button></div>'});
  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">'+banNutHoSo(ttk,r)+'</div>';
  h+='</div></div>';
  return h}
@@ -18490,12 +18672,26 @@ function navGroupOf(k){for(var i=0;i<NAVTREE.length;i++){var G=NAVTREE[i];
   if(G.items.indexOf(k)>=0)return G.g;
   for(var j=0;j<G.items.length;j++)if(navOwner(G.items[j])===k)return G.g}
  return null}
+/* ═══ MENU BẢN V6 - GOM THEO THỰC THỂ, KHÔNG THEO CHẶNG ══════════════════════════════════
+   Bốn nhóm chặng C1-C4 của v5 biến mất khỏi menu: chúng là CÁCH KỂ hành trình, không phải chỗ
+   làm việc. Ở v6 hành trình nằm gọn trong chip giai đoạn của từng hồ sơ trên Bàn làm việc.
+   Nhóm "Làm hàng loạt" là bản khai TRUNG THỰC của ranh giới em đã báo anh Luân: việc trên MỘT
+   hồ sơ vào ngăn kéo, việc trên NHIỀU hồ sơ cùng lúc thì phải có trang riêng - ép điểm danh cả
+   lớp 20 học viên vào một ngăn kéo 760px là lùi, không phải tiến. Sáu màn dưới đây là sáu chỗ
+   người ta cần nhìn nhiều dòng một lúc. */
+var NAVTREE6=[
+ {g:"Bàn làm việc",items:["ban"]},
+ {g:"Việc & hàng chờ",items:["viec","ychv","giaoviec","duyet"]},
+ {g:"Làm hàng loạt",items:["xeplop","banglop","baitap","banggiao","bangcong","giaoan"]},
+ {g:"Tra cứu",items:["hocvien","giangvien","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan",
+   "dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai"]},
+ {g:"Quản lý",items:["baocao","nhansu","hoidap","khac","settings"]}];
 function buildNav(){
  window.__navarc1=0;   /* neo @navarc chi gan cho nhom chặng ĐẦU TIÊN - neo trùng là tô sáng nhầm chỗ */
  window.__NAVJ=null;try{window.__NAVJ=jAll()}catch(e){}   /* tính 1 lần cho mọi badge */
  var h="";
  var ORPHAN=!navAnyCur();   /* trang hiện tại không có mục riêng trên menu */
- NAVTREE.forEach(function(G){
+ (V6()?NAVTREE6:NAVTREE).forEach(function(G){
   if(!uiMenuOn("g:"+G.g))return;                                   /* V9.20: nhóm bị ẩn ở Cài đặt > Giao diện */
   var items=G.items.filter(function(k){return navVis(k)&&uiMenuOn(k)});
   if(!items.length)return;
@@ -19143,10 +19339,10 @@ HV_SHELL = r"""
 # Them mot ham ghi moi ma quen khai -> _check15 BAO DO (no tu do nguon ra ban khai that).
 DOORS = {
  "DL01":["staffAdd","staffSave","gvBioSave"],
- "DL02":["bgSplitOrphansRun","doHandoverRun","leadInboundSave","reassignSave","runGiveUpDo","runRejectSave","testQuickSave","touchLead","tvEnrollSave"],
- "DL02b":["leadInboundSave","rfNeed","runRejectSave","runTouchSave","testQuickSave"],
- "DL03":["rfNeed","testAttend","testBook","testNoShowSave","testQuickSave","testRebookSave","testRefuse","testResultSave","tvSave","testEnd"],
- "DL04":["rfNeed","runSkipTest","tvCloseSave","tvEnrollSave","tvQuickSave","tvSave","testConsult"],
+ "DL02":["bkLuuTuVan","bgSplitOrphansRun","doHandoverRun","leadInboundSave","reassignSave","runGiveUpDo","runRejectSave","testQuickSave","touchLead","tvEnrollSave"],
+ "DL02b":["bkLuuLienHe","leadInboundSave","rfNeed","runRejectSave","runTouchSave","testQuickSave"],
+ "DL03":["bkLuuTest","bkLuuTuVan","rfNeed","testAttend","testBook","testNoShowSave","testQuickSave","testRebookSave","testRefuse","testResultSave","tvSave","testEnd"],
+ "DL04":["bkLuuTuVan","rfNeed","runSkipTest","tvCloseSave","tvEnrollSave","tvQuickSave","tvSave","testConsult"],
  "DL06":["cancelEnrollRun","paySave","rfNeed","runCancelEnroll","tvEnrollSave","insSync","debtRemind"],
  "DL06b":["insPlanSave"],
  "DL07":["duyetRefundRun","paySave","payVerifyRun","rfNeed"],
@@ -19228,6 +19424,25 @@ except Exception as e:
 for p in [os.path.join(_OUT,"ITTs_WebApp_v5_demo.html")]:
     open(p,"w",encoding="utf-8").write(out)
     print("WROTE", p, len(out), "bytes")
+
+# ═══════════════════════════════════════════════════════════════════════════════════════════
+# BẢN V6 - TRỤC THỰC THỂ (anh Luân đặt 01/08)
+# ═══════════════════════════════════════════════════════════════════════════════════════════
+# Anh Luân: *"Nếu em build, thì xuất ra v2 nhé, bản hiện tại cũng đang ổn"* -> đổi tên thành v6
+# cho khớp mạch phiên bản của app (đang v5), vì "v2" dễ đọc nhầm thành phiên bản 2 của cả app.
+#
+# MỘT NGUỒN, HAI BẢN BUILD - và đây là quyết định kiến trúc quan trọng nhất của việc này.
+# Tách file nguồn ra thì hai nguồn SẼ TRÔI KHỎI NHAU: mọi bản vá chung sau này (bộ lọc, câu chữ,
+# phân quyền, sửa mã ma) phải làm hai lần, và tới lần thứ ba là quên một bên. Dự án này đã cắn
+# đúng cái bẫy "một sự thật ở hai chỗ" nhiều lần rồi.
+# Nên: cùng một `gen_v5.py`, chỉ khác một BIẾN CỜ nhúng vào bản build. Phần thân app đọc cờ đó
+# để quyết trục tổ chức; mọi thứ còn lại dùng chung nguyên vẹn.
+_v6 = out.replace('window.ITTS_V6=0;', 'window.ITTS_V6=1;')
+if _v6 == out:
+    raise SystemExit("LOI: khong tim thay cho cam co ITTS_V6 trong ban build - v6 se giong het v5")
+_p6 = os.path.join(_OUT,"ITTs_WebApp_v6_demo.html")
+open(_p6,"w",encoding="utf-8").write(_v6)
+print("WROTE", _p6, len(_v6), "bytes  (ban V6 - truc thuc the)")
 _php = os.path.join(_OUT,"ITTs_TrangHocVien_demo.html")
 open(_php,"w",encoding="utf-8").write(out_hv)
 print("WROTE", _php, len(out_hv), "bytes")

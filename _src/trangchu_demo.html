@@ -39,7 +39,19 @@ body{
 .logo span{display:block;font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.6px;margin-top:5px}
 
 .doors{display:grid;grid-template-columns:1fr;gap:14px}
-@media(min-width:700px){.doors{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:700px){.doors{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1080px){.doors{grid-template-columns:repeat(4,1fr)}}
+.tag{display:inline-block;vertical-align:2px;margin-left:6px;font-size:10px;font-weight:700;
+ letter-spacing:.4px;text-transform:uppercase;padding:2px 7px;border-radius:999px;
+ background:#FBF3E4;color:#7A5B12}
+.sosanh{margin:22px auto 0;max-width:980px;border:1px solid var(--line,#E4E9F0);border-radius:14px;
+ background:#fff;padding:16px 18px}
+.sosanh h3{font-size:13.5px;font-weight:800;color:var(--ink,#1E2A38);margin-bottom:10px}
+.sosanh table{width:100%;border-collapse:collapse;font-size:12.5px}
+.sosanh th,.sosanh td{text-align:left;padding:7px 8px;border-top:1px solid var(--line,#E4E9F0);
+ color:var(--muted,#6B7887);vertical-align:top}
+.sosanh th{color:var(--ink,#1E2A38);font-weight:700;border-top:0}
+.sosanh td:first-child{color:var(--ink,#1E2A38);font-weight:600;width:30%}
 .door{
   display:flex;flex-direction:column;text-decoration:none;color:inherit;
   background:var(--card);border:1px solid var(--line);border-radius:15px;padding:20px 18px 17px;
@@ -57,7 +69,7 @@ body{
   color:var(--accent,var(--navyd));margin-top:12px}
 .door .go svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:.16s}
 .door:hover .go svg{transform:translateX(3px)}
-.d1{--accent:#1E3A5F} .d2{--accent:#0D7C66} .d3{--accent:#8A4FD3}
+.d1{--accent:#1E3A5F} .d2{--accent:#0D7C66} .d3{--accent:#8A4FD3} .d4{--accent:#B58A2B}
 </style>
 </head>
 <body>
@@ -81,9 +93,17 @@ body{
 
     <a class="door d1" href="cong-nhan-vien/">
       <div class="dic"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5"/><path d="M9 11h.01M15 11h.01"/></svg></div>
-      <h2>Cổng nhân viên</h2>
-      <p>Việc hôm nay theo SOP, hồ sơ học viên, báo cáo KPI, cấu hình hệ thống.</p>
+      <h2>Cổng nhân viên · bản 5</h2>
+      <p><b>Sắp theo nghiệp vụ.</b> Menu gom theo 4 chặng vòng đời, mỗi nghiệp vụ một trang riêng: lead, test, tư vấn, thu tiền, xếp lớp. Làm xong một việc thì sang trang khác để làm việc kế.</p>
       <span class="go">Vào cổng
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </a>
+
+    <a class="door d4" href="cong-nhan-vien-v6/">
+      <div class="dic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></div>
+      <h2>Cổng nhân viên · bản 6 <span class="tag">thử nghiệm</span></h2>
+      <p><b>Sắp theo đối tượng.</b> Mở app ra là Bàn làm việc: chọn một khách, một học viên, một lớp hay một giảng viên - bên dưới là hồ sơ và toàn bộ việc bạn phải làm với người đó. Bấm Làm là ngăn kéo mở ngay tại chỗ, không đổi trang.</p>
+      <span class="go">Vào thử
         <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
     </a>
 
@@ -104,6 +124,20 @@ body{
     </a>
 
   </nav>
+
+  <section class="sosanh">
+    <h3>Hai bản khác nhau ở đâu</h3>
+    <table>
+      <tr><th>&nbsp;</th><th>Bản 5 - theo nghiệp vụ</th><th>Bản 6 - theo đối tượng</th></tr>
+      <tr><td>Mở app ra thấy</td><td>Trang bắt đầu: các con số của hôm nay</td><td>Bàn làm việc: hồ sơ của bạn, việc bày sẵn</td></tr>
+      <tr><td>Câu hỏi phải nhớ</td><td>"Chức năng này nằm ở trang nào?"</td><td>"Tôi đang làm việc với ai?"</td></tr>
+      <tr><td>Menu</td><td>8 nhóm, 33 trang</td><td>5 nhóm - Bàn làm việc, Việc &amp; hàng chờ, Làm hàng loạt, Tra cứu, Quản lý</td></tr>
+      <tr><td>Làm một việc</td><td>Đổi sang trang nghiệp vụ, tìm lại đúng người, làm, rồi quay ra</td><td>Bấm Làm, ngăn kéo mở tại chỗ, đóng lại là vẫn đứng nguyên chỗ cũ</td></tr>
+      <tr><td>Việc hàng loạt</td><td>Trang riêng</td><td>Vẫn trang riêng - điểm danh cả lớp, chấm nhiều bài, xếp lớp, chia lead, bảng công, báo cáo. Ngăn kéo nói rõ vì sao và mở đúng màn</td></tr>
+      <tr><td>Phân quyền</td><td>Theo trang</td><td>Theo việc: mỗi chức danh chỉ thấy đúng việc mà bảng CH3 của SOP giao cho mình</td></tr>
+      <tr><td>Dữ liệu</td><td colspan="2">Chung một bộ - mở hai bản cạnh nhau là cùng số liệu, so được ngay</td></tr>
+    </table>
+  </section>
 
 </div>
 </body>

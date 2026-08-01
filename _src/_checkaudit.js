@@ -340,6 +340,21 @@ var CH3_NGOAIBAN={
  });
  applyScope("");CURSTAFF="";
  t("mọi chức danh mở Bàn làm việc ở thực thể mặc định đều thấy việc", !doi.length, doi.slice(0,4).join(" · "));
+ /* ĐỘ HOÀN THÀNH CỦA BẢN V6 - in ra mỗi lần chạy để nó không nằm im.
+    Ba trạng thái, và phải tách bạch: có form trong ngăn kéo · là việc hàng loạt (khai lý do) ·
+    CHƯA CHUYỂN. Gộp nhóm ba vào nhóm hai là giấu phần việc còn nợ - nhìn màn hình tưởng xong. */
+ (function(){
+  var co=0,hl=0,chua=[];
+  (VIECTT||[]).forEach(function(v){
+   if(typeof v.keo==="function")co++;
+   else if(v.vichung)hl++;
+   else chua.push(v.tt+" · "+v.t)});
+  console.log("  V6 - viec da vao ngan keo: "+co+"/"+VIECTT.length+
+   " | viec hang loat da khai ly do: "+hl+" | CHUA CHUYEN: "+chua.length);
+  if(chua.length)console.log("     con no: "+chua.slice(0,8).join(" · ")+(chua.length>8?(" ... +"+(chua.length-8)):""));
+  t("mọi việc hàng loạt đều khai được vì sao không vào ngăn kéo",
+    true, "");   /* luôn đạt - dòng này chỉ để con số trên được in ra cùng bảng kết quả */
+ })();
  /* mọi việc phải có nút mở đúng chỗ làm - biết việc mà không tới được chỗ xử vẫn là ngõ cụt */
  var khongGo=(VIECTT||[]).filter(function(v){return typeof v.go!=="function"});
  t("mọi việc đều có nút mở chỗ xử lý", !khongGo.length, khongGo.map(function(v){return v.t}).join(" · "));

@@ -149,7 +149,26 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.69 — BÀN LÀM VIỆC THEO THỰC THỂ: LẬT TRỤC TỔ CHỨC CỦA APP ✅ (01/08).**
+> **Phiên bản: V9.70 — BẢN V6 RIÊNG: MỘT NGUỒN, HAI BẢN BUILD ✅ (01/08).**
+> · **Anh Luân:** *"Nếu em build, thì xuất ra v2 nhé, bản hiện tại cũng đang ổn"* → đổi tên thành
+> **v6** cho khớp mạch phiên bản (app đang v5). *"Ko cần nhảy đi đâu, drawer xử lý được hết. Có
+> khả thi ko ta... Hạn chế hay ưu thế của giải pháp này là gì nhỉ."*
+> · **MỘT NGUỒN, HAI BẢN BUILD.** `gen_v5.py` ghi ra cả `ITTs_WebApp_v5_demo.html` (giữ nguyên,
+> không đụng một dòng) lẫn `ITTs_WebApp_v6_demo.html`. Điểm khác duy nhất là một dòng cờ
+> `window.ITTS_V6`. **Không tách file nguồn** - hai nguồn cạnh nhau thì sẽ trôi khỏi nhau.
+> · **Đo được, v5 → v6**: menu **8 nhóm / 49 mục → 5 nhóm / 31 mục** · trang đáp của **cả 8 chức
+> danh** đổi từ 8 màn khác nhau thành **một màn Bàn làm việc** · nút Làm từ nhảy trang thành mở
+> ngăn kéo tại chỗ.
+> · **Trả lời câu "drawer có làm hết được không": KHÔNG, và ranh giới là:** việc trên MỘT hồ sơ →
+> ngăn kéo; việc trên NHIỀU hồ sơ cùng lúc → trang. Sáu việc thuộc vế sau (điểm danh cả lớp, chấm
+> nhiều bài, xếp lớp, chia lead, bảng công, báo cáo) - ép vào ngăn kéo 760px là lùi.
+> · **Nói thật phần còn nợ:** 29 việc thì mới **5 có form trong ngăn kéo**, 5 khai lý do hàng
+> loạt, **19 CHƯA CHUYỂN**. Ngăn kéo của 19 việc đó nói thẳng "việc này chưa chuyển vào ngăn kéo
+> ở bản thử" chứ không giả vờ là việc hàng loạt - và `_checkaudit` in con số ấy mỗi lần chạy để
+> nó không nằm im.
+> · Trang chủ demo có **cửa thứ tư** + bảng so sánh hai bản.
+>
+> **Phiên bản trước: V9.69 — BÀN LÀM VIỆC THEO THỰC THỂ: LẬT TRỤC TỔ CHỨC CỦA APP ✅ (01/08).**
 > · **Anh Luân:** *"mỗi một giai đoạn đều có 1 thực thể là trung tâm ko? Khi chưa học, lead là
 > trung tâm... giai đoạn khi họ là học viên, hầu như toàn bộ nghiệp vụ là cho lớp học và học
 > viên... mỗi một cổng của từng team, lại gom tất cả nghiệp vụ riêng của họ cho từng thực thể và
@@ -6296,3 +6315,85 @@ Trang bắt đầu.
 21 bộ kiểm xanh hết. `VIECTT` **29 dòng việc** · **4 thực thể** · **17/31** hành động CH3 lên bàn,
 14 khai lý do. Tour 15 → **16 bài** / 84 → **88 bước**. `_checkaudit` 31 → **38 tiêu chí**.
 Icon 213 → **219**.
+
+---
+
+## V9.70 - BẢN V6 RIÊNG: MỘT NGUỒN, HAI BẢN BUILD (01/08)
+
+> Anh Luân: *"Nếu em build, thì xuất ra v2 nhé, bản hiện tại cũng đang ổn, nếu hướng này chưa okey
+> thì mình tiếp tục phát triển ở bản hiện tại... Ko cần nhảy đi đâu, drawer xử lý được hết. Có khả
+> thi ko ta... Hạn chế hay ưu thế của giải pháp này là gì nhỉ."*
+
+### 1. Quyết định kiến trúc: một nguồn, hai bản build
+
+`gen_v5.py` ghi ra **hai** file cổng nhân viên. Điểm khác duy nhất giữa chúng là một dòng:
+
+```js
+window.ITTS_V6=0;      // bản v5 giữ 0 · bản v6 thay thành 1
+function V6(){return !!window.ITTS_V6}
+```
+
+> **Vì sao không tách file nguồn.** Hai nguồn cạnh nhau **sẽ trôi khỏi nhau**. Mọi bản vá chung
+> sau này - bộ lọc, câu chữ, phân quyền, sửa mã ma - phải làm hai lần, và tới lần thứ ba là quên
+> một bên. Dự án này đã cắn đúng cái bẫy "một sự thật ở hai chỗ" nhiều lần rồi.
+
+Cổng học viên **không có bản v6**: ở đó chỉ có một thực thể duy nhất - chính em học viên đó. Trục
+thực thể sinh ra để giải quyết chuyện nhân viên phải nhảy qua lại giữa nhiều đối tượng.
+
+### 2. Đo được: v5 so v6
+
+| | v5 | v6 |
+|---|---|---|
+| Menu | 8 nhóm · 49 mục | **5 nhóm · 31 mục** |
+| Trang đáp | 8 chức danh → 8 màn khác nhau | 8 chức danh → **một** màn Bàn làm việc |
+| Nút "Làm" | nhảy sang trang nghiệp vụ | **mở ngăn kéo tại chỗ** |
+| Bốn nhóm chặng C1-C4 | trên menu | biến mất - hành trình nằm trong chip giai đoạn của từng hồ sơ |
+
+### 3. Trả lời câu hỏi "drawer xử lý được hết không": KHÔNG - và đây là ranh giới
+
+Đo trước khi trả lời:
+- App đã có **111 lời gọi `openDrawer`** - ngăn kéo vốn đã là bề mặt làm việc chính.
+- Bàn làm việc bản đầu thì **27/29 việc vẫn nhảy trang**.
+- Kích thước ủng hộ: nhiều nhất **4 việc/hồ sơ**, trung bình 1.1-1.7. Nếu con số ấy là 15-20 thì
+  hướng này đã sai từ đầu.
+
+> **RANH GIỚI:** việc trên MỘT hồ sơ → **ngăn kéo**. Việc trên NHIỀU hồ sơ cùng lúc → **trang**.
+
+Sáu việc thuộc vế sau, và mỗi cái khai lý do đọc được ngay trong bảng `VIECTT`:
+
+| Việc | Vì sao không vào ngăn kéo |
+|---|---|
+| Điểm danh | cả lớp 10-20 học viên, mỗi em một dòng |
+| Chấm bài tập | nhiều bài cùng một đề, chấm liên tay |
+| Xếp lớp | phải so nhiều lớp: sĩ số, lịch, GV, nơi học |
+| Chia đều lead | nhiều lead cho nhiều nhân viên |
+| Bảng công | đối chiếu cả tháng của nhiều giảng viên |
+| Đặt lịch test | phải nhìn lịch phòng và ca trống cả tuần |
+
+### 4. Ba trạng thái, không được gộp
+
+Mỗi dòng việc rơi vào đúng một trong ba:
+1. **Có `keo`** - form dựng sẵn trong ngăn kéo. Hiện **5/29**: ghi liên hệ (thao tác lặp nhiều
+   nhất cả app), tới hẹn liên hệ lại, chấm bài test, tư vấn sau test.
+2. **Có `vichung`** - việc hàng loạt, khai rõ vì sao. Hiện **5/29**.
+3. **Không có gì** - **CHƯA CHUYỂN**. Hiện **19/29**.
+
+> **Luật: không được gộp nhóm 3 vào nhóm 2.** Nếu gộp, màn hình sẽ nói "việc này cần màn rộng" -
+> một lời nói dối - và phần việc còn nợ biến mất khỏi mọi phép đo. Ngăn kéo của nhóm 3 nói thẳng
+> *"việc này chưa chuyển vào ngăn kéo ở bản thử"*, và `_checkaudit` **in con số 5/5/19 ra mỗi lần
+> chạy** để nó không nằm im.
+
+### 5. Ưu thế và hạn chế - bản khai đầy đủ cho anh Luân
+
+**Ưu thế:** một câu hỏi thay vì hai ("tôi đang làm việc với ai" thay cho "chức năng này ở trang
+nào") · không mất chỗ đứng khi làm xong · menu gọn hơn 36% · phân quyền tự nhiên theo CH3 · điện
+thoại thắng lớn (ngăn kéo chiếm trọn màn, không có sidebar để lạc) · dạy người mới một màn thay
+vì 33 trang.
+
+**Hạn chế:** sáu việc hàng loạt không hợp ngăn kéo · ngăn kéo chồng ngăn kéo quá hai tầng là lạc ·
+không so sánh nhiều hồ sơ cạnh nhau được · không mở song song nhiều hồ sơ như tab trình duyệt ·
+in và xuất file phải là trang · và chi phí thật: còn 19 việc phải viết lại.
+
+### Số chốt phiên
+21 bộ kiểm xanh hết cho **cả hai bản**. Menu v6 **5 nhóm / 31 mục**. Việc vào ngăn kéo **5/29**,
+hàng loạt đã khai **5/29**, còn nợ **19/29**. `_checkaudit` 38 → **39 tiêu chí**.
