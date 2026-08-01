@@ -231,6 +231,42 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
   t("(trang chu) ba the deu tro dung ba cong",
     !TC||(/href="cong-nhan-vien\/"/.test(TC)&&/href="cong-hoc-vien\/"/.test(TC)&&/href="cong-hoc-vien\/\?phuhuynh"/.test(TC)));
   t("(trang chu) khong con ten cu 'Trang hoc vien'", !TC||TC.indexOf("Trang học viên")<0);
+
+  /* V9.72 - TRANG CHU HAI BUOC (anh Luan: "cu chia ra em, chon v5 hoac v6, chon xong thi chon
+     tiep 3 cong, thieu gi lam cho du di em").
+     Canh CAU TRUC chu khong canh chu: moi buoc phai ton tai, moi nhanh phai co DU BA CONG, va
+     phai co loi quay lai. Da cam mot luat o day: bo kiem cu chi doi "co ba href tro ba cong" -
+     dieu do van dung khi ca hai nhanh deu chi co MOT cong, hoac khi khong co nhanh nao ca. */
+  (function(){
+   if(!TC)return;
+   function khoi(id){
+    var i=TC.indexOf('id="'+id+'"');if(i<0)return "";
+    var j=TC.indexOf("</section>",i);return j<0?"":TC.slice(i,j)}
+   var b1=khoi("b1"), b5=khoi("b5"), b6=khoi("b6");
+   t("(trang chu) co du ba buoc: chon ban, cong cua ban 5, cong cua ban 6",
+     !!b1&&!!b5&&!!b6, "b1="+b1.length+" b5="+b5.length+" b6="+b6.length);
+   t("(trang chu) buoc 1 chi hoi MOT cau - chon ban, chua bay cong ra",
+     !!b1&&/href="\?ban5"/.test(b1)&&/href="\?ban6"/.test(b1)&&b1.indexOf('href="cong-')<0,
+     "buoc 1 dang lo cua vao app");
+   /* Du ba cong o CA HAI nhanh - day la cho anh Luan noi "thieu gi lam cho du" */
+   [["ban 5",b5,"cong-nhan-vien/"],["ban 6",b6,"cong-nhan-vien-v6/"]].forEach(function(x){
+    var ten=x[0],kh=x[1],nv=x[2];
+    var du=kh.indexOf('href="'+nv+'"')>=0 &&
+           kh.indexOf('href="cong-hoc-vien/"')>=0 &&
+           kh.indexOf('href="cong-hoc-vien/?phuhuynh"')>=0;
+    t("(trang chu) nhanh "+ten+" co du ba cong", du,
+      "thieu cong trong nhanh "+ten)});
+   t("(trang chu) nhanh ban 6 tro dung ban 6, khong lan sang ban 5",
+     b6.indexOf('href="cong-nhan-vien/"')<0, "nhanh ban 6 con tro ve cong nhan vien ban 5");
+   t("(trang chu) moi buoc 2 deu co loi quay lai chon ban",
+     /href="\?"/.test(b5)&&/href="\?"/.test(b6), "thieu nut Doi ban");
+   /* Hai cong dung chung phai NOI RA la dung chung - khong duoc de nguoi xem tuong ban 6 co
+      cong hoc vien rieng. Bo cuc can doi ma khong dung su that thi la noi doi bang bo cuc. */
+   t("(trang chu) nhanh ban 6 khai ro hai cong sau dung chung voi ban 5",
+     (b6.match(/chung với bản 5/g)||[]).length>=2, "chua khai, hoac khai thieu cho");
+   t("(trang chu) tat JavaScript van vao duoc app", /<noscript>/.test(TC)&&
+     TC.indexOf('href="cong-nhan-vien-v6/"')>0);
+  })();
  })();
 })();
 

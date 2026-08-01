@@ -387,6 +387,24 @@ var CH3_NGOAIBAN={
   location.pathname=cuP;window.ITTS_V6=cuV;
   t("nút Đổi cổng trỏ đúng ở cả ba thư mục cổng và cả khi mở thẳng file",
     !xau.length, xau.slice(0,3).join(" · "));
+
+  /* CỔNG HỌC VIÊN NHỚ KHÁCH ĐANG XEM BẢN NÀO. Cổng học viên chỉ có MỘT bản, dùng chung cho cả
+     hai - nên tự nó không biết mình thuộc bản nào. Không có mẩu nhớ này thì: chọn bản 6 ->
+     vào cổng học viên -> bấm "về cổng nhân viên" -> rơi vào bản 5. Đúng cái lỗi lặng lẽ đổi bản
+     dưới chân người dùng đã vá ở V9.71, chỉ khác lối đi. */
+  var xau2=[], cuHV=window.HVPORTAL;
+  location.pathname="/itts-sop-demo/cong-hoc-vien/";window.ITTS_V6=0;window.HVPORTAL=1;
+  [["6","/itts-sop-demo/cong-nhan-vien-v6/"],
+   ["5","/itts-sop-demo/cong-nhan-vien/"],
+   [null,"/itts-sop-demo/cong-nhan-vien/"]].forEach(function(x){
+   if(x[0]==null)sessionStorage.removeItem("ITTS_BAN");
+   else sessionStorage.setItem("ITTS_BAN",x[0]);
+   var ra=congURL("nv");
+   if(ra!==x[1])xau2.push("nhớ bản "+(x[0]||"chưa có")+" -> "+ra+" (mong "+x[1]+")")});
+  sessionStorage.removeItem("ITTS_BAN");
+  window.HVPORTAL=cuHV;location.pathname=cuP;window.ITTS_V6=cuV;
+  t("từ cổng học viên, nút về cổng nhân viên trả khách đúng bản họ đang xem",
+    !xau2.length, xau2.join(" · "));
  })();
  /* ĐỘ HOÀN THÀNH CỦA BẢN V6 - in ra mỗi lần chạy để nó không nằm im.
     Ba trạng thái, và phải tách bạch: có form trong ngăn kéo · là việc hàng loạt (khai lý do) ·

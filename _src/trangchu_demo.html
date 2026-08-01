@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light">
 <title>ITTs · Hệ thống tuân thủ SOP - Bản demo</title>
-<meta name="description" content="Bản demo hệ thống vận hành theo SOP của IELTS The Tutors - cổng nhân viên, trang học viên, cổng phụ huynh.">
+<meta name="description" content="Bản demo hệ thống vận hành theo SOP của IELTS The Tutors - chọn bản 5 hoặc bản 6, rồi chọn cổng nhân viên, cổng học viên hay cổng phụ huynh.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='16' fill='%23D51920'/%3E%3Ccircle cx='20' cy='20' r='7' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,18 +32,29 @@ body{
 }
 .wrap{width:100%;max-width:880px}
 
-.head{text-align:center;margin-bottom:30px}
+.head{text-align:center;margin-bottom:24px}
 .logo{display:inline-flex;align-items:center;gap:13px}
 .logo svg{width:42px;height:42px;flex:none}
 .logo b{font-size:23px;font-weight:800;letter-spacing:.4px;color:var(--navyd);line-height:1;display:block}
 .logo span{display:block;font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.6px;margin-top:5px}
 
+/* Nhịp hai bước: bước 1 chọn BẢN, bước 2 chọn CỔNG. Mỗi bước có một câu hỏi duy nhất -
+   trước đây bốn cửa bày phẳng ra cùng lúc, người xem phải tự tách "bản nào" khỏi "cổng nào". */
+.buoc{display:none}
+.buoc.on{display:block}
+.hoi{text-align:center;margin-bottom:16px}
+.hoi h1{font-size:17px;font-weight:800;color:var(--ink);letter-spacing:.2px}
+.hoi p{font-size:12.5px;color:var(--muted);margin-top:5px}
+.buocso{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.6px;
+ text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+
 .doors{display:grid;grid-template-columns:1fr;gap:14px}
 @media(min-width:700px){.doors{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:1080px){.doors{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1080px){.doors.ba{grid-template-columns:repeat(3,1fr)}}
 .tag{display:inline-block;vertical-align:2px;margin-left:6px;font-size:10px;font-weight:700;
  letter-spacing:.4px;text-transform:uppercase;padding:2px 7px;border-radius:999px;
  background:#FBF3E4;color:#7A5B12}
+.tag.xam{background:#EEF2F6;color:#5A6675}
 .sosanh{margin:22px auto 0;max-width:980px;border:1px solid var(--line,#E4E9F0);border-radius:14px;
  background:#fff;padding:16px 18px}
 .sosanh h3{font-size:13.5px;font-weight:800;color:var(--ink,#1E2A38);margin-bottom:10px}
@@ -70,6 +81,19 @@ body{
 .door .go svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:.16s}
 .door:hover .go svg{transform:translateX(3px)}
 .d1{--accent:#1E3A5F} .d2{--accent:#0D7C66} .d3{--accent:#8A4FD3} .d4{--accent:#B58A2B}
+
+/* Dải cho biết đang đứng ở bản nào + lối quay lại. Không có nó thì vào tới bước 2 là mất dấu:
+   ba cổng của bản 5 và của bản 6 trông y hệt nhau. */
+.dangxem{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+ background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:16px}
+.dangxem b{font-size:13px;font-weight:700;color:var(--ink)}
+.dangxem small{font-size:12px;color:var(--muted)}
+.doiban{margin-left:auto;display:inline-flex;align-items:center;gap:5px;text-decoration:none;
+ font-size:12.5px;font-weight:700;color:var(--navyd);
+ border:1px solid var(--line);border-radius:9px;padding:6px 11px;background:#F7FAFD;transition:.16s ease}
+.doiban:hover{background:#EDF3F9}
+.doiban svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.ghichu{font-size:12px;color:var(--muted);margin-top:14px;text-align:center;line-height:1.6}
 </style>
 </head>
 <body>
@@ -89,56 +113,184 @@ body{
     </div>
   </header>
 
-  <nav class="doors">
+  <!-- ═══ BƯỚC 1 · CHỌN BẢN ═══ -->
+  <section class="buoc on" id="b1">
+    <div class="hoi">
+      <span class="buocso">Bước 1 / 2</span>
+      <h1>Xem bản nào</h1>
+      <p>Hai bản dùng chung một bộ dữ liệu - mở cạnh nhau là so được ngay.</p>
+    </div>
 
-    <a class="door d1" href="cong-nhan-vien/">
-      <div class="dic"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5"/><path d="M9 11h.01M15 11h.01"/></svg></div>
-      <h2>Cổng nhân viên · bản 5</h2>
-      <p><b>Sắp theo nghiệp vụ.</b> Menu gom theo 4 chặng vòng đời, mỗi nghiệp vụ một trang riêng: lead, test, tư vấn, thu tiền, xếp lớp. Làm xong một việc thì sang trang khác để làm việc kế.</p>
-      <span class="go">Vào cổng
-        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-    </a>
+    <nav class="doors">
+      <a class="door d1" href="?ban5" data-ban="5">
+        <div class="dic"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5"/><path d="M9 11h.01M15 11h.01"/></svg></div>
+        <h2>Bản 5 · theo nghiệp vụ</h2>
+        <p><b>Mỗi nghiệp vụ một trang riêng.</b> Menu gom theo 4 chặng vòng đời: lead, test, tư vấn, thu tiền, xếp lớp. Làm xong một việc thì sang trang khác để làm việc kế.</p>
+        <span class="go">Chọn bản này
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
 
-    <a class="door d4" href="cong-nhan-vien-v6/">
-      <div class="dic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></div>
-      <h2>Cổng nhân viên · bản 6 <span class="tag">thử nghiệm</span></h2>
-      <p><b>Sắp theo đối tượng.</b> Mở app ra là Bàn làm việc: chọn một khách, một học viên, một lớp hay một giảng viên - bên dưới là hồ sơ và toàn bộ việc bạn phải làm với người đó. Bấm Làm là ngăn kéo mở ngay tại chỗ, không đổi trang.</p>
-      <span class="go">Vào thử
-        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-    </a>
+      <a class="door d4" href="?ban6" data-ban="6">
+        <div class="dic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></div>
+        <h2>Bản 6 · theo đối tượng <span class="tag">thử nghiệm</span></h2>
+        <p><b>Mở app ra là Bàn làm việc.</b> Chọn một khách, một học viên, một lớp hay một giảng viên - bên dưới là hồ sơ và toàn bộ việc phải làm với người đó. Bấm Làm là ngăn kéo mở tại chỗ, không đổi trang.</p>
+        <span class="go">Chọn bản này
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+    </nav>
 
-    <a class="door d2" href="cong-hoc-vien/">
-      <div class="dic"><svg viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg></div>
-      <h2>Cổng học viên</h2>
-      <p>Lịch học, bài tập, buổi WOW 1-1, học phí theo đợt, trao đổi với trung tâm.</p>
-      <span class="go">Vào cổng
-        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-    </a>
-
-    <a class="door d3" href="cong-hoc-vien/?phuhuynh">
-      <div class="dic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-      <h2>Cổng phụ huynh</h2>
-      <p>Theo dõi việc học của con - ẩn phần trao đổi riêng tư của các em.</p>
-      <span class="go">Vào cổng
-        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-    </a>
-
-  </nav>
-
-  <section class="sosanh">
-    <h3>Hai bản khác nhau ở đâu</h3>
-    <table>
-      <tr><th>&nbsp;</th><th>Bản 5 - theo nghiệp vụ</th><th>Bản 6 - theo đối tượng</th></tr>
-      <tr><td>Mở app ra thấy</td><td>Trang bắt đầu: các con số của hôm nay</td><td>Bàn làm việc: hồ sơ của bạn, việc bày sẵn</td></tr>
-      <tr><td>Câu hỏi phải nhớ</td><td>"Chức năng này nằm ở trang nào?"</td><td>"Tôi đang làm việc với ai?"</td></tr>
-      <tr><td>Menu</td><td>8 nhóm, 33 trang</td><td>5 nhóm - Bàn làm việc, Việc &amp; hàng chờ, Làm hàng loạt, Tra cứu, Quản lý</td></tr>
-      <tr><td>Làm một việc</td><td>Đổi sang trang nghiệp vụ, tìm lại đúng người, làm, rồi quay ra</td><td>Bấm Làm, ngăn kéo mở tại chỗ, đóng lại là vẫn đứng nguyên chỗ cũ</td></tr>
-      <tr><td>Việc hàng loạt</td><td>Trang riêng</td><td>Vẫn trang riêng - điểm danh cả lớp, chấm nhiều bài, xếp lớp, chia lead, bảng công, báo cáo. Ngăn kéo nói rõ vì sao và mở đúng màn</td></tr>
-      <tr><td>Phân quyền</td><td>Theo trang</td><td>Theo việc: mỗi chức danh chỉ thấy đúng việc mà bảng CH3 của SOP giao cho mình</td></tr>
-      <tr><td>Dữ liệu</td><td colspan="2">Chung một bộ - mở hai bản cạnh nhau là cùng số liệu, so được ngay</td></tr>
-    </table>
+    <section class="sosanh">
+      <h3>Hai bản khác nhau ở đâu</h3>
+      <table>
+        <tr><th>&nbsp;</th><th>Bản 5 - theo nghiệp vụ</th><th>Bản 6 - theo đối tượng</th></tr>
+        <tr><td>Mở app ra thấy</td><td>Trang bắt đầu: các con số của hôm nay</td><td>Bàn làm việc: hồ sơ của bạn, việc bày sẵn</td></tr>
+        <tr><td>Câu hỏi phải nhớ</td><td>"Chức năng này nằm ở trang nào?"</td><td>"Tôi đang làm việc với ai?"</td></tr>
+        <tr><td>Menu</td><td>8 nhóm, 33 trang</td><td>5 nhóm - Bàn làm việc, Việc &amp; hàng chờ, Làm hàng loạt, Tra cứu, Quản lý</td></tr>
+        <tr><td>Làm một việc</td><td>Đổi sang trang nghiệp vụ, tìm lại đúng người, làm, rồi quay ra</td><td>Bấm Làm, ngăn kéo mở tại chỗ, đóng lại là vẫn đứng nguyên chỗ cũ</td></tr>
+        <tr><td>Việc hàng loạt</td><td>Trang riêng</td><td>Vẫn trang riêng - điểm danh cả lớp, chấm nhiều bài, xếp lớp, chia lead, bảng công, báo cáo. Ngăn kéo nói rõ vì sao và mở đúng màn</td></tr>
+        <tr><td>Phân quyền</td><td>Theo trang</td><td>Theo việc: mỗi chức danh chỉ thấy đúng việc mà bảng CH3 của SOP giao cho mình</td></tr>
+        <tr><td>Khác nhau ở cổng nào</td><td colspan="2">Chỉ ở <b>cổng nhân viên</b>. Cổng học viên và cổng phụ huynh dùng chung một bản</td></tr>
+        <tr><td>Dữ liệu</td><td colspan="2">Chung một bộ - mở hai bản cạnh nhau là cùng số liệu, so được ngay</td></tr>
+      </table>
+    </section>
   </section>
 
+  <!-- ═══ BƯỚC 2 · CHỌN CỔNG (bản 5) ═══ -->
+  <section class="buoc" id="b5">
+    <div class="dangxem">
+      <b>Bản 5 · theo nghiệp vụ</b>
+      <small>Mỗi nghiệp vụ một trang riêng</small>
+      <a class="doiban" href="?">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Đổi bản</a>
+    </div>
+    <div class="hoi">
+      <span class="buocso">Bước 2 / 2</span>
+      <h1>Vào bằng cổng nào</h1>
+      <p>Ba cổng nhìn cùng một bộ dữ liệu, mỗi cổng chỉ hiện phần của người đó.</p>
+    </div>
+
+    <nav class="doors ba">
+      <a class="door d1" href="cong-nhan-vien/">
+        <div class="dic"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5"/><path d="M9 11h.01M15 11h.01"/></svg></div>
+        <h2>Cổng nhân viên</h2>
+        <p>Việc hôm nay theo SOP, hồ sơ học viên, báo cáo KPI, cấu hình hệ thống.</p>
+        <span class="go">Vào cổng
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="door d2" href="cong-hoc-vien/">
+        <div class="dic"><svg viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg></div>
+        <h2>Cổng học viên</h2>
+        <p>Lịch học, bài tập, buổi WOW 1-1, học phí theo đợt, trao đổi với trung tâm.</p>
+        <span class="go">Vào cổng
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="door d3" href="cong-hoc-vien/?phuhuynh">
+        <div class="dic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h2>Cổng phụ huynh</h2>
+        <p>Theo dõi việc học của con - ẩn phần trao đổi riêng tư của các em.</p>
+        <span class="go">Vào cổng
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+    </nav>
+  </section>
+
+  <!-- ═══ BƯỚC 2 · CHỌN CỔNG (bản 6) ═══
+       Hai cổng sau trỏ về CÙNG địa chỉ với bản 5, và nói thẳng như vậy. Dựng thêm một bản
+       cổng học viên "v6" chỉ để trang này trông cân đối là nhân đôi 5MB mà không có gì khác
+       bên trong - tức là nói dối bằng bố cục. Lý do thật thì đọc được: trục của bản 6 là CHỌN
+       MỘT HỒ SƠ trong nhiều hồ sơ, mà học viên đăng nhập vào chỉ có đúng một hồ sơ là chính
+       mình - không có gì để chọn. -->
+  <section class="buoc" id="b6">
+    <div class="dangxem">
+      <b>Bản 6 · theo đối tượng <span class="tag">thử nghiệm</span></b>
+      <small>Mở app ra là Bàn làm việc</small>
+      <a class="doiban" href="?">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Đổi bản</a>
+    </div>
+    <div class="hoi">
+      <span class="buocso">Bước 2 / 2</span>
+      <h1>Vào bằng cổng nào</h1>
+      <p>Bản 6 thay đổi <b>cổng nhân viên</b>. Hai cổng còn lại dùng chung một bản với bản 5.</p>
+    </div>
+
+    <nav class="doors ba">
+      <a class="door d4" href="cong-nhan-vien-v6/">
+        <div class="dic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></div>
+        <h2>Cổng nhân viên <span class="tag">bản 6</span></h2>
+        <p>Mở ra là Bàn làm việc: chọn một hồ sơ, bên dưới là toàn bộ việc phải làm với hồ sơ đó. Bấm Làm là ngăn kéo mở tại chỗ.</p>
+        <span class="go">Vào thử
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="door d2" href="cong-hoc-vien/">
+        <div class="dic"><svg viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg></div>
+        <h2>Cổng học viên <span class="tag xam">chung với bản 5</span></h2>
+        <p>Lịch học, bài tập, buổi WOW 1-1, học phí theo đợt, trao đổi với trung tâm. Học viên chỉ có một hồ sơ là chính mình, nên không có gì để chọn - trục của bản 6 không áp vào đây.</p>
+        <span class="go">Vào cổng
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="door d3" href="cong-hoc-vien/?phuhuynh">
+        <div class="dic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h2>Cổng phụ huynh <span class="tag xam">chung với bản 5</span></h2>
+        <p>Theo dõi việc học của con - ẩn phần trao đổi riêng tư của các em. Phụ huynh nhiều con thì đã có sẵn màn chọn con ngay khi vào.</p>
+        <span class="go">Vào cổng
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+    </nav>
+  </section>
+
+  <noscript>
+    <div class="ghichu">Trình duyệt đang tắt JavaScript nên hai bước gộp làm một - bốn cửa ở ngay dưới đây.</div>
+    <nav class="doors" style="margin-top:14px">
+      <a class="door d1" href="cong-nhan-vien/"><h2>Cổng nhân viên · bản 5</h2>
+        <p>Sắp theo nghiệp vụ - mỗi nghiệp vụ một trang riêng.</p></a>
+      <a class="door d4" href="cong-nhan-vien-v6/"><h2>Cổng nhân viên · bản 6</h2>
+        <p>Sắp theo đối tượng - mở ra là Bàn làm việc.</p></a>
+      <a class="door d2" href="cong-hoc-vien/"><h2>Cổng học viên</h2>
+        <p>Lịch học, bài tập, buổi WOW 1-1, học phí theo đợt.</p></a>
+      <a class="door d3" href="cong-hoc-vien/?phuhuynh"><h2>Cổng phụ huynh</h2>
+        <p>Theo dõi việc học của con.</p></a>
+    </nav>
+  </noscript>
+
 </div>
+
+<script>
+/* Hai bước nhưng MỘT trang - và mỗi bước có địa chỉ riêng (`?ban5`, `?ban6`) để ba việc sau
+   đều chạy: gửi link thẳng vào bước 2, bấm nút Back của trình duyệt để quay ra bước 1, và
+   tải lại trang mà không văng về đầu.
+   Các cửa vẫn là thẻ <a href> thật chứ không phải nút gọi JS: chuột phải mở tab mới được,
+   và kịch bản `update.sh` bên repo demo đọc được href để chốt cửa nào 404. */
+(function(){
+ var BUOC={"":"b1","ban5":"b5","ban6":"b6"};
+ function doc(){
+  var q=String(location.search||"").replace(/^\?/,"").toLowerCase();
+  return BUOC[q]?q:""}
+ function ve(){
+  var id=BUOC[doc()];
+  ["b1","b5","b6"].forEach(function(k){
+   var el=document.getElementById(k);
+   if(el)el.classList.toggle("on",k===id)});
+  window.scrollTo(0,0)}
+ document.addEventListener("click",function(e){
+  var a=e.target.closest?e.target.closest("a"):null;
+  if(!a)return;
+  var h=a.getAttribute("href")||"";
+  if(h!=="?"&&h!=="?ban5"&&h!=="?ban6"){
+   /* Cửa vào app: để trình duyệt đi bình thường, nhưng GHI LẠI khách đang xem bản nào.
+      Cổng học viên chỉ có một bản nên tự nó không biết; không có mẩu nhớ này thì chọn bản 6,
+      vào cổng học viên, bấm "về cổng nhân viên" là rơi vào bản 5 - lặng lẽ đổi bản dưới chân. */
+   try{sessionStorage.setItem("ITTS_BAN",doc()==="ban6"?"6":"5")}catch(err){}
+   return}
+  e.preventDefault();
+  try{history.pushState(null,"",h)}catch(err){location.href=h;return}
+  ve()});
+ window.addEventListener("popstate",ve);
+ ve();
+})();
+</script>
 </body>
 </html>

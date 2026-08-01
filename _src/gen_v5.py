@@ -19269,8 +19269,18 @@ function congKieuFile(){return /\/ITTs_(WebApp_v5|WebApp_v6|TrangHocVien)_demo\.
 /* Cổng nhân viên có HAI bản build ở hai địa chỉ. Đang xem bản nào thì "về cổng nhân viên" phải
    về ĐÚNG bản đó - đưa người đang xem v6 về v5 là lặng lẽ đổi bản demo dưới chân họ. Bản học
    viên chỉ có một, và từ đó không biết khách vào bằng cửa nào, nên về v5 (cửa chính). */
-function congTenNV(){return (typeof V6==="function"&&V6())?"cong-nhan-vien-v6":"cong-nhan-vien"}
-function congFileNV(){return (typeof V6==="function"&&V6())?"ITTs_WebApp_v6_demo.html":"ITTs_WebApp_v5_demo.html"}
+/* Đang ở cổng nhân viên thì tự biết mình là bản nào (cờ V6). Đang ở cổng HỌC VIÊN thì không -
+   cổng học viên chỉ có một bản, dùng chung cho cả hai. Nên trang chủ ghi lại lựa chọn của khách
+   vào sessionStorage lúc họ bấm vào cổng, và ở đây đọc lại.
+   Không có mẩu nhớ này thì: chọn bản 6 -> vào cổng học viên -> bấm "về cổng nhân viên" -> rơi
+   vào bản 5. Đúng cái lỗi lặng lẽ đổi bản dưới chân người dùng đã vá ở V9.71, chỉ khác lối đi. */
+function congBanNho(){try{var v=sessionStorage.getItem("ITTS_BAN");return v==="6"?"6":"5"}catch(e){return "5"}}
+function congLaV6(){
+ if(typeof V6==="function"&&V6())return true;          /* chính mình là bản 6 */
+ if(window.HVPORTAL)return congBanNho()==="6";          /* cổng học viên: hỏi lại mẩu nhớ */
+ return false}
+function congTenNV(){return congLaV6()?"cong-nhan-vien-v6":"cong-nhan-vien"}
+function congFileNV(){return congLaV6()?"ITTs_WebApp_v6_demo.html":"ITTs_WebApp_v5_demo.html"}
 function congURL(w){
  var p=location.pathname;
  if(congKieuFile()){var d=p.replace(/[^\/]*$/,"");
@@ -19301,7 +19311,11 @@ function congDoiMo(){openDrawer("Đổi cổng",congHTML())}
 function congDi(w){if(w===congDangO())return;
  try{closeModal()}catch(e){}
  location.href=congURL(w)}
+/* Cổng nhân viên tự khai mình là bản nào, để cổng học viên mở sau đó biết đường về. Cần cả khi
+   khách mở thẳng địa chỉ cổng nhân viên chứ không đi qua trang chủ. */
+function congBanGhi(){try{sessionStorage.setItem("ITTS_BAN",(typeof V6==="function"&&V6())?"6":"5")}catch(e){}}
 function demoBoot(){
+ try{congBanGhi()}catch(e){}
  /* V9.30: kéo dữ liệu về hiện tại TRƯỚC khi tính cột dẫn xuất - deriveAll đọc ngày để suy trạng
     thái, chạy sau khi dịch mới ra số đúng. */
  try{cfEnsure()}catch(e){}try{tshAuto()}catch(e){}

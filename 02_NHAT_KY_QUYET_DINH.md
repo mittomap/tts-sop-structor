@@ -149,7 +149,26 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.71 — BẢN V6 ĐÃ LÊN DEMO ONLINE ✅ (01/08).**
+> **Phiên bản: V9.72 — TRANG CHỦ HAI BƯỚC: CHỌN BẢN, RỒI CHỌN CỔNG ✅ (01/08).**
+> · **Anh Luân:** *"Trang index cứ chia ra em, chọn v5 hoặc v6, chọn xong thì chọn tiếp 3 cổng,
+> thiếu gì làm cho đủ đi em."*
+> · Bốn cửa phẳng trộn **hai câu hỏi khác loại** vào một hàng - *"xem bản nào"* và *"vào bằng
+> cổng nào"* - người xem phải tự tách. Nay mỗi bước hỏi **một câu**, mỗi bước có **địa chỉ riêng**
+> (`?ban5`, `?ban6`) nên gửi link thẳng / bấm Back / tải lại đều đúng.
+> · **Cả hai nhánh đủ ba cổng.** Nhưng cổng học viên và phụ huynh của bản 6 **trỏ về cùng địa chỉ
+> với bản 5 và nói thẳng như vậy** (nhãn *"chung với bản 5"*): trục của bản 6 là chọn một hồ sơ
+> trong nhiều hồ sơ, mà học viên chỉ có đúng một hồ sơ là chính mình.
+> · **Luật:** *đủ là đủ LỐI ĐI, không phải đủ số file* - dựng bản sao rỗng cho cân bảng là **nói
+> dối bằng bố cục**.
+> · **Lỗ thứ ba do chính hai bước sinh ra, đã vá:** chọn bản 6 → vào cổng học viên → bấm về cổng
+> nhân viên → **rơi vào bản 5**. Cổng học viên chỉ có một bản nên tự nó không biết; nay trang chủ
+> và cổng nhân viên cùng ghi lựa chọn vào `sessionStorage`, cổng học viên đọc lại.
+> · **Luật:** *một lỗi đã vá ở một lối đi thì phải đi thử NHỮNG LỐI CÒN LẠI tới cùng chỗ đó.*
+> · `_checkux` 197 → **205 tiêu chí**, `_checkaudit` 42 → **43**; canh CẤU TRÚC không canh chữ;
+> **bốn lần thử phá đều đỏ đúng chỗ**. Trình duyệt thật: 8 luồng + 3 vòng khứ hồi đúng, 0 lỗi JS;
+> 15 lượt (5 khổ màn × 3 bước) không cuộn ngang.
+>
+> **Phiên bản trước: V9.71 — BẢN V6 ĐÃ LÊN DEMO ONLINE ✅ (01/08).**
 > · Cửa thứ tư của trang chủ nay mở được: **https://mittomap.github.io/itts-sop-demo/cong-nhan-vien-v6/**
 > · **Hai lỗi thật chỉ lộ ra khi mở app bằng trình duyệt và đi đúng đường người dùng đi**, cả 21
 > bộ kiểm đều mù: (1) bản v6 mở ra **vẫn rơi vào Trang bắt đầu** vì luật trang đáp nằm trong
@@ -6469,3 +6488,80 @@ chép là thêm 5MB vĩnh viễn vào `.git` (repo demo đã 165MB).
 mở app bằng trình duyệt và đi đúng đường người dùng đi** - không lỗi nào lộ ra qua 21 bộ kiểm
 chạy trên hàm. Bản khai còn nợ giữ nguyên: ngăn kéo **4/29**, hàng loạt **6/29**, chưa chuyển
 **19/29** (con số cũ ghi trong tài liệu là 5/5/19 - sai, nay sửa theo máy đếm).
+
+---
+
+## V9.72 - TRANG CHỦ HAI BƯỚC: CHỌN BẢN, RỒI CHỌN CỔNG (01/08)
+
+> **Anh Luân:** *"Trang index cứ chia ra em, chọn v5 hoặc v6, chọn xong thì chọn tiếp 3 cổng,
+> thiếu gì làm cho đủ đi em."*
+
+### Bệnh: bốn cửa phẳng bắt người xem tự tách hai câu hỏi
+
+Trang chủ đang bày **bốn cửa cùng một hàng**: nhân viên bản 5, nhân viên bản 6, học viên, phụ
+huynh. Trong bốn cửa ấy có **hai câu hỏi khác loại** trộn vào nhau - *"xem bản nào"* và *"vào
+bằng cổng nào"* - mà người xem phải tự tách ra. Cửa "Cổng học viên" thì thuộc bản nào? Nhìn vào
+không trả lời được, vì câu hỏi ấy chưa từng được hỏi.
+
+**Nay hai bước, mỗi bước một câu hỏi duy nhất:** bước 1 chọn bản (kèm bảng so sánh để chọn có cơ
+sở), bước 2 chọn cổng - và mỗi nhánh có **đủ ba cổng**.
+
+### Ba chi tiết kỹ thuật không được bỏ
+
+1. **Mỗi bước một địa chỉ riêng** (`?ban5`, `?ban6`). Có thế thì gửi link thẳng vào bước 2 được,
+   bấm Back của trình duyệt quay ra bước 1 được, tải lại trang không văng về đầu.
+2. **Cửa vẫn là thẻ `<a href>` thật**, không phải nút gọi JS: chuột phải mở tab mới được, và
+   `update.sh` bên repo demo còn đọc được href để chốt cửa nào 404.
+3. **`<noscript>` bày lại cả bốn cửa phẳng.** Hai bước là tiện, không phải là điều kiện để vào.
+
+### "Thiếu gì làm cho đủ" - và chỗ KHÔNG được làm cho đủ bằng cách nhân đôi
+
+Nhánh bản 6 nay có đủ ba cổng. Nhưng **hai cổng sau trỏ về đúng cùng địa chỉ với bản 5**, và
+trang nói thẳng như vậy bằng nhãn *"chung với bản 5"* trên cả hai thẻ.
+
+Dựng thêm một `ITTs_TrangHocVien_v6_demo.html` cho trang trông cân đối là **nhân đôi 5MB mà bên
+trong không có gì khác** - tức là **nói dối bằng bố cục**. Lý do thật thì đọc được ngay trên thẻ:
+
+> Trục của bản 6 là **chọn một hồ sơ trong nhiều hồ sơ**. Học viên đăng nhập vào chỉ có đúng
+> **một** hồ sơ là chính mình - không có gì để chọn. Phụ huynh nhiều con thì đã có sẵn màn chọn
+> con từ V9.45. Trục ấy không áp vào hai cổng này.
+
+> **Luật:** *đủ là đủ LỐI ĐI, không phải đủ số file.* Chỗ nào hai nhánh dùng chung một bản thì
+> khai ra, đừng dựng bản sao rỗng cho cân bảng.
+
+### Bộ kiểm
+
+`_checkux` 197 → **205 tiêu chí**, canh **cấu trúc chứ không canh chữ**: đủ ba khối bước · bước 1
+không được lộ cửa vào app (lộ là gộp lại thành một bước) · **cả hai nhánh đủ ba cổng** · nhánh
+bản 6 không trỏ nhầm về cổng nhân viên bản 5 · mỗi bước 2 có lối quay lại · hai cổng dùng chung
+phải khai ra ở **cả hai chỗ** · có `<noscript>`.
+
+Bẫy của chính bộ kiểm cũ: nó chỉ đòi *"có ba href trỏ ba cổng"* - điều đó **vẫn đúng** khi cả hai
+nhánh mỗi nhánh chỉ có một cổng, hoặc khi không có nhánh nào cả. Ba lần thử phá (bỏ một cổng khỏi
+nhánh bản 6 · xoá nhãn "chung với bản 5" · bày cửa vào app ở bước 1) đều làm bộ kiểm **đỏ đúng
+chỗ**.
+
+Đo thêm bằng trình duyệt thật: **8 luồng** (mở trang, bấm từng bản, Back, Đổi bản, link thẳng,
+địa chỉ lạ, bấm vào cổng) đều đúng, 0 lỗi JS; **15 lượt** (5 khổ màn × 3 bước) không cuộn ngang,
+không chữ dưới 11px, không nút dưới 24px.
+
+### Lỗ thứ ba, do chính hai bước sinh ra: chọn bản xong thì cổng học viên quên mất
+
+Hai bước làm việc "chọn bản" thành một hành động rõ ràng - nên mất nó cũng chói hơn. Mà mất thật:
+
+> Chọn **bản 6** → vào **cổng học viên** → bấm **Đổi cổng → Cổng nhân viên** → rơi vào **bản 5**.
+
+Vì cổng học viên chỉ có MỘT bản, dùng chung cho cả hai, nên tự nó không biết mình thuộc bản nào.
+Đây đúng là lỗi **lặng lẽ đổi bản dưới chân người dùng** đã vá ở V9.71, chỉ khác lối đi - lần
+trước đi từ cổng nhân viên v6, lần này đi vòng qua cổng học viên.
+
+**Vá:** trang chủ ghi lựa chọn vào `sessionStorage` lúc khách bấm vào cổng; cổng nhân viên cũng tự
+khai mình là bản nào lúc mở (để khách mở thẳng địa chỉ, không qua trang chủ, vẫn đúng); cổng học
+viên đọc lại mẩu nhớ ấy. Chưa có mẩu nhớ thì về bản 5 - cửa chính.
+
+`_checkaudit` 42 → **43 tiêu chí**, đóng vai cổng học viên với ba trạng thái nhớ (bản 6 · bản 5 ·
+chưa có). Bỏ một dòng của bản vá đi thì bộ kiểm **đỏ đúng chỗ**. Trình duyệt thật: ba vòng khứ hồi
+đều trả khách về đúng bản, kể cả vòng mở thẳng `cong-nhan-vien-v6/` không qua trang chủ.
+
+> **Luật:** *một lỗi đã vá ở một lối đi thì phải đi thử NHỮNG LỐI CÒN LẠI tới cùng chỗ đó.* Vá
+> `congURL` cho cổng nhân viên xong mà không hỏi "còn ai gọi hàm này nữa", là để nguyên nửa lỗi.
