@@ -605,7 +605,12 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
   t("cua ghi cau hinh KHONG con ban toast moi lan cham vao", !/function cfgSave\(\)[\s\S]{0,400}?toast\("Đang ở chế độ XEM THỬ/.test(SRC));
   t("dai vang mang san nut mo quyen quan tri", /function cfBarSync[\s\S]{0,600}?cfDoiCheDo\(\)/.test(SRC));
   t("doi che do la ve lai dai ngay", /function cfSetMode[\s\S]{0,120}?cfBarSync\(\)/.test(SRC));
-  t("o che do quan tri that van co dai bao DANG DUNG DU LIEU DEMO", /cfbar on demo/.test(SRC)&&/DỮ LIỆU DEMO/.test(SRC));
+  /* V9.68: canh Y DINH chu khong canh CACH VIET. Ban truoc doi dung chu HOA "DỮ LIỆU DEMO";
+    khi rut gon cau chu cho chuyen nghiep ("Dữ liệu demo" + chu thich re chuot) la do ngay, du
+    dai bao van con nguyen. Do la loi cua cai thuoc. Nay chi doi: van con dai `cfbar on demo`
+    va tren do van co chu "dữ liệu demo" (khong phan biet hoa thuong). */
+ t("o che do quan tri that van co dai bao dang dung du lieu demo",
+   /cfbar on demo/.test(SRC)&&/d[ữu] li[êệ]u demo/i.test(SRC));
   t("dai du lieu demo co nut dung lai du lieu", /function cfBarSync[\s\S]{0,900}?demoResetHoi\(\)/.test(SRC));
   t("cong hoc vien cung co dai nay", HTMLHV.indexOf('id="cfBar"')>=0);
  })();

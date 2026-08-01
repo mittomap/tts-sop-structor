@@ -793,7 +793,11 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  /* dong CH6 co ID de nhay toi + tab CH6 co notebar giai thich */
  window.SETTAB="ch6";var pg=RENDER["settings"]();
  t("moi dong CH6 co ID de nhay toi", (pg.match(/id="kpirow_/g)||[]).length>0);
- t("tab CH6 co notebar giai thich (tab cuoi cung con thieu)", /class="notebar"/.test(pg)&&/ngưỡng đạt/.test(pg));
+ /* V9.68: cau giai thich nay da rut gon va mot phan chuyen vao chu thich re chuot (`data-tip`),
+    nen doi dung chu "ngưỡng đạt" trong phan HIEN RA la doi sai cho. Doi dung thu no phai co:
+    co dai notebar, va co nhac toi nguong - o dau cung duoc, ke ca trong chu thich. */
+ t("tab CH6 co notebar giai thich (tab cuoi cung con thieu)",
+   /class="notebar"/.test(pg)&&/ng[uư][ơỡ]ng/i.test(pg));
  /* cau nhac SOP phai co nut sua ngay canh */
  var L0=rows("DL02")[0];var J=jInfo(L0.lead_id);
  var sb=sopBlock(J);

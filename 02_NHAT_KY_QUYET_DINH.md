@@ -149,7 +149,25 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.67 — SỬA MÀN HÌNH ĐIỆN THOẠI & MÁY TÍNH BẢNG ✅ (01/08).**
+> **Phiên bản: V9.68 — CẢI TỔ CÂU CHỮ: NGẮN GỌN VÀ CHUYÊN NGHIỆP ✅ (01/08).**
+> · **Anh Luân:** *"Việc cần cấp quản lý gật đầu? Ai lại dùng mấy từ như gật đầu trong app hả em?
+> Chuyên nghiệp?"* và *"chỉ cần nói: Chế độ xem thử, rồi muốn giải thích thì dùng tooltip nó
+> không gọn hơn à em."*
+> · **Cơ chế mới - dấu ngắt `||`**: một chuỗi cấu hình, phần TRƯỚC hiện trên màn, phần SAU vào
+> chú thích rê chuột. Không thêm khoá cấu hình thứ hai (thêm khoá là nhân đôi chỗ phải sửa),
+> người sửa chữ trong Cài đặt thấy rõ dấu ngắt và tự chia lại được.
+> · **Đo được**: 19/25 dải nhắc dài quá 110 ký tự, dài nhất **557** - năm dòng chắn ngang đầu
+> trang. Sau khi biên tập: **19 → 4**, mà bốn cái còn lại đều là câu có số sống chèn vào.
+> · **Từ ngữ**: "gật đầu" → "phê duyệt" (21 chỗ hiện ra màn) · "kẻo" → "tránh để" · "dắt tôi làm
+> từng bước" → "Xử lý từng bước" · "bao nhiêu cái đã quá hạn" → "số hồ sơ đã quá hạn" · "lead
+> nhân viên này ôm" → "lead nhân viên này phụ trách".
+> · **Luật M9 trong `_checkaudit`** canh cả hai mặt: bảng từ cấm (kèm bản thay thế đúng nghĩa) và
+> trần 150 ký tự cho đoạn nhắc đầu trang. Đo trên CHỮ HIỆN RA, không đo mã nguồn.
+> · **Hai bộ kiểm cũ đỏ oan** vì bám CÁCH VIẾT: một cái đòi đúng chữ HOA "DỮ LIỆU DEMO", một cái
+> đòi đúng cụm "ngưỡng đạt" trong phần hiện ra. Rút gọn câu chữ là đỏ, dù thứ chúng canh vẫn còn
+> nguyên. Đã sửa cả hai sang canh Ý ĐỊNH.
+>
+> **Phiên bản trước: V9.67 — SỬA MÀN HÌNH ĐIỆN THOẠI & MÁY TÍNH BẢNG ✅ (01/08).**
 > · **Anh Luân:** *"A thấy trên di động nhiều lỗi hiển thị lắm. Navbar, cái tour thì bao lỗi vì
 > bị mất cái sidebar mà."* Mở app thật ở 390px rồi chụp lại - bốn chỗ hỏng, đều thật.
 > · **Thanh trên vỡ**: sáu nút và tiêu đề chen chung một hàng, nút "Reset demo" mang nguyên chữ
@@ -6093,3 +6111,72 @@ rồi 6 trang khổ iPad, rồi 3 trang Cài đặt/Thu học phí - chỗ cuố
 "149.450.000đ" không xuống dòng được nên thẻ nở 29px và đội cả khung nội dung). Bài hướng dẫn
 trỏ ra ngoài màn ở điện thoại: **3/83 → 0**. `_checkui` thêm một mặt kiểm mới (bài hướng dẫn ở
 khổ điện thoại) và chữa được một chỗ đo nhầm đã im lặng nhiều bản.
+
+---
+
+## V9.68 - CẢI TỔ CÂU CHỮ: NGẮN GỌN VÀ CHUYÊN NGHIỆP (01/08)
+
+> Anh Luân: *"A muốn em cải tổ câu từ trong app cho chuyên nghiệp, tránh dài dòng. Ví dụ: chỉ cần
+> nói: Chế độ xem thử, rồi muốn giải thích thì dùng tooltip nó không gọn hơn à em... Việc cần cấp
+> quản lý gật đầu? Ai lại dùng mấy từ như gật đầu trong app hả em? Chuyên nghiệp?"*
+
+### 1. Hai lỗi, một gốc
+
+Chữ trên màn là chữ của **một phần mềm vận hành**, không phải lời kể. Từ suồng sã nghe thân mật
+lúc viết, nhưng đọc trên màn của một trung tâm 5 chi nhánh thì thành thiếu nghiêm túc. Và **chữ
+dài không phải chữ kỹ càng - nó là chữ chưa được biên tập**.
+
+### 2. Đo trước khi sửa
+
+| | Trước | Sau |
+|---|---|---|
+| Dải nhắc `.notebar` dài quá 110 ký tự | **19/25** (dài nhất 557) | **4/25** - đều là câu có số sống |
+| Dòng `.fhint` dài quá 110 ký tự | 6/11 | 2/11 |
+| "gật đầu" hiện ra màn | 21 lần | 0 |
+
+557 ký tự là **năm dòng chữ chắn ngang đầu trang** - thứ mà ngày nào người dùng cũng phải lướt
+qua để tới chỗ làm việc.
+
+### 3. Cơ chế: dấu ngắt `||`
+
+Giữ **một** chuỗi cấu hình, cho phép ngắt bằng `||`: phần trước hiện trên màn, phần sau vào chú
+thích rê chuột, kèm dấu chấm hỏi nhỏ để người dùng biết còn phần giải thích.
+
+> **Vì sao không tách thành hai khoá cấu hình?** Vì thêm khoá là nhân đôi chỗ phải sửa, và tới
+> ngày ai đó sửa một nửa thì hai nửa nói hai chuyện. Một chuỗi, một dấu ngắt - người sửa chữ
+> trong Cài đặt nhìn thấy dấu ngắt và tự chia lại được. Hộp sửa đoạn chữ có ghi rõ luật này.
+
+### 4. Bảng thay từ
+
+| Trước | Sau | Vì sao |
+|---|---|---|
+| gật đầu | phê duyệt | từ nghiệp vụ, đúng ngôn ngữ SOP |
+| kẻo | tránh để | "kẻo" là lời dặn dò, không phải câu lệnh |
+| dắt tôi làm từng bước | Xử lý từng bước | nút phải nói HÀNH ĐỘNG |
+| Trợ lý dắt bạn | Trợ lý hướng dẫn | |
+| bao nhiêu cái đã quá hạn | số hồ sơ đã quá hạn | "cái" là khẩu ngữ |
+| lead nhân viên này ôm | lead nhân viên này phụ trách | |
+| Mọi thứ đang chờ ai đó gật đầu | Hàng chờ phê duyệt của toàn trung tâm | |
+
+### 5. Luật M9 trong `_checkaudit`
+
+Canh cả hai mặt: **bảng từ cấm** (mỗi từ kèm bản thay thế đúng nghĩa, để bộ kiểm không chỉ nói
+"sai" mà nói luôn "nên viết gì") và **trần 150 ký tự** cho đoạn nhắc đầu trang. Đo trên **chữ
+hiện ra** - vẽ thật mọi trang rồi bóc thẻ - chứ không đo mã nguồn, vì chú thích mã nguồn viết cho
+người sửa app đọc, dài bao nhiêu cũng được.
+
+### 6. Bẫy đã cắn: hai bộ kiểm cũ đỏ oan vì bám CÁCH VIẾT
+
+- `_check14` đòi đúng chữ HOA `"DỮ LIỆU DEMO"`. Rút gọn thành "Dữ liệu demo" là đỏ, dù dải báo
+  vẫn còn nguyên và vẫn nói đúng chuyện đó.
+- `_check16` đòi đúng cụm `"ngưỡng đạt"` **trong phần hiện ra**. Chuyển nửa câu vào chú thích rê
+  chuột là đỏ.
+
+> **Đây là lần thứ ba trong ba phiên liên tiếp một bộ kiểm bám cách viết thay vì bám ý định.**
+> Luật đã có từ V9.65 mà vẫn tái phạm, nên ghi lại rõ hơn: **bộ kiểm phải hỏi "thứ này còn làm
+> đúng việc của nó không", không hỏi "câu này còn y nguyên không".** Bám nguyên văn thì mỗi lần
+> biên tập câu chữ là một lần đỏ giả - và đỏ giả vài lần là lần sau không ai đọc bộ kiểm nữa.
+
+### Số chốt phiên
+21 bộ kiểm xanh hết. Dải nhắc dài quá 110 ký tự: **19 → 4**. Từ suồng sã hiện ra màn: **0**.
+`_checkaudit` 29 → **31 tiêu chí**.

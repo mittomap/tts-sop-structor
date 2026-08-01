@@ -281,6 +281,54 @@ setRole("all");
  t("không câu lọc nào dùng mã không có trong CH1",!ma.length,ma.slice(0,4).join(" · "));
 })();
 
+/* ═════════ M9 · GIỌNG VĂN CHUYÊN NGHIỆP & CHỮ NGẮN GỌN ══════════════════════════════════
+   Anh Luân 01/08: *"Việc cần cấp quản lý gật đầu? Ai lại dùng mấy từ như gật đầu trong app hả
+   em? Chuyên nghiệp?"* và *"chỉ cần nói: Chế độ xem thử, rồi muốn giải thích thì dùng tooltip
+   nó không gọn hơn à em."*
+   Hai luật, cùng một gốc: CHỮ TRÊN MÀN LÀ CHỮ CỦA MỘT PHẦN MỀM VẬN HÀNH, không phải lời kể.
+   (1) TỪ NGỮ - từ suồng sã ("gật đầu", "kẻo", "dắt tôi") nghe thân mật lúc viết, nhưng đọc trên
+       màn của một trung tâm 5 chi nhánh thì thành thiếu nghiêm túc. Mỗi từ có bản thay thế đúng
+       nghĩa và gọn hơn.
+   (2) ĐỘ DÀI - đo được: 19/25 dải nhắc dài quá 110 ký tự, dài nhất 557, tức năm dòng chắn ngang
+       đầu trang mà ngày nào cũng phải lướt qua. Chữ dài không phải chữ kỹ càng; nó là chữ chưa
+       được biên tập. Phần giải thích chuyển vào chú thích rê chuột (dấu ngắt `||` của `goiyG`).
+   Đo trên CHỮ HIỆN RA (vẽ thật mọi trang rồi bóc thẻ), không đo mã nguồn - chú thích mã nguồn
+   viết cho người sửa app đọc, viết thoải mái thế nào cũng được. */
+(function(){
+ var TUXAU={
+  "gật đầu":"phê duyệt", "kẻo":"tránh để", "dắt tôi":"xử lý từng bước", "dắt bạn":"hướng dẫn",
+  "cho chắc":"cho chắc chắn", "đỡ mệt":"", "mỏi mắt":"", "tùm lum":"", "bạn nhé":"",
+  "nhé bạn":"", "đó nha":"", "luôn nha":"", "khỏi phải":"không cần", "đỡ phải":"không cần",
+  "chịu khó":"", "ai lại":"", "kỳ lắm":"", "ngon lành":"", "cứ thế":"", "toang":""};
+ var pg=Object.keys(PBK).filter(function(k){return !PBK[k].hide});
+ var CHU="";
+ pg.forEach(function(k){CHU+=" "+chuThay(veTrang(k))});
+ ["ch2","ch4","ch6","brand","menu","phanquyen","qa","demo"].forEach(function(tb){
+  window.SETTAB=tb;CHU+=" "+chuThay(veTrang("settings"))});
+ try{CHU+=" "+chuThay(JSON.stringify(TOURS))+" "+chuThay(JSON.stringify(THEDEF))}catch(e){}
+ try{CHU+=" "+Object.keys(PBK).map(function(k){return (PBK[k].t||"")+" "+(PBK[k].c||"")}).join(" ")}catch(e){}
+ var thay=[];
+ Object.keys(TUXAU).forEach(function(w){
+  if(CHU.toLowerCase().indexOf(w)>=0)thay.push('"'+w+'"'+(TUXAU[w]?(" -> nên dùng \""+TUXAU[w]+"\""):" -> bỏ hẳn"))});
+ t("chữ trên màn không dùng từ suồng sã",!thay.length,thay.slice(0,5).join(" · "));
+
+ /* Độ dài: đoạn nhắc trên đầu trang. Ngưỡng 150 ký tự - rộng hơn mức đã dọn (110) để chừa chỗ
+    cho những đoạn có SỐ SỐNG chèn vào (tiền, ngày, tên khóa) vốn tự dài ra theo dữ liệu. */
+ var HTMLALL="";
+ pg.forEach(function(k){HTMLALL+="\n"+veTrang(k)});
+ ["ch2","ch4","ch6","brand","menu","phanquyen","qa","demo"].forEach(function(tb){
+  window.SETTAB=tb;HTMLALL+="\n"+veTrang("settings")});
+ function bocDoan(cls){
+  var re=new RegExp('<div class="'+cls+'[^"]*"[^>]*>([\\s\\S]*?)</div>',"g"),m,out=[];
+  while((m=re.exec(HTMLALL))){var x=chuThay(m[1]);if(x.length>3)out.push(x)}
+  var c={};return out.filter(function(x){if(c[x])return false;c[x]=1;return true})}
+ var dai=[];
+ ["notebar","fhint"].forEach(function(c){
+  bocDoan(c).forEach(function(x){if(x.length>150)dai.push(c+" "+x.length+" ký tự: "+x.slice(0,70)+"...")})});
+ t("đoạn nhắc đầu trang không quá 150 ký tự (phần dài đưa vào chú thích rê chuột)",
+   !dai.length, dai.slice(0,4).join(" · "));
+})();
+
 /* ═════════ M7 · SỐ PHẢI SỬA ĐƯỢC - "cái này cấu hình ở đâu đấy?" ═════════════════════════
    Anh Luân bấm vào một con số trên màn rồi hỏi sửa ở đâu. Nếu không sửa được thì đó là hằng số
    của phần mềm chứ không phải thông số của trung tâm - trái LUẬT CỨNG.
