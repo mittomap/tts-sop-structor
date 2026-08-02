@@ -780,6 +780,8 @@ var TAT_BOQUA={
  HV:"viết tắt của Học viên - đã có mục 'lead' và 'at_risk' giải nghĩa ngữ cảnh xung quanh",
  NV:"viết tắt của Nhân viên - hiểu được ngay trong câu, không cần tra",
  GV:"viết tắt của Giáo viên - hiểu được ngay trong câu",
+ CAO:"không phải từ viết tắt - là chữ 'cao' viết hoa để nhấn mức độ, trong 'Khiếu nại mức CAO'. "+
+  "Lộ ra khi bảng việc của chức danh về đúng chỗ trên Bàn làm việc của bản v6.",
  ITTs:"tên trung tâm", IELTS:"tên kỳ thi", VND:"đơn vị tiền Việt Nam",
  OK:"từ thông dụng", ID:"từ thông dụng", CSV:"định dạng tệp, hiện trong câu 'mở được bằng Excel'",
  AI:"đã giải thích ngay tại khối cấu hình AI trong Cài đặt", API:"đi liền chữ 'API key' ở màn cấu hình",

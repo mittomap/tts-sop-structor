@@ -107,6 +107,22 @@ chay "check_sop.py"    "KET QUA: DAT"        python3 check_sop.py
 chay "check_gs.py"     "KET QUA: DAT"        python3 check_gs.py
 
 echo
+echo "${Dam}== 4bis. CHAY LAI TOAN BO BO KIEM TREN BAN V6 ==${Het}"
+# Vi sao co muc nay (anh Luan 02/08: "van de la e build v6 da chuan chua ay, chu bat a lam thu
+# trong khi thiet ke luong te hoac loi tum lum thi..."): truoc do `extract_js.py` chi trich than
+# app tu ban v5, nen 20/21 bo kiem CHUA TUNG chay qua ban v6. Ban v6 duoc giao ma khong bo kiem
+# nao di qua no. Chay lan dau lien ra hai loi that:
+#   - navCurKey/navGroupOf/navInTree/navGrpArc duyet cam cung NAVTREE (cay menu v5) -> o v6 mo
+#     trang ra khong muc nao sang tren sidebar, nguoi dung mat dau minh dang dung dau.
+#   - bangViecHTML() so CUR voi BVLAND (ban do trang dap cua v5) -> o v6 CA 8 CHUC DANH mat
+#     bang viec cua minh va khoi "Cho ban phe duyet" (BC9 cua SOP).
+# Ca hai deu la mat tinh nang IM LANG - khong bao loi, chi la khong hien ra.
+for _b in _tall _check11 _check12 _check13 _check15 _check16 _check17 _check18 \
+          _checktour _checkqa _checkux _checkdata _checkaudit _checkdemo; do
+  chay "v6: ${_b}" "(OK|0 loi|^TONG: [0-9]+)" env ITTS_APP=./_APP6.js node "${_b}.js"
+done
+
+echo
 echo "${Dam}== 5. KIEM THU TREN TRINH DUYET THAT ==${Het}"
 if [ $NHANH -eq 1 ]; then
   ghi "_checkui" BOQUA "bo qua vi chay voi --nhanh"

@@ -123,8 +123,13 @@ const PROBE = () => {
 
   const bad = [], net = new Set();
   let luot = 0;
+  /* V9.78: BAN V6 nay cung duoc MO THAT tren trinh duyet. Truoc day bo kiem nay chi mo v5 va
+     cong hoc vien - ban v6 duoc giao ma chua mot lan nao duoc mo bang trinh duyet that, trong
+     khi no la ban co menu khac, trang dap khac, va nut Lam mo ngan keo thay vi nhay trang.
+     Anh Luan: "van de la e build v6 da chuan chua ay". Mo that la cach duy nhat tra loi. */
   const CONG = [
     {f: "ITTs_WebApp_v5_demo.html", who: "ITTS_WHO",    ten: "cong nhan vien"},
+    {f: "ITTs_WebApp_v6_demo.html", who: "ITTS_WHO",    ten: "cong nhan vien BAN V6"},
     {f: "ITTs_TrangHocVien_demo.html", who: "ITTS_WHO_HV", ten: "cong hoc vien"},
   ];
   for (const C of CONG) for (const V of VIEWS) {

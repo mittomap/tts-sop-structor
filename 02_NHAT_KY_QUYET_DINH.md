@@ -149,6 +149,18 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.78 — BỘ KIỂM SOI ĐƯỢC V6, VÀ NÓ TÌM RA MỘT TÍNH NĂNG BIẾN MẤT ✅ (02/08).**
+> · Xong ba việc nợ: `_checkui` mở v6 trên trình duyệt thật (**1431 lượt**), truy xong tiêu chí
+> `_check16`, và `verify.sh` nay có mục **4bis chạy lại 14 bộ kiểm JS trên bản v6**.
+> · **Lỗi thật tìm được:** `bangViecHTML()` so `CUR` với `BVLAND` - bản đồ trang đáp **của v5**,
+> cắm cứng. Bản v6 đáp xuống Bàn làm việc nên **cả 8 chức danh mất bảng việc của mình lẫn khối
+> "Chờ bạn phê duyệt" (BC9 của SOP)**. Mất tính năng IM LẶNG - không báo lỗi, chỉ là không hiện.
+> · **Vá hai nấc:** hỏi `SCOPE().land` thay vì bản đồ cắm cứng · và `renderBan` phải GỌI `bvSau()`
+> - sửa cho hàm chịu vẽ là chưa đủ, còn phải có người gọi nó.
+> · **Luật:** *bản đồ nào cắm cứng theo một bản build thì bản kia sẽ lặng lẽ mất tính năng.*
+> · Sửa lại một con số em ghi sai hôm qua: vẽ MỚI thì trang Chờ duyệt của v5 và v6 **giống hệt
+> nhau, 11873 byte** - "v6 ngắn hơn 3.7KB" là đo giữa chừng.
+>
 > **Phiên bản: V9.75 — ĐO LẠI V6 vs V5, VÀ TÌM RA MỘT LỖ CỦA V6 ✅ (01/08).**
 > · v6 hơn v5 ở đúng **ba chỗ đo được**: trang đáp (8 màn → 1) · menu (49 → **35 mục**) · nút Làm
 > (**150/150 nhảy trang → 150/150 mở ngăn kéo**).
@@ -6822,3 +6834,52 @@ nó mới chạy vài giờ, và lỗ vừa tìm ra là bằng chứng bản nà
 ### Số chốt phiên
 Menu v6 **35 mục** (v5: 49), trang không tới được **0**, khai lý do **2**. `_checkaudit` 48 →
 **50 tiêu chí**. 21 bộ kiểm xanh hết.
+
+
+---
+
+## V9.78 - BỘ KIỂM SOI ĐƯỢC V6, VÀ NÓ TÌM RA MỘT TÍNH NĂNG BIẾN MẤT KHỎI V6 (02/08)
+
+Xong ba việc còn nợ. Và đúng như anh Luân lo, **mở bộ kiểm sang v6 là ra lỗi thật ngay**.
+
+### 1. Cả 8 chức danh mất BẢNG VIỆC ở bản v6
+
+`bangViecHTML()` chỉ vẽ khi `CUR` khớp `BVLAND[nhóm]` - mà `BVLAND` là **bản đồ trang đáp của
+v5, cắm cứng**. Bản v6 cho mọi chức danh đáp xuống Bàn làm việc, nên **không bao giờ khớp**: cả
+bảng việc của nhóm lẫn khối **"Chờ bạn phê duyệt" (BC9 của SOP)** biến mất khỏi toàn bộ v6.
+
+Đây là **mất tính năng im lặng** - không báo lỗi, không văng, chỉ là không hiện ra. Loại hỏng
+khó thấy nhất, và không bộ kiểm nào bắt được vì chưa bộ nào chạy trên v6.
+
+**Vá hai nấc, và nấc thứ hai mới là chỗ dễ quên:**
+1. `bangViecHTML()` hỏi **trang đáp thật** (`SCOPE().land`) thay vì bản đồ cắm cứng. Ở v5 hai thứ
+   này trùng khít nên không đổi gì.
+2. Sửa cho hàm CHỊU vẽ là chưa đủ - **còn phải có người GỌI nó**. `renderBan` (trang đáp mới của
+   v6) chưa hề gọi `bvSau()`. `_checktour` bắt đúng chỗ này ngay sau khi em vá nấc một.
+
+> **Luật:** *bản đồ nào cắm cứng theo một bản build thì bản kia sẽ lặng lẽ mất tính năng.*
+> Đã cắn hai lần trong hai ngày - lần trước là `NAVTREE` trong `navCurKey/navInTree`.
+
+Và bộ kiểm mắc **y hệt bệnh của app**: `_checktour` cũng đọc `BVLAND` để biết trang đáp, tức là
+đo bản v6 bằng thước của bản v5. Đã sửa cùng một cách.
+
+### 2. Ba việc còn nợ - xong cả ba
+
+- **`_checkui` mở bản v6 trên trình duyệt thật.** 1029 → **1431 lượt mở thật** (5 khổ màn × 3
+  cổng). v6 không cuộn ngang, không cắt chữ, không lỗi JS, nút đủ to.
+- **Tiêu chí `_check16` còn đỏ** - truy ra gốc: vẽ **mới** thì v5 và v6 ra **giống hệt nhau,
+  11873 byte, không lệch một ký tự**. Con số "v6 ngắn hơn 3.7KB" ghi hôm qua là **đo giữa chừng**
+  nên sai; đã sửa lại trong `README_SRC`. Nguyên nhân thật là `CUR` khác nhau lúc đo, dẫn thẳng
+  tới lỗi ở mục 1.
+- **`verify.sh` nay có mục `4bis`**: chạy lại **cả 14 bộ kiểm JS trên bản v6**.
+
+### 3. Bộ kiểm canh Ý ĐỊNH, không canh hình dạng của một bản
+
+`_check11` đòi *"hub không sáng đè khi mục con đang sáng (wow)"* - đúng ở v5 nơi `wow` là một mục
+menu riêng. Ở v6 `wow` chỉ là TAB của hub nên chính hub sáng, và đó là **đúng** - hệt điều câu
+ngay bên dưới nó mô tả cho `cskh/khaosat`. Viết lại thành luật thật: **đúng một mục sáng, và là
+mục gần nhất có mặt trên menu** - hỏi `navInTree()` thay vì cắm cứng.
+
+### Số chốt phiên
+`verify.sh` nay chạy **hai lượt**: v5 và v6. Bộ kiểm trình duyệt **1431 lượt mở thật**.
+Trên v6: **14/14 bộ kiểm JS xanh**. Tổng: xanh hết cả hai bản.

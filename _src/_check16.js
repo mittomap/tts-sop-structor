@@ -1616,7 +1616,15 @@ function stripOf(o){var i=o.indexOf('<div class="bstats"');if(i<0)return "";   /
     nó đo phải TRẠNG THÁI SÓT chứ không đo app. Chạy trên v5 thì tình cờ xanh, trên v6 thì đỏ -
     khác nhau chỉ vì thứ tự các câu chạy trước đã đổi.
     Luật: bộ kiểm phải TỰ ĐẶT ĐIỀU KIỆN của mình, không thừa hưởng của câu trước. */
- try{setRole("all");applyScope("");CURSTAFF="";window.DUYTAB=""}catch(e){}
+ /* Đặt lại TRỌN VẸN trước khi đo: vai, phạm vi, tab, và CẤU HÌNH GIAO DIỆN (ẩn/hiện thẻ,
+    đổi tên nhóm menu) mà hàng trăm câu phía trên đã nghịch vào. Bẫy đã cắn: câu này đo phải
+    trạng thái sót chứ không đo app - vẽ MỚI thì v5 và v6 ra HỆT NHAU (11873 byte, không lệch
+    một ký tự), nhưng chạy giữa dàn bộ kiểm thì v6 đỏ.
+    Luật: bộ kiểm phải TỰ ĐẶT ĐIỀU KIỆN của mình, không thừa hưởng của câu trước. */
+ try{setRole("all");applyScope("");CURSTAFF="";window.DUYTAB="";
+  if(DATA.config&&DATA.config.ui)delete DATA.config.ui;   /* trả cấu hình giao diện về mặc định */
+  if(typeof THEHTML!=="undefined")for(var _k in THEHTML)delete THEHTML[_k];
+ }catch(e){}
  /* 3 trang truoc day KHONG co dai so nao */
  ["giaoan","banggiao","duyet"].forEach(function(k){
   t("trang "+k+" da co dai so", /class="bstats"/.test(RENDER[k]()))});

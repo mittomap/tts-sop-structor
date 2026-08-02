@@ -4404,9 +4404,22 @@ function bvMa(t){t=String(t==null?"":t);
  return BVMA[t]||BVMA[t.replace(/\d+/g,"N")]||""}
 function bangViecHTML(){
  var rs=SCOPE(),g=rs.group||"quantri";
- var L=BVLAND[g];if(!L||CUR!==L[0])return "";
- if(L[1]){var tb=(L[0]==="tuyensinh")?window.TSTAB:(L[0]==="hoctap"?window.HTTAB:null);
-  if(tb&&tb!==L[1])return ""}
+ /* BVLAND là bản đồ TRANG ĐÁP CỦA V5, cắm cứng. Bản v6 cho mọi chức danh đáp xuống Bàn làm
+    việc, nên so với bản đồ ấy là không bao giờ khớp - và cả bảng việc của chức danh lẫn khối
+    "Chờ bạn phê duyệt" (BC9 của SOP) BIẾN MẤT KHỎI TOÀN BỘ v6. Đo được: 8/8 chức danh mất.
+    Nay hỏi TRANG ĐÁP THẬT (`SCOPE().land`) và chỉ dùng BVLAND cho phần TAB của hub. Ở v5 hai
+    thứ này trùng khít nhau nên không đổi gì; ở v6 bảng việc về đúng chỗ người ta đang đứng.
+    Luật (lần thứ hai trong hai ngày): bản đồ nào cắm cứng theo một bản build thì bản kia sẽ
+    lặng lẽ mất tính năng - phải hỏi trạng thái thật. */
+ var L=BVLAND[g];if(!L)return "";
+ var dap=SCOPE().land||L[0];
+ if(CUR!==dap)return "";
+ /* Tab của hub chỉ xét khi trang đáp ĐÚNG LÀ hub đó (v5). Ở v6 trang đáp là Bàn làm việc,
+    không có tab, nên bỏ qua vế này. */
+ if(dap===L[0]){
+  if(L[1]){var tb=(L[0]==="tuyensinh")?window.TSTAB:(L[0]==="hoctap"?window.HTTAB:null);
+   if(tb&&tb!==L[1])return ""}
+ }
  var T=BANGVIEC(),h="";
  var B=T[bvKhoi(g)];
  /* Chỉ mấy bảng CÓ TRONG SOP mới ghi "theo BC… của SOP"; bảng nào tự dựng thì ghi thẳng nó
@@ -15397,7 +15410,7 @@ function tourFind(sel){
  if(than){var el=tourTrong(than,sel);if(el)return el}
  return tourTrong(document,sel)}
 function tourShow(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
- window.__tourScroll="";   /* sang bước mới thì được cuộn lại một lần */
+ window.__tourScroll="";window.__tourScrollN=null;   /* sang bước mới thì được cuộn lại */
  var st=T.steps[TOUR.i];if(!st){tourEnd();return}
  if(st.ctx)try{st.ctx()}catch(e){}
  if(st.p&&typeof go==="function"&&CUR!==st.p){try{go(st.p)}catch(e){}}
@@ -15494,8 +15507,14 @@ function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
      Kết quả trên màn: vòng sáng chưa có kích thước, chỉ còn lớp phủ tối trùm cả màn hình - "đen thui".
      Sửa hai lớp: (1) phần tử nằm trong khối position:fixed thì đừng cuộn, nó không đi đâu cả;
      (2) mỗi bước chỉ cho cuộn ĐÚNG MỘT LẦN - cuộn xong vẫn chưa vừa thì cứ vẽ, thà lệch còn hơn đen. */
-  if((r.top<70||r.bottom>vh-70)&&!tourFixed(el)&&window.__tourScroll!==TOUR.key+"|"+TOUR.i){
-   window.__tourScroll=TOUR.key+"|"+TOUR.i;
+  /* V9.78: cho cuộn HAI lần thay vì một. Đo trên trình duyệt thật (khổ điện thoại, bản v6):
+     bài `cn_nguong` bước 2 neo `@settabs` vẫn nằm ngoài màn sau lần cuộn đầu - vì cuộn xong
+     trang còn dàn lại (thanh tab Cài đặt xuống dòng ở màn hẹp) nên vị trí đổi lần nữa. Một lần
+     là không đủ; hai lần có chặn cứng nên không thể lặp vô hạn. */
+  var _sk=TOUR.key+"|"+TOUR.i, _sn=(window.__tourScrollN&&window.__tourScrollN[_sk])||0;
+  if((r.top<70||r.bottom>vh-70)&&!tourFixed(el)&&_sn<2){
+   window.__tourScrollN=window.__tourScrollN||{};window.__tourScrollN[_sk]=_sn+1;
+   window.__tourScroll=_sk;
    try{el.scrollIntoView({block:"center",behavior:"smooth"});setTimeout(tourPaint,320);return}catch(e){}}
   s.style.display="";s.style.left=(r.left-6)+"px";s.style.top=(r.top-6)+"px";
   s.style.width=(r.width+12)+"px";s.style.height=(r.height+12)+"px";
@@ -18052,6 +18071,12 @@ function renderBan(){
   var n=0;try{n=ttDanhSach(x.k).filter(function(z){return z.viec.length}).length}catch(e){}
   return '<button class="seg'+(x.k===ttk?" on":"")+'" onclick="banChon(\''+x.k+'\')" data-tip="'+esc(x.d)+'">'+
    '<i class="ti '+x.ic+'"></i>'+esc(x.t)+(n?'<span class="segn">'+n+'</span>':'')+'</button>'}).join("")+'</div>';
+ /* BẢNG VIỆC CỦA CHỨC DANH ngay sau thanh chọn thực thể - đọc xuôi từ trên xuống: tôi đang
+    xem loại hồ sơ nào → nhóm tôi đang tồn những việc gì → rồi mới tới danh sách hồ sơ.
+    Ở v5 khối này nằm trên trang đáp của từng chức danh; v6 đổi trang đáp thành Bàn làm việc mà
+    quên mang nó theo, nên CẢ 8 CHỨC DANH mất bảng việc của mình lẫn khối "Chờ bạn phê duyệt"
+    (BC9 của SOP). Sửa `bangViecHTML` cho nó CHỊU vẽ là chưa đủ - còn phải có người GỌI nó. */
+ h+=bvSau();
  var DS=ttDanhSach(ttk);
  var coViec=DS.filter(function(z){return z.viec.length});
  var mo=window.BANMO||"";

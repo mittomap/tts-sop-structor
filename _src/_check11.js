@@ -215,8 +215,14 @@ applyScope("");CURROLE="all";
    var on=(NAVEL.innerHTML.match(/class="navitem on" data-k="([a-z0-9]+)"/g)||[]).map(function(s){return s.match(/data-k="([a-z0-9]+)"/)[1]});
    if(!(on.length===1&&on[0]===k))sai.push(a+">"+k+"=["+on.join(",")+"]")})});
  tv5("V9.19 moi nghiep vu trong chang sang DUNG 1 muc sidebar"+(sai.length?" ["+sai.join(" ")+"]":""), sai.length===0)})();
-t("V9.19 hub khong sang de khi muc con dang sang (wow)", (function(){
- window.HTTAB="wow";CUR="hoctap";return navCur("wow")===true&&navCur("hoctap")===false})());
+/* Luat that: MOT muc sang, va la muc GAN NHAT co mat tren menu. O v5 `wow` la mot muc rieng
+   nen no sang va hub `hoctap` nhuong; o v6 `wow` chi la TAB cua hub, khong co muc rieng, nen
+   chinh hub sang - dung nhu cau ngay ben duoi mo ta cho cskh/khaosat. Hoi CAY MENU THAT thay
+   vi cam cung hinh dang cua mot ban. */
+t("V9.19 dung MOT muc sang, va la muc gan nhat co tren menu (wow)", (function(){
+ window.HTTAB="wow";CUR="hoctap";
+ return navInTree("wow") ? (navCur("wow")===true&&navCur("hoctap")===false)
+                         : (navCur("hoctap")===true)})());
 t("V9.19 hub VAN sang khi tab khong co muc con rieng (cskh/khaosat)", (function(){
  window.CSTAB="khaosat";CUR="cskh";return navCur("cskh")===true})());
 window.HTTAB="today";

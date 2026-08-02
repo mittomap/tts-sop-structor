@@ -282,9 +282,13 @@ var TOUR_BOQUA={
   window.GATE_SID=sid;setRole("all");applyScope(sid);
   var L=[];try{L=nhipList()}catch(e){}
   t2("nhom vai '"+g+"' co NHIP NGAY (>=3 dong)", L.length>=3);
-  var B="";try{CUR=(BVLAND[g]||[])[0]||"";
-   var tab=(BVLAND[g]||[])[1];
-   if(tab){if(CUR==="tuyensinh")window.TSTAB=tab;if(CUR==="hoctap")window.HTTAB=tab}
+  /* Hỏi TRANG ĐÁP THẬT chứ không đọc BVLAND - bản đồ ấy là trang đáp của v5, mà v6 cho mọi
+     chức danh đáp xuống Bàn làm việc. Cắm cứng bản đồ đúng là con bệnh vừa vá trong app;
+     bộ kiểm mắc y hệt thì nó đo bản v6 bằng thước của bản v5. */
+  var B="";try{
+   var Lm=BVLAND[g]||[];
+   CUR=SCOPE().land||Lm[0]||"";
+   if(Lm[1]&&CUR===Lm[0]){if(CUR==="tuyensinh")window.TSTAB=Lm[1];if(CUR==="hoctap")window.HTTAB=Lm[1]}
    B=bangViecHTML()}catch(e){}
   t2("nhom vai '"+g+"' co BANG VIEC o trang dap", (B||"").indexOf("bsn")>=0);
  });
