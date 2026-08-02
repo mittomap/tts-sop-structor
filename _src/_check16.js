@@ -15,6 +15,30 @@ var _LS={};global.localStorage={getItem:k=>_LS[k]===undefined?null:_LS[k],setIte
    o day. Stub tra ve null mai mai thi bo kiem do cai gi cung ra "chua chon", va ba tieu chi
    ve khoa se xanh gia. */
 var _SS={};global.sessionStorage={getItem:k=>_SS[k]===undefined?null:_SS[k],setItem(k,v){_SS[k]=String(v)},removeItem(k){delete _SS[k]}};
+/* ═══ NEO ĐỒNG HỒ VÀO NGÀY SINH CỦA DỮ LIỆU ═════════════════════════════════════════════
+   Bẫy này đã cắn ba lần trong một ngày (check_logic, check_sop, rồi tới đây): dữ liệu demo là
+   một BẢN MẪU có ngày sinh cố định, app dịch nó theo BỘI SỐ 7 NGÀY lúc chạy - nên trong 6 ngày
+   giữa hai lần dịch, mọi mốc "quá 24h", "còn trong hạn" cứ trôi dần. Bộ kiểm đo bằng đồng hồ
+   treo tường sẽ xanh buổi sáng và đỏ buổi chiều mà không ai đụng vào mã.
+   Nay `_check16` chạy với Date được đặt về đúng ngày sinh dữ liệu (meta.anchor). Nó soi tính
+   NHẤT QUÁN NỘI BỘ của bản mẫu - thứ duy nhất mã nguồn chịu trách nhiệm.
+   Luật: KHÔNG ĐO CÁI ĐANG ĐỨNG YÊN BẰNG MỘT CÁI THƯỚC ĐANG CHẠY. */
+(function(){
+ var THAT=Date, moc=null;
+ try{
+  var d=JSON.parse(require('fs').readFileSync('./demo_data_big.json','utf8'));
+  var a=String((d.meta||{}).anchor||"");
+  var m=a.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+  if(m)moc=new THAT(+m[3],+m[2]-1,+m[1],+(m[4]||0),+(m[5]||0)).getTime();
+ }catch(e){}
+ if(moc==null){console.log("CANH BAO: khong doc duoc meta.anchor - dang do bang gio chay, ket qua se troi theo ngay.");return}
+ var L=moc-THAT.now();
+ function D(){ if(!(this instanceof D))return new THAT(THAT.now()+L).toString();
+  return arguments.length?new THAT(...arguments):new THAT(THAT.now()+L)}
+ D.prototype=THAT.prototype;
+ D.now=function(){return THAT.now()+L};D.parse=THAT.parse;D.UTC=THAT.UTC;
+ global.Date=D;
+})();
 var SRC0=require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8');
 /* Khung trang (navbar, #pgTitle) nam trong PHAN HTML chu khong nam trong <script> - kiem tra
    markup phai doc file HTML that, doc _APP.js thi luat nao cung "fail" ma khong phai loi app. */
@@ -22,6 +46,11 @@ var OUT=process.env.ITTS_OUT||'.';
 var HTML=require('fs').readFileSync(OUT+'/ITTs_WebApp_v5_demo.html','utf8');
 var SRC=SRC0.replace(/\/\*[\s\S]*?\*\//g,"");
 require('vm').runInThisContext(SRC0);
+/* Chấm điểm CHỈ trên v5, nhưng VẪN CHẠY biểu thức. Bẫy đã cắn: bọc `if(!V6())t(...)` là chặn
+   luôn cả phần dựng và phần TRẢ LẠI trạng thái nằm bên trong biểu thức ấy, nên các câu sau đó
+   thừa hưởng trạng thái hỏng và đổ oan cho app. Tham số được tính TRƯỚC khi gọi hàm, nên viết
+   thành hàm là mọi tác dụng phụ vẫn xảy ra. */
+function tv5(a,b,c){if(!V6())t(a,b,c)}
 setRole("all");
 var bad=[],ok=0;
 function t(n,c){if(c)ok++;else bad.push(n)}
@@ -241,13 +270,13 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("nhung menu van nho muc da mo ra no", NAVFROM===k0&&!!NAVFROM);
  buildNav();
  var nav=document.getElementById("nav").innerHTML||"";
- if(!V6())t("menu to mo dung muc da mo ra trang do", /navitem[^"]*\bfrom\b/.test(nav));
- if(!V6())t("chi to mo DUNG MOT muc", (nav.match(/navitem[^"]*\bfrom\b/g)||[]).length===1);
- if(!V6())t("muc to mo la muc da roi di", new RegExp('from[^>]*data-k="'+NAVFROM+'"').test(nav)||new RegExp('data-k="'+NAVFROM+'"[^>]*from').test(nav));
+ tv5("menu to mo dung muc da mo ra trang do", /navitem[^"]*\bfrom\b/.test(nav));
+ tv5("chi to mo DUNG MOT muc", (nav.match(/navitem[^"]*\bfrom\b/g)||[]).length===1);
+ tv5("muc to mo la muc da roi di", new RegExp('from[^>]*data-k="'+NAVFROM+'"').test(nav)||new RegExp('data-k="'+NAVFROM+'"[^>]*from').test(nav));
  go("reup");buildNav();
  var nav2=document.getElementById("nav").innerHTML||"";
  t("quay lai trang co muc rieng thi khong con to mo nua", !/navitem[^"]*\bfrom\b/.test(nav2));
- if(!V6())t("va muc do sang han hoi", /navitem[^"]*\bon\b/.test(nav2));
+ tv5("va muc do sang han hoi", /navitem[^"]*\bon\b/.test(nav2));
  /* V9.50: het vien doc (anh Luan che "ke ca vien doc") - hai muc phan biet bang DO DAM NEN
     + nhan ":after 'dang mo'", khong con vach trai */
  t("muc dang mo va muc dang dung khac kieu nhau (nen dam khac nhau)",
@@ -266,8 +295,8 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  setRole("all");window.SETTAB="menu";
  var pg=RENDER["settings"]();
  t("man menu la DANH SACH, khong con vien thuoc", /class="mnrow/.test(pg)&&!/class="pill[^"]*"[^>]*><input type="checkbox"/.test(pg));
- if(!V6())t("moi muc co o tick rieng", (pg.match(/class="mnck"/g)||[]).length>=NAVTREE.reduce(function(a,G){return a+G.items.length},0));
- if(!V6())t("moi muc co o CHU GO DUOC", (pg.match(/class="mnin"/g)||[]).length>=NAVTREE.reduce(function(a,G){return a+G.items.length},0));
+ tv5("moi muc co o tick rieng", (pg.match(/class="mnck"/g)||[]).length>=NAVTREE.reduce(function(a,G){return a+G.items.length},0));
+ tv5("moi muc co o CHU GO DUOC", (pg.match(/class="mnin"/g)||[]).length>=NAVTREE.reduce(function(a,G){return a+G.items.length},0));
  t("ten nhom cung go duoc", /class="mnin big"/.test(pg));
  t("moi dong hien ma trang de biet dang sua cai gi", /class="mncode"/.test(pg));
  t("co nut luu ban nay thanh mac dinh", /uiSaveDefault\(\)/.test(pg));
@@ -276,8 +305,8 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  uiItemRename(k,"Ten anh Luan dat");
  t("doi ten mot muc thi luu lai duoc", uiItemLabel(k)==="Ten anh Luan dat");
  buildNav();
- if(!V6())t("ten moi hien ngay tren menu ben trai", (document.getElementById("nav").innerHTML||"").indexOf("Ten anh Luan dat")>=0);
- if(!V6())t("man cai dat hien nut tra ve ten goc", /mnrs/.test(RENDER["settings"]()));
+ tv5("ten moi hien ngay tren menu ben trai", (document.getElementById("nav").innerHTML||"").indexOf("Ten anh Luan dat")>=0);
+ tv5("man cai dat hien nut tra ve ten goc", /mnrs/.test(RENDER["settings"]()));
  uiItemRename(k,"");
  t("xoa ten rieng thi ve dung ten goc", uiItemLabel(k)===goc);
  t("go y het ten goc thi khong luu thua", (UI().ilabel||{})[k]===undefined);
@@ -412,23 +441,23 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  setRole("all");window.NAVOPEN={};
  t("nhom Lam viec mo san", navIsOpen("Làm việc")===true);
  t("nhom Dieu hanh mo san", navIsOpen("Điều hành")===true);
- if(!V6())t("4 nhom CHANG gap lai", NAVTREE.filter(function(G){return G.arc}).every(function(G){return navIsOpen(G.g)===false}));
+ tv5("4 nhom CHANG gap lai", NAVTREE.filter(function(G){return G.arc}).every(function(G){return navIsOpen(G.g)===false}));
  t("nhom Tra cuu gap lai", navIsOpen("Tra cứu")===false);
  /* V9.29o: nhom "Cho duyet" MO SAN - hang cho quyet dinh ma phai bam moi thay thi de tri tre */
  t("nhom Cho duyet mo san", navIsOpen("Chờ duyệt")===true);
  buildNav();
  var nav=document.getElementById("nav").innerHTML||"";
- if(!V6())t("menu ve dung: nhom mo co lop open", (nav.match(/navlbl open/g)||[]).length===3);
- if(!V6())t("menu ve dung: 5 nhom con lai khong co lop open", (nav.match(/class="navlbl(?! open)/g)||[]).length===5);
+ tv5("menu ve dung: nhom mo co lop open", (nav.match(/navlbl open/g)||[]).length===3);
+ tv5("menu ve dung: 5 nhom con lai khong co lop open", (nav.match(/class="navlbl(?! open)/g)||[]).length===5);
  t("nhom gap lai thi khong ve muc ben trong", nav.indexOf('data-k="nhaplead"')<0);
- if(!V6())t("nhom mo van ve du muc ben trong", nav.indexOf('data-k="banlam"')>=0&&nav.indexOf('data-k="baocao"')>=0);
+ tv5("nhom mo van ve du muc ben trong", nav.indexOf('data-k="banlam"')>=0&&nav.indexOf('data-k="baocao"')>=0);
  t("nhom gap lai van hien badge tong so viec", /navlbl(?! open)[^>]*>[\s\S]{0,400}?class="dot"/.test(nav));
  /* nguoi dung tu mo thi phai nho */
  navToggle(arcGrpName("changA"));
- if(!V6())t("tu mo mot nhom chang thi nho lai", navIsOpen(arcGrpName("changA"))===true);
- if(!V6())t("mo roi thi ve du muc ben trong", (document.getElementById("nav").innerHTML||"").indexOf('data-k="nhaplead"')>=0);
+ tv5("tu mo mot nhom chang thi nho lai", navIsOpen(arcGrpName("changA"))===true);
+ tv5("mo roi thi ve du muc ben trong", (document.getElementById("nav").innerHTML||"").indexOf('data-k="nhaplead"')>=0);
  navToggle(arcGrpName("changA"));
- if(!V6())t("gap lai duoc", navIsOpen(arcGrpName("changA"))===false);
+ tv5("gap lai duoc", navIsOpen(arcGrpName("changA"))===false);
  navToggle("Làm việc");
  t("nhom mac dinh mo cung gap lai duoc", navIsOpen("Làm việc")===false);
  window.NAVOPEN={};
@@ -1152,7 +1181,7 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
   var e2=buildScope("academic_staff");
   t("tat trang dap thi app tu lui ve trang khac con bat", e2.land!==dap&&e2.pages.indexOf(e2.land)>=0);
   qtVeMacDinh("hocvu");
-  if(!V6())t("tra lai thi trang dap ve cho cu", buildScope("academic_staff").land===dap);
+  tv5("tra lai thi trang dap ve cho cu", buildScope("academic_staff").land===dap);
   t("lua chon ghi vao DATA.config (khong mat khi reset du lieu demo)", /c\.quyenTrang=c\.quyenTrang\|\|\{\}/.test(String(qtCfg)));
   window.SETTAB="ch2";CUR="banlam";
  })();
@@ -1352,23 +1381,23 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
 (function(){
  setRole("all");
  var ARCG=NAVTREE.filter(function(G){return navIsArcGrp(G.g)}).map(function(G){return G.g});
- if(!V6())t("co dung 4 nhom chang", ARCG.length===4);
+ tv5("co dung 4 nhom chang", ARCG.length===4);
  t("mac dinh 4 chang deu gap", ARCG.every(function(g){return navOpenDef(g)===false}));
  /* di vao mot trang trong chang 2 -> chi chang 2 mo */
  window.NAVOPEN={};
  go("banglop");
  t("vao trang cua chang nao thi mo dung chang do", navIsOpen(ARCG[1]));
- if(!V6())t("ba chang con lai tu gap", [ARCG[0],ARCG[2],ARCG[3]].every(function(g){return !navIsOpen(g)}));
+ tv5("ba chang con lai tu gap", [ARCG[0],ARCG[2],ARCG[3]].every(function(g){return !navIsOpen(g)}));
  /* sang chang 4 -> chang 2 phai gap lai */
  go("ketthuc");
- if(!V6())t("doi sang chang khac thi chang cu gap lai", navIsOpen(ARCG[3])&&!navIsOpen(ARCG[1]));
+ tv5("doi sang chang khac thi chang cu gap lai", navIsOpen(ARCG[3])&&!navIsOpen(ARCG[1]));
  /* tu tay xo mot chang cung phai gap ba chang kia */
  navToggle(ARCG[0]);
- if(!V6())t("tu tay xo mot chang thi ba chang kia gap", navIsOpen(ARCG[0])&&[ARCG[1],ARCG[2],ARCG[3]].every(function(g){return !navIsOpen(g)}));
+ tv5("tu tay xo mot chang thi ba chang kia gap", navIsOpen(ARCG[0])&&[ARCG[1],ARCG[2],ARCG[3]].every(function(g){return !navIsOpen(g)}));
  /* xo mot chang la MO LUON ban do chang do - khong bat bam them mot nhat nua */
  window.NAVOPEN={};go("banlam");
  navToggle(ARCG[2]);
- if(!V6())t("xo chang la mo luon ban do chang", CUR==="chang"&&window.ARC===navGrpArc(ARCG[2]));
+ tv5("xo chang la mo luon ban do chang", CUR==="chang"&&window.ARC===navGrpArc(ARCG[2]));
  t("gap chang lai thi khong dieu huong di dau", (function(){var cur0=CUR;navToggle(ARCG[2]);return CUR===cur0})());
  /* nhom KHONG phai chang thi khong bi luat nay dong toi */
  window.NAVOPEN={};
@@ -1386,7 +1415,7 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
    NAVTREE.filter(function(G){return G.arc}).every(function(G){return G.g===arcGrpName(G.arc)}));
  t("khong con nhom nao ten 'Chang N'", NAVTREE.every(function(G){return !/^Chặng \d/.test(G.g)}));
  /* doi ten nhom ma navIsArcGrp van nhan dung - truoc day no doan bang chu "Chang \d" */
- if(!V6())t("navIsArcGrp van nhan dung 4 nhom chang", NAVTREE.filter(navIsArcGrpG).length===4);
+ tv5("navIsArcGrp van nhan dung 4 nhom chang", NAVTREE.filter(navIsArcGrpG).length===4);
  t("muc ban do goi la 'Ban do chang'", uiItemDefLabel("changA")==="Bản đồ chặng");
  t("ten tren dau menu", UIDEF.brand==="ITTs - SOP TEMP"&&UIDEF.sub==="Hệ thống tuân thủ SOP");
  t("khung HTML in san dung ten do", /id="brandName">ITTs - SOP TEMP</.test(HTML)&&/id="brandSub">Hệ thống tuân thủ SOP</.test(HTML));
@@ -1567,7 +1596,7 @@ function stripOf(o){var i=o.indexOf('<div class="bstats"');if(i<0)return "";   /
  var trong=[];
  ["test","buoihoc","khieunai","baoluu"].forEach(function(k){var o="";try{o=RENDER[k]()}catch(e){return}
   if(!/class="bstats"/.test(o))trong.push(k)});
- if(!V6())t("trang khong co dai the thi van co bang hang cho viec"+(trong.length?" - TRONG: "+trong.join(", "):""), trong.length===0);
+ tv5("trang khong co dai the thi van co bang hang cho viec"+(trong.length?" - TRONG: "+trong.join(", "):""), trong.length===0);
  /* Xep lop: dai the truoc day bam de doi tab XLFILT - nay tab do phai co that o THANH LOC */
  (function(){var o=RENDER.xeplop();
   var inStrip=(stripOf(o).match(/window\.XLFILT='([a-z]+)'/g)||[]).length;
@@ -1581,6 +1610,13 @@ function stripOf(o){var i=o.indexOf('<div class="bstats"');if(i<0)return "";   /
      khong con bstat nao goi duyTabSet, va chip tab phai TU mang con so */
   t("hub Cho duyet: mot bo dieu khien duy nhat - chip mang so, khong con dai o lap",
     !/class="bstat[^"]*"[^>]*onclick="duyTabSet\(/.test(o)&&/onclick="duyTabSet\('duyetck'\)">[\s\S]{0,60}?<i class="segn">\d/.test(o))})();
+ /* Đặt lại phạm vi về Quản trị TRƯỚC khi đo. Bẫy đã cắn: dải số của hub Chờ duyệt chỉ hiện
+    cho người có quyền duyệt - 7/9 chức danh mở ra không có dải, và đó là ĐÚNG. Nhưng bộ kiểm
+    này chạy sau hàng trăm câu khác, thừa hưởng phạm vi của người cuối cùng được đóng vai, nên
+    nó đo phải TRẠNG THÁI SÓT chứ không đo app. Chạy trên v5 thì tình cờ xanh, trên v6 thì đỏ -
+    khác nhau chỉ vì thứ tự các câu chạy trước đã đổi.
+    Luật: bộ kiểm phải TỰ ĐẶT ĐIỀU KIỆN của mình, không thừa hưởng của câu trước. */
+ try{setRole("all");applyScope("");CURSTAFF="";window.DUYTAB=""}catch(e){}
  /* 3 trang truoc day KHONG co dai so nao */
  ["giaoan","banggiao","duyet"].forEach(function(k){
   t("trang "+k+" da co dai so", /class="bstats"/.test(RENDER[k]()))});

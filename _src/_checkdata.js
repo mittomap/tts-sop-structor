@@ -26,6 +26,26 @@ global.document={getElementById:(id)=>ST[id]||(ST[id]=El()),querySelector:()=>El
 global.window=global;global.location={hash:""};
 global.localStorage={getItem:()=>null,setItem(){},removeItem(){}};
 global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
+/* NEO DONG HO VAO NGAY SINH DU LIEU - bay thu tu trong ngay (sau check_logic, check_sop,
+   _check16). Du lieu demo la ban mau co ngay sinh co dinh; app dich no theo boi so 7 ngay, nen
+   giua hai lan dich moi moc "qua 24h" cu troi dan. Do bang dong ho treo tuong thi xanh buoi
+   sang, do buoi chieu, ma khong ai dung vao ma.
+   LUAT: khong do cai dang dung yen bang mot cai thuoc dang chay. */
+(function(){
+ var THAT=Date, moc=null;
+ try{
+  var d=JSON.parse(require('fs').readFileSync('./demo_data_big.json','utf8'));
+  var m=String((d.meta||{}).anchor||"").match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+  if(m)moc=new THAT(+m[3],+m[2]-1,+m[1],+(m[4]||0),+(m[5]||0)).getTime();
+ }catch(e){}
+ if(moc==null){console.log("CANH BAO: khong doc duoc meta.anchor - ket qua se troi theo ngay.");return}
+ var L=moc-THAT.now();
+ function D(){ if(!(this instanceof D))return new THAT(THAT.now()+L).toString();
+  return arguments.length?new THAT(...arguments):new THAT(THAT.now()+L)}
+ D.prototype=THAT.prototype;
+ D.now=function(){return THAT.now()+L};D.parse=THAT.parse;D.UTC=THAT.UTC;
+ global.Date=D;
+})();
 require('vm').runInThisContext(require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8'));
 setRole("all");
 

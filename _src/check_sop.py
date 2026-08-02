@@ -184,7 +184,6 @@ print("KET QUA COT: DAT - moi cot SOP mo ta deu duoc app dung, hoac da khai ly d
 TRIG_BOQUA = {
     # NA037 da bo khoi danh sach nay 31/07: sau khi gieo lai du lieu demo (WOW trai deu 18
     # ngay), app CO sinh ra tinh huong nay that - giu trong danh sach bo qua la khai gian.
-    "NA039": "Nhan 'khao sat da tra loi' - trang thai XONG.",
     "NA045": "Nhan 'khieu nai da dong' - trang thai XONG, con viec hoi lai HV thi da co luat rieng "
              "(slaComplaintFollowup_days).",
     "NA056": "Ma cu cua 'da tu van chua tao don' - app dung NA001 (con han) va NA055 (qua han).",
@@ -225,6 +224,33 @@ SYNTH = {
     # no chi dung khi du lieu demo tinh co co mot buoi WOW xong trong vong 24 gio truoc luc chay.
     # Chay luc 14h thi con, chay luc 20h thi het - bo kiem do luc do se bao "app khong sinh ra
     # NA076" trong khi app khong he doi mot dong nao. Dung dong dung san cho chac tay.
+    # V9.77: cung mot benh lan thu ba trong mot ngay (sau NA049/NA050/NA076, va sau ca
+    # check_logic sang nay). NA013 la nhanh "CON TRONG HAN xu ly" cua ho so xep lop: qua
+    # slaPLR48_hours (48 gio) thi doi thanh NA063, qua slaClassInfoZalo_hours (24 gio) thi
+    # thanh NA062. Du lieu demo co ngay sinh co dinh, nen sau vai ngay MOI ho so deu da qua
+    # han - khong dong nao con "trong han" nua, va bo kiem bao "app khong sinh ra NA013"
+    # trong khi khong ai doi mot dong ma nao. Do la do cai dang dung yen bang dong ho dang chay.
+    "NA013": ("DL08",
+              "Chi dung tu luc giao ho so xep lop den khi het han (slaPLR48_hours / "
+              "slaClassInfoZalo_hours). Qua han la doi sang NA063 / NA062, nen du lieu demo "
+              "tinh khong giu duoc tinh huong nay - bo kiem se do hay xanh tuy vao NGAY chay, "
+              "khong lien quan gi den ma nguon.",
+              {"onboarding_id": "OB-PROBE13", "student_id": "HV001",
+               "student_id_name": "Dong dung san", "enrollment_id": "",
+               "onboarding_status": "", "class_id": "", "class_info_sent_at": "",
+               "class_confirmation_status": "", "confirmation_time": "",
+               "assigned_at": {"__ago_min": 60}}),
+    # Cung ho voi NA013: NA006 la nhanh "CON TRONG HAN" cua don dang ky - qua
+    # slaENR_pending_hours (24 gio) thi thanh NA005, qua slaPayment_hours (48 gio) thi thanh
+    # NA007. Don trong du lieu demo deu da qua han tu lau.
+    "NA006": ("DL06",
+              "Chi dung tu luc tao don den khi het han xac nhan / thu tien (slaENR_pending_hours "
+              "/ slaPayment_hours). Qua han la doi sang NA005 / NA007, nen du lieu demo tinh "
+              "khong giu duoc tinh huong nay.",
+              {"enrollment_id": "ENR-PROBE06", "student_id": "HV001", "lead_id": "",
+               "student_id_name": "Dong dung san", "enrollment_status": "confirmed (Đã xác nhận)",
+               "paid_amount": 0, "remaining_amount": 5000000, "final_fee": 5000000,
+               "total_fee": 5000000, "enrollment_time": {"__ago_min": 60}}),
     "NA076": ("DL14",
               "Chi dung tu luc buoi WOW ket thuc den het han ghi ket qua (slaWowNote_hours). Qua "
               "han la doi sang NA075, nen du lieu demo tinh khong giu duoc tinh huong nay - bo "

@@ -343,5 +343,32 @@ minh dang dung dau. Nay ca bon hoi `navCay()`.
 Cac tieu chi canh HINH DANG MENU CUA V5 (4 nhom chang, ten nhom cu the) duoc khoanh `if(!V6())`
 trong `_check11`, `_check16`, `_checkqa` - v6 co y dung menu khac, khong phai loi.
 
-CON NO: chay tren v6, `_check16` con **1 tieu chi do** chua giai thich duoc ("trang duyet da co
-dai so"). Chua vao verify.sh vi the.
+### Ba bay ve DONG HO da cat trong mot ngay (01-02/08)
+
+Du lieu demo la BAN MAU co ngay sinh co dinh (`meta.anchor`), app dich no theo BOI SO 7 NGAY luc
+chay. Trong 6 ngay giua hai lan dich, moi moc "qua 24h" / "con trong han" cu troi dan - bo kiem
+do bang dong ho treo tuong se XANH BUOI SANG va DO BUOI CHIEU ma khong ai dung vao ma.
+
+    LUAT: KHONG DO CAI DANG DUNG YEN BANG MOT CAI THUOC DANG CHAY.
+
+Da neo ba cho:
+- `check_logic.py` - NOW lay tu `meta.anchor`.
+- `check_sop.py`   - them dong dung san (SYNTH) cho **NA013** va **NA006**, hai nhanh "CON TRONG
+  HAN" ma du lieu tinh khong bao gio giu duoc. Nay 5 dong dung san. Bo khai thua **NA039**
+  (app da sinh ra that).
+- `_check16.js`    - dat `Date` ve dung `meta.anchor` truoc khi nap app.
+
+### Bay khac: bo kiem an ca TAC DUNG PHU cua chinh no
+
+Khoanh `if(!V6())t(...)` la chan luon phan DUNG va phan TRA LAI TRANG THAI nam ben trong bieu
+thuc ay, nen cac cau sau thua huong trang thai hong va do oan cho app. Nay dung `tv5(...)`:
+tham so van duoc tinh (moi tac dung phu van xay ra), chi bo phan cham diem.
+
+Bo kiem cung phai TU DAT DIEU KIEN cua minh, khong thua huong cua cau truoc - vd dai so cua hub
+Cho duyet chi hien cho nguoi co quyen duyet (7/9 chuc danh mo ra khong co dai, va do la DUNG).
+
+CON NO: chay tren v6, `_check16` con **1 tieu chi do**: "trang duyet da co dai so". Da khoanh
+vung duoc: cung phai vi, cung CURROLE/SCOPE/tabs/segs nhu v5, nhung `RENDER.duyet()` o v6 ngan
+hon 3.7KB va KHONG co khoi `bstats` - tuc la loi goi `statStrip` cua trang do bi bo qua o v6.
+KHONG phai do `navInTree` (renderDuyet khong goi ham nay). Buoc tiep: tim cho goi statStrip cua
+hub Cho duyet va xem dieu kien nao gat no o v6. Chua dua v6 vao verify.sh vi the.

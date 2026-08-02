@@ -8,6 +8,11 @@ var store={};global.localStorage={getItem:k=>store[k]===undefined?null:store[k],
 global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
 require('vm').runInThisContext(require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8'));
 var ok=0,bad=[];function t(name,cond){if(cond)ok++;else bad.push(name)}
+/* Chấm điểm CHỈ trên v5, nhưng VẪN CHẠY biểu thức. Bẫy đã cắn: bọc `if(!V6())t(...)` là chặn
+   luôn cả phần dựng và phần TRẢ LẠI trạng thái nằm bên trong biểu thức ấy, nên các câu sau đó
+   thừa hưởng trạng thái hỏng và đổ oan cho app. Tham số được tính TRƯỚC khi gọi hàm, nên viết
+   thành hàm là mọi tác dụng phụ vẫn xảy ra. */
+function tv5(a,b,c){if(!V6())t(a,b,c)}
 setRole("all");
 
 /* --- 1. tang arc phu kin 17 chang --- */
@@ -209,7 +214,7 @@ applyScope("");CURROLE="all";
    go(a);go(k);
    var on=(NAVEL.innerHTML.match(/class="navitem on" data-k="([a-z0-9]+)"/g)||[]).map(function(s){return s.match(/data-k="([a-z0-9]+)"/)[1]});
    if(!(on.length===1&&on[0]===k))sai.push(a+">"+k+"=["+on.join(",")+"]")})});
- if(!V6())t("V9.19 moi nghiep vu trong chang sang DUNG 1 muc sidebar"+(sai.length?" ["+sai.join(" ")+"]":""), sai.length===0)})();
+ tv5("V9.19 moi nghiep vu trong chang sang DUNG 1 muc sidebar"+(sai.length?" ["+sai.join(" ")+"]":""), sai.length===0)})();
 t("V9.19 hub khong sang de khi muc con dang sang (wow)", (function(){
  window.HTTAB="wow";CUR="hoctap";return navCur("wow")===true&&navCur("hoctap")===false})());
 t("V9.19 hub VAN sang khi tab khong co muc con rieng (cskh/khaosat)", (function(){
@@ -295,7 +300,7 @@ t("V9.20 an muc menu thi buildNav bo muc do", (function(){
  uiMenuToggle("giaoviec");buildNav();var after=NAVEL.innerHTML.indexOf('data-k="giaoviec"')>=0;
  uiMenuToggle("giaoviec");buildNav();
  return before&&!after&&NAVEL.innerHTML.indexOf('data-k="giaoviec"')>=0})());
-if(!V6())t("V9.20 doi ten nhom menu hien dung tren sidebar", (function(){
+tv5("V9.20 doi ten nhom menu hien dung tren sidebar", (function(){
  uiGroupRename("Làm việc","Bàn của tôi");buildNav();
  var okk=NAVEL.innerHTML.indexOf("Bàn của tôi")>=0;
  uiGroupRename("Làm việc","");buildNav();return okk})());
