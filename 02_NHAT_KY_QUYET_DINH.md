@@ -149,6 +149,18 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.79 — GỘP 15 SỔ TRA CỨU VỀ THEO THỰC THỂ ✅ (02/08).**
+> · Việc anh Luân đặt từ V9.69, nay trả. Mỗi sổ thuộc đúng **một** thực thể: Khách 3 · Học viên 8
+> · Lớp 3 · Phụ huynh 0 (không có sổ riêng). Sổ **Giảng viên** khai đứng ngoài kèm lý do - sổ
+> nguồn lực, không phải đối tượng được phục vụ.
+> · Bàn làm việc bày sổ của thực thể đang chọn. **Thêm một lối, KHÔNG dời chỗ** - 15 mục vẫn
+> nguyên trong menu Tra cứu, menu v6 vẫn 35 mục.
+> · **Luật:** *dời chỗ một thứ người ta đã quen tay là bắt họ học lại; thêm một lối thì không.*
+> · `_checkaudit` 50 → **55 tiêu chí** - có cả câu "Bàn làm việc phải BÀY chúng ra" (vẽ thật màn
+> rồi tìm lời gọi), vì khai mà không hiện thì người dùng vẫn không thấy.
+> · Sửa một con số em nói sai: **không có "5 việc chưa vào ngăn kéo"** - 24 làm tại chỗ + 5 việc
+> hàng loạt CỐ Ý, còn nợ **0**.
+>
 > **Phiên bản: V9.78 — BỘ KIỂM SOI ĐƯỢC V6, VÀ NÓ TÌM RA MỘT TÍNH NĂNG BIẾN MẤT ✅ (02/08).**
 > · Xong ba việc nợ: `_checkui` mở v6 trên trình duyệt thật (**1431 lượt**), truy xong tiêu chí
 > `_check16`, và `verify.sh` nay có mục **4bis chạy lại 14 bộ kiểm JS trên bản v6**.
@@ -6883,3 +6895,43 @@ mục gần nhất có mặt trên menu** - hỏi `navInTree()` thay vì cắm c
 ### Số chốt phiên
 `verify.sh` nay chạy **hai lượt**: v5 và v6. Bộ kiểm trình duyệt **1431 lượt mở thật**.
 Trên v6: **14/14 bộ kiểm JS xanh**. Tổng: xanh hết cả hai bản.
+
+
+---
+
+## V9.79 - GỘP 15 SỔ TRA CỨU VỀ THEO THỰC THỂ (02/08)
+
+Việc anh Luân đặt từ V9.69, nay trả. Mười lăm sổ nằm phẳng thành một danh sách trong menu thì
+người dùng phải **tự nhớ sổ nào nói về ai**. Nay mỗi sổ thuộc về đúng **một** trong bốn thực thể,
+và Bàn làm việc bày sổ của thực thể đang chọn ngay dưới thanh chọn:
+
+| Thực thể | Sổ |
+|---|---|
+| **Khách** (3) | Sổ liên hệ · Sổ test đầu vào · Sổ tư vấn |
+| **Học viên** (8) | Học viên · Sổ đăng ký khóa · Sổ thu học phí · Sổ WOW 1-1 · Sổ kết thúc khóa · Sổ khảo sát · Sổ phản hồi · Sổ khiếu nại |
+| **Lớp** (3) | Sổ buổi học · Sổ điểm danh · Sổ bài tập |
+| **Phụ huynh** (0) | không có sổ riêng - họ dựng từ ba cột người đồng hành của DL09, xem qua hồ sơ học viên |
+
+Sổ thứ 15 - **Giảng viên** - khai đứng ngoài, kèm lý do: *sổ nguồn lực, không phải một trong bốn
+đối tượng được phục vụ; giảng viên là người phục vụ.* Đúng mạch V9.74.
+
+### Thêm một lối, KHÔNG dời chỗ
+
+15 mục vẫn nguyên trong nhóm Tra cứu cho ai đã quen tay vào thẳng. Bàn làm việc là **lối thứ
+hai**, không phải chỗ mới bắt người ta đi học lại. Menu v6 vẫn **35 mục**.
+
+> **Luật:** *dời chỗ một thứ người ta đã quen tay là bắt họ học lại; thêm một lối thì không.*
+
+### Bộ kiểm
+
+`_checkaudit` 50 → **55 tiêu chí**, canh năm mặt: mọi sổ thuộc về một thực thể hoặc khai lý do ·
+không sổ nào thuộc hai chỗ · bản khai ngoài không nhắc sổ đã biến mất · sổ khai cho thực thể phải
+là **trang có thật** (khai tên chết là lối cụt im lặng) · và **Bàn làm việc phải BÀY chúng ra** -
+vẽ thật màn rồi tìm lời gọi, vì khai mà không hiện thì người dùng vẫn không thấy.
+
+### Một con số em nói sai, đã sửa
+Em từng nói "còn 5 việc chưa vào ngăn kéo". Sai: máy đếm là **24 làm tại chỗ + 5 việc hàng loạt
+CỐ Ý ở trang rộng**, còn nợ **0**. Năm việc ấy đã khai lý do từ V9.70, không phải nợ.
+
+### Số chốt phiên
+Sổ đã gắn **14/15**, khai lý do đứng ngoài **1**. `_checkaudit` 50 → **55 tiêu chí**.

@@ -1163,6 +1163,8 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .banch{color:var(--muted);flex:none;font-size:16px}
 .banjob{display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid var(--line)}
 .banjob.bankhac{opacity:.72;background:#FAFBFD}
+.tbar.tbso{margin-top:-4px;margin-bottom:14px}
+.tbar.tbso .seg{font-size:12px;padding:5px 10px}
 .banji{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none;background:var(--gray);color:#5A6675}
 .banji.do{background:var(--redb);color:var(--red)}
 .banji.ho{background:var(--amberb);color:var(--amber)}
@@ -17373,14 +17375,27 @@ function renderHoidap(){
    Danh sách giảng viên vẫn còn nguyên trong Tra cứu - bỏ khỏi trục KHÔNG phải là bỏ khỏi app. */
 var TTHE=[
  {k:"khach",  t:"Khách",  ic:"ti-user-plus",  bang:"DL02", ma:"lead_id",    ten:"full_name", col:"#3B82C4",
+  so:["dslienhe","dstest","dstuvan"],
   d:"Chưa học - trung tâm của chặng tuyển sinh."},
  {k:"hocvien",t:"Học viên",ic:"ti-user-check", bang:"DL09", ma:"student_id", ten:"full_name", col:"#0D9488",
+  so:["hocvien","dsdangky","dsthanhtoan","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai"],
   d:"Đang học - trung tâm của mọi nghiệp vụ vận hành."},
  {k:"phuhuynh",t:"Phụ huynh",ic:"ti-users",   bang:"__PH", ma:"ph_id",      ten:"full_name", col:"#7C3AED",
   nguon:function(){return phDS()},
+  so:[],
   d:"Người đồng hành của học viên - dựng từ ba cột người đồng hành trong hồ sơ."},
  {k:"lop",    t:"Lớp",     ic:"ti-chalkboard", bang:"DL10", ma:"class_id",   ten:"class_name",col:"#6B4FA0",
+  so:["dsbuoihoc","dsdiemdanh","dsbaitap"],
   d:"Đang học - trung tâm của giảng dạy và điểm danh."}];
+/* ═══ SỔ TRA CỨU THUỘC VỀ THỰC THỂ ═══════════════════════════════════════════════════════════
+   Anh Luân đặt từ V9.69: gộp 15 sổ Tra cứu về theo thực thể. Trước đây chúng nằm thành một
+   danh sách phẳng 15 mục - người dùng phải tự nhớ sổ nào nói về ai. Nay mỗi sổ thuộc về đúng
+   một thực thể, và Bàn làm việc bày sổ của thực thể đang chọn ngay dưới thanh chọn.
+   MENU KHÔNG PHÌNH RA: 15 mục vẫn nguyên ở nhóm Tra cứu cho ai muốn vào thẳng. Đây là thêm
+   một lối, không phải dời chỗ - dời chỗ là bắt người quen tay đi học lại. */
+var TTSO_NGOAI={
+ giangvien:"sổ nguồn lực, không phải một trong bốn đối tượng được phục vụ - giảng viên là "+
+  "người phục vụ. Vẫn ở nhóm Tra cứu như mọi sổ khác."};
 /* Phụ huynh KHÔNG có bảng riêng trong SOP - họ nằm trong ba cột người giám hộ của DL09. Nên
    thực thể này được DỰNG từ dữ liệu ấy, gom theo số điện thoại: một số là một người, kèm danh
    sách con. Dựng lại mỗi lần vẽ thì tốn, nên nhớ tạm và xoá khi dữ liệu đổi. */
@@ -18076,6 +18091,15 @@ function renderBan(){
     Ở v5 khối này nằm trên trang đáp của từng chức danh; v6 đổi trang đáp thành Bàn làm việc mà
     quên mang nó theo, nên CẢ 8 CHỨC DANH mất bảng việc của mình lẫn khối "Chờ bạn phê duyệt"
     (BC9 của SOP). Sửa `bangViecHTML` cho nó CHỊU vẽ là chưa đủ - còn phải có người GỌI nó. */
+ /* Sổ tra cứu của chính thực thể đang chọn - "tôi đang làm việc với Khách, vậy sổ nào nói về
+    khách?" trả lời được ngay tại chỗ, không phải quét danh sách 15 mục trong menu. */
+ (function(){var so=(T.so||[]).filter(function(k){try{return canSee(k)}catch(e){return false}});
+  if(!so.length)return;
+  h+='<div class="tbar tbso"><span class="mut" style="font-size:11.5px;align-self:center;margin-right:2px">'+
+   'Sổ của '+esc(T.t.toLowerCase())+':</span>'+
+   so.map(function(k){var p=PBK[k]||{};
+    return '<button class="seg" onclick="go(\''+esc(k)+'\')"><i class="ti '+(p.ic||"ti-book")+'"></i>'+
+     esc(p.t||k)+'</button>'}).join("")+'</div>'})();
  h+=bvSau();
  var DS=ttDanhSach(ttk);
  var coViec=DS.filter(function(z){return z.viec.length});

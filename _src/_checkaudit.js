@@ -365,6 +365,41 @@ var CH3_NGOAIBAN={
      if(noi<k2.length)thieuAi.push(T.k+" "+z.ma+": "+k2.length+" việc mà chỉ "+noi+" chỗ ghi đang chờ ai")})})});
   applyScope("");CURSTAFF="";
   t("việc của bộ phận khác đều ghi rõ đang chờ bộ phận nào", !thieuAi.length, thieuAi.slice(0,3).join(" · "));
+
+  /* (c) MỌI SỔ TRA CỨU THUỘC VỀ MỘT THỰC THỂ (anh Luân đặt từ V9.69).
+     15 sổ nằm phẳng trong menu thì người dùng phải tự nhớ sổ nào nói về ai. Nay mỗi sổ khai
+     thuộc đúng MỘT thực thể - hoặc khai lý do vì sao đứng ngoài. Canh cả ba mặt: phủ hết,
+     không sổ nào thuộc hai chỗ, và bản khai ngoài không nhắc sổ đã biến mất. */
+  (function(){
+   var traG=(NAVTREE6||[]).filter(function(g){return g.g==="Tra cứu"})[0];
+   if(!traG){t("có nhóm Tra cứu trong menu v6", false, "không thấy");return}
+   var thuoc={},trung=[];
+   TTHE.forEach(function(T){(T.so||[]).forEach(function(k){
+    if(thuoc[k])trung.push(k+" (ở cả "+thuoc[k]+" và "+T.k+")");
+    thuoc[k]=T.k})});
+   var sot=traG.items.filter(function(k){return !thuoc[k]&&!TTSO_NGOAI[k]});
+   t("mọi sổ Tra cứu thuộc về một thực thể, hoặc khai lý do ("+traG.items.length+" sổ)",
+     !sot.length, sot.join(", ")+" => khai `so:` cho thực thể, hoặc TTSO_NGOAI kèm lý do");
+   t("không sổ nào thuộc hai thực thể cùng lúc", !trung.length, trung.join(" · "));
+   var thua=Object.keys(TTSO_NGOAI).filter(function(k){return traG.items.indexOf(k)<0});
+   t("bản khai sổ-ngoài-thực-thể không nhắc sổ đã biến mất", !thua.length, thua.join(", "));
+   /* sổ khai cho thực thể phải là sổ CÓ THẬT trong menu - khai tên chết là lối cụt im lặng */
+   var ma=[];TTHE.forEach(function(T){(T.so||[]).forEach(function(k){
+    if(!PBK[k])ma.push(T.k+"->"+k)})});
+   t("sổ khai cho thực thể đều là trang có thật", !ma.length, ma.join(", "));
+   /* và Bàn làm việc phải BÀY chúng ra - khai mà không hiện thì người dùng vẫn không thấy */
+   var chuaBay=[];
+   TTHE.forEach(function(T){
+    if(!(T.so||[]).length)return;
+    window.BANTT=T.k;window.BANMO="";
+    var h="";try{h=veTrang("ban")}catch(e){chuaBay.push(T.k+": lỗi");return}
+    (T.so||[]).forEach(function(k){
+     if(h.indexOf("go('"+k+"')")<0)chuaBay.push(T.k+"->"+k)})});
+   window.BANTT="";
+   t("Bàn làm việc bày sổ của thực thể đang chọn", !chuaBay.length, chuaBay.slice(0,4).join(" · "));
+   console.log("  V6 - so tra cuu theo thuc the: "+Object.keys(thuoc).length+"/"+traG.items.length+
+    " da gan | khai ly do dung ngoai: "+Object.keys(TTSO_NGOAI).length);
+  })();
  })();
  /* (2) mọi dòng phải khai ai làm */
  var mo=(VIECTT||[]).filter(function(v){return !v.act&&!(v.vai&&v.vai.length)});
