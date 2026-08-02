@@ -18146,11 +18146,19 @@ function banThe(ttk,z){
    '<div class="banjt">'+esc(v.t)+
     '<div class="mut" style="font-size:11px">'+esc(v.act?("theo CH3 · "+((CH3BY[v.act]||{}).t||v.act)):("việc của "+(v.vai||[]).join(", ")))+'</div></div>'+
    /* V6: nút Làm mở NGĂN KÉO ngay tại chỗ. v5 giữ nguyên lối cũ - nhảy sang trang nghiệp vụ,
-      để hai bản khác nhau đúng một chuyện và anh Luân so được sòng phẳng. */
+      để hai bản khác nhau đúng một chuyện và anh Luân so được sòng phẳng.
+      TRỪ 5 VIỆC HÀNG LOẠT (điểm danh cả lớp, chấm nhiều bài, xếp lớp, chia lead, bảng công):
+      chúng KHÔNG có form trong ngăn kéo, ngăn kéo chỉ hiện một dòng giải thích rồi chìa ra nút
+      "Mở màn làm việc". Đo thật: giáo viên ACA có 4/11 việc rơi vào nhóm này, tức v6 bắt họ bấm
+      HAI lần cho đúng phần việc họ làm hằng ngày, trong khi v5 chỉ một. Ngăn kéo trung gian ấy
+      giải thích được đúng một lần đầu, còn từ lần thứ hai trở đi chỉ là một cú bấm thừa.
+      Nên: việc hàng loạt đi THẲNG tới màn, và nói thật ngay trên nhãn nút là nó dẫn đi đâu -
+      "Mở màn" chứ không phải "Làm", để không ai bấm nhầm mà tưởng làm xong tại chỗ. */
    '<button class="btn primary sm" onclick="'+
-   (V6()?("bkMo('"+esc(ttk)+"','"+esc(ttMa(ttk,r))+"','"+esc((v.act||"")+"|"+v.t)+"')")
+   ((V6()&&!v.vichung)?("bkMo('"+esc(ttk)+"','"+esc(ttMa(ttk,r))+"','"+esc((v.act||"")+"|"+v.t)+"')")
         :v.go(r)).split('"').join("&quot;")+
-   '"><i class="ti '+(V6()?"ti-pencil":"ti-arrow-right")+'"></i>Làm</button></div>'});
+   '"><i class="ti '+((V6()&&!v.vichung)?"ti-pencil":"ti-arrow-right")+'"></i>'+
+   ((V6()&&v.vichung)?"Mở màn":"Làm")+'</button></div>'});
  /* CÁC BỘ PHẬN KHÁC đang làm gì trên chính hồ sơ này. Không có khối này thì mỗi người mở hồ sơ
     ra chỉ thấy góc của mình - ba bộ phận cùng làm trên một học viên mà không ai biết hai người
     kia. Thấy được, nhưng KHÔNG có nút Làm: quyền chặn tay, không che mắt. */

@@ -406,7 +406,22 @@ const PROBE = () => {
                 tong++;
                 var el = null; try { el = tourFind(st.sel) } catch (e) {}
                 if (el) {
-                  var r = el.getBoundingClientRect();
+                  /* V9.81 - NGỦ MỘT KHOẢNG CỐ ĐỊNH LÀ ĐUA VỚI HIỆU ỨNG, KHÔNG PHẢI ĐỢI NÓ.
+                     App cuộn bằng `behavior:"smooth"` rồi vẽ lại sau 320ms, và `tourPaint` còn
+                     được phép cuộn thêm một nhịp nữa nếu neo vẫn lệch. Tổng thời gian ấy KHÔNG
+                     cố định - nó phụ thuộc máy đang bận tới đâu. Trên máy rảnh 950ms là dư, trên
+                     máy đang chạy song song thì đo trúng lúc neo còn đang trượt, và bộ kiểm báo
+                     một chỗ đỏ KHÔNG CÓ THẬT: cùng một build, chạy lần này đỏ lần sau xanh.
+                     (Đã đo tận tay: bản HEAD đỏ ở `cn_nguong` bước 2, chạy lại chính nó thì xanh.)
+                     Nay ĐỢI CHO NÓ ĐỨNG YÊN: lấy toạ độ liên tục tới khi hai lần liền giống nhau,
+                     hoặc quá 3 giây thì thôi. Đợi theo TRẠNG THÁI, không đợi theo đồng hồ. */
+                  var r = el.getBoundingClientRect(), _yen = 0;
+                  for (var _n = 0; _n < 30 && _yen < 2; _n++) {
+                    await new Promise(rs => setTimeout(rs, 100));
+                    var r2 = el.getBoundingClientRect();
+                    _yen = (Math.abs(r2.top - r.top) < 0.5 && Math.abs(r2.left - r.left) < 0.5) ? _yen + 1 : 0;
+                    r = r2;
+                  }
                   if (r.right < 1 || r.left > innerWidth - 1 || r.bottom < 1 || r.top > innerHeight - 1)
                     xau.push(k + " buoc " + (TOUR.i + 1) + " (" + st.sel + ")");
                 }

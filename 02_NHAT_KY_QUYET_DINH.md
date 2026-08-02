@@ -149,6 +149,25 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.81 — VIỆC HÀNG LOẠT ĐI THẲNG, VÀ MỘT BỘ KIỂM CHẬP CHỜN ✅ (02/08).**
+> · Đo giá một việc trên hai bản (bấm Làm xong tốn mấy màn): v5 **114/114 phải đổi màn**, v6
+> **100/114 làm tại chỗ**. Nhưng chia theo chức danh thì lộ chỗ v6 THUA: **giáo viên ACA chỉ
+> 7/11** - 4 việc hàng loạt (điểm danh cả lớp, chấm bài) bắt họ bấm HAI lần, v5 chỉ một.
+> · Sửa: 5 việc hàng loạt ở v6 đi **thẳng** tới màn, nhãn nút đổi thành **"Mở màn"** để không ai
+> tưởng làm xong tại chỗ. Đo lại: 14 lượt đổi màn nhưng chỉ **một** cú bấm.
+> · Nói công bằng cho v5, em từng nói quá: v5 **không** quăng người ta vào danh sách dài -
+> **86/114** lượt trang đích đã có sẵn tên người, **92/114** có sẵn ô nhập. Cái v5 mất là **chỗ
+> đứng**: làm xong thì đang ở trang khác, phải tự bò về Bàn làm việc lấy việc kế.
+> · **`_checkui` chập chờn - và em suýt đổ oan cho thay đổi của mình.** Nó báo đỏ ở
+> `cn_nguong` bước 2 (điện thoại, v6). Dựng lại bản **HEAD** (đã đẩy sáng nay, xanh) rồi chạy
+> chính bộ kiểm ấy: **cũng đỏ y hệt**. Rồi chạy lại lần nữa trên cùng build: **xanh**.
+> · Gốc: bộ kiểm **ngủ 950ms cố định** rồi mới đo, trong khi app cuộn bằng `behavior:"smooth"` và
+> `tourPaint` còn được cuộn thêm một nhịp - tổng thời gian phụ thuộc máy đang bận tới đâu. Nay
+> **đợi cho neo đứng yên** (lấy toạ độ tới khi hai lần liền giống nhau, tối đa 3 giây).
+> · **Luật:** *đợi theo TRẠNG THÁI, không đợi theo đồng hồ - ngủ một khoảng cố định là đua với
+> hiệu ứng chứ không phải đợi nó.* Và: *thấy đỏ sau khi mình vừa sửa thì việc đầu tiên là dựng
+> lại bản CŨ chạy thử, chứ không phải đi sửa app.*
+
 > **Phiên bản: V9.80 — NHÂN VIÊN ẢO: MÁY NGỒI LÀM VIỆC THAY NGƯỜI ✅ (02/08).**
 > · Anh Luân hỏi *"e có máy học nào chạy thay nhân viên test luôn ko"*. Trả lời thật lúc đó là
 > CHƯA: 20 bộ kiểm đọc **chuỗi HTML**, `_checkui` mở trình duyệt thật 1431 lượt nhưng chỉ **NHÌN**
@@ -7014,4 +7033,64 @@ thật sự canh được gì là PHÁ app rồi đếm xem nó bắt được m
 **228 lượt việc** làm thật trên hai bản build, **0 đỏ**. v6: 100 lượt ghi được (34 lượt trong đó
 mở tiếp màn kế) + 14 việc hàng loạt, **0 lượt im lặng**. v5: 114 lượt nhảy trang, không trang nào
 rỗng, không lỗi JS. `_checknv` đã nằm trong `./verify.sh` mục 5.
+
+## V9.81 - VIỆC HÀNG LOẠT ĐI THẲNG, VÀ MỘT BỘ KIỂM CHẬP CHỜN (02/08)
+
+Anh Luân: *"Ý là em kiểm xong thì v6 và v5 nhân viên thích cái nào hơn"*.
+
+### Đo giá của một việc, chứ không đoán
+`_checknv` mới chỉ hỏi "có làm được không". Câu của anh Luân hỏi chuyện khác: **làm xong tốn
+mấy màn, và làm xong còn đứng ở chỗ cũ không.** Đo riêng:
+
+| | v5 | v6 (trước sửa) |
+|---|---|---|
+| Làm được tại chỗ | 0/114 | 100/114 |
+| Phải đổi màn | 114/114 | 14/114 |
+| Trang đích | 8 trang khác nhau | 2 |
+| Trang đích có sẵn tên người | 86/114 | 12/14 |
+| Trang đích có sẵn ô nhập | 92/114 | 13/14 |
+
+**Hai dòng cuối là chỗ em từng nói quá về v5.** v5 KHÔNG quăng người ta vào một danh sách dài
+rồi bắt tự mò: phần lớn trang đích là màn chạy quy trình đã mở sẵn cho đúng người. Cái v5 thật sự
+mất là **chỗ đứng** - làm xong thì đang ở `tuyensinh` hay `hoso`, phải tự về Bàn làm việc lấy việc
+kế, ngày vài chục lần.
+
+(Ở đây cũng cắn thêm một cái thước sai: lần đo đầu em đếm `<tr>` để suy "trang đích dài bao nhiêu
+dòng", ra 0 - vì trang đích phần lớn không phải bảng. Suýt kết luận ngược.)
+
+### Chỗ v6 đang THUA v5 - chia theo chức danh mới thấy
+Tổng số đẹp nhưng chia ra thì: tư vấn / kế toán / marketing / sale leader / WOW đều **10/10, 6/6,
+2/2** làm tại chỗ. Riêng **giáo viên ACA chỉ 7/11**. Bốn việc còn lại là điểm danh cả lớp và chấm
+bài - việc hàng loạt, phải mở màn rộng, và v6 bắt bấm ngăn kéo trung gian rồi mới bấm tiếp "Mở màn
+làm việc". **Hai lần bấm cho đúng phần việc họ làm hằng ngày, trong khi v5 chỉ một.**
+
+Ngăn kéo trung gian ấy giải thích được đúng lần đầu; từ lần thứ hai là cú bấm thừa. Nay 5 việc
+hàng loạt đi **thẳng** tới màn, và nhãn nút nói thật là nó dẫn đi đâu: **"Mở màn"** chứ không phải
+"Làm". `_checknv` được dạy luật mới (việc khai `vichung` thì chấm theo vế nhảy trang như v5), vẫn
+xanh 228 lượt.
+
+### Bộ kiểm chập chờn - và em suýt đổ oan cho thay đổi của mình
+`_checkui` báo đỏ: `dienthoai · BAN V6 · cn_nguong bước 2 (@settabs) trỏ ra ngoài màn`.
+
+Việc đầu tiên KHÔNG phải đi sửa app, mà là hỏi: **có phải do mình không?** Dựng lại bản **HEAD**
+(đúng bản đã đẩy sáng nay, lúc ấy xanh) vào thư mục riêng rồi chạy chính bộ kiểm ấy - **cũng đỏ y
+hệt**. Chạy lại lần nữa trên cùng một build - **xanh**.
+
+Gốc: bộ kiểm **ngủ 950ms cố định** rồi mới đo toạ độ. Nhưng app cuộn bằng `behavior:"smooth"`, vẽ
+lại sau 320ms, và `tourPaint` còn được phép cuộn thêm một nhịp nữa nếu neo vẫn lệch - **tổng thời
+gian ấy không cố định, nó phụ thuộc máy đang bận tới đâu**. Máy rảnh thì 950ms dư; máy đang chạy
+song song thì đo trúng lúc neo còn đang trượt.
+
+Nay đợi cho nó **đứng yên**: lấy toạ độ liên tục tới khi hai lần liền giống nhau, quá 3 giây thì
+thôi.
+
+**Hai luật:**
+- *Đợi theo TRẠNG THÁI, không đợi theo đồng hồ - ngủ một khoảng cố định là ĐUA với hiệu ứng chứ
+  không phải đợi nó.*
+- *Thấy đỏ ngay sau khi mình vừa sửa: việc đầu tiên là dựng lại bản CŨ chạy thử. Không làm bước
+  ấy thì rất dễ đi "sửa" một chỗ vốn không hỏng.*
+
+### Số chốt phiên
+v6: **100 việc làm tại chỗ + 14 việc hàng loạt đi thẳng một cú bấm**. `_checknv` 228 lượt xanh.
+`_checkui` 1431 lượt xanh, nay đo bằng thước đợi-trạng-thái nên hết chập chờn.
 

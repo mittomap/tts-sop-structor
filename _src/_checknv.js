@@ -171,7 +171,10 @@ const TRANGTHAI = () => {
         gateEnter(sid);
         go("ban"); banChon(k);
         return ttDanhSach(k).filter(z => z.viec.length).slice(0, n)
-          .map(z => ({ma: z.ma, ten: z.ten, viec: z.viec.map(v => v.t)}));
+          .map(z => ({ma: z.ma, ten: z.ten, viec: z.viec.map(v => v.t),
+                      /* việc HÀNG LOẠT đã khai lý do: ở v6 nó đi thẳng tới màn chứ không mở
+                         ngăn kéo - chấm bằng thước khác, không phải thước "phải làm tại chỗ" */
+                      hl: z.viec.map(v => !!v.vichung)}));
       }, [A.sid, TT.k, MAXHS]);
 
       for (const H of hs) for (let i = 0; i < H.viec.length; i++) {
@@ -199,8 +202,9 @@ const TRANGTHAI = () => {
 
         if (!st.keoMo) {
           /* v5 cố ý nhảy trang - đó là thiết kế của bản 5, không phải lỗi. Nhưng nhảy sang một
-             trang TRỐNG hay nhảy xong lỗi JS thì vẫn là lỗi, nên vẫn phải soi. */
-          if (!laV6) {
+             trang TRỐNG hay nhảy xong lỗi JS thì vẫn là lỗi, nên vẫn phải soi.
+             Ở v6, 5 việc hàng loạt cũng cố ý nhảy trang (từ V9.81) - chấm y hệt vế v5. */
+          if (!laV6 || H.hl[i]) {
             dem.nhay++;
             const dai = await page.evaluate(() => (document.getElementById("content") || {}).innerHTML.length || 0);
             if (st.cur === "ban") do_.push(cx + ": bam Lam ma khong di dau ca, cung khong mo ngan keo");
