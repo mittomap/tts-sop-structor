@@ -128,6 +128,9 @@ if [ $NHANH -eq 1 ]; then
   ghi "_checkui" BOQUA "bo qua vi chay voi --nhanh"
 else
   chay "_checkui trinh duyet that" "CHECKUI (OK|BO QUA)" node _checkui.js
+  # NHAN VIEN AO: khong nhin man hinh nua ma NGOI LAM - bam Lam, dien form, bam Luu, doi chieu
+  # nhat ky xem co ghi that khong. Bo kiem duy nhat di het mot viec tu dau den cuoi.
+  chay "_checknv nhan vien ao" "CHECKNV (OK|BO QUA)" node _checknv.js
 fi
 
 echo

@@ -149,6 +149,28 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.80 — NHÂN VIÊN ẢO: MÁY NGỒI LÀM VIỆC THAY NGƯỜI ✅ (02/08).**
+> · Anh Luân hỏi *"e có máy học nào chạy thay nhân viên test luôn ko"*. Trả lời thật lúc đó là
+> CHƯA: 20 bộ kiểm đọc **chuỗi HTML**, `_checkui` mở trình duyệt thật 1431 lượt nhưng chỉ **NHÌN**
+> - không bấm một nút nào. Chưa bộ nào đi hết một VIỆC.
+> · `_src/_checknv.js` đi đủ sáu bước bằng **chuột thật**: vào app bằng danh tính một chức danh có
+> thật trong DL01 → mở Bàn làm việc → chọn thực thể → bấm hồ sơ → bấm **Làm** → điền form → bấm
+> **Lưu** → đối chiếu nhật ký DL25.
+> · **Luật chấm:** chỉ hai kết cục được tính đạt - app **GHI** (DL25 dài thêm) hoặc app **TỪ CHỐI
+> CÓ LỜI** (toast nói rõ thiếu gì). Còn lại đỏ, nguy hiểm nhất là **bấm mà không có gì xảy ra**.
+> · Số đo: **228 lượt việc** trên cả hai bản, 0 đỏ. v6 ghi được 100 + 14 việc hàng loạt, **0 lượt
+> im lặng**; v5 nhảy trang 114 lượt, không trang nào rỗng, không lỗi JS.
+> · **Ba bẫy của chính cái thước, cả ba đã cắn:** `actGuard` khoá 1200ms **thời gian thật** (bẫy
+> thước đang chạy, lần thứ năm) · **toast cũ còn hiện** bị tính là "app từ chối có lời" của lượt
+> sau - phá thật để đo: chưa xoá toast bắt 3 chỗ, xoá rồi bắt **7**, bốn lỗi kia bị chính cái
+> thước giấu đi · ngăn kéo còn mở sau khi ghi phải tách **mở tiếp màn kế** khỏi **form vừa lưu
+> đứng nguyên**.
+> · **Luật:** *một bộ kiểm hỏng không báo sai - nó im lặng bỏ qua. Phải phá app thật rồi đếm xem
+> nó bắt được mấy chỗ.*
+> · github.io: em vẫn **không mở được từ phiên này** - proxy trả 403 (chính sách egress chặn host),
+> không phải lỗi bản demo. Đối chiếu bằng đường khác: Pages đã deploy **thành công** đúng commit
+> `7ca5a51`, ba cửa đủ file, cửa v6 mang cờ `ITTS_V6=1`.
+
 > **Phiên bản: V9.79 — GỘP 15 SỔ TRA CỨU VỀ THEO THỰC THỂ ✅ (02/08).**
 > · Việc anh Luân đặt từ V9.69, nay trả. Mỗi sổ thuộc đúng **một** thực thể: Khách 3 · Học viên 8
 > · Lớp 3 · Phụ huynh 0 (không có sổ riêng). Sổ **Giảng viên** khai đứng ngoài kèm lý do - sổ
@@ -6935,3 +6957,61 @@ CỐ Ý ở trang rộng**, còn nợ **0**. Năm việc ấy đã khai lý do t
 
 ### Số chốt phiên
 Sổ đã gắn **14/15**, khai lý do đứng ngoài **1**. `_checkaudit` 50 → **55 tiêu chí**.
+
+## V9.80 - NHÂN VIÊN ẢO: MÁY NGỒI LÀM VIỆC THAY NGƯỜI (02/08)
+
+Anh Luân: *"Sao ko mở đc github nhỉ, e có máy học nào chạy thay nhân viên test luôn ko"*.
+
+### Câu hỏi 1 - github.io
+Em đã trả lời hớ một lần ("có vẻ bị chặn") rồi mới đi đo. Đo đúng: `curl --cacert` tới
+`mittomap.github.io` trả **403 ở tầng CONNECT**, và sổ lỗi của proxy ghi thẳng
+`connect_rejected · policy denial · mittomap.github.io:443`. Vậy là **chính sách egress của phiên
+cloud chặn host này**, không phải bản demo hỏng, cũng không phải lỗi phía anh. Không được vòng
+tránh, không được tắt kiểm chứng TLS.
+Đối chiếu bản online bằng đường khác - đường GitHub API: Pages **deploy thành công** đúng commit
+`7ca5a51` lúc 06:51Z hôm nay; ba cửa đều có `index.html`; cửa `cong-nhan-vien-v6` mang cờ
+`ITTS_V6=1`, cửa `cong-nhan-vien` mang `=0`. Anh mở không lên thì gần như chắc là **cache trình
+duyệt** - Cmd+Shift+R.
+
+### Câu hỏi 2 - máy chạy thay nhân viên
+Trả lời thật: tới sáng nay là **chưa có**. 20 bộ kiểm đầu đọc chuỗi HTML - không ai bấm.
+`_checkui` có mở Chromium thật 1431 lượt nhưng chỉ **NHÌN**: cuộn ngang, chữ bị cắt, nút quá nhỏ.
+Nghĩa là chưa bộ kiểm nào đi hết một **VIỆC** - đúng phần mà nhân viên thật làm cả ngày.
+
+`_src/_checknv.js` làm đúng chuyện đó, sáu bước bằng chuột thật trên DOM thật:
+vào app bằng danh tính một chức danh **có thật trong DL01** → mở Bàn làm việc → chọn một trong bốn
+thực thể → bấm một hồ sơ → bấm **Làm** → điền mọi ô còn trống → bấm **Lưu** → đối chiếu nhật ký
+DL25 có dài thêm không. Sau mỗi lượt, dựng lại toàn bộ dữ liệu về gốc để lượt sau không đo trên
+thế giới mà lượt trước đã sửa.
+
+**Luật chấm** - viết vào đầu file để bộ kiểm không thể xanh bằng cách dễ dãi: bấm Lưu xong chỉ có
+hai kết cục được tính là đạt - (a) app **GHI**, DL25 dài thêm ít nhất một dòng; (b) app **TỪ CHỐI
+CÓ LỜI**, hiện toast nói rõ thiếu gì. Mọi kết cục khác là đỏ, và cái nguy hiểm nhất là **bấm mà
+không có gì xảy ra**: người thật sẽ bấm lại vài lần rồi bỏ đi, còn bộ kiểm chuỗi thì không bao giờ
+nhìn thấy.
+
+Hai bản chấm theo hai vế khác nhau, vì chúng cố ý khác nhau đúng chỗ này: **v6** phải mở ngăn kéo
+tại chỗ; **v5** cố ý nhảy trang, nên hỏi lại - nhảy tới trang nào, trang đó có rỗng không, có lỗi
+JS không.
+
+### Ba cái bẫy nằm trong CHÍNH CÁI THƯỚC - cả ba đều cắn khi dựng
+1. **Bấm hai lần.** `actGuard` khoá theo **thời gian thật** 1200ms. Máy chạy nhanh hơn người rất
+   nhiều nên hai lượt thử khác nhau rơi vào cùng cửa sổ khoá, lượt sau bị app từ chối oan và bộ
+   kiểm báo một lỗi **không có thật**. Phải xoá `__actT` mỗi lần dựng lại thế giới. Bẫy "thước
+   đang chạy", **lần thứ năm** trong dự án này.
+2. **Toast cũ còn hiện.** Toast sống 1.9 giây thật. Không xoá trước khi bấm Lưu thì câu nhắc của
+   lượt TRƯỚC bị tính là "app từ chối có lời" của lượt NÀY - và **một nút Lưu chết được chấm là
+   đạt**. Đo bằng cách phá app thật (chặn `bkLuuLienHe`): chưa xoá toast bắt được **3** chỗ, xoá
+   rồi bắt được **7**. Bốn lỗi kia đã bị chính cái thước giấu đi.
+3. **Ngăn kéo còn mở sau khi ghi.** Phải tách hai chuyện khác hẳn nhau: **mở tiếp màn kế** (thu
+   tiền xong ra biên lai - đúng thiết kế) và **cái form vừa lưu đứng nguyên** (người dùng không
+   biết đã lưu chưa, rất dễ bấm Lưu lần nữa). So tiêu đề ngăn kéo trước/sau mới tách được.
+
+**Luật rút ra:** *một bộ kiểm hỏng thì không báo sai - nó im lặng bỏ qua. Cách duy nhất biết nó
+thật sự canh được gì là PHÁ app rồi đếm xem nó bắt được mấy chỗ.*
+
+### Số chốt phiên
+**228 lượt việc** làm thật trên hai bản build, **0 đỏ**. v6: 100 lượt ghi được (34 lượt trong đó
+mở tiếp màn kế) + 14 việc hàng loạt, **0 lượt im lặng**. v5: 114 lượt nhảy trang, không trang nào
+rỗng, không lỗi JS. `_checknv` đã nằm trong `./verify.sh` mục 5.
+
