@@ -1170,6 +1170,13 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .bankgroup>summary.bankmo:hover{color:var(--ink)}
 .tbar.tbso{margin-top:-4px;margin-bottom:14px}
 .tbar.banai{gap:8px}
+.quyenbox{margin-top:14px}
+.quyenr{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:9px 2px;border-top:1px solid var(--line)}
+.quyenr:first-child{border-top:0}
+.quyent{font-size:12.5px;font-weight:700;color:var(--ink);min-width:210px;flex:none}
+.quyenv{display:flex;gap:5px;flex-wrap:wrap}
+.quyenn{font-size:11.5px;margin-left:auto;text-align:right;max-width:46%}
+@media(max-width:700px){.quyent{min-width:100%}.quyenn{margin-left:0;text-align:left;max-width:100%}}
 .tbar.banai select{font-family:inherit;font-size:12px;font-weight:600;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:#fff}
 .tbar.tbso .segb{font-size:12px}
 .banji{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none;background:var(--gray);color:#5A6675}
@@ -5459,13 +5466,66 @@ function duyPayList(){return rows("DL07").filter(function(p){
 function duyTaskList(){return rows("DL23").filter(function(t){return tkSt(t)==="new"})}
 function duyTabSet(k){window.DUYTAB=k;reRender("duyet")}
 function duyN(){var n=0;duyTabs().forEach(function(x){n+=x.n});return n}
+/* -- AI DUOC DUYET VIEC GI (khoi cho nguoi chot he thong) --------------------------------
+   Anh Luan 03/08: *"o trang cua admin hoac giam doc, no co them 1 block nho ghi ai co quyen
+   duyet... no ho tro cho viec chot he thong"*.
+   Dung: bang phan quyen CH3 dang nam trong Cai dat - muon biet "ai duyet chiet khau" phai roi
+   man dang lam, mo Cai dat, tim dung dong. Nguoi dang chot he thong thi hoi cau ay lien tuc.
+   Dua cau tra loi ve DUNG CHO no duoc hoi.
+
+   LUAT QUAN TRONG: khoi nay DOC THANG tu CH3BY va DL01, khong chep lai mot ban danh sach nao.
+   Du an nay da cắn hai lan vi mot ban do cam cung (BVLAND o v6, NAVTREE o menu) - ban do roi
+   xa su that ma khong ai thay. O day chi co MOT nguon: sua phan quyen trong Cai dat la khoi
+   nay doi theo ngay.
+
+   Chi hien voi nguoi toan quyen (Quan tri vien, Giam doc). Nhan vien mo trang nay la de LAM
+   viec cua ho, khong phai de doc so do to chuc. */
+function duyAiHTML(){
+ if(!banToanQuyen())return "";
+ var ds=[];
+ (BVDUYET||[]).forEach(function(x){if(ds.indexOf(x[0])<0)ds.push(x[0])});
+ /* Va lay THEM moi hanh dong ma chinh bang CH3 danh dau `duyet:1`. Ban dau em go tay ba ten
+    o day - hai trong ba KHONG TON TAI, khoi nay lang le thieu hai dong. Dung cai bay ma chinh
+    file nay canh bao: mot ban danh sach go tay se troi xa su that. Doc tu bang. */
+ Object.keys(CH3BY||{}).forEach(function(a){
+   if(CH3BY[a]&&CH3BY[a].duyet&&ds.indexOf(a)<0)ds.push(a)});
+ ds=ds.filter(function(a){return !!CH3BY[a]});
+ if(!ds.length)return "";
+ var nguoi=rows("DL01").filter(function(x){return !/inactive|ngh\u1ec9/i.test(String(x.status||""))});
+ var h='<div class="panel quyenbox"><div class="ph"><i class="ti ti-shield-check" style="margin-right:7px"></i>'+
+  '<b>Ai duy\u1ec7t vi\u1ec7c g\u00ec</b>'+
+  '<span class="mut" style="margin-left:8px;font-size:11.5px">theo b\u1ea3ng ph\u00e2n quy\u1ec1n CH3 c\u1ee7a SOP</span>'+
+  '<button class="btn sm" style="margin-left:auto" onclick="go(\'settings\');window.SETTAB=\'phanquyen\'">'+
+  '<i class="ti ti-adjustments"></i>S\u1eeda ph\u00e2n quy\u1ec1n</button></div><div class="pbody">';
+ ds.forEach(function(a){
+  var C=CH3BY[a]||{};
+  /* Ai lam duoc - hoi lai chinh canAct bang cach dong vai tung nguoi, khong suy tu bang vai.
+     Hoi bang canAct thi ke ca luat sua tay trong Cai dat cung duoc tinh dung. */
+  var goc=window.GATE_SID||"", ai=[];
+  nguoi.forEach(function(x){
+   try{applyScope(x.staff_id);if(canAct(a))ai.push(x)}catch(e){}});
+  try{applyScope(goc)}catch(e){}
+  var vai={};ai.forEach(function(x){var v=elabel(x.role)||ecode(x.role)||"";if(v)vai[v]=(vai[v]||0)+1});
+  var dsVai=Object.keys(vai);
+  h+='<div class="quyenr">'+
+   '<div class="quyent">'+esc(C.t||a)+'</div>'+
+   '<div class="quyenv">'+(dsVai.length
+     ? dsVai.map(function(v){return '<span class="chip">'+esc(v)+' <b>'+vai[v]+'</b></span>'}).join(" ")
+     : '<span class="chip red">Ch\u01b0a ai \u0111\u01b0\u1ee3c giao</span>')+'</div>'+
+   '<div class="quyenn mut">'+(ai.length?(ai.length+" ng\u01b0\u1eddi: "+esc(ai.slice(0,4).map(function(x){return x.full_name||x.staff_id}).join(", "))+
+      (ai.length>4?(" v\u00e0 "+(ai.length-4)+" ng\u01b0\u1eddi n\u1eefa"):""))
+      :"Kh\u00f4ng ai trong danh s\u00e1ch nh\u00e2n s\u1ef1 hi\u1ec7n t\u1ea1i duy\u1ec7t \u0111\u01b0\u1ee3c vi\u1ec7c n\u00e0y")+'</div>'+
+   '</div>'});
+ h+='</div></div>';
+ return h}
 function renderDuyet(){var TH=ckThreshold();
  var tab=window.DUYTAB||"duyetck";
  var TB=duyTabs();
  var h=pageHead("Chờ duyệt & quyết định","Hàng chờ phê duyệt: chiết khấu, hoàn tiền, đơn xin nghỉ, đối soát tiền, việc được giao, bàn giao lead","");
  /* tab nào KHÔNG phải việc của vai này thì không hiện - hub gom việc lại, không gom quyền lại */
  var segs=scopeTabs("duyet",TB.map(function(x){return [x.k,x.t,x.n||"",x.n?"amber":""]}));
- if(!segs.length)return h+'<div class="panel"><div class="empty">Chức danh của bạn không có hàng chờ quyết định nào.</div></div>';
+ var _ai="";try{_ai=duyAiHTML()}catch(e){_ai=""}
+ if(!segs.length)return h+'<div class="panel"><div class="empty">Chức danh của bạn không có hàng chờ quyết định nào.</div></div>'+_ai;
  if(!segs.some(function(t){return t[0]===tab})){tab=segs[0][0];window.DUYTAB=tab}
  /* V9.40 - Ô THỐNG KÊ BẤM CHẾT. Trước đây dải này vẽ từ duyTabs() ĐẦY ĐỦ trong khi dải tab đi
     qua scopeTabs (đã lọc quyền). Đo: NV007 5 ô / 2 tab -> 3 ô bấm không tới; NV005 4 ô chết;
@@ -5476,12 +5536,12 @@ function renderDuyet(){var TH=ckThreshold();
     ngay ben duoi - cung con so, cung dich bam. Mot man mot bo dieu khien: chip tab da mang so,
     dai o thong ke bo han. */
  h+=tbar(segHTML(tab,segs,"duyTabSet('{k}')"),"");
- if(tab==="duyetnghi")return h+duyNghiHTML();
- if(tab==="duyetthu")return h+duyThuHTML();
- if(tab==="duyetgiao")return h+duyGiaoHTML();
- if(tab==="banggiao")return h+renderBanggiao(1);
- if(tab==="duyethoan")return h+duyHoanHTML();
- return h+duyCkHTML(TH)}
+ if(tab==="duyetnghi")return h+duyNghiHTML()+_ai;
+ if(tab==="duyetthu")return h+duyThuHTML()+_ai;
+ if(tab==="duyetgiao")return h+duyGiaoHTML()+_ai;
+ if(tab==="banggiao")return h+renderBanggiao(1)+_ai;
+ if(tab==="duyethoan")return h+duyHoanHTML()+_ai;
+ return h+duyCkHTML(TH)+_ai}
 /* --- tab ĐƠN XIN NGHỈ: dùng lại đúng hàng đợi của màn điểm danh, không dựng bản thứ hai --- */
 function duyNghiHTML(){var q=absQueue();
  if(!q.length)return '<div class="panel"><div class="empty">Không có đơn xin nghỉ học nào chờ duyệt.</div></div>';
