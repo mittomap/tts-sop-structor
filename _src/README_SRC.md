@@ -39,6 +39,14 @@ ITTS_OUT="<mnt>/SOP ITTs" python3 gen_v5.py
 > không phải để gõ tay từng dòng.
 >
 > `_APP.js` / `_HV.js` sinh bằng `_src/extract_js.py` - **không** phải mã nguồn, đừng sửa.
+>
+> **Đồng hồ và đếm ngược (V9.96c).** Mỗi bộ in kèm thời gian chạy của chính nó và ước lượng
+> **còn bao lâu nữa**; cuối bảng in tổng thời gian. Ước lượng lấy từ bảng giờ **đo được ở lượt
+> trước trên chính máy này** (`_src/_thoigian_verify.txt`, `..._nhanh.txt` cho `--nhanh`; cả hai
+> nằm ngoài git vì mỗi máy một tốc độ) - nên lượt đầu tiên trên máy mới chưa có đếm ngược, từ
+> lượt hai trở đi càng chạy càng sát. Số đo trên máy cloud (03/08): **tổng 26m47s**, trong đó
+> `_checkui` 8m12s + `_checknv` 4m09s + `_checkbam` 3m07s - tức mục 5 chiếm hơn nửa; muốn nhanh
+> thì `./verify.sh --nhanh` (~11 phút, bỏ phần trình duyệt).
 
 Bộ kiểm gồm **18 phần, phải xanh HẾT mới được giao** (~2.100 tiêu chí tự động + 488 lượt mở thật trong trình duyệt):
 | Lệnh | Kỳ vọng |
@@ -393,6 +401,16 @@ Chi tiet "vi sao" o `02_NHAT_KY_QUYET_DINH.md`. O day chi ghi nhung cho **cham v
   NO mang chu, duoi 3.0 la do (chip kia do duoc 1.9). **Co y khong lay 4.5 cua chuan AA**: app
   dung nhieu chu phu mau xam nhat co chu dich, siet thang len 4.5 la do hang loat cho khong ai
   keu - thuoc keu qua nhieu thi nguoi ta tat no di.
+- `_checkui` **do o ty le 100%, khong do o ty le mac dinh 90%** (V9.96c). Sau khi app mac dinh
+  thu nho 90%, thuoc bao **141 nut qua nho**. Phan xa dau tien la phinh nut len 27px cho qua
+  thuoc - lam roi: **van con 107 cho do** va app dac lai trong thay. Do la dau hieu ro rang cua
+  viec **dang do sai dai luong**. Luat "nut >=24px" tinh bang **pixel CSS** - no noi ve kich
+  thuoc NGUOI THIET KE dat ra, khong phai kich thuoc sau khi nguoi dung tu thu nho man hinh; nut
+  24px xem o 90% ra 21,6px vat ly, y het nhu nguoi dung bam Ctrl+-, do la LUA CHON CUA HO. Nay
+  harness khai san `ITTS_ZOOM_V1=100` vao localStorage trong `addInitScript` de app tu dung ty le
+  goc. Ban than nut ty le co phep thu rieng (smokezoom) va `zoomApply` tu tat thu nho duoi 1200px.
+  **Luat: thuoc va app cai nhau thi phai tim ra ben nao sai - dung mac dinh la app, va cung dung
+  bit mieng thuoc; sua cho no do dung dai luong.**
   Kem mot bay ky thuat dang ghi lai: hai ham phu cua phep do phai nam TRONG than `PROBE`, vi
   `page.evaluate` chi gui than ham do sang trinh duyet - de o ngoai thi ben kia khong co, va loi
   ay IM LANG (phep do tra ve rong, bo kiem van xanh).

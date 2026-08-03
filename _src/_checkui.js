@@ -210,7 +210,16 @@ const PROBE = () => {
       /* V9.51: man chao phien dau (helloMaybe) chi hien voi NGUOI THAT lan dau - harness phai
          tu nhan "da chao roi", khong thi tam chao che moi phep do bam nut. Man chao co bo kiem
          rieng trong _checkqa (hop dong nguon + ve that). */
-      localStorage.setItem("ITTS_HELLO_V1","1"); } catch (e) {} }, C.who);
+      localStorage.setItem("ITTS_HELLO_V1","1");
+      /* V9.96c: DO GIAO DIEN O TY LE 100%, KHONG PHAI O TY LE MAC DINH 90%.
+         Luat "nut phai >=24px" la luat tinh bang PIXEL CSS - no noi ve kich thuoc ma NGUOI THIET KE
+         dat ra, khong phai kich thuoc sau khi nguoi dung tu thu nho man hinh. Nut 24px xem o 90%
+         ra 21.6px vat ly, dung y het nhu nguoi dung bam Ctrl+- tren trinh duyet: do la LUA CHON
+         CUA HO, khong phai loi cua app. Neu de thuoc do o 90% thi de sua duy nhat la phinh moi
+         nut len 27px - da thu, no lam dac lai toan bo app va van con 107 cho do: dau hieu ro rang
+         la DANG DO SAI THU, khong phai app sai. Nen harness khai san ty le 100% vao localStorage
+         de app tu dung dung ty le goc; con ban than nut zoom co bo kiem rieng (smokezoom + _checkqa). */
+      localStorage.setItem("ITTS_ZOOM_V1","100"); } catch (e) {} }, C.who);
     await page.goto("file://" + require("path").resolve(OUT) + "/" + C.f, {waitUntil: "load"});
     await page.waitForFunction(() => typeof window.go === "function" || typeof window.renderTrangHV === "function", null, {timeout: 30000});
     await page.waitForTimeout(400);

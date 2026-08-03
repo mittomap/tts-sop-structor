@@ -149,6 +149,23 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.96c — THƯỚC ĐO SAI CHỖ, VÀ ĐỒNG HỒ CHO VERIFY ✅ (03/08).**
+> · **Sau khi mặc định tỷ lệ hiển thị 90%, `_checkui` báo 141 "nút quá nhỏ".** Phản xạ đầu tiên
+> của em là phình nút lên 27px cho qua thước - làm rồi: **vẫn còn 107 chỗ đỏ**, và app đặc lại
+> trông thấy. Đó là dấu hiệu rõ ràng của việc **đang đo sai thứ, không phải app sai**. Luật
+> "nút phải ≥24px" là luật tính bằng **pixel CSS** - nó nói về kích thước NGƯỜI THIẾT KẾ đặt ra,
+> không phải kích thước sau khi người dùng tự thu nhỏ màn hình. Nút 24px xem ở 90% ra 21,6px vật
+> lý, y hệt như người dùng bấm Ctrl+- trên trình duyệt: **đó là lựa chọn của họ**. Nên `_checkui`
+> nay khai sẵn `ITTS_ZOOM_V1=100` vào localStorage trước khi đo; bản thân nút tỷ lệ có phép thử
+> riêng. Hoàn nguyên toàn bộ phần phình nút. **Luật: thước và app cãi nhau thì phải tìm ra bên
+> nào sai, đừng mặc định là app - và cũng đừng bịt miệng thước, hãy sửa cho nó đo đúng đại lượng.**
+> · **`verify.sh` có đồng hồ** (anh Luân: *"chờ em chạy mà ko có đếm ngược cũng hơi khó, lâu ghê
+> á, còn bao lâu nữa em"*). Mỗi bộ kiểm nay in thời gian chạy của chính nó và **ước lượng còn bao
+> lâu**; cuối bảng in tổng thời gian. Số ước lượng lấy từ **bảng giờ đo được ở lượt trước trên
+> chính máy này** (`_src/_thoigian_verify.txt`, không vào git vì mỗi máy một tốc độ), nên lượt đầu
+> chưa có đếm ngược, từ lượt hai trở đi càng chạy càng sát. Nhờ đó cũng thấy được bộ nào ăn thời
+> gian để mà tối ưu.
+
 > **Phiên bản: V9.96 — TOUR NHẦM BẢN: LỖI NGHIÊM TRỌNG NHẤT TRONG NGÀY ✅ (03/08).**
 > · Anh Luân: *"cái tour, em có đang nhầm V5 với V6 ko? sao a đang ở V5, tự nhiên cái tour làm
 > xuất hiện thực thể của V6... em ko tách biệt được V5 và V6 sẽ làm lỗi kéo theo rất nghiêm

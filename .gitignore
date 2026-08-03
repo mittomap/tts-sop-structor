@@ -15,3 +15,8 @@ _src/_vhbc_spec.json
 _src/ITTs_WebApp_v5_demo.html
 _src/ITTs_TrangHocVien_demo.html
 _src/ITTs_data.js
+
+# bang gio verify.sh do duoc tren MAY NAY - de dem nguoc "con ~N phut" o luot sau.
+# Moi may mot toc do nen khong dua vao git (V9.96c)
+_src/_thoigian_verify.txt
+_src/_thoigian_verify_nhanh.txt

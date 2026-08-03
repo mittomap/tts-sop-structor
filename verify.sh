@@ -22,12 +22,44 @@ Do=$'\033[31m'; Xanh=$'\033[32m'; Vang=$'\033[33m'; Dam=$'\033[1m'; Het=$'\033[0
 LOI=0
 declare -a KETQUA
 
+# ── DONG HO & DEM NGUOC ───────────────────────────────────────────────────────────────────
+# Vi sao co: mot luot day mat 25-30 phut, trong do rieng phan trinh duyet chiem hon hai phan ba.
+# Ngoi nhin man hinh dung im khong biet con bao lau la cam giac "treo may", va cung khong biet
+# bo nao dang an thoi gian de ma toi uu. Nen: bam gio TUNG BO, ghi lai vao mot bang, lan chay
+# sau lay chinh bang do lam uoc luong -> in duoc "con ~9 phut". Bang gio la SO DO DUOC tu may
+# nay chu khong phai so em doan, va no tu chinh dan sau moi luot chay.
+# Bang gio khong vao git (moi may mot toc do) - xem .gitignore.
+TFILE="$GOC/_src/_thoigian_verify$([ "${1:-}" = "--nhanh" ] && echo "_nhanh").txt"
+declare -A UOC; declare -A GIO
+TONGUOC=0
+if [ -f "$TFILE" ]; then
+  while IFS='|' read -r _k _v; do
+    [ -n "${_k:-}" ] && [ -n "${_v:-}" ] && { UOC["$_k"]="$_v"; TONGUOC=$((TONGUOC+_v)); }
+  done < "$TFILE"
+fi
+T0=$(date +%s)
+GIAY=-1  # chay() dat gia tri nay truoc khi goi ghi(); -1 = buoc khong bam gio
+
+# in "2m10s" hoac "45s"
+_thoigian() { local s=$1; if [ "$s" -ge 60 ]; then printf "%dm%02ds" $((s/60)) $((s%60)); else printf "%ds" "$s"; fi; }
+
 ghi() {  # ghi <ten> <trang-thai> <chi-tiet>
   KETQUA+=("$1|$2|$3")
+  local dh=""
+  if [ "$GIAY" -ge 0 ]; then
+    dh="$(_thoigian "$GIAY")"
+    if [ "$TONGUOC" -gt 0 ]; then
+      local conlai=$((TONGUOC - ($(date +%s) - T0)))
+      [ "$conlai" -lt 0 ] && conlai=0
+      dh="$dh · con ~$(_thoigian "$conlai")"
+    fi
+    dh="[$dh]"
+  fi
+  GIAY=-1
   case "$2" in
-    OK)   printf "  ${Xanh}v${Het} %-26s %s\n" "$1" "$3" ;;
-    BOQUA)printf "  ${Vang}-${Het} %-26s %s\n" "$1" "$3" ;;
-    *)    printf "  ${Do}X${Het} %-26s ${Do}%s${Het}\n" "$1" "$3"; LOI=$((LOI+1)) ;;
+    OK)   printf "  ${Xanh}v${Het} %-26s %-20s %s\n" "$1" "$dh" "$3" ;;
+    BOQUA)printf "  ${Vang}-${Het} %-26s %-20s %s\n" "$1" "$dh" "$3" ;;
+    *)    printf "  ${Do}X${Het} %-26s %-20s ${Do}%s${Het}\n" "$1" "$dh" "$3"; LOI=$((LOI+1)) ;;
   esac
 }
 
@@ -38,8 +70,10 @@ ghi() {  # ghi <ten> <trang-thai> <chi-tiet>
 #                 nen bat buoc phai soi noi dung chu khong tin ma thoat)
 chay() {
   local ten="$1" mau="$2"; shift 2
-  local out ma cuoi
+  local out ma cuoi _t1
+  _t1=$(date +%s)
   out="$("$@" 2>&1)"; ma=$?
+  GIAY=$(( $(date +%s) - _t1 )); GIO["$ten"]=$GIAY
   cuoi="$(printf '%s' "$out" | tail -1)"
   if [ "$mau" = "-" ]; then
     if [ $ma -eq 0 ]; then ghi "$ten" OK "${cuoi:-khong bao gi (dung)}"
@@ -153,7 +187,12 @@ else
   chay "_checkbam bam thu moi cho" "CHECKBAM (OK|BO QUA)" node _checkbam.js
 fi
 
+# Ghi lai bang gio de luot sau co cai ma dem nguoc. Chi ghi khi chay day du (khong bi cat giua
+# chung), va ghi ca luot do lan luot xanh - mot bo do vi FAIL van ton dung tung ay thoi gian.
+{ for _k in "${!GIO[@]}"; do printf '%s|%s\n' "$_k" "${GIO[$_k]}"; done; } > "$TFILE" 2>/dev/null || true
+
 echo
+printf "${Dam}Tong thoi gian:${Het} %s\n" "$(_thoigian $(( $(date +%s) - T0 )))"
 echo "${Dam}=================== TONG KET ===================${Het}"
 if [ $LOI -eq 0 ]; then
   printf "${Xanh}${Dam}XANH HET.${Het} Ban sua nay khong lam gay gi trong pham vi bo kiem.\n\n"
