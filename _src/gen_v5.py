@@ -4429,13 +4429,20 @@ function bangViecHTML(){
  var L=BVLAND[g];if(!L)return "";
  var dap=SCOPE().land||L[0];
  if(CUR!==dap)return "";
+ /* Ô "Xem việc của" ở BẢN 5. Anh Luân 03/08: *"vậy là cái V5, thực ra ở mấy cổng quản lý, vẫn
+    có thể cho quản lý lọc theo người và vị trí như V6 mà phải ko nhỉ?"* - đúng, và đo được là
+    bản 5 CHƯA có: `ban` không nằm trong menu bản 5, nên quản lý bản 5 không có lối nào tới ô ấy.
+    Máy móc dùng chung, chỉ thiếu chỗ đặt. Đặt ngay trên bảng việc - đúng chỗ họ bắt đầu ngày.
+    Bản 6 đã có ô này trên Bàn làm việc rồi; thêm lần nữa là hai ô giống hệt trên cùng một màn. */
+ var _pick="";
+ if(!(typeof V6==="function"&&V6())){try{_pick=banAiHTML()}catch(e){_pick=""}}
  /* Tab của hub chỉ xét khi trang đáp ĐÚNG LÀ hub đó (v5). Ở v6 trang đáp là Bàn làm việc,
     không có tab, nên bỏ qua vế này. */
  if(dap===L[0]){
   if(L[1]){var tb=(L[0]==="tuyensinh")?window.TSTAB:(L[0]==="hoctap"?window.HTTAB:null);
    if(tb&&tb!==L[1])return ""}
  }
- var T=BANGVIEC(),h="";
+ var T=BANGVIEC(),h=_pick;
  var B=T[bvKhoi(g)];
  /* Chỉ mấy bảng CÓ TRONG SOP mới ghi "theo BC… của SOP"; bảng nào tự dựng thì ghi thẳng nó
     trông coi mảng gì, chứ không ghép thành câu "theo tiền & học phí của SOP". */
@@ -18123,7 +18130,7 @@ function banXem(sid){
  applyScope(sid||"");
  try{phQuen()}catch(e){}
  try{buildNav()}catch(e){}
- reRender("ban")}
+ reRender(CUR||"ban")}
 function banVeMinh(){
  var goc=window.BANGOC!==undefined?window.BANGOC:"";
  window.BANAI="";window.BANMO="";window.BANGOC=undefined;
@@ -18131,7 +18138,7 @@ function banVeMinh(){
  applyScope(goc);
  try{phQuen()}catch(e){}
  try{buildNav()}catch(e){}
- reRender("ban")}
+ reRender(CUR||"ban")}
 /* Tên để in lên nhãn "việc của ..." - đang mượn ghế ai thì gọi tên người đó, không thì gọi tên
    BỘ PHẬN chứ không phải "tôi". Anh Luân: *"sao em ko để kiểu: việc của học vụ, việc của giảng
    viên... Để vậy sẽ dễ làm đấy em"* - và anh đúng: "của tôi" bắt người đọc tự dịch xem "tôi" là
@@ -18157,9 +18164,15 @@ function banAiHTML(){
  var h='<div class="tbar banai"><span class="mut" style="font-size:11.5px;align-self:center">Xem việc của:</span>'+
   '<select onchange="banXem(this.value)" style="max-width:280px">'+
    '<option value="" selected>'+esc(banToanQuyen()?"Toàn hệ thống (chính tôi)":"Chính tôi")+'</option>'+
-   ds.map(function(x){return '<option value="'+esc(x.staff_id)+'">'+
-     esc(x.full_name||x.staff_id)+' - '+esc(elabel(x.role)||ecode(x.role)||"")+'</option>'}).join("")+
-  '</select><span class="mut" style="font-size:11.5px">chọn một người để xem đúng màn hình của họ</span>';
+   (function(){var nhom=[],idx={};
+     ds.forEach(function(x){var v=elabel(x.role)||ecode(x.role)||"Khác";
+       if(idx[v]===undefined){idx[v]=nhom.length;nhom.push([v,[]])}
+       nhom[idx[v]][1].push(x)});
+     return nhom.map(function(g){
+       return '<optgroup label="'+esc(g[0])+'">'+g[1].map(function(x){
+         return '<option value="'+esc(x.staff_id)+'">'+esc(x.full_name||x.staff_id)+'</option>'}).join("")+
+       '</optgroup>'}).join("")})()+
+  '</select><span class="mut" style="font-size:11.5px">chọn theo chức danh rồi chọn người - màn hình sẽ hiện đúng như người đó nhìn thấy</span>';
  h+='</div>';
  return h}
 /* ── SỔ PHỤ HUYNH ─────────────────────────────────────────────────────────────────────────
