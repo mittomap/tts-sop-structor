@@ -200,8 +200,11 @@ t("V9.18 trang HV: co timeline buoi hoc + khong con Gui phu huynh", (function(){
  return o.indexOf('class="hvtl"')>=0&&o.indexOf("Gửi phụ huynh")<0})());
 t("V9.18 chip trang thai khoa dac mau (fill-)", (function(){
  window.HVID="HV061";var o=renderTrangHV();return o.indexOf("chip fill-")>=0})());
-t("V9.18 tab demo gon: co Reset, het huong dan dai", (function(){window.SETTAB="demo";var o=RENDER.settings();window.SETTAB="ch2";
- return o.indexOf("Reset demo")>=0&&o.indexOf("Cách demo hai cổng")<0})());
+/* Bam vao HAM chu khong vao nhan hien thi: nhan da doi mot lan (V9.88 gop nam cai ten
+   "Reset demo"/"Dung lai du lieu demo"/"Reset du lieu demo" thanh MOT ten "Dung lai demo"),
+   va con doi nua. Bo kiem canh CHUC NANG co mat, khong canh cach goi ten no. */
+t("V9.18 tab demo gon: co nut dung lai demo, het huong dan dai", (function(){window.SETTAB="demo";var o=RENDER.settings();window.SETTAB="ch2";
+ return o.indexOf("demoResetHoi()")>=0&&o.indexOf("Cách demo hai cổng")<0})());
 CUR="banlam";window.BLVIEW="list";
 t("V9.18b hint o tim hero nam NGOAI hop tim (khong de len input)", RENDER.banlam().indexOf('</div><span class="bwsrchhint"')>=0);
 

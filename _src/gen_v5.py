@@ -970,16 +970,16 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 @media(max-width:860px){.cbit{min-width:46%;border-right:0}}
 .tbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;margin-bottom:12px}
 .tbar .srch{margin:0}
-.seg{display:inline-flex;background:var(--bg);border-radius:8px;padding:3px;gap:2px;flex-wrap:wrap}
-.segb{border:0;background:transparent;color:#5A6675;font-family:inherit;font-size:11.5px;font-weight:700;padding:0 11px;height:28px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.12s}
+.seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:8px;padding:3px;gap:2px;flex-wrap:wrap}
+.segb{border:0;background:transparent;color:#3A4756;font-family:inherit;font-size:12px;font-weight:700;padding:0 12px;height:30px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.12s}
 /* V9.47: nút mở/thu dải chip dài - phải KHÁC hẳn các chip lọc để mắt không nhầm nó là một nhóm */
 .segb.segmo{color:var(--navy);border:1px dashed var(--line);font-weight:800}
 .segb.segmo:hover{border-color:var(--navy);background:#FAFBFD}
-.segb:hover{color:var(--navy)}
-.segb.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(16,32,58,.14)}
+.segb:hover{color:var(--navy);background:var(--bg)}
+.segb.on{background:var(--navy);color:#fff;box-shadow:none}
 .segb.on.red{color:#A32D2D}.segb.on.amber{color:#854F0B}.segb.on.green{color:#1E6A47}
 .segn{font-style:normal;font-size:10px;font-weight:800;background:rgba(46,90,136,.10);color:#5A6675;border-radius:20px;padding:1px 6px;min-width:17px;text-align:center;line-height:1.5}
-.segb.on .segn{background:var(--navy);color:#fff}
+.segb.on .segn{background:#ffffff33;color:#fff}
 .segb.on.red .segn{background:var(--red);color:#fff}
 .segb.on.amber .segn{background:var(--amber);color:#fff}
 .segb.on.green .segn{background:var(--green);color:#fff}
@@ -1710,7 +1710,7 @@ body.drsz .drawer{transition:none}
   <div class="main">
     <div class="topbar">
       <button class="tbtn navtoggle" onclick="toggleNav()" aria-label="Menu"><i class="ti ti-menu-2"></i></button>
-      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div style="min-width:0"><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none;align-items:center;gap:8px;margin-left:auto"><button class="btn sm" onclick="demoResetHoi()" title="Đưa dữ liệu demo về nguyên bản - mọi cửa sổ đang mở cùng nạp lại"><i class="ti ti-refresh"></i><span class="tbl">Reset demo</span></button></span></div>
+      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div style="min-width:0"><h1 id="pgTitle">Tổng quan</h1><div class="crumb" id="pgCrumb">-</div></div><span id="demoBadgeWrap" style="display:none"></span></div>
       <div class="rolesel">
 <!-- V9.29: bỏ ô chọn vai roleSel - luôn bị ẩn từ V9.9, giữ lại chỉ tổ rối -->
         <button class="tbtn" id="congBtn" data-tour="doicong" onclick="congDoiMo()" aria-label="Đổi cổng" data-tip="Đổi cổng - sang cổng học viên hoặc cổng phụ huynh, dữ liệu vẫn là một"><i class="ti ti-arrows-exchange"></i></button>
@@ -5161,7 +5161,7 @@ function cfBarSync(){var b=document.getElementById("cfBar");if(!b)return;
     liệu mẫu và chỉ nằm trên máy này. Người xem demo hay tưởng mình đang đụng vào số thật. */
  b.className="cfbar on demo";
  b.innerHTML='<i class="ti ti-info-circle"></i><span data-tip="Mọi thao tác chạy thật nhưng chỉ lưu trên máy này, không ảnh hưởng số liệu thật."><b>Dữ liệu demo</b></span>'+
-  '<button class="btn sm" onclick="demoResetHoi()"><i class="ti ti-refresh"></i>Dựng lại dữ liệu demo</button>'}
+  '<button class="btn sm" onclick="demoResetHoi()"><i class="ti ti-refresh"></i>Dựng lại demo</button>'}
 function cfGhiDuoc(){return cfMode()==="that"}
 /* Hộp hỏi mật khẩu dùng chung. `xong` là TÊN hàm (chuỗi) - đi qua cfnGet như confirmRun, để
    không phải nhét hàm vào thuộc tính onclick. */
@@ -5194,7 +5194,7 @@ function cfDoiCheDo(){
    là đúng cái "rắc rối" anh Luân vừa bảo bỏ. Chỉ còn hộp xác nhận như cũ. */
 function demoResetHoi(){
  if(cfGhiDuoc()){demoReset();return}
- pwHoi("Dựng lại dữ liệu demo",
+ pwHoi("Dựng lại demo",
   "Thao tác này xoá MỌI thay đổi dữ liệu của buổi demo và quay về dữ liệu gốc (cấu hình giữ nguyên). Cần mật khẩu quản trị.","demoResetMo")}
 function demoResetMo(){cfSetMode("that");demoReset()}
 function confirmRun(msg,fn,arg){var m=document.getElementById("cfm");if(!m){var g0=cfnGet(fn);if(g0)g0(arg);return}window.__cfn=fn;window.__carg=arg;document.getElementById("cfmMsg").textContent=msg;m.classList.add("on")}
@@ -5464,7 +5464,7 @@ function duyRefundList(){return rows("DL06").filter(function(r){
 function duyPayList(){return rows("DL07").filter(function(p){
  return num(p.amount)>0&&!(p.verified_by&&String(p.verified_by).trim())})}
 function duyTaskList(){return rows("DL23").filter(function(t){return tkSt(t)==="new"})}
-function duyTabSet(k){window.DUYTAB=k;reRender("duyet")}
+function duyTabSet(k){if(DUYMAP[k]){go(k);return}window.DUYTAB=k;reRender("duyet")}
 function duyN(){var n=0;duyTabs().forEach(function(x){n+=x.n});return n}
 /* -- AI DUOC DUYET VIEC GI (khoi cho nguoi chot he thong) --------------------------------
    Anh Luan 03/08: *"o trang cua admin hoac giam doc, no co them 1 block nho ghi ai co quyen
@@ -7665,7 +7665,7 @@ function renderBanlam(){
 /* ===== TÁC VỤ: TẠO REVIEW GỬI LỚP (khảo sát định kỳ cho cả lớp) ===== */
 /* ===== HUB CSKH 2 CHIỀU: Khảo sát (TT→HV) · Phản hồi/Góp ý & Khiếu nại (HV→TT) ===== */
 function csGo(tab){window.CSTAB=tab;go("cskh")}
-function csTabSet(tab){window.CSTAB=tab;reRender(CUR)}
+function csTabSet(tab){for(var k in CSMAP)if(CSMAP[k]===tab){go(k);return}window.CSTAB=tab;reRender(CUR)}
 /* ===== YÊU CẦU TỪ HỌC VIÊN (V9.63 - anh Luân hỏi "nghiệp vụ này nên ở đâu") =====
    Học viên gửi yêu cầu được từ lúc được cấp cổng vào, và gửi được ở BẤT KỲ chặng nào - nó không
    thuộc C1/C2/C3/C4. Vậy nó phải nằm ở chỗ dành cho việc xuyên chặng, và đúng chỗ đó là hub CSKH:
@@ -9708,7 +9708,7 @@ var SETMOTA={
  khoa:["Danh mục khóa học: học phí, số buổi, quota WOW. Đây là cấu hình sản phẩm, không phải lớp đang chạy.",function(){return rows("DL05").length+" khóa"},"ti-school"],
  health:["Máy tự soi dữ liệu đang có và chỉ ra chỗ thiếu, chỗ lệch, chỗ mâu thuẫn - vào đây trước khi tin một con số báo cáo.",function(){var n=dataHealth().filter(function(x){return x.sev!=="ok"}).length;return n?(n+" chỗ cần xem"):"không có cảnh báo"},"ti-stethoscope"],
  nhatky:["Ai đổi ô nào, từ gì sang gì, lúc mấy giờ, qua cửa nào - mọi lần ghi dữ liệu đều để lại một dòng.",function(){return logRows().length+" dòng"},"ti-history"],
- demo:["Dựng lại dữ liệu demo, kéo ngày tháng về hôm nay, xoá sạch làm lại - chỉ có ở bản demo chạy trong trình duyệt.",function(){return "bản demo"},"ti-table"]};
+ demo:["Dựng lại demo, kéo ngày tháng về hôm nay, xoá sạch làm lại - chỉ có ở bản demo chạy trong trình duyệt.",function(){return "bản demo"},"ti-table"]};
 function setTabs(){
  var nHealth=dataHealth().filter(function(x){return x.sev!=="ok"}).length;
  return [
@@ -10082,7 +10082,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   h+='<span class="chip '+(gateKhoaVai()?"amber":"green")+'">'+(gateKhoaVai()?"Đang khoá - mọi người vào bằng Quản trị viên":"Đang mở - ai cũng chọn được chức danh")+'</span>';
   h+='<div class="fld" style="min-width:250px;margin:0"><label>Mật khẩu quản trị</label>'
    +'<input id="mk_in" value="'+esc(matKhau())+'" placeholder="mittomap">'
-   +'<div class="fhint" style="margin-top:4px">Dùng cho: vào Cài đặt ở chế độ ghi được, và nút Reset demo.</div></div>';
+   +'<div class="fhint" style="margin-top:4px">Dùng cho: vào Cài đặt ở chế độ ghi được, và nút Dựng lại demo.</div></div>';
   h+='<button class="btn primary sm" onclick="mkLuu()"><i class="ti ti-device-floppy"></i>Lưu mật khẩu</button>';
   h+='</div></div>';
   h+='<div class="notebar" style="background:#FAFBFD;border-color:#CFE0F7;color:#2E5A88"><i class="ti ti-info-circle"></i><span data-tip="Đây là bản demo chạy hẳn trong trình duyệt nên mật khẩu nằm ngay trong file - ai mở mã nguồn ra là thấy. Khi nối backend thật thì việc kiểm mật khẩu chuyển sang máy chủ."><b>Chốt cửa của bản demo</b>, không phải khoá an ninh.<i class="ti ti-info-circle gyti"></i></span></div>';
@@ -10209,7 +10209,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   /* V9.18 (Luân): room mặc định đã thông với nhau - tab này chỉ cần trạng thái 1 dòng + Reset */
   h+='<div class="panel" style="max-width:640px"><div class="ph"><b><i class="ti ti-devices" style="margin-right:6px"></i>Dữ liệu demo</b></div><div style="padding:14px 16px;font-size:12.5px;line-height:1.9">';
   h+='Các cửa sổ trên máy này và các máy khác mở cùng bản demo tự đồng bộ với nhau. Dữ liệu hiện tại: '+(d?'<span class="chip amber">đang có thay đổi demo</span>':'<span class="chip green">nguyên bản</span>')+(CANLS?'':' · <span class="chip red">trình duyệt chặn lưu - dùng Chrome hoặc http.server</span>')+'</div>';
-  h+='<div style="padding:0 16px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn danger" onclick="demoResetHoi()"><i class="ti ti-lock"></i>Reset demo (về nguyên bản)</button><button class="btn sm" onclick="demoPing()"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ</button></div></div>';
+  h+='<div style="padding:0 16px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn danger" onclick="demoResetHoi()"><i class="ti ti-lock"></i>Dựng lại demo (về nguyên bản)</button><button class="btn sm" onclick="demoPing()"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ</button></div></div>';
   /* V9.30 (anh Luân): "để demo lúc nào cũng ổn... điều chỉnh thời gian để lúc nào nó cũng hợp lý" */
   h+='<div class="panel" style="max-width:640px;margin-top:16px"><div class="ph"><b><i class="ti ti-calendar-event" style="margin-right:6px"></i>Mốc thời gian của dữ liệu demo</b></div><div class="pbody">';
   h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i><span data-tip="Để lâu không mở thì mọi việc thành quá hạn và lịch tuần trống trơn - app trông như hỏng dù không sai gì. Nút dưới kéo toàn bộ mốc thời gian về hiện tại.">Dữ liệu demo neo theo <b>ngày sinh ra nó</b>.<i class="ti ti-info-circle gyti"></i></span></div>';
@@ -11770,7 +11770,7 @@ function tvQuickSave(){var lid=fldV("f_tvq_lead");if(!lid){toast("Gõ tên/SĐT 
   closeModal();toast("Đã tạo phiếu tư vấn "+id+".");go("tuvan")})}
 /* ===== HUB TUYỂN SINH: gộp Lead → Test → Tư vấn & ĐK → Thanh toán vào MỘT luồng có tab ===== */
 function tsGo(tab){window.TSTAB=tab;go("tuyensinh")}
-function tsTabSet(tab){window.TSTAB=tab;reRender(CUR)}
+function tsTabSet(tab){for(var k in TSMAP)if(TSMAP[k]===tab){go(k);return}window.TSTAB=tab;reRender(CUR)}
 function renderTuyensinh(){
  var tab=window.TSTAB||"lead";
  var tests=rows("DL03"),cons=rows("DL04"),enr=rows("DL06");
@@ -14235,7 +14235,7 @@ function bhState(s){
 function yesv(x){return /^(true|1|yes|y|có|x)$/i.test(String(x==null?"":x).trim())}
 /* ===== HUB HỌC TẬP: Lớp học · Nhận xét buổi (SLA) · Buổi WOW 1-1 — gộp các trang giảng dạy rời ===== */
 function htGo(tab){window.HTTAB=tab;go("hoctap")}
-function htTabSet(tab){window.HTTAB=tab;reRender(CUR)}
+function htTabSet(tab){for(var k in HTMAP)if(HTMAP[k]===tab){go(k);return}window.HTTAB=tab;reRender(CUR)}
 function sameDay(d,e){return d&&e&&d.getDate()===e.getDate()&&d.getMonth()===e.getMonth()&&d.getFullYear()===e.getFullYear()}
 /* yyyy-mm-dd theo GIỜ ĐỊA PHƯƠNG. Không dùng toISOString(): nó quy về UTC nên buổi tối ở VN
    bị lùi một ngày - ô chọn ngày sẽ nhảy lùi ngay khi bấm. */
@@ -14996,7 +14996,7 @@ function bhMakeupSave(id,force){var d=(fldV("bh_md")||"").trim();
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d2(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL11",w)}
  else{d2("SES-BU-"+seqNo("DL11","session_id"))}}
 /* ===== BẢO LƯU / BỎ HỌC - giữ chân & mời quay lại (KPI TCR, DOR) ===== */
-function kcTabSet(tab){window.KTAB=tab;reRender(CUR)}
+function kcTabSet(tab){for(var k in KMAP)if(KMAP[k]===tab){go(k);return}window.KTAB=tab;reRender(CUR)}
 function renderKhac(){
  var tab=window.KTAB||"baoluu";
  var bl=rows("DL09").filter(function(x){return isc(x.student_status,"dropped","transferred")});
@@ -15416,7 +15416,7 @@ function tourAsk(k){var T=TOURS[k];if(!T)return;
  h+=ctxRows([["Cấp độ",esc((TOURLV.filter(function(x){return x[0]===T.lv})[0]||["","?"])[1])],
   ["Dành cho",esc(T.role||"Mọi người")],["Số bước",T.steps.length+" bước, khoảng "+Math.max(1,Math.round(T.steps.length*0.4))+" phút"]]);
  h+='<div class="mut" style="font-size:12px;line-height:1.65;margin:2px 0 4px">Trong lúc chạy bạn vẫn thao tác bình thường được. Có nút <b>Quay lại</b>, <b>Làm lại từ đầu</b> và <b>Đóng</b> ở mọi bước.'+
-  (T.lv==="trainghiem"?' Bài này có thao tác thử trên dữ liệu demo - hết buổi bấm Reset demo là sạch.':'')+'</div>';
+  (T.lv==="trainghiem"?' Bài này có thao tác thử trên dữ liệu demo - hết buổi bấm Dựng lại demo là sạch.':'')+'</div>';
  h+='<div class="dact"><button class="btn primary" onclick="closeModal();tourStart(\''+k+'\')"><i class="ti ti-player-play"></i>Bắt đầu hướng dẫn</button>'+
   '<button class="btn" onclick="closeModal()"><i class="ti ti-x"></i>Để lúc khác</button></div></div>';
  openDrawer("Xác nhận chạy hướng dẫn",h)}
@@ -19085,18 +19085,22 @@ function hashKey(){
  var h=String(location.hash||"").replace(/^#\/?/,"").split(/[?&]/)[0];
  return h?slugPg(decodeURIComponent(h)):""}
 function hashOK(k){return !!k&&(!!PBK[k]||goAlias(k))}
-function hashSet(k){if(SVR||!k)return;   /* bản chạy trên Apps Script không sở hữu thanh địa chỉ */
+function hashSet(k,deGhi){if(SVR||!k)return;   /* bản chạy trên Apps Script không sở hữu thanh địa chỉ */
  window.HASHCUR=k;var want="?"+pgSlug(k);
  if(location.search===want)return;
- /* replaceState chứ không push: app đã có breadcrumb + nút Quay lại riêng, đẻ thêm mốc lịch sử
-    thì Back của trình duyệt và Quay lại của app đá nhau. Mở bằng file:// thì replaceState đổi
-    query bị chặn -> lùi về #/slug. */
- try{if(window.history&&history.replaceState){history.replaceState(null,"",location.pathname+want);return}}catch(e){}
+ /* V9.88 - ĐẨY một mốc lịch sử để nút Back của trình duyệt lùi được về trang liền trước.
+    `deGhi` = true khi chính nút Back vừa gọi tới đây: lúc đó chỉ ghi đè, đẩy thêm là Back sẽ
+    không bao giờ lui qua được trang thứ hai. Mở bằng file:// thì đổi query bị chặn -> lùi về
+    #/slug, và hash cũng tự sinh mốc lịch sử nên Back vẫn chạy. */
+ try{if(window.history){
+   if(deGhi&&history.replaceState){history.replaceState(null,"",location.pathname+want);return}
+   if(history.pushState){history.pushState(null,"",location.pathname+want);return}
+ }}catch(e){}
  try{location.hash="/"+pgSlug(k)}catch(e2){}}
 function hashApply(){var k=hashKey();
  if(!k||k===window.HASHCUR)return;
  if(!hashOK(k))return;
- go(k)}
+ go(k,true)}   /* true = đang do Back/Forward, đừng đẩy thêm mốc nữa */
 function go(key,noHist){
  /* V9.27: nhớ lại mục menu đang sáng TRƯỚC khi rời đi. Trang nào không có mục riêng trên menu
     (vd "Chạy quy trình" mở ra từ Chăm lại / Reup) thì menu vẫn giữ mục cũ sáng mờ, để người dùng
@@ -19145,7 +19149,7 @@ function go(key,noHist){
  if(!canSee(key)&&!SENSITIVE[key]&&SCOPE().pages!=="*")el.innerHTML='<div class="notebar" style="margin-bottom:12px"><i class="ti ti-info-circle"></i>Trang ngoài phạm vi chức danh của bạn - đang xem ở chế độ THAM KHẢO.</div>'+el.innerHTML;
  window.CURCTX=navSnap();   /* ngữ cảnh của TRANG NÀY, chụp sau khi đã render (dùng khi rời trang) */
  renderCrumb();
- el.scrollTop=0;closeNav();closeBell();updateBellBadge();hashSet(key0);persistSoon()}
+ el.scrollTop=0;closeNav();closeBell();updateBellBadge();hashSet(key0,noHist);persistSoon()}
 /* ===== SIDEBAR: nhóm GẬP ĐƯỢC, tự mở nhóm chứa trang đang xem =====
    Giữ ĐỦ mọi trang (không rút gọn), chỉ gập nhóm không dùng tới cho đỡ phải cuộn. */
 function navBadge(k){
@@ -19666,7 +19670,7 @@ function hvTopPaint(){var t=document.getElementById("hvTools");if(!t)return;
  try{h+=hvCallHTML("","",1)}catch(e){}
  h+='<button class="tbtn" onclick="congDoiMo()" aria-label="Đổi cổng" data-tip="Đổi cổng - sang cổng nhân viên hoặc cổng phụ huynh, dữ liệu vẫn là một"><i class="ti ti-arrows-exchange"></i></button>';
  h+='<button class="tbtn" onclick="gateSwitchHV()" aria-label="Đổi người đang xem" data-tip="Đổi người đang xem - quay về màn chọn của cổng này"><i class="ti ti-user-check"></i></button>';
- if(CANLS&&!SVR)h+='<button class="tbtn" onclick="demoResetHoi()" aria-label="Reset demo" data-tip="Dựng lại dữ liệu demo về nguyên bản - cấu hình đã chỉnh vẫn giữ"><i class="ti ti-refresh"></i></button>';
+ if(CANLS&&!SVR)h+='<button class="tbtn" onclick="demoResetHoi()" aria-label="Dựng lại demo" data-tip="Dựng lại demo về nguyên bản - cấu hình đã chỉnh vẫn giữ"><i class="ti ti-refresh"></i></button>';
  t.innerHTML=h}
 /* ═══ V9.65 - HUY HIỆU "VIỆC CẦN BẠN XỬ LÝ" Ở CỔNG HỌC VIÊN ══════════════════════════════
    Mục lục cổng học viên đã có nhóm "Cần bạn xử lý" từ lâu, nhưng nó chỉ là một CÁI TÊN: mở cổng
@@ -19891,7 +19895,7 @@ function gateStatusHTML(){var d=demoDirty();
  if(!CANLS)st='<span class="chip red">trình duyệt chặn lưu/đồng bộ - mở bằng Chrome hoặc chạy http.server</span>';
  return '<div style="font-size:11.5px;color:var(--muted);margin-top:14px;display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap">'+
   '<span>'+src+'</span>'+st+
-  (d?'<button class="btn sm" onclick="demoResetHoi()"><i class="ti ti-lock"></i>Reset dữ liệu demo</button>':'')+
+  (d?'<button class="btn sm" onclick="demoResetHoi()"><i class="ti ti-lock"></i>Dựng lại demo</button>':'')+
   '<button class="btn sm" onclick="demoPing()" title="Bấm ở một cửa sổ, cửa sổ kia phải hiện thông báo"><i class="ti ti-broadcast"></i>Kiểm tra đồng bộ</button>'+
   '</div>'}
 function gateRole(x){var m=String(x.role||"").match(/^[^(]*\((.+)\)\s*$/);return m?m[1]:(String(x.role||"").trim()||"Khác")}

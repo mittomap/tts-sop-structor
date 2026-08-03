@@ -9,8 +9,13 @@ function El(id){return {id:id||"",innerHTML:"",textContent:"",value:(FIELDS[id]|
  appendChild(){},remove(){},focus(){},addEventListener(){},getBoundingClientRect(){return{left:0,top:0,width:9,height:9,bottom:9,right:9}},files:[]}}
 global.document={getElementById:(id)=>ST[id]||(ST[id]=El(id)),querySelector:()=>El(),querySelectorAll:()=>[],createElement:()=>El(),body:El(),addEventListener(){}};
 global.window=global;global.location={hash:"",search:"",pathname:"/cong-nhan-vien/"};
-global.history={replaceState:function(a,b,u){var i=String(u).indexOf("?");
- location.search=i<0?"":String(u).slice(i);location.pathname=i<0?String(u):String(u).slice(0,i)}};
+/* V9.88: khung gia phai co CA pushState. App nay day mot moc lich su moi khi doi trang de nut
+   Back cua trinh duyet lui duoc; khung chi co replaceState thi app roi xuong nhanh du phong
+   (location.hash) va ba tieu chi "doi trang la doi dia chi" do oan. Khung phai giong trinh
+   duyet that o dung nhung thu app co dung. */
+function _hist(a,b,u){var i=String(u).indexOf("?");
+ location.search=i<0?"":String(u).slice(i);location.pathname=i<0?String(u):String(u).slice(0,i)}
+global.history={replaceState:_hist,pushState:_hist};
 var _LS={};global.localStorage={getItem:k=>_LS[k]===undefined?null:_LS[k],setItem(k,v){_LS[k]=String(v)},removeItem(k){delete _LS[k]}};/* V9.62: sessionStorage phai NHO THAT - che do vao Cai dat (chi trai nghiem / cong thuc) luu
    o day. Stub tra ve null mai mai thi bo kiem do cai gi cung ra "chua chon", va ba tieu chi
    ve khoa se xanh gia. */
@@ -1150,7 +1155,7 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
     (SRC.match(/onclick="demoReset\(\)/g)||[]).length===0&&(SRC.match(/demoResetHoi\(\)/g)||[]).length>=3);
   /* Reset demo: dang o quan tri that thi KHONG hoi lai lan hai (vua nhap luc vao cong) */
   cfSetMode("xem");demoResetHoi();
-  t("o xem thu, bam Reset demo thi phai nhap mat khau", /Dựng lại dữ liệu demo/.test((document.getElementById("drawerBody").innerHTML)||""));
+  t("o xem thu, bam Dung lai demo thi phai nhap mat khau", /Dựng lại demo/.test((document.getElementById("drawerBody").innerHTML)||""));
   cfSetMode("that");
   t("o quan tri that thi Reset demo khong hoi mat khau lan hai", /if\(cfGhiDuoc\(\)\)\{demoReset\(\);return\}/.test(String(demoResetHoi)));
   /* Tra lai che do QUAN TRI THAT cho cac muc kiem phia sau: chung do viec ghi cau hinh, ma o
@@ -1313,7 +1318,22 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  t("trang Xep lop & Onboarding: ten hoc vien bam duoc", /openQuick\(/.test(xl));
  t("trang Xep lop & Onboarding: ten lop cung bam duoc", /openLopQuick\(/.test(xl));
  /* cum nut demo tren thanh tieu de day sang phai cho do vuong */
- t("cum Room demo / Chay huong dan / Reset demo canh phai", /id="demoBadgeWrap"[^>]*margin-left:auto/.test(HTML));
+ /* V9.88 - anh Luan: *"ua sao thay dung lai demo va reset demo trung nhau a"*. Do duoc NAM cua
+   vao cung mot viec voi BA cai ten. Chip tren thanh tieu de bi bo vi no lap lai dung cai nut da
+   co o dai "Du lieu demo" ngay duoi, va con goi bang mot ten khac. Tieu chi doi theo: thanh
+   tieu de KHONG duoc mang mot nut dung lai demo thu hai. */
+t("thanh tieu de khong co nut dung lai demo trung lap",
+  !/id="demoBadgeWrap"[\s\S]{0,240}demoResetHoi/.test(HTML));
+/* Do tren CHU HIEN RA, khong do tren ma nguon: chu thich trong ma cung nam trong file build
+   nhung khong ai doc thay no. Do nham vao ma nguon la bat mot loi khong ton tai. */
+t("chi con MOT ten cho viec dung lai demo", (function(){
+  var noi=[];
+  ["settings","banlam","viec"].forEach(function(k){
+    try{CUR=k;window.SETTAB="demo";
+      var o=String(RENDER[k]?RENDER[k]():"").replace(/<!--[\s\S]*?-->/g,"");
+      if(/Reset demo|Reset d\u1eef li\u1ec7u demo|D\u1ef1ng l\u1ea1i d\u1eef li\u1ec7u demo/.test(o))noi.push(k)}catch(e){}});
+  window.SETTAB="ch2";
+  return noi.length===0})());
  t("tieu de trang co the co lai khi ten dai", /id="pgTitle"/.test(HTML)&&/flex:1;min-width:0/.test(HTML));
 })();
 
