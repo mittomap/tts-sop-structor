@@ -776,10 +776,10 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
  .hvtools{gap:5px}
 }
 /* Ngăn kéo ĐỔI CỔNG - dùng chung cho cả ba cổng */
-.congr{display:flex;align-items:center;gap:12px;padding:12px 13px;border:1px solid var(--line);border-radius:12px;margin-bottom:9px;cursor:pointer;background:#fff;transition:.14s}
-.congr:hover{border-color:var(--navy);box-shadow:0 6px 18px rgba(16,32,58,.09);transform:translateY(-1px)}
-.congr.here{cursor:default;background:var(--bg)}
-.congr.here:hover{border-color:var(--line);box-shadow:none;transform:none}
+.congr,.congb{display:flex;align-items:center;gap:12px;padding:12px 13px;border:1px solid var(--line);border-radius:12px;margin-bottom:9px;cursor:pointer;background:#fff;transition:.14s}
+.congr:hover,.congb:hover{border-color:var(--navy);box-shadow:0 6px 18px rgba(16,32,58,.09);transform:translateY(-1px)}
+.congr.here,.congb.here{cursor:default;background:var(--bg)}
+.congr.here:hover,.congb.here:hover{border-color:var(--line);box-shadow:none;transform:none}
 .congr b{display:block;font-size:13.5px;color:var(--text)}
 .congr small{display:block;font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:2px}
 .congi{width:36px;height:36px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--navyd);font-size:18px}
@@ -18194,7 +18194,7 @@ function renderSoPH(){
   ["ti-cash",coNo,"Còn nợ học phí","#B58A2B","cộng nợ của tất cả các con"],
   ["ti-alert-triangle",coRui,"Có con đang cảnh báo","#E24B4A","cần liên hệ sớm với phụ huynh"]],"dsphuhuynh");
  h+='<div class="panel"><div class="ph"><b>Danh sách ('+ds.length+')</b>'+
-  '<input id="ph_q" style="margin-left:auto;max-width:260px" placeholder="Tìm tên, SĐT hoặc mã..."'+
+  '<input id="ph_q" style="margin-left:auto;max-width:260px;min-height:32px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:12.5px" placeholder="Tìm tên, SĐT hoặc mã..."'+
   ' value="'+esc(window.PHQ||"")+'" oninput="window.PHQ=this.value;reRender(\'dsphuhuynh\')">'+
   '</div><div class="pbody">';
  if(!ds.length)h+='<div class="empty">Chưa có người đồng hành nào khớp. Sổ này chỉ hiện học viên đã khai số điện thoại người đồng hành trong hồ sơ.</div>';
@@ -19939,6 +19939,24 @@ function congURL(w){
  if(b===p)b=p.replace(/[^\/]*$/,"");
  if(b.slice(-1)!=="/")b+="/";
  return w==="nv"?(b+congTenNV()+"/"):(b+"cong-hoc-vien/"+(w==="ph"?"?phuhuynh":""))}
+/* DIA CHI CUA MOT BAN CU THE cua cong nhan vien. congURL("nv") luon tra ve ban DANG XEM;
+   ham nay tra ve dung ban duoc chi dinh, de o Doi cong con doi duoc ban 5 <-> ban 6.
+   Anh Luan 03/08: *"Cho doi cong chua co doi v5 hoac v6 nhe"* - dung: truoc day muon doi ban
+   phai quay ra trang chu bam lai, ma tu trong app khong co loi nao ra trang chu. */
+function congURLBan(b){
+ var p=location.pathname;
+ if(congKieuFile()){var d=p.replace(/[^\/]*$/,"");
+  return d+(b==="6"?"ITTs_WebApp_v6_demo.html":"ITTs_WebApp_v5_demo.html")}
+ var base=p.replace(/(cong-nhan-vien-v6|cong-nhan-vien|cong-hoc-vien)\/?[^\/]*$/,"");
+ if(base===p)base=p.replace(/[^\/]*$/,"");
+ if(base.slice(-1)!=="/")base+="/";
+ return base+(b==="6"?"cong-nhan-vien-v6":"cong-nhan-vien")+"/"}
+/* Doi ban: ghi lai lua chon truoc khi di, de cong hoc vien mo sau do biet duong ve dung ban. */
+function congDiBan(b){
+ if((congLaV6()?"6":"5")===b&&congDangO()==="nv")return;
+ try{sessionStorage.setItem("ITTS_BAN",b)}catch(e){}
+ try{closeModal()}catch(e){}
+ location.href=congURLBan(b)}
 function congDangO(){if(!window.HVPORTAL)return "nv";
  var ph=false;try{ph=hvPH()}catch(e){}
  return ph?"ph":"hv"}
@@ -19948,6 +19966,22 @@ var CONGDS=[
  ["ph","Cổng phụ huynh","ti-users","Theo dõi việc học của con - ẩn phần trao đổi riêng tư của học viên."]];
 function congHTML(){var cur=congDangO(),h="";
  h+='<div class="fhint" style="margin:0 0 12px">Ba cổng dùng chung một bộ dữ liệu demo - đổi qua lại bao nhiêu lần thì số liệu vẫn là một.</div>';
+ /* CHON BAN - chi hien o cong nhan vien, vi ban 5 va ban 6 chi khac nhau o dung cong nay.
+    Cong hoc vien va cong phu huynh dung chung mot ban, bay them nut o do la noi doi bang bo cuc. */
+ (function(){
+  if(cur!=="nv")return;
+  var dangV6=false;try{dangV6=congLaV6()}catch(e){}
+  h+='<div class="sechd" style="margin-top:0">Bản đang xem</div>';
+  [["5","Bản 5 · theo nghiệp vụ","ti-layout-cards","Mỗi nghiệp vụ một trang riêng, menu chia theo chặng vòng đời của khách."],
+   ["6","Bản 6 · theo đối tượng","ti-focus-2","Mở app ra là Bàn làm việc - chọn một người, làm hết việc ngay tại chỗ."]]
+  .forEach(function(b){var here=(b[0]==="6")===dangV6;
+   h+='<div class="congb'+(here?" here":"")+'"'+(here?"":' onclick="congDiBan(\''+b[0]+'\')"')+'>'+
+    '<div class="congi"><i class="ti '+b[2]+'"></i></div>'+
+    '<div style="min-width:0"><b>'+esc(b[1])+'</b><small>'+esc(b[3])+'</small></div>'+
+    (here?'<span class="chip" style="margin-left:auto;flex:none">Đang xem</span>'
+         :'<i class="ti ti-arrow-right" style="margin-left:auto;opacity:.55;flex:none"></i>')+'</div>'});
+  h+='<div class="sechd">Cổng</div>';
+ })();
  CONGDS.forEach(function(c){var here=(c[0]===cur);
   h+='<div class="congr'+(here?" here":"")+'"'+(here?"":' onclick="congDi(\''+c[0]+'\')"')+'>'+
    '<div class="congi"><i class="ti '+c[2]+'"></i></div>'+
