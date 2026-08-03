@@ -1151,6 +1151,18 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 /* Ô CHỌN DÀI - gõ để tìm (V9.91). Anh Luân 03/08 kèm ảnh form Tiếp nhận khiếu nại:
    *"làm sao chọn nổi em, chỗ đó phải là tìm kiếm"*. Ô chọn nào từ PKMIN lựa chọn trở lên thì
    lúc vẽ ra được thay bằng ô gõ + danh sách lọc. Thẻ <select> gốc vẫn nằm đó, chỉ ẩn đi. */
+/* TỶ LỆ HIỂN THỊ (V9.94). Anh Luân 03/08: *"a đang ở tỷ lệ thu nhỏ 90% trên chrome trên màn
+   hình mac air m2, thấy hiển thị đầy đủ, e nên thêm cái nút tỷ lệ hiển thị lên navbar cho
+   chuyên nghiệp, và mặc định để tỷ lệ 90%"*. App nhiều bảng rộng, ở 100% trên màn 13" phải cuộn
+   ngang; 90% là vừa. Trước nay muốn vậy phải biết cách phóng to thu nhỏ của trình duyệt - không
+   phải ai cũng biết, và mỗi trình duyệt một kiểu. */
+.zwrap{display:flex;align-items:center;gap:4px;height:32px;padding:0 6px;border:1px solid var(--line);
+ border-radius:8px;background:#fff;flex:none}
+.zwrap>i{font-size:14px;color:var(--muted);line-height:1}
+.zwrap>select{border:0;background:none;font-family:inherit;font-size:12px;font-weight:700;
+ color:var(--navy);cursor:pointer;height:30px;padding:0 2px}
+.zwrap>select:focus{outline:none}
+@media(max-width:820px){.zwrap{display:none}}   /* điện thoại: để trình duyệt tự lo, thu nhỏ nữa là không đọc được */
 .pk{position:relative;display:flex;flex-direction:column;min-width:150px;max-width:100%}
 /* Ô gõ tự mang đủ dáng của một ô nhập: nó có thể được dựng ở NGOÀI .fld (thanh lọc trên trang),
    nơi không có luật CSS nào của form chạm tới - để trần là ra một ô cao 19px, đúng loại lỗi
@@ -1727,7 +1739,7 @@ body.drsz .drawer{transition:none}
 <div class="app" id="app" style="display:none">
   <aside class="sidebar" id="sidebar">
     <div class="sbszr" id="sbszr" title="Kéo để đổi độ rộng menu - bấm đúp để về mặc định"></div>
-    <div class="brand" data-tour="brand"><div class="logo" id="brandLogo"><svg viewBox="0 0 40 40" width="26" height="26" aria-hidden="true"><g fill="none" stroke="#D51920" stroke-width="3.2"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="7.5"/></g><circle cx="20" cy="20" r="3.4" fill="#D51920"/><g stroke="#D51920" stroke-width="3.2"><line x1="20" y1="1.5" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="38.5"/><line x1="1.5" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="38.5" y2="20"/></g></svg></div><div><b id="brandName">ITTs - SOP TEMP</b><small id="brandSub">Hệ thống tuân thủ SOP</small></div></div>
+    <div class="brand" data-tour="brand" onclick="trangChuDemo()" title="Về trang chủ bản demo - chọn cổng khác" style="cursor:pointer"><div class="logo" id="brandLogo"><svg viewBox="0 0 40 40" width="26" height="26" aria-hidden="true"><g fill="none" stroke="#D51920" stroke-width="3.2"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="7.5"/></g><circle cx="20" cy="20" r="3.4" fill="#D51920"/><g stroke="#D51920" stroke-width="3.2"><line x1="20" y1="1.5" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="38.5"/><line x1="1.5" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="38.5" y2="20"/></g></svg></div><div><b id="brandName">ITTs - SOP TEMP</b><small id="brandSub">Hệ thống tuân thủ SOP</small></div></div>
     <nav class="nav" id="nav"></nav>
     <div class="me" data-tour="me" onclick="gateSwitch()" title="Đổi người / về màn cổng" style="cursor:pointer"><div class="av" id="meAv">M</div><div><b id="meName">-</b><small id="meRole">-</small></div><i class="ti ti-arrows-exchange" style="margin-left:auto;opacity:.6"></i></div>
   </aside>
@@ -1743,6 +1755,7 @@ body.drsz .drawer{transition:none}
         <!-- V9.51: nut "Chay huong dan" to o demoBadgeWrap da bo - trung viec voi nut "?" nay
      (anh Luan bat). id=tourBtn don ve day de tourBtnSync (an/hien theo Cai dat) van chay. -->
         <button class="tbtn" id="tourBtn" data-tour="help" onclick="tourMenu()" aria-label="Hướng dẫn sử dụng" title="Hướng dẫn từng bước - chọn cấp độ rồi app chỉ tận nơi"><i class="ti ti-help-circle"></i></button>
+        <div class="zwrap" data-tour="tyle"><i class="ti ti-text-size"></i><select id="zoomSel" onchange="zoomSet(this.value)" aria-label="Tỷ lệ hiển thị"></select></div>
         <button class="tbtn" id="gyBtn" data-tour="gopy" onclick="gyForm()" aria-label="Báo lỗi hoặc góp ý" data-tip="Báo lỗi / góp ý - app tự ghi sẵn bạn đang ở trang nào, đăng nhập bằng ai"><i class="ti ti-message-report"></i></button>
         <button class="tbtn" data-tour="bell" onclick="toggleBell(event)" aria-label="Thông báo"><i class="ti ti-bell"></i><span class="n" id="bellN" style="display:none">0</span></button>
         <div class="notif" id="notif"></div>
@@ -2271,6 +2284,8 @@ var PAGES=[
 /* V9.92 - trang meta cua dot dung thu: khong phai nghiep vu SOP, nhung la cho duy nhat
    giu cho gop y khong troi. Ai cung thay duoc (VIEW_ALWAYS) vi ai cung co quyen gop y. */
 {k:"gopy",g:"Điều hành",ic:"ti-message-report",t:"Ghi nhận góp ý",c:"Báo lỗi và đề xuất của đợt dùng thử",ty:"custom"},
+/* V9.94: trang CA NHAN - thoi quen cua mot nguoi tren mot may, khac han Cai dat cua trung tam. */
+{k:"canhan",g:"Điều hành",ic:"ti-user-circle",t:"Trang cá nhân",c:"Ảnh đại diện, liên hệ, thói quen dùng app",ty:"custom"},
 {k:"dsketthuc",g:"Tra cứu",ic:"ti-flag",t:"Sổ kết thúc khóa",c:"Tra cứu đầu ra",ty:"list"},
 {k:"dskhaosat",g:"Tra cứu",ic:"ti-clipboard-text",t:"Sổ khảo sát",c:"Tra cứu khảo sát",ty:"list"},
 {k:"dsphanhoi",g:"Tra cứu",ic:"ti-message-2",t:"Sổ phản hồi",c:"Góp ý của học viên",ty:"list"},
@@ -2352,7 +2367,7 @@ var CURSTAFF="";
 /* ===== V9.9 - MÀN HÌNH THEO CHỨC DANH (ma trận đã hội đồng thiết kế, Luân duyệt) =====
    Phân quyền GIAO DIỆN: chỉ chọn tập trang/khối/tab có sẵn, KHÔNG giấu dữ liệu tầng data.
    "Vào nhanh - Quản trị viên" = quantri thấy hết. Bấm tên luôn xem được hồ sơ 360. */
-var VIEW_ALWAYS={hoso:1,hosogv:1,hosonv:1,hosokhoa:1,chay:1,chang:1,lop:1,viec:1,dashboard:1,tracuu:1,pipeline:1,nhanvien:1,khoahoc:1,tranghv:1,nhaplead:1,lienhe:1,test:1,tuvan:1,thanhtoan:1,diemdanh:1,buoihoc:1,baitap:1,wow:1,review:1,khaosat:1,ghinhan:1,khieunai:1,baoluu:1,magioithieu:1,banggiao:1,gopy:1};
+var VIEW_ALWAYS={hoso:1,hosogv:1,hosonv:1,hosokhoa:1,chay:1,chang:1,lop:1,viec:1,dashboard:1,tracuu:1,pipeline:1,nhanvien:1,khoahoc:1,tranghv:1,nhaplead:1,lienhe:1,test:1,tuvan:1,thanhtoan:1,diemdanh:1,buoihoc:1,baitap:1,wow:1,review:1,khaosat:1,ghinhan:1,khieunai:1,baoluu:1,magioithieu:1,banggiao:1,gopy:1,canhan:1};
 var SENSITIVE={duyet:1,settings:1,baocao:1};
 var ROLESCOPE={
  quantri:{match:null,land:"banlam",pages:"*",blocks:"*",mine:0,mineBtn:0,kpi:0,bell:"*"},
@@ -6095,6 +6110,29 @@ function drwInit(){var g=document.getElementById("drszr");if(!g||g.__on)return;g
   start(e.touches[0].clientX,d?d.getBoundingClientRect().width:DRW_DEF)},{passive:true});
  g.addEventListener("dblclick",drwReset)}
 function openDrawer(title,html){tourCleanup();drwInit();drwApply();document.body.classList.add("drwon");document.getElementById("drawerTitle").textContent=title;document.getElementById("drawerBody").innerHTML=html;try{pkQuet(document.getElementById("drawerBody"))}catch(e){}document.getElementById("mask").classList.add("on");document.getElementById("drawer").classList.add("on")}
+/* ═══ TỶ LỆ HIỂN THỊ ════════════════════════════════════════════════════════════════════════
+   Mặc định 90% theo anh Luân chốt 03/08. Nhớ theo MÁY (localStorage) chứ không vào cấu hình
+   trung tâm: đây là thói quen cá nhân và phụ thuộc cỡ màn của từng người - cùng một cách đã
+   dùng cho độ rộng ngăn kéo và bộ lọc đã lưu.
+   Dùng `zoom` chứ không dùng `transform:scale`: scale làm lệch mọi thứ dán cứng (thanh trên,
+   ngăn kéo, hộp xác nhận) và làm toạ độ chuột không còn khớp với chỗ nhìn thấy. */
+var ZKEY="ITTS_ZOOM_V1", ZMUC=[80,90,100,110,125], ZMAC=90;
+function zoomGet(){var v=0;try{v=parseInt(localStorage.getItem(ZKEY)||"",10)}catch(e){}
+ return (ZMUC.indexOf(v)>=0)?v:ZMAC}
+function zoomApply(v){
+ try{document.body.style.zoom=(v===100)?"":(v/100)}catch(e){}
+ /* Điện thoại: giữ nguyên 100% dù người dùng đã chọn khác trên máy tính - màn nhỏ mà thu thêm
+    thì chữ 11px thành 9.9px, không đọc nổi. */
+ try{if((window.innerWidth||1400)<=820)document.body.style.zoom=""}catch(e){}}
+function zoomSet(v){v=parseInt(v,10)||ZMAC;
+ try{localStorage.setItem(ZKEY,String(v))}catch(e){}
+ zoomApply(v);zoomVe()}
+function zoomVe(){var el=document.getElementById("zoomSel");if(!el)return;
+ var cur=zoomGet();
+ el.innerHTML=ZMUC.map(function(n){return '<option value="'+n+'"'+(n===cur?" selected":"")+'>'+n+'%</option>'}).join("");
+ el.setAttribute("data-tip","Tỷ lệ hiển thị - màn nhỏ để 90% là vừa một bảng rộng, không phải cuộn ngang")}
+function zoomInit(){zoomApply(zoomGet());zoomVe();
+ try{window.addEventListener("resize",function(){zoomApply(zoomGet())})}catch(e){}}
 /* ═══ Ô CHỌN DÀI PHẢI GÕ ĐƯỢC (V9.91) ═══════════════════════════════════════════════════════
    Anh Luân 03/08, kèm ảnh chụp form Tiếp nhận khiếu nại: *"làm sao chọn nổi em, chỗ đó phải là
    tìm kiếm"*. Đúng - ô Học viên là <select> thường đổ ra hơn ba trăm dòng, muốn chọn phải kéo
@@ -6252,6 +6290,113 @@ function moNutXem(box){
  return null}
 function moNutDu(t){return /Xoá|Xóa|Huỷ|Hủy|Từ chối|Leo thang|Xuất|Dựng lại|Đóng/i.test(String(t||""))}
 
+/* ═══ TRANG CÁ NHÂN (V9.94) ═════════════════════════════════════════════════════════════════
+   Anh Luân 03/08: *"hình như mình còn thiếu trang cá nhân để tùy chỉnh nhỉ, ví dụ đổi avatar,
+   đổi pass, cấu hình những thông tin có thể ở các trang"*. Đúng - app có Cài đặt (của trung
+   tâm, cần quyền) nhưng chưa có chỗ nào cho THÓI QUEN CỦA MỘT NGƯỜI.
+
+   RANH GIỚI, để hai màn không lấn nhau:
+     Cài đặt   = của TRUNG TÂM, đổi là mọi người thấy, cần mật khẩu quản trị.
+     Cá nhân   = của MỘT NGƯỜI TRÊN MỘT MÁY, đổi chỉ mình thấy, không cần quyền gì.
+   Vì thế mọi tuỳ chỉnh ở đây nằm trong `localStorage` chứ không vào `DATA.config` - đúng cách
+   độ rộng ngăn kéo và bộ lọc đã lưu vẫn làm.
+
+   Ảnh đại diện cũng vậy: bản demo không có máy chủ, ảnh nằm trên máy người dùng. Nói thẳng
+   điều đó trên màn chứ không để người ta tưởng cả trung tâm nhìn thấy ảnh mình vừa đổi. */
+function avKey(sid){return "ITTS_AV_"+(sid||"ADMIN")}
+function avGet(sid){try{return localStorage.getItem(avKey(sid))||""}catch(e){return ""}}
+function avSet(sid,d){try{if(d)localStorage.setItem(avKey(sid),d);else localStorage.removeItem(avKey(sid))}catch(e){}}
+function avChon(inp){var f=inp&&inp.files&&inp.files[0];if(!f)return;
+ var r=new FileReader();
+ r.onload=function(){gyThuNhoAv(r.result,function(d){
+  avSet(CURSTAFF||"ADMIN",d);toast("Đã đổi ảnh đại diện.");
+  try{setRole(CURROLE)}catch(e){}
+  go("canhan")})};
+ r.readAsDataURL(f)}
+/* Ảnh đại diện chỉ cần 160px - giữ nguyên ảnh 3MB trong localStorage là đầy kho ngay. */
+function gyThuNhoAv(src,xong){
+ try{var im=new Image();
+  im.onload=function(){var M=160,w=im.width,h=im.height,t=Math.min(M/w,M/h,1);
+   var c=document.createElement("canvas");c.width=Math.round(w*t);c.height=Math.round(h*t);
+   c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+   try{xong(c.toDataURL("image/jpeg",0.8))}catch(e){xong(src)}};
+  im.onerror=function(){xong(src)};im.src=src}
+ catch(e){xong(src)}}
+function avXoa(){avSet(CURSTAFF||"ADMIN","");toast("Đã bỏ ảnh, quay lại chữ tắt.");
+ try{setRole(CURROLE)}catch(e){}go("canhan")}
+function cnLuu(){
+ var sid=CURSTAFF;if(!sid){toast("Chế độ Quản trị viên không gắn với một hồ sơ nhân sự nào.");return}
+ var em=String((document.getElementById("cn_email")||{}).value||"").trim();
+ var sd=String((document.getElementById("cn_sdt")||{}).value||"").trim();
+ if(em&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){toastErr("Email chưa đúng dạng.");return}
+ markRow("DL01","staff_id",sid,{email:em,phone:sd},"Đã lưu thông tin liên hệ của bạn.");
+ go("canhan")}
+function cnXoaThoiQuen(){confirmRun("Xoá mọi thói quen đã lưu trên MÁY NÀY (tỷ lệ hiển thị, bề rộng ngăn kéo, cột đã ẩn, bộ lọc đã lưu, ảnh đại diện)? Dữ liệu công việc không bị đụng tới.","cnXoaThoiQuenRun","")}
+function cnXoaThoiQuenRun(){
+ try{var bo=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);
+   if(/^ITTS_(AV_|ZOOM|DRW|FLT|HIDECOL|TTH)/.test(String(k||"")))bo.push(k)}
+  bo.forEach(function(k){localStorage.removeItem(k)})}catch(e){}
+ toast("Đã xoá thói quen trên máy này.");location.reload()}
+function renderCanhan(){
+ var sid=CURSTAFF||"",st=(sid&&find("DL01","staff_id",sid))||{};
+ var admin=!sid;
+ var h=pageHead("Trang cá nhân","Ảnh đại diện, thông tin liên hệ và thói quen dùng app của riêng bạn","",1);
+ h+='<div class="notebar"><i class="ti ti-info-circle"></i>'+goiyG("gy_trang_ca_nhan_7f30",
+  'Trang này là của <b>riêng bạn trên máy này</b> - khác với Cài đặt (của cả trung tâm).||'+
+  'Ảnh đại diện và các tuỳ chỉnh bên dưới lưu trong trình duyệt của máy này, người khác không thấy. '+
+  'Bản demo chạy hẳn trong trình duyệt nên chưa đồng bộ giữa các máy; khi nối máy chủ thật thì phần này theo tài khoản.')+'</div>';
+ /* --- hồ sơ --- */
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-user-circle" style="margin-right:6px"></i>Hồ sơ của tôi</b></div><div class="pbody">';
+ var av=avGet(sid||"ADMIN");
+ h+='<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:12px">';
+ h+='<div style="width:64px;height:64px;border-radius:50%;overflow:hidden;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;flex:none">'+
+  (av?('<img src="'+esc(av)+'" style="width:100%;height:100%;object-fit:cover">'):esc(gateAv(st.full_name||"Quản trị viên")))+'</div>';
+ h+='<div><div class="fld" style="margin:0"><label>Ảnh đại diện</label>'+
+  '<input type="file" accept="image/*" onchange="avChon(this)"></div>'+
+  (av?'<button class="btn sm" style="margin-top:6px" onclick="avXoa()"><i class="ti ti-trash"></i>Bỏ ảnh, dùng chữ tắt</button>':'')+'</div></div>';
+ h+=ctxRows([["Họ tên",esc(st.full_name||"Quản trị viên (chế độ demo)")],["Mã nhân sự",esc(sid||"-")],
+  ["Chức danh",esc(elabel(st.role)||"Quản trị viên")],["Cơ sở",esc(elabel(st.branch)||st.branch||"toàn hệ thống")],
+  ["Quản lý trực tiếp",esc(((staffBoss(sid)||{}).full_name)||"-")]]);
+ if(sid){
+  h+='<div class="grid2" style="margin-top:10px">';
+  h+='<div class="fld"><label>Email đăng nhập</label><input id="cn_email" value="'+esc(st.email||"")+'" placeholder="ten@thetutors.edu.vn"></div>';
+  h+='<div class="fld"><label>Số điện thoại</label><input id="cn_sdt" value="'+esc(st.phone||"")+'" placeholder="09..."></div>';
+  h+='</div><div class="fhint">Chức danh và cơ sở do Nhân sự đặt - muốn đổi thì báo phòng Nhân sự. Hai ô trên là thông tin liên hệ của chính bạn.</div>';
+  h+='<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" onclick="cnLuu()"><i class="ti ti-device-floppy"></i>Lưu thông tin</button>'+
+   '<button class="btn" onclick="openNSQuick(\''+esc(sid)+'\')"><i class="ti ti-id-badge-2"></i>Xem hồ sơ nhân sự đầy đủ</button></div>';
+ } else {
+  h+='<div class="fhint" data-tip="Chế độ Quản trị viên là cửa vào bằng mật khẩu, không phải một dòng trong sổ nhân sự - nên không có email, số điện thoại hay quản lý trực tiếp để hiện. Muốn xem trang cá nhân của một chức danh thì ra cổng chọn tên mình.">Chế độ Quản trị viên không gắn với một người trong sổ nhân sự.</div>';
+ }
+ h+='</div></div>';
+ /* --- mật khẩu --- */
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-lock" style="margin-right:6px"></i>Mật khẩu</b></div><div class="pbody">';
+  h+='<div class="fhint" style="margin-bottom:8px" data-tip="Bản demo chạy hẳn trong trình duyệt nên chưa có tài khoản riêng từng người - đăng nhập bằng cách chọn tên mình ở cổng. Mật khẩu quản trị dùng chung cho việc sửa cấu hình và dựng lại dữ liệu demo; khi nối máy chủ thật thì mỗi người một tài khoản.">Bản demo chưa có mật khẩu riêng từng người - chỉ có mật khẩu quản trị dùng chung.</div>';
+ if(cfGhiDuoc()){
+  h+='<div class="fld" style="max-width:300px"><label>Mật khẩu quản trị</label><input id="mk_in2" value="'+esc(matKhau())+'"></div>'+
+   '<button class="btn primary sm" style="margin-top:6px" onclick="mkLuu2()"><i class="ti ti-device-floppy"></i>Lưu mật khẩu</button>';
+ } else {
+  h+='<div class="fhint">Đang ở chế độ xem thử nên không sửa được. Vào lại bằng <b>Quản trị thật</b> ở cổng nếu cần đổi.</div>';
+ }
+ h+='</div></div>';
+ /* --- thói quen trên máy này --- */
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-adjustments" style="margin-right:6px"></i>Thói quen dùng app trên máy này</b></div><div class="pbody">';
+ h+='<div class="grid2">';
+ h+='<div class="fld"><label>Tỷ lệ hiển thị</label><select onchange="zoomSet(this.value)">'+
+  ZMUC.map(function(n){return '<option value="'+n+'"'+(n===zoomGet()?" selected":"")+'>'+n+'%</option>'}).join("")+
+  '</select><div class="fhint">Trên màn 13 inch, mức chín mươi phần trăm vừa đủ một bảng rộng mà không phải cuộn ngang.</div></div>';
+ h+='<div class="fld"><label>Nút bánh răng sửa tại chỗ</label><select onchange="uiSet(\'gear\',this.value===\'1\'?1:0);reRender(CUR)">'+
+  '<option value="1"'+(UI().gear?" selected":"")+'>Hiện - bấm là sửa ngay tại chỗ</option>'+
+  '<option value="0"'+(UI().gear?"":" selected")+'>Ẩn - màn hình gọn hơn</option></select></div>';
+ h+='</div>';
+ h+='<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">'+
+  '<button class="btn" onclick="drwReset()"><i class="ti ti-arrows-horizontal"></i>Đặt lại bề rộng ngăn kéo</button>'+
+  '<button class="btn" onclick="cnXoaThoiQuen()"><i class="ti ti-eraser"></i>Xoá mọi thói quen trên máy này</button></div>';
+ h+='</div></div>';
+ return h}
+function mkLuu2(){var v="";try{v=String((document.getElementById("mk_in2")||{}).value||"").trim()}catch(e){}
+ if(v.length<4){toastErr("Mật khẩu phải từ 4 ký tự trở lên.");return}
+ var c=(DATA.config=DATA.config||{});c.matKhau=v;cfgSave();
+ if(cfGhiDuoc())toast("Đã lưu mật khẩu quản trị.")}
 /* ═══ GHI NHẬN GÓP Ý (V9.92) ════════════════════════════════════════════════════════════════
    Anh Luân 03/08: *"để đỡ trôi, e cứ thêm vào sidebar 1 trang: ghi nhận góp ý, tổng hợp hết
    vào"* - đợt các phòng ban dùng thử, góp ý gửi qua tin nhắn sẽ trôi mất.
@@ -6420,9 +6565,10 @@ function gyAnhTo(id,i){var x=gyAll().filter(function(y){return y.id===id})[0];if
  openDrawer("Ảnh kèm góp ý",'<div class="dcard"><img src="'+(x.anh||[])[i]+'" style="width:100%;border-radius:8px"></div>')}
 function gyDoi(id,tt){var a=gyAll();for(var i=0;i<a.length;i++)if(a[i].id===id)a[i].tt=tt;
  if(gyGhi(a)){toast("Đã đổi trạng thái góp ý.");try{buildNav()}catch(e){}reRender("gopy")}}
-function gyXoa(id){askConfirm("Xoá góp ý này khỏi máy? Không lấy lại được.",function(){
+function gyXoa(id){confirmRun("Xoá góp ý này khỏi máy? Không lấy lại được.","gyXoaRun",id)}
+function gyXoaRun(id){
  var a=gyAll().filter(function(x){return x.id!==id});
- if(gyGhi(a)){toast("Đã xoá.");try{buildNav()}catch(e){}reRender("gopy")}})}
+ if(gyGhi(a)){toast("Đã xoá.");try{buildNav()}catch(e){}reRender("gopy")}}
 function gyXuat(){
  var a=gyAll();
  if(!a.length){toast("Chưa có góp ý nào để xuất.");return}
@@ -10606,6 +10752,9 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   h+='<div class="fld full"><label>Tải ảnh logo (PNG/SVG, dưới 250KB)</label><input type="file" accept="image/*" onchange="uiLogoFile(this)"></div>';
   h+='<div class="fld full"><label>Hoặc dán đường dẫn ảnh / gõ 1-2 chữ tắt</label><input value="'+esc(/^data:/.test(u.logo)?"":u.logo)+'" oninput="uiSet(\'logo\',this.value)" placeholder="https://... hoặc TT"></div>';
   h+='<div style="padding-top:4px"><button class="btn sm" onclick="uiSet(\'logo\',\'\');reRender(CUR)"><i class="ti ti-restore"></i>Dùng logo mặc định</button></div>';
+  h+='<div class="fld full" style="margin-top:10px"><label>Bấm logo thì về đâu</label>'+
+   '<input value="'+esc(u.trangchu||"")+'" oninput="uiSet(\'trangchu\',this.value)" placeholder="'+esc(trangChuURL())+'">'+
+   '<div class="fhint" data-tip="Để trống thì app tự tính đường về: mở từ web sẽ về trang chủ bản demo nằm cùng thư mục, mở thẳng file trên máy sẽ về '+esc(TRANGCHU)+'. Điền địa chỉ vào đây khi trung tâm có tên miền riêng.">Để trống là app tự tính đường về.</div></div>';
   h+='</div></div></div><div>';
   h+='<div class="panel" data-tour="cfbrandmau"><div class="ph"><b><i class="ti ti-palette" style="margin-right:6px"></i>Màu thương hiệu</b></div><div class="pbody">';
   h+='<div class="fld"><label>Màu nền menu (chủ đạo)</label><input type="color" value="'+esc(u.navy)+'" oninput="uiSet(\'navy\',this.value)" style="height:38px;padding:2px"></div>';
@@ -14566,7 +14715,7 @@ var GOIYDEF={};
 /* Đoạn nào hiện ở màn nào - để người sửa biết mình đang sửa dòng ở đâu. */
 /* Bấm 'Xem tại chỗ' thì mở đúng màn đang chứa dòng đó. */
 var GOIYPG={gy_ay_la_cac_cau_3fed:"window.SETTAB='ch4';reRender('settings')",gy_ay_la_nguong_at_f276:"window.SETTAB='ch6';reRender('settings')",gy_cau_nhac_viec_chuan_281e:"window.SETTAB='ch4';reRender('settings')",gy_chi_quan_ly_giam_63c5:"window.SETTAB='ch2';reRender('settings')",gy_danh_muc_lua_chon_293d:"window.SETTAB='ch1';reRender('settings')",gy_email_dung_e_ang_eb0e:"window.SETTAB='staff';reRender('settings')",gy_hop_nay_tra_loi_5ff9:"go('hoidap')",gy_khoa_hoc_la_cau_1eb3:"window.SETTAB='khoa';reRender('settings')",gy_lop_nay_chua_co_a916:"go('banglop')",gy_nguoi_nay_la_giang_ade7:"go('hosonv')",gy_oi_ten_logo_va_844c:"window.SETTAB='brand';reRender('settings')",gy_phan_quyen_co_ba_7c33:"window.SETTAB='phanquyen';reRender('settings')",gy_ung_nhung_gi_hoc_ef1d:"go('hoso')"};
-var GOIYO={gy_ban_lam_viec_tt01:"Trang Bàn làm việc",gy_chua_ban_duoc_dong_4b71:"Bảng danh mục - cột tính tiền",gy_khoa_chua_co_don_9c28:"Bảng danh mục - cột đếm đơn",gy_chua_co_hoat_dong_3e05:"Bảng danh mục - cột lâu chưa hoạt động",gy_ay_la_cac_cau_3fed:"Cài đặt",gy_ay_la_nguong_at_f276:"Cài đặt",gy_cau_nhac_viec_chuan_281e:"Cài đặt",gy_chi_quan_ly_giam_63c5:"Cài đặt",gy_chon_mot_muc_ben_d524:"Màn pickerPage",gy_chon_nguoi_nhan_app_6ef8:"Màn tkNew",gy_danh_muc_lua_chon_293d:"Cài đặt",gy_email_dung_e_ang_eb0e:"Cài đặt",gy_ho_so_chua_ghi_1990:"Màn riskCare",gy_hop_nay_tra_loi_5ff9:"Trang Hỏi đáp",gy_khach_ngung_khong_phai_0425:"Màn ReupTab",gy_khoa_hoc_la_cau_1eb3:"Cài đặt",gy_lop_nay_chua_co_a916:"Vận hành lớp",gy_nguoi_nay_la_giang_ade7:"Hồ sơ Nhân viên",gy_oi_ten_logo_va_844c:"Cài đặt",gy_phan_quyen_co_ba_7c33:"Cài đặt",gy_ung_nhung_gi_hoc_ef1d:"Hồ sơ 360 học viên",gy_trang_gop_y_9c21:"Trang Ghi nhận góp ý"};
+var GOIYO={gy_ban_lam_viec_tt01:"Trang Bàn làm việc",gy_chua_ban_duoc_dong_4b71:"Bảng danh mục - cột tính tiền",gy_khoa_chua_co_don_9c28:"Bảng danh mục - cột đếm đơn",gy_chua_co_hoat_dong_3e05:"Bảng danh mục - cột lâu chưa hoạt động",gy_ay_la_cac_cau_3fed:"Cài đặt",gy_ay_la_nguong_at_f276:"Cài đặt",gy_cau_nhac_viec_chuan_281e:"Cài đặt",gy_chi_quan_ly_giam_63c5:"Cài đặt",gy_chon_mot_muc_ben_d524:"Màn pickerPage",gy_chon_nguoi_nhan_app_6ef8:"Màn tkNew",gy_danh_muc_lua_chon_293d:"Cài đặt",gy_email_dung_e_ang_eb0e:"Cài đặt",gy_ho_so_chua_ghi_1990:"Màn riskCare",gy_hop_nay_tra_loi_5ff9:"Trang Hỏi đáp",gy_khach_ngung_khong_phai_0425:"Màn ReupTab",gy_khoa_hoc_la_cau_1eb3:"Cài đặt",gy_lop_nay_chua_co_a916:"Vận hành lớp",gy_nguoi_nay_la_giang_ade7:"Hồ sơ Nhân viên",gy_oi_ten_logo_va_844c:"Cài đặt",gy_phan_quyen_co_ba_7c33:"Cài đặt",gy_ung_nhung_gi_hoc_ef1d:"Hồ sơ 360 học viên",gy_trang_gop_y_9c21:"Trang Ghi nhận góp ý",gy_trang_ca_nhan_7f30:"Trang cá nhân"};
 function goiy(k,vb){if(!(k in GOIYDEF))GOIYDEF[k]=vb;
  var g=(DATA.config&&DATA.config.goiy)||{};
  var v=g[k];return (v==null||v==="")?vb:String(v)}
@@ -15868,7 +16017,7 @@ var TOURLV=[
  ["donviec","Dọn việc hôm nay","ti-checklist","Trợ lý hướng dẫn xử lý từng việc đang chờ, tới khi hết hàng chờ"]];
 var TOURS={
  /* ---------- CẤP 1: THAM QUAN ---------- */
- tq_tong:{lv:"thamquan",t:"Toàn cảnh app",ic:"ti-rocket",d:"8 bước - hiểu app chạy thế nào trong 2 phút",steps:[
+ tq_tong:{lv:"thamquan",t:"Toàn cảnh app",ic:"ti-rocket",d:"10 bước - hiểu app chạy thế nào trong 2 phút",steps:[
   /* V9.53 (anh Luân: "bàn làm việc mà nó trỏ vào logo, chẳng hiểu kiểu gì"): bước này nói về
      CẢ APP chứ không về một ô nào - neo vào logo là sai hẳn. `mo:1` = bước mở đầu: không khoanh
      gì, màn tối đều, hộp ra giữa. Trỏ bừa vào một ô còn tệ hơn không trỏ. */
@@ -15883,7 +16032,8 @@ var TOURS={
   /* Bước cuối của bài đầu tiên là chỗ đắt nhất để đặt câu này: người dùng vừa xem xong app,
      đúng lúc họ sắp có ý kiến đầu tiên. Đợt dùng thử sống hay chết là ở chỗ góp ý có được ghi
      lại hay trôi mất trong tin nhắn. */
-  {p:"gopy",sel:'@phead',t:"Thấy gì chưa ổn thì báo ngay tại đây",d:"Nút hình loa ở thanh trên mở ô báo lỗi - app tự ghi sẵn bạn đang ở trang nào, đăng nhập bằng ai, dùng bản nào; bạn chỉ gõ một câu và dán ảnh chụp màn hình. Mọi phiếu gom về trang này, xuất ra một tệp gửi cho người tổng hợp.",hint:"Xong phần tham quan. Thử cấp độ Trải nghiệm để làm việc thật."}]},
+  {p:"gopy",sel:'@phead',t:"Thấy gì chưa ổn thì báo ngay tại đây",d:"Nút hình loa ở thanh trên mở ô báo lỗi - app tự ghi sẵn bạn đang ở trang nào, đăng nhập bằng ai, dùng bản nào; bạn chỉ gõ một câu và dán ảnh chụp màn hình. Mọi phiếu gom về trang này, xuất ra một tệp gửi cho người tổng hợp.",hint:"Bấm Tiếp theo - bước cuối."},
+  {p:"canhan",sel:'@phead',t:"Chỗ của riêng bạn",d:"Ảnh đại diện, số điện thoại liên hệ, và những thói quen dùng app trên máy này: tỷ lệ hiển thị, bật tắt bánh răng sửa tại chỗ, bề rộng ngăn kéo. Khác với Cài đặt - Cài đặt là của cả trung tâm, trang này chỉ mình bạn thấy.",hint:"Xong phần tham quan. Thử cấp độ Trải nghiệm để làm việc thật."}]},
  /* ---------- CẤP 2: TRẢI NGHIỆM THEO VỊ TRÍ ---------- */
  /* V9.66 - HAI BÀI MỚI. Đo trước khi thêm: 13 bài / 75 bước cho một app 33 trang, trong đó
     13 SỔ TRA CỨU không có một bước nào - mà đó chính là chỗ anh Luân vừa bắt lỗi thiếu bộ lọc
@@ -16503,6 +16653,10 @@ var UIDEF={brand:"ITTs - SOP TEMP",sub:"Hệ thống tuân thủ SOP",center:"IE
     sửa được thông số theo thực tế của trung tâm mình ngay tại chỗ thấy con số. Trung tâm chạy
     thật thì tắt đi cho gọn, số vẫn đúng, chỉ không còn nút nhảy. */
  gear:1,
+ /* Địa chỉ trang chủ bản demo - bấm logo là về đây. Để TRỐNG là app tự tính theo cách trang
+    đang được mở (anh Luân 03/08: *"chắc nên nằm đâu đó trong cài đặt"* - đúng, một địa chỉ
+    cắm cứng trong mã là thứ không ai sửa được khi đổi tên miền). */
+ trangchu:"",
  menu:{},mlabel:{},ilabel:{}};
 function UI(){var c=(DATA.config=DATA.config||{});var u=(c.ui=c.ui||{});
  for(var k in UIDEF)if(u[k]===undefined)u[k]=(typeof UIDEF[k]==="object"?JSON.parse(JSON.stringify(UIDEF[k])):UIDEF[k]);
@@ -19105,7 +19259,7 @@ function banNutHoSo(ttk,r){
  if(ttk==="hocvien")return '<button class="btn" onclick="window.HOSO=\''+esc(r.student_id)+'\';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>';
  return '<button class="btn" onclick="openLop(\''+esc(r.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Mở lớp</button>'}
 
-var RENDER={ban:renderBan,gopy:renderGopy,dsphuhuynh:renderSoPH,hoidap:renderHoidap,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
+var RENDER={ban:renderBan,gopy:renderGopy,canhan:renderCanhan,dsphuhuynh:renderSoPH,hoidap:renderHoidap,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
 function dashJump(key){var m={urgent:"viec",newlead:"nhaplead",consider:"viec",convert:"tuvan",risk:"viec",onboard:"xeplop",approve:"duyet",debt:"thanhtoan",complaint:"khieunai",ungraded:"baitap",testpend:"test",wowbook:"wow",unverified:"thanhtoan",classes:"banglop"};var pg=m[key];if(pg&&RBK[CURROLE].pages.indexOf(pg)>=0)go(pg);else go("viec")}
 
 /* ---------- router ---------- */
@@ -19913,7 +20067,7 @@ var NAVTREE=[
     thẩm quyền chứ không thuộc chặng nào. Duyệt nghỉ trước đây nằm lẫn trong màn Điểm danh nên
     học vụ phải mò mới thấy. */
  {g:"Chờ duyệt",items:["duyetck","duyethoan","duyetnghi","duyetthu","duyetgiao","banggiao"]},
- {g:"Điều hành",items:["baocao","gopy","settings"]},
+ {g:"Điều hành",items:["baocao","gopy","canhan","settings"]},
  {g:"Tra cứu",items:["hocvien","dsphuhuynh","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","giangvien","nhanvien"]}];
 var NAVSUB={nhaplead:"tuyensinh",test:"tuyensinh",tuvan:"tuyensinh",thanhtoan:"tuyensinh",reup:"tuyensinh",
  review:"cskh",khaosat:"cskh",ghinhan:"cskh",khieunai:"cskh",ychv:"cskh",
@@ -20022,7 +20176,7 @@ var NAVTREE6=[
    "tuyensinh","hoctap","cskh","ketthuc"]},
  {g:"Tra cứu",items:["hocvien","dsphuhuynh","giangvien","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan",
    "dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai"]},
- {g:"Quản lý",items:["baocao","nhansu","hoidap","khac","gopy","settings"]}];
+ {g:"Quản lý",items:["baocao","nhansu","hoidap","khac","gopy","canhan","settings"]}];
 function buildNav(){
  window.__navarc1=0;   /* neo @navarc chi gan cho nhom chặng ĐẦU TIÊN - neo trùng là tô sáng nhầm chỗ */
  window.__NAVJ=null;try{window.__NAVJ=jAll()}catch(e){}   /* tính 1 lần cho mọi badge */
@@ -20058,7 +20212,11 @@ function setRole(k){CURROLE=k;var r=RBK[k];
  var st=(window.GATE_SID&&find("DL01","staff_id",window.GATE_SID))||staffFor(k);CURSTAFF=st.staff_id||"";
  document.getElementById("meName").textContent=(st.staff_id==="ADMIN")?"Admin":(st.staff_id+" - "+st.full_name);
  document.getElementById("meRole").textContent=(st.staff_id==="ADMIN")?"Quản trị viên · toàn quyền":(window.GATE_SID?(elabel(st.role)||r.name):r.name);
- document.getElementById("meAv").textContent=(st.full_name||"?").trim().slice(-1).toUpperCase()==""?"?":(st.full_name.trim().split(" ").pop()[0]||"?");
+ /* Ảnh đại diện người dùng tự đặt ở Trang cá nhân; chưa đặt thì vẫn là chữ tắt như cũ. */
+ var _av="";try{_av=avGet(st.staff_id||"ADMIN")}catch(e){}
+ var _mav=document.getElementById("meAv");
+ if(_av){_mav.innerHTML='<img src="'+esc(_av)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">'}
+ else{_mav.innerHTML="";_mav.textContent=(st.full_name||"?").trim().slice(-1).toUpperCase()==""?"?":(st.full_name.trim().split(" ").pop()[0]||"?")}
  buildNav();try{tthBtn()}catch(e){}go(SCOPE().land||"banlam")}
 function toast(m,ms,kind){var t=document.getElementById("toast");t.textContent=m;
  if(kind==="err"){t.classList.add("err");if(!ms)ms=6000}else t.classList.remove("err");
@@ -20197,6 +20355,7 @@ function enter(k){try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{rtEnsur
  try{cfBarSync()}catch(e){}
  try{pkNghe()}catch(e){}
  try{moGan()}catch(e){}
+ try{zoomInit()}catch(e){}
  try{tourOfferOnce()}catch(e){}}
 
 /* ============ CỔNG HỌC VIÊN (file HTML riêng) ============
@@ -20656,6 +20815,25 @@ function congLaV6(){
  return false}
 function congTenNV(){return congLaV6()?"cong-nhan-vien-v6":"cong-nhan-vien"}
 function congFileNV(){return congLaV6()?"ITTs_WebApp_v6_demo.html":"ITTs_WebApp_v5_demo.html"}
+/* BẤM LOGO LÀ VỀ TRANG CHỦ BẢN DEMO (V9.94, anh Luân: *"Mặc định của chỗ logo trong cổng nhân
+   viên, em cho bay về: https://mittomap.github.io/itts-sop-demo/ nhé"*).
+   Địa chỉ TÍNH THEO CÁCH TRANG ĐANG ĐƯỢC MỞ, đúng cách `congURL` đang làm cho nút Đổi cổng:
+   mở từ web thì lùi một bậc thư mục (.../cong-nhan-vien/ -> .../), mở thẳng file trên máy thì
+   về trang chủ demo trên web. Cắm cứng một địa chỉ vào mọi trường hợp là hỏng ngay khi ai đó
+   mở file bằng tay hoặc đổi tên miền. */
+var TRANGCHU="https://mittomap.github.io/itts-sop-demo/";
+function trangChuURL(){
+ try{
+  var kh=String((UI().trangchu||"")).trim();
+  if(kh)return kh;
+  if(congKieuFile())return TRANGCHU;
+  var p=location.pathname;
+  var b=p.replace(/(cong-nhan-vien-v6|cong-nhan-vien|cong-hoc-vien)\/?[^\/]*$/,"");
+  if(b===p)return TRANGCHU;
+  if(b.slice(-1)!=="/")b+="/";
+  return b}
+ catch(e){return TRANGCHU}}
+function trangChuDemo(){try{closeModal()}catch(e){}location.href=trangChuURL()}
 function congURL(w){
  var p=location.pathname;
  if(congKieuFile()){var d=p.replace(/[^\/]*$/,"");

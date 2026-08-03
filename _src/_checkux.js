@@ -556,6 +556,11 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
   try{h=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){return}
   var re=/<([a-z]+)([^>]*)>([^<]{0,30}?\d{1,3}%)/g,m;
   while((m=re.exec(h))){
+   /* <option> la MOT LUA CHON, khong phai mot con so do duoc. "90%" trong o Ty le hien thi la
+      cai nguoi dung CHON, khong phai ket qua tinh tu du lieu - doi no khai "cach tinh" la doi
+      mot thu khong ton tai. Luat nay sinh ra tu cau hoi cua anh Luan ve KPI ("95% la tinh the
+      nao"), nen giu dung pham vi ay. */
+   if(m[1]==="option")continue;
    var attr=m[2]||"",truoc=h.slice(Math.max(0,m.index-420),m.index+60);tong++;
    var co=/data-tip="[^"]{10,}|title="[^"]{10,}/.test(attr)||/data-tip="[^"]{10,}"/.test(truoc);
    if(!co){var fn=(attr.match(/data-tipfn="([^"]+)"/)||[])[1],ta=(attr.match(/data-tipa="([^"]*)"/)||[])[1]||"";

@@ -400,6 +400,22 @@ Chi tiet "vi sao" o `02_NHAT_KY_QUYET_DINH.md`. O day chi ghi nhung cho **cham v
   `/active|đang|working/` - ma **"inactive (Đã nghỉ việc)" CHUA chu "active"**, nen 4 nguoi da
   nghi van duoc cham nhu nguoi dang di lam. Nay hoi thang `staffActive()` cua app.
   **Luat: dung viet lai luat cua app bang chu cua minh.**
+- **`_checkbam.js` (MOI, V9.93)** - **BAM THU MOI THE VA MOI DONG TREN MOI TRANG**, tren trinh
+  duyet that. Anh Luan mo ban demo online va hoi: *"Vay lam sao biet o cac trang khac co ton tai
+  loi gi ko?"* - cau tra loi that long luc do la KHONG BIET. Ca 22 bo kiem cu khong bo nao bam
+  vao mot cai the: 20 bo do CHUOI HTML (khong bao gio chay vao ham mo ngan keo), `_checkui` chi
+  NHIN, `_checknv` chi bam nut "Lam" o Ban lam viec. Nen hai loi that nam im rat lau:
+  (1) `SVTPL` duoc dung o 5 cho ma **chua bao gio duoc khai** - mo form Gui khao sat la chet
+  ngan keo, khong mot dong bao nao cho nguoi dung, ca luong Khao sat dinh ky cua SOP dung im;
+  (2) the khieu nai / phan hoi va dong lop trong bang khao sat **khong bam duoc**.
+  Chay lan dau: **92 cho bam vao khong co gi xay ra**. Nay 0.
+  Khong chi hoi "co bam duoc khong" (anh Luan: *"khong chi bam, ma phai xem tinh hop ly cua no
+  va hanh dong, va trang mo ra, noi dung tuong tac"*) ma con hoi: mo **DUNG ho so vua bam**
+  khong · co lo `undefined`/`NaN`/`[object Object]` ra man khong · ngan keo co rong khong.
+  Hai bay cua chinh cai thuoc da cat: (a) "khong co gi xay ra" bo sot tin hieu **than trang ve
+  lai tai cho** (Ban lam viec mo ho so ngay trong trang) - tu oan 8 dong dang chay dung; (b) rut
+  ma ho so tu `textContent` thi chu cac o dinh lien nhau ("LOP-FOUND-PLA-01"+"10"+"100") thanh
+  mot ma bia ra - nay chi hoi khi dong TU KHAI ma bang `data-mo-arg`.
 - **`_checknguoi.js` (MOI, V9.91)** - dong vai **tung NGUOI** trong DL01 (37 nguoi / 18 chuc danh),
   khong phai tung chuc danh. Vi sao can them mot bo nua: pham vi du lieu cat theo CHI NHANH va
   theo NGUOI PHU TRACH, nen 7 nhan vien tu van o 5 co so nhin ra 7 man hinh khac nhau - lay mot

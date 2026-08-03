@@ -149,6 +149,38 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.93-V9.94 — ANH LUÂN MỞ BẢN DEMO VÀ BẮT ĐƯỢC LUỒNG CHẾT ✅ (03/08).**
+> · **Không gửi được khảo sát.** `SVTPL` (bảng bộ câu hỏi) được **dùng ở 5 chỗ mà chưa bao giờ
+> được khai** - mở form là `SVTPL is not defined`, ngăn kéo chết ngay, **không một dòng báo nào
+> cho người dùng**. Cả luồng Khảo sát định kỳ của SOP đứng im vì một cái bảng thiếu. Nay khai đủ
+> bộ câu cho 5 đợt; đo lại: gửi một lớp tạo đúng 10 phiếu.
+> · **Thẻ và dòng khắp app không bấm được** - anh Luân bấm vào tên người khiếu nại, bấm vào lớp,
+> không có gì xảy ra. Sửa ở **một chỗ dùng chung** (`moGan`/`moBam`): bấm thân thẻ hoặc thân dòng
+> là mở chi tiết, ưu tiên `data-mo` khai trên thẻ rồi tới nút mang nghĩa xem, tránh nút phá.
+> Kèm bốn màn mới: **lịch sử khảo sát của lớp** · **một phiếu khảo sát** · **một phản hồi** ·
+> **xem trọn một dòng sổ** (`lstXem`, chạy cho cả 13 sổ vì đọc thẳng `LISTCFG`).
+> · **Câu hỏi quan trọng nhất của cả ngày** - anh Luân: *"Vậy làm sao biết ở các trang khác có
+> tồn tại lỗi gì ko?"* Câu trả lời thật lúc đó: **không biết**. Trong 22 bộ kiểm, không bộ nào
+> từng bấm vào một cái thẻ. Nên dựng `_checkbam`: **bấm thật 120 thẻ/dòng trên 78 màn** mỗi bản.
+> Lần chạy đầu: **92 chỗ bấm vào không có gì xảy ra**. Nay 0.
+> · Và theo anh Luân bổ sung (*"không chỉ bấm, mà phải xem tính hợp lý của nó và hành động, và
+> trang mở ra, nội dung tương tác"*), bộ kiểm hỏi thêm: mở **đúng hồ sơ vừa bấm** không · có lộ
+> `undefined`/`NaN` ra màn không · ngăn kéo có rỗng không.
+> · **Tỷ lệ hiển thị** trên thanh trên, mặc định **90%** (anh Luân dùng Chrome 90% trên Mac Air
+> M2 thấy vừa). Tự tắt ở màn ≤820px - thu nhỏ thêm trên điện thoại là không đọc nổi.
+> · **Trang cá nhân**: ảnh đại diện, liên hệ, và thói quen dùng app **trên máy này**. Ranh giới
+> vạch rõ để hai màn không lấn nhau - **Cài đặt** là của trung tâm (cần quyền, ai cũng thấy),
+> **Trang cá nhân** là của một người trên một máy (không cần quyền, chỉ mình thấy).
+> · **Bấm logo là về trang chủ bản demo**, địa chỉ **để trong Cài đặt → Giao diện** chứ không
+> cắm cứng (anh Luân: *"chắc nên nằm đâu đó trong cài đặt"*); để trống thì app tự tính theo cách
+> trang đang được mở.
+> · **Hai lần cái thước tự tố oan, cùng một buổi:** (1) `_checkbam` không biết tín hiệu "mở hồ sơ
+> ngay tại chỗ" nên chấm 8 dòng đang chạy đúng là chết; (2) nó rút mã hồ sơ từ `textContent`, mà
+> chữ các ô trong bảng dính liền nhau ("LOP-FOUND-PLA-01"+"10"+"100") thành một mã bịa ra.
+> **Luật: một tín hiệu không có trong vốn từ của cái thước không có nghĩa là app không phản hồi.**
+> · Một luật nữa cho `_checkux`: `<option>` là **một lựa chọn, không phải một con số đo được** -
+> bắt "90%" trong ô Tỷ lệ hiển thị phải khai cách tính là đòi một thứ không tồn tại.
+
 > **Phiên bản: V9.92 — TRANG GHI NHẬN GÓP Ý ✅ (03/08).**
 > · Anh Luân: *"để đỡ trôi, e cứ thêm vào sidebar 1 trang: ghi nhận góp ý, tổng hợp hết vào"*.
 > Nút hình loa trên thanh trên mở ô báo lỗi ở **mọi màn**; app tự ghi sẵn phần khó nhất - đang ở
