@@ -18082,10 +18082,30 @@ function renderBan(){
   'Mỗi giai đoạn có <b>một thực thể trung tâm</b>. Chọn thực thể, mở một hồ sơ, làm hết việc của bạn ngay tại đó.||'+
   'Chưa học thì khách là trung tâm; đang học thì lớp và học viên là trung tâm. App chỉ hiện những việc mà chức danh của bạn được làm theo bảng phân quyền CH3, và chỉ những việc hồ sơ đó còn thiếu.')+'</div>';
  /* chọn thực thể */
+ var _tong=0;
  h+='<div class="tbar" data-tour="bantt">'+TTHE.map(function(x){
   var n=0;try{n=ttDanhSach(x.k).filter(function(z){return z.viec.length}).length}catch(e){}
+  _tong+=n;
   return '<button class="seg'+(x.k===ttk?" on":"")+'" onclick="banChon(\''+x.k+'\')" data-tip="'+esc(x.d)+'">'+
    '<i class="ti '+x.ic+'"></i>'+esc(x.t)+(n?'<span class="segn">'+n+'</span>':'')+'</button>'}).join("")+'</div>';
+ /* CHỨC DANH KHÔNG CÓ VIỆC NÀO TRÊN BỐN ĐỐI TƯỢNG - phải CHỈ ĐƯỜNG, không để họ đứng trước
+    một danh sách không phải của mình. Đo được ở bản v6: ba chức danh Nhân sự đáp xuống Bàn làm
+    việc rồi nhìn thấy **344 hồ sơ, 0 việc của mình, 264 việc của bộ phận khác** - hơn 90% màn
+    hình là nhiễu. Không phải app hỏng: việc của Nhân sự vốn nằm ở người-lao-động, mà bốn đối
+    tượng được phục vụ là khách - học viên - phụ huynh - lớp, không có nhân viên trong đó (đúng
+    trục anh Luân chốt). Nhưng "không thuộc trục" không có nghĩa là để người ta tự mò.
+    Danh sách vẫn giữ nguyên bên dưới - quyền chặn tay, không che mắt; chỉ thêm một biển chỉ
+    đường lên trên. */
+ if(!_tong){
+  var _g=SCOPE().group||"quantri", _nha=(BVLAND[_g]||[])[0];
+  var _ds=[];[_nha,"giaoviec","bangcong"].forEach(function(k){
+   if(!k||_ds.indexOf(k)>=0)return;try{if(canSee(k))_ds.push(k)}catch(e){}});
+  if(_ds.length)h+='<div class="notebar"><i class="ti ti-route"></i>'+
+   'Bốn đối tượng này chưa có việc nào của bạn. Việc của bạn ở: '+
+   _ds.map(function(k){var p=PBK[k]||{};
+    return '<button class="pill" onclick="go(\''+esc(k)+'\')"><i class="ti '+(p.ic||"ti-arrow-right")+
+     '"></i>'+esc(p.t||k)+'</button>'}).join(" ")+'</div>';
+ }
  /* BẢNG VIỆC CỦA CHỨC DANH ngay sau thanh chọn thực thể - đọc xuôi từ trên xuống: tôi đang
     xem loại hồ sơ nào → nhóm tôi đang tồn những việc gì → rồi mới tới danh sách hồ sơ.
     Ở v5 khối này nằm trên trang đáp của từng chức danh; v6 đổi trang đáp thành Bàn làm việc mà

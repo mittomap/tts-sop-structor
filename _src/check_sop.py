@@ -206,6 +206,19 @@ TRIG_BOQUA = {
 #   ma -> (bang, mo ta vi sao phai dung san, cac cot cua dong)
 #   gia tri {"__ago_min": n} = "n phut truoc", quy ra chuoi dd/mm/yyyy hh:mm luc chay.
 SYNTH = {
+    # V9.82: benh cu, lan thu tu. NA039 la nhanh "khieu nai muc TRUNG BINH da qua han xu ly"
+    # (hSince(complaint_time) > slaKN_medium_hours = 24 gio) va van CHUA giao ai, CHUA leo thang,
+    # CHUA giai quyet. Ba dieu kien "chua" ay khong song lau trong du lieu demo: chi can mot don
+    # khieu nai duoc gan nguoi xu ly la nhanh nay tat. Truoc day bo kiem xanh nho DONG HO THAT
+    # troi qua moc 24 gio - tuc no xanh vi may man, va den khi neo dong ho vao ngay sinh du lieu
+    # thi lo ra. Dung dong dung san cho chac tay, giong bon truong hop truoc.
+    "NA039": ("DL17",
+              "Nhanh 'khieu nai trung binh QUA HAN xu ly': don DA co nguoi xu ly (chua giao thi "
+              "ra NA081), chua leo thang, chua giai quyet, va da qua slaKN_medium_hours. Cua so "
+              "nay khong giu duoc trong bo du lieu demo co ngay sinh co dinh. Dat 96 gio chu khong phai dung 48: nguong slaKN_medium_hours dang cau hinh la 48 va phep so la > chu khong phai >=, dat sat mep la dong dung san tu roi xuong nhanh NA081.",
+              {"complaint_id": "KN-PROBE39", "complaint_status": "open (Mới)",
+               "complaint_severity": "medium (Trung bình)", "escalated_to": "",
+               "assigned_handler": "NV-001", "complaint_time": {"__ago_min": 60 * 96}}),
     "NA049": ("DL02",
               "Chi dung tu phut thu 15 den gio thu 4 sau khi lead vao (slaLRT_minutes -> "
               "slaLeadReassign_hours). Cua so ba tieng ruoi nay khong the gieo tinh vao du lieu: "
@@ -312,6 +325,19 @@ global.document={getElementById:function(){return El()},querySelector:function()
 global.window=global;global.location={hash:"",search:""};
 global.localStorage={getItem:function(){return null},setItem:function(){}};
 global.sessionStorage={getItem:function(){return null},setItem:function(){},removeItem:function(){}};
+/* NEO DONG HO VAO NGAY SINH CUA BO DU LIEU - TRUOC khi nap app.
+   Bay da can (02/08): sang chay DAT, chieu cung ngay KHONG DAT o ba tinh huong NA037/NA072/NA073,
+   ca ba deu la "con trong han" - chung HET han dan trong ngay nen ket qua phu thuoc gio chay.
+   Luat: khong do cai dang dung yen bang mot cai thuoc dang chay. */
+(function(){try{
+  var meta=JSON.parse(require("fs").readFileSync("./demo_data_big.json","utf8")).meta||{};
+  var m=String(meta.anchor||"").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/);
+  if(!m)return;
+  var moc=new Date(+m[3],+m[2]-1,+m[1],+(m[4]||0),+(m[5]||0)).getTime(), D=Date;
+  global.Date=function(){return arguments.length?new D(...arguments):new D(moc)};
+  global.Date.now=function(){return moc};
+  global.Date.prototype=D.prototype;global.Date.parse=D.parse;global.Date.UTC=D.UTC;
+}catch(e){}})();
 require("vm").runInThisContext(require("fs").readFileSync(process.argv[2],"utf8"));
 setRole("all");
 var ra={};
@@ -512,6 +538,19 @@ global.document={getElementById:function(){return El()},querySelector:function()
 global.window=global;global.location={hash:"",search:""};
 global.localStorage={getItem:function(){return null},setItem:function(){}};
 global.sessionStorage={getItem:function(){return null},setItem:function(){},removeItem:function(){}};
+/* NEO DONG HO VAO NGAY SINH CUA BO DU LIEU - TRUOC khi nap app.
+   Bay da can (02/08): sang chay DAT, chieu cung ngay KHONG DAT o ba tinh huong NA037/NA072/NA073,
+   ca ba deu la "con trong han" - chung HET han dan trong ngay nen ket qua phu thuoc gio chay.
+   Luat: khong do cai dang dung yen bang mot cai thuoc dang chay. */
+(function(){try{
+  var meta=JSON.parse(require("fs").readFileSync("./demo_data_big.json","utf8")).meta||{};
+  var m=String(meta.anchor||"").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/);
+  if(!m)return;
+  var moc=new Date(+m[3],+m[2]-1,+m[1],+(m[4]||0),+(m[5]||0)).getTime(), D=Date;
+  global.Date=function(){return arguments.length?new D(...arguments):new D(moc)};
+  global.Date.now=function(){return moc};
+  global.Date.prototype=D.prototype;global.Date.parse=D.parse;global.Date.UTC=D.UTC;
+}catch(e){}})();
 require("vm").runInThisContext(require("fs").readFileSync(process.argv[2],"utf8"));
 setRole("all");
 var out=[];

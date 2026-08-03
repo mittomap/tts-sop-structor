@@ -149,6 +149,26 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.82 — MỘT NGÀY CỦA TỪNG CHỨC DANH, VÀ BA NGƯỜI NHÂN SỰ ĐỨNG TRƯỚC TƯỜNG ✅ (02/08).**
+> · Anh Luân hỏi nhân viên chê gì. Sự thật: **chưa ai dùng thử nên chưa ai nói gì** - em không bịa
+> ra lời của người chưa nói. Nhưng có mấy dạng kẹt máy hỏi thay được, nên dựng `_src/_checkngay.js`.
+> · **Phát hiện thật:** ba chức danh **Nhân sự** đáp xuống Bàn làm việc rồi nhìn thấy **344 hồ sơ ·
+> 0 việc của mình · 264 việc của bộ phận khác** - hơn 90% màn hình là nhiễu. App không hỏng; việc
+> của Nhân sự vốn nằm ở người-lao-động, mà bốn đối tượng được phục vụ không có nhân viên trong đó.
+> · **Vá:** không bịa việc cho họ, mà **chỉ đường** - một dải "Việc của bạn ở: Nhân sự · Giao việc ·
+> Bảng công". Danh sách vẫn giữ nguyên bên dưới (quyền chặn tay, không che mắt).
+> · **Việc mồ côi: 0** - không việc nào nổi lên mà không chức danh nào được phép làm.
+> · **Còn để ngỏ, chờ anh quyết:** ba chức danh **Marketing** thấy 26 việc của mình bên cạnh **85**
+> việc của bộ phận khác (gấp 3.3 lần). Đúng thiết kế nhưng có thể là quá ồn - em chưa tự đổi.
+> · **Hai lần cái thước tố oan app, cả hai đều bắt được nhờ soi lại thước:** đo bằng biến
+> `BANGVIEC[vai]` **không tồn tại** nên ra 0 cho cả 18 chức danh · và "trang trống" hỏi mỗi "có
+> `.empty` không" nên tố oan cả CEO là trang Giao việc trống trong khi CEO đang có 4 việc.
+> · **Bẫy đồng hồ lần thứ sáu và bảy:** `_check13.js` và `check_sop.py` chưa được neo giờ - sáng
+> chạy xanh, chiều cùng ngày chạy đỏ ở đúng những tình huống "còn trong hạn". Nay neo cả hai vào
+> `meta.anchor`. Neo xong lộ thêm NA039 (khiếu nại trung bình quá hạn) trước nay **xanh nhờ may**.
+> · **Bẫy công cụ:** `extract_js.py` luôn ghi vào `_src/_APP*.js` bất kể trích từ đâu - trích bản
+> cũ để đối chứng là **âm thầm ghi đè** bản đang thử. Em đã đo nhầm một lượt vì chuyện này.
+
 > **Phiên bản: V9.81 — VIỆC HÀNG LOẠT ĐI THẲNG, VÀ MỘT BỘ KIỂM CHẬP CHỜN ✅ (02/08).**
 > · Đo giá một việc trên hai bản (bấm Làm xong tốn mấy màn): v5 **114/114 phải đổi màn**, v6
 > **100/114 làm tại chỗ**. Nhưng chia theo chức danh thì lộ chỗ v6 THUA: **giáo viên ACA chỉ
@@ -7093,4 +7113,74 @@ thôi.
 ### Số chốt phiên
 v6: **100 việc làm tại chỗ + 14 việc hàng loạt đi thẳng một cú bấm**. `_checknv` 228 lượt xanh.
 `_checkui` 1431 lượt xanh, nay đo bằng thước đợi-trạng-thái nên hết chập chờn.
+
+## V9.82 - MỘT NGÀY CỦA TỪNG CHỨC DANH (02/08)
+
+Anh Luân: *"Các nhân viên bảo v5 hoặc v6 đang thiếu gì, hoặc trải nghiệm không tốt chỗ nào?"*
+
+### Trả lời thẳng trước
+**Chưa ai nói gì, vì chưa ai dùng thử.** Em không bịa ra lời của người chưa nói. Cái em có là báo
+cáo của máy - và nó trả lời được một phần câu hỏi, phần còn lại thì không.
+
+`_checknv` hỏi *"bấm vào có chạy không"* - hỏng hay không hỏng. Câu của anh hỏi chuyện khác:
+*"ngồi vào ghế người ta thì có làm được việc không"* - đủ hay thiếu. Nên dựng `_src/_checkngay.js`,
+sáu câu: mở app ra có việc không · **việc mồ côi** · thấy-mà-không-được-làm nhiều tới mức nào · bao
+xa tới việc đầu tiên · trang trống trong menu của chính mình · và không có việc thì có được chỉ
+đường không.
+
+### Phát hiện thật: ba người Nhân sự đứng trước một bức tường
+| | hồ sơ thấy | việc của mình | việc của bộ phận khác |
+|---|---|---|---|
+| NV Tư vấn | 220 | 163 | 73 |
+| Kế toán | 171 | 96 | 84 |
+| **Nhân sự (cả 3 chức danh)** | **344** | **0** | **264** |
+
+App không hỏng - họ vẫn có bảng việc riêng ở trên (17 hồ sơ nhân sự còn thiếu, 2 buổi thiếu mốc
+giờ). Nhưng ngay dưới đó là danh sách 344 hồ sơ mà **không một hồ sơ nào là việc của họ**. Hơn 90%
+màn hình đầu ngày là nhiễu.
+
+Đây KHÔNG phải lỗi của trục bốn đối tượng. Việc của Nhân sự nằm ở người-lao-động, mà bốn đối tượng
+được phục vụ là khách - học viên - phụ huynh - lớp, không có nhân viên trong đó (đúng trục anh Luân
+chốt, và cũng đúng lý do sổ Giảng viên được khai đứng ngoài). Nhưng **"không thuộc trục" không có
+nghĩa là để người ta tự mò**.
+
+Vá: không bịa việc cho họ, mà **chỉ đường** - "Việc của bạn ở: Nhân sự · Giao việc · Bảng công",
+mỗi cái một nút. Danh sách vẫn giữ nguyên bên dưới: quyền chặn tay, không che mắt.
+
+Tiêu chí này nay là **đỏ cứng** trong `_checkngay`, và đã chứng minh nó bắt được: dựng lại bản HEAD
+rồi chạy - đỏ đúng ba chỗ.
+
+### Còn để ngỏ, chờ anh quyết
+Ba chức danh **Marketing** thấy 26 việc của mình bên cạnh **85** việc của bộ phận khác - gấp 3.3
+lần. Đúng thiết kế (họ nuôi lead, người khác chốt), nhưng có thể là quá ồn. Em để ở mức "cần xem
+thêm", không tự đổi: đây là chuyện cân nhắc nghiệp vụ, không phải lỗi.
+
+### Hai lần cái thước tố oan app
+1. **Đo bằng một biến không tồn tại.** Bản đầu hỏi `BANGVIEC[vai]` - biến ấy **không có**. Nó trả 0
+   cho cả 18 chức danh, và suýt kết luận ba người Nhân sự "mở app ra trắng bảng". *Số 0 của một
+   phép đo hỏng trông y hệt một phát hiện.* Nay vẽ thật `bangViecHTML()` rồi đếm ô.
+2. **"Trang trống" là câu khó hơn nó tưởng.** Hỏi mỗi "có khối `.empty` không" thì tố oan cả CEO là
+   trang Giao việc trống - trong khi CEO đang có 1 việc chờ xác nhận và 3 việc đang chạy. Trang ấy
+   có nhiều danh sách, một cái rỗng là đủ sinh ra `.empty`. Nay phải đủ ba điều: có `.empty` ·
+   không bảng/dòng nào · và mọi con số trên ô đếm đều bằng 0.
+
+### Bẫy đồng hồ, lần thứ sáu và bảy
+`_check13.js` và `check_sop.py` chưa được neo giờ. Sáng nay cả hai xanh; chiều cùng ngày cùng mã
+nguồn, cùng dữ liệu: `_check13` đỏ ở "HCR bỏ được bài chưa tới hạn", `check_sop` đỏ ở NA037/NA072/
+NA073 - **cả bốn đều là tình huống "còn trong hạn"**, mà "còn trong hạn" thì hết dần trong ngày.
+Nay neo cả hai vào `meta.anchor`.
+
+Neo xong lộ ra một chỗ nữa: **NA039** (khiếu nại trung bình quá hạn) trước nay xanh **nhờ may** -
+đồng hồ thật trôi qua mốc là nó tự đúng. Dựng dòng dựng sẵn cho nó, và ở đây cắn thêm một mép:
+ngưỡng `slaKN_medium_hours` đang cấu hình là **48** chứ không phải 24 như mặc định, phép so là `>`
+chứ không phải `>=` - đặt dòng thử đúng 48 giờ thì nó rơi xuống nhánh NA081. Đặt 96.
+
+### Bẫy công cụ - không nằm trong bộ kiểm nào
+`extract_js.py` luôn ghi vào `_src/_APP*.js`, **bất kể trích từ thư mục nào**. Em trích bản cũ ra
+để đối chứng, và nó âm thầm ghi đè bản đang thử; mấy phép đo sau đó đo nhầm file, cho ra "v5 đỏ"
+hoàn toàn giả. Đối chứng xong **phải trích lại**.
+
+### Số chốt phiên
+18 chức danh, **0 việc mồ côi**, 0 người mở app ra bảng trống, 3 chỗ "cần xem thêm" (Marketing).
+`_checkngay` đã vào `verify.sh` cho cả hai bản build.
 

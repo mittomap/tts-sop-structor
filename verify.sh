@@ -88,6 +88,11 @@ chay "_checkaudit doi xung & nga cut" "CHECKAUDIT OK"    node _checkaudit.js
 # Cho trong o lat cat nao thi mai mai trong o dung thu do - va khong bo kiem nao thay.
 chay "_checkdemo bay thu trong tuan" "CHECKDEMO OK"     node _checkdemo.js
 
+# MOT NGAY CUA TUNG CHUC DANH: khong hoi "co hong khong" ma hoi "ngoi vao ghe ho thi co lam duoc
+# viec khong". Bat duoc chuyen ba chuc danh Nhan su dap xuong Ban lam viec roi nhin 344 ho so ma
+# 0 viec cua minh - app khong hong, nhung buoi sang dau tien cua ho rat te.
+chay "_checkngay mot ngay cua tung chuc danh" "CHECKNGAY OK" node _checkngay.js
+
 echo
 echo "${Dam}== 4. DU LIEU DEMO ==${Het}"
 # V9.40: truoc day cho khop "TONG BAN GHI LOI: 4". So 4 do gom ca CA CO Y (viec demo de qua han
@@ -118,7 +123,7 @@ echo "${Dam}== 4bis. CHAY LAI TOAN BO BO KIEM TREN BAN V6 ==${Het}"
 #     bang viec cua minh va khoi "Cho ban phe duyet" (BC9 cua SOP).
 # Ca hai deu la mat tinh nang IM LANG - khong bao loi, chi la khong hien ra.
 for _b in _tall _check11 _check12 _check13 _check15 _check16 _check17 _check18 \
-          _checktour _checkqa _checkux _checkdata _checkaudit _checkdemo; do
+          _checktour _checkqa _checkux _checkdata _checkaudit _checkdemo _checkngay; do
   chay "v6: ${_b}" "(OK|0 loi|^TONG: [0-9]+)" env ITTS_APP=./_APP6.js node "${_b}.js"
 done
 

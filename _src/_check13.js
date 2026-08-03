@@ -4,6 +4,20 @@ function El(){return {innerHTML:"",textContent:"",value:"",style:{setProperty(){
 global.document={getElementById:()=>El(),querySelector:()=>El(),querySelectorAll:()=>[],createElement:()=>El(),body:El(),addEventListener(){}};
 global.window=global;global.location={hash:""};
 global.localStorage={getItem:()=>null,setItem(){},removeItem(){}};global.sessionStorage={getItem:()=>null,setItem(){},removeItem(){}};
+/* NEO DONG HO VAO NGAY SINH CUA BO DU LIEU - phai dat TRUOC khi nap app.
+   Bay da can (02/08): sang chay XANH, chieu cung ngay chay DO o tieu chi "HCR bo duoc bai chua
+   toi han" - khong ai dung vao ma nguon lan du lieu. Ly do: bai tap "chua toi han" HET han dan
+   trong ngay, nen ket qua bo kiem phu thuoc vao GIO nguoi ta bam chay no.
+   Luat cua du an: KHONG DO CAI DANG DUNG YEN BANG MOT CAI THUOC DANG CHAY. */
+(function(){try{
+  var meta=JSON.parse(require('fs').readFileSync('./demo_data_big.json','utf8')).meta||{};
+  var m=String(meta.anchor||"").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/);
+  if(!m)return;
+  var moc=new Date(+m[3],+m[2]-1,+m[1],+(m[4]||0),+(m[5]||0)).getTime(), D=Date;
+  global.Date=function(){return arguments.length?new D(...arguments):new D(moc)};
+  global.Date.now=function(){return moc};
+  global.Date.prototype=D.prototype;global.Date.parse=D.parse;global.Date.UTC=D.UTC;
+}catch(e){}})();
 var SRC=require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8');
 require('vm').runInThisContext(SRC);
 setRole("all");
