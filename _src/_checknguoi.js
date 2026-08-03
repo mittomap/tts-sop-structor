@@ -1,4 +1,5 @@
-/* _checknguoi: ĐĂNG NHẬP BẰNG TỪNG NGƯỜI MỘT - 37 người trong DL01, không phải 18 chức danh.
+/* _checknguoi: ĐĂNG NHẬP BẰNG TỪNG NGƯỜI MỘT - mọi người đang đi làm trong DL01, không phải
+   mỗi chức danh một người đại diện.
    Anh Luân 03/08: *"nhớ check kỹ lại mỗi 1 bộ phận, 1 người đăng nhập thì tính năng, giao diện
    đã chuẩn chưa, nghiệp vụ đã đủ chưa, có bị dư thiếu hay sai lệch gì không"*.
 
@@ -61,10 +62,11 @@ let soNguoi = 0, soTrang = 0;
 /* Ai đang đi làm. Người đã nghỉ không cần đăng nhập được - nhưng cũng không được biến mất khỏi
    sổ nhân sự, chuyện đó `_checkdata` canh. */
 function dsNguoi() {
-  return (DL.DL01 || []).filter(s => {
-    const tt = String(s.status || "").toLowerCase();
-    return s.staff_id && (!tt || /active|đang|working/i.test(tt));
-  });
+  /* DÙNG ĐÚNG ĐỊNH NGHĨA CỦA APP (`staffActive`), đừng viết lại luật bằng chữ của mình. Bản đầu
+     bộ kiểm này lọc bằng /active|đang|working/ - mà chuỗi "inactive (Đã nghỉ việc)" CHỨA chữ
+     "active", nên 4 người đã nghỉ vẫn lọt vào và được chấm như người đang đi làm. Đo bằng một
+     cái đúng-gần-đúng thì kết quả cũng gần đúng, mà "gần đúng" trong một bản kiểm là sai. */
+  return (DL.DL01 || []).filter(s => s.staff_id && staffActive(s));
 }
 
 /* Vào app đúng như người ấy bấm vào thẻ tên mình ở cổng: gateEnter -> applyScope -> enter.

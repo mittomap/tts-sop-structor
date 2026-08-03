@@ -387,6 +387,19 @@ Chi tiet "vi sao" o `02_NHAT_KY_QUYET_DINH.md`. O day chi ghi nhung cho **cham v
   bang quan ly x2"). Goc: `renderBan` vua goi `pageHead(...)` (dau trang tu gan bang viec) vua goi
   `bvSau()` sau thanh chon thuc the. O v5 khong ai thay vi Ban lam viec khong phai trang dap cua
   chuc danh nao nen bang rong. Nay `renderBan` truyen `hoan=1`.
+- `_checkui` them mot mat moi: **DO TUONG PHAN CHU/NEN** (V9.92). Anh Luan gui anh chip "Qua han"
+  dang chon - chu do sam tren nen navy, doc khong ra. Loai loi nay khong bo kiem nao thay duoc:
+  HTML dung, khong tran, khong cat, nut du to. Nay tinh ti le tuong phan WCAG cho moi phan tu TU
+  NO mang chu, duoi 3.0 la do (chip kia do duoc 1.9). **Co y khong lay 4.5 cua chuan AA**: app
+  dung nhieu chu phu mau xam nhat co chu dich, siet thang len 4.5 la do hang loat cho khong ai
+  keu - thuoc keu qua nhieu thi nguoi ta tat no di.
+  Kem mot bay ky thuat dang ghi lai: hai ham phu cua phep do phai nam TRONG than `PROBE`, vi
+  `page.evaluate` chi gui than ham do sang trinh duyet - de o ngoai thi ben kia khong co, va loi
+  ay IM LANG (phep do tra ve rong, bo kiem van xanh).
+- Bay "chuoi con chuoi" o CA HAI bo (`_checknguoi`, `_checknv`): loc nguoi dang di lam bang
+  `/active|đang|working/` - ma **"inactive (Đã nghỉ việc)" CHUA chu "active"**, nen 4 nguoi da
+  nghi van duoc cham nhu nguoi dang di lam. Nay hoi thang `staffActive()` cua app.
+  **Luat: dung viet lai luat cua app bang chu cua minh.**
 - **`_checknguoi.js` (MOI, V9.91)** - dong vai **tung NGUOI** trong DL01 (37 nguoi / 18 chuc danh),
   khong phai tung chuc danh. Vi sao can them mot bo nua: pham vi du lieu cat theo CHI NHANH va
   theo NGUOI PHU TRACH, nen 7 nhan vien tu van o 5 co so nhin ra 7 man hinh khac nhau - lay mot

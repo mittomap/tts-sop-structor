@@ -27,8 +27,35 @@ const VIEWS = [{n:"dienthoai",w:390,h:844},{n:"dienthoai-ngang",w:844,h:390},
    App da xu ly dung (im lang, luot sau thu lai). Moi URL ngoai KHAC deu la loi. */
 const NGOAI_OK = [/peerjs/];
 
+/* ĐỘ TƯƠNG PHẢN CHỮ / NỀN (V9.92). Anh Luân gửi ảnh chip "Quá hạn" đang chọn: *"màu chữ hơi
+   khó thấy nha em"* - chữ đỏ sẫm nằm trên nền navy, vì luật cũ đặt màu chữ theo mức độ còn luật
+   mới (V9.88) đổi nền chip đang chọn sang navy. Hai luật đúng riêng lẻ, gặp nhau thành không
+   đọc được, và KHÔNG bộ kiểm nào thấy: HTML đúng, không tràn, không cắt, nút đủ to.
+   Nay đo bằng số: tỉ lệ tương phản WCAG. Ngưỡng lấy 3.0 - dưới mức đó thì không còn là chuyện
+   "hơi nhạt" mà là chữ chìm hẳn vào nền (chip kia đo được 1.9). Cố ý KHÔNG lấy 4.5 của chuẩn
+   AA: app này dùng nhiều chữ phụ màu xám nhạt có chủ ý, siết thẳng lên 4.5 là đỏ hàng loạt chỗ
+   không ai kêu - cái thước kêu quá nhiều thì người ta tắt nó đi. */
 const PROBE = () => {
-  const out = {wide:0, clip:[], over:[], tiny:[], cover:[], vun:[]};
+  /* Hai hàm dưới BẮT BUỘC nằm trong thân PROBE: `page.evaluate` chỉ gửi thân hàm này sang trình
+     duyệt, hàm nào định nghĩa ở ngoài sẽ không tồn tại bên kia - và lỗi ấy im lặng, chỉ làm phép
+     đo trả về rỗng. */
+  const _lum = (c) => {
+    const m = String(c).match(/rgba?\(([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,\s/]+([\d.]+))?/);
+    if (!m) return null;
+    const f = (v) => { v = +v / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+    return {L: 0.2126 * f(m[1]) + 0.7152 * f(m[2]) + 0.0722 * f(m[3]), a: m[4] === undefined ? 1 : +m[4]};
+  };
+  const _nen = (el) => {                      /* nền THẬT: đi ngược lên tới tổ tiên đầu tiên có màu đục */
+    let p = el;
+    while (p && p.nodeType === 1) {
+      const b = _lum(getComputedStyle(p).backgroundColor);
+      if (b && b.a >= 0.6) return b.L;
+      p = p.parentElement;
+    }
+    return 1;                                  /* không thấy gì thì coi như nền trắng */
+  };
+
+  const out = {wide:0, clip:[], over:[], tiny:[], cover:[], vun:[], mo:[]};
   const W = window.innerWidth;
   out.wide = Math.max(0, document.documentElement.scrollWidth - W);
   /* V9.67 - ĐO NHẦM CHỖ SUỐT MẤY BẢN. `documentElement.scrollWidth` không bắt được tràn ngang
@@ -56,6 +83,18 @@ const PROBE = () => {
     const key = tag + "." + cls + "|" + txt;
 
     const coChu = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
+    /* chỉ đo phần tử TỰ NÓ mang chữ - đo cả thẻ bọc là đo lại một câu vài chục lần */
+    if (coChu && txt && !seen.has("m" + key)) {
+      seen.add("m" + key);
+      const fg = _lum(cs.color);
+      if (fg && fg.a >= 0.5) {
+        const bg = _nen(el);
+        const tl = Math.max(fg.L, bg) + 0.05, td = Math.min(fg.L, bg) + 0.05;
+        const ti = tl / td;
+        if (ti < 3.0) out.mo.push({tag, cls, txt, ti: Math.round(ti * 10) / 10,
+          chu: cs.color, nen: getComputedStyle(el).backgroundColor});
+      }
+    }
     /* text-overflow:ellipsis = co y cat VA co dau ... bao cho nguoi doc biet -> khong tinh la loi */
     if (coChu && cs.textOverflow !== "ellipsis" && /hidden|clip/.test(cs.overflowX) &&
         el.clientWidth > 0 && el.scrollWidth > el.clientWidth + 2 && !seen.has("c"+key)) {
@@ -381,6 +420,8 @@ const PROBE = () => {
       p.tiny.forEach(c => bad.push(nhan(m + ": nut qua nho " + c.w + "x" + c.h + "px <" + c.tag + " class=\"" + c.cls + "\"> \"" + c.txt + "\"")));
       p.cover.forEach(c => bad.push(nhan(m + ": hai thanh noi che nhau - " + c)));
       p.vun.forEach(c => bad.push(nhan(m + ": cau van bi FLEX BE VUN thanh " + c.n + " cot trong <" + c.tag + " class=\"" + c.cls + "\"> - \"" + c.txt + "\"")));
+      p.mo.forEach(c => bad.push(nhan(m + ": CHU CHIM VAO NEN (tuong phan " + c.ti + ", can >=3) <" +
+        c.tag + " class=\"" + c.cls + "\"> \"" + c.txt + "\" - chu " + c.chu)));
     }
     /* ═══ V9.67 - BÀI HƯỚNG DẪN TRÊN ĐIỆN THOẠI ═══════════════════════════════════════════
        Anh Luân: *"cái tour thì bao lỗi vì bị mất cái sidebar mà."* Từ 820px trở xuống sidebar

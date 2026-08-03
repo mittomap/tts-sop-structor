@@ -2179,3 +2179,42 @@ Cài đặt không phải làm gì thêm.
 Số **lần đổi lớp được miễn duyệt** nay là tham số (Cài đặt, nhóm *P5 · Xếp lớp & nhập học*).
 Đổi số này thì cả ba nơi đổi theo cùng lúc: ô thẻ *Đổi lớp từ N lần* ở Bảng Quản lý, cửa chặn khi
 học vụ bấm đổi lớp, và câu giải thích trên thẻ.
+
+## Ô chọn dài gõ để tìm (V9.91)
+
+Ô chọn nào có từ 12 lựa chọn trở lên (học viên, lớp, nhân sự, đăng ký...) tự thành **ô gõ để
+tìm**: gõ vài chữ là danh sách thu lại, bấm một dòng là chọn xong. Bỏ dấu vẫn ra - gõ "nguyen"
+tìm được "Nguyễn". Mỗi lần chỉ hiện 40 dòng đầu, còn lại app nhắc gõ thêm cho hẹp.
+
+Áp dụng ở **mọi form**, kể cả form dựng sau này - việc nâng cấp diễn ra ngay lúc màn hình vẽ ra,
+không phải khai từng ô.
+
+## Đăng nhập theo chức danh (V9.91)
+
+Cổng nhân viên mặc định cho **chọn chức danh rồi chọn tên mình**. Mỗi vị trí thấy một phần việc
+và một phạm vi dữ liệu khác nhau - Leader chi nhánh chỉ thấy dữ liệu cơ sở mình, trưởng phòng
+thấy cả phòng, giám đốc thấy toàn hệ thống.
+
+Muốn khoá lại (mọi người vào thẳng Quản trị viên, hợp cho buổi trình chiếu): **Cài đặt → Phân
+quyền & Phạm vi → Khoá chọn chức danh ở cổng nhân viên**.
+
+## Ghi nhận góp ý (V9.92)
+
+Nút hình loa trên thanh trên có ở **mọi màn**. Bấm là mở ô báo lỗi / góp ý:
+
+- Chọn **người gửi** (điền sẵn người đang đăng nhập, đổi được - buổi thử một người hay đổi vai).
+- Chọn **Lỗi / Khó dùng / Đề xuất**, gõ mô tả.
+- **Dán ảnh** chụp màn hình bằng Ctrl+V, hoặc chọn tệp. Tối đa 3 ảnh, ảnh tự thu nhỏ.
+- App tự ghi kèm: đang ở trang nào, tab nào, chức danh, cơ sở, bản 5 hay bản 6, cỡ màn, giờ.
+
+Trang **Ghi nhận góp ý** (menu Điều hành) gom hết lại: lọc theo trạng thái, bấm "Tới trang đó" để
+nhảy thẳng tới chỗ xảy ra chuyện, đánh dấu **Đang sửa / Đã sửa / Không sửa**, và:
+
+- **Xuất tệp** - tải về một tệp `.json` để gửi cho người tổng hợp.
+- **Nhập tệp** - kéo nhiều tệp của nhiều người vào, app gộp lại, phiếu đã có thì bỏ qua.
+- **Chép danh sách** - chép ra dạng chữ để dán vào tin nhắn hoặc tài liệu.
+
+Số trên menu là số góp ý **chưa xử**.
+
+Lưu ý: bản demo chạy hẳn trong trình duyệt nên góp ý nằm trên **máy của người ghi** - phải xuất
+tệp gửi đi thì máy khác mới thấy. Nút **Dựng lại demo không xoá góp ý**.

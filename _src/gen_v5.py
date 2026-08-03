@@ -977,7 +977,12 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .segb.segmo:hover{border-color:var(--navy);background:#FAFBFD}
 .segb:hover{color:var(--navy);background:var(--bg)}
 .segb.on{background:var(--navy);color:#fff;box-shadow:none}
-.segb.on.red{color:#A32D2D}.segb.on.amber{color:#854F0B}.segb.on.green{color:#1E6A47}
+/* V9.92 (anh Luân, kèm ảnh chip "Quá hạn" đang chọn): *"màu chữ hơi khó thấy nha em"*. Đúng -
+   ba dòng cũ đặt chữ ĐỎ SẪM / NÂU / XANH LÁ SẪM lên chip đang chọn, mà từ V9.88 chip đang chọn
+   có nền NAVY. Chữ sẫm trên nền sẫm thì gần như không đọc được.
+   Chip đang chọn nay chữ TRẮNG hết; màu nhận diện của mức độ chuyển hẳn vào con số bên cạnh
+   (ba dòng `.segn` ngay dưới) - vẫn phân biệt được đỏ/vàng/xanh mà không phải hy sinh chữ. */
+.segb.on.red,.segb.on.amber,.segb.on.green{color:#fff}
 .segn{font-style:normal;font-size:10px;font-weight:800;background:rgba(46,90,136,.10);color:#5A6675;border-radius:20px;padding:1px 6px;min-width:17px;text-align:center;line-height:1.5}
 .segb.on .segn{background:#ffffff33;color:#fff}
 .segb.on.red .segn{background:var(--red);color:#fff}
@@ -1146,7 +1151,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 /* Ô CHỌN DÀI - gõ để tìm (V9.91). Anh Luân 03/08 kèm ảnh form Tiếp nhận khiếu nại:
    *"làm sao chọn nổi em, chỗ đó phải là tìm kiếm"*. Ô chọn nào từ PKMIN lựa chọn trở lên thì
    lúc vẽ ra được thay bằng ô gõ + danh sách lọc. Thẻ <select> gốc vẫn nằm đó, chỉ ẩn đi. */
-.pk{position:relative;display:flex;flex-direction:column}
+.pk{position:relative;display:flex;flex-direction:column;min-width:150px;max-width:100%}
 /* Ô gõ tự mang đủ dáng của một ô nhập: nó có thể được dựng ở NGOÀI .fld (thanh lọc trên trang),
    nơi không có luật CSS nào của form chạm tới - để trần là ra một ô cao 19px, đúng loại lỗi
    `_checkui` bắt trên trình duyệt thật. */
@@ -1737,6 +1742,7 @@ body.drsz .drawer{transition:none}
         <!-- V9.51: nut "Chay huong dan" to o demoBadgeWrap da bo - trung viec voi nut "?" nay
      (anh Luan bat). id=tourBtn don ve day de tourBtnSync (an/hien theo Cai dat) van chay. -->
         <button class="tbtn" id="tourBtn" data-tour="help" onclick="tourMenu()" aria-label="Hướng dẫn sử dụng" title="Hướng dẫn từng bước - chọn cấp độ rồi app chỉ tận nơi"><i class="ti ti-help-circle"></i></button>
+        <button class="tbtn" id="gyBtn" data-tour="gopy" onclick="gyForm()" aria-label="Báo lỗi hoặc góp ý" data-tip="Báo lỗi / góp ý - app tự ghi sẵn bạn đang ở trang nào, đăng nhập bằng ai"><i class="ti ti-message-report"></i></button>
         <button class="tbtn" data-tour="bell" onclick="toggleBell(event)" aria-label="Thông báo"><i class="ti ti-bell"></i><span class="n" id="bellN" style="display:none">0</span></button>
         <div class="notif" id="notif"></div>
       </div>
@@ -2261,6 +2267,9 @@ var PAGES=[
 {k:"dsbaitap",g:"Tra cứu",ic:"ti-book",t:"Sổ bài tập",c:"Tra cứu bài tập",ty:"list"},
 {k:"dswow",g:"Tra cứu",ic:"ti-star",t:"Sổ WOW 1-1",c:"Tra cứu buổi WOW",ty:"list"},
 {k:"dsphuhuynh",g:"Tra cứu",ic:"ti-users",t:"Sổ phụ huynh",c:"Người đồng hành và các con",ty:"custom"},
+/* V9.92 - trang meta cua dot dung thu: khong phai nghiep vu SOP, nhung la cho duy nhat
+   giu cho gop y khong troi. Ai cung thay duoc (VIEW_ALWAYS) vi ai cung co quyen gop y. */
+{k:"gopy",g:"Điều hành",ic:"ti-message-report",t:"Ghi nhận góp ý",c:"Báo lỗi và đề xuất của đợt dùng thử",ty:"custom"},
 {k:"dsketthuc",g:"Tra cứu",ic:"ti-flag",t:"Sổ kết thúc khóa",c:"Tra cứu đầu ra",ty:"list"},
 {k:"dskhaosat",g:"Tra cứu",ic:"ti-clipboard-text",t:"Sổ khảo sát",c:"Tra cứu khảo sát",ty:"list"},
 {k:"dsphanhoi",g:"Tra cứu",ic:"ti-message-2",t:"Sổ phản hồi",c:"Góp ý của học viên",ty:"list"},
@@ -2342,7 +2351,7 @@ var CURSTAFF="";
 /* ===== V9.9 - MÀN HÌNH THEO CHỨC DANH (ma trận đã hội đồng thiết kế, Luân duyệt) =====
    Phân quyền GIAO DIỆN: chỉ chọn tập trang/khối/tab có sẵn, KHÔNG giấu dữ liệu tầng data.
    "Vào nhanh - Quản trị viên" = quantri thấy hết. Bấm tên luôn xem được hồ sơ 360. */
-var VIEW_ALWAYS={hoso:1,hosogv:1,hosonv:1,hosokhoa:1,chay:1,chang:1,lop:1,viec:1,dashboard:1,tracuu:1,pipeline:1,nhanvien:1,khoahoc:1,tranghv:1,nhaplead:1,lienhe:1,test:1,tuvan:1,thanhtoan:1,diemdanh:1,buoihoc:1,baitap:1,wow:1,review:1,khaosat:1,ghinhan:1,khieunai:1,baoluu:1,magioithieu:1,banggiao:1};
+var VIEW_ALWAYS={hoso:1,hosogv:1,hosonv:1,hosokhoa:1,chay:1,chang:1,lop:1,viec:1,dashboard:1,tracuu:1,pipeline:1,nhanvien:1,khoahoc:1,tranghv:1,nhaplead:1,lienhe:1,test:1,tuvan:1,thanhtoan:1,diemdanh:1,buoihoc:1,baitap:1,wow:1,review:1,khaosat:1,ghinhan:1,khieunai:1,baoluu:1,magioithieu:1,banggiao:1,gopy:1};
 var SENSITIVE={duyet:1,settings:1,baocao:1};
 var ROLESCOPE={
  quantri:{match:null,land:"banlam",pages:"*",blocks:"*",mine:0,mineBtn:0,kpi:0,bell:"*"},
@@ -2990,6 +2999,11 @@ function colMenuHTML(key){var cfg=LISTCFG[key];if(window.COLMENU!==key)return ''
    Bộ kiểm _checkux canh: dải nào gọi statStrip mà không khai ở đây là đỏ; số thẻ khai lệch với
    số thẻ vẽ ra thật cũng đỏ; thẻ nào còn onclick cũng đỏ. */
 var THEDEF={
+ gopy:{t:"Ghi nhận góp ý",the:[
+  ["gy_tong","Tổng góp ý","Tất cả phiếu góp ý đang có TRÊN MÁY NÀY - gồm phiếu bạn tự ghi và phiếu nhập từ tệp người khác gửi. Muốn xem danh sách: chính danh sách ngay dưới dải này."],
+  ["gy_moi","Chưa xử","Phiếu chưa ai đụng tới. Đây là con số cần nhìn mỗi ngày trong đợt dùng thử. Muốn xem: bấm chip Chưa xử ở thanh ngay dưới."],
+  ["gy_dang","Đang sửa","Phiếu đã nhận và đang làm - để người gửi biết ý kiến của họ không rơi vào im lặng. Muốn xem: bấm chip Đang sửa."],
+  ["gy_xong","Đã sửa","Phiếu đã xử xong và có trong bản mới. Đây là con số ta muốn nó lớn. Muốn xem: bấm chip Đã sửa."]]},
  dsphuhuynh:{t:"Sổ phụ huynh",the:[
   ["ph_nguoi","Người đồng hành","Số người đồng hành trong phạm vi dữ liệu của bạn. Gộp theo SỐ ĐIỆN THOẠI - hai học viên khai cùng một số là một người. Muốn xem danh sách: chính bảng ngay dưới dải này."],
   ["ph_nhieu","Có từ 2 con trở lên","Người đang có nhiều hơn một con theo học. Gọi cho họ một lần là nói được chuyện của cả hai - đừng để hai bộ phận gọi hai lần trong một ngày. Muốn xem: cột thứ hai của mỗi dòng ghi rõ tên từng con."],
@@ -6071,6 +6085,11 @@ function pkMot(s){
  if(!s||s.__pk)return;
  if(s.getAttribute&&s.getAttribute("data-pk")==="0")return;   /* form nào khai không cần thì thôi */
  if((s.options?s.options.length:0)<PKMIN)return;
+ /* KHÔNG nâng cấp ô chọn nằm TRONG MỘT Ô BẢNG. Ở đó nó là ô sửa nhanh ngay trên dòng, cột hẹp
+    theo bề ngang bảng - `_checkui` đo được ô gõ chỉ còn 24px ở bảng Nhân sự trong Cài đặt. Bảng
+    vốn đã có ô tìm của riêng nó ở đầu trang, nên cái được thêm gần bằng không mà cái mất là vỡ
+    cột. Ô chọn trong FORM và trên THANH CÔNG CỤ thì vẫn nâng cấp như thường. */
+ try{if(s.closest&&s.closest("td,th"))return}catch(e){}
  var box=document.createElement("div");box.className="pk";
  s.parentNode.insertBefore(box,s);box.appendChild(s);
  s.__pk=1;s.classList.add("pkan");
@@ -6145,6 +6164,264 @@ function pkNghe(){if(typeof MutationObserver==="undefined")return;
   try{pkQuet(recs[i].target)}catch(e){}});
  ["content","drawerBody","hvMain"].forEach(function(id){var el=document.getElementById(id);
   if(el)try{mo.observe(el,{childList:true,subtree:true})}catch(e){}})}
+
+/* ═══ GHI NHẬN GÓP Ý (V9.92) ════════════════════════════════════════════════════════════════
+   Anh Luân 03/08: *"để đỡ trôi, e cứ thêm vào sidebar 1 trang: ghi nhận góp ý, tổng hợp hết
+   vào"* - đợt các phòng ban dùng thử, góp ý gửi qua tin nhắn sẽ trôi mất.
+
+   NÓI RÕ RANH GIỚI NGAY Ở ĐÂY, VÌ NÓ QUYẾT ĐỊNH TOÀN BỘ THIẾT KẾ: bản demo chạy HẲN trong
+   trình duyệt, không có máy chủ. Phiếu góp ý vì thế nằm trong `localStorage` của CHÍNH MÁY ẤY -
+   máy anh Luân không tự nhìn thấy phiếu người khác gõ. Nên luồng là: mỗi người ghi trên máy
+   mình, bấm **Xuất** ra một tệp, gửi tệp ấy; người tổng hợp bấm **Nhập** để gộp lại. App
+   phân biệt được ai gửi cái gì KHÔNG PHẢI vì nó đoán, mà vì mỗi phiếu tự mang sẵn tên người,
+   chức danh, cơ sở, bản build và đúng trang đang đứng lúc bấm.
+   Khi nối backend thật thì chỉ cần thay hai hàm `gyAll/gySave` - phần còn lại giữ nguyên.
+
+   Vì sao KHÔNG nhét vào DL/DATA: đây không phải dữ liệu nghiệp vụ của SOP, và quan trọng hơn -
+   nút "Dựng lại demo" xoá sạch DL. Góp ý mà bay theo mỗi lần dựng lại demo thì vô dụng. */
+var GYKEY="ITTS_GOPY_V1";
+var GYMUC=[["loi","Lỗi","#E24B4A"],["kho","Khó dùng","#E08A1E"],["dx","Đề xuất","#3B82C4"]];
+var GYTT=[["moi","Chưa xử"],["dangsua","Đang sửa"],["dasua","Đã sửa"],["bo","Không sửa"]];
+function gyAll(){try{return JSON.parse(localStorage.getItem(GYKEY)||"[]")||[]}catch(e){return []}}
+function gyGhi(a){try{localStorage.setItem(GYKEY,JSON.stringify(a));return true}
+ catch(e){toastErr("Bộ nhớ trình duyệt đã đầy - xuất bớt góp ý ra tệp rồi xoá đi.");return false}}
+function gyChuaXu(){return gyAll().filter(function(x){return (x.tt||"moi")==="moi"}).length}
+function gyNhan(k,ds){for(var i=0;i<ds.length;i++)if(ds[i][0]===k)return ds[i][1];return k}
+function gyMau(k){for(var i=0;i<GYMUC.length;i++)if(GYMUC[i][0]===k)return GYMUC[i][2];return "#6B7887"}
+/* Bối cảnh app TỰ ghi - đây mới là phần khó nhất của một phiếu báo lỗi, và cũng là phần người
+   dùng hay quên nhất. Bắt họ gõ "tôi đang ở trang nào" là bắt họ làm việc của máy. */
+function gyTab(){var m={duyet:window.DUYTAB,tuyensinh:window.TSTAB,hoctap:window.HTTAB,
+  cskh:window.CSTAB,khac:window.KTAB,giangvien:window.GVTAB,settings:window.SETTAB};
+ return m[CUR]||""}
+function gyBoiCanh(){
+ var p=PBK[CUR]||{},st=(CURSTAFF&&find("DL01","staff_id",CURSTAFF))||{};
+ return {trang:CUR||"",trangT:p.t||CUR||"",tab:gyTab(),
+  nguoi:st.staff_id||"ADMIN",ten:st.full_name||"Quản trị viên",
+  vai:elabel(st.role)||"Quản trị viên",coso:st.branch||"",
+  ban:(typeof V6==="function"&&V6())?"Bản 6":"Bản 5",
+  man:(window.innerWidth||0)+"x"+(window.innerHeight||0),luc:nowStr()}}
+/* AI ĐANG GỬI. Anh Luân 03/08: *"em nên cho người ta chọn ai đang gửi góp ý nhé, tại đang demo,
+   1 người có thể vào rất nhiều vai trò khác nhau"* - đúng, trong một buổi thử một người có thể
+   đăng nhập lần lượt sáu vai, mà app chỉ biết vai ĐANG mở. Nên hỏi thẳng, và điền sẵn người
+   đang đăng nhập để người dùng chỉ phải sửa khi khác.
+   Xếp CHỨC CAO LÊN ĐẦU (Giám đốc -> trưởng phòng -> leader -> nhân viên), cùng cấp thì gom theo
+   chức danh rồi tới tên. Bỏ Quản trị viên khỏi danh sách: đó là chế độ vào bằng mật khẩu, không
+   phải một người có thật trong sổ nhân sự - phiếu góp ý ký tên "Quản trị viên" thì hỏi lại ai
+   cũng không biết là ai. */
+function gyNguoiDS(){
+ return rows("DL01").filter(function(x){
+   return x.staff_id&&x.staff_id!=="ADMIN"&&!/inactive|nghỉ/i.test(String(x.status||""))})
+  .sort(function(a,b){
+   var la=staffLevel(a),lb=staffLevel(b);
+   if(la!==lb)return lb-la;                                   /* chức cao lên đầu */
+   var ra=elabel(a.role)||"",rb=elabel(b.role)||"";
+   if(ra!==rb)return ra.localeCompare(rb,"vi");               /* cùng cấp thì gom theo chức danh */
+   return String(a.full_name||"").localeCompare(String(b.full_name||""),"vi")})}
+function gyForm(){
+ var B=gyBoiCanh();window.GYANH=[];window.GYMUCC="loi";
+ var h='<div class="dcard"><h4><i class="ti ti-message-report"></i>Báo lỗi / góp ý</h4>';
+ h+='<div class="notebar"><i class="ti ti-info-circle"></i>Góp ý lưu trên MÁY NÀY. Ghi xong vào trang <b>Ghi nhận góp ý</b> bấm Xuất tệp rồi gửi cho người tổng hợp.</div>';
+ h+='<div class="fld full"><label>Người gửi <i>*</i></label><select id="gy_ai"><option value="">-- chọn tên bạn --</option>'+
+  gyNguoiDS().map(function(x){
+   return '<option value="'+esc(x.staff_id)+'"'+(x.staff_id===CURSTAFF?" selected":"")+'>'+
+    esc((x.full_name||x.staff_id)+" · "+(elabel(x.role)||"")+(x.branch?(" · "+x.branch):""))+'</option>'}).join("")+
+  '</select><div class="fhint">Đang đăng nhập bằng ai thì app điền sẵn người đó - đổi lại nếu bạn đang thử vai khác.</div></div>';
+ h+='<div class="fld"><label>Đây là chuyện gì</label><div class="seg" id="gy_muc">'+
+  GYMUC.map(function(m){return '<button class="segb'+(m[0]==="loi"?" on":"")+'" onclick="gyMucChon(\''+m[0]+'\')">'+esc(m[1])+'</button>'}).join("")+'</div></div>';
+ h+='<div class="fld full"><label>Mô tả <i>*</i></label>'+
+  '<textarea id="gy_nd" rows="4" placeholder="Đang định làm gì, thấy gì, mong nó chạy ra sao"></textarea>'+
+  '<div class="fhint">Càng cụ thể càng sửa nhanh. "Chỗ này khó dùng" thì không sửa được; "chọn học viên phải kéo cả danh sách, nên cho gõ tên" thì sửa được ngay.</div></div>';
+ h+='<div class="fld full"><label>Ảnh chụp màn hình</label>'+
+  '<input type="file" id="gy_file" accept="image/*" multiple onchange="gyAnhChon(this.files)">'+
+  '<div class="fhint">Hoặc bấm phím chụp màn hình rồi <b>Ctrl+V</b> ngay tại đây. Ảnh được thu nhỏ trước khi lưu.</div>'+
+  '<div id="gy_anh" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"></div></div>';
+ h+='<div class="fld full"><label>App tự ghi kèm</label><div class="fhint" style="line-height:1.7">'+
+  'Trang <b>'+esc(B.trangT)+'</b>'+(B.tab?(' · tab <b>'+esc(B.tab)+'</b>'):'')+' · '+esc(B.ban)+'<br>'+
+  esc(B.ten)+' · '+esc(B.vai)+(B.coso?(' · '+esc(B.coso)):'')+' · màn '+esc(B.man)+' · '+esc(B.luc)+
+  '</div></div>';
+ h+='<div class="dact"><button class="btn" onclick="closeModal()">Huỷ</button>'+
+  '<button class="btn primary" onclick="gyLuu()"><i class="ti ti-send"></i>Gửi góp ý</button></div></div>';
+ openDrawer("Báo lỗi / góp ý",h);
+ try{var ta=document.getElementById("gy_nd");if(ta){ta.focus();
+  ta.addEventListener("paste",function(e){gyDan(e)})}}catch(e){}}
+function gyMucChon(k){window.GYMUCC=k;
+ try{var box=document.getElementById("gy_muc"),bs=box.querySelectorAll("button");
+  for(var i=0;i<bs.length;i++)bs[i].className="segb"+(GYMUC[i][0]===k?" on":"")}catch(e){}}
+/* Dán ảnh từ bộ nhớ tạm - người Việt quen bấm PrintScreen rồi Ctrl+V; bắt họ lưu ra tệp rồi
+   chọn tệp là thêm hai bước không cần thiết. */
+function gyDan(e){try{var it=(e.clipboardData||{}).items||[];
+ for(var i=0;i<it.length;i++)if(String(it[i].type||"").indexOf("image")===0){
+  var f=it[i].getAsFile();if(f){e.preventDefault();gyAnhChon([f])}}}catch(err){}}
+function gyAnhChon(files){
+ var ds=[];for(var i=0;i<files.length;i++)ds.push(files[i]);
+ ds.forEach(function(f){
+  if((window.GYANH||[]).length>=3){toast("Mỗi phiếu tối đa 3 ảnh.");return}
+  var r=new FileReader();
+  r.onload=function(){gyThuNho(r.result,function(d){window.GYANH=(window.GYANH||[]).concat([d]);gyAnhVe()})};
+  r.readAsDataURL(f)})}
+/* Thu nhỏ TRƯỚC khi lưu: ảnh chụp màn hình 2MB nhét thẳng vào localStorage là đầy kho sau vài
+   phiếu, mà lúc đầy thì trình duyệt ném lỗi giữa chừng - người dùng tưởng app nuốt mất góp ý. */
+function gyThuNho(src,xong){
+ try{
+  var im=new Image();
+  im.onload=function(){
+   var w=im.width,hh=im.height,M=1400;
+   if(w>M||hh>M){var t=Math.min(M/w,M/hh);w=Math.round(w*t);hh=Math.round(hh*t)}
+   var c=document.createElement("canvas");c.width=w;c.height=hh;
+   c.getContext("2d").drawImage(im,0,0,w,hh);
+   try{xong(c.toDataURL("image/jpeg",0.72))}catch(e){xong(src)}};
+  im.onerror=function(){xong(src)};
+  im.src=src}
+ catch(e){xong(src)}}
+function gyAnhVe(){var el=document.getElementById("gy_anh");if(!el)return;
+ el.innerHTML=(window.GYANH||[]).map(function(d,i){
+  return '<span style="position:relative;display:inline-block">'+
+   '<img src="'+d+'" style="width:78px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--line)">'+
+   '<button class="btn sm" style="position:absolute;top:-6px;right:-6px;padding:0 6px;min-height:22px" onclick="gyAnhBo('+i+')">&times;</button></span>'}).join("")}
+function gyAnhBo(i){var a=window.GYANH||[];a.splice(i,1);window.GYANH=a;gyAnhVe()}
+function gyLuu(){
+ var nd=String((document.getElementById("gy_nd")||{}).value||"").trim();
+ var ai=String((document.getElementById("gy_ai")||{}).value||"").trim();
+ if(!ai){toastErr("Chọn tên người gửi - phiếu không có tên thì hỏi lại không biết hỏi ai.");return}
+ if(nd.length<5){toastErr("Viết giúp một câu mô tả - ít nhất 5 ký tự.");return}
+ var B=gyBoiCanh();
+ /* Người gửi lấy theo Ô CHỌN chứ không theo người đang đăng nhập - trong một buổi thử, một
+    người đổi vai liên tục. Chép cả tên, chức danh, cơ sở vào phiếu để tệp xuất ra tự đọc được,
+    không phải tra ngược sổ nhân sự. */
+ var P=find("DL01","staff_id",ai)||{};
+ B.nguoi=ai;B.ten=P.full_name||ai;B.vai=elabel(P.role)||"";B.coso=P.branch||"";
+ var r=B;r.id="GY"+Date.now().toString(36).toUpperCase()+Math.floor(Math.random()*900+100);
+ r.muc=window.GYMUCC||"loi";r.nd=nd;r.anh=(window.GYANH||[]).slice(0,3);r.tt="moi";
+ var a=gyAll();a.unshift(r);
+ if(!gyGhi(a))return;
+ closeModal();toast("Đã ghi góp ý. Vào trang Ghi nhận góp ý để xem và xuất tệp gửi đi.",4200);
+ try{buildNav()}catch(e){}
+ if(CUR==="gopy")reRender("gopy")}
+/* --- trang tổng hợp --- */
+function gyTTSet(k){window.GYTTF=k;reRender("gopy")}
+function gySrch(v){window.GYQ=v;var el=document.getElementById("gybody");if(el)el.innerHTML=gyDsHTML()}
+function gyLoc(){var q=vnorm(window.GYQ||""),f=window.GYTTF||"";
+ return gyAll().filter(function(x){
+  if(f&&(x.tt||"moi")!==f)return false;
+  if(!q)return true;
+  return vnorm([x.nd,x.ten,x.vai,x.coso,x.trangT,x.ban].join(" ")).indexOf(q)>=0})}
+function gyDsHTML(){
+ var ds=gyLoc();
+ if(!ds.length)return '<div class="empty"><i class="ti ti-message-report"></i>Chưa có góp ý nào khớp. Bấm <b>Thêm góp ý</b>, hoặc <b>Nhập tệp</b> để gộp góp ý người khác gửi.</div>';
+ return ds.map(function(x){
+  var tt=x.tt||"moi";
+  return '<div class="panel" style="margin-bottom:10px"><div class="pbody">'+
+   '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px">'+
+    '<span class="chip" style="border-color:'+gyMau(x.muc)+';color:'+gyMau(x.muc)+'">'+esc(gyNhan(x.muc,GYMUC))+'</span>'+
+    '<span class="chip'+(tt==="dasua"?" green":(tt==="moi"?" amber":""))+'">'+esc(gyNhan(tt,GYTT))+'</span>'+
+    '<b style="font-size:12.5px">'+esc(x.ten||"")+'</b>'+
+    '<span class="mut" style="font-size:11.5px">'+esc(x.vai||"")+(x.coso?(" · "+esc(x.coso)):"")+'</span>'+
+   '</div>'+
+   '<div style="font-size:13px;line-height:1.6;margin-bottom:6px">'+esc(x.nd||"").replace(/\n/g,"<br>")+'</div>'+
+   ((x.anh||[]).length?('<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">'+
+     x.anh.map(function(d,i){return '<img src="'+d+'" onclick="gyAnhTo(\''+esc(x.id)+'\','+i+')" style="width:120px;height:80px;object-fit:cover;border-radius:6px;border:1px solid var(--line);cursor:zoom-in">'}).join("")+'</div>'):'')+
+   '<div class="mut" style="font-size:11.5px;margin-bottom:8px">'+
+     '<i class="ti ti-map-pin" style="margin-right:4px"></i>Trang <b>'+esc(x.trangT||x.trang||"")+'</b>'+
+     (x.tab?(" · tab "+esc(x.tab)):"")+' · '+esc(x.ban||"")+' · màn '+esc(x.man||"")+' · '+esc(x.luc||"")+'</div>'+
+   '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+    (PBK[x.trang]?('<button class="btn sm" onclick="go(\''+esc(x.trang)+'\')"><i class="ti ti-arrow-right"></i>Tới trang đó</button>'):'')+
+    GYTT.filter(function(t){return t[0]!==tt}).map(function(t){
+      return '<button class="btn sm" onclick="gyDoi(\''+esc(x.id)+'\',\''+t[0]+'\')">'+esc(t[1])+'</button>'}).join("")+
+    '<button class="btn sm" onclick="gyXoa(\''+esc(x.id)+'\')"><i class="ti ti-trash"></i>Xoá</button>'+
+   '</div></div></div>'}).join("")}
+function gyAnhTo(id,i){var x=gyAll().filter(function(y){return y.id===id})[0];if(!x)return;
+ openDrawer("Ảnh kèm góp ý",'<div class="dcard"><img src="'+(x.anh||[])[i]+'" style="width:100%;border-radius:8px"></div>')}
+function gyDoi(id,tt){var a=gyAll();for(var i=0;i<a.length;i++)if(a[i].id===id)a[i].tt=tt;
+ if(gyGhi(a)){toast("Đã đổi trạng thái góp ý.");try{buildNav()}catch(e){}reRender("gopy")}}
+function gyXoa(id){askConfirm("Xoá góp ý này khỏi máy? Không lấy lại được.",function(){
+ var a=gyAll().filter(function(x){return x.id!==id});
+ if(gyGhi(a)){toast("Đã xoá.");try{buildNav()}catch(e){}reRender("gopy")}})}
+function gyXuat(){
+ var a=gyAll();
+ if(!a.length){toast("Chưa có góp ý nào để xuất.");return}
+ var B=gyBoiCanh();
+ var nm="gopy-"+slugify(B.ten||"nguoi-dung")+"-"+fmtYMD(new Date())+".json";
+ try{
+  var b=new Blob([JSON.stringify({app:"ITTs SOP",loai:"gopy",luc:B.luc,ds:a},null,1)],{type:"application/json"});
+  var el=document.createElement("a");el.href=URL.createObjectURL(b);el.download=nm;
+  document.body.appendChild(el);el.click();
+  setTimeout(function(){try{document.body.removeChild(el);URL.revokeObjectURL(el.href)}catch(e){}},400);
+  toast("Đã xuất "+a.length+" góp ý ra tệp "+nm+" - gửi tệp này cho người tổng hợp.",5200)}
+ catch(e){toastErr("Trình duyệt không cho tải tệp: "+e.message)}}
+function gyNhapMo(){var el=document.getElementById("gy_nhap");if(el)el.click()}
+/* Gộp theo MÃ PHIẾU, không gộp theo nội dung: hai người có thể báo trùng một chuyện bằng hai
+   câu chữ khác nhau - đó là hai phiếu thật, gộp lại là mất một tiếng nói. Chỉ bỏ đúng phiếu đã
+   nhập rồi (cùng mã), để nhập lại cùng một tệp hai lần không đẻ ra bản sao. */
+function gyNhap(files){
+ var ds=[];for(var i=0;i<files.length;i++)ds.push(files[i]);
+ if(!ds.length)return;
+ var con=ds.length,them=0,trung=0,hong=0;
+ ds.forEach(function(f){
+  var r=new FileReader();
+  r.onload=function(){
+   try{
+    var o=JSON.parse(r.result),moi=(o&&o.ds)||(Array.isArray(o)?o:[]);
+    var a=gyAll(),co={};a.forEach(function(x){co[x.id]=1});
+    moi.forEach(function(x){if(!x||!x.id)return;if(co[x.id]){trung++;return}co[x.id]=1;a.push(x);them++});
+    a.sort(function(p,q){return String(q.luc||"").localeCompare(String(p.luc||""))});
+    gyGhi(a)}
+   catch(e){hong++}
+   if(--con<=0){
+    toast("Đã nhập "+them+" góp ý mới"+(trung?(", bỏ qua "+trung+" phiếu đã có"):"")+
+      (hong?(", "+hong+" tệp không đọc được"):"")+".",5200);
+    try{buildNav()}catch(e){}reRender("gopy")}};
+   r.onerror=function(){hong++;if(--con<=0)reRender("gopy")};
+   r.readAsText(f)})}
+function gyChep(){
+ var ds=gyLoc();
+ if(!ds.length){toast("Không có góp ý nào để chép.");return}
+ var t=ds.map(function(x,i){
+  return (i+1)+". ["+gyNhan(x.muc,GYMUC)+"] "+(x.nd||"")+
+   "\n   - "+(x.ten||"")+" · "+(x.vai||"")+(x.coso?(" · "+x.coso):"")+
+   "\n   - trang: "+(x.trangT||x.trang||"")+(x.tab?(" / tab "+x.tab):"")+" · "+(x.ban||"")+" · "+(x.luc||"")+
+   "\n   - trạng thái: "+gyNhan(x.tt||"moi",GYTT)}).join("\n");
+ var full="GÓP Ý ĐỢT DÙNG THỬ - "+ds.length+" phiếu\n\n"+t;
+ try{
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+   navigator.clipboard.writeText(full).then(function(){toast("Đã chép "+ds.length+" góp ý - dán vào tin nhắn hoặc tài liệu.",4200)},
+    function(){gyChepTay(full)})}
+  else gyChepTay(full)}
+ catch(e){gyChepTay(full)}}
+/* Trinh duyet cam chep tu dong (mo bang file:// hoac chua cap quyen) thi khong duoc im lang -
+   chia ra o chu de nguoi ta tu chep. */
+function gyChepTay(t){openDrawer("Danh sách góp ý (chép tay)",
+ '<div class="dcard"><div class="notebar"><i class="ti ti-info-circle"></i>Trình duyệt không cho app tự chép vào bộ nhớ tạm, nên danh sách để sẵn ở đây.</div>'+
+ '<div class="fld full"><label>Bôi đen rồi Ctrl+C</label>'+
+ '<textarea rows="18" style="height:auto;font-size:12px">'+esc(t)+'</textarea>'+
+ '<div class="fhint">Dán vào tin nhắn hoặc tài liệu để gửi cho người tổng hợp. Danh sách này theo đúng bộ lọc đang chọn ở trang.</div></div></div>')}
+function renderGopy(){
+ var a=gyAll(),f=window.GYTTF||"";
+ var h=pageHead("Ghi nhận góp ý","Mọi góp ý và báo lỗi của đợt dùng thử gom về một chỗ - không trôi trong tin nhắn",
+  '<button class="btn primary" onclick="gyForm()"><i class="ti ti-plus"></i>Thêm góp ý</button>',1);
+ h+='<div class="notebar"><i class="ti ti-info-circle"></i>'+goiyG("gy_trang_gop_y_9c21",
+  'Góp ý nằm trên <b>máy này</b> - bản demo chạy hẳn trong trình duyệt, không có máy chủ.||'+
+  'Mỗi người ghi trên máy mình rồi bấm <b>Xuất tệp</b> và gửi tệp đó đi; người tổng hợp bấm <b>Nhập tệp</b> để gộp lại. '+
+  'Không lẫn của ai với ai: mỗi phiếu tự mang sẵn tên người, chức danh, cơ sở, bản đang dùng và đúng trang lúc bấm. '+
+  'Nút Dựng lại demo KHÔNG xoá góp ý.')+'</div>';
+ h+=statStrip([
+  ["ti-message-report",a.length,"Tổng góp ý","#2E5A88","tất cả phiếu đang có trên máy này"],
+  ["ti-alert-circle",a.filter(function(x){return (x.tt||"moi")==="moi"}).length,"Chưa xử","#E08A1E","chưa ai đụng tới"],
+  ["ti-tool",a.filter(function(x){return x.tt==="dangsua"}).length,"Đang sửa","#3B82C4","đã nhận, đang làm"],
+  ["ti-checks",a.filter(function(x){return x.tt==="dasua"}).length,"Đã sửa","#16A34A","xong, đã có trong bản mới"]],"gopy",
+  ["gy_tong","gy_moi","gy_dang","gy_xong"]);
+ h+='<div class="tbar"><div class="srch"><i class="ti ti-search"></i>'+
+  '<input value="'+esc(window.GYQ||"")+'" oninput="gySrch(this.value)" placeholder="Tìm trong trang này..."></div>'+
+  '<div class="seg">'+
+   '<button class="segb'+(f?"":" on")+'" onclick="gyTTSet(\'\')">Tất cả<span class="segn">'+a.length+'</span></button>'+
+   GYTT.map(function(t){var n=a.filter(function(x){return (x.tt||"moi")===t[0]}).length;
+    return '<button class="segb'+(f===t[0]?" on":"")+'" onclick="gyTTSet(\''+t[0]+'\')">'+esc(t[1])+
+     (n?'<span class="segn">'+n+'</span>':'')+'</button>'}).join("")+'</div>'+
+  '<div class="sp"><button class="btn" onclick="gyChep()"><i class="ti ti-clipboard-text"></i>Chép danh sách</button>'+
+  '<button class="btn" onclick="gyXuat()"><i class="ti ti-download"></i>Xuất tệp</button>'+
+  '<button class="btn" onclick="gyNhapMo()"><i class="ti ti-upload"></i>Nhập tệp</button>'+
+  '<input type="file" id="gy_nhap" accept=".json,application/json" multiple style="display:none" onchange="gyNhap(this.files)"></div></div>';
+ h+='<div id="gybody" data-tour="gybody">'+gyDsHTML()+'</div>';
+ return h}
 function closeModal(){document.body.classList.remove("drwon");document.getElementById("mask").classList.remove("on");document.getElementById("drawer").classList.remove("on");if(window.__pendSync)setTimeout(syncApply,50)}
 /* ===== V9.27 TOOLTIP HIEN NGAY =====
    Thuoc tinh title cua trinh duyet doi khoang 1 giay moi hien, lai bi cat khi nam trong khung cuon.
@@ -14085,7 +14362,7 @@ var GOIYDEF={};
 /* Đoạn nào hiện ở màn nào - để người sửa biết mình đang sửa dòng ở đâu. */
 /* Bấm 'Xem tại chỗ' thì mở đúng màn đang chứa dòng đó. */
 var GOIYPG={gy_ay_la_cac_cau_3fed:"window.SETTAB='ch4';reRender('settings')",gy_ay_la_nguong_at_f276:"window.SETTAB='ch6';reRender('settings')",gy_cau_nhac_viec_chuan_281e:"window.SETTAB='ch4';reRender('settings')",gy_chi_quan_ly_giam_63c5:"window.SETTAB='ch2';reRender('settings')",gy_danh_muc_lua_chon_293d:"window.SETTAB='ch1';reRender('settings')",gy_email_dung_e_ang_eb0e:"window.SETTAB='staff';reRender('settings')",gy_hop_nay_tra_loi_5ff9:"go('hoidap')",gy_khoa_hoc_la_cau_1eb3:"window.SETTAB='khoa';reRender('settings')",gy_lop_nay_chua_co_a916:"go('banglop')",gy_nguoi_nay_la_giang_ade7:"go('hosonv')",gy_oi_ten_logo_va_844c:"window.SETTAB='brand';reRender('settings')",gy_phan_quyen_co_ba_7c33:"window.SETTAB='phanquyen';reRender('settings')",gy_ung_nhung_gi_hoc_ef1d:"go('hoso')"};
-var GOIYO={gy_ban_lam_viec_tt01:"Trang Bàn làm việc",gy_chua_ban_duoc_dong_4b71:"Bảng danh mục - cột tính tiền",gy_khoa_chua_co_don_9c28:"Bảng danh mục - cột đếm đơn",gy_chua_co_hoat_dong_3e05:"Bảng danh mục - cột lâu chưa hoạt động",gy_ay_la_cac_cau_3fed:"Cài đặt",gy_ay_la_nguong_at_f276:"Cài đặt",gy_cau_nhac_viec_chuan_281e:"Cài đặt",gy_chi_quan_ly_giam_63c5:"Cài đặt",gy_chon_mot_muc_ben_d524:"Màn pickerPage",gy_chon_nguoi_nhan_app_6ef8:"Màn tkNew",gy_danh_muc_lua_chon_293d:"Cài đặt",gy_email_dung_e_ang_eb0e:"Cài đặt",gy_ho_so_chua_ghi_1990:"Màn riskCare",gy_hop_nay_tra_loi_5ff9:"Trang Hỏi đáp",gy_khach_ngung_khong_phai_0425:"Màn ReupTab",gy_khoa_hoc_la_cau_1eb3:"Cài đặt",gy_lop_nay_chua_co_a916:"Vận hành lớp",gy_nguoi_nay_la_giang_ade7:"Hồ sơ Nhân viên",gy_oi_ten_logo_va_844c:"Cài đặt",gy_phan_quyen_co_ba_7c33:"Cài đặt",gy_ung_nhung_gi_hoc_ef1d:"Hồ sơ 360 học viên"};
+var GOIYO={gy_ban_lam_viec_tt01:"Trang Bàn làm việc",gy_chua_ban_duoc_dong_4b71:"Bảng danh mục - cột tính tiền",gy_khoa_chua_co_don_9c28:"Bảng danh mục - cột đếm đơn",gy_chua_co_hoat_dong_3e05:"Bảng danh mục - cột lâu chưa hoạt động",gy_ay_la_cac_cau_3fed:"Cài đặt",gy_ay_la_nguong_at_f276:"Cài đặt",gy_cau_nhac_viec_chuan_281e:"Cài đặt",gy_chi_quan_ly_giam_63c5:"Cài đặt",gy_chon_mot_muc_ben_d524:"Màn pickerPage",gy_chon_nguoi_nhan_app_6ef8:"Màn tkNew",gy_danh_muc_lua_chon_293d:"Cài đặt",gy_email_dung_e_ang_eb0e:"Cài đặt",gy_ho_so_chua_ghi_1990:"Màn riskCare",gy_hop_nay_tra_loi_5ff9:"Trang Hỏi đáp",gy_khach_ngung_khong_phai_0425:"Màn ReupTab",gy_khoa_hoc_la_cau_1eb3:"Cài đặt",gy_lop_nay_chua_co_a916:"Vận hành lớp",gy_nguoi_nay_la_giang_ade7:"Hồ sơ Nhân viên",gy_oi_ten_logo_va_844c:"Cài đặt",gy_phan_quyen_co_ba_7c33:"Cài đặt",gy_ung_nhung_gi_hoc_ef1d:"Hồ sơ 360 học viên",gy_trang_gop_y_9c21:"Trang Ghi nhận góp ý"};
 function goiy(k,vb){if(!(k in GOIYDEF))GOIYDEF[k]=vb;
  var g=(DATA.config&&DATA.config.goiy)||{};
  var v=g[k];return (v==null||v==="")?vb:String(v)}
@@ -15395,7 +15672,11 @@ var TOURS={
   {p:"changA",sel:'@nrail',t:"Bản đồ một chặng",d:"Đường ray hiện số người ở từng ga và phần trăm chuyển đổi thật giữa các ga - nhìn là biết đang tắc ở đâu.",hint:"Bấm một ga để lọc người ở ga đó."},
   {sel:'@bell',t:"Chuông cảnh báo",d:"Mọi việc trễ hẹn theo quy trình chuẩn dồn về đây, chia theo bộ phận. Việc mới từ máy khác còn nổ bong bóng góc màn hình.",hint:"Bấm chuông xem thử."},
   {sel:'@me',t:"Mỗi chức danh một màn hình riêng",d:"Bấm ô tên ở đáy menu để đổi người. Sale, học vụ, giáo viên, kế toán mỗi người thấy một giao diện và một phạm vi dữ liệu khác nhau.",hint:"Bấm ô tên ở đáy menu để xem danh sách người."},
-  {sel:'@doicong',t:"Ba cổng, một bộ dữ liệu",d:"Ngoài cổng nhân viên còn cổng học viên và cổng phụ huynh. Nút này mở thẳng sang cổng kia - ghi ở cổng này thì cổng kia thấy ngay, vì cả ba đọc chung một bộ dữ liệu.",hint:"Xong phần tham quan. Thử cấp độ Trải nghiệm để làm việc thật."}]},
+  {sel:'@doicong',t:"Ba cổng, một bộ dữ liệu",d:"Ngoài cổng nhân viên còn cổng học viên và cổng phụ huynh. Nút này mở thẳng sang cổng kia - ghi ở cổng này thì cổng kia thấy ngay, vì cả ba đọc chung một bộ dữ liệu.",hint:"Bấm Tiếp theo - còn một việc quan trọng."},
+  /* Bước cuối của bài đầu tiên là chỗ đắt nhất để đặt câu này: người dùng vừa xem xong app,
+     đúng lúc họ sắp có ý kiến đầu tiên. Đợt dùng thử sống hay chết là ở chỗ góp ý có được ghi
+     lại hay trôi mất trong tin nhắn. */
+  {p:"gopy",sel:'@phead',t:"Thấy gì chưa ổn thì báo ngay tại đây",d:"Nút hình loa ở thanh trên mở ô báo lỗi - app tự ghi sẵn bạn đang ở trang nào, đăng nhập bằng ai, dùng bản nào; bạn chỉ gõ một câu và dán ảnh chụp màn hình. Mọi phiếu gom về trang này, xuất ra một tệp gửi cho người tổng hợp.",hint:"Xong phần tham quan. Thử cấp độ Trải nghiệm để làm việc thật."}]},
  /* ---------- CẤP 2: TRẢI NGHIỆM THEO VỊ TRÍ ---------- */
  /* V9.66 - HAI BÀI MỚI. Đo trước khi thêm: 13 bài / 75 bước cho một app 33 trang, trong đó
     13 SỔ TRA CỨU không có một bước nào - mà đó chính là chỗ anh Luân vừa bắt lỗi thiếu bộ lọc
@@ -18615,7 +18896,7 @@ function banNutHoSo(ttk,r){
  if(ttk==="hocvien")return '<button class="btn" onclick="window.HOSO=\''+esc(r.student_id)+'\';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>';
  return '<button class="btn" onclick="openLop(\''+esc(r.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Mở lớp</button>'}
 
-var RENDER={ban:renderBan,dsphuhuynh:renderSoPH,hoidap:renderHoidap,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
+var RENDER={ban:renderBan,gopy:renderGopy,dsphuhuynh:renderSoPH,hoidap:renderHoidap,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
 function dashJump(key){var m={urgent:"viec",newlead:"nhaplead",consider:"viec",convert:"tuvan",risk:"viec",onboard:"xeplop",approve:"duyet",debt:"thanhtoan",complaint:"khieunai",ungraded:"baitap",testpend:"test",wowbook:"wow",unverified:"thanhtoan",classes:"banglop"};var pg=m[key];if(pg&&RBK[CURROLE].pages.indexOf(pg)>=0)go(pg);else go("viec")}
 
 /* ---------- router ---------- */
@@ -19307,6 +19588,7 @@ function go(key,noHist){
 function navBadge(k){
  try{
   if(k==="ychv")return ychvCho();
+  if(k==="gopy")return gyChuaXu();   /* góp ý chưa xử - con số duy nhất của đợt dùng thử */
   if(k==="duyet")return duyN();
   if(DUYMAP[k]){var TBd=duyTabs();for(var i8=0;i8<TBd.length;i8++)if(TBd[i8].k===k)return TBd[i8].n;return 0}
   if(k==="banlam")return (window.__NAVJ||jAll()).filter(function(J){return J.act&&J.over}).length;
@@ -19422,7 +19704,7 @@ var NAVTREE=[
     thẩm quyền chứ không thuộc chặng nào. Duyệt nghỉ trước đây nằm lẫn trong màn Điểm danh nên
     học vụ phải mò mới thấy. */
  {g:"Chờ duyệt",items:["duyetck","duyethoan","duyetnghi","duyetthu","duyetgiao","banggiao"]},
- {g:"Điều hành",items:["baocao","settings"]},
+ {g:"Điều hành",items:["baocao","gopy","settings"]},
  {g:"Tra cứu",items:["hocvien","dsphuhuynh","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","giangvien","nhanvien"]}];
 var NAVSUB={nhaplead:"tuyensinh",test:"tuyensinh",tuvan:"tuyensinh",thanhtoan:"tuyensinh",reup:"tuyensinh",
  review:"cskh",khaosat:"cskh",ghinhan:"cskh",khieunai:"cskh",ychv:"cskh",
@@ -19531,7 +19813,7 @@ var NAVTREE6=[
    "tuyensinh","hoctap","cskh","ketthuc"]},
  {g:"Tra cứu",items:["hocvien","dsphuhuynh","giangvien","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan",
    "dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai"]},
- {g:"Quản lý",items:["baocao","nhansu","hoidap","khac","settings"]}];
+ {g:"Quản lý",items:["baocao","nhansu","hoidap","khac","gopy","settings"]}];
 function buildNav(){
  window.__navarc1=0;   /* neo @navarc chi gan cho nhom chặng ĐẦU TIÊN - neo trùng là tô sáng nhầm chỗ */
  window.__NAVJ=null;try{window.__NAVJ=jAll()}catch(e){}   /* tính 1 lần cho mọi badge */

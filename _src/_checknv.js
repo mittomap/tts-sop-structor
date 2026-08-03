@@ -68,9 +68,10 @@ const AITHUC = () => {
   const out = [], da = {};
   (DL.DL01 || []).forEach(s => {
     const v = String(s.role || "").trim();
-    const tt = String(s.status || "").toLowerCase();
+    /* "inactive (Đã nghỉ việc)" CHỨA chữ "active" - lọc bằng /active/ là nhận nhầm người đã
+       nghỉ làm đại diện cho cả chức danh. Hỏi đúng hàm app đang dùng. */
     if (!v || da[v]) return;
-    if (tt && !/active|đang|working/i.test(tt)) return;
+    if (typeof staffActive === "function" ? !staffActive(s) : /inactive|nghỉ/i.test(String(s.status || ""))) return;
     da[v] = 1;
     out.push({sid: s.staff_id, vai: v, ten: s.full_name || s.staff_id});
   });

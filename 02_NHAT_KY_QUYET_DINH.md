@@ -149,6 +149,32 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.92 — TRANG GHI NHẬN GÓP Ý ✅ (03/08).**
+> · Anh Luân: *"để đỡ trôi, e cứ thêm vào sidebar 1 trang: ghi nhận góp ý, tổng hợp hết vào"*.
+> Nút hình loa trên thanh trên mở ô báo lỗi ở **mọi màn**; app tự ghi sẵn phần khó nhất - đang ở
+> trang nào, tab nào, ai gửi, chức danh gì, cơ sở nào, bản 5 hay bản 6, cỡ màn, giờ. Người dùng
+> chỉ gõ một câu và **dán ảnh** (Ctrl+V, ảnh tự thu nhỏ trước khi lưu). Trang **Ghi nhận góp ý**
+> gom hết: lọc theo trạng thái, đánh dấu đang sửa - đã sửa - không sửa, xuất tệp, nhập tệp, chép
+> danh sách. Menu hiện số góp ý **chưa xử**.
+> · **Nói thẳng giới hạn, không hứa quá:** bản demo chạy hẳn trong trình duyệt, không có máy chủ
+> - phiếu nằm trên **máy của chính người ghi**. Nên luồng là mỗi người **xuất một tệp** rồi gửi,
+> người tổng hợp **nhập** để gộp. App không lẫn ai với ai vì mỗi phiếu tự mang tên người - chứ
+> không phải vì nó đoán. Khi nối backend chỉ phải thay đúng hai hàm `gyAll` / `gyGhi`.
+> · **Ô chọn người gửi** (anh Luân: *"1 người có thể vào rất nhiều vai trò khác nhau"*): điền sẵn
+> người đang đăng nhập, đổi được; xếp **chức cao lên đầu**, cùng cấp gom theo chức danh; **bỏ
+> Quản trị viên** khỏi danh sách - phiếu ký tên "Quản trị viên" thì hỏi lại không biết hỏi ai.
+> · **Góp ý KHÔNG nằm trong DL** mà ở `localStorage` riêng: nút Dựng lại demo xoá sạch DL, góp ý
+> mà bay theo mỗi lần dựng lại demo thì vô dụng.
+> · **Chữ chìm vào nền** (anh Luân gửi ảnh chip "Quá hạn"): *"màu chữ hơi khó thấy nha em"*. Hai
+> luật đúng riêng lẻ gặp nhau thành sai - luật cũ đặt chữ đỏ sẫm theo mức độ, luật V9.88 đổi nền
+> chip đang chọn sang navy. Nay chip đang chọn chữ trắng hết, màu mức độ chuyển vào con số bên
+> cạnh. **Và đo được bằng máy từ nay:** `_checkui` tính tỉ lệ tương phản WCAG cho mọi phần tử có
+> chữ, dưới 3.0 là đỏ (chip kia đo được 1.9).
+> · **Bẫy của chính bộ kiểm, kiểu mới:** lọc người đang đi làm bằng `/active|đang|working/` -
+> mà chuỗi **"inactive (Đã nghỉ việc)" CHỨA chữ "active"**, nên 4 người đã nghỉ vẫn được chấm
+> như người đang đi làm. Nay hỏi đúng hàm app dùng (`staffActive`). **Luật: đừng viết lại luật
+> của app bằng chữ của mình - hỏi thẳng hàm app đang dùng.**
+
 > **Phiên bản: V9.91 — MỞ CHO TỪNG NGƯỜI ĐĂNG NHẬP, VÀ RÀ LẠI TỪNG NGƯỜI ✅ (03/08).**
 > · **Ô chọn dài phải gõ được.** Anh Luân kèm ảnh form Tiếp nhận khiếu nại: *"làm sao chọn nổi
 > em, chỗ đó phải là tìm kiếm"*. Đúng - ô Học viên đổ ra hàng chục tới hàng trăm dòng mà vẫn là
