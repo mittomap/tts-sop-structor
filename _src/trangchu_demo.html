@@ -35,7 +35,7 @@ body{
 .head{text-align:center;margin-bottom:24px}
 .logo{display:inline-flex;align-items:center;gap:13px}
 .logo svg{width:42px;height:42px;flex:none}
-.logo b{font-size:23px;font-weight:800;letter-spacing:.4px;color:var(--navyd);line-height:1;display:block}
+.logo b{font-size:23px;font-weight:800;letter-spacing:1.1px;color:var(--navyd);line-height:1;display:block;text-transform:uppercase}
 .logo span{display:block;font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.6px;margin-top:5px}
 
 /* Nhịp hai bước: bước 1 chọn BẢN, bước 2 chọn CỔNG. Mỗi bước có một câu hỏi duy nhất -
@@ -58,6 +58,9 @@ body{
 .sosanh{margin:22px auto 0;max-width:980px;border:1px solid var(--line,#E4E9F0);border-radius:14px;
  background:#fff;padding:16px 18px}
 .sosanh h3{font-size:13.5px;font-weight:800;color:var(--ink,#1E2A38);margin-bottom:10px}
+.khuyen{font-size:13px;line-height:1.7;color:var(--ink,#1E2A38)}
+.khuyen p{margin:0 0 8px}
+.khuyen p.nho{font-size:12px;color:#5A6675;margin-bottom:0}
 .sosanh table{width:100%;border-collapse:collapse;font-size:12.5px}
 .sosanh th,.sosanh td{text-align:left;padding:7px 8px;border-top:1px solid var(--line,#E4E9F0);
  color:var(--muted,#6B7887);vertical-align:top}
@@ -133,25 +136,46 @@ body{
       <a class="door d4" href="?ban6" data-ban="6">
         <div class="dic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></div>
         <h2>Bản 6 · theo đối tượng <span class="tag">thử nghiệm</span></h2>
-        <p><b>Mở app ra là Bàn làm việc.</b> Chọn một khách, một học viên, một lớp hay một giảng viên - bên dưới là hồ sơ và toàn bộ việc phải làm với người đó. Bấm Làm là ngăn kéo mở tại chỗ, không đổi trang.</p>
+        <p><b>Mở app ra là Bàn làm việc.</b> Chọn một khách, một học viên, một phụ huynh hay một lớp - bên dưới là hồ sơ và toàn bộ việc phải làm với người đó. Bấm Làm là ngăn kéo mở tại chỗ, không đổi trang.</p>
         <span class="go">Chọn bản này
           <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </a>
     </nav>
 
     <section class="sosanh">
-      <h3>Hai bản khác nhau ở đâu</h3>
+      <h3>Nên xem bản nào</h3>
+      <div class="khuyen">
+        <p><b>Chưa biết chọn gì thì mở bản 6.</b> Đây là bản mới, làm việc nhanh hơn: mở app ra là
+        đã đứng trước danh sách người mình phải xử lý hôm nay, bấm một nút là làm xong ngay tại chỗ.</p>
+        <p><b>Mở bản 5 khi muốn xem cách bố trí quen thuộc</b> - mỗi nghiệp vụ một trang riêng, giống
+        phần lớn phần mềm quản lý hiện nay. Bản 5 vẫn chạy đầy đủ, không thiếu chức năng nào.</p>
+        <p class="nho">Hai bản dùng chung một bộ dữ liệu và chung cổng học viên, cổng phụ huynh.
+        Mở cạnh nhau là so được ngay, không mất gì.</p>
+      </div>
+
+      <h3 style="margin-top:18px">Cùng một việc, hai bản làm khác nhau thế nào</h3>
       <table>
-        <tr><th>&nbsp;</th><th>Bản 5 - theo nghiệp vụ</th><th>Bản 6 - theo đối tượng</th></tr>
-        <tr><td>Mở app ra thấy</td><td>Trang bắt đầu: các con số của hôm nay</td><td>Bàn làm việc: hồ sơ của bạn, việc bày sẵn</td></tr>
-        <tr><td>Câu hỏi phải nhớ</td><td>"Chức năng này nằm ở trang nào?"</td><td>"Tôi đang làm việc với ai?"</td></tr>
-        <tr><td>Menu</td><td>8 nhóm, 33 trang</td><td>5 nhóm - Bàn làm việc, Việc &amp; hàng chờ, Làm hàng loạt, Tra cứu, Quản lý</td></tr>
-        <tr><td>Làm một việc</td><td>Đổi sang trang nghiệp vụ, tìm lại đúng người, làm, rồi quay ra</td><td>Bấm Làm, ngăn kéo mở tại chỗ, đóng lại là vẫn đứng nguyên chỗ cũ</td></tr>
-        <tr><td>Việc hàng loạt</td><td>Trang riêng</td><td>Vẫn trang riêng - điểm danh cả lớp, chấm nhiều bài, xếp lớp, chia lead, bảng công, báo cáo. Ngăn kéo nói rõ vì sao và mở đúng màn</td></tr>
-        <tr><td>Phân quyền</td><td>Theo trang</td><td>Theo việc: mỗi chức danh chỉ thấy đúng việc mà bảng CH3 của SOP giao cho mình</td></tr>
-        <tr><td>Khác nhau ở cổng nào</td><td colspan="2">Chỉ ở <b>cổng nhân viên</b>. Cổng học viên và cổng phụ huynh dùng chung một bản</td></tr>
-        <tr><td>Dữ liệu</td><td colspan="2">Chung một bộ - mở hai bản cạnh nhau là cùng số liệu, so được ngay</td></tr>
+        <tr><th>&nbsp;</th><th>Bản 5</th><th>Bản 6</th></tr>
+        <tr><td>Vừa đăng nhập, màn hình đầu tiên</td>
+            <td>Bảng số liệu của hôm nay. Đọc xong vẫn phải tự tìm trang để làm.</td>
+            <td>Danh sách người đang cần mình xử lý, việc bày sẵn cạnh từng người.</td></tr>
+        <tr><td>Muốn ghi một cuộc gọi cho khách</td>
+            <td>Vào trang Tuyển sinh, tìm lại đúng khách trong danh sách, mở ra, ghi, rồi quay về.</td>
+            <td>Bấm nút Làm ngay cạnh tên khách. Ghi xong, đóng lại, vẫn đứng nguyên chỗ cũ.</td></tr>
+        <tr><td>Điểm danh cả lớp, chấm nhiều bài</td>
+            <td colspan="2">Cả hai bản đều mở màn riêng - loại việc này cần bảng rộng, không nhét vừa một ngăn kéo.</td></tr>
+        <tr><td>Số mục trong menu</td>
+            <td>50 mục, chia 8 nhóm theo chặng vòng đời của khách.</td>
+            <td>36 mục, chia 5 nhóm theo việc phải làm.</td></tr>
+        <tr><td>Quản lý muốn xem việc của nhân viên mình</td>
+            <td>Chưa có.</td>
+            <td>Chọn tên người đó, màn hình hiện đúng như họ nhìn thấy, kể cả quyền.</td></tr>
+        <tr><td>Ai được làm việc gì</td>
+            <td colspan="2">Giống nhau - cả hai bản đều theo bảng phân quyền CH3 trong SOP của trung tâm.</td></tr>
+        <tr><td>Dữ liệu</td>
+            <td colspan="2">Chung một bộ. Sửa ở bản này thì bản kia thấy ngay sau khi tải lại.</td></tr>
       </table>
+    </section>
     </section>
   </section>
 

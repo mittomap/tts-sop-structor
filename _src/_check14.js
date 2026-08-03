@@ -620,4 +620,53 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
  t("nut Doi cong o cong nhan vien co loi giai thich", /id="congBtn"[^>]*data-tip="[^"]{20,}"/.test(HTMLNV));
 })();
 
+/* ===== XUNG HO O CONG PHU HUYNH (V9.84) ==================================================
+   Anh Luan 03/08: *"cong phu huynh, em xung ho cho dung nhe, dung ban khong on dau, loi chao
+   cung de ten dung don doc, nguoi Viet goi la hon day nhe"*.
+   Do duoc luc do: cong phu huynh goi nguoi doc la "ban" 39 LAN va chao "Chao buoi sang,
+   <ten tran>". Day khong phai loi chu - la loi phep tac, va khong bo kiem nao hoi toi.
+   Ba dieu phai dung, do tren BAN VE THAT cua tung loai quan he co trong du lieu:
+     1. khong con mot "ban" nao dung lam DAI TU (chua "ban be" - do la danh tu);
+     2. loi chao co tu xung ho dung truoc ten, khong bao gio de ten dung mot minh;
+     3. cong HOC VIEN khong bi doi lay - o do "ban" moi la dung. */
+(function(){
+  var qhThu={};
+  (DL.DL09||[]).forEach(function(x){var q=ghQuanHe(x);
+    if(q&&ghSdt(x)&&!qhThu[q])qhThu[q]=x});
+  var loaiQH=Object.keys(qhThu);
+  t("du lieu demo co nguoi dong hanh de kiem xung ho", loaiQH.length>0);
+  var conBan=[], chaoTran=[];
+  loaiQH.forEach(function(q){
+    var S=qhThu[q];
+    window.HVID=S.student_id; window.HVPHONE=ghSdt(S);
+    var txt="";
+    /* KHONG DUOC IM LANG BO QUA. Ban dau khoi nay bat loi roi `return` - va tren ban build CU
+       (chua co hvXungLoc) no nem loi, txt rong, dem ra 0 "ban", the la bo kiem BAO XANH tren
+       dung cai ban dang hong. Ve khong duoc thi phai DO. */
+    try{txt=String(hvXungLoc(renderTrangHV())).replace(/<[^>]*>/g," ").replace(/\s+/g," ")}
+    catch(e){conBan.push(q+": KHONG VE DUOC - "+e.message);return}
+    if(txt.length<400){conBan.push(q+": ve ra gan nhu rong ("+txt.length+" ky tu)");return}
+    var soBan=(txt.replace(/b\u1ea1n b\u00e8/gi," ").match(/\bb\u1ea1n\b/gi)||[]).length;
+    if(soBan)conBan.push(q+": "+soBan+" cho");
+    /* loi chao phai co tu xung ho ngay truoc ten nguoi doc */
+    var ten=ghTen(S);
+    if(ten&&txt.indexOf(ten)>=0){
+      var truoc=txt.slice(Math.max(0,txt.indexOf(ten)-14),txt.indexOf(ten));
+      if(!/(anh|ch\u1ecb|\u00f4ng|b\u00e0|b\u00e1c|ch\u00fa|c\u00f4|anh\/ch\u1ecb)\s*$/i.test(truoc))
+        chaoTran.push(q+": ..."+truoc.trim()+" ["+ten+"]");
+    }
+  });
+  t("cong phu huynh khong goi nguoi doc la 'ban'"+(conBan.length?" - CON: "+conBan.join(" | "):""),
+    conBan.length===0);
+  t("loi chao o cong phu huynh luon co tu xung ho truoc ten"+(chaoTran.length?" - TRAN: "+chaoTran.join(" | "):""),
+    chaoTran.length===0);
+  /* cong hoc vien: PHAI con "ban" - doi ca hai cong la sua qua tay */
+  window.HVPHONE="";
+  var S0=(DL.DL09||[])[0]||{}; window.HVID=S0.student_id;
+  var t0="",loi0="";
+  try{t0=String(hvXungLoc(renderTrangHV())).replace(/<[^>]*>/g," ")}catch(e){loi0=e.message}
+  t("cong hoc vien van xung 'ban' nhu cu"+(loi0?(" - KHONG VE DUOC: "+loi0):""),
+    !loi0&&(t0.match(/\bb\u1ea1n\b/gi)||[]).length>0);
+})();
+
 console.log(bad.length?("CHECK14 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK14 OK: "+ok+" tieu chi");

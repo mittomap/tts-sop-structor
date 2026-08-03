@@ -30,7 +30,7 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .sbszr:hover:after,.sbszr.drag:after{background:var(--blue);height:56px;margin-top:-28px}
 .brand{display:flex;align-items:center;gap:10px;padding:15px 18px;border-bottom:1px solid #ffffff18}
 .brand .logo{width:38px;height:38px;border-radius:8px;background:#fff;color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
-.brand b{color:#fff;font-size:14px;font-weight:700;line-height:1.1}.brand small{display:block;color:#93A7C2;font-size:10px;font-weight:500;letter-spacing:.3px;margin-top:2px}
+.brand b{color:#fff;font-size:14px;font-weight:800;line-height:1.1;text-transform:uppercase;letter-spacing:.7px}.brand small{display:block;color:#93A7C2;font-size:10px;font-weight:500;letter-spacing:.3px;margin-top:2px}
 .nav{flex:1;overflow-y:auto;padding:8px 10px 18px}
 .nav::-webkit-scrollbar{width:6px}.nav::-webkit-scrollbar-thumb{background:#ffffff22;border-radius:3px}
 /* V9.64 (anh Luân: *"font chỗ này to lên tí em, để phân biệt khi sổ ra danh sách bên trong"*).
@@ -1169,7 +1169,9 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .bankgroup>summary.bankmo::marker{color:var(--muted)}
 .bankgroup>summary.bankmo:hover{color:var(--ink)}
 .tbar.tbso{margin-top:-4px;margin-bottom:14px}
-.tbar.tbso .seg{font-size:12px;padding:5px 10px}
+.tbar.banai{gap:8px}
+.tbar.banai select{font-family:inherit;font-size:12px;font-weight:600;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:#fff}
+.tbar.tbso .segb{font-size:12px}
 .banji{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none;background:var(--gray);color:#5A6675}
 .banji.do{background:var(--redb);color:var(--red)}
 .banji.ho{background:var(--amberb);color:var(--amber)}
@@ -2956,9 +2958,9 @@ var THEDEF={
   ["ph_nguoi","Người đồng hành","Số người đồng hành trong phạm vi dữ liệu của bạn. Gộp theo SỐ ĐIỆN THOẠI - hai học viên khai cùng một số là một người. Muốn xem danh sách: chính bảng ngay dưới dải này."],
   ["ph_nhieu","Có từ 2 con trở lên","Người đang có nhiều hơn một con theo học. Gọi cho họ một lần là nói được chuyện của cả hai - đừng để hai bộ phận gọi hai lần trong một ngày. Muốn xem: cột thứ hai của mỗi dòng ghi rõ tên từng con."],
   ["ph_no","Còn nợ học phí","Cộng phần còn lại của MỌI đơn của MỌI con người ấy. Một người có hai con, mỗi con nợ một ít, thì đây là con số họ thật sự phải trả. Muốn xem: chip vàng ở cuối mỗi dòng."],
-  ["ph_rui","Có con đang cảnh báo","Người có ít nhất một con đang ở mức đỏ về chuyên cần hoặc học thuật - nên gọi trước khi họ gọi mình. Muốn xem: chip đỏ ở cuối dòng ghi mấy con."]]},
+  ["ph_rui","Có con đang cảnh báo","Người có ít nhất một con đang ở mức đỏ về chuyên cần hoặc học thuật - cần chủ động liên hệ sớm. Muốn xem: chip đỏ ở cuối dòng ghi mấy con."]]},
  ban:{t:"Bàn làm việc",the:[
-  ["ban_co","Còn việc của tôi","Số hồ sơ trong phạm vi của bạn mà chức danh của bạn còn việc phải làm với họ. Muốn xem danh sách: chính bảng ngay dưới dải này."],
+  ["ban_co","Còn việc của bộ phận","Số hồ sơ trong phạm vi của bạn mà chức danh của bạn còn việc phải làm với họ. Quản lý đang xem thay một người thì đây là số của CHÍNH NGƯỜI ẤY. Muốn xem danh sách: chính bảng ngay dưới dải này."],
   ["ban_gap","Có việc gấp","Trong số hồ sơ còn việc, đếm riêng những hồ sơ có ít nhất một việc mức ĐỎ - làm trước. Muốn xem danh sách: bảng dưới xếp hồ sơ có việc gấp lên đầu."],
   ["ban_sach","Đang sạch việc","Hồ sơ bạn thấy nhưng không còn việc nào của bạn - không cần đụng tới. Đây là con số ta MUỐN nó lớn. Muốn xem danh sách: bảng dưới chỉ liệt kê hồ sơ CÒN việc, nên phần còn lại chính là nhóm này."]]},
  viec:{t:"Việc hôm nay",the:[
@@ -12890,9 +12892,8 @@ function renderTrangHV(){
  var _p=hvPH()?hvPHof(S.student_id):null;
  /* Có tên thì chào bằng TÊN (quan hệ đã nói ở dòng dưới); chưa khai tên thì chào bằng quan hệ -
     không bao giờ chào người nhà bằng tên của em học viên. */
- var _chaoAi=_p?(_p.ten||(_p.qh||"Quý phụ huynh")):S.full_name;
- h+='<div class="hvhero"><div style="flex:1"><div class="hvg">'+esc(greet)+', '+esc(_chaoAi)+'</div>'+
-  (_p?('<div class="hvsub" style="margin-bottom:2px">'+esc(_p.qh||"Người đồng hành")+' của <b>'+esc(S.full_name||"")+'</b> - bạn đang xem trang học của học viên</div>'):'')+
+ h+='<div class="hvhero"><div style="flex:1"><div class="hvg">'+hvChao(greet,S)+'</div>'+
+  (_p?('<div class="hvsub" style="margin-bottom:2px">'+esc(_p.qh||"Người đồng hành")+' của <b>'+esc(S.full_name||"")+'</b> - đang xem trang học tập của con</div>'):'')+
   '<div class="hvsub">'+esc(S.student_id)+(lop?' · Lớp <b>'+esc(lop.class_name)+'</b>':'')+(lop&&lop.course_id_name?' · '+esc(lop.course_id_name):'')+
   ' · <span class="chip '+stCls(S.student_status)+'">'+esc(elabel(S.student_status))+'</span></div>'+
   (nextSes?('<div class="hvsub" style="margin-top:6px"><i class="ti ti-calendar-check" style="margin-right:5px"></i>Buổi học tiếp theo: <b>'+esc(nextSes.session_date)+'</b>'+(nextSes.teacher_id_name?' · GV '+esc(nextSes.teacher_id_name):'')+'</div>'):'')+
@@ -18086,6 +18087,81 @@ function banChon(k){window.BANTT=k;window.BANMO="";reRender("ban")}
 function banMo(ma){window.BANMO=ma;reRender("ban")}
 function banDong(){window.BANMO="";reRender("ban")}
 function banTT(){var k=window.BANTT||ttMacDinh();return TTBK[k]?k:"khach"}
+/* ── XEM VIỆC CỦA AI ──────────────────────────────────────────────────────────────────────
+   Anh Luân 03/08: *"a đang ở chỗ quản trị viên, a phải có quyền xem việc của 1 người hoặc 1 vị
+   trí cụ thể nhé em, mấy quản lý, leader cũng thế nha em, ở trang của họ, họ phải xem được của
+   từng người trực thuộc"*.
+
+   Cách làm: KHÔNG dựng một tầng lọc mới. App đã có sẵn `applyScope(sid)` - hàm dựng trọn phạm vi
+   của một người: họ thấy trang nào, làm được việc gì, đụng được dòng dữ liệu nào. Chọn một người
+   ở đây tức là CHẠY THẬT phạm vi của họ. Được hai điều mà một bộ lọc riêng không cho:
+     · số liệu ra đúng y như họ đăng nhập - không có đường nào lệch, vì đi chung một cửa;
+     · không đẻ thêm nhánh mã để về sau quên vá.
+
+   Ai được xem của ai:
+     · toàn quyền (`pages==="*"` - Quản trị viên, Giám đốc): mọi người, mọi chức danh;
+     · quản lý / leader: những người trong `myTeam()` - cấp dưới trực tiếp, cùng phòng cấp thấp
+       hơn, cùng cơ sở cấp thấp hơn. Đúng phạm vi họ đã được thấy dữ liệu, không rộng hơn.
+     · nhân viên: không có ô này.
+   Đang xem người khác thì có dải nhắc rõ ràng và nút quay về - mượn ghế ai cũng phải trả. */
+function banToanQuyen(){try{return SCOPE().pages==="*"}catch(e){return false}}
+function banQuanLy(){try{return !!SCOPE().mgr||banToanQuyen()}catch(e){return false}}
+function banAiDS(){
+ var out=[],goc=window.BANGOC!==undefined?window.BANGOC:(window.GATE_SID||"");
+ var team=null;if(!banToanQuyen()){try{team=myTeam()}catch(e){team=null}}
+ rows("DL01").forEach(function(x){
+  if(/inactive|nghỉ/i.test(String(x.status||"")))return;
+  if(team&&!team[x.staff_id])return;
+  out.push(x)});
+ return out.sort(function(a,b){return String(a.role||"").localeCompare(String(b.role||""))||
+   String(a.full_name||"").localeCompare(String(b.full_name||""))})}
+/* Mượn ghế một người. Nhớ ghế gốc để còn trả lại. */
+function banXem(sid){
+ if(window.BANGOC===undefined)window.BANGOC=window.GATE_SID||"";
+ window.BANAI=sid||"";window.BANMO="";
+ try{dsReset()}catch(e){}
+ applyScope(sid||"");
+ try{phQuen()}catch(e){}
+ try{buildNav()}catch(e){}
+ reRender("ban")}
+function banVeMinh(){
+ var goc=window.BANGOC!==undefined?window.BANGOC:"";
+ window.BANAI="";window.BANMO="";window.BANGOC=undefined;
+ try{dsReset()}catch(e){}
+ applyScope(goc);
+ try{phQuen()}catch(e){}
+ try{buildNav()}catch(e){}
+ reRender("ban")}
+/* Tên để in lên nhãn "việc của ..." - đang mượn ghế ai thì gọi tên người đó, không thì gọi tên
+   BỘ PHẬN chứ không phải "tôi". Anh Luân: *"sao em ko để kiểu: việc của học vụ, việc của giảng
+   viên... Để vậy sẽ dễ làm đấy em"* - và anh đúng: "của tôi" bắt người đọc tự dịch xem "tôi" là
+   ai, còn tên bộ phận thì đọc phát hiểu ngay, nhất là lúc quản lý đang xem hộ người khác. */
+function banAiTen(){
+ if(window.BANAI){var s=find("DL01","staff_id",window.BANAI);
+  if(s)return (s.full_name||window.BANAI)+" ("+(elabel(s.role)||ecode(s.role)||"")+")"}
+ try{var g=SCOPE().group;if(g==="quantri")return "Quản trị viên";
+  if(g==="dieuhanh")return "Ban Giám đốc";
+  return NHIPTEN[g]||g}catch(e){return "bạn"}}
+function banAiHTML(){
+ var dang=window.BANAI||"";
+ /* Đang mượn ghế thì LUÔN phải có đường về - kể cả khi ghế đang mượn không có quyền quản lý.
+    Đã cắn: mượn ghế một nhân viên thường là cả dải chọn biến mất cùng với nút quay về, người
+    dùng kẹt lại trong vai người khác và chỉ còn cách tải lại trang. */
+ if(dang)return '<div class="tbar banai"><i class="ti ti-eye"></i>'+
+  '<span style="font-size:12.5px;font-weight:700">Đang xem thay <b>'+esc(banAiTen())+'</b></span>'+
+  '<span class="mut" style="font-size:11.5px">Màn hình đang hiển thị đúng phần việc và quyền của người này.</span>'+
+  '<button class="btn sm" style="margin-left:auto" onclick="banVeMinh()">'+
+  '<i class="ti ti-arrow-back-up"></i>Về việc của tôi</button></div>';
+ if(!banQuanLy())return "";
+ var ds=banAiDS();if(!ds.length)return "";
+ var h='<div class="tbar banai"><span class="mut" style="font-size:11.5px;align-self:center">Xem việc của:</span>'+
+  '<select onchange="banXem(this.value)" style="max-width:280px">'+
+   '<option value="" selected>'+esc(banToanQuyen()?"Toàn hệ thống (chính tôi)":"Chính tôi")+'</option>'+
+   ds.map(function(x){return '<option value="'+esc(x.staff_id)+'">'+
+     esc(x.full_name||x.staff_id)+' - '+esc(elabel(x.role)||ecode(x.role)||"")+'</option>'}).join("")+
+  '</select><span class="mut" style="font-size:11.5px">chọn một người để xem đúng màn hình của họ</span>';
+ h+='</div>';
+ return h}
 /* ── SỔ PHỤ HUYNH ─────────────────────────────────────────────────────────────────────────
    Phụ huynh là thực thể DUY NHẤT trong bốn đối tượng được phục vụ mà không có sổ tra cứu của
    riêng mình - ba cái kia có 3 tới 8 sổ. Đo được ở `_checkaudit`, và nó lệch thật: người trực
@@ -18114,14 +18190,14 @@ function renderSoPH(){
  var h=pageHead("Sổ phụ huynh","Một người đồng hành - tất cả các con đang theo học, công nợ và cảnh báo gộp về một chỗ");
  h+=statStrip([
   ["ti-users",ds.length,"Người đồng hành","#7C3AED","gộp theo số điện thoại"],
-  ["ti-users-group",nhieuCon,"Có từ 2 con trở lên","#3B82C4","gọi một lần nói được cả hai"],
+  ["ti-users-group",nhieuCon,"Có từ 2 con trở lên","#3B82C4","liên hệ một lần trao đổi được cho cả hai con"],
   ["ti-cash",coNo,"Còn nợ học phí","#B58A2B","cộng nợ của tất cả các con"],
-  ["ti-alert-triangle",coRui,"Có con đang cảnh báo","#E24B4A","chuyên cần hoặc học thuật"]],"dsphuhuynh");
+  ["ti-alert-triangle",coRui,"Có con đang cảnh báo","#E24B4A","cần liên hệ sớm với phụ huynh"]],"dsphuhuynh");
  h+='<div class="panel"><div class="ph"><b>Danh sách ('+ds.length+')</b>'+
   '<input id="ph_q" style="margin-left:auto;max-width:260px" placeholder="Tìm tên, SĐT hoặc mã..."'+
   ' value="'+esc(window.PHQ||"")+'" oninput="window.PHQ=this.value;reRender(\'dsphuhuynh\')">'+
   '</div><div class="pbody">';
- if(!ds.length)h+='<div class="empty">Không có người đồng hành nào khớp. Học viên chỉ vào sổ này khi hồ sơ có số điện thoại người đồng hành.</div>';
+ if(!ds.length)h+='<div class="empty">Chưa có người đồng hành nào khớp. Sổ này chỉ hiện học viên đã khai số điện thoại người đồng hành trong hồ sơ.</div>';
  ds.slice(0,60).forEach(function(P){
   var con=phCon(P), no=phNo(P), rui=phNguyCo(P);
   h+='<div class="banrow" onclick="phMo(\''+esc(P.ph_id)+'\')">'+
@@ -18149,11 +18225,12 @@ function renderBan(){
   'Chưa học thì khách là trung tâm; đang học thì lớp và học viên là trung tâm. App chỉ hiện những việc mà chức danh của bạn được làm theo bảng phân quyền CH3, và chỉ những việc hồ sơ đó còn thiếu.')+'</div>';
  /* chọn thực thể */
  var _tong=0;
- h+='<div class="tbar" data-tour="bantt">'+TTHE.map(function(x){
+ h+=banAiHTML();
+ h+='<div class="tbar" data-tour="bantt"><div class="seg">'+TTHE.map(function(x){
   var n=0;try{n=ttDanhSach(x.k).filter(function(z){return z.viec.length}).length}catch(e){}
   _tong+=n;
-  return '<button class="seg'+(x.k===ttk?" on":"")+'" onclick="banChon(\''+x.k+'\')" data-tip="'+esc(x.d)+'">'+
-   '<i class="ti '+x.ic+'"></i>'+esc(x.t)+(n?'<span class="segn">'+n+'</span>':'')+'</button>'}).join("")+'</div>';
+  return '<button class="segb'+(x.k===ttk?" on":"")+'" onclick="banChon(\''+x.k+'\')" data-tip="'+esc(x.d)+'">'+
+   '<i class="ti '+x.ic+'"></i>'+esc(x.t)+(n?'<span class="segn">'+n+'</span>':'')+'</button>'}).join("")+'</div></div>';
  /* CHỨC DANH KHÔNG CÓ VIỆC NÀO TRÊN BỐN ĐỐI TƯỢNG - phải CHỈ ĐƯỜNG, không để họ đứng trước
     một danh sách không phải của mình. Đo được ở bản v6: ba chức danh Nhân sự đáp xuống Bàn làm
     việc rồi nhìn thấy **344 hồ sơ, 0 việc của mình, 264 việc của bộ phận khác** - hơn 90% màn
@@ -18182,10 +18259,10 @@ function renderBan(){
  (function(){var so=(T.so||[]).filter(function(k){try{return canSee(k)}catch(e){return false}});
   if(!so.length)return;
   h+='<div class="tbar tbso"><span class="mut" style="font-size:11.5px;align-self:center;margin-right:2px">'+
-   'Sổ của '+esc(T.t.toLowerCase())+':</span>'+
+   'Sổ của '+esc(T.t.toLowerCase())+':</span><div class="seg">'+
    so.map(function(k){var p=PBK[k]||{};
-    return '<button class="seg" onclick="go(\''+esc(k)+'\')"><i class="ti '+(p.ic||"ti-book")+'"></i>'+
-     esc(p.t||k)+'</button>'}).join("")+'</div>'})();
+    return '<button class="segb" onclick="go(\''+esc(k)+'\')"><i class="ti '+(p.ic||"ti-book")+'"></i>'+
+     esc(p.t||k)+'</button>'}).join("")+'</div></div>'})();
  h+=bvSau();
  var DS=ttDanhSach(ttk);
  var coViec=DS.filter(function(z){return z.viec.length});
@@ -18194,12 +18271,12 @@ function renderBan(){
  if(one)return h+banThe(ttk,one);
  /* dải số của chính màn này - đếm trên tập đang đứng, không mượn số nơi khác */
  h+=statStrip([
-  ["ti-inbox",coViec.length,T.t+" còn việc của tôi",T.col,"trong "+DS.length+" hồ sơ tôi thấy"],
+  ["ti-inbox",coViec.length,T.t+" còn việc của "+banAiTen(),T.col,"trong "+DS.length+" hồ sơ thuộc phạm vi của bạn"],
   ["ti-alert-triangle",coViec.filter(function(z){return z.do_}).length,"Có việc gấp","#E24B4A","làm trước"],
   ["ti-checks",DS.length-coViec.length,"Đang sạch việc","#16A34A","không cần đụng tới"]],"ban",
   ["ban_co","ban_gap","ban_sach"]);
  h+='<div class="panel"><div class="ph"><b><i class="ti '+T.ic+'" style="margin-right:6px"></i>'+
-  esc(T.t)+' còn việc của tôi ('+coViec.length+')</b><span class="mut" style="margin-left:auto;font-size:11px">bấm một dòng để mở bàn làm việc</span></div><div class="pbody">';
+  esc(T.t)+' còn việc của '+esc(banAiTen())+' ('+coViec.length+')</b><span class="mut" style="margin-left:auto;font-size:11px">bấm một dòng để mở bàn làm việc</span></div><div class="pbody">';
  if(!coViec.length)h+='<div class="empty">Không còn '+esc(T.t.toLowerCase())+' nào cần bạn xử lý. '+
   (DS.length?('Cả '+DS.length+' hồ sơ trong phạm vi của bạn đều sạch việc.'):'Phạm vi của bạn chưa có hồ sơ nào.')+'</div>';
  coViec.slice(0,40).forEach(function(z){
@@ -18224,7 +18301,7 @@ function banThe(ttk,z){
   '<span class="chip" style="margin-left:8px">'+esc(z.gd)+'</span>'+
   '<span class="mut" style="margin-left:auto;font-size:11.5px">'+esc(z.ma)+'</span></div><div class="pbody">';
  h+=ctxRows(banHoSo(ttk,r));
- h+='<div class="sechd">Việc của bạn với '+esc(T.t.toLowerCase())+' này ('+z.viec.length+')</div>';
+ h+='<div class="sechd">Việc của '+esc(banAiTen())+' với '+esc(T.t.toLowerCase())+' này ('+z.viec.length+')</div>';
  if(!z.viec.length)h+='<div class="mut" style="font-size:12px;padding:2px 0 6px">Không còn việc nào - hồ sơ này đang sạch.</div>';
  z.viec.forEach(function(v){
   h+='<div class="banjob">'+
@@ -19440,6 +19517,45 @@ function hvPH(){return !!window.HVPHONE}
 function hvAn(k){return hvPH()&&!!HVPH_AN[k]}
 /* Ai là người giám hộ đang xem - tra ngược từ số điện thoại đã đăng nhập. */
 function hvPHof(sid){var S=find("DL09","student_id",sid)||{};return {ten:ghTen(S),qh:ghQuanHe(S),sdt:ghSdt(S)}}
+/* -- XUNG HO O CONG PHU HUYNH ------------------------------------------------------------
+   Anh Luan 03/08: *"cong phu huynh, em xung ho cho dung nhe, dung ban khong on dau, loi chao
+   cung de ten dung don doc, nguoi Viet goi la hon day nhe"*.
+   Do truoc khi sua: cong phu huynh goi nguoi doc la "ban" 39 LAN, va loi chao la
+   "Chao buoi sang, Ngo Minh Binh" - ten tran, khong co tu xung ho. Voi nguoi Viet, goi trong
+   khong ten mot nguoi lon tuoi hon la that le; day khong phai loi chu, la loi phep tac.
+
+   Dai tu suy ra tu QUAN HE da khai trong ho so, khong doan theo ten (ten khong noi len tuoi
+   hay gioi). Chua khai quan he thi dung "anh/chi" - trung tinh va luon dung muc. */
+var HVXUNG=[[/^(b\u1ed1|ba|cha)$/i,"anh"],[/^(m\u1eb9|m\u00e1|m\u1ee3)$/i,"ch\u1ecb"],
+ [/^\u00f4ng$/i,"\u00f4ng"],[/^b\u00e0$/i,"b\u00e0"],[/^(anh|anh trai)$/i,"anh"],
+ [/^(ch\u1ecb|ch\u1ecb g\u00e1i)$/i,"ch\u1ecb"],
+ [/^(ch\u00fa|c\u1eadu|b\u00e1c trai)$/i,"ch\u00fa"],
+ [/^(c\u00f4|d\u00ec|b\u00e1c g\u00e1i)$/i,"c\u00f4"]];
+function hvXung(){
+ if(!hvPH())return "b\u1ea1n";
+ var qh="";try{qh=String((hvPHof(window.HVID)||{}).qh||"").trim()}catch(e){}
+ for(var i=0;i<HVXUNG.length;i++)if(HVXUNG[i][0].test(qh))return HVXUNG[i][1];
+ return "anh/ch\u1ecb"}
+function hvXungHoa(){var x=hvXung();return x.charAt(0).toUpperCase()+x.slice(1)}
+/* Loi chao: LUON co tu xung ho truoc ten. Chua khai ten thi chao theo cach trang trong chung. */
+function hvChao(greet,S){
+ if(!hvPH())return esc(greet)+", "+esc(S.full_name||"");
+ var p=hvPHof(S.student_id)||{};
+ if(p.ten)return "K\u00ednh ch\u00e0o "+esc(hvXung())+" "+esc(p.ten);
+ return "K\u00ednh ch\u00e0o qu\u00fd ph\u1ee5 huynh"}
+/* DOI XUNG HO TREN BAN VE CUOI. Vi sao lam o day chu khong sua 39 chuoi: 39 cho ay DUNG CHUNG
+   cho ca cong hoc vien - o do "ban" la dung. Sua tay tung chuoi thanh hai nhanh la 39 co hoi
+   quen mot cho, ma quen thi khong ai thay. Doi o dung mot cua ra thi hoac dung het, hoac sai
+   het - va co bo kiem canh.
+   Chua "ban be" (chuong trinh gioi thieu ban be) - do la danh tu, khong phai dai tu. */
+function hvXungLoc(h){
+ if(!hvPH())return h;
+ var x=hvXung(),X=hvXungHoa();
+ return String(h)
+  .replace(/\bb\u1ea1n b\u00e8\b/g,"\u0001")
+  .replace(/\bB\u1ea1n b\u00e8\b/g,"\u0002")
+  .replace(/\bb\u1ea1n\b/g,x).replace(/\bB\u1ea1n\b/g,X)
+  .replace(/\u0001/g,"b\u1ea1n b\u00e8").replace(/\u0002/g,"B\u1ea1n b\u00e8")}
 var HVGRP=[["Cần bạn xử lý",["s-hocphi","s-saptoi","s-khaosat"]],
  ["Việc học của bạn",["s-khoa","s-lop","s-xacnhan","s-hanhtrinh","s-tiendo","s-diem","s-buoihoc","s-wow","s-khuyennghi","s-chungnhan"]],
  ["Nói chuyện với trung tâm",["s-hoidap","s-gopy","s-gioithieu"]]];
@@ -19575,7 +19691,7 @@ function hvHashRead(){
 function hvRender(){
  var S=find("DL09","student_id",window.HVID)||rows("DL09")[0]||{};
  window.HVID=S.student_id;
- document.getElementById("hvBody").innerHTML=hvPHBar(S)+renderTrangHV();
+ document.getElementById("hvBody").innerHTML=hvXungLoc(hvPHBar(S)+renderTrangHV());
  /* Đếm việc MỘT LẦN mỗi lần vẽ trang, rồi mục lục và thanh trên cùng đọc con số đó. */
  try{var _sv=rows("DL15").filter(function(v){return String(v.student_id||"")===S.student_id});
      window.HVDEM=hvDemViec(S.student_id,_sv)}catch(e){window.HVDEM={}}
@@ -19683,7 +19799,7 @@ function demoBootHV(){window.HVPORTAL=1;try{hvPHmodeRead()}catch(e){}
  else bootHV(who||"")}
 /* trên cổng HV, reRender chỉ vẽ lại thân trang */
 function hvReRender(){var b=document.getElementById("hvBody");
- if(b){b.innerHTML=renderTrangHV();
+ if(b){b.innerHTML=hvXungLoc(renderTrangHV());
    try{var _S2=find("DL09","student_id",window.HVID)||{};
        var _sv2=rows("DL15").filter(function(v){return String(v.student_id||"")===_S2.student_id});
        window.HVDEM=hvDemViec(_S2.student_id,_sv2)}catch(e){}
@@ -19870,7 +19986,7 @@ HV_SHELL = r"""
 <div class="hvapp" id="hvapp">
   <div class="hvmask" id="hvMask" onclick="hvCloseSide()"></div>
   <aside class="hvside" id="hvSide">
-    <div class="hvbrand"><div class="logo" style="width:34px;height:34px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 40 40" width="22" height="22" aria-hidden="true"><g fill="none" stroke="#D51920" stroke-width="3.2"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="7.5"/></g><circle cx="20" cy="20" r="3.4" fill="#D51920"/><g stroke="#D51920" stroke-width="3.2"><line x1="20" y1="1.5" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="38.5"/><line x1="1.5" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="38.5" y2="20"/></g></svg></div><div><b>IELTS The Tutors</b><small>Cổng học viên</small></div></div>
+    <div class="hvbrand"><div class="logo" style="width:34px;height:34px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 40 40" width="22" height="22" aria-hidden="true"><g fill="none" stroke="#D51920" stroke-width="3.2"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="7.5"/></g><circle cx="20" cy="20" r="3.4" fill="#D51920"/><g stroke="#D51920" stroke-width="3.2"><line x1="20" y1="1.5" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="38.5"/><line x1="1.5" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="38.5" y2="20"/></g></svg></div><div><b style="text-transform:uppercase;letter-spacing:.6px">IELTS The Tutors</b><small>Cổng học viên</small></div></div>
     <div class="hvme"><div class="av" id="hvAv">?</div><div><b id="hvWho">-</b><small id="hvWho2">-</small></div></div>
     <nav class="hvnav" id="hvNav"></nav>
   </aside>
