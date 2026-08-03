@@ -147,9 +147,19 @@ var TOUR_BOQUA={
  khac:"vo hub", duyet:"vo hub - cac tab ben trong deu da khai", hocvien:"co trong tour hoc vu"};
 (function(){
  var coTour={};
- keys.forEach(function(k){TOURS[k].steps.forEach(function(st){if(st.p)coTour[st.p]=1})});
+ /* Chi tinh bai NGUOI DUNG BAN NAY THAY DUOC. Truoc day dem het moi bai trong TOURS, nen trang
+    `ban` (truc cua ban 6) van duoc coi la "co bai di qua" ngay o ban 5 - trong khi bai ay da
+    khai `chi:"6"` va nguoi dung ban 5 khong bao gio thay no. Dem mot thu nguoi dung khong thay
+    la tu ru minh la da phu. */
+ keys.forEach(function(k){
+  try{if(typeof tourHopBan==="function"&&!tourHopBan(k))return}catch(e){}
+  TOURS[k].steps.forEach(function(st){if(st.p)coTour[st.p]=1})});
+ /* Trang TRUC cua ban kia thi ban nay khong can bai nao di qua - no khong nam trong menu ban nay. */
+ var laV6b=(typeof V6==="function")&&V6();
+ var trucKia={};(laV6b?["banlam","changA","changB","changC","changD","hanhtrinh"]:["ban"])
+  .forEach(function(x){trucKia[x]=1});
  var thieu=Object.keys(PBK).filter(function(pg){
-  if(coTour[pg]||TOUR_BOQUA[pg])return false;
+  if(coTour[pg]||TOUR_BOQUA[pg]||trucKia[pg])return false;
   return !PBK[pg].hide});
  var thuaKhai=Object.keys(TOUR_BOQUA).filter(function(pg){return !PBK[pg]});
  if(thieu.length)bad.push("TRANG KHONG BAI HUONG DAN NAO DI QUA (them vao tour, hoac khai ly do o TOUR_BOQUA): "+thieu.join(", "));
@@ -297,6 +307,34 @@ var TOUR_BOQUA={
  var oChon={};nhipRoles().forEach(function(r){oChon[r[0]]=1});
  var mocoi=Object.keys(NHIP).filter(function(k){return k!=="order"&&Array.isArray(NHIP[k])&&!oChon[k]});
  t2("moi nhip ngay deu sua duoc trong Cai dat"+(mocoi.length?(" - mo coi: "+mocoi.join(",")):""), mocoi.length===0);
+})();
+
+/* ═══ V9.96 - BUOC HUONG DAN KHONG DUOC KEO NGUOI SANG TRUC CUA BAN KIA ══════════════════════
+   Anh Luan 03/08: *"cai tour, em co dang nham V5 voi V6 ko? sao a dang o V5, tu nhien cai tour
+   lam xuat hien thuc the cua V6... em ko tach biet duoc V5 va V6 se lam loi keo theo rat nghiem
+   trong day"*. Loi that: bai "Ban lam viec" (4 buoc) cam cung `p:"ban"` - trang TRUC THUC THE
+   cua ban 6 - va no van hien ra o ban 5, keo nguoi dung sang mot man khong co tren menu cua ho.
+   Chieu nguoc lai: 4 buoc cua "Toan canh app" cam cung `banlam` + `changA` (truc cua ban 5).
+
+   CHI CANH TRANG TRUC, khong canh moi trang lech menu: `tuyensinh`/`duyet`/`hoidap` co o CA HAI
+   ban (ban 5 dua tab len menu, ban 6 dua hub len menu) - di toi do la binh thuong. Trang truc
+   thi khac: no la CACH APP TO CHUC CONG VIEC, hien nham la day nguoi dung sang mot san pham
+   khac han. */
+(function(){
+ var TRUC6=["ban"], TRUC5=["banlam","changA","changB","changC","changD","hanhtrinh"];
+ var laV6=(typeof V6==="function")&&V6();
+ var cam=laV6?TRUC5:TRUC6, xau=[];
+ Object.keys(TOURS||{}).forEach(function(k){
+  /* bai da khai chi danh cho ban kia thi khong tinh - no khong hien ra o ban nay */
+  try{if(typeof tourHopBan==="function"&&!tourHopBan(k))return}catch(e){}
+  (TOURS[k].steps||[]).forEach(function(st,i){
+   if(st.p&&cam.indexOf(st.p)>=0)xau.push(k+" buoc "+(i+1)+" -> "+st.p)})});
+ t2("khong buoc nao keo nguoi sang TRANG TRUC cua ban kia"+(xau.length?(" - LECH: "+xau.join(" · ")):""),
+   xau.length===0);
+ /* Va bai khai `chi` phai khai dung mot trong hai ban */
+ var saiChi=Object.keys(TOURS||{}).filter(function(k){var c=(TOURS[k]||{}).chi;
+   return c!==undefined&&String(c)!=="5"&&String(c)!=="6"});
+ t2("bai khai 'chi' phai la 5 hoac 6"+(saiChi.length?(": "+saiChi.join(",")):""), saiChi.length===0);
 })();
 
 /* ═══ V9.60 - NEO CUA TOUR PHAI TRO DUNG MOT CHO ══════════════════════════════════════════

@@ -1159,13 +1159,31 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
    chuyên nghiệp, và mặc định để tỷ lệ 90%"*. App nhiều bảng rộng, ở 100% trên màn 13" phải cuộn
    ngang; 90% là vừa. Trước nay muốn vậy phải biết cách phóng to thu nhỏ của trình duyệt - không
    phải ai cũng biết, và mỗi trình duyệt một kiểu. */
+/* ═══ HIỆU ỨNG NHẮC CHỖ (V9.96) ══════════════════════════════════════════════════════════════
+   Anh Luân 03/08: *"kết thúc tour, sao ko hướng dẫn người ta bấm lại vào nút nào để mở lại"* và
+   *"nên mở cái hộp trợ lý lên vài giây rồi đóng gọn lại, nó như kiểu hiệu ứng nhắc người ta biết
+   chỗ đó có trợ lý, cái ô nhập trợ lý nên có cái viền ánh sáng chạy quanh"*.
+   Hai thứ khác nhau: `nhacvong` là VÒNG SÁNG NHẤP ba nhịp rồi tắt - dùng để chỉ "nút nằm ở đây";
+   `qaGlow` là VIỀN SÁNG CHẠY quanh ô hỏi - dùng để mời gõ vào. Cả hai đều tắt hẳn khi người dùng
+   bật "giảm chuyển động" của hệ điều hành. */
+@keyframes nhacvong{0%{box-shadow:0 0 0 0 rgba(46,90,136,.55)}70%{box-shadow:0 0 0 12px rgba(46,90,136,0)}100%{box-shadow:0 0 0 0 rgba(46,90,136,0)}}
+.nhacvong{animation:nhacvong 1.15s ease-out 3;border-radius:9px}
+@keyframes qaChay{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+.qaGlow{position:relative}
+.qaGlow:before{content:"";position:absolute;inset:-2px;border-radius:10px;z-index:0;
+ background:linear-gradient(90deg,var(--navy),#3B82C4,#7C3AED,#0D9488,var(--navy));
+ background-size:200% 100%;animation:qaChay 3.6s linear infinite;opacity:.85;
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+ -webkit-mask-composite:xor;mask-composite:exclude;padding:2px}
+.qaGlow>*{position:relative;z-index:1}
+@media(prefers-reduced-motion:reduce){.nhacvong{animation:none}.qaGlow:before{animation:none;opacity:.5}}
 .zwrap{display:flex;align-items:center;gap:4px;height:32px;padding:0 6px;border:1px solid var(--line);
  border-radius:8px;background:#fff;flex:none}
 .zwrap>i{font-size:14px;color:var(--muted);line-height:1}
 .zwrap>select{border:0;background:none;font-family:inherit;font-size:12px;font-weight:700;
  color:var(--navy);cursor:pointer;height:30px;padding:0 2px}
 .zwrap>select:focus{outline:none}
-@media(max-width:820px){.zwrap{display:none}}   /* điện thoại: để trình duyệt tự lo, thu nhỏ nữa là không đọc được */
+@media(max-width:1199px){.zwrap{display:none}}   /* màn nhỏ: để trình duyệt tự lo, thu nhỏ nữa là nút khó bấm */
 .pk{position:relative;display:flex;flex-direction:column;min-width:150px;max-width:100%}
 /* Ô gõ tự mang đủ dáng của một ô nhập: nó có thể được dựng ở NGOÀI .fld (thanh lọc trên trang),
    nơi không có luật CSS nào của form chạm tới - để trần là ra một ô cao 19px, đúng loại lỗi
@@ -6149,6 +6167,31 @@ function drwInit(){var g=document.getElementById("drszr");if(!g||g.__on)return;g
   start(e.touches[0].clientX,d?d.getBoundingClientRect().width:DRW_DEF)},{passive:true});
  g.addEventListener("dblclick",drwReset)}
 function openDrawer(title,html){tourCleanup();drwInit();drwApply();document.body.classList.add("drwon");document.getElementById("drawerTitle").textContent=title;document.getElementById("drawerBody").innerHTML=html;try{pkQuet(document.getElementById("drawerBody"))}catch(e){}document.getElementById("mask").classList.add("on");document.getElementById("drawer").classList.add("on")}
+/* Nháy một vòng sáng quanh một nút để nói "nó nằm ở đây" - dùng khi vừa đóng một thứ và người
+   dùng cần biết đường mở lại. Tự gỡ lớp sau khi chạy xong để lần sau còn nháy tiếp được. */
+function nhacCho(id,giay){
+ try{var el=document.getElementById(id);if(!el)return;
+  el.classList.remove("nhacvong");void el.offsetWidth;el.classList.add("nhacvong");
+  setTimeout(function(){try{el.classList.remove("nhacvong")}catch(e){}},(giay||4)*1000)}
+ catch(e){}}
+/* HÉ MỞ TRỢ LÝ MỘT LẦN cho mỗi phiên: mở ra vài giây rồi tự đóng, kèm vòng sáng ở nút.
+   Chỉ một lần - lần thứ hai là phiền chứ không còn là nhắc. Không chạy khi người dùng đã tắt
+   Trợ lý, khi đang chạy hướng dẫn, hoặc trên màn hẹp (hộp che gần hết màn). */
+function asstHeMo(){
+ try{
+  if(sessionStorage.getItem("ITTS_ASST_HE")==="1")return;
+  sessionStorage.setItem("ITTS_ASST_HE","1");
+  if(typeof tthOn==="function"&&!tthOn())return;
+  if(window.TOUR&&window.TOUR.on)return;
+  if((window.innerWidth||1400)<820)return;
+  setTimeout(function(){
+   try{
+    if(window.TOUR&&window.TOUR.on)return;
+    var a=asstEl();if(!a||a.classList.contains("on"))return;
+    asstOpen();
+    setTimeout(function(){try{asstClose();nhacCho("asstfab",4)}catch(e){}},3200)}
+   catch(e){}},1400)}
+ catch(e){}}
 /* ═══ TỶ LỆ HIỂN THỊ ════════════════════════════════════════════════════════════════════════
    Mặc định 90% theo anh Luân chốt 03/08. Nhớ theo MÁY (localStorage) chứ không vào cấu hình
    trung tâm: đây là thói quen cá nhân và phụ thuộc cỡ màn của từng người - cùng một cách đã
@@ -6160,9 +6203,13 @@ function zoomGet(){var v=0;try{v=parseInt(localStorage.getItem(ZKEY)||"",10)}cat
  return (ZMUC.indexOf(v)>=0)?v:ZMAC}
 function zoomApply(v){
  try{document.body.style.zoom=(v===100)?"":(v/100)}catch(e){}
- /* Điện thoại: giữ nguyên 100% dù người dùng đã chọn khác trên máy tính - màn nhỏ mà thu thêm
-    thì chữ 11px thành 9.9px, không đọc nổi. */
- try{if((window.innerWidth||1400)<=820)document.body.style.zoom=""}catch(e){}}
+ /* MÀN NHỎ GIỮ NGUYÊN 100%, dù người dùng đã chọn khác trên máy tính.
+    Mốc **1200px**, hạ dần từ 820 qua 1000 vì `_checkui` đo trên trình duyệt thật và bắt được
+    nút tụt xuống dưới 24px: điện thoại nằm ngang 844px ra 689 nút, máy tính bảng nằm ngang
+    1112px vẫn còn 357 nút. Lý do là số học chứ không phải cảm tính - thu 90% thì nút 26px chỉ
+    còn 23.4px, ngón tay bấm trượt. Thu nhỏ sinh ra để nhét vừa BẢNG RỘNG trên màn máy tính;
+    máy tính bảng và điện thoại vốn đã phải cuộn, thu thêm chỉ làm nút khó bấm. */
+ try{if((window.innerWidth||1400)<1200)document.body.style.zoom=""}catch(e){}}
 function zoomSet(v){v=parseInt(v,10)||ZMAC;
  try{localStorage.setItem(ZKEY,String(v))}catch(e){}
  zoomApply(v);zoomVe()}
@@ -16061,10 +16108,28 @@ var TOURS={
      CẢ APP chứ không về một ô nào - neo vào logo là sai hẳn. `mo:1` = bước mở đầu: không khoanh
      gì, màn tối đều, hộp ra giữa. Trỏ bừa vào một ô còn tệ hơn không trỏ. */
   {mo:1,sel:'',t:"Đây là bàn làm việc của trung tâm",d:"App gom mọi việc về một chỗ: khách quan tâm, học viên đang học, lớp, tiền và việc được giao. Menu bên trái xếp theo đúng hành trình của khách.",hint:"Bấm Tiếp theo để đi từng phần."},
-  {p:"banlam",sel:'@navarc',t:"Menu theo 4 chặng vòng đời",d:"C1 Khách tiềm năng - C2 Đang học - C3 Tạm dừng - C4 Kết thúc & Học tiếp. Chấm màu là chặng, số đỏ là việc quá hạn.",hint:"Bấm một nhóm chặng để mở ra."},
-  {p:"banlam",sel:'@bstats',t:"Việc cần xử lý hôm nay",d:"Mỗi ô là một con số phải nhìn mỗi sáng. Ô chỉ để XEM, không bấm - rê chuột vào ô sẽ có câu chú thích nói con số đó đếm gì và muốn xem danh sách thì bấm chip nào ở dưới. Nút Thẻ ở góc phải cho bạn tắt bớt ô không cần.",hint:"Rê chuột vào ô Tới hẹn hôm nay để đọc chú thích."},
-  {p:"banlam",sel:'@chaybody',t:"Danh sách người cần xử lý",d:"Mỗi dòng là một người kèm việc kế tiếp. Dải hạt màu cho biết họ đang ở chặng nào. Rê vào MỘT HẠT là biết chặng đó đã để lại gì trong hồ sơ; bấm vào hạt mở ngăn kéo riêng của chặng đó; bấm chữ C1/C2 đầu dải mở cả hành trình.",hint:"Rê vào một hạt rồi bấm thử - ngăn kéo kể đủ sản phẩm của chặng đó."},
-  {p:"changA",sel:'@nrail',t:"Bản đồ một chặng",d:"Đường ray hiện số người ở từng ga và phần trăm chuyển đổi thật giữa các ga - nhìn là biết đang tắc ở đâu.",hint:"Bấm một ga để lọc người ở ga đó."},
+  /* ═══ BỐN BƯỚC "TRỤC CỦA APP" - MỖI BẢN MỘT BỘ ═══════════════════════════════════════════
+     Anh Luân 03/08: *"cái tour, em có đang nhầm V5 với V6 ko? sao a đang ở V5, tự nhiên cái
+     tour làm xuất hiện thực thể của V6... em ko tách biệt được V5 và V6 sẽ làm lỗi kéo theo
+     rất nghiêm trọng đấy"*. Đúng, và đây là lỗi thật: bốn bước này cắm cứng `banlam` + `changA`
+     - hai trang RIÊNG CỦA BẢN 5, không có trên menu bản 6. Người dùng bản 6 đang xem tour bỗng
+     bị kéo sang một màn hình không thuộc bản mình đang dùng, rồi không có đường quay lại.
+     (Chiều ngược lại còn nặng hơn: bài "Bàn làm việc" kéo người bản 5 sang trang `ban` - trục
+     thực thể của bản 6. Bài đó nay khai `chi:"6"`, bản 5 không thấy nữa.)
+     LUẬT TỪ ĐÂY: bước hướng dẫn KHÔNG được trỏ vào trang chỉ có ở bản kia. `_checktour` canh
+     bằng cách so hai cây menu, nên quên là đỏ ngay. */
+  V6()
+   ? {p:"ban",sel:'@bantt',t:"Bốn đối tượng được phục vụ",d:"Khách · Học viên · Phụ huynh · Lớp. Chọn một loại là thấy đúng những hồ sơ loại đó còn việc của bạn - không phải đi tìm theo trang.",hint:"Bấm thử một loại khác xem danh sách đổi theo."}
+   : {p:"banlam",sel:'@navarc',t:"Menu theo 4 chặng vòng đời",d:"C1 Khách tiềm năng - C2 Đang học - C3 Tạm dừng - C4 Kết thúc & Học tiếp. Chấm màu là chặng, số đỏ là việc quá hạn.",hint:"Bấm một nhóm chặng để mở ra."},
+  V6()
+   ? {p:"ban",sel:'@bstats',t:"Ba con số của màn này",d:"Bao nhiêu hồ sơ còn việc của bạn, trong đó mấy hồ sơ có việc gấp, và bao nhiêu đang sạch việc. Ô chỉ để xem - rê chuột vào ô có câu chú thích nói con số đếm gì.",hint:"Rê chuột vào ô đầu tiên."}
+   : {p:"banlam",sel:'@bstats',t:"Việc cần xử lý hôm nay",d:"Mỗi ô là một con số phải nhìn mỗi sáng. Ô chỉ để XEM, không bấm - rê chuột vào ô sẽ có câu chú thích nói con số đó đếm gì và muốn xem danh sách thì bấm chip nào ở dưới. Nút Thẻ ở góc phải cho bạn tắt bớt ô không cần.",hint:"Rê chuột vào ô Tới hẹn hôm nay để đọc chú thích."},
+  V6()
+   ? {p:"ban",sel:'@bangviec',t:"Bảng việc của chức danh bạn",d:"Ngay dưới thanh chọn là bảng việc còn tồn của chính bộ phận bạn, và khối những việc đang chờ bạn phê duyệt. Mở app ra là biết hôm nay còn nợ gì.",hint:"Nhìn các ô trong bảng việc."}
+   : {p:"banlam",sel:'@chaybody',t:"Danh sách người cần xử lý",d:"Mỗi dòng là một người kèm việc kế tiếp. Dải hạt màu cho biết họ đang ở chặng nào. Rê vào MỘT HẠT là biết chặng đó đã để lại gì trong hồ sơ; bấm vào hạt mở ngăn kéo riêng của chặng đó; bấm chữ C1/C2 đầu dải mở cả hành trình.",hint:"Rê vào một hạt rồi bấm thử - ngăn kéo kể đủ sản phẩm của chặng đó."},
+  V6()
+   ? {p:"hocvien",sel:'@tbarct',t:"Lọc nhiều trục trên mọi sổ",d:"Mọi danh sách trong app dùng chung một bộ công cụ: chip lọc nhanh, bộ lọc sâu, chọn cột, xuất tệp. Học một lần dùng được mọi sổ.",hint:"Bấm thử một chip lọc."}
+   : {p:"changA",sel:'@nrail',t:"Bản đồ một chặng",d:"Đường ray hiện số người ở từng ga và phần trăm chuyển đổi thật giữa các ga - nhìn là biết đang tắc ở đâu.",hint:"Bấm một ga để lọc người ở ga đó."},
   {sel:'@bell',t:"Chuông cảnh báo",d:"Mọi việc trễ hẹn theo quy trình chuẩn dồn về đây, chia theo bộ phận. Việc mới từ máy khác còn nổ bong bóng góc màn hình.",hint:"Bấm chuông xem thử."},
   {sel:'@me',t:"Mỗi chức danh một màn hình riêng",d:"Bấm ô tên ở đáy menu để đổi người. Sale, học vụ, giáo viên, kế toán mỗi người thấy một giao diện và một phạm vi dữ liệu khác nhau.",hint:"Bấm ô tên ở đáy menu để xem danh sách người."},
   {sel:'@doicong',t:"Ba cổng, một bộ dữ liệu",d:"Ngoài cổng nhân viên còn cổng học viên và cổng phụ huynh. Nút này mở thẳng sang cổng kia - ghi ở cổng này thì cổng kia thấy ngay, vì cả ba đọc chung một bộ dữ liệu.",hint:"Bấm Tiếp theo - còn một việc quan trọng."},
@@ -16081,7 +16146,7 @@ var TOURS={
     được giới thiệu một dòng ở màn chào, không có bài nào. */
  /* V9.69 - bài đầu tiên của app. Bàn làm việc là TRỤC MỚI, mà trục mới thì phải dạy trước
     mọi thứ khác - nếu không người dùng vẫn quay về thói quen đi tìm theo trang. */
- tq_ban:{lv:"thamquan",t:"Bàn làm việc - mở một người, làm hết việc",ic:"ti-focus-2",d:"4 bước - thực thể trung tâm của từng giai đoạn",steps:[
+ tq_ban:{lv:"thamquan",chi:"6",t:"Bàn làm việc - mở một người, làm hết việc",ic:"ti-focus-2",d:"4 bước - thực thể trung tâm của từng giai đoạn",steps:[
   {p:"ban",sel:'@phead',t:"Mỗi giai đoạn có một thực thể trung tâm",d:"Bốn đối tượng được phục vụ: KHÁCH · HỌC VIÊN · PHỤ HUYNH · LỚP. Chưa học thì khách là trung tâm - mọi việc nhằm đưa họ vào lớp; đã học thì học viên và lớp là trung tâm; phụ huynh là người trả tiền và người cần được báo cáo. Bàn làm việc gom theo đúng bốn trục đó.",hint:"Bấm Tiếp theo."},
   {p:"ban",sel:'@bantt',t:"Chọn thực thể bạn đang làm việc cùng",d:"App tự mở sẵn thực thể hợp với chức danh của bạn: tư vấn và marketing thì Khách, kế toán thì Học viên, học vụ và giảng viên thì Lớp. Con số trên mỗi nút là số hồ sơ còn việc của riêng bạn - không có số nghĩa là thực thể đó đang sạch việc với bạn.",hint:"Bấm thử một thực thể khác để so."},
   {p:"ban",sel:'@bstats',t:"Ba con số của bàn",d:"Bao nhiêu hồ sơ còn việc của tôi, bao nhiêu có việc gấp, bao nhiêu đang sạch. Hồ sơ sạch là hồ sơ không cần đụng tới - đó mới là đích.",hint:"Nhìn ba ô."},
@@ -16099,7 +16164,7 @@ var TOURS={
   {p:"hoidap",sel:'@qavd',t:"Hỏi số - và số đó là số thật",d:"Bấm thử câu mẫu 'có bao nhiêu học viên nguy cơ'. Con số trả về chính là con số app đang hiện trên thẻ, tính lại tại chỗ theo ngưỡng CH2 - không phải số gõ sẵn. Bên dưới còn liệt kê cụ thể là ai.",hint:"Bấm một câu mẫu."},
   {p:"hoidap",sel:'@qabox',t:"Không hiểu thì nói là không hiểu",d:"Hỏi câu Trợ lý chưa trả lời được thì nó nói thẳng, gợi ý những thứ gần nhất, và GHI câu đó vào sổ trong Cài đặt để quản trị viên soạn câu trả lời một lần - lần sau app trả lời được ngay.",hint:"Xong phần Trợ lý!"}]},
  tn_sale:{lv:"trainghiem",role:"Nhân viên Tư vấn",t:"Một ngày của Nhân viên Tư vấn",ic:"ti-phone",d:"8 bước - từ khách mới tới lúc thu tiền",steps:[
-  {p:"banlam",sel:'@bstats',t:"Mở máy là nhìn 5 ô này",d:"Tới hẹn hôm nay là việc gấp nhất - khách đã hẹn mà không gọi là mất. Sau đó tới học viên nguy cơ và đăng ký còn nợ. Ô chỉ để xem; muốn ra danh sách thì bấm chip Tới hẹn / quá hẹn ở thanh Nhóm.",hint:"Bấm chip Tới hẹn / quá hẹn ở thanh Nhóm."},
+  {p:(V6()?"ban":"banlam"),sel:'@bstats',t:"Mở máy là nhìn 5 ô này",d:"Tới hẹn hôm nay là việc gấp nhất - khách đã hẹn mà không gọi là mất. Sau đó tới học viên nguy cơ và đăng ký còn nợ. Ô chỉ để xem; muốn ra danh sách thì bấm chip Tới hẹn / quá hẹn ở thanh Nhóm.",hint:"Bấm chip Tới hẹn / quá hẹn ở thanh Nhóm."},
   {p:"nhaplead",sel:'@txt:Thêm mới',t:"Khách mới gọi đến",d:"Mọi khách hỏi qua điện thoại, Zalo, fanpage đều ghi vào đây. Hệ thống tự chặn trùng số và bắt đầu đếm giờ phản hồi.",hint:"Bấm nút 'Thêm mới' ở đầu trang, nhập tên và số điện thoại rồi Lưu bản ghi.",chk:function(){return tourMore("lead")}},
   {p:"nhaplead",sel:'@txt:Ghi liên hệ',t:"Gọi và ghi kết quả",d:"Gọi xong bấm Ghi liên hệ, chọn kết quả: gặp được, không nghe máy, hẹn gọi lại... Một nỗ lực gọi là đủ tắt cảnh báo, không bị phạt vì khách không nghe.",hint:"Mở một khách, bấm Ghi liên hệ, chọn kết quả rồi Lưu.",chk:function(){return tourMore("lh")}},
   {p:"test",sel:'@phead',t:"Đặt lịch test đầu vào",d:"Khách đồng ý test thì đặt lịch ngay. Đến ngày, học vụ chấm và trả kết quả, hệ thống tự nhắc bạn gọi tư vấn.",hint:"Xem danh sách test đang chờ."},
@@ -16162,8 +16227,8 @@ var TOURS={
   {p:"baocao",sel:'@phead',t:"Báo cáo doanh thu",d:"Doanh thu theo tháng, theo nguồn khách, công nợ tồn - số liệu tự tính từ phiếu thu, không phải gõ lại.",hint:"Xong một ngày của kế toán!"}]},
  tn_quanly:{lv:"trainghiem",role:"Quản lý - Giám đốc",t:"Một ngày của Quản lý",ic:"ti-shield-check",d:"6 bước - nhìn số, duyệt, giao việc",steps:[
   {p:"baocao",sel:'@phead',t:"Mở máy là nhìn số",d:"Doanh thu, phễu tuyển sinh, chuyên cần, hài lòng - và quan trọng nhất là phần nhận xét kèm việc nên làm ngay cho từng chỉ số.",hint:"Cuộn xuống xem khối chỉ số."},
-  {p:"banlam",sel:'@bstats',t:"Điểm nghẽn toàn trung tâm",d:"Ô nào số cao bất thường là chỗ đang tắc. Rê chuột vào ô để biết mở trang nào hoặc bấm chip nào thì ra đúng danh sách người đang kẹt ở đó.",hint:"Rê chuột vào ô có số lớn nhất."},
-  {p:"changA",sel:'@nrail',t:"Tắc ở chặng nào",d:"Phần trăm chuyển đổi giữa các ga cho biết mất khách ở bước nào: gọi không được, test rồi không tư vấn, hay tư vấn rồi không chốt.",hint:"Nhìn tỷ lệ giữa các ga."},
+  {p:(V6()?"ban":"banlam"),sel:'@bstats',t:"Điểm nghẽn toàn trung tâm",d:"Ô nào số cao bất thường là chỗ đang tắc. Rê chuột vào ô để biết mở trang nào hoặc bấm chip nào thì ra đúng danh sách người đang kẹt ở đó.",hint:"Rê chuột vào ô có số lớn nhất."},
+  {p:(V6()?"hocvien":"changA"),sel:(V6()?'@tbarct':'@nrail'),t:"Tắc ở chặng nào",d:"Phần trăm chuyển đổi giữa các ga cho biết mất khách ở bước nào: gọi không được, test rồi không tư vấn, hay tư vấn rồi không chốt.",hint:"Nhìn tỷ lệ giữa các ga."},
   {p:"duyet",sel:'@txt:Duyệt',t:"Duyệt việc chờ bạn",d:"Chiết khấu lớn, hoàn tiền - nhân viên tạo là bạn nhận thông báo ngay, duyệt xong nhân viên biết liền.",hint:"Bấm 'Duyệt' hoặc 'Từ chối' trên một chiết khấu đang chờ.",chk:function(){return (window.TOURB&&rows("DL06").filter(function(x){return String(x.discount_approved_by||"").trim()}).length>(window.TOURB.duyet||0))}},
   {p:"giaoviec",sel:'@txt:Giao việc mới',t:"Giao việc cho đội",d:"Giao xuống cấp dưới, phối hợp ngang cấp, hoặc nhờ hỗ trợ. Việc bắt buộc thì không được từ chối.",hint:"Bấm 'Giao việc mới', chọn người nhận, ghi tiêu đề và hạn rồi Lưu.",chk:function(){return tourMore("viec")}},
   {p:"giaoviec",sel:'@tbar',t:"Ai đang làm tốt, ai hay trễ",d:"Tab Tổng hợp cho biết tỷ lệ hoàn thành đúng hạn của từng người - dùng khi đánh giá cuối tháng.",hint:"Bấm tab Tổng hợp & báo cáo."}]},
@@ -16191,12 +16256,17 @@ var TOURS={
   {p:"settings",ctx:function(){window.SETTAB="ch4"},sel:'@settabs',t:"Câu nhắc việc",d:"Toàn bộ câu chữ nhắc nhân viên làm gì nằm ở đây - sửa được, không cần lập trình viên. Câu có tham số tự điền số từ ngưỡng.",hint:"Sửa thử một câu và xem bản xem trước."},
   {p:"settings",ctx:function(){window.SETTAB="ch1"},sel:'@settabs',t:"Danh mục",d:"Mọi nhãn trạng thái trong app lấy từ danh mục này: nguồn khách, trạng thái lớp, hình thức thanh toán...",hint:"Còn một mẹo cuối - bấm Tiếp."},
   /* V9.54: dạy luôn đường tắt, không thì người dùng cứ nghĩ muốn đổi ngưỡng là phải mò vào đây. */
-  {p:"banlam",sel:'@chaybody',t:"Không cần vào Cài đặt mới sửa được",d:"Ở bất kỳ màn nào, thấy cái bánh răng nhỏ cạnh một con số hay một câu nhắc là bấm được: nó mở ngăn kéo sửa NGAY TẠI CHỖ, lưu xong màn đang xem tính lại theo, bạn không phải rời chỗ đang làm. Trong ngăn kéo vẫn có nút mở trang Cài đặt nếu muốn xem cả nhóm.",hint:"Tìm một bánh răng trên màn và bấm thử. Không thích thấy bánh răng thì tắt ở Cài đặt > Giao diện."}]},
+  {p:(V6()?"ban":"banlam"),sel:(V6()?'@bantt':'@chaybody'),t:"Không cần vào Cài đặt mới sửa được",d:"Ở bất kỳ màn nào, thấy cái bánh răng nhỏ cạnh một con số hay một câu nhắc là bấm được: nó mở ngăn kéo sửa NGAY TẠI CHỖ, lưu xong màn đang xem tính lại theo, bạn không phải rời chỗ đang làm. Trong ngăn kéo vẫn có nút mở trang Cài đặt nếu muốn xem cả nhóm.",hint:"Tìm một bánh răng trên màn và bấm thử. Không thích thấy bánh răng thì tắt ở Cài đặt > Giao diện."}]},
  /* ---------- CẤP 4: DEV ---------- */
 
 };
 
 var TOUR={key:"",i:0,on:false};
+/* BÀI HƯỚNG DẪN CHỈ DÀNH CHO MỘT BẢN BUILD. Bài "Bàn làm việc" dạy TRỤC THỰC THỂ - trục riêng
+   của bản 6; hiện nó ở bản 5 là kéo người dùng sang một màn hình không thuộc bản họ đang dùng
+   (anh Luân bắt được 03/08). Khai `chi:"6"` hoặc `chi:"5"` là bản kia không thấy bài đó nữa. */
+function tourHopBan(k){var c=(TOURS[k]||{}).chi;if(!c)return true;
+ return (String(c)==="6")===(typeof V6==="function"&&V6())}
 function tourMenu(lv){var L=lv||window.TOURLVSEL||"";
  var h="";
  if(!L){
@@ -16209,7 +16279,7 @@ function tourMenu(lv){var L=lv||window.TOURLVSEL||"";
      '<div style="flex:1"><b>'+esc(V[1])+'</b><span>'+esc(V[3])+'</span></div>'+
      '<span class="chip '+(nv?"amber":"green")+'" style="align-self:center">'+(nv?(nv+" việc"):"đã sạch")+'</span></div>';
     return}
-   var n=0;for(var k in TOURS)if(TOURS[k].lv===V[0])n++;
+   var n=0;for(var k in TOURS)if(TOURS[k].lv===V[0]&&tourHopBan(k))n++;
    h+='<div class="tourmi" onclick="tourMenu(\''+V[0]+'\')"><span class="tmi"><i class="ti '+V[2]+'"></i></span>'+
     '<div style="flex:1"><b>'+esc(V[1])+'</b><span>'+esc(V[3])+'</span></div>'+
     '<span class="chip" style="align-self:center">'+n+' bài</span></div>'});
@@ -16224,6 +16294,7 @@ function tourMenu(lv){var L=lv||window.TOURLVSEL||"";
  h+='<div class="tourmenu">';
  var any=false;
  Object.keys(TOURS).forEach(function(k){var T=TOURS[k];if(T.lv!==L)return;
+  if(!tourHopBan(k))return;            /* bài chỉ dành cho bản build kia */
   if(!tourBaiOn(k))return;             /* bài bị tắt ở Cài đặt */
   any=true;
   var mine=T.role&&me&&(elabel(me.role)||"").indexOf(T.role.split(" ")[0])>=0;
@@ -16258,10 +16329,11 @@ function tourRestart(){if(!TOUR.key)return;TOUR.i=0;tourShow()}
 function tourNext(){var T=TOURS[TOUR.key];if(!T)return;
  if(TOUR.i>=T.steps.length-1){
   if(T.live){var con=tourWorkLeft();tourEnd();
-   if(con>0)toast("Hết lượt này. Còn "+con+" việc chưa xong - mở Trợ lý để dọn tiếp.",5200);
+   if(con>0){toast("Hết lượt này. Còn "+con+" việc chưa xong - mở Trợ lý để dọn tiếp.",5200);nhacCho("asstfab",5)}
    else toast("Sạch hàng chờ. Không còn việc nào đang chờ bạn.",4200);
+   nhacCho("tourBtn",5);
    return}
-  tourEnd();toast("Đã xong hướng dẫn. Bấm dấu hỏi trên đầu để xem lại bất cứ lúc nào.",4200);return}
+  tourEnd();toast("Đã xong hướng dẫn. Muốn xem lại: bấm nút dấu hỏi trên thanh trên (đang nhấp sáng).",5200);nhacCho("tourBtn",5);return}
  TOUR.i++;tourShow()}
 function tourPrev(){if(TOUR.i>0){TOUR.i--;tourShow()}}
 /* ===== MÃ ĐIỂM NEO CHO HƯỚNG DẪN (V9.23) =====
@@ -19697,7 +19769,7 @@ function asstHTML(){
   '<button class="x" onclick="asstClose()" aria-label="Thu gọn Trợ lý"><i class="ti ti-chevron-down"></i></button></div>';
  /* Ô HỎI đứng trên cùng - đây là cửa vào chính của Trợ lý, không phải một tính năng phụ. */
  var _q=window.ASSTQ||"";
- h+='<div class="qaAsk"><input id="asst_q" value="'+esc(_q)+'" placeholder="Hỏi tên học viên, hoặc chỗ cấu hình…" onkeydown="if(event.key===\'Enter\')asstQHoi()">'+
+ h+='<div class="qaAsk"><span class="qaGlow" style="flex:1;min-width:0;display:flex"><input id="asst_q" value="'+esc(_q)+'" placeholder="Hỏi tên học viên, hoặc chỗ cấu hình…" onkeydown="if(event.key===\'Enter\')asstQHoi()"></span>'+
   '<button class="btn primary sm" onclick="asstQHoi()" aria-label="Hỏi"><i class="ti ti-search"></i></button>'+
   (_q?'<button class="btn sm" onclick="asstQXoa()" aria-label="Xoá câu hỏi"><i class="ti ti-x"></i></button>':'')+'</div>';
  if(_q)return h+asstTraLoi(_q)+aiKhoiHTML(_q);
@@ -20395,6 +20467,7 @@ function enter(k){try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{rtEnsur
  try{pkNghe()}catch(e){}
  try{moGan()}catch(e){}
  try{zoomInit()}catch(e){}
+ try{asstHeMo()}catch(e){}
  try{tourOfferOnce()}catch(e){}}
 
 /* ============ CỔNG HỌC VIÊN (file HTML riêng) ============

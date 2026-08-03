@@ -149,6 +149,32 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.96 — TOUR NHẦM BẢN: LỖI NGHIÊM TRỌNG NHẤT TRONG NGÀY ✅ (03/08).**
+> · Anh Luân: *"cái tour, em có đang nhầm V5 với V6 ko? sao a đang ở V5, tự nhiên cái tour làm
+> xuất hiện thực thể của V6... em ko tách biệt được V5 và V6 sẽ làm lỗi kéo theo rất nghiêm
+> trọng đấy"*. **Lỗi thật, và anh gọi đúng mức độ.** Đo được: bài "Bàn làm việc" (4 bước) cắm
+> cứng `p:"ban"` - trang TRỤC THỰC THỂ của bản 6 - mà nó vẫn hiện ở bản 5, kéo người dùng sang
+> một màn không có trên menu của họ. Chiều ngược lại nặng không kém: 4 bước của "Toàn cảnh app"
+> cắm cứng `banlam` + `changA` (trục của bản 5) nên người dùng bản 6 bị kéo ngược về bản 5.
+> · Sửa: bài khai `chi:"6"` thì bản 5 không thấy nữa; bốn bước trục của "Toàn cảnh app" nay
+> **mỗi bản một bộ** (bản 6 dạy bốn đối tượng + bảng việc; bản 5 dạy bốn chặng + danh sách chạy).
+> · **Canh bằng máy từ nay:** `_checktour` so hai cây menu và cấm mọi bước trỏ vào **trang trục**
+> của bản kia. Chỉ canh trang trục - `tuyensinh`/`duyet`/`hoidap` có ở cả hai bản (bản 5 đưa tab
+> lên menu, bản 6 đưa hub lên menu), đi tới đó là bình thường. Kèm một chỗ nữa: phép đếm "trang
+> nào chưa có bài đi qua" trước đây **đếm cả bài mà người dùng bản này không thấy** - tự ru mình
+> là đã phủ.
+> · **Kết thúc hướng dẫn phải chỉ đường quay lại** (anh Luân): nay nút dấu hỏi **nhấp sáng ba
+> nhịp** và câu nhắc nói thẳng "bấm nút dấu hỏi trên thanh trên (đang nhấp sáng)".
+> · **Trợ lý tự giới thiệu** (anh Luân: *"nên mở cái hộp trợ lý lên vài giây rồi đóng gọn lại"*):
+> hé mở 3,2 giây rồi tự đóng, xong nút nhấp sáng - **một lần cho mỗi phiên**, lần hai là phiền
+> chứ không còn là nhắc. Không chạy khi đang có hướng dẫn, khi người dùng đã tắt Trợ lý, hoặc
+> trên màn hẹp. Ô hỏi có **viền ánh sáng chạy quanh**; cả hai hiệu ứng tắt hẳn khi hệ điều hành
+> bật "giảm chuyển động".
+> · **Tỷ lệ hiển thị chỉ bật từ 1200px trở lên** - hạ dần từ 820 qua 1000 vì `_checkui` đo trên
+> trình duyệt thật: điện thoại nằm ngang 844px ra **689 nút dưới 24px**, máy tính bảng ngang
+> 1112px còn **357 nút**. Thu 90% thì nút 26px chỉ còn 23,4px - ngón tay bấm trượt. Con số quyết
+> định, không phải cảm tính.
+
 > **Phiên bản: V9.95 — BA CHỖ ANH LUÂN CHỤP ẢNH ✅ (03/08).**
 > · **Khối "Ai duyệt việc gì" xấu** - anh Luân: *"em bị áp lực gì ko, sao làm chỗ này xấu vậy"*.
 > Không phải áp lực, là làm vội. Bản đầu là một hàng flex đẩy danh sách tên sang phải, tên dài
