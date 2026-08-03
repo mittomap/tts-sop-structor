@@ -192,7 +192,6 @@ TRIG_BOQUA = {
     "NA069": "Nhan 'HV da tot nghiep' - trang thai XONG.",
     "NA074": "Nhan 'da gui khao sat' - app dung NA073 (cho tra loi) va NA075 (qua han chua tra loi).",
     "NA080": "Nhan 'phan hoi tich cuc, da ghi nhan' - khong co viec gi.",
-    "NA092": "Nhan 'da moi tai ghi danh' - app dung NA091 (chua moi) va NA093 (da nhan loi).",
 }
 
 # ── TINH HUONG CHI SONG TRONG MOT CUA SO NGAN ────────────────────────────────
