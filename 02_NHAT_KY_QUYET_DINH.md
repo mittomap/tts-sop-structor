@@ -149,7 +149,15 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.84-V9.89 — ĐỢT CHUẨN BỊ MANG ĐI DEMO ✅ (03/08).**
+> **Phiên bản: V9.84-V9.90 — ĐỢT CHUẨN BỊ MANG ĐI DEMO ✅ (03/08).**
+> · **Audit cuối bắt hai chỗ đỏ, cả hai chỉ có ở bản v6, cả hai cùng một gốc: bản đồ cắm cứng
+> theo bản v5.** (1) Trang **Bàn làm việc** vẽ **hai bảng việc chồng nhau** - `renderBan` vừa gọi
+> `pageHead(...)` (đầu trang tự gắn bảng việc) vừa gọi `bvSau()` sau thanh chọn thực thể; ở v5
+> không ai thấy vì Bàn làm việc không phải trang đáp của chức danh nào nên bảng rỗng, sang v6 nó
+> là trang đáp của cả 8 chức danh nên hiện ra hai lần. (2) Bước đầu bài hướng dẫn **"Một ngày của
+> nhóm hỗ trợ"** neo `@bangviec` vào trang `banlam` - trang đáp của v5; ở v6 mọi chức danh đáp
+> xuống `ban` nên cái neo rơi ra ngoài. **Luật (lần thứ ba trong ba ngày): bản đồ nào cắm cứng
+> theo một bản build thì bản kia sẽ lặng lẽ mất tính năng - phải hỏi trạng thái thật.**
 > · **Cổng phụ huynh xưng hô sai** - anh Luân: *"dùng bạn không ổn đâu, lời chào cũng để tên đứng
 > đơn độc, người Việt gọi là hỗn đấy nhé"*. Đo: gọi "bạn" **39 lần**, chào bằng **tên trần**. Nay
 > đại từ suy từ quan hệ đã khai (bố→anh, mẹ→chị, ông→ông, bà→bà, chưa khai→anh/chị), chào "Kính

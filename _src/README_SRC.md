@@ -369,8 +369,25 @@ tham so van duoc tinh (moi tac dung phu van xay ra), chi bo phan cham diem.
 Bo kiem cung phai TU DAT DIEU KIEN cua minh, khong thua huong cua cau truoc - vd dai so cua hub
 Cho duyet chi hien cho nguoi co quyen duyet (7/9 chuc danh mo ra khong co dai, va do la DUNG).
 
-CON NO: chay tren v6, `_check16` con **1 tieu chi do**: "trang duyet da co dai so". Da khoanh
-vung duoc: cung phai vi, cung CURROLE/SCOPE/tabs/segs nhu v5, nhung `RENDER.duyet()` o v6 ngan
-hon 3.7KB va KHONG co khoi `bstats` - tuc la loi goi `statStrip` cua trang do bi bo qua o v6.
-KHONG phai do `navInTree` (renderDuyet khong goi ham nay). Buoc tiep: tim cho goi statStrip cua
-hub Cho duyet va xem dieu kien nao gat no o v6. Chua dua v6 vao verify.sh vi the.
+(Mon no cu "`_check16` con 1 tieu chi do o v6 - trang duyet chua co dai so" DA TRA XONG tu 02/08.
+Muc **4bis** cua `verify.sh` nay chay lai 15 bo kiem tren `_APP6.js`, xanh het.)
+
+## V9.84-V9.90 - DOT CHUAN BI MANG DI DEMO (03/08)
+
+Chi tiet "vi sao" o `02_NHAT_KY_QUYET_DINH.md`. O day chi ghi nhung cho **cham vao bo kiem**:
+
+- `_check14` them **4 tieu chi xung ho cong phu huynh** (215 tieu chi). Bay da can: ban dau bo
+  kiem BAT duoc loi khi ve trang roi **im lang tra ve**, thanh ra XANH tren ban hong. Nay ve
+  khong duoc la **DO**. Da dung lai ban cu de chung minh no thuc su can (7 quan he do).
+- `_check16` shim `history` them `pushState` (nut Back cua trinh duyet), va **hai cau ve nut Dung
+  lai demo do bang CHU DA VE RA**, khong do bang chuoi trong ma nguon nua.
+- `_checkui` cho hinh hoc cua tour **doi theo TRANG THAI** (neo dung yen) thay vi ngu 950ms - ngu
+  mot khoang co dinh la DUA voi hieu ung cuon, khong phai doi no.
+- `_checkaudit` bat that mot loi V9.90: o v6, trang **Ban lam viec** ve **hai bang viec** ("ban:
+  bang quan ly x2"). Goc: `renderBan` vua goi `pageHead(...)` (dau trang tu gan bang viec) vua goi
+  `bvSau()` sau thanh chon thuc the. O v5 khong ai thay vi Ban lam viec khong phai trang dap cua
+  chuc danh nao nen bang rong. Nay `renderBan` truyen `hoan=1`.
+- `_checktour` bat that loi thu hai cung goc: buoc `tn_hotro[0]` neo `@bangviec` cam cung trang
+  `banlam` - trang dap cua **ban v5**. O v6 moi chuc danh dap xuong `ban` nen neo roi ra ngoai.
+  Nay `p` doc `V6()`. **Luat lai lan nua: ban do nao cam cung theo mot ban build thi ban kia se
+  lang le mat tinh nang.**

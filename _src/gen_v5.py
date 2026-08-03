@@ -15340,7 +15340,9 @@ var TOURS={
      trang đó nữa. Phễu chuyển đổi xem ngay trên trang Tuyển sinh, đúng chỗ họ làm việc. */
   {p:"tuyensinh",ctx:function(){window.TSTAB="lead"},sel:'@phead',t:"Phễu và tỷ lệ chuyển đổi",d:"Phễu trên đầu trang cho biết mất khách ở bước nào. Marketing đổ nhiều lead mà tắc ở khâu gọi thì vấn đề không nằm ở quảng cáo.",hint:"Xong một ngày của marketing!"}]},
  tn_hotro:{lv:"trainghiem",role:"Nhóm hỗ trợ (HR, IT...)",t:"Một ngày của nhóm hỗ trợ",ic:"ti-tool",d:"3 bước - nhận việc, làm, báo xong",steps:[
-  {p:"banlam",sel:'@bangviec',t:"Bảng việc của bạn",d:"Nhóm hỗ trợ không đụng vào phễu hay lớp học - bạn làm việc qua module Giao việc. Bốn con số đầu trang cho biết việc mới, đang làm, quá hạn và việc chờ người giao xác nhận.",hint:"Nhìn bốn ô đầu trang."},
+  /* Bảng việc nằm ở TRANG ĐÁP, mà trang đáp của bản 5 là Trang bắt đầu còn bản 6 là Bàn làm
+     việc - cắm cứng "banlam" thì sang v6 bước này trỏ vào chỗ không có neo. */
+  {p:(V6()?"ban":"banlam"),sel:'@bangviec',t:"Bảng việc của bạn",d:"Nhóm hỗ trợ không đụng vào phễu hay lớp học - bạn làm việc qua module Giao việc. Bốn con số đầu trang cho biết việc mới, đang làm, quá hạn và việc chờ người giao xác nhận.",hint:"Nhìn bốn ô đầu trang."},
   {p:"giaoviec",sel:'@txt:Nhận việc',t:"Nhận việc được giao",d:"Bấm Nhận là người giao biết việc đã tới tay bạn. Việc bắt buộc thì không từ chối được; việc thường thì từ chối phải ghi lý do.",hint:"Bấm 'Nhận việc' trên một việc mới được giao."},
   {p:"giaoviec",sel:'@tbar',t:"Báo xong ngay lúc làm xong",d:"Báo xong kèm ghi chú, người giao xác nhận là việc đóng. Không làm kịp thì báo lại sớm - im lặng mới là vấn đề.",hint:"Xong một ngày của nhóm hỗ trợ!"}]},
  tn_nhansu:{lv:"trainghiem",role:"Nhân sự",t:"Một ngày của Nhân sự",ic:"ti-id-badge",d:"4 bước - hồ sơ người, bảng công, việc nội bộ",steps:[
@@ -18310,8 +18312,12 @@ function renderSoPH(){
 function phMo(id){window.BANTT="phuhuynh";window.BANMO=id;go("ban")}
 function renderBan(){
  var ttk=banTT(), T=TTBK[ttk];
+ /* hoãn=1: trang này TỰ gọi bvSau() sau thanh chọn thực thể (dòng dưới). Không hoãn thì đầu
+    trang gắn một bảng việc, thân trang gắn bảng thứ hai - ở v5 không thấy vì Bàn làm việc không
+    phải trang đáp của chức danh nào nên bảng rỗng, sang v6 nó là trang đáp của cả 8 chức danh
+    nên bảng hiện ra HAI LẦN (_checkaudit bắt "ban: bảng quản lý x2"). */
  var h=pageHead("Bàn làm việc","Mở một "+T.t.toLowerCase()+" là thấy trọn việc của bạn với người đó",
-  '<button class="btn" onclick="go(\'hanhtrinh\')"><i class="ti ti-route"></i>Xem theo chặng</button>');
+  '<button class="btn" onclick="go(\'hanhtrinh\')"><i class="ti ti-route"></i>Xem theo chặng</button>',1);
  h+='<div class="notebar"><i class="ti ti-focus-2"></i>'+goiyG("gy_ban_lam_viec_tt01",
   'Mỗi giai đoạn có <b>một thực thể trung tâm</b>. Chọn thực thể, mở một hồ sơ, làm hết việc của bạn ngay tại đó.||'+
   'Chưa học thì khách là trung tâm; đang học thì lớp và học viên là trung tâm. App chỉ hiện những việc mà chức danh của bạn được làm theo bảng phân quyền CH3, và chỉ những việc hồ sơ đó còn thiếu.')+'</div>';
