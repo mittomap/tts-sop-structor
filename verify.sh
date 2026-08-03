@@ -144,6 +144,13 @@ else
   # NHAN VIEN AO: khong nhin man hinh nua ma NGOI LAM - bam Lam, dien form, bam Luu, doi chieu
   # nhat ky xem co ghi that khong. Bo kiem duy nhat di het mot viec tu dau den cuoi.
   chay "_checknv nhan vien ao" "CHECKNV (OK|BO QUA)" node _checknv.js
+  # V9.93 - BAM THU MOI THE VA MOI DONG TREN MOI TRANG (anh Luan: "vay lam sao biet o cac trang
+  # khac co ton tai loi gi ko?"). Cau tra loi truoc do la KHONG BIET: khong bo kiem nao bam vao
+  # mot cai the. Chay lan dau bat duoc 92 cho bam vao khong co gi xay ra, cong mot bang SVTPL
+  # duoc dung o 5 cho ma chua bao gio duoc khai (mo form Gui khao sat la chet ngan keo).
+  # Khong chi hoi "co bam duoc khong" ma con hoi: mo dung ho so vua bam khong, co lo chu may
+  # (undefined/NaN) ra man khong, ngan keo co rong khong.
+  chay "_checkbam bam thu moi cho" "CHECKBAM (OK|BO QUA)" node _checkbam.js
 fi
 
 echo

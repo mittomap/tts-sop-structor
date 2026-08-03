@@ -1434,6 +1434,7 @@ body.drsz .drawer{transition:none}
 .stab{height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:#fff;color:#5A6675;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
 .stab:hover{border-color:#B9C6D6}.stab.on{background:var(--navy);border-color:var(--navy);color:#fff}
 .bgck{width:16px;height:16px;cursor:pointer}
+.obcard{cursor:pointer}
 .obcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
 .obcards>.empty{grid-column:1/-1}
 /* V9.12 - "mỗi học viên/lead 1 DÒNG": .rows biến lưới thẻ thành danh sách hàng; bấm dòng nở chi tiết tại chỗ */
@@ -3279,6 +3280,35 @@ function rowSlaBtn(r,pk){
  var x=rowActMap()[String(r[pk]==null?"":r[pk])];
  if(!x||!x.act)return "";
  return '<button class="btn primary sm" onclick="slaAct(\''+esc(x.act)+'\',\''+esc(String(x.rid||""))+'\')" data-tip="'+esc(String(x.what||"").slice(0,90))+'"><i class="ti ti-tool"></i>Làm ngay</button>'}
+/* XEM TRỌN MỘT DÒNG SỔ (V9.93). Bảng chỉ hiện vài cột được chọn; muốn đọc đủ một bản ghi -
+   ghi chú, việc tiếp theo, các cột đang bị ẩn - thì trước đây không có đường nào.
+   Một cửa dùng chung cho MỌI sổ: đọc chính bản khai `LISTCFG` nên thêm sổ mới là tự có. */
+function lstXem(arg){
+ var s=String(arg||""),i=s.indexOf("|");if(i<0)return;
+ var key=s.slice(0,i),id=s.slice(i+1);
+ var cfg=LISTCFG[key];if(!cfg)return;
+ var pk=cfg.cols[0][0];
+ var r=find(cfg.code,pk,id);
+ if(!r){toast("Không thấy bản ghi "+id+".");return}
+ var p=PBK[key]||{};
+ var h='<div class="dcard"><h4><i class="ti '+(p.ic||"ti-list-details")+'"></i>'+esc(p.t||key)+' · '+esc(id)+'</h4>';
+ /* mọi cột ĐÃ KHAI, kể cả cột người dùng đang ẩn trên bảng - đây là chỗ đọc đủ */
+ h+=ctxRows(cfg.cols.map(function(c){return [esc(c[1]),cell(r,c,cfg.code)]}));
+ /* hai cột chung mà bảng nào cũng có mà bảng nào cũng không đủ chỗ hiện */
+ if(String(r.notes||"").trim())h+=ctxContent("Ghi chú",r.notes,"var(--navy)");
+ if(String(r.next_action||"").trim())h+=ctxContent("Việc tiếp theo",r.next_action,"var(--amber)");
+ var nut=[];
+ if(r.student_id)nut.push('<button class="btn" onclick="openHoso(\''+esc(r.student_id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ học viên</button>');
+ else if(r.lead_id)nut.push('<button class="btn" onclick="leadDetail(\''+esc(r.lead_id)+'\')"><i class="ti ti-user-search"></i>Hồ sơ khách</button>');
+ if(r.class_id)nut.push('<button class="btn" onclick="openLop(\''+esc(r.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Bảng lớp</button>');
+ (cfg.act||[]).forEach(function(a){
+  nut.push('<button class="btn" onclick="'+a.fn+'(\''+esc(String(r[a.arg]||""))+'\')"><i class="ti '+a.ic+'"></i>'+esc(a.lb)+'</button>')});
+ if(!cfg.ro)nut.push('<button class="btn primary" onclick="closeModal();openEdit(\''+esc(key)+'\',\''+esc(id)+'\')"><i class="ti ti-edit"></i>Sửa bản ghi</button>');
+ if(cfg.lam&&PBK[cfg.lam])nut.push('<button class="btn" onclick="closeModal();go(\''+esc(cfg.lam)+'\')"><i class="ti ti-arrow-right"></i>Sang '+esc((PBK[cfg.lam]||{}).t||cfg.lam)+' để làm</button>');
+ if(nut.length)h+='<div class="dact">'+nut.join("")+'</div>';
+ else h+='<div class="fhint">Sổ này chỉ để tra cứu - mọi thao tác ghi nằm ở màn nghiệp vụ tương ứng.</div>';
+ h+='</div>';
+ openDrawer((p.t||key)+" · "+id,h)}
 function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
  hideInit(key);var cols=cfg.cols.filter(function(c){return colVisible(key,c[0])});if(!cols.length)cols=[cfg.cols[0]];
  var h='<div class="tbwrap"><table class="dt"><thead><tr>';
@@ -3293,7 +3323,11 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
  h+='</tr></thead><tbody>';
  if(!data.length){var isF=(SEARCH[key]||(FILT[key]||[]).length||(window.QF||{})[key]||((key==="hocvien")&&(window.HVFCLS||window.HVFCRS)));
   h+='<tr><td class="empty" colspan="'+(cols.length+(coTT?1:0))+'">'+(isF?'Không có bản ghi khớp BỘ LỌC hiện tại. <button class="btn sm" onclick="clearFilt(\''+key+'\')" style="margin-left:8px"><i class="ti ti-x"></i>Xóa lọc</button>':'Chưa có bản ghi nào trong bảng này.')+'</td></tr>'}
- data.forEach(function(r){var id=esc(String(r[pk]||""));h+='<tr>';
+ /* V9.93 - MỖI DÒNG PHẢI MỞ RA ĐƯỢC. Bộ kiểm `_checkbam` bấm thử 122 thẻ/dòng và bắt được
+    **92 chỗ bấm vào không có gì xảy ra** - gần như toàn bộ sổ tra cứu. Người dùng bấm vào dòng
+    theo phản xạ (anh Luân bấm đúng như thế và kết luận app hỏng). Sửa ở ĐÂY, một chỗ dựng bảng
+    dùng chung cho 13 sổ, chứ không đi sửa từng sổ. */
+ data.forEach(function(r){var id=esc(String(r[pk]||""));h+='<tr data-mo="lstXem" data-mo-arg="'+esc(key+"|"+String(r[pk]||""))+'">';
   cols.forEach(function(c){
     if(!cfg.ro&&cfg.filt&&c[0]===cfg.filt&&ENUMMAP[cfg.filt]&&ENUM[ENUMMAP[cfg.filt]]){h+='<td>'+qsel(key,id,cfg.filt,r[c[0]])+'</td>';return}
     var lk=(c[2]==="chip"||c[2]==="enum"||c[2]==="money"||c[2]==="na"||c[2]==="calcso"||c[2]==="lau")?null:cellLnk(r,c,cfg);
@@ -6165,6 +6199,59 @@ function pkNghe(){if(typeof MutationObserver==="undefined")return;
  ["content","drawerBody","hvMain"].forEach(function(id){var el=document.getElementById(id);
   if(el)try{mo.observe(el,{childList:true,subtree:true})}catch(e){}})}
 
+/* ═══ BẤM VÀO THÂN THẺ / DÒNG LÀ MỞ CHI TIẾT (V9.93) ══════════════════════════════════════
+   Anh Luân 03/08, mở bản demo online: *"ở tab khiếu nại cùng trang, bấm vào tên người khiếu nại
+   cũng chẳng biết họ khiếu nại cái gì?"* và *"bấm vào lớp cũng ko thấy liệt kê lịch sử"*.
+   Đúng - và không phải một chỗ: app có 10 dải thẻ `.obcard` và mấy chục bảng, thẻ nào cũng chỉ
+   tóm tắt vài dòng rồi để một nút nhỏ ở góc. Người dùng bấm vào thân thẻ theo phản xạ, không có
+   gì xảy ra, và họ kết luận app hỏng.
+   Chính app đã có sẵn nếp đúng ở dòng việc (`slaRow`): *bấm vào thân dòng mở drawer xem nhanh,
+   nút Xử lý vẫn đi thẳng như cũ*. Ở đây làm đúng nếp ấy, nhưng ở MỘT CHỖ dùng chung thay vì
+   chép vào từng thẻ - nghe sự kiện nổi lên từ `#content` / `#drawerBody`.
+   Thứ tự tìm việc để làm khi bấm vào thân:
+     1. `data-mo` khai ngay trên thẻ / dòng (mã hàm + đối số) - dùng khi muốn chỉ đích danh;
+     2. nút trong thẻ có chữ mang nghĩa XEM (Xem / Xử lý / Chi tiết / Mở) - nút này vốn là lối
+        vào chi tiết của chính thẻ đó;
+     3. không có gì thì thôi - không bịa ra hành động.
+   Bấm đúng vào nút, liên kết hay ô nhập thì để chúng làm việc của chúng. */
+function moGan(){
+ ["content","drawerBody","hvMain"].forEach(function(id){
+  var el=document.getElementById(id);
+  if(!el||el.__mo)return;el.__mo=1;
+  el.addEventListener("click",moBam)})}
+function moBam(ev){
+ var t=ev.target,than=ev.currentTarget;
+ while(t&&t!==than){
+  var tag=(t.tagName||"").toLowerCase();
+  if(tag==="button"||tag==="a"||tag==="input"||tag==="select"||tag==="textarea"||tag==="label")return;
+  if(t.getAttribute&&t.getAttribute("onclick"))return;   /* phần tử tự có việc của nó */
+  var mo=t.getAttribute&&t.getAttribute("data-mo");
+  if(mo){var arg=t.getAttribute("data-mo-arg")||"";
+   try{if(typeof window[mo]==="function"){window[mo](arg);ev.stopPropagation()}}catch(e){}
+   return}
+  var cl=" "+String(t.className||"")+" ";
+  if(cl.indexOf(" obcard ")>=0||(tag==="tr"&&moTrongBang(t))){
+   var b=moNutXem(t);
+   if(b){b.click();ev.stopPropagation()}
+   return}
+  t=t.parentNode}}
+function moTrongBang(tr){try{var p=tr.parentNode;while(p){if((p.tagName||"").toLowerCase()==="table")
+  return String(p.className||"").indexOf("dt")>=0;p=p.parentNode}}catch(e){}return false}
+function moNutXem(box){
+ var bs=[];try{bs=box.querySelectorAll("button")}catch(e){return null}
+ var i,t;
+ /* Nút mang nghĩa XEM trước - đó là lối vào chi tiết đúng nghĩa nhất. */
+ for(i=0;i<bs.length;i++){t=String(bs[i].textContent||"");
+  if(/Xem|Chi tiết|Xử lý|Mở |Lịch sử|Hồ sơ/i.test(t)&&!moNutDu(t))return bs[i]}
+ /* Không có thì lấy NÚT ĐẦU của thẻ: thẻ nghiệp vụ (chấm test, ghi kết quả tư vấn, ghi thu tiền)
+    không có nút "Xem" nào cả - việc chính của thẻ CHÍNH LÀ lối vào của nó. Vẫn tránh nút phá
+    (xoá, huỷ, từ chối, leo thang): bấm nhầm vào thân thẻ mà ra một việc không lùi được thì tệ
+    hơn nhiều so với việc thẻ không bấm được. */
+ for(i=0;i<bs.length;i++){t=String(bs[i].textContent||"");
+  if(!moNutDu(t))return bs[i]}
+ return null}
+function moNutDu(t){return /Xoá|Xóa|Huỷ|Hủy|Từ chối|Leo thang|Xuất|Dựng lại|Đóng/i.test(String(t||""))}
+
 /* ═══ GHI NHẬN GÓP Ý (V9.92) ════════════════════════════════════════════════════════════════
    Anh Luân 03/08: *"để đỡ trôi, e cứ thêm vào sidebar 1 trang: ghi nhận góp ý, tổng hợp hết
    vào"* - đợt các phòng ban dùng thử, góp ý gửi qua tin nhắn sẽ trôi mất.
@@ -8166,23 +8253,75 @@ function renderReview(embed){var p="review",fil=fget(p);
  view.forEach(function(i){var c=i.c;
   var rcls=i.rate==null?"":(i.rate>=kpiTh(/^SRR/,0.6)?"green":"red");
   var scls=i.ss==null?"":(i.ss>=kpiTh(/^SS/,4.5)?"green":"amber");
-  h+='<tr><td><b>'+esc(c.class_name||c.class_id)+'</b><div class="mut" style="font-size:10.5px">'+esc(c.class_id)+'</div></td>'+
+  h+='<tr data-mo="rvLichSu" data-mo-arg="'+esc(c.class_id)+'"><td><b>'+esc(c.class_name||c.class_id)+'</b><div class="mut" style="font-size:10.5px">'+esc(c.class_id)+'</div></td>'+
    '<td>'+i.stu+'</td><td>'+i.mine.length+'</td><td>'+i.sub.length+'</td>'+
    '<td>'+(i.rate==null?'<span class="mut" data-tip="Lớp này chưa gửi phiếu khảo sát nào nên chưa tính được">—</span>':'<span class="chip '+rcls+'" data-tip="'+esc(pctG(i.sub.length,i.mine.length,"phiếu đã gửi được học viên trả lời")+" · ngưỡng đạt "+Math.round(kpiTh(/^SRR/,0.6)*100)+"% (CH6 · SRR)")+'">'+Math.round(i.rate*100)+'%</span>')+'</td>'+
    '<td>'+(i.ss==null?'<span class="mut">—</span>':'<span class="chip '+scls+'">'+i.ss.toFixed(1)+'/5</span>')+'</td>'+
    '<td>'+(i.fu.length?'<span class="chip red">'+i.fu.length+'</span>':'<span class="mut">0</span>')+'</td>'+
    '<td>'+(i.last?esc(vnd2(i.last)):'<span class="chip red">chưa gửi</span>')+'</td>'+
-   '<td><div class="rowact"><button class="btn primary sm" onclick="rvForm(\''+esc(c.class_id)+'\')"><i class="ti ti-send"></i>Gửi đợt</button>'+
+   '<td><div class="rowact"><button class="btn sm" onclick="rvLichSu(\''+esc(c.class_id)+'\')"><i class="ti ti-history"></i>Lịch sử</button>'+
+   '<button class="btn primary sm" onclick="rvForm(\''+esc(c.class_id)+'\')"><i class="ti ti-send"></i>Gửi đợt</button>'+
    '<button class="btn sm" onclick="openLop(\''+esc(c.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Bảng lớp</button></div></td></tr>'});
  h+='</tbody></table></div></div>';
  var recent=sv.slice().sort(function(a,b){return (pvnd(b.sent_date)||0)-(pvnd(a.sent_date)||0)}).slice(0,12);
  h+='<div class="panel"><div class="ph"><b>Phiếu gần đây ('+recent.length+')</b><div class="mini"><button class="pill" onclick="window.KSTAB=\'ks\';go(\'khaosat\')">Mở Khảo sát & Phản hồi</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Học viên</th><th>Lớp</th><th>Đợt</th><th>Gửi</th><th>Trạng thái</th><th>Hài lòng</th></tr></thead><tbody>';
  recent.forEach(function(v){var sub=String(v.submitted_date||"").trim();
-  h+='<tr><td>'+esc(v.survey_id)+'</td><td>'+esc(v.student_name||v.student_id)+'</td><td>'+lopLnk(v.class_id,v.class_id_name,"-")+'</td><td>'+esc(elabel(v.survey_type)||"-")+'</td><td>'+esc(v.sent_date||"-")+'</td>'+
+  h+='<tr data-mo="svXem" data-mo-arg="'+esc(v.survey_id)+'"><td>'+esc(v.survey_id)+'</td><td>'+esc(v.student_name||v.student_id)+'</td><td>'+lopLnk(v.class_id,v.class_id_name,"-")+'</td><td>'+esc(elabel(v.survey_type)||"-")+'</td><td>'+esc(v.sent_date||"-")+'</td>'+
    '<td>'+(sub?'<span class="chip green">đã trả lời</span>':'<span class="chip amber">chờ</span>')+'</td>'+
    '<td>'+(v.satisfaction_score?esc(v.satisfaction_score)+"/5":'<span class="mut">-</span>')+'</td></tr>'});
  return h+'</tbody></table></div></div>'}
 function vnd2(d){try{return ("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2)+"/"+d.getFullYear()}catch(e){return ""}}
+/* LỊCH SỬ KHẢO SÁT CỦA MỘT LỚP (V9.93 - anh Luân: *"bấm vào lớp cũng ko thấy liệt kê lịch sử"*).
+   Bảng ngoài chỉ có số tổng; muốn biết lớp này đã gửi mấy đợt, ai trả lời, ai chấm thấp thì
+   trước đây không có đường nào xem. */
+function rvLichSu(cid){
+ var c=find("DL10","class_id",cid)||{};
+ var sv=rows("DL15").filter(function(v){return v.class_id===cid})
+  .sort(function(a,b){return (pvnd(b.sent_date)||0)-(pvnd(a.sent_date)||0)});
+ var sub=sv.filter(function(v){return String(v.submitted_date||"").trim()});
+ var diem=sub.filter(function(v){return num(v.satisfaction_score)>0});
+ var tb=diem.length?(diem.reduce(function(a,v){return a+num(v.satisfaction_score)},0)/diem.length):null;
+ var h='<div class="dcard"><h4><i class="ti ti-history"></i>Lịch sử khảo sát - '+esc(c.class_name||cid)+'</h4>';
+ h+=ctxRows([["Lớp",esc(c.class_name||cid)],["Mã lớp",esc(cid)],
+  ["Đã gửi",sv.length+" phiếu"],["Đã trả lời",sub.length+" phiếu"+(sv.length?(" ("+Math.round(sub.length/sv.length*100)+"%)"):"")],
+  ["Hài lòng trung bình",tb==null?"chưa có điểm":(tb.toFixed(1)+"/5")]]);
+ if(!sv.length)h+='<div class="empty"><i class="ti ti-inbox"></i>Lớp này chưa gửi phiếu khảo sát nào.</div>';
+ else{
+  h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Đợt</th><th>Học viên</th><th>Gửi</th><th>Trả lời</th><th>Hài lòng</th><th>Ghi nhận</th></tr></thead><tbody>';
+  sv.forEach(function(v){var tl=String(v.submitted_date||"").trim();
+   var yk=[v.positive_comments,v.negative_comments,v.suggestions].filter(function(x){return String(x||"").trim()}).join(" · ");
+   h+='<tr data-mo="svXem" data-mo-arg="'+esc(v.survey_id)+'"><td>'+esc(elabel(v.survey_type)||v.survey_type||"-")+'</td>'+
+    '<td>'+esc(v.student_name||v.student_id)+'</td><td>'+esc(v.sent_date||"-")+'</td>'+
+    '<td>'+(tl?esc(tl):'<span class="chip amber">chờ</span>')+'</td>'+
+    '<td>'+(num(v.satisfaction_score)?esc(v.satisfaction_score)+"/5":'<span class="mut">-</span>')+'</td>'+
+    '<td>'+esc(String(yk).slice(0,70)||"-")+'</td></tr>'});
+  h+='</tbody></table></div>';
+  h+='<div class="fhint" style="margin-top:6px">Bấm một dòng để xem đầy đủ phiếu đó.</div>';}
+ h+='<div class="dact"><button class="btn primary" onclick="rvForm(\''+esc(cid)+'\')"><i class="ti ti-send"></i>Gửi đợt mới cho lớp này</button>'+
+  '<button class="btn" onclick="openLop(\''+esc(cid)+'\')"><i class="ti ti-clipboard-list"></i>Mở bảng lớp</button></div></div>';
+ openDrawer("Lịch sử khảo sát · "+(c.class_name||cid),h)}
+/* MỘT PHIẾU KHẢO SÁT ĐẦY ĐỦ - bộ câu đã gửi, học viên trả lời gì, có cần follow-up không. */
+function svXem(id){
+ var v=find("DL15","survey_id",id);if(!v){toast("Không thấy phiếu khảo sát.");return}
+ var tl=String(v.submitted_date||"").trim();
+ var h='<div class="dcard"><h4><i class="ti ti-clipboard-text"></i>Phiếu khảo sát '+esc(id)+'</h4>';
+ h+=ctxRows([["Học viên",esc(v.student_name||v.student_id)],["Lớp",esc(v.class_id_name||v.class_id||"-")],
+  ["Đợt",esc(elabel(v.survey_type)||v.survey_type||"-")],["Gửi lúc",esc(v.sent_date||"-")],
+  ["Trả lời lúc",tl?esc(tl):"chưa trả lời"],
+  ["Hài lòng",num(v.satisfaction_score)?(esc(v.satisfaction_score)+"/5"):"-"],
+  ["Sẵn sàng giới thiệu (NPS)",num(v.nps_score)?esc(v.nps_score)+"/10":"-"],
+  ["Tự thấy tiến bộ",esc(v.progress_perception||"-")],
+  ["Người phụ trách",esc(v.assigned_staff||"-")],
+  ["Cần follow-up",fuNeed(v.follow_up_needed)?'<span class="chip red">Có</span>':'<span class="chip green">Không</span>']]);
+ if(String(v.notes||"").trim())h+=ctxContent("Bộ câu hỏi đã gửi kèm",v.notes,"var(--navy)");
+ if(String(v.positive_comments||"").trim())h+=ctxContent("Học viên khen",v.positive_comments,"var(--green)");
+ if(String(v.negative_comments||"").trim())h+=ctxContent("Học viên chê",v.negative_comments,"var(--red)");
+ if(String(v.suggestions||"").trim())h+=ctxContent("Học viên đề xuất",v.suggestions,"var(--amber)");
+ if(!tl)h+='<div class="notebar"><i class="ti ti-clock"></i>Phiếu chưa có trả lời. Nhắc học viên qua cổng học viên hoặc gọi trực tiếp.</div>';
+ h+='<div class="dact"><button class="btn" onclick="openHoso(\''+esc(v.student_id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ học viên</button>'+
+  (v.class_id?('<button class="btn" onclick="rvLichSu(\''+esc(v.class_id)+'\')"><i class="ti ti-history"></i>Lịch sử cả lớp</button>'):'')+
+  '</div></div>';
+ openDrawer("Phiếu khảo sát · "+(v.student_name||v.student_id),h)}
 function rvForm(cid){var cls=rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))});
  var h='<div class="dcard"><h4><i class="ti ti-send"></i>Gửi đợt khảo sát cho cả lớp</h4>';
  h+='<div class="fld full"><label>Lớp <i>*</i></label><select id="rv_cls" onchange="rvPreview(this.value)"><option value="">-- chọn lớp --</option>'+
@@ -8241,7 +8380,7 @@ function renderGhinhan(embed){var p="ghinhan",fil=fget(p);
  if(!view.length)h+='<div class="empty">Không có phản hồi nào khớp bộ lọc.</div>';
  var MIX=jIndex();
  view.slice(0,60).forEach(function(f){var s=fst(f);var id=f.feedback_id;
-  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(f.student_id,f.student_id_name,"(chưa gắn HV)")+'</b>'+
+  h+='<div class="obcard" data-mo="fbXem" data-mo-arg="'+esc(id)+'"><div class="obh"><div><b>'+nguoiLnk(f.student_id,f.student_id_name,"(chưa gắn HV)")+'</b>'+
    '<div class="obm">'+esc(elabel(f.feedback_category)||f.feedback_category||"")+' · '+esc(elabel(f.feedback_channel)||"")+
    (f.feedback_score?' · điểm '+esc(f.feedback_score)+'/5':'')+' · '+esc(f.feedback_time||"")+(f.class_id_name?' · '+esc(f.class_id_name):'')+'</div></div>'+mstripFor(f.student_id,MIX)+
    '<span class="chip '+(s.neg?"red":(isc(f.feedback_type,"positive")?"green":"gray"))+'">'+esc(elabel(f.feedback_type)||"-")+'</span></div>';
@@ -9722,7 +9861,8 @@ function renderBanggiao(embed){
  h+='<div class="panel"><div class="ph"><b>Lead của '+esc(src)+' - hiện '+leads.length+'/'+allLeads.length+'</b><div class="mini"><button class="pill" onclick="bgAll(true)">Chọn tất cả (đang hiện)</button><button class="pill" onclick="bgAll(false)">Bỏ chọn</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th style="width:36px"></th><th>Mã</th><th>Họ tên</th><th>SĐT</th><th>Trạng thái</th><th>Việc cần làm</th></tr></thead><tbody>';
  if(!allLeads.length)h+='<tr><td class="empty" colspan="6">NV này không còn lead.</td></tr>';
  else if(!leads.length)h+='<tr><td class="empty" colspan="6">Không có lead nào khớp bộ lọc.</td></tr>';
- leads.forEach(function(l){h+='<tr><td><input type="checkbox" class="bgck" value="'+esc(l.lead_id)+'"></td><td>'+esc(l.lead_id)+'</td><td><a class="lnk" onclick="leadDetail(\''+esc(l.lead_id)+'\')">'+esc(l.full_name)+'</a></td><td>'+esc(l.phone_number||"")+'</td><td><span class="chip '+stCls(l.lead_status)+'">'+esc(elabel(l.lead_status))+'</span></td><td style="font-size:11.5px;color:var(--muted)">'+esc(naLive("DL02",l)||"")+'</td></tr>'});
+ /* V9.93: cả dòng mở hồ sơ khách (ô tick vẫn là ô tick - `moBam` không cướp việc của nó). */
+ leads.forEach(function(l){h+='<tr data-mo="leadDetail" data-mo-arg="'+esc(l.lead_id)+'"><td><input type="checkbox" class="bgck" value="'+esc(l.lead_id)+'"></td><td>'+esc(l.lead_id)+'</td><td><a class="lnk" onclick="leadDetail(\''+esc(l.lead_id)+'\')">'+esc(l.full_name)+'</a></td><td>'+esc(l.phone_number||"")+'</td><td><span class="chip '+stCls(l.lead_status)+'">'+esc(elabel(l.lead_status))+'</span></td><td style="font-size:11.5px;color:var(--muted)">'+esc(naLive("DL02",l)||"")+'</td></tr>'});
  h+='</tbody></table></div></div>';return h}
 function bgAll(v){[].forEach.call(document.querySelectorAll(".bgck"),function(c){c.checked=v})}
 function bgSplitOrphans(){
@@ -12961,6 +13101,42 @@ function wowAddSave(force){var sid=fldV("wa_stu");if(!sid){toast("Chọn học v
   toast("Đã đặt buổi WOW cho "+(s.full_name||sid)+" - lượt chỉ trừ sau khi buổi diễn ra.",4200);closeModal();reRender(CUR)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL14",w)}else{d("WOW-"+seqNo("DL14","wow_id"))}}
 /* ===== P8 Khảo sát & Phản hồi (DL15 + DL16) ===== */
+/* BỘ CÂU HỎI CHUẨN THEO ĐỢT KHẢO SÁT.
+   V9.93 - anh Luân 03/08 mở bản demo online: *"Sao ko gửi khảo sát"*. Gốc: `SVTPL` được DÙNG ở
+   năm chỗ (svTplBox, svPick, svSend, rvForm, rvPick) mà **chưa bao giờ được khai** - mở form ra
+   là `SVTPL is not defined`, ngăn kéo chết ngay, không một dòng báo lỗi nào cho người dùng.
+   Cả luồng Khảo sát định kỳ của SOP đứng im vì một cái bảng thiếu.
+   Vì sao 21 bộ kiểm không thấy: chúng đo CHUỖI HTML do các hàm render sinh ra, mà `rvForm` là
+   hàm mở NGĂN KÉO - không hàm render nào gọi nó, nên không ai chạy vào dòng chết ấy.
+   Chữ trong bảng này sửa được ngay trên form trước khi gửi (ô "Bộ câu hỏi gửi kèm"). */
+var SVTPL={
+ week_1:{t:"Tuần 1 - đầu khóa",q:[
+  "Buổi học đầu tiên có đúng như bạn hình dung khi đăng ký không?",
+  "Giáo viên nói bạn có nghe rõ và theo kịp không?",
+  "Trình độ lớp so với bạn: dễ - vừa - hay khó?",
+  "Có gì trung tâm nên chỉnh ngay trong tuần này không?"]},
+ week_4:{t:"Tuần 4 - giữa khóa",q:[
+  "Sau một tháng, bạn thấy mình tiến bộ nhất ở kỹ năng nào?",
+  "Kỹ năng nào bạn vẫn thấy đuối và cần kèm thêm?",
+  "Bài tập về nhà nhiều hay ít so với thời gian bạn có?",
+  "Giáo viên chữa bài có kịp và có rõ không?",
+  "Bạn hài lòng mức nào với lớp hiện tại (1-5)?"]},
+ week_8:{t:"Tuần 8 - cuối chặng",q:[
+  "So với lúc mới vào, bạn tự chấm mình tiến bộ mấy phần trên 10?",
+  "Bạn đã thi thử chưa, kết quả có sát mục tiêu không?",
+  "Điều gì ở lớp giúp bạn nhiều nhất?",
+  "Điều gì trung tâm nên làm khác đi cho khóa sau?",
+  "Bạn hài lòng mức nào với lớp hiện tại (1-5)?"]},
+ end_of_course:{t:"Cuối khóa - tổng kết",q:[
+  "Bạn đạt được mục tiêu đặt ra khi đăng ký chưa?",
+  "Bạn hài lòng mức nào với giáo viên, học vụ và cơ sở vật chất (1-5 từng mục)?",
+  "Bạn có sẵn sàng giới thiệu trung tâm cho bạn bè không (0-10)?",
+  "Bạn có dự định học tiếp khóa cao hơn không?",
+  "Một câu góp ý thẳng thắn nhất bạn muốn nói với trung tâm."]},
+ adhoc:{t:"Đột xuất",q:[
+  "Chuyện vừa xảy ra, bạn thấy trung tâm xử lý ổn chưa?",
+  "Bạn còn điều gì chưa hài lòng không?",
+  "Bạn muốn trung tâm làm gì tiếp theo?"]}};
 function fuNeed(v){var s=String(v||"").trim();return s!==""&&!/^(không|khong|no|false|0)/i.test(s)}
 function svTplBox(code){var t=SVTPL[ecode(code)||code];
  if(!t)return '<div class="fhint">Đợt này chưa có bộ câu mẫu.</div>';
@@ -12999,6 +13175,34 @@ function svResultSave(id){var v=find("DL15","survey_id",id)||{};var sat=fldV("sv
  markRow("DL15","survey_id",id,{submitted_date:nowStr(),within_3_days:w3,satisfaction_score:sat,nps_score:fldV("sv_nps"),positive_comments:fldV("sv_pos"),negative_comments:fldV("sv_neg"),suggestions:fldV("sv_sug"),follow_up_needed:fu},(fu?"Đã lưu - HV cần follow-up!":"Đã lưu kết quả khảo sát."));closeModal()}
 function svFollowDone(id){var v=find("DL15","survey_id",id)||{};
  markRow("DL15","survey_id",id,{follow_up_needed:"",notes:(v.notes?v.notes+" | ":"")+nowStr()+": đã follow-up bởi "+myName()},"Đã xử lý follow-up.")}
+/* MỘT PHẢN HỒI ĐẦY ĐỦ (V9.93). Thẻ ngoài chỉ cắt 120 ký tự đầu; phản hồi đã xử lý xong thì
+   trên thẻ chỉ còn nút "Hồ sơ" - tức là không còn đường nào đọc lại nội dung gốc và cách đã xử
+   lý. Đây là thứ cấp trên đọc khi rà lại, không được để mất. */
+function fbXem(id){
+ var f=find("DL16","feedback_id",id);if(!f){toast("Không thấy phản hồi.");return}
+ var code=ecode(f.feedback_status),loai=ecode(f.feedback_type);
+ var h='<div class="dcard"><h4><i class="ti ti-message-2"></i>Phản hồi '+esc(id)+'</h4>';
+ h+=ctxRows([["Người gửi",esc(f.student_id_name||f.student_id||"(chưa gắn học viên)")],
+  ["Lớp",esc(f.class_id_name||f.class_id||"-")],
+  ["Nhận lúc",esc(f.feedback_time||"-")],
+  ["Kênh",esc(elabel(f.feedback_channel)||f.feedback_channel||"-")],
+  ["Loại",'<span class="chip '+(loai==="negative"?"red":(loai==="positive"?"green":""))+'">'+esc(elabel(f.feedback_type)||f.feedback_type||"-")+'</span>'],
+  ["Nhóm vấn đề",esc(elabel(f.feedback_category)||f.feedback_category||"-")],
+  ["Điểm",num(f.feedback_score)?esc(f.feedback_score)+"/5":"-"],
+  ["Trạng thái",esc(elabel(f.feedback_status)||code||"-")],
+  ["Người phân loại",esc(f.classified_by||"chưa phân loại")+(f.classified_at?(" · "+esc(f.classified_at)):"")]]);
+ h+=ctxContent("Nội dung phản hồi",f.feedback_content,loai==="negative"?"var(--red)":"var(--navy)");
+ if(String(f.feedback_action_note||"").trim())
+  h+=ctxContent("Đã xử lý thế nào",f.feedback_action_note,"var(--green)")+
+     ctxRows([["Xử lý xong lúc",esc(f.action_taken_at||"-")]]);
+ if(String(f.related_complaint_id||"").trim())
+  h+='<div class="notebar"><i class="ti ti-alert-triangle"></i>Phản hồi này đã được chuyển thành khiếu nại <b>'+esc(f.related_complaint_id)+'</b>.</div>';
+ h+='<div class="dact">';
+ if(String(f.related_complaint_id||"").trim())
+  h+='<button class="btn" onclick="openComplaint(\''+esc(f.related_complaint_id)+'\')"><i class="ti ti-external-link"></i>Mở khiếu nại</button>';
+ if(f.student_id)h+='<button class="btn" onclick="openHoso(\''+esc(f.student_id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ học viên</button>';
+ h+='</div></div>';
+ openDrawer("Phản hồi · "+(f.student_id_name||f.student_id||id),h)}
 function fbClassify(id){var f=find("DL16","feedback_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-tags"></i>Tiếp nhận & phân loại - '+esc(f.student_id_name||f.student_id)+'</h4>';
  h+=ctxContent("Nội dung phản hồi",f.feedback_content,"var(--blue)");
@@ -14827,7 +15031,10 @@ function renderLichTuan(embed){
   else if(k==="__nogv")label='<b style="color:var(--red)">Chưa gán GV</b>';
   else if(mode==="gv"){var g=find("DL01","staff_id",k);label="<b>"+esc(g?g.full_name:k)+"</b><div class=\'mut\' style=\'font-size:10px\'>"+esc(k)+"</div>"}
   else{var c2=find("DL10","class_id",k);label="<b>"+esc(c2?(c2.class_name||k):k)+"</b>"}
-  h+='<tr><td>'+label+'</td>';
+  /* V9.93: bấm cả dòng lịch tuần là mở hồ sơ giảng viên (chế độ xếp theo GV) hoặc bảng lớp
+     (chế độ xếp theo lớp) - trước đây cả dòng câm, chỉ nhìn được. */
+  var _mo=(k.indexOf("__")===0)?"":((mode==="gv")?' data-mo="openNSQuick" data-mo-arg="'+esc(k)+'"':' data-mo="openLop" data-mo-arg="'+esc(k)+'"');
+  h+='<tr'+_mo+'><td>'+label+'</td>';
   days.forEach(function(d){
    var cell=list.filter(function(e2){return sameDay(e2.d,d)}).sort(function(a,b){return a.d-b.d});
    h+='<td style="vertical-align:top;padding:5px 6px">';
@@ -16918,7 +17125,9 @@ function renderCong(){
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Người dạy</th><th>Cơ sở</th><th>Buổi lớp</th><th>Giờ dạy</th><th>Chia theo ca</th><th>Trong đó online</th><th>Buổi WOW (giờ kèm)</th><th>Ca test</th><th>Vào trễ</th><th>Chưa ghi nội dung</th><th>Tiền công tạm tính</th></tr></thead><tbody>';
  if(!L.filter(function(x){return x.n||x.wow||x.test}).length)h+='<tr><td class="empty" colspan="11">Tháng này chưa có buổi dạy nào hoàn thành.</td></tr>';
  L.forEach(function(x){if(!x.n&&!x.wow&&!x.test)return;
-  h+='<tr><td>'+nsLnk(x.g.staff_id,x.g.full_name,"")+'</td>'+
+  /* V9.93: bấm cả dòng là mở hồ sơ chính người đó - trước đây chỉ có cái tên là bấm được, phần
+     còn lại của dòng câm (`_checkbam` bắt). */
+  h+='<tr data-mo="openNSQuick" data-mo-arg="'+esc(x.g.staff_id)+'"><td>'+nsLnk(x.g.staff_id,x.g.full_name,"")+'</td>'+
    '<td>'+esc(elabel(x.g.branch)||x.g.branch||"-")+'</td>'+
    '<td><b>'+x.n+'</b></td>'+
    '<td><b>'+(Math.round(x.gio*10)/10)+'h</b>'+(x.thieuGio?' <span class="chip red" data-tip="Buổi đã dạy xong mà không ghi giờ vào - giờ ra, không tính công được">'+x.thieuGio+' buổi thiếu giờ</span>':'')+'</td>'+
@@ -19987,6 +20196,7 @@ function enter(k){try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{rtEnsur
  try{sbInit();sbApply()}catch(e){}
  try{cfBarSync()}catch(e){}
  try{pkNghe()}catch(e){}
+ try{moGan()}catch(e){}
  try{tourOfferOnce()}catch(e){}}
 
 /* ============ CỔNG HỌC VIÊN (file HTML riêng) ============
@@ -20234,7 +20444,7 @@ function bootHV(sid){window.HVPORTAL=1;try{deriveAll()}catch(e){}try{cfEnsure()}
   clearTimeout(window.__spy);window.__spy=setTimeout(hvSpy,60)});
  /* F5 hay mở link người khác gửi: về đúng mục ghi trong địa chỉ, không phải cuộn lại từ đầu */
  try{if(__want)setTimeout(function(){hvGo(__want)},80)}catch(e){}
- try{pkNghe();pkQuet(document.getElementById("hvMain"))}catch(e){}}
+ try{pkNghe();pkQuet(document.getElementById("hvMain"));moGan()}catch(e){}}
 function gateEnterHV(sid){window.HVPHONE="";ssSet("ITTS_WHO_PH",null);ssSet("ITTS_WHO_HV",sid||"");bootHV(sid)}
 /* Vào cổng ở CHẾ ĐỘ PHỤ HUYNH. Ngoài đời sẽ đăng nhập bằng chính số điện thoại người giám hộ
    đã khai trong hồ sơ; bản demo bấm thẳng cho nhanh nhưng vẫn đi qua đúng số đó, nên hồ sơ chưa
