@@ -149,6 +149,31 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.84-V9.89 — ĐỢT CHUẨN BỊ MANG ĐI DEMO ✅ (03/08).**
+> · **Cổng phụ huynh xưng hô sai** - anh Luân: *"dùng bạn không ổn đâu, lời chào cũng để tên đứng
+> đơn độc, người Việt gọi là hỗn đấy nhé"*. Đo: gọi "bạn" **39 lần**, chào bằng **tên trần**. Nay
+> đại từ suy từ quan hệ đã khai (bố→anh, mẹ→chị, ông→ông, bà→bà, chưa khai→anh/chị), chào "Kính
+> chào <xưng hô> <tên>". Đổi ở **đúng một cửa vẽ ra** chứ không sửa tay 39 chuỗi dùng chung với
+> cổng học viên. Đo lại: 0 chỗ còn "bạn" ở cả 7 loại quan hệ; cổng học viên giữ nguyên.
+> · **Ô "Xem việc của"** - Quản trị viên và Giám đốc xem được mọi người, quản lý/leader xem được
+> người trực thuộc. Không dựng tầng lọc mới mà **chạy thật** `applyScope` của người đó. Có ở **cả
+> hai bản**: v6 trên Bàn làm việc, v5 trên bảng việc của chức danh. Lọc theo vị trí bằng
+> `<optgroup>`; **không** làm mục "cả chức danh X" gộp - gộp nhiều người thành một phạm vi là bịa
+> ra một người không tồn tại.
+> · **Khối "Ai duyệt việc gì"** ở trang Chờ duyệt cho Quản trị viên/Giám đốc - 8 hành động phê
+> duyệt, mỗi dòng kể tên người thật. Đọc thẳng từ CH3BY + DL01.
+> · **Nút Back của trình duyệt** nay lui về trang liền trước, và **lui được cả giữa các tab** -
+> 5 hàm đổi tab trước đây chỉ đặt biến, không đụng thanh địa chỉ.
+> · **Dải tab quá chìm**: khung `.seg` nền `#F4F6F9` đặt trên trang cùng đúng màu ấy - **không ai
+> thấy cái khung**. Nay khung có viền nền trắng, nút đang chọn navy chữ trắng.
+> · **Năm cửa vào cùng một việc với ba cái tên** (Reset demo / Dựng lại dữ liệu demo / Reset dữ
+> liệu demo) → một tên **"Dựng lại demo"**, bỏ chip trùng trên thanh tiêu đề.
+> · **Bốn lỗ hổng phân quyền**: `lead_new`, `ck_nho`, `wow_day`, `fb_xau` khai trong CH3 mà không
+> dòng mã nào chặn - nặng nhất là chiết khấu **dưới** 1 triệu (trên 1 triệu thì đã chặn). Nay khoá
+> cả bốn; ngưỡng lấy từ CH2 chứ không cắm số.
+> · **Luật:** *thấy thước bắt một câu đúng thì siết thước, đừng bẻ câu chữ cho vừa nó.*
+> · **Luật:** *đo bằng chuỗi literal là bỏ sót mọi lời gọi bằng BIẾN* - cắn 3 lần trong một buổi.
+
 > **Phiên bản: V9.83 — DỌN BA VIỆC TREO ✅ (03/08).**
 > · **Khối "bộ phận khác" gấp lại** bằng thẻ `<details>` gốc: một dòng ghi số việc và đang chờ
 > những bộ phận nào, bấm mới mở. Marketing đang 85 việc của người khác cạnh 26 việc của mình -

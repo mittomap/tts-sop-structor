@@ -5236,7 +5236,8 @@ function wowStart(id){var w=find("DL14","wow_id",id);if(!w){toast("Không thấy
   wow_status:eFull("enum_wow_status","confirmed")},
   (num(tre)>5?("Đã bắt đầu buổi WOW - vào trễ "+tre+" phút."):"Đã bắt đầu buổi WOW đúng giờ.")+
   " Xong buổi nhớ bấm Kết thúc rồi ghi nội dung.","wow")}
-function wowEnd(id){var w=find("DL14","wow_id",id);if(!w){toast("Không thấy buổi WOW.");return}
+function wowEnd(id){if(chanAct("wow_day"))return;   /* CH3: ai duoc thuc hien buoi WOW 1-1 */
+ var w=find("DL14","wow_id",id);if(!w){toast("Không thấy buổi WOW.");return}
  if(!String(w.wow_start_actual||"").trim()){toast("Chưa bấm Bắt đầu buổi - không có mốc để tính thời lượng.");return}
  wowUseQuota(id);
  markRow("DL14","wow_id",id,{wow_end_actual:nowStr(),wow_status:eFull("enum_wow_status","completed")},
@@ -5626,6 +5627,14 @@ function canDuyetCK(){var rs=SCOPE();
  if(rs.pages==="*")return true;                      /* quản trị viên toàn quyền */
  var t=rs.tabs&&rs.tabs.duyet;
  return t?t.indexOf("duyetck")>=0:(rs.pages.indexOf("duyet")>=0)}
+/* Chan theo MUC chiet khau. Nguong lay tu CH2 (ckThreshold) chu khong cam so trong ma -
+   doi nguong o Cai dat la cho chan doi theo ngay. */
+function ckChanTheoMuc(d){
+ var TH=0;try{TH=num(ckThreshold())}catch(e){TH=0}
+ var act=(TH&&num(d)>=TH)?"ck_lon":"ck_nho";
+ if(!chanAct(act))return false;
+ toast("Chức danh của bạn không được áp mức chiết khấu này. Chuyển cho cấp có quyền duyệt.",5000);
+ return true}
 function ckChanNeuKhongQuyen(){
  if(chanAct("ck_lon"))return true;                   /* CH3: việc này của Quản lý */
  if(canDuyetCK())return false;
@@ -6942,6 +6951,9 @@ var RSTEP={
    ["disc_reason","Lý do chiết khấu","text","vd: ưu đãi khai giảng"]]},
   save:function(C,cb){var cid=rfV("course");var cs=find("DL05","course_id",cid)||{};
    var fee=num(rfV("fee")),d=num(rfV("disc"));
+   /* CH3: ap chiet khau la mot HANH DONG CO CHU, khong phai mot o nhap. Duoi nguong thi
+      `ck_nho`, tu nguong tro len thi `ck_lon` - hai muc, hai nhom nguoi khac nhau. */
+   if(d>0&&ckChanTheoMuc(d))return;
    function mk(sid,sname){
     var o={lead_id:C.L.lead_id,lead_id_name:C.L.full_name,student_id:sid,student_id_name:sname,
      course_id:cid,course_id_name:cs.course_name,consultation_id:(C.cons[0]||{}).consultation_id||"",
@@ -11669,6 +11681,7 @@ function testQuickAdd(){
  h+='<div class="dact"><button class="btn primary" onclick="testQuickSave()"><i class="ti ti-check"></i>Tạo lead + đặt lịch test</button></div></div>';
  openDrawer("Test ngay cho khách mới",h)}
 function testQuickSave(){
+ if(chanAct("lead_new"))return;   /* CH3: chuc danh nao duoc nhap lead moi */
  if(!actGuard("testQuick"))return;
  var nm=(fldV("tq_name")||"").trim(),ph=(fldV("tq_phone")||"").trim(),dt=(fldV("tq_date")||"").trim();
  if(!nm||!ph){toast("Nhập họ tên và số điện thoại.");return}
@@ -11717,6 +11730,7 @@ function leadInbound(){window.__dupOK="";var dr=window.__liDraft||{};window.__li
 function liDupCheck(){var box=document.getElementById("li_dup");if(!box)return;
  var dup=findDupPhone(fldV("li_phone"));window.__dupFound=dup?1:0;box.innerHTML=dupWarnHTML(dup)}
 function leadInboundSave(){
+ if(chanAct("lead_new"))return;   /* CH3: chuc danh nao duoc nhap lead moi */
  if(!actGuard("leadInbound"))return;   /* bấm 2 lần = 2 lead trùng cùng một số */
  var nm=(fldV("li_name")||"").trim(),ph=(fldV("li_phone")||"").trim(),note=(fldV("li_note")||"").trim();
  if(!nm||!ph){toast("Nhập họ tên và số điện thoại.");return}
@@ -12597,7 +12611,12 @@ function fbResolve(id){var f=find("DL16","feedback_id",id)||{};
  h+='<div class="fld full"><label>Đã xử lý thế nào</label><textarea id="fb_note" rows="3"></textarea></div>';
  h+='<div class="fld full"><button class="btn green" onclick="fbResolveSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Đóng phản hồi</button></div></div>';
  openDrawer("Xử lý phản hồi",h)}
-function fbResolveSave(id){var n=fldV("fb_note");if(!n.trim()){toast("Nhập cách xử lý.");return}
+function fbResolveSave(id){
+ /* CH3 tach rieng "Xu ly feedback tieu cuc (diem 1-2)" - chi chan khi dung la phan hoi xau,
+    con phan hoi thuong thi ai tiep nhan cung xu ly duoc. */
+ var _f=find("DL16","feedback_id",id)||{};
+ if(isc(_f.feedback_type,"negative")&&chanAct("fb_xau"))return;
+ var n=fldV("fb_note");if(!n.trim()){toast("Nhập cách xử lý.");return}
  markRow("DL16","feedback_id",id,{feedback_action_note:n,action_taken_at:nowStr(),feedback_status:eFull("enum_feedback_status","resolved")},"Đã đóng phản hồi.");closeModal()}
 var FB2KN={teacher_quality:"teacher",curriculum:"academic",schedule:"schedule",facility:"other",service:"service"};
 function fbToComplaint(id){var f=find("DL16","feedback_id",id)||{};
