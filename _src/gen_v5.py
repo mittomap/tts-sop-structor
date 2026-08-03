@@ -1143,6 +1143,25 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .fld input,.fld select,.fld textarea{height:36px;border:1px solid var(--line);border-radius:8px;padding:0 10px;font-family:inherit;font-size:13px;background:#fff}
 .fld textarea{height:60px;padding:8px 10px;resize:vertical}
 .fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--navy)}
+/* Ô CHỌN DÀI - gõ để tìm (V9.91). Anh Luân 03/08 kèm ảnh form Tiếp nhận khiếu nại:
+   *"làm sao chọn nổi em, chỗ đó phải là tìm kiếm"*. Ô chọn nào từ PKMIN lựa chọn trở lên thì
+   lúc vẽ ra được thay bằng ô gõ + danh sách lọc. Thẻ <select> gốc vẫn nằm đó, chỉ ẩn đi. */
+.pk{position:relative;display:flex;flex-direction:column}
+/* Ô gõ tự mang đủ dáng của một ô nhập: nó có thể được dựng ở NGOÀI .fld (thanh lọc trên trang),
+   nơi không có luật CSS nào của form chạm tới - để trần là ra một ô cao 19px, đúng loại lỗi
+   `_checkui` bắt trên trình duyệt thật. */
+.pk>input.pki{width:100%;height:36px;border:1px solid var(--line);border-radius:8px;padding:0 10px;
+ font-family:inherit;font-size:13px;background:#fff;color:var(--ink)}
+.pk>input.pki:focus{outline:none;border-color:var(--navy)}
+.pk>select.pkan{display:none}
+.pkls{display:none;position:absolute;z-index:70;left:0;right:0;top:calc(100% + 4px);background:#fff;
+ border:1px solid var(--line);border-radius:8px;box-shadow:0 3px 14px rgba(46,90,136,.12);
+ max-height:252px;overflow:auto;padding:4px}
+.pk.on>.pkls{display:block}
+.pkls button{display:block;width:100%;text-align:left;background:none;border:0;border-radius:6px;
+ padding:7px 9px;min-height:32px;font-family:inherit;font-size:13px;color:var(--ink);cursor:pointer}
+.pkls button:hover,.pkls button.pkro{background:#EEF2F6}
+.pkls .pkmut{padding:8px 9px;font-size:12px;color:var(--muted)}
 /* V9.31 (kiem thu that tren trinh duyet): truoc day .notebar la display:flex + gap:9px. Flex bien
    MOI doan chu va MOI the <b>/<span> thanh mot O RIENG co khe ho 9px - cau van bi be vun thanh
    nhieu cot. Notebar it the thi chi thay hoi ho ra (dau cham bi day ra xa); notebar nhieu the thi
@@ -2645,7 +2664,17 @@ function myTeam(){if(__dsTeam)return __dsTeam;var o={};
   var lv=staffLevel(st),dep=st&&st.department,br=st&&st.branch;
   rows("DL01").forEach(function(x){
    if(String(x.reports_to||"")===CURSTAFF)o[x.staff_id]=1;                    /* cấp dưới trực tiếp */
-   if(lv>=1&&dep&&x.department===dep&&staffLevel(x)<=lv)o[x.staff_id]=1;      /* cùng phòng, cấp thấp hơn */
+   /* Cùng phòng, cấp thấp hơn - NHƯNG LEADER CÓ CƠ SỞ THÌ CHỈ TRONG CƠ SỞ CỦA MÌNH.
+      V9.91, đo được bằng `_checknguoi` khi đóng vai từng người: Leader Tư vấn Cơ sở 1 khai
+      phạm vi là "team" mà nhìn thấy **cả 82 học viên và 187/190 lead của toàn hệ thống** -
+      bằng đúng Trưởng phòng. Gốc: luật này chỉ xét PHÒNG BAN, mà cả 7 nhân viên tư vấn của 5
+      cơ sở đều chung phòng "Tư vấn". Anh Luân định nghĩa chức danh này là *"Leader của tư vấn,
+      kiêm nhiệm quản lý chi nhánh"* - phạm vi của họ là CHI NHÁNH.
+      Trưởng phòng (cấp 2) giữ nguyên cả phòng. Leader không gắn cơ sở (WOW, Marketing, Nhân sự
+      - phòng chỉ có một đội, không chia chi nhánh) cũng giữ nguyên cả phòng.
+      Cấp dưới trực tiếp (`reports_to`) vẫn luôn được tính ở dòng trên, nên leader Cơ sở 1 vẫn
+      giữ người mình quản lý dù người đó ngồi cơ sở khác - đường báo cáo là khai báo có chủ ý. */
+   if(lv>=1&&dep&&x.department===dep&&staffLevel(x)<=lv&&(lv>=2||!br||x.branch===br))o[x.staff_id]=1;
    if(lv>=1&&br&&x.branch===br&&staffLevel(x)<=lv)o[x.staff_id]=1});          /* cùng cơ sở */
  }
  __dsTeam=o;return o}
@@ -6017,7 +6046,105 @@ function drwInit(){var g=document.getElementById("drszr");if(!g||g.__on)return;g
  g.addEventListener("touchstart",function(e){var d=document.getElementById("drawer");
   start(e.touches[0].clientX,d?d.getBoundingClientRect().width:DRW_DEF)},{passive:true});
  g.addEventListener("dblclick",drwReset)}
-function openDrawer(title,html){tourCleanup();drwInit();drwApply();document.body.classList.add("drwon");document.getElementById("drawerTitle").textContent=title;document.getElementById("drawerBody").innerHTML=html;document.getElementById("mask").classList.add("on");document.getElementById("drawer").classList.add("on")}
+function openDrawer(title,html){tourCleanup();drwInit();drwApply();document.body.classList.add("drwon");document.getElementById("drawerTitle").textContent=title;document.getElementById("drawerBody").innerHTML=html;try{pkQuet(document.getElementById("drawerBody"))}catch(e){}document.getElementById("mask").classList.add("on");document.getElementById("drawer").classList.add("on")}
+/* ═══ Ô CHỌN DÀI PHẢI GÕ ĐƯỢC (V9.91) ═══════════════════════════════════════════════════════
+   Anh Luân 03/08, kèm ảnh chụp form Tiếp nhận khiếu nại: *"làm sao chọn nổi em, chỗ đó phải là
+   tìm kiếm"*. Đúng - ô Học viên là <select> thường đổ ra hơn ba trăm dòng, muốn chọn phải kéo
+   tay qua cả danh sách, mà tên người Việt lại hay trùng họ.
+
+   SỬA Ở MỘT CHỖ, KHÔNG SỬA TỪNG FORM. App có hơn bảy chục form ghi; vá tay từng ô chọn thì
+   hôm nay xong, tuần sau thêm form mới là quên. Nên chỗ vá đặt ngay lúc HTML vừa vẽ ra màn:
+   quét mọi <select>, cái nào từ PKMIN lựa chọn trở lên thì bọc lại thành ô gõ-để-tìm.
+
+   Thẻ <select> gốc VẪN NẰM NGUYÊN (chỉ ẩn đi) và vẫn là nơi giữ giá trị. Nhờ vậy:
+   - mọi đường ghi đang đọc `fldV("ka_stu")` / `.value` không phải sửa một dòng nào;
+   - `onchange="xmStuChanged(this.value)"` cắm sẵn trên thẻ vẫn nổ đúng lúc (mình bắn sự kiện
+     `change` thật chứ không gọi tay hàm nào);
+   - chỗ nào đổi options bằng innerHTML sau đó (xm_cls) thì lượt quét sau nâng cấp tiếp.
+   Dựng ô mới rồi bỏ <select> đi là tự tay cắt ba mối nối ấy - đắt hơn nhiều so với cái được. */
+var PKMIN=12;      /* dưới ngần này thì kéo tay còn nhanh hơn gõ - đừng bắt người ta gõ để chọn 3 dòng */
+var PKTOI=40;      /* mỗi lần chỉ vẽ ngần này dòng, còn lại nhắc gõ thêm - đỡ dựng 300 nút vô ích */
+function pkQuet(root){if(!root||!root.querySelectorAll)return;
+ var ds=root.querySelectorAll("select");
+ for(var i=0;i<ds.length;i++){try{pkMot(ds[i])}catch(e){}}}
+function pkMot(s){
+ if(!s||s.__pk)return;
+ if(s.getAttribute&&s.getAttribute("data-pk")==="0")return;   /* form nào khai không cần thì thôi */
+ if((s.options?s.options.length:0)<PKMIN)return;
+ var box=document.createElement("div");box.className="pk";
+ s.parentNode.insertBefore(box,s);box.appendChild(s);
+ s.__pk=1;s.classList.add("pkan");
+ var inp=document.createElement("input");
+ inp.type="text";inp.className="pki";inp.autocomplete="off";
+ /* Bộ kiểm "nhân viên ảo" điền mọi ô trống trong form bằng chữ mẫu - ô TÌM không phải ô dữ
+    liệu, điền vào là lọc mất hết lựa chọn. Đánh dấu để nó bỏ qua. */
+ inp.setAttribute("data-pktim","1");
+ inp.placeholder=pkNhac(s);
+ var ls=document.createElement("div");ls.className="pkls";
+ box.insertBefore(inp,s);box.appendChild(ls);
+ inp.addEventListener("focus",function(){pkVe(box,"")});
+ inp.addEventListener("input",function(){pkVe(box,inp.value)});
+ inp.addEventListener("keydown",function(e){pkPhim(box,e)});
+ ls.addEventListener("mousedown",function(e){e.preventDefault()});  /* giữ con trỏ, đừng đóng vội */
+ box.addEventListener("focusout",function(){setTimeout(function(){
+  try{if(!box.contains(document.activeElement))pkDong(box)}catch(e){pkDong(box)}},0)});
+ pkDongBo(box)}
+function pkNhac(s){var n=0,i;
+ for(i=0;i<s.options.length;i++)if(s.options[i].value!=="")n++;
+ return "Gõ để tìm trong "+n+" lựa chọn";}
+/* Ô gõ luôn hiển thị đúng thứ <select> đang giữ - gọi lại sau mỗi lần chọn hoặc mỗi lần app tự
+   đặt giá trị. Không có bước này thì ô gõ và giá trị thật lệch nhau mà không ai hay. */
+function pkDongBo(box){var s=box.querySelector("select"),inp=box.querySelector("input.pki");
+ if(!s||!inp)return;var o=s.options[s.selectedIndex];
+ inp.value=(o&&o.value!=="")?(o.textContent||o.text||""):"";}
+function pkVe(box,q){var s=box.querySelector("select"),ls=box.querySelector(".pkls");
+ if(!s||!ls)return;
+ var tq=vnorm(q||""),h="",dem=0,con=0,i,o,t;
+ if(s.value!=="")h+='<button type="button" class="pkmut" data-v="">Bỏ chọn</button>';
+ for(i=0;i<s.options.length;i++){o=s.options[i];
+  if(o.value==="")continue;
+  t=o.textContent||o.text||"";
+  if(tq&&vnorm(t).indexOf(tq)<0)continue;
+  if(dem>=PKTOI){con++;continue}
+  h+='<button type="button" data-i="'+i+'"'+(o.value===s.value?' class="pkro"':'')+'>'+esc(t)+'</button>';
+  dem++}
+ if(!dem)h+='<div class="pkmut">Không có lựa chọn nào khớp "'+esc(q||"")+'".</div>';
+ else if(con)h+='<div class="pkmut">Còn '+con+' lựa chọn nữa - gõ thêm để thu hẹp.</div>';
+ ls.innerHTML=h;
+ var bs=ls.querySelectorAll("button");
+ for(i=0;i<bs.length;i++)bs[i].addEventListener("click",function(){pkChon(box,this.getAttribute("data-i"))});
+ box.classList.add("on")}
+function pkChon(box,i){var s=box.querySelector("select"),inp=box.querySelector("input.pki");
+ if(!s)return;
+ s.selectedIndex=(i===null||i==="")?0:(+i);
+ pkDongBo(box);pkDong(box);
+ /* onchange cắm sẵn trên thẻ là một người nghe thật - bắn sự kiện thật thì nó nổ, gọi tay
+    một hàm nào đó thì chỉ đúng cho form mình nhớ tới. */
+ try{s.dispatchEvent(new Event("change",{bubbles:true}))}catch(e){try{if(s.onchange)s.onchange()}catch(e2){}}
+ if(inp)inp.focus()}
+function pkDong(box){box.classList.remove("on")}
+function pkPhim(box,e){var ls=box.querySelector(".pkls");if(!ls)return;
+ var k=e.key||"";
+ if(k==="Escape"){pkDong(box);return}
+ var bs=ls.querySelectorAll("button");if(!bs.length&&k!=="ArrowDown")return;
+ var cur=-1,i;for(i=0;i<bs.length;i++)if(bs[i].className.indexOf("pkro")>=0)cur=i;
+ if(k==="ArrowDown"||k==="ArrowUp"){
+  if(!box.classList.contains("on")){pkVe(box,"");return}
+  e.preventDefault();
+  var n=(k==="ArrowDown")?(cur+1):(cur-1);
+  if(n<0)n=bs.length-1;if(n>=bs.length)n=0;
+  for(i=0;i<bs.length;i++)bs[i].className=(i===n)?"pkro":"";
+  if(bs[n].scrollIntoView)bs[n].scrollIntoView({block:"nearest"});return}
+ if(k==="Enter"&&box.classList.contains("on")&&cur>=0){e.preventDefault();
+  pkChon(box,bs[cur].getAttribute("data-i"))}}
+/* Mọi chỗ khác đổ HTML vào thân trang hay thân ngăn kéo đều đi qua `innerHTML` - có hơn mười
+   chỗ như thế. Cắm lời gọi vào từng chỗ là bỏ sót chỗ thứ mười một; nghe thẳng biến động của
+   hai thùng chứa ấy thì không sót cái nào, kể cả màn dựng sau này. */
+function pkNghe(){if(typeof MutationObserver==="undefined")return;
+ var mo=new MutationObserver(function(recs){for(var i=0;i<recs.length;i++)
+  try{pkQuet(recs[i].target)}catch(e){}});
+ ["content","drawerBody","hvMain"].forEach(function(id){var el=document.getElementById(id);
+  if(el)try{mo.observe(el,{childList:true,subtree:true})}catch(e){}})}
 function closeModal(){document.body.classList.remove("drwon");document.getElementById("mask").classList.remove("on");document.getElementById("drawer").classList.remove("on");if(window.__pendSync)setTimeout(syncApply,50)}
 /* ===== V9.27 TOOLTIP HIEN NGAY =====
    Thuoc tinh title cua trinh duyet doi khoang 1 giay moi hien, lai bi cat khi nam trong khung cuon.
@@ -19577,6 +19704,7 @@ function enter(k){try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{rtEnsur
   window.addEventListener("popstate",function(){try{hashApply()}catch(e){}})}}catch(e){}
  try{sbInit();sbApply()}catch(e){}
  try{cfBarSync()}catch(e){}
+ try{pkNghe()}catch(e){}
  try{tourOfferOnce()}catch(e){}}
 
 /* ============ CỔNG HỌC VIÊN (file HTML riêng) ============
@@ -19823,7 +19951,8 @@ function bootHV(sid){window.HVPORTAL=1;try{deriveAll()}catch(e){}try{cfEnsure()}
  var box=document.getElementById("hvMain");if(box)box.addEventListener("scroll",function(){
   clearTimeout(window.__spy);window.__spy=setTimeout(hvSpy,60)});
  /* F5 hay mở link người khác gửi: về đúng mục ghi trong địa chỉ, không phải cuộn lại từ đầu */
- try{if(__want)setTimeout(function(){hvGo(__want)},80)}catch(e){}}
+ try{if(__want)setTimeout(function(){hvGo(__want)},80)}catch(e){}
+ try{pkNghe();pkQuet(document.getElementById("hvMain"))}catch(e){}}
 function gateEnterHV(sid){window.HVPHONE="";ssSet("ITTS_WHO_PH",null);ssSet("ITTS_WHO_HV",sid||"");bootHV(sid)}
 /* Vào cổng ở CHẾ ĐỘ PHỤ HUYNH. Ngoài đời sẽ đăng nhập bằng chính số điện thoại người giám hộ
    đã khai trong hồ sơ; bản demo bấm thẳng cho nhanh nhưng vẫn đi qua đúng số đó, nên hồ sơ chưa
@@ -19988,9 +20117,13 @@ function demoGate(){var el=document.getElementById("login");if(!el)return;
   '<div style="font-size:11.5px;color:var(--muted)">Mở thêm phía học viên: file <b>ITTs_TrangHocVien_demo.html</b> cùng thư mục.</div>'+
   gateStatusHTML()+'</div></div>';
  el.innerHTML=h;el.style.display="flex"}
-/* Công tắc "khoá chức danh ở cổng nhân viên" - mặc định BẬT theo yêu cầu 31/07, tắt được trong
-   Cài đặt → Phân quyền. Để trong cấu hình chứ không cắm cứng, vì anh Luân nói "tạm thời". */
-function gateKhoaVai(){var c=DATA.config||{};return c.gateKhoaVai==null?true:!!c.gateKhoaVai}
+/* Công tắc "khoá chức danh ở cổng nhân viên", để trong cấu hình chứ không cắm cứng.
+   31/07 anh Luân cho khoá - lúc ấy app chỉ đi trình chiếu, ai mở cũng nên vào thẳng Quản trị
+   viên để xem được hết. 03/08 đổi lại: *"nhớ check kỹ lại mỗi 1 bộ phận, 1 người đăng nhập thì
+   tính năng, giao diện đã chuẩn chưa"* - các phòng ban sắp dùng thử thật, mà góp ý của học vụ
+   chỉ đúng khi họ nhìn đúng màn của học vụ. Nên MẶC ĐỊNH NAY LÀ MỞ; muốn khoá lại cho một buổi
+   trình chiếu thì bật công tắc trong Cài đặt → Phân quyền. */
+function gateKhoaVai(){var c=DATA.config||{};return c.gateKhoaVai==null?false:!!c.gateKhoaVai}
 function gateKhoaToggle(){var c=(DATA.config=DATA.config||{});
  c.gateKhoaVai=gateKhoaVai()?0:1;cfgSave();reRender("settings")}
 function mkLuu(){var v="";try{v=String((document.getElementById("mk_in")||{}).value||"").trim()}catch(e){}

@@ -1119,17 +1119,39 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
     hien hop chon che do, "cong thuc" phai co mat khau; (3) nut Reset demo cung phai nhap pass.
     Canh CHAY THAT: bam vao Cai dat thi CUR khong duoc doi; nhap sai pass thi khong duoc mo. */
  (function(){
-  /* (1) cong nhan vien */
-  t("mac dinh khoa chon chuc danh o cong nhan vien", gateKhoaVai()===true);
+  /* (1) cong nhan vien. V9.91 - anh Luan 03/08 doi mac dinh: cac phong ban sap dung thu that,
+     "1 bo phan, 1 nguoi dang nhap" phai vao duoc dung vai cua ho. Nen bo kiem KHONG con canh
+     mot trang thai co dinh nua ma canh CA HAI NAC cua cong tac - chat hon truoc, vi truoc day
+     nac "mo" chua tung duoc do lan nao. */
+  var __khoaCu=(DATA.config||{}).gateKhoaVai;
+  /* HOI MAC DINH THI PHAI XOA HAN KHOA, khong duoc dat no bang 0 roi hoi lai - dat xong hoi lai
+     la do chinh tay minh vua dat, cau nao cung xanh. (Da cAn that: pha ham gateKhoaVai o ban
+     build ma bo kiem van xanh, vi no dang do tac dung phu cua chinh no.) */
+  delete DATA.config.gateKhoaVai;
+  t("mac dinh MO - moi nguoi chon duoc chuc danh cua minh", gateKhoaVai()===false);
+  DATA.config.gateKhoaVai=0;
+  demoGate();
+  var gtMo=(document.getElementById("login").innerHTML)||"";
+  t("nac MO: the chuc danh bam duoc ("+((gtMo.match(/<div class="rcard" onclick/g)||[]).length)+" the)",
+    (gtMo.match(/<div class="rcard" onclick/g)||[]).length>0);
+  t("nac MO: khong the nao bi lam mo", (gtMo.match(/class="rcard khoa"/g)||[]).length===0);
+  t("nac MO: van con loi vao xem thu va loi vao quan tri that",
+    /gateEnter\('','xem'\)/.test(gtMo)&&/gateHoiPass\(\)/.test(gtMo));
+  DATA.config.gateKhoaVai=1;
   demoGate();
   var gt=(document.getElementById("login").innerHTML)||"";
   var soKhoa=(gt.match(/class="rcard khoa"/g)||[]).length;
   var soBam=(gt.match(/<div class="rcard" onclick/g)||[]).length;
-  t("the chuc danh deu bi lam mo ("+soKhoa+" the)", soKhoa>0);
-  t("khong the chuc danh nao con bam duoc ("+soBam+")", soBam===0);
-  t("van con cua vao Quan tri vien", /gateEnter\(''\)/.test(gt)||gt.indexOf("Quản trị viên")>=0);
-  t("the bi khoa noi ro vi sao va mo lai o dau", /Tạm khoá trong buổi demo/.test(gt));
+  t("nac KHOA: the chuc danh deu bi lam mo ("+soKhoa+" the)", soKhoa>0);
+  t("nac KHOA: khong the chuc danh nao con bam duoc ("+soBam+")", soBam===0);
+  t("nac KHOA: van con cua vao Quan tri vien", /gateEnter\(''\)/.test(gt)||gt.indexOf("Quản trị viên")>=0);
+  t("nac KHOA: noi ro vi sao va mo lai o dau", /Tạm khoá trong buổi demo/.test(gt));
+  t("cong tac doi duoc ca hai chieu", (function(){var a=gateKhoaVai();gateKhoaToggle();
+    var b=gateKhoaVai();gateKhoaToggle();return a!==b&&gateKhoaVai()===a})());
   t("cong tac mo lai nam trong cau hinh, khong cam cung", /c\.gateKhoaVai=/.test(String(gateKhoaToggle)));
+  DATA.config.gateKhoaVai=__khoaCu;   /* tra lai trang thai cu - cau sau khong duoc thua huong cua cau nay */
+  demoGate();
+  gt=(document.getElementById("login").innerHTML)||"";
   /* (2) CHON CHE DO NGAY TAI CONG VAO - anh Luan 31/07: *"chi can cho nguoi ta chon che do trai
      nghiem, hoac chon che do quan tri that duoc ma ta, can gi rac roi nhu hien tai."* Hop dong cu
      ("bam Cai dat thi hien popup") BO HAN chu khong giu lai: mot viec chi duoc hoi o MOT CHO. */

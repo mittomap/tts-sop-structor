@@ -387,6 +387,26 @@ Chi tiet "vi sao" o `02_NHAT_KY_QUYET_DINH.md`. O day chi ghi nhung cho **cham v
   bang quan ly x2"). Goc: `renderBan` vua goi `pageHead(...)` (dau trang tu gan bang viec) vua goi
   `bvSau()` sau thanh chon thuc the. O v5 khong ai thay vi Ban lam viec khong phai trang dap cua
   chuc danh nao nen bang rong. Nay `renderBan` truyen `hoan=1`.
+- **`_checknguoi.js` (MOI, V9.91)** - dong vai **tung NGUOI** trong DL01 (37 nguoi / 18 chuc danh),
+  khong phai tung chuc danh. Vi sao can them mot bo nua: pham vi du lieu cat theo CHI NHANH va
+  theo NGUOI PHU TRACH, nen 7 nhan vien tu van o 5 co so nhin ra 7 man hinh khac nhau - lay mot
+  nguoi lam dai dien la bo qua 6 man con lai. Tam cau cho moi nguoi: vao duoc khong · thanh tren
+  co dung ten ho khong · trang dap co noi dung khong · menu co muc nao **moi roi duoi** khong
+  (bam that, xem co hien "ngoai pham vi chuc danh" khong) · co viec cua chinh ho hoac duoc chi
+  duong khong · quyen CH3 co lech giua hai nguoi cung chuc danh khong · **pham vi khai co cat
+  that khong** · Tro ly co nhip ngay cho ho khong. Chay lan dau ra mot loi that: **Leader Tu van
+  Co so 1 khai "team" ma nhin thay tron 82 hoc vien cua ca 5 co so**.
+  Hai bay cua chinh cai thuoc, deu tu oan app, deu cung mot kieu - **do cai danh muc thay cho cai
+  da ve ra**: (1) duyet `navCay()` roi hoi `canSee` -> ca 37 nguoi deu "menu bay ra 30 may muc
+  khong duoc xem", trong khi `navCay()` chi la cay day du con `buildNav` moi loc; (2) hoi `canSee`
+  tren ma TAB CON cua hub (duyetgiao...) - `go()` remap sang trang cha roi moi xet quyen.
+- `_checknv` them hai mat: moi ngan keo di qua deu bi hoi *"con o chon dai nao chua co o tim khong"*,
+  va mot lan moi ban build **go THAT** vao o tim roi bam chon, doi chieu `<select>` an ben duoi co
+  nhan dung gia tri khong. "Co o tim" moi la mot nua; mot o tim chet van co o tim.
+- `_check16` doi cach canh cong tac khoa chuc danh: khong canh mot trang thai co dinh nua ma canh
+  **ca hai nac** (mo / khoa) - chat hon truoc, vi nac "mo" chua tung duoc do lan nao. Kem mot bay
+  da can: hoi mac dinh cua mot tham so thi phai **xoa han khoa** roi hoi, dat no bang 0 roi hoi
+  lai la dang do tac dung phu cua chinh minh (pha ham o ban build ma bo kiem van xanh).
 - `_checktour` bat that loi thu hai cung goc: buoc `tn_hotro[0]` neo `@bangviec` cam cung trang
   `banlam` - trang dap cua **ban v5**. O v6 moi chuc danh dap xuong `ban` nen neo roi ra ngoai.
   Nay `p` doc `V6()`. **Luat lai lan nua: ban do nao cam cung theo mot ban build thi ban kia se

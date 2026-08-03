@@ -149,6 +149,34 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.91 — MỞ CHO TỪNG NGƯỜI ĐĂNG NHẬP, VÀ RÀ LẠI TỪNG NGƯỜI ✅ (03/08).**
+> · **Ô chọn dài phải gõ được.** Anh Luân kèm ảnh form Tiếp nhận khiếu nại: *"làm sao chọn nổi
+> em, chỗ đó phải là tìm kiếm"*. Đúng - ô Học viên đổ ra hàng chục tới hàng trăm dòng mà vẫn là
+> `<select>` thường. Sửa **ở một chỗ, không sửa từng form**: mọi ô chọn từ 12 lựa chọn trở lên
+> được nâng cấp thành ô gõ-để-tìm ngay lúc HTML vẽ ra màn (nghe biến động của `#content` /
+> `#drawerBody` / `#hvMain`, nên form dựng sau này cũng tự có). Thẻ `<select>` gốc **vẫn nằm
+> nguyên**, chỉ ẩn đi và vẫn giữ giá trị - nhờ vậy hơn 70 đường ghi đang đọc `.value` và mọi
+> `onchange` cắm sẵn không phải sửa một dòng. Bỏ dấu vẫn tìm được ("nguyen" ra "Nguyễn").
+> · **Mở khoá đăng nhập theo chức danh.** 31/07 khoá lại để đi trình chiếu; nay các phòng ban
+> sắp dùng thử thật nên mặc định **mở** - công tắc khoá vẫn còn trong Cài đặt cho buổi trình
+> chiếu. Bộ kiểm nay canh **cả hai nấc** của công tắc chứ không canh một trạng thái cố định.
+> · **Lỗ hổng phạm vi thật, tìm được nhờ đóng vai TỪNG NGƯỜI:** Leader Tư vấn Cơ sở 1 khai phạm
+> vi là "team" mà **nhìn thấy trọn 82 học viên và 187/190 lead của cả 5 cơ sở** - bằng đúng
+> Trưởng phòng. Gốc: `myTeam()` chỉ xét PHÒNG BAN, mà 7 nhân viên tư vấn của 5 cơ sở đều chung
+> phòng "Tư vấn". Nay leader **có gắn cơ sở** thì đội của họ giới hạn trong cơ sở ấy (trưởng
+> phòng và leader không gắn cơ sở giữ nguyên cả phòng; đường `reports_to` vẫn luôn được tính).
+> Đo lại: 82 → 57/40/35 theo ba leader.
+> · **Luật:** *lấy một người làm đại diện cho cả chức danh là bỏ qua mọi màn hình còn lại* -
+> phạm vi cắt theo chi nhánh và theo người phụ trách, nên 7 người cùng chức danh là 7 màn khác nhau.
+> · **Hai lần cái thước tố oan trong một buổi, cùng một kiểu:** đo cái danh mục thay cho cái đã
+> vẽ ra. `navCay()` là cây đầy đủ, `buildNav` mới lọc - hỏi `canSee` trên cây đầy đủ thì cả 37
+> người đều "menu bày ra 30 mấy mục không được xem". Và hỏi `canSee` trên mã tab con của hub
+> cũng sai, vì `go()` remap sang trang cha rồi mới xét quyền. Chỉ khi **bấm thật** rồi soi màn
+> hình có hiện câu "ngoài phạm vi chức danh" hay không thì thước mới trúng.
+> · **Một bẫy nữa của chính bộ kiểm:** hỏi mặc định của một tham số thì phải **xoá hẳn khoá**
+> rồi hỏi, chứ đặt nó bằng 0 rồi hỏi lại là đang đo tác dụng phụ của chính mình - phá hàm ở bản
+> build mà bộ kiểm vẫn xanh.
+
 > **Phiên bản: V9.84-V9.90 — ĐỢT CHUẨN BỊ MANG ĐI DEMO ✅ (03/08).**
 > · **Audit cuối bắt hai chỗ đỏ, cả hai chỉ có ở bản v6, cả hai cùng một gốc: bản đồ cắm cứng
 > theo bản v5.** (1) Trang **Bàn làm việc** vẽ **hai bảng việc chồng nhau** - `renderBan` vừa gọi

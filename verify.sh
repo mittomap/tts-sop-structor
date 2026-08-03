@@ -93,6 +93,14 @@ chay "_checkdemo bay thu trong tuan" "CHECKDEMO OK"     node _checkdemo.js
 # 0 viec cua minh - app khong hong, nhung buoi sang dau tien cua ho rat te.
 chay "_checkngay mot ngay cua tung chuc danh" "CHECKNGAY OK" node _checkngay.js
 
+# V9.91 - DONG VAI TUNG NGUOI, khong phai tung chuc danh (anh Luan 03/08: "nho check ky lai moi
+# 1 bo phan, 1 nguoi dang nhap thi tinh nang, giao dien da chuan chua, nghiep vu da du chua, co
+# bi du thieu hay sai lech gi ko"). Pham vi du lieu cat theo CHI NHANH va theo NGUOI PHU TRACH,
+# nen lay mot nguoi lam dai dien cho ca chuc danh la bo qua nhung man con lai. Chay lan dau ra
+# ngay mot loi that: Leader Tu van Co so 1 khai pham vi "team" ma nhin thay tron 82 hoc vien cua
+# ca 5 co so - bang dung Truong phong.
+chay "_checknguoi tung nguoi dang nhap" "CHECKNGUOI OK" node _checknguoi.js
+
 echo
 echo "${Dam}== 4. DU LIEU DEMO ==${Het}"
 # V9.40: truoc day cho khop "TONG BAN GHI LOI: 4". So 4 do gom ca CA CO Y (viec demo de qua han
@@ -123,7 +131,7 @@ echo "${Dam}== 4bis. CHAY LAI TOAN BO BO KIEM TREN BAN V6 ==${Het}"
 #     bang viec cua minh va khoi "Cho ban phe duyet" (BC9 cua SOP).
 # Ca hai deu la mat tinh nang IM LANG - khong bao loi, chi la khong hien ra.
 for _b in _tall _check11 _check12 _check13 _check15 _check16 _check17 _check18 \
-          _checktour _checkqa _checkux _checkdata _checkaudit _checkdemo _checkngay; do
+          _checktour _checkqa _checkux _checkdata _checkaudit _checkdemo _checkngay _checknguoi; do
   chay "v6: ${_b}" "(OK|0 loi|^TONG: [0-9]+)" env ITTS_APP=./_APP6.js node "${_b}.js"
 done
 

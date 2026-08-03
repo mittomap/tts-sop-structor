@@ -89,6 +89,9 @@ const DIEN = () => {
   let n = 0;
   box.querySelectorAll("input, textarea, select").forEach(el => {
     if (el.type === "hidden" || el.type === "file" || el.disabled) return;
+    /* Ô TÌM của ô chọn dài không phải ô dữ liệu - điền chữ mẫu vào đó là lọc sạch danh sách
+       rồi form không chọn được gì, mà lỗi lại đổ lên đầu app. */
+    if (el.getAttribute && el.getAttribute("data-pktim")) return;
     if (el.tagName === "SELECT") {
       if (!el.value && el.options.length) { el.selectedIndex = 0; n++; }
       return;
@@ -107,6 +110,26 @@ const DIEN = () => {
     n++;
   });
   return n;
+};
+
+/* Ô CHỌN DÀI PHẢI GÕ ĐƯỢC (V9.91). Anh Luân bắt được ở form Tiếp nhận khiếu nại: ô Học viên đổ
+   ra hơn ba trăm dòng mà vẫn là <select> thường - *"làm sao chọn nổi em"*. App nay tự nâng cấp
+   mọi ô chọn từ PKMIN lựa chọn trở lên, nên bộ kiểm đi qua ngăn kéo nào cũng hỏi lại một câu:
+   còn ô chọn dài nào chưa có ô tìm không. Đo trên NGĂN KÉO THẬT vì việc nâng cấp xảy ra lúc vẽ
+   ra màn - đọc mã nguồn không thấy được. */
+const OCHON = () => {
+  const box = document.getElementById("drawerBody");
+  if (!box) return [];
+  const nguong = (typeof PKMIN === "number") ? PKMIN : 12;
+  const xau = [];
+  box.querySelectorAll("select").forEach(s => {
+    const n = s.options ? s.options.length : 0;
+    if (n < nguong) return;
+    const p = s.parentNode;
+    const ok = p && String(p.className || "").split(" ").indexOf("pk") >= 0 && p.querySelector("input.pki");
+    if (!ok) xau.push((s.id || "(o khong ten)") + " - " + n + " lua chon");
+  });
+  return xau;
 };
 
 const TRANGTHAI = () => {
@@ -138,7 +161,8 @@ const TRANGTHAI = () => {
 
   const do_ = [];          /* chỗ đỏ */
   const ghi = [];          /* chỗ đáng ghi chú, không tính đỏ */
-  let dem = {luot: 0, ghiDuoc: 0, tuChoi: 0, imLang: 0, khongKeo: 0, loiJS: 0, nhay: 0, tiep: 0};
+  const ochonDaBao = new Set();
+  let dem = {luot: 0, ghiDuoc: 0, tuChoi: 0, imLang: 0, khongKeo: 0, loiJS: 0, nhay: 0, tiep: 0, oTim: 0};
 
   for (const F of FILES) {
     if (!fs.existsSync(path.resolve(OUT) + "/" + F)) { do_.push(F + ": khong co file build"); continue; }
@@ -163,6 +187,49 @@ const TRANGTHAI = () => {
     const ai = await page.evaluate(AITHUC);
     if (!ai.length) { do_.push(nhan("khong tim thay chuc danh nao trong DL01")); continue; }
     const TTS = await page.evaluate(() => TTHE.map(x => ({k: x.k, t: x.t})));
+
+    /* ĐI HẾT MỘT LƯỢT CHỌN BẰNG CÁCH GÕ - đúng cái form anh Luân chụp ảnh (Tiếp nhận khiếu nại).
+       "Có ô tìm" mới là một nửa; nửa còn lại là gõ vào thì danh sách có hẹp lại không, và bấm
+       một dòng thì <select> ẩn bên dưới có nhận đúng giá trị không. Không đo nửa sau thì một ô
+       tìm chết vẫn được chấm đạt. */
+    {
+      const sn = await page.evaluate(() => {
+        RESTORE_FN(); gateEnter("");
+        try { knAdd(); } catch (e) { return {loi: String(e.message).slice(0, 80)}; }
+        const s = document.getElementById("ka_stu");
+        if (!s) return {loi: "form khong co o chon hoc vien (ka_stu)"};
+        const p = s.parentNode;
+        const t = String((s.options[Math.min(3, s.options.length - 1)] || {}).textContent || "");
+        return {co: !!(p && p.querySelector && p.querySelector("input.pki")),
+                n: s.options.length, ten: t};
+      });
+      if (sn.loi) do_.push(nhan("khong thu duoc o tim tren form Tiep nhan khieu nai: " + sn.loi));
+      else if (sn.n < 12) ghi.push(nhan("form Tiep nhan khieu nai chi co " + sn.n + " lua chon - duoi nguong, khong can o tim"));
+      else if (!sn.co) do_.push(nhan("form Tiep nhan khieu nai: o Hoc vien (" + sn.n + " lua chon) VAN LA O CHON THUONG"));
+      else {
+        const tu = String(sn.ten).split("·")[0].trim().split(/\s+/).pop() || "";
+        const inp = page.locator("#drawerBody input.pki").first();
+        await inp.click({timeout: 4000}).catch(() => {});
+        await inp.fill(tu).catch(() => {});
+        await page.waitForTimeout(150);
+        const soDong = await page.locator("#drawerBody .pkls button").count();
+        if (!soDong) do_.push(nhan('go "' + tu + '" vao o tim ma khong ra dong nao'));
+        else {
+          if (soDong >= sn.n - 1) do_.push(nhan('go "' + tu + '" ma danh sach khong hep lai (' + soDong + "/" + sn.n + ")"));
+          await page.locator("#drawerBody .pkls button").first().click({timeout: 4000}).catch(() => {});
+          await page.waitForTimeout(120);
+          const sau = await page.evaluate(() => {
+            const s = document.getElementById("ka_stu"), i = s && s.parentNode.querySelector("input.pki");
+            return {v: s ? s.value : "", chu: i ? i.value : "", mo: !!(s && s.parentNode.className.indexOf("on") >= 0)};
+          });
+          if (!sau.v) do_.push(nhan("bam mot dong trong o tim ma <select> khong nhan gia tri"));
+          if (!sau.chu) do_.push(nhan("chon xong ma o tim khong hien ten nguoi vua chon"));
+          if (sau.mo) do_.push(nhan("chon xong ma danh sach van bung ra"));
+          dem.oTim++;
+        }
+        await page.evaluate(() => { try { closeModal(); } catch (e) {} });
+      }
+    }
 
     for (const A of ai) for (const TT of TTS) {
       /* mỗi (chức danh x thực thể): lấy tối đa MAXHS hồ sơ đang còn việc của chính người đó */
@@ -217,6 +284,15 @@ const TRANGTHAI = () => {
           continue;
         }
         if (st.keoDai < 120) { do_.push(cx + ": ngan keo mo ra nhung gan nhu trong (" + st.keoDai + " ky tu)"); continue; }
+
+        /* ô chọn dài phải gõ tìm được - hỏi ở MỌI ngăn kéo đi qua, nhưng mỗi ô chỉ báo một lần
+           (cùng một form mở đi mở lại vài chục lượt, in đủ thì lấp mất mọi lỗi khác) */
+        for (const o of await page.evaluate(OCHON)) {
+          const k = ten + " · " + o;
+          if (ochonDaBao.has(k)) continue;
+          ochonDaBao.add(k);
+          do_.push(nhan("o chon dai ma khong go tim duoc: " + o + " (form \"" + st.keoTen + "\")"));
+        }
 
         /* BƯỚC 5 - điền rồi Lưu. Nút Lưu là nút primary trong .dact, không phải nút Đóng. */
         await page.evaluate(DIEN);
