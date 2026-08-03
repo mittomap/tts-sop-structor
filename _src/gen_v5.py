@@ -21114,7 +21114,11 @@ HTML_HV = (_head.replace("<title>IELTS The Tutors · Cổng làm việc</title>"
 out = HTML.replace("__DATA_JSON__", DATA)
 out_hv = HTML_HV.replace("__DATA_JSON__", DATA)
 import datetime as _dt
-_GEN=_dt.datetime.now().strftime("%d/%m/%Y %H:%M")
+# Chi ghi NGAY, khong ghi gio: dung lai app trong cung mot ngay ma khong doi mot dong ma nao
+# thi ba file san pham phai GIONG HET ban truoc. Truoc day co ca gio nen moi lan chay verify.sh
+# la 4 file "thay doi" du noi dung y nguyen - git day len toan commit rac, va nguoi doc lich su
+# khong phan biet duoc lan nao that su doi gi.
+_GEN=_dt.datetime.now().strftime("%d/%m/%Y")
 out=out.replace("__GEN_STAMP__",_GEN); out_hv=out_hv.replace("__GEN_STAMP__",_GEN)
 assert "demoBootHV()" in out_hv and 'id="login"' in out_hv, "LAP RAP HV GAY: boot/gate khong dung cho"
 assert "Cổng học viên</title>" in out_hv, "LAP RAP HV GAY: title"
