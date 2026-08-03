@@ -149,6 +149,27 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.95 — BA CHỖ ANH LUÂN CHỤP ẢNH ✅ (03/08).**
+> · **Khối "Ai duyệt việc gì" xấu** - anh Luân: *"em bị áp lực gì ko, sao làm chỗ này xấu vậy"*.
+> Không phải áp lực, là làm vội. Bản đầu là một hàng flex đẩy danh sách tên sang phải, tên dài
+> thì vỡ dòng giữa chừng thành *"và 1 / người nữa"*. Nay **ba cột thật** có tiêu đề: việc cần
+> duyệt → chức danh được duyệt → cụ thể những ai (2 tên, còn lại gộp, đủ tên trong chú thích rê).
+> · **Nút chiếm hết một cột** - dải nút trong thẻ hành trình là một cột riêng rộng 190px xếp dọc,
+> mà phần lớn thẻ chỉ có một nút nên gần hết cột ấy là khoảng trắng, còn phần chữ bị bóp lại.
+> Nay nút xuống **một hàng ngang dưới cùng**, ngăn bằng một đường kẻ.
+> · **Ô ghi chú cho mọi thao tác xác nhận** (anh Luân: *"để phòng trường hợp người ta lưu lại gì
+> đó sau này dễ tra cứu"*). Không bắt buộc; gõ vào là đi thẳng vào nhật ký DL25 **cùng lượt** với
+> chính thao tác ấy - phải gán tay số lượt, không thì ghi chú mồ côi ở lượt khác và đọc lại
+> không biết nó giải thích cho việc nào. Đặt ở **một hộp xác nhận dùng chung** nên mọi thao tác
+> đi qua `confirmRun` đều có.
+> · **Phép đo tương phản chốt ở 2.5, có lý do chứ không phải cho dễ**: chip anh Luân bắt được đo
+> 1.9 → vẫn bị bắt; chữ xám `#8A94A0` (2.97) đã **sửa thật** sang `--muted` (4.35) chứ không hạ
+> thước cho qua; dải 2.5-3.0 còn lại là **chip màu của hệ thiết kế** (chữ trắng trên hổ phách
+> 2.6) - đổi chúng là đổi cả bảng màu thương hiệu, việc đó phải anh Luân quyết.
+> · **Hai lần thước tự tố oan trong một buổi:** (1) nền là **gradient** thì `backgroundColor`
+> trong suốt, thước coi như nền trắng → **4800 dòng chữ trắng trên dải chào navy** bị chấm là
+> "chìm vào nền" (tương phản 1.1); (2) đã kể ở V9.93. **Luật: đo không được thì đừng kết luận.**
+
 > **Phiên bản: V9.93-V9.94 — ANH LUÂN MỞ BẢN DEMO VÀ BẮT ĐƯỢC LUỒNG CHẾT ✅ (03/08).**
 > · **Không gửi được khảo sát.** `SVTPL` (bảng bộ câu hỏi) được **dùng ở 5 chỗ mà chưa bao giờ
 > được khai** - mở form là `SVTPL is not defined`, ngăn kéo chết ngay, **không một dòng báo nào

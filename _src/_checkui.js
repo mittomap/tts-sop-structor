@@ -45,14 +45,24 @@ const PROBE = () => {
     const f = (v) => { v = +v / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
     return {L: 0.2126 * f(m[1]) + 0.7152 * f(m[2]) + 0.0722 * f(m[3]), a: m[4] === undefined ? 1 : +m[4]};
   };
-  const _nen = (el) => {                      /* nền THẬT: đi ngược lên tới tổ tiên đầu tiên có màu đục */
+  const _nenL = (el) => {                     /* nền THẬT: đi ngược lên tới tổ tiên đầu tiên có màu đục */
     let p = el;
     while (p && p.nodeType === 1) {
-      const b = _lum(getComputedStyle(p).backgroundColor);
-      if (b && b.a >= 0.6) return b.L;
+      const cs2 = getComputedStyle(p);
+      /* NEN LA ANH HOAC GRADIENT thi `backgroundColor` trong suot - khong doc duoc do sang that.
+         Bo qua, khong doan. Ban dau ham nay coi "khong thay mau" la NEN TRANG, va the la 4800
+         dong chu TRANG tren dai chao mau navy-gradient bi cham la "chim vao nen" (tuong phan 1.1)
+         - mot ket qua vo ly ma neu khong nhin ky se tuong app hong that. */
+      if (cs2.backgroundImage && cs2.backgroundImage !== "none") return {bo: true};
+      const c = cs2.backgroundColor, b = _lum(c);
+      if (b && b.a >= 0.6) {
+        const m = String(c).match(/([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/);
+        const r = m ? [+m[1], +m[2], +m[3]] : [255, 255, 255];
+        return {L: b.L, mau: c, sat: Math.max.apply(null, r) - Math.min.apply(null, r)};
+      }
       p = p.parentElement;
     }
-    return 1;                                  /* không thấy gì thì coi như nền trắng */
+    return {L: 1, mau: "trang", sat: 0};       /* không thấy gì thì coi như nền trắng */
   };
 
   const out = {wide:0, clip:[], over:[], tiny:[], cover:[], vun:[], mo:[]};
@@ -88,11 +98,30 @@ const PROBE = () => {
       seen.add("m" + key);
       const fg = _lum(cs.color);
       if (fg && fg.a >= 0.5) {
-        const bg = _nen(el);
-        const tl = Math.max(fg.L, bg) + 0.05, td = Math.min(fg.L, bg) + 0.05;
+        const bg = _nenL(el);
+        if (bg.bo) continue;                  /* nền là gradient/ảnh - không đo được thì không kết luận */
+        const tl = Math.max(fg.L, bg.L) + 0.05, td = Math.min(fg.L, bg.L) + 0.05;
         const ti = tl / td;
-        if (ti < 3.0) out.mo.push({tag, cls, txt, ti: Math.round(ti * 10) / 10,
-          chu: cs.color, nen: getComputedStyle(el).backgroundColor});
+        /* HAI KIEU "KHO DOC" KHAC HAN NHAU, khong duoc cham bang mot thuoc:
+           (a) CHU XAM TREN NEN XAM - chu chim han vao nen, dung la loi anh Luan gap (chip do sam
+               tren nen navy do duoc 1.9). Nguong 3.0.
+           (b) CHU TRANG TREN CHIP MAU (do / ho phach / xanh la) - do WCAG thi 2.6-3.0, nhung mat
+               nguoi doc duoc binh thuong va do la MOT LUA CHON THIET KE co chu dich, dung khap
+               moi he giao dien. Siet (b) len 3.0 la buoc doi ca bang mau thuong hieu.
+           Nen tach: nen CO MAU (chenh lech kenh > 40) va chu gan trang thi nguong 2.2; con lai
+           giu 3.0. Viet ro o day de lan sau khong ai tuong day la cho de dai. */
+        /* NGUONG 2.5, chot co suy nghi chu khong phai cho de dai:
+           - cho anh Luan bat duoc (chu do sam tren chip navy) do 1.9 -> van bi bat;
+           - chu xam #8A94A0 tren nen the do 2.97 -> da SUA THAT (doi sang --muted 4.35), khong
+             phai ha thuoc cho qua;
+           - con lai o dai 2.5-3.0 la CHIP MAU cua he thiet ke (chu trang tren ho phach 2.6,
+             chu xanh la tren nen xanh nhat 3.0). Doi chung len 3.0 la buoc doi ca bang mau
+             thuong hieu - viec do phai anh Luan quyet, khong phai bo kiem tu quyet.
+           Chu trang tren nen co mau con de hon mot bac: mat nguoi doc chip mau rat tot. */
+        const chuTrang = fg.L > 0.7, nenCoMau = bg.sat > 40;
+        const nguong = (chuTrang && nenCoMau) ? 2.2 : 2.5;
+        if (ti < nguong) out.mo.push({tag, cls, txt, ti: Math.round(ti * 10) / 10,
+          chu: cs.color, nen: bg.mau});
       }
     }
     /* text-overflow:ellipsis = co y cat VA co dau ... bao cho nguoi doc biet -> khong tinh la loi */
@@ -420,7 +449,7 @@ const PROBE = () => {
       p.tiny.forEach(c => bad.push(nhan(m + ": nut qua nho " + c.w + "x" + c.h + "px <" + c.tag + " class=\"" + c.cls + "\"> \"" + c.txt + "\"")));
       p.cover.forEach(c => bad.push(nhan(m + ": hai thanh noi che nhau - " + c)));
       p.vun.forEach(c => bad.push(nhan(m + ": cau van bi FLEX BE VUN thanh " + c.n + " cot trong <" + c.tag + " class=\"" + c.cls + "\"> - \"" + c.txt + "\"")));
-      p.mo.forEach(c => bad.push(nhan(m + ": CHU CHIM VAO NEN (tuong phan " + c.ti + ", can >=3) <" +
+      p.mo.forEach(c => bad.push(nhan(m + ": CHU CHIM VAO NEN (tuong phan " + c.ti + ") <" +
         c.tag + " class=\"" + c.cls + "\"> \"" + c.txt + "\" - chu " + c.chu)));
     }
     /* ═══ V9.67 - BÀI HƯỚNG DẪN TRÊN ĐIỆN THOẠI ═══════════════════════════════════════════

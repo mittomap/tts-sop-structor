@@ -76,7 +76,7 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .mnbox{border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden;background:#fff}
 .mnbox.off{opacity:.6}
 .mnhd{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#FAFBFD;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.mnct{margin-left:auto;font-size:11px;color:#8A94A0;font-weight:700;white-space:nowrap}
+.mnct{margin-left:auto;font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap}
 .mnck{display:flex;align-items:center;cursor:pointer;flex:none}
 .mnck input{width:16px;height:16px;cursor:pointer;accent-color:var(--navy)}
 .mnin{height:32px;border:1px solid transparent;border-radius:8px;padding:0 9px;font-family:inherit;font-size:12.5px;
@@ -91,7 +91,7 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .mnrow.off .mnin,.mnrow.off .mnic{opacity:.5}
 .mnic{font-size:16px;color:#7A8694;flex:none;width:18px;text-align:center}
 .mnrs{flex:none;height:26px;padding:0 8px;font-size:11px}
-.mncode{flex:none;font-size:10px;color:#AAB4C0;font-family:ui-monospace,Menlo,Consolas,monospace;min-width:74px;text-align:right}
+.mncode{flex:none;font-size:10px;color:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace;min-width:74px;text-align:right}
 .mnact{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding-top:6px}
 @media(max-width:620px){.mncode{display:none}}
 /* V9.27: hang nut hen nhanh - nhieu nut hon nen cho xuong dong gon gang */
@@ -151,7 +151,7 @@ tr.cfhl>td{background:#FFF6D8}
 @keyframes cfhl{0%,60%{background:#FFF6D8}100%{background:transparent}}
 /* V9.29: nut nho "sua o day" canh cau nhac / danh muc */
 .cfedit{display:inline-flex;align-items:center;justify-content:center;margin-left:6px;background:none;border:0;
- width:26px;height:26px;flex:none;border-radius:50%;color:#9AA5B1;cursor:pointer;font-family:inherit;padding:0;
+ width:26px;height:26px;flex:none;border-radius:50%;color:var(--muted);cursor:pointer;font-family:inherit;padding:0;
  vertical-align:middle;transition:.12s}
 /* V9.56: banh rang 24x24 la du tren chuot, nhung tren cam ung dau ngon tay rong ~9mm - phai noi
    vung bam ra. Khong phong to CAI ICON (phong to la no doi vai voi noi dung chinh), chi noi VUNG
@@ -212,7 +212,7 @@ tr.cfhl>td{background:#FFF6D8}
 .setgrp.setg2 .stab.on{background:none;color:var(--navyd);font-weight:800;border-bottom-color:var(--navy)}
 /* Vung bam phai du 24x24 - bo kiem trinh duyet that bat dung: banh rang 19x14px thi tren may
    tinh bang khong ai bam trung. Icon van nho, chi vung cham la rong ra. */
-.gearbtn{background:none;border:0;color:#9AA5B1;cursor:pointer;font-size:13px;line-height:1;
+.gearbtn{background:none;border:0;color:var(--muted);cursor:pointer;font-size:13px;line-height:1;
  width:24px;height:24px;padding:0;display:inline-flex;align-items:center;justify-content:center;vertical-align:-6px}
 .gearbtn:hover{color:var(--navy)}
 /* V9.64 (anh Luân: *"bánh răng bị rớt xấu quá em"*). Bánh răng đứng SAU một khối chữ rộng
@@ -425,7 +425,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .hvjr.on .hvjd{border-color:var(--green);color:var(--green);background:var(--greenb)}
 .hvjc{flex:1;min-width:0}
 .hvjc b{display:block;font-size:12.5px;color:var(--text)}
-.hvjr:not(.on) .hvjc b{color:#AAB4C0}
+.hvjr:not(.on) .hvjc b{color:var(--muted)}
 .hvjc span{font-size:11.5px;color:var(--muted)}
 .hvjt{font-size:11.5px;color:var(--muted);font-weight:700;white-space:nowrap;flex:none;text-align:right;min-width:118px}
 @media(max-width:700px){.hvjt{min-width:0;font-size:10.5px}}
@@ -433,12 +433,12 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .hvreq{border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:10px;background:#fff}
 .hvreqh{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--navy);margin-bottom:3px}
 .hvreqh b{flex:1;min-width:0}
-.hvreqm{font-size:11px;color:#8A94A0;margin-bottom:6px}
+.hvreqm{font-size:11px;color:var(--muted);margin-bottom:6px}
 .hvreqc{font-size:12.5px;line-height:1.6;color:#4A5A6E;margin-bottom:7px}
 .hvcmt{background:#FAFBFD;border-radius:8px;padding:7px 10px;margin-bottom:5px;font-size:12px;line-height:1.55}
 .hvcmt.me{background:#EEF2F6}
 .hvcmt b{display:block;font-size:11px;color:var(--navy)}
-.hvcmt i{display:block;font-size:10px;color:#9AA5B1;font-style:normal;margin-top:2px}
+.hvcmt i{display:block;font-size:10px;color:var(--muted);font-style:normal;margin-top:2px}
 .hvstars{display:inline-flex;gap:2px;vertical-align:middle}
 .hvstars i{font-size:18px;color:#D5DEE8;cursor:pointer;transition:.12s}
 .hvstars i:hover{color:#F0B429;transform:scale(1.12)}
@@ -492,7 +492,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .hvf{flex:1;min-width:130px;padding:8px 14px;border-right:1px solid var(--line)}
 .hvf:last-child{border-right:0}
 .hvf.hi{background:var(--bg);border-radius:8px}
-.hvf span{display:block;font-size:10.5px;font-weight:700;color:#8A94A0;text-transform:uppercase;letter-spacing:.3px}
+.hvf span{display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
 .hvf b{font-size:15px}
 .hvbar{height:8px;background:var(--bg);border-radius:6px;overflow:hidden;margin-top:12px}
 .hvbar i{display:block;height:100%;background:var(--green);border-radius:6px}
@@ -518,7 +518,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .hvcr.on{border-color:var(--navy);background:linear-gradient(180deg,#FAFBFD,#fff);box-shadow:0 4px 18px rgba(46,90,136,.16)}
 .hvcr.on:before{content:"";position:absolute;left:-1.5px;top:14px;bottom:14px;width:4px;border-radius:3px;background:var(--navy)}
 .hvcrh{display:flex;align-items:flex-start;gap:11px}
-.hvcri{width:38px;height:38px;border-radius:10px;background:var(--bg);color:#8A94A0;display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+.hvcri{width:38px;height:38px;border-radius:10px;background:var(--bg);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
 .hvcr.on .hvcri{background:var(--navy);color:#fff}
 .hvcrt{flex:1;min-width:0}
 .hvcrt b{display:block;font-size:13px;color:var(--text);line-height:1.35}
@@ -724,7 +724,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .hvsb{padding:8px 13px}
 .hvev{display:flex;gap:9px;align-items:flex-start;padding:6px 0;font-size:11.5px;line-height:1.55;border-bottom:1px dashed #EEF2F6}
 .hvev:last-child{border-bottom:0}
-.hvev i{font-size:15px;color:#9AA5B1;flex:none;margin-top:2px}
+.hvev i{font-size:15px;color:var(--muted);flex:none;margin-top:2px}
 .hvev span{flex:1;min-width:0}
 /* ===== CỔNG HỌC VIÊN (file riêng) ===== */
 .hvapp{display:flex;height:100vh;overflow:hidden}
@@ -784,7 +784,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .congr small{display:block;font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:2px}
 .congi{width:36px;height:36px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--navyd);font-size:18px}
 .hvpick{display:flex;align-items:center;gap:9px;margin-bottom:14px}
-.hvpick span{font-size:11px;font-weight:700;color:#8A94A0;text-transform:uppercase;letter-spacing:.3px}
+.hvpick span{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
 .hvhero{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,var(--navy),#3E7BB5);color:#fff;border-radius:12px;padding:20px 22px;margin-bottom:18px}
 .hvg{font-size:20px;font-weight:800}
 .hvsub{font-size:12.5px;opacity:.95;margin-top:4px}
@@ -817,7 +817,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .mslb{grid-column:1/-1;font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--navy)}
 .msw{display:flex;align-items:flex-start;gap:10px;text-align:left;padding:12px 13px;border:1.5px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-family:inherit;transition:.12s}
 .msw:hover{border-color:#9BB2CC}
-.msw i{font-size:18px;color:#8A94A0;line-height:1;margin-top:1px}
+.msw i{font-size:18px;color:var(--muted);line-height:1;margin-top:1px}
 .msw span{display:flex;flex-direction:column;gap:2px}
 .msw b{font-size:13px;font-weight:700;color:var(--ink)}
 .msw small{font-size:11px;color:var(--muted);line-height:1.35}
@@ -853,7 +853,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .pickgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
 .pickc{display:flex;align-items:center;gap:10px;text-align:left;padding:12px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-family:inherit;transition:.12s}
 .pickc:hover{border-color:var(--navy);background:#FAFBFD;transform:translateY(-1px);box-shadow:0 3px 10px rgba(16,32,58,.07)}
-.pickc i{font-size:18px;color:#8A94A0;flex:none}
+.pickc i{font-size:18px;color:var(--muted);flex:none}
 .pickc:hover i{color:var(--navy)}
 .pickc span{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
 .pickc b{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -875,7 +875,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
    được chứ bấm nhảy đi chỗ khác thì cũng như không." */
 .cfnhanh{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:9px}
 .cfnr{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
-.cfnr>i{font-size:18px;color:#8A94A0;flex:none}
+.cfnr>i{font-size:18px;color:var(--muted);flex:none}
 .cfnt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .cfnt b{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.35}
 .cfnt small{font-size:10.5px;color:var(--muted);line-height:1.45}
@@ -963,7 +963,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .cbit{display:flex;flex-direction:column;gap:3px;padding:2px 14px;min-width:0;border-right:1px solid var(--line)}
 .cbit:last-child{border-right:0}
 .cbit i{display:none}
-.cbl{font-size:10px;font-weight:700;color:#8A94A0;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+.cbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
 .cbit b{font-size:12.5px;color:var(--text);font-weight:700;overflow-wrap:anywhere;line-height:1.35}
 @media(max-width:1000px){.cbgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px 0}.cbit{border-right:0}}
 @media(max-width:620px){.cbgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -1001,7 +1001,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
  background:var(--bg);border-top:1px solid var(--line)}
 .tbar.hai>.tbduoi .tbcnt{margin-right:auto}
 .tbcnt{font-size:11.5px;color:var(--muted);font-weight:600;white-space:nowrap}
-.tblbl{font-size:11px;font-weight:700;color:#8A94A0;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+.tblbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
 @media(max-width:860px){.tbar{padding:8px}.seg{width:100%}}
 .colwrap{position:relative;display:inline-block;margin-left:8px}
 .colmenu{position:absolute;top:calc(100% + 6px);right:0;z-index:30;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.14);padding:8px;min-width:200px;max-height:320px;overflow-y:auto}
@@ -1090,7 +1090,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .jgo:hover{background:var(--blue);border-color:var(--blue);color:#fff}
 .jstep{display:flex;align-items:flex-start;gap:0;overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 10px;margin-bottom:14px}
 .jsi{min-width:74px;text-align:center;flex:0 0 auto}
-.jsd{width:30px;height:30px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:15px;background:var(--bg);color:#9AA5B1;border:2px solid var(--line)}
+.jsd{width:30px;height:30px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:15px;background:var(--bg);color:var(--muted);border:2px solid var(--line)}
 .jsi.done .jsd{background:var(--greenb);color:var(--green);border-color:var(--green)}
 .jsi.now .jsd{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 0 0 4px var(--blueb)}
 .jsl{font-size:10.5px;margin-top:5px;color:var(--muted);line-height:1.25}
@@ -1098,7 +1098,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .jsw{font-size:10px;color:#6B7887;margin-top:1px}
 .jsc{flex:1;min-width:14px;height:2px;background:var(--line);margin-top:15px}
 .jsc.done{background:var(--green)}
-.jnext{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;background:linear-gradient(180deg,#fff,#FAFBFD);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.jnext{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start;background:linear-gradient(180deg,#fff,#FAFBFD);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
 /* V9.15 sopb - block nghiep vu chuan (dung chung khung .jnext) */
 .sopb .sopr{display:flex;gap:8px;padding:3px 0;font-size:12.5px;align-items:flex-start}
 /* V9.29 (anh Luân): "cố gắng trong thiết kế đừng để xuống dòng, khi mà không gian vẫn đang ổn".
@@ -1111,7 +1111,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .sopb .sopna i{color:var(--blue);margin-top:1px;flex:none}
 .sopb .mstrip{margin-left:0;padding:0}
 .jnext.over{background:#FFFBFA;border-color:#EBC8C4}
-.jnl{flex:1;min-width:260px}
+.jnl{flex:1 1 100%;min-width:0}
 .jnt{font-size:10px;font-weight:800;letter-spacing:.6px;color:var(--blue)}
 .jnext.over .jnt{color:var(--red)}
 .jnb{font-size:17px;font-weight:800;color:var(--navy);margin-top:2px}
@@ -1119,8 +1119,11 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .jns{font-size:11px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:5px}
 .jns.over{color:var(--red);font-weight:700}
 .jnm{font-size:11.5px;color:#8A6D1F;background:var(--amberb);border-radius:8px;padding:7px 10px;margin-top:8px;display:flex;gap:6px;align-items:flex-start}
-.jnr{display:flex;flex-direction:column;gap:8px;min-width:190px}
-.jnr .btn{justify-content:flex-start}
+/* V9.95 (anh Luân, kèm ảnh: *"mấy cái nút em để nó chiếm hết 1 cột à"*). Đúng - dải nút trước
+   đây là MỘT CỘT RIÊNG rộng 190px xếp dọc, mà phần lớn thẻ chỉ có một nút, nên gần hết cột ấy
+   là khoảng trắng, còn phần chữ bên trái thì bị bóp lại. Nay nút xuống thành MỘT HÀNG ngang
+   dưới cùng, ngăn bằng một đường kẻ: chữ được trọn bề ngang, nút vẫn nổi và bấm dễ hơn. */
+.jnr{display:flex;flex-wrap:wrap;gap:8px;width:100%;padding-top:11px;margin-top:3px;border-top:1px solid var(--line)}
 .btn.ghost{opacity:.65}
 /* V9.67: ô của lưới mặc định `min-width:auto`, nghĩa là nó KHÔNG chịu hẹp hơn nội dung rộng nhất
    bên trong. Lưới đã gãy còn một cột ở 900px mà cột đó vẫn nở 412px trên màn 390px, đẩy cả trang
@@ -1207,12 +1210,17 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .tbar.tbso{margin-top:-4px;margin-bottom:14px}
 .tbar.banai{gap:8px}
 .quyenbox{margin-top:14px}
-.quyenr{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:9px 2px;border-top:1px solid var(--line)}
+/* V9.95 (anh Luân: *"sao làm chỗ này xấu vậy"* - đúng, bản đầu là một hàng flex đẩy danh sách tên
+   sang phải, tên dài thì vỡ dòng giữa chừng thành "và 1 / người nữa"). Nay là BA CỘT thật, đọc
+   xuôi từ trái sang: việc gì -> chức danh nào được duyệt -> cụ thể những ai. */
+.quyenr{display:grid;grid-template-columns:minmax(190px,1.05fr) minmax(210px,1.35fr) minmax(150px,.95fr);
+ gap:8px 16px;align-items:start;padding:10px 2px;border-top:1px solid var(--line)}
 .quyenr:first-child{border-top:0}
-.quyent{font-size:12.5px;font-weight:700;color:var(--ink);min-width:210px;flex:none}
+.quyenhd{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);padding-bottom:2px}
+.quyent{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.45}
 .quyenv{display:flex;gap:5px;flex-wrap:wrap}
-.quyenn{font-size:11.5px;margin-left:auto;text-align:right;max-width:46%}
-@media(max-width:700px){.quyent{min-width:100%}.quyenn{margin-left:0;text-align:left;max-width:100%}}
+.quyenn{font-size:11.5px;line-height:1.55;color:var(--muted)}
+@media(max-width:820px){.quyenr{grid-template-columns:1fr;gap:5px}.quyenhd{display:none}}
 .tbar.banai select{font-family:inherit;font-size:12px;font-weight:600;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:#fff}
 .tbar.tbso .segb{font-size:12px}
 .banji{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none;background:var(--gray);color:#5A6675}
@@ -1257,7 +1265,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .ddrow .rn{min-width:200px}
 .cintag{display:inline-block;font-size:10px;font-weight:700;color:var(--green);background:var(--greenb);border-radius:6px;padding:1px 6px;margin-left:6px}
 .pfseg{display:flex;gap:3px}
-.pfb{width:26px;height:28px;border-radius:6px;border:1px solid var(--line);background:#fff;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;color:#8A94A0}
+.pfb{width:26px;height:28px;border-radius:6px;border:1px solid var(--line);background:#fff;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;color:var(--muted)}
 .pfb.g.on{background:var(--green);border-color:var(--green);color:#fff}
 .pfb.av.on{background:#6B7887;border-color:#6B7887;color:#fff}
 .pfb.w.on{background:var(--red);border-color:var(--red);color:#fff}
@@ -1283,7 +1291,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .fchip.on{color:#fff;border-color:transparent;background:var(--navy)}
 .fchip.on.red{background:var(--red)}.fchip.on.amber{background:var(--amber)}.fchip.on.green{background:var(--green)}.fchip.on.gray{background:#6B7887}.fchip.on.blue{background:var(--blue)}
 .fchip.clr{color:var(--red);border-color:#F0B4B4;font-weight:700}
-.fbar .lbl{font-size:11.5px;font-weight:700;color:#8A94A0;text-transform:uppercase;letter-spacing:.3px}
+.fbar .lbl{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
 /* V9.29l (anh Luân: "kéo ra tí em, khuyết chữ quá"): ô trạng thái bị cắt cụt vì max-width 170px -
    "Đã chuyển đổi - đã thành HV" hiện thành "...đã thành H" và mũi tên đè lên chữ. Nhãn enum phải
    đọc được NGUYÊN VĂN theo CH1, cắt chữ là đọc sai nghiệp vụ. Nay ô nở theo nhãn dài nhất, chừa
@@ -1354,11 +1362,11 @@ input[type=checkbox],input[type=radio]{width:17px;height:17px;flex:none;accent-c
 .jpanel h4{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--navy);font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:6px}
 .jline{display:flex;gap:0;flex-wrap:nowrap;overflow-x:auto;align-items:flex-start;padding:4px 2px}
 .jlstep{min-width:88px;flex:0 0 auto;text-align:center;position:relative}
-.jldot{width:26px;height:26px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;background:var(--bg);color:#9AA5B1;border:2px solid var(--line);font-size:12px;font-weight:700}
+.jldot{width:26px;height:26px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--muted);border:2px solid var(--line);font-size:12px;font-weight:700}
 .jlstep.done .jldot{background:var(--greenb);color:var(--green);border-color:var(--green)}
 .jlt{font-size:10.5px;margin-top:5px;color:var(--muted);line-height:1.25}
 .jlstep.done .jlt{color:var(--navy);font-weight:700}
-.jld{font-size:10px;color:#9AA5B1;margin-top:2px}
+.jld{font-size:10px;color:var(--muted);margin-top:2px}
 .jlc{flex:1;min-width:10px;height:2px;background:var(--line);margin-top:13px}
 .jlc.done{background:var(--green)}
 .jd{font-size:11px;color:var(--muted)}
@@ -1374,6 +1382,11 @@ input[type=checkbox],input[type=radio]{width:17px;height:17px;flex:none;accent-c
    thoại cũng vậy. Hộp xác nhận phải nằm TRÊN mọi thứ - nó là thứ cuối cùng chặn trước khi ghi. */
 .cfmask{position:fixed;inset:0;background:rgba(20,30,45,.5);z-index:210;display:none;align-items:center;justify-content:center;padding:20px}
 .cfmask.on{display:flex}
+/* Ô ghi chú trong hộp xác nhận - hộp này nằm ngoài .drawer nên không thừa hưởng CSS của .fld ở form. */
+.cfbox .fld label{font-size:11.5px;font-weight:700;color:#5A6675;display:block;margin-bottom:4px}
+.cfbox .fld textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;
+ font-family:inherit;font-size:13px;background:#fff;resize:vertical;min-height:52px}
+.cfbox .fld textarea:focus{outline:none;border-color:var(--navy)}
 .cfbox{background:#fff;border-radius:12px;max-width:410px;width:100%;padding:20px 22px;box-shadow:0 22px 60px rgba(0,0,0,.32)}
 .cfh{font-size:14px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:7px;margin-bottom:10px}
 .cfmsg{font-size:13px;color:var(--text);line-height:1.55;margin-bottom:18px}
@@ -1431,7 +1444,7 @@ body.drsz .drawer{transition:none}
 .ccb{font-size:12.5px;line-height:1.5;color:var(--text);white-space:pre-wrap}
 .tp{border-left:2px solid var(--line);padding:2px 0 10px 12px;margin-left:4px}
 .tp .tph{font-size:11.5px;font-weight:700;color:var(--navy)}.tp .tpc{font-size:12.5px;margin-top:2px}.tp .tpr{font-size:12px;color:#1E6A47;margin-top:2px}.tp .tpm{font-size:11px;color:var(--muted);margin-top:2px}
-.dsec{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:#8A94A0;font-weight:800;margin:6px 2px 8px}
+.dsec{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:800;margin:6px 2px 8px}
 .dact{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 /* V9.64 (anh Luân: *"khoảng cách các button chưa hợp lý"*). Trong ngăn kéo, hàng nút đứng CUỐI
    thẻ trước đây dính sát đoạn chữ ngay trên nó (8px) mà lại cách mép dưới tận 24px - đọc ra như
@@ -1515,7 +1528,7 @@ body.drsz .drawer{transition:none}
 .nscw{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-width:34px;flex:1 0 34px;padding-top:20px}
 .nsc{height:3px;width:100%;min-width:24px;background:#E3E9F0;border-radius:3px}
 .nscp{font-size:10px;font-weight:800;color:var(--muted);margin-top:4px;white-space:nowrap}
-.nst.ghost .nsd{border:2px dashed #C4D2E4;background:#fff;color:#AAB4C0}
+.nst.ghost .nsd{border:2px dashed #C4D2E4;background:#fff;color:var(--muted)}
 .nst.ghost .nsl{color:var(--muted);font-weight:600}
 .nst.br .nsd{border-radius:12px;transform:rotate(45deg);width:38px;height:38px;margin:3px}
 .nst.br .nsd i{transform:rotate(-45deg)}
@@ -1552,7 +1565,7 @@ body.drsz .drawer{transition:none}
 /* V9.27: truoc day cac buoc khong co khoang cach nen chu buoc nay dinh vao cham buoc kia.
    Nay moi buoc la mot vien thuoc, noi nhau bang mot doan gach ngan. */
 .steps{display:flex;align-items:center;gap:0;margin-bottom:12px;flex-wrap:nowrap;overflow-x:auto;padding:2px 0 4px}
-.stp{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600;color:#8A94A0;white-space:nowrap;flex:0 0 auto;
+.stp{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600;color:var(--muted);white-space:nowrap;flex:0 0 auto;
  background:#FAFBFD;border:1px solid #EEF2F6;border-radius:999px;padding:3px 13px 3px 3px;position:relative}
 .stp+.stp{margin-left:22px}
 .stp+.stp:before{content:"";position:absolute;left:-22px;top:50%;margin-top:-1px;width:22px;height:2px;background:#E3E9F0}
@@ -1611,7 +1624,7 @@ body.drsz .drawer{transition:none}
 .agebadge.red{background:var(--redb);color:var(--red)}.agebadge.amber{background:var(--amberb);color:var(--amber)}
 .slaa{flex:0 0 auto}
 .fbar.sub{margin-top:-6px;background:#FAFBFD}
-.fbar.sub .lbl{color:#9AA5B1}
+.fbar.sub .lbl{color:var(--muted)}
 .rkpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:14px}
 .rkpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
 .rkpi .v{font-size:22px;font-weight:800;line-height:1.1}
@@ -1644,10 +1657,10 @@ body.drsz .drawer{transition:none}
 .kpirow{display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:1px solid #FAFBFD}
 .kpirow:last-child{border-bottom:0}
 .kpil{flex:1;min-width:0;display:flex;align-items:center;gap:7px}
-.kpic{font-size:10px;font-weight:800;color:#8A94A0;background:var(--bg);border-radius:3px;padding:2px 5px;flex:none}
+.kpic{font-size:10px;font-weight:800;color:var(--muted);background:var(--bg);border-radius:3px;padding:2px 5px;flex:none}
 .kpin{font-size:11.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .kpiv{font-size:12.5px;font-weight:800;flex:none;min-width:52px;text-align:right}
-.kpiv.green{color:var(--green)}.kpiv.red{color:var(--red)}.kpiv.gray{color:#8A94A0}
+.kpiv.green{color:var(--green)}.kpiv.red{color:var(--red)}.kpiv.gray{color:var(--muted)}
 .kpig{font-size:10px;color:var(--muted);flex:none;min-width:64px;text-align:right;white-space:nowrap}
 .kdot{width:7px;height:7px;border-radius:50%;flex:none}
 .kdot.green{background:var(--green)}.kdot.red{background:var(--red)}.kdot.gray{background:#D5DEE8}
@@ -1658,7 +1671,7 @@ body.drsz .drawer{transition:none}
 .funh{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--navy)}
 .funbar{height:16px;background:#EEF2F6;border-radius:6px;overflow:hidden}
 .funbar i{display:block;height:100%;background:linear-gradient(90deg,#2F6BFF,#5B8DEF);border-radius:6px}
-.funpct{font-size:10px;color:#8A94A0;font-weight:500}
+.funpct{font-size:10px;color:var(--muted);font-weight:500}
 .navtoggle{display:none}
 .navmask{display:none}
 @media(max-width:820px){
@@ -1771,7 +1784,7 @@ body.drsz .drawer{transition:none}
 <button class="asstfab" id="asstfab" aria-label="Mở Trợ lý"></button>
 
 <div class="mask" id="mask" onclick="closeModal()"></div>
-<div class="cfmask" id="cfm"><div class="cfbox"><div class="cfh"><i class="ti ti-alert-triangle"></i> Xác nhận thao tác</div><div class="cfmsg" id="cfmMsg"></div><div class="cfa"><button class="btn" onclick="closeConfirm()">Huỷ</button><button class="btn primary" onclick="confirmYes()">Xác nhận</button></div></div></div>
+<div class="cfmask" id="cfm"><div class="cfbox"><div class="cfh"><i class="ti ti-alert-triangle"></i> Xác nhận thao tác</div><div class="cfmsg" id="cfmMsg"></div><div class="fld full" style="margin:2px 0 10px"><label>Ghi chú (không bắt buộc)</label><textarea id="cfmNote" rows="2" placeholder="Lý do, số liệu đã đối chiếu, ai đồng ý... - lưu vào nhật ký để sau này tra lại"></textarea></div><div class="cfa"><button class="btn" onclick="closeConfirm()">Huỷ</button><button class="btn primary" onclick="confirmYes()">Xác nhận</button></div></div></div>
 <div class="drawer" id="drawer" role="dialog" aria-modal="true"><div class="drszr" id="drszr" title="Kéo để đổi độ rộng - bấm đúp để về mặc định"></div><div class="dh"><b id="drawerTitle">Chi tiết</b><button class="x" onclick="closeModal()" aria-label="Đóng">&times;</button></div><div class="dbody" id="drawerBody"></div></div>
 
 <script src="ITTs_data.js"></script>
@@ -5289,9 +5302,32 @@ function demoResetHoi(){
  pwHoi("Dựng lại demo",
   "Thao tác này xoá MỌI thay đổi dữ liệu của buổi demo và quay về dữ liệu gốc (cấu hình giữ nguyên). Cần mật khẩu quản trị.","demoResetMo")}
 function demoResetMo(){cfSetMode("that");demoReset()}
-function confirmRun(msg,fn,arg){var m=document.getElementById("cfm");if(!m){var g0=cfnGet(fn);if(g0)g0(arg);return}window.__cfn=fn;window.__carg=arg;document.getElementById("cfmMsg").textContent=msg;m.classList.add("on")}
-function confirmYes(){var f=window.__cfn,a=window.__carg;closeConfirm();var g=cfnGet(f);
- if(g)g(a); else toastErr("Không chạy được thao tác này - báo IT (thiếu hàm xử lý).")}
+/* V9.95 (anh Luân: *"tất cả mấy cái thao tác xác nhận, em nên thêm cái ghi chú nữa, để phòng
+   trường hợp người ta lưu lại gì đó sau này dễ tra cứu"*). Ô ghi chú KHÔNG BẮT BUỘC, nhưng gõ
+   vào là nó đi thẳng vào nhật ký DL25 cùng lượt với chính thao tác ấy - mở nhật ký ra đọc là
+   thấy "ai · lúc nào · làm gì · và vì sao". Đặt ở ĐÂY, một hộp xác nhận dùng chung, nên mọi
+   thao tác đi qua `confirmRun` đều có, không phải sửa từng chỗ. */
+function confirmRun(msg,fn,arg){var m=document.getElementById("cfm");if(!m){var g0=cfnGet(fn);if(g0)g0(arg);return}
+ window.__cfn=fn;window.__carg=arg;window.__cnote="";
+ document.getElementById("cfmMsg").textContent=msg;
+ var nt=document.getElementById("cfmNote");if(nt)nt.value="";
+ m.classList.add("on");
+ try{if(nt)setTimeout(function(){nt.focus()},60)}catch(e){}}
+function confirmYes(){var f=window.__cfn,a=window.__carg;
+ var note="";try{note=String((document.getElementById("cfmNote")||{}).value||"").trim()}catch(e){}
+ window.__cnote=note;
+ closeConfirm();var g=cfnGet(f);
+ if(!g){toastErr("Không chạy được thao tác này - báo IT (thiếu hàm xử lý).");return}
+ g(a);
+ /* Ghi chú vào nhật ký NGAY SAU thao tác, trong cùng một tick nên nó nằm chung lượt (batch)
+    với chính thao tác vừa chạy - đọc lại là hai dòng đi liền nhau, không mồ côi. */
+ if(note){try{
+  var L0=logRows(),bt=(L0[0]&&L0[0].batch)||"";
+  var e9=logAct("Ghi chú khi xác nhận","","",null,"Ghi chú: "+note);
+  /* Gán ĐÚNG lượt của thao tác vừa chạy. Không gán thì `logAct` mở một lượt mới và ghi chú nằm
+     mồ côi ở lượt khác - đọc nhật ký sẽ không biết nó giải thích cho việc nào. */
+  if(e9&&bt)e9.batch=bt;
+ }catch(e){}}}
 function closeConfirm(){var m=document.getElementById("cfm");if(m)m.classList.remove("on")}
 function testBook(id){markRow("DL03","test_booking_id",id,{booking_status:eFull("enum_booking_status","booked")},"Đã đặt lịch test.")}
 function wowConfirm(id){var w=find("DL14","wow_id",id)||{};
@@ -5589,7 +5625,8 @@ function duyAiHTML(){
   '<b>Ai duy\u1ec7t vi\u1ec7c g\u00ec</b>'+
   '<span class="mut" style="margin-left:8px;font-size:11.5px">theo b\u1ea3ng ph\u00e2n quy\u1ec1n CH3 c\u1ee7a SOP</span>'+
   '<button class="btn sm" style="margin-left:auto" onclick="go(\'settings\');window.SETTAB=\'phanquyen\'">'+
-  '<i class="ti ti-adjustments"></i>S\u1eeda ph\u00e2n quy\u1ec1n</button></div><div class="pbody">';
+  '<i class="ti ti-adjustments"></i>S\u1eeda ph\u00e2n quy\u1ec1n</button></div><div class="pbody">'+
+  '<div class="quyenr"><div class="quyenhd">Vi\u1ec7c c\u1ea7n duy\u1ec7t</div><div class="quyenhd">Ch\u1ee9c danh \u0111\u01b0\u1ee3c duy\u1ec7t</div><div class="quyenhd">C\u1ee5 th\u1ec3 nh\u1eefng ai</div></div>';
  ds.forEach(function(a){
   var C=CH3BY[a]||{};
   /* Ai lam duoc - hoi lai chinh canAct bang cach dong vai tung nguoi, khong suy tu bang vai.
@@ -5600,14 +5637,16 @@ function duyAiHTML(){
   try{applyScope(goc)}catch(e){}
   var vai={};ai.forEach(function(x){var v=elabel(x.role)||ecode(x.role)||"";if(v)vai[v]=(vai[v]||0)+1});
   var dsVai=Object.keys(vai);
+  var tenDu=ai.map(function(x){return x.full_name||x.staff_id});
   h+='<div class="quyenr">'+
    '<div class="quyent">'+esc(C.t||a)+'</div>'+
    '<div class="quyenv">'+(dsVai.length
-     ? dsVai.map(function(v){return '<span class="chip">'+esc(v)+' <b>'+vai[v]+'</b></span>'}).join(" ")
+     ? dsVai.map(function(v){return '<span class="chip">'+esc(v)+(vai[v]>1?(' <b>'+vai[v]+'</b>'):'')+'</span>'}).join(" ")
      : '<span class="chip red">Ch\u01b0a ai \u0111\u01b0\u1ee3c giao</span>')+'</div>'+
-   '<div class="quyenn mut">'+(ai.length?(ai.length+" ng\u01b0\u1eddi: "+esc(ai.slice(0,4).map(function(x){return x.full_name||x.staff_id}).join(", "))+
-      (ai.length>4?(" v\u00e0 "+(ai.length-4)+" ng\u01b0\u1eddi n\u1eefa"):""))
-      :"Kh\u00f4ng ai trong danh s\u00e1ch nh\u00e2n s\u1ef1 hi\u1ec7n t\u1ea1i duy\u1ec7t \u0111\u01b0\u1ee3c vi\u1ec7c n\u00e0y")+'</div>'+
+   '<div class="quyenn"'+(tenDu.length>2?(' data-tip="'+esc(tenDu.join(", "))+'"'):'')+'>'+
+    (tenDu.length
+      ? (esc(tenDu.slice(0,2).join(", "))+(tenDu.length>2?('<br><span style="opacity:.75">v\u00e0 '+(tenDu.length-2)+' ng\u01b0\u1eddi n\u1eefa</span>'):''))
+      :"Ch\u01b0a c\u00f3 ai trong s\u1ed5 nh\u00e2n s\u1ef1 duy\u1ec7t \u0111\u01b0\u1ee3c vi\u1ec7c n\u00e0y")+'</div>'+
    '</div>'});
  h+='</div></div>';
  return h}
@@ -9230,7 +9269,7 @@ function svgBarsV(items,opt){opt=opt||{};var n=items.length,step=52,W=Math.max(n
  items.forEach(function(it,i){var bh=Math.max(1,Math.round((it[1]/mx)*(H-24)));var x=14+i*step,y=H-bh;
   s+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+bh+'" rx="4" fill="'+(opt.color||'#2F6BFF')+'"/>';
   s+='<text x="'+(x+bw/2)+'" y="'+(y-4)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#3A4756">'+esc(opt.fmt?opt.fmt(it[1]):it[1])+'</text>';
-  s+='<text x="'+(x+bw/2)+'" y="'+(H+15)+'" text-anchor="middle" font-size="9.5" fill="#8A94A0">'+esc(it[0])+'</text>';});
+  s+='<text x="'+(x+bw/2)+'" y="'+(H+15)+'" text-anchor="middle" font-size="9.5" fill="#6B7887">'+esc(it[0])+'</text>';});
  return s+'</svg>'}
 function svgDonut(segs){var tot=segs.reduce(function(a,b){return a+b[1]},0)||1;var R=52,r=31,cx=60,cy=64,a0=-Math.PI/2;
  var s='<svg viewBox="0 0 250 132" width="100%" preserveAspectRatio="xMidYMid meet" style="max-height:150px">';
@@ -9238,7 +9277,7 @@ function svgDonut(segs){var tot=segs.reduce(function(a,b){return a+b[1]},0)||1;v
   var x0=(cx+R*Math.cos(a0)).toFixed(1),y0=(cy+R*Math.sin(a0)).toFixed(1),x1=(cx+R*Math.cos(a1)).toFixed(1),y1=(cy+R*Math.sin(a1)).toFixed(1);
   var xi1=(cx+r*Math.cos(a1)).toFixed(1),yi1=(cy+r*Math.sin(a1)).toFixed(1),xi0=(cx+r*Math.cos(a0)).toFixed(1),yi0=(cy+r*Math.sin(a0)).toFixed(1);
   s+='<path d="M'+x0+' '+y0+' A'+R+' '+R+' 0 '+big+' 1 '+x1+' '+y1+' L'+xi1+' '+yi1+' A'+r+' '+r+' 0 '+big+' 0 '+xi0+' '+yi0+' Z" fill="'+g[2]+'"/>';a0=a1;});
- s+='<text x="60" y="60" text-anchor="middle" font-size="18" font-weight="800" fill="#1E2A38">'+tot+'</text><text x="60" y="77" text-anchor="middle" font-size="9" fill="#8A94A0">tổng</text>';
+ s+='<text x="60" y="60" text-anchor="middle" font-size="18" font-weight="800" fill="#1E2A38">'+tot+'</text><text x="60" y="77" text-anchor="middle" font-size="9" fill="#6B7887">tổng</text>';
  var ly=20;segs.forEach(function(g){s+='<rect x="126" y="'+(ly-9)+'" width="10" height="10" rx="2" fill="'+g[2]+'"/><text x="141" y="'+ly+'" font-size="10.5" fill="#3A4756">'+esc(g[0])+' ('+g[1]+')</text>';ly+=19;});
  return s+'</svg>'}
 /* ===== KPI THEO SOP: tính thẳng từ dữ liệu vận hành, so với ngưỡng CH6 ===== */
@@ -15337,7 +15376,7 @@ function renderGvdp(embed){
  if(!free.length)h+='<tr><td class="empty" colspan="4">Hôm nay giáo viên nào cũng có lịch - không còn người dự phòng.</td></tr>';
  GV.forEach(function(g){var nb=busyMap[g.staff_id]||0;
   var brs=Object.keys(gvBranches(g.staff_id)).map(function(b){return elabel(b)||b});
-  h+='<tr'+(nb?' style="opacity:.6"':'')+'><td>'+nsLnk(g.staff_id,g.full_name,"")+'</td>'+
+  h+='<tr data-mo="openNSQuick" data-mo-arg="'+esc(g.staff_id||"")+'"'+(nb?' style="opacity:.6"':'')+'><td>'+nsLnk(g.staff_id,g.full_name,"")+'</td>'+
    '<td>'+esc(elabel(g.branch)||g.branch||"-")+'</td>'+
    '<td style="font-size:11.5px">'+esc(brs.join(" · ")||"-")+'</td>'+
    '<td>'+(nb?'<span class="chip amber">'+nb+' buổi</span>':'<span class="chip green">trống</span>')+'</td></tr>'});
@@ -20954,7 +20993,7 @@ HV_SHELL = r"""
 # ve no; gio no o day, app nhan duoc de tu ghi nhat ky, con _check15 doc lai tu app da build.
 # Them mot ham ghi moi ma quen khai -> _check15 BAO DO (no tu do nguon ra ban khai that).
 DOORS = {
- "DL01":["staffAdd","staffSave","gvBioSave","bkLuuHoSoGV","bkLuuEmailGV"],
+ "DL01":["staffAdd","staffSave","gvBioSave","bkLuuHoSoGV","bkLuuEmailGV","cnLuu"],
  "DL02":["bkLuuTuVan","bgSplitOrphansRun","doHandoverRun","leadInboundSave","reassignSave","runGiveUpDo","runRejectSave","testQuickSave","touchLead","tvEnrollSave"],
  "DL02b":["bkLuuLienHe","bkLuuNhacTest","leadInboundSave","rfNeed","runRejectSave","runTouchSave","testQuickSave"],
  "DL03":["bkLuuTest","bkLuuTuVan","bkLuuNhacTest","rfNeed","testAttend","testBook","testNoShowSave","testQuickSave","testRebookSave","testRefuse","testResultSave","tvSave","testEnd"],
