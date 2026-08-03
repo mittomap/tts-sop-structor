@@ -1163,6 +1163,11 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .banch{color:var(--muted);flex:none;font-size:16px}
 .banjob{display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid var(--line)}
 .banjob.bankhac{opacity:.72;background:#FAFBFD}
+/* Khối "bộ phận khác" gấp lại bằng <details> gốc - con trỏ và mũi tên là của trình duyệt,
+   chỉ chỉnh cho nó ngồi đúng nhịp với các tiêu đề mục khác. */
+.bankgroup>summary.bankmo{cursor:pointer;list-style:revert;user-select:none}
+.bankgroup>summary.bankmo::marker{color:var(--muted)}
+.bankgroup>summary.bankmo:hover{color:var(--ink)}
 .tbar.tbso{margin-top:-4px;margin-bottom:14px}
 .tbar.tbso .seg{font-size:12px;padding:5px 10px}
 .banji{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none;background:var(--gray);color:#5A6675}
@@ -2227,6 +2232,7 @@ var PAGES=[
 {k:"dsdiemdanh",g:"Tra cứu",ic:"ti-user-check",t:"Sổ điểm danh",c:"Tra cứu điểm danh",ty:"list"},
 {k:"dsbaitap",g:"Tra cứu",ic:"ti-book",t:"Sổ bài tập",c:"Tra cứu bài tập",ty:"list"},
 {k:"dswow",g:"Tra cứu",ic:"ti-star",t:"Sổ WOW 1-1",c:"Tra cứu buổi WOW",ty:"list"},
+{k:"dsphuhuynh",g:"Tra cứu",ic:"ti-users",t:"Sổ phụ huynh",c:"Người đồng hành và các con",ty:"custom"},
 {k:"dsketthuc",g:"Tra cứu",ic:"ti-flag",t:"Sổ kết thúc khóa",c:"Tra cứu đầu ra",ty:"list"},
 {k:"dskhaosat",g:"Tra cứu",ic:"ti-clipboard-text",t:"Sổ khảo sát",c:"Tra cứu khảo sát",ty:"list"},
 {k:"dsphanhoi",g:"Tra cứu",ic:"ti-message-2",t:"Sổ phản hồi",c:"Góp ý của học viên",ty:"list"},
@@ -2946,6 +2952,11 @@ function colMenuHTML(key){var cfg=LISTCFG[key];if(window.COLMENU!==key)return ''
    Bộ kiểm _checkux canh: dải nào gọi statStrip mà không khai ở đây là đỏ; số thẻ khai lệch với
    số thẻ vẽ ra thật cũng đỏ; thẻ nào còn onclick cũng đỏ. */
 var THEDEF={
+ dsphuhuynh:{t:"Sổ phụ huynh",the:[
+  ["ph_nguoi","Người đồng hành","Số người đồng hành trong phạm vi dữ liệu của bạn. Gộp theo SỐ ĐIỆN THOẠI - hai học viên khai cùng một số là một người. Muốn xem danh sách: chính bảng ngay dưới dải này."],
+  ["ph_nhieu","Có từ 2 con trở lên","Người đang có nhiều hơn một con theo học. Gọi cho họ một lần là nói được chuyện của cả hai - đừng để hai bộ phận gọi hai lần trong một ngày. Muốn xem: cột thứ hai của mỗi dòng ghi rõ tên từng con."],
+  ["ph_no","Còn nợ học phí","Cộng phần còn lại của MỌI đơn của MỌI con người ấy. Một người có hai con, mỗi con nợ một ít, thì đây là con số họ thật sự phải trả. Muốn xem: chip vàng ở cuối mỗi dòng."],
+  ["ph_rui","Có con đang cảnh báo","Người có ít nhất một con đang ở mức đỏ về chuyên cần hoặc học thuật - nên gọi trước khi họ gọi mình. Muốn xem: chip đỏ ở cuối dòng ghi mấy con."]]},
  ban:{t:"Bàn làm việc",the:[
   ["ban_co","Còn việc của tôi","Số hồ sơ trong phạm vi của bạn mà chức danh của bạn còn việc phải làm với họ. Muốn xem danh sách: chính bảng ngay dưới dải này."],
   ["ban_gap","Có việc gấp","Trong số hồ sơ còn việc, đếm riêng những hồ sơ có ít nhất một việc mức ĐỎ - làm trước. Muốn xem danh sách: bảng dưới xếp hồ sơ có việc gấp lên đầu."],
@@ -15180,8 +15191,8 @@ var TOURS={
  /* V9.69 - bài đầu tiên của app. Bàn làm việc là TRỤC MỚI, mà trục mới thì phải dạy trước
     mọi thứ khác - nếu không người dùng vẫn quay về thói quen đi tìm theo trang. */
  tq_ban:{lv:"thamquan",t:"Bàn làm việc - mở một người, làm hết việc",ic:"ti-focus-2",d:"4 bước - thực thể trung tâm của từng giai đoạn",steps:[
-  {p:"ban",sel:'@phead',t:"Mỗi giai đoạn có một thực thể trung tâm",d:"Khi chưa học, KHÁCH là trung tâm - mọi việc nhằm đưa họ vào lớp. Khi đã học, LỚP và HỌC VIÊN là trung tâm. Khối Nhân sự thì làm việc với GIẢNG VIÊN. Bàn làm việc gom theo đúng cách đó.",hint:"Bấm Tiếp theo."},
-  {p:"ban",sel:'@bantt',t:"Chọn thực thể bạn đang làm việc cùng",d:"App tự mở sẵn thực thể hợp với chức danh của bạn: tư vấn thì Khách, học vụ và giảng viên thì Lớp, nhân sự thì Giảng viên. Con số trên mỗi nút là số hồ sơ còn việc của riêng bạn.",hint:"Bấm thử một thực thể khác để so."},
+  {p:"ban",sel:'@phead',t:"Mỗi giai đoạn có một thực thể trung tâm",d:"Bốn đối tượng được phục vụ: KHÁCH · HỌC VIÊN · PHỤ HUYNH · LỚP. Chưa học thì khách là trung tâm - mọi việc nhằm đưa họ vào lớp; đã học thì học viên và lớp là trung tâm; phụ huynh là người trả tiền và người cần được báo cáo. Bàn làm việc gom theo đúng bốn trục đó.",hint:"Bấm Tiếp theo."},
+  {p:"ban",sel:'@bantt',t:"Chọn thực thể bạn đang làm việc cùng",d:"App tự mở sẵn thực thể hợp với chức danh của bạn: tư vấn và marketing thì Khách, kế toán thì Học viên, học vụ và giảng viên thì Lớp. Con số trên mỗi nút là số hồ sơ còn việc của riêng bạn - không có số nghĩa là thực thể đó đang sạch việc với bạn.",hint:"Bấm thử một thực thể khác để so."},
   {p:"ban",sel:'@bstats',t:"Ba con số của bàn",d:"Bao nhiêu hồ sơ còn việc của tôi, bao nhiêu có việc gấp, bao nhiêu đang sạch. Hồ sơ sạch là hồ sơ không cần đụng tới - đó mới là đích.",hint:"Nhìn ba ô."},
   {p:"ban",sel:'@phead',t:"Mở một hồ sơ là thấy trọn việc",d:"Bấm một dòng: app hiện hồ sơ gọn và TẤT CẢ việc mà chức danh của bạn được làm với người đó, theo bảng phân quyền CH3 của SOP. Mỗi việc một nút - làm ngay, không phải đi tìm trang.",hint:"Xong phần Bàn làm việc!"}]},
  tq_sotracuu:{lv:"thamquan",t:"Sổ tra cứu - tìm gì cũng ra",ic:"ti-list-search",d:"5 bước - bộ lọc nhiều trục, chọn cột, xuất file",steps:[
@@ -15189,6 +15200,7 @@ var TOURS={
   {p:"dskhieunai",sel:'@tbarct',t:"Lọc nhiều trục cùng lúc",d:"Muốn biết có bao nhiêu khiếu nại về lịch học? Bấm Bộ lọc rồi chọn Loại khiếu nại. Mỗi sổ tự dựng trục lọc theo đúng cột của bảng đó - trạng thái, loại, mức độ, cơ sở, khoảng ngày - nên không sổ nào thiếu đường tìm.",hint:"Bấm nút Bộ lọc, chọn một giá trị rồi xem số dòng đổi."},
   {p:"dsbaitap",sel:'@tbarct',t:"Sổ nào cũng cùng một bộ công cụ",d:"Đổi sang sổ bài tập: vẫn ô tìm, vẫn Bộ lọc, vẫn Cột, vẫn Xuất, vẫn dòng đếm n/N ở cùng chỗ. Học một sổ là dùng được cả 13 sổ - không phải học lại từng cái.",hint:"So thanh công cụ với sổ vừa xem."},
   {p:"dsdiemdanh",sel:'@tbarct',t:"Chọn cột và xuất ra file",d:"Bấm Cột để tắt bớt cột không cần - bảng gọn lại, in ra vừa trang. Bấm Xuất là ra file CSV mở được bằng Excel, kèm đúng phần đang lọc chứ không phải cả bảng.",hint:"Bấm Cột, tắt vài cột, rồi bấm Xuất."},
+  {p:"dsphuhuynh",sel:'@phead',t:"Sổ phụ huynh - một người, tất cả các con",d:"Ba sổ trên đọc theo BẢNG dữ liệu. Sổ này đọc theo NGƯỜI: gộp học viên theo số điện thoại người đồng hành, nên nhận cuộc gọi \"tôi là mẹ cháu Minh\" là tra ra ngay người ấy có mấy con đang học, tổng còn nợ bao nhiêu, con nào đang cảnh báo. Bấm một dòng là sang thẳng Bàn làm việc đúng người đó.",hint:"Nhìn dải bốn số ở đầu trang."},
   {p:"dswow",sel:'@phead',t:"Từ sổ sang chỗ làm việc",d:"Tra ra rồi thì bấm nút ở đầu sổ để sang màn xử lý - sổ chỉ để đọc, mọi thao tác ghi đều nằm ở trang nghiệp vụ. Đó là lý do sổ không có nút Thêm.",hint:"Xong phần sổ tra cứu!"}]},
  tq_troly:{lv:"thamquan",t:"Hỏi Trợ lý - nhanh hơn đi tìm",ic:"ti-message-question",d:"4 bước - hỏi về người, hỏi số, hỏi chỉ số, hỏi chỗ cấu hình",steps:[
   {p:"hoidap",sel:'@phead',t:"Gõ tiếng Việt, không cần nhớ menu",d:"Trợ lý trả lời bốn loại câu hỏi: một hồ sơ (học viên, khách, nhân viên, lớp, khóa), một con số ('có bao nhiêu học viên nguy cơ'), một chỉ số (gõ mã như CVR), và chuyện của app ('đổi hotline ở đâu').",hint:"Bấm Tiếp theo."},
@@ -17382,7 +17394,7 @@ var TTHE=[
   d:"Đang học - trung tâm của mọi nghiệp vụ vận hành."},
  {k:"phuhuynh",t:"Phụ huynh",ic:"ti-users",   bang:"__PH", ma:"ph_id",      ten:"full_name", col:"#7C3AED",
   nguon:function(){return phDS()},
-  so:[],
+  so:["dsphuhuynh"],
   d:"Người đồng hành của học viên - dựng từ ba cột người đồng hành trong hồ sơ."},
  {k:"lop",    t:"Lớp",     ic:"ti-chalkboard", bang:"DL10", ma:"class_id",   ten:"class_name",col:"#6B4FA0",
   so:["dsbuoihoc","dsdiemdanh","dsbaitap"],
@@ -18074,6 +18086,60 @@ function banChon(k){window.BANTT=k;window.BANMO="";reRender("ban")}
 function banMo(ma){window.BANMO=ma;reRender("ban")}
 function banDong(){window.BANMO="";reRender("ban")}
 function banTT(){var k=window.BANTT||ttMacDinh();return TTBK[k]?k:"khach"}
+/* ── SỔ PHỤ HUYNH ─────────────────────────────────────────────────────────────────────────
+   Phụ huynh là thực thể DUY NHẤT trong bốn đối tượng được phục vụ mà không có sổ tra cứu của
+   riêng mình - ba cái kia có 3 tới 8 sổ. Đo được ở `_checkaudit`, và nó lệch thật: người trực
+   điện thoại nhận cuộc gọi "tôi là mẹ cháu Minh" thì không có chỗ nào tra ra người ấy có mấy
+   con đang học, còn nợ bao nhiêu, con nào đang có vấn đề.
+
+   Sổ này KHÔNG đẻ ra bảng dữ liệu mới. Phụ huynh vốn là dữ liệu SUY RA từ DL09 (gom theo số
+   điện thoại người đồng hành) - đúng cách `phDS()` đã làm cho Bàn làm việc. Dựng thêm một bảng
+   để "cho giống mấy sổ kia" là nhân đôi sự thật, rồi hai bản sẽ lệch nhau.
+   Vì thế nó là trang tự vẽ (`ty:"custom"`) chứ không phải sổ `ty:"list"` - và cũng vì thế nó
+   chỉ ĐỌC, mọi thao tác ghi vẫn nằm ở hồ sơ học viên, đúng luật của các sổ khác. */
+function phNo(P){var t=0;phCon(P).forEach(function(c){
+  ttDonCua(c.student_id).forEach(function(e){t+=num(e.remaining_amount)})});return t}
+function phNguyCo(P){return phCon(P).filter(function(c){
+  return stCls(c.attendance_progress_status)==="red"||stCls(c.academic_progress_status)==="red"}).length}
+function renderSoPH(){
+ var ds=phDS().filter(function(P){
+   try{return phCon(P).some(function(c){return canRow("DL09",c)})}catch(e){return true}});
+ var q=String(window.PHQ||"").trim().toLowerCase();
+ if(q)ds=ds.filter(function(P){
+   return (P.full_name+" "+P.phone_number+" "+phCon(P).map(function(c){return c.full_name}).join(" "))
+     .toLowerCase().indexOf(q)>=0});
+ var nhieuCon=ds.filter(function(P){return phCon(P).length>1}).length;
+ var coNo=ds.filter(function(P){return phNo(P)>0}).length;
+ var coRui=ds.filter(function(P){return phNguyCo(P)>0}).length;
+ var h=pageHead("Sổ phụ huynh","Một người đồng hành - tất cả các con đang theo học, công nợ và cảnh báo gộp về một chỗ");
+ h+=statStrip([
+  ["ti-users",ds.length,"Người đồng hành","#7C3AED","gộp theo số điện thoại"],
+  ["ti-users-group",nhieuCon,"Có từ 2 con trở lên","#3B82C4","gọi một lần nói được cả hai"],
+  ["ti-cash",coNo,"Còn nợ học phí","#B58A2B","cộng nợ của tất cả các con"],
+  ["ti-alert-triangle",coRui,"Có con đang cảnh báo","#E24B4A","chuyên cần hoặc học thuật"]],"dsphuhuynh");
+ h+='<div class="panel"><div class="ph"><b>Danh sách ('+ds.length+')</b>'+
+  '<input id="ph_q" style="margin-left:auto;max-width:260px" placeholder="Tìm tên, SĐT hoặc mã..."'+
+  ' value="'+esc(window.PHQ||"")+'" oninput="window.PHQ=this.value;reRender(\'dsphuhuynh\')">'+
+  '</div><div class="pbody">';
+ if(!ds.length)h+='<div class="empty">Không có người đồng hành nào khớp. Học viên chỉ vào sổ này khi hồ sơ có số điện thoại người đồng hành.</div>';
+ ds.slice(0,60).forEach(function(P){
+  var con=phCon(P), no=phNo(P), rui=phNguyCo(P);
+  h+='<div class="banrow" onclick="phMo(\''+esc(P.ph_id)+'\')">'+
+   '<span class="bani" style="background:#7C3AED18;color:#7C3AED"><i class="ti ti-users"></i></span>'+
+   '<div class="banmain"><div class="bant">'+esc(P.full_name)+
+     '<span class="mut" style="font-weight:500"> · '+esc(P.quanhe||"người đồng hành")+'</span></div>'+
+   '<div class="banm">'+telHTML(P.phone_number)+' · '+con.length+' con: '+
+     esc(con.map(function(c){return c.full_name}).join(", "))+'</div></div>'+
+   '<div class="banviec">'+
+    (no>0?'<span class="chip amber">còn nợ '+vnd(no)+'</span>':'<span class="chip green">đã đóng đủ</span>')+
+    (rui?'<span class="chip red" style="margin-left:6px">'+rui+' con cảnh báo</span>':'')+'</div>'+
+   '<i class="ti ti-chevron-right banch"></i></div>'});
+ if(ds.length>60)h+='<div class="mut" style="font-size:11.5px;padding-top:8px">... và '+(ds.length-60)+' người nữa. Gõ vào ô tìm để thu hẹp.</div>';
+ h+='</div></div>';
+ return h}
+/* Mở một phụ huynh = sang Bàn làm việc, đúng thực thể đó, đúng hồ sơ đó. Sổ chỉ để đọc; chỗ
+   LÀM là Bàn làm việc - giống hệt luật "từ sổ sang chỗ làm việc" của mười bốn sổ kia. */
+function phMo(id){window.BANTT="phuhuynh";window.BANMO=id;go("ban")}
 function renderBan(){
  var ttk=banTT(), T=TTBK[ttk];
  var h=pageHead("Bàn làm việc","Mở một "+T.t.toLowerCase()+" là thấy trọn việc của bạn với người đó",
@@ -18182,15 +18248,27 @@ function banThe(ttk,z){
  /* CÁC BỘ PHẬN KHÁC đang làm gì trên chính hồ sơ này. Không có khối này thì mỗi người mở hồ sơ
     ra chỉ thấy góc của mình - ba bộ phận cùng làm trên một học viên mà không ai biết hai người
     kia. Thấy được, nhưng KHÔNG có nút Làm: quyền chặn tay, không che mắt. */
+ /* GẤP LẠI, KHÔNG BỎ ĐI. Đo được: Marketing mở hồ sơ ra thấy 26 việc của mình bên cạnh 85 việc
+    của bộ phận khác - gấp 3.3 lần. Ở v5 khối này nằm sâu trong trang nghiệp vụ nên ít ai vấp;
+    ở v6 nó nằm ngay màn đáp, ngày nào cũng phải lướt qua. Xoá đi thì phạm đúng luật đã chốt
+    (quyền chặn TAY, không che MẮT), nên chỉ gấp: một dòng nói rõ có bao nhiêu việc và đang chờ
+    những bộ phận nào, bấm mới mở. Dùng thẻ <details> gốc của trình duyệt - không thêm JS, không
+    thêm trạng thái phải nhớ, và người dùng bàn phím vẫn mở được. */
  var khac=ttViecKhac(ttk,r);
  if(khac.length){
-  h+='<div class="sechd">Bộ phận khác đang làm trên hồ sơ này ('+khac.length+')</div>';
+  var _bp={};khac.forEach(function(x){var t=bpTenDS(x.bp);if(t)_bp[t]=1});
+  var _dsbp=Object.keys(_bp);
+  h+='<details class="bankgroup"><summary class="sechd bankmo">'+
+   'Bộ phận khác đang làm trên hồ sơ này ('+khac.length+')'+
+   (_dsbp.length?'<span class="mut" style="font-weight:500"> - đang chờ '+esc(_dsbp.join(", "))+'</span>':'')+
+   '</summary>';
   khac.forEach(function(x){
    h+='<div class="banjob bankhac">'+
     '<span class="banji"><i class="ti '+x.v.ic+'"></i></span>'+
     '<div class="banjt">'+esc(x.v.t)+
      '<div class="mut" style="font-size:11px">đang chờ <b>'+esc(bpTenDS(x.bp))+'</b></div></div>'+
     '<span class="chip gray" style="flex:none">không thuộc phần của bạn</span></div>'});
+  h+='</details>';
  }
  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">'+banNutHoSo(ttk,r)+'</div>';
  h+='</div></div>';
@@ -18235,7 +18313,7 @@ function banNutHoSo(ttk,r){
  if(ttk==="hocvien")return '<button class="btn" onclick="window.HOSO=\''+esc(r.student_id)+'\';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>';
  return '<button class="btn" onclick="openLop(\''+esc(r.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Mở lớp</button>'}
 
-var RENDER={ban:renderBan,hoidap:renderHoidap,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
+var RENDER={ban:renderBan,dsphuhuynh:renderSoPH,hoidap:renderHoidap,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
 function dashJump(key){var m={urgent:"viec",newlead:"nhaplead",consider:"viec",convert:"tuvan",risk:"viec",onboard:"xeplop",approve:"duyet",debt:"thanhtoan",complaint:"khieunai",ungraded:"baitap",testpend:"test",wowbook:"wow",unverified:"thanhtoan",classes:"banglop"};var pg=m[key];if(pg&&RBK[CURROLE].pages.indexOf(pg)>=0)go(pg);else go("viec")}
 
 /* ---------- router ---------- */
@@ -19039,7 +19117,7 @@ var NAVTREE=[
     học vụ phải mò mới thấy. */
  {g:"Chờ duyệt",items:["duyetck","duyethoan","duyetnghi","duyetthu","duyetgiao","banggiao"]},
  {g:"Điều hành",items:["baocao","settings"]},
- {g:"Tra cứu",items:["hocvien","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","giangvien","nhanvien"]}];
+ {g:"Tra cứu",items:["hocvien","dsphuhuynh","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","giangvien","nhanvien"]}];
 var NAVSUB={nhaplead:"tuyensinh",test:"tuyensinh",tuvan:"tuyensinh",thanhtoan:"tuyensinh",reup:"tuyensinh",
  review:"cskh",khaosat:"cskh",ghinhan:"cskh",khieunai:"cskh",ychv:"cskh",
  lop:"hoctap",buoihoc:"hoctap",lichtuan:"hoctap",wow:"hoctap",gvdp:"hoctap",phong:"hoctap",
@@ -19145,7 +19223,7 @@ var NAVTREE6=[
     gần như là làm cho người ta không thấy. */
  {g:"Làm hàng loạt",items:["xeplop","banglop","baitap","banggiao","bangcong","giaoan",
    "tuyensinh","hoctap","cskh","ketthuc"]},
- {g:"Tra cứu",items:["hocvien","giangvien","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan",
+ {g:"Tra cứu",items:["hocvien","dsphuhuynh","giangvien","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan",
    "dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai"]},
  {g:"Quản lý",items:["baocao","nhansu","hoidap","khac","settings"]}];
 function buildNav(){

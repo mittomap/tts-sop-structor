@@ -189,6 +189,37 @@ function motNgay(A, dsTT) {
         r.trong.join(", "));
   });
 
+  /* 7. BÀI HƯỚNG DẪN CÓ ĐANG TẢ ĐÚNG APP KHÔNG.
+     `_checktour` canh các BƯỚC chạy được - neo tìm thấy, hộp vẽ ra. Nó không canh LỜI NÓI.
+     Đã cắn thật: sau khi bỏ Giảng viên khỏi bốn thực thể và thêm Phụ huynh vào, bài "Bàn làm
+     việc" vẫn dạy *"Khối Nhân sự thì làm việc với GIẢNG VIÊN"* và *"nhân sự thì Giảng viên"* -
+     hai câu tả một app không còn tồn tại, mà mọi bộ kiểm đều xanh vì các bước vẫn chạy.
+     Luật: **các bước chạy được không có nghĩa là lời nói còn đúng.** */
+  const TTTEN = {}; try { (TTHE || []).forEach(x => TTTEN[String(x.t).toLowerCase()] = 1); } catch (e) {}
+  const CUTHE = ["giảng viên", "giáo viên"];   /* từng là thực thể, nay không còn */
+  const loiTour = [];
+  try {
+    Object.keys(TOURS || {}).forEach(k => {
+      (TOURS[k].steps || []).forEach((st, i) => {
+        if (st.p !== "ban") return;   /* chỉ soi bài nói về Bàn làm việc - nơi bốn thực thể sống */
+        const txt = String((st.t || "") + " " + (st.d || "") + " " + (st.hint || "")).toLowerCase();
+        /* Một từ có thể vừa là CHỨC DANH vừa từng là THỰC THỂ. "học vụ và giảng viên thì Lớp"
+           là câu đúng - giảng viên ở đây là người, không phải thực thể. Bản đầu của luật này
+           cấm cả hai, và nó bắt em phải bẻ câu chữ cho vừa cái thước thay vì ngược lại.
+           Chỉ bắt đúng cái sai thật: từ ấy đứng ở VẾ TRẢ LỜI - ngay sau "thì", tức app đang
+           gán nó làm thực thể mặc định của một nhóm. Đó chính là câu đã sai:
+           *"nhân sự thì Giảng viên"*. */
+        CUTHE.forEach(w => {
+          if (TTTEN[w]) return;
+          if (txt.indexOf("thì " + w) >= 0)
+            loiTour.push(k + " buoc " + (i + 1) + ': gan "' + w + '" lam thuc the ("thi ' + w +
+              '"), ma bon thuc the nay la ' + Object.keys(TTTEN).join("/"));
+        });
+      });
+    });
+  } catch (e) {}
+  loiTour.forEach(x => xau.push("BAI HUONG DAN ta sai truc thuc the: " + x));
+
   /* ---- in bảng ---------------------------------------------------------------------------- */
   console.log("  MOT NGAY CUA TUNG CHUC DANH (ho so thay | ho so co viec | viec cua toi | " +
     "viec cua bo phan khac | bang viec | trang dap | so buoc toi viec dau tien)");

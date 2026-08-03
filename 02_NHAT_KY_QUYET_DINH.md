@@ -149,6 +149,25 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.83 — DỌN BA VIỆC TREO ✅ (03/08).**
+> · **Khối "bộ phận khác" gấp lại** bằng thẻ `<details>` gốc: một dòng ghi số việc và đang chờ
+> những bộ phận nào, bấm mới mở. Marketing đang 85 việc của người khác cạnh 26 việc của mình -
+> ở v5 khối ấy nằm sâu trong trang, ở v6 nó nằm ngay màn đáp nên chói hơn. **Gấp, không xoá** -
+> quyền chặn tay, không che mắt.
+> · **Sổ phụ huynh** (`dsphuhuynh`): thực thể duy nhất chưa có sổ nay có. Một người đồng hành -
+> tất cả các con, công nợ cộng lại, số con đang cảnh báo. **Không đẻ bảng dữ liệu mới**: suy ra
+> từ DL09 như `phDS()` vẫn làm - dựng bảng thứ hai là nhân đôi sự thật rồi hai bản lệch nhau.
+> · **Bài hướng dẫn tả sai trục thực thể** - lỗi thật, và không bộ kiểm nào thấy: sau khi bỏ
+> Giảng viên khỏi bốn thực thể, bài "Bàn làm việc" vẫn dạy *"Khối Nhân sự thì làm việc với GIẢNG
+> VIÊN"*. Các bước vẫn chạy nên `_checktour` vẫn xanh. **Luật: các bước chạy được không có nghĩa
+> là lời nói còn đúng.**
+> · **Ba lần cái thước tố oan trong một buổi.** Đo "trang có trong cây menu không" - sai, vì 30
+> trang nằm trong `VIEW_ALWAYS` mở được mà không có trên menu, nên cả hai bản đều đỏ ~20 chỗ như
+> nhau. Đo "câu chữ nhắc tên nhóm menu" - cũng sai, vì "Bàn làm việc" là tên TRANG. Cấm từ
+> "giảng viên" - sai nốt, vì nó vừa là chức danh vừa từng là thực thể. **Chỉ khi bắt đúng
+> `"thì <từ>"` - vế trả lời của một phép gán - thước mới trúng.**
+> · **Luật:** *thấy thước bắt một câu đúng thì siết thước, đừng bẻ câu chữ cho vừa nó.*
+
 > **Phiên bản: V9.82 — MỘT NGÀY CỦA TỪNG CHỨC DANH, VÀ BA NGƯỜI NHÂN SỰ ĐỨNG TRƯỚC TƯỜNG ✅ (02/08).**
 > · Anh Luân hỏi nhân viên chê gì. Sự thật: **chưa ai dùng thử nên chưa ai nói gì** - em không bịa
 > ra lời của người chưa nói. Nhưng có mấy dạng kẹt máy hỏi thay được, nên dựng `_src/_checkngay.js`.
@@ -7183,4 +7202,57 @@ hoàn toàn giả. Đối chứng xong **phải trích lại**.
 ### Số chốt phiên
 18 chức danh, **0 việc mồ côi**, 0 người mở app ra bảng trống, 3 chỗ "cần xem thêm" (Marketing).
 `_checkngay` đã vào `verify.sh` cho cả hai bản build.
+
+## V9.83 - DỌN BA VIỆC TREO (03/08)
+
+Anh Luân: *"okey e xử lý mấy việc treo đi"*.
+
+### 1. Khối "bộ phận khác" gấp lại
+Đo được từ phiên trước: Marketing mở hồ sơ ra thấy **26 việc của mình bên cạnh 85 việc của bộ
+phận khác** - gấp 3.3 lần. Ở v5 khối ấy nằm sâu trong trang nghiệp vụ nên ít ai vấp; ở v6 nó nằm
+ngay màn đáp, ngày nào cũng phải lướt qua.
+
+Xoá đi thì phạm luật đã chốt (*quyền chặn TAY, không che MẮT*), nên chỉ **gấp**: dùng thẻ
+`<details>` gốc của trình duyệt, dòng tóm tắt ghi rõ có bao nhiêu việc và **đang chờ những bộ phận
+nào**, bấm mới mở. Không thêm JS, không thêm trạng thái phải nhớ, người dùng bàn phím vẫn mở được.
+
+### 2. Sổ phụ huynh
+Phụ huynh là thực thể duy nhất trong bốn đối tượng không có sổ tra cứu riêng - ba cái kia có 3 tới
+8 sổ. Lệch thật: người trực điện thoại nhận cuộc gọi "tôi là mẹ cháu Minh" không có chỗ nào tra ra
+người ấy có mấy con đang học, nợ bao nhiêu, con nào đang có vấn đề.
+
+`dsphuhuynh` trả lời đúng ba câu đó. Quyết định quan trọng: **không đẻ bảng dữ liệu mới**. Phụ
+huynh vốn là dữ liệu suy ra từ DL09 (gom theo số điện thoại người đồng hành) - đúng cách `phDS()`
+đã làm cho Bàn làm việc. Dựng thêm một bảng cho "giống mấy sổ kia" là nhân đôi sự thật rồi hai bản
+sẽ lệch nhau. Vì thế nó là trang tự vẽ (`ty:"custom"`), và cũng vì thế nó chỉ ĐỌC - mọi thao tác
+ghi vẫn ở hồ sơ học viên, đúng luật của mười bốn sổ kia.
+
+### 3. Bài hướng dẫn tả sai trục thực thể - lỗi thật
+Sau khi bỏ Giảng viên khỏi bốn thực thể và thêm Phụ huynh vào, bài "Bàn làm việc" **vẫn dạy**:
+> *"Khối Nhân sự thì làm việc với GIẢNG VIÊN"* · *"nhân sự thì Giảng viên"*
+
+Hai câu tả một app không còn tồn tại. Mọi bộ kiểm vẫn xanh vì **các bước vẫn chạy** - `_checktour`
+canh neo tìm thấy và hộp vẽ ra, nó không canh LỜI NÓI.
+
+**Luật: các bước chạy được không có nghĩa là lời nói còn đúng.** Nay `_checkngay` có tiêu chí
+riêng cho chuyện này, và đã chứng minh bằng bản cũ: đỏ đúng 2 chỗ ấy.
+
+### Ba lần cái thước tố oan trong một buổi
+Việc 3 phải đo lại **ba lần** mới trúng:
+1. *"Trang có nằm trong cây menu không"* - sai. 30 trang nằm trong `VIEW_ALWAYS` mở được mà không
+   có trên menu, nên **cả hai bản đều đỏ ~20 chỗ như nhau**. Một phép đo mà hai bản khác hẳn nhau
+   lại ra cùng kết quả thì nó đang đo thứ khác, không phải thứ mình hỏi.
+2. *"Câu chữ nhắc tên nhóm menu không có ở bản này"* - cũng sai. Nó tố bài `tq_ban` ở v5 vì nhắc
+   "Bàn làm việc", trong khi đó là tên **trang**, không phải tên nhóm.
+3. *Cấm từ "giảng viên"* - sai nốt. Câu sửa của em có "học vụ và giảng viên thì Lớp" - ở đây giảng
+   viên là **chức danh**, không phải thực thể. Cái thước bắt em bẻ câu chữ cho vừa nó.
+
+Chỉ khi bắt đúng mẫu **`"thì <từ>"`** - tức vế TRẢ LỜI của một phép gán thực thể - nó mới trúng
+đúng câu sai thật và tha câu đúng.
+
+**Luật:** *thấy thước bắt một câu đúng thì siết thước, đừng bẻ câu chữ cho vừa nó.*
+
+### Số chốt phiên
+44 trang (thêm sổ phụ huynh), icon 220 đủ. `_checkngay` xanh cả hai bản, và đỏ 4 chỗ trên bản cũ -
+chứng minh nó cắn được.
 
