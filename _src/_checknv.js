@@ -81,8 +81,11 @@ const AITHUC = () => {
 /* Điền mọi ô còn trống trong ngăn kéo. Điền GIÁ TRỊ HỢP LỆ, không điền bừa: ô ngày ra ngày,
    ô số ra số, ô chọn giữ nguyên mặc định của app (mặc định là do app tự chọn, sửa đi là đo
    một đường mà người thật đi một đường khác). */
-const DIEN = () => {
-  const box = document.getElementById("drawerBody");
+/* V9.99d: DIEN nhan PHAM VI. Ban V6 dien trong ngan keo; ban V5 nhay sang mot trang ma CHINH
+   TRANG DO la cai form (vd bam Lam -> trang "chay", nut ghi ten "Luu & tiep tuc" nam thang tren
+   trang). Mot ham dien dung cho ca hai, khong chep doi. */
+const DIEN = (pham) => {
+  const box = document.getElementById(pham || "drawerBody");
   if (!box) return 0;
   const d = new Date(); const p = n => String(n).padStart(2, "0");
   const ngay = d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
@@ -193,7 +196,7 @@ const TRANGTHAI = () => {
   const ghi = [];          /* chỗ đáng ghi chú, không tính đỏ */
   const ochonDaBao = new Set();
   let dem = {luot: 0, ghiDuoc: 0, tuChoi: 0, imLang: 0, khongKeo: 0, loiJS: 0, nhay: 0, tiep: 0, oTim: 0,
-             moTuTrang: 0, khongCho: 0};
+             moTuTrang: 0, khongCho: 0, ghiTrenTrang: 0};
 
   for (const F of FILES) {
     if (!fs.existsSync(path.resolve(OUT) + "/" + F)) { do_.push(F + ": khong co file build"); continue; }
@@ -318,6 +321,52 @@ const TRANGTHAI = () => {
             /* ĐI TIẾP đường ghi của bản V5: mở một hồ sơ trên trang vừa tới. Mở không được thì
                vẫn tính là "nhảy trang đúng" - không phải trang nào cũng là trang ghi (báo cáo,
                bản đồ chặng chỉ để đọc). Chỉ khi mở được mới chấm tiếp việc GHI. */
+            /* CHINH TRANG VUA TOI CO PHAI LA FORM KHONG? Do la cach ban V5 lam viec: bam Lam
+               -> nhay sang trang "chay" -> dien ngay tren trang -> bam "Luu & tiep tuc".
+               Bay da can khi dung bo nay: em cu di tim mot thu de BAM CHO NGAN KEO MO RA, mo
+               duoc 7 cai nhung ca 7 deu la ngan keo XEM HO SO (chi doc, khong nut Luu) - nen
+               ghiDuoc van 0. Sai o MO HINH, khong phai o selector: tren ban V5 phan lon cho ghi
+               khong nam trong ngan keo nao ca. Do bang mat mot lan la ra, doan selector ba lan
+               thi khong. */
+            const nutGhi = page.locator("#content button.btn.primary")
+              .filter({hasText: /Lưu|Ghi|Xác nhận|Gửi|Chốt|Duyệt|Tạo|Đặt|Đánh dấu|Hoàn tất|Nhận|Bàn giao/i}).first();
+            if (await nutGhi.count()) {
+              await page.evaluate(DIEN, "content");
+              /* Lấy nhãn nút TRƯỚC khi bấm. Bấm xong trang vẽ lại, locator trỏ sang phần tử
+                 khác - đọc nhãn lúc đó ra "?" và câu báo lỗi chỉ vào một cái nút không tồn tại. */
+              const nhanNut = (await nutGhi.textContent().catch(() => "?")).replace(/\s+/g, " ").trim().slice(0, 26);
+              const truoc0 = st.log;
+              await page.evaluate(() => { const t = document.getElementById("toast");
+                if (t) { t.classList.remove("show"); t.textContent = ""; } });
+              await nutGhi.click({timeout: 5000}).catch(() => {});
+              await page.waitForTimeout(220);
+              let st2 = await page.evaluate(TRANGTHAI);
+              if (st2.hoi) {
+                await page.locator("#cfm button.btn.primary").last().click({timeout: 4000}).catch(() => {});
+                await page.waitForTimeout(200);
+                st2 = await page.evaluate(TRANGTHAI);
+              }
+              if (loiJS.length) { dem.loiJS++; do_.push(cx + ": LOI JS khi Luu tren trang - " + loiJS[0]); continue; }
+              if (st2.log > truoc0) { dem.ghiDuoc++; dem.ghiTrenTrang++; continue; }
+              /* NUT DO MO RA MOT FORM, chu khong ghi ngay - va do la mot ket cuc HOAN TOAN DUNG.
+                 Bay da can: ban dau em cham moi luot "bam ma DL25 khong dai them" la IM LANG, ra
+                 59 cho do trong khi app khong sai gi ca - "Ghi nhan khoan thu" tren trang Tuyen
+                 sinh mo mot ngan keo de nhap so tien, dung nhu no phai lam. Mot cai nut mo form
+                 khong phai mot cai nut chet.
+                 Nen: ngan keo mo ra thi DI TIEP bang chinh khoi dien-va-Luu cua ngan keo phia
+                 duoi - khong `continue`, de luong chay xuong do. */
+              if (st2.keoMo) { st = st2; }
+              else if (st2.toast) { dem.tuChoi++; continue; }
+              else {
+              dem.imLang++;
+              do_.push(cx + ": bam \"" + nhanNut + "\" tren trang " + st.cur
+                + " ma KHONG GHI, khong mo form, cung khong noi gi");
+              continue;
+              }
+            }
+
+            /* Trang khong tu no la form: thu mo mot ho so tren do (mot so man van lam kieu
+               ngan keo). Mo khong duoc thi la trang chi de doc - khong cham diem ghi. */
             const moBang = await page.evaluate(MOKEO);
             if (!moBang) { dem.khongCho++; continue; }
             await page.waitForTimeout(320);
@@ -348,7 +397,7 @@ const TRANGTHAI = () => {
         }
 
         /* BƯỚC 5 - điền rồi Lưu. Nút Lưu là nút primary trong .dact, không phải nút Đóng. */
-        await page.evaluate(DIEN);
+        await page.evaluate(DIEN, "drawerBody");
         /* Nút GHI là nút chính có chữ nói tới việc ghi - không lấy bừa nút primary cuối cùng:
            trong ngăn kéo dùng lại của app còn có nút "Mở màn", "Xem", "Đóng" cũng là primary. */
         const luu = page.locator("#drawerBody button.btn.primary")
@@ -410,6 +459,7 @@ const TRANGTHAI = () => {
     " - ghi duoc " + dem.ghiDuoc + " (trong do " + dem.tiep + " luot mo tiep man ke) · tu choi co loi " + dem.tuChoi +
     (dem.nhay ? " · nhay trang (ban 5) " + dem.nhay : "") +
     (dem.moTuTrang ? " · mo tiep ho so tu trang vua toi " + dem.moTuTrang : "") +
+    (dem.ghiTrenTrang ? " · trong do GHI THANG TREN TRANG (ban 5) " + dem.ghiTrenTrang : "") +
     (dem.khongCho ? " · trang chi de doc " + dem.khongCho : "") +
     (dem.imLang ? " · IM LANG " + dem.imLang : "") +
     (dem.khongKeo ? " · khong mo ngan keo " + dem.khongKeo : "") +

@@ -31,6 +31,17 @@ Chủ dự án: Luân. Mọi phiên làm việc (Claude Code hay Claude Cowork) 
   pipeline, không sửa tay JSON.
 - Thêm icon ti-* mới = dựng lại font subset theo công thức trong README_SRC (thiếu là _tall.js báo).
 
+## Anh Luân nói "audit" = chạy trọn `GIAO_THUC_AUDIT.md`
+
+Anh Luân đặt 04/08: *"lưu cái này lại cho những lần anh yêu cầu audit, cần bổ sung thêm gì thì em
+bổ sung, cái anh yêu cầu phải có nhé"*. Chín mảng: **giao diện · nghiệp vụ · chức năng · dữ liệu
+demo (nhất là nút Reset demo) · ngữ cảnh** (năm mảng anh đặt, bắt buộc) cộng **phạm vi dữ liệu ·
+nhất quán ba cổng · tài liệu · khai thẳng phần chưa đo được** (bổ sung).
+
+Nhớ nhất: **trước khi giao, anh Luân sẽ bấm nút Reset demo** - nó phải kéo demo về trạng thái
+hoàn hảo ở cả ba cổng, mọi chức danh đều có việc, ngày tháng kéo về hiện tại, mà cấu hình đã
+chỉnh thì giữ nguyên.
+
 ## LUẬT CỨNG SỐ 0 - PHỦ TRỌN SOP (anh Luân chốt 29/07, cao hơn mọi luật khác)
 
 > *"Chúng ta viết app để phục vụ trọn vẹn SOP, nếu làm xong mà chưa thể hiện đủ 100% SOP tức là
