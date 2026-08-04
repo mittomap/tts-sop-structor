@@ -8958,7 +8958,7 @@ function renderSetQA(){
  h+='</div></div>';
  /* ---- NỐI AI MIỄN PHÍ (V9.51) ---- */
  var A=aiCfg(),P=AIPROV[A.prov];
- h+='<div class="panel"><div class="ph"><b><i class="ti ti-sparkles" style="margin-right:6px"></i>Nối Trợ lý với một AI miễn phí</b>'+
+ h+='<div class="panel" data-tour="cfai"><div class="ph"><b><i class="ti ti-sparkles" style="margin-right:6px"></i>Nối Trợ lý với một AI miễn phí</b>'+
   (aiOn()?'<span class="chip green">đang BẬT · '+esc(P.t)+'</span>':'<span class="chip">đang tắt</span>')+'</div><div class="pbody">';
  h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i><span data-tip="Máy trả lời trước bằng chính bộ luật app: số liệu, nút hành động, hướng dẫn từng bước. AI hợp với câu kiểu vì sao SOP bắt gọi trong 15 phút, hoặc giải thích quy trình bảo lưu cho học viên. Khi bật, câu hỏi và phần ngữ cảnh liên quan được gửi tới nhà cung cấp AI; API key nằm trên máy này, không nhúng vào bản build."><b>Máy trả lời trước, AI diễn giải thêm bằng lời người.</b><i class="ti ti-info-circle gyti"></i></span></div>';
  h+='<div class="fld"><label>Bật / tắt</label><select id="ai_on"><option value="0"'+(A.on?"":" selected")+'>Tắt - chỉ trả lời bằng máy</option><option value="1"'+(A.on?" selected":"")+'>Bật - máy trả lời trước, AI diễn giải thêm</option></select></div>';
@@ -14332,8 +14332,8 @@ var TOURS={
   /* Bước cuối của bài đầu tiên là chỗ đắt nhất để đặt câu này: người dùng vừa xem xong app,
      đúng lúc họ sắp có ý kiến đầu tiên. Đợt dùng thử sống hay chết là ở chỗ góp ý có được ghi
      lại hay trôi mất trong tin nhắn. */
-  {p:"gopy",sel:'@phead',t:"Thấy gì chưa ổn thì báo ngay tại đây",d:"Nút hình loa ở thanh trên mở ô báo lỗi - app tự ghi sẵn bạn đang ở trang nào, đăng nhập bằng ai, dùng bản nào; bạn chỉ gõ một câu và dán ảnh chụp màn hình. Mọi phiếu gom về trang này, xuất ra một tệp gửi cho người tổng hợp.",hint:"Bấm Tiếp theo - bước cuối."},
-  {p:"canhan",sel:'@phead',t:"Chỗ của riêng bạn",d:"Ảnh đại diện, số điện thoại liên hệ, và những thói quen dùng app trên máy này: tỷ lệ hiển thị, bật tắt bánh răng sửa tại chỗ, bề rộng ngăn kéo. Khác với Cài đặt - Cài đặt là của cả trung tâm, trang này chỉ mình bạn thấy.",hint:"Xong phần tham quan. Thử cấp độ Trải nghiệm để làm việc thật."}]},
+  {p:"gopy",sel:'@man',t:"Thấy gì chưa ổn thì báo ngay tại đây",d:"Nút hình loa ở thanh trên mở ô báo lỗi - app tự ghi sẵn bạn đang ở trang nào, đăng nhập bằng ai, dùng bản nào; bạn chỉ gõ một câu và dán ảnh chụp màn hình. Mọi phiếu gom về trang này, xuất ra một tệp gửi cho người tổng hợp.",hint:"Bấm Tiếp theo - bước cuối."},
+  {p:"canhan",sel:'@man',t:"Chỗ của riêng bạn",d:"Ảnh đại diện, số điện thoại liên hệ, và những thói quen dùng app trên máy này: tỷ lệ hiển thị, bật tắt bánh răng sửa tại chỗ, bề rộng ngăn kéo. Khác với Cài đặt - Cài đặt là của cả trung tâm, trang này chỉ mình bạn thấy.",hint:"Xong phần tham quan. Thử cấp độ Trải nghiệm để làm việc thật."}]},
  /* ---------- CẤP 2: TRẢI NGHIỆM THEO VỊ TRÍ ---------- */
  /* V9.66 - HAI BÀI MỚI. Đo trước khi thêm: 13 bài / 75 bước cho một app 33 trang, trong đó
     13 SỔ TRA CỨU không có một bước nào - mà đó chính là chỗ anh Luân vừa bắt lỗi thiếu bộ lọc
@@ -14343,67 +14343,71 @@ var TOURS={
  /* V9.69 - bài đầu tiên của app. Bàn làm việc là TRỤC MỚI, mà trục mới thì phải dạy trước
     mọi thứ khác - nếu không người dùng vẫn quay về thói quen đi tìm theo trang. */
  tq_ban:{lv:"thamquan",chi:"6",t:"Bàn làm việc - mở một người, làm hết việc",ic:"ti-focus-2",d:"4 bước - thực thể trung tâm của từng giai đoạn",steps:[
-  {p:"ban",sel:'@phead',t:"Mỗi giai đoạn có một thực thể trung tâm",d:"Bốn đối tượng được phục vụ: KHÁCH · HỌC VIÊN · PHỤ HUYNH · LỚP. Chưa học thì khách là trung tâm - mọi việc nhằm đưa họ vào lớp; đã học thì học viên và lớp là trung tâm; phụ huynh là người trả tiền và người cần được báo cáo. Bàn làm việc gom theo đúng bốn trục đó.",hint:"Bấm Tiếp theo."},
+  {p:"ban",sel:'@man',t:"Mỗi giai đoạn có một thực thể trung tâm",d:"Bốn đối tượng được phục vụ: KHÁCH · HỌC VIÊN · PHỤ HUYNH · LỚP. Chưa học thì khách là trung tâm - mọi việc nhằm đưa họ vào lớp; đã học thì học viên và lớp là trung tâm; phụ huynh là người trả tiền và người cần được báo cáo. Bàn làm việc gom theo đúng bốn trục đó.",hint:"Bấm Tiếp theo."},
   {p:"ban",sel:'@bantt',t:"Chọn thực thể bạn đang làm việc cùng",d:"App tự mở sẵn thực thể hợp với chức danh của bạn: tư vấn và marketing thì Khách, kế toán thì Học viên, học vụ và giảng viên thì Lớp. Con số trên mỗi nút là số hồ sơ còn việc của riêng bạn - không có số nghĩa là thực thể đó đang sạch việc với bạn.",hint:"Bấm thử một thực thể khác để so."},
   {p:"ban",sel:'@bstats',t:"Ba con số của bàn",d:"Bao nhiêu hồ sơ còn việc của tôi, bao nhiêu có việc gấp, bao nhiêu đang sạch. Hồ sơ sạch là hồ sơ không cần đụng tới - đó mới là đích.",hint:"Nhìn ba ô."},
-  {p:"ban",sel:'@phead',t:"Mở một hồ sơ là thấy trọn việc",d:"Bấm một dòng: app hiện hồ sơ gọn và TẤT CẢ việc mà chức danh của bạn được làm với người đó, theo bảng phân quyền CH3 của SOP. Mỗi việc một nút - làm ngay, không phải đi tìm trang.",hint:"Xong phần Bàn làm việc!"}]},
+  {p:"ban",sel:'@man',t:"Mở một hồ sơ là thấy trọn việc",d:"Bấm một dòng: app hiện hồ sơ gọn và TẤT CẢ việc mà chức danh của bạn được làm với người đó, theo bảng phân quyền CH3 của SOP. Mỗi việc một nút - làm ngay, không phải đi tìm trang.",hint:"Xong phần Bàn làm việc!"}]},
  tq_sotracuu:{lv:"thamquan",t:"Sổ tra cứu - tìm gì cũng ra",ic:"ti-list-search",d:"5 bước - bộ lọc nhiều trục, chọn cột, xuất file",steps:[
-  {p:"dskhieunai",sel:'@phead',t:"Sổ tra cứu là gì",d:"Mỗi bảng dữ liệu của SOP có một sổ tra cứu riêng: khiếu nại, bài tập, điểm danh, buổi WOW, phiếu thu... Sổ là nơi TRA, còn nơi LÀM là các trang nghiệp vụ - nút đầu trang luôn chỉ sang đó.",hint:"Nhìn dòng phụ đề: nó ghi rõ sổ này đọc bảng DL nào."},
+  {p:"dskhieunai",sel:'@man',t:"Sổ tra cứu là gì",d:"Mỗi bảng dữ liệu của SOP có một sổ tra cứu riêng: khiếu nại, bài tập, điểm danh, buổi WOW, phiếu thu... Sổ là nơi TRA, còn nơi LÀM là các trang nghiệp vụ - nút đầu trang luôn chỉ sang đó.",hint:"Nhìn dòng phụ đề: nó ghi rõ sổ này đọc bảng DL nào."},
   {p:"dskhieunai",sel:'@tbarct',t:"Lọc nhiều trục cùng lúc",d:"Muốn biết có bao nhiêu khiếu nại về lịch học? Bấm Bộ lọc rồi chọn Loại khiếu nại. Mỗi sổ tự dựng trục lọc theo đúng cột của bảng đó - trạng thái, loại, mức độ, cơ sở, khoảng ngày - nên không sổ nào thiếu đường tìm.",hint:"Bấm nút Bộ lọc, chọn một giá trị rồi xem số dòng đổi."},
   {p:"dsbaitap",sel:'@tbarct',t:"Sổ nào cũng cùng một bộ công cụ",d:"Đổi sang sổ bài tập: vẫn ô tìm, vẫn Bộ lọc, vẫn Cột, vẫn Xuất, vẫn dòng đếm n/N ở cùng chỗ. Học một sổ là dùng được cả 13 sổ - không phải học lại từng cái.",hint:"So thanh công cụ với sổ vừa xem."},
   {p:"dsdiemdanh",sel:'@tbarct',t:"Chọn cột và xuất ra file",d:"Bấm Cột để tắt bớt cột không cần - bảng gọn lại, in ra vừa trang. Bấm Xuất là ra file CSV mở được bằng Excel, kèm đúng phần đang lọc chứ không phải cả bảng.",hint:"Bấm Cột, tắt vài cột, rồi bấm Xuất."},
-  {p:"dsphuhuynh",sel:'@phead',t:"Sổ phụ huynh - một người, tất cả các con",d:"Ba sổ trên đọc theo BẢNG dữ liệu. Sổ này đọc theo NGƯỜI: gộp học viên theo số điện thoại người đồng hành, nên nhận cuộc gọi \"tôi là mẹ cháu Minh\" là tra ra ngay người ấy có mấy con đang học, tổng còn nợ bao nhiêu, con nào đang cảnh báo. Bấm một dòng là sang thẳng Bàn làm việc đúng người đó.",hint:"Nhìn dải bốn số ở đầu trang."},
-  {p:"dswow",sel:'@phead',t:"Từ sổ sang chỗ làm việc",d:"Tra ra rồi thì bấm nút ở đầu sổ để sang màn xử lý - sổ chỉ để đọc, mọi thao tác ghi đều nằm ở trang nghiệp vụ. Đó là lý do sổ không có nút Thêm.",hint:"Xong phần sổ tra cứu!"}]},
+  {p:"dsphuhuynh",sel:'@man',t:"Sổ phụ huynh - một người, tất cả các con",d:"Ba sổ trên đọc theo BẢNG dữ liệu. Sổ này đọc theo NGƯỜI: gộp học viên theo số điện thoại người đồng hành, nên nhận cuộc gọi \"tôi là mẹ cháu Minh\" là tra ra ngay người ấy có mấy con đang học, tổng còn nợ bao nhiêu, con nào đang cảnh báo. Bấm một dòng là sang thẳng Bàn làm việc đúng người đó.",hint:"Nhìn dải bốn số ở đầu trang."},
+  {p:"dswow",sel:'@man',t:"Từ sổ sang chỗ làm việc",d:"Tra ra rồi thì bấm nút ở đầu sổ để sang màn xử lý - sổ chỉ để đọc, mọi thao tác ghi đều nằm ở trang nghiệp vụ. Đó là lý do sổ không có nút Thêm.",hint:"Xong phần sổ tra cứu!"}]},
  tq_troly:{lv:"thamquan",t:"Hỏi Trợ lý - nhanh hơn đi tìm",ic:"ti-message-question",d:"4 bước - hỏi về người, hỏi số, hỏi chỉ số, hỏi chỗ cấu hình",steps:[
-  {p:"hoidap",sel:'@phead',t:"Gõ tiếng Việt, không cần nhớ menu",d:"Trợ lý trả lời bốn loại câu hỏi: một hồ sơ (học viên, khách, nhân viên, lớp, khóa), một con số ('có bao nhiêu học viên nguy cơ'), một chỉ số (gõ mã như CVR), và chuyện của app ('đổi hotline ở đâu').",hint:"Bấm Tiếp theo."},
+  {p:"hoidap",sel:'@man',t:"Gõ tiếng Việt, không cần nhớ menu",d:"Trợ lý trả lời bốn loại câu hỏi: một hồ sơ (học viên, khách, nhân viên, lớp, khóa), một con số ('có bao nhiêu học viên nguy cơ'), một chỉ số (gõ mã như CVR), và chuyện của app ('đổi hotline ở đâu').",hint:"Bấm Tiếp theo."},
   {p:"hoidap",sel:'@qabox',t:"Hỏi về một con người",d:"Gõ tên một học viên: Trợ lý đọc hồ sơ rồi trả lời hiện trạng, vì sao có cảnh báo, và việc phải làm tiếp theo SOP - kèm nút mở thẳng màn xử lý. Trùng tên thì nó hỏi lại chứ không đoán bừa.",hint:"Gõ tên một học viên rồi bấm Hỏi."},
   {p:"hoidap",sel:'@qavd',t:"Hỏi số - và số đó là số thật",d:"Bấm thử câu mẫu 'có bao nhiêu học viên nguy cơ'. Con số trả về chính là con số app đang hiện trên thẻ, tính lại tại chỗ theo ngưỡng CH2 - không phải số gõ sẵn. Bên dưới còn liệt kê cụ thể là ai.",hint:"Bấm một câu mẫu."},
   {p:"hoidap",sel:'@qabox',t:"Không hiểu thì nói là không hiểu",d:"Hỏi câu Trợ lý chưa trả lời được thì nó nói thẳng, gợi ý những thứ gần nhất, và GHI câu đó vào sổ trong Cài đặt để quản trị viên soạn câu trả lời một lần - lần sau app trả lời được ngay.",hint:"Xong phần Trợ lý!"}]},
  tn_sale:{lv:"trainghiem",role:"Nhân viên Tư vấn",t:"Một ngày của Nhân viên Tư vấn",ic:"ti-phone",d:"8 bước - từ khách mới tới lúc thu tiền",steps:[
   {p:(V6()?"ban":"banlam"),sel:'@bstats',t:"Mở máy là nhìn 5 ô này",d:"Tới hẹn hôm nay là việc gấp nhất - khách đã hẹn mà không gọi là mất. Sau đó tới học viên nguy cơ và đăng ký còn nợ. Ô chỉ để xem; muốn ra danh sách thì bấm chip Tới hẹn / quá hẹn ở thanh Nhóm.",hint:"Bấm chip Tới hẹn / quá hẹn ở thanh Nhóm."},
-  {p:"nhaplead",sel:'@txt:Thêm mới',t:"Khách mới gọi đến",d:"Mọi khách hỏi qua điện thoại, Zalo, fanpage đều ghi vào đây. Hệ thống tự chặn trùng số và bắt đầu đếm giờ phản hồi.",hint:"Bấm nút 'Thêm mới' ở đầu trang, nhập tên và số điện thoại rồi Lưu bản ghi.",chk:function(){return tourMore("lead")}},
+  /* V9.97: neo cũ là '@txt:Thêm mới' - KHÔNG CÓ nút nào tên vậy trên màn này. Trang `nhaplead`
+     đi qua remap của go() thành tab "lead" của hub Tuyển sinh, mà ở đó nút thêm tên là "Khách mới
+     liên hệ đến". Bài bảo người ta bấm một nút không tồn tại, và câu "Việc cần làm" cũng sai theo.
+     _checkneo bắt được vì nó hỏi neo có tìm ra trên MÀN THẬT không, không đọc chuỗi trong nguồn. */
+  {p:"nhaplead",sel:'@txt:Khách mới liên hệ đến',t:"Khách mới gọi đến",d:"Mọi khách hỏi qua điện thoại, Zalo, fanpage đều ghi vào đây. Hệ thống tự chặn trùng số và bắt đầu đếm giờ phản hồi.",hint:"Bấm nút 'Khách mới liên hệ đến' ở đầu trang, nhập tên và số điện thoại rồi Lưu bản ghi.",chk:function(){return tourMore("lead")}},
   {p:"nhaplead",sel:'@txt:Ghi liên hệ',t:"Gọi và ghi kết quả",d:"Gọi xong bấm Ghi liên hệ, chọn kết quả: gặp được, không nghe máy, hẹn gọi lại... Một nỗ lực gọi là đủ tắt cảnh báo, không bị phạt vì khách không nghe.",hint:"Mở một khách, bấm Ghi liên hệ, chọn kết quả rồi Lưu.",chk:function(){return tourMore("lh")}},
-  {p:"test",sel:'@phead',t:"Đặt lịch test đầu vào",d:"Khách đồng ý test thì đặt lịch ngay. Đến ngày, học vụ chấm và trả kết quả, hệ thống tự nhắc bạn gọi tư vấn.",hint:"Xem danh sách test đang chờ."},
-  {p:"tuvan",sel:'@phead',t:"Tư vấn lộ trình",d:"Dựa trên điểm test, tư vấn khóa phù hợp. Ghi rõ ngân sách và mối quan tâm của khách vào phiếu để lần sau gọi không hỏi lại.",hint:"Mở một khách có kết quả test."},
+  {p:"test",sel:'@man',t:"Đặt lịch test đầu vào",d:"Khách đồng ý test thì đặt lịch ngay. Đến ngày, học vụ chấm và trả kết quả, hệ thống tự nhắc bạn gọi tư vấn.",hint:"Xem danh sách test đang chờ."},
+  {p:"tuvan",sel:'@man',t:"Tư vấn lộ trình",d:"Dựa trên điểm test, tư vấn khóa phù hợp. Ghi rõ ngân sách và mối quan tâm của khách vào phiếu để lần sau gọi không hỏi lại.",hint:"Mở một khách có kết quả test."},
   {p:"tuvan",sel:'@txt:Cập nhật chốt',t:"Chốt và tạo đăng ký",d:"Khách đồng ý thì tạo phiếu đăng ký, chọn khóa và ưu đãi. Ưu đãi vượt ngưỡng sẽ tự chuyển quản lý duyệt - bạn không cần đi xin.",hint:"Bấm Cập nhật chốt trên một hồ sơ đã tư vấn xong.",chk:function(){return tourMore("dk")}},
   {p:"thanhtoan",sel:'@txt:Ghi nhận khoản thu',t:"Thu tiền và gửi xác nhận",d:"Thu đủ hoặc thu theo đợt đều được. Thu xong in phiếu và bấm nút copy tin nhắn Zalo gửi khách ngay.",hint:"Bấm 'Ghi nhận khoản thu' ở đầu trang (hoặc 'Ghi nhận thanh toán' trên một đăng ký còn nợ), nhập số tiền rồi Lưu.",chk:function(){return tourMore("thu")}},
-  {p:"giaoviec",sel:'@phead',t:"Việc sếp giao cho bạn",d:"Ngoài khách, bạn còn nhận việc từ quản lý ở đây. Nhận việc, làm xong bấm Báo xong, có gì vướng thì trao đổi ngay trong việc.",hint:"Xong một ngày của tư vấn viên!"}]},
+  {p:"giaoviec",sel:'@man',t:"Việc sếp giao cho bạn",d:"Ngoài khách, bạn còn nhận việc từ quản lý ở đây. Nhận việc, làm xong bấm Báo xong, có gì vướng thì trao đổi ngay trong việc.",hint:"Xong một ngày của tư vấn viên!"}]},
  tn_hocvu:{lv:"trainghiem",role:"Học vụ - CSKH",t:"Một ngày của Học vụ",ic:"ti-school",d:"8 bước - xếp lớp, theo lớp, chăm học viên",steps:[
   /* V9.63: kênh học viên gửi yêu cầu là việc của học vụ, mà bài này chưa nói tới - anh Luân nhắc
      đúng luật đã chốt: mỗi lần đổi app phải soát lại tour và Trợ lý. */
-  {p:"ychv",sel:'@phead',t:"Học viên nhắn gì cho trung tâm",d:"Học viên gửi yêu cầu từ Cổng học viên - xin nghỉ, xin học bù, hỏi lịch, báo đã chuyển khoản. Hệ thống tự chuyển tới bạn kèm hạn nhận việc; yêu cầu về tiền thì sang kế toán.",hint:"Bấm Nhận việc ở một thẻ rồi trả lời ngay trong thẻ đó."},
+  {p:"ychv",sel:'@man',t:"Học viên nhắn gì cho trung tâm",d:"Học viên gửi yêu cầu từ Cổng học viên - xin nghỉ, xin học bù, hỏi lịch, báo đã chuyển khoản. Hệ thống tự chuyển tới bạn kèm hạn nhận việc; yêu cầu về tiền thì sang kế toán.",hint:"Bấm Nhận việc ở một thẻ rồi trả lời ngay trong thẻ đó."},
   {p:"xeplop",sel:'@txt:Xếp vào lớp',t:"Xếp lớp cho học viên mới",d:"Học viên đóng tiền xong về đây. Chọn lớp phù hợp trình độ và lịch học, gửi thông tin lớp, chờ học viên xác nhận rồi hoàn tất nhập học.",hint:"Bấm Xếp lớp trên một học viên đang chờ, chọn lớp rồi Lưu.",chk:function(){return tourMore("ob")}},
   {p:"hoctap",sel:'@txt:Lớp học',t:"Bức tranh dạy và học",d:"Tab Hôm nay là việc của giáo viên trong ngày, tab Lớp học là sức khỏe từng lớp, tab Lịch tuần là toàn bộ lịch dạy.",hint:"Bấm sang tab Lớp học."},
   {p:"banglop",sel:'@txt:Vận hành',t:"Vận hành một lớp",d:"Điểm danh, giao bài, ghi nhận xét buổi, nhập điểm giữa khóa - tất cả trong một màn hình của lớp đó.",hint:"Chọn một lớp, mở tab Điểm danh, đánh dấu vài học viên rồi bấm Lưu buổi học.",chk:function(){return tourMore("dd")}},
   {p:"buoihoc",sel:'@txt:Chờ ghi nhận xét',t:"Nhắc giáo viên ghi nhận xét",d:"Buổi dạy xong mà quá hạn chưa có nhận xét sẽ hiện đỏ ở đây. Đây là việc học vụ phải đốc thúc hằng tuần.",hint:"Bấm chip 'Chờ ghi nhận xét' để lọc, rồi ghi nhận xét cho một buổi trong danh sách.",chk:function(){return (window.TOURB&&rows("DL11").filter(function(x){return bhState(x).note}).length>(window.TOURB.nx||0))}},
   {p:"hocvien",sel:'@txt:Nguy cơ',t:"Học viên nguy cơ",d:"Lọc nhanh những học viên vắng nhiều hoặc tiến bộ chậm để gọi hỏi thăm trước khi phụ huynh phàn nàn.",hint:"Bấm chip lọc 'Nguy cơ', mở một học viên rồi ghi lần chăm."},
-  {p:"cskh",sel:'@phead',t:"Khảo sát và phản hồi",d:"Gửi khảo sát định kỳ theo lớp, tiếp nhận góp ý, xử lý khiếu nại. Điểm hài lòng thấp sẽ tự bật việc follow-up.",hint:"Xem tab Khảo sát."},
-  {p:"baoluu",sel:'@phead',t:"Giữ chân học viên muốn nghỉ",d:"Học viên xin bảo lưu hoặc có ý bỏ học nằm ở đây - gọi giữ chân, hẹn ngày quay lại, hoặc chốt bảo lưu có hạn.",hint:"Xong một ngày của học vụ!"}]},
+  {p:"cskh",sel:'@man',t:"Khảo sát và phản hồi",d:"Gửi khảo sát định kỳ theo lớp, tiếp nhận góp ý, xử lý khiếu nại. Điểm hài lòng thấp sẽ tự bật việc follow-up.",hint:"Xem tab Khảo sát."},
+  {p:"baoluu",sel:'@man',t:"Giữ chân học viên muốn nghỉ",d:"Học viên xin bảo lưu hoặc có ý bỏ học nằm ở đây - gọi giữ chân, hẹn ngày quay lại, hoặc chốt bảo lưu có hạn.",hint:"Xong một ngày của học vụ!"}]},
  tn_giaovien:{lv:"trainghiem",role:"Giáo viên",t:"Một ngày của Giáo viên",ic:"ti-chalkboard",d:"5 bước - dạy, điểm danh, chấm bài",steps:[
-  {p:"hoctap",sel:'@phead',t:"Hôm nay bạn dạy gì",d:"Vào app là thấy ngay buổi dạy hôm nay, chủ đề buổi, bài tập sẽ giao và lời dặn từ giáo án khóa.",hint:"Xem thẻ buổi học của bạn."},
+  {p:"hoctap",sel:'@man',t:"Hôm nay bạn dạy gì",d:"Vào app là thấy ngay buổi dạy hôm nay, chủ đề buổi, bài tập sẽ giao và lời dặn từ giáo án khóa.",hint:"Xem thẻ buổi học của bạn."},
   {p:"banglop",sel:'@txt:Buổi học & điểm danh',t:"Vào lớp và điểm danh",d:"Bấm Bắt đầu lớp để mở cổng điểm danh. Vắng có phép hay không phép đều ghi rõ, vắng phải ghi lý do.",hint:"Bấm tab 'Buổi học & điểm danh' của lớp, đánh dấu vài học viên rồi Lưu buổi học."},
   {p:"banglop",sel:'@txt:Giao & chấm bài tập',t:"Giao bài tập",d:"Giao một bài chung cho cả lớp hoặc bài riêng cho từng học viên. Hạn nộp tự tính theo giáo án khóa, sửa được.",hint:"Bấm tab 'Giao & chấm bài tập' rồi giao một bài mới."},
   {p:"buoihoc",sel:'@txt:Chờ ghi nhận xét',t:"Ghi nhận xét buổi học",d:"Cuối buổi ghi nhận xét chung - học viên và phụ huynh đọc được trong cổng học viên. Quá hạn sẽ bị nhắc.",hint:"Bấm chip 'Chờ ghi nhận xét', mở buổi vừa dạy rồi ghi nhận xét."},
-  {p:"giaoviec",sel:'@phead',t:"Việc được giao",d:"Học vụ hoặc tổ trưởng giao việc cho bạn ở đây: chuẩn bị đề, dự giờ, viết giáo án bổ sung.",hint:"Xong một ngày của giáo viên!"}]},
+  {p:"giaoviec",sel:'@man',t:"Việc được giao",d:"Học vụ hoặc tổ trưởng giao việc cho bạn ở đây: chuẩn bị đề, dự giờ, viết giáo án bổ sung.",hint:"Xong một ngày của giáo viên!"}]},
  /* V9.44 - BA BÀI CÒN THIẾU. Cấp "trải nghiệm" trước đây có 5 bài cho 5 chức danh, nhưng app
     có TÁM nhóm vai. NV WOW - người giữ toàn bộ buổi kèm 1-1 và việc chấm test - không có bài
     nào; Marketing giữ đầu vào của cả phễu cũng không; nhóm hỗ trợ thì mở app ra không biết mình
     làm gì ở đây. Anh Luân: "Mỗi 1 chức danh đều có 1 hướng dẫn và trợ lý riêng phù hợp với họ."
     Bộ kiểm mới canh chuyện này: thêm nhóm vai mà quên bài hướng dẫn là ĐỎ. */
  tn_wow:{lv:"trainghiem",role:"Giáo viên WOW 1-1",t:"Một ngày của Giáo viên WOW",ic:"ti-star",d:"5 bước - chấm test, dạy kèm 1-1, ghi kết quả",steps:[
-  {p:"hoctap",ctx:function(){window.HTTAB="wow"},sel:'@phead',t:"Buổi WOW hôm nay của bạn",d:"Vào app là thấy ngay buổi kèm 1-1 hôm nay: học viên nào, yếu kỹ năng gì, lần trước kèm tới đâu. Buổi mới học viên đặt mà bạn chưa xác nhận thì hiện chip hổ phách.",hint:"Xem danh sách buổi WOW của bạn."},
-  {p:"tuyensinh",ctx:function(){window.TSTAB="test"},sel:'@phead',t:"Chấm test đầu vào",d:"Chấm bài test là việc của NV WOW chứ không phải giáo viên đứng lớp - bảng phân quyền CH3 của SOP ghi rõ. Nhập bốn kỹ năng, điểm tổng tự tính trung bình.",hint:"Mở một phiếu test chờ chấm."},
+  {p:"hoctap",ctx:function(){window.HTTAB="wow"},sel:'@man',t:"Buổi WOW hôm nay của bạn",d:"Vào app là thấy ngay buổi kèm 1-1 hôm nay: học viên nào, yếu kỹ năng gì, lần trước kèm tới đâu. Buổi mới học viên đặt mà bạn chưa xác nhận thì hiện chip hổ phách.",hint:"Xem danh sách buổi WOW của bạn."},
+  {p:"tuyensinh",ctx:function(){window.TSTAB="test"},sel:'@man',t:"Chấm test đầu vào",d:"Chấm bài test là việc của NV WOW chứ không phải giáo viên đứng lớp - bảng phân quyền CH3 của SOP ghi rõ. Nhập bốn kỹ năng, điểm tổng tự tính trung bình.",hint:"Mở một phiếu test chờ chấm."},
   {p:"tuyensinh",ctx:function(){window.TSTAB="test"},sel:'@tbar',t:"Viết academic_note",d:"Nhận xét học thuật là thứ nhân viên tư vấn dùng để tư vấn lộ trình. Chấm điểm mà không viết nhận xét thì người sau không biết nói gì với khách.",hint:"Nhìn chip Chờ chấm và Đã chấm."},
   {p:"hoctap",ctx:function(){window.HTTAB="wow"},sel:'@txt:Chờ ghi nội dung',t:"Ghi nội dung và kết quả buổi kèm",d:"Dạy xong ghi ngay: kèm gì, học viên tiến bộ hay chưa. Chỉ số WOR (tỷ lệ buổi có tiến bộ) tính từ đúng ô này, và giáo viên chủ nhiệm đọc nó để biết đã kèm gì.",hint:"Bấm chip Chờ ghi nội dung."},
   {p:"hocvien",sel:'@tbarct',t:"Học viên nào cần đặt buổi kèm",d:"Em nào yếu học thuật thì SOP bảo đặt buổi WOW kèm. Lọc nhanh Nguy cơ cho ra đúng nhóm đó, kèm số buổi vắng và số bài thiếu để biết nặng nhẹ.",hint:"Xong một ngày của giáo viên WOW!"}]},
  tn_marketing:{lv:"trainghiem",role:"Marketing",t:"Một ngày của Marketing",ic:"ti-speakerphone",d:"5 bước - nguồn lead, chất lượng lead, kho khách cũ",steps:[
-  {p:"tuyensinh",ctx:function(){window.TSTAB="lead"},sel:'@phead',t:"Đêm qua lead về từ đâu",d:"Mỗi lead ghi rõ nguồn. Nguồn nào đang đổ về nhiều mà chất lượng kém thì phải biết trong ngày, không đợi cuối tháng mới cộng sổ.",hint:"Nhìn cột Nguồn trong danh sách lead."},
+  {p:"tuyensinh",ctx:function(){window.TSTAB="lead"},sel:'@man',t:"Đêm qua lead về từ đâu",d:"Mỗi lead ghi rõ nguồn. Nguồn nào đang đổ về nhiều mà chất lượng kém thì phải biết trong ngày, không đợi cuối tháng mới cộng sổ.",hint:"Nhìn cột Nguồn trong danh sách lead."},
   {p:"tuyensinh",ctx:function(){window.TSTAB="lead"},sel:'@tbarct',t:"Lead chưa ai nhận",d:"Lead không có người phụ trách là lead sẽ nguội. Lọc ra rồi đẩy về đội tư vấn - tiền quảng cáo đã tiêu rồi, đừng để mất ở khâu này.",hint:"Lọc theo trạng thái Mới."},
-  {p:"reup",sel:'@phead',t:"Kho khách cũ để chăm lại",d:"Khách đã mất, không phản hồi, không liên lạc được - vẫn rẻ hơn khách mới rất nhiều. Mỗi ngày chạm lại một ít thay vì để nằm im.",hint:"Xem danh sách khách cần chăm lại."},
-  {p:"magioithieu",sel:'@phead',t:"Mã giới thiệu và thưởng",d:"Khách cũ giới thiệu là nguồn rẻ nhất. Ai đang giới thiệu được nhiều, thưởng nào còn treo chưa trả - trả chậm là lần sau không ai giới thiệu nữa.",hint:"Xem thưởng đang chờ."},
+  {p:"reup",sel:'@man',t:"Kho khách cũ để chăm lại",d:"Khách đã mất, không phản hồi, không liên lạc được - vẫn rẻ hơn khách mới rất nhiều. Mỗi ngày chạm lại một ít thay vì để nằm im.",hint:"Xem danh sách khách cần chăm lại."},
+  {p:"magioithieu",sel:'@man',t:"Mã giới thiệu và thưởng",d:"Khách cũ giới thiệu là nguồn rẻ nhất. Ai đang giới thiệu được nhiều, thưởng nào còn treo chưa trả - trả chậm là lần sau không ai giới thiệu nữa.",hint:"Xem thưởng đang chờ."},
   /* V9.60: bước này từng dẫn sang trang Báo cáo - nay Marketing không xem tiền nên không có
      trang đó nữa. Phễu chuyển đổi xem ngay trên trang Tuyển sinh, đúng chỗ họ làm việc. */
-  {p:"tuyensinh",ctx:function(){window.TSTAB="lead"},sel:'@phead',t:"Phễu và tỷ lệ chuyển đổi",d:"Phễu trên đầu trang cho biết mất khách ở bước nào. Marketing đổ nhiều lead mà tắc ở khâu gọi thì vấn đề không nằm ở quảng cáo.",hint:"Xong một ngày của marketing!"}]},
+  {p:"tuyensinh",ctx:function(){window.TSTAB="lead"},sel:'@man',t:"Phễu và tỷ lệ chuyển đổi",d:"Phễu trên đầu trang cho biết mất khách ở bước nào. Marketing đổ nhiều lead mà tắc ở khâu gọi thì vấn đề không nằm ở quảng cáo.",hint:"Xong một ngày của marketing!"}]},
  tn_hotro:{lv:"trainghiem",role:"Nhóm hỗ trợ (HR, IT...)",t:"Một ngày của nhóm hỗ trợ",ic:"ti-tool",d:"3 bước - nhận việc, làm, báo xong",steps:[
   /* Bảng việc nằm ở TRANG ĐÁP, mà trang đáp của bản 5 là Trang bắt đầu còn bản 6 là Bàn làm
      việc - cắm cứng "banlam" thì sang v6 bước này trỏ vào chỗ không có neo. */
@@ -14411,7 +14415,7 @@ var TOURS={
   {p:"giaoviec",sel:'@txt:Nhận việc',t:"Nhận việc được giao",d:"Bấm Nhận là người giao biết việc đã tới tay bạn. Việc bắt buộc thì không từ chối được; việc thường thì từ chối phải ghi lý do.",hint:"Bấm 'Nhận việc' trên một việc mới được giao."},
   {p:"giaoviec",sel:'@tbar',t:"Báo xong ngay lúc làm xong",d:"Báo xong kèm ghi chú, người giao xác nhận là việc đóng. Không làm kịp thì báo lại sớm - im lặng mới là vấn đề.",hint:"Xong một ngày của nhóm hỗ trợ!"}]},
  tn_nhansu:{lv:"trainghiem",role:"Nhân sự",t:"Một ngày của Nhân sự",ic:"ti-id-badge",d:"4 bước - hồ sơ người, bảng công, việc nội bộ",steps:[
-  {p:"nhansu",sel:'@phead',t:"Danh sách người của trung tâm",d:"Toàn bộ nhân sự đang làm việc: chức danh, cơ sở, email đăng nhập và tình trạng. Đây là màn chính của bạn - Nhân sự không đụng vào hồ sơ học viên hay doanh thu.",hint:"Nhìn qua danh sách, để ý ai chưa có cơ sở."},
+  {p:"nhansu",sel:'@man',t:"Danh sách người của trung tâm",d:"Toàn bộ nhân sự đang làm việc: chức danh, cơ sở, email đăng nhập và tình trạng. Đây là màn chính của bạn - Nhân sự không đụng vào hồ sơ học viên hay doanh thu.",hint:"Nhìn qua danh sách, để ý ai chưa có cơ sở."},
   {p:"nhansu",sel:'@tbarct',t:"Lọc theo chức danh và cơ sở",d:"Cần soát riêng một bộ phận hay một chi nhánh thì lọc ở thanh này. Bấm tên một người để mở hồ sơ đầy đủ.",hint:"Chọn một chức danh ở bộ lọc."},
   {p:"giangvien",ctx:function(){window.GVTAB="cong"},sel:'@txt:Bảng công giảng dạy',t:"Bảng công giảng dạy",d:"Giờ đứng lớp, ca WOW 1-1 và ca test đầu vào của từng giảng viên trong tháng. Buổi nào thiếu mốc giờ vào - giờ ra thì tính công sai, phải soát trước khi chốt lương.",hint:"Xem cột giờ dạy và cột buổi thiếu mốc giờ."},
   {p:"giaoviec",sel:'@txt:Nhận việc',t:"Việc nội bộ",d:"Việc người khác giao cho bạn nằm ở đây. Bấm Nhận là người giao biết việc đã tới tay; báo xong ngay lúc làm xong.",hint:"Xong một ngày của Nhân sự!"}]},
@@ -14419,10 +14423,10 @@ var TOURS={
   {p:"thanhtoan",sel:'@txt:Ghi nhận khoản thu',t:"Thu học phí",d:"Thu tiền mặt hay chuyển khoản đều ghi ở đây, in phiếu thu ngay. Đóng theo đợt thì ghi hẹn thu đợt sau.",hint:"Bấm 'Ghi nhận khoản thu' ở đầu trang, chọn đăng ký còn nợ, nhập số tiền rồi Lưu.",chk:function(){return tourMore("thu")}},
   {p:"thanhtoan",sel:'@obcards',t:"Đối soát khoản thu",d:"Tư vấn viên thu hộ thì kế toán phải xác nhận lại. Khoản chưa xác nhận hiện chip hổ phách.",hint:"Bấm chip Chờ xác nhận, mở một khoản và bấm Xác nhận đã nhận.",chk:function(){return (window.TOURB&&rows("DL07").filter(function(x){return String(x.verified_by||"").trim()}).length>(window.TOURB.xacnhan||0))}},
   {p:"thanhtoan",sel:'@tbar',t:"Công nợ và tới hẹn thu",d:"Danh sách đăng ký còn nợ, ai tới hẹn hôm nay, ai quá hạn. Gọi nhắc rồi ghi lại lịch hẹn mới.",hint:"Bấm chip Tới hẹn thu."},
-  {p:"duyet",sel:'@phead',t:"Duyệt chiết khấu và hoàn tiền",d:"Ưu đãi vượt ngưỡng và yêu cầu hoàn tiền tập trung ở đây. Hoàn tiền có gợi ý mức theo chính sách và số ngày đã học.",hint:"Mở một yêu cầu để xem."},
-  {p:"baocao",sel:'@phead',t:"Báo cáo doanh thu",d:"Doanh thu theo tháng, theo nguồn khách, công nợ tồn - số liệu tự tính từ phiếu thu, không phải gõ lại.",hint:"Xong một ngày của kế toán!"}]},
+  {p:"duyet",sel:'@man',t:"Duyệt chiết khấu và hoàn tiền",d:"Ưu đãi vượt ngưỡng và yêu cầu hoàn tiền tập trung ở đây. Hoàn tiền có gợi ý mức theo chính sách và số ngày đã học.",hint:"Mở một yêu cầu để xem."},
+  {p:"baocao",sel:'@man',t:"Báo cáo doanh thu",d:"Doanh thu theo tháng, theo nguồn khách, công nợ tồn - số liệu tự tính từ phiếu thu, không phải gõ lại.",hint:"Xong một ngày của kế toán!"}]},
  tn_quanly:{lv:"trainghiem",role:"Quản lý - Giám đốc",t:"Một ngày của Quản lý",ic:"ti-shield-check",d:"6 bước - nhìn số, duyệt, giao việc",steps:[
-  {p:"baocao",sel:'@phead',t:"Mở máy là nhìn số",d:"Doanh thu, phễu tuyển sinh, chuyên cần, hài lòng - và quan trọng nhất là phần nhận xét kèm việc nên làm ngay cho từng chỉ số.",hint:"Cuộn xuống xem khối chỉ số."},
+  {p:"baocao",sel:'@man',t:"Mở máy là nhìn số",d:"Doanh thu, phễu tuyển sinh, chuyên cần, hài lòng - và quan trọng nhất là phần nhận xét kèm việc nên làm ngay cho từng chỉ số.",hint:"Cuộn xuống xem khối chỉ số."},
   {p:(V6()?"ban":"banlam"),sel:'@bstats',t:"Điểm nghẽn toàn trung tâm",d:"Ô nào số cao bất thường là chỗ đang tắc. Rê chuột vào ô để biết mở trang nào hoặc bấm chip nào thì ra đúng danh sách người đang kẹt ở đó.",hint:"Rê chuột vào ô có số lớn nhất."},
   {p:(V6()?"hocvien":"changA"),sel:(V6()?'@tbarct':'@nrail'),t:"Tắc ở chặng nào",d:"Phần trăm chuyển đổi giữa các ga cho biết mất khách ở bước nào: gọi không được, test rồi không tư vấn, hay tư vấn rồi không chốt.",hint:"Nhìn tỷ lệ giữa các ga."},
   {p:"duyet",sel:'@txt:Duyệt',t:"Duyệt việc chờ bạn",d:"Chiết khấu lớn, hoàn tiền - nhân viên tạo là bạn nhận thông báo ngay, duyệt xong nhân viên biết liền.",hint:"Bấm 'Duyệt' hoặc 'Từ chối' trên một chiết khấu đang chờ.",chk:function(){return (window.TOURB&&rows("DL06").filter(function(x){return String(x.discount_approved_by||"").trim()}).length>(window.TOURB.duyet||0))}},
@@ -14445,7 +14449,7 @@ var TOURS={
   {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'@cfpqche',t:"Che thông tin nhạy cảm",d:"Thấy dòng nhưng không đọc được ô: giáo viên không thấy tiền, marketing không thấy số điện thoại đầy đủ, kế toán không đọc nội dung tư vấn.",hint:"Xem 3 công tắc bên phải."},
   {p:"settings",ctx:function(){window.SETTAB="phanquyen"},sel:'@cfpqtong',t:"Công tắc tổng",d:"Tắt phạm vi dữ liệu là mọi người thấy hết - dùng khi demo hoặc khi mới triển khai. Bật lên khi chạy thật.",hint:"Xong phần phân quyền!"}]},
  cn_nguong:{lv:"chuyennghiep",t:"Ngưỡng, KPI và câu nhắc việc",ic:"ti-adjustments",d:"5 bước - điều chỉnh quy trình theo trung tâm bạn",steps:[
-  {p:"settings",ctx:function(){window.SETTAB="qa"},sel:'@txt:Nối Trợ lý với một AI miễn phí',t:"Nối Trợ lý với một AI miễn phí",d:"Trợ lý vốn trả lời bằng chính bộ luật app. Nối thêm AI thì nó giải thích được bằng lời người - hợp với câu \"vì sao SOP bắt gọi trong 15 phút\" hay \"bảo lưu ai được duyệt\". Máy vẫn trả lời trước; AI chỉ diễn giải, không được bịa số.",hint:'Vào Cài đặt > Hỏi đáp, kéo xuống khối "Nối Trợ lý với một AI miễn phí", chọn nhà cung cấp rồi dán API key.',chk:function(){return aiOn()}},
+  {p:"settings",ctx:function(){window.SETTAB="qa"},sel:'@cfai',t:"Nối Trợ lý với một AI miễn phí",d:"Trợ lý vốn trả lời bằng chính bộ luật app. Nối thêm AI thì nó giải thích được bằng lời người - hợp với câu \"vì sao SOP bắt gọi trong 15 phút\" hay \"bảo lưu ai được duyệt\". Máy vẫn trả lời trước; AI chỉ diễn giải, không được bịa số.",hint:'Vào Cài đặt > Hỏi đáp, kéo xuống khối "Nối Trợ lý với một AI miễn phí", chọn nhà cung cấp rồi dán API key.',chk:function(){return aiOn()}},
   {p:"settings",ctx:function(){window.SETTAB="ch2"},sel:'@settabs',t:"Ngưỡng thời gian và SLA",d:"Bao lâu phải gọi khách mới, bao lâu phải chấm test, bao lâu phải ghi nhận xét. Đổi ở đây là mọi cảnh báo trong app đổi theo ngay.",hint:"Tìm slaLeadResponse_min (hoặc slaLRT_minutes), đổi số rồi Lưu - cảnh báo trên app đổi theo ngay.",chk:function(){return num(paramOf("slaLeadResponse_min",15))!==15}},
   {p:"settings",ctx:function(){window.SETTAB="ch2"},sel:'@cfch2',t:"Ngưỡng tiền và chính sách",d:"Chiết khấu bao nhiêu thì phải duyệt, nợ bao lâu thì cảnh báo, hoàn tiền theo mốc nào - đều là tham số.",hint:"Cuộn tìm nhóm Tài chính."},
   {p:"settings",ctx:function(){window.SETTAB="ch6"},sel:'@settabs',t:"Ngưỡng KPI",d:"Chuyên cần bao nhiêu là đạt, tỷ lệ chuyển đổi bao nhiêu là tốt. Báo cáo chấm xanh đỏ dựa trên các ngưỡng này.",hint:"Xem bảng ngưỡng."},
@@ -14578,7 +14582,32 @@ function tourTrong(goc,sel){
   for(var i=0;i<l.length;i++){var r=l[i].getBoundingClientRect&&l[i].getBoundingClientRect();
    if(r&&(r.width>4||r.height>4))return l[i]}
   return l[0]||null}catch(e){return null}}
+/* ═══ V9.97 - NEO "@man": KHỐI NỘI DUNG CHÍNH CỦA MÀN ĐANG MỞ ═══════════════════════════════
+   Anh Luân (04/08): *"tour vẫn tệ quá em, nó trỏ sai hoài... có cơ chế nào để nó chính xác ko"*.
+   Đo bằng `_checkneo` ra đúng cơ chế: **24 bước cùng neo `@phead`**, tức cùng khoanh DÒNG MÔ TẢ
+   CHUNG của trang. Năm bài khác nhau ("Đặt lịch test đầu vào", "Tư vấn lộ trình", "Chấm test đầu
+   vào", "Đêm qua lead về từ đâu", "Phễu và tỷ lệ chuyển đổi") khoanh y hệt một dòng chữ - vì cả
+   năm đều là TAB của cùng một trang hub, mà `phead` nằm NGOÀI thân tab.
+   Gốc của lỗi: bước giới thiệu MỘT MÀN thì không có gì để trỏ ngoài đầu trang dùng chung.
+   Nên thêm một loại neo trả về **khối nội dung thật của màn đang mở** - mỗi màn một phần tử
+   khác nhau, nên không hai bước nào còn khoanh trùng chỗ.
+   Bỏ qua đầu trang, bảng việc dùng chung và dải nhắc; lấy khối đầu tiên CÓ NỘI DUNG THẬT. */
+function tourMan(){
+ var c=null;try{c=document.getElementById("content")}catch(e){}
+ if(!c)return null;
+ /* Bỏ qua cả THANH CÔNG CỤ: nó có mã neo riêng (@tbar/@tbarct) và bài nào cần dạy bộ lọc thì
+    trỏ thẳng vào đó. Không bỏ thì trên mọi sổ tra cứu, `@man` rơi đúng vào thanh công cụ - hai
+    bước "Sổ tra cứu là gì" và "Lọc nhiều trục cùng lúc" lại khoanh trùng một chỗ. */
+ var bo=/(^|\s)(phead|notebar|cfbar|bangviec|bvwrap|tbar)(\s|$)/;
+ var con=c.children||[];
+ for(var i=0;i<con.length;i++){var el=con[i];
+  if(bo.test(String(el.className||"")))continue;
+  var r=el.getBoundingClientRect&&el.getBoundingClientRect();
+  if(!r||(r.width<40&&r.height<20))continue;
+  return el}
+ return c.firstElementChild||null}
 function tourFind(sel){
+ if(String(sel||"")==="@man")return tourMan();
  if(String(sel||"").indexOf("@txt:")===0)return tourTimChu(String(sel).slice(5));
  sel=tourSel(sel);if(!sel)return null;
  var than=null;try{than=document.getElementById("content")}catch(e){}

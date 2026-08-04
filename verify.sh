@@ -185,6 +185,13 @@ else
   # Khong chi hoi "co bam duoc khong" ma con hoi: mo dung ho so vua bam khong, co lo chu may
   # (undefined/NaN) ra man khong, ngan keo co rong khong.
   chay "_checkbam bam thu moi cho" "CHECKBAM (OK|BO QUA)" node _checkbam.js
+  # V9.97 - VONG SANG CUA HUONG DAN CO KHOANH DUNG THU CAU NOI DANG NOI TOI KHONG (anh Luan:
+  # "tour van te qua em, no tro sai hoai... co co che nao de no chinh xac ko em"). _checktour va
+  # _checkui deu XANH suot trong khi anh Luan van thay loi, vi ca hai chi hoi "neo co tim ra
+  # khong". Bo nay hoi them: mot cho tren man chi duoc MOT buoc khoanh (26 buoc tung cung neo
+  # @phead - cung khoanh dong mo ta chung cua trang), neo phai nam trong than trang, vong sang
+  # phai trung phan tu. Chay tren ca hai ban build.
+  chay "_checkneo vong sang tro dung cho" "CHECKNEO (OK|BO QUA)" node _checkneo.js
 fi
 
 # Ghi lai bang gio de luot sau co cai ma dem nguoc. Chi ghi khi chay day du (khong bi cat giua
