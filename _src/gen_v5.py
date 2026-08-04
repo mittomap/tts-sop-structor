@@ -18,7 +18,12 @@ HTML = r"""<!DOCTYPE html>
 --red:#E24B4A;--redb:#FBF0EF;--amber:#E08A1E;--amberb:#FFF6D8;--green:#2E9E6B;--greenb:#E4F5EC;--blue:#3B82C4;--blueb:#EEF2F6;--gray:#EEF2F6}
 *{box-sizing:border-box;margin:0;padding:0}html,body{height:100%}
 body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:var(--bg);font-size:14px;-webkit-font-smoothing:antialiased}
-.app{display:flex;height:100vh;overflow:hidden}
+/* V9.97 (anh Luân, kèm ảnh: *"tự nhiên có cái footer bar đấy... nó thô quá"*). Không phải
+   footer bar - là một CÁI HỐ do chính tính năng thu nhỏ đẻ ra. `zoom:.9` co luôn đơn vị `vh`:
+   vỏ app cao `100vh` hoá ra chỉ còn 810px vật lý trong cửa sổ 900px, chừa 90px nền trống ở đáy
+   chạy hết bề ngang - nhìn đúng như một thanh chân trang thô. Nên chiều cao vỏ phải CHIA LẠI
+   cho tỷ lệ: `--vh` do zoomApply đặt, mặc định 100vh khi không thu nhỏ. */
+.app{display:flex;height:var(--vh,100vh);overflow:hidden}
 /* V9.63 (anh Luân: *"tăng độ rộng thêm 1 tí, hoặc cho người ta tự kéo"*): làm cả hai - rộng mặc
    định nhích lên 262px, và có tay kéo ở mép phải như ngăn kéo. Chỉ đổi độ rộng của CỘT MENU, phần
    nội dung tự co theo (flex), nên không có gì bị đẩy ra ngoài màn. Dưới 820px sidebar là lớp phủ
@@ -221,7 +226,16 @@ tr.cfhl>td{background:#FFF6D8}
    thành một hàng ngang không tách rời, và bánh răng neo theo mép TRÊN của khối chữ. */
 .gearline{display:inline-flex;align-items:flex-start;gap:2px;max-width:100%}
 .gearline>.gearbtn{flex:none;vertical-align:0;margin-top:-2px}
-.cfbar.demo{background:var(--bg);border-bottom-color:var(--line);color:var(--navyd)}
+/* V9.97 (anh Luân, kèm ảnh: *"cái thanh chứa dữ liệu demo nó trùng màu nền em ạ"*). Đúng -
+   nó lấy đúng `var(--bg)`, tức CHÍNH màu nền trang, nên dải không còn là dải: chữ "Dữ liệu demo"
+   với nút "Dựng lại demo" trôi lơ lửng giữa khoảng trắng. Dải này nói một trạng thái người xem
+   cần nhớ suốt phiên (số liệu là số mẫu), nên nó phải THẤY ĐƯỢC mà vẫn không tranh chỗ với nội
+   dung: nền trắng như thanh trên để thành một khối liền với vỏ app, thêm một vạch màu mảnh bên
+   trái làm dấu, chữ và icon lấy màu hổ phách trầm. Không dùng nền vàng đặc - đây là trạng thái,
+   không phải cảnh báo (cùng lý do đã bỏ nền vàng ở V9.63). */
+.cfbar.demo{background:#fff;border-bottom-color:var(--line);color:#7A5B12;
+ box-shadow:inset 3px 0 0 var(--amber)}
+.cfbar.demo i{color:var(--amber)}
 .cfbar i{font-size:15px;flex:none}
 .cfbar span{flex:1;min-width:0}
 .topbar{height:60px;flex-shrink:0;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 22px}
@@ -6203,13 +6217,17 @@ function zoomGet(){var v=0;try{v=parseInt(localStorage.getItem(ZKEY)||"",10)}cat
  return (ZMUC.indexOf(v)>=0)?v:ZMAC}
 function zoomApply(v){
  try{document.body.style.zoom=(v===100)?"":(v/100)}catch(e){}
+ /* Bù lại chiều cao vỏ app: `zoom` co cả `vh` nên `100vh` không còn bằng chiều cao cửa sổ.
+    Xem chú thích ở `.app` - đây là chỗ vá gốc, không phải vá từng màn. */
+ try{document.documentElement.style.setProperty("--vh",(v===100)?"100vh":(100*100/v)+"vh")}catch(e){}
  /* MÀN NHỎ GIỮ NGUYÊN 100%, dù người dùng đã chọn khác trên máy tính.
     Mốc **1200px**, hạ dần từ 820 qua 1000 vì `_checkui` đo trên trình duyệt thật và bắt được
     nút tụt xuống dưới 24px: điện thoại nằm ngang 844px ra 689 nút, máy tính bảng nằm ngang
     1112px vẫn còn 357 nút. Lý do là số học chứ không phải cảm tính - thu 90% thì nút 26px chỉ
     còn 23.4px, ngón tay bấm trượt. Thu nhỏ sinh ra để nhét vừa BẢNG RỘNG trên màn máy tính;
     máy tính bảng và điện thoại vốn đã phải cuộn, thu thêm chỉ làm nút khó bấm. */
- try{if((window.innerWidth||1400)<1200)document.body.style.zoom=""}catch(e){}}
+ try{if((window.innerWidth||1400)<1200){document.body.style.zoom="";
+  document.documentElement.style.setProperty("--vh","100vh")}}catch(e){}}
 function zoomSet(v){v=parseInt(v,10)||ZMAC;
  try{localStorage.setItem(ZKEY,String(v))}catch(e){}
  zoomApply(v);zoomVe()}
