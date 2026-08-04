@@ -524,7 +524,9 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
  var hPH=congHTML();
  window.HVPORTAL=_hp;window.HVPHONE=_ph;
  [["cong nhan vien",hNV,"Cổng nhân viên"],["cong hoc vien",hHV,"Cổng học viên"],["cong phu huynh",hPH,"Cổng phụ huynh"]].forEach(function(x){
-  var n3=(x[1].match(/class="congr/g)||[]).length;
+  /* V9.98: ngan keo nay nay co ca hai dong NGUOI (doi cong + doi nguoi da gop mot cua). Chung
+     mang lop `congr nguoir` - dem cong thi phai TRU chung ra, khong thi "du ba cong" thanh nam. */
+  var n3=(x[1].match(/class="congr(?! nguoir)/g)||[]).length;
   var nHere=(x[1].match(/class="congr here"/g)||[]).length;
   var seg=x[1].split('class="congr here"')[1]||"";
   t("("+x[0]+") ngan keo liet ke du ba cong", n3===3);

@@ -358,7 +358,27 @@ const PROBE = () => {
         const n = await page.evaluate(k => TOURS[k].steps.length, k);
         for (let i = 0; i < n; i++) {
           await page.evaluate(i => { TOUR.i = i; tourShow(); }, i);
-          await page.waitForTimeout(420);
+          /* V9.98 - DOI THEO TRANG THAI, KHONG DOI THEO DONG HO.
+             Ngu co dinh 420ms tung vua du, nhung `tourPaint` la mot qua trinh NHIEU NHIP: no cuon
+             toi phan tu (`scrollIntoView` muot) roi TU GOI LAI sau 320ms moi dat toa do vong -
+             cong voi 170ms cua `tourShow` la 490ms, da vuot 420ms. Khi buoc huong dan doi sang neo
+             `@man` (khoi noi dung chinh, cao 500-800px, gan nhu luon phai cuon) thi nhip do thanh
+             chuyen thuong xuyen, va bo kiem bao "vong sang khong co kich thuoc" cho nhung buoc
+             THUC RA chay dung. Nay doi den khi vong dung yen, toi da 4 giay.
+             (Cung bai hoc `_checkneo` da rut cung ngay: ngu mot khoang co dinh la DUA voi hieu ung
+              cuon, khong phai doi no.) */
+          await page.waitForFunction(() => {
+            const sp = document.getElementById("tourspot");
+            if (!sp) return false;
+            if (getComputedStyle(sp).display === "none") return true;
+            const r = sp.getBoundingClientRect();
+            if (r.width < 2 || r.height < 2) { window.__uiNeoTruoc = ""; return false; }
+            const k = [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)].join(",");
+            const yen = (window.__uiNeoTruoc === k);
+            window.__uiNeoTruoc = k;
+            return yen;
+          }, null, {timeout: 4000, polling: 160}).catch(() => {});
+          await page.waitForTimeout(120);
           const r = await page.evaluate(() => {
             const bx = document.getElementById("tourbox"), sp = document.getElementById("tourspot");
             const T = TOURS[TOUR.key], st = T.steps[TOUR.i];

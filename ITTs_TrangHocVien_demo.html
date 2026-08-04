@@ -21035,11 +21035,15 @@ function congHTML(){var cur=congDangO(),h="";
     tên ở đáy menu: hai chỗ xa nhau, và khối tên trông như một cái nút mà bấm vào lại văng ra màn
     đăng nhập, không ai đoán được. Nay khối tên chỉ dẫn sang Trang cá nhân (đúng thứ nó đang nói),
     còn đổi người về đây, đứng cạnh đổi cổng. */
+ /* DÙNG LỚP `nguoir` CHỨ KHÔNG DÙNG LẠI `congr`: `_check14` đếm `class="congr"` để canh ngăn kéo
+    liệt kê ĐÚNG BA CỔNG và đánh dấu ĐÚNG MỘT cổng đang đứng. Nhét hai dòng NGƯỜI vào cùng lớp là
+    lặng lẽ làm sai phép đếm của nó - và nó đã báo đỏ thật ngay lượt verify đầu. Người không phải
+    một cái cổng, nên nó phải mang lớp riêng; dáng vẫn y hệt vì `nguoir` kế thừa từ `congr`. */
  h+='<div class="sechd">Người đang đăng nhập</div>';
- h+='<div class="congr here"><div class="congi"><i class="ti ti-user-circle"></i></div>'+
+ h+='<div class="congr nguoir here"><div class="congi"><i class="ti ti-user-circle"></i></div>'+
   '<div style="min-width:0"><b>'+esc(meTen())+'</b><small>'+esc(meChucDanh())+'</small></div>'+
   '<span class="chip" style="margin-left:auto;flex:none">Đang là bạn</span></div>';
- h+='<div class="congr" onclick="gateSwitch()"><div class="congi"><i class="ti ti-arrows-exchange"></i></div>'+
+ h+='<div class="congr nguoir" onclick="gateSwitch()"><div class="congi"><i class="ti ti-arrows-exchange"></i></div>'+
   '<div style="min-width:0"><b>Đăng nhập bằng người khác</b><small>Về màn chọn người - mọi cấu hình và dữ liệu demo giữ nguyên</small></div>'+
   '<i class="ti ti-arrow-right" style="margin-left:auto;opacity:.55;flex:none"></i></div>';
  return h}
