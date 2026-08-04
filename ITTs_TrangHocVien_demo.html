@@ -2972,6 +2972,14 @@ var DSDEF={
  wow:{lead:"mine",hocvien:"mine",lop:"mine",tien:"none",baocao:"none",viec:"mine",nhansu:"none",noidung:"none"},
  ketoan:{lead:"none",hocvien:"all",lop:"none",tien:"all",baocao:"all",viec:"mine",nhansu:"none",noidung:"none"},
  marketing:{lead:"all",hocvien:"none",lop:"none",tien:"none",baocao:"all",viec:"mine",nhansu:"none",noidung:"none"},
+ /* V9.99m - NHÓM NHÂN SỰ TRƯỚC ĐÂY KHÔNG CÓ DÒNG NÀO Ở ĐÂY. Đo được 04/08: đăng nhập bằng
+    Trưởng phòng Nhân sự rồi gõ tên một học viên vào Trợ lý là ra trọn hồ sơ, kèm cả công nợ -
+    trong khi menu của họ không có một trang học viên nào. Lý do nằm ở dòng cuối `dsLevel`:
+    nhóm không khai thì `DSDEF[g]` rỗng và nó rơi về `DSDEF.quantri`, tức THỪA HƯỞNG ĐÚNG
+    PHẠM VI CỦA QUẢN TRỊ VIÊN. Một nhóm bị quên hoá ra lại là nhóm nhiều quyền nhất.
+    Nhân sự làm hồ sơ nhân viên, bảng công và việc nội bộ: `nhansu` toàn quyền, `lop` để "all"
+    vì bảng công tính từ buổi dạy của các lớp; học viên, lead, tiền và nội dung thì không. */
+ nhansu:{lead:"none",hocvien:"none",lop:"all",tien:"none",baocao:"none",viec:"mine",nhansu:"all",noidung:"none"},
  hotro:{lead:"none",hocvien:"none",lop:"none",tien:"none",baocao:"none",viec:"mine",nhansu:"none",noidung:"none"}};
 /* trường bị CHE khi miền "noidung"/"tien" không đủ quyền */
 var DSMASK={noidung:["lead_note","notes","content","result_note","consultation_note","complaint_content","feedback_content","negative_comments","suggestions"],
@@ -2993,7 +3001,11 @@ function dsLevel(dom){var p=dsCfg();
   if(e.sid===CURSTAFF&&e.dom===dom){var d=pvnd(e.until);if(!e.until||(d&&d.getTime()>=now))return e.lv}}
  var g=dsGroup();
  if(p.m[g]&&p.m[g][dom])return p.m[g][dom];
- var base=DSDEF[g]||DSDEF[(g||"").replace(/_mgr$/,"")]||DSDEF.quantri;
+ /* V9.99m - RƠI VỀ CHỖ AN TOÀN, KHÔNG RƠI VỀ CHỖ NHIỀU QUYỀN NHẤT. Bản cũ để `DSDEF.quantri`
+    làm lưới đỡ: nhóm nào quên khai một dòng ở DSDEF là lặng lẽ được nhìn thấy tất cả. Đã cắn
+    thật với nhóm Nhân sự. Nay lưới đỡ là `hotro` - nhóm hẹp nhất; quên khai thì màn hình trống
+    và người ta đi hỏi, chứ không phải dữ liệu rò ra mà không ai biết. */
+ var base=DSDEF[g]||DSDEF[(g||"").replace(/_mgr$/,"")]||DSDEF.hotro;
  return base[dom]||"none"}
 var __dsTeam=null,__dsBr=null;
 var __dsWow=null;

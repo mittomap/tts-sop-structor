@@ -1027,6 +1027,38 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
    thua.length===0, "khai mot trang khong con cua nao tro toi, hoac khong con ton tai");
 })();
 
+/* ---- 13. NHOM NAO CUNG PHAI KHAI PHAM VI DU LIEU (V9.99m) ---------------------------------
+   Bay da can that: nhom "nhansu" khong co dong nao trong DSDEF, `dsLevel` roi ve DSDEF.quantri,
+   thanh ra Truong phong Nhan su nhin thay tron 82 hoc vien va 190 lead - bang dung Quan tri
+   vien - trong khi menu cua ho khong co mot trang hoc vien nao. Go vao Tro ly ten mot hoc vien
+   la ra ho so kem cong no. Khong bo kiem nao hoi cau "nhom nay da khai pham vi chua".
+   Ba phep: moi nhom trong ROLESCOPE phai co dong DSDEF · luoi do phai la nhom HEP nhat, khong
+   phai quan tri · va do THAT: nhom khong duoc dung du lieu ma menu cua ho khong cho mo. */
+(function(){
+ var thieu=Object.keys(ROLESCOPE||{}).filter(function(g){return !DSDEF[g]});
+ t("moi nhom chuc danh deu co dong khai pham vi du lieu"+(thieu.length?" - THIEU: "+thieu.join(", "):""),
+   thieu.length===0, "nhom quen khai se thua huong pham vi cua luoi do");
+ t("luoi do cua dsLevel la nhom HEP nhat, khong phai quan tri",
+   /DSDEF\[\(g\|\|""\)\.replace\(\/_mgr\$\/,""\)\]\|\|DSDEF\.hotro/.test(SRC),
+   "roi ve quantri nghia la quen khai = duoc thay tat ca");
+ /* Do THAT: nhom nao khong co trang hoc vien tren menu thi cung khong duoc thay dong DL09 nao. */
+ var ro=[];
+ Object.keys(ROLESCOPE||{}).forEach(function(g){
+  var nv=(DL.DL01||[]).filter(function(x){return staffActive(x)&&ROLESCOPE[g].match&&ROLESCOPE[g].match.test(ecode(x.role)||"")})[0];
+  if(!nv)return;
+  window.GATE_SID=nv.staff_id;applyScope(nv.staff_id);setRole("all");
+  /* CHI dem nhung trang BAY RA HO SO HOC VIEN. Ban dau ke ca "viec" va "duyet" - hai trang moi
+     chuc danh deu co, nen phep do luon xanh va khong bao gio cắn duoc gi. */
+  var coTrangHV=PAGES.filter(function(p){return !p.hide&&canSee(p.k)})
+    .some(function(p){return /^(hocvien|hoso|dsphuhuynh|banlam|tuyensinh|hoctap|banglop|diemdanh|cskh|ketthuc|khac|ban|chang|hanhtrinh|dsthanhtoan|xeplop|wow|test|tuvan|thanhtoan|baitap|buoihoc|review|ghinhan|khieunai|baoluu|magioithieu)$/.test(p.k)});
+  var soHV=0;try{soHV=srows("DL09").length}catch(e){}
+  if(!coTrangHV&&soHV>0)ro.push(g+" ("+nv.full_name+"): thay "+soHV+" hoc vien ma khong co trang nao mo duoc");
+ });
+ window.GATE_SID="";applyScope("");setRole("all");
+ t("khong nhom nao thay du lieu hoc vien ma menu khong cho mo"+(ro.length?" - RO: "+ro.join(" | "):""),
+   ro.length===0, "Tro ly va tim kiem van doc duoc du lieu do");
+})();
+
 if(bad.length){console.log("CHECKUX DO ("+bad.length+"/"+(ok+bad.length)+"):");
  bad.forEach(function(b){console.log("  - "+b)});process.exit(1)}
 console.log("CHECKUX OK: "+ok+" tieu chi | "+FORM.length+" form ghi deu co loi giai thich, khong o ngay nao de trong");
