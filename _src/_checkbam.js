@@ -32,7 +32,7 @@ const PATHS = ["/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
 const OUT    = process.env.ITTS_OUT || ".";
 const MAXBAM = +(process.env.ITTS_BAMMAX || 3);
 const FILES  = process.env.ITTS_BAMFILE ? [process.env.ITTS_BAMFILE]
-             : ["ITTs_WebApp_v5_demo.html", "ITTs_WebApp_v6_demo.html"];
+             : ["ITTs_WebApp_v5_demo.html"];   /* V9.99: ban V6 da ngung phat hanh */
 
 /* Trang nào KHÔNG có gì để bấm thì khai ở đây kèm lý do đọc được - im lặng bỏ qua thì lần sau
    không ai biết là cố ý hay quên. */

@@ -77,7 +77,7 @@ const VO_OK = ["@bell", "@me", "@doicong", "@help", "@tyle", "@gopy", "@brand", 
      (Luật đã cắn 3 lần: bản đồ nào cắm cứng theo một bản build thì bản kia lặng lẽ mất tính năng.) */
   const CONG = [
     {f: "ITTs_WebApp_v5_demo.html", ten: "v5"},
-    {f: "ITTs_WebApp_v6_demo.html", ten: "v6"},
+  /* V9.99: ban V6 da NGUNG PHAT HANH (anh Luan 04/08) - khong con file de mo. */
   ];
 
   const do_ = [], bo = [];

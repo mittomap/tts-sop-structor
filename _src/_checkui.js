@@ -197,7 +197,7 @@ const PROBE = () => {
      Anh Luan: "van de la e build v6 da chuan chua ay". Mo that la cach duy nhat tra loi. */
   const CONG = [
     {f: "ITTs_WebApp_v5_demo.html", who: "ITTS_WHO",    ten: "cong nhan vien"},
-    {f: "ITTs_WebApp_v6_demo.html", who: "ITTS_WHO",    ten: "cong nhan vien BAN V6"},
+  /* V9.99: ban V6 da NGUNG PHAT HANH (anh Luan 04/08) - khong con file de mo. */
     {f: "ITTs_TrangHocVien_demo.html", who: "ITTS_WHO_HV", ten: "cong hoc vien"},
   ];
   for (const C of CONG) for (const V of VIEWS) {

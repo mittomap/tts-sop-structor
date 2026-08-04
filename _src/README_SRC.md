@@ -33,6 +33,22 @@ cp -r "<mnt>/SOP ITTs/_src/." <WORK>/ && cd <WORK>
 ITTS_OUT="<mnt>/SOP ITTs" python3 gen_v5.py
 ```
 
+## Bản V6 đã ngừng phát hành (04/08)
+
+Anh Luân chốt: *"Hủy V6 nhé em"* - mức **ngừng phát hành, giữ mã nguồn**. Nguồn không còn build
+ra `ITTs_WebApp_v6_demo.html` / `_APP6.js`; `verify.sh` không còn mục 4bis; bốn bộ kiểm trình
+duyệt chỉ chạy bản V5; trang chủ demo rút còn một bước.
+
+**Vẫn còn nguyên trong `gen_v5.py`:** cờ `window.ITTS_V6`, hàm `V6()`, `NAVTREE6`, trang `ban`,
+bài hướng dẫn `tq_ban`, mọi nhánh rẽ theo bản build. Muốn bật lại: bỏ dấu `#` ở ba dòng cuối
+`gen_v5.py`, một dòng trong `extract_js.py`, và dựng lại mục 4bis trong `verify.sh` (ghi chú
+của mục đó vẫn nằm nguyên chỗ cũ, kèm hai lỗi thật mà nó từng bắt được).
+
+**Luật rút ra khi gỡ:** gỡ một tính năng thì phải đi tìm **mọi cái thước đang đo nó**. `_checkux`
+có bảy phép kiểm viết riêng cho trang chủ hai bước; xoá cho im thì mất luôn phép canh *"cửa nào
+trang chủ trỏ tới cũng phải có file thật"* - đúng loại 404 mà `update.sh` từng cắn. Nên với mỗi
+phép kiểm phải hỏi lại: **nên xoá, hay nên đổi câu hỏi?**
+
 ## VERIFY (bắt buộc sau mỗi build)
 > **Chạy một lệnh là xong: `./verify.sh` ở gốc repo.** Nó build lại, trích `_APP.js`/`_HV.js` rồi
 > chạy toàn bộ bảng dưới đây, in xanh/đỏ và trả mã thoát. Bảng này để tra "bộ kiểm nào canh điều gì",

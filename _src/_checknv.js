@@ -34,7 +34,7 @@ const PATHS = ["/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
 const OUT   = process.env.ITTS_OUT || ".";
 const MAXHS = +(process.env.ITTS_NVHS || 2);
 const FILES = process.env.ITTS_NVFILE ? [process.env.ITTS_NVFILE]
-            : ["ITTs_WebApp_v5_demo.html", "ITTs_WebApp_v6_demo.html"];
+            : ["ITTs_WebApp_v5_demo.html"];   /* V9.99: ban V6 da ngung phat hanh */
 
 /* ---- các đoạn chạy TRONG trang ---------------------------------------------------------- */
 

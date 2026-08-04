@@ -18974,22 +18974,11 @@ var CONGDS=[
  ["ph","Cổng phụ huynh","ti-users","Theo dõi việc học của con - ẩn phần trao đổi riêng tư của học viên."]];
 function congHTML(){var cur=congDangO(),h="";
  h+='<div class="fhint" style="margin:0 0 12px">Ba cổng dùng chung một bộ dữ liệu demo - đổi qua lại bao nhiêu lần thì số liệu vẫn là một.</div>';
- /* CHON BAN - chi hien o cong nhan vien, vi ban 5 va ban 6 chi khac nhau o dung cong nay.
-    Cong hoc vien va cong phu huynh dung chung mot ban, bay them nut o do la noi doi bang bo cuc. */
- (function(){
-  if(cur!=="nv")return;
-  var dangV6=false;try{dangV6=congLaV6()}catch(e){}
-  h+='<div class="sechd" style="margin-top:0">Bản đang xem</div>';
-  [["5","Bản 5 · theo nghiệp vụ","ti-layout-cards","Mỗi nghiệp vụ một trang riêng, menu chia theo chặng vòng đời của khách."],
-   ["6","Bản 6 · theo đối tượng","ti-focus-2","Mở app ra là Bàn làm việc - chọn một người, làm hết việc ngay tại chỗ."]]
-  .forEach(function(b){var here=(b[0]==="6")===dangV6;
-   h+='<div class="congb'+(here?" here":"")+'"'+(here?"":' onclick="congDiBan(\''+b[0]+'\')"')+'>'+
-    '<div class="congi"><i class="ti '+b[2]+'"></i></div>'+
-    '<div style="min-width:0"><b>'+esc(b[1])+'</b><small>'+esc(b[3])+'</small></div>'+
-    (here?'<span class="chip" style="margin-left:auto;flex:none">Đang xem</span>'
-         :'<i class="ti ti-arrow-right" style="margin-left:auto;opacity:.55;flex:none"></i>')+'</div>'});
-  h+='<div class="sechd">Cổng</div>';
- })();
+ /* V9.99 - O CHON BAN DA GO. Anh Luan 04/08: *"Huy V6 nhe em"* (muc: ngung phat hanh, giu ma
+    nguon). Ngan keo nay tung co them muc "Ban dang xem" de nhay qua lai giua ban 5 va ban 6;
+    khong con ban 6 de nhay toi nen muc do bien mat. Ham congDiBan/congLaV6/congBanNho van con
+    trong nguon - chung tra ve "ban 5" cho moi truong hop, va la duong bat lai neu mai kia dung
+    lai ban thu hai. */
  CONGDS.forEach(function(c){var here=(c[0]===cur);
   h+='<div class="congr'+(here?" here":"")+'"'+(here?"":' onclick="congDi(\''+c[0]+'\')"')+'>'+
    '<div class="congi"><i class="ti '+c[2]+'"></i></div>'+

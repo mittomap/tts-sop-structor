@@ -20,3 +20,7 @@ _src/ITTs_data.js
 # Moi may mot toc do nen khong dua vao git (V9.96c)
 _src/_thoigian_verify.txt
 _src/_thoigian_verify_nhanh.txt
+
+# ban V6 da ngung phat hanh (04/08) - khong con build ra hai file nay
+ITTs_WebApp_v6_demo.html
+_src/_APP6.js

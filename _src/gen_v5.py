@@ -20796,22 +20796,11 @@ var CONGDS=[
  ["ph","Cổng phụ huynh","ti-users","Theo dõi việc học của con - ẩn phần trao đổi riêng tư của học viên."]];
 function congHTML(){var cur=congDangO(),h="";
  h+='<div class="fhint" style="margin:0 0 12px">Ba cổng dùng chung một bộ dữ liệu demo - đổi qua lại bao nhiêu lần thì số liệu vẫn là một.</div>';
- /* CHON BAN - chi hien o cong nhan vien, vi ban 5 va ban 6 chi khac nhau o dung cong nay.
-    Cong hoc vien va cong phu huynh dung chung mot ban, bay them nut o do la noi doi bang bo cuc. */
- (function(){
-  if(cur!=="nv")return;
-  var dangV6=false;try{dangV6=congLaV6()}catch(e){}
-  h+='<div class="sechd" style="margin-top:0">Bản đang xem</div>';
-  [["5","Bản 5 · theo nghiệp vụ","ti-layout-cards","Mỗi nghiệp vụ một trang riêng, menu chia theo chặng vòng đời của khách."],
-   ["6","Bản 6 · theo đối tượng","ti-focus-2","Mở app ra là Bàn làm việc - chọn một người, làm hết việc ngay tại chỗ."]]
-  .forEach(function(b){var here=(b[0]==="6")===dangV6;
-   h+='<div class="congb'+(here?" here":"")+'"'+(here?"":' onclick="congDiBan(\''+b[0]+'\')"')+'>'+
-    '<div class="congi"><i class="ti '+b[2]+'"></i></div>'+
-    '<div style="min-width:0"><b>'+esc(b[1])+'</b><small>'+esc(b[3])+'</small></div>'+
-    (here?'<span class="chip" style="margin-left:auto;flex:none">Đang xem</span>'
-         :'<i class="ti ti-arrow-right" style="margin-left:auto;opacity:.55;flex:none"></i>')+'</div>'});
-  h+='<div class="sechd">Cổng</div>';
- })();
+ /* V9.99 - O CHON BAN DA GO. Anh Luan 04/08: *"Huy V6 nhe em"* (muc: ngung phat hanh, giu ma
+    nguon). Ngan keo nay tung co them muc "Ban dang xem" de nhay qua lai giua ban 5 va ban 6;
+    khong con ban 6 de nhay toi nen muc do bien mat. Ham congDiBan/congLaV6/congBanNho van con
+    trong nguon - chung tra ve "ban 5" cho moi truong hop, va la duong bat lai neu mai kia dung
+    lai ban thu hai. */
  CONGDS.forEach(function(c){var here=(c[0]===cur);
   h+='<div class="congr'+(here?" here":"")+'"'+(here?"":' onclick="congDi(\''+c[0]+'\')"')+'>'+
    '<div class="congi"><i class="ti '+c[2]+'"></i></div>'+
@@ -21004,12 +20993,18 @@ for p in [os.path.join(_OUT,"ITTs_WebApp_v5_demo.html")]:
 # đúng cái bẫy "một sự thật ở hai chỗ" nhiều lần rồi.
 # Nên: cùng một `gen_v5.py`, chỉ khác một BIẾN CỜ nhúng vào bản build. Phần thân app đọc cờ đó
 # để quyết trục tổ chức; mọi thứ còn lại dùng chung nguyên vẹn.
-_v6 = out.replace('window.ITTS_V6=0;', 'window.ITTS_V6=1;')
-if _v6 == out:
-    raise SystemExit("LOI: khong tim thay cho cam co ITTS_V6 trong ban build - v6 se giong het v5")
-_p6 = os.path.join(_OUT,"ITTs_WebApp_v6_demo.html")
-open(_p6,"w",encoding="utf-8").write(_v6)
-print("WROTE", _p6, len(_v6), "bytes  (ban V6 - truc thuc the)")
+# ── NGUNG PHAT HANH BAN V6 (anh Luan chot 04/08: "Huy V6 nhe em" -> muc "ngung phat hanh, giu
+#    ma nguon"). KHONG con ghi file ITTs_WebApp_v6_demo.html, khong con trich _APP6.js, khong con
+#    muc 4bis trong verify.sh, khong con o chon ban tren trang chu demo.
+#    NHUNG PHAN THAN VAN CON NGUYEN: co `window.ITTS_V6`, ham `V6()`, `NAVTREE6`, trang `ban`,
+#    moi nhanh re theo ban build - tat ca giu lai co chu dich. Ly do: go sach chung la dong vao
+#    hang nghin dong cua ban V5 dang chay tot, doi lay mot ban nguon gon hon mot chut. Rui ro
+#    khong dang. Muon bat lai V6 thi bo dau `#` o ba dong duoi day (cong voi extract_js.py va
+#    verify.sh) - mot buoi la xong.
+#    Truoc do da xay xong bo kiem chay ca hai ban build; lich su do nam trong git.
+# _v6 = out.replace('window.ITTS_V6=0;', 'window.ITTS_V6=1;')
+# _p6 = os.path.join(_OUT,"ITTs_WebApp_v6_demo.html")
+# open(_p6,"w",encoding="utf-8").write(_v6)
 _php = os.path.join(_OUT,"ITTs_TrangHocVien_demo.html")
 open(_php,"w",encoding="utf-8").write(out_hv)
 print("WROTE", _php, len(out_hv), "bytes")

@@ -21,7 +21,9 @@ OUT = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("ITTS_OUT") or os.pat
 # ban v6 duoc giao ma chua bo kiem nao chay qua. Anh Luan 01/08: "van de la e build v6 da chuan
 # chua ay, chu bat a lam thu trong khi thiet ke luong te hoac loi tum lum thi...".
 CAP = [("ITTs_WebApp_v5_demo.html", "_APP.js"),
-       ("ITTs_WebApp_v6_demo.html", "_APP6.js"),
+       # V9.99: ban V6 da ngung phat hanh (anh Luan 04/08) - khong con file de trich.
+       # Bat lai thi bo dau # o dong duoi, cung luc voi ba dong o cuoi gen_v5.py.
+       # ("ITTs_WebApp_v6_demo.html", "_APP6.js"),
        ("ITTs_TrangHocVien_demo.html", "_HV.js")]
 
 for ten_html, ten_js in CAP:

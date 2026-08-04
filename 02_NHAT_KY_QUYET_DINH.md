@@ -149,6 +149,30 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.99 — NGỪNG PHÁT HÀNH BẢN V6 ✅ (04/08).**
+> · Anh Luân: *"Hủy V6 nhé em"* - chốt mức **ngừng phát hành, GIỮ mã nguồn**.
+> · **Đã gỡ:** không còn build `ITTs_WebApp_v6_demo.html` và `_APP6.js` · mục **4bis** của
+> `verify.sh` (chạy lại 16 bộ kiểm trên bản V6) · bản V6 trong 4 bộ kiểm trình duyệt · ô **"Bản
+> đang xem"** trong ngăn kéo Đổi cổng · **bước chọn bản** trên trang chủ demo (từ hai bước rút
+> còn một - vào thẳng ba cổng) · cổng `cong-nhan-vien-v6/` bên repo demo và trong `update.sh`.
+> · **Cố ý GIỮ trong nguồn:** cờ `window.ITTS_V6`, hàm `V6()`, `NAVTREE6`, trang `ban`, bài
+> hướng dẫn `tq_ban` (đã khai `chi:"6"` nên bản 5 không thấy), và mọi nhánh rẽ theo bản build.
+> Lý do: gỡ sạch chúng là động vào hàng nghìn dòng của bản V5 **đang chạy tốt**, đổi lấy một bản
+> nguồn gọn hơn một chút. Rủi ro không đáng. Muốn bật lại thì bỏ dấu `#` ở ba dòng cuối
+> `gen_v5.py` cộng `extract_js.py` và `verify.sh` - một buổi là xong.
+> · **Ba chỗ đỏ cuối cùng của lượt verify trước đều là của riêng V6** (`v6: _checktour` báo neo
+> `@bangviec` không có trên trang `ban` vì bộ kiểm đóng vai Admin mà Admin không có bảng việc;
+> `_checkneo` v6 ×2 trùng chỗ giữa bài tổng quan và bài Bàn làm việc). Em **cố ý không vá** -
+> vá một bản sắp gỡ là công bỏ đi. Chúng biến mất vì sản phẩm không còn, không phải vì bịt
+> miệng thước.
+> · **Bẫy đã cắn ngay khi gỡ:** `_checkux` có **bảy phép kiểm** viết riêng cho trang chủ hai
+> bước ("đủ ba bước", "nhánh bản 6 trỏ đúng bản 6", "mỗi bước 2 có lối quay lại chọn bản"...).
+> Gỡ giao diện mà quên thước thì thước đỏ oan - và tệ hơn, nếu ai đó chỉ xoá dòng đỏ cho im thì
+> mất luôn phép canh **"cửa nào trang chủ trỏ tới cũng phải có file thật"**. Nay thay bằng bốn
+> phép hỏi đúng cái còn lại, trong đó có một phép MỚI: *không còn cửa nào trỏ sang bản V6 đã gỡ*
+> - chính là loại 404 mà `update.sh` từng cắn một lần. **Luật: gỡ một tính năng thì phải đi tìm
+> mọi cái thước đang đo nó, và hỏi lại từng cái là nên xoá hay nên đổi câu hỏi.**
+
 > **Phiên bản: V9.98 — GÓP Ý RA GOOGLE SHEET, GỘP ĐỔI CỔNG + ĐỔI NGƯỜI ✅ (04/08).**
 > · **Bỏ hẳn trang "Ghi nhận góp ý"** (anh Luân: *"em đổi cái nút báo lỗi góp ý bay ra trang mới
 > <link sheet>. Rồi em bỏ trang Ghi nhận góp ý đi. Anh dùng google sheet để ghi nhận cho tiện"*).
