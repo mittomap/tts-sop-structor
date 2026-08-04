@@ -133,6 +133,35 @@ const OCHON = () => {
   return xau;
 };
 
+/* ═══ V9.99b - ĐƯỜNG GHI CỦA BẢN V5 ═══════════════════════════════════════════════════════
+   Bản V6 làm việc TẠI CHỖ: bấm Làm là ngăn kéo mở ra, điền rồi Lưu. Bản V5 cố ý NHẢY TRANG.
+   Nên khi bỏ bản V6 (04/08), nhánh chạy tới `ghiDuoc` không còn được đi qua - `ghiDuoc` tụt từ
+   100 xuống 0 mà bộ kiểm vẫn in OK. Đèn xanh phủ lên một phép đo đã mất.
+   Sửa: ở bản V5, sau khi nhảy trang thì **đường ghi bắt đầu từ chính trang đó** - bấm một dòng
+   hoặc một thẻ, ngăn kéo mở ra, rồi chạy tiếp đúng khối điền-và-Lưu cũ. Đây là đúng thao tác
+   người thật làm: mở app, tới trang, bấm vào hồ sơ, làm việc.
+   Bốn loại phần tử dưới đây là đúng bốn loại `_checkbam` đã chứng minh mở được ngăn kéo trên
+   bản V5 (79 lượt mở thật). Không đoán thêm loại nào. */
+const MOKEO = () => {
+  /* THỨ TỰ QUAN TRỌNG. Bản vá đầu chỉ bấm dòng/thẻ, và mở ra đúng 7 ngăn kéo - nhưng cả 7 đều
+     là ngăn kéo XEM HỒ SƠ (chỉ đọc), không có nút Lưu, nên `ghiDuoc` vẫn 0. Mở được một cái gì
+     đó không có nghĩa là mở đúng thứ cần mở.
+     Thứ thật sự ghi được trên bản V5 là NÚT HÀNH ĐỘNG trong thẻ việc (`.jnr` / `.jgo`: "Ghi nhận
+     thanh toán", "Gọi & ghi kết quả", "Xếp lớp cho học viên"...). Nên hỏi chúng TRƯỚC; hết mới
+     lùi về dòng/thẻ. */
+  const ds = ["#content .jnr button.btn.primary", "#content button.jgo",
+              "#content .obcard", "#content table.dt tbody tr", "#content .lrow", "#content .banrow"];
+  for (const sel of ds) {
+    const el = document.querySelector(sel);
+    if (!el) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width < 20 || r.height < 8) continue;
+    try { el.click(); } catch (e) { continue; }
+    return sel;
+  }
+  return "";
+};
+
 const TRANGTHAI = () => {
   const dr = document.getElementById("drawer");
   const to = document.getElementById("toast");
@@ -163,7 +192,8 @@ const TRANGTHAI = () => {
   const do_ = [];          /* chỗ đỏ */
   const ghi = [];          /* chỗ đáng ghi chú, không tính đỏ */
   const ochonDaBao = new Set();
-  let dem = {luot: 0, ghiDuoc: 0, tuChoi: 0, imLang: 0, khongKeo: 0, loiJS: 0, nhay: 0, tiep: 0, oTim: 0};
+  let dem = {luot: 0, ghiDuoc: 0, tuChoi: 0, imLang: 0, khongKeo: 0, loiJS: 0, nhay: 0, tiep: 0, oTim: 0,
+             moTuTrang: 0, khongCho: 0};
 
   for (const F of FILES) {
     if (!fs.existsSync(path.resolve(OUT) + "/" + F)) { do_.push(F + ": khong co file build"); continue; }
@@ -261,6 +291,12 @@ const TRANGTHAI = () => {
         if (dat.cur !== "ban") { do_.push(cx + ": mo Ban lam viec khong duoc (CUR=" + dat.cur + ")"); continue; }
         if (dat.nut <= i) { do_.push(cx + ": ho so ve ra " + dat.nut + " nut Lam, thieu nut cho viec nay"); continue; }
 
+        /* Đóng ngăn kéo còn sót của lượt TRƯỚC. Lớp phủ của nó chặn chuột, và Playwright sẽ
+           đợi hết 5 giây rồi báo "không bấm được nút Làm" - một lỗi hoàn toàn của cái thước.
+           (Từ khi bản V5 cũng mở ngăn kéo, lượt nào cũng có thể để lại một cái đang mở.) */
+        await page.evaluate(() => { try { closeModal(); } catch (e) {} });
+        await page.waitForTimeout(120);
+
         /* BƯỚC 4 - bấm nút Làm bằng chuột thật */
         await page.locator(".banjob button.btn.primary").nth(i).click({timeout: 5000}).catch(e => {
           do_.push(cx + ": khong bam duoc nut Lam (" + String(e.message).split("\n")[0].slice(0, 70) + ")");
@@ -277,12 +313,28 @@ const TRANGTHAI = () => {
             const dai = await page.evaluate(() => (document.getElementById("content") || {}).innerHTML.length || 0);
             if (st.cur === "ban") do_.push(cx + ": bam Lam ma khong di dau ca, cung khong mo ngan keo");
             else if (dai < 400) do_.push(cx + ": nhay sang trang " + st.cur + " nhung trang trong (" + dai + " ky tu)");
-            if (loiJS.length) { dem.loiJS++; do_.push(cx + ": LOI JS khi nhay trang - " + loiJS[0]); }
+            if (loiJS.length) { dem.loiJS++; do_.push(cx + ": LOI JS khi nhay trang - " + loiJS[0]); continue; }
+
+            /* ĐI TIẾP đường ghi của bản V5: mở một hồ sơ trên trang vừa tới. Mở không được thì
+               vẫn tính là "nhảy trang đúng" - không phải trang nào cũng là trang ghi (báo cáo,
+               bản đồ chặng chỉ để đọc). Chỉ khi mở được mới chấm tiếp việc GHI. */
+            const moBang = await page.evaluate(MOKEO);
+            if (!moBang) { dem.khongCho++; continue; }
+            await page.waitForTimeout(320);
+            st = await page.evaluate(TRANGTHAI);
+            if (!st.keoMo) { dem.khongCho++; continue; }
+            dem.moTuTrang++;
+          }
+          /* CHỈ rơi xuống đây khi ngăn kéo VẪN chưa mở. Bẫy đã cắn ngay ở bản vá đầu: nhánh
+             bản V5 phía trên vốn kết bằng `continue`; em thay nó bằng đoạn mở ngăn kéo mà quên
+             mất rằng bỏ `continue` là luồng chảy thẳng xuống nhánh của bản V6 - 7 lượt vừa mở
+             được ngăn kéo lập tức bị chấm "bấm Làm mà ngăn kéo không mở (v6 phải làm tại chỗ)".
+             Máy báo đỏ 14 chỗ mà app không sai một dòng nào. */
+          if (!st.keoMo) {
+            dem.khongKeo++;
+            do_.push(cx + ": bam Lam ma ngan keo khong mo (v6 phai lam tai cho)");
             continue;
           }
-          dem.khongKeo++;
-          do_.push(cx + ": bam Lam ma ngan keo khong mo (v6 phai lam tai cho)");
-          continue;
         }
         if (st.keoDai < 120) { do_.push(cx + ": ngan keo mo ra nhung gan nhu trong (" + st.keoDai + " ky tu)"); continue; }
 
@@ -357,6 +409,8 @@ const TRANGTHAI = () => {
   const tom = "da lam THAT " + dem.luot + " luot viec (bam chuot that tren " + FILES.length + " ban build)" +
     " - ghi duoc " + dem.ghiDuoc + " (trong do " + dem.tiep + " luot mo tiep man ke) · tu choi co loi " + dem.tuChoi +
     (dem.nhay ? " · nhay trang (ban 5) " + dem.nhay : "") +
+    (dem.moTuTrang ? " · mo tiep ho so tu trang vua toi " + dem.moTuTrang : "") +
+    (dem.khongCho ? " · trang chi de doc " + dem.khongCho : "") +
     (dem.imLang ? " · IM LANG " + dem.imLang : "") +
     (dem.khongKeo ? " · khong mo ngan keo " + dem.khongKeo : "") +
     (dem.loiJS ? " · loi JS " + dem.loiJS : "");
