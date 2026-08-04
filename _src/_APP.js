@@ -1237,6 +1237,12 @@ function colMenuHTML(key){var cfg=LISTCFG[key];if(window.COLMENU!==key)return ''
    Bộ kiểm _checkux canh: dải nào gọi statStrip mà không khai ở đây là đỏ; số thẻ khai lệch với
    số thẻ vẽ ra thật cũng đỏ; thẻ nào còn onclick cũng đỏ. */
 var THEDEF={
+ lopruiro:{t:"Vận hành lớp - cần xử lý",the:[
+  ["lr_nguyco","Học viên nguy cơ","Học viên CỦA LỚP NÀY đang bị đánh dấu nguy cơ - vắng nhiều hoặc điểm học thuật dưới ngưỡng. Muốn xem từng em: tab Học viên ngay dưới, cột trạng thái có chip đỏ."],
+  ["lr_chuadd","Buổi chưa điểm danh","Buổi ĐÃ dạy xong mà chưa có một dòng điểm danh nào. Buổi chưa tới thì không tính - chưa dạy thì chưa phải việc. Muốn xem: tab Điểm danh."],
+  ["lr_chuanx","Buổi quá hạn chưa nhận xét","Buổi dạy xong đã quá ngưỡng giờ ghi nhận xét (chỉnh ở Cài đặt, slaTeacherNote_hours) mà giáo viên chưa ghi. Muốn xem: tab Buổi học, dòng nào quá hạn hiện đỏ."],
+  ["lr_chuacham","Bài đã nộp chưa chấm","Học viên đã nộp mà chưa ai chấm - nộp rồi để đó là các em chờ vô ích. Muốn xem: tab Bài tập."],
+  ["lr_no","Học viên còn nợ","Đếm số HỌC VIÊN của lớp còn khoản phải thu, cộng mọi đơn chưa huỷ của em đó. Một em nợ hai đơn vẫn tính là một người. Muốn xem: trang Thanh toán, lọc theo lớp."]]},
  dsphuhuynh:{t:"Sổ phụ huynh",the:[
   ["ph_nguoi","Người đồng hành","Số người đồng hành trong phạm vi dữ liệu của bạn. Gộp theo SỐ ĐIỆN THOẠI - hai học viên khai cùng một số là một người. Muốn xem danh sách: chính bảng ngay dưới dải này."],
   ["ph_nhieu","Có từ 2 con trở lên","Người đang có nhiều hơn một con theo học. Gọi cho họ một lần là nói được chuyện của cả hai - đừng để hai bộ phận gọi hai lần trong một ngày. Muốn xem: cột thứ hai của mỗi dòng ghi rõ tên từng con."],
@@ -7197,6 +7203,49 @@ function renderBanglop(){
   var risk=stu.filter(stuRisk).length;
   var sv=rows("DL15").filter(function(v){return String(v.class_id||"")===cid&&num(v.satisfaction_score)>0});
   var ss=sv.length?(sv.reduce(function(a,v){return a+num(v.satisfaction_score)},0)/sv.length):null;
+  /* ═══ V9.99g - DẢI RỦI RO CỦA CHÍNH LỚP NÀY ═══════════════════════════════════════════════
+     Anh Luân 04/08: *"ở trong vận hành lớp, nó có tổng hợp được mấy cái rủi ro của lớp đó ko
+     nhỉ: học viên nguy cơ · Buổi chưa điểm danh · Buổi chưa nhận xét ... anh muốn tìm mà ko
+     biết chỗ nào để xem đấy"*.
+     Đo lại thì anh đúng: trang này có KPI (sĩ số, chuyên cần, nộp bài, hài lòng) - toàn số
+     TỔNG KẾT, không có ô nào nói "còn việc gì chưa làm cho lớp này". Muốn biết buổi nào chưa
+     nhận xét phải rời khỏi lớp, sang hub Học tập, mở tab khác. Người đang vận hành một lớp mà
+     phải đi nơi khác mới biết lớp mình thiếu gì là thiết kế sai chỗ.
+     KHÁC KPI Ở CHỖ NÀO: KPI trả lời "lớp này đang tốt hay xấu"; dải này trả lời "TÔI CÒN PHẢI
+     LÀM GÌ". Nên mỗi ô là một số ĐẾM VIỆC CÒN TỒN, và bấm được để đi thẳng tới chỗ làm. */
+  (function(){
+   var ses=rows("DL11").filter(function(x){return x.class_id===cid});
+   var coDD={};att.forEach(function(a){coDD[a.session_id]=1});
+   /* Buổi ĐÃ DẠY XONG mà không có một dòng điểm danh nào. Buổi chưa tới thì chưa phải việc. */
+   var chuaDD=ses.filter(function(x){var st=bhState(x);return st.done&&!coDD[x.session_id]}).length;
+   /* Quá hạn ghi nhận xét - dùng chính bhState().noteOver của app (ngưỡng CH2 slaTeacherNote_hours). */
+   var chuaNX=ses.filter(function(x){return bhState(x).noteOver}).length;
+   /* Bài đã nộp mà chưa chấm - nộp rồi để đó là học viên chờ vô ích. */
+   var chuaCham=hw.filter(function(x){return hwSubmitted(x)&&!hwGraded(x)}).length;
+   /* Còn nợ: tính theo ĐƠN của học viên trong lớp, dùng đúng công thức app dùng ở chỗ khác. */
+   var noHV={};
+   rows("DL06").forEach(function(e){
+    if(/cancel/.test(ecode(e.enrollment_status)))return;
+    if(!sidsK[e.student_id])return;
+    var rem=num(e.remaining_amount)||Math.max(0,(num(e.final_fee)||num(e.total_fee))-num(e.paid_amount));
+    if(rem>0)noHV[e.student_id]=1});
+   var soNo=Object.keys(noHV).length;
+   var tong=risk+chuaDD+chuaNX+chuaCham+soNo;
+   h+='<div class="sechd" data-tour="lopruiro">Cần xử lý cho lớp này'+
+     ' <span style="font-weight:600;text-transform:none;letter-spacing:0" class="mut">· '+
+     (tong?(tong+" việc còn tồn"):"không còn việc nào")+'</span></div>'+
+    '<div class="fhint" style="margin:-4px 0 8px">Khác với dải chỉ số ở trên (nói lớp đang tốt hay xấu), dải này đếm VIỆC CÒN PHẢI LÀM cho riêng lớp này. Bấm một ô để tới thẳng chỗ làm.</div>';
+   /* THẺ LÀ ĐỒNG HỒ - không bấm (luật AC/AB của dự án): giữ thẻ bấm được thì phải viết bộ lọc
+      riêng cho từng ô, và app sẽ có HAI loại ô mà người dùng phải học phân biệt. Đường tới danh
+      sách nằm trong câu chú thích của từng thẻ (khai ở THEDEF.lopruiro). */
+   h+=statStrip([
+    ["ti-alert-triangle",risk,"Học viên nguy cơ",risk?"#E24B4A":"#16A34A"],
+    ["ti-checkbox",chuaDD,"Buổi chưa điểm danh",chuaDD?"#E24B4A":"#16A34A"],
+    ["ti-writing",chuaNX,"Buổi quá hạn chưa nhận xét",chuaNX?"#E08A1E":"#16A34A"],
+    ["ti-book",chuaCham,"Bài đã nộp chưa chấm",chuaCham?"#E08A1E":"#16A34A"],
+    ["ti-cash",soNo,"Học viên còn nợ",soNo?"#E08A1E":"#16A34A"]
+   ],"lopruiro");
+  })();
   var cap=num(lop.class_capacity),cur=num(lop.current_enrollment)||nStu;
   var curP=cap>0?cur/cap:null, attP=att.length?pres/att.length:null, hcrP=hw.length?hwSub/hw.length:null;
   h+=statStrip([
