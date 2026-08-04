@@ -38,7 +38,7 @@ var have={};(SRCPY.match(/data-tour="[A-Za-z0-9_.\-]+"/g)||[]).forEach(function(
 var want={};
 keys.forEach(function(k){TOURS[k].steps.forEach(function(st,i){
   var sl=String(st.sel||"");
-  if(sl.indexOf("@txt:")===0)return;   /* neo theo CHU tren nut - canh o khoi rieng ben duoi */
+  if(neoChay(sl))return;   /* neo theo CHU tren nut - canh o khoi rieng ben duoi */
   if(sl.charAt(0)==="@"){var a=sl.slice(1);want[a]=1;
     if(!have[a])bad.push("bai "+k+" buoc "+(i+1)+": goi ma neo @"+a+" KHONG co trong ma nguon")}
 })});
@@ -75,16 +75,43 @@ function t2(n,c){if(!c)bad.push(n)}
 /* MOI ma neo phai LA DUY NHAT tren mot man. Neo trung ten o hai cho thi tourFind lay cai dau
    tien trong DOM - va vo app (menu, thanh tren, dai nhac) luon dung truoc than trang, nen cai
    thang luon la cai sai. Do THAT: ve tung trang roi dem so lan ma neo xuat hien. */
+/* ═══ V9.98 - VE DUNG CAI MAN NGUOI DUNG THAT SU TOI ════════════════════════════════════════
+   Bay da can: buoc tn_sale#2 khai `p:"nhaplead"` va neo vao nut "Khach moi lien he den". Bo kiem
+   nay bao DO ("chu khong co tren trang") trong khi mo trinh duyet that thi nut nam so so ra do.
+   Ai sai? BO KIEM SAI. `go("nhaplead")` KHONG ve trang nhaplead: no remap sang hub Tuyen sinh voi
+   tab "lead" (TSMAP), va tab do la mot man KHAC han trang danh sach dung rieng - nut them o day
+   ten "Khach moi lien he den", con trang danh sach dung rieng thi nut ten "Them moi".
+   Tuc la bo kiem dang soi mot MAN NGUOI DUNG KHONG BAO GIO TOI, roi lay ket qua do cham bai
+   huong dan. Nay hoi THANG cac bang remap cua chinh app (TSMAP/CSMAP/HTMAP/KMAP/DUYMAP/ARCMAP)
+   thay vi tu doan - dung mot ham dung chung cho ca 5 cho ve trang trong file nay.
+   LUAT: bo kiem phai di dung cua ma nguoi dung di. Ve thang RENDER[p] la tu dat ra mot man rieng. */
+function manThat(pg){
+ try{
+  if(typeof TSMAP==="object"&&TSMAP[pg]){window.TSTAB=TSMAP[pg];return "tuyensinh"}
+  if(pg==="bangcong"){window.GVTAB="cong";return "giangvien"}
+  if(pg==="hanhtrinh"){window.BLVIEW="board";return "banlam"}
+  if(typeof ARCMAP==="object"&&ARCMAP[pg]){window.ARC=pg;return "chang"}
+  if(typeof CSMAP==="object"&&CSMAP[pg]){window.CSTAB=CSMAP[pg];return "cskh"}
+  if(typeof HTMAP==="object"&&HTMAP[pg]){window.HTTAB=HTMAP[pg];return "hoctap"}
+  if(typeof KMAP==="object"&&KMAP[pg]){window.KTAB=KMAP[pg];return "khac"}
+  if(typeof DUYMAP==="object"&&DUYMAP[pg]){window.DUYTAB=pg;return "duyet"}
+ }catch(e){}
+ return pg}
+/* V9.98: `@man` la neo TINH LUC CHAY (tourMan() tra ve khoi noi dung chinh cua man dang mo),
+   khong phai mot thuoc tinh data-tour khai san trong ma nguon - nen moi phep kiem "ma neo nay co
+   trong nguon khong / co tren trang khong" deu khong ap dung duoc cho no. Do dung do trong
+   `_checkneo` tren trinh duyet that: no goi thang tourFind() roi soi phan tu tra ve. */
+function neoChay(sel){return String(sel||"")==="@man"||String(sel||"").indexOf("@txt:")===0}
 (function(){
  var trung=[];
  setRole("all");
  keys.forEach(function(k){TOURS[k].steps.forEach(function(st,i){
   var sel=String(st.sel||"");
-  if(sel.charAt(0)!=="@"||sel.indexOf("@txt:")===0)return;
+  if(sel.charAt(0)!=="@"||neoChay(sel))return;
   var ma=sel.slice(1), pg=st.p;
   if(!pg||!PBK[pg])return;
   if(st.ctx)try{st.ctx()}catch(e){}
-  var h="";try{CUR=pg;h=(PBK[pg].ty==="list")?renderList(pg):(RENDER[pg]?RENDER[pg]():"")}catch(e){return}
+  var h="";try{pg=manThat(pg);CUR=pg;h=(PBK[pg].ty==="list")?renderList(pg):(RENDER[pg]?RENDER[pg]():"")}catch(e){return}
   if(!h||/ngo[aà]i ph[aạ]m vi/i.test(h))return;
   var n=(h.match(new RegExp('data-tour="'+ma+'"',"g"))||[]).length;
   if(n>1)trung.push(k+"["+i+"] @"+ma+" x"+n+" tren trang "+pg)})});
@@ -102,11 +129,11 @@ var NEO_VO={navlbl:1,navarc:1,navarcx:1,bell:1,me:1,help:1,doicong:1,brand:1,hvn
  setRole("all");
  keys.forEach(function(k){TOURS[k].steps.forEach(function(st,i){
   var sel=String(st.sel||"");
-  if(sel.charAt(0)!=="@"||sel.indexOf("@txt:")===0)return;
+  if(sel.charAt(0)!=="@"||neoChay(sel))return;
   var ma=sel.slice(1); if(NEO_VO[ma])return;
   var pg=st.p; if(!pg||!PBK[pg])return;
   if(st.ctx)try{st.ctx()}catch(e){}
-  var h="";try{CUR=pg;h=(PBK[pg].ty==="list")?renderList(pg):(RENDER[pg]?RENDER[pg]():"")}catch(e){return}
+  var h="";try{pg=manThat(pg);CUR=pg;h=(PBK[pg].ty==="list")?renderList(pg):(RENDER[pg]?RENDER[pg]():"")}catch(e){return}
   if(!h||/ngo[aà]i ph[aạ]m vi/i.test(h))return;
   if(h.indexOf('data-tour="'+ma+'"')<0)lech.push(k+"["+i+"] @"+ma+" khong co tren trang "+pg)})});
  if(lech.length)bad.push("BUOC TRO VAO MA NEO KHONG CO TREN TRANG CUA NO: "+lech.slice(0,8).join(" | "));
@@ -179,7 +206,7 @@ var TOUR_BOQUA={
  if(!HTML){bad.push("khong doc duoc ban build de doi chieu neo: "+duong+" (dat ITTS_OUT roi chay lai)");return}
  var thieu=[];
  keys.forEach(function(k){TOURS[k].steps.forEach(function(st,i){
-  var sel=String(st.sel||"");if(sel.indexOf("@txt:")===0)return;
+  var sel=String(st.sel||"");if(neoChay(sel))return;
   if(sel.charAt(0)!=="@")return;
   var ma=sel.slice(1);
   if(HTML.indexOf('data-tour="'+ma+'"')<0)thieu.push(ma)})});
@@ -201,7 +228,7 @@ var TOUR_BOQUA={
   var chu=sel.slice(5).trim();
   var pg=st.p||"banlam";
   if(st.ctx)try{st.ctx()}catch(e){}
-  var h="";try{CUR=pg;h=(PBK[pg]&&PBK[pg].ty==="list")?renderList(pg):(RENDER[pg]?RENDER[pg]():"")}catch(e){h=""}
+  var h="";try{pg=manThat(pg);CUR=pg;h=(PBK[pg]&&PBK[pg].ty==="list")?renderList(pg):(RENDER[pg]?RENDER[pg]():"")}catch(e){h=""}
   var tho=String(h).replace(/&amp;/g,"&").replace(/<[^>]*>/g," ").replace(/\s+/g," ");
   if(tho.indexOf(chu)<0)xau.push(k+"#"+(i+1)+" tro vao '"+chu+"' - trang "+pg+" khong co chu do");
   var m=String(st.hint||"").match(/Bấm (?:(?:sang|vào|nút|chip|tab|lọc)\s+)*['"]?([^,.;'"]{2,40})/);
@@ -351,10 +378,10 @@ var TOUR_BOQUA={
  Object.keys(TS).forEach(function(k){
   (TS[k].steps||TS[k]||[]).forEach(function(st,i){
    var sel=String((st&&st.sel)||"");
-   if(sel.charAt(0)!=="@"||sel.indexOf("@txt:")===0)return;
+   if(sel.charAt(0)!=="@"||neoChay(sel))return;
    var ten=sel.slice(1);
    var pg=st.p||"banlam",h="";
-   try{CUR=pg;h=(PBK[pg]&&PBK[pg].ty==="list")?renderList(pg):(RENDER[pg]?RENDER[pg]():"")}catch(e){}
+   try{pg=manThat(pg);CUR=pg;h=(PBK[pg]&&PBK[pg].ty==="list")?renderList(pg):(RENDER[pg]?RENDER[pg]():"")}catch(e){}
    var n=((h+nav).match(new RegExp('data-tour="'+ten+'"',"g"))||[]).length;
    if(!n)thieu.push(k+"#"+(i+1)+" @"+ten+" ("+pg+")");
    else if(n>1)trung.push(k+"#"+(i+1)+" @"+ten+" x"+n+" ("+pg+")")})});
@@ -410,7 +437,7 @@ function dongVai(sid){applyScope(sid||"");CURSTAFF=sid||""}
         var _h=rows("DL09").filter(function(x){return canRow("DL09",x)})[0];
         window.HVID=_h?_h.student_id:(rows("DL09")[0]||{}).student_id}catch(e){}
     if(st.ctx)try{st.ctx()}catch(e){}
-    var h="";try{CUR=pg;h=(PBK[pg]&&PBK[pg].ty==="list")?renderList(pg):(RENDER[pg]?RENDER[pg]():"")}catch(e){}
+    var h="";try{pg=manThat(pg);CUR=pg;h=(PBK[pg]&&PBK[pg].ty==="list")?renderList(pg):(RENDER[pg]?RENDER[pg]():"")}catch(e){}
     /* Phai GO MA HOA HTML truoc khi so: tren man that `tourTimChu` doc `el.textContent` (da go
        roi), con o day ta doc chuoi HTML tho nen "&" van la "&amp;" - so thang la bao dong gia. */
     /* Nguoi dai dien cua nhom co the khong phu trach lop nao -> trang tra ve man "ngoai pham vi",

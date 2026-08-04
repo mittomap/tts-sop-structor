@@ -2198,23 +2198,25 @@ thấy cả phòng, giám đốc thấy toàn hệ thống.
 Muốn khoá lại (mọi người vào thẳng Quản trị viên, hợp cho buổi trình chiếu): **Cài đặt → Phân
 quyền & Phạm vi → Khoá chọn chức danh ở cổng nhân viên**.
 
-## Ghi nhận góp ý (V9.92)
+## Báo lỗi & góp ý (V9.98 - thay cho trang "Ghi nhận góp ý" của V9.92)
 
-Nút hình loa trên thanh trên có ở **mọi màn**. Bấm là mở ô báo lỗi / góp ý:
+Nút **hình loa** trên thanh trên mở thẳng một **bảng Google Sheet dùng chung** ở tab mới. Cả trung
+tâm ghi vào một bảng, anh Luân mở ra là thấy hết - không ai phải gom tệp của ai.
 
-- Chọn **người gửi** (điền sẵn người đang đăng nhập, đổi được - buổi thử một người hay đổi vai).
-- Chọn **Lỗi / Khó dùng / Đề xuất**, gõ mô tả.
-- **Dán ảnh** chụp màn hình bằng Ctrl+V, hoặc chọn tệp. Tối đa 3 ảnh, ảnh tự thu nhỏ.
-- App tự ghi kèm: đang ở trang nào, tab nào, chức danh, cơ sở, bản 5 hay bản 6, cỡ màn, giờ.
+Địa chỉ bảng **sửa được trong Cài đặt > Giao diện** ("Bảng góp ý / báo lỗi mở ra đâu"). Để trống là
+dùng bảng mặc định.
 
-Trang **Ghi nhận góp ý** (menu Điều hành) gom hết lại: lọc theo trạng thái, bấm "Tới trang đó" để
-nhảy thẳng tới chỗ xảy ra chuyện, đánh dấu **Đang sửa / Đã sửa / Không sửa**, và:
+**Vì sao bỏ trang cũ:** V9.92 từng có hẳn một trang "Ghi nhận góp ý" trong menu Điều hành. Nhưng bản
+demo chạy trọn trong trình duyệt, không có máy chủ - phiếu góp ý nằm trong `localStorage` của từng
+máy, nên mỗi người chỉ thấy phiếu của chính mình; muốn tổng hợp phải Xuất tệp, gửi đi, rồi người kia
+Nhập vào. Cả một thủ tục cho việc đáng lẽ chỉ là gõ một dòng. Google Sheet giải đúng chỗ đó.
 
-- **Xuất tệp** - tải về một tệp `.json` để gửi cho người tổng hợp.
-- **Nhập tệp** - kéo nhiều tệp của nhiều người vào, app gộp lại, phiếu đã có thì bỏ qua.
-- **Chép danh sách** - chép ra dạng chữ để dán vào tin nhắn hoặc tài liệu.
+## Đổi cổng / đổi người - một cửa (V9.98)
 
-Số trên menu là số góp ý **chưa xử**.
+Nút **đổi cổng** trên thanh trên nay mở ngăn kéo **"Đổi cổng / đổi người"** gồm ba phần: bản đang xem
+(chỉ ở cổng nhân viên), ba cổng, và **người đang đăng nhập** kèm nút *Đăng nhập bằng người khác*.
 
-Lưu ý: bản demo chạy hẳn trong trình duyệt nên góp ý nằm trên **máy của người ghi** - phải xuất
-tệp gửi đi thì máy khác mới thấy. Nút **Dựng lại demo không xoá góp ý**.
+**Khối tên ở đáy menu giữ nguyên**, nhưng nay bấm vào là sang **Trang cá nhân** - đúng thứ nó đang
+nói. Trước đây nó là chỗ đổi người: trông như một cái nút mà bấm vào lại văng ra màn đăng nhập,
+không ai đoán được, và nó nằm xa nút đổi cổng trong khi cả hai cùng trả lời một câu hỏi - *"tôi muốn
+nhìn app bằng mắt của ai"*.

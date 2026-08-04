@@ -149,6 +149,29 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.98 — GÓP Ý RA GOOGLE SHEET, GỘP ĐỔI CỔNG + ĐỔI NGƯỜI ✅ (04/08).**
+> · **Bỏ hẳn trang "Ghi nhận góp ý"** (anh Luân: *"em đổi cái nút báo lỗi góp ý bay ra trang mới
+> <link sheet>. Rồi em bỏ trang Ghi nhận góp ý đi. Anh dùng google sheet để ghi nhận cho tiện"*).
+> 258 dòng của trang cũ đã gỡ; nút hình loa trên thanh trên nay mở thẳng bảng Google Sheet ở tab
+> mới. **Đổi là đúng:** bản demo chạy trọn trong trình duyệt nên phiếu góp ý nằm trong localStorage
+> từng máy - mỗi người chỉ thấy phiếu của mình, muốn tổng hợp phải Xuất tệp rồi gửi rồi Nhập. Cả
+> một thủ tục cho việc đáng lẽ chỉ là gõ một dòng. Địa chỉ sheet **không cắm cứng** - nằm trong
+> Cài đặt > Giao diện, cạnh địa chỉ trang chủ.
+> · **Gộp "đổi cổng" và "đổi người" làm một** (anh Luân: *"đổi cổng và đổi người tích hợp chung đi
+> em, để navbar được rồi"*, rồi làm rõ: *"khối tên user để lại, a đang nói bỏ cái chỗ đổi người
+> chỗ khối tên user"*). Hai việc cùng trả lời một câu hỏi - "tôi muốn nhìn app bằng mắt của ai" -
+> nên phải cùng một cửa. Trước đây đổi cổng ở thanh trên còn đổi người giấu trong khối tên ở đáy
+> menu: hai chỗ xa nhau, và khối tên trông như một cái nút mà bấm vào lại văng ra màn đăng nhập -
+> không ai đoán được. Nay khối tên **giữ nguyên** nhưng dẫn sang Trang cá nhân (đúng thứ nó đang
+> nói), còn đổi người về ngăn kéo "Đổi cổng / đổi người".
+> · **BẪY ĐÃ CẮN - hai bộ kiểm cãi nhau, và bộ kiểm sai:** bước tn_sale#2 neo vào nút "Khách mới
+> liên hệ đến"; `_checktour` (đo chuỗi) báo đỏ "chữ không có trên trang" trong khi trình duyệt
+> thật thấy nút sờ sờ. Gốc: `go("nhaplead")` **không** vẽ trang nhaplead - nó remap sang tab
+> "lead" của hub Tuyển sinh (TSMAP), và tab đó là một màn khác hẳn trang danh sách đứng riêng
+> (nút thêm ở đây tên "Khách mới liên hệ đến", ở trang riêng tên "Thêm mới"). Bộ kiểm đang soi
+> **một màn người dùng không bao giờ tới** rồi lấy kết quả đó chấm bài hướng dẫn. Nay nó hỏi
+> thẳng các bảng remap của chính app. **Luật: bộ kiểm phải đi đúng cửa mà người dùng đi.**
+
 > **Phiên bản: V9.96c — THƯỚC ĐO SAI CHỖ, VÀ ĐỒNG HỒ CHO VERIFY ✅ (03/08).**
 > · **Sau khi mặc định tỷ lệ hiển thị 90%, `_checkui` báo 141 "nút quá nhỏ".** Phản xạ đầu tiên
 > của em là phình nút lên 27px cho qua thước - làm rồi: **vẫn còn 107 chỗ đỏ**, và app đặc lại
