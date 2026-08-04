@@ -27,8 +27,12 @@ Chủ dự án: Luân. Mọi phiên làm việc (Claude Code hay Claude Cowork) 
   `node --check` script của cả 2 file HTML, `_tall.js` (kỳ vọng 37 trang 0 lỗi + icon đủ),
   và `_src/_check11.js` cùng các bộ check khác nếu có (suite chuẩn 366 điểm) - xanh hết mới giao.
 - Dữ liệu demo: pipeline `_src/gen_demo.py -> seed_giaoan.py -> mkdemo.py -> fixdata.py ->
-  check_data.py` (chạy đúng thứ tự, sản phẩm demo_data_big.json). Sửa dữ liệu = sửa Ở NGUỒN
-  pipeline, không sửa tay JSON.
+  seed_giaoviec.py -> check_data.py -> check_logic.py` (chạy ĐỦ và ĐÚNG thứ tự, sản phẩm
+  demo_data_big.json). Sửa dữ liệu = sửa Ở NGUỒN pipeline, không sửa tay JSON.
+  **Bẫy đã cắn 04/08:** danh sách trên trước đây thiếu `seed_giaoviec.py`. Chạy theo bản thiếu
+  là bảng Giao việc (DL23 36 việc + DL24 67 bình luận) biến mất không một tiếng động - phải
+  `check_logic.py` mới lộ ra (11 lỗi mã tham chiếu chết). Chạy pipeline xong LUÔN chạy cả
+  `check_data.py` và `check_logic.py`, cả hai phải ĐẠT.
 - Thêm icon ti-* mới = dựng lại font subset theo công thức trong README_SRC (thiếu là _tall.js báo).
 
 ## Anh Luân nói "audit" = chạy trọn `GIAO_THUC_AUDIT.md`

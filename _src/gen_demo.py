@@ -276,18 +276,62 @@ def _fits(book,key,slots):
 def _book(book,key,slots):
     m=book.setdefault(key,{})
     for s0,e0 in slots: m.setdefault(s0.date(),[]).append((s0,e0))
-_bkT={}; _bkR={}
+_bkT={}; _bkR={}; _loadT={}   # _loadT: mỗi giáo viên đang giữ mấy lớp - để chia đều, xem chú thích dưới
+_loadHV={}                    # mỗi giáo viên đang giữ mấy lớp CÓ HỌC VIÊN (đang chạy / đã kết thúc)
+_GHIM_GV={"LOP-PRE-06"}       # lớp ghim tay giáo viên ở trên - không được xếp lại
+_ORDER_GV={t:i for i,t in enumerate(TEACH)}   # TEACH là dict {mã: tên}, giữ thứ tự khai báo
+# TRẦN lớp mỗi giáo viên: chia đều số lớp còn dạy được cho số giáo viên, tối thiểu 2 (một người
+# dạy đúng một lớp thì lịch của họ mỏng quá, không giống một trung tâm thật).
+_CAN_GV=len([c for c in CLS if "cancelled" not in str(c.get("class_status",""))])
+_TRAN_LOP=max(2,-(-_CAN_GV//max(1,len(TEACH))))
 # Xếp lớp KHÓ nhất trước (khoảng chạy dài nhất, khai giảng sớm nhất): greedy "ai đến trước
 # xếp trước" hay kẹt ở lớp cuối vì các lớp ngắn đã chiếm hết GV của khung giờ đó.
-for c in sorted(CLS,key=lambda x:(-(cls_off.get(x["class_id"],(0,0))[1]-cls_off.get(x["class_id"],(0,0))[0]),
+# V9.99m - LỚP CÓ HỌC VIÊN ĐI TRƯỚC. Chia đều SỐ LỚP thôi chưa đủ: nếu mấy lớp đang chạy rơi
+# hết vào ba bốn người thì những người còn lại tuy có lớp nhưng toàn lớp "đang lên kế hoạch",
+# mở app ra vẫn 0 học viên. Lúc xếp lịch chưa biết sĩ số (DL08 gieo sau), nên lấy TRẠNG THÁI
+# lớp làm dấu: đang chạy / đã kết thúc là lớp có người học. Xếp chúng trước, mỗi lớp cho một
+# giáo viên đang ít lớp nhất - thế là chúng trải ra chứ không dồn.
+# "open (Đang tuyển sinh)" cũng vào nhóm này: lớp đang tuyển đã có người ghi danh rồi. Bỏ sót
+# nó thì một lớp có học viên rơi xuống lượt sau và thành lớp thứ hai của người đã có lớp đông.
+_CO_HV=lambda x:0 if ("in_progress" in str(x.get("class_status","")) or
+                      "finished" in str(x.get("class_status","")) or
+                      "open" in str(x.get("class_status",""))) else 1
+# Lớp GHIM TAY xếp trước hết: xếp sau thì lúc tới lượt nó, giáo viên được ghim có thể đã nhận
+# một lớp có học viên rồi - thành ra người ấy ôm hai lớp đông trong khi người khác không có ai.
+for c in sorted(CLS,key=lambda x:(0 if x["class_id"] in _GHIM_GV else 1,
+                                  _CO_HV(x),
+                                  -(cls_off.get(x["class_id"],(0,0))[1]-cls_off.get(x["class_id"],(0,0))[0]),
                                   cls_off.get(x["class_id"],(0,0))[0])):
     if "cancelled" in str(c.get("class_status","")):
         c["venue_or_zoom_link"]="Đã hủy phòng"; c["main_teacher_id"]=""; continue
     sl=cls_slots(c)
     if not sl: continue
-    _pt=[t for t in [str(c.get("main_teacher_id") or "")] if t in TEACH]
-    for t in _pt+[x for x in TEACH if x not in _pt]:
-        if _fits(_bkT,t,sl): c["main_teacher_id"]=t; _book(_bkT,t,sl); break
+    # V9.99m - CHIA LỚP CHO NGƯỜI ÍT LỚP NHẤT TRƯỚC, không phải cho người đầu danh sách.
+    # Cách cũ ("ai rảnh đầu tiên trong TEACH thì lấy") dồn lớp về mấy giáo viên đứng đầu danh
+    # sách: đo được 04/08 - Phan Trung Chính 5 lớp, trong khi Đoàn Minh Khoa, Lương Bảo Ngọc,
+    # Trịnh Quốc Bảo KHÔNG CÓ LỚP NÀO. Ba người ấy đăng nhập vào demo là thấy một app trống
+    # trơn: 0 buổi dạy, 0 học viên, 0 việc. Sáu trên mười giáo viên rơi vào cảnh đó.
+    # Nay xếp cho người đang ít lớp nhất trước - vẫn giữ nguyên luật không đụng lịch, vẫn tôn
+    # trọng lớp đã ghim sẵn giáo viên (_pt), chỉ đổi THỨ TỰ ưu tiên khi có nhiều người cùng rảnh.
+    _gv0=str(c.get("main_teacher_id") or "")
+    # Giữ giáo viên có sẵn CHỪNG NÀO người đó chưa quá phần của mình (_TRAN_LOP), hoặc lớp
+    # được ghim tay ở trên. Quá phần thì lớp này đi tìm người khác - xem chú thích ngay trên.
+    # CHỈ giữ giáo viên có sẵn khi lớp được GHIM TAY. Giá trị thừa hưởng từ file gốc không mang
+    # ý nghĩa nghiệp vụ nào - giữ nó lại thì bốn giáo viên đầu ăn hết lớp, sáu người sau trắng
+    # tay. (Đã thử giữ-nếu-chưa-quá-trần: vẫn còn hai người không lớp nào, vì bốn người kia ôm
+    # đủ trần trước khi tới lượt họ.)
+    _pt=[t for t in [_gv0] if t in TEACH and c["class_id"] in _GHIM_GV]
+    # Lớp CÓ học viên thì ưu tiên người CHƯA có lớp nào có học viên (khoá _loadHV), rồi mới
+    # tới người ít lớp nhất. Chỉ đếm tổng số lớp thôi thì mấy lớp đang chạy vẫn dồn vào vài
+    # người: đo được - 7/10 giáo viên có học viên, 3 người còn lại toàn lớp chưa khai giảng.
+    _cohv=(_CO_HV(c)==0)
+    _rest=sorted([x for x in TEACH if x not in _pt],
+                 key=lambda t:((_loadHV.get(t,0) if _cohv else 0), _loadT.get(t,0), _ORDER_GV[t]))
+    for t in _pt+_rest:
+        if _fits(_bkT,t,sl):
+            c["main_teacher_id"]=t; _book(_bkT,t,sl); _loadT[t]=_loadT.get(t,0)+1
+            if _cohv: _loadHV[t]=_loadHV.get(t,0)+1
+            break
     else: raise SystemExit("Khong du giao vien de xep lop %s (khung %s, dang co %d GV) - them GV vao _NEW_TEACH"
                            %(c["class_id"],c["class_schedule"],len(TEACH)))
     if "online" in str(c.get("learning_mode","")).lower():
@@ -944,12 +988,32 @@ for srow in sessions:
     _sd=dt.datetime.strptime(srow["session_date"],"%d/%m/%Y %H:%M")
     if _sd.date()==TODAY.date() and not srow["session_status"].startswith("cancelled"):
         _teach_today.add(srow["teacher_id"])
+# V9.99m - BUỔI BÙ KHÔNG ĐƯỢC ĐẠP LÊN PHÒNG ĐANG CÓ LỚP. Buổi bù này chèn thêm ngoài lịch
+# tuần của lớp, nên nó KHÔNG đi qua bộ giữ chỗ phòng ở phần xếp lớp. Đo được 04/08: lớp IELTS
+# 6.5 (T2-T4-T6) được chèn buổi bù 19h30 hôm nay - trúng ngay khung 19h-20h30 của lớp IELTS 7.0
+# đang học cùng Phòng 202. Trên màn "Phòng & đụng lịch" hiện thành một ca đụng phòng mà không
+# ai tạo ra có chủ đích. Nay chọn giờ bù có tránh: giờ nào phòng ấy đang có lớp thì bỏ qua.
+_ban_phong={}          # phòng -> tập giờ hôm nay đã có lớp (mỗi buổi chiếm 2 giờ, buổi dài 90 phút)
+for srow in sessions:
+    _sd0=dt.datetime.strptime(srow["session_date"],"%d/%m/%Y %H:%M")
+    if _sd0.date()!=TODAY.date() or srow["session_status"].startswith("cancelled"): continue
+    _c0=next((x for x in CLS if x["class_id"]==srow["class_id"]),None)
+    _ph=str((_c0 or {}).get("venue_or_zoom_link") or "")
+    if not _ph or _ph.startswith("http") or "hủy" in _ph: continue   # lớp online không chiếm phòng
+    _ban_phong.setdefault(_ph,set()).update({_sd0.hour,_sd0.hour+1})
 _mk_hour=17 if NOW.hour<=17 else min(NOW.hour+1,21)
 for _tid in TEACH:
     if _tid in _teach_today: continue
     _cid=next((c["class_id"] for c in CLS if str(c.get("main_teacher_id"))== _tid and c["class_id"] in RUN),None)
     if not _cid: continue
     _c=next(x for x in CLS if x["class_id"]==_cid)
+    _ph=str(_c.get("venue_or_zoom_link") or "")
+    _phong_that=bool(_ph) and not _ph.startswith("http") and "hủy" not in _ph
+    if _phong_that:
+        _ban=_ban_phong.get(_ph,set())
+        while _mk_hour<=21 and ({_mk_hour,_mk_hour+1} & _ban): _mk_hour+=1
+        if _mk_hour>21: continue      # hôm nay phòng ấy kín - thà không có buổi bù còn hơn đụng phòng
+        _ban_phong.setdefault(_ph,set()).update({_mk_hour,_mk_hour+1})
     _sd=TODAY+dt.timedelta(hours=_mk_hour,minutes=30)
     ses_n+=1
     sessions.append({"session_id":"SES-%03d"%ses_n,"class_id":_cid,"session_number":0,"session_date":F(_sd),
@@ -1279,6 +1343,12 @@ for i in range(9):
     r=add_fb(random.choice(active),random.choice(RUN),"positive (Tích cực)","resolved" if i<5 else "new",random.choice(POS))
     if i<3: r["is_testimonial"]="Có"
 for i in range(7): add_fb(random.choice(active),random.choice(RUN),"neutral (Trung tính)","inprog" if i<3 else "new",random.choice(NEU),score=3)
+# NA092 "Phan hoi moi con trong han" (SOP HD3): phai co it nhat MOT phan hoi vua gui trong vai
+# gio, chua phan loai. add_fb luon lui ngau nhien 1-25 ngay nen tinh huong nay chi thinh thoang
+# ra dung - check_sop bat duoc 04/08 khi bat ngau nhien khong ra so 1. Nay gieo co chu dich.
+_fb_moi=add_fb(random.choice(active),random.choice(RUN),"neutral (Trung tính)","new",
+               "Xin thêm đề luyện Reading để làm ở nhà",score=4)
+_fb_moi["feedback_time"]=F(NOW-dt.timedelta(hours=3))
 negs=[]
 for i in range(10):
     kind="new" if i<3 else ("inprog" if i<6 else "resolved")

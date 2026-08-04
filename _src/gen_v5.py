@@ -2469,7 +2469,20 @@ var VIEW_ALWAYS={hoso:1,hosogv:1,hosonv:1,hosokhoa:1,chay:1,chang:1,lop:1,viec:1
 var SENSITIVE={duyet:1,settings:1,baocao:1};
 var ROLESCOPE={
  quantri:{match:null,land:"banlam",pages:"*",blocks:"*",mine:0,mineBtn:0,kpi:0,bell:"*"},
- dieuhanh:{match:/^ceo$/,land:"baocao",pages:"*",blocks:"*",mine:0,mineBtn:0,kpi:0,bell:"*"},
+ /* V9.99m (anh Luân 04/08: *"CEO em cũng cho full quyền mọi thứ giống Admin, trừ mấy cái quyền
+    liên quan đến hệ thống"*).
+    Đo trước khi sửa: CEO ĐÃ bằng đúng Admin - 36 trang, 31 hành động CH3, 20 tab Cài đặt, không
+    thiếu một mục nào. Nên việc phải làm là vế SAU của câu anh nói: cắt phần hệ thống ra.
+    Ranh giới: CEO điều hành TRUNG TÂM, Quản trị viên trông coi HỆ THỐNG.
+      · CEO giữ toàn bộ cấu hình nghiệp vụ - ngưỡng CH2, KPI CH6, câu nhắc CH4, danh mục CH1,
+        thương hiệu, menu, thẻ, gợi ý, Trợ lý, nhịp ngày, hướng dẫn, hỏi đáp, nhân sự, giá/giờ,
+        khóa học, và nhật ký thao tác (để soi ai làm gì).
+      · Ba tab thuộc về hệ thống thì không: `phanquyen` (sửa quyền của chính mình và của người
+        khác), `health` (bộ kiểm và sức khỏe dữ liệu), `demo` (dựng lại toàn bộ dữ liệu mẫu).
+    Đây là ba cửa mà một người điều hành bấm nhầm là hỏng cả bản demo hoặc tự nâng quyền. */
+ dieuhanh:{match:/^ceo$/,land:"baocao",pages:"*",blocks:"*",mine:0,mineBtn:0,kpi:0,bell:"*",
+  tabs:{settings:["tongquan","brand","menu","ch2","ch6","ch4","goiy","the","ch1","tro","nhip",
+   "huongdan","qa","staff","giagio","khoa","nhatky"]}},
  tuvan:{match:/^sales/,land:"banlam",
   pages:["viec","banlam","hanhtrinh","hocvien","giangvien","tuyensinh","ketthuc","khac","duyet"],
   tabs:{khac:["magioithieu"],duyet:["duyetgiao","banggiao"]},
@@ -3163,7 +3176,7 @@ var THEDEF={
   ["bv_tk_doing","Đang làm","Việc tôi đã nhận và chưa báo xong. Muốn xem danh sách: mở trang Giao việc ở menu trái, tab Việc của tôi."],
   ["bv_tk_late","Quá hạn","Việc của tôi đã qua hạn mà chưa xong - cần báo lại người giao. Muốn xem danh sách: mở trang Giao việc ở menu trái, tab Việc của tôi."],
   ["bv_tk_wait","Chờ người giao xác nhận","Việc tôi đã báo xong, đang chờ người giao xác nhận. Muốn xem danh sách: mở trang Giao việc ở menu trái, tab Việc của tôi."],
-  ["bv_hs_thieu","Hồ sơ nhân sự còn thiếu","Nhân viên chưa điền đủ chức danh, cơ sở hoặc email đăng nhập - thiếu thì phân quyền và phân công đều sai. Muốn xem danh sách: bảng nhân sự ngay dưới trên chính trang này."],
+  ["bv_hs_thieu","Hồ sơ nhân sự còn thiếu","Nhân viên chưa điền chức danh, hoặc là giáo viên / tư vấn viên mà chưa khai cơ sở - thiếu thì phân quyền và phân công đều sai. Khối văn phòng (giám đốc, trưởng phòng, marketing, kế toán, nhân sự) không gắn cơ sở nào nên không tính là thiếu. Muốn xem danh sách: bảng nhân sự ngay dưới trên chính trang này."],
   ["bv_gio_thieu","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy mà chưa ghi giờ vào hoặc giờ ra - thiếu mốc thì bảng công tính sai. Muốn xem danh sách: mở trang Bảng công giảng dạy ở menu trái."],
   ["bv_mk_moi","Lead mới N ngày","Số khách tiềm năng vào hệ thống trong cửa sổ nhìn lại (đặt ở Cài đặt, nhóm Bảng số). Đây là sản lượng của Marketing. Muốn xem danh sách: mở trang Lead & khai thác."],
   ["bv_mk_orph","Lead chưa ai phụ trách","Lead còn sống mà chưa gán cho nhân viên tư vấn nào - tiền quảng cáo đã tiêu rồi, để nguội là mất trắng. Muốn xem danh sách: mở trang Chờ duyệt, tab Bàn giao lead - ở đó có nút Chia đều cho đội tư vấn."],
@@ -4521,7 +4534,7 @@ function BANGVIEC(){
  /* Bộ phận Nhân sự: SOP không giao cho họ việc nào với học viên, nên bảng của họ nói về CON
     NGƯỜI và về việc nội bộ - đúng phạm vi họ được xem. */
  nhansu:{bc:"nhân sự",t:"Bảng Nhân sự",d:"Bốn con số đầu ca: hồ sơ nhân sự còn thiếu, buổi dạy thiếu mốc giờ, và việc nội bộ của bạn.",
-  o:[["ti-id-badge",rows("DL01").filter(function(x){return !String(x.branch||"").trim()||!String(x.role||"").trim()}).length,"Hồ sơ nhân sự còn thiếu","#B58A2B","thiếu chức danh hoặc cơ sở","go('nhansu')"],
+  o:[["ti-id-badge",hsThieu().length,"Hồ sơ nhân sự còn thiếu","#B58A2B","thiếu chức danh, hoặc thiếu cơ sở ở vai làm việc tại cơ sở","go('nhansu')"],
      ["ti-clock-exclamation",rows("DL11").filter(function(x){return isc(x.session_status,"completed")&&!(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())}).length,"Buổi thiếu mốc giờ vào/ra","#E24B4A","thiếu mốc là tính công sai","go('bangcong')"],
      ["ti-inbox",gvSo("new"),"Việc mới chờ nhận","#3B82C4","bấm Nhận để bắt đầu","go('giaoviec')"],
      ["ti-player-play",gvSo("doing"),"Đang làm","#0D9488","đã nhận, chưa báo xong","go('giaoviec')"]]},
@@ -4601,6 +4614,17 @@ var BVDUYET=[["ck_lon",0],["doilop2",1],["kn_duyet",2],["kn_duyet",3],["hoantien
    ô bảng việc bấm được) và người dùng phải học phân biệt. Một luật cho cả app: THẺ LÀ ĐỒNG HỒ.
    Đường tới danh sách không mất - nó chuyển vào câu chú thích, và bộ kiểm canh câu đó không
    được chỉ vào chỗ không có. */
+/* V9.99m - HỒ SƠ NHÂN SỰ CÒN THIẾU: ĐỪNG ĐÒI CƠ SỞ Ở NGƯỜI KHÔNG THUỘC CƠ SỞ NÀO.
+   Luật cũ là "thiếu cơ sở HOẶC thiếu chức danh" - nghe thì hợp lý, nhưng đo ra 17 người, mà 16
+   trong số đó là khối văn phòng: Giám đốc, cả sáu trưởng phòng, Marketing, Kế toán, Học vụ, WOW,
+   Nhân sự. Họ làm cho cả trung tâm, không gắn một cơ sở nào - hồ sơ của họ ĐỦ. Thẻ đầu trang của
+   Nhân sự vì thế mỗi sáng bày ra 17 việc không có thật, và người ta sẽ học cách phớt lờ nó.
+   Nay cơ sở chỉ BẮT BUỘC với chức danh làm việc TẠI một cơ sở - giáo viên đứng lớp và tư vấn
+   viên/leader tư vấn, đúng những vai mà app cắt phạm vi dữ liệu theo cơ sở. */
+var VAI_CO_SO=/^(teacher|sales_staff|sales_leader)/;
+function hsThieu(){return rows("DL01").filter(function(x){
+ if(!String(x.role||"").trim())return true;
+ return VAI_CO_SO.test(ecode(x.role)||"")&&!String(x.branch||"").trim()})}
 var BVMA={"Học viên liên hệ":"bv_ychv","Lead mới (chưa LH)":"bv_lead_new","Lead đang khai thác":"bv_lead_work","Test sắp tới":"bv_test_up","Tư vấn cần làm":"bv_tv_can","Test chờ chấm":"bv_test_wait","Test đã chấm":"bv_test_done","WOW sắp tới":"bv_wow_up","WOW có tiến bộ":"bv_wow_imp","Buổi đã hoàn thành":"bv_ses_done","Cần viết nhận xét buổi":"bv_ses_note","Bài tập chờ chấm":"bv_hw_wait","HV nguy cơ học thuật":"bv_risk_aca","Nhập học chưa xong":"bv_ob_open","Học viên nguy cơ":"bv_risk_stu","Phản hồi chờ phân loại":"bv_fb_new","Khiếu nại đang xử lý":"bv_kn_open","Chiết khấu cần duyệt":"bv_ck_duyet","Đổi lớp từ N lần":"bv_doilop2","Lead mới N ngày":"bv_mk_moi","Lead chưa ai phụ trách":"bv_mk_orph","Nguồn đang kém":"bv_mk_yeu","Khách cũ chờ chạy lại":"bv_mk_cu","Thưởng giới thiệu chưa trao":"bv_mk_thuong","Khiếu nại mức CAO":"bv_kn_high","Khiếu nại đã leo thang":"bv_kn_esc","Hoàn tiền chờ duyệt":"bv_hoan","Việc mới chờ nhận":"bv_tk_new","Đang làm":"bv_tk_doing","Quá hạn":"bv_tk_late","Chờ người giao xác nhận":"bv_tk_wait","Hồ sơ nhân sự còn thiếu":"bv_hs_thieu","Buổi thiếu mốc giờ vào/ra":"bv_gio_thieu","Đơn còn nợ phí":"bv_no_phi","Phiếu thu chờ đối soát":"bv_thu_soat"};
 function bvStrip(t,bc,d,o,tour){
  if(!o.length)return "";
@@ -19489,7 +19513,7 @@ var NHIP={
   ["sang","Nhận việc mới được giao","Người giao đang đợi bạn bấm Nhận để biết việc đã tới tay","giaoviec",
    function(){return gvSo("new")}],
   ["sang","Soát danh sách nhân sự","Ai mới vào, ai đã nghỉ, ai chưa có chức danh hoặc chưa gắn cơ sở","nhansu",
-   function(){return rows("DL01").filter(function(x){return !String(x.branch||"").trim()||!String(x.role||"").trim()}).length}],
+   function(){return hsThieu().length}],
   ["ngay","Đối chiếu bảng công giảng viên","Buổi thiếu mốc giờ vào/ra thì tính công sai - soát trước khi chốt","bangcong",
    function(){try{return rows("DL11").filter(function(x){return isc(x.session_status,"completed")&&!(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())}).length}catch(e){return 0}}],
   ["chieu","Làm và báo xong việc đang giữ","Báo xong ngay lúc làm xong, đừng để dồn cuối tuần","giaoviec",
@@ -20123,7 +20147,12 @@ var NAVTREE=[
     thẩm quyền chứ không thuộc chặng nào. Duyệt nghỉ trước đây nằm lẫn trong màn Điểm danh nên
     học vụ phải mò mới thấy. */
  {g:"Chờ duyệt",items:["duyetck","duyethoan","duyetnghi","duyetthu","duyetgiao","banggiao"]},
- {g:"Điều hành",items:["baocao","canhan","settings"]},
+ /* V9.99m (anh Luân 04/08: *"cái trang hỏi đáp... nó đang ở đâu nhỉ, a thấy tour thì hiện ra,
+    mà a tìm trên sidebar ko thấy"*) - đúng, và đây là một chỗ SÓT KHI GỠ V6: trang Hỏi đáp có
+    mục menu ở NAVTREE6 nhưng chưa bao giờ có ở cây menu bản V5, nên nó chỉ mở được bằng nút Trợ
+    lý. Trong khi bài hướng dẫn về nó vẫn chạy ở bản 5 - người xem tour thấy trang, đi tìm thì
+    không có cửa nào. Nay nó có chỗ đứng thật; nút Trợ lý vẫn mở nó như cũ, đây là thêm một lối. */
+ {g:"Điều hành",items:["baocao","hoidap","canhan","settings"]},
  {g:"Tra cứu",items:["hocvien","dsphuhuynh","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","giangvien","nhanvien"]}];
 var NAVSUB={nhaplead:"tuyensinh",test:"tuyensinh",tuvan:"tuyensinh",thanhtoan:"tuyensinh",reup:"tuyensinh",
  review:"cskh",khaosat:"cskh",ghinhan:"cskh",khieunai:"cskh",ychv:"cskh",
