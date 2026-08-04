@@ -328,9 +328,27 @@ const TRANGTHAI = () => {
                ghiDuoc van 0. Sai o MO HINH, khong phai o selector: tren ban V5 phan lon cho ghi
                khong nam trong ngan keo nao ca. Do bang mat mot lan la ra, doan selector ba lan
                thi khong. */
-            const nutGhi = page.locator("#content button.btn.primary")
-              .filter({hasText: /Lưu|Ghi|Xác nhận|Gửi|Chốt|Duyệt|Tạo|Đặt|Đánh dấu|Hoàn tất|Nhận|Bàn giao/i}).first();
-            if (await nutGhi.count()) {
+            /* CHỈ ghi khi trang vừa tới THẬT SỰ LÀ MỘT FORM - tức có ô nhập trên đó. Bẫy đã
+               cắn: trang `hoso` là trang XEM hồ sơ, không có ô nhập nào, nhưng vẫn có vài nút
+               hành động rời (Mời tái ghi danh, Xin cảm nhận...). Thước cũ vớ lấy nút ĐẦU TIÊN
+               khớp động từ rồi bấm - tức là bấm một hành động CHẲNG LIÊN QUAN GÌ tới việc đang
+               làm ("Học viên đang có nguy cơ" mà đi bấm "Mời tái ghi danh"), rồi chấm app là
+               im lặng. App không sai; thước bấm bừa.
+               Có ô nhập = trang này mời người ta điền = đúng chỗ để chấm việc ghi. */
+            const coONhap = await page.evaluate(() =>
+              !!document.querySelector("#content input:not([type=hidden]):not([data-pktim]), #content textarea, #content select"));
+            /* ĐÚNG MỘT NÚT GHI = ĐÚNG MỘT CÁI FORM. Đây là luật rẻ nhất mà tách sạch được hai
+               loại trang, và nó bắt được nốt chỗ đỏ cuối: tab "Test đầu vào" có **40** nút khớp
+               động từ ("Đã đặt lịch" trên từng dòng), `.first()` vớ đúng một dòng ngẫu nhiên
+               chẳng liên quan gì tới việc đang làm - bấm xong dòng vẽ lại, nhãn đọc ra "?" và
+               app bị chấm là im lặng. Trang form thật (vd "chay") chỉ có MỘT nút ghi.
+               Ô nhập không đủ để phân biệt: danh sách nào cũng có ô tìm và ô lọc trên thanh
+               công cụ, nên `coONhap` một mình vẫn cho đi qua. */
+            const nutKhop = page.locator("#content button.btn.primary")
+              .filter({hasText: /Lưu|Ghi|Xác nhận|Gửi|Chốt|Duyệt|Tạo|Đặt|Đánh dấu|Hoàn tất|Nhận|Bàn giao/i});
+            const soNutGhi = await nutKhop.count();
+            const nutGhi = nutKhop.first();
+            if (coONhap && soNutGhi === 1) {
               await page.evaluate(DIEN, "content");
               /* Lấy nhãn nút TRƯỚC khi bấm. Bấm xong trang vẽ lại, locator trỏ sang phần tử
                  khác - đọc nhãn lúc đó ra "?" và câu báo lỗi chỉ vào một cái nút không tồn tại. */
@@ -475,13 +493,13 @@ const TRANGTHAI = () => {
      Nen no phai NOI TO RA. Chua chuyen thanh do vi con phai dung duong ghi cua ban V5 (tu trang
      dap -> mo form -> Luu) - viec do dang nam trong VIEC TON. Trong luc do, dong canh bao nay la
      thu giu cho khong ai doc bang ket qua ma tuong con duoc canh. */
+  /* V9.99d - LO THUNG DA DONG. Go V6 xong, `ghiDuoc` tut tu 100 xuong 0 ma bo kiem van in OK -
+     den xanh phu len mot phep do da mat. Nay da noi duong ghi cua ban V5 (bam Lam -> nhay sang
+     trang -> CHINH TRANG DO la form -> Luu -> doi chieu DL25) va do lai duoc 18 luot ghi that.
+     Van giu mot canh bao MONG: neu mai kia so nay ve 0 lan nua thi phai keu ngay, khong duoc im. */
   if (!dem.ghiDuoc) {
-    console.log("CHECKNV CANH BAO: khong con luot GHI nao duoc kiem tu dau den cuoi.");
-    console.log("  Duong 'bam Lam -> dien form -> Luu -> doi chieu DL25' la duong cua ban V6 (lam");
-    console.log("  tai cho); ban V5 co y nhay trang nen khong di qua duong do. Tu khi ngung phat");
-    console.log("  hanh ban V6 (04/08), bo kiem nay chi con soi 'nhay den trang nao, trang do co");
-    console.log("  rong khong, co loi JS khong' - KHONG con chung minh app ghi duoc.");
-    console.log("  Phai dung duong ghi cua ban V5 - dang nam trong VIEC TON cua 02_NHAT_KY.");
+    console.log("CHECKNV CANH BAO: khong con luot GHI nao duoc kiem tu dau den cuoi -");
+    console.log("  duong ghi cua ban V5 (bam Lam -> trang form -> Luu -> DL25) da dut o dau do.");
   }
 
   if (do_.length) {

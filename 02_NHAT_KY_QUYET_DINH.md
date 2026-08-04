@@ -148,19 +148,19 @@
 
 ## 3. VIỆC TỒN (backlog)
 
-> ### ⚠ VIỆC TỒN SỐ 1 - LỖ THỦNG DO CHÍNH VIỆC GỠ V6 TẠO RA (04/08)
-> **`_checknv` không còn kiểm được lượt GHI nào từ đầu đến cuối.** Bộ này sinh ra để trả lời
-> *"máy có ngồi LÀM VIỆC được không"*, và câu trả lời mạnh nhất của nó là `ghiDuoc`: bấm Làm →
-> điền form → bấm Lưu → **đối chiếu nhật ký DL25 có dài thêm không**. Nhưng đường đi đó là đường
-> của **bản V6** (làm tại chỗ trong ngăn kéo); bản V5 cố ý **nhảy trang** khi bấm Làm, nên nhánh
-> chạy tới `ghiDuoc` không bao giờ được đi qua.
-> Gỡ V6 xong: `ghiDuoc` tụt từ **100 xuống 0**, mà bộ kiểm vẫn in "OK". Đèn xanh phủ lên một
-> phép đo đã mất - đúng kiểu hỏng nguy hiểm nhất: không ai thấy.
-> Đã thêm **dòng cảnh báo to** vào `_checknv` để không ai đọc bảng kết quả mà tưởng còn được
-> canh. Việc phải làm: **dựng đường ghi của bản V5** (từ trang đáp → mở form → Lưu → đối chiếu
-> DL25) rồi mới bỏ cảnh báo.
-> **Luật rút ra: gỡ một sản phẩm thì phải hỏi lại từng bộ kiểm - nó có đang đo qua sản phẩm đó
-> không. Bộ kiểm mất đường đi vẫn in xanh, và đó là im lặng chứ không phải an toàn.**
+> ### ✅ ĐÃ ĐÓNG - lỗ thủng `_checknv` do việc gỡ V6 tạo ra (04/08)
+> `ghiDuoc` từng tụt **100 → 0** mà bộ kiểm vẫn in OK. Nay đã nối **đường ghi của bản V5**:
+> bấm Làm → nhảy sang trang → **chính trang đó là cái form** (nút "Lưu & tiếp tục" nằm thẳng
+> trên trang, không trong ngăn kéo) → Lưu → đối chiếu DL25. Đo lại: **18 lượt ghi thật** trên
+> 114 lượt việc, 89 trang chỉ để đọc.
+> · Em đoán sai mô hình **hai lần** trước khi đo bằng mắt một lần là ra.
+> · **Năm cái bẫy trong lúc dựng, cả năm đều là thước sai chứ không phải app sai:** bỏ `continue`
+> nên luồng chảy sang nhánh V6 (7 chỗ đỏ oan) · ngăn kéo lượt trước còn mở chặn chuột (7 chỗ) ·
+> chấm nút MỞ FORM là "im lặng" (**59 chỗ** - một cái nút mở form không phải một cái nút chết) ·
+> đọc nhãn nút SAU khi bấm nên ra "?" · và cuối cùng: trang danh sách có **40 nút** khớp động từ,
+> `.first()` vớ một dòng ngẫu nhiên chẳng liên quan tới việc đang làm.
+> · **Luật chốt lại: đúng MỘT nút ghi trên trang = đúng một cái form.** Ô nhập không đủ để phân
+> biệt - danh sách nào cũng có ô tìm và ô lọc trên thanh công cụ.
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
