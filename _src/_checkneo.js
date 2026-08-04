@@ -238,7 +238,7 @@ const VO_OK = ["@bell", "@me", "@doicong", "@help", "@tyle", "@gopy", "@brand", 
     console.log("CHECKNEO DO");
     process.exit(0);
   }
-  console.log("CHECKNEO OK: " + luot + " buoc / " + soBai + " bai tren 2 ban build - moi buoc khoanh"
+  console.log("CHECKNEO OK: " + luot + " buoc / " + soBai + " bai tren " + CONG.length + " ban build - moi buoc khoanh"
     + " dung mot cho rieng cua no, nam trong man, trong than trang, vong sang trung phan tu"
     + (bo.length ? " (" + bo.length + " neo dung chung da khai ly do)" : ""));
 })();

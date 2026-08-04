@@ -148,6 +148,21 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### ⚠ VIỆC TỒN SỐ 1 - LỖ THỦNG DO CHÍNH VIỆC GỠ V6 TẠO RA (04/08)
+> **`_checknv` không còn kiểm được lượt GHI nào từ đầu đến cuối.** Bộ này sinh ra để trả lời
+> *"máy có ngồi LÀM VIỆC được không"*, và câu trả lời mạnh nhất của nó là `ghiDuoc`: bấm Làm →
+> điền form → bấm Lưu → **đối chiếu nhật ký DL25 có dài thêm không**. Nhưng đường đi đó là đường
+> của **bản V6** (làm tại chỗ trong ngăn kéo); bản V5 cố ý **nhảy trang** khi bấm Làm, nên nhánh
+> chạy tới `ghiDuoc` không bao giờ được đi qua.
+> Gỡ V6 xong: `ghiDuoc` tụt từ **100 xuống 0**, mà bộ kiểm vẫn in "OK". Đèn xanh phủ lên một
+> phép đo đã mất - đúng kiểu hỏng nguy hiểm nhất: không ai thấy.
+> Đã thêm **dòng cảnh báo to** vào `_checknv` để không ai đọc bảng kết quả mà tưởng còn được
+> canh. Việc phải làm: **dựng đường ghi của bản V5** (từ trang đáp → mở form → Lưu → đối chiếu
+> DL25) rồi mới bỏ cảnh báo.
+> **Luật rút ra: gỡ một sản phẩm thì phải hỏi lại từng bộ kiểm - nó có đang đo qua sản phẩm đó
+> không. Bộ kiểm mất đường đi vẫn in xanh, và đó là im lặng chứ không phải an toàn.**
+
+
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V9.99 — NGỪNG PHÁT HÀNH BẢN V6 ✅ (04/08).**
 > · Anh Luân: *"Hủy V6 nhé em"* - chốt mức **ngừng phát hành, GIỮ mã nguồn**.

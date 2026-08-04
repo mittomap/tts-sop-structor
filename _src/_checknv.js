@@ -361,6 +361,25 @@ const TRANGTHAI = () => {
     (dem.khongKeo ? " · khong mo ngan keo " + dem.khongKeo : "") +
     (dem.loiJS ? " · loi JS " + dem.loiJS : "");
 
+  /* ═══ V9.99 - MOT LO THUNG DO CHINH VIEC GO BAN V6 TAO RA ═══════════════════════════════
+     Bo kiem nay sinh ra de tra loi cau hoi "may co ngoi LAM VIEC duoc khong" - va cau tra loi
+     manh nhat cua no la `ghiDuoc`: bam Lam -> dien form -> bam Luu -> DOI CHIEU NHAT KY DL25 co
+     dai them khong. Nhung duong di do la duong cua BAN V6 (lam tai cho trong ngan keo). Ban V5
+     co y NHAY TRANG khi bam Lam, nen nhanh chay toi `ghiDuoc` khong bao gio duoc di qua.
+     Go ban V6 xong: ghiDuoc tut tu 100 xuong 0, ma bo kiem VAN IN "OK" - den xanh phu len mot
+     phep do da mat. Do dung la kieu hong nguy hiem nhat: khong ai thay.
+     Nen no phai NOI TO RA. Chua chuyen thanh do vi con phai dung duong ghi cua ban V5 (tu trang
+     dap -> mo form -> Luu) - viec do dang nam trong VIEC TON. Trong luc do, dong canh bao nay la
+     thu giu cho khong ai doc bang ket qua ma tuong con duoc canh. */
+  if (!dem.ghiDuoc) {
+    console.log("CHECKNV CANH BAO: khong con luot GHI nao duoc kiem tu dau den cuoi.");
+    console.log("  Duong 'bam Lam -> dien form -> Luu -> doi chieu DL25' la duong cua ban V6 (lam");
+    console.log("  tai cho); ban V5 co y nhay trang nen khong di qua duong do. Tu khi ngung phat");
+    console.log("  hanh ban V6 (04/08), bo kiem nay chi con soi 'nhay den trang nao, trang do co");
+    console.log("  rong khong, co loi JS khong' - KHONG con chung minh app ghi duoc.");
+    console.log("  Phai dung duong ghi cua ban V5 - dang nam trong VIEC TON cua 02_NHAT_KY.");
+  }
+
   if (do_.length) {
     console.log("CHECKNV FAIL (" + do_.length + "/" + dem.luot + " luot): " + tom);
     do_.slice(0, 25).forEach(x => console.log("  - " + x));
