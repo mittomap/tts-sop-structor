@@ -247,6 +247,8 @@ tr.cfhl>td{background:#FFF6D8}
 a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-decoration:underline}
 .crb.cur{color:var(--ink);font-weight:600}
 .crbsep{color:#B9C6D6;font-size:11px}
+.crbi{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;min-width:0}
+.crbi .crb{overflow:hidden;text-overflow:ellipsis}
 .rolesel{margin-left:auto;display:flex;align-items:center;gap:8px;position:relative}
 .notif{position:absolute;top:46px;right:0;width:372px;max-height:74vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 44px #0000002e;z-index:80;display:none}
 .notif.on{display:block}
@@ -19822,7 +19824,14 @@ function renderCrumb(){var host=document.getElementById("pgCrumb");if(!host)retu
  }else{for(var i=0;i<h.length;i++)parts.push(step(i))}
  if(!h.length&&p.g&&p.g!=="_")parts.push('<span class="crb">'+esc(p.g)+'</span>'); /* chưa đi đâu: hiện nhóm menu cho có ngữ cảnh */
  parts.push('<span class="crb cur">'+esc(crumbLabel(CUR,navSnap()))+'</span>');
- host.innerHTML=out+parts.join('<span class="crbsep">›</span>')}
+ /* V9.99i (anh Luân, kèm ảnh: *"breadscrumb lỗi nhé"*). Vệt đường đi là một hàng `flex-wrap`,
+    còn dấu `›` trước đây là một phần tử RIÊNG nằm giữa hai mục. Vệt dài quá một dòng thì mục
+    cuối rớt xuống dòng dưới mà DẤU NGĂN ở lại cuối dòng trên - hiện ra đúng như ảnh anh gửi:
+    "... › Phòng học & đụng lịch ›" rồi trống, tưởng như breadcrumb cụt mất một mục.
+    Nay dấu ngăn đi LIỀN với mục đứng sau nó trong cùng một khối `nowrap`: xuống dòng thì cả cặp
+    cùng xuống, không bao giờ còn một dấu `›` mồ côi. */
+ host.innerHTML=out+parts.map(function(x,i){
+  return '<span class="crbi">'+(i?'<span class="crbsep">›</span>':'')+x+'</span>'}).join("")}
 function navBack(){var h=window.NAVHIST;if(!h||!h.length)return;var last=h.pop();navApply(last.ctx);go(last.key,true)}
 function navJump(i){var h=window.NAVHIST;if(!h||i<0||i>=h.length)return;var target=h[i];h.length=i;navApply(target.ctx);go(target.key,true)}
 /* Bảng gộp trang: 4 trang tuyển sinh -> HUB Tuyển sinh đúng tab, 4 chặng -> trang Chặng...
