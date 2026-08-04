@@ -274,12 +274,26 @@ function demoPing(){if(!CANLS){toast("Trình duyệt đang chặn lưu trữ - k
      syncApply như thể một cổng khác trên máy vừa lưu -> chuông/badge/toast/last-write-wins tự chạy.
    - Thư viện PeerJS tải NGẦM khi có mạng; máy offline thì room im lặng đứng ngoài, app chạy như cũ.
    - Cầu nối bắt tay là dịch vụ PeerJS công cộng miễn phí - đủ cho demo, không dùng dữ liệu thật.
-   - LƯU Ý: ai mở link demo cùng phiên bản cũng vào chung room (kể cả người lạ). Từ V9.59 KHÔNG
-     còn nút "Ngắt room" trên giao diện (anh Luân bỏ phần hiển thị) - cờ `ITTS_ROOM_OFF` trong
-     sessionStorage vẫn có tác dụng nếu về sau cần dựng lại một cửa tắt. Muốn mọi máy về dữ liệu
-     gốc thì bấm "Reset demo". */
+   - LƯU Ý: khi BẬT, ai mở link demo cùng phiên bản cũng vào chung một phòng (kể cả người lạ) -
+     vì thế từ V9.99m mặc định là TẮT, xem khối chú thích ngay dưới đây. Cửa bật/tắt nằm ở
+     Cài đặt > Giao diện; cờ `ITTS_ROOM_OFF` trong sessionStorage vẫn là một cửa chặn cứng theo
+     tab. Muốn mọi máy về dữ liệu gốc thì bấm "Dựng lại demo". */
 var ROOM={p:null,conns:[],code:"AUTO",host:false,on:false,lastRaw:null};
-function roomOffFlag(){return ssGet("ITTS_ROOM_OFF")==="1"}
+/* ═══ V9.99m - MẶC ĐỊNH MỖI MÁY MỘT BẢN RIÊNG (anh Luân 04/08 đưa demo cho cả công ty xem) ═══
+   Cỗ máy này dựng ra cho MỘT người demo trên VÀI máy của mình. Đưa link cho cả công ty là một
+   cảnh khác hẳn: hai chục người cùng vào là cùng một phòng, cùng một bộ dữ liệu. Một người
+   điểm danh thì cả công ty thấy đổi theo; một người bấm "Reset demo" thì cả công ty bị reload.
+   Và demo nằm trên GitHub Pages công khai - người lạ mở link cũng vào chung phòng.
+   Nay công tắc nằm ở localStorage (`ITTS_DONGBO_V1`), MẶC ĐỊNH TẮT:
+   · Đọc được TRƯỚC khi nạp dữ liệu, nên `roomAuto()` lúc khởi động hỏi được ngay - để trong
+     `DATA.config` thì lúc hỏi chưa chắc đã có dữ liệu.
+   · Theo MÁY chứ không theo bộ dữ liệu: "máy này có tham gia đồng bộ không" là chuyện của máy.
+     Vì thế bấm "Reset demo" không cuốn nó theo - cùng luật với tỷ lệ hiển thị và trang cá nhân.
+   KHÔNG gỡ cỗ máy: anh Luân vẫn cần nó khi demo hai màn hình. Chỉ đổi mặc định và bù lại một
+   cửa bật/tắt nhìn thấy được ở Cài đặt > Giao diện - trước đây nó chạy ngầm, không ai biết. */
+var DBKEY="ITTS_DONGBO_V1";
+function dongBoOn(){try{return localStorage.getItem(DBKEY)==="1"}catch(e){return false}}
+function roomOffFlag(){return ssGet("ITTS_ROOM_OFF")==="1"||!dongBoOn()}
 function roomN(){var n=ROOM.conns.filter(function(c){return c&&c.open}).length;
  return ROOM.host?n:(ROOM.remoteN!=null?ROOM.remoteN:n)} /* khách lấy sĩ số do trạm phát ({t:"n"}) */
 function roomLib(cb){if(window.Peer){cb();return}
@@ -337,10 +351,12 @@ function roomDown(){ /* mất trạm trung chuyển: nghỉ ngẫu nhiên rồi 
  ROOM={p:null,conns:[],code:"AUTO",host:false,on:false,lastRaw:ROOM.lastRaw,remoteN:null};roomUiRefresh();
  setTimeout(roomAuto,300+Math.floor(Math.random()*1500))}
 function roomRetry(){roomUiRefresh();clearTimeout(window.__roomRt);window.__roomRt=setTimeout(roomAuto,15000)}
-function roomToggle(){ /* Ngắt / nối lại room (nhớ theo TAB) */
- if(roomOffFlag()){ssSet("ITTS_ROOM_OFF",null);window.__roomGen++;window.__roomBusy=0;clearTimeout(window.__roomRt);
-  roomUiRefresh();roomAuto();toast("Đang nối lại đồng bộ nhiều máy...",2500)}
- else{ssSet("ITTS_ROOM_OFF","1");window.__roomGen++;window.__roomBusy=0;clearTimeout(window.__roomRt);
+function roomToggle(){ /* Bật / tắt đồng bộ nhiều máy - nhớ theo MÁY (localStorage), không theo tab */
+ if(!dongBoOn()){try{localStorage.setItem(DBKEY,"1")}catch(e){}
+  ssSet("ITTS_ROOM_OFF",null);window.__roomGen++;window.__roomBusy=0;clearTimeout(window.__roomRt);
+  roomUiRefresh();roomAuto();toast("Đang nối máy này với các máy khác đang mở cùng bản demo...",3200)}
+ else{try{localStorage.removeItem(DBKEY)}catch(e){}
+  ssSet("ITTS_ROOM_OFF","1");window.__roomGen++;window.__roomBusy=0;clearTimeout(window.__roomRt);
   try{if(window.__roomPend)window.__roomPend.destroy()}catch(e){}
   try{if(ROOM.p)ROOM.p.destroy()}catch(e){}
   ROOM={p:null,conns:[],code:"AUTO",host:false,on:false,lastRaw:null,remoteN:null};roomUiRefresh();
@@ -394,12 +410,14 @@ function roomUiRefresh(){
  if(!window.HVPORTAL&&typeof CUR!=="undefined"&&CUR==="settings"&&typeof reRender==="function")try{reRender("settings")}catch(e){}}
 /* V9.59 (anh Luân 31/07): *"lát e bỏ hết mấy cái thông tin liên quan đến room đi, mặc định thì
    vẫn có thể kết nối demo trên nhiều máy, e ko cần hiện ra làm gì nữa."*
-   Cỗ máy đồng bộ giữ nguyên và vẫn TỰ BẬT - chỉ phần HIỆN RA cho người dùng là bỏ hết: chip
+   Cỗ máy đồng bộ giữ nguyên - chỉ phần HIỆN RA cho người dùng là bỏ hết: chip
    trạng thái ở thanh tiêu đề, dòng "Room demo: chỉ máy này", nút Ngắt/Nối lại room, và tên
    "room" trong mọi câu thông báo. Người xem demo không cần biết bên dưới có cái gì đang chạy.
    `roomStatus()` và `roomBtnHTML()` XOÁ HẲN chứ không để lại trả về rỗng - hàm không ai gọi là
    code chết, mà code chết còn nguy hiểm hơn code sai: bản sau đọc thấy tưởng còn dùng.
-   `roomToggle()` giữ lại (cờ ITTS_ROOM_OFF vẫn chạy) nhưng không còn cửa bấm nào trên giao diện. */
+   `roomToggle()` giữ lại (cờ ITTS_ROOM_OFF vẫn chạy). V9.99m dựng lại cho nó MỘT cửa bấm ở
+   Cài đặt > Giao diện, vì mặc định đã đổi sang tắt: đổi mặc định mà không chừa cửa bật lại thì
+   không phải đổi mặc định, mà là gỡ tính năng. */
 /* TỰ VÀO ROOM khi mở app; có mạng trở lại cũng tự nối */
 if(!SVR&&CANLS&&typeof window.addEventListener==="function"&&typeof document!=="undefined"){
  setTimeout(function(){try{roomAuto()}catch(e){}},600);
@@ -3863,12 +3881,15 @@ function duyAiHTML(){
 function renderDuyet(){var TH=ckThreshold();
  var tab=window.DUYTAB||"duyetck";
  var TB=duyTabs();
- var h=pageHead("Chờ duyệt & quyết định","Hàng chờ phê duyệt: chiết khấu, hoàn tiền, đơn xin nghỉ, đối soát tiền, việc được giao, bàn giao lead","");
+ var DHEAD="Hàng chờ phê duyệt: chiết khấu, hoàn tiền, đơn xin nghỉ, đối soát tiền, việc được giao, bàn giao lead";
  /* tab nào KHÔNG phải việc của vai này thì không hiện - hub gom việc lại, không gom quyền lại */
  var segs=scopeTabs("duyet",TB.map(function(x){return [x.k,x.t,x.n||"",x.n?"amber":""]}));
  var _ai="";try{_ai=duyAiHTML()}catch(e){_ai=""}
- if(!segs.length)return h+'<div class="panel"><div class="empty">Chức danh của bạn không có hàng chờ quyết định nào.</div></div>'+_ai;
+ if(!segs.length)return pageHead("Chờ duyệt & quyết định",DHEAD,"")+'<div class="panel"><div class="empty">Chức danh của bạn không có hàng chờ quyết định nào.</div></div>'+_ai;
  if(!segs.some(function(t){return t[0]===tab})){tab=segs[0][0];window.DUYTAB=tab}
+ /* V9.99m: câu mở đầu dựng SAU khi chốt tab. Dựng trước thì vai bị lọc mất tab mặc định sẽ đọc
+    một câu nói về tab họ không hề đang xem. */
+ var h=pageHead("Chờ duyệt & quyết định",DHEAD+hubCau("duyet",tab),"");
  /* V9.40 - Ô THỐNG KÊ BẤM CHẾT. Trước đây dải này vẽ từ duyTabs() ĐẦY ĐỦ trong khi dải tab đi
     qua scopeTabs (đã lọc quyền). Đo: NV007 5 ô / 2 tab -> 3 ô bấm không tới; NV005 4 ô chết;
     NV001 4 ô chết. Bấm vào thì duyTabSet gặp key ngoài quyền, im lặng rơi về tab đầu, không
@@ -6390,7 +6411,7 @@ function renderCskh(){
  var nKnOpen=kn.filter(function(c){return !isc(c.complaint_status,"resolved")}).length;
  var nYcWait=ychvCho();
  var actBtn=(tab==="khaosat")?'<button class="btn primary" onclick="rvForm()"><i class="ti ti-send"></i>Gửi đợt khảo sát</button>':(tab==="phanhoi")?'<button class="btn primary" onclick="ghForm()"><i class="ti ti-message-plus"></i>Ghi nhận phản hồi</button>':'<button class="btn primary" onclick="knAdd()"><i class="ti ti-plus"></i>Tiếp nhận khiếu nại</button>';
- var h=pageHead("CSKH · Khảo sát & Phản hồi","Hai chiều rõ ràng: Trung tâm gửi khảo sát cho học viên; học viên gửi góp ý / khiếu nại từ Cổng học viên. Mọi phiếu đều theo dõi trạng thái tới khi đóng.",actBtn);
+ var h=pageHead("CSKH · Khảo sát & Phản hồi","Hai chiều rõ ràng: Trung tâm gửi khảo sát cho học viên; học viên gửi góp ý / khiếu nại từ Cổng học viên. Mọi phiếu đều theo dõi trạng thái tới khi đóng."+hubCau("cskh",tab),actBtn);
  h+='<div class="csway">'+
   '<div class="cwrow"><span class="cwdir out"><i class="ti ti-arrow-right"></i> Trung tâm → Học viên</span> <b>Khảo sát</b> định kỳ — HV nhận &amp; trả lời trong Cổng học viên.</div>'+
   '<div class="cwrow"><span class="cwdir in"><i class="ti ti-arrow-left"></i> Học viên → Trung tâm</span> <b>Góp ý &amp; Khiếu nại</b> — HV gửi từ Cổng học viên (hoặc NV ghi hộ khi nhận qua gọi/nhắn), trung tâm xử lý &amp; phản hồi lại.</div>'+
@@ -8844,6 +8865,15 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   h+='<div class="fld full" style="margin-top:10px"><label>Bấm logo thì về đâu</label>'+
    '<input value="'+esc(u.trangchu||"")+'" oninput="uiSet(\'trangchu\',this.value)" placeholder="'+esc(trangChuURL())+'">'+
    '<div class="fhint" data-tip="Để trống thì app tự tính đường về: mở từ web sẽ về trang chủ bản demo nằm cùng thư mục, mở thẳng file trên máy sẽ về '+esc(TRANGCHU)+'. Điền địa chỉ vào đây khi trung tâm có tên miền riêng.">Để trống là app tự tính đường về.</div></div>';
+  /* V9.99m - CỬA BẬT/TẮT ĐỒNG BỘ NHIỀU MÁY. Trước đây cỗ máy này chạy ngầm, tự bật, không một
+     dòng nào trên màn nói nó tồn tại - mà nó quyết định một chuyện rất lớn: dữ liệu của mình
+     là của riêng mình hay dùng chung với mọi người đang mở cùng link. Chạy ngầm được khi chỉ
+     có anh Luân và hai máy của anh; đưa link cho cả công ty thì phải nhìn thấy được. */
+  h+='<div class="fld full" style="margin-top:10px"><label>Đồng bộ nhiều máy</label>'+
+   '<select onchange="roomToggle();reRender(\'settings\')">'+
+   '<option value="0"'+(dongBoOn()?"":" selected")+'>Tắt - máy này có bộ dữ liệu riêng (nên dùng khi nhiều người cùng xem)</option>'+
+   '<option value="1"'+(dongBoOn()?" selected":"")+'>Bật - dùng chung dữ liệu với mọi máy đang mở cùng bản demo</option></select>'+
+   '<div class="fhint"><span data-tip="Bật lên thì mọi máy đang mở cùng bản demo sẽ dùng CHUNG một bộ dữ liệu: một máy điểm danh hay thu tiền là các máy kia thấy đổi theo trong vài giây, và một máy bấm Dựng lại demo là các máy kia tải lại trang. Hữu ích khi một người trình bày trên hai màn hình. Không nên bật khi gửi link cho nhiều người cùng xem - ai cũng giẫm lên dữ liệu của nhau, kể cả người lạ mở đúng link đó. Công tắc này nhớ theo MÁY và không bị Dựng lại demo cuốn theo.">Mặc định tắt: mỗi người xem demo có bộ dữ liệu riêng, làm gì cũng không ảnh hưởng người khác.<i class="ti ti-info-circle gyti"></i></span></div></div>';
   h+='<div class="fld full" style="margin-top:10px"><label>Bảng góp ý / báo lỗi mở ra đâu</label>'+
    '<input value="'+esc(u.gopy||"")+'" oninput="uiSet(\'gopy\',this.value)" placeholder="'+esc(GOPYMAC)+'">'+
    '<div class="fhint" data-tip="Nút hình loa trên thanh trên mở thẳng địa chỉ này ở tab mới. Để trống là dùng bảng mặc định.">Nút hình loa trên thanh trên mở địa chỉ này. Để trống là dùng bảng mặc định.</div></div>';
@@ -10582,7 +10612,7 @@ function renderTuyensinh(){
    nhưng form chung KHÔNG chặn trùng số và KHÔNG ghi lượt liên hệ đầu (DL02b) - lead tạo bằng
    nó làm sai luôn đồng hồ SLA phản hồi (LRT) và sổ chạm. Giữ đúng một cửa vào. */
  var actBtn=(tab==="lead")?'<button class="btn primary" onclick="leadInbound()"><i class="ti ti-message-plus"></i>Khách mới liên hệ đến</button>':(tab==="test")?'<button class="btn primary" onclick="testQuickAdd()"><i class="ti ti-plus"></i>Khách muốn test ngay</button>':(tab==="tuvan")?'<button class="btn primary" onclick="tvQuick()"><i class="ti ti-plus"></i>Tư vấn không qua test</button>':(tab==="reup")?'':'<button class="btn primary" onclick="payQuick()"><i class="ti ti-cash"></i>Ghi nhận khoản thu</button>';
- var h=pageHead("Tuyển sinh","Một luồng liền mạch: Lead → Test đầu vào → Tư vấn & Đăng ký → Thanh toán. Bấm một bước để xử lý; số trên phễu là việc đang chờ ở bước đó. Khách rơi khỏi luồng nằm ở \"Chăm lại\".",actBtn,1);
+ var h=pageHead("Tuyển sinh","Một luồng liền mạch: Lead → Test đầu vào → Tư vấn & Đăng ký → Thanh toán. Bấm một bước để xử lý; số trên phễu là việc đang chờ ở bước đó. Khách rơi khỏi luồng nằm ở \"Chăm lại\"."+hubCau("tuyensinh",tab),actBtn,1);
  var steps=[["lead","ti-users","Lead",nLead,"#3B82C4"],["test","ti-file-text","Test đầu vào",nTest,"#7C3AED"],["tuvan","ti-messages","Tư vấn & ĐK",nTuvan,"#E08A1E"],["thanhtoan","ti-cash","Thanh toán",nPay,"#0D9488"]];
  h+='<div class="tsfun">';
  steps.forEach(function(s,i){h+='<div class="tsstep'+(tab===s[0]?" on":"")+'" onclick="tsTabSet(\''+s[0]+'\')" title="Xử lý bước '+esc(s[2])+'"><span class="tssic" style="background:'+s[4]+'18;color:'+s[4]+'"><i class="ti '+s[1]+'"></i></span><div class="tssm"><div class="tssn">'+s[3]+'</div><div class="tssl">'+esc(s[2])+'</div></div></div>';
@@ -12784,7 +12814,18 @@ function mgDetail(key){var ev=rows("DL22").filter(function(x){return String(x.re
    '<td>'+esc(x.referred_phone||"-")+'</td><td>'+esc(String(x.used_date||"").slice(0,10)||"-")+'</td>'+
    '<td><span class="chip '+(isc(x.status,"enrolled")?"green":"amber")+'">'+esc(elabel(x.status)||x.status)+'</span></td>'+
    '<td>'+(num(x.friend_discount_amount)?vnd(num(x.friend_discount_amount)):'<span class="mut">—</span>')+'</td></tr>'});
- h+='</tbody></table></div></div>';
+ h+='</tbody></table></div>';
+ /* V9.99m - NGÕ CỤT. `_checkbam` ghi chú ngăn kéo này "không có nút nào" - đọc xong rồi đứng đó.
+    Mà chính dải ô của trang đã nói "dùng mã nhưng chưa đăng ký - gọi chốt": người cần gọi đang
+    nằm ngay trong bảng này. Nay ngăn kéo chìa đúng hai lối đi tiếp: mở hồ sơ chủ mã (chỗ theo
+    dõi phần thưởng của họ) và mở chính sách giới thiệu (CH2) nếu cần đổi mức ưu đãi. */
+ var chuaDK=ev.filter(function(x){return !isc(x.status,"enrolled")}).length;
+ if(chuaDK)h+='<div class="notebar nbamber"><i class="ti ti-phone-call"></i><b>'+chuaDK+
+  ' bạn</b> đã dùng mã mà chưa đăng ký - họ đã quan tâm sẵn, bấm tên trong bảng để mở hồ sơ và gọi chốt.</div>';
+ h+='<div class="dact">'+
+  (ev[0].referrer_student_id?('<button class="btn primary" onclick="closeModal();openQuick(\''+esc(ev[0].referrer_student_id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ '+esc(nm)+'</button>'):'')+
+  '<button class="btn" onclick="closeModal();window.SETTAB=\'ch2\';go(\'settings\')"><i class="ti ti-settings"></i>Chính sách giới thiệu</button>'+
+  '</div></div>';
  openDrawer("Bạn được giới thiệu · "+code,h)}
 /* V9.29p (mảng 5, việc tồn từ đầu): dải số ĐỨNG YÊN là một lời hứa hụt - người dùng thấy
    "5 buổi quá hạn" rồi bấm vào, không có gì xảy ra. Nay ô nào có chỗ để đi thì đi được:
@@ -13626,7 +13667,7 @@ function renderHoctap(){
  var nNote=rows("DL11").filter(function(s){return bhState(s).noteOver}).length;
  var nWow=rows("DL14").filter(function(w){var done=ecode(w.wow_status)==="completed";var note=!!(w.wow_content_note&&String(w.wow_content_note).trim());return isc(w.wow_status,"booked","confirmed")||(done&&!note)}).length;
  var actBtn=(tab==="wow")?'<button class="btn primary" onclick="wowAdd()"><i class="ti ti-plus"></i>Đặt buổi WOW</button>':'<button class="btn primary" onclick="go(\'xeplop\')"><i class="ti ti-layout-grid-add"></i>Xếp lớp & Onboarding</button>';
- var h=pageHead("Học tập & Giảng dạy","Lớp đang mở, theo dõi nhận xét buổi (SLA), và buổi WOW 1-1 — một chỗ. Bấm một lớp để vào Vận hành lớp; theo dõi SLA nhận xét và WOW ở hai tab còn lại.",actBtn,1);
+ var h=pageHead("Học tập & Giảng dạy","Lớp đang mở, theo dõi nhận xét buổi (SLA), và buổi WOW 1-1 — một chỗ. Bấm một lớp để vào Vận hành lớp; theo dõi SLA nhận xét và WOW ở hai tab còn lại."+hubCau("hoctap",tab),actBtn,1);
  var todayN=rows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,new Date())}).length;
  var nNoGv=rows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,new Date())&&!isc(x.session_status,"cancelled")&&!String(x.teacher_id||"").trim()}).length;
  h+=tbar(segHTML(tab,[["today","Hôm nay",todayN||"",""],["lichtuan","Lịch tuần","",""],["gvdp","GV dự phòng",nNoGv||"",nNoGv?"red":""],["phong","Phòng & đụng lịch",clashList().length||"",clashList().length?"red":""],["lop","Lớp học",cls.length||"",""],["buoihoc","Nhận xét buổi",nNote||"",nNote?"red":""],["wow","Buổi WOW 1-1",nWow||"",nWow?"amber":""]],"htTabSet('{k}')"),
@@ -13874,9 +13915,10 @@ function renderKhac(){
  var nBlCall=bl.filter(function(x){return !String(x.next_followup_time||"").trim()}).length;
  var nRef=rows("DL22").length;
  var actBtn=(tab==="magioithieu")?'<button class="btn" onclick="window.SETTAB=\'ch2\';go(\'settings\')"><i class="ti ti-settings"></i>Cấu hình chính sách</button>':'';
- var h=pageHead("Tính năng khác","Các việc không nằm trong nhịp hằng ngày, gom về một chỗ cho menu gọn: giữ chân học viên dừng học và chương trình giới thiệu bạn. (Bàn giao lead đã chuyển sang nhóm Chờ duyệt.)",actBtn);
  var ksegs=scopeTabs("khac",[["baoluu","Bảo lưu / Bỏ học",bl.length||"",nBlCall?"amber":""],["magioithieu","Mã giới thiệu",nRef||"",""]]);
  if(!ksegs.some(function(t){return t[0]===tab})){tab=(ksegs[0]||["baoluu"])[0];window.KTAB=tab}
+ /* V9.99m: chốt tab trước rồi mới dựng câu mở đầu - xem chú thích cùng mã ở renderDuyet. */
+ var h=pageHead("Tính năng khác","Các việc không nằm trong nhịp hằng ngày, gom về một chỗ cho menu gọn: giữ chân học viên dừng học và chương trình giới thiệu bạn. (Bàn giao lead đã chuyển sang nhóm Chờ duyệt.)"+hubCau("khac",tab),actBtn);
  h+=tbar(segHTML(tab,ksegs,"kcTabSet('{k}')"),"");
  if(tab==="magioithieu")h+=renderMaGioiThieu(1);
  else h+=renderBaoluu(1);
@@ -18273,6 +18315,36 @@ var HUBTAB={tuyensinh:{v:"TSTAB",d:"lead",m:{lead:"nhaplead",test:"test",tuvan:"
    "lop", HUBTAB để "today", còn navVis lại để "today". Kết quả: mở hub Học tập thì màn hình ra
    tab Lớp học nhưng sidebar và breadcrumb tưởng đang ở tab Hôm nay. Nay CHỈ HUBTAB.d nói, hai
    chỗ kia hỏi lại. */
+/* V9.99m - NGỮ CẢNH HUB. Một hub gom nhiều tab nhưng chỉ có MỘT câu mở đầu, viết cho cả hub.
+   Người bấm thẳng vào tab Thanh toán đọc tiêu đề "Tuyển sinh" cộng một câu nói về luồng lead -
+   đúng cho hub, nhưng không nói cho họ biết họ đang đứng ở bước nào. Nay mỗi tab có thêm đúng
+   một câu nói rõ tab đang mở làm việc gì. Chỉ THÊM câu, không bỏ câu cũ của hub. */
+var HUBCAU={
+ tuyensinh:{lead:"Đang mở bước Lead - khách mới liên hệ, phải phản hồi trong hạn SLA.",
+  test:"Đang mở bước Test đầu vào - xếp lịch test, chấm bài và trả kết quả.",
+  tuvan:"Đang mở bước Tư vấn & Đăng ký - chốt lộ trình rồi lập đăng ký.",
+  thanhtoan:"Đang mở bước Thanh toán - thu tiền, đối soát và xác nhận khoản thu.",
+  reup:"Đang mở Chăm lại - khách đã ngưng, hẹn liên hệ lại theo đợt."},
+ hoctap:{today:"Đang mở Hôm nay - buổi học trong ngày và việc phải chốt trước giờ lên lớp.",
+  lichtuan:"Đang mở Lịch tuần - toàn bộ buổi của tuần theo lớp và theo phòng.",
+  gvdp:"Đang mở GV dự phòng - buổi chưa có giáo viên, cần xếp người dạy thay.",
+  phong:"Đang mở Phòng & đụng lịch - chỗ hai buổi trùng phòng hoặc trùng giờ.",
+  lop:"Đang mở Lớp học - lớp đang chạy; bấm một lớp để vào Vận hành lớp.",
+  buoihoc:"Đang mở Nhận xét buổi - buổi đã dạy mà nhận xét còn thiếu, tính theo hạn SLA.",
+  wow:"Đang mở Buổi WOW 1-1 - lịch hẹn, xác nhận và ghi nội dung sau buổi."},
+ cskh:{khaosat:"Đang mở Khảo sát - trung tâm gửi phiếu, theo dõi lớp nào chưa trả lời.",
+  phanhoi:"Đang mở Phản hồi / Góp ý - học viên gửi lên, theo tới khi đóng phiếu.",
+  khieunai:"Đang mở Khiếu nại - phân loại, cử người xử lý rồi trả lời lại học viên.",
+  ychv:"Đang mở Học viên liên hệ - yêu cầu và câu hỏi gửi từ Cổng học viên."},
+ khac:{baoluu:"Đang mở Bảo lưu / Bỏ học - học viên đã dừng, giữ liên lạc để kéo lại.",
+  magioithieu:"Đang mở Mã giới thiệu - mã của học viên, lượt giới thiệu và thưởng."},
+ duyet:{duyetck:"Đang mở Chiết khấu - đơn giảm học phí vượt mức tự quyết, chờ người có quyền duyệt.",
+  duyethoan:"Đang mở Hoàn tiền - yêu cầu hoàn, kèm lý do và số tiền.",
+  duyetnghi:"Đang mở Xin nghỉ học - đơn xin nghỉ buổi, duyệt thì buổi đó không tính vắng.",
+  duyetthu:"Đang mở Xác nhận thu tiền - khoản thu chờ đối soát đã về tài khoản.",
+  duyetgiao:"Đang mở Việc chờ nhận - việc người khác giao cho bạn, nhận rồi mới làm.",
+  banggiao:"Đang mở Bàn giao lead - lead chuyển tay giữa các tư vấn viên."}};
+function hubCau(hub,tab){var m=HUBCAU[hub]||{};return m[tab]?(" "+m[tab]):""}
 function hubDef(hub){var H=HUBTAB[hub];return (H&&H.d)||""}
 function hubTab(hub){return window[(HUBTAB[hub]||{}).v]||hubDef(hub)}
 function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)]||""}

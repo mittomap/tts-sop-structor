@@ -883,9 +883,16 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
 /* ═══ V9.59 - CHỮ "ROOM" KHÔNG ĐƯỢC HIỆN RA NỮA ═══════════════════════════════════════════
    Anh Luân: *"lát e bỏ hết mấy cái thông tin liên quan đến room đi, mặc định thì vẫn có thể kết
    nối demo trên nhiều máy, e ko cần hiện ra làm gì nữa."*
-   Hai vế, canh cả hai: KHÔNG hiện ra chữ nào, nhưng cỗ máy đồng bộ phải CÒN SỐNG và còn tự bật.
+   Hai vế, canh cả hai: KHÔNG hiện ra chữ "room" nào, nhưng cỗ máy đồng bộ phải CÒN SỐNG.
    Canh cả hai mới đúng - bỏ hiển thị mà tiện tay bỏ luôn cơ chế thì lần sau mở hai máy không
-   thấy đồng bộ, và không ai biết vì sao. */
+   thấy đồng bộ, và không ai biết vì sao.
+
+   V9.99m ĐỔI MỘT VẾ, có lý do: vế cũ đòi "còn TỰ BẬT" (`roomOffFlag()===false`). Anh Luân đưa
+   link demo cho cả công ty xem, mà tự bật nghĩa là hai chục người dùng CHUNG một bộ dữ liệu -
+   một người điểm danh thì tất cả thấy đổi theo, một người bấm "Dựng lại demo" thì tất cả bị
+   tải lại trang. Nay mặc định TẮT, và bù lại đúng cái mà bản cũ thiếu: một cửa bật/tắt NHÌN
+   THẤY ĐƯỢC ở Cài đặt > Giao diện. Vế "còn sống" giữ nguyên - và thêm một vế mới: phải có cửa
+   bật lại, nếu không thì đây là gỡ tính năng chứ không phải đổi mặc định. */
 (function(){
  /* KHÔNG được nuốt lỗi vẽ. Đã cắn ngay trong bản này: bỏ `roomBtnHTML` mà sót một chỗ gọi ->
     màn Cài đặt ném lỗi -> `catch` nuốt -> HTML rỗng -> "không còn chữ room" BÁO XANH trong khi
@@ -902,8 +909,17 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
  t("khong man nao con hien chu 'room'"+(bay.length?" - CON: "+bay.slice(0,5).join(", "):""), bay.length===0);
  t("ham ve chip/nut room da xoa han, khong de lai code chet",
    typeof roomStatus==="undefined"&&typeof roomBtnHTML==="undefined");
- t("co che dong bo nhieu may VAN CON va van tu bat",
-   typeof roomAuto==="function"&&typeof roomCast==="function"&&typeof roomCastState==="function"&&roomOffFlag()===false);
+ t("co che dong bo nhieu may VAN CON (khong ai tien tay go mat)",
+   typeof roomAuto==="function"&&typeof roomCast==="function"&&typeof roomCastState==="function"&&typeof roomToggle==="function");
+ t("dong bo nhieu may MAC DINH TAT - moi nguoi xem demo mot bo du lieu rieng",
+   typeof dongBoOn==="function"&&dongBoOn()===false&&roomOffFlag()===true,
+   "tu bat lai la ca cong ty dung chung mot bo du lieu");
+ (function(){window.SETTAB="brand";var o="";   /* ma tab la "brand"; "giaodien" la ten NHOM tab */
+  try{o=RENDER.settings()}catch(e){}
+  window.SETTAB="";
+  t("co cua BAT LAI dong bo nhieu may trong Cai dat > Giao dien",
+    /roomToggle\(\)/.test(o)&&/Đồng bộ nhiều máy/.test(o),
+    "doi mac dinh ma khong chua cua bat lai thi la go tinh nang");})();
 })();
 /* ═══ V9.60 - GIỌNG GHI CHÚ NỘI BỘ KHÔNG ĐƯỢC LỌT RA MÀN HÌNH ═════════════════════════════
    Anh Luân 31/07: *"e đừng có viết ghi chú riêng của em vào thẳng app: 'SOP chưa có bảng cho kế
@@ -961,6 +977,56 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
    if(/(^|[\s(])em([\s.,;:)]|$)/.test(ch))xau.push(ch.slice(0,70))}
   t("app KHONG goi hoc vien la 'em' trong bat ky chuoi nao"+(xau.length?" - CON "+xau.length+": "+xau.slice(0,2).join(" | "):""), xau.length===0);
  })();
+
+/* ---- 12. CUA NAO CUNG PHAI DAN TOI MOT TRANG CO CHO DUNG (V9.99m) --------------------------
+   Vi sao co muc nay: go V6 xong, luat "den xanh tren mot phep do da mat" lap tuc co dat dien.
+   Ba cua trong ban V5 van goi go('ban') - trang Ban lam viec cua V6. Khong bo kiem nao hoi
+   "cua nay dan toi dau", nen neu mai kia trang do bi go THAT thi ba cua ay chet lang le:
+   khong bao loi, chi la bam vao khong co gi xay ra (go() gap PBK[key] rong thi return im).
+   Phep do: gom moi dich go('X') trong ma nguon, chay qua dung cac bang remap cua go(), roi
+   hoi hai cau - trang co ton tai trong PBK khong, va no co CHO DUNG khong (co mat tren menu,
+   hoac la trang chi tiet mo ra tu mot so - loai thu hai phai KHAI RO kem ly do doc duoc). */
+(function(){
+ var CO={};
+ NAVTREE.forEach(function(g){(g.items||[]).forEach(function(k){CO[k]=1})});
+ for(var k in NAVSUB)CO[k]=1;
+ [TSMAP,CSMAP,HTMAP,KMAP,DUYMAP,ARCMAP].forEach(function(M){for(var k in M)CO[k]=1});
+ ["tuyensinh","cskh","hoctap","khac","duyet","chang","hanhtrinh","bangcong"].forEach(function(k){CO[k]=1});
+ /* TRANG CHI TIET: khong co muc menu rieng, va dung nhu the. Mo ra tu mot dong trong so; go()
+    giu muc menu cu sang mo (NAVFROM) nen nguoi dung khong mat dau minh dang o nhanh nao.
+    Moi dong duoi day phai noi duoc MO RA TU DAU - khong khai duoc thi la ngo cut. */
+ var CHITIET={
+  hoso:"ho so mot hoc vien - mo tu So hoc vien va tu moi bang viec",
+  hosogv:"ho so mot giang vien - mo tu so Giang vien",
+  hosonv:"ho so mot nhan vien - mo tu so Nhan vien va man Nhan su",
+  hosokhoa:"ho so mot khoa hoc - mo tu so Khoa hoc",
+  baitap:"bai tap cua mot lop - mo tu Van hanh lop va tu so Bai tap",
+  chay:"chay quy trinh cho mot ho so - mo tu Trang bat dau va tab Cham lai",
+  hoidap:"hop hoi dap - mo tu nut Tro ly, khong phai mot muc menu",
+  nhansu:"man khoi luong nhan su - mo tu the va tu Tro ly",
+  ban:"Ban lam viec theo thuc the - o ban V5 la trang chi tiet mo tu So phu huynh va tu Tro ly; "+
+   "no la man CHINH cua ban V6 da ngung phat hanh, nen khong co muc menu rieng o V5"
+ };
+ /* Doc _APP.js chu khong doc gen_v5.py: chu thich trong nguon co nhac ten cua ("4 cho dang goi
+    go('bangcong')") - dem ca chu thich thi bo kiem di canh mot cai cua khong ton tai. */
+ var JS=require('fs').readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8');
+ var dem={},re=/go\(\s*(?:\\?['"])([a-zA-Z0-9_]+)(?:\\?['"])/g,m;
+ while((m=re.exec(JS)))dem[m[1]]=(dem[m[1]]||0)+1;
+ var chet=[],vodanh=[];
+ Object.keys(dem).forEach(function(k){
+  if(!PBK[k]){chet.push(k+" ("+dem[k]+" cua)");return}
+  if(!CO[k]&&!CHITIET[k])vodanh.push(k+" ("+dem[k]+" cua)");
+ });
+ t("moi cua go() deu tro toi mot trang CO THAT"+(chet.length?" - CHET: "+chet.join(", "):""),
+   chet.length===0, "bam vao khong co gi xay ra, khong mot cau bao");
+ t("trang khong co muc menu deu duoc khai la trang chi tiet"+(vodanh.length?" - CHUA KHAI: "+vodanh.join(", "):""),
+   vodanh.length===0, "trang khong co cho dung ma cung khong khai ly do");
+ /* Khai thua cung la sai: khai mot trang la "chi tiet" roi go han trang do di thi ban khai
+    nam lai vinh vien, va lan sau khong ai biet dong do da vo nghia. */
+ var thua=Object.keys(CHITIET).filter(function(k){return !PBK[k]||!dem[k]});
+ t("ban khai trang chi tiet khong con dong nao thua"+(thua.length?" - THUA: "+thua.join(", "):""),
+   thua.length===0, "khai mot trang khong con cua nao tro toi, hoac khong con ton tai");
+})();
 
 if(bad.length){console.log("CHECKUX DO ("+bad.length+"/"+(ok+bad.length)+"):");
  bad.forEach(function(b){console.log("  - "+b)});process.exit(1)}
