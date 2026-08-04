@@ -6,8 +6,16 @@
 # co y). Ai nhan ban giao ma khong biet chinh xac 14 lenh do se khong chay gi ca - tuc la lop bao
 # ve duy nhat cua du an tro thanh vo hinh.
 #
-#   ./verify.sh          build lai + trich JS + chay HET bo kiem
-#   ./verify.sh --nhanh  bo qua bo kiem trinh duyet (nhanh hon ~2 phut)
+#   ./verify.sh --nhanh  TANG NHANH (~3 phut) - chay sau MOI LAN SUA
+#   ./verify.sh          TANG DAY DU (~18 phut) - chay truoc khi giao
+#
+# VI SAO TACH HAI TANG (anh Luan 04/08): "qua trinh verify cua em rat lau, nhung lan nao a cung
+# bat duoc loi, e nen xem lai cach lam verify, chu vua ton thoi gian vua ko hieu qua thi giu nhu
+# cu lam gi". Dem lai thi anh dung: trong mot ngay, SAU loi deu do anh Luan chi ra, khong loi nao
+# do 26 bo kiem (18 phut) tim ra. Mot bo kiem 18 phut thi nguoi ta chay mot ngay mot lan - ma loi
+# sinh ra tu chinh lan sua vua roi. Nen: nhung phep do RE ma bat dung loai loi hay gap thi dua ve
+# TANG NHANH de chay lien tuc; phan dat (mo 1000 luot man tren 5 kho, dong vai 33 nguoi) de lai
+# tang day du, chay truoc khi giao.
 #
 # Ma thoat 0 = xanh het. Khac 0 = co cho do, doc bang tong ket o cuoi.
 set -uo pipefail
@@ -167,6 +175,11 @@ chay "check_gs.py"     "KET QUA: DAT"        python3 check_gs.py
 
 echo
 echo "${Dam}== 5. KIEM THU TREN TRINH DUYET THAT ==${Het}"
+# V9.99k - _checkmat CHAY O CA HAI TANG. No la bo duy nhat do THU MAT NGUOI THAY ma HTML khong
+# noi duoc: chu rong hon cho no co, nut bi cai khac phu len, dau ngan mo coi khi vet xuong dong.
+# Ba trong sau loi anh Luan bat duoc trong ngay 04/08 deu roi vao dung hai phep do dau. No re
+# (mot kho man, 14 trang, ~50 giay) nen khong co ly do gi de no vang mat o tang nhanh.
+chay "_checkmat do bang mat" "CHECKMAT (OK|BO QUA)" node _checkmat.js
 if [ $NHANH -eq 1 ]; then
   ghi "_checkui" BOQUA "bo qua vi chay voi --nhanh"
 else

@@ -1238,11 +1238,11 @@ function colMenuHTML(key){var cfg=LISTCFG[key];if(window.COLMENU!==key)return ''
    số thẻ vẽ ra thật cũng đỏ; thẻ nào còn onclick cũng đỏ. */
 var THEDEF={
  lopruiro:{t:"Vận hành lớp - cần xử lý",the:[
-  ["lr_nguyco","Học viên nguy cơ","Học viên CỦA LỚP NÀY đang bị đánh dấu nguy cơ - vắng nhiều hoặc điểm học thuật dưới ngưỡng. Muốn xem từng em: tab Học viên ngay dưới, cột trạng thái có chip đỏ."],
+  ["lr_nguyco","Học viên nguy cơ","Học viên của lớp này đang bị đánh dấu nguy cơ - vắng nhiều hoặc điểm học thuật dưới ngưỡng. Muốn xem: tab Học viên ngay dưới, cột trạng thái có chip đỏ."],
   ["lr_chuadd","Buổi chưa điểm danh","Buổi ĐÃ dạy xong mà chưa có một dòng điểm danh nào. Buổi chưa tới thì không tính - chưa dạy thì chưa phải việc. Muốn xem: tab Điểm danh."],
   ["lr_chuanx","Buổi quá hạn chưa nhận xét","Buổi dạy xong đã quá ngưỡng giờ ghi nhận xét (chỉnh ở Cài đặt, slaTeacherNote_hours) mà giáo viên chưa ghi. Muốn xem: tab Buổi học, dòng nào quá hạn hiện đỏ."],
-  ["lr_chuacham","Bài đã nộp chưa chấm","Học viên đã nộp mà chưa ai chấm - nộp rồi để đó là các em chờ vô ích. Muốn xem: tab Bài tập."],
-  ["lr_no","Học viên còn nợ","Đếm số HỌC VIÊN của lớp còn khoản phải thu, cộng mọi đơn chưa huỷ của em đó. Một em nợ hai đơn vẫn tính là một người. Muốn xem: trang Thanh toán, lọc theo lớp."]]},
+  ["lr_chuacham","Bài đã nộp chưa chấm","Học viên đã nộp mà chưa ai chấm - nộp rồi để đó là người học chờ vô ích. Muốn xem: tab Bài tập."],
+  ["lr_no","Học viên còn nợ","Đếm số học viên của lớp còn khoản phải thu, cộng mọi đơn chưa huỷ của người đó. Một người nợ hai đơn vẫn tính là một. Muốn xem: trang Thanh toán, lọc theo lớp."]]},
  dsphuhuynh:{t:"Sổ phụ huynh",the:[
   ["ph_nguoi","Người đồng hành","Số người đồng hành trong phạm vi dữ liệu của bạn. Gộp theo SỐ ĐIỆN THOẠI - hai học viên khai cùng một số là một người. Muốn xem danh sách: chính bảng ngay dưới dải này."],
   ["ph_nhieu","Có từ 2 con trở lên","Người đang có nhiều hơn một con theo học. Gọi cho họ một lần là nói được chuyện của cả hai - đừng để hai bộ phận gọi hai lần trong một ngày. Muốn xem: cột thứ hai của mỗi dòng ghi rõ tên từng con."],
