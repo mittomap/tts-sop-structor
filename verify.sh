@@ -188,6 +188,12 @@ else
   # @phead - cung khoanh dong mo ta chung cua trang), neo phai nam trong than trang, vong sang
   # phai trung phan tu. Chay tren ca hai ban build.
   chay "_checkneo vong sang tro dung cho" "CHECKNEO (OK|BO QUA)" node _checkneo.js
+  # V9.99e - BAM NUT "DUNG LAI DEMO" ROI KIEM LAI TU DAU (anh Luan: "nhat la nut reset demo,
+  # truoc khi giao a se bam nut nay day. No phai keo demo ve trang thai hoan hao"). Day la nut
+  # anh Luan bam NGAY TRUOC KHI GIAO - no ra mot bo du lieu te thi moi thu con lai het y nghia.
+  # Kiem SAU khi bam: moi chuc danh co viec, co viec gap/qua han, tuan nay co buoi hoc, va
+  # CAU HINH + thoi quen rieng KHONG bi cuon theo.
+  chay "_checkreset dung lai demo" "CHECKRESET (OK|BO QUA)" node _checkreset.js
 fi
 
 # Ghi lai bang gio de luot sau co cai ma dem nguoc. Chi ghi khi chay day du (khong bi cat giua
