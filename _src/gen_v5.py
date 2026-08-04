@@ -263,7 +263,13 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .sel{height:36px;border:1px solid var(--line);border-radius:8px;padding:0 10px;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--text);background:#fff}
 .tbtn{width:38px;height:38px;border-radius:8px;border:1px solid var(--line);background:#fff;color:#5A6675;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;position:relative}
 .tbtn .n{position:absolute;top:-5px;right:-5px;background:var(--red);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:999px;padding:0 4px;box-sizing:border-box;line-height:1;white-space:nowrap;display:flex;align-items:center;justify-content:center}
-.content{flex:1;overflow-y:auto;padding:22px 26px}
+/* V9.99f (anh Luân: *"có vài chỗ a thấy ko bấm được nhé"*, kèm ảnh nút "Cột (9/11)" bị che).
+   Đo được bằng `elementFromPoint`: nút Trợ lý nổi ở góc dưới phải che mất 8 nút của nội dung
+   (Xử lý · Ghi liên hệ · Hồ sơ · Huỷ đăng ký · Gửi đợt · Bảng lớp...). Nút nổi luôn ở đó, nên
+   dòng nào trôi tới đúng góc ấy là bấm không được - người dùng bấm hai ba lần rồi bỏ đi.
+   Chừa chỗ ở ĐÁY vùng cuộn đủ cao hơn nút nổi (39px + 18px lề + thở): cuối danh sách luôn cuộn
+   qua được nút, không còn dòng nào bị kẹt vĩnh viễn dưới nó. */
+.content{flex:1;overflow-y:auto;padding:22px 26px 76px}
 /* V9.67: tiêu đề trang + dải nút phải XUỐNG DÒNG được ở mọi khổ, không chỉ dưới 820px. Đo ở
    iPad dọc (834px, sidebar vẫn hiện nên khung nội dung chỉ còn 572px): nút "Khách mới liên hệ
    đến" thò ra 94px, kéo cả trang cuộn ngang - 6 trang bị. Khổ nào cũng có thể hẹp, tuỳ sidebar
@@ -1198,7 +1204,13 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
  color:var(--navy);cursor:pointer;height:30px;padding:0 2px}
 .zwrap>select:focus{outline:none}
 @media(max-width:1199px){.zwrap{display:none}}   /* màn nhỏ: để trình duyệt tự lo, thu nhỏ nữa là nút khó bấm */
-.pk{position:relative;display:flex;flex-direction:column;min-width:150px;max-width:100%}
+/* V9.99f (anh Luân, kèm ảnh: *"mấy cái ô này hẹp quá"*). Câu gợi ý là "Gõ để tìm trong 22 lựa
+   chọn" - dài khoảng 210px, mà ô chỉ rộng tối thiểu 150px nên chữ bị cắt cụt thành "...22 lựa".
+   Người dùng đọc câu hướng dẫn mà câu hướng dẫn bị cụt là hỏng đúng chỗ nó sinh ra để đỡ.
+   Nay tối thiểu 224px (đo bằng chính câu dài nhất: 2 chữ số + "lựa chọn"), và cho phép nở thêm
+   khi thanh công cụ còn chỗ. Màn hẹp vẫn co lại được nhờ `max-width:100%` + `flex-wrap` của
+   thanh cha, nên không đẻ ra cuộn ngang. */
+.pk{position:relative;display:flex;flex-direction:column;flex:1 1 224px;min-width:224px;max-width:100%}
 /* Ô gõ tự mang đủ dáng của một ô nhập: nó có thể được dựng ở NGOÀI .fld (thanh lọc trên trang),
    nơi không có luật CSS nào của form chạm tới - để trần là ra một ô cao 19px, đúng loại lỗi
    `_checkui` bắt trên trình duyệt thật. */
