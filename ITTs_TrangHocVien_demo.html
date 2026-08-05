@@ -5190,6 +5190,11 @@ function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sa
     tư vấn - trọn vẹn miền lead cộng miền tiền. Kế toán và Trưởng phòng Học vụ khai `lead:"none"`
     thì bảng này không phải của họ; bảng khối lượng việc VH11 ngay dưới vẫn còn cho phần việc. */
  if(dsLevel("lead")==="none")return "";
+ /* Chỉ những tư vấn viên TRONG ĐỘI mình - trưởng phòng Tư vấn thấy cả phòng, leader chi nhánh
+    thấy cơ sở mình, nhân viên thì bảng này không có ai ngoài chính họ nên không vẽ. */
+ if(bcMuc()!=="all"&&CURSTAFF){var _tm=null;try{_tm=myTeam()}catch(e){}
+  if(_tm)sales=sales.filter(function(x){return !!_tm[x.staff_id]});
+  if(sales.length<2)return ""}
  /* Cùng cửa sổ nhìn lại với bảng số cá nhân - hai bảng nói về cùng một quãng thời gian thì
     phải đọc cùng một tham số, không thì đội trưởng và nhân viên nhìn hai con số khác nhau. */
  var _ng=mkNgay();
@@ -10348,7 +10353,7 @@ function kpiSection(){var comp=kpiCompute();var ch6=(DATA.config&&DATA.config.ch
     Một NV WOW mở trang ra gặp 49 dòng mà 40 dòng ghi "chưa đủ dữ liệu" - đó không phải bảng chỉ
     số, đó là danh mục. Ở mức "team"/"all" thì giữ nguyên: quản lý cần thấy cả chỗ CHƯA đo được,
     vì đó chính là chỗ dữ liệu đang thiếu. */
- if(dsLevel("baocao")==="mine")ch6=ch6.filter(function(k){var c=comp[k.code];return !(c==null||isNaN(c))});
+ if(bcMuc()==="mine")ch6=ch6.filter(function(k){var c=comp[k.code];return !(c==null||isNaN(c))});
  if(!ch6.length)return '<div class="sechd">KPI theo SOP</div><div class="panel"><div class="empty">Chưa có chỉ số nào tính được cho riêng bạn trong kỳ này - làm việc trên hồ sơ của mình rồi số sẽ hiện ra.</div></div>';
  var byPhase={},order=[];
  ch6.forEach(function(k){var p=k.phase||"-";if(!byPhase[p]){byPhase[p]=[];order.push(p)}byPhase[p].push(k)});
@@ -10462,7 +10467,10 @@ function kpiTop3Section(){
    nào nên gộp vào một cơ sở bất kỳ là sai cả hai đầu. */
 function brOf(code){return elabel(code)||code||"(chưa ghi)"}
 function baocaoBranch(){
- var cls=rows("DL10"),enr=rows("DL08"),ses=rows("DL11");
+ /* Bảng so sánh 5 cơ sở trả lời câu hỏi của người điều hành CHUỖI ("cơ sở nào đang gánh").
+    Người quản một đội hay một cơ sở nhìn bảng ấy là nhìn sang phần việc của người khác. */
+ if(bcMuc()!=="all"&&CURSTAFF)return "";
+ var cls=srows("DL10"),enr=srows("DL08"),ses=srows("DL11");
  var clsBr={},clsOn={};cls.forEach(function(c){clsBr[c.class_id]=c.branch||"";clsOn[c.class_id]=clsOnline(c)});
  var K={};
  function slot(b){if(!K[b])K[b]={b:b,cls:0,on:0,stu:0,ses:0,note:0,risk:0,gv:{},rev:0,debt:0};return K[b]}
@@ -10496,13 +10504,29 @@ function baocaoBranch(){
    '<td style="font-variant-numeric:tabular-nums">'+(k.debt>0?'<b style="color:var(--red)">'+vnd(k.debt)+'</b>':vnd(0))+'</td></tr>'});
  h+='</tbody></table></div><div class="mut" style="font-size:11.5px;padding:11px 16px;line-height:1.7">Cột <b>Trong đó online</b> đếm lớp có hình thức học trực tuyến - những lớp này KHÔNG ràng buộc cơ sở khi tìm giáo viên dạy thay. Ngưỡng tỷ lệ có nhận xét lấy từ '+kpiChip(/^TNR/,0.9,1)+'.</div></div>';
  return h}
+/* ═══ V9.99x - PHẠM VI TRANG CHỈ SỐ TÍNH THEO CHỖ ĐỨNG, KHÔNG CHỈ THEO BẢNG KHAI ══════════
+   Anh Luân 05/08: *"người nào đăng nhập thì họ thấy cái thuộc về họ hoặc cái họ phụ trách
+   thôi"*. Bảng `DSDEF` khai theo NHÓM, mà nhiều nhóm không tách dòng `_mgr` (marketing, kế
+   toán, ACA...) nên nhân viên trong nhóm ấy thừa hưởng luôn mức của trưởng phòng - NV Marketing
+   mở ra thấy chỉ số của cả phòng. Nay kẹp lại theo đúng ba bậc anh Luân đặt:
+     nhân viên -> của riêng mình · quản lý -> của đội mình · Giám đốc/Quản trị -> toàn trung tâm
+   Bảng khai vẫn là TRẦN (không ai vượt quá mức đã khai), hàm này chỉ kéo xuống. */
+function bcMuc(){
+ if(!CURSTAFF)return "all";
+ var rs=SCOPE()||{};
+ if(rs.pages==="*")return "all";
+ /* Đúng ba bậc, không hơn: nhân viên -> của mình · quản lý -> của đội mình · toàn quyền ->
+    toàn trung tâm. Không đọc mức khai của nhóm ở đây nữa: nhiều nhóm không tách dòng `_mgr`
+    nên mức khai của nhóm là mức của NHÂN VIÊN, dùng nó cho trưởng phòng thì trưởng phòng
+    Nhân sự và trưởng phòng WOW bị kẹp xuống "của riêng tôi" - không nhìn được đội mình. */
+ return (!!rs.mgr||!!rs.leader)?"team":"mine"}
 function renderBaocao(){
  if(dsLevel("baocao")==="none")return dsDeny("Báo cáo & KPI");
  var L=srows("DL02"),S=srows("DL09"),E=srows("DL06");
  var risk=S.filter(function(r){return/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status))}).length;
  /* V9.99w - TRANG NÀY LÀ CỦA AI. Ba mức phạm vi thì ba câu khác nhau, nói thẳng trên tiêu đề -
     người đọc phải biết con số đang đếm tập nào trước khi tin nó. */
- var _bcLv=dsLevel("baocao");
+ var _bcLv=bcMuc();
  var _bcTen=(_bcLv==="all")?"Toàn trung tâm"
    :(_bcLv==="team")?"Đội của bạn"
    :"Của riêng bạn";
@@ -16058,7 +16082,17 @@ function gvTaiRows(){
 function khoiLuongRows(){
  var L=rows("DL02"),T=rows("DL03"),C=rows("DL04"),OB=rows("DL08"),KN=rows("DL17"),TK=rows("DL23");
  function mo(r,f){return !isc(r[f],"resolved")}
- return rows("DL01").filter(staffActive).map(function(nv){
+ /* V9.99x (anh Luân 05/08, mở Báo cáo của Trưởng phòng ACA): *"sao lại hiện hết các người khác
+    thế này"* · *"người nào đăng nhập thì họ thấy cái thuộc về họ hoặc cái họ phụ trách thôi"*.
+    Bảng này đọc THẲNG `rows("DL01")` nên ai mở cũng thấy trọn 23 người và 122 việc của cả trung
+    tâm - kể cả người chỉ quản một đội. Chốt phạm vi ngay tại nguồn của bảng: `all` thì cả trung
+    tâm, còn lại chỉ những người trong đội mình (`myTeam()` đã tính sẵn cả cấp dưới trực tiếp,
+    cùng phòng và cùng cơ sở). */
+ var _klAll=bcMuc()==="all"||!CURSTAFF;
+ var _klTeam=null;if(!_klAll){try{_klTeam=myTeam()}catch(e){_klTeam=null}}
+ return rows("DL01").filter(staffActive)
+  .filter(function(nv){return _klAll||!_klTeam||!!_klTeam[nv.staff_id]})
+  .map(function(nv){
   var id=String(nv.staff_id||"");
   var lead=L.filter(function(r){return String(r.assigned_to||"")===id&&mkLeadSong(r)}).length;
   var cham=T.filter(function(r){return String(r.graded_by||"")===id&&!isc(r.test_status,"graded")}).length

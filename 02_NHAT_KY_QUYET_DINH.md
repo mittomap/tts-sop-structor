@@ -164,6 +164,45 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.99v/w — MỖI NGƯỜI MỘT TRANG CHỈ SỐ CỦA CHÍNH MÌNH ✅ (05/08).**
+> · **`buildNav()` cắm cứng `NAVTREE`** nên toàn bộ cơ chế chọn khung menu không có tác dụng gì
+> lên thanh menu THẬT: các MỤC chặng biến mất (vì `navVis` lọc từng mục) nhưng **TIÊU ĐỀ NHÓM
+> vẫn là tiêu đề chặng** - anh Luân chụp màn "C2 · ĐANG HỌC" ở Trưởng phòng ACA. Đây là **lần
+> thứ ba** một bản đồ cắm cứng làm mất tính năng trong im lặng (BVLAND ở v6, NAVTREE ở
+> `navCurKey`, nay `buildNav`). Phép đo của em cũng trượt vì cùng lý do - nó hỏi lại `navCay()`
+> thay vì đọc CHUỖI HTML thanh menu thật sự vẽ ra. **Nay `_check11` đo trên HTML thật**, cho
+> từng chức danh đang đi làm, cộng hai luật cụ thể cho ACA.
+> · **Ô "Xem việc của" liệt kê cả chính mình** (anh Luân ở TP Kế toán: *"em hiện trưởng phòng
+> làm gì, nó là chính tôi rồi mà"*) - dòng đầu đã là "Chính tôi". Biến `goc` đã tính sẵn từ lâu
+> mà chưa ai dùng tới. Kèm theo: ô này nay mở cho cả **leader**, không chỉ manager - Trưởng
+> phòng WOW (mã vai `wow_leader`) trước đây không có ô này dù là một trong bốn cửa trưởng phòng.
+> XEM và DUYỆT là hai chuyện khác nhau; duyệt vẫn chỉ của `*_manager` trở lên.
+> · **Kế toán Phan Thị Hồng Đào nghỉ việc** (anh Luân chốt) - bỏ khỏi `STAFF` **ngay đầu
+> `gen_demo`** nên không dòng nào trong 4.000 dòng còn trỏ tới họ. Bẫy kèm theo: hằng số
+> `ACCOUNTANT` cắm cứng mã NV010, quên sửa là `DL07.verified_by` trỏ vào mã chết -
+> `check_logic.py` bắt được ngay. Phòng Kế toán demo nay đúng một người, khớp với một cửa Kế
+> toán ở cổng.
+> · **MỖI NGƯỜI MỘT TRANG CHỈ SỐ & KPI** (anh Luân: *"mỗi người phải có 1 sheet Chỉ số và KPI
+> riêng... nhân viên cũng nên có để họ biết việc của mình, trưởng phòng để theo dõi team, giám
+> đốc thì khỏi nói"*). Trước bản này **9/17 chức danh không có trang chỉ số nào**, kể cả Trưởng
+> phòng ACA; và người CÓ trang thì đọc số của TOÀN TRUNG TÂM dù chỉ quản một đội - nên TP Kế
+> toán mở ra thấy *"sai tè le"*: số đúng, nhưng không phải số của họ.
+>   · Ai cũng có trang, khác nhau là **PHẠM VI**: nhân viên `mine` · quản lý `team` · Giám đốc
+>     và Quản trị `all`.
+>   · Con số tự đúng theo mức ấy vì `renderBaocao`, `bizSection`, `upcomingSection`,
+>     `deptSection`, `kpiCompute` và `kpiNum` nay đọc **`srows()`** - đã cắt theo phạm vi của
+>     người đang đăng nhập - thay vì bảng thô.
+>   · Tiêu đề nói thẳng trang này của ai, kèm một câu giải thích con số đang đếm tập nào.
+>   · Khối chỉ có nghĩa ở cấp quản lý (so sánh 5 cơ sở · hiệu suất đội tư vấn · khối lượng việc
+>     VH11) không vẽ ở mức cá nhân. Khối tiền không vẽ cho ai khai `tien:"none"` - trước đó giáo
+>     viên mở ra thấy bảy ô 0đ.
+>   · Ở mức cá nhân, **chỉ số không có dữ liệu của họ thì không hiện**: NV WOW từng thấy 49 dòng
+>     mà 40 dòng ghi "chưa đủ dữ liệu" - đó là danh mục, không phải bảng chỉ số.
+> · **Sidebar 262px → 292px**, mỗi mục menu gọn MỘT DÒNG (anh Luân đặt); tên quá dài thì cắt
+> bằng "..." còn tooltip nói đủ.
+> · **Nguyên tắc làm việc anh Luân chốt 05/08:** *"làm xong là đẩy, verify xong nếu có gì thay
+> đổi thì đẩy tiếp"* - đẩy trước để anh có bản mới xem ngay, verify chạy song song.
+
 > **Phiên bản: V9.99t — MENU HAI CHẾ ĐỘ, VIỆC VỀ ĐÚNG NGƯỜI, GỠ CỔNG MARKETING ✅ (05/08).**
 > · **Menu sidebar nay có HAI CHẾ ĐỘ** (anh Luân: *"trưởng phòng aca chỉ còn chặng 2, mà em để
 > chặng 2 làm gì, ko có ý nghĩa, và nó ko đẹp"*). Cách gom trang theo bốn chặng vòng đời chỉ có
