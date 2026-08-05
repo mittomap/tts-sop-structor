@@ -416,6 +416,9 @@ tr.cfhl>td{background:#FFF6D8}
 .navitem.sub{padding-left:26px;position:relative}
 .navitem.sub::before{content:"";position:absolute;left:14px;top:6px;bottom:6px;width:1px;background:#ffffff1f}
 .navitem.sub i{font-size:16px}
+/* Tầng ba: tab của một hub nằm trong một chặng (chặng > hub > tab). */
+.navitem.sub2{padding-left:42px}
+.navitem.sub2::before{left:30px}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
 .navitem:hover{background:#ffffff12;color:#fff}
 .navitem.on{background:#ffffff2e;color:#fff;font-weight:700;box-shadow:inset 0 0 0 1px #ffffff1f} /* V9.19: nền 10% quá mờ trên navy - Luân không thấy mục đang mở; đậm lên + icon sáng */
@@ -2820,7 +2823,15 @@ var ROLESCOPE={
  aca:{match:/^aca_/,land:"hoctap",ctx:{HTTAB:"lop"},
   pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan"],
   blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:1,mgr:1,
-  bell:["Giảng viên chuyên môn","Giao việc"]},
+  /* V9.99y (anh Luân 05/08): *"Trưởng phòng aca cũng quản lý toàn bộ team Wow, em đừng quên"*.
+     Đội WOW nằm trong phòng ACA nên phạm vi NGƯỜI đã đúng sẵn; thiếu là cái chuông - 21 việc
+     của đội WOW chưa bao giờ đổ về Trưởng phòng ACA, và trang Việc hôm nay của họ chỉ có đúng
+     một chip bộ phận.
+     BẪY ĐÃ CẮN: sửa này em viết từ lượt trước nhưng script sửa NHIỀU CHỖ bị dừng giữa chừng vì
+     một phép khớp sai - mà script chỉ ghi file ở cuối, nên MỌI sửa trong lượt ấy mất sạch trong
+     im lặng, kể cả những chỗ đã khớp đúng. Anh Luân phát hiện lại bằng mắt. Luật: sửa xong phải
+     ĐO LẠI trên bản build, đừng tin vào việc script in ra "ok". */
+  bell:["Giảng viên chuyên môn","WOW","Giao việc"]},
  hocvu:{match:/^academic/,land:"xeplop",
   pages:["viec","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ychv","ketthuc","khac","duyet"],
   tabs:{khac:["baoluu"],duyet:["duyetnghi"]},
@@ -20910,6 +20921,9 @@ function go(key,noHist){
  /* V9.64: bảng công giảng dạy nay là một tab của trang Giảng viên. 4 chỗ trong app đang gọi
     go('bangcong') (ô thẻ Nhân sự, trợ lý, nhịp ngày, tour) - remap ở ĐÂY chứ không đi sửa 4 chỗ,
     để mai kia có chỗ thứ 5 gọi tên cũ thì vẫn tới đúng nơi. */
+ /* Nhớ lại khoá NGƯỜI DÙNG THẬT SỰ BẤM, trước mọi phép đổi tên bên dưới - có nó mới phân biệt
+    được "bấm vào tên hub" với "bấm vào một mục con của hub" (hai chuyện phải xử khác nhau). */
+ var _bamGoc=key;
  if(key==="bangcong"){window.GVTAB="cong";key="giangvien"}
  /* V9.99u - lối cũ: mọi nút/link/bài hướng dẫn còn trỏ tới `duyetgiao` nay dẫn thẳng sang tab
     "Việc chờ nhận" của trang Quản lý việc giao & nhận. Đổi chỗ một màn thì phải để lại lối,
@@ -20924,7 +20938,11 @@ function go(key,noHist){
     lần trước có thể là một tab rất lẻ (GV dự phòng), và mục con ấy sáng lên trong khi người ta
     vừa bấm mục cha. Và tab mặc định phải là tab NGƯỜI ĐÓ CÓ (cùng luật đã sửa cho hub Tuyển
     sinh ở V9.99s). */
- if(HUBTAB[key]){var _hm=HUBTAB[key].m||{},_ok=[];
+ /* BẪY VỪA CẮN: bản đầu của luật này chạy cho MỌI lần vào hub, kể cả khi người ta vừa bấm một
+    MỤC CON - dòng ngay trên vừa đặt tab theo mục con thì dòng này đẩy ngược về tab mặc định,
+    thành ra bấm "GV dự phòng" mà màn không nhúc nhích. Anh Luân: *"đơ đơ thì phải"*.
+    Chỉ rà lại tab khi người ta bấm ĐÚNG TÊN HUB. */
+ if(_bamGoc===key&&HUBTAB[key]){var _hm=HUBTAB[key].m||{},_ok=[];
   for(var _t in _hm)if(scopeTabs(key,[[_hm[_t]]]).length)_ok.push(_t);
   var _md=HUBTAB[key].d;
   window[HUBTAB[key].v]=(_ok.indexOf(_md)>=0||!_ok.length)?_md:_ok[0]}
@@ -21290,8 +21308,15 @@ function buildNav(){
    var isArc=/^chang[A-D]$/.test(k);
    /* Mục con của một hub thụt vào - trước đây hub và mục con của nó nằm ngang hàng nhau trên
       menu, nhìn không ra cái nào chứa cái nào. */
-   var isSub=navOwner(k)!==k&&G.items.indexOf(navOwner(k))>=0;
-   h+='<div class="navitem'+(isArc?" chang":"")+(isSub?" sub":"")+(navCur(k)?" on":(ORPHAN&&k===NAVFROM?" from":""))+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
+   /* V9.99z4 (anh Luân): *"e cũng áp dụng cách phân cấp này cho mấy chặng đi, dễ nhìn á"*.
+      Trong một nhóm CHẶNG, "Bản đồ chặng" là mục cha - mọi màn nghiệp vụ còn lại thuộc về chặng
+      ấy nên thụt vào một bậc. Màn nào lại là TAB của một hub (GV dự phòng, Phòng học, Buổi WOW
+      thuộc hub Học tập) thì thụt thêm một bậc nữa - đọc ra đúng ba tầng: chặng > hub > tab. */
+   var _laHub=navOwner(k)!==k&&G.items.indexOf(navOwner(k))>=0;
+   var _trongArc=!!G.arc&&!/^chang[A-D]$/.test(k);
+   var isSub=_laHub||_trongArc;
+   var isSub2=_laHub&&_trongArc;
+   h+='<div class="navitem'+(isArc?" chang":"")+(isSub2?" sub sub2":(isSub?" sub":""))+(navCur(k)?" on":(ORPHAN&&k===NAVFROM?" from":""))+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
     ' data-k="'+k+'" title="'+esc(m.t)+'" onclick="go(\''+k+'\')"><i class="ti '+m.ic+'"></i><span>'+esc(m.t)+'</span>'+
     (n?'<span class="dot">'+(n>99?"99+":n)+'</span>':'')+'</div>'});
   h+='</div>'});
