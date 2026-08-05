@@ -302,7 +302,10 @@ var TOUR_BOQUA={
  var nhom=Object.keys(ROLESCOPE);
  var coBai={};Object.keys(TOURS).forEach(function(k){if(TOURS[k].lv==="trainghiem")coBai[k.replace(/^tn_/,"")]=1});
  /* mot so nhom dung chung bai/nhip voi nhom khac - khai ro o day, khong de im lang */
- var DUNGCHUNG={quantri:"quanly",dieuhanh:"quanly",tuvan:"sale"};
+ /* aca: nhom tach khoi hocvu 04/08. Bai huong dan dung CHUNG voi Hoc vu vi hai phong di qua
+    cung mot bo man (lop, buoi, bai) - chi khac phan duoc bam. Nhip ngay thi RIENG, vi ngay cua
+    ho khac han: chat luong day, khong phai xep lop. */
+ var DUNGCHUNG={quantri:"quanly",dieuhanh:"quanly",tuvan:"sale",aca:"hocvu"};
  function bai(g){return coBai[DUNGCHUNG[g]||g]||coBai[g]}
  nhom.forEach(function(g){
   t2("nhom vai '"+g+"' co BAI HUONG DAN rieng", !!bai(g));

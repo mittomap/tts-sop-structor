@@ -38,6 +38,27 @@ STAFF = [s for s in odl["DL01"] if str(s.get("role", "")).startswith(BOPHAN_SOP)
 if _bo:
     print("Da bo %d nhan su ngoai SOP khoi cong nhan vien: %s"
           % (len(_bo), ", ".join(sorted({str(x.get("role", "")).split(" (")[0] for x in _bo}))))
+# ═══ V9.99p - ANH LUÂN CHỐT LẠI SƠ ĐỒ LEADER TƯ VẤN (04/08) ═══════════════════════════════
+#   *"Khải leader chi nhánh 2 · Hà leader chi nhánh 3 · Thuyên leader chi nhánh 5"*
+# Ba người trên là TOÀN BỘ leader tư vấn. Phương trước đây là leader Cơ sở 3 nên nay trở lại
+# làm nhân viên tư vấn - danh sách anh đưa chỉ có ba cái tên, mà một cơ sở không thể có hai
+# leader. Sau khi đổi, cơ sở còn LẠI không có leader là Cơ sở 1 và Cơ sở 4.
+# Sửa Ở ĐÂY chứ không sửa tay JSON: chạy lại pipeline là sơ đồ này dựng lại y nguyên.
+LEADER_TUVAN = {
+    "NV020": ("sales_leader (Sale Leader Chi nhánh)", "branch_2 (Cơ sở 2)"),   # Huỳnh Quang Khải
+    "NV021": ("sales_leader (Sale Leader Chi nhánh)", "branch_3 (Cơ sở 3)"),   # Trần Thị Thanh Hà
+    "NV002": ("sales_leader (Sale Leader Chi nhánh)", "branch_5 (Cơ sở 5)"),   # Nguyễn Văn Thanh Thuyên
+    "NV022": ("sales_staff (NV Tư vấn)",              "branch_3 (Cơ sở 3)"),   # Nguyễn Huỳnh Thanh Phương - thôi leader
+}
+# Anh Luân 04/08: *"Kế toán là Nguyễn Cẩm Ly"* - cửa Kế toán ở cổng vào bằng trưởng bộ phận
+# kế toán (NV017), nên đổi tên đúng người đứng sau cửa ấy.
+DOI_TEN = {"NV017": "Nguyễn Cẩm Ly"}
+for _st in STAFF:
+    _kw = LEADER_TUVAN.get(_st.get("staff_id"))
+    if _kw:
+        _st["role"], _st["branch"] = _kw
+    if _st.get("staff_id") in DOI_TEN:
+        _st["full_name"] = DOI_TEN[_st["staff_id"]]
 COURSES = odl["DL05"]
 CBY = {c["course_id"]: c for c in COURSES}
 def staff_name(sid):

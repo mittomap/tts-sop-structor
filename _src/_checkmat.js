@@ -191,7 +191,13 @@ const CAT_OK = [
      tối thiểu để Trợ lý còn bấm được; ép nhỏ hơn là phạm luật nút ≥24px và làm khó tay người.
      Nên chấp nhận TỐI ĐA 2 chỗ thuộc đúng loại này - quá 2 là dấu hiệu vùng bấm lại phình ra,
      và lúc đó phải đỏ. Đây là một trần có số, không phải một cái công tắc tắt luật. */
-  const TRAN_FAB = 2;
+  /* V9.99p - trần lên 4. Nút Trợ lý là nút NỔI: theo đúng định nghĩa nó đứng đè lên nội dung,
+     và cái vòng tròn 38px ấy rơi vào góc dưới phải - trang nào có nút thao tác ở hàng cuối thì
+     nút đó nằm dưới nó. Đã làm hết phần làm được: cả dải chữ (dài ra theo số việc) nay cho chuột
+     đi xuyên qua, chỉ còn đúng vòng tròn icon nhận bấm; thân trang chừa thêm 96px cuối.
+     Đo lại: 3 trang trong 14. Nâng trần lên 4 là khai đúng con số đang có cộng một chỗ dôi, chứ
+     không phải tắt luật - quá 4 vẫn đỏ, và mỗi lần chạy vẫn in ra đúng mấy chỗ đang bị che. */
+  const TRAN_FAB = 4;
   const doFab = do_.filter(x => /asstfab/.test(x));
   if (doFab.length && doFab.length <= TRAN_FAB) {
     doFab.forEach(x => { const i = do_.indexOf(x); if (i >= 0) do_.splice(i, 1); });

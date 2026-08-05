@@ -63,6 +63,10 @@ function t(ten,ok,chitiet){n++;if(!ok)bad.push(ten+(chitiet?(" - "+chitiet):""))
    Đây là chỗ duy nhất được nói "ô này 0 cũng không sao". Mỗi dòng phải đọc ra được lý do -
    một trung tâm chạy bình thường thì ngày nào cũng có mấy việc này bằng 0 là CHUYỆN TỐT. */
 var RONGDUOC={
+ /* V9.99p - o cua bang Chuyen mon (ACA). Buoi thieu giao vien la SU CO, khong phai nhip ngay:
+    lich day duoc xep truoc ca thang, ngay nao cung thieu nguoi day moi la trung tam co van de.
+    O nay dung de bao dong khi CO chuyen, nen rong la trang thai dung. */
+ "Buổi hôm nay chưa có giáo viên":"buổi thiếu người dạy là sự cố, không phải việc thường ngày - rỗng nghĩa là lịch đang lành",
  "Buổi đã huỷ hôm nay":"huỷ buổi là việc bất thường - demo mà ngày nào cũng có buổi huỷ mới là sai",
  "Khiếu nại mức CAO":"khiếu nại nặng là hiếm theo đúng SOP; ép có mỗi ngày là bôi đen trung tâm",
  "Khiếu nại đã leo thang":"leo thang là ngoại lệ của ngoại lệ",

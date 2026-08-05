@@ -271,7 +271,12 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
    dòng nào trôi tới đúng góc ấy là bấm không được - người dùng bấm hai ba lần rồi bỏ đi.
    Chừa chỗ ở ĐÁY vùng cuộn đủ cao hơn nút nổi (39px + 18px lề + thở): cuối danh sách luôn cuộn
    qua được nút, không còn dòng nào bị kẹt vĩnh viễn dưới nó. */
-.content{flex:1;overflow-y:auto;padding:22px 26px 76px}
+/* V9.99p - CHỪA CHỖ CHO NÚT TRỢ LÝ. Nút nổi ở góc dưới phải, và nhãn của nó DÀI RA theo số
+   việc ("189 việc · 110 quá hạn") - càng nhiều việc nó càng rộng, càng phủ lên nút của nội dung.
+   Đo được hai lần trong ngày, mỗi lần một chỗ khác nhau, vì bề rộng nút thay đổi theo dữ liệu.
+   Vá từng chỗ bị che là chạy theo cái bóng; chừa hẳn một dải trống cuối trang mới hết. */
+.content{flex:1;overflow-y:auto;padding:22px 26px 96px}
+.content>*:last-child{margin-bottom:34px}
 /* V9.67: tiêu đề trang + dải nút phải XUỐNG DÒNG được ở mọi khổ, không chỉ dưới 820px. Đo ở
    iPad dọc (834px, sidebar vẫn hiện nên khung nội dung chỉ còn 572px): nút "Khách mới liên hệ
    đến" thò ra 94px, kéo cả trang cuộn ngang - 6 trang bị. Khổ nào cũng có thể hẹp, tuỳ sidebar
@@ -643,6 +648,11 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
    Góc màn là chỗ DỄ trúng nhất (chuột trượt tới mép là dừng), nên thu vùng bấm về biểu tượng
    không làm khó tay ai. */
 .asstfab{pointer-events:none}
+/* V9.99p - NHÃN CỦA NÚT KHÔNG ĐƯỢC ĂN CÚ BẤM. Nút để `pointer-events:none` nhưng CÁC CON của
+   nó vẫn nhận mặc định `auto`, nên phần chữ "195 việc · 110 quá hạn" vẫn chặn chuột - mà chữ ấy
+   DÀI RA theo số việc, hôm nay che nút này, mai che nút khác. Chỉ đúng cái vòng tròn icon mới
+   được nhận bấm; phần còn lại cho chuột đi xuyên qua. */
+.asstfab *{pointer-events:none}
 .asstfab>i{pointer-events:auto;cursor:pointer;width:38px;height:38px;margin:-8px -4px -8px -10px;
  border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
 .asstfab>i:hover{background:#ffffff26}
@@ -1828,7 +1838,9 @@ body.drsz .drawer{transition:none}
 .gvrow:hover{border-color:var(--navy);background:#F4F7FB}
 .gvav{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;font-weight:800;font-size:12.5px;
  display:inline-flex;align-items:center;justify-content:center;flex:none}
-.gvten{font-size:12.5px;font-weight:700;color:var(--ink)}
+.gvten{font-size:12.5px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:7px;min-width:0}
+.gvcap{font-size:10.5px;font-weight:700;color:var(--navy);background:#1E3A5F14;border-radius:20px;padding:2px 8px;white-space:nowrap}
+.gvav.ld{background:var(--red,#D51920)}
 .gvphu{font-size:11px;color:var(--muted);margin-left:auto}
 .gvrow>i{font-size:15px;color:var(--muted);flex:none}
 .rcard:hover{border-color:var(--navy);background:#FAFBFD}
@@ -2524,24 +2536,51 @@ var ROLESCOPE={
     Thanh toán) và giáo viên (đáp vào Học tập); riêng học vụ thì sót.
     Và mineBtn bật lên: "Việc hôm nay" đổ 76 việc toàn trung tâm, trong đó 50 là của giảng viên,
     việc thật của học vụ là 11 - mà vai này không có nút "chỉ việc của tôi" để cắt xuống. */
- hocvu:{match:/^(academic|aca_)/,land:"xeplop",
-  pages:["viec","banlam","hanhtrinh","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ychv","ketthuc","khac","duyet"],
+/* ═══ V9.99p - CẮT NHỮNG TRANG MỞ RA CHỈ ĐỂ THẤY SỐ 0 ════════════════════════════════════
+   Anh Luân 04/08: *"a mở thử 1 chức danh, ví dụ như trưởng phòng aca nhé, nó hiện ra những cái
+   mà chức danh này ko cần á, mà thậm chí có hiện ra thì cũng là số 0 thôi."*
+   Đo bằng máy - vẽ THẬT mọi trang của từng chức danh rồi đếm thẻ và đếm dòng:
+     · `banlam` (Trang bắt đầu) dựng quanh PHỄU TUYỂN SINH. Học vụ và ACA mở ra thấy 5 thẻ,
+       trong đó "Lượt liên hệ hôm nay", "Đăng ký mới 7 ngày", "Tiền thu 7 ngày" đều bằng 0 và
+       không một dòng nào - ba con số ấy không phải việc của họ. Giáo viên: 1 thẻ, 0 dòng.
+       WOW: 2 thẻ, 0 dòng. Kế toán: 2 thẻ, 0 dòng.
+     · `hanhtrinh` với Học vụ/ACA: 0 thẻ, 0 dòng - một trang trắng có tên trên menu.
+   Bốn nhóm này KHÔNG đáp vào `banlam` (họ đáp vào xeplop / hoctap / tuyensinh), nên cắt khỏi
+   menu không làm ai mất đường về. Tư vấn và Marketing thì GIỮ - phễu đúng là việc của họ, đo ra
+   có nội dung thật. Trang không bị xoá khỏi app, chỉ không còn đứng trên menu của người không
+   dùng tới nó. */
+ /* ═══ V9.99p - TÁCH ACA RA KHỎI HỌC VỤ ═════════════════════════════════════════════════════
+    Anh Luân mở thử Trưởng phòng ACA và thấy "những cái mà chức danh này ko cần". Gốc nằm ở đây:
+    `match:/^(academic|aca_)/` gom CẢ HAI phòng vào một nhóm, nên Trưởng phòng ACA nhận nguyên
+    bộ trang của Học vụ - Xếp lớp & Onboarding, CSKH, Học viên liên hệ, Kết thúc khóa, Bảo lưu.
+    Đó là việc của Học vụ, không phải của người phụ trách CHUYÊN MÔN.
+    ACA trông coi: giảng viên · lớp đang dạy · giáo án & ngân hàng bài · chất lượng buổi dạy.
+    Học vụ trông coi: xếp lớp, onboarding, chăm sóc, khiếu nại, kết thúc khóa, bảo lưu.
+    Hai bộ trang khác nhau thì phải là hai nhóm khác nhau - gom lại rồi bảo "ai không cần thì
+    đừng bấm" là đẩy việc phân quyền sang cho người dùng tự làm bằng mắt. */
+ aca:{match:/^aca_/,land:"hoctap",ctx:{HTTAB:"lop"},
+  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan","duyet"],
+  tabs:{duyet:["duyetgiao"]},
+  blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:1,mgr:1,
+  bell:["Giảng viên chuyên môn","Học vụ","Giao việc"]},
+ hocvu:{match:/^academic/,land:"xeplop",
+  pages:["viec","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ychv","ketthuc","khac","duyet"],
   tabs:{khac:["baoluu"],duyet:["duyetnghi","duyetgiao"]},
   blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:1,kpi:1,bell:["Học vụ","CSKH","Giảng viên chuyên môn","WOW","Giao việc"]},
  giaovien:{match:/^teacher$/,land:"hoctap",ctx:{HTTAB:"today"},
-  pages:["viec","banlam","hocvien","giangvien","banglop","hoctap","giaoan","duyet"],
+  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan","duyet"],
   tabs:{duyet:["duyetgiao"]},blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:0,bell:["Giảng viên chuyên môn","Học vụ","Giao việc"]},
  /* V9.60: CH3 giao cho NV WOW việc CHẤM TEST ĐẦU VÀO, mà phạm vi trang lại không có màn test -
     bài hướng dẫn của chính họ dẫn sang Tuyển sinh rồi bị chặn. Mở đúng một tab test, không mở
     cả hub tuyển sinh. */
  wow:{match:/^wow/,land:"hoctap",ctx:{HTTAB:"wow"},
-  pages:["viec","banlam","hocvien","giangvien","hoctap","banglop","tuyensinh","duyet"],
+  pages:["viec","hocvien","giangvien","hoctap","banglop","tuyensinh","duyet"],
   tabs:{duyet:["duyetgiao"],tuyensinh:["test"]},blocks:["test_grading","wowq","risk"],mine:0,mineBtn:0,kpi:0,bell:["WOW","Giảng viên chuyên môn","Giao việc"]},
  /* V9.40 (anh Luân chốt 29/07): "Duyệt chiết khấu là trưởng phòng tư vấn, kế toán luôn chỉ xác
     nhận và làm theo thôi." Trước đây cấu hình quyền cho Kế toán duyệt, trong khi DỮ LIỆU ghi
     NV012 - Trưởng phòng Tư vấn - là người duyệt cả 8 lần. Cấu hình sai, dữ liệu đúng. */
  ketoan:{match:/^account/,land:"tuyensinh",ctx:{TSTAB:"thanhtoan"},
-  pages:["viec","banlam","hocvien","giangvien","tuyensinh","duyet","baocao"],
+  pages:["viec","hocvien","giangvien","tuyensinh","duyet","baocao"],
   tabs:{duyet:["duyethoan","duyetthu","duyetgiao"]},
   blocks:["enrolled","approve","debt"],mine:0,mineBtn:0,kpi:0,bell:["Tài chính","Giao việc"]},
  /* V9.60: Marketing KHÔNG xem tiền. Đo trước khi sửa: Trưởng phòng Marketing mở app thấy trang
@@ -2703,11 +2742,15 @@ var CH3=[
  {k:"xeplop",     t:"Xếp lớp học viên",                         vai:["hocvu"]},
  {k:"doilop1",    t:"Đổi lớp (lần 1 - miễn phí)",               vai:["hocvu"]},
  {k:"doilop2",    t:"Đổi lớp (lần 2 trở đi)",                   vai:[],duyet:1,mgr:["hocvu"]},
- {k:"diemdanh",   t:"Điểm danh buổi học",                       vai:["giaovien"]},
- {k:"baitap",     t:"Giao và chấm bài tập về nhà",              vai:["giaovien"]},
- {k:"tnote",      t:"Viết teacher_note",                        vai:["giaovien"]},
- {k:"wow_book",   t:"Book buổi WOW 1-1 cho học viên",           vai:["hocvu","giaovien"]},
- {k:"risk_flag",  t:"Cập nhật at_risk/off_track",               vai:["hocvu","giaovien"]},
+ {k:"diemdanh",   t:"Điểm danh buổi học",                       vai:["giaovien","aca"]},
+ {k:"baitap",     t:"Giao và chấm bài tập về nhà",              vai:["giaovien","aca"]},
+ {k:"tnote",      t:"Viết teacher_note",                        vai:["giaovien","aca"]},
+ /* V9.99p - nhóm `aca` (Chuyên môn) tách khỏi Học vụ 04/08. Bốn hành động dưới đây thuộc về
+   CHẤT LƯỢNG GIẢNG DẠY nên ACA phải làm được: điểm danh, chấm bài, viết nhận xét buổi, gắn cờ
+   nguy cơ học thuật, đặt buổi WOW kèm. Tách nhóm mà quên cấp quyền thì trưởng phòng ACA mở app
+   ra không bấm được gì - đo được đúng vậy: 0 hành động CH3 của con người. */
+ {k:"wow_book",   t:"Book buổi WOW 1-1 cho học viên",           vai:["hocvu","giaovien","aca"]},
+ {k:"risk_flag",  t:"Cập nhật at_risk/off_track",               vai:["aca","hocvu","giaovien"]},
  {k:"wow_auto",   t:"Tạo buổi WOW từ cảnh báo at_risk",         vai:[],may:1},
  {k:"wow_lms",    t:"Học viên tự book WOW qua LMS",             vai:["hocvu","giaovien"],hv:1},
  {k:"wow_day",    t:"Thực hiện buổi WOW 1-1",                   vai:["wow"]},
@@ -2797,6 +2840,9 @@ var DSDEF={
     PHẠM VI CỦA QUẢN TRỊ VIÊN. Một nhóm bị quên hoá ra lại là nhóm nhiều quyền nhất.
     Nhân sự làm hồ sơ nhân viên, bảng công và việc nội bộ: `nhansu` toàn quyền, `lop` để "all"
     vì bảng công tính từ buổi dạy của các lớp; học viên, lead, tiền và nội dung thì không. */
+ /* ACA: chuyên môn giảng dạy - thấy trọn học viên và lớp để chấm chất lượng, nhưng không đụng
+    lead và không đụng tiền. */
+ aca:{lead:"none",hocvien:"all",lop:"all",tien:"none",baocao:"team",viec:"team",nhansu:"team",noidung:"all"},
  nhansu:{lead:"none",hocvien:"none",lop:"all",tien:"none",baocao:"none",viec:"mine",nhansu:"all",noidung:"none"},
  hotro:{lead:"none",hocvien:"none",lop:"none",tien:"none",baocao:"none",viec:"mine",nhansu:"none",noidung:"none"}};
 /* trường bị CHE khi miền "noidung"/"tien" không đủ quyền */
@@ -3218,6 +3264,10 @@ var THEDEF={
   ["bv_tk_wait","Chờ người giao xác nhận","Việc tôi đã báo xong, đang chờ người giao xác nhận. Muốn xem danh sách: mở trang Giao việc ở menu trái, tab Việc của tôi."],
   ["bv_hs_thieu","Hồ sơ nhân sự còn thiếu","Nhân viên chưa điền chức danh, hoặc là giáo viên / tư vấn viên mà chưa khai cơ sở - thiếu thì phân quyền và phân công đều sai. Khối văn phòng (giám đốc, trưởng phòng, marketing, kế toán, nhân sự) không gắn cơ sở nào nên không tính là thiếu. Muốn xem danh sách: bảng nhân sự ngay dưới trên chính trang này."],
   ["bv_gio_thieu","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy mà chưa ghi giờ vào hoặc giờ ra - thiếu mốc thì bảng công tính sai. Muốn xem danh sách: mở trang Bảng công giảng dạy ở menu trái."],
+  /* V9.99p - năm ô của bảng Chuyên môn (ACA), nhóm tách khỏi Học vụ 04/08. */
+  ["bv_aca_note","Buổi quá hạn nhận xét","Buổi đã dạy xong mà giáo viên chưa ghi nhận xét, tính theo hạn SLA. Muốn xem danh sách: Học tập & Giảng dạy > Nhận xét buổi."],
+  ["bv_aca_gv","Buổi hôm nay chưa có giáo viên","Buổi trong ngày hôm nay chưa xếp được người dạy - không xoay kịp là phải huỷ buổi. Muốn xem danh sách: Học tập & Giảng dạy > GV dự phòng."],
+  ["bv_aca_risk","Học viên đuối học thuật","Học viên bị đánh dấu at_risk/off_track ở trục học thuật. Muốn xem danh sách: mở Học viên rồi lọc nguy cơ."],
   ["bv_mk_moi","Lead mới N ngày","Số khách tiềm năng vào hệ thống trong cửa sổ nhìn lại (đặt ở Cài đặt, nhóm Bảng số). Đây là sản lượng của Marketing. Muốn xem danh sách: mở trang Lead & khai thác."],
   ["bv_mk_orph","Lead chưa ai phụ trách","Lead còn sống mà chưa gán cho nhân viên tư vấn nào - tiền quảng cáo đã tiêu rồi, để nguội là mất trắng. Muốn xem danh sách: mở trang Chờ duyệt, tab Bàn giao lead - ở đó có nút Chia đều cho đội tư vấn."],
   ["bv_mk_yeu","Nguồn đang kém","Nguồn lead đã có đủ số lead để kết luận (ngưỡng sourceMinLeads) mà tỷ lệ ra học viên vẫn dưới ngưỡng CVR ở CH6. Nguồn mới chạy vài lead thì chưa tính. Muốn xem: mở Báo cáo, bảng nguồn lead."],
@@ -4553,6 +4603,22 @@ function BANGVIEC(){
      ["ti-message-2",FB.filter(function(r){return !String(r.classified_at||"").trim()}).length,"Phản hồi chờ phân loại","#3B82C4","SLA "+slaChip("slaFeedbackClassify_hours",24,"giờ"),"goCS('phanhoi')"],
      ["ti-alert-triangle",KN.filter(function(r){return !isc(r.complaint_status,"resolved")}).length,"Khiếu nại đang xử lý","#6B4FA0","SLA phân công "+slaChip("slaComplaintFirstResponse_hours",4,"giờ"),"goCS('khieunai')"],
      ["ti-inbox",ycHVSo(),"Học viên liên hệ","#3B82C4","SLA nhận việc "+slaChip("slaTaskAccept_hours",4,"giờ"),"goCS('ychv')"]]},
+ /* V9.99p - BẢNG CỦA CHUYÊN MÔN (ACA), tách khỏi bảng Học vụ. Bốn con số đầu ca của người
+    trông coi chất lượng dạy: nhận xét buổi có kịp hạn không, bài có ai chấm không, buổi nào
+    thiếu giáo viên, và học viên nào đang đuối về học thuật. Không có ô nào về xếp lớp, phản hồi
+    hay hộp thư học viên - đó là việc của Học vụ. */
+ aca:{bc:"chất lượng giảng dạy",t:"Bảng Chuyên môn (ACA)",
+  d:"Việc của khối chuyên môn: nhận xét buổi, chấm bài, buổi thiếu giáo viên, học viên đuối học thuật.",
+  o:[["ti-message-2",SE.filter(function(x){return bhState(x).noteOver}).length,"Buổi quá hạn nhận xét","#E24B4A","SLA "+slaChip("slaTeacherNote_hours",48,"giờ"),"goHT('buoihoc')"],
+     ["ti-book",HW.filter(function(h){return hwSubmitted(h)&&!hwGraded(h)}).length,"Bài tập chờ chấm","#B58A2B","SLA "+slaChip("slaHomeworkGrading_hours",48,"giờ"),"go('baitap')"],
+     ["ti-user-question",(function(){var t=new Date();return SE.filter(function(x){var d=pvnd(x.session_date);
+        return d&&sameDay(d,t)&&!isc(x.session_status,"cancelled")&&!String(x.teacher_id||"").trim()}).length})(),
+      "Buổi hôm nay chưa có giáo viên","#DB2777","không xếp kịp là phải huỷ buổi","goHT('gvdp')"],
+     ["ti-chart-line",S.filter(function(x){return /at_risk|off_track/.test(ecode(x.academic_progress_status))}).length,
+      "Học viên đuối học thuật","#6B4FA0","điểm tụt - dấu hiệu sớm nhất","goRisk()"],
+     ["ti-clock-exclamation",SE.filter(function(x){return isc(x.session_status,"completed")&&
+        !(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())}).length,
+      "Buổi thiếu mốc giờ vào/ra","#E08A1E","thiếu mốc là bảng công tính sai","go('bangcong')"]]},
  quanly:{bc:"BC9",t:"Bảng Quản lý",d:"Việc cần cấp quản lý phê duyệt, theo bảng phân quyền CH3.",
   o:[["ti-discount-2",duyCkList().length,"Chiết khấu cần duyệt","#B58A2B","từ "+slaChip("thresholdDiscount_approval",1000000,"đ")+" trở lên","goDuyet('duyetck')"],
      ["ti-transfer",OB.filter(function(r){return num(r.placement_change_count)>=dlNguong()}).length,"Đổi lớp từ "+dlNguong()+" lần","#6B4FA0","quá "+slaChip("placementChange_free_times",1,"lần")+" miễn duyệt - cần quản lý phê duyệt","go('xeplop')"],
@@ -4634,13 +4700,17 @@ function mkKhoCu(){return scopeList("DL02",rows("DL02")).filter(function(l){
    Bẫy này đã cắn ở phiên trước với `placement_time` / `reservation_end_date`. */
 function mkThuongTreo(){return rows("DL19").filter(function(r){
  return String(r.referred_name||"").trim()&&!String(r.granted_at||"").trim()}).length}
-var BVLAND={tuvan:["banlam",null],marketing:["tuyensinh","lead"],hocvu:["xeplop",null],
+var BVLAND={tuvan:["banlam",null],marketing:["tuyensinh","lead"],hocvu:["xeplop",null],aca:["hoctap","lop"],
  giaovien:["hoctap","today"],wow:["hoctap","wow"],ketoan:["tuyensinh","thanhtoan"],
  hotro:["giaoviec",null],nhansu:["nhansu",null],dieuhanh:["baocao",null],quantri:["banlam",null]};
 /* Nhóm vai -> bảng việc của chính nhóm đó. Marketing dùng chung bảng tuyển sinh (SOP không tách). */
 function bvKhoi(g){g=g||(SCOPE().group||"quantri");
  /* V9.65: BỎ dòng ép `if(g==="marketing")g="tuvan"` - Marketing nay có bảng của chính họ. */
  if(g==="dieuhanh"||g==="quantri")return "quanly";
+ /* ACA có bảng việc RIÊNG (khai trong BANGVIEC). Bản đầu em cho ACA mượn bảng của Học vụ cho
+    nhanh - và bộ kiểm bắt được ngay: ô "Học viên liên hệ" bằng 0 suốt bảy ngày trong tuần, vì
+    hộp thư học viên là việc của Học vụ, ACA không có trang đó. Mượn bảng của phòng khác là
+    mang theo cả những ô không phải việc của mình. */
  return g}
 /* Mỗi ô "chờ duyệt" gắn với MỘT hành động trong bảng CH3 - ai sở hữu hành động đó mới thấy ô đó.
    Trước bản này mọi trưởng phòng đều thấy cả bốn ô duyệt, kể cả TP Marketing thấy ô khiếu nại. */
@@ -4665,7 +4735,7 @@ var VAI_CO_SO=/^(teacher|sales_staff|sales_leader)/;
 function hsThieu(){return rows("DL01").filter(function(x){
  if(!String(x.role||"").trim())return true;
  return VAI_CO_SO.test(ecode(x.role)||"")&&!String(x.branch||"").trim()})}
-var BVMA={"Học viên liên hệ":"bv_ychv","Lead mới (chưa LH)":"bv_lead_new","Lead đang khai thác":"bv_lead_work","Test sắp tới":"bv_test_up","Tư vấn cần làm":"bv_tv_can","Test chờ chấm":"bv_test_wait","Test đã chấm":"bv_test_done","WOW sắp tới":"bv_wow_up","WOW có tiến bộ":"bv_wow_imp","Buổi đã hoàn thành":"bv_ses_done","Cần viết nhận xét buổi":"bv_ses_note","Bài tập chờ chấm":"bv_hw_wait","HV nguy cơ học thuật":"bv_risk_aca","Nhập học chưa xong":"bv_ob_open","Học viên nguy cơ":"bv_risk_stu","Phản hồi chờ phân loại":"bv_fb_new","Khiếu nại đang xử lý":"bv_kn_open","Chiết khấu cần duyệt":"bv_ck_duyet","Đổi lớp từ N lần":"bv_doilop2","Lead mới N ngày":"bv_mk_moi","Lead chưa ai phụ trách":"bv_mk_orph","Nguồn đang kém":"bv_mk_yeu","Khách cũ chờ chạy lại":"bv_mk_cu","Thưởng giới thiệu chưa trao":"bv_mk_thuong","Khiếu nại mức CAO":"bv_kn_high","Khiếu nại đã leo thang":"bv_kn_esc","Hoàn tiền chờ duyệt":"bv_hoan","Việc mới chờ nhận":"bv_tk_new","Đang làm":"bv_tk_doing","Quá hạn":"bv_tk_late","Chờ người giao xác nhận":"bv_tk_wait","Hồ sơ nhân sự còn thiếu":"bv_hs_thieu","Buổi thiếu mốc giờ vào/ra":"bv_gio_thieu","Đơn còn nợ phí":"bv_no_phi","Phiếu thu chờ đối soát":"bv_thu_soat"};
+var BVMA={"Học viên liên hệ":"bv_ychv","Lead mới (chưa LH)":"bv_lead_new","Lead đang khai thác":"bv_lead_work","Test sắp tới":"bv_test_up","Tư vấn cần làm":"bv_tv_can","Test chờ chấm":"bv_test_wait","Test đã chấm":"bv_test_done","WOW sắp tới":"bv_wow_up","WOW có tiến bộ":"bv_wow_imp","Buổi đã hoàn thành":"bv_ses_done","Cần viết nhận xét buổi":"bv_ses_note","Bài tập chờ chấm":"bv_hw_wait","HV nguy cơ học thuật":"bv_risk_aca","Nhập học chưa xong":"bv_ob_open","Học viên nguy cơ":"bv_risk_stu","Phản hồi chờ phân loại":"bv_fb_new","Khiếu nại đang xử lý":"bv_kn_open","Chiết khấu cần duyệt":"bv_ck_duyet","Đổi lớp từ N lần":"bv_doilop2","Lead mới N ngày":"bv_mk_moi","Lead chưa ai phụ trách":"bv_mk_orph","Nguồn đang kém":"bv_mk_yeu","Khách cũ chờ chạy lại":"bv_mk_cu","Thưởng giới thiệu chưa trao":"bv_mk_thuong","Khiếu nại mức CAO":"bv_kn_high","Khiếu nại đã leo thang":"bv_kn_esc","Hoàn tiền chờ duyệt":"bv_hoan","Việc mới chờ nhận":"bv_tk_new","Đang làm":"bv_tk_doing","Quá hạn":"bv_tk_late","Chờ người giao xác nhận":"bv_tk_wait","Hồ sơ nhân sự còn thiếu":"bv_hs_thieu","Buổi thiếu mốc giờ vào/ra":"bv_gio_thieu","Buổi quá hạn nhận xét":"bv_aca_note","Buổi hôm nay chưa có giáo viên":"bv_aca_gv","Học viên đuối học thuật":"bv_aca_risk","Đơn còn nợ phí":"bv_no_phi","Phiếu thu chờ đối soát":"bv_thu_soat"};
 function bvStrip(t,bc,d,o,tour){
  if(!o.length)return "";
  /* Viết thẳng chuỗi data-tour="bangviec" chứ không ghép biến - bộ kiểm quét mã nguồn tìm
@@ -10885,9 +10955,15 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   h+='<div class="panel"><div class="pbody" style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">';
   h+='<label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox"'+(gateKhoaVai()?" checked":"")+' onclick="gateKhoaToggle()" style="width:17px;height:17px"><b>Khoá chọn chức danh ở cổng nhân viên</b></label>';
   h+='<span class="chip '+(gateKhoaVai()?"amber":"green")+'">'+(gateKhoaVai()?"Đang khoá - mọi người vào bằng Quản trị viên":"Đang mở - ai cũng chọn được chức danh")+'</span>';
+  /* V9.99p (anh Luân 04/08, kèm ảnh chụp ô này): *"chỗ này e hiển thị thành ****** nhé, hiện ra
+     vầy lúc xem demo họ thấy hết"*. Đúng - ô này nằm trong Cài đặt, mà lúc trình chiếu thì màn
+     hình đang chiếu cho cả phòng. Nay che sẵn, có nút con mắt để người có quyền tự mở ra xem. */
   h+='<div class="fld" style="min-width:250px;margin:0"><label>Mật khẩu quản trị</label>'
-   +'<input id="mk_in" value="'+esc(matKhau())+'" placeholder="mittomap">'
-   +'<div class="fhint" style="margin-top:4px">Dùng cho: vào Cài đặt ở chế độ ghi được, và nút Dựng lại demo.</div></div>';
+   +'<div style="display:flex;gap:6px;align-items:stretch">'
+   +'<input id="mk_in" type="password" autocomplete="new-password" value="'+esc(matKhau())+'" placeholder="mittomap" style="flex:1;min-width:0">'
+   +'<button class="btn sm" type="button" id="mk_mat" onclick="mkHien()" aria-label="Hiện mật khẩu" data-tip="Bấm để hiện hoặc che mật khẩu"><i class="ti ti-eye"></i></button>'
+   +'</div>'
+   +'<div class="fhint" style="margin-top:4px">Che sẵn để lúc trình chiếu không lộ. Dùng cho: vào Cài đặt ở chế độ ghi được, và nút Dựng lại demo.</div></div>';
   h+='<button class="btn primary sm" onclick="mkLuu()"><i class="ti ti-device-floppy"></i>Lưu mật khẩu</button>';
   h+='</div></div>';
   h+='<div class="notebar" style="background:#FAFBFD;border-color:#CFE0F7;color:#2E5A88"><i class="ti ti-info-circle"></i><span data-tip="Đây là bản demo chạy hẳn trong trình duyệt nên mật khẩu nằm ngay trong file - ai mở mã nguồn ra là thấy. Khi nối backend thật thì việc kiểm mật khẩu chuyển sang máy chủ."><b>Chốt cửa của bản demo</b>, không phải khoá an ninh.<i class="ti ti-info-circle gyti"></i></span></div>';
@@ -17172,10 +17248,19 @@ function renderGiaoviec(){
  var h=pageHead("Giao việc & Phối hợp",
   "Giao việc cho cấp dưới, phối hợp ngang cấp hoặc nhờ hỗ trợ - mỗi việc có hạn, trạng thái và luồng trao đổi riêng nên không trôi mất như tin nhắn.",
   '<button class="btn primary" onclick="tkNew()"><i class="ti ti-clipboard-plus"></i>Giao việc mới</button>');
+ /* V9.99p - BỐN Ô SỐ 0 KHÔNG NÓI ĐƯỢC GÌ. Anh Luân: *"thậm chí có hiện ra thì cũng là số 0
+    thôi"*. Đo được: 7/33 người mở Giao việc ra thấy đúng bốn ô 0 và không một dòng nào. Bốn số
+    0 xếp hàng không phải là thông tin, nó chỉ chiếm chỗ và bắt người ta đọc bốn lần để hiểu ra
+    "không có gì". Sạch việc thì nói MỘT câu; còn việc thì mới bày dải số. */
+ if(!mLive.length&&!mOver.length&&!gWait.length&&!gLive.length){
+  h+='<div class="notebar"><i class="ti ti-circle-check"></i>'+
+   'Bạn đang <b>sạch việc nội bộ</b> - không có việc ai giao cho bạn, cũng không có việc bạn giao đang chạy. '+
+   'Bấm <b>Giao việc mới</b> khi cần nhờ hoặc giao cho người khác.</div>';
+ }else{
  h+=statStrip([["ti-checkbox",mLive.length,"Việc tôi phải làm","#2E5A88",mOver.length?(mOver.length+" quá hạn"):"trong hạn","tkTabSet('mine');tkFset('live')"],
   ["ti-clock-exclamation",mOver.length,"Quá hạn của tôi","#E24B4A",mOver.length?"cần làm ngay":"không có","tkTabSet('mine');tkFset('live')"],
   ["ti-inbox",gWait.length,"Chờ tôi xác nhận","#E08A1E",gWait.length?"người nhận đã báo xong":"không có","tkTabSet('given');tkFset('live')"],
-  ["ti-send",gLive.length,"Tôi giao, đang chạy","#0D9488","theo dõi tiến độ","tkTabSet('given');tkFset('live')"]],"giaoviec");
+  ["ti-send",gLive.length,"Tôi giao, đang chạy","#0D9488","theo dõi tiến độ","tkTabSet('given');tkFset('live')"]],"giaoviec");}
  h+=tbar(timHTML("giaoviec")+segHTML(tab,[["mine","Việc của tôi",mLive.length||"",mOver.length?"red":""],
    ["given","Tôi đã giao",gLive.length||"",gWait.length?"amber":""],
    ["report","Tổng hợp & báo cáo",null,""]],"tkTabSet('{k}')"),
@@ -18458,7 +18543,7 @@ var TTBK={};TTHE.forEach(function(x){TTBK[x.k]=x});
 /* Nhân sự trước đây đáp vào thực thể "giảng viên"; nay giảng viên không còn là thực thể trung
    tâm nên nhân sự đáp vào LỚP - chỗ việc của họ chạm tới người được phục vụ (lớp có đủ giáo
    viên, buổi có nhận xét). Hồ sơ nhân sự thuần tuý vẫn ở trang Nhân sự. */
-var TTMAC={tuvan:"khach",marketing:"khach",hocvu:"lop",giaovien:"lop",wow:"khach",ketoan:"hocvien",
+var TTMAC={tuvan:"khach",marketing:"khach",hocvu:"lop",aca:"lop",giaovien:"lop",wow:"khach",ketoan:"hocvien",
  hotro:"hocvien",nhansu:"lop",dieuhanh:"khach",quantri:"khach"};
 function ttMacDinh(){var g=(SCOPE().group||"quantri");var v=TTMAC[g]||"khach";
  return TTBK[v]?v:"hocvien"}
@@ -19611,6 +19696,21 @@ var NHIP={
     !rows("DL06").some(function(e){return String(e.lead_id||"")===String(c.lead_id||"")})}).length}],
   ["chieu","Nhận và báo xong việc được giao","Việc treo qua đêm là người giao phải đi hỏi","giaoviec",
    function(){var me=CURSTAFF||"";return rows("DL23").filter(function(t){return String(t.assignee_id||"")===me&&tkSt(t)==="new"}).length}]],
+ /* V9.99p - NHỊP NGÀY CỦA ACA (nhóm mới tách khỏi Học vụ). Ngày của người phụ trách chuyên môn
+    xoay quanh CHẤT LƯỢNG DẠY chứ không phải xếp lớp: nhận xét buổi có kịp hạn không, bài có
+    được chấm không, lớp nào đang đuối, giáo án đã đủ cho khoá chưa. */
+ aca:[
+  ["sang","Soi buổi dạy hôm qua đã có nhận xét chưa","Nhận xét trễ là học viên mất mạch phản hồi, và số SLA của cả phòng lệch theo","buoihoc",
+   function(){return rows("DL11").filter(function(x){return bhState(x).noteOver}).length}],
+  ["sang","Bài tập đang chờ chấm","Chấm trễ thì buổi sau giáo viên không biết lớp yếu chỗ nào","baitap",
+   function(){return rows("DL13").filter(function(h){return String(h.submitted_at||"").trim()&&!String(h.graded_at||"").trim()}).length}],
+  ["ngay","Học viên nguy cơ học thuật","Điểm tụt là dấu hiệu sớm nhất, thấy trước khi họ nghỉ","hocvien",
+   function(){return rows("DL09").filter(function(x){return /at_risk|off_track/.test(ecode(x.academic_progress_status))}).length}],
+  ["ngay","Lớp thiếu giáo viên hôm nay","Buổi không có người dạy là buổi phải huỷ - biết sớm còn xoay được","gvdp",
+   function(){var t=new Date();return rows("DL11").filter(function(x){var d=pvnd(x.session_date);
+    return d&&sameDay(d,t)&&!isc(x.session_status,"cancelled")&&!String(x.teacher_id||"").trim()}).length}],
+  ["chieu","Giáo án và ngân hàng bài của khoá","Khoá chưa đủ giáo án là lớp sau lại dạy chay","giaoan",
+   function(){return rows("DL05").filter(function(k){return !rows("DL21").some(function(p){return String(p.course_id||"")===String(k.course_id)})}).length}]],
  hocvu:[
   ["sang","Duyệt xin nghỉ học của học viên","Giáo viên cần biết TRƯỚC giờ dạy ai vắng","duyetnghi",
    function(){return absQueue().length}],
@@ -19748,7 +19848,7 @@ function nhipReset(){var c=(DATA.config=DATA.config||{});c.nhip={};persistSoon()
    với 4 dòng. Hậu quả: nhịp ngày của NV WOW TỒN TẠI mà không ai với tới để sửa, vì ô chọn không
    có mục đó. Sinh ra đúng từ khoá của NHIP thì thêm nhóm vai mới là ô chọn tự có, không phải nhớ
    sửa hai nơi - và không thể lệch lần nữa. */
-var NHIPTEN={tuvan:"NV Tư vấn",marketing:"Marketing",hocvu:"Học vụ - CSKH",giaovien:"Giáo viên đứng lớp",
+var NHIPTEN={tuvan:"NV Tư vấn",marketing:"Marketing",hocvu:"Học vụ - CSKH",aca:"Chuyên môn (ACA)",giaovien:"Giáo viên đứng lớp",
  wow:"Giáo viên WOW 1-1",ketoan:"Kế toán",quanly:"Quản lý - Giám đốc",hotro:"Nhóm hỗ trợ (HR, IT...)"};
 function nhipRoles(){return Object.keys(NHIP).filter(function(k){return k!=="order"&&Array.isArray(NHIP[k])})
  .map(function(k){return [k,NHIPTEN[k]||k]})}
@@ -21034,10 +21134,19 @@ var GATEVAI=[
 /* NHÂN SỰ ĐÃ GỠ KHỎI CỔNG (anh Luân 04/08: *"Bỏ nhân sự"*). Hai người HR vẫn còn trong sổ nhân
    sự và trong dữ liệu - chỉ là không còn cửa đăng nhập ở màn này. Phạm vi dữ liệu của nhóm
    `nhansu` vẫn giữ nguyên trong mã: mai kia mở lại chỉ là thêm một dòng vào GATEVAI. */
+/* Cấp bậc để xếp thứ tự và để HIỆN RA. Anh Luân 04/08 nhìn danh sách Tư vấn: *"leader thì phải
+   hiện ra họ là leader, bên trong họ vẫn đủ quyền leader chi nhánh phải ko em?"* - đúng cả hai
+   vế: quyền bên trong đã đúng (đo được: Leader nhìn trọn cơ sở mình 36-48 học viên, nhân viên
+   chỉ 26-31), chỉ có ngoài cổng thì bảy người xếp lẫn nhau, không biết ai là leader. */
+function gateCap(x){var c=ecode(x.role)||"";
+ if(/_manager$|^ceo$/.test(c))return 2;
+ if(/_leader$/.test(c))return 1;
+ return 0}
 function gateNguoi(v){
  return rows("DL01").filter(function(x){
   return x.staff_id!=="ADMIN" && staffActive(x) && v.vai.test(ecode(x.role)||"")})
-  .sort(function(a,b){return String(a.full_name||"").localeCompare(String(b.full_name||""))})}
+  .sort(function(a,b){return gateCap(b)-gateCap(a)||
+    String(a.full_name||"").localeCompare(String(b.full_name||""))})}
 function demoGate(){var el=document.getElementById("login");if(!el)return;
  var khoaVai=gateKhoaVai();
  var mo=window.__gateRole||"";           /* mã cửa đang mở danh sách tên */
@@ -21051,10 +21160,12 @@ function demoGate(){var el=document.getElementById("login");if(!el)return;
   h+='<div class="gvhd"><i class="ti '+vMo.ic+'"></i>'+esc(vMo.t)+' · '+ds.length+' người</div>';
   h+='<div class="gvds">';
   ds.forEach(function(x){
+   var cap=gateCap(x), cs=x.branch?String(x.branch).replace(/^[a-z_0-9]+\s*\(|\)$/g,""):"toàn trung tâm";
    h+='<button class="gvrow" onclick="gateEnter(\''+esc(x.staff_id)+'\')">'+
-    '<span class="gvav">'+esc(gateAv(x.full_name))+'</span>'+
-    '<span class="gvten">'+esc(x.full_name)+'</span>'+
-    '<span class="gvphu">'+esc(x.branch?String(x.branch).replace(/^[a-z_0-9]+\s*\(|\)$/g,""):"toàn trung tâm")+'</span>'+
+    '<span class="gvav'+(cap?" ld":"")+'">'+esc(gateAv(x.full_name))+'</span>'+
+    '<span class="gvten">'+esc(x.full_name)+
+     (cap?'<span class="gvcap">'+esc(elabel(x.role)||ecode(x.role))+'</span>':'')+'</span>'+
+    '<span class="gvphu">'+esc(cs)+(cap===1?' · quản lý cơ sở này':'')+'</span>'+
     '<i class="ti ti-chevron-right"></i></button>'});
   h+='</div>';
  }else{
@@ -21102,6 +21213,13 @@ function demoGate(){var el=document.getElementById("login");if(!el)return;
 function gateKhoaVai(){var c=DATA.config||{};return c.gateKhoaVai==null?false:!!c.gateKhoaVai}
 function gateKhoaToggle(){var c=(DATA.config=DATA.config||{});
  c.gateKhoaVai=gateKhoaVai()?0:1;cfgSave();reRender("settings")}
+/* Hiện / che mật khẩu. Đổi cả biểu tượng để nhìn là biết đang ở nấc nào. */
+function mkHien(){
+ var o=document.getElementById("mk_in"),b=document.getElementById("mk_mat");if(!o)return;
+ var hien=(o.type==="text");
+ o.type=hien?"password":"text";
+ if(b)b.innerHTML='<i class="ti '+(hien?"ti-eye":"ti-eye-off")+'"></i>';
+ if(b)b.setAttribute("aria-label",hien?"Hiện mật khẩu":"Che mật khẩu")}
 function mkLuu(){var v="";try{v=String((document.getElementById("mk_in")||{}).value||"").trim()}catch(e){}
  if(v.length<4){toastErr("Mật khẩu phải từ 4 ký tự trở lên.");return}
  var c=(DATA.config=DATA.config||{});c.matKhau=v;cfgSave();
