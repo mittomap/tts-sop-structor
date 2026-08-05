@@ -57,7 +57,12 @@ const AI=(process.env.AI||"").split(",").filter(Boolean);
    phai hoc phi cua hoc vien cung khong phai kho lead: chung la LUONG va LOAI CA cua giang vien,
    dung nghiep vu ma phong Nhan su phai tinh. Chan hai chu nay lai la lam Nhan su khong tinh
    duoc luong - do la bo bot chu khong phai phan quyen. */
-const MIENTRU=[["nhansu","bangcong","tien"],["nhansu","bangcong","lead"]];
+/* Nhom "*" = moi chuc danh. Bang cong dem CA LAM cua giang vien - gio dung lop, ca WOW 1-1,
+   va ca cham test dau vao. Chu "test dau vao" o day la TEN MOT LOAI CA CONG, khong phai du
+   lieu khach hang: khong co ten khach, khong co so dien thoai, khong co ket qua test nao.
+   Con [tien] thi tu V9.99z5 app da tu cat - ai khong co mien `tien` la bang khong con mot
+   con so tien nao; giu dong khai cho nhom nhansu de neu mai kia co cho hien lai thi thay. */
+const MIENTRU=[["nhansu","bangcong","tien"],["*","bangcong","lead"]];
 const TRAN=0;                /* so cho ngoai mien con lai - chi duoc phep GIAM, khong duoc nang */
 let tong=0;
 (DL.DL01||[]).filter(s=>s.staff_id&&staffActive(s)&&(!AI.length||AI.indexOf(s.staff_id)>=0)).forEach(S=>{
@@ -92,7 +97,7 @@ let tong=0;
   const txt=o2.replace(/<[^>]*>/g," ").replace(/\s+/g," ");
   Object.keys(DAU).forEach(d=>{
    if(mien[d]!=="none")return;
-   if(MIENTRU.some(x=>x[0]===g&&x[1]===p.k&&x[2]===d))return;
+   if(MIENTRU.some(x=>(x[0]===g||x[0]==="*")&&x[1]===p.k&&x[2]===d))return;
    const m=txt.match(DAU[d]);
    if(m){const i=(m.index!=null?m.index:txt.indexOf(m[0]));
     ra.push((p.arc||p.k)+" ["+d+"] <<"+m[0]+">> ..."+txt.slice(Math.max(0,i-45),i+45).trim()+"...")}

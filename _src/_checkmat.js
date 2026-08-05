@@ -197,7 +197,14 @@ const CAT_OK = [
      đi xuyên qua, chỉ còn đúng vòng tròn icon nhận bấm; thân trang chừa thêm 96px cuối.
      Đo lại: 3 trang trong 14. Nâng trần lên 4 là khai đúng con số đang có cộng một chỗ dôi, chứ
      không phải tắt luật - quá 4 vẫn đỏ, và mỗi lần chạy vẫn in ra đúng mấy chỗ đang bị che. */
-  const TRAN_FAB = 4;
+  /* V9.99z5 - TRAN NANG 4 -> 6, VA DAY LA MOT DANH DOI ANH LUAN CHON, khong phai tat luat.
+     Anh Luan 05/08: *"hỏi trợ lý thì nhấn được vào cả cụm nha em, hiện tại chỉ ấn được vào bóng
+     đèn"*. Vung bam cua nut Tro ly vi the rong tu vong tron 38px thanh ca cai vien thuoc ~130px.
+     Rong hon thi che nhieu hon: do lai ra 6 cho (truoc la 3). Doi lai, nguoi dung bam trung nut
+     ngay lan dau - do la thu ho lam MOI NGAY, con o bi che la nhung dong TINH CO troi toi goc
+     duoi phai o mot nac cuon, cuon them mot chut la het.
+     Van in ra du 6 cho moi lan chay, va qua 6 la do - de mai kia nhan nut dai ra thi biet ngay. */
+  const TRAN_FAB = 6;
   const doFab = do_.filter(x => /asstfab/.test(x));
   if (doFab.length && doFab.length <= TRAN_FAB) {
     doFab.forEach(x => { const i = do_.indexOf(x); if (i >= 0) do_.splice(i, 1); });

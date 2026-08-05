@@ -260,13 +260,16 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
  t("trợ thủ đọc slaItems chứ không tự khai việc", /slaItems\(\)/.test(body));
  /* tắt là biến mất sạch, không để lại khoảng trống */
  t("tam tro thu ve ra co noi dung that", asstHTML().length>400);
- /* KHÔNG ĐƯỢC NÓI LÁO: hết việc thì nói hết việc, còn việc thì đếm việc thật - không nói chung chung */
- t("con viec thi noi ro con bao nhieu", (function(){
-   var n=workAll().length;return n===0||asstHTML().indexOf(n+" việc")>=0})());
- t("het viec thi noi thang la het, khong ve the viec rong", (function(){
-   var cu=window.ASSTSKIP;window.ASSTSKIP={};
-   var h=asstHTML();window.ASSTSKIP=cu;
-   return workAll().length?(h.indexOf("Việc kế tiếp")>=0):(h.indexOf("Không còn việc nào")>=0)})());
+ /* V9.99z5 - Trợ lý nay CHỈ ĐỂ HỎI (anh Luân 05/08), nên hai tiêu chí cũ về "việc kế tiếp"
+    nằm trong tấm Trợ lý không còn đúng chỗ. Việc vẫn phải nói thật - nhưng nói ở TRANG VIỆC
+    HÔM NAY. Đo đúng chỗ mới, và đo luôn cái mà Trợ lý KHÔNG được hứa nữa. */
+ t("trang Viec hom nay noi ro con bao nhieu viec", (function(){
+   var n=bellItems().length;var o="";try{o=RENDER.viec()}catch(e){}
+   return n===0||o.indexOf(">"+n+"<")>=0})());
+ t("Tro ly khong con hua xu ly viec", (function(){var h=asstHTML();
+   return h.indexOf("Việc kế tiếp")<0&&h.indexOf("Dọn từng bước")<0&&h.indexOf("Để sau")<0})());
+ t("Tro ly la hop HOI: co o hoi + goi y + loi vao bai huong dan", (function(){var h=asstHTML();
+   return h.indexOf('id="asst_q"')>=0&&h.indexOf("asstQDatText(")>=0&&h.indexOf("tourMenu()")>=0})());
  /* nói đúng việc của ĐÚNG người: đổi chức danh là đổi nội dung */
  (function(){
   var gv=rows("DL01").filter(isGVRole)[0];
@@ -276,8 +279,9 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
   nhu(ac.staff_id);var b=asstHTML();
   window.GATE_SID="";applyScope("");setRole("all");
   t("hai chức danh khác nhau thì trợ thủ nói khác nhau", a!==b&&a.length>200&&b.length>200)})();
- /* việc gấp nhất phải BẤM ĐƯỢC ngay, không chỉ đọc */
- t("việc gấp nhất có nút làm ngay", /slaAct\(|leadDetail\(|openQuick\(|jumpFlow\(/.test(asstHTML()));
+ /* việc gấp nhất phải BẤM ĐƯỢC ngay, không chỉ đọc - nay đo ở TRANG VIỆC HÔM NAY (V9.99z5) */
+ t("việc gấp nhất có nút làm ngay", (function(){var o="";try{o=RENDER.viec()}catch(e){}
+   return /slaAct\(|leadDetail\(|openQuick\(|jumpFlow\(/.test(o)})());
  /* V9.35: tro thu KHONG con chen vao than trang - no o nut goc duoi ben phai. Tieu chi cu dang
     canh gac dung cai da bo. */
  t("V9.35 than trang KHONG con bi tro thu chen vao", !/_tth\+renderList\(key\)/.test(SRCn)&&!/_tth\+RENDER\[key\]\(\)/.test(SRCn));
@@ -314,18 +318,22 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
   /* V9.35: nhip ngay nay hien trong tam tro thu. Chip cua mot buoi chi cong so cua HANG CHO;
      buoi nao toan thoi quen thi chip ghi dau gach chu KHONG ghi so 0 - ghi 0 la nguoi ta doc
      thanh "da xong het", ma thoi quen thi khong co gi de xong. */
-  window.ASSTBUOI="";var html=asstHTML();
+  /* V9.99z5 - nhịp ngày nay vẽ ở TRANG VIỆC HÔM NAY (`nhipPanel`), không còn nằm trong tấm
+     Trợ lý. Ba tiêu chí dưới đây theo nó sang chỗ mới - vẫn canh đúng một điều: thói quen
+     không bao giờ được gắn mác "xong". */
+  var html=nhipPanel();
   t("có phân biệt thói quen với hàng chờ", hab.length>0);
-  t("thoi quen KHONG bi gan mac xong - chip ghi dau gach", (function(){
+  t("nhip ngay co cho dung that tren trang Viec hom nay", (function(){
+    var o="";try{o=RENDER.viec()}catch(e){}
+    return html.length>400&&o.indexOf("Nhịp ngày của bạn")>=0})());
+  t("thoi quen KHONG bi gan mac xong - buoi toan thoi quen ghi dau gach", (function(){
     var buois={};L.forEach(function(r){(buois[r.buoi]=buois[r.buoi]||[]).push(r)});
     var toanThoiQuen=Object.keys(buois).filter(function(b){return buois[b].every(function(r){return r.hab})});
     if(!toanThoiQuen.length)return true;
-    return html.indexOf("—")>=0})());
-  t("mo chip ra thi thoi quen ghi ro 'nen xem'", (function(){
-    var b0=(L.filter(function(r){return r.hab})[0]||{}).buoi;
-    if(!b0)return true;
-    window.ASSTBUOI=b0;var h2=asstHTML();window.ASSTBUOI="";
-    return /nên xem/.test(h2)})());
+    return html.indexOf("mdash")>=0&&html.indexOf("xong")<0})());
+  t("thoi quen ghi ro 'nen xem'", (function(){
+    if(!L.some(function(r){return r.hab}))return true;
+    return /nên xem/.test(html)})());
   window.GATE_SID="";applyScope("");setRole("all")})();
  /* nhịp ngày chỉ ở TRANG ĐẦU - nhét vào mọi trang là nhiễu, nhiễu thì người ta tắt Trợ thủ luôn */
  (function(){var st=rows("DL01").filter(function(x){return /^account/.test(ecode(x.role))})[0];
@@ -850,12 +858,15 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
   t("V9.35 tro thu KHONG con chen vao than trang", (function(){
     var o="";try{o=RENDER.banlam()}catch(e){}
     return o.indexOf('class="tth"')<0&&o.indexOf('class="nhip"')<0})());
-  t("V9.35 tam tro thu goc ve duoc va co du 3 phan (viec ke tiep + nhip ngay + don tung buoc)", (function(){
+  /* V9.99z5 - hai tiêu chí này canh tấm Trợ lý BẢN CŨ (việc kế tiếp + chip nhịp ngày + dọn
+     từng bước + con số việc trên nút góc). Anh Luân đã bỏ phần xử lý việc khỏi Trợ lý, nên
+     canh theo bản cũ là canh gác một thứ đã tháo. Nay canh bản mới, và canh CẢ HAI CHIỀU:
+     có đủ phần hỏi, và KHÔNG hứa lại phần việc. */
+  t("V9.99z3 tam Tro ly ve duoc va la hop HOI", (function(){
     var h=asstHTML();
-    return h.indexOf("Việc kế tiếp")>=0&&h.indexOf("asstChip")>=0&&h.indexOf("Dọn từng bước")>=0})());
-  t("V9.35 nut goc hien dung so viec dang cho", (function(){
-    var n=workAll().length;
-    return typeof asstPaint==="function"&&asstHTML().indexOf(String(n))>=0&&n>0})());
+    return h.length>400&&h.indexOf('id="asst_q"')>=0&&h.indexOf("Bài hướng dẫn")>=0})());
+  t("V9.99z3 nut goc khong hua con so viec nua", (function(){
+    return typeof asstPaint==="function"&&/Hỏi Trợ lý/.test(SRC0)&&!/asstfab[^\n]*workAll\(\)\.length/.test(SRC0)})());
   t("V9.35 tro thu goi TEN nguoi, khong goi chuc danh", (function(){
     var cu=CURSTAFF;var st=rows("DL01")[0];CURSTAFF=st.staff_id;
     var h=asstHTML();CURSTAFF=cu;

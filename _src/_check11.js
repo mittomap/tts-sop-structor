@@ -318,8 +318,16 @@ applyScope("");CURROLE="all";
   arcJobs(a).forEach(function(jb){var k=jb[0];
    window.NAVOPEN={};window.NAVHIST=[];CUR="banlam";
    go(a);go(k);
-   var on=(NAVEL.innerHTML.match(/class="navitem on" data-k="([a-z0-9]+)"/g)||[]).map(function(s){return s.match(/data-k="([a-z0-9]+)"/)[1]});
-   if(!(on.length===1&&on[0]===k))sai.push(a+">"+k+"=["+on.join(",")+"]")})});
+   /* V9.99z5 - BAY: phep do nay bam vao chuoi `class="navitem on"` NGUYEN VAN. Tu khi muc con
+      cua hub duoc thut vao (them lop `sub`/`sub2`), chuoi that la `class="navitem sub on"` nen
+      khong khop CAI NAO - 13 dong deu tra ve mang rong va luat bao do trong khi app dung.
+      Bam vao TU KHOA `on` giua cac lop, dung bam vao ca chuoi lop. */
+   var on=(NAVEL.innerHTML.match(/class="navitem[^"]*\bon\b[^"]*" data-k="([a-z0-9]+)"/g)||[]).map(function(s){return s.match(/data-k="([a-z0-9]+)"/)[1]});
+   /* V9.99z5: bam vao TEN HUB thi hub mo tab mac dinh cua no, va MUC CON ung voi tab ay sang
+      (do la cho dang dung that); hang cua hub mang lop `anc`. Van la DUNG MOT muc sang. */
+   var anc=(NAVEL.innerHTML.match(/class="navitem[^"]*\banc\b[^"]*" data-k="([a-z0-9]+)"/g)||[]).map(function(s){return s.match(/data-k="([a-z0-9]+)"/)[1]});
+   var okHub=(HUBTAB[k]&&anc.indexOf(k)>=0&&HUBTAB[k].m[hubTab(k)]===on[0]);
+   if(!(on.length===1&&(on[0]===k||okHub)))sai.push(a+">"+k+"=["+on.join(",")+"]")})});
  tv5("V9.19 moi nghiep vu trong chang sang DUNG 1 muc sidebar"+(sai.length?" ["+sai.join(" ")+"]":""), sai.length===0)})();
 /* Luat that: MOT muc sang, va la muc GAN NHAT co mat tren menu. O v5 `wow` la mot muc rieng
    nen no sang va hub `hoctap` nhuong; o v6 `wow` chi la TAB cua hub, khong co muc rieng, nen
@@ -329,8 +337,13 @@ t("V9.19 dung MOT muc sang, va la muc gan nhat co tren menu (wow)", (function(){
  window.HTTAB="wow";CUR="hoctap";
  return navInTree("wow") ? (navCur("wow")===true&&navCur("hoctap")===false)
                          : (navCur("hoctap")===true)})());
-t("V9.19 hub VAN sang khi tab khong co muc con rieng (cskh/khaosat)", (function(){
- window.CSTAB="khaosat";CUR="cskh";return navCur("cskh")===true})());
+/* V9.99z5 - luat nay DOI: tu nay MOI tab cua hub deu co mot muc rieng tren menu (anh Luan:
+   *"bên sidebar giống như 1 cái bản đồ vậy, họ biết mình cần tìm gì ở đâu"*), nen hub khong
+   con sang thay cho tab nua - muc con sang, hang cha mang lop `anc` (sang mo) de van doc ra
+   "dang o dau do trong nhom nay". */
+t("V9.99z5 tab cskh/khaosat co muc rieng, muc con sang - cha sang mo", (function(){
+ window.CSTAB="khaosat";CUR="cskh";
+ return navInTree("khaosat")&&navCur("khaosat")===true&&navCur("cskh")===false&&navAnc("cskh")===true})());
 window.HTTAB="today";
 t("V9.19 crumbLabel noi ro tab dang dung", (function(){window.TSTAB="test";
  return crumbLabel("tuyensinh",{}).indexOf("·")>0})());
@@ -539,6 +552,77 @@ console.log(bad.length?("FAIL:\n  "+bad.join("\n  ")):"OK: "+ok);
  t("dai nghiep vu co tieu de rieng", hA.indexOf("Nghiệp vụ trong chặng")>=0);
  t("moi dai noi ro bam vao thi chuyen gi xay ra",
    hA.indexOf("bấm một ga để lọc")>=0&&hA.indexOf("bấm để mở màn hình")>=0);
+})();
+
+/* ═══ V9.99z5 - THANH MENU LA MOT BAN DO, DO TREN TUNG CHUC DANH ═══════════════════════════
+   Anh Luan 05/08: *"lệch nhau giữa nghiệp vụ bên trong và trang trên sidebar là do thiết kế
+   vậy hả em, hay do sót nhỉ, e kiểm tra lại nha"* ... *"tại thiếu thì có thể người ta đang ở
+   đâu họ ko biết, bên sidebar giống như 1 cái bản đồ vậy, họ biết mình cần tìm gì ở đâu"*.
+   Sau do: *"mấy cái bên sidebar lỗi nhiều chỗ nha em, nhớ check đủ nha"*.
+   Nam cau hoi, hoi cho TUNG CHUC DANH, tren THANH MENU THAT (chuoi HTML buildNav ve ra):
+     1. khong khoa nao / nhan nao nam hai cho
+     2. trang DAP cua chuc danh phai co mot muc tren menu
+     3. bam moi muc -> DUNG MOT muc sang, va la chinh no (hoac muc con mac dinh cua hub)
+     4. bam moi muc -> man mo ra co noi dung, khong phai man "ngoai pham vi"
+     5. moi TAB cua hub co mot muc sidebar, va nguoc lai - muc sidebar nao cung con tab that
+   Do tren MENU DA MO HET NHOM: nhom dang gap khong ve muc nao, hoi luc gap la hoi hut. */
+(function(){
+ function ve(k){var p=PBK[k];return (p&&p.ty==="list")?renderList(k):(RENDER[k]?RENDER[k]():"")}
+ function unesc(x){return String(x).replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'")}
+ function moHet(){window.NAVOPEN={};navCay().forEach(function(g){window.NAVOPEN[g.g]=true});buildNav()}
+ function docMenu(){var h=NAVEL.innerHTML,out=[],m,re=/<div class="navitem([^"]*)"[^>]*data-k="([a-z0-9]+)" title="([^"]*)"/g;
+  while((m=re.exec(h)))out.push({k:m[2],t:unesc(m[3])});return out}
+ function sang(){return (NAVEL.innerHTML.match(/class="navitem[^"]*\bon\b[^"]*" data-k="([a-z0-9]+)"/g)||[]).map(function(x){return x.match(/data-k="([a-z0-9]+)"/)[1]})}
+ function toGoc(){return (NAVEL.innerHTML.match(/class="navitem[^"]*\banc\b[^"]*" data-k="([a-z0-9]+)"/g)||[]).map(function(x){return x.match(/data-k="([a-z0-9]+)"/)[1]})}
+ var xTrung=[],xDap=[],xSang=[],xTrong=[],xTab=[],xMoNhom=[],soVai=0,seen={};
+ rows("DL01").forEach(function(st){
+  if(st.staff_id==="ADMIN"||seen[st.role])return;seen[st.role]=1;soVai++;
+  var vai=st.role;
+  window.GATE_SID=st.staff_id;CURSTAFF=st.staff_id;applyScope(st.staff_id);setRole("all");CURSTAFF=st.staff_id;
+  moHet();
+  var L=docMenu(),menu=L.map(function(i){return i.k}),dk={},dt={};
+  L.forEach(function(i){dk[i.k]=(dk[i.k]||0)+1;dt[i.t]=(dt[i.t]||0)+1});
+  Object.keys(dk).forEach(function(k){if(dk[k]>1)xTrung.push(vai+": khoa "+k+" x"+dk[k])});
+  Object.keys(dt).forEach(function(x){if(dt[x]>1)xTrung.push(vai+': ten "'+x+'" x'+dt[x])});
+  var dap=SCOPE().land||"banlam";
+  if(!L.some(function(i){return i.k===dap||navOwner(i.k)===dap||i.k===navOwner(dap)}))xDap.push(vai+" -> "+dap);
+  L.forEach(function(i){
+   window.NAVHIST=[];CUR="banlam";
+   try{go(i.k)}catch(e){xSang.push(vai+" go("+i.k+") loi");return}
+   moHet();
+   var on=sang(),anc=toGoc();
+   var okHub=(HUBTAB[i.k]&&anc.indexOf(i.k)>=0&&HUBTAB[i.k].m[hubTab(i.k)]===on[0]);
+   if(!(on.length===1&&(on[0]===i.k||okHub)))xSang.push(vai+" bam "+i.k+" -> ["+on.join(",")+"]");
+   /* Va do THEM mot lan nua voi menu DANG GAP nhu luc moi mo app: bam mot muc thi go() phai
+      MO DUNG NHOM chua muc dang sang. Bay da can 05/08: `navGroupOf` tra ve nhom dau tien co
+      mot muc con thuoc `k`, nen bam CSKH thi app mo nhom "Lam viec" (vi "Hoc vien lien he" nam
+      do va thuoc hub CSKH) con nhom that su chua CSKH van gap - man hinh khong muc nao sang. */
+   window.NAVOPEN={};CUR="banlam";
+   try{go(i.k)}catch(e){}
+   buildNav();
+   if(sang().length!==1)xMoNhom.push(vai+" bam "+i.k+" -> nhom chua no van gap");
+   moHet();
+   var o="";try{o=ve(CUR)}catch(e){o="ERR"}
+   if(o==="ERR"||o.length<300)xTrong.push(vai+" "+i.k+" ("+(o==="ERR"?"loi":o.length+" ky tu")+")");
+   else if(/ngoài phạm vi chức danh/.test(o))xTrong.push(vai+" "+i.k+" (man tu choi)")});
+  Object.keys(HUBTAB).forEach(function(hb){
+   var mm=HUBTAB[hb].m;
+   if(menu.indexOf(hb)<0&&!Object.keys(mm).some(function(tb){return menu.indexOf(mm[tb])>=0}))return;
+   var html="";try{go(hb);html=ve(hb)}catch(e){return}
+   var tabs=[],m,re=/(?:htTabSet|tsTabSet|csTabSet|kcTabSet|duyTabSet|gvTab)\('([a-z0-9]+)'\)/g;
+   while((m=re.exec(html)))if(tabs.indexOf(m[1])<0)tabs.push(m[1]);
+   tabs.forEach(function(tb){if(!mm[tb])xTab.push(vai+" "+hb+"/"+tb+" khong co khoa trang");
+    else if(menu.indexOf(mm[tb])<0)xTab.push(vai+" "+hb+"/"+tb+" thieu muc menu")});
+   Object.keys(mm).forEach(function(tb){if(menu.indexOf(mm[tb])>=0&&tabs.indexOf(tb)<0)xTab.push(vai+" muc "+mm[tb]+" nhung hub "+hb+" het tab "+tb)})});
+ });
+ function kq(ten,x){tv5(ten+" ("+soVai+" chuc danh)"+(x.length?": "+x.slice(0,4).join(" | "):""), x.length===0)}
+ kq("menu khong co khoa/ten nam hai cho",xTrung);
+ kq("trang dap cua moi chuc danh deu co mat tren menu",xDap);
+ kq("bam moi muc menu -> dung mot muc sang, va la chinh no",xSang);
+ kq("bam mot muc -> app tu mo dung nhom chua no",xMoNhom);
+ kq("moi muc menu mo ra man co noi dung, khong bi tu choi",xTrong);
+ kq("moi tab cua hub deu co mot muc sidebar, va nguoc lai",xTab);
+ window.GATE_SID="";applyScope("");setRole("all");
 })();
 
 console.log(bad.length?("FAIL2:\n  "+bad.join("\n  ")):"TONG: "+ok);

@@ -291,5 +291,50 @@ t("co trang ngoai LISTCFG cung dung duoc (giao viec)", fltCode("giaoviec")==="DL
  t("nhom dau tien sau 'Tat ca' la viec cua chang P1", co.length>0&&VIECNHOMBY[co[0]]<=2);
 })();
 
+/* ═══ V9.99z5 - DANH SÁCH NHÚNG: GÕ TÌM KHÔNG ĐƯỢC NUỐT CẢ TRANG ═════════════════════════
+   Anh Luân 05/08 gặp trên trang "Lead & khai thác": gõ vào ô tìm thì cả hub Tuyển sinh biến
+   mất, thay bằng sổ dữ liệu thô kèm nút "Thêm mới" và khung nhập bản ghi.
+   Đo CHẠY THẬT: đặt trang đang mở là HUB, gọi đúng hàm mà ô tìm gọi, rồi đọc thân trang xem
+   còn là hub không. Bốn danh sách nhúng đều phải qua được. */
+(function(){
+ var NHUNG=[["tuyensinh","nhaplead","tsTabSet("],
+            ["nhansu","nhanvien","RENDER.nhansu"],
+            ["dsthanhtoan","dsthanhtoan",""],
+            ["giangvien","giangvien","gvTab("]];
+ var xau=[];
+ NHUNG.forEach(function(pr){
+  var trang=pr[0],ds=pr[1];
+  if(!RENDER[trang])return;
+  if(trang==="tuyensinh")window.TSTAB="lead";
+  if(trang==="giangvien")window.GVTAB="ds";
+  if(trang==="dsthanhtoan")window.STTAB="thu";
+  CUR=trang;
+  var el=document.getElementById("content");
+  el.innerHTML="";try{el.innerHTML=RENDER[trang]()}catch(e){xau.push(trang+" khong ve duoc");return}
+  var truoc=el.innerHTML;
+  var coThemMoi=truoc.indexOf("newForm('"+ds+"')")>=0;
+  try{listSearch(ds,"a")}catch(e){xau.push(trang+" listSearch nem loi: "+e.message);return}
+  var sau=el.innerHTML;
+  if(!sau||sau.length<300){xau.push(trang+": go tim xong than trang rong");return}
+  /* Dau hieu "bi nuot": ban doc lap co tieu de rieng .phead va nut Them moi cua chinh danh sach */
+  if(sau.indexOf('data-tour="phead"')>=0&&truoc.indexOf('data-tour="phead"')<0)
+   xau.push(trang+": go tim xong bi thay bang so du lieu thô (co .phead moi)");
+  if(!coThemMoi&&sau.indexOf("newForm('"+ds+"')")>=0)
+   xau.push(trang+': go tim xong tu nhien moc ra nut "Them moi"');
+  if(pr[2]&&truoc.indexOf(pr[2])>=0&&sau.indexOf(pr[2])<0)
+   xau.push(trang+": go tim xong mat thanh tab cua trang");
+  SEARCH[ds]="";
+ });
+ t("go tim trong danh sach NHUNG khong nuot ca trang ("+NHUNG.length+" cho)"+(xau.length?": "+xau.join(" | "):""), xau.length===0);
+ /* Cung con benh: bam sua/them/huy tren mot danh sach nhung cung khong duoc thay ca trang */
+ (function(){window.TSTAB="lead";CUR="tuyensinh";
+  var el=document.getElementById("content");
+  try{el.innerHTML=RENDER.tuyensinh()}catch(e){}
+  var co=el.innerHTML.indexOf("tsTabSet(")>=0;
+  try{cancelEdit("nhaplead")}catch(e){}
+  t("huy sua tren danh sach nhung cung giu nguyen trang", co&&el.innerHTML.indexOf("tsTabSet(")>=0)})();
+ CUR="banlam";
+})();
+
 console.log(bad.length?("CHECK17 FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECK17 OK: "+ok+" tieu chi");
 process.exitCode=bad.length?1:0;

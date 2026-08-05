@@ -67,13 +67,17 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .navlbl.isarc .navarc{width:8px;height:8px}
 /* mục Tổng quan chặng: cùng cỡ chữ với mục nghiệp vụ, chỉ khác ở chấm màu chặng và chữ nghiêng
    nhẹ - đủ để biết "đây là bản đồ", không giành chỗ với tên chặng. */
-.navitem.chang{font-weight:600;color:#C4D2E4}
+/* V9.99z5 (anh Luân): *"cái bản đồ chặng cũng thụt vào tí cho nó phân cấp em"*. Bản đồ chặng
+   là mục CHA của cả nhóm chặng nên thụt nhẹ hơn mục con một bậc - đọc ra ba tầng rõ ràng. */
+.navitem.chang{font-weight:600;color:#C4D2E4;padding-left:18px}
 .navitem.chang i{color:var(--acol,#8CC5F2);opacity:1}
 .navitem.chang:after{content:"";width:6px;height:6px;border-radius:50%;background:var(--acol,#8CC5F2);
  margin-left:auto;flex:none;opacity:.85}
 .navitem.chang.on{background:#ffffff2e;color:#fff}
 .navitem.chang.on i{color:var(--acol,#8CC5F2)}
 /* V9.27: mục đã mở ra trang hiện tại - sáng MỜ và có vạch đứt, phân biệt rõ với mục ĐANG đứng */
+.navitem.anc{background:#ffffff12;color:#CFE0F7}
+.navitem.anc i{opacity:1}
 .navitem.from{background:#ffffff14;color:#CFE0F7}
 .navitem.from i{opacity:.95}
 .navitem.from:after{content:"đang mở";margin-left:auto;font-size:9px;font-weight:800;letter-spacing:.4px;
@@ -186,12 +190,12 @@ tr.cfhl>td{background:#FFF6D8}
    không tự xuống dòng (và tooltip `title` vẫn nói đủ tên). */
 .navitem>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 /* Mục con của một hub: thụt vào + gạch dọc mảnh, để đọc ra ngay cái nào chứa cái nào. */
-.navitem.sub{padding-left:26px;position:relative}
-.navitem.sub::before{content:"";position:absolute;left:14px;top:6px;bottom:6px;width:1px;background:#ffffff1f}
+.navitem.sub{padding-left:30px;position:relative}
+.navitem.sub::before{content:"";position:absolute;left:18px;top:6px;bottom:6px;width:1px;background:#ffffff1f}
 .navitem.sub i{font-size:16px}
 /* Tầng ba: tab của một hub nằm trong một chặng (chặng > hub > tab). */
-.navitem.sub2{padding-left:42px}
-.navitem.sub2::before{left:30px}
+.navitem.sub2{padding-left:46px}
+.navitem.sub2::before{left:34px}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
 .navitem:hover{background:#ffffff12;color:#fff}
 .navitem.on{background:#ffffff2e;color:#fff;font-weight:700;box-shadow:inset 0 0 0 1px #ffffff1f} /* V9.19: nền 10% quá mờ trên navy - Luân không thấy mục đang mở; đậm lên + icon sáng */
@@ -662,13 +666,18 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
    liệu, vẫn mở được Trợ lý, mà không còn ô nào của nội dung bị khoá.
    Góc màn là chỗ DỄ trúng nhất (chuột trượt tới mép là dừng), nên thu vùng bấm về biểu tượng
    không làm khó tay ai. */
-.asstfab{pointer-events:none}
+/* V9.99z5 (anh Luân 05/08): *"hỏi trợ lý thì nhấn được vào cả cụm nha em, hiện tại chỉ ấn được
+   vào bóng đèn"*. Đúng - và lý do cũ đã hết hiệu lực: hồi V9.99p nhãn nút còn là "195 việc · 110
+   quá hạn", DÀI RA theo số việc, nên nó quét ngang góc phải và chặn chuột của những nút nằm dưới.
+   Từ V9.99z3 nhãn chỉ còn "Hỏi Trợ lý" - ngắn và không đổi. Cả cụm nhận bấm lại; chỗ chống che
+   nội dung nay là khoảng chừa 96px cuối thân trang, không phải cách tắt chuột của nửa cái nút. */
+.asstfab{pointer-events:auto}
 /* V9.99p - NHÃN CỦA NÚT KHÔNG ĐƯỢC ĂN CÚ BẤM. Nút để `pointer-events:none` nhưng CÁC CON của
    nó vẫn nhận mặc định `auto`, nên phần chữ "195 việc · 110 quá hạn" vẫn chặn chuột - mà chữ ấy
    DÀI RA theo số việc, hôm nay che nút này, mai che nút khác. Chỉ đúng cái vòng tròn icon mới
    được nhận bấm; phần còn lại cho chuột đi xuyên qua. */
 .asstfab *{pointer-events:none}
-.asstfab>i{pointer-events:auto;cursor:pointer;width:38px;height:38px;margin:-8px -4px -8px -10px;
+.asstfab>i{cursor:pointer;width:38px;height:38px;margin:-8px -4px -8px -10px;
  border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
 .asstfab>i:hover{background:#ffffff26}
 .asstfab:hover{transform:translateY(-1px);box-shadow:0 16px 36px rgba(10,20,40,.4)}
@@ -1362,7 +1371,29 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .bcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
 .bcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 15px}
 .bcard h4{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--navy);font-weight:800;margin-bottom:9px;display:flex;align-items:center;gap:6px}
-.kv{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;padding:3px 0}.kv .k{color:var(--muted)}.kv .v{font-weight:600;text-align:right}
+/* V9.99z5 - NHỊP NGÀY về đúng chỗ của nó: trang Việc hôm nay. */
+.nhipg{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;padding:12px 14px 14px}
+.nhipc{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.nhiph{display:flex;align-items:center;gap:7px;padding:8px 11px;background:#FAFBFD;border-bottom:1px solid var(--line);font-size:12.5px}
+.nhiph b{flex:1}
+.nhiph i{color:var(--muted)}
+.nhipr{padding:8px 11px;border-bottom:1px solid var(--line);cursor:pointer}
+.nhipr:last-child{border-bottom:0}
+.nhipr:hover{background:#FAFBFD}
+.nhipt{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600}
+.nhipt b{margin-left:auto;font-size:13px}
+.nhipt b.hot{color:var(--red)}
+.nhipv{font-size:11.5px;margin-top:2px}
+/* V9.99z5 (anh Luân 05/08, kèm ảnh ngăn kéo Thông tin lead): *"thiết kế lại chỗ này xíu em,
+   khó nhìn theo hàng lắm"*. Đúng: bản cũ là `space-between` - nhãn dính mép trái, giá trị dính
+   mép phải, giữa là một khoảng trống rộng bằng cả ngăn kéo. Mắt phải bắc cầu qua khoảng trống
+   ấy cho từng dòng, 18 dòng là 18 lần bắc cầu, và rất dễ đọc lệch sang dòng bên cạnh.
+   Nay là HAI CỘT thật: cột nhãn rộng cố định, giá trị bắt đầu ngay sau nó và canh TRÁI - mọi
+   giá trị thẳng hàng theo một mép, đọc dọc xuống được. Thêm một gạch chân rất nhạt giữa các
+   dòng để mắt bám hàng (gạch kẻ bảng, không phải dải màu trang trí - luật W5 cấm cái sau). */
+.kv{display:grid;grid-template-columns:minmax(88px,32%) 1fr;gap:12px;font-size:12.5px;padding:6px 0;align-items:baseline;border-bottom:1px solid var(--line)}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--muted)}.kv .v{font-weight:600;text-align:left;min-width:0;overflow-wrap:anywhere}
 .rost{display:flex;align-items:center;gap:10px;padding:9px 6px;border-bottom:1px solid #EEF2F6}
 .rost .rn{flex:1;font-weight:600;font-size:13px}
 .att{display:flex;gap:5px}.attb{height:28px;padding:0 10px;border-radius:6px;border:1px solid var(--line);background:#fff;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;color:#5A6675}
@@ -2480,6 +2511,13 @@ var PAGES=[
 {k:"baitap",g:"_",ic:"ti-book",t:"Giao & chấm Bài tập",c:"Bài tập",ty:"custom",hide:1},
 {k:"wow",g:"_",ic:"ti-star",t:"Buổi WOW 1-1",c:"Kèm riêng",ty:"custom",hide:1},
 {k:"gvdp",g:"_",ic:"ti-user-plus",t:"GV dự phòng theo ngày",c:"Ai thay được khi GV nghỉ đột xuất",ty:"custom",hide:1},
+/* V9.99z5 (anh Luân 05/08: *"lệch nhau giữa nghiệp vụ bên trong và trang trên sidebar là do
+   thiết kế vậy hả em, hay do sót nhỉ"* + *"bên sidebar giống như 1 cái bản đồ vậy, họ biết
+   mình cần tìm gì ở đâu"*): hai tab "Hôm nay" và "Lịch tuần" của hub Học tập chưa bao giờ có
+   khoá trang riêng, nên không có cách nào cho chúng một mục trên menu. Khai ở đây để menu vẽ
+   được; go() vẫn remap về hub nên KHÔNG cần hàm vẽ riêng (giống `reup` của hub Tuyển sinh). */
+{k:"buoihnay",g:"_",ic:"ti-calendar-event",t:"Buổi hôm nay",c:"Buổi học trong ngày - lớp nào, ai dạy, phòng nào",ty:"custom",hide:1},
+{k:"lichtuan",g:"_",ic:"ti-calendar-week",t:"Lịch tuần",c:"Toàn bộ buổi của tuần theo lớp và theo phòng",ty:"custom",hide:1},
 {k:"phong",g:"_",ic:"ti-layout-grid",t:"Phòng học & đụng lịch",c:"Đụng phòng, đụng giờ, lớp chưa có phòng",ty:"custom",hide:1},
 /* ===== THEO CHẶNG P8-P10: CSKH & KẾT THÚC ===== */
 {k:"cskh",g:"Chặng · CSKH & Kết thúc",ic:"ti-headset",t:"CSKH · Khảo sát & Phản hồi",c:"Khảo sát (TT→HV) · Góp ý & Khiếu nại (HV→TT)",ty:"custom"},
@@ -2611,7 +2649,9 @@ var ROLESCOPE={
     Hai bộ trang khác nhau thì phải là hai nhóm khác nhau - gom lại rồi bảo "ai không cần thì
     đừng bấm" là đẩy việc phân quyền sang cho người dùng tự làm bằng mắt. */
  aca:{match:/^aca_/,land:"hoctap",ctx:{HTTAB:"lop"},
-  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan"],
+  /* V9.99z5 - thêm `bangcong`: người phụ trách chuyên môn là người duyệt giờ dạy của giảng viên
+     và của đội WOW trước khi chốt lương. Trước đây bảng ấy chỉ Nhân sự và CEO có. */
+  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan","bangcong"],
   blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:1,mgr:1,
   /* V9.99y (anh Luân 05/08): *"Trưởng phòng aca cũng quản lý toàn bộ team Wow, em đừng quên"*.
      Đội WOW nằm trong phòng ACA nên phạm vi NGƯỜI đã đúng sẵn; thiếu là cái chuông - 21 việc
@@ -2626,20 +2666,26 @@ var ROLESCOPE={
   pages:["viec","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ychv","ketthuc","khac","duyet"],
   tabs:{khac:["baoluu"],duyet:["duyetnghi"]},
   blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:1,kpi:1,bell:["Học vụ","CSKH","Giao việc"]},
+ /* V9.99z5 - GIÁO VIÊN không xếp người dạy thay và không gỡ đụng phòng: hai màn ấy là cửa
+    GHI của Học vụ / Trưởng phòng ACA (CH3). Trước bản này chúng vẫn mở cho giáo viên, đầy nút
+    bấm vào là bị từ chối - đúng con bệnh "mời rồi đuổi" mà V9.51 đã chữa cho thanh menu. */
  giaovien:{match:/^teacher$/,land:"hoctap",ctx:{HTTAB:"today"},
   pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan"],
+  tabs:{hoctap:["buoihnay","lichtuan","lop","buoihoc","wow"]},
   blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:0,bell:["Giảng viên chuyên môn","Giao việc"]},
  /* V9.60: CH3 giao cho NV WOW việc CHẤM TEST ĐẦU VÀO, mà phạm vi trang lại không có màn test -
     bài hướng dẫn của chính họ dẫn sang Tuyển sinh rồi bị chặn. Mở đúng một tab test, không mở
     cả hub tuyển sinh. */
  wow:{match:/^wow/,land:"hoctap",ctx:{HTTAB:"wow"},
   pages:["viec","hocvien","giangvien","hoctap","banglop","tuyensinh"],
-  tabs:{tuyensinh:["test"]},blocks:["test_grading","wowq","risk"],mine:0,mineBtn:0,kpi:0,bell:["WOW","Giao việc"]},
+  /* Đội WOW kèm 1-1: không xếp giáo viên thay, không gỡ đụng phòng, không canh SLA nhận xét
+     buổi của lớp ACA. Ba tab ấy thuộc Học vụ / ACA. */
+  tabs:{tuyensinh:["test"],hoctap:["buoihnay","lichtuan","lop","wow"]},blocks:["test_grading","wowq","risk"],mine:0,mineBtn:0,kpi:0,bell:["WOW","Giao việc"]},
  /* V9.40 (anh Luân chốt 29/07): "Duyệt chiết khấu là trưởng phòng tư vấn, kế toán luôn chỉ xác
     nhận và làm theo thôi." Trước đây cấu hình quyền cho Kế toán duyệt, trong khi DỮ LIỆU ghi
     NV012 - Trưởng phòng Tư vấn - là người duyệt cả 8 lần. Cấu hình sai, dữ liệu đúng. */
  ketoan:{match:/^account/,land:"tuyensinh",ctx:{TSTAB:"thanhtoan"},
-  pages:["viec","hocvien","giangvien","tuyensinh","duyet","baocao"],
+  pages:["viec","hocvien","giangvien","tuyensinh","duyet","baocao","bangcong"],   /* V9.99z5: kế toán chốt lương theo bảng công giảng dạy */
   /* V9.99r - Kế toán chỉ có phần THANH TOÁN của hub Tuyển sinh. Trước đây không khai tab nào
      nên họ bấm được cả Lead, Test đầu vào, Tư vấn & Đăng ký - ba bước họ khai `lead:"none"`,
      mở ra chỉ để nhìn. Khai đúng một tab thì phễu, câu mở đầu và menu cùng thu lại theo. */
@@ -2875,7 +2921,11 @@ function ch3Vai(a){
    nhóm vai nào đó khai tabs là lỗi "toàn quyền mà chỉ thấy 1 tab" quay lại theo đường khác. */
 function scopeTabs(page,segs){var rs=SCOPE();if(rs.pages==="*")return segs;
  if(!rs.tabs||!rs.tabs[page])return segs;
- return segs.filter(function(t){return rs.tabs[page].indexOf(t[0])>=0})}
+ /* V9.99z5: bản khai quyền viết bằng KHOÁ TRANG (nhaplead, ghinhan, buoihnay) vì `navVis` đọc
+    theo khoá trang; còn thanh tab lại đặt tên tab (lead, phanhoi, today). Hai cách gọi cùng một
+    chỗ - hàm này nhận cả hai, nếu không thì khai đúng ở menu là sai ở thanh tab và ngược lại. */
+ var L=rs.tabs[page],mm=(typeof HUBTAB!=="undefined"&&HUBTAB[page]&&HUBTAB[page].m)||{};
+ return segs.filter(function(t){return L.indexOf(t[0])>=0||(mm[t[0]]&&L.indexOf(mm[t[0]])>=0)})}
 function mapRoleCode(c){c=String(c||"");
  if(c==="ceo")return"ceo";
  if(/sales_manager|sales_leader/.test(c))return"smanager";
@@ -4564,7 +4614,28 @@ function pageGo(key,n){PAGE[key]=n;if(typeof CUR!=="undefined"&&CUR!==key&&RENDE
 function listSort(key,col){window.SORT=window.SORT||{};var so=window.SORT[key];
  if(so&&so.col===col)so.dir=-so.dir;else window.SORT[key]={col:col,dir:1};
  reRenderKeep(CUR)}
-function listSearch(key,v){SEARCH[key]=v;PAGE[key]=0;var el=document.getElementById("content");var sc=el.scrollTop;el.innerHTML=renderList(key);el.scrollTop=sc;var i=el.querySelector(".srch input");if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}}
+/* ═══ V9.99z5 - DANH SÁCH NHÚNG: GÕ TÌM KHÔNG ĐƯỢC NUỐT CẢ TRANG ═════════════════════════
+   Anh Luân 05/08: *"cái trang Lead & khai thác khi a gõ tìm ở trang này tự nhiên nó nhảy cái
+   gì ấy, xuất hiện nút thêm mới gì đó, bấm vào lại ra popup???? sao thấy nó giống bị lỗi gì á"*.
+   Đúng là lỗi. Bốn danh sách được NHÚNG vào trong một trang khác - `nhaplead` trong hub Tuyển
+   sinh, `nhanvien` trong trang Nhân sự, `dsthanhtoan` trong Sổ thu, `giangvien` trong trang
+   Giảng viên. Ba hàm dưới đây vẽ lại bằng BẢN ĐỘC LẬP của danh sách (`renderList(key)`) rồi
+   nhét thẳng vào thân trang, nên gõ một chữ vào ô tìm là cả hub biến mất, thay bằng một sổ dữ
+   liệu thô có tiêu đề riêng, nút "Thêm mới" và khung nhập bản ghi - thứ mà bản nhúng cố tình
+   không có. `rlist` và `pageGo` đã có chốt "trang đang mở là trang khác thì vẽ lại trang đó",
+   ba hàm này thì chưa. Cùng một con bệnh với NAVTREE cắm cứng: vẽ theo bản gốc thay vì hỏi
+   TRANG ĐANG MỞ. Nay tất cả đi chung một cửa. */
+function listPaint(key,dau){
+ /* Hỏi TRANG ĐANG MỞ, không hỏi khoá danh sách: trang `giangvien` có hàm vẽ riêng (thanh tab
+    Danh sách / Bảng công) mà khoá danh sách nhúng trong nó cũng tên `giangvien` - so tên với
+    nhau là hai cái bằng nhau, chốt không đóng, thanh tab vẫn bay. Điều kiện đúng là "trang
+    đang mở có hàm vẽ riêng", chứ không phải "trang đang mở khác khoá danh sách". */
+ var _p=PBK[(typeof CUR!=="undefined")?CUR:key]||{};
+ if(typeof CUR!=="undefined"&&RENDER[CUR]&&_p.ty!=="list"){reRenderKeep(CUR);return}
+ var el=document.getElementById("content");if(!el)return;
+ var sc=dau?0:el.scrollTop;el.innerHTML=renderList(key);el.scrollTop=sc;
+ var i=el.querySelector(".srch input");if(i&&!dau){i.focus();i.setSelectionRange(i.value.length,i.value.length)}}
+function listSearch(key,v){SEARCH[key]=v;PAGE[key]=0;listPaint(key)}
 function saveForm(key){var cfg=LISTCFG[key];var o={},idk=cfg.cols[0][0]; var miss=[];
  cfg.form.forEach(function(f){var e=document.getElementById("f_"+f[0]); var v=normDT(f[0],e?e.value:""); if(f[3]&&!v)miss.push(f[1]); o[f[0]]=v;
   if(f[2]==="@lead"&&v){var Lx=find("DL02","lead_id",v);if(Lx){o.lead_id_name=Lx.full_name;o.customer_name=Lx.full_name}}
@@ -4597,9 +4668,9 @@ function saveForm(key){var cfg=LISTCFG[key];var o={},idk=cfg.cols[0][0]; var mis
  o[idk]=cfg.idp+seqNo(cfg.code,idk);
  function _ins(nid){o[idk]=nid;rows(cfg.code).unshift(o);toast("Đã lưu "+nid+".");go(key)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi lưu: "+((res&&res.error)||""));return}_ins(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave(cfg.code,o)}else{_ins(o[idk])}}
-function openEdit(key,id){var cfg=LISTCFG[key];var rec=find(cfg.code,cfg.cols[0][0],id);if(!rec){toast("Không thấy bản ghi");return}window.PREFILL=null;EDIT[key]=rec;var el=document.getElementById("content");el.innerHTML=renderList(key);el.scrollTop=0}
-function newForm(key){EDIT[key]=null;window.PREFILL=null;var el=document.getElementById("content");el.innerHTML=renderList(key);var p=document.getElementById("formPanel");if(p)p.classList.remove("hidden");el.scrollTop=0}
-function cancelEdit(key){EDIT[key]=null;document.getElementById("content").innerHTML=renderList(key)}
+function openEdit(key,id){var cfg=LISTCFG[key];var rec=find(cfg.code,cfg.cols[0][0],id);if(!rec){toast("Không thấy bản ghi");return}window.PREFILL=null;EDIT[key]=rec;listPaint(key,1)}
+function newForm(key){EDIT[key]=null;window.PREFILL=null;listPaint(key,1);var p=document.getElementById("formPanel");if(p)p.classList.remove("hidden")}
+function cancelEdit(key){EDIT[key]=null;listPaint(key,1)}
 /* V9.27 (anh Luân bắt lỗi): đổi trạng thái ở bảng xong thấy "chẳng có gì thay đổi".
    Gốc: hàm này KHÔNG tự gọi persistSoon. Nó chỉ được lưu NHỜ MAY - khi bảng nằm trong hub thì
    rlist đi đường reRender -> reRenderKeep gọi persistSoon hộ. Trên trang danh sách đứng riêng
@@ -5959,6 +6030,9 @@ function renderViec(){var items=bellItems();
    var top=Object.keys(cc).sort(function(a,b){return cc[b]-cc[a]})[0];
    return top?["ti-users-group",cc[top],"Quá hạn nhiều nhất: "+top,"#0D9488","hôm nay nên dồn người sang đây"]
              :["ti-users-group","-","Quá hạn nhiều nhất","#0D9488","chưa bộ phận nào quá hạn"]})()],"viec");
+ /* V9.99z5: nhịp ngày của chức danh đứng ngay đây - đọc "hôm nay tôi làm gì theo buổi" trước,
+    rồi mới xuống hàng chờ chi tiết. Trang khác không có khối này (một việc một chỗ). */
+ h+=nhipPanel();
  /* V9.59: lọc theo mức độ nay là một THANH LỌC đúng nghĩa, không còn nấp trong cái nút "Chỉ quá
     hạn" và trong mấy cái thẻ. Một việc - một chỗ làm. */
  var msegs=[["","Tất cả",items.length,""],["red","Quá hạn",redn,"red"],["amber","Sắp tới hạn",ambn,"amber"]];
@@ -8716,7 +8790,7 @@ function renderCskh(){
   '<div class="cwrow"><span class="cwdir in"><i class="ti ti-arrow-left"></i> Học viên → Trung tâm</span> <b>Góp ý &amp; Khiếu nại</b> — HV gửi từ Cổng học viên (hoặc NV ghi hộ khi nhận qua gọi/nhắn), trung tâm xử lý &amp; phản hồi lại.</div>'+
   '<div class="cwrow"><span class="cwdir in"><i class="ti ti-arrow-left"></i> Học viên → Trung tâm</span> <b>Yêu cầu &amp; câu hỏi</b> — HV gửi từ Cổng học viên, hệ thống tự chuyển tới học vụ (hoặc kế toán nếu là chuyện tiền) kèm hạn nhận việc.</div>'+
   '</div>';
- h+=tbar(segHTML(tab,[["khaosat","Khảo sát (TT→HV)",nSvWait||"",nSvWait?"amber":""],["phanhoi","Phản hồi / Góp ý",nFbOpen||"",nFbOpen?"amber":""],["khieunai","Khiếu nại",nKnOpen||"",nKnOpen?"red":""],["ychv","Học viên liên hệ",nYcWait||"",nYcWait?"amber":""]],"csTabSet('{k}')"),"");
+ h+=tbar(segHTML(tab,scopeTabs("cskh",[["khaosat","Khảo sát (TT→HV)",nSvWait||"",nSvWait?"amber":""],["phanhoi","Phản hồi / Góp ý",nFbOpen||"",nFbOpen?"amber":""],["khieunai","Khiếu nại",nKnOpen||"",nKnOpen?"red":""],["ychv","Học viên liên hệ",nYcWait||"",nYcWait?"amber":""]]),"csTabSet('{k}')"),"");
  if(tab==="khaosat")h+=renderReview(1);
  else if(tab==="phanhoi")h+=renderGhinhan(1);
  else if(tab==="ychv")h+=renderYcHV();
@@ -16144,7 +16218,10 @@ function renderHoctap(){
  var h=pageHead("Học tập & Giảng dạy","Lớp đang mở, theo dõi nhận xét buổi (SLA), và buổi WOW 1-1 — một chỗ. Bấm một lớp để vào Vận hành lớp; theo dõi SLA nhận xét và WOW ở hai tab còn lại."+hubCau("hoctap",tab),actBtn,1);
  var todayN=srows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,new Date())}).length;
  var nNoGv=srows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,new Date())&&!isc(x.session_status,"cancelled")&&!String(x.teacher_id||"").trim()}).length;
- h+=tbar(segHTML(tab,[["today","Hôm nay",todayN||"",""],["lichtuan","Lịch tuần","",""],["gvdp","GV dự phòng",nNoGv||"",nNoGv?"red":""],["phong","Phòng & đụng lịch",clashList().length||"",clashList().length?"red":""],["lop","Lớp học",cls.length||"",""],["buoihoc","Nhận xét buổi",nNote||"",nNote?"red":""],["wow","Buổi WOW 1-1",nWow||"",nWow?"amber":""]],"htTabSet('{k}')"),
+ /* V9.99z5 - thanh tab của hub này (và của hub CSKH) chưa bao giờ đi qua `scopeTabs`, trong
+    khi ba hub kia có. Nên khai `tabs:{hoctap:[...]}` cho một chức danh thì menu thu lại mà
+    thanh tab vẫn mở đủ 7 cửa - hai chỗ nói hai đằng. */
+ h+=tbar(segHTML(tab,scopeTabs("hoctap",[["today","Hôm nay",todayN||"",""],["lichtuan","Lịch tuần","",""],["gvdp","GV dự phòng",nNoGv||"",nNoGv?"red":""],["phong","Phòng & đụng lịch",clashList().length||"",clashList().length?"red":""],["lop","Lớp học",cls.length||"",""],["buoihoc","Nhận xét buổi",nNote||"",nNote?"red":""],["wow","Buổi WOW 1-1",nWow||"",nWow?"amber":""]]),"htTabSet('{k}')"),
   '<button class="pill" onclick="go(\'giaoan\')"><i class="ti ti-notes"></i>Kho bài & Giáo án</button><button class="pill" onclick="go(\'banglop\')"><i class="ti ti-clipboard-list"></i>Vận hành lớp</button>');
  h+=bvSau();   /* chọn chặng xong mới tới bảng việc của chức danh */
  if(tab==="today")h+=renderHtToday(1);
@@ -17958,10 +18035,13 @@ function giaGioHTML(){
   'nên nó tính theo BUỔI với đơn giá '+slaChip("wowPayPerSession",250000,"đ/buổi")+'. '+
   'Muốn tính WOW theo giờ thì phải ghi giờ vào - giờ ra cho buổi WOW trước đã.</div></div>';
  return h}
-function caText(theoCa){var out=[];
+/* V9.99z5: cột "Chia theo ca" ghi kèm ĐƠN GIÁ từng ca - ai không có miền `tien` thì chỉ đọc
+   số giờ. Đây là chỗ cuối cùng còn rò một con số tiền ra khỏi khối tiền trên bảng công. */
+function caText(theoCa,xTien){var out=[];
+ if(xTien===undefined)xTien=true;
  DAYK.forEach(function(dk){SHIFTK.forEach(function(sk){
   var v=theoCa[dk[0]+"|"+sk[0]];if(!v||!v.h)return;
-  out.push((dk[0]==="cuoituan"?"Cuối tuần ":"")+sk[1].replace("Ca ","")+" "+(Math.round(v.h*10)/10)+"h x "+vnd(v.dg))})});
+  out.push((dk[0]==="cuoituan"?"Cuối tuần ":"")+sk[1].replace("Ca ","")+" "+(Math.round(v.h*10)/10)+"h"+(xTien?(" x "+vnd(v.dg)):""))})});
  return out.join(" · ")}
 function congSet(v){window.CONGM=v;reRender(CUR)}
 function renderCong(){
@@ -17976,20 +18056,28 @@ function renderCong(){
  var totWG=L.reduce(function(a,x){return a+x.gioWow},0),totWThieu=L.reduce(function(a,x){return a+x.thieuWow},0);
  var noNote=L.reduce(function(a,x){return a+x.noNote},0);
  var h='<div class="notebar"><i class="ti ti-info-circle"></i><span data-tip="Tính theo giờ dạy thật, từ giờ vào lớp tới giờ kết thúc. Đơn giá tra theo giảng viên x loại ngày x ca. Giờ vào - ra của buổi WOW và ca test vẫn ghi nhận để quản lý ca, nhưng không nhân vào tiền. Căn cứ tính là buổi đã dạy xong - cùng một định nghĩa với KPI và hồ sơ giáo viên."><b>Màn này tính và đối chiếu công</b>, chưa nối bảng lương.<i class="ti ti-info-circle gyti"></i></span> <a class="lnk" onclick="window.SETTAB=\'giagio\';go(\'settings\')">Sửa đơn giá</a>.</div>';
+ var xTien=true;try{xTien=(dsLevel("tien")!=="none")}catch(e){xTien=true}
  h+=statStrip([
   ["ti-school",tot,"Buổi lớp đã dạy trong tháng","#3B82C4",L.length+" giảng viên"],
   ["ti-clock-hour-4",(Math.round(totG*10)/10)+"h","Tổng giờ dạy","#2E5A88",totThieu?(totThieu+" buổi thiếu giờ vào/ra"):"đủ giờ vào - giờ ra"],
-  ["ti-star",totW,"Buổi WOW 1-1 đã dạy","#DB2777",vnd(wowRate())+"/buổi · "+(Math.round(totWG*10)/10)+"h kèm"+(totWThieu?(" · "+totWThieu+" buổi thiếu mốc"):"")],
-  ["ti-file-text",totT,"Ca test đầu vào","#7C3AED",vnd(testRate())+"/lần"],
-  ["ti-report-money",vnd(tien),"Tiền công tạm tính","#0D9488","theo giờ x ca x người"],
+  /* V9.99z5 - BẢNG CÔNG CÓ HAI TẦNG NGƯỜI ĐỌC. Người duyệt CHUYÊN MÔN (Trưởng phòng ACA) cần
+     GIỜ và SỐ CA để đối chiếu trước khi chốt; đơn giá và tiền công tạm tính là việc của khối
+     tiền. Ai không có miền `tien` thì bảng này chỉ đếm công, không hiện một con số tiền nào -
+     cùng luật đã áp cho KPI và Báo cáo. */
+  ["ti-star",totW,"Buổi WOW 1-1 đã dạy","#DB2777",(xTien?(vnd(wowRate())+"/buổi · "):"")+(Math.round(totWG*10)/10)+"h kèm"+(totWThieu?(" · "+totWThieu+" buổi thiếu mốc"):"")],
+  ["ti-file-text",totT,"Ca test đầu vào","#7C3AED",xTien?(vnd(testRate())+"/lần"):"đã chấm trong tháng"],
+  /* Ô này KHÔNG được biến mất khi người xem không có miền tiền - dải thẻ khai theo mã cố định,
+     ô nào rụng giữa chừng là lệch cả bảng khai (luật đã ghi ngay trên, ở dải Việc hôm nay).
+     Không được xem thì ghi dấu gạch và nói thẳng vì sao. */
+  ["ti-report-money",xTien?vnd(tien):"-","Tiền công tạm tính","#0D9488",xTien?"theo giờ x ca x người":"chỉ khối tiền xem được"],
   ["ti-writing",noNote,"Buổi chưa ghi nhận xét","#E08A1E",noNote?"đối chiếu trước khi chốt":"đã đủ nhận xét"],
   ["ti-clock",L.reduce(function(a,x){return a+x.late},0),"Buổi vào trễ giờ","#E24B4A","ảnh hưởng KPI ADC"]],"cong");
  h+=tbar('<span class="tblbl">Tháng</span><select class="sel" onchange="congSet(this.value)">'+
   mo.map(function(k){return '<option value="'+esc(k)+'"'+(k===ym?" selected":"")+'>'+esc(k.split("-")[1]+"/"+k.split("-")[0])+'</option>'}).join("")+'</select>',
   '<span class="tbcnt">'+L.filter(function(x){return x.n||x.wow||x.test}).length+' giảng viên</span>');
  h+=pgBar("cong",L.filter(function(x){return x.n||x.wow||x.test}).length);
- h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Người dạy</th><th>Cơ sở</th><th>Buổi lớp</th><th>Giờ dạy</th><th>Chia theo ca</th><th>Trong đó online</th><th>Buổi WOW (giờ kèm)</th><th>Ca test</th><th>Vào trễ</th><th>Chưa ghi nội dung</th><th>Tiền công tạm tính</th></tr></thead><tbody>';
- if(!L.filter(function(x){return x.n||x.wow||x.test}).length)h+='<tr><td class="empty" colspan="11">Tháng này chưa có buổi dạy nào hoàn thành.</td></tr>';
+ h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Người dạy</th><th>Cơ sở</th><th>Buổi lớp</th><th>Giờ dạy</th><th>Chia theo ca</th><th>Trong đó online</th><th>Buổi WOW (giờ kèm)</th><th>Ca test</th><th>Vào trễ</th><th>Chưa ghi nội dung</th>'+(xTien?"<th>Tiền công tạm tính</th>":"")+'</tr></thead><tbody>';
+ if(!L.filter(function(x){return x.n||x.wow||x.test}).length)h+='<tr><td class="empty" colspan="'+(xTien?11:10)+'">Tháng này chưa có buổi dạy nào hoàn thành.</td></tr>';
  L.forEach(function(x){if(!x.n&&!x.wow&&!x.test)return;
   /* V9.93: bấm cả dòng là mở hồ sơ chính người đó - trước đây chỉ có cái tên là bấm được, phần
      còn lại của dòng câm (`_checkbam` bắt). */
@@ -17997,14 +18085,14 @@ function renderCong(){
    '<td>'+esc(elabel(x.g.branch)||x.g.branch||"-")+'</td>'+
    '<td><b>'+x.n+'</b></td>'+
    '<td><b>'+(Math.round(x.gio*10)/10)+'h</b>'+(x.thieuGio?' <span class="chip red" data-tip="Buổi đã dạy xong mà không ghi giờ vào - giờ ra, không tính công được">'+x.thieuGio+' buổi thiếu giờ</span>':'')+'</td>'+
-   '<td style="font-size:11.5px">'+esc(caText(x.theoCa)||"-")+'</td>'+
+   '<td style="font-size:11.5px">'+esc(caText(x.theoCa,xTien)||"-")+'</td>'+
    '<td>'+(x.onl?'<span class="chip blue">'+x.onl+'</span>':'<span class="mut">0</span>')+'</td>'+
    '<td>'+(x.wow?('<span class="chip" style="background:#FCE7F3;color:#9D174D">'+x.wow+'</span> <span class="mut" style="font-size:11px">'+(Math.round(x.gioWow*10)/10)+'h'+(x.thieuWow?(' · '+x.thieuWow+' thiếu mốc'):'')+'</span>'):'<span class="mut">0</span>')+'</td>'+
    '<td>'+(x.test?('<span class="chip" style="background:#EDE9FE;color:#5B21B6">'+x.test+'</span>'):'<span class="mut">0</span>')+'</td>'+
    '<td>'+(x.late?'<span class="chip amber">'+x.late+'</span>':'0')+'</td>'+
    '<td>'+(x.noNote?'<span class="chip red">'+x.noNote+'</span>':'<span class="chip green">0</span>')+'</td>'+
-   '<td style="font-variant-numeric:tabular-nums"><b>'+vnd(x.tien)+'</b></td></tr>'});
- h+='<tr style="background:#FAFBFD;font-weight:800"><td colspan="2">TỔNG</td><td>'+tot+'</td><td>'+(Math.round(totG*10)/10)+'h</td><td colspan="2"></td><td>'+totW+'</td><td>'+totT+'</td><td></td><td>'+noNote+'</td><td style="font-variant-numeric:tabular-nums">'+vnd(tien)+'</td></tr>';
+   (xTien?('<td style="font-variant-numeric:tabular-nums"><b>'+vnd(x.tien)+'</b></td>'):'')+'</tr>'});
+ h+='<tr style="background:#FAFBFD;font-weight:800"><td colspan="2">TỔNG</td><td>'+tot+'</td><td>'+(Math.round(totG*10)/10)+'h</td><td colspan="2"></td><td>'+totW+'</td><td>'+totT+'</td><td></td><td>'+noNote+'</td>'+(xTien?('<td style="font-variant-numeric:tabular-nums">'+vnd(tien)+'</td>'):'')+'</tr>';
  return h+'</tbody></table></div></div>'}
 /* ===== SỔ THU HỌC PHÍ: tab ĐÃ THU (DL07) + tab DỰ THU (DL06b) ===== */
 function sothuTab(k){window.STTAB=k;reRender("dsthanhtoan")}
@@ -18114,7 +18202,14 @@ function renderSothu(){var tab=window.STTAB||"da";
 function gvTab(k){window.GVTAB=k;reRender("giangvien")}
 function renderGiangvien(){var tab=window.GVTAB||"ds";
  var h=pageHead("Giảng viên & NV WOW","Hồ sơ đội ngũ đứng lớp (DL01) và bảng công giảng dạy của chính họ.","");
- h+=tbar(segHTML(tab,[["ds","Danh sách",gvDsSo()],["cong","Bảng công giảng dạy",""]],"gvTab('{k}')"),"");
+ /* V9.99z5 - tab "Bảng công giảng dạy" hỏi ĐÚNG một cửa với mục menu cùng tên (`navVis`), nên
+    thanh tab và thanh menu không thể nói hai đằng. Trước bản này mọi chức danh xem được trang
+    Giảng viên đều bấm được bảng công - tức đọc được giờ dạy dùng để chốt lương của cả trung
+    tâm - trong khi menu của họ không có mục ấy. */
+ var gvsegs=[["ds","Danh sách",gvDsSo()]];
+ if(navVis("bangcong"))gvsegs.push(["cong","Bảng công giảng dạy",""]);
+ if(!gvsegs.some(function(x){return x[0]===tab})){tab="ds";window.GVTAB="ds"}
+ h+=tbar(segHTML(tab,gvsegs,"gvTab('{k}')"),"");
  h+=(tab==="cong")?renderCong():renderList("giangvien",1);
  return h}
 function gvDsSo(){var c=LISTCFG.giangvien;
@@ -19731,7 +19826,7 @@ function banTT(){var k=window.BANTT||ttMacDinh();return TTBK[k]?k:"khach"}
    Đang xem người khác thì có dải nhắc rõ ràng và nút quay về - mượn ghế ai cũng phải trả. */
 function banToanQuyen(){try{return SCOPE().pages==="*"}catch(e){return false}}
 /* V9.99v - Ô "Xem việc của" là một BỘ LỌC XEM, không phải quyền duyệt. Trước bản này nó chỉ mở
-   cho `mgr` (trưởng phòng trở lên), nên **Trưởng phòng WOW** - một trong bốn cửa trưởng phòng ở
+   cho `mgr` (trưởng phòng trở lên), nên **WOW Leader** - một trong bốn cửa cấp trưởng ở
    cổng đăng nhập - lại không có ô này, vì mã vai của họ là `wow_leader` và từ V9.99q cờ `mgr`
    cố ý chỉ bật cho `*_manager` (để leader chi nhánh không duyệt được chiết khấu).
    Hai chuyện khác nhau: DUYỆT thì đúng là của trưởng phòng trở lên; XEM VIỆC CỦA NGƯỜI TRONG
@@ -20350,6 +20445,36 @@ function nhipList(){var k=nhipKey();if(!k)return [];
   L.push({buoi:o.buoi||"sang",t:o.t||"",vi:o.vi||"",page:o.page||"",ord:1000+i,n:0,hab:true,tu:1})});
  return L.sort(function(a,b){return a.ord-b.ord})}
 
+/* ═══ V9.99z5 - NHỊP NGÀY CÓ LẠI CHỖ ĐỨNG ═══════════════════════════════════════════════
+   BẪY ĐÃ CẮN: V9.99z3 gỡ phần xử lý việc ra khỏi Trợ lý theo đúng ý anh Luân (*"trợ lý, em bỏ
+   xử lý task đi, dùng để hỏi thôi"*) - nhưng tấm Trợ lý khi ấy là NƠI DUY NHẤT vẽ nhịp ngày,
+   nên nhịp ngày theo chức danh biến mất khỏi app trong im lặng. `nhipList()` còn nguyên, còn
+   được cấu hình trong Cài đặt, mà không một hàm nào gọi tới nó nữa.
+   Anh Luân bảo bỏ XỬ LÝ VIỆC khỏi Trợ lý, không bảo bỏ nhịp ngày - luật cứng số 0 của dự án:
+   thêm thì được, bớt thì không. Nay nhịp ngày nằm ở TRANG VIỆC HÔM NAY, đúng chỗ người ta mở
+   ra để hỏi "hôm nay tôi làm gì", và chỉ ở một chỗ đó.
+   Hai loại dòng KHÔNG được trộn: hàng chờ đếm được (số, hết thì ghi "xong"), và thói quen
+   (không có gì để cạn - ghi "nên xem", đời nào cũng không được gắn mác xong). */
+function nhipPanel(){
+ var L=[];try{L=nhipList()}catch(e){L=[]}
+ if(!L.length)return "";
+ var h='<div class="panel" data-tour="nhipngay"><div class="ph"><b>Nhịp ngày của bạn</b>'+
+  '<span class="mut" style="font-size:11.5px">Việc nên làm theo buổi - hàng chờ có số đếm, thói quen ghi "nên xem"</span></div><div class="nhipg">';
+ NHIPBUOI2.forEach(function(B){
+  var R=L.filter(function(x){return x.buoi===B[0]});
+  if(!R.length)return;
+  var dem=R.filter(function(x){return !x.hab});
+  var tong=0;dem.forEach(function(x){tong+=num(x.n)});
+  var chip=dem.length?(tong?'<span class="chip red">'+tong+' việc</span>':'<span class="chip green">xong</span>')
+                     :'<span class="mut">&mdash;</span>';
+  h+='<div class="nhipc"><div class="nhiph"><i class="ti '+esc((NHIPBUOI[B[0]]||["","ti-clock"])[1])+'"></i><b>'+esc(B[1])+'</b>'+chip+'</div>';
+  R.forEach(function(r){
+   h+='<div class="nhipr"'+(r.page?' onclick="go(\''+esc(r.page)+'\')" title="Mở '+esc((PBK[r.page]||{}).t||r.page)+'"':'')+'>'+
+    '<div class="nhipt"><span>'+esc(r.t)+'</span>'+
+    (r.hab?'<b class="mut" style="font-weight:600">nên xem</b>':'<b'+(num(r.n)?' class="hot"':'')+'>'+num(r.n)+'</b>')+'</div>'+
+    (r.vi?'<div class="mut nhipv">'+esc(r.vi)+'</div>':'')+'</div>'});
+  h+='</div>'});
+ return h+'</div></div>'}
 function tthKey(){var me="";try{me=tkMeId()||CURSTAFF||""}catch(e){me=CURSTAFF||""}
  return "ITTS_TROTHU_"+(me||"guest")}
 function tthOn(){try{var v=localStorage.getItem(tthKey());return v===null?true:v==="1"}catch(e){return true}}
@@ -20642,7 +20767,7 @@ function navJump(i){var h=window.NAVHIST;if(!h||i<0||i>=h.length)return;var targ
 var TSMAP={nhaplead:"lead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"};
 var ARCMAP={changA:1,changB:1,changC:1,changD:1};
 var CSMAP={review:"khaosat",khaosat:"khaosat",ghinhan:"phanhoi",khieunai:"khieunai",ychv:"ychv"};
-var HTMAP={lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp",phong:"phong"};
+var HTMAP={lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp",phong:"phong",buoihnay:"today"};
 var KMAP={baoluu:"baoluu",magioithieu:"magioithieu"};
 /* V9.29o: bàn giao lead rời hub "Tính năng khác" sang hub "Chờ duyệt" - nó là một QUYẾT ĐỊNH
    (giao lead của người này cho người kia), không phải một tiện ích lặt vặt. */
@@ -20706,14 +20831,17 @@ function go(key,noHist){
     biết mình đang đứng ở nhánh nào - trước đây cả menu tối thui, không biết đang ở đâu. */
  try{if(navAnyCur())NAVFROM=navCurKey()}catch(e){}
  var key0=key;   /* key GỐC trước remap - dùng tìm nhóm menu */
+ /* Nhớ lại khoá NGƯỜI DÙNG THẬT SỰ BẤM, TRƯỚC mọi phép đổi tên bên dưới - có nó mới phân biệt
+    được "bấm vào tên hub" với "bấm vào một mục con của hub" (hai chuyện phải xử khác nhau).
+    BẪY ĐÃ CẮN (V9.99z5): dòng này từng đứng SAU phép remap TSMAP, nên bấm "Test đầu vào" thì
+    _bamGoc đã kịp thành "tuyensinh" - luật rà tab mặc định bên dưới tưởng người ta bấm tên hub
+    và đẩy ngược về tab Lead. Bốn mục con của Tuyển sinh đứng im y hệt lỗi "đơ đơ" đã sửa. */
+ var _bamGoc=key;
  if(TSMAP[key]){window.TSTAB=TSMAP[key];key="tuyensinh"}
  if(key==="hanhtrinh"){window.BLVIEW="board";key="banlam"} /* V9.18: Hành trình đã gộp vào Trang bắt đầu (góc nhìn bảng chặng) */
  /* V9.64: bảng công giảng dạy nay là một tab của trang Giảng viên. 4 chỗ trong app đang gọi
     go('bangcong') (ô thẻ Nhân sự, trợ lý, nhịp ngày, tour) - remap ở ĐÂY chứ không đi sửa 4 chỗ,
     để mai kia có chỗ thứ 5 gọi tên cũ thì vẫn tới đúng nơi. */
- /* Nhớ lại khoá NGƯỜI DÙNG THẬT SỰ BẤM, trước mọi phép đổi tên bên dưới - có nó mới phân biệt
-    được "bấm vào tên hub" với "bấm vào một mục con của hub" (hai chuyện phải xử khác nhau). */
- var _bamGoc=key;
  if(key==="bangcong"){window.GVTAB="cong";key="giangvien"}
  /* V9.99u - lối cũ: mọi nút/link/bài hướng dẫn còn trỏ tới `duyetgiao` nay dẫn thẳng sang tab
     "Việc chờ nhận" của trang Quản lý việc giao & nhận. Đổi chỗ một màn thì phải để lại lối,
@@ -20886,7 +21014,13 @@ var NAVTREE=[
  /* V9.99z - xếp lại thứ tự: mục ĐỘC LẬP trước, rồi tới HUB và các mục con của nó nằm liền
     một mạch. Bản cũ để "Kho bài tập & Giáo án" chen vào giữa các mục con của hub Học tập, nên
     nhìn không ra cái nào thuộc cái nào. */
- {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","banglop","giaoan","cskh","hoctap","gvdp","phong","wow"]},
+ /* V9.99z5 - MỌI TAB CỦA HUB ĐỀU CÓ MỘT MỤC TRÊN MENU. Đo 05/08 bằng cách dựng thật thanh
+    menu rồi so với thanh tab của chính hub ấy: hub Học tập có 7 tab mà menu chỉ dẫn tới 3
+    (GV dự phòng · Phòng học · Buổi WOW); Hôm nay, Lịch tuần, Lớp học, Nhận xét buổi không có
+    lối nào. Hub CSKH có 4 tab mà menu chỉ có tên hub. Anh Luân: *"bên sidebar giống như 1 cái
+    bản đồ vậy, họ biết mình cần tìm gì ở đâu"* - thiếu một mục là mất một chỗ trên bản đồ.
+    Thứ tự các mục con xếp ĐÚNG THỨ TỰ THANH TAB của hub, để menu và màn hình đọc như nhau. */
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","banglop","giaoan","cskh","khaosat","ghinhan","khieunai","hoctap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
@@ -20912,9 +21046,9 @@ var NAVTREE=[
  {g:"Tra cứu",items:["hocvien","dsphuhuynh","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","giangvien","nhanvien"]}];
 var NAVSUB={nhaplead:"tuyensinh",test:"tuyensinh",tuvan:"tuyensinh",thanhtoan:"tuyensinh",reup:"tuyensinh",
  review:"cskh",khaosat:"cskh",ghinhan:"cskh",khieunai:"cskh",ychv:"cskh",
- lop:"hoctap",buoihoc:"hoctap",lichtuan:"hoctap",wow:"hoctap",gvdp:"hoctap",phong:"hoctap",
+ lop:"hoctap",buoihoc:"hoctap",lichtuan:"hoctap",wow:"hoctap",gvdp:"hoctap",phong:"hoctap",buoihnay:"hoctap",
  baoluu:"khac",magioithieu:"khac",
- duyetck:"duyet",duyethoan:"duyet",duyetnghi:"duyet",duyetthu:"duyet",banggiao:"duyet",
+ duyetck:"duyet",duyethoan:"duyet",duyetnghi:"duyet",duyetthu:"duyet",banggiao:"duyet",bangcong:"giangvien",
  changA:"chang",changB:"chang",changC:"chang",changD:"chang"};
 function navOwner(k){return NAVSUB[k]||k}
 function navItemMeta(k){
@@ -20922,6 +21056,11 @@ function navItemMeta(k){
  var p=PBK[k]||{};return {t:uiItemLabel(k),ic:p.ic||"ti-point"}}
 function navVis(k){var r=RBK[CURROLE],rs=SCOPE();
  var o=navOwner(k);
+ /* V9.99z5 - `bangcong` vừa là TAB của trang Giảng viên vừa là một trang được khai RIÊNG trong
+    bản quyền (chỉ Nhân sự và cấp điều hành có). Nó phải qua CẢ HAI cửa: có quyền vào trang
+    Giảng viên, và có tên nó trong bản khai. Chỉ hỏi tên hub thì mọi chức danh xem được Giảng
+    viên đều thấy Bảng công - tức tự nới quyền xem lương giờ dạy của cả trung tâm. */
+ if(k==="bangcong"&&rs.pages!=="*"&&rs.pages.indexOf("bangcong")<0)return false;
  if(r.pages.indexOf(o)<0&&r.pages.indexOf(k)<0)return false;
  /* V9.51 (monitor từng chức danh): menu KHÔNG được mời vào trang mà go() sẽ đóng sập bằng màn
     "ngoài phạm vi". Đo được 4 chức danh dư mục: HR/IT manager, HR leader, WOW leader thấy
@@ -20948,8 +21087,12 @@ function navVis(k){var r=RBK[CURROLE],rs=SCOPE();
  return true}
 /* V9.19: hub vừa là MỤC MENU vừa là chủ của mục con (hoctap có mục con wow/lop/buoihoc/lichtuan) -
    khi tab đang đứng thuộc về một mục con thì mục HUB không được sáng theo, nếu không 2 mục cùng sáng. */
-var HUBTAB={tuyensinh:{v:"TSTAB",d:"lead",m:{lead:"nhaplead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"}},
- hoctap:{v:"HTTAB",d:"lop",m:{lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp",phong:"phong"}},
+/* V9.99z5: `giangvien` cũng là một hub hai tab (Danh sách · Bảng công giảng dạy) - khai ở đây
+   thì mục "Bảng công" trên menu mới sáng đúng lúc. Trước bản này bấm nó là menu tối thui:
+   go() đổi trang sang `giangvien` mà `bangcong` không được coi là mục con của trang ấy. */
+var HUBTAB={giangvien:{v:"GVTAB",d:"ds",m:{ds:"giangvien",cong:"bangcong"}},
+ tuyensinh:{v:"TSTAB",d:"lead",m:{lead:"nhaplead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"}},
+ hoctap:{v:"HTTAB",d:"lop",m:{today:"buoihnay",lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp",phong:"phong"}},
  cskh:{v:"CSTAB",d:"khaosat",m:{khaosat:"khaosat",phanhoi:"ghinhan",khieunai:"khieunai",ychv:"ychv"}},
  khac:{v:"KTAB",d:"baoluu",m:{baoluu:"baoluu",magioithieu:"magioithieu"}},
  duyet:{v:"DUYTAB",d:"duyetck",m:{duyetck:"duyetck",duyethoan:"duyethoan",duyetnghi:"duyetnghi",duyetthu:"duyetthu",banggiao:"banggiao"}}};
@@ -20996,8 +21139,8 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
    "Test đầu vào" -> cũng vậy. Trước đây hai người ấy thấy nhóm "C1 · Khách tiềm năng".) */
 var NAVPHANG=[
  {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:"Lớp học & Giảng dạy",items:["xeplop","banglop","giaoan","hoctap","gvdp","phong","wow"]},
- {g:"Chăm sóc & Sau khóa",items:["cskh","baoluu","ketthuc","magioithieu"]}];
+ {g:"Lớp học & Giảng dạy",items:["xeplop","banglop","giaoan","hoctap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
+ {g:"Chăm sóc & Sau khóa",items:["cskh","khaosat","ghinhan","khieunai","baoluu","ketthuc","magioithieu"]}];
 function navCayV5(){
  if(arcMode()==="chang")return NAVTREE;
  var out=[],xong=false;
@@ -21010,17 +21153,25 @@ function navCay(){return (typeof V6==="function"&&V6())?NAVTREE6:navCayV5()}
    mục con có mặt trên menu rồi nhường sáng cho nó - mà mục con ấy không tồn tại ở v6, thành ra
    cả menu không có gì sáng. */
 function navInTree(k){var T=navCay();for(var i=0;i<T.length;i++)if(T[i].items.indexOf(k)>=0)return true;return false}
+/* V9.99z5 - bấm vào tên hub thì hub mở tab mặc định, và mục con ứng với tab ấy sáng (đúng chỗ
+   đang đứng). Nhưng hàng của chính hub lại tối như chưa hề đi qua - nhìn ra là "đang ở đâu đó
+   trong nhóm này" thì hơn. `navAnc` bật lớp mờ cho hàng cha khi một mục con của nó đang sáng. */
+function navAnc(k){if(k!==CUR)return false;
+ var H=HUBTAB[k];if(!H)return false;
+ var sub=hubSubKey(k);
+ return !!(sub&&sub!==k&&navInTree(sub)&&navVis(sub))}
 function navCur(k){
  /* mục con phải THỰC SỰ đứng trên menu mới nhường sáng cho nó (vd tab Khảo sát của CSKH không có
     mục riêng -> chính mục CSKH phải sáng, nếu không cả menu không có gì sáng - bẫy đã cắn) */
  if(k===CUR){var sub=hubSubKey(k);
   return !(sub&&sub!==k&&navInTree(sub)&&navVis(sub))}
  var o=navOwner(k);if(o!==CUR)return false;
- if(o==="tuyensinh")return ({nhaplead:"lead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"})[k]===(window.TSTAB||"lead");
- if(o==="cskh")return ({review:"khaosat",khaosat:"khaosat",ghinhan:"phanhoi",khieunai:"khieunai",ychv:"ychv"})[k]===(window.CSTAB||"khaosat");
- if(o==="hoctap")return (HUBTAB.hoctap.m[k]===k)&&k===hubTab("hoctap");
- if(o==="khac")return ({baoluu:"baoluu",magioithieu:"magioithieu"})[k]===(window.KTAB||"baoluu");
- if(o==="duyet")return !!DUYMAP[k]&&k===(window.DUYTAB||"duyetck");
+ /* V9.99z5: trước đây mỗi hub có một dòng riêng, và ba trong năm dòng ấy chép lại bảng tab
+    của chính hub - chép lệch một chỗ là mục menu không bao giờ sáng. Nay hỏi thẳng HUBTAB:
+    mục `k` sáng khi TAB đang mở trỏ về đúng nó. Thêm tab mới chỉ phải khai một chỗ. */
+ if(HUBTAB[o]){var _mm=HUBTAB[o].m,_cur=hubTab(o);
+  for(var _t in _mm)if(_mm[_t]===k)return _t===_cur;
+  return false}
  if(o==="chang")return k===(window.ARC||"changA");
  return false}
 /* V9.27: quét menu xem có mục nào đang sáng không, và mục nào */
@@ -21037,9 +21188,15 @@ function navCurKey(){var T=navCay();for(var i=0;i<T.length;i++){var G=T[i];
   for(var j=0;j<G.items.length;j++){var k=G.items[j];if(navVis(k)&&navCur(k))return k}}
  return ""}
 function navAnyCur(){return !!navCurKey()}
-function navGroupOf(k){var T=navCay();for(var i=0;i<T.length;i++){var G=T[i];
-  if(G.items.indexOf(k)>=0)return G.g;
-  for(var j=0;j<G.items.length;j++)if(navOwner(G.items[j])===k)return G.g}
+/* V9.99z5 - BẪY: hàm này hỏi hai câu trong CÙNG một vòng, nên nhóm nào đứng trước mà có một
+   mục con thuộc `k` là nó thắng, dù nhóm chứa CHÍNH `k` nằm ngay dưới. Đo được 05/08: mục
+   "Học viên liên hệ" nằm ở nhóm Làm việc và thuộc hub CSKH, nên bấm "CSKH · Khảo sát & Phản
+   hồi" thì app mở nhóm LÀM VIỆC, còn nhóm Đang học chứa CSKH vẫn gập - trên màn hình không
+   một mục nào sáng, người dùng mất dấu mình đang đứng đâu. Hỏi tách làm hai lượt: nhóm chứa
+   chính nó trước, không có mới hỏi tới nhóm chứa mục con của nó. */
+function navGroupOf(k){var T=navCay(),i,j;
+ for(i=0;i<T.length;i++)if(T[i].items.indexOf(k)>=0)return T[i].g;
+ for(i=0;i<T.length;i++)for(j=0;j<T[i].items.length;j++)if(navOwner(T[i].items[j])===k)return T[i].g;
  return null}
 /* ═══ MENU BẢN V6 - GOM THEO THỰC THỂ, KHÔNG THEO CHẶNG ══════════════════════════════════
    Bốn nhóm chặng C1-C4 của v5 biến mất khỏi menu: chúng là CÁCH KỂ hành trình, không phải chỗ
@@ -21106,7 +21263,7 @@ function buildNav(){
    var _trongArc=!!G.arc&&!/^chang[A-D]$/.test(k);
    var isSub=_laHub||_trongArc;
    var isSub2=_laHub&&_trongArc;
-   h+='<div class="navitem'+(isArc?" chang":"")+(isSub2?" sub sub2":(isSub?" sub":""))+(navCur(k)?" on":(ORPHAN&&k===NAVFROM?" from":""))+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
+   h+='<div class="navitem'+(isArc?" chang":"")+(isSub2?" sub sub2":(isSub?" sub":""))+(navCur(k)?" on":(navAnc(k)?" anc":(ORPHAN&&k===NAVFROM?" from":"")))+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
     ' data-k="'+k+'" title="'+esc(m.t)+'" onclick="go(\''+k+'\')"><i class="ti '+m.ic+'"></i><span>'+esc(m.t)+'</span>'+
     (n?'<span class="dot">'+(n>99?"99+":n)+'</span>':'')+'</div>'});
   h+='</div>'});
@@ -21650,7 +21807,11 @@ var GATEVAI=[
  {k:"tpaca",khoi:"Trưởng phòng",  t:"Trưởng phòng ACA",    ic:"ti-award",        vai:/^aca_manager$/},
  {k:"tphv", khoi:"Trưởng phòng",  t:"Trưởng phòng Học vụ", ic:"ti-school",       vai:/^academic_manager$/},
  {k:"tptv", khoi:"Trưởng phòng",  t:"Trưởng phòng Tư vấn", ic:"ti-phone",        vai:/^sales_manager$/},
- {k:"tpwow",khoi:"Trưởng phòng",  t:"Trưởng phòng WOW",    ic:"ti-star",         vai:/^wow_leader$/},
+ /* V9.99z5 (anh Luân 05/08): *"Không phải trưởng phòng wow em nhé, là Wow Leader, e sửa lại
+    cả ở cổng đăng nhập nhé, cứ để ở vị trí đó cũng được"* - đúng chức danh trong dữ liệu
+    (`elabel("wow_leader")` = "WOW Leader"); cổng đăng nhập là chỗ duy nhất còn gọi sai tên.
+    Vị trí giữ nguyên trong khối Trưởng phòng vì thẩm quyền của họ ngang tầm ấy. */
+ {k:"tpwow",khoi:"Trưởng phòng",  t:"WOW Leader",          ic:"ti-star",         vai:/^wow_leader$/},
  {k:"nvhv", khoi:"Nhân viên",     t:"Học vụ",              ic:"ti-school",       vai:/^academic_staff$/},
  {k:"nvtv", khoi:"Nhân viên",     t:"Tư vấn",              ic:"ti-phone",        vai:/^sales_(staff|leader)$/},
  {k:"nvgv", khoi:"Nhân viên",     t:"Giáo viên đứng lớp",  ic:"ti-chalkboard",   vai:/^teacher$/},

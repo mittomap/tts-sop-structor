@@ -173,7 +173,10 @@ setRole("all");
  /* Chặt hơn: yêu cầu học viên gửi từ cổng HV phải hiện ở CẢ BA nơi đã hứa trong README. */
  var HV="";try{HV=FS.readFileSync('./_HV.js','utf8')}catch(e){}
  t("cổng học viên có cửa gửi yêu cầu", /student_request/.test(HV));
- var oCskh=/ychv/.test(SRC)&&/HUBTAB[\s\S]{0,400}ychv/.test(SRC);
+ /* V9.99z5 - BAY: phep do nay bam vao "chu ychv phai nam trong 400 ky tu sau chu HUBTAB".
+    Them mot hub moi (giangvien) vao dau bang la ychv troi ra ngoai khung, tieu chi do trong
+    khi app khong he doi. Hoi THANG cai bang do luc chay - dung do khoang cach chu. */
+ var oCskh=!!(typeof HUBTAB!=="undefined"&&HUBTAB.cskh&&HUBTAB.cskh.m&&HUBTAB.cskh.m.ychv==="ychv");
  t("cổng nhân viên có màn nhận yêu cầu học viên (hub CSKH)", oCskh);
  t("yêu cầu học viên có mục riêng trên menu trái", /items:\["banlam","viec","ychv"/.test(SRC));
 })();

@@ -171,11 +171,14 @@ t("cac hat gian ra >=6px cho de tro", (function(){var m=CSS.match(/\.mstrip\{[^}
 t("hover vao dai hat co phan hoi thay duoc", /\.mstrip\.clk:hover\{/.test(CSS)&&/\.mstrip\.clk:hover \.msd\{[^}]*transform:scale/.test(CSS));
 t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)return/.test(SRC));
 (function(){ /* chay that: tro vao mot dai hat thi tooltip phai co chu ngay */
- var el={_a:{"data-tip":arcGrpName("changA")},getAttribute:function(k){return this._a[k]||""},
+ /* V9.99z5: ten nhom chang khong con so thu tu (anh Luan: ten phai doc duoc ca khi mot chuc
+    danh chi co 2-3 chang), nen phep do khong duoc bam vao chuoi "C1" nua - hoi thang arcGrpName. */
+ var tenA=arcGrpName("changA");
+ var el={_a:{"data-tip":tenA},getAttribute:function(k){return this._a[k]||""},
   getBoundingClientRect:function(){return{left:100,top:100,width:80,height:14,bottom:114,right:180}}};
  tipHide();tipShow(el);
  var box=document.getElementById("tipbox");
- t("tro vao la co ngay noi dung", !!box&&/C1/.test(box.textContent||""));
+ t("tro vao la co ngay noi dung", !!box&&!!tenA&&(box.textContent||"").indexOf(tenA)>=0);
  t("tro vao la bat lop on ngay", !!box&&/\bon\b/.test(box.className||""));
  tipHide();
  t("roi chuot ra thi tat", !/\bon\b/.test((document.getElementById("tipbox")||{}).className||""));
@@ -1203,13 +1206,18 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
   t("Cai dat co bang bat/tat tung trang cho tung chuc danh ("+soO+" o)", soO>=200&&/Thấy trang nào/.test(pg));
   t("bang co neo rieng cho bai huong dan", /data-tour="quyentrang"/.test(pg));
   /* V9.99w: MOI chuc danh nay deu CO trang Bao cao (khac nhau la pham vi), nen o dung de thu
-     bat/tat phai la mot trang van con tat mac dinh. Chon `banggiao` - Marketing khong co no. */
-  t("mac dinh: Marketing khong xem Ban giao lead", qtOn("marketing","banggiao")===false);
-  qtToggle("marketing","banggiao");
-  t("bam o thi pham vi THAT doi theo", buildScope("marketing_manager").tabs.duyet.indexOf("banggiao")>=0||buildScope("marketing_manager").pages.indexOf("banggiao")>=0);
-  t("o khac mac dinh duoc danh dau", qtSua("marketing","banggiao")===true&&qtSoSua("marketing")===1);
+     bat/tat phai la mot trang van con tat mac dinh.
+     V9.99z5 - BAY DA CAN: ban truoc chon `banggiao`, ma trang ay khai `hide:1` nen no KHONG
+     nam trong bang phan quyen (`qtMoiTrang` bo moi trang an). `qtSua` doc thang cau hinh nen
+     van tra "da sua", con `qtSoSua` duyet theo bang nen dem ra 0 - phep do bat mot o KHONG CO
+     TREN MAN HINH. Nay chon `giangvien`: co that trong bang, va Marketing mac dinh khong co. */
+  var oThu="giangvien";
+  t("mac dinh: Marketing khong xem trang Giang vien", qtOn("marketing",oThu)===false&&qtMoiTrang().indexOf(oThu)>=0);
+  qtToggle("marketing",oThu);
+  t("bam o thi pham vi THAT doi theo", buildScope("marketing_manager").pages.indexOf(oThu)>=0);
+  t("o khac mac dinh duoc danh dau", qtSua("marketing",oThu)===true&&qtSoSua("marketing")===1);
   qtVeMacDinh("marketing");
-  t("tra ve mac dinh thi sach han", qtSua("marketing","banggiao")===false&&qtSoSua("marketing")===0);
+  t("tra ve mac dinh thi sach han", qtSua("marketing",oThu)===false&&qtSoSua("marketing")===0);
   /* TAT trang dap: khong duoc de chuc danh do roi vao khoang khong */
   var dap=ROLESCOPE.hocvu.land;
   qtToggle("hocvu",dap);
