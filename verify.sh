@@ -135,6 +135,12 @@ chay "_checkmien du lieu ngoai mien" "CHECKMIEN OK"      node _checkmien.js
 # app keo du lieu demo theo boi so 7 ngay nen moi thu trong tuan nhin thay mot lat cat KHAC.
 # Cho trong o lat cat nao thi mai mai trong o dung thu do - va khong bo kiem nao thay.
 chay "_checkdemo bay thu trong tuan" "CHECKDEMO OK"     node _checkdemo.js
+# V9.99z5 - CHUOI PHOI HOP NHIEU NGUOI (anh Luan 05/08: "Nho kiem tra logic nghiep vu khi phoi
+# hop nhieu nguoi nha. Vi du: hoc vien gui xin nghi hoc, thi tiep theo la gi, ai duyet, roi the
+# nao the nao..."). Moi bo kiem cu soi TUNG MAN cua TUNG NGUOI; bo nay di HET mot viec di qua tay
+# hai ba nguoi - gui, vao hang cho, dung nguoi thay, co nhac, xu ly duoc, nguoi gui biet ket qua.
+# Bat ngay lan chay dau: o "Cho toi xac nhan" dan sang nhom loc khong chua chinh may viec do.
+chay "_checkchuoi chuoi phoi hop nhieu nguoi" "CHECKCHUOI OK" node _checkchuoi.js
 
 # MOT NGAY CUA TUNG CHUC DANH: khong hoi "co hong khong" ma hoi "ngoi vao ghe ho thi co lam duoc
 # viec khong". Bat duoc chuyen ba chuc danh Nhan su dap xuong Ban lam viec roi nhin 344 ho so ma

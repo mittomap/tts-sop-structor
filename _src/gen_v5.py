@@ -17788,7 +17788,11 @@ function renderGiaoviec(){
  }else{
  h+=statStrip([["ti-checkbox",mLive.length,"Việc tôi phải làm","#2E5A88",mOver.length?(mOver.length+" quá hạn"):"trong hạn","tkTabSet('mine');tkFset('live')"],
   ["ti-clock-exclamation",mOver.length,"Quá hạn của tôi","#E24B4A",mOver.length?"cần làm ngay":"không có","tkTabSet('mine');tkFset('live')"],
-  ["ti-inbox",gWait.length,"Chờ tôi xác nhận","#E08A1E",gWait.length?"người nhận đã báo xong":"không có","tkTabSet('given');tkFset('live')"],
+  /* V9.99z5 - ô này trước đây dẫn sang `tkFset('live')`, mà "live" = mới giao + đã nhận, KHÔNG
+     có việc đã BÁO XONG. Nên bấm vào ô "Chờ tôi xác nhận (3)" là mở ra một danh sách không có
+     ba việc ấy - mắt xích CUỐI của chuỗi giao việc (người giao xác nhận) không có cửa nào dẫn
+     tới. Nay có riêng một nhóm lọc "Chờ tôi xác nhận" và ô số dẫn thẳng vào đó. */
+  ["ti-inbox",gWait.length,"Chờ tôi xác nhận","#E08A1E",gWait.length?"người nhận đã báo xong":"không có","tkTabSet('given');tkFset('cho')"],
   ["ti-send",gLive.length,"Tôi giao, đang chạy","#0D9488","theo dõi tiến độ","tkTabSet('given');tkFset('live')"]],"giaoviec");}
  /* V9.99u - TAB "VIỆC CHỜ NHẬN" đứng ĐẦU: đây là việc chưa ai đụng vào, người giao đang chờ,
     nên nó gấp hơn cả việc đang làm. Con số trên tab là việc CỦA CHÍNH NGƯỜI ĐANG ĐĂNG NHẬP. */
@@ -17796,11 +17800,14 @@ function renderGiaoviec(){
    ["mine","Việc của tôi",mLive.length||"",mOver.length?"red":""],
    ["given","Tôi đã giao",gLive.length||"",gWait.length?"amber":""],
    ["report","Tổng hợp & báo cáo",null,""]],"tkTabSet('{k}')"),
-  (tab==="report"||tab==="wait")?"":segHTML(f,[["live","Đang chạy",null,""],["all","Tất cả",null,""],["done","Đã xong",null,""]],"tkFset('{k}')"));
+  (tab==="report"||tab==="wait")?"":segHTML(f,[["live","Đang chạy",null,""]]
+   .concat(tab==="given"?[["cho","Chờ tôi xác nhận",gWait.length||"",gWait.length?"amber":""]]:[])
+   .concat([["all","Tất cả",null,""],["done","Đã xong",null,""]]),"tkFset('{k}')"));
  if(tab==="report")return h+tkReport();
  var list=(tab==="wait")?mWait:(tab==="mine")?mine:given;
  if(tab!=="wait"){
   if(f==="live")list=list.filter(tkLive);
+  else if(f==="cho")list=list.filter(function(t){return tkSt(t)==="done"});
   else if(f==="done")list=list.filter(function(t){return tkSt(t)==="confirmed"||tkSt(t)==="done"})}
  /* V9.28: bộ lọc chuyên sâu chồng LÊN TRÊN tab, không thay tab: tab chọn "việc của tôi / tôi đã giao",
     bộ lọc thu hẹp tiếp theo người nhận, hạn, độ ưu tiên... */
