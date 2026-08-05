@@ -60,6 +60,19 @@ for _st in STAFF:
     _kw = LEADER_TUVAN.get(_st.get("staff_id"))
     if _kw:
         _st["role"], _st["branch"] = _kw
+# ═══ V9.99v - NGƯỜI NGHỈ VIỆC, VIỆC BÀN GIAO LẠI CHO AI ═══════════════════════════════════
+# Anh Luân 05/08: *"Bạn Đào kế toán nghỉ rồi, em đẩy hết dữ liệu demo qua trưởng phòng kế toán
+# luôn nghen"*. Bỏ NGAY Ở ĐÂY, trước khi mọi bảng được sinh ra - như vậy không dòng nào trong
+# 4.000 dòng dữ liệu còn trỏ tới người đã nghỉ, khỏi phải đi vá từng bảng sau.
+# Phòng Kế toán demo nay còn ĐÚNG MỘT người, đúng với cửa "Kế toán" duy nhất ở cổng đăng nhập.
+NGHI_VIEC = {"NV010": "NV017"}      # người nghỉ -> người tiếp nhận
+STAFF = [s for s in STAFF if s.get("staff_id") not in NGHI_VIEC]
+# Cơ sở 5 có leader (Thuyên) mà nhân viên tư vấn duy nhất của cơ sở lại đang "đã nghỉ việc",
+# nên ô "Xem việc của" của leader ấy rỗng - một leader không có ai để quản là vô lý trên demo.
+# Mở lại đúng một người; NV025 và NV027 giữ nguyên trạng thái nghỉ để vẫn còn ca "đã nghỉ việc".
+for _s in STAFF:
+    if _s.get("staff_id") == "NV026":
+        _s["status"] = "active (Đang làm việc)"
 COURSES = odl["DL05"]
 CBY = {c["course_id"]: c for c in COURSES}
 def staff_name(sid):
@@ -68,7 +81,11 @@ def staff_name(sid):
     return sid
 SALES = ["NV001","NV002","NV023","NV024","NV025","NV026"]
 SALES_MGR = "NV012"
-ACCOUNTANT = "NV010"   # Phan Thị Hồng Đào - accountant (NV Kế toán). NV011 là IT, không đối soát thu chi.
+# V9.99v - NV010 (Phan Thị Hồng Đào) đã nghỉ, việc bàn giao cho Trưởng phòng Kế toán NV017.
+# Hằng số này cắm cứng mã người nên nếu chỉ xoá người mà quên sửa đây thì mọi dòng
+# `DL07.verified_by` vẫn trỏ tới một mã đã chết - `check_logic.py` bắt được ngay.
+ACCOUNTANT = NGHI_VIEC.get("NV010", "NV010")
+SALES = [x for x in SALES if x not in NGHI_VIEC]
 ACAD = [("NV007","Lê Thị Đức"),("NV008","Nguyễn Thị Hồng Thu")]
 ACAD_IDS=[a[0] for a in ACAD]
 WOWS = [("NV003","Nguyễn Thanh Kiu"),("NV004","Nguyễn Tuấn Phong"),("NV030","Phạm Công Danh")]

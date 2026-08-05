@@ -19548,12 +19548,25 @@ function banTT(){var k=window.BANTT||ttMacDinh();return TTBK[k]?k:"khach"}
      · nhân viên: không có ô này.
    Đang xem người khác thì có dải nhắc rõ ràng và nút quay về - mượn ghế ai cũng phải trả. */
 function banToanQuyen(){try{return SCOPE().pages==="*"}catch(e){return false}}
-function banQuanLy(){try{return !!SCOPE().mgr||banToanQuyen()}catch(e){return false}}
+/* V9.99v - Ô "Xem việc của" là một BỘ LỌC XEM, không phải quyền duyệt. Trước bản này nó chỉ mở
+   cho `mgr` (trưởng phòng trở lên), nên **Trưởng phòng WOW** - một trong bốn cửa trưởng phòng ở
+   cổng đăng nhập - lại không có ô này, vì mã vai của họ là `wow_leader` và từ V9.99q cờ `mgr`
+   cố ý chỉ bật cho `*_manager` (để leader chi nhánh không duyệt được chiết khấu).
+   Hai chuyện khác nhau: DUYỆT thì đúng là của trưởng phòng trở lên; XEM VIỆC CỦA NGƯỜI TRONG
+   ĐỘI MÌNH thì leader cũng phải có - danh sách đã tự thu về đúng đội qua `myTeam()`. */
+function banQuanLy(){try{var rs=SCOPE();return !!rs.mgr||!!rs.leader||banToanQuyen()}catch(e){return false}}
 function banAiDS(){
  var out=[],goc=window.BANGOC!==undefined?window.BANGOC:(window.GATE_SID||"");
  var team=null;if(!banToanQuyen()){try{team=myTeam()}catch(e){team=null}}
  rows("DL01").forEach(function(x){
   if(/inactive|nghỉ/i.test(String(x.status||"")))return;
+  /* V9.99v (anh Luân 05/08, đang đăng nhập bằng Trưởng phòng Kế toán): *"em hiện trưởng phòng
+     làm gì, nó là chính tôi rồi mà"*. Đúng - dòng đầu của ô chọn đã là "Chính tôi", nên tên
+     mình xuất hiện lần thứ hai ở dưới là hai cửa cho cùng một thứ, mà cửa thứ hai còn tạo cảm
+     giác "xem việc của người khác" trong khi người ấy là mình. Biến `goc` đã tính sẵn ở dòng
+     trên từ lâu mà chưa ai dùng tới. */
+  if(goc&&String(x.staff_id)===String(goc))return;
+  if(x.staff_id==="ADMIN")return;
   if(team&&!team[x.staff_id])return;
   out.push(x)});
  return out.sort(function(a,b){return String(a.role||"").localeCompare(String(b.role||""))||
