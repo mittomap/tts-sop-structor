@@ -1803,6 +1803,34 @@ body.drsz .drawer{transition:none}
 .loginbox h2{font-size:20px;font-weight:800}.loginbox p{font-size:13px;color:var(--muted);margin:6px 0 20px}
 .rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}@media(max-width:640px){.rgrid{grid-template-columns:1fr 1fr}}
 .rcard{border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;text-align:center}
+/* ── CỔNG CHỌN VAI TRÒ (V9.99n) ─────────────────────────────────────────────────────────────
+   Khối Quản trị viên đứng riêng và nói rõ nó là vai gì; các vai còn lại là những ô một dòng
+   xếp theo khối, không phải lưới thẻ to. Bấm một vai chỉ có một người là vào thẳng. */
+.gvadm{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--bg2,#F7F8FA);text-align:left}
+.gvadmt{font-size:12.5px;color:var(--navy);display:flex;align-items:center;gap:7px;margin-bottom:10px}
+.gvadmt i{font-size:16px}
+.gvadmb{display:flex;gap:10px;flex-wrap:wrap}
+.gvsep{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin:16px 0 8px}
+.gvkhoi{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);text-align:left;margin:12px 0 6px}
+.gvhang{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:8px}
+.gvo{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
+ background:#fff;cursor:pointer;text-align:left;font-family:inherit;min-height:52px;width:100%}
+.gvo:hover{border-color:var(--navy);background:#F4F7FB}
+.gvo>i:first-child{font-size:17px;color:var(--navy);flex:none}
+.gvot{font-size:12.5px;font-weight:700;color:var(--ink)}
+.gvop{font-size:11px;color:var(--muted);margin-left:auto;text-align:right;line-height:1.35}
+.gvo.khoa{opacity:.5;cursor:not-allowed}
+.gvkl{font-size:13px;color:var(--muted);margin-left:6px}
+.gvhd{font-size:12.5px;font-weight:800;color:var(--navy);display:flex;align-items:center;justify-content:center;gap:6px;margin:8px 0 10px}
+.gvds{display:flex;flex-direction:column;gap:6px;text-align:left}
+.gvrow{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;
+ background:#fff;cursor:pointer;font-family:inherit;width:100%}
+.gvrow:hover{border-color:var(--navy);background:#F4F7FB}
+.gvav{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;font-weight:800;font-size:12.5px;
+ display:inline-flex;align-items:center;justify-content:center;flex:none}
+.gvten{font-size:12.5px;font-weight:700;color:var(--ink)}
+.gvphu{font-size:11px;color:var(--muted);margin-left:auto}
+.gvrow>i{font-size:15px;color:var(--muted);flex:none}
 .rcard:hover{border-color:var(--navy);background:#FAFBFD}
 .rcard .ri{width:46px;height:46px;border-radius:12px;background:var(--blueb);color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 10px}
 .rcard b{font-size:13px;font-weight:700;display:block}.rcard small{font-size:11px;color:var(--muted)}
@@ -4651,6 +4679,35 @@ function bvStrip(t,bc,d,o,tour){
    lặng chứ không báo gì. Nên tra hai nấc: nguyên văn trước, rồi tới bản THAY MỌI SỐ BẰNG "N". */
 function bvMa(t){t=String(t==null?"":t);
  return BVMA[t]||BVMA[t.replace(/\d+/g,"N")]||""}
+/* Danh sách việc của ĐÚNG người đang được lọc - dùng khi quản lý bấm "Xem việc của".
+   Cố ý gọn: mỗi việc một dòng, nhóm việc + câu mô tả + nút mở đúng chỗ làm. Không dựng lại một
+   bảng thống kê thứ hai - màn này trả lời một câu hỏi duy nhất: người này còn nợ những gì. */
+function bvDsHTML(){
+ var L=[];try{L=bellItems()}catch(e){L=[]}
+ var ten="";try{ten=banAiTen()}catch(e){}
+ var do_=L.filter(function(x){return x.sev==="red"}).length;
+ var h='<div class="panel"><div class="ph"><b><i class="ti ti-user-search" style="margin-right:6px"></i>'+
+  'Việc của '+esc(ten)+' ('+L.length+')</b>'+
+  (do_?'<span class="chip red" style="margin-left:8px">'+do_+' quá hạn</span>':'')+
+  '<span class="mut" style="margin-left:auto;font-size:11px">Bạn vẫn đang đăng nhập bằng tài khoản của mình</span>'+
+  '</div><div class="pbody">';
+ if(!L.length)h+='<div class="empty">Người này không còn việc nào đang chờ.</div>';
+ var nhom={},thutu=[];
+ L.forEach(function(x){var g=x.grp||x.cat||"Khác";if(!nhom[g]){nhom[g]=[];thutu.push(g)}nhom[g].push(x)});
+ thutu.sort(function(a,b){return (VIECNHOMBY[a]==null?999:VIECNHOMBY[a])-(VIECNHOMBY[b]==null?999:VIECNHOMBY[b])});
+ thutu.forEach(function(g){
+  var ds=nhom[g];
+  h+='<div class="sechd">'+esc(g)+' <span class="mut" style="font-weight:500">'+ds.length+' việc</span></div>';
+  catXem("bvds_"+g,ds,8).forEach(function(x){
+   h+='<div class="banjob">'+
+    '<span class="banji '+(x.sev==="red"?"do":(x.sev==="amber"?"ho":""))+'"><i class="ti '+(x.ic||"ti-point-filled")+'"></i></span>'+
+    '<div class="banjt">'+esc(x.who||"")+
+     '<div class="mut" style="font-size:11px">'+esc(x.what||"")+'</div></div>'+
+    (x.page?('<button class="btn sm" onclick="go(\''+esc(x.page)+'\')"><i class="ti ti-arrow-right"></i>Mở màn</button>'):'')+
+    '</div>'});
+  h+=xemTiepBtn("bvds_"+g,ds.length,8);
+ });
+ return h+'</div></div>'}
 function bangViecHTML(){
  var rs=SCOPE(),g=rs.group||"quantri";
  /* BVLAND là bản đồ TRANG ĐÁP CỦA V5, cắm cứng. Bản v6 cho mọi chức danh đáp xuống Bàn làm
@@ -4677,6 +4734,10 @@ function bangViecHTML(){
    if(tb&&tb!==L[1])return ""}
  }
  var T=BANGVIEC(),h=_pick;
+ /* Đang lọc theo MỘT NGƯỜI thì dải số của cả BỘ PHẬN không còn đúng chỗ: nó đếm trên toàn
+    phòng, trong khi màn đang trả lời câu hỏi "người này còn việc gì". Hai con số khác nhau đứng
+    cạnh nhau trên cùng một màn là chỗ người ta đọc sai. Lọc thì bỏ dải, giữ danh sách việc. */
+ if(window.BANAI)return h+bvDsHTML();
  var B=T[bvKhoi(g)];
  /* Chỉ mấy bảng CÓ TRONG SOP mới ghi "theo BC… của SOP"; bảng nào tự dựng thì ghi thẳng nó
     trông coi mảng gì, chứ không ghép thành câu "theo tiền & học phí của SOP". */
@@ -4929,7 +4990,7 @@ var VIECNHOM=[
  "Đã thu - chờ xếp lớp","Lớp sắp khai giảng thiếu sĩ số","Onboarding","Gửi thông tin lớp",
  "Hoàn tất onboarding",
  /* P6 · Buổi học, điểm danh, bài tập */
- "Ghi nhận xét buổi","Chấm bài tập","Duyệt xin nghỉ học","Gọi hỏi thăm HV vắng",
+ "Ghi nhận xét buổi","Chấm bài tập","Buổi thiếu mốc giờ vào/ra","Duyệt xin nghỉ học","Gọi hỏi thăm HV vắng",
  /* P6 · Học viên nguy cơ - năm mức của SOP, gấp nhất lên trước */
  "Máy thấy nguy cơ - chưa gắn cờ","Nguy cơ - HỌP 4 BÊN GẤP","Nguy cơ - HỌP 3 BÊN trong 24h",
  "Nguy cơ - HỌP 3 BÊN gấp","Nguy cơ - ĐẶT BUỔI WOW KÈM","Nguy cơ - GỌI trong 24-48h",
@@ -5220,6 +5281,29 @@ function slaItems(){var out=jTasks();
     (c.class_name||s2.class_id||"")+" · buổi "+(s2.session_number||"?"),
     (st.noteOver?"QUÁ HẠN ghi nhận xét - ":"")+"Buổi dạy xong "+Math.round(st.ageH)+"h trước, chưa có nhận xét (hạn "+st.lim+"h)",
     st.ageH,"buoihoc",null,{act:"bhNoteForm",rid:s2.session_id,prm:"slaTeacherNote_hours"})})})();
+ /* V9.99n - VIỆC CỦA NHÂN SỰ CHƯA BAO GIỜ VÀO BẢNG VIỆC. Đo được 04/08: Trưởng phòng Nhân sự
+    mở app ra thấy đúng MỘT việc (một đầu việc nội bộ được giao), trong khi ngay trên màn của
+    họ thẻ đầu trang đang chỉ ra buổi dạy thiếu mốc giờ vào/ra - thứ mà nếu không ai sửa thì
+    bảng công tháng tính sai tiền lương. Việc có thật, có người chịu trách nhiệm, có màn để
+    xử lý, mà chuông không hề reo. Nay nó là một nhóm việc như mọi nhóm khác.
+    Hạn: buổi dạy xong bao lâu mà chưa có mốc giờ thì thành quá hạn - đi qua CH2 như mọi ngưỡng
+    khác, không cắm cứng. */
+ (function(){var limH=paramOf("slaTimesheetGap_hours",72);
+  rows("DL11").forEach(function(s2){
+   if(!isc(s2.session_status,"completed"))return;
+   if(String(s2.class_start_actual||"").trim()&&String(s2.class_end_actual||"").trim())return;
+   var d=pvnd(s2.session_date);if(!d)return;
+   var ageH=(Date.now()-d.getTime())/36e5;if(ageH<0)return;
+   var c=find("DL10","class_id",s2.class_id)||{};
+   var thieu=!String(s2.class_start_actual||"").trim()
+     ?(!String(s2.class_end_actual||"").trim()?"cả giờ vào và giờ ra":"giờ vào")
+     :"giờ ra";
+   add("Giảng viên chuyên môn","Buổi thiếu mốc giờ vào/ra",ageH>limH?"red":"amber","ti-clock-exclamation",
+    (c.class_name||s2.class_id||"")+" · buổi "+(s2.session_number||"?")+
+     (s2.teacher_id_name?(" · "+s2.teacher_id_name):""),
+    (ageH>limH?"QUÁ HẠN - ":"")+"Buổi đã dạy xong "+Math.round(ageH)+"h trước mà còn thiếu "+thieu+
+     " (hạn "+limH+"h). Thiếu mốc thì bảng công tháng tính sai.",
+    ageH,"bangcong",null,{rid:s2.session_id,prm:"slaTimesheetGap_hours"})})})();
  /* HV vắng buổi mà chưa ai hỏi thăm: SOP gọi trong slaAbsenceCall_hours (24h). Ghi chú vào dòng điểm danh = đã xử lý. */
  (function(){var absH=paramOf("slaAbsenceCall_hours",24);
   srows("DL12").forEach(function(a){
@@ -11801,6 +11885,7 @@ var APPPARAMS=[
  ["P4 · Học phí, đợt đóng & công nợ","installmentRemind_days","Nhắc trước hạn đóng đợt bao nhiêu ngày","ngày",3],
  ["P4 · Học phí, đợt đóng & công nợ","installmentLate_days","Quá hạn bao nhiêu ngày thì chuyển thành nợ quá hạn","ngày",3],
  ["P6 · Buổi học, điểm danh & bài tập","slaTeacherNote_hours","Hạn giáo viên ghi nhận xét sau buổi dạy","giờ",24],
+ ["P6 · Buổi học, điểm danh & bài tập","slaTimesheetGap_hours","Hạn điền mốc giờ vào/ra sau buổi dạy (bảng công)","giờ",72],
  ["P6 · Buổi học, điểm danh & bài tập","slaHomeworkGrading_hours","Hạn chấm bài tập cho học viên","giờ",48],
  ["P6 · Buổi học, điểm danh & bài tập","slaAbsenceCall_hours","Học viên vắng thì phải gọi hỏi thăm trong bao lâu","giờ",24],
  ["P5 · Xếp lớp & nhập học","slaPLR48_hours","Hạn phản hồi phụ huynh / học viên khi có việc phát sinh","giờ",48],
@@ -18417,7 +18502,11 @@ var VIECTT=[
     return isc(r.booking_status,"booked")&&!String(r.test_attendance_status||"").trim()&&d&&d<=t0})},
   keo:function(l){return bkDiemDanhTest(l)},
   go:function(l){return "goTS('test')"}},
- {tt:"khach",act:"test_grade",t:"Chấm bài test",ic:"ti-file-check",sev:"red",
+ /* V9.99n `chung:1` - VIỆC CỦA HÀNG ĐỢI, không thuộc về người phụ trách hồ sơ. Bài test do
+     ai chấm cũng được (giáo viên WOW, ACA, học vụ): nó nằm trên hồ sơ của một khách mà tư vấn
+     viên khác đang phụ trách, nên nếu Bàn làm việc chỉ nhận hồ sơ "của tôi" thì người chấm bài
+     mở ra thấy TRỐNG TRƠN - đo được đúng như vậy với giáo viên WOW. */
+ {tt:"khach",act:"test_grade",chung:1,t:"Chấm bài test",ic:"ti-file-check",sev:"red",
   khi:function(l){return ttTestCua(l.lead_id).some(function(r){
     return isc(r.test_attendance_status,"on_time","late")&&!isc(r.test_status,"graded")})},
   keo:function(l){return bkChamTest(l)},
@@ -18631,6 +18720,40 @@ function ttGiaiDoan(ttk,r){
 function ttTen(ttk,r){var T=TTBK[ttk];return String((T&&r[T.ten])||"")||"(chưa đặt tên)"}
 function ttMa(ttk,r){var T=TTBK[ttk];return String((T&&r[T.ma])||"")}
 /* Danh sách thực thể TRONG PHẠM VI CỦA TÔI, xếp việc nhiều lên trước. */
+/* Ai đang phụ trách hồ sơ này. Rỗng nghĩa là chưa ai nhận - đó là việc chung, ai rảnh thì làm.
+   Phụ huynh không có người phụ trách riêng: họ đi theo con, nên lấy người phụ trách của con. */
+function ttChuHoSo(ttk,r){
+ try{
+  if(ttk==="lop")return String(r.main_teacher_id||"");
+  if(ttk==="phuhuynh"){var con=phCon(r);
+   for(var i=0;i<con.length;i++){var o=ttChuHoSo("hocvien",con[i]);if(o)return o}
+   return ""}
+  var pid=(ttk==="khach")?r.lead_id:r.student_id;
+  var J=jInfo(pid);
+  return String((J&&J.C&&J.C.owner)||"");
+ }catch(e){return ""}}
+/* AI ĐANG DÍNH TỚI HỒ SƠ NÀY - không chỉ người phụ trách chính.
+   Chỉ hỏi "chủ hồ sơ" là hụt đúng những nghề làm việc TRÊN hồ sơ của người khác: giáo viên WOW
+   kèm 1-1 cho học viên do tư vấn viên phụ trách, giáo viên đứng lớp dạy học viên do người khác
+   tuyển. Đo được ngay sau khi siết: WOW mở Bàn làm việc ra TRỐNG TRƠN ở mọi thực thể.
+   Nên danh sách này gồm: người phụ trách hồ sơ · coach của các buổi WOW · giáo viên của các
+   buổi dạy. Rỗng nghĩa là chưa ai dính - việc chung, ai rảnh thì nhận. */
+function ttNguoiLienQuan(ttk,r){
+ var out=[];
+ function them(x){x=String(x||"").trim();if(x&&out.indexOf(x)<0)out.push(x)}
+ try{
+  them(ttChuHoSo(ttk,r));
+  if(ttk==="lop"){
+   rows("DL11").forEach(function(s2){if(String(s2.class_id||"")===String(r.class_id))them(s2.teacher_id)});
+  }else if(ttk==="hocvien"){
+   rows("DL14").forEach(function(w){if(String(w.student_id||"")===String(r.student_id))them(w.staff_id)});
+   var lop={};rows("DL08").forEach(function(o){if(String(o.student_id||"")===String(r.student_id)&&o.class_id)lop[o.class_id]=1});
+   rows("DL11").forEach(function(s2){if(lop[s2.class_id])them(s2.teacher_id)});
+  }else if(ttk==="phuhuynh"){
+   phCon(r).forEach(function(c){ttNguoiLienQuan("hocvien",c).forEach(them)});
+  }
+ }catch(e){}
+ return out}
 function ttDanhSach(ttk){
  var T=TTBK[ttk];if(!T)return [];
  /* V9.69 - PHẠM VI KHÔNG PHẢI LÀ ĐIỀU KIỆN DUY NHẤT ĐỂ HỒ SƠ LÊN BÀN.
@@ -18649,7 +18772,23 @@ function ttDanhSach(ttk){
    trong=T.nguon?phCon(r).some(function(c){return canRow("DL09",c)}):canRow(T.bang,r);
   }catch(e){trong=true}
   if(trong)return true;
-  return ttViec(ttk,r).length>0});
+  /* V9.99n - VẾ THỨ HAI PHẢI LÀ "VIỆC CỦA TÔI", KHÔNG PHẢI "VIỆC CỦA CHỨC DANH TÔI".
+     `ttDuocLam` chỉ hỏi chức danh, nên vế "tôi có việc với hồ sơ này" hoá ra đúng với MỌI hồ sơ
+     của trung tâm mà chức danh tôi có phần. Đo được 04/08: cả bốn nhân viên tư vấn cùng hiện
+     165 việc dù phạm vi của họ là 26-31 học viên khác nhau; cả mười giáo viên cùng hiện 58.
+     Một con số giống hệt nhau cho những người có phạm vi khác hẳn nhau là một con số nói dối,
+     và nó kéo luôn hồ sơ của đồng nghiệp lên bàn của mình.
+     Nay hồ sơ NGOÀI phạm vi chỉ lên bàn khi việc đó CHƯA CÓ AI phụ trách, hoặc người phụ trách
+     chính là tôi. Vẫn giữ nguyên ý đã chốt ở V9.69 - "việc tìm tới người, không phải người đi
+     tìm việc": việc vô chủ vẫn nổi lên cho ai rảnh nhận (đo lại: NV tư vấn 34 -> 54, giáo viên
+     3 -> 18, tức phần việc chờ người nhận không hề mất). */
+  var vc=ttViec(ttk,r);
+  if(!vc.length)return false;
+  /* Việc hàng đợi (`chung:1`) thì hồ sơ lên bàn của mọi người được phép làm - đó chính là ý
+     "việc tìm tới người". Việc còn lại chỉ lên bàn của người đang dính tới hồ sơ. */
+  if(vc.some(function(v){return v.chung}))return true;
+  var lq=ttNguoiLienQuan(ttk,r);
+  return !lq.length||lq.indexOf(CURSTAFF)>=0});
  return ds.map(function(r){var tat=ttViecAll(ttk,r);
    var v=tat.filter(function(x){return x.minh}).map(function(x){return x.v});
    return {r:r,ma:ttMa(ttk,r),ten:ttTen(ttk,r),gd:ttGiaiDoan(ttk,r),viec:v,
@@ -19060,23 +19199,35 @@ function banAiDS(){
   out.push(x)});
  return out.sort(function(a,b){return String(a.role||"").localeCompare(String(b.role||""))||
    String(a.full_name||"").localeCompare(String(b.full_name||""))})}
-/* Mượn ghế một người. Nhớ ghế gốc để còn trả lại. */
+/* XEM VIỆC CỦA MỘT NGƯỜI - LÀ MỘT BỘ LỌC, KHÔNG PHẢI ĐỔI NGƯỜI ĐĂNG NHẬP (V9.99n).
+   Anh Luân 04/08: *"Giám đốc, a thấy có phần: xem việc của người khác, tự nhiên bấm vào cái nó
+   nhảy luôn qua cổng của nhân viên đó đấy em, chứ ko phải chỉ hiện thị việc của người đó ở cái
+   trang mà giám đốc vừa chọn xem việc."*
+   Đúng, và bản cũ làm đúng như anh mô tả: `applyScope(sid)` + `buildNav()` - tức là dựng lại
+   phạm vi, menu, bộ quyền theo người kia. Giám đốc bấm một ô lọc mà bị đưa hẳn sang cổng của
+   nhân viên: menu đổi, trang đang đứng biến mất, quyền tụt xuống. Đó là ĐỔI VAI, không phải XEM.
+   Nay chỉ đặt một cờ lọc: giám đốc vẫn là giám đốc, vẫn đứng nguyên trang, danh sách việc bên
+   dưới lọc lại còn việc của người được chọn. Bấm "Về việc của tôi" là bỏ lọc. */
 function banXem(sid){
- if(window.BANGOC===undefined)window.BANGOC=window.GATE_SID||"";
  window.BANAI=sid||"";window.BANMO="";
- try{dsReset()}catch(e){}
- applyScope(sid||"");
- try{phQuen()}catch(e){}
- try{buildNav()}catch(e){}
  reRender(CUR||"ban")}
 function banVeMinh(){
- var goc=window.BANGOC!==undefined?window.BANGOC:"";
  window.BANAI="";window.BANMO="";window.BANGOC=undefined;
- try{dsReset()}catch(e){}
- applyScope(goc);
- try{phQuen()}catch(e){}
- try{buildNav()}catch(e){}
  reRender(CUR||"ban")}
+/* Một việc có thuộc về người đang được lọc không. Dùng chung một định nghĩa "ai dính tới hồ sơ"
+   với Bàn làm việc - hai chỗ cùng trả lời một câu hỏi thì phải cùng một câu trả lời. */
+function bvCuaAi(x,sid){
+ if(!sid)return true;
+ try{
+  if(x.jpid){var J=jInfo(x.jpid);
+   if(J&&J.C&&String(J.C.owner||"")===sid)return true}
+  var r=null;
+  if(x.hoso){r=find("DL09","student_id",x.hoso)||find("DL02","lead_id",x.hoso)}
+  if(!r&&x.lead){r=find("DL02","lead_id",x.lead)}
+  if(r){var k=r.student_id?"hocvien":"khach";
+   if(ttNguoiLienQuan(k,r).indexOf(sid)>=0)return true}
+ }catch(e){}
+ return false}
 /* Tên để in lên nhãn "việc của ..." - đang mượn ghế ai thì gọi tên người đó, không thì gọi tên
    BỘ PHẬN chứ không phải "tôi". Anh Luân: *"sao em ko để kiểu: việc của học vụ, việc của giảng
    viên... Để vậy sẽ dễ làm đấy em"* - và anh đúng: "của tôi" bắt người đọc tự dịch xem "tôi" là
@@ -19369,8 +19520,12 @@ function navBody(open){try{document.body.classList.toggle("navon",!!open)}catch(
 function toggleNav(){var s=document.getElementById("sidebar"),m=document.getElementById("navmask");if(!s)return;var open=s.classList.toggle("open");if(m)m.classList.toggle("on",open);navBody(open)}
 function closeNav(){var s=document.getElementById("sidebar"),m=document.getElementById("navmask");if(s)s.classList.remove("open");if(m)m.classList.remove("on");navBody(false)}
 function bellItems(){var rs=SCOPE();var items=slaItems();
- if(rs.bell==="*")return items;
- return items.filter(function(x){return rs.bell.indexOf(x.cat)>=0})}
+ if(rs.bell!=="*")items=items.filter(function(x){return rs.bell.indexOf(x.cat)>=0});
+ /* Đang lọc theo một người (quản lý bấm "Xem việc của") thì mọi bề mặt việc cùng lọc theo -
+    chuông, Việc hôm nay và bảng việc phải nói cùng một con số. */
+ var ai=window.BANAI||"";
+ if(ai)items=items.filter(function(x){return bvCuaAi(x,ai)});
+ return items}
 function updateBellBadge(){var b=document.getElementById("bellN");if(!b)return;
  var rs=SCOPE();var btn=b.parentNode;
  if(Array.isArray(rs.bell)&&!rs.bell.length){b.style.display="none";if(btn&&btn.style)btn.style.display="none";return}
@@ -19380,7 +19535,15 @@ function renderBell(){var items=bellItems();var groups={},order=[];
  items.forEach(function(it){if(!groups[it.grp]){groups[it.grp]={cat:it.cat,n:0,red:0};order.push(it.grp)}groups[it.grp].n++;if(it.sev==="red")groups[it.grp].red++});
  var h='<div class="nhd"><b>Thông báo công việc</b><span class="nc">'+items.length+' việc · '+items.filter(function(x){return x.sev==="red"}).length+' quá hạn</span></div>';
  if(!order.length)return h+'<div class="nempty"><i class="ti ti-circle-check" style="font-size:26px;color:var(--green)"></i><div style="margin-top:6px">Không có việc nào - tuyệt vời!</div></div>';
- ["Tuyển sinh","Học vụ","Tài chính","CSKH"].forEach(function(t){var gs=order.filter(function(g){return groups[g].cat===t});if(!gs.length)return;gs.sort(function(a,b){return groups[b].red-groups[a].red});var col=grpColor(t);
+ /* V9.99n - CHUONG TUNG CHI VE BON DOI. Danh sach nay go tay, nen nhom viec nao co ma doi
+    ngoai bon cai ay (Giao viec, WOW, Giang vien chuyen mon, va nay la Nhan su) thi DEM vao so
+    tren chuong ma KHONG hien dong nao khi mo chuong ra - nguoi ta thay "5 viec" roi bam vao,
+    khong thay gi. Nay ve theo dung nhung doi DANG CO viec, thu tu bon doi cu giu nguyen. */
+ var doiCu=["Tuyển sinh","Học vụ","Tài chính","CSKH"];
+ var doiCo=[];order.forEach(function(g){var t=groups[g].cat;if(doiCo.indexOf(t)<0)doiCo.push(t)});
+ doiCu.filter(function(t){return doiCo.indexOf(t)>=0})
+  .concat(doiCo.filter(function(t){return doiCu.indexOf(t)<0}))
+  .forEach(function(t){var gs=order.filter(function(g){return groups[g].cat===t});if(!gs.length)return;gs.sort(function(a,b){return groups[b].red-groups[a].red});var col=grpColor(t);
   h+='<div class="nsec" style="color:'+col+'"><i class="ti '+(TEAMICON[t]||"ti-users")+'"></i> '+esc(t)+'</div>';
   gs.forEach(function(g){var gg=groups[g];h+='<div class="nrow" onclick="bellGo(\''+t+'\',\''+esc(g).replace(/'/g,"")+'\')"><div class="nic" style="background:'+col+'18;color:'+col+'"><i class="ti '+(GRPICON[g]||"ti-point-filled")+'"></i></div><div class="ntx"><div class="ntt">'+esc(g)+'</div><div class="nts">'+gg.n+' việc'+(gg.red?' · '+gg.red+' quá hạn':'')+'</div></div>'+(gg.red?'<span class="chip red">'+gg.red+'</span>':'<span class="chip green">'+gg.n+'</span>')+'</div>'});
  });
@@ -20842,55 +21005,89 @@ function gateRoleIcon(r){
  if(/Marketing/i.test(r))return "ti-broadcast";
  if(/CSKH|Chăm sóc/i.test(r))return "ti-headset";
  return "ti-users"}
+/* ═══ CỔNG CHỌN VAI TRÒ - dựng lại 04/08 theo đúng danh sách anh Luân đưa ══════════════════
+   *"Chọn Admin · Chọn Giám Đốc · Chọn trưởng phòng nào thì vào thẳng luôn, vì trưởng phòng chỉ
+   có 1 người · Chọn nhân viên phòng A, rồi hiện list chọn, chứ hiện tại em đang cho nó thành
+   từng block dài dòng lắm"* - kèm *"Kế toán chỉ còn 1 cổng"*, *"Bỏ nhân sự"*, và *"phải thể
+   hiện rõ, chỗ này là vai trò admin nhé"*.
+   Bản cũ gom người theo NHÃN chức danh rồi đổ ra một lưới thẻ to bằng nhau - 10 nhóm, mỗi nhóm
+   một thẻ, bấm vào lại ra một lưới thẻ to nữa. Hai tầng thẻ to cho một việc đáng ra chỉ là
+   chọn tên. Nay: một người thì VÀO THẲNG, nhiều người thì mới bày danh sách tên gọn một dòng.
+   Bảng dưới đây là NƠI DUY NHẤT khai cổng nào có mặt - thêm/bớt một cửa là sửa đúng ở đây. */
+var GATEVAI=[
+ {k:"gd",   khoi:"Ban điều hành", t:"Giám đốc",            ic:"ti-shield-check", vai:/^ceo$/},
+ {k:"tpaca",khoi:"Trưởng phòng",  t:"Trưởng phòng ACA",    ic:"ti-award",        vai:/^aca_manager$/},
+ {k:"tphv", khoi:"Trưởng phòng",  t:"Trưởng phòng Học vụ", ic:"ti-school",       vai:/^academic_manager$/},
+ {k:"tptv", khoi:"Trưởng phòng",  t:"Trưởng phòng Tư vấn", ic:"ti-phone",        vai:/^sales_manager$/},
+ {k:"tpwow",khoi:"Trưởng phòng",  t:"Trưởng phòng WOW",    ic:"ti-star",         vai:/^wow_leader$/},
+ {k:"nvhv", khoi:"Nhân viên",     t:"Học vụ",              ic:"ti-school",       vai:/^academic_staff$/},
+ {k:"nvtv", khoi:"Nhân viên",     t:"Tư vấn",              ic:"ti-phone",        vai:/^sales_(staff|leader)$/},
+ {k:"nvgv", khoi:"Nhân viên",     t:"Giáo viên đứng lớp",  ic:"ti-chalkboard",   vai:/^teacher$/},
+ {k:"nvwow",khoi:"Nhân viên",     t:"Giáo viên WOW 1-1",   ic:"ti-star",         vai:/^wow_coach$/},
+ /* Kế toán CHỈ MỘT CỬA (anh Luân chốt): trung tâm có hai người kế toán nhưng người xem demo
+    không cần chọn ai - vào bằng trưởng bộ phận là thấy trọn màn của khối tiền. */
+ {k:"kt",   khoi:"Bộ phận khác",  t:"Kế toán",             ic:"ti-cash",         vai:/^accounting_manager$/, mot:1},
+ /* Marketing anh Luân KHÔNG nhắc tới trong danh sách giữ lại, mà cũng không bảo bỏ. Giữ MỘT
+    cửa (như kế toán) thay vì tự ý gỡ một phòng ban đang có màn và có việc thật - gỡ là mất,
+    giữ thì lúc nào bảo bỏ cũng bỏ được. */
+ {k:"mkt",  khoi:"Bộ phận khác",  t:"Marketing",           ic:"ti-broadcast",    vai:/^marketing_manager$/, mot:1}];
+/* NHÂN SỰ ĐÃ GỠ KHỎI CỔNG (anh Luân 04/08: *"Bỏ nhân sự"*). Hai người HR vẫn còn trong sổ nhân
+   sự và trong dữ liệu - chỉ là không còn cửa đăng nhập ở màn này. Phạm vi dữ liệu của nhóm
+   `nhansu` vẫn giữ nguyên trong mã: mai kia mở lại chỉ là thêm một dòng vào GATEVAI. */
+function gateNguoi(v){
+ return rows("DL01").filter(function(x){
+  return x.staff_id!=="ADMIN" && staffActive(x) && v.vai.test(ecode(x.role)||"")})
+  .sort(function(a,b){return String(a.full_name||"").localeCompare(String(b.full_name||""))})}
 function demoGate(){var el=document.getElementById("login");if(!el)return;
- var act=rows("DL01").filter(function(x){return !/inactive|nghỉ/i.test(String(x.status||""))});
- var byRole={};act.forEach(function(x){var r=gateRole(x);(byRole[r]=byRole[r]||[]).push(x)});
- var ORDER=["Giám đốc","Trưởng phòng Tư vấn","Sale Leader","NV Tư vấn","Trưởng phòng Học vụ","NV Học vụ","Giáo viên","WOW","Kế toán","Marketing"];
- function ordK(r){for(var i=0;i<ORDER.length;i++)if(r.indexOf(ORDER[i])>=0)return i;return 99}
- var roles=Object.keys(byRole).sort(function(a,b){return ordK(a)-ordK(b)||a.localeCompare(b)});
- var pick=window.__gateRole&&byRole[window.__gateRole]?window.__gateRole:"";
+ var khoaVai=gateKhoaVai();
+ var mo=window.__gateRole||"";           /* mã cửa đang mở danh sách tên */
+ var vMo=null;GATEVAI.forEach(function(v){if(v.k===mo)vMo=v});
  var h='<div class="loginbox" style="max-width:720px;max-height:88vh;overflow:auto;text-align:center">';
  h+='<h2>IELTS The Tutors · Cổng làm việc</h2>';
- if(!pick){
-  /* V9.62 (anh Luân 31/07): *"cổng nhân viên, tạm thời em làm mờ ko cho bấm mấy chỗ khác, để
-     mặc định vào admin nhé."* Các chức danh vẫn HIỆN RA - để người xem biết app có phân vai và
-     mỗi vai một màn - nhưng mờ đi và không bấm được. Nói rõ vì sao ngay tại đó, chứ mờ mà im
-     lặng thì người ta tưởng app hỏng. Mở lại bằng một công tắc trong Cài đặt → Phân quyền. */
-  var khoaVai=gateKhoaVai();
-  h+='<p>'+(khoaVai
-    ?'Bản demo đang mở sẵn ở <b>tài khoản Quản trị viên</b> để xem được toàn bộ chức năng. Các chức danh bên dưới cho biết app phân vai thế nào - tạm khoá trong buổi demo này.'
-    :'Chọn CHỨC DANH rồi chọn tên bạn. Mỗi cửa sổ một người - các cổng dùng chung một nguồn dữ liệu, thao tác bên này bên kia thấy ngay.')+'</p>';
-  /* V9.62c (anh Luân: *"nếu vậy, lúc chọn cổng nhân viên, chỉ cần cho người ta chọn chế độ trải
-     nghiệm, hoặc chọn chế độ quản trị thật được mà ta, cần gì rắc rối như hiện tại nhỉ"*). Đúng.
-     Trước đó em hỏi chế độ ở CỬA VÀO CÀI ĐẶT - tức người ta phải quyết hai lần, ở hai chỗ, cho
-     cùng một chuyện. Nay hỏi ĐÚNG MỘT LẦN, đúng lúc bước vào app. */
-  h+='<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:2px 0 10px">'+
-   '<button class="btn primary" onclick="gateEnter(\'\',\'xem\')"><i class="ti ti-eye"></i>Vào xem thử</button>'+
-   '<button class="btn" onclick="gateHoiPass()"><i class="ti ti-lock"></i>Vào quản trị thật</button></div>';
-  h+='<div class="fhint" style="line-height:1.8;margin-bottom:14px">'+
-   '<b>Xem thử</b> - dùng được mọi chức năng, ghi chép trong buổi demo vẫn chạy bình thường; riêng <b>Cài đặt thì không lưu lại</b> và không dựng lại được dữ liệu demo.<br>'+
-   '<b>Quản trị thật</b> - sửa cấu hình và dựng lại dữ liệu demo được, cần mật khẩu quản trị.</div>';
-  h+='<div class="rgrid" style="grid-template-columns:repeat(auto-fill,minmax(190px,1fr))">';
-  roles.forEach(function(r){
-   var mo=esc(r).replace(/'/g,"\\'");
-   h+=khoaVai
-    ?('<div class="rcard khoa" data-tip="Tạm khoá trong buổi demo - mở lại ở Cài đặt → Phân quyền &amp; Phạm vi">'+
-      '<div class="ri"><i class="ti '+gateRoleIcon(r)+'"></i></div>'+
-      '<b>'+esc(r)+'</b><small>'+byRole[r].length+' người</small>'+
-      '<i class="ti ti-lock gklock"></i></div>')
-    :('<div class="rcard" onclick="window.__gateRole=\''+mo+'\';demoGate()">'+
-      '<div class="ri"><i class="ti '+gateRoleIcon(r)+'"></i></div>'+
-      '<b>'+esc(r)+'</b><small>'+byRole[r].length+' người</small></div>')});
+ if(vMo&&!khoaVai){
+  /* BƯỚC 2 - chọn tên trong phòng. Danh sách MỘT DÒNG MỘT NGƯỜI, không phải lưới thẻ to. */
+  var ds=gateNguoi(vMo);
+  h+='<p style="margin-bottom:8px"><button class="pill" onclick="window.__gateRole=\'\';demoGate()"><i class="ti ti-arrow-left"></i>Chọn vai trò khác</button></p>';
+  h+='<div class="gvhd"><i class="ti '+vMo.ic+'"></i>'+esc(vMo.t)+' · '+ds.length+' người</div>';
+  h+='<div class="gvds">';
+  ds.forEach(function(x){
+   h+='<button class="gvrow" onclick="gateEnter(\''+esc(x.staff_id)+'\')">'+
+    '<span class="gvav">'+esc(gateAv(x.full_name))+'</span>'+
+    '<span class="gvten">'+esc(x.full_name)+'</span>'+
+    '<span class="gvphu">'+esc(x.branch?String(x.branch).replace(/^[a-z_0-9]+\s*\(|\)$/g,""):"toàn trung tâm")+'</span>'+
+    '<i class="ti ti-chevron-right"></i></button>'});
   h+='</div>';
  }else{
-  h+='<p style="margin-bottom:6px"><button class="pill" onclick="window.__gateRole=\'\';demoGate()"><i class="ti ti-arrow-left"></i>Chọn chức danh khác</button></p>';
-  h+='<div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--navy);margin:6px 0 10px"><i class="ti '+gateRoleIcon(pick)+'" style="margin-right:5px"></i>'+esc(pick)+'</div>';
-  h+='<div class="rgrid" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr))">';
-  byRole[pick].forEach(function(x){
-   h+='<div class="rcard" style="padding:12px" onclick="gateEnter(\''+esc(x.staff_id)+'\')">'+
-    '<div class="ri" style="width:38px;height:38px;font-size:16px;font-weight:800">'+esc(gateAv(x.full_name))+'</div>'+
-    '<b style="font-size:12.5px">'+esc(x.full_name)+'</b><small>'+esc(x.staff_id)+'</small></div>'});
-  h+='</div>';
+  /* BƯỚC 1 - QUẢN TRỊ VIÊN trước, rồi tới các vai. Khối admin phải nói rõ nó LÀ vai quản trị. */
+  h+='<div class="gvadm">'+
+   '<div class="gvadmt"><i class="ti ti-shield-lock"></i>Vai trò <b>Quản trị viên</b> - toàn quyền, thấy mọi phòng ban</div>'+
+   '<div class="gvadmb">'+
+    '<button class="btn primary" onclick="gateEnter(\'\',\'xem\')"><i class="ti ti-eye"></i>Quản trị viên · xem thử</button>'+
+    '<button class="btn" onclick="gateHoiPass()"><i class="ti ti-lock"></i>Quản trị viên · quản trị thật</button></div>'+
+   '<div class="fhint" style="margin:8px 0 0;line-height:1.75">'+
+    '<b>Xem thử</b> - dùng được mọi chức năng, ghi chép vẫn chạy; riêng <b>Cài đặt không lưu lại</b> và không dựng lại được dữ liệu demo.<br>'+
+    '<b>Quản trị thật</b> - sửa cấu hình và dựng lại dữ liệu demo được, cần mật khẩu quản trị.</div></div>';
+  if(khoaVai){
+   h+='<div class="fhint" style="margin:14px 0 6px">Các vai bên dưới cho biết app phân quyền thế nào - <b>tạm khoá</b> trong buổi demo này. Mở lại ở Cài đặt → Phân quyền &amp; Phạm vi.</div>';
+  }else{
+   h+='<div class="gvsep">hoặc vào bằng một vai cụ thể - mỗi vai một màn hình khác nhau</div>';
+  }
+  var khoiDa={};
+  GATEVAI.forEach(function(v){
+   var ds=gateNguoi(v);if(!ds.length)return;
+   if(!khoiDa[v.khoi]){khoiDa[v.khoi]=1;h+='<div class="gvkhoi">'+esc(v.khoi)+'</div><div class="gvhang">'}
+   var mot=(ds.length===1||v.mot);
+   var lenh=khoaVai?"":(mot?("gateEnter('"+esc(ds[0].staff_id)+"')")
+                           :("window.__gateRole='"+v.k+"';demoGate()"));
+   h+='<button class="gvo'+(khoaVai?" khoa":"")+'"'+(khoaVai?' disabled':'')+' onclick="'+lenh+'">'+
+    '<i class="ti '+v.ic+'"></i>'+
+    '<span class="gvot">'+esc(v.t)+'</span>'+
+    '<span class="gvop">'+(mot?esc(ds[0].full_name):(ds.length+" người - chọn tên"))+'</span>'+
+    (khoaVai?'<i class="ti ti-lock gvkl"></i>':'')+'</button>';
+   /* đóng hàng khi khối sau khác khối này */
+   var i=GATEVAI.indexOf(v),sau=GATEVAI[i+1];
+   if(!sau||sau.khoi!==v.khoi)h+='</div>';
+  });
  }
  h+='<div style="margin-top:18px;border-top:1px solid var(--line);padding-top:14px">'+
   '<div style="font-size:11.5px;color:var(--muted)">Mở thêm phía học viên: file <b>ITTs_TrangHocVien_demo.html</b> cùng thư mục.</div>'+

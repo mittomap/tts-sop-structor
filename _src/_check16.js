@@ -1132,20 +1132,28 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
   DATA.config.gateKhoaVai=0;
   demoGate();
   var gtMo=(document.getElementById("login").innerHTML)||"";
-  t("nac MO: the chuc danh bam duoc ("+((gtMo.match(/<div class="rcard" onclick/g)||[]).length)+" the)",
-    (gtMo.match(/<div class="rcard" onclick/g)||[]).length>0);
-  t("nac MO: khong the nao bi lam mo", (gtMo.match(/class="rcard khoa"/g)||[]).length===0);
+  /* V9.99n - cong chon vai dung lai: o vai la `.gvo` chu khong con la the `.rcard`, va vai nao
+     chi co MOT nguoi thi bam la vao thang (`gateEnter('NVxxx')`) chu khong qua buoc chon ten. */
+  var oMo=(gtMo.match(/class="gvo"/g)||[]).length;
+  t("nac MO: o chon vai bam duoc ("+oMo+" o)", oMo>0);
+  t("nac MO: khong o nao bi lam mo", (gtMo.match(/class="gvo khoa"/g)||[]).length===0);
+  t("nac MO: vai mot nguoi thi vao thang, vai nhieu nguoi thi mo danh sach ten",
+    /gateEnter\('NV/.test(gtMo)&&/__gateRole='/.test(gtMo));
   t("nac MO: van con loi vao xem thu va loi vao quan tri that",
     /gateEnter\('','xem'\)/.test(gtMo)&&/gateHoiPass\(\)/.test(gtMo));
+  t("nac MO: noi ro hai nut dau la VAI TRO QUAN TRI VIEN",
+    /Vai trò <b>Quản trị viên<\/b>/.test(gtMo)&&/Quản trị viên · xem thử/.test(gtMo));
+  /* Anh Luan 04/08: *"Bo nhan su"* - cong khong duoc con cua nao cho nhom hr_. */
+  t("cong KHONG con cua Nhan su", gtMo.indexOf("Nhân sự")<0&&!/gateEnter\('NV016'\)/.test(gtMo)&&!/gateEnter\('NV050'\)/.test(gtMo));
   DATA.config.gateKhoaVai=1;
   demoGate();
   var gt=(document.getElementById("login").innerHTML)||"";
-  var soKhoa=(gt.match(/class="rcard khoa"/g)||[]).length;
-  var soBam=(gt.match(/<div class="rcard" onclick/g)||[]).length;
-  t("nac KHOA: the chuc danh deu bi lam mo ("+soKhoa+" the)", soKhoa>0);
-  t("nac KHOA: khong the chuc danh nao con bam duoc ("+soBam+")", soBam===0);
-  t("nac KHOA: van con cua vao Quan tri vien", /gateEnter\(''\)/.test(gt)||gt.indexOf("Quản trị viên")>=0);
-  t("nac KHOA: noi ro vi sao va mo lai o dau", /Tạm khoá trong buổi demo/.test(gt));
+  var soKhoa=(gt.match(/class="gvo khoa"/g)||[]).length;
+  var soBam=(gt.match(/class="gvo"/g)||[]).length;
+  t("nac KHOA: o chon vai deu bi lam mo ("+soKhoa+" o)", soKhoa>0);
+  t("nac KHOA: khong o vai nao con bam duoc ("+soBam+")", soBam===0);
+  t("nac KHOA: van con cua vao Quan tri vien", /gateEnter\(''/.test(gt)||gt.indexOf("Quản trị viên")>=0);
+  t("nac KHOA: noi ro vi sao va mo lai o dau", /tạm khoá/i.test(gt)&&/Phân quyền/.test(gt));
   t("cong tac doi duoc ca hai chieu", (function(){var a=gateKhoaVai();gateKhoaToggle();
     var b=gateKhoaVai();gateKhoaToggle();return a!==b&&gateKhoaVai()===a})());
   t("cong tac mo lai nam trong cau hinh, khong cam cung", /c\.gateKhoaVai=/.test(String(gateKhoaToggle)));
