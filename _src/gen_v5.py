@@ -20405,10 +20405,12 @@ function asstPaint(){
  try{L=workAll();do_=L.filter(function(x){return x.sev==="red"}).length}catch(e){}
  var chay=(TOUR.on&&TOUR.min);
  f.className="asstfab"+(do_?" hot":"")+(chay?" run":"");
+ /* V9.99z3 - nút nổi không còn đếm việc: Trợ lý nay chỉ để HỎI, mà một con số việc trên nút
+    thì hứa một thứ tấm bên trong không làm nữa. Việc vẫn đếm ở chuông trên thanh trên. */
  f.innerHTML=(chay?'<i class="ti ti-checklist"></i><b>'+tourWorkLeft()+'</b> <span>đang dọn</span>'
-  :'<i class="ti ti-bulb"></i><b>'+L.length+'</b> <span>việc</span>'+(do_?'<em>'+do_+' quá hạn</em>':''));
+  :'<i class="ti ti-bulb"></i><span>Hỏi Trợ lý</span>');
  f.setAttribute("data-tip",chay?"Đang dọn việc dở - bấm để mở lại đúng chỗ đang làm"
-  :(L.length?("Trợ lý - hỏi bất cứ gì, hoặc dọn "+L.length+" việc đang chờ"):"Trợ lý - hỏi bất cứ gì, hàng chờ của bạn đã sạch"));
+  :"Trợ lý - hỏi về một học viên, một lớp, hoặc chỗ cấu hình");
  if(!a.classList.contains("on"))return;
  a.innerHTML=asstHTML()}
 /* Dựng chuỗi tách khỏi chỗ gắn vào màn hình: bộ kiểm đọc được nội dung thật mà không cần DOM,
@@ -20450,65 +20452,41 @@ function qaTheNguoi(x){
   (nv?(r.branch?' · '+esc(elabel(r.branch)||String(r.branch)):'')
      :(lop?' · '+esc(lop):(hv?' · chưa xếp lớp':'')))+
   (sdt?' · '+esc(sdt):' · chưa có SĐT')+'</div></div>'}
+/* ═══ V9.99z3 - TRỢ LÝ CHỈ ĐỂ HỎI ═════════════════════════════════════════════════════════
+   Anh Luân 05/08: *"trợ lý, em bỏ xử lý task đi, dùng để hỏi thôi, để cả xử lý task thừa quá"*.
+   Đúng là thừa: việc đã có ĐỦ CHỖ ĐỨNG rồi - chuông trên thanh trên, trang Việc hôm nay, bảng
+   việc của từng chức danh, và trang Quản lý việc giao & nhận. Tấm này ôm thêm "Việc kế tiếp",
+   nút "Để sau", ba chip nhịp ngày và nút "Dọn từng bước" là cửa thứ NĂM cho cùng một việc -
+   trái đúng luật "một việc một cửa" của dự án.
+   Nay tấm này làm đúng một việc: TRẢ LỜI CÂU HỎI (về một người, hoặc về chỗ cấu hình), cộng lối
+   mở các bài hướng dẫn. Bài "dọn việc từng bước" không mất - nó vẫn nằm trong menu Hướng dẫn. */
 function asstHTML(){
- var L=[],do_=0;
- try{L=workAll();do_=L.filter(function(x){return x.sev==="red"}).length}catch(e){}
- /* Gọi TÊN người ta, không gọi chức danh. "Chào buổi sáng, Quản trị viên · toàn quyền" nghe như
-    máy đọc bảng phân quyền chứ không phải trợ thủ chào người. */
  var me="";
  try{var st=CURSTAFF&&find("DL01","staff_id",CURSTAFF);
-  if(st&&st.full_name)me=String(st.full_name).trim().split(/\s+/).slice(-1)[0];
-  else if(CURSTAFF==="ADMIN"||!CURSTAFF)me=""}catch(e){}
- var x=asstNext(),p=PBK[CUR]||{};
+  if(st&&st.full_name)me=String(st.full_name).trim().split(/\s+/).slice(-1)[0]}catch(e){}
+ var p=PBK[CUR]||{};
  var h='<div class="asstH"><div><b>'+esc(asstChao()+(me?(", "+me):""))+'</b>'+
-  '<span>'+(L.length?(L.length+' việc'+(do_?(' · <i>'+do_+' quá hạn</i>'):' · còn trong hạn')):'hàng chờ của bạn đã sạch')+'</span></div>'+
+  '<span>Hỏi về một học viên, một lớp, hoặc chỗ cấu hình - Trợ lý tra giúp bạn.</span></div>'+
   '<button class="x" onclick="asstClose()" aria-label="Thu gọn Trợ lý"><i class="ti ti-chevron-down"></i></button></div>';
- /* Ô HỎI đứng trên cùng - đây là cửa vào chính của Trợ lý, không phải một tính năng phụ. */
  var _q=window.ASSTQ||"";
  h+='<div class="qaAsk"><span class="qaGlow" style="flex:1;min-width:0;display:flex"><input id="asst_q" value="'+esc(_q)+'" placeholder="Hỏi tên học viên, hoặc chỗ cấu hình…" onkeydown="if(event.key===\'Enter\')asstQHoi()"></span>'+
   '<button class="btn primary sm" onclick="asstQHoi()" aria-label="Hỏi"><i class="ti ti-search"></i></button>'+
   (_q?'<button class="btn sm" onclick="asstQXoa()" aria-label="Xoá câu hỏi"><i class="ti ti-x"></i></button>':'')+'</div>';
  if(_q)return h+asstTraLoi(_q)+aiKhoiHTML(_q);
- if(x){
-  h+='<div class="asstCard"><div class="k">Việc kế tiếp</div>'+
-   '<div class="t">'+esc(x.grp||x.cat||"")+'</div>'+
-   '<div class="w">'+esc(x.who||"")+'</div>'+
-   '<div class="d">'+esc(String(x.what||""))+'</div>'+
-   '<div class="c">'+(x.sev==="red"?'<span class="chip red">quá hạn</span>':'<span class="chip">còn trong hạn</span>')+
-    (x.prm?slaChip(x.prm,""):'')+'</div>'+
-   '<div class="a">'+slaBtn(x,"btn primary sm")+
-    '<button class="btn sm" onclick="asstBoQua()" data-tip="Để việc này lại, xem việc kế"><i class="ti ti-player-skip-forward"></i>Để sau</button></div></div>';
- }else{
-  h+='<div class="asstCard done"><div class="t"><i class="ti ti-circle-check"></i> Không còn việc nào đang chờ bạn.</div>'+
-   '<div class="d">Hàng chờ sạch. Có việc mới, con số ở nút này sẽ tự nhảy lên.</div></div>';
- }
- /* ba chip nhịp ngày */
- var NL=[];try{NL=nhipList()}catch(e){}
- if(NL.length){
-  h+='<div class="asstChips">';
-  NHIPBUOI2.forEach(function(b){
-   var R=NL.filter(function(r){return r.buoi===b[0]});
-   if(!R.length)return;
-   var n=R.reduce(function(a2,r){return a2+(r.hab?0:num(r.n))},0);
-   var coDem=R.some(function(r){return !r.hab});
-   h+='<button class="asstChip'+(window.ASSTBUOI===b[0]?" on":"")+'" onclick="asstBuoiSet(\''+b[0]+'\')">'+
-    esc(b[1])+' <b'+(n?' class="hot"':'')+'>'+(coDem?n:"—")+'</b></button>'});
-  h+='</div>';
-  if(window.ASSTBUOI){
-   var R2=NL.filter(function(r){return r.buoi===window.ASSTBUOI});
-   h+='<div class="asstList">';
-   R2.forEach(function(r){
-    h+='<div class="asstRow'+(r.page?' clk':'')+'"'+(r.page?(' onclick="asstClose();go(\''+esc(r.page)+'\')"'):'')+'>'+
-     '<span class="n">'+esc(r.t)+'</span>'+
-     (r.hab?'<span class="chip">nên xem</span>':'<span class="chip '+(r.n?"amber":"green")+'">'+r.n+'</span>')+'</div>'});
-   h+='</div>'}
- }
+ /* Chưa hỏi gì thì gợi ý vài câu hỏi THẬT - một ô nhập trống không nói cho người ta biết hỏi
+    được những gì. Tên học viên lấy từ đúng phạm vi của người đang đăng nhập. */
+ var vd=[];
+ try{var hv=srows("DL09")[0];if(hv&&hv.full_name)vd.push(hv.full_name)}catch(e){}
+ try{var lp=srows("DL10")[0];if(lp&&lp.class_name)vd.push(lp.class_name)}catch(e){}
+ vd.push("đổi ngưỡng nhắc lead ở đâu");
+ h+='<div class="asstChips">'+vd.map(function(x){
+   return '<button class="asstChip" onclick="asstQDatText('+JSON.stringify(x).split('"').join("&quot;")+')">'+esc(x)+'</button>'}).join("")+'</div>';
  h+='<div class="asstFoot">'+
-  (L.length?'<button class="btn primary sm" onclick="asstClose();tourWork()"><i class="ti ti-checklist"></i>Dọn từng bước ('+L.length+')</button>':'')+
-  '<button class="btn sm" onclick="asstClose();tourMenu()" data-tip="Các bài hướng dẫn"><i class="ti ti-help-circle"></i></button>'+
+  '<button class="btn sm" onclick="asstClose();tourMenu()" data-tip="Các bài hướng dẫn"><i class="ti ti-help-circle"></i>Bài hướng dẫn</button>'+
   '</div>';
  if(p.c)h+='<div class="asstNote"><b>Trang này để làm gì:</b> '+esc(p.c)+'</div>';
  return h}
+function asstQDatText(q){window.ASSTQ=String(q||"");asstPaint()}
 /* Trả lời TRONG TẤM TRỢ LÝ. Luật: một lần chỉ vẽ MỘT phần. Chưa chọn phần nào thì chỉ có thẻ
    nhận dạng + câu hỏi lại - không đổ sẵn thứ người ta chưa hỏi. */
 function asstTraLoi(q){

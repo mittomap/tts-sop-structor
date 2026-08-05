@@ -233,13 +233,17 @@ t("khong ep y khi cau khong noi gi", qaYDinh("Nguyễn Văn A")==="");
  t("chi con MOT nut o goc (khong con nut Hoi dap rieng)",
    (SRC.match(/id="qafab"/g)||[]).length===0&&(SRC.match(/id="asstfab"/g)||[]).length>=1);
  t("khong con code chet cua tam Hoi dap cu", typeof qaPanVe==="undefined"&&typeof qaFabClick==="undefined");
- t("nut goc goi dung ten Tro ly", /aria-label="Mở Trợ lý"/.test(SRC)&&/Trợ lý - hỏi bất cứ gì/.test(SRC));
+ t("nut goc goi dung ten Tro ly", /aria-label="Mở Trợ lý"/.test(SRC)&&/Trợ lý - hỏi về một học viên/.test(SRC));
  /* mo tam: phai co O HOI ngay tren cung, VA van con phan viec trong ngay */
  asstOpen();
  var h=document.getElementById("asst").innerHTML;
  t("tam Tro ly co o hoi ngay tren cung", /id="asst_q"/.test(h));
- t("chua hoi gi thi van la tro thu nhu cu (viec ke tiep + don tung buoc)",
-   /Việc kế tiếp|Không còn việc nào/.test(h)&&/tourWork\(\)/.test(h));
+ /* V9.99z3 (anh Luan): *"tro ly, em bo xu ly task di, dung de hoi thoi, de ca xu ly task thua
+    qua"*. Tam nay nay chi lam MOT viec: tra loi cau hoi. Hop dong doi theo: chua hoi gi thi
+    phai co O HOI + goi y cau hoi that + loi mo bai huong dan, va KHONG duoc con cua xu ly viec
+    (Viec ke tiep / Don tung buoc) - viec da co bon cho khac roi. */
+ t("chua hoi gi thi la mot o HOI, khong con cua xu ly viec",
+   /asstChip/.test(h)&&/tourMenu\(\)/.test(h)&&!/Việc kế tiếp/.test(h)&&!/tourWork\(\)/.test(h));
  /* HOI MOT CAI TEN - phai ra THE NHAN DANG, va KHONG duoc do het */
  var s=rows("DL09").filter(function(x){return String(x.full_name||"").split(" ").length>=3})[0];
  window.ASSTQ=s.full_name;window.ASSTYD="";asstPaint();
@@ -278,8 +282,9 @@ t("khong ep y khi cau khong noi gi", qaYDinh("Nguyễn Văn A")==="");
  window.ASSTQ="zzzqqq wwweee rrrttt";asstPaint();
  t("bi thi noi thang chua hieu", /Em chưa hiểu rõ câu này/.test(document.getElementById("asst").innerHTML));
  window.ASSTQ="";window.ASSTYD="";asstPaint();
- t("xoa cau hoi thi tam quay ve la tro thu",
-   /Việc kế tiếp|Không còn việc nào/.test(document.getElementById("asst").innerHTML));
+ t("xoa cau hoi thi tam quay ve o hoi trong",
+   (function(){var hh=document.getElementById("asst").innerHTML;
+    return /id="asst_q"/.test(hh)&&/asstChip/.test(hh)&&!/Việc kế tiếp/.test(hh)})());
  asstClose();
 })();
 
