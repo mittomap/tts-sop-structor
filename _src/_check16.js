@@ -1202,14 +1202,14 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
   var soO=(pg.match(/onclick="qtToggle\(/g)||[]).length;
   t("Cai dat co bang bat/tat tung trang cho tung chuc danh ("+soO+" o)", soO>=200&&/Thấy trang nào/.test(pg));
   t("bang co neo rieng cho bai huong dan", /data-tour="quyentrang"/.test(pg));
-  /* BAT mot trang dang tat: Marketing von KHONG duoc xem Bao cao */
-  t("mac dinh: Marketing khong xem Bao cao", qtOn("marketing","baocao")===false);
-  qtToggle("marketing","baocao");
-  t("bam o thi pham vi THAT doi theo", buildScope("marketing_manager").pages.indexOf("baocao")>=0);
-  t("o khac mac dinh duoc danh dau", qtSua("marketing","baocao")===true&&qtSoSua("marketing")===1);
+  /* V9.99w: MOI chuc danh nay deu CO trang Bao cao (khac nhau la pham vi), nen o dung de thu
+     bat/tat phai la mot trang van con tat mac dinh. Chon `banggiao` - Marketing khong co no. */
+  t("mac dinh: Marketing khong xem Ban giao lead", qtOn("marketing","banggiao")===false);
+  qtToggle("marketing","banggiao");
+  t("bam o thi pham vi THAT doi theo", buildScope("marketing_manager").tabs.duyet.indexOf("banggiao")>=0||buildScope("marketing_manager").pages.indexOf("banggiao")>=0);
+  t("o khac mac dinh duoc danh dau", qtSua("marketing","banggiao")===true&&qtSoSua("marketing")===1);
   qtVeMacDinh("marketing");
-  t("tra ve mac dinh thi sach han", qtSua("marketing","baocao")===false&&qtSoSua("marketing")===0
-    &&buildScope("marketing_manager").pages.indexOf("baocao")<0);
+  t("tra ve mac dinh thi sach han", qtSua("marketing","banggiao")===false&&qtSoSua("marketing")===0);
   /* TAT trang dap: khong duoc de chuc danh do roi vao khoang khong */
   var dap=ROLESCOPE.hocvu.land;
   qtToggle("hocvu",dap);
@@ -1233,8 +1233,10 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
   t("Nhan su KHONG co cua nao vao Cai dat", rs.pages!=="*"&&rs.pages.indexOf("settings")<0);
   t("Nhan su co man cua chinh ho (nhan su + bang cong)",
     rs.pages.indexOf("nhansu")>=0&&rs.pages.indexOf("bangcong")>=0);
+  /* V9.99w: Nhan su nay CO trang chi so (cua doi minh), nhung van khong cham vao hoc vien va
+     khong cham vao man thu tien - do moi la ranh gioi that. */
   t("Nhan su khong cham vao hoc vien / tien",
-    rs.pages.indexOf("hocvien")<0&&rs.pages.indexOf("thanhtoan")<0&&rs.pages.indexOf("baocao")<0);
+    rs.pages.indexOf("hocvien")<0&&rs.pages.indexOf("thanhtoan")<0);
   CUR="nhansu";var pg="";try{pg=RENDER["nhansu"]()}catch(e){}
   t("man Nhan su ve duoc va co danh sach nguoi", pg.length>500&&/Danh s|nhân sự|Chức danh/i.test(pg));
   applyScope("");setRole("all")})();
@@ -1460,7 +1462,9 @@ t("chi con MOT ten cho viec dung lai demo", (function(){
 
 /* ---- 35. Ten hien thi anh Luan chot (V9.29n) ---- */
 (function(){
- t("nhom chang goi la C1..C4", ["changA","changB","changC","changD"].every(function(k,i){return arcGrpName(k)==="C"+(i+1)+" · "+ARCBK[k].t}));
+ /* V9.99y (anh Luan): bo SO khoi ten nhom chang - nguoi chi co 2-3 chang nhin "C2, C3, C4" la
+    tuong app thieu mat C1. Ten nhom nay la TEN CHANG, khong so. */
+ t("ten nhom chang la ten chang, khong con so", ["changA","changB","changC","changD"].every(function(k){return arcGrpName(k)===ARCBK[k].t}));
  t("ten nhom tren menu lay tu arcGrpName, khong go tay",
    NAVTREE.filter(function(G){return G.arc}).every(function(G){return G.g===arcGrpName(G.arc)}));
  t("khong con nhom nao ten 'Chang N'", NAVTREE.every(function(G){return !/^Chặng \d/.test(G.g)}));

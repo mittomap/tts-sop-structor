@@ -3154,6 +3154,8 @@ function doiWOW(){if(__dsWow)return __dsWow;
   .map(function(s){return String(s.staff_id||"")});
  return __dsWow}
 function dsReset(){__dsTeam=null;__dsBr=null;__dsWow=null}
+/* Leader của một ĐỘI nằm trong một phòng lớn hơn - phạm vi người là đội ấy, không phải cả phòng. */
+var DOIVAI={wow_leader:/^wow/};
 function myTeam(){if(__dsTeam)return __dsTeam;var o={};
  if(CURSTAFF){o[CURSTAFF]=1;
   var st=find("DL01","staff_id",CURSTAFF);
@@ -3173,6 +3175,15 @@ function myTeam(){if(__dsTeam)return __dsTeam;var o={};
    if(lv>=1&&dep&&x.department===dep&&staffLevel(x)<=lv&&(lv>=2||!br||x.branch===br))o[x.staff_id]=1;
    if(lv>=1&&br&&x.branch===br&&staffLevel(x)<=lv)o[x.staff_id]=1});          /* cùng cơ sở */
  }
+ /* V9.99y (anh Luân): *"Leader wow thì quản lý đội wow"*. Luật "cùng phòng, cấp thấp hơn" ở
+    trên gom cả phòng ACA - mà phòng ACA có cả giáo viên đứng lớp lẫn đội WOW, nên WOW Leader
+    nhận luôn 12 người trong đó có giáo viên không thuộc đội mình. Leader của một ĐỘI TRONG
+    PHÒNG thì phạm vi là ĐỘI ấy; người khai `reports_to` thẳng lên họ thì vẫn giữ. */
+ var _stR=CURSTAFF&&find("DL01","staff_id",CURSTAFF);
+ var _re=_stR&&DOIVAI[ecode(_stR.role)];
+ if(_re){var o2={};for(var k2 in o){var x2=find("DL01","staff_id",k2);
+   if(k2===CURSTAFF||(x2&&(_re.test(ecode(x2.role))||String(x2.reports_to||"")===CURSTAFF)))o2[k2]=1}
+  o=o2}
  __dsTeam=o;return o}
 function myBranches(){if(__dsBr)return __dsBr;var o={};
  var st=CURSTAFF&&find("DL01","staff_id",CURSTAFF);if(st&&st.branch)o[st.branch]=1;
@@ -5170,6 +5181,9 @@ function repRange(){var k=window.REPKY||"all";var now=new Date();
  return {from:null,lb:"toàn kỳ"}}
 function inRep(dstr){var r=repRange();if(!r.from)return true;var d=pvnd(dstr);return d&&d>=r.from}
 function srcPerfSection(){var R=repRange();
+ /* V9.99y - bảng này xếp hạng NGUỒN LEAD theo doanh thu ("nguồn nào đáng đổ tiền"). Ai khai
+    `tien:"none"` thì cột doanh thu là thứ họ không được đọc, mà bỏ cột đi thì bảng mất nghĩa. */
+ if(dsLevel("tien")==="none")return "";
  var by={},order=[];
  rows("DL02").forEach(function(l){if(!inRep(l.lead_created_time))return;
   var k=ecode(l.lead_source)||"khac";if(!by[k]){by[k]={lb:elabel(l.lead_source)||k,n:0,test:0,enr:0,rev:0};order.push(k)}
@@ -5190,6 +5204,8 @@ function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sa
     tư vấn - trọn vẹn miền lead cộng miền tiền. Kế toán và Trưởng phòng Học vụ khai `lead:"none"`
     thì bảng này không phải của họ; bảng khối lượng việc VH11 ngay dưới vẫn còn cho phần việc. */
  if(dsLevel("lead")==="none")return "";
+ /* Bảng này xếp hạng nguồn lead theo DOANH THU - không phải bảng của người không xem tiền. */
+ if(dsLevel("tien")==="none")return "";
  /* Chỉ những tư vấn viên TRONG ĐỘI mình - trưởng phòng Tư vấn thấy cả phòng, leader chi nhánh
     thấy cơ sở mình, nhân viên thì bảng này không có ai ngoài chính họ nên không vẽ. */
  if(bcMuc()!=="all"&&CURSTAFF){var _tm=null;try{_tm=myTeam()}catch(e){}
@@ -5305,11 +5321,11 @@ function deptSection(){var L=srows("DL02"),S=srows("DL09"),E=srows("DL06"),pay=s
   h+='</div></div>'});
  return h+'</div>'}
 function alertsHTML(){var out=[];
- rows("DL09").forEach(function(r){var a=/at_risk|off_track/.test(ecode(r.attendance_progress_status)),b=/at_risk|off_track/.test(ecode(r.academic_progress_status));
+ srows("DL09").forEach(function(r){var a=/at_risk|off_track/.test(ecode(r.attendance_progress_status)),b=/at_risk|off_track/.test(ecode(r.academic_progress_status));
   if(a||b)out.push(["red","ti-user-exclamation",r.student_id+" - "+r.full_name,(a?"Chuyên cần ":"")+(b?"Học thuật":"")+" nguy cơ"])});
- rows("DL06").forEach(function(r){if(num(r.discount_amount)>=1000000&&!r.discount_approved_by)out.push(["amber","ti-discount",r.enrollment_id+" - "+(r.student_id_name||r.student_id),"Chiết khấu "+money(r.discount_amount)+" chờ duyệt"])});
- rows("DL06").forEach(function(r){if(num(r.remaining_amount)>=5000000)out.push(["amber","ti-cash",(r.student_id_name||r.student_id),"Còn nợ "+money(r.remaining_amount)])});
- rows("DL17").forEach(function(r){if(!/resolved/.test(ecode(r.complaint_status)))out.push(["red","ti-message-circle",r.complaint_id+" - "+(r.student_id_name||r.student_id),"Khiếu nại "+elabel(r.complaint_severity)])});
+ srows("DL06").forEach(function(r){if(num(r.discount_amount)>=1000000&&!r.discount_approved_by)out.push(["amber","ti-discount",r.enrollment_id+" - "+(r.student_id_name||r.student_id),"Chiết khấu "+money(r.discount_amount)+" chờ duyệt"])});
+ srows("DL06").forEach(function(r){if(num(r.remaining_amount)>=5000000)out.push(["amber","ti-cash",(r.student_id_name||r.student_id),"Còn nợ "+money(r.remaining_amount)])});
+ srows("DL17").forEach(function(r){if(!/resolved/.test(ecode(r.complaint_status)))out.push(["red","ti-message-circle",r.complaint_id+" - "+(r.student_id_name||r.student_id),"Khiếu nại "+elabel(r.complaint_severity)])});
  out=out.slice(0,6);if(!out.length)return'<div class="empty">Không có cảnh báo.</div>';
  return out.map(function(a){return '<div class="alert"><div class="ab" style="background:var(--'+(a[0]==="red"?"redb":"amberb")+');color:var(--'+a[0]+')"><i class="ti '+a[1]+'"></i></div><div class="at"><b>'+esc(a[2])+'</b><small>'+esc(a[3])+'</small></div></div>'}).join("")}
 
@@ -7492,7 +7508,15 @@ var ARCS=[
   d:"Ra kết quả đầu ra, mời học tiếp, xin giới thiệu bạn bè - vòng đời quay lại từ đầu."}];
 var ARCBK={};ARCS.forEach(function(a){ARCBK[a.k]=a});
 /* Tên nhóm chặng trên menu: "C1 · Khách tiềm năng". Một chỗ sinh ra, mọi chỗ dùng lại. */
-function arcGrpName(k){var A=ARCBK[k];return A?("C"+A.n+" · "+A.t):k}
+/* V9.99y (anh Luân 05/08, mở Học vụ): *"em có nghĩ ra cách đặt tên chặng nào mà kể cả khi chỉ
+   có 2-3 chặng nó vẫn hợp lý ko... khi nó bị thiếu, nó lòi ra câu chuyện là nhìn nó ko liền
+   mạch"*. Đúng - và thủ phạm là CON SỐ. Học vụ mở menu ra thấy "C2 · Đang học · C3 · Tạm dừng ·
+   C4 · Kết thúc" thì mắt tự đi tìm C1, không thấy, và kết luận là app bị thiếu. Bỏ số đi thì
+   ba nhóm ấy đọc thành "Đang học · Tạm dừng · Kết thúc & Học tiếp" - một bộ TRỌN VẸN, đúng
+   phần vòng đời mà họ phụ trách, không gợi ra chỗ trống nào.
+   Thứ tự và chấm màu vẫn kể được dòng chảy cho người thấy đủ bốn chặng; con số thì chỉ có ích
+   cho người thấy đủ, mà lại gây hiểu nhầm cho mọi người còn lại. */
+function arcGrpName(k){var A=ARCBK[k];return A?A.t:k}
 var ARCOF={new:"changA",contacted:"changA",test_booked:"changA",test_grading:"changA",
  test_done:"changA",consult:"changA",enrolled:"changA",no_contact:"changA",lost:"changA",
  paid:"changB",onboarding:"changB",learning:"changB",
@@ -8782,10 +8806,10 @@ function renderBanlam(){
   '<div class="bwr"><div class="bwsearch"><i class="ti ti-search"></i><input placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.CHAYSRCH||"")+'" oninput="chaySrch(this.value)" autocomplete="off"><div class="pkres" id="bwac" style="position:absolute;top:100%;left:0;right:0;z-index:30;background:#fff;color:var(--text);text-align:left;border-radius:0 0 10px 10px;box-shadow:0 8px 24px rgba(0,0,0,.18)"></div></div>'+
   '<span class="bwsrchhint" id="bwsrchhint"></span></div></div>'; /* V9.18b: hint phải nằm NGOÀI hộp tìm - nằm trong là chữ trắng trên nền trắng + bóp placeholder (Luân bắt lỗi) */
  function cS(k){return all0.filter(function(J){return J.k===k&&J.act}).length}
- var nRisk=rows("DL09").filter(stuRisk).length;
- var nDebt=rows("DL06").filter(function(e){return num(e.remaining_amount)>0&&!/cancel/.test(ecode(e.enrollment_status))}).length;
- var nApprove=rows("DL06").filter(function(e){return num(e.discount_amount)>=ckThreshold()&&!e.discount_approved_by}).length;
- var nWow=rows("DL14").filter(function(w){return isc(w.wow_status,"booked","confirmed")||(ecode(w.wow_status)==="completed"&&!(w.wow_content_note&&String(w.wow_content_note).trim()))}).length;
+ var nRisk=srows("DL09").filter(stuRisk).length;
+ var nDebt=srows("DL06").filter(function(e){return num(e.remaining_amount)>0&&!/cancel/.test(ecode(e.enrollment_status))}).length;
+ var nApprove=srows("DL06").filter(function(e){return num(e.discount_amount)>=ckThreshold()&&!e.discount_approved_by}).length;
+ var nWow=srows("DL14").filter(function(w){return isc(w.wow_status,"booked","confirmed")||(ecode(w.wow_status)==="completed"&&!(w.wow_content_note&&String(w.wow_content_note).trim()))}).length;
  var reupN=cS("lost")+cS("no_contact");
  /* V9.18c (Luân xác nhận THỪA): bỏ 8 khối đếm-theo-chặng - trùng chip lọc "Nhóm" ngay dưới và
     Bảng chặng đã gộp vào trang. Chỉ giữ khối có GIÁ TRỊ RIÊNG (lối tắt sang trang khác / tập đặc biệt). */
@@ -8859,7 +8883,7 @@ function renderYcHV(){
  return h}
 function renderCskh(){
  var tab=window.CSTAB||"khaosat";
- var sv=rows("DL15"),fb=rows("DL16"),kn=rows("DL17");
+ var sv=srows("DL15"),fb=srows("DL16"),kn=srows("DL17");
  var nSvWait=sv.filter(function(v){return !String(v.submitted_date||"").trim()}).length;
  var nFbOpen=fb.filter(function(f){return !isc(f.feedback_status,"resolved")}).length;
  var nKnOpen=kn.filter(function(c){return !isc(c.complaint_status,"resolved")}).length;
@@ -8878,12 +8902,12 @@ function renderCskh(){
  else h+=renderKhieunai(1);
  return h}
 function renderReview(embed){var p="review",fil=fget(p);
- var cls=rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))});
- var sv=rows("DL15");
+ var cls=srows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))});
+ var sv=srows("DL15");
  /* gom phiếu theo lớp để biết lớp nào chưa gửi / trả lời kém */
  function info(c){
   var mine=sv.filter(function(v){return String(v.class_id||"")===c.class_id});
-  var stu=rows("DL08").filter(function(o){return o.class_id===c.class_id}).length;
+  var stu=srows("DL08").filter(function(o){return o.class_id===c.class_id}).length;
   var sub=mine.filter(function(v){return String(v.submitted_date||"").trim()});
   var fu=mine.filter(function(v){return fuNeed(v.follow_up_needed)});
   var ss=[];sub.forEach(function(v){var x=num(v.satisfaction_score);if(x>0)ss.push(x)});
@@ -9017,7 +9041,7 @@ function rvSend(){var cid=fldV("rv_cls");if(!cid){toast("Chọn lớp.");return}
  closeModal();toast("Đã tạo "+made+" phiếu review gửi lớp "+(cl.class_name||cid)+".");go("review")}
 /* ===== TÁC VỤ: GHI NHẬN PHẢN HỒI THỦ CÔNG (nhận qua gọi/nhắn) ===== */
 function renderGhinhan(embed){var p="ghinhan",fil=fget(p);
- var fb=rows("DL16");
+ var fb=srows("DL16");
  var lim=paramOf("slaFeedbackClassify_hours",24);
  function fst(f){var code=ecode(f.feedback_status);var age=hoursSince(f.feedback_time);
   return {news:code==="new",done:code==="resolved",neg:isc(f.feedback_type,"negative"),
@@ -9343,13 +9367,13 @@ function daysInStage(L,stage){var d=pvnd(stageTime(L,stage));return d?Math.floor
 function leadValue(L,avg){var enr=rows("DL06").filter(function(e){return e.lead_id===L.lead_id});if(enr.length)return num(enr[0].final_fee)||num(enr[0].total_fee);var con=rows("DL04").filter(function(c){return c.lead_id===L.lead_id&&c.recommended_course});if(con.length){var cs=rows("DL05").filter(function(x){return x.course_name===con[0].recommended_course})[0];if(cs&&num(cs.list_price))return num(cs.list_price)}return avg}
 function psum(ic,label,val,col){return '<div class="psum"><div class="psic" style="background:'+col+'18;color:'+col+'"><i class="ti '+ic+'"></i></div><div><div class="psv">'+esc(String(val))+'</div><div class="psl">'+esc(label)+'</div></div></div>'}
 function journeyHTML(sid){
- var enr=rows("DL06").filter(function(x){return x.student_id===sid});var lid=enr.length?enr[0].lead_id:"";
+ var enr=srows("DL06").filter(function(x){return x.student_id===sid});var lid=enr.length?enr[0].lead_id:"";
  var L=lid?find("DL02","lead_id",lid):null;
- var test=lid?rows("DL03").filter(function(x){return x.lead_id===lid}):[];
- var cons=lid?rows("DL04").filter(function(x){return x.lead_id===lid}):[];
- var pay=rows("DL07").filter(function(x){return x.student_id===sid});
- var ob=rows("DL08").filter(function(x){return x.student_id===sid});
- var ce=rows("DL18").filter(function(x){return x.student_id===sid});
+ var test=lid?srows("DL03").filter(function(x){return x.lead_id===lid}):[];
+ var cons=lid?srows("DL04").filter(function(x){return x.lead_id===lid}):[];
+ var pay=srows("DL07").filter(function(x){return x.student_id===sid});
+ var ob=srows("DL08").filter(function(x){return x.student_id===sid});
+ var ce=srows("DL18").filter(function(x){return x.student_id===sid});
  var st=[["Tạo lead",L?L.lead_created_time:""],["Test đầu vào",test.length?test[0].test_date:""],["Tư vấn",cons.length?cons[0].consultation_time:""],["Đăng ký",enr.length?enr[0].enrollment_time:""],["Thanh toán",pay.length?pay[pay.length-1].payment_time:""],["Xếp lớp / Onboarding",ob.length?(ob[0].onboarding_completed_at||ob[0].confirmation_time):""],["Kết thúc khóa",ce.length?ce[0].course_completion_time:""]];
  var h='<div class="jpanel"><h4><i class="ti ti-route"></i>Hành trình khách hàng</h4><div class="jline">';
  st.forEach(function(x,i){var done=!!(x[1]&&String(x[1]).trim());
@@ -9657,7 +9681,7 @@ function midSave(cid){var trs=document.querySelectorAll("#drawerBody tr[data-oid
  closeModal();toast("Đã lưu điểm giữa khóa cho "+n+" học viên."+(SVR?"":" (Bản Sheets: nhớ thêm 6 cột mid_* vào DL08.)"));reRender(CUR)}
 function renderBanglop(){
  if(window.BLCLASS&&!canRow("DL10",find("DL10","class_id",window.BLCLASS)))return dsDeny("Lớp này");
- var cls=rows("DL10"),cid=window.BLCLASS||(cls[0]&&cls[0].class_id),lop=find("DL10","class_id",cid)||{};
+ var cls=srows("DL10"),cid=window.BLCLASS||(cls[0]&&cls[0].class_id),lop=find("DL10","class_id",cid)||{};
  window.BLCLASS=cid;
  var tab=window.BLTAB||"buoi";
  var h='<div class="phead" data-tour="phead"><div><div class="t">Vận hành lớp · '+esc(lop.class_name||cid)+'</div><div class="s">Buổi học · điểm danh · nhận xét · giao & chấm bài tập — tất cả cho lớp này ở một chỗ</div></div>'+
@@ -9666,17 +9690,17 @@ function renderBanglop(){
  h+='</select></div></div>';
  /* ---- KPI riêng của lớp ---- */
  (function(){
-  var obs=rows("DL08").filter(function(o){return o.class_id===cid});
+  var obs=srows("DL08").filter(function(o){return o.class_id===cid});
   var sidsK={};obs.forEach(function(o){sidsK[o.student_id]=1});
-  var stu=rows("DL09").filter(function(s){return sidsK[s.student_id]});
+  var stu=srows("DL09").filter(function(s){return sidsK[s.student_id]});
   var nStu=stu.length||obs.length;
-  var sesIds={};rows("DL11").forEach(function(s){if(s.class_id===cid)sesIds[s.session_id]=1});
-  var att=rows("DL12").filter(function(a){return sesIds[a.session_id]});
+  var sesIds={};srows("DL11").forEach(function(s){if(s.class_id===cid)sesIds[s.session_id]=1});
+  var att=srows("DL12").filter(function(a){return sesIds[a.session_id]});
   var pres=att.filter(function(a){return isc(a.attendance_status,"on_time","late")}).length;
-  var hw=rows("DL13").filter(function(x){return x.class_id===cid});
+  var hw=srows("DL13").filter(function(x){return x.class_id===cid});
   var hwSub=hw.filter(hwSubmitted).length;
   var risk=stu.filter(stuRisk).length;
-  var sv=rows("DL15").filter(function(v){return String(v.class_id||"")===cid&&num(v.satisfaction_score)>0});
+  var sv=srows("DL15").filter(function(v){return String(v.class_id||"")===cid&&num(v.satisfaction_score)>0});
   var ss=sv.length?(sv.reduce(function(a,v){return a+num(v.satisfaction_score)},0)/sv.length):null;
   /* ═══ V9.99g - DẢI RỦI RO CỦA CHÍNH LỚP NÀY ═══════════════════════════════════════════════
      Anh Luân 04/08: *"ở trong vận hành lớp, nó có tổng hợp được mấy cái rủi ro của lớp đó ko
@@ -9689,7 +9713,7 @@ function renderBanglop(){
      KHÁC KPI Ở CHỖ NÀO: KPI trả lời "lớp này đang tốt hay xấu"; dải này trả lời "TÔI CÒN PHẢI
      LÀM GÌ". Nên mỗi ô là một số ĐẾM VIỆC CÒN TỒN, và bấm được để đi thẳng tới chỗ làm. */
   (function(){
-   var ses=rows("DL11").filter(function(x){return x.class_id===cid});
+   var ses=srows("DL11").filter(function(x){return x.class_id===cid});
    var coDD={};att.forEach(function(a){coDD[a.session_id]=1});
    /* Buổi ĐÃ DẠY XONG mà không có một dòng điểm danh nào. Buổi chưa tới thì chưa phải việc. */
    var chuaDD=ses.filter(function(x){var st=bhState(x);return st.done&&!coDD[x.session_id]}).length;
@@ -9699,7 +9723,7 @@ function renderBanglop(){
    var chuaCham=hw.filter(function(x){return hwSubmitted(x)&&!hwGraded(x)}).length;
    /* Còn nợ: tính theo ĐƠN của học viên trong lớp, dùng đúng công thức app dùng ở chỗ khác. */
    var noHV={};
-   rows("DL06").forEach(function(e){
+   srows("DL06").forEach(function(e){
     if(/cancel/.test(ecode(e.enrollment_status)))return;
     if(!sidsK[e.student_id])return;
     var rem=num(e.remaining_amount)||Math.max(0,(num(e.final_fee)||num(e.total_fee))-num(e.paid_amount));
@@ -9739,7 +9763,7 @@ function renderBanglop(){
    ["ti-thumb-up",ss==null?"—":ss.toFixed(1)+"/5","Hài lòng (SS)",(ss!=null&&ss>=kpiTh(/^SS/,4.5))?"#16A34A":"#E08A1E","mục tiêu ≥ "+kpiTh(/^SS/,4.5)]],"banglop");
  })();
  h+=classBar(cid);
- var enr=rows("DL08").filter(function(r){return r.class_id===cid});
+ var enr=srows("DL08").filter(function(r){return r.class_id===cid});
  var ses=ddSessions(cid);
  /* ---- THANH TAB ---- */
  window.DDCLASS=cid;window.BTCLASS=cid;
@@ -9777,15 +9801,15 @@ function renderBanglop(){
   h+=ddHub({embed:true,noSessUI:ses.length>0});
  }
  else if(tab==="hocvien"){
-  var sesOfCls={};rows("DL11").forEach(function(x){if(x.class_id===cid)sesOfCls[x.session_id]=1});
+  var sesOfCls={};srows("DL11").forEach(function(x){if(x.class_id===cid)sesOfCls[x.session_id]=1});
   h+='<div class="panel"><div class="ph"><b>Học viên trong lớp ('+enr.length+')</b><div class="mini"><button class="pill" onclick="midForm(\''+esc(cid)+'\')"><i class="ti ti-writing"></i>Nhập điểm giữa khóa</button></div></div>'+
    '<div style="padding:8px 14px 0"><span class="mut" style="font-size:11.5px">chuyên cần & bài tập tính THEO LỚP NÀY (không trộn lớp cũ của học viên)</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã HV</th><th>Họ tên</th><th>Chuyên cần</th><th>Bài tập</th><th>Trạng thái</th><th></th></tr></thead><tbody>';
   if(!enr.length)h+='<tr><td class="empty" colspan="6">Lớp chưa có học viên.</td></tr>';
   enr.forEach(function(e){var s=find("DL09","student_id",e.student_id)||{};
-   var att=rows("DL12").filter(function(x){return x.student_id===e.student_id&&sesOfCls[x.session_id]});
+   var att=srows("DL12").filter(function(x){return x.student_id===e.student_id&&sesOfCls[x.session_id]});
    var pr=att.filter(function(x){return/present|on_time|late/.test(ecode(x.attendance_status))}).length;
    var rate=att.length?Math.round(pr/att.length*100)+"%":"-";
-   var hw=rows("DL13").filter(function(x){return x.student_id===e.student_id&&x.class_id===cid});
+   var hw=srows("DL13").filter(function(x){return x.student_id===e.student_id&&x.class_id===cid});
    var gr=hw.filter(hwGraded).length;
    var risk=/at_risk|off_track/.test(ecode(s.attendance_progress_status)+" "+ecode(s.academic_progress_status));
    h+='<tr><td>'+esc(e.student_id)+'</td><td>'+nguoiLnk(e.student_id,s.full_name,"-")+'</td><td>'+rate+'</td><td>'+gr+'/'+hw.length+'</td><td><span class="chip '+(risk?"red":"green")+'">'+(risk?"Nguy cơ":"Ổn định")+'</span></td>'+
@@ -10308,7 +10332,7 @@ var KPIDOC={
   visao:"Đây là lời hứa của trung tâm. Không đạt thì không xin được lời giới thiệu, không dùng được làm minh chứng tuyển sinh.",
   nguon:"DL18: achievement_status. Hồ sơ CHƯA chấm xong không nằm trong mẫu số.",
   doc:{tot:"Đầu ra tốt hơn cam kết.",dat:"Đạt cam kết.",hut:"Hụt so với cam kết.",
-   canhbao:"Nhiều học viên không đạt mục tiêu.",baodong:"Đầu ra kém xa cam kết - rủi ro hoàn tiền và mất uy tín."},
+   canhbao:"Nhiều học viên không đạt mục tiêu.",baodong:"Đầu ra kém xa cam kết - mất uy tín và học viên không quay lại."},
   viec:{hut:[["Xem hồ sơ kết thúc khóa","ti-flag","ketthuc",{}]],
    canhbao:[["Xem hồ sơ kết thúc khóa","ti-flag","ketthuc",{}],
     ["Xem tiến bộ theo kỹ năng","ti-chart-bar","baocao",{}]],
@@ -10325,6 +10349,11 @@ function kpiMau(code){var d=kpiNum(code);var t=d.tot;
 /* Quy chỉ số ra NGƯỜI và TIỀN - đây là thứ người quyết định thật sự nghe. */
 function kpiQuy(code,v,th,dir){var d=kpiNum(code);var fee=kpiAvgFee();
  if(d.n==null)return "";
+ /* V9.99y - CÂU "QUY RA TIỀN" CHỈ NÓI VỚI NGƯỜI ĐƯỢC XEM TIỀN. Giáo viên, ACA, WOW, Marketing
+    khai `tien:"none"` mà vẫn đọc được "Còn 16 chỗ trống, lấp đầy tương đương 277.680.000đ" hay
+    "rủi ro hoàn tiền" ngay trên trang chỉ số của họ. Quy ra NGƯỜI thì ai cũng hiểu và ai cũng
+    làm được; quy ra TIỀN là chuyện của người giữ tiền. */
+ if(dsLevel("tien")==="none")return d.lbl?("Quy ra người: "+d.lbl+"."):"";
  if(code==="PCR"&&d.money)return "Đang có "+vnd(d.money)+" nằm ngoài tài khoản.";
  if(code==="CAR"&&d.money)return "Số đơn hủy tương đương "+vnd(d.money)+" doanh thu đã hụt.";
  if(code==="CVR"&&v!=null&&th){var gap=Math.max(0,th-v)*(d.tot||0);
@@ -10520,17 +10549,47 @@ function bcMuc(){
     nên mức khai của nhóm là mức của NHÂN VIÊN, dùng nó cho trưởng phòng thì trưởng phòng
     Nhân sự và trưởng phòng WOW bị kẹp xuống "của riêng tôi" - không nhìn được đội mình. */
  return (!!rs.mgr||!!rs.leader)?"team":"mine"}
+/* ═══ V9.99y - XEM CHỈ SỐ CỦA MỘT NGƯỜI CỤ THỂ ════════════════════════════════════════════
+   Anh Luân 05/08: *"cấp giám đốc, hoặc quản lý muốn xem chỉ số của 1 nhân viên nào đó, thì xem
+   thế nào. Hoặc trưởng phòng aca muốn xem 1 giáo viên nào đang phụ trách các lớp nào, và tình
+   hình các lớp đó ra sao, các chỉ số của giáo viên đó?"*
+   App đã có ô "Xem việc của" - một BỘ LỌC theo người, dùng chung cho chuông, Việc hôm nay và
+   bảng việc. Nay trang Chỉ số & KPI đi theo đúng ô ấy: chọn một người thì cả trang tính lại
+   bằng phạm vi của NGƯỜI ĐÓ. Cách làm: mượn tạm chỗ đứng của họ đúng trong lúc vẽ trang này rồi
+   trả lại ngay - không phải "đổi cổng" (anh Luân đã bác cách ấy 04/08), vì menu, quyền ghi và
+   mọi trang khác không đổi; chỉ đúng một trang đọc số theo người được chọn.
+   KHÔNG có leo thang quyền: chỉ chọn được người TRONG ĐỘI mình (`banAiDS`), mà phạm vi của cấp
+   dưới bao giờ cũng hẹp hơn của mình. */
 function renderBaocao(){
+ var _bcAi=window.BANAI||"";
+ var _stAi=_bcAi&&find("DL01","staff_id",_bcAi);
+ if(_stAi&&_bcAi!==CURSTAFF){
+  /* Mượn tạm CẢ HAI thứ quyết định con số: mã người (để `canRow` biết ai là chủ dòng) VÀ bộ
+     phạm vi của chức danh họ (để `dsLevel` trả đúng mức mine/team/all của họ). Thiếu vế thứ
+     hai thì mức vẫn là mức của người đang đăng nhập - đo được: Trưởng phòng ACA chọn xem một
+     giáo viên mà số vẫn y nguyên số của mình, vì ACA khai `lop:"all"` nên `canRow` gật hết.
+     Dựng bằng `buildScope` (hàm thuần) chứ không gọi `applyScope` - `applyScope` còn đặt lại
+     tab ngữ cảnh và xoá bộ nhớ tạm, tức là làm đổi cả những trang khác. */
+  var _giu=CURSTAFF,_giuS=window.SCOPEEFF;
+  CURSTAFF=_bcAi;window.SCOPEEFF=buildScope(ecode(_stAi.role));
+  try{dsReset()}catch(e){}
+  try{return baocaoThan(_bcAi)}
+  finally{CURSTAFF=_giu;window.SCOPEEFF=_giuS;try{dsReset()}catch(e){}}}
+ return baocaoThan("")}
+function baocaoThan(_xemAi){
  if(dsLevel("baocao")==="none")return dsDeny("Báo cáo & KPI");
  var L=srows("DL02"),S=srows("DL09"),E=srows("DL06");
  var risk=S.filter(function(r){return/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status))}).length;
  /* V9.99w - TRANG NÀY LÀ CỦA AI. Ba mức phạm vi thì ba câu khác nhau, nói thẳng trên tiêu đề -
     người đọc phải biết con số đang đếm tập nào trước khi tin nó. */
  var _bcLv=bcMuc();
- var _bcTen=(_bcLv==="all")?"Toàn trung tâm"
+ var _bcTen=_xemAi?((find("DL01","staff_id",_xemAi)||{}).full_name||_xemAi)
+   :(_bcLv==="all")?"Toàn trung tâm"
    :(_bcLv==="team")?"Đội của bạn"
    :"Của riêng bạn";
- var _bcCau=(_bcLv==="all")
+ var _bcCau=_xemAi
+   ?("Đang xem chỉ số của "+((find("DL01","staff_id",_xemAi)||{}).full_name||_xemAi)+" - mọi con số dưới đây tính theo đúng phạm vi công việc của người này. Bấm \"Về việc của tôi\" ở trên để quay lại số của bạn.")
+   :(_bcLv==="all")
    ?"Bức tranh điều hành + toàn bộ chỉ số KPI theo SOP. Số liệu tính thẳng từ dữ liệu vận hành; ngưỡng chỉnh ở Cài đặt (CH6)."
    :(_bcLv==="team")
    ?"Chỉ số của ĐỘI BẠN - mọi con số dưới đây chỉ đếm phần dữ liệu thuộc phạm vi bạn quản lý, không phải toàn trung tâm. Ngưỡng dùng chung của trung tâm (CH6)."
@@ -10539,6 +10598,10 @@ function renderBaocao(){
   '<div class="sp"><button class="btn" onclick="go(\'banlam\')"><i class="ti ti-checklist"></i>Trang bắt đầu</button><button class="btn" onclick="window.SETTAB=\'ch6\';go(\'settings\')"><i class="ti ti-adjustments"></i>Ngưỡng KPI</button></div></div>';
  h+=tbar('<span class="tblbl">Kỳ số liệu</span>'+segHTML(window.REPKY||"all",[["m0","Tháng này"],["30","30 ngày"],["90","90 ngày"],["all","Toàn kỳ"]],"window.REPKY='{k}';reRender(CUR)")+
   '<span class="mut" style="font-size:11px;margin-left:10px">Kỳ này áp cho TOÀN BỘ chỉ số bên dưới.</span>',"");
+ /* Ô chọn người ngay trên trang này - quản lý mở Chỉ số ra là chọn được luôn, không phải quay
+    về trang đáp mới đổi được người. Dùng CHUNG một ô với "Xem việc của" (cùng `window.BANAI`)
+    nên chuông, Việc hôm nay, bảng việc và trang này luôn nói về cùng một người. */
+ h+=banAiHTML();
  h+=bvSau();   /* chọn kỳ số liệu xong mới tới bảng việc của Ban Giám đốc */
  h+=kpiTop3Section();
  /* Bảng so sánh 5 cơ sở là câu hỏi của người điều hành chuỗi ("cơ sở nào đang gánh") - một nhân
@@ -12506,7 +12569,7 @@ function xlWaiting(){/* Đăng ký đã xác nhận (đã cọc/đóng) nhưng C
    Dùng ĐÚNG tập của nút "Xếp lớp học viên" để hàng đợi và nút luôn khớp nhau. */
  var haveOb={};rows("DL08").forEach(function(o){haveOb[o.student_id]=1});
  return rows("DL06").filter(function(e){return isc(e.enrollment_status,"confirmed")&&!haveOb[e.student_id]})}
-function renderXeplop(){var fil=window.XLFILT||"all";var obs=rows("DL08");
+function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
  var wait=xlWaiting();
  var view=obs.filter(function(o){var s=obState(o);if(fil==="all")return true;if(fil==="sendinfo")return !s.sent;if(fil==="confirm")return s.sent&&!s.confirmed;if(fil==="finish")return !s.done;if(fil==="overdue")return s.infoOverdue||s.obOverdue;return true});
  var h='<div class="phead" data-tour="phead"><div><div class="t">Xếp lớp & Onboarding</div><div class="s">Từ lúc đóng đủ tiền → xếp lớp → gửi thông tin → HV xác nhận → hoàn tất. Mỗi bước có dấu hoàn thành để tắt cảnh báo</div></div><div class="sp"><button class="btn primary" onclick="openXepMoi()"><i class="ti ti-plus"></i>Xếp lớp học viên</button></div></div>';
@@ -12522,7 +12585,7 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=rows("DL08");
  if(wait.length&&(fil==="all")){
   h+='<div class="sechd" style="display:flex;align-items:center;gap:8px"><i class="ti ti-user-plus" style="color:var(--red)"></i>Đã đóng đủ tiền · chờ xếp lớp ('+wait.length+')</div>';
   h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Khóa đã đăng ký</th><th>Ngày đóng đủ</th><th></th></tr></thead><tbody>';
-  wait.forEach(function(e){var lastPay="";var ps=rows("DL07").filter(function(p){return String(p.enrollment_id)===String(e.enrollment_id)&&num(p.amount)>0});if(ps.length)lastPay=ps[ps.length-1].payment_time||"";
+  wait.forEach(function(e){var lastPay="";var ps=srows("DL07").filter(function(p){return String(p.enrollment_id)===String(e.enrollment_id)&&num(p.amount)>0});if(ps.length)lastPay=ps[ps.length-1].payment_time||"";
    h+='<tr><td>'+nguoiLnk(e.student_id,e.student_id_name,e.student_id)+'</td>'+
     '<td>'+esc(e.course_id_name||e.course_id||"-")+'</td><td>'+esc(String(lastPay).slice(0,10)||"-")+'</td>'+
     '<td><button class="btn primary sm" onclick="xepFor(\''+esc(e.student_id)+'\')"><i class="ti ti-layout-grid-add"></i>Xếp vào lớp</button></td></tr>'});
@@ -13143,11 +13206,11 @@ function renderTuyensinh(){
     `tien:"none"`. Rà lại một câu là hết. */
  (function(){var ok=scopeTabs("tuyensinh",[["lead"],["test"],["tuvan"],["thanhtoan"],["reup"]]).map(function(x){return x[0]});
   if(ok.length&&ok.indexOf(tab)<0){tab=ok[0];window.TSTAB=tab}})();
- var tests=rows("DL03"),cons=rows("DL04"),enr=rows("DL06");
- var nLead=rows("DL02").filter(function(l){return !isc(l.lead_status,"converted","rejected","unreachable")}).length;
+ var tests=srows("DL03"),cons=srows("DL04"),enr=srows("DL06");
+ var nLead=srows("DL02").filter(function(l){return !isc(l.lead_status,"converted","rejected","unreachable")}).length;
  var nTest=tests.filter(function(r){var graded=isc(r.test_status,"graded"),consulted=isc(r.post_test_status,"consulted");return !isc(r.booking_status,"rejected")&&!(graded&&consulted)}).length;
  var nTuvan=cons.filter(function(c){return !isc(c.conversion_status,"confirmed_with_deposit","dropped")}).length;
- var nPay=enr.filter(function(e){if(/cancel/.test(ecode(e.enrollment_status)))return false;var rem=(e.remaining_amount!==undefined&&e.remaining_amount!=="")?num(e.remaining_amount):Math.max(0,(num(e.final_fee)||num(e.total_fee))-num(e.paid_amount));var unv=rows("DL07").filter(function(x){return x.enrollment_id===e.enrollment_id&&!(x.verified_by&&String(x.verified_by).trim())}).length;return rem>0||unv>0}).length;
+ var nPay=enr.filter(function(e){if(/cancel/.test(ecode(e.enrollment_status)))return false;var rem=(e.remaining_amount!==undefined&&e.remaining_amount!=="")?num(e.remaining_amount):Math.max(0,(num(e.final_fee)||num(e.total_fee))-num(e.paid_amount));var unv=srows("DL07").filter(function(x){return x.enrollment_id===e.enrollment_id&&!(x.verified_by&&String(x.verified_by).trim())}).length;return rem>0||unv>0}).length;
  var nReup=jAll().filter(function(J){return J.k==="lost"||J.k==="no_contact"}).length;
  /* V9.23 (Luân): BỎ nút "Nhập lead mới". Nó và "Khách mới liên hệ đến" cùng tạo một dòng DL02,
    nhưng form chung KHÔNG chặn trùng số và KHÔNG ghi lượt liên hệ đầu (DL02b) - lead tạo bằng
@@ -13202,7 +13265,7 @@ function renderReupTab(){
  h+='<div class="notebar"><i class="ti ti-bulb"></i>'+goiyG("gy_khach_ngung_khong_phai_0425",'Khách ngưng chưa phải là mất - hẹn chăm lại theo đợt khai giảng hoặc ưu đãi.||Bấm "Xử lý" để gọi và ghi kết quả. Liên hệ được thì hành trình tự chạy tiếp.')+'</div>';
  h+='<div class="panel"><div class="pbody">'+chayListHTML(L,"tsReupList")+'</div></div>';
  return h}
-function renderTest(embed){var p="test",fil=fget(p);var all=rows("DL03");
+function renderTest(embed){var p="test",fil=fget(p);var all=srows("DL03");
  function st(r){var booked=isc(r.booking_status,"booked");var refused=isc(r.booking_status,"rejected");var att=isc(r.test_attendance_status,"on_time","late");var noshow=isc(r.test_attendance_status,"no_show");var graded=isc(r.test_status,"graded");var consulted=isc(r.post_test_status,"consulted");var overdue=att&&!graded&&hoursSince(r.test_attendance_time)!=null&&hoursSince(r.test_attendance_time)>paramOf("slaTestResult_hours",48);return {booked:booked,refused:refused,att:att,noshow:noshow,graded:graded,consulted:consulted,overdue:overdue}}
  var view=all.filter(function(r){var s=st(r);if(fil==="all")return true;if(fil==="book")return !s.booked;if(fil==="grade")return s.att&&!s.graded;if(fil==="consult")return s.graded&&!s.consulted;if(fil==="overdue")return s.overdue;return true});
  var h=embed?'':pageHead("Test đầu vào","Đặt lịch test - HV dự test - chấm điểm - tư vấn sau test",'<button class="btn primary" onclick="testQuickAdd()"><i class="ti ti-plus"></i>Khách muốn test ngay</button>');
@@ -13288,8 +13351,8 @@ function testResult(id){var r=find("DL03","test_booking_id",id)||{};
 function testResultSave(id){var _tsK=attachLine("tsr");
  var vals={test_status:eFull("enum_test_status","graded"),skill_listening:fldV("t_l"),skill_reading:fldV("t_r"),skill_writing:fldV("t_w"),skill_speaking:fldV("t_s"),overall_score:fldV("t_o"),academic_note:fldV("t_note")+_tsK,result_time:nowStr(),post_test_status:eFull("enum_post_test_status","awaiting_consultation")};markRow("DL03","test_booking_id",id,vals,"Đã lưu kết quả test.","test");closeModal()}
 /* ===== P3 Tư vấn & Đăng ký (DL04 -> DL06) ===== */
-function renderTuvan(embed){var p="tuvan",fil=fget(p);var all=rows("DL04");
- function enrolled(c){return rows("DL06").some(function(e){return (c.consultation_id&&e.consultation_id===c.consultation_id)||(c.lead_id&&e.lead_id===c.lead_id)})}
+function renderTuvan(embed){var p="tuvan",fil=fget(p);var all=srows("DL04");
+ function enrolled(c){return srows("DL06").some(function(e){return (c.consultation_id&&e.consultation_id===c.consultation_id)||(c.lead_id&&e.lead_id===c.lead_id)})}
  function st(c){var consulted=isc(c.consultation_status,"consulted");var closed=isc(c.conversion_status,"confirmed_with_deposit");var dropped=isc(c.conversion_status,"dropped");return {consulted:consulted,closed:closed,dropped:dropped,enr:enrolled(c)}}
  var view=all.filter(function(c){var s=st(c);if(fil==="all")return true;if(fil==="todo")return !s.consulted;if(fil==="close")return s.consulted&&!s.closed&&!s.dropped;if(fil==="enroll")return s.closed&&!s.enr;return true});
  var h=embed?'':pageHead("Tư vấn & Đăng ký sau test","Tư vấn lộ trình sau test - chốt - tạo đăng ký",'<button class="btn primary" onclick="tvQuick()"><i class="ti ti-plus"></i>Tư vấn không qua test</button>');
@@ -13374,8 +13437,8 @@ function tvEnrollSave(id){var c=find("DL04","consultation_id",id)||{};var cid=fl
   if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL06",enr)}else{d("EN-"+seqNo("DL06","enrollment_id"))}
  })}
 /* ===== P4 Thu & xác nhận Thanh toán (DL06 + DL07) ===== */
-function renderThanhtoan(embed){var p="thanhtoan",fil=fget(p);var enr=rows("DL06");
- function pinfo(e){var tot=num(e.final_fee)||num(e.total_fee);var paid=num(e.paid_amount);var rem=e.remaining_amount!==undefined&&e.remaining_amount!==""?num(e.remaining_amount):Math.max(0,tot-paid);var pays=rows("DL07").filter(function(x){return x.enrollment_id===e.enrollment_id});var unverif=pays.filter(function(x){return !(x.verified_by&&String(x.verified_by).trim())}).length;return {tot:tot,paid:paid,rem:rem,pays:pays,unverif:unverif,full:rem<=0&&paid>0,partial:paid>0}}
+function renderThanhtoan(embed){var p="thanhtoan",fil=fget(p);var enr=srows("DL06");
+ function pinfo(e){var tot=num(e.final_fee)||num(e.total_fee);var paid=num(e.paid_amount);var rem=e.remaining_amount!==undefined&&e.remaining_amount!==""?num(e.remaining_amount):Math.max(0,tot-paid);var pays=srows("DL07").filter(function(x){return x.enrollment_id===e.enrollment_id});var unverif=pays.filter(function(x){return !(x.verified_by&&String(x.verified_by).trim())}).length;return {tot:tot,paid:paid,rem:rem,pays:pays,unverif:unverif,full:rem<=0&&paid>0,partial:paid>0}}
  var view=enr.filter(function(e){var s=pinfo(e);var canc=isc(e.enrollment_status,"cancelled");
   if(fil==="cancelled")return canc;
   if(canc)return fil==="all";                    /* đã hủy chỉ hiện ở Tất cả và Đã hủy */
@@ -13402,7 +13465,7 @@ function renderThanhtoan(embed){var p="thanhtoan",fil=fget(p);var enr=rows("DL06
  view=fltApply(p,view);
  h+=filterBar(p,fil,[["all","Tất cả",enr.length],["due","Tới hẹn thu",nDue,nDue?"red":""],
   ["debt","Còn công nợ",enr.filter(function(e){return pinfo(e).rem>0&&!isc(e.enrollment_status,"cancelled")}).length,"amber"],
-  ["verify","Chờ xác nhận",rows("DL07").filter(function(x){return !(x.verified_by&&String(x.verified_by).trim())}).length,"red"],
+  ["verify","Chờ xác nhận",srows("DL07").filter(function(x){return !(x.verified_by&&String(x.verified_by).trim())}).length,"red"],
   ["paid","Đã đủ",enr.filter(function(e){return pinfo(e).full}).length],["cancelled","Đã hủy"]],view.length);
  h+='<div class="obcards rows" data-tour="obcards">';if(!view.length)h+='<div class="empty">Không có đăng ký phù hợp.</div>';
  var MIX=jIndex();
@@ -13760,7 +13823,7 @@ function wowGrantSave(){
  if(SVR)google.script.run.apiUpdate("DL09",sid,{wow_extra_approved:s.wow_extra_approved,wow_extra_purchased:s.wow_extra_purchased,wow_quota_remaining:s.wow_quota_remaining,notes:s.notes});
  toast("Đã cấp thêm "+n+" lượt WOW cho "+(s.full_name||sid)+" - còn "+s.wow_quota_remaining+" lượt.",4200);
  closeModal();reRender(CUR);persistSoon()}
-function renderWow(embed){var p="wow",fil=fget(p);var all=rows("DL14");
+function renderWow(embed){var p="wow",fil=fget(p);var all=srows("DL14");
  function st(w){var code=ecode(w.wow_status);var done=code==="completed";var confirmed=done||code==="confirmed";var booked=confirmed||code==="booked";var noshow=code==="no_show";var note=!!(w.wow_content_note&&String(w.wow_content_note).trim());var overdue=done&&!note&&hoursSince(w.wow_session_date)!=null&&hoursSince(w.wow_session_date)>paramOf("slaWowNote_hours",24);return {booked:booked,confirmed:confirmed,done:done,noshow:noshow,note:note,overdue:overdue}}
  var view=all.filter(function(w){var s=st(w);if(fil==="all")return true;if(fil==="confirm")return s.booked&&!s.confirmed&&!s.noshow;if(fil==="upcoming")return s.confirmed&&!s.done&&!s.noshow;if(fil==="note")return s.done&&!s.note;if(fil==="overdue")return s.overdue;return true});
  var h=embed?'':pageHead("Buổi WOW 1-1","Đặt buổi - xác nhận - dạy - ghi nội dung (trong 24h)",'<button class="btn primary" onclick="wowAdd()"><i class="ti ti-plus"></i>Đặt buổi WOW</button><button class="btn" onclick="wowGrantForm()"><i class="ti ti-star"></i>Cấp thêm lượt WOW</button>');
@@ -13784,7 +13847,7 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=rows("DL14");
      buoi da dat ma HV chua xac nhan - goi chot gio moi la viec cua hom nay. */
   (function(){var n=all.filter(function(w){return isc(w.wow_status,"booked")}).length;
    return ["ti-phone-check",n,"Đã đặt, chờ HV xác nhận","#7C3AED",n?"gọi chốt giờ trước khi học viên quên":"đã xác nhận hết"]})(),
-  ["ti-player-stop",rows("DL09").filter(function(x){return String(x.wow_quota_remaining||"")!==""&&wowQuotaOf(x.student_id).free<=0}).length,"HV đã hết lượt WOW","#6B7887","cấp thêm nếu có căn cứ"]],"wow");
+  ["ti-player-stop",srows("DL09").filter(function(x){return String(x.wow_quota_remaining||"")!==""&&wowQuotaOf(x.student_id).free<=0}).length,"HV đã hết lượt WOW","#6B7887","cấp thêm nếu có căn cứ"]],"wow");
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả",all.length],["confirm","Chờ xác nhận lịch",_w.filter(function(x){return x.booked&&!x.confirmed&&!x.noshow}).length,"amber"],["upcoming","Đã xác nhận, sắp dạy",_w.filter(function(x){return x.confirmed&&!x.done&&!x.noshow}).length],["note","Chờ ghi nội dung",_w.filter(function(x){return x.done&&!x.note}).length,"amber"],["overdue","Quá hạn ghi chú",_w.filter(function(x){return x.overdue}).length,"red"]],view.length);
  h+='<div class="obcards rows" data-tour="obcards">';if(!view.length)h+='<div class="empty">Không có buổi WOW phù hợp.</div>';
@@ -14074,7 +14137,7 @@ function fbToComplaintSave(id){var f=find("DL16","feedback_id",id);if(!f)return;
   toast("Đã tạo khiếu nại "+nid+" từ phản hồi.");closeModal();reRender(CUR)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL17",c)}else{var n=rows("DL17").length+1;d("KN-2026-"+("00"+n).slice(-3))}}
 /* ===== P9 Khiếu nại (DL17) ===== */
-function renderKhieunai(embed){var p="khieunai",fil=fget(p);var all=rows("DL17");
+function renderKhieunai(embed){var p="khieunai",fil=fget(p);var all=srows("DL17");
  function slaLim(sev){var c=ecode(sev);return c==="high"?paramOf("slaComplaintHigh_hours",24):c==="medium"?paramOf("slaComplaintMed_hours",48):paramOf("slaComplaintLow_hours",72)}
  function st(c){var assigned=isc(c.complaint_status,"assigned","in_progress","resolved","escalated");var working=isc(c.complaint_status,"in_progress","resolved","escalated");var resolved=isc(c.complaint_status,"resolved");var overdue=!resolved&&hoursSince(c.complaint_time)!=null&&hoursSince(c.complaint_time)>slaLim(c.complaint_severity);return {assigned:assigned,working:working,resolved:resolved,overdue:overdue}}
  var view=all.filter(function(c){var s=st(c);if(fil==="all")return true;if(fil==="new")return !s.assigned;if(fil==="work")return s.assigned&&!s.resolved;if(fil==="overdue")return s.overdue;if(fil==="done")return s.resolved;return true});
@@ -14141,7 +14204,7 @@ function knAddSave(){var sid=fldV("ka_stu");if(!sid){toast("Chọn học viên."
  function d(nid){c.complaint_id=nid;rows("DL17").unshift(c);toast("Đã tiếp nhận khiếu nại "+nid+".");closeModal();reRender(CUR)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL17",c)}else{d("CMP-"+seqNo("DL17","complaint_id"))}}
 /* ===== P10 Kết thúc khóa & Tái ghi danh (DL18) ===== */
-function renderKetthuc(){var p="ketthuc",fil=fget(p);var all=rows("DL18");
+function renderKetthuc(){var p="ketthuc",fil=fget(p);var all=srows("DL18");
  function st(r){var scored=!!(r.final_test_score&&String(r.final_test_score).trim());var invited=isc(r.re_enrollment_status,"contacted","interested","confirmed_with_deposit","rejected");var closed=isc(r.re_enrollment_status,"confirmed_with_deposit","rejected");return {scored:scored,invited:invited,closed:closed}}
  var view=all.filter(function(r){var s=st(r);if(fil==="all")return true;if(fil==="score")return !s.scored;if(fil==="invite")return s.scored&&!s.invited;if(fil==="follow")return s.invited&&!s.closed;return true});
  var h=pageHead("Kết thúc khóa & Tái ghi danh","Nhập kết quả đầu ra - đánh giá mục tiêu - mời & chốt tái ghi danh",'<button class="btn primary" onclick="ktGen()"><i class="ti ti-school-off"></i>Tạo hồ sơ kết thúc cho lớp</button>');
@@ -15323,7 +15386,7 @@ function hvFeedbackSave(){var c=(fldV("hf_content")||"").trim();
    Dải 4 số kiểu bảng BC + KPI riêng + các bảng liên quan. */
 /* ===== TRANG QUẢN LÝ MÃ GIỚI THIỆU (DL22) ===== */
 function renderMaGioiThieu(embed){
- var ev=rows("DL22");
+ var ev=srows("DL22");
  var off=hvRefOffer(),reward=paramStr("referralReferrer_reward","1 buổi WOW 1-1 miễn phí");
  /* gom theo học viên chủ mã */
  var byRef={};ev.forEach(function(x){var k=x.referrer_student_id||x.referrer_name;(byRef[k]=byRef[k]||{name:x.referrer_name,code:x.referral_code,sid:x.referrer_student_id,rows:[]}).rows.push(x)});
@@ -15759,11 +15822,11 @@ function renderHtToday(embed){
  var me=find("DL01","staff_id",CURSTAFF);
  var gid=window.HTGV||((me&&/teacher|wow/.test(ecode(me.role)))?me.staff_id:"")||"";
  var today=new Date();
- var ses=rows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,today)&&(!gid||String(x.teacher_id||"")===gid)});
+ var ses=srows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,today)&&(!gid||String(x.teacher_id||"")===gid)});
  ses.sort(function(a,b){return (pvnd(a.session_date)||0)-(pvnd(b.session_date)||0)});
- var hwQ=rows("DL13").filter(function(x){return hwSubmitted(x)&&!hwGraded(x)&&(!gid||String(x.teacher_id||"")===gid)});
- var owe=rows("DL11").filter(function(x){var st=bhState(x);return st.done&&!st.note&&(!gid||String(x.teacher_id||"")===gid)});
- var wowT=rows("DL14").filter(function(w){var d=pvnd(w.wow_session_date);return d&&sameDay(d,today)&&(!gid||String(w.staff_id||"")===gid)&&!isc(w.wow_status,"cancelled")});
+ var hwQ=srows("DL13").filter(function(x){return hwSubmitted(x)&&!hwGraded(x)&&(!gid||String(x.teacher_id||"")===gid)});
+ var owe=srows("DL11").filter(function(x){var st=bhState(x);return st.done&&!st.note&&(!gid||String(x.teacher_id||"")===gid)});
+ var wowT=srows("DL14").filter(function(w){var d=pvnd(w.wow_session_date);return d&&sameDay(d,today)&&(!gid||String(w.staff_id||"")===gid)&&!isc(w.wow_status,"cancelled")});
  var h='<div class="fbar"><span class="lbl">Của giảng viên</span><select class="sel" onchange="window.HTGV=this.value;reRender(CUR)"><option value="">-- tất cả GV --</option>'+
   gvs.map(function(g){return '<option value="'+esc(g.staff_id)+'"'+(g.staff_id===gid?" selected":"")+'>'+esc(g.staff_id+" - "+g.full_name)+'</option>'}).join("")+'</select></div>';
  h+=statStrip([["ti-calendar-check",ses.length,"Buổi dạy hôm nay","#2E5A88",""],
@@ -15833,15 +15896,15 @@ function renderLichTuan(embed){
  function hhmm(d){return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
  /* gom su kien trong tuan */
  var evs=[];
- rows("DL11").forEach(function(x){var d=pvnd(x.session_date);if(!d||d<mon||d>sun)return;
+ srows("DL11").forEach(function(x){var d=pvnd(x.session_date);if(!d||d<mon||d>sun)return;
   evs.push({d:d,who:String(x.teacher_id||""),whoNm:x.teacher_id_name||"",cls:x.class_id,kind:"lop",
    lb:hhmm(d)+" "+(x.class_id_name||x.class_id),st:ecode(x.session_status),
    act:"goDD(\'"+esc(x.class_id)+"\',\'"+esc(x.session_id)+"\')"})});
- rows("DL14").forEach(function(x){var d=pvnd(x.wow_session_date);if(!d||d<mon||d>sun)return;
+ srows("DL14").forEach(function(x){var d=pvnd(x.wow_session_date);if(!d||d<mon||d>sun)return;
   if(isc(x.wow_status,"cancelled"))return;
   evs.push({d:d,who:String(x.staff_id||""),whoNm:x.staff_name||"",cls:"",kind:"wow",
    lb:hhmm(d)+" WOW "+(x.student_name||x.student_id),st:ecode(x.wow_status),act:"go(\'wow\')"})});
- rows("DL03").forEach(function(x){var d=pvnd(x.test_date);if(!d||d<mon||d>sun)return;
+ srows("DL03").forEach(function(x){var d=pvnd(x.test_date);if(!d||d<mon||d>sun)return;
   if(isc(x.booking_status,"rejected","cancelled"))return;
   evs.push({d:d,who:"__test",whoNm:"Test đầu vào",cls:"",kind:"test",
    lb:hhmm(d)+" "+(x.lead_id_name||x.lead_id),st:ecode(x.test_status),act:"go(\'test\')"})});
@@ -15857,7 +15920,7 @@ function renderLichTuan(embed){
  var _sp=sesSpanH()*36e5;   /* V9.29o: lấy từ cấu hình, cùng một con số với màn GV dự phòng */
  evs.forEach(function(a){evs.forEach(function(b){if(a===b||!a.who||a.who!==b.who||a.who==="__test")return;
   if(Math.abs(a.d.getTime()-b.d.getTime())<_sp){clash[a.who+"|"+a.d.getTime()]=1}})});
- var noGvCls=rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()});
+ var noGvCls=srows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()});
  var h='';
  h+=tbar('<button class="pill" onclick="window.WKOFF=(window.WKOFF||0)-1;reRender(CUR)"><i class="ti ti-chevron-left"></i>Tuần trước</button>'+
   '<span class="tblbl" style="margin:0 6px">'+fmtD(mon)+' - '+fmtD(days[6])+(off===0?' (tuần này)':'')+'</span>'+
@@ -15997,7 +16060,7 @@ function gvdpDay(){var d=pvnd(window.GVDPD||"");if(d)return d;var t=new Date();t
 function gvdpSet(v){window.GVDPD=v;reRender(CUR)}
 function renderGvdp(embed){
  var day=gvdpDay();
- var ses=rows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,day)&&!isc(x.session_status,"cancelled")})
+ var ses=srows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,day)&&!isc(x.session_status,"cancelled")})
   .sort(function(a,b){return (pvnd(a.session_date)||0)-(pvnd(b.session_date)||0)});
  var GV=rows("DL01").filter(isGVRole);
  var busyMap={};ses.forEach(function(x){if(x.teacher_id)busyMap[x.teacher_id]=(busyMap[x.teacher_id]||0)+1});
@@ -16012,7 +16075,7 @@ function renderGvdp(embed){
      roi cung khong xep GV thay khac di. Doi sang hai cau hoi that su cua nguoi truc hom nay. */
   ["ti-user-off",ses.filter(function(x){return !String(x.teacher_id||"").trim()}).length,"Buổi hôm nay chưa có GV","#E24B4A","giao người ngay, đừng để tới giờ"],
   ["ti-calendar-off",(function(){var t0=new Date();t0.setHours(0,0,0,0);
-    return rows("DL11").filter(function(x){var d=pvnd(x.session_date);
+    return srows("DL11").filter(function(x){var d=pvnd(x.session_date);
      return d&&sameDay(d,t0)&&isc(x.session_status,"cancelled")}).length})(),"Buổi đã huỷ hôm nay","#E08A1E","báo học viên chưa?"]],"gvdp");
  h+=tbar('<span class="tblbl">Ngày</span><input type="date" class="sel" value="'+esc(ymd)+'" onchange="gvdpSet(this.value)">'+
   '<button class="pill" onclick="gvdpSet(\''+esc(fmtYMD(new Date(day.getTime()-864e5)))+'\')"><i class="ti ti-chevron-left"></i>Hôm trước</button>'+
@@ -16053,9 +16116,9 @@ function gvTaiSet(n){window.GVTAIKY=num(n)||30;reRender(CUR)}
 function gvTaiRows(){
  var ky=gvTaiKy(),t0=new Date();t0.setHours(0,0,0,0);var t1=t0.getTime()+ky*864e5;
  var GV=rows("DL01").filter(isGVRole);
- var CL={};rows("DL10").forEach(function(c){CL[c.class_id]=c});
+ var CL={};srows("DL10").forEach(function(c){CL[c.class_id]=c});
  var M={};GV.forEach(function(g){M[g.staff_id]={g:g,toi:0,daDay:0,tre:0,coNX:0,xongNX:0,lop:{},cs:{}}});
- rows("DL11").forEach(function(x){
+ srows("DL11").forEach(function(x){
   var id=String(x.teacher_id||"");if(!M[id])return;var m=M[id];
   if(isc(x.session_status,"cancelled"))return;
   var d=pvnd(x.session_date);if(!d)return;
@@ -16065,7 +16128,7 @@ function gvTaiRows(){
   if(isc(x.session_status,"completed")){m.daDay++;
    if(num(x.teacher_late_minutes)>0)m.tre++;
    m.coNX++;if(bhState(x).note)m.xongNX++}});
- rows("DL10").forEach(function(c){var id=String(c.main_teacher_id||"");
+ srows("DL10").forEach(function(c){var id=String(c.main_teacher_id||"");
   if(M[id]&&!/finished|cancelled/.test(ecode(c.class_status)))M[id].lop[c.class_id]=1});
  return GV.map(function(g){var m=M[g.staff_id];
   return {id:g.staff_id,ten:g.full_name||g.staff_id,vai:elabel(g.role)||g.role||"",
@@ -16200,14 +16263,14 @@ function noRoomList(){
 function renderPhong(embed){
  var cl=fltApply("phong",clashList()),nr=noRoomList();
  var byT={phong:0,lop:0,gv:0};cl.forEach(function(x){byT[x.t]++});
- var onl=rows("DL10").filter(clsOnline).length;
+ var onl=srows("DL10").filter(clsOnline).length;
  var h=embed?'':pageHead("Phòng học & đụng lịch","Soi đụng phòng, đụng giờ của lớp và của giáo viên trên toàn bộ lịch. Lớp online không tính đụng phòng - 'phòng' của nó là link riêng.","");
  h+=statStrip([
   ["ti-layout-grid",byT.phong,"Đụng phòng","#E24B4A",byT.phong?"hai lớp cùng một phòng":"không có"],
   ["ti-calendar-x",byT.lop,"Lớp trùng giờ với chính nó","#DB2777",byT.lop?"xếp lịch bị lặp":"không có"],
   ["ti-user-exclamation",byT.gv,"Giáo viên trùng giờ","#E08A1E",byT.gv?"cần đổi người hoặc đổi giờ":"không có"],
   ["ti-map-pin",nr.length,"Lớp tại chỗ chưa có phòng","#7C3AED",nr.length?"tới giờ mới đi tìm phòng":"đủ phòng"],
-  ["ti-user-exclamation",rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()}).length,"Lớp mở chưa có GV chính","#DB2777","giao lớp ngay"],
+  ["ti-user-exclamation",srows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()}).length,"Lớp mở chưa có GV chính","#DB2777","giao lớp ngay"],
   /* V9.57: bo o "Lop online - khong rang buoc phong": tren mot trang ve XEP PHONG, dem lop
      KHONG can phong la thong tin nen, khong ai quyet gi tu no. Cau da noi ro o dong ghi chu. */
   ],"phong");
@@ -16225,7 +16288,7 @@ function renderPhong(embed){
  h+='</tbody></table></div></div>';
  /* Lớp đang mở mà CHƯA CÓ GV CHÍNH: trước đây chỉ là một dòng chữ đỏ trên lịch tuần, không có
     lối nào để xử lý ngay. Nay có danh sách + nút giao lớp. */
- var noGv=rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()});
+ var noGv=srows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()});
  h+='<div class="panel"><div class="ph"><b>Lớp đang mở chưa có giáo viên chính ('+noGv.length+')</b><span class="mut" style="font-size:11.5px">giao lớp ngay tại đây</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Cơ sở</th><th>Hình thức</th><th>Lịch</th><th>Sĩ số</th><th></th></tr></thead><tbody>';
  if(!noGv.length)h+='<tr><td class="empty" colspan="6">Lớp đang mở nào cũng đã có giáo viên chính.</td></tr>';
  noGv.forEach(function(c){
@@ -16243,13 +16306,13 @@ function renderPhong(embed){
  return h+'</tbody></table></div></div>'}
 function renderHoctap(){
  var tab=hubTab("hoctap");
- var cls=rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))});
- var nNote=rows("DL11").filter(function(s){return bhState(s).noteOver}).length;
- var nWow=rows("DL14").filter(function(w){var done=ecode(w.wow_status)==="completed";var note=!!(w.wow_content_note&&String(w.wow_content_note).trim());return isc(w.wow_status,"booked","confirmed")||(done&&!note)}).length;
+ var cls=srows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))});
+ var nNote=srows("DL11").filter(function(s){return bhState(s).noteOver}).length;
+ var nWow=srows("DL14").filter(function(w){var done=ecode(w.wow_status)==="completed";var note=!!(w.wow_content_note&&String(w.wow_content_note).trim());return isc(w.wow_status,"booked","confirmed")||(done&&!note)}).length;
  var actBtn=(tab==="wow")?'<button class="btn primary" onclick="wowAdd()"><i class="ti ti-plus"></i>Đặt buổi WOW</button>':'<button class="btn primary" onclick="go(\'xeplop\')"><i class="ti ti-layout-grid-add"></i>Xếp lớp & Onboarding</button>';
  var h=pageHead("Học tập & Giảng dạy","Lớp đang mở, theo dõi nhận xét buổi (SLA), và buổi WOW 1-1 — một chỗ. Bấm một lớp để vào Vận hành lớp; theo dõi SLA nhận xét và WOW ở hai tab còn lại."+hubCau("hoctap",tab),actBtn,1);
- var todayN=rows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,new Date())}).length;
- var nNoGv=rows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,new Date())&&!isc(x.session_status,"cancelled")&&!String(x.teacher_id||"").trim()}).length;
+ var todayN=srows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,new Date())}).length;
+ var nNoGv=srows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,new Date())&&!isc(x.session_status,"cancelled")&&!String(x.teacher_id||"").trim()}).length;
  h+=tbar(segHTML(tab,[["today","Hôm nay",todayN||"",""],["lichtuan","Lịch tuần","",""],["gvdp","GV dự phòng",nNoGv||"",nNoGv?"red":""],["phong","Phòng & đụng lịch",clashList().length||"",clashList().length?"red":""],["lop","Lớp học",cls.length||"",""],["buoihoc","Nhận xét buổi",nNote||"",nNote?"red":""],["wow","Buổi WOW 1-1",nWow||"",nWow?"amber":""]],"htTabSet('{k}')"),
   '<button class="pill" onclick="go(\'giaoan\')"><i class="ti ti-notes"></i>Kho bài & Giáo án</button><button class="pill" onclick="go(\'banglop\')"><i class="ti ti-clipboard-list"></i>Vận hành lớp</button>');
  h+=bvSau();   /* chọn chặng xong mới tới bảng việc của chức danh */
@@ -16261,7 +16324,7 @@ function renderHoctap(){
  else if(tab==="buoihoc")h+=renderBuoihoc(1);
  else h+=renderWow(1);
  return h}
-function renderBuoihoc(embed){var p="buoihoc",fil=fget(p);var all=rows("DL11");
+function renderBuoihoc(embed){var p="buoihoc",fil=fget(p);var all=srows("DL11");
  var view=all.filter(function(s){var st=bhState(s);
   if(fil==="all")return true;
   if(fil==="note")return st.done&&!st.note;
@@ -16491,9 +16554,9 @@ function bhMakeupSave(id,force){var d=(fldV("bh_md")||"").trim();
 function kcTabSet(tab){for(var k in KMAP)if(KMAP[k]===tab){go(k);return}window.KTAB=tab;reRender(CUR)}
 function renderKhac(){
  var tab=window.KTAB||"baoluu";
- var bl=rows("DL09").filter(function(x){return isc(x.student_status,"dropped","transferred")});
+ var bl=srows("DL09").filter(function(x){return isc(x.student_status,"dropped","transferred")});
  var nBlCall=bl.filter(function(x){return !String(x.next_followup_time||"").trim()}).length;
- var nRef=rows("DL22").length;
+ var nRef=srows("DL22").length;
  var actBtn=(tab==="magioithieu")?'<button class="btn" onclick="window.SETTAB=\'ch2\';go(\'settings\')"><i class="ti ti-settings"></i>Cấu hình chính sách</button>':'';
  var ksegs=scopeTabs("khac",[["baoluu","Bảo lưu / Bỏ học",bl.length||"",nBlCall?"amber":""],["magioithieu","Mã giới thiệu",nRef||"",""]]);
  if(!ksegs.some(function(t){return t[0]===tab})){tab=(ksegs[0]||["baoluu"])[0];window.KTAB=tab}
@@ -16504,7 +16567,7 @@ function renderKhac(){
  else h+=renderBaoluu(1);
  return h}
 function renderBaoluu(embed){var p="baoluu",fil=fget(p);
- var all=rows("DL09").filter(function(s){return isc(s.student_status,"dropped","transferred")});
+ var all=srows("DL09").filter(function(s){return isc(s.student_status,"dropped","transferred")});
  var view=all.filter(function(s){var dropped=isc(s.student_status,"dropped");
   if(fil==="all")return true;
   if(fil==="drop")return dropped;
@@ -16524,10 +16587,10 @@ function renderBaoluu(embed){var p="baoluu",fil=fget(p);
  if(!view.length)h+='<div class="empty">Không có học viên nào ở nhóm này - tốt!</div>';
  var MIX=jIndex();
  view.forEach(function(s){var dropped=isc(s.student_status,"dropped");var id=s.student_id;
-  var obL=rows("DL08").filter(function(o){return o.student_id===id&&String(o.class_id||"").trim()});
+  var obL=srows("DL08").filter(function(o){return o.student_id===id&&String(o.class_id||"").trim()});
   var clsNm=obL.length?(obL[obL.length-1].class_id_name||obL[obL.length-1].class_id):"";
   var reason=s.dropout_reason||s.academic_risk_reason||s.attendance_risk_reason||"";
-  var ce=rows("DL18").filter(function(x){return x.student_id===id})[0];
+  var ce=srows("DL18").filter(function(x){return x.student_id===id})[0];
   if(!reason&&ce)reason=ce.dropout_reason||ce.transferred_note||"";
   h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(id,s.full_name)+'</b>'+
    '<div class="obm">'+esc(id)+(s.phone_number?' · '+esc(s.phone_number):'')+(clsNm?' · '+esc(clsNm):'')+
@@ -16676,12 +16739,12 @@ function renderChang(){
  var a=arcHopLe(window.ARC||"changA");
  if(!a)return dsDeny("Bản đồ chặng vòng đời học viên");
  var A=ARCBK[a];window.ARC=A.k;a=A.k;
- var pt=document.getElementById("pgTitle");if(pt)pt.textContent="Chặng "+A.n+" · "+A.t;
+ var pt=document.getElementById("pgTitle");if(pt)pt.textContent=A.t;
  var all=jAll();var mine=all.filter(function(J){return arcOf(J.k)===a});
  var rail=ARCRAIL[a]||[],brs=ARCBRANCH[a]||[];
  var cnt={},ovr={};mine.forEach(function(J){cnt[J.k]=(cnt[J.k]||0)+1;if(J.over)ovr[J.k]=(ovr[J.k]||0)+1});
  var sel=window.CHANGK||"";
- var h=pageHead("Chặng "+A.n+" · "+A.t,A.d,
+ var h=pageHead(A.t,A.d,
   (mine.filter(function(J){return J.act}).length?'<button class="btn primary" onclick="window.CHANGK=\'\';runQueue(changList().filter(function(J){return J.act}).map(function(J){return J.C.pid}))"><i class="ti ti-player-play"></i>Chạy cả chặng</button>':''));
  /* --- ĐƯỜNG RAY GA --- */
  /* V9.63 (anh Luân: *"mà 2 cái này khác gì nhau ko em?"*) - hỏi đúng chỗ dễ nhầm: trên cùng một
@@ -20230,7 +20293,7 @@ function crumbLabel(key,ctx){ctx=ctx||{};var p=PBK[key];var t=p?p.t:key;
  else if(key==="banglop"&&ctx.BLCLASS)t="Lớp · "+nm("DL10","class_id",ctx.BLCLASS,"class_name");
  /* V9.19: hub/trang nhiều góc nhìn phải nói RÕ đang ở tab nào - breadcrumb mới có nghĩa */
  else if(HUBTAB[key]){var sk=hubSubKey(key);if(sk&&PBK[sk])t=p.t+" · "+PBK[sk].t}
- else if(key==="chang"){var A9=ARCBK[window.ARC||"changA"];if(A9)t="Chặng "+A9.n+" · "+A9.t}
+ else if(key==="chang"){var A9=ARCBK[window.ARC||"changA"];if(A9)t=A9.t}
  else if(key==="banlam"&&window.BLVIEW==="board")t=p.t+" · Bảng chặng";
  return t}
 /* V9.19 - BREADCRUMB = VỆT ĐƯỜNG ĐI THẬT (Luân: "làm lại breadcrumb để phục vụ back trang").

@@ -115,7 +115,12 @@ t("nhom chang du 4", NAVTREE.filter(function(G){return G.arc}).length===4);
  vao(acam.staff_id);setRole("all");
  window.NAVOPEN={};navCay().forEach(function(G){window.NAVOPEN[G.g]=true});
  buildNav();
- t("ACA: thanh menu that khong con chu chang", !/C[1-4]\s*·/.test(NAVEL.innerHTML));
+ /* V9.99y: ten nhom chang khong con so ("C2 ·") nua - anh Luan: nhin thieu so la tuong app
+    thieu phan. Nen luat nay hoi thang: menu cua ACA khong duoc mang TEN CHANG nao lam ten nhom,
+    va khong co muc "Ban do chang". */
+ t("ACA: thanh menu that khong co nhom chang nao",
+   ARCS.every(function(A){return NAVEL.innerHTML.indexOf(">"+A.t+"<")<0})&&
+   NAVEL.innerHTML.indexOf("Bản đồ chặng")<0);
  t("ACA: thanh menu that co nhom Lop hoc & Giang day", /Lớp học &amp; Giảng dạy|Lớp học & Giảng dạy/.test(NAVEL.innerHTML));
  vao("")})();
 t("menu lo test/wow/baoluu tro lai (yeu cau Luan)", (function(){
@@ -184,7 +189,10 @@ if(hr){vao(hr.staff_id);
  t("nhan su: dung nhom rieng", SCOPE().group==="nhansu");
  t("nhan su: khong thay ban do chang (khong cham hoc vien)", !navVis("changA")&&!navVis("changB"));
  t("nhan su: khong thay hoc vien / tuyen sinh / thanh toan", !navVis("hocvien")&&!navVis("tuyensinh")&&!navVis("thanhtoan"));
- t("nhan su: khong vao duoc Cai dat va Bao cao", !navVis("settings")&&!navVis("baocao"));
+ /* V9.99w: MOI chuc danh nay deu co trang Chi so & KPI, khac nhau la PHAM VI (anh Luan dat).
+    Nhan su van khong vao duoc Cai dat - do moi la cua he thong. */
+ t("nhan su: khong vao duoc Cai dat", !navVis("settings"));
+ t("nhan su: CO trang chi so cua rieng doi minh", navVis("baocao"));
  /* 05/08 - CAU NAY TUNG HOI SAI CAU HOI: `navVis` tra loi "co DUOC PHEP thay khong", khong tra
     loi "co CHO DUNG tren menu khong". Nhan su duoc phep thay `nhansu`/`bangcong` nhung hai khoa
     ay khong nam trong NAVTREE, nen menu that cua ho chi co 4 muc va trang dap khong sang o dau.
@@ -209,7 +217,9 @@ if(hr){vao(hr.staff_id);
 /* Marketing khong duoc xem tien - do that tren trang Bao cao thay vi tin loi khai */
 var mk=rows("DL01").filter(function(x){return /^marketing_(manager|leader)/.test(ecode(x.role))})[0];
 if(mk){vao(mk.staff_id);
- t("marketing (quan ly) khong duoc moi vao Bao cao", !navVis("baocao"));
+ t("marketing (quan ly): CO trang chi so, va trang do khong bay tien",
+   navVis("baocao")&&(function(){CUR="baocao";var o="";try{o=RENDER.baocao()}catch(e){}
+    return !/Tình hình kinh doanh/.test(o)})());
  t("marketing bi cam tien trong pham vi", SCOPE().noTien===1);}
 /* IT / bao ve / tap vu da ra khoi cong nhan vien */
 t("cong nhan vien khong con IT / bao ve / tap vu",
