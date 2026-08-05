@@ -2656,7 +2656,17 @@ function buildScope(code){
  var base=ROLESCOPE[gk];var eff={group:gk};
  for(var p in base)if(p!=="match")eff[p]=Array.isArray(base[p])?base[p].slice():(base[p]&&typeof base[p]==="object"?JSON.parse(JSON.stringify(base[p])):base[p]);
  var isMgr=/manager|leader/.test(code);
- eff.mgr=isMgr?1:0;              /* V9.41: CH3 phân quyền theo "có phải quản lý không" - phải nhớ */
+ /* ═══ V9.99q - LEADER CHI NHÁNH KHÔNG PHẢI TRƯỞNG PHÒNG ══════════════════════════════════
+    Anh Luân 04/08: *"Duyệt chiết khấu chỉ có trưởng phòng tư vấn và giám đốc mới có quyền em."*
+    Đo trước khi sửa: `canAct("ck_lon")` trả TRUE cho cả BA Sale Leader chi nhánh, vì cờ `mgr`
+    bật cho mọi mã có chữ "manager" HOẶC "leader" - mà bảng CH3 chỉ hỏi "có phải quản lý không"
+    rồi hỏi tiếp "thuộc nhóm nào", không hỏi "cấp mấy". Leader chi nhánh là cấp trung: họ quản
+    người và số của cơ sở mình, nhưng những việc PHÊ DUYỆT theo SOP thuộc trưởng phòng trở lên.
+    Nay tách hai khái niệm: `mgr` = quyền DUYỆT (chỉ *_manager và CEO), `leader` = quản lý cấp
+    cơ sở (giữ nguyên để phạm vi dữ liệu và các màn quản lý chạy như cũ). */
+ var isLead=/leader/.test(code)&&!/manager/.test(code);
+ eff.leader=isLead?1:0;
+ eff.mgr=(isMgr&&!isLead)?1:0;   /* V9.41 + V9.99q: chỉ trưởng phòng trở lên mới là người DUYỆT */
  if(isMgr&&eff.pages!=="*"){
   /* Trưởng phòng / Leader được xem Báo cáo - TRỪ vai bị cấm tiền (Marketing) và vai không đụng
      nghiệp vụ học viên (Nhân sự). Trước bản này câu lệnh này đẩy Báo cáo cho MỌI quản lý, nên
@@ -6025,7 +6035,7 @@ function duyCkHTML(TH){
   h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+duyWho(r)+' - '+esc(r.course_id_name||r.course_id)+'</div><div class="amt">'+money(r.discount_amount)+'đ <span style="font-size:12px;color:var(--muted);font-weight:600" data-tip="'+esc(pctG(num(r.discount_amount),num(r.total_fee),"đồng chiết khấu trên học phí gốc"))+'">('+pct+'% / học phí gốc '+money(r.total_fee)+'đ)</span></div><div class="rs">Loại: '+esc(elabel(r.discount_type)||"-")+' - Lý do: '+esc(r.discount_reason||"-")+'</div></div><div class="act">'+duyXemBtn(r)+'<button class="btn green" onclick="confirmRun(\'Duyệt chiết khấu '+money(r.discount_amount)+'đ cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi tên bạn là người duyệt.\',\'duyetOK\',\''+id+'\')"><i class="ti ti-check"></i>Duyệt</button><button class="btn danger" onclick="confirmRun(\'TỪ CHỐI chiết khấu này? Chiết khấu về 0 và học phí tính lại.\',\'duyetNo\',\''+id+'\')"><i class="ti ti-x"></i>Từ chối</button></div></div>'});
  h+='</div></div>';
  if(appr.length){h+='<div class="sechd">Đã quyết định gần đây</div><div class="panel"><div class="pbody">';
-  appr.slice(0,8).forEach(function(r){var rej=/từ chối|tu choi/i.test(String(r.discount_approved_by));h+='<div class="appcard done"><div class="info"><div class="id">'+esc(r.enrollment_id)+'</div><div class="big">'+esc(r.student_id_name||r.student_id)+' - chiết khấu '+money(r.discount_amount)+'đ</div><div class="rs">'+esc(r.discount_approved_by)+(r.discount_approved_at?' · '+esc(r.discount_approved_at):'')+'</div></div><div class="act"><span class="chip '+(rej?"red":"green")+'" style="padding:6px 12px">'+(rej?"Đã từ chối":"Đã duyệt")+'</span></div></div>'});
+  appr.slice(0,8).forEach(function(r){var rej=/từ chối|tu choi/i.test(String(r.discount_approved_by));h+='<div class="appcard done"><div class="info"><div class="id">'+esc(r.enrollment_id)+'</div><div class="big">'+esc(r.student_id_name||r.student_id)+' - chiết khấu '+money(r.discount_amount)+'đ</div><div class="rs">'+duyetAiTen(r.discount_approved_by)+(r.discount_approved_at?' · '+esc(r.discount_approved_at):'')+'</div></div><div class="act"><span class="chip '+(rej?"red":"green")+'" style="padding:6px 12px">'+(rej?"Đã từ chối":"Đã duyệt")+'</span></div></div>'});
   h+='</div></div>'}
  return h}
 function duyetWrite(id,decision,apply){var r=find("DL06","enrollment_id",id);if(!r){toast("Không thấy đăng ký.");return}
@@ -6050,6 +6060,16 @@ function ckChanNeuKhongQuyen(){
  if(canDuyetCK())return false;
  toast("Chiết khấu do Trưởng phòng Tư vấn duyệt. Chức danh của bạn xác nhận và thực hiện theo quyết định đó.",5000);
  return true}
+/* V9.99q (anh Luân: *"Chỗ đã duyệt gần đây cũng vậy, nó ko hiện ra ai duyệt"*).
+   Cột `discount_approved_by` trong dữ liệu gieo sẵn chứa MÃ nhân viên ("NV012"), còn khi app tự
+   ghi thì lưu TÊN (`myName()`). Thẻ in thẳng giá trị ấy ra, nên với dữ liệu demo người đọc thấy
+   một chuỗi mã vô nghĩa. Hàm này nhận cả hai kiểu và luôn trả về tên đọc được. */
+function duyetAiTen(v){
+ var x=String(v||"").trim();
+ if(!x)return '<span class="mut">chưa ghi người duyệt</span>';
+ var s=find("DL01","staff_id",x);
+ if(s)return nsLnk(s.staff_id);
+ return esc(x)}
 function duyetOK(id){if(ckChanNeuKhongQuyen())return;duyetWrite(id,"approve",function(r){r.discount_approved_by=myName();r.discount_approved_at=nowStr();toast("Đã duyệt CK "+money(r.discount_amount)+"đ - ghi người duyệt + thời điểm.")})}
 function duyetNo(id){if(ckChanNeuKhongQuyen())return;duyetWrite(id,"reject",function(r){var old=num(r.discount_amount);r.discount_amount=0;r.discount_approved_by="Từ chối - "+myName();r.discount_approved_at=nowStr();r.final_fee=num(r.total_fee);r.remaining_amount=Math.max(0,num(r.total_fee)-num(r.paid_amount));r.notes=(r.notes?r.notes+" | ":"")+"CK "+money(old)+"đ bị từ chối bởi "+myName();toast("Đã từ chối CK - học phí tính lại theo giá gốc.")})}
 function refundSuggest(e){var paid=num(e.paid_amount);if(paid<=0)return {pct:0,amt:0,why:"Chưa đóng"};
@@ -21068,6 +21088,23 @@ function demoBootHV(){window.HVPORTAL=1;try{hvPHmodeRead()}catch(e){}
  if(__base===null)__base=demoPack();
  try{logArm()}catch(e){}
  var who=ssGet("ITTS_WHO_HV");
+ /* ═══ V9.99q - TẢI LẠI TRANG THÌ PHẢI VỀ ĐÚNG CỔNG ĐANG ĐỨNG ═════════════════════════════
+    Anh Luân 04/08: *"Xem lại chỗ đổi cổng đổi người bên trong giúp anh nghen, a phát hiện thấy
+    lỗi ở chỗ phụ huynh."* Đúng, và đây là gốc:
+    `hvPHmodeRead()` đọc `?phuhuynh` trên địa chỉ để biết đang ở cổng nào, nhưng thứ quyết định
+    app CHẠY như cổng phụ huynh lại là `window.HVPHONE` - một biến chỉ được đặt lúc bấm vào thẻ
+    tên ở màn đăng nhập. Tải lại trang là biến ấy mất, trong khi phiên đăng nhập
+    (`ITTS_WHO_HV`) vẫn còn, nên app đi thẳng vào và chạy như CỔNG HỌC VIÊN - dù địa chỉ vẫn
+    ghi `?phuhuynh` và tiêu đề vẫn ghi "Cổng phụ huynh".
+    Hậu quả thấy được: ngăn kéo Đổi cổng đánh dấu "Đang ở đây" vào SAI cổng, và những phần
+    riêng tư của học viên (`HVPH_AN`) lẽ ra phải giấu thì lại hiện ra cho người đang xem.
+    Số điện thoại người giám hộ đã được cất sẵn ở `ITTS_WHO_PH` đúng cho tình huống này - chỉ là
+    chưa ai đọc lại. Nay đọc lại, và dọn cờ khi địa chỉ KHÔNG còn ở cổng phụ huynh nữa. */
+ try{
+  var phSdt=ssGet("ITTS_WHO_PH");
+  if(hvPHmode()){ if(phSdt)window.HVPHONE=phSdt; }
+  else { window.HVPHONE=""; if(phSdt)ssSet("ITTS_WHO_PH",null); }
+ }catch(e){}
  if(who===null||who===undefined){var ap=document.getElementById("hvapp");if(ap)ap.style.display="none";demoGateHV()}
  else bootHV(who||"")}
 /* trên cổng HV, reRender chỉ vẽ lại thân trang */
