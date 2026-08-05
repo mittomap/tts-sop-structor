@@ -326,6 +326,38 @@ def main():
         add(boss_of(who), who, random.choice(pool), "assign", "accepted", True, 28, -20,
             related=pick_related())
 
+    # ---- 3bis-c. MỌI CHỨC DANH CÓ CỬA ĐĂNG NHẬP ĐỀU PHẢI CÓ "VIỆC CHỜ NHẬN" (V9.99t) ----
+    # Anh Luân 05/08: *"Cái chỗ việc chờ nhận, nó chưa theo người nha em - việc chờ nhận nghĩa là
+    # người đang đăng nhập được giao đó"*. App đã sửa để lọc theo người nhận. Nhưng sửa xong thì
+    # lộ ra vế thứ hai: cả trung tâm chỉ có 11 việc ở trạng thái "Mới giao", rơi lung tung, nên
+    # Giám đốc và ba trong bốn trưởng phòng mở tab ấy ra thấy TRỐNG. Lọc đúng mà không có gì để
+    # xem thì người xem demo vẫn kết luận là app hỏng.
+    # Bảo đảm: mỗi chức danh ĐANG CÓ CỬA Ở CỔNG ĐĂNG NHẬP đều có ít nhất một việc chờ nhận.
+    # (Danh sách này đi theo GATEVAI trong gen_v5.py - thêm/bớt cửa thì sửa cả hai chỗ.)
+    VAI_CO_CUA = ["ceo", "aca_manager", "academic_manager", "sales_manager", "wow_leader",
+                  "academic_staff", "sales_staff", "sales_leader", "teacher", "wow_coach",
+                  "accounting_manager", "accountant"]
+    for rc in VAI_CO_CUA:
+        ng = [x for x in staff if role_of(x) == rc]
+        if not ng:
+            continue
+        ids_vai = {x["staff_id"] for x in ng}
+        co = [r for r in rows if r["assignee_id"] in ids_vai
+              and r["task_status"].split("(")[0].strip() == "new"]
+        if co:
+            continue
+        who = ng[0]
+        bs = boss_of(who)
+        if not bs or bs["staff_id"] == who["staff_id"]:
+            # Giám đốc không có cấp trên - việc chờ nhận của họ do trưởng phòng gửi lên.
+            bs = next((x for x in staff if lvl(x.get("role")) == 2
+                       and x["staff_id"] != who["staff_id"]), None)
+        if not bs:
+            continue
+        pool = [x for x in SCEN if x[2] == who.get("department")] or SCEN
+        add(bs, who, random.choice(pool), "assign", "new", True, 22, -3,
+            related=pick_related())
+
     # ---- 3b. QUYỀN TẠM THEO VIỆC (câu hỏi của Luân 28/07) ----
     # Việc dính hồ sơ học viên thì người nhận PHẢI được mở quyền, nhưng quyền là thứ đi mượn:
     # có MỨC rõ (chỉ xem / xem và sửa), có HẠN rõ (mặc định = hạn việc + số ngày ân hạn),

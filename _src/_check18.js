@@ -45,7 +45,7 @@ var TABS={
  tuyensinh:["TSTAB",["lead","test","tuvan","thanhtoan","reup"]],
  cskh:["CSTAB",["khaosat","phanhoi","khieunai"]],
  khac:["KTAB",["baoluu","magioithieu"]],
- duyet:["DUYTAB",["duyetck","duyethoan","duyetnghi","duyetthu","duyetgiao","banggiao"]],
+ duyet:["DUYTAB",["duyetck","duyethoan","duyetnghi","duyetthu","banggiao"]],
  dsthanhtoan:["STTAB",["da","du","cong"]],
  /* Lay THANG tu app (setTabs) - truoc day cho nay chep tay danh sach tab, them tab moi la bo kiem im lang bo sot. */
  settings:["SETTAB",setTabs().map(function(t){return t[0]})],
@@ -514,7 +514,10 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
  /* các hàng chờ quyết định + màn xếp lịch cũng phải xuất được (kế toán hay xin file) */
  (function(){
   var thieu=[];
-  [["duyet","DUYTAB","duyetthu"],["duyet","DUYTAB","duyetgiao"],["dsthanhtoan","STTAB","du"],
+  /* V9.99u - o cho thu hai truoc day la `duyetgiao`, nay khoa ay khong con la hang cho quyet
+     dinh nua (da ve trang Quan ly viec giao & nhan). Doi sang `duyetnghi` - van dung mot HANG
+     CHO PHE DUYET, dung y do cua luat nay. */
+  [["duyet","DUYTAB","duyetthu"],["duyet","DUYTAB","duyetnghi"],["dsthanhtoan","STTAB","du"],
    ["dsthanhtoan","STTAB","cong"],["hoctap","HTTAB","gvdp"],["hoctap","HTTAB","phong"]].forEach(function(x){
    window[x[1]]=x[2];var o="";try{o=RENDER[x[0]]()}catch(e){}
    if(!/pgExport\(/.test(o))thieu.push(x[0]+"#"+x[2]);window[x[1]]=undefined});
@@ -631,7 +634,7 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
      bao nham vai lan la nguoi ta thoi doc no. */
   var MAN=Object.keys(RENDER);
   var HUB=[["hoctap","HTTAB",["lop","buoihoc","wow","lichtuan","gvdp","phong"]],
-           ["duyet","DUYTAB",["duyetck","duyethoan","duyetnghi","duyetthu","duyetgiao"]],
+           ["duyet","DUYTAB",["duyetck","duyethoan","duyetnghi","duyetthu","banggiao"]],
            ["dsthanhtoan","STTAB",["thu","du","cong"]],
            ["cskh","CSTAB",["khaosat","phanhoi","khieunai"]]];
   function anh(){var o="";
@@ -959,11 +962,11 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
   applyScope("");
   var rs=SCOPE();
   t("quan tri vien toan quyen khong bi chan tab o hub nao", rs.pages==="*"&&!rs.tabs);
-  t("hub Cho duyet ve du 6 tab cho quan tri vien", (function(){
+  /* V9.99u: 5 tab, khong con 6 - "Viec cho nhan" da ve trang Quan ly viec giao & nhan. */
+  t("hub Cho duyet ve du 5 tab cho quan tri vien", (function(){
    window.DUYTAB="duyetck";var o=RENDER.duyet();
    var n=(o.match(/duyTabSet\('/g)||[]).length;
-   /* V9.51: dai 5 o thong ke da BO (lap nguyen dai chip - anh Luan chup). Nay dung 6 tab. */
-   return n>=6})());
+   return n>=5})());
  })();
  /* --- NHO TAM BANG TRA: phai vua NHO that, vua VUT dung luc --- */
  (function(){

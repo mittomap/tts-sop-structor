@@ -44,7 +44,10 @@ require("vm").runInThisContext(FS.readFileSync("./_APP.js","utf8"));
 
 /* dau hieu cua tung mien tren MAN HINH */
 const DAU={
- tien:/(\d[\d.]{5,}\s*đ)|học phí|công nợ|còn nợ|đã đóng tiền|đã thu đủ|chiết khấu|hoàn tiền|phiếu thu|doanh thu/i,
+ /* 05/08 - to oan: mau cu `\d[\d.]{5,}\s*đ` vo luon SO DIEN THOAI dung truoc mot chu D hoa
+    ("0334728038 Đã thành học vien"). Tien trong app luon di qua vnd() nen CO DAU CHAM nghin va
+    chu d THUONG dinh sat: 461.266.668d. Doi mau theo dung hinh dang do. */
+ tien:/(\d{1,3}(\.\d{3})+\s*đ)|học phí|công nợ|còn nợ|đã đóng tiền|đã thu đủ|chiết khấu|hoàn tiền|phiếu thu|doanh thu/i,
  lead:/\blead\b|khách tiềm năng|tư vấn & đăng ký|test đầu vào|phễu|chăm lại/i,
 };
 const AI=(process.env.AI||"").split(",").filter(Boolean);

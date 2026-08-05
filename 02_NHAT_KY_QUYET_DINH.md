@@ -164,6 +164,64 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.99t — MENU HAI CHẾ ĐỘ, VIỆC VỀ ĐÚNG NGƯỜI, GỠ CỔNG MARKETING ✅ (05/08).**
+> · **Menu sidebar nay có HAI CHẾ ĐỘ** (anh Luân: *"trưởng phòng aca chỉ còn chặng 2, mà em để
+> chặng 2 làm gì, ko có ý nghĩa, và nó ko đẹp"*). Cách gom trang theo bốn chặng vòng đời chỉ có
+> nghĩa với người đi qua nhiều chặng. Với người làm đúng một khúc thì nó vô duyên, và có chỗ còn
+> sai hẳn: kế toán thấy nhóm **"C1 · Khách tiềm năng" chứa đúng một mục "Thanh toán"**; NV WOW
+> thấy nhóm ấy chứa đúng một mục "Test đầu vào"; ACA/giáo viên thấy nhóm "C2 · Đang học" trong
+> khi mọi thứ họ làm đều là "đang học".
+>   · **Từ 2 chặng trở lên** (Giám đốc, tư vấn, học vụ) -> giữ khung chặng C1..C4, có Bản đồ
+>     chặng và chấm màu.
+>   · **Dưới 2 chặng** (ACA, giáo viên, WOW, kế toán, marketing, nhân sự) -> khung **PHẲNG THEO
+>     NGHIỆP VỤ**: Tuyển sinh & Thu tiền · Lớp học & Giảng dạy · Chăm sóc & Sau khóa. Không mục
+>     Bản đồ chặng, không chấm màu. `arcDuoc` là điều kiện, `arcMode()` chọn chế độ, `arcXem`
+>     hỏi cả hai - tách ba hàm để không vòng tròn.
+>   Chặng KHÔNG bị xoá khỏi app (luật cứng số 0) - nó chỉ không dựng khung menu cho người mà nó
+>   không kể được câu chuyện nào.
+> · **"Việc chờ nhận" chưa theo người** (anh Luân: *"việc chờ nhận nghĩa là người đang đăng nhập
+> được giao đó"*). `duyTaskList()` đọc thẳng cả bảng DL23 rồi chỉ lọc trạng thái - mọi người mở
+> tab ấy ra thấy CÙNG MỘT danh sách. App đã có sẵn `tkScopeMine()` làm đúng việc này, chỗ này chỉ
+> quên gọi. Sửa xong thì lộ vế hai: cả trung tâm chỉ có 11 việc "Mới giao" rơi lung tung, nên
+> Giám đốc và 3/4 trưởng phòng mở ra thấy TRỐNG - **lọc đúng mà không có gì để xem thì người xem
+> demo vẫn kết luận app hỏng**. Seeder nay bảo đảm mỗi chức danh CÓ CỬA Ở CỔNG đều có ít nhất
+> một việc chờ nhận (19 việc "new").
+> · **Chuông và Việc hôm nay phải là việc của chính chức danh đó** (anh Luân đứng ở TP ACA:
+> *"sao a thấy toàn là task của học vụ thế... lớp chưa điểm danh, bài chưa chấm này nọ mới thực
+> sự là của ACA chứ"*). `bell` phát quá rộng tay: ACA và giáo viên nhận cả đội "Học vụ" (33 việc
+> không màn nào của họ mở được), học vụ nhận cả "Giảng viên chuyên môn" và "WOW", NV WOW nhận cả
+> "Giảng viên chuyên môn". **Luật: một đội chỉ đổ vào chuông của người có màn để xử lý việc đội
+> đó.** ACA từ 68 việc xuống **27** - đúng ba nhóm nhận xét buổi · chấm bài · mốc giờ vào-ra.
+> · **BẪY: hai khối cùng ghi một ô, khối sau thắng.** Tên Kế toán anh Luân đặt hôm 04/08
+> ("Nguyễn Cẩm Ly") ghi vào `DOI_TEN` ở đầu `gen_demo.py`, nhưng khối `_DUPFIX` phía dưới cũng
+> ghi `full_name` của đúng NV017 (nó sinh ra để tách hai người trùng tên) nên **lặng lẽ đè lại
+> "Vũ Thị Thanh Huyền"**. Pipeline không báo lỗi, bộ kiểm cũng không - vì cả hai khối đều "đúng"
+> theo cách của chúng. Chỉ lộ khi mở cổng Kế toán và đọc tên trên màn. Nay tên do anh Luân đặt là
+> LỜI CUỐI CÙNG, áp sau mọi khối tự sinh, và email đi theo tên.
+> · **Gỡ cổng Marketing** (anh Luân: *"bỏ luôn cổng marketing đi em"*) - cùng cách xử lý với Nhân
+> sự: người và màn vẫn còn nguyên trong dữ liệu và trong mã, chỉ không còn cửa đăng nhập.
+> · **Sơ đồ leader chốt lần cuối** (anh Luân: *"Khải 2, Hà 3, Thuyên 5 anh nhầm hoài"*):
+> Khải - Cơ sở 2 · Hà - Cơ sở 3 · Thuyên - Cơ sở 5. Hai cơ sở **không có leader tư vấn là Cơ sở
+> 1 và Cơ sở 4**.
+> · **"Việc chờ nhận" gộp vào trang Giao việc** (anh Luân: *"a thấy trong giao việc có: việc của
+> tôi, tôi đã giao, tổng hợp và báo cáo. Sao em ko đưa việc chờ nhận vào luôn"*). Đúng: nó là một
+> LÁT CẮT của "việc của tôi" (việc tôi chưa bấm Nhận), không phải một hàng chờ phê duyệt - để nó
+> trong hub Chờ duyệt là **xếp nhầm họ hàng**. Nay là tab đầu tiên của trang, đứng trước "Việc
+> của tôi" vì việc chưa ai đụng vào thì gấp hơn việc đang làm. Hub Chờ duyệt còn 5 tab, đều là
+> hàng chờ QUYẾT ĐỊNH thật. Khoá `duyetgiao` giữ lại làm **lối cũ**: link, nút và bài hướng dẫn
+> cũ bấm vào vẫn tới đúng chỗ mới.
+> · **Đổi tên trang thành "Quản lý việc giao & nhận"** (anh Luân đặt) - tên cũ "Giao việc" chỉ
+> nói một nửa việc trang này làm.
+> · **Bốn chức danh mất luôn nhóm Chờ duyệt** vì tab duy nhất của họ ở đó là Việc chờ nhận: ACA,
+> giáo viên, NV WOW, Nhân sự. Menu giáo viên nay còn **10 mục**, ACA **10**, kế toán **8**.
+> · **Lộ thêm một chỗ khi đổi:** hàng chờ **Đơn xin nghỉ học chưa bao giờ xuất được ra tệp** - nó
+> vẽ thẳng bằng `absQueueHTML` nên không đi qua `fltApply`, mà `pgExport` lấy dòng từ chính chỗ
+> đó. Học vụ xin file đối chiếu cuối tháng thì không có nút nào. Nay có ô tìm, nút Xuất và bộ lọc
+> như mọi hàng chờ khác.
+> · **`_checkmien` tố oan một lần:** mẫu nhận tiền `\d[\d.]{5,}\s*đ` vớ luôn **số điện thoại**
+> đứng trước một chữ Đ hoa ("0334728038 Đã thành học viên"). Tiền trong app luôn đi qua `vnd()`
+> nên có dấu chấm nghìn và chữ đ thường dính sát - đổi mẫu theo đúng hình dạng đó.
+
 > **Phiên bản: V9.99s — BẢN ĐỒ CHẶNG VỀ ĐÚNG NGƯỜI, MIỀN DỮ LIỆU KÍN 0/0 ✅ (05/08).**
 > · Anh Luân mở Trưởng phòng ACA và chụp màn: *"dính cache hay sao ta, a vào thử trưởng phòng
 > aca hưng vẫn thấy nó bất hợp lý"* - anh đang đứng ở **"Chặng 1 · Khách tiềm năng"** với nguyên

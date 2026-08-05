@@ -73,8 +73,16 @@ t("mstrip: chang khong ton tai -> rong", mstrip("xxx",false)==="");
 t("NAVTREE co 8 nhom (them nhom Cho duyet)", NAVTREE.length===8);
 /* V9.29o: nhom "Cho duyet" - moi hang cho QUYET DINH gom ve mot cho, theo NGUOI CO THAM QUYEN
    chu khong theo chang. Bat bien: moi muc trong nhom deu remap ve hub duyet. */
-t("nhom Cho duyet co du 6 muc", (function(){var G=NAVTREE.filter(function(x){return x.g==="Chờ duyệt"})[0];
- return G&&G.items.length===6&&G.items.every(function(k){return !!DUYMAP[k]&&navOwner(k)==="duyet"})})());
+/* V9.99u - nhom con 5 muc: "Viec cho nhan" da ROI hub nay ve trang Quan ly viec giao & nhan
+   (anh Luan 05/08: *"Sao em ko dua viec cho nhan vao luon"*). No la mot LAT CAT cua viec cua toi,
+   khong phai mot hang cho PHE DUYET - xep vao hub Cho duyet la xep nham ho hang. */
+t("nhom Cho duyet co du 5 muc phe duyet", (function(){var G=NAVTREE.filter(function(x){return x.g==="Chờ duyệt"})[0];
+ return G&&G.items.length===5&&G.items.indexOf("duyetgiao")<0&&G.items.every(function(k){return !!DUYMAP[k]&&navOwner(k)==="duyet"})})());
+t("Viec cho nhan la mot TAB cua trang Giao viec", (function(){
+ window.TKTAB="wait";var o="";try{o=RENDER.giaoviec()}catch(e){}
+ return /tkTabSet\('wait'\)/.test(o)&&/Việc chờ nhận/.test(o)})());
+t("loi cu: go('duyetgiao') dan sang tab moi", (function(){
+ window.TKTAB="mine";go("duyetgiao");return CUR==="giaoviec"&&window.TKTAB==="wait"})());
 t("ma tab TRUNG ma muc menu (mot ten cho mot thu)", duyTabs().every(function(x){return !!DUYMAP[x.k]}));
 t("ban giao lead da roi hub Khac", !KMAP.banggiao&&!!DUYMAP.banggiao);
 t("nhom chang du 4", NAVTREE.filter(function(G){return G.arc}).length===4);
@@ -103,7 +111,7 @@ t("tu van: thay nhaplead + reup, khong thay xeplop", navVis("nhaplead")&&navVis(
 /* Tu van CO viec trong hub Cho duyet (ban giao lead, viec cho nhan) nhung KHONG duoc thay
    chiet khau / hoan tien / doi soat tien - hub gom VIEC lai, khong gom QUYEN lai. */
 t("tu van chi thay tab cua minh trong Cho duyet",
-  navVis("banggiao")&&navVis("duyetgiao")&&!navVis("duyetck")&&!navVis("duyethoan")&&!navVis("duyetthu"));
+  navVis("banggiao")&&!navVis("duyetck")&&!navVis("duyethoan")&&!navVis("duyetthu"));
 /* V9.99s - HOP DONG MOI CUA BAN DO CHANG (anh Luan 05/08, mo Truong phong ACA: *"a vao thu
    truong phong aca hung van thay no bat hop ly"* - anh dang dung o "Chang 1 - Khach tiem nang"
    voi ca phe u lead 82/54/12/40, trong khi ACA khai `lead:"none"`).
@@ -118,10 +126,21 @@ t("tu van: khong thay bao luu (tab khac bi khoa)", !navVis("baoluu"));
 /* Truong phong ACA - dung ca anh Luan chup anh. Ho lo chuyen mon giang day: chi con C2 Dang hoc. */
 var acam=rows("DL01").filter(function(x){return /^aca_/.test(ecode(x.role))})[0];
 if(acam){vao(acam.staff_id);
- t("ACA: khong thay chang Khach tiem nang (khai lead none)", !navVis("changA"));
- t("ACA: CO chang Dang hoc", navVis("changB"));
- t("ACA: khong thay chang Tam dung / Ket thuc (viec cua Hoc vu)", !navVis("changC")&&!navVis("changD"));
+ /* V9.99t (anh Luan 05/08: *"truong phong aca chi con chang 2, ma em de chang 2 lam gi, ko co
+    y nghia, va no ko dep"*): chuc danh di qua DUOI 2 chang thi menu bo han khung chang, chuyen
+    sang khung PHANG THEO NGHIEP VU. ACA chi co chang 2 -> khong con muc chang nao, va nhom
+    "Lop hoc & Giang day" thay cho nhom "C2 - Dang hoc". */
+ t("ACA: khong con muc chang nao tren menu",
+   !navVis("changA")&&!navVis("changB")&&!navVis("changC")&&!navVis("changD"));
+ t("ACA: menu chay khung phang theo nghiep vu", arcMode()==="phang"&&navInTree("banglop"));
+ t("ACA: van co man lop hoc & giang day", navVis("banglop")&&navVis("hoctap")&&navVis("giaoan"));
  t("ACA: khong thay hub Tuyen sinh va man Thanh toan", !navVis("tuyensinh")&&!navVis("thanhtoan"));}
+/* Nguoc lai: chuc danh di qua tu 2 chang tro len thi GIU khung chang - ban do vong doi con ke
+   duoc chuyen. Do tren Hoc vu (C2+C3+C4) va Giam doc (du bon). */
+var hvq=rows("DL01").filter(function(x){return /^academic_manager$/.test(ecode(x.role))})[0];
+if(hvq){vao(hvq.staff_id);
+ t("Hoc vu: van giu khung chang (di qua 3 chang)", arcMode()==="chang"&&navVis("changB")&&navVis("changC")&&navVis("changD"));
+ t("Hoc vu: khong thay chang Khach tiem nang", !navVis("changA"));}
 var gv=rows("DL01").filter(function(x){return /^teacher$/.test(ecode(x.role))})[0];
 vao(gv.staff_id);
 t("giao vien: thay wow/banglop, khong thay nhaplead/thanhtoan", navVis("wow")&&navVis("banglop")&&!navVis("nhaplead")&&!navVis("thanhtoan"));

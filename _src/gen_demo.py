@@ -47,6 +47,9 @@ if _bo:
 LEADER_TUVAN = {
     "NV020": ("sales_leader (Sale Leader Chi nhánh)", "branch_2 (Cơ sở 2)"),   # Huỳnh Quang Khải
     "NV021": ("sales_leader (Sale Leader Chi nhánh)", "branch_3 (Cơ sở 3)"),   # Trần Thị Thanh Hà
+    # Anh Luân chốt lần cuối 05/08: *"Khải 2, Hà 3, Thuyên 5 anh nhầm hoài"*.
+    # Ba người có quyền leader là Khải (CS2) - Hà (CS3) - Thuyên (CS5).
+    # Hai cơ sở KHÔNG có leader tư vấn là **Cơ sở 1 và Cơ sở 4**.
     "NV002": ("sales_leader (Sale Leader Chi nhánh)", "branch_5 (Cơ sở 5)"),   # Nguyễn Văn Thanh Thuyên
     "NV022": ("sales_staff (NV Tư vấn)",              "branch_3 (Cơ sở 3)"),   # Nguyễn Huỳnh Thanh Phương - thôi leader
 }
@@ -57,8 +60,6 @@ for _st in STAFF:
     _kw = LEADER_TUVAN.get(_st.get("staff_id"))
     if _kw:
         _st["role"], _st["branch"] = _kw
-    if _st.get("staff_id") in DOI_TEN:
-        _st["full_name"] = DOI_TEN[_st["staff_id"]]
 COURSES = odl["DL05"]
 CBY = {c["course_id"]: c for c in COURSES}
 def staff_name(sid):
@@ -93,6 +94,19 @@ for _s in STAFF:
         _s["full_name"]=_f[0]; _s["email"]=_f[1]+"@ieltsthetutors.edu.vn"
     if str(_s.get("full_name") or "").strip()=="(Chưa tuyển)":
         _s["full_name"]="(Chưa tuyển - "+str(_s.get("department") or "?")+")"
+# ═══ V9.99t - BẪY ĐÃ CẮN: HAI KHỐI CÙNG GHI MỘT Ô, KHỐI SAU THẮNG ═══════════════════════════
+# Anh Luân đặt tên Kế toán là "Nguyễn Cẩm Ly" hôm 04/08 và em có ghi vào `DOI_TEN` - nhưng đặt
+# ngay dưới bảng leader, tức là TRƯỚC khối `_DUPFIX` ở đây. `_DUPFIX` cũng ghi `full_name` của
+# đúng NV017 (nó sinh ra để tách hai người trùng tên) nên nó lặng lẽ đè lại "Vũ Thị Thanh Huyền".
+# Chạy pipeline không báo lỗi gì, bộ kiểm cũng không - vì cả hai khối đều "đúng" theo cách của
+# chúng. Chỉ lộ ra khi mở cổng Kế toán và đọc tên người trên màn.
+# Luật: tên do anh Luân đặt là LỜI CUỐI CÙNG - áp sau mọi khối tự sinh khác. Và khi thêm một
+# khối ghi vào ô đã có người ghi, phải đi tìm mọi khối kia trước.
+for _s in STAFF:
+    if _s.get("staff_id") in DOI_TEN:
+        _s["full_name"] = DOI_TEN[_s["staff_id"]]
+        _ho = _s["full_name"].split()[-1].lower()
+        _s["email"] = _ho + ".kt@ieltsthetutors.edu.vn"
 # Cổng học viên phải cho HV biết GV của mình là ai. gvBioEdit trong app đã biết ghi 2 cột này
 # nhưng DL01 chưa bao giờ seed -> thẻ giảng viên bên cổng HV trống trơn.
 _GVBIO=["Chuyên luyện Speaking và phát âm, 6 năm đứng lớp IELTS, IELTS 8.0.",

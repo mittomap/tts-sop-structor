@@ -2403,7 +2403,10 @@ var PAGES=[
 /* ===== V5.2 - trang chủ Bàn làm việc ===== */
 {k:"banlam",g:"Vận hành",ic:"ti-home",t:"Trang bắt đầu",c:"Việc hôm nay + bảng chặng hành trình",ty:"custom"},
 {k:"ban",g:"Vận hành",ic:"ti-focus-2",t:"Bàn làm việc",c:"Mở một khách, học viên hay lớp là thấy trọn việc của bạn với họ",ty:"custom"},
-{k:"giaoviec",g:"Vận hành",ic:"ti-clipboard-list",t:"Giao việc",c:"Giao - phối hợp - nhờ hỗ trợ",ty:"custom"},
+/* V9.99u (anh Luân 05/08): *"Giao việc, e đổi thành: Quản lý việc giao & nhận là xong"* - tên
+   cũ chỉ nói một nửa việc trang này làm (giao đi), trong khi nửa còn lại (nhận về, chờ nhận,
+   báo xong) mới là phần người ta mở ra xem mỗi ngày. */
+{k:"giaoviec",g:"Vận hành",ic:"ti-clipboard-list",t:"Quản lý việc giao & nhận",c:"Giao - nhận - phối hợp - nhờ hỗ trợ",ty:"custom"},
 {k:"chay",g:"_",hide:1,ic:"ti-player-play",t:"Chạy quy trình",c:"Dắt từng bước theo hành trình",ty:"custom"},
 {k:"chang",g:"_",hide:1,ic:"ti-route",t:"Tổng quan chặng",c:"Bản đồ một chặng vòng đời",ty:"custom"},
 {k:"hanhtrinh",g:"Vận hành",ic:"ti-route",t:"Hành trình học viên",c:"Toàn bộ theo chặng",ty:"custom"},
@@ -2482,7 +2485,12 @@ var PAGES=[
 {k:"duyethoan",g:"_",hide:1,ic:"ti-arrow-back-up",t:"Duyệt hoàn tiền",c:"Hoàn tiền theo mốc SOP",ty:"custom"},
 {k:"duyetnghi",g:"_",hide:1,ic:"ti-user-question",t:"Duyệt xin nghỉ học",c:"Học viên báo nghỉ chờ học vụ duyệt",ty:"custom"},
 {k:"duyetthu",g:"_",hide:1,ic:"ti-receipt",t:"Xác nhận thu tiền",c:"Kế toán đối soát khoản đã ghi",ty:"custom"},
-{k:"duyetgiao",g:"_",hide:1,ic:"ti-inbox",t:"Việc chờ nhận",c:"Việc đã giao chưa ai bấm nhận",ty:"custom"},
+/* V9.99u - "Việc chờ nhận" ĐÃ VỀ TRANG GIAO VIỆC (anh Luân: *"a thấy trong giao việc có: việc
+   của tôi, tôi đã giao, tổng hợp và báo cáo. Sao em ko đưa việc chờ nhận vào luôn"*). Đúng: nó
+   là một LÁT CẮT của "việc của tôi" (những việc tôi chưa bấm Nhận), không phải một hàng chờ
+   phê duyệt - để nó trong hub Chờ duyệt là xếp nhầm họ hàng. Khoá `duyetgiao` giữ lại làm LỐI
+   CŨ: link cũ, bài hướng dẫn cũ, nút cũ bấm vào vẫn tới đúng chỗ mới. */
+{k:"duyetgiao",g:"_",hide:1,ic:"ti-inbox",t:"Việc chờ nhận",c:"Đã gộp vào Quản lý việc giao & nhận",ty:"custom"},
 {k:"hoidap",g:"Quản lý",ic:"ti-message-question",t:"Hỏi đáp",c:"Hỏi về một học viên, hoặc hỏi chỗ cấu hình",ty:"custom"},
 {k:"khac",g:"Quản lý",ic:"ti-adjustments",t:"Tính năng khác",c:"Bảo lưu · Mã giới thiệu · Bàn giao lead",ty:"custom"},
 {k:"banggiao",g:"_",ic:"ti-arrows-exchange",t:"Bàn giao lead",c:"Trong Tính năng khác",ty:"custom",hide:1},
@@ -2508,6 +2516,21 @@ var CURSTAFF="";
    "Vào nhanh - Quản trị viên" = quantri thấy hết. Bấm tên luôn xem được hồ sơ 360. */
 var VIEW_ALWAYS={hoso:1,hosogv:1,hosonv:1,hosokhoa:1,chay:1,chang:1,lop:1,viec:1,dashboard:1,tracuu:1,pipeline:1,nhanvien:1,khoahoc:1,tranghv:1,nhaplead:1,lienhe:1,test:1,tuvan:1,thanhtoan:1,diemdanh:1,buoihoc:1,baitap:1,wow:1,review:1,khaosat:1,ghinhan:1,khieunai:1,baoluu:1,magioithieu:1,banggiao:1,canhan:1};
 var SENSITIVE={duyet:1,settings:1,baocao:1};
+/* ═══ V9.99t - CHUÔNG VÀ "VIỆC HÔM NAY" PHẢI LÀ VIỆC CỦA CHÍNH CHỨC DANH ĐÓ ════════════════
+   Anh Luân 05/08, đang đứng ở Trưởng phòng ACA: *"chỗ việc hôm nay, a đang ở trưởng phòng ACA,
+   mà sao a thấy toàn là task của học vụ thế... lớp chưa điểm danh, bài chưa chấm này nọ mới
+   thực sự là của ACA chứ em"*.
+   Đúng. `bell` là danh sách ĐỘI mà việc SLA được đổ vào chuông và trang Việc hôm nay. Bản cũ
+   phát rộng tay: ACA và giáo viên nhận cả đội "Học vụ" (xếp lớp, onboarding, gọi HV vắng, duyệt
+   xin nghỉ - 33 việc không màn nào của họ mở được), học vụ nhận cả "Giảng viên chuyên môn" và
+   "WOW", NV WOW nhận cả "Giảng viên chuyên môn".
+   Luật: **một đội chỉ đổ vào chuông của người có màn để xử lý việc đội đó.**
+     ACA và giáo viên  -> Giảng viên chuyên môn (nhận xét buổi · chấm bài · mốc giờ vào-ra)
+     Học vụ            -> Học vụ · CSKH
+     WOW               -> WOW (buổi WOW · chấm test đầu vào)
+     Tư vấn / Marketing-> Tuyển sinh
+     Kế toán           -> Tài chính
+   "Giao việc" thì mọi chức danh đều có - đó là hộp việc nội bộ, ai cũng nhận được. */
 var ROLESCOPE={
  quantri:{match:null,land:"banlam",pages:"*",blocks:"*",mine:0,mineBtn:0,kpi:0,bell:"*"},
  /* V9.99m (anh Luân 04/08: *"CEO em cũng cho full quyền mọi thứ giống Admin, trừ mấy cái quyền
@@ -2526,7 +2549,7 @@ var ROLESCOPE={
    "huongdan","qa","staff","giagio","khoa","nhatky"]}},
  tuvan:{match:/^sales/,land:"banlam",
   pages:["viec","banlam","hanhtrinh","hocvien","giangvien","tuyensinh","ketthuc","khac","duyet"],
-  tabs:{khac:["magioithieu"],duyet:["duyetgiao","banggiao"]},
+  tabs:{khac:["magioithieu"],duyet:["banggiao"]},
   blocks:["appt","new","contacted","test_done","enrolled","reup"],
   mine:1,mineBtn:1,kpi:1,bell:["Tuyển sinh","Giao việc"]},
  /* V9.40 - Học vụ đáp thẳng vào XẾP LỚP, không đáp vào Trang bắt đầu. Đo bằng trình duyệt thật:
@@ -2560,23 +2583,22 @@ var ROLESCOPE={
     Hai bộ trang khác nhau thì phải là hai nhóm khác nhau - gom lại rồi bảo "ai không cần thì
     đừng bấm" là đẩy việc phân quyền sang cho người dùng tự làm bằng mắt. */
  aca:{match:/^aca_/,land:"hoctap",ctx:{HTTAB:"lop"},
-  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan","duyet"],
-  tabs:{duyet:["duyetgiao"]},
+  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan"],
   blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:1,mgr:1,
-  bell:["Giảng viên chuyên môn","Học vụ","Giao việc"]},
+  bell:["Giảng viên chuyên môn","Giao việc"]},
  hocvu:{match:/^academic/,land:"xeplop",
   pages:["viec","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ychv","ketthuc","khac","duyet"],
-  tabs:{khac:["baoluu"],duyet:["duyetnghi","duyetgiao"]},
-  blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:1,kpi:1,bell:["Học vụ","CSKH","Giảng viên chuyên môn","WOW","Giao việc"]},
+  tabs:{khac:["baoluu"],duyet:["duyetnghi"]},
+  blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:1,kpi:1,bell:["Học vụ","CSKH","Giao việc"]},
  giaovien:{match:/^teacher$/,land:"hoctap",ctx:{HTTAB:"today"},
-  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan","duyet"],
-  tabs:{duyet:["duyetgiao"]},blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:0,bell:["Giảng viên chuyên môn","Học vụ","Giao việc"]},
+  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan"],
+  blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:0,bell:["Giảng viên chuyên môn","Giao việc"]},
  /* V9.60: CH3 giao cho NV WOW việc CHẤM TEST ĐẦU VÀO, mà phạm vi trang lại không có màn test -
     bài hướng dẫn của chính họ dẫn sang Tuyển sinh rồi bị chặn. Mở đúng một tab test, không mở
     cả hub tuyển sinh. */
  wow:{match:/^wow/,land:"hoctap",ctx:{HTTAB:"wow"},
-  pages:["viec","hocvien","giangvien","hoctap","banglop","tuyensinh","duyet"],
-  tabs:{duyet:["duyetgiao"],tuyensinh:["test"]},blocks:["test_grading","wowq","risk"],mine:0,mineBtn:0,kpi:0,bell:["WOW","Giảng viên chuyên môn","Giao việc"]},
+  pages:["viec","hocvien","giangvien","hoctap","banglop","tuyensinh"],
+  tabs:{tuyensinh:["test"]},blocks:["test_grading","wowq","risk"],mine:0,mineBtn:0,kpi:0,bell:["WOW","Giao việc"]},
  /* V9.40 (anh Luân chốt 29/07): "Duyệt chiết khấu là trưởng phòng tư vấn, kế toán luôn chỉ xác
     nhận và làm theo thôi." Trước đây cấu hình quyền cho Kế toán duyệt, trong khi DỮ LIỆU ghi
     NV012 - Trưởng phòng Tư vấn - là người duyệt cả 8 lần. Cấu hình sai, dữ liệu đúng. */
@@ -2585,27 +2607,26 @@ var ROLESCOPE={
   /* V9.99r - Kế toán chỉ có phần THANH TOÁN của hub Tuyển sinh. Trước đây không khai tab nào
      nên họ bấm được cả Lead, Test đầu vào, Tư vấn & Đăng ký - ba bước họ khai `lead:"none"`,
      mở ra chỉ để nhìn. Khai đúng một tab thì phễu, câu mở đầu và menu cùng thu lại theo. */
-  tabs:{duyet:["duyethoan","duyetthu","duyetgiao"],tuyensinh:["thanhtoan"]},
+  tabs:{duyet:["duyethoan","duyetthu"],tuyensinh:["thanhtoan"]},
   blocks:["enrolled","approve","debt"],mine:0,mineBtn:0,kpi:0,bell:["Tài chính","Giao việc"]},
  /* V9.60: Marketing KHÔNG xem tiền. Đo trước khi sửa: Trưởng phòng Marketing mở app thấy trang
     Báo cáo với 36 con số doanh thu và công nợ toàn trung tâm - trong khi CH3 chỉ giao cho
     marketing hai việc: nhập lead mới và chăm lại khách cũ. `noTien` cắt mọi khối tiền. */
  marketing:{match:/^marketing/,land:"tuyensinh",ctx:{TSTAB:"lead"},
   pages:["viec","banlam","tuyensinh","khac","hocvien","reup","duyet"],
-  tabs:{khac:["magioithieu"],duyet:["banggiao","duyetgiao"]},
+  tabs:{khac:["magioithieu"],duyet:["banggiao"]},
   blocks:["new","reup"],mine:0,mineBtn:0,kpi:0,noTien:1,bell:["Tuyển sinh","Giao việc"]},
  /* V9.60 - NHÂN SỰ (anh Luân chốt giữ bộ phận này). SOP không giao cho họ hành động nào với
     học viên, nên họ KHÔNG có trang nào chạm tới học viên, tiền hay luật của trung tâm. Việc
     thật của họ là con người: ai đang làm ở đâu, giảng viên tháng này dạy bao nhiêu giờ, và
     hộp việc nội bộ. */
  nhansu:{match:/^hr_/,land:"nhansu",
-  pages:["viec","giaoviec","nhansu","giangvien","bangcong","duyet"],
-  tabs:{duyet:["duyetgiao"]},
+  pages:["viec","giaoviec","nhansu","giangvien","bangcong"],
   blocks:[],mine:0,mineBtn:0,kpi:0,noHV:1,bell:["Giao việc"]},
  /* Nhóm DỰ PHÒNG: một chức danh lạ (trung tâm thêm vai mới mà chưa khai ở đây) rơi vào đây.
     Nó phải là chỗ AN TOÀN NHẤT - chỉ hộp việc nội bộ, không trang nào khác. */
  hotro:{match:/^(it_|janitor|security)/,land:"giaoviec",lite:1,
-  pages:["viec","giaoviec","duyet"],tabs:{duyet:["duyetgiao"]},
+  pages:["viec","giaoviec"],
   blocks:[],mine:0,mineBtn:0,kpi:0,bell:[]}};
 /* V9.20: GIAO VIỆC là việc của MỌI chức danh (kể cả nhóm hỗ trợ) - cấp quyền trang + chuông cho tất cả
    ở MỘT chỗ, khỏi sót khi thêm nhóm vai mới sau này. */
@@ -2688,7 +2709,7 @@ function buildScope(code){
    eff.blocks=eff.blocks.concat(["approve","debt"]);
    eff.tabs=eff.tabs||{};eff.tabs.khac=["magioithieu","banggiao"];
    /* V9.40: DUYỆT CHIẾT KHẤU là việc của Trưởng phòng / Leader Tư vấn - anh Luân chốt 29/07. */
-   eff.tabs.duyet=["duyetck","duyetgiao","banggiao"];
+   eff.tabs.duyet=["duyetck","banggiao"];
    eff.bell=["Tuyển sinh","Tài chính"]}}
  /* V9.60: bỏ hẳn ngoại lệ cũ cho it_/hr_ - trước đây cả hai được đẩy thêm trang Cài đặt, tức
     là chỗ sửa LUẬT của cả trung tâm. Vai trò quản trị hệ thống nay là tài khoản Quản trị viên
@@ -5913,7 +5934,6 @@ function duyTabs(){
   {k:"duyethoan",t:"Hoàn tiền",      ic:"ti-arrow-back-up",n:duyRefundList().length},
   {k:"duyetnghi",t:"Xin nghỉ học",   ic:"ti-user-question",n:absQueue().length},
   {k:"duyetthu", t:"Xác nhận thu tiền",ic:"ti-receipt",    n:duyPayList().length},
-  {k:"duyetgiao",t:"Việc chờ nhận",  ic:"ti-inbox",        n:duyTaskList().length},
   {k:"banggiao",t:"Bàn giao lead",ic:"ti-arrows-exchange",n:0}]}
 /* MOT nguon su that cho tung hang cho duyet - bang viec quan ly, chip tab va than tab deu goi
    chung ham nay. Truoc day moi noi mot cong thuc: o "Hoan tien" bang viec dem 1 trong khi chip
@@ -5924,7 +5944,18 @@ function duyRefundList(){return rows("DL06").filter(function(r){
  return (/cancel/.test(ecode(r.enrollment_status))||r.cancellation_reason)&&!/hoàn tiền|hoan tien/i.test(String(r.notes||""))})}
 function duyPayList(){return rows("DL07").filter(function(p){
  return num(p.amount)>0&&!(p.verified_by&&String(p.verified_by).trim())})}
-function duyTaskList(){return rows("DL23").filter(function(t){return tkSt(t)==="new"})}
+/* V9.99t (anh Luân 05/08: *"Cái chỗ việc chờ nhận, nó chưa theo người nha em... việc chờ nhận
+   nghĩa là người đang đăng nhập được giao đó"*).
+   Đúng: hàm này đọc THẲNG cả bảng DL23 rồi chỉ lọc theo trạng thái, không hỏi ai được giao -
+   nên mọi người mở tab "Việc chờ nhận" ra đều thấy CÙNG MỘT danh sách, kể cả việc giao cho
+   người khác, và con số trên chip cũng là con số của cả trung tâm. App đã có sẵn `tkScopeMine()`
+   làm đúng việc này (nhân viên thật thì lọc theo `assignee_id`, Quản trị viên vào nhanh thì xem
+   trọn để giám sát) - chỗ này chỉ là quên gọi.
+   Kèm theo: đang lọc "Xem việc của <người>" thì tab này cũng theo đúng người ấy, để chuông,
+   Việc hôm nay, bảng việc và tab này nói cùng một con số. */
+function duyTaskList(){var ai=window.BANAI||"";
+ var L=ai?rows("DL23").filter(function(t){return String(t.assignee_id||"")===ai}):tkScopeMine();
+ return L.filter(function(t){return tkSt(t)==="new"})}
 function duyTabSet(k){if(DUYMAP[k]){go(k);return}window.DUYTAB=k;reRender("duyet")}
 function duyN(){var n=0;duyTabs().forEach(function(x){n+=x.n});return n}
 /* -- AI DUOC DUYET VIEC GI (khoi cho nguoi chot he thong) --------------------------------
@@ -6011,14 +6042,18 @@ function renderDuyet(){var TH=ckThreshold();
  h+=tbar(segHTML(tab,segs,"duyTabSet('{k}')"),"");
  if(tab==="duyetnghi")return h+duyNghiHTML()+_ai;
  if(tab==="duyetthu")return h+duyThuHTML()+_ai;
- if(tab==="duyetgiao")return h+duyGiaoHTML()+_ai;
  if(tab==="banggiao")return h+renderBanggiao(1)+_ai;
  if(tab==="duyethoan")return h+duyHoanHTML()+_ai;
  return h+duyCkHTML(TH)+_ai}
 /* --- tab ĐƠN XIN NGHỈ: dùng lại đúng hàng đợi của màn điểm danh, không dựng bản thứ hai --- */
-function duyNghiHTML(){var q=absQueue();
- if(!q.length)return '<div class="panel"><div class="empty">Không có đơn xin nghỉ học nào chờ duyệt.</div></div>';
- return absQueueHTML(q,"Xin nghỉ học chờ duyệt");}
+function duyNghiHTML(){var q=fltApply("duyetnghi",absQueue());
+ /* V9.99u - hàng chờ này trước đây KHÔNG xuất được ra tệp: nó vẽ thẳng bằng `absQueueHTML` nên
+    không đi qua `fltApply` - mà `pgExport` lấy dòng từ chính chỗ đó. Học vụ xin file danh sách
+    đơn nghỉ để đối chiếu cuối tháng thì không có nút nào. Nay có ô tìm, nút Xuất và bộ lọc
+    giống mọi hàng chờ khác. */
+ var h=pgBar("duyetnghi",q.length);
+ if(!q.length)return h+'<div class="panel"><div class="empty">Không có đơn xin nghỉ học nào chờ duyệt.</div></div>';
+ return h+absQueueHTML(q,"Xin nghỉ học chờ duyệt");}
 /* --- tab XÁC NHẬN THU TIỀN: kế toán đối soát khoản đã ghi nhưng chưa xác nhận --- */
 function duyThuHTML(){var L=fltApply("duyetthu",duyPayList());
  var h='<div class="notebar"><i class="ti ti-info-circle"></i>Khoản đã ghi vào sổ nhưng kế toán chưa đối soát. Xác nhận xong mới tính là tiền thật vào két.</div>';
@@ -7250,9 +7285,24 @@ var ARCBRANCH={changA:["no_contact","lost"],changB:[],changC:[],changD:[]};
    Vế (c) là vế quan trọng nhất: bản đồ chặng là CHỖ LÀM VIỆC, không phải tấm áp phích kể
    chuyện vòng đời. Không có việc nào trong chặng thì chặng ấy không phải của họ. */
 var ARCMIEN={changA:["lead"],changB:["hocvien","lop"],changC:["hocvien"],changD:["hocvien"]};
-function arcXem(k){var rs=SCOPE()||{};
+/* ═══ V9.99t - KHUNG CHẶNG CHỈ DÙNG CHO NGƯỜI ĐI QUA NHIỀU CHẶNG ═══════════════════════════
+   Anh Luân 05/08: *"mình nên thay đổi menu sidebar cho hợp lý em, ví dụ trưởng phòng aca chỉ
+   còn chặng 2, mà em để chặng 2 làm gì, ko có ý nghĩa, và nó ko đẹp"*.
+   Đúng, và không chỉ ở ACA. Menu bản V5 gom trang theo BỐN CHẶNG vòng đời - cách gom ấy chỉ có
+   nghĩa với người đi qua nhiều chặng (Giám đốc, tư vấn, học vụ). Với người làm đúng một khúc,
+   nó thành ra vô duyên và có chỗ còn sai hẳn:
+     · ACA / giáo viên / NV WOW: một nhóm tên "C2 · Đang học" - mà mọi thứ họ làm đều là "đang
+       học", nhóm ấy không phân loại được gì.
+     · Kế toán: một nhóm tên "C1 · Khách tiềm năng" chứa đúng một mục "Thanh toán".
+     · NV WOW: một nhóm "C1 · Khách tiềm năng" chứa đúng một mục "Test đầu vào".
+   Nay menu có HAI CHẾ ĐỘ, tự chọn theo người đang đăng nhập:
+     · Từ 2 chặng trở lên -> giữ khung chặng (C1..C4, có "Bản đồ chặng" và chấm màu).
+     · Dưới 2 chặng       -> khung PHẲNG THEO NGHIỆP VỤ: Tuyển sinh · Lớp học & Giảng dạy ·
+       Chăm sóc & Sau khóa. Không mục "Bản đồ chặng", không chấm màu chặng.
+   Chặng không bị xoá khỏi app (luật cứng số 0) - nó chỉ không dựng khung menu cho người mà nó
+   không kể được câu chuyện nào. */
+function arcDuoc(k){var rs=SCOPE()||{};
  if(rs.lite||rs.noHV)return false;
- if(!k||k==="chang")return ARCS.some(function(A){return arcXem(A.k)});
  if(!ARCMIEN[k])return false;
  if(!ARCMIEN[k].some(function(d){return dsLevel(d)!=="none"}))return false;
  if(!arcJobs(k).length)return false;
@@ -7267,6 +7317,12 @@ function arcXem(k){var rs=SCOPE()||{};
   var co=false;try{co=jAll().some(function(J){return arcOf(J.k)===k})}catch(e){co=true}
   if(!co)return false}
  return true}
+/* Chế độ menu: "chang" khi người này đi qua từ 2 chặng trở lên, còn lại là "phang". */
+function arcMode(){var n=0;ARCS.forEach(function(A){if(arcDuoc(A.k))n++});return n>=2?"chang":"phang"}
+function arcXem(k){
+ if(arcMode()!=="chang")return false;
+ if(!k||k==="chang")return ARCS.some(function(A){return arcDuoc(A.k)});
+ return arcDuoc(k)}
 function arcDs(){return ARCS.filter(function(A){return arcXem(A.k)})}
 /* chặng đang mở mà chức danh này không được xem thì lùi về chặng đầu tiên họ có */
 function arcHopLe(k){if(arcXem(k))return k;var d=arcDs();return d.length?d[0].k:""}
@@ -17456,6 +17512,7 @@ function renderGiaoviec(){
  var tab=window.TKTAB||"mine",f=window.TKF||"live";
  var mine=tkScopeMine(),given=tkScopeGiven();
  var mLive=mine.filter(tkLive),mOver=mine.filter(tkOver);
+ var mWait=mine.filter(function(t){return tkSt(t)==="new"});
  var gWait=given.filter(function(t){return tkSt(t)==="done"});
  var gLive=given.filter(tkLive);
  var h=pageHead("Giao việc & Phối hợp",
@@ -17474,14 +17531,18 @@ function renderGiaoviec(){
   ["ti-clock-exclamation",mOver.length,"Quá hạn của tôi","#E24B4A",mOver.length?"cần làm ngay":"không có","tkTabSet('mine');tkFset('live')"],
   ["ti-inbox",gWait.length,"Chờ tôi xác nhận","#E08A1E",gWait.length?"người nhận đã báo xong":"không có","tkTabSet('given');tkFset('live')"],
   ["ti-send",gLive.length,"Tôi giao, đang chạy","#0D9488","theo dõi tiến độ","tkTabSet('given');tkFset('live')"]],"giaoviec");}
- h+=tbar(timHTML("giaoviec")+segHTML(tab,[["mine","Việc của tôi",mLive.length||"",mOver.length?"red":""],
+ /* V9.99u - TAB "VIỆC CHỜ NHẬN" đứng ĐẦU: đây là việc chưa ai đụng vào, người giao đang chờ,
+    nên nó gấp hơn cả việc đang làm. Con số trên tab là việc CỦA CHÍNH NGƯỜI ĐANG ĐĂNG NHẬP. */
+ h+=tbar(timHTML("giaoviec")+segHTML(tab,[["wait","Việc chờ nhận",mWait.length||"",mWait.length?"red":""],
+   ["mine","Việc của tôi",mLive.length||"",mOver.length?"red":""],
    ["given","Tôi đã giao",gLive.length||"",gWait.length?"amber":""],
    ["report","Tổng hợp & báo cáo",null,""]],"tkTabSet('{k}')"),
-  (tab==="report"?"":segHTML(f,[["live","Đang chạy",null,""],["all","Tất cả",null,""],["done","Đã xong",null,""]],"tkFset('{k}')")));
+  (tab==="report"||tab==="wait")?"":segHTML(f,[["live","Đang chạy",null,""],["all","Tất cả",null,""],["done","Đã xong",null,""]],"tkFset('{k}')"));
  if(tab==="report")return h+tkReport();
- var list=(tab==="mine")?mine:given;
- if(f==="live")list=list.filter(tkLive);
- else if(f==="done")list=list.filter(function(t){return tkSt(t)==="confirmed"||tkSt(t)==="done"});
+ var list=(tab==="wait")?mWait:(tab==="mine")?mine:given;
+ if(tab!=="wait"){
+  if(f==="live")list=list.filter(tkLive);
+  else if(f==="done")list=list.filter(function(t){return tkSt(t)==="confirmed"||tkSt(t)==="done"})}
  /* V9.28: bộ lọc chuyên sâu chồng LÊN TRÊN tab, không thay tab: tab chọn "việc của tôi / tôi đã giao",
     bộ lọc thu hẹp tiếp theo người nhận, hạn, độ ưu tiên... */
  var _n0=list.length; list=fltApply("giaoviec",list);
@@ -17492,8 +17553,8 @@ function renderGiaoviec(){
   var la=tkLive(a)?0:1,lb=tkLive(b)?0:1;if(la!==lb)return la-lb;
   return (pvnd(a.due_time)||0)-(pvnd(b.due_time)||0)});
  h+='<div class="panel"><div class="pbody">';
- if(!list.length)h+='<div class="empty">'+(tab==="mine"?"Không có việc nào ở nhóm này.":"Bạn chưa giao việc nào ở nhóm này - bấm <b>Giao việc mới</b> để bắt đầu.")+'</div>';
- list.forEach(function(t){h+=tkCard(t,tab)});
+ if(!list.length)h+='<div class="empty">'+(tab==="wait"?"Không có việc nào đang chờ bạn bấm Nhận.":tab==="mine"?"Không có việc nào ở nhóm này.":"Bạn chưa giao việc nào ở nhóm này - bấm <b>Giao việc mới</b> để bắt đầu.")+'</div>';
+ list.forEach(function(t){h+=tkCard(t,tab==="wait"?"mine":tab)});
  h+='</div></div>';
  return h}
 function tkReport(){var all=srows("DL23");
@@ -20414,7 +20475,7 @@ var KMAP={baoluu:"baoluu",magioithieu:"magioithieu"};
    (giao lead của người này cho người kia), không phải một tiện ích lặt vặt. */
 /* Mã tab TRÙNG mã mục menu - cố ý. Đặt hai tên cho cùng một thứ ("ck" ở tab, "duyetck" ở menu)
    là sớm muộn có chỗ tra nhầm bảng; đây đúng là lớp lỗi vừa cắn ở scopeTabs. */
-var DUYMAP={duyetck:1,duyethoan:1,duyetnghi:1,duyetthu:1,duyetgiao:1,banggiao:1};
+var DUYMAP={duyetck:1,duyethoan:1,duyetnghi:1,duyetthu:1,banggiao:1};
 function goAlias(k){return !!(TSMAP[k]||ARCMAP[k]||CSMAP[k]||HTMAP[k]||KMAP[k]||DUYMAP[k]||k==="hanhtrinh")}
 /* ===== V9.29c (anh Luân): MỖI TRANG MỘT ĐỊA CHỈ - F5 KHÔNG MẤT CHỖ ĐANG ĐỨNG =====
    "mỗi lần anh refresh là mất tiêu nơi anh đang đứng". App là một trang duy nhất nên trước đây
@@ -20478,6 +20539,10 @@ function go(key,noHist){
     go('bangcong') (ô thẻ Nhân sự, trợ lý, nhịp ngày, tour) - remap ở ĐÂY chứ không đi sửa 4 chỗ,
     để mai kia có chỗ thứ 5 gọi tên cũ thì vẫn tới đúng nơi. */
  if(key==="bangcong"){window.GVTAB="cong";key="giangvien"}
+ /* V9.99u - lối cũ: mọi nút/link/bài hướng dẫn còn trỏ tới `duyetgiao` nay dẫn thẳng sang tab
+    "Việc chờ nhận" của trang Quản lý việc giao & nhận. Đổi chỗ một màn thì phải để lại lối,
+    không thì mai kia có một nút bấm vào mà không đi đâu cả. */
+ if(key==="duyetgiao"){window.TKTAB="wait";key="giaoviec"}
  if(ARCMAP[key]){if(window.ARC!==key)window.CHANGK="";window.ARC=key;key="chang"}
  if(CSMAP[key]){window.CSTAB=CSMAP[key];key="cskh"}
  if(HTMAP[key]){window.HTTAB=HTMAP[key];key="hoctap"}
@@ -20634,7 +20699,7 @@ var NAVTREE=[
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
     thẩm quyền chứ không thuộc chặng nào. Duyệt nghỉ trước đây nằm lẫn trong màn Điểm danh nên
     học vụ phải mò mới thấy. */
- {g:"Chờ duyệt",items:["duyetck","duyethoan","duyetnghi","duyetthu","duyetgiao","banggiao"]},
+ {g:"Chờ duyệt",items:["duyetck","duyethoan","duyetnghi","duyetthu","banggiao"]},
  /* V9.99m (anh Luân 04/08: *"cái trang hỏi đáp... nó đang ở đâu nhỉ, a thấy tour thì hiện ra,
     mà a tìm trên sidebar ko thấy"*) - đúng, và đây là một chỗ SÓT KHI GỠ V6: trang Hỏi đáp có
     mục menu ở NAVTREE6 nhưng chưa bao giờ có ở cây menu bản V5, nên nó chỉ mở được bằng nút Trợ
@@ -20656,7 +20721,7 @@ var NAVSUB={nhaplead:"tuyensinh",test:"tuyensinh",tuvan:"tuyensinh",thanhtoan:"t
  review:"cskh",khaosat:"cskh",ghinhan:"cskh",khieunai:"cskh",ychv:"cskh",
  lop:"hoctap",buoihoc:"hoctap",lichtuan:"hoctap",wow:"hoctap",gvdp:"hoctap",phong:"hoctap",
  baoluu:"khac",magioithieu:"khac",
- duyetck:"duyet",duyethoan:"duyet",duyetnghi:"duyet",duyetthu:"duyet",duyetgiao:"duyet",banggiao:"duyet",
+ duyetck:"duyet",duyethoan:"duyet",duyetnghi:"duyet",duyetthu:"duyet",banggiao:"duyet",
  changA:"chang",changB:"chang",changC:"chang",changD:"chang"};
 function navOwner(k){return NAVSUB[k]||k}
 function navItemMeta(k){
@@ -20694,7 +20759,7 @@ var HUBTAB={tuyensinh:{v:"TSTAB",d:"lead",m:{lead:"nhaplead",test:"test",tuvan:"
  hoctap:{v:"HTTAB",d:"lop",m:{lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp",phong:"phong"}},
  cskh:{v:"CSTAB",d:"khaosat",m:{khaosat:"khaosat",phanhoi:"ghinhan",khieunai:"khieunai",ychv:"ychv"}},
  khac:{v:"KTAB",d:"baoluu",m:{baoluu:"baoluu",magioithieu:"magioithieu"}},
- duyet:{v:"DUYTAB",d:"duyetck",m:{duyetck:"duyetck",duyethoan:"duyethoan",duyetnghi:"duyetnghi",duyetthu:"duyetthu",duyetgiao:"duyetgiao",banggiao:"banggiao"}}};
+ duyet:{v:"DUYTAB",d:"duyetck",m:{duyetck:"duyetck",duyethoan:"duyethoan",duyetnghi:"duyetnghi",duyetthu:"duyetthu",banggiao:"banggiao"}}};
 /* V9.33: TAB MẶC ĐỊNH của mỗi hub trước đây khai ở BA nơi và cả ba khai khác nhau: hàm vẽ để
    "lop", HUBTAB để "today", còn navVis lại để "today". Kết quả: mở hub Học tập thì màn hình ra
    tab Lớp học nhưng sidebar và breadcrumb tưởng đang ở tab Hôm nay. Nay CHỈ HUBTAB.d nói, hai
@@ -20726,13 +20791,28 @@ var HUBCAU={
   duyethoan:"Đang mở Hoàn tiền - yêu cầu hoàn, kèm lý do và số tiền.",
   duyetnghi:"Đang mở Xin nghỉ học - đơn xin nghỉ buổi, duyệt thì buổi đó không tính vắng.",
   duyetthu:"Đang mở Xác nhận thu tiền - khoản thu chờ đối soát đã về tài khoản.",
-  duyetgiao:"Đang mở Việc chờ nhận - việc người khác giao cho bạn, nhận rồi mới làm.",
   banggiao:"Đang mở Bàn giao lead - lead chuyển tay giữa các tư vấn viên."}};
 function hubCau(hub,tab){var m=HUBCAU[hub]||{};return m[tab]?(" "+m[tab]):""}
 function hubDef(hub){var H=HUBTAB[hub];return (H&&H.d)||""}
 function hubTab(hub){return window[(HUBTAB[hub]||{}).v]||hubDef(hub)}
 function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)]||""}
-function navCay(){return (typeof V6==="function"&&V6())?NAVTREE6:NAVTREE}
+/* Khung PHẲNG THEO NGHIỆP VỤ - dùng thay bốn nhóm chặng cho người đi qua dưới 2 chặng.
+   Ba nhóm này gom đúng những mục đang nằm rải trong C1..C4, chỉ đổi CÁCH GỌI TÊN:
+   tên nhóm nói NGHIỆP VỤ chứ không nói chặng, nên đọc đúng với mọi tập con.
+   (Kế toán chỉ còn "Thanh toán" -> nhóm "Tuyển sinh & Thu tiền" vẫn đọc thuận; NV WOW chỉ còn
+   "Test đầu vào" -> cũng vậy. Trước đây hai người ấy thấy nhóm "C1 · Khách tiềm năng".) */
+var NAVPHANG=[
+ {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
+ {g:"Lớp học & Giảng dạy",items:["xeplop","banglop","hoctap","gvdp","phong","giaoan","wow"]},
+ {g:"Chăm sóc & Sau khóa",items:["cskh","baoluu","ketthuc","magioithieu"]}];
+function navCayV5(){
+ if(arcMode()==="chang")return NAVTREE;
+ var out=[],xong=false;
+ NAVTREE.forEach(function(G){
+  if(G.arc){if(!xong){xong=true;NAVPHANG.forEach(function(P){out.push(P)})};return}
+  out.push(G)});
+ return out}
+function navCay(){return (typeof V6==="function"&&V6())?NAVTREE6:navCayV5()}
 /* Cùng bệnh với navCurKey: phải hỏi ĐÚNG cây đang được vẽ. Hỏi nhầm cây thì navCur() tưởng
    mục con có mặt trên menu rồi nhường sáng cho nó - mà mục con ấy không tồn tại ở v6, thành ra
    cả menu không có gì sáng. */
@@ -21366,10 +21446,11 @@ var GATEVAI=[
  /* Kế toán CHỈ MỘT CỬA (anh Luân chốt): trung tâm có hai người kế toán nhưng người xem demo
     không cần chọn ai - vào bằng trưởng bộ phận là thấy trọn màn của khối tiền. */
  {k:"kt",   khoi:"Bộ phận khác",  t:"Kế toán",             ic:"ti-cash",         vai:/^accounting_manager$/, mot:1},
- /* Marketing anh Luân KHÔNG nhắc tới trong danh sách giữ lại, mà cũng không bảo bỏ. Giữ MỘT
-    cửa (như kế toán) thay vì tự ý gỡ một phòng ban đang có màn và có việc thật - gỡ là mất,
-    giữ thì lúc nào bảo bỏ cũng bỏ được. */
- {k:"mkt",  khoi:"Bộ phận khác",  t:"Marketing",           ic:"ti-broadcast",    vai:/^marketing_manager$/, mot:1}];
+];
+/* MARKETING ĐÃ GỠ KHỎI CỔNG (anh Luân 05/08: *"bỏ luôn cổng marketing đi em"*). Cùng cách xử lý
+   với Nhân sự hôm 04/08: người và màn của họ vẫn còn nguyên trong dữ liệu và trong mã (nhóm
+   `marketing` trong ROLESCOPE, bảng việc riêng, phạm vi `lead:"all"` kèm che số điện thoại) -
+   chỉ là không còn cửa đăng nhập ở màn chọn vai. Mai kia mở lại chỉ là thêm một dòng vào GATEVAI. */
 /* NHÂN SỰ ĐÃ GỠ KHỎI CỔNG (anh Luân 04/08: *"Bỏ nhân sự"*). Hai người HR vẫn còn trong sổ nhân
    sự và trong dữ liệu - chỉ là không còn cửa đăng nhập ở màn này. Phạm vi dữ liệu của nhóm
    `nhansu` vẫn giữ nguyên trong mã: mai kia mở lại chỉ là thêm một dòng vào GATEVAI. */
