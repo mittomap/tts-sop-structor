@@ -164,6 +164,31 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.99z9 — AUDIT TOÀN DIỆN ĐÃ NỘP, 29 BỘ KIỂM XANH HẾT ✅ (05/08, bản dựng `f74f22`).**
+> · **Bảng audit nằm ở `AUDIT_05_08_2026.md`** - trọn 9 mảng của `GIAO_THUC_AUDIT.md` cộng
+> **mảng thứ 10 mới dựng**: *chuỗi phối hợp nhiều người* (anh Luân đặt: *"nhớ kiểm tra logic
+> nghiệp vụ khi phối hợp nhiều người nha… học viên gửi xin nghỉ học, thì tiếp theo là gì, ai
+> duyệt"*). Bộ kiểm `_checkchuoi`: 6 chuỗi × 6 mắt xích = 31 tiêu chí chạy thật.
+> · **Ba lỗi nặng nhất bắt được trong đợt audit** (đã vá, mỗi cái có bộ kiểm canh lại):
+>   1. **Nút Reset demo** - lần sửa cấu hình ĐẦU TIÊN của một phiên không bao giờ được lưu (mốc
+>      `__cfbase` đặt lười ngay trên chính lần sửa ấy). Bấm Reset là mất, trong khi hộp xác nhận
+>      vừa hứa "thương hiệu không mất". Đây đúng là nút anh Luân bấm trước khi giao.
+>   2. **Mắt xích cuối chuỗi giao việc không có cửa vào** - ô "Chờ tôi xác nhận (N)" dẫn sang
+>      nhóm lọc không chứa N việc ấy.
+>   3. **NV Marketing thấy 42 việc, cả 42 của Tư vấn, 0 việc của chính họ** - việc chính của họ
+>      (chăm lại khách cũ) có màn, có badge, mà chưa từng có một luật SLA nào sinh ra việc.
+> · **`go()` KHÔNG ĐƯỢC TỰ ĐỔI TAB** (bẫy do chính bản z gây ra, bắt được cuối ngày): luật "bấm
+> tên hub thì mở tab mặc định" nằm trong `go()` nên nó đè lên MỌI lời gọi có đặt tab sẵn - bài
+> hướng dẫn của NV WOW và **trang đáp của cả nhóm WOW** đều bị kéo về tab "Lớp học". Nay tách ra
+> `goHub()`: `go()` là bộ định tuyến, đổi tab là việc của thanh menu.
+> · **"Bấm menu không ăn"** (anh Luân báo 3 lần): đo bằng chuột thật 120 lượt - app CÓ chạy,
+> nhưng tiêu đề trang, câu mở đầu và dải phễu **y hệt nhau ở cả năm tab của hub**, nên mắt đọc
+> ra là "không có gì xảy ra". Nay tiêu đề gọi tên tab ("Tuyển sinh · Test đầu vào"), mục vừa bấm
+> loé một cái, bấm lại trang đang mở thì kéo thân trang về đầu.
+> · **DẤU BẢN DỰNG ở chân menu** (ngày + mã 6 ký tự sinh từ nội dung file). Đã hai lần hai bên
+> nói về hai bản khác nhau mà không ai biết - file app nặng 5MB nên trình duyệt giữ cache rất
+> dai, và **không fetch được trang live để tự kiểm** (proxy môi trường chặn, HTTP 403).
+
 > **Phiên bản: V9.99z5/z6 — SIDEBAR LÀ BẢN ĐỒ ĐỦ MỤC, VÀ CHUỖI VIỆC QUA NHIỀU NGƯỜI ĐƯỢC ĐO ✅ (05/08).**
 > · **Sidebar thiếu mục - đo ra bằng máy, không đoán.** Anh Luân: *"lệch nhau giữa nghiệp vụ bên
 > trong và trang trên sidebar là do thiết kế vậy hả em, hay do sót nhỉ"* … *"tại thiếu thì có
