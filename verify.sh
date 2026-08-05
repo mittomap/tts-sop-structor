@@ -125,6 +125,12 @@ chay "_checkdata du lieu vs luat" "CHECKDATA OK"         node _checkdata.js
 # doi xung giua cac trang cung ho, luong hai dau, du thua & rong, so phai sua duoc, cho dung,
 # nga cut cua nguoi dung, dong bo tai lieu. Chi tiet o dau file _checkaudit.js.
 chay "_checkaudit doi xung & nga cut" "CHECKAUDIT OK"    node _checkaudit.js
+# V9.99r - DU LIEU NGOAI MIEN (anh Luan 04/08 mo thu man Truong phong ACA: "no hien ra nhung cai
+# ma chuc danh nay ko can a... roi dong tien gi tum lum trong do"). App co ban khai mien du lieu
+# cho tung nhom, nhung chi tang DOC BANG ton trong no - dai the, cau mo dau, dai pheu, cot bang
+# thi ve thang. Bo nay dong vai tung nguoi, ve THAT moi trang ho thay, roi tim dau hieu cua mien
+# ho khai "none". Nguong la CHOT KEO XUONG: qua so dang co la do.
+chay "_checkmien du lieu ngoai mien" "CHECKMIEN OK"      node _checkmien.js
 # V9.66 - MO APP VAO BAY THU TRONG TUAN. Moi bo kiem khac chi chay vao DUNG MOT NGAY (hom nay);
 # app keo du lieu demo theo boi so 7 ngay nen moi thu trong tuan nhin thay mot lat cat KHAC.
 # Cho trong o lat cat nao thi mai mai trong o dung thu do - va khong bo kiem nao thay.

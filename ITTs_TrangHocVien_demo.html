@@ -2791,7 +2791,10 @@ var ROLESCOPE={
     NV012 - Trưởng phòng Tư vấn - là người duyệt cả 8 lần. Cấu hình sai, dữ liệu đúng. */
  ketoan:{match:/^account/,land:"tuyensinh",ctx:{TSTAB:"thanhtoan"},
   pages:["viec","hocvien","giangvien","tuyensinh","duyet","baocao"],
-  tabs:{duyet:["duyethoan","duyetthu","duyetgiao"]},
+  /* V9.99r - Kế toán chỉ có phần THANH TOÁN của hub Tuyển sinh. Trước đây không khai tab nào
+     nên họ bấm được cả Lead, Test đầu vào, Tư vấn & Đăng ký - ba bước họ khai `lead:"none"`,
+     mở ra chỉ để nhìn. Khai đúng một tab thì phễu, câu mở đầu và menu cùng thu lại theo. */
+  tabs:{duyet:["duyethoan","duyetthu","duyetgiao"],tuyensinh:["thanhtoan"]},
   blocks:["enrolled","approve","debt"],mine:0,mineBtn:0,kpi:0,bell:["Tài chính","Giao việc"]},
  /* V9.60: Marketing KHÔNG xem tiền. Đo trước khi sửa: Trưởng phòng Marketing mở app thấy trang
     Báo cáo với 36 con số doanh thu và công nợ toàn trung tâm - trong khi CH3 chỉ giao cho
@@ -2881,7 +2884,14 @@ function buildScope(code){
   /* Trưởng phòng / Leader được xem Báo cáo - TRỪ vai bị cấm tiền (Marketing) và vai không đụng
      nghiệp vụ học viên (Nhân sự). Trước bản này câu lệnh này đẩy Báo cáo cho MỌI quản lý, nên
      Trưởng phòng Marketing nhìn thấy doanh thu và công nợ toàn trung tâm. */
-  if(!eff.noTien&&gk!=="nhansu"&&eff.pages.indexOf("baocao")<0)eff.pages.push("baocao");
+  /* V9.99r - HỎI MIỀN DỮ LIỆU, ĐỪNG GỌI TÊN NHÓM. Câu cũ loại trừ bằng hai cái tên gõ tay
+     (`noTien` của Marketing và `gk!=="nhansu"`), nên mỗi lần thêm một nhóm mới là nhóm ấy lặng
+     lẽ được phát trang Báo cáo. Đã cắn thật với nhóm `aca` vừa tách 04/08: Trưởng phòng ACA
+     khai `tien:"none"` mà vẫn mở được Báo cáo và đọc thấy doanh thu, công nợ, nguồn lead của
+     cả trung tâm. Báo cáo điều hành nói bằng TIỀN - ai không được xem tiền thì không có việc
+     ở đó. Nay điều kiện đọc thẳng bản khai miền, nên nhóm mới nào cũng tự đúng. */
+  var _duocTien=((DSDEF[gk]||{}).tien||"none")!=="none";
+  if(!eff.noTien&&_duocTien&&eff.pages.indexOf("baocao")<0)eff.pages.push("baocao");
   eff.mine=0;
   if(gk==="tuvan"){if(eff.pages.indexOf("duyet")<0)eff.pages.push("duyet");
    eff.blocks=eff.blocks.concat(["approve","debt"]);
@@ -6149,7 +6159,13 @@ function duyAiHTML(){
 function renderDuyet(){var TH=ckThreshold();
  var tab=window.DUYTAB||"duyetck";
  var TB=duyTabs();
- var DHEAD="Hàng chờ phê duyệt: chiết khấu, hoàn tiền, đơn xin nghỉ, đối soát tiền, việc được giao, bàn giao lead";
+ /* V9.99r - CÂU MỞ ĐẦU PHẢI KỂ ĐÚNG NHỮNG HÀNG CHỜ NGƯỜI NÀY CÓ. Bản cũ liệt kê cứng cả sáu
+    loại, nên giáo viên - người chỉ có đúng một tab "Việc chờ nhận" - vẫn đọc thấy "chiết khấu,
+    hoàn tiền, đối soát tiền, bàn giao lead". Câu chữ hứa những thứ màn hình không có, và nó
+    còn bày ra cho người ta biết trung tâm có những hàng chờ nào mà họ không được đụng. */
+ var DHEAD="Hàng chờ phê duyệt: "+
+   duyTabs().filter(function(x){return scopeTabs("duyet",[[x.k,x.t,"",""]]).length})
+     .map(function(x){return String(x.t).toLowerCase()}).join(", ");
  /* tab nào KHÔNG phải việc của vai này thì không hiện - hub gom việc lại, không gom quyền lại */
  var segs=scopeTabs("duyet",TB.map(function(x){return [x.k,x.t,x.n||"",x.n?"amber":""]}));
  var _ai="";try{_ai=duyAiHTML()}catch(e){_ai=""}
@@ -9537,13 +9553,21 @@ function renderBanglop(){
    /* THẺ LÀ ĐỒNG HỒ - không bấm (luật AC/AB của dự án): giữ thẻ bấm được thì phải viết bộ lọc
       riêng cho từng ô, và app sẽ có HAI loại ô mà người dùng phải học phân biệt. Đường tới danh
       sách nằm trong câu chú thích của từng thẻ (khai ở THEDEF.lopruiro). */
-   h+=statStrip([
+   /* V9.99r - Ô TIỀN CHỈ HIỆN VỚI NGƯỜI ĐƯỢC XEM TIỀN. Dải này em thêm hôm 04/08 và quên hỏi
+      miền dữ liệu: giáo viên đứng lớp, giáo viên WOW và cả Trưởng phòng ACA đều khai
+      `tien:"none"` mà vẫn thấy ô "Học viên còn nợ" ngay trên màn lớp của mình. Công nợ là
+      chuyện giữa học viên và kế toán; giáo viên biết ai đang nợ là một chuyện tế nhị không
+      cần thiết cho việc dạy. Ô nào thuộc miền nào thì phải hỏi miền ấy trước khi vẽ. */
+   var _oRui=[
     ["ti-alert-triangle",risk,"Học viên nguy cơ",risk?"#E24B4A":"#16A34A"],
     ["ti-checkbox",chuaDD,"Buổi chưa điểm danh",chuaDD?"#E24B4A":"#16A34A"],
     ["ti-writing",chuaNX,"Buổi quá hạn chưa nhận xét",chuaNX?"#E08A1E":"#16A34A"],
-    ["ti-book",chuaCham,"Bài đã nộp chưa chấm",chuaCham?"#E08A1E":"#16A34A"],
-    ["ti-cash",soNo,"Học viên còn nợ",soNo?"#E08A1E":"#16A34A"]
-   ],"lopruiro");
+    ["ti-book",chuaCham,"Bài đã nộp chưa chấm",chuaCham?"#E08A1E":"#16A34A"]];
+   var _idRui=["lr_nguyco","lr_chuadd","lr_chuanx","lr_chuacham"];
+   if(dsLevel("tien")!=="none"){_oRui.push(["ti-cash",soNo,"Học viên còn nợ",soNo?"#E08A1E":"#16A34A"]);_idRui.push("lr_no")}
+   /* truyền mã từng thẻ: dải này CẮT BỚT theo chức danh, nên bộ kiểm phải soi theo mã chứ không
+      soi theo số lượng - đúng lối các dải cắt theo vai khác trong app. */
+   h+=statStrip(_oRui,"lopruiro",_idRui);
   })();
   var cap=num(lop.class_capacity),cur=num(lop.current_enrollment)||nStu;
   var curP=cap>0?cur/cap:null, attP=att.length?pres/att.length:null, hcrP=hw.length?hwSub/hw.length:null;
@@ -10304,7 +10328,7 @@ function renderBaocao(){
  var h='<div class="phead" data-tour="phead"><div><div class="t">Tổng quan · Báo cáo & KPI</div><div class="s">Bức tranh điều hành + toàn bộ chỉ số KPI theo SOP. Số liệu tính thẳng từ dữ liệu vận hành; ngưỡng chỉnh ở Cài đặt (CH6).</div></div>'+
   '<div class="sp"><button class="btn" onclick="go(\'banlam\')"><i class="ti ti-checklist"></i>Trang bắt đầu</button><button class="btn" onclick="window.SETTAB=\'ch6\';go(\'settings\')"><i class="ti ti-adjustments"></i>Ngưỡng KPI</button></div></div>';
  h+=tbar('<span class="tblbl">Kỳ số liệu</span>'+segHTML(window.REPKY||"all",[["m0","Tháng này"],["30","30 ngày"],["90","90 ngày"],["all","Toàn kỳ"]],"window.REPKY='{k}';reRender(CUR)")+
-  '<span class="mut" style="font-size:11px;margin-left:10px">Kỳ này áp cho TOÀN BỘ chỉ số bên dưới, không riêng bảng nguồn lead.</span>',"");
+  '<span class="mut" style="font-size:11px;margin-left:10px">Kỳ này áp cho TOÀN BỘ chỉ số bên dưới.</span>',"");
  h+=bvSau();   /* chọn kỳ số liệu xong mới tới bảng việc của Ban Giám đốc */
  h+=kpiTop3Section();
  h+=baocaoBranch();
@@ -12897,8 +12921,24 @@ function renderTuyensinh(){
    nhưng form chung KHÔNG chặn trùng số và KHÔNG ghi lượt liên hệ đầu (DL02b) - lead tạo bằng
    nó làm sai luôn đồng hồ SLA phản hồi (LRT) và sổ chạm. Giữ đúng một cửa vào. */
  var actBtn=(tab==="lead")?'<button class="btn primary" onclick="leadInbound()"><i class="ti ti-message-plus"></i>Khách mới liên hệ đến</button>':(tab==="test")?'<button class="btn primary" onclick="testQuickAdd()"><i class="ti ti-plus"></i>Khách muốn test ngay</button>':(tab==="tuvan")?'<button class="btn primary" onclick="tvQuick()"><i class="ti ti-plus"></i>Tư vấn không qua test</button>':(tab==="reup")?'':'<button class="btn primary" onclick="payQuick()"><i class="ti ti-cash"></i>Ghi nhận khoản thu</button>';
- var h=pageHead("Tuyển sinh","Một luồng liền mạch: Lead → Test đầu vào → Tư vấn & Đăng ký → Thanh toán. Bấm một bước để xử lý; số trên phễu là việc đang chờ ở bước đó. Khách rơi khỏi luồng nằm ở \"Chăm lại\"."+hubCau("tuyensinh",tab),actBtn,1);
+ /* V9.99r - CÂU MỞ ĐẦU KỂ ĐÚNG NHỮNG BƯỚC NGƯỜI NÀY CÓ. Kế toán chỉ có tab Thanh toán, mà câu
+    cũ vẫn đọc "Lead → Test đầu vào → Tư vấn & Đăng ký → Thanh toán" - ba bước đầu họ không có
+    cửa nào bước vào, và phễu bên dưới cũng chỉ vẽ đúng bước của họ. Câu chữ hứa một luồng bốn
+    bước trong khi màn hình có một: người đọc đi tìm ba bước kia rồi tưởng app thiếu. */
+ var _bcTS=scopeTabs("tuyensinh",[["lead","Lead"],["test","Test đầu vào"],["tuvan","Tư vấn & Đăng ký"],["thanhtoan","Thanh toán"]]);
+ var _cauTS=(_bcTS.length>1)
+   ?("Một luồng liền mạch: "+_bcTS.map(function(x){return x[1]}).join(" → ")+
+     ". Bấm một bước để xử lý; số trên phễu là việc đang chờ ở bước đó.")
+   :("Phần bạn phụ trách trong luồng tuyển sinh: "+((_bcTS[0]||["","bước này"])[1])+".");
+ var h=pageHead("Tuyển sinh",_cauTS+hubCau("tuyensinh",tab),actBtn,1);
+ /* V9.99r - PHỄU CŨNG PHẢI CẮT THEO QUYỀN. Câu mở đầu đã kể đúng bước của từng người, nhưng
+    dải phễu vẫn vẽ đủ bốn bước cho ai cũng vậy - kế toán nhìn thấy "82 Lead · 54 Test đầu vào"
+    rồi bấm vào, rơi về tab của mình mà không một câu giải thích. Cùng một màn thì câu chữ,
+    dải phễu và menu phải nói cùng một sự thật. */
  var steps=[["lead","ti-users","Lead",nLead,"#3B82C4"],["test","ti-file-text","Test đầu vào",nTest,"#7C3AED"],["tuvan","ti-messages","Tư vấn & ĐK",nTuvan,"#E08A1E"],["thanhtoan","ti-cash","Thanh toán",nPay,"#0D9488"]];
+ (function(){var _ok={};scopeTabs("tuyensinh",steps.map(function(x){return [x[0],x[2],"",""]}))
+   .forEach(function(x){_ok[x[0]]=1});
+  if(Object.keys(_ok).length)steps=steps.filter(function(x){return _ok[x[0]]})})();
  h+='<div class="tsfun">';
  steps.forEach(function(s,i){h+='<div class="tsstep'+(tab===s[0]?" on":"")+'" onclick="tsTabSet(\''+s[0]+'\')" title="Xử lý bước '+esc(s[2])+'"><span class="tssic" style="background:'+s[4]+'18;color:'+s[4]+'"><i class="ti '+s[1]+'"></i></span><div class="tssm"><div class="tssn">'+s[3]+'</div><div class="tssl">'+esc(s[2])+'</div></div></div>';
   if(i<steps.length-1)h+='<div class="tsarr"><i class="ti ti-chevron-right"></i></div>'});
@@ -15061,7 +15101,11 @@ function renderMaGioiThieu(embed){
  var h=embed?'':pageHead("Mã giới thiệu","Học viên giới thiệu bạn bè - theo dõi lượt dùng, bạn được liên kết và ưu đãi đã cấp",
   '<button class="btn" onclick="window.SETTAB=\'ch2\';go(\'settings\')"><i class="ti ti-settings"></i>Cấu hình chính sách</button>');
  /* chính sách hiện hành */
- h+='<div class="notebar"><i class="ti ti-discount-2"></i>Chính sách hiện tại (Cài đặt → CH2): bạn được giới thiệu <b data-tip="Mức giảm cho người ĐƯỢC giới thiệu, áp dụng cho khóa đầu tiên - lấy từ Cài đặt > CH2 (chính sách giới thiệu), không cắm cứng trong app">giảm '+esc(off.txt)+'</b> khi đăng ký khóa đầu · người giới thiệu nhận <b>'+esc(reward)+'</b>.</div>';
+ /* V9.99r - mức ưu đãi và phần thưởng là con số TIỀN: Marketing khai `tien:"none"` mà vẫn đọc
+    được "giảm 500.000đ", "2.000.000đ ưu đãi đã cấp" ngay trên trang Mã giới thiệu. Chương trình
+    giới thiệu là việc của họ, nhưng số tiền thì không. */
+ if(dsLevel("tien")!=="none")
+  h+='<div class="notebar"><i class="ti ti-discount-2"></i>Chính sách hiện tại (Cài đặt → CH2): bạn được giới thiệu <b data-tip="Mức giảm cho người ĐƯỢC giới thiệu, áp dụng cho khóa đầu tiên - lấy từ Cài đặt > CH2 (chính sách giới thiệu), không cắm cứng trong app">giảm '+esc(off.txt)+'</b> khi đăng ký khóa đầu · người giới thiệu nhận <b>'+esc(reward)+'</b>.</div>';
  h+=statStrip([
   /* ═══ V9.57 (anh Luân): bốn ô cũ ở đây đều là SỐ TÍCH LUỸ - "HV đã tạo mã", "lượt bạn dùng mã",
      "bạn đã đăng ký", "ưu đãi đã cấp". Đọc thì vui, nhưng sáng mai đọc lại vẫn gần y hệt và
@@ -15076,14 +15120,14 @@ function renderMaGioiThieu(embed){
  var list=amb.filter(function(g){return !q||vnorm(g.name+" "+g.code).indexOf(q)>=0});
  h+=tbar(srchHTML(window.MGQ||"","window.MGQ=this.value;reRenderKeep(CUR)","Tìm tên, SĐT hoặc mã...",300),
   '<span class="tbcnt">'+list.length+'/'+amb.length+' học viên</span>');
- h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên chủ mã</th><th>Mã giới thiệu</th><th>Lượt dùng</th><th>Đã đăng ký</th><th>Ưu đãi đã cấp</th><th>Thưởng</th><th></th></tr></thead><tbody>';
+ h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên chủ mã</th><th>Mã giới thiệu</th><th>Lượt dùng</th><th>Đã đăng ký</th>'+(dsLevel("tien")==="none"?'':'<th>Ưu đãi đã cấp</th>')+'<th>Thưởng</th><th></th></tr></thead><tbody>';
  if(!list.length)h+='<tr><td class="empty" colspan="7">Chưa có mã giới thiệu nào được dùng.</td></tr>';
  list.forEach(function(g){
   h+='<tr><td>'+(g.sid?nguoiLnk(g.sid,g.name,""):esc(g.name))+'</td>'+
    '<td><code style="font-size:11.5px;letter-spacing:.5px">'+esc(g.code)+'</code></td>'+
    '<td><b>'+g.rows.length+'</b></td>'+
    '<td>'+(g.enrolled?'<span class="chip green">'+g.enrolled+' bạn</span>':'<span class="mut">0</span>')+'</td>'+
-   '<td>'+(g.disc?vnd(g.disc):'<span class="mut">—</span>')+'</td>'+
+   (dsLevel("tien")==="none"?'':('<td>'+(g.disc?vnd(g.disc):'<span class="mut">—</span>')+'</td>'))+
    '<td>'+(g.enrolled?'<span class="chip blue">'+g.enrolled+' × thưởng</span>':'<span class="mut">chưa</span>')+'</td>'+
    '<td><button class="btn sm" onclick="mgDetail(\''+esc(g.sid||g.name)+'\')"><i class="ti ti-list-details"></i>Bạn được giới thiệu</button></td></tr>'});
  h+='</tbody></table></div></div>';
@@ -16203,7 +16247,7 @@ function renderKhac(){
  var ksegs=scopeTabs("khac",[["baoluu","Bảo lưu / Bỏ học",bl.length||"",nBlCall?"amber":""],["magioithieu","Mã giới thiệu",nRef||"",""]]);
  if(!ksegs.some(function(t){return t[0]===tab})){tab=(ksegs[0]||["baoluu"])[0];window.KTAB=tab}
  /* V9.99m: chốt tab trước rồi mới dựng câu mở đầu - xem chú thích cùng mã ở renderDuyet. */
- var h=pageHead("Tính năng khác","Các việc không nằm trong nhịp hằng ngày, gom về một chỗ cho menu gọn: giữ chân học viên dừng học và chương trình giới thiệu bạn. (Bàn giao lead đã chuyển sang nhóm Chờ duyệt.)"+hubCau("khac",tab),actBtn);
+ var h=pageHead("Tính năng khác","Các việc không nằm trong nhịp hằng ngày, gom về một chỗ cho menu gọn: giữ chân học viên dừng học và chương trình giới thiệu bạn."+hubCau("khac",tab),actBtn);
  h+=tbar(segHTML(tab,ksegs,"kcTabSet('{k}')"),"");
  if(tab==="magioithieu")h+=renderMaGioiThieu(1);
  else h+=renderBaoluu(1);
