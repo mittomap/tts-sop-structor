@@ -733,6 +733,9 @@ var ROLESCOPE={
    ở MỘT chỗ, khỏi sót khi thêm nhóm vai mới sau này. */
 (function(){for(var k in ROLESCOPE){var r=ROLESCOPE[k];
  if(Array.isArray(r.pages)&&r.pages.indexOf("giaoviec")<0)r.pages.push("giaoviec");
+ /* V9.99w - TRANG CHỈ SỐ & KPI cũng vậy: ai cũng có, chỉ khác PHẠM VI (miền `baocao`).
+    Trước đây 9/17 chức danh không có trang này - trong đó có Trưởng phòng ACA. */
+ if(Array.isArray(r.pages)&&r.pages.indexOf("baocao")<0)r.pages.push("baocao");
  if(Array.isArray(r.bell)&&r.bell.indexOf("Giao việc")<0)r.bell.push("Giao việc")}})();
 /* Lớp phủ QUẢN LÝ: leader/manager trong nhóm được cộng thêm quyền */
 /* ═══════════ V9.61 - TẦNG 1 CỦA PHÂN QUYỀN NAY SỬA ĐƯỢC TRONG CÀI ĐẶT ═══════════════════════
@@ -965,17 +968,28 @@ var DSDOMT={lead:"Khách tiềm năng",hocvien:"Học viên",lop:"Lớp & giản
  baocao:"Báo cáo tổng",viec:"Việc được giao",nhansu:"Nhân sự",noidung:"Nội dung nhạy cảm"};
 var DSLV=[["none","Không xem"],["mine","Chỉ của tôi"],["team","Nhóm / cơ sở"],["all","Toàn trung tâm"]];
 /* ma trận mặc định - khóa theo nhóm ROLESCOPE, hậu tố _mgr = lớp phủ quản lý (leader/manager) */
+/* ═══ V9.99w - MỖI NGƯỜI MỘT TRANG CHỈ SỐ CỦA CHÍNH MÌNH ═══════════════════════════════════
+   Anh Luân 05/08: *"mỗi người phải có 1 sheet Chỉ số và KPI riêng đúng ko... Thậm chí nhân viên
+   cũng nên có để họ biết việc của mình. Trưởng phòng thì biết để còn theo dõi team mình. Giám
+   đốc thì khỏi nói rồi."*
+   Trước bản này miền `baocao` chỉ có ba mức thật: "all" cho quản lý, "none" cho gần hết nhân
+   viên - tức là **9/17 chức danh không có trang chỉ số nào**, kể cả Trưởng phòng ACA. Và người
+   CÓ trang thì đọc số của TOÀN TRUNG TÂM dù họ chỉ quản một đội, nên anh Luân mở Trưởng phòng
+   Kế toán ra thấy "sai tè le" - số đúng, nhưng không phải số của họ.
+   Nay: nhân viên **"mine"**, quản lý **"team"**, Giám đốc/Quản trị **"all"**. Con số tự đúng
+   theo mức ấy vì cả trang Báo cáo và bộ tính KPI nay đọc `srows()` - tức là đã cắt theo đúng
+   phạm vi dữ liệu của người đang đăng nhập, không phải bảng thô. */
 var DSDEF={
  quantri:{lead:"all",hocvien:"all",lop:"all",tien:"all",baocao:"all",viec:"all",nhansu:"all",noidung:"all"},
  dieuhanh:{lead:"all",hocvien:"all",lop:"all",tien:"all",baocao:"all",viec:"all",nhansu:"all",noidung:"all"},
- tuvan:{lead:"mine",hocvien:"team",lop:"all",tien:"mine",baocao:"none",viec:"mine",nhansu:"none",noidung:"mine"},
+ tuvan:{lead:"mine",hocvien:"team",lop:"all",tien:"mine",baocao:"mine",viec:"mine",nhansu:"none",noidung:"mine"},
  tuvan_mgr:{lead:"team",hocvien:"team",lop:"all",tien:"team",baocao:"team",viec:"team",nhansu:"team",noidung:"team"},
- hocvu:{lead:"none",hocvien:"all",lop:"all",tien:"all",baocao:"none",viec:"mine",nhansu:"none",noidung:"all"},
- hocvu_mgr:{lead:"none",hocvien:"all",lop:"all",tien:"all",baocao:"all",viec:"team",nhansu:"team",noidung:"all"},
- giaovien:{lead:"none",hocvien:"mine",lop:"mine",tien:"none",baocao:"none",viec:"mine",nhansu:"none",noidung:"none"},
- wow:{lead:"mine",hocvien:"mine",lop:"mine",tien:"none",baocao:"none",viec:"mine",nhansu:"none",noidung:"none"},
- ketoan:{lead:"none",hocvien:"all",lop:"none",tien:"all",baocao:"all",viec:"mine",nhansu:"none",noidung:"none"},
- marketing:{lead:"all",hocvien:"none",lop:"none",tien:"none",baocao:"all",viec:"mine",nhansu:"none",noidung:"none"},
+ hocvu:{lead:"none",hocvien:"all",lop:"all",tien:"all",baocao:"mine",viec:"mine",nhansu:"none",noidung:"all"},
+ hocvu_mgr:{lead:"none",hocvien:"all",lop:"all",tien:"all",baocao:"team",viec:"team",nhansu:"team",noidung:"all"},
+ giaovien:{lead:"none",hocvien:"mine",lop:"mine",tien:"none",baocao:"mine",viec:"mine",nhansu:"none",noidung:"none"},
+ wow:{lead:"mine",hocvien:"mine",lop:"mine",tien:"none",baocao:"mine",viec:"mine",nhansu:"none",noidung:"none"},
+ ketoan:{lead:"none",hocvien:"all",lop:"none",tien:"all",baocao:"team",viec:"mine",nhansu:"none",noidung:"none"},
+ marketing:{lead:"all",hocvien:"none",lop:"none",tien:"none",baocao:"team",viec:"mine",nhansu:"none",noidung:"none"},
  /* V9.99m - NHÓM NHÂN SỰ TRƯỚC ĐÂY KHÔNG CÓ DÒNG NÀO Ở ĐÂY. Đo được 04/08: đăng nhập bằng
     Trưởng phòng Nhân sự rồi gõ tên một học viên vào Trợ lý là ra trọn hồ sơ, kèm cả công nợ -
     trong khi menu của họ không có một trang học viên nào. Lý do nằm ở dòng cuối `dsLevel`:
@@ -986,8 +1000,8 @@ var DSDEF={
  /* ACA: chuyên môn giảng dạy - thấy trọn học viên và lớp để chấm chất lượng, nhưng không đụng
     lead và không đụng tiền. */
  aca:{lead:"none",hocvien:"all",lop:"all",tien:"none",baocao:"team",viec:"team",nhansu:"team",noidung:"all"},
- nhansu:{lead:"none",hocvien:"none",lop:"all",tien:"none",baocao:"none",viec:"mine",nhansu:"all",noidung:"none"},
- hotro:{lead:"none",hocvien:"none",lop:"none",tien:"none",baocao:"none",viec:"mine",nhansu:"none",noidung:"none"}};
+ nhansu:{lead:"none",hocvien:"none",lop:"all",tien:"none",baocao:"mine",viec:"mine",nhansu:"all",noidung:"none"},
+ hotro:{lead:"none",hocvien:"none",lop:"none",tien:"none",baocao:"mine",viec:"mine",nhansu:"none",noidung:"none"}};
 /* trường bị CHE khi miền "noidung"/"tien" không đủ quyền */
 var DSMASK={noidung:["lead_note","notes","content","result_note","consultation_note","complaint_content","feedback_content","negative_comments","suggestions"],
  lienhe:["phone_number","phone","email","zalo_id"],
@@ -2993,10 +3007,10 @@ function inMonth(s){var d=pvnd(s);return d&&(d.getFullYear()+"-"+("0"+(d.getMont
 function mkMoiNgay(){return Math.max(1,num(paramOf("statsNewWindow_days",30)))}
 function in30(s){var d=pvnd(s);return d&&(Date.now()-d.getTime())<mkMoiNgay()*864e5}
 function upcomingSection(){var D=Math.max(1,num(paramOf("statsUpcoming_days",7)));
- var call=rows("DL02").filter(function(l){return isc(l.lead_status,"new","contacted","considering","no_response")&&inNextDays(l.next_followup_time,D)}).length;
- var tst=rows("DL03").filter(function(t){return !isc(t.test_attendance_status,"on_time","late","no_show")&&inNextDays(t.test_date,D)}).length;
- var ses=rows("DL11").filter(function(s){return !isc(s.session_status,"cancelled","completed")&&inNextDays(s.session_date,D)}).length;
- var ww=rows("DL14").filter(function(w){return isc(w.wow_status,"booked","confirmed")&&inNextDays(w.wow_session_date,D)}).length;
+ var call=srows("DL02").filter(function(l){return isc(l.lead_status,"new","contacted","considering","no_response")&&inNextDays(l.next_followup_time,D)}).length;
+ var tst=srows("DL03").filter(function(t){return !isc(t.test_attendance_status,"on_time","late","no_show")&&inNextDays(t.test_date,D)}).length;
+ var ses=srows("DL11").filter(function(s){return !isc(s.session_status,"cancelled","completed")&&inNextDays(s.session_date,D)}).length;
+ var ww=srows("DL14").filter(function(w){return isc(w.wow_status,"booked","confirmed")&&inNextDays(w.wow_session_date,D)}).length;
  var items=[["Hẹn gọi lại",call,"ti-phone-call","#3B82C4","nhaplead"],["Test đầu vào",tst,"ti-file-text","#7C3AED","test"],["Buổi học",ses,"ti-school","#0D9488","banglop"],["Buổi WOW",ww,"ti-star","#DB2777","wow"]];
  /* Hai ô đầu là lịch hẹn với KHÁCH TIỀM NĂNG (DL02/DL03) và bấm vào là sang màn Lead/Test.
     Ai khai `lead:"none"` thì vừa không có số liệu vừa không có cửa vào - bỏ hai ô, giữ hai ô
@@ -3009,7 +3023,10 @@ function bizSection(){
  /* V9.60: vai bị cấm tiền (Marketing) thì khối "Tình hình kinh doanh" không vẽ. Chặn ở ĐÂY chứ
     không chặn bằng cách giấu trang - trang Báo cáo còn nhiều thứ khác họ được xem. */
  if(SCOPE().noTien)return "";
- var pay=rows("DL07"),L=rows("DL02"),E=rows("DL06"),S=rows("DL09");
+ /* V9.99w - ai khai `tien:"none"` thì mọi ô trong khối này đều là 0đ (giáo viên, ACA, nhân sự).
+    Bảy ô số 0 xếp hàng dưới tiêu đề "Tình hình kinh doanh" không nói được gì - bỏ hẳn khối. */
+ if(dsLevel("tien")==="none")return "";
+ var pay=srows("DL07"),L=srows("DL02"),E=srows("DL06"),S=srows("DL09");
  var revTotal=pay.reduce(function(a,b){return a+num(b.amount)},0);
  var revMonth=pay.filter(function(p){return inMonth(p.payment_time)}).reduce(function(a,b){return a+num(b.amount)},0);
  var conv=L.filter(function(r){return isc(r.lead_status,"converted")}).length;var cvr=L.length?Math.round(conv/L.length*100):0;
@@ -3095,7 +3112,7 @@ function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sa
   '<b>Doanh thu khách của mình</b> = mọi khoản đã thu của các đơn thuộc lead người đó phụ trách - đây là con số dùng để đánh giá và để họp. '+
   '<b>Trong đó tự tay thu</b> = phần chính người đó trực tiếp nhận tiền; cột này để kế toán đối chiếu quỹ, không phải để chấm công. '+
   'Hai số lệch nhau là bình thường: khách chuyển khoản thẳng, hoặc đóng ở quầy cơ sở khác.</div></div>';return h}
-function deptSection(){var L=rows("DL02"),S=rows("DL09"),E=rows("DL06"),pay=rows("DL07"),HW=rows("DL13"),T=rows("DL03"),W=rows("DL14"),KN=rows("DL17"),FB=rows("DL16"),SV=rows("DL15"),OB=rows("DL08"),ATT=rows("DL12");
+function deptSection(){var L=srows("DL02"),S=srows("DL09"),E=srows("DL06"),pay=srows("DL07"),HW=srows("DL13"),T=srows("DL03"),W=srows("DL14"),KN=srows("DL17"),FB=srows("DL16"),SV=srows("DL15"),OB=srows("DL08"),ATT=srows("DL12");
  function cnt(a,fn){return a.filter(fn).length}function pct(a,b){return b?Math.round(a/b*100)+"%":"-"}
  var conv=cnt(L,function(r){return isc(r.lead_status,"converted")});var cvr=L.length?Math.round(conv/L.length*100):0;
  var risk=cnt(S,function(r){return/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status))});
@@ -7680,16 +7697,16 @@ function svgDonut(segs){var tot=segs.reduce(function(a,b){return a+b[1]},0)||1;v
 function repF(arr,fld){if(!repRange().from)return arr;
  return arr.filter(function(r){return inRep(r[fld])})}
 function kpiCompute(){
- var L=repF(rows("DL02"),"lead_created_time"),T=repF(rows("DL03"),"test_date"),
-     CS=repF(rows("DL04"),"consultation_time"),E=repF(rows("DL06"),"enrollment_time"),
-     OB=repF(rows("DL08"),"assigned_at"),S=rows("DL09"),CL=rows("DL10"),
-     SE=repF(rows("DL11"),"session_date"),HW=repF(rows("DL13"),"homework_assigned_time"),
-     W=repF(rows("DL14"),"wow_session_date"),SV=repF(rows("DL15"),"sent_date"),
-     FB=repF(rows("DL16"),"feedback_time"),KN=repF(rows("DL17"),"complaint_time"),
-     CE=repF(rows("DL18"),"course_completion_time");
+ var L=repF(srows("DL02"),"lead_created_time"),T=repF(srows("DL03"),"test_date"),
+     CS=repF(srows("DL04"),"consultation_time"),E=repF(srows("DL06"),"enrollment_time"),
+     OB=repF(srows("DL08"),"assigned_at"),S=srows("DL09"),CL=srows("DL10"),
+     SE=repF(srows("DL11"),"session_date"),HW=repF(srows("DL13"),"homework_assigned_time"),
+     W=repF(srows("DL14"),"wow_session_date"),SV=repF(srows("DL15"),"sent_date"),
+     FB=repF(srows("DL16"),"feedback_time"),KN=repF(srows("DL17"),"complaint_time"),
+     CE=repF(srows("DL18"),"course_completion_time");
  /* điểm danh không có mốc riêng - lọc theo buổi học thuộc kỳ */
  var _seIn={};SE.forEach(function(x){_seIn[String(x.session_id||"")]=1});
- var AT=repRange().from?rows("DL12").filter(function(a){return _seIn[String(a.session_id||"")]}):rows("DL12");
+ var AT=repRange().from?srows("DL12").filter(function(a){return _seIn[String(a.session_id||"")]}):srows("DL12");
  function hb(a,b){var da=pvnd(a),db=pvnd(b);return (da&&db)?(db.getTime()-da.getTime())/3600000:null}
  function rate(a,b){return b>0?a/b:null}
  function cnt(arr,fn){var n=0;arr.forEach(function(x){if(fn(x))n++});return n}
@@ -7932,8 +7949,8 @@ var KPIARC={LRT:"A",TBR:"A",CVR:"A",PCR:"A",CAR:"A",CLR:"B",CUR:"B",ATR:"B",UAR:
 var KPITREND={LRT:1,ATR:1,UAR:1,HCR:1,GCR7:1,TNR:1,SS:1,NPS:1,CLR:1,CUR:1};
 
 function kpiNum(code){          /* con số con THẬT đứng sau mỗi chỉ số */
- var L=rows("DL02"),T=rows("DL03"),E=rows("DL06"),OB=rows("DL08"),CL=rows("DL10"),
-     AT=rows("DL12"),HW=rows("DL13"),SV=rows("DL15"),CE=rows("DL18"),SE=rows("DL11");
+ var L=srows("DL02"),T=srows("DL03"),E=srows("DL06"),OB=srows("DL08"),CL=srows("DL10"),
+     AT=srows("DL12"),HW=srows("DL13"),SV=srows("DL15"),CE=srows("DL18"),SE=srows("DL11");
  function c(a,f){var n=0;a.forEach(function(x){if(f(x))n++});return n}
  switch(code){
   case "LRT":{var slow=c(L,function(l){var x=hoursSince(l.lead_created_time);
@@ -8210,7 +8227,12 @@ function kpiTrendHTML(code){
 function kpiSection(){var comp=kpiCompute();var ch6=(DATA.config&&DATA.config.ch6)||[];
  if(!ch6.length)return '<div class="sechd">KPI theo SOP</div><div class="panel"><div class="empty">Chưa nạp được ngưỡng KPI (CH6).</div></div>';
  ch6=ch6.filter(kpiCoMien);
- if(!ch6.length)return "";
+ /* V9.99w - Ở PHẠM VI CÁ NHÂN, chỉ số không có dữ liệu của bạn thì không phải chỉ số của bạn.
+    Một NV WOW mở trang ra gặp 49 dòng mà 40 dòng ghi "chưa đủ dữ liệu" - đó không phải bảng chỉ
+    số, đó là danh mục. Ở mức "team"/"all" thì giữ nguyên: quản lý cần thấy cả chỗ CHƯA đo được,
+    vì đó chính là chỗ dữ liệu đang thiếu. */
+ if(dsLevel("baocao")==="mine")ch6=ch6.filter(function(k){var c=comp[k.code];return !(c==null||isNaN(c))});
+ if(!ch6.length)return '<div class="sechd">KPI theo SOP</div><div class="panel"><div class="empty">Chưa có chỉ số nào tính được cho riêng bạn trong kỳ này - làm việc trên hồ sơ của mình rồi số sẽ hiện ra.</div></div>';
  var byPhase={},order=[];
  ch6.forEach(function(k){var p=k.phase||"-";if(!byPhase[p]){byPhase[p]=[];order.push(p)}byPhase[p].push(k)});
  order.sort(function(a,b){return (parseInt(String(a).replace(/[^0-9]/g,""),10)||99)-(parseInt(String(b).replace(/[^0-9]/g,""),10)||99)});
@@ -8359,20 +8381,34 @@ function baocaoBranch(){
  return h}
 function renderBaocao(){
  if(dsLevel("baocao")==="none")return dsDeny("Báo cáo & KPI");
- var L=rows("DL02"),S=rows("DL09"),E=rows("DL06");
+ var L=srows("DL02"),S=srows("DL09"),E=srows("DL06");
  var risk=S.filter(function(r){return/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status))}).length;
- var h='<div class="phead" data-tour="phead"><div><div class="t">Tổng quan · Báo cáo & KPI</div><div class="s">Bức tranh điều hành + toàn bộ chỉ số KPI theo SOP. Số liệu tính thẳng từ dữ liệu vận hành; ngưỡng chỉnh ở Cài đặt (CH6).</div></div>'+
+ /* V9.99w - TRANG NÀY LÀ CỦA AI. Ba mức phạm vi thì ba câu khác nhau, nói thẳng trên tiêu đề -
+    người đọc phải biết con số đang đếm tập nào trước khi tin nó. */
+ var _bcLv=dsLevel("baocao");
+ var _bcTen=(_bcLv==="all")?"Toàn trung tâm"
+   :(_bcLv==="team")?"Đội của bạn"
+   :"Của riêng bạn";
+ var _bcCau=(_bcLv==="all")
+   ?"Bức tranh điều hành + toàn bộ chỉ số KPI theo SOP. Số liệu tính thẳng từ dữ liệu vận hành; ngưỡng chỉnh ở Cài đặt (CH6)."
+   :(_bcLv==="team")
+   ?"Chỉ số của ĐỘI BẠN - mọi con số dưới đây chỉ đếm phần dữ liệu thuộc phạm vi bạn quản lý, không phải toàn trung tâm. Ngưỡng dùng chung của trung tâm (CH6)."
+   :"Chỉ số của RIÊNG BẠN - mọi con số dưới đây chỉ đếm hồ sơ, lớp và việc do chính bạn phụ trách. Ngưỡng so sánh dùng chung của trung tâm (CH6).";
+ var h='<div class="phead" data-tour="phead"><div><div class="t">Chỉ số &amp; KPI · '+esc(_bcTen)+'</div><div class="s">'+esc(_bcCau)+'</div></div>'+
   '<div class="sp"><button class="btn" onclick="go(\'banlam\')"><i class="ti ti-checklist"></i>Trang bắt đầu</button><button class="btn" onclick="window.SETTAB=\'ch6\';go(\'settings\')"><i class="ti ti-adjustments"></i>Ngưỡng KPI</button></div></div>';
  h+=tbar('<span class="tblbl">Kỳ số liệu</span>'+segHTML(window.REPKY||"all",[["m0","Tháng này"],["30","30 ngày"],["90","90 ngày"],["all","Toàn kỳ"]],"window.REPKY='{k}';reRender(CUR)")+
   '<span class="mut" style="font-size:11px;margin-left:10px">Kỳ này áp cho TOÀN BỘ chỉ số bên dưới.</span>',"");
  h+=bvSau();   /* chọn kỳ số liệu xong mới tới bảng việc của Ban Giám đốc */
  h+=kpiTop3Section();
- h+=baocaoBranch();
+ /* Bảng so sánh 5 cơ sở là câu hỏi của người điều hành chuỗi ("cơ sở nào đang gánh") - một nhân
+    viên nhìn bảng ấy không quyết được gì, mà số của họ cũng chỉ nằm ở đúng một ô. */
+ if(_bcLv!=="mine")h+=baocaoBranch();
  h+=bizSection();
  h+=upcomingSection();
  h+=kpiSection();
  /* V9.42 - VH11 của SOP: ai đang ôm bao nhiêu việc. Đặt ở Báo cáo vì đây là câu hỏi của quản lý. */
- h+='<div class="sechd">Khối lượng việc theo nhân viên · VH11</div>'+khoiLuongHTML();
+ /* VH11 là bảng so người với người - chỉ có nghĩa với người quản lý nhiều hơn một người. */
+ if(_bcLv!=="mine")h+='<div class="sechd">Khối lượng việc theo nhân viên · VH11</div>'+khoiLuongHTML();
  /* V9.99s - PHẦN LEAD CỦA BÁO CÁO CHỈ DÀNH CHO NGƯỜI CÓ MIỀN LEAD. Đo được 05/08: Kế toán và
     Trưởng phòng Học vụ khai `lead:"none"` nhưng trang Báo cáo vẫn bày đủ phễu chuyển đổi, biểu
     đồ phân bố trạng thái lead và bảng hiệu quả nguồn - ba khối dựng hoàn toàn trên DL02. Quyền
@@ -8405,8 +8441,8 @@ function renderBaocao(){
   h+='<div class="chartrow">'+_bAca.replace('<div class="chartp">','<div class="chartp" style="grid-column:1/-1">')+'</div>';
  }
  // Hiệu quả nguồn + hiệu suất đội + KPI phòng ban + bảng HV nguy cơ
- if(_coLead)h+=srcPerfSection();
- h+=staffPerfSection();
+ if(_coLead&&_bcLv!=="mine")h+=srcPerfSection();
+ if(_bcLv!=="mine")h+=staffPerfSection();
  h+=deptSection();
  // risk table
  h+='<div class="panel"><div class="ph"><b>Học viên nguy cơ cần theo dõi ('+risk+')</b><div class="mini"><button class="pill" onclick="go(\'viec\')">Mở Việc hôm nay</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã HV</th><th>Họ tên</th><th>Chuyên cần</th><th>Học thuật</th><th>Việc cần làm</th></tr></thead><tbody>';
@@ -8414,7 +8450,7 @@ function renderBaocao(){
  if(!rk.length)h+='<tr><td class="empty" colspan="5">Không có học viên nguy cơ.</td></tr>';
  catXem("bcrisk",rk,30).forEach(function(r){h+='<tr><td>'+esc(r.student_id)+'</td><td>'+esc(r.full_name)+'</td><td><span class="chip '+stCls(r.attendance_progress_status)+'">'+elabel(r.attendance_progress_status)+'</span></td><td><span class="chip '+stCls(r.academic_progress_status)+'">'+elabel(r.academic_progress_status)+'</span></td><td>'+naDecor(r.next_action||"-")+'</td></tr>'});
  h+='</tbody></table></div>'+xemTiepBtn("bcrisk",rk.length,30)+'</div>';return h}
-function revByMonth(){var m={};rows("DL07").forEach(function(p){var d=pvnd(p.payment_time);if(!d)return;var k=d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2);m[k]=(m[k]||0)+num(p.amount)});var ks=Object.keys(m).sort().slice(-6);return ks.map(function(k){return [k.slice(5)+"/"+k.slice(2,4),Math.round(m[k]/1000000)]})}
+function revByMonth(){var m={};srows("DL07").forEach(function(p){var d=pvnd(p.payment_time);if(!d)return;var k=d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2);m[k]=(m[k]||0)+num(p.amount)});var ks=Object.keys(m).sort().slice(-6);return ks.map(function(k){return [k.slice(5)+"/"+k.slice(2,4),Math.round(m[k]/1000000)]})}
 
 function renderBanggiao(embed){
  var staff=rows("DL01").filter(function(s){return /sales/.test(ecode(s.role))});
@@ -19018,7 +19054,7 @@ function buildNav(){
   items.forEach(function(k){var m=navItemMeta(k),n=navBadge(k);
    var isArc=/^chang[A-D]$/.test(k);
    h+='<div class="navitem'+(isArc?" chang":"")+(navCur(k)?" on":(ORPHAN&&k===NAVFROM?" from":""))+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
-    ' data-k="'+k+'" onclick="go(\''+k+'\')"><i class="ti '+m.ic+'"></i>'+esc(m.t)+
+    ' data-k="'+k+'" title="'+esc(m.t)+'" onclick="go(\''+k+'\')"><i class="ti '+m.ic+'"></i><span>'+esc(m.t)+'</span>'+
     (n?'<span class="dot">'+(n>99?"99+":n)+'</span>':'')+'</div>'});
   h+='</div>'});
  document.getElementById("nav").innerHTML=h;
