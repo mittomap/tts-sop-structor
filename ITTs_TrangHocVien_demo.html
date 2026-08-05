@@ -2922,6 +2922,9 @@ var ROLESCOPE={
  marketing:{match:/^marketing/,land:"tuyensinh",ctx:{TSTAB:"lead"},
   pages:["viec","banlam","tuyensinh","khac","hocvien","reup","duyet"],
   tabs:{khac:["magioithieu"],duyet:["banggiao"]},
+  /* V9.99z10 - hai hàng chờ THẬT của Marketing theo CH3: lead mới về (họ nhập, phải chắc có
+     người nhận) và khách cũ tới hẹn chăm lại. Phần còn lại của phễu là việc của Tư vấn. */
+  bellGrp:["Lead mới","Chăm lại tới hẹn"],
   blocks:["new","reup"],mine:0,mineBtn:0,kpi:0,noTien:1,bell:["Tuyển sinh","Giao việc"]},
  /* V9.60 - NHÂN SỰ (anh Luân chốt giữ bộ phận này). SOP không giao cho họ hành động nào với
     học viên, nên họ KHÔNG có trang nào chạm tới học viên, tiền hay luật của trung tâm. Việc
@@ -20449,6 +20452,17 @@ function toggleNav(){var s=document.getElementById("sidebar"),m=document.getElem
 function closeNav(){var s=document.getElementById("sidebar"),m=document.getElementById("navmask");if(s)s.classList.remove("open");if(m)m.classList.remove("on");navBody(false)}
 function bellItems(){var rs=SCOPE();var items=slaItems();
  if(rs.bell!=="*")items=items.filter(function(x){return rs.bell.indexOf(x.cat)>=0});
+ /* ═══ V9.99z10 - CẮT THEO NHÓM VIỆC, KHÔNG CHỈ THEO BỘ PHẬN ═════════════════════════════════
+    Chuông cắt theo `cat` (bộ phận) là đủ cho hầu hết chức danh, nhưng KHÔNG đủ cho Marketing:
+    cả phễu tuyển sinh mang chung một `cat` là "Tuyển sinh", nên họ nhận nguyên hàng chờ của Tư
+    vấn. Đo 05/08: NV Marketing mở app thấy **50 việc, trong đó 43 là việc của Tư vấn** - tư vấn
+    sau test, đang tư vấn, chờ chốt lộ trình... CH3 giao cho Marketing đúng hai việc: nhập lead
+    mới và chăm lại khách cũ. Anh Luân: *"người nào đăng nhập thì họ thấy cái thuộc về họ hoặc
+    cái họ phụ trách thôi"*.
+    `bellGrp` là bản khai HẸP HƠN một bậc: chức danh nào khai thì chỉ nhận đúng những nhóm việc
+    ấy (cộng các bộ phận khác trong `bell` - vd nhóm Giao việc vẫn về đủ). */
+ if(rs.bellGrp&&rs.bellGrp.length)items=items.filter(function(x){
+  return rs.bellGrp.indexOf(x.grp)>=0||rs.bell==="*"||(x.cat!=="Tuyển sinh")});
  /* Đang lọc theo một người (quản lý bấm "Xem việc của") thì mọi bề mặt việc cùng lọc theo -
     chuông, Việc hôm nay và bảng việc phải nói cùng một con số. */
  var ai=window.BANAI||"";
