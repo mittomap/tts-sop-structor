@@ -307,6 +307,8 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
    `outline` chứ không đụng `background`, để mục đang sáng (`on`) giữ nguyên nền của nó. */
 @keyframes navhit{0%{outline:2px solid #ffffff2e;outline-offset:-2px}100%{outline:2px solid transparent;outline-offset:-2px}}
 .navitem.hit{animation:navhit .5s ease-out}
+.navver{padding:5px 12px 8px;font-size:10px;letter-spacing:.3px;color:#C4D2E4;opacity:.45;text-align:center;border-top:1px solid #ffffff14;user-select:text}
+.navver b{font-weight:700;opacity:.9}
 .navitem.anc{background:#ffffff12;color:#CFE0F7}
 .navitem.anc i{opacity:1}
 .navitem.from{background:#ffffff14;color:#CFE0F7}
@@ -2154,6 +2156,12 @@ body.drsz .drawer{transition:none}
     <div class="brand" data-tour="brand" onclick="trangChuDemo()" title="Về trang chủ bản demo - chọn cổng khác" style="cursor:pointer"><div class="logo" id="brandLogo"><svg viewBox="0 0 40 40" width="26" height="26" aria-hidden="true"><g fill="none" stroke="#D51920" stroke-width="3.2"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="7.5"/></g><circle cx="20" cy="20" r="3.4" fill="#D51920"/><g stroke="#D51920" stroke-width="3.2"><line x1="20" y1="1.5" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="38.5"/><line x1="1.5" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="38.5" y2="20"/></g></svg></div><div><b id="brandName">ITTs - SOP TEMP</b><small id="brandSub">Hệ thống tuân thủ SOP</small></div></div>
     <nav class="nav" id="nav"></nav>
     <div class="me" data-tour="me" onclick="go('canhan')" title="Trang cá nhân - ảnh đại diện, mật khẩu, thói quen dùng app" style="cursor:pointer"><div class="av" id="meAv">M</div><div><b id="meName">-</b><small id="meRole">-</small></div><i class="ti ti-chevron-right" style="margin-left:auto;opacity:.6"></i></div>
+    <!-- V9.99z7 - DẤU BẢN DỰNG. Anh Luân báo "bấm menu không ăn" ba lần, máy đo lại thì bản
+         trong tay em chạy đúng - hai người đang nhìn hai bản khác nhau mà không ai biết, vì bản
+         demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
+         rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
+         bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">05/08/2026 · <b>f84b75</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -5543,7 +5551,7 @@ var VIECNHOM=[
  /* P8-P9 · Khảo sát, phản hồi & khiếu nại */
  "Xử lý khiếu nại","Hỏi lại HV sau khi đóng khiếu nại","Xin cảm nhận học viên",
  /* P10 · Kết thúc khóa & tái đăng ký */
- "Bảo lưu sắp hết hạn","Mời tái ghi danh",
+ "Bảo lưu sắp hết hạn","Mời tái ghi danh","Chăm lại tới hẹn",   /* V9.99z7 - hàng chờ của Marketing */
  /* V9.63: yêu cầu do học viên gửi lên - xuyên chặng, xếp ngay sau khối CSKH vì cùng là việc
     "học viên đang chờ trung tâm"; nhóm nội bộ Giao việc xuống sau cùng. */
  "Học viên liên hệ - chưa ai nhận","Học viên liên hệ mới","Học viên liên hệ - xử lý quá hạn","Học viên liên hệ - tới hạn hôm nay",
@@ -5612,7 +5620,7 @@ function slaItems(){var out=jTasks();
    add("Tuyển sinh","Chăm lại tới hẹn",qua?"red":"amber","ti-refresh",
     L.full_name||J.pid||"",
     qua?"QUÁ HẸN chăm lại - khách đã ngưng, hẹn gọi lại đã trôi qua":"Tới hẹn chăm lại khách đã ngưng",
-    hoursSince(L.next_followup_time),"reup","",{lead:L.lead_id||"",hoso:"",jpid:J.pid})})})();
+    hoursSince(L.next_followup_time),"reup","",{lead:L.lead_id||"",hoso:"",jpid:J.pid,prm:"slaFollowup_grace_days"})})})();
  srows("DL04").forEach(function(c){if(isc(c.consultation_status,"not_consulted"))add("Tuyển sinh","Chờ tư vấn lộ trình","amber","ti-messages",c.customer_name_display||c.lead_id,"Chờ tư vấn lộ trình",null,"tuvan","todo",{act:"tvform",rid:c.consultation_id})});
  /* V9.40: mức độ trước đây để CỨNG "amber" nên tham số slaDiscountApprove_hours chỉ là cái nhãn.
     Đề nghị chiết khấu treo lâu là chặn cả luồng phía sau - khách chờ báo giá cuối để đóng tiền. */
@@ -20512,7 +20520,10 @@ function crumbLabel(key,ctx){ctx=ctx||{};var p=PBK[key];var t=p?p.t:key;
  else if(key==="hosokhoa"&&ctx.KHID)t="Khóa · "+nm("DL05","course_id",ctx.KHID,"course_name");
  else if(key==="banglop"&&ctx.BLCLASS)t="Lớp · "+nm("DL10","class_id",ctx.BLCLASS,"class_name");
  /* V9.19: hub/trang nhiều góc nhìn phải nói RÕ đang ở tab nào - breadcrumb mới có nghĩa */
- else if(HUBTAB[key]){var sk=hubSubKey(key);if(sk&&PBK[sk])t=p.t+" · "+PBK[sk].t}
+ /* V9.99z7: đừng nói lại thứ đã nói. Hub "CSKH · Khảo sát & Phản hồi" mà tab cũng tên "Khảo
+    sát & Phản hồi" thì ghép ra "CSKH · Khảo sát & Phản hồi · Khảo sát & Phản hồi". */
+ else if(HUBTAB[key]){var sk=hubSubKey(key);
+  if(sk&&PBK[sk]&&String(p.t||"").indexOf(PBK[sk].t)<0)t=p.t+" · "+PBK[sk].t}
  else if(key==="chang"){var A9=ARCBK[window.ARC||"changA"];if(A9)t=A9.t}
  else if(key==="banlam"&&window.BLVIEW==="board")t=p.t+" · Bảng chặng";
  return t}
@@ -21191,7 +21202,13 @@ function go(key,noHist){
  var g15=navGroupOf(key0)||navGroupOf(key);
  if(g15){window.NAVOPEN=window.NAVOPEN||{};window.NAVOPEN[g15]=true;navArcOnly(g15)}
  buildNav();
- document.getElementById("pgTitle").textContent=p.t;
+ /* V9.99z7 - TIÊU ĐỀ TRANG NÓI RÕ ĐANG Ở TAB NÀO. Anh Luân bấm "Test đầu vào" rồi bảo *"nó cứ
+    đơ đơ"*: app CÓ đổi - danh sách bên dưới đổi, bước trên phễu sáng sang chỗ khác - nhưng ba
+    thứ đập vào mắt trước nhất (tiêu đề trang, câu mở đầu, dải phễu) thì y hệt nhau ở cả năm
+    tab của hub. Đổi mà phần đầu màn hình không đổi thì mắt đọc ra là "không có gì xảy ra".
+    Nay tiêu đề ghi "Tuyển sinh · Test đầu vào" - dùng đúng hàm mà breadcrumb đang dùng, không
+    đẻ thêm một bảng tên thứ hai. */
+ document.getElementById("pgTitle").textContent=(function(){try{return crumbLabel(key,navSnap())||p.t}catch(e){return p.t}})();
  var el=document.getElementById("content");
  /* V9.35: Trợ thủ KHÔNG còn chen vào đầu thân trang nữa - nó ở nút góc dưới bên phải. Thân trang
     trả lại cho nội dung chính, thứ quan trọng nhất lên ngay đầu màn hình. */

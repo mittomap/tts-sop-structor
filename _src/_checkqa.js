@@ -28,6 +28,9 @@ require('vm').runInThisContext(require('fs').readFileSync((process.env.ITTS_APP|
 var SRC=require('fs').readFileSync('./gen_v5.py','utf8');
 var CSS=(SRC.match(/\.asstfab\{[\s\S]*?\.tourfab\{/)||[""])[0];
 var ok=0,bad=[];
+/* V9.99z7 - BAY QUEN THUOC: bam vao CHUOI LOP nguyen van `class="navitem on"` la mu ngay khi
+   them mot lop nua (sub, sub2, anc, hit). Hoi TU KHOA `on` giua cac lop. */
+function sangLa(nav,k){var re=new RegExp('class="navitem[^"]*\\bon\\b[^"]*" data-k="'+k+'"');return re.test(nav)}
 function t(n,c){if(c)ok++;else bad.push(n)}
 setRole("all");cfEnsure();
 
@@ -369,11 +372,11 @@ t("Hoi dap nam trong menu, khong bi giau", PBK["hoidap"]&&!PBK["hoidap"].hide);
   /* v5: mỗi hàng chờ là một mục menu riêng. v6: chúng là TAB của hub "Chờ duyệt", nên mục
      sáng lên phải là hub - cùng một ý định, khác hình dạng. */
   t("bam tab Don xin nghi thi menu sang dung muc do",
-    nav.indexOf('class="navitem on" data-k="'+(V6()?"duyet":"duyetnghi")+'"')>=0);
+    sangLa(nav,V6()?"duyet":"duyetnghi"));
   duyTabSet("duyetthu");nav=document.getElementById("nav").innerHTML;
   t("doi sang tab khac thi vet sang nhay theo",
-    V6() ? (nav.indexOf('class="navitem on" data-k="duyet"')>=0)
-         : (nav.indexOf('class="navitem on" data-k="duyetthu"')>=0&&nav.indexOf('data-k="duyetnghi"')>=0&&nav.indexOf('class="navitem on" data-k="duyetnghi"')<0));
+    V6() ? sangLa(nav,"duyet")
+         : (sangLa(nav,"duyetthu")&&nav.indexOf('data-k="duyetnghi"')>=0&&!sangLa(nav,"duyetnghi")));
  }catch(e){t("thu that tab hub khong vo: "+e.message,false)}
 })();
 
