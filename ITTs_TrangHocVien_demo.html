@@ -412,6 +412,10 @@ tr.cfhl>td{background:#FFF6D8}
    `.sidebar`; thêm chốt này để nếu mai kia có tên dài hơn nữa thì nó cắt bằng dấu ... chứ
    không tự xuống dòng (và tooltip `title` vẫn nói đủ tên). */
 .navitem>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+/* Mục con của một hub: thụt vào + gạch dọc mảnh, để đọc ra ngay cái nào chứa cái nào. */
+.navitem.sub{padding-left:26px;position:relative}
+.navitem.sub::before{content:"";position:absolute;left:14px;top:6px;bottom:6px;width:1px;background:#ffffff1f}
+.navitem.sub i{font-size:16px}
 .navitem i{font-size:18px;width:20px;text-align:center;opacity:.85}
 .navitem:hover{background:#ffffff12;color:#fff}
 .navitem.on{background:#ffffff2e;color:#fff;font-weight:700;box-shadow:inset 0 0 0 1px #ffffff1f} /* V9.19: nền 10% quá mờ trên navy - Luân không thấy mục đang mở; đậm lên + icon sáng */
@@ -3558,10 +3562,13 @@ var THEDEF={
   ["bv_kn_high","Khiếu nại mức CAO","Khiếu nại xếp mức cao còn đang mở - quản lý phải tham gia trong hạn khai ở Ngưỡng & SLA. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Khiếu nại."],
   ["bv_kn_esc","Khiếu nại đã leo thang","Khiếu nại đã đẩy lên cấp trên vì học viên không chấp nhận cách xử lý. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Khiếu nại."],
   ["bv_hoan","Hoàn tiền chờ duyệt","Khoản hoàn tiền đang chờ người có thẩm quyền phê duyệt - hạn tính theo slaRefundProcess_days. Muốn xem danh sách: mở trang Chờ duyệt ở menu trái, tab Duyệt hoàn tiền."],
-  ["bv_tk_new","Việc mới chờ nhận","Việc người khác giao cho tôi mà tôi chưa bấm Nhận. Muốn xem danh sách: mở trang Giao việc ở menu trái, tab Việc của tôi."],
-  ["bv_tk_doing","Đang làm","Việc tôi đã nhận và chưa báo xong. Muốn xem danh sách: mở trang Giao việc ở menu trái, tab Việc của tôi."],
-  ["bv_tk_late","Quá hạn","Việc của tôi đã qua hạn mà chưa xong - cần báo lại người giao. Muốn xem danh sách: mở trang Giao việc ở menu trái, tab Việc của tôi."],
-  ["bv_tk_wait","Chờ người giao xác nhận","Việc tôi đã báo xong, đang chờ người giao xác nhận. Muốn xem danh sách: mở trang Giao việc ở menu trái, tab Việc của tôi."],
+  /* V9.99z - bốn câu này còn chỉ đường tới "trang Giao việc, tab Việc của tôi": trang đã đổi tên
+     thành "Quản lý việc giao & nhận" và việc chưa nhận nay có TAB RIÊNG. Chỉ đường bằng cái tên
+     không còn trên màn hình là đưa người ta đi lạc. */
+  ["bv_tk_new","Việc mới chờ nhận","Việc người khác giao cho tôi mà tôi chưa bấm Nhận. Muốn xem danh sách: mở Quản lý việc giao & nhận ở menu trái, tab Việc chờ nhận."],
+  ["bv_tk_doing","Đang làm","Việc tôi đã nhận và chưa báo xong. Muốn xem danh sách: mở Quản lý việc giao & nhận ở menu trái, tab Việc của tôi."],
+  ["bv_tk_late","Quá hạn","Việc của tôi đã qua hạn mà chưa xong - cần báo lại người giao. Muốn xem danh sách: mở Quản lý việc giao & nhận ở menu trái, tab Việc của tôi."],
+  ["bv_tk_wait","Chờ người giao xác nhận","Việc tôi đã báo xong, đang chờ người giao xác nhận. Muốn xem danh sách: mở Quản lý việc giao & nhận ở menu trái, tab Tôi đã giao."],
   ["bv_hs_thieu","Hồ sơ nhân sự còn thiếu","Nhân viên chưa điền chức danh, hoặc là giáo viên / tư vấn viên mà chưa khai cơ sở - thiếu thì phân quyền và phân công đều sai. Khối văn phòng (giám đốc, trưởng phòng, marketing, kế toán, nhân sự) không gắn cơ sở nào nên không tính là thiếu. Muốn xem danh sách: bảng nhân sự ngay dưới trên chính trang này."],
   ["bv_gio_thieu","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy mà chưa ghi giờ vào hoặc giờ ra - thiếu mốc thì bảng công tính sai. Muốn xem danh sách: mở trang Bảng công giảng dạy ở menu trái."],
   /* V9.99p - năm ô của bảng Chuyên môn (ACA), nhóm tách khỏi Học vụ 04/08. */
@@ -16068,6 +16075,16 @@ function renderGvdp(embed){
  var free=GV.filter(function(g){return !busyMap[g.staff_id]});
  var ymd=fmtYMD(day);
  var h=embed?'':pageHead("Giáo viên dự phòng theo ngày","Một giáo viên nghỉ đột xuất thì ai đẩy lên được - tính theo lịch dạy thật, cơ sở của lớp và hình thức học.","");
+ /* V9.99z (anh Luân 05/08): *"đăng ký giáo viên dự phòng ở đâu em nhỉ, tức là mình tạo giáo viên
+    dự phòng ở đâu"* - câu hỏi đúng chỗ đau: màn này KHÔNG có bước đăng ký nào, mà cũng không nói
+    ra điều đó, nên người dùng đi tìm một cái nút không tồn tại. Không có danh sách "GV dự phòng"
+    khai trước vì một danh sách khai tay sẽ lạc hậu ngay khi lịch đổi; app tính thẳng từ lịch dạy
+    thật. Nay nói thẳng ra trên màn. */
+ h+='<div class="notebar"><i class="ti ti-info-circle"></i>'+
+  '<b>Không cần đăng ký trước.</b> Không có danh sách "giáo viên dự phòng" khai tay - app tự tính người thay được cho TỪNG BUỔI: '+
+  'ai trống lịch đúng khung giờ đó, dạy được ở cơ sở của lớp (hoặc lớp online), và không vượt số buổi/ngày. '+
+  'Muốn ai đó nhận thay thì bấm <b>Đẩy người thay</b> ở dòng buổi tương ứng. '+
+  'Giáo viên nghỉ cả ngày thì để trống lịch của họ - họ tự rơi vào nhóm "trống lịch cả ngày" ở ô bên trên.</div>';
  h+=statStrip([
   ["ti-calendar",ses.length,"Buổi trong ngày","#3B82C4",noGv.length?(noGv.length+" buổi chưa có GV"):"đã có GV đủ"],
   ["ti-user-check",free.length+"/"+GV.length,"Giáo viên trống lịch cả ngày","#16A34A","có thể nhận thay"],
@@ -16934,7 +16951,7 @@ var TOURS={
  tn_hotro:{lv:"trainghiem",role:"Nhóm hỗ trợ (HR, IT...)",t:"Một ngày của nhóm hỗ trợ",ic:"ti-tool",d:"3 bước - nhận việc, làm, báo xong",steps:[
   /* Bảng việc nằm ở TRANG ĐÁP, mà trang đáp của bản 5 là Trang bắt đầu còn bản 6 là Bàn làm
      việc - cắm cứng "banlam" thì sang v6 bước này trỏ vào chỗ không có neo. */
-  {p:(V6()?"ban":"banlam"),sel:'@bangviec',t:"Bảng việc của bạn",d:"Nhóm hỗ trợ không đụng vào phễu hay lớp học - bạn làm việc qua module Giao việc. Bốn con số đầu trang cho biết việc mới, đang làm, quá hạn và việc chờ người giao xác nhận.",hint:"Nhìn bốn ô đầu trang."},
+  {p:(V6()?"ban":"banlam"),sel:'@bangviec',t:"Bảng việc của bạn",d:"Nhóm hỗ trợ không đụng vào phễu hay lớp học - bạn làm việc qua trang Quản lý việc giao & nhận. Bốn con số đầu trang cho biết việc mới, đang làm, quá hạn và việc chờ người giao xác nhận.",hint:"Nhìn bốn ô đầu trang."},
   {p:"giaoviec",sel:'@txt:Nhận việc',t:"Nhận việc được giao",d:"Bấm Nhận là người giao biết việc đã tới tay bạn. Việc bắt buộc thì không từ chối được; việc thường thì từ chối phải ghi lý do.",hint:"Bấm 'Nhận việc' trên một việc mới được giao."},
   {p:"giaoviec",sel:'@tbar',t:"Báo xong ngay lúc làm xong",d:"Báo xong kèm ghi chú, người giao xác nhận là việc đóng. Không làm kịp thì báo lại sớm - im lặng mới là vấn đề.",hint:"Xong một ngày của nhóm hỗ trợ!"}]},
  tn_nhansu:{lv:"trainghiem",role:"Nhân sự",t:"Một ngày của Nhân sự",ic:"ti-id-badge",d:"4 bước - hồ sơ người, bảng công, việc nội bộ",steps:[
@@ -20910,6 +20927,16 @@ function go(key,noHist){
  if(ARCMAP[key]){if(window.ARC!==key)window.CHANGK="";window.ARC=key;key="chang"}
  if(CSMAP[key]){window.CSTAB=CSMAP[key];key="cskh"}
  if(HTMAP[key]){window.HTTAB=HTMAP[key];key="hoctap"}
+ /* V9.99z (anh Luân 05/08): *"học tập & giảng dạy là trang cha phải ko, bấm vào đó thì nó mặc
+    định chọn giáo viên dự phòng làm anh cứ tưởng trang đó lỗi"*.
+    Bấm vào TÊN HUB thì phải mở tab MẶC ĐỊNH của hub, không phải giữ nguyên tab lần trước - vì
+    lần trước có thể là một tab rất lẻ (GV dự phòng), và mục con ấy sáng lên trong khi người ta
+    vừa bấm mục cha. Và tab mặc định phải là tab NGƯỜI ĐÓ CÓ (cùng luật đã sửa cho hub Tuyển
+    sinh ở V9.99s). */
+ if(HUBTAB[key]){var _hm=HUBTAB[key].m||{},_ok=[];
+  for(var _t in _hm)if(scopeTabs(key,[[_hm[_t]]]).length)_ok.push(_t);
+  var _md=HUBTAB[key].d;
+  window[HUBTAB[key].v]=(_ok.indexOf(_md)>=0||!_ok.length)?_md:_ok[0]}
  if(KMAP[key]){window.KTAB=KMAP[key];key="khac"}
  if(DUYMAP[key]){window.DUYTAB=key;key="duyet"}
  var p=PBK[key];if(!p)return;
@@ -21057,7 +21084,10 @@ var NAVTREE=[
  /* V9.29n (anh Luân): "Chặng 1" -> "C1". Tên nhóm nay SINH TỪ ARCS (arcGrpName) chứ không gõ tay:
     trước đây số chặng và tên chặng nằm cả ở ARCS lẫn ở đây, đổi một chỗ là hai chỗ nói khác nhau. */
  {g:arcGrpName("changA"),arc:"changA",items:["changA","nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","banglop","hoctap","gvdp","phong","giaoan","wow","cskh"]},
+ /* V9.99z - xếp lại thứ tự: mục ĐỘC LẬP trước, rồi tới HUB và các mục con của nó nằm liền
+    một mạch. Bản cũ để "Kho bài tập & Giáo án" chen vào giữa các mục con của hub Học tập, nên
+    nhìn không ra cái nào thuộc cái nào. */
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","banglop","giaoan","cskh","hoctap","gvdp","phong","wow"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
@@ -21167,7 +21197,7 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
    "Test đầu vào" -> cũng vậy. Trước đây hai người ấy thấy nhóm "C1 · Khách tiềm năng".) */
 var NAVPHANG=[
  {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:"Lớp học & Giảng dạy",items:["xeplop","banglop","hoctap","gvdp","phong","giaoan","wow"]},
+ {g:"Lớp học & Giảng dạy",items:["xeplop","banglop","giaoan","hoctap","gvdp","phong","wow"]},
  {g:"Chăm sóc & Sau khóa",items:["cskh","baoluu","ketthuc","magioithieu"]}];
 function navCayV5(){
  if(arcMode()==="chang")return NAVTREE;
@@ -21267,7 +21297,10 @@ function buildNav(){
   h+='<div class="navgrp">';
   items.forEach(function(k){var m=navItemMeta(k),n=navBadge(k);
    var isArc=/^chang[A-D]$/.test(k);
-   h+='<div class="navitem'+(isArc?" chang":"")+(navCur(k)?" on":(ORPHAN&&k===NAVFROM?" from":""))+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
+   /* Mục con của một hub thụt vào - trước đây hub và mục con của nó nằm ngang hàng nhau trên
+      menu, nhìn không ra cái nào chứa cái nào. */
+   var isSub=navOwner(k)!==k&&G.items.indexOf(navOwner(k))>=0;
+   h+='<div class="navitem'+(isArc?" chang":"")+(isSub?" sub":"")+(navCur(k)?" on":(ORPHAN&&k===NAVFROM?" from":""))+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
     ' data-k="'+k+'" title="'+esc(m.t)+'" onclick="go(\''+k+'\')"><i class="ti '+m.ic+'"></i><span>'+esc(m.t)+'</span>'+
     (n?'<span class="dot">'+(n>99?"99+":n)+'</span>':'')+'</div>'});
   h+='</div>'});

@@ -1059,6 +1059,41 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
    ro.length===0, "Tro ly va tim kiem van doc duoc du lieu do");
 })();
 
+/* ═══ 14. CHU HUONG DAN KHONG DUOC CHI DUONG BANG TEN DA CHET (V9.99z) ══════════════════════
+   Anh Luan 05/08: *"em kiem tra lai may cai tooltip huong dan nhe, coi co cai gi loi thoi ko"*.
+   Do duoc ngay: bon tooltip cua bang viec van ghi *"mo trang Giao viec o menu trai, tab Viec
+   cua toi"* - ma trang do da doi ten thanh "Quan ly viec giao & nhan" va viec chua nhan nay co
+   TAB RIENG. Chi duong bang mot cai ten khong con tren man hinh la dua nguoi ta di lac.
+   Luat nay la MOT CHOT KEO XUONG theo kieu khac: moi lan doi ten mot trang/tab/nhom, THEM ten
+   cu vao bang duoi day. Bo kiem se doc moi chu hien ra man va bao neu ten chet con song. */
+(function(){
+ var TENCHET=[
+  ["trang Giao việc","trang nay ten la \"Quan ly viec giao & nhan\" tu V9.99u"],
+  ["module Giao việc","nt"],
+  ["C1 · ","ten nhom chang bo so tu V9.99y"],["C2 · ","nt"],["C3 · ","nt"],["C4 · ","nt"],
+  ["Chặng 1 ·","nt"],["Chặng 2 ·","nt"],["Chặng 3 ·","nt"],["Chặng 4 ·","nt"],
+  ["Trợ thủ","doi thanh \"Tro ly\" tu V9.62"],
+  ["Ghi nhận góp ý","trang nay da go tu V9.98, nut loa mo thang Google Sheet"],
+  ["bản V6","ban V6 ngung phat hanh tu V9.99"]
+ ];
+ var chu="";
+ window.GATE_SID="";applyScope("");setRole("all");
+ /* Doc chu tu BA nguon nguoi dung that su nhin thay: tooltip the (THEDEF), moi trang duoc ve,
+    va moi buoc cua moi bai huong dan. */
+ /* THEDEF la mot OBJECT (khoa theo nhom the), khong phai mang - goi .forEach tren no nem loi,
+    ma loi ay bi try/catch nuot mat nen phep do im lang bo qua TOAN BO tooltip the. Da can dung
+    kieu bay "do sot ma bao xanh" ma file nay von sinh ra de chong. */
+ try{Object.keys(THEDEF||{}).forEach(function(k){(((THEDEF[k]||{}).the)||[]).forEach(function(x){chu+=" "+x[1]+" "+x[2]})})}catch(e){}
+ PAGES.filter(function(p){return !p.hide}).forEach(function(p){CUR=p.k;
+  try{chu+=" "+((PBK[p.k]&&PBK[p.k].ty==="list")?renderList(p.k):(RENDER[p.k]?RENDER[p.k]():""))}catch(e){}});
+ try{for(var b in TOUR){(TOUR[b].steps||[]).forEach(function(st){chu+=" "+(st.t||"")+" "+(st.d||"")+" "+(st.hint||"")})}}catch(e){}
+ chu=String(chu).replace(/<[^>]*>/g," ");
+ if(process.env.SOI)console.log("DEBUG chu.length=",chu.length,"| co THEDEF:",typeof THEDEF,"| co 'Giao việc':",chu.indexOf("trang Giao việc"));
+ var chet=TENCHET.filter(function(x){return chu.indexOf(x[0])>=0});
+ t("chu huong dan khong chi duong bang ten da chet"+(chet.length?" ["+chet.map(function(x){return x[0]}).join(" ; ")+"]":""),
+   chet.length===0);
+})();
+
 if(bad.length){console.log("CHECKUX DO ("+bad.length+"/"+(ok+bad.length)+"):");
  bad.forEach(function(b){console.log("  - "+b)});process.exit(1)}
 console.log("CHECKUX OK: "+ok+" tieu chi | "+FORM.length+" form ghi deu co loi giai thich, khong o ngay nao de trong");
