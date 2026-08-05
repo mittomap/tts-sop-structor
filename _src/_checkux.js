@@ -1066,6 +1066,19 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
    TAB RIENG. Chi duong bang mot cai ten khong con tren man hinh la dua nguoi ta di lac.
    Luat nay la MOT CHOT KEO XUONG theo kieu khac: moi lan doi ten mot trang/tab/nhom, THEM ten
    cu vao bang duoi day. Bo kiem se doc moi chu hien ra man va bao neu ten chet con song. */
+/* Dang xem thay nguoi khac thi phai co DIEM NHAN, khong duoc lan vao moi thanh cong cu khac
+   (anh Luan: "neu ko la nguoi dung se quen la minh dang xem cua nguoi khac, kheo lai nham chi
+   so day"). Canh ba thu: nhan canh bao, lop dinh dau man, va nut quay ve. */
+(function(){
+ var nv=(DL.DL01||[]).filter(function(x){return staffActive(x)})[0];
+ window.GATE_SID=nv.staff_id;CURSTAFF=nv.staff_id;applyScope(nv.staff_id);setRole("all");
+ window.BANAI=(DL.DL01||[]).filter(function(x){return staffActive(x)&&x.staff_id!==nv.staff_id})[0].staff_id;
+ var h="";try{h=banAiHTML()}catch(e){}
+ t("dang xem thay nguoi khac thi thanh bao co diem nhan va dinh dau man",
+   /xemthay/.test(h)&&/Đang xem thay người khác/.test(h)&&/banVeMinh\(\)/.test(h));
+ window.BANAI="";window.GATE_SID="";CURSTAFF="";applyScope("");setRole("all");
+})();
+
 (function(){
  var TENCHET=[
   ["trang Giao việc","trang nay ten la \"Quan ly viec giao & nhan\" tu V9.99u"],

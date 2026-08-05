@@ -17862,9 +17862,9 @@ function banAiHTML(){
  /* Đang mượn ghế thì LUÔN phải có đường về - kể cả khi ghế đang mượn không có quyền quản lý.
     Đã cắn: mượn ghế một nhân viên thường là cả dải chọn biến mất cùng với nút quay về, người
     dùng kẹt lại trong vai người khác và chỉ còn cách tải lại trang. */
- if(dang)return '<div class="tbar banai"><i class="ti ti-eye"></i>'+
-  '<span style="font-size:12.5px;font-weight:700">Đang xem thay <b>'+esc(banAiTen())+'</b></span>'+
-  '<span class="mut" style="font-size:11.5px">Màn hình đang hiển thị đúng phần việc và quyền của người này.</span>'+
+ if(dang)return '<div class="tbar banai xemthay"><span class="xtnhan"><i class="ti ti-eye"></i>Đang xem thay người khác</span>'+
+  '<span style="font-size:13px;font-weight:800"><b>'+esc(banAiTen())+'</b></span>'+
+  '<span style="font-size:11.5px">Mọi con số và danh sách trên màn là CỦA NGƯỜI NÀY, không phải của bạn.</span>'+
   '<button class="btn sm" style="margin-left:auto" onclick="banVeMinh()">'+
   '<i class="ti ti-arrow-back-up"></i>Về việc của tôi</button></div>';
  if(!banQuanLy())return "";

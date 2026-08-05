@@ -1526,6 +1526,19 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .bankgroup>summary.bankmo:hover{color:var(--ink)}
 .tbar.tbso{margin-top:-4px;margin-bottom:14px}
 .tbar.banai{gap:8px}
+/* ═══ V9.99z (anh Luân): *"chỗ này nên có điểm nhấn nếu ko là người dùng sẽ quên là mình đang
+   xem của người khác, khéo lại nhầm chỉ số đấy"*. Thanh cũ trắng trơn, nằm lẫn với mọi thanh
+   công cụ khác - cuộn xuống hai màn là quên mất. Nay: nền hổ phách, chữ đậm, và DÍNH LẠI ĐẦU
+   MÀN khi cuộn, để lúc nào cũng còn một câu nhắc "đây không phải số của bạn".
+   Không phải dải viền trang trí (luật W5) - đây là chỉ báo TRẠNG THÁI, mất nó là người dùng
+   đọc nhầm số của người khác thành số của mình. */
+/* Dùng lại đúng bộ màu cảnh báo đã có (--amberb / #F2D9AE / #7A4E0A của notebar) - thêm mã màu
+   mới là bảng màu phình ra, mà bảng màu phình thì giao diện mất tính nhất quán (bộ kiểm canh). */
+.tbar.banai.xemthay{position:sticky;top:0;z-index:30;background:var(--amberb);border:1px solid #F2D9AE;color:#7A4E0A}
+.tbar.banai.xemthay .xtnhan{display:inline-flex;align-items:center;gap:6px;background:#7A4E0A;color:#fff;
+ font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;border-radius:999px;padding:3px 9px}
+.tbar.banai.xemthay b{color:#7A4E0A}
+.tbar.banai.xemthay .btn{background:#7A4E0A;color:#fff;border-color:#7A4E0A;font-weight:700}
 .quyenbox{margin-top:14px}
 /* V9.95 (anh Luân: *"sao làm chỗ này xấu vậy"* - đúng, bản đầu là một hàng flex đẩy danh sách tên
    sang phải, tên dài thì vỡ dòng giữa chừng thành "và 1 / người nữa"). Nay là BA CỘT thật, đọc
@@ -19983,9 +19996,9 @@ function banAiHTML(){
  /* Đang mượn ghế thì LUÔN phải có đường về - kể cả khi ghế đang mượn không có quyền quản lý.
     Đã cắn: mượn ghế một nhân viên thường là cả dải chọn biến mất cùng với nút quay về, người
     dùng kẹt lại trong vai người khác và chỉ còn cách tải lại trang. */
- if(dang)return '<div class="tbar banai"><i class="ti ti-eye"></i>'+
-  '<span style="font-size:12.5px;font-weight:700">Đang xem thay <b>'+esc(banAiTen())+'</b></span>'+
-  '<span class="mut" style="font-size:11.5px">Màn hình đang hiển thị đúng phần việc và quyền của người này.</span>'+
+ if(dang)return '<div class="tbar banai xemthay"><span class="xtnhan"><i class="ti ti-eye"></i>Đang xem thay người khác</span>'+
+  '<span style="font-size:13px;font-weight:800"><b>'+esc(banAiTen())+'</b></span>'+
+  '<span style="font-size:11.5px">Mọi con số và danh sách trên màn là CỦA NGƯỜI NÀY, không phải của bạn.</span>'+
   '<button class="btn sm" style="margin-left:auto" onclick="banVeMinh()">'+
   '<i class="ti ti-arrow-back-up"></i>Về việc của tôi</button></div>';
  if(!banQuanLy())return "";
