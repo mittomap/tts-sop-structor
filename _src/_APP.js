@@ -18974,10 +18974,13 @@ function go(key,noHist){
     MỤC CON - dòng ngay trên vừa đặt tab theo mục con thì dòng này đẩy ngược về tab mặc định,
     thành ra bấm "GV dự phòng" mà màn không nhúc nhích. Anh Luân: *"đơ đơ thì phải"*.
     Chỉ rà lại tab khi người ta bấm ĐÚNG TÊN HUB. */
- if(_bamGoc===key&&HUBTAB[key]){var _hm=HUBTAB[key].m||{},_ok=[];
-  for(var _t in _hm)if(scopeTabs(key,[[_hm[_t]]]).length)_ok.push(_t);
-  var _md=HUBTAB[key].d;
-  window[HUBTAB[key].v]=(_ok.indexOf(_md)>=0||!_ok.length)?_md:_ok[0]}
+ /* V9.99z8 - LUẬT NÀY ĐÃ DỜI RA `goHub()`. Nó từng nằm ngay đây, trong `go()`, và vì thế nó
+    đè lên MỌI lời gọi có đặt tab sẵn: bài hướng dẫn của NV WOW đặt `HTTAB="wow"` rồi gọi
+    `go("hoctap")` - go() lập tức kéo về tab mặc định "Lớp học", nên bước "Ghi nội dung buổi
+    kèm" không tìm thấy chip của nó (`_checkneo` bắt được). Cùng bệnh với trang đáp của nhóm
+    WOW: `ROLESCOPE.wow.ctx={HTTAB:"wow"}` cũng bị go() xoá ngay sau đó.
+    `go()` là bộ định tuyến - nó không được tự ý đổi tab. "Bấm vào TÊN HUB thì mở tab mặc định"
+    là một hành vi của THANH MENU, nên nó thuộc về hàm mà thanh menu gọi. */
  if(KMAP[key]){window.KTAB=KMAP[key];key="khac"}
  if(DUYMAP[key]){window.DUYTAB=key;key="duyet"}
  var p=PBK[key];if(!p)return;
@@ -19342,6 +19345,14 @@ var NAVTREE6=[
  {g:"Tra cứu",items:["hocvien","dsphuhuynh","giangvien","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan",
    "dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai"]},
  {g:"Quản lý",items:["baocao","nhansu","hoidap","khac","canhan","settings"]}];
+/* V9.99z8 - bấm vào TÊN HUB trên menu: mở tab mặc định của hub (và phải là tab NGƯỜI ĐÓ CÓ).
+   Tách khỏi `go()` để mọi lời gọi khác - bài hướng dẫn, trang đáp của chức danh, nút trong thân
+   trang - giữ được tab mà chúng vừa đặt. */
+function goHub(k){var H=HUBTAB[k];
+ if(H){var m=H.m||{},ok=[];
+  for(var t in m)if(scopeTabs(k,[[m[t]]]).length)ok.push(t);
+  var d=H.d;window[H.v]=(ok.indexOf(d)>=0||!ok.length)?d:ok[0]}
+ go(k)}
 function buildNav(){
  window.__navarc1=0;   /* neo @navarc chi gan cho nhom chặng ĐẦU TIÊN - neo trùng là tô sáng nhầm chỗ */
  window.__NAVJ=null;try{window.__NAVJ=jAll()}catch(e){}   /* tính 1 lần cho mọi badge */
@@ -19387,7 +19398,7 @@ function buildNav(){
    var isSub=_laHub||_trongArc;
    var isSub2=_laHub&&_trongArc;
    h+='<div class="navitem'+(isArc?" chang":"")+(isSub2?" sub sub2":(isSub?" sub":""))+(navCur(k)?" on":(navAnc(k)?" anc":(ORPHAN&&k===NAVFROM?" from":"")))+(k===window.__NAVHIT?" hit":"")+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
-    ' data-k="'+k+'" title="'+esc(m.t)+'" onclick="go(\''+k+'\')"><i class="ti '+m.ic+'"></i><span>'+esc(m.t)+'</span>'+
+    ' data-k="'+k+'" title="'+esc(m.t)+'" onclick="'+(HUBTAB[k]?"goHub":"go")+'(\''+k+'\')"><i class="ti '+m.ic+'"></i><span>'+esc(m.t)+'</span>'+
     (n?'<span class="dot">'+(n>99?"99+":n)+'</span>':'')+'</div>'});
   h+='</div>'});
  /* ═══ V9.99z7 - THANH MENU KHÔNG ĐƯỢC NHẢY VỀ ĐẦU MỖI LẦN VẼ LẠI ═══════════════════════════
