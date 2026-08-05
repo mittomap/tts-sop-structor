@@ -303,6 +303,10 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .navitem.chang.on{background:#ffffff2e;color:#fff}
 .navitem.chang.on i{color:var(--acol,#8CC5F2)}
 /* V9.27: mục đã mở ra trang hiện tại - sáng MỜ và có vạch đứt, phân biệt rõ với mục ĐANG đứng */
+/* V9.99z7 - cú bấm nào cũng phải có phản hồi: mục vừa bấm loé một viền sáng rồi tắt. Dùng
+   `outline` chứ không đụng `background`, để mục đang sáng (`on`) giữ nguyên nền của nó. */
+@keyframes navhit{0%{outline:2px solid #ffffff2e;outline-offset:-2px}100%{outline:2px solid transparent;outline-offset:-2px}}
+.navitem.hit{animation:navhit .5s ease-out}
 .navitem.anc{background:#ffffff12;color:#CFE0F7}
 .navitem.anc i{opacity:1}
 .navitem.from{background:#ffffff14;color:#CFE0F7}
@@ -2246,7 +2250,14 @@ function cfgSave(){if(!CANLS||SVR)return;
     Việc báo trạng thái do dải vàng thường trực trên thanh trên lo. */
  if(cfMode()!=="that")return;
  var cur=cfgPack();
- if(__cfbase===null){__cfbase=cur;return}
+ /* ═══ V9.99z7 - BẪY: LẦN SỬA CẤU HÌNH ĐẦU TIÊN CỦA MỘT PHIÊN KHÔNG BAO GIỜ ĐƯỢC LƯU ═══════
+    Mốc so sánh `__cfbase` trước đây được đặt LƯỜI - lần gọi đầu tiên chỉ ghi nhận mốc rồi trả
+    về, không lưu. Mà lần gọi đầu tiên ấy chính là lần người dùng vừa sửa xong thứ đầu tiên
+    (đổi tên thương hiệu chẳng hạn) - nên thứ đó bị lấy làm "mốc gốc" và không có gì để lưu.
+    Bấm Reset demo: `LSKEY` bị xoá, `CFKEY` chưa từng được ghi -> sửa gì cũng mất, trong khi
+    hộp xác nhận vừa hứa "thương hiệu không mất". `_checkreset` bắt được đúng hai chỗ này.
+    Nay mốc gốc được đặt NGAY LÚC NẠP APP (`cfgLoad`), nên mọi thay đổi sau đó đều khác mốc. */
+ if(__cfbase===null)__cfbase=cur;
  if(cur===__cfbase)return;
  try{localStorage.setItem(CFKEY,JSON.stringify({sig:SEED_SIG,t:new Date().getTime(),config:DATA.config,enums:DATA.enums}));__cfbase=cur}
  catch(e){}}
@@ -2637,6 +2648,8 @@ function notiDiff(by){var pre=window.__preBell;window.__preBell=null;if(!pre)ret
    demo) thì bản cấu hình trong đó mới nhất nên được đè lên; nếu vừa reset dữ liệu thì `LSKEY` đã
    mất, và cấu hình trong `CFKEY` sống sót đúng như anh Luân muốn. */
 cfgLoad();
+/* Đặt mốc gốc của cấu hình NGAY SAU khi nạp - xem chú thích trong cfgSave. */
+try{__cfbase=cfgPack()}catch(e){}
 demoLoad();
 function rows(c){return DL[c]||[]}
 function find(c,f,v){var a=rows(c);for(var i=0;i<a.length;i++)if(a[i][f]===v)return a[i];return null}
@@ -4300,7 +4313,14 @@ function renderList(key,emb){
       phải tự đi tìm. Nay là NÚT bấm sang thẳng chỗ làm việc. */
    '</div>'+
  '<div class="sp">'+(cfg.ro?'':'<button class="btn primary" onclick="newForm(\''+key+'\')"><i class="ti ti-plus"></i>Thêm mới</button>')+'</div></div>');
- if(!cfg.ro)h+='<div class="panel'+(pf?'':' hidden')+'" id="formPanel"><div class="ph"><b>'+(ed?("Sửa "+esc(String(ed[cfg.cols[0][0]]))):"Thêm bản ghi mới")+'</b><div class="mini">'+(ed?'<button class="pill" onclick="cancelEdit(\''+key+'\')">Hủy sửa</button>':'')+'<button class="pill" onclick="toggleForm(\''+key+'\')">Đóng</button></div></div>'+formHTML(key)+'</div>';
+ /* V9.99z7 - KHUNG NHẬP BẢN GHI: bản NHÚNG chỉ dựng khi nó ĐANG MỞ. Danh sách nhúng trong một
+    trang khác (Lead trong hub Tuyển sinh, Nhân viên trong trang Nhân sự...) không có nút "Thêm
+    mới" - nút ấy nằm ở tiêu đề riêng mà bản nhúng cố tình bỏ. Vậy mà khung nhập vẫn được dựng
+    sẵn ở trạng thái ẩn, kéo theo một nút "Lưu bản ghi" nằm chết trong DOM: `_checknv` đóng vai
+    người dùng bấm trúng nó 5 lần, bấm xong không ghi gì, không mở form, cũng không nói gì.
+    Một cửa ghi không có lối vào thì đừng dựng nó ra. Sửa bản ghi từ một dòng (`openEdit`) vẫn
+    chạy: lúc ấy `pf` có giá trị nên khung vẫn hiện. */
+ if(!cfg.ro&&(!emb||pf))h+='<div class="panel'+(pf?'':' hidden')+'" id="formPanel"><div class="ph"><b>'+(ed?("Sửa "+esc(String(ed[cfg.cols[0][0]]))):"Thêm bản ghi mới")+'</b><div class="mini">'+(ed?'<button class="pill" onclick="cancelEdit(\''+key+'\')">Hủy sửa</button>':'')+'<button class="pill" onclick="toggleForm(\''+key+'\')">Đóng</button></div></div>'+formHTML(key)+'</div>';
  /* THANH CÔNG CỤ CHUẨN: [tìm] [chip lọc có số đếm] ...... [số dòng] [Xóa lọc] [Cột] */
  var left=srchHTML(SEARCH[key]||"","listSearch('"+key+"',this.value)","Tìm trong trang này...",270);
  if(cfg.filt){var seen={},opts=[];
@@ -5574,6 +5594,25 @@ function slaItems(){var out=jTasks();
     add("Giao việc","Việc chờ tôi xác nhận",(ch!=null&&ch>cl)?"red":"amber","ti-inbox",t.assignee_id_name||"",("Đã báo xong: "+(t.title||"")),ch,"giaoviec","",{lead:"",hoso:"",act:"tkopen",rid:t.task_id})}
   })})();
  /* (các luật lead cũ đã chuyển vào bộ máy hành trình - xem jTasks) */
+ /* ═══ V9.99z7 - CHĂM LẠI TỚI HẸN: hàng chờ THẬT của Marketing ══════════════════════════════
+    Đo được 05/08 (audit mảng 6): NV Marketing mở app thấy **42 việc, cả 42 đều của Tư vấn**,
+    và **0 việc là của chính họ** - lead quá hạn phản hồi, chờ tư vấn sau test, chốt lộ trình...
+    toàn bộ phễu của người khác. Trong khi CH3 giao cho Marketing đúng hai việc: nhập lead mới
+    và **chăm lại khách cũ**. Màn "Chăm lại / Reup" thì có, badge trên menu cũng đếm đúng, mà
+    KHÔNG có một luật SLA nào sinh ra việc - nên việc chính của họ chưa bao giờ xuất hiện trên
+    Việc hôm nay hay trong chuông. Nay có, dùng ĐÚNG điều kiện của badge menu (khách đã ngưng /
+    không liên hệ được, có hẹn chăm lại và hẹn ấy tới hạn trong hôm nay). */
+ (function(){var eod=endToday();
+  var Ls=[];try{Ls=jAll()}catch(e){Ls=[]}
+  Ls.forEach(function(J){
+   if(J.k!=="lost"&&J.k!=="no_contact")return;
+   var nf=jNF(J);if(!nf||nf>eod)return;
+   var C=J.C||{},L=C.L||{};
+   var qua=nf.getTime()<Date.now();
+   add("Tuyển sinh","Chăm lại tới hẹn",qua?"red":"amber","ti-refresh",
+    L.full_name||J.pid||"",
+    qua?"QUÁ HẸN chăm lại - khách đã ngưng, hẹn gọi lại đã trôi qua":"Tới hẹn chăm lại khách đã ngưng",
+    hoursSince(L.next_followup_time),"reup","",{lead:L.lead_id||"",hoso:"",jpid:J.pid})})})();
  srows("DL04").forEach(function(c){if(isc(c.consultation_status,"not_consulted"))add("Tuyển sinh","Chờ tư vấn lộ trình","amber","ti-messages",c.customer_name_display||c.lead_id,"Chờ tư vấn lộ trình",null,"tuvan","todo",{act:"tvform",rid:c.consultation_id})});
  /* V9.40: mức độ trước đây để CỨNG "amber" nên tham số slaDiscountApprove_hours chỉ là cái nhãn.
     Đề nghị chiết khấu treo lâu là chặn cả luồng phía sau - khách chờ báo giá cuối để đóng tiền. */
@@ -6176,7 +6215,9 @@ function slaOpen(key){
  var gc=grpColor(it.cat);
  var h='<div class="dcard"><h4><i class="ti '+it.ic+'"></i>'+esc(it.grp||it.cat)+'</h4>';
  h+=ctxRows([["Đối tượng",esc(it.who||"-")],
-  ["Bộ phận",'<span class="chip" style="background:'+gc+'22;color:'+gc+'">'+esc(it.cat)+'</span>'],
+  /* V9.99z7 - cùng lý do với dải lọc ở trang Việc hôm nay: dòng này in `it.cat`, mà một trong
+     bảy giá trị của nó là "Giao việc" - không phải tên một bộ phận. */
+  ["Mảng việc",'<span class="chip" style="background:'+gc+'22;color:'+gc+'">'+esc(it.cat)+'</span>'],
   ["Mức độ",it.sev==="red"?'<span class="chip red">Quá hạn - làm ngay</span>':(it.sev==="amber"?'<span class="chip amber">Sắp tới hạn</span>':'<span class="chip">Theo dõi</span>')],
   ["Đã chờ",it.age!=null?esc(fmtAge(it.age)):"-"],
   ["Ngưỡng áp dụng",(function(){
@@ -6266,7 +6307,15 @@ function renderViec(){var items=bellItems();
  h+=tbar('<span class="tblbl">Mức độ</span>'+segHTML(sev||"",msegs,"viecOnly('{k}')","viec_mucdo"),"");
  var tsegs=[["all","Tất cả",base.length,""]];
  teams.forEach(function(t){if(teamC[t])tsegs.push([t,t,teamC[t],""])});
- h+=tbar('<span class="tblbl">Bộ phận</span>'+segHTML(team,tsegs,"viecTeam('{k}')","viec_bophan"),"");
+ /* V9.99z7 (anh Luân 05/08, kèm ảnh dải chip "Tất cả 7 · Tuyển sinh 6 · Giao việc 1"): *"dùng
+    chữ bộ phận trong tình huống này có ổn ko em"* - KHÔNG ổn. Dải này lọc theo `cat` của việc,
+    mà `cat` có bảy giá trị: Tuyển sinh · Học vụ · CSKH · Giảng viên chuyên môn · WOW · Tài
+    chính · **Giao việc**. Sáu cái đầu là bộ phận thật, riêng "Giao việc" là việc nội bộ giữa
+    người với người - không phòng ban nào tên vậy. Gọi cả dải là "Bộ phận" thì đúng sáu phần
+    bảy, và cái sai lại là cái người ta nhìn thấy đầu tiên khi chỉ còn hai chip.
+    "Mảng việc" đúng cho cả bảy, và không đụng với dải "Nhóm việc" ngay dưới (dải ấy lọc theo
+    từng hàng chờ cụ thể: Lead quá hạn, Mời tái ghi danh...). */
+ h+=tbar('<span class="tblbl">Mảng việc</span>'+segHTML(team,tsegs,"viecTeam('{k}')","viec_bophan"),"");
  var gsegs=[["all","Tất cả nhóm",scoped.length,""]];
  grpOrder.forEach(function(g){gsegs.push([String(g).replace(/'/g,""),g,grpC[g],""])});
  h+=tbar('<span class="tblbl">Nhóm việc</span>'+segHTML(grp,gsegs,"window.VIECGRP='{k}';reRender('viec')","viec_nhom"),
@@ -13869,8 +13918,19 @@ function paySave(id){var e=find("DL06","enrollment_id",id);if(!e)return;var amt=
   else if(rem<=0){e.next_payment_due=""}
   insSync(id);   /* HÀM LÕI: phân bổ lại tiền vào các đợt + suy lại hẹn thu. Mọi cửa động vào
                     tiền đều phải gọi, nếu không lịch đợt và số dư của đơn lệch nhau ngay. */
+  /* V9.99z7 - CỬA GHI TIỀN MÀ KHÔNG VÀO NHẬT KÝ. `_checknv` đóng vai Trưởng phòng Tư vấn đi
+     trọn việc "Còn nợ học phí" -> mở form thu -> bấm Lưu: tiền VÀO thật (DL07 dài thêm, số dư
+     đơn đổi), nhưng `DL25` không dài thêm một dòng nào và trong nhánh thường cũng không có một
+     câu xác nhận nào - người thật bấm xong không biết mình vừa ghi được hay chưa, nên bấm lại.
+     Mọi cửa ghi phải nói được AI · LÀM GÌ · LÚC NÀO · TRÊN HỒ SƠ NÀO (luật 5c của giao thức
+     audit); riêng khoản tiền thì càng phải, vì đây là dấu vết đối soát. */
+  try{logAct("Ghi khoản thu","DL07",pay.payment_id||pid,null,
+   "Thu "+vnd(amt)+" của "+(e.student_id_name||e.student_id||"")+" - đơn "+id+
+   (pay.payment_method?(" · "+(elabel(pay.payment_method)||pay.payment_method)):"")+
+   (rem>0?(" · còn lại "+vnd(rem)):" · đã thu đủ"))}catch(_e){}
   var dep=paramOf("thresholdDeposit_minimum",5000000);
   if(rem>0&&newPaid<dep)toast("Đã ghi thu. LƯU Ý: tổng đã đóng "+vnd(newPaid)+" dưới mức cọc chuẩn "+vnd(dep)+" - cân nhắc thu thêm.",5200);
+  else toast("Đã ghi khoản thu "+vnd(amt)+(rem>0?(" - còn lại "+vnd(rem)):" - đơn đã thu đủ")+".",4200);
   closeModal();reRender(CUR);payReceipt(id,amt,pay.payment_method,pay.transaction_ref,pid)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}google.script.run.withSuccessHandler(function(){d(res.id)}).withFailureHandler(function(er){toast("Lỗi kết nối: "+er.message)}).apiUpdate("DL06",id,{paid_amount:newPaid,remaining_amount:rem,payment_status:pstatus})}).withFailureHandler(function(er){toast("Lỗi kết nối: "+er.message)}).apiSave("DL07",pay)}else{d("PMT-"+seqNo("DL07","payment_id"))}}
 function payVerify(id){var pays=rows("DL07").filter(function(x){return x.enrollment_id===id&&!(x.verified_by&&String(x.verified_by).trim())});if(!pays.length){toast("Không có khoản chờ xác nhận.");return}
@@ -16448,7 +16508,7 @@ function renderHoctap(){
  /* V9.99z5 - thanh tab của hub này (và của hub CSKH) chưa bao giờ đi qua `scopeTabs`, trong
     khi ba hub kia có. Nên khai `tabs:{hoctap:[...]}` cho một chức danh thì menu thu lại mà
     thanh tab vẫn mở đủ 7 cửa - hai chỗ nói hai đằng. */
- h+=tbar(segHTML(tab,scopeTabs("hoctap",[["today","Hôm nay",todayN||"",""],["lichtuan","Lịch tuần","",""],["gvdp","GV dự phòng",nNoGv||"",nNoGv?"red":""],["phong","Phòng & đụng lịch",clashList().length||"",clashList().length?"red":""],["lop","Lớp học",cls.length||"",""],["buoihoc","Nhận xét buổi",nNote||"",nNote?"red":""],["wow","Buổi WOW 1-1",nWow||"",nWow?"amber":""]]),"htTabSet('{k}')"),
+ h+=tbar(segHTML(tab,scopeTabs("hoctap",[["today","Buổi hôm nay",todayN||"",""],["lichtuan","Lịch tuần","",""],["gvdp","GV dự phòng",nNoGv||"",nNoGv?"red":""],["phong","Phòng & đụng lịch",clashList().length||"",clashList().length?"red":""],["lop","Lớp học",cls.length||"",""],["buoihoc","Nhận xét buổi",nNote||"",nNote?"red":""],["wow","Buổi WOW 1-1",nWow||"",nWow?"amber":""]]),"htTabSet('{k}')"),
   '<button class="pill" onclick="go(\'giaoan\')"><i class="ti ti-notes"></i>Kho bài & Giáo án</button><button class="pill" onclick="go(\'banglop\')"><i class="ti ti-clipboard-list"></i>Vận hành lớp</button>');
  h+=bvSau();   /* chọn chặng xong mới tới bảng việc của chức danh */
  if(tab==="today")h+=renderHtToday(1);
@@ -21065,6 +21125,12 @@ function go(key,noHist){
     biết mình đang đứng ở nhánh nào - trước đây cả menu tối thui, không biết đang ở đâu. */
  try{if(navAnyCur())NAVFROM=navCurKey()}catch(e){}
  var key0=key;   /* key GỐC trước remap - dùng tìm nhóm menu */
+ /* V9.99z7 (anh Luân: *"a bấm vào rất nhiều menu bên sidebar ko ăn nhé"*). Đo bằng chuột thật
+    trên 120 lượt bấm: mọi mục ĐỀU chạy, trừ những mục mà người ta ĐANG ĐỨNG SẴN ở đó - bốn
+    "Bản đồ chặng" (bấm tên nhóm chặng đã tự mở bản đồ rồi), Trang bắt đầu, và tab mặc định của
+    hub CSKH. Bấm mà màn hình không đổi một pixel nào thì đúng là "không ăn" theo mắt người dùng,
+    dù app không sai. Nay MỌI cú bấm đều có phản hồi: mục vừa bấm loé một cái trên menu. */
+ window.__NAVHIT=key0;
  /* Nhớ lại khoá NGƯỜI DÙNG THẬT SỰ BẤM, TRƯỚC mọi phép đổi tên bên dưới - có nó mới phân biệt
     được "bấm vào tên hub" với "bấm vào một mục con của hub" (hai chuyện phải xử khác nhau).
     BẪY ĐÃ CẮN (V9.99z5): dòng này từng đứng SAU phép remap TSMAP, nên bấm "Test đầu vào" thì
@@ -21117,6 +21183,9 @@ function go(key,noHist){
      vòng lặp A>B>A>B, và luôn đọc được như đường đi thật từ gốc tới chỗ đang đứng. */
   if(dup>=0)hh.length=dup;
   else{hh.push({key:CUR,ctx:window.CURCTX||{}});if(hh.length>15)hh.shift()}}
+ /* Đứng sẵn ở trang ấy rồi mà vẫn bấm: kéo thân trang về đầu. Người ta bấm lại tên trang
+    thường là để "về đầu trang này" - và đó cũng là một phản hồi nhìn thấy được. */
+ if(CUR===key){try{var _c0=document.getElementById("content");if(_c0)_c0.scrollTop=0}catch(e){}}
  CUR=key;
  /* vào trang nào thì tự mở nhóm NAVTREE chứa nó (kể cả khi người dùng đã gập tay trước đó) */
  var g15=navGroupOf(key0)||navGroupOf(key);
@@ -21497,11 +21566,27 @@ function buildNav(){
    var _trongArc=!!G.arc&&!/^chang[A-D]$/.test(k);
    var isSub=_laHub||_trongArc;
    var isSub2=_laHub&&_trongArc;
-   h+='<div class="navitem'+(isArc?" chang":"")+(isSub2?" sub sub2":(isSub?" sub":""))+(navCur(k)?" on":(navAnc(k)?" anc":(ORPHAN&&k===NAVFROM?" from":"")))+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
+   h+='<div class="navitem'+(isArc?" chang":"")+(isSub2?" sub sub2":(isSub?" sub":""))+(navCur(k)?" on":(navAnc(k)?" anc":(ORPHAN&&k===NAVFROM?" from":"")))+(k===window.__NAVHIT?" hit":"")+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
     ' data-k="'+k+'" title="'+esc(m.t)+'" onclick="go(\''+k+'\')"><i class="ti '+m.ic+'"></i><span>'+esc(m.t)+'</span>'+
     (n?'<span class="dot">'+(n>99?"99+":n)+'</span>':'')+'</div>'});
   h+='</div>'});
- document.getElementById("nav").innerHTML=h;
+ /* ═══ V9.99z7 - THANH MENU KHÔNG ĐƯỢC NHẢY VỀ ĐẦU MỖI LẦN VẼ LẠI ═══════════════════════════
+    Anh Luân 05/08: *"a bấm vào rất nhiều menu bên sidebar ko ăn nhé"*. Đo bằng trình duyệt thật
+    mới ra: bấm thì ĂN - trang đổi đúng - nhưng `innerHTML=` xoá sạch nút con cũ nên **vị trí
+    cuộn của thanh menu bị kéo về 0**. Người dùng cuộn xuống, bấm một mục ở nửa dưới, menu nhảy
+    vọt lên đầu: chỗ vừa bấm biến khỏi tầm mắt và mục đang sáng nằm ngoài màn - nhìn y như bấm
+    không ăn. Menu càng dài càng nặng, mà bản này vừa thêm 7 mục (Giám đốc: 60 mục).
+    Nay giữ nguyên chỗ cuộn; và nếu mục đang sáng rơi ra ngoài tầm nhìn thì kéo nhẹ nó vào -
+    kéo TỐI THIỂU (`block:"nearest"`), không giật cả thanh. */
+ var _nv=document.getElementById("nav");
+ var _sc=0;try{_sc=_nv.scrollTop||0}catch(e){}
+ _nv.innerHTML=h;
+ try{_nv.scrollTop=_sc;
+  var _on=_nv.querySelector(".navitem.on");
+  if(_on&&_on.getBoundingClientRect&&_nv.getBoundingClientRect){
+   var _r=_on.getBoundingClientRect(),_rr=_nv.getBoundingClientRect();
+   if(_r.height&&(_r.top<_rr.top+2||_r.bottom>_rr.bottom-2))_on.scrollIntoView({block:"nearest"})}
+ }catch(e){}
  window.__NAVJ=null}
 function setRole(k){CURROLE=k;var r=RBK[k];
  var st=(window.GATE_SID&&find("DL01","staff_id",window.GATE_SID))||staffFor(k);CURSTAFF=st.staff_id||"";
