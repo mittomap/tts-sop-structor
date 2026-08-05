@@ -86,6 +86,38 @@ t("loi cu: go('duyetgiao') dan sang tab moi", (function(){
 t("ma tab TRUNG ma muc menu (mot ten cho mot thu)", duyTabs().every(function(x){return !!DUYMAP[x.k]}));
 t("ban giao lead da roi hub Khac", !KMAP.banggiao&&!!DUYMAP.banggiao);
 t("nhom chang du 4", NAVTREE.filter(function(G){return G.arc}).length===4);
+/* ═══ V9.99v - THANH MENU THAT PHAI KHOP VOI CAY MENU DANG DUOC CHON ════════════════════════
+   Bay da can lan thu BA: `buildNav()` cam cung `NAVTREE` thay vi hoi `navCay()`, nen ca co che
+   chon khung menu (khung chang / khung phang) khong co tac dung gi len thanh menu that - cac
+   MUC chang bien mat (vi navVis loc tung muc) nhung TIEU DE NHOM van la "C2 - Dang hoc".
+   Anh Luan chup man gui lai: *"a van thay chang o tren menu kia"*.
+   Phep do cu cua em cung truot vi cung ly do: no hoi lai `navCay()` thay vi doc CHUOI HTML ma
+   thanh menu thuc su ve ra. Luat moi doc HTML that, cho tung chuc danh dang di lam. */
+(function(){var xau=[];
+ rows("DL01").filter(function(x){return x.staff_id&&staffActive(x)}).forEach(function(S){
+  vao(S.staff_id);setRole("all");
+  window.NAVOPEN={};navCay().forEach(function(G){window.NAVOPEN[G.g]=true});
+  buildNav();
+  var ve=(NAVEL.innerHTML.match(/class="navlbl[^"]*"[^>]*>[\s\S]*?<span>([^<]+)<\/span>/g)||[])
+    .map(function(x){return (x.match(/<span>([^<]+)<\/span>/)||[])[1]||""});
+  var can=navCay().filter(function(G){return G.items.some(function(k){return navVis(k)})})
+    .map(function(G){return uiGroupLabel(G.g)});
+  /* HTML that da qua esc() nen "&" thanh "&amp;" - go ve truoc khi so, khong thi luat nay bao do
+     oan chi vi mot dau va. */
+  function _go(x){return String(x).replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">")}
+  ve=ve.map(_go);can=can.map(_go);
+  if(ve.join("|")!==can.join("|"))xau.push(ecode(S.role)+": ve["+ve.join(",")+"] can["+can.join(",")+"]")});
+ vao("");
+ t("thanh menu that khop cay menu dang chon"+(xau.length?" ["+xau.slice(0,2).join(" ; ")+"]":""), !xau.length)})();
+/* Va cu the cho dung cho anh Luan bat: chuc danh khung phang KHONG duoc con chu "C1..C4". */
+(function(){var acam=rows("DL01").filter(function(x){return /^aca_/.test(ecode(x.role))})[0];
+ if(!acam)return;
+ vao(acam.staff_id);setRole("all");
+ window.NAVOPEN={};navCay().forEach(function(G){window.NAVOPEN[G.g]=true});
+ buildNav();
+ t("ACA: thanh menu that khong con chu chang", !/C[1-4]\s*·/.test(NAVEL.innerHTML));
+ t("ACA: thanh menu that co nhom Lop hoc & Giang day", /Lớp học &amp; Giảng dạy|Lớp học & Giảng dạy/.test(NAVEL.innerHTML));
+ vao("")})();
 t("menu lo test/wow/baoluu tro lai (yeu cau Luan)", (function(){
  var all=[];NAVTREE.forEach(function(G){all=all.concat(G.items)});
  return all.indexOf("test")>=0&&all.indexOf("wow")>=0&&all.indexOf("baoluu")>=0&&all.indexOf("tuvan")>=0&&all.indexOf("reup")>=0})());

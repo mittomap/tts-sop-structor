@@ -21084,7 +21084,16 @@ function buildNav(){
  window.__NAVJ=null;try{window.__NAVJ=jAll()}catch(e){}   /* tính 1 lần cho mọi badge */
  var h="";
  var ORPHAN=!navAnyCur();   /* trang hiện tại không có mục riêng trên menu */
- (V6()?NAVTREE6:NAVTREE).forEach(function(G){
+ /* V9.99v - HÀM VẼ MENU CẮM CỨNG `NAVTREE`, KHÔNG HỎI `navCay()`.
+    Anh Luân 05/08 gửi ảnh: Trưởng phòng ACA vẫn thấy nhóm "C2 · ĐANG HỌC" dù `arcMode()` đã trả
+    "phang" và `arcXem` đã trả rỗng. Không phải cache - hàm này đọc thẳng NAVTREE nên toàn bộ
+    phần chọn khung menu (`navCayV5`) không có tác dụng gì lên thanh menu THẬT; các mục chặng
+    biến mất (vì `navVis` lọc từng mục) nhưng TIÊU ĐỀ NHÓM vẫn là tiêu đề chặng.
+    Đây là lần thứ BA trong dự án một bản đồ cắm cứng làm mất tính năng trong im lặng (BVLAND ở
+    v6, NAVTREE ở navCurKey, nay là buildNav). Luật đã ghi từ lần trước: **phải hỏi trạng thái
+    thật, đừng đọc bảng gốc**. Và phép đo của em cũng trượt vì cùng lý do - nó hỏi lại `navCay()`
+    thay vì đọc CHUỖI HTML mà thanh menu thật sự vẽ ra. Nay `_check11` đo trên HTML thật. */
+ navCay().forEach(function(G){
   if(!uiMenuOn("g:"+G.g))return;                                   /* V9.20: nhóm bị ẩn ở Cài đặt > Giao diện */
   var items=G.items.filter(function(k){return navVis(k)&&uiMenuOn(k)});
   if(!items.length)return;
