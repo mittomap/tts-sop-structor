@@ -1926,7 +1926,8 @@ body.drsz .drawer{transition:none}
 .slad{font-size:11.5px;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .slacat{display:inline-block;font-size:10px;background:#EEF2F6;color:#5A6675;border-radius:6px;padding:1px 6px;margin-left:4px;white-space:nowrap}
 .agebadge{display:inline-block;font-size:10px;font-weight:700;border-radius:6px;padding:1px 6px;margin-left:6px}
-.agebadge.red{background:var(--redb);color:var(--red)}.agebadge.amber{background:var(--amberb);color:var(--amber)}
+/* V9.99s - huy hieu tuoi viec ("quá 15h", "quá 10 ngày") dung MAU BAO DONG lam MAU CHU: #E08A1E tren nen #FFF6D8 chi duoc tuong phan 2.5, doc bang mat la chu chim vao nen. Da co san cap mau dam hon dung cho dung viec nay o `.chip` (#854F0B / #A32D2D) - dung lai chinh no de toan app chi co MOT thang mau chu tren nen canh bao. */
+.agebadge.red{background:var(--redb);color:#A32D2D}.agebadge.amber{background:var(--amberb);color:#854F0B}
 .slaa{flex:0 0 auto}
 .fbar.sub{margin-top:-6px;background:#FAFBFD}
 .fbar.sub .lbl{color:var(--muted)}
@@ -3186,6 +3187,11 @@ function stuOwners(sid){if(!sid)return [];var o=[];
   var c=b.class_id&&find("DL10","class_id",b.class_id);if(c)o.push(c.main_teacher_id)});
  var e=rows("DL06").filter(function(x){return x.student_id===sid})[0];
  if(e&&e.lead_id){var L=find("DL02","lead_id",e.lead_id);if(L)o.push(L.assigned_to)}
+ /* V9.99s - NGƯỜI KÈM WOW 1-1 CŨNG LÀ CHỦ HỒ SƠ. Đo được 05/08: NV WOW khai `hocvien:"mine"`
+    nhưng bảng chủ sở hữu chỉ tính người xếp lớp, giáo viên đứng lớp và tư vấn viên - không có
+    coach WOW. Nên một coach đang kèm riêng 32 buổi cho các em vẫn mở ra thấy 0-1 học viên.
+    Ai ngồi kèm một em 1-1 thì em ấy là học viên của họ, đúng nghĩa đen. */
+ rows("DL14").forEach(function(w){if(w.student_id!==sid)return;o.push(w.staff_id);o.push(w.wow_booked_by)});
  return o}
 /* ===== CƠ SỞ CỦA MỘT HỌC VIÊN: NƠI ĐĂNG KÝ **VÀ** NƠI ĐANG HỌC ===================
    V9.40. DL09.branch được ghi ĐÚNG MỘT LẦN - lúc lead chuyển thành học viên, chép từ hồ sơ
@@ -3245,7 +3251,17 @@ function canPid(pid){if(!pid||!CURSTAFF||!dsCfg().on)return true;
  var S=find("DL09","student_id",pid);
  if(S)return canRow("DL09",S)||tkGrant(pid);
  var L=find("DL02","lead_id",pid);
- if(L)return canRow("DL02",L)||tkGrant(pid);
+ if(L){if(canRow("DL02",L)||tkGrant(pid))return true;
+  /* V9.99s - LEAD ĐÃ THÀNH HỌC VIÊN THÌ HỒ SƠ ẤY LÀ HỒ SƠ HỌC VIÊN.
+     Đo được 05/08: Học vụ và ACA khai `hocvien:"all"` mà mở Chặng 2 "Đang học" ra chỉ thấy 0-2
+     hồ sơ, trong khi trung tâm có 69. Lý do: một hồ sơ hành trình lấy MÃ LEAD làm mã hồ sơ khi
+     người đó từng là lead - mà gần như ai cũng từng là lead. Cửa này chỉ hỏi `canRow("DL02")`,
+     gặp miền lead "none" là chặn, nên chặn luôn cả học viên đang học của chính họ.
+     Nay hỏi thêm một câu: lead này đã chuyển thành học viên chưa, và người đang đăng nhập có
+     xem được HỌC VIÊN đó không. Đây không phải nới quyền lead - danh sách lead (`srows("DL02")`)
+     vẫn chặn như cũ; chỉ là hành trình của một người ĐANG HỌC thuộc về miền học viên. */
+  try{var C=jCtx(pid);if(C&&C.S)return canRow("DL09",C.S)}catch(e){}
+  return false}
  return true}
 /* CẤP QUYỀN TẠM QUA GIAO VIỆC: được giao việc gắn hồ sơ nào thì xem được hồ sơ đó tới khi việc khép lại */
 function tkGrant(pid){var me=CURSTAFF;if(!me)return false;
@@ -4822,7 +4838,7 @@ function BANGVIEC(){
   o:[["ti-user-plus",mkLeadMoi(),"Lead mới "+mkMoiNgay()+" ngày","#3B82C4","mình kéo về được bao nhiêu","goTS('lead')"],
      ["ti-user-off",mkLeadKhongAi(),"Lead chưa ai phụ trách","#E24B4A","tiền quảng cáo đã tiêu - đừng để nguội","goDuyet('banggiao')"],
      ["ti-trending-down",mkNguonYeu(),"Nguồn đang kém","#B58A2B","tỷ lệ ra học viên dưới ngưỡng","go('baocao')"],
-     ["ti-refresh",mkKhoCu(),"Khách cũ chờ chạy lại","#6B4FA0","lead đã đóng - còn dùng lại được","goTS('reup')"],
+     ["ti-refresh",mkKhoCu(),"Khách cũ chờ chạy lại","#6B4FA0","lead đã khép - còn dùng lại được","goTS('reup')"],
      ["ti-gift",mkThuongTreo(),"Thưởng giới thiệu chưa trao","#DB2777","hạn trao "+slaChip("referralRewardGrant_days",7,"ngày"),"go('magioithieu')"]]},
  wow:{bc:"BC6",t:"Bảng NV WOW",d:"Việc của NV WOW: chấm test đầu vào, ghi nhận xét học thuật, dạy buổi WOW 1-1.",
   o:[["ti-file-text",dsTest(function(r){return isc(r.test_attendance_status,"on_time","late")&&!isc(r.test_status,"graded")}),"Test chờ chấm","#E24B4A","SLA chấm "+slaChip("slaGLA_hours",24,"giờ"),"goTS('test')"],
@@ -5087,6 +5103,10 @@ function upcomingSection(){var D=Math.max(1,num(paramOf("statsUpcoming_days",7))
  var ses=rows("DL11").filter(function(s){return !isc(s.session_status,"cancelled","completed")&&inNextDays(s.session_date,D)}).length;
  var ww=rows("DL14").filter(function(w){return isc(w.wow_status,"booked","confirmed")&&inNextDays(w.wow_session_date,D)}).length;
  var items=[["Hẹn gọi lại",call,"ti-phone-call","#3B82C4","nhaplead"],["Test đầu vào",tst,"ti-file-text","#7C3AED","test"],["Buổi học",ses,"ti-school","#0D9488","banglop"],["Buổi WOW",ww,"ti-star","#DB2777","wow"]];
+ /* Hai ô đầu là lịch hẹn với KHÁCH TIỀM NĂNG (DL02/DL03) và bấm vào là sang màn Lead/Test.
+    Ai khai `lead:"none"` thì vừa không có số liệu vừa không có cửa vào - bỏ hai ô, giữ hai ô
+    buổi học và buổi WOW. */
+ if(dsLevel("lead")==="none")items=items.filter(function(t){return t[4]!=="nhaplead"&&t[4]!=="test"});
  var h='<div class="sechd">Sắp diễn ra trong '+D+' ngày</div><div class="biztiles" style="margin-bottom:18px">';
  items.forEach(function(t){h+='<div class="biztile" style="cursor:pointer" onclick="go(\''+t[4]+'\')" data-tip="'+esc((t[5]?t[5]+" · ":"")+bamDiDau("go('"+t[4]+"')"))+'"><div class="bti" style="color:'+t[3]+'"><i class="ti '+t[2]+'"></i></div><div class="btv">'+t[1]+'</div><div class="btl">'+esc(t[0])+'</div></div>'});
  return h+'</div>'}
@@ -5104,7 +5124,11 @@ function bizSection(){
  var enr30=E.filter(function(r){return in30(r.enrollment_time)}).length;
  var revPrev=pay.filter(function(p){return inYm(p.payment_time,ymOf(-1))}).reduce(function(a,b){return a+num(b.amount)},0);
  var trend="";if(revPrev>0){var pctc=Math.round((revMonth-revPrev)/revPrev*100);trend=(pctc>=0?'<span style="color:#16A34A">▲ +':'<span style="color:#DC2626">▼ ')+Math.abs(pctc)+'%</span> so tháng trước'}
+ /* V9.99s - ba ô LEAD trong dải này (Lead mới N ngày, Tỷ lệ chuyển đổi, và mẫu số của nó) dựng
+    trên DL02; ai khai `lead:"none"` thì không hiện - cùng luật với phễu và biểu đồ lead phía dưới. */
+ var _bizLead=dsLevel("lead")!=="none";
  var tiles=[["Doanh thu đã thu",vnd(revTotal),"ti-cash","#16A34A"],["Doanh thu tháng này",vnd(revMonth),"ti-report-money","#0D9488",trend,"Tổng tiền đã thu trong tháng này = "+vnd(revMonth)+(revPrev>0?("; tháng trước "+vnd(revPrev)+" -> chênh "+(revMonth>=revPrev?"+":"")+Math.round((revMonth-revPrev)/revPrev*100)+"%"):"; tháng trước chưa có số để so")],["Lead mới "+mkMoiNgay()+" ngày",String(lead30),"ti-user-plus","#3B82C4"],["Tỷ lệ chuyển đổi",cvr+"%","ti-trending-up",cvr>=40?"#16A34A":cvr>=25?"#D97706":"#DC2626","",pctG(conv,L.length,"lead đã thành học viên")],["Đăng ký "+mkMoiNgay()+" ngày",String(enr30),"ti-clipboard-check","#7C3AED"],["Công nợ tồn",vnd(debt),"ti-alert-triangle",debt>0?"#D97706":"#16A34A"],["HV đang học",String(learning),"ti-users-group","#3B82C4"]];
+ if(!_bizLead)tiles=tiles.filter(function(t){return !/^Lead mới|^Tỷ lệ chuyển đổi/.test(t[0])});
  var h='<div class="sechd">Tình hình kinh doanh</div><div class="bizrow"><div class="biztiles">';
  tiles.forEach(function(t){h+='<div class="biztile"'+(t[5]?' data-tip="'+esc(t[5])+'"':'')+'><div class="bti" style="color:'+t[3]+'"><i class="ti '+t[2]+'"></i></div><div class="btv">'+esc(t[1])+'</div><div class="btl">'+esc(t[0])+(t[4]?' · '+t[4]:'')+'</div></div>'});
  h+='</div>';var rev=revByMonth();
@@ -5133,6 +5157,10 @@ function srcPerfSection(){var R=repRange();
  return h+'</tbody></table></div></div>'}
 function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sales/.test(ecode(x.role))&&!/inactive|nghỉ/i.test(String(x.status||""))});
  if(!sales.length)return "";
+ /* V9.99s - "Hiệu suất đội tư vấn" đếm lead phụ trách, lượt liên hệ và doanh thu theo từng NV
+    tư vấn - trọn vẹn miền lead cộng miền tiền. Kế toán và Trưởng phòng Học vụ khai `lead:"none"`
+    thì bảng này không phải của họ; bảng khối lượng việc VH11 ngay dưới vẫn còn cho phần việc. */
+ if(dsLevel("lead")==="none")return "";
  /* Cùng cửa sổ nhìn lại với bảng số cá nhân - hai bảng nói về cùng một quãng thời gian thì
     phải đọc cùng một tham số, không thì đội trưởng và nhân viên nhìn hai con số khác nhau. */
  var _ng=mkNgay();
@@ -5228,6 +5256,14 @@ function deptSection(){var L=rows("DL02"),S=rows("DL09"),E=rows("DL06"),pay=rows
    ["Phản hồi chưa xử lý",cnt(FB,function(x){return !isc(x.feedback_status,"resolved")}),"go('ghinhan')"],
    ["Phiếu khảo sát chưa trả lời",cnt(SV,function(v){return !String(v.submitted_date||"").trim()}),"go('review')"]]}
  ];;
+ /* V9.99s - MỖI Ô Ở ĐÂY THUỘC VỀ MỘT MIỀN DỮ LIỆU. Khối "Tư vấn" đếm lead chưa gọi và hẹn quá
+    hạn (DL02/DL03) - người khai `lead:"none"` không được thấy; khối "Tài chính" đếm công nợ và
+    chiết khấu (DL06/DL07) - người khai `tien:"none"` không được thấy. Bỏ cả thẻ phòng ban chứ
+    không bỏ từng dòng: một thẻ "Tư vấn" còn đúng một dòng thì đọc ra sai bức tranh. */
+ var _dmien={"Tư vấn":"lead","Tài chính":"tien","Học vụ":"hocvien","Chuyên môn":"lop",
+  "WOW":"lop","CSKH":"hocvien"};
+ depts=depts.filter(function(d){var m=_dmien[d.n];return !m||dsLevel(m)!=="none"});
+ if(!depts.length)return "";
  var h='<div class="sechd">Việc đang nợ theo phòng ban</div><div class="deptgrid">';
  depts.forEach(function(d){h+='<div class="deptc"><div class="depth" style="box-shadow:inset 4px 0 0 '+d.c+'"><div class="depti" style="background:'+d.c+'18;color:'+d.c+'"><i class="ti '+d.ic+'"></i></div><b>'+esc(d.n)+'</b></div><div class="deptb">';
   d.s.forEach(function(x){var act=x[2]||"";
@@ -7423,6 +7459,44 @@ var ARCRAIL={
  changD:["ending","reenroll","alumni"]};
 /* ga RẼ NHÁNH vẽ kèm dưới ray (hình thoi): rơi khỏi dòng chảy chính */
 var ARCBRANCH={changA:["no_contact","lost"],changB:[],changC:[],changD:[]};
+/* ═══ V9.99s - CHẶNG NÀO LÀ VIỆC CỦA AI ════════════════════════════════════════════════════
+   Anh Luân 05/08 (mở Trưởng phòng ACA): *"dính cache hay sao ta, a vào thử trưởng phòng aca
+   hưng vẫn thấy nó bất hợp lý"* - kèm ảnh: ACA đang đứng ở "Chặng 1 · Khách tiềm năng" với
+   nguyên phễu lead 82 · test 54 · tư vấn 12 · thanh toán 40.
+   Không phải cache. Hai lỗi thật, nằm cạnh nhau:
+     1. `navVis` cho cả bốn chặng đi qua bằng MỘT câu `return !rs.lite&&!rs.noHV` - tức là chỉ
+        hỏi "có phải nhóm gọn không", không hỏi chức danh này có miền dữ liệu của chặng đó
+        không. ACA khai `lead:"none"` mà vẫn được mời vào chặng lead.
+     2. Dải "Nghiệp vụ trong chặng" đếm bằng `rows()` - BẢNG THÔ, chưa cắt phạm vi. Nên dù sổ
+        trực bên dưới đã lọc đúng (0 hồ sơ), bốn con số phía trên vẫn khoe số của cả trung tâm.
+        Đây là cùng một con bệnh em đã cắn ở `_soinguoi.js`: hỏi `rows` thay vì `srows`.
+   Luật thay thế, đo được bằng máy: một chặng chỉ đứng trên menu của một người khi
+     (a) họ không thuộc nhóm gọn / nhóm không chạm học viên, VÀ
+     (b) họ có ÍT NHẤT MỘT miền dữ liệu mà chặng đó dựng lên, VÀ
+     (c) trong chặng còn ÍT NHẤT MỘT màn nghiệp vụ mà chính họ mở được.
+   Vế (c) là vế quan trọng nhất: bản đồ chặng là CHỖ LÀM VIỆC, không phải tấm áp phích kể
+   chuyện vòng đời. Không có việc nào trong chặng thì chặng ấy không phải của họ. */
+var ARCMIEN={changA:["lead"],changB:["hocvien","lop"],changC:["hocvien"],changD:["hocvien"]};
+function arcXem(k){var rs=SCOPE()||{};
+ if(rs.lite||rs.noHV)return false;
+ if(!k||k==="chang")return ARCS.some(function(A){return arcXem(A.k)});
+ if(!ARCMIEN[k])return false;
+ if(!ARCMIEN[k].some(function(d){return dsLevel(d)!=="none"}))return false;
+ if(!arcJobs(k).length)return false;
+ /* Chốt cuối, cho các chức danh chỉ có phạm vi CÁ NHÂN ("mine"): bản đồ chặng vẽ NGƯỜI. Ở mức
+    "mine" mà trong chặng ấy họ không có hồ sơ nào thì tấm bản đồ đó trống trơn - đúng thứ anh
+    Luân gọi là "hiện ra thì cũng là số 0 thôi". Đo được: NV WOW khai `lead:"mine"` (để chấm
+    test) nên trước chốt này họ được mời vào Chặng 1 với đường ray toàn số 0 và sổ trực rỗng,
+    trong khi việc chấm test của họ đã có sẵn ở Tuyển sinh > Test đầu vào.
+    Chỉ áp cho mức "mine": ở mức "team"/"all" thì chặng rỗng là TIN TỨC (hôm nay không ai tạm
+    dừng), phải giữ nguyên chỗ đứng. */
+ if(ARCMIEN[k].every(function(d){var lv=dsLevel(d);return lv==="mine"||lv==="none"})){
+  var co=false;try{co=jAll().some(function(J){return arcOf(J.k)===k})}catch(e){co=true}
+  if(!co)return false}
+ return true}
+function arcDs(){return ARCS.filter(function(A){return arcXem(A.k)})}
+/* chặng đang mở mà chức danh này không được xem thì lùi về chặng đầu tiên họ có */
+function arcHopLe(k){if(arcXem(k))return k;var d=arcDs();return d.length?d[0].k:""}
 function goArc(a){window.ARC=a;window.CHANGK="";go("chang")}
 /* NODE TANG 2 - dai hat hanh trinh gan tren tung dong danh sach.
    Nhin 1 giay biet: nguoi nay o chang lon nao (C1..C4), toi hat thu may, co qua han khong.
@@ -10205,6 +10279,8 @@ function kpiTrendHTML(code){
  return '<span style="font-size:10.5px;color:'+(good?"#16A34A":"#DC2626")+'">'+(up?"▲":"▼")+" "+kpiFmt(code,Math.abs(dl))+' so kỳ đối chiếu</span>'}
 function kpiSection(){var comp=kpiCompute();var ch6=(DATA.config&&DATA.config.ch6)||[];
  if(!ch6.length)return '<div class="sechd">KPI theo SOP</div><div class="panel"><div class="empty">Chưa nạp được ngưỡng KPI (CH6).</div></div>';
+ ch6=ch6.filter(kpiCoMien);
+ if(!ch6.length)return "";
  var byPhase={},order=[];
  ch6.forEach(function(k){var p=k.phase||"-";if(!byPhase[p]){byPhase[p]=[];order.push(p)}byPhase[p].push(k)});
  order.sort(function(a,b){return (parseInt(String(a).replace(/[^0-9]/g,""),10)||99)-(parseInt(String(b).replace(/[^0-9]/g,""),10)||99)});
@@ -10263,11 +10339,24 @@ function kpiOpen(code){
 
 /* 3 VIỆC NÊN LÀM TUẦN NÀY: chọn theo điểm = bậc lệch x trọng số, mỗi chặng tối đa 1 việc để
    không dồn cả 3 việc vào một chỗ. */
+/* V9.99s - CHỈ SỐ CŨNG CÓ MIỀN DỮ LIỆU. Đo được 05/08: Kế toán và Trưởng phòng Học vụ khai
+   `lead:"none"` nhưng ô "3 việc nên làm tuần này" vẫn đẩy LRT - Lead Response Time - lên đầu,
+   kèm nút nhảy sang màn Lead mà họ không có cửa vào. Chỉ số dựng trên dữ liệu nào thì thuộc
+   miền đó; SOP đã chia sẵn theo chặng P1..P10 nên chỉ cần đọc lại đúng cách chia ấy:
+     P1-P3 (lead - test - tư vấn) -> miền lead
+     P4    (thanh toán, huỷ đăng ký) -> miền tiền
+     P5-P10 (xếp lớp - học - CSKH - kết thúc) -> miền học viên
+   Người không có miền nào thì cả nhóm chỉ số của chặng ấy không hiện, ở CẢ hai chỗ: bảng KPI
+   đầy đủ và ô "3 việc nên làm tuần này". */
+var KPIMIEN={P1:"lead",P2:"lead",P3:"lead",P4:"tien",P5:"hocvien",P6:"hocvien",P7:"lop",
+ P8:"hocvien",P9:"hocvien",P10:"hocvien"};
+function kpiCoMien(k){var d=KPIMIEN[k&&k.phase];return !d||dsLevel(d)!=="none"}
 function kpiTop3(){
  var comp=kpiCompute();var ch6=(DATA.config&&DATA.config.ch6)||[];
  var cand=[];
  ch6.forEach(function(k){
   if(!KPIDOC[k.code])return;
+  if(!kpiCoMien(k))return;
   var v=comp[k.code];if(v==null||isNaN(v))return;
   var th=Number(k.threshold);var sev=kpiSev(k.code,v,th,k.dir);
   var w=SEVW[sev]||0;if(!w)return;
@@ -10354,27 +10443,39 @@ function renderBaocao(){
  h+=kpiSection();
  /* V9.42 - VH11 của SOP: ai đang ôm bao nhiêu việc. Đặt ở Báo cáo vì đây là câu hỏi của quản lý. */
  h+='<div class="sechd">Khối lượng việc theo nhân viên · VH11</div>'+khoiLuongHTML();
- // funnel with stage conversion
- function uniqLead(code){var m={};rows(code).forEach(function(x){if(x.lead_id)m[x.lead_id]=1});return Object.keys(m).length}
- var funnel=[["Lead",L.length],["Đặt test",uniqLead("DL03")],["Tư vấn",uniqLead("DL04")],["Đăng ký",E.length],["Đang học",S.filter(function(r){return/active|studying/.test(ecode(r.student_status))}).length]];
- var fmax=funnel[0][1]||1;
- h+='<div class="chartrow"><div class="chartp" style="grid-column:1/-1"><h4>Phễu chuyển đổi</h4>';
- funnel.forEach(function(f,i){var pct=Math.round(f[1]/fmax*100);var conv2=i>0&&funnel[i-1][1]?Math.round(f[1]/funnel[i-1][1]*100):null;
-  var gt=(conv2!=null?pctG(f[1],funnel[i-1][1],funnel[i-1][0].toLowerCase()+" đi tiếp được tới bước \""+f[0]+"\""):"")
-   +(conv2!=null?" · ":"")+"So với tổng đầu phễu: "+pctG(f[1],fmax,"lead");
-  h+='<div class="funrow" data-tip="'+esc(gt)+'"><div class="funh"><span>'+f[0]+'</span><span>'+f[1]+(conv2!=null?' <span class="funpct">('+conv2+'% từ bước trước)</span>':'')+'</span></div><div class="funbar"><i style="width:'+pct+'%"></i></div></div>'});
- h+='</div></div>';
- // lead status donut + attendance/academic bars
- var lsCount={};["new","contacted","considering","converted","no_response","unreachable","rejected"].forEach(function(k){lsCount[k]=0});
- L.forEach(function(r){var c=ecode(r.lead_status);if(lsCount[c]==null)lsCount[c]=0;lsCount[c]++});
- var lsSeg=[["Mới",lsCount.new||0,"#9AA5B1"],["Đã LH",lsCount.contacted||0,"#2F6BFF"],["Cân nhắc",lsCount.considering||0,"#F59E0B"],["Chuyển đổi",lsCount.converted||0,"#16A34A"],["Mất",(lsCount.no_response||0)+(lsCount.unreachable||0)+(lsCount.rejected||0),"#DC2626"]];
+ /* V9.99s - PHẦN LEAD CỦA BÁO CÁO CHỈ DÀNH CHO NGƯỜI CÓ MIỀN LEAD. Đo được 05/08: Kế toán và
+    Trưởng phòng Học vụ khai `lead:"none"` nhưng trang Báo cáo vẫn bày đủ phễu chuyển đổi, biểu
+    đồ phân bố trạng thái lead và bảng hiệu quả nguồn - ba khối dựng hoàn toàn trên DL02. Quyền
+    xem BÁO CÁO và quyền xem MIỀN LEAD là hai chuyện khác nhau; báo cáo không phải cửa hậu. */
+ /* V9.99s - PHẦN LEAD CỦA BÁO CÁO CHỈ DÀNH CHO NGƯỜI CÓ MIỀN LEAD. Đo được 05/08: Kế toán và
+    Trưởng phòng Học vụ khai `lead:"none"` nhưng trang Báo cáo vẫn bày đủ phễu chuyển đổi, biểu
+    đồ phân bố trạng thái lead và bảng hiệu quả nguồn - ba khối dựng hoàn toàn trên DL02. Quyền
+    xem BÁO CÁO và quyền xem MIỀN LEAD là hai chuyện khác nhau; báo cáo không phải cửa hậu.
+    Hai biểu đồ Chuyên cần & Học thuật thì GIỮ - chúng dựng trên DL09, đúng miền của họ. */
+ var _coLead=dsLevel("lead")!=="none";
  function cnt(arr,re){return arr.filter(function(r){return re.test(ecode(r))}).length}
- var att=[["Đều",cnt(S.map(function(r){return r.attendance_progress_status}),/on_track/),],["Nguy cơ",cnt(S.map(function(r){return r.attendance_progress_status}),/at_risk/)],["Sa sút",cnt(S.map(function(r){return r.attendance_progress_status}),/off_track/)]];
+ var att=[["Đều",cnt(S.map(function(r){return r.attendance_progress_status}),/on_track/)],["Nguy cơ",cnt(S.map(function(r){return r.attendance_progress_status}),/at_risk/)],["Sa sút",cnt(S.map(function(r){return r.attendance_progress_status}),/off_track/)]];
  var aca=[["Tiến bộ",cnt(S.map(function(r){return r.academic_progress_status}),/on_track/)],["Nguy cơ",cnt(S.map(function(r){return r.academic_progress_status}),/at_risk/)],["Lệch",cnt(S.map(function(r){return r.academic_progress_status}),/off_track/)]];
- h+='<div class="chartrow"><div class="chartp"><h4>Phân bố trạng thái Lead</h4>'+svgDonut(lsSeg)+'</div>';
- h+='<div class="chartp"><h4>Chuyên cần & Học thuật (số HV)</h4><div class="grid2"><div>'+svgBarsV(att,{color:"#2F6BFF",h:120})+'<div class="mut" style="text-align:center;font-size:10.5px">Chuyên cần</div></div><div>'+svgBarsV(aca,{color:"#7C3AED",h:120})+'<div class="mut" style="text-align:center;font-size:10.5px">Học thuật</div></div></div></div></div>';
+ var _bAca='<div class="chartp"><h4>Chuyên cần &amp; Học thuật (số HV)</h4><div class="grid2"><div>'+svgBarsV(att,{color:"#2F6BFF",h:120})+'<div class="mut" style="text-align:center;font-size:10.5px">Chuyên cần</div></div><div>'+svgBarsV(aca,{color:"#7C3AED",h:120})+'<div class="mut" style="text-align:center;font-size:10.5px">Học thuật</div></div></div></div>';
+ if(_coLead){
+  function uniqLead(code){var m={};rows(code).forEach(function(x){if(x.lead_id)m[x.lead_id]=1});return Object.keys(m).length}
+  var funnel=[["Lead",L.length],["Đặt test",uniqLead("DL03")],["Tư vấn",uniqLead("DL04")],["Đăng ký",E.length],["Đang học",S.filter(function(r){return/active|studying/.test(ecode(r.student_status))}).length]];
+  var fmax=funnel[0][1]||1;
+  h+='<div class="chartrow"><div class="chartp" style="grid-column:1/-1"><h4>Phễu chuyển đổi</h4>';
+  funnel.forEach(function(f,i){var pct=Math.round(f[1]/fmax*100);var conv2=i>0&&funnel[i-1][1]?Math.round(f[1]/funnel[i-1][1]*100):null;
+   var gt=(conv2!=null?pctG(f[1],funnel[i-1][1],funnel[i-1][0].toLowerCase()+" đi tiếp được tới bước \""+f[0]+"\""):"")
+    +(conv2!=null?" · ":"")+"So với tổng đầu phễu: "+pctG(f[1],fmax,"lead");
+   h+='<div class="funrow" data-tip="'+esc(gt)+'"><div class="funh"><span>'+f[0]+'</span><span>'+f[1]+(conv2!=null?' <span class="funpct">('+conv2+'% từ bước trước)</span>':'')+'</span></div><div class="funbar"><i style="width:'+pct+'%"></i></div></div>'});
+  h+='</div></div>';
+  var lsCount={};["new","contacted","considering","converted","no_response","unreachable","rejected"].forEach(function(k){lsCount[k]=0});
+  L.forEach(function(r){var c=ecode(r.lead_status);if(lsCount[c]==null)lsCount[c]=0;lsCount[c]++});
+  var lsSeg=[["Mới",lsCount.new||0,"#9AA5B1"],["Đã LH",lsCount.contacted||0,"#2F6BFF"],["Cân nhắc",lsCount.considering||0,"#F59E0B"],["Chuyển đổi",lsCount.converted||0,"#16A34A"],["Mất",(lsCount.no_response||0)+(lsCount.unreachable||0)+(lsCount.rejected||0),"#DC2626"]];
+  h+='<div class="chartrow"><div class="chartp"><h4>Phân bố trạng thái Lead</h4>'+svgDonut(lsSeg)+'</div>'+_bAca+'</div>';
+ }else{
+  h+='<div class="chartrow">'+_bAca.replace('<div class="chartp">','<div class="chartp" style="grid-column:1/-1">')+'</div>';
+ }
  // Hiệu quả nguồn + hiệu suất đội + KPI phòng ban + bảng HV nguy cơ
- h+=srcPerfSection();
+ if(_coLead)h+=srcPerfSection();
  h+=staffPerfSection();
  h+=deptSection();
  // risk table
@@ -12928,6 +13029,13 @@ function tsGo(tab){window.TSTAB=tab;go("tuyensinh")}
 function tsTabSet(tab){for(var k in TSMAP)if(TSMAP[k]===tab){go(k);return}window.TSTAB=tab;reRender(CUR)}
 function renderTuyensinh(){
  var tab=window.TSTAB||"lead";
+ /* V9.99s - TAB ĐANG ĐỨNG PHẢI NẰM TRONG PHẠM VI CỦA NGƯỜI ĐANG ĐĂNG NHẬP. `window.TSTAB` sống
+    lâu hơn một lần đăng nhập: đổi cổng/đổi người ngay trong app mà tab cũ không được rà lại thì
+    người mới rơi vào một tab không phải của họ - đo được 05/08: NV WOW (chỉ có tab Test đầu vào)
+    mở Tuyển sinh ra thấy màn Thanh toán với ô "Tổng còn nợ toàn hệ thống", trong khi họ khai
+    `tien:"none"`. Rà lại một câu là hết. */
+ (function(){var ok=scopeTabs("tuyensinh",[["lead"],["test"],["tuvan"],["thanhtoan"],["reup"]]).map(function(x){return x[0]});
+  if(ok.length&&ok.indexOf(tab)<0){tab=ok[0];window.TSTAB=tab}})();
  var tests=rows("DL03"),cons=rows("DL04"),enr=rows("DL06");
  var nLead=rows("DL02").filter(function(l){return !isc(l.lead_status,"converted","rejected","unreachable")}).length;
  var nTest=tests.filter(function(r){var graded=isc(r.test_status,"graded"),consulted=isc(r.post_test_status,"consulted");return !isc(r.booking_status,"rejected")&&!(graded&&consulted)}).length;
@@ -12959,8 +13067,11 @@ function renderTuyensinh(){
  h+='<div class="tsfun">';
  steps.forEach(function(s,i){h+='<div class="tsstep'+(tab===s[0]?" on":"")+'" onclick="tsTabSet(\''+s[0]+'\')" title="Xử lý bước '+esc(s[2])+'"><span class="tssic" style="background:'+s[4]+'18;color:'+s[4]+'"><i class="ti '+s[1]+'"></i></span><div class="tssm"><div class="tssn">'+s[3]+'</div><div class="tssl">'+esc(s[2])+'</div></div></div>';
   if(i<steps.length-1)h+='<div class="tsarr"><i class="ti ti-chevron-right"></i></div>'});
- h+='<div class="tsarr" style="opacity:.45"><i class="ti ti-corner-down-left"></i></div>';
- h+='<div class="tsstep'+(tab==="reup"?" on":"")+'" onclick="tsTabSet(\'reup\')" title="Khách đã ngưng - chăm lại theo lịch hẹn"><span class="tssic" style="background:#6B788718;color:#6B7887"><i class="ti ti-refresh"></i></span><div class="tssm"><div class="tssn">'+nReup+'</div><div class="tssl">Chăm lại / Reup</div></div></div>';
+ /* Ga "Chăm lại / Reup" nằm NGOÀI vòng lặp phễu nên bản V9.99r quên cắt nó theo phạm vi tab -
+    kế toán (chỉ có bước Thanh toán) vẫn thấy ga này đứng chỏng chơ ở cuối dải. */
+ if(scopeTabs("tuyensinh",[["reup"]]).length){
+  h+='<div class="tsarr" style="opacity:.45"><i class="ti ti-corner-down-left"></i></div>';
+  h+='<div class="tsstep'+(tab==="reup"?" on":"")+'" onclick="tsTabSet(\'reup\')" title="Khách đã ngưng - chăm lại theo lịch hẹn"><span class="tssic" style="background:#6B788718;color:#6B7887"><i class="ti ti-refresh"></i></span><div class="tssm"><div class="tssn">'+nReup+'</div><div class="tssl">Chăm lại / Reup</div></div></div>'}
  h+='</div>';
  h+=bvSau();   /* chọn chặng xong mới tới bảng việc của chức danh - đọc xuôi từ trên xuống */
  if(tab==="lead")h+=renderList("nhaplead",1);
@@ -15878,6 +15989,7 @@ function khoiLuongRows(){
   .filter(function(x){return x.tong>0||/sales|academic|wow|teacher/.test(vnorm(x.vai))})
   .sort(function(a,b){return b.tong-a.tong})}
 function khoiLuongHTML(){
+ var _klLead=dsLevel("lead")!=="none";
  var L=khoiLuongRows();
  if(!L.length)return "";
  var tong=L.reduce(function(a,x){return a+x.tong},0);
@@ -15889,14 +16001,19 @@ function khoiLuongHTML(){
   (trong?(' · '+trong+' người đang trống'):'')+'</span></div>'+
   '<div class="fhint" style="padding:0 14px 6px">Theo màn VH11 của SOP. Chỉ đếm việc CÒN MỞ - đã xong thì không tính. Bấm tên để mở hồ sơ nhân viên.</div>'+
   '<div class="tbwrap"><table class="dt"><thead><tr><th>Nhân viên</th><th>Chức danh</th><th>Cơ sở</th>'+
-  '<th>Lead đang giữ</th><th>Test chờ chấm</th><th>Tư vấn dở</th><th>Nhập học dở</th><th>Khiếu nại</th><th>Việc được giao</th><th>Tổng</th></tr></thead><tbody>';
+  /* Ba cột đầu của phần việc là việc trên MIỀN LEAD (lead đang giữ, phiếu test chờ chấm, tư vấn
+     dở dang). Người khai `lead:"none"` xem bảng khối lượng để cân việc nội bộ, không có quyền
+     nhìn tồn kho khách tiềm năng của phòng tư vấn - bỏ đúng ba cột đó, tổng vẫn giữ nguyên. */
+  (_klLead?'<th>Lead đang giữ</th><th>Test chờ chấm</th><th>Tư vấn dở</th>':'')+
+  '<th>Nhập học dở</th><th>Khiếu nại</th><th>Việc được giao</th><th>Tổng</th></tr></thead><tbody>';
  L.forEach(function(x){
   var qt=x.tong>=Math.max(6,deu*1.8);
   function o(n){return n?('<b>'+n+'</b>'):'<span class="mut">0</span>'}
   /* V9.54: bấm tên trong bảng thì mở NGĂN KÉO xem nhanh, không quăng người ta sang trang hồ sơ -
      đang dò một bảng mà bị đổi trang là mất chỗ đang dò (ngăn kéo vẫn có nút mở hồ sơ đầy đủ). */
   h+='<tr><td>'+nsLnk(x.id,x.ten)+'</td><td>'+esc(x.vai)+'</td><td>'+esc(x.br)+'</td>'+
-   '<td>'+o(x.lead)+'</td><td>'+o(x.cham)+'</td><td>'+o(x.tuvan)+'</td><td>'+o(x.ob)+'</td><td>'+o(x.kn)+'</td><td>'+o(x.giao)+'</td>'+
+   (_klLead?('<td>'+o(x.lead)+'</td><td>'+o(x.cham)+'</td><td>'+o(x.tuvan)+'</td>'):'')+
+   '<td>'+o(x.ob)+'</td><td>'+o(x.kn)+'</td><td>'+o(x.giao)+'</td>'+
    '<td>'+(qt?'<span class="chip red">'+x.tong+'</span>':'<b>'+x.tong+'</b>')+'</td></tr>'});
  return h+'</tbody></table></div></div>'}
 function gvTaiHTML(){
@@ -16380,14 +16497,14 @@ function changList(){var a=window.ARC||"changA";var k=window.CHANGK||"";
  return L}
 function changPick(k){window.CHANGK=(window.CHANGK===k?"":k);reRender(CUR)}
 /* các nghiệp vụ nằm TRONG từng chặng - đúng yêu cầu "mỗi chặng có chặng nghiệp vụ bên trong" */
-function arcJobs(a){
+function arcJobRaw(a){
  var jobs={
   changA:[
-   ["nhaplead","ti-users","Lead & khai thác","Tiếp nhận khách mới, gọi - nhắn, hẹn test",function(){return rows("DL02").filter(function(l){return !isc(l.lead_status,"converted","rejected","unreachable")}).length}],
-   ["test","ti-file-text","Test đầu vào","Đặt lịch - dự test - chấm - trả kết quả",function(){return rows("DL03").filter(function(r){return !isc(r.booking_status,"rejected")&&!(isc(r.test_status,"graded")&&isc(r.post_test_status,"consulted"))}).length}],
-   ["tuvan","ti-messages","Tư vấn & Đăng ký","Tư vấn lộ trình - chốt khóa - tạo phiếu ĐK",function(){return rows("DL04").filter(function(c){return !isc(c.conversion_status,"confirmed_with_deposit","dropped")}).length}],
-   ["thanhtoan","ti-credit-card","Thanh toán","Thu học phí - xác nhận khoản thu",function(){return rows("DL06").filter(function(e){if(/cancel/.test(ecode(e.enrollment_status)))return false;var rem=(e.remaining_amount!==undefined&&e.remaining_amount!=="")?num(e.remaining_amount):Math.max(0,(num(e.final_fee)||num(e.total_fee))-num(e.paid_amount));return rem>0}).length}],
-   ["reup","ti-refresh","Chăm lại / Reup","Khách đã ngưng - gọi lại theo lịch hẹn chăm",function(){return jAll().filter(function(J){return J.k==="lost"||J.k==="no_contact"}).length}]],
+   ["nhaplead","ti-users","Lead & khai thác","Tiếp nhận khách mới, gọi - nhắn, hẹn test",function(){return srows("DL02").filter(function(l){return !isc(l.lead_status,"converted","rejected","unreachable")}).length},"lead"],
+   ["test","ti-file-text","Test đầu vào","Đặt lịch - dự test - chấm - trả kết quả",function(){return srows("DL03").filter(function(r){return !isc(r.booking_status,"rejected")&&!(isc(r.test_status,"graded")&&isc(r.post_test_status,"consulted"))}).length},"lead"],
+   ["tuvan","ti-messages","Tư vấn & Đăng ký","Tư vấn lộ trình - chốt khóa - tạo phiếu ĐK",function(){return srows("DL04").filter(function(c){return !isc(c.conversion_status,"confirmed_with_deposit","dropped")}).length},"lead"],
+   ["thanhtoan","ti-credit-card","Thanh toán","Thu học phí - xác nhận khoản thu",function(){return srows("DL06").filter(function(e){if(/cancel/.test(ecode(e.enrollment_status)))return false;var rem=(e.remaining_amount!==undefined&&e.remaining_amount!=="")?num(e.remaining_amount):Math.max(0,(num(e.final_fee)||num(e.total_fee))-num(e.paid_amount));return rem>0}).length},"tien"],
+   ["reup","ti-refresh","Chăm lại / Reup","Khách đã ngưng - gọi lại theo lịch hẹn chăm",function(){return jAll().filter(function(J){return J.k==="lost"||J.k==="no_contact"}).length},"lead"]],
   changB:[
    /* V9.63 (anh Luân: *"bản đồ chặng và nghiệp vụ trong chặng nếu ko có cấu trúc tốt rất dễ dư
       thừa"*) - đo ra đúng: ô này từng đếm SỐ HỒ SƠ đang onboarding, ra 6, y hệt con số của ga
@@ -16397,12 +16514,12 @@ function arcJobs(a){
    ["xeplop","ti-layout-grid-add","Xếp lớp & Onboarding","Hồ sơ nhập học đã quá hạn - xếp lớp, gửi info, HV xác nhận",function(){var lim=num(paramOf("slaOBT_hours",48))||48;
     /* đọc ĐÚNG TÊN CỘT của DL08: assigned_at (lúc xếp lớp). Bản đầu em gõ placement_time /
        created_at - ba cột không hề tồn tại, nên ô lặng lẽ ra 0 mà không ai biết. */
-    return rows("DL08").filter(function(o){if(isc(o.onboarding_status,"completed"))return false;
-     var h=hoursSince(o.assigned_at);return h!=null&&h>lim}).length}],
-   ["banglop","ti-clipboard-list","Vận hành lớp","Buổi học - điểm danh - nhận xét - bài tập",function(){return rows("DL10").filter(function(c){return isc(c.class_status,"in_progress")}).length}],
-   ["hoctap","ti-school","Học tập & Giảng dạy","Việc của GV hôm nay - lịch tuần - WOW",function(){var t=new Date();return rows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,t)}).length}],
-   ["wow","ti-star","Buổi WOW 1-1","Đặt - dạy - ghi nội dung buổi kèm riêng",function(){return rows("DL14").filter(function(w){return !isc(w.wow_status,"cancelled")&&!String(w.wow_content_notes||"").trim()}).length}],
-   ["cskh","ti-headset","CSKH · Khảo sát","Khảo sát định kỳ - phản hồi - khiếu nại",function(){return rows("DL17").filter(function(c){return !isc(c.complaint_status,"resolved")}).length}]],
+    return srows("DL08").filter(function(o){if(isc(o.onboarding_status,"completed"))return false;
+     var h=hoursSince(o.assigned_at);return h!=null&&h>lim}).length},"hocvien"],
+   ["banglop","ti-clipboard-list","Vận hành lớp","Buổi học - điểm danh - nhận xét - bài tập",function(){return srows("DL10").filter(function(c){return isc(c.class_status,"in_progress")}).length},"lop"],
+   ["hoctap","ti-school","Học tập & Giảng dạy","Việc của GV hôm nay - lịch tuần - WOW",function(){var t=new Date();return srows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,t)}).length},"lop"],
+   ["wow","ti-star","Buổi WOW 1-1","Đặt - dạy - ghi nội dung buổi kèm riêng",function(){return srows("DL14").filter(function(w){return !isc(w.wow_status,"cancelled")&&!String(w.wow_content_notes||"").trim()}).length},"lop"],
+   ["cskh","ti-headset","CSKH · Khảo sát","Khảo sát định kỳ - phản hồi - khiếu nại",function(){return srows("DL17").filter(function(c){return !isc(c.complaint_status,"resolved")}).length},"hocvien"]],
   changC:[
    /* Ô này từng trùng KHÍT với ga "Bảo lưu / Bỏ học" - cùng tên, cùng con số, cùng tập người.
       Đổi tên và đổi phép đếm cho đúng vai: ga nói CÓ BAO NHIÊU NGƯỜI đang tạm dừng, ô nói CÓ BAO
@@ -16410,16 +16527,38 @@ function arcJobs(a){
    ["baoluu","ti-player-pause","Bảo lưu sắp tới hạn","Hẹn quay lại đã cận ngày - gọi chốt học tiếp hay bỏ",function(){var d=num(paramOf("slaReenroll_contact_days",3))||3;
     var eod=new Date();eod.setHours(23,59,59,999);var lim=eod.getTime()+d*864e5;
     /* cột thật của DL09 là pause_until - hẹn ngày quay lại. Đếm đơn đã cận ngày hoặc quá ngày. */
-    return rows("DL09").filter(function(s){var r=pvnd(s.pause_until);return r&&r.getTime()<=lim}).length}],
+    return srows("DL09").filter(function(s){var r=pvnd(s.pause_until);return r&&r.getTime()<=lim}).length},"hocvien"],
    /* V9.29o: trỏ thẳng vào TAB hoàn tiền chứ không trỏ vào cả hub - bấm từ chặng C mà rơi vào
       tab chiết khấu thì người ta lại phải tìm tiếp. */
-   ["duyethoan","ti-arrow-back-up","Duyệt Hoàn tiền","ĐK hủy đã thu tiền - tính và duyệt hoàn",function(){return rows("DL06").filter(function(e){return isc(e.enrollment_status,"cancelled")&&num(e.paid_amount)>0&&!isc(e.payment_status,"refunded")}).length}]],
+   ["duyethoan","ti-arrow-back-up","Duyệt Hoàn tiền","ĐK hủy đã thu tiền - tính và duyệt hoàn",function(){return srows("DL06").filter(function(e){return isc(e.enrollment_status,"cancelled")&&num(e.paid_amount)>0&&!isc(e.payment_status,"refunded")}).length},"tien"]],
   changD:[
-   ["ketthuc","ti-flag","Kết thúc & Tái ĐK","Điểm đầu ra - đánh giá - mời học tiếp",function(){return rows("DL18").filter(function(r){return !String(r.final_test_score||"").trim()||!/confirmed|declined/.test(ecode(r.re_enrollment_status))}).length}],
-   ["magioithieu","ti-gift","Mã giới thiệu","HV cũ giới thiệu bạn - thưởng hoa hồng",function(){return rows("DL19").filter(function(m){return isc(m.reward_status,"pending")}).length}]]};
+   ["ketthuc","ti-flag","Kết thúc & Tái ĐK","Điểm đầu ra - đánh giá - mời học tiếp",function(){return srows("DL18").filter(function(r){return !String(r.final_test_score||"").trim()||!/confirmed|declined/.test(ecode(r.re_enrollment_status))}).length},"hocvien"],
+   ["magioithieu","ti-gift","Mã giới thiệu","HV cũ giới thiệu bạn - thưởng hoa hồng",function(){return srows("DL19").filter(function(m){return isc(m.reward_status,"pending")}).length},"tien"]]};
  return jobs[a]||[]}
+/* Ô nghiệp vụ chỉ đứng lại khi NGƯỜI NÀY mở được màn ấy VÀ có miền dữ liệu của nó.
+   Trước đây điều kiện là `canSee(jb[0])` - mà `canSee` trả true cho mọi khoá nằm trong
+   VIEW_ALWAYS (nhaplead, test, tuvan, thanhtoan, wow, baoluu, magioithieu... đều nằm trong đó),
+   nên phép lọc ấy gần như không lọc gì. Nay hỏi đúng ba chốt mà menu vẫn hỏi:
+   trang có trong phạm vi không, tab có trong phạm vi hub không, và miền dữ liệu có mở không. */
+function arcJobs(a){var rs=SCOPE()||{};
+ return arcJobRaw(a).filter(function(jb){
+  var d=jb[5];if(d&&dsLevel(d)==="none")return false;
+  var k=jb[0],o=navOwner(k);
+  if(rs.pages!=="*"){
+   if(rs.pages.indexOf(k)<0&&rs.pages.indexOf(o)<0)return false;
+   if(o!==k&&rs.tabs&&rs.tabs[o]&&rs.tabs[o].indexOf(k)<0)return false}
+  /* Ở phạm vi CÁ NHÂN ("mine"), con số 0 không phải tin vui mà là dấu hiệu việc đó không thuộc
+     về mình: NV WOW mở Chặng 2 thấy "Vận hành lớp 0" và "Học tập & Giảng dạy 0" vì họ không đứng
+     lớp nào - hai ô ấy sẽ mãi là 0. Ở phạm vi "team"/"all" thì ngược lại, số 0 là TIN TỨC (hôm
+     nay không còn hồ sơ nào tồn) nên giữ nguyên ô. */
+  if(d&&dsLevel(d)==="mine"){var n=0;try{n=jb[4]()}catch(e){n=1}if(!n)return false}
+  return true})}
 function renderChang(){
- var a=window.ARC||"changA";var A=ARCBK[a]||ARCS[0];window.ARC=A.k;a=A.k;
+ /* V9.99s: chức danh này không có chặng nào thì nói thẳng, đừng vẽ một bản đồ rỗng; còn nếu
+    họ có chặng khác thì lùi về chặng đầu tiên của họ thay vì mở lì chặng ngoài phạm vi. */
+ var a=arcHopLe(window.ARC||"changA");
+ if(!a)return dsDeny("Bản đồ chặng vòng đời học viên");
+ var A=ARCBK[a];window.ARC=A.k;a=A.k;
  var pt=document.getElementById("pgTitle");if(pt)pt.textContent="Chặng "+A.n+" · "+A.t;
  var all=jAll();var mine=all.filter(function(J){return arcOf(J.k)===a});
  var rail=ARCRAIL[a]||[],brs=ARCBRANCH[a]||[];
@@ -16437,7 +16576,10 @@ function renderChang(){
  h+='<div class="ph" style="padding:0 2px 8px"><b><i class="ti ti-route" style="margin-right:6px"></i>Người đang ở đâu trong chặng</b>'+
   '<span class="mut" style="margin-left:auto;font-size:11px">bấm một ga để lọc sổ trực bên dưới</span></div>';
  h+='<div class="nrail" data-tour="nrail" style="--mscol:'+A.col+'">';
- var prev=ARCS[A.n-2],next=ARCS[A.n];
+ /* ga đầu/cuối ray là lối SANG CHẶNG BÊN CẠNH - chỉ vẽ khi chặng bên cạnh thuộc về họ,
+    không thì bấm vào là rơi vào màn từ chối. */
+ var prev=(A.n>=2&&arcXem(ARCS[A.n-2].k))?ARCS[A.n-2]:null;
+ var next=(ARCS[A.n]&&arcXem(ARCS[A.n].k))?ARCS[A.n]:null;
  if(prev)h+='<div class="nst ghost" onclick="goArc(\''+prev.k+'\')" title="Sang '+esc(prev.t)+'"><span class="nsd"><i class="ti '+prev.ic+'"></i></span><span class="nsl">← C'+prev.n+' '+esc(prev.t)+'</span></div><div class="nscw"><span class="nsc"></span></div>';
  /* tỷ lệ chuyển đổi: reached(i)=tổng hồ sơ đã tới ga i trở đi (trong chặng) */
  var reached=[];for(var i2=0;i2<rail.length;i2++){var s2=0;for(var j2=i2;j2<rail.length;j2++)s2+=(cnt[rail[j2]]||0);reached.push(s2)}
@@ -16468,7 +16610,7 @@ function renderChang(){
   ["ti-calendar-event",nApt,"Có hẹn hôm nay","#2E5A88",""],
   ["ti-file-alert",nMiss,"Thiếu dữ liệu","#E08A1E",""]],"chang");
  /* --- NGHIỆP VỤ TRONG CHẶNG --- */
- var jobs=arcJobs(a).filter(function(jb){return canSee(jb[0])||PBK[jb[0]]==null});
+ var jobs=arcJobs(a);
  if(jobs.length){h+='<div class="ph" style="padding:0 2px 8px"><b><i class="ti ti-briefcase" style="margin-right:6px"></i>Nghiệp vụ trong chặng</b><span class="mut" style="margin-left:auto;font-size:11px">bấm để mở màn hình làm việc</span></div><div class="arcjobs" style="--mscol:'+A.col+'">';
   jobs.forEach(function(jb){var n=0;try{n=jb[4]()}catch(e){}
    h+='<div class="arcjob" onclick="go(\''+jb[0]+'\')" data-tip="'+esc(jb[3]+" — "+bamDiDau("go('"+jb[0]+"')"))+'"><span class="aji" style="background:'+A.col+'14;color:'+A.col+'"><i class="ti '+jb[1]+'"></i></span><div class="ajt" style="min-width:0">'+esc(jb[2])+'</div>' +(n?'<span class="ajn'+(n>=10?" hot":"")+'">'+n+'</span>':'')+'</div>'});
@@ -16618,7 +16760,14 @@ var TOURS={
  tn_nhansu:{lv:"trainghiem",role:"Nhân sự",t:"Một ngày của Nhân sự",ic:"ti-id-badge",d:"4 bước - hồ sơ người, bảng công, việc nội bộ",steps:[
   {p:"nhansu",sel:'@man',t:"Danh sách người của trung tâm",d:"Toàn bộ nhân sự đang làm việc: chức danh, cơ sở, email đăng nhập và tình trạng. Đây là màn chính của bạn - Nhân sự không đụng vào hồ sơ học viên hay doanh thu.",hint:"Nhìn qua danh sách, để ý ai chưa có cơ sở."},
   {p:"nhansu",sel:'@tbarct',t:"Lọc theo chức danh và cơ sở",d:"Cần soát riêng một bộ phận hay một chi nhánh thì lọc ở thanh này. Bấm tên một người để mở hồ sơ đầy đủ.",hint:"Chọn một chức danh ở bộ lọc."},
-  {p:"giangvien",ctx:function(){window.GVTAB="cong"},sel:'@txt:Bảng công giảng dạy',t:"Bảng công giảng dạy",d:"Giờ đứng lớp, ca WOW 1-1 và ca test đầu vào của từng giảng viên trong tháng. Buổi nào thiếu mốc giờ vào - giờ ra thì tính công sai, phải soát trước khi chốt lương.",hint:"Xem cột giờ dạy và cột buổi thiếu mốc giờ."},
+  /* V9.99s - bước này neo vào dòng chữ "Bảng công giảng dạy". Từ khi trang `bangcong` có mục
+     riêng trên menu (đúng tên ấy), neo @txt vớ luôn MỤC TRÊN THANH MENU - trên màn điện thoại
+     thanh menu nằm ngoài khung nhìn nên bong bóng chỉ ra chỗ không ai thấy.
+     Giữ nguyên trang Giảng viên (nếu dời sang trang `bangcong` thì không bài nào còn đi qua
+     Giảng viên nữa - `_checktour` bắt ngay), chỉ đổi neo sang thân trang.
+     Luật rút ra: neo theo CHỮ chỉ chắc khi chữ ấy là duy nhất trên màn - thêm một mục menu
+     trùng tên là neo lệch, mà lệch kiểu này chỉ lộ ra ở khổ điện thoại. */
+  {p:"giangvien",ctx:function(){window.GVTAB="cong"},sel:'@man',t:"Bảng công giảng dạy",d:"Giờ đứng lớp, ca WOW 1-1 và ca test đầu vào của từng giảng viên trong tháng. Buổi nào thiếu mốc giờ vào - giờ ra thì tính công sai, phải soát trước khi chốt lương.",hint:"Xem cột giờ dạy và cột buổi thiếu mốc giờ."},
   {p:"giaoviec",sel:'@txt:Nhận việc',t:"Việc nội bộ",d:"Việc người khác giao cho bạn nằm ở đây. Bấm Nhận là người giao biết việc đã tới tay; báo xong ngay lúc làm xong.",hint:"Xong một ngày của Nhân sự!"}]},
  tn_ketoan:{lv:"trainghiem",role:"Kế toán",t:"Một ngày của Kế toán",ic:"ti-cash",d:"5 bước - thu, đối soát, công nợ, hoàn tiền",steps:[
   {p:"thanhtoan",sel:'@txt:Ghi nhận khoản thu',t:"Thu học phí",d:"Thu tiền mặt hay chuyển khoản đều ghi ở đây, in phiếu thu ngay. Đóng theo đợt thì ghi hẹn thu đợt sau.",hint:"Bấm 'Ghi nhận khoản thu' ở đầu trang, chọn đăng ký còn nợ, nhập số tiền rồi Lưu.",chk:function(){return tourMore("thu")}},
@@ -20718,7 +20867,17 @@ var NAVTREE=[
     mục menu ở NAVTREE6 nhưng chưa bao giờ có ở cây menu bản V5, nên nó chỉ mở được bằng nút Trợ
     lý. Trong khi bài hướng dẫn về nó vẫn chạy ở bản 5 - người xem tour thấy trang, đi tìm thì
     không có cửa nào. Nay nó có chỗ đứng thật; nút Trợ lý vẫn mở nó như cũ, đây là thêm một lối. */
- {g:"Điều hành",items:["baocao","hoidap","canhan","settings"]},
+ /* V9.99s - HAI TRANG CỦA PHÒNG NHÂN SỰ CHƯA BAO GIỜ CÓ MẶT TRÊN MENU. Đo được 05/08 bằng cách
+    dựng THẬT thanh menu của từng chức danh: Trưởng phòng Nhân sự chỉ có 4 mục - Việc hôm nay,
+    Giao việc, Việc chờ nhận, Giảng viên - trong khi `ROLESCOPE.nhansu` khai `pages:["viec",
+    "giaoviec","nhansu","giangvien","bangcong","duyet"]` và TRANG ĐÁP của họ là `nhansu`.
+    `navVis("nhansu")` trả true, `_check11` hỏi navVis nên báo xanh - nhưng `NAVTREE` không có
+    hai khoá ấy ở bất kỳ nhóm nào, mà menu chỉ vẽ những gì có trong cây. Nghĩa là họ đăng nhập
+    vào rơi thẳng xuống một trang KHÔNG CÓ MỤC MENU nào sáng, y hệt con bệnh trang Hỏi đáp anh
+    Luân bắt được hôm 04/08 (*"a tìm trên sidebar ko thấy"*).
+    Bài học lặp lại lần thứ hai: hỏi `navVis` là hỏi "có ĐƯỢC PHÉP thấy không", không phải "có
+    CHỖ ĐỨNG trên menu không". Hai câu khác nhau, và cái thước phải hỏi câu thứ hai. */
+ {g:"Điều hành",items:["baocao","nhansu","bangcong","hoidap","canhan","settings"]},
  {g:"Tra cứu",items:["hocvien","dsphuhuynh","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","giangvien","nhanvien"]}];
 var NAVSUB={nhaplead:"tuyensinh",test:"tuyensinh",tuvan:"tuyensinh",thanhtoan:"tuyensinh",reup:"tuyensinh",
  review:"cskh",khaosat:"cskh",ghinhan:"cskh",khieunai:"cskh",ychv:"cskh",
@@ -20745,7 +20904,7 @@ function navVis(k){var r=RBK[CURROLE],rs=SCOPE();
  /* Bản đồ chặng là HÀNH TRÌNH HỌC VIÊN. Ai làm việc với học viên đều thấy; nhóm gọn (lite) và
     nhóm không chạm học viên (Nhân sự) thì không - V9.60: trước bản này Nhân sự vào app là thấy
     ngay bản đồ vòng đời học viên, trong khi họ không có một việc nào với học viên. */
- if(o==="chang")return !rs.lite&&!rs.noHV;
+ if(o==="chang")return arcXem(k==="chang"?"":k);
  if(rs.pages!=="*"&&rs.pages.indexOf(o)<0)return false;
  /* Mục con của một HUB còn bị chặn theo rs.tabs[<hub>] (vd tư vấn chỉ thấy mã giới thiệu trong
     hub Khác; học vụ chỉ thấy tab Đơn xin nghỉ trong hub Chờ duyệt).
@@ -20755,7 +20914,6 @@ function navVis(k){var r=RBK[CURROLE],rs=SCOPE();
   var _sub=(HUBTAB[o]&&HUBTAB[o].m)||null,_names=[];
   if(_sub)for(var _t in _sub)_names.push(_sub[_t]);
   if((_names.length?_names.indexOf(k)>=0:true)&&rs.tabs[o].indexOf(k)<0)return false}
- if(/^chang[A-D]$/.test(k)&&rs.lite)return false;
  return true}
 /* V9.19: hub vừa là MỤC MENU vừa là chủ của mục con (hoctap có mục con wow/lop/buoihoc/lichtuan) -
    khi tab đang đứng thuộc về một mục con thì mục HUB không được sáng theo, nếu không 2 mục cùng sáng. */

@@ -164,6 +164,63 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.99s — BẢN ĐỒ CHẶNG VỀ ĐÚNG NGƯỜI, MIỀN DỮ LIỆU KÍN 0/0 ✅ (05/08).**
+> · Anh Luân mở Trưởng phòng ACA và chụp màn: *"dính cache hay sao ta, a vào thử trưởng phòng
+> aca hưng vẫn thấy nó bất hợp lý"* - anh đang đứng ở **"Chặng 1 · Khách tiềm năng"** với nguyên
+> phễu lead **82 · 54 · 12 · 40**, trong khi nhóm `aca` khai `lead:"none"`.
+> · **Không phải cache. Hai lỗi thật, nằm cạnh nhau.** (1) `navVis` cho cả bốn chặng đi qua bằng
+> đúng một câu `return !rs.lite&&!rs.noHV` - chỉ hỏi "có phải nhóm gọn không", không hỏi chức
+> danh có miền dữ liệu của chặng đó không. (2) Dải "Nghiệp vụ trong chặng" đếm bằng `rows()` -
+> **bảng thô, chưa cắt phạm vi** - nên sổ trực bên dưới lọc đúng (0 hồ sơ) mà bốn con số phía
+> trên vẫn khoe số toàn trung tâm. Đúng con bệnh `rows` thay vì `srows` đã cắn ở `_soinguoi.js`.
+> · **Luật mới của bản đồ chặng** (`arcXem`, đo được bằng máy): một chặng chỉ đứng trên menu khi
+> (a) người đó **có miền dữ liệu** chặng ấy dựng lên (`ARCMIEN`: C1→lead, C2→học viên/lớp,
+> C3/C4→học viên), (b) trong chặng còn **ít nhất một màn nghiệp vụ chính họ mở được**, (c) ở
+> phạm vi cá nhân (`mine`) thì phải **có hồ sơ thật**. Vế (b) là vế quan trọng nhất: bản đồ chặng
+> là CHỖ LÀM VIỆC, không phải tấm áp phích kể chuyện vòng đời.
+> · **Kết quả đo lại:** ACA còn đúng **C2 · Đang học** (68 hồ sơ, 3 màn nghiệp vụ) · tư vấn có
+> C1 + C4 · học vụ có C2+C3+C4 · kế toán có C3 (hoàn tiền) · marketing có C1 · giáo viên và WOW
+> có C2 của học viên mình · nhân sự không có chặng nào.
+> · **Ba lỗi kèm theo, đều đo được:**
+>   1. `canPid` chặn hồ sơ hành trình theo `canRow("DL02")` - mà hồ sơ hành trình **lấy mã lead
+>      làm mã hồ sơ** khi người đó từng là lead (gần như ai cũng từng). Học vụ khai `hocvien:"all"`
+>      mà mở C2 ra chỉ thấy **2/69** hồ sơ. Nay hỏi thêm: lead này đã thành học viên chưa, và
+>      người đang đăng nhập có xem được HỌC VIÊN đó không. Không nới quyền lead - `srows("DL02")`
+>      vẫn chặn như cũ.
+>   2. `stuOwners` **không tính coach WOW**: một người đang kèm riêng 32 buổi vẫn mở ra thấy 0-1
+>      học viên. Ai ngồi kèm một em 1-1 thì em ấy là học viên của họ, đúng nghĩa đen.
+>   3. `window.TSTAB` **sống lâu hơn một lần đăng nhập**: đổi cổng/đổi người ngay trong app mà
+>      không rà lại thì người mới rơi vào tab không phải của họ - NV WOW (chỉ có tab Test đầu vào)
+>      mở Tuyển sinh ra gặp màn Thanh toán với ô "Tổng còn nợ toàn hệ thống".
+> · **`_checkmien` từ 15 xuống 0** - và **chính bộ kiểm ấy đã để lọt bốn màn Chặng**: nó bỏ qua
+> mọi trang `hide:1`, mà `chang` đúng là trang `hide:1`. Đo sót một trang thì báo cáo xanh không
+> có nghĩa gì. 12 chỗ vá thêm ở lượt này: phễu chuyển đổi · biểu đồ phân bố lead · bảng hiệu suất
+> đội tư vấn · ba cột lead của bảng khối lượng VH11 · nhóm chỉ số P1-P3 (lead) và P4 (tiền) theo
+> `KPIMIEN` · hai ô lịch hẹn lead ở "Sắp diễn ra" · hai ô lead ở "Tình hình kinh doanh" · thẻ
+> phòng ban Tư vấn/Tài chính ở "Việc đang nợ" · ga "Chăm lại / Reup" của phễu tuyển sinh.
+> · **`_check11` cũng sai cách vào app:** nó gọi `applyScope(sid)` mà không đặt `GATE_SID`/
+> `CURSTAFF`, nên app dùng đúng bộ trang của chức danh nhưng vẫn tưởng người ngồi là ADMIN. Trước
+> đây không sao vì không câu nào hỏi tới quyền sở hữu dòng; nay có. **Vào app thì phải vào cho trọn.**
+> · **Miễn trừ có ghi lý do** (`MIENTRU` trong `_checkmien`): bảng công của Nhân sự có đơn giá
+> công giảng dạy ("250.000đ/buổi") và loại ca "test đầu vào" - đó là **lương và loại ca của giảng
+> viên**, không phải học phí học viên hay kho lead. Chặn hai chữ ấy lại là làm Nhân sự không tính
+> được lương.
+> · **Ba chỗ nữa lộ ra khi soi tiếp, đều đã vá:**
+>   · **Hai trang của phòng Nhân sự chưa bao giờ có mặt trên menu.** `ROLESCOPE.nhansu` khai
+>     `pages:[...,"nhansu","bangcong",...]` và trang đáp của họ là `nhansu`, `navVis` trả true,
+>     `_check11` hỏi navVis nên báo xanh - nhưng `NAVTREE` **không có hai khoá ấy ở bất kỳ nhóm
+>     nào**, mà menu chỉ vẽ những gì có trong cây. Họ đăng nhập vào rơi thẳng xuống một trang
+>     không mục nào sáng, đúng con bệnh trang Hỏi đáp anh Luân bắt hôm 04/08. **Hỏi `navVis` là
+>     hỏi "có ĐƯỢC PHÉP thấy không", không phải "có CHỖ ĐỨNG trên menu không"** - nay `_check11`
+>     hỏi cả hai, và có thêm một luật chung: **trang đáp của MỌI chức danh phải có mặt trên menu.**
+>   · **Huy hiệu tuổi việc ("quá 15h", "quá 10 ngày") chữ chìm vào nền** - #E08A1E trên #FFF6D8
+>     chỉ được tương phản 2.5, `_checkui` đo bằng thước thật. Nay dùng lại đúng cặp màu đậm đã có
+>     ở `.chip` (#854F0B / #A32D2D) để toàn app chỉ còn MỘT thang màu chữ trên nền cảnh báo.
+>   · **Bài hướng dẫn của Nhân sự trỏ ra ngoài màn ở khổ điện thoại** - bước 3 neo theo chữ
+>     "Bảng công giảng dạy", mà mục menu mới thêm mang đúng tên đó nên neo vớ luôn thanh menu
+>     (nằm ngoài khung nhìn trên điện thoại). **Neo theo CHỮ chỉ chắc khi chữ ấy là duy nhất trên
+>     màn** - thêm một mục menu trùng tên là neo lệch, và lệch kiểu này chỉ lộ ra ở khổ điện thoại.
+
 > **Phiên bản: V9.99 — NGỪNG PHÁT HÀNH BẢN V6 ✅ (04/08).**
 > · Anh Luân: *"Hủy V6 nhé em"* - chốt mức **ngừng phát hành, GIỮ mã nguồn**.
 > · **Đã gỡ:** không còn build `ITTs_WebApp_v6_demo.html` và `_APP6.js` · mục **4bis** của

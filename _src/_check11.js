@@ -91,37 +91,79 @@ var nv=NAVEL.innerHTML;
 if(!V6()){t("quantri: menu co du 4 tong quan chang", (nv.match(/data-k="chang[A-D]"/g)||[]).length===4);
 t("menu co cham mau arc", (nv.match(/class="navarc"/g)||[]).length===4);}
 /* navVis theo vai: tu van khong thay xep lop, giao vien khong thay lead */
+/* 05/08 - LOI CUA CHINH PHEP DO NAY: cac cau duoi day goi `applyScope(sid)` KHONG kem
+   `window.GATE_SID` / `CURSTAFF`, nen app dung dung bo trang cua chuc danh do nhung van tuong
+   nguoi dang ngoi la ADMIN. Truoc day khong sao vi khong cau nao hoi toi QUYEN SO HUU DONG.
+   Tu V9.99s thi co: ban do chang o pham vi "mine" phai co ho so that moi hien, ma "ADMIN" thi
+   khong so huu dong nao - do ra ai cung khong co chang. Vao app phai vao cho tron. */
+function vao(sid){window.GATE_SID=sid||"";CURSTAFF=sid||"";applyScope(sid||"")}
 var sales=rows("DL01").filter(function(x){return /^sales/.test(ecode(x.role))&&!/manager|leader/.test(ecode(x.role))})[0];
-applyScope(sales.staff_id);
+vao(sales.staff_id);
 t("tu van: thay nhaplead + reup, khong thay xeplop", navVis("nhaplead")&&navVis("reup")&&!navVis("xeplop"));
 /* Tu van CO viec trong hub Cho duyet (ban giao lead, viec cho nhan) nhung KHONG duoc thay
    chiet khau / hoan tien / doi soat tien - hub gom VIEC lai, khong gom QUYEN lai. */
 t("tu van chi thay tab cua minh trong Cho duyet",
   navVis("banggiao")&&navVis("duyetgiao")&&!navVis("duyetck")&&!navVis("duyethoan")&&!navVis("duyetthu"));
-t("tu van: thay tong quan chang (ban do vong doi)", navVis("changA")&&navVis("changB"));
+/* V9.99s - HOP DONG MOI CUA BAN DO CHANG (anh Luan 05/08, mo Truong phong ACA: *"a vao thu
+   truong phong aca hung van thay no bat hop ly"* - anh dang dung o "Chang 1 - Khach tiem nang"
+   voi ca phe u lead 82/54/12/40, trong khi ACA khai `lead:"none"`).
+   Luat cu chi hoi "co phai nhom gon khong" nen ca bon chang mo cho gan nhu moi nguoi. Luat moi:
+   mot chang chi dung tren menu khi (a) nguoi do co mien du lieu cua chang, (b) trong chang con
+   it nhat mot man nghiep vu ma chinh ho mo duoc, (c) o pham vi "mine" thi phai co ho so that.
+   Do lai bang may sau khi sua: tu van co C1 (khach tiem nang) va C4 (ket thuc & hoc tiep - reup,
+   ma gioi thieu); KHONG co C2/C3 vi trong hai chang do khong mot man nao thuoc pham vi cua ho. */
+t("tu van: thay chang khach tiem nang, khong thay chang van hanh lop",
+  navVis("changA")&&navVis("changD")&&!navVis("changB")&&!navVis("changC"));
 t("tu van: khong thay bao luu (tab khac bi khoa)", !navVis("baoluu"));
+/* Truong phong ACA - dung ca anh Luan chup anh. Ho lo chuyen mon giang day: chi con C2 Dang hoc. */
+var acam=rows("DL01").filter(function(x){return /^aca_/.test(ecode(x.role))})[0];
+if(acam){vao(acam.staff_id);
+ t("ACA: khong thay chang Khach tiem nang (khai lead none)", !navVis("changA"));
+ t("ACA: CO chang Dang hoc", navVis("changB"));
+ t("ACA: khong thay chang Tam dung / Ket thuc (viec cua Hoc vu)", !navVis("changC")&&!navVis("changD"));
+ t("ACA: khong thay hub Tuyen sinh va man Thanh toan", !navVis("tuyensinh")&&!navVis("thanhtoan"));}
 var gv=rows("DL01").filter(function(x){return /^teacher$/.test(ecode(x.role))})[0];
-applyScope(gv.staff_id);
+vao(gv.staff_id);
 t("giao vien: thay wow/banglop, khong thay nhaplead/thanhtoan", navVis("wow")&&navVis("banglop")&&!navVis("nhaplead")&&!navVis("thanhtoan"));
 /* V9.60 (anh Luân gom cổng nhân viên về đúng bộ phận SOP): IT / bảo vệ / tạp vụ đã ra khỏi
    demo, Nhân sự có nhóm riêng `nhansu`. Hợp đồng cũ neo vào nhóm "hỗ trợ gọn" - nhóm đó nay
    chỉ còn là chỗ dự phòng cho chức danh app chưa biết. Canh lại theo đúng vai còn sống. */
 var hr=rows("DL01").filter(function(x){return /^hr_/.test(ecode(x.role))})[0];
-if(hr){applyScope(hr.staff_id);
+if(hr){vao(hr.staff_id);
  t("nhan su: dung nhom rieng", SCOPE().group==="nhansu");
  t("nhan su: khong thay ban do chang (khong cham hoc vien)", !navVis("changA")&&!navVis("changB"));
  t("nhan su: khong thay hoc vien / tuyen sinh / thanh toan", !navVis("hocvien")&&!navVis("tuyensinh")&&!navVis("thanhtoan"));
  t("nhan su: khong vao duoc Cai dat va Bao cao", !navVis("settings")&&!navVis("baocao"));
- t("nhan su: CO man cua chinh ho (nhan su, bang cong, giao viec)", navVis("nhansu")&&navVis("bangcong")&&navVis("giaoviec"));}
+ /* 05/08 - CAU NAY TUNG HOI SAI CAU HOI: `navVis` tra loi "co DUOC PHEP thay khong", khong tra
+    loi "co CHO DUNG tren menu khong". Nhan su duoc phep thay `nhansu`/`bangcong` nhung hai khoa
+    ay khong nam trong NAVTREE, nen menu that cua ho chi co 4 muc va trang dap khong sang o dau.
+    Nay hoi ca hai: duoc phep VA co mat trong cay menu dang duoc ve. */
+ t("nhan su: CO man cua chinh ho (nhan su, bang cong, giao viec)",
+   ["nhansu","bangcong","giaoviec"].every(function(k){return navVis(k)&&navInTree(k)}));
+ t("nhan su: trang dap cua ho co mat tren menu", navInTree(SCOPE().land)&&navVis(SCOPE().land));}
+/* LUAT CHUNG, ap cho MOI chuc danh dang di lam (mo rong tu ca Nhan su o tren): trang ma app tha
+   nguoi ta xuong khi dang nhap (`SCOPE().land`) phai vua duoc phep xem, vua co mat tren cay menu
+   dang duoc ve - neu khong thi ho dung o mot trang khong muc nao sang, mat dau minh dang o dau. */
+(function(){var xau=[];
+ rows("DL01").filter(function(x){return x.staff_id&&staffActive(x)}).forEach(function(S){
+  vao(S.staff_id);var L=SCOPE().land;
+  if(!L)return;
+  /* Trang dap co the la mot HUB (vd ke toan dap xuong `tuyensinh` voi tab Thanh toan). O ban v5
+     hub khong dung tren menu, TAB cua no moi dung - nen hoi ca tab dang mo cua hub. */
+  var ok=[L,navOwner(L),hubSubKey(L)].filter(Boolean)
+    .some(function(k){return navVis(k)&&navInTree(k)});
+  if(!ok)xau.push(ecode(S.role)+"->"+L)});
+ vao("");
+ t("moi chuc danh: trang dap co mat tren menu"+(xau.length?" ["+xau.slice(0,4).join(", ")+"]":""), !xau.length)})();
 /* Marketing khong duoc xem tien - do that tren trang Bao cao thay vi tin loi khai */
 var mk=rows("DL01").filter(function(x){return /^marketing_(manager|leader)/.test(ecode(x.role))})[0];
-if(mk){applyScope(mk.staff_id);
+if(mk){vao(mk.staff_id);
  t("marketing (quan ly) khong duoc moi vao Bao cao", !navVis("baocao"));
  t("marketing bi cam tien trong pham vi", SCOPE().noTien===1);}
 /* IT / bao ve / tap vu da ra khoi cong nhan vien */
 t("cong nhan vien khong con IT / bao ve / tap vu",
   rows("DL01").filter(function(x){return /^(it_|janitor|security)/.test(ecode(x.role))}).length===0);
-applyScope("");
+vao("");
 /* navCur: highlight dung muc con theo tab */
 window.TSTAB="test";CUR="tuyensinh";
 t("navCur: dang o tab test -> muc test sang", navCur("test")===true&&navCur("nhaplead")===false);

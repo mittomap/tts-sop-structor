@@ -44,32 +44,55 @@ require("vm").runInThisContext(FS.readFileSync("./_APP.js","utf8"));
 
 /* dau hieu cua tung mien tren MAN HINH */
 const DAU={
- tien:/(\d[\d.]{5,}\s*đ)|học phí|công nợ|còn nợ|đã đóng|chiết khấu|hoàn tiền|phiếu thu|doanh thu/i,
+ tien:/(\d[\d.]{5,}\s*đ)|học phí|công nợ|còn nợ|đã đóng tiền|đã thu đủ|chiết khấu|hoàn tiền|phiếu thu|doanh thu/i,
  lead:/\blead\b|khách tiềm năng|tư vấn & đăng ký|test đầu vào|phễu|chăm lại/i,
 };
 const AI=(process.env.AI||"").split(",").filter(Boolean);
-const TRAN=15;               /* so cho ngoai mien do duoc 04/08 - chi duoc phep GIAM */
+/* MIEN TRU CO LY DO DOC DUOC - khong phai cong tac, tung dong mot ly do.
+   bangcong: Bang cong giang day la man cua NHAN SU. No co don gia cong ("250.000d/buoi") va co
+   loai ca "ca test dau vao" - hai chu nay trung voi dau hieu mien tien/lead, nhung chung khong
+   phai hoc phi cua hoc vien cung khong phai kho lead: chung la LUONG va LOAI CA cua giang vien,
+   dung nghiep vu ma phong Nhan su phai tinh. Chan hai chu nay lai la lam Nhan su khong tinh
+   duoc luong - do la bo bot chu khong phai phan quyen. */
+const MIENTRU=[["nhansu","bangcong","tien"],["nhansu","bangcong","lead"]];
+const TRAN=0;                /* so cho ngoai mien con lai - chi duoc phep GIAM, khong duoc nang */
 let tong=0;
 (DL.DL01||[]).filter(s=>s.staff_id&&staffActive(s)&&(!AI.length||AI.indexOf(s.staff_id)>=0)).forEach(S=>{
  window.GATE_SID=S.staff_id;applyScope(S.staff_id);setRole("all");window.BANAI="";
  const g=SCOPE().group;
  const mien={}; ["lead","hocvien","lop","tien","baocao","viec","nhansu","noidung"].forEach(d=>{try{mien[d]=dsLevel(d)}catch(e){mien[d]="?"}});
  const ra=[];
- PAGES.filter(p=>!p.hide&&canSee(p.k)).forEach(p=>{
-  let o="";CUR=p.k;
+ /* 05/08 - BAY DA CAN, LOI CUA CHINH PHEP DO NAY: vong lap duoi day bo qua moi trang `hide:1`,
+    ma `chang` (Ban do chang) chinh la mot trang hide:1 - no khong nam thang tren menu, bon muc
+    C1..C4 tro vao no qua window.ARC. Nen bon man CHANG - dung cho anh Luan chup anh Truong phong
+    ACA dang dung o "Chang 1 - Khach tiem nang" voi ca phe u lead - chua bao gio duoc ve mot lan
+    nao trong phep do. Do sot mot trang thi bao cao xanh khong co nghia gi.
+    Nay ve them: moi chang ma `arcXem` cho phep, dung cach app dung (dat window.ARC roi goi
+    renderChang), cong voi cac trang hide:1 khac ma menu van dan toi duoc. */
+ const TRANG=PAGES.filter(p=>!p.hide&&canSee(p.k)).map(p=>({k:p.k,arc:""}));
+ try{ARCS.forEach(A=>{if(arcXem(A.k))TRANG.push({k:"chang",arc:A.k})})}catch(e){}
+ TRANG.forEach(p=>{
+  let o="";CUR=p.k;if(p.arc){window.ARC=p.arc;window.CHANGK=""}
   try{o=(PBK[p.k]&&PBK[p.k].ty==="list")?renderList(p.k):(RENDER[p.k]?RENDER[p.k]():"")}catch(e){return}
   /* Bo VIEC NOI BO ra khoi phep do: tieu de va noi dung viec giao la CHU CUA NGUOI DUNG go vao
      ("Xem giup so lieu doanh thu...", "Chuan bi de test dau vao"), khong phai du lieu app bay ra.
      Do ca chu cua nguoi dung la to oan - dung cai bay da can o _checkux luat "goi hoc vien la em". */
   let o2=String(o||"");
-  if(p.k==="giaoviec"||p.k==="duyet")o2=o2.replace(/<div class="tkti">[\s\S]*?<\/div>/g," ")
-    .replace(/<div class="tkct">[\s\S]*?<\/div>/g," ").replace(/<b>[^<]{20,}<\/b>/g," ");
+  /* Lop markup THAT cua mot dong viec giao la .tktt (tieu de) va .tkmeta - ban dau file nay go
+     nham thanh .tkti/.tkct nen KHONG boc duoc gi, va hai lan "ro" con lai o giao viec deu la
+     chu nguoi dung tu go ("Xem giup so lieu doanh thu...", "Chuan bi de test dau vao dot moi").
+     Do chu cua nguoi dung la to oan - dung cai bay da can o _checkux luat "goi hoc vien la em". */
+  if(p.k==="giaoviec"||p.k==="duyet"||p.k==="viec")o2=o2
+    .replace(/<div class="tktt">[\s\S]*?<\/div>/g," ")
+    .replace(/<div class="tkmeta">[\s\S]*?<\/div>/g," ")
+    .replace(/<b>[^<]{20,}<\/b>/g," ");
   const txt=o2.replace(/<[^>]*>/g," ").replace(/\s+/g," ");
   Object.keys(DAU).forEach(d=>{
    if(mien[d]!=="none")return;
+   if(MIENTRU.some(x=>x[0]===g&&x[1]===p.k&&x[2]===d))return;
    const m=txt.match(DAU[d]);
-   if(m){const i=txt.indexOf(m[0]);
-    ra.push(p.k+" ["+d+"] ..."+txt.slice(Math.max(0,i-45),i+45).trim()+"...")}
+   if(m){const i=(m.index!=null?m.index:txt.indexOf(m[0]));
+    ra.push((p.arc||p.k)+" ["+d+"] <<"+m[0]+">> ..."+txt.slice(Math.max(0,i-45),i+45).trim()+"...")}
   });
  });
  tong+=ra.length;
