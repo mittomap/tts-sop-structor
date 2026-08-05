@@ -164,6 +164,47 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.99z5/z6 — SIDEBAR LÀ BẢN ĐỒ ĐỦ MỤC, VÀ CHUỖI VIỆC QUA NHIỀU NGƯỜI ĐƯỢC ĐO ✅ (05/08).**
+> · **Sidebar thiếu mục - đo ra bằng máy, không đoán.** Anh Luân: *"lệch nhau giữa nghiệp vụ bên
+> trong và trang trên sidebar là do thiết kế vậy hả em, hay do sót nhỉ"* … *"tại thiếu thì có
+> thể người ta đang ở đâu họ ko biết, bên sidebar giống như 1 cái bản đồ vậy"*. Dựng THẬT thanh
+> menu của 17 chức danh rồi so với thanh tab của chính hub ấy: hub **Học tập có 7 tab mà menu
+> chỉ dẫn tới 3**; hub **CSKH có 4 tab mà menu chỉ có tên hub**. Nay mọi tab đều có một mục
+> menu (thêm khoá trang `buoihnay`, `lichtuan` cho hai tab chưa từng có khoá riêng), xếp đúng
+> thứ tự thanh tab. Menu đọc ra ba tầng: **chặng > hub > tab**, mỗi tầng thụt một bậc.
+> · **`navGroupOf` mở nhầm nhóm.** Hàm hỏi hai câu trong cùng một vòng, nên nhóm nào đứng trước
+> mà có một mục con thuộc `k` là thắng: bấm **CSKH** thì app mở nhóm *Làm việc* (vì "Học viên
+> liên hệ" nằm đó và thuộc hub CSKH), còn nhóm thật sự chứa CSKH vẫn gập - **không mục nào
+> sáng**, người dùng mất dấu. Đã tách làm hai lượt hỏi.
+> · **`_bamGoc` chốt SAU phép remap** nên bấm *Test đầu vào / Tư vấn / Thanh toán / Chăm lại* là
+> bị đẩy ngược về tab Lead - đúng con bệnh "đơ đơ" đã sửa cho hub Học tập, tái phát ở hub Tuyển
+> sinh vì chốt đặt sai chỗ một dòng.
+> · **Bảng công là TAB thật của trang Giảng viên** (`HUBTAB.giangvien`), nên mục "Bảng công" mới
+> sáng đúng lúc. Trưởng phòng ACA và Kế toán nay có bảng công; và **bảng công không hiện một con
+> số tiền nào với ai khai `tien:"none"`** - đơn giá giờ, đơn giá WOW, đơn giá test và cột tiền
+> công tạm tính đều tắt, ô thẻ vẫn còn chỗ nhưng ghi dấu gạch kèm lý do.
+> · **Giáo viên và đội WOW không còn tab "GV dự phòng" và "Phòng & đụng lịch"** - hai màn ấy là
+> cửa GHI của Học vụ/ACA, mở cho họ chỉ để bấm vào rồi bị từ chối.
+> · **NHỊP NGÀY suýt mất trong im lặng.** V9.99z3 gỡ phần xử lý việc khỏi Trợ lý theo đúng ý anh
+> Luân - nhưng tấm Trợ lý khi ấy là NƠI DUY NHẤT vẽ nhịp ngày, nên `nhipList()` còn nguyên, còn
+> cấu hình được trong Cài đặt, mà **không một hàm nào gọi tới nữa**. Anh bảo bỏ *xử lý việc*,
+> không bảo bỏ nhịp ngày. Nay nhịp ngày nằm ở **trang Việc hôm nay** - đúng chỗ người ta mở ra
+> để hỏi "hôm nay tôi làm gì".
+> · **Gõ tìm trong danh sách NHÚNG nuốt cả trang** (anh Luân bắt ở *Lead & khai thác*: *"tự
+> nhiên nó nhảy cái gì ấy, xuất hiện nút thêm mới gì đó, bấm vào lại ra popup"*). `listSearch`,
+> `openEdit`, `newForm`, `cancelEdit` vẽ lại bằng BẢN ĐỘC LẬP của danh sách rồi nhét thẳng vào
+> thân trang - gõ một chữ là hub biến mất, thay bằng sổ dữ liệu thô có nút "Thêm mới" và khung
+> nhập bản ghi. Bốn hàm nay đi chung một cửa `listPaint`, hỏi TRANG ĐANG MỞ.
+> · **Bộ kiểm `_checkchuoi` - CHUỖI PHỐI HỢP NHIỀU NGƯỜI** (anh Luân đặt: *"nhớ kiểm tra logic
+> nghiệp vụ khi phối hợp nhiều người nha… học viên gửi xin nghỉ học, thì tiếp theo là gì, ai
+> duyệt"*). 6 chuỗi × 6 mắt xích = 31 tiêu chí chạy thật. **Bắt được ngay lần đầu**: ô *"Chờ tôi
+> xác nhận (N)"* dẫn sang nhóm lọc *Đang chạy*, mà nhóm ấy chỉ có việc *mới giao* + *đã nhận*,
+> KHÔNG có việc *đã báo xong* - mắt xích cuối của chuỗi giao việc không có cửa nào dẫn tới.
+> · **Nút Trợ lý bấm được cả cụm** (anh Luân); cổng đăng nhập gọi đúng **WOW Leader**; hàng
+> nhãn-giá trị (`.kv`) thành hai cột thật, giá trị canh trái, có gạch chân nhạt để bám hàng.
+> · `_check11` thêm **6 luật sidebar** đo trên 17 chức danh (đã thử mutation cho từng luật), và
+> 12 hợp đồng lạc hậu trong `_check11/16/17/18/checkaudit/checkmat` đã sửa lại theo luật mới.
+
 > **Phiên bản: V9.99v/w — MỖI NGƯỜI MỘT TRANG CHỈ SỐ CỦA CHÍNH MÌNH ✅ (05/08).**
 > · **`buildNav()` cắm cứng `NAVTREE`** nên toàn bộ cơ chế chọn khung menu không có tác dụng gì
 > lên thanh menu THẬT: các MỤC chặng biến mất (vì `navVis` lọc từng mục) nhưng **TIÊU ĐỀ NHÓM

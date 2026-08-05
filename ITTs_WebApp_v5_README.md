@@ -2220,3 +2220,45 @@ Nút **đổi cổng** trên thanh trên nay mở ngăn kéo **"Đổi cổng / 
 nói. Trước đây nó là chỗ đổi người: trông như một cái nút mà bấm vào lại văng ra màn đăng nhập,
 không ai đoán được, và nó nằm xa nút đổi cổng trong khi cả hai cùng trả lời một câu hỏi - *"tôi muốn
 nhìn app bằng mắt của ai"*.
+
+---
+
+# Cập nhật V9.99z5 / z6 — sidebar là bản đồ đủ mục, nhịp ngày về đúng chỗ, chuỗi việc khép kín
+
+## Menu trái đọc ra ba tầng: chặng > hub > tab
+Mỗi **tab** bên trong một hub nay đều có **một mục trên menu**. Trước bản này hub "Học tập &
+Giảng dạy" có 7 tab mà menu chỉ dẫn tới 3 (GV dự phòng · Phòng học · Buổi WOW); hub "CSKH ·
+Khảo sát & Phản hồi" có 4 tab mà menu chỉ có tên hub. Thiếu một mục là mất một chỗ trên bản đồ:
+người dùng biết màn hình ấy tồn tại nhưng không có đường tìm lại.
+
+- Mục mới trên menu: **Buổi hôm nay · Lịch tuần · Lớp học · Nhận xét buổi** (hub Học tập) và
+  **Khảo sát · Phản hồi / Góp ý · Khiếu nại** (hub CSKH).
+- Thứ tự các mục con xếp **đúng thứ tự thanh tab** của hub, để menu và màn hình đọc như nhau.
+- Ba bậc thụt: "Bản đồ chặng" thụt nhẹ, mục nghiệp vụ trong chặng thụt một bậc, tab của hub
+  thụt thêm một bậc nữa.
+- Bấm vào **tên hub** thì hub mở tab mặc định, mục con ứng với tab ấy sáng, và hàng của hub
+  sáng mờ (biết mình đang ở đâu đó trong nhóm này).
+
+## Nhịp ngày của bạn — nằm ở trang Việc hôm nay
+Nhịp ngày theo chức danh (đầu ngày · trong ngày · cuối ngày) nay hiện ngay trên trang **Việc hôm
+nay**. Hai loại dòng không trộn: **hàng chờ** có số đếm (hết thì ghi "xong"), **thói quen** ghi
+"nên xem" và không bao giờ được gắn mác xong.
+
+## Trang Quản lý việc giao & nhận — nhóm lọc "Chờ tôi xác nhận"
+Ô số *"Chờ tôi xác nhận (N)"* nay dẫn vào đúng nhóm lọc chứa N việc ấy. Trước đây nó dẫn sang
+nhóm "Đang chạy" - nhóm chỉ có việc *mới giao* và *đã nhận* - nên bấm vào là mở ra một danh sách
+**không có** những việc đang chờ chính mình xác nhận.
+
+## Bảng công giảng dạy: giờ cho người duyệt chuyên môn, tiền cho khối tiền
+Trưởng phòng ACA và Kế toán nay xem được bảng công. Ai không có phạm vi dữ liệu **tiền** thì bảng
+này chỉ đếm công - đơn giá giờ, đơn giá WOW, đơn giá test và cột "Tiền công tạm tính" đều tắt.
+
+## Những chỗ nhỏ
+- Nút **Trợ lý** bấm được cả cụm, không chỉ cái bóng đèn.
+- Cổng đăng nhập gọi đúng tên **WOW Leader**.
+- Hàng nhãn - giá trị trong ngăn kéo thông tin thành **hai cột thật**, giá trị canh trái, có
+  gạch chân nhạt để mắt bám hàng (trước đây nhãn dính mép trái, giá trị dính mép phải).
+- Gõ tìm trong một danh sách **nhúng** (Lead & khai thác, Nhân viên, Sổ thu, Giảng viên) không
+  còn thay cả trang bằng sổ dữ liệu thô.
+- Giáo viên và đội WOW không còn tab "GV dự phòng" / "Phòng & đụng lịch" - đó là cửa ghi của
+  Học vụ và Trưởng phòng ACA.

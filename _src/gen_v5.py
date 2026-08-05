@@ -16221,7 +16221,7 @@ function renderHoctap(){
  /* V9.99z5 - thanh tab của hub này (và của hub CSKH) chưa bao giờ đi qua `scopeTabs`, trong
     khi ba hub kia có. Nên khai `tabs:{hoctap:[...]}` cho một chức danh thì menu thu lại mà
     thanh tab vẫn mở đủ 7 cửa - hai chỗ nói hai đằng. */
- h+=tbar(segHTML(tab,scopeTabs("hoctap",[["today","Hôm nay",todayN||"",""],["lichtuan","Lịch tuần","",""],["gvdp","GV dự phòng",nNoGv||"",nNoGv?"red":""],["phong","Phòng & đụng lịch",clashList().length||"",clashList().length?"red":""],["lop","Lớp học",cls.length||"",""],["buoihoc","Nhận xét buổi",nNote||"",nNote?"red":""],["wow","Buổi WOW 1-1",nWow||"",nWow?"amber":""]]),"htTabSet('{k}')"),
+ h+=tbar(segHTML(tab,scopeTabs("hoctap",[["today","Buổi hôm nay",todayN||"",""],["lichtuan","Lịch tuần","",""],["gvdp","GV dự phòng",nNoGv||"",nNoGv?"red":""],["phong","Phòng & đụng lịch",clashList().length||"",clashList().length?"red":""],["lop","Lớp học",cls.length||"",""],["buoihoc","Nhận xét buổi",nNote||"",nNote?"red":""],["wow","Buổi WOW 1-1",nWow||"",nWow?"amber":""]]),"htTabSet('{k}')"),
   '<button class="pill" onclick="go(\'giaoan\')"><i class="ti ti-notes"></i>Kho bài & Giáo án</button><button class="pill" onclick="go(\'banglop\')"><i class="ti ti-clipboard-list"></i>Vận hành lớp</button>');
  h+=bvSau();   /* chọn chặng xong mới tới bảng việc của chức danh */
  if(tab==="today")h+=renderHtToday(1);
