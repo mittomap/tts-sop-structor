@@ -194,6 +194,7 @@ echo "${Dam}== 5. KIEM THU TREN TRINH DUYET THAT ==${Het}"
 # (mot kho man, 14 trang, ~50 giay) nen khong co ly do gi de no vang mat o tang nhanh.
 chay "_checkmat do bang mat" "CHECKMAT (OK|BO QUA)" node _checkmat.js
 chay "_checkdrawer hinh hoc ngan keo" "CHECKDRAWER OK" node _checkdrawer.js
+chay "_checkcrumb vet duong di" "CHECKCRUMB OK" node _checkcrumb.js
 if [ $NHANH -eq 1 ]; then
   ghi "_checkui" BOQUA "bo qua vi chay voi --nhanh"
 else

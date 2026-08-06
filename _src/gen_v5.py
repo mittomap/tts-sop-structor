@@ -265,15 +265,24 @@ tr.cfhl>td{background:#FFF6D8}
 .cfbar span{flex:1;min-width:0}
 .topbar{height:60px;flex-shrink:0;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 22px}
 .topbar h1{font-size:17px;font-weight:700}.topbar .crumb{font-size:11px;color:var(--muted);font-weight:500;margin-top:1px}
-.crumb{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+/* V9.99z10 (anh Luân, kèm ảnh: *"em nên có phương án cho breadcrumb nhé, nó rớt hàng rất xấu
+   nếu dài"*). Trước đây `flex-wrap:wrap` - vệt dài thì rớt xuống dòng hai, đẩy cả thân trang
+   xuống và trông như hỏng. Nhưng CẤM rớt hàng không thôi thì vệt sẽ bị cắt cụt ở mép phải, mất
+   luôn mục CUỐI - mà mục cuối chính là "tôi đang đứng ở đâu", thứ quan trọng nhất trên cả vệt.
+   Nên luật là: MỘT HÀNG, và khi chật thì **các mốc GIỮA teo lại trước** (mỗi mốc tự cụt bằng dấu
+   ba chấm), còn mốc ĐANG ĐỨNG luôn giữ ít nhất 140px. Hết đường co thì bảng rút gọn "mốc đầu ...
+   2 mốc gần nhất" bên `renderCrumb` đã lo phần còn lại. */
+.crumb{display:flex;align-items:center;gap:5px;flex-wrap:nowrap;overflow:hidden}
 .crbback{border:1px solid var(--line);background:#fff;color:var(--navy);width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;margin-right:3px;flex:none}
 .crbback:hover{background:#FAFBFD;border-color:var(--navy)}.crbback i{font-size:14px}
 .crb{font-size:11px;color:var(--muted);font-weight:500}
 a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-decoration:underline}
 .crb.cur{color:var(--ink);font-weight:600}
 .crbsep{color:#B9C6D6;font-size:11px}
-.crbi{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;min-width:0}
-.crbi .crb{overflow:hidden;text-overflow:ellipsis}
+.crbi{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;min-width:0;flex:0 100 auto}
+/* Mốc đang đứng co sau cùng và không bao giờ nhỏ hơn 140px - chật mấy cũng phải đọc được mình ở đâu. */
+.crbi:last-child{flex:0 1 auto;min-width:140px}
+.crbi .crb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .rolesel{margin-left:auto;display:flex;align-items:center;gap:8px;position:relative}
 .notif{position:absolute;top:46px;right:0;width:372px;max-height:74vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 44px #0000002e;z-index:80;display:none}
 .notif.on{display:block}
@@ -20878,6 +20887,16 @@ function renderCrumb(){var host=document.getElementById("pgCrumb");if(!host)retu
  }else{for(var i=0;i<h.length;i++)parts.push(step(i))}
  if(!h.length&&p.g&&p.g!=="_")parts.push('<span class="crb">'+esc(p.g)+'</span>'); /* chưa đi đâu: hiện nhóm menu cho có ngữ cảnh */
  parts.push('<span class="crb cur">'+esc(crumbLabel(CUR,navSnap()))+'</span>');
+ /* V9.99z10 - KHONG NOI LAI THU VUA NOI. Anh Luân gửi ảnh có "Học tập & Giảng dạy · Theo dõi
+    nhận xét buổi" đứng LIỀN NHAU HAI LẦN. Lịch sử gạn trùng theo KHOÁ TRANG, mà hai khoá khác
+    nhau (`buoihoc` và `hoctap`) lại vẽ ra ĐÚNG MỘT dòng chữ vì `go()` gộp tab con về trang cha.
+    Gạn theo khoá là gạn cái máy nhìn thấy; người đọc chỉ nhìn thấy CHỮ - nên gạn theo chữ. */
+ (function(){var sach=[],i,t,tr="";
+  for(i=0;i<parts.length;i++){
+   t=String(parts[i]).replace(/<[^>]*>/g,"").trim();
+   if(t&&t===tr)continue;                    /* trùng ngay mốc liền trước -> bỏ */
+   tr=t;sach.push(parts[i])}
+  parts=sach})();
  /* V9.99i (anh Luân, kèm ảnh: *"breadscrumb lỗi nhé"*). Vệt đường đi là một hàng `flex-wrap`,
     còn dấu `›` trước đây là một phần tử RIÊNG nằm giữa hai mục. Vệt dài quá một dòng thì mục
     cuối rớt xuống dòng dưới mà DẤU NGĂN ở lại cuối dòng trên - hiện ra đúng như ảnh anh gửi:

@@ -455,6 +455,18 @@ Chi tiet "vi sao" o `02_NHAT_KY_QUYET_DINH.md`. O day chi ghi nhung cho **cham v
   lai tai cho** (Ban lam viec mo ho so ngay trong trang) - tu oan 8 dong dang chay dung; (b) rut
   ma ho so tu `textContent` thi chu cac o dinh lien nhau ("LOP-FOUND-PLA-01"+"10"+"100") thanh
   mot ma bia ra - nay chi hoi khi dong TU KHAI ma bang `data-mo-arg`.
+- **`_checkcrumb.js` (MOI, V9.99z10)** - **VET DUONG DI PHAI NAM TRON MOT HANG**. Anh Luan 05/08
+  kem anh: *"em nen co phuong an cho breadcrumb nhe, no rot hang rat xau neu dai"*. Trong chinh
+  anh do con loi thu hai: mot moc dung LIEN NHAU HAI LAN.
+  Hai cai sai, hai goc: (1) `.crumb{flex-wrap:wrap}` - vet dai thi rot dong hai. Nhung cam rot
+  hang khong thoi la vet bi cat cut o mep phai, mat luon moc CUOI - ma moc cuoi moi la "toi dang
+  dung o dau". Nen: MOT HANG, chat thi cac moc GIUA teo truoc, moc dang dung giu it nhat 140px.
+  (2) Lich su gan trung theo KHOA TRANG, ma `buoihoc` va `hoctap` ve ra dung mot dong chu vi
+  `go()` gop tab con ve trang cha - gan theo khoa la gan cai MAY thay, nguoi doc chi thay CHU.
+  **DO O BA KHO MAN (1440/1100/860) - va day moi la diem chinh: loi nay KHONG lo ra o 1440px.**
+  `_checkmat` co y chi do mot kho man nen no khong the thay. Ban cu do lai: 22px o 1440 nhung
+  **41px o 1100 va 60px o 860** (hai va ba dong). Ban moi: 22px o ca ba.
+  Da tu thu lai cai thuoc: chay tren ban CU thi no do dung hai kho man hep.
 - **`_checkdrawer.js` (MOI, V9.99z10)** - **HINH HOC CUA NGAN KEO**, do bang Chromium that.
   Anh Luan 05/08 kem anh chup: *"co vai loi css o drawer em"* - o chon hoc vien cao 224px, chua
   mot mang trang gan nua man hinh. Goc: `.pk{flex:1 1 224px}` dat hoi V9.99f de noi CHIEU RONG,

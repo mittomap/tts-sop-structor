@@ -18902,6 +18902,16 @@ function renderCrumb(){var host=document.getElementById("pgCrumb");if(!host)retu
  }else{for(var i=0;i<h.length;i++)parts.push(step(i))}
  if(!h.length&&p.g&&p.g!=="_")parts.push('<span class="crb">'+esc(p.g)+'</span>'); /* chưa đi đâu: hiện nhóm menu cho có ngữ cảnh */
  parts.push('<span class="crb cur">'+esc(crumbLabel(CUR,navSnap()))+'</span>');
+ /* V9.99z10 - KHONG NOI LAI THU VUA NOI. Anh Luân gửi ảnh có "Học tập & Giảng dạy · Theo dõi
+    nhận xét buổi" đứng LIỀN NHAU HAI LẦN. Lịch sử gạn trùng theo KHOÁ TRANG, mà hai khoá khác
+    nhau (`buoihoc` và `hoctap`) lại vẽ ra ĐÚNG MỘT dòng chữ vì `go()` gộp tab con về trang cha.
+    Gạn theo khoá là gạn cái máy nhìn thấy; người đọc chỉ nhìn thấy CHỮ - nên gạn theo chữ. */
+ (function(){var sach=[],i,t,tr="";
+  for(i=0;i<parts.length;i++){
+   t=String(parts[i]).replace(/<[^>]*>/g,"").trim();
+   if(t&&t===tr)continue;                    /* trùng ngay mốc liền trước -> bỏ */
+   tr=t;sach.push(parts[i])}
+  parts=sach})();
  /* V9.99i (anh Luân, kèm ảnh: *"breadscrumb lỗi nhé"*). Vệt đường đi là một hàng `flex-wrap`,
     còn dấu `›` trước đây là một phần tử RIÊNG nằm giữa hai mục. Vệt dài quá một dòng thì mục
     cuối rớt xuống dòng dưới mà DẤU NGĂN ở lại cuối dòng trên - hiện ra đúng như ảnh anh gửi:
