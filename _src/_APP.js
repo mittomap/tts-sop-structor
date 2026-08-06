@@ -19252,7 +19252,7 @@ var NAVTREE=[
  {g:"Chờ duyệt",items:["duyetck","duyethoan","duyetnghi","duyetthu","banggiao"]},
  /* V9.99m (anh Luân 04/08: *"cái trang hỏi đáp... nó đang ở đâu nhỉ, a thấy tour thì hiện ra,
     mà a tìm trên sidebar ko thấy"*) - đúng, và đây là một chỗ SÓT KHI GỠ V6: trang Hỏi đáp có
-    mục menu ở NAVTREE6 nhưng chưa bao giờ có ở cây menu bản V5, nên nó chỉ mở được bằng nút Trợ
+    mục menu ở cây của bản v6 (đã gỡ 06/08) nhưng chưa bao giờ có ở cây menu V5, nên chỉ mở được bằng nút Trợ
     lý. Trong khi bài hướng dẫn về nó vẫn chạy ở bản 5 - người xem tour thấy trang, đi tìm thì
     không có cửa nào. Nay nó có chỗ đứng thật; nút Trợ lý vẫn mở nó như cũ, đây là thêm một lối. */
  /* V9.99s - HAI TRANG CỦA PHÒNG NHÂN SỰ CHƯA BAO GIỜ CÓ MẶT TRÊN MENU. Đo được 05/08 bằng cách
@@ -19400,7 +19400,7 @@ function navCur(k){
 /* V9.27: quét menu xem có mục nào đang sáng không, và mục nào */
 var NAVFROM="";
 /* Hai hàm này trước đây duyệt CẮM CỨNG `NAVTREE` - cây menu của bản v5. Bản v6 dựng menu từ
-   `NAVTREE6`, nên chúng dò nhầm cây: mở một trang ra, hàm tìm thấy mục trong cây KHÔNG ĐƯỢC VẼ
+   cây menu của bản v6 (đã gỡ 06/08), nên chúng dò nhầm cây: mở một trang ra, hàm tìm thấy mục trong cây KHÔNG ĐƯỢC VẼ
    rồi báo "đang sáng", trong khi trên màn hình không mục nào sáng cả. Người dùng mất dấu mình
    đang đứng đâu - đúng con bệnh W1 đã chữa cho v5, tái phát ở v6 vì quên hỏi "hàm này còn dùng
    cây nào nữa không".
@@ -20192,7 +20192,7 @@ function trangChuURL(){
   if(kh)return kh;
   if(congKieuFile())return TRANGCHU;
   var p=location.pathname;
-  var b=p.replace(/(cong-nhan-vien-v6|cong-nhan-vien|cong-hoc-vien)\/?[^\/]*$/,"");
+  var b=p.replace(/(cong-nhan-vien|cong-hoc-vien)\/?[^\/]*$/,"");
   if(b===p)return TRANGCHU;
   if(b.slice(-1)!=="/")b+="/";
   return b}
@@ -20203,8 +20203,8 @@ function congURL(w){
  if(congKieuFile()){var d=p.replace(/[^\/]*$/,"");
   return w==="nv"?(d+"ITTs_WebApp_v5_demo.html"):(d+"ITTs_TrangHocVien_demo.html"+(w==="ph"?"?phuhuynh":""))}
  /* Tên dài đứng TRƯỚC trong nhánh chọn: để "cong-nhan-vien" đứng trước thì đường dẫn
-    .../cong-nhan-vien-v6/ không cắt được đuôi, gốc tính sai và cổng kia ra 404. */
- var b=p.replace(/(cong-nhan-vien-v6|cong-nhan-vien|cong-hoc-vien)\/?[^\/]*$/,"");
+    một thư mục cổng lạ thì cắt không được, gốc tính sai và cổng kia ra 404. */
+ var b=p.replace(/(cong-nhan-vien|cong-hoc-vien)\/?[^\/]*$/,"");
  if(b===p)b=p.replace(/[^\/]*$/,"");
  if(b.slice(-1)!=="/")b+="/";
  return w==="nv"?(b+"cong-nhan-vien/"):(b+"cong-hoc-vien/"+(w==="ph"?"?phuhuynh":""))}
@@ -20223,7 +20223,7 @@ function congHTML(){var cur=congDangO(),h="";
  h+='<div class="fhint" style="margin:0 0 12px">Ba cổng dùng chung một bộ dữ liệu demo - đổi qua lại bao nhiêu lần thì số liệu vẫn là một.</div>';
  /* V9.99 - O CHON BAN DA GO. Anh Luan 04/08: *"Huy V6 nhe em"* (muc: ngung phat hanh, giu ma
     nguon). Ngan keo nay tung co them muc "Ban dang xem" de nhay qua lai giua ban 5 va ban 6;
-    khong con ban 6 de nhay toi nen muc do bien mat. Ham congDiBan/congLaV6/congBanNho van con
+    khong con ban 6 de nhay toi nen muc do bien mat; 06/08 go not may moc doi ban. Chu thich giu lai
     trong nguon - chung tra ve "ban 5" cho moi truong hop, va la duong bat lai neu mai kia dung
     lai ban thu hai. */
  CONGDS.forEach(function(c){var here=(c[0]===cur);

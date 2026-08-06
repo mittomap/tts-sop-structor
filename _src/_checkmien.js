@@ -47,7 +47,13 @@ const DAU={
  /* 05/08 - to oan: mau cu `\d[\d.]{5,}\s*đ` vo luon SO DIEN THOAI dung truoc mot chu D hoa
     ("0334728038 Đã thành học vien"). Tien trong app luon di qua vnd() nen CO DAU CHAM nghin va
     chu d THUONG dinh sat: 461.266.668d. Doi mau theo dung hinh dang do. */
- tien:/(\d{1,3}(\.\d{3})+\s*đ)|học phí|công nợ|còn nợ|đã đóng tiền|đã thu đủ|chiết khấu|hoàn tiền|phiếu thu|doanh thu/i,
+ /* V9.99z11 - "còn nợ" MỘT MÌNH KHÔNG PHẢI TỪ CỦA MIỀN TIỀN. App có việc "Buổi còn nợ nhận
+    xét" (giảng viên chưa viết nhận xét buổi) - không liên quan gì tới tiền. Trước đây không lộ
+    ra vì trang chứa câu đó nằm ngoài phạm vi mọi chức danh; 06/08 nó thành trang hồ sơ phụ
+    huynh của V5 nên giảng viên đọc được, và thước chấm oan 5 người.
+    Luật số 1 của GIAO_THUC_AUDIT: nghi cái thước trước. Đúng là thước sai - nên sửa thước,
+    KHÔNG sửa câu chữ của app cho vừa lòng một biểu thức. */
+ tien:/(\d{1,3}(\.\d{3})+\s*đ)|học phí|công nợ|còn nợ(?!\s*nhận xét)|đã đóng tiền|đã thu đủ|chiết khấu|hoàn tiền|phiếu thu|doanh thu/i,
  lead:/\blead\b|khách tiềm năng|tư vấn & đăng ký|test đầu vào|phễu|chăm lại/i,
 };
 const AI=(process.env.AI||"").split(",").filter(Boolean);
