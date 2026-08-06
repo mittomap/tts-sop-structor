@@ -93,11 +93,25 @@ chỉnh thì giữ nguyên.
    "⭐ HIỆN TRẠNG" + VIỆC TỒN. App đổi tính năng thì thêm mục vào `ITTs_WebApp_v5_README.md`.
 2. Đẩy repo này: phiên cloud Claude Code tự `git add -A` + commit `cap nhat <ngay gio>` + push
    (từ 28/07 chiều phiên cloud có quyền ghi cả 2 repo); làm trên máy Luân thì chạy `./push.sh`.
-3. Nếu 3 file app ở gốc có bản mới: chép 3 file **cộng `_src/trangchu_demo.html` -> `index.html`**
-   sang gốc repo `mittomap/itts-sop-demo` rồi
-   commit + push (phiên cloud tự làm; trên máy Luân thì chạy `./update.sh` trong
-   `~/Claude/itts-sop-demo`). Demo online: https://mittomap.github.io/itts-sop-demo/
-   (Pages deploy mất 1-2 phút; xem lại nhớ Cmd+Shift+R để bỏ cache).
+3. Nếu 3 file app ở gốc có bản mới: **CHẠY `./update.sh` trong repo demo** - đừng chép tay:
+   ```
+   cd ~/itts-sop-demo && ITTS_SRC=/home/user/tts-sop-structor ./update.sh
+   ```
+   **BẪY ĐÃ CẮN NGUYÊN MỘT NGÀY (05/08):** trang demo online KHÔNG phục vụ ba file ở gốc repo.
+   Nó phục vụ **`cong-nhan-vien/index.html`** và **`cong-hoc-vien/index.html`** - hai bản chép
+   riêng, có sửa đường dẫn dữ liệu thành `../ITTs_data.js`. Ba file ở gốc chỉ còn để link cũ
+   (trước 28/07) không chết. Cả ngày 05/08 em chép đúng ba file ở gốc rồi báo "đã đẩy, anh
+   refresh đi" - anh Luân refresh, mở cả tab ẩn danh, vẫn thấy bản 08:06 sáng, rồi báo đi báo
+   lại "bấm menu không ăn", "đơ đơ", "sao tải lại vẫn không đúng bản mới". Em thì đo trên file
+   ở gốc nên lần nào cũng thấy đúng. **Hai người nhìn hai file khác nhau suốt một ngày.**
+4. **Đối chiếu MÃ BẢN DỰNG sau khi đẩy** - bắt buộc, đây là chốt cửa của bẫy trên:
+   ```
+   grep -oP 'id="navver"[^>]*>[^<]*<b>[a-f0-9]{6}' cong-nhan-vien/index.html | grep -oP '[a-f0-9]{6}$'
+   ```
+   Mã này phải KHỚP với mã `gen_v5.py` in ra lúc build (`BUILD ID: xxxxxx`). Không khớp là
+   trang online vẫn đang phục vụ bản cũ. Mã cũng hiện ở **chân thanh menu** trong app - bảo
+   anh Luân đọc dòng đó là biết ngay hai bên có đang nhìn cùng một bản không.
+   Demo online: https://mittomap.github.io/itts-sop-demo/ (Pages deploy mất 1-2 phút).
 
 ## Phối hợp 2 nơi làm việc
 
