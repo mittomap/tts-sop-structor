@@ -455,6 +455,21 @@ Chi tiet "vi sao" o `02_NHAT_KY_QUYET_DINH.md`. O day chi ghi nhung cho **cham v
   lai tai cho** (Ban lam viec mo ho so ngay trong trang) - tu oan 8 dong dang chay dung; (b) rut
   ma ho so tu `textContent` thi chu cac o dinh lien nhau ("LOP-FOUND-PLA-01"+"10"+"100") thanh
   mot ma bia ra - nay chi hoi khi dong TU KHAI ma bang `data-mo-arg`.
+- **`_checklap.js` (MOI, V9.99z10)** - **MOT MAN KHONG DUOC NOI HAI LAN CUNG MOT THU**. Anh Luan
+  05/08 kem anh trang Chi so cua Ban Giam doc: *"man cua giam doc lap cai gi day?"* - hai thanh
+  "Xem viec cua:" chong len nhau. Goc: o do co BA noi goi, **moi noi deu dung phan minh** - trang
+  Chi so tu dat mot o, roi goi `bvSau()` ma bang viec lai tu chen mot o nua khi trang dang xem
+  chinh la trang dap cua chuc danh; voi Ban Giam doc trang dap dung la trang Chi so. Va bang cach
+  de CHINH cai o tu biet minh da ra mat trong luot ve nay chua (co dat lai o dau moi luot ve
+  than trang) - khong di sua tung noi goi, vi mai them noi thu tu la lap lai.
+  **BAY DA CAN - VI SAO BO NAY PHAI CHAY TRONG TRINH DUYET:** ban dau viet kieu node (goi thang
+  `RENDER["baocao"]()` roi dem chuoi). No bao XANH ca tren ban CU dang loi, vi trong node
+  `banAiHTML()` tra ve rong - dem duoc 0 thanh o ca hai ban. Chay bang Chromium that, dang nhap
+  dung NV009: ban cu **2 thanh**, ban moi **1**. Day la lan thu HAI trong cung mot ngay mot cai
+  thuoc bao xanh oan (lan dau: `_checkmoi` do tren chuoi tho). **Luat rut ra: bo kiem moi phai
+  duoc thu nguoc tren ban CU va phai DO o do, truoc khi duoc tin.**
+  Bon phep dem tren 16 chuc danh / 856 tieu chi: thanh "Xem viec cua" toi da MOT · dau trang toi
+  da MOT · hai khoi `.tbar` giong het nhau · hai `.notebar` cung mot cau.
 - **`_checkcrumb.js` (MOI, V9.99z10)** - **VET DUONG DI PHAI NAM TRON MOT HANG**. Anh Luan 05/08
   kem anh: *"em nen co phuong an cho breadcrumb nhe, no rot hang rat xau neu dai"*. Trong chinh
   anh do con loi thu hai: mot moc dung LIEN NHAU HAI LAN.

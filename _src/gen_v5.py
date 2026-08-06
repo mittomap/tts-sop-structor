@@ -20009,7 +20009,20 @@ function banAiTen(){
  try{var g=SCOPE().group;if(g==="quantri")return "Quản trị viên";
   if(g==="dieuhanh")return "Ban Giám đốc";
   return NHIPTEN[g]||g}catch(e){return "bạn"}}
+/* V9.99z10 - MỘT MÀN CHỈ ĐƯỢC CÓ MỘT Ô "XEM VIỆC CỦA". Anh Luân 05/08, kèm ảnh trang Chỉ số
+   của Ban Giám đốc: *"màn của giám đốc lặp cái gì đây?"* - hai thanh "Xem việc của:" giống hệt,
+   chồng lên nhau.
+   Gốc: ô này có BA nơi gọi, mỗi nơi đều đúng phần mình. Trang Chỉ số tự đặt một ô (để quản lý
+   không phải quay về trang đáp mới đổi được người), rồi gọi tiếp `bvSau()` - mà bảng việc lại
+   tự chèn một ô nữa khi trang đang xem CHÍNH LÀ trang đáp của chức danh. Với Ban Giám đốc,
+   trang đáp đúng là trang Chỉ số, nên hai vế cùng đúng và cùng vẽ.
+   Không đi sửa từng nơi gọi (mai thêm nơi thứ tư là lặp lại): để CHÍNH cái ô tự biết mình đã
+   ra mặt trong lượt vẽ này chưa. Cờ đặt lại ở đầu mỗi lượt vẽ thân trang. */
 function banAiHTML(){
+ if(window.__banAiDaVe)return "";
+ window.__banAiDaVe=true;
+ return banAiHTML_();}
+function banAiHTML_(){
  var dang=window.BANAI||"";
  /* Đang mượn ghế thì LUÔN phải có đường về - kể cả khi ghế đang mượn không có quyền quản lý.
     Đã cắn: mượn ghế một nhân viên thường là cả dải chọn biến mất cùng với nút quay về, người
@@ -20275,6 +20288,7 @@ function reRender(k){try{setTimeout(tourTick,240)}catch(e){}   /* người dùng
  var el=document.getElementById("content");
  if(!el||!RENDER[k]){if(typeof hvReRender==="function")hvReRender();return}   /* cổng học viên: chỉ vẽ lại thân trang */
  var p=PBK[k];var sc=el.scrollTop;
+ window.__banAiDaVe=false;
  el.innerHTML=((p&&p.ty==="list")?renderList(k):RENDER[k]());el.scrollTop=sc;
  /* vẽ lại cả SIDEBAR: đổi tab trong hub (duyTabSet, csTabSet...) thì mục đang sáng trên menu
     phải nhảy theo - anh Luân bắt được cảnh bấm "Đơn xin nghỉ" mà menu vẫn sáng tab cũ. Vá ở đây
@@ -20283,6 +20297,7 @@ function reRender(k){try{setTimeout(tourTick,240)}catch(e){}   /* người dùng
  try{buildNav()}catch(e){}
  updateBellBadge();asstTick();persistSoon()}
 function reRenderKeep(k){var el=document.getElementById("content");var sc=el.scrollTop;var p=PBK[k];
+ window.__banAiDaVe=false;
  el.innerHTML=((p&&p.ty==="list")?renderList(k):RENDER[k]());asstTick();el.scrollTop=sc;try{buildNav()}catch(e){}var i=el.querySelector(".srch input");if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}persistSoon()}
 /* V9.67: mở ngăn kéo menu thì GIẤU nút Trợ lý nổi. Trên điện thoại nút đó nằm đúng chỗ chân
    sidebar (dòng tên người đăng nhập) nên che mất - và bấm vào là trúng nút Trợ lý chứ không
@@ -21056,6 +21071,7 @@ function go(key,noHist){
  var el=document.getElementById("content");
  /* V9.35: Trợ thủ KHÔNG còn chen vào đầu thân trang nữa - nó ở nút góc dưới bên phải. Thân trang
     trả lại cho nội dung chính, thứ quan trọng nhất lên ngay đầu màn hình. */
+ window.__banAiDaVe=false;
  if(p.ty==="list")el.innerHTML=renderList(key);else el.innerHTML=RENDER[key]();
  asstTick();try{tourBtnSync()}catch(e){}
  /* ═══ V9.99z10 - KHÔNG MỜI RỒI ĐUỔI ═══════════════════════════════════════════════════
