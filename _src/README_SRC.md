@@ -455,6 +455,12 @@ Chi tiet "vi sao" o `02_NHAT_KY_QUYET_DINH.md`. O day chi ghi nhung cho **cham v
   lai tai cho** (Ban lam viec mo ho so ngay trong trang) - tu oan 8 dong dang chay dung; (b) rut
   ma ho so tu `textContent` thi chu cac o dinh lien nhau ("LOP-FOUND-PLA-01"+"10"+"100") thanh
   mot ma bia ra - nay chi hoi khi dong TU KHAI ma bang `data-mo-arg`.
+> **DUNG SUA `verify.sh` TRONG LUC NO DANG CHAY** (bay da can 05/08). Bash doc file script
+> TUNG DOAN chu khong nap het mot lan, nen them mot dong vao giua file dang chay lam no doc
+> tiep tu sai vi tri: luot do bao `verify.sh: line 226: syntax error near unexpected token '('`
+> trong khi file hoan toan dung cu phap (`bash -n verify.sh` sach). Mat vai phut tuong la minh
+> lam hong bo verify. Sua xong thi doi luot dang chay ket, hoac dung han no roi hay sua.
+
 - **`_checklap.js` (MOI, V9.99z10)** - **MOT MAN KHONG DUOC NOI HAI LAN CUNG MOT THU**. Anh Luan
   05/08 kem anh trang Chi so cua Ban Giam doc: *"man cua giam doc lap cai gi day?"* - hai thanh
   "Xem viec cua:" chong len nhau. Goc: o do co BA noi goi, **moi noi deu dung phan minh** - trang
