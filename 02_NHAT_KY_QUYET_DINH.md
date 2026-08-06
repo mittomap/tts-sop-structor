@@ -148,6 +148,21 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 🔚 ANH LUÂN CHỐT 05/08: **BỎ HẲN BẢN V6**
+> *"ko cần sửa đâu, a bỏ luôn bản v6 đây"* - nói khi em khai một chỗ chưa vá nằm trên Bàn làm
+> việc theo thực thể (màn riêng của v6): hồ sơ Marketing mở ra còn 86 việc của người khác so
+> với 26 việc của họ.
+> **Nghĩa là:** v6 không còn là một phần của sản phẩm. Không audit nó, không đo nó, không sửa
+> nó, và **không được xếp phát hiện nào trên màn v6 vào diện lỗi phải vá**. Bản đang giao là
+> **V5** - `cong-nhan-vien/index.html` và `cong-hoc-vien/index.html`.
+> **Còn để lại (việc dọn, chưa làm):** mã v6 vẫn nằm trong nguồn - `V6()` 25 nhánh rẽ trong
+> `gen_v5.py`, `NAVTREE6`, trang Bàn làm việc theo thực thể, cộng 11 chỗ rẽ nhánh trong 7 bộ
+> kiểm. Đây KHÔNG phải mã vô hại: riêng hôm nay đã có ba lỗi ở bản V5 sinh ra từ chỗ mã dùng
+> chung cắm cứng bảng của v6 (`navCurKey`/`navGroupOf`/`buildNav` dò nhầm cây menu). Khi nào
+> dọn thì làm y cách đã vét lớp Google Sheets hôm 30/07: gỡ sạch rồi **thêm một bộ kiểm canh
+> không cho dựng lại**. Chưa làm hôm nay vì anh Luân đang cần bản chạy để xem demo, và đây là
+> loại sửa đụng vào mọi nhánh rẽ - phải có nguyên một lượt verify sạch mới dám giao.
+
 > ### ✅ ĐÃ ĐÓNG - lỗ thủng `_checknv` do việc gỡ V6 tạo ra (04/08)
 > `ghiDuoc` từng tụt **100 → 0** mà bộ kiểm vẫn in OK. Nay đã nối **đường ghi của bản V5**:
 > bấm Làm → nhảy sang trang → **chính trang đó là cái form** (nút "Lưu & tiếp tục" nằm thẳng
