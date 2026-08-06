@@ -1274,7 +1274,13 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
    Nay tối thiểu 224px (đo bằng chính câu dài nhất: 2 chữ số + "lựa chọn"), và cho phép nở thêm
    khi thanh công cụ còn chỗ. Màn hẹp vẫn co lại được nhờ `max-width:100%` + `flex-wrap` của
    thanh cha, nên không đẻ ra cuộn ngang. */
-.pk{position:relative;display:flex;flex-direction:column;flex:1 1 224px;min-width:224px;max-width:100%}
+/* V9.99z10 (anh Luân, kèm ảnh: *"có vài lỗi css ở drawer em"*) - BẢN VÁ TRÊN ĐÂY TỪNG ĐẺ RA
+   MỘT LỖI KHÁC. `flex:1 1 224px` viết ra để nói CHIỀU RỘNG tối thiểu, nhưng `flex-basis` đo
+   theo TRỤC CHÍNH CỦA CHA: ở thanh lọc (cha xếp ngang) nó đúng là chiều rộng; trong drawer thì
+   `.fld` xếp DỌC, nên 224px thành CHIỀU CAO - ô chọn học viên cao 224px, chừa một mảng trắng
+   to bằng nửa màn hình giữa ô gõ và mục kế tiếp. Nay bề rộng nói bằng `min-width` (không phụ
+   thuộc trục), còn `flex-basis` để `auto` nên chiều cao luôn bằng đúng nội dung. */
+.pk{position:relative;display:flex;flex-direction:column;flex:1 1 auto;min-width:224px;max-width:100%}
 /* Ô gõ tự mang đủ dáng của một ô nhập: nó có thể được dựng ở NGOÀI .fld (thanh lọc trên trang),
    nơi không có luật CSS nào của form chạm tới - để trần là ra một ô cao 19px, đúng loại lỗi
    `_checkui` bắt trên trình duyệt thật. */

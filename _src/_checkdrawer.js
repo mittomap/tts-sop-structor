@@ -1,0 +1,99 @@
+/* _checkdrawer.js - HÌNH HỌC CỦA NGĂN KÉO, ĐO BẰNG TRÌNH DUYỆT THẬT.
+ *
+ * VÌ SAO CÓ FILE NÀY (anh Luân 05/08, kèm ảnh chụp màn hình): *"có vài lỗi css ở drawer em"*.
+ * Ảnh cho thấy ô "Học viên (kèm quota WOW còn lại)" rồi một mảng trắng cao gần nửa màn hình,
+ * mãi dưới mới tới "Kỹ năng".
+ *
+ * GỐC - MỘT BẢN VÁ CŨ ĐẺ RA LỖI MỚI. `.pk{flex:1 1 224px}` viết ra hồi V9.99f để nói CHIỀU RỘNG
+ * tối thiểu (lúc đó anh Luân báo "mấy cái ô này hẹp quá"). Nhưng `flex-basis` đo theo TRỤC CHÍNH
+ * CỦA CHA: ở thanh lọc, cha xếp ngang -> 224px là chiều rộng, đúng ý; trong ngăn kéo, `.fld` xếp
+ * DỌC -> 224px thành CHIỀU CAO. Cùng một dòng CSS, hai nơi hiểu hai nghĩa. Nay bề rộng nói bằng
+ * `min-width` (không phụ thuộc trục), `flex-basis` để `auto`.
+ *
+ * VÌ SAO 29 BỘ KIỂM CŨ KHÔNG THẤY: HTML hoàn toàn đúng, không lỗi JS, không tràn ngang, chữ
+ * không bị cắt. `_checkux` soi NỘI DUNG form (có câu giải thích chưa, có nút Lưu chưa) chứ không
+ * soi HÌNH. `_checkmat` soi hình nhưng đi theo TRANG, không mở ngăn kéo. Chỗ hở nằm đúng giữa
+ * hai bộ - nên phải có bộ thứ ba đứng vào đó.
+ *
+ * BỐN PHÉP ĐO (mở thật 25 ngăn kéo trên 15 trang, đo bằng Chromium):
+ *   D1  Ô MỘT DÒNG MÀ CAO      - `.pk`/input/select cao quá 64px thì nó đang chiếm chỗ không phải của nó
+ *   D2  THÒ RA NGOÀI / CUỘN NGANG - mép phải vượt khỏi thân ngăn kéo
+ *   D3  KHE TRỐNG GIỮA HAI MỤC - hai mục liền nhau cách nhau quá 40px: đúng cái mắt anh Luân thấy
+ *   D4  Ô NHẬP DẸT             - ô nhập thấp dưới 30px (thường do CSS của form không chạm tới)
+ *
+ * TỰ THỬ LẠI CÁI THƯỚC - làm rồi, không bỏ qua: chạy bộ này trên bản CŨ (bản còn lỗi) thì nó
+ * phải ĐỎ. Nó đỏ thật, bắt đúng 224px ở ngăn kéo "Giao việc mới". Một cái thước chỉ báo xanh mà
+ * chưa từng báo đỏ là một cái thước chưa ai biết nó có đo được gì không - hôm nay đã cắn một lần
+ * đúng kiểu đó (`_checkmoi` đo trên chuỗi thô).
+ *
+ * Chạy: ITTS_OUT=<out> node _checkdrawer.js
+ */
+const OUT=process.env.O||process.env.ITTS_OUT||".";
+const PATHS=["/opt/pw-browsers/chromium-1194/chrome-linux/chrome","/opt/pw-browsers/chromium/chrome-linux/chrome"];
+const TRANG=["banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","hocvien","giaoviec","duyet","baocao","nhansu","khac","canhan","xeplop","giangvien"];
+(async()=>{
+ let chromium; try{chromium=require("playwright").chromium}catch(e){console.log("CHECKDRAWER BO QUA: chua cai playwright");process.exit(0)} const fs=require("fs"),path=require("path");
+ const exe=PATHS.find(p=>{try{return fs.existsSync(p)}catch(e){return false}});
+ const b=await chromium.launch(exe?{executablePath:exe}:{});
+ const ctx=await b.newContext({viewport:{width:1440,height:900}});
+ const page=await ctx.newPage();
+ await page.addInitScript(()=>{try{sessionStorage.setItem("ITTS_WHO","");localStorage.setItem("ITTS_HELLO_V1","1");localStorage.setItem("ITTS_ZOOM_V1","100")}catch(e){}});
+ await page.goto("file://"+path.resolve(OUT)+(process.env.F||"/ITTs_WebApp_v5_demo.html"),{waitUntil:"load"});
+ await page.waitForFunction(()=>typeof window.go==="function",null,{timeout:30000});
+ await page.waitForTimeout(4600);
+ await page.evaluate(()=>{try{if(typeof asstDong==="function")asstDong()}catch(e){}});
+ const loi=[]; let soDrawer=0;
+ for(const tr of TRANG){
+  await page.evaluate(k=>{try{go(k)}catch(e){}},tr);
+  await page.waitForTimeout(350);
+  const n=await page.evaluate(()=>document.querySelectorAll("#content button").length);
+  for(let i=0;i<Math.min(n,26);i++){
+   const mo=await page.evaluate(i=>{
+    const bs=document.querySelectorAll("#content button");
+    const el=bs[i]; if(!el)return null;
+    const t=(el.textContent||"").trim().slice(0,30);
+    try{el.click()}catch(e){return null}
+    return t;
+   },i);
+   await page.waitForTimeout(260);
+   const kq=await page.evaluate(()=>{
+    const d=document.getElementById("drawer");
+    if(!d||!d.classList.contains("on"))return null;
+    const db=d.getBoundingClientRect(); const ra=[];
+    d.querySelectorAll(".pk,input,select,textarea,.fld").forEach(el=>{
+     const r=el.getBoundingClientRect(); const cs=getComputedStyle(el);
+     if(cs.display==="none"||r.width===0)return;
+     const motDong = el.classList.contains("pk")||el.tagName==="INPUT"||el.tagName==="SELECT";
+     if(motDong && r.height>64) ra.push({l:"O MOT DONG MA CAO "+Math.round(r.height)+"px",c:el.className||el.tagName});
+     if(r.right>db.right+1) ra.push({l:"THO RA NGOAI drawer "+Math.round(r.right-db.right)+"px",c:el.className||el.tagName});
+    });
+    /* KHE HO DOC giua hai muc lien tiep - dung cai mat anh Luan nhin thay */
+    const flds=[...d.querySelectorAll(".fld")].filter(e=>getComputedStyle(e).display!=="none"&&e.getBoundingClientRect().width>0);
+    for(let j=1;j<flds.length;j++){
+     const tren=flds[j-1].getBoundingClientRect(), duoi=flds[j].getBoundingClientRect();
+     if(duoi.top-tren.bottom>40 && Math.abs(duoi.left-tren.left)<4)
+      ra.push({l:"KHE TRONG "+Math.round(duoi.top-tren.bottom)+"px giua hai muc",
+        c:(flds[j-1].textContent||"").trim().slice(0,26)+" -> "+(flds[j].textContent||"").trim().slice(0,26)});
+    }
+    /* NHAN va O NHAP le nhau, hoac o nhap thap hon 30px (o det) */
+    d.querySelectorAll("input,select,textarea").forEach(el=>{
+     const r=el.getBoundingClientRect(); const cs=getComputedStyle(el);
+     if(cs.display==="none"||r.width===0)return;
+     if(el.type!=="checkbox"&&el.type!=="radio"&&r.height<30)
+      ra.push({l:"O NHAP DET "+Math.round(r.height)+"px",c:el.className||el.name||el.tagName});
+    });
+    const body=d.querySelector(".dbody")||d;
+    if(body.scrollWidth>body.clientWidth+1) ra.push({l:"DRAWER CUON NGANG "+(body.scrollWidth-body.clientWidth)+"px",c:"dbody"});
+    return ra;
+   });
+   if(kq){soDrawer++; kq.forEach(x=>loi.push(tr+" · nut \""+mo+"\" · "+x.l+" ["+x.c+"]"));}
+   await page.evaluate(()=>{try{closeDrawer()}catch(e){try{document.getElementById("drawer").classList.remove("on")}catch(e2){}}});
+   await page.waitForTimeout(120);
+  }
+ }
+ const gom={}; loi.forEach(x=>gom[x]=1);
+ const ds=Object.keys(gom);
+ await b.close();
+ if(ds.length){console.log("CHECKDRAWER DO ("+ds.length+"):");ds.slice(0,40).forEach(x=>console.log("  - "+x));process.exit(1)}
+ console.log("CHECKDRAWER OK: mo that "+soDrawer+" ngan keo tren "+TRANG.length+" trang - khong o nao cao sai, khong cho nao tho ra, khong khe trong, khong o det");
+})().catch(e=>{console.log("ERR",e.message);process.exit(1)});

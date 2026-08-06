@@ -455,6 +455,19 @@ Chi tiet "vi sao" o `02_NHAT_KY_QUYET_DINH.md`. O day chi ghi nhung cho **cham v
   lai tai cho** (Ban lam viec mo ho so ngay trong trang) - tu oan 8 dong dang chay dung; (b) rut
   ma ho so tu `textContent` thi chu cac o dinh lien nhau ("LOP-FOUND-PLA-01"+"10"+"100") thanh
   mot ma bia ra - nay chi hoi khi dong TU KHAI ma bang `data-mo-arg`.
+- **`_checkdrawer.js` (MOI, V9.99z10)** - **HINH HOC CUA NGAN KEO**, do bang Chromium that.
+  Anh Luan 05/08 kem anh chup: *"co vai loi css o drawer em"* - o chon hoc vien cao 224px, chua
+  mot mang trang gan nua man hinh. Goc: `.pk{flex:1 1 224px}` dat hoi V9.99f de noi CHIEU RONG,
+  nhung `flex-basis` do theo TRUC CHINH CUA CHA - thanh loc xep ngang thi ra chieu rong (dung y),
+  ngan keo xep doc thi ra CHIEU CAO. Mot dong CSS, hai noi hieu hai nghia.
+  Vi sao 29 bo cu khong thay: `_checkux` soi NOI DUNG form chu khong soi hinh; `_checkmat` soi
+  hinh nhung di theo TRANG, khong mo ngan keo. Cho ho nam dung giua hai bo.
+  Bon phep do tren 25 ngan keo that / 15 trang: **o mot dong ma cao qua 64px** · **tho ra ngoai
+  / cuon ngang** · **khe trong qua 40px giua hai muc** (dung cai mat anh Luan thay) · **o nhap
+  det duoi 30px**.
+  **DA TU THU LAI CAI THUOC:** chay bo nay tren ban CU (ban con loi) thi no phai DO - va no do
+  that, bat dung 224px o ngan keo "Giao viec moi". Mot cai thuoc chi bao xanh ma chua tung bao
+  do la mot cai thuoc chua ai biet no do duoc gi khong.
 - **`_checkmoi.js` (MOI, V9.99z10)** - **KHONG MOI ROI DUOI**. Anh Luan 05/08: *"o trang lop hoc
   cua truong phong ACA lai co nut Xep lop va onboarding, bam vao thi: Trang ngoai pham vi chuc
   danh cua ban - dang xem o che do THAM KHAO. Day la 1 dang loi nang do em."* Do lai: **67 cho**
