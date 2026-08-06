@@ -1686,17 +1686,27 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .nhip .nhiph i{font-size:16px;color:var(--blue)}
 .nhip .nhiph .tthx{margin-left:auto;font-size:11px;color:var(--muted);cursor:pointer;border-bottom:1px dashed var(--line)}
 .nhip .nhiph .tthx:hover{color:var(--blue);border-color:var(--blue)}
-.nhipg{margin-bottom:7px}
-.nhipg:last-child{margin-bottom:0}
-.nhipgt{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);display:flex;align-items:center;gap:5px;margin:6px 0 4px}
-.nhipr{display:flex;align-items:center;gap:8px;padding:6px 9px;border:1px solid var(--line);border-radius:8px;margin-bottom:5px;cursor:pointer;font-size:12.5px;transition:.12s}
-.nhipr:hover{border-color:var(--blue);background:#FAFBFD;transform:translateY(-1px)}
-.nhipr>i{font-size:15px;color:var(--amber);flex:none}
-.nhipr.ok{opacity:.68}
-.nhipr.hab>i{color:var(--muted)}
-.nhipr.ok>i{color:var(--green)}
-.nhipr .nhipt{flex:1;min-width:0}
-@media(max-width:560px){.nhipr .nhipt{white-space:normal}}
+/* V9.99z12 (anh Luan 06/08, kem anh khoi "Nhip ngay cua ban"): con so dem DE LEN cau mo ta -
+   "Chi 3o duoi nguong". Do lai: 2 dong dam nhau o man 1440px, 4 dong o man 1200px.
+   GOC - MOT CAI TEN, HAI CHU NHAN. Khoi nay co HAI ban: mot ban nam trong hop Tro ly (`.nhip`),
+   mot ban la the tren trang Viec hom nay. Tac gia CO Y viet rieng cho hop Tro ly - nam dong
+   ngay tren deu co tien to `.nhip`. Nhung tu day tro di thi QUEN tien to, nen `.nhipr{display:
+   flex}` cua hop Tro ly tran ra de len ban tren trang: `.nhipt` (nhan + so) va `.nhipv` (cau mo
+   ta) dang la hai dong xep doc bi ep thanh hai cot nam ngang, roi con so bi day chong len chu.
+   Va vi no dung SAU trong tep nen no thang - cung do uu tien, ai viet sau nguoi ay duoc.
+   Nay cham lai tien to cho ca khoi. Bai hoc: dat ten lop trung nhau giua hai thanh phan thi
+   SOM MUON cung dam - tien to khong phai de cho dep, no la ranh gioi. */
+.nhip .nhipg{margin-bottom:7px}
+.nhip .nhipg:last-child{margin-bottom:0}
+.nhip .nhipgt{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);display:flex;align-items:center;gap:5px;margin:6px 0 4px}
+.nhip .nhipr{display:flex;align-items:center;gap:8px;padding:6px 9px;border:1px solid var(--line);border-radius:8px;margin-bottom:5px;cursor:pointer;font-size:12.5px;transition:.12s}
+.nhip .nhipr:hover{border-color:var(--blue);background:#FAFBFD;transform:translateY(-1px)}
+.nhip .nhipr>i{font-size:15px;color:var(--amber);flex:none}
+.nhip .nhipr.ok{opacity:.68}
+.nhip .nhipr.hab>i{color:var(--muted)}
+.nhip .nhipr.ok>i{color:var(--green)}
+.nhip .nhipr .nhipt{flex:1;min-width:0}
+@media(max-width:560px){.nhip .nhipr .nhipt{white-space:normal}}
 .pgq{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:8px;padding:0 9px;background:#fff;max-width:230px}
 .pgq i{color:var(--muted);font-size:14px;flex:none}
 /* V9.31: o tich mac dinh cua trinh duyet chi 13x13px - dung ngon tay bam truot lien tuc. */

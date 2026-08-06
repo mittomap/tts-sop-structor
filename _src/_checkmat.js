@@ -23,6 +23,7 @@
  *   M2  BỊ CÁI KHÁC PHỦ LÊN     - nút/ô mà điểm giữa lại thuộc về một phần tử khác
  *   M3  HẸP GIỮA KHOẢNG TRỐNG   - ô bị cắt chữ trong khi hàng chứa nó còn thừa chỗ rộng rãi
  *   M4  DẤU NGĂN MỒ CÔI         - dấu ›/·/| nằm khác dòng với mục nó đi kèm
+ *   M5  HAI KHỐI CHỮ ĐÈ NHAU    - hai phần tử anh em cùng mang chữ mà hộp của chúng giao nhau
  *
  * CỐ Ý CHẠY NHANH (một khổ màn, một lượt đi qua các trang chính): bộ này phải nằm ở TẦNG NHANH,
  * chạy sau mỗi lần sửa. Bộ kiểm 18 phút thì người ta chạy một ngày một lần, mà lỗi loại này sinh
@@ -36,8 +37,14 @@ const PATHS = ["/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
 
 /* Trang đi qua: đủ phủ các kiểu bố cục (hub nhiều tab · sổ tra cứu · trang form · trang cấu
    hình · trang hồ sơ), không cần đi hết 92 trang - lỗi hình học lặp theo KIỂU bố cục. */
+/* V9.99z12 - THEM "viec". Anh Luan 06/08 gui anh khoi "Nhip ngay cua ban": con so dem de len
+   cau mo ta. Do lai dung: 2 dong dam nhau o 1440px, 4 dong o 1200px. Bo nay khong thay vi trang
+   `viec` KHONG CO trong danh sach - ma khoi Nhip ngay chi nam o do.
+   Bai hoc: mot bo kiem "di qua cac trang chinh" thi cai gi khong nam tren duong di deu la vung
+   toi. Danh sach nay phai phu du KIEU BO CUC, va "trang viec theo nhip ngay" la mot kieu rieng
+   khong trang nao khac co. */
 const TRANG = ["banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","hocvien",
-               "giaoviec","duyet","baocao","nhansu","khac","canhan","settings"];
+               "giaoviec","duyet","baocao","nhansu","khac","canhan","settings","viec"];
 
 /* Chỗ được phép cắt chữ, kèm lý do đọc được. Thêm dòng vào đây là một quyết định. */
 const CAT_OK = [
@@ -88,7 +95,7 @@ const CAT_OK = [
       await new Promise(r => setTimeout(r, 340));
       const c = document.getElementById("content");
       if (!c) return {loi: "khong co than trang"};
-      const ra = {cat: [], che: [], hep: [], moCoi: [], dem: 0};
+      const ra = {cat: [], che: [], hep: [], moCoi: [], deNhau: [], dem: 0};
 
       /* Thước đo bề rộng THẬT của một đoạn chữ với đúng font của nó. Dựng một lần, dùng lại. */
       const do_ = document.createElement("span");
@@ -170,6 +177,43 @@ const CAT_OK = [
         if (Math.abs(ny - y) > 6) ra.moCoi.push('dau "' + t + '" nam khac dong voi muc di sau no');
       });
 
+      /* ── M5: HAI KHOI CHU DE LEN NHAU ───────────────────────────────────────────────────
+         Anh Luan 06/08 gui anh khoi "Nhip ngay cua ban": con so dem nam de len cau mo ta, doc
+         ra thanh "Chi 3o duoi nguong". M2 khong bat duoc vi M2 chi hoi "NUT co bi phu khong" -
+         o day khong co nut nao, chi la hai doan chu.
+         HAI LAN DUNG HUT TRUOC KHI DUNG - ghi lai ca hai:
+          (1) So MOI CAP PHAN TU: bat oan 4 cho o trang Bao cao. Phan tu chu troi (inline) trai
+              nhieu dong thi `getBoundingClientRect` tra ve HOP GOP trum ca ba dong nen "de len"
+              moi anh em dung canh, trong khi mat nguoi doc van thay binh thuong.
+          (2) Siet lai chi so ANH EM RUOT: sach bat oan, nhung bo sot dung cai loi that - vi con
+              so nam TRONG `.nhipt` con cau mo ta la `.nhipv` BEN CANH, hai cai la chu-chau chu
+              khong phai anh em.
+         Nay so cac O CHU LA (khong con phan tu con), bo qua cap co quan he to-tien, bo qua chu
+         troi nhieu dong va lop noi, va doi giao nhau day dan (>4px ca hai chieu). */
+      (function(){
+        const nhinThay = el => {
+          const cs = getComputedStyle(el);
+          if (cs.display === "none" || cs.visibility === "hidden" || +cs.opacity === 0) return false;
+          if (cs.position === "absolute" || cs.position === "fixed") return false;
+          if (el.getClientRects().length !== 1) return false;
+          const r = el.getBoundingClientRect();
+          return r.width > 0 && r.height > 0;
+        };
+        const than = document.getElementById("content"); if (!than) return;
+        const la = [...than.querySelectorAll("*")].filter(el =>
+          el.children.length === 0 && (el.textContent || "").trim().length > 0 && nhinThay(el));
+        for (let i = 0; i < la.length; i++) for (let j = i + 1; j < la.length; j++) {
+          const x = la[i], y = la[j];
+          if (x.contains(y) || y.contains(x)) continue;
+          const a = x.getBoundingClientRect(), b = y.getBoundingClientRect();
+          const chungNgang = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+          const chungDoc   = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+          if (chungNgang <= 4 || chungDoc <= 4) continue;
+          ra.deNhau.push('"' + (x.textContent || "").trim().slice(0, 24) + '" de len "' +
+                         (y.textContent || "").trim().slice(0, 24) + '"');
+        }
+      })();
+
       do_.remove();
       return ra;
     }, [k, CAT_OK.map(x => ({k: x.khop.source, f: x.khop.flags, ly: x.ly}))]);
@@ -181,6 +225,7 @@ const CAT_OK = [
     gom(r.cat, "CHU BI CAT");
     gom(r.che, "BI PHU LEN - khong bam duoc");
     gom(r.moCoi, "DAU NGAN MO COI");
+    gom(r.deNhau, "HAI KHOI CHU DE LEN NHAU");
   }
 
   await browser.close();
