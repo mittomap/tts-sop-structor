@@ -155,7 +155,14 @@
 > **Nghĩa là:** v6 không còn là một phần của sản phẩm. Không audit nó, không đo nó, không sửa
 > nó, và **không được xếp phát hiện nào trên màn v6 vào diện lỗi phải vá**. Bản đang giao là
 > **V5** - `cong-nhan-vien/index.html` và `cong-hoc-vien/index.html`.
-> **Còn để lại (việc dọn, chưa làm):** mã v6 vẫn nằm trong nguồn - `V6()` 25 nhánh rẽ trong
+> **Anh Luân nói rõ thêm ngay sau đó:** *"bỏ luôn tức là thôi em quên nó đi đó, khỏi cần đụng
+> tới. **Miễn là nó ko ảnh hưởng gì tới V5 hiện tại**"*. Vậy là **KHÔNG dọn mã v6** - để nguyên,
+> đừng sờ vào. Nhưng vế sau là một ĐIỀU KIỆN, nên phải có người canh: `_check11` nay có 5 tiêu
+> chí bắt v6 phải chết hẳn lúc chạy - cờ `ITTS_V6` cắm cứng 0, không một cửa nào bật lên được
+> (chú thích Python thì không tính), `V6()` trả false, `navCay()` trả cây của V5 chứ không phải
+> `NAVTREE6`, và không còn file build v6 nào ở gốc. Ba tháng nữa ai bật lại một dòng là đỏ ngay.
+>
+> **Việc dọn thì KHÔNG làm (anh Luân đã chốt):** mã v6 vẫn nằm trong nguồn - `V6()` 25 nhánh rẽ trong
 > `gen_v5.py`, `NAVTREE6`, trang Bàn làm việc theo thực thể, cộng 11 chỗ rẽ nhánh trong 7 bộ
 > kiểm. Đây KHÔNG phải mã vô hại: riêng hôm nay đã có ba lỗi ở bản V5 sinh ra từ chỗ mã dùng
 > chung cắm cứng bảng của v6 (`navCurKey`/`navGroupOf`/`buildNav` dò nhầm cây menu). Khi nào

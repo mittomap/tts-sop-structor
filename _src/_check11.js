@@ -625,4 +625,28 @@ console.log(bad.length?("FAIL:\n  "+bad.join("\n  ")):"OK: "+ok);
  window.GATE_SID="";applyScope("");setRole("all");
 })();
 
+/* ═══ V9.99z10 - BẢN V6 ĐÃ BỎ HẲN: PHẢI CHẮC NÓ KHÔNG CHẠM VÀO V5 ═════════════════════════
+   Anh Luân 05/08: *"bỏ luôn tức là thôi em quên nó đi đó, khỏi cần đụng tới. **Miễn là nó ko
+   ảnh hưởng gì tới V5 hiện tại**"*. Vế sau là một điều kiện, nên phải có người canh - không thì
+   ba tháng nữa ai đó bật lại một dòng là cả cây menu của V5 đổi mà không ai biết.
+   Mã v6 vẫn nằm trong nguồn (anh Luân bảo đừng đụng tới), nhưng nó phải CHẾT HẲN lúc chạy:
+   cờ `ITTS_V6` cắm cứng 0 trong bản dựng, không một cửa nào bật lên được, và mọi hàm dùng
+   chung phải trả về cây/khung của V5. Ba lỗi trong ngày 05/08 đều sinh ra từ chỗ mã dùng chung
+   đọc bảng của v6 - nên đây không phải lo hão. */
+(function(){
+ var SRCX="";try{SRCX=require('fs').readFileSync('./gen_v5.py','utf8')}catch(e){}
+ t("V6 tat cung trong ban dung (ITTS_V6=0 cam cung)", /window\.ITTS_V6\s*=\s*0\s*;/.test(SRCX));
+ t("khong co cua nao bat V6 len trong ma app", (function(){
+   /* Bo qua DONG CHU THICH cua Python (bat dau bang #) - buoc dung ban v6 da go tu 04/08 con
+      nam do duoi dang chu thich, de doi sau doc hieu vi sao. Chu thich khong bat duoc cai gi. */
+   var xau=SRCX.split("\n").filter(function(d){
+     return d.trim().charAt(0)!=="#" && /ITTS_V6\s*=\s*[^0]/.test(d)});
+   return xau.length===0})());
+ t("V6() tra ve false luc chay", typeof V6==="function"&&V6()===false);
+ t("navCay() tra cay cua V5, khong phai NAVTREE6", (function(){
+   var T=navCay();return T!==NAVTREE6&&T.some(function(g){return (g.items||[]).indexOf("banlam")>=0})})());
+ t("khong con file build v6 nao o goc", (function(){
+   try{return !require('fs').existsSync((process.env.ITTS_OUT||'.')+'/ITTs_WebApp_v6_demo.html')}catch(e){return true}})());
+})();
+
 console.log(bad.length?("FAIL2:\n  "+bad.join("\n  ")):"TONG: "+ok);
