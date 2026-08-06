@@ -154,6 +154,7 @@ chay "_checkngay mot ngay cua tung chuc danh" "CHECKNGAY OK" node _checkngay.js
 # ngay mot loi that: Leader Tu van Co so 1 khai pham vi "team" ma nhin thay tron 82 hoc vien cua
 # ca 5 co so - bang dung Truong phong.
 chay "_checknguoi tung nguoi dang nhap" "CHECKNGUOI OK" node _checknguoi.js
+chay "_checkmoi khong moi roi duoi" "TONG:" node _checkmoi.js
 
 echo
 echo "${Dam}== 4. DU LIEU DEMO ==${Het}"

@@ -2864,6 +2864,28 @@ function applyScope(sid){var eff;
  if(eff.ctx)for(var k in eff.ctx)window[k==="HTTAB"?"HTTAB":k==="TSTAB"?"TSTAB":k]=eff.ctx[k];
  return eff}
 function canSee(k){var rs=SCOPE();return rs.pages==="*"||rs.pages.indexOf(k)>=0||!!VIEW_ALWAYS[k]}
+/* Xem `go()` để biết vì sao có hàm này. Trả về đúng chuỗi vào nếu người đang xem có toàn quyền -
+   không đụng gì tới màn của Quản trị viên. */
+function scrubMoiRoiDuoi(h){
+ try{
+  if(!h||SCOPE().pages==="*")return h;
+  var ngoai=function(k){return !canSee(k)&&!SENSITIVE[k]};
+  /* 1. Nút bấm dẫn ra ngoài phạm vi -> bỏ hẳn cả cái nút. Không cho lồng nút trong nút nên
+        dùng [^]*? chặn tới thẻ đóng gần nhất là đủ. */
+  h=h.replace(/<button\b[^>]*onclick="go\('([a-z0-9_]+)'\)"[^>]*>[\s\S]*?<\/button>/g,
+   function(m,k){return ngoai(k)?"":m});
+  /* 2. Ô/dòng bấm được: giữ nội dung, gỡ cú bấm + vẻ bấm được (lớp `clk`, con trỏ tay, title
+        kiểu "Bấm để mở..."). Người vẫn đọc được con số của mình, chỉ không còn cửa cụt. */
+  h=h.replace(/<(div|tr|td|li|a)\b([^>]*?)onclick="go\('([a-z0-9_]+)'\)"([^>]*)>/g,
+   function(m,tag,tr,k,sau){
+    if(!ngoai(k))return m;
+    var at=(tr+sau).replace(/\bclass="([^"]*)"/,function(_,c){
+      return 'class="'+c.replace(/\bclk\b/g,"").replace(/\s+/g," ").trim()+'"'})
+     .replace(/\s*style="[^"]*cursor\s*:\s*pointer[^"]*"/,"")
+     .replace(/\s*title="[^"]*"/,"");
+    return "<"+tag+at+">"});
+  return h;
+ }catch(e){return h}}
 /* ═══════════ V9.41 - BẢNG PHÂN QUYỀN CH3 CỦA SOP ═══════════════════════════════════════
    SOP có hẳn một trang CH3 "BẢNG PHÂN QUYỀN VẬN HÀNH (Ai được làm gì)": 30 hành động x 5 vai,
    trong đó 8 hành động ghi rõ "Quản lý phê duyệt". App trước đây phân quyền theo TRANG (thấy
@@ -21004,6 +21026,21 @@ function go(key,noHist){
     trả lại cho nội dung chính, thứ quan trọng nhất lên ngay đầu màn hình. */
  if(p.ty==="list")el.innerHTML=renderList(key);else el.innerHTML=RENDER[key]();
  asstTick();try{tourBtnSync()}catch(e){}
+ /* ═══ V9.99z10 - KHÔNG MỜI RỒI ĐUỔI ═══════════════════════════════════════════════════
+    Anh Luân 05/08: *"ở trang lớp học của trưởng phòng ACA lại có nút Xếp lớp và onboarding, bấm
+    vào thì: Trang ngoài phạm vi chức danh của bạn - đang xem ở chế độ THAM KHẢO. Đây là 1 dạng
+    lỗi nặng đó em."* Đúng là nặng: người ta bấm một cái nút app tự vẽ ra cho họ, rồi bị app báo
+    là mình không có phận sự ở đây. Cái sai không nằm ở câu báo - nó nằm ở CÁI NÚT.
+    Đo được 67 chỗ như thế trên 16 chức danh (trang Học tập, Báo cáo, Việc hôm nay, Bảng công...).
+    Vá ở 67 chỗ lẻ là mai lại mọc chỗ thứ 68, nên chặn ở ĐÚNG MỘT CỬA: mọi thân trang trước khi
+    hiện lên đều đi qua đây.
+    Hai cách xử, không phải một:
+     · NÚT (`<button>`): bỏ hẳn. Một cái nút là một lời mời làm việc - không mời được thì đừng vẽ.
+     · Ô SỐ / DÒNG bấm được: GIỮ con số (nó vẫn là thông tin thật của họ), chỉ gỡ cú bấm và cái
+       vẻ bấm-được. Bỏ luôn cả ô là bớt thông tin - phạm LUẬT CỨNG SỐ 0.
+    Chế độ THAM KHẢO vẫn còn nguyên cho người GÕ THẲNG địa chỉ hoặc đi từ link cũ - đó mới đúng
+    là chỗ nó sinh ra để phục vụ. */
+ el.innerHTML=scrubMoiRoiDuoi(el.innerHTML);
  if(!canSee(key)&&!SENSITIVE[key]&&SCOPE().pages!=="*")el.innerHTML='<div class="notebar" style="margin-bottom:12px"><i class="ti ti-info-circle"></i>Trang ngoài phạm vi chức danh của bạn - đang xem ở chế độ THAM KHẢO.</div>'+el.innerHTML;
  window.CURCTX=navSnap();   /* ngữ cảnh của TRANG NÀY, chụp sau khi đã render (dùng khi rời trang) */
  renderCrumb();
