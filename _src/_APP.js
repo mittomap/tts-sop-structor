@@ -1565,7 +1565,7 @@ var THEDEF={
  ghinhan:{t:"Ghi nhận phản hồi",the:[
   ["gn_xau","Phản hồi xấu chưa xử lý","Đếm phản hồi tiêu cực hoặc lời than phiền còn đang mở - để lâu là thành khiếu nại. Danh sách: bấm chip trạng thái 'chưa xử lý' ở thanh lọc dưới."]]},
  giaoan:{t:"Giáo án & kho bài",the:[
-  ["ga_7ng","Buổi 7 ngày tới chưa có giáo án","Đếm buổi học sắp diễn ra trong 7 ngày mà chưa gắn giáo án - giáo viên lên lớp không có bài. Danh sách: bấm tab 'Giáo án theo buổi' ở dưới."],
+  ["ga_7ng","Buổi sắp dạy chưa có giáo án","Đếm buổi học sắp diễn ra trong khoảng nhìn trước (gaAhead_days) mà chưa gắn giáo án - giáo viên lên lớp không có bài. Danh sách: bấm tab 'Giáo án theo buổi' ở dưới."],
   ["ga_khoa","Khóa chưa có giáo án nào","Đếm khóa học chưa soạn buổi nào - mở lớp là hụt bài ngay. Danh sách: bảng khóa ngay dưới."],
   ["ga_kho","Bài trong kho","Tổng số bài đang có trong kho học liệu, kèm số bài chưa dùng ở đâu. Danh sách: bấm tab 'Kho bài'."],
   ["ga_hw","Buổi chưa gắn bài tập","Đếm buổi đã có giáo án nhưng chưa gắn bài về nhà. Danh sách: bấm tab 'Giáo án theo buổi'."]]},
@@ -7463,11 +7463,12 @@ function renderGiaoan(){var tab=window.GATAB||"ga";
   h+=statStrip([
    /* V9.57: "Buoi da soan giao an" la so tich luy - 640 hay 641 thi hom nay cung khong lam gi
       khac. Doi sang buoi SAP DAY ma chua co giao an: do moi la viec phai chay. */
-   (function(){var t0=new Date();t0.setHours(0,0,0,0);var t7=new Date(t0.getTime()+7*864e5);
+   (function(){var _nga=paramOf("gaAhead_days",7);
+    var t0=new Date();t0.setHours(0,0,0,0);var t7=new Date(t0.getTime()+_nga*864e5);
     var n=rows("DL11").filter(function(x){var d=pvnd(x.session_date);
      if(!d||d<t0||d>=t7||isc(x.session_status,"cancelled","completed"))return false;
      return !pl.some(function(g){return String(g.session_id||"")===String(x.session_id)})}).length;
-    return ["ti-notes",n,"Buổi 7 ngày tới chưa có giáo án","#E24B4A",n?"soạn trước, đừng để tới giờ dạy":"đã soạn đủ cả tuần"]})(),
+    return ["ti-notes",n,"Buổi sắp dạy chưa có giáo án","#E24B4A",(n?"soạn trước, đừng để tới giờ dạy":"đã soạn đủ")+" · nhìn trước "+slaChip("gaAhead_days",7,"ngày")]})(),
    ["ti-file-alert",noPlan,"Khóa chưa có giáo án nào","#E24B4A",noPlan?"soạn để lớp có bài":"đủ cả"],
    ["ti-book",bank.length,"Bài trong kho","#0D9488",orphan?(orphan+" bài chưa dùng ở đâu"):"đều đang dùng","window.GATAB='kho';reRender('giaoan')"],
    ["ti-clipboard-x",noHw,"Buổi chưa gắn bài tập","#E08A1E","học viên không có bài về nhà","window.GATAB='ga';reRender('giaoan')"]],"giaoan")})();
@@ -10499,6 +10500,11 @@ var APPPARAMS=[
  ["P5 · Xếp lớp & nhập học","placementChange_free_times","Học viên được đổi lớp mấy lần trước khi phải trình quản lý phê duyệt","lần",1],
  ["P5 · Xếp lớp & nhập học","slaClassInfoZalo_hours","Hạn gửi thông tin lớp cho HV sau khi xếp lớp","giờ",24],
  ["P5 · Xếp lớp & nhập học","slaOBT_hours","Hạn hoàn tất onboarding cho HV mới","giờ",48],
+ /* V9.99z12 - so 7 nay TRUOC DAY CAM CUNG trong ma (`t0.getTime()+7*864e5`). `_checkaudit`
+    khong bat duoc suot mot thoi gian dai vi no tim banh rang trong vong 200 ky tu quanh cau, ma
+    mot banh rang cua MUC BEN CANH tinh co lot vao tam. Rut ngan cau (dot van phong 06/08) lam
+    banh rang ay roi ra ngoai tam, the la lo. Luat CH2 bi vi pham suot, chi la dang duoc che. */
+ ["P6 · Buổi học, điểm danh & bài tập","gaAhead_days","Nhìn trước bao nhiêu ngày để soạn giáo án cho buổi sắp dạy","ngày",7],
  ["P6 · Buổi học, điểm danh & bài tập","slaAttendanceGate_minutes","Cổng điểm danh mở bao nhiêu phút TRƯỚC giờ học (GV bấm Bắt đầu lớp trong khoảng này)","phút",20],
  ["P6 · Học viên nguy cơ","thresholdAtRisk_absences","Vắng không phép bao nhiêu buổi -> HV có nguy cơ chuyên cần","buổi",2],
  ["P6 · Học viên nguy cơ","thresholdAtRisk_hw_missing","Thiếu bài tập bao nhiêu lần -> HV có nguy cơ học thuật","lần",3],
