@@ -2161,7 +2161,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">06/08/2026 · <b>df266b</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">06/08/2026 · <b>b65a29</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -19159,6 +19159,13 @@ function qaSoTim(q){
  var kq=null;try{kq=best.m.fn()}catch(e){return null}
  if(!kq)return null;
  kq.t=best.m.t;kq.ic=best.m.ic;kq.k=best.m.k;
+ /* V9.99z10 - TRỢ LÝ CŨNG KHÔNG ĐƯỢC MỜI RỒI ĐUỔI. Bộ lọc `scrubMoiRoiDuoi` đứng ở `go()`, mà
+    hộp Trợ lý vẽ vào chỗ khác nên nó không với tới - thẻ "Hồ sơ còn việc của tôi" vẫn chìa nút
+    "Mở Bàn làm việc" cho người không có trang ấy trong phạm vi. Cắt ngay ở nguồn: không có
+    quyền vào thì bỏ cái nút, phần trả lời (con số, danh sách) vẫn giữ nguyên vì nó là thông
+    tin thật của họ. */
+ try{var _g=String(kq.go||"").match(/go\('([a-z0-9_]+)'\)/);
+  if(_g&&!canSee(_g[1])&&!SENSITIVE[_g[1]]){kq.go="";kq.nut=""}}catch(e){}
  return kq}
 function qaTraLoi(cau){
  var q=String(cau||"").trim();

@@ -455,6 +455,20 @@ Chi tiet "vi sao" o `02_NHAT_KY_QUYET_DINH.md`. O day chi ghi nhung cho **cham v
   lai tai cho** (Ban lam viec mo ho so ngay trong trang) - tu oan 8 dong dang chay dung; (b) rut
   ma ho so tu `textContent` thi chu cac o dinh lien nhau ("LOP-FOUND-PLA-01"+"10"+"100") thanh
   mot ma bia ra - nay chi hoi khi dong TU KHAI ma bang `data-mo-arg`.
+- **`_checkmoi.js` (MOI, V9.99z10)** - **KHONG MOI ROI DUOI**. Anh Luan 05/08: *"o trang lop hoc
+  cua truong phong ACA lai co nut Xep lop va onboarding, bam vao thi: Trang ngoai pham vi chuc
+  danh cua ban - dang xem o che do THAM KHAO. Day la 1 dang loi nang do em."* Do lai: **67 cho**
+  tren 16 chuc danh. `_checknguoi` da hoi "menu co muc nao moi roi duoi khong" - nhung chi hoi
+  tren MENU. Loi vao con nam ca trong THAN TRANG: nut nghiep vu dau trang, o so trang Bao cao,
+  dong viec trang Viec hom nay, banh rang dan sang Cai dat. Bo nay dong vai 32 nguoi dang di lam,
+  ve THAT moi trang trong pham vi cua ho roi hoi hai cau cho tung trang: con `<button>` nao dan
+  ra ngoai pham vi khong, va con o/dong bam duoc nao dan ra ngoai khong. **603 tieu chi.**
+  Vá o dung MOT cua - `scrubMoiRoiDuoi()` goi trong `go()`, hai cach xu khac nhau co chu y:
+  nut thi **bo han** (mot cai nut la mot loi moi lam viec), o so thi **giu con so, chi go cu bam**
+  (bo ca o la bot thong tin cua ho - pham LUAT CUNG SO 0).
+  **BAY CUA CHINH CAI THUOC:** lan chay dau ra "67 cho" y het luc chua va, vi no do tren chuoi THO
+  cua `RENDER[k]()` - ma bo loc nam o `go()`. Phai do SAU khi goi `scrubMoiRoiDuoi` moi la do cai
+  nguoi dung that su nhin thay. Do ban tho thi do oan; do ban da qua `go()` moi dung cua.
 - **`_checknguoi.js` (MOI, V9.91)** - dong vai **tung NGUOI** trong DL01 (37 nguoi / 18 chuc danh),
   khong phai tung chuc danh. Vi sao can them mot bo nua: pham vi du lieu cat theo CHI NHANH va
   theo NGUOI PHU TRACH, nen 7 nhan vien tu van o 5 co so nhin ra 7 man hinh khac nhau - lay mot

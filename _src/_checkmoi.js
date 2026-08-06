@@ -63,6 +63,20 @@ function t(ten,dieu){if(dieu)ok++;else xau.push(ten)}
   t(role+" · trang "+pk+" con o bam duoc ra ngoai pham vi: "+o.join(","), o.length===0);
  });
 });
+/* 3. HOP TRO LY - vao bang cua rieng no, khong di qua go() nen bo loc kia khong voi toi.
+      The "Ho so con viec cua toi" tung chia nut "Mo Ban lam viec" cho nguoi khong co trang ay. */
+(DL.DL01||[]).filter(s=>s.staff_id&&staffActive(s)).forEach(function(S){
+ var role=(ecode(S.role)||S.role)+"";
+ window.GATE_SID=S.staff_id; applyScope(S.staff_id); setRole("all");
+ if(SCOPE().pages==="*")return;
+ (typeof QASO!=="undefined"?QASO:[]).forEach(function(c){
+  var kq=null; try{kq=qaSoTim((c.tu&&c.tu[0])||c.t)}catch(e){return}
+  if(!kq||kq.k!==c.k)return;
+  var g=String(kq.go||"").match(/go\('([a-z0-9_]+)'\)/);
+  var ngoai = g && !canSee(g[1]) && !SENSITIVE[g[1]];
+  t(role+" · The Tro ly '"+c.k+"' chia nut ra ngoai pham vi: "+(g?g[1]:""), !ngoai);
+ });
+});
 t("co do duoc it nhat 10 nguoi", soNguoi>=10);
 console.log(xau.length?("FAIL:\n  "+xau.slice(0,40).join("\n  ")+(xau.length>40?("\n  ... con "+(xau.length-40)):"")):"TONG: "+ok+" tieu chi tren "+soNguoi+" nguoi");
 process.exit(xau.length?1:0);

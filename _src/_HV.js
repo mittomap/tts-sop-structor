@@ -16962,6 +16962,13 @@ function qaSoTim(q){
  var kq=null;try{kq=best.m.fn()}catch(e){return null}
  if(!kq)return null;
  kq.t=best.m.t;kq.ic=best.m.ic;kq.k=best.m.k;
+ /* V9.99z10 - TRỢ LÝ CŨNG KHÔNG ĐƯỢC MỜI RỒI ĐUỔI. Bộ lọc `scrubMoiRoiDuoi` đứng ở `go()`, mà
+    hộp Trợ lý vẽ vào chỗ khác nên nó không với tới - thẻ "Hồ sơ còn việc của tôi" vẫn chìa nút
+    "Mở Bàn làm việc" cho người không có trang ấy trong phạm vi. Cắt ngay ở nguồn: không có
+    quyền vào thì bỏ cái nút, phần trả lời (con số, danh sách) vẫn giữ nguyên vì nó là thông
+    tin thật của họ. */
+ try{var _g=String(kq.go||"").match(/go\('([a-z0-9_]+)'\)/);
+  if(_g&&!canSee(_g[1])&&!SENSITIVE[_g[1]]){kq.go="";kq.nut=""}}catch(e){}
  return kq}
 function qaTraLoi(cau){
  var q=String(cau||"").trim();

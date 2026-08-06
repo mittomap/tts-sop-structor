@@ -148,6 +148,33 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### ✅ ĐÃ ĐÓNG - "MỜI RỒI ĐUỔI": 67 lối vào dẫn ra ngoài phạm vi chức danh (05/08)
+> Anh Luân: *"ở trang lớp học của trưởng phòng ACA lại có nút Xếp lớp và onboarding, bấm vào
+> thì: Trang ngoài phạm vi chức danh của bạn - đang xem ở chế độ THAM KHẢO... **Đây là 1 dạng
+> lỗi nặng đó em**"* - rồi: *"tức là màn hình dành cho mỗi người vẫn còn nhiều chỗ chưa chuẩn,
+> e phải rà soát lại."*
+> · **Gốc:** `renderHoctap` dựng nút "Xếp lớp & Onboarding" VÔ ĐIỀU KIỆN - không hỏi người đang
+>   ngồi trước màn là ai. Vế thứ hai anh tả (*"nút đổi thành Xếp lớp học viên"*) không phải lỗi
+>   thứ hai: app đã sang trang `xeplop` thật, nút chính của trang đó tên như vậy. Anh đọc đúng -
+>   **trang có đổi**. Cái sai là **cái nút không bao giờ nên được vẽ ra**.
+> · **Đo ra 67 chỗ / 16 chức danh**, bốn kiểu: nút nghiệp vụ đầu trang · ô số trang Báo cáo ·
+>   dòng việc trang Việc hôm nay · bánh răng dẫn sang Cài đặt (11/16 chức danh không vào được).
+> · **Vá ở ĐÚNG MỘT CỬA** (`scrubMoiRoiDuoi` gọi trong `go()`), hai cách xử có chủ ý:
+>   **nút thì bỏ hẳn** - một cái nút là một lời mời làm việc, không mời được thì đừng vẽ;
+>   **ô số thì giữ con số, chỉ gỡ cú bấm** - bỏ cả ô là bớt thông tin của họ, phạm LUẬT CỨNG SỐ 0.
+>   Chế độ THAM KHẢO giữ nguyên, nay chỉ phục vụ người gõ thẳng địa chỉ / đi từ link cũ.
+> · **Lỗ thứ hai tự lòi ra trong lúc vá:** hộp **Trợ lý** vẽ vào chỗ khác nên `go()` không với
+>   tới - thẻ "Hồ sơ còn việc của tôi" vẫn chìa nút "Mở Bàn làm việc" cho người không có trang
+>   ấy. Cắt thêm ở `qaSoTim`: mất quyền thì bỏ nút, phần trả lời giữ nguyên.
+> · **Bộ kiểm mới `_checkmoi`** - đóng vai 32 người đang đi làm, vẽ THẬT mọi trang trong phạm vi
+>   của họ + hỏi lại mọi thẻ Trợ lý. **1019 tiêu chí**, đã nối vào `./verify.sh`.
+> · **BẪY CỦA CHÍNH CÁI THƯỚC (đã cắn):** lượt chạy đầu vẫn ra "67 chỗ" y như lúc chưa vá - vì
+>   nó đo trên chuỗi THÔ của `RENDER[k]()`, mà bộ lọc nằm ở `go()`. **Đo bản thô là đo oan; phải
+>   đo sau khi qua đúng cái cửa người dùng đi qua.** Cùng họ với bẫy `_checknv` hôm 04/08.
+> · Vì sao `_checknguoi` không bắt được: nó CÓ hỏi "mời rồi đuổi" - nhưng **chỉ hỏi trên MENU**.
+>   Lối vào còn nằm cả trong THÂN TRANG. Một câu hỏi đúng, đặt thiếu một nửa chỗ.
+
+
 > ### 🔚 ANH LUÂN CHỐT 05/08: **BỎ HẲN BẢN V6**
 > *"ko cần sửa đâu, a bỏ luôn bản v6 đây"* - nói khi em khai một chỗ chưa vá nằm trên Bàn làm
 > việc theo thực thể (màn riêng của v6): hồ sơ Marketing mở ra còn 86 việc của người khác so
