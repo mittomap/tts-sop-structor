@@ -12,7 +12,7 @@ var ok=0,bad=[];function t(name,cond){if(cond)ok++;else bad.push(name)}
    luôn cả phần dựng và phần TRẢ LẠI trạng thái nằm bên trong biểu thức ấy, nên các câu sau đó
    thừa hưởng trạng thái hỏng và đổ oan cho app. Tham số được tính TRƯỚC khi gọi hàm, nên viết
    thành hàm là mọi tác dụng phụ vẫn xảy ra. */
-function tv5(a,b,c){if(!V6())t(a,b,c)}
+function tv5(a,b,c){t(a,b,c)}   /* v6 da go - moi tieu chi deu la tieu chi cua V5 */
 setRole("all");
 
 /* --- 1. tang arc phu kin 17 chang --- */
@@ -133,7 +133,7 @@ var nv=NAVEL.innerHTML;
    Bản v6 cố ý không có nhóm chặng - menu 5 nhóm, nhiều trang là TAB của một hub. Nên các câu
    dưới đây không áp cho v6; ý định của chúng ("người dùng luôn biết mình đang ở đâu") đã được
    đo riêng cho cả hai bản và cho kết quả như nhau. */
-if(!V6()){t("quantri: menu co du 4 tong quan chang", (nv.match(/data-k="chang[A-D]"/g)||[]).length===4);
+if(1){t("quantri: menu co du 4 tong quan chang", (nv.match(/data-k="chang[A-D]"/g)||[]).length===4);
 t("menu co cham mau arc", (nv.match(/class="navarc"/g)||[]).length===4);}
 /* navVis theo vai: tu van khong thay xep lop, giao vien khong thay lead */
 /* 05/08 - LOI CUA CHINH PHEP DO NAY: cac cau duoi day goi `applyScope(sid)` KHONG kem
@@ -625,28 +625,25 @@ console.log(bad.length?("FAIL:\n  "+bad.join("\n  ")):"OK: "+ok);
  window.GATE_SID="";applyScope("");setRole("all");
 })();
 
-/* ═══ V9.99z10 - BẢN V6 ĐÃ BỎ HẲN: PHẢI CHẮC NÓ KHÔNG CHẠM VÀO V5 ═════════════════════════
-   Anh Luân 05/08: *"bỏ luôn tức là thôi em quên nó đi đó, khỏi cần đụng tới. **Miễn là nó ko
-   ảnh hưởng gì tới V5 hiện tại**"*. Vế sau là một điều kiện, nên phải có người canh - không thì
-   ba tháng nữa ai đó bật lại một dòng là cả cây menu của V5 đổi mà không ai biết.
-   Mã v6 vẫn nằm trong nguồn (anh Luân bảo đừng đụng tới), nhưng nó phải CHẾT HẲN lúc chạy:
-   cờ `ITTS_V6` cắm cứng 0 trong bản dựng, không một cửa nào bật lên được, và mọi hàm dùng
-   chung phải trả về cây/khung của V5. Ba lỗi trong ngày 05/08 đều sinh ra từ chỗ mã dùng chung
-   đọc bảng của v6 - nên đây không phải lo hão. */
+/* ═══ V9.99z11 - V6 ĐÃ GỠ SẠCH, VÀ KHÔNG ĐƯỢC DỰNG LẠI ══════════════════════════════════
+   Anh Luân 06/08: *"bỏ v6, ko được làm ảnh hưởng v5"*. Nguồn nay không còn cờ `ITTS_V6`, hàm
+   `V6()`, bảng `NAVTREE6`, hàm `v6Dap`, và bộ máy đổi bản của nút Đổi cổng.
+   Chốt này canh y cách `check_gs.py` canh lớp Google Sheets đã nghỉ hưu: thứ đã bỏ thì phải có
+   người gác cửa, không thì ba tháng nữa nó mọc lại bằng một lần chép nhầm.
+   KHÔNG canh trang `ban`: đo lại 06/08 mới biết nó đang làm TRANG HỒ SƠ PHỤ HUYNH của bản V5
+   (Sổ người đồng hành bấm vào một dòng là mở nó). Nó không còn là "màn của v6" nữa. */
 (function(){
  var SRCX="";try{SRCX=require('fs').readFileSync('./gen_v5.py','utf8')}catch(e){}
- t("V6 tat cung trong ban dung (ITTS_V6=0 cam cung)", /window\.ITTS_V6\s*=\s*0\s*;/.test(SRCX));
- t("khong co cua nao bat V6 len trong ma app", (function(){
-   /* Bo qua DONG CHU THICH cua Python (bat dau bang #) - buoc dung ban v6 da go tu 04/08 con
-      nam do duoi dang chu thich, de doi sau doc hieu vi sao. Chu thich khong bat duoc cai gi. */
-   var xau=SRCX.split("\n").filter(function(d){
-     return d.trim().charAt(0)!=="#" && /ITTS_V6\s*=\s*[^0]/.test(d)});
-   return xau.length===0})());
- t("V6() tra ve false luc chay", typeof V6==="function"&&V6()===false);
- t("navCay() tra cay cua V5, khong phai NAVTREE6", (function(){
-   var T=navCay();return T!==NAVTREE6&&T.some(function(g){return (g.items||[]).indexOf("banlam")>=0})})());
- t("khong con file build v6 nao o goc", (function(){
-   try{return !require('fs').existsSync((process.env.ITTS_OUT||'.')+'/ITTs_WebApp_v6_demo.html')}catch(e){return true}})());
+ var maSong=function(re){return SRCX.split("\n").filter(function(d){
+   var t=d.trim(); return t.charAt(0)!=="#" && t.slice(0,2)!=="/*" && t.charAt(0)!=="*" && re.test(d)}).length};
+ t("khong con co ITTS_V6 trong nguon", maSong(/ITTS_V6/)===0);
+ t("khong con ham V6() trong nguon",   maSong(/\bfunction V6\s*\(/)===0);
+ t("khong con bang NAVTREE6",          maSong(/NAVTREE6/)===0);
+ t("khong con v6Dap",                  maSong(/v6Dap/)===0);
+ t("khong con may doi ban o nut Doi cong", maSong(/congLaV6|congURLBan|congDiBan|congBanNho|congBanGhi/)===0);
+ t("khong con duong dan cong-nhan-vien-v6", maSong(/cong-nhan-vien-v6/)===0);
+ t("V6 khong con la mot ham luc chay", typeof V6!=="function");
+ t("navCay() tra dung cay cua V5", navCay()===navCayV5()||JSON.stringify(navCay())===JSON.stringify(navCayV5()));
 })();
 
 console.log(bad.length?("FAIL2:\n  "+bad.join("\n  ")):"TONG: "+ok);

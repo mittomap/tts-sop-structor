@@ -2176,7 +2176,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">06/08/2026 · <b>fa6507</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">06/08/2026 · <b>dfd9b7</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -2233,15 +2233,6 @@ var PARAMS=(DATA&&DATA.params)||{}, MEINFO=null, EDIT={};
    thêm cửa ghi mới mà quên nối vào đây là ĐỎ - đúng cái ta cần khi backend xuất hiện. */
 var SVR=(typeof google!=="undefined"&&google.script&&google.script.run);
 
-/* ═══ CỜ BẢN V6 - TRỤC THỰC THỂ ═══════════════════════════════════════════════════════════
-   Dòng dưới đây là ĐIỂM KHÁC DUY NHẤT giữa hai bản build. `gen_v5.py` ghi ra hai file: bản v5
-   giữ nguyên chữ số 0, bản v6 thay thành 1. Mọi chỗ trong app hỏi `V6()` để biết mình đang chạy
-   ở trục nào - không có nhánh nào khác, không có file nguồn thứ hai.
-   Vì sao không tách nguồn: hai nguồn cạnh nhau thì sẽ trôi khỏi nhau. Mọi bản vá chung sau này
-   (bộ lọc, câu chữ, phân quyền) phải làm hai lần, và tới lần thứ ba là quên một bên - đúng cái
-   bẫy "một sự thật ở hai chỗ" mà dự án này đã cắn nhiều lần. */
-window.ITTS_V6=0;
-function V6(){return !!window.ITTS_V6}
 
 /* ===== NỀN DEMO ĐA CỔNG (V9.7) =====
    - Mọi thao tác ghi được LƯU THẬT vào localStorage (bản Google Sheets đã cho nghỉ hưu 30/07).
@@ -2843,7 +2834,19 @@ var CURSTAFF="";
 /* ===== V9.9 - MÀN HÌNH THEO CHỨC DANH (ma trận đã hội đồng thiết kế, Luân duyệt) =====
    Phân quyền GIAO DIỆN: chỉ chọn tập trang/khối/tab có sẵn, KHÔNG giấu dữ liệu tầng data.
    "Vào nhanh - Quản trị viên" = quantri thấy hết. Bấm tên luôn xem được hồ sơ 360. */
-var VIEW_ALWAYS={hoso:1,hosogv:1,hosonv:1,hosokhoa:1,chay:1,chang:1,lop:1,viec:1,dashboard:1,tracuu:1,pipeline:1,nhanvien:1,khoahoc:1,tranghv:1,nhaplead:1,lienhe:1,test:1,tuvan:1,thanhtoan:1,diemdanh:1,buoihoc:1,baitap:1,wow:1,review:1,khaosat:1,ghinhan:1,khieunai:1,baoluu:1,magioithieu:1,banggiao:1,canhan:1};
+/* V9.99z11 - `ban` VÀO ĐÂY, VÀ ĐÂY LÀ MỘT QUYẾT ĐỊNH CHỨ KHÔNG PHẢI MỘT DÒNG THÊM CHO ĐỦ.
+   Gỡ bản v6 ngày 06/08, em định xoá luôn trang `ban` (Bàn làm việc theo thực thể) vì nó là màn
+   riêng của v6: không nằm trong cây menu V5, không nằm trong phạm vi của chức danh nào.
+   ĐO LẠI THÌ KHÔNG PHẢI VẬY: trang **Sổ người đồng hành** của bản V5 bấm vào một dòng là gọi
+   `phMo()` -> `go("ban")` với thực thể đặt sẵn là phụ huynh. Tức `ban` đang làm TRANG HỒ SƠ
+   PHỤ HUYNH của V5. Xoá nó là xoá một tính năng V5 đang chạy - đúng cái anh Luân dặn không
+   được làm.
+   Và nó còn đang hỏng sẵn: vì không ở trong phạm vi ai cả, bấm một phụ huynh là ăn ngay dòng
+   "Trang ngoài phạm vi chức danh của bạn" - cùng họ với 67 chỗ "mời rồi đuổi" đã vá 05/08,
+   chỉ khác là lối đi vòng qua một hàm nên bộ kiểm dò theo `go('...')` không thấy.
+   Nên `ban` xếp cùng nhóm với `hoso`/`hosogv`/`hosonv`/`hosokhoa`: TRANG CHI TIẾT mở ra từ một
+   danh sách, ai mở được danh sách thì đọc được chi tiết. */
+var VIEW_ALWAYS={ban:1,hoso:1,hosogv:1,hosonv:1,hosokhoa:1,chay:1,chang:1,lop:1,viec:1,dashboard:1,tracuu:1,pipeline:1,nhanvien:1,khoahoc:1,tranghv:1,nhaplead:1,lienhe:1,test:1,tuvan:1,thanhtoan:1,diemdanh:1,buoihoc:1,baitap:1,wow:1,review:1,khaosat:1,ghinhan:1,khieunai:1,baoluu:1,magioithieu:1,banggiao:1,canhan:1};
 var SENSITIVE={duyet:1,settings:1,baocao:1};
 /* ═══ V9.99t - CHUÔNG VÀ "VIỆC HÔM NAY" PHẢI LÀ VIỆC CỦA CHÍNH CHỨC DANH ĐÓ ════════════════
    Anh Luân 05/08, đang đứng ở Trưởng phòng ACA: *"chỗ việc hôm nay, a đang ở trưởng phòng ACA,
@@ -3075,7 +3078,6 @@ function buildScope(code){
     Anh Luân đã dạy em một luật ở phiên trước và nó áp thẳng vào đây: **thêm một mục vào menu
     chưa phải là làm cho người ta thấy nó.** Bàn làm việc ở v5 là một mục trong menu - ai không
     bấm thì không biết. Ở v6 nó là chỗ người ta rơi vào. */
- v6Dap(eff);
  if(eff.pages!=="*"&&eff.pages.indexOf(eff.land)<0)eff.land=eff.pages[0]||"viec";
  return eff}
 /* Luật trang đáp của v6 tách thành hàm riêng vì nó phải áp cho MỌI lối dựng phạm vi, không
@@ -3083,11 +3085,6 @@ function buildScope(code){
    dựng thẳng một object), nên bản v6 mở ra vẫn rơi vào Trang bắt đầu y hệt v5 - đúng cái thay đổi
    dễ thấy nhất của v6 thì người mở demo lại không thấy, vì demo mặc định mở bằng Quản trị viên.
    Bộ kiểm cũng không thấy: nó đóng vai từng chức danh, mà Quản trị viên không phải chức danh. */
-function v6Dap(eff){
- if(!(typeof V6==="function"&&V6()))return eff;
- if(eff.pages==="*"||eff.pages.indexOf("ban")>=0)eff.land="ban";
- else{eff.pages=["ban"].concat(eff.pages);eff.land="ban"}
- return eff}
 function SCOPE(){return window.SCOPEEFF||ROLESCOPE.quantri}
 function applyScope(sid){var eff;
  /* V9.33 (anh Luân: "bấm vô mấy trang chờ duyệt nó đơ hết"): Quản trị viên dựng bằng cách gọi
@@ -3098,7 +3095,7 @@ function applyScope(sid){var eff;
     cùng một tab - nhìn y như trang bị đơ.
     Nay dựng THẲNG từ ROLESCOPE.quantri chứ không mượn nhóm khác rồi vá: mượn rồi vá thì bỏ sót
     một ô là im lặng sai, và không ai đọc ra được. */
- if(!sid){eff=v6Dap({group:"quantri",land:"banlam",pages:"*",blocks:"*",bell:"*",tabs:null,
+ if(!sid){eff=({group:"quantri",land:"banlam",pages:"*",blocks:"*",bell:"*",tabs:null,
    lite:0,kpi:0,mine:0,mineBtn:0,name:"Quản trị viên · toàn quyền"})}
  else{var st=find("DL01","staff_id",sid);eff=buildScope(st?ecode(st.role):"")}
  window.SCOPEEFF=eff;window.MINEONLY=eff.mine?1:0;
@@ -5308,7 +5305,7 @@ function bangViecHTML(){
     Máy móc dùng chung, chỉ thiếu chỗ đặt. Đặt ngay trên bảng việc - đúng chỗ họ bắt đầu ngày.
     Bản 6 đã có ô này trên Bàn làm việc rồi; thêm lần nữa là hai ô giống hệt trên cùng một màn. */
  var _pick="";
- if(!(typeof V6==="function"&&V6())){try{_pick=banAiHTML()}catch(e){_pick=""}}
+ try{_pick=banAiHTML()}catch(e){_pick=""}
  /* Tab của hub chỉ xét khi trang đáp ĐÚNG LÀ hub đó (v5). Ở v6 trang đáp là Bàn làm việc,
     không có tab, nên bỏ qua vế này. */
  if(dap===L[0]){
@@ -17102,18 +17099,10 @@ var TOURS={
      thực thể của bản 6. Bài đó nay khai `chi:"6"`, bản 5 không thấy nữa.)
      LUẬT TỪ ĐÂY: bước hướng dẫn KHÔNG được trỏ vào trang chỉ có ở bản kia. `_checktour` canh
      bằng cách so hai cây menu, nên quên là đỏ ngay. */
-  V6()
-   ? {p:"ban",sel:'@bantt',t:"Bốn đối tượng được phục vụ",d:"Khách · Học viên · Phụ huynh · Lớp. Chọn một loại là thấy đúng những hồ sơ loại đó còn việc của bạn - không phải đi tìm theo trang.",hint:"Bấm thử một loại khác xem danh sách đổi theo."}
-   : {p:"banlam",sel:'@navarc',t:"Menu theo 4 chặng vòng đời",d:"C1 Khách tiềm năng - C2 Đang học - C3 Tạm dừng - C4 Kết thúc & Học tiếp. Chấm màu là chặng, số đỏ là việc quá hạn.",hint:"Bấm một nhóm chặng để mở ra."},
-  V6()
-   ? {p:"ban",sel:'@bstats',t:"Ba con số của màn này",d:"Bao nhiêu hồ sơ còn việc của bạn, trong đó mấy hồ sơ có việc gấp, và bao nhiêu đang sạch việc. Ô chỉ để xem - rê chuột vào ô có câu chú thích nói con số đếm gì.",hint:"Rê chuột vào ô đầu tiên."}
-   : {p:"banlam",sel:'@bstats',t:"Việc cần xử lý hôm nay",d:"Mỗi ô là một con số phải nhìn mỗi sáng. Ô chỉ để XEM, không bấm - rê chuột vào ô sẽ có câu chú thích nói con số đó đếm gì và muốn xem danh sách thì bấm chip nào ở dưới. Nút Thẻ ở góc phải cho bạn tắt bớt ô không cần.",hint:"Rê chuột vào ô Tới hẹn hôm nay để đọc chú thích."},
-  V6()
-   ? {p:"ban",sel:'@bangviec',t:"Bảng việc của chức danh bạn",d:"Ngay dưới thanh chọn là bảng việc còn tồn của chính bộ phận bạn, và khối những việc đang chờ bạn phê duyệt. Mở app ra là biết hôm nay còn nợ gì.",hint:"Nhìn các ô trong bảng việc."}
-   : {p:"banlam",sel:'@chaybody',t:"Danh sách người cần xử lý",d:"Mỗi dòng là một người kèm việc kế tiếp. Dải hạt màu cho biết họ đang ở chặng nào. Rê vào MỘT HẠT là biết chặng đó đã để lại gì trong hồ sơ; bấm vào hạt mở ngăn kéo riêng của chặng đó; bấm chữ C1/C2 đầu dải mở cả hành trình.",hint:"Rê vào một hạt rồi bấm thử - ngăn kéo kể đủ sản phẩm của chặng đó."},
-  V6()
-   ? {p:"hocvien",sel:'@tbarct',t:"Lọc nhiều trục trên mọi sổ",d:"Mọi danh sách trong app dùng chung một bộ công cụ: chip lọc nhanh, bộ lọc sâu, chọn cột, xuất tệp. Học một lần dùng được mọi sổ.",hint:"Bấm thử một chip lọc."}
-   : {p:"changA",sel:'@nrail',t:"Bản đồ một chặng",d:"Đường ray hiện số người ở từng ga và phần trăm chuyển đổi thật giữa các ga - nhìn là biết đang tắc ở đâu.",hint:"Bấm một ga để lọc người ở ga đó."},
+  {p:"banlam",sel:'@navarc',t:"Menu theo 4 chặng vòng đời",d:"C1 Khách tiềm năng - C2 Đang học - C3 Tạm dừng - C4 Kết thúc & Học tiếp. Chấm màu là chặng, số đỏ là việc quá hạn.",hint:"Bấm một nhóm chặng để mở ra."},
+  {p:"banlam",sel:'@bstats',t:"Việc cần xử lý hôm nay",d:"Mỗi ô là một con số phải nhìn mỗi sáng. Ô chỉ để XEM, không bấm - rê chuột vào ô sẽ có câu chú thích nói con số đó đếm gì và muốn xem danh sách thì bấm chip nào ở dưới. Nút Thẻ ở góc phải cho bạn tắt bớt ô không cần.",hint:"Rê chuột vào ô Tới hẹn hôm nay để đọc chú thích."},
+  {p:"banlam",sel:'@chaybody',t:"Danh sách người cần xử lý",d:"Mỗi dòng là một người kèm việc kế tiếp. Dải hạt màu cho biết họ đang ở chặng nào. Rê vào MỘT HẠT là biết chặng đó đã để lại gì trong hồ sơ; bấm vào hạt mở ngăn kéo riêng của chặng đó; bấm chữ C1/C2 đầu dải mở cả hành trình.",hint:"Rê vào một hạt rồi bấm thử - ngăn kéo kể đủ sản phẩm của chặng đó."},
+  {p:"changA",sel:'@nrail',t:"Bản đồ một chặng",d:"Đường ray hiện số người ở từng ga và phần trăm chuyển đổi thật giữa các ga - nhìn là biết đang tắc ở đâu.",hint:"Bấm một ga để lọc người ở ga đó."},
   {sel:'@bell',t:"Chuông cảnh báo",d:"Mọi việc trễ hẹn theo quy trình chuẩn dồn về đây, chia theo bộ phận. Việc mới từ máy khác còn nổ bong bóng góc màn hình.",hint:"Bấm chuông xem thử."},
   {sel:'@me',t:"Mỗi chức danh một màn hình riêng",d:"Bấm ô tên ở đáy menu để đổi người. Sale, học vụ, giáo viên, kế toán mỗi người thấy một giao diện và một phạm vi dữ liệu khác nhau.",hint:"Bấm ô tên ở đáy menu để xem danh sách người."},
   {sel:'@doicong',t:"Đổi cổng, đổi người - cùng một nút",d:"Ngoài cổng nhân viên còn cổng học viên và cổng phụ huynh, và bạn xem thử được app bằng mắt của bất kỳ ai trong trung tâm. Nút này mở thẳng sang cổng kia - ghi ở cổng này thì cổng kia thấy ngay, vì cả ba đọc chung một bộ dữ liệu.",hint:"Bấm Tiếp theo - còn một việc quan trọng."},
@@ -17151,7 +17140,7 @@ var TOURS={
   {p:"hoidap",sel:'@qavd',t:"Hỏi số - và số đó là số thật",d:"Bấm thử câu mẫu 'có bao nhiêu học viên nguy cơ'. Con số trả về chính là con số app đang hiện trên thẻ, tính lại tại chỗ theo ngưỡng CH2 - không phải số gõ sẵn. Bên dưới còn liệt kê cụ thể là ai.",hint:"Bấm một câu mẫu."},
   {p:"hoidap",sel:'@qabox',t:"Không hiểu thì nói là không hiểu",d:"Hỏi câu Trợ lý chưa trả lời được thì nó nói thẳng, gợi ý những thứ gần nhất, và GHI câu đó vào sổ trong Cài đặt để quản trị viên soạn câu trả lời một lần - lần sau app trả lời được ngay.",hint:"Xong phần Trợ lý!"}]},
  tn_sale:{lv:"trainghiem",role:"Nhân viên Tư vấn",t:"Một ngày của Nhân viên Tư vấn",ic:"ti-phone",d:"8 bước - từ khách mới tới lúc thu tiền",steps:[
-  {p:(V6()?"ban":"banlam"),sel:'@bstats',t:"Mở máy là nhìn 5 ô này",d:"Tới hẹn hôm nay là việc gấp nhất - khách đã hẹn mà không gọi là mất. Sau đó tới học viên nguy cơ và đăng ký còn nợ. Ô chỉ để xem; muốn ra danh sách thì bấm chip Tới hẹn / quá hẹn ở thanh Nhóm.",hint:"Bấm chip Tới hẹn / quá hẹn ở thanh Nhóm."},
+  {p:"banlam",sel:'@bstats',t:"Mở máy là nhìn 5 ô này",d:"Tới hẹn hôm nay là việc gấp nhất - khách đã hẹn mà không gọi là mất. Sau đó tới học viên nguy cơ và đăng ký còn nợ. Ô chỉ để xem; muốn ra danh sách thì bấm chip Tới hẹn / quá hẹn ở thanh Nhóm.",hint:"Bấm chip Tới hẹn / quá hẹn ở thanh Nhóm."},
   /* V9.97: neo cũ là '@txt:Thêm mới' - KHÔNG CÓ nút nào tên vậy trên màn này. Trang `nhaplead`
      đi qua remap của go() thành tab "lead" của hub Tuyển sinh, mà ở đó nút thêm tên là "Khách mới
      liên hệ đến". Bài bảo người ta bấm một nút không tồn tại, và câu "Việc cần làm" cũng sai theo.
@@ -17202,7 +17191,7 @@ var TOURS={
  tn_hotro:{lv:"trainghiem",role:"Nhóm hỗ trợ (HR, IT...)",t:"Một ngày của nhóm hỗ trợ",ic:"ti-tool",d:"3 bước - nhận việc, làm, báo xong",steps:[
   /* Bảng việc nằm ở TRANG ĐÁP, mà trang đáp của bản 5 là Trang bắt đầu còn bản 6 là Bàn làm
      việc - cắm cứng "banlam" thì sang v6 bước này trỏ vào chỗ không có neo. */
-  {p:(V6()?"ban":"banlam"),sel:'@bangviec',t:"Bảng việc của bạn",d:"Nhóm hỗ trợ không đụng vào phễu hay lớp học - bạn làm việc qua trang Quản lý việc giao & nhận. Bốn con số đầu trang cho biết việc mới, đang làm, quá hạn và việc chờ người giao xác nhận.",hint:"Nhìn bốn ô đầu trang."},
+  {p:"banlam",sel:'@bangviec',t:"Bảng việc của bạn",d:"Nhóm hỗ trợ không đụng vào phễu hay lớp học - bạn làm việc qua trang Quản lý việc giao & nhận. Bốn con số đầu trang cho biết việc mới, đang làm, quá hạn và việc chờ người giao xác nhận.",hint:"Nhìn bốn ô đầu trang."},
   {p:"giaoviec",sel:'@txt:Nhận việc',t:"Nhận việc được giao",d:"Bấm Nhận là người giao biết việc đã tới tay bạn. Việc bắt buộc thì không từ chối được; việc thường thì từ chối phải ghi lý do.",hint:"Bấm 'Nhận việc' trên một việc mới được giao."},
   {p:"giaoviec",sel:'@tbar',t:"Báo xong ngay lúc làm xong",d:"Báo xong kèm ghi chú, người giao xác nhận là việc đóng. Không làm kịp thì báo lại sớm - im lặng mới là vấn đề.",hint:"Xong một ngày của nhóm hỗ trợ!"}]},
  tn_nhansu:{lv:"trainghiem",role:"Nhân sự",t:"Một ngày của Nhân sự",ic:"ti-id-badge",d:"4 bước - hồ sơ người, bảng công, việc nội bộ",steps:[
@@ -17225,8 +17214,8 @@ var TOURS={
   {p:"baocao",sel:'@man',t:"Báo cáo doanh thu",d:"Doanh thu theo tháng, theo nguồn khách, công nợ tồn - số liệu tự tính từ phiếu thu, không phải gõ lại.",hint:"Xong một ngày của kế toán!"}]},
  tn_quanly:{lv:"trainghiem",role:"Quản lý - Giám đốc",t:"Một ngày của Quản lý",ic:"ti-shield-check",d:"6 bước - nhìn số, duyệt, giao việc",steps:[
   {p:"baocao",sel:'@man',t:"Mở máy là nhìn số",d:"Doanh thu, phễu tuyển sinh, chuyên cần, hài lòng - và quan trọng nhất là phần nhận xét kèm việc nên làm ngay cho từng chỉ số.",hint:"Cuộn xuống xem khối chỉ số."},
-  {p:(V6()?"ban":"banlam"),sel:'@bstats',t:"Điểm nghẽn toàn trung tâm",d:"Ô nào số cao bất thường là chỗ đang tắc. Rê chuột vào ô để biết mở trang nào hoặc bấm chip nào thì ra đúng danh sách người đang kẹt ở đó.",hint:"Rê chuột vào ô có số lớn nhất."},
-  {p:(V6()?"hocvien":"changA"),sel:(V6()?'@tbarct':'@nrail'),t:"Tắc ở chặng nào",d:"Phần trăm chuyển đổi giữa các ga cho biết mất khách ở bước nào: gọi không được, test rồi không tư vấn, hay tư vấn rồi không chốt.",hint:"Nhìn tỷ lệ giữa các ga."},
+  {p:"banlam",sel:'@bstats',t:"Điểm nghẽn toàn trung tâm",d:"Ô nào số cao bất thường là chỗ đang tắc. Rê chuột vào ô để biết mở trang nào hoặc bấm chip nào thì ra đúng danh sách người đang kẹt ở đó.",hint:"Rê chuột vào ô có số lớn nhất."},
+  {p:"changA",sel:'@nrail',t:"Tắc ở chặng nào",d:"Phần trăm chuyển đổi giữa các ga cho biết mất khách ở bước nào: gọi không được, test rồi không tư vấn, hay tư vấn rồi không chốt.",hint:"Nhìn tỷ lệ giữa các ga."},
   {p:"duyet",sel:'@txt:Duyệt',t:"Duyệt việc chờ bạn",d:"Chiết khấu lớn, hoàn tiền - nhân viên tạo là bạn nhận thông báo ngay, duyệt xong nhân viên biết liền.",hint:"Bấm 'Duyệt' hoặc 'Từ chối' trên một chiết khấu đang chờ.",chk:function(){return (window.TOURB&&rows("DL06").filter(function(x){return String(x.discount_approved_by||"").trim()}).length>(window.TOURB.duyet||0))}},
   {p:"giaoviec",sel:'@txt:Giao việc mới',t:"Giao việc cho đội",d:"Giao xuống cấp dưới, phối hợp ngang cấp, hoặc nhờ hỗ trợ. Việc bắt buộc thì không được từ chối.",hint:"Bấm 'Giao việc mới', chọn người nhận, ghi tiêu đề và hạn rồi Lưu.",chk:function(){return tourMore("viec")}},
   {p:"giaoviec",sel:'@tbar',t:"Ai đang làm tốt, ai hay trễ",d:"Tab Tổng hợp cho biết tỷ lệ hoàn thành đúng hạn của từng người - dùng khi đánh giá cuối tháng.",hint:"Bấm tab Tổng hợp & báo cáo."}]},
@@ -17254,7 +17243,7 @@ var TOURS={
   {p:"settings",ctx:function(){window.SETTAB="ch4"},sel:'@settabs',t:"Câu nhắc việc",d:"Toàn bộ câu chữ nhắc nhân viên làm gì nằm ở đây - sửa được, không cần lập trình viên. Câu có tham số tự điền số từ ngưỡng.",hint:"Sửa thử một câu và xem bản xem trước."},
   {p:"settings",ctx:function(){window.SETTAB="ch1"},sel:'@settabs',t:"Danh mục",d:"Mọi nhãn trạng thái trong app lấy từ danh mục này: nguồn khách, trạng thái lớp, hình thức thanh toán...",hint:"Còn một mẹo cuối - bấm Tiếp."},
   /* V9.54: dạy luôn đường tắt, không thì người dùng cứ nghĩ muốn đổi ngưỡng là phải mò vào đây. */
-  {p:(V6()?"ban":"banlam"),sel:(V6()?'@bantt':'@chaybody'),t:"Không cần vào Cài đặt mới sửa được",d:"Ở bất kỳ màn nào, thấy cái bánh răng nhỏ cạnh một con số hay một câu nhắc là bấm được: nó mở ngăn kéo sửa NGAY TẠI CHỖ, lưu xong màn đang xem tính lại theo, bạn không phải rời chỗ đang làm. Trong ngăn kéo vẫn có nút mở trang Cài đặt nếu muốn xem cả nhóm.",hint:"Tìm một bánh răng trên màn và bấm thử. Không thích thấy bánh răng thì tắt ở Cài đặt > Giao diện."}]},
+  {p:"banlam",sel:'@chaybody',t:"Không cần vào Cài đặt mới sửa được",d:"Ở bất kỳ màn nào, thấy cái bánh răng nhỏ cạnh một con số hay một câu nhắc là bấm được: nó mở ngăn kéo sửa NGAY TẠI CHỖ, lưu xong màn đang xem tính lại theo, bạn không phải rời chỗ đang làm. Trong ngăn kéo vẫn có nút mở trang Cài đặt nếu muốn xem cả nhóm.",hint:"Tìm một bánh răng trên màn và bấm thử. Không thích thấy bánh răng thì tắt ở Cài đặt > Giao diện."}]},
  /* ---------- CẤP 4: DEV ---------- */
 
 };
@@ -17264,7 +17253,7 @@ var TOUR={key:"",i:0,on:false};
    của bản 6; hiện nó ở bản 5 là kéo người dùng sang một màn hình không thuộc bản họ đang dùng
    (anh Luân bắt được 03/08). Khai `chi:"6"` hoặc `chi:"5"` là bản kia không thấy bài đó nữa. */
 function tourHopBan(k){var c=(TOURS[k]||{}).chi;if(!c)return true;
- return (String(c)==="6")===(typeof V6==="function"&&V6())}
+ return String(c)!=="6"}   /* bai khai chi:"6" la bai cua ban da bo - khong bao gio hien */
 function tourMenu(lv){var L=lv||window.TOURLVSEL||"";
  var h="";
  if(!L){
@@ -19448,7 +19437,13 @@ var TTHE=[
    một lối, không phải dời chỗ - dời chỗ là bắt người quen tay đi học lại. */
 var TTSO_NGOAI={
  giangvien:"sổ nguồn lực, không phải một trong bốn đối tượng được phục vụ - giảng viên là "+
-  "người phục vụ. Vẫn ở nhóm Tra cứu như mọi sổ khác."};
+  "người phục vụ. Vẫn ở nhóm Tra cứu như mọi sổ khác.",
+ /* V9.99z11 - hai sổ này lộ ra khi gỡ v6: thước cũ đọc nhóm Tra cứu của cây menu v6 (15 sổ),
+    nay đọc cây V5 (18 sổ) nên hai sổ chưa từng được hỏi tới. Cả hai đều đứng ngoài có lý. */
+ khoahoc:"sổ danh mục khoá - một khoá là thứ được BÁN, không phải một người hay một lớp được "+
+  "phục vụ. Nó là dữ liệu nền của cả bốn thực thể chứ không thuộc riêng thực thể nào.",
+ nhanvien:"sổ nhân sự - người trong nhà, cùng họ với sổ Giảng viên. Bốn thực thể là người "+
+  "được phục vụ, nhân viên là người phục vụ."};
 /* Phụ huynh KHÔNG có bảng riêng trong SOP - họ nằm trong ba cột người giám hộ của DL09. Nên
    thực thể này được DỰNG từ dữ liệu ấy, gom theo số điện thoại: một số là một người, kèm danh
    sách con. Dựng lại mỗi lần vẽ thì tốn, nên nhớ tạm và xoá khi dữ liệu đổi. */
@@ -20456,10 +20451,10 @@ function banThe(ttk,z){
       Nên: việc hàng loạt đi THẲNG tới màn, và nói thật ngay trên nhãn nút là nó dẫn đi đâu -
       "Mở màn" chứ không phải "Làm", để không ai bấm nhầm mà tưởng làm xong tại chỗ. */
    '<button class="btn primary sm" onclick="'+
-   ((V6()&&!v.vichung)?("bkMo('"+esc(ttk)+"','"+esc(ttMa(ttk,r))+"','"+esc((v.act||"")+"|"+v.t)+"')")
+   ((false)?""
         :v.go(r)).split('"').join("&quot;")+
-   '"><i class="ti '+((V6()&&!v.vichung)?"ti-pencil":"ti-arrow-right")+'"></i>'+
-   ((V6()&&v.vichung)?"Mở màn":"Làm")+'</button></div>'});
+   '"><i class="ti '+"ti-arrow-right"+'"></i>'+
+   "Làm"+'</button></div>'});
  /* CÁC BỘ PHẬN KHÁC đang làm gì trên chính hồ sơ này. Không có khối này thì mỗi người mở hồ sơ
     ra chỉ thấy góc của mình - ba bộ phận cùng làm trên một học viên mà không ai biết hai người
     kia. Thấy được, nhưng KHÔNG có nút Làm: quyền chặn tay, không che mắt. */
@@ -21588,7 +21583,7 @@ function navCayV5(){
   if(G.arc){if(!xong){xong=true;NAVPHANG.forEach(function(P){out.push(P)})};return}
   out.push(G)});
  return out}
-function navCay(){return (typeof V6==="function"&&V6())?NAVTREE6:navCayV5()}
+function navCay(){return navCayV5()}
 /* Cùng bệnh với navCurKey: phải hỏi ĐÚNG cây đang được vẽ. Hỏi nhầm cây thì navCur() tưởng
    mục con có mặt trên menu rồi nhường sáng cho nó - mà mục con ấy không tồn tại ở v6, thành ra
    cả menu không có gì sáng. */
@@ -21645,20 +21640,6 @@ function navGroupOf(k){var T=navCay(),i,j;
    hồ sơ vào ngăn kéo, việc trên NHIỀU hồ sơ cùng lúc thì phải có trang riêng - ép điểm danh cả
    lớp 20 học viên vào một ngăn kéo 760px là lùi, không phải tiến. Sáu màn dưới đây là sáu chỗ
    người ta cần nhìn nhiều dòng một lúc. */
-var NAVTREE6=[
- {g:"Bàn làm việc",items:["ban"]},
- {g:"Việc & hàng chờ",items:["viec","ychv","giaoviec","duyet"]},
- /* Bốn hub vận hành theo chặng (lịch test cả tuần · lịch WOW và phòng học · khảo sát và phản
-    hồi · kết thúc khoá) là MÀN RỘNG đúng nghĩa - cùng loại với xếp lớp và chấm bài, nên nằm ở
-    nhóm này. Bỏ chúng khỏi menu cho gọn thì gọn thật, nhưng người dùng mất đường: đo ra 6 trang
-    chỉ còn tới được bằng một cái nút nằm trong ngăn kéo. Luật cũ của dự án đọc ngược lại vẫn
-    đúng: *thêm một mục vào menu chưa phải là làm cho người ta thấy nó* - và bỏ khỏi menu thì
-    gần như là làm cho người ta không thấy. */
- {g:"Làm hàng loạt",items:["xeplop","banglop","baitap","banggiao","bangcong","giaoan",
-   "tuyensinh","hoctap","cskh","ketthuc"]},
- {g:"Tra cứu",items:["hocvien","dsphuhuynh","giangvien","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan",
-   "dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai"]},
- {g:"Quản lý",items:["baocao","nhansu","hoidap","khac","canhan","settings"]}];
 /* V9.99z8 - bấm vào TÊN HUB trên menu: mở tab mặc định của hub (và phải là tab NGƯỜI ĐÓ CÓ).
    Tách khỏi `go()` để mọi lời gọi khác - bài hướng dẫn, trang đáp của chức danh, nút trong thân
    trang - giữ được tab mà chúng vừa đặt. */
@@ -22408,13 +22389,6 @@ function congKieuFile(){return /\/ITTs_(WebApp_v5|WebApp_v6|TrangHocVien)_demo\.
    vào sessionStorage lúc họ bấm vào cổng, và ở đây đọc lại.
    Không có mẩu nhớ này thì: chọn bản 6 -> vào cổng học viên -> bấm "về cổng nhân viên" -> rơi
    vào bản 5. Đúng cái lỗi lặng lẽ đổi bản dưới chân người dùng đã vá ở V9.71, chỉ khác lối đi. */
-function congBanNho(){try{var v=sessionStorage.getItem("ITTS_BAN");return v==="6"?"6":"5"}catch(e){return "5"}}
-function congLaV6(){
- if(typeof V6==="function"&&V6())return true;          /* chính mình là bản 6 */
- if(window.HVPORTAL)return congBanNho()==="6";          /* cổng học viên: hỏi lại mẩu nhớ */
- return false}
-function congTenNV(){return congLaV6()?"cong-nhan-vien-v6":"cong-nhan-vien"}
-function congFileNV(){return congLaV6()?"ITTs_WebApp_v6_demo.html":"ITTs_WebApp_v5_demo.html"}
 /* BẤM LOGO LÀ VỀ TRANG CHỦ BẢN DEMO (V9.94, anh Luân: *"Mặc định của chỗ logo trong cổng nhân
    viên, em cho bay về: https://mittomap.github.io/itts-sop-demo/ nhé"*).
    Địa chỉ TÍNH THEO CÁCH TRANG ĐANG ĐƯỢC MỞ, đúng cách `congURL` đang làm cho nút Đổi cổng:
@@ -22439,31 +22413,17 @@ function trangChuDemo(){try{closeModal()}catch(e){}location.href=trangChuURL()}
 function congURL(w){
  var p=location.pathname;
  if(congKieuFile()){var d=p.replace(/[^\/]*$/,"");
-  return w==="nv"?(d+congFileNV()):(d+"ITTs_TrangHocVien_demo.html"+(w==="ph"?"?phuhuynh":""))}
+  return w==="nv"?(d+"ITTs_WebApp_v5_demo.html"):(d+"ITTs_TrangHocVien_demo.html"+(w==="ph"?"?phuhuynh":""))}
  /* Tên dài đứng TRƯỚC trong nhánh chọn: để "cong-nhan-vien" đứng trước thì đường dẫn
     .../cong-nhan-vien-v6/ không cắt được đuôi, gốc tính sai và cổng kia ra 404. */
  var b=p.replace(/(cong-nhan-vien-v6|cong-nhan-vien|cong-hoc-vien)\/?[^\/]*$/,"");
  if(b===p)b=p.replace(/[^\/]*$/,"");
  if(b.slice(-1)!=="/")b+="/";
- return w==="nv"?(b+congTenNV()+"/"):(b+"cong-hoc-vien/"+(w==="ph"?"?phuhuynh":""))}
+ return w==="nv"?(b+"cong-nhan-vien/"):(b+"cong-hoc-vien/"+(w==="ph"?"?phuhuynh":""))}
 /* DIA CHI CUA MOT BAN CU THE cua cong nhan vien. congURL("nv") luon tra ve ban DANG XEM;
    ham nay tra ve dung ban duoc chi dinh, de o Doi cong con doi duoc ban 5 <-> ban 6.
    Anh Luan 03/08: *"Cho doi cong chua co doi v5 hoac v6 nhe"* - dung: truoc day muon doi ban
    phai quay ra trang chu bam lai, ma tu trong app khong co loi nao ra trang chu. */
-function congURLBan(b){
- var p=location.pathname;
- if(congKieuFile()){var d=p.replace(/[^\/]*$/,"");
-  return d+(b==="6"?"ITTs_WebApp_v6_demo.html":"ITTs_WebApp_v5_demo.html")}
- var base=p.replace(/(cong-nhan-vien-v6|cong-nhan-vien|cong-hoc-vien)\/?[^\/]*$/,"");
- if(base===p)base=p.replace(/[^\/]*$/,"");
- if(base.slice(-1)!=="/")base+="/";
- return base+(b==="6"?"cong-nhan-vien-v6":"cong-nhan-vien")+"/"}
-/* Doi ban: ghi lai lua chon truoc khi di, de cong hoc vien mo sau do biet duong ve dung ban. */
-function congDiBan(b){
- if((congLaV6()?"6":"5")===b&&congDangO()==="nv")return;
- try{sessionStorage.setItem("ITTS_BAN",b)}catch(e){}
- try{closeModal()}catch(e){}
- location.href=congURLBan(b)}
 function congDangO(){if(!window.HVPORTAL)return "nv";
  var ph=false;try{ph=hvPH()}catch(e){}
  return ph?"ph":"hv"}
@@ -22511,11 +22471,7 @@ function congDoiMo(){openDrawer("Đổi cổng / đổi người",congHTML())}
 function congDi(w){if(w===congDangO())return;
  try{closeModal()}catch(e){}
  location.href=congURL(w)}
-/* Cổng nhân viên tự khai mình là bản nào, để cổng học viên mở sau đó biết đường về. Cần cả khi
-   khách mở thẳng địa chỉ cổng nhân viên chứ không đi qua trang chủ. */
-function congBanGhi(){try{sessionStorage.setItem("ITTS_BAN",(typeof V6==="function"&&V6())?"6":"5")}catch(e){}}
 function demoBoot(){
- try{congBanGhi()}catch(e){}
  /* V9.30: kéo dữ liệu về hiện tại TRƯỚC khi tính cột dẫn xuất - deriveAll đọc ngày để suy trạng
     thái, chạy sau khi dịch mới ra số đúng. */
  try{cfEnsure()}catch(e){}try{tshAuto()}catch(e){}

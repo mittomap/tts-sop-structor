@@ -352,7 +352,7 @@ var CH3_NGOAIBAN={
   applyScope("");CURSTAFF="";
   t("mở một hồ sơ ra là thấy việc của MỌI bộ phận, không chỉ của mình",
     !giau.length, giau.slice(0,3).join(" · "));
-  console.log("  V6 - mot ho so, moi bo phan: "+tongMinh+" viec cua toi + "+tongKhac+
+  console.log("  Mot ho so, moi bo phan: "+tongMinh+" viec cua toi + "+tongKhac+
    " viec cua bo phan khac deu HIEN (truoc day "+tongKhac+" viec nay bi giau)");
   /* và việc của bộ phận khác phải nói RÕ đang chờ ai - thấy mà không biết chờ ai thì vô dụng */
   var thieuAi=[];
@@ -374,8 +374,10 @@ var CH3_NGOAIBAN={
      thuộc đúng MỘT thực thể - hoặc khai lý do vì sao đứng ngoài. Canh cả ba mặt: phủ hết,
      không sổ nào thuộc hai chỗ, và bản khai ngoài không nhắc sổ đã biến mất. */
   (function(){
-   var traG=(NAVTREE6||[]).filter(function(g){return g.g==="Tra cứu"})[0];
-   if(!traG){t("có nhóm Tra cứu trong menu v6", false, "không thấy");return}
+   /* V9.99z11 - truoc day doc nhom "Tra cuu" cua NAVTREE6; v6 da go 06/08 nen hoi cay cua V5.
+      Y nghia phep do khong doi: moi so tra cuu phai thuoc ve mot thuc the, hoac khai ly do. */
+   var traG=(navCayV5()||[]).filter(function(g){return g.g==="Tra cứu"})[0];
+   if(!traG){t("có nhóm Tra cứu trong menu", false, "không thấy");return}
    var thuoc={},trung=[];
    TTHE.forEach(function(T){(T.so||[]).forEach(function(k){
     if(thuoc[k])trung.push(k+" (ở cả "+thuoc[k]+" và "+T.k+")");
@@ -400,7 +402,7 @@ var CH3_NGOAIBAN={
      if(h.indexOf("go('"+k+"')")<0)chuaBay.push(T.k+"->"+k)})});
    window.BANTT="";
    t("Bàn làm việc bày sổ của thực thể đang chọn", !chuaBay.length, chuaBay.slice(0,4).join(" · "));
-   console.log("  V6 - so tra cuu theo thuc the: "+Object.keys(thuoc).length+"/"+traG.items.length+
+   console.log("  So tra cuu theo thuc the: "+Object.keys(thuoc).length+"/"+traG.items.length+
     " da gan | khai ly do dung ngoai: "+Object.keys(TTSO_NGOAI).length);
   })();
  })();
@@ -452,54 +454,53 @@ var CH3_NGOAIBAN={
     vì demo mặc định mở bằng Quản trị viên. Bộ kiểm cũ đóng vai từng CHỨC DANH nên không thấy:
     Quản trị viên không phải một chức danh trong DL01.
     Luật rút ra: đo trên hàm con là đo một nhánh; phải đo trên CỬA VÀO THẬT mới đủ mọi nhánh. */
+ /* V9.99z11 - khoi do "ban v6 dap xuong dau" da bo cung voi ban v6 (anh Luan 06/08:
+    *"bo v6, ko duoc lam anh huong v5"*). Giu lai dung ve con y nghia: ban dang chay phai dap
+    xuong Trang bat dau. */
  (function(){
-  var cu=window.ITTS_V6, xau=[];
-  function dap(sid){applyScope(sid);return SCOPE().land}
-  window.ITTS_V6=1;
-  if(dap("")!=="ban")xau.push("Quản trị viên -> "+dap(""));
-  var daG={};
-  rows("DL01").filter(function(x){return staffActive(x)}).forEach(function(nv){
-   var g;try{applyScope(nv.staff_id);g=SCOPE().group||"?"}catch(e){return}
-   if(daG[g])return;daG[g]=1;
-   if(SCOPE().land!=="ban")xau.push(g+" -> "+SCOPE().land)});
-  window.ITTS_V6=0;
-  var v5dap=dap("");
-  window.ITTS_V6=cu;applyScope("");CURSTAFF="";
-  t("bản v6: MỌI lối vào (kể cả Quản trị viên) đều đáp xuống Bàn làm việc",
-    !xau.length, xau.slice(0,4).join(" · "));
-  t("bản v5 không bị kéo theo - vẫn đáp xuống Trang bắt đầu",
-    v5dap==="banlam", "đang đáp xuống "+v5dap);
+  applyScope("");
+  t("moi loi vao deu dap xuong Trang bat dau", SCOPE().land==="banlam", "dang dap xuong "+SCOPE().land);
+  applyScope("");CURSTAFF="";
  })();
 
- /* (4b) BẢN V6 GỌN HƠN - NHƯNG KHÔNG ĐƯỢC GỌN BẰNG CÁCH LÀM MẤT ĐƯỜNG.
-    Menu v6 có 5 nhóm thay vì 8. Đo ra: 6 trang không còn tới được từ menu, trong đó có bốn hub
-    vận hành thật (lịch test cả tuần, lịch WOW và phòng học, khảo sát/phản hồi, kết thúc khoá) -
-    chúng chỉ còn tới được bằng một cái nút nằm trong ngăn kéo, tức là gần như không ai tìm ra.
-    Luật cũ của dự án đọc ngược lại vẫn đúng: *thêm một mục vào menu chưa phải là làm cho người
-    ta thấy nó* - và bỏ khỏi menu thì gần như là làm cho người ta không thấy.
-    Nay: mọi trang phải tới được từ menu v6 (thẳng hoặc là tab của một hub có trong menu), hoặc
-    khai lý do đọc được. */
+ /* (4b) MENU KHONG DUOC LAM MAT DUONG TOI TRANG NAO.
+    Truoc 06/08 khoi nay do menu cua ban v6 (5 nhom thay vi 8) va tung bat duoc 6 trang mat
+    duong - trong do bon hub van hanh that. v6 da go, nhung PHEP DO thi giu, chuyen sang do
+    chinh cay menu cua V5: moi trang phai toi duoc tu menu (thang, hoac la tab cua mot hub co
+    trong menu), hoac khai ly do doc duoc.
+    Luat cu cua du an van dung: *them mot muc vao menu chua phai la lam cho nguoi ta thay no* -
+    va bo khoi menu thi gan nhu la lam cho nguoi ta khong thay. */
  (function(){
-  var V6NGOAIMENU={
-   banlam:"bản v6 thay Trang bắt đầu bằng Bàn làm việc - đó là điểm khác lớn nhất của bản này. "+
-    "Vẫn mở được bằng nút 'Xem theo chặng' trên Bàn làm việc.",
-   hanhtrinh:"góc nhìn bảng chặng của Trang bắt đầu - cùng một trang, mở bằng nút 'Xem theo chặng'."};
-  function tap(t){var o={};t.forEach(function(g){g.items.forEach(function(k){o[k]=1})});return o}
-  var M=tap(NAVTREE6);
+  var NGOAIMENU={
+   ban:"trang chi tiet mo ra tu So nguoi dong hanh (phMo) - cung ho voi hoso/hosogv/hosonv, "+
+    "khong dung o menu vi no luon duoc mo kem mot ho so cu the.",
+   hanhtrinh:"goc nhin bang chang cua Trang bat dau - cung mot trang, mo bang nut 'Xem theo chang'."};
+  function tap(t){var o={};t.forEach(function(g){(g.items||[]).forEach(function(k){o[k]=1})});return o}
+  var M=tap(navCayV5());
   var HUB=[[TSMAP,"tuyensinh"],[HTMAP,"hoctap"],[CSMAP,"cskh"],[DUYMAP,"duyet"],[KMAP,"khac"],[ARCMAP,"chang"]];
+  /* Cay menu V5 bay THANG cac tab (nhaplead, test, tuvan...) chu khong bay ten hub, nen hoi
+     "hub `tuyensinh` co trong menu khong" la sai cau hoi - phai hoi "co tab nao cua no trong
+     menu khong". Do sai cau hoi thi ra ba hub "mat duong" trong khi nguoi dung bam vao no
+     moi ngay. */
+  function hubToiDuoc(hubKey){
+   if(M[hubKey])return true;
+   var found=false;
+   HUB.forEach(function(H){ if(H[1]!==hubKey||!H[0])return;
+    Object.keys(H[0]).forEach(function(tab){ if(M[tab])found=true }) });
+   return found}
   var mat=[];
   PAGES.forEach(function(pg){
-   var k=pg.k; if(pg.hide||M[k]||V6NGOAIMENU[k])return;
+   var k=pg.k; if(pg.hide||M[k]||NGOAIMENU[k])return;
+   if(hubToiDuoc(k))return;                      /* chinh no la mot hub, tab cua no co tren menu */
    var ok=false;
-   HUB.forEach(function(H){if(H[0]&&H[0][k]!==undefined&&M[H[1]])ok=true});
+   HUB.forEach(function(H){if(H[0]&&H[0][k]!==undefined&&hubToiDuoc(H[1]))ok=true});
    if(!ok)mat.push(k+" (\""+(pg.t||"?")+"\")")});
-  t("bản v6 không làm mất đường tới trang nào - hoặc khai được lý do",
+  t("menu khong lam mat duong toi trang nao - hoac khai duoc ly do",
     !mat.length, mat.slice(0,5).join(" · "));
-  var thua=Object.keys(V6NGOAIMENU).filter(function(k){return !PBK[k]});
-  t("bản khai trang-ngoài-menu-v6 không nhắc trang đã biến mất", !thua.length, thua.join(", "));
-  var soV5=tap(NAVTREE), soV6=M;
-  console.log("  V6 - menu: "+Object.keys(soV6).length+" muc (v5: "+Object.keys(soV5).length+
-   ") | trang khong toi duoc tu menu: "+mat.length+" | khai ly do: "+Object.keys(V6NGOAIMENU).length);
+  var thua=Object.keys(NGOAIMENU).filter(function(k){return !PBK[k]});
+  t("ban khai trang-ngoai-menu khong nhac trang da bien mat", !thua.length, thua.join(", "));
+  console.log("  Menu V5: "+Object.keys(M).length+" muc | trang khong toi duoc tu menu: "+
+   mat.length+" | khai ly do: "+Object.keys(NGOAIMENU).length);
  })();
 
  /* (5) ĐỔI CỔNG phải trỏ đúng khi có BA thư mục cổng. Đã cắn: hàm cắt gốc đường dẫn chỉ biết
@@ -507,39 +508,21 @@ var CH3_NGOAIBAN={
     được, gốc tính ra chính thư mục đang đứng và nút "Cổng học viên" trỏ tới một chỗ 404.
     Đo bằng cách đặt chân vào từng địa chỉ thật rồi đọc hai đường ra. */
  (function(){
-  var cuP=location.pathname, cuV=window.ITTS_V6, xau=[];
-  function thu(p,v6,mongNV,mongHV){
-   location.pathname=p;window.ITTS_V6=v6;
+  var cuP=location.pathname, xau=[];
+  function thu(p,mongNV,mongHV){
+   location.pathname=p;
    var nv=congURL("nv"), hv=congURL("hv");
    if(nv!==mongNV)xau.push(p+" -> nv="+nv+" (mong "+mongNV+")");
    if(hv!==mongHV)xau.push(p+" -> hv="+hv+" (mong "+mongHV+")")}
-  thu("/itts-sop-demo/cong-nhan-vien/",0,"/itts-sop-demo/cong-nhan-vien/","/itts-sop-demo/cong-hoc-vien/");
-  thu("/itts-sop-demo/cong-nhan-vien-v6/",1,"/itts-sop-demo/cong-nhan-vien-v6/","/itts-sop-demo/cong-hoc-vien/");
-  thu("/itts-sop-demo/cong-nhan-vien-v6/index.html",1,"/itts-sop-demo/cong-nhan-vien-v6/","/itts-sop-demo/cong-hoc-vien/");
-  thu("/itts-sop-demo/cong-hoc-vien/",0,"/itts-sop-demo/cong-nhan-vien/","/itts-sop-demo/cong-hoc-vien/");
-  thu("/ITTs_WebApp_v6_demo.html",1,"/ITTs_WebApp_v6_demo.html","/ITTs_TrangHocVien_demo.html");
-  thu("/ITTs_WebApp_v5_demo.html",0,"/ITTs_WebApp_v5_demo.html","/ITTs_TrangHocVien_demo.html");
-  location.pathname=cuP;window.ITTS_V6=cuV;
-  t("nút Đổi cổng trỏ đúng ở cả ba thư mục cổng và cả khi mở thẳng file",
+  thu("/itts-sop-demo/cong-nhan-vien/","/itts-sop-demo/cong-nhan-vien/","/itts-sop-demo/cong-hoc-vien/");
+  thu("/itts-sop-demo/cong-hoc-vien/","/itts-sop-demo/cong-nhan-vien/","/itts-sop-demo/cong-hoc-vien/");
+  thu("/ITTs_WebApp_v5_demo.html","/ITTs_WebApp_v5_demo.html","/ITTs_TrangHocVien_demo.html");
+  location.pathname=cuP;
+  t("nút Đổi cổng trỏ đúng ở mọi thư mục cổng và cả khi mở thẳng file",
     !xau.length, xau.slice(0,3).join(" · "));
 
-  /* CỔNG HỌC VIÊN NHỚ KHÁCH ĐANG XEM BẢN NÀO. Cổng học viên chỉ có MỘT bản, dùng chung cho cả
-     hai - nên tự nó không biết mình thuộc bản nào. Không có mẩu nhớ này thì: chọn bản 6 ->
-     vào cổng học viên -> bấm "về cổng nhân viên" -> rơi vào bản 5. Đúng cái lỗi lặng lẽ đổi bản
-     dưới chân người dùng đã vá ở V9.71, chỉ khác lối đi. */
-  var xau2=[], cuHV=window.HVPORTAL;
-  location.pathname="/itts-sop-demo/cong-hoc-vien/";window.ITTS_V6=0;window.HVPORTAL=1;
-  [["6","/itts-sop-demo/cong-nhan-vien-v6/"],
-   ["5","/itts-sop-demo/cong-nhan-vien/"],
-   [null,"/itts-sop-demo/cong-nhan-vien/"]].forEach(function(x){
-   if(x[0]==null)sessionStorage.removeItem("ITTS_BAN");
-   else sessionStorage.setItem("ITTS_BAN",x[0]);
-   var ra=congURL("nv");
-   if(ra!==x[1])xau2.push("nhớ bản "+(x[0]||"chưa có")+" -> "+ra+" (mong "+x[1]+")")});
-  sessionStorage.removeItem("ITTS_BAN");
-  window.HVPORTAL=cuHV;location.pathname=cuP;window.ITTS_V6=cuV;
-  t("từ cổng học viên, nút về cổng nhân viên trả khách đúng bản họ đang xem",
-    !xau2.length, xau2.join(" · "));
+  /* Khoi "cong hoc vien nho khach dang xem ban nao" da bo 06/08: chi con MOT ban nen khong
+     con gi de nho. Lich su trong git. */
  })();
  /* ĐỘ HOÀN THÀNH CỦA BẢN V6 - in ra mỗi lần chạy để nó không nằm im.
     Ba trạng thái, và phải tách bạch: có form trong ngăn kéo · là việc hàng loạt (khai lý do) ·
@@ -614,7 +597,7 @@ var CH3_NGOAIBAN={
    else chua.push(v.tt+" · "+v.t)});
 
   openDrawer=drawerCu; toast=toastCu;
-  console.log("  V6 - lam TAI CHO: "+(keo+mo)+"/"+VIECTT.length+
+  console.log("  Viec lam TAI CHO: "+(keo+mo)+"/"+VIECTT.length+
    " (form rieng "+keo+" + ngan keo dung lai "+mo+") | hang loat da khai ly do: "+hl+
    " | CHUA CHUYEN: "+chua.length+" | muon ho so de thu: "+muon);
   if(chua.length)console.log("     con no: "+chua.join(" · "));

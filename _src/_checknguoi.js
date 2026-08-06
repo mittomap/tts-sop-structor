@@ -55,7 +55,7 @@ var SS={};global.sessionStorage={getItem:(k)=>(k in SS?SS[k]:null),setItem(k,v){
 global.innerWidth=1400;global.innerHeight=900;
 require("vm").runInThisContext(FS.readFileSync(APP, "utf8"));
 
-const V6BAN = (typeof V6 === "function") && V6();
+const V6BAN = false;   /* v6 da go 06/08 - giu bien de khong phai sua 2 cho ben duoi */
 const xau = [], canh = [];
 let soNguoi = 0, soTrang = 0;
 

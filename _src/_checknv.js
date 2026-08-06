@@ -213,7 +213,7 @@ const TRANGTHAI = () => {
     await page.waitForTimeout(300);
 
     await page.evaluate("window.RESTORE_FN = " + RESTORE.toString());
-    const laV6 = await page.evaluate(() => typeof V6 === "function" && V6());
+    const laV6 = false;   /* v6 da go 06/08 */
     const ten = F.replace(/^ITTs_WebApp_|_demo\.html$/g, "");
     const nhan = t => ten + " · " + t;
     await page.evaluate(SNAP);

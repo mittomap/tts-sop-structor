@@ -55,7 +55,7 @@ require('vm').runInThisContext(SRC0);
    luôn cả phần dựng và phần TRẢ LẠI trạng thái nằm bên trong biểu thức ấy, nên các câu sau đó
    thừa hưởng trạng thái hỏng và đổ oan cho app. Tham số được tính TRƯỚC khi gọi hàm, nên viết
    thành hàm là mọi tác dụng phụ vẫn xảy ra. */
-function tv5(a,b,c){if(!V6())t(a,b,c)}
+function tv5(a,b,c){t(a,b,c)}   /* v6 da go 06/08 - moi tieu chi deu la cua V5 */
 setRole("all");
 var bad=[],ok=0;
 function t(n,c){if(c)ok++;else bad.push(n)}

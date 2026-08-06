@@ -182,7 +182,7 @@ var TOUR_BOQUA={
   try{if(typeof tourHopBan==="function"&&!tourHopBan(k))return}catch(e){}
   TOURS[k].steps.forEach(function(st){if(st.p)coTour[st.p]=1})});
  /* Trang TRUC cua ban kia thi ban nay khong can bai nao di qua - no khong nam trong menu ban nay. */
- var laV6b=(typeof V6==="function")&&V6();
+ var laV6b=false;   /* v6 da go 06/08 */
  var trucKia={};(laV6b?["banlam","changA","changB","changC","changD","hanhtrinh"]:["ban"])
   .forEach(function(x){trucKia[x]=1});
  var thieu=Object.keys(PBK).filter(function(pg){
@@ -352,7 +352,7 @@ var TOUR_BOQUA={
    khac han. */
 (function(){
  var TRUC6=["ban"], TRUC5=["banlam","changA","changB","changC","changD","hanhtrinh"];
- var laV6=(typeof V6==="function")&&V6();
+ var laV6=false;   /* v6 da go 06/08 */
  var cam=laV6?TRUC5:TRUC6, xau=[];
  Object.keys(TOURS||{}).forEach(function(k){
   /* bai da khai chi danh cho ban kia thi khong tinh - no khong hien ra o ban nay */

@@ -372,10 +372,10 @@ t("Hoi dap nam trong menu, khong bi giau", PBK["hoidap"]&&!PBK["hoidap"].hide);
   /* v5: mỗi hàng chờ là một mục menu riêng. v6: chúng là TAB của hub "Chờ duyệt", nên mục
      sáng lên phải là hub - cùng một ý định, khác hình dạng. */
   t("bam tab Don xin nghi thi menu sang dung muc do",
-    sangLa(nav,V6()?"duyet":"duyetnghi"));
+    sangLa(nav,"duyetnghi"));
   duyTabSet("duyetthu");nav=document.getElementById("nav").innerHTML;
   t("doi sang tab khac thi vet sang nhay theo",
-    V6() ? sangLa(nav,"duyet")
+    false ? sangLa(nav,"duyet")
          : (sangLa(nav,"duyetthu")&&nav.indexOf('data-k="duyetnghi"')>=0&&!sangLa(nav,"duyetnghi")));
  }catch(e){t("thu that tab hub khong vo: "+e.message,false)}
 })();
