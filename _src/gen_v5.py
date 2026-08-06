@@ -315,13 +315,7 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
    iPad dọc (834px, sidebar vẫn hiện nên khung nội dung chỉ còn 572px): nút "Khách mới liên hệ
    đến" thò ra 94px, kéo cả trang cuộn ngang - 6 trang bị. Khổ nào cũng có thể hẹp, tuỳ sidebar
    rộng bao nhiêu, nên chặn theo ĐIỂM GÃY là canh sai chỗ; để nó tự xuống dòng mới đúng. */
-/* V9.99z12 (anh Luan 06/08: *"phan phia tren la cac the chiem toi 1 nua man hinh roi, co
-   cach nao toi uu ko"*). Do duoc: trang Bao cao phai cuon 561px - 71% man hinh - moi thay dong
-   du lieu dau tien; CSKH 526px; Tuyen sinh 447px. Khong khoi nao sai, nhung cong lai thi day
-   het viec xuong duoi nep gap.
-   CHI THU KHOANG TRONG, khong thu co chu va KHONG thu chieu cao nut - luat vung bam toi thieu
-   cua `_checkui` giu nguyen. Day la toi uu MAT DO, khong phai thu nho giao dien. */
-.phead{display:flex;align-items:flex-end;gap:14px;margin-bottom:11px;flex-wrap:wrap}
+.phead{display:flex;align-items:flex-end;gap:14px;margin-bottom:18px;flex-wrap:wrap}
 .phead>div:first-child{min-width:0}
 .phead .t{font-size:18px;font-weight:800;letter-spacing:-.2px}.phead .s{font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}
 /* V9.67: dải nút bên phải tiêu đề trang phải XUỐNG DÒNG và co được. Ô chọn lớp mang tên đầy đủ
@@ -454,7 +448,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .bwcta2{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:10px 14px;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600}
 .bwcta2:hover{background:rgba(255,255,255,.22)}
 .bstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin-bottom:16px}
-.bstat{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 13px;transition:.15s}
+.bstat{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 13px;transition:.15s}
 /* V9.67: cùng lý do với `.jgrid>*` - khối chữ trong thẻ phải chịu hẹp lại, nếu không một câu phụ
    chú dài ("Đến hạn thu, tính tới hôm nay") đẩy cả trang Thu học phí cuộn ngang trên điện thoại. */
 .bstat>*{min-width:0}
@@ -469,7 +463,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .rcard.khoa{position:relative;opacity:.45;cursor:default;filter:grayscale(.7)}
 .rcard.khoa:hover{border-color:var(--line);box-shadow:none;transform:none}
 .rcard .gklock{position:absolute;top:8px;right:9px;font-size:13px;color:var(--muted)}
-.bstatsw{position:relative;margin-bottom:10px}
+.bstatsw{position:relative;margin-bottom:16px}
 .bstatsw .bstats{margin-bottom:0}
 .thewrap{position:relative;display:flex;justify-content:flex-end;margin-bottom:6px}
 .thewrap .colmenu{top:calc(100% + 4px);min-width:250px}
@@ -999,7 +993,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .tssl{font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap}
 .tsstep.on .tssl{color:var(--navy);font-weight:700}
 .tsarr{display:flex;align-items:center;color:#B9C6D6;flex:0 0 auto}
-.csway{background:#fff;border:1px solid var(--line);border-radius:12px;padding:7px 12px;margin-bottom:8px;display:flex;flex-direction:column;gap:5px}
+.csway{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:12px;display:flex;flex-direction:column;gap:6px}
 .cwrow{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .cwdir{display:inline-flex;align-items:center;gap:5px;font-weight:800;font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap}
 .cwdir.out{background:#EEF2F6;color:#2E5A88}
@@ -1067,7 +1061,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 @media(max-width:1000px){.cbgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px 0}.cbit{border-right:0}}
 @media(max-width:620px){.cbgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:860px){.cbit{min-width:46%;border-right:0}}
-.tbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px 11px;margin-bottom:8px}
+.tbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;margin-bottom:12px}
 .tbar .srch{margin:0}
 .seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:8px;padding:3px;gap:2px;flex-wrap:wrap}
 .segb{border:0;background:transparent;color:#3A4756;font-family:inherit;font-size:12px;font-weight:700;padding:0 12px;height:30px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.12s}
@@ -1095,8 +1089,8 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
    nhau, người dùng phải đi tìm nút Xuất bằng mắt. Nay hai TẦNG: tầng trên là chip lọc, tầng dưới
    là công cụ - đứng yên một chỗ ở mọi trang, mọi cỡ dữ liệu. */
 .tbar.hai{flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden}
-.tbar.hai>.tbtren{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 11px}
-.tbar.hai>.tbduoi{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:5px 11px;
+.tbar.hai>.tbtren{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 11px}
+.tbar.hai>.tbduoi{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 11px;
  background:var(--bg);border-top:1px solid var(--line)}
 .tbar.hai>.tbduoi .tbcnt{margin-right:auto}
 .tbcnt{font-size:11.5px;color:var(--muted);font-weight:600;white-space:nowrap}
@@ -1808,7 +1802,7 @@ body.drsz .drawer{transition:none}
 .kpihv{font-size:26px;font-weight:800;color:var(--navy);line-height:1}
 .kpihs{font-size:13px;font-weight:800;color:var(--navy)}
 .kpiacts{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
-.k3row{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:10px}
+.k3row{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:18px}
 .k3card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px}
 .k3card.amber .k3n{background:#E08A1E}.k3card.red .k3n{background:#DC2626}.k3card.green .k3n{background:#16A34A}
 .k3hd{display:flex;align-items:center;gap:9px;margin-bottom:7px;font-size:13px}
