@@ -896,6 +896,31 @@ function applyScope(sid){var eff;
 function canSee(k){var rs=SCOPE();return rs.pages==="*"||rs.pages.indexOf(k)>=0||!!VIEW_ALWAYS[k]}
 /* Xem `go()` để biết vì sao có hàm này. Trả về đúng chuỗi vào nếu người đang xem có toàn quyền -
    không đụng gì tới màn của Quản trị viên. */
+/* Mọi thân trang, dù vẽ từ `go()` hay vẽ lại từ `reRender`, đều đi qua đúng cửa này. Gộp lại
+   một hàm để không bao giờ có lối vẽ nào lọt bộ lọc - trước đây `reRender` không lọc, nên đổi
+   tab trong hub xong là các nút ngoài phạm vi quay lại. */
+function scrubMan(h){try{return scrubMoiRoiDuoi(h)}catch(e){return h}}
+/* V9.99z10 - MỘT MÀN CHỈ CÓ MỘT Ô "XEM VIỆC CỦA". Anh Luân 05/08, kèm ảnh trang Chỉ số của Ban
+   Giám đốc: *"màn của giám đốc lặp cái gì đây?"* - hai thanh giống hệt chồng lên nhau. Ô này có
+   BA nơi gọi và CẢ BA đều đúng phần mình: trang Chỉ số tự đặt một ô (để quản lý không phải quay
+   về trang đáp mới đổi được người), rồi gọi `bvSau()` mà bảng việc lại chèn một ô nữa khi trang
+   đang xem chính là trang đáp của chức danh - với Ban Giám đốc, trang đáp đúng là trang Chỉ số.
+   HAI BẢN VÁ ĐẦU ĐỀU SAI, ghi lại cả hai cho người sau:
+    · Bản 1 - MỘT CÁI CỜ ("đã vẽ ô này trong lượt này chưa"). Cờ nhớ trạng thái thì nó sống dai
+      hơn lượt vẽ: ai gọi thẳng `banAiHTML()` ngoài lượt vẽ (bộ kiểm, hoặc một màn dựng riêng)
+      đều nhận về rỗng. `_checkux` đỏ ngay - đúng một tiêu chí thật: "đang xem thay người khác
+      thì thanh báo phải có điểm nhấn".
+    · Bản 2 - GẠN BẰNG REGEX trên chuỗi HTML. Khối này có div lồng div, mà regex thì không đếm
+      được ngoặc - nó cắt trượt, đo lại vẫn ra 2 thanh. Gạn HTML lồng nhau bằng regex là chọn
+      sai công cụ, không phải viết sai biểu thức.
+   Nay dọn trên DOM SAU KHI đã dựng xong: hỏi trình duyệt "có mấy phần tử `.tbar.banai`", giữ
+   cái đầu, bỏ phần còn lại. Không nhớ gì nên không rò, và đếm bằng chính bộ đếm của trình
+   duyệt nên không trượt. */
+function donLapTrenMan(el){try{
+ if(!el)return;
+ var ds=el.querySelectorAll(".tbar.banai");
+ for(var i=1;i<ds.length;i++){try{ds[i].remove()}catch(e){}}
+}catch(e){}}
 function scrubMoiRoiDuoi(h){
  try{
   if(!h||SCOPE().pages==="*")return h;
@@ -18034,10 +18059,6 @@ function banAiTen(){
    Không đi sửa từng nơi gọi (mai thêm nơi thứ tư là lặp lại): để CHÍNH cái ô tự biết mình đã
    ra mặt trong lượt vẽ này chưa. Cờ đặt lại ở đầu mỗi lượt vẽ thân trang. */
 function banAiHTML(){
- if(window.__banAiDaVe)return "";
- window.__banAiDaVe=true;
- return banAiHTML_();}
-function banAiHTML_(){
  var dang=window.BANAI||"";
  /* Đang mượn ghế thì LUÔN phải có đường về - kể cả khi ghế đang mượn không có quyền quản lý.
     Đã cắn: mượn ghế một nhân viên thường là cả dải chọn biến mất cùng với nút quay về, người
@@ -18303,8 +18324,7 @@ function reRender(k){try{setTimeout(tourTick,240)}catch(e){}   /* người dùng
  var el=document.getElementById("content");
  if(!el||!RENDER[k]){if(typeof hvReRender==="function")hvReRender();return}   /* cổng học viên: chỉ vẽ lại thân trang */
  var p=PBK[k];var sc=el.scrollTop;
- window.__banAiDaVe=false;
- el.innerHTML=((p&&p.ty==="list")?renderList(k):RENDER[k]());el.scrollTop=sc;
+ el.innerHTML=scrubMan((p&&p.ty==="list")?renderList(k):RENDER[k]());donLapTrenMan(el);el.scrollTop=sc;
  /* vẽ lại cả SIDEBAR: đổi tab trong hub (duyTabSet, csTabSet...) thì mục đang sáng trên menu
     phải nhảy theo - anh Luân bắt được cảnh bấm "Đơn xin nghỉ" mà menu vẫn sáng tab cũ. Vá ở đây
     (tầng chung) chứ không vá từng hàm đổi tab; con số badge trên menu cũng tươi lại sau mỗi lần
@@ -18312,8 +18332,7 @@ function reRender(k){try{setTimeout(tourTick,240)}catch(e){}   /* người dùng
  try{buildNav()}catch(e){}
  updateBellBadge();asstTick();persistSoon()}
 function reRenderKeep(k){var el=document.getElementById("content");var sc=el.scrollTop;var p=PBK[k];
- window.__banAiDaVe=false;
- el.innerHTML=((p&&p.ty==="list")?renderList(k):RENDER[k]());asstTick();el.scrollTop=sc;try{buildNav()}catch(e){}var i=el.querySelector(".srch input");if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}persistSoon()}
+ el.innerHTML=scrubMan((p&&p.ty==="list")?renderList(k):RENDER[k]());donLapTrenMan(el);asstTick();el.scrollTop=sc;try{buildNav()}catch(e){}var i=el.querySelector(".srch input");if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}persistSoon()}
 /* V9.67: mở ngăn kéo menu thì GIẤU nút Trợ lý nổi. Trên điện thoại nút đó nằm đúng chỗ chân
    sidebar (dòng tên người đăng nhập) nên che mất - và bấm vào là trúng nút Trợ lý chứ không
    trúng hồ sơ. Dùng đúng lối đã có sẵn cho ngăn kéo hồ sơ (`body.drwon`), thêm một lớp anh em. */
@@ -19086,7 +19105,6 @@ function go(key,noHist){
  var el=document.getElementById("content");
  /* V9.35: Trợ thủ KHÔNG còn chen vào đầu thân trang nữa - nó ở nút góc dưới bên phải. Thân trang
     trả lại cho nội dung chính, thứ quan trọng nhất lên ngay đầu màn hình. */
- window.__banAiDaVe=false;
  if(p.ty==="list")el.innerHTML=renderList(key);else el.innerHTML=RENDER[key]();
  asstTick();try{tourBtnSync()}catch(e){}
  /* ═══ V9.99z10 - KHÔNG MỜI RỒI ĐUỔI ═══════════════════════════════════════════════════
@@ -19103,7 +19121,7 @@ function go(key,noHist){
        vẻ bấm-được. Bỏ luôn cả ô là bớt thông tin - phạm LUẬT CỨNG SỐ 0.
     Chế độ THAM KHẢO vẫn còn nguyên cho người GÕ THẲNG địa chỉ hoặc đi từ link cũ - đó mới đúng
     là chỗ nó sinh ra để phục vụ. */
- el.innerHTML=scrubMoiRoiDuoi(el.innerHTML);
+ el.innerHTML=scrubMan(el.innerHTML);donLapTrenMan(el);
  if(!canSee(key)&&!SENSITIVE[key]&&SCOPE().pages!=="*")el.innerHTML='<div class="notebar" style="margin-bottom:12px"><i class="ti ti-info-circle"></i>Trang ngoài phạm vi chức danh của bạn - đang xem ở chế độ THAM KHẢO.</div>'+el.innerHTML;
  window.CURCTX=navSnap();   /* ngữ cảnh của TRANG NÀY, chụp sau khi đã render (dùng khi rời trang) */
  renderCrumb();
