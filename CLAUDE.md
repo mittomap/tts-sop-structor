@@ -20,6 +20,18 @@ Chủ dự án: Luân. Mọi phiên làm việc (Claude Code hay Claude Cowork) 
 - NGUỒN DUY NHẤT: `_src/gen_v5.py` (generator Python chứa toàn bộ HTML/CSS/JS trong chuỗi).
   KHÔNG BAO GIỜ sửa tay 3 file build ở gốc repo: `ITTs_WebApp_v5_demo.html`,
   `ITTs_TrangHocVien_demo.html`, `ITTs_data.js` - sửa gen_v5.py rồi build lại.
+- **HAI TẦNG CHẠY BỘ KIỂM (anh Luân hỏi 06/08: *"có thật sự cần chạy lại toàn bộ với mọi trường
+  hợp không?"*). Chốt: CÓ phân tầng, nhưng ranh giới đặt ở lúc ĐẨY, không đặt ở loại thay đổi.**
+  · **Đang làm dở** → chạy `./verify.sh --nhanh` (~8 phút, bỏ phần trình duyệt), hoặc chạy thẳng
+    vài bộ liên quan (`node _checkmien.js`, `node _checklap.js`...). Sửa tới sửa lui thì dùng cái này.
+  · **Trước khi ĐẨY** → chạy TRỌN BỘ, không ngoại lệ, kể cả khi chỉ sửa một chữ.
+  **Vì sao không tha cho "chỉ sửa chữ":** `check_sop.py` đòi những CHUỖI CHỮ CHÍNH XÁC phải có
+  trên màn (VH0 phải có "Tìm tên, SĐT hoặc mã", VH8 phải có "Đơn còn nợ phí"...). Đổi câu chữ là
+  chạm đúng chỗ LUẬT CỨNG SỐ 0 đang canh - thủng mà không ai hay. Ngày 06/08 một đợt sửa văn
+  phong đụng 145 chuỗi; nếu tin "chỉ là chữ" thì đã đẩy mù.
+  **Và ba lần trong một ngày 05-06/08 một bản vá "trông vô hại" làm đỏ chỗ khác:** vá CSS thuần
+  làm hỏng drawer · thêm một cái cờ làm đỏ `_checkux` · gỡ v6 suýt để lọt hai chỗ.
+  23 phút đó là thời gian của MÁY, chạy nền; cái giá duy nhất là chờ trước lúc đẩy.
 - Build + verify: **một lệnh duy nhất `./verify.sh`** ở gốc repo (build -> trích JS -> 14 bộ kiểm ->
   in bảng xanh/đỏ, mã thoát khác 0 là có chỗ đỏ). `./verify.sh --nhanh` bỏ phần trình duyệt.
   Chi tiết từng bộ kiểm canh điều gì: `_src/README_SRC.md`. Người mới nhận bàn giao đọc `BAN_GIAO_DEV.md`.

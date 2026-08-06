@@ -758,7 +758,14 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
  t("the nao cung co cau chu thich"+(noTip.length?" - THIEU: "+noTip.slice(0,4).join(","):""), noTip.length===0);
  t("moi the co ten doc duoc de bay o Cai dat", all.every(function(x){return String(x[1][1]||"").trim().length>2}));
  /* chú thích phải nói được CÁCH XEM DANH SÁCH - đó là cái thay cho việc bấm vào thẻ */
- var khongChiCho=all.filter(function(x){return !/(Muốn xem|Rê chuột|Muốn chi tiết)/i.test(theTip(x[1][0]))}).map(function(x){return x[1][0]});
+ /* V9.99z12 - THEM "Danh sách:" VAO DANH SACH DAU HIEU. Anh Luan 06/08 chot van phong: app
+    chuyen nghiep khong ke duong di bang chu, va khong viet "Muon xem danh sach: mo trang X o
+    menu trai". 134 cho da doi sang dang gon "Danh sách: X › Y". Luat CU van dung nguyen - the
+    khong bam duoc thi chu thich PHAI noi duoc cach xem danh sach - chi la cach viet doi.
+    Bay da can ngay hom do: doi chu xong chay verify, bo nay do 4 the, trong khi ca 4 deu CO chi
+    duong. Thuoc bat theo mot cum tu cu the thi doi cum tu la thuoc mu - phai sua thuoc cung luc
+    voi sua chu, khong thi lan sau ai do se go bo chi duong that ma van xanh. */
+ var khongChiCho=all.filter(function(x){return !/(Danh sách\s*:|Muốn xem|Rê chuột|Muốn chi tiết)/i.test(theTip(x[1][0]))}).map(function(x){return x[1][0]});
  t("chu thich the co chi cho xem danh sach o dau"+(khongChiCho.length?" - THIEU: "+khongChiCho.slice(0,4).join(","):""), khongChiCho.length===0);
 
  /* (3) CHẠY THẬT: đếm thẻ vẽ ra so với thẻ khai, ở mọi chức danh + mọi màn chi tiết */

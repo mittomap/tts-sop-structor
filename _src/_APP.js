@@ -1496,7 +1496,7 @@ var THEDEF={
  ban:{t:"Bàn làm việc",the:[
   ["ban_co","Còn việc của bộ phận","Số hồ sơ trong phạm vi của bạn mà chức danh của bạn còn việc phải làm với họ. Quản lý đang xem thay một người thì đây là số của CHÍNH NGƯỜI ẤY. Danh sách: chính bảng ngay dưới dải này."],
   ["ban_gap","Có việc gấp","Trong số hồ sơ còn việc, đếm riêng những hồ sơ có ít nhất một việc mức ĐỎ - làm trước. Danh sách: bảng dưới xếp hồ sơ có việc gấp lên đầu."],
-  ["ban_sach","Đang sạch việc","Hồ sơ bạn thấy nhưng không còn việc nào của bạn - không còn việc nào chờ xử lý. Danh sách: bảng dưới chỉ liệt kê hồ sơ còn việc, nên phần còn lại chính là nhóm này."]]},
+  ["ban_sach","Đang sạch việc","Hồ sơ trong phạm vi của bạn, không còn việc nào chờ xử lý. Danh sách: bảng dưới chỉ liệt kê hồ sơ còn việc, nên phần còn lại chính là nhóm này."]]},
  viec:{t:"Việc hôm nay",the:[
   ["vc_red","Quá hạn","Đếm những việc đã QUÁ hạn SLA - mỗi loại việc một luật hạn riêng, tất cả đặt ở Cài đặt nhóm Ngưỡng &amp; SLA. Danh sách: bấm chip 'Quá hạn' ở thanh Mức độ ngay dưới."],
   ["vc_amber","Sắp tới hạn","Đếm những việc CHƯA quá hạn nhưng sắp tới nơi - còn kịp làm hôm nay. Danh sách: bấm chip 'Sắp tới hạn' ở thanh Mức độ ngay dưới."],
