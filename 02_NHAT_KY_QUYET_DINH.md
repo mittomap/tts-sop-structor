@@ -148,6 +148,32 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### ✅ ĐÃ ĐÓNG - GỠ HẲN BẢN V6 + NỘP BẢNG AUDIT 9 MẢNG (06/08)
+> Anh Luân: *"1- bỏ v6, ko được làm ảnh hưởng v5. 2- okey em, tồn thì làm đi."*
+> · Gỡ khỏi nguồn: cờ `ITTS_V6` · `V6()` · `NAVTREE6` · `v6Dap` · máy đổi bản của nút Đổi cổng ·
+>   25 nhánh rẽ · 11 nhánh trong 7 bộ kiểm · hai dòng build. `_check11` có 8 tiêu chí chặn quay lại.
+> · **GIỮ trang "Bàn làm việc"** - đo lại mới biết Sổ người đồng hành của V5 dùng nó làm TRANG HỒ
+>   SƠ PHỤ HUYNH (`phMo()` -> `go("ban")`). Xoá là xoá tính năng V5. Nay xếp cùng nhóm `hoso`.
+>   Và nó đang hỏng sẵn: ngoài phạm vi mọi chức danh nên bấm một phụ huynh là ăn dòng "ngoài
+>   phạm vi" - cùng họ 67 chỗ "mời rồi đuổi" 05/08, chỉ khác là **lối đi vòng qua một hàm** nên
+>   bộ kiểm dò theo `go('...')` không thấy. Đã vá.
+> · **KHÔNG xoá hai phép đo** từng đo cây menu v6 - chuyển sang đo cây V5. Chính việc chuyển đó
+>   lộ ra hai sổ tra cứu chưa ai hỏi tới (`khoahoc`, `nhanvien`): cây v6 có 15 sổ, cây V5 có 18.
+> · **BẪY: chốt chặn v6 bắt được chính người vừa cắm nó.** Nguồn còn `cong-nhan-vien-v6` ở hai
+>   biểu thức tính đường dẫn cổng. Cắm để canh ba tháng, nó bắt sau ba tiếng.
+> · **BẪY: thước sai, không phải app rò.** `_checkmien` báo 5 người thấy dữ liệu miền tiền - đọc
+>   ra là câu "Buổi **còn nợ** nhận xét" (giảng viên chưa viết nhận xét). Sửa THƯỚC, không sửa câu
+>   chữ app. Đổi câu cho vừa lòng một biểu thức là làm hỏng tiếng Việt của sản phẩm.
+> · **Bảng audit 9 mảng: `AUDIT_06_08_2026.md`.** verify 32 bộ kiểm xanh hết. Ba việc tay đều làm:
+>   đóng vai 6 chức danh · bấm Reset demo · đọc tay 60 câu giải thích (bắt được câu "Chạy lại
+>   pipeline" lọt ra màn Cài đặt - việc của người làm app, không phải của quản trị viên trung tâm).
+> · **BA QUAN SÁT MỚI, CHƯA SỬA, chờ anh Luân quyết** (mục 9a của bảng audit):
+>   1. NV Tư vấn (11 việc) và TP ACA (50 việc) mở app ra chỉ có **1 nút bấm làm được** trên trang
+>      đáp - phải bấm chip, ra danh sách, bấm dòng, sang trang mới làm được. TP Kế toán có 48 nút.
+>   2. NV Marketing: trên hồ sơ họ mở, việc của người khác (86) gấp 3,3 lần việc của họ (26).
+>   3. Trịnh Quốc Bảo [giáo viên · Cơ sở 3]: 1 mục menu mở ra TRỐNG - trang Giao việc.
+
+
 > ### ✅ ĐÃ ĐÓNG - "MỜI RỒI ĐUỔI": 67 lối vào dẫn ra ngoài phạm vi chức danh (05/08)
 > Anh Luân: *"ở trang lớp học của trưởng phòng ACA lại có nút Xếp lớp và onboarding, bấm vào
 > thì: Trang ngoài phạm vi chức danh của bạn - đang xem ở chế độ THAM KHẢO... **Đây là 1 dạng

@@ -186,7 +186,11 @@ function tshNow(){
  persistSoon();reRender(CUR)}
 function tshInfoHTML(){
  var a=tshAnchor(),d=tshDays();
- if(!a)return '<div class="fhint">Bộ dữ liệu này chưa ghi ngày sinh - không tự dịch được. Chạy lại pipeline để có mốc.</div>';
+ /* V9.99z11 - CÂU NÀY TỪNG NÓI VIỆC CỦA NGƯỜI LÀM APP, KHÔNG PHẢI VIỆC CỦA NGƯỜI DÙNG.
+    Bản cũ: "Chạy lại pipeline để có mốc". Người mở màn Cài đặt là quản trị viên của trung tâm -
+    họ không có pipeline nào để chạy, đọc xong không biết làm gì tiếp. Bắt được khi đọc tay 60
+    câu giải thích trong form (audit 06/08, mảng 5). Nay câu nói rõ HẬU QUẢ và LỐI RA có thật. */
+ if(!a)return '<div class="fhint">Bộ dữ liệu demo này không ghi mốc ngày sinh nên app không tự kéo lịch về hôm nay được - lịch tuần và các hạn sẽ hiện theo ngày gốc của dữ liệu. Bấm <b>Dựng lại demo</b> ở khối trên để lấy bộ dữ liệu chuẩn có đủ mốc.</div>';
  var lech=Math.round((new Date()-a)/864e5);
  return ctxRows([["Dữ liệu sinh ngày",String(DATA.meta.anchor).slice(0,10)],
   ["So với hôm nay",(lech===0?"cùng ngày":(lech>0?("cũ hơn "+lech+" ngày"):("mới hơn "+Math.abs(lech)+" ngày")))],
