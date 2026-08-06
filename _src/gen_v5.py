@@ -315,7 +315,13 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
    iPad dọc (834px, sidebar vẫn hiện nên khung nội dung chỉ còn 572px): nút "Khách mới liên hệ
    đến" thò ra 94px, kéo cả trang cuộn ngang - 6 trang bị. Khổ nào cũng có thể hẹp, tuỳ sidebar
    rộng bao nhiêu, nên chặn theo ĐIỂM GÃY là canh sai chỗ; để nó tự xuống dòng mới đúng. */
-.phead{display:flex;align-items:flex-end;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+/* V9.99z12 (anh Luan 06/08: *"phan phia tren la cac the chiem toi 1 nua man hinh roi, co
+   cach nao toi uu ko"*). Do duoc: trang Bao cao phai cuon 561px - 71% man hinh - moi thay dong
+   du lieu dau tien; CSKH 526px; Tuyen sinh 447px. Khong khoi nao sai, nhung cong lai thi day
+   het viec xuong duoi nep gap.
+   CHI THU KHOANG TRONG, khong thu co chu va KHONG thu chieu cao nut - luat vung bam toi thieu
+   cua `_checkui` giu nguyen. Day la toi uu MAT DO, khong phai thu nho giao dien. */
+.phead{display:flex;align-items:flex-end;gap:14px;margin-bottom:11px;flex-wrap:wrap}
 .phead>div:first-child{min-width:0}
 .phead .t{font-size:18px;font-weight:800;letter-spacing:-.2px}.phead .s{font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}
 /* V9.67: dải nút bên phải tiêu đề trang phải XUỐNG DÒNG và co được. Ô chọn lớp mang tên đầy đủ
@@ -448,7 +454,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .bwcta2{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:10px 14px;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600}
 .bwcta2:hover{background:rgba(255,255,255,.22)}
 .bstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin-bottom:16px}
-.bstat{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 13px;transition:.15s}
+.bstat{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 13px;transition:.15s}
 /* V9.67: cùng lý do với `.jgrid>*` - khối chữ trong thẻ phải chịu hẹp lại, nếu không một câu phụ
    chú dài ("Đến hạn thu, tính tới hôm nay") đẩy cả trang Thu học phí cuộn ngang trên điện thoại. */
 .bstat>*{min-width:0}
@@ -463,7 +469,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .rcard.khoa{position:relative;opacity:.45;cursor:default;filter:grayscale(.7)}
 .rcard.khoa:hover{border-color:var(--line);box-shadow:none;transform:none}
 .rcard .gklock{position:absolute;top:8px;right:9px;font-size:13px;color:var(--muted)}
-.bstatsw{position:relative;margin-bottom:16px}
+.bstatsw{position:relative;margin-bottom:10px}
 .bstatsw .bstats{margin-bottom:0}
 .thewrap{position:relative;display:flex;justify-content:flex-end;margin-bottom:6px}
 .thewrap .colmenu{top:calc(100% + 4px);min-width:250px}
@@ -993,7 +999,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .tssl{font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap}
 .tsstep.on .tssl{color:var(--navy);font-weight:700}
 .tsarr{display:flex;align-items:center;color:#B9C6D6;flex:0 0 auto}
-.csway{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:12px;display:flex;flex-direction:column;gap:6px}
+.csway{background:#fff;border:1px solid var(--line);border-radius:12px;padding:7px 12px;margin-bottom:8px;display:flex;flex-direction:column;gap:5px}
 .cwrow{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .cwdir{display:inline-flex;align-items:center;gap:5px;font-weight:800;font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap}
 .cwdir.out{background:#EEF2F6;color:#2E5A88}
@@ -1061,7 +1067,7 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 @media(max-width:1000px){.cbgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px 0}.cbit{border-right:0}}
 @media(max-width:620px){.cbgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:860px){.cbit{min-width:46%;border-right:0}}
-.tbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;margin-bottom:12px}
+.tbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px 11px;margin-bottom:8px}
 .tbar .srch{margin:0}
 .seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:8px;padding:3px;gap:2px;flex-wrap:wrap}
 .segb{border:0;background:transparent;color:#3A4756;font-family:inherit;font-size:12px;font-weight:700;padding:0 12px;height:30px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.12s}
@@ -1089,8 +1095,8 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
    nhau, người dùng phải đi tìm nút Xuất bằng mắt. Nay hai TẦNG: tầng trên là chip lọc, tầng dưới
    là công cụ - đứng yên một chỗ ở mọi trang, mọi cỡ dữ liệu. */
 .tbar.hai{flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden}
-.tbar.hai>.tbtren{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 11px}
-.tbar.hai>.tbduoi{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 11px;
+.tbar.hai>.tbtren{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 11px}
+.tbar.hai>.tbduoi{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:5px 11px;
  background:var(--bg);border-top:1px solid var(--line)}
 .tbar.hai>.tbduoi .tbcnt{margin-right:auto}
 .tbcnt{font-size:11.5px;color:var(--muted);font-weight:600;white-space:nowrap}
@@ -1802,7 +1808,7 @@ body.drsz .drawer{transition:none}
 .kpihv{font-size:26px;font-weight:800;color:var(--navy);line-height:1}
 .kpihs{font-size:13px;font-weight:800;color:var(--navy)}
 .kpiacts{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
-.k3row{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:18px}
+.k3row{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:10px}
 .k3card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px}
 .k3card.amber .k3n{background:#E08A1E}.k3card.red .k3n{background:#DC2626}.k3card.green .k3n{background:#16A34A}
 .k3hd{display:flex;align-items:center;gap:9px;margin-bottom:7px;font-size:13px}
@@ -1964,7 +1970,7 @@ body.drsz .drawer{transition:none}
      (anh Luan bat). id=tourBtn don ve day de tourBtnSync (an/hien theo Cai dat) van chay. -->
         <button class="tbtn" id="tourBtn" data-tour="help" onclick="tourMenu()" aria-label="Hướng dẫn sử dụng" title="Hướng dẫn từng bước - chọn cấp độ rồi app chỉ tận nơi"><i class="ti ti-help-circle"></i></button>
         <div class="zwrap" data-tour="tyle"><i class="ti ti-text-size"></i><select id="zoomSel" onchange="zoomSet(this.value)" aria-label="Tỷ lệ hiển thị"></select></div>
-        <button class="tbtn" id="gyBtn" data-tour="gopy" onclick="gopyMo()" aria-label="Báo lỗi hoặc góp ý" data-tip="Báo lỗi / góp ý - app tự ghi sẵn bạn đang ở trang nào, đăng nhập bằng ai"><i class="ti ti-message-report"></i></button>
+        <button class="tbtn" id="gyBtn" data-tour="gopy" onclick="gopyMo()" aria-label="Báo lỗi hoặc góp ý" data-tip="Báo lỗi / góp ý - mở bảng ghi nhận ở tab mới"><i class="ti ti-message-report"></i></button>
         <button class="tbtn" data-tour="bell" onclick="toggleBell(event)" aria-label="Thông báo"><i class="ti ti-bell"></i><span class="n" id="bellN" style="display:none">0</span></button>
         <div class="notif" id="notif"></div>
       </div>
@@ -2338,7 +2344,7 @@ function roomDown(){ /* mất trạm trung chuyển: nghỉ ngẫu nhiên rồi 
  ROOM={p:null,conns:[],code:"AUTO",host:false,on:false,lastRaw:ROOM.lastRaw,remoteN:null};roomUiRefresh();
  setTimeout(roomAuto,300+Math.floor(Math.random()*1500))}
 function roomRetry(){roomUiRefresh();clearTimeout(window.__roomRt);window.__roomRt=setTimeout(roomAuto,15000)}
-function roomToggle(){ /* Bật / tắt đồng bộ nhiều máy - nhớ theo MÁY (localStorage), không theo tab */
+function roomToggle(){ /* Bật / tắt đồng bộ nhiều máy - nhớ theo từng máy (localStorage), không theo tab */
  if(!dongBoOn()){try{localStorage.setItem(DBKEY,"1")}catch(e){}
   ssSet("ITTS_ROOM_OFF",null);window.__roomGen++;window.__roomBusy=0;clearTimeout(window.__roomRt);
   roomUiRefresh();roomAuto();toast("Đang nối máy này với các máy khác đang mở cùng bản demo...",3200)}
@@ -3474,199 +3480,199 @@ var THEDEF={
   ["lr_chuacham","Bài đã nộp chưa chấm","Học viên đã nộp mà chưa ai chấm - nộp rồi để đó là người học chờ vô ích. Muốn xem: tab Bài tập."],
   ["lr_no","Học viên còn nợ","Đếm số học viên của lớp còn khoản phải thu, cộng mọi đơn chưa huỷ của người đó. Một người nợ hai đơn vẫn tính là một. Muốn xem: trang Thanh toán, lọc theo lớp."]]},
  dsphuhuynh:{t:"Sổ phụ huynh",the:[
-  ["ph_nguoi","Người đồng hành","Số người đồng hành trong phạm vi dữ liệu của bạn. Gộp theo SỐ ĐIỆN THOẠI - hai học viên khai cùng một số là một người. Muốn xem danh sách: chính bảng ngay dưới dải này."],
+  ["ph_nguoi","Người đồng hành","Số người đồng hành trong phạm vi dữ liệu của bạn. Gộp theo SỐ ĐIỆN THOẠI - hai học viên khai cùng một số là một người. Danh sách: chính bảng ngay dưới dải này."],
   ["ph_nhieu","Có từ 2 con trở lên","Người đang có nhiều hơn một con theo học. Gọi cho họ một lần là nói được chuyện của cả hai - đừng để hai bộ phận gọi hai lần trong một ngày. Muốn xem: cột thứ hai của mỗi dòng ghi rõ tên từng con."],
   ["ph_no","Còn nợ học phí","Cộng phần còn lại của MỌI đơn của MỌI con người ấy. Một người có hai con, mỗi con nợ một ít, thì đây là con số họ thật sự phải trả. Muốn xem: chip vàng ở cuối mỗi dòng."],
   ["ph_rui","Có con đang cảnh báo","Người có ít nhất một con đang ở mức đỏ về chuyên cần hoặc học thuật - cần chủ động liên hệ sớm. Muốn xem: chip đỏ ở cuối dòng ghi mấy con."]]},
  ban:{t:"Bàn làm việc",the:[
-  ["ban_co","Còn việc của bộ phận","Số hồ sơ trong phạm vi của bạn mà chức danh của bạn còn việc phải làm với họ. Quản lý đang xem thay một người thì đây là số của CHÍNH NGƯỜI ẤY. Muốn xem danh sách: chính bảng ngay dưới dải này."],
-  ["ban_gap","Có việc gấp","Trong số hồ sơ còn việc, đếm riêng những hồ sơ có ít nhất một việc mức ĐỎ - làm trước. Muốn xem danh sách: bảng dưới xếp hồ sơ có việc gấp lên đầu."],
-  ["ban_sach","Đang sạch việc","Hồ sơ bạn thấy nhưng không còn việc nào của bạn - không cần đụng tới. Đây là con số ta MUỐN nó lớn. Muốn xem danh sách: bảng dưới chỉ liệt kê hồ sơ CÒN việc, nên phần còn lại chính là nhóm này."]]},
+  ["ban_co","Còn việc của bộ phận","Số hồ sơ trong phạm vi của bạn mà chức danh của bạn còn việc phải làm với họ. Quản lý đang xem thay một người thì đây là số của CHÍNH NGƯỜI ẤY. Danh sách: chính bảng ngay dưới dải này."],
+  ["ban_gap","Có việc gấp","Trong số hồ sơ còn việc, đếm riêng những hồ sơ có ít nhất một việc mức ĐỎ - làm trước. Danh sách: bảng dưới xếp hồ sơ có việc gấp lên đầu."],
+  ["ban_sach","Đang sạch việc","Hồ sơ bạn thấy nhưng không còn việc nào của bạn - không còn việc nào chờ xử lý. Danh sách: bảng dưới chỉ liệt kê hồ sơ còn việc, nên phần còn lại chính là nhóm này."]]},
  viec:{t:"Việc hôm nay",the:[
-  ["vc_red","Quá hạn","Đếm những việc đã QUÁ hạn SLA - mỗi loại việc một luật hạn riêng, tất cả đặt ở Cài đặt nhóm Ngưỡng &amp; SLA. Muốn xem danh sách: bấm chip 'Quá hạn' ở thanh Mức độ ngay dưới."],
-  ["vc_amber","Sắp tới hạn","Đếm những việc CHƯA quá hạn nhưng sắp tới nơi - còn kịp làm hôm nay. Muốn xem danh sách: bấm chip 'Sắp tới hạn' ở thanh Mức độ ngay dưới."],
-  ["vc_old","Nợ quá N ngày","Trong số việc quá hạn, đếm riêng những việc đã để mốc quá số ngày khai ở Ngưỡng & SLA (viecOldAlert_days). Nợ càng lâu càng khó cứu. Muốn xem danh sách: bấm chip 'Quá hạn' ở thanh Mức độ rồi nhìn phần ghi số ngày trễ của từng dòng."],
-  ["vc_team","Quá hạn nhiều nhất","Bộ phận đang ôm nhiều việc QUÁ HẠN nhất (xếp theo quá hạn chứ không theo tổng việc) - hôm nay nên dồn người sang đó. Muốn xem danh sách: chọn đúng bộ phận đó ở thanh Bộ phận ngay dưới."]]},
+  ["vc_red","Quá hạn","Đếm những việc đã QUÁ hạn SLA - mỗi loại việc một luật hạn riêng, tất cả đặt ở Cài đặt nhóm Ngưỡng &amp; SLA. Danh sách: bấm chip 'Quá hạn' ở thanh Mức độ ngay dưới."],
+  ["vc_amber","Sắp tới hạn","Đếm những việc CHƯA quá hạn nhưng sắp tới nơi - còn kịp làm hôm nay. Danh sách: bấm chip 'Sắp tới hạn' ở thanh Mức độ ngay dưới."],
+  ["vc_old","Nợ quá N ngày","Trong số việc quá hạn, đếm riêng những việc đã để mốc quá số ngày khai ở Ngưỡng & SLA (viecOldAlert_days). Nợ càng lâu càng khó cứu. Danh sách: bấm chip 'Quá hạn' ở thanh Mức độ rồi nhìn phần ghi số ngày trễ của từng dòng."],
+  ["vc_team","Quá hạn nhiều nhất","Bộ phận đang ôm nhiều việc QUÁ HẠN nhất (xếp theo quá hạn chứ không theo tổng việc) - hôm nay nên dồn người sang đó. Danh sách: chọn đúng bộ phận đó ở thanh Bộ phận ngay dưới."]]},
  /* `neo` khác "bstats": dải này nằm CÙNG TRANG với dải thẻ của trang (Trang bắt đầu có cả hai).
     Hai chỗ cùng mang một mã neo thì bài hướng dẫn tô sáng nhầm chỗ - đúng lỗi anh Luân vừa chụp
     được. Dải này đã có neo riêng `bangviec` ở dòng tiêu đề, nên phần thẻ mang mã khác. */
  bangviec:{t:"Bảng việc theo chức danh (dải dưới thanh chọn)",neo:"bvstats",the:[
-  ["bv_lead_new","Lead mới (chưa LH)","Lead đã vào hệ thống mà chưa ai gọi lần nào - đồng hồ SLA phản hồi đang chạy. Muốn xem danh sách: mở trang Tuyển sinh ở menu trái rồi chọn bước Lead."],
-  ["bv_lead_work","Lead đang khai thác","Lead đã liên hệ và đang trong quá trình chăm. Muốn xem danh sách: trang Tuyển sinh, bước Lead, lọc theo trạng thái Đã liên hệ."],
-  ["bv_test_up","Test sắp tới","Ca test đầu vào đã đặt lịch, chưa thi hoặc chưa chấm. Muốn xem danh sách: trang Tuyển sinh, bước Test đầu vào."],
-  ["bv_tv_can","Tư vấn cần làm","Khách đã có điểm test mà chưa được tư vấn - hạn tính theo CVT. Muốn xem danh sách: trang Tuyển sinh, bước Tư vấn & ĐK."],
-  ["bv_test_wait","Test chờ chấm","Ca test đã thi mà chưa ai chấm điểm - hạn tính theo GLA. Muốn xem danh sách: trang Tuyển sinh, bước Test đầu vào."],
-  ["bv_test_done","Test đã chấm","Ca test đã có điểm tổng. Muốn xem danh sách: trang Tuyển sinh, bước Test đầu vào, lọc trạng thái đã chấm."],
-  ["bv_wow_up","WOW sắp tới","Buổi WOW 1-1 đã đặt lịch, chưa dạy. Muốn xem danh sách: trang Học tập & Giảng dạy, tab Buổi WOW 1-1."],
-  ["bv_wow_imp","WOW có tiến bộ","Buổi WOW đã dạy và ghi nhận học viên tiến bộ - tử số của chỉ số WOR. Muốn xem danh sách: trang Học tập & Giảng dạy, tab Buổi WOW 1-1."],
-  ["bv_ses_done","Buổi đã hoàn thành","Buổi lớp tôi đã dạy xong. Muốn xem danh sách: trang Học tập & Giảng dạy, tab Nhận xét buổi."],
-  ["bv_ses_note","Cần viết nhận xét buổi","Buổi đã dạy mà chưa ghi nhận xét - hạn tính theo slaTeacherNote_hours. Muốn xem danh sách: trang Học tập & Giảng dạy, tab Nhận xét buổi."],
-  ["bv_hw_wait","Bài tập chờ chấm","Bài học viên đã nộp mà chưa chấm - hạn tính theo slaHomeworkGrading_hours. Muốn xem danh sách: mở trang Giao & chấm Bài tập ở menu trái."],
-  ["bv_risk_aca","HV nguy cơ học thuật","Học viên trong lớp tôi đang bị đánh dấu nguy cơ học thuật - nên đề xuất buổi WOW. Muốn xem danh sách: mở trang Học viên nguy cơ ở menu trái."],
-  ["bv_ob_open","Nhập học chưa xong","Hồ sơ onboarding còn dở bước - hạn tính theo slaOBT_hours. Muốn xem danh sách: bảng hồ sơ ngay dưới trên chính trang này."],
-  ["bv_risk_stu","Học viên nguy cơ","Học viên bị đánh dấu nguy cơ trên trục chuyên cần hoặc học thuật. Muốn xem danh sách: mở trang Học viên nguy cơ ở menu trái."],
-  ["bv_fb_new","Phản hồi chờ phân loại","Phản hồi mới nhận, chưa ai xếp loại. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Phản hồi / Góp ý."],
-  ["bv_ychv","Học viên liên hệ","Yêu cầu học viên gửi lên từ Cổng học viên mà bạn chưa bấm Nhận - hạn nhận tính theo slaTaskAccept_hours. Muốn xem danh sách: mở mục Học viên liên hệ ở menu trái."],
-  ["bv_kn_open","Khiếu nại đang xử lý","Khiếu nại chưa đóng. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Khiếu nại."],
-  ["bv_ck_duyet","Chiết khấu cần duyệt","Đăng ký có mức chiết khấu vượt ngưỡng phải trình quản lý mà chưa ai duyệt. Muốn xem danh sách: mở trang Chờ duyệt ở menu trái, tab Duyệt chiết khấu."],
-  ["bv_doilop2","Đổi lớp quá số lần miễn duyệt","Học viên đã đổi lớp nhiều hơn số lần được miễn duyệt (đặt ở Cài đặt, nhóm P5) - theo CH3 phải có quản lý phê duyệt. Muốn xem danh sách: mở trang Xếp lớp & Onboarding ở menu trái."],
-  ["bv_kn_high","Khiếu nại mức CAO","Khiếu nại xếp mức cao còn đang mở - quản lý phải tham gia trong hạn khai ở Ngưỡng & SLA. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Khiếu nại."],
-  ["bv_kn_esc","Khiếu nại đã leo thang","Khiếu nại đã đẩy lên cấp trên vì học viên không chấp nhận cách xử lý. Muốn xem danh sách: mở trang CSKH ở menu trái, tab Khiếu nại."],
-  ["bv_hoan","Hoàn tiền chờ duyệt","Khoản hoàn tiền đang chờ người có thẩm quyền phê duyệt - hạn tính theo slaRefundProcess_days. Muốn xem danh sách: mở trang Chờ duyệt ở menu trái, tab Duyệt hoàn tiền."],
+  ["bv_lead_new","Lead mới (chưa LH)","Lead đã vào hệ thống mà chưa ai gọi lần nào - đồng hồ SLA phản hồi đang chạy. Danh sách: mở trang Tuyển sinh ở menu trái rồi chọn bước Lead."],
+  ["bv_lead_work","Lead đang khai thác","Lead đã liên hệ và đang trong quá trình chăm. Danh sách: trang Tuyển sinh, bước Lead, lọc theo trạng thái Đã liên hệ."],
+  ["bv_test_up","Test sắp tới","Ca test đầu vào đã đặt lịch, chưa thi hoặc chưa chấm. Danh sách: trang Tuyển sinh, bước Test đầu vào."],
+  ["bv_tv_can","Tư vấn cần làm","Khách đã có điểm test mà chưa được tư vấn - hạn tính theo CVT. Danh sách: trang Tuyển sinh, bước Tư vấn & ĐK."],
+  ["bv_test_wait","Test chờ chấm","Ca test đã thi mà chưa ai chấm điểm - hạn tính theo GLA. Danh sách: trang Tuyển sinh, bước Test đầu vào."],
+  ["bv_test_done","Test đã chấm","Ca test đã có điểm tổng. Danh sách: trang Tuyển sinh, bước Test đầu vào, lọc trạng thái đã chấm."],
+  ["bv_wow_up","WOW sắp tới","Buổi WOW 1-1 đã đặt lịch, chưa dạy. Danh sách: trang Học tập & Giảng dạy, tab Buổi WOW 1-1."],
+  ["bv_wow_imp","WOW có tiến bộ","Buổi WOW đã dạy và ghi nhận học viên tiến bộ - tử số của chỉ số WOR. Danh sách: trang Học tập & Giảng dạy, tab Buổi WOW 1-1."],
+  ["bv_ses_done","Buổi đã hoàn thành","Buổi lớp tôi đã dạy xong. Danh sách: trang Học tập & Giảng dạy, tab Nhận xét buổi."],
+  ["bv_ses_note","Cần viết nhận xét buổi","Buổi đã dạy mà chưa ghi nhận xét - hạn tính theo slaTeacherNote_hours. Danh sách: trang Học tập & Giảng dạy, tab Nhận xét buổi."],
+  ["bv_hw_wait","Bài tập chờ chấm","Bài học viên đã nộp mà chưa chấm - hạn tính theo slaHomeworkGrading_hours. Danh sách: Giao & chấm Bài tập."],
+  ["bv_risk_aca","HV nguy cơ học thuật","Học viên trong lớp tôi đang bị đánh dấu nguy cơ học thuật - nên đề xuất buổi WOW. Danh sách: Học viên nguy cơ."],
+  ["bv_ob_open","Nhập học chưa xong","Hồ sơ onboarding còn dở bước - hạn tính theo slaOBT_hours. Danh sách: bảng hồ sơ ngay dưới trên chính trang này."],
+  ["bv_risk_stu","Học viên nguy cơ","Học viên bị đánh dấu nguy cơ trên trục chuyên cần hoặc học thuật. Danh sách: Học viên nguy cơ."],
+  ["bv_fb_new","Phản hồi chờ phân loại","Phản hồi mới nhận, chưa ai xếp loại. Danh sách: CSKH › Phản hồi / Góp ý."],
+  ["bv_ychv","Học viên liên hệ","Yêu cầu học viên gửi lên từ Cổng học viên mà bạn chưa bấm Nhận - hạn nhận tính theo slaTaskAccept_hours. Danh sách: mở mục Học viên liên hệ ở menu trái."],
+  ["bv_kn_open","Khiếu nại đang xử lý","Khiếu nại chưa đóng. Danh sách: CSKH › Khiếu nại."],
+  ["bv_ck_duyet","Chiết khấu cần duyệt","Đăng ký có mức chiết khấu vượt ngưỡng phải trình quản lý mà chưa ai duyệt. Danh sách: Chờ duyệt › Duyệt chiết khấu."],
+  ["bv_doilop2","Đổi lớp quá số lần miễn duyệt","Học viên đã đổi lớp nhiều hơn số lần được miễn duyệt (đặt ở Cài đặt, nhóm P5) - theo CH3 phải có quản lý phê duyệt. Danh sách: Xếp lớp & Onboarding."],
+  ["bv_kn_high","Khiếu nại mức CAO","Khiếu nại xếp mức cao còn đang mở - quản lý phải tham gia trong hạn khai ở Ngưỡng & SLA. Danh sách: CSKH › Khiếu nại."],
+  ["bv_kn_esc","Khiếu nại đã leo thang","Khiếu nại đã đẩy lên cấp trên vì học viên không chấp nhận cách xử lý. Danh sách: CSKH › Khiếu nại."],
+  ["bv_hoan","Hoàn tiền chờ duyệt","Khoản hoàn tiền đang chờ người có thẩm quyền phê duyệt - hạn tính theo slaRefundProcess_days. Danh sách: Chờ duyệt › Duyệt hoàn tiền."],
   /* V9.99z - bốn câu này còn chỉ đường tới "trang Giao việc, tab Việc của tôi": trang đã đổi tên
      thành "Quản lý việc giao & nhận" và việc chưa nhận nay có TAB RIÊNG. Chỉ đường bằng cái tên
      không còn trên màn hình là đưa người ta đi lạc. */
-  ["bv_tk_new","Việc mới chờ nhận","Việc người khác giao cho tôi mà tôi chưa bấm Nhận. Muốn xem danh sách: mở Quản lý việc giao & nhận ở menu trái, tab Việc chờ nhận."],
-  ["bv_tk_doing","Đang làm","Việc tôi đã nhận và chưa báo xong. Muốn xem danh sách: mở Quản lý việc giao & nhận ở menu trái, tab Việc của tôi."],
-  ["bv_tk_late","Quá hạn","Việc của tôi đã qua hạn mà chưa xong - cần báo lại người giao. Muốn xem danh sách: mở Quản lý việc giao & nhận ở menu trái, tab Việc của tôi."],
-  ["bv_tk_wait","Chờ người giao xác nhận","Việc tôi đã báo xong, đang chờ người giao xác nhận. Muốn xem danh sách: mở Quản lý việc giao & nhận ở menu trái, tab Tôi đã giao."],
-  ["bv_hs_thieu","Hồ sơ nhân sự còn thiếu","Nhân viên chưa điền chức danh, hoặc là giáo viên / tư vấn viên mà chưa khai cơ sở - thiếu thì phân quyền và phân công đều sai. Khối văn phòng (giám đốc, trưởng phòng, marketing, kế toán, nhân sự) không gắn cơ sở nào nên không tính là thiếu. Muốn xem danh sách: bảng nhân sự ngay dưới trên chính trang này."],
-  ["bv_gio_thieu","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy mà chưa ghi giờ vào hoặc giờ ra - thiếu mốc thì bảng công tính sai. Muốn xem danh sách: mở trang Bảng công giảng dạy ở menu trái."],
+  ["bv_tk_new","Việc mới chờ nhận","Việc người khác giao cho tôi mà tôi chưa bấm Nhận. Danh sách: mở Quản lý việc giao & nhận ở menu trái, tab Việc chờ nhận."],
+  ["bv_tk_doing","Đang làm","Việc tôi đã nhận và chưa báo xong. Danh sách: mở Quản lý việc giao & nhận ở menu trái, tab Việc của tôi."],
+  ["bv_tk_late","Quá hạn","Việc của tôi đã qua hạn mà chưa xong - cần báo lại người giao. Danh sách: mở Quản lý việc giao & nhận ở menu trái, tab Việc của tôi."],
+  ["bv_tk_wait","Chờ người giao xác nhận","Việc tôi đã báo xong, đang chờ người giao xác nhận. Danh sách: mở Quản lý việc giao & nhận ở menu trái, tab Tôi đã giao."],
+  ["bv_hs_thieu","Hồ sơ nhân sự còn thiếu","Nhân viên chưa điền chức danh, hoặc là giáo viên / tư vấn viên mà chưa khai cơ sở - thiếu thì phân quyền và phân công đều sai. Khối văn phòng (giám đốc, trưởng phòng, marketing, kế toán, nhân sự) không gắn cơ sở nào nên không tính là thiếu. Danh sách: bảng nhân sự ngay dưới trên chính trang này."],
+  ["bv_gio_thieu","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy mà chưa ghi giờ vào hoặc giờ ra - thiếu mốc thì bảng công tính sai. Danh sách: Bảng công giảng dạy."],
   /* V9.99p - năm ô của bảng Chuyên môn (ACA), nhóm tách khỏi Học vụ 04/08. */
-  ["bv_aca_note","Buổi quá hạn nhận xét","Buổi đã dạy xong mà giáo viên chưa ghi nhận xét, tính theo hạn SLA. Muốn xem danh sách: Học tập & Giảng dạy > Nhận xét buổi."],
-  ["bv_aca_gv","Buổi hôm nay chưa có giáo viên","Buổi trong ngày hôm nay chưa xếp được người dạy - không xoay kịp là phải huỷ buổi. Muốn xem danh sách: Học tập & Giảng dạy > GV dự phòng."],
-  ["bv_aca_risk","Học viên đuối học thuật","Học viên bị đánh dấu at_risk/off_track ở trục học thuật. Muốn xem danh sách: mở Học viên rồi lọc nguy cơ."],
-  ["bv_mk_moi","Lead mới N ngày","Số khách tiềm năng vào hệ thống trong cửa sổ nhìn lại (đặt ở Cài đặt, nhóm Bảng số). Đây là sản lượng của Marketing. Muốn xem danh sách: mở trang Lead & khai thác."],
-  ["bv_mk_orph","Lead chưa ai phụ trách","Lead còn sống mà chưa gán cho nhân viên tư vấn nào - tiền quảng cáo đã tiêu rồi, để nguội là mất trắng. Muốn xem danh sách: mở trang Chờ duyệt, tab Bàn giao lead - ở đó có nút Chia đều cho đội tư vấn."],
+  ["bv_aca_note","Buổi quá hạn nhận xét","Buổi đã dạy xong mà giáo viên chưa ghi nhận xét, tính theo hạn SLA. Danh sách: Học tập & Giảng dạy > Nhận xét buổi."],
+  ["bv_aca_gv","Buổi hôm nay chưa có giáo viên","Buổi trong ngày hôm nay chưa xếp được người dạy - không xoay kịp là phải huỷ buổi. Danh sách: Học tập & Giảng dạy > GV dự phòng."],
+  ["bv_aca_risk","Học viên đuối học thuật","Học viên bị đánh dấu at_risk/off_track ở trục học thuật. Danh sách: mở Học viên rồi lọc nguy cơ."],
+  ["bv_mk_moi","Lead mới N ngày","Số khách tiềm năng vào hệ thống trong cửa sổ nhìn lại (đặt ở Cài đặt, nhóm Bảng số). Đây là sản lượng của Marketing. Danh sách: mở trang Lead & khai thác."],
+  ["bv_mk_orph","Lead chưa ai phụ trách","Lead còn sống mà chưa gán cho nhân viên tư vấn nào - tiền quảng cáo đã tiêu rồi, để nguội là mất trắng. Danh sách: mở trang Chờ duyệt, tab Bàn giao lead - ở đó có nút Chia đều cho đội tư vấn."],
   ["bv_mk_yeu","Nguồn đang kém","Nguồn lead đã có đủ số lead để kết luận (ngưỡng sourceMinLeads) mà tỷ lệ ra học viên vẫn dưới ngưỡng CVR ở CH6. Nguồn mới chạy vài lead thì chưa tính. Muốn xem: mở Báo cáo, bảng nguồn lead."],
-  ["bv_mk_cu","Khách cũ chờ chạy lại","Lead đã đóng (từ chối hoặc không liên lạc được) - vẫn là kho khách để chạy lại chiến dịch. Muốn xem danh sách: mở Tuyển sinh, tab Chăm lại."],
-  ["bv_mk_thuong","Thưởng giới thiệu chưa trao","Bạn được giới thiệu đã đăng ký mà người giới thiệu chưa nhận thưởng. Hứa mà không trao là mất uy tín chương trình. Muốn xem danh sách: mở trang Mã giới thiệu."],
-  ["bv_no_phi","Đơn còn nợ phí","Đăng ký còn hiệu lực mà vẫn còn tiền chưa thu. Muốn xem danh sách: trang Tuyển sinh, bước Thanh toán."],
-  ["bv_thu_soat","Phiếu thu chờ đối soát","Phiếu thu đã ghi mà kế toán chưa xác nhận. Muốn xem danh sách: mở trang Chờ duyệt ở menu trái, tab Xác nhận thu tiền."]]},
+  ["bv_mk_cu","Khách cũ chờ chạy lại","Lead đã đóng (từ chối hoặc không liên lạc được) - vẫn là kho khách để chạy lại chiến dịch. Danh sách: mở Tuyển sinh, tab Chăm lại."],
+  ["bv_mk_thuong","Thưởng giới thiệu chưa trao","Bạn được giới thiệu đã đăng ký mà người giới thiệu chưa nhận thưởng. Hứa mà không trao là mất uy tín chương trình. Danh sách: mở trang Mã giới thiệu."],
+  ["bv_no_phi","Đơn còn nợ phí","Đăng ký còn hiệu lực mà vẫn còn tiền chưa thu. Danh sách: trang Tuyển sinh, bước Thanh toán."],
+  ["bv_thu_soat","Phiếu thu chờ đối soát","Phiếu thu đã ghi mà kế toán chưa xác nhận. Danh sách: Chờ duyệt › Xác nhận thu tiền."]]},
  banlam:{t:"Trang bắt đầu",the:[
-  ["bl0_appt","Tới hẹn hôm nay","Số hồ sơ có lịch hẹn liên hệ rơi vào hôm nay, cộng phần đã quá hẹn từ hôm trước. Muốn xem danh sách: bấm chip 'Tới hẹn / quá hẹn' ở thanh Nhóm ngay dưới."],
-  ["bl0_risk","Học viên nguy cơ","Học viên đang bị đánh dấu nguy cơ trên trục chuyên cần hoặc trục học thuật, toàn trung tâm. Muốn xem danh sách: mở trang Học viên nguy cơ ở menu trái."],
-  ["bl0_wow","WOW chờ xử lý","Buổi WOW đã đặt/đã xác nhận chưa dạy, cộng buổi đã dạy mà coach chưa ghi nội dung. Muốn xem danh sách: mở trang WOW ở menu trái."],
-  ["bl0_duyet","Chiết khấu chờ duyệt","Đăng ký có mức chiết khấu vượt ngưỡng phải trình quản lý mà chưa ai duyệt. Muốn xem danh sách: mở trang Chờ duyệt ở menu trái."],
-  ["bl0_debt","Đăng ký còn nợ","Đăng ký còn hiệu lực mà vẫn còn số tiền chưa thu. Muốn xem danh sách: mở trang Thanh toán, chip 'Còn nợ'."]]},
+  ["bl0_appt","Tới hẹn hôm nay","Số hồ sơ có lịch hẹn liên hệ rơi vào hôm nay, cộng phần đã quá hẹn từ hôm trước. Danh sách: chip Tới hẹn / quá hẹn. ngay dưới."],
+  ["bl0_risk","Học viên nguy cơ","Học viên đang bị đánh dấu nguy cơ trên trục chuyên cần hoặc trục học thuật, toàn trung tâm. Danh sách: Học viên nguy cơ."],
+  ["bl0_wow","WOW chờ xử lý","Buổi WOW đã đặt/đã xác nhận chưa dạy, cộng buổi đã dạy mà coach chưa ghi nội dung. Danh sách: WOW."],
+  ["bl0_duyet","Chiết khấu chờ duyệt","Đăng ký có mức chiết khấu vượt ngưỡng phải trình quản lý mà chưa ai duyệt. Danh sách: Chờ duyệt."],
+  ["bl0_debt","Đăng ký còn nợ","Đăng ký còn hiệu lực mà vẫn còn số tiền chưa thu. Danh sách: mở trang Thanh toán, chip 'Còn nợ'."]]},
  mykpi:{t:"Bảng số của tôi (trang cá nhân)",the:[
-  ["mk_lh","Lượt liên hệ hôm nay / N ngày","Số lần tôi đã gọi/nhắn cho khách: vế trái là hôm nay, vế phải là cửa sổ nhìn lại (đặt ở Cài đặt, tham số statsLookback_days). Muốn xem danh sách: mở trang Lead và lọc theo tên mình."],
+  ["mk_lh","Lượt liên hệ hôm nay / N ngày","Số lần tôi đã gọi/nhắn cho khách: vế trái là hôm nay, vế phải là cửa sổ nhìn lại (đặt ở Cài đặt, tham số statsLookback_days). Danh sách: mở trang Lead và lọc theo tên mình."],
   ["mk_kn","Tỷ lệ kết nối N ngày","Trong các lượt liên hệ của cửa sổ nhìn lại, bao nhiêu phần trăm gặp được khách thật (không phải máy bận, không nghe). Rê chuột vào con số để thấy phép chia."],
-  ["mk_dk","Đăng ký mới N ngày","Số khách tôi phụ trách đã chốt đăng ký trong cửa sổ nhìn lại. Muốn xem danh sách: mở trang Đăng ký & Học phí."],
-  ["mk_tien","Tiền thu N ngày","Tổng tiền các khoản do chính tôi ghi nhận trong cửa sổ nhìn lại. Muốn xem danh sách: mở trang Thanh toán."]]},
+  ["mk_dk","Đăng ký mới N ngày","Số khách tôi phụ trách đã chốt đăng ký trong cửa sổ nhìn lại. Danh sách: mở trang Đăng ký & Học phí."],
+  ["mk_tien","Tiền thu N ngày","Tổng tiền các khoản do chính tôi ghi nhận trong cửa sổ nhìn lại. Danh sách: mở trang Thanh toán."]]},
  review:{t:"Khảo sát & phản hồi lớp",the:[
-  ["rv_cho","Phiếu chờ trả lời","Số phiếu khảo sát đã gửi mà học viên chưa điền. Muốn xem danh sách: bảng 'Phiếu gần đây' ngay dưới, cột Trạng thái là 'chờ'."],
-  ["rv_quen","Gửi quá N ngày chưa ai trả lời","Trong số phiếu chờ, đếm riêng phiếu đã gửi quá số ngày khai ở Ngưỡng & SLA (svNudge_days) - đó là lớp cần gọi nhắc. Muốn xem danh sách: bấm chip 'Trả lời kém' ở thanh lọc dưới."]]},
+  ["rv_cho","Phiếu chờ trả lời","Số phiếu khảo sát đã gửi mà học viên chưa điền. Danh sách: bảng 'Phiếu gần đây' ngay dưới, cột Trạng thái là 'chờ'."],
+  ["rv_quen","Gửi quá N ngày chưa ai trả lời","Trong số phiếu chờ, đếm riêng phiếu đã gửi quá số ngày khai ở Ngưỡng & SLA (svNudge_days) - đó là lớp cần gọi nhắc. Danh sách: bấm chip 'Trả lời kém' ở thanh lọc dưới."]]},
  ghinhan:{t:"Ghi nhận phản hồi",the:[
-  ["gn_xau","Phản hồi xấu chưa xử lý","Đếm phản hồi tiêu cực hoặc lời than phiền còn đang mở - để lâu là thành khiếu nại. Muốn xem danh sách: bấm chip trạng thái 'chưa xử lý' ở thanh lọc dưới."]]},
+  ["gn_xau","Phản hồi xấu chưa xử lý","Đếm phản hồi tiêu cực hoặc lời than phiền còn đang mở - để lâu là thành khiếu nại. Danh sách: bấm chip trạng thái 'chưa xử lý' ở thanh lọc dưới."]]},
  giaoan:{t:"Giáo án & kho bài",the:[
-  ["ga_7ng","Buổi 7 ngày tới chưa có giáo án","Đếm buổi học sắp diễn ra trong 7 ngày mà chưa gắn giáo án - giáo viên lên lớp không có bài. Muốn xem danh sách: bấm tab 'Giáo án theo buổi' ở dưới."],
-  ["ga_khoa","Khóa chưa có giáo án nào","Đếm khóa học chưa soạn buổi nào - mở lớp là hụt bài ngay. Muốn xem danh sách: bảng khóa ngay dưới."],
-  ["ga_kho","Bài trong kho","Tổng số bài đang có trong kho học liệu, kèm số bài chưa dùng ở đâu. Muốn xem danh sách: bấm tab 'Kho bài'."],
-  ["ga_hw","Buổi chưa gắn bài tập","Đếm buổi đã có giáo án nhưng chưa gắn bài về nhà. Muốn xem danh sách: bấm tab 'Giáo án theo buổi'."]]},
+  ["ga_7ng","Buổi 7 ngày tới chưa có giáo án","Đếm buổi học sắp diễn ra trong 7 ngày mà chưa gắn giáo án - giáo viên lên lớp không có bài. Danh sách: bấm tab 'Giáo án theo buổi' ở dưới."],
+  ["ga_khoa","Khóa chưa có giáo án nào","Đếm khóa học chưa soạn buổi nào - mở lớp là hụt bài ngay. Danh sách: bảng khóa ngay dưới."],
+  ["ga_kho","Bài trong kho","Tổng số bài đang có trong kho học liệu, kèm số bài chưa dùng ở đâu. Danh sách: bấm tab 'Kho bài'."],
+  ["ga_hw","Buổi chưa gắn bài tập","Đếm buổi đã có giáo án nhưng chưa gắn bài về nhà. Danh sách: bấm tab 'Giáo án theo buổi'."]]},
  banglop:{t:"Bảng lớp - một lớp",the:[
-  ["bl_siso","Sĩ số","Số học viên đang học trên sức chứa của lớp. Muốn xem danh sách: bảng học viên ngay dưới."],
+  ["bl_siso","Sĩ số","Số học viên đang học trên sức chứa của lớp. Danh sách: bảng học viên ngay dưới."],
   ["bl_atr","Chuyên cần (ATR)","Tỷ lệ buổi có mặt trên tổng buổi đã điểm danh của cả lớp, so với ngưỡng ATR ở Ngưỡng KPI. Muốn xem chi tiết: tab Điểm danh."],
   ["bl_hcr","Nộp bài (HCR)","Tỷ lệ bài tập đã nộp trên tổng bài đã giao của cả lớp, so với ngưỡng HCR. Muốn xem chi tiết: tab Bài tập."],
-  ["bl_risk","HV nguy cơ","Số học viên của lớp đang bị đánh dấu nguy cơ (chuyên cần hoặc học thuật). Muốn xem danh sách: bảng học viên dưới, nhìn hai cột trạng thái."],
+  ["bl_risk","HV nguy cơ","Số học viên của lớp đang bị đánh dấu nguy cơ (chuyên cần hoặc học thuật). Danh sách: bảng học viên dưới, nhìn hai cột trạng thái."],
   ["bl_ss","Hài lòng (SS)","Điểm hài lòng trung bình lớp này trên thang 5, so với ngưỡng SS. Muốn xem chi tiết: trang Khảo sát & Phản hồi."]]},
  banggiao:{t:"Bàn giao lead",the:[
-  ["bg_om","Lead NV này đang ôm","Số lead đang gán cho nhân viên được chọn. Muốn xem danh sách: bảng lead ngay dưới."],
-  ["bg_orph","Lead chưa có ai phụ trách","Lead chưa gán cho ai - không ai gọi thì nguội. Muốn xem danh sách: bảng lead dưới, cột Phụ trách trống."],
-  ["bg_due","Quá hẹn liên hệ của NV này","Số lead nhân viên này phụ trách đã quá hẹn liên hệ. Muốn xem danh sách: bảng lead dưới, cột Hẹn liên hệ."]]},
+  ["bg_om","Lead NV này đang ôm","Số lead đang gán cho nhân viên được chọn. Danh sách: bảng lead ngay dưới."],
+  ["bg_orph","Lead chưa có ai phụ trách","Lead chưa gán cho ai - không ai gọi thì nguội. Danh sách: bảng lead dưới, cột Phụ trách trống."],
+  ["bg_due","Quá hẹn liên hệ của NV này","Số lead nhân viên này phụ trách đã quá hẹn liên hệ. Danh sách: bảng lead dưới, cột Hẹn liên hệ."]]},
  nhatky:{t:"Nhật ký thao tác",the:[
   ["nk_tong","Thao tác đã ghi","Tổng số dòng nhật ký đang giữ (có trần, cũ nhất bị đẩy ra). Muốn xem: bảng nhật ký ngay dưới."],
-  ["nk_today","Hôm nay","Số thao tác ghi trong ngày hôm nay. Muốn xem danh sách: lọc theo ngày ở thanh lọc dưới."],
+  ["nk_today","Hôm nay","Số thao tác ghi trong ngày hôm nay. Danh sách: lọc theo ngày ở thanh lọc dưới."],
   ["nk_nguoi","Người thao tác","Số người khác nhau đã ghi dữ liệu trong sổ này. Muốn xem: cột Người ở bảng dưới."],
   ["nk_undo","Dòng đã hoàn tác","Số thao tác đã bị bấm hoàn tác - dữ liệu đã trả về giá trị cũ. Muốn xem: bảng dưới, dòng có dấu hoàn tác."]]},
  xeplop:{t:"Xếp lớp & onboarding",the:[
-  ["xl_cho","Đã thu · chờ xếp lớp","Học viên đã đóng tiền nhưng chưa được xếp vào lớp nào - đây là bước đầu tiên phải làm. Muốn xem danh sách: bấm chip 'Chưa hoàn tất' ở thanh lọc dưới rồi nhìn cột Lớp còn trống."],
-  ["xl_send","Chờ gửi thông tin lớp","Đã xếp lớp nhưng chưa gửi thông tin lớp cho học viên, hạn theo slaClassInfoZalo_hours. Muốn xem danh sách: bấm chip 'Chờ gửi thông tin lớp' ở thanh lọc dưới."],
-  ["xl_cfm","Chờ HV xác nhận lớp","Đã gửi thông tin mà học viên chưa xác nhận sẽ đi học. Muốn xem danh sách: bấm chip 'Chờ HV xác nhận' ở thanh lọc dưới."],
-  ["xl_ob","Onboarding chưa xong","Số hồ sơ onboarding chưa đủ bước, hạn theo slaOBT_hours. Muốn xem danh sách: bấm chip 'Chưa hoàn tất' ở thanh lọc dưới."],
-  ["xl_over","Quá hạn","Số hồ sơ đã vi phạm hạn gửi thông tin hoặc hạn onboarding. Muốn xem danh sách: bấm chip 'Quá hạn' ở thanh lọc dưới."]]},
+  ["xl_cho","Đã thu · chờ xếp lớp","Học viên đã đóng tiền nhưng chưa được xếp vào lớp nào - đây là bước đầu tiên phải làm. Danh sách: bấm chip 'Chưa hoàn tất' ở thanh lọc dưới rồi nhìn cột Lớp còn trống."],
+  ["xl_send","Chờ gửi thông tin lớp","Đã xếp lớp nhưng chưa gửi thông tin lớp cho học viên, hạn theo slaClassInfoZalo_hours. Danh sách: bấm chip 'Chờ gửi thông tin lớp' ở thanh lọc dưới."],
+  ["xl_cfm","Chờ HV xác nhận lớp","Đã gửi thông tin mà học viên chưa xác nhận sẽ đi học. Danh sách: bấm chip 'Chờ HV xác nhận' ở thanh lọc dưới."],
+  ["xl_ob","Onboarding chưa xong","Số hồ sơ onboarding chưa đủ bước, hạn theo slaOBT_hours. Danh sách: bấm chip 'Chưa hoàn tất' ở thanh lọc dưới."],
+  ["xl_over","Quá hạn","Số hồ sơ đã vi phạm hạn gửi thông tin hoặc hạn onboarding. Danh sách: bấm chip 'Quá hạn' ở thanh lọc dưới."]]},
  reup:{t:"Chăm lại khách cũ",the:[
-  ["ru_nc","Chưa gặp được","Lead đã gọi nhưng không liên lạc được - nên đổi kênh Zalo/SMS. Muốn xem danh sách: bấm chip 'Chưa gặp được' ở thanh lọc dưới."],
-  ["ru_lost","Đã mất / từ chối","Khách đã từ chối hoặc bỏ cuộc - vẫn nên chăm lại định kỳ. Muốn xem danh sách: chip 'Đã mất'."],
-  ["ru_due","Tới hẹn chăm lại","Khách cũ đã tới ngày hẹn chăm lại theo chu kỳ khai ở Ngưỡng & SLA. Muốn xem danh sách: chip 'Tới hẹn'."]]},
+  ["ru_nc","Chưa gặp được","Lead đã gọi nhưng không liên lạc được - nên đổi kênh Zalo/SMS. Danh sách: bấm chip 'Chưa gặp được' ở thanh lọc dưới."],
+  ["ru_lost","Đã mất / từ chối","Khách đã từ chối hoặc bỏ cuộc - vẫn nên chăm lại định kỳ. Danh sách: chip 'Đã mất'."],
+  ["ru_due","Tới hẹn chăm lại","Khách cũ đã tới ngày hẹn chăm lại theo chu kỳ khai ở Ngưỡng & SLA. Danh sách: chip 'Tới hẹn'."]]},
  tuvan:{t:"Tư vấn",the:[
-  ["tv_drop","Khách từ chối","Số khách đã chốt là không mua - đọc lý do để sửa cách tư vấn. Muốn xem danh sách: chip 'Từ chối' ở thanh lọc dưới."]]},
+  ["tv_drop","Khách từ chối","Số khách đã chốt là không mua - đọc lý do để sửa cách tư vấn. Danh sách: chip 'Từ chối' ở thanh lọc dưới."]]},
  thanhtoan:{t:"Thanh toán & công nợ",the:[
-  ["tt_no","Tổng còn nợ","Tổng tiền còn phải thu của mọi đăng ký chưa huỷ, toàn hệ thống. Muốn xem danh sách: bảng công nợ ngay dưới."],
-  ["tt_hom","Tiền đến hạn hôm nay","Tổng tiền của các đợt có hạn đóng rơi vào hôm nay hoặc đã trễ - đây là con số kế toán phải nhìn đầu ngày. Muốn xem danh sách: mở trang Dự thu theo đợt."]]},
+  ["tt_no","Tổng còn nợ","Tổng tiền còn phải thu của mọi đăng ký chưa huỷ, toàn hệ thống. Danh sách: bảng công nợ ngay dưới."],
+  ["tt_hom","Tiền đến hạn hôm nay","Tổng tiền của các đợt có hạn đóng rơi vào hôm nay hoặc đã trễ - đây là con số kế toán phải nhìn đầu ngày. Danh sách: mở trang Dự thu theo đợt."]]},
  wow:{t:"WOW 1-1",the:[
-  ["ww_today","Buổi WOW hôm nay","Số buổi WOW xếp trong ngày hôm nay và chưa huỷ. Muốn xem danh sách: bảng buổi WOW dưới, lọc theo ngày."],
-  ["ww_gio","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy nhưng coach chưa ghi giờ vào/giờ ra - thiếu mốc thì bảng công tính sai. Muốn xem danh sách: chip 'Thiếu mốc giờ'."],
-  ["ww_cfm","Đã đặt, chờ HV xác nhận","Buổi đã đặt lịch mà học viên chưa xác nhận - gọi chốt giờ. Muốn xem danh sách: chip trạng thái 'đã đặt'."],
-  ["ww_het","HV đã hết lượt WOW","Học viên đã dùng hết quota WOW của khóa - cấp thêm nếu có căn cứ. Muốn xem danh sách: tab Quota."]]},
+  ["ww_today","Buổi WOW hôm nay","Số buổi WOW xếp trong ngày hôm nay và chưa huỷ. Danh sách: bảng buổi WOW dưới, lọc theo ngày."],
+  ["ww_gio","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy nhưng coach chưa ghi giờ vào/giờ ra - thiếu mốc thì bảng công tính sai. Danh sách: chip 'Thiếu mốc giờ'."],
+  ["ww_cfm","Đã đặt, chờ HV xác nhận","Buổi đã đặt lịch mà học viên chưa xác nhận - gọi chốt giờ. Danh sách: chip trạng thái 'đã đặt'."],
+  ["ww_het","HV đã hết lượt WOW","Học viên đã dùng hết quota WOW của khóa - cấp thêm nếu có căn cứ. Danh sách: tab Quota."]]},
  ketthuc:{t:"Kết thúc khóa & tái ghi danh",the:[
-  ["kt_chuamoi","Học xong mà chưa ai mời tái ghi danh","Học viên đã hoàn thành khóa nhưng chưa có ai liên hệ mời học tiếp - để lâu là nguội. Muốn xem danh sách: chip 'Chưa liên hệ' ở thanh lọc dưới."]]},
+  ["kt_chuamoi","Học xong mà chưa ai mời tái ghi danh","Học viên đã hoàn thành khóa nhưng chưa có ai liên hệ mời học tiếp - để lâu là nguội. Danh sách: chip 'Chưa liên hệ' ở thanh lọc dưới."]]},
  tranghv:{t:"Cổng học viên (xem hộ)",the:[
   ["hv_att","Chuyên cần","Tỷ lệ buổi có mặt của riêng học viên này. Muốn xem chi tiết: mục Điểm danh trong hồ sơ."],
   ["hv_hw","Bài tập đã nộp","Tỷ lệ bài đã nộp trên tổng bài được giao của học viên này. Muốn xem chi tiết: mục Bài tập."],
   ["hv_diem","Điểm bài tập TB","Điểm trung bình các bài đã được chấm của học viên này. Muốn xem chi tiết: mục Bài tập."],
   ["hv_wow","Buổi WOW còn lại","Số lượt WOW 1-1 học viên còn được dùng theo quota khóa. Muốn xem chi tiết: mục WOW."]]},
  magioithieu:{t:"Mã giới thiệu",the:[
-  ["mg_dung","Lượt bạn dùng mã","Tổng số lượt người quen nhập mã giới thiệu. Muốn xem danh sách: bảng lượt dùng ngay dưới."],
-  ["mg_chua","Dùng mã nhưng chưa đăng ký","Người đã nhập mã mà chưa chốt đăng ký - họ đã quan tâm rồi, gọi là chốt được. Muốn xem danh sách: bảng dưới, cột Đăng ký trống."]]},
+  ["mg_dung","Lượt bạn dùng mã","Tổng số lượt người quen nhập mã giới thiệu. Danh sách: bảng lượt dùng ngay dưới."],
+  ["mg_chua","Dùng mã nhưng chưa đăng ký","Người đã nhập mã mà chưa chốt đăng ký - họ đã quan tâm rồi, gọi là chốt được. Danh sách: bảng dưới, cột Đăng ký trống."]]},
  hosogv:{t:"Hồ sơ giảng viên",the:[
-  ["gv_day","Buổi đã dạy","Số buổi giảng viên này đã dạy xong. Muốn xem danh sách: bảng buổi dạy ngay dưới."],
-  ["gv_nx","Cần viết nhận xét","Buổi đã dạy mà chưa ghi nhận xét, hạn theo slaTeacherNote_hours. Muốn xem danh sách: bảng buổi dạy, cột Nhận xét trống."],
-  ["gv_hw","Bài chờ chấm","Bài tập học viên đã nộp mà giảng viên chưa chấm, hạn theo slaHomeworkGrading_hours. Muốn xem danh sách: trang Bài tập."],
-  ["gv_risk","HV nguy cơ học thuật","Học viên trong lớp của giảng viên này đang bị đánh dấu nguy cơ học thuật - nên đề xuất buổi WOW. Muốn xem danh sách: trang Học viên nguy cơ."]]},
+  ["gv_day","Buổi đã dạy","Số buổi giảng viên này đã dạy xong. Danh sách: bảng buổi dạy ngay dưới."],
+  ["gv_nx","Cần viết nhận xét","Buổi đã dạy mà chưa ghi nhận xét, hạn theo slaTeacherNote_hours. Danh sách: bảng buổi dạy, cột Nhận xét trống."],
+  ["gv_hw","Bài chờ chấm","Bài tập học viên đã nộp mà giảng viên chưa chấm, hạn theo slaHomeworkGrading_hours. Danh sách: trang Bài tập."],
+  ["gv_risk","HV nguy cơ học thuật","Học viên trong lớp của giảng viên này đang bị đánh dấu nguy cơ học thuật - nên đề xuất buổi WOW. Danh sách: trang Học viên nguy cơ."]]},
  hosonv_ts:{t:"Hồ sơ nhân viên - khối tuyển sinh",the:[
-  ["nvt_new","Lead mới chưa LH","Lead đã vào hệ thống mà nhân viên này chưa gọi lần nào, hạn theo slaLRT_minutes. Muốn xem danh sách: bảng 'Lead cần liên hệ' ngay dưới."],
-  ["nvt_work","Đang khai thác","Lead đã liên hệ và đang trong quá trình chăm. Muốn xem danh sách: trang Lead, lọc theo nhân viên này."],
-  ["nvt_test","Test sắp tới","Ca test đầu vào của khách nhân viên này phụ trách, sắp diễn ra. Muốn xem danh sách: trang Test đầu vào."],
-  ["nvt_due","Cần liên hệ hôm nay","Lead đã tới hoặc quá hẹn liên hệ. Muốn xem danh sách: bảng 'Lead cần liên hệ' ngay dưới."]]},
+  ["nvt_new","Lead mới chưa LH","Lead đã vào hệ thống mà nhân viên này chưa gọi lần nào, hạn theo slaLRT_minutes. Danh sách: bảng 'Lead cần liên hệ' ngay dưới."],
+  ["nvt_work","Đang khai thác","Lead đã liên hệ và đang trong quá trình chăm. Danh sách: trang Lead, lọc theo nhân viên này."],
+  ["nvt_test","Test sắp tới","Ca test đầu vào của khách nhân viên này phụ trách, sắp diễn ra. Danh sách: trang Test đầu vào."],
+  ["nvt_due","Cần liên hệ hôm nay","Lead đã tới hoặc quá hẹn liên hệ. Danh sách: bảng 'Lead cần liên hệ' ngay dưới."]]},
  hosonv_wow:{t:"Hồ sơ nhân viên - khối test & WOW",the:[
-  ["nvw_tw","Test chờ chấm","Ca test đã thi mà chưa ai chấm, hạn theo slaGLA_hours. Muốn xem danh sách: trang Test đầu vào."],
-  ["nvw_td","Test đã chấm","Ca test người này đã chấm xong và đã có điểm. Muốn xem danh sách: trang Test đầu vào, lọc trạng thái 'đã chấm'."],
-  ["nvw_wu","WOW sắp tới","Buổi WOW của người này đã đặt lịch, chưa dạy. Muốn xem danh sách: bảng 'Buổi WOW sắp tới' ngay dưới."],
-  ["nvw_wd","WOW đã dạy","Buổi WOW đã hoàn thành, kèm số buổi ghi nhận học viên có tiến bộ. Muốn xem danh sách: trang WOW."]]},
+  ["nvw_tw","Test chờ chấm","Ca test đã thi mà chưa ai chấm, hạn theo slaGLA_hours. Danh sách: trang Test đầu vào."],
+  ["nvw_td","Test đã chấm","Ca test người này đã chấm xong và đã có điểm. Danh sách: trang Test đầu vào, lọc trạng thái 'đã chấm'."],
+  ["nvw_wu","WOW sắp tới","Buổi WOW của người này đã đặt lịch, chưa dạy. Danh sách: bảng 'Buổi WOW sắp tới' ngay dưới."],
+  ["nvw_wd","WOW đã dạy","Buổi WOW đã hoàn thành, kèm số buổi ghi nhận học viên có tiến bộ. Danh sách: trang WOW."]]},
  hosonv_hv:{t:"Hồ sơ nhân viên - khối học vụ",the:[
-  ["nvh_ob","Onboarding chưa xong","Hồ sơ onboarding còn dở, hạn theo slaOBT_hours. Muốn xem danh sách: trang Xếp lớp & Onboarding."],
-  ["nvh_risk","HV nguy cơ","Học viên bị đánh dấu nguy cơ trên một trong hai trục chuyên cần / học thuật. Muốn xem danh sách: bảng 'Học viên nguy cơ' ngay dưới."],
-  ["nvh_fb","Phản hồi chờ phân loại","Phản hồi mới nhận, chưa ai xếp loại. Muốn xem danh sách: trang Ghi nhận phản hồi."],
-  ["nvh_kn","Khiếu nại đang xử lý","Khiếu nại chưa đóng, hạn xử lý theo mức độ. Muốn xem danh sách: trang Khiếu nại."]]},
+  ["nvh_ob","Onboarding chưa xong","Hồ sơ onboarding còn dở, hạn theo slaOBT_hours. Danh sách: trang Xếp lớp & Onboarding."],
+  ["nvh_risk","HV nguy cơ","Học viên bị đánh dấu nguy cơ trên một trong hai trục chuyên cần / học thuật. Danh sách: bảng 'Học viên nguy cơ' ngay dưới."],
+  ["nvh_fb","Phản hồi chờ phân loại","Phản hồi mới nhận, chưa ai xếp loại. Danh sách: trang Ghi nhận phản hồi."],
+  ["nvh_kn","Khiếu nại đang xử lý","Khiếu nại chưa đóng, hạn xử lý theo mức độ. Danh sách: trang Khiếu nại."]]},
  hosokhoa:{t:"Hồ sơ khóa học",the:[
-  ["hk_lop","Lớp đã mở","Số lớp đã mở của khóa này, kèm tổng học viên. Muốn xem danh sách: bảng lớp ngay dưới."],
-  ["hk_dk","Đăng ký hiệu lực","Đăng ký còn hiệu lực của khóa (đã trừ số đã huỷ). Muốn xem danh sách: bảng đăng ký dưới."],
-  ["hk_thu","Doanh thu đã thu","Tổng tiền đã thu được của khóa này, đối chiếu với giá niêm yết. Muốn xem danh sách: trang Thanh toán."],
-  ["hk_no","Công nợ còn lại","Tổng tiền học viên khóa này còn nợ. Muốn xem danh sách: trang Dự thu theo đợt."]]},
+  ["hk_lop","Lớp đã mở","Số lớp đã mở của khóa này, kèm tổng học viên. Danh sách: bảng lớp ngay dưới."],
+  ["hk_dk","Đăng ký hiệu lực","Đăng ký còn hiệu lực của khóa (đã trừ số đã huỷ). Danh sách: bảng đăng ký dưới."],
+  ["hk_thu","Doanh thu đã thu","Tổng tiền đã thu được của khóa này, đối chiếu với giá niêm yết. Danh sách: trang Thanh toán."],
+  ["hk_no","Công nợ còn lại","Tổng tiền học viên khóa này còn nợ. Danh sách: trang Dự thu theo đợt."]]},
  httoday:{t:"Hôm nay của giảng viên",the:[
-  ["ht_ses","Buổi dạy hôm nay","Số buổi lớp tôi phải dạy trong hôm nay. Muốn xem danh sách: bảng buổi ngay dưới, có ghi giờ và phòng."],
-  ["ht_wow","Buổi WOW hôm nay","Số buổi kèm 1-1 tôi phải dạy hôm nay. Muốn xem danh sách: bảng WOW ngay dưới."],
-  ["ht_hw","Bài chờ chấm","Bài học viên đã nộp mà tôi chưa chấm, hạn theo slaHomeworkGrading_hours. Muốn xem danh sách: bảng bài tập dưới."],
-  ["ht_nx","Buổi nợ nhận xét","Buổi tôi đã dạy mà chưa ghi nhận xét, hạn theo slaTeacherNote_hours. Muốn xem danh sách: bảng buổi dưới, cột Nhận xét."]]},
+  ["ht_ses","Buổi dạy hôm nay","Số buổi lớp tôi phải dạy trong hôm nay. Danh sách: bảng buổi ngay dưới, có ghi giờ và phòng."],
+  ["ht_wow","Buổi WOW hôm nay","Số buổi kèm 1-1 tôi phải dạy hôm nay. Danh sách: bảng WOW ngay dưới."],
+  ["ht_hw","Bài chờ chấm","Bài học viên đã nộp mà tôi chưa chấm, hạn theo slaHomeworkGrading_hours. Danh sách: bảng bài tập dưới."],
+  ["ht_nx","Buổi nợ nhận xét","Buổi tôi đã dạy mà chưa ghi nhận xét, hạn theo slaTeacherNote_hours. Danh sách: bảng buổi dưới, cột Nhận xét."]]},
  gvdp:{t:"Giáo viên dự phòng",the:[
-  ["dp_ses","Buổi trong ngày","Tổng số buổi học của cả trung tâm trong ngày đang xem. Muốn xem danh sách: bảng buổi ngay dưới."],
-  ["dp_free","Giáo viên trống lịch cả ngày","Giảng viên hôm nay không có buổi nào - có thể nhận dạy thay. Muốn xem danh sách: bảng giáo viên dưới."],
-  ["dp_nogv","Buổi hôm nay chưa có GV","Buổi đã lên lịch mà chưa gán giảng viên - giao người ngay, đừng để tới giờ. Muốn xem danh sách: bảng buổi dưới, cột Giảng viên trống."],
-  ["dp_huy","Buổi đã huỷ hôm nay","Buổi bị huỷ trong ngày - kiểm xem đã báo học viên chưa. Muốn xem danh sách: bảng buổi dưới, trạng thái 'đã huỷ'."]]},
+  ["dp_ses","Buổi trong ngày","Tổng số buổi học của cả trung tâm trong ngày đang xem. Danh sách: bảng buổi ngay dưới."],
+  ["dp_free","Giáo viên trống lịch cả ngày","Giảng viên hôm nay không có buổi nào - có thể nhận dạy thay. Danh sách: bảng giáo viên dưới."],
+  ["dp_nogv","Buổi hôm nay chưa có GV","Buổi đã lên lịch mà chưa gán giảng viên - giao người ngay, đừng để tới giờ. Danh sách: bảng buổi dưới, cột Giảng viên trống."],
+  ["dp_huy","Buổi đã huỷ hôm nay","Buổi bị huỷ trong ngày - kiểm xem đã báo học viên chưa. Danh sách: bảng buổi dưới, trạng thái 'đã huỷ'."]]},
  phong:{t:"Phòng học & xung đột lịch",the:[
-  ["ph_dung","Đụng phòng","Hai lớp bị xếp cùng một phòng cùng một giờ. Muốn xem danh sách: bảng xung đột ngay dưới."],
-  ["ph_lop","Lớp trùng giờ với chính nó","Cùng một lớp bị xếp hai buổi chồng giờ - lỗi xếp lịch lặp. Muốn xem danh sách: bảng xung đột dưới."],
-  ["ph_gv","Giáo viên trùng giờ","Một giảng viên bị xếp hai buổi cùng giờ - phải đổi người hoặc đổi giờ. Muốn xem danh sách: bảng xung đột dưới."],
-  ["ph_nr","Lớp tại chỗ chưa có phòng","Lớp học trực tiếp mà chưa gán phòng - tới giờ mới đi tìm phòng là muộn. Muốn xem danh sách: bảng lớp dưới, cột Phòng trống."],
-  ["ph_nogv","Lớp mở chưa có GV chính","Lớp đang mở mà chưa có giảng viên chính. Muốn xem danh sách: bảng lớp dưới, cột Giảng viên."]]},
+  ["ph_dung","Đụng phòng","Hai lớp bị xếp cùng một phòng cùng một giờ. Danh sách: bảng xung đột ngay dưới."],
+  ["ph_lop","Lớp trùng giờ với chính nó","Cùng một lớp bị xếp hai buổi chồng giờ - lỗi xếp lịch lặp. Danh sách: bảng xung đột dưới."],
+  ["ph_gv","Giáo viên trùng giờ","Một giảng viên bị xếp hai buổi cùng giờ - phải đổi người hoặc đổi giờ. Danh sách: bảng xung đột dưới."],
+  ["ph_nr","Lớp tại chỗ chưa có phòng","Lớp học trực tiếp mà chưa gán phòng - tới giờ mới đi tìm phòng là muộn. Danh sách: bảng lớp dưới, cột Phòng trống."],
+  ["ph_nogv","Lớp mở chưa có GV chính","Lớp đang mở mà chưa có giảng viên chính. Danh sách: bảng lớp dưới, cột Giảng viên."]]},
  chang:{t:"Chạy quy trình theo chặng",the:[
-  ["cg_sla","Quá hạn SLA","Số hồ sơ ở chặng đang xem đã quá hạn theo luật SLA của chặng đó. Muốn xem danh sách: bảng hồ sơ ngay dưới, dòng tô đỏ."],
-  ["cg_hen","Có hẹn hôm nay","Hồ sơ ở chặng này có lịch hẹn rơi vào hôm nay. Muốn xem danh sách: bảng dưới, cột Hẹn."],
-  ["cg_thieu","Thiếu dữ liệu","Hồ sơ chưa điền đủ ô bắt buộc của chặng - chưa đủ để đi tiếp. Muốn xem danh sách: bảng dưới, dòng có dấu cảnh báo."]]},
+  ["cg_sla","Quá hạn SLA","Số hồ sơ ở chặng đang xem đã quá hạn theo luật SLA của chặng đó. Danh sách: bảng hồ sơ ngay dưới, dòng tô đỏ."],
+  ["cg_hen","Có hẹn hôm nay","Hồ sơ ở chặng này có lịch hẹn rơi vào hôm nay. Danh sách: bảng dưới, cột Hẹn."],
+  ["cg_thieu","Thiếu dữ liệu","Hồ sơ chưa điền đủ ô bắt buộc của chặng - chưa đủ để đi tiếp. Danh sách: bảng dưới, dòng có dấu cảnh báo."]]},
  giaoviec:{t:"Giao việc nội bộ",the:[
-  ["gv_mine","Việc tôi phải làm","Việc người khác giao cho tôi và chưa xong. Muốn xem danh sách: bấm tab 'Việc của tôi' ở thanh dưới."],
-  ["gv_over","Quá hạn của tôi","Số việc của tôi đã quá hạn. Muốn xem danh sách: tab 'Việc của tôi', chip 'Quá hạn'."],
-  ["gv_wait","Chờ tôi xác nhận","Việc tôi giao, người nhận đã báo xong và đang chờ tôi gật. Muốn xem danh sách: tab 'Tôi giao', chip 'Chờ xác nhận'."],
-  ["gv_given","Tôi giao, đang chạy","Việc tôi giao cho người khác và họ đang làm. Muốn xem danh sách: tab 'Tôi giao', chip 'Đang chạy'."]]},
+  ["gv_mine","Việc tôi phải làm","Việc người khác giao cho tôi và chưa xong. Danh sách: bấm tab 'Việc của tôi' ở thanh dưới."],
+  ["gv_over","Quá hạn của tôi","Số việc của tôi đã quá hạn. Danh sách: tab 'Việc của tôi', chip 'Quá hạn'."],
+  ["gv_wait","Chờ tôi xác nhận","Việc tôi giao, người nhận đã báo xong và đang chờ tôi gật. Danh sách: tab 'Tôi giao', chip 'Chờ xác nhận'."],
+  ["gv_given","Tôi giao, đang chạy","Việc tôi giao cho người khác và họ đang làm. Danh sách: tab 'Tôi giao', chip 'Đang chạy'."]]},
  tkreport:{t:"Báo cáo giao việc",the:[
-  ["tr_tong","Tổng số việc","Tổng số việc đã giao trong toàn trung tâm ở kỳ đang xem. Muốn xem danh sách: bảng việc ngay dưới."],
-  ["tr_done","Đã hoàn thành","Số việc đã đóng, kèm tỷ lệ trên tổng. Muốn xem danh sách: lọc trạng thái 'hoàn thành' ở bảng dưới."],
-  ["tr_over","Đang quá hạn","Việc chưa xong mà đã qua hạn - cần đốc thúc. Muốn xem danh sách: lọc trạng thái 'quá hạn'."],
+  ["tr_tong","Tổng số việc","Tổng số việc đã giao trong toàn trung tâm ở kỳ đang xem. Danh sách: bảng việc ngay dưới."],
+  ["tr_done","Đã hoàn thành","Số việc đã đóng, kèm tỷ lệ trên tổng. Danh sách: lọc trạng thái 'hoàn thành' ở bảng dưới."],
+  ["tr_over","Đang quá hạn","Việc chưa xong mà đã qua hạn - cần đốc thúc. Danh sách: lọc trạng thái 'quá hạn'."],
   ["tr_ontime","Xong đúng hạn","Trong số việc đã xong, bao nhiêu phần trăm xong trước hạn. Rê chuột vào con số để thấy phép chia."]]},
  cong:{t:"Bảng công giảng viên",the:[
-  ["cg_buoi","Buổi lớp đã dạy trong tháng","Tổng số buổi lớp cả đội đã dạy trong tháng đang xem. Muốn xem danh sách: bảng công theo người ngay dưới."],
+  ["cg_buoi","Buổi lớp đã dạy trong tháng","Tổng số buổi lớp cả đội đã dạy trong tháng đang xem. Danh sách: bảng công theo người ngay dưới."],
   ["cg_gio","Tổng giờ dạy","Tổng số giờ đứng lớp tính từ mốc giờ vào/ra, kèm số buổi còn thiếu mốc. Muốn xem chi tiết: bảng công dưới, cột Giờ."],
   ["cg_wow","Buổi WOW 1-1 đã dạy","Tổng buổi kèm riêng đã dạy, kèm đơn giá và tổng giờ kèm. Muốn xem chi tiết: bảng công dưới, cột WOW."],
   ["cg_test","Ca test đầu vào","Số ca test đầu vào đã chấm, tính theo đơn giá mỗi lần. Muốn xem chi tiết: bảng công dưới, cột Test."],
   ["cg_tien","Tiền công tạm tính","Tổng tiền công tạm tính = giờ dạy x đơn giá + ca WOW + ca test. Đây là số TẠM, chốt xong mới thành công nợ. Muốn xem chi tiết từng người: bảng công ngay dưới."],
-  ["cg_nonx","Buổi chưa ghi nhận xét","Buổi đã dạy mà chưa có nhận xét - phải đối chiếu trước khi chốt công. Muốn xem danh sách: bảng công dưới, cột Nhận xét."],
-  ["cg_tre","Buổi vào trễ giờ","Số buổi giảng viên vào lớp trễ so với giờ xếp - ảnh hưởng KPI ADC. Muốn xem danh sách: bảng công dưới, cột Trễ."]]},
+  ["cg_nonx","Buổi chưa ghi nhận xét","Buổi đã dạy mà chưa có nhận xét - phải đối chiếu trước khi chốt công. Danh sách: bảng công dưới, cột Nhận xét."],
+  ["cg_tre","Buổi vào trễ giờ","Số buổi giảng viên vào lớp trễ so với giờ xếp - ảnh hưởng KPI ADC. Danh sách: bảng công dưới, cột Trễ."]]},
  duthu:{t:"Dự thu theo đợt",the:[
-  ["dt_tong","Tổng còn phải thu","Tổng tiền của mọi đợt đóng chưa thu, kèm số đợt và số học viên. Muốn xem danh sách: bảng đợt ngay dưới."],
-  ["dt_late","Đã quá hạn","Tiền của các đợt đã qua hạn đóng quá số ngày khai ở installmentLate. Muốn xem danh sách: bấm chip 'Quá hạn' ở thanh lọc dưới."],
-  ["dt_soon","Sắp đến hạn","Tiền của các đợt sắp tới hạn trong khoảng nhắc trước khai ở installmentRemind. Muốn xem danh sách: chip 'Sắp đến hạn'."],
-  ["dt_far","Hạn xa hơn","Tiền của các đợt còn hạn xa, chưa cần nhắc. Muốn xem danh sách: chip 'Hạn xa'."]]}
+  ["dt_tong","Tổng còn phải thu","Tổng tiền của mọi đợt đóng chưa thu, kèm số đợt và số học viên. Danh sách: bảng đợt ngay dưới."],
+  ["dt_late","Đã quá hạn","Tiền của các đợt đã qua hạn đóng quá số ngày khai ở installmentLate. Danh sách: bấm chip 'Quá hạn' ở thanh lọc dưới."],
+  ["dt_soon","Sắp đến hạn","Tiền của các đợt sắp tới hạn trong khoảng nhắc trước khai ở installmentRemind. Danh sách: chip 'Sắp đến hạn'."],
+  ["dt_far","Hạn xa hơn","Tiền của các đợt còn hạn xa, chưa cần nhắc. Danh sách: chip 'Hạn xa'."]]}
 };
 var THEHTML={};      /* dải nào đã vẽ thì giữ lại HTML từng thẻ để bật/tắt không phải vẽ lại trang */
 function theAll(){var r=[];for(var k in THEDEF)THEDEF[k].the.forEach(function(t){r.push([k,t])});return r}
@@ -3789,7 +3795,7 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
  var h='<div class="tbwrap"><table class="dt"><thead><tr>';
  var so=(window.SORT||{})[key];
  cols.forEach(function(c){var on=so&&so.col===c[0];
-  h+='<th style="cursor:pointer" onclick="listSort(\''+key+'\',\''+c[0]+'\')" title="Bấm để sắp xếp">'+esc(c[1])+(on?(so.dir>0?' ▲':' ▼'):'')+'</th>'});
+  h+='<th style="cursor:pointer" onclick="listSort(\''+key+'\',\''+c[0]+'\')" title="sắp xếp">'+esc(c[1])+(on?(so.dir>0?' ▲':' ▼'):'')+'</th>'});
  /* V9.63 (anh Luân: *"cột thao tác ở các sổ ko thấy gì nhỉ"*): sổ chỉ-xem không có nút Sửa,
     không khai act, và phần lớn dòng cũng không có nút SLA - nên cột này rỗng từ đầu tới cuối.
     Một cột không bao giờ có gì thì đừng dựng cột. Hỏi trước khi vẽ: cột này có nội dung không. */
@@ -6037,7 +6043,7 @@ function slaRow(it){var age=it.age!=null?'<span class="agebadge '+it.sev+'">'+es
     không có bước xem nhanh "việc này là gì, của ai, trễ bao lâu, ngưỡng lấy ở đâu". Nay bấm vào
     THÂN dòng mở drawer xem nhanh; nút Xử lý vẫn đi thẳng như cũ cho người đã quen. */
  var key=esc(String(it.rid||it.lead||it.hoso||"")+"|"+String(it.grp||""));
- return '<div class="slarow clk" style="box-shadow:inset 3px 0 0 '+gc+'" onclick="slaOpen(\''+key+'\')" data-tip="Bấm để xem nhanh việc này"><div class="slaic '+it.sev+'"><i class="ti '+it.ic+'"></i></div><div class="slat"><div class="slaw">'+esc(it.who)+' '+age+'</div><div class="slad">'+esc(it.what)+' <span class="slacat" style="background:'+gc+'22;color:'+gc+'">'+esc(it.grp||it.cat)+'</span></div></div><div class="slaa" onclick="event.stopPropagation()">'+btn+'</div></div>'}
+ return '<div class="slarow clk" style="box-shadow:inset 3px 0 0 '+gc+'" onclick="slaOpen(\''+key+'\')" data-tip="xem nhanh việc này"><div class="slaic '+it.sev+'"><i class="ti '+it.ic+'"></i></div><div class="slat"><div class="slaw">'+esc(it.who)+' '+age+'</div><div class="slad">'+esc(it.what)+' <span class="slacat" style="background:'+gc+'22;color:'+gc+'">'+esc(it.grp||it.cat)+'</span></div></div><div class="slaa" onclick="event.stopPropagation()">'+btn+'</div></div>'}
 /* Drawer XEM NHANH một việc: ai - việc gì - trễ bao lâu - bộ phận nào - ngưỡng lấy từ đâu - làm gì tiếp */
 var SLAPRM={"Gọi hỏi thăm HV vắng":["slaAbsenceCall_hours",24],"Duyệt xin nghỉ học":["slaTaskAccept_hours",4],
  "Ghi nhận xét buổi":["slaTeacherNote_hours",48],"Chấm bài tập":["slaHomeworkGrading_hours",48],
@@ -7692,7 +7698,7 @@ function mstripOpen(pid){var J,C;try{J=jInfo(pid);C=J.C}catch(e){return}
   var A=ARCBK[arcOf(k)];
   var sum=st?jOutSum(C,k,2):"";
   var span=st?jStageSpan(C,k,J.k):"";
-  h+='<div class="hvjr'+(st?" on":"")+' clk" onclick="jStagePop(\''+esc(pid)+'\',\''+esc(k)+'\')" data-tip="Bấm để xem đầy đủ sản phẩm chặng '+esc(S.t)+'">'+
+  h+='<div class="hvjr'+(st?" on":"")+' clk" onclick="jStagePop(\''+esc(pid)+'\',\''+esc(k)+'\')" data-tip="xem đầy đủ sản phẩm chặng '+esc(S.t)+'">'+
    '<span class="hvjd"'+(st==="now"?' style="background:'+A.col+';color:#fff"':'')+'><i class="ti '+(st==="done"?"ti-check":S.ic)+'"></i></span>'+
    '<div class="hvjc"><b>'+esc(S.t)+(st==="now"?' <span class="chip blue">đang ở đây</span>':'')+'</b><span>Chặng '+A.n+' · '+esc(A.t)+(span?(' · nằm ở đây '+esc(span)):'')+'</span>'+
    (sum?'<span class="hvjo"><i class="ti ti-package"></i>'+esc(sum)+'</span>':(st?'<span class="hvjo mut"><i class="ti ti-package-off"></i>chưa ghi lại gì ở chặng này</span>':''))+'</div>'+
@@ -8816,7 +8822,7 @@ function renderBanlam(){
  var nextAp=null;var nowT=new Date();
  all0.forEach(function(J){var nf=jNF(J);if(nf&&nf>=nowT&&(!nextAp||nf<jNF(nextAp)))nextAp=J});
  /* Một dòng tóm tắt thay cho ba dòng: số việc · số quá hạn · hẹn kế tiếp (bấm được). */
- var apChip=nextAp?('<span class="bwap" onclick="chayQSet(\'appt\')" data-tip="Bấm để lọc danh sách còn đúng các cuộc hẹn"><i class="ti ti-clock"></i>Hẹn kế: <b>'+esc((function(){var d=jNF(nextAp);var hh=("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);var td=new Date();var sameDay=d.getDate()===td.getDate()&&d.getMonth()===td.getMonth();return hh+(sameDay?" hôm nay":" "+("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2))})())+'</b> · '+esc(nextAp.name)+'</span>'):'';
+ var apChip=nextAp?('<span class="bwap" onclick="chayQSet(\'appt\')" data-tip="lọc danh sách còn đúng các cuộc hẹn"><i class="ti ti-clock"></i>Hẹn kế: <b>'+esc((function(){var d=jNF(nextAp);var hh=("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);var td=new Date();var sameDay=d.getDate()===td.getDate()&&d.getMonth()===td.getMonth();return hh+(sameDay?" hôm nay":" "+("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2))})())+'</b> · '+esc(nextAp.name)+'</span>'):'';
  var h='<div class="bwhero"><div class="bwl"><div class="bwg">'+esc(greet)+', '+esc(meNm)+'</div>'+
   '<div class="bwsub"><span><b>'+tasks.length+'</b> việc cần xử lý</span>'+
    (over.length?('<span class="bwdot">·</span><span class="bwover">'+over.length+' quá hạn</span>'):'')+
@@ -9179,7 +9185,7 @@ function renderHanhtrinh(embed){ /* V9.18: thân trang dùng được cả khi N
  /* dải tóm tắt theo chặng chính */
  h+='<div class="jflow">';
  JMAIN.forEach(function(k,i){var S=JBY[k],n=byKAll[k].length,ov=byKAll[k].filter(function(J){return J.over}).length;
-  h+='<div class="jfs'+(n?"":" mut")+(F.stage===k?" on":"")+'" title="Bấm để xem danh sách chặng này" onclick="jStage(\''+k+'\')"><div class="jfn">'+n+'</div><div class="jft">'+esc(S.t)+'</div>'+(ov?'<div class="jfo">'+ov+' quá hạn</div>':'')+'</div>';
+  h+='<div class="jfs'+(n?"":" mut")+(F.stage===k?" on":"")+'" title="xem danh sách chặng này" onclick="jStage(\''+k+'\')"><div class="jfn">'+n+'</div><div class="jft">'+esc(S.t)+'</div>'+(ov?'<div class="jfo">'+ov+' quá hạn</div>':'')+'</div>';
   if(i<JMAIN.length-1)h+='<div class="jfa"><i class="ti ti-chevron-right"></i></div>'});
  h+='</div>';
  /* nhánh rẽ (mất/từ chối, bảo lưu, ĐK hủy) cũng bấm xem được */
@@ -11481,7 +11487,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
    '<select onchange="roomToggle();reRender(\'settings\')">'+
    '<option value="0"'+(dongBoOn()?"":" selected")+'>Tắt - máy này có bộ dữ liệu riêng (nên dùng khi nhiều người cùng xem)</option>'+
    '<option value="1"'+(dongBoOn()?" selected":"")+'>Bật - dùng chung dữ liệu với mọi máy đang mở cùng bản demo</option></select>'+
-   '<div class="fhint"><span data-tip="Bật lên thì mọi máy đang mở cùng bản demo sẽ dùng CHUNG một bộ dữ liệu: một máy điểm danh hay thu tiền là các máy kia thấy đổi theo trong vài giây, và một máy bấm Dựng lại demo là các máy kia tải lại trang. Hữu ích khi một người trình bày trên hai màn hình. Không nên bật khi gửi link cho nhiều người cùng xem - ai cũng giẫm lên dữ liệu của nhau, kể cả người lạ mở đúng link đó. Công tắc này nhớ theo MÁY và không bị Dựng lại demo cuốn theo.">Mặc định tắt: mỗi người xem demo có bộ dữ liệu riêng, làm gì cũng không ảnh hưởng người khác.<i class="ti ti-info-circle gyti"></i></span></div></div>';
+   '<div class="fhint"><span data-tip="Bật lên thì mọi máy đang mở cùng bản demo sẽ dùng chung một bộ dữ liệu: một máy điểm danh hay thu tiền là các máy kia thấy đổi theo trong vài giây, và một máy bấm Dựng lại demo là các máy kia tải lại trang. Hữu ích khi một người trình bày trên hai màn hình. Không nên bật khi gửi link cho nhiều người cùng xem - ai cũng giẫm lên dữ liệu của nhau, kể cả người lạ mở đúng link đó. Công tắc này nhớ theo từng máy và không bị Dựng lại demo cuốn theo.">Mặc định tắt: mỗi người xem demo có bộ dữ liệu riêng, làm gì cũng không ảnh hưởng người khác.<i class="ti ti-info-circle gyti"></i></span></div></div>';
   h+='<div class="fld full" style="margin-top:10px"><label>Bảng góp ý / báo lỗi mở ra đâu</label>'+
    '<input value="'+esc(u.gopy||"")+'" oninput="uiSet(\'gopy\',this.value)" placeholder="'+esc(GOPYMAC)+'">'+
    '<div class="fhint" data-tip="Nút hình loa trên thanh trên mở thẳng địa chỉ này ở tab mới. Để trống là dùng bảng mặc định.">Nút hình loa trên thanh trên mở địa chỉ này. Để trống là dùng bảng mặc định.</div></div>';
@@ -11521,7 +11527,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   h+='<div class="fld" style="min-width:250px;margin:0"><label>Mật khẩu quản trị</label>'
    +'<div style="display:flex;gap:6px;align-items:stretch">'
    +'<input id="mk_in" type="password" autocomplete="new-password" value="'+esc(matKhau())+'" placeholder="mittomap" style="flex:1;min-width:0">'
-   +'<button class="btn sm" type="button" id="mk_mat" onclick="mkHien()" aria-label="Hiện mật khẩu" data-tip="Bấm để hiện hoặc che mật khẩu"><i class="ti ti-eye"></i></button>'
+   +'<button class="btn sm" type="button" id="mk_mat" onclick="mkHien()" aria-label="Hiện mật khẩu" data-tip="hiện hoặc che mật khẩu"><i class="ti ti-eye"></i></button>'
    +'</div>'
    +'<div class="fhint" style="margin-top:4px">Che sẵn để lúc trình chiếu không lộ. Dùng cho: vào Cài đặt ở chế độ ghi được, và nút Dựng lại demo.</div></div>';
   h+='<button class="btn primary sm" onclick="mkLuu()"><i class="ti ti-device-floppy"></i>Lưu mật khẩu</button>';
@@ -15085,7 +15091,7 @@ function hvCallHTML(lb,cls,chiIcon){var p=hvHotline();
  if(!p)return (window.HVPORTAL?'':'<span class="chip amber" data-tip="Vào Cài đặt > Giao diện & Thương hiệu để điền hotline">chưa có hotline · <b>cấu hình</b></span>');
  /* chiIcon: nút gọn chỉ có icon, dùng cho thanh trên cổng học viên. Vẫn ĐI QUA hàm này chứ không
     tự dựng thẻ liên kết gọi riêng - một cửa cho mọi nút gọi. */
- var goi=' href="tel:'+esc(phoneKey(p))+'" data-tip="Bấm để gọi '+esc(p)+'"';
+ var goi=' href="tel:'+esc(phoneKey(p))+'" data-tip="gọi '+esc(p)+'"';
  if(chiIcon)return '<a class="tbtn"'+goi+' aria-label="Gọi trung tâm"><i class="ti ti-phone"></i></a>';
  return '<a class="btn '+(cls||"")+' sm"'+goi+'><i class="ti ti-phone"></i>'+esc(lb||("Gọi trung tâm "+p))+'</a>'}
 /* Dòng điểm danh do CHÍNH học viên tự báo. Đánh dấu bằng tiền tố thay vì đẻ cột mới:
@@ -21093,7 +21099,7 @@ function go(key,noHist){
  asstTick();try{tourBtnSync()}catch(e){}
  /* ═══ V9.99z10 - KHÔNG MỜI RỒI ĐUỔI ═══════════════════════════════════════════════════
     Anh Luân 05/08: *"ở trang lớp học của trưởng phòng ACA lại có nút Xếp lớp và onboarding, bấm
-    vào thì: Trang ngoài phạm vi chức danh của bạn - đang xem ở chế độ THAM KHẢO. Đây là 1 dạng
+    vào thì: Trang ngoài phạm vi chức danh của bạn - đang xem ở chế độ tham khảo. Đây là 1 dạng
     lỗi nặng đó em."* Đúng là nặng: người ta bấm một cái nút app tự vẽ ra cho họ, rồi bị app báo
     là mình không có phận sự ở đây. Cái sai không nằm ở câu báo - nó nằm ở CÁI NÚT.
     Đo được 67 chỗ như thế trên 16 chức danh (trang Học tập, Báo cáo, Việc hôm nay, Bảng công...).
@@ -21106,7 +21112,7 @@ function go(key,noHist){
     Chế độ THAM KHẢO vẫn còn nguyên cho người GÕ THẲNG địa chỉ hoặc đi từ link cũ - đó mới đúng
     là chỗ nó sinh ra để phục vụ. */
  el.innerHTML=scrubMan(el.innerHTML);donLapTrenMan(el);
- if(!canSee(key)&&!SENSITIVE[key]&&SCOPE().pages!=="*")el.innerHTML='<div class="notebar" style="margin-bottom:12px"><i class="ti ti-info-circle"></i>Trang ngoài phạm vi chức danh của bạn - đang xem ở chế độ THAM KHẢO.</div>'+el.innerHTML;
+ if(!canSee(key)&&!SENSITIVE[key]&&SCOPE().pages!=="*")el.innerHTML='<div class="notebar" style="margin-bottom:12px"><i class="ti ti-info-circle"></i>Trang ngoài phạm vi chức danh của bạn - đang xem ở chế độ tham khảo.</div>'+el.innerHTML;
  window.CURCTX=navSnap();   /* ngữ cảnh của TRANG NÀY, chụp sau khi đã render (dùng khi rời trang) */
  renderCrumb();
  el.scrollTop=0;closeNav();closeBell();updateBellBadge();hashSet(key0,noHist);persistSoon()}
