@@ -164,6 +164,25 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
+> **Phiên bản: V9.99z10 — AUDIT ĐÃ NỘP, 29 BỘ KIỂM XANH HẾT ✅ (05/08, bản dựng `2f8287`).**
+>
+> ### 🔴 BẪY ĐẮT NHẤT NGÀY 05/08 - ĐẨY NHẦM FILE SUỐT MỘT NGÀY
+> Trang demo online **KHÔNG phục vụ ba file ở gốc repo demo**. Nó phục vụ
+> **`cong-nhan-vien/index.html`** và **`cong-hoc-vien/index.html`** - hai bản chép riêng có sửa
+> đường dẫn dữ liệu thành `../ITTs_data.js`; ba file ở gốc chỉ còn để link cũ trước 28/07 không
+> chết. Repo demo có sẵn **`update.sh`** làm đúng việc ấy, mà em không dùng - em chép tay ba
+> file ở gốc theo đúng chữ trong CLAUDE.md (bản cũ ghi thiếu).
+> **Hậu quả:** cả ngày em báo "đã đẩy, anh refresh đi"; anh Luân refresh, mở cả tab ẩn danh, vẫn
+> thấy bản **08:06 sáng**, rồi báo đi báo lại *"bấm vào rất nhiều menu bên sidebar ko ăn"*,
+> *"nó cứ đơ đơ mà em bảo ko sao là sao"*, *"bấm vào đống trang này nó có thay đổi gì bên dữ
+> liệu đâu"*. Em đo trên file ở gốc nên lần nào cũng thấy đúng - **hai người nhìn hai file khác
+> nhau suốt một ngày**, và em ba lần nói "app không sai" trong khi cái anh cầm thì sai thật.
+> **Bài học:** khi người dùng báo một lỗi mà máy đo không thấy, câu hỏi đầu tiên không phải
+> "phép đo của mình có đúng không" mà là **"mình và họ có đang nhìn CÙNG MỘT BẢN không"**.
+> **Chốt cửa:** (1) CLAUDE.md nay bắt chạy `./update.sh`, không chép tay; (2) sau khi đẩy phải
+> đối chiếu **mã bản dựng** đọc từ `cong-nhan-vien/index.html` với mã `gen_v5.py` in ra lúc
+> build; (3) app hiện mã ấy ở **chân thanh menu** để hỏi người dùng một câu là biết.
+
 > **Phiên bản: V9.99z9 — AUDIT TOÀN DIỆN ĐÃ NỘP, 29 BỘ KIỂM XANH HẾT ✅ (05/08, bản dựng `f74f22`).**
 > · **Bảng audit nằm ở `AUDIT_05_08_2026.md`** - trọn 9 mảng của `GIAO_THUC_AUDIT.md` cộng
 > **mảng thứ 10 mới dựng**: *chuỗi phối hợp nhiều người* (anh Luân đặt: *"nhớ kiểm tra logic
