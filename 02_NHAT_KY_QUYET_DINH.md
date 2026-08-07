@@ -241,6 +241,38 @@
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V9.99z12 — AC1-AC6 XONG HẾT, 34 BỘ KIỂM (07/08, bản dựng `829572`).**
 >
+> ### 🟢 ĐANG LÀM: BẢN V2 - MỖI NGHIỆP VỤ MỘT TRANG (bắt đầu 07/08)
+> **Hai nhánh chạy song song, KHÔNG đụng nhau** (đúng cách anh Luân chốt: *"làm nhánh git riêng
+> đi em... Độc lập, dễ sửa nữa mà ko sợ ảnh hưởng nhau"*):
+>
+> | | Nhánh git | Repo demo | Địa chỉ |
+> |---|---|---|---|
+> | **V1** (đang chạy) | `claude/itts-sop-five-areas-jw5f2q` | `mittomap/itts-sop-demo` | https://mittomap.github.io/itts-sop-demo/ |
+> | **V2** (đang làm) | `claude/tts-sop-v2-single-page-4olkq4` | `mittomap/itts-sop-demo-v2` | https://mittomap.github.io/itts-sop-demo-v2/ |
+>
+> Bàn giao đầy đủ ở **`BAN_GIAO_V2.md`** (anh muốn gì · 4 ràng buộc cứng · 7 khúc · 4 bẫy).
+>
+> **KHÚC 1 XONG (07/08):** nhánh V2 tách từ tip V1 `543d6cc` (kế thừa đủ AC1-AC6) · repo demo v2
+> dựng xong · mã V6 sót đã gỡ · **verify TRỌN BỘ 34 bộ xanh hết, 26m51s** làm mốc · đẩy demo lần
+> đầu, mã bản dựng khớp `829572`.
+>
+> **Ba điều đo được ở Khúc 1, ghi lại để Khúc 2 khỏi dò lại:**
+> 1. **Mã V6 đã sạch từ nhánh V1** - `_check11` có sẵn 8 phép canh không cho nó quay lại. Chỗ còn
+>    nhắc "V6" đều là CỬA GÁC hoặc ghi chép bài học, **đừng xoá** (xoá thước là mất phép canh).
+> 2. **25 trang nghiệp vụ ĐÃ NẰM SẴN trong nguồn.** Mỗi tab của hub có hàm vẽ riêng dạng
+>    `renderX(embed)`: `embed=1` vẽ không đầu trang (để nhúng vào hub), `embed=0` **tự vẽ đầu
+>    trang của chính nó**. Dỡ hub là MỞ NẮP, không dựng mới.
+> 3. **Chỗ trói hub nằm gọn trong `go()`**: năm bảng đổi tên `TSMAP` · `CSMAP` · `HTMAP` · `KMAP`
+>    · `DUYMAP` (cộng `bangcong`→`giangvien`) kéo mọi cú bấm mục con về hub chủ. `NAVSUB` là bảng
+>    trói thứ hai, cho thanh menu. Sidebar thì KHÔNG phải dựng lại - `NAVTREE` đã liệt kê đủ cả
+>    25 mục con theo chặng rồi.
+>
+> **`update.sh` của repo demo v2 tự đối chiếu mã bản dựng và thoát lỗi nếu lệch** - bẫy 05/08
+> (đẩy hụt mà script báo "không có thay đổi" rồi im lặng) từ nay có máy canh, không dựa trí nhớ.
+>
+> **Một ghi chú `_checkbam` để dành cho Khúc 3:** ngăn kéo một dòng ở trang Giảng viên mở ra
+> không có nút nào, chỉ 241 ký tự - đúng chỗ anh Luân gọi *"lỗi logic ghê"* (RB3).
+>
 > ### 🔴 BẪY 07/08 (lần 2) - DỜI LỊCH CỘNG NGÀY THAY VÌ ĐẾM Ô LỊCH
 > Anh Luân: *"cái dời buổi nó có theo logic ko đó em? ví dụ khóa đó là 3-5-7, dời lịch thì chỉ
 > được chọn 3-5-7, các khóa sau cũng phải dời tương ứng á."* Đúng, và bản đầu của AC5 **SAI**:
