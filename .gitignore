@@ -25,3 +25,7 @@ _src/_thoigian_verify_nhanh.txt
 # ban V6 da ngung phat hanh (04/08) - khong con build ra hai file nay
 ITTs_WebApp_v6_demo.html
 _src/_APP6.js
+
+# rac do python sinh ra khi kiem cu phap
+__pycache__/
+*.pyc
