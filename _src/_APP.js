@@ -11969,8 +11969,17 @@ function printReceipt(eid,amt,payId){var e=find("DL06","enrollment_id",eid)||{};
   '<div class="sm">Phiếu in từ hệ thống vận hành ITTs</div>'+
   '<script>window.print()<\/script></body></html>');
  w.document.close()}
-function paySave(id){var e=find("DL06","enrollment_id",id);if(!e)return;var amt=num(fldV("pm_amt"));if(amt<=0){toast("Nhập số tiền hợp lệ.");return}
- if(!actGuard("paySave:"+id))return;   /* bấm 2 lần = thu tiền 2 lần trên cùng một khoản */
+/* HAI LỐI THOÁT IM LẶNG - đã vá. `_checknv` bắt được: bấm Lưu mà KHÔNG GHI, KHÔNG BÁO gì cả.
+   Luật chấm của bộ kiểm ấy viết ra đúng để canh chuyện này: bấm Lưu xong chỉ hai kết cục được
+   tính là đạt - app GHI, hoặc app TỪ CHỐI CÓ LỜI. Im lặng là kiểu hỏng nguy hiểm nhất vì người
+   thật sẽ bấm lại vài lần rồi bỏ đi, và không bộ kiểm chuỗi nào thấy được.
+   Hai lối ấy: (a) không tìm ra đơn - hiếm, nhưng khi xảy ra thì người dùng phải biết là chuyện
+   gì; (b) chốt chặn bấm hai lần trong 1,2 giây - nó đang bảo vệ đúng (thu tiền hai lần trên
+   cùng một khoản là lỗi tiền bạc), nhưng bảo vệ mà không nói thì người ta tưởng nút chết. */
+function paySave(id){var e=find("DL06","enrollment_id",id);
+ if(!e){toast("Không tìm thấy đơn đăng ký này - có thể vừa bị xoá hoặc đổi mã. Mở lại danh sách rồi thử lại.",4500);return}
+ var amt=num(fldV("pm_amt"));if(amt<=0){toast("Nhập số tiền hợp lệ.");return}
+ if(!actGuard("paySave:"+id)){toast("Khoản thu này vừa được ghi xong - chờ một chút rồi kiểm lại danh sách, đừng bấm thêm để khỏi thu hai lần.",4500);return}
  var rem0=e.remaining_amount!==undefined&&e.remaining_amount!==""?num(e.remaining_amount):Math.max(0,(num(e.final_fee)||num(e.total_fee))-num(e.paid_amount));
  if(amt>rem0){toast("Số thu "+vnd(amt)+" VƯỢT phần còn lại "+vnd(rem0)+" - không cho đóng thừa. Kiểm lại số tiền.",4500);return}
  var pay={enrollment_id:id,student_id:e.student_id,student_id_name:e.student_id_name,payment_time:nowStr(),payment_method:fldV("pm_method"),amount:amt,net_received:amt,sender_name:fldV("pm_sender"),transaction_ref:fldV("pm_ref"),received_by:CURSTAFF||"",received_by_name:myName(),payment_note:(attachVal("pay")?("Chứng từ: "+attachVal("pay")):"")};
