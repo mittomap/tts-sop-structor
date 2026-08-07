@@ -16087,11 +16087,19 @@ function renderHtLop(embed){var fil=window.HTLOPQ||"all";
  var cls=rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))});
  var hs=cls.map(function(c){var m=clsHealth(c);m.c=c;return m});
  var nBad=hs.filter(function(m){return m.bad}).length;
- var view=(fil==="bad")?hs.filter(function(m){return m.bad}):hs;
+ /* V9.99z13 (anh Luân 06/08): *"lát em bổ sung bộ lọc theo lớp 1-1 và lớp nhóm nghen"*.
+    Hỏi qua `lopLa11()` - cùng cái hàm mà thẻ trước tên lớp đang dùng. Nếu ở đây viết lại phép
+    so sánh sĩ số thì sớm muộn thẻ nói một đằng bộ lọc đếm một nẻo. */
+ var n11=hs.filter(function(m){return lopLa11(m.c)}).length;
+ var nNhom=hs.length-n11;
+ var view=(fil==="bad")?hs.filter(function(m){return m.bad})
+        :(fil==="mot")?hs.filter(function(m){return lopLa11(m.c)})
+        :(fil==="nhom")?hs.filter(function(m){return !lopLa11(m.c)}):hs;
  var h='<div class="notebar"><i class="ti ti-info-circle"></i><span data-tip="Lớp vào diện cần chú ý khi chuyên cần dưới '+Math.round(kpiTh(/^ATR/,0.8)*100)+'%, nộp bài dưới '+Math.round(kpiTh(/^HCR/,0.7)*100)+'%, có học viên nguy cơ, hoặc còn nợ nhận xét buổi."><b>Sức khỏe mọi lớp</b> - lớp nào cần chú ý.<i class="ti ti-info-circle gyti"></i></span></div>';
- h+=tbar(segHTML(fil,[["all","Tất cả lớp",hs.length],["bad","Dưới ngưỡng / cần để mắt",nBad,nBad?"red":""]],"window.HTLOPQ='{k}';reRender(CUR)"),"");
+ h+=tbar(segHTML(fil,[["all","Tất cả lớp",hs.length],["bad","Dưới ngưỡng / cần để mắt",nBad,nBad?"red":""],
+   ["mot","Lớp 1-1",n11],["nhom","Lớp nhóm",nNhom]],"window.HTLOPQ='{k}';reRender(CUR)"),"");
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Giảng viên</th><th>Sĩ số</th><th>Chuyên cần</th><th>Nộp bài</th><th>HV nguy cơ</th><th>GV trễ</th><th>Nợ nhận xét</th><th></th></tr></thead><tbody>';
- if(!view.length)h+='<tr><td class="empty" colspan="9">Không có lớp nào'+(fil==="bad"?" dưới ngưỡng - tốt!":".")+'</td></tr>';
+ if(!view.length)h+='<tr><td class="empty" colspan="9">Không có lớp nào'+(fil==="bad"?" dưới ngưỡng - tốt!":(fil==="mot"?" kèm riêng 1-1 đang chạy.":(fil==="nhom"?" nhóm đang chạy.":".")))+'</td></tr>';
  view.forEach(function(m){var c=m.c;
   function pchip(v,t,tu,mau,dvi){if(v==null)return '<span class="mut" data-tip="Chưa có '+esc(dvi||"dữ liệu")+' nào nên chưa tính được">—</span>';
    var p=Math.round(v*100)+"%";
