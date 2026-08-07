@@ -99,6 +99,26 @@ chỉnh thì giữ nguyên.
   CH6 (`kpiTh`) - không cắm cứng số trong code.
 - Nhãn enum ghi NGUYÊN VĂN theo CH1 (dạng "code (Nhãn tiếng Việt)").
 
+## LUÔN ĐỂ ANH LUÂN THẤY MÌNH ĐANG CHẠY (anh đặt 07/08)
+
+> *"nhớ hiện running task để a biết e vẫn đang làm, lỡ em bị lỗi gì ko làm mắc công a chờ"* ·
+> *"a vẫn ko thấy dấu hiệu gì là em đang làm việc... nếu a thấy em im lìm là a đang mặc định
+> e ko làm gì."*
+
+**Anh Luân KHÔNG đọc được tiến trình bên trong.** Im lặng với anh không có nghĩa là "đang bận",
+nó có nghĩa là "hỏng rồi" - và anh ngồi chờ một thứ không bao giờ tới. Đây là lỗi giao tiếp,
+không phải lỗi kỹ thuật, nhưng cái giá là thời gian THẬT của anh.
+
+**Luật:**
+- **Luôn có đúng một việc ở trạng thái `in_progress`** trong suốt lúc làm. Bắt đầu việc gì thì
+  bật NGAY, trước khi gõ dòng đầu tiên - không phải bật xong mới nhớ ra.
+- **Đổi nhãn `activeForm` theo từng bước**, dạng `AC4 (3/5): ...`. Một cái nhãn đứng yên 20 phút
+  thì cũng là im lìm - anh không phân biệt được "đang chạy" với "treo".
+- Việc dài (dựng bộ kiểm, chạy verify 34 phút) thì **nói trước là sẽ mất bao lâu**, rồi báo lại
+  khi xong. Đừng để anh tự đoán.
+- Chưa xong mà phải dừng thì **khai thẳng là chưa xong và đang vướng ở đâu** - đừng im rồi để
+  anh tưởng đã giao.
+
 ## Kết MỌI phiên có thay đổi
 
 1. Cập nhật `02_NHAT_KY_QUYET_DINH.md`: thêm mục mới (quyết định + bẫy đã cắn) + sửa
