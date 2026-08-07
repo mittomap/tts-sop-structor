@@ -593,12 +593,18 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
   t("muc nam tren menu trai", !!G);
   t("muc nam o nhom LAM VIEC (khong chon trong nhom chang dang gap)", !!G&&G.g==="Làm việc");
   t("muc co so viec dang cho", navBadge("ychv")===ychvCho());
-  t("bam vao muc la mo dung hub CSKH o tab do", CSMAP["ychv"]==="ychv");
-  var cu=CUR,cs=window.CSTAB;
-  CUR="cskh";window.CSTAB="ychv";
-  t("dang o tab do thi muc tren menu sang", navCur("ychv")===true);
-  t("dang o tab khac thi muc do KHONG sang", (window.CSTAB="khaosat",navCur("ychv")===false));
-  CUR=cu;window.CSTAB=cs;
+  /* V2 - DOI CAU HOI. "Hoc vien lien he" tung la TAB thu tu cua hub CSKH; anh Luan bat 05/08
+     (*"cai tab tren sidebar thong bao tu hoc vien dau?"*) nen no duoc cho mot muc menu rieng,
+     con man hinh thi van la hub mo san tab do. Sang V2 no la MOT TRANG THAT.
+     Dieu can bao ve khong doi mot chut nao: bam vao muc thi toi dung cho do, va dang o do thi
+     muc do sang - chi la nay hoi thang bang `go()` chu khong hoi qua mot bang doi ten. */
+  var cu=CUR;
+  go("ychv");
+  t("bam vao muc la toi dung trang Hoc vien lien he", CUR==="ychv");
+  t("dang o trang do thi muc tren menu sang", navCur("ychv")===true);
+  go("khaosat");
+  t("dang o trang khac thi muc do KHONG sang", navCur("ychv")===false);
+  CUR=cu;
  })();
 
  /* --- 5ter. DAI VANG XEM THU + DAI DU LIEU DEMO (V9.63) --- */

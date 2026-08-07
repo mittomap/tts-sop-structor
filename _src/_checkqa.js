@@ -365,18 +365,24 @@ t("Hoi dap nam trong menu, khong bi giau", PBK["hoidap"]&&!PBK["hoidap"].hide);
    duyTabSet/csTabSet/tsTabSet chi reRender than trang; truoc day reRender khong buildNav nen
    muc dang sang tren menu dung im o tab cu. Nay reRender ve lai ca sidebar - thu THAT o day. */
 (function(){
- t("reRender co goi buildNav", /function reRender\(k\)\{[\s\S]{0,900}?buildNav\(\)/.test(SRC));
+ /* Cua so ky tu la mot phep do GIAN TIEP cho cau hoi that: "buildNav() co nam TRONG than ham
+    reRender khong". No gion voi chu thich - V2 them mot khoi chu thich vao dau ham (giai thich
+    bay tran ngan xep cua trang danh sach) la con so nhay tu ~700 len 1328, thuoc bao do trong
+    khi ma van dung y nguyen. Noi tran len 2500 va ghi lai day de lan sau ai cham vao biet ngay
+    do la mot cai tran, khong phai mot luat. Luat that van la: reRender PHAI ve lai sidebar. */
+ t("reRender co goi buildNav", /function reRender\(k\)\{[\s\S]{0,2500}?buildNav\(\)/.test(SRC));
  try{
-  go("duyet");duyTabSet("duyetnghi");
+  /* V2 - DOI CAU HOI. Nam hang cho phe duyet nay la NAM TRANG, khong con la nam tab cua mot
+     hub - nen khong con "doi tab" de ma canh. Dieu can bao ve giu nguyen, va do moi la phan
+     quan trong: DI SANG CHO KHAC THI VET SANG PHAI NHAY THEO. Anh Luan tung bat dung loi nay
+     (bam "Don xin nghi" ma menu van sang muc cu), nen luat o lai, chi doi cach hoi. */
+  go("duyetnghi");
   var nav=document.getElementById("nav").innerHTML;
-  /* v5: mỗi hàng chờ là một mục menu riêng. v6: chúng là TAB của hub "Chờ duyệt", nên mục
-     sáng lên phải là hub - cùng một ý định, khác hình dạng. */
-  t("bam tab Don xin nghi thi menu sang dung muc do",
+  t("vao trang Don xin nghi thi menu sang dung muc do",
     sangLa(nav,"duyetnghi"));
-  duyTabSet("duyetthu");nav=document.getElementById("nav").innerHTML;
-  t("doi sang tab khac thi vet sang nhay theo",
-    false ? sangLa(nav,"duyet")
-         : (sangLa(nav,"duyetthu")&&nav.indexOf('data-k="duyetnghi"')>=0&&!sangLa(nav,"duyetnghi")));
+  go("duyetthu");nav=document.getElementById("nav").innerHTML;
+  t("di sang trang khac thi vet sang nhay theo",
+    sangLa(nav,"duyetthu")&&nav.indexOf('data-k="duyetnghi"')>=0&&!sangLa(nav,"duyetnghi"));
  }catch(e){t("thu that tab hub khong vo: "+e.message,false)}
 })();
 

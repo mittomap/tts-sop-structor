@@ -270,10 +270,10 @@
 > **`update.sh` của repo demo v2 tự đối chiếu mã bản dựng và thoát lỗi nếu lệch** - bẫy 05/08
 > (đẩy hụt mà script báo "không có thay đổi" rồi im lặng) từ nay có máy canh, không dựa trí nhớ.
 >
-> ### 🟡 KHÚC 2 ĐANG LÀM DỞ - ĐỌC KỸ TRƯỚC KHI LÀM TIẾP
-> **Commit XANH cuối cùng: `97354da`** (Khúc 1 + vá CI + vá F5). Nhánh hiện đứng SAU nó một
-> commit "Khúc 2a", và commit ấy CÒN ĐỎ 3 bộ kiểm - có chủ ý, ghi rõ ở đây để đừng ai tưởng là
-> tự nhiên hỏng.
+> ### 🟢 KHÚC 2 NHỊP 2a XONG - 25 NGHIỆP VỤ THÀNH 25 TRANG
+> Đã xanh trọn bộ. Bảng "câu hỏi cũ / câu hỏi mới" bên dưới giữ lại làm mẫu cho nhịp 2b-2c: mỗi
+> lần dỡ một tầng cấu trúc là một lần phải đi hỏi lại từng cái thước *"nên xoá, hay nên ĐỔI CÂU
+> HỎI?"* - và lần này **cả 9 chỗ đều là đổi câu hỏi**, không chỗ nào phải xoá luật.
 >
 > **Khúc 2a đã làm được (đo bằng máy, không phải tự nhận):**
 > - `_tall` vẽ **55 trang** (trước 39) · `_check18` vẽ **100 trang/tab** (trước 91) ·
@@ -298,14 +298,25 @@
 > 3. **Một nút viết sai thứ tự class** (`btn sm green` thay vì `btn green sm`) ở hàng chờ Xác
 >    nhận thu tiền - có sẵn từ trước, chỉ lộ ra vì V2 vẽ trang đó độc lập.
 >
-> **CÒN LẠI - 3 bộ đỏ, đều là THƯỚC ĐANG HỎI CÂU CỦA BẢN CŨ, không phải app hỏng.** Với mỗi cái
-> phải hỏi *"nên xoá, hay nên ĐỔI CÂU HỎI?"* - và ở đây đều là đổi câu hỏi, vì điều cần bảo vệ
-> vẫn còn nguyên giá trị, chỉ có cấu trúc bên dưới đổi:
+> **CHÍN CHỖ THƯỚC HỎI CÂU CỦA BẢN CŨ - đã đổi câu hỏi, không xoá luật nào.** Điều cần bảo vệ
+> giữ nguyên giá trị, chỉ có cấu trúc bên dưới đổi:
 > | Bộ | Câu hỏi cũ còn sót | Câu hỏi đúng của V2 |
 > |---|---|---|
 > | `_check11` | "bàn giao lead đã rời hub Khác" · "đang ở tab test thì mục test sáng" · "mỗi nghiệp vụ trong chặng sáng đúng 1 mục sidebar" (đang thấy `hoctap=[lop]`, `cskh=[khaosat]`) · "một mục sáng, là mục gần nhất có trên menu" · "tab cskh/khaosat có mục riêng" | Hỏi theo TRANG: bấm một trang nghiệp vụ thì chính nó sáng. Sáu khoá hub nay là bí danh nên đừng hỏi chúng như một mục menu |
 > | `_check14` | "bấm vào mục là mở đúng hub CSKH ở tab đó" · "đang ở tab đó thì mục trên menu sáng" | Bấm mục là mở đúng TRANG đó, và chính nó sáng |
 > | `_checkqa` | "bấm tab Đơn xin nghỉ thì menu sáng đúng mục đó" · "đổi sang tab khác thì vệt sáng nhảy theo" | Không còn tab để đổi - hỏi: đi sang trang khác thì vệt sáng nhảy theo |
+>
+> **Thêm hai lỗi thật nữa lộ ra khi đổi câu hỏi:**
+> 4. **Bản đồ chặng kể tên HUB, và nhãn nói một đằng con số đếm một nẻo.** Hai hạt trỏ vào khoá
+>    hub: hạt "Học tập & Giảng dạy" thật ra đếm BUỔI HỌC TRONG NGÀY, hạt "CSKH · Khảo sát" thật
+>    ra đếm KHIẾU NẠI CHƯA ĐÓNG (DL17). Nay mỗi hạt trỏ thẳng vào một trang nghiệp vụ và **nhãn
+>    khớp với con số**: "Buổi hôm nay" và "Xử lý Khiếu nại". Dỡ hub làm lộ ra một lỗi nhóm M7/M4
+>    mà `_checkaudit` vốn canh nhưng chưa với tới.
+> 5. **`_checkqa` dò `buildNav()` trong cửa sổ 900 ký tự tính từ đầu `reRender`** - một phép đo
+>    GIÁN TIẾP cho câu hỏi thật ("có nằm trong cùng hàm không"), và nó giòn với chú thích: thêm
+>    một khối chú thích vào đầu hàm là con số nhảy lên 1328, thước báo đỏ trong khi mã đúng
+>    nguyên. Nới trần lên 2500 **và ghi ngay tại chỗ rằng đó là một cái TRẦN, không phải một
+>    LUẬT** - để lần sau ai chạm vào biết ngay mình đang chạm vào cái gì.
 >
 > **Còn lại của Khúc 2 (nhịp 2b, 2c) chưa làm:** mỗi trang một dải thẻ riêng và dải cảnh báo
 > riêng (2b); xoá `HUBTAB`/`HUBCAU`/`hubCau`/`hubDef`/`hubTab`/`hubSubKey` và các hàm vẽ hub đã

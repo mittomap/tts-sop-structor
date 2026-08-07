@@ -15463,6 +15463,15 @@ function changList(){var a=window.ARC||"changA";var k=window.CHANGK||"";
  return L}
 function changPick(k){window.CHANGK=(window.CHANGK===k?"":k);reRender(CUR)}
 /* các nghiệp vụ nằm TRONG từng chặng - đúng yêu cầu "mỗi chặng có chặng nghiệp vụ bên trong" */
+/* ═══ V2 - BẢN ĐỒ CHẶNG KỂ TÊN NGHIỆP VỤ, KHÔNG KỂ TÊN HUB ═════════════════════════════════
+   Hai hạt trong bản đồ chặng trước đây trỏ vào KHOÁ HUB (`hoctap`, `cskh`). Sang V2 hub không
+   còn màn hình riêng, nên bấm vào hạt là bị dẫn tiếp sang một trang khác tên - người dùng bấm
+   "Học tập & Giảng dạy" mà sáng lên mục "Lớp học" (`_check11` bắt được).
+   Nay mỗi hạt trỏ thẳng vào một trang nghiệp vụ, và NHÃN KHỚP VỚI CON SỐ nó đang đếm:
+     · hạt cũ "Học tập & Giảng dạy" đếm BUỔI HỌC TRONG NGÀY  -> nay là "Buổi hôm nay"
+     · hạt cũ "CSKH · Khảo sát" đếm KHIẾU NẠI CHƯA ĐÓNG (DL17) -> nay là "Xử lý Khiếu nại"
+   Vế thứ hai là một cái lợi ngoài dự tính: trước đây nhãn nói một đằng con số đếm một nẻo -
+   đúng loại lỗi nhóm M7/M4 của `_checkaudit` canh. Dỡ hub làm nó lộ ra. */
 function arcJobRaw(a){
  var jobs={
   changA:[
@@ -15483,9 +15492,9 @@ function arcJobRaw(a){
     return srows("DL08").filter(function(o){if(isc(o.onboarding_status,"completed"))return false;
      var h=hoursSince(o.assigned_at);return h!=null&&h>lim}).length},"hocvien"],
    ["banglop","ti-clipboard-list","Vận hành lớp","Buổi học - điểm danh - nhận xét - bài tập",function(){return srows("DL10").filter(function(c){return isc(c.class_status,"in_progress")}).length},"lop"],
-   ["hoctap","ti-school","Học tập & Giảng dạy","Việc của GV hôm nay - lịch tuần - WOW",function(){var t=new Date();return srows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,t)}).length},"lop"],
+   ["buoihnay","ti-calendar-event","Buổi hôm nay","Buổi học trong ngày - lớp nào, ai dạy, phòng nào",function(){var t=new Date();return srows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,t)}).length},"lop"],
    ["wow","ti-star","Buổi WOW 1-1","Đặt - dạy - ghi nội dung buổi kèm riêng",function(){return srows("DL14").filter(function(w){return !isc(w.wow_status,"cancelled")&&!String(w.wow_content_notes||"").trim()}).length},"lop"],
-   ["cskh","ti-headset","CSKH · Khảo sát","Khảo sát định kỳ - phản hồi - khiếu nại",function(){return srows("DL17").filter(function(c){return !isc(c.complaint_status,"resolved")}).length},"hocvien"]],
+   ["khieunai","ti-alert-triangle","Xử lý Khiếu nại","Tiếp nhận - phân loại - cử người xử lý - đóng phiếu",function(){return srows("DL17").filter(function(c){return !isc(c.complaint_status,"resolved")}).length},"hocvien"]],
   changC:[
    /* Ô này từng trùng KHÍT với ga "Bảo lưu / Bỏ học" - cùng tên, cùng con số, cùng tập người.
       Đổi tên và đổi phép đếm cho đúng vai: ga nói CÓ BAO NHIÊU NGƯỜI đang tạm dừng, ô nói CÓ BAO

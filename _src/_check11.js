@@ -91,7 +91,13 @@ t("loi cu: go('duyetgiao') dan sang tab moi", (function(){
 /* V2 - luat "mot ten cho mot thu" van con, chi doi cho hoi: truoc ma tab phai trung ma muc
    menu (`DUYMAP`); nay moi hang cho la mot TRANG nen ma ay phai la mot khoa trang that. */
 t("ma hang cho TRUNG ma trang (mot ten cho mot thu)", duyTabs().every(function(x){return !!PBK[x.k]}));
-t("ban giao lead da roi hub Khac", !KMAP.banggiao&&!!DUYMAP.banggiao);
+/* V2 - DOI CAU HOI. Dieu can bao ve (V9.29o): ban giao lead la mot QUYET DINH, no thuoc nhom
+   "Cho duyet", khong phai mot tien ich lat vat cua "Tinh nang khac". Truoc day hoi bang hai bang
+   doi ten (KMAP/DUYMAP); hai bang ay nay da rong nen phai hoi thang CAY MENU - cho no thuc su
+   dung. Hoi cay menu con dung hon hoi bang doi ten: bang chi noi y dinh, cay noi cho that. */
+t("ban giao lead nam o nhom Cho duyet, khong nam o Tinh nang khac", (function(){
+ var g=null;NAVTREE.forEach(function(G){if((G.items||[]).indexOf("banggiao")>=0)g=G.g});
+ return g==="Chờ duyệt"})());
 t("nhom chang du 4", NAVTREE.filter(function(G){return G.arc}).length===4);
 /* ═══ V9.99v - THANH MENU THAT PHAI KHOP VOI CAY MENU DANG DUOC CHON ════════════════════════
    Bay da can lan thu BA: `buildNav()` cam cung `NAVTREE` thay vi hoi `navCay()`, nen ca co che
@@ -233,8 +239,10 @@ t("cong nhan vien khong con IT / bao ve / tap vu",
   rows("DL01").filter(function(x){return /^(it_|janitor|security)/.test(ecode(x.role))}).length===0);
 vao("");
 /* navCur: highlight dung muc con theo tab */
-window.TSTAB="test";CUR="tuyensinh";
-t("navCur: dang o tab test -> muc test sang", navCur("test")===true&&navCur("nhaplead")===false);
+/* V2 - dung o TRANG Test, khong con la "tab test cua hub Tuyen sinh". Dieu can bao ve khong
+   doi: dang o dau thi muc do sang, muc anh em khong sang. */
+CUR="test";
+t("navCur: dang o trang Test -> muc Test sang", navCur("test")===true&&navCur("nhaplead")===false);
 window.ARC="changB";CUR="chang";
 t("navCur: dang o changB -> muc changB sang", navCur("changB")===true&&navCur("changA")===false);
 CUR="banlam";
@@ -340,17 +348,22 @@ applyScope("");CURROLE="all";
    nen no sang va hub `hoctap` nhuong; o v6 `wow` chi la TAB cua hub, khong co muc rieng, nen
    chinh hub sang - dung nhu cau ngay ben duoi mo ta cho cskh/khaosat. Hoi CAY MENU THAT thay
    vi cam cung hinh dang cua mot ban. */
-t("V9.19 dung MOT muc sang, va la muc gan nhat co tren menu (wow)", (function(){
- window.HTTAB="wow";CUR="hoctap";
- return navInTree("wow") ? (navCur("wow")===true&&navCur("hoctap")===false)
-                         : (navCur("hoctap")===true)})());
+/* V2 - luat "MOT muc sang, va la muc GAN NHAT co mat tren menu" van nguyen, chi khong con
+   canh hub nua: `wow` la mot trang that va co muc rieng nen chinh no sang. */
+t("V2 dung MOT muc sang, va la chinh trang dang mo (wow)", (function(){
+ CUR="wow";
+ return navInTree("wow")&&navCur("wow")===true&&navCur("lop")===false})());
 /* V9.99z5 - luat nay DOI: tu nay MOI tab cua hub deu co mot muc rieng tren menu (anh Luan:
    *"bên sidebar giống như 1 cái bản đồ vậy, họ biết mình cần tìm gì ở đâu"*), nen hub khong
    con sang thay cho tab nua - muc con sang, hang cha mang lop `anc` (sang mo) de van doc ra
    "dang o dau do trong nhom nay". */
-t("V9.99z5 tab cskh/khaosat co muc rieng, muc con sang - cha sang mo", (function(){
- window.CSTAB="khaosat";CUR="cskh";
- return navInTree("khaosat")&&navCur("khaosat")===true&&navCur("cskh")===false&&navAnc("cskh")===true})());
+/* V2 - luat nay DOI LAN THU HAI. V9.99z5 dat ra no khi moi tab cua hub bat dau co muc rieng
+   tren menu (anh Luan: *"bên sidebar giống như 1 cái bản đồ vậy"*) - luc ay van con hang CHA de
+   ma "sang mo". Nay khong con hub, khong con cha: Khao sat la mot trang, no sang cho chinh no.
+   Dieu can bao ve van la mot: nguoi dung nhin sidebar phai doc ra minh dang dung o dau. */
+t("V2 Khao sat la trang that, no sang cho chinh no", (function(){
+ CUR="khaosat";
+ return navInTree("khaosat")&&navCur("khaosat")===true&&navCur("khieunai")===false})());
 window.HTTAB="today";
 t("V9.19 crumbLabel noi ro tab dang dung", (function(){window.TSTAB="test";
  return crumbLabel("tuyensinh",{}).indexOf("·")>0})());
