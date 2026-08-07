@@ -1049,14 +1049,34 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
    Bản trước chỉ một dấu "!" đỏ, nợ hai việc thì hiện số "2" - người xem biết CÓ nợ mà không
    biết nợ GÌ. Nay mỗi loại nợ mang đúng biểu tượng của ô đếm nói về nó, nợ hai việc thì đeo
    hai huy hiệu, nhìn một lượt là đọc được loại việc. */
+/* AC6 - lưới rubric trong ngăn kéo nhận xét buổi. Mỗi dòng: tên tiêu chí + câu giải thích ngắn
+   bên trái, thang 1-5 bên phải. Nút "-" là "không đánh giá được ở buổi này" - phải có, nếu
+   không người dạy sẽ chấm bừa một điểm cho xong, và điểm bừa còn tệ hơn ô trống. */
+.rbwrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:12px}
+.rbrow{display:flex;align-items:center;gap:12px;padding:9px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.rbrow:last-child{border-bottom:0}
+.rbl{flex:1 1 220px;min-width:0}
+.rbl b{font-size:12.5px;font-weight:600;display:block}
+.rbl small{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
+.rbs{display:flex;gap:4px;flex-shrink:0}
+.rbo{position:relative;cursor:pointer}
+.rbo input{position:absolute;opacity:0;width:0;height:0}
+.rbo span{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;
+ border:1px solid var(--line);font-size:12.5px;font-weight:700;color:var(--muted);background:#fff}
+.rbo input:checked+span{background:var(--blue);border-color:var(--blue);color:#fff}
+.rbo.rbx input:checked+span{background:var(--gray);border-color:var(--line);color:var(--muted)}
+.rbtick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.rbt{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border:1px solid var(--line);
+ border-radius:20px;font-size:12.5px;cursor:pointer;background:#fff}
+.rbt input{margin:0}
 .sespill .swarns{position:absolute;top:-6px;left:-6px;display:flex;gap:2px}
-.sespill .swarn{font-size:9.5px;background:var(--red);color:#fff;
+.sespill .swarn{font-size:10px;background:var(--red);color:#fff;
  border-radius:20px;min-width:16px;height:16px;padding:0 3px;display:flex;align-items:center;
  justify-content:center;font-weight:800;box-shadow:0 0 0 2px #fff;cursor:help}
 .sespill.canhbao{border-color:var(--red)}
 /* Nhãn buổi thi trên viên buổi - nằm trong viên, không phải huy hiệu góc (huy hiệu góc dành
    cho VIỆC CÒN NỢ; loại buổi là thuộc tính, không phải việc phải làm). */
-.sespill .sthi{display:block;font-size:8.5px;font-weight:800;letter-spacing:.3px;margin-top:2px;
+.sespill .sthi{display:block;font-size:9px;font-weight:800;letter-spacing:.3px;margin-top:2px;
  padding:1px 5px;border-radius:20px;white-space:nowrap}
 .sespill .sthi.mid{background:var(--blueb);color:#185FA5}
 .sespill .sthi.final{background:var(--amberb);color:#854F0B}
@@ -16320,7 +16340,9 @@ function doiForm(cid,sid){
  h+='<div class="mut" style="font-size:12px;margin:-4px 0 10px">'+lopThe(c)+esc(c.class_name||cid)+'</div>';
  h+='<div class="fld"><label>Dời từ buổi <i>*</i></label><select id="dl_ses" onchange="doiXem()">'+
   ses.map(function(x){return '<option value="'+esc(x.session_id)+'"'+(x.session_id===cur?" selected":"")+' data-ngay="'+esc(x.session_date||"")+'">Buổi '+esc(x.session_number||"?")+' · '+esc(String(x.session_date||"").slice(0,10)||"chưa có ngày")+'</option>'}).join("")+'</select></div>';
- h+='<div class="fld"><label>Ngày mới <i>*</i></label><input id="dl_ngay" type="date" onchange="doiXem()"></div>';
+ (function(){var _s0=ses.filter(function(x){return x.session_id===cur})[0]||ses[0];
+  var _d0=pvnd(_s0&&_s0.session_date)||new Date();
+  h+='<div class="fld"><label>Ngày mới <i>*</i></label><input id="dl_ngay" type="date" value="'+esc(_isoP(_d0))+'" onchange="doiXem()"></div>'})();
  h+='<div class="fld full"><label>Phạm vi <i>*</i></label><select id="dl_pv" onchange="doiXem()">'+
   '<option value="ca_khoa">Buổi này và MỌI buổi sau (dời cả khóa)</option>'+
   '<option value="mot_buoi">Chỉ buổi này</option></select></div>';
@@ -17034,17 +17056,76 @@ function bhCancelRun(id){var reason=(fldV("bc_reason")||"").trim();
  markRow("DL11","session_id",id,{session_status:eFull("enum_session_status","cancelled"),
   notes:(st.notes?st.notes+" | ":"")+"Hủy "+nowStr()+": "+reason+" (đã báo HV)"},"Đã hủy buổi ("+reason+"). Hãy xếp lịch dạy bù.");
  closeModal()}
+/* ═══════════ AC6 · NHẬN XÉT BUỔI DẠNG TÍCH CHỌN + CHẤM ĐIỂM (RUBRIC) ════════════════════
+   Trưởng phòng ACA 06/08: nhận xét buổi nên có phần TÍCH CHỌN và CHẤM ĐIỂM, không chỉ một ô
+   văn xuôi. Anh Luân chốt cách làm: *"Em đề xuất bộ mặc định, anh sửa trong Cài đặt."*
+
+   VÌ SAO KHÔNG BỎ Ô VĂN XUÔI ĐI: rubric trả lời "buổi này đạt mức nào", còn ô văn xuôi trả lời
+   "chuyện gì đã xảy ra với EM NÀO" - hai câu khác nhau, và câu thứ hai là thứ học viên với phụ
+   huynh thật sự đọc ở cổng. Bỏ nó là bớt, mà LUẬT CỨNG SỐ 0 nói thêm thì được, bớt thì không.
+
+   Bộ mặc định dưới đây là ĐỀ XUẤT - sửa được ở Cài đặt > Rubric nhận xét buổi, và sửa xong thì
+   không mất khi bấm Dựng lại demo (cùng cơ chế với đoạn gợi ý). */
+var RUBRICDEF={
+ diem:[["chuanbi","Chuẩn bị bài và học liệu","Giáo án, slide, bài nghe, tài liệu phát - có đủ và đúng buổi chưa"],
+       ["nhipday","Bám giáo án và nhịp dạy","Dạy đủ nội dung của buổi, không cháy giáo án cũng không thừa giờ"],
+       ["tuongtac","Mức tham gia của học viên","Học viên có nói, có làm bài tại lớp, hay ngồi im cả buổi"],
+       ["quanly","Quản lý lớp và thời gian","Vào đúng giờ, giữ trật tự, chia thời lượng hợp lý giữa các phần"],
+       ["phanhoi","Chữa bài và phản hồi","Có chữa bài cũ, nói rõ chỗ sai và cách sửa cho từng học viên"]],
+ tich:[["ddau","Đã điểm danh đầu buổi"],
+       ["chuabai","Đã chữa bài buổi trước"],
+       ["giaobai","Đã giao bài về nhà"],
+       ["nhacyeu","Đã kèm riêng học viên yếu trong buổi"],
+       ["baophuhuynh","Cần báo phụ huynh sau buổi này"]]};
+function rubricCfg(){var c=(DATA.config&&DATA.config.rubric)||{};
+ return {diem:(c.diem&&c.diem.length?c.diem:RUBRICDEF.diem),
+         tich:(c.tich&&c.tich.length?c.tich:RUBRICDEF.tich)}}
+/* Điểm lưu dạng "ma:diem|ma:diem" - gọn, đọc được bằng mắt, và không phụ thuộc thứ tự tiêu chí
+   (thêm/bớt tiêu chí trong Cài đặt thì dữ liệu cũ vẫn đọc đúng phần còn khớp). */
+function rubricDoc(v){var o={};String(v==null?"":v).split("|").forEach(function(x){
+ var p=x.split(":");if(p[0])o[p[0].trim()]=p[1]!=null?String(p[1]).trim():""});return o}
+function rubricGhi(o){var a=[];for(var k in o)if(String(o[k]).trim()!=="")a.push(k+":"+o[k]);return a.join("|")}
+function rubricTB(v){var o=rubricDoc(v),t=0,n=0;
+ for(var k in o){var x=parseFloat(o[k]);if(isFinite(x)&&x>0){t+=x;n++}}
+ return n?Math.round(t/n*10)/10:null}
 function bhNoteForm(id){var s=find("DL11","session_id",id);if(!s){toast("Không thấy buổi học.");return}
  var h='<div class="dcard"><h4><i class="ti ti-writing"></i>Nhận xét buổi - '+esc(s.class_id_name||s.class_id)+' buổi '+esc(s.session_number||"")+'</h4>';
  h+=ctxRows([["Ngày học",esc(s.session_date||"-")],["Giảng viên",esc(s.teacher_id_name||s.teacher_id||"-")],["Hạn ghi nhận xét",slaChip("slaTeacherNote_hours",48)+" giờ sau buổi"]]);
+ /* AC6 - RUBRIC: chấm điểm từng tiêu chí + tích những việc đã làm. Đặt TRƯỚC ô văn xuôi vì
+    người dạy vừa xong buổi thì nhớ rõ mấy điều này nhất; viết văn để sau, lúc đã điểm lại đầu. */
+ (function(){var RB=rubricCfg(),cu=rubricDoc(s.rubric_diem),ct=rubricDoc(s.rubric_tich);
+  h+='<div class="sechd">Chấm buổi dạy</div>';
+  h+='<div class="fhint" style="margin:-2px 0 8px">Thang 1-5. Để trống tiêu chí nào không đánh giá được ở buổi này - trống thì không tính vào điểm trung bình.</div>';
+  h+='<div class="rbwrap">';
+  RB.diem.forEach(function(t){
+   h+='<div class="rbrow"><div class="rbl"><b>'+esc(t[1])+'</b>'+(t[2]?('<small>'+esc(t[2])+'</small>'):'')+'</div><div class="rbs">';
+   for(var i=1;i<=5;i++)h+='<label class="rbo"><input type="radio" name="rb_'+esc(t[0])+'" value="'+i+'"'+(String(cu[t[0]]||"")===String(i)?" checked":"")+'><span>'+i+'</span></label>';
+   h+='<label class="rbo rbx"><input type="radio" name="rb_'+esc(t[0])+'" value=""'+(!cu[t[0]]?" checked":"")+'><span>-</span></label>';
+   h+='</div></div>'});
+  h+='</div>';
+  h+='<div class="sechd">Việc đã làm trong buổi</div><div class="rbtick">';
+  RB.tich.forEach(function(t){
+   h+='<label class="rbt"><input type="checkbox" id="rbt_'+esc(t[0])+'"'+(ct[t[0]]==="1"?" checked":"")+'><span>'+esc(t[1])+'</span></label>'});
+  h+='</div>';})();
  h+='<div class="fld full"><label>Nhận xét buổi học <i>*</i></label><textarea id="bh_note" rows="4" placeholder="Lớp học thế nào, học viên nào yếu/tiến bộ, cần lưu ý gì cho buổi sau...">'+esc(s.teacher_note_summary||"")+'</textarea></div>';
+ h+='<div class="fhint" style="margin:-6px 0 8px">Đoạn này học viên và phụ huynh đọc được ở cổng của họ - viết cho họ hiểu, đừng viết tắt nội bộ.</div>';
  h+='<div class="fld"><label>GV vào trễ (phút, để trống nếu đúng giờ)</label><input id="bh_late" value="'+esc(s.teacher_late_minutes||"")+'"></div>';
  h+='<div class="dact"><button class="btn primary" onclick="bhNoteSave(\''+esc(id)+'\')"><i class="ti ti-device-floppy"></i>Lưu nhận xét</button></div></div>';
  openDrawer("Nhận xét buổi học",h)}
 function bhNoteSave(id){var v=(fldV("bh_note")||"").trim();
  if(!v){toast("Chưa nhập nhận xét buổi.");return}
  var late=(fldV("bh_late")||"").trim();
- markRow("DL11","session_id",id,{teacher_note_summary:v,has_teacher_note:"TRUE",teacher_note_completed_at:nowStr(),teacher_late_minutes:late,session_status:eFull("enum_session_status","completed")},"Đã lưu nhận xét buổi học.");
+ /* Gom rubric: điểm từng tiêu chí + việc đã tích. Đọc từ CHÍNH bộ tiêu chí đang cấu hình, nên
+    trung tâm thêm/bớt tiêu chí trong Cài đặt thì form và chỗ lưu đi cùng nhau, không lệch. */
+ var RB=rubricCfg(),od={},ot={};
+ RB.diem.forEach(function(t){var el=document.querySelector('input[name="rb_'+t[0]+'"]:checked');
+  if(el&&String(el.value).trim())od[t[0]]=el.value});
+ RB.tich.forEach(function(t){var el=document.getElementById("rbt_"+t[0]);if(el&&el.checked)ot[t[0]]="1"});
+ var sd=rubricGhi(od),st2=rubricGhi(ot),tb=rubricTB(sd);
+ markRow("DL11","session_id",id,{teacher_note_summary:v,has_teacher_note:"TRUE",teacher_note_completed_at:nowStr(),teacher_late_minutes:late,
+  rubric_diem:sd,rubric_tich:st2,rubric_tb:(tb==null?"":String(tb)),
+  session_status:eFull("enum_session_status","completed")},
+  "Đã lưu nhận xét buổi học."+(tb!=null?(" Điểm buổi dạy: "+tb+"/5."):""));
  closeModal()}
 /* ═══════ V9.29t - ĐỔI GIÁO VIÊN CHÍNH CỦA LỚP (việc tồn đợt 2 - khối giáo viên/lớp) ═══════
    Đổi GV cho MỘT buổi đã có (sesSetTeacher). Nhưng khi một giáo viên nghỉ hẳn / chuyển cơ sở thì
