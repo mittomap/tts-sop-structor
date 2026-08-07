@@ -1279,6 +1279,12 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 /* AC6 - lưới rubric trong ngăn kéo nhận xét buổi. Mỗi dòng: tên tiêu chí + câu giải thích ngắn
    bên trái, thang 1-5 bên phải. Nút "-" là "không đánh giá được ở buổi này" - phải có, nếu
    không người dạy sẽ chấm bừa một điểm cho xong, và điểm bừa còn tệ hơn ô trống. */
+/* DÒNG BẢNG ĐANG ĐƯỢC CHỌN phải nhìn ra ngay (anh Luân 07/08: *"bấm vào giảng viên nó chưa có
+   tô màu em ạ"*). Em có gắn lớp `on` nhưng chưa cho nó hình hài nào - bấm xong bảng dưới đổi mà
+   dòng vừa bấm vẫn y như cũ, người dùng không biết mình đang lọc theo ai. Vạch xanh bên trái +
+   nền nhạt: đủ rõ để thấy, đủ nhẹ để không át nội dung. */
+table.dt tbody tr.clk.on{background:var(--blueb);box-shadow:inset 3px 0 0 var(--blue)}
+table.dt tbody tr.clk.on td{font-weight:600}
 .rbwrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:12px}
 .rbrow{display:flex;align-items:center;gap:12px;padding:9px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .rbrow:last-child{border-bottom:0}
@@ -2256,7 +2262,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">07/08/2026 · <b>db27e2</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">07/08/2026 · <b>713525</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
