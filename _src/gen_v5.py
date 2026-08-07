@@ -3047,7 +3047,10 @@ var CH3X=[
  /* AC4 - anh Luân chốt 06/08 khi TP ACA hỏi: đổi buổi nào là buổi thi thì "Học vụ và TP ACA".
     Giảng viên KHÔNG có quyền: dời buổi thi là dời mốc đo đầu ra của cả lớp, không phải việc
     của người đứng lớp. */
- {k:"ses_thi",   t:"Đổi buổi thi giữa khóa / cuối khóa",        vai:["hocvu","aca"],them:1}];
+ {k:"ses_thi",   t:"Đổi buổi thi giữa khóa / cuối khóa",        vai:["hocvu","aca"],them:1},
+ /* AC5 - dời lịch buổi/khóa. Dời một buổi là dời lịch của cả lớp, ảnh hưởng phòng, giáo viên
+    và lịch cá nhân của từng học viên - việc của Học vụ, không phải của người đứng lớp. */
+ {k:"ses_doi",   t:"Dời lịch buổi học / dời khóa học",          vai:["hocvu","aca"],them:1}];
 var CH3BY={};CH3.concat(CH3X).forEach(function(a){CH3BY[a.k]=a});
 /* Ai đang đăng nhập có được làm việc này không. Việc KHÔNG nằm trong CH3 thì không chặn - CH3 là
    danh sách việc SOP có ý kiến, không phải danh sách trắng cho toàn bộ app. */
@@ -3105,7 +3108,7 @@ function mapRoleCode(c){c=String(c||"");
    slaItems (chuông) - cộng vài guard cho trang mở bằng link trực tiếp. */
 var DSDOM={DL02:"lead",DL02b:"lead",DL03:"lead",DL04:"lead",
  DL09:"hocvien",DL08:"hocvien",DL12:"hocvien",DL15:"hocvien",DL16:"hocvien",DL17:"hocvien",DL18:"hocvien",DL18b:"hocvien",
- DL10:"lop",DL11:"lop",DL13:"lop",DL14:"lop",DL21:"lop",
+ DL10:"lop",DL11:"lop",DL11b:"lop",DL13:"lop",DL14:"lop",DL21:"lop",
  DL06:"tien",DL07:"tien",DL19:"tien",DL22:"tien",
  DL01:"nhansu",DL23:"viec",DL24:"viec"};
 var DSDOMT={lead:"Khách tiềm năng",hocvien:"Học viên",lop:"Lớp & giảng dạy",tien:"Tiền & học phí",
@@ -3236,7 +3239,7 @@ function recOwners(code,r){if(!r)return [];
   case "DL08":return [r.assigned_by].concat(stuOwners(r.student_id));
   case "DL12":case "DL15":case "DL16":case "DL17":case "DL18":case "DL18b":return stuOwners(r.student_id);
   case "DL10":return [r.main_teacher_id];
-  case "DL11":return [r.teacher_id,(r.class_id&&(find("DL10","class_id",r.class_id)||{}).main_teacher_id)];
+  case "DL11":case "DL11b":return [r.teacher_id,(r.class_id&&(find("DL10","class_id",r.class_id)||{}).main_teacher_id)];
   case "DL13":return [r.teacher_id,(r.class_id&&(find("DL10","class_id",r.class_id)||{}).main_teacher_id)];
   case "DL14":return [r.staff_id,r.wow_booked_by];
   case "DL21":return [];
@@ -8123,7 +8126,8 @@ var JIDK={},JIDP={};
 function jIdInit(){for(var k in LISTCFG){var c=LISTCFG[k];if(c&&c.code&&c.cols&&c.cols[0]){JIDK[c.code]=c.cols[0][0];if(c.idp)JIDP[c.code]=c.idp}}
  /* DL18b (kỳ thi IELTS thật) không có trang danh sách riêng nên không nằm trong LISTCFG - khai
     tay khoá chính ở đây, nếu không jSaveRow rơi về khoá "id" và sinh ra dòng không có exam_id. */
- JIDK.DL18b="exam_id";JIDP.DL18b="IELTS-";}
+ JIDK.DL18b="exam_id";JIDP.DL18b="IELTS-";
+ JIDK.DL11b="change_id";JIDP.DL11b="DOI-";}
 function jSaveRow(code,o,cb){jIdInit();
  var idk=JIDK[code]||"id";
  function done(id){o[idk]=id;rows(code).unshift(o);
@@ -9929,7 +9933,10 @@ function renderBanglop(){
     /* AC4 - nút mở cửa ghi "buổi nào là buổi thi". Chỉ hiện với người CÓ QUYỀN (CH3X ses_thi:
        Học vụ + TP ACA) - hiện cho người không có quyền rồi chặn khi bấm đúng là bệnh
        "mời rồi đuổi" mà app đã chữa ở thanh menu. */
-    (canAct("ses_thi")?('<div class="mini"><button class="pill" onclick="sesThiForm(\''+esc(cid)+'\')"><i class="ti ti-award"></i>Đổi buổi thi</button></div>'):'')+
+    ('<div class="mini">'+
+     (canAct("ses_doi")?('<button class="pill" onclick="doiForm(\''+esc(cid)+'\')"><i class="ti ti-calendar-event"></i>Dời khóa học</button> '):'')+
+     (canAct("ses_thi")?('<button class="pill" onclick="sesThiForm(\''+esc(cid)+'\')"><i class="ti ti-award"></i>Đổi buổi thi</button>'):'')+
+     '</div>')+
     '</div><div class="pbody"><div class="sesstrip">';
    ses.forEach(function(s){var st=ecode(s.session_status);
     var col=st==="completed"?"var(--green)":st==="in_progress"?"var(--amber)":st==="cancelled"?"var(--red)":"#B9C6D6";
@@ -9955,6 +9962,23 @@ function renderBanglop(){
      sesThiThe(s)+
      (noteDone?'<span class="snote"><i class="ti ti-check"></i></span>':'')+'</button>'});
    h+='</div></div></div>';
+   /* ═══ AC5 - LỊCH SỬ ĐỔI LỊCH, NGAY DƯỚI DANH SÁCH BUỔI ═══════════════════════════════
+      Trưởng phòng ACA đặt đúng vị trí này: nhìn dải buổi thấy ngày lệch so với lịch gốc thì
+      câu hỏi kế tiếp luôn là "ai dời, vì sao" - câu trả lời phải nằm ngay đó, không bắt đi
+      tìm ở trang khác. Lớp chưa dời lần nào thì KHÔNG vẽ bảng rỗng. */
+   (function(){var LS=doiLichSu(cid);if(!LS.length)return;
+    h+='<div class="panel"><div class="ph"><b>Lịch sử đổi lịch</b><span class="mut" style="font-size:11.5px">'+LS.length+' lần dời · gần nhất trước</span></div>'+
+     '<div class="tbwrap"><table class="dt"><thead><tr><th>Buổi</th><th>Ngày cũ</th><th>Ngày mới</th><th style="width:80px">Lệch</th><th>Phạm vi</th><th>Lý do</th><th>Người dời</th><th>Lúc</th></tr></thead><tbody>';
+    LS.forEach(function(x){var _l=num(x.so_ngay_doi);
+     h+='<tr><td><b>Buổi '+esc(x.session_number||"?")+'</b></td>'+
+      '<td>'+esc(String(x.ngay_cu||"").slice(0,10))+'</td>'+
+      '<td>'+esc(String(x.ngay_moi||"").slice(0,10))+'</td>'+
+      '<td><span class="chip '+(_l>0?"amber":"blue")+'" data-tip="'+esc(_l>0?("Lùi "+_l+" ngày"):("Dời sớm "+Math.abs(_l)+" ngày"))+'">'+(_l>0?"+":"")+esc(_l)+'d</span></td>'+
+      '<td>'+esc(elabel(x.pham_vi)||x.pham_vi||"")+'</td>'+
+      '<td style="white-space:normal;max-width:280px">'+esc(x.ly_do||"-")+'</td>'+
+      '<td>'+esc(x.nguoi_doi_name||x.nguoi_doi||"-")+'</td>'+
+      '<td class="mut">'+esc(x.thoi_diem||"")+'</td></tr>'});
+    h+='</tbody></table></div></div>'})();
    /* thanh KẾ HOẠCH của buổi đang chọn - compact */
    var cs=find("DL11","session_id",window.DDSESS);
    if(cs){var P=sesPlan(cs);
@@ -11044,7 +11068,7 @@ function renderHealth(){var items=dataHealth();
    "hôm nay ai làm gì", "cái vừa rồi lùi lại được không". Màn này trả lời cả ba. */
 var SHEETVN={DL01:"Nhân sự",DL02:"Lead",DL02b:"Lượt chạm lead",DL03:"Test đầu vào",DL04:"Tư vấn",
  DL05:"Khóa học",DL06:"Ghi danh",DL06b:"Đợt đóng học phí",DL07:"Thu - chi học phí",DL08:"Xếp lớp & Onboarding",
- DL09:"Học viên",DL10:"Lớp học",DL11:"Buổi học",DL12:"Điểm danh",DL13:"Bài tập",DL14:"Buổi WOW",
+ DL09:"Học viên",DL10:"Lớp học",DL11:"Buổi học",DL11b:"Lịch sử đổi lịch",DL12:"Điểm danh",DL13:"Bài tập",DL14:"Buổi WOW",
  DL15:"Khảo sát",DL16:"Ghi nhận phản hồi",DL17:"Khiếu nại",DL18:"Kết thúc khóa",DL18b:"Kỳ thi IELTS thật",DL19:"Nhật ký hệ thống",
  DL20:"Giáo án - Buổi & Bài tập",DL21:"Giáo án chi tiết",DL22:"Tham số",DL23:"Việc được giao",
  DL24:"Trao đổi trong việc",DL25:"Nhật ký thao tác"};
@@ -16278,6 +16302,74 @@ function sesThiSave(cid){
   jUpdRow("DL11",x.session_id,{session_type:eFull("enum_session_type",moi)});n++});
  toast(n?("Đã cập nhật buổi thi của lớp ("+n+" buổi đổi loại)."):"Không có gì thay đổi.");
  closeModal();reRender(CUR)}
+/* ═══════════ AC5 · DỜI LỊCH BUỔI / DỜI KHÓA HỌC + LỊCH SỬ ĐỔI LỊCH ══════════════════════
+   Trưởng phòng ACA 06/08: cần module lịch sử đổi lịch ngay dưới danh sách buổi, và một nút
+   "Dời khóa học" - chọn buổi, chọn ngày mới, ghi lý do, các buổi sau tự dời theo.
+   Trước bản này app CÓ nút "Lùi ngày khai giảng" nhưng nó ghi lý do vào ô `notes` của lớp dưới
+   dạng một câu văn nối đuôi nhau: không lọc được theo lớp, không đếm được lớp nào hay dời,
+   không biết ai dời và dời mấy ngày. Một thứ cần TRA thì phải là DÒNG CÓ CỘT (DL11b). */
+function doiLichSu(cid){return srows("DL11b").filter(function(x){return String(x.class_id||"")===String(cid)})
+ .sort(function(a,b){var da=pvnd(a.thoi_diem),db=pvnd(b.thoi_diem);return (db?db.getTime():0)-(da?da.getTime():0)})}
+function doiForm(cid,sid){
+ if(chanAct("ses_doi"))return;
+ var ses=ddSessions(cid)||[];
+ if(!ses.length){toast("Lớp này chưa có buổi nào.");return}
+ var c=find("DL10","class_id",cid)||{};
+ var cur=sid||window.DDSESS||ses[0].session_id;
+ var h='<div class="dcard"><h4><i class="ti ti-calendar-event"></i>Dời lịch</h4>';
+ h+='<div class="mut" style="font-size:12px;margin:-4px 0 10px">'+lopThe(c)+esc(c.class_name||cid)+'</div>';
+ h+='<div class="fld"><label>Dời từ buổi <i>*</i></label><select id="dl_ses" onchange="doiXem()">'+
+  ses.map(function(x){return '<option value="'+esc(x.session_id)+'"'+(x.session_id===cur?" selected":"")+' data-ngay="'+esc(x.session_date||"")+'">Buổi '+esc(x.session_number||"?")+' · '+esc(String(x.session_date||"").slice(0,10)||"chưa có ngày")+'</option>'}).join("")+'</select></div>';
+ h+='<div class="fld"><label>Ngày mới <i>*</i></label><input id="dl_ngay" type="date" onchange="doiXem()"></div>';
+ h+='<div class="fld full"><label>Phạm vi <i>*</i></label><select id="dl_pv" onchange="doiXem()">'+
+  '<option value="ca_khoa">Buổi này và MỌI buổi sau (dời cả khóa)</option>'+
+  '<option value="mot_buoi">Chỉ buổi này</option></select></div>';
+ h+='<div class="fld full"><label>Lý do <i>*</i></label><input id="dl_ly" placeholder="vd: trùng lịch nghỉ lễ, giáo viên nghỉ đột xuất"></div>';
+ h+='<div id="dl_xem" class="fhint" style="margin:2px 0 8px">Chọn buổi và ngày mới để xem sẽ dời bao nhiêu buổi.</div>';
+ h+='<div class="dact"><button class="btn primary" onclick="doiSave(\''+esc(cid)+'\')"><i class="ti ti-check"></i>Dời lịch</button></div></div>';
+ openDrawer("Dời lịch buổi học",h)}
+/* Đếm THỬ trước khi làm - nói thẳng "sẽ dời N buổi, lệch M ngày" chứ không bắt người ta bấm rồi
+   mới biết mình vừa đụng vào bao nhiêu buổi. Cùng lối `tshCount` đã dùng cho việc dịch mốc. */
+function doiTinh(cid){
+ var sid=fldV("dl_ses"),nv=fldV("dl_ngay"),pv=fldV("dl_pv")||"ca_khoa";
+ var ses=ddSessions(cid)||[];
+ var s0=ses.filter(function(x){return x.session_id===sid})[0];
+ if(!s0||!nv)return null;
+ var cu=pvnd(s0.session_date);var moi=new Date(nv);
+ if(!cu||isNaN(moi.getTime()))return null;
+ moi.setHours(cu.getHours(),cu.getMinutes(),0,0);
+ var lech=Math.round((moi.getTime()-new Date(cu.getFullYear(),cu.getMonth(),cu.getDate(),cu.getHours(),cu.getMinutes()).getTime())/864e5);
+ var n0=num(s0.session_number);
+ var dich=(pv==="mot_buoi")?[s0]:ses.filter(function(x){return num(x.session_number)>=n0});
+ return {s0:s0,cu:cu,moi:moi,lech:lech,dich:dich,pv:pv}}
+function doiXem(){var el=document.getElementById("dl_xem");if(!el)return;
+ var t=doiTinh(window.BLCLASS);
+ if(!t){el.textContent="Chọn buổi và ngày mới để xem sẽ dời bao nhiêu buổi.";return}
+ if(!t.lech){el.textContent="Ngày mới trùng ngày cũ - chưa có gì để dời.";return}
+ el.innerHTML='Sẽ dời <b>'+t.dich.length+'</b> buổi, mỗi buổi '+(t.lech>0?"lùi":"sớm")+' <b>'+Math.abs(t.lech)+'</b> ngày.'+
+  (t.pv==="ca_khoa"?' Buổi cuối khóa dời sang <b>'+esc(dmy(new Date(pvnd(t.dich[t.dich.length-1].session_date).getTime()+t.lech*864e5)))+'</b>.':'')}
+function doiSave(cid){
+ if(chanAct("ses_doi"))return;
+ var ly=String(fldV("dl_ly")||"").trim();
+ if(!ly){toast("Ghi lý do dời - học viên và giáo viên sẽ hỏi.");return}
+ var t=doiTinh(cid);
+ if(!t){toast("Chọn buổi và ngày mới.");return}
+ if(!t.lech){toast("Ngày mới trùng ngày cũ.");return}
+ var c=find("DL10","class_id",cid)||{};
+ t.dich.forEach(function(x){
+  var d=pvnd(x.session_date);if(!d)return;
+  var nd=new Date(d.getTime()+t.lech*864e5);
+  var gio=String(x.session_date||"").slice(10);
+  jUpdRow("DL11",x.session_id,{session_date:dmy(nd)+gio,
+   session_status:eFull("enum_session_status","rescheduled")})});
+ jSaveRow("DL11b",{class_id:cid,class_id_name:c.class_name||"",
+  session_id:t.s0.session_id,session_number:t.s0.session_number,
+  pham_vi:(t.pv==="ca_khoa"?"ca_khoa (Buổi này và các buổi sau)":"mot_buoi (Chỉ buổi này)"),
+  ngay_cu:String(t.s0.session_date||""),ngay_moi:dmy(t.moi)+String(t.s0.session_date||"").slice(10),
+  so_ngay_doi:t.lech,ly_do:ly,nguoi_doi:GATE_SID||"",nguoi_doi_name:myName(),
+  thoi_diem:nowStr(),next_action:""},function(){
+   toast("Đã dời "+t.dich.length+" buổi, lệch "+Math.abs(t.lech)+" ngày. Nhớ báo lại học viên và giáo viên.");
+   closeModal();reRender(CUR)})}
 function bhState(s){
  var done=isc(s.session_status,"completed"),cancelled=isc(s.session_status,"cancelled"),running=isc(s.session_status,"in_progress");
  var note=yesv(s.has_teacher_note)||!!String(s.teacher_note_summary||"").trim();
@@ -22880,7 +22972,8 @@ DOORS = {
  "DL08":["hvClassConfirm","hvClassRejectSave","midSave","obMark","rfNeed","xepMoiLuu","obChangeSave","obFinish"],
  "DL09":["bkLuuPHNguyCo","bkLuuPHQuanHe","blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave","riskCareSave","riskFlagRun","riskIgnoreSave","dhSave"],
  "DL10":["xepMoiLuu","obChangeSave","rfNeed","clsSetTeacher","moLopDelay","moLopCancelRun"],
- "DL11":["bhCancelRun","bhDone","bhMakeupSave","bhNoteSave","bkLuuMocGio","ddSave","sessEnd","sessStart","sesSetTeacher","clsSetTeacher","sesThiSave"],
+ "DL11":["bhCancelRun","bhDone","bhMakeupSave","bhNoteSave","bkLuuMocGio","ddSave","sessEnd","sessStart","sesSetTeacher","clsSetTeacher","sesThiSave","doiSave"],
+ "DL11b":["doiSave"],
  "DL12":["ddSave","hvAbsentSave","absReq","absReview","absMakeup","absCallSave"],
  "DL13":["chamLuu","giaoBaiCaLop","giaoBaiRieng","sesAssignRun","thuLuu"],
  "DL14":["hvWowSave","wowAddSave","wowCancelRun","wowConfirm","wowNoShow","wowNoteSave","wowRescheduleRun","wowTaught","wowUseQuota","wowStart","wowEnd"],

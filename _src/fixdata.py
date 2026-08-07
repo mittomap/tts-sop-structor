@@ -2333,6 +2333,56 @@ for _t, _rows in dl.items():
         tabs += 1; flat += _hit
 log.append("15. Sơ đồ cột: san phẳng %d dòng ở %d bảng về đủ bộ cột (union key)" % (flat, tabs))
 
+# ═══ 14i. LỊCH SỬ ĐỔI LỊCH - BẢNG DL11b ══════════════════════════════════════════════════
+# Trưởng phòng ACA hỏi 06/08: cần một module lịch sử đổi lịch nằm ngay dưới danh sách buổi, và
+# một nút "Dời khóa học" - chọn buổi, chọn ngày mới, ghi lý do, các buổi sau tự dời theo.
+#
+# VÌ SAO PHẢI CÓ BẢNG RIÊNG: app đang ghi lý do lùi khai giảng vào ô `notes` của lớp dưới dạng
+# một câu văn nối đuôi nhau. Ghi kiểu đó thì KHÔNG tra cứu được - không lọc được theo lớp, không
+# đếm được lớp nào hay dời, không biết ai dời và dời mấy ngày. Một thứ cần TRA thì phải là dòng
+# có cột, không phải một câu trong ô ghi chú.
+_dh = dl.setdefault("DL11b", [])
+if not _dh:
+    _rnd5 = __import__("random").Random(20260807)
+    _lyDo = ["Trùng lịch nghỉ lễ", "Giáo viên nghỉ đột xuất, không xếp được người dạy thay",
+             "Phòng học bị trùng với lớp khác", "Học viên xin dời do lịch thi ở trường",
+             "Trung tâm bảo trì hệ thống điện"]
+    _nvHV = [x for x in R("DL01") if str(x.get("role", "")).startswith(("academic_", "aca_"))] or R("DL01")[:1]
+    _n5 = 0
+    for _c in R("DL10"):
+        if _n5 >= 6:
+            break
+        if "in_progress" not in str(_c.get("class_status") or ""):
+            continue
+        _ssC = sorted([x for x in R("DL11") if str(x.get("class_id")) == str(_c.get("class_id"))],
+                      key=lambda x: n(x.get("session_number")) or 0)
+        if len(_ssC) < 3:
+            continue
+        _s5 = _ssC[min(2 + _n5, len(_ssC) - 1)]
+        _cu = str(_s5.get("session_date") or "")
+        if not _cu:
+            continue
+        _dich = _rnd5.choice([2, 3, 7])
+        _moi = tshOne(_cu, _dich) if False else None
+        try:
+            _d0 = datetime.datetime.strptime(_cu[:10], "%d/%m/%Y")
+            _moi = (_d0 + datetime.timedelta(days=_dich)).strftime("%d/%m/%Y") + _cu[10:]
+        except Exception:
+            continue
+        _ng = _nvHV[_n5 % len(_nvHV)]
+        _n5 += 1
+        _dh.append({
+            "change_id": "DOI-%03d" % _n5,
+            "class_id": _c.get("class_id", ""), "class_id_name": _c.get("class_name", ""),
+            "session_id": _s5.get("session_id", ""), "session_number": _s5.get("session_number", ""),
+            "pham_vi": ("ca_khoa (Buổi này và các buổi sau)" if _n5 % 2 else "mot_buoi (Chỉ buổi này)"),
+            "ngay_cu": _cu, "ngay_moi": _moi, "so_ngay_doi": _dich,
+            "ly_do": _rnd5.choice(_lyDo),
+            "nguoi_doi": _ng.get("staff_id", ""), "nguoi_doi_name": _ng.get("full_name", ""),
+            "thoi_diem": fmt(NOW - datetime.timedelta(days=_rnd5.randint(1, 20))),
+            "next_action": ""})
+log.append("14i. Lich su doi lich (DL11b): %d lan doi" % len(_dh))
+
 # ═══ 14h. NA067 - HỌC VIÊN IM LẶNG QUÁ LÂU, GIEO THẲNG ═══════════════════════════════════
 # `check_sop` báo SOP mô tả NA067 mà app không sinh ra. Đào ra: `last_learning_activity_time`
 # lấy từ mốc hoạt động THẬT (điểm danh / bài tập / WOW), nên chỉ cần dữ liệu dày lên một chút
