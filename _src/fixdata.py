@@ -1907,8 +1907,25 @@ if _du:
     _lapPhieuThu(_rm, _phi, "Đóng đủ học phí", 1)
     _raiDot(_rm.get("enrollment_id"))
     _g88 = 1
-log.append("14octodecies. Dang ky: gieo %d ca cho qua han, %d ca du coc con treo, %d ca du tien chua mo onboarding"
-           % (_g60, _g87, _g88))
+# NA005 - don CHO da qua han xac nhan nhung CHUA den muc "de lau qua, nen huy" (NA060).
+# Cua so cua no hep: qua slaENR_pending_hours (24h) nhung chua qua slaENR_stale_hours (7 ngay),
+# va chua dong dong nao (dong roi thi thanh NA087). Truoc 07/08 khong ai gieo ca nay - no xanh
+# vi TINH CO co mot don roi dung vao cua so ay; doi mot nhip ngau nhien la SOP mo ta mot tinh
+# huong ma app khong con sinh ra, va check_sop bat dung. Nay gieo THANG, khong trong may nua.
+_g05 = 0
+_con = [e for e in _pend[2:]
+        if str(e.get("enrollment_id") or "") not in _obE
+        and code(e.get("enrollment_status")) == "pending"]
+if _con:
+    _e5 = _con[0]
+    _e5["enrollment_time"] = fmt(NOW - datetime.timedelta(days=3))
+    _e5["paid_amount"] = 0
+    _e5["remaining_amount"] = n(_e5.get("final_fee")) or n(_e5.get("total_fee"))
+    _e5["payment_status"] = eF("enum_payment_status", "unpaid")
+    _raiDot(_e5.get("enrollment_id"))
+    _g05 = 1
+log.append("14octodecies. Dang ky: gieo %d ca cho qua han, %d ca du coc con treo, %d ca du tien chua mo onboarding, %d ca cho qua han xac nhan (NA005)"
+           % (_g60, _g87, _g88, _g05))
 
 # ═══ 14octodecies-bis. NA032 - BUỔI WOW ĐÃ XÁC NHẬN MÀ QUA GIỜ HẸN (V9.47) ════════════
 # SOP mô tả tình huống này (HD3 NA032) và app CÓ luật cho nó, nhưng sau khi sinh lại dữ liệu thì

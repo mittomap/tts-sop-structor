@@ -376,7 +376,10 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .knbs{display:inline-flex;gap:4px;white-space:nowrap}
 .knb{display:inline-flex;align-items:center;gap:3px;background:var(--gray);border-radius:6px;
  padding:1px 5px;font-size:11.5px;font-weight:600;color:var(--text)}
-.knb i{font-style:normal;font-size:9.5px;font-weight:700;color:var(--muted);letter-spacing:.3px}
+
+/* Dùng đúng cỡ chữ đã có trong thang (10px) - thang càng nhiều bậc thì trang càng loạn, và
+   `_checkux` canh đúng chuyện đó: mỗi cỡ mới đẻ ra là một bậc mới không ai xin phép. */
+.knb i{font-style:normal;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.3px}
 .chip.red{background:var(--redb);color:#A32D2D}.chip.amber{background:var(--amberb);color:#854F0B}.chip.green{background:var(--greenb);color:#1E6A47}.chip.gray{background:var(--gray);color:#5A6675}.chip.blue{background:var(--blueb);color:#185FA5}
 .alert{display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid var(--line)}.alert:last-child{border-bottom:0}
 .alert .ab{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
@@ -3635,7 +3638,7 @@ var THEDEF={
   ["kq_hv","Học viên đã học xong","Đếm hồ sơ kết thúc khóa ở trạng thái hoàn thành, trong phạm vi bộ lọc đang chọn. Danh sách: bảng chi tiết cuối trang."],
   ["kq_thu","Đạt AIM · thi thử tại trung tâm","Tỷ lệ học viên có điểm Overall bài thi thử cuối khóa đạt hoặc vượt band mục tiêu. Em nào chưa có điểm không nằm trong mẫu số. Danh sách: bảng chi tiết cuối trang, cột Overall thử."],
   ["kq_that","Đạt AIM · kỳ thi IELTS thật","Tỷ lệ học viên có điểm Overall kỳ thi IELTS chính thức đạt hoặc vượt band mục tiêu. Thi nhiều lần thì tính theo cách chọn khai ở aimOfficialPick. Danh sách: bảng chi tiết cuối trang, cột Overall thật."],
-  ["kq_chua","Chưa đi thi thật","Đếm học viên đã học xong nhưng sổ kỳ thi IELTS thật chưa có lượt nào. Nhập bằng nút Nhập điểm thi thật ở đầu trang."]]},
+  ["kq_chua","Chưa đi thi thật","Đếm học viên đã học xong nhưng sổ kỳ thi IELTS thật chưa có lượt nào. Danh sách: bảng chi tiết cuối trang, cột Overall thật ghi \"chưa có điểm\". Nhập điểm bằng nút ở đầu trang."]]},
  banglop:{t:"Bảng lớp - một lớp",the:[
   ["bl_siso","Sĩ số","Số học viên đang học trên sức chứa của lớp. Danh sách: bảng học viên ngay dưới."],
   ["bl_atr","Chuyên cần (ATR)","Tỷ lệ buổi có mặt trên tổng buổi đã điểm danh của cả lớp, so với ngưỡng ATR ở Ngưỡng KPI. Muốn xem chi tiết: tab Điểm danh."],
@@ -6700,7 +6703,7 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
  }else{
   h+='<div class="fbar">';
   if(!embed){h+='<label style="font-size:12px;font-weight:700;color:#5A6675">Lớp</label><select class="sel" onchange="DDCLASS=this.value;DDSESS=null;reRender(CUR)">'+
-   cls.map(function(c){return '<option value="'+c.class_id+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id)+' - ['+lopLoai(c)+'] '+esc(c.class_name)+'</option>'}).join("")+'</select>'}
+   cls.map(function(c){return '<option value="'+c.class_id+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id)+''+(lopLa11(c)?' · 1-1':'')+' - '+esc(c.class_name)+'</option>'}).join("")+'</select>'}
   h+='<label style="font-size:12px;font-weight:700;color:#5A6675'+(embed?'':';margin-left:8px')+'">Buổi</label><select class="sel" id="ddSess" onchange="DDSESS=this.value;reRender(CUR)">';
   sessList.forEach(function(x){var has=rows("DL12").some(function(r){return r.session_id===x.id});h+='<option value="'+esc(x.id)+'"'+(x.id===sess?" selected":"")+'>'+esc(x.label)+(has?" ✓":"")+'</option>'});
   h+='</select></div>';
@@ -9806,7 +9809,7 @@ function renderBanglop(){
  var coDD={};srows("DL12").forEach(function(a){coDD[a.session_id]=1});
  var h='<div class="phead" data-tour="phead"><div><div class="t">Vận hành lớp · '+lopThe(lop)+esc(lop.class_name||cid)+'</div><div class="s">Buổi học · điểm danh · nhận xét · giao & chấm bài tập — tất cả cho lớp này ở một chỗ</div></div>'+
  '<div class="sp"><select class="sel" onchange="window.BLCLASS=this.value;window.DDSESS=null;window.BTSESS=null;reRender(CUR)">';
- cls.forEach(function(c){h+='<option value="'+c.class_id+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id)+' - ['+lopLoai(c)+'] '+esc(c.class_name)+'</option>'});
+ cls.forEach(function(c){h+='<option value="'+c.class_id+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id)+''+(lopLa11(c)?' · 1-1':'')+' - '+esc(c.class_name)+'</option>'});
  h+='</select></div></div>';
  /* ---- KPI riêng của lớp ---- */
  (function(){
@@ -9900,7 +9903,7 @@ function renderBanglop(){
    /* đảm bảo có buổi đang chọn */
    if(!ses.some(function(s){return s.session_id===window.DDSESS}))window.DDSESS=ses[0].session_id;
    /* dải THẺ BUỔI: gọn, chấm màu theo trạng thái, dấu ✓ khi đã ghi nhận xét */
-   h+='<div class="panel"><div class="ph"><b>Chọn buổi để điểm danh</b><span class="mut" style="font-size:11.5px">'+ses.length+' buổi · chấm màu = trạng thái · ✓ xanh = đã ghi nhận xét · ! đỏ = buổi còn nợ việc (rê chuột để biết nợ gì)</span></div><div class="pbody"><div class="sesstrip">';
+   h+='<div class="panel"><div class="ph"><b>Chọn buổi để điểm danh</b><span class="mut" style="font-size:11.5px">'+ses.length+' buổi · chấm màu = trạng thái · ✓ xanh = đã ghi nhận xét · ! đỏ = buổi còn việc chưa xong (rê chuột để biết việc gì)</span></div><div class="pbody"><div class="sesstrip">';
    ses.forEach(function(s){var st=ecode(s.session_status);
     var col=st==="completed"?"var(--green)":st==="in_progress"?"var(--amber)":st==="cancelled"?"var(--red)":"#B9C6D6";
     var noteDone=yesv(s.has_teacher_note)||!!String(s.teacher_note_summary||"").trim();
@@ -9969,12 +9972,13 @@ function renderBanglop(){
   /* Đầu ra CỦA CHÍNH LỚP NÀY. Anh Luân 06/08 hỏi *"hiện tại xem lớp đã hoàn thành ở đâu em"* -
      câu trả lời trước bản này là "không ở đâu cả": có màn NHẬP điểm, không có màn ĐỌC lại. */
   var tThu=aimTL(kqLop,"datThu"),tThat=aimTL(kqLop,"datThat");
-  h+='<div class="notebar"><i class="ti ti-target-arrow"></i><b>Đạt AIM</b> = điểm Overall đạt hoặc vượt band mục tiêu. Hai mốc: bài thi thử cuối khóa tại trung tâm và kỳ thi IELTS thật. Học viên chưa có điểm hiện "chưa có điểm" và không nằm trong mẫu số.</div>';
+  h+='<div class="notebar" data-tip="Hai mốc đo: bài thi thử cuối khóa tại trung tâm, và kỳ thi IELTS chính thức. Học viên chưa có điểm thì ô điểm ghi chưa có điểm và không nằm trong mẫu số của tỷ lệ.">'+
+   '<i class="ti ti-target-arrow"></i><b>Đạt mục tiêu</b> = điểm Overall đạt hoặc vượt band học viên đăng ký.</div>';
   h+=statStrip([
-   ["ti-users",kqLop.length,"Đã học xong","#3B82C4",tThu.mau+" em có điểm thi thử"],
+   ["ti-users",kqLop.length,"Đã học xong","#3B82C4",tThu.mau+" học viên có điểm thi thử"],
    ["ti-target-arrow",aimO(tThu),"Đạt AIM · thi thử",(tThu.pct!=null&&tThu.pct>=Math.round(kpiTh(/^AR$/,0.7)*100))?"#16A34A":"#E08A1E","mục tiêu ≥ "+Math.round(kpiTh(/^AR$/,0.7)*100)+"%","",aimG(tThu,"thi thử")],
-   ["ti-certificate",aimO(tThat),"Đạt AIM · thi thật",(tThat.pct!=null&&tThat.pct>=Math.round(kpiTh(/^AR$/,0.7)*100))?"#16A34A":"#E08A1E",tThat.mau?(tThat.mau+" em đã đi thi"):"chưa có ai đi thi","",aimG(tThat,"thi thật")],
-   ["ti-clock-question",kqLop.filter(function(r){return !r.lan}).length,"Chưa đi thi thật","#E08A1E","","",
+   ["ti-award",aimO(tThat),"Đạt AIM · thi thật",(tThat.pct!=null&&tThat.pct>=Math.round(kpiTh(/^AR$/,0.7)*100))?"#16A34A":"#E08A1E",tThat.mau?(tThat.mau+" học viên đã đi thi"):"chưa có ai đi thi","",aimG(tThat,"thi thật")],
+   ["ti-clock-exclamation",kqLop.filter(function(r){return !r.lan}).length,"Chưa đi thi thật","#E08A1E","","",
     "Học viên của lớp này đã học xong nhưng chưa có lượt thi IELTS thật nào trong sổ."]],"ketqua",
    ["kq_hv","kq_thu","kq_that","kq_chua"]);
   h+=kqBang(kqLop,"Điểm đầu ra của lớp này",true);
@@ -14612,10 +14616,12 @@ function renderKetqua(){
   if(f.loai==="nhom"&&r.l11)return false;
   return true});
  var h=pageHead("Điểm đầu ra từng học viên và tỷ lệ đạt AIM theo hai mốc: thi thử cuối khóa tại trung tâm và kỳ thi IELTS thật",
-  "",'<button class="btn primary" onclick="kqNhapThat()"><i class="ti ti-certificate"></i>Nhập điểm thi thật</button>');
- h+='<div class="notebar"><i class="ti ti-info-circle"></i><b>Đạt AIM</b> = điểm <b>Overall</b> đạt hoặc vượt <b>band mục tiêu</b> học viên đăng ký. '+
-  '<b>Thi thử</b> lấy kết quả buổi thi cuối khóa tại trung tâm (DL18); <b>thi thật</b> lấy kỳ thi IELTS chính thức (DL18b), học viên thi nhiều lần thì tính theo '+
-  '<b>'+esc(kqChonTen())+'</b>'+cfGear("aimOfficialPick")+'. Học viên chưa có điểm không nằm trong mẫu số của tỷ lệ.</div>';
+  "",'<button class="btn primary" onclick="kqNhapThat()"><i class="ti ti-award"></i>Nhập điểm thi thật</button>');
+ /* Câu đầu trang giữ trong 150 ký tự (luật `_checkaudit`): đoạn dài hơn thì người ta không đọc,
+    họ lướt qua. Phần giải thích chi tiết đưa vào chú thích rê chuột - ai cần thì có, ai không
+    cần thì không phải bước qua nó mỗi lần vào trang. */
+ h+='<div class="notebar" data-tip="Điểm thi thử lấy từ buổi thi cuối khóa tại trung tâm; điểm thi thật lấy từ kỳ thi IELTS chính thức. Học viên thi thật nhiều lần thì tính theo '+esc(kqChonTen())+'. Học viên chưa có điểm không nằm trong mẫu số của tỷ lệ.">'+
+  '<i class="ti ti-info-circle"></i><b>Đạt mục tiêu</b> = điểm Overall đạt hoặc vượt band học viên đăng ký, đo ở hai mốc.'+cfGear("aimOfficialPick")+'</div>';
 
  /* ---- bộ lọc ---- */
  var gvs={},cns={},khs={};
@@ -14635,13 +14641,13 @@ function renderKetqua(){
  var tThu=aimTL(view,"datThu"),tThat=aimTL(view,"datThat");
  var chuaThi=view.filter(function(r){return !r.lan}).length;
  h+=statStrip([
-  ["ti-users",view.length,"Học viên đã học xong","#3B82C4",tThu.mau+" em đã có điểm thi thử","",
+  ["ti-users",view.length,"Học viên đã học xong","#3B82C4",tThu.mau+" học viên đã có điểm thi thử","",
    "Đếm hồ sơ kết thúc khóa có trạng thái hoàn thành, trong phạm vi bộ lọc đang chọn."],
   ["ti-target-arrow",aimO(tThu),"Đạt AIM · thi thử tại trung tâm",(tThu.pct!=null&&tThu.pct>=Math.round(kpiTh(/^AR$/,0.7)*100))?"#16A34A":"#E08A1E",
    "mục tiêu ≥ "+Math.round(kpiTh(/^AR$/,0.7)*100)+"%","",aimG(tThu,"thi thử")],
-  ["ti-certificate",aimO(tThat),"Đạt AIM · kỳ thi IELTS thật",(tThat.pct!=null&&tThat.pct>=Math.round(kpiTh(/^AR$/,0.7)*100))?"#16A34A":"#E08A1E",
-   tThat.mau?(tThat.mau+" em đã đi thi"):"chưa có ai đi thi","",aimG(tThat,"thi thật")],
-  ["ti-clock-question",chuaThi,"Chưa đi thi thật",chuaThi?"#E08A1E":"#16A34A",chuaThi?"chưa có kết quả chính thức":"đã có kết quả hết","",
+  ["ti-award",aimO(tThat),"Đạt AIM · kỳ thi IELTS thật",(tThat.pct!=null&&tThat.pct>=Math.round(kpiTh(/^AR$/,0.7)*100))?"#16A34A":"#E08A1E",
+   tThat.mau?(tThat.mau+" học viên đã đi thi"):"chưa có ai đi thi","",aimG(tThat,"thi thật")],
+  ["ti-clock-exclamation",chuaThi,"Chưa đi thi thật",chuaThi?"#E08A1E":"#16A34A",chuaThi?"chưa có kết quả chính thức":"đã có kết quả hết","",
    "Học viên đã học xong nhưng sổ kỳ thi IELTS thật chưa có lượt thi nào. Nhập bằng nút Nhập điểm thi thật ở đầu trang."]],"ketqua");
 
  /* ---- bảng bóc tách theo lát cắt ---- */
@@ -14653,19 +14659,30 @@ function renderKetqua(){
   '<th style="width:90px">Học xong</th><th style="width:160px">Đạt AIM · thi thử</th><th style="width:160px">Đạt AIM · thi thật</th></tr></thead><tbody>';
  if(!nh.length)h+='<tr><td class="empty" colspan="4">Chưa có hồ sơ đầu ra nào khớp bộ lọc.</td></tr>';
  nh.forEach(function(g){
-  h+='<tr><td><b>'+esc(g.t)+'</b></td><td>'+g.ds.length+'</td>'+
-   '<td>'+pctT(g.thu.dat,g.thu.mau,"em có đủ mục tiêu và điểm thi thử")+' <span class="mut" style="font-size:11.5px">'+g.thu.dat+'/'+g.thu.mau+'</span></td>'+
-   '<td>'+pctT(g.that.dat,g.that.mau,"em có đủ mục tiêu và điểm thi thật")+' <span class="mut" style="font-size:11.5px">'+g.that.dat+'/'+g.that.mau+'</span></td></tr>'});
+  /* Bấm một nhóm là LỌC XUỐNG bảng chi tiết ngay dưới - đó đúng là việc người ta muốn làm khi
+     nhìn thấy một nhóm có tỷ lệ thấp. Trước bản này dòng nhóm bấm vào không có gì xảy ra;
+     `_checkbam` gọi đó là "IM LẶNG" và nó đúng: một dòng trong bảng mà bấm không phản hồi thì
+     người dùng không biết là mình bấm hụt hay app hỏng. */
+  var _dang=(window.KQNHOM===g.k);
+  h+='<tr class="clk'+(_dang?" on":"")+'" onclick="window.KQNHOM='+(_dang?"null":"\'"+esc(g.k)+"\'")+';reRender(CUR)" data-tip="'+(_dang?"Bấm lại để bỏ lọc":"Bấm để lọc bảng chi tiết bên dưới còn riêng nhóm này")+'">'+
+   '<td><b>'+esc(g.t)+'</b></td><td>'+g.ds.length+'</td>'+
+   '<td>'+pctT(g.thu.dat,g.thu.mau,"học viên có đủ mục tiêu và điểm thi thử")+' <span class="mut" style="font-size:11.5px">'+g.thu.dat+'/'+g.thu.mau+'</span></td>'+
+   '<td>'+pctT(g.that.dat,g.that.mau,"học viên có đủ mục tiêu và điểm thi thật")+' <span class="mut" style="font-size:11.5px">'+g.that.dat+'/'+g.that.mau+'</span></td></tr>'});
  h+='</tbody></table></div></div>';
 
  /* ---- bảng chi tiết từng học viên ---- */
- h+=kqBang(view,"Chi tiết từng học viên");
+ var chiTiet=view, tenNhom="";
+ if(window.KQNHOM){
+  var _g=nh.filter(function(x){return x.k===window.KQNHOM})[0];
+  if(_g){chiTiet=_g.ds;tenNhom=_g.t}else window.KQNHOM=null}
+ h+=kqBang(chiTiet,tenNhom?("Chi tiết - "+tenNhom):"Chi tiết từng học viên",false,
+  tenNhom?('<button class="btn sm" onclick="window.KQNHOM=null;reRender(CUR)"><i class="ti ti-x"></i>Bỏ lọc nhóm</button>'):"");
  return h}
 
 /* Bảng chi tiết dùng chung cho trang Kết quả đầu ra và cho tab trong Vận hành lớp - một bảng,
    hai chỗ gọi. Chép làm hai là hai chỗ để lệch. */
-function kqBang(ds,tieude,anLop){
- var h='<div class="panel"><div class="ph"><b>'+esc(tieude)+'</b><span class="mut" style="font-size:11.5px">'+ds.length+' học viên · bấm một dòng để xem lịch sử thi</span></div>'+
+function kqBang(ds,tieude,anLop,nutPhai){
+ var h='<div class="panel"><div class="ph"><b>'+esc(tieude)+'</b><span class="mut" style="font-size:11.5px">'+ds.length+' học viên · bấm một dòng để xem lịch sử thi</span>'+(nutPhai?('<div class="mini">'+nutPhai+'</div>'):"")+'</div>'+
   '<div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th>'+(anLop?"":'<th>Lớp</th>')+
   '<th style="width:70px">Mục tiêu</th><th style="width:170px">Thi thử · 4 kỹ năng</th><th style="width:100px">Overall thử</th>'+
   '<th style="width:170px">Thi thật · 4 kỹ năng</th><th style="width:120px">Overall thật</th></tr></thead><tbody>';
@@ -14700,18 +14717,18 @@ function kqMo(sid){
  r.ls.forEach(function(x){h+=dong("Thi thật lần "+(x.attempt_no||"?"),x.exam_date,[x.listening,x.reading,x.writing,x.speaking],x.overall,r.chon&&x.exam_id===r.chon.exam_id)});
  h+='</tbody></table></div>';
  if(r.ls.length>1)h+='<div class="fhint" style="margin:8px 0 0">Dòng in đậm là lượt đang được tính vào tỷ lệ đạt AIM ('+esc(kqChonTen())+') - đổi cách chọn trong Cài đặt.</div>';
- h+='<div class="dact"><button class="btn primary" onclick="kqNhapThat(\''+esc(sid)+'\')"><i class="ti ti-certificate"></i>Thêm lượt thi thật</button>'+
+ h+='<div class="dact"><button class="btn primary" onclick="kqNhapThat(\''+esc(sid)+'\')"><i class="ti ti-award"></i>Thêm lượt thi thật</button>'+
   '<button class="btn" onclick="openHoso(\''+esc(sid)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button></div></div>';
  openDrawer("Kết quả đầu ra",h)}
 
 function kqNhapThat(sid){
  if(chanAct("kq_that"))return;
  var cands=srows("DL18").filter(function(x){return isc(x.student_status,"completed")});
- var h='<div class="dcard"><h4><i class="ti ti-certificate"></i>Nhập điểm kỳ thi IELTS thật</h4>';
+ var h='<div class="dcard"><h4><i class="ti ti-award"></i>Nhập điểm kỳ thi IELTS thật</h4>';
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Điểm của kỳ thi IELTS chính thức (IDP / British Council), không phải bài thi thử cuối khóa. Overall hệ thống tự tính từ 4 kỹ năng theo mốc 0.5.</div>';
  h+='<div class="fld"><label>Học viên <i>*</i></label><select id="kt_sid">'+
   cands.map(function(x){return '<option value="'+esc(x.student_id)+'"'+(sid===x.student_id?" selected":"")+'>'+esc((x.student_id_name||x.student_id)+" - "+(x.class_id_name||x.class_id||""))+'</option>'}).join("")+'</select></div>';
- h+='<div class="fld"><label>Ngày thi <i>*</i></label><input id="kt_date" type="date"></div>';
+ h+='<div class="fld"><label>Ngày thi <i>*</i></label><input id="kt_date" type="date" value="'+esc(_isoP(new Date()))+'"></div>';
  ["l|Listening","r|Reading","w|Writing","s|Speaking"].forEach(function(x){var p=x.split("|");
   h+='<div class="fld"><label>'+p[1]+'</label><input id="kt_'+p[0]+'" type="number" step="0.5" min="0" max="9" placeholder="vd 6.5"></div>'});
  h+='<div class="fld full"><label>Ghi chú</label><input id="kt_note" placeholder="vd: thi lại để nâng band Writing"></div>';
@@ -17345,7 +17362,12 @@ var TOURS={
   {p:"buoihoc",sel:'@txt:Chờ ghi nhận xét',t:"Nhắc giáo viên ghi nhận xét",d:"Buổi dạy xong mà quá hạn chưa có nhận xét sẽ hiện đỏ ở đây. Đây là việc học vụ phải đốc thúc hằng tuần.",hint:"Bấm chip 'Chờ ghi nhận xét' để lọc, rồi ghi nhận xét cho một buổi trong danh sách.",chk:function(){return (window.TOURB&&rows("DL11").filter(function(x){return bhState(x).note}).length>(window.TOURB.nx||0))}},
   {p:"hocvien",sel:'@txt:Nguy cơ',t:"Học viên nguy cơ",d:"Lọc nhanh những học viên vắng nhiều hoặc tiến bộ chậm để gọi hỏi thăm trước khi phụ huynh phàn nàn.",hint:"Bấm chip lọc 'Nguy cơ', mở một học viên rồi ghi lần chăm."},
   {p:"cskh",sel:'@man',t:"Khảo sát và phản hồi",d:"Gửi khảo sát định kỳ theo lớp, tiếp nhận góp ý, xử lý khiếu nại. Điểm hài lòng thấp sẽ tự bật việc follow-up.",hint:"Xem tab Khảo sát."},
-  {p:"baoluu",sel:'@man',t:"Giữ chân học viên muốn nghỉ",d:"Học viên xin bảo lưu hoặc có ý bỏ học nằm ở đây - gọi giữ chân, hẹn ngày quay lại, hoặc chốt bảo lưu có hạn.",hint:"Xong một ngày của học vụ!"}]},
+  {p:"baoluu",sel:'@man',t:"Giữ chân học viên muốn nghỉ",d:"Học viên xin bảo lưu hoặc có ý bỏ học nằm ở đây - gọi giữ chân, hẹn ngày quay lại, hoặc chốt bảo lưu có hạn.",hint:"Bấm Tiếp theo - còn một bước cuối khóa."},
+  /* AC2 - trang Kết quả đầu ra sinh ra 07/08 theo yêu cầu của Trưởng phòng ACA. Trang mới mà
+     không có bài hướng dẫn nào đi qua thì người nhận bàn giao không biết nó tồn tại;
+     `_checktour` canh đúng chuyện đó và nó đã đỏ ngay lượt verify đầu tiên sau khi em dựng. */
+  {p:"ketqua",sel:'@bstats',t:"Lớp đã học xong ra kết quả thế nào",d:"Hai tỷ lệ đạt mục tiêu đứng cạnh nhau: theo bài thi thử cuối khóa tại trung tâm, và theo kỳ thi IELTS chính thức. Bóc được theo giảng viên, theo lớp, theo chi nhánh và theo lớp 1-1 hay lớp nhóm.",hint:"Bấm Theo giảng viên để xem lớp của ai đang ra kết quả tốt nhất."},
+  {p:"ketqua",sel:'@man',t:"Điểm bốn kỹ năng của từng học viên",d:"Bảng dưới cho từng học viên: mục tiêu, bốn kỹ năng và Overall ở cả hai mốc thi. Bấm một dòng mở lịch sử thi - ai thi lại nhiều lần thì thấy đủ các lần.",hint:"Xong một ngày của học vụ!"}]},
  tn_giaovien:{lv:"trainghiem",role:"Giáo viên",t:"Một ngày của Giáo viên",ic:"ti-chalkboard",d:"5 bước - dạy, điểm danh, chấm bài",steps:[
   {p:"hoctap",sel:'@man',t:"Hôm nay bạn dạy gì",d:"Vào app là thấy ngay buổi dạy hôm nay, chủ đề buổi, bài tập sẽ giao và lời dặn từ giáo án khóa.",hint:"Xem thẻ buổi học của bạn."},
   {p:"banglop",sel:'@txt:Buổi học & điểm danh',t:"Vào lớp và điểm danh",d:"Bấm Bắt đầu lớp để mở cổng điểm danh. Vắng có phép hay không phép đều ghi rõ, vắng phải ghi lý do.",hint:"Bấm tab 'Buổi học & điểm danh' của lớp, đánh dấu vài học viên rồi Lưu buổi học."},
@@ -18877,6 +18899,11 @@ function qaKhoHeThong(){
  return K}
 /* Nghĩa MẶC ĐỊNH nằm trong mã; trung tâm sửa/thêm thì bản của họ đè lên (config.tudien). */
 var QATUDIENDEF=[
+ /* AIM giữ nguyên trên màn chứ không dịch ra tiếng Việt: đây là từ NHÀ MÌNH ĐANG DÙNG - Trưởng
+    phòng ACA gọi điện hỏi "tỷ lệ đạt AIM" chứ không hỏi "tỷ lệ đạt band mục tiêu". Đổi chữ trong
+    app thành một từ đúng hơn nhưng không ai nói ngoài đời là bắt người dùng dịch ngược mỗi lần
+    đọc. Việc phải làm là ghi nó vào từ điển để người mới tra được. */
+ ["AIM","band muc tieu dau ra","Band điểm học viên đăng ký nhắm tới khi vào học (ghi ở cột target_band). ĐẠT AIM = điểm Overall của học viên đạt hoặc vượt band đó. App đo hai mốc: điểm bài thi thử cuối khóa tại trung tâm, và điểm kỳ thi IELTS chính thức.","Menu > Chặng CSKH & Kết thúc > Kết quả đầu ra & AIM","go('ketqua')"],
  ["WOW","buổi wow 1-1 kèm riêng","Buổi kèm RIÊNG 1 thầy - 1 trò, nằm trong gói học viên đã mua (mỗi gói có một số lượt gọi là quota). Dùng để chữa đúng kỹ năng học viên đang yếu, tách hẳn khỏi buổi học lớp. Đặt buổi thì trừ quota; hết quota phải được duyệt cấp thêm. Giáo viên WOW phải xác nhận lịch, bấm mốc giờ vào - ra, và ghi nội dung sau buổi.","Menu > C2 Đang học > Buổi WOW 1-1","go('wow')"],
  ["SOP","standard operating procedure quy trinh chuan","Bộ quy trình chuẩn của trung tâm: mỗi việc làm theo thứ tự nào, ai làm, trong bao lâu. App này là SOP chạy được - mọi cảnh báo và hạn giờ đều lấy từ đó.","Cài đặt > Ngưỡng & SLA (CH2)","window.SETTAB='ch2';go('settings')"],
  ["SLA","service level agreement han xu ly","Hạn thời gian cam kết cho một việc: gọi khách mới trong bao lâu, chấm bài trong bao lâu, xử khiếu nại trong bao lâu. Quá hạn là app tô đỏ và đẩy vào hàng chờ. Mọi mốc SLA sửa được ở Cài đặt.","Cài đặt > Ngưỡng & SLA (CH2)","window.SETTAB='ch2';go('settings')"],
@@ -21640,7 +21667,7 @@ var NAVTREE=[
     Thứ tự các mục con xếp ĐÚNG THỨ TỰ THANH TAB của hub, để menu và màn hình đọc như nhau. */
  {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","banglop","giaoan","cskh","khaosat","ghinhan","khieunai","hoctap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
- {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","magioithieu"]},
+ {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","ketqua","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
     thẩm quyền chứ không thuộc chặng nào. Duyệt nghỉ trước đây nằm lẫn trong màn Điểm danh nên
     học vụ phải mò mới thấy. */
@@ -21758,7 +21785,7 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
 var NAVPHANG=[
  {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
  {g:"Lớp học & Giảng dạy",items:["xeplop","banglop","giaoan","hoctap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
- {g:"Chăm sóc & Sau khóa",items:["cskh","khaosat","ghinhan","khieunai","baoluu","ketthuc","magioithieu"]}];
+ {g:"Chăm sóc & Sau khóa",items:["cskh","khaosat","ghinhan","khieunai","baoluu","ketthuc","ketqua","magioithieu"]}];
 function navCayV5(){
  if(arcMode()==="chang")return NAVTREE;
  var out=[],xong=false;
@@ -22725,6 +22752,10 @@ DOORS = {
  "DL16":["fbClassifySave","fbResolveSave","fbToComplaintSave","ghSave","ghToKN","hvFeedbackSave","hvRateSes"],
  "DL17":["fbToComplaintSave","ghToKN","knAddSave","knUpd"],
  "DL18":["bkLuuKetQua","bkLuuMoiHoc","ktFollowSave","ktGenSave","ktInvite","ktMissSave","ktResultSave","ktTestiSave","rfNeed"],
+ # DL18b - ky thi IELTS that (AC2). Chi MOT cua ghi, va no di qua chanAct("kq_that"): theo anh
+ # Luan chot 06/08 chi Hoc vu va TP ACA duoc nhap. Diem thi that la du lieu doi ngoai, sai mot
+ # con so la sai ca chi so dau ra cua trung tam.
+ "DL18b":["kqNhapThatSave"],
  "DL20":["hwbSave","sesSave"],
  "DL21":["gaSave"],
  "DL23":["hvReq","tkNewSave"],

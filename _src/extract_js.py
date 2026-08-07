@@ -8,14 +8,24 @@ nhan ban giao ma sua `gen_v5.py` xong se KHONG CHAY DUOC bo kiem nao, tuc la mat
 duy nhat cua du an. Do la lo hong ban giao, khong phai chuyen nho.
 
 Chay:  python3 extract_js.py [duong-dan-thu-muc-chua-HTML]
-Mac dinh lay thu muc cha cua _src (dung voi bo cuc repo hien tai).
+Mac dinh: CUNG CHO voi gen_v5.py, tuc la ngay canh script (_src).
+
+BAY DA CAN HAI LAN (lan hai 07/08) - VI SAO MAC DINH PHAI KHOP `gen_v5.py`:
+Truoc ban nay hai script co HAI mac dinh KHAC NHAU: `gen_v5.py` ghi vao `_src/`, con script
+nay doc tu THU MUC CHA (goc repo). Chay tay `python3 gen_v5.py && python3 extract_js.py` la
+dung xay ban moi vao `_src/` roi trich ban CU o goc repo de len `_APP.js` - moi bo kiem sau
+do do BAN CU ma van in ra ket qua nhu that. `verify.sh` khong dinh vi no `export ITTS_OUT`
+nen hai ben cung mot cho; chi nguoi chay tay moi dinh, va dinh trong im lang.
+07/08 no lam em doc nham ket qua cua bon bo kiem, tuong da va xong trong khi ban do chua he
+duoc dung lai. Nay hai mac dinh KHOP NHAU - muon tro ban o goc repo thi phai noi ro
+`ITTS_OUT=<goc>`, va noi ro thi khong con am tham nua.
 """
 import os
 import re
 import sys
 
 SD = os.path.dirname(os.path.abspath(__file__))
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("ITTS_OUT") or os.path.dirname(SD)
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("ITTS_OUT") or SD
 
 # _APP6.js la than cua BAN V6. Truoc day khong trich no, nen 20/21 bo kiem chi soi ban v5 -
 # ban v6 duoc giao ma chua bo kiem nao chay qua. Anh Luan 01/08: "van de la e build v6 da chuan
