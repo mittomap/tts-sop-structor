@@ -109,11 +109,18 @@ chỉnh thì giữ nguyên.
 nó có nghĩa là "hỏng rồi" - và anh ngồi chờ một thứ không bao giờ tới. Đây là lỗi giao tiếp,
 không phải lỗi kỹ thuật, nhưng cái giá là thời gian THẬT của anh.
 
+**ĐỪNG TRÔNG VÀO NHÃN VIỆC CHẠY - ANH KHÔNG THẤY NÓ.** Đã thử 07/08: em bật `in_progress` và
+đổi `activeForm` theo từng bước, anh chụp màn hình lại - chỉ có **một dấu sao xoay, không một
+chữ nào**. Nhãn ấy không tới được màn hình anh. Thứ DUY NHẤT tới được anh là **chữ em viết ra
+trong khung chat**.
+
 **Luật:**
-- **Luôn có đúng một việc ở trạng thái `in_progress`** trong suốt lúc làm. Bắt đầu việc gì thì
-  bật NGAY, trước khi gõ dòng đầu tiên - không phải bật xong mới nhớ ra.
-- **Đổi nhãn `activeForm` theo từng bước**, dạng `AC4 (3/5): ...`. Một cái nhãn đứng yên 20 phút
-  thì cũng là im lìm - anh không phân biệt được "đang chạy" với "treo".
+- **Viết một dòng trạng thái NGẮN vào khung chat trước mỗi bước dài**, không gom hết vào một
+  bản báo cáo ở cuối. Dạng: *"Đang dựng lại pipeline (~2 phút)"*, *"Chạy verify trọn bộ, 34
+  phút, xong em báo"*. Anh đọc dòng đó là biết em còn sống.
+- **Đừng làm 20 phút liền rồi mới nói một lần.** Cắt việc thành khúc ngắn, mỗi khúc một dòng.
+- Vẫn bật `in_progress` + `activeForm` (có ích cho phiên khác), nhưng **coi nó là phụ** - nó
+  không thay được chữ viết ra.
 - Việc dài (dựng bộ kiểm, chạy verify 34 phút) thì **nói trước là sẽ mất bao lâu**, rồi báo lại
   khi xong. Đừng để anh tự đoán.
 - Chưa xong mà phải dừng thì **khai thẳng là chưa xong và đang vướng ở đâu** - đừng im rồi để
