@@ -5192,7 +5192,7 @@ function BANGVIEC(){
      ["ti-user-question",(function(){var t=new Date();return SE.filter(function(x){var d=pvnd(x.session_date);
         return d&&sameDay(d,t)&&!isc(x.session_status,"cancelled")&&!String(x.teacher_id||"").trim()}).length})(),
       "Buổi hôm nay chưa có giáo viên","#DB2777","không xếp kịp là phải huỷ buổi","goHT('gvdp')"],
-     ["ti-chart-line",S.filter(function(x){return /at_risk|off_track/.test(ecode(x.academic_progress_status))}).length,
+     ["ti-chart-line",S.filter(stuAca).length,
       "Học viên đuối học thuật","#6B4FA0","điểm tụt - dấu hiệu sớm nhất","goRisk()"],
      ["ti-clock-exclamation",SE.filter(function(x){return isc(x.session_status,"completed")&&
         !(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())}).length,
@@ -5531,7 +5531,7 @@ function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sa
 function deptSection(){var L=srows("DL02"),S=srows("DL09"),E=srows("DL06"),pay=srows("DL07"),HW=srows("DL13"),T=srows("DL03"),W=srows("DL14"),KN=srows("DL17"),FB=srows("DL16"),SV=srows("DL15"),OB=srows("DL08"),ATT=srows("DL12");
  function cnt(a,fn){return a.filter(fn).length}function pct(a,b){return b?Math.round(a/b*100)+"%":"-"}
  var conv=cnt(L,function(r){return isc(r.lead_status,"converted")});var cvr=L.length?Math.round(conv/L.length*100):0;
- var risk=cnt(S,function(r){return/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status))});
+ var risk=cnt(S,stuRisk);   /* cùng một hàm với mọi chỗ khác - xem chú thích ở bảng HV trong lớp */
  var sdate={};rows("DL11").forEach(function(s){sdate[s.session_id]=s.session_date});
  var att30=ATT.filter(function(a){return in30(sdate[a.session_id])});
  var attP=cnt(att30,function(a){return/on_time|late|present/.test(ecode(a.attendance_status))});
@@ -5599,7 +5599,7 @@ function deptSection(){var L=srows("DL02"),S=srows("DL09"),E=srows("DL06"),pay=s
   h+='</div></div>'});
  return h+'</div>'}
 function alertsHTML(){var out=[];
- srows("DL09").forEach(function(r){var a=/at_risk|off_track/.test(ecode(r.attendance_progress_status)),b=/at_risk|off_track/.test(ecode(r.academic_progress_status));
+ srows("DL09").forEach(function(r){var a=stuAtt(r),b=stuAca(r);
   if(a||b)out.push(["red","ti-user-exclamation",r.student_id+" - "+r.full_name,(a?"Chuyên cần ":"")+(b?"Học thuật":"")+" nguy cơ"])});
  srows("DL06").forEach(function(r){if(num(r.discount_amount)>=1000000&&!r.discount_approved_by)out.push(["amber","ti-discount",r.enrollment_id+" - "+(r.student_id_name||r.student_id),"Chiết khấu "+money(r.discount_amount)+" chờ duyệt"])});
  srows("DL06").forEach(function(r){if(num(r.remaining_amount)>=5000000)out.push(["amber","ti-cash",(r.student_id_name||r.student_id),"Còn nợ "+money(r.remaining_amount)])});
@@ -5610,7 +5610,7 @@ function alertsHTML(){var out=[];
 function roleTasks(role){var out=[];
  function add(id,title,sub,na,open){out.push({id:id,title:title,sub:sub,na:na,cls:naCls(na),open:open})}
  if(role==="sales"||role==="smanager"||role==="ceo"||role==="all"){scopeList("DL02",rows("DL02")).forEach(function(r){if(r.next_action&&/^(new|contacted|considering|no_response)/.test(ecode(r.lead_status)))add(r.lead_id,r.full_name,"SĐT "+r.phone_number+" - "+elabel(r.lead_status),naLive("DL02",r),{t:"lead",id:r.lead_id})})}
- if(role==="academic"||role==="amanager"||role==="ceo"||role==="all"){rows("DL09").forEach(function(r){if(/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status)))add(r.student_id,r.full_name,"CC: "+elabel(r.attendance_progress_status)+" - HT: "+elabel(r.academic_progress_status),r.next_action||"Theo dõi và can thiệp học viên nguy cơ.",{t:"hoso",sid:r.student_id})})}
+ if(role==="academic"||role==="amanager"||role==="ceo"||role==="all"){rows("DL09").forEach(function(r){if(stuRisk(r))add(r.student_id,r.full_name,"CC: "+elabel(r.attendance_progress_status)+" - HT: "+elabel(r.academic_progress_status),r.next_action||"Theo dõi và can thiệp học viên nguy cơ.",{t:"hoso",sid:r.student_id})})}
  if(role==="teacher"||role==="all"){scopeList("DL13",rows("DL13")).forEach(function(r){if(hwSubmitted(r)&&!hwGraded(r))add(r.homework_id,r.student_name+" - "+r.homework_title,"Kỹ năng "+elabel(r.skill)+" - "+(hwLate(r)?"đã nộp trễ, chờ chấm":"đã nộp, chờ chấm"),naLive("DL13",r)||"Chấm bài và gửi nhận xét trong 48h.",{t:"hoso",sid:r.student_id})})}
  if(role==="wow"||role==="all"){scopeList("DL03",rows("DL03")).forEach(function(r){if(/pending/.test(ecode(r.test_status)))add(r.test_booking_id,"Test "+(r.lead_id_name||r.lead_id),"Ngày "+r.test_date+" - "+elabel(r.test_format),naLive("DL03",r)||"Chấm bài test đầu vào, trả kết quả.",{t:"edit",page:"test",id:r.test_booking_id})});
   scopeList("DL14",rows("DL14")).forEach(function(r){if(/booked|scheduled/.test(ecode(r.wow_status)))add(r.wow_id,r.student_name,"Buổi WOW "+elabel(r.wow_session_type)+" - "+r.wow_session_date,naLive("DL14",r)||"Chuẩn bị và thực hiện buổi WOW.",{t:"hoso",sid:r.student_id})})}
@@ -9998,6 +9998,16 @@ function renderBanglop(){
  var cls=srows("DL10"),cid=window.BLCLASS||(cls[0]&&cls[0].class_id),lop=find("DL10","class_id",cid)||{};
  window.BLCLASS=cid;
  var tab=window.BLTAB||"buoi";
+ /* ═══ BUỔI NÀO ĐÃ CÓ ĐIỂM DANH - TÍNH MỘT LẦN, DÙNG CHUNG ══════════════════════════════
+    Trước bản này bản đồ ấy khai bằng `var` BÊN TRONG khối tính mấy ô "Cần xử lý cho lớp
+    này", mà viên buổi phía dưới lại đọc nó - ngoài phạm vi, nên tab "Buổi học & điểm danh"
+    ném ReferenceError và KHÔNG VẼ RA GÌ. Tab chính của trang Vận hành lớp chết câm.
+    Bộ kiểm `_checkdem.js` (viết hôm nay để canh chuyện "thẻ đếm N mà bảng không có dấu
+    nào") bắt được ngay ở lượt chạy ĐẦU TIÊN - nó là bộ kiểm duy nhất mở tab này ra. Bài
+    học: một tab không có bộ kiểm nào bấm vào thì hỏng bao lâu cũng không ai biết.
+    Khai Ở ĐẦU HÀM: cả ô đếm lẫn viên buổi đều đọc nó, mà ô đếm chạy trước - khai ở giữa
+    thì `var` được kéo lên nhưng GIÁ TRỊ thì chưa, và ô đếm đọc phải undefined. */
+ var coDD={};srows("DL12").forEach(function(a){coDD[a.session_id]=1});
  var h='<div class="phead" data-tour="phead"><div><div class="t">Vận hành lớp · '+lopThe(lop)+esc(lop.class_name||cid)+'</div><div class="s">Buổi học · điểm danh · nhận xét · giao & chấm bài tập — tất cả cho lớp này ở một chỗ</div></div>'+
  '<div class="sp"><select class="sel" onchange="window.BLCLASS=this.value;window.DDSESS=null;window.BTSESS=null;reRender(CUR)">';
  cls.forEach(function(c){h+='<option value="'+c.class_id+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id)+' - ['+lopLoai(c)+'] '+esc(c.class_name)+'</option>'});
@@ -10028,7 +10038,6 @@ function renderBanglop(){
      LÀM GÌ". Nên mỗi ô là một số ĐẾM VIỆC CÒN TỒN, và bấm được để đi thẳng tới chỗ làm. */
   (function(){
    var ses=srows("DL11").filter(function(x){return x.class_id===cid});
-   var coDD={};att.forEach(function(a){coDD[a.session_id]=1});
    /* Buổi ĐÃ DẠY XONG mà không có một dòng điểm danh nào. Buổi chưa tới thì chưa phải việc. */
    var chuaDD=ses.filter(function(x){var st=bhState(x);return st.done&&!coDD[x.session_id]}).length;
    /* Quá hạn ghi nhận xét - dùng chính bhState().noteOver của app (ngưỡng CH2 slaTeacherNote_hours). */
@@ -10140,8 +10149,20 @@ function renderBanglop(){
    var rate=att.length?Math.round(pr/att.length*100)+"%":"-";
    var hw=srows("DL13").filter(function(x){return x.student_id===e.student_id&&x.class_id===cid});
    var gr=hw.filter(hwGraded).length;
-   var risk=/at_risk|off_track/.test(ecode(s.attendance_progress_status)+" "+ecode(s.academic_progress_status));
-   h+='<tr><td>'+esc(e.student_id)+'</td><td>'+nguoiLnk(e.student_id,s.full_name,"-")+'</td><td>'+rate+'</td><td>'+gr+'/'+hw.length+'</td><td><span class="chip '+(risk?"red":"green")+'">'+(risk?"Nguy cơ":"Ổn định")+'</span></td>'+
+   /* ═══ MỘT ĐỊNH NGHĨA NGUY CƠ, KHÔNG HAI ═══════════════════════════════════════════════
+      Anh Luân 07/08, đúng cùng một bệnh với dải thẻ buổi hôm qua: *"báo 2 học viên nguy cơ
+      mà a chẳng thấy đâu"*. Thẻ ở đầu trang đếm bằng `stuRisk()` - CỜ NGƯỜI GẮN **hoặc**
+      MÁY THẤY vượt ngưỡng (vắng không phép >= thresholdAtRisk_absences, thiếu bài >=
+      thresholdAtRisk_hw_missing), trừ những em học vụ đã tạm gạt có lý do. Bảng dưới thì đọc
+      THẲNG hai cột trạng thái - tức là chỉ thấy cờ người gắn. Em nào máy thấy mà chưa ai gắn
+      cờ thì vào thẻ mà không vào bảng: thẻ ghi 2, bảng mười dòng "Ổn định".
+      Con số không sai, cái sai là NÓ KHÔNG DẪN TỚI ĐÂU. Nay bảng hỏi đúng hàm mà thẻ hỏi,
+      và nói luôn vì sao - máy thấy hay người gắn - để người đọc biết có cần xác nhận lại. */
+   var risk=stuRisk(s);var vsao=risk?stuRiskReasons(s).join(" · "):"";
+   var mayThay=risk&&!isRisk(s.attendance_progress_status)&&!isRisk(s.academic_progress_status);
+   h+='<tr><td>'+esc(e.student_id)+'</td><td>'+nguoiLnk(e.student_id,s.full_name,"-")+'</td><td>'+rate+'</td><td>'+gr+'/'+hw.length+'</td>'+
+    '<td><span class="chip '+(risk?"red":"green")+'"'+(vsao?' data-tip="'+esc(vsao)+'"':'')+'>'+(risk?"Nguy cơ":"Ổn định")+'</span>'+
+    (mayThay?' <span class="chip amber" data-tip="Máy đếm thấy vượt ngưỡng nhưng chưa ai gắn cờ chính thức - vào hồ sơ xác nhận rồi gắn.">máy thấy</span>':'')+'</td>'+
     '<td><button class="btn sm" onclick="openHoso(\''+esc(e.student_id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button></td></tr>'});
   h+='</tbody></table></div></div>';
  }
@@ -10922,7 +10943,7 @@ function renderBaocao(){
 function baocaoThan(_xemAi){
  if(dsLevel("baocao")==="none")return dsDeny("Báo cáo & KPI");
  var L=srows("DL02"),S=srows("DL09"),E=srows("DL06");
- var risk=S.filter(function(r){return/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status))}).length;
+ var risk=S.filter(stuRisk).length;   /* cùng một hàm với trang Học viên nguy cơ và thẻ của lớp */
  /* V9.99w - TRANG NÀY LÀ CỦA AI. Ba mức phạm vi thì ba câu khác nhau, nói thẳng trên tiêu đề -
     người đọc phải biết con số đang đếm tập nào trước khi tin nó. */
  var _bcLv=bcMuc();
@@ -10993,7 +11014,7 @@ function baocaoThan(_xemAi){
  h+=deptSection();
  // risk table
  h+='<div class="panel"><div class="ph"><b>Học viên nguy cơ cần theo dõi ('+risk+')</b><div class="mini"><button class="pill" onclick="go(\'viec\')">Mở Việc hôm nay</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã HV</th><th>Họ tên</th><th>Chuyên cần</th><th>Học thuật</th><th>Việc cần làm</th></tr></thead><tbody>';
- var rk=S.filter(function(r){return/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status))});
+ var rk=S.filter(stuRisk);
  if(!rk.length)h+='<tr><td class="empty" colspan="5">Không có học viên nguy cơ.</td></tr>';
  catXem("bcrisk",rk,30).forEach(function(r){h+='<tr><td>'+esc(r.student_id)+'</td><td>'+esc(r.full_name)+'</td><td><span class="chip '+stCls(r.attendance_progress_status)+'">'+elabel(r.attendance_progress_status)+'</span></td><td><span class="chip '+stCls(r.academic_progress_status)+'">'+elabel(r.academic_progress_status)+'</span></td><td>'+naDecor(r.next_action||"-")+'</td></tr>'});
  h+='</tbody></table></div>'+xemTiepBtn("bcrisk",rk.length,30)+'</div>';return h}
@@ -21027,7 +21048,7 @@ var NHIP={
   ["sang","Bài tập đang chờ chấm","Chấm trễ thì buổi sau giáo viên không biết lớp yếu chỗ nào","baitap",
    function(){return rows("DL13").filter(function(h){return String(h.submitted_at||"").trim()&&!String(h.graded_at||"").trim()}).length}],
   ["ngay","Học viên nguy cơ học thuật","Điểm tụt là dấu hiệu sớm nhất, thấy trước khi họ nghỉ","hocvien",
-   function(){return rows("DL09").filter(function(x){return /at_risk|off_track/.test(ecode(x.academic_progress_status))}).length}],
+   function(){return rows("DL09").filter(stuAca).length}],
   ["ngay","Lớp thiếu giáo viên hôm nay","Buổi không có người dạy là buổi phải huỷ - biết sớm còn xoay được","gvdp",
    function(){var t=new Date();return rows("DL11").filter(function(x){var d=pvnd(x.session_date);
     return d&&sameDay(d,t)&&!isc(x.session_status,"cancelled")&&!String(x.teacher_id||"").trim()}).length}],
