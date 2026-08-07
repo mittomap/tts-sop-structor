@@ -240,15 +240,46 @@ def sched_dur(s):
 BRANCHES=["branch_1 (Cơ sở 1)","branch_2 (Cơ sở 2)","branch_3 (Cơ sở 3)",
           "branch_4 (Cơ sở 4)","branch_5 (Cơ sở 5)","online (Cơ sở Online)"]
 CLS = [dict(c) for c in odl["DL10"]]
+
+# ═══ LỚP 1-1 (anh Luân 06/08, TP ACA hỏi qua điện thoại) ═══════════════════════════════════
+# Anh Luân chốt cách phân loại: *"suy ra từ sĩ số để đặt tên thôi em, hiện chỉ có 2 loại: 1-1
+# hoặc nhóm, nên lớp mà có sĩ số max 1 người thì nó là 1-1"*. Nên KHÔNG thêm cột nào vào DL10 -
+# `class_capacity <= 1` LÀ định nghĩa của lớp 1-1, dùng chung cho toàn app.
+# Bản SOP gốc không có lớp nào sĩ số dưới 10, nên TP ACA mở app ra sẽ thấy mảng 1-1 trống trơn.
+# Gieo ở ĐÂY (nguồn pipeline) chứ không vá tay JSON - luật của dự án.
+# Rải đủ ba trạng thái để mọi báo cáo đều có số thật: đang học (giờ dạy + nhận xét), đã kết thúc
+# (điểm đầu ra + tỷ lệ đạt AIM), đang tuyển (lớp sắp khai giảng).
+MOTMOT=[
+ ("LOP-1-1-IELTS-01","IELTS 1-1 Sáng (kèm riêng)",   "CRS-IEL-65","IELTS 6.5","T3-T5, 09h-10h30", "branch_1 (Cơ sở 1)"),
+ ("LOP-1-1-IELTS-02","IELTS 1-1 Tối (kèm riêng)",    "CRS-IEL-70","IELTS 7.0","T2-T6, 19h-20h30", "branch_3 (Cơ sở 3)"),
+ ("LOP-1-1-IELTS-03","IELTS 1-1 Online (kèm riêng)", "CRS-IEL-65","IELTS 6.5","T4-T7, 20h-21h30", "online (Cơ sở Online)"),
+ ("LOP-1-1-PRE-01",  "Pre-IELTS 1-1 (kèm riêng)",    "CRS-PRE-01","Pre-IELTS","T2-T5, 17h-18h30", "branch_2 (Cơ sở 2)"),
+]
+# BƯỚC NÀY PHẢI CHẠY BAO NHIÊU LẦN CŨNG RA MỘT KẾT QUẢ. `gen_demo.py` đọc lại CHÍNH FILE NÓ VỪA
+# SINH (`odl = old["dl"]`), nên "cứ thế append" là mỗi lượt chạy lại đẻ thêm 4 lớp nữa: chạy hai
+# lần ra 8 lớp trùng mã, `check_data` báo LỖI NẶNG. Đã cắn ngay lượt thứ hai.
+_khoaCo={c.get("course_id") for c in CLS}
+_daCo={c.get("class_id") for c in CLS}
+for _cid,_ten,_khoa,_trinh,_lich,_cs in MOTMOT:
+    if _cid in _daCo: continue                    # đã có từ lượt chạy trước - không thêm nữa
+    if _khoa not in _khoaCo:                      # khóa không có thật thì mượn khóa của lớp đầu
+        _khoa=CLS[0].get("course_id")
+    CLS.append({
+        "class_id":_cid,"class_name":_ten,"course_id":_khoa,"class_level":_trinh,
+        "class_schedule":_lich,"class_start_date":"","class_end_date":"",
+        "main_teacher_id":"","class_capacity":1,"current_enrollment":0,
+        "class_status":"","learning_mode":("online (Trực tuyến)" if "Online" in _cs else "offline (Tại trung tâm)"),
+        "branch":_cs,"venue_or_zoom_link":("Link Zoom riêng" if "Online" in _cs else "Phòng kèm 1-1"),
+        "notes":"","course_id_name":""})
 def setc(cid,**kw):
     for c in CLS:
         if c["class_id"]==cid:
             c.update(kw); return c
-RUN = ["LOP-IELTS-6.5-04","LOP-IELTS-6.0-12","LOP-IELTS-7.0-02","LOP-PRE-06","LOP-FOUND-PLA-01","LOP-CRSIEL-18"]
-FIN = ["LOP-IELTS-6.5-03","LOP-FOUND-01"]
-OPEN= ["LOP-IELTS-6.0-15","LOP-FOUND-02","LOP-CRSPRI-24"]
-run_start={"LOP-IELTS-6.5-04":-63,"LOP-IELTS-6.0-12":-49,"LOP-IELTS-7.0-02":-42,"LOP-PRE-06":-35,"LOP-FOUND-PLA-01":-28,"LOP-CRSIEL-18":-21}
-FIN_END={"LOP-IELTS-6.5-03":-20,"LOP-FOUND-01":-55}   # lớp đã kết thúc: neo NGÀY KẾT THÚC, suy ngược ngày khai giảng
+RUN = ["LOP-IELTS-6.5-04","LOP-IELTS-6.0-12","LOP-IELTS-7.0-02","LOP-PRE-06","LOP-FOUND-PLA-01","LOP-CRSIEL-18","LOP-1-1-IELTS-01","LOP-1-1-PRE-01"]
+FIN = ["LOP-IELTS-6.5-03","LOP-FOUND-01","LOP-1-1-IELTS-02"]
+OPEN= ["LOP-IELTS-6.0-15","LOP-FOUND-02","LOP-CRSPRI-24","LOP-1-1-IELTS-03"]
+run_start={"LOP-1-1-IELTS-01":-56,"LOP-1-1-PRE-01":-30,"LOP-IELTS-6.5-04":-63,"LOP-IELTS-6.0-12":-49,"LOP-IELTS-7.0-02":-42,"LOP-PRE-06":-35,"LOP-FOUND-PLA-01":-28,"LOP-CRSIEL-18":-21}
+FIN_END={"LOP-IELTS-6.5-03":-20,"LOP-FOUND-01":-55,"LOP-1-1-IELTS-02":-14}   # lớp đã kết thúc: neo NGÀY KẾT THÚC, suy ngược ngày khai giảng
 
 def ses_target(c):
     """Số buổi HỢP ĐỒNG của khóa (DL05.duration_sessions)."""
@@ -396,8 +427,13 @@ for c in sorted(CLS,key=lambda x:(0 if x["class_id"] in _GHIM_GV else 1,
                            %(c["class_id"],c["class_schedule"],len(ROOMS)))
 
 # ================= HỌC VIÊN + ROSTER =================
-roster_size={"LOP-IELTS-6.5-04":11,"LOP-IELTS-6.0-12":12,"LOP-IELTS-7.0-02":9,"LOP-PRE-06":10,"LOP-FOUND-PLA-01":9,"LOP-CRSIEL-18":8}
-fin_size={"LOP-IELTS-6.5-03":6,"LOP-FOUND-01":5}
+# Lớp 1-1 đúng MỘT học viên - đó là định nghĩa của nó. Ghi vào chính bảng sĩ số này để mọi
+# đoạn sau (điểm danh, bài tập, nhận xét, điểm đầu ra) đối xử với nó y như lớp nhóm.
+roster_size={"LOP-IELTS-6.5-04":11,"LOP-IELTS-6.0-12":12,"LOP-IELTS-7.0-02":9,"LOP-PRE-06":10,"LOP-FOUND-PLA-01":9,"LOP-CRSIEL-18":8,
+             "LOP-1-1-IELTS-01":1,"LOP-1-1-PRE-01":1}
+# Lớp 1-1 đã kết thúc cũng phải có ĐÚNG MỘT học viên - không có thì không có điểm đầu ra, mà
+# không có điểm đầu ra thì TP ACA mở "tỷ lệ đạt AIM lớp 1-1" ra là bảng trống.
+fin_size={"LOP-IELTS-6.5-03":6,"LOP-FOUND-01":5,"LOP-1-1-IELTS-02":1}
 students=[]; rosters={cid:[] for cid in list(roster_size)+list(FIN)}
 sid_n=0
 def new_sid():
@@ -917,6 +953,10 @@ for c in CLS: c["current_enrollment"]=cnt.get(c["class_id"],0)
 for c in CLS:
     try: _cap=int(str(c.get("class_capacity") or 0))
     except Exception: _cap=0
+    # LỚP 1-1 KHÔNG ĐI QUA LUẬT NÀY. Sĩ số tối đa 1 CHÍNH LÀ định nghĩa lớp 1-1 (anh Luân chốt
+    # 06/08); nâng nó lên "sĩ số + 2" là xoá sổ toàn bộ mảng 1-1 mà không ai thấy - lớp vẫn còn
+    # đó, chỉ là không lớp nào còn được tính là 1-1 nữa.
+    if _cap==1: continue
     if _cap<int(c["current_enrollment"] or 0)+2: c["class_capacity"]=int(c["current_enrollment"] or 0)+2
 
 # ĐIỂM KIỂM TRA GIỮA KHÓA (mid_*) - app đọc từ DL08 (midForm/midSave dùng mid_listening/
@@ -1459,7 +1499,10 @@ def add_ce(s,cid,kind,re_state,idx=0):
     if not re_state.startswith("not_contacted"):
         row["re_enrollment_contact_time"]=F(endd+days(3))
     ces.append(row); return row
-fin_students=[SBY[r] for r in rosters["LOP-IELTS-6.5-03"]]+[SBY[r] for r in rosters["LOP-FOUND-01"]]
+# Duyệt MỌI lớp đã kết thúc, đừng liệt kê tay hai lớp. Cùng một cái bẫy với vòng lặp bên dưới:
+# thêm lớp kết thúc thứ ba (lớp 1-1, 06/08) mà quên sửa dòng này thì học viên của nó không nằm
+# trong danh sách, không ai sinh bản ghi kết thúc khoá cho họ - `check_logic` bắt bằng luật 1c.
+fin_students=[SBY[r] for cid in fin_size for r in rosters.get(cid,[])]
 re2_map={s2["student_id"]:e2 for s2,e2 in re2}
 # hồ sơ cũ đóng cho dứt điểm (rejected), hồ sơ đang theo thì mới liên hệ GẦN ĐÂY; giữ đúng 1 ca
 # not_contacted làm việc đỏ có chủ đích ở hàng "mời tái ghi danh"
@@ -1468,7 +1511,12 @@ re_states=["contacted (Đã liên hệ)","interested (Quan tâm, chưa quyết �
            "contacted (Đã liên hệ)","contacted (Đã liên hệ)"]
 ri=0
 for s in fin_students:
-    cid="LOP-IELTS-6.5-03" if s["student_id"] in rosters["LOP-IELTS-6.5-03"] else "LOP-FOUND-01"
+    # TRA THEO SỔ LỚP, ĐỪNG CẮM CỨNG TÊN LỚP. Bản cũ viết thẳng hai mã lớp đã kết thúc và cho
+    # mọi trường hợp còn lại rơi vào lớp thứ hai - nên khi thêm lớp 1-1 đã kết thúc (06/08),
+    # học viên của nó bị gán bản ghi kết thúc khoá SANG LỚP KHÁC: lớp 1-1 không có điểm đầu ra,
+    # còn lớp kia có một học viên chưa từng học ở đó. `check_logic` bắt được bằng luật 1c.
+    cid=next((c for c in fin_size if s["student_id"] in rosters.get(c,[])),None)
+    if not cid: continue
     if s["student_id"] in re2_map:
         r=add_ce(s,cid,"fin","confirmed_with_deposit (Đồng ý + có cọc)")
         r["next_enrollment_id"]=re2_map[s["student_id"]]["enrollment_id"]
@@ -1635,6 +1683,22 @@ for r in ces:
     else: r["next_action"]=""
 
 # ================= XUẤT =================
+# ═══ LUẬT BẤT BIẾN: KHÔNG THU TIỀN TRƯỚC NGÀY ĐĂNG KÝ ═════════════════════════════════════
+# `check_logic` luật 6d. Trước 06/08 luật này vẫn xanh, nhưng chỉ vì MAY: các mốc thời gian
+# được bốc ngẫu nhiên và tình cờ chưa rơi vào thế sai. Thêm học viên lớp 1-1 làm chuỗi ngẫu
+# nhiên lệch đi một nhịp là lộ ngay một phiếu thu ghi trước ngày đăng ký 4 ngày.
+# Nên chốt thành BẤT BIẾN thay vì vá đúng một dòng: phiếu thu không bao giờ được sớm hơn đăng
+# ký của chính nó. Sớm hơn thì kéo về đúng ngày đăng ký cộng một khoảng ngắn.
+_enrT={e["enrollment_id"]:e.get("enrollment_time","") for e in enrs}
+for _p in pays:
+    _et=_enrT.get(_p.get("enrollment_id",""),"")
+    if not _et or not _p.get("payment_time"): continue
+    try:
+        _a=dt.datetime.strptime(_p["payment_time"],"%d/%m/%Y %H:%M")
+        _b=dt.datetime.strptime(_et,"%d/%m/%Y %H:%M")
+    except Exception: continue
+    if _a<_b: _p["payment_time"]=F(_b+dt.timedelta(hours=random.randint(1,20)))
+
 dl_new={"DL01":STAFF,"DL02":leads,"DL02b":tps,"DL03":tests,"DL04":cons_rows,"DL05":COURSES,"DL06":enrs,"DL07":pays,
         "DL08":obs,"DL09":students,"DL10":CLS,"DL11":sessions,"DL12":atts,"DL13":hws,"DL14":wows,"DL15":surveys,
         "DL16":fbs,"DL17":kns,"DL18":ces}

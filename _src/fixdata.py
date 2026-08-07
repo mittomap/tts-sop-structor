@@ -2297,6 +2297,29 @@ for _t, _rows in dl.items():
         tabs += 1; flat += _hit
 log.append("15. Sơ đồ cột: san phẳng %d dòng ở %d bảng về đủ bộ cột (union key)" % (flat, tabs))
 
+# ═══ 16. LUẬT BẤT BIẾN: KHÔNG THU TIỀN TRƯỚC NGÀY ĐĂNG KÝ (check_logic 6d) ═════════════════
+# 16. LUAT BAT BIEN: KHONG THU TIEN TRUOC NGAY DANG KY
+# Luật này đã cắm ở cuối `gen_demo.py` - và đặt ở đó là CHƯA ĐỦ. Bài học: `fixdata.py` còn SINH
+# THÊM phiếu thu sau đó (PAY-2026-109 không hề tồn tại lúc gen_demo chạy xong), nên phiếu mới
+# không đi qua luật. Một luật bất biến phải đứng ở CUỐI dây chuyền, sau người ghi cuối cùng;
+# đứng giữa thì nó chỉ canh được phần việc phía trước nó.
+# Lộ ra 06/08 khi thêm học viên lớp 1-1 làm chuỗi ngẫu nhiên lệch một nhịp - trước đó luật vẫn
+# xanh, nhưng xanh vì MAY chứ không vì được canh.
+import datetime as _dt2, random as _rnd2
+_enrT = {e.get("enrollment_id",""): e.get("enrollment_time","") for e in dl.get("DL06", [])}
+_sua = 0
+for _p in dl.get("DL07", []):
+    _et = _enrT.get(_p.get("enrollment_id",""), "")
+    if not _et or not _p.get("payment_time"): continue
+    try:
+        _a = _dt2.datetime.strptime(_p["payment_time"], "%d/%m/%Y %H:%M")
+        _b = _dt2.datetime.strptime(_et, "%d/%m/%Y %H:%M")
+    except Exception: continue
+    if _a < _b:
+        _p["payment_time"] = (_b + _dt2.timedelta(hours=_rnd2.randint(1, 20))).strftime("%d/%m/%Y %H:%M")
+        _sua += 1
+log.append("16. Thu tien truoc ngay dang ky: keo ve sau dang ky %d phieu" % _sua)
+
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("  12. Da tao DL22 referral +", len(dl["DL22"]), "luot | DL19 thuong:", len(dl["DL19"]))
 for _l in log[-6:]: print("  "+_l)
