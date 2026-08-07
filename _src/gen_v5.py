@@ -3748,7 +3748,9 @@ var THEDEF={
   ["tr_ontime","Xong đúng hạn","Trong số việc đã xong, bao nhiêu phần trăm xong trước hạn. Rê chuột vào con số để thấy phép chia."]]},
  cong:{t:"Bảng công giảng viên",the:[
   ["cg_buoi","Buổi lớp đã dạy trong tháng","Tổng số buổi lớp cả đội đã dạy trong tháng đang xem. Danh sách: bảng công theo người ngay dưới."],
-  ["cg_gio","Tổng giờ dạy","Tổng số giờ đứng lớp tính từ mốc giờ vào/ra, kèm số buổi còn thiếu mốc. Muốn xem chi tiết: bảng công dưới, cột Giờ."],
+  ["cg_gio","Tổng giờ dạy","Tổng số giờ đứng lớp tính từ mốc giờ vào/ra, kèm số buổi còn thiếu mốc. Danh sách: bảng công dưới, cột Giờ dạy."],
+  ["cg_g11","Giờ kèm riêng 1-1","Phần giờ dạy đổ vào lớp kèm riêng (sĩ số tối đa 1 người) và tỷ lệ của nó trên tổng giờ. Danh sách: bảng công dưới, cột Chia 1-1 / nhóm."],
+  ["cg_gnhom","Giờ lớp nhóm","Phần giờ dạy đổ vào lớp nhóm và tỷ lệ của nó trên tổng giờ. Danh sách: bảng công dưới, cột Chia 1-1 / nhóm."],
   ["cg_wow","Buổi WOW 1-1 đã dạy","Tổng buổi kèm riêng đã dạy, kèm đơn giá và tổng giờ kèm. Muốn xem chi tiết: bảng công dưới, cột WOW."],
   ["cg_test","Ca test đầu vào","Số ca test đầu vào đã chấm, tính theo đơn giá mỗi lần. Muốn xem chi tiết: bảng công dưới, cột Test."],
   ["cg_tien","Tiền công tạm tính","Tổng tiền công tạm tính = giờ dạy x đơn giá + ca WOW + ca test. Đây là số TẠM, chốt xong mới thành công nợ. Muốn xem chi tiết từng người: bảng công ngay dưới."],
@@ -18533,12 +18535,27 @@ function congThang(ym){
   /* V9.40: tính theo GIỜ, đơn giá tra theo (giảng viên x loại ngày x ca) - anh Luân chốt 29/07.
      Buổi 3 giờ và buổi 1,5 giờ trước đây trả bằng nhau; đo trên dữ liệu có 8 buổi 3 giờ ở lớp
      Foundation T7-CN, tức trả thiếu đúng một nửa cho những buổi đó. */
+  /* ═══ AC3 - GIỜ DẠY CHIA THEO LOẠI LỚP VÀ THEO CHI NHÁNH ════════════════════════════════
+     Trưởng phòng ACA hỏi 06/08: giờ dạy thực tế của từng giảng viên, tách 1-1 với lớp nhóm và
+     tách theo chi nhánh. Bảng công trước nay chỉ có MỘT con số giờ gộp - biết người này dạy 40
+     giờ mà không biết bao nhiêu giờ kèm riêng, bao nhiêu giờ đứng lớp đông, ở cơ sở nào. Ba
+     câu ấy quyết định chuyện khác hẳn nhau: xếp người, tính tải, và cân người giữa các cơ sở.
+     Chia NGAY TẠI CHỖ TÍNH chứ không để màn hình tự cộng lại - có hai nơi đọc con số này
+     (bảng công và hồ sơ giảng viên), tách ra là sớm muộn hai nơi nói hai số. */
   var gio=0,tienGio=0,thieuGio=0,theoCa={};
+  var gio11=0,gioNhom=0,n11=0,nNhom=0,gioCS={},buoiCS={};
   ses.forEach(function(x){var d=pvnd(x.class_start_actual)||pvnd(x.session_date);
+   var _c=find("DL10","class_id",x.class_id)||{};
+   var _l11=lopLa11(_c);
+   if(_l11)n11++;else nNhom++;
+   var _cs=ecode(_c.branch)||"__";
+   buoiCS[_cs]=(buoiCS[_cs]||0)+1;
    var h=sesHours(x);
    if(!h){thieuGio++;return}
    var dr=hourRate(g.staff_id,d);
    gio+=h;tienGio+=h*dr;
+   if(_l11)gio11+=h;else gioNhom+=h;
+   gioCS[_cs]=(gioCS[_cs]||0)+h;
    var k=dayKindOf(d)+"|"+shiftOf(d);
    if(!theoCa[k])theoCa[k]={h:0,tien:0,dg:dr};
    theoCa[k].h+=h;theoCa[k].tien+=h*dr});
@@ -18551,6 +18568,7 @@ function congThang(ym){
   test.forEach(function(x){var y=testHours(x);if(y)gioTest+=y;else thieuTest++});
   return {g:g,n:ses.length,wow:wow.length,test:test.length,late:late.length,noNote:noNote.length,brs:brs,onl:onl,
    gio:gio,thieuGio:thieuGio,theoCa:theoCa,
+   gio11:gio11,gioNhom:gioNhom,n11:n11,nNhom:nNhom,gioCS:gioCS,buoiCS:buoiCS,
    gioWow:gioWow,thieuWow:thieuWow,gioTest:gioTest,thieuTest:thieuTest,
    tien:Math.round((tienGio+wow.length*wowRate()+test.length*testRate())/1000)*1000}});
  out.sort(function(a,b){return (b.n+b.wow)-(a.n+a.wow)});
@@ -18640,6 +18658,7 @@ function renderCong(){
    tien_cong:x.tien,_x:x}}).filter(function(r){return r.buoi||r.buoi_wow||r.ca_test})).map(function(r){return r._x});
  var tot=L.reduce(function(a,x){return a+x.n},0),totW=L.reduce(function(a,x){return a+x.wow},0),tien=L.reduce(function(a,x){return a+x.tien},0);
  var totG=L.reduce(function(a,x){return a+x.gio},0),totThieu=L.reduce(function(a,x){return a+x.thieuGio},0);
+ var tot11=L.reduce(function(a,x){return a+(x.gio11||0)},0),totNhom=L.reduce(function(a,x){return a+(x.gioNhom||0)},0);
  var totT=L.reduce(function(a,x){return a+x.test},0);
  var totWG=L.reduce(function(a,x){return a+x.gioWow},0),totWThieu=L.reduce(function(a,x){return a+x.thieuWow},0);
  var noNote=L.reduce(function(a,x){return a+x.noNote},0);
@@ -18647,7 +18666,15 @@ function renderCong(){
  var xTien=true;try{xTien=(dsLevel("tien")!=="none")}catch(e){xTien=true}
  h+=statStrip([
   ["ti-school",tot,"Buổi lớp đã dạy trong tháng","#3B82C4",L.length+" giảng viên"],
-  ["ti-clock-hour-4",(Math.round(totG*10)/10)+"h","Tổng giờ dạy","#2E5A88",totThieu?(totThieu+" buổi thiếu giờ vào/ra"):"đủ giờ vào - giờ ra"],
+  ["ti-clock-hour-4",(Math.round(totG*10)/10)+"h","Tổng giờ dạy","#2E5A88",totThieu?(totThieu+" buổi thiếu giờ vào/ra"):"đủ giờ vào - giờ ra","",
+   "Tổng giờ đứng lớp thật trong tháng, tính từ giờ vào lớp tới giờ kết thúc của những buổi ĐÃ DẠY XONG. Buổi thiếu mốc giờ không tính được nên nằm ngoài con số này."],
+  /* AC3 (Trưởng phòng ACA 06/08) - hai ô này trả lời "giờ ấy đổ vào đâu": kèm riêng hay lớp
+     đông. Cùng một tổng giờ nhưng nghiêng về 1-1 hay nghiêng về nhóm là hai bài toán xếp người
+     khác hẳn nhau. */
+  ["ti-user",(Math.round(tot11*10)/10)+"h","Giờ kèm riêng 1-1","#B45309",totG?(Math.round(tot11/totG*100)+"% tổng giờ"):"",""
+   ,totG?pctG(Math.round(tot11*10)/10,Math.round(totG*10)/10,"giờ dạy trong tháng"):"Tháng này chưa có giờ dạy nào để chia"],
+  ["ti-users-group",(Math.round(totNhom*10)/10)+"h","Giờ lớp nhóm","#3B82C4",totG?(Math.round(totNhom/totG*100)+"% tổng giờ"):"",""
+   ,totG?pctG(Math.round(totNhom*10)/10,Math.round(totG*10)/10,"giờ dạy trong tháng"):"Tháng này chưa có giờ dạy nào để chia"],
   /* V9.99z5 - BẢNG CÔNG CÓ HAI TẦNG NGƯỜI ĐỌC. Người duyệt CHUYÊN MÔN (Trưởng phòng ACA) cần
      GIỜ và SỐ CA để đối chiếu trước khi chốt; đơn giá và tiền công tạm tính là việc của khối
      tiền. Ai không có miền `tien` thì bảng này chỉ đếm công, không hiện một con số tiền nào -
@@ -18660,12 +18687,29 @@ function renderCong(){
   ["ti-report-money",xTien?vnd(tien):"-","Tiền công tạm tính","#0D9488",xTien?"theo giờ x ca x người":"chỉ khối tiền xem được"],
   ["ti-writing",noNote,"Buổi chưa ghi nhận xét","#E08A1E",noNote?"đối chiếu trước khi chốt":"đã đủ nhận xét"],
   ["ti-clock",L.reduce(function(a,x){return a+x.late},0),"Buổi vào trễ giờ","#E24B4A","ảnh hưởng KPI ADC"]],"cong");
+ /* AC3 - LỌC THEO CHI NHÁNH. Vế thứ ba Trưởng phòng ACA hỏi: giờ dạy ở CƠ SỞ NÀO. Bảng vốn
+    có cột Cơ sở nhưng không lọc được, nên muốn biết cơ sở 3 tháng này ai dạy bao nhiêu giờ thì
+    phải dò bằng mắt qua cả bảng. Lọc theo cơ sở của LỚP (nơi buổi học diễn ra) chứ không theo
+    cơ sở ghi trong hồ sơ giảng viên - một người dạy chéo cơ sở là chuyện thường, và cái cần
+    biết là giờ đổ vào đâu, không phải người thuộc về đâu. */
+ /* Nhãn cơ sở phải tra từ CHUỖI ĐẦY ĐỦ trong dữ liệu ("branch_1 (Cơ sở 1)") chứ không từ mã -
+    `elabel()` nhận chuỗi đầy đủ, đưa mã trần vào thì nó trả rỗng và ô chọn in ra mã máy. */
+ var _csAll={};
+ rows("DL10").forEach(function(c){var k=ecode(c.branch);if(k&&!_csAll[k])_csAll[k]=elabel(c.branch)||c.branch||k});
+ (function(){var co={};L.forEach(function(x){for(var k in (x.buoiCS||{}))if(k!=="__")co[k]=1});
+  for(var k in _csAll)if(!co[k])delete _csAll[k]})();
+ var _csCur=window.CONGCS||"";
+ if(_csCur){L=L.filter(function(x){return (x.buoiCS||{})[_csCur]})}
  h+=tbar('<span class="tblbl">Tháng</span><select class="sel" onchange="congSet(this.value)">'+
-  mo.map(function(k){return '<option value="'+esc(k)+'"'+(k===ym?" selected":"")+'>'+esc(k.split("-")[1]+"/"+k.split("-")[0])+'</option>'}).join("")+'</select>',
+  mo.map(function(k){return '<option value="'+esc(k)+'"'+(k===ym?" selected":"")+'>'+esc(k.split("-")[1]+"/"+k.split("-")[0])+'</option>'}).join("")+'</select>'+
+  '<span class="tblbl">Cơ sở</span><select class="sel" onchange="window.CONGCS=this.value;reRender(CUR)">'+
+   '<option value="">Mọi cơ sở</option>'+
+   Object.keys(_csAll).sort().map(function(k){return '<option value="'+esc(k)+'"'+(k===_csCur?" selected":"")+'>'+esc(_csAll[k])+'</option>'}).join("")+
+  '</select>',
   '<span class="tbcnt">'+L.filter(function(x){return x.n||x.wow||x.test}).length+' giảng viên</span>');
  h+=pgBar("cong",L.filter(function(x){return x.n||x.wow||x.test}).length);
- h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Người dạy</th><th>Cơ sở</th><th>Buổi lớp</th><th>Giờ dạy</th><th>Chia theo ca</th><th>Trong đó online</th><th>Buổi WOW (giờ kèm)</th><th>Ca test</th><th>Vào trễ</th><th>Chưa ghi nội dung</th>'+(xTien?"<th>Tiền công tạm tính</th>":"")+'</tr></thead><tbody>';
- if(!L.filter(function(x){return x.n||x.wow||x.test}).length)h+='<tr><td class="empty" colspan="'+(xTien?11:10)+'">Tháng này chưa có buổi dạy nào hoàn thành.</td></tr>';
+ h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Người dạy</th><th>Cơ sở</th><th>Buổi lớp</th><th>Giờ dạy</th><th>Chia 1-1 / nhóm</th><th>Chia theo ca</th><th>Trong đó online</th><th>Buổi WOW (giờ kèm)</th><th>Ca test</th><th>Vào trễ</th><th>Chưa ghi nội dung</th>'+(xTien?"<th>Tiền công tạm tính</th>":"")+'</tr></thead><tbody>';
+ if(!L.filter(function(x){return x.n||x.wow||x.test}).length)h+='<tr><td class="empty" colspan="'+(xTien?12:11)+'">Tháng này chưa có buổi dạy nào hoàn thành.</td></tr>';
  L.forEach(function(x){if(!x.n&&!x.wow&&!x.test)return;
   /* V9.93: bấm cả dòng là mở hồ sơ chính người đó - trước đây chỉ có cái tên là bấm được, phần
      còn lại của dòng câm (`_checkbam` bắt). */
@@ -18673,6 +18717,10 @@ function renderCong(){
    '<td>'+esc(elabel(x.g.branch)||x.g.branch||"-")+'</td>'+
    '<td><b>'+x.n+'</b></td>'+
    '<td><b>'+(Math.round(x.gio*10)/10)+'h</b>'+(x.thieuGio?' <span class="chip red" data-tip="Buổi đã dạy xong mà không ghi giờ vào - giờ ra, không tính công được">'+x.thieuGio+' buổi thiếu giờ</span>':'')+'</td>'+
+   /* AC3 - tách 1-1 với lớp nhóm. Đọc thẳng con số `congThang()` đã chia sẵn, không cộng lại ở
+      đây: hai nơi cùng đọc một nguồn thì không thể nói hai số. */
+   '<td>'+(x.gio11?('<span class="knb" data-tip="'+esc(x.n11+" buổi kèm riêng 1-1 trong tháng")+'"><i>1-1</i>'+(Math.round(x.gio11*10)/10)+'h</span>'):'<span class="mut">-</span>')+
+     (x.gioNhom?(' <span class="knb" data-tip="'+esc(x.nNhom+" buổi lớp nhóm trong tháng")+'"><i>NHÓM</i>'+(Math.round(x.gioNhom*10)/10)+'h</span>'):'')+'</td>'+
    '<td style="font-size:11.5px">'+esc(caText(x.theoCa,xTien)||"-")+'</td>'+
    '<td>'+(x.onl?'<span class="chip blue">'+x.onl+'</span>':'<span class="mut">0</span>')+'</td>'+
    '<td>'+(x.wow?('<span class="chip" style="background:#FCE7F3;color:#9D174D">'+x.wow+'</span> <span class="mut" style="font-size:11px">'+(Math.round(x.gioWow*10)/10)+'h'+(x.thieuWow?(' · '+x.thieuWow+' thiếu mốc'):'')+'</span>'):'<span class="mut">0</span>')+'</td>'+
