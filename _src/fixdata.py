@@ -635,6 +635,7 @@ ENUM_COL = {
     ("DL09", "payer_side"): "enum_payer_side",
     ("DL10", "class_status"): "enum_class_status", ("DL10", "class_level"): "enum_class_level",
     ("DL11", "session_status"): "enum_session_status",
+    ("DL11", "session_type"): "enum_session_type",
     ("DL12", "attendance_status"): "enum_attendance_status",
     ("DL12", "absence_type"): "enum_absence_type",
     ("DL12", "in_class_performance"): "enum_in_class_performance",
@@ -1646,6 +1647,13 @@ if len(_mo) >= 3:
         _l3["next_followup_time"] = ""
         _seed.append("NA048")
 
+# --- DL11: enum LOAI BUOI (thuong / thi giua khoa / thi cuoi khoa) ---
+# Nhan enum ghi NGUYEN VAN dang "code (Nhan tieng Viet)" theo luat CH1 cua du an.
+_st = d.setdefault("enums", {}).setdefault("enum_session_type", [])
+for _v in ("regular (Buổi thường)", "mid (Thi giữa khóa)", "final (Thi cuối khóa)"):
+    if _v not in _st:
+        _st.append(_v)
+
 # --- DL11: mot buoi DA DOI lich ---
 _sd = d.setdefault("enums", {}).setdefault("enum_session_status", [])
 if not any(str(x).startswith("rescheduled") for x in _sd):
@@ -2325,6 +2333,78 @@ for _t, _rows in dl.items():
         tabs += 1; flat += _hit
 log.append("15. Sơ đồ cột: san phẳng %d dòng ở %d bảng về đủ bộ cột (union key)" % (flat, tabs))
 
+# ═══ 14h. NA067 - HỌC VIÊN IM LẶNG QUÁ LÂU, GIEO THẲNG ═══════════════════════════════════
+# `check_sop` báo SOP mô tả NA067 mà app không sinh ra. Đào ra: `last_learning_activity_time`
+# lấy từ mốc hoạt động THẬT (điểm danh / bài tập / WOW), nên chỉ cần dữ liệu dày lên một chút
+# là không còn ai im lặng quá ngưỡng - trigger tắt mà không ai hay.
+# Đây là lần THỨ HAI trong ngày một tình huống SOP xanh vì TÌNH CỜ chứ không vì được gieo
+# (lần đầu là NA005). Bài học chung: tình huống nào SOP mô tả thì phải có người gieo NÓ, không
+# trông vào chuyện dữ liệu ngẫu nhiên rơi trúng.
+# Gieo THUẦN: lấy một học viên ĐANG HỌC, kéo mốc hoạt động cuối lùi quá ngưỡng - đúng câu
+# chuyện "em này bặt tăm mấy tuần rồi mà chưa ai gọi".
+_imN = 0
+_nguong = 7
+for _cf in dl.get("config", {}).get("ch2", []) or []:
+    if str(_cf.get("name")) == "slaActivity_inactive_days":
+        try: _nguong = int(float(str(_cf.get("value"))))
+        except Exception: pass
+for _st in R("DL09"):
+    if _imN >= 2:
+        break
+    if "active" not in str(_st.get("student_status") or ""):
+        continue
+    if str(_st.get("attendance_progress_status") or "").startswith(("at_risk", "off_track")):
+        continue
+    if str(_st.get("academic_progress_status") or "").startswith(("at_risk", "off_track")):
+        continue
+    # `naFor()` chay theo THU TU: nguy co (co nguoi gan HOAC may thay vuot nguong) an truoc,
+    # NA067 chi toi luot khi em ay SACH ca hai truc. Chon nham mot em may dang thay nguy co thi
+    # gieo xong trigger van khong hien - da dinh dung vay o luot dau.
+    _sid9 = str(_st.get("student_id") or "")
+    _vang = len([a for a in R("DL12")
+                 if str(a.get("student_id")) == _sid9
+                 and "no_show" in str(a.get("attendance_status") or "")
+                 and "unexcused" in str(a.get("absence_type") or "")])
+    _thieu = len([h for h in R("DL13")
+                  if str(h.get("student_id")) == _sid9
+                  and "missing" in str(h.get("homework_status") or "")])
+    if _vang >= 2 or _thieu >= 3:
+        continue
+    _st["last_learning_activity_time"] = fmt(NOW - datetime.timedelta(days=_nguong + 6 + _imN * 3))
+    _imN += 1
+log.append("14h. NA067 hoc vien im lang qua %d ngay: gieo %d em" % (_nguong, _imN))
+
+# ═══ 14g. BUỔI THI GIỮA KHÓA / CUỐI KHÓA - CỘT session_type CỦA DL11 ═════════════════════
+# Trưởng phòng ACA hỏi 06/08: buổi thi giữa khóa và cuối khóa phải HIỆN RA trong danh sách buổi,
+# chứ không phải chỉ là một con số đếm ở đâu đó. Anh Luân chốt thêm: mặc định suy ra được, và
+# **TP Học vụ hoặc TP ACA đổi lại được** buổi nào là buổi thi.
+#
+# VÌ SAO PHẢI CÓ CỘT THẬT chứ không suy tại chỗ lúc vẽ: nếu app tự tính "buổi giữa = buổi ở
+# giữa" mỗi lần vẽ thì không ai ĐỔI được - mà đổi chính là thứ TP Học vụ cần (lớp nghỉ lễ, dời
+# lịch, thi sớm một buổi). Một thứ người dùng phải sửa được thì phải có chỗ để lưu.
+#
+# MẶC ĐỊNH: buổi CUỐI của lớp = final; buổi ở khoảng GIỮA (làm tròn) = mid. Lớp dưới 4 buổi thì
+# không gieo mid - một khóa quá ngắn không có "giữa khóa" để thi.
+_stN = {"mid": 0, "final": 0}
+_sesByCls = {}
+for _s in R("DL11"):
+    _sesByCls.setdefault(str(_s.get("class_id") or ""), []).append(_s)
+for _cid, _ss in _sesByCls.items():
+    _ss.sort(key=lambda x: n(x.get("session_number")) or 0)
+    for _s in _ss:
+        _s.setdefault("session_type", "")
+        if not str(_s.get("session_type") or "").strip():
+            _s["session_type"] = "regular (Buổi thường)"
+    if not _ss:
+        continue
+    _ss[-1]["session_type"] = "final (Thi cuối khóa)"
+    _stN["final"] += 1
+    if len(_ss) >= 4:
+        _ss[(len(_ss) - 1) // 2]["session_type"] = "mid (Thi giữa khóa)"
+        _stN["mid"] += 1
+log.append("14g. Buoi thi: %d buoi cuoi khoa + %d buoi giua khoa tren %d lop"
+           % (_stN["final"], _stN["mid"], len(_sesByCls)))
+
 # ═══ 14f. MỘT BUỔI NỢ CẢ HAI VIỆC - ĐỂ HUY HIỆU KÉP CÓ CHỖ HIỆN RA ═══════════════════════
 # Anh Luân 07/08: *"1 buổi có 2 cảnh báo thì gắn cả 2 icon."* App làm được, nhưng đo trên demo
 # thì KHÔNG buổi nào nợ cả hai việc cùng lúc (quá hạn nhận xét VÀ chưa điểm danh), nên nhánh
@@ -2452,9 +2532,30 @@ log.append("14e. Ky thi IELTS that (DL18b): %d luot thi cua %d hoc vien"
 # Lộ ra 06/08 khi thêm học viên lớp 1-1 làm chuỗi ngẫu nhiên lệch một nhịp - trước đó luật vẫn
 # xanh, nhưng xanh vì MAY chứ không vì được canh.
 import datetime as _dt2, random as _rnd2
+# ═══ TRUOC HET: DON DANG KY KHONG DUOC MANG NGAY O TUONG LAI ═════════════════════════════
+# Bat duoc 07/08 khi di truy PAY-2026-109 "thu tien truoc ngay dang ky": phieu thu khong sai,
+# CAI SAI la don dang ky ghi ngay 09/08 - hai ngay nua moi toi. Mot don dang ky la ban ghi mot
+# viec DA XAY RA; de no o tuong lai thi moi thu treo vao no (phieu thu, lich dong dot, han xac
+# nhan) deu lech theo, va bo kiem se to cao nhung ban ghi vo toi o phia sau.
+# Bai hoc lap lai lan thu ba trong ngay: truy mot con so bao do thi phai di toi GOC, dung va
+# ngay cho no keu.
+_donTL = 0
+for _e in dl.get("DL06", []):
+    _t = _e.get("enrollment_time", "")
+    if not _t:
+        continue
+    try:
+        _td = _dt2.datetime.strptime(_t, "%d/%m/%Y %H:%M")
+    except Exception:
+        continue
+    if _td > NOW:
+        _e["enrollment_time"] = (NOW - _dt2.timedelta(days=_rnd2.randint(1, 5),
+                                                     hours=_rnd2.randint(0, 20))).strftime("%d/%m/%Y %H:%M")
+        _donTL += 1
+log.append("16pre. Don dang ky ghi ngay tuong lai: keo ve qua khu %d don" % _donTL)
+
 _enrT = {e.get("enrollment_id",""): e.get("enrollment_time","") for e in dl.get("DL06", [])}
 _sua = 0
-_tuonglai = [0]
 for _p in dl.get("DL07", []):
     _et = _enrT.get(_p.get("enrollment_id",""), "")
     if not _et or not _p.get("payment_time"): continue
@@ -2462,19 +2563,23 @@ for _p in dl.get("DL07", []):
         _a = _dt2.datetime.strptime(_p["payment_time"], "%d/%m/%Y %H:%M")
         _b = _dt2.datetime.strptime(_et, "%d/%m/%Y %H:%M")
     except Exception: continue
-    if _a < _b:
-        _a = _b + _dt2.timedelta(hours=_rnd2.randint(1, 20))
-        _p["payment_time"] = _a.strftime("%d/%m/%Y %H:%M")
-        _sua += 1
-    # ... VA KHONG DUOC THU TIEN O TUONG LAI. Luat tren chi keo phieu ve SAU ngay dang ky, khong
-    # ai chan dau tren - don dang ky hom nay ma bi keo them vai gio la phieu roi sang ngay mai.
-    # Lo ra 07/08: PAY-2026-106 ghi 09/08/2026, tuc so quy cua trung tam co mot khoan thu chua
-    # xay ra. Mot bat bien phai chan CA HAI dau, chan mot dau la con nua kia bo ngo.
-    if _a > NOW:
-        _p["payment_time"] = (NOW - _dt2.timedelta(hours=_rnd2.randint(1, 6))).strftime("%d/%m/%Y %H:%M")
-        _tuonglai[0] += 1
-log.append("16. Thu tien truoc ngay dang ky: keo ve sau dang ky %d phieu | keo ve qua khu %d phieu ghi ngay tuong lai"
-           % (_sua, _tuonglai[0]))
+    # ═══ KEP PHIEU THU VAO TRONG KHOANG [ngay dang ky ... bay gio] ═══════════════════════
+    # Phieu thu phai nam SAU ngay dang ky VA KHONG duoc o tuong lai. Hai rang buoc nay phai xu
+    # CUNG MOT LUC.
+    # BAY DA CAN NGAY TRONG NGAY 07/08: em va dau tren truoc (khong thu tien tuong lai) bang mot
+    # phep keo rieng, the la no keo mot phieu ve TRUOC ngay dang ky - thung dau duoi. Va mot dau
+    # roi thung dau kia la dau hieu dang le phai KEP, khong phai chan tung ben.
+    # Neu don dang ky o TUONG LAI (du lieu demo co the co) thi khong the keo phieu vao khoang
+    # nao ca - de nguyen, `check_logic` se bat chinh cai don do.
+    if _b <= NOW:
+        if _a < _b or _a > NOW:
+            _tre = int((NOW - _b).total_seconds() // 3600)
+            _a = _b + _dt2.timedelta(hours=_rnd2.randint(1, max(1, min(20, _tre))))
+            if _a > NOW:
+                _a = NOW - _dt2.timedelta(minutes=_rnd2.randint(5, 120))
+            _p["payment_time"] = _a.strftime("%d/%m/%Y %H:%M")
+            _sua += 1
+log.append("16. Phieu thu kep vao khoang [ngay dang ky ... bay gio]: chinh %d phieu" % _sua)
 
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("  12. Da tao DL22 referral +", len(dl["DL22"]), "luot | DL19 thuong:", len(dl["DL19"]))

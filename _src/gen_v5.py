@@ -1054,6 +1054,12 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
  border-radius:20px;min-width:16px;height:16px;padding:0 3px;display:flex;align-items:center;
  justify-content:center;font-weight:800;box-shadow:0 0 0 2px #fff;cursor:help}
 .sespill.canhbao{border-color:var(--red)}
+/* Nhãn buổi thi trên viên buổi - nằm trong viên, không phải huy hiệu góc (huy hiệu góc dành
+   cho VIỆC CÒN NỢ; loại buổi là thuộc tính, không phải việc phải làm). */
+.sespill .sthi{display:block;font-size:8.5px;font-weight:800;letter-spacing:.3px;margin-top:2px;
+ padding:1px 5px;border-radius:20px;white-space:nowrap}
+.sespill .sthi.mid{background:var(--blueb);color:#185FA5}
+.sespill .sthi.final{background:var(--amberb);color:#854F0B}
 .sespill .snote{position:absolute;top:-5px;right:-5px;font-size:9px;background:var(--green);color:#fff;border-radius:20px;width:15px;height:15px;display:flex;align-items:center;justify-content:center}
 .planbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;background:#FAFBFD;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:12px}
 .planbar .pbi{display:flex;flex-direction:column;gap:1px;min-width:0}
@@ -2529,7 +2535,7 @@ conversion_status:"enum_conversion_status",enrollment_status:"enum_enrollment_st
 payment_method:"enum_payment_method",payment_status:"enum_payment_status",placement_status:"enum_placement_status",
 class_confirmation_status:"enum_class_confirmation_status",onboarding_status:"enum_onboarding_status",student_status:"enum_student_status",
 attendance_status:"enum_attendance_status",absence_type:"enum_absence_type",in_class_performance:"enum_in_class_performance",
-session_status:"enum_session_status",homework_status:"enum_homework_status",skill:"enum_homework_skill",wow_session_type:"enum_wow_session_type",
+session_status:"enum_session_status",session_type:"enum_session_type",homework_status:"enum_homework_status",skill:"enum_homework_skill",wow_session_type:"enum_wow_session_type",
 wow_skill:"enum_homework_skill",wow_status:"enum_wow_status",wow_outcome:"enum_wow_outcome",survey_type:"enum_survey_type",
 feedback_channel:"enum_feedback_channel",feedback_type:"enum_feedback_type",feedback_category:"enum_feedback_category",feedback_status:"enum_feedback_status",
 complaint_channel:"enum_complaint_channel",complaint_type:"enum_complaint_type",complaint_severity:"enum_complaint_severity",
@@ -3037,7 +3043,11 @@ var CH3X=[
  /* Điểm thi IELTS thật do trung tâm nhập hộ học viên - anh Luân chốt 06/08 khi TP ACA hỏi tỷ lệ
     đạt AIM: quyền ghi cho *"Học vụ và TP ACA"*. Giảng viên KHÔNG có quyền này: điểm thi thật là
     dữ liệu đối ngoại, sai một con số là sai cả chỉ số đầu ra của trung tâm. */
- {k:"kq_that",   t:"Nhập điểm kỳ thi IELTS thật",              vai:["hocvu","aca"],them:1}];
+ {k:"kq_that",   t:"Nhập điểm kỳ thi IELTS thật",              vai:["hocvu","aca"],them:1},
+ /* AC4 - anh Luân chốt 06/08 khi TP ACA hỏi: đổi buổi nào là buổi thi thì "Học vụ và TP ACA".
+    Giảng viên KHÔNG có quyền: dời buổi thi là dời mốc đo đầu ra của cả lớp, không phải việc
+    của người đứng lớp. */
+ {k:"ses_thi",   t:"Đổi buổi thi giữa khóa / cuối khóa",        vai:["hocvu","aca"],them:1}];
 var CH3BY={};CH3.concat(CH3X).forEach(function(a){CH3BY[a.k]=a});
 /* Ai đang đăng nhập có được làm việc này không. Việc KHÔNG nằm trong CH3 thì không chặn - CH3 là
    danh sách việc SOP có ý kiến, không phải danh sách trắng cho toàn bộ app. */
@@ -9915,7 +9925,12 @@ function renderBanglop(){
    /* đảm bảo có buổi đang chọn */
    if(!ses.some(function(s){return s.session_id===window.DDSESS}))window.DDSESS=ses[0].session_id;
    /* dải THẺ BUỔI: gọn, chấm màu theo trạng thái, dấu ✓ khi đã ghi nhận xét */
-   h+='<div class="panel"><div class="ph"><b>Chọn buổi để điểm danh</b><span class="mut" style="font-size:11.5px">'+ses.length+' buổi · chấm màu = trạng thái · ✓ xanh = đã ghi nhận xét · huy hiệu đỏ = việc còn nợ, dùng đúng biểu tượng của ô đếm ở đầu trang (rê chuột để biết việc gì)</span></div><div class="pbody"><div class="sesstrip">';
+   h+='<div class="panel"><div class="ph"><b>Chọn buổi để điểm danh</b><span class="mut" style="font-size:11.5px">'+ses.length+' buổi · chấm màu = trạng thái · ✓ xanh = đã ghi nhận xét · huy hiệu đỏ = việc còn nợ, dùng đúng biểu tượng của ô đếm ở đầu trang (rê chuột để biết việc gì)</span>'+
+    /* AC4 - nút mở cửa ghi "buổi nào là buổi thi". Chỉ hiện với người CÓ QUYỀN (CH3X ses_thi:
+       Học vụ + TP ACA) - hiện cho người không có quyền rồi chặn khi bấm đúng là bệnh
+       "mời rồi đuổi" mà app đã chữa ở thanh menu. */
+    (canAct("ses_thi")?('<div class="mini"><button class="pill" onclick="sesThiForm(\''+esc(cid)+'\')"><i class="ti ti-award"></i>Đổi buổi thi</button></div>'):'')+
+    '</div><div class="pbody"><div class="sesstrip">';
    ses.forEach(function(s){var st=ecode(s.session_status);
     var col=st==="completed"?"var(--green)":st==="in_progress"?"var(--amber)":st==="cancelled"?"var(--red)":"#B9C6D6";
     var noteDone=yesv(s.has_teacher_note)||!!String(s.teacher_note_summary||"").trim();
@@ -9935,6 +9950,9 @@ function renderBanglop(){
        return '<span class="swarn" data-tip="'+esc(x.t+' (đang được đếm ở ô "'+x.o+'" trên đầu trang)')+'"><i class="ti '+x.ic+'"></i></span>'}).join("")+'</span>'):'')+
      '<span class="sdot" style="background:'+col+'"></span>'+
      '<b>Buổi '+esc(s.session_number)+'</b><small>'+esc(String(s.session_date||"").slice(0,5)||"—")+'</small>'+
+     /* AC4 - buổi THI phải nhìn ra ngay trên dải, không phải mở từng buổi mới biết. Trưởng phòng
+        ACA 06/08: buổi thi giữa khóa và cuối khóa phải HIỆN RA trong danh sách buổi. */
+     sesThiThe(s)+
      (noteDone?'<span class="snote"><i class="ti ti-check"></i></span>':'')+'</button>'});
    h+='</div></div></div>';
    /* thanh KẾ HOẠCH của buổi đang chọn - compact */
@@ -16217,6 +16235,49 @@ function renderHosoKhoa(){var id=window.KHID;var c=find("DL05","course_id",id);
  cls.forEach(function(x){h+='<tr><td>'+esc(x.class_id)+'</td><td>'+esc(x.class_name)+'</td><td><span class="chip '+stCls(x.class_status)+'">'+esc(elabel(x.class_status))+'</span></td><td>'+esc(x.current_enrollment||0)+'/'+esc(x.class_capacity||0)+'</td><td>'+esc(x.main_teacher_id_name||x.main_teacher_id||"")+'</td><td>'+esc(x.class_start_date||"")+'</td><td><button class="btn sm" onclick="openLop(\''+esc(x.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Bảng lớp</button></td></tr>'});
  return h+'</tbody></table></div></div>'}
 /* ===== P6 · BUỔI HỌC & NHẬN XÉT GV (DL11) - SOP NA019-NA024, NA068, NA069 ===== */
+/* ═══════════ AC4 · BUỔI THI GIỮA KHÓA / CUỐI KHÓA ═══════════════════════════════════════
+   Trưởng phòng ACA hỏi 06/08: buổi thi phải HIỆN RA trong danh sách buổi, và **TP Học vụ hoặc
+   TP ACA đổi lại được** buổi nào là buổi thi (lớp nghỉ lễ, dời lịch, thi sớm một buổi).
+   Cột thật `DL11.session_type` (CH1 `enum_session_type`), mặc định gieo ở nguồn dữ liệu: buổi
+   CUỐI = final, buổi GIỮA = mid, lớp dưới 4 buổi thì không có mid.
+   VÌ SAO KHÔNG SUY TẠI CHỖ LÚC VẼ: suy thì không ai đổi được - mà đổi chính là thứ Học vụ cần.
+   Thứ người dùng phải sửa được thì phải có chỗ để lưu. */
+function sesThi(s){return ecode(s&&s.session_type)}
+function sesLaThi(s){return /^(mid|final)$/.test(sesThi(s))}
+function sesThiTen(s){var k=sesThi(s);return k==="final"?"Thi cuối khóa":k==="mid"?"Thi giữa khóa":""}
+function sesThiThe(s){var k=sesThi(s);if(!/^(mid|final)$/.test(k))return "";
+ return '<span class="sthi '+k+'" data-tip="'+esc(sesThiTen(s)+(k==="final"
+   ?" - điểm buổi này là điểm thi thử tại trung tâm, dùng để tính tỷ lệ đạt AIM"
+   :" - điểm giữa khóa, ghi vào hồ sơ xếp lớp của từng học viên"))+'">'+(k==="final"?"THI CUỐI":"THI GIỮA")+'</span>'}
+/* Cửa ghi: đổi buổi nào là buổi thi. Chặn qua CH3X `ses_thi` - Học vụ và TP ACA. */
+function sesThiForm(cid){
+ if(chanAct("ses_thi"))return;
+ var ses=ddSessions(cid)||[];
+ if(!ses.length){toast("Lớp này chưa có buổi nào.");return}
+ var c=find("DL10","class_id",cid)||{};
+ var h='<div class="dcard"><h4><i class="ti ti-award"></i>Buổi thi của lớp</h4>';
+ h+='<div class="mut" style="font-size:12px;margin:-4px 0 10px">'+lopThe(c)+esc(c.class_name||cid)+' · '+ses.length+' buổi</div>';
+ h+='<div class="notebar" style="margin:0 0 10px" data-tip="Mặc định: buổi cuối là thi cuối khóa, buổi ở khoảng giữa là thi giữa khóa. Lớp nghỉ lễ hay dời lịch thì mốc thi lệch đi, nên chỗ này sửa được."><i class="ti ti-info-circle"></i>Điểm buổi <b>thi cuối khóa</b> là điểm thi thử dùng tính tỷ lệ đạt mục tiêu.</div>';
+ function o(cur,val,lb){return '<option value="'+esc(val)+'"'+(cur===val?" selected":"")+'>'+esc(lb)+'</option>'}
+ var curM=(ses.filter(function(x){return sesThi(x)==="mid"})[0]||{}).session_id||"";
+ var curF=(ses.filter(function(x){return sesThi(x)==="final"})[0]||{}).session_id||"";
+ function sel(id,cur,nhan){
+  return '<div class="fld"><label>'+nhan+'</label><select id="'+id+'"><option value="">-- không có --</option>'+
+   ses.map(function(x){return o(cur,x.session_id,"Buổi "+(x.session_number||"?")+" · "+(String(x.session_date||"").slice(0,10)||"chưa có ngày"))}).join("")+'</select></div>'}
+ h+=sel("st_mid",curM,"Buổi thi GIỮA khóa")+sel("st_fin",curF,"Buổi thi CUỐI khóa");
+ h+='<div class="dact"><button class="btn primary" onclick="sesThiSave(\''+esc(cid)+'\')"><i class="ti ti-check"></i>Lưu buổi thi</button></div></div>';
+ openDrawer("Buổi thi của lớp",h)}
+function sesThiSave(cid){
+ if(chanAct("ses_thi"))return;
+ var mid=fldV("st_mid"),fin=fldV("st_fin");
+ if(mid&&fin&&mid===fin){toast("Buổi giữa khóa và cuối khóa không thể là cùng một buổi.");return}
+ var ses=ddSessions(cid)||[],n=0;
+ ses.forEach(function(x){
+  var moi=(x.session_id===fin)?"final":(x.session_id===mid)?"mid":"regular";
+  if(sesThi(x)===moi)return;
+  jUpdRow("DL11",x.session_id,{session_type:eFull("enum_session_type",moi)});n++});
+ toast(n?("Đã cập nhật buổi thi của lớp ("+n+" buổi đổi loại)."):"Không có gì thay đổi.");
+ closeModal();reRender(CUR)}
 function bhState(s){
  var done=isc(s.session_status,"completed"),cancelled=isc(s.session_status,"cancelled"),running=isc(s.session_status,"in_progress");
  var note=yesv(s.has_teacher_note)||!!String(s.teacher_note_summary||"").trim();
@@ -22819,7 +22880,7 @@ DOORS = {
  "DL08":["hvClassConfirm","hvClassRejectSave","midSave","obMark","rfNeed","xepMoiLuu","obChangeSave","obFinish"],
  "DL09":["bkLuuPHNguyCo","bkLuuPHQuanHe","blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave","riskCareSave","riskFlagRun","riskIgnoreSave","dhSave"],
  "DL10":["xepMoiLuu","obChangeSave","rfNeed","clsSetTeacher","moLopDelay","moLopCancelRun"],
- "DL11":["bhCancelRun","bhDone","bhMakeupSave","bhNoteSave","bkLuuMocGio","ddSave","sessEnd","sessStart","sesSetTeacher","clsSetTeacher"],
+ "DL11":["bhCancelRun","bhDone","bhMakeupSave","bhNoteSave","bkLuuMocGio","ddSave","sessEnd","sessStart","sesSetTeacher","clsSetTeacher","sesThiSave"],
  "DL12":["ddSave","hvAbsentSave","absReq","absReview","absMakeup","absCallSave"],
  "DL13":["chamLuu","giaoBaiCaLop","giaoBaiRieng","sesAssignRun","thuLuu"],
  "DL14":["hvWowSave","wowAddSave","wowCancelRun","wowConfirm","wowNoShow","wowNoteSave","wowRescheduleRun","wowTaught","wowUseQuota","wowStart","wowEnd"],
