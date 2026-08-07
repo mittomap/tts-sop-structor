@@ -223,6 +223,13 @@ else
   # Kiem SAU khi bam: moi chuc danh co viec, co viec gap/qua han, tuan nay co buoi hoc, va
   # CAU HINH + thoi quen rieng KHONG bi cuon theo.
   chay "_checkreset dung lai demo" "CHECKRESET (OK|BO QUA)" node _checkreset.js
+  # V2 (anh Luan 07/08): "e thiet ke sao ma de anh F5 lai trang no van o nguyen trang a dang
+  # dung nhe". App DA hua dieu nay tu V9.29c nhung chua ai DO - do ra thi 10/11 ca deu roi ve
+  # Trang bat dau. Goc loi o THU TU: enter() goi setRole() TRUOC, cu nhay ay ghi de thanh dia chi,
+  # roi moi doc dia chi - doc dung cai minh vua xoa.
+  # VI SAO 34 BO CU KHONG BAT DUOC: tat ca deu nap app MOT LAN roi do, khong bo nao NAP LAI.
+  # Bo nay do tren http:// (dung nhu demo that) chu khong phai file://.
+  chay "_checkf5 F5 khong mat cho dang dung" "CHECKF5 (OK|BO QUA)" node _checkf5.js
   # V9.99z11 - SO TREN THE PHAI TIM DUOC O DANH SACH. Hai lan trong hai ngay anh Luan bat cung
   # mot benh: the dem N ma danh sach ngay duoi khong co dau nao (buoi qua han nhan xet 06/08,
   # hoc vien nguy co 07/08). Goc chung: the va bang hoi HAI ham khac nhau cho cung mot cau hoi.

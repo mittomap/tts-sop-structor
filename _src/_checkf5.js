@@ -48,12 +48,14 @@ const CA = [
                                                                                              hoi:`({t:CUR,ai:window.GVID||""})`},
   {ten:"ho so MOT khoa hoc",        di:`window.KHID=rows("DL05")[0].course_id;go("hosokhoa")`,hoi:`({t:CUR,ai:window.KHID||""})`},
   {ten:"van hanh MOT lop",          di:`window.BLCLASS=rows("DL10")[0].class_id;go("banglop")`,hoi:`({t:CUR,lop:window.BLCLASS||""})`},
-  /* Cài đặt có CỬA CHẶN riêng: chưa chọn chế độ thì `go("settings")` chỉ mở hộp hỏi chứ KHÔNG
-     đổi trang (`_check16` canh đúng chốt đó). Không gõ cửa trước thì ca này đo nhầm - nó đứng
-     ở Trang bắt đầu suốt và báo đỏ một thứ không liên quan tới F5.
-     Cùng bài học `_checkui` đã rút: "thêm một cửa chặn thì phải hỏi lại - bộ kiểm có biết gõ
-     cửa không?" */
-  {ten:"Cai dat - tab Nguong CH2",  di:`cfSetMode("that");window.SETTAB="ch2";go("settings")`, hoi:`({t:CUR,tab:window.SETTAB||""})`},
+  /* Cài đặt nằm trong `SENSITIVE` - người bán hàng KHÔNG được vào, và `go()` chặn đúng như vậy.
+     Bản đầu của ca này đóng vai NV001 (sales) rồi báo đỏ "F5 mất chỗ đứng" - TỐ OAN app: app
+     chặn đúng, chỉ là cái thước gõ nhầm cửa. Nên ca này phải đổi sang người CÓ quyền.
+     `gateEnter("")` = vào bằng quyền toàn phần, đúng cửa mà `demoBoot` dùng khi `ITTS_WHO` là
+     chuỗi rỗng. Cộng `cfSetMode("that")` cho qua nốt cửa chọn chế độ.
+     (Lần thứ hai trong dự án một bộ kiểm tố oan vì đóng vai bằng cửa sai - lần trước là
+      `applyScope` thay vì `gateEnter` ở `_checkreset`.) */
+  {ten:"Cai dat - tab Nguong CH2",  di:`gateEnter("");cfSetMode("that");window.SETTAB="ch2";go("settings")`, hoi:`({t:CUR,tab:window.SETTAB||""})`},
 ];
 
 (async () => {
@@ -118,9 +120,12 @@ const CA = [
     else do_.push(c.ten + ": F5 xong MAT cho dang dung - truoc " + nhu + " (dia chi " + diachi + ") -> sau " + duoc);
   }
 
-  /* Cửa vào phải còn nhớ người: mất danh tính thì F5 rơi về cổng đăng nhập, cũng là mất chỗ. */
-  const who = await p.evaluate(() => sessionStorage.getItem("ITTS_WHO") || "");
-  if (who) ok.push("F5 van nho danh tinh (" + who + ")");
+  /* Cửa vào phải còn nhớ người: mất danh tính thì F5 rơi về cổng đăng nhập, cũng là mất chỗ.
+     Hỏi `!== null` chứ không hỏi "có giá trị": chuỗi RỖNG là một danh tính hợp lệ - đó là quyền
+     toàn phần, đúng nhánh `who===""` mà `demoBoot` xử. Hỏi bằng phép "có giá trị" thì người dùng
+     quyền toàn phần bị chấm là mất danh tính. */
+  const who = await p.evaluate(() => sessionStorage.getItem("ITTS_WHO"));
+  if (who !== null) ok.push("F5 van nho danh tinh (" + (who === "" ? "quyen toan phan" : who) + ")");
   else do_.push("F5 xong MAT danh tinh - roi ve cong dang nhap");
 
   if (loiJS.length) do_.push("loi JS trong luc nap lai: " + loiJS[0]);

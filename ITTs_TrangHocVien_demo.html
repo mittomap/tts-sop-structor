@@ -22066,7 +22066,7 @@ function hashKey(){
  return h?slugPg(decodeURIComponent(h)):""}
 function hashOK(k){return !!k&&(!!PBK[k]||goAlias(k))}
 function hashSet(k,deGhi){if(SVR||!k)return;   /* bản chạy trên Apps Script không sở hữu thanh địa chỉ */
- window.HASHCUR=k;var want="?"+pgSlug(k);
+ window.HASHCUR=k;var want="?"+pgSlug(k)+ctxQuery(k);
  if(location.search===want)return;
  /* V9.88 - ĐẨY một mốc lịch sử để nút Back của trình duyệt lùi được về trang liền trước.
     `deGhi` = true khi chính nút Back vừa gọi tới đây: lúc đó chỉ ghi đè, đẩy thêm là Back sẽ
@@ -22077,9 +22077,56 @@ function hashSet(k,deGhi){if(SVR||!k)return;   /* bản chạy trên Apps Script
    if(history.pushState){history.pushState(null,"",location.pathname+want);return}
  }}catch(e){}
  try{location.hash="/"+pgSlug(k)}catch(e2){}}
+/* ═══ ĐỊA CHỈ PHẢI NÓI ĐỦ "CHỖ ĐANG ĐỨNG", KHÔNG CHỈ "TRANG NÀO" (anh Luân 07/08) ═══════════
+   Anh Luân: *"e thiết kế sao mà để anh F5 lại trang nó vẫn ở nguyên trang a đang đứng nhé"*.
+   Trước bản này địa chỉ chỉ ghi tên trang, nên F5 ở hồ sơ một học viên là ra trang hồ sơ TRỐNG -
+   đúng trang, mà không còn ai trong đó.
+   Những thứ tạo nên "chỗ đang đứng" bên trong một trang (đang mở hồ sơ của AI, lớp nào, tab Cài
+   đặt nào) app ĐÃ khai sẵn ở `NAVCTX` - bảng mà breadcrumb và nút Quay lại đang dùng. Dùng lại
+   CHÍNH NÓ, không khai bảng thứ hai: hai bảng cùng tả một thứ thì sớm muộn nói hai đằng, đó là
+   lớp lỗi dự án đã cắn nhiều lần (tab mặc định của hub từng khai ở BA nơi, cả ba khác nhau).
+   Cộng thêm biến tab của các hub, lấy THẲNG từ `HUBTAB` nên thêm hub mới không phải nhớ sửa ở
+   đây. (Sang V2 mỗi nghiệp vụ là một trang riêng thì phần tab tự rỗng - `?thanh-toan` nói đủ.)
+   Tên tham số = ĐÚNG TÊN BIẾN của app viết thường (`?ho-so-360&hoso=HV061`) - không đặt bộ tên
+   thứ hai để phải nuôi một bảng dịch. */
+function ctxKeys(){var K=NAVCTX.slice();
+ try{for(var h in HUBTAB){var v=HUBTAB[h].v;if(v&&K.indexOf(v)<0)K.push(v)}}catch(e){}
+ return K}
+/* TRANG NÀO CẦN NHỚ THỨ GÌ. Chỉ ghi vào địa chỉ đúng những thứ TRANG ĐANG MỞ dùng tới.
+   Vì sao không ghi tất: biến ngữ cảnh là biến toàn cục, mở hồ sơ một học viên rồi đi tiếp thì
+   `HOSO` vẫn treo đó. Ghi tất thì đứng ở Vận hành lớp mà địa chỉ vẫn kéo theo hoso=... gvid=...
+   khid=... - dài loằng ngoằng, và cái link gửi cho người khác nói cả những chỗ họ không hỏi.
+   Trang không khai ở đây thì địa chỉ chỉ có tên trang - đúng, vì trang ấy không có "chỗ đứng bên
+   trong". Thêm một trang chi tiết mới mà quên khai thì `_checkf5` báo đỏ. */
+var CTXTRANG={hoso:["HOSO"],hosogv:["GVID"],hosonv:["NVID"],hosokhoa:["KHID"],
+ banglop:["BLCLASS"],diemdanh:["DDCLASS"],baitap:["BTCLASS","BTSESS"],giaoan:["GACRS","GATAB"],
+ settings:["SETTAB","MSGQ","CFQ"],chay:["JPID"]};
+/* Khoá ngữ cảnh của MỘT trang: phần khai ở trên, cộng biến tab nếu trang đó là hub (lấy thẳng
+   từ HUBTAB). Sang V2 mỗi nghiệp vụ một trang thì vế hub tự rỗng. */
+function ctxCuaTrang(k){var K=(CTXTRANG[k]||[]).slice();
+ try{if(HUBTAB[k]&&HUBTAB[k].v)K.push(HUBTAB[k].v)}catch(e){}
+ return K}
+function ctxQuery(k){var s="";
+ ctxCuaTrang(k).forEach(function(k2){var v=window[k2];
+  if(v===null||v===undefined||v==="")return;
+  v=String(v);
+  /* Ô tìm kiếm có thể dài - thanh địa chỉ không phải chỗ chứa văn bản. Bỏ qua chứ không cắt
+     ngắn: một chuỗi tìm bị cắt còn tệ hơn không nhớ, vì nạp lại ra kết quả khác mà không ai ngờ. */
+  if(v.length>80)return;
+  s+="&"+k2.toLowerCase()+"="+encodeURIComponent(v)});
+ return s}
+/* Đọc ngữ cảnh TỪ địa chỉ và đặt lại vào app. Chỉ nhận đúng những khoá đã khai trong ctxKeys -
+   người ta gõ thêm tham số lạ vào thanh địa chỉ thì app không đặt bừa biến toàn cục theo. */
+function ctxApply(qs){
+ var M={};ctxKeys().forEach(function(k){M[k.toLowerCase()]=k});
+ String(qs!=null?qs:(location.search||"")).replace(/^\?/,"").split("&").forEach(function(x){
+  var i=x.indexOf("=");if(i<0)return;
+  var t=M[x.slice(0,i)];if(!t)return;
+  try{window[t]=decodeURIComponent(x.slice(i+1))}catch(e){}})}
 function hashApply(){var k=hashKey();
  if(!k||k===window.HASHCUR)return;
  if(!hashOK(k))return;
+ ctxApply();          /* đặt lại hồ sơ/lớp/tab TRƯỚC khi vẽ, không thì vẽ ra trang trống */
  go(k,true)}   /* true = đang do Back/Forward, đừng đẩy thêm mốc nữa */
 function go(key,noHist){
  /* V9.27: nhớ lại mục menu đang sáng TRƯỚC khi rời đi. Trang nào không có mục riêng trên menu
@@ -22703,10 +22750,23 @@ function helloMaybe(){
   '</div>';
  d.onclick=function(ev){if(ev.target===d)helloDong()};
  document.body.appendChild(d)}
-function enter(k){try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{rtEnsure()}catch(e){}try{autoReturnHandovers()}catch(e){}document.getElementById("login").style.display="none";document.getElementById("app").style.display="flex";setRole(k);try{helloMaybe()}catch(e){}
- /* Vào app xong mới đọc địa chỉ: setRole đã dựng menu + đứng ở trang mặc định, giờ nếu trên thanh
-    địa chỉ có #/<trang> hợp lệ thì nhảy về đúng đó (F5 hoặc mở link người khác gửi). */
- try{var hk=hashKey();if(hashOK(hk))go(hk)}catch(e){}
+function enter(k){
+ /* ĐỌC ĐỊA CHỈ TRƯỚC KHI LÀM BẤT CỨ VIỆC GÌ CÓ THỂ GHI VÀO NÓ - đây là cả bản vá.
+    BẪY ĐÃ CẮN (anh Luân 07/08: *"F5 lại trang nó vẫn ở nguyên trang a đang đứng nhé"*): ba dòng
+    này vốn nằm SAU `setRole(k)`. Mà `setRole` đưa người dùng về trang đáp của chức danh, cú đi
+    ấy gọi `go()` -> `hashSet()` -> địa chỉ `?thanh-toan` bị ghi đè thành `?trang-bat-dau`. Nên
+    khi tới lượt đọc thì nó đọc đúng cái mình vừa xoá. Đo được: 10/11 ca đều rơi về Trang bắt
+    đầu, trong khi `ITTS_WHO` vẫn còn nguyên - app vào đúng người, chỉ là tự tay xoá mất đích đến.
+    Lỗi không nằm ở phép ghi địa chỉ, nó nằm ở THỨ TỰ. Cùng họ với bẫy "đo một bản, sửa một bản
+    khác": một giá trị bị thay đổi giữa lúc ghi và lúc đọc, và không ai báo gì cả.
+    `_checkf5.js` canh chỗ này - nó nạp lại app THẬT rồi hỏi lại, việc mà 34 bộ kiểm cũ không bộ
+    nào làm (tất cả đều nạp app một lần rồi đo). */
+ var hkVao="";try{hkVao=hashKey()}catch(e){}
+ var ctxVao=String(location.search||"");
+ try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{rtEnsure()}catch(e){}try{autoReturnHandovers()}catch(e){}document.getElementById("login").style.display="none";document.getElementById("app").style.display="flex";setRole(k);try{helloMaybe()}catch(e){}
+ /* Giờ mới đi tới chỗ đã đọc được lúc nãy (F5, hoặc mở link người khác gửi). Ngữ cảnh phải đặt
+    TRƯỚC `go` - đặt sau thì trang đã vẽ xong bằng hồ sơ rỗng rồi. */
+ try{if(hashOK(hkVao)){ctxApply(ctxVao);go(hkVao)}}catch(e){}
  /* người dùng sửa tay thanh địa chỉ / bấm Back về hash cũ */
  try{if(!window.__hashOn){window.__hashOn=1;
   window.addEventListener("hashchange",function(){try{hashApply()}catch(e){}});
