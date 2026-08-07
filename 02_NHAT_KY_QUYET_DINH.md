@@ -239,7 +239,58 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.99z10 — AUDIT ĐÃ NỘP, 29 BỘ KIỂM XANH HẾT ✅ (05/08, bản dựng `2f8287`).**
+> **Phiên bản: V9.99z11 — AC2 (HAI TỶ LỆ ĐẠT AIM) XONG, 33 BỘ KIỂM XANH HẾT ✅
+> (07/08, bản dựng `650b6f`). Demo online CỐ Ý CHƯA ĐẨY - anh Luân đang trình diễn.**
+>
+> ### 🟢 ANH LUÂN CHỐT 07/08: LÀM **BẢN V2** - MỖI NGHIỆP VỤ MỘT TRANG
+> *"Mỗi nghiệp vụ 1 trang, vẫn sắp xếp được theo chặng trên sidebar, nhưng mỗi trang là nghiệp
+> vụ riêng, và nó có thẻ, có chip lọc, có cảnh báo của riêng nó."* · *"các team ngoài team sale
+> ra là cần đi theo luồng, theo chặng, còn các vị trí khác, đa phần là cần trang nghiệp vụ."*
+> · **CÁCH LÀM (anh chốt):** NHÁNH GIT RIÊNG + deploy riêng `itts-sop-demo-v2`. Bản đang chạy
+>   không đụng tới. Tách nhánh **SAU** khi xong việc tồn, nên V2 kế thừa sẵn AC2-AC6.
+> · **Bỏ hẳn hub.** 6 hub (tuyensinh, hoctap, cskh, duyet, giangvien, khac) đang đậy **25 trang
+>   THẬT** đã có hàm vẽ riêng, chỉ bị gắn `hide:1`. Việc chính là **mở nắp**, không phải dựng mới.
+> · **Trang đáp đổi thành dải cảnh báo** gom chỗ bất thường của các trang nghiệp vụ.
+> · **HAI RÀNG BUỘC CỨNG của V2** (đều rút từ lỗi cắn trong ngày):
+>   1. Trang đáp **ĐỌC** bản khai số của trang nghiệp vụ, **KHÔNG tự tính lại** - tự tính lại là
+>      nhân bệnh "thẻ đếm một kiểu, bảng đếm kiểu khác" lên 25 lần.
+>   2. Anh Luân 07/08: *"cùng 1 nghiệp vụ mà ở bản hiện tại có thể làm được ở rất nhiều nơi, sẽ
+>      làm cho nhân sự bị rối."* → **một nghiệp vụ = MỘT cửa ghi** (một form, một hàm lưu, một
+>      chỗ chặn quyền). Nơi khác chỉ được **mở** cửa đó, cấm dựng bản sao.
+> · **ĐỪNG LẶP LẠI SAI LẦM V6.** V6 sai KHÔNG ở ý tưởng (đo được: 100/114 làm tại chỗ so với
+>   114/114 phải đổi màn). V6 sai ở **CÁCH**: hai sản phẩm sống chung một nguồn, bật tắt bằng cờ
+>   `ITTS_V6` - 25 chỗ rẽ nhánh, tour kéo người bản 5 sang trang bản 6 và ngược lại (anh Luân:
+>   *"lỗi kéo theo rất nghiêm trọng"*), bảng cắm cứng BVLAND/NAVTREE âm thầm mất tính năng một
+>   bên, verify phải chạy hai lượt. **Nhánh git riêng không có bệnh đó: một nguồn, một thế giới.**
+>
+> ### 🔴 BẪY NGÀY 07/08 - MỘT VIỆC CÓ HAI BẢN CÀI ĐẶT (anh Luân bắt HAI LẦN trong hai ngày)
+> 06/08: *"2 buổi quá hạn chưa nhận xét, nhưng a nhìn xuống buổi, a ko thấy icon nên a ko biết
+> chỗ nào."* · 07/08: *"tương tự trường hợp lúc nãy, báo 2 học viên nguy cơ mà a chẳng thấy đâu."*
+> **Gốc chung: cái THẺ và cái BẢNG hỏi HAI HÀM KHÁC NHAU cho cùng một câu hỏi.** Thẻ đếm bằng
+> `stuRisk()` = cờ NGƯỜI GẮN **hoặc** MÁY THẤY vượt ngưỡng; bảng đọc thẳng hai cột trạng thái nên
+> chỉ thấy cờ người gắn. Em nào máy thấy mà chưa ai gắn cờ thì vào thẻ mà không vào bảng.
+> **Con số không sai - cái sai là NÓ KHÔNG DẪN TỚI ĐÂU.** Đã gom 8 chỗ về một hàm, dòng nguy cơ
+> nói luôn vì sao + chip "máy thấy". Bộ kiểm mới `_checkdem.js` canh (thử ngược bản cũ: **18/88 đỏ**).
+> **VÀ NGAY LƯỢT CHẠY ĐẦU TIÊN NÓ BẮT MỘT LỖI NẶNG HƠN:** `coDD` khai bằng `var` trong khối tính
+> ô đếm nhưng viên buổi phía dưới lại đọc - tab **"Buổi học & điểm danh"** ném ReferenceError và
+> **không vẽ ra gì**. Tab CHÍNH của Vận hành lớp chết câm mà không bộ kiểm nào báo, vì không bộ
+> nào bấm vào đúng tab đó. **Bài học: một tab không có bộ kiểm nào bấm vào thì hỏng bao lâu cũng
+> không ai biết.**
+>
+> ### 🔴 BẪY NGÀY 07/08 (lần 2) - `extract_js.py` ĐỌC NHẦM THƯ MỤC
+> `gen_v5.py` mặc định ghi vào `_src/`, `extract_js.py` mặc định đọc từ **gốc repo**. Chạy tay
+> `gen_v5.py && extract_js.py` là xây bản mới ở một chỗ rồi trích bản **CŨ** ở chỗ khác đè lên
+> `_APP.js` - mọi bộ kiểm sau đó đo bản cũ mà vẫn in kết quả như thật. Hôm nay nó làm em **đọc
+> nhầm kết quả của bốn bộ kiểm**, tưởng đã vá xong trong khi bản đó chưa hề được dựng lại.
+> `verify.sh` không dính vì nó `export ITTS_OUT`; chỉ người chạy tay mới dính, và dính trong im
+> lặng. **Đã cho hai mặc định KHỚP NHAU.** (Bẫy này đã ghi từ 02/08 - đây là lần cắn thứ hai.)
+>
+> ### 🟡 LUẬT: CHẠY TRỌN BỘ TRƯỚC KHI ĐẨY - 07/08 CHỨNG MINH NÓ ĐÁNG GIÁ
+> Lượt trọn bộ sau AC2 ra **9 chỗ đỏ**, gần như đều do màn mới đẻ ra, trong đó **hai lỗi thật**:
+> trang Kết quả đầu ra **chưa hề có trên cây menu** (vào được bằng link nhưng không ai tìm thấy),
+> và dòng bảng lát cắt **bấm vào không có gì xảy ra** (`_checkbam` gọi đúng tên: "IM LẶNG").
+> Thêm một chỗ đáng nhớ: `check_sop` báo SOP mô tả **NA005** mà app không còn sinh ra - đào ra thì
+> trước nay nó xanh **vì tình cờ** có một đơn rơi đúng cửa sổ 24h-7 ngày. Nay gieo thẳng.
 >
 > ### 🔴 BẪY ĐẮT NHẤT NGÀY 05/08 - ĐẨY NHẦM FILE SUỐT MỘT NGÀY
 > Trang demo online **KHÔNG phục vụ ba file ở gốc repo demo**. Nó phục vụ
