@@ -239,8 +239,30 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.99z11 — AC2 (HAI TỶ LỆ ĐẠT AIM) XONG, 33 BỘ KIỂM XANH HẾT ✅
-> (07/08, bản dựng `650b6f`). Demo online CỐ Ý CHƯA ĐẨY - anh Luân đang trình diễn.**
+> **Phiên bản: V9.99z12 — AC1-AC6 XONG HẾT, 34 BỘ KIỂM (07/08, bản dựng `829572`).**
+>
+> ### 🔴 BẪY 07/08 (lần 2) - DỜI LỊCH CỘNG NGÀY THAY VÌ ĐẾM Ô LỊCH
+> Anh Luân: *"cái dời buổi nó có theo logic ko đó em? ví dụ khóa đó là 3-5-7, dời lịch thì chỉ
+> được chọn 3-5-7, các khóa sau cũng phải dời tương ứng á."* Đúng, và bản đầu của AC5 **SAI**:
+> nó cộng cứng `+N ngày` cho mọi buổi. Lớp T3-T5-T7 dời 5 ngày là buổi rơi vào Chủ nhật - một
+> ngày lớp không hề học, và cả khóa lệch nếp từ đó về sau.
+> **Vá:** bộ đọc `class_schedule` (`lopThu`) chịu được cả bốn dạng viết trong dữ liệu -
+> `"T2-4-6 19:30"`, `"T2-T4-T6, 19h-20h30"`, `"T7+CN, 9h-12h"`, `"T3-T5, 19h-20h30"`. Dời lịch
+> nay tính bằng **Ô LỊCH** (`demO` đếm, `nhichO` nhích), chặn ngày rơi vào thứ lớp không học
+> (`ngayHopLe`), và gợi ý sẵn ô lịch kế tiếp. Đo thật: lớp T2-T4-T6 dời 2 ô → **cả 35 buổi** vẫn
+> rơi đúng T2/T4/T6, không một buổi lệch thứ; chọn Thứ Ba thì bị chặn ngay ở phần xem trước.
+>
+> ### 🔴 BẪY 07/08 (lần 3) - RUBRIC GẮN ĐÚNG MỘT TRONG HAI CHỖ GHI NHẬN XÉT
+> Anh Luân chụp màn ô nhận xét và hỏi *"cái nâng cấp phần nhận xét là em bảo làm ở V2 hay làm
+> luôn cho ver này?"* - **đã làm cho bản này (AC6), nhưng em gắn nhầm chỗ**: rubric nằm ở ngăn
+> kéo *Nhận xét buổi*, còn chỗ anh thật sự dùng là ô nhận xét **trong trang Điểm danh**. Hai chỗ
+> ghi cùng một thứ mà chỉ một chỗ có bộ tiêu chí. **Đúng bệnh anh nêu cho V2: một nghiệp vụ làm
+> được ở nhiều nơi.** Nay cả hai gọi chung `rubricHTML` (vẽ) + `rubricThu` (đọc), `ddSave` ghi
+> đủ ba cột `rubric_diem/rubric_tich/rubric_tb`.
+> **Và lúc vá lòi ra một cái nữa:** ngăn kéo mở ĐÈ lên trang mà trang vẫn còn trong DOM → hai bộ
+> tiêu chí **trùng id phần tử**, `getElementById` vớ trúng bản ở trang bên dưới. Người dạy chấm
+> trong ngăn kéo mà app lưu điểm của trang. Đã cho ngăn kéo tiền tố riêng (`rb_d…`). Đo lại:
+> chấm 5-4-3 ở trang → lưu ra `tb=4`, mở ngăn kéo thấy lại đúng 5-4-3.
 >
 > ### 🟢 ANH LUÂN CHỐT 07/08: LÀM **BẢN V2** - MỖI NGHIỆP VỤ MỘT TRANG
 > *"Mỗi nghiệp vụ 1 trang, vẫn sắp xếp được theo chặng trên sidebar, nhưng mỗi trang là nghiệp

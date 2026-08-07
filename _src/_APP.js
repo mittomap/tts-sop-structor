@@ -4763,6 +4763,9 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
   h+='<div class="psub"><span class="stepn">Cả lớp</span><b>Nhận xét chung buổi học</b>'+
    (noteDone?'<span class="chip green" style="margin-left:2px">đã ghi</span>':'<span class="chip amber" style="margin-left:2px">chờ ghi · hạn '+paramOf("slaTeacherNote_hours",48)+'h</span>')+
    '<span class="mut" style="font-size:11.5px">học vụ đọc để phát hiện lớp/HV cần lưu ý</span></div>';
+  /* Bộ tiêu chí chấm buổi dạy - CÙNG MỘT hàm với ngăn kéo "Nhận xét buổi". Trước 07/08 chỗ này
+     chỉ có ô văn xuôi, nên người dạy ghi ở đây thì không có rubric, ghi ở ngăn kéo thì có. */
+  h+='<div class="pbody" style="padding-bottom:0">'+rubricHTML(ses)+'</div>';
   h+='<div class="pbody"><div class="fld full" style="margin:0"><textarea id="dd_note" rows="3" placeholder="Lớp học thế nào, học viên nào yếu / tiến bộ, cần lưu ý gì cho buổi sau...">'+esc(ses.teacher_note_summary||"")+'</textarea>'+
    (num(ses.teacher_late_minutes)>5?'<div class="fhint"><i class="ti ti-clock-exclamation"></i> Giờ vào lớp của GV (trễ '+esc(ses.teacher_late_minutes)+' phút) đã tự ghi khi bấm Bắt đầu lớp.</div>':'')+'</div>'+
    /* V9.40: nút Lưu THỨ HAI ngay dưới ô nhận xét. Đo tọa độ thật: nút Lưu ở đầu panel nằm cách
@@ -4807,8 +4810,14 @@ function ddSave(){var sess=window.DDSESS;if(!sess){toast("Chưa chọn buổi.")
  function saveSesNote(){if(sesNote==null)return "";var srow=find("DL11","session_id",sess);if(!srow)return "";
   srow.teacher_note_summary=sesNote;   /* teacher_late_minutes tự ghi khi Bắt đầu lớp - KHÔNG đụng vào */
   if(sesNote){srow.has_teacher_note="TRUE";srow.teacher_note_completed_at=nowStr();if(!isc(srow.session_status,"completed"))srow.session_status=eFull("enum_session_status","completed")}
-  if(SVR)google.script.run.apiUpdate("DL11",sess,{teacher_note_summary:sesNote,has_teacher_note:sesNote?"TRUE":"",teacher_note_completed_at:sesNote?nowStr():""});
-  return sesNote?" · đã lưu nhận xét buổi":""}
+  /* Rubric chấm buổi dạy - ghi kể cả khi ô văn xuôi còn trống, vì chấm điểm tự nó đã là nhận
+     xét. Cùng bộ tiêu chí, cùng ba cột với ngăn kéo "Nhận xét buổi" (rubricThu). */
+  var rb=rubricThu(),ex2="";
+  if(rb.co){srow.rubric_diem=rb.diem;srow.rubric_tich=rb.tich;srow.rubric_tb=(rb.tb==null?"":String(rb.tb));
+   ex2=(rb.tb!=null?" · điểm buổi dạy "+rb.tb+"/5":" · đã chấm buổi dạy")}
+  if(SVR)google.script.run.apiUpdate("DL11",sess,{teacher_note_summary:sesNote,has_teacher_note:sesNote?"TRUE":"",teacher_note_completed_at:sesNote?nowStr():"",
+   rubric_diem:rb.diem,rubric_tich:rb.tich,rubric_tb:(rb.tb==null?"":String(rb.tb))});
+  return (sesNote?" · đã lưu nhận xét buổi":"")+ex2}
  function apply(){var up=0,ins=0;recs.forEach(function(rc){var cur=rows("DL12").filter(function(x){return x.student_id===rc.student_id&&x.session_id===sess})[0];var full=eFull("enum_attendance_status",rc.attendance_status);var s9=find("DL09","student_id",rc.student_id)||{};
   if(cur){cur.attendance_status=full;cur.absence_type=rc.absence_type||"";if(rc.performance)cur.in_class_performance=rc.performance;if(rc.note!==undefined)cur.note=rc.note;
    if(/on_time|late/.test(rc.attendance_status)){if(!String(cur.check_in_time||"").trim())cur.check_in_time=nowStr()}else{cur.check_in_time=""}up++}
@@ -14279,6 +14288,46 @@ function sesThiSave(cid){
    Trước bản này app CÓ nút "Lùi ngày khai giảng" nhưng nó ghi lý do vào ô `notes` của lớp dưới
    dạng một câu văn nối đuôi nhau: không lọc được theo lớp, không đếm được lớp nào hay dời,
    không biết ai dời và dời mấy ngày. Một thứ cần TRA thì phải là DÒNG CÓ CỘT (DL11b). */
+/* ═══ LỚP CHẠY THEO Ô LỊCH, KHÔNG PHẢI THEO NGÀY ═════════════════════════════════════════
+   Anh Luân 07/08: *"cái dời buổi nó có theo logic ko đó em? ví dụ khóa đó là 3-5-7, dời lịch
+   thì chỉ được chọn 3-5-7, các khóa sau cũng phải dời tương ứng á."*
+   Đúng, và bản trước SAI: nó cộng cứng +N ngày cho mọi buổi. Lớp T3-T5-T7 dời 5 ngày là buổi
+   rơi vào Chủ nhật - một ngày lớp không hề học. Dời lịch phải dời theo Ô LỊCH của lớp: ngày
+   mới phải là một thứ lớp có học, và các buổi sau nhích đi ĐÚNG BẤY NHIÊU Ô, không phải bấy
+   nhiêu ngày.
+   `class_schedule` viết đủ kiểu trong dữ liệu: "T2-4-6 19:30", "T2-T4-T6, 19h-20h30",
+   "T7+CN, 9h-12h", "T3-T5, 09h-10h30" - nên bộ đọc phải chịu được cả bốn dạng. */
+function lopThu(c){
+ var t=String((c&&c.class_schedule)||"");
+ var gio=t.indexOf(",");if(gio<0)gio=t.search(/\d{1,2}\s*[h:]/);
+ var phan=(gio>0?t.slice(0,gio):t);
+ var o={},m;
+ if(/CN|chủ\s*nhật/i.test(phan))o[0]=1;
+ var re=/T\s*([2-7])/gi;while((m=re.exec(phan)))o[+m[1]-1]=1;
+ /* dạng viết tắt "T2-4-6": chỉ chữ T đầu có, các số sau đứng trần */
+ var re2=/(?:^|[-+\s])([2-7])(?![\dh:])/g;while((m=re2.exec(phan)))o[+m[1]-1]=1;
+ var ds=Object.keys(o).map(Number).sort(function(a,b){return a-b});
+ return ds.length?ds:null}
+function lopThuTen(c){var d=lopThu(c);if(!d)return "";
+ var T=["CN","T2","T3","T4","T5","T6","T7"];
+ return d.map(function(x){return T[x]}).join(" · ")}
+function ngayHopLe(c,d){var ds=lopThu(c);if(!ds||!d)return true;return ds.indexOf(d.getDay())>=0}
+/* Nhích một ngày đi N Ô LỊCH (N>0 tới, N<0 lùi). Lớp không khai lịch thì rơi về cộng ngày. */
+function nhichO(c,d,n){var ds=lopThu(c);
+ if(!ds||!n)return new Date(d.getTime()+(ds?0:n)*864e5);
+ var b=new Date(d.getTime()),buoc=n>0?1:-1,con=Math.abs(n),an=0;
+ while(con>0&&an<4000){b=new Date(b.getTime()+buoc*864e5);an++;
+  if(ds.indexOf(b.getDay())>=0)con--}
+ return b}
+/* Từ ngày cũ tới ngày mới là bao nhiêu Ô LỊCH - dùng để biết các buổi sau phải nhích mấy ô. */
+function demO(c,cu,moi){var ds=lopThu(c);
+ if(!ds)return Math.round((moi-cu)/864e5);
+ var xuoi=moi>=cu,b=new Date(cu.getTime()),n=0,an=0;
+ while(an<4000){
+  if(Math.abs(b-moi)<432e5&&b.toDateString()===moi.toDateString())return xuoi?n:-n;
+  b=new Date(b.getTime()+(xuoi?1:-1)*864e5);an++;
+  if(ds.indexOf(b.getDay())>=0)n++}
+ return Math.round((moi-cu)/864e5)}
 function doiLichSu(cid){return srows("DL11b").filter(function(x){return String(x.class_id||"")===String(cid)})
  .sort(function(a,b){var da=pvnd(a.thoi_diem),db=pvnd(b.thoi_diem);return (db?db.getTime():0)-(da?da.getTime():0)})}
 function doiForm(cid,sid){
@@ -14293,7 +14342,14 @@ function doiForm(cid,sid){
   ses.map(function(x){return '<option value="'+esc(x.session_id)+'"'+(x.session_id===cur?" selected":"")+' data-ngay="'+esc(x.session_date||"")+'">Buổi '+esc(x.session_number||"?")+' · '+esc(String(x.session_date||"").slice(0,10)||"chưa có ngày")+'</option>'}).join("")+'</select></div>';
  (function(){var _s0=ses.filter(function(x){return x.session_id===cur})[0]||ses[0];
   var _d0=pvnd(_s0&&_s0.session_date)||new Date();
-  h+='<div class="fld"><label>Ngày mới <i>*</i></label><input id="dl_ngay" type="date" value="'+esc(_isoP(_d0))+'" onchange="doiXem()"></div>'})();
+  /* Gợi ý sẵn Ô LỊCH KẾ TIẾP của lớp chứ không phải chính ngày cũ - dời lịch thì ai cũng đang
+     định đẩy sang buổi sau, và ngày gợi ý luôn rơi đúng thứ lớp học. */
+  var _g=nhichO(c,_d0,1);
+  h+='<div class="fld"><label>Ngày mới <i>*</i></label><input id="dl_ngay" type="date" value="'+esc(_isoP(_g))+'" onchange="doiXem()"></div>'})();
+ (function(){var _t=lopThuTen(c);
+  h+='<div class="fhint" style="margin:-4px 0 8px">'+(_t
+   ?('Lớp chạy <b>'+esc(_t)+'</b> - ngày mới phải rơi vào một trong các thứ đó, và mọi buổi sau sẽ nhích đúng bấy nhiêu <b>buổi lịch</b> để giữ nguyên nếp.')
+   :('Lớp chưa khai lịch cố định trong hồ sơ lớp nên hệ thống dời theo <b>số ngày</b>. Khai lịch ở hồ sơ lớp để dời theo đúng nếp thứ.'))+'</div>'})();
  h+='<div class="fld full"><label>Phạm vi <i>*</i></label><select id="dl_pv" onchange="doiXem()">'+
   '<option value="ca_khoa">Buổi này và MỌI buổi sau (dời cả khóa)</option>'+
   '<option value="mot_buoi">Chỉ buổi này</option></select></div>';
@@ -14314,13 +14370,25 @@ function doiTinh(cid){
  var lech=Math.round((moi.getTime()-new Date(cu.getFullYear(),cu.getMonth(),cu.getDate(),cu.getHours(),cu.getMinutes()).getTime())/864e5);
  var n0=num(s0.session_number);
  var dich=(pv==="mot_buoi")?[s0]:ses.filter(function(x){return num(x.session_number)>=n0});
- return {s0:s0,cu:cu,moi:moi,lech:lech,dich:dich,pv:pv}}
+ /* Lệch tính bằng Ô LỊCH của lớp, không bằng ngày. Lớp T3-T5-T7 dời từ T3 sang T5 là 1 ô
+    (2 ngày); dời sang T3 tuần sau là 3 ô (7 ngày). Các buổi sau nhích đúng bấy nhiêu ô nên
+    lớp giữ nguyên nếp thứ của nó. */
+ var c=find("DL10","class_id",cid)||{};
+ var thu=lopThu(c);
+ var oLech=demO(c,new Date(cu.getFullYear(),cu.getMonth(),cu.getDate()),new Date(moi.getFullYear(),moi.getMonth(),moi.getDate()));
+ var hopLe=ngayHopLe(c,moi);
+ return {s0:s0,cu:cu,moi:moi,lech:lech,oLech:oLech,dich:dich,pv:pv,c:c,thu:thu,hopLe:hopLe,thuTen:lopThuTen(c)}}
 function doiXem(){var el=document.getElementById("dl_xem");if(!el)return;
  var t=doiTinh(window.BLCLASS);
  if(!t){el.textContent="Chọn buổi và ngày mới để xem sẽ dời bao nhiêu buổi.";return}
  if(!t.lech){el.textContent="Ngày mới trùng ngày cũ - chưa có gì để dời.";return}
- el.innerHTML='Sẽ dời <b>'+t.dich.length+'</b> buổi, mỗi buổi '+(t.lech>0?"lùi":"sớm")+' <b>'+Math.abs(t.lech)+'</b> ngày.'+
-  (t.pv==="ca_khoa"?' Buổi cuối khóa dời sang <b>'+esc(dmy(new Date(pvnd(t.dich[t.dich.length-1].session_date).getTime()+t.lech*864e5)))+'</b>.':'')}
+ /* Ngày mới rơi vào thứ lớp KHÔNG học thì chặn ngay ở đây, đừng để bấm rồi mới biết. */
+ if(!t.hopLe){el.innerHTML='<span style="color:var(--red)"><b>Ngày này lớp không học.</b> Lớp chạy '+esc(t.thuTen)+
+   ' - chọn một ngày rơi vào các thứ đó, nếu không cả khóa sẽ lệch nếp.</span>';return}
+ var cuoi=t.dich[t.dich.length-1],dc=pvnd(cuoi&&cuoi.session_date);
+ el.innerHTML='Sẽ dời <b>'+t.dich.length+'</b> buổi, mỗi buổi '+(t.oLech>0?"lùi":"sớm")+' <b>'+Math.abs(t.oLech)+'</b> buổi lịch'+
+  (t.thuTen?' (lớp chạy '+esc(t.thuTen)+' - dời xong vẫn đúng nếp thứ)':' ('+Math.abs(t.lech)+' ngày)')+'.'+
+  (t.pv==="ca_khoa"&&dc?' Buổi cuối khóa dời sang <b>'+esc(dmy(nhichO(t.c,dc,t.oLech)))+'</b>.':'')}
 function doiSave(cid){
  if(chanAct("ses_doi"))return;
  var ly=String(fldV("dl_ly")||"").trim();
@@ -14328,10 +14396,13 @@ function doiSave(cid){
  var t=doiTinh(cid);
  if(!t){toast("Chọn buổi và ngày mới.");return}
  if(!t.lech){toast("Ngày mới trùng ngày cũ.");return}
- var c=find("DL10","class_id",cid)||{};
+ if(!t.hopLe){toast("Ngày mới rơi vào thứ lớp không học. Lớp chạy "+t.thuTen+" - chọn ngày trong các thứ đó.",4500);return}
+ var c=t.c;
  t.dich.forEach(function(x){
   var d=pvnd(x.session_date);if(!d)return;
-  var nd=new Date(d.getTime()+t.lech*864e5);
+  /* Nhích theo Ô LỊCH: mỗi buổi tiến/lùi đúng `oLech` buổi lịch của lớp, nên buổi nào cũng
+     rơi vào một thứ lớp có học. Cộng cứng ngày như bản cũ là đẩy buổi vào ngày lớp nghỉ. */
+  var nd=nhichO(c,d,t.oLech);
   var gio=String(x.session_date||"").slice(10);
   jUpdRow("DL11",x.session_id,{session_date:dmy(nd)+gio,
    session_status:eFull("enum_session_status","rescheduled")})});
@@ -14341,7 +14412,7 @@ function doiSave(cid){
   ngay_cu:String(t.s0.session_date||""),ngay_moi:dmy(t.moi)+String(t.s0.session_date||"").slice(10),
   so_ngay_doi:t.lech,ly_do:ly,nguoi_doi:GATE_SID||"",nguoi_doi_name:myName(),
   thoi_diem:nowStr(),next_action:""},function(){
-   toast("Đã dời "+t.dich.length+" buổi, lệch "+Math.abs(t.lech)+" ngày. Nhớ báo lại học viên và giáo viên.");
+   toast("Đã dời "+t.dich.length+" buổi, mỗi buổi lệch "+Math.abs(t.oLech)+" buổi lịch"+(t.thuTen?" (vẫn đúng nếp "+t.thuTen+")":"")+". Nhớ báo lại học viên và giáo viên.");
    closeModal();reRender(CUR)})}
 /* Ngăn kéo kể đầy đủ MỘT lần dời - bảng chỉ đủ chỗ cho phần tóm tắt, lý do dài bị cắt. */
 function doiXemChiTiet(id){
@@ -15054,25 +15125,45 @@ function rubricGhi(o){var a=[];for(var k in o)if(String(o[k]).trim()!=="")a.push
 function rubricTB(v){var o=rubricDoc(v),t=0,n=0;
  for(var k in o){var x=parseFloat(o[k]);if(isFinite(x)&&x>0){t+=x;n++}}
  return n?Math.round(t/n*10)/10:null}
+/* MỘT NGHIỆP VỤ - MỘT BẢN DỰNG. Anh Luân 07/08 chụp màn ô nhận xét ở trang Điểm danh và hỏi
+   *"cái nâng cấp phần nhận xét là làm ở V2 hay làm luôn cho ver này?"* - làm rồi, nhưng em gắn
+   vào NGĂN KÉO "Nhận xét buổi", còn chỗ anh thật sự dùng là ô nhận xét trong trang Điểm danh.
+   Hai chỗ ghi cùng một thứ mà chỉ một chỗ có bộ tiêu chí. Đúng cái bệnh anh nêu: *"cùng 1 nghiệp
+   vụ mà ở bản hiện tại có thể làm được ở rất nhiều nơi, sẽ làm cho nhân sự bị rối."*
+   Nay CẢ HAI chỗ gọi chung `rubricHTML` để vẽ và `rubricThu` để đọc - sửa bộ tiêu chí một lần
+   là hai chỗ đổi theo, không thể lệch nữa. */
+/* `pre` là TIỀN TỐ tên phần tử. Ngăn kéo "Nhận xét buổi" mở ĐÈ LÊN trang Điểm danh mà trang
+   vẫn còn nguyên trong DOM - hai bộ tiêu chí cùng tồn tại. Không có tiền tố thì `getElementById`
+   vớ trúng bản ở trang bên dưới, người dạy chấm trong ngăn kéo mà app lưu điểm của trang.
+   Đo được ngay lượt chạy đầu: mở ngăn kéo thấy sẵn hai ô tích của trang bên dưới. */
+function rubricHTML(s,pre){pre=pre||"";var RB=rubricCfg(),cu=rubricDoc(s&&s.rubric_diem),ct=rubricDoc(s&&s.rubric_tich),h="";
+ h+='<div class="sechd">Chấm buổi dạy</div>';
+ h+='<div class="fhint" style="margin:-2px 0 8px">Thang 1-5. Để trống tiêu chí nào không đánh giá được ở buổi này - trống thì không tính vào điểm trung bình.</div>';
+ h+='<div class="rbwrap">';
+ RB.diem.forEach(function(t){
+  h+='<div class="rbrow"><div class="rbl"><b>'+esc(t[1])+'</b>'+(t[2]?('<small>'+esc(t[2])+'</small>'):'')+'</div><div class="rbs">';
+  for(var i=1;i<=5;i++)h+='<label class="rbo"><input type="radio" name="rb_'+esc(pre)+esc(t[0])+'" value="'+i+'"'+(String(cu[t[0]]||"")===String(i)?" checked":"")+'><span>'+i+'</span></label>';
+  h+='<label class="rbo rbx"><input type="radio" name="rb_'+esc(pre)+esc(t[0])+'" value=""'+(!cu[t[0]]?" checked":"")+'><span>-</span></label>';
+  h+='</div></div>'});
+ h+='</div>';
+ h+='<div class="sechd">Việc đã làm trong buổi</div><div class="rbtick">';
+ RB.tich.forEach(function(t){
+  h+='<label class="rbt"><input type="checkbox" id="rbt_'+esc(pre)+esc(t[0])+'"'+(ct[t[0]]==="1"?" checked":"")+'><span>'+esc(t[1])+'</span></label>'});
+ h+='</div>';return h}
+/* Đọc từ CHÍNH bộ tiêu chí đang cấu hình, nên trung tâm thêm/bớt tiêu chí trong Cài đặt thì
+   form và chỗ lưu đi cùng nhau. Trả về đúng ba cột để ghi thẳng vào DL11. */
+function rubricThu(pre){pre=pre||"";var RB=rubricCfg(),od={},ot={};
+ RB.diem.forEach(function(t){var el=document.querySelector('input[name="rb_'+pre+t[0]+'"]:checked');
+  if(el&&String(el.value).trim())od[t[0]]=el.value});
+ RB.tich.forEach(function(t){var el=document.getElementById("rbt_"+pre+t[0]);if(el&&el.checked)ot[t[0]]="1"});
+ var sd=rubricGhi(od),tb=rubricTB(sd);
+ return {diem:sd,tich:rubricGhi(ot),tb:tb,co:!!(sd||rubricGhi(ot))}}
 function bhNoteForm(id){var s=find("DL11","session_id",id);if(!s){toast("Không thấy buổi học.");return}
  var h='<div class="dcard"><h4><i class="ti ti-writing"></i>Nhận xét buổi - '+esc(s.class_id_name||s.class_id)+' buổi '+esc(s.session_number||"")+'</h4>';
  h+=ctxRows([["Ngày học",esc(s.session_date||"-")],["Giảng viên",esc(s.teacher_id_name||s.teacher_id||"-")],["Hạn ghi nhận xét",slaChip("slaTeacherNote_hours",48)+" giờ sau buổi"]]);
  /* AC6 - RUBRIC: chấm điểm từng tiêu chí + tích những việc đã làm. Đặt TRƯỚC ô văn xuôi vì
     người dạy vừa xong buổi thì nhớ rõ mấy điều này nhất; viết văn để sau, lúc đã điểm lại đầu. */
- (function(){var RB=rubricCfg(),cu=rubricDoc(s.rubric_diem),ct=rubricDoc(s.rubric_tich);
-  h+='<div class="sechd">Chấm buổi dạy</div>';
-  h+='<div class="fhint" style="margin:-2px 0 8px">Thang 1-5. Để trống tiêu chí nào không đánh giá được ở buổi này - trống thì không tính vào điểm trung bình.</div>';
-  h+='<div class="rbwrap">';
-  RB.diem.forEach(function(t){
-   h+='<div class="rbrow"><div class="rbl"><b>'+esc(t[1])+'</b>'+(t[2]?('<small>'+esc(t[2])+'</small>'):'')+'</div><div class="rbs">';
-   for(var i=1;i<=5;i++)h+='<label class="rbo"><input type="radio" name="rb_'+esc(t[0])+'" value="'+i+'"'+(String(cu[t[0]]||"")===String(i)?" checked":"")+'><span>'+i+'</span></label>';
-   h+='<label class="rbo rbx"><input type="radio" name="rb_'+esc(t[0])+'" value=""'+(!cu[t[0]]?" checked":"")+'><span>-</span></label>';
-   h+='</div></div>'});
-  h+='</div>';
-  h+='<div class="sechd">Việc đã làm trong buổi</div><div class="rbtick">';
-  RB.tich.forEach(function(t){
-   h+='<label class="rbt"><input type="checkbox" id="rbt_'+esc(t[0])+'"'+(ct[t[0]]==="1"?" checked":"")+'><span>'+esc(t[1])+'</span></label>'});
-  h+='</div>';})();
+ h+=rubricHTML(s,"d");
  h+='<div class="fld full"><label>Nhận xét buổi học <i>*</i></label><textarea id="bh_note" rows="4" placeholder="Lớp học thế nào, học viên nào yếu/tiến bộ, cần lưu ý gì cho buổi sau...">'+esc(s.teacher_note_summary||"")+'</textarea></div>';
  h+='<div class="fhint" style="margin:-6px 0 8px">Đoạn này học viên và phụ huynh đọc được ở cổng của họ - viết cho họ hiểu, đừng viết tắt nội bộ.</div>';
  h+='<div class="fld"><label>GV vào trễ (phút, để trống nếu đúng giờ)</label><input id="bh_late" value="'+esc(s.teacher_late_minutes||"")+'"></div>';
@@ -15081,13 +15172,7 @@ function bhNoteForm(id){var s=find("DL11","session_id",id);if(!s){toast("Không 
 function bhNoteSave(id){var v=(fldV("bh_note")||"").trim();
  if(!v){toast("Chưa nhập nhận xét buổi.");return}
  var late=(fldV("bh_late")||"").trim();
- /* Gom rubric: điểm từng tiêu chí + việc đã tích. Đọc từ CHÍNH bộ tiêu chí đang cấu hình, nên
-    trung tâm thêm/bớt tiêu chí trong Cài đặt thì form và chỗ lưu đi cùng nhau, không lệch. */
- var RB=rubricCfg(),od={},ot={};
- RB.diem.forEach(function(t){var el=document.querySelector('input[name="rb_'+t[0]+'"]:checked');
-  if(el&&String(el.value).trim())od[t[0]]=el.value});
- RB.tich.forEach(function(t){var el=document.getElementById("rbt_"+t[0]);if(el&&el.checked)ot[t[0]]="1"});
- var sd=rubricGhi(od),st2=rubricGhi(ot),tb=rubricTB(sd);
+ var rb=rubricThu("d"),sd=rb.diem,st2=rb.tich,tb=rb.tb;
  markRow("DL11","session_id",id,{teacher_note_summary:v,has_teacher_note:"TRUE",teacher_note_completed_at:nowStr(),teacher_late_minutes:late,
   rubric_diem:sd,rubric_tich:st2,rubric_tb:(tb==null?"":String(tb)),
   session_status:eFull("enum_session_status","completed")},
