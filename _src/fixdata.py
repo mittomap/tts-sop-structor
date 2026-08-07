@@ -2455,38 +2455,6 @@ for _cid, _ss in _sesByCls.items():
 log.append("14g. Buoi thi: %d buoi cuoi khoa + %d buoi giua khoa tren %d lop"
            % (_stN["final"], _stN["mid"], len(_sesByCls)))
 
-# ═══ 14f. MỘT BUỔI NỢ CẢ HAI VIỆC - ĐỂ HUY HIỆU KÉP CÓ CHỖ HIỆN RA ═══════════════════════
-# Anh Luân 07/08: *"1 buổi có 2 cảnh báo thì gắn cả 2 icon."* App làm được, nhưng đo trên demo
-# thì KHÔNG buổi nào nợ cả hai việc cùng lúc (quá hạn nhận xét VÀ chưa điểm danh), nên nhánh
-# hai huy hiệu không có chỗ nào hiện ra - tính năng có mà không ai nhìn thấy, và bộ kiểm cũng
-# không có ca thật để canh. Một tính năng không quan sát được thì coi như chưa làm.
-# Gieo THUẦN: lấy một buổi ĐÃ DẠY XONG mà giáo viên chưa ghi nhận xét (đã có sẵn nhiều ca như
-# vậy), rồi xoá các dòng điểm danh của đúng buổi đó - đúng câu chuyện thật "dạy xong rồi bỏ đó,
-# không điểm danh mà cũng không nhận xét".
-_kep = None
-for _s in R("DL11"):
-    if not str(_s.get("session_status", "")).startswith("completed"):
-        continue
-    if str(_s.get("has_teacher_note", "")).strip().upper() in ("TRUE", "CO", "CÓ", "1"):
-        continue
-    if str(_s.get("teacher_note_summary", "")).strip():
-        continue
-    _d = dt(_s.get("session_date"))
-    if not _d or (NOW - _d).total_seconds() / 3600 < 72:   # phải quá hạn hẳn, không sát ngưỡng
-        continue
-    if not any(str(a.get("session_id")) == str(_s.get("session_id")) for a in R("DL12")):
-        continue                                            # buổi này vốn đã không có điểm danh
-    _kep = _s
-    break
-_kepN = 0
-if _kep:
-    _sid = str(_kep.get("session_id"))
-    _dl12 = R("DL12")
-    _kepN = len([a for a in _dl12 if str(a.get("session_id")) == _sid])
-    _dl12[:] = [a for a in _dl12 if str(a.get("session_id")) != _sid]
-log.append("14f. Buoi no CA HAI viec (qua han nhan xet + chua diem danh): %s (xoa %d dong diem danh)"
-           % ((_kep.get("session_id") if _kep else "khong gieo duoc"), _kepN))
-
 # ═══ 14e. KỲ THI IELTS THẬT - BẢNG DL18b ═══════════════════════════════════════════════════
 # 14e. KY THI IELTS THAT
 # TP ACA hỏi qua điện thoại 06/08: tỷ lệ đạt AIM. Anh Luân chốt luật tính: **đạt AIM = điểm

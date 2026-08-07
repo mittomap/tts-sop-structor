@@ -9949,7 +9949,7 @@ function renderBanglop(){
    /* đảm bảo có buổi đang chọn */
    if(!ses.some(function(s){return s.session_id===window.DDSESS}))window.DDSESS=ses[0].session_id;
    /* dải THẺ BUỔI: gọn, chấm màu theo trạng thái, dấu ✓ khi đã ghi nhận xét */
-   h+='<div class="panel"><div class="ph"><b>Chọn buổi để điểm danh</b><span class="mut" style="font-size:11.5px">'+ses.length+' buổi · chấm màu = trạng thái · ✓ xanh = đã ghi nhận xét · huy hiệu đỏ = việc còn nợ, dùng đúng biểu tượng của ô đếm ở đầu trang (rê chuột để biết việc gì)</span>'+
+   h+='<div class="panel"><div class="ph"><b>Chọn buổi để điểm danh</b><span class="mut" style="font-size:11.5px">'+ses.length+' buổi · chấm màu = trạng thái · ✓ xanh = đã ghi nhận xét · huy hiệu đỏ = việc chưa xong, dùng đúng biểu tượng của ô đếm ở đầu trang (rê chuột để biết việc gì)</span>'+
     /* AC4 - nút mở cửa ghi "buổi nào là buổi thi". Chỉ hiện với người CÓ QUYỀN (CH3X ses_thi:
        Học vụ + TP ACA) - hiện cho người không có quyền rồi chặn khi bấm đúng là bệnh
        "mời rồi đuổi" mà app đã chữa ở thanh menu. */
@@ -9990,7 +9990,10 @@ function renderBanglop(){
     h+='<div class="panel"><div class="ph"><b>Lịch sử đổi lịch</b><span class="mut" style="font-size:11.5px">'+LS.length+' lần dời · gần nhất trước</span></div>'+
      '<div class="tbwrap"><table class="dt"><thead><tr><th>Buổi</th><th>Ngày cũ</th><th>Ngày mới</th><th style="width:80px">Lệch</th><th>Phạm vi</th><th>Lý do</th><th>Người dời</th><th>Lúc</th></tr></thead><tbody>';
     LS.forEach(function(x){var _l=num(x.so_ngay_doi);
-     h+='<tr><td><b>Buổi '+esc(x.session_number||"?")+'</b></td>'+
+     /* Dòng bảng phải BẤM ĐƯỢC. `_checkbam` gọi dòng câm là "IM LẶNG" và nó đúng: người dùng
+        không biết mình bấm hụt hay app hỏng. Đây là lần thứ hai trong ngày em để một bảng mới
+        ra đời với dòng câm - lần trước là bảng lát cắt ở màn Kết quả đầu ra. */
+     h+='<tr class="clk" onclick="doiXemChiTiet(\''+esc(x.change_id)+'\')" data-tip="Bấm để xem đầy đủ lần dời này"><td><b>Buổi '+esc(x.session_number||"?")+'</b></td>'+
       '<td>'+esc(String(x.ngay_cu||"").slice(0,10))+'</td>'+
       '<td>'+esc(String(x.ngay_moi||"").slice(0,10))+'</td>'+
       '<td><span class="chip '+(_l>0?"amber":"blue")+'" data-tip="'+esc(_l>0?("Lùi "+_l+" ngày"):("Dời sớm "+Math.abs(_l)+" ngày"))+'">'+(_l>0?"+":"")+esc(_l)+'d</span></td>'+
@@ -16392,6 +16395,21 @@ function doiSave(cid){
   thoi_diem:nowStr(),next_action:""},function(){
    toast("Đã dời "+t.dich.length+" buổi, lệch "+Math.abs(t.lech)+" ngày. Nhớ báo lại học viên và giáo viên.");
    closeModal();reRender(CUR)})}
+/* Ngăn kéo kể đầy đủ MỘT lần dời - bảng chỉ đủ chỗ cho phần tóm tắt, lý do dài bị cắt. */
+function doiXemChiTiet(id){
+ var x=srows("DL11b").filter(function(r){return String(r.change_id||"")===String(id)})[0];
+ if(!x){toast("Không thấy lần dời này.");return}
+ var l=num(x.so_ngay_doi);
+ var h='<div class="dcard"><h4><i class="ti ti-calendar-event"></i>Buổi '+esc(x.session_number||"?")+' · '+esc(x.class_id_name||x.class_id||"")+'</h4>';
+ h+=ctxRows([["Ngày cũ",esc(String(x.ngay_cu||"-"))],
+  ["Ngày mới",esc(String(x.ngay_moi||"-"))],
+  ["Lệch",(l>0?("lùi "+l+" ngày"):("dời sớm "+Math.abs(l)+" ngày"))],
+  ["Phạm vi",esc(elabel(x.pham_vi)||x.pham_vi||"-")],
+  ["Người dời",esc(x.nguoi_doi_name||x.nguoi_doi||"-")],
+  ["Lúc",esc(x.thoi_diem||"-")]]);
+ h+='<div class="fld full"><label>Lý do</label><div class="fhint" style="margin:0;white-space:normal">'+esc(x.ly_do||"(không ghi)")+'</div></div>';
+ h+='<div class="dact"><button class="btn" onclick="closeModal();openLop(\''+esc(x.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Mở lớp</button></div></div>';
+ openDrawer("Chi tiết lần dời lịch",h)}
 function bhState(s){
  var done=isc(s.session_status,"completed"),cancelled=isc(s.session_status,"cancelled"),running=isc(s.session_status,"in_progress");
  var note=yesv(s.has_teacher_note)||!!String(s.teacher_note_summary||"").trim();

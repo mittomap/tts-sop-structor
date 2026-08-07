@@ -788,13 +788,6 @@ if SCH:
 COY = {
     "10k Viec chua xong va DA QUA HAN (demo canh bao do)":
         "co y - de trang Giao viec luon co viec qua han mau do; so nay tang dan theo ngay",
-    # 07/08 - fixdata §14f gieo DUNG MOT buoi no CA HAI viec (qua han nhan xet + chua diem danh),
-    # de huy hieu kep tren vien buoi co cho hien ra. Anh Luan: "1 buoi co 2 canh bao thi gan ca 2
-    # icon". Truoc do demo khong buoi nao no ca hai, nen nhanh hai huy hieu khong ai nhin thay va
-    # bo kiem cung khong co ca that de canh - mot tinh nang khong quan sat duoc thi coi nhu chua
-    # lam. Day la CA GIEO, khong phai loi du lieu; so nay phai la 1, nhieu hon la co cho khac hong.
-    "4i Buoi da day xong QUA 24h ma khong co ban ghi diem danh nao":
-        "co y - fixdata 14f gieo 1 buoi no ca hai viec de huy hieu kep co cho hien ra",
 }
 ORD = {"NANG":0,"VUA":1,"NHE":2}
 print("\n" + "="*90)

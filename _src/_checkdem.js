@@ -102,6 +102,32 @@ const PATHS=["/opt/pw-browsers/chromium-1194/chrome-linux/chrome","/opt/pw-brows
     t("D3 "+cid+": the ghi "+theNX+" no nhan xet + "+theDD+" chua diem danh, ma so chip mang dau la "+coDau,
       coDau>=Math.max(theNX,theDD));
   });
+  /* ═══ D5 - HAI HUY HIEU TREN MOT VIEN BUOI ══════════════════════════════════════════════
+     Anh Luan 07/08: *"1 buoi co 2 canh bao thi gan ca 2 icon."* App lam duoc, nhung DEMO khong
+     buoi nao no ca hai cung luc, nen nhanh hai huy hieu khong co cho hien ra.
+     LUC DAU em GIEO mot buoi nhu vay vao du lieu demo - SAI. "Buoi da day qua 24h ma khong
+     diem danh" la LOI DU LIEU THAT, `_checkdata` va man Suc khoe du lieu deu bat dung; gieo no
+     vao la lam ban bo demo de khoe mot tinh nang. Bo demo phai sach.
+     Cho dung cua ca do la O DAY: bo kiem TU DUNG ca trong bo nho, do xong thi tra lai. Du lieu
+     that khong bi dung toi, ma tinh nang van co nguoi canh. */
+  (function(){
+   var s=(DL.DL11||[]).filter(function(x){var st=bhState(x);return st.done&&st.noteOver})[0];
+   if(!s){xau.push("D5: khong tim duoc buoi qua han nhan xet nao de dung ca hai huy hieu");return}
+   var giu=(DL.DL12||[]).filter(function(a){return String(a.session_id)===String(s.session_id)});
+   for(var i=DL.DL12.length-1;i>=0;i--)if(String(DL.DL12[i].session_id)===String(s.session_id))DL.DL12.splice(i,1);
+   window.BLCLASS=s.class_id; window.BLTAB="buoi"; go("banglop");
+   var el=document.getElementById("content");
+   var idx=(ddSessions(s.class_id)||[]).map(function(x){return x.session_id}).indexOf(s.session_id);
+   var chip=[...el.querySelectorAll(".sespill")][idx];
+   var w=chip?[...chip.querySelectorAll(".swarn")]:[];
+   t("D5 buoi no ca hai viec phai deo DUNG HAI huy hieu (dang co "+w.length+")", w.length===2);
+   var ics=w.map(function(x){var i2=x.querySelector("i");return i2?i2.className:""}).join(" ");
+   t("D5 hai huy hieu phai dung DUNG bieu tuong cua o dem (ti-writing + ti-checkbox), dang co: "+ics,
+     /ti-writing/.test(ics)&&/ti-checkbox/.test(ics));
+   t("D5 moi huy hieu phai noi duoc vi sao (data-tip)",
+     w.length>0&&w.every(function(x){return (x.getAttribute("data-tip")||"").trim().length>10}));
+   DL.DL12.push.apply(DL.DL12,giu);   /* tra lai du lieu - do xong khong duoc de lai dau vet */
+  })();
   return {ok:ok,xau:xau,lop:soLop}});
 
  await b.close();
