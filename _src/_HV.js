@@ -7785,7 +7785,10 @@ function renderBanglop(){
  var coDD={};srows("DL12").forEach(function(a){coDD[a.session_id]=1});
  var h='<div class="phead" data-tour="phead"><div><div class="t">Vận hành lớp · '+lopThe(lop)+esc(lop.class_name||cid)+'</div><div class="s">Buổi học · điểm danh · nhận xét · giao & chấm bài tập — tất cả cho lớp này ở một chỗ</div></div>'+
  '<div class="sp"><select class="sel" onchange="window.BLCLASS=this.value;window.DDSESS=null;window.BTSESS=null;reRender(CUR)">';
- cls.forEach(function(c){h+='<option value="'+c.class_id+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id)+''+(lopLa11(c)?' · 1-1':'')+' - '+esc(c.class_name)+'</option>'});
+ /* Ô chọn phải nói lớp nào ĐÃ KẾT THÚC. Trước bản này nó liệt kê hết mọi lớp như nhau, nên bảo
+    người ta "mở một lớp đã kết thúc ra xem kết quả đầu ra" là bảo họ đoán. */
+ cls.forEach(function(c){var _xong=isc(c.class_status,"finished");
+  h+='<option value="'+c.class_id+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id)+''+(lopLa11(c)?' · 1-1':'')+(_xong?' · đã kết thúc':'')+' - '+esc(c.class_name)+'</option>'});
  h+='</select></div></div>';
  /* ---- KPI riêng của lớp ---- */
  (function(){
@@ -7879,7 +7882,7 @@ function renderBanglop(){
    /* đảm bảo có buổi đang chọn */
    if(!ses.some(function(s){return s.session_id===window.DDSESS}))window.DDSESS=ses[0].session_id;
    /* dải THẺ BUỔI: gọn, chấm màu theo trạng thái, dấu ✓ khi đã ghi nhận xét */
-   h+='<div class="panel"><div class="ph"><b>Chọn buổi để điểm danh</b><span class="mut" style="font-size:11.5px">'+ses.length+' buổi · chấm màu = trạng thái · ✓ xanh = đã ghi nhận xét · ! đỏ = buổi còn việc chưa xong (rê chuột để biết việc gì)</span></div><div class="pbody"><div class="sesstrip">';
+   h+='<div class="panel"><div class="ph"><b>Chọn buổi để điểm danh</b><span class="mut" style="font-size:11.5px">'+ses.length+' buổi · chấm màu = trạng thái · ✓ xanh = đã ghi nhận xét · huy hiệu đỏ = việc còn nợ, dùng đúng biểu tượng của ô đếm ở đầu trang (rê chuột để biết việc gì)</span></div><div class="pbody"><div class="sesstrip">';
    ses.forEach(function(s){var st=ecode(s.session_status);
     var col=st==="completed"?"var(--green)":st==="in_progress"?"var(--amber)":st==="cancelled"?"var(--red)":"#B9C6D6";
     var noteDone=yesv(s.has_teacher_note)||!!String(s.teacher_note_summary||"").trim();
@@ -14214,22 +14217,36 @@ function clsHealth(c){var cid=c.class_id;
  return {atr:atr,hcr:hcr,risk:risk,late:late,noNote:noNote,atrT:atrT,hcrT:hcrT,bad:bad,si:obs.length,
   attCo:pr,attTong:att.length,hwNop:hs,hwTong:hw.length}}
 function renderHtLop(embed){var fil=window.HTLOPQ||"all";
- var cls=rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))});
- var hs=cls.map(function(c){var m=clsHealth(c);m.c=c;return m});
- var nBad=hs.filter(function(m){return m.bad}).length;
+ /* ═══ LỚP ĐÃ KẾT THÚC PHẢI CÓ CHỖ ĐỂ MỞ RA ═══════════════════════════════════════════════
+    Anh Luân hỏi hai lần: 06/08 *"hiện tại xem lớp đã hoàn thành ở đâu em"*, rồi 07/08 khi em
+    bảo anh mở thử tab Kết quả đầu ra: *"làm sao biết 1 lớp đã kết thúc em"*. Đo ra thì cả hai
+    lần app đều không trả lời được: bảng này CẮT THẲNG lớp `finished` ngay ở dòng lọc đầu tiên,
+    nên lớp học xong biến mất khỏi màn Lớp học - trong khi đó mới là chỗ có toàn bộ kết quả đầu
+    ra. Nay lớp đã kết thúc vẫn nằm trong bảng, có chip lọc riêng, và cột trạng thái nói rõ.
+    Lớp `planning` (chưa khai giảng) và `cancelled` thì vẫn cắt - chúng chưa/không có gì để đo. */
+ var cls=rows("DL10").filter(function(c){return /in_progress|open|finished/.test(ecode(c.class_status))});
+ var hs=cls.map(function(c){var m=clsHealth(c);m.c=c;m.xong=isc(c.class_status,"finished");return m});
+ var nBad=hs.filter(function(m){return m.bad&&!m.xong}).length;
+ var nXong=hs.filter(function(m){return m.xong}).length;
  /* V9.99z13 (anh Luân 06/08): *"lát em bổ sung bộ lọc theo lớp 1-1 và lớp nhóm nghen"*.
     Hỏi qua `lopLa11()` - cùng cái hàm mà thẻ trước tên lớp đang dùng. Nếu ở đây viết lại phép
     so sánh sĩ số thì sớm muộn thẻ nói một đằng bộ lọc đếm một nẻo. */
- var n11=hs.filter(function(m){return lopLa11(m.c)}).length;
- var nNhom=hs.length-n11;
- var view=(fil==="bad")?hs.filter(function(m){return m.bad})
-        :(fil==="mot")?hs.filter(function(m){return lopLa11(m.c)})
-        :(fil==="nhom")?hs.filter(function(m){return !lopLa11(m.c)}):hs;
+ var n11=hs.filter(function(m){return lopLa11(m.c)&&!m.xong}).length;
+ var nNhom=hs.filter(function(m){return !lopLa11(m.c)&&!m.xong}).length;
+ /* Mặc định (chip "Đang chạy") KHÔNG trộn lớp đã kết thúc vào: người mở màn này hằng ngày là
+    để coi lớp đang dạy, trộn lớp cũ vào là mỗi ngày phải lọc lại bằng mắt. Muốn xem lớp xong thì
+    bấm đúng một chip. */
+ var view=(fil==="bad")?hs.filter(function(m){return m.bad&&!m.xong})
+        :(fil==="mot")?hs.filter(function(m){return lopLa11(m.c)&&!m.xong})
+        :(fil==="nhom")?hs.filter(function(m){return !lopLa11(m.c)&&!m.xong})
+        :(fil==="xong")?hs.filter(function(m){return m.xong})
+        :(fil==="tatca")?hs:hs.filter(function(m){return !m.xong});
  var h='<div class="notebar"><i class="ti ti-info-circle"></i><span data-tip="Lớp vào diện cần chú ý khi chuyên cần dưới '+Math.round(kpiTh(/^ATR/,0.8)*100)+'%, nộp bài dưới '+Math.round(kpiTh(/^HCR/,0.7)*100)+'%, có học viên nguy cơ, hoặc còn nợ nhận xét buổi."><b>Sức khỏe mọi lớp</b> - lớp nào cần chú ý.<i class="ti ti-info-circle gyti"></i></span></div>';
- h+=tbar(segHTML(fil,[["all","Tất cả lớp",hs.length],["bad","Dưới ngưỡng / cần để mắt",nBad,nBad?"red":""],
-   ["mot","Lớp 1-1",n11],["nhom","Lớp nhóm",nNhom]],"window.HTLOPQ='{k}';reRender(CUR)"),"");
+ h+=tbar(segHTML(fil,[["all","Đang chạy",hs.length-nXong],["bad","Dưới ngưỡng / cần để mắt",nBad,nBad?"red":""],
+   ["mot","Lớp 1-1",n11],["nhom","Lớp nhóm",nNhom],
+   ["xong","Đã kết thúc",nXong,nXong?"green":""],["tatca","Tất cả",hs.length]],"window.HTLOPQ='{k}';reRender(CUR)"),"");
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Giảng viên</th><th>Sĩ số</th><th>Chuyên cần</th><th>Nộp bài</th><th>HV nguy cơ</th><th>GV trễ</th><th>Nợ nhận xét</th><th></th></tr></thead><tbody>';
- if(!view.length)h+='<tr><td class="empty" colspan="9">Không có lớp nào'+(fil==="bad"?" dưới ngưỡng - tốt!":(fil==="mot"?" kèm riêng 1-1 đang chạy.":(fil==="nhom"?" nhóm đang chạy.":".")))+'</td></tr>';
+ if(!view.length)h+='<tr><td class="empty" colspan="9">Không có lớp nào'+(fil==="bad"?" dưới ngưỡng - tốt!":(fil==="mot"?" kèm riêng 1-1 đang chạy.":(fil==="nhom"?" nhóm đang chạy.":(fil==="xong"?" nào đã kết thúc.":"."))))+'</td></tr>';
  view.forEach(function(m){var c=m.c;
   function pchip(v,t,tu,mau,dvi){if(v==null)return '<span class="mut" data-tip="Chưa có '+esc(dvi||"dữ liệu")+' nào nên chưa tính được">—</span>';
    var p=Math.round(v*100)+"%";
