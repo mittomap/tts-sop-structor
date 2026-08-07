@@ -8,7 +8,7 @@
    Không phải bộ kiểm - nó không có tiêu chí đúng/sai, nó là cái THƯỚC ĐỌC. Nên nó không nằm
    trong `verify.sh`; chạy tay khi cần đối chiếu quyền.
 
-   Chạy: ITTS_APP=./_APP6.js node _bangquyen.js  (hoặc _APP.js cho bản v5) */
+   Chạy: node _bangquyen.js   (mặc định đọc ./_APP.js; đổi bằng ITTS_APP=<đường dẫn>) */
 
 const APP = process.env.ITTS_APP || "./_APP.js";
 const FS = require("fs");
@@ -113,8 +113,7 @@ CHON.forEach(C => {
 });
 
 /* ---- in ra ------------------------------------------------------------------------------- */
-const V6 = /_APP6/.test(APP);
-console.log("BANG PHAN QUYEN - ban " + (V6 ? "V6" : "V5") + " - " + CHON.length + " chuc danh cong dang nhap\n");
+console.log("BANG PHAN QUYEN - " + CHON.length + " chuc danh cong dang nhap\n");
 
 KQ.forEach(r => {
   if (r.loi) { console.log("## " + r.ten + "\n   " + r.loi + "\n"); return; }

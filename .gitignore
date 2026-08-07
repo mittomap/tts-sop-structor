@@ -3,6 +3,7 @@ _to_delete/
 *.tmp
 
 node_modules/
+package.json
 package-lock.json
 _src/node_modules/
 _src/package.json
