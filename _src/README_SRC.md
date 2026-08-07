@@ -515,6 +515,27 @@ Chi tiet "vi sao" o `02_NHAT_KY_QUYET_DINH.md`. O day chi ghi nhung cho **cham v
   **BAY CUA CHINH CAI THUOC:** lan chay dau ra "67 cho" y het luc chua va, vi no do tren chuoi THO
   cua `RENDER[k]()` - ma bo loc nam o `go()`. Phai do SAU khi goi `scrubMoiRoiDuoi` moi la do cai
   nguoi dung that su nhin thay. Do ban tho thi do oan; do ban da qua `go()` moi dung cua.
+- **`_checkdem.js` (MOI, V9.99z11)** - **SO TREN THE PHAI TIM DUOC O DANH SACH**. Hai lan trong
+  hai ngay anh Luan bat dung mot benh, o hai cho khac nhau: 06/08 *"2 buoi qua han chua nhan xet,
+  nhung a nhin xuong buoi, a ko thay icon nen a ko biet cho nao"*; 07/08 *"tuong tu truong hop luc
+  nay, bao 2 hoc vien nguy co ma a chang thay dau"*. **Goc chung: cai THE va cai BANG hoi HAI HAM
+  KHAC NHAU cho cung mot cau hoi.** The "HV nguy co" dem bang `stuRisk()` = co NGUOI GAN **hoac**
+  MAY THAY vuot nguong (vang khong phep >= `thresholdAtRisk_absences`, thieu bai >=
+  `thresholdAtRisk_hw_missing`), tru nhung em hoc vu da tam gat co ly do; con bang "Hoc vien trong
+  lop" doc THANG hai cot trang thai - chi thay co nguoi gan. Em nao may thay ma chua ai gan co thi
+  vao THE ma khong vao BANG. Con so khong sai, cai sai la **no khong dan toi dau**.
+  Bo nay mo Chromium that, di qua TUNG LOP, doi chieu bon dieu: **D1** the "HV nguy co" == so dong
+  mang chip "Nguy co"; **D2** so buoi con no viec == so chip buoi mang dau `.swarn`; **D3** hai o
+  dem buoi khong duoc lon hon so chip co dau; **D4** moi dong "Nguy co" phai NOI DUOC VI SAO
+  (co `data-tip`) - chi ra cho thoi chua du, nguoi doc con phai biet nen tin co nguoi gan hay so
+  may dem. **Da thu nguoc tren ban cu: 18/88 do**, trong do co dung ca "LOP-PRE-06: the ghi 4 ma
+  bang 0 dong" - dung cai anh Luan nhin thay.
+  **VA NGAY LUOT CHAY DAU TIEN NO BAT DUOC MOT LOI KHAC, NANG HON:** `coDD` khai bang `var` ben
+  trong khoi tinh may o "Can xu ly cho lop nay" nhung vien buoi phia duoi lai doc no - ngoai pham
+  vi, nen tab **"Buoi hoc & diem danh"** nem ReferenceError va khong ve ra gi. Tab CHINH cua trang
+  Van hanh lop chet cam, ma khong bo kiem nao truoc do bao: `_checkui`/`_checkmat` mo trang nhung
+  khong bam vao dung tab do. **Bai hoc: mot tab khong co bo kiem nao bam vao thi hong bao lau cung
+  khong ai biet.**
 - **`_checknguoi.js` (MOI, V9.91)** - dong vai **tung NGUOI** trong DL01 (37 nguoi / 18 chuc danh),
   khong phai tung chuc danh. Vi sao can them mot bo nua: pham vi du lieu cat theo CHI NHANH va
   theo NGUOI PHU TRACH, nen 7 nhan vien tu van o 5 co so nhin ra 7 man hinh khac nhau - lay mot

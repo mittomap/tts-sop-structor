@@ -426,6 +426,45 @@ else:
     if not any(str(t.get("task_status", "")).startswith("new") for t in _yc):
         bad(VUA, "16 yeu cau tu hoc vien", "khong co yeu cau nao dang CHO NHAN - man hinh khong co viec that de bam")
 
+# ── 17. OVERALL PHAI KHOP 4 KY NANG (DL18 thi thu + DL18b thi that) ──────
+# Ty le dat AIM = overall >= band muc tieu. Neu overall khong khop 4 ky nang thi ca cai ty le
+# dung tren mot con so tu do, va khong ai nhin ra vi nguoi ta chi doc cot Overall.
+# BAY DA CAN 06/08: `round()` cua Python lam tron VE SO CHAN (banker's rounding) nen trung binh
+# 6.25 ra 6.0, trong khi Math.round() ben JS cua app ra 6.5. Lech dung nua band, va dung o
+# nhung ca sat nguong - tuc la dung nhung ca quyet dinh mot em co dat AIM hay khong.
+def _hband(v):
+    try:
+        f = float(str(v).replace(",", "."))
+    except Exception:
+        return None
+    return f if f > 0 else None
+
+
+def _ovrKhop(rows_, ten, kn, cot_ovr, cot_id):
+    for r in rows_:
+        a = [_hband(r.get(k)) for k in kn]
+        o = _hband(r.get(cot_ovr))
+        if o is None or any(x is None for x in a):
+            continue
+        dung = math.floor(sum(a) / 4 * 2 + 0.5) / 2
+        if abs(dung - o) > 0.001:
+            bad(NANG, "17 overall vs 4 ky nang",
+                "%s %s: overall ghi %.1f nhung 4 ky nang ra %.1f" % (ten, r.get(cot_id), o, dung))
+
+
+import math
+_ovrKhop(dl.get("DL18", []), "DL18",
+         ["final_listening", "final_reading", "final_writing", "final_speaking"],
+         "final_test_score", "course_end_id")
+_ovrKhop(dl.get("DL18b", []), "DL18b",
+         ["listening", "reading", "writing", "speaking"], "overall", "exam_id")
+# Ky thi that khong duoc mang ngay o TUONG LAI - ket qua chua co ma da ghi diem la du lieu doi.
+for _e in dl.get("DL18b", []):
+    _d = dt(_e.get("exam_date"))
+    if _d and _d.date() > NOW.date():
+        bad(NANG, "17 overall vs 4 ky nang",
+            "%s: ngay thi %s nam o tuong lai" % (_e.get("exam_id"), _e.get("exam_date")))
+
 # ── KẾT ──────────────────────────────────────────────────────────────────
 print("=" * 74)
 print("KIEM DU LIEU · %d bang · %d dong" % (len(dl), sum(len(v) for v in dl.values())))

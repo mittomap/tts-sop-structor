@@ -223,6 +223,11 @@ else
   # Kiem SAU khi bam: moi chuc danh co viec, co viec gap/qua han, tuan nay co buoi hoc, va
   # CAU HINH + thoi quen rieng KHONG bi cuon theo.
   chay "_checkreset dung lai demo" "CHECKRESET (OK|BO QUA)" node _checkreset.js
+  # V9.99z11 - SO TREN THE PHAI TIM DUOC O DANH SACH. Hai lan trong hai ngay anh Luan bat cung
+  # mot benh: the dem N ma danh sach ngay duoi khong co dau nao (buoi qua han nhan xet 06/08,
+  # hoc vien nguy co 07/08). Goc chung: the va bang hoi HAI ham khac nhau cho cung mot cau hoi.
+  # Loai loi nay khong hien ra khi doc ma - ca hai ve deu chay dung, khong do bo kiem nao.
+  chay "_checkdem the vs danh sach" "CHECKDEM (OK|BO QUA)" node _checkdem.js
 fi
 
 # Ghi lai bang gio de luot sau co cai ma dem nguoc. Chi ghi khi chay day du (khong bi cat giua

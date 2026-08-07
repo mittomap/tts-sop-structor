@@ -1828,7 +1828,18 @@ def _lapPhieuThu(e, tien, ghichu, dot):
     Tien vao thi phai co chung tu. Truoc day em chi nang paid_amount, thanh ra don ghi "da dong 5
     trieu" ma so quy trong 0 dong - mot app quan ly hoc phi ma tien khong co phieu thi khong tin
     duoc, va bo kiem tien bat dung ngay.
+
+    KHONG LAP HAI LAN (bay da can 06/08). `fixdata.py` doc THANG demo_data_big.json roi ghi de
+    len chinh no - y het bay da can o `gen_demo.py`. Chay lai fixdata mot lan nua la don
+    ENR-2026-087 co HAI phieu 5 trieu giong het (PAY-108 va PAY-110), tong phieu thu 10 trieu
+    trong khi paid_amount van 5 trieu; `check_data.py` bao LOI NANG. Mot ham GIEO du lieu phai
+    hoi truoc "cho nay da co chua" - vi khong ai bao dam duoc day chuyen chi chay dung mot luot.
     """
+    for _cu in R("DL07"):
+        if str(_cu.get("enrollment_id") or "") == str(e.get("enrollment_id") or "") \
+           and str(_cu.get("payment_note") or "") == ghichu \
+           and str(_cu.get("installment_no") or "") == str(dot):
+            return
     _tt = [x for x in R("DL01") if code(x.get("role")) in ("accountant", "ketoan")] or R("DL01")[:1]
     _nv = _tt[0] if _tt else {}
     _pn = 0
@@ -2296,6 +2307,92 @@ for _t, _rows in dl.items():
     if _hit:
         tabs += 1; flat += _hit
 log.append("15. Sơ đồ cột: san phẳng %d dòng ở %d bảng về đủ bộ cột (union key)" % (flat, tabs))
+
+# ═══ 14e. KỲ THI IELTS THẬT - BẢNG DL18b ═══════════════════════════════════════════════════
+# 14e. KY THI IELTS THAT
+# TP ACA hỏi qua điện thoại 06/08: tỷ lệ đạt AIM. Anh Luân chốt luật tính: **đạt AIM = điểm
+# OVERALL >= band mục tiêu**, và có HAI tỷ lệ - theo điểm thi thử tại trung tâm (chính là kết
+# quả BUỔI THI FINAL, đã có sẵn ở DL18.final_*) và theo ĐIỂM THI THẬT.
+# SOP không có chỗ nào lưu điểm thi thật -> đây là phần THÊM (LUẬT CỨNG SỐ 0 cho phép thêm).
+#
+# VÌ SAO BẢNG RIÊNG CHỨ KHÔNG NHÉT THÊM CỘT VÀO DL18: học viên thi lại là chuyện thường. Nhét
+# một bộ cột vào DL18 thì mỗi người chỉ giữ được MỘT lần thi - lần sau ghi đè lần trước, và tỷ
+# lệ đạt AIM của trung tâm hiện ra thấp hơn thực tế. Anh Luân duyệt bảng riêng 06/08 kèm điều
+# kiện: *"a sợ hiển thị rắc rối, nếu em vẫn có thể làm nó gọn đẹp và chuyên nghiệp thì anh okey"*
+# -> màn chính chỉ hiện MỘT dòng cho mỗi HV (điểm được tính), số lần thi thu vào một chip nhỏ,
+# bấm mới mở lịch sử. Bảng nhiều dòng nằm dưới lớp giao diện, không đổ ra màn.
+_p2set("aimOfficialPick", "Điểm cao nhất", "cách chọn",
+       "Học viên thi thật nhiều lần thì lấy lượt nào để tính đạt AIM")
+
+import datetime as _dt3, random as _rnd3
+_rnd3.seed(20260806)
+def _ovr(a, b, c, e):
+    """Overall IELTS = trung bình 4 kỹ năng, làm tròn về mốc 0.5 gần nhất, NỬA THÌ LÊN.
+
+    KHÔNG dùng round() của Python: nó làm tròn "về số chẵn" (banker's rounding), nên
+    round(12.5)=12 và trung bình 6.25 ra 6.0. IELTS làm tròn 6.25 LÊN 6.5, và hàm bandOvr
+    bên JS của app dùng Math.round() nên cũng ra 6.5. Hai bên lệch nhau nửa band ở đúng những
+    ca sát ngưỡng - tức là đúng những ca quyết định một em có đạt AIM hay không.
+    """
+    import math as _m
+    return _m.floor((a + b + c + e) / 4 * 2 + 0.5) / 2
+
+_ces = dl.get("DL18", [])
+_sbyid = {s.get("student_id"): s for s in dl.get("DL09", [])}
+_ky = []
+_n = 0
+for _ce in _ces:
+    _sid = _ce.get("student_id", "")
+    if not _sid: continue
+    try: _tb = float(str(_ce.get("target_band") or 0) or 0)
+    except Exception: _tb = 0
+    if not _tb: continue
+    # HV bỏ học thì không tính - họ không hoàn thành khoá nên không có "đầu ra" để đo.
+    if "dropped" in str(_ce.get("student_status", "")): continue
+    if _rnd3.random() > 0.75: continue           # ~25% chưa đăng ký thi thật
+    try:
+        _end = _dt3.datetime.strptime(str(_ce.get("course_completion_time", ""))[:10], "%d/%m/%Y")
+    except Exception:
+        continue
+    _lan = 2 if _rnd3.random() < 0.35 else 1     # ~35% thi lại lần hai
+    # Điểm thi thật bám theo ĐIỂM THI THỬ của chính em ấy chứ không bám theo mục tiêu - thi thử
+    # cuối khoá là dự báo sát nhất mà trung tâm có. Lệch +-0.5 là biên độ thật của một kỳ thi.
+    try: _mock = float(str(_ce.get("final_test_score") or 0) or 0)
+    except Exception: _mock = 0
+    _base = (_mock if _mock else _tb - 0.5) + _rnd3.choice([-0.5, 0.0, 0.0, 0.5])
+    _d = None
+    for _i in range(_lan):
+        # Người ta thường thi trong vòng 2-5 tuần sau khi kết thúc khoá; thi lại cách đó ~6 tuần
+        # (đủ để nhận kết quả và ôn thêm).
+        _d = (_end + _dt3.timedelta(days=12 + _rnd3.randint(0, 25))) if _i == 0 \
+             else (_d + _dt3.timedelta(days=35 + _rnd3.randint(0, 20)))
+        # KHÔNG ĐƯỢC có kết quả thi mang ngày ở TƯƠNG LAI. Học viên vừa kết thúc khoá tuần
+        # trước thì đơn giản là chưa đi thi - bỏ lượt này (và mọi lượt sau nó) chứ không kéo
+        # ngày về. Kéo về sẽ dồn cục kết quả vào đúng hôm nay, nhìn là biết máy sinh.
+        if _d.date() > NOW.date():
+            break
+        _n += 1
+        # lần thi sau thường nhỉnh hơn - đó là lý do người ta thi lại
+        _b = min(9.0, _base + (0.5 if _i else 0))
+        _sk = [max(3.0, min(9.0, round((_b + _rnd3.choice([-0.5, 0, 0, 0.5])) * 2) / 2)) for _ in range(4)]
+        _ky.append({
+            "exam_id": "IELTS-%03d" % _n,
+            "student_id": _sid,
+            "student_id_name": (_sbyid.get(_sid) or {}).get("full_name", ""),
+            "class_id": _ce.get("class_id", ""),
+            "class_id_name": _ce.get("class_id_name", ""),
+            "exam_date": _d.strftime("%d/%m/%Y"),
+            "listening": str(_sk[0]), "reading": str(_sk[1]),
+            "writing": str(_sk[2]), "speaking": str(_sk[3]),
+            "overall": str(_ovr(*_sk)),
+            "target_band": str(_tb),
+            "attempt_no": str(_i + 1),
+            "note": "" if _i == 0 else "Thi lại để nâng band",
+            "next_action": ""})
+dl["DL18b"] = _ky
+log.append("14e. Ky thi IELTS that (DL18b): %d luot thi cua %d hoc vien"
+           % (len(_ky), len(set(x["student_id"] for x in _ky))))
+
 
 # ═══ 16. LUẬT BẤT BIẾN: KHÔNG THU TIỀN TRƯỚC NGÀY ĐĂNG KÝ (check_logic 6d) ═════════════════
 # 16. LUAT BAT BIEN: KHONG THU TIEN TRUOC NGAY DANG KY

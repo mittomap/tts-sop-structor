@@ -370,6 +370,13 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
  display:inline-block;vertical-align:middle;margin-right:6px;letter-spacing:.2px}
 .lopthe.mot{background:var(--amberb);color:#854F0B}
 .lopthe.nhom{background:var(--gray);color:#5A6675}
+/* Bốn kỹ năng IELTS trong MỘT ô bảng. Bốn cột riêng cho L/R/W/S nhân đôi thành tám cột khi có
+   cả hai mốc thi - bảng tràn ngang ngay. Gộp thành một dải nhỏ: nhãn kỹ năng in mờ, điểm in
+   đậm, đọc lướt vẫn ra ngay em nào yếu Writing. */
+.knbs{display:inline-flex;gap:4px;white-space:nowrap}
+.knb{display:inline-flex;align-items:center;gap:3px;background:var(--gray);border-radius:6px;
+ padding:1px 5px;font-size:11.5px;font-weight:600;color:var(--text)}
+.knb i{font-style:normal;font-size:9.5px;font-weight:700;color:var(--muted);letter-spacing:.3px}
 .chip.red{background:var(--redb);color:#A32D2D}.chip.amber{background:var(--amberb);color:#854F0B}.chip.green{background:var(--greenb);color:#1E6A47}.chip.gray{background:var(--gray);color:#5A6675}.chip.blue{background:var(--blueb);color:#185FA5}
 .alert{display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid var(--line)}.alert:last-child{border-bottom:0}
 .alert .ab{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
@@ -2592,6 +2599,9 @@ var PAGES=[
 {k:"ghinhan",g:"_",ic:"ti-message-plus",t:"Tiếp nhận & xử lý phản hồi",c:"Nhận qua gọi/nhắn, không qua form",ty:"custom",hide:1},
 {k:"khieunai",g:"_",ic:"ti-alert-triangle",t:"Xử lý Khiếu nại",c:"Tiếp nhận - xử lý - đóng",ty:"custom",hide:1},
 {k:"ketthuc",g:"Chặng · CSKH & Kết thúc",ic:"ti-flag",t:"Kết thúc & Tái ĐK",c:"Đầu ra - mời học tiếp",ty:"custom"},
+/* AC2 (Trưởng phòng ACA hỏi 06/08): app có chỗ NHẬP điểm đầu ra (Kết thúc & Tái ĐK) nhưng không
+   có chỗ nào ĐỌC lại theo lớp, theo giảng viên, theo chi nhánh, theo loại lớp. Đây là chỗ đọc. */
+{k:"ketqua",g:"Chặng · CSKH & Kết thúc",ic:"ti-target-arrow",t:"Kết quả đầu ra & AIM",c:"Điểm 4 kỹ năng - hai tỷ lệ đạt AIM",ty:"custom"},
 {k:"baoluu",g:"_",ic:"ti-player-pause",t:"Bảo lưu / Bỏ học",c:"Trong Tính năng khác",ty:"custom",hide:1},
 {k:"magioithieu",g:"_",ic:"ti-gift",t:"Mã giới thiệu",c:"Trong Tính năng khác",ty:"custom",hide:1},
 /* ===== QUẢN LÝ ===== */
@@ -2686,7 +2696,7 @@ var ROLESCOPE={
   tabs:{settings:["tongquan","brand","menu","ch2","ch6","ch4","goiy","the","ch1","tro","nhip",
    "huongdan","qa","staff","giagio","khoa","nhatky"]}},
  tuvan:{match:/^sales/,land:"banlam",
-  pages:["viec","banlam","hanhtrinh","hocvien","giangvien","tuyensinh","ketthuc","khac","duyet"],
+  pages:["viec","banlam","hanhtrinh","hocvien","giangvien","tuyensinh","ketthuc","ketqua","khac","duyet"],
   tabs:{khac:["magioithieu"],duyet:["banggiao"]},
   blocks:["appt","new","contacted","test_done","enrolled","reup"],
   mine:1,mineBtn:1,kpi:1,bell:["Tuyển sinh","Giao việc"]},
@@ -2723,7 +2733,7 @@ var ROLESCOPE={
  aca:{match:/^aca_/,land:"hoctap",ctx:{HTTAB:"lop"},
   /* V9.99z5 - thêm `bangcong`: người phụ trách chuyên môn là người duyệt giờ dạy của giảng viên
      và của đội WOW trước khi chốt lương. Trước đây bảng ấy chỉ Nhân sự và CEO có. */
-  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan","bangcong"],
+  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan","ketqua","bangcong"],
   blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:1,mgr:1,
   /* V9.99y (anh Luân 05/08): *"Trưởng phòng aca cũng quản lý toàn bộ team Wow, em đừng quên"*.
      Đội WOW nằm trong phòng ACA nên phạm vi NGƯỜI đã đúng sẵn; thiếu là cái chuông - 21 việc
@@ -2735,7 +2745,7 @@ var ROLESCOPE={
      ĐO LẠI trên bản build, đừng tin vào việc script in ra "ok". */
   bell:["Giảng viên chuyên môn","WOW","Giao việc"]},
  hocvu:{match:/^academic/,land:"xeplop",
-  pages:["viec","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ychv","ketthuc","khac","duyet"],
+  pages:["viec","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ychv","ketthuc","ketqua","khac","duyet"],
   tabs:{khac:["baoluu"],duyet:["duyetnghi"]},
   blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:1,kpi:1,bell:["Học vụ","CSKH","Giao việc"]},
  /* V9.99z5 - GIÁO VIÊN không xếp người dạy thay và không gỡ đụng phòng: hai màn ấy là cửa
@@ -3005,7 +3015,20 @@ var CH3=[
  {k:"kn_duyet",   t:"Phê duyệt giải pháp khiếu nại",            vai:[],duyet:1,mgr:["hocvu"]},
  {k:"baoluu",     t:"Phê duyệt bảo lưu khóa học",               vai:[],duyet:1,mgr:["hocvu"]},
  {k:"gia_khoa",   t:"Cập nhật bảng giá khóa học",               vai:[],duyet:1,mgr:[]}];
-var CH3BY={};CH3.forEach(function(a){CH3BY[a.k]=a});
+/* ═══ CH3X - CỬA GHI APP TỰ THÊM, KHÔNG CÓ TRONG BẢNG CH3 CỦA SOP ═════════════════════════
+   LUẬT CỨNG SỐ 0 cho phép THÊM chức năng ngoài SOP. Nhưng `check_sop.py` đối chiếu `var CH3=[]`
+   với bảng CH3 trong file .xlsx theo cả HAI chiều: thiếu một dòng là đỏ, THỪA một dòng cũng đỏ
+   (nó coi dòng thừa là dấu hiệu gõ sai chính tả tên hành động). Nhét việc mới vào CH3 là làm
+   hỏng chính cái thước đang canh SOP.
+   Nên việc app tự thêm ở BẢNG RIÊNG này: cùng chảy vào `CH3BY` nên `canAct`/`chanAct` chặn y
+   hệt, mà thước SOP vẫn soi đúng 31 dòng của SOP. Ranh giới đặt ở "SOP có nói hay không", không
+   đặt ở "app có làm hay không". */
+var CH3X=[
+ /* Điểm thi IELTS thật do trung tâm nhập hộ học viên - anh Luân chốt 06/08 khi TP ACA hỏi tỷ lệ
+    đạt AIM: quyền ghi cho *"Học vụ và TP ACA"*. Giảng viên KHÔNG có quyền này: điểm thi thật là
+    dữ liệu đối ngoại, sai một con số là sai cả chỉ số đầu ra của trung tâm. */
+ {k:"kq_that",   t:"Nhập điểm kỳ thi IELTS thật",              vai:["hocvu","aca"],them:1}];
+var CH3BY={};CH3.concat(CH3X).forEach(function(a){CH3BY[a.k]=a});
 /* Ai đang đăng nhập có được làm việc này không. Việc KHÔNG nằm trong CH3 thì không chặn - CH3 là
    danh sách việc SOP có ý kiến, không phải danh sách trắng cho toàn bộ app. */
 function canAct(k){
@@ -3061,7 +3084,7 @@ function mapRoleCode(c){c=String(c||"");
    là gãy dây chuyền. Chỉ lọc ở 3 cổ chai: scopeList (mọi trang danh sách), jAll (bộ máy hành trình),
    slaItems (chuông) - cộng vài guard cho trang mở bằng link trực tiếp. */
 var DSDOM={DL02:"lead",DL02b:"lead",DL03:"lead",DL04:"lead",
- DL09:"hocvien",DL08:"hocvien",DL12:"hocvien",DL15:"hocvien",DL16:"hocvien",DL17:"hocvien",DL18:"hocvien",
+ DL09:"hocvien",DL08:"hocvien",DL12:"hocvien",DL15:"hocvien",DL16:"hocvien",DL17:"hocvien",DL18:"hocvien",DL18b:"hocvien",
  DL10:"lop",DL11:"lop",DL13:"lop",DL14:"lop",DL21:"lop",
  DL06:"tien",DL07:"tien",DL19:"tien",DL22:"tien",
  DL01:"nhansu",DL23:"viec",DL24:"viec"};
@@ -3191,7 +3214,7 @@ function recOwners(code,r){if(!r)return [];
   case "DL04":{var L4=r.lead_id&&find("DL02","lead_id",r.lead_id);return [r.consulted_by,L4&&L4.assigned_to]}
   case "DL09":return stuOwners(r.student_id);
   case "DL08":return [r.assigned_by].concat(stuOwners(r.student_id));
-  case "DL12":case "DL15":case "DL16":case "DL17":case "DL18":return stuOwners(r.student_id);
+  case "DL12":case "DL15":case "DL16":case "DL17":case "DL18":case "DL18b":return stuOwners(r.student_id);
   case "DL10":return [r.main_teacher_id];
   case "DL11":return [r.teacher_id,(r.class_id&&(find("DL10","class_id",r.class_id)||{}).main_teacher_id)];
   case "DL13":return [r.teacher_id,(r.class_id&&(find("DL10","class_id",r.class_id)||{}).main_teacher_id)];
@@ -3608,6 +3631,11 @@ var THEDEF={
   ["ga_khoa","Khóa chưa có giáo án nào","Đếm khóa học chưa soạn buổi nào - mở lớp là hụt bài ngay. Danh sách: bảng khóa ngay dưới."],
   ["ga_kho","Bài trong kho","Tổng số bài đang có trong kho học liệu, kèm số bài chưa dùng ở đâu. Danh sách: bấm tab 'Kho bài'."],
   ["ga_hw","Buổi chưa gắn bài tập","Đếm buổi đã có giáo án nhưng chưa gắn bài về nhà. Danh sách: bấm tab 'Giáo án theo buổi'."]]},
+ ketqua:{t:"Kết quả đầu ra & tỷ lệ đạt AIM",the:[
+  ["kq_hv","Học viên đã học xong","Đếm hồ sơ kết thúc khóa ở trạng thái hoàn thành, trong phạm vi bộ lọc đang chọn. Danh sách: bảng chi tiết cuối trang."],
+  ["kq_thu","Đạt AIM · thi thử tại trung tâm","Tỷ lệ học viên có điểm Overall bài thi thử cuối khóa đạt hoặc vượt band mục tiêu. Em nào chưa có điểm không nằm trong mẫu số. Danh sách: bảng chi tiết cuối trang, cột Overall thử."],
+  ["kq_that","Đạt AIM · kỳ thi IELTS thật","Tỷ lệ học viên có điểm Overall kỳ thi IELTS chính thức đạt hoặc vượt band mục tiêu. Thi nhiều lần thì tính theo cách chọn khai ở aimOfficialPick. Danh sách: bảng chi tiết cuối trang, cột Overall thật."],
+  ["kq_chua","Chưa đi thi thật","Đếm học viên đã học xong nhưng sổ kỳ thi IELTS thật chưa có lượt nào. Nhập bằng nút Nhập điểm thi thật ở đầu trang."]]},
  banglop:{t:"Bảng lớp - một lớp",the:[
   ["bl_siso","Sĩ số","Số học viên đang học trên sức chứa của lớp. Danh sách: bảng học viên ngay dưới."],
   ["bl_atr","Chuyên cần (ATR)","Tỷ lệ buổi có mặt trên tổng buổi đã điểm danh của cả lớp, so với ngưỡng ATR ở Ngưỡng KPI. Muốn xem chi tiết: tab Điểm danh."],
@@ -4960,7 +4988,7 @@ function BANGVIEC(){
      ["ti-user-question",(function(){var t=new Date();return SE.filter(function(x){var d=pvnd(x.session_date);
         return d&&sameDay(d,t)&&!isc(x.session_status,"cancelled")&&!String(x.teacher_id||"").trim()}).length})(),
       "Buổi hôm nay chưa có giáo viên","#DB2777","không xếp kịp là phải huỷ buổi","goHT('gvdp')"],
-     ["ti-chart-line",S.filter(function(x){return /at_risk|off_track/.test(ecode(x.academic_progress_status))}).length,
+     ["ti-chart-line",S.filter(stuAca).length,
       "Học viên đuối học thuật","#6B4FA0","điểm tụt - dấu hiệu sớm nhất","goRisk()"],
      ["ti-clock-exclamation",SE.filter(function(x){return isc(x.session_status,"completed")&&
         !(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())}).length,
@@ -5299,7 +5327,7 @@ function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sa
 function deptSection(){var L=srows("DL02"),S=srows("DL09"),E=srows("DL06"),pay=srows("DL07"),HW=srows("DL13"),T=srows("DL03"),W=srows("DL14"),KN=srows("DL17"),FB=srows("DL16"),SV=srows("DL15"),OB=srows("DL08"),ATT=srows("DL12");
  function cnt(a,fn){return a.filter(fn).length}function pct(a,b){return b?Math.round(a/b*100)+"%":"-"}
  var conv=cnt(L,function(r){return isc(r.lead_status,"converted")});var cvr=L.length?Math.round(conv/L.length*100):0;
- var risk=cnt(S,function(r){return/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status))});
+ var risk=cnt(S,stuRisk);   /* cùng một hàm với mọi chỗ khác - xem chú thích ở bảng HV trong lớp */
  var sdate={};rows("DL11").forEach(function(s){sdate[s.session_id]=s.session_date});
  var att30=ATT.filter(function(a){return in30(sdate[a.session_id])});
  var attP=cnt(att30,function(a){return/on_time|late|present/.test(ecode(a.attendance_status))});
@@ -5367,7 +5395,7 @@ function deptSection(){var L=srows("DL02"),S=srows("DL09"),E=srows("DL06"),pay=s
   h+='</div></div>'});
  return h+'</div>'}
 function alertsHTML(){var out=[];
- srows("DL09").forEach(function(r){var a=/at_risk|off_track/.test(ecode(r.attendance_progress_status)),b=/at_risk|off_track/.test(ecode(r.academic_progress_status));
+ srows("DL09").forEach(function(r){var a=stuAtt(r),b=stuAca(r);
   if(a||b)out.push(["red","ti-user-exclamation",r.student_id+" - "+r.full_name,(a?"Chuyên cần ":"")+(b?"Học thuật":"")+" nguy cơ"])});
  srows("DL06").forEach(function(r){if(num(r.discount_amount)>=1000000&&!r.discount_approved_by)out.push(["amber","ti-discount",r.enrollment_id+" - "+(r.student_id_name||r.student_id),"Chiết khấu "+money(r.discount_amount)+" chờ duyệt"])});
  srows("DL06").forEach(function(r){if(num(r.remaining_amount)>=5000000)out.push(["amber","ti-cash",(r.student_id_name||r.student_id),"Còn nợ "+money(r.remaining_amount)])});
@@ -5378,7 +5406,7 @@ function alertsHTML(){var out=[];
 function roleTasks(role){var out=[];
  function add(id,title,sub,na,open){out.push({id:id,title:title,sub:sub,na:na,cls:naCls(na),open:open})}
  if(role==="sales"||role==="smanager"||role==="ceo"||role==="all"){scopeList("DL02",rows("DL02")).forEach(function(r){if(r.next_action&&/^(new|contacted|considering|no_response)/.test(ecode(r.lead_status)))add(r.lead_id,r.full_name,"SĐT "+r.phone_number+" - "+elabel(r.lead_status),naLive("DL02",r),{t:"lead",id:r.lead_id})})}
- if(role==="academic"||role==="amanager"||role==="ceo"||role==="all"){rows("DL09").forEach(function(r){if(/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status)))add(r.student_id,r.full_name,"CC: "+elabel(r.attendance_progress_status)+" - HT: "+elabel(r.academic_progress_status),r.next_action||"Theo dõi và can thiệp học viên nguy cơ.",{t:"hoso",sid:r.student_id})})}
+ if(role==="academic"||role==="amanager"||role==="ceo"||role==="all"){rows("DL09").forEach(function(r){if(stuRisk(r))add(r.student_id,r.full_name,"CC: "+elabel(r.attendance_progress_status)+" - HT: "+elabel(r.academic_progress_status),r.next_action||"Theo dõi và can thiệp học viên nguy cơ.",{t:"hoso",sid:r.student_id})})}
  if(role==="teacher"||role==="all"){scopeList("DL13",rows("DL13")).forEach(function(r){if(hwSubmitted(r)&&!hwGraded(r))add(r.homework_id,r.student_name+" - "+r.homework_title,"Kỹ năng "+elabel(r.skill)+" - "+(hwLate(r)?"đã nộp trễ, chờ chấm":"đã nộp, chờ chấm"),naLive("DL13",r)||"Chấm bài và gửi nhận xét trong 48h.",{t:"hoso",sid:r.student_id})})}
  if(role==="wow"||role==="all"){scopeList("DL03",rows("DL03")).forEach(function(r){if(/pending/.test(ecode(r.test_status)))add(r.test_booking_id,"Test "+(r.lead_id_name||r.lead_id),"Ngày "+r.test_date+" - "+elabel(r.test_format),naLive("DL03",r)||"Chấm bài test đầu vào, trả kết quả.",{t:"edit",page:"test",id:r.test_booking_id})});
   scopeList("DL14",rows("DL14")).forEach(function(r){if(/booked|scheduled/.test(ecode(r.wow_status)))add(r.wow_id,r.student_name,"Buổi WOW "+elabel(r.wow_session_type)+" - "+r.wow_session_date,naLive("DL14",r)||"Chuẩn bị và thực hiện buổi WOW.",{t:"hoso",sid:r.student_id})})}
@@ -8070,7 +8098,10 @@ function jGoRefund(pid){var C=jCtx(pid);go("duyet")}
    lưu xong tự nhảy sang màn kế tiếp. Có hàng đợi để làm liên tục nhiều người.
    ========================================================================== */
 var JIDK={},JIDP={};
-function jIdInit(){for(var k in LISTCFG){var c=LISTCFG[k];if(c&&c.code&&c.cols&&c.cols[0]){JIDK[c.code]=c.cols[0][0];if(c.idp)JIDP[c.code]=c.idp}}}
+function jIdInit(){for(var k in LISTCFG){var c=LISTCFG[k];if(c&&c.code&&c.cols&&c.cols[0]){JIDK[c.code]=c.cols[0][0];if(c.idp)JIDP[c.code]=c.idp}}
+ /* DL18b (kỳ thi IELTS thật) không có trang danh sách riêng nên không nằm trong LISTCFG - khai
+    tay khoá chính ở đây, nếu không jSaveRow rơi về khoá "id" và sinh ra dòng không có exam_id. */
+ JIDK.DL18b="exam_id";JIDP.DL18b="IELTS-";}
 function jSaveRow(code,o,cb){jIdInit();
  var idk=JIDK[code]||"id";
  function done(id){o[idk]=id;rows(code).unshift(o);
@@ -9763,6 +9794,16 @@ function renderBanglop(){
  var cls=srows("DL10"),cid=window.BLCLASS||(cls[0]&&cls[0].class_id),lop=find("DL10","class_id",cid)||{};
  window.BLCLASS=cid;
  var tab=window.BLTAB||"buoi";
+ /* ═══ BUỔI NÀO ĐÃ CÓ ĐIỂM DANH - TÍNH MỘT LẦN, DÙNG CHUNG ══════════════════════════════
+    Trước bản này bản đồ ấy khai bằng `var` BÊN TRONG khối tính mấy ô "Cần xử lý cho lớp
+    này", mà viên buổi phía dưới lại đọc nó - ngoài phạm vi, nên tab "Buổi học & điểm danh"
+    ném ReferenceError và KHÔNG VẼ RA GÌ. Tab chính của trang Vận hành lớp chết câm.
+    Bộ kiểm `_checkdem.js` (viết hôm nay để canh chuyện "thẻ đếm N mà bảng không có dấu
+    nào") bắt được ngay ở lượt chạy ĐẦU TIÊN - nó là bộ kiểm duy nhất mở tab này ra. Bài
+    học: một tab không có bộ kiểm nào bấm vào thì hỏng bao lâu cũng không ai biết.
+    Khai Ở ĐẦU HÀM: cả ô đếm lẫn viên buổi đều đọc nó, mà ô đếm chạy trước - khai ở giữa
+    thì `var` được kéo lên nhưng GIÁ TRỊ thì chưa, và ô đếm đọc phải undefined. */
+ var coDD={};srows("DL12").forEach(function(a){coDD[a.session_id]=1});
  var h='<div class="phead" data-tour="phead"><div><div class="t">Vận hành lớp · '+lopThe(lop)+esc(lop.class_name||cid)+'</div><div class="s">Buổi học · điểm danh · nhận xét · giao & chấm bài tập — tất cả cho lớp này ở một chỗ</div></div>'+
  '<div class="sp"><select class="sel" onchange="window.BLCLASS=this.value;window.DDSESS=null;window.BTSESS=null;reRender(CUR)">';
  cls.forEach(function(c){h+='<option value="'+c.class_id+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id)+' - ['+lopLoai(c)+'] '+esc(c.class_name)+'</option>'});
@@ -9793,7 +9834,6 @@ function renderBanglop(){
      LÀM GÌ". Nên mỗi ô là một số ĐẾM VIỆC CÒN TỒN, và bấm được để đi thẳng tới chỗ làm. */
   (function(){
    var ses=srows("DL11").filter(function(x){return x.class_id===cid});
-   var coDD={};att.forEach(function(a){coDD[a.session_id]=1});
    /* Buổi ĐÃ DẠY XONG mà không có một dòng điểm danh nào. Buổi chưa tới thì chưa phải việc. */
    var chuaDD=ses.filter(function(x){var st=bhState(x);return st.done&&!coDD[x.session_id]}).length;
    /* Quá hạn ghi nhận xét - dùng chính bhState().noteOver của app (ngưỡng CH2 slaTeacherNote_hours). */
@@ -9846,7 +9886,13 @@ function renderBanglop(){
  var ses=ddSessions(cid);
  /* ---- THANH TAB ---- */
  window.DDCLASS=cid;window.BTCLASS=cid;
- h+=tbar(segHTML(tab,[["buoi","Buổi học & điểm danh",ses.length||""],["hocvien","Học viên",enr.length||""],["baitap","Giao & chấm bài tập"]],"window.BLTAB='{k}';reRender(CUR)"),
+ /* AC2 - tab KẾT QUẢ ĐẦU RA chỉ hiện khi lớp này ĐÃ CÓ hồ sơ đầu ra. Lớp đang học dở mở ra thấy
+    một tab trống là đúng bệnh "mời rồi đuổi" mà app đã chữa ở thanh menu - không tái phạm ở tab. */
+ var kqLop=kqDS().filter(function(r){return r.cid===cid});
+ var tabsBL=[["buoi","Buổi học & điểm danh",ses.length||""],["hocvien","Học viên",enr.length||""],["baitap","Giao & chấm bài tập"]];
+ if(kqLop.length)tabsBL.push(["ketqua","Kết quả đầu ra",kqLop.length]);
+ else if(tab==="ketqua")tab=window.BLTAB="buoi";
+ h+=tbar(segHTML(tab,tabsBL,"window.BLTAB='{k}';reRender(CUR)"),
   '<button class="pill" onclick="window.GACRS=\''+esc(lop.course_id||"")+'\';window.GATAB=\'ga\';go(\'giaoan\')"><i class="ti ti-notes"></i>Giáo án khóa</button>');
 
  if(tab==="buoi"){
@@ -9899,13 +9945,39 @@ function renderBanglop(){
    var rate=att.length?Math.round(pr/att.length*100)+"%":"-";
    var hw=srows("DL13").filter(function(x){return x.student_id===e.student_id&&x.class_id===cid});
    var gr=hw.filter(hwGraded).length;
-   var risk=/at_risk|off_track/.test(ecode(s.attendance_progress_status)+" "+ecode(s.academic_progress_status));
-   h+='<tr><td>'+esc(e.student_id)+'</td><td>'+nguoiLnk(e.student_id,s.full_name,"-")+'</td><td>'+rate+'</td><td>'+gr+'/'+hw.length+'</td><td><span class="chip '+(risk?"red":"green")+'">'+(risk?"Nguy cơ":"Ổn định")+'</span></td>'+
+   /* ═══ MỘT ĐỊNH NGHĨA NGUY CƠ, KHÔNG HAI ═══════════════════════════════════════════════
+      Anh Luân 07/08, đúng cùng một bệnh với dải thẻ buổi hôm qua: *"báo 2 học viên nguy cơ
+      mà a chẳng thấy đâu"*. Thẻ ở đầu trang đếm bằng `stuRisk()` - CỜ NGƯỜI GẮN **hoặc**
+      MÁY THẤY vượt ngưỡng (vắng không phép >= thresholdAtRisk_absences, thiếu bài >=
+      thresholdAtRisk_hw_missing), trừ những em học vụ đã tạm gạt có lý do. Bảng dưới thì đọc
+      THẲNG hai cột trạng thái - tức là chỉ thấy cờ người gắn. Em nào máy thấy mà chưa ai gắn
+      cờ thì vào thẻ mà không vào bảng: thẻ ghi 2, bảng mười dòng "Ổn định".
+      Con số không sai, cái sai là NÓ KHÔNG DẪN TỚI ĐÂU. Nay bảng hỏi đúng hàm mà thẻ hỏi,
+      và nói luôn vì sao - máy thấy hay người gắn - để người đọc biết có cần xác nhận lại. */
+   var risk=stuRisk(s);var vsao=risk?stuRiskReasons(s).join(" · "):"";
+   var mayThay=risk&&!isRisk(s.attendance_progress_status)&&!isRisk(s.academic_progress_status);
+   h+='<tr><td>'+esc(e.student_id)+'</td><td>'+nguoiLnk(e.student_id,s.full_name,"-")+'</td><td>'+rate+'</td><td>'+gr+'/'+hw.length+'</td>'+
+    '<td><span class="chip '+(risk?"red":"green")+'"'+(vsao?' data-tip="'+esc(vsao)+'"':'')+'>'+(risk?"Nguy cơ":"Ổn định")+'</span>'+
+    (mayThay?' <span class="chip amber" data-tip="Máy đếm thấy vượt ngưỡng nhưng chưa ai gắn cờ chính thức - vào hồ sơ xác nhận rồi gắn.">máy thấy</span>':'')+'</td>'+
     '<td><button class="btn sm" onclick="openHoso(\''+esc(e.student_id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button></td></tr>'});
   h+='</tbody></table></div></div>';
  }
  else if(tab==="baitap"){
   h+=btHub(true);
+ }
+ else if(tab==="ketqua"){
+  /* Đầu ra CỦA CHÍNH LỚP NÀY. Anh Luân 06/08 hỏi *"hiện tại xem lớp đã hoàn thành ở đâu em"* -
+     câu trả lời trước bản này là "không ở đâu cả": có màn NHẬP điểm, không có màn ĐỌC lại. */
+  var tThu=aimTL(kqLop,"datThu"),tThat=aimTL(kqLop,"datThat");
+  h+='<div class="notebar"><i class="ti ti-target-arrow"></i><b>Đạt AIM</b> = điểm Overall đạt hoặc vượt band mục tiêu. Hai mốc: bài thi thử cuối khóa tại trung tâm và kỳ thi IELTS thật. Học viên chưa có điểm hiện "chưa có điểm" và không nằm trong mẫu số.</div>';
+  h+=statStrip([
+   ["ti-users",kqLop.length,"Đã học xong","#3B82C4",tThu.mau+" em có điểm thi thử"],
+   ["ti-target-arrow",aimO(tThu),"Đạt AIM · thi thử",(tThu.pct!=null&&tThu.pct>=Math.round(kpiTh(/^AR$/,0.7)*100))?"#16A34A":"#E08A1E","mục tiêu ≥ "+Math.round(kpiTh(/^AR$/,0.7)*100)+"%","",aimG(tThu,"thi thử")],
+   ["ti-certificate",aimO(tThat),"Đạt AIM · thi thật",(tThat.pct!=null&&tThat.pct>=Math.round(kpiTh(/^AR$/,0.7)*100))?"#16A34A":"#E08A1E",tThat.mau?(tThat.mau+" em đã đi thi"):"chưa có ai đi thi","",aimG(tThat,"thi thật")],
+   ["ti-clock-question",kqLop.filter(function(r){return !r.lan}).length,"Chưa đi thi thật","#E08A1E","","",
+    "Học viên của lớp này đã học xong nhưng chưa có lượt thi IELTS thật nào trong sổ."]],"ketqua",
+   ["kq_hv","kq_thu","kq_that","kq_chua"]);
+  h+=kqBang(kqLop,"Điểm đầu ra của lớp này",true);
  }
  return h}
 
@@ -10667,7 +10739,7 @@ function renderBaocao(){
 function baocaoThan(_xemAi){
  if(dsLevel("baocao")==="none")return dsDeny("Báo cáo & KPI");
  var L=srows("DL02"),S=srows("DL09"),E=srows("DL06");
- var risk=S.filter(function(r){return/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status))}).length;
+ var risk=S.filter(stuRisk).length;   /* cùng một hàm với trang Học viên nguy cơ và thẻ của lớp */
  /* V9.99w - TRANG NÀY LÀ CỦA AI. Ba mức phạm vi thì ba câu khác nhau, nói thẳng trên tiêu đề -
     người đọc phải biết con số đang đếm tập nào trước khi tin nó. */
  var _bcLv=bcMuc();
@@ -10738,7 +10810,7 @@ function baocaoThan(_xemAi){
  h+=deptSection();
  // risk table
  h+='<div class="panel"><div class="ph"><b>Học viên nguy cơ cần theo dõi ('+risk+')</b><div class="mini"><button class="pill" onclick="go(\'viec\')">Mở Việc hôm nay</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã HV</th><th>Họ tên</th><th>Chuyên cần</th><th>Học thuật</th><th>Việc cần làm</th></tr></thead><tbody>';
- var rk=S.filter(function(r){return/at_risk|off_track/.test(ecode(r.attendance_progress_status)+" "+ecode(r.academic_progress_status))});
+ var rk=S.filter(stuRisk);
  if(!rk.length)h+='<tr><td class="empty" colspan="5">Không có học viên nguy cơ.</td></tr>';
  catXem("bcrisk",rk,30).forEach(function(r){h+='<tr><td>'+esc(r.student_id)+'</td><td>'+esc(r.full_name)+'</td><td><span class="chip '+stCls(r.attendance_progress_status)+'">'+elabel(r.attendance_progress_status)+'</span></td><td><span class="chip '+stCls(r.academic_progress_status)+'">'+elabel(r.academic_progress_status)+'</span></td><td>'+naDecor(r.next_action||"-")+'</td></tr>'});
  h+='</tbody></table></div>'+xemTiepBtn("bcrisk",rk.length,30)+'</div>';return h}
@@ -10936,7 +11008,7 @@ function renderHealth(){var items=dataHealth();
 var SHEETVN={DL01:"Nhân sự",DL02:"Lead",DL02b:"Lượt chạm lead",DL03:"Test đầu vào",DL04:"Tư vấn",
  DL05:"Khóa học",DL06:"Ghi danh",DL06b:"Đợt đóng học phí",DL07:"Thu - chi học phí",DL08:"Xếp lớp & Onboarding",
  DL09:"Học viên",DL10:"Lớp học",DL11:"Buổi học",DL12:"Điểm danh",DL13:"Bài tập",DL14:"Buổi WOW",
- DL15:"Khảo sát",DL16:"Ghi nhận phản hồi",DL17:"Khiếu nại",DL18:"Kết thúc khóa",DL19:"Nhật ký hệ thống",
+ DL15:"Khảo sát",DL16:"Ghi nhận phản hồi",DL17:"Khiếu nại",DL18:"Kết thúc khóa",DL18b:"Kỳ thi IELTS thật",DL19:"Nhật ký hệ thống",
  DL20:"Giáo án - Buổi & Bài tập",DL21:"Giáo án chi tiết",DL22:"Tham số",DL23:"Việc được giao",
  DL24:"Trao đổi trong việc",DL25:"Nhật ký thao tác"};
 function sheetVN(c){return SHEETVN[c]?(SHEETVN[c]+" ("+c+")"):(c||"")}
@@ -11632,6 +11704,14 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
    var ok=canAct(a.k);
    h+='<tr><td>'+esc(a.t)+(a.duyet?' <span class="chip amber">cần duyệt</span>':'')+'</td>'+
     '<td>'+esc(ch3Vai(a))+'</td>'+
+    '<td>'+(ok?'<span class="chip green">được</span>':'<span class="chip red">không</span>')+'</td></tr>'});
+  h+='</tbody></table></div>';
+  /* Việc app tự thêm để riêng, không trộn vào bảng chép từ SOP - trộn vào là người đọc tưởng
+     SOP có nói, và lần sau đối chiếu file gốc sẽ không tìm thấy dòng đó. */
+  h+='<div class="fhint" style="margin:14px 0 8px">Ngoài bảng trên, app còn '+CH3X.length+' cửa ghi <b>không có trong SOP</b> - phần mở rộng, cùng cơ chế chặn:</div>';
+  h+='<div class="tbwrap"><table class="tb"><thead><tr><th>Hành động (app tự thêm)</th><th style="width:230px">Ai được làm</th><th style="width:120px">Bạn</th></tr></thead><tbody>';
+  CH3X.forEach(function(a){var ok=canAct(a.k);
+   h+='<tr><td>'+esc(a.t)+'</td><td>'+esc(ch3Vai(a))+'</td>'+
     '<td>'+(ok?'<span class="chip green">được</span>':'<span class="chip red">không</span>')+'</td></tr>'});
   h+='</tbody></table></div></div></div>';
   h+='<div class="panel" data-tour="cfpqtong"><div class="pbody" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">';
@@ -12534,6 +12614,10 @@ var APPPARAMS=[
  ["Giới thiệu bạn bè","referralReferrer_reward","Phần thưởng cho học viên giới thiệu (mô tả tự do)","chữ","1 buổi WOW 1-1 miễn phí cho mỗi bạn đăng ký thành công","text"],
  ["Trung tâm","centerHotline","Hotline hiện trong tin nhắn xác nhận và phiếu thu","chữ","","text"],
  ["P10 · Kết thúc khóa & tái đăng ký","thresholdPauseRemind_days","Nhắc gọi mời HV bảo lưu quay lại TRƯỚC hạn bao nhiêu ngày","ngày",14],
+ /* AC2 - học viên thi IELTS thật nhiều lần thì lấy lượt nào để tính đạt AIM. Anh Luân chọn
+    "điểm cao nhất" 06/08. Khai bằng DANH SÁCH CHỮ chứ không phải mã 0/1/2: người mở Cài đặt
+    đọc "Điểm cao nhất" là hiểu ngay, còn số 0 thì phải tra tài liệu mới biết nghĩa gì. */
+ ["P10 · Kết thúc khóa & tái đăng ký","aimOfficialPick","Học viên thi thật nhiều lần thì lấy lượt nào để tính đạt AIM","cách chọn","Điểm cao nhất",["Điểm cao nhất","Lần thi gần nhất","Lần thi đầu tiên"]],
  ["P4 · Hoàn tiền khi hủy","refundPartial_percent","Mức hoàn (%) khi hủy trong cửa sổ refundPartial_days","%",70],
  ["P4 · Hoàn tiền khi hủy","refundReduced_percent","Mức hoàn (%) khi hủy trong cửa sổ refundReduced_days","%",50],
  ["Trung tâm","centerAddress","Địa chỉ hiện trên phiếu thu","chữ","","text"],
@@ -14420,6 +14504,243 @@ function ktFollow(id){var r=find("DL18","course_end_id",id)||{};
  h+='<div class="fld full"><button class="btn primary" onclick="ktFollowSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Lưu</button></div></div>';
  openDrawer("Cập nhật tái ghi danh",h)}
 function ktFollowSave(id){markRow("DL18","course_end_id",id,{re_enrollment_status:fldV("kf_st"),re_enrollment_note:fldV("kf_note")},"Đã cập nhật tái ghi danh.","ketthuc");closeModal()}
+
+/* ═══════════ AC2 · KẾT QUẢ ĐẦU RA & HAI TỶ LỆ ĐẠT AIM ═══════════════════════════════════
+   Trưởng phòng ACA hỏi qua điện thoại 06/08: tỷ lệ đạt AIM của lớp 1-1 và lớp nhóm. Anh Luân
+   chốt luật tính bằng đúng một câu: *"đạt aim nghĩa là: điểm overal >= band điểm mục tiêu"*,
+   và chốt là có HAI tỷ lệ: *"đạt aim theo điểm thi thử tại trung tâm (là buổi thi final đó em),
+   và đạt aim theo điểm thi thật"*.
+
+   TRƯỚC BẢN NÀY APP KHÔNG CÓ CHỖ NÀO XEM ĐẦU RA CỦA MỘT LỚP ĐÃ HỌC XONG. Có cột
+   `achievement_status` trong DL18 và một chỉ số AR ở hồ sơ khóa - nhưng cả hai đọc một Ô ĐÁNH
+   GIÁ do người nhập tay, không đọc điểm. Người nhập gõ "đạt" cho một em 5.0/6.0 là chỉ số đẹp
+   lên mà không ai biết. Nay tỷ lệ tính THẲNG TỪ ĐIỂM; `achievement_status` giữ nguyên vì SOP
+   có mô tả nó (LUẬT CỨNG SỐ 0: thêm thì được, bớt thì không) và vì nó ghi được những thứ điểm
+   không nói - "không cải thiện đáng kể", "đề xuất học lại".
+
+   MẪU SỐ ĐẾM AI: chỉ đếm học viên CÓ CẢ mục tiêu LẪN điểm. Em nào chưa có điểm thì hiện "chưa
+   có điểm" chứ KHÔNG bị đếm là trượt - đếm người chưa thi vào mẫu số là tự bôi xấu trung tâm
+   bằng dữ liệu còn thiếu, và tệ hơn, nó khiến người ta ngại nhập thêm hồ sơ. */
+function dmy(d){function p(n){return n<10?"0"+n:""+n}return p(d.getDate())+"/"+p(d.getMonth()+1)+"/"+d.getFullYear()}
+function bandN(v){var n=parseFloat(String(v==null?"":v).replace(",","."));return (isFinite(n)&&n>0)?n:null}
+function bandTxt(v){var n=bandN(v);return n==null?"":(Math.round(n*10)%10===0?n.toFixed(1):String(n))}
+/* Overall IELTS = trung bình 4 kỹ năng, làm tròn về mốc 0.5 gần nhất - đúng cách IDP/BC tính. */
+function bandOvr(l,r,w,s){var a=[bandN(l),bandN(r),bandN(w),bandN(s)];
+ if(a.some(function(x){return x==null}))return null;
+ return Math.round((a[0]+a[1]+a[2]+a[3])/4*2)/2}
+/* Đạt AIM = overall >= band mục tiêu. Thiếu một trong hai vế thì trả null (chưa đo được), KHÔNG
+   trả false - "chưa biết" và "trượt" là hai chuyện khác hẳn nhau. */
+function aimDat(ovr,tgt){var o=bandN(ovr),t=bandN(tgt);return (o==null||t==null)?null:(o>=t)}
+/* Các lượt thi thật của một học viên, xếp theo NGÀY TĂNG DẦN (lần 1 trước). */
+function kqThi(sid){return srows("DL18b").filter(function(x){return String(x.student_id||"")===String(sid)})
+ .sort(function(a,b){var da=pvnd(a.exam_date),db=pvnd(b.exam_date);
+  if(da&&db)return da-db;return num(a.attempt_no)-num(b.attempt_no)})}
+/* Thi nhiều lần thì LẤY LẦN NÀO để tính đạt AIM - anh Luân chọn "điểm cao nhất" 06/08, nhưng
+   trung tâm khác có thể muốn khác nên đặt vào CH2 chứ không cắm cứng. */
+function kqChon(ls){if(!ls||!ls.length)return null;
+ var mode=paramStr("aimOfficialPick","Điểm cao nhất");
+ if(/gần nhất/i.test(mode))return ls[ls.length-1];
+ if(/đầu tiên/i.test(mode))return ls[0];
+ var best=null;ls.forEach(function(x){var o=bandN(x.overall);if(o==null)return;
+  if(!best||o>bandN(best.overall))best=x});
+ return best||ls[ls.length-1]}
+function kqChonTen(){var m=paramStr("aimOfficialPick","Điểm cao nhất");
+ return /gần nhất/i.test(m)?"lần thi gần nhất":/đầu tiên/i.test(m)?"lần thi đầu tiên":"lần có điểm cao nhất"}
+/* Một dòng kết quả đầu ra: gộp hồ sơ kết thúc khóa (thi thử) với sổ thi thật. */
+function kqDong(ce){
+ var lop=find("DL10","class_id",ce.class_id)||{};
+ var ls=kqThi(ce.student_id),ch=kqChon(ls);
+ var thu=bandN(ce.final_test_score);
+ if(thu==null)thu=bandOvr(ce.final_listening,ce.final_reading,ce.final_writing,ce.final_speaking);
+ var tgt=bandN(ce.target_band);
+ return {ce:ce,sid:ce.student_id,ten:ce.student_id_name||ce.student_id,
+  cid:ce.class_id,lop:lop,ltn:ce.class_id_name||ce.class_id,
+  gv:lop.main_teacher_id||"",gvt:lop.main_teacher_id_name||((find("DL01","staff_id",lop.main_teacher_id)||{}).full_name)||"",
+  cn:ecode(lop.branch)||"",cnt:elabel(lop.branch)||lop.branch||"",
+  l11:lopLa11(lop),loai:lopLoai(lop),
+  tgt:tgt,
+  thu:thu,thuKn:[ce.final_listening,ce.final_reading,ce.final_writing,ce.final_speaking],
+  that:ch?bandN(ch.overall):null,thatKn:ch?[ch.listening,ch.reading,ch.writing,ch.speaking]:null,
+  lan:ls.length,ls:ls,chon:ch,
+  datThu:aimDat(thu,tgt),datThat:aimDat(ch&&ch.overall,tgt)}}
+/* Toàn bộ hồ sơ đầu ra trong phạm vi của người đang đăng nhập. Chỉ tính HV HOÀN THÀNH khóa -
+   em bỏ giữa chừng hay chuyển lớp thì không có "đầu ra của khóa này" để đo. */
+function kqDS(){return srows("DL18").filter(function(x){return isc(x.student_status,"completed")}).map(kqDong)}
+/* Tỷ lệ đạt AIM trên một tập dòng. mat = "datThu" hoặc "datThat". */
+function aimTL(ds,mat){var dat=0,mau=0;
+ ds.forEach(function(r){if(r[mat]==null)return;mau++;if(r[mat])dat++});
+ return {dat:dat,mau:mau,pct:mau?Math.round(dat/mau*100):null}}
+function aimO(t){return t.mau?(t.pct+"%"):"—"}
+function aimG(t,ten){return t.mau?pctG(t.dat,t.mau,"học viên có đủ mục tiêu và điểm "+ten)
+ :("Chưa học viên nào trong nhóm này có đủ mục tiêu và điểm "+ten+" nên chưa tính được tỷ lệ")}
+/* Ô điểm: xanh khi đạt, đỏ khi chưa, xám khi chưa có điểm. Không tô đỏ ô trống - trống là CHƯA
+   THI, không phải TRƯỢT. */
+function bandO(v,tgt){var n=bandN(v);
+ if(n==null)return '<span class="mut" style="font-size:11.5px">chưa có điểm</span>';
+ var d=aimDat(n,tgt);
+ return '<span class="chip '+(d==null?"":(d?"green":"red"))+'">'+esc(bandTxt(n))+'</span>'}
+function bandKn(a){if(!a)return '<span class="mut">-</span>';
+ var nm=["L","R","W","S"],out=[],co=false;
+ a.forEach(function(v,i){var n=bandN(v);if(n!=null)co=true;out.push('<span class="knb"><i>'+nm[i]+'</i>'+esc(n==null?"-":bandTxt(n))+'</span>')});
+ return co?('<span class="knbs">'+out.join("")+'</span>'):'<span class="mut">-</span>'}
+
+/* ---- LÁT CẮT: bóc tỷ lệ theo giảng viên / lớp / chi nhánh / loại lớp ----
+   TP ACA hỏi đúng bốn lát này. Viết một hàm gom chung chứ không bốn bảng chép tay - bốn bản chép
+   là bốn chỗ để lệch nhau về sau. */
+var KQLAT=[["gv","Giảng viên"],["lop","Lớp"],["cn","Chi nhánh"],["loai","Loại lớp"]];
+function kqNhom(ds,lat){var m={},od=[];
+ ds.forEach(function(r){
+  var k=lat==="gv"?(r.gv||"__"):lat==="lop"?(r.cid||"__"):lat==="cn"?(r.cn||"__"):(r.l11?"mot":"nhom");
+  var t=lat==="gv"?(r.gvt||"Chưa gán giảng viên"):lat==="lop"?(r.ltn||r.cid):lat==="cn"?(r.cnt||"Chưa gán chi nhánh"):(r.l11?"Lớp 1-1":"Lớp nhóm");
+  if(!m[k]){m[k]={k:k,t:t,ds:[]};od.push(k)}
+  m[k].ds.push(r)});
+ return od.map(function(k){var g=m[k];g.thu=aimTL(g.ds,"datThu");g.that=aimTL(g.ds,"datThat");return g})
+  .sort(function(a,b){return b.ds.length-a.ds.length})}
+
+function renderKetqua(){
+ /* Tên biến trạng thái KHÔNG được trùng tên bảng khai. `var KQLAT` ở tầng ngoài CHÍNH LÀ
+    `window.KQLAT` - đặt `window.KQLAT="gv"` là ghi đè cả bảng bằng một chuỗi, và trang chết
+    ngay ở lần bấm lát cắt đầu tiên với lỗi "KQLAT.map is not a function". */
+ var lat=window.KQCUT||"loai";
+ var f=window.KQF||(window.KQF={gv:"",cn:"",khoa:"",loai:""});
+ var all=kqDS();
+ var view=all.filter(function(r){
+  if(f.gv&&r.gv!==f.gv)return false;
+  if(f.cn&&r.cn!==f.cn)return false;
+  if(f.khoa&&String((r.lop||{}).course_id||"")!==f.khoa)return false;
+  if(f.loai==="mot"&&!r.l11)return false;
+  if(f.loai==="nhom"&&r.l11)return false;
+  return true});
+ var h=pageHead("Điểm đầu ra từng học viên và tỷ lệ đạt AIM theo hai mốc: thi thử cuối khóa tại trung tâm và kỳ thi IELTS thật",
+  "",'<button class="btn primary" onclick="kqNhapThat()"><i class="ti ti-certificate"></i>Nhập điểm thi thật</button>');
+ h+='<div class="notebar"><i class="ti ti-info-circle"></i><b>Đạt AIM</b> = điểm <b>Overall</b> đạt hoặc vượt <b>band mục tiêu</b> học viên đăng ký. '+
+  '<b>Thi thử</b> lấy kết quả buổi thi cuối khóa tại trung tâm (DL18); <b>thi thật</b> lấy kỳ thi IELTS chính thức (DL18b), học viên thi nhiều lần thì tính theo '+
+  '<b>'+esc(kqChonTen())+'</b>'+cfGear("aimOfficialPick")+'. Học viên chưa có điểm không nằm trong mẫu số của tỷ lệ.</div>';
+
+ /* ---- bộ lọc ---- */
+ var gvs={},cns={},khs={};
+ all.forEach(function(r){if(r.gv)gvs[r.gv]=r.gvt||r.gv;if(r.cn)cns[r.cn]=r.cnt||r.cn;
+  var ci=String((r.lop||{}).course_id||"");if(ci)khs[ci]=(find("DL05","course_id",ci)||{}).course_name||ci});
+ function opts(o,cur){var a=['<option value="">Tất cả</option>'];
+  Object.keys(o).sort(function(x,y){return String(o[x]).localeCompare(String(o[y]),"vi")}).forEach(function(k){
+   a.push('<option value="'+esc(k)+'"'+(cur===k?" selected":"")+'>'+esc(o[k])+'</option>')});
+  return a.join("")}
+ h+='<div class="tbar" data-tour="tbar"><select class="sel" onchange="window.KQF.khoa=this.value;reRender(CUR)">'+opts(khs,f.khoa)+'</select>'+
+  '<select class="sel" onchange="window.KQF.gv=this.value;reRender(CUR)">'+opts(gvs,f.gv).replace("Tất cả","Mọi giảng viên")+'</select>'+
+  '<select class="sel" onchange="window.KQF.cn=this.value;reRender(CUR)">'+opts(cns,f.cn).replace("Tất cả","Mọi chi nhánh")+'</select>'+
+  segHTML(f.loai||"",[["","Mọi loại lớp",all.length],["mot","Lớp 1-1",all.filter(function(r){return r.l11}).length],["nhom","Lớp nhóm",all.filter(function(r){return !r.l11}).length]],
+   "window.KQF.loai='{k}';reRender(CUR)")+
+  '<div class="tbsp"></div><span class="mut" style="font-size:12px">'+view.length+' hồ sơ đầu ra</span></div>';
+
+ var tThu=aimTL(view,"datThu"),tThat=aimTL(view,"datThat");
+ var chuaThi=view.filter(function(r){return !r.lan}).length;
+ h+=statStrip([
+  ["ti-users",view.length,"Học viên đã học xong","#3B82C4",tThu.mau+" em đã có điểm thi thử","",
+   "Đếm hồ sơ kết thúc khóa có trạng thái hoàn thành, trong phạm vi bộ lọc đang chọn."],
+  ["ti-target-arrow",aimO(tThu),"Đạt AIM · thi thử tại trung tâm",(tThu.pct!=null&&tThu.pct>=Math.round(kpiTh(/^AR$/,0.7)*100))?"#16A34A":"#E08A1E",
+   "mục tiêu ≥ "+Math.round(kpiTh(/^AR$/,0.7)*100)+"%","",aimG(tThu,"thi thử")],
+  ["ti-certificate",aimO(tThat),"Đạt AIM · kỳ thi IELTS thật",(tThat.pct!=null&&tThat.pct>=Math.round(kpiTh(/^AR$/,0.7)*100))?"#16A34A":"#E08A1E",
+   tThat.mau?(tThat.mau+" em đã đi thi"):"chưa có ai đi thi","",aimG(tThat,"thi thật")],
+  ["ti-clock-question",chuaThi,"Chưa đi thi thật",chuaThi?"#E08A1E":"#16A34A",chuaThi?"chưa có kết quả chính thức":"đã có kết quả hết","",
+   "Học viên đã học xong nhưng sổ kỳ thi IELTS thật chưa có lượt thi nào. Nhập bằng nút Nhập điểm thi thật ở đầu trang."]],"ketqua");
+
+ /* ---- bảng bóc tách theo lát cắt ---- */
+ h+=tbar(segHTML(lat,KQLAT.map(function(x){return [x[0],"Theo "+x[1].toLowerCase()]}),"window.KQCUT='{k}';reRender(CUR)"),"");
+ var nh=kqNhom(view,lat);
+ h+='<div class="panel"><div class="ph"><b>Tỷ lệ đạt AIM theo '+esc((KQLAT.filter(function(x){return x[0]===lat})[0]||["","",""])[1]).toLowerCase()+'</b>'+
+  '<span class="mut" style="font-size:11.5px">'+nh.length+' nhóm · hai mốc cạnh nhau để so</span></div>'+
+  '<div class="tbwrap"><table class="dt"><thead><tr><th>'+esc((KQLAT.filter(function(x){return x[0]===lat})[0]||["",""])[1])+'</th>'+
+  '<th style="width:90px">Học xong</th><th style="width:160px">Đạt AIM · thi thử</th><th style="width:160px">Đạt AIM · thi thật</th></tr></thead><tbody>';
+ if(!nh.length)h+='<tr><td class="empty" colspan="4">Chưa có hồ sơ đầu ra nào khớp bộ lọc.</td></tr>';
+ nh.forEach(function(g){
+  h+='<tr><td><b>'+esc(g.t)+'</b></td><td>'+g.ds.length+'</td>'+
+   '<td>'+pctT(g.thu.dat,g.thu.mau,"em có đủ mục tiêu và điểm thi thử")+' <span class="mut" style="font-size:11.5px">'+g.thu.dat+'/'+g.thu.mau+'</span></td>'+
+   '<td>'+pctT(g.that.dat,g.that.mau,"em có đủ mục tiêu và điểm thi thật")+' <span class="mut" style="font-size:11.5px">'+g.that.dat+'/'+g.that.mau+'</span></td></tr>'});
+ h+='</tbody></table></div></div>';
+
+ /* ---- bảng chi tiết từng học viên ---- */
+ h+=kqBang(view,"Chi tiết từng học viên");
+ return h}
+
+/* Bảng chi tiết dùng chung cho trang Kết quả đầu ra và cho tab trong Vận hành lớp - một bảng,
+   hai chỗ gọi. Chép làm hai là hai chỗ để lệch. */
+function kqBang(ds,tieude,anLop){
+ var h='<div class="panel"><div class="ph"><b>'+esc(tieude)+'</b><span class="mut" style="font-size:11.5px">'+ds.length+' học viên · bấm một dòng để xem lịch sử thi</span></div>'+
+  '<div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th>'+(anLop?"":'<th>Lớp</th>')+
+  '<th style="width:70px">Mục tiêu</th><th style="width:170px">Thi thử · 4 kỹ năng</th><th style="width:100px">Overall thử</th>'+
+  '<th style="width:170px">Thi thật · 4 kỹ năng</th><th style="width:120px">Overall thật</th></tr></thead><tbody>';
+ if(!ds.length)h+='<tr><td class="empty" colspan="'+(anLop?6:7)+'">Chưa có học viên nào học xong.</td></tr>';
+ ds.forEach(function(r){
+  h+='<tr class="clk" onclick="kqMo(\''+esc(r.sid)+'\')"><td>'+esc(r.ten)+'</td>'+
+   (anLop?"":'<td>'+lopThe(r.lop)+esc(r.ltn)+'</td>')+
+   '<td>'+(r.tgt==null?'<span class="mut">-</span>':'<b>'+esc(bandTxt(r.tgt))+'</b>')+'</td>'+
+   '<td>'+bandKn(r.thuKn)+'</td><td>'+bandO(r.thu,r.tgt)+'</td>'+
+   '<td>'+bandKn(r.thatKn)+'</td>'+
+   '<td>'+bandO(r.that,r.tgt)+(r.lan>1?' <span class="chip">'+r.lan+' lần</span>':'')+'</td></tr>'});
+ return h+'</tbody></table></div></div>'}
+
+/* Ngăn kéo lịch sử thi. Anh Luân duyệt bảng lịch sử 06/08 kèm điều kiện *"a sợ hiển thị rắc rối,
+   nếu em vẫn có thể làm nó gọn đẹp và chuyên nghiệp thì anh okey"* - nên màn chính chỉ một dòng
+   một em, toàn bộ lịch sử nằm ở đây, mở khi cần. */
+function kqMo(sid){
+ var ce=srows("DL18").filter(function(x){return String(x.student_id||"")===String(sid)})[0];
+ if(!ce){toast("Chưa có hồ sơ đầu ra của học viên này.");return}
+ var r=kqDong(ce);
+ var h='<div class="dcard"><h4><i class="ti ti-target-arrow"></i>'+esc(r.ten)+'</h4>';
+ h+='<div class="mut" style="font-size:12px;margin:-4px 0 12px">'+lopThe(r.lop)+esc(r.ltn)+(r.gvt?" · GV "+esc(r.gvt):"")+(r.cnt?" · "+esc(r.cnt):"")+'</div>';
+ h+='<div class="tbwrap"><table class="tb"><thead><tr><th>Mốc</th><th>Ngày</th><th>L</th><th>R</th><th>W</th><th>S</th><th>Overall</th><th>So với mục tiêu '+esc(r.tgt==null?"-":bandTxt(r.tgt))+'</th></tr></thead><tbody>';
+ function dong(nhan,ngay,a,ovr,dam){
+  var d=aimDat(ovr,r.tgt);
+  return '<tr'+(dam?' style="font-weight:600"':'')+'><td>'+esc(nhan)+'</td><td>'+esc(ngay||"-")+'</td>'+
+   a.map(function(v){return '<td>'+esc(bandN(v)==null?"-":bandTxt(v))+'</td>'}).join("")+
+   '<td><b>'+esc(bandN(ovr)==null?"-":bandTxt(ovr))+'</b></td>'+
+   '<td>'+(d==null?'<span class="mut">chưa đo được</span>':'<span class="chip '+(d?"green":"red")+'">'+(d?"đạt AIM":"chưa đạt")+'</span>')+'</td></tr>'}
+ h+=dong("Thi thử cuối khóa",String(ce.course_completion_time||"").slice(0,10),r.thuKn,r.thu);
+ if(!r.ls.length)h+='<tr><td colspan="8" class="empty">Chưa có lượt thi IELTS thật nào.</td></tr>';
+ r.ls.forEach(function(x){h+=dong("Thi thật lần "+(x.attempt_no||"?"),x.exam_date,[x.listening,x.reading,x.writing,x.speaking],x.overall,r.chon&&x.exam_id===r.chon.exam_id)});
+ h+='</tbody></table></div>';
+ if(r.ls.length>1)h+='<div class="fhint" style="margin:8px 0 0">Dòng in đậm là lượt đang được tính vào tỷ lệ đạt AIM ('+esc(kqChonTen())+') - đổi cách chọn trong Cài đặt.</div>';
+ h+='<div class="dact"><button class="btn primary" onclick="kqNhapThat(\''+esc(sid)+'\')"><i class="ti ti-certificate"></i>Thêm lượt thi thật</button>'+
+  '<button class="btn" onclick="openHoso(\''+esc(sid)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button></div></div>';
+ openDrawer("Kết quả đầu ra",h)}
+
+function kqNhapThat(sid){
+ if(chanAct("kq_that"))return;
+ var cands=srows("DL18").filter(function(x){return isc(x.student_status,"completed")});
+ var h='<div class="dcard"><h4><i class="ti ti-certificate"></i>Nhập điểm kỳ thi IELTS thật</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Điểm của kỳ thi IELTS chính thức (IDP / British Council), không phải bài thi thử cuối khóa. Overall hệ thống tự tính từ 4 kỹ năng theo mốc 0.5.</div>';
+ h+='<div class="fld"><label>Học viên <i>*</i></label><select id="kt_sid">'+
+  cands.map(function(x){return '<option value="'+esc(x.student_id)+'"'+(sid===x.student_id?" selected":"")+'>'+esc((x.student_id_name||x.student_id)+" - "+(x.class_id_name||x.class_id||""))+'</option>'}).join("")+'</select></div>';
+ h+='<div class="fld"><label>Ngày thi <i>*</i></label><input id="kt_date" type="date"></div>';
+ ["l|Listening","r|Reading","w|Writing","s|Speaking"].forEach(function(x){var p=x.split("|");
+  h+='<div class="fld"><label>'+p[1]+'</label><input id="kt_'+p[0]+'" type="number" step="0.5" min="0" max="9" placeholder="vd 6.5"></div>'});
+ h+='<div class="fld full"><label>Ghi chú</label><input id="kt_note" placeholder="vd: thi lại để nâng band Writing"></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="kqNhapThatSave()"><i class="ti ti-check"></i>Lưu điểm thi</button></div></div>';
+ openDrawer("Nhập điểm thi thật",h)}
+function kqNhapThatSave(){
+ if(chanAct("kq_that"))return;
+ var sid=fldV("kt_sid"),d=fldV("kt_date");
+ if(!sid){toast("Chọn học viên.");return}
+ if(!d){toast("Chọn ngày thi.");return}
+ var dd=new Date(d);
+ if(!isNaN(dd.getTime())&&dd>new Date()){toast("Ngày thi không được ở tương lai.");return}
+ var sk=["kt_l","kt_r","kt_w","kt_s"].map(function(k){return fldV(k)});
+ var ovr=bandOvr(sk[0],sk[1],sk[2],sk[3]);
+ if(ovr==null){toast("Nhập đủ điểm 4 kỹ năng.");return}
+ if(sk.some(function(v){var n=bandN(v);return n==null||n>9})){toast("Điểm từng kỹ năng phải trong khoảng 0.5 - 9.0.");return}
+ var ce=srows("DL18").filter(function(x){return String(x.student_id||"")===String(sid)})[0]||{};
+ var da=kqThi(sid).length;
+ var o={student_id:sid,student_id_name:ce.student_id_name||sid,
+  class_id:ce.class_id||"",class_id_name:ce.class_id_name||"",
+  exam_date:dmy(dd),listening:String(bandN(sk[0])),reading:String(bandN(sk[1])),
+  writing:String(bandN(sk[2])),speaking:String(bandN(sk[3])),overall:String(ovr),
+  target_band:String(ce.target_band||""),attempt_no:String(da+1),
+  note:(fldV("kt_note")||"").trim(),next_action:""};
+ jSaveRow("DL18b",o,function(){
+  var t=aimDat(ovr,ce.target_band);
+  toast("Đã lưu điểm thi thật: Overall "+bandTxt(ovr)+(t==null?"":(t?" - đạt AIM":" - chưa đạt AIM")));
+  closeModal();reRender(CUR)})}
+
 /* ===================== TRANG HỌC VIÊN (bản HỌC VIÊN tự xem) =====================
    KHÁC hồ sơ 360 của nhân viên: viết cho học viên đọc - không có SLA, không có NV phụ trách,
    không có việc nội bộ. Chỉ: trung tâm đã xác nhận gì · hành trình · tiến độ · sắp tới ·
@@ -18536,8 +18857,8 @@ function qaKhoHeThong(){
  try{ch4List().forEach(function(m){
   K.push({t:"Câu nhắc "+m.code,d:m.tmpl,o:"Cài đặt > Thông điệp nhắc việc (CH4)",
    go:"window.SETTAB='ch4';window.MSGQ='"+m.code+"';go('settings')",tag:m.code+" "+m.tmpl+" "+(m.when||"")})})}catch(e){}
- try{CH3.forEach(function(a){
-  K.push({t:"Ai được: "+a.t,d:"Theo bảng phân quyền CH3 của SOP - "+ch3Vai(a)+(a.duyet?" (việc này cần duyệt)":""),
+ try{CH3.concat(CH3X).forEach(function(a){
+  K.push({t:"Ai được: "+a.t,d:(a.them?"App tự thêm ngoài SOP - ":"Theo bảng phân quyền CH3 của SOP - ")+ch3Vai(a)+(a.duyet?" (việc này cần duyệt)":""),
    o:"Cài đặt > Phân quyền & Phạm vi",go:"window.SETTAB='phanquyen';go('settings')",tag:a.t+" "+ch3Vai(a)})})}catch(e){}
  try{((DATA.config||{}).ch6||[]).forEach(function(k){
   K.push({t:"Chỉ số "+k.code+": "+k.name,d:"Ngưỡng đạt đang đặt: "+k.threshold+" ("+k.dir+")",
@@ -20385,7 +20706,7 @@ function banNutHoSo(ttk,r){
  if(ttk==="hocvien")return '<button class="btn" onclick="window.HOSO=\''+esc(r.student_id)+'\';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>';
  return '<button class="btn" onclick="openLop(\''+esc(r.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Mở lớp</button>'}
 
-var RENDER={ban:renderBan,canhan:renderCanhan,dsphuhuynh:renderSoPH,hoidap:renderHoidap,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
+var RENDER={ban:renderBan,canhan:renderCanhan,dsphuhuynh:renderSoPH,hoidap:renderHoidap,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,ketqua:renderKetqua,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
 function dashJump(key){var m={urgent:"viec",newlead:"nhaplead",consider:"viec",convert:"tuvan",risk:"viec",onboard:"xeplop",approve:"duyet",debt:"thanhtoan",complaint:"khieunai",ungraded:"baitap",testpend:"test",wowbook:"wow",unverified:"thanhtoan",classes:"banglop"};var pg=m[key];if(pg&&RBK[CURROLE].pages.indexOf(pg)>=0)go(pg);else go("viec")}
 
 /* ---------- router ---------- */
@@ -20523,7 +20844,7 @@ var NHIP={
   ["sang","Bài tập đang chờ chấm","Chấm trễ thì buổi sau giáo viên không biết lớp yếu chỗ nào","baitap",
    function(){return rows("DL13").filter(function(h){return String(h.submitted_at||"").trim()&&!String(h.graded_at||"").trim()}).length}],
   ["ngay","Học viên nguy cơ học thuật","Điểm tụt là dấu hiệu sớm nhất, thấy trước khi họ nghỉ","hocvien",
-   function(){return rows("DL09").filter(function(x){return /at_risk|off_track/.test(ecode(x.academic_progress_status))}).length}],
+   function(){return rows("DL09").filter(stuAca).length}],
   ["ngay","Lớp thiếu giáo viên hôm nay","Buổi không có người dạy là buổi phải huỷ - biết sớm còn xoay được","gvdp",
    function(){var t=new Date();return rows("DL11").filter(function(x){var d=pvnd(x.session_date);
     return d&&sameDay(d,t)&&!isc(x.session_status,"cancelled")&&!String(x.teacher_id||"").trim()}).length}],
