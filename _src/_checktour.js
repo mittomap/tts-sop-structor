@@ -149,7 +149,21 @@ var TOUR_BOQUA={
  hosogv:"nhu tren", hosonv:"nhu tren", hosokhoa:"nhu tren",
  chay:"man chay quy trinh, tour bai 'Khong can vao Cai dat' da di qua bang neo @chaybody",
  hanhtrinh:"da gop vao banlam (go() remap)",
- bangcong:"da gop vao trang Giang vien (go() remap)",
+ /* V2 - `bangcong` NGUOC LAI: no khong con gop vao trang Giang vien nua, no la mot trang
+    nghiep vu rieng cua Nhan su, va bai "Bang cong giang day" da di thang qua no. Bo dong khai
+    cu di chu khong de lai - mot dong khai mien tru cho thu khong con can mien tru la mot cho
+    im lang thua, va lan sau ai doc cung tuong bangcong van la tab cua Giang vien. */
+ /* ═══ V2 - SAU KHOA HUB CHI CON LA BI DANH ═════════════════════════════════════════════════
+    `go()` dan chung tiep toi trang nghiep vu dau tien nguoi do xem duoc, nen KHONG AI DUNG LAI
+    o day - khong co man hinh nao de ma di qua. Chung o lai chi de moi link cu, bai huong dan cu
+    va nut cu khong chet. Day KHONG phai "bo qua cho tien": mot bai huong dan di qua chung se
+    lap tuc bi day sang trang khac, va do moi la cai sai. */
+ tuyensinh:"V2: chi la bi danh, go() dan toi trang nghiep vu dau tien nguoi do xem duoc",
+ hoctap:"V2: nhu tren", cskh:"V2: nhu tren", khac:"V2: nhu tren", duyet:"V2: nhu tren",
+ /* `giangvien` la SO TRA CUU doi nguu (nhom Tra cuu tren menu). Phan nghiep vu cua no - bang
+    cong giang day - da tach ra thanh trang rieng va CO bai di qua. Cung ho voi cac so tra cuu
+    khai ngay ben duoi. */
+ giangvien:"so tra cuu doi nguu - phan nghiep vu (Bang cong) da co bai di qua o trang rieng",
  /* V9.66: ho SO TRA CUU nay co bai rieng - "tq_sotracuu" di qua 4 so (khieu nai, bai tap,
     diem danh, WOW) va noi ro ca ho dung CHUNG mot bo cong cu. May so con lai khai o day khong
     phai vi bo qua, ma vi day mot so la day duoc ca ho - di het 13 so chi lam bai dai ra ma

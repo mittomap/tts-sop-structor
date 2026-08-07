@@ -53,6 +53,25 @@ const NEO_CHUNG = {
     "Cùng ô hỏi của Trợ lý với bước 2/4, nhưng dạy mặt khác: 2/4 dạy HỎI ĐƯỢC GÌ, 4/4 dạy app "
     + "trả lời sao khi KHÔNG hiểu. Ô hỏi là thứ duy nhất trên màn để trỏ, và cả hai bài đều "
     + "đang nói về chính nó.",
+  /* ═══ V2 - BỐN CHỖ DÙNG CHUNG SINH RA TỪ VIỆC DỠ HUB ═════════════════════════════════════
+     Trước V2, các bài hướng dẫn của những chức danh khác nhau đứng ở những TAB khác nhau của
+     cùng một hub, nên neo `@man` (khối nội dung của màn đang mở) tự khác nhau. Nay mỗi nghiệp
+     vụ là một trang riêng: hai bài dạy hai người khác nhau về CÙNG một trang thì cùng trỏ vào
+     chính trang ấy - đó là đúng, không phải trỏ sai.
+     Khai kèm lý do chứ không nới luật: luật N3 vẫn bắt mọi trường hợp trùng KHÔNG khai. */
+  "tn_giaovien 5/5":
+    "Trang Giao việc, trùng với tn_sale 8/8. Cùng một màn dạy cho hai người: sale nhận việc "
+    + "từ quản lý, giáo viên nhận việc từ học vụ. Cả hai bước đều giới thiệu CẢ màn nên không "
+    + "tách nhỏ được.",
+  "tn_wow 2/5":
+    "Trang Test đầu vào, trùng với tn_sale 4/8. Sale đặt lịch test cho khách; NV WOW là người "
+    + "CHẤM bài test đó (bảng phân quyền CH3 của SOP giao vậy). Hai đầu của cùng một việc.",
+  "tn_marketing 5/5":
+    "Trang Lead, trùng với chính bước 1/5 của bài này. 1/5 dạy ĐỌC kho lead, 5/5 dạy đọc PHỄU "
+    + "và tỷ lệ chuyển đổi trên cùng kho ấy - hai câu hỏi khác nhau trên cùng một màn.",
+  "tn_quanly 4/6":
+    "Hàng chờ phê duyệt, trùng với tn_ketoan 4/5. Kế toán đứng ở phía hoàn tiền, quản lý đứng "
+    + "ở phía duyệt - cùng một hàng chờ, hai vai.",
   "tn_quanly 1/6":
     "Màn Báo cáo, trùng với tn_ketoan 5/5. Cùng một màn dạy cho hai chức danh: kế toán đọc "
     + "doanh thu, quản lý đọc toàn cảnh. Không tách nhỏ được vì cả hai bước đều giới thiệu CẢ màn.",

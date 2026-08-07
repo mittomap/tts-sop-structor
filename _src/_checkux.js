@@ -799,10 +799,21 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
   CURSTAFF=(rows("DL01")[0]||{}).staff_id;
   Object.keys(RENDER).forEach(function(p){CUR=p;ve(function(){RENDER[p]()})})})();
  window.SCOPEEFF=null;
+ /* V2 - PHAI VE CA TRANG DANH SACH. Vong nay chi duyet `RENDER`, ma trang kieu DANH SACH khong
+    co mat trong `RENDER` - chung ve bang `renderList`. O V1 chuyen do vo hai vi khong chuc danh
+    nao dap xuong mot trang danh sach. Sang V2 co: ACA dap xuong `lop`, marketing dap xuong
+    `nhaplead` - va bang viec cua ho nam o do. Khong ve thi sau THE cua ho (bv_aca_*, bv_mk_*)
+    bi cham la "khai ma khong bao gio ve ra", tuc thuoc bao do mot thu app dang lam dung.
+    LUAT: mot vong lap "di qua moi trang" ma chi doc MOT bang dang ky thi moi trang nam ngoai
+    bang do deu la vung toi - cung ho voi bai hoc `_checkmat` da rut ve trang `viec`. */
+ var TRANGDS=PAGES.filter(function(x){return x.ty==="list"}).map(function(x){return x.k});
+ function veTrang(p){CUR=p;
+  if(TRANGDS.indexOf(p)>=0)ve(function(){renderList(p)});
+  else if(RENDER[p])ve(function(){RENDER[p]()})}
  ["quantri","tuvan","hocvu","giaovien","wow","ketoan","marketing","hotro","dieuhanh"].forEach(function(r){
   try{setRole(r)}catch(e){}
   try{CURSTAFF=(rows("DL01")[0]||{}).staff_id}catch(e){}
-  Object.keys(RENDER).forEach(function(p){CUR=p;ve(function(){RENDER[p]()})})});
+  Object.keys(RENDER).concat(TRANGDS).forEach(veTrang)});
  try{setRole("all")}catch(e){}
  rows("DL01").forEach(function(s){CURSTAFF=s.staff_id;ve(function(){myKpiHTML()});
   window.GVID=s.staff_id;ve(function(){renderHosoGV()});
@@ -811,10 +822,25 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
  /* các dải nằm trong TAB con, không gọi tới qua RENDER[trang] - phải gọi thẳng hàm vẽ tab */
  ["renderNhatky","renderReupTab","renderTrangHV","renderHtToday","tkReport","renderCong","renderDuthu"]
   .forEach(function(f){ve(function(){global[f]()})});
- Object.keys(RENDER).forEach(function(p){CUR=p;ve(function(){RENDER[p]()})});
+ Object.keys(RENDER).concat(TRANGDS).forEach(veTrang);
  var chuaChay=Object.keys(THEDEF).filter(function(k){return !SEEN[k]});
  t("so the khai khop so the ve ra o moi dai"+(Object.keys(LECH).length?" - LECH: "+JSON.stringify(LECH):" ("+Object.keys(SEEN).length+" dai)"), Object.keys(LECH).length===0);
  t("khong co dai the khai thua (dai nao cung chay that)"+(chuaChay.length?" - CHUA CHAY: "+chuaChay.join(","):""), chuaChay.length===0);
+ /* V2 - DAI THE CUA BANG VIEC CHI VE O TRANG DAP CUA CHINH NGUOI DO. Muon thay no thi phai
+    DONG VAI THAT roi mo dung trang ay. Hai vong tren dung `setRole` - no moi cat pham vi du
+    lieu, CHUA DAT DANH TINH, nen `bangViecHTML` khong nhan ra "day la trang dap cua toi" va
+    tra ve rong. Day la lan thu BA du an can dung cai bay nay (truoc do: `_checkreset` va
+    `_checktour` deu dung `applyScope` roi do ra 0 va to oan app).
+    Cua vao THAT cua app la `gateEnter(sid)` - hoi thang no. */
+ Object.keys(ROLESCOPE).forEach(function(g){
+  var rs0=ROLESCOPE[g];if(!rs0||!rs0.match)return;
+  var ng=rows("DL01").filter(function(x){return staffActive(x)&&rs0.match.test(String(x.role||""))})[0];
+  if(!ng)return;
+  try{gateEnter(ng.staff_id)}catch(e){return}
+  var lp="";try{lp=SCOPE().land||""}catch(e){}
+  if(lp)veTrang(lp)});
+ try{gateEnter("")}catch(e){}
+ try{setRole("all")}catch(e){}
  var theChet=all.filter(function(x){return !VE[x[1][0]]}).map(function(x){return x[1][0]});
  t("khong co THE khai ma khong bao gio ve ra"+(theChet.length?" - CHET: "+theChet.slice(0,6).join(","):" ("+Object.keys(VE).length+" the)"), theChet.length===0);
  global.statStrip=_ss;

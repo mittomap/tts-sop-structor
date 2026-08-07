@@ -4316,6 +4316,16 @@ function renderList(key,emb){
       phải tự đi tìm. Nay là NÚT bấm sang thẳng chỗ làm việc. */
    '</div>'+
  '<div class="sp">'+(cfg.ro?'':'<button class="btn primary" onclick="newForm(\''+key+'\')"><i class="ti ti-plus"></i>Thêm mới</button>')+'</div></div>');
+ /* V2 - BẢNG VIỆC CỦA TÔI PHẢI TỚI ĐƯỢC CẢ TRANG DANH SÁCH.
+    `pageHead()` gắn bảng việc (BC5-BC9 của SOP) ở một chỗ dùng chung - nhưng `renderList` KHÔNG
+    gọi `pageHead`, nó tự dựng đầu trang bằng tay. Ở V1 chuyện đó vô hại vì không chức danh nào
+    đáp xuống một trang danh sách: họ đáp xuống hub, và hub gọi `pageHead`.
+    Sang V2 hub không còn, bốn nhóm (WOW, giáo viên, ACA, marketing) đáp thẳng xuống `lop` và
+    `nhaplead` - hai trang danh sách - nên mở app lên là KHÔNG THẤY VIỆC CỦA MÌNH. Ba bộ kiểm
+    cùng bắt được: `_checkaudit`, `_checknv`, `_checkux`.
+    Gắn ở ĐÂY, một chỗ, đúng cách `pageHead` đang làm. `bangViecHTML` tự biết im lặng ở trang
+    không phải trang đáp của người đang đăng nhập, nên không có chuyện nó mọc ra khắp nơi. */
+ if(!emb)h+=bvSau();
  /* V9.99z7 - KHUNG NHẬP BẢN GHI: bản NHÚNG chỉ dựng khi nó ĐANG MỞ. Danh sách nhúng trong một
     trang khác (Lead trong hub Tuyển sinh, Nhân viên trong trang Nhân sự...) không có nút "Thêm
     mới" - nút ấy nằm ở tiêu đề riêng mà bản nhúng cố tình bỏ. Vậy mà khung nhập vẫn được dựng
@@ -4323,7 +4333,15 @@ function renderList(key,emb){
     người dùng bấm trúng nó 5 lần, bấm xong không ghi gì, không mở form, cũng không nói gì.
     Một cửa ghi không có lối vào thì đừng dựng nó ra. Sửa bản ghi từ một dòng (`openEdit`) vẫn
     chạy: lúc ấy `pf` có giá trị nên khung vẫn hiện. */
- if(!cfg.ro&&(!emb||pf))h+='<div class="panel'+(pf?'':' hidden')+'" id="formPanel"><div class="ph"><b>'+(ed?("Sửa "+esc(String(ed[cfg.cols[0][0]]))):"Thêm bản ghi mới")+'</b><div class="mini">'+(ed?'<button class="pill" onclick="cancelEdit(\''+key+'\')">Hủy sửa</button>':'')+'<button class="pill" onclick="toggleForm(\''+key+'\')">Đóng</button></div></div>'+formHTML(key)+'</div>';
+ /* V2 - LUAT NAY NAY AP CHO CA BAN DUNG RIENG. Ghi chu ngay tren da rut ra bai hoc cho ban
+    NHUNG: dung san khung nhap o trang thai an la de lai mot nut "Luu ban ghi" NAM CHET trong
+    DOM, `_checknv` dong vai nguoi dung bam vao thi khong ghi, khong mo form, cung khong noi gi -
+    va do la kieu hong nguy hiem nhat (nguoi that se bam lai vai lan roi bo di).
+    O V1 ban dung rieng khong sao vi khong ai DAP XUONG mot trang danh sach. Sang V2 co: marketing
+    dap xuong `nhaplead`, ACA dap xuong `lop`, va cac viec trong bang viec dan thang toi do.
+    `newForm()` dat `pf` roi ve lai, nen khung van hien ra dung luc can - chi khong con nam san
+    o trang thai an nua. */
+ if(!cfg.ro&&pf)h+='<div class="panel'+(pf?'':' hidden')+'" id="formPanel"><div class="ph"><b>'+(ed?("Sửa "+esc(String(ed[cfg.cols[0][0]]))):"Thêm bản ghi mới")+'</b><div class="mini">'+(ed?'<button class="pill" onclick="cancelEdit(\''+key+'\')">Hủy sửa</button>':'')+'<button class="pill" onclick="toggleForm(\''+key+'\')">Đóng</button></div></div>'+formHTML(key)+'</div>';
  /* THANH CÔNG CỤ CHUẨN: [tìm] [chip lọc có số đếm] ...... [số dòng] [Xóa lọc] [Cột] */
  var left=srchHTML(SEARCH[key]||"","listSearch('"+key+"',this.value)","Tìm trong trang này...",270);
  if(cfg.filt){var seen={},opts=[];
@@ -17767,11 +17785,11 @@ var TOURS={
      đúng luật đã chốt: mỗi lần đổi app phải soát lại tour và Trợ lý. */
   {p:"ychv",sel:'@man',t:"Học viên nhắn gì cho trung tâm",d:"Học viên gửi yêu cầu từ Cổng học viên - xin nghỉ, xin học bù, hỏi lịch, báo đã chuyển khoản. Hệ thống tự chuyển tới bạn kèm hạn nhận việc; yêu cầu về tiền thì sang kế toán.",hint:"Bấm Nhận việc ở một thẻ rồi trả lời ngay trong thẻ đó."},
   {p:"xeplop",sel:'@txt:Xếp vào lớp',t:"Xếp lớp cho học viên mới",d:"Học viên đóng tiền xong về đây. Chọn lớp phù hợp trình độ và lịch học, gửi thông tin lớp, chờ học viên xác nhận rồi hoàn tất nhập học.",hint:"Bấm Xếp lớp trên một học viên đang chờ, chọn lớp rồi Lưu.",chk:function(){return tourMore("ob")}},
-  {p:"hoctap",sel:'@txt:Lớp học',t:"Bức tranh dạy và học",d:"Tab Hôm nay là việc của giáo viên trong ngày, tab Lớp học là sức khỏe từng lớp, tab Lịch tuần là toàn bộ lịch dạy.",hint:"Bấm sang tab Lớp học."},
+  {p:"lop",sel:'@man',t:"Bức tranh dạy và học",d:"Tab Hôm nay là việc của giáo viên trong ngày, tab Lớp học là sức khỏe từng lớp, tab Lịch tuần là toàn bộ lịch dạy.",hint:"Bấm sang tab Lớp học."},
   {p:"banglop",sel:'@txt:Vận hành',t:"Vận hành một lớp",d:"Điểm danh, giao bài, ghi nhận xét buổi, nhập điểm giữa khóa - tất cả trong một màn hình của lớp đó.",hint:"Chọn một lớp, mở tab Điểm danh, đánh dấu vài học viên rồi bấm Lưu buổi học.",chk:function(){return tourMore("dd")}},
   {p:"buoihoc",sel:'@txt:Chờ ghi nhận xét',t:"Nhắc giáo viên ghi nhận xét",d:"Buổi dạy xong mà quá hạn chưa có nhận xét sẽ hiện đỏ ở đây. Đây là việc học vụ phải đốc thúc hằng tuần.",hint:"Bấm chip 'Chờ ghi nhận xét' để lọc, rồi ghi nhận xét cho một buổi trong danh sách.",chk:function(){return (window.TOURB&&rows("DL11").filter(function(x){return bhState(x).note}).length>(window.TOURB.nx||0))}},
   {p:"hocvien",sel:'@txt:Nguy cơ',t:"Học viên nguy cơ",d:"Lọc nhanh những học viên vắng nhiều hoặc tiến bộ chậm để gọi hỏi thăm trước khi phụ huynh phàn nàn.",hint:"Bấm chip lọc 'Nguy cơ', mở một học viên rồi ghi lần chăm."},
-  {p:"cskh",sel:'@man',t:"Khảo sát và phản hồi",d:"Gửi khảo sát định kỳ theo lớp, tiếp nhận góp ý, xử lý khiếu nại. Điểm hài lòng thấp sẽ tự bật việc follow-up.",hint:"Xem tab Khảo sát."},
+  {p:"khaosat",sel:'@man',t:"Khảo sát và phản hồi",d:"Gửi khảo sát định kỳ theo lớp, tiếp nhận góp ý, xử lý khiếu nại. Điểm hài lòng thấp sẽ tự bật việc follow-up.",hint:"Xem tab Khảo sát."},
   {p:"baoluu",sel:'@man',t:"Giữ chân học viên muốn nghỉ",d:"Học viên xin bảo lưu hoặc có ý bỏ học nằm ở đây - gọi giữ chân, hẹn ngày quay lại, hoặc chốt bảo lưu có hạn.",hint:"Bấm Tiếp theo - còn một bước cuối khóa."},
   /* AC2 - trang Kết quả đầu ra sinh ra 07/08 theo yêu cầu của Trưởng phòng ACA. Trang mới mà
      không có bài hướng dẫn nào đi qua thì người nhận bàn giao không biết nó tồn tại;
@@ -17779,7 +17797,7 @@ var TOURS={
   {p:"ketqua",sel:'@bstats',t:"Lớp đã học xong ra kết quả thế nào",d:"Hai tỷ lệ đạt mục tiêu đứng cạnh nhau: theo bài thi thử cuối khóa tại trung tâm, và theo kỳ thi IELTS chính thức. Bóc được theo giảng viên, theo lớp, theo chi nhánh và theo lớp 1-1 hay lớp nhóm.",hint:"Bấm Theo giảng viên để xem lớp của ai đang ra kết quả tốt nhất."},
   {p:"ketqua",sel:'@man',t:"Điểm bốn kỹ năng của từng học viên",d:"Bảng dưới cho từng học viên: mục tiêu, bốn kỹ năng và Overall ở cả hai mốc thi. Bấm một dòng mở lịch sử thi - ai thi lại nhiều lần thì thấy đủ các lần.",hint:"Xong một ngày của học vụ!"}]},
  tn_giaovien:{lv:"trainghiem",role:"Giáo viên",t:"Một ngày của Giáo viên",ic:"ti-chalkboard",d:"5 bước - dạy, điểm danh, chấm bài",steps:[
-  {p:"hoctap",sel:'@man',t:"Hôm nay bạn dạy gì",d:"Vào app là thấy ngay buổi dạy hôm nay, chủ đề buổi, bài tập sẽ giao và lời dặn từ giáo án khóa.",hint:"Xem thẻ buổi học của bạn."},
+  {p:"buoihnay",sel:'@man',t:"Hôm nay bạn dạy gì",d:"Vào app là thấy ngay buổi dạy hôm nay, chủ đề buổi, bài tập sẽ giao và lời dặn từ giáo án khóa.",hint:"Xem thẻ buổi học của bạn."},
   {p:"banglop",sel:'@txt:Buổi học & điểm danh',t:"Vào lớp và điểm danh",d:"Bấm Bắt đầu lớp để mở cổng điểm danh. Vắng có phép hay không phép đều ghi rõ, vắng phải ghi lý do.",hint:"Bấm tab 'Buổi học & điểm danh' của lớp, đánh dấu vài học viên rồi Lưu buổi học."},
   {p:"banglop",sel:'@txt:Giao & chấm bài tập',t:"Giao bài tập",d:"Giao một bài chung cho cả lớp hoặc bài riêng cho từng học viên. Hạn nộp tự tính theo giáo án khóa, sửa được.",hint:"Bấm tab 'Giao & chấm bài tập' rồi giao một bài mới."},
   {p:"buoihoc",sel:'@txt:Chờ ghi nhận xét',t:"Ghi nhận xét buổi học",d:"Cuối buổi ghi nhận xét chung - học viên và phụ huynh đọc được trong cổng học viên. Quá hạn sẽ bị nhắc.",hint:"Bấm chip 'Chờ ghi nhận xét', mở buổi vừa dạy rồi ghi nhận xét."},
@@ -17790,19 +17808,19 @@ var TOURS={
     làm gì ở đây. Anh Luân: "Mỗi 1 chức danh đều có 1 hướng dẫn và trợ lý riêng phù hợp với họ."
     Bộ kiểm mới canh chuyện này: thêm nhóm vai mà quên bài hướng dẫn là ĐỎ. */
  tn_wow:{lv:"trainghiem",role:"Giáo viên WOW 1-1",t:"Một ngày của Giáo viên WOW",ic:"ti-star",d:"5 bước - chấm test, dạy kèm 1-1, ghi kết quả",steps:[
-  {p:"hoctap",ctx:function(){window.HTTAB="wow"},sel:'@man',t:"Buổi WOW hôm nay của bạn",d:"Vào app là thấy ngay buổi kèm 1-1 hôm nay: học viên nào, yếu kỹ năng gì, lần trước kèm tới đâu. Buổi mới học viên đặt mà bạn chưa xác nhận thì hiện chip hổ phách.",hint:"Xem danh sách buổi WOW của bạn."},
-  {p:"tuyensinh",ctx:function(){window.TSTAB="test"},sel:'@man',t:"Chấm test đầu vào",d:"Chấm bài test là việc của NV WOW chứ không phải giáo viên đứng lớp - bảng phân quyền CH3 của SOP ghi rõ. Nhập bốn kỹ năng, điểm tổng tự tính trung bình.",hint:"Mở một phiếu test chờ chấm."},
-  {p:"tuyensinh",ctx:function(){window.TSTAB="test"},sel:'@tbar',t:"Viết academic_note",d:"Nhận xét học thuật là thứ nhân viên tư vấn dùng để tư vấn lộ trình. Chấm điểm mà không viết nhận xét thì người sau không biết nói gì với khách.",hint:"Nhìn chip Chờ chấm và Đã chấm."},
-  {p:"hoctap",ctx:function(){window.HTTAB="wow"},sel:'@txt:Chờ ghi nội dung',t:"Ghi nội dung và kết quả buổi kèm",d:"Dạy xong ghi ngay: kèm gì, học viên tiến bộ hay chưa. Chỉ số WOR (tỷ lệ buổi có tiến bộ) tính từ đúng ô này, và giáo viên chủ nhiệm đọc nó để biết đã kèm gì.",hint:"Bấm chip Chờ ghi nội dung."},
+  {p:"wow",sel:'@man',t:"Buổi WOW hôm nay của bạn",d:"Vào app là thấy ngay buổi kèm 1-1 hôm nay: học viên nào, yếu kỹ năng gì, lần trước kèm tới đâu. Buổi mới học viên đặt mà bạn chưa xác nhận thì hiện chip hổ phách.",hint:"Xem danh sách buổi WOW của bạn."},
+  {p:"test",sel:'@man',t:"Chấm test đầu vào",d:"Chấm bài test là việc của NV WOW chứ không phải giáo viên đứng lớp - bảng phân quyền CH3 của SOP ghi rõ. Nhập bốn kỹ năng, điểm tổng tự tính trung bình.",hint:"Mở một phiếu test chờ chấm."},
+  {p:"test",sel:'@tbar',t:"Viết academic_note",d:"Nhận xét học thuật là thứ nhân viên tư vấn dùng để tư vấn lộ trình. Chấm điểm mà không viết nhận xét thì người sau không biết nói gì với khách.",hint:"Nhìn chip Chờ chấm và Đã chấm."},
+  {p:"wow",sel:'@txt:Chờ ghi nội dung',t:"Ghi nội dung và kết quả buổi kèm",d:"Dạy xong ghi ngay: kèm gì, học viên tiến bộ hay chưa. Chỉ số WOR (tỷ lệ buổi có tiến bộ) tính từ đúng ô này, và giáo viên chủ nhiệm đọc nó để biết đã kèm gì.",hint:"Bấm chip Chờ ghi nội dung."},
   {p:"hocvien",sel:'@tbarct',t:"Học viên nào cần đặt buổi kèm",d:"Em nào yếu học thuật thì SOP bảo đặt buổi WOW kèm. Lọc nhanh Nguy cơ cho ra đúng nhóm đó, kèm số buổi vắng và số bài thiếu để biết nặng nhẹ.",hint:"Xong một ngày của giáo viên WOW!"}]},
  tn_marketing:{lv:"trainghiem",role:"Marketing",t:"Một ngày của Marketing",ic:"ti-speakerphone",d:"5 bước - nguồn lead, chất lượng lead, kho khách cũ",steps:[
-  {p:"tuyensinh",ctx:function(){window.TSTAB="lead"},sel:'@man',t:"Đêm qua lead về từ đâu",d:"Mỗi lead ghi rõ nguồn. Nguồn nào đang đổ về nhiều mà chất lượng kém thì phải biết trong ngày, không đợi cuối tháng mới cộng sổ.",hint:"Nhìn cột Nguồn trong danh sách lead."},
-  {p:"tuyensinh",ctx:function(){window.TSTAB="lead"},sel:'@tbarct',t:"Lead chưa ai nhận",d:"Lead không có người phụ trách là lead sẽ nguội. Lọc ra rồi đẩy về đội tư vấn - tiền quảng cáo đã tiêu rồi, đừng để mất ở khâu này.",hint:"Lọc theo trạng thái Mới."},
+  {p:"nhaplead",sel:'@man',t:"Đêm qua lead về từ đâu",d:"Mỗi lead ghi rõ nguồn. Nguồn nào đang đổ về nhiều mà chất lượng kém thì phải biết trong ngày, không đợi cuối tháng mới cộng sổ.",hint:"Nhìn cột Nguồn trong danh sách lead."},
+  {p:"nhaplead",sel:'@tbarct',t:"Lead chưa ai nhận",d:"Lead không có người phụ trách là lead sẽ nguội. Lọc ra rồi đẩy về đội tư vấn - tiền quảng cáo đã tiêu rồi, đừng để mất ở khâu này.",hint:"Lọc theo trạng thái Mới."},
   {p:"reup",sel:'@man',t:"Kho khách cũ để chăm lại",d:"Khách đã mất, không phản hồi, không liên lạc được - vẫn rẻ hơn khách mới rất nhiều. Mỗi ngày chạm lại một ít thay vì để nằm im.",hint:"Xem danh sách khách cần chăm lại."},
   {p:"magioithieu",sel:'@man',t:"Mã giới thiệu và thưởng",d:"Khách cũ giới thiệu là nguồn rẻ nhất. Ai đang giới thiệu được nhiều, thưởng nào còn treo chưa trả - trả chậm là lần sau không ai giới thiệu nữa.",hint:"Xem thưởng đang chờ."},
   /* V9.60: bước này từng dẫn sang trang Báo cáo - nay Marketing không xem tiền nên không có
      trang đó nữa. Phễu chuyển đổi xem ngay trên trang Tuyển sinh, đúng chỗ họ làm việc. */
-  {p:"tuyensinh",ctx:function(){window.TSTAB="lead"},sel:'@man',t:"Phễu và tỷ lệ chuyển đổi",d:"Phễu trên đầu trang cho biết mất khách ở bước nào. Marketing đổ nhiều lead mà tắc ở khâu gọi thì vấn đề không nằm ở quảng cáo.",hint:"Xong một ngày của marketing!"}]},
+  {p:"nhaplead",sel:'@man',t:"Phễu và tỷ lệ chuyển đổi",d:"Phễu trên đầu trang cho biết mất khách ở bước nào. Marketing đổ nhiều lead mà tắc ở khâu gọi thì vấn đề không nằm ở quảng cáo.",hint:"Xong một ngày của marketing!"}]},
  tn_hotro:{lv:"trainghiem",role:"Nhóm hỗ trợ (HR, IT...)",t:"Một ngày của nhóm hỗ trợ",ic:"ti-tool",d:"3 bước - nhận việc, làm, báo xong",steps:[
   /* Bảng việc nằm ở TRANG ĐÁP, mà trang đáp của bản 5 là Trang bắt đầu còn bản 6 là Bàn làm
      việc - cắm cứng "banlam" thì sang v6 bước này trỏ vào chỗ không có neo. */
@@ -17819,19 +17837,19 @@ var TOURS={
      Giảng viên nữa - `_checktour` bắt ngay), chỉ đổi neo sang thân trang.
      Luật rút ra: neo theo CHỮ chỉ chắc khi chữ ấy là duy nhất trên màn - thêm một mục menu
      trùng tên là neo lệch, mà lệch kiểu này chỉ lộ ra ở khổ điện thoại. */
-  {p:"giangvien",ctx:function(){window.GVTAB="cong"},sel:'@man',t:"Bảng công giảng dạy",d:"Giờ đứng lớp, ca WOW 1-1 và ca test đầu vào của từng giảng viên trong tháng. Buổi nào thiếu mốc giờ vào - giờ ra thì tính công sai, phải soát trước khi chốt lương.",hint:"Xem cột giờ dạy và cột buổi thiếu mốc giờ."},
+  {p:"bangcong",sel:'@man',t:"Bảng công giảng dạy",d:"Giờ đứng lớp, ca WOW 1-1 và ca test đầu vào của từng giảng viên trong tháng. Buổi nào thiếu mốc giờ vào - giờ ra thì tính công sai, phải soát trước khi chốt lương.",hint:"Xem cột giờ dạy và cột buổi thiếu mốc giờ."},
   {p:"giaoviec",sel:'@txt:Nhận việc',t:"Việc nội bộ",d:"Việc người khác giao cho bạn nằm ở đây. Bấm Nhận là người giao biết việc đã tới tay; báo xong ngay lúc làm xong.",hint:"Xong một ngày của Nhân sự!"}]},
  tn_ketoan:{lv:"trainghiem",role:"Kế toán",t:"Một ngày của Kế toán",ic:"ti-cash",d:"5 bước - thu, đối soát, công nợ, hoàn tiền",steps:[
   {p:"thanhtoan",sel:'@txt:Ghi nhận khoản thu',t:"Thu học phí",d:"Thu tiền mặt hay chuyển khoản đều ghi ở đây, in phiếu thu ngay. Đóng theo đợt thì ghi hẹn thu đợt sau.",hint:"Bấm 'Ghi nhận khoản thu' ở đầu trang, chọn đăng ký còn nợ, nhập số tiền rồi Lưu.",chk:function(){return tourMore("thu")}},
   {p:"thanhtoan",sel:'@obcards',t:"Đối soát khoản thu",d:"Tư vấn viên thu hộ thì kế toán phải xác nhận lại. Khoản chưa xác nhận hiện chip hổ phách.",hint:"Bấm chip Chờ xác nhận, mở một khoản và bấm Xác nhận đã nhận.",chk:function(){return (window.TOURB&&rows("DL07").filter(function(x){return String(x.verified_by||"").trim()}).length>(window.TOURB.xacnhan||0))}},
   {p:"thanhtoan",sel:'@tbar',t:"Công nợ và tới hẹn thu",d:"Danh sách đăng ký còn nợ, ai tới hẹn hôm nay, ai quá hạn. Gọi nhắc rồi ghi lại lịch hẹn mới.",hint:"Bấm chip Tới hẹn thu."},
-  {p:"duyet",sel:'@man',t:"Duyệt chiết khấu và hoàn tiền",d:"Ưu đãi vượt ngưỡng và yêu cầu hoàn tiền tập trung ở đây. Hoàn tiền có gợi ý mức theo chính sách và số ngày đã học.",hint:"Mở một yêu cầu để xem."},
+  {p:"duyethoan",sel:'@man',t:"Duyệt hoàn tiền",d:"Ưu đãi vượt ngưỡng và yêu cầu hoàn tiền tập trung ở đây. Hoàn tiền có gợi ý mức theo chính sách và số ngày đã học.",hint:"Mở một yêu cầu để xem."},
   {p:"baocao",sel:'@man',t:"Báo cáo doanh thu",d:"Doanh thu theo tháng, theo nguồn khách, công nợ tồn - số liệu tự tính từ phiếu thu, không phải gõ lại.",hint:"Xong một ngày của kế toán!"}]},
  tn_quanly:{lv:"trainghiem",role:"Quản lý - Giám đốc",t:"Một ngày của Quản lý",ic:"ti-shield-check",d:"6 bước - nhìn số, duyệt, giao việc",steps:[
   {p:"baocao",sel:'@man',t:"Mở máy là nhìn số",d:"Doanh thu, phễu tuyển sinh, chuyên cần, hài lòng - và quan trọng nhất là phần nhận xét kèm việc nên làm ngay cho từng chỉ số.",hint:"Cuộn xuống xem khối chỉ số."},
   {p:"banlam",sel:'@bstats',t:"Điểm nghẽn toàn trung tâm",d:"Ô nào số cao bất thường là chỗ đang tắc. Rê chuột vào ô để biết mở trang nào hoặc bấm chip nào thì ra đúng danh sách người đang kẹt ở đó.",hint:"Rê chuột vào ô có số lớn nhất."},
   {p:"changA",sel:'@nrail',t:"Tắc ở chặng nào",d:"Phần trăm chuyển đổi giữa các ga cho biết mất khách ở bước nào: gọi không được, test rồi không tư vấn, hay tư vấn rồi không chốt.",hint:"Nhìn tỷ lệ giữa các ga."},
-  {p:"duyet",sel:'@txt:Duyệt',t:"Duyệt việc chờ bạn",d:"Chiết khấu lớn, hoàn tiền - nhân viên tạo là bạn nhận thông báo ngay, duyệt xong nhân viên biết liền.",hint:"Bấm 'Duyệt' hoặc 'Từ chối' trên một chiết khấu đang chờ.",chk:function(){return (window.TOURB&&rows("DL06").filter(function(x){return String(x.discount_approved_by||"").trim()}).length>(window.TOURB.duyet||0))}},
+  {p:"duyetck",sel:'@man',t:"Duyệt việc chờ bạn",d:"Chiết khấu lớn, hoàn tiền - nhân viên tạo là bạn nhận thông báo ngay, duyệt xong nhân viên biết liền.",hint:"Bấm 'Duyệt' hoặc 'Từ chối' trên một chiết khấu đang chờ.",chk:function(){return (window.TOURB&&rows("DL06").filter(function(x){return String(x.discount_approved_by||"").trim()}).length>(window.TOURB.duyet||0))}},
   {p:"giaoviec",sel:'@txt:Giao việc mới',t:"Giao việc cho đội",d:"Giao xuống cấp dưới, phối hợp ngang cấp, hoặc nhờ hỗ trợ. Việc bắt buộc thì không được từ chối.",hint:"Bấm 'Giao việc mới', chọn người nhận, ghi tiêu đề và hạn rồi Lưu.",chk:function(){return tourMore("viec")}},
   {p:"giaoviec",sel:'@tbar',t:"Ai đang làm tốt, ai hay trễ",d:"Tab Tổng hợp cho biết tỷ lệ hoàn thành đúng hạn của từng người - dùng khi đánh giá cuối tháng.",hint:"Bấm tab Tổng hợp & báo cáo."}]},
  /* ---------- CẤP 3: CHUYÊN NGHIỆP (người cấu hình) ---------- */
@@ -21206,7 +21224,14 @@ function nvCau(k){
  try{for(var h in HUBCAU){var m=HUBCAU[h],M=(HUBTAB[h]||{}).m||{};
    for(var t in m)if(M[t]===k)return m[t];}}catch(e){}
  return (PBK[k]||{}).c||""}
-function nvHead(k,btn){return pageHead((PBK[k]||{}).t||k,nvCau(k),btn||"",1)}
+/* BẪY ĐÃ CẮN NGAY LƯỢT ĐẦU: bản trước của hàm này truyền `1` vào ô thứ tư của `pageHead` - đó là
+   cờ HOÃN BẢNG VIỆC. Các hàm vẽ hub truyền `1` vì chúng muốn đặt thanh chọn chặng lên trước rồi
+   mới gọi `bvSau()`; hàm này truyền theo mà KHÔNG gọi `bvSau()`, thành ra bảng "việc của tôi"
+   (BC5-BC9 của SOP) biến mất khỏi trang đáp của bốn nhóm chức danh. Ba bộ kiểm cùng bắt:
+   `_checkaudit` ("trang đáp lop không nói được việc nào"), `_checknv` (bấm nút trên trang đáp mà
+   không có gì xảy ra), `_checkux` (sáu thẻ khai mà không bao giờ vẽ ra).
+   Đúng loại BỚT mà luật cứng số 0 cấm, và nó đi vào bằng một con số `1` chép theo cho giống. */
+function nvHead(k,btn){return pageHead((PBK[k]||{}).t||k,nvCau(k),btn||"")}
 function _duyAi(){try{return duyAiHTML()}catch(e){return ""}}
 
 RENDER.reup      = function(){return renderReupTab()};        /* tự có đầu trang riêng */
@@ -22409,12 +22434,34 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
       bat duoc hai lan (trang Hoi dap 04/08, hai trang Nhan su 05/08).
       Doi sang trang nghiep vu dau tien ho xem duoc - de o day chu khong sua tay bay dong, vi
       sua tay la mai kia them mot chuc danh nua lai quen. */
+   /* BẪY ĐÃ CẮN NGAY LƯỢT ĐẦU: bản trước của khối này tự chọn "trang đầu tiên người đó xem
+      được", nên ba nhóm WOW / giáo viên / ACA - vốn đáp xuống BA TAB KHÁC NHAU của cùng hub
+      Học tập - bị dồn hết về `lop`. Giáo viên mở app lên không thấy buổi dạy hôm nay của mình,
+      NV WOW không thấy buổi kèm của mình. `_checkux` bắt được bằng sáu THẺ khai mà không bao
+      giờ vẽ ra (`bv_wow_*`, `bv_ses_*`, `bv_test_*`).
+      Không phải đoán: `BVLAND` ĐÃ KHAI SẴN đúng tab của từng nhóm (`wow:["hoctap","wow"]`,
+      `giaovien:["hoctap","today"]`, `aca:["hoctap","lop"]`). Hỏi bản khai ấy rồi đổi tab thành
+      trang qua `HUBTAB.m`. Chỉ khi nó không nói gì mới rơi về phép chọn "trang đầu tiên".
+      Và cập nhật LUÔN `BVLAND` theo, vì đó là một bản đồ CẮM CỨNG - để nó nói tên hub đã chết
+      là đúng cái bẫy RB4 cảnh báo: bản đồ cắm cứng thì lặng lẽ làm mất tính năng. */
    if(rs.land&&HUBTAB[rs.land]){
-    var mm2=HUBTAB[rs.land].m||{}, uu2=[];
-    if(HUBTAB[rs.land].d&&mm2[HUBTAB[rs.land].d])uu2.push(mm2[HUBTAB[rs.land].d]);
-    for(var t2 in mm2)if(uu2.indexOf(mm2[t2])<0)uu2.push(mm2[t2]);
-    for(var i2=0;i2<uu2.length;i2++){
-     if(rs.pages==="*"||rs.pages.indexOf(uu2[i2])>=0){rs.land=uu2[i2];break}}
+    var hub2=rs.land, mm2=HUBTAB[hub2].m||{}, chon="";
+    /* Tên nhóm chính là KHOÁ của `ROLESCOPE` (`wow`, `giaovien`, `aca`...) - `BVLAND` tra
+       theo đúng khoá ấy. Bản đầu hỏi `rs.group`, một trường KHÔNG CÓ, nên `BVLAND[""]` trả về
+       rỗng và cả khối lặng lẽ rơi về phép đoán. Đúng bài học đã ghi nhiều lần: bịa tên trường
+       thì đo ra rỗng rồi tưởng luật không áp dụng - hỏi thẳng từ vựng app đang dùng. */
+    var nhom=rs.group||vai;
+    var kb=BVLAND[nhom]||null;
+    if(kb&&kb[0]===hub2&&kb[1]&&mm2[kb[1]])chon=mm2[kb[1]];
+    if(!chon||(rs.pages!=="*"&&rs.pages.indexOf(chon)<0)){
+     var uu2=[];
+     if(HUBTAB[hub2].d&&mm2[HUBTAB[hub2].d])uu2.push(mm2[HUBTAB[hub2].d]);
+     for(var t2 in mm2)if(uu2.indexOf(mm2[t2])<0)uu2.push(mm2[t2]);
+     chon="";
+     for(var i2=0;i2<uu2.length;i2++)
+      if(rs.pages==="*"||rs.pages.indexOf(uu2[i2])>=0){chon=uu2[i2];break}}
+    if(chon){rs.land=chon;
+     if(BVLAND[nhom])BVLAND[nhom]=[chon,null]}
    }
   }
  }catch(e){}
@@ -22713,7 +22760,11 @@ function enter(k){
     `_checkf5.js` canh chỗ này - nó nạp lại app THẬT rồi hỏi lại, việc mà 34 bộ kiểm cũ không bộ
     nào làm (tất cả đều nạp app một lần rồi đo). */
  var hkVao="";try{hkVao=hashKey()}catch(e){}
- var ctxVao=String(location.search||"");
+ /* Bọc luôn vế này: trình duyệt thì `location` luôn có, nhưng các harness kiểm chuỗi chạy app
+    trong Node bằng một bộ khung DOM giả - bộ nào quên giả `location` là app chết NGAY Ở CỬA VÀO,
+    và vết lỗi chỉ tay vào `enter()` chứ không nói gì về bộ khung thiếu. Một dòng try là đủ để
+    cái thước hỏng không giả trang thành app hỏng. */
+ var ctxVao="";try{ctxVao=String(location.search||"")}catch(e){}
  try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{rtEnsure()}catch(e){}try{autoReturnHandovers()}catch(e){}document.getElementById("login").style.display="none";document.getElementById("app").style.display="flex";setRole(k);try{helloMaybe()}catch(e){}
  /* Giờ mới đi tới chỗ đã đọc được lúc nãy (F5, hoặc mở link người khác gửi). Ngữ cảnh phải đặt
     TRƯỚC `go` - đặt sau thì trang đã vẽ xong bằng hồ sơ rỗng rồi. */
