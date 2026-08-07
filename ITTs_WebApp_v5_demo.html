@@ -1303,10 +1303,18 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .sespill.canhbao{border-color:var(--red)}
 /* Nhãn buổi thi trên viên buổi - nằm trong viên, không phải huy hiệu góc (huy hiệu góc dành
    cho VIỆC CÒN NỢ; loại buổi là thuộc tính, không phải việc phải làm). */
-.sespill .sthi{display:block;font-size:9px;font-weight:800;letter-spacing:.3px;margin-top:2px;
- padding:1px 5px;border-radius:20px;white-space:nowrap}
-.sespill .sthi.mid{background:var(--blueb);color:#185FA5}
-.sespill .sthi.final{background:var(--amberb);color:#854F0B}
+/* BUỔI THI PHẢI NỔI LÊN GIỮA DẢI, không chỉ đeo thêm một cái nhãn (anh Luân 07/08: *"là làm
+   nổi bật cái buổi đó 1 tí, hiện tại e chỉ gắn test vào à"*). Cả viên buổi đổi nền và viền, chứ
+   nhãn nhỏ nằm lọt giữa 35 viên giống hệt nhau thì mắt vẫn lướt qua. */
+.sespill.thi{border-width:2px}
+/* Dùng lại đúng cặp màu đã có trong bảng (blue/blueb, amber/amberb) - mỗi mã màu mới đẻ ra là
+   một bậc mới trong bảng màu, và `_checkux` canh đúng chuyện đó. */
+.sespill.thi.mid{border-color:var(--blue);background:var(--blueb)}
+.sespill.thi.final{border-color:var(--amber);background:var(--amberb)}
+.sespill .sthi{display:block;font-size:9px;font-weight:800;letter-spacing:.4px;margin-top:3px;
+ padding:2px 6px;border-radius:20px;white-space:nowrap}
+.sespill .sthi.mid{background:#185FA5;color:#fff}
+.sespill .sthi.final{background:#854F0B;color:#fff}
 .sespill .snote{position:absolute;top:-5px;right:-5px;font-size:9px;background:var(--green);color:#fff;border-radius:20px;width:15px;height:15px;display:flex;align-items:center;justify-content:center}
 .planbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;background:#FAFBFD;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:12px}
 .planbar .pbi{display:flex;flex-direction:column;gap:1px;min-width:0}
@@ -2248,7 +2256,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">07/08/2026 · <b>b84bd5</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">07/08/2026 · <b>db27e2</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -10198,7 +10206,8 @@ function renderBanglop(){
     if(_bs.noteOver)_no.push({ic:"ti-writing",t:"Quá hạn ghi nhận xét - đã "+Math.round(_bs.ageH)+" giờ, hạn "+_bs.lim+" giờ",o:"Buổi quá hạn chưa nhận xét"});
     if(_bs.done&&!coDD[s.session_id])_no.push({ic:"ti-checkbox",t:"Đã dạy xong mà chưa điểm danh buổi này",o:"Buổi chưa điểm danh"});
     var _canh=_no.length;
-    h+='<button class="sespill'+(isSel?" on":"")+(_canh?" canhbao":"")+'" onclick="window.DDSESS=\''+esc(s.session_id)+'\';reRender(CUR)"'+
+    var _tk=sesThi(s);
+    h+='<button class="sespill'+(isSel?" on":"")+(_canh?" canhbao":"")+(/^(mid|final)$/.test(_tk)?(" thi "+_tk):"")+'" onclick="window.DDSESS=\''+esc(s.session_id)+'\';reRender(CUR)"'+
      (_canh?' data-tip="'+esc(_no.map(function(x){return x.t}).join(" · "))+'"':'')+'>'+
      (_canh?('<span class="swarns">'+_no.map(function(x){
        return '<span class="swarn" data-tip="'+esc(x.t+' (đang được đếm ở ô "'+x.o+'" trên đầu trang)')+'"><i class="ti '+x.ic+'"></i></span>'}).join("")+'</span>'):'')+
@@ -16518,11 +16527,15 @@ function renderHosoKhoa(){var id=window.KHID;var c=find("DL05","course_id",id);
    Thứ người dùng phải sửa được thì phải có chỗ để lưu. */
 function sesThi(s){return ecode(s&&s.session_type)}
 function sesLaThi(s){return /^(mid|final)$/.test(sesThi(s))}
-function sesThiTen(s){var k=sesThi(s);return k==="final"?"Thi cuối khóa":k==="mid"?"Thi giữa khóa":""}
+/* Tên gọi dùng ĐÚNG THUẬT NGỮ NGÀNH: Midterm Test và Final Test - anh Luân 07/08. Trung tâm
+   IELTS nói chuyện với học viên bằng đúng hai chữ này, dịch ra "thi giữa khóa / thi cuối khóa"
+   là bắt cả thầy lẫn trò dịch ngược mỗi lần đọc. Câu chú thích thì vẫn tiếng Việt, vì đó là
+   chỗ giải thích. */
+function sesThiTen(s){var k=sesThi(s);return k==="final"?"Final Test":k==="mid"?"Midterm Test":""}
 function sesThiThe(s){var k=sesThi(s);if(!/^(mid|final)$/.test(k))return "";
  return '<span class="sthi '+k+'" data-tip="'+esc(sesThiTen(s)+(k==="final"
-   ?" - điểm buổi này là điểm thi thử tại trung tâm, dùng để tính tỷ lệ đạt AIM"
-   :" - điểm giữa khóa, ghi vào hồ sơ xếp lớp của từng học viên"))+'">'+(k==="final"?"THI CUỐI":"THI GIỮA")+'</span>'}
+   ?" - bài thi cuối khóa tại trung tâm. Điểm buổi này là điểm thi thử dùng tính tỷ lệ đạt mục tiêu đầu ra."
+   :" - bài kiểm tra giữa khóa. Điểm ghi vào hồ sơ xếp lớp của từng học viên."))+'">'+(k==="final"?"FINAL TEST":"MIDTERM")+'</span>'}
 /* Cửa ghi: đổi buổi nào là buổi thi. Chặn qua CH3X `ses_thi` - Học vụ và TP ACA. */
 function sesThiForm(cid){
  if(chanAct("ses_thi"))return;
