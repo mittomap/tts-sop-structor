@@ -1043,9 +1043,16 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
    nhận (N)" bắt được hôm 05/08.
    Huy hiệu ĐỎ ở góc TRÁI TRÊN, đối diện dấu ✓ xanh ở góc phải - hai góc hai nghĩa, không lẫn:
    trái = còn nợ việc, phải = đã xong nhận xét. */
-.sespill .swarn{position:absolute;top:-5px;left:-5px;font-size:9px;background:var(--red);color:#fff;
- border-radius:20px;min-width:15px;height:15px;padding:0 3px;display:flex;align-items:center;
- justify-content:center;font-weight:800;box-shadow:0 0 0 2px #fff}
+/* ═══ HUY HIỆU NỢ VIỆC TRÊN VIÊN BUỔI - DÙNG ĐÚNG BIỂU TƯỢNG CỦA THẺ ĐẾM ═══════════════════
+   Anh Luân 07/08: *"cái icon em dùng, nó nên trùng icon của thẻ luôn em, 1 buổi có 2 cảnh báo
+   thì gắn cả 2 icon, hover vào thì thấy thông tin."*
+   Bản trước chỉ một dấu "!" đỏ, nợ hai việc thì hiện số "2" - người xem biết CÓ nợ mà không
+   biết nợ GÌ. Nay mỗi loại nợ mang đúng biểu tượng của ô đếm nói về nó, nợ hai việc thì đeo
+   hai huy hiệu, nhìn một lượt là đọc được loại việc. */
+.sespill .swarns{position:absolute;top:-6px;left:-6px;display:flex;gap:2px}
+.sespill .swarn{font-size:9.5px;background:var(--red);color:#fff;
+ border-radius:20px;min-width:16px;height:16px;padding:0 3px;display:flex;align-items:center;
+ justify-content:center;font-weight:800;box-shadow:0 0 0 2px #fff;cursor:help}
 .sespill.canhbao{border-color:var(--red)}
 .sespill .snote{position:absolute;top:-5px;right:-5px;font-size:9px;background:var(--green);color:#fff;border-radius:20px;width:15px;height:15px;display:flex;align-items:center;justify-content:center}
 .planbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;background:#FAFBFD;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:12px}
@@ -9914,13 +9921,16 @@ function renderBanglop(){
     /* Đọc CHÍNH những luật mà mấy ô đếm phía trên đang dùng - `bhState().noteOver` (ngưỡng CH2
        slaTeacherNote_hours) và `coDD` (đã dạy mà chưa có dòng điểm danh nào). Tính lại bằng một
        công thức riêng ở đây là mở đường cho ô đếm và viên buổi nói hai con số khác nhau. */
+    /* Mỗi món nợ khai BA thứ: biểu tượng (đúng biểu tượng ô đếm nói về nó), câu giải thích, và
+       tên ô đếm tương ứng - để người rê chuột biết con số nào trên đầu trang đang đếm mình. */
     var _bs=bhState(s), _no=[];
-    if(_bs.noteOver)_no.push("Quá hạn ghi nhận xét - đã "+Math.round(_bs.ageH)+" giờ, hạn "+_bs.lim+" giờ");
-    if(_bs.done&&!coDD[s.session_id])_no.push("Đã dạy xong mà chưa điểm danh buổi này");
+    if(_bs.noteOver)_no.push({ic:"ti-writing",t:"Quá hạn ghi nhận xét - đã "+Math.round(_bs.ageH)+" giờ, hạn "+_bs.lim+" giờ",o:"Buổi quá hạn chưa nhận xét"});
+    if(_bs.done&&!coDD[s.session_id])_no.push({ic:"ti-checkbox",t:"Đã dạy xong mà chưa điểm danh buổi này",o:"Buổi chưa điểm danh"});
     var _canh=_no.length;
     h+='<button class="sespill'+(isSel?" on":"")+(_canh?" canhbao":"")+'" onclick="window.DDSESS=\''+esc(s.session_id)+'\';reRender(CUR)"'+
-     (_canh?' data-tip="'+esc(_no.join(" · "))+'"':'')+'>'+
-     (_canh?'<span class="swarn">'+(_canh>1?String(_canh):'!')+'</span>':'')+
+     (_canh?' data-tip="'+esc(_no.map(function(x){return x.t}).join(" · "))+'"':'')+'>'+
+     (_canh?('<span class="swarns">'+_no.map(function(x){
+       return '<span class="swarn" data-tip="'+esc(x.t+' (đang được đếm ở ô "'+x.o+'" trên đầu trang)')+'"><i class="ti '+x.ic+'"></i></span>'}).join("")+'</span>'):'')+
      '<span class="sdot" style="background:'+col+'"></span>'+
      '<b>Buổi '+esc(s.session_number)+'</b><small>'+esc(String(s.session_date||"").slice(0,5)||"—")+'</small>'+
      (noteDone?'<span class="snote"><i class="ti ti-check"></i></span>':'')+'</button>'});

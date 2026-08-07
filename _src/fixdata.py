@@ -2325,6 +2325,38 @@ for _t, _rows in dl.items():
         tabs += 1; flat += _hit
 log.append("15. Sơ đồ cột: san phẳng %d dòng ở %d bảng về đủ bộ cột (union key)" % (flat, tabs))
 
+# ═══ 14f. MỘT BUỔI NỢ CẢ HAI VIỆC - ĐỂ HUY HIỆU KÉP CÓ CHỖ HIỆN RA ═══════════════════════
+# Anh Luân 07/08: *"1 buổi có 2 cảnh báo thì gắn cả 2 icon."* App làm được, nhưng đo trên demo
+# thì KHÔNG buổi nào nợ cả hai việc cùng lúc (quá hạn nhận xét VÀ chưa điểm danh), nên nhánh
+# hai huy hiệu không có chỗ nào hiện ra - tính năng có mà không ai nhìn thấy, và bộ kiểm cũng
+# không có ca thật để canh. Một tính năng không quan sát được thì coi như chưa làm.
+# Gieo THUẦN: lấy một buổi ĐÃ DẠY XONG mà giáo viên chưa ghi nhận xét (đã có sẵn nhiều ca như
+# vậy), rồi xoá các dòng điểm danh của đúng buổi đó - đúng câu chuyện thật "dạy xong rồi bỏ đó,
+# không điểm danh mà cũng không nhận xét".
+_kep = None
+for _s in R("DL11"):
+    if not str(_s.get("session_status", "")).startswith("completed"):
+        continue
+    if str(_s.get("has_teacher_note", "")).strip().upper() in ("TRUE", "CO", "CÓ", "1"):
+        continue
+    if str(_s.get("teacher_note_summary", "")).strip():
+        continue
+    _d = dt(_s.get("session_date"))
+    if not _d or (NOW - _d).total_seconds() / 3600 < 72:   # phải quá hạn hẳn, không sát ngưỡng
+        continue
+    if not any(str(a.get("session_id")) == str(_s.get("session_id")) for a in R("DL12")):
+        continue                                            # buổi này vốn đã không có điểm danh
+    _kep = _s
+    break
+_kepN = 0
+if _kep:
+    _sid = str(_kep.get("session_id"))
+    _dl12 = R("DL12")
+    _kepN = len([a for a in _dl12 if str(a.get("session_id")) == _sid])
+    _dl12[:] = [a for a in _dl12 if str(a.get("session_id")) != _sid]
+log.append("14f. Buoi no CA HAI viec (qua han nhan xet + chua diem danh): %s (xoa %d dong diem danh)"
+           % ((_kep.get("session_id") if _kep else "khong gieo duoc"), _kepN))
+
 # ═══ 14e. KỲ THI IELTS THẬT - BẢNG DL18b ═══════════════════════════════════════════════════
 # 14e. KY THI IELTS THAT
 # TP ACA hỏi qua điện thoại 06/08: tỷ lệ đạt AIM. Anh Luân chốt luật tính: **đạt AIM = điểm
@@ -2422,6 +2454,7 @@ log.append("14e. Ky thi IELTS that (DL18b): %d luot thi cua %d hoc vien"
 import datetime as _dt2, random as _rnd2
 _enrT = {e.get("enrollment_id",""): e.get("enrollment_time","") for e in dl.get("DL06", [])}
 _sua = 0
+_tuonglai = [0]
 for _p in dl.get("DL07", []):
     _et = _enrT.get(_p.get("enrollment_id",""), "")
     if not _et or not _p.get("payment_time"): continue
@@ -2430,9 +2463,18 @@ for _p in dl.get("DL07", []):
         _b = _dt2.datetime.strptime(_et, "%d/%m/%Y %H:%M")
     except Exception: continue
     if _a < _b:
-        _p["payment_time"] = (_b + _dt2.timedelta(hours=_rnd2.randint(1, 20))).strftime("%d/%m/%Y %H:%M")
+        _a = _b + _dt2.timedelta(hours=_rnd2.randint(1, 20))
+        _p["payment_time"] = _a.strftime("%d/%m/%Y %H:%M")
         _sua += 1
-log.append("16. Thu tien truoc ngay dang ky: keo ve sau dang ky %d phieu" % _sua)
+    # ... VA KHONG DUOC THU TIEN O TUONG LAI. Luat tren chi keo phieu ve SAU ngay dang ky, khong
+    # ai chan dau tren - don dang ky hom nay ma bi keo them vai gio la phieu roi sang ngay mai.
+    # Lo ra 07/08: PAY-2026-106 ghi 09/08/2026, tuc so quy cua trung tam co mot khoan thu chua
+    # xay ra. Mot bat bien phai chan CA HAI dau, chan mot dau la con nua kia bo ngo.
+    if _a > NOW:
+        _p["payment_time"] = (NOW - _dt2.timedelta(hours=_rnd2.randint(1, 6))).strftime("%d/%m/%Y %H:%M")
+        _tuonglai[0] += 1
+log.append("16. Thu tien truoc ngay dang ky: keo ve sau dang ky %d phieu | keo ve qua khu %d phieu ghi ngay tuong lai"
+           % (_sua, _tuonglai[0]))
 
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("  12. Da tao DL22 referral +", len(dl["DL22"]), "luot | DL19 thuong:", len(dl["DL19"]))
