@@ -353,7 +353,11 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .ph{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
 .ph b{font-size:13px;font-weight:700}.ph .mini{margin-left:auto;display:flex;gap:6px}
 .pbody{padding:6px 6px}
-.pill{height:29px;padding:0 12px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--muted);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer}
+/* `white-space:nowrap` + `inline-flex`: nut cao 29px ma chu rot xuong hai dong thi chu tran ra
+   ngoai vien, nhin nhu vo. Anh Luan 07/08 chup lai dung canh do o hai nut "Doi khoa hoc" /
+   "Doi buoi thi". Nut phai giu chu tren MOT hang, hep thi cho no dai ra. */
+.pill{height:29px;padding:0 12px;border-radius:20px;border:1px solid var(--line);background:#fff;color:var(--muted);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;
+ white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
 .pill:hover{border-color:#B9C6D6}.pill.on{background:var(--navy);border-color:var(--navy);color:#fff}
 .task{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:8px;margin:6px 4px;background:#fff}
 .task:hover{background:#FAFBFD}
@@ -1085,13 +1089,13 @@ table.dt tbody tr.clk.on td{font-weight:600}
 /* BUỔI THI PHẢI NỔI LÊN GIỮA DẢI, không chỉ đeo thêm một cái nhãn (anh Luân 07/08: *"là làm
    nổi bật cái buổi đó 1 tí, hiện tại e chỉ gắn test vào à"*). Cả viên buổi đổi nền và viền, chứ
    nhãn nhỏ nằm lọt giữa 35 viên giống hệt nhau thì mắt vẫn lướt qua. */
-.sespill.thi{border-width:2px}
+.sespill.thi{border-width:2px;box-shadow:0 1px 6px rgba(0,0,0,.08)}
 /* Dùng lại đúng cặp màu đã có trong bảng (blue/blueb, amber/amberb) - mỗi mã màu mới đẻ ra là
    một bậc mới trong bảng màu, và `_checkux` canh đúng chuyện đó. */
 .sespill.thi.mid{border-color:var(--blue);background:var(--blueb)}
 .sespill.thi.final{border-color:var(--amber);background:var(--amberb)}
-.sespill .sthi{display:block;font-size:9px;font-weight:800;letter-spacing:.4px;margin-top:3px;
- padding:2px 6px;border-radius:20px;white-space:nowrap}
+.sespill .sthi{display:block;font-size:10px;font-weight:800;letter-spacing:.5px;margin-top:4px;
+ padding:3px 8px;border-radius:20px;white-space:nowrap;text-transform:uppercase}
 .sespill .sthi.mid{background:#185FA5;color:#fff}
 .sespill .sthi.final{background:#854F0B;color:#fff}
 .sespill .snote{position:absolute;top:-5px;right:-5px;font-size:9px;background:var(--green);color:#fff;border-radius:20px;width:15px;height:15px;display:flex;align-items:center;justify-content:center}
