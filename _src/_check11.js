@@ -47,8 +47,10 @@ t("changList loc theo arc", changList().every(function(J){return arcOf(J.k)==="c
 
 /* --- 3. go() remap arc + reup + lichtuan --- */
 go("changB");t("go(changB) -> trang chang, ARC=changB", CUR==="chang"&&window.ARC==="changB");
-go("reup");t("go(reup) -> hub tuyen sinh tab reup", CUR==="tuyensinh"&&window.TSTAB==="reup");
-go("lichtuan");t("go(lichtuan) -> hub hoc tap tab lich tuan", CUR==="hoctap"&&window.HTTAB==="lichtuan");
+/* V2 - DOI CAU HOI: `reup` va `lichtuan` nay LA TRANG THAT, khong con la tab cua hub.
+   Dieu can bao ve van nguyen: bam vao ten do thi PHAI toi dung cho do, khong bi keo di dau. */
+go("reup");t("go(reup) -> dung trang Cham lai / Reup", CUR==="reup");
+go("lichtuan");t("go(lichtuan) -> dung trang Lich tuan", CUR==="lichtuan");
 t("VIEW_ALWAYS co chang", !!VIEW_ALWAYS.chang);
 
 /* --- 4. tab reup trong tuyen sinh --- */
@@ -76,14 +78,19 @@ t("NAVTREE co 8 nhom (them nhom Cho duyet)", NAVTREE.length===8);
 /* V9.99u - nhom con 5 muc: "Viec cho nhan" da ROI hub nay ve trang Quan ly viec giao & nhan
    (anh Luan 05/08: *"Sao em ko dua viec cho nhan vao luon"*). No la mot LAT CAT cua viec cua toi,
    khong phai mot hang cho PHE DUYET - xep vao hub Cho duyet la xep nham ho hang. */
-t("nhom Cho duyet co du 5 muc phe duyet", (function(){var G=NAVTREE.filter(function(x){return x.g==="Chờ duyệt"})[0];
- return G&&G.items.length===5&&G.items.indexOf("duyetgiao")<0&&G.items.every(function(k){return !!DUYMAP[k]&&navOwner(k)==="duyet"})})());
+/* V2 - nam hang cho phe duyet nay la NAM TRANG doc lap, khong con la nam tab cua mot hub.
+   Hoi `DUYMAP[k]` va `navOwner(k)==="duyet"` la hoi ve quan he cha-con da khong con.
+   Giu nguyen dieu can bao ve: du nam muc, khong lan `duyetgiao`, va moi muc la TRANG THAT. */
+t("nhom Cho duyet co du 5 muc phe duyet, moi muc la mot trang that", (function(){var G=NAVTREE.filter(function(x){return x.g==="Chờ duyệt"})[0];
+ return G&&G.items.length===5&&G.items.indexOf("duyetgiao")<0&&G.items.every(function(k){return !!PBK[k]&&typeof RENDER[k]==="function"})})());
 t("Viec cho nhan la mot TAB cua trang Giao viec", (function(){
  window.TKTAB="wait";var o="";try{o=RENDER.giaoviec()}catch(e){}
  return /tkTabSet\('wait'\)/.test(o)&&/Việc chờ nhận/.test(o)})());
 t("loi cu: go('duyetgiao') dan sang tab moi", (function(){
  window.TKTAB="mine";go("duyetgiao");return CUR==="giaoviec"&&window.TKTAB==="wait"})());
-t("ma tab TRUNG ma muc menu (mot ten cho mot thu)", duyTabs().every(function(x){return !!DUYMAP[x.k]}));
+/* V2 - luat "mot ten cho mot thu" van con, chi doi cho hoi: truoc ma tab phai trung ma muc
+   menu (`DUYMAP`); nay moi hang cho la mot TRANG nen ma ay phai la mot khoa trang that. */
+t("ma hang cho TRUNG ma trang (mot ten cho mot thu)", duyTabs().every(function(x){return !!PBK[x.k]}));
 t("ban giao lead da roi hub Khac", !KMAP.banggiao&&!!DUYMAP.banggiao);
 t("nhom chang du 4", NAVTREE.filter(function(G){return G.arc}).length===4);
 /* ═══ V9.99v - THANH MENU THAT PHAI KHOP VOI CAY MENU DANG DUOC CHON ════════════════════════
@@ -605,15 +612,24 @@ console.log(bad.length?("FAIL:\n  "+bad.join("\n  ")):"OK: "+ok);
    var o="";try{o=ve(CUR)}catch(e){o="ERR"}
    if(o==="ERR"||o.length<300)xTrong.push(vai+" "+i.k+" ("+(o==="ERR"?"loi":o.length+" ky tu")+")");
    else if(/ngoài phạm vi chức danh/.test(o))xTrong.push(vai+" "+i.k+" (man tu choi)")});
-  Object.keys(HUBTAB).forEach(function(hb){
-   var mm=HUBTAB[hb].m;
-   if(menu.indexOf(hb)<0&&!Object.keys(mm).some(function(tb){return menu.indexOf(mm[tb])>=0}))return;
-   var html="";try{go(hb);html=ve(hb)}catch(e){return}
-   var tabs=[],m,re=/(?:htTabSet|tsTabSet|csTabSet|kcTabSet|duyTabSet|gvTab)\('([a-z0-9]+)'\)/g;
-   while((m=re.exec(html)))if(tabs.indexOf(m[1])<0)tabs.push(m[1]);
-   tabs.forEach(function(tb){if(!mm[tb])xTab.push(vai+" "+hb+"/"+tb+" khong co khoa trang");
-    else if(menu.indexOf(mm[tb])<0)xTab.push(vai+" "+hb+"/"+tb+" thieu muc menu")});
-   Object.keys(mm).forEach(function(tb){if(menu.indexOf(mm[tb])>=0&&tabs.indexOf(tb)<0)xTab.push(vai+" muc "+mm[tb]+" nhung hub "+hb+" het tab "+tb)})});
+  /* V2 - DOI CAU HOI, KHONG XOA LUAT.
+     Cau hoi cu: "moi TAB cua hub deu co mot muc sidebar, va nguoc lai". No sinh ra tu bai hoc
+     anh Luan 05/08 (*"ben sidebar giong nhu 1 cai ban do vay, ho biet minh can tim gi o dau"*):
+     hub Hoc tap co 7 tab ma menu chi dan toi 3, bon tab kia khong co loi nao.
+     Sang V2 KHONG CON TAB NAO - 25 nghiep vu la 25 trang. Hoi ve tab la hoi ve mot thu khong
+     con ton tai, va cai gia phai tra khong phai la "xanh oan" ma la "do oan": no `go(hub)` roi
+     doc dai tab cua man hub cu, thay mot tab ma nguoi nay KHONG co quyen, roi bao "thieu muc
+     menu" - trong khi app dang chan dung.
+     Cau hoi moi giu nguyen DIEU CAN BAO VE, chi doi cach hoi: **trang nghiep vu nao nguoi nay
+     XEM DUOC thi phai co mot muc tren sidebar**. Danh sach 25 nghiep vu van lay tu `HUBTAB.m` -
+     do la ban khai "nhung viec nay la nghiep vu rieng", con nguyen gia tri du hub da di. */
+  var NV25={};Object.keys(HUBTAB).forEach(function(hb){var mm=HUBTAB[hb].m||{};
+   for(var tb in mm)NV25[mm[tb]]=1});
+  Object.keys(NV25).forEach(function(tr){
+   if(!PBK[tr])return;
+   var thay=false;try{thay=navVis(tr)}catch(e){return}
+   if(thay&&menu.indexOf(tr)<0)xTab.push(vai+" xem duoc trang "+tr+" ma khong co muc tren sidebar");
+   if(!thay&&menu.indexOf(tr)>=0)xTab.push(vai+" khong duoc xem "+tr+" ma menu van moi vao")});
  });
  function kq(ten,x){tv5(ten+" ("+soVai+" chuc danh)"+(x.length?": "+x.slice(0,4).join(" | "):""), x.length===0)}
  kq("menu khong co khoa/ten nam hai cho",xTrung);
@@ -621,7 +637,7 @@ console.log(bad.length?("FAIL:\n  "+bad.join("\n  ")):"OK: "+ok);
  kq("bam moi muc menu -> dung mot muc sang, va la chinh no",xSang);
  kq("bam mot muc -> app tu mo dung nhom chua no",xMoNhom);
  kq("moi muc menu mo ra man co noi dung, khong bi tu choi",xTrong);
- kq("moi tab cua hub deu co mot muc sidebar, va nguoc lai",xTab);
+ kq("trang nghiep vu nao xem duoc thi co muc tren sidebar, va nguoc lai",xTab);
  window.GATE_SID="";applyScope("");setRole("all");
 })();
 

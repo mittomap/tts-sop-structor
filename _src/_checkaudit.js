@@ -482,8 +482,17 @@ var CH3_NGOAIBAN={
      "hub `tuyensinh` co trong menu khong" la sai cau hoi - phai hoi "co tab nao cua no trong
      menu khong". Do sai cau hoi thi ra ba hub "mat duong" trong khi nguoi dung bam vao no
      moi ngay. */
+  /* V2 - HOI `HUBTAB` CHU KHONG HOI CAC BANG DOI TEN. Sang V2, sau khoa hub chi con la BI DANH:
+     `go()` dan tiep toi trang nghiep vu dau tien nguoi do xem duoc, nen `TSMAP`/`HTMAP`/`CSMAP`/
+     `KMAP`/`DUYMAP` da rong. Hoi mot bang rong thi moi hub deu "mat duong toi" trong khi nguoi
+     dung van bam vao no moi ngay - do sai cau hoi, ra mot phat hien gia.
+     Su that "trang nao TUNG thuoc hub nao" nam o `HUBTAB` - hoi thang no.
+     LUAT (da ghi o README_SRC): go mot tinh nang thi phai di tim moi cai thuoc dang do no, va
+     voi moi cai hoi lai "nen xoa, hay nen DOI CAU HOI?". Day la mot ca doi cau hoi. */
   function hubToiDuoc(hubKey){
    if(M[hubKey])return true;
+   var HB=(typeof HUBTAB!=="undefined"&&HUBTAB[hubKey]&&HUBTAB[hubKey].m)||null;
+   if(HB){for(var t0 in HB)if(M[HB[t0]])return true}
    var found=false;
    HUB.forEach(function(H){ if(H[1]!==hubKey||!H[0])return;
     Object.keys(H[0]).forEach(function(tab){ if(M[tab])found=true }) });

@@ -799,15 +799,24 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  setRole("all");
  ["renderDashboardOld","renderPipeline","pipeSet","renderTracuu","renderKhaosat"].forEach(function(f){
   t("da xoa han ham chet "+f, typeof global[f]==="undefined")});
- ["pipeline","tracuu","khaosat"].forEach(function(k){
+ /* V2 - `khaosat` DA RA KHOI DANH SACH NAY. No tung la mot khoa chet (co trong PAGES, khong co
+    ham ve, `go()` doi ten no ve hub CSKH) nen muc kiem canh dung. Sang V2 no la MOT TRANG THAT -
+    Khao sat & Phan hoi, ve bang `renderReview` - nen doi hoi "khong duoc co ham ve" thanh sai.
+    `pipeline` va `tracuu` van la khoa chet that, giu nguyen. */
+ ["pipeline","tracuu"].forEach(function(k){
   t("bo dang ky RENDER cho trang chet "+k, !RENDER[k])});
+ t("khaosat nay la trang that, co ham ve rieng", typeof RENDER["khaosat"]==="function");
  t("bo o chon vai roleSel (luon bi an tu V9.9)", !/id="roleSel"/.test(SRC));
  /* xoa roi thi moi trang con lai van phai ve duoc */
  var loi=[];Object.keys(RENDER).forEach(function(k){try{if(typeof RENDER[k]()!=="string")loi.push(k)}catch(e){loi.push(k+": "+e.message)}});
  t("moi trang con lai van ve duoc"+(loi.length?(" - hong: "+loi.join(", ")):""), loi.length===0);
  /* duong vao cu khong duoc vo: go('khaosat') phai ve hub CSKH */
  go("khaosat");
- t("go('khaosat') van vao duoc hub CSKH", CUR==="cskh");
+ /* V2 - DOI CAU HOI. Truoc day `khaosat` la mot khoa CHET: no co trong PAGES nhung khong co
+    ham ve, `go('khaosat')` bi doi ten ve hub CSKH. Muc kiem nay canh dung dieu do.
+    Sang V2 `khaosat` LA MOT TRANG THAT (Khao sat & Phan hoi, ve bang `renderReview`). Cau hoi
+    dung bay gio la nguoc lai: bam vao no phai vao DUNG no, khong bi ai keo di dau. */
+ t("go('khaosat') vao dung trang Khao sat (khong con bi keo ve hub)", CUR==="khaosat");
  go("banlam");
 })();
 

@@ -3414,7 +3414,7 @@ hocvien:{code:"DL09",filt:"student_status",ro:1,sub:"Học viên (DL09) - lọc 
  qf:[["risk","Nguy cơ",function(s){return stuRisk(s)}]],
  act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"student_id"}],
  cols:[["student_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["student_status","Trạng thái","chip"],["attendance_progress_status","Chuyên cần","chip"],["academic_progress_status","Học thuật","chip"],["attendance_risk_reason","Lý do CC","enum"],["academic_risk_reason","Lý do HT","enum"],["__vang","Vắng (buổi)","calcso"],["__thieubai","Thiếu bài","calcso"],["last_learning_activity_time","Hoạt động cuối","lau"],["wow_quota_remaining","WOW còn"]]},
-lop:{code:"DL10",filt:"class_status",ro:1,sub:"Lớp học (DL10)",
+lop:{code:"DL10",nut:'<button class="btn primary sm" onclick="go(\'xeplop\')"><i class="ti ti-layout-grid-add"></i>Xếp lớp & Onboarding</button>',filt:"class_status",ro:1,sub:"Lớp học (DL10)",
  
  /* V9.40d: class_level là cột SOP mô tả từ đầu mà app chưa hiện ở đâu - xếp một em trình độ
     Foundation vào lớp IELTS 7.0+ là hỏng cả lớp, nên trình độ phải nhìn thấy ngay ở danh sách. */
@@ -3433,7 +3433,7 @@ nhanvien:{code:"DL01",filt:"status",ro:1,lam:"nhansu",sub:"Toàn bộ nhân sự
  cols:[["staff_id","Mã"],["full_name","Họ tên"],["role","Vai trò","enum"],["department","Bộ phận"],["email","Email"],["reports_to_name","Quản lý"],["status","Trạng thái","chip"]]},
 /* V9.42: mọi danh sách khác đều có dòng `sub` nói rõ nó là bảng nào, riêng bảng lead thì không -
    người mới mở ra không biết mình đang xem DL02 hay một bảng lọc sẵn nào đó. */
-nhaplead:{code:"DL02",filt:"lead_status",sub:"Khách tiềm năng (DL02) - lọc theo trạng thái, nguồn, nhân viên phụ trách",act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"lead_id"},{lb:"Ghi liên hệ",ic:"ti-phone",fn:"openLienhe",arg:"lead_id"}],
+nhaplead:{code:"DL02",filt:"lead_status",nut:'<button class="btn primary sm" onclick="leadInbound()"><i class="ti ti-message-plus"></i>Khách mới liên hệ đến</button>',sub:"Khách tiềm năng (DL02) - lọc theo trạng thái, nguồn, nhân viên phụ trách",act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"lead_id"},{lb:"Ghi liên hệ",ic:"ti-phone",fn:"openLienhe",arg:"lead_id"}],
  cols:[["lead_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["lead_created_time","Vào hệ thống"],["lead_status","Trạng thái","chip"],["contact_count","Lượt LH"],["next_followup_time","Hẹn liên hệ"],["assigned_to_name","NV phụ trách"],["next_action","Việc cần làm","na"]],
  form:[["full_name","Họ tên",0,1],["phone_number","SĐT",0,1],["zalo_id","Zalo (SĐT/nick)",0],["lead_source","Nguồn","enum_lead_source",1],["student_type","Đối tượng","enum_student_type"],["learning_goal","Mục tiêu học","enum_learning_goal_type"],["target_band","Điểm mục tiêu"],["learning_mode","Hình thức","enum_learning_mode"],["expected_start_time","Dự kiến bắt đầu"],["availability_schedule","Lịch rảnh"],["lead_qualification_status","Mức đủ ĐK","enum_lead_qualification_status"],["branch","Cơ sở","enum_branch"],["lead_note","Ghi chú trao đổi","ta"]],idp:"L-2026-"},
 lienhe:{code:"DL02b",filt:"channel",
@@ -4350,7 +4350,14 @@ function renderList(key,emb){
     KHÔNG được vẽ khi danh sách được NHÚNG vào một hub (Sổ thu học phí là hub hai tab). Kết quả:
     LISTCFG.dsthanhtoan khai `lam:"thanhtoan"` mà nút không bao giờ hiện ra - một khai báo chết,
     im lặng. Nay nút nằm ở tầng công cụ, vẽ ở cả hai trường hợp. */
- var duoi='<span class="tbcnt">'+total+' dòng'+(fa.length||q||qk||hvF||_f2?" (đã lọc)":"")+'</span>'+
+ /* V2 - NÚT NGHIỆP VỤ CỦA TRANG DANH SÁCH. Trước V2, nút "Khách mới liên hệ đến" nằm ở đầu
+    HUB Tuyển sinh và chỉ hiện khi đang ở tab Lead. Tách tab thành trang thì nút ấy RƠI MẤT -
+    đúng loại BỚT mà luật cứng số 0 cấm, và `_checktour` bắt được ngay (một bước hướng dẫn trỏ
+    vào chữ trên nút, chữ không còn trên trang nữa).
+    Nay trang danh sách khai được nút của chính nó ở `LISTCFG[key].nut`. Khai một chỗ, hiện ở
+    đúng trang ấy - không phải nhớ rằng nó từng phụ thuộc vào một cái tab. */
+ var _nutNV=(cfg.nut||"");
+ var duoi=_nutNV+'<span class="tbcnt">'+total+' dòng'+(fa.length||q||qk||hvF||_f2?" (đã lọc)":"")+'</span>'+
   fltBarHTML(key,1)+   /* trang danh sách đã có ô tìm riêng ở tầng trên */
   (fa.length||q||qk||hvF||_f2?'<button class="btn sm" onclick="clearFilt(\''+key+'\')"><i class="ti ti-x"></i>Xóa lọc</button>':'')+
   '<div class="colwrap"><button class="btn'+(nHid?" primary":"")+' sm" onclick="colMenuToggle(\''+key+'\')"><i class="ti ti-columns"></i>Cột'+(nHid?" ("+(cfg.cols.length-1-nHid)+"/"+(cfg.cols.length-1)+")":"")+'</button>'+colMenuHTML(key)+'</div>'+
@@ -6495,7 +6502,7 @@ function duyThuHTML(){var L=fltApply("duyetthu",duyPayList());
    '<td>'+nguoiLnk(e.student_id,p.student_id_name||e.student_id_name,"-")+'</td>'+
    '<td style="font-variant-numeric:tabular-nums"><b>'+vnd(num(p.amount))+'</b></td>'+
    '<td>'+esc(elabel(p.payment_method)||"-")+'</td><td>'+esc(p.received_by_name||p.received_by||"-")+'</td>'+
-   '<td><button class="btn sm green" onclick="payVerify(\''+esc(p.enrollment_id)+'\')"><i class="ti ti-check"></i>Đã đối soát</button></td></tr>'});
+   '<td><button class="btn green sm" onclick="payVerify(\''+esc(p.enrollment_id)+'\')"><i class="ti ti-check"></i>Đã đối soát</button></td></tr>'});
  return h+'</tbody></table></div>'+xemTiepBtn("duythu",L.length,30)+'</div>'}
 /* --- tab VIỆC CHỜ NHẬN: DL23 trạng thái "new" - người được giao chưa bấm nhận --- */
 function duyGiaoHTML(){var L=fltApply("duyetgiao",duyTaskList());
@@ -21174,12 +21181,70 @@ function banNutHoSo(ttk,r){
  return '<button class="btn" onclick="openLop(\''+esc(r.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Mở lớp</button>'}
 
 var RENDER={ban:renderBan,canhan:renderCanhan,dsphuhuynh:renderSoPH,hoidap:renderHoidap,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,ketqua:renderKetqua,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
+/* ═══ V2 - 25 NGHIỆP VỤ, 25 TRANG ═══════════════════════════════════════════════════════════
+   Anh Luân: *"Mỗi nghiệp vụ 1 trang, vẫn sắp xếp được theo chặng trên sidebar, nhưng mỗi trang
+   là nghiệp vụ riêng, và nó có thẻ, có chip lọc, có cảnh báo của riêng nó."*
+
+   VIỆC CHÍNH LÀ MỞ NẮP, KHÔNG PHẢI DỰNG MỚI. Đo trước khi làm: trong 25 tab của sáu hub, 14 tab
+   đã có hàm vẽ TỰ VẼ ĐƯỢC ĐẦU TRANG khi không nhúng (`renderX(embed)` với `embed` rỗng), 2 tab là
+   danh sách (`renderList` tự lo), còn 9 tab thì thân có sẵn mà chưa có đầu. Khối này chỉ đội đầu
+   trang cho 9 chỗ ấy rồi ghi tên chúng vào `RENDER`.
+
+   CÂU NGỮ CẢNH KHÔNG VIẾT LẠI: `HUBCAU` đã có sẵn một câu cho từng tab (V9.99m viết ra đúng để
+   người bấm thẳng vào một tab biết mình đang ở bước nào). `nvCau()` đọc thẳng bảng ấy - một chỗ
+   khai, không chép sang chỗ thứ hai để rồi hai chỗ nói hai đằng. */
+function nvCau(k){
+ try{for(var h in HUBCAU){var m=HUBCAU[h],M=(HUBTAB[h]||{}).m||{};
+   for(var t in m)if(M[t]===k)return m[t];}}catch(e){}
+ return (PBK[k]||{}).c||""}
+function nvHead(k,btn){return pageHead((PBK[k]||{}).t||k,nvCau(k),btn||"",1)}
+function _duyAi(){try{return duyAiHTML()}catch(e){return ""}}
+
+RENDER.reup      = function(){return renderReupTab()};        /* tự có đầu trang riêng */
+RENDER.ychv      = function(){return renderYcHV()};           /* tự có đầu trang riêng */
+RENDER.khaosat   = function(){return renderReview()};         /* embed rỗng -> tự vẽ đầu trang */
+RENDER.buoihnay  = function(){return nvHead("buoihnay")+renderHtToday(1)};
+RENDER.lichtuan  = function(){return nvHead("lichtuan")+renderLichTuan(1)};
+RENDER.duyetck   = function(){return nvHead("duyetck")+duyCkHTML(ckThreshold())+_duyAi()};
+RENDER.duyethoan = function(){return nvHead("duyethoan")+duyHoanHTML()+_duyAi()};
+RENDER.duyetnghi = function(){return nvHead("duyetnghi")+duyNghiHTML()+_duyAi()};
+RENDER.duyetthu  = function(){return nvHead("duyetthu")+duyThuHTML()+_duyAi()};
+
+/* ═══ SÁU HUB THÀNH BÍ DANH, KHÔNG THÀNH TRANG CHẾT ════════════════════════════════════════
+   Sáu khoá hub (`tuyensinh` `hoctap` `cskh` `khac` `duyet` `giangvien`) vẫn còn đầy rẫy trong
+   app: bài hướng dẫn trỏ vào, trang đáp của chức danh trỏ vào, nút trong thân trang trỏ vào,
+   và link người dùng đã gửi cho nhau. Xoá chúng là làm chết một loạt cửa trong im lặng.
+   Nên chúng ở lại - nhưng chỉ còn là BÍ DANH: bấm vào thì đi thẳng tới trang nghiệp vụ đầu tiên
+   mà người đó có quyền xem. Không còn màn hub nào có dải tab.
+   VÌ SAO PHẢI HỎI "NGƯỜI ĐÓ CÓ QUYỀN XEM KHÔNG" chứ không nhảy đại vào tab mặc định: hub Chờ
+   duyệt có năm hàng chờ thuộc năm người khác nhau; học vụ chỉ có Đơn xin nghỉ. Nhảy vào Chiết
+   khấu là đưa họ tới một trang họ không được vào, rồi app đuổi ra - "mời rồi đuổi còn tệ hơn
+   không mời" (luật đã ghi ở `navVis`).
+   `giangvien` là ngoại lệ: chính nó vẫn là một trang thật (danh sách giảng viên), chỉ có tab
+   Bảng công tách ra thành trang riêng. Nên nó KHÔNG nằm trong bảng bí danh. */
+function hubDich(k){
+ var H=HUBTAB[k];if(!H||!H.m)return "";
+ var d=H.d, uu=[];
+ if(d&&H.m[d])uu.push(H.m[d]);
+ for(var t in H.m)if(uu.indexOf(H.m[t])<0)uu.push(H.m[t]);
+ for(var i=0;i<uu.length;i++){var tr=uu[i];
+  if(!PBK[tr])continue;
+  try{if(navVis(tr))return tr}catch(e){return tr}}
+ return uu[0]||""}
+
 function dashJump(key){var m={urgent:"viec",newlead:"nhaplead",consider:"viec",convert:"tuvan",risk:"viec",onboard:"xeplop",approve:"duyet",debt:"thanhtoan",complaint:"khieunai",ungraded:"baitap",testpend:"test",wowbook:"wow",unverified:"thanhtoan",classes:"banglop"};var pg=m[key];if(pg&&RBK[CURROLE].pages.indexOf(pg)>=0)go(pg);else go("viec")}
 
 /* ---------- router ---------- */
 function reRender(k){try{setTimeout(tourTick,240)}catch(e){}   /* người dùng làm tay không qua nút của guide - guide vẫn phải biết */
  var el=document.getElementById("content");
- if(!el||!RENDER[k]){if(typeof hvReRender==="function")hvReRender();return}   /* cổng học viên: chỉ vẽ lại thân trang */
+ /* V2 - BẪY ĐÃ CẮN: dòng này chỉ hỏi `RENDER[k]`, mà trang kiểu DANH SÁCH không có mục trong
+    `RENDER` - chúng vẽ bằng `renderList`. Trước V2 các trang ấy (`nhaplead`, `lop`) không bao giờ
+    là trang đang mở vì `go()` đổi tên chúng về hub, nên chỗ này chưa lộ. Sang V2 chúng là trang
+    thật: `reRender("nhaplead")` rơi vào nhánh cổng học viên, `hvReRender` gọi ngược `reRender`,
+    hai hàm gọi nhau tới TRÀN NGĂN XẾP (`_checkcrumb` bắt được).
+    Hỏi đủ cả hai cách vẽ - có hàm riêng, HOẶC là trang danh sách. */
+ var _pl=PBK[k];
+ if(!el||!(RENDER[k]||(_pl&&_pl.ty==="list"))){if(typeof hvReRender==="function")hvReRender();return}   /* cổng học viên: chỉ vẽ lại thân trang */
  var p=PBK[k];var sc=el.scrollTop;
  el.innerHTML=scrubMan((p&&p.ty==="list")?renderList(k):RENDER[k]());donLapTrenMan(el);el.scrollTop=sc;
  /* vẽ lại cả SIDEBAR: đổi tab trong hub (duyTabSet, csTabSet...) thì mục đang sáng trên menu
@@ -21816,16 +21881,28 @@ function navJump(i){var h=window.NAVHIST;if(!h||i<0||i>=h.length)return;var targ
 /* Bảng gộp trang: 4 trang tuyển sinh -> HUB Tuyển sinh đúng tab, 4 chặng -> trang Chặng...
    Trước đây khai báo BÊN TRONG go() nên chỗ khác không biết "nhaplead" là một trang hợp lệ -
    hashOK phải đọc được đúng bảng này, không được chép lại danh sách lần thứ hai. */
-var TSMAP={nhaplead:"lead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"};
+/* ═══ V2 - CÁC BẢNG GỘP TRANG ĐÃ RỖNG: MỖI NGHIỆP VỤ MỘT TRANG ═══════════════════════════
+   Anh Luân: *"Mỗi nghiệp vụ 1 trang, vẫn sắp xếp được theo chặng trên sidebar, nhưng mỗi trang
+   là nghiệp vụ riêng, và nó có thẻ, có chip lọc, có cảnh báo của riêng nó."*
+   Bốn bảng dưới đây từng kéo mọi cú bấm mục con về hub chủ - bấm "Test đầu vào" thì `go()` đổi
+   thầm khoá thành "tuyensinh" rồi đặt tab. Nay bỏ trống: `go("test")` đi thẳng tới trang Test.
+   GIỮ LẠI TÊN BIẾN (không xoá hẳn) vì `goAlias`/`hashOK` và bộ kiểm còn hỏi tới; bảng rỗng thì
+   câu trả lời là "không phải bí danh" - đúng sự thật mới. Bảng nào còn dòng thì dòng ấy là một
+   bí danh CÒN SỐNG, đọc mã là thấy ngay, không phải dò.
+   `ARCMAP` KHÔNG rỗng: bốn chặng vẫn là bốn góc nhìn của cùng một trang Bản đồ chặng, không
+   phải bốn nghiệp vụ. */
+var TSMAP={};
 var ARCMAP={changA:1,changB:1,changC:1,changD:1};
-var CSMAP={review:"khaosat",khaosat:"khaosat",ghinhan:"phanhoi",khieunai:"khieunai",ychv:"ychv"};
-var HTMAP={lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp",phong:"phong",buoihnay:"today"};
-var KMAP={baoluu:"baoluu",magioithieu:"magioithieu"};
+/* `review` (Gửi khảo sát theo lớp) và `khaosat` hiện dùng CHUNG một hàm vẽ - đó là một bản dựng
+   trùng, thuộc RB1, xử ở Khúc 4. Tới lúc đó gỡ nốt dòng này. */
+var CSMAP={review:"khaosat"};
+var HTMAP={};
+var KMAP={};
 /* V9.29o: bàn giao lead rời hub "Tính năng khác" sang hub "Chờ duyệt" - nó là một QUYẾT ĐỊNH
    (giao lead của người này cho người kia), không phải một tiện ích lặt vặt. */
 /* Mã tab TRÙNG mã mục menu - cố ý. Đặt hai tên cho cùng một thứ ("ck" ở tab, "duyetck" ở menu)
    là sớm muộn có chỗ tra nhầm bảng; đây đúng là lớp lỗi vừa cắn ở scopeTabs. */
-var DUYMAP={duyetck:1,duyethoan:1,duyetnghi:1,duyetthu:1,banggiao:1};
+var DUYMAP={};
 function goAlias(k){return !!(TSMAP[k]||ARCMAP[k]||CSMAP[k]||HTMAP[k]||KMAP[k]||DUYMAP[k]||k==="hanhtrinh")}
 /* ===== V9.29c (anh Luân): MỖI TRANG MỘT ĐỊA CHỈ - F5 KHÔNG MẤT CHỖ ĐANG ĐỨNG =====
    "mỗi lần anh refresh là mất tiêu nơi anh đang đứng". App là một trang duy nhất nên trước đây
@@ -21947,7 +22024,9 @@ function go(key,noHist){
  /* V9.64: bảng công giảng dạy nay là một tab của trang Giảng viên. 4 chỗ trong app đang gọi
     go('bangcong') (ô thẻ Nhân sự, trợ lý, nhịp ngày, tour) - remap ở ĐÂY chứ không đi sửa 4 chỗ,
     để mai kia có chỗ thứ 5 gọi tên cũ thì vẫn tới đúng nơi. */
- if(key==="bangcong"){window.GVTAB="cong";key="giangvien"}
+ /* V2: `bangcong` nay LA MOT TRANG THAT (Bang cong giang day - nghiep vu rieng cua Nhan su),
+    khong con la mot tab cua trang Giang vien. Bo phep doi ten cu di, neu khong no keo nguoc moi
+    cu bam ve trang Giang vien va trang Bang cong khong bao gio mo duoc. */
  /* V9.99u - lối cũ: mọi nút/link/bài hướng dẫn còn trỏ tới `duyetgiao` nay dẫn thẳng sang tab
     "Việc chờ nhận" của trang Quản lý việc giao & nhận. Đổi chỗ một màn thì phải để lại lối,
     không thì mai kia có một nút bấm vào mà không đi đâu cả. */
@@ -21974,6 +22053,14 @@ function go(key,noHist){
     là một hành vi của THANH MENU, nên nó thuộc về hàm mà thanh menu gọi. */
  if(KMAP[key]){window.KTAB=KMAP[key];key="khac"}
  if(DUYMAP[key]){window.DUYTAB=key;key="duyet"}
+  /* V2 - HUB CHI CON LA BI DANH. Sau khi 25 nghiep vu tach ra thanh 25 trang, sau khoa hub
+    khong con man hinh rieng nua. Nhung chung van nam day ray trong app (bai huong dan, trang dap
+    cua chuc danh, nut trong than trang, link nguoi dung da gui) nen KHONG duoc xoa - xoa la lam
+    chet mot loat cua trong im lang. Chung dan tiep toi trang nghiep vu dau tien nguoi do XEM
+    DUOC (`hubDich`), khong nhay dai vao tab mac dinh: hub Cho duyet co nam hang cho cua nam
+    nguoi khac nhau, hoc vu chi co Don xin nghi - nhay vao Chiet khau la moi roi duoi. */
+ if(typeof HUBTAB!=="undefined"&&HUBTAB[key]&&key!=="giangvien"){
+   var _d2=hubDich(key);if(_d2&&PBK[_d2])key=_d2}
  var p=PBK[key];if(!p)return;
  if(!canSee(key)&&SENSITIVE[key]){
   var el0=document.getElementById("content");
@@ -22152,7 +22239,7 @@ var NAVTREE=[
     lối nào. Hub CSKH có 4 tab mà menu chỉ có tên hub. Anh Luân: *"bên sidebar giống như 1 cái
     bản đồ vậy, họ biết mình cần tìm gì ở đâu"* - thiếu một mục là mất một chỗ trên bản đồ.
     Thứ tự các mục con xếp ĐÚNG THỨ TỰ THANH TAB của hub, để menu và màn hình đọc như nhau. */
- {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","banglop","giaoan","cskh","khaosat","ghinhan","khieunai","hoctap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","banglop","giaoan","khaosat","ghinhan","khieunai","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","ketqua","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
@@ -22176,12 +22263,16 @@ var NAVTREE=[
     CHỖ ĐỨNG trên menu không". Hai câu khác nhau, và cái thước phải hỏi câu thứ hai. */
  {g:"Điều hành",items:["baocao","nhansu","bangcong","hoidap","canhan","settings"]},
  {g:"Tra cứu",items:["hocvien","dsphuhuynh","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","giangvien","nhanvien"]}];
-var NAVSUB={nhaplead:"tuyensinh",test:"tuyensinh",tuvan:"tuyensinh",thanhtoan:"tuyensinh",reup:"tuyensinh",
- review:"cskh",khaosat:"cskh",ghinhan:"cskh",khieunai:"cskh",ychv:"cskh",
- lop:"hoctap",buoihoc:"hoctap",lichtuan:"hoctap",wow:"hoctap",gvdp:"hoctap",phong:"hoctap",buoihnay:"hoctap",
- baoluu:"khac",magioithieu:"khac",
- duyetck:"duyet",duyethoan:"duyet",duyetnghi:"duyet",duyetthu:"duyet",banggiao:"duyet",bangcong:"giangvien",
- changA:"chang",changB:"chang",changC:"chang",changD:"chang"};
+/* ═══ V2 - 25 NGHIỆP VỤ ĐÃ RỜI KHỎI BẢNG NÀY ════════════════════════════════════════════════
+   `NAVSUB` khai "mục này là MỤC CON của mục kia" - dùng cho `navOwner`, và `navOwner` là thứ
+   quyết định mục nào sáng trên sidebar, mục nào bị chặn theo `rs.tabs` của hub chủ.
+   Trước V2, cả 25 nghiệp vụ đều là mục con của một trong sáu hub. Nay mỗi nghiệp vụ là một TRANG
+   ĐỘC LẬP nên không còn chủ nào - `navOwner(k)` trả về chính `k`, mục tự sáng cho mình.
+   CÒN LẠI ĐÚNG BỐN CHẶNG: chúng thật sự là bốn góc nhìn của MỘT trang Bản đồ chặng (`window.ARC`
+   đổi góc nhìn), không phải bốn nghiệp vụ - nên chúng vẫn là mục con, đúng nghĩa.
+   `bangcong` cũng rời ra: nó là Bảng công giảng dạy, một nghiệp vụ riêng của Nhân sự, không phải
+   một tab của trang Giảng viên. */
+var NAVSUB={changA:"chang",changB:"chang",changC:"chang",changD:"chang"};
 function navOwner(k){return NAVSUB[k]||k}
 function navItemMeta(k){
  if(/^chang[A-D]$/.test(k)){var A=ARCBK[k];return {t:uiItemLabel(k),ic:"ti-route",arc:A}}
@@ -22222,7 +22313,12 @@ function navVis(k){var r=RBK[CURROLE],rs=SCOPE();
 /* V9.99z5: `giangvien` cũng là một hub hai tab (Danh sách · Bảng công giảng dạy) - khai ở đây
    thì mục "Bảng công" trên menu mới sáng đúng lúc. Trước bản này bấm nó là menu tối thui:
    go() đổi trang sang `giangvien` mà `bangcong` không được coi là mục con của trang ấy. */
-var HUBTAB={giangvien:{v:"GVTAB",d:"ds",m:{ds:"giangvien",cong:"bangcong"}},
+/* V2 - `giangvien` KHÔNG CÒN LÀ HUB. Bảng công giảng dạy đã thành một trang nghiệp vụ riêng
+   (`bangcong`), nên trang Giảng viên chỉ còn đúng một việc: danh sách giảng viên.
+   Để nó lại trong bảng này là `navCur` còn đi hỏi `hubSubKey("giangvien")`, gặp `GVTAB="cong"`
+   còn treo từ lần trước thì nó nhường sáng cho một mục con không còn thuộc về nó - bấm Giảng
+   viên mà không mục nào sáng (`_check11` bắt được). */
+var HUBTAB={
  tuyensinh:{v:"TSTAB",d:"lead",m:{lead:"nhaplead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"}},
  hoctap:{v:"HTTAB",d:"lop",m:{today:"buoihnay",lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp",phong:"phong"}},
  cskh:{v:"CSTAB",d:"khaosat",m:{khaosat:"khaosat",phanhoi:"ghinhan",khieunai:"khieunai",ychv:"ychv"}},
@@ -22264,6 +22360,56 @@ function hubCau(hub,tab){var m=HUBCAU[hub]||{};return m[tab]?(" "+m[tab]):""}
 function hubDef(hub){var H=HUBTAB[hub];return (H&&H.d)||""}
 function hubTab(hub){return window[(HUBTAB[hub]||{}).v]||hubDef(hub)}
 function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)]||""}
+/* ═══ V2 - NỞ BẢN KHAI QUYỀN TỪ **TAB** SANG **TRANG** ═══════════════════════════════════════
+   LUẬT CỨNG SỐ 0: thêm thì được, BỚT thì không.
+
+   V1 khai quyền hai tầng: `pages` nói được vào TRANG nào; `tabs` nói trong một hub thì được thấy
+   TAB nào (vd tư vấn chỉ thấy tab Mã giới thiệu trong hub Khác, học vụ chỉ thấy tab Đơn xin nghỉ
+   trong hub Chờ duyệt). Sang V2 những tab ấy THÀNH TRANG.
+   Nếu chỉ gỡ định tuyến mà không đụng bản khai quyền thì 25 trang sẽ biến mất khỏi menu của mọi
+   chức danh có phạm vi hẹp - vì `navVis` hỏi `rs.pages` mà trong đó chỉ có tên hub. Đó là BỚT,
+   phạm luật số 0, và nó BIẾN MẤT TRONG IM LẶNG: người ta mở app lên thiếu một trang, không có
+   thông báo nào cả.
+
+   Nên: **ai từng thấy một TAB thì nay thấy đúng TRANG ấy** - không thêm một trang nào họ chưa
+   từng thấy, không bớt một trang nào họ đang có.
+
+   LÀM BẰNG MỘT VÒNG NỞ CHẠY MỘT LẦN, không đi sửa tay 16 chức danh. Sửa tay 16 dòng là chắc chắn
+   sót một dòng, mà sót thì im lặng. Vòng nở đọc thẳng `HUBTAB` nên nó luôn đúng theo bản khai.
+
+   Hub nào chức danh CÓ mà KHÔNG khai `tabs` = họ thấy cả hub -> nở ra đủ mọi trang con của hub đó.
+   Bản khai `tabs` viết lẫn lộn tên tab ("lead") và khoá trang ("nhaplead") - `scopeTabs` đã phải
+   nhận cả hai, nên vòng này cũng nhận cả hai; hỏi một kiểu thôi là nở thiếu. */
+(function noQuyenTheoTrang(){
+ try{
+  for(var vai in ROLESCOPE){
+   var rs=ROLESCOPE[vai];
+   if(!rs||rs.pages==="*"||!rs.pages||!rs.pages.length)continue;
+   var them=[];
+   rs.pages.forEach(function(k){
+    var H=HUBTAB[k];if(!H||!H.m)return;
+    var cho=(rs.tabs&&rs.tabs[k])||null;      /* null = không giới hạn tab -> thấy cả hub */
+    for(var t in H.m){
+     var trang=H.m[t];
+     if(cho&&cho.indexOf(t)<0&&cho.indexOf(trang)<0)continue;
+     if(rs.pages.indexOf(trang)<0&&them.indexOf(trang)<0)them.push(trang)}});
+   if(them.length)rs.pages=rs.pages.concat(them);
+   /* TRANG DAP cung phai doi theo. Bay chuc danh khai `land` la mot khoa hub (`tuyensinh`,
+      `hoctap`). Sang V2 hub khong con man hinh rieng va khong con muc tren sidebar, nen ho
+      dang nhap vao roi dung o mot trang KHONG CO MUC MENU NAO SANG - dung con benh anh Luan
+      bat duoc hai lan (trang Hoi dap 04/08, hai trang Nhan su 05/08).
+      Doi sang trang nghiep vu dau tien ho xem duoc - de o day chu khong sua tay bay dong, vi
+      sua tay la mai kia them mot chuc danh nua lai quen. */
+   if(rs.land&&HUBTAB[rs.land]){
+    var mm2=HUBTAB[rs.land].m||{}, uu2=[];
+    if(HUBTAB[rs.land].d&&mm2[HUBTAB[rs.land].d])uu2.push(mm2[HUBTAB[rs.land].d]);
+    for(var t2 in mm2)if(uu2.indexOf(mm2[t2])<0)uu2.push(mm2[t2]);
+    for(var i2=0;i2<uu2.length;i2++){
+     if(rs.pages==="*"||rs.pages.indexOf(uu2[i2])>=0){rs.land=uu2[i2];break}}
+   }
+  }
+ }catch(e){}
+})();
 /* Khung PHẲNG THEO NGHIỆP VỤ - dùng thay bốn nhóm chặng cho người đi qua dưới 2 chặng.
    Ba nhóm này gom đúng những mục đang nằm rải trong C1..C4, chỉ đổi CÁCH GỌI TÊN:
    tên nhóm nói NGHIỆP VỤ chứ không nói chặng, nên đọc đúng với mọi tập con.
@@ -22271,8 +22417,8 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
    "Test đầu vào" -> cũng vậy. Trước đây hai người ấy thấy nhóm "C1 · Khách tiềm năng".) */
 var NAVPHANG=[
  {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:"Lớp học & Giảng dạy",items:["xeplop","banglop","giaoan","hoctap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
- {g:"Chăm sóc & Sau khóa",items:["cskh","khaosat","ghinhan","khieunai","baoluu","ketthuc","ketqua","magioithieu"]}];
+ {g:"Lớp học & Giảng dạy",items:["xeplop","banglop","giaoan","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
+ {g:"Chăm sóc & Sau khóa",items:["khaosat","ghinhan","khieunai","baoluu","ketthuc","ketqua","magioithieu"]}];
 function navCayV5(){
  if(arcMode()==="chang")return NAVTREE;
  var out=[],xong=false;

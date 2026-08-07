@@ -270,6 +270,50 @@
 > **`update.sh` của repo demo v2 tự đối chiếu mã bản dựng và thoát lỗi nếu lệch** - bẫy 05/08
 > (đẩy hụt mà script báo "không có thay đổi" rồi im lặng) từ nay có máy canh, không dựa trí nhớ.
 >
+> ### 🟡 KHÚC 2 ĐANG LÀM DỞ - ĐỌC KỸ TRƯỚC KHI LÀM TIẾP
+> **Commit XANH cuối cùng: `97354da`** (Khúc 1 + vá CI + vá F5). Nhánh hiện đứng SAU nó một
+> commit "Khúc 2a", và commit ấy CÒN ĐỎ 3 bộ kiểm - có chủ ý, ghi rõ ở đây để đừng ai tưởng là
+> tự nhiên hỏng.
+>
+> **Khúc 2a đã làm được (đo bằng máy, không phải tự nhận):**
+> - `_tall` vẽ **55 trang** (trước 39) · `_check18` vẽ **100 trang/tab** (trước 91) ·
+>   `_checkmoi` **1479 tiêu chí** (trước 1045) · `_checklap` **1268** (trước 884).
+> - **`check_sop.py` vẫn DAT** - không rơi mất một cột DL, một trigger, một chỉ số, một màn nào.
+>   Đây là bằng chứng máy cho LUẬT CỨNG SỐ 0 trong lần thay cấu trúc này.
+> - `_checkmien` vẫn **0/0**, `_checkdata`, `check_data`, `check_logic`, `check_gs` đều DAT.
+> - 5 bảng đổi tên trong `go()` (`TSMAP`/`CSMAP`/`HTMAP`/`KMAP`/`DUYMAP`) đã rỗng; 25 nghiệp vụ
+>   là 25 trang thật; `NAVSUB` chỉ còn 4 chặng; sáu hub thành **bí danh** (`hubDich`) chứ không
+>   bị xoá - mọi link cũ, bài hướng dẫn cũ, nút cũ vẫn sống.
+> - `ROLESCOPE` được **nở một lần** từ tab sang trang (`noQuyenTheoTrang`) nên không chức danh
+>   nào mất trang; trang đáp khai bằng khoá hub cũng tự đổi sang trang nghiệp vụ thật.
+>
+> **BA LỖI THẬT bắt được trong lúc làm (không phải thước sai):**
+> 1. **`reRender` gọi vòng tới tràn ngăn xếp.** Nó chỉ hỏi `RENDER[k]`, mà trang kiểu DANH SÁCH
+>    không có mục trong `RENDER` - chúng vẽ bằng `renderList`. Trước V2 các trang ấy không bao
+>    giờ là trang đang mở nên chưa lộ. Nay hỏi đủ cả hai cách vẽ.
+> 2. **Nút "Khách mới liên hệ đến" rơi mất.** Nó vốn nằm ở đầu hub Tuyển sinh và chỉ hiện ở tab
+>    Lead; tách tab thành trang thì nút biến mất - đúng loại BỚT mà luật số 0 cấm. Nay trang danh
+>    sách khai được nút của chính nó ở `LISTCFG[key].nut`. `_checktour` là bộ bắt được (một bước
+>    hướng dẫn trỏ vào chữ trên nút ấy).
+> 3. **Một nút viết sai thứ tự class** (`btn sm green` thay vì `btn green sm`) ở hàng chờ Xác
+>    nhận thu tiền - có sẵn từ trước, chỉ lộ ra vì V2 vẽ trang đó độc lập.
+>
+> **CÒN LẠI - 3 bộ đỏ, đều là THƯỚC ĐANG HỎI CÂU CỦA BẢN CŨ, không phải app hỏng.** Với mỗi cái
+> phải hỏi *"nên xoá, hay nên ĐỔI CÂU HỎI?"* - và ở đây đều là đổi câu hỏi, vì điều cần bảo vệ
+> vẫn còn nguyên giá trị, chỉ có cấu trúc bên dưới đổi:
+> | Bộ | Câu hỏi cũ còn sót | Câu hỏi đúng của V2 |
+> |---|---|---|
+> | `_check11` | "bàn giao lead đã rời hub Khác" · "đang ở tab test thì mục test sáng" · "mỗi nghiệp vụ trong chặng sáng đúng 1 mục sidebar" (đang thấy `hoctap=[lop]`, `cskh=[khaosat]`) · "một mục sáng, là mục gần nhất có trên menu" · "tab cskh/khaosat có mục riêng" | Hỏi theo TRANG: bấm một trang nghiệp vụ thì chính nó sáng. Sáu khoá hub nay là bí danh nên đừng hỏi chúng như một mục menu |
+> | `_check14` | "bấm vào mục là mở đúng hub CSKH ở tab đó" · "đang ở tab đó thì mục trên menu sáng" | Bấm mục là mở đúng TRANG đó, và chính nó sáng |
+> | `_checkqa` | "bấm tab Đơn xin nghỉ thì menu sáng đúng mục đó" · "đổi sang tab khác thì vệt sáng nhảy theo" | Không còn tab để đổi - hỏi: đi sang trang khác thì vệt sáng nhảy theo |
+>
+> **Còn lại của Khúc 2 (nhịp 2b, 2c) chưa làm:** mỗi trang một dải thẻ riêng và dải cảnh báo
+> riêng (2b); xoá `HUBTAB`/`HUBCAU`/`hubCau`/`hubDef`/`hubTab`/`hubSubKey` và các hàm vẽ hub đã
+> thành mã chết `renderTuyensinh`/`renderHoctap`/`renderCskh`/`renderKhac`/`renderDuyet` (2c).
+> Lưu ý khi xoá: `HUBTAB` hiện đang là **bản khai "trang nào là một nghiệp vụ"** cho ba chỗ -
+> `noQuyenTheoTrang`, `hubDich`, và `_check11`. Xoá nó thì phải chuyển bản khai ấy sang một tên
+> mới đúng nghĩa hơn (kiểu `NGHIEPVU`), đừng xoá trắng.
+>
 > **Một ghi chú `_checkbam` để dành cho Khúc 3:** ngăn kéo một dòng ở trang Giảng viên mở ra
 > không có nút nào, chỉ 241 ký tự - đúng chỗ anh Luân gọi *"lỗi logic ghê"* (RB3).
 >
