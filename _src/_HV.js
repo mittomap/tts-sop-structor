@@ -7914,7 +7914,8 @@ function renderBanglop(){
     if(_bs.noteOver)_no.push({ic:"ti-writing",t:"Quá hạn ghi nhận xét - đã "+Math.round(_bs.ageH)+" giờ, hạn "+_bs.lim+" giờ",o:"Buổi quá hạn chưa nhận xét"});
     if(_bs.done&&!coDD[s.session_id])_no.push({ic:"ti-checkbox",t:"Đã dạy xong mà chưa điểm danh buổi này",o:"Buổi chưa điểm danh"});
     var _canh=_no.length;
-    h+='<button class="sespill'+(isSel?" on":"")+(_canh?" canhbao":"")+'" onclick="window.DDSESS=\''+esc(s.session_id)+'\';reRender(CUR)"'+
+    var _tk=sesThi(s);
+    h+='<button class="sespill'+(isSel?" on":"")+(_canh?" canhbao":"")+(/^(mid|final)$/.test(_tk)?(" thi "+_tk):"")+'" onclick="window.DDSESS=\''+esc(s.session_id)+'\';reRender(CUR)"'+
      (_canh?' data-tip="'+esc(_no.map(function(x){return x.t}).join(" · "))+'"':'')+'>'+
      (_canh?('<span class="swarns">'+_no.map(function(x){
        return '<span class="swarn" data-tip="'+esc(x.t+' (đang được đếm ở ô "'+x.o+'" trên đầu trang)')+'"><i class="ti '+x.ic+'"></i></span>'}).join("")+'</span>'):'')+
@@ -14234,11 +14235,15 @@ function renderHosoKhoa(){var id=window.KHID;var c=find("DL05","course_id",id);
    Thứ người dùng phải sửa được thì phải có chỗ để lưu. */
 function sesThi(s){return ecode(s&&s.session_type)}
 function sesLaThi(s){return /^(mid|final)$/.test(sesThi(s))}
-function sesThiTen(s){var k=sesThi(s);return k==="final"?"Thi cuối khóa":k==="mid"?"Thi giữa khóa":""}
+/* Tên gọi dùng ĐÚNG THUẬT NGỮ NGÀNH: Midterm Test và Final Test - anh Luân 07/08. Trung tâm
+   IELTS nói chuyện với học viên bằng đúng hai chữ này, dịch ra "thi giữa khóa / thi cuối khóa"
+   là bắt cả thầy lẫn trò dịch ngược mỗi lần đọc. Câu chú thích thì vẫn tiếng Việt, vì đó là
+   chỗ giải thích. */
+function sesThiTen(s){var k=sesThi(s);return k==="final"?"Final Test":k==="mid"?"Midterm Test":""}
 function sesThiThe(s){var k=sesThi(s);if(!/^(mid|final)$/.test(k))return "";
  return '<span class="sthi '+k+'" data-tip="'+esc(sesThiTen(s)+(k==="final"
-   ?" - điểm buổi này là điểm thi thử tại trung tâm, dùng để tính tỷ lệ đạt AIM"
-   :" - điểm giữa khóa, ghi vào hồ sơ xếp lớp của từng học viên"))+'">'+(k==="final"?"THI CUỐI":"THI GIỮA")+'</span>'}
+   ?" - bài thi cuối khóa tại trung tâm. Điểm buổi này là điểm thi thử dùng tính tỷ lệ đạt mục tiêu đầu ra."
+   :" - bài kiểm tra giữa khóa. Điểm ghi vào hồ sơ xếp lớp của từng học viên."))+'">'+(k==="final"?"FINAL TEST":"MIDTERM")+'</span>'}
 /* Cửa ghi: đổi buổi nào là buổi thi. Chặn qua CH3X `ses_thi` - Học vụ và TP ACA. */
 function sesThiForm(cid){
  if(chanAct("ses_thi"))return;
