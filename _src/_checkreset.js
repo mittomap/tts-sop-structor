@@ -20,15 +20,36 @@
  *     mang `sev` va chu "(qua han)" trong `what`. Bia ten truong thi do ra 0 va tuong app hong.
  * LUAT: hoi thang tu vung ma app dung, dung tu dat ten.
  *
- * Chay: node _checkreset.js   (khong can ITTS_OUT - doc file build o thu muc cha)
+ * Chay: ITTS_OUT=<out> node _checkreset.js
+ *
+ * BAY DA CAN (07/08, do CI bat duoc): ban dau file nay CAM CUNG hai duong dan cua DUNG MOT MAY -
+ * `/opt/pw-browsers/chromium-1194/...` va `file:///home/user/tts-sop-structor/`. Tren may do no
+ * xanh; tren may khac (CI cua GitHub, may cua anh Luan) no chet trong 0 giay ngay o dong mo
+ * trinh duyet, va bang tong ket chi in duoc phan duoi cua vet loi (`} Node.js v20...`) nen doc
+ * vao tuong la loi phien ban Node. Bay bat duoc vi CI chay tren MOT MAY KHAC - do la ca gia tri
+ * cua CI: no khong chia se gia dinh nao voi may nguoi viet.
+ * LUAT: bo kiem khong duoc cam cung duong dan cua may minh. Hoi `ITTS_OUT` cho thu muc build,
+ * va de Playwright TU TIM trinh duyet neu khong co san duong dan nao trong danh sach.
+ * (Bay ho hang voi bay "gen_v5.py ghi _src, extract_js.py doc goc repo" - cung mot goc: mot
+ *  duong dan doan mo, dung tren may nay, sai tren may kia, va sai trong im lang.)
  */
 const {chromium}=require("playwright");
-const EXE="/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
-const OUT="file:///home/user/tts-sop-structor/";
+const PATHS=["/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+             "/opt/pw-browsers/chromium/chrome-linux/chrome"];
+const FS=require("fs"), PATH=require("path");
+/* Thu muc build: theo ITTS_OUT nhu moi bo kiem khac; khong co thi lay thu muc CHA cua _src
+   (dung noi gen_v5.py ghi ra khi chay o goc repo). Doi ra URL file:// cho Playwright. */
+const OUTDIR=process.env.ITTS_OUT||PATH.resolve(__dirname,"..");
+const OUT="file://"+PATH.resolve(OUTDIR).replace(/\/*$/,"/");
 const do_=[], ok=[];
 const t=(ten,dat,chitiet)=>{ (dat?ok:do_).push(ten+(chitiet?" ("+chitiet+")":"")); };
 (async()=>{
-const b=await chromium.launch({executablePath:EXE});
+const _f=PATH.join(PATH.resolve(OUTDIR),"ITTs_WebApp_v5_demo.html");
+if(!FS.existsSync(_f)){console.log("CHECKRESET DO: khong thay "+_f+" - chay `ITTS_OUT=<out> python3 gen_v5.py` truoc da");process.exit(1)}
+const exe=PATHS.find(p=>{try{return FS.existsSync(p)}catch(e){return false}});
+let b;
+try{ b=await chromium.launch(exe?{executablePath:exe}:{}); }
+catch(e){ console.log("CHECKRESET BO QUA: khong mo duoc Chromium ("+String(e.message).slice(0,80)+")"); process.exit(0); }
 const ctx=await b.newContext({viewport:{width:1440,height:900}});
 const p=await ctx.newPage();
 const loi=[];p.on("pageerror",e=>loi.push(e.message.slice(0,120)));

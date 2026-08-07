@@ -151,6 +151,27 @@ const VO_OK = ["@bell", "@me", "@doicong", "@help", "@tyle", "@gopy", "@brand", 
            sau khi nó "đứng yên" hai lần vẫn có thể rơi vào giữa quãng trượt. Đợi thêm quá 220ms
            cho hiệu ứng chạy hết rồi mới đo. */
         await page.waitForTimeout(420);
+        /* BẪY 07/08 - CI BẮT ĐƯỢC CÁI MÀ MÁY NÀY KHÔNG THẤY. Trên máy chạy CI, hai bước của bài
+           `cn_nguong` báo "VÒNG SÁNG LỆCH" với khoảng lệch tới 3195px - tức đúng bằng một quãng
+           CUỘN, không phải một sai lệch vài chục pixel. Nghĩa là app chưa cuộn xong thì máy đã đo.
+           Vì sao phép đợi ở trên vẫn lọt: nó chỉ hỏi "vòng đã ĐỨNG YÊN chưa". Trang Cài đặt rất
+           dài, `scrollIntoView` mượt chạy lâu hơn trên máy CI, nên có một quãng vòng sáng nằm im
+           Ở CHỖ CŨ - đứng yên thật, mà là đứng yên trước khi đi.
+           Vá đúng chỗ: đợi tới khi vòng sáng THẬT SỰ TRÙNG phần tử, chứ không đợi nó hết động
+           đậy. Vẫn có mốc chặn trên 3 giây, nên một bước trỏ SAI THẬT thì hết 3 giây vẫn lệch và
+           vẫn bị bắt - phép đo không hề bị nới lỏng, chỉ thôi đua với hiệu ứng cuộn.
+           (Đây là lần thứ tư dự án cắn "ngủ một khoảng cố định là ĐUA với hiệu ứng, không phải
+            đợi nó" - ba lần trước ở `_checkui`, `_checknv` và chính bộ này.) */
+        await page.waitForFunction(([k2, i2]) => {
+          const T = window.TOURS[k2], st = T.steps[i2];
+          const sp = document.getElementById("tourspot");
+          if (!sp) return true;                                   /* không có vòng thì không có gì để đợi */
+          if (getComputedStyle(sp).display === "none") return true; /* app cố ý ẩn vòng */
+          const el = st.mo ? null : tourFind(st.sel);
+          if (!el) return true;                                   /* không tìm ra neo - N1 lo việc đó */
+          const a = el.getBoundingClientRect(), s = sp.getBoundingClientRect();
+          return Math.abs(s.x - a.x) <= 24 && Math.abs(s.y - a.y) <= 24;
+        }, [k, i], {timeout: 3000, polling: 120}).catch(() => {});
         luot++;
 
         const r = await page.evaluate(([k, i]) => {

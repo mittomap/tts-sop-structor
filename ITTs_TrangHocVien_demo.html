@@ -1734,7 +1734,12 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .pfb.g.on{background:var(--green);border-color:var(--green);color:#fff}
 .pfb.av.on{background:#6B7887;border-color:#6B7887;color:#fff}
 .pfb.w.on{background:var(--red);border-color:var(--red);color:#fff}
-.ddnote{width:170px;height:28px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:11.5px}
+/* V2 (07/08, do CI bat duoc): o nay tung khai `width:170px` cung ngac - tru 16px dem va 2px vien
+   thi con 152px cho chu, ma chinh cau goi y trong o ("Ghi chu rieng hoc vien nay") can 159px.
+   Tren may nay do vua khit nen xanh; tren may CI (font khac mot chut) hut 7px va bi cat.
+   Sai o cho DAT SO CHET trong khi hang chua no con thua hon 900px. Nay o TU GIAN theo cho trong,
+   co san 190px la du cho cau goi y, va van co tran de no khong nuot ca hang khi ghi chu dai. */
+.ddnote{flex:1 1 190px;min-width:190px;max-width:420px;height:28px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:11.5px}
 .sesbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:14px}
 .sesi{display:flex;align-items:center;gap:8px;font-size:12px}
 .sesi i{font-size:17px;color:var(--navy)}
