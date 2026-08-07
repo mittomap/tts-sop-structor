@@ -27,10 +27,15 @@ import sys
 SD = os.path.dirname(os.path.abspath(__file__))
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("ITTS_OUT") or SD
 
-# _APP6.js la than cua BAN V6. Truoc day khong trich no, nen 20/21 bo kiem chi soi ban v5 -
-# ban v6 duoc giao ma chua bo kiem nao chay qua. Anh Luan 01/08: "van de la e build v6 da chuan
-# chua ay, chu bat a lam thu trong khi thiet ke luong te hoac loi tum lum thi...".
-# Ban V6 da go han 06/08 (anh Luan: "bo v6, ko duoc lam anh huong v5") - khong con file de trich.
+# CHI CON HAI BAN BUILD. Ban V6 da go han 06/08 (anh Luan: "bo v6, ko duoc lam anh huong v5"),
+# nguon khong con xuat ITTs_WebApp_v6_demo.html nen khong con _APP6.js de trich.
+# GIU LAI BAI HOC vi no van dung cho moi ban build ve sau: hoi 01/08 ban V6 duoc giao trong khi
+# 20/21 bo kiem chi soi ban v5 - vi khong ai trich than cua no ra. Anh Luan 01/08: "van de la e
+# build v6 da chuan chua ay, chu bat a lam thu trong khi thiet ke luong te hoac loi tum lum
+# thi...". Nen: them mot ban build moi thi phai them no vao CAP nay TRUOC, khong thi ca bo kiem
+# lang le do mot ban khac voi ban dem giao.
+# (Ban V2 khong roi vao bay do: no la mot NHANH GIT rieng - mot nguon, mot the gioi, mot ban
+#  build. Xem BAN_GIAO_V2.md muc RB4.)
 CAP = [("ITTs_WebApp_v5_demo.html", "_APP.js"),
        ("ITTs_TrangHocVien_demo.html", "_HV.js")]
 

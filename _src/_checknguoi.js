@@ -22,7 +22,7 @@
        hai người khác chi nhánh vẫn nhìn thấy y hệt nhau thì phân quyền chỉ là trang trí.
     8. TRỢ LÝ CÓ NHỊP NGÀY CHO HỌ KHÔNG, VÀ CÓ BÀI HƯỚNG DẪN CHO NHÓM CỦA HỌ KHÔNG.
 
-   Chạy: ITTS_APP=./_APP.js node _checknguoi.js   (hoặc _APP6.js cho bản v6) */
+   Chạy: ITTS_APP=./_APP.js node _checknguoi.js */
 
 const APP = process.env.ITTS_APP || "./_APP.js";
 const FS = require("fs");

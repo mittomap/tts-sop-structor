@@ -22,7 +22,7 @@
     6. VIỆC KHÔNG AI SỜ TỚI ĐƯỢC TỪ BÀN LÀM VIỆC. Việc app biết (bảng việc / trigger) mà không
        nổi lên trên hồ sơ nào ở Bàn làm việc - biết mà không tới được cũng là ngõ cụt.
 
-   Chạy: ITTS_APP=./_APP.js node _checkngay.js   (hoặc _APP6.js cho bản v6) */
+   Chạy: ITTS_APP=./_APP.js node _checkngay.js */
 
 const APP = process.env.ITTS_APP || "./_APP.js";
 
