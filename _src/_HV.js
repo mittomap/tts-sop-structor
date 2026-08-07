@@ -7840,12 +7840,21 @@ function renderBanglop(){
    /* đảm bảo có buổi đang chọn */
    if(!ses.some(function(s){return s.session_id===window.DDSESS}))window.DDSESS=ses[0].session_id;
    /* dải THẺ BUỔI: gọn, chấm màu theo trạng thái, dấu ✓ khi đã ghi nhận xét */
-   h+='<div class="panel"><div class="ph"><b>Chọn buổi để điểm danh</b><span class="mut" style="font-size:11.5px">'+ses.length+' buổi · chấm màu = trạng thái, ✓ = đã ghi nhận xét</span></div><div class="pbody"><div class="sesstrip">';
+   h+='<div class="panel"><div class="ph"><b>Chọn buổi để điểm danh</b><span class="mut" style="font-size:11.5px">'+ses.length+' buổi · chấm màu = trạng thái · ✓ xanh = đã ghi nhận xét · ! đỏ = buổi còn nợ việc (rê chuột để biết nợ gì)</span></div><div class="pbody"><div class="sesstrip">';
    ses.forEach(function(s){var st=ecode(s.session_status);
     var col=st==="completed"?"var(--green)":st==="in_progress"?"var(--amber)":st==="cancelled"?"var(--red)":"#B9C6D6";
     var noteDone=yesv(s.has_teacher_note)||!!String(s.teacher_note_summary||"").trim();
     var isSel=(window.DDSESS===s.session_id);
-    h+='<button class="sespill'+(isSel?" on":"")+'" onclick="window.DDSESS=\''+esc(s.session_id)+'\';reRender(CUR)">'+
+    /* Đọc CHÍNH những luật mà mấy ô đếm phía trên đang dùng - `bhState().noteOver` (ngưỡng CH2
+       slaTeacherNote_hours) và `coDD` (đã dạy mà chưa có dòng điểm danh nào). Tính lại bằng một
+       công thức riêng ở đây là mở đường cho ô đếm và viên buổi nói hai con số khác nhau. */
+    var _bs=bhState(s), _no=[];
+    if(_bs.noteOver)_no.push("Quá hạn ghi nhận xét - đã "+Math.round(_bs.ageH)+" giờ, hạn "+_bs.lim+" giờ");
+    if(_bs.done&&!coDD[s.session_id])_no.push("Đã dạy xong mà chưa điểm danh buổi này");
+    var _canh=_no.length;
+    h+='<button class="sespill'+(isSel?" on":"")+(_canh?" canhbao":"")+'" onclick="window.DDSESS=\''+esc(s.session_id)+'\';reRender(CUR)"'+
+     (_canh?' data-tip="'+esc(_no.join(" · "))+'"':'')+'>'+
+     (_canh?'<span class="swarn">'+(_canh>1?String(_canh):'!')+'</span>':'')+
      '<span class="sdot" style="background:'+col+'"></span>'+
      '<b>Buổi '+esc(s.session_number)+'</b><small>'+esc(String(s.session_date||"").slice(0,5)||"—")+'</small>'+
      (noteDone?'<span class="snote"><i class="ti ti-check"></i></span>':'')+'</button>'});
