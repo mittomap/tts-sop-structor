@@ -362,6 +362,14 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .task .na{font-size:12px;margin-top:7px;background:#FAFBFD;border:1px dashed #D5DEE8;border-radius:6px;padding:6px 9px;color:#3A4756}
 .task .ac{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
 .chip{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;display:inline-block}
+/* THẺ LOẠI LỚP (anh Luân 06/08). `.chip` trần KHÔNG có nền - nền nằm ở các lớp phụ red/amber/
+   green/gray. Lượt đầu em viết `class="chip"` cho lớp nhóm nên nó ra chữ trơn, nhìn như lỗi
+   chứ không như một cái thẻ. Nay khai riêng: gọn hơn chip thường (đứng trước tên nên không
+   được lấn chỗ của tên), và luôn nằm cùng dòng với tên. */
+.lopthe{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;
+ display:inline-block;vertical-align:middle;margin-right:6px;letter-spacing:.2px}
+.lopthe.mot{background:var(--amberb);color:#854F0B}
+.lopthe.nhom{background:var(--gray);color:#5A6675}
 .chip.red{background:var(--redb);color:#A32D2D}.chip.amber{background:var(--amberb);color:#854F0B}.chip.green{background:var(--greenb);color:#1E6A47}.chip.gray{background:var(--gray);color:#5A6675}.chip.blue{background:var(--blueb);color:#185FA5}
 .alert{display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid var(--line)}.alert:last-child{border-bottom:0}
 .alert .ab{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
@@ -3394,7 +3402,32 @@ function calcCol(k,r,sheet){
   if(k==="__vang")return A.abs||0;
   if(k==="__thieubai")return A.miss||0;}
  return 0}
+/* ═══ LỚP 1-1 HAY LỚP NHÓM ═══════════════════════════════════════════════════════════════
+   Anh Luân chốt 06/08 (TP ACA hỏi qua điện thoại): *"suy ra từ sĩ số để đặt tên thôi em, hiện
+   chỉ có 2 loại thôi: 1-1 hoặc nhóm, nên lớp mà có sĩ số max 1 người thì nó là 1-1"*.
+   Nên KHÔNG có cột nào tên là "loại lớp" - SỨC CHỨA chính là định nghĩa. Đặt thành hàm dùng
+   chung để mọi nơi hỏi cùng một câu: đếm số, lọc, vẽ thẻ, chia báo cáo đều gọi vào đây. Viết
+   lại phép so sánh ở từng chỗ là sớm muộn cũng có một chỗ hiểu khác đi.
+   Lớp thiếu sức chứa thì coi là lớp nhóm - đó là mặc định của trung tâm, và đoán "1-1" cho một
+   lớp không khai gì là đoán sai về phía nguy hiểm hơn (số liệu 1-1 phồng lên vô cớ). */
+function lopLa11(c){var n=parseInt(String((c&&c.class_capacity)||""),10);return n===1||n===0&&false}
+function lopLoai(c){return lopLa11(c)?"1-1":"nhóm"}
+/* Thẻ đứng TRƯỚC tên lớp (anh Luân 06/08: *"em thêm mấy cái thẻ trước tên lớp cho đẹp nha,
+   thẻ 1-1 và thẻ nhóm ấy"*). Lớp 1-1 dùng màu nhấn vì nó là sản phẩm khác hẳn về chi phí và
+   cách vận hành; lớp nhóm để màu chữ thường cho khỏi rối - phần lớn lớp là lớp nhóm, tô đậm
+   hết thì không còn gì nổi lên nữa. */
+function lopThe(c){
+ if(!c)return "";
+ var l11=lopLa11(c);
+ return '<span class="lopthe '+(l11?"mot":"nhom")+'" data-tip="'+
+  (l11?"Lớp kèm riêng - sĩ số tối đa 1 học viên":"Lớp nhóm - sĩ số tối đa "+esc(String(c.class_capacity||"?"))+" học viên")+
+  '">'+(l11?"1-1":"Nhóm")+'</span>'}
+/* Tên lớp có thẻ đứng trước - dùng ở mọi chỗ in tên lớp ra cho người đọc. */
+function lopTen(c){if(!c)return "";return lopThe(c)+esc(c.class_name||c.class_id||"")}
 function cell(r,col,sheet){var k=col[0],ty=col[2],v=r[k];
+ /* Cột tên lớp: gắn thẻ 1-1 / Nhóm ngay trước tên. Đặt ở ĐÂY (bộ vẽ ô dùng chung) nên mọi bảng
+    có cột `class_name` đều được, không phải đi sửa từng bảng. */
+ if(k==="class_name"&&sheet==="DL10")return lopThe(r)+esc(v==null?"":String(v));
  /* V9.22: tang CHE TRUONG - thay dong nhung che o nhay cam (tien / SDT / noi dung tu van) */
  if(dsMaskField(k))return '<span class="mut" title="Truong nay bi an theo phan quyen cua chuc danh ban">&#8226;&#8226;&#8226;</span>';
  if(ty==="enum")return esc(elabel(v))||"<span class=mut>-</span>";
@@ -3816,7 +3849,13 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
   cols.forEach(function(c){
     if(!cfg.ro&&cfg.filt&&c[0]===cfg.filt&&ENUMMAP[cfg.filt]&&ENUM[ENUMMAP[cfg.filt]]){h+='<td>'+qsel(key,id,cfg.filt,r[c[0]])+'</td>';return}
     var lk=(c[2]==="chip"||c[2]==="enum"||c[2]==="money"||c[2]==="na"||c[2]==="calcso"||c[2]==="lau")?null:cellLnk(r,c,cfg);
-    if(lk){h+='<td>'+lk+'</td>';return}
+    /* THẺ 1-1 / NHÓM ĐỨNG TRƯỚC TÊN LỚP (anh Luân 06/08). Gắn ở ĐÂY chứ không ở trong `cell()`:
+       cột tên lớp không khai kiểu nên nó được bọc thành LIÊN KẾT ở dòng trên và `return` ngay,
+       không bao giờ chạy tới `cell()`. Đặt nhầm chỗ thì thẻ không hiện mà cũng không báo lỗi -
+       đã cắn một lượt. Gắn sau khi tính `lk` nên cả hai nhánh (có link / không link) đều có thẻ. */
+    var _the=(c[0]==="class_name"&&cfg.code==="DL10")?lopThe(r):"";
+    if(lk){h+='<td>'+_the+lk+'</td>';return}
+    if(_the){h+='<td>'+_the+cell(r,c,cfg.code)+'</td>';return}
     h+='<td'+(c[2]==="money"?' style="text-align:right;font-variant-numeric:tabular-nums"':'')+'>'+cell(r,c,cfg.code)+'</td>'});
   if(coTT)h+='<td><div class="rowact">'+rowSlaBtn(r,pk)+(cfg.ro?'':'<button class="btn sm" onclick="openEdit(\''+key+'\',\''+id+'\')"><i class="ti ti-edit"></i>Sửa</button>')+
    act.map(function(a){return '<button class="btn sm" onclick="'+a.fn+'(\''+esc(String(r[a.arg]||""))+'\')"><i class="ti '+a.ic+'"></i>'+a.lb+'</button>'}).join("")+'</div></td>';
@@ -4658,7 +4697,7 @@ function openLopQuick(cid){var c=find("DL10","class_id",cid);if(!c){toast("Khôn
  h+='<button class="btn" onclick="closeModal();clsTeacherForm(\''+esc(cid)+'\')"><i class="ti ti-user-cog"></i>Đổi giáo viên chính</button>';
  if(risk.length)h+='<button class="btn" onclick="closeModal();goRisk()"><i class="ti ti-user-exclamation"></i>Xem HV nguy cơ</button>';
  h+='</div>';
- openDrawer(cid+" · "+(c.class_name||""),h)}
+ openDrawer(cid+" · "+lopLoai(c)+" · "+(c.class_name||""),h)}
 /* ===== V9.29c (anh Luân): BẤM TÊN = XEM NHANH, KHÔNG NHẢY TRANG =====
    "a bấm vào học viên, tự nhiên nảy trang khác, nó nhảm lắm" - bấm tên phải mở drawer trước,
    trong drawer mới có nút Hồ sơ đầy đủ. Luật này áp cho CẢ 4 loại tên: học viên, lớp,
@@ -5607,7 +5646,7 @@ function slaItems(){var out=jTasks();
    if(left<0||left>win)return;
    var si=num(c.current_enrollment),cap=num(c.class_capacity);
    var thieuGV=!String(c.main_teacher_id||"").trim();
-   var nhan=(c.class_name||c.class_id)+(clsOnline(c)?" (online)":(c.branch?" · "+(elabel(c.branch)||c.branch):""));
+   var nhan=(c.class_name||c.class_id)+" · "+lopLoai(c)+(clsOnline(c)?" (online)":(c.branch?" · "+(elabel(c.branch)||c.branch):""));
    if(minS>0&&si<minS){
     var red=left<=dec;
     add("Học vụ","Lớp sắp khai giảng thiếu sĩ số",red?"red":"amber","ti-calendar-exclamation",nhan,
@@ -6622,7 +6661,7 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
  }else{
   h+='<div class="fbar">';
   if(!embed){h+='<label style="font-size:12px;font-weight:700;color:#5A6675">Lớp</label><select class="sel" onchange="DDCLASS=this.value;DDSESS=null;reRender(CUR)">'+
-   cls.map(function(c){return '<option value="'+c.class_id+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id)+' - '+esc(c.class_name)+'</option>'}).join("")+'</select>'}
+   cls.map(function(c){return '<option value="'+c.class_id+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id)+' - ['+lopLoai(c)+'] '+esc(c.class_name)+'</option>'}).join("")+'</select>'}
   h+='<label style="font-size:12px;font-weight:700;color:#5A6675'+(embed?'':';margin-left:8px')+'">Buổi</label><select class="sel" id="ddSess" onchange="DDSESS=this.value;reRender(CUR)">';
   sessList.forEach(function(x){var has=rows("DL12").some(function(r){return r.session_id===x.id});h+='<option value="'+esc(x.id)+'"'+(x.id===sess?" selected":"")+'>'+esc(x.label)+(has?" ✓":"")+'</option>'});
   h+='</select></div>';
@@ -9713,9 +9752,9 @@ function renderBanglop(){
  var cls=srows("DL10"),cid=window.BLCLASS||(cls[0]&&cls[0].class_id),lop=find("DL10","class_id",cid)||{};
  window.BLCLASS=cid;
  var tab=window.BLTAB||"buoi";
- var h='<div class="phead" data-tour="phead"><div><div class="t">Vận hành lớp · '+esc(lop.class_name||cid)+'</div><div class="s">Buổi học · điểm danh · nhận xét · giao & chấm bài tập — tất cả cho lớp này ở một chỗ</div></div>'+
+ var h='<div class="phead" data-tour="phead"><div><div class="t">Vận hành lớp · '+lopThe(lop)+esc(lop.class_name||cid)+'</div><div class="s">Buổi học · điểm danh · nhận xét · giao & chấm bài tập — tất cả cho lớp này ở một chỗ</div></div>'+
  '<div class="sp"><select class="sel" onchange="window.BLCLASS=this.value;window.DDSESS=null;window.BTSESS=null;reRender(CUR)">';
- cls.forEach(function(c){h+='<option value="'+c.class_id+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id)+' - '+esc(c.class_name)+'</option>'});
+ cls.forEach(function(c){h+='<option value="'+c.class_id+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id)+' - ['+lopLoai(c)+'] '+esc(c.class_name)+'</option>'});
  h+='</select></div></div>';
  /* ---- KPI riêng của lớp ---- */
  (function(){
@@ -15853,7 +15892,9 @@ function renderHtLop(embed){var fil=window.HTLOPQ||"all";
   function pchip(v,t,tu,mau,dvi){if(v==null)return '<span class="mut" data-tip="Chưa có '+esc(dvi||"dữ liệu")+' nào nên chưa tính được">—</span>';
    var p=Math.round(v*100)+"%";
    return '<span class="chip '+(v>=t?"green":"red")+'" data-tip="'+esc(pctG(tu,mau,dvi)+" · ngưỡng đạt "+Math.round(t*100)+"% (Cài đặt > CH6)")+'">'+p+'</span>'}
-  h+='<tr><td><a class="lnk" onclick="openLopQuick(\''+esc(c.class_id)+'\')"><b>'+esc(c.class_name||c.class_id)+'</b></a><div class="mut" style="font-size:10.5px">'+esc(c.class_id)+'</div></td>'+
+  /* Thẻ 1-1 / Nhóm đứng trước tên lớp - bảng này là bảng RIÊNG của hub Học tập, không đi qua
+     bộ vẽ ô của danh sách DL10, nên phải gắn ở đây nữa. Đây đúng là bảng anh Luân nhìn hằng ngày. */
+  h+='<tr><td>'+lopThe(c)+'<a class="lnk" onclick="openLopQuick(\''+esc(c.class_id)+'\')"><b>'+esc(c.class_name||c.class_id)+'</b></a><div class="mut" style="font-size:10.5px">'+esc(c.class_id)+'</div></td>'+
    '<td>'+esc(c.main_teacher_id?((find("DL01","staff_id",c.main_teacher_id)||{}).full_name||c.main_teacher_id):"chưa gán")+'</td>'+
    '<td>'+m.si+'/'+esc(c.class_capacity||"?")+'</td>'+
    '<td>'+pchip(m.atr,m.atrT,m.attCo,m.attTong,"lượt điểm danh có mặt")+'</td><td>'+pchip(m.hcr,m.hcrT,m.hwNop,m.hwTong,"bài đã nộp")+'</td>'+
