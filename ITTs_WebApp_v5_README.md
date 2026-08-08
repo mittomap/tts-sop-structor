@@ -2,6 +2,52 @@
 
 > `ITTs_WebApp_v5_demo.html` là bản app: mở bằng trình duyệt, mọi thao tác ghi thật vào bộ nhớ trình duyệt. **Lớp Google Sheets đã cho nghỉ hưu 30/07** - không còn bản `.gs` nào, mọi cấu hình nằm trong màn Cài đặt của chính app. Khi anh Luân chốt nền tảng backend, 66 chỗ ghi trong app đã có sẵn đường nối ra máy chủ (xem khối ghi chú tại `var SVR=` trong `gen_v5.py`).
 
+## ⭐ V2 (08/08/2026) — mở app ra là thấy VIỆC CỦA HÔM NAY
+
+> Anh Luân: *"Hệ thống lớn, nhưng quá khó dùng thì chết ngay. Như v1, a ko chắc nhân viên sale
+> có hiểu hành trình và cách app trình bày ko đó."*
+
+Đo bằng bảng `NHIP` mà chính app khai (mỗi chức danh mỗi ngày hỏi gì): **15 chức danh, 74 câu
+hỏi, không ai cần quá 5 trang** để làm hết việc trong ngày. Báo cáo đầy đủ:
+`PHAN_TICH_CAU_HOI_08_08.md`.
+
+**Quyết định:** giữ đủ 25 trang nghiệp vụ, nhưng bớt **số trang một người phải nhìn**.
+
+| | Trước | Sau |
+|---|---|---|
+| Mở app ra thấy ngay việc hôm nay | **0/16 chức danh** | **16/16** |
+| Mục menu của Giám đốc | 60 | **44** |
+| Câu hỏi bấm một cái ra đúng danh sách | 12/74 | **63/70** |
+| Câu hỏi không tới được trang | 19 | **0** |
+| Câu hỏi trỏ vào trang bị chặn | 6 | **0** |
+
+**Bốn thay đổi người dùng thấy được:**
+
+1. **Nhịp ngày ở ngay trang bạn đáp xuống.** Mở app là 3-5 dòng "hôm nay làm gì", theo buổi
+   (đầu ngày · trong ngày · cuối ngày), mỗi dòng một con số thật và một câu *vì sao phải làm*.
+   **Bấm một dòng là tới trang đích với danh sách đã lọc sẵn đúng câu hỏi ấy** — không phải mở
+   trang rồi tự dò trong vài trăm dòng.
+2. **Số trên nhịp bằng số trên trang.** Trước đây nhịp đếm toàn trung tâm còn trang đếm theo
+   phạm vi người dùng: Trưởng phòng Marketing đọc *"57 việc quá hạn"*, mở trang ra thấy 7.
+3. **Trưởng phòng Tư vấn / Marketing / Học vụ có nhịp của phòng mình** — trước đây cả ba đọc
+   đúng năm dòng của Giám đốc, không một dòng nào về phòng họ.
+4. **Trang Tra cứu & sổ sách** gom 16 cuốn sổ chỉ-đọc sau một cửa, có ô tìm, mỗi thẻ nói sổ đó
+   đang có bao nhiêu dòng. Không sổ nào bị xoá; số cú bấm để tới một cuốn sổ **không tăng**.
+
+**Hai trang từng bị giấu, nay mở ra đúng người:**
+- **Giao & chấm Bài tập** — giáo viên và Trưởng phòng ACA. App vẫn giục *"12 bài chờ chấm"* mà
+  họ không có cửa nào vào. Thêm chế độ **"Chờ chấm - mọi lớp"**: gom bài chưa chấm của mọi lớp
+  vào một bảng, mỗi dòng một nút nhảy thẳng vào chấm.
+- **Duyệt chiết khấu** — Trưởng phòng Tư vấn. SOP giao họ duyệt, nhịp ngày nhắc họ, mà trang bị
+  chặn ở cửa.
+
+**Chip lọc mới:** Buổi WOW hôm nay · HV không đến chưa hỏi · Chờ ghi nhận xét (6 chip trang Buổi
+học trước đây **không có một con số nào**) · Chờ xếp lớp · Chờ chấm mọi lớp · Lead về trong 24h ·
+Lead không đạt chuẩn · Nguy cơ học thuật · Hồ sơ nhân sự còn thiếu · 3 chip trang Chăm lại khách cũ.
+
+Canh bằng máy: **`_src/_checkcauhoi.js`** — mỗi câu hỏi trong nhịp phải tới được trang, người đó
+phải được xem, và **số trên nhịp phải bằng số trên chip**. Lệch một con là đỏ.
+
 ## Triết lý V5: người dùng là trung tâm, đi theo luồng — không phải tra bảng
 
 Nhân viên mở **Chạy quy trình** → chọn một khách/học viên (hoặc hàng đợi) → app **dắt qua từng màn theo đúng chặng người đó đang đứng**. Mỗi màn chỉ hỏi vài ô cần cho bước đó, và bày sẵn mọi thông tin cần biết.
