@@ -18027,8 +18027,13 @@ var TOURS={
      đúng luật đã chốt: mỗi lần đổi app phải soát lại tour và Trợ lý. */
   {p:"ychv",sel:'@man',t:"Học viên nhắn gì cho trung tâm",d:"Học viên gửi yêu cầu từ Cổng học viên - xin nghỉ, xin học bù, hỏi lịch, báo đã chuyển khoản. Hệ thống tự chuyển tới bạn kèm hạn nhận việc; yêu cầu về tiền thì sang kế toán.",hint:"Bấm Nhận việc ở một thẻ rồi trả lời ngay trong thẻ đó."},
   {p:"xeplop",sel:'@txt:Xếp vào lớp',t:"Xếp lớp cho học viên mới",d:"Học viên đóng tiền xong về đây. Chọn lớp phù hợp trình độ và lịch học, gửi thông tin lớp, chờ học viên xác nhận rồi hoàn tất nhập học.",hint:"Bấm Xếp lớp trên một học viên đang chờ, chọn lớp rồi Lưu.",chk:function(){return tourMore("ob")}},
-  {p:"lop",sel:'@man',t:"Bức tranh dạy và học",d:"Tab Hôm nay là việc của giáo viên trong ngày, tab Lớp học là sức khỏe từng lớp, tab Lịch tuần là toàn bộ lịch dạy.",hint:"Bấm sang tab Lớp học."},
-  {p:"banglop",sel:'@txt:Vận hành',t:"Vận hành một lớp",d:"Điểm danh, giao bài, ghi nhận xét buổi, nhập điểm giữa khóa - tất cả trong một màn hình của lớp đó.",hint:"Chọn một lớp, mở tab Điểm danh, đánh dấu vài học viên rồi bấm Lưu buổi học.",chk:function(){return tourMore("dd")}},
+  /* V2 - LỜI HƯỚNG DẪN PHẢI ĐỔI THEO ĐƯỜNG ĐI. Hai bước này viết cho bản có hub: bước đầu kể tên
+     ba TAB ("Tab Hôm nay... tab Lớp học... tab Lịch tuần") mà V2 không còn tab nào - chúng là ba
+     TRANG riêng trên sidebar; bước sau neo vào chữ "Vận hành" của mục menu cũ, mà mục ấy đã rời
+     khỏi menu để thành trang con.
+     Luật đã ghi ở `_checkngay` (V9.83): *các bước chạy được không có nghĩa là lời nói còn đúng.* */
+  {p:"lop",sel:'@man',t:"Bức tranh dạy và học",d:"Mỗi việc một trang riêng trên sidebar: Buổi hôm nay là việc của giáo viên trong ngày, Lớp học là sức khỏe từng lớp, Lịch tuần là toàn bộ lịch dạy.",hint:"Bấm một lớp để xem nhanh, rồi bấm Vận hành lớp trong ngăn kéo."},
+  {p:"banglop",sel:'@man',t:"Vận hành một lớp",d:"Điểm danh, giao bài, ghi nhận xét buổi, nhập điểm giữa khóa - tất cả trong một màn hình của lớp đó. Vào đây bằng cách bấm một lớp ở trang Lớp học.",hint:"Mở tab Điểm danh, đánh dấu vài học viên rồi bấm Lưu buổi học.",chk:function(){return tourMore("dd")}},
   {p:"buoihoc",sel:'@txt:Chờ ghi nhận xét',t:"Nhắc giáo viên ghi nhận xét",d:"Buổi dạy xong mà quá hạn chưa có nhận xét sẽ hiện đỏ ở đây. Đây là việc học vụ phải đốc thúc hằng tuần.",hint:"Bấm chip 'Chờ ghi nhận xét' để lọc, rồi ghi nhận xét cho một buổi trong danh sách.",chk:function(){return (window.TOURB&&rows("DL11").filter(function(x){return bhState(x).note}).length>(window.TOURB.nx||0))}},
   {p:"hocvien",sel:'@txt:Nguy cơ',t:"Học viên nguy cơ",d:"Lọc nhanh những học viên vắng nhiều hoặc tiến bộ chậm để gọi hỏi thăm trước khi phụ huynh phàn nàn.",hint:"Bấm chip lọc 'Nguy cơ', mở một học viên rồi ghi lần chăm."},
   {p:"khaosat",sel:'@man',t:"Khảo sát và phản hồi",d:"Gửi khảo sát định kỳ theo lớp, tiếp nhận góp ý, xử lý khiếu nại. Điểm hài lòng thấp sẽ tự bật việc follow-up.",hint:"Xem tab Khảo sát."},
