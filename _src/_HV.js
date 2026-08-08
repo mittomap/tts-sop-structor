@@ -7037,6 +7037,12 @@ function renderBanlam(){
    (apChip?('<span class="bwdot">·</span>'+apChip):'')+'</div></div>'+
   '<div class="bwr"><div class="bwsearch"><i class="ti ti-search"></i><input placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.CHAYSRCH||"")+'" oninput="chaySrch(this.value)" autocomplete="off"><div class="pkres" id="bwac" style="position:absolute;top:100%;left:0;right:0;z-index:30;background:#fff;color:var(--text);text-align:left;border-radius:0 0 10px 10px;box-shadow:0 8px 24px rgba(0,0,0,.18)"></div></div>'+
   '<span class="bwsrchhint" id="bwsrchhint"></span></div></div>'; /* V9.18b: hint phải nằm NGOÀI hộp tìm - nằm trong là chữ trắng trên nền trắng + bóp placeholder (Luân bắt lỗi) */
+ /* V2 KHÚC 5 - DẢI CẢNH BÁO ĐẶT NGAY DƯỚI Ô CHÀO, TRÊN MỌI THỨ KHÁC.
+    Anh Luân: *"bàn làm việc em đổi thành: các chỉ số số cảnh báo đi, nó tổng hợp những thứ bất
+    thường ở các trang nghiệp vụ để cảnh báo, các nhân sự sẽ tự biết mình cần làm gì."*
+    Đặt ở đây chứ không đặt cuối trang: thứ người ta cần biết trước nhất phải nằm chỗ mắt chạm
+    đầu tiên. Mỗi ô bấm được, đi thẳng tới trang nghiệp vụ đẻ ra con số ấy. */
+ h+=canhBaoHTML();
  function cS(k){return all0.filter(function(J){return J.k===k&&J.act}).length}
  var nRisk=srows("DL09").filter(stuRisk).length;
  var nDebt=srows("DL06").filter(function(e){return num(e.remaining_amount)>0&&!/cancel/.test(ecode(e.enrollment_status))}).length;
@@ -14181,8 +14187,23 @@ function bamDiDau(act){var m=String(act||"").match(/go(?:HT|Arc)?\('([a-z0-9_]+)
    mang mã cố định, chú thích lấy từ cấu hình, và dải có nút "Thẻ (n/N)" để ẩn/hiện.
    Không mã = dải bảng việc theo chức danh (bvStrip) - đó là HÀNG CHỜ VIỆC, mỗi ô là một danh
    sách phải mở ra làm, không có bộ lọc nào bên dưới thay được. Chỗ đó vẫn bấm. */
+/* ═══ V2 KHÚC 5 - SỔ GHI SỐ THẬT CỦA TỪNG THẺ ══════════════════════════════════════════════
+   Anh Luân tả trang đáp của V2: *"bàn làm việc em đổi thành: các chỉ số số cảnh báo đi, nó tổng
+   hợp những thứ bất thường ở các trang nghiệp vụ để cảnh báo, các nhân sự sẽ tự biết mình cần
+   làm gì."*
+   RB2 - RÀNG BUỘC CỨNG CỦA VIỆC NÀY: trang đáp phải **hỏi chính trang nghiệp vụ** cho con số,
+   TUYỆT ĐỐI không được tự viết lại công thức. Vì sao gắt thế: anh Luân bắt HAI LẦN TRONG HAI
+   NGÀY cùng một bệnh - *"2 buổi quá hạn chưa nhận xét, nhưng a nhìn xuống buổi, a ko thấy icon
+   nên a ko biết chỗ nào"* và *"báo 2 học viên nguy cơ mà a chẳng thấy đâu"*. Gốc: cái thẻ và
+   cái bảng hỏi HAI HÀM KHÁC NHAU cho cùng một câu hỏi. Con số không sai - cái sai là NÓ KHÔNG
+   DẪN TỚI ĐÂU. Nếu trang đáp tự tính lại thì bệnh ấy nhân lên 23 lần.
+   Cách chặn từ gốc: mỗi lần một trang vẽ dải thẻ của nó, `statStrip` GHI LẠI luôn con số thật
+   vào `THESO`. Dải cảnh báo chỉ ĐỌC sổ này - nó không có cơ hội tính sai, vì nó không tính. */
+var THESO={};
 function statStrip(items,key,ids){
  var D=key?THEDEF[key]:null;
+ if(key){try{THESO[key]=(items||[]).map(function(t,i){
+   return {ma:((ids&&ids[i])||((D&&D.the[i])||[])[0]||""),so:t[1],nhan:t[2],mau:t[3],phu:t[4]||""}})}catch(e){}}
  if(D){
   var parts=items.map(function(t,i){
    /* ids: dải nào cắt bớt thẻ theo chức danh thì phải nói THẲNG mã của từng thẻ còn lại - đếm
@@ -19346,6 +19367,67 @@ RENDER.duyetthu  = function(){var L=duyPayList();
    không mời" (luật đã ghi ở `navVis`).
    `giangvien` là ngoại lệ: chính nó vẫn là một trang thật (danh sách giảng viên), chỉ có tab
    Bảng công tách ra thành trang riêng. Nên nó KHÔNG nằm trong bảng bí danh. */
+/* ═══ V2 KHÚC 5 - DẢI CẢNH BÁO: TỔNG HỢP BẤT THƯỜNG TỪ CÁC TRANG NGHIỆP VỤ ═════════════════
+   Anh Luân: *"nó tổng hợp những thứ bất thường ở các trang nghiệp vụ để cảnh báo, các nhân sự
+   sẽ tự biết mình cần làm gì."*
+
+   CÁCH LÀM - và đây là chỗ RB2 được thoả bằng CẤU TRÚC chứ không bằng lời hứa:
+   `canhBaoQuet()` VẼ THẬT từng trang nghiệp vụ (đo được: 23 trang hết 80ms - rẻ), việc vẽ ấy làm
+   `statStrip` tự ghi số thật vào `THESO`, rồi dải cảnh báo chỉ ĐỌC sổ đó. Nó không có cơ hội
+   tính sai vì nó không tính gì cả.
+
+   THẾ NÀO LÀ "BẤT THƯỜNG" - không phải khai thêm một bảng thứ hai: mỗi thẻ ĐÃ TỰ KHAI MÀU của
+   nó khi trang vẽ ra. Đỏ là việc gấp, vàng là sắp tới hạn, xám là số để biết. Nên luật gọn:
+   **thẻ đỏ hoặc vàng, có số khác 0** = một cảnh báo. Đổi màu một thẻ ở trang nghiệp vụ thì dải
+   cảnh báo đổi theo ngay, không phải nhớ sửa hai chỗ.
+
+   VÀ MỖI CẢNH BÁO PHẢI DẪN TỚI ĐÂU ĐƯỢC. Đây là vế anh Luân bắt hai lần: con số đúng mà không
+   bấm tới được thì vô dụng. Mỗi ô cảnh báo bấm được, đi thẳng tới trang nghiệp vụ đẻ ra nó, và
+   mang theo đúng câu chú thích của thẻ (`theTip`) để người đọc biết con số ấy đếm cái gì. */
+function canhBaoQuet(){
+ /* Vẽ trang nghiệp vụ ngay giữa lúc đang vẽ một trang khác là chuyện dễ đẻ đệ quy: trang đáp gọi
+    quét, quét vẽ trang đáp, trang đáp lại gọi quét... Chốt bằng một lá cờ, và trả `CUR` về
+    nguyên trạng dù có lỗi ở giữa - `CUR` sai một nhịp là cả sidebar sáng nhầm chỗ. */
+ if(window.__cbDangQuet)return [];
+ window.__cbDangQuet=1;
+ var cuCUR=CUR, ra=[];
+ try{
+  var NV=[];for(var h in HUBTAB){var m=HUBTAB[h].m||{};for(var t in m)if(NV.indexOf(m[t])<0)NV.push(m[t])}
+  NV.forEach(function(k){
+   if(!PBK[k])return;
+   /* Chỉ quét trang NGƯỜI NÀY ĐƯỢC XEM. Cảnh báo về một trang họ không có quyền vào là mời rồi
+      đuổi - luật đã ghi ở `navVis`. */
+   try{if(!navVis(k))return}catch(e){return}
+   try{CUR=k;(PBK[k].ty==="list")?renderList(k):(RENDER[k]&&RENDER[k]())}catch(e){return}
+   (THESO[k]||[]).forEach(function(o){
+    var so=num(String(o.so).replace(/[^0-9.-]/g,""));
+    if(!so)return;
+    var mau=String(o.mau||"").toUpperCase();
+    var muc=(mau==="#E24B4A")?"do":((mau==="#E08A1E")?"vang":"");
+    if(!muc)return;
+    ra.push({trang:k,ma:o.ma,nhan:o.nhan,so:o.so,muc:muc,
+             viSao:(function(){try{return theTip(o.ma)}catch(e){return ""}})()})})});
+ }catch(e){}
+ CUR=cuCUR; window.__cbDangQuet=0;
+ /* Đỏ lên trước, rồi tới số lớn - người ta đọc từ trên xuống và dừng khi hết thời gian. */
+ ra.sort(function(a,b){if(a.muc!==b.muc)return a.muc==="do"?-1:1;
+  return num(String(b.so).replace(/[^0-9.-]/g,""))-num(String(a.so).replace(/[^0-9.-]/g,""))});
+ return ra}
+function canhBaoHTML(){
+ var L=[];try{L=canhBaoQuet()}catch(e){L=[]}
+ if(!L.length)return '<div class="panel" data-tour="canhbao"><div class="pbody">'+
+   '<div class="empty">Không có cảnh báo nào từ các trang nghiệp vụ trong phạm vi của bạn - mọi việc đang trong hạn.</div></div></div>';
+ var nDo=L.filter(function(x){return x.muc==="do"}).length;
+ var h='<div class="panel" data-tour="canhbao"><div class="ph"><b><i class="ti ti-bell-ringing" style="margin-right:6px"></i>Cần chú ý</b>'+
+  '<div class="mini mut">'+L.length+' chỗ bất thường'+(nDo?(' · '+nDo+' gấp'):'')+' - gom từ các trang nghiệp vụ của bạn</div></div>'+
+  '<div class="pbody"><div class="cbwrap">';
+ L.slice(0,12).forEach(function(x){
+  var p=PBK[x.trang]||{};
+  h+='<div class="cbo '+x.muc+'" onclick="go(\''+esc(x.trang)+'\')" title="'+esc((x.viSao||"")+" — Bấm để mở trang "+(p.t||x.trang))+'">'+
+   '<div class="cbso">'+esc(String(x.so))+'</div>'+
+   '<div class="cbtx"><div class="cbn">'+esc(x.nhan)+'</div><div class="cbp">'+esc(p.t||x.trang)+'</div></div>'+
+   '<i class="ti ti-chevron-right cbmui"></i></div>'});
+ return h+'</div></div></div>'}
 function hubDich(k){
  var H=HUBTAB[k];if(!H||!H.m)return "";
  var d=H.d, uu=[];
