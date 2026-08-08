@@ -19424,7 +19424,7 @@ function canhBaoHTML(){
  L.slice(0,12).forEach(function(x){
   var p=PBK[x.trang]||{};
   h+='<div class="cbo '+x.muc+'" onclick="go(\''+esc(x.trang)+'\')" title="'+esc((x.viSao||"")+" — Bấm để mở trang "+(p.t||x.trang))+'">'+
-   '<div class="cbso">'+esc(String(x.so))+'</div>'+
+   '<span class="cbcham"></span><div class="cbso">'+esc(String(x.so))+'</div>'+
    '<div class="cbtx"><div class="cbn">'+esc(x.nhan)+'</div><div class="cbp">'+esc(p.t||x.trang)+'</div></div>'+
    '<i class="ti ti-chevron-right cbmui"></i></div>'});
  return h+'</div></div></div>'}

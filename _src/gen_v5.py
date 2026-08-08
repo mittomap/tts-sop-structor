@@ -1522,10 +1522,15 @@ table.dt tbody tr.clk.on td{font-weight:600}
 /* V2 Khúc 5 - dải cảnh báo trên trang đáp. Dùng đúng biến màu và bậc bo góc đang có, không đẻ
    thêm mã màu mới (`_checkux` nhóm 9 chốt trần 110 mã màu · 20 bậc chữ · 10 bậc bo góc). */
 .cbwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
-.cbo{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-left-width:3px;border-radius:10px;padding:8px 10px;cursor:pointer;background:#fff}
+/* LUẬT W5 - CẤM DẢI VIỀN MÀU TRANG TRÍ (kể cả dải dựng bằng ::before). Bản đầu của ô cảnh báo
+   dùng `border-left:3px` màu đỏ/vàng để nói mức độ - `_checkux` bắt ngay, và luật đúng: một dải
+   màu ở mép là trang trí, nó không mang thông tin nào mà chính con số và cái chấm không nói được.
+   Nay mức độ nói bằng hai thứ đọc được: MÀU CỦA CON SỐ, và một CHẤM TRẠNG THÁI có hình. */
+.cbo{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer;background:#fff}
 .cbo:hover{background:var(--bg)}
-.cbo.do{border-left-color:var(--red)}
-.cbo.vang{border-left-color:var(--amber)}
+.cbcham{width:8px;height:8px;border-radius:50%;flex:none;background:var(--muted)}
+.cbo.do .cbcham{background:var(--red)}
+.cbo.vang .cbcham{background:var(--amber)}
 .cbso{font-size:18px;font-weight:800;min-width:34px;text-align:center;color:var(--navy)}
 .cbo.do .cbso{color:var(--red)}
 .cbo.vang .cbso{color:var(--amber)}
@@ -21518,7 +21523,7 @@ function canhBaoHTML(){
  L.slice(0,12).forEach(function(x){
   var p=PBK[x.trang]||{};
   h+='<div class="cbo '+x.muc+'" onclick="go(\''+esc(x.trang)+'\')" title="'+esc((x.viSao||"")+" — Bấm để mở trang "+(p.t||x.trang))+'">'+
-   '<div class="cbso">'+esc(String(x.so))+'</div>'+
+   '<span class="cbcham"></span><div class="cbso">'+esc(String(x.so))+'</div>'+
    '<div class="cbtx"><div class="cbn">'+esc(x.nhan)+'</div><div class="cbp">'+esc(p.t||x.trang)+'</div></div>'+
    '<i class="ti ti-chevron-right cbmui"></i></div>'});
  return h+'</div></div></div>'}

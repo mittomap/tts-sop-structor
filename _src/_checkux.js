@@ -197,9 +197,16 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
    trang tri. Ai them lai mot dai vien mau la do ngay tai day. */
 (function(){
  var xau=[];
- (SRC.match(/border-left:\s*[3-9]px[^;"'\}]*/g)||[]).forEach(function(m){if(!/transparent/.test(m))xau.push(m)});
- (SRC.match(/border-top:\s*[3-9]px[^;"'\}]*/g)||[]).forEach(function(m){xau.push(m)});
- (SRC.match(/border-left-color:[^;"'\}]*/g)||[]).forEach(function(m){xau.push(m)});
+ /* ĐO CSS THẬT, KHÔNG ĐO CHÚ THÍCH. Bẫy đã cắn 07/08 khi làm dải cảnh báo: người sửa viết một
+    khối chú thích GIẢI THÍCH VÌ SAO ĐÃ GỠ dải viền màu, trong đó có nhắc lại chuỗi bị cấm - và
+    bộ kiểm bắt chính lời giải thích ấy, báo đỏ một thứ đã được sửa xong.
+    Đây là bài học dự án đã rút ở nhóm M6b và ở `_checkux` nhóm 12: **chú thích mã nguồn viết cho
+    người sửa app đọc, không phải cho máy đếm.** Thấy thước bắt một câu đúng thì siết thước, đừng
+    bẻ câu chữ cho vừa nó - vì bẻ một lần là lần sau người ta không dám ghi lại bài học nữa. */
+ var CSS=SRC.replace(/\/\*[\s\S]*?\*\//g," ");
+ (CSS.match(/border-left:\s*[3-9]px[^;"'\}]*/g)||[]).forEach(function(m){if(!/transparent/.test(m))xau.push(m)});
+ (CSS.match(/border-top:\s*[3-9]px[^;"'\}]*/g)||[]).forEach(function(m){xau.push(m)});
+ (CSS.match(/border-left-color:[^;"'\}]*/g)||[]).forEach(function(m){xau.push(m)});
  t("khong con dai vien mau >=3px hay border-left-color nao"+(xau.length?" - CON: "+xau.slice(0,5).join(" | "):""), xau.length===0);
  t("to vang cau hinh chi con nen, khong thanh doc", /tr\.cfhl\{background:#FFF6D8\}/.test(SRC));
  t("KPI card khong con vien tren, mau don vao vong so", /\.k3card\.red \.k3n\{background:#DC2626\}/.test(SRC));
@@ -217,8 +224,12 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
   var fs=require('fs');
   var TC="";try{TC=fs.readFileSync('./trangchu_demo.html','utf8')}catch(e){TC=""}
   t("co ban nguon trang chu ban demo de soi (_src/trangchu_demo.html)", TC.length>500);
+  /* Cùng lý do như mục 6 ngay trên: BỎ CHÚ THÍCH TRƯỚC KHI ĐO. Chú thích mã nguồn viết cho
+     người sửa app đọc - và người sửa app rất hay phải NHẮC LẠI chuỗi bị cấm để giải thích vì
+     sao mình đã gỡ nó. Đếm cả chú thích thì càng ghi bài học cẩn thận càng bị báo đỏ, tức là
+     cái thước đang phạt đúng thứ ta muốn khuyến khích. */
   [["ma app",SRC],["trang chu ban demo",TC]].forEach(function(x){
-   var ten=x[0],ma=x[1];if(!ma)return;
+   var ten=x[0],ma=String(x[1]||"").replace(/\/\*[\s\S]*?\*\//g," ");if(!ma.trim())return;
    var b1=(ma.match(/border-left:\s*[3-9]px[^;"'\}]*/g)||[]).filter(function(m){return !/transparent/.test(m)});
    var b2=(ma.match(/border-top:\s*[3-9]px[^;"'\}]*/g)||[]);
    var b3=(ma.match(/border-left-color:[^;"'\}]*/g)||[]);
