@@ -18889,11 +18889,17 @@ function tourPaint(){var T=TOURS[TOUR.key];if(!T||!TOUR.on)return;
      bài `cn_nguong` bước 2 neo `@settabs` vẫn nằm ngoài màn sau lần cuộn đầu - vì cuộn xong
      trang còn dàn lại (thanh tab Cài đặt xuống dòng ở màn hẹp) nên vị trí đổi lần nữa. Một lần
      là không đủ; hai lần có chặn cứng nên không thể lặp vô hạn. */
+  /* V2 08/08 - CUỘN CẢ CHIỀU NGANG. Luật cũ chỉ hỏi chiều DỌC (`r.top`/`r.bottom`) và cuộn bằng
+     `block:"center"` - cũng chỉ chiều dọc. Trên khổ điện thoại, mọi bảng đều nằm trong khung
+     cuộn ngang (`.tbwrap`), nên một nút ở cột bên phải thì cuộn dọc bao nhiêu cũng không tới:
+     nó ở NGOÀI MÀN theo chiều ngang, và vòng sáng khoanh vào chỗ người ta không nhìn thấy.
+     `_checkui` bắt đúng ca ấy: bài Tư vấn bước 3 neo vào nút "Ghi liên hệ" của một dòng lead.
+     Hỏi cả bốn mép, và cuộn cả hai chiều. */
   var _sk=TOUR.key+"|"+TOUR.i, _sn=(window.__tourScrollN&&window.__tourScrollN[_sk])||0;
-  if((r.top<70||r.bottom>vh-70)&&!tourFixed(el)&&_sn<2){
+  if((r.top<70||r.bottom>vh-70||r.left<4||r.right>vw-4)&&!tourFixed(el)&&_sn<2){
    window.__tourScrollN=window.__tourScrollN||{};window.__tourScrollN[_sk]=_sn+1;
    window.__tourScroll=_sk;
-   try{el.scrollIntoView({block:"center",behavior:"smooth"});setTimeout(tourPaint,320);return}catch(e){}}
+   try{el.scrollIntoView({block:"center",inline:"center",behavior:"smooth"});setTimeout(tourPaint,320);return}catch(e){}}
   s.style.display="";s.style.left=(r.left-6)+"px";s.style.top=(r.top-6)+"px";
   s.style.width=(r.width+12)+"px";s.style.height=(r.height+12)+"px";
  }else{ /* KHÔNG thấy phần tử cần trỏ: nói thẳng chứ đừng khoanh bừa giữa màn - khoanh bừa
