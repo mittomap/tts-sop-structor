@@ -12,20 +12,31 @@
 
 | RB | Đo bằng | Kết quả | Kết luận |
 |---|---|---|---|
-| **RB1** một nghiệp vụ một cửa ghi | `_check15` kiểm kê cửa ghi | 24 bảng · **146 cửa ghi** · nhiều nhất DL09 (18), DL03 (13), DL14 (11) | **CHƯA ĐẠT** - việc của Khúc 4 |
-| **RB2** trang đáp ĐỌC bản khai số, không tự tính | `_checkdem` | 105 tiêu chí / 26 lớp - mọi số trên thẻ đều tìm được dấu vết ở danh sách ngay dưới | Đạt ở phạm vi hiện có; dải cảnh báo (Khúc 5) chưa làm |
+| **RB1** một nghiệp vụ một cửa ghi | `_checkmotcua` (dựng sau báo cáo này) | 1604 hàm · chỉ **4 ô nhập dùng chung**, cả 4 giữa hai ngăn kéo (không nguy hiểm) | **ĐẠT** - xem 1.1, kết luận cũ đã sai |
+| **RB2** trang đáp ĐỌC bản khai số, không tự tính | `_checkdem` + cấu trúc `THESO` | Dải cảnh báo (Khúc 5) **không tự tính một con số nào** - nó vẽ thật từng trang nghiệp vụ rồi đọc sổ `THESO` mà chính `statStrip` ghi ra | **ĐẠT** - xem 2.2 |
 | **RB3** cha trước con | Khúc 3 | Lớp học thành cha; Vận hành lớp vào qua ngăn kéo; đứng ở con thì mục cha sáng và nhóm cha tự mở | **ĐẠT** |
 | **RB4** không lặp sai lầm V6 | `_check11` 8 phép canh | Không cờ nào bật tắt hai bản; một nguồn, một thế giới | **ĐẠT** |
 
-### 1.1 RB1 là chỗ đáng lo nhất - và đây là con số
+### 1.1 RB1 - CHẨN ĐOÁN BAN ĐẦU CỦA BÁO CÁO NÀY ĐÃ SAI, ĐO LẠI RỒI SỬA
 
-**146 cửa ghi trên 24 bảng.** Riêng DL09 (học viên) có **18 cửa**. Đó đúng là điều anh Luân mô tả:
-*"cùng 1 nghiệp vụ mà ở bản hiện tại có thể làm được ở rất nhiều nơi, sẽ làm cho nhân sự bị rối."*
+**Bản đầu của mục này viết:** *"146 cửa ghi trên 24 bảng, riêng DL09 mười tám cửa - chỗ đáng lo
+nhất."* Để nguyên câu ấy ở đây thay vì xoá đi, vì cách nó sai mới là phần đáng đọc.
 
-Cần nói rõ để không hiểu nhầm: **146 cửa ghi không phải 146 chỗ trùng nhau.** Một bảng có nhiều
-cửa là bình thường (ghi tên khác ghi điểm, khác ghi trạng thái). Cái phải gom là những cửa **cùng
-làm một việc ở nhiều nơi**. Muốn biết con số thật thì phải khai bảng `NGHIEPVU` như bàn giao mô
-tả rồi để máy đối chiếu - **chưa làm, đó là Khúc 4**.
+**Đo kỹ thì 18 cửa của DL09 là 18 NGHIỆP VỤ KHÁC NHAU** - bảo lưu · quay lại · bỏ học · chăm nguy
+cơ · quota WOW · đăng ký. Không cửa nào thừa. Một bảng có nhiều cửa ghi là **bình thường**; cái
+phải bắt là hai cửa **cùng làm một việc**. Đếm cửa ghi rồi kết luận "rối" là đếm sai thứ.
+
+**Đo đúng thì đo cái gì:** dấu vết không cãi được của "mỗi nơi một bản dựng" là **hai hàm cùng
+phát ra CÙNG MỘT `id=` cho ô nhập**. Chạy trên 1604 hàm của bản build: chỉ **4 ô nhập** bị dùng
+chung, và cả 4 đều giữa **hai ngăn kéo** - mà `openDrawer` thay nội dung nên hai ngăn kéo không
+bao giờ cùng mở. **Không có ca nguy hiểm nào.**
+
+Chính việc dỡ hub ở Khúc 2a đã xử phần lớn chuyện này: khi mỗi nghiệp vụ có trang riêng thì không
+còn lý do để bốn chỗ cùng dựng lại một form.
+
+Việc còn lại của RB1 là chuyện gọn gàng chứ không phải chuyện đúng sai: gom `openComplaint`/
+`knResolve` và `openXepMoi`/`xepFor` về một hàm dựng form. `_checkmotcua` ghi chú chúng ở mỗi lần
+chạy nên không quên được.
 
 ### 1.2 Bằng chứng máy cho LUẬT CỨNG SỐ 0 trong một lần thay cấu trúc lớn
 
@@ -110,18 +121,24 @@ Trần trong `_checkroi` đặt ở **58 - số đo được thật**, không ph
 trần thấp hơn thực tế thì lần nào cũng đỏ, mà một bộ kiểm đỏ mãi thì người ta tắt nó đi. Nó là
 **chốt kéo xuống**: đóng băng con số hiện tại để menu không dài thêm trong im lặng.
 
-### 2.2 PHÁT HIỆN SỐ 2 - 14/25 trang nghiệp vụ chưa có dải thẻ riêng
+### 2.2 PHÁT HIỆN SỐ 2 - 14/25 trang thiếu dải thẻ → ĐÃ XONG, và nó mở đường cho Khúc 5
 
-Anh Luân mô tả V2: *"mỗi trang là nghiệp vụ riêng, và **nó có thẻ, có chip lọc, có cảnh báo của
-riêng nó**"*. Đo lại: `THEDEF` khai **35 dải thẻ / 165 thẻ**, nhưng trong 25 trang nghiệp vụ mới
-thì **chỉ 9 trang đã có dải thẻ riêng**.
+Lúc lập báo cáo này, đo ra chỉ **9/23 trang nghiệp vụ** có dải thẻ riêng. Anh Luân mô tả V2 là
+*"mỗi trang là nghiệp vụ riêng, và **nó có thẻ, có chip lọc, có cảnh báo của riêng nó**"* - nên
+14 trang thiếu thẻ là thiếu một phần ba lời mô tả.
 
-| Đã có thẻ riêng (9) | Chưa có (14) |
-|---|---|
-| tuvan · thanhtoan · reup · wow · gvdp · phong · ghinhan · magioithieu · banggiao | nhaplead · test · buoihnay · lop · buoihoc · lichtuan · khaosat · khieunai · ychv · baoluu · duyetck · duyethoan · duyetnghi · duyetthu |
+**Đã làm xong (Khúc 2b), trần `_checkkhuon` đi từ 16 xuống 0.** Mọi trang nghiệp vụ giờ hoặc có
+dải thẻ riêng, hoặc **khai được vì sao không cần** - `lichtuan` là trang duy nhất khai lý do: nó
+là một bức tranh thời gian, lưới lịch đã là cách đọc nhanh nhất, đặt dải thẻ số lên trên là nói
+lại bằng chữ cái mà mắt vừa đọc bằng hình.
 
-Đây là việc còn lại của Khúc 2b, **và nó là điều kiện cần của Khúc 5**: dải cảnh báo phải ĐỌC thẻ
-của các trang nghiệp vụ, nên trang nào chưa có thẻ thì chưa có gì để đọc.
+**Và đây là điều kiện cần của Khúc 5.** Dải cảnh báo phải ĐỌC thẻ của các trang chứ không được
+tự tính - trang nào chưa có thẻ thì chưa có gì để đọc. Làm xong Khúc 2b mới làm được Khúc 5.
+
+**Khúc 5 đã xong, đo được (đóng vai người có thật):** Giáo viên ACA thấy **1** cảnh báo · GV WOW
+2 · NV Tư vấn 8 · NV Học vụ 10 · CEO 25. Quét hết 23 trang chỉ tốn **12-150ms**.
+Đúng câu anh đặt - *"các nhân sự sẽ tự biết mình cần làm gì"*: giáo viên mở app lên thấy đúng
+**một** việc của mình, không phải bơi giữa 25 con số của người khác.
 
 ### 2.3 Ba quan sát cũ vẫn còn (đo lại, chưa mất đi)
 
@@ -153,12 +170,11 @@ của các trang nghiệp vụ, nên trang nào chưa có thẻ thì chưa có g
 
 ## 4. VIỆC TỒN, XẾP THEO THỨ TỰ NÊN LÀM
 
-1. **Khúc 2b** - 14 trang nghiệp vụ còn thiếu dải thẻ riêng. Điều kiện cần của Khúc 5.
-2. **Khúc 5** - bàn làm việc thành dải cảnh báo (RB2). Móc vào `THEDEF`, tuyệt đối không viết lại
-   công thức: *cái thẻ và cái bảng hỏi hai hàm khác nhau cho cùng một câu hỏi* là bệnh anh Luân đã
-   bắt hai lần trong hai ngày.
-3. **Khúc 4** - gom cửa ghi (RB1). Khai bảng `NGHIEPVU`, dựng bộ kiểm canh một nghiệp vụ một cửa.
-4. **Gom nhóm Tra cứu** - hạ menu CEO từ 58 xuống ~41.
+1. ~~**Khúc 2b**~~ - XONG, trần thẻ 16 → 0.
+2. ~~**Khúc 5**~~ - XONG, dải cảnh báo đọc `THESO`, không tự tính một con số nào.
+3. ~~**Khúc 4**~~ - XONG, `_checkmotcua` canh RB1; kết luận đảo ngược so với chẩn đoán ban đầu.
+4. **Gom nhóm Tra cứu** - hạ menu CEO từ 58 xuống ~41. Việc lớn nhất còn lại.
+5. **12 trang thiếu chip lọc** - `_checkkhuon` đang giữ trần ở 12, chỉ được hạ.
 5. **Khúc 2c** - dọn `HUBTAB`/`HUBCAU`/`hub*` và các hàm vẽ hub đã thành mã chết. **Lưu ý khi dọn:**
    `HUBTAB` hiện là bản khai *"trang nào là một nghiệp vụ"* cho bốn chỗ - `noQuyenTheoTrang`,
    `hubDich`, `nvCau`, `_check11`. Đổi tên nó thành `NGHIEPVU` cho đúng nghĩa, **đừng xoá trắng**.
