@@ -5135,10 +5135,21 @@ function gvSo(k){var me=CURSTAFF||"";
 function dsLead(k){var L=scopeList("DL02",rows("DL02"));
  if(k==="new")return L.filter(function(r){return isc(r.lead_status,"new")&&!String(r.first_call_time||"").trim()}).length;
  return L.filter(function(r){return isc(r.lead_status,"contacted","considering")}).length}
-function goTS(t){window.TSTAB=t;go("tuyensinh")}
-function goHT(t){window.HTTAB=t;go("hoctap")}
-function goCS(t){window.CSTAB=t;go("cskh")}
-function goDuyet(t){window.DUYTAB=t;go("duyet")}
+/* ═══ V2 - BỐN LỐI CŨ "ĐI TỚI HUB RỒI MỞ TAB" NAY ĐI THẲNG TỚI TRANG ═════════════════════════
+   Bốn hàm này là đường đi của HÀNG CHỤC nút "đi tới chỗ làm" rải khắp app (bảng việc, trợ lý,
+   nhịp ngày, ô thẻ, bài hướng dẫn). Chúng đặt tên tab rồi `go(<hub>)`.
+   Sang V2 hub chỉ còn là BÍ DANH, và bí danh dẫn tới trang nghiệp vụ ĐẦU TIÊN người đó xem được
+   - nên tên tab bị bỏ rơi và mọi nút ấy rơi về cùng một chỗ.
+   `_checknv` bắt được, và triệu chứng nó mô tả đúng cái giá phải trả: bấm việc "Còn nợ học phí"
+   thì đáng ra tới Thanh toán, mà app thả xuống trang Lead; người dùng thấy một form lạ, điền
+   rồi bấm Lưu, và không có gì xảy ra. Không phải nút chết - là **đi nhầm phòng**.
+   Nay đổi tên tab thành khoá trang rồi đi thẳng. Vẫn giữ bốn tên hàm cũ chứ không đi sửa hàng
+   chục chỗ gọi: đổi ở MỘT chỗ thì không sót, sửa tay hàng chục chỗ thì chắc chắn sót một. */
+function goNV(hub,t){var m=(HUBTAB[hub]||{}).m||{};var k=m[t]||t;go(PBK[k]?k:hub)}
+function goTS(t){goNV("tuyensinh",t)}
+function goHT(t){goNV("hoctap",t)}
+function goCS(t){goNV("cskh",t)}
+function goDuyet(t){goNV("duyet",t)}
 function goRisk(){fset("hocvien","risk");go("hocvien")}
 /* Chức danh nào đáp vào trang nào thì bảng của họ hiện ở đó - khai MỘT chỗ, không chép vào 6 trang. */
 /* Bốn phép đếm của bảng Marketing. Đặt cạnh nhau để đọc một lượt là hiểu bảng đó nói gì. */

@@ -270,7 +270,7 @@
 > **`update.sh` của repo demo v2 tự đối chiếu mã bản dựng và thoát lỗi nếu lệch** - bẫy 05/08
 > (đẩy hụt mà script báo "không có thay đổi" rồi im lặng) từ nay có máy canh, không dựa trí nhớ.
 >
-> ### 🟡 KHÚC 2 NHỊP 2a - 34/35 BỘ XANH, CÒN 1 CHỖ (đọc mục 'CÒN ĐÚNG MỘT CHỖ ĐỎ' bên dưới)
+> ### 🟢 KHÚC 2 NHỊP 2a XONG - 25 NGHIỆP VỤ THÀNH 25 TRANG, 35/35 BỘ XANH
 > Đã xanh trọn bộ. Bảng "câu hỏi cũ / câu hỏi mới" bên dưới giữ lại làm mẫu cho nhịp 2b-2c: mỗi
 > lần dỡ một tầng cấu trúc là một lần phải đi hỏi lại từng cái thước *"nên xoá, hay nên ĐỔI CÂU
 > HỎI?"* - và lần này **cả 9 chỗ đều là đổi câu hỏi**, không chỗ nào phải xoá luật.
@@ -318,21 +318,33 @@
 >    nguyên. Nới trần lên 2500 **và ghi ngay tại chỗ rằng đó là một cái TRẦN, không phải một
 >    LUẬT** - để lần sau ai chạm vào biết ngay mình đang chạm vào cái gì.
 >
-> **CÒN ĐÚNG MỘT CHỖ ĐỎ - `_checknv`, và nó là việc đầu tiên của phiên sau.**
-> Triệu chứng: việc *"Còn nợ học phí"* (và *"Con còn nợ học phí"* ở hồ sơ phụ huynh) - bấm **Lưu**
-> mà **không ghi, không báo**. Đó là kiểu hỏng mà chính bộ kiểm ấy gọi là nguy hiểm nhất: *"người
-> thật sẽ bấm lại vài lần rồi bỏ đi"*, và không bộ kiểm chuỗi nào thấy được.
-> **Đã loại được hai giả thuyết** (ghi lại để phiên sau khỏi đo lại):
-> - *Trùng id giữa ngăn kéo và trang bên dưới* (bẫy số 4 của `BAN_GIAO_V2`): ĐO RỒI, KHÔNG TRÙNG.
->   `payForm` dùng `pm_amt`/`pm_due`/`pm_method`/`pm_ref`/`pm_sender`; `renderThanhtoan` không có
->   id nào. Giao của hai tập là rỗng.
-> - *`paySave` thoát im lặng*: nó CÓ hai lối thoát im lặng thật (không tìm ra đơn · chốt chặn bấm
->   hai lần) và **đã vá cho cả hai nói ra lời** - đúng luật chấm của `_checknv` (chỉ hai kết cục
->   được tính là đạt: app GHI, hoặc app TỪ CHỐI CÓ LỜI). Vá xong vẫn đỏ, nên **nút bị bấm không
->   phải nút của form thu tiền** - đó là manh mối tiếp theo.
-> **Hướng đo tiếp:** cho `_checknv` in ra NHÃN và `onclick` của đúng cái nút nó vừa bấm. Bộ kiểm
-> đang chỉ nói "bấm Lưu" - một cái tên chung, và chính sự chung chung ấy đang giấu mất chỗ hỏng.
-> Đây cũng là một bài học về thước: *thông báo lỗi phải nói được nó vừa chạm vào cái gì.*
+> **LỖI THỨ TÁM - RỘNG NHẤT CẢ ĐỢT, và `_checknv` là bộ duy nhất bắt được.**
+> Triệu chứng ban đầu chỉ là một dòng: việc *"Còn nợ học phí"* bấm **Lưu** mà không ghi, không
+> báo. Đào ra thì gốc nằm ở chỗ khác hẳn và rộng hơn nhiều.
+>
+> Bốn hàm `goTS` · `goHT` · `goCS` · `goDuyet` là lối cũ *"đặt tên tab rồi `go(<hub>)`"*. Chúng là
+> đường đi của **52 chỗ gọi** rải khắp app: bảng việc, trợ lý, nhịp ngày, ô thẻ, bài hướng dẫn.
+> Sang V2 hub chỉ còn là bí danh, mà bí danh dẫn tới trang nghiệp vụ ĐẦU TIÊN người đó xem được -
+> nên **tên tab bị bỏ rơi và cả 52 nút "đi tới chỗ làm" rơi về cùng một chỗ**.
+>
+> Cái giá đúng như bộ kiểm mô tả: bấm việc "Còn nợ học phí" thì đáng ra tới Thanh toán, app thả
+> xuống trang Lead; người dùng thấy một form lạ, điền, bấm Lưu, không có gì xảy ra. **Không phải
+> nút chết - là đi nhầm phòng.** Và đó là lý do hai giả thuyết đầu (trùng id · `paySave` thoát im
+> lặng) đều đo ra "không phải": chúng đi tìm lỗi ở CÁI FORM, trong khi lỗi ở ĐƯỜNG ĐI TỚI FORM.
+>
+> Vá ở MỘT chỗ (bốn hàm ấy đổi tên tab thành khoá trang rồi đi thẳng), không đi sửa 52 chỗ gọi -
+> sửa tay 52 chỗ thì chắc chắn sót một, mà sót thì im lặng.
+>
+> **Ba bài học ghi lại:**
+> 1. **`_checknv` là bộ duy nhất bắt được, và vì sao thì đáng nhớ:** 34 bộ kia đọc chuỗi HTML
+>    hoặc nhìn màn hình - không bộ nào ĐI HẾT MỘT VIỆC bằng chuột thật từ bảng việc tới nút Lưu.
+>    Lỗi này không làm hỏng một trang nào; mọi trang vẽ đúng, mọi nút bấm được. Nó chỉ sai ở chỗ
+>    **nút dẫn người ta tới đâu** - và chỉ ai đi hết quãng đường mới thấy.
+> 2. **Một triệu chứng nhỏ có thể là một lỗi rộng.** Một dòng đỏ về một việc hoá ra là 52 cửa.
+>    Đừng vá cái triệu chứng.
+> 3. **Thông báo lỗi phải nói được nó vừa chạm vào cái gì.** Bộ kiểm chỉ nói *"bấm Lưu"* - một
+>    cái tên chung, và chính sự chung chung ấy giấu chỗ hỏng suốt hai vòng đo. Câu *"bấm Lưu trên
+>    trang `nhaplead`"* mới là câu mở ra được vụ này.
 >
 > **Còn lại của Khúc 2 (nhịp 2b, 2c) chưa làm:** mỗi trang một dải thẻ riêng và dải cảnh báo
 > riêng (2b); xoá `HUBTAB`/`HUBCAU`/`hubCau`/`hubDef`/`hubTab`/`hubSubKey` và các hàm vẽ hub đã
