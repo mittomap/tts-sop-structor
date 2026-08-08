@@ -2314,7 +2314,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">08/08/2026 · <b>c65897</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">08/08/2026 · <b>0a7b1d</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -5809,7 +5809,10 @@ function bizSection(){
  var _bizLead=dsLevel("lead")!=="none";
  var tiles=[["Doanh thu đã thu",vnd(revTotal),"ti-cash","#16A34A"],["Doanh thu tháng này",vnd(revMonth),"ti-report-money","#0D9488",trend,"Tổng tiền đã thu trong tháng này = "+vnd(revMonth)+(revPrev>0?("; tháng trước "+vnd(revPrev)+" -> chênh "+(revMonth>=revPrev?"+":"")+Math.round((revMonth-revPrev)/revPrev*100)+"%"):"; tháng trước chưa có số để so")],["Lead mới "+mkMoiNgay()+" ngày",String(lead30),"ti-user-plus","#3B82C4"],["Tỷ lệ chuyển đổi",cvr+"%","ti-trending-up",cvr>=40?"#16A34A":cvr>=25?"#D97706":"#DC2626","",pctG(conv,L.length,"lead đã thành học viên")],["Đăng ký "+mkMoiNgay()+" ngày",String(enr30),"ti-clipboard-check","#7C3AED"],["Công nợ tồn",vnd(debt),"ti-alert-triangle",debt>0?"#D97706":"#16A34A"],["HV đang học",String(learning),"ti-users-group","#3B82C4"]];
  if(!_bizLead)tiles=tiles.filter(function(t){return !/^Lead mới|^Tỷ lệ chuyển đổi/.test(t[0])});
- var h='<div class="sechd">Tình hình kinh doanh</div><div class="bizrow"><div class="biztiles">';
+ /* V2 08/08 - neo riêng `@bizso`: bước cuối bài Kế toán ("Báo cáo doanh thu") nói đúng về khối
+    này, mà trước đây neo `@man` nên khoanh trùng chỗ với bước 1 bài Quản lý. Vỏ trang thì bài
+    nào cũng trỏ được - khoanh vào nó là khoanh vào chỗ không nói riêng điều gì. */
+ var h='<div class="sechd" data-tour="bizso">Tình hình kinh doanh</div><div class="bizrow"><div class="biztiles">';
  tiles.forEach(function(t){h+='<div class="biztile"'+(t[5]?' data-tip="'+esc(t[5])+'"':'')+'><div class="bti" style="color:'+t[3]+'"><i class="ti '+t[2]+'"></i></div><div class="btv">'+esc(t[1])+'</div><div class="btl">'+esc(t[0])+(t[4]?' · '+t[4]:'')+'</div></div>'});
  h+='</div>';var rev=revByMonth();
  h+='<div class="bizchart"><div class="bch">Doanh thu theo tháng (triệu đ)</div>'+(rev.length?svgBarsV(rev,{color:"#16A34A",h:118}):'<div class="empty">Chưa có dữ liệu.</div>')+'</div></div>';
@@ -11288,11 +11291,16 @@ function kpiTop3(){
  /* chưa đủ 3 thì nới luật một-việc-một-chặng */
  if(out.length<3)cand.forEach(function(x){if(out.length>=3)return;if(out.indexOf(x)<0)out.push(x)});
  return out}
+/* V2 08/08 - khối này có NEO RIÊNG (`@kpitop`). Bước 1 của bài "Một ngày của Quản lý" nói đúng
+   về nó ("quan trọng nhất là phần nhận xét kèm việc nên làm ngay cho từng chỉ số") nhưng trước
+   đây neo `@man` - vỏ trang thì bài nào cũng trỏ được, nên nó khoanh trùng chỗ với bước 5 của
+   bài Kế toán. `_checkneo`: *"hai bước khác nhau khoanh cùng một chỗ thì ít nhất một bước đang
+   trỏ sai"*. */
 function kpiTop3Section(){
  var top=kpiTop3();
- if(!top.length)return '<div class="sechd">3 việc nên làm tuần này</div>'+
+ if(!top.length)return '<div class="sechd" data-tour="kpitop">3 việc nên làm tuần này</div>'+
   '<div class="panel"><div class="pbody"><div class="empty">Mọi chỉ số quan trọng đang đạt ngưỡng - tuần này không có việc nào phải chữa cháy.</div></div></div>';
- var h='<div class="sechd">3 việc nên làm tuần này <span style="font-weight:600;text-transform:none;letter-spacing:0" class="mut">· chọn theo mức lệch ngưỡng và mức ảnh hưởng, mỗi chặng tối đa 1 việc</span></div><div class="k3row">';
+ var h='<div class="sechd" data-tour="kpitop">3 việc nên làm tuần này <span style="font-weight:600;text-transform:none;letter-spacing:0" class="mut">· chọn theo mức lệch ngưỡng và mức ảnh hưởng, mỗi chặng tối đa 1 việc</span></div><div class="k3row">';
  top.forEach(function(x,i){
   var doc=KPIDOC[x.code];var SL=SEVLBL[x.sev];var d=kpiNum(x.code);
   var acts=(doc.viec&&(doc.viec[x.sev]||doc.viec.canhbao))||[];
@@ -18549,7 +18557,9 @@ var TOURS={
   {p:"banglop",sel:'@txt:Giao & chấm bài tập',t:"Giao bài tập",d:"Giao một bài chung cho cả lớp hoặc bài riêng cho từng học viên. Hạn nộp tự tính theo giáo án khóa, sửa được.",hint:"Bấm tab 'Giao & chấm bài tập' rồi giao một bài mới."},
   {p:"baitap",sel:'@txt:Chờ chấm',t:"Còn bài nào bạn chưa chấm",d:"Ba chế độ đầu bắt chọn trước một lớp và một buổi. Chip 'Chờ chấm - mọi lớp' gom hết bài đã nộp mà chưa chấm của MỌI lớp bạn dạy vào một bảng, mỗi dòng một nút nhảy thẳng vào chấm.",hint:"Bấm chip 'Chờ chấm - mọi lớp' rồi chấm một bài."},
   {p:"buoihoc",sel:'@txt:Chờ ghi nhận xét',t:"Ghi nhận xét buổi học",d:"Cuối buổi ghi nhận xét chung - học viên và phụ huynh đọc được trong cổng học viên. Quá hạn sẽ bị nhắc.",hint:"Bấm chip 'Chờ ghi nhận xét', mở buổi vừa dạy rồi ghi nhận xét."},
-  {p:"giaoviec",sel:'@man',t:"Việc được giao",d:"Học vụ hoặc tổ trưởng giao việc cho bạn ở đây: chuẩn bị đề, dự giờ, viết giáo án bổ sung.",hint:"Xong một ngày của giáo viên!"}]},
+  /* neo vào ĐÚNG tab đang nói tới, không neo vào vỏ trang: `@man` trên Giao việc bị bước cuối
+     của bài Tư vấn khoanh trùng - `_checkneo` bắt. */
+  {p:"giaoviec",sel:'@txt:Việc chờ nhận',t:"Việc được giao",d:"Học vụ hoặc tổ trưởng giao việc cho bạn ở đây: chuẩn bị đề, dự giờ, viết giáo án bổ sung. Tab Việc chờ nhận là những việc chưa ai bấm Nhận - người giao đang đợi.",hint:"Xong một ngày của giáo viên!"}]},
  /* V9.44 - BA BÀI CÒN THIẾU. Cấp "trải nghiệm" trước đây có 5 bài cho 5 chức danh, nhưng app
     có TÁM nhóm vai. NV WOW - người giữ toàn bộ buổi kèm 1-1 và việc chấm test - không có bài
     nào; Marketing giữ đầu vào của cả phễu cũng không; nhóm hỗ trợ thì mở app ra không biết mình
@@ -18592,9 +18602,9 @@ var TOURS={
   {p:"thanhtoan",sel:'@obcards',t:"Đối soát khoản thu",d:"Tư vấn viên thu hộ thì kế toán phải xác nhận lại. Khoản chưa xác nhận hiện chip hổ phách.",hint:"Bấm chip Chờ xác nhận, mở một khoản và bấm Xác nhận đã nhận.",chk:function(){return (window.TOURB&&rows("DL07").filter(function(x){return String(x.verified_by||"").trim()}).length>(window.TOURB.xacnhan||0))}},
   {p:"thanhtoan",sel:'@tbar',t:"Công nợ và tới hẹn thu",d:"Danh sách đăng ký còn nợ, ai tới hẹn hôm nay, ai quá hạn. Gọi nhắc rồi ghi lại lịch hẹn mới.",hint:"Bấm chip Tới hẹn thu."},
   {p:"duyethoan",sel:'@man',t:"Duyệt hoàn tiền",d:"Ưu đãi vượt ngưỡng và yêu cầu hoàn tiền tập trung ở đây. Hoàn tiền có gợi ý mức theo chính sách và số ngày đã học.",hint:"Mở một yêu cầu để xem."},
-  {p:"baocao",sel:'@man',t:"Báo cáo doanh thu",d:"Doanh thu theo tháng, theo nguồn khách, công nợ tồn - số liệu tự tính từ phiếu thu, không phải gõ lại.",hint:"Xong một ngày của kế toán!"}]},
+  {p:"baocao",sel:'@bizso',t:"Báo cáo doanh thu",d:"Doanh thu theo tháng, theo nguồn khách, công nợ tồn - số liệu tự tính từ phiếu thu, không phải gõ lại.",hint:"Xong một ngày của kế toán!"}]},
  tn_quanly:{lv:"trainghiem",role:"Quản lý - Giám đốc",t:"Một ngày của Quản lý",ic:"ti-shield-check",d:"6 bước - nhìn số, duyệt, giao việc",steps:[
-  {p:"baocao",sel:'@man',t:"Mở máy là nhìn số",d:"Doanh thu, phễu tuyển sinh, chuyên cần, hài lòng - và quan trọng nhất là phần nhận xét kèm việc nên làm ngay cho từng chỉ số.",hint:"Cuộn xuống xem khối chỉ số."},
+  {p:"baocao",sel:'@kpitop',t:"Mở máy là nhìn số",d:"Doanh thu, phễu tuyển sinh, chuyên cần, hài lòng - và quan trọng nhất là phần nhận xét kèm việc nên làm ngay cho từng chỉ số.",hint:"Cuộn xuống xem khối chỉ số."},
   /* V2 - neo sang DẢI CẢNH BÁO, và đây là chỗ đúng của bước này chứ không phải một cách né trùng.
      Bước tên là "Điểm nghẽn toàn trung tâm"; ở V1 nó phải trỏ vào dải thẻ chung (`@bstats`) vì
      app chưa có chỗ nào gom bất thường lại. Khúc 5 đẻ ra đúng cái chỗ ấy: dải cảnh báo gom mọi
@@ -18785,7 +18795,7 @@ function tourMan(){
  /* Bỏ qua cả THANH CÔNG CỤ: nó có mã neo riêng (@tbar/@tbarct) và bài nào cần dạy bộ lọc thì
     trỏ thẳng vào đó. Không bỏ thì trên mọi sổ tra cứu, `@man` rơi đúng vào thanh công cụ - hai
     bước "Sổ tra cứu là gì" và "Lọc nhiều trục cùng lúc" lại khoanh trùng một chỗ. */
- var bo=/(^|\s)(phead|notebar|cfbar|bangviec|bvwrap|tbar)(\s|$)/;
+ var bo=/(^|\s)(phead|notebar|cfbar|bangviec|bvwrap|tbar|nhipwrap)(\s|$)/;
  var con=c.children||[];
  for(var i=0;i<con.length;i++){var el=con[i];
   if(bo.test(String(el.className||"")))continue;
@@ -22562,7 +22572,12 @@ function nhipList(){var k=nhipKey();if(!k)return [];
 function nhipPanel(){
  var L=[];try{L=nhipList()}catch(e){L=[]}
  if(!L.length)return "";
- var h='<div class="panel" data-tour="nhipngay"><div class="ph"><b>Nhịp ngày của bạn</b>'+
+ /* V2 08/08 - lớp `nhipwrap` để `tourMan()` BỎ QUA tấm này khi tìm "khối nội dung chính".
+    Từ hôm nay nhịp ngày nằm ở đầu MỌI trang đáp, nên nó là khối DÙNG CHUNG y như bảng việc và
+    đầu trang - `@man` mà rơi vào nó thì mọi bài hướng dẫn trên mọi trang đáp cùng khoanh một
+    chỗ. `_checkneo` bắt đúng hai cặp bước khoanh trùng vì chuyện này. Nó đã có neo riêng
+    (`@nhipngay`) cho bài nào muốn nói về chính nó. */
+ var h='<div class="panel nhipwrap" data-tour="nhipngay"><div class="ph"><b>Nhịp ngày của bạn</b>'+
   '<span class="mut" style="font-size:11.5px">Việc nên làm theo buổi - hàng chờ có số đếm, thói quen ghi "nên xem"</span></div><div class="nhipg">';
  NHIPBUOI2.forEach(function(B){
   var R=L.filter(function(x){return x.buoi===B[0]});
