@@ -15943,11 +15943,25 @@ var TOURS={
   {p:"baocao",sel:'@man',t:"Báo cáo doanh thu",d:"Doanh thu theo tháng, theo nguồn khách, công nợ tồn - số liệu tự tính từ phiếu thu, không phải gõ lại.",hint:"Xong một ngày của kế toán!"}]},
  tn_quanly:{lv:"trainghiem",role:"Quản lý - Giám đốc",t:"Một ngày của Quản lý",ic:"ti-shield-check",d:"6 bước - nhìn số, duyệt, giao việc",steps:[
   {p:"baocao",sel:'@man',t:"Mở máy là nhìn số",d:"Doanh thu, phễu tuyển sinh, chuyên cần, hài lòng - và quan trọng nhất là phần nhận xét kèm việc nên làm ngay cho từng chỉ số.",hint:"Cuộn xuống xem khối chỉ số."},
-  {p:"banlam",sel:'@bstats',t:"Điểm nghẽn toàn trung tâm",d:"Ô nào số cao bất thường là chỗ đang tắc. Rê chuột vào ô để biết mở trang nào hoặc bấm chip nào thì ra đúng danh sách người đang kẹt ở đó.",hint:"Rê chuột vào ô có số lớn nhất."},
-  {p:"changA",sel:'@nrail',t:"Tắc ở chặng nào",d:"Phần trăm chuyển đổi giữa các ga cho biết mất khách ở bước nào: gọi không được, test rồi không tư vấn, hay tư vấn rồi không chốt.",hint:"Nhìn tỷ lệ giữa các ga."},
+  /* V2 - neo sang DẢI CẢNH BÁO, và đây là chỗ đúng của bước này chứ không phải một cách né trùng.
+     Bước tên là "Điểm nghẽn toàn trung tâm"; ở V1 nó phải trỏ vào dải thẻ chung (`@bstats`) vì
+     app chưa có chỗ nào gom bất thường lại. Khúc 5 đẻ ra đúng cái chỗ ấy: dải cảnh báo gom mọi
+     bất thường từ các trang nghiệp vụ, mỗi ô bấm được đi thẳng tới trang đẻ ra con số.
+     Tiện thể gỡ luôn một chỗ khoanh trùng với `tn_sale 1/8` mà `_checkneo` vừa bắt. */
+  {p:"banlam",sel:'@canhbao',t:"Điểm nghẽn toàn trung tâm",d:"Dải này gom mọi chỗ bất thường từ các trang nghiệp vụ trong phạm vi của bạn - đỏ là gấp, vàng là sắp tới hạn. Mỗi ô bấm được, đi thẳng tới trang đẻ ra con số đó.",hint:"Bấm ô đỏ đầu tiên."},
+  /* V2 - BƯỚC NÀY TỪNG DẠY TRÙNG. `_checkneo` bắt nó khoanh cùng chỗ với `tq_tong 5/10` ("Bản đồ
+     một chặng"), và đọc lại thì đúng là trùng THẬT chứ không phải hai góc nhìn: cả hai cùng chỉ
+     vào dải chặng và cùng nói "nhìn tỷ lệ giữa các ga là biết tắc ở đâu".
+     Bài `tq_tong` là bài THAM QUAN - nó dạy đọc dải chặng, và dạy đủ rồi. Bài `tn_quanly` là bài
+     cho NGƯỜI QUẢN LÝ, nên bước này phải dạy thứ khác: không phải "đọc số ở đâu" mà "đọc xong
+     thì làm gì". Neo đổi sang dải thẻ của chính chặng đó - chỗ có con số để ra quyết định. */
+  {p:"changA",sel:'@bstats',t:"Tắc ở chặng nào thì dồn người vào đó",d:"Đọc dải chặng xong, việc của quản lý là chọn chỗ dồn người: ga nào ứ nhiều nhất và ứ lâu nhất thì ưu tiên trước, đừng chia đều.",hint:"So số ở các ô rồi bấm ô lớn nhất để ra danh sách người đang kẹt."},
   {p:"duyetck",sel:'@man',t:"Duyệt việc chờ bạn",d:"Chiết khấu lớn, hoàn tiền - nhân viên tạo là bạn nhận thông báo ngay, duyệt xong nhân viên biết liền.",hint:"Bấm 'Duyệt' hoặc 'Từ chối' trên một chiết khấu đang chờ.",chk:function(){return (window.TOURB&&rows("DL06").filter(function(x){return String(x.discount_approved_by||"").trim()}).length>(window.TOURB.duyet||0))}},
   {p:"giaoviec",sel:'@txt:Giao việc mới',t:"Giao việc cho đội",d:"Giao xuống cấp dưới, phối hợp ngang cấp, hoặc nhờ hỗ trợ. Việc bắt buộc thì không được từ chối.",hint:"Bấm 'Giao việc mới', chọn người nhận, ghi tiêu đề và hạn rồi Lưu.",chk:function(){return tourMore("viec")}},
-  {p:"giaoviec",sel:'@tbar',t:"Ai đang làm tốt, ai hay trễ",d:"Tab Tổng hợp cho biết tỷ lệ hoàn thành đúng hạn của từng người - dùng khi đánh giá cuối tháng.",hint:"Bấm tab Tổng hợp & báo cáo."}]},
+  /* V2 - neo vào ĐÚNG TAB mà chính câu hint bảo bấm, không neo vào cả thanh công cụ. `_checkneo`
+     bắt: bước này khoanh trùng chỗ với `tn_hotro 3/3` vì cả hai cùng trỏ `@tbar` - vỏ trang thì
+     bài nào cũng trỏ được, nên khoanh vào nó là khoanh vào chỗ không nói riêng điều gì. */
+  {p:"giaoviec",sel:'@txt:Tổng hợp',t:"Ai đang làm tốt, ai hay trễ",d:"Tab Tổng hợp cho biết tỷ lệ hoàn thành đúng hạn của từng người - dùng khi đánh giá cuối tháng.",hint:"Bấm tab Tổng hợp & báo cáo."}]},
  /* ---------- CẤP 3: CHUYÊN NGHIỆP (người cấu hình) ---------- */
  cn_thuonghieu:{lv:"chuyennghiep",t:"Đổi thương hiệu và menu",ic:"ti-palette",d:"5 bước - biến app thành bản của trung tâm bạn",steps:[
   {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'@settabs',t:"Trang Cài đặt là trung tâm điều khiển",d:"9 tab: giao diện, menu, phân quyền, ngưỡng SLA, ngưỡng KPI, câu nhắc việc, danh mục, khóa học, nhân sự. App không cắm cứng con số nào.",hint:"Bấm Tiếp theo."},
