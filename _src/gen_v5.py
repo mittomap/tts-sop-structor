@@ -3625,7 +3625,21 @@ function colMenuHTML(key){var cfg=LISTCFG[key];if(window.COLMENU!==key)return ''
    Bộ kiểm _checkux canh: dải nào gọi statStrip mà không khai ở đây là đỏ; số thẻ khai lệch với
    số thẻ vẽ ra thật cũng đỏ; thẻ nào còn onclick cũng đỏ. */
 var THEDEF={
- /* ═══ V2 KHÚC 2b - BỐN HÀNG CHỜ PHÊ DUYỆT CÓ DẢI THẺ RIÊNG ════════════════════════════════
+ /* ═══ V2 KHÚC 2b đợt 2 - BA TRANG NỮA CÓ DẢI THẺ RIÊNG ═════════════════════════════════════
+    Cùng luật RB2 như đợt 1: con số lấy từ ĐÚNG phép đếm mà thân trang bên dưới đang dùng (chính
+    là các con số đang hiện trên chip lọc), không viết lại lần thứ hai. */
+ khieunai:{t:"Xử lý khiếu nại",the:[
+  ["kn_moi","Mới tiếp nhận","Khiếu nại vừa nhận, chưa cử người xử lý. Danh sách: bấm chip \"Mới\" ở thanh lọc ngay dưới."],
+  ["kn_dang","Đang xử lý","Đã có người nhận và đang làm - gồm cả phiếu đã đẩy lên cấp trên. Danh sách: bấm chip \"Đang xử lý\"."],
+  ["kn_tong","Tổng phiếu chưa đóng","Mọi khiếu nại chưa đóng trong phạm vi dữ liệu của bạn. Danh sách: bấm chip \"Tất cả\"."]]},
+ baoluu:{t:"Bảo lưu / Bỏ học",the:[
+  ["bl_hold","Đang bảo lưu","Học viên đã dừng có thời hạn - còn quay lại được, và đó là việc phải giữ liên lạc. Danh sách: bấm chip \"Đang bảo lưu\"."],
+  ["bl_drop","Đã bỏ học","Học viên đã dừng hẳn. Danh sách: bấm chip \"Đã bỏ học\"."],
+  ["bl_nohen","Chưa hẹn liên hệ lại","Người đã dừng mà chưa ai đặt lịch gọi lại - để lâu là mất hẳn. Danh sách: bấm chip \"Chưa hẹn liên hệ lại\"."]]},
+ ychv:{t:"Học viên liên hệ",the:[
+  ["yc_moi","Chưa ai nhận","Yêu cầu và câu hỏi học viên gửi từ Cổng học viên mà chưa ai nhận xử lý. Danh sách: các dòng có chip \"Mới\" nằm trên đầu bảng dưới."],
+  ["yc_tong","Tổng yêu cầu đang mở","Mọi yêu cầu chưa đóng trong phạm vi của bạn. Danh sách: toàn bộ bảng ngay dưới."]]},
+/* ═══ V2 KHÚC 2b - BỐN HÀNG CHỜ PHÊ DUYỆT CÓ DẢI THẺ RIÊNG ════════════════════════════════
     Anh Luân tả V2: *"mỗi trang là nghiệp vụ riêng, và nó có THẺ, có chip lọc, có cảnh báo của
     riêng nó"*. Bốn hàng chờ này tách ra thành bốn trang ở Khúc 2a nhưng chưa có thẻ nào.
     LUẬT KHI THÊM THẺ (RB2): con số phải lấy từ ĐÚNG hàm mà thân trang đang dùng - `duyCkList`,
@@ -9135,7 +9149,11 @@ function renderYcHV(){
  var L=ychvList().slice().sort(function(a,b){
   var na=isc(a.task_status,"new")?0:1,nb=isc(b.task_status,"new")?0:1;if(na!==nb)return na-nb;
   return (pvnd(b.created_time)||0)-(pvnd(a.created_time)||0)});
- var h=h0+'<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>'+
+ var _ycMoi=L.filter(function(x){return isc(x.task_status,"new")}).length;
+ var h=h0+statStrip([
+  ["ti-inbox",_ycMoi,"Chưa ai nhận","#E24B4A",_ycMoi?"nhận trong ngày":""],
+  ["ti-messages",L.length,"Tổng yêu cầu đang mở","#3B82C4",""]],"ychv")+
+  '<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>'+
   'Yêu cầu học viên gửi từ Cổng học viên. Hệ thống tự chuyển tới học vụ, riêng yêu cầu về tiền thì chuyển kế toán, hạn nhận việc lấy theo <b>'+
   slaChip("slaTaskAccept_hours",4,"giờ")+'</b>. Nhận và trả lời ngay trong thẻ dưới đây.</div>';
  h+='<div class="panel"><div class="pbody">';
@@ -14543,6 +14561,12 @@ function renderKhieunai(embed){var p="khieunai",fil=fget(p);var all=srows("DL17"
  function st(c){var assigned=isc(c.complaint_status,"assigned","in_progress","resolved","escalated");var working=isc(c.complaint_status,"in_progress","resolved","escalated");var resolved=isc(c.complaint_status,"resolved");var overdue=!resolved&&hoursSince(c.complaint_time)!=null&&hoursSince(c.complaint_time)>slaLim(c.complaint_severity);return {assigned:assigned,working:working,resolved:resolved,overdue:overdue}}
  var view=all.filter(function(c){var s=st(c);if(fil==="all")return true;if(fil==="new")return !s.assigned;if(fil==="work")return s.assigned&&!s.resolved;if(fil==="overdue")return s.overdue;if(fil==="done")return s.resolved;return true});
  var h=embed?'':pageHead("Tiếp nhận & Xử lý Khiếu nại","Tiếp nhận - phân công - xử lý - đóng (SLA theo mức độ)",'<button class="btn primary" onclick="knAdd()"><i class="ti ti-plus"></i>Tiếp nhận khiếu nại</button>');
+ /* V2 Khúc 2b - dải thẻ của trang Khiếu nại. Ba con số gọi lại ĐÚNG `st()` của chính hàm này -
+    cũng là phép đếm đang hiện trên chip lọc ngay dưới, nên thẻ và chip không bao giờ lệch nhau. */
+ if(!embed)h+=statStrip([
+  ["ti-alert-triangle",all.filter(function(c){return !st(c).assigned}).length,"Mới tiếp nhận","#E08A1E","cử người xử lý"],
+  ["ti-progress",all.filter(function(c){var x=st(c);return x.assigned&&!x.resolved}).length,"Đang xử lý","#3B82C4",""],
+  ["ti-folder",all.filter(function(c){return !st(c).resolved}).length,"Tổng phiếu chưa đóng","#6B7887",""]],"khieunai");
  /* V9.51: 4/4 o thong ke la nut loc doi lot - bo dai, so + mau don vao chip loc */
  view=fltApply(p,view);
  h+=filterBar(p,fil,[["all","Tất cả",all.length],
@@ -17533,6 +17557,12 @@ function renderBaoluu(embed){var p="baoluu",fil=fget(p);
  var nHold=all.length-nDrop;
  var h=embed?'':pageHead("Bảo lưu / Bỏ học","Học viên đang dừng học - liên hệ giữ chân, chốt bảo lưu hoặc mời quay lại. SOP: nhắc trước khi hết hạn bảo lưu "+num(paramOf("thresholdPauseRemind_days",14))+" ngày.",
   '<span class="chip amber">'+nHold+' bảo lưu</span> <span class="chip red">'+nDrop+' bỏ học</span>');
+ /* V2 Khúc 2b - dải thẻ của trang Bảo lưu. Ba con số dùng lại đúng `nHold`/`nDrop` mà đầu trang
+    và chip lọc đang dùng - một phép đếm, ba chỗ đọc. */
+ if(!embed)h+=statStrip([
+  ["ti-player-pause",nHold,"Đang bảo lưu","#E08A1E","giữ liên lạc"],
+  ["ti-user-x",nDrop,"Đã bỏ học","#E24B4A",""],
+  ["ti-calendar-off",all.filter(function(s2){return !String(s2.next_followup_time||"").trim()}).length,"Chưa hẹn liên hệ lại","#6B7887","đặt lịch gọi"]],"baoluu");
  /* V9.51: 4/4 o thong ke la nut loc doi lot - bo dai, so don vao chip loc */
  view=fltApply(p,view);
  h+=filterBar(p,fil,[["all","Tất cả",all.length],["hold","Đang bảo lưu",nHold,"amber"],

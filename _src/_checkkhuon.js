@@ -40,7 +40,7 @@ const APP = process.env.ITTS_APP || PATH.join(__dirname, "_APP.js");
 /* ---- trần: SỐ ĐO ĐƯỢC lúc dựng bộ này. Chỉ được HẠ, không bao giờ nâng. ---- */
 /* 16 -> 10: Khúc 2b đã cho bốn hàng chờ phê duyệt dải thẻ riêng. Trần HẠ theo, đúng luật chốt
    kéo xuống - sửa được trang nào thì hạ xuống đúng số mới, không bao giờ nâng lên. */
-const TRAN_THIEU_THE  = 10;  /* trang nghiệp vụ chưa có dải thẻ riêng */
+const TRAN_THIEU_THE  = 5;   /* trang nghiệp vụ chưa có dải thẻ riêng */
 /* 12 = SỐ ĐO ĐƯỢC. Bản đầu em đặt 8 - một con số ĐOÁN, và nó đỏ ngay. Trần phải là số đo được
    thật: đặt thấp hơn thực tế thì lần nào cũng đỏ, mà một bộ kiểm đỏ mãi thì người ta tắt nó đi.
    Danh sách 12 trang in ra ngay dưới bảng tổng kết - sửa được trang nào thì HẠ trần xuống. */
@@ -129,10 +129,14 @@ NV.forEach(k => {
   const coNut = /class="phead"[\s\S]{0,1500}?<button/.test(h) || /class="btn primary/.test(h);
   if (!coNut && !CHIDOC[k]) thieu.nut.push(k);
 
-  /* K3 - dải thẻ riêng: vẽ ra có thẻ, VÀ có khai ở THEDEF (khai mới sửa được ở Cài đặt) */
-  const coThe = /class="bstats|class="stat/.test(h);
-  const khaiThe = !!THEDEF[k];
-  if (!coThe || !khaiThe) thieu.the.push(k + (coThe && !khaiThe ? " (ve ra the ma khong khai o THEDEF)" : ""));
+  /* K3 - DẢI THẺ RIÊNG. Chỉ hỏi "trang có vẽ ra dải thẻ không".
+     Bản đầu đòi thêm `THEDEF[k]` tồn tại - tức đòi MÃ DẢI phải trùng MÃ TRANG. Đó là đòi hỏi vô
+     cớ: `buoihnay` dùng dải `httoday`, `khaosat` dùng dải `review`, cả hai đều khai đàng hoàng và
+     đều đúng. Hai trang bị chấm oan.
+     Và nó còn LÀM TRÙNG VIỆC: luật "mọi lời gọi `statStrip` phải truyền mã dải, và mã ấy phải có
+     trong `THEDEF`" đã là nhóm 10 của `_checkux`. Hai cái thước cùng đo một thứ thì sớm muộn hai
+     cái nói hai đằng, và người sửa không biết tin cái nào. Trả luật ấy về cho `_checkux`. */
+  if (!/class="bstats|class="stat/.test(h)) thieu.the.push(k);
 
   /* K4 - chip lọc */
   if (!/class="fbar|class="chipf|onclick="fset\(/.test(h)) thieu.loc.push(k);
