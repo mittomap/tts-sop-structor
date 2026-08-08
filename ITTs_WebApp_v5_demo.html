@@ -2291,7 +2291,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">08/08/2026 · <b>19f19f</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">08/08/2026 · <b>526628</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -2887,7 +2887,7 @@ var PAGES=[
 {k:"giaoan",g:"Chặng · Học tập",ic:"ti-notes",t:"Kho bài tập & Giáo án",c:"Bài + dặn dò mặc định từng buổi",ty:"custom"},
 {k:"diemdanh",g:"_",ic:"ti-checkbox",t:"Điểm danh",c:"Theo buổi",ty:"custom",hide:1},
 {k:"buoihoc",g:"_",ic:"ti-calendar-check",t:"Theo dõi nhận xét buổi",c:"SLA ghi nhận xét toàn bộ lớp",ty:"custom",hide:1},
-{k:"baitap",g:"_",ic:"ti-book",t:"Giao & chấm Bài tập",c:"Bài tập",ty:"custom",hide:1},
+{k:"baitap",g:"_",ic:"ti-book",t:"Giao & chấm Bài tập",c:"Bài tập",ty:"custom"},
 {k:"wow",g:"_",ic:"ti-star",t:"Buổi WOW 1-1",c:"Kèm riêng",ty:"custom",hide:1},
 {k:"gvdp",g:"_",ic:"ti-user-plus",t:"GV dự phòng theo ngày",c:"Ai thay được khi GV nghỉ đột xuất",ty:"custom",hide:1},
 /* V9.99z5 (anh Luân 05/08: *"lệch nhau giữa nghiệp vụ bên trong và trang trên sidebar là do
@@ -3045,7 +3045,7 @@ var ROLESCOPE={
  aca:{match:/^aca_/,land:"hoctap",ctx:{HTTAB:"lop"},
   /* V9.99z5 - thêm `bangcong`: người phụ trách chuyên môn là người duyệt giờ dạy của giảng viên
      và của đội WOW trước khi chốt lương. Trước đây bảng ấy chỉ Nhân sự và CEO có. */
-  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan","ketqua","bangcong"],
+  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan","baitap","ketqua","bangcong"],
   blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:1,mgr:1,
   /* V9.99y (anh Luân 05/08): *"Trưởng phòng aca cũng quản lý toàn bộ team Wow, em đừng quên"*.
      Đội WOW nằm trong phòng ACA nên phạm vi NGƯỜI đã đúng sẵn; thiếu là cái chuông - 21 việc
@@ -3064,7 +3064,13 @@ var ROLESCOPE={
     GHI của Học vụ / Trưởng phòng ACA (CH3). Trước bản này chúng vẫn mở cho giáo viên, đầy nút
     bấm vào là bị từ chối - đúng con bệnh "mời rồi đuổi" mà V9.51 đã chữa cho thanh menu. */
  giaovien:{match:/^teacher$/,land:"hoctap",ctx:{HTTAB:"today"},
-  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan"],
+  /* V2 08/08 - THÊM `baitap`. Nhịp ngày của giáo viên có dòng "Chấm bài học viên đã nộp - 12 bài"
+     và bảng cửa ghi (DOORTB) khai `baitap` thuộc `vai:["giaovien","aca"]` - tức app vẫn coi đây
+     là việc của họ. Vậy mà trang ấy khai `hide:1` và không chức danh nào ngoài quản trị/điều
+     hành có nó trong phạm vi: giáo viên được app giục đi chấm bài rồi bị chặn ở cửa.
+     Đúng LUẬT SỐ 0 - SOP mô tả, app có trang, người phải làm không có lối vào là SÓT, không phải
+     là "ngoài phạm vi". */
+  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan","baitap"],
   tabs:{hoctap:["buoihnay","lichtuan","lop","buoihoc","wow"]},
   blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:0,bell:["Giảng viên chuyên môn","Giao việc"]},
  /* V9.60: CH3 giao cho NV WOW việc CHẤM TEST ĐẦU VÀO, mà phạm vi trang lại không có màn test -
@@ -3079,7 +3085,10 @@ var ROLESCOPE={
     nhận và làm theo thôi." Trước đây cấu hình quyền cho Kế toán duyệt, trong khi DỮ LIỆU ghi
     NV012 - Trưởng phòng Tư vấn - là người duyệt cả 8 lần. Cấu hình sai, dữ liệu đúng. */
  ketoan:{match:/^account/,land:"tuyensinh",ctx:{TSTAB:"thanhtoan"},
-  pages:["viec","hocvien","giangvien","tuyensinh","duyet","baocao","bangcong"],   /* V9.99z5: kế toán chốt lương theo bảng công giảng dạy */
+  /* V2 08/08 - thêm `dsthanhtoan` (Sổ thu học phí): nhịp cuối ngày của kế toán là "nhìn dự thu
+     tháng", trỏ thẳng vào sổ ấy - mà trước bản này chỉ quản trị và điều hành được xem. Sổ thu
+     học phí là sổ của chính phòng kế toán. */
+  pages:["viec","hocvien","giangvien","tuyensinh","duyet","baocao","bangcong","dsthanhtoan"],   /* V9.99z5: kế toán chốt lương theo bảng công giảng dạy */
   /* V9.99r - Kế toán chỉ có phần THANH TOÁN của hub Tuyển sinh. Trước đây không khai tab nào
      nên họ bấm được cả Lead, Test đầu vào, Tư vấn & Đăng ký - ba bước họ khai `lead:"none"`,
      mở ra chỉ để nhìn. Khai đúng một tab thì phễu, câu mở đầu và menu cùng thu lại theo. */
@@ -3197,6 +3206,20 @@ function buildScope(code){
     là chỗ sửa LUẬT của cả trung tâm. Vai trò quản trị hệ thống nay là tài khoản Quản trị viên
     riêng; Nhân sự có nhóm `nhansu` với màn của chính họ. Nhóm dự phòng thì không được với tới
     Cài đặt trong mọi trường hợp - một chức danh app chưa biết là chức danh chưa ai duyệt quyền. */
+ /* ═══ V2 08/08 - NỞ TAB THÀNH TRANG CHO CẢ LỚP PHỦ CHẠY LÚC ĐĂNG NHẬP ═══════════════════════
+    `noQuyenTheoTrang()` đã nở `ROLESCOPE` từ tab sang trang khi V2 dỡ hub - nhưng nó chạy MỘT
+    LẦN trên bảng TĨNH. Lớp phủ quản lý ngay phía trên lại thêm quyền bằng cách ghi vào `eff.tabs`
+    (`eff.tabs.duyet=["duyetck","banggiao"]` - anh Luân chốt 29/07: *"Duyệt chiết khấu là trưởng
+    phòng tư vấn"*), và những dòng ấy KHÔNG được nở.
+    Ở V1 vẫn chạy đúng vì `duyetck` là mục con của hub `duyet`, nên `navVis` hỏi tới `rs.tabs`.
+    Sang V2 nó là TRANG ĐỘC LẬP - `navOwner("duyetck")` trả về chính nó, nhánh hỏi `rs.tabs` không
+    bao giờ chạy tới. Hậu quả đo được 08/08: **Trưởng phòng Tư vấn được SOP giao duyệt chiết
+    khấu, nhịp ngày nhắc họ "Chiết khấu chờ bạn duyệt", mà trang ấy không mở được.**
+    Nở ở ĐÂY - sau mọi lớp phủ, trước bản sửa tay của anh Luân - nên lớp phủ nào thêm sau này
+    cũng tự đúng, không phải nhớ sửa hai nơi. */
+ if(eff.pages!=="*"&&eff.tabs)for(var _hub in eff.tabs)(eff.tabs[_hub]||[]).forEach(function(_t){
+  var _k=((typeof HUBTAB!=="undefined"&&HUBTAB[_hub]&&HUBTAB[_hub].m)||{})[_t]||_t;
+  if(PBK[_k]&&eff.pages.indexOf(_k)<0)eff.pages.push(_k)});
  /* V9.61: bản sửa của anh Luân trong Cài đặt đắp lên CUỐI cùng - sau mọi luật tự động ở trên,
     để cái anh bấm luôn là cái thắng. */
  eff.pages=qtPages(gk,eff.pages);
@@ -3664,7 +3687,23 @@ function isRisk(v){return /at_risk|off_track/.test(ecode(v))}
    còn đa số dừng ở ngăn kéo là đủ. */
 var LISTCFG={
 hocvien:{code:"DL09",filt:"student_status",ro:1,sub:"Học viên (DL09) - lọc theo trạng thái / nguy cơ / lớp / khóa",extra:"hvExtraFilter",
- qf:[["risk","Nguy cơ",function(s){return stuRisk(s)}]],
+ /* V2 - CHIP LỌC PHẢI KHỚP VỚI CON SỐ TRÊN MÀN. Anh Luân đưa ca thật: *"Học vụ muốn có danh sách
+    các học viên nghỉ học nhiều, và xếp theo lớp chẳng hạn, họ đủ thông tin ko, có đủ nghiệp vụ
+    ko?"* Đo thật: dữ liệu CÓ (44 học viên vắng từ 2 buổi, 29 vắng từ 3, nhiều nhất 13 buổi), cột
+    "Vắng (buổi)" CÓ, bấm cột xếp được, ô xổ chọn lớp CÓ, nghiệp vụ trên dòng CÓ.
+    Thiếu đúng một thứ: **không có chip nào lọc ra "vắng nhiều"** - người ta phải xếp cột rồi tự
+    đọc bằng mắt. Thông tin có, đường tới nó thì không.
+    Ngưỡng đi qua CH2 (`thresholdAtRisk_absences` - tham số app ĐANG dùng để tính cờ nguy cơ,
+    không đẻ thêm tham số thứ hai cho cùng một khái niệm) chứ không cắm cứng - trung tâm nào coi 2
+    buổi là nhiều, trung tâm nào coi 4, đó là chuyện của người dùng chứ không phải của người viết. */
+ /* V2 08/08 - thêm "Nguy cơ học thuật": nhịp ngày của Trưởng phòng ACA hỏi đúng câu này mỗi
+    ngày ("Điểm tụt là dấu hiệu sớm nhất, thấy trước khi họ nghỉ"), mà trang Học viên chỉ có chip
+    nguy cơ CHUNG - lọc ra 23 người trong khi câu hỏi của ACA là 7 người. Hỏi thẳng `stuAca`,
+    cùng hàm mà cờ nguy cơ học thuật của app đang dùng. */
+ qf:[["risk","Nguy cơ",function(s){return stuRisk(s)}],
+     ["hocthuat","Nguy cơ học thuật",function(s){return stuAca(s)}],
+     ["vangnhieu","Vắng nhiều",function(s){var A=riskAuto(s.student_id)||{};
+       return num(A.abs)>=num(paramOf("thresholdAtRisk_absences",2))}]],
  act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"student_id"}],
  cols:[["student_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["student_status","Trạng thái","chip"],["attendance_progress_status","Chuyên cần","chip"],["academic_progress_status","Học thuật","chip"],["attendance_risk_reason","Lý do CC","enum"],["academic_risk_reason","Lý do HT","enum"],["__vang","Vắng (buổi)","calcso"],["__thieubai","Thiếu bài","calcso"],["last_learning_activity_time","Hoạt động cuối","lau"],["wow_quota_remaining","WOW còn"]]},
 lop:{code:"DL10",
@@ -3698,10 +3737,33 @@ giangvien:{code:"DL01",ro:1,sub:"Giảng viên & NV WOW (DL01) - lọc nhanh đ�
  pre:function(s){return /teacher|wow|giảng|giang/.test(ecode(s.role))||/giảng|giang|teacher/i.test(String(s.role))},
  cols:[["staff_id","Mã"],["full_name","Họ tên"],["role","Vai trò","enum"],["phone","SĐT"],["email","Email"],["branch","Cơ sở","enum"],["status","Trạng thái","chip"]]},
 nhanvien:{code:"DL01",filt:"status",ro:1,lam:"nhansu",sub:"Toàn bộ nhân sự (DL01)",
+ /* V2 08/08 - chip "Hồ sơ còn thiếu": nhịp sáng của Nhân sự là *"soát danh sách nhân sự - ai mới
+    vào, ai đã nghỉ, ai chưa có chức danh hoặc chưa gắn cơ sở"*. App đã có `hsThieu()` đếm ra con
+    số ấy từ lâu, nhưng trang Nhân sự không có cách nào lọc riêng họ ra: người dùng đọc "3 hồ sơ
+    thiếu" rồi phải dò 36 dòng bằng mắt. Hỏi thẳng `hsThieuMot` - cùng phép thử `hsThieu` dùng. */
+ qf:[["thieu","Hồ sơ còn thiếu",function(x){return hsThieuMot(x)}]],
  cols:[["staff_id","Mã"],["full_name","Họ tên"],["role","Vai trò","enum"],["department","Bộ phận"],["email","Email"],["reports_to_name","Quản lý"],["status","Trạng thái","chip"]]},
 /* V9.42: mọi danh sách khác đều có dòng `sub` nói rõ nó là bảng nào, riêng bảng lead thì không -
    người mới mở ra không biết mình đang xem DL02 hay một bảng lọc sẵn nào đó. */
 nhaplead:{code:"DL02",filt:"lead_status",
+ /* V2 - BA CHIP LỌC KHỚP ĐÚNG BA THẺ. Anh Luân đưa ca thật: *"với lead, muốn xem danh sách lead
+    có hẹn trong hôm nay hoặc 1 ngày cụ thể thì vào đâu, vào đó thì có nghiệp vụ gì"*.
+    Đo thật: vào trang Lead là đúng chỗ, cột "Hẹn liên hệ" có, nghiệp vụ trên dòng có (Xử lý, Ghi
+    liên hệ). Thẻ báo "Tới hẹn liên hệ: 5" - nhưng KHÔNG có cách nào lọc ra đúng 5 dòng ấy, phải
+    xếp cột rồi đọc bằng mắt trên 193 dòng.
+    Đúng con bệnh anh Luân bắt hai lần: con số đúng mà KHÔNG DẪN TỚI ĐÂU.
+    Nay mỗi thẻ có một chip cùng tên ngay dưới - bấm là ra đúng danh sách của con số đó. */
+ /* V2 08/08 - thêm hai chip cho MARKETING. Ba dòng nhịp của họ ("lead đêm qua về từ nguồn nào",
+    "lead mới chưa ai nhận", "lead không đạt chuẩn") trước đây trỏ vào hub `tuyensinh` - trang đã
+    rời khỏi menu ở V2 - và không dòng nào có chip. Nay cả ba về đúng sổ Lead, mỗi câu một chip.
+    "Lead mới chưa chạm" cũng siết lại cho khớp câu hỏi: mới VÀ chưa gọi lần nào; trước đây chỉ
+    hỏi trạng thái nên nhịp đếm 4 mà chip hiện 5 - hai con số cho một câu hỏi. */
+ qf:[["moi","Lead mới chưa chạm",function(l){return isc(l.lead_status,"new")&&!String(l.first_call_time||"").trim()}],
+     ["toihen","Tới hẹn liên hệ",function(l){var d=pvnd(l.next_followup_time);
+       return d&&d<=endToday()&&!isc(l.lead_status,"converted","rejected")}],
+     ["khongai","Chưa ai phụ trách",function(l){return !String(l.assigned_to||"").trim()&&!isc(l.lead_status,"converted","rejected")}],
+     ["dem","Về trong 24h qua",function(l){var t=hoursSince(l.lead_created_time);return t!=null&&t<=24}],
+     ["xau","Không đạt chuẩn",function(l){return /not_qualified|unqualified/.test(ecode(l.lead_qualification_status))}]],
  /* Ba con số này đọc thẳng trạng thái lead và mốc hẹn - đúng thứ thanh lọc ngay dưới đang lọc. */
  the:function(all){var hn=new Date();
   return [["ti-user-plus",all.filter(function(l){return isc(l.lead_status,"new")}).length,"Lead mới chưa chạm","#E24B4A","gọi trong hạn SLA"],
@@ -4822,6 +4884,17 @@ function clearFilt(key){__clearHVF();FILT[key]=[];if(window.QF)window.QF[key]=nu
  if(window.FLT2)window.FLT2[key]={};   /* V9.28: xoá lọc là xoá CẢ bộ lọc chuyên sâu, không để sót điều kiện ẩn */
  PAGE[key]=0;rlist(key)}
 function qfToggle(key,k){window.QF=window.QF||{};window.QF[key]=(window.QF[key]===k)?null:k;PAGE[key]=0;rlist(key)}
+/* V2 08/08 - ĐẾM ĐÚNG BẰNG PHÉP ĐẾM CỦA CHIP, KHÔNG ĐẾM LẠI.
+   Nhịp ngày cần con số "bao nhiêu lead tới hẹn hôm nay". Trước đây nó tự viết lại phép đếm ấy,
+   và bản viết lại lệch khỏi chip trên trang (nhịp `rows()` toàn trung tâm, chip `scopeList()`
+   theo phạm vi người dùng). Hai phép đếm cho cùng một câu hỏi thì kiểu gì cũng có ngày lệch.
+   Hàm này dựng LẠI ĐÚNG tập mà `renderList` dựng cho dải chip - cùng `scopeList`, cùng `pre` -
+   rồi chạy đúng hàm lọc của chip ấy. Nhịp gọi hàm này thì số của nhịp LÀ số của chip. */
+function qfDem(key,k){
+ var c=LISTCFG[key];if(!c||!c.qf)return 0;
+ var d=c.qf.filter(function(x){return x[0]===k})[0];if(!d)return 0;
+ var all=scopeList(c.code,rows(c.code));if(c.pre)all=all.filter(c.pre);
+ return all.filter(d[2]).length}
 /* Bấm tên bất kỳ (Trang bắt đầu / Hành trình) -> MỞ DRAWER thông tin trước; muốn xử lý thì bấm nút. */
 /* V9.29 (anh Luân: "ở xếp lớp & onboarding, sao ko có drawer tóm tắt thông tin học viên em").
    Không riêng trang đó - 7 màn tác vụ đều in tên người thành CHỮ CHẾT. Một hàm dùng chung, cùng
@@ -5546,9 +5619,12 @@ var BVDUYET=[["ck_lon",0],["doilop2",1],["kn_duyet",2],["kn_duyet",3],["hoantien
    Nay cơ sở chỉ BẮT BUỘC với chức danh làm việc TẠI một cơ sở - giáo viên đứng lớp và tư vấn
    viên/leader tư vấn, đúng những vai mà app cắt phạm vi dữ liệu theo cơ sở. */
 var VAI_CO_SO=/^(teacher|sales_staff|sales_leader)/;
-function hsThieu(){return rows("DL01").filter(function(x){
+/* V2 08/08 - tách phép thử MỘT hồ sơ ra khỏi phép đếm cả danh sách, để chip lọc trên trang
+   Nhân sự và con số trên nhịp ngày dùng chung một luật (chứ không phải hai bản chép tay). */
+function hsThieuMot(x){
  if(!String(x.role||"").trim())return true;
- return VAI_CO_SO.test(ecode(x.role)||"")&&!String(x.branch||"").trim()})}
+ return VAI_CO_SO.test(ecode(x.role)||"")&&!String(x.branch||"").trim()}
+function hsThieu(){return rows("DL01").filter(hsThieuMot)}
 var BVMA={"Học viên liên hệ":"bv_ychv","Lead mới (chưa LH)":"bv_lead_new","Lead đang khai thác":"bv_lead_work","Test sắp tới":"bv_test_up","Tư vấn cần làm":"bv_tv_can","Test chờ chấm":"bv_test_wait","Test đã chấm":"bv_test_done","WOW sắp tới":"bv_wow_up","WOW có tiến bộ":"bv_wow_imp","Buổi đã hoàn thành":"bv_ses_done","Cần viết nhận xét buổi":"bv_ses_note","Bài tập chờ chấm":"bv_hw_wait","HV nguy cơ học thuật":"bv_risk_aca","Nhập học chưa xong":"bv_ob_open","Học viên nguy cơ":"bv_risk_stu","Phản hồi chờ phân loại":"bv_fb_new","Khiếu nại đang xử lý":"bv_kn_open","Chiết khấu cần duyệt":"bv_ck_duyet","Đổi lớp từ N lần":"bv_doilop2","Lead mới N ngày":"bv_mk_moi","Lead chưa ai phụ trách":"bv_mk_orph","Nguồn đang kém":"bv_mk_yeu","Khách cũ chờ chạy lại":"bv_mk_cu","Thưởng giới thiệu chưa trao":"bv_mk_thuong","Khiếu nại mức CAO":"bv_kn_high","Khiếu nại đã leo thang":"bv_kn_esc","Hoàn tiền chờ duyệt":"bv_hoan","Việc mới chờ nhận":"bv_tk_new","Đang làm":"bv_tk_doing","Quá hạn":"bv_tk_late","Chờ người giao xác nhận":"bv_tk_wait","Hồ sơ nhân sự còn thiếu":"bv_hs_thieu","Buổi thiếu mốc giờ vào/ra":"bv_gio_thieu","Buổi quá hạn nhận xét":"bv_aca_note","Buổi hôm nay chưa có giáo viên":"bv_aca_gv","Học viên đuối học thuật":"bv_aca_risk","Đơn còn nợ phí":"bv_no_phi","Phiếu thu chờ đối soát":"bv_thu_soat"};
 function bvStrip(t,bc,d,o,tour){
  if(!o.length)return "";
@@ -6295,7 +6371,38 @@ function slaItems(){var out=jTasks();
      null,null,null,{hoso:r.student_id,act:"riskCare",rid:r.student_id,
       prm:A.att?"thresholdAtRisk_absences":"thresholdAtRisk_hw_missing"})})})();
  return out}
-function jumpFlow(page,filter){if(filter){if(page==="xeplop")window.XLFILT=filter;else fset(page,filter)}go(page)}
+/* ═══ V2 - MỘT CỬA ĐẶT CHIP LỌC CHO MỌI TRANG (đo 08/08 theo câu anh Luân hỏi) ═══════════════
+   Anh Luân 08/08: *"mỗi nhân viên, mỗi trưởng phòng, họ hỏi bao nhiêu loại câu hỏi... họ cần
+   bao nhiêu trang? Hệ thống lớn, nhưng quá khó dùng thì chết ngay."*
+   Đo bằng máy trên bảng `NHIP` (chính app khai mỗi chức danh mỗi ngày hỏi gì): 74 câu hỏi trên
+   16 chức danh, mà chỉ 12 câu bấm một cái là ra ĐÚNG danh sách. 62 câu còn lại app nói "có 30
+   buổi chưa nhận xét" rồi thả người ta vào bảng 200 dòng tự dò bằng mắt.
+   Gốc của chuyện đó nằm ở đây: `jumpFlow` chỉ biết HAI kiểu chip (fset và XLFILT), trong khi
+   app có NĂM kiểu. Nhịp ngày muốn dẫn tới một chip nào khác thì không có đường, nên nó chỉ
+   `go(trang)` rồi bỏ mặc.
+   Nay MỘT hàm biết cả năm kiểu, và mã chip khai theo tiền tố nên đọc ra ngay nó là kiểu nào:
+     · "abc"      - trang tác vụ, dải chip dựng bằng `filterBar` (fset)
+     · "qf:abc"   - trang danh sách, chip tuỳ biến (`LISTCFG.qf` -> window.QF)
+     · "en:abc"   - trang danh sách, chip trạng thái sinh từ danh mục (FILT)
+     · "xl:abc"   - Xếp lớp (biến riêng XLFILT, có từ trước V2)
+     · "tk:tab/f" - Giao việc (hai biến TKTAB + TKF, tab và nhóm lọc là hai tầng) */
+function nhipDat(page,filter){
+ if(!page||!filter)return;
+ var f=String(filter),i=f.indexOf(":"),k=(i<0?"":f.slice(0,i)),v=(i<0?f:f.slice(i+1));
+ /* "qf:key" đặt chip trên chính trang này; "qf:trang/key" đặt chip trên một danh sách được
+    NHÚNG trong trang này (vd trang Nhân sự nhúng danh sách `nhanvien`) - chip thuộc về danh
+    sách nhúng chứ không thuộc về trang, nên mã chip phải nói ra nó nằm ở đâu. */
+ if(k==="qf"||k==="en"){var j=v.indexOf("/"),pg=(j<0?page:v.slice(0,j)),key=(j<0?v:v.slice(j+1));
+  if(k==="qf"){window.QF=window.QF||{};window.QF[pg]=key}else FILT[pg]=[key];
+  PAGE[pg]=0;return}
+ if(k==="xl"){window.XLFILT=v;return}
+ if(k==="tk"){var ab=v.split("/");window.TKTAB=ab[0]||"mine";if(ab[1])window.TKF=ab[1];return}
+ if(k==="vi"){window.VIECTEAM="all";window.VIECGRP="all";window.VIECSEV=v;window.VIECOD=(v==="red");return}
+ if(k==="bt"){window.BTMODE=v;return}
+ if(k==="ga"){window.GATAB=v;return}
+ if(page==="xeplop"){window.XLFILT=f;return}   /* lời gọi cũ không có tiền tố - giữ chạy được */
+ fset(page,f)}
+function jumpFlow(page,filter){nhipDat(page,filter);go(page)}
 function slaAct(act,id){
  /* V9.29: hai luật mới (duyệt xin nghỉ, ghi nhận xét buổi) đi qua đây - thiếu là bấm "Xử lý ngay"
     không ra gì mà cũng không báo lỗi. */
@@ -12614,6 +12721,10 @@ function saveMsg(idx){var a=ch4List();var m=a[idx];if(!m){toast("Không thấy t
 function eFull(en,code){var a=ENUM[en]||[];for(var i=0;i<a.length;i++){if(ecode(a[i])===code||a[i].indexOf(code)===0)return a[i]}return code}
 function uniqTitles(){var s={},o=[];rows("DL13").forEach(function(r){var t=r.homework_title;if(t&&!s[t]){s[t]=1;o.push(t)}});return o}
 function renderBaitap(){return btHub(false)}
+/* Từ dòng "chờ chấm" nhảy thẳng vào đúng lớp + đúng bài ở chế độ Chấm - không bắt người ta
+   chọn lại lớp rồi chọn lại bài trong hai ô select. */
+function btChamNgay(cid,title){if(cid)window.BTCLASS=cid;if(title)window.BTGRADE=title;
+ window.BTMODE="cham";reRender(CUR)}
 /* btHub: giao / thu / chấm bài. embed=true -> bỏ tiêu đề trang, classBar, ô chọn lớp
    (do trang Lớp học đã có); giữ ô chọn buổi + chế độ. */
 function btHub(embed){
@@ -12629,7 +12740,29 @@ function btHub(embed){
  var curSes=find("DL11","session_id",sesId)||null, SP=curSes?sesPlan(curSes):null;
  h+='<span class="lbl">Buổi</span><select class="sel" onchange="window.BTSESS=this.value;reRender(CUR)">'+
   (sesL.length?sesL.map(function(s){var p=sesPlan(s);return '<option value="'+esc(s.session_id)+'"'+(s.session_id===sesId?" selected":"")+'>Buổi '+esc(s.session_number)+(s.session_date?" · "+esc(s.session_date):"")+(p&&p.hw?" · "+esc(p.hw.title):"")+'</option>'}).join(""):'<option>(lớp chưa có buổi)</option>')+'</select>';
- h+='<div class="sep"></div>'+segHTML(mode,[["giao","Giao bài"],["thu","Thu bài"],["cham","Chấm bài"]],"window.BTMODE='{k}';reRender(CUR)")+'</div>';
+ /* V2 08/08 - THÊM MỘT CHẾ ĐỘ: "CHỜ CHẤM - MỌI LỚP".
+    Câu hỏi cuối ngày của giáo viên là *"còn bài nào tôi chưa chấm?"* - nhịp ngày đếm ra 12 bài.
+    Nhưng ba chế độ cũ đều buộc chọn TRƯỚC một lớp và một buổi, nên muốn biết 12 bài ấy nằm đâu
+    thì phải mở từng lớp một mà dò. App biết câu trả lời mà không có màn nào nói ra.
+    Chế độ mới liệt kê thẳng bài đã nộp chưa chấm của mọi lớp, mỗi dòng một nút nhảy đúng vào
+    lớp + bài ấy ở chế độ Chấm. Số trên chip đếm bằng `btChoCham` - đúng hàm nhịp ngày dùng. */
+ var _chua=srows("DL13").filter(btChoCham);
+ h+='<div class="sep"></div>'+segHTML(mode,[["giao","Giao bài"],["thu","Thu bài"],["cham","Chấm bài"],
+  ["chocham","Chờ chấm - mọi lớp",_chua.length,_chua.length?"red":""]],"window.BTMODE='{k}';reRender(CUR)")+'</div>';
+ if(mode==="chocham"){
+  h+='<div class="panel"><div class="ph"><b>Bài đã nộp, chưa chấm - mọi lớp ('+_chua.length+')</b></div><div class="pbody">';
+  if(!_chua.length)h+='<div class="empty">Không còn bài nào chờ chấm. Sạch.</div>';
+  else{
+   h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Lớp</th><th>Bài</th><th>Nộp lúc</th><th></th></tr></thead><tbody>';
+   _chua.slice().sort(function(a,b){return String(a.homework_submitted_time||"").localeCompare(String(b.homework_submitted_time||""))})
+    .forEach(function(r){
+     h+='<tr><td>'+esc(r.student_name||r.student_id||"")+'</td>'+
+      '<td>'+lopLnk(r.class_id,r.class_id_name,"-")+'</td>'+
+      '<td>'+esc(r.homework_title||"(không tên)")+'</td>'+
+      '<td>'+esc(String(r.homework_submitted_time||"").slice(0,16)||"-")+'</td>'+
+      '<td><button class="btn primary sm" onclick="btChamNgay(\''+esc(r.class_id)+'\',\''+esc(String(r.homework_title||"").split("'").join(""))+'\')"><i class="ti ti-writing"></i>Chấm bài này</button></td></tr>'});
+   h+='</tbody></table></div>'}
+  return h+'</div></div>'}
  if(!cid){h+='<div class="panel"><div class="empty">Chọn một lớp để bắt đầu.</div></div>';return h}
  if(!embed)h+=classBar(cid);
  if(mode==="giao"){
@@ -13246,6 +13379,16 @@ function xlWaiting(){/* Đăng ký đã xác nhận (đã cọc/đóng) nhưng C
    Dùng ĐÚNG tập của nút "Xếp lớp học viên" để hàng đợi và nút luôn khớp nhau. */
  var haveOb={};rows("DL08").forEach(function(o){haveOb[o.student_id]=1});
  return rows("DL06").filter(function(e){return isc(e.enrollment_status,"confirmed")&&!haveOb[e.student_id]})}
+/* Dải chip của Xếp lớp - dựng ở MỘT chỗ vì trang vẽ nó ở hai nhánh (nhánh "chờ xếp lớp" trả về
+   sớm). Hai bản chép tay của cùng một dải chip là thứ chắc chắn có ngày lệch nhau. */
+function xlSegs(fil,obs,wait){
+ return segHTML(fil,[["all","Tất cả",obs.length],
+  ["chuaxep","Chờ xếp lớp",wait.length,wait.length?"red":""],
+  ["sendinfo","Chờ gửi thông tin lớp",obs.filter(function(o){return !obState(o).sent}).length,"amber"],
+  ["confirm","Chờ HV xác nhận",obs.filter(function(o){var s=obState(o);return s.sent&&!s.confirmed}).length],
+  ["finish","Chưa hoàn tất",obs.filter(function(o){return !obState(o).done}).length],
+  ["overdue","Quá hạn",obs.filter(function(o){var s=obState(o);return s.infoOverdue||s.obOverdue}).length,"red"]],
+  "window.XLFILT='{k}';reRender('xeplop')")}
 function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
  var wait=xlWaiting();
  var view=obs.filter(function(o){var s=obState(o);if(fil==="all")return true;if(fil==="sendinfo")return !s.sent;if(fil==="confirm")return s.sent&&!s.confirmed;if(fil==="finish")return !s.done;if(fil==="overdue")return s.infoOverdue||s.obOverdue;return true});
@@ -13259,7 +13402,12 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
   ["ti-layout-grid-add",obs.filter(function(o){return !isc(o.onboarding_status,"completed")}).length,"Onboarding chưa xong","#3B82C4","SLA "+slaChip("slaOBT_hours",72),"window.XLFILT='finish';reRender('xeplop')"],
   ["ti-alert-triangle",obs.filter(function(o){var s=obState(o);return s.infoOverdue||s.obOverdue}).length,"Quá hạn","#E24B4A","vi phạm PLR48/OBT","window.XLFILT='overdue';reRender('xeplop')"]],"xeplop");
  /* HÀNG ĐỢI CHỜ XẾP LỚP - trước đây bị giấu sau nút, nay thành danh sách như trong hành trình */
- if(wait.length&&(fil==="all")){
+ /* V2 08/08 - HÀNG "ĐÃ ĐÓNG ĐỦ · CHỜ XẾP LỚP" NAY CÓ CHIP RIÊNG.
+    Đây là câu hỏi đầu ngày của Học vụ ("Xếp lớp cho học viên đã đóng đủ"), mà trước bản này nó
+    chỉ hiện khi chip đang ở "Tất cả" - tức là muốn thấy nó thì phải KHÔNG lọc gì cả, giữa một
+    trang có hai bảng. Nhịp ngày bấm vào chỉ mở được trang chứ không tách được đúng hàng ấy.
+    Nay có chip "Chờ xếp lớp": bật lên thì bảng onboarding lui, chỉ còn đúng danh sách này. */
+ if(wait.length&&(fil==="all"||fil==="chuaxep")){
   h+='<div class="sechd" style="display:flex;align-items:center;gap:8px"><i class="ti ti-user-plus" style="color:var(--red)"></i>Đã đóng đủ tiền · chờ xếp lớp ('+wait.length+')</div>';
   h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Khóa đã đăng ký</th><th>Ngày đóng đủ</th><th></th></tr></thead><tbody>';
   wait.forEach(function(e){var lastPay="";var ps=srows("DL07").filter(function(p){return String(p.enrollment_id)===String(e.enrollment_id)&&num(p.amount)>0});if(ps.length)lastPay=ps[ps.length-1].payment_time||"";
@@ -13267,12 +13415,16 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
     '<td>'+esc(e.course_id_name||e.course_id||"-")+'</td><td>'+esc(String(lastPay).slice(0,10)||"-")+'</td>'+
     '<td><button class="btn primary sm" onclick="xepFor(\''+esc(e.student_id)+'\')"><i class="ti ti-layout-grid-add"></i>Xếp vào lớp</button></td></tr>'});
   h+='</tbody></table></div></div>';
-  h+='<div class="sechd">Đang onboarding</div>';
+  if(fil==="all")h+='<div class="sechd">Đang onboarding</div>';
  }
+ if(fil==="chuaxep"){   /* chip này hỏi về DL06 (đơn đã đóng đủ), không hỏi về DL08 - bảng dưới lui */
+  h+=tbar(timHTML("xeplop")+xlSegs(fil,obs,wait),'<span class="tbcnt">'+wait.length+' hồ sơ</span>');
+  if(!wait.length)h+='<div class="empty">Không còn ai đóng đủ tiền mà chưa xếp lớp.</div>';
+  return h}
  /* V9.28: trang này tự dựng thanh công cụ và KHÔNG có biến p (nó dùng window.XLFILT),
     nên phải ghi thẳng mã trang - viết p ở đây là tham chiếu biến không tồn tại, lọc câm luôn. */
  view=fltApply("xeplop",view);
- h+=tbar(timHTML("xeplop")+segHTML(fil,[["all","Tất cả"],["sendinfo","Chờ gửi thông tin lớp"],["confirm","Chờ HV xác nhận"],["finish","Chưa hoàn tất"],["overdue","Quá hạn","","red"]],"window.XLFILT='{k}';reRender('xeplop')"),
+ h+=tbar(timHTML("xeplop")+xlSegs(fil,obs,wait),
   '<span class="tbcnt">'+view.length+' hồ sơ</span>'+fltBarHTML("xeplop",1));
  h+='<div class="obcards rows" data-tour="obcards">';if(!view.length)h+='<div class="empty">Không có hồ sơ phù hợp.</div>';
  var MIX=jIndex();
@@ -13935,8 +14087,17 @@ function tsReupList(){var L=jAll().filter(function(J){return J.k==="lost"||J.k==
    đầu trang chuẩn `pageHead`, nên chúng không có câu ngữ cảnh và không có chỗ đặt nút hành động.
    `_checkkhuon` sinh ra để bắt đúng loại lệch này: 25 trang mà mỗi trang một kiểu thì người dùng
    phải học lại bố cục ở từng trang. */
+/* V2 08/08 - "Khách nguội chờ chăm lại" đã có ba THẺ SỐ nhưng không có một chip lọc nào: người
+   dùng đọc "16 tới hẹn chăm lại" rồi phải dò cả danh sách bằng mắt để tìm ra 16 người ấy.
+   Nhịp cuối ngày của Marketing hỏi đúng câu này, nên nó cần một chip bấm ra ngay. */
+function reupTuiLoc(fil,L){
+ if(fil==="nguoi")return L.filter(function(J){return J.k==="no_contact"});
+ if(fil==="mat")return L.filter(function(J){return J.k!=="no_contact"});
+ if(fil==="toihen")return L.filter(function(J){var nf=jNF(J);return !!(nf&&nf<=endToday())});
+ return L}
 function renderReupTab(){
  var h0=nvHead("reup");
+ var fil=fget("reup");
  var L=tsReupList();
  var nNC=L.filter(function(J){return J.k==="no_contact"}).length,nLost=L.length-nNC;
  var t0=new Date();t0.setHours(0,0,0,0);
@@ -13944,6 +14105,11 @@ function renderReupTab(){
  var h=h0+statStrip([["ti-phone-off",nNC,"Chưa gặp được","#E08A1E","đổi kênh Zalo/SMS"],
   ["ti-user-x",nLost,"Đã mất / từ chối","#6B7887","chăm lại định kỳ"],
   ["ti-calendar-event",due,"Tới hẹn chăm lại","#E24B4A",due?"gọi hôm nay":""]],"reup");
+ h+=filterBar("reup",fil,[["all","Tất cả",L.length],
+  ["nguoi","Chưa gặp được",nNC,nNC?"amber":""],
+  ["mat","Đã mất / từ chối",nLost],
+  ["toihen","Tới hẹn chăm lại",due,due?"red":""]],reupTuiLoc(fil,L).length);
+ L=reupTuiLoc(fil,L);
  h+='<div class="notebar"><i class="ti ti-bulb"></i>'+goiyG("gy_khach_ngung_khong_phai_0425",'Khách ngưng chưa phải là mất - hẹn chăm lại theo đợt khai giảng hoặc ưu đãi.||Bấm "Xử lý" để gọi và ghi kết quả. Liên hệ được thì hành trình tự chạy tiếp.')+'</div>';
  /* V2 - DANH SÁCH RỖNG PHẢI NÓI VÌ SAO. `chayListHTML` không tự sinh lời khi không có dòng nào,
     nên trang này từng để lại một khoảng trắng - `_checkkhuon` mục K5 bắt được.
@@ -14046,10 +14212,21 @@ function testResult(id){var r=find("DL03","test_booking_id",id)||{};
 function testResultSave(id){var _tsK=attachLine("tsr");
  var vals={test_status:eFull("enum_test_status","graded"),skill_listening:fldV("t_l"),skill_reading:fldV("t_r"),skill_writing:fldV("t_w"),skill_speaking:fldV("t_s"),overall_score:fldV("t_o"),academic_note:fldV("t_note")+_tsK,result_time:nowStr(),post_test_status:eFull("enum_post_test_status","awaiting_consultation")};markRow("DL03","test_booking_id",id,vals,"Đã lưu kết quả test.","test");closeModal()}
 /* ===== P3 Tư vấn & Đăng ký (DL04 -> DL06) ===== */
+/* V2 08/08 - TRẠNG THÁI MỘT PHIẾU TƯ VẤN RA KHỎI BỤNG `renderTuvan`.
+   Trước đây `st()` là hàm nội bộ, nên nhịp ngày muốn đếm "chờ tạo đăng ký" phải VIẾT LẠI phép
+   đếm ấy bằng tay - và bản viết tay đã lệch thật: nhịp dùng `rows("DL04")` toàn trung tâm, còn
+   trang dùng `srows("DL04")`. Đưa ra ngoài thì nhịp, chip và danh sách cùng gọi một hàm.
+   Còn một chỗ lệch nữa ngay trong trang, sửa luôn: chip "Chờ tư vấn" đếm bằng
+   `isc(consultation_status,"not_consulted")` trong khi danh sách lọc bằng `!s.consulted` -
+   hai câu hỏi khác nhau đội cùng một cái tên. Nay cả hai đọc `tvChoTV`. */
+function tvEnrolled(c){return srows("DL06").some(function(e){return (c.consultation_id&&e.consultation_id===c.consultation_id)||(c.lead_id&&e.lead_id===c.lead_id)})}
+function tvSt(c){var consulted=isc(c.consultation_status,"consulted");var closed=isc(c.conversion_status,"confirmed_with_deposit");var dropped=isc(c.conversion_status,"dropped");return {consulted:consulted,closed:closed,dropped:dropped,enr:tvEnrolled(c)}}
+function tvChoTV(c){return !tvSt(c).consulted}
+function tvChoChot(c){var t=tvSt(c);return t.consulted&&!t.closed&&!t.dropped}
+function tvChoDK(c){var t=tvSt(c);return t.closed&&!t.enr}
 function renderTuvan(embed){var p="tuvan",fil=fget(p);var all=srows("DL04");
- function enrolled(c){return srows("DL06").some(function(e){return (c.consultation_id&&e.consultation_id===c.consultation_id)||(c.lead_id&&e.lead_id===c.lead_id)})}
- function st(c){var consulted=isc(c.consultation_status,"consulted");var closed=isc(c.conversion_status,"confirmed_with_deposit");var dropped=isc(c.conversion_status,"dropped");return {consulted:consulted,closed:closed,dropped:dropped,enr:enrolled(c)}}
- var view=all.filter(function(c){var s=st(c);if(fil==="all")return true;if(fil==="todo")return !s.consulted;if(fil==="close")return s.consulted&&!s.closed&&!s.dropped;if(fil==="enroll")return s.closed&&!s.enr;return true});
+ var st=tvSt;
+ var view=all.filter(function(c){if(fil==="all")return true;if(fil==="todo")return tvChoTV(c);if(fil==="close")return tvChoChot(c);if(fil==="enroll")return tvChoDK(c);return true});
  var h=embed?'':pageHead("Tư vấn & Đăng ký sau test","Tư vấn lộ trình sau test - chốt - tạo đăng ký",'<button class="btn primary" onclick="tvQuick()"><i class="ti ti-plus"></i>Tư vấn không qua test</button>');
  /* V9.51: 3 o loc doi lot bo di, so don vao chip; giu MOT o thong tin thuan (khach tu choi -
     khong co nut loc tuong ung, xem de cai thien). */
@@ -14057,9 +14234,9 @@ function renderTuvan(embed){var p="tuvan",fil=fget(p);var all=srows("DL04");
   ["ti-user-x",all.filter(function(c){return isc(c.conversion_status,"dropped")}).length,"Khách từ chối","#6B7887","xem lý do để cải thiện"]],"tuvan");
  view=fltApply(p,view);
  h+=filterBar(p,fil,[["all","Tất cả",all.length],
-  ["todo","Chờ tư vấn",all.filter(function(c){return isc(c.consultation_status,"not_consulted")}).length,"amber"],
-  ["close","Chờ chốt",all.filter(function(c){var t=st(c);return t.consulted&&!t.closed&&!t.dropped}).length],
-  ["enroll","Chờ tạo ĐK",all.filter(function(c){var t=st(c);return t.closed&&!t.enr}).length,"red"]],view.length);
+  ["todo","Chờ tư vấn",all.filter(tvChoTV).length,"amber"],
+  ["close","Chờ chốt",all.filter(tvChoChot).length],
+  ["enroll","Chờ tạo ĐK",all.filter(tvChoDK).length,"red"]],view.length);
  h+='<div class="obcards rows" data-tour="obcards">';if(!view.length)h+='<div class="empty">Không có hồ sơ phù hợp.</div>';
  var MIX=jIndex();
  view.forEach(function(c){var s=st(c);var id=c.consultation_id;
@@ -14132,8 +14309,12 @@ function tvEnrollSave(id){var c=find("DL04","consultation_id",id)||{};var cid=fl
   if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL06",enr)}else{d("EN-"+seqNo("DL06","enrollment_id"))}
  })}
 /* ===== P4 Thu & xác nhận Thanh toán (DL06 + DL07) ===== */
+/* V2 08/08 - `pinfo` ra khỏi bụng `renderThanhtoan`. Nó là phép tính TIỀN CỦA MỘT ĐĂNG KÝ (tổng,
+   đã thu, còn nợ, đợt chưa xác nhận) - nhịp ngày của kế toán cần nó để đếm "đợt tới hạn hôm nay"
+   bằng ĐÚNG phép tính mà trang đang dùng. Để nó nằm trong bụng một hàm vẽ thì mọi nơi khác phải
+   chép lại - mà chép lại chính là gốc của con bệnh "nhịp nói một số, trang hiện một số khác". */
+function pinfo(e){var tot=num(e.final_fee)||num(e.total_fee);var paid=num(e.paid_amount);var rem=e.remaining_amount!==undefined&&e.remaining_amount!==""?num(e.remaining_amount):Math.max(0,tot-paid);var pays=srows("DL07").filter(function(x){return x.enrollment_id===e.enrollment_id});var unverif=pays.filter(function(x){return !(x.verified_by&&String(x.verified_by).trim())}).length;return {tot:tot,paid:paid,rem:rem,pays:pays,unverif:unverif,full:rem<=0&&paid>0,partial:paid>0}}
 function renderThanhtoan(embed){var p="thanhtoan",fil=fget(p);var enr=srows("DL06");
- function pinfo(e){var tot=num(e.final_fee)||num(e.total_fee);var paid=num(e.paid_amount);var rem=e.remaining_amount!==undefined&&e.remaining_amount!==""?num(e.remaining_amount):Math.max(0,tot-paid);var pays=srows("DL07").filter(function(x){return x.enrollment_id===e.enrollment_id});var unverif=pays.filter(function(x){return !(x.verified_by&&String(x.verified_by).trim())}).length;return {tot:tot,paid:paid,rem:rem,pays:pays,unverif:unverif,full:rem<=0&&paid>0,partial:paid>0}}
  var view=enr.filter(function(e){var s=pinfo(e);var canc=isc(e.enrollment_status,"cancelled");
   if(fil==="cancelled")return canc;
   if(canc)return fil==="all";                    /* đã hủy chỉ hiện ở Tất cả và Đã hủy */
@@ -14156,7 +14337,7 @@ function renderThanhtoan(embed){var p="thanhtoan",fil=fget(p);var enr=srows("DL0
       LAM DUOC: noi ra SO TIEN. Chip dem dong, o dem tien - hai su that khac nhau. */
    return ["ti-calendar-dollar",vnd(ti),"Đến hạn thu, tính tới hôm nay","#E24B4A",
     n?(n+" đăng ký - lọc bằng chip \"Đến hạn\" bên dưới"):"không còn khoản nào tới hạn"]})()],"thanhtoan");
- var nDue=enr.filter(function(e2){var s2=pinfo(e2);var du=pvnd(e2.next_payment_due);return s2.rem>0&&du&&du<=endToday()&&!isc(e2.enrollment_status,"cancelled")}).length;
+ var nDue=ttToiHan().length;   /* V2 08/08: cùng một hàm với nhịp ngày - hai bên không lệch được */
  view=fltApply(p,view);
  h+=filterBar(p,fil,[["all","Tất cả",enr.length],["due","Tới hẹn thu",nDue,nDue?"red":""],
   ["debt","Còn công nợ",enr.filter(function(e){return pinfo(e).rem>0&&!isc(e.enrollment_status,"cancelled")}).length,"amber"],
@@ -14540,7 +14721,16 @@ function wowGrantSave(){
  closeModal();reRender(CUR);persistSoon()}
 function renderWow(embed){var p="wow",fil=fget(p);var all=srows("DL14");
  function st(w){var code=ecode(w.wow_status);var done=code==="completed";var confirmed=done||code==="confirmed";var booked=confirmed||code==="booked";var noshow=code==="no_show";var note=!!(w.wow_content_note&&String(w.wow_content_note).trim());var overdue=done&&!note&&hoursSince(w.wow_session_date)!=null&&hoursSince(w.wow_session_date)>paramOf("slaWowNote_hours",24);return {booked:booked,confirmed:confirmed,done:done,noshow:noshow,note:note,overdue:overdue}}
- var view=all.filter(function(w){var s=st(w);if(fil==="all")return true;if(fil==="confirm")return s.booked&&!s.confirmed&&!s.noshow;if(fil==="upcoming")return s.confirmed&&!s.done&&!s.noshow;if(fil==="note")return s.done&&!s.note;if(fil==="overdue")return s.overdue;return true});
+ /* V2 08/08 - ba chip dưới đây đổi sang ĐÚNG hàm mà nhịp ngày đang đếm (`wowChoXN`, `wowChoGhi`,
+    `wowVang`) và thêm chip "Buổi hôm nay" - câu hỏi đầu tiên của một GV WOW mỗi sáng, trước bản
+    này không có chip nào trả lời được nên nhịp chỉ mở trang rồi bỏ mặc. */
+ var view=all.filter(function(w){var s=st(w);if(fil==="all")return true;
+  if(fil==="homnay")return wowHomNay(w);
+  if(fil==="confirm")return wowChoXN(w);
+  if(fil==="upcoming")return s.confirmed&&!s.done&&!s.noshow;
+  if(fil==="note")return wowChoGhi(w);
+  if(fil==="noshow")return wowVang(w);
+  if(fil==="overdue")return s.overdue;return true});
  var h=embed?'':pageHead("Buổi WOW 1-1","Đặt buổi - xác nhận - dạy - ghi nội dung (trong 24h)",'<button class="btn primary" onclick="wowAdd()"><i class="ti ti-plus"></i>Đặt buổi WOW</button><button class="btn" onclick="wowGrantForm()"><i class="ti ti-star"></i>Cấp thêm lượt WOW</button>');
  var _w=all.map(st);
  var _done=all.filter(function(w){return isc(w.wow_status,"completed")});
@@ -14564,7 +14754,13 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=srows("DL14");
    return ["ti-phone-check",n,"Đã đặt, chờ HV xác nhận","#7C3AED",n?"gọi chốt giờ trước khi học viên quên":"đã xác nhận hết"]})(),
   ["ti-player-stop",srows("DL09").filter(function(x){return String(x.wow_quota_remaining||"")!==""&&wowQuotaOf(x.student_id).free<=0}).length,"HV đã hết lượt WOW","#6B7887","cấp thêm nếu có căn cứ"]],"wow");
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
- h+=filterBar(p,fil,[["all","Tất cả",all.length],["confirm","Chờ xác nhận lịch",_w.filter(function(x){return x.booked&&!x.confirmed&&!x.noshow}).length,"amber"],["upcoming","Đã xác nhận, sắp dạy",_w.filter(function(x){return x.confirmed&&!x.done&&!x.noshow}).length],["note","Chờ ghi nội dung",_w.filter(function(x){return x.done&&!x.note}).length,"amber"],["overdue","Quá hạn ghi chú",_w.filter(function(x){return x.overdue}).length,"red"]],view.length);
+ h+=filterBar(p,fil,[["all","Tất cả",all.length],
+  ["homnay","Buổi hôm nay",all.filter(wowHomNay).length],
+  ["confirm","Chờ xác nhận lịch",all.filter(wowChoXN).length,"amber"],
+  ["upcoming","Đã xác nhận, sắp dạy",_w.filter(function(x){return x.confirmed&&!x.done&&!x.noshow}).length],
+  ["note","Chờ ghi nội dung",all.filter(wowChoGhi).length,"amber"],
+  ["noshow","HV không đến, chưa hỏi",all.filter(wowVang).length,"amber"],
+  ["overdue","Quá hạn ghi chú",_w.filter(function(x){return x.overdue}).length,"red"]],view.length);
  h+='<div class="obcards rows" data-tour="obcards">';if(!view.length)h+='<div class="empty">Không có buổi WOW phù hợp.</div>';
  var MIX=jIndex();
  view.forEach(function(w){var s=st(w);var id=w.wow_id;
@@ -16948,6 +17144,46 @@ function bhState(s){
  var noteOver=done&&!note&&ageH!=null&&ageH>lim;
  var late=num(s.teacher_late_minutes)>0;
  return {done:done,cancelled:cancelled,running:running,note:note,ageH:ageH,lim:lim,noteOver:noteOver,late:late}}
+/* ═══ V2 08/08 - PHÉP ĐẾM CỦA CÂU HỎI TRONG NHỊP NGÀY, ĐẶT CẠNH NHAU MỘT CHỖ ═══════════════════
+   Anh Luân 08/08 hỏi mỗi chức danh hỏi bao nhiêu loại câu hỏi. Đo xong lòi ra chuyện nặng hơn
+   câu hỏi: NHỊP NÓI MỘT SỐ, TRANG HIỆN MỘT SỐ KHÁC. Gốc là mỗi bên tự viết lấy phép đếm - nhịp
+   đếm `rows()` toàn trung tâm, trang đếm `srows()` theo phạm vi người dùng, chip lại đếm kiểu
+   thứ ba. Ba bản chép tay của cùng một câu hỏi thì kiểu gì cũng có ngày lệch, và đã lệch thật:
+   Trưởng phòng Marketing đọc "57 việc quá hạn", mở trang ra thấy 7.
+   Mười ba hàm dưới đây là BẢN GỐC DUY NHẤT của mười ba câu hỏi ấy. Nhịp gọi chúng, chip trên
+   trang cũng gọi chúng, `_checkcauhoi.js` đối chiếu hai bên phải ra cùng một con số.
+   Tất cả nhận MỘT bản ghi và trả true/false, để dùng thẳng làm hàm lọc của chip. */
+function bhQuaHan(s){return bhState(s).noteOver}                       /* buổi quá hạn ghi nhận xét */
+function bhChoNX(s){var t=bhState(s);return t.done&&!t.note}           /* đã dạy xong, chưa ghi nhận xét */
+function btChoCham(h){return hwSubmitted(h)&&!hwGraded(h)}             /* bài đã nộp, chưa chấm */
+function wowChoXN(w){return isc(w.wow_status,"booked")}                /* đã đặt, chờ xác nhận lịch */
+function wowChoGhi(w){return isc(w.wow_status,"completed")&&!String(w.wow_content_note||"").trim()}
+function wowVang(w){return isc(w.wow_status,"no_show")&&!String(w.wow_no_show_reason||"").trim()}
+function wowHomNay(w){var d=pvnd(w.wow_session_date),t=new Date();
+ return !!(d&&sameDay(d,t)&&!isc(w.wow_status,"cancelled"))}
+function lopThieuGV(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()}
+/* Buổi HÔM NAY chưa có người dạy - việc của trang GV dự phòng. */
+function gvdpThieu(){var t=new Date();return srows("DL11").filter(function(x){var d=pvnd(x.session_date);
+ return d&&sameDay(d,t)&&!isc(x.session_status,"cancelled")&&!String(x.teacher_id||"").trim()})}
+/* Khoá chưa có một giáo án nào trong ngân hàng. */
+function gaThieuKhoa(){return srows("DL05").filter(function(k){
+ return !rows("DL21").some(function(p){return String(p.course_id||"")===String(k.course_id)})})}
+/* "Đã đóng đủ · chờ xếp lớp": KHÔNG viết hàm mới. Trang Xếp lớp đã có `xlWaiting()` và dải thẻ
+   của nó đang đếm bằng hàm ấy - nhịp ngày đọc chung, đó là lý do hai bên không lệch được. */
+/* Đăng ký tới hạn thu tính tới hôm nay (đúng phép đếm chip "Tới hẹn thu" của trang Thanh toán). */
+function ttToiHan(){return srows("DL06").filter(function(e){var s=pinfo(e),du=pvnd(e.next_payment_due);
+ return s.rem>0&&du&&du<=endToday()&&!isc(e.enrollment_status,"cancelled")})}
+/* Khách cũ TỚI HẸN chăm lại hôm nay - việc của trang Chăm lại khách cũ.
+   Bản đầu em đếm "mọi khách đã nguội" (16 người) trong khi trang đếm theo CHẶNG HÀNH TRÌNH
+   (3 người) - `_checkcauhoi` bắt được ngay: hai con số cho một câu hỏi. Câu hỏi thật của nhịp
+   cuối ngày là *"hôm nay chạm lại ai"*, tức là người TỚI HẸN, nên đếm đúng cái đó và đọc
+   chung `tsReupList()` với trang. */
+function reupToiHen(){return tsReupList().filter(function(J){var nf=jNF(J);return !!(nf&&nf<=endToday())})}
+/* Mã giới thiệu có thưởng còn treo, chưa chi. */
+function mgtChoChi(){return srows("DL19").filter(function(r){return isc(r.reward_status,"pending")})}
+/* Buổi đã dạy xong mà thiếu mốc giờ vào hoặc ra - thiếu là tính công sai. */
+function bcThieuMoc(){return srows("DL11").filter(function(x){return isc(x.session_status,"completed")&&
+ !(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())})}
 function yesv(x){return /^(true|1|yes|y|có|x)$/i.test(String(x==null?"":x).trim())}
 /* ===== HUB HỌC TẬP: Lớp học · Nhận xét buổi (SLA) · Buổi WOW 1-1 — gộp các trang giảng dạy rời ===== */
 function htGo(tab){window.HTTAB=tab;go("hoctap")}
@@ -17544,8 +17780,8 @@ function renderHoctap(){
 function renderBuoihoc(embed){var p="buoihoc",fil=fget(p);var all=srows("DL11");
  var view=all.filter(function(s){var st=bhState(s);
   if(fil==="all")return true;
-  if(fil==="note")return st.done&&!st.note;
-  if(fil==="overdue")return st.noteOver;
+  if(fil==="note")return bhChoNX(s);
+  if(fil==="overdue")return bhQuaHan(s);
   if(fil==="late")return st.late;
   if(fil==="cancelled")return st.cancelled;
   if(fil==="upcoming")return !st.done&&!st.cancelled;
@@ -17567,7 +17803,16 @@ function renderBuoihoc(embed){var p="buoihoc",fil=fget(p);var all=srows("DL11");
    var ss=find("DL11","session_id",a.session_id); var d=ss?pvnd(ss.session_date):null;
    return d&&d.getTime()>=Date.now()-2*36e5}),"Học viên đã báo nghỉ các buổi sắp tới - chờ duyệt");
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
- h+=filterBar(p,fil,[["all","Tất cả"],["note","Chờ ghi nhận xét"],["overdue","Quá hạn ghi"],["late","GV vào trễ"],["upcoming","Chưa dạy xong"],["cancelled","Hủy / cần dạy bù"]],view.length);
+ /* V2 08/08 - DẢI CHIP NÀY TRƯỚC ĐÂY KHÔNG CÓ MỘT CON SỐ NÀO. Sáu chip trần, người dùng phải
+    bấm từng cái mới biết cái nào có việc - trong khi nhịp ngày đã nói sẵn "30 buổi chưa nhận
+    xét" ở trang trước. Số đếm dùng ĐÚNG hàm `bhChoNX`/`bhQuaHan` mà nhịp ngày đang đếm, nên
+    hai chỗ không thể nói hai con số khác nhau nữa. */
+ h+=filterBar(p,fil,[["all","Tất cả",all.length],
+  ["note","Chờ ghi nhận xét",all.filter(bhChoNX).length,"amber"],
+  ["overdue","Quá hạn ghi",nOver,"red"],
+  ["late","GV vào trễ",all.filter(function(x){return bhState(x).late}).length],
+  ["upcoming","Chưa dạy xong",all.filter(function(x){var t=bhState(x);return !t.done&&!t.cancelled}).length],
+  ["cancelled","Hủy / cần dạy bù",all.filter(function(x){return bhState(x).cancelled}).length]],view.length);
  h+='<div class="obcards rows" data-tour="obcards">';
  if(!view.length)h+='<div class="empty">Không có buổi học phù hợp.</div>';
  view.slice(0,80).forEach(function(s){var st=bhState(s);var id=s.session_id;
@@ -21901,125 +22146,202 @@ function crumbLabel(key,ctx){ctx=ctx||{};var p=PBK[key];var t=p?p.t:key;
    LUẬT: mỗi nhịp KHÔNG tự đếm lấy - nó trỏ vào một nhóm việc CÓ SẴN của slaItems (cat/grp) hoặc
    một phép đếm đã có trong app. Tự đếm là ngày mai nhịp ngày và cái chuông nói hai con số.
    Nhịp nào không còn việc thì tick xanh - đó chính là "xong tới đâu". */
+/* ═══ V2 08/08 - MỖI DÒNG NHỊP KHAI THÊM MÃ CHIP ĐÍCH (ô thứ SÁU) ════════════════════════════
+   Anh Luân 08/08: *"mỗi nhân viên, mỗi trưởng phòng, họ hỏi bao nhiêu loại câu hỏi, họ cần bao
+   nhiêu trang để phục vụ nghiệp vụ? Hệ thống lớn, nhưng quá khó dùng thì chết ngay."*
+   Đo trên chính bảng này (nó là bản khai "mỗi ngày người này hỏi gì"): 74 câu hỏi / 16 chức
+   danh. Không ai cần quá 5 trang. Nhưng đo tiếp thì lòi ra hai chỗ hỏng:
+     · chỉ 12/74 câu bấm một cái là ra đúng danh sách - 62 câu còn lại thả người ta vào bảng
+       vài trăm dòng tự dò bằng mắt;
+     · và tệ hơn: CON SỐ TRÊN NHỊP KHÔNG BẰNG CON SỐ TRÊN TRANG. Nhịp đếm `rows()` (toàn trung
+       tâm), trang đếm `srows()` / `bellItems()` (phạm vi của người đó). Trưởng phòng Marketing
+       đọc "57 việc quá hạn" rồi mở trang ra thấy 7. Chỉ CEO là khớp, vì phạm vi CEO là tất cả.
+       Số đầu tiên người ta nhìn thấy mỗi sáng là số sai - không có cách nào tệ hơn.
+   HAI SỬA, đi cùng nhau:
+     1. mọi phép đếm ở đây đổi sang ĐÚNG NGUỒN mà trang đích đang đọc (`srows`, `bellItems`,
+        `scopeList`) - nhịp và trang cùng một phạm vi;
+     2. ô thứ SÁU khai mã chip trên trang đích, `nhipPanel` bấm qua `jumpFlow` nên tới nơi là
+        danh sách đã lọc sẵn đúng câu hỏi ấy.
+   `_src/_checkcauhoi.js` canh cả hai: mỗi dòng phải tới được, chip phải có thật, và SỐ TRÊN
+   NHỊP PHẢI BẰNG SỐ TRÊN CHIP. Lệch một con là đỏ. */
 var NHIP={
  tuvan:[
   ["sang","Gọi khách đã hẹn hôm nay","Khách hẹn mà không gọi là mất - việc gấp nhất trong ngày","nhaplead",
-   function(){return jTasks().filter(function(x){return x.cat==="Tuyển sinh"&&x.sev==="red"}).length}],
+   function(){return qfDem("nhaplead","toihen")},"qf:toihen"],
   ["sang","Nhận lead mới về trong đêm","Lead mới phải liên hệ trong hạn phản hồi","nhaplead",
-   function(){return rows("DL02").filter(function(l){return isc(l.lead_status,"new")&&!String(l.first_call_time||"").trim()}).length}],
+   function(){return qfDem("nhaplead","moi")},"qf:moi"],
   ["ngay","Chốt khách đã có kết quả test","Có điểm rồi mà không gọi tư vấn là nguội","tuvan",
-   function(){return rows("DL04").filter(function(c){return isc(c.consultation_status,"not_consulted")}).length}],
+   function(){return srows("DL04").filter(tvChoTV).length},"todo"],
   ["ngay","Tạo đăng ký cho khách đã chốt","Chốt miệng mà không lập phiếu thì không ai thu tiền được","tuvan",
-   function(){return rows("DL04").filter(function(c){return isc(c.conversion_status,"confirmed_with_deposit")&&
-    !rows("DL06").some(function(e){return String(e.lead_id||"")===String(c.lead_id||"")})}).length}],
+   function(){return srows("DL04").filter(tvChoDK).length},"enroll"],
   ["chieu","Nhận và báo xong việc được giao","Việc treo qua đêm là người giao phải đi hỏi","giaoviec",
-   function(){var me=CURSTAFF||"";return rows("DL23").filter(function(t){return String(t.assignee_id||"")===me&&tkSt(t)==="new"}).length}]],
+   function(){return tkScopeMine().filter(function(t){return tkSt(t)==="new"}).length},"tk:wait"]],
  /* V9.99p - NHỊP NGÀY CỦA ACA (nhóm mới tách khỏi Học vụ). Ngày của người phụ trách chuyên môn
     xoay quanh CHẤT LƯỢNG DẠY chứ không phải xếp lớp: nhận xét buổi có kịp hạn không, bài có
     được chấm không, lớp nào đang đuối, giáo án đã đủ cho khoá chưa. */
  aca:[
   ["sang","Soi buổi dạy hôm qua đã có nhận xét chưa","Nhận xét trễ là học viên mất mạch phản hồi, và số SLA của cả phòng lệch theo","buoihoc",
-   function(){return rows("DL11").filter(function(x){return bhState(x).noteOver}).length}],
+   function(){return srows("DL11").filter(bhQuaHan).length},"overdue"],
   ["sang","Bài tập đang chờ chấm","Chấm trễ thì buổi sau giáo viên không biết lớp yếu chỗ nào","baitap",
-   function(){return rows("DL13").filter(function(h){return String(h.submitted_at||"").trim()&&!String(h.graded_at||"").trim()}).length}],
+   function(){return srows("DL13").filter(btChoCham).length},"bt:chocham"],
   ["ngay","Học viên nguy cơ học thuật","Điểm tụt là dấu hiệu sớm nhất, thấy trước khi họ nghỉ","hocvien",
-   function(){return rows("DL09").filter(stuAca).length}],
+   function(){return qfDem("hocvien","hocthuat")},"qf:hocthuat"],
   ["ngay","Lớp thiếu giáo viên hôm nay","Buổi không có người dạy là buổi phải huỷ - biết sớm còn xoay được","gvdp",
-   function(){var t=new Date();return rows("DL11").filter(function(x){var d=pvnd(x.session_date);
-    return d&&sameDay(d,t)&&!isc(x.session_status,"cancelled")&&!String(x.teacher_id||"").trim()}).length}],
+   function(){return gvdpThieu().length}],
   ["chieu","Giáo án và ngân hàng bài của khoá","Khoá chưa đủ giáo án là lớp sau lại dạy chay","giaoan",
-   function(){return rows("DL05").filter(function(k){return !rows("DL21").some(function(p){return String(p.course_id||"")===String(k.course_id)})}).length}]],
+   function(){return gaThieuKhoa().length}]],
  hocvu:[
   ["sang","Duyệt xin nghỉ học của học viên","Giáo viên cần biết TRƯỚC giờ dạy ai vắng","duyetnghi",
    function(){return absQueue().length}],
   ["sang","Xếp lớp cho học viên đã đóng đủ","Đóng tiền rồi mà chờ xếp lớp là trải nghiệm tệ nhất","xeplop",
-   function(){return rows("DL06").filter(function(e){return num(e.remaining_amount)<=0&&num(e.paid_amount)>0&&
-    !rows("DL08").some(function(o){return o.student_id===e.student_id&&String(o.class_id||"").trim()})}).length}],
+   function(){return xlWaiting().length},"xl:chuaxep"],
   ["ngay","Gửi thông tin lớp và chốt xác nhận","Học viên chưa xác nhận lớp là chưa chắc đi học","xeplop",
-   function(){return rows("DL08").filter(function(o){var st=obState(o);return o.class_id&&!st.confirmed}).length}],
+   function(){return srows("DL08").filter(function(o){var s=obState(o);return s.sent&&!s.confirmed}).length},"xl:confirm"],
   ["ngay","Theo học viên nguy cơ","Bỏ học không báo trước - dấu hiệu luôn có trước cả tuần","hocvien",
-   function(){return rows("DL09").filter(stuRisk).length}],
+   function(){return qfDem("hocvien","risk")},"qf:risk"],
   ["chieu","Soi buổi chưa ghi nhận xét","Cuối ngày là lúc nhắc giáo viên, không phải sáng hôm sau","buoihoc",
-   function(){return rows("DL11").filter(function(x){return bhState(x).noteOver}).length}]],
+   function(){return srows("DL11").filter(bhQuaHan).length},"overdue"]],
  giaovien:[
-  ["sang","Xem buổi dạy hôm nay và ai báo nghỉ","Biết trước ai vắng để chuẩn bị phần bù","hoctap",
-   function(){var t=new Date();return rows("DL11").filter(function(x){var d=pvnd(x.session_date);
+  ["sang","Xem buổi dạy hôm nay và ai báo nghỉ","Biết trước ai vắng để chuẩn bị phần bù","buoihnay",
+   function(){var t=new Date();return srows("DL11").filter(function(x){var d=pvnd(x.session_date);
     return d&&sameDay(d,t)&&String(x.teacher_id||"")===(CURSTAFF||"")}).length}],
   ["ngay","Điểm danh ngay khi vào lớp","Điểm danh muộn là số chuyên cần sai cả tháng","banglop",
    function(){var g=num(paramOf("attendanceGrace_hours",24));
-    return rows("DL11").filter(function(x){if(!isc(x.session_status,"completed"))return false;
+    return srows("DL11").filter(function(x){if(!isc(x.session_status,"completed"))return false;
      if(String(x.teacher_id||"")!==(CURSTAFF||""))return false;
      var a=hoursSince(x.session_date);if(a==null||a>g)return false;
      return !rows("DL12").some(function(y){return y.session_id===x.session_id})}).length}],
   ["chieu","Ghi nhận xét buổi vừa dạy","Trong hạn thì viết còn nhớ; để hôm sau là viết cho có","buoihoc",
-   function(){return rows("DL11").filter(function(x){return String(x.teacher_id||"")===(CURSTAFF||"")&&bhState(x).done&&!bhState(x).note}).length}],
+   function(){return srows("DL11").filter(bhChoNX).length},"note"],
   ["chieu","Chấm bài học viên đã nộp","Bài nộp mà không chấm thì lần sau học viên không nộp nữa","baitap",
-   function(){return rows("DL13").filter(function(x){return String(x.teacher_id||"")===(CURSTAFF||"")&&hwSubmitted(x)&&!hwGraded(x)}).length}]],
+   function(){return srows("DL13").filter(btChoCham).length},"bt:chocham"]],
  /* V9.40 - NHỊP NGÀY CỦA GIÁO VIÊN WOW. Trước đây họ dùng chung nhịp với giáo viên đứng lớp,
     mà mọi dòng ở đó lọc DL11/DL13 theo teacher_id nên với họ dòng nào cũng bằng 0. Bốn dòng
     dưới đây lọc DL14 theo staff_id - đúng bảng họ thật sự làm việc. */
  wow:[
-  ["sang","Xem buổi WOW hôm nay","Buổi 1-1 mà không xem trước thì vào lớp mới biết học viên này yếu gì","hoctap",
-   function(){var t=new Date();return rows("DL14").filter(function(w){var d=pvnd(w.wow_session_date);
-    return d&&sameDay(d,t)&&String(w.staff_id||"")===(CURSTAFF||"")&&!isc(w.wow_status,"cancelled")}).length}],
+  ["sang","Xem buổi WOW hôm nay","Buổi 1-1 mà không xem trước thì vào lớp mới biết học viên này yếu gì","wow",
+   function(){var t=new Date();return srows("DL14").filter(function(w){var d=pvnd(w.wow_session_date);
+    return d&&sameDay(d,t)&&!isc(w.wow_status,"cancelled")}).length},"homnay"],
   ["sang","Xác nhận các buổi mới được đặt","Chưa xác nhận thì học viên không biết có buổi hay không","wow",
-   function(){return rows("DL14").filter(function(w){return String(w.staff_id||"")===(CURSTAFF||"")&&isc(w.wow_status,"booked")}).length}],
+   function(){return srows("DL14").filter(wowChoXN).length},"confirm"],
   ["chieu","Ghi nội dung buổi vừa dạy","Không ghi thì giáo viên chủ nhiệm không biết đã kèm gì","wow",
-   function(){return rows("DL14").filter(function(w){return String(w.staff_id||"")===(CURSTAFF||"")&&
-    isc(w.wow_status,"completed")&&!String(w.wow_content_note||"").trim()}).length}],
+   function(){return srows("DL14").filter(wowChoGhi).length},"note"],
   ["chieu","Gọi lại học viên không đến buổi WOW","Buổi đã trừ quota mà học viên không đến - hỏi rồi xếp bù","wow",
-   function(){return rows("DL14").filter(function(w){return String(w.staff_id||"")===(CURSTAFF||"")&&
-    isc(w.wow_status,"no_show")&&!String(w.wow_no_show_reason||"").trim()}).length}]],
+   function(){return srows("DL14").filter(wowVang).length},"noshow"]],
+ /* V9.40 (anh Luân chốt 29/07): *"Duyệt chiết khấu là trưởng phòng tư vấn, kế toán luôn chỉ xác
+    nhận và làm theo thôi."* Dòng thứ ba trước đây trỏ vào `duyetck` và đếm CẢ chiết khấu lẫn
+    hoàn tiền - hai thứ kế toán không có quyền vào. Đo 08/08: mở nhịp của Trưởng phòng Kế toán
+    ra thấy đúng dòng "Xử lý chiết khấu và hoàn tiền chờ duyệt · 6", bấm vào thì bị chặn. Đó là
+    "mời rồi đuổi", loại lỗi đã chữa cho thanh menu ở V9.51 mà nhịp ngày còn sót.
+    Nay dòng ấy nói đúng phần việc của kế toán: HOÀN TIỀN (họ có `duyethoan`), không nói chiết khấu.
+    Dòng cuối cũng vậy: `dsthanhtoan` (Sổ thu học phí) là sổ của chính phòng kế toán mà họ không
+    được xem - mở quyền, chứ không phải bỏ dòng. */
  ketoan:[
   ["sang","Đối soát khoản thu hôm qua","Chưa đối soát thì chưa phải tiền vào két","duyetthu",
    function(){return duyPayList().length}],
   ["ngay","Thu các đợt tới hạn hôm nay","Nhắc đúng ngày thì thu được; trễ một tuần là phải đòi","thanhtoan",
-   function(){return duthuList().filter(function(r){return r.st.k==="today"||r.st.k==="due"||r.st.k==="late"}).length}],
-  ["ngay","Xử lý chiết khấu và hoàn tiền chờ duyệt","Hàng chờ quyết định để lâu là chặn cả luồng phía sau","duyetck",
-   function(){return duyTabs().filter(function(x){return x.k==="duyetck"||x.k==="duyethoan"}).reduce(function(a,x){return a+x.n},0)}],
+   function(){return ttToiHan().length},"due"],
+  ["ngay","Hoàn tiền đang chờ xử lý","Hàng chờ quyết định để lâu là chặn cả luồng phía sau","duyethoan",
+   function(){return duyTabs().filter(function(x){return x.k==="duyethoan"}).reduce(function(a,x){return a+x.n},0)}],
   ["chieu","Nhìn dự thu tháng","Biết tháng sau về bao nhiêu mới lên kế hoạch được","dsthanhtoan",
    null]],
  /* V9.44 - NHỊP NGÀY CHO MARKETING. Trước đây nhóm này không có dòng nào: họ mở app ra là một
     trang trắng về mặt "hôm nay tôi phải làm gì", trong khi họ chính là người giữ đầu vào của cả
     phễu. Bốn dòng dưới đây bám đúng việc của họ - nguồn lead, chất lượng lead, kho khách cũ. */
+ /* V2 08/08 - BA DÒNG ĐẦU TRƯỚC ĐÂY TRỎ VÀO HUB `tuyensinh`. V2 đã gỡ hub khỏi menu, nên
+    Marketing bấm nhịp là rơi xuống một trang không có mục nào sáng trên sidebar - đúng con
+    bệnh *"a tìm trên sidebar ko thấy"*. Trang thật của ba câu hỏi ấy là `nhaplead` (sổ Lead),
+    và cả ba nay đều có chip bấm một cái ra đúng danh sách. */
  marketing:[
-  ["sang","Soi lead đêm qua về từ nguồn nào","Nguồn nào đang đổ lead xấu thì phải biết trong ngày, không đợi cuối tháng","tuyensinh",
-   function(){var h=24;return rows("DL02").filter(function(l){var t=hoursSince(l.lead_created_time);return t!=null&&t<=h}).length}],
-  ["sang","Lead mới chưa ai nhận","Lead không có người phụ trách là lead sẽ nguội - đẩy về đội tư vấn ngay","tuyensinh",
-   function(){return rows("DL02").filter(function(l){return isc(l.lead_status,"new")&&!String(l.assigned_to||"").trim()}).length}],
-  ["ngay","Lead bị đánh dấu không đạt chuẩn","Tỷ lệ lead xấu cao là tiền quảng cáo đang chảy sai chỗ","tuyensinh",
-   function(){return rows("DL02").filter(function(l){return /not_qualified|unqualified/.test(ecode(l.lead_qualification_status))}).length}],
+  ["sang","Soi lead đêm qua về từ nguồn nào","Nguồn nào đang đổ lead xấu thì phải biết trong ngày, không đợi cuối tháng","nhaplead",
+   function(){return qfDem("nhaplead","dem")},"qf:dem"],
+  ["sang","Lead mới chưa ai nhận","Lead không có người phụ trách là lead sẽ nguội - đẩy về đội tư vấn ngay","nhaplead",
+   function(){return qfDem("nhaplead","khongai")},"qf:khongai"],
+  ["ngay","Lead bị đánh dấu không đạt chuẩn","Tỷ lệ lead xấu cao là tiền quảng cáo đang chảy sai chỗ","nhaplead",
+   function(){return qfDem("nhaplead","xau")},"qf:xau"],
   ["chieu","Khơi lại kho khách cũ","Khách đã nguội vẫn rẻ hơn khách mới - mỗi ngày chạm lại một ít","reup",
-   function(){return rows("DL02").filter(function(l){return isc(l.lead_status,"no_response","unreachable")}).length}],
+   function(){return reupToiHen().length},"toihen"],
   ["chieu","Xem mã giới thiệu ai đang chạy","Khách cũ giới thiệu là nguồn rẻ nhất, đừng để thưởng treo","magioithieu",
-   function(){return rows("DL19").filter(function(r){return isc(r.reward_status,"pending")}).length}]],
+   function(){return mgtChoChi().length}]],
  /* V9.44 - NHỊP NGÀY CHO NHÓM HỖ TRỢ (HR, IT, bảo vệ, tạp vụ). Họ không đụng vào phễu hay lớp
     học, chỉ làm việc qua module Giao việc - nhưng "không có nhịp" khác hẳn "nhịp ngắn". */
  hotro:[
   ["sang","Nhận việc mới được giao","Người giao đang đợi bạn bấm Nhận để biết việc đã tới tay","giaoviec",
-   function(){return gvSo("new")}],
+   function(){return gvSo("new")},"tk:wait"],
   ["ngay","Làm và báo xong việc đang giữ","Báo xong ngay lúc làm xong, đừng để dồn cuối tuần","giaoviec",
-   function(){return gvSo("doing")}],
+   function(){return tkScopeMine().filter(tkLive).length},"tk:mine/live"],
+  /* Không khai chip: "quá hạn" KHÔNG phải một chip riêng trên trang Giao việc - việc quá hạn
+     nằm lẫn trong nhóm "Việc của tôi", đánh dấu đỏ trên từng thẻ. Dẫn tới chip "Việc của tôi"
+     rồi bắt hai số phải bằng nhau là ép hai câu hỏi khác nhau đội chung một con số. */
   ["chieu","Việc quá hạn phải báo lại","Không làm kịp thì nói sớm - im lặng mới là vấn đề","giaoviec",
    function(){return gvSo("late")}]],
  nhansu:[
   ["sang","Nhận việc mới được giao","Người giao đang đợi bạn bấm Nhận để biết việc đã tới tay","giaoviec",
-   function(){return gvSo("new")}],
+   function(){return gvSo("new")},"tk:wait"],
   ["sang","Soát danh sách nhân sự","Ai mới vào, ai đã nghỉ, ai chưa có chức danh hoặc chưa gắn cơ sở","nhansu",
-   function(){return hsThieu().length}],
+   function(){return qfDem("nhanvien","thieu")},"qf:nhanvien/thieu"],
   ["ngay","Đối chiếu bảng công giảng viên","Buổi thiếu mốc giờ vào/ra thì tính công sai - soát trước khi chốt","bangcong",
-   function(){try{return rows("DL11").filter(function(x){return isc(x.session_status,"completed")&&!(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())}).length}catch(e){return 0}}],
+   function(){return bcThieuMoc().length}],
   ["chieu","Làm và báo xong việc đang giữ","Báo xong ngay lúc làm xong, đừng để dồn cuối tuần","giaoviec",
-   function(){return gvSo("doing")}]],
+   function(){return tkScopeMine().filter(tkLive).length},"tk:mine/live"]],
+ /* V2 08/08 - NHỊP CỦA CẤP ĐIỀU HÀNH. Trước đây năm dòng này dùng `slaItems()` - hàng chờ
+    TOÀN TRUNG TÂM - trong khi trang Việc hôm nay vẽ bằng `bellItems()` (đã cắt theo phạm vi
+    của người đăng nhập). Với CEO hai cái bằng nhau nên không ai thấy gì; với ba trưởng phòng
+    dùng chung nhịp này thì lệch tới 8 lần (Marketing đọc "57 việc quá hạn", mở ra thấy 7).
+    Nay đọc `bellItems()` - đúng cái trang đang vẽ. */
  quanly:[
   ["sang","Xem việc quá hạn toàn trung tâm","Số đỏ hôm nay là vấn đề tuần sau","viec",
-   function(){return slaItems().filter(function(x){return x.sev==="red"}).length}],
+   function(){return bellItems().filter(function(x){return x.sev==="red"}).length},"vi:red"],
   ["sang","Duyệt hàng chờ quyết định","Cấp dưới đang chờ bạn phê duyệt","duyet",
    function(){return duyN()}],
   ["ngay","Soi KPI dưới ngưỡng","Chỉ số dưới ngưỡng là việc phải giao, không phải để ngắm","baocao",
    function(){return kpiTop3().length}],
   ["ngay","Soi đụng lịch và lớp thiếu giáo viên","Một buổi vỡ là cả lớp mất buổi","phong",
-   function(){return clashList().length+rows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()}).length}],
+   function(){return clashList().length+srows("DL10").filter(lopThieuGV).length}],
+  ["chieu","Giao việc cho ngày mai","Giao cuối ngày thì sáng mai người ta có việc ngay","giaoviec",
+   null]],
+ /* ═══ V2 08/08 - BA TRƯỞNG PHÒNG NAY CÓ NHỊP CỦA PHÒNG MÌNH ══════════════════════════════════
+    Anh Luân 08/08: *"mỗi nhân viên, MỖI TRƯỞNG PHÒNG, họ hỏi bao nhiêu loại câu hỏi"*.
+    Đo ra một chỗ hổng chưa ai để ý: `nhipKey()` có dòng
+        if(mgr&&(g==="tuvan"||g==="hocvu"||g==="marketing"))return "quanly";
+    nên Trưởng phòng Tư vấn, Marketing và Học vụ đọc ĐÚNG NĂM DÒNG CỦA CEO - "việc quá hạn toàn
+    trung tâm", "KPI dưới ngưỡng", "đụng lịch phòng học". Không một dòng nào về phòng của chính
+    họ: Trưởng phòng Tư vấn mở app ra không có câu nào về phễu lead.
+    Và hai trong năm dòng ấy trỏ vào `phong` - trang mà Tư vấn/Marketing KHÔNG được xem, nên nhịp
+    mời họ vào một chỗ sẽ đuổi họ ra.
+    Ba nhóm dưới đây theo cùng một khuôn: BA dòng đầu là hàng chờ của phòng (thứ chỉ họ mới
+    giải quyết được), HAI dòng cuối là phần quản lý (việc quá hạn của phòng + giao việc). */
+ tuvanql:[
+  ["sang","Lead của đội chưa ai nhận","Lead không có người phụ trách là lead nguội trong im lặng","nhaplead",
+   function(){return qfDem("nhaplead","khongai")},"qf:khongai"],
+  ["sang","Chiết khấu chờ bạn duyệt","Anh Luân chốt 29/07: duyệt chiết khấu là Trưởng phòng Tư vấn","duyetck",
+   function(){return duyTabs().filter(function(x){return x.k==="duyetck"}).reduce(function(a,x){return a+x.n},0)}],
+  ["ngay","Khách đã có kết quả test mà chưa ai tư vấn","Có điểm rồi để nguội là mất khách đã tốn tiền kéo về","tuvan",
+   function(){return srows("DL04").filter(tvChoTV).length},"todo"],
+  ["ngay","Việc quá hạn của phòng","Số đỏ hôm nay là vấn đề tuần sau","viec",
+   function(){return bellItems().filter(function(x){return x.sev==="red"}).length},"vi:red"],
+  ["chieu","Giao việc cho ngày mai","Giao cuối ngày thì sáng mai người ta có việc ngay","giaoviec",
+   null]],
+ hocvuql:[
+  ["sang","Đơn xin nghỉ chờ duyệt","Giáo viên cần biết TRƯỚC giờ dạy ai vắng","duyetnghi",
+   function(){return absQueue().length}],
+  ["sang","Học viên đóng đủ mà chưa xếp lớp","Đóng tiền rồi phải chờ là trải nghiệm tệ nhất của cả hành trình","xeplop",
+   function(){return xlWaiting().length},"xl:chuaxep"],
+  ["ngay","Học viên nguy cơ bỏ học","Dấu hiệu luôn có trước cả tuần - thấy sớm còn giữ được","hocvien",
+   function(){return qfDem("hocvien","risk")},"qf:risk"],
+  ["ngay","Việc quá hạn của phòng","Số đỏ hôm nay là vấn đề tuần sau","viec",
+   function(){return bellItems().filter(function(x){return x.sev==="red"}).length},"vi:red"],
+  ["chieu","Giao việc cho ngày mai","Giao cuối ngày thì sáng mai người ta có việc ngay","giaoviec",
+   null]],
+ marketingql:[
+  ["sang","Lead mới chưa ai nhận","Lead không có người phụ trách là tiền quảng cáo đổ xuống sông","nhaplead",
+   function(){return qfDem("nhaplead","khongai")},"qf:khongai"],
+  ["sang","Lead bị đánh dấu không đạt chuẩn","Tỷ lệ lead xấu cao là tiền quảng cáo đang chảy sai chỗ","nhaplead",
+   function(){return qfDem("nhaplead","xau")},"qf:xau"],
+  ["ngay","Chỉ số dưới ngưỡng","Chỉ số dưới ngưỡng là việc phải giao, không phải để ngắm","baocao",
+   function(){return kpiTop3().length}],
+  ["ngay","Việc quá hạn của phòng","Số đỏ hôm nay là vấn đề tuần sau","viec",
+   function(){return bellItems().filter(function(x){return x.sev==="red"}).length},"vi:red"],
   ["chieu","Giao việc cho ngày mai","Giao cuối ngày thì sáng mai người ta có việc ngay","giaoviec",
    null]]};
 var NHIPBUOI={sang:["Đầu ngày","ti-alarm"],ngay:["Trong ngày","ti-clock-play"],chieu:["Cuối ngày","ti-clock-check"]};
@@ -22067,7 +22389,8 @@ function nhipReset(){var c=(DATA.config=DATA.config||{});c.nhip={};persistSoon()
    có mục đó. Sinh ra đúng từ khoá của NHIP thì thêm nhóm vai mới là ô chọn tự có, không phải nhớ
    sửa hai nơi - và không thể lệch lần nữa. */
 var NHIPTEN={tuvan:"NV Tư vấn",marketing:"Marketing",hocvu:"Học vụ - CSKH",aca:"Chuyên môn (ACA)",giaovien:"Giáo viên đứng lớp",
- wow:"Giáo viên WOW 1-1",ketoan:"Kế toán",quanly:"Quản lý - Giám đốc",hotro:"Nhóm hỗ trợ (HR, IT...)"};
+ wow:"Giáo viên WOW 1-1",ketoan:"Kế toán",quanly:"Quản lý - Giám đốc",hotro:"Nhóm hỗ trợ (HR, IT...)",
+ tuvanql:"Trưởng phòng Tư vấn",hocvuql:"Trưởng phòng Học vụ",marketingql:"Trưởng phòng Marketing"};
 function nhipRoles(){return Object.keys(NHIP).filter(function(k){return k!=="order"&&Array.isArray(NHIP[k])})
  .map(function(k){return [k,NHIPTEN[k]||k]})}
 function nhipKey(){
@@ -22079,6 +22402,12 @@ function nhipKey(){
  var g=(SCOPE()||{}).group||"";
  var mgr=!!(SCOPE()||{}).mgr;
  if(g==="dieuhanh"||g==="quantri")return "quanly";
+ /* V2 08/08 - TRƯỞNG PHÒNG ĐỌC NHỊP CỦA PHÒNG MÌNH, KHÔNG ĐỌC NHỊP CEO.
+    Dòng cũ ở đây là `if(mgr&&(g==="tuvan"||g==="hocvu"||g==="marketing"))return "quanly"` -
+    ba trưởng phòng nhận nguyên năm dòng của Giám đốc, không một dòng nào về phòng họ, và hai
+    dòng trong đó trỏ vào trang họ không được xem. Nay mỗi phòng có nhịp riêng; nhóm nào chưa
+    khai nhịp trưởng phòng thì vẫn rơi về `quanly` như cũ. */
+ if(mgr&&NHIP[g+"ql"])return g+"ql";
  if(mgr&&(g==="tuvan"||g==="hocvu"||g==="marketing"))return "quanly";
  if(NHIP[g])return g;
  return CURSTAFF?"":"quanly"}          /* chưa gắn nhân viên (quản trị demo) -> xem nhịp quản lý */
@@ -22091,12 +22420,15 @@ function nhipList(){var k=nhipKey();if(!k)return [];
  var L=(NHIP[k]||[]).map(function(r,i){
   var o=nhipOf(k,i);
   if(o.on===0)return null;
-  var it={buoi:o.buoi||r[0],t:o.t||r[1],vi:o.vi||r[2],page:r[3],ord:(o.ord!=null?o.ord:i),n:0,hab:true};
+  /* `chip` (ô thứ SÁU) là mã chip lọc trên trang đích - `nhipPanel` bấm qua `jumpFlow` nên tới
+     nơi là danh sách đã lọc sẵn đúng câu hỏi này. Không cho cấu hình sửa: nó là chuyện KỸ THUẬT
+     (mã chip phải khớp mã trang), không phải câu chữ để trung tâm chỉnh. */
+  var it={buoi:o.buoi||r[0],t:o.t||r[1],vi:o.vi||r[2],page:r[3],chip:r[5]||"",ord:(o.ord!=null?o.ord:i),n:0,hab:true};
   if(typeof r[4]==="function"){it.hab=false;try{it.n=num(r[4]())}catch(e){it.n=0}}
   return it}).filter(Boolean);
  /* dòng tự thêm của trung tâm (không có hàm đếm) - luôn là thói quen, không bao giờ "sạch" */
  (nhipCfg()["+"+k]||[]).forEach(function(o,i){
-  L.push({buoi:o.buoi||"sang",t:o.t||"",vi:o.vi||"",page:o.page||"",ord:1000+i,n:0,hab:true,tu:1})});
+  L.push({buoi:o.buoi||"sang",t:o.t||"",vi:o.vi||"",page:o.page||"",chip:"",ord:1000+i,n:0,hab:true,tu:1})});
  return L.sort(function(a,b){return a.ord-b.ord})}
 
 /* ═══ V9.99z5 - NHỊP NGÀY CÓ LẠI CHỖ ĐỨNG ═══════════════════════════════════════════════
@@ -22123,7 +22455,11 @@ function nhipPanel(){
                      :'<span class="mut">&mdash;</span>';
   h+='<div class="nhipc"><div class="nhiph"><i class="ti '+esc((NHIPBUOI[B[0]]||["","ti-clock"])[1])+'"></i><b>'+esc(B[1])+'</b>'+chip+'</div>';
   R.forEach(function(r){
-   h+='<div class="nhipr"'+(r.page?' onclick="go(\''+esc(r.page)+'\')" title="Mở '+esc((PBK[r.page]||{}).t||r.page)+'"':'')+'>'+
+   /* V2 08/08 - BẤM MỘT CÁI RA ĐÚNG DANH SÁCH, không phải "mở trang rồi tự dò".
+      Trước đây dòng nhịp chỉ `go(trang)`: app nói "30 buổi chưa nhận xét" rồi thả người ta vào
+      bảng 200 dòng. Nay đi qua `jumpFlow` với mã chip đã khai ở ô thứ sáu, nên tới nơi là danh
+      sách đã lọc đúng 30 buổi ấy. Dòng nào chưa khai chip thì vẫn mở trang như cũ. */
+   h+='<div class="nhipr"'+(r.page?' onclick="jumpFlow(\''+esc(r.page)+'\','+(r.chip?("'"+esc(r.chip)+"'"):"null")+')" title="Mở '+esc((PBK[r.page]||{}).t||r.page)+(r.chip?" - lọc sẵn đúng danh sách này":"")+'"':'')+'>'+
     '<div class="nhipt"><span>'+esc(r.t)+'</span>'+
     (r.hab?'<b class="mut" style="font-weight:600">nên xem</b>':'<b'+(num(r.n)?' class="hot"':'')+'>'+num(r.n)+'</b>')+'</div>'+
     (r.vi?'<div class="mut nhipv">'+esc(r.vi)+'</div>':'')+'</div>'});
@@ -22790,13 +23126,19 @@ var NAVTREE=[
     lối nào. Hub CSKH có 4 tab mà menu chỉ có tên hub. Anh Luân: *"bên sidebar giống như 1 cái
     bản đồ vậy, họ biết mình cần tìm gì ở đâu"* - thiếu một mục là mất một chỗ trên bản đồ.
     Thứ tự các mục con xếp ĐÚNG THỨ TỰ THANH TAB của hub, để menu và màn hình đọc như nhau. */
- {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","giaoan","khaosat","ghinhan","khieunai","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","giaoan","baitap","khaosat","ghinhan","khieunai","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","ketqua","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
     thẩm quyền chứ không thuộc chặng nào. Duyệt nghỉ trước đây nằm lẫn trong màn Điểm danh nên
     học vụ phải mò mới thấy. */
- {g:"Chờ duyệt",items:["duyetck","duyethoan","duyetnghi","duyetthu","banggiao"]},
+ /* V2 08/08 - `duyet` (Chờ duyệt & quyết định) NAY CÓ MỤC MENU. Năm chức danh có dòng nhịp
+    "Duyệt hàng chờ quyết định - 16 việc" trỏ vào trang này, mà trang chưa bao giờ đứng trên cây
+    menu: bấm nhịp vào được, nhưng cả sidebar tối thui và không có đường quay lại. Đúng con bệnh
+    anh Luân bắt ba lần (trang Hỏi đáp 04/08, hai trang Nhân sự 05/08): *"a tìm trên sidebar ko
+    thấy"*. Nó đứng ĐẦU nhóm vì nó là câu hỏi gộp - "còn gì chờ tôi quyết?" - còn bốn mục dưới là
+    bốn hàng chờ cụ thể. */
+ {g:"Chờ duyệt",items:["duyet","duyetck","duyethoan","duyetnghi","duyetthu","banggiao"]},
  /* V9.99m (anh Luân 04/08: *"cái trang hỏi đáp... nó đang ở đâu nhỉ, a thấy tour thì hiện ra,
     mà a tìm trên sidebar ko thấy"*) - đúng, và đây là một chỗ SÓT KHI GỠ V6: trang Hỏi đáp có
     mục menu ở cây của bản v6 (đã gỡ 06/08) nhưng chưa bao giờ có ở cây menu V5, nên chỉ mở được bằng nút Trợ
@@ -22996,7 +23338,7 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
    "Test đầu vào" -> cũng vậy. Trước đây hai người ấy thấy nhóm "C1 · Khách tiềm năng".) */
 var NAVPHANG=[
  {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:"Lớp học & Giảng dạy",items:["xeplop","giaoan","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
+ {g:"Lớp học & Giảng dạy",items:["xeplop","giaoan","baitap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
  {g:"Chăm sóc & Sau khóa",items:["khaosat","ghinhan","khieunai","baoluu","ketthuc","ketqua","magioithieu"]}];
 function navCayV5(){
  if(arcMode()==="chang")return NAVTREE;

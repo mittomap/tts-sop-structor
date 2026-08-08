@@ -36,8 +36,22 @@ const APP = process.env.ITTS_APP || PATH.join(__dirname, "_APP.js");
    VIỆC TỒN đã biết: nhóm "Tra cứu" đang chiếm 18/58 mục - mười tám cuốn sổ chỉ để xem. Gom
    chúng sau MỘT cửa "Tra cứu" (một trang liệt kê 18 sổ) sẽ hạ trần xuống khoảng 41 mà KHÔNG
    phạm RB1: luật "một nghiệp vụ một cửa ghi" nói về CỬA GHI, còn đây là sổ chỉ-đọc, không có
-   thao tác ghi nào. Làm xong thì hạ TRAN_MUC xuống đúng số mới. */
-const TRAN_MUC   = 58;   /* mục menu của một chức danh */
+   thao tác ghi nào. Làm xong thì hạ TRAN_MUC xuống đúng số mới.
+
+   ═══ 08/08: TRẦN NÀY BỊ NÂNG 58 -> 60. LẦN DUY NHẤT, VÀ ĐÂY LÀ LÝ DO ═══════════════════════
+   Nâng một cái chốt kéo xuống là chuyện phải khai thẳng, không được sửa lặng lẽ. Hai mục thêm
+   vào đều vá một lỗi "vào được mà không có đường tới / không có đường về":
+     · `baitap` - trang "Giao & chấm Bài tập" có thật, đầy đủ, mà khai `hide:1` và không chức
+       danh nào ngoài quản trị được xem; trong khi bảng cửa ghi khai nó thuộc giáo viên và ACA,
+       và nhịp ngày của giáo viên nhắc họ "12 bài chờ chấm". **LUẬT CỨNG SỐ 0: SOP mô tả, app có
+       trang, người phải làm không có lối vào - đó là SÓT, và sót thì không có quyền bỏ.**
+     · `duyet` - "Chờ duyệt & quyết định", trang mà năm chức danh có dòng nhịp trỏ vào, chưa bao
+       giờ đứng trên cây menu. Bấm vào được, nhưng cả sidebar tối thui và không có đường quay
+       lại - đúng con bệnh anh Luân bắt ba lần: *"a tìm trên sidebar ko thấy"*.
+   Luật "thêm thì được, bớt thì không" đứng CAO HƠN cái trần này; trần chỉ để menu không dài
+   thêm trong IM LẶNG. Hai mục này không im lặng.
+   Phần nợ vẫn nguyên: gom nhóm Tra cứu sẽ đưa con số về khoảng 43. Đó mới là cách hạ thật. */
+const TRAN_MUC   = 60;   /* mục menu của một chức danh */
 const TRAN_NHOM  = 20;   /* mục trong MỘT nhóm */
 const TRAN_TRONG = 2;    /* mục mở ra trống, trên toàn bộ chức danh */
 

@@ -44,7 +44,7 @@ const TRAN_THIEU_THE  = 0;   /* trang nghiệp vụ chưa có dải thẻ riêng
 /* 12 = SỐ ĐO ĐƯỢC. Bản đầu em đặt 8 - một con số ĐOÁN, và nó đỏ ngay. Trần phải là số đo được
    thật: đặt thấp hơn thực tế thì lần nào cũng đỏ, mà một bộ kiểm đỏ mãi thì người ta tắt nó đi.
    Danh sách 12 trang in ra ngay dưới bảng tổng kết - sửa được trang nào thì HẠ trần xuống. */
-const TRAN_THIEU_LOC  = 12;  /* trang chưa có chip lọc */
+const TRAN_THIEU_LOC  = 11;  /* trang chưa có chip lọc */
 const TRAN_THIEU_NUT  = 12;  /* trang chưa có nút hành động chính */
 
 /* Trang KHÔNG CẦN DẢI THẺ - phải khai kèm lý do đọc được, y như `CHIDOC`.
@@ -150,7 +150,11 @@ NV.forEach(k => {
   if (!/class="bstats|class="stat/.test(h) && !KHONGTHE[k]) thieu.the.push(k);
 
   /* K4 - chip lọc */
-  if (!/class="fbar|class="chipf|onclick="fset\(/.test(h)) thieu.loc.push(k);
+  /* Ba cách app cho người ta lọc, phải hỏi đủ cả ba - hỏi thiếu một cách là chấm oan một trang
+     đang lọc được thật. Đã cắn: trang Lead có chip lọc nhanh (`qfToggle`) chạy hẳn hoi - đo được
+     bấm chip "Tới hẹn liên hệ" thì 20 dòng còn 2 - mà bộ kiểm vẫn ghi "chưa có lọc", vì bản đầu
+     chỉ dò `fset(` và `class="fbar"`. */
+  if (!/class="fbar|class="chipf|onclick="fset\(|onclick="qfToggle\(/.test(h)) thieu.loc.push(k);
 
   /* K5 - KHÔNG BAO GIỜ ĐỂ MỘT KHOẢNG TRẮNG. Hỏi đúng câu: trang có dòng dữ liệu nào không -
      nếu KHÔNG có thì phải có lời nói vì sao (`.empty`). Bản đầu hỏi ngược ("có khối rỗng không")

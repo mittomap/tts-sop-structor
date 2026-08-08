@@ -239,7 +239,62 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V9.99z12 — AC1-AC6 XONG HẾT, 34 BỘ KIỂM (07/08, bản dựng `829572`).**
+> **Phiên bản: V2 — 39 BỘ KIỂM (08/08). V1 mốc cũ: V9.99z12, 34 bộ, bản dựng `829572`.**
+>
+> ### 🟢 08/08 - MỖI CHỨC DANH HỎI BAO NHIÊU CÂU, CẦN BAO NHIÊU TRANG
+> Anh Luân: *"Em nên phân tích xem, mỗi nhân viên, mỗi trưởng phòng, họ hỏi bao nhiêu loại câu
+> hỏi, họ cần bao nhiêu trang để phục vụ nghiệp vụ? Nó quan trọng dữ lắm em. Hệ thống lớn, nhưng
+> quá khó dùng thì chết ngay."*
+>
+> Báo cáo đầy đủ: **`PHAN_TICH_CAU_HOI_08_08.md`**. Bộ kiểm: **`_src/_checkcauhoi.js`**.
+>
+> **Đo bằng bản khai của chính app, không đoán:** bảng `NHIP` khai cho từng chức danh *"mỗi ngày
+> người này làm gì"* - mỗi dòng `[buổi, việc, vì sao, TRANG ĐÍCH, hàm đếm, MÃ CHIP]`. Đó chính là
+> danh sách câu hỏi họ hỏi.
+>
+> **Kết quả: 15 chức danh · 70 câu hỏi · KHÔNG AI CẦN QUÁ 5 TRANG** (GV WOW chỉ cần 1). Mà ít
+> nhất họ nhìn 6 mục menu, nhiều nhất 59 (CEO).
+>
+> **BỐN CHỖ HỎNG, đều là hỏng thật:**
+> 1. **CON SỐ TRÊN NHỊP KHÔNG BẰNG CON SỐ TRÊN TRANG** - nặng nhất. Nhịp đếm `rows()` (toàn trung
+>    tâm), trang đếm `srows()`/`bellItems()` (phạm vi người dùng). Trưởng phòng Marketing đọc
+>    *"57 việc quá hạn"*, mở trang ra thấy **7**; Tư vấn 169 vs 95. Chỉ CEO khớp vì phạm vi CEO
+>    là tất cả. **Con số đầu tiên người ta nhìn mỗi sáng là con số sai** - không ai tự phát hiện
+>    được, vì hai con số ấy không bao giờ đứng cạnh nhau trên màn hình.
+>    *Vá:* 13 phép đếm tách thành hàm riêng (`bhQuaHan`, `btChoCham`, `wowChoXN`, `ttToiHan`,
+>    `hsThieuMot`, `reupToiHen`...), nhịp và chip cùng gọi một hàm. `pinfo` cũng ra khỏi bụng
+>    `renderThanhtoan` vì lý do y hệt.
+> 2. **GIÁO VIÊN CÓ 12 BÀI CHỜ CHẤM, APP GIỤC ĐI CHẤM, MÀ KHÔNG VÀO ĐƯỢC.** Trang `baitap` có
+>    thật (14.000 ký tự HTML) nhưng khai `hide:1` và không chức danh nào ngoài quản trị/điều hành
+>    có nó - trong khi `DOORTB` khai `baitap` thuộc `vai:["giaovien","aca"]`. **Đúng LUẬT SỐ 0:
+>    SOP mô tả, app có trang, người phải làm không có lối vào là SÓT.** Đã mở quyền + mục menu +
+>    thêm chế độ **"Chờ chấm - mọi lớp"** (ba chế độ cũ bắt chọn trước một lớp một buổi).
+> 3. **19 câu trỏ vào HUB của V1** (`tuyensinh` ×6, `hoctap` ×4, `duyet` ×5...). V2 gỡ hub khỏi
+>    menu nên bấm nhịp là sidebar tối thui - con bệnh *"a tìm trên sidebar ko thấy"*.
+> 4. **BA TRƯỞNG PHÒNG ĐỌC NHỊP CỦA GIÁM ĐỐC.** `nhipKey()` có dòng gom Tư vấn/Học vụ/Marketing
+>    về `quanly`, nên họ nhận đúng 5 dòng của CEO, **không một dòng nào về phòng mình** - Trưởng
+>    phòng Tư vấn mở app không có câu nào về phễu lead. Và 2/5 dòng ấy trỏ vào `phong`, trang họ
+>    không được xem. Đã dựng 3 nhóm nhịp mới: `tuvanql` · `hocvuql` · `marketingql`.
+>
+> **BẤM MỘT CÁI RA ĐÚNG DANH SÁCH: 12/74 → 63/70.** Mỗi dòng nhịp khai thêm **mã chip đích** (ô
+> thứ sáu), `jumpFlow` được dạy đủ **7 kiểu chip** của app (`fset`·`qf`·`en`·`xl`·`tk`·`vi`·`bt`).
+> Chip mới: `wow/homnay` · `wow/noshow` · `buoihoc` (6 chip trước đây **không có một con số nào**)
+> · `xeplop/chuaxep` · `baitap/chocham` · `nhaplead/dem` · `nhaplead/xau` · `hocvien/hocthuat` ·
+> `nhanvien/thieu` · `reup` (3 chip).
+>
+> **Ba trần chốt kéo xuống** trong `_checkcauhoi.js` - là số ĐANG CÒN THIẾU, không phải hạn mức:
+> `TRAN_KHONG_CHIP=7` (gvdp·giaoan·bangcong·magioithieu·duyetck·phong - cấu trúc trang khác hẳn,
+> chip không gắn vào được trong một nhịp sửa) · `TRAN_KHONG_MENU=2` · `TRAN_KHONG_XEM=1`.
+>
+> **HAI LẦN CÁI THƯỚC BẮT CHÍNH NGƯỜI VIẾT NÓ SAI** (phần đáng học nhất):
+> · Bản đo đầu chỉ đếm chip kiểu `LISTCFG.qf` nên đọc nhầm mọi trang tác vụ thành *"không có
+>   chip"* - **đã báo anh Luân con số 1/70 rồi phải đính chính thành 12/74.** Bài học: đo trên
+>   **chuỗi HTML thật** của trang, đừng hỏi lại một bảng cấu hình.
+> · Chip `reup` em đếm *"mọi khách đã nguội"* (16) trong khi trang đếm theo chặng hành trình (3) -
+>   đúng cái bệnh bộ kiểm sinh ra để bắt, và nó bắt ngay lần chạy đầu.
+> · Và một lỗi thật do chính sửa này gây ra: `ttToiHan()` gọi `pinfo` khi `pinfo` còn nằm trong
+>   bụng `renderThanhtoan` → trang Thanh toán đỏ. `_tall` bắt trong 2 giây.
+>
 >
 > ### 🟢 ĐANG LÀM: BẢN V2 - MỖI NGHIỆP VỤ MỘT TRANG (bắt đầu 07/08)
 > **Hai nhánh chạy song song, KHÔNG đụng nhau** (đúng cách anh Luân chốt: *"làm nhánh git riêng
