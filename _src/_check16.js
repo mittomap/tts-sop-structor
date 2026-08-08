@@ -797,15 +797,27 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
 /* ---- 25. DON CODE CHET (mang 5, V9.29) ---- */
 (function(){
  setRole("all");
- ["renderDashboardOld","renderPipeline","pipeSet","renderTracuu","renderKhaosat"].forEach(function(f){
+ ["renderDashboardOld","renderPipeline","pipeSet","renderKhaosat"].forEach(function(f){
   t("da xoa han ham chet "+f, typeof global[f]==="undefined")});
  /* V2 - `khaosat` DA RA KHOI DANH SACH NAY. No tung la mot khoa chet (co trong PAGES, khong co
     ham ve, `go()` doi ten no ve hub CSKH) nen muc kiem canh dung. Sang V2 no la MOT TRANG THAT -
     Khao sat & Phan hoi, ve bang `renderReview` - nen doi hoi "khong duoc co ham ve" thanh sai.
-    `pipeline` va `tracuu` van la khoa chet that, giu nguyen. */
- ["pipeline","tracuu"].forEach(function(k){
+    `pipeline` van la khoa chet that, giu nguyen.
+
+    V2 08/08 - `tracuu` DI DUNG CON DUONG CUA `khaosat`, nen doi cau hoi y het. No la khoa chet
+    tu V9.15 (co ten trong PAGES, khong co ham ve). Nay no la CUA DUY NHAT dan vao muoi sau cuon
+    so chi-doc vua roi khoi cay menu - anh Luan 08/08 giao quyet so trang, va em chot "khong bot
+    trang nao, bot so trang MOT NGUOI PHAI NHIN": menu CEO 60 -> 45.
+    Doi cau hoi chu KHONG xoa luat: truoc hoi "khong duoc co ham ve", nay hoi "PHAI co ham ve va
+    phai ve ra duoc" - van la mot phep canh, chi la canh dung chieu.
+    BAY DA CAN NGAY LUC LAM: em them mot muc THU HAI cung khoa `tracuu` thay vi sua muc cu, thanh
+    ra hai trang cung dia chi `tra-cuu-so-sach`. Bo kiem bat trong mot lan chay. */
+ ["pipeline"].forEach(function(k){
   t("bo dang ky RENDER cho trang chet "+k, !RENDER[k])});
  t("khaosat nay la trang that, co ham ve rieng", typeof RENDER["khaosat"]==="function");
+ t("tracuu nay la trang that, co ham ve rieng", typeof RENDER["tracuu"]==="function");
+ t("tracuu ve ra noi dung that, khong phai trang trang",
+   (function(){try{var h=RENDER["tracuu"]();return typeof h==="string"&&h.length>300&&h.indexOf("tcgrid")>=0}catch(e){return false}})());
  t("bo o chon vai roleSel (luon bi an tu V9.9)", !/id="roleSel"/.test(SRC));
  /* xoa roi thi moi trang con lai van phai ve duoc */
  var loi=[];Object.keys(RENDER).forEach(function(k){try{if(typeof RENDER[k]()!=="string")loi.push(k)}catch(e){loi.push(k+": "+e.message)}});

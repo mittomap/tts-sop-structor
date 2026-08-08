@@ -528,7 +528,6 @@ var PAGES=[
    nhóm, bấm sổ); nay cũng hai cú (mở trang Tra cứu, bấm thẻ) - và có thêm ô tìm.
    HAI TRANG Ở LẠI NGOÀI, có lý do đọc được: `hocvien` và `giangvien` nằm trong NHỊP NGÀY của
    Học vụ, ACA và Nhân sự - đẩy chúng vào trong là làm khó đúng người dùng chúng mỗi ngày. */
-{k:"tracuu",g:"Tra cứu",ic:"ti-folders",t:"Tra cứu & sổ sách",c:"Các sổ chỉ-đọc - tra khi cần",ty:"custom"},
 {k:"hocvien",g:"Tra cứu",ic:"ti-user-check",t:"Học viên",c:"Đang & đã học",ty:"list"},
 /* V2 RB3 - CHA TRƯỚC CON (anh Luân: *"trang vận hành lớp, nó là trang con của lớp học mới đúng
    em nhỉ"*). V1 đang ngược: `banglop` (Vận hành lớp) đứng trên menu còn `lop` (Lớp học) - đáng ra
@@ -638,7 +637,15 @@ var PAGES=[
 {k:"viec",g:"_",ic:"ti-checklist",t:"Việc hôm nay",c:"Toàn bộ việc tới hạn hôm nay, gom theo nhóm và theo bộ phận",ty:"custom"},
 {k:"hoso",g:"_",ic:"ti-id-badge-2",t:"Hồ sơ hành trình 360",c:"",ty:"custom",hide:1},
 {k:"pipeline",g:"_",ic:"ti-layout-kanban",t:"Phễu vận hành",c:"",ty:"custom",hide:1},
-{k:"tracuu",g:"_",ic:"ti-search",t:"Tra cứu nhanh",c:"",ty:"custom",hide:1}];
+/* V2 08/08 - `tracuu` HỒI SINH ĐÚNG TẠI MỤC CŨ CỦA NÓ, không đẻ mục thứ hai.
+   Khoá này có từ V9.15 rồi CHẾT: còn tên trong PAGES mà không có hàm vẽ, nên `_check16` mục 25
+   ("dọn code chết") canh không cho nó quay lại. Em suýt phạm đúng lỗi ấy theo kiểu tệ hơn - thêm
+   một mục THỨ HAI cùng khoá `tracuu`, làm hai trang cùng một địa chỉ `tra-cuu-so-sach`; bộ kiểm
+   bắt ngay. Một khoá một mục, sửa tại chỗ.
+   Nay nó là TRANG THẬT: cửa duy nhất dẫn vào mười sáu cuốn sổ chỉ-đọc vừa rời khỏi cây menu
+   (menu CEO 60 -> 45). Cùng đường đi với `khaosat`: một khoá chết trở thành trang thật thì bộ
+   kiểm phải ĐỔI CÂU HỎI, không phải xoá luật - `_check16` đã ghi tiền lệ ấy cho `khaosat` 07/08. */
+{k:"tracuu",g:"Tra cứu",ic:"ti-folders",t:"Tra cứu & sổ sách",c:"Các sổ chỉ-đọc - tra khi cần",ty:"custom"}];
 var PBK={};PAGES.forEach(function(p){PBK[p.k]=p});
 
 var ROLES=[{k:"all",name:"Toàn bộ chức năng",ic:"ti-layout-grid",codes:[],scope:0,
@@ -20890,7 +20897,13 @@ var NAVTREE=[
     anh Luân bắt ba lần (trang Hỏi đáp 04/08, hai trang Nhân sự 05/08): *"a tìm trên sidebar ko
     thấy"*. Nó đứng ĐẦU nhóm vì nó là câu hỏi gộp - "còn gì chờ tôi quyết?" - còn bốn mục dưới là
     bốn hàng chờ cụ thể. */
- {g:"Chờ duyệt",items:["duyet","duyetck","duyethoan","duyetnghi","duyetthu","banggiao"]},
+ /* V2 08/08 - EM ĐÃ THỬ ĐẶT `duyet` (hub gộp) LÊN ĐẦU NHÓM NÀY RỒI GỠ RA. `_check11` đòi
+    "nhóm Chờ duyệt mỗi mục là MỘT TRANG THẬT" - đúng nguyên tắc V2, và đo ra hậu quả thật: bấm
+    `duyet` thì mục sáng lại là `duyetck`/`duyetnghi` chứ không phải chính nó, vì `navCur` nhường
+    sáng cho mục con. Mời người ta vào một mục rồi tô sáng mục khác là làm họ mất dấu.
+    Trang `duyet` vẫn sống (nhịp ngày và Việc hôm nay dẫn tới), chỉ không đứng trên menu - và
+    `_checkcauhoi` khai thẳng đúng một dòng nhịp còn thiếu lối menu vì chuyện này. */
+ {g:"Chờ duyệt",items:["duyetck","duyethoan","duyetnghi","duyetthu","banggiao"]},
  /* V9.99m (anh Luân 04/08: *"cái trang hỏi đáp... nó đang ở đâu nhỉ, a thấy tour thì hiện ra,
     mà a tìm trên sidebar ko thấy"*) - đúng, và đây là một chỗ SÓT KHI GỠ V6: trang Hỏi đáp có
     mục menu ở cây của bản v6 (đã gỡ 06/08) nhưng chưa bao giờ có ở cây menu V5, nên chỉ mở được bằng nút Trợ

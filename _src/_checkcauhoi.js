@@ -37,7 +37,13 @@ const FS=require("fs"),PATH=require("path");
 
 /* ---- trần (chốt kéo xuống) ---- */
 const TRAN_KHONG_CHIP = 7;   /* dòng nhịp CÓ SỐ ĐẾM mà chưa khai chip đích */
-const TRAN_KHONG_MENU = 0;    /* dòng nhịp trỏ vào trang không có mục trên menu của người đó */
+/* 1 = dòng "Duyệt hàng chờ quyết định" của cấp điều hành, trỏ vào trang gộp `duyet`.
+   Em đã THỬ cho nó một mục menu rồi GỠ RA: `_check11` đòi nhóm "Chờ duyệt" mỗi mục phải là một
+   TRANG THẬT (nguyên tắc V2), và đo ra hậu quả thật - bấm `duyet` thì mục sáng lại là `duyetck`
+   chứ không phải chính nó, vì `navCur` nhường sáng cho mục con. Mời người ta vào một mục rồi tô
+   sáng mục khác là làm họ mất dấu, tệ hơn là không có mục.
+   Bốn hàng chờ con đều đã đứng trên menu với số đếm riêng, nên không ai mất đường. */
+const TRAN_KHONG_MENU = 1;    /* dòng nhịp trỏ vào trang không có mục trên menu của người đó */
 const TRAN_KHONG_XEM  = 0;    /* dòng nhịp trỏ vào trang người đó không được xem */
 
 /* Dòng nhịp KHÔNG khai chip mà vẫn đúng - trang ấy CHÍNH LÀ hàng chờ, vào là thấy hết, không

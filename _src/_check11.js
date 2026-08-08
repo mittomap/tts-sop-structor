@@ -283,8 +283,17 @@ window.BLVIEW="list";
 t("V9.18 banlam view list co Chay quy trinh", RENDER.banlam().indexOf("Chạy quy trình")>=0);
 t("V9.18 menu Lam viec: banlam (hanhtrinh da gop) + giaoviec", (function(){var g=NAVTREE.filter(function(x){return x.g==="Làm việc"})[0];
  return g&&g.items.indexOf("banlam")>=0&&g.items.indexOf("hanhtrinh")<0})());
-t("V9.18 Tra cuu >= 15 so", (function(){var g=NAVTREE.filter(function(x){return x.g==="Tra cứu"})[0];
- return g&&g.items.length>=15})());
+/* V2 08/08 - DOI CAU HOI, KHONG XOA LUAT. Cau cu dem MUC TREN MENU cua nhom "Tra cứu" (>=15).
+   Nay muoi sau cuon so chi-doc vao sau MOT CUA `tracuu` de menu CEO tu 60 muc xuong 45 (anh Luan
+   giao quyet so trang 08/08; chot: khong bot trang nao, bot so trang MOT NGUOI PHAI NHIN).
+   Dieu can bao ve van y nguyen - DU SO TRA CUU, KHONG DUOC MAT CUON NAO - nen cau hoi doi tu
+   "dem muc menu" sang "dem so con toi duoc": bang khai `SOTRACUU` phai co >=15 cuon, moi cuon
+   phai la mot trang co that, va cua `tracuu` phai dung tren menu. Giau bot mot cuon van do. */
+t("V9.18 Tra cuu >= 15 so, moi so la mot trang that", (function(){
+ if(typeof SOTRACUU==="undefined")return false;
+ return SOTRACUU.length>=15&&SOTRACUU.every(function(k){return !!PBK[k]})})());
+t("V2 cua Tra cuu dung tren menu", (function(){var g=NAVTREE.filter(function(x){return x.g==="Tra cứu"})[0];
+ return !!(g&&g.items.indexOf("tracuu")>=0&&PBK.tracuu&&!PBK.tracuu.hide)})());
 t("V9.18 cac so tra cuu du LISTCFG + PAGES ty=list", ["dslienhe","dstest","dstuvan","dsdangky","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai"].every(function(k){return LISTCFG[k]&&LISTCFG[k].ro&&PBK[k]&&PBK[k].ty==="list"}));
 /* V9.29c: rieng So thu hoc phi thanh trang 2 tab (Da thu / Du thu) nen ty="custom", nhung phan
    "Da thu" van la chinh LISTCFG.dsthanhtoan nhung vao - khong de no bien thanh bang chep tay. */
