@@ -1034,6 +1034,8 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
   hosonv:"ho so mot nhan vien - mo tu so Nhan vien va man Nhan su",
   hosokhoa:"ho so mot khoa hoc - mo tu so Khoa hoc",
   baitap:"bai tap cua mot lop - mo tu Van hanh lop va tu so Bai tap",
+  banglop:"van hanh MOT lop - mo tu mot dong o trang Lop hoc (V2 RB3: cha truoc con). Trong trang "+
+   "van co o xo chon nhanh lop khac, nen vao roi khong bi ket o mot lop.",
   chay:"chay quy trinh cho mot ho so - mo tu Trang bat dau va tab Cham lai",
   nhansu:"man khoi luong nhan su - mo tu the va tu Tro ly",
   ban:"Ban lam viec theo thuc the - o ban V5 la trang chi tiet mo tu So phu huynh va tu Tro ly; "+

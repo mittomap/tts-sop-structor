@@ -182,8 +182,12 @@ if(acam){vao(acam.staff_id);
     "Lop hoc & Giang day" thay cho nhom "C2 - Dang hoc". */
  t("ACA: khong con muc chang nao tren menu",
    !navVis("changA")&&!navVis("changB")&&!navVis("changC")&&!navVis("changD"));
- t("ACA: menu chay khung phang theo nghiep vu", arcMode()==="phang"&&navInTree("banglop"));
- t("ACA: van co man lop hoc & giang day", navVis("banglop")&&navVis("hoctap")&&navVis("giaoan"));
+ /* V2 - hoi `lop` chu khong hoi `banglop`. RB3 da doi quan he: `lop` (Lop hoc) la trang CHA co
+    mat tren menu, `banglop` (Van hanh MOT lop) la trang con vao bang cach bam mot lop - no khong
+    con o tren cay menu, va do la DUNG. Dieu can bao ve khong doi: chuc danh nay phai co duong
+    toi man lop hoc & giang day. */
+ t("ACA: menu chay khung phang theo nghiep vu", arcMode()==="phang"&&navInTree("lop"));
+ t("ACA: van co man lop hoc & giang day", navVis("lop")&&navVis("banglop")&&navVis("buoihoc")&&navVis("giaoan"));
  t("ACA: khong thay hub Tuyen sinh va man Thanh toan", !navVis("tuyensinh")&&!navVis("thanhtoan"));}
 /* Nguoc lai: chuc danh di qua tu 2 chang tro len thi GIU khung chang - ban do vong doi con ke
    duoc chuyen. Do tren Hoc vu (C2+C3+C4) va Giam doc (du bon). */
@@ -342,7 +346,12 @@ applyScope("");CURROLE="all";
       (do la cho dang dung that); hang cua hub mang lop `anc`. Van la DUNG MOT muc sang. */
    var anc=(NAVEL.innerHTML.match(/class="navitem[^"]*\banc\b[^"]*" data-k="([a-z0-9]+)"/g)||[]).map(function(s){return s.match(/data-k="([a-z0-9]+)"/)[1]});
    var okHub=(HUBTAB[k]&&anc.indexOf(k)>=0&&HUBTAB[k].m[hubTab(k)]===on[0]);
-   if(!(on.length===1&&(on[0]===k||okHub)))sai.push(a+">"+k+"=["+on.join(",")+"]")})});
+   /* V2 RB3 - TRANG CON THI MUC CUA TRANG CHA SANG. `banglop` (Van hanh MOT lop) khong co muc
+      menu rieng: no vao bang cach bam mot lop o trang Lop hoc. Dung trong mot lop ma sidebar toi
+      thui la mat dau - nen dap an DUNG o day la muc CHA sang, khong phai chinh no.
+      Luat "DUNG MOT muc sang" giu nguyen, chi them mot dang dap an hop le. */
+   var okCon=(NAVSUB[k]&&on[0]===NAVSUB[k]);
+   if(!(on.length===1&&(on[0]===k||okHub||okCon)))sai.push(a+">"+k+"=["+on.join(",")+"]")})});
  tv5("V9.19 moi nghiep vu trong chang sang DUNG 1 muc sidebar"+(sai.length?" ["+sai.join(" ")+"]":""), sai.length===0)})();
 /* Luat that: MOT muc sang, va la muc GAN NHAT co mat tren menu. O v5 `wow` la mot muc rieng
    nen no sang va hub `hoctap` nhuong; o v6 `wow` chi la TAB cua hub, khong co muc rieng, nen

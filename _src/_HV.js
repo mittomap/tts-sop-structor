@@ -517,7 +517,13 @@ var PAGES=[
 {k:"hanhtrinh",g:"Vận hành",ic:"ti-route",t:"Hành trình học viên",c:"Toàn bộ theo chặng",ty:"custom"},
 /* ===== TRA CỨU - chỉ những danh sách thật sự cần khi làm việc ===== */
 {k:"hocvien",g:"Tra cứu",ic:"ti-user-check",t:"Học viên",c:"Đang & đã học",ty:"list"},
-{k:"lop",g:"_",ic:"ti-users-group",t:"Lớp học",c:"Các lớp (trong Học tập)",ty:"list",hide:1},
+/* V2 RB3 - CHA TRƯỚC CON (anh Luân: *"trang vận hành lớp, nó là trang con của lớp học mới đúng
+   em nhỉ"*). V1 đang ngược: `banglop` (Vận hành lớp) đứng trên menu còn `lop` (Lớp học) - đáng ra
+   là cha - lại bị ẩn, nên phải vào thẳng màn vận hành rồi chọn lớp bằng ô xổ.
+   Nay `lop` là một trang thật, có nhóm, cấu hình được ở màn Cài đặt; `banglop` rời khỏi menu và
+   vào bằng cách BẤM MỘT LỚP ở trang Lớp học (ô xổ chọn nhanh vẫn giữ trong trang con cho người
+   quen lối cũ khỏi hụt). */
+{k:"lop",g:"Chặng · Học tập",ic:"ti-users-group",t:"Lớp học",c:"Các lớp đang chạy - bấm một lớp để vào Vận hành lớp",ty:"list"},
 {k:"giangvien",g:"Tra cứu",ic:"ti-chalkboard",t:"Giảng viên",c:"Đội ngũ + bảng công",ty:"custom"},
 {k:"dslienhe",g:"Tra cứu",ic:"ti-phone",t:"Sổ liên hệ",c:"Điểm chạm với khách",ty:"list"},
 {k:"dstest",g:"Tra cứu",ic:"ti-file-text",t:"Sổ test đầu vào",c:"Tra cứu test",ty:"list"},
@@ -1334,7 +1340,12 @@ hocvien:{code:"DL09",filt:"student_status",ro:1,sub:"Học viên (DL09) - lọc 
  qf:[["risk","Nguy cơ",function(s){return stuRisk(s)}]],
  act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"student_id"}],
  cols:[["student_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["student_status","Trạng thái","chip"],["attendance_progress_status","Chuyên cần","chip"],["academic_progress_status","Học thuật","chip"],["attendance_risk_reason","Lý do CC","enum"],["academic_risk_reason","Lý do HT","enum"],["__vang","Vắng (buổi)","calcso"],["__thieubai","Thiếu bài","calcso"],["last_learning_activity_time","Hoạt động cuối","lau"],["wow_quota_remaining","WOW còn"]]},
-lop:{code:"DL10",nut:'<button class="btn primary sm" onclick="go(\'xeplop\')"><i class="ti ti-layout-grid-add"></i>Xếp lớp & Onboarding</button>',filt:"class_status",ro:1,sub:"Lớp học (DL10)",
+lop:{code:"DL10",nut:'<button class="btn primary sm" onclick="go(\'xeplop\')"><i class="ti ti-layout-grid-add"></i>Xếp lớp & Onboarding</button>',filt:"class_status",ro:1,sub:"Lớp học (DL10) - bấm nút Vận hành lớp trên một dòng để vào buổi học, điểm danh, nhận xét và bài tập của lớp đó",
+ /* V2 RB3 - CỬA VÀO TRANG CON, ĐẶT NGAY TRÊN DÒNG. Trước đây muốn vào Vận hành lớp phải mở ngăn
+    kéo của dòng rồi mới thấy nút - hai lần bấm cho việc người ta làm nhiều nhất ở trang này.
+    Anh Luân: *"kiểu cái nào là nghiệp vụ của 1 lớp học ấy"* - vận hành một lớp CHÍNH LÀ việc của
+    trang này, nên cửa của nó phải nằm ngay trên dòng. */
+ act:[{lb:"Vận hành lớp",ic:"ti-clipboard-list",fn:"openLop",arg:"class_id"}],
  
  /* V9.40d: class_level là cột SOP mô tả từ đầu mà app chưa hiện ở đâu - xếp một em trình độ
     Foundation vào lớp IELTS 7.0+ là hỏng cả lớp, nên trình độ phải nhìn thấy ngay ở danh sách. */
@@ -20213,7 +20224,7 @@ var NAVTREE=[
     lối nào. Hub CSKH có 4 tab mà menu chỉ có tên hub. Anh Luân: *"bên sidebar giống như 1 cái
     bản đồ vậy, họ biết mình cần tìm gì ở đâu"* - thiếu một mục là mất một chỗ trên bản đồ.
     Thứ tự các mục con xếp ĐÚNG THỨ TỰ THANH TAB của hub, để menu và màn hình đọc như nhau. */
- {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","banglop","giaoan","khaosat","ghinhan","khieunai","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","giaoan","khaosat","ghinhan","khieunai","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","ketqua","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
@@ -20246,7 +20257,13 @@ var NAVTREE=[
    đổi góc nhìn), không phải bốn nghiệp vụ - nên chúng vẫn là mục con, đúng nghĩa.
    `bangcong` cũng rời ra: nó là Bảng công giảng dạy, một nghiệp vụ riêng của Nhân sự, không phải
    một tab của trang Giảng viên. */
-var NAVSUB={changA:"chang",changB:"chang",changC:"chang",changD:"chang"};
+var NAVSUB={changA:"chang",changB:"chang",changC:"chang",changD:"chang",
+ /* V2 RB3 - CHA TRƯỚC CON. `banglop` (Vận hành MỘT lớp) là trang con của `lop` (Lớp học): nó
+    không có mục menu riêng, vào bằng cách bấm một lớp. Khai quan hệ ấy ở đây để khi đang đứng
+    trong một lớp thì mục "Lớp học" trên sidebar SÁNG - người dùng đọc ra mình đang ở nhánh nào.
+    Không khai thì cả menu tối thui, đúng con bệnh anh Luân đã bắt hai lần (trang Hỏi đáp 04/08,
+    hai trang Nhân sự 05/08): *"a tìm trên sidebar ko thấy"*. */
+ banglop:"lop"};
 function navOwner(k){return NAVSUB[k]||k}
 function navItemMeta(k){
  if(/^chang[A-D]$/.test(k)){var A=ARCBK[k];return {t:uiItemLabel(k),ic:"ti-route",arc:A}}
@@ -20413,7 +20430,7 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
    "Test đầu vào" -> cũng vậy. Trước đây hai người ấy thấy nhóm "C1 · Khách tiềm năng".) */
 var NAVPHANG=[
  {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:"Lớp học & Giảng dạy",items:["xeplop","banglop","giaoan","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
+ {g:"Lớp học & Giảng dạy",items:["xeplop","giaoan","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
  {g:"Chăm sóc & Sau khóa",items:["khaosat","ghinhan","khieunai","baoluu","ketthuc","ketqua","magioithieu"]}];
 function navCayV5(){
  if(arcMode()==="chang")return NAVTREE;
@@ -20439,6 +20456,12 @@ function navCur(k){
     mục riêng -> chính mục CSKH phải sáng, nếu không cả menu không có gì sáng - bẫy đã cắn) */
  if(k===CUR){var sub=hubSubKey(k);
   return !(sub&&sub!==k&&navInTree(sub)&&navVis(sub))}
+ /* V2 RB3 - ĐANG ĐỨNG Ở TRANG CON THÌ MỤC CỦA TRANG CHA SÁNG.
+    Luật cũ chỉ đi một chiều: mục `k` sáng khi nó là CON của trang đang mở (mô hình hub - hub là
+    trang, mục con sáng). Mô hình cha-con đi chiều NGƯỢC LẠI: trang đang mở là CON, và thứ phải
+    sáng là mục của CHA. Thiếu vế này thì bấm một lớp để vào Vận hành lớp là cả sidebar tối thui.
+    Hỏi `navInTree` trước: cha nào không có mặt trên menu thì không có gì để mà sáng. */
+ if(NAVSUB[CUR]===k&&navInTree(k))return true;
  var o=navOwner(k);if(o!==CUR)return false;
  /* V9.99z5: trước đây mỗi hub có một dòng riêng, và ba trong năm dòng ấy chép lại bảng tab
     của chính hub - chép lệch một chỗ là mục menu không bao giờ sáng. Nay hỏi thẳng HUBTAB:

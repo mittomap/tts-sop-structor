@@ -154,6 +154,12 @@ chay "_checkngay mot ngay cua tung chuc danh" "CHECKNGAY OK" node _checkngay.js
 # ngay mot loi that: Leader Tu van Co so 1 khai pham vi "team" ma nhin thay tron 82 hoc vien cua
 # ca 5 co so - bang dung Truong phong.
 chay "_checknguoi tung nguoi dang nhap" "CHECKNGUOI OK" node _checknguoi.js
+# V2 (anh Luan dat dieu kien cho viec do hub: *"mien la khong roi"*). Do hub thanh 25 trang thi
+# THANH MENU DAI RA - voi nguoi co pham vi rong do la mot kieu roi KHAC: khong phai "mot nghiep vu
+# lam duoc o nhieu noi" nhu V1, ma la "khong biet nghiep vu cua minh nam dong nao". Doi mot kieu
+# roi lay mot kieu roi khac thi khong phai la tien. Bo nay dong vai tung chuc danh, dung THAT
+# thanh menu cua ho roi dem - va co TRAN de menu khong dai them trong im lang.
+chay "_checkroi menu co lam roi khong" "CHECKROI (OK|BO QUA)" node _checkroi.js
 chay "_checkmoi khong moi roi duoi" "TONG:" node _checkmoi.js
 
 echo

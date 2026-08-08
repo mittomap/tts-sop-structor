@@ -474,7 +474,11 @@ var CH3_NGOAIBAN={
   var NGOAIMENU={
    ban:"trang chi tiet mo ra tu So nguoi dong hanh (phMo) - cung ho voi hoso/hosogv/hosonv, "+
     "khong dung o menu vi no luon duoc mo kem mot ho so cu the.",
-   hanhtrinh:"goc nhin bang chang cua Trang bat dau - cung mot trang, mo bang nut 'Xem theo chang'."};
+   hanhtrinh:"goc nhin bang chang cua Trang bat dau - cung mot trang, mo bang nut 'Xem theo chang'.",
+   banglop:"V2 RB3 - Van hanh lop la TRANG CON cua Lop hoc, mo ra bang cach bam mot lop o trang "+
+    "Lop hoc (anh Luan: 'trang van hanh lop, no la trang con cua lop hoc moi dung em nhi'). "+
+    "V1 de nguoc: banglop dung tren menu con lop bi an, nen phai vao thang man van hanh roi chon "+
+    "lop bang o xo. O xo do van giu trong trang con cho nguoi quen loi cu khoi hut."};
   function tap(t){var o={};t.forEach(function(g){(g.items||[]).forEach(function(k){o[k]=1})});return o}
   var M=tap(navCayV5());
   var HUB=[[TSMAP,"tuyensinh"],[HTMAP,"hoctap"],[CSMAP,"cskh"],[DUYMAP,"duyet"],[KMAP,"khac"],[ARCMAP,"chang"]];
