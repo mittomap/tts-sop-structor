@@ -9111,10 +9111,11 @@ function csTabSet(tab){for(var k in CSMAP)if(CSMAP[k]===tab){go(k);return}window
 function ychvList(){return srows("DL23").filter(function(t){return isc(t.task_type,"student_request")})}
 function ychvCho(){return ychvList().filter(function(t){return isc(t.task_status,"new")}).length}
 function renderYcHV(){
+ var h0=nvHead("ychv");
  var L=ychvList().slice().sort(function(a,b){
   var na=isc(a.task_status,"new")?0:1,nb=isc(b.task_status,"new")?0:1;if(na!==nb)return na-nb;
   return (pvnd(b.created_time)||0)-(pvnd(a.created_time)||0)});
- var h='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>'+
+ var h=h0+'<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>'+
   'Yêu cầu học viên gửi từ Cổng học viên. Hệ thống tự chuyển tới học vụ, riêng yêu cầu về tiền thì chuyển kế toán, hạn nhận việc lấy theo <b>'+
   slaChip("slaTaskAccept_hours",4,"giờ")+'</b>. Nhận và trả lời ngay trong thẻ dưới đây.</div>';
  h+='<div class="panel"><div class="pbody">';
@@ -13602,16 +13603,28 @@ function renderTuyensinh(){
 function tsReupList(){var L=jAll().filter(function(J){return J.k==="lost"||J.k==="no_contact"});
  L.sort(function(a,b){var x=jNF(a),y=jNF(b);return (x?x.getTime():9e15)-(y?y.getTime():9e15)});
  return L}
+/* V2 - VÀO KHUÔN TRANG NGHIỆP VỤ. Hai trang `reup` và `ychv` là hai trang duy nhất không dùng
+   đầu trang chuẩn `pageHead`, nên chúng không có câu ngữ cảnh và không có chỗ đặt nút hành động.
+   `_checkkhuon` sinh ra để bắt đúng loại lệch này: 25 trang mà mỗi trang một kiểu thì người dùng
+   phải học lại bố cục ở từng trang. */
 function renderReupTab(){
+ var h0=nvHead("reup");
  var L=tsReupList();
  var nNC=L.filter(function(J){return J.k==="no_contact"}).length,nLost=L.length-nNC;
  var t0=new Date();t0.setHours(0,0,0,0);
  var due=L.filter(function(J){var nf=jNF(J);return nf&&nf<=endToday()}).length;
- var h=statStrip([["ti-phone-off",nNC,"Chưa gặp được","#E08A1E","đổi kênh Zalo/SMS"],
+ var h=h0+statStrip([["ti-phone-off",nNC,"Chưa gặp được","#E08A1E","đổi kênh Zalo/SMS"],
   ["ti-user-x",nLost,"Đã mất / từ chối","#6B7887","chăm lại định kỳ"],
   ["ti-calendar-event",due,"Tới hẹn chăm lại","#E24B4A",due?"gọi hôm nay":""]],"reup");
  h+='<div class="notebar"><i class="ti ti-bulb"></i>'+goiyG("gy_khach_ngung_khong_phai_0425",'Khách ngưng chưa phải là mất - hẹn chăm lại theo đợt khai giảng hoặc ưu đãi.||Bấm "Xử lý" để gọi và ghi kết quả. Liên hệ được thì hành trình tự chạy tiếp.')+'</div>';
- h+='<div class="panel"><div class="pbody">'+chayListHTML(L,"tsReupList")+'</div></div>';
+ /* V2 - DANH SÁCH RỖNG PHẢI NÓI VÌ SAO. `chayListHTML` không tự sinh lời khi không có dòng nào,
+    nên trang này từng để lại một khoảng trắng - `_checkkhuon` mục K5 bắt được.
+    Và ở đây rỗng là TIN TỐT (không còn khách nào chờ chăm lại), nên phải nói ra đúng như vậy:
+    một khoảng trắng thì người dùng không biết là hết việc hay là app hỏng. */
+ h+='<div class="panel"><div class="pbody">'+
+   (L.length?chayListHTML(L,"tsReupList")
+            :'<div class="empty">Không còn khách nào chờ chăm lại - mọi khách đã ngưng đều đang trong hạn hẹn liên hệ. Tới hẹn thì họ tự nổi lên đây.</div>')+
+   '</div></div>';
  return h}
 function renderTest(embed){var p="test",fil=fget(p);var all=srows("DL03");
  function st(r){var booked=isc(r.booking_status,"booked");var refused=isc(r.booking_status,"rejected");var att=isc(r.test_attendance_status,"on_time","late");var noshow=isc(r.test_attendance_status,"no_show");var graded=isc(r.test_status,"graded");var consulted=isc(r.post_test_status,"consulted");var overdue=att&&!graded&&hoursSince(r.test_attendance_time)!=null&&hoursSince(r.test_attendance_time)>paramOf("slaTestResult_hours",48);return {booked:booked,refused:refused,att:att,noshow:noshow,graded:graded,consulted:consulted,overdue:overdue}}

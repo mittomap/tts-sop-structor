@@ -1,0 +1,181 @@
+/* _checkkhuon.js - MỘT TRANG NGHIỆP VỤ PHẢI TRÔNG THẾ NÀO.
+ *
+ * VÌ SAO CÓ FILE NÀY (anh Luân 07/08): *"Có hội đồng nào chuyên về nghiệp vụ và trải nghiệm ko
+ * em, để họ biết nên thiết kế trang thế nào ấy"*.
+ *
+ * Dự án CÓ chuẩn thiết kế - `ITTs_UX_UI_ChuanThietKe.md` phần C khai chuẩn cho bảy loại màn:
+ * Dashboard · Bảng danh sách · Trang chi tiết · Phễu · Form · Lịch · Cài đặt. Nhưng **không có
+ * loại "trang nghiệp vụ"**, vì hồi viết chuẩn ấy loại màn đó chưa tồn tại - nghiệp vụ còn nằm
+ * trong sáu cái hub. V2 đẻ ra 25 trang nghiệp vụ mà không có khuôn nào cho chúng.
+ * Hậu quả đo được: 9/25 trang có dải thẻ riêng, 16 trang không. Mỗi trang một kiểu.
+ *
+ * KHUÔN NÀY KHÔNG PHẢI EM NGHĨ RA - nó ghép từ ba nguồn đã có, chỉ là chưa ai gom lại:
+ *   · lời anh Luân tả V2: *"mỗi trang là nghiệp vụ riêng, và nó có THẺ, có CHIP LỌC, có CẢNH BÁO
+ *     của riêng nó"* -> ba thành phần bắt buộc;
+ *   · `ITTs_UX_UI_ChuanThietKe.md` phần C mục 1-2 (thẻ phải có CTA dẫn tới hành động; bảng phải
+ *     lọc/sắp/chọn cột được) và phần D (trạng thái rỗng phải biết nói);
+ *   · các luật đã có trong bộ kiểm: câu đầu trang ≤150 ký tự (M9), danh sách 0 dòng phải nói vì
+ *     sao (TIỆN DỤNG), thẻ phải khai ở `THEDEF` kèm chú thích chỉ chỗ xem (`_checkux` nhóm 10).
+ *
+ * SÁU MẶT CỦA KHUÔN - đo trên chữ HIỆN RA (vẽ thật từng trang), không đo mã nguồn:
+ *   K1  CÂU NGỮ CẢNH: trang nói được nó làm việc gì, và không dài quá 150 ký tự.
+ *   K2  NÚT HÀNH ĐỘNG CHÍNH: việc người ta tới đây để LÀM phải có cửa ngay đầu trang. Trang chỉ
+ *       để đọc thì khai lý do - nhưng phải khai, không được im.
+ *   K3  DẢI THẺ RIÊNG: có `statStrip` và có khai ở `THEDEF`.
+ *   K4  CHIP LỌC: có `filterBar` hoặc thanh lọc chuyên sâu - danh sách dài mà không lọc được thì
+ *       người ta cuộn tay.
+ *   K5  TRẠNG THÁI RỖNG BIẾT NÓI: có khối `.empty` (danh sách rỗng phải nói vì sao, không để
+ *       một khoảng trắng).
+ *   K6  KHÔNG CÒN DÍNH TỚI HUB: không trang nghiệp vụ nào còn vẽ thanh tab của hub cũ.
+ *
+ * BA MẶT ĐẦU LÀ TRẦN KÉO XUỐNG, không phải cổng chặn. Lý do: 16 trang đang thiếu thẻ - đặt luật
+ * "mọi trang phải có thẻ" ngay hôm nay là bộ kiểm đỏ 16 chỗ và không ai chạy nó nữa. Nên: ghi
+ * đúng số đang thiếu, và số ấy CHỈ ĐƯỢC GIẢM. Sửa được trang nào thì hạ trần xuống đúng số mới.
+ *
+ * Chạy: ITTS_OUT=<out> node _checkkhuon.js
+ */
+const FS = require("fs"), PATH = require("path");
+const APP = process.env.ITTS_APP || PATH.join(__dirname, "_APP.js");
+
+/* ---- trần: SỐ ĐO ĐƯỢC lúc dựng bộ này. Chỉ được HẠ, không bao giờ nâng. ---- */
+const TRAN_THIEU_THE  = 16;  /* trang nghiệp vụ chưa có dải thẻ riêng */
+/* 12 = SỐ ĐO ĐƯỢC. Bản đầu em đặt 8 - một con số ĐOÁN, và nó đỏ ngay. Trần phải là số đo được
+   thật: đặt thấp hơn thực tế thì lần nào cũng đỏ, mà một bộ kiểm đỏ mãi thì người ta tắt nó đi.
+   Danh sách 12 trang in ra ngay dưới bảng tổng kết - sửa được trang nào thì HẠ trần xuống. */
+const TRAN_THIEU_LOC  = 12;  /* trang chưa có chip lọc */
+const TRAN_THIEU_NUT  = 12;  /* trang chưa có nút hành động chính */
+
+/* Trang CHỈ ĐỂ ĐỌC - không có nút hành động là đúng, nhưng phải khai kèm lý do đọc được. */
+const CHIDOC = {
+  lichtuan: "lich tuan la BUC TRANH thoi gian - viec dat/doi lich nam o trang cua chinh buoi do; " +
+            "them mot nut ghi o day la de mot cua ghi thu hai cho cung mot viec (pham RB1).",
+  phong:    "trang doi chieu phong va gio - no CHI RA cho dung, con sua thi sua o lich cua lop.",
+  buoihnay: "lat cat theo ngay cua buoi hoc - moi viec tren buoi deu mo tu chinh dong buoi do.",
+};
+
+const meta = (() => { try { return JSON.parse(FS.readFileSync(PATH.join(__dirname, "demo_data_big.json"), "utf8")).meta || {} } catch (e) { return {} } })();
+(function neo() {
+  const m = String(meta.anchor || "").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/);
+  if (!m) return;
+  const T = new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 9), +(m[5] || 0)).getTime();
+  const D = Date;
+  global.Date = class extends D { constructor(...a) { if (!a.length) super(T); else super(...a) } static now() { return T } };
+})();
+
+function el() {
+  return {innerHTML: "", style: {}, classList: {add(){},remove(){},toggle(){},contains(){return false}},
+          textContent: "", value: "", scrollTop: 0, dataset: {}, children: [],
+          appendChild(){}, removeChild(){}, setAttribute(){}, removeAttribute(){}, getAttribute(){return null},
+          addEventListener(){}, querySelector(){return null}, querySelectorAll(){return []},
+          closest(){return null}, focus(){}, click(){},
+          getBoundingClientRect(){return {x:0,y:0,width:0,height:0,top:0,left:0,right:0,bottom:0}}};
+}
+const kho = {};
+global.document = {getElementById: id => kho[id] || (kho[id] = el()), createElement: () => el(),
+  querySelector: () => null, querySelectorAll: () => [], addEventListener(){}, body: el(), documentElement: el()};
+global.window = global;
+const ss = {}, ls = {};
+global.sessionStorage = {getItem: k => (k in ss ? ss[k] : null), setItem: (k,v) => {ss[k]=String(v)}, removeItem: k => {delete ss[k]}};
+global.localStorage  = {getItem: k => (k in ls ? ls[k] : null), setItem: (k,v) => {ls[k]=String(v)}, removeItem: k => {delete ls[k]}};
+global.location = {search:"", hash:"", pathname:"/", reload(){}};
+global.history = {replaceState(){}, pushState(){}};
+global.navigator = {userAgent:"node", clipboard:{writeText(){return Promise.resolve()}}};
+global.getComputedStyle = () => ({display:"block", getPropertyValue: () => ""});
+global.matchMedia = () => ({matches:false, addEventListener(){}, addListener(){}});
+global.requestAnimationFrame = f => setTimeout(f, 0);
+global.alert = () => {}; global.confirm = () => true; global.prompt = () => "";
+
+try { require("vm").runInThisContext(FS.readFileSync(APP, "utf8")); }
+catch (e) { console.log("CHECKKHUON DO: khong nap duoc " + APP + " - " + String(e.message).slice(0,120)); process.exit(1); }
+
+const do_ = [], thieu = {the: [], loc: [], nut: [], cau: [], rong: [], hub: []};
+
+/* 25 trang nghiệp vụ - lấy từ chính bản khai `HUBTAB` (nó nay là bản khai "trang nào là một
+   nghiệp vụ", không còn là bản khai hub). Không gõ tay danh sách: gõ tay là thêm một nghiệp vụ
+   mới thì quên thêm vào đây, và bộ kiểm im lặng bỏ sót đúng trang mới nhất. */
+const NV = [];
+try { for (const h in HUBTAB) { const m = HUBTAB[h].m || {}; for (const t in m) if (NV.indexOf(m[t]) < 0) NV.push(m[t]); } }
+catch (e) { console.log("CHECKKHUON DO: khong doc duoc ban khai nghiep vu"); process.exit(1); }
+
+try { setRole("all"); applyScope(""); } catch (e) {}
+
+/* Bóc chữ hiện ra khỏi HTML - đo trên thứ NGƯỜI DÙNG ĐỌC, không đo mã nguồn. */
+function chu(h) { return String(h || "").replace(/<[^>]*>/g, " ").replace(/&[a-z]+;/g, " ").replace(/\s+/g, " ").trim(); }
+
+NV.forEach(k => {
+  if (!PBK[k]) return;
+  let h = "";
+  try { CUR = k; h = (PBK[k].ty === "list") ? renderList(k) : (RENDER[k] ? RENDER[k]() : ""); }
+  catch (e) { do_.push(k + ": ve ra thi LOI - " + String(e.message).slice(0, 70)); return; }
+  if (!h) { do_.push(k + ": khong ve ra gi ca"); return; }
+
+  /* K1 - câu ngữ cảnh. Lấy đoạn nhắc đầu trang, đo trên chữ hiện ra.
+     BẪY CỦA CHÍNH CÁI THƯỚC, cắn ngay lần chạy đầu: lớp CSS thật là `class="phead nohd"`, mà
+     bản đầu dò `class="phead"` CÓ DẤU NGOẶC ĐÓNG - không khớp trang nào, và bộ kiểm chấm oan 20
+     trang "không có câu ngữ cảnh" trong khi trang nào cũng có.
+     Cùng họ với bẫy `_check11` đã cắn: bám vào chuỗi lớp CSS NGUYÊN VĂN thì thêm một lớp phụ là
+     phép đo chết. Bám vào TỪ KHOÁ giữa các lớp, đừng bám cả chuỗi. */
+  /* Lấy ĐÚNG khối câu (`<div class="s">...`), không lấy cả vùng đầu trang: `pageHead` gắn BẢNG
+     VIỆC ngay sau đó, ăn lan sang đấy là đếm cả một cái bảng vào độ dài một câu - lại một phép
+     đo phóng đại. Đo cái gì thì phải bám đúng cái đó. */
+  const mHead = h.match(/class="phead[^"]*"[\s\S]{0,80}?class="s"[^>]*>([\s\S]{0,1200}?)<\/div>/);
+  const cau = mHead ? chu(mHead[1]) : "";
+  if (!cau) thieu.cau.push(k + " (khong co cau ngu canh)");
+  else if (cau.length > 150) thieu.cau.push(k + " (cau dau trang " + cau.length + " ky tu, tran 150)");
+
+  /* K2 - nút hành động chính ở đầu trang */
+  const coNut = /class="phead"[\s\S]{0,1500}?<button/.test(h) || /class="btn primary/.test(h);
+  if (!coNut && !CHIDOC[k]) thieu.nut.push(k);
+
+  /* K3 - dải thẻ riêng: vẽ ra có thẻ, VÀ có khai ở THEDEF (khai mới sửa được ở Cài đặt) */
+  const coThe = /class="bstats|class="stat/.test(h);
+  const khaiThe = !!THEDEF[k];
+  if (!coThe || !khaiThe) thieu.the.push(k + (coThe && !khaiThe ? " (ve ra the ma khong khai o THEDEF)" : ""));
+
+  /* K4 - chip lọc */
+  if (!/class="fbar|class="chipf|onclick="fset\(/.test(h)) thieu.loc.push(k);
+
+  /* K5 - KHÔNG BAO GIỜ ĐỂ MỘT KHOẢNG TRẮNG. Hỏi đúng câu: trang có dòng dữ liệu nào không -
+     nếu KHÔNG có thì phải có lời nói vì sao (`.empty`). Bản đầu hỏi ngược ("có khối rỗng không")
+     nên chấm đỏ cả những trang đang đầy dữ liệu - hỏi sai câu thì con số ra vô nghĩa.
+     Dữ liệu demo hầu hết đang đầy, nên mục này chủ yếu canh cho tương lai: lọc hết sạch, hoặc
+     một chức danh không có dòng nào, thì trang vẫn phải nói được điều gì đó. */
+  /* ĐỪNG ĐUỔI THEO TÊN LỚP CSS. Bản đầu hỏi "có `<tr>` hoặc khối tên `card`/`row` không" - và
+     hụt hai lần liên tiếp: `appcard` ở Duyệt chiết khấu, rồi `rvq` ở Chăm lại. Mỗi màn một kiểu
+     thẻ dòng, nên một danh sách tên đóng thì cứ thêm một kiểu là thước lại hụt, và mỗi lần hụt
+     là một lần TỐ OAN app.
+     Hỏi câu KHÔNG phụ thuộc tên lớp, và cũng đúng là câu người dùng hỏi: **sau đầu trang, còn
+     chữ gì để đọc không?** Trang nào chỉ có đầu trang rồi hết mà không một lời giải thích thì
+     đúng là một khoảng trắng - dù nó dựng bằng thẻ tên gì. */
+  const than = chu(h.replace(/[\s\S]*?class="phead[^"]*"[\s\S]{0,3000}?class="sp"[\s\S]*?<\/div>/, ""));
+  const coLoiRong = /class="empty"/.test(h);
+  if (than.length < 120 && !coLoiRong) thieu.rong.push(k + " (than trang chi co " + than.length + " ky tu chu)");
+
+  /* K6 - không còn dính tới hub: trang nghiệp vụ không được vẽ thanh tab của hub cũ */
+  if (/TabSet\('|duyTabSet\(|tsTabSet\(|htTabSet\(|csTabSet\(/.test(h)) thieu.hub.push(k);
+});
+
+/* Trang khai CHỈ ĐỌC mà lại có nút hành động thì bản khai đã cũ - gỡ dòng khai đi. */
+Object.keys(CHIDOC).forEach(k => { if (NV.indexOf(k) < 0) do_.push("ban khai CHIDOC nhac trang khong con la nghiep vu: " + k); });
+
+if (thieu.cau.length)  do_.push("K1 cau ngu canh: " + thieu.cau.length + " trang - " + thieu.cau.slice(0,4).join(", "));
+if (thieu.rong.length) do_.push("K5 trang thai rong khong biet noi: " + thieu.rong.length + " trang - " + thieu.rong.slice(0,4).join(", "));
+if (thieu.hub.length)  do_.push("K6 CON DINH TOI HUB - trang nghiep vu van ve thanh tab hub cu: " + thieu.hub.join(", "));
+
+if (thieu.the.length > TRAN_THIEU_THE) do_.push("K3 thieu dai the: " + thieu.the.length + " trang, qua tran " + TRAN_THIEU_THE + " - " + thieu.the.slice(0,5).join(", "));
+if (thieu.loc.length > TRAN_THIEU_LOC) do_.push("K4 thieu chip loc: " + thieu.loc.length + " trang, qua tran " + TRAN_THIEU_LOC + " - " + thieu.loc.slice(0,5).join(", "));
+if (thieu.nut.length > TRAN_THIEU_NUT) do_.push("K2 thieu nut hanh dong: " + thieu.nut.length + " trang, qua tran " + TRAN_THIEU_NUT + " - " + thieu.nut.slice(0,5).join(", "));
+
+console.log("  " + NV.length + " trang nghiep vu | thieu the " + thieu.the.length + "/" + TRAN_THIEU_THE +
+            " · thieu loc " + thieu.loc.length + "/" + TRAN_THIEU_LOC +
+            " · thieu nut " + thieu.nut.length + "/" + TRAN_THIEU_NUT);
+if (thieu.the.length) console.log("  chua co the: " + thieu.the.join(" "));
+if (thieu.loc.length) console.log("  chua co loc: " + thieu.loc.join(" "));
+
+if (do_.length) {
+  console.log("CHECKKHUON DO (" + do_.length + " cho):");
+  do_.forEach(x => console.log("  - " + x));
+  console.log("CHECKKHUON DO");
+  process.exit(1);
+}
+console.log("CHECKKHUON OK: " + NV.length + " trang nghiep vu deu theo khuon (cau ngu canh, trang thai rong, khong con dinh hub); ba tran keo xuong deu trong nguong");

@@ -160,6 +160,13 @@ chay "_checknguoi tung nguoi dang nhap" "CHECKNGUOI OK" node _checknguoi.js
 # roi lay mot kieu roi khac thi khong phai la tien. Bo nay dong vai tung chuc danh, dung THAT
 # thanh menu cua ho roi dem - va co TRAN de menu khong dai them trong im lang.
 chay "_checkroi menu co lam roi khong" "CHECKROI (OK|BO QUA)" node _checkroi.js
+# V2 (anh Luan 07/08: "Co hoi dong nao chuyen ve nghiep vu va trai nghiem ko em, de ho biet nen
+# thiet ke trang the nao ay"). Du an CO chuan thiet ke, nhung phan C chi khai chuan cho bay loai
+# man - khong co loai "trang nghiep vu", vi hoi viet chuan ay nghiep vu con nam trong sau cai hub.
+# V2 de ra 25 trang ma khong co khuon nao cho chung: 9 trang co the, 14 trang khong. Moi trang
+# mot kieu thi nguoi dung phai hoc lai bo cuc o tung trang.
+# Bo nay do TUNG TRANG theo sau mat cua khuon, tren chu HIEN RA chu khong tren ma nguon.
+chay "_checkkhuon khuon trang nghiep vu" "CHECKKHUON (OK|BO QUA)" node _checkkhuon.js
 chay "_checkmoi khong moi roi duoi" "TONG:" node _checkmoi.js
 
 echo
