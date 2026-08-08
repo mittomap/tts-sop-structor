@@ -743,6 +743,13 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
    if(SRC.slice(Math.max(0,i-9),i)==="function ")continue;
    var dong=SRC.slice(0,i).split("\n").length-1;
    if(fnDong[dong]==="bvStrip")continue;
+   /* `renderList` là hàm vẽ DÙNG CHUNG của mọi sổ, nên mã dải của nó không thể là một chuỗi
+      viết cứng - nó truyền `key`, tức chính khoá trang đang vẽ. Bản khai vẫn đầy đủ và vẫn sửa
+      được ở Cài đặt: mỗi trang danh sách khai thẻ ở `LISTCFG[k].the` và khai mã ở `THEDEF[k]`.
+      Luật "mọi dải đều có mã khai" KHÔNG bị nới - chỉ là ở đây mã đến từ tham số, mà phép dò
+      theo chữ trong mã nguồn thì không nhìn xuyên được một biến. Miễn trừ đúng một chỗ này,
+      cùng lối đã dùng cho `bvStrip`. */
+   if(fnDong[dong]==="renderList")continue;
    /* dò tới ngoặc đóng CÂN BẰNG rồi soi đối số cuối - lời gọi trải nhiều dòng, không cắt theo dòng được */
    var j=SRC.indexOf("(",i),d=0,k=j;
    while(k<SRC.length){if(SRC[k]==="(")d++;else if(SRC[k]===")"){d--;if(!d)break}k++}

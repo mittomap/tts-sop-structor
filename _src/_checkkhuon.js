@@ -40,12 +40,23 @@ const APP = process.env.ITTS_APP || PATH.join(__dirname, "_APP.js");
 /* ---- trần: SỐ ĐO ĐƯỢC lúc dựng bộ này. Chỉ được HẠ, không bao giờ nâng. ---- */
 /* 16 -> 10: Khúc 2b đã cho bốn hàng chờ phê duyệt dải thẻ riêng. Trần HẠ theo, đúng luật chốt
    kéo xuống - sửa được trang nào thì hạ xuống đúng số mới, không bao giờ nâng lên. */
-const TRAN_THIEU_THE  = 5;   /* trang nghiệp vụ chưa có dải thẻ riêng */
+const TRAN_THIEU_THE  = 0;   /* trang nghiệp vụ chưa có dải thẻ riêng (KHONGTHE khai riêng) */
 /* 12 = SỐ ĐO ĐƯỢC. Bản đầu em đặt 8 - một con số ĐOÁN, và nó đỏ ngay. Trần phải là số đo được
    thật: đặt thấp hơn thực tế thì lần nào cũng đỏ, mà một bộ kiểm đỏ mãi thì người ta tắt nó đi.
    Danh sách 12 trang in ra ngay dưới bảng tổng kết - sửa được trang nào thì HẠ trần xuống. */
 const TRAN_THIEU_LOC  = 12;  /* trang chưa có chip lọc */
 const TRAN_THIEU_NUT  = 12;  /* trang chưa có nút hành động chính */
+
+/* Trang KHÔNG CẦN DẢI THẺ - phải khai kèm lý do đọc được, y như `CHIDOC`.
+   Khai một chỗ này mạnh hơn để trần bằng 1: trần chỉ nói "còn một trang thiếu", còn bản khai nói
+   RÕ trang nào và VÌ SAO. Trần bằng 0 cộng bản khai = từ nay mọi trang nghiệp vụ hoặc có thẻ,
+   hoặc nói được vì sao không cần - không còn chỗ nào lọt qua trong im lặng. */
+const KHONGTHE = {
+  lichtuan: "lich tuan la mot BUC TRANH THOI GIAN - ban than luoi lich da la cach doc nhanh nhat " +
+            "(nhin mot cai la thay tuan nay day bao nhieu, o nao trong). Dat mot dai the so o tren " +
+            "no la noi lai bang chu cai ma mat vua doc bang hinh - them mot cho phai doc, khong " +
+            "them mot thong tin nao. Nhung con so ve buoi trong tuan da co trang Buoi hom nay lo.",
+};
 
 /* Trang CHỈ ĐỂ ĐỌC - không có nút hành động là đúng, nhưng phải khai kèm lý do đọc được. */
 const CHIDOC = {
@@ -136,7 +147,7 @@ NV.forEach(k => {
      Và nó còn LÀM TRÙNG VIỆC: luật "mọi lời gọi `statStrip` phải truyền mã dải, và mã ấy phải có
      trong `THEDEF`" đã là nhóm 10 của `_checkux`. Hai cái thước cùng đo một thứ thì sớm muộn hai
      cái nói hai đằng, và người sửa không biết tin cái nào. Trả luật ấy về cho `_checkux`. */
-  if (!/class="bstats|class="stat/.test(h)) thieu.the.push(k);
+  if (!/class="bstats|class="stat/.test(h) && !KHONGTHE[k]) thieu.the.push(k);
 
   /* K4 - chip lọc */
   if (!/class="fbar|class="chipf|onclick="fset\(/.test(h)) thieu.loc.push(k);
@@ -163,6 +174,10 @@ NV.forEach(k => {
 
 /* Trang khai CHỈ ĐỌC mà lại có nút hành động thì bản khai đã cũ - gỡ dòng khai đi. */
 Object.keys(CHIDOC).forEach(k => { if (NV.indexOf(k) < 0) do_.push("ban khai CHIDOC nhac trang khong con la nghiep vu: " + k); });
+Object.keys(KHONGTHE).forEach(k => { if (NV.indexOf(k) < 0) do_.push("ban khai KHONGTHE nhac trang khong con la nghiep vu: " + k); });
+/* Khai "khong can the" ma trang lai CO the thi ban khai da cu - go dong khai di, dung de no nam
+   lai vinh vien roi che mat mot trang that su thieu. */
+Object.keys(KHONGTHE).forEach(k => { if (NV.indexOf(k) >= 0 && thieu.the.indexOf(k) < 0 && THEDEF[k]) do_.push("ban khai KHONGTHE thua: " + k + " nay da co dai the"); });
 
 if (thieu.cau.length)  do_.push("K1 cau ngu canh: " + thieu.cau.length + " trang - " + thieu.cau.slice(0,4).join(", "));
 if (thieu.rong.length) do_.push("K5 trang thai rong khong biet noi: " + thieu.rong.length + " trang - " + thieu.rong.slice(0,4).join(", "));

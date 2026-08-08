@@ -1340,7 +1340,13 @@ hocvien:{code:"DL09",filt:"student_status",ro:1,sub:"Học viên (DL09) - lọc 
  qf:[["risk","Nguy cơ",function(s){return stuRisk(s)}]],
  act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"student_id"}],
  cols:[["student_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["student_status","Trạng thái","chip"],["attendance_progress_status","Chuyên cần","chip"],["academic_progress_status","Học thuật","chip"],["attendance_risk_reason","Lý do CC","enum"],["academic_risk_reason","Lý do HT","enum"],["__vang","Vắng (buổi)","calcso"],["__thieubai","Thiếu bài","calcso"],["last_learning_activity_time","Hoạt động cuối","lau"],["wow_quota_remaining","WOW còn"]]},
-lop:{code:"DL10",nut:'<button class="btn primary sm" onclick="go(\'xeplop\')"><i class="ti ti-layout-grid-add"></i>Xếp lớp & Onboarding</button>',filt:"class_status",ro:1,sub:"Lớp học (DL10) - bấm nút Vận hành lớp trên một dòng để vào buổi học, điểm danh, nhận xét và bài tập của lớp đó",
+lop:{code:"DL10",
+ /* Đọc thẳng trạng thái lớp - cùng thứ chip lọc ngay dưới đang lọc. */
+ the:function(all){
+  return [["ti-player-play",all.filter(function(c){return isc(c.class_status,"in_progress")}).length,"Lớp đang học","#2E9E6B",""],
+   ["ti-hourglass",all.filter(function(c){return isc(c.class_status,"open","planned")}).length,"Đang tuyển / chờ mở","#E08A1E",""],
+   ["ti-flag-check",all.filter(function(c){return isc(c.class_status,"finished")}).length,"Đã kết thúc","#6B7887",""]]},
+ nut:'<button class="btn primary sm" onclick="go(\'xeplop\')"><i class="ti ti-layout-grid-add"></i>Xếp lớp & Onboarding</button>',filt:"class_status",ro:1,sub:"Lớp học (DL10) - bấm nút Vận hành lớp trên một dòng để vào buổi học, điểm danh, nhận xét và bài tập của lớp đó",
  /* V2 RB3 - CỬA VÀO TRANG CON NẰM TRONG NGĂN KÉO, KHÔNG NẰM TRÊN DÒNG.
     Bản đầu của Khúc 3 đặt một nút "Vận hành lớp" thẳng lên từng dòng - và `_check18` mục 26 bắt
     ngay: **nút hàng của bảng danh sách phải mở NGĂN KÉO, không được rời trang**. Luật ấy là lời
@@ -1368,7 +1374,13 @@ nhanvien:{code:"DL01",filt:"status",ro:1,lam:"nhansu",sub:"Toàn bộ nhân sự
  cols:[["staff_id","Mã"],["full_name","Họ tên"],["role","Vai trò","enum"],["department","Bộ phận"],["email","Email"],["reports_to_name","Quản lý"],["status","Trạng thái","chip"]]},
 /* V9.42: mọi danh sách khác đều có dòng `sub` nói rõ nó là bảng nào, riêng bảng lead thì không -
    người mới mở ra không biết mình đang xem DL02 hay một bảng lọc sẵn nào đó. */
-nhaplead:{code:"DL02",filt:"lead_status",nut:'<button class="btn primary sm" onclick="leadInbound()"><i class="ti ti-message-plus"></i>Khách mới liên hệ đến</button>',sub:"Khách tiềm năng (DL02) - lọc theo trạng thái, nguồn, nhân viên phụ trách",act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"lead_id"},{lb:"Ghi liên hệ",ic:"ti-phone",fn:"openLienhe",arg:"lead_id"}],
+nhaplead:{code:"DL02",filt:"lead_status",
+ /* Ba con số này đọc thẳng trạng thái lead và mốc hẹn - đúng thứ thanh lọc ngay dưới đang lọc. */
+ the:function(all){var hn=new Date();
+  return [["ti-user-plus",all.filter(function(l){return isc(l.lead_status,"new")}).length,"Lead mới chưa chạm","#E24B4A","gọi trong hạn SLA"],
+   ["ti-phone-call",all.filter(function(l){var d=pvnd(l.next_followup_time);return d&&d<=hn&&!isc(l.lead_status,"converted","rejected")}).length,"Tới hẹn liên hệ","#E08A1E","gọi hôm nay"],
+   ["ti-user-off",all.filter(function(l){return !String(l.assigned_to||"").trim()&&!isc(l.lead_status,"converted","rejected")}).length,"Chưa ai phụ trách","#6B7887","giao người"]]},
+ nut:'<button class="btn primary sm" onclick="leadInbound()"><i class="ti ti-message-plus"></i>Khách mới liên hệ đến</button>',sub:"Khách tiềm năng (DL02) - lọc theo trạng thái, nguồn, nhân viên phụ trách",act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"lead_id"},{lb:"Ghi liên hệ",ic:"ti-phone",fn:"openLienhe",arg:"lead_id"}],
  cols:[["lead_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["lead_created_time","Vào hệ thống"],["lead_status","Trạng thái","chip"],["contact_count","Lượt LH"],["next_followup_time","Hẹn liên hệ"],["assigned_to_name","NV phụ trách"],["next_action","Việc cần làm","na"]],
  form:[["full_name","Họ tên",0,1],["phone_number","SĐT",0,1],["zalo_id","Zalo (SĐT/nick)",0],["lead_source","Nguồn","enum_lead_source",1],["student_type","Đối tượng","enum_student_type"],["learning_goal","Mục tiêu học","enum_learning_goal_type"],["target_band","Điểm mục tiêu"],["learning_mode","Hình thức","enum_learning_mode"],["expected_start_time","Dự kiến bắt đầu"],["availability_schedule","Lịch rảnh"],["lead_qualification_status","Mức đủ ĐK","enum_lead_qualification_status"],["branch","Cơ sở","enum_branch"],["lead_note","Ghi chú trao đổi","ta"]],idp:"L-2026-"},
 lienhe:{code:"DL02b",filt:"channel",
@@ -1545,7 +1557,24 @@ function colMenuHTML(key){var cfg=LISTCFG[key];if(window.COLMENU!==key)return ''
    Bộ kiểm _checkux canh: dải nào gọi statStrip mà không khai ở đây là đỏ; số thẻ khai lệch với
    số thẻ vẽ ra thật cũng đỏ; thẻ nào còn onclick cũng đỏ. */
 var THEDEF={
- /* ═══ V2 KHÚC 2b đợt 2 - BA TRANG NỮA CÓ DẢI THẺ RIÊNG ═════════════════════════════════════
+  /* ═══ V2 KHÚC 2b đợt 3 ═══════════════════════════════════════════════════════════════════ */
+ nhaplead:{t:"Lead & khai thác",the:[
+  ["nl_moi","Lead mới chưa chạm","Khách vừa vào hệ thống, chưa ai gọi hay nhắn lần nào - phản hồi trong hạn SLA là việc gấp nhất. Danh sách: bấm chip \"Mới\" ở thanh lọc ngay dưới."],
+  ["nl_hen","Tới hẹn liên hệ","Khách có mốc hẹn liên hệ đã tới hoặc đã qua, và chưa chốt cũng chưa từ chối. Danh sách: cột Hẹn liên hệ ở bảng dưới, xếp theo mốc gần nhất."],
+  ["nl_khong","Chưa ai phụ trách","Lead chưa gán nhân viên nào - không ai nhận thì không ai gọi. Danh sách: cột NV phụ trách để trống ở bảng dưới."]]},
+ lop:{t:"Lớp học",the:[
+  ["lop_chay","Lớp đang học","Lớp đang chạy buổi. Danh sách: bấm chip \"Đang học\" ở thanh lọc ngay dưới."],
+  ["lop_mo","Đang tuyển / chờ mở","Lớp đã lên kế hoạch hoặc đang tuyển thêm học viên. Danh sách: bấm chip tương ứng ở thanh lọc."],
+  ["lop_xong","Đã kết thúc","Lớp đã dạy xong - mở ra để tra cứu lại buổi, điểm danh và kết quả. Danh sách: bấm chip \"Đã kết thúc\"."]]},
+ buoihoc:{t:"Theo dõi nhận xét buổi",the:[
+  ["bh_cho","Chờ ghi nhận xét","Buổi đã dạy xong mà giảng viên chưa ghi nhận xét, vẫn còn trong hạn. Danh sách: bấm chip \"Chờ ghi nhận xét\" ở thanh lọc ngay dưới."],
+  ["bh_qua","Quá hạn ghi nhận xét","Buổi dạy xong đã quá ngưỡng giờ ghi nhận xét (chỉnh ở Cài đặt, slaTeacherNote_hours) - đây là việc học vụ phải đốc thúc. Danh sách: bấm chip \"Quá hạn ghi\"."],
+  ["bh_tre","Giảng viên vào trễ","Buổi có ghi nhận số phút giảng viên vào muộn. Danh sách: bấm chip \"GV vào trễ\"."]]},
+ test:{t:"Test đầu vào",the:[
+  ["te_lich","Chờ đặt lịch","Khách đã nhận phiếu test mà chưa có lịch thi - đặt sớm thì tỷ lệ dự test cao hơn. Danh sách: bấm chip \"Chờ đặt lịch\" ở thanh lọc ngay dưới."],
+  ["te_cham","Chờ chấm","Khách đã dự test mà chưa ai chấm - chấm chậm là khách nguội. Danh sách: bấm chip \"Chờ chấm\"."],
+  ["te_tuvan","Chờ tư vấn sau test","Đã có điểm mà chưa tư vấn lộ trình - đây là bước chốt. Danh sách: bấm chip \"Chờ tư vấn\"."]]},
+/* ═══ V2 KHÚC 2b đợt 2 - BA TRANG NỮA CÓ DẢI THẺ RIÊNG ═════════════════════════════════════
     Cùng luật RB2 như đợt 1: con số lấy từ ĐÚNG phép đếm mà thân trang bên dưới đang dùng (chính
     là các con số đang hiện trên chip lọc), không viết lại lần thứ hai. */
  khieunai:{t:"Xử lý khiếu nại",the:[
@@ -2347,12 +2376,20 @@ function renderList(key,emb){
     Nay trang danh sách khai được nút của chính nó ở `LISTCFG[key].nut`. Khai một chỗ, hiện ở
     đúng trang ấy - không phải nhớ rằng nó từng phụ thuộc vào một cái tab. */
  var _nutNV=(cfg.nut||"");
+ /* V2 Khúc 2b - DẢI THẺ CHO TRANG DANH SÁCH. `renderList` là hàm dùng chung của mọi sổ, nên
+    trang danh sách không có chỗ nào để tự vẽ thẻ của riêng nó. Mở một cửa khai: `LISTCFG[k].the`
+    là một HÀM nhận danh sách đã lọc theo phạm vi và trả về mảng thẻ cho `statStrip`.
+    Truyền `all` (đã qua `scopeList`) chứ không truyền dữ liệu thô: thẻ phải đếm đúng phần người
+    này được thấy, nếu không thì thẻ nói một đằng bảng nói một nẻo - và đó là cách nhanh nhất để
+    một con số mất hết uy tín. */
+ var _theNV="";
+ if(!emb&&typeof cfg.the==="function"){try{_theNV=statStrip(cfg.the(all),key)}catch(e){_theNV=""}}
  var duoi=_nutNV+'<span class="tbcnt">'+total+' dòng'+(fa.length||q||qk||hvF||_f2?" (đã lọc)":"")+'</span>'+
   fltBarHTML(key,1)+   /* trang danh sách đã có ô tìm riêng ở tầng trên */
   (fa.length||q||qk||hvF||_f2?'<button class="btn sm" onclick="clearFilt(\''+key+'\')"><i class="ti ti-x"></i>Xóa lọc</button>':'')+
   '<div class="colwrap"><button class="btn'+(nHid?" primary":"")+' sm" onclick="colMenuToggle(\''+key+'\')"><i class="ti ti-columns"></i>Cột'+(nHid?" ("+(cfg.cols.length-1-nHid)+"/"+(cfg.cols.length-1)+")":"")+'</button>'+colMenuHTML(key)+'</div>'+
   (cfg.lam&&PBK[cfg.lam]?('<button class="btn sm" onclick="go(\''+esc(cfg.lam)+'\')" data-tip="Sổ này chỉ để tra cứu - bấm để sang chỗ làm việc thật"><i class="ti ti-arrow-right"></i>Sang '+esc(PBK[cfg.lam].t)+' để làm</button>'):'');
- h+=tbar2(left,duoi);
+ h+=_theNV+tbar2(left,duoi);
  h+='<div class="panel">'+tableHTML(cfg,view,key)+'</div>';
  if(pages>1||total>20)h+='<div class="pgbar"><button class="btn sm" '+(pg<=0?"disabled":"")+' onclick="pageGo(\''+key+'\','+(pg-1)+')"><i class="ti ti-chevron-left"></i>Trước</button><span class="cnt">Trang '+(pg+1)+' / '+pages+'</span><button class="btn sm" '+(pg>=pages-1?"disabled":"")+' onclick="pageGo(\''+key+'\','+(pg+1)+')">Sau<i class="ti ti-chevron-right"></i></button>'+
   '<select class="sel" style="height:30px" onchange="window.PSZ=window.PSZ||{};window.PSZ[\''+key+'\']=parseInt(this.value);PAGE[\''+key+'\']=0;reRender(CUR)">'+[20,50,100].map(function(n){return '<option value="'+n+'"'+(n===psz?" selected":"")+'>'+n+' dòng/trang</option>'}).join("")+'</select></div>';
@@ -11589,6 +11626,12 @@ function renderTest(embed){var p="test",fil=fget(p);var all=srows("DL03");
  var view=all.filter(function(r){var s=st(r);if(fil==="all")return true;if(fil==="book")return !s.booked;if(fil==="grade")return s.att&&!s.graded;if(fil==="consult")return s.graded&&!s.consulted;if(fil==="overdue")return s.overdue;return true});
  var h=embed?'':pageHead("Test đầu vào","Đặt lịch test - HV dự test - chấm điểm - tư vấn sau test",'<button class="btn primary" onclick="testQuickAdd()"><i class="ti ti-plus"></i>Khách muốn test ngay</button>');
  var _s=all.map(st);
+ /* V2 Khúc 2b - dải thẻ dùng lại ĐÚNG `_s` mà chip lọc ngay dưới đang dùng: một phép đếm, hai
+    chỗ đọc. Thẻ và chip không bao giờ nói hai con số. */
+ if(!embed)h+=statStrip([
+  ["ti-calendar-plus",_s.filter(function(x){return !x.booked&&!x.refused}).length,"Chờ đặt lịch","#E08A1E","đặt sớm thì tỷ lệ dự test cao hơn"],
+  ["ti-writing",_s.filter(function(x){return x.att&&!x.graded}).length,"Chờ chấm","#E24B4A","chấm chậm là khách nguội"],
+  ["ti-messages",_s.filter(function(x){return x.graded&&!x.consulted}).length,"Chờ tư vấn sau test","#3B82C4","bước chốt"]],"test");
  /* V9.51: 4/4 o thong ke deu la nut loc doi lot chip ben duoi - bo dai, SO DON VAO CHIP.
     Han cham (GLA/CVT) da co banh rang o form va notebar, khong mat duong toi Cai dat. */
  view=fltApply(p,view);
@@ -15163,6 +15206,12 @@ function renderBuoihoc(embed){var p="buoihoc",fil=fget(p);var all=srows("DL11");
  var nOver=all.filter(function(s){return bhState(s).noteOver}).length;
  var h=embed?'':pageHead("Buổi học & nhận xét giảng viên","Theo dõi SLA ghi nhận xét (hạn "+slaChip("slaTeacherNote_hours",48)+" sau buổi). Nhận xét chung có thể ghi ngay khi điểm danh xong ở trang Điểm danh — hai nơi cùng một ô.",
   nOver?'<span class="chip red">'+nOver+' buổi quá hạn ghi nhận xét</span>':'');
+ /* V2 Khúc 2b - dải thẻ dùng lại ĐÚNG `bhState()` mà chip lọc ngay dưới đang dùng. `nOver` ở
+    dòng trên cũng là con số ấy - một phép đếm, ba chỗ đọc, nên không có chỗ nào lệch được. */
+ if(!embed)h+=statStrip([
+  ["ti-writing",all.filter(function(x){var st2=bhState(x);return st2.done&&!st2.note&&!st2.noteOver}).length,"Chờ ghi nhận xét","#E08A1E",""],
+  ["ti-alarm",nOver,"Quá hạn ghi nhận xét","#E24B4A",nOver?"đốc thúc hôm nay":""],
+  ["ti-clock-exclamation",all.filter(function(x){return bhState(x).late}).length,"Giảng viên vào trễ","#6B7887",""]],"buoihoc");
  /* V9.51: 4 o thong ke deu la nut loc doi lot - bo dai, so don vao chip loc ben duoi */
  /* V9.29: giáo viên phải biết TRƯỚC giờ dạy ai đã báo nghỉ - app hứa với học viên là "báo trước
     giúp giảng viên chuẩn bị phần bù", trước đây GV chỉ thấy lúc mở điểm danh (tức là đã tới giờ). */
