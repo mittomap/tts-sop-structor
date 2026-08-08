@@ -1755,12 +1755,24 @@ table.dt tbody tr.clk.on td{font-weight:600}
    có viền mảnh như mọi ô khác trong app, phân biệt bằng icon và con số chứ không bằng màu. */
 .tcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:8px;padding:2px}
 .tco{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:#fff;transition:.12s}
-.tco:hover{border-color:var(--brand);background:#F7FAFF}
-.tco>i{font-size:19px;color:var(--brand);flex:none}
+/* V2 08/08 - KHÔNG ĐẺ MÃ MÀU MỚI. Ba màu em gõ riêng cho dải thẻ này (nền rê chuột, chữ số,
+   nền số) đẩy bảng màu từ 110 lên 113 mã - `_checkux` bắt ngay. Cùng một luật với thang cỡ chữ:
+   không chỗ nào sai hẳn, cả trăm chỗ lệch nhẹ thì app nhìn lộn xộn.
+   Nay dùng lại biến đã có: `--bg` cho nền nhạt, `--muted` cho chữ mờ.
+   BẪY CẮN HAI LẦN TRONG MỘT NGÀY: lần vá đầu em vẫn để NGUYÊN ba mã hex trong chính dòng chú
+   thích này, nên bộ kiểm vẫn đếm ra 113 - nó soi cả tệp chứ không phân biệt mã sống hay mã nằm
+   trong lời giải thích. Viết tên màu bằng chữ, đừng gõ mã. */
+.tco:hover{border-color:var(--brand);background:var(--bg)}
+/* V2 08/08 - dùng ĐÚNG bậc đã có trong thang. Bản đầu em gõ 19px và bo góc 7px cho riêng dải
+   thẻ này; `_checkux` bắt ngay: thang cỡ chữ nhảy 20 -> 21 bậc, thang bo góc 10 -> 11. Đó chính
+   là con bệnh "nhìn app hơi lộn xộn mà không chỉ ra được chỗ nào sai" mà bộ kiểm ấy sinh ra để
+   chặn - không chỗ nào sai hẳn, cả trăm chỗ lệch nhẹ. Thêm một bậc cho một màn mới là bắt đầu
+   lại từ đầu. */
+.tco>i{font-size:18px;color:var(--brand);flex:none}
 .tcn{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .tcn b{font-size:13px;font-weight:700}
 .tcn span{font-size:11px;line-height:1.45}
-.tcso{flex:none;font-size:11.5px;font-weight:700;color:#5A6B80;background:#EEF3F9;border-radius:7px;padding:2px 8px;font-variant-numeric:tabular-nums}
+.tcso{flex:none;font-size:11.5px;font-weight:700;color:var(--muted);background:var(--bg);border-radius:6px;padding:2px 8px;font-variant-numeric:tabular-nums}
 /* LUẬT W5 - CẤM DẢI VIỀN MÀU TRANG TRÍ (kể cả dải dựng bằng ::before). Bản đầu của ô cảnh báo
    dùng `border-left:3px` màu đỏ/vàng để nói mức độ - `_checkux` bắt ngay, và luật đúng: một dải
    màu ở mép là trang trí, nó không mang thông tin nào mà chính con số và cái chấm không nói được.
@@ -2302,7 +2314,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">08/08/2026 · <b>485b85</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">08/08/2026 · <b>c65897</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -12810,12 +12822,13 @@ function btHub(embed){
   var preT=(SP&&SP.hw)?SP.hw.title:"", preDue=SP?toISOdt(SP.dueDate,true):"";
   var mode2=window.BTWHO==="each"?"each":"all";
   h+='<div class="panel"><div class="ph"><b>Giao bài - '+esc(lop.class_name||cid)+'</b><span class="mut" style="font-size:11.5px">lớp cá nhân hóa: một bài chung cho học viên được chọn, hoặc mỗi học viên một bài riêng</span></div><div class="form">';
-  if(SP)h+='<div class="notebar" style="grid-column:1/-1;margin:0 0 4px"><i class="ti ti-notes"></i>Buổi '+esc(curSes.session_number)+(curSes.session_date?' ('+esc(curSes.session_date)+')':'')+' theo giáo án: '+
-   /* V2 08/08 - `_checkaudit` bắt được NGAY khi trang Bài tập hết `hide` và bắt đầu được đo:
-      đoạn nhắc này dài 191 ký tự, quá trần 150. Luật của app là câu nhắc đầu trang phải đọc HẾT
-      trong một nhịp mắt; phần dặn dò thêm đưa vào chú thích rê chuột chứ không nối dài dòng chữ.
-      Một trang bị giấu là một trang không ai đo - mở nó ra thì mọi luật chung mới áp được. */
-   (SP.hw?'<b>'+esc(SP.hw.title)+'</b> '+planSrcChip(SP.hwFrom):'<i>chưa đặt bài</i>')+' · hạn nộp '+dueChip(SP)+'.'+(mode2==="each"?'':' <span data-tip="Bài và hạn nộp đã điền sẵn bên dưới - sửa được trước khi bấm Giao bài.">(điền sẵn)</span>')+'</div>';
+  /* V2 08/08 - `_checkaudit` bắt được NGAY khi trang Bài tập hết `hide` và bắt đầu được đo:
+     đoạn nhắc này dài 191 ký tự, quá trần 150. Luật của app là câu nhắc đầu trang phải đọc HẾT
+     trong một nhịp mắt; phần dặn dò thêm đưa vào chú thích rê chuột chứ không nối dài dòng chữ.
+     Một trang bị giấu là một trang không ai đo - mở nó ra thì mọi luật chung mới áp được.
+     Rút hai lượt: bỏ chữ "theo giáo án" (chip nguồn ngay sau đó đã nói) và bỏ chữ "nộp" thừa. */
+  if(SP)h+='<div class="notebar" style="grid-column:1/-1;margin:0 0 4px"><i class="ti ti-notes"></i>Buổi '+esc(curSes.session_number)+(curSes.session_date?' ('+esc(curSes.session_date)+')':'')+': '+
+   (SP.hw?'<b>'+esc(SP.hw.title)+'</b> '+planSrcChip(SP.hwFrom):'<i>chưa đặt bài</i>')+' · hạn '+dueChip(SP)+(mode2==="each"?'':' <span data-tip="Bài và hạn nộp lấy theo giáo án khoá, đã điền sẵn bên dưới - sửa được trước khi bấm Giao bài.">· điền sẵn</span>')+'</div>';
   /* CẤP 1: cách giao - quyết định toàn bộ bố cục bên dưới */
   h+='<div class="mswrap"><div class="mslb">Bước 1 · Cách giao</div>'+
    [["all","ti-users-group","Một bài chung","Các học viên được tick nhận cùng một bài, cùng hạn nộp"],
@@ -18600,7 +18613,12 @@ var TOURS={
   /* V2 - neo vào ĐÚNG TAB mà chính câu hint bảo bấm, không neo vào cả thanh công cụ. `_checkneo`
      bắt: bước này khoanh trùng chỗ với `tn_hotro 3/3` vì cả hai cùng trỏ `@tbar` - vỏ trang thì
      bài nào cũng trỏ được, nên khoanh vào nó là khoanh vào chỗ không nói riêng điều gì. */
-  {p:"giaoviec",sel:'@txt:Tổng hợp',t:"Ai đang làm tốt, ai hay trễ",d:"Tab Tổng hợp cho biết tỷ lệ hoàn thành đúng hạn của từng người - dùng khi đánh giá cuối tháng.",hint:"Bấm tab Tổng hợp & báo cáo."}]},
+  {p:"giaoviec",sel:'@txt:Tổng hợp',t:"Ai đang làm tốt, ai hay trễ",d:"Tab Tổng hợp cho biết tỷ lệ hoàn thành đúng hạn của từng người - dùng khi đánh giá cuối tháng.",hint:"Bấm tab Tổng hợp & báo cáo."},
+  /* V2 08/08 - BƯỚC MỚI CHO TRANG TRA CỨU. Mười sáu cuốn sổ chỉ-đọc vừa rời khỏi cây menu vào
+     sau một cửa (menu CEO 60 -> 44). Mở một cửa mới mà không dẫn đường tới nó thì người dùng
+     vẫn không biết sổ của mình đi đâu mất - `_checktour` bắt đúng chuyện đó ngay lần chạy đầu:
+     "TRANG KHONG BAI HUONG DAN NAO DI QUA: tracuu". */
+  {p:"tracuu",sel:'@man',t:"Sổ sách để tra khi cần",d:"Nghiệp vụ làm ở trang nghiệp vụ; các sổ chỉ-đọc gom hết vào đây thay vì nằm chật thanh menu. Mỗi thẻ nói sổ đó đang có bao nhiêu dòng, và có ô tìm để không cần đọc từng cái.",hint:"Gõ vài chữ vào ô tìm rồi bấm một thẻ để mở sổ."}]},
  /* ---------- CẤP 3: CHUYÊN NGHIỆP (người cấu hình) ---------- */
  cn_thuonghieu:{lv:"chuyennghiep",t:"Đổi thương hiệu và menu",ic:"ti-palette",d:"5 bước - biến app thành bản của trung tâm bạn",steps:[
   {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'@settabs',t:"Trang Cài đặt là trung tâm điều khiển",d:"9 tab: giao diện, menu, phân quyền, ngưỡng SLA, ngưỡng KPI, câu nhắc việc, danh mục, khóa học, nhân sự. App không cắm cứng con số nào.",hint:"Bấm Tiếp theo."},
@@ -19971,7 +19989,10 @@ function renderTracuu(){
  var q=vnorm(window.TCQ||"");
  var h=pageHead("Tra cứu & sổ sách",
   "Các sổ CHỈ-ĐỌC của trung tâm. Nghiệp vụ làm ở trang nghiệp vụ; ở đây chỉ để tra lại một hồ sơ, một khoản thu, một buổi học đã qua.","");
- h+='<div class="tbar" data-tour="tbar">'+srchHTML(window.TCQ||"","tcTim(this.value)","Tìm sổ...",280)+'<div class="tbsp"></div></div>';
+ /* Ô tìm dùng ĐÚNG câu mời chuẩn của app ("Tìm trong trang này..."). Bản đầu em viết riêng
+    "Tìm sổ..." cho hợp cảnh - `_checkux` bắt: mỗi trang một cách gọi thì người dùng phải học
+    lại từng màn. Một câu mời cho cả app, không có ngoại lệ cho màn nào. */
+ h+='<div class="tbar" data-tour="tbar">'+srchHTML(window.TCQ||"","tcTim(this.value)","Tìm trong trang này...",280)+'<div class="tbsp"></div></div>';
  var co=SOTRACUU.filter(function(k){try{return !!PBK[k]&&navVis(k)}catch(e){return false}});
  var hien=co.filter(function(k){var p=PBK[k]||{};
   return !q||vnorm(p.t).indexOf(q)>=0||vnorm(p.c||"").indexOf(q)>=0});

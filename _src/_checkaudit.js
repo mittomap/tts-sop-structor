@@ -378,6 +378,14 @@ var CH3_NGOAIBAN={
       Y nghia phep do khong doi: moi so tra cuu phai thuoc ve mot thuc the, hoac khai ly do. */
    var traG=(navCayV5()||[]).filter(function(g){return g.g==="Tra cứu"})[0];
    if(!traG){t("có nhóm Tra cứu trong menu", false, "không thấy");return}
+   /* V2 08/08 - DANH SÁCH SỔ KHÔNG CÒN NẰM TRỰC TIẾP TRÊN MENU. Mười sáu cuốn sổ chỉ-đọc vào
+      sau cửa `tracuu` để menu CEO từ 60 mục xuống 44 (anh Luân giao quyết số trang 08/08).
+      Ý nghĩa phép đo KHÔNG đổi - mọi sổ vẫn phải thuộc về một thực thể hoặc khai lý do - chỉ là
+      hỏi đúng chỗ danh sách sổ đang nằm: bản khai `SOTRACUU`, cộng những sổ còn đứng trực tiếp
+      trên menu (`hocvien`, `giangvien` - hai trang ở lại vì chúng nằm trong nhịp ngày). */
+   var traSo=(typeof SOTRACUU!=="undefined"?SOTRACUU:[]).concat(
+     traG.items.filter(function(k){return k!=="tracuu"}));
+   traG={g:traG.g,items:traSo};
    var thuoc={},trung=[];
    TTHE.forEach(function(T){(T.so||[]).forEach(function(k){
     if(thuoc[k])trung.push(k+" (ở cả "+thuoc[k]+" và "+T.k+")");
@@ -504,6 +512,9 @@ var CH3_NGOAIBAN={
   var mat=[];
   PAGES.forEach(function(pg){
    var k=pg.k; if(pg.hide||M[k]||NGOAIMENU[k])return;
+   /* V2 08/08 - sổ chỉ-đọc vào bằng cửa `tracuu`: có đường tới, chỉ là qua cửa cha. Cùng luật
+      với `banglop` (vào từ một dòng ở trang Lớp học) - không phải trang mất đường. */
+   if(typeof SOTRACUU!=="undefined"&&SOTRACUU.indexOf(k)>=0&&M["tracuu"])return;
    if(hubToiDuoc(k))return;                      /* chinh no la mot hub, tab cua no co tren menu */
    var ok=false;
    HUB.forEach(function(H){if(H[0]&&H[0][k]!==undefined&&hubToiDuoc(H[1]))ok=true});

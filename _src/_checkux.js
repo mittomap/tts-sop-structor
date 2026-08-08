@@ -1041,6 +1041,11 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
  var CO={};
  NAVTREE.forEach(function(g){(g.items||[]).forEach(function(k){CO[k]=1})});
  for(var k in NAVSUB)CO[k]=1;
+ /* V2 08/08 - MƯỜI SÁU CUỐN SỔ CHỈ-ĐỌC VÀO SAU CỬA `tracuu`. Chúng không còn mục menu RIÊNG,
+    nhưng vẫn có CHỖ ĐỨNG trên bản đồ: cửa `tracuu` đứng trên menu và trang ấy bày đủ cả mười
+    sáu, có ô tìm. Anh Luân 08/08 giao quyết số trang; chốt: không bớt trang nào, bớt số trang
+    MỘT NGƯỜI PHẢI NHÌN - menu CEO 60 xuống 44. Đây là "có cửa cha", không phải "ngõ cụt". */
+ if(typeof SOTRACUU!=="undefined")SOTRACUU.forEach(function(k){CO[k]=1});
  [TSMAP,CSMAP,HTMAP,KMAP,DUYMAP,ARCMAP].forEach(function(M){for(var k in M)CO[k]=1});
  ["tuyensinh","cskh","hoctap","khac","duyet","chang","hanhtrinh","bangcong"].forEach(function(k){CO[k]=1});
  /* TRANG CHI TIET: khong co muc menu rieng, va dung nhu the. Mo ra tu mot dong trong so; go()

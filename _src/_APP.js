@@ -10472,12 +10472,13 @@ function btHub(embed){
   var preT=(SP&&SP.hw)?SP.hw.title:"", preDue=SP?toISOdt(SP.dueDate,true):"";
   var mode2=window.BTWHO==="each"?"each":"all";
   h+='<div class="panel"><div class="ph"><b>Giao bài - '+esc(lop.class_name||cid)+'</b><span class="mut" style="font-size:11.5px">lớp cá nhân hóa: một bài chung cho học viên được chọn, hoặc mỗi học viên một bài riêng</span></div><div class="form">';
-  if(SP)h+='<div class="notebar" style="grid-column:1/-1;margin:0 0 4px"><i class="ti ti-notes"></i>Buổi '+esc(curSes.session_number)+(curSes.session_date?' ('+esc(curSes.session_date)+')':'')+' theo giáo án: '+
-   /* V2 08/08 - `_checkaudit` bắt được NGAY khi trang Bài tập hết `hide` và bắt đầu được đo:
-      đoạn nhắc này dài 191 ký tự, quá trần 150. Luật của app là câu nhắc đầu trang phải đọc HẾT
-      trong một nhịp mắt; phần dặn dò thêm đưa vào chú thích rê chuột chứ không nối dài dòng chữ.
-      Một trang bị giấu là một trang không ai đo - mở nó ra thì mọi luật chung mới áp được. */
-   (SP.hw?'<b>'+esc(SP.hw.title)+'</b> '+planSrcChip(SP.hwFrom):'<i>chưa đặt bài</i>')+' · hạn nộp '+dueChip(SP)+'.'+(mode2==="each"?'':' <span data-tip="Bài và hạn nộp đã điền sẵn bên dưới - sửa được trước khi bấm Giao bài.">(điền sẵn)</span>')+'</div>';
+  /* V2 08/08 - `_checkaudit` bắt được NGAY khi trang Bài tập hết `hide` và bắt đầu được đo:
+     đoạn nhắc này dài 191 ký tự, quá trần 150. Luật của app là câu nhắc đầu trang phải đọc HẾT
+     trong một nhịp mắt; phần dặn dò thêm đưa vào chú thích rê chuột chứ không nối dài dòng chữ.
+     Một trang bị giấu là một trang không ai đo - mở nó ra thì mọi luật chung mới áp được.
+     Rút hai lượt: bỏ chữ "theo giáo án" (chip nguồn ngay sau đó đã nói) và bỏ chữ "nộp" thừa. */
+  if(SP)h+='<div class="notebar" style="grid-column:1/-1;margin:0 0 4px"><i class="ti ti-notes"></i>Buổi '+esc(curSes.session_number)+(curSes.session_date?' ('+esc(curSes.session_date)+')':'')+': '+
+   (SP.hw?'<b>'+esc(SP.hw.title)+'</b> '+planSrcChip(SP.hwFrom):'<i>chưa đặt bài</i>')+' · hạn '+dueChip(SP)+(mode2==="each"?'':' <span data-tip="Bài và hạn nộp lấy theo giáo án khoá, đã điền sẵn bên dưới - sửa được trước khi bấm Giao bài.">· điền sẵn</span>')+'</div>';
   /* CẤP 1: cách giao - quyết định toàn bộ bố cục bên dưới */
   h+='<div class="mswrap"><div class="mslb">Bước 1 · Cách giao</div>'+
    [["all","ti-users-group","Một bài chung","Các học viên được tick nhận cùng một bài, cùng hạn nộp"],
@@ -16262,7 +16263,12 @@ var TOURS={
   /* V2 - neo vào ĐÚNG TAB mà chính câu hint bảo bấm, không neo vào cả thanh công cụ. `_checkneo`
      bắt: bước này khoanh trùng chỗ với `tn_hotro 3/3` vì cả hai cùng trỏ `@tbar` - vỏ trang thì
      bài nào cũng trỏ được, nên khoanh vào nó là khoanh vào chỗ không nói riêng điều gì. */
-  {p:"giaoviec",sel:'@txt:Tổng hợp',t:"Ai đang làm tốt, ai hay trễ",d:"Tab Tổng hợp cho biết tỷ lệ hoàn thành đúng hạn của từng người - dùng khi đánh giá cuối tháng.",hint:"Bấm tab Tổng hợp & báo cáo."}]},
+  {p:"giaoviec",sel:'@txt:Tổng hợp',t:"Ai đang làm tốt, ai hay trễ",d:"Tab Tổng hợp cho biết tỷ lệ hoàn thành đúng hạn của từng người - dùng khi đánh giá cuối tháng.",hint:"Bấm tab Tổng hợp & báo cáo."},
+  /* V2 08/08 - BƯỚC MỚI CHO TRANG TRA CỨU. Mười sáu cuốn sổ chỉ-đọc vừa rời khỏi cây menu vào
+     sau một cửa (menu CEO 60 -> 44). Mở một cửa mới mà không dẫn đường tới nó thì người dùng
+     vẫn không biết sổ của mình đi đâu mất - `_checktour` bắt đúng chuyện đó ngay lần chạy đầu:
+     "TRANG KHONG BAI HUONG DAN NAO DI QUA: tracuu". */
+  {p:"tracuu",sel:'@man',t:"Sổ sách để tra khi cần",d:"Nghiệp vụ làm ở trang nghiệp vụ; các sổ chỉ-đọc gom hết vào đây thay vì nằm chật thanh menu. Mỗi thẻ nói sổ đó đang có bao nhiêu dòng, và có ô tìm để không cần đọc từng cái.",hint:"Gõ vài chữ vào ô tìm rồi bấm một thẻ để mở sổ."}]},
  /* ---------- CẤP 3: CHUYÊN NGHIỆP (người cấu hình) ---------- */
  cn_thuonghieu:{lv:"chuyennghiep",t:"Đổi thương hiệu và menu",ic:"ti-palette",d:"5 bước - biến app thành bản của trung tâm bạn",steps:[
   {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'@settabs',t:"Trang Cài đặt là trung tâm điều khiển",d:"9 tab: giao diện, menu, phân quyền, ngưỡng SLA, ngưỡng KPI, câu nhắc việc, danh mục, khóa học, nhân sự. App không cắm cứng con số nào.",hint:"Bấm Tiếp theo."},
@@ -17633,7 +17639,10 @@ function renderTracuu(){
  var q=vnorm(window.TCQ||"");
  var h=pageHead("Tra cứu & sổ sách",
   "Các sổ CHỈ-ĐỌC của trung tâm. Nghiệp vụ làm ở trang nghiệp vụ; ở đây chỉ để tra lại một hồ sơ, một khoản thu, một buổi học đã qua.","");
- h+='<div class="tbar" data-tour="tbar">'+srchHTML(window.TCQ||"","tcTim(this.value)","Tìm sổ...",280)+'<div class="tbsp"></div></div>';
+ /* Ô tìm dùng ĐÚNG câu mời chuẩn của app ("Tìm trong trang này..."). Bản đầu em viết riêng
+    "Tìm sổ..." cho hợp cảnh - `_checkux` bắt: mỗi trang một cách gọi thì người dùng phải học
+    lại từng màn. Một câu mời cho cả app, không có ngoại lệ cho màn nào. */
+ h+='<div class="tbar" data-tour="tbar">'+srchHTML(window.TCQ||"","tcTim(this.value)","Tìm trong trang này...",280)+'<div class="tbsp"></div></div>';
  var co=SOTRACUU.filter(function(k){try{return !!PBK[k]&&navVis(k)}catch(e){return false}});
  var hien=co.filter(function(k){var p=PBK[k]||{};
   return !q||vnorm(p.t).indexOf(q)>=0||vnorm(p.c||"").indexOf(q)>=0});
