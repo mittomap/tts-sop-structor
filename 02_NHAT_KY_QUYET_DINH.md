@@ -241,6 +241,58 @@
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 39 BỘ KIỂM (08/08). V1 mốc cũ: V9.99z12, 34 bộ, bản dựng `829572`.**
 >
+> ### 🟢 08/08 (chiều) - ANH LUÂN GIAO QUYẾT SỐ TRANG: *"E toàn quyết định có bao nhiêu trang là phù hợp"*
+>
+> **Em chốt: KHÔNG bớt trang nào. Bớt số trang MỘT NGƯỜI PHẢI NHÌN.**
+> Vấn đề chưa bao giờ là "app có bao nhiêu trang" - là **khoảng cách giữa 5 và 60**.
+>
+> | | Trước | Sau |
+> |---|---|---|
+> | Trang nghiệp vụ trong app | 25 | **25** (giữ nguyên - LUẬT SỐ 0) |
+> | Trang một người dùng hằng ngày | 1-5 | **1-5** (vốn đã đúng) |
+> | **Mở app ra thấy ngay việc hôm nay** | **0/16 chức danh** | **16/16** |
+> | Mục menu CEO | 60 | **44** |
+>
+> **1. NHỊP NGÀY VỀ ĐÚNG TRANG NGƯỜI TA ĐÁP XUỐNG - chỗ đau nhất, suýt bỏ sót.**
+> Nhịp ngày có đủ, nay còn nói đúng số và bấm một cái ra đúng danh sách - mà nó CHỈ vẽ ở trang
+> "Việc hôm nay", trong khi **không một chức danh nào đáp xuống trang ấy**. Lối tắt tới 5 trang
+> nằm ở chỗ không ai đi qua thì bằng không có. Đúng cái anh Luân lo: *"a ko chắc nhân viên sale
+> có hiểu hành trình và cách app trình bày ko đó."*
+> Gắn vào `bvSau()` - hàm đã có mặt ở mọi trang (kể cả trang danh sách) và đã biết tự im ở trang
+> không phải trang đáp. Một luật, một chỗ, không đi thêm 8 lời gọi mới.
+>
+> **2. GOM 16 SỔ TRA CỨU SAU MỘT CỬA** (`tracuu`). Menu CEO 60 → 44. Không sổ nào bị xoá.
+> **Số cú bấm KHÔNG tăng**: nhóm "Tra cứu" vốn gập mặc định nên tới một cuốn sổ đã là hai cú;
+> nay cũng hai cú, và có thêm ô tìm. **Hai trang cố ý để lại ngoài**: `hocvien` và `giangvien`
+> nằm trong nhịp ngày của Học vụ/ACA/Nhân sự - đẩy vào trong là làm khó đúng người dùng hằng ngày.
+> Cửa `tracuu` mở **theo nội dung** (ai có ít nhất một cuốn thì có cửa) - mở một cửa dẫn vào
+> phòng trống còn tệ hơn không có cửa.
+>
+> **3. TRẦN MENU: NÂNG 58 → 60 RỒI TRẢ VỀ 44 trong cùng một ngày.** Nâng vì phải mở hai trang bị
+> giấu (`baitap`, `duyet`) - LUẬT SỐ 0 đứng cao hơn cái trần, và trần chỉ để menu không dài thêm
+> TRONG IM LẶNG. Trả bằng phép đo, không bằng lời hứa. Lý do nâng ghi thẳng trong `_checkroi.js`.
+>
+> ### 🔴 BỐN LỖI CỦA CHÍNH EM TRONG ĐỢT NÀY, BỘ KIỂM BẮT HẾT
+> 1. **Suýt để hai trang cùng một địa chỉ.** Khoá `tracuu` ĐÃ CÓ SẴN trong `PAGES` từ V9.15 - một
+>    mục CHẾT (có tên, không hàm vẽ) - và `_check16` mục 25 có hẳn luật canh không cho nó sống lại.
+>    Em không đọc kỹ, thêm mục THỨ HAI cùng khoá. Hậu quả: hai trang cùng địa chỉ `tra-cuu-so-sach`.
+>    Sửa: hồi sinh mục cũ TẠI CHỖ; đổi câu hỏi `_check16` từ *"không được có hàm vẽ"* thành
+>    *"phải có hàm vẽ và phải vẽ ra được"* - đúng tiền lệ đã ghi sẵn trong file ấy cho `khaosat`.
+> 2. **Thêm mục menu `duyet` rồi phải gỡ ra.** `_check11` đòi nhóm "Chờ duyệt" mỗi mục là một
+>    TRANG THẬT (nguyên tắc V2), và đo ra hậu quả thật: bấm `duyet` thì mục sáng lại là `duyetck`
+>    vì `navCur` nhường sáng cho mục con. **Mời người ta vào một mục rồi tô sáng mục khác còn tệ
+>    hơn không có mục.**
+> 3. **CSS đẻ ra bậc mới trong thang thiết kế** - một cỡ chữ, một bo góc, ba mã màu. `_checkux`:
+>    thang cỡ chữ 20→21, bo góc 10→11, bảng màu 110→113. **Và cắn hai lần trong một ngày**: lần
+>    vá đầu em vẫn để nguyên ba mã hex TRONG CHÍNH DÒNG CHÚ THÍCH, nên thước vẫn đếm 113 - nó soi
+>    cả tệp, không phân biệt mã sống hay mã trong lời giải thích. **Viết tên màu bằng chữ, đừng gõ mã.**
+> 4. **Ô tìm của trang mới viết riêng "Tìm sổ..."** cho hợp cảnh - mỗi trang một cách gọi thì
+>    người dùng phải học lại từng màn.
+>
+> **Và một luật lặp lại lần thứ ba:** mở một trang bị giấu ra thì MỌI luật chung mới áp được lên
+> nó. `baitap` hết `hide` là `_checktour` (không bài hướng dẫn nào đi qua) và `_checkaudit` (đoạn
+> nhắc 191 ký tự, quá trần 150) đỏ ngay. **Một trang bị giấu là một trang không ai đo.**
+>
 > ### 🟢 08/08 - MỖI CHỨC DANH HỎI BAO NHIÊU CÂU, CẦN BAO NHIÊU TRANG
 > Anh Luân: *"Em nên phân tích xem, mỗi nhân viên, mỗi trưởng phòng, họ hỏi bao nhiêu loại câu
 > hỏi, họ cần bao nhiêu trang để phục vụ nghiệp vụ? Nó quan trọng dữ lắm em. Hệ thống lớn, nhưng
