@@ -50,8 +50,16 @@ const APP = process.env.ITTS_APP || PATH.join(__dirname, "_APP.js");
        lại - đúng con bệnh anh Luân bắt ba lần: *"a tìm trên sidebar ko thấy"*.
    Luật "thêm thì được, bớt thì không" đứng CAO HƠN cái trần này; trần chỉ để menu không dài
    thêm trong IM LẶNG. Hai mục này không im lặng.
-   Phần nợ vẫn nguyên: gom nhóm Tra cứu sẽ đưa con số về khoảng 43. Đó mới là cách hạ thật. */
-const TRAN_MUC   = 60;   /* mục menu của một chức danh */
+   ═══ VÀ NGAY TRONG NGÀY 08/08 PHẦN NỢ ẤY ĐÃ TRẢ: 60 -> 45 ════════════════════════════════
+   Gom xong nhóm Tra cứu (16 cuốn sổ chỉ-đọc vào sau một cửa `tracuu`, xem ghi chú ở bảng PAGES
+   của `gen_v5.py`), CEO còn **45 mục** - thấp hơn cả mốc 58 trước khi nâng. Không sổ nào bị xoá,
+   và số cú bấm để tới một cuốn sổ KHÔNG tăng: nhóm "Tra cứu" vốn gập mặc định nên vẫn là hai cú.
+   Nâng trần rồi trả lại trong cùng một ngày là cách duy nhất em thấy là lương thiện: nâng thì
+   khai thẳng lý do, và trả thì trả bằng phép đo chứ không bằng lời hứa.
+   Nợ còn lại: `academic_staff` và `academic_manager` đang 26 mục - nhóm chặng B của họ có 13 mục
+   (lớp học, giáo án, bài tập, buổi hôm nay, lịch tuần, GV dự phòng, phòng học...). Đó là việc
+   hằng ngày thật, không gom được như sổ tra cứu; muốn ngắn thì phải tách chặng, để dịp sau. */
+const TRAN_MUC   = 45;   /* mục menu của một chức danh */
 const TRAN_NHOM  = 20;   /* mục trong MỘT nhóm */
 const TRAN_TRONG = 2;    /* mục mở ra trống, trên toàn bộ chức danh */
 

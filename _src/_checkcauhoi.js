@@ -103,7 +103,11 @@ function menuCua(){const out=[];
  return out}
 function coLoiMenu(k,M){
  if(M.some(G=>G.items.indexOf(k)>=0))return true;
- const cha=(typeof NAVSUB!=="undefined"&&NAVSUB[k])||"";
+ /* Trang con vào bằng cửa cha vẫn tính là CÓ LỐI - miễn là cửa cha đứng trên menu. Hai quan hệ
+    cha-con đang có: `NAVSUB` (vd Vận hành lớp <- Lớp học) và `SOTRACUU` (mười sáu cuốn sổ chỉ-đọc
+    <- trang Tra cứu, gom 08/08 để menu CEO từ 60 mục xuống 45). */
+ const cha=(typeof NAVSUB!=="undefined"&&NAVSUB[k])||
+           ((typeof SOTRACUU!=="undefined"&&SOTRACUU.indexOf(k)>=0)?"tracuu":"");
  return !!(cha&&M.some(G=>G.items.indexOf(cha)>=0));
 }
 

@@ -516,6 +516,19 @@ var PAGES=[
 {k:"chang",g:"_",hide:1,ic:"ti-route",t:"Tổng quan chặng",c:"Bản đồ một chặng vòng đời",ty:"custom"},
 {k:"hanhtrinh",g:"Vận hành",ic:"ti-route",t:"Hành trình học viên",c:"Toàn bộ theo chặng",ty:"custom"},
 /* ===== TRA CỨU - chỉ những danh sách thật sự cần khi làm việc ===== */
+/* ═══ V2 08/08 - MỘT CỬA CHO CÁC SỔ TRA CỨU ═════════════════════════════════════════════════
+   Anh Luân 08/08 giao em quyết số trang: *"E toàn quyết định có bao nhiêu trang là phù hợp."*
+   Em chốt: **không bớt trang nào, mà bớt số trang MỘT NGƯỜI PHẢI NHÌN.** Đo bằng `NHIP`: không
+   ai cần quá 5 trang mỗi ngày, mà ít nhất họ nhìn 6 mục menu, nhiều nhất 60 (CEO). Khoảng cách
+   giữa 5 và 60 mới là chỗ *"hệ thống lớn nhưng quá khó dùng thì chết ngay"*.
+   Mười sáu cuốn sổ CHỈ-ĐỌC chiếm gần một phần ba thanh menu của CEO, trong khi chúng là thứ tra
+   khi cần chứ không phải việc hằng ngày. Gom sau một cửa: menu ngắn lại mà không sổ nào bị xoá -
+   trang `tracuu` liệt kê đủ, có ô tìm, mỗi thẻ nói rõ sổ ấy đang có bao nhiêu dòng.
+   SỐ CÚ BẤM KHÔNG TĂNG: nhóm "Tra cứu" vốn GẬP MẶC ĐỊNH nên tới một cuốn sổ đã là hai cú (mở
+   nhóm, bấm sổ); nay cũng hai cú (mở trang Tra cứu, bấm thẻ) - và có thêm ô tìm.
+   HAI TRANG Ở LẠI NGOÀI, có lý do đọc được: `hocvien` và `giangvien` nằm trong NHỊP NGÀY của
+   Học vụ, ACA và Nhân sự - đẩy chúng vào trong là làm khó đúng người dùng chúng mỗi ngày. */
+{k:"tracuu",g:"Tra cứu",ic:"ti-folders",t:"Tra cứu & sổ sách",c:"Các sổ chỉ-đọc - tra khi cần",ty:"custom"},
 {k:"hocvien",g:"Tra cứu",ic:"ti-user-check",t:"Học viên",c:"Đang & đã học",ty:"list"},
 /* V2 RB3 - CHA TRƯỚC CON (anh Luân: *"trang vận hành lớp, nó là trang con của lớp học mới đúng
    em nhỉ"*). V1 đang ngược: `banglop` (Vận hành lớp) đứng trên menu còn `lop` (Lớp học) - đáng ra
@@ -893,6 +906,13 @@ function buildScope(code){
  if(eff.pages!=="*"&&eff.tabs)for(var _hub in eff.tabs)(eff.tabs[_hub]||[]).forEach(function(_t){
   var _k=((typeof HUBTAB!=="undefined"&&HUBTAB[_hub]&&HUBTAB[_hub].m)||{})[_t]||_t;
   if(PBK[_k]&&eff.pages.indexOf(_k)<0)eff.pages.push(_k)});
+ /* V2 08/08 - CỬA `tracuu` MỞ THEO NỘI DUNG, KHÔNG MỞ SẴN CHO TẤT CẢ. Mười sáu cuốn sổ chỉ-đọc
+    nay vào sau cửa này; ai có ÍT NHẤT MỘT cuốn thì có cửa, ai không có cuốn nào thì không - mở
+    một cái cửa dẫn vào phòng trống còn tệ hơn không có cửa (`_checkroi` gọi đó là "mục mở ra
+    TRỐNG"). Tự suy từ `eff.pages` nên thêm/bớt sổ về sau không phải nhớ sửa ở đây. */
+ if(eff.pages!=="*"&&typeof SOTRACUU!=="undefined"&&
+    SOTRACUU.some(function(_s){return eff.pages.indexOf(_s)>=0})&&eff.pages.indexOf("tracuu")<0)
+  eff.pages.push("tracuu");
  /* V9.61: bản sửa của anh Luân trong Cài đặt đắp lên CUỐI cùng - sau mọi luật tự động ở trên,
     để cái anh bấm luôn là cái thắng. */
  eff.pages=qtPages(gk,eff.pages);
@@ -10446,7 +10466,11 @@ function btHub(embed){
   var mode2=window.BTWHO==="each"?"each":"all";
   h+='<div class="panel"><div class="ph"><b>Giao bài - '+esc(lop.class_name||cid)+'</b><span class="mut" style="font-size:11.5px">lớp cá nhân hóa: một bài chung cho học viên được chọn, hoặc mỗi học viên một bài riêng</span></div><div class="form">';
   if(SP)h+='<div class="notebar" style="grid-column:1/-1;margin:0 0 4px"><i class="ti ti-notes"></i>Buổi '+esc(curSes.session_number)+(curSes.session_date?' ('+esc(curSes.session_date)+')':'')+' theo giáo án: '+
-   (SP.hw?'<b>'+esc(SP.hw.title)+'</b> '+planSrcChip(SP.hwFrom):'<i>chưa đặt bài</i>')+' · hạn nộp '+dueChip(SP)+'.'+(mode2==="each"?'':' Đã điền sẵn bên dưới, sửa được trước khi giao.')+'</div>';
+   /* V2 08/08 - `_checkaudit` bắt được NGAY khi trang Bài tập hết `hide` và bắt đầu được đo:
+      đoạn nhắc này dài 191 ký tự, quá trần 150. Luật của app là câu nhắc đầu trang phải đọc HẾT
+      trong một nhịp mắt; phần dặn dò thêm đưa vào chú thích rê chuột chứ không nối dài dòng chữ.
+      Một trang bị giấu là một trang không ai đo - mở nó ra thì mọi luật chung mới áp được. */
+   (SP.hw?'<b>'+esc(SP.hw.title)+'</b> '+planSrcChip(SP.hwFrom):'<i>chưa đặt bài</i>')+' · hạn nộp '+dueChip(SP)+'.'+(mode2==="each"?'':' <span data-tip="Bài và hạn nộp đã điền sẵn bên dưới - sửa được trước khi bấm Giao bài.">(điền sẵn)</span>')+'</div>';
   /* CẤP 1: cách giao - quyết định toàn bộ bố cục bên dưới */
   h+='<div class="mswrap"><div class="mslb">Bước 1 · Cách giao</div>'+
    [["all","ti-users-group","Một bài chung","Các học viên được tick nhận cùng một bài, cùng hạn nộp"],
@@ -11207,7 +11231,27 @@ function pageHead(t,s,btn,hoan){/* UX-23: tiêu đề đã có ở topbar (#pgTi
     thanh chọn - hoãn mà quên gọi lại là mất hẳn bảng việc của một chức danh. */
  var bv=hoan?"":bvSau();
  return '<div class="phead nohd" data-tour="phead"><div><div class="s" style="margin-top:0">'+s+'</div></div><div class="sp">'+(btn||"")+'</div></div>'+bv}
-function bvSau(){try{return bangViecHTML()}catch(e){return ""}}
+/* ═══ V2 08/08 - NHỊP NGÀY VỀ ĐÚNG TRANG NGƯỜI TA ĐÁP XUỐNG ══════════════════════════════════
+   Anh Luân 08/08: *"Hệ thống lớn, nhưng quá khó dùng thì chết ngay. Như v1, a ko chắc nhân viên
+   sale có hiểu hành trình và cách app trình bày ko đó."*
+   Đo được chỗ đau nhất của cả đợt: **16/16 chức danh mở app ra KHÔNG thấy nhịp ngày của mình.**
+   Không phải vì nhịp ngày hỏng - nó có đủ, nay còn nói đúng số và bấm một cái ra đúng danh sách.
+   Mà vì nó chỉ vẽ ở TRANG "VIỆC HÔM NAY", trong khi **không một chức danh nào đáp xuống trang
+   ấy**: Học vụ đáp vào Xếp lớp, Tư vấn vào Bàn làm việc, Giáo viên vào Buổi hôm nay, Kế toán vào
+   Thanh toán... Muốn biết "hôm nay tôi làm gì" thì phải TỰ BIẾT mà bấm sang một trang khác -
+   mà người mới thì không biết là có trang ấy.
+   Cả trung tâm không ai cần quá 5 trang mỗi ngày (đo bằng `NHIP`, xem `PHAN_TICH_CAU_HOI_08_08.md`).
+   Nhịp ngày CHÍNH LÀ lối tắt tới đúng 5 trang đó. Để nó ở chỗ không ai đi qua thì bằng không có.
+   Gắn vào `bvSau()` chứ không đi thêm 8 lời gọi mới: hàm ấy đã có mặt ở mọi trang (kể cả trang
+   danh sách) và đã biết tự im ở trang không phải trang đáp - đúng luật cần, không phải nhớ hai chỗ. */
+function nhipSau(){try{
+ if(CUR==="viec")return "";                        /* trang Việc hôm nay đã vẽ nhịp ở chỗ của nó */
+ var dap=(SCOPE()||{}).land||"";
+ if(!dap||CUR!==dap)return "";
+ return nhipPanel();
+}catch(e){return ""}}
+function bvSau(){var a="";try{a=nhipSau()}catch(e){}
+ try{return a+bangViecHTML()}catch(e){return a}}
 /* ===== THANH CÔNG CỤ CHUẨN =====
    segHTML(cur, opts, onTpl): opts = [mã, nhãn, (số đếm), (lớp màu)]; onTpl chứa {k} để thay mã.
    tbar(parts): ghép [tìm] [chip phân đoạn] ... đẩy [số dòng][Cột][nút] về BÊN PHẢI. */
@@ -16137,10 +16181,15 @@ var TOURS={
      `_checktour` canh đúng chuyện đó và nó đã đỏ ngay lượt verify đầu tiên sau khi em dựng. */
   {p:"ketqua",sel:'@bstats',t:"Lớp đã học xong ra kết quả thế nào",d:"Hai tỷ lệ đạt mục tiêu đứng cạnh nhau: theo bài thi thử cuối khóa tại trung tâm, và theo kỳ thi IELTS chính thức. Bóc được theo giảng viên, theo lớp, theo chi nhánh và theo lớp 1-1 hay lớp nhóm.",hint:"Bấm Theo giảng viên để xem lớp của ai đang ra kết quả tốt nhất."},
   {p:"ketqua",sel:'@man',t:"Điểm bốn kỹ năng của từng học viên",d:"Bảng dưới cho từng học viên: mục tiêu, bốn kỹ năng và Overall ở cả hai mốc thi. Bấm một dòng mở lịch sử thi - ai thi lại nhiều lần thì thấy đủ các lần.",hint:"Xong một ngày của học vụ!"}]},
- tn_giaovien:{lv:"trainghiem",role:"Giáo viên",t:"Một ngày của Giáo viên",ic:"ti-chalkboard",d:"5 bước - dạy, điểm danh, chấm bài",steps:[
+ /* V2 08/08 - THÊM BƯỚC "CÒN BÀI NÀO CHƯA CHẤM". Trang `baitap` vừa hết `hide` và vừa được mở
+    quyền cho giáo viên (trước đó app giục họ chấm 12 bài mà không có cửa nào vào) - `_checktour`
+    bắt ngay: không một bài hướng dẫn nào đi qua trang ấy. Mở một trang mà không dẫn đường tới nó
+    thì người dùng vẫn không biết nó tồn tại. Bài này thành 6 bước, không phải 5. */
+ tn_giaovien:{lv:"trainghiem",role:"Giáo viên",t:"Một ngày của Giáo viên",ic:"ti-chalkboard",d:"6 bước - dạy, điểm danh, giao bài, chấm bài",steps:[
   {p:"buoihnay",sel:'@man',t:"Hôm nay bạn dạy gì",d:"Vào app là thấy ngay buổi dạy hôm nay, chủ đề buổi, bài tập sẽ giao và lời dặn từ giáo án khóa.",hint:"Xem thẻ buổi học của bạn."},
   {p:"banglop",sel:'@txt:Buổi học & điểm danh',t:"Vào lớp và điểm danh",d:"Bấm Bắt đầu lớp để mở cổng điểm danh. Vắng có phép hay không phép đều ghi rõ, vắng phải ghi lý do.",hint:"Bấm tab 'Buổi học & điểm danh' của lớp, đánh dấu vài học viên rồi Lưu buổi học."},
   {p:"banglop",sel:'@txt:Giao & chấm bài tập',t:"Giao bài tập",d:"Giao một bài chung cho cả lớp hoặc bài riêng cho từng học viên. Hạn nộp tự tính theo giáo án khóa, sửa được.",hint:"Bấm tab 'Giao & chấm bài tập' rồi giao một bài mới."},
+  {p:"baitap",sel:'@txt:Chờ chấm',t:"Còn bài nào bạn chưa chấm",d:"Ba chế độ đầu bắt chọn trước một lớp và một buổi. Chip 'Chờ chấm - mọi lớp' gom hết bài đã nộp mà chưa chấm của MỌI lớp bạn dạy vào một bảng, mỗi dòng một nút nhảy thẳng vào chấm.",hint:"Bấm chip 'Chờ chấm - mọi lớp' rồi chấm một bài."},
   {p:"buoihoc",sel:'@txt:Chờ ghi nhận xét',t:"Ghi nhận xét buổi học",d:"Cuối buổi ghi nhận xét chung - học viên và phụ huynh đọc được trong cổng học viên. Quá hạn sẽ bị nhắc.",hint:"Bấm chip 'Chờ ghi nhận xét', mở buổi vừa dạy rồi ghi nhận xét."},
   {p:"giaoviec",sel:'@man',t:"Việc được giao",d:"Học vụ hoặc tổ trưởng giao việc cho bạn ở đây: chuẩn bị đề, dự giờ, viết giáo án bổ sung.",hint:"Xong một ngày của giáo viên!"}]},
  /* V9.44 - BA BÀI CÒN THIẾU. Cấp "trải nghiệm" trước đây có 5 bài cho 5 chức danh, nhưng app
@@ -17567,6 +17616,36 @@ function renderDuthu(){
    '<td><button class="btn primary sm" onclick="payForm(\''+esc(r.e.enrollment_id)+'\')"><i class="ti ti-cash"></i>Thu tiền</button></td></tr>'});
  if(L.length>120)h+='<tr><td class="empty" colspan="7">... còn '+(L.length-120)+' đợt nữa.</td></tr>';
  return h+'</tbody></table></div>'+xemTiepBtn("duthu",L.length,30)+'</div>'}
+/* ═══ V2 08/08 - TRANG TRA CỨU: MỘT CỬA, MỖI SỔ MỘT THẺ ═════════════════════════════════════
+   Không phải một cái menu thứ hai. Mỗi thẻ nói ba điều mà một dòng menu không nói được: sổ ấy
+   đang có BAO NHIÊU DÒNG, nó là sổ của bảng dữ liệu nào, và một câu ngắn nó dùng để tra gì.
+   Chỉ vẽ những sổ người đang đăng nhập được xem - hỏi thẳng `navVis`, không tự chép lại luật
+   phân quyền lần thứ hai (chép lại là gốc của mọi lần lệch). */
+function tcTim(v){window.TCQ=String(v||"");reRender("tracuu")}
+function renderTracuu(){
+ var q=vnorm(window.TCQ||"");
+ var h=pageHead("Tra cứu & sổ sách",
+  "Các sổ CHỈ-ĐỌC của trung tâm. Nghiệp vụ làm ở trang nghiệp vụ; ở đây chỉ để tra lại một hồ sơ, một khoản thu, một buổi học đã qua.","");
+ h+='<div class="tbar" data-tour="tbar">'+srchHTML(window.TCQ||"","tcTim(this.value)","Tìm sổ...",280)+'<div class="tbsp"></div></div>';
+ var co=SOTRACUU.filter(function(k){try{return !!PBK[k]&&navVis(k)}catch(e){return false}});
+ var hien=co.filter(function(k){var p=PBK[k]||{};
+  return !q||vnorm(p.t).indexOf(q)>=0||vnorm(p.c||"").indexOf(q)>=0});
+ h+='<div class="panel"><div class="ph"><b>'+hien.length+' sổ</b>'+
+  (q?'<span class="mut" style="font-size:11.5px">lọc theo "'+esc(window.TCQ)+'" - toàn bộ có '+co.length+' sổ</span>':
+     '<span class="mut" style="font-size:11.5px">bấm một thẻ để mở sổ</span>')+'</div><div class="pbody">';
+ if(!hien.length)h+='<div class="empty">'+(co.length?'Không có sổ nào khớp "'+esc(window.TCQ)+'". Xoá từ khoá để xem đủ '+co.length+' sổ.'
+   :'Chức danh của bạn chưa được cấp sổ tra cứu nào. Cấp thêm ở Cài đặt &rsaquo; Phân quyền trang.')+'</div>';
+ else{
+  h+='<div class="tcgrid">';
+  hien.forEach(function(k){var p=PBK[k]||{};
+   var cfg=LISTCFG[k],n=null;
+   try{if(cfg&&cfg.code){var a=scopeList(cfg.code,rows(cfg.code));if(cfg.pre)a=a.filter(cfg.pre);n=a.length}}catch(e){n=null}
+   h+='<div class="tco" onclick="go(\''+esc(k)+'\')" title="Mở '+esc(p.t)+'">'+
+    '<i class="ti '+esc(p.ic||"ti-file")+'"></i>'+
+    '<div class="tcn"><b>'+esc(p.t)+'</b><span class="mut">'+esc(p.c||"")+'</span></div>'+
+    (n==null?'':'<span class="tcso">'+n+'</span>')+'</div>'});
+  h+='</div>'}
+ return h+'</div></div>'}
 function renderNhansu(){
  return pageHead("Nhân sự",
   "Danh sách toàn bộ người đang làm việc tại trung tâm: chức danh, cơ sở, email đăng nhập và tình trạng.","")
@@ -19562,7 +19641,7 @@ function banNutHoSo(ttk,r){
  if(ttk==="hocvien")return '<button class="btn" onclick="window.HOSO=\''+esc(r.student_id)+'\';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>';
  return '<button class="btn" onclick="openLop(\''+esc(r.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Mở lớp</button>'}
 
-var RENDER={ban:renderBan,canhan:renderCanhan,dsphuhuynh:renderSoPH,hoidap:renderHoidap,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,ketqua:renderKetqua,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
+var RENDER={ban:renderBan,canhan:renderCanhan,dsphuhuynh:renderSoPH,hoidap:renderHoidap,tracuu:renderTracuu,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,ketqua:renderKetqua,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
 /* ═══ V2 - 25 NGHIỆP VỤ, 25 TRANG ═══════════════════════════════════════════════════════════
    Anh Luân: *"Mỗi nghiệp vụ 1 trang, vẫn sắp xếp được theo chặng trên sidebar, nhưng mỗi trang
    là nghiệp vụ riêng, và nó có thẻ, có chip lọc, có cảnh báo của riêng nó."*
@@ -20828,7 +20907,14 @@ var NAVTREE=[
     Bài học lặp lại lần thứ hai: hỏi `navVis` là hỏi "có ĐƯỢC PHÉP thấy không", không phải "có
     CHỖ ĐỨNG trên menu không". Hai câu khác nhau, và cái thước phải hỏi câu thứ hai. */
  {g:"Điều hành",items:["baocao","nhansu","bangcong","hoidap","canhan","settings"]},
- {g:"Tra cứu",items:["hocvien","dsphuhuynh","dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh","dsbaitap","dswow","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","giangvien","nhanvien"]}];
+ /* V2 08/08 - mười sáu cuốn sổ chỉ-đọc rời khỏi cây menu, vào sau một cửa `tracuu` (ghi chú
+    dài ở bảng PAGES). `hocvien` và `giangvien` Ở LẠI vì chúng nằm trong nhịp ngày của ba nhóm. */
+ {g:"Tra cứu",items:["tracuu","hocvien","giangvien"]}];
+/* Danh mục sổ nằm sau cửa Tra cứu. Khai MỘT chỗ, BA nơi đọc: trang `tracuu` vẽ theo nó, `navCur`
+   dùng nó để biết "đang đứng trong một cuốn sổ thì mục Tra cứu phải sáng", và `_checkcauhoi`
+   dùng nó để biết các sổ ấy VẪN có lối trên menu (qua cửa cha). */
+var SOTRACUU=["dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh",
+ "dsbaitap","dswow","dsphuhuynh","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","nhanvien"];
 /* ═══ V2 - 25 NGHIỆP VỤ ĐÃ RỜI KHỎI BẢNG NÀY ════════════════════════════════════════════════
    `NAVSUB` khai "mục này là MỤC CON của mục kia" - dùng cho `navOwner`, và `navOwner` là thứ
    quyết định mục nào sáng trên sidebar, mục nào bị chặn theo `rs.tabs` của hub chủ.
@@ -21043,6 +21129,10 @@ function navCur(k){
     sáng là mục của CHA. Thiếu vế này thì bấm một lớp để vào Vận hành lớp là cả sidebar tối thui.
     Hỏi `navInTree` trước: cha nào không có mặt trên menu thì không có gì để mà sáng. */
  if(NAVSUB[CUR]===k&&navInTree(k))return true;
+ /* V2 08/08 - mười sáu cuốn sổ vào sau cửa `tracuu` nên chúng không còn mục riêng trên menu.
+    Đang đứng trong một cuốn sổ thì mục "Tra cứu & sổ sách" phải sáng, nếu không cả sidebar tối
+    thui - đúng con bệnh đã bắt ba lần (*"a tìm trên sidebar ko thấy"*). */
+ if(k==="tracuu"&&typeof SOTRACUU!=="undefined"&&SOTRACUU.indexOf(CUR)>=0)return true;
  var o=navOwner(k);if(o!==CUR)return false;
  /* V9.99z5: trước đây mỗi hub có một dòng riêng, và ba trong năm dòng ấy chép lại bảng tab
     của chính hub - chép lệch một chỗ là mục menu không bao giờ sáng. Nay hỏi thẳng HUBTAB:
