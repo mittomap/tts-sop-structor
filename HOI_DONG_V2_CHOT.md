@@ -90,10 +90,15 @@ Mọi trang còn lại đứng trên menu **đều phải đủ bộ bốn thứ
 
 ## Phần 2 - BỘ KIỂM PHẢI ĐỔI GÌ
 
-### Việc 1 - Dựng `_checkv2.js`: một thước giữ NĂM luật trên
+### Việc 1 - Dựng `_checkv2.js`
 Hôm nay cả năm luật đều **đang đúng** (đo: L1 16/16 · L2 0 hub · L3 0 tối · L4 dải cảnh báo 25 ô
 cho Giám đốc, mỗi ô bấm được · L5 đang thiếu 4 trang). Nhưng **không thước nào giữ chúng** - ngày
 mai đổi một trang đáp là hỏng trong im lặng. Luật không có thước là lời hứa, không phải luật.
+
+**MỖI LUẬT MỘT THƯỚC, KHÔNG HAI:** `_checkv2` giữ **L1-L4**. Luật **L5** (trang nghiệp vụ phải có
+dải thẻ) đã có thước từ trước - mục **K3 của `_checkkhuon`** - nên KHÔNG viết lại ở đây. Bản đầu
+của tệp này có viết lại, và Phần 4 dưới đây kể chuyện đó: một luật đo hai chỗ không an toàn hơn,
+nó chỉ tạo hai nơi phải giữ đồng bộ.
 
 ### Việc 2 - `_checkkhuon` đo ĐÚNG TẬP TRANG
 Đổi phạm vi từ "23 trang theo chặng" sang định nghĩa trang nghiệp vụ ở trên, kèm bảng khai lý do
@@ -121,3 +126,73 @@ Ghi lại vì đây là phần đáng học nhất, và cả ba cùng một họ
 
 **Luật rút ra:** đo trên **chuỗi HTML thật** mà app phát ra, và khi thước bắt mình thì **đọc lại
 phép đo trước khi đọc lại app**.
+
+---
+
+## Phần 4 - **V2 có cần 40 bộ kiểm không?** (anh Luân hỏi 08/08)
+
+> *"Ở v2 có nhất thiết 40 bộ kiểm ko? Hội đồng xem có dư thừa gì ko?"*
+
+Anh đã hỏi một lần rồi, ngày 04/08: *"quá trình verify của em rất lâu, nhưng lần nào a cũng bắt
+được lỗi, e nên xem lại cách làm verify, chứ vừa tốn thời gian vừa ko hiệu quả thì giữ như cũ
+làm gì."* Lần ấy câu trả lời là chia hai tầng (`--nhanh` / trọn bộ). Lần này đo sâu hơn.
+
+### Đo trước, kết luận sau
+
+| Bộ | Giây | % tổng |
+|---|---|---|
+| `_check18` hội đồng audit | **1168s (19m28)** | **39%** |
+| `_checkui` trình duyệt thật | 396s | 13% |
+| `_checknv` nhân viên ảo | 243s | 8% |
+| `_checkdrawer` · `_checklap` · `_checkngay` · `_checkneo` · `_check16` | 148 · 130 · 121 · 103 · 77 | 24% |
+| **20 bộ rẻ nhất cộng lại** | **~220s** | **7%** |
+
+**Số bộ không phải là chi phí. Ba bộ ăn 60% thời gian; hai mươi bộ rẻ nhất cộng lại chưa tới 4
+phút.** Cắt hai mươi bộ ấy tiết kiệm được vài giây và mất hẳn hai mươi lớp canh.
+
+### Chỗ nóng nhất nằm TRONG APP, không nằm trong bộ kiểm
+
+Chạy hồ sơ đo (`node --prof`) trên `_check18`: đỉnh không phải mã bộ kiểm mà là **hàm đọc ngày
+`pvnd` của app** - mỗi lần vẽ một trang, nó khớp lại từ đầu hàng nghìn chuỗi ngày y hệt nhau.
+
+Cho nó nhớ mốc đã đọc (**nhớ SỐ, không nhớ đối tượng `Date`** - ba chỗ trong app sửa thẳng vào
+kết quả `pvnd`, dùng chung một đối tượng là lỗi im lặng):
+
+- `_check18`: **19m28 → 7m09** (giảm 63%)
+- `_check16`: 1m17 → 42s
+
+**Và đây không phải chuyện của riêng verify - người dùng thật trên điện thoại trả đúng cái giá
+đó mỗi lần bấm một chip lọc.** Bộ kiểm chậm hoá ra là cái NHIỆT KẾ báo app chậm. Nếu hôm nay
+cắt bộ kiểm cho nhanh thì đã vứt đi đúng cái đang chỉ ra chỗ người dùng phải chờ.
+
+### Dư thừa: tìm được ĐÚNG MỘT chỗ, và nó do chính người viết tài liệu này tạo ra sáng nay
+
+Luật *"trang nghiệp vụ phải có dải thẻ"* là mục **K3 của `_checkkhuon`** từ trước. Sáng 08/08
+em viết lại nó thành **L5 của `_checkv2`** - cùng phép thử (`class="bstats"`), cùng tập trang
+(cả hai đọc `_v2def.js`).
+
+**Một luật đo hai chỗ không an toàn hơn.** Nó chỉ tạo hai nơi phải giữ đồng bộ, và ngày nào đó
+hai nơi nói hai đằng thì người sửa không biết tin cái nào - đúng con bệnh mà cả hai thước ấy
+sinh ra để bắt. Đã gỡ L5; **luật vẫn còn nguyên trong bản chốt, chỉ là nó có đúng một cái thước.**
+
+### Chỗ NGHI trùng thứ hai: không phải trùng
+
+*"Mục mở ra TRỐNG"* xuất hiện ở ba bộ - nhưng chỉ `_checkroi` **bắt lỗi** (có trần, đỏ khi vượt);
+`_checkngay` và `_checknguoi` chỉ **ghi chú kèm ngữ cảnh** (ai là người thấy mục trống), và cả
+hai đã quét vai sẵn nên không tốn thêm một giây nào. Một luật được thi hành + hai lời chú thích
+khác một luật bị chép ba lần.
+
+### KHÔNG gộp năm bộ quét-theo-vai
+
+`_checkngay` · `_checknguoi` · `_checkmoi` · `_checklap` · `_checkroi` cùng đóng vai từng người
+rồi vẽ mọi trang - gộp lại tiết kiệm khoảng 4 phút. **Không nên.** Khi đỏ, giá trị lớn nhất là
+một dòng đỏ **gọi tên đúng một luật**. Gộp thành một bộ khổng lồ là đổi 4 phút của MÁY lấy thời
+gian của NGƯỜI ngồi đọc lỗi - sai hướng.
+
+### Chốt
+
+- **Giữ nguyên số bộ.** Không cắt bộ nào.
+- **Gỡ đúng một chỗ trùng** (do chính đợt này tạo ra).
+- **Chi phí chữa ở app, không chữa bằng cách bỏ thước** - và bản vá ấy làm app nhanh lên cho
+  người dùng thật, không chỉ cho verify.
+- Nguyên tắc rút ra: **khi bộ kiểm chậm, hỏi "app đang làm gì mà chậm" trước khi hỏi "bỏ bộ nào".**
