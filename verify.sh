@@ -181,6 +181,12 @@ chay "_checkmotcua mot nghiep vu mot cua ghi" "CHECKMOTCUA (OK|BO QUA)" node _ch
 # phong Marketing doc "57 viec qua han" roi mo trang ra thay 7. Con so DAU TIEN nguoi ta nhin
 # moi sang la con so sai. Nay bo kiem doi chieu SO TREN NHIP voi SO TREN CHIP, lech mot con la do.
 chay "_checkcauhoi cau hoi cua tung chuc danh" "CHECKCAUHOI (OK|BO QUA)" node _checkcauhoi.js
+# Anh Luan 08/08: "E nen sua lai bo kiem, v2 ko phai v1, no co dac thu rieng cua no. E nho chuyen
+# gia quyet dinh v2 se nhu the nao di." Ban chot cua hoi dong: HOI_DONG_V2_CHOT.md. Bo nay la ban
+# THI HANH: nam luat rieng cua V2 (nhip ngay o trang dap · menu khong con hub · khong trang mo coi
+# · so canh bao bam duoc · trang nghiep vu du dai the). Ca nam HOM NAY DEU DANG DUNG - dung bo nay
+# de ngay mai doi mot trang dap khong lam hong trong im lang. Luat khong co thuoc la loi hua.
+chay "_checkv2 nam luat rieng cua V2" "CHECKV2 (OK|BO QUA)" node _checkv2.js
 chay "_checkmoi khong moi roi duoi" "TONG:" node _checkmoi.js
 
 echo

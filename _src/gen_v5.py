@@ -1524,6 +1524,7 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .cbwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
 /* V2 08/08 - lưới thẻ của trang Tra cứu. Không dải viền màu trang trí (luật W5): mỗi thẻ chỉ
    có viền mảnh như mọi ô khác trong app, phân biệt bằng icon và con số chứ không bằng màu. */
+.bwctx{font-size:11.5px;color:#5A6675;line-height:1.6;margin-top:6px;max-width:640px}
 .tcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:8px;padding:2px}
 .tco{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:#fff;transition:.12s}
 /* V2 08/08 - KHÔNG ĐẺ MÃ MÀU MỚI. Ba màu em gõ riêng cho dải thẻ này (nền rê chuột, chữ số,
@@ -2680,48 +2681,48 @@ var PAGES=[
 /* ===== THEO CHẶNG P1-P4: TUYỂN SINH ===== */
 {k:"tuyensinh",g:"Chặng · Tuyển sinh",ic:"ti-user-plus",t:"Tuyển sinh",c:"Lead → Test → Tư vấn → Thu tiền (một luồng)",ty:"custom"},
 /* 4 trang con giữ nguyên chức năng nhưng ẩn khỏi menu - nhúng trong hub Tuyển sinh */
-{k:"nhaplead",g:"_",ic:"ti-users",t:"Lead & khai thác",c:"Tiếp nhận & khai thác khách",ty:"list",hide:1},
-{k:"reup",g:"_",ic:"ti-refresh",t:"Chăm lại / Reup",c:"Khách đã ngưng - kho remarketing",ty:"custom",hide:1},
+{k:"nhaplead",g:"_",ic:"ti-users",t:"Lead & khai thác",c:"Tiếp nhận & khai thác khách",ty:"list"},
+{k:"reup",g:"_",ic:"ti-refresh",t:"Chăm lại / Reup",c:"Khách đã ngưng - kho remarketing",ty:"custom"},
 {k:"lienhe",g:"_",ic:"ti-phone",t:"Ghi nhận liên hệ",c:"Mở từ hồ sơ / luồng",ty:"list",hide:1},
-{k:"test",g:"_",ic:"ti-file-text",t:"Test đầu vào",c:"Đặt lịch - dự test - chấm - tư vấn",ty:"custom",hide:1},
-{k:"tuvan",g:"_",ic:"ti-messages",t:"Tư vấn & Đăng ký sau test",c:"Tư vấn lộ trình - chốt - tạo ĐK",ty:"custom",hide:1},
-{k:"thanhtoan",g:"_",ic:"ti-credit-card",t:"Thanh toán",c:"Thu & xác nhận học phí",ty:"custom",hide:1},
+{k:"test",g:"_",ic:"ti-file-text",t:"Test đầu vào",c:"Đặt lịch - dự test - chấm - tư vấn",ty:"custom"},
+{k:"tuvan",g:"_",ic:"ti-messages",t:"Tư vấn & Đăng ký sau test",c:"Tư vấn lộ trình - chốt - tạo ĐK",ty:"custom"},
+{k:"thanhtoan",g:"_",ic:"ti-credit-card",t:"Thanh toán",c:"Thu & xác nhận học phí",ty:"custom"},
 /* ===== THEO CHẶNG P5-P7: HỌC TẬP ===== */
 {k:"xeplop",g:"Chặng · Học tập",ic:"ti-layout-grid-add",t:"Xếp lớp & Onboarding",c:"Xếp lớp - gửi info - nhập học",ty:"custom"},
 {k:"banglop",g:"Chặng · Học tập",ic:"ti-clipboard-list",t:"Vận hành lớp",c:"Buổi · điểm danh · nhận xét · bài tập",ty:"custom"},
 {k:"hoctap",g:"Chặng · Học tập",ic:"ti-school",t:"Học tập & Giảng dạy",c:"Lớp · nhận xét buổi (SLA) · WOW 1-1",ty:"custom"},
 {k:"giaoan",g:"Chặng · Học tập",ic:"ti-notes",t:"Kho bài tập & Giáo án",c:"Bài + dặn dò mặc định từng buổi",ty:"custom"},
 {k:"diemdanh",g:"_",ic:"ti-checkbox",t:"Điểm danh",c:"Theo buổi",ty:"custom",hide:1},
-{k:"buoihoc",g:"_",ic:"ti-calendar-check",t:"Theo dõi nhận xét buổi",c:"SLA ghi nhận xét toàn bộ lớp",ty:"custom",hide:1},
+{k:"buoihoc",g:"_",ic:"ti-calendar-check",t:"Theo dõi nhận xét buổi",c:"SLA ghi nhận xét toàn bộ lớp",ty:"custom"},
 {k:"baitap",g:"_",ic:"ti-book",t:"Giao & chấm Bài tập",c:"Bài tập",ty:"custom"},
-{k:"wow",g:"_",ic:"ti-star",t:"Buổi WOW 1-1",c:"Kèm riêng",ty:"custom",hide:1},
-{k:"gvdp",g:"_",ic:"ti-user-plus",t:"GV dự phòng theo ngày",c:"Ai thay được khi GV nghỉ đột xuất",ty:"custom",hide:1},
+{k:"wow",g:"_",ic:"ti-star",t:"Buổi WOW 1-1",c:"Kèm riêng",ty:"custom"},
+{k:"gvdp",g:"_",ic:"ti-user-plus",t:"GV dự phòng theo ngày",c:"Ai thay được khi GV nghỉ đột xuất",ty:"custom"},
 /* V9.99z5 (anh Luân 05/08: *"lệch nhau giữa nghiệp vụ bên trong và trang trên sidebar là do
    thiết kế vậy hả em, hay do sót nhỉ"* + *"bên sidebar giống như 1 cái bản đồ vậy, họ biết
    mình cần tìm gì ở đâu"*): hai tab "Hôm nay" và "Lịch tuần" của hub Học tập chưa bao giờ có
    khoá trang riêng, nên không có cách nào cho chúng một mục trên menu. Khai ở đây để menu vẽ
    được; go() vẫn remap về hub nên KHÔNG cần hàm vẽ riêng (giống `reup` của hub Tuyển sinh). */
-{k:"buoihnay",g:"_",ic:"ti-calendar-event",t:"Buổi hôm nay",c:"Buổi học trong ngày - lớp nào, ai dạy, phòng nào",ty:"custom",hide:1},
-{k:"lichtuan",g:"_",ic:"ti-calendar-week",t:"Lịch tuần",c:"Toàn bộ buổi của tuần theo lớp và theo phòng",ty:"custom",hide:1},
-{k:"phong",g:"_",ic:"ti-layout-grid",t:"Phòng học & đụng lịch",c:"Đụng phòng, đụng giờ, lớp chưa có phòng",ty:"custom",hide:1},
+{k:"buoihnay",g:"_",ic:"ti-calendar-event",t:"Buổi hôm nay",c:"Buổi học trong ngày - lớp nào, ai dạy, phòng nào",ty:"custom"},
+{k:"lichtuan",g:"_",ic:"ti-calendar-week",t:"Lịch tuần",c:"Toàn bộ buổi của tuần theo lớp và theo phòng",ty:"custom"},
+{k:"phong",g:"_",ic:"ti-layout-grid",t:"Phòng học & đụng lịch",c:"Đụng phòng, đụng giờ, lớp chưa có phòng",ty:"custom"},
 /* ===== THEO CHẶNG P8-P10: CSKH & KẾT THÚC ===== */
 {k:"cskh",g:"Chặng · CSKH & Kết thúc",ic:"ti-headset",t:"CSKH · Khảo sát & Phản hồi",c:"Khảo sát (TT→HV) · Góp ý & Khiếu nại (HV→TT)",ty:"custom"},
 /* V9.63 (anh Luân: *"cái tab trên sidebar thông báo từ học viên đâu?"*): học viên liên hệ là
    việc quan trọng nên nó phải có ĐƯỜNG RIÊNG trên menu trái, không bắt người ta nhớ rằng nó
    nằm trong tab thứ tư của trang CSKH. Không đẻ trang mới: khoá này là bí danh, go() đưa về
    đúng hub CSKH mở sẵn tab đó - y như cách các hàng Chờ duyệt đang làm. */
-{k:"ychv",g:"_",hide:1,ic:"ti-school",t:"Học viên liên hệ",c:"Học viên gửi lên từ Cổng học viên - nhận và trả lời ngay",ty:"custom"},
+{k:"ychv",g:"_",ic:"ti-school",t:"Học viên liên hệ",c:"Học viên gửi lên từ Cổng học viên - nhận và trả lời ngay",ty:"custom"},
 /* 4 trang con gộp vào hub CSKH - ẩn khỏi menu, vẫn dùng được qua hub */
 {k:"review",g:"_",ic:"ti-clipboard-check",t:"Gửi khảo sát theo lớp",c:"Gửi khảo sát cho cả lớp",ty:"custom",hide:1},
-{k:"khaosat",g:"_",ic:"ti-clipboard-text",t:"Khảo sát & Phản hồi",c:"Theo dõi phiếu - xử lý phản hồi",ty:"custom",hide:1},
-{k:"ghinhan",g:"_",ic:"ti-message-plus",t:"Tiếp nhận & xử lý phản hồi",c:"Nhận qua gọi/nhắn, không qua form",ty:"custom",hide:1},
-{k:"khieunai",g:"_",ic:"ti-alert-triangle",t:"Xử lý Khiếu nại",c:"Tiếp nhận - xử lý - đóng",ty:"custom",hide:1},
+{k:"khaosat",g:"_",ic:"ti-clipboard-text",t:"Khảo sát & Phản hồi",c:"Theo dõi phiếu - xử lý phản hồi",ty:"custom"},
+{k:"ghinhan",g:"_",ic:"ti-message-plus",t:"Tiếp nhận & xử lý phản hồi",c:"Nhận qua gọi/nhắn, không qua form",ty:"custom"},
+{k:"khieunai",g:"_",ic:"ti-alert-triangle",t:"Xử lý Khiếu nại",c:"Tiếp nhận - xử lý - đóng",ty:"custom"},
 {k:"ketthuc",g:"Chặng · CSKH & Kết thúc",ic:"ti-flag",t:"Kết thúc & Tái ĐK",c:"Đầu ra - mời học tiếp",ty:"custom"},
 /* AC2 (Trưởng phòng ACA hỏi 06/08): app có chỗ NHẬP điểm đầu ra (Kết thúc & Tái ĐK) nhưng không
    có chỗ nào ĐỌC lại theo lớp, theo giảng viên, theo chi nhánh, theo loại lớp. Đây là chỗ đọc. */
 {k:"ketqua",g:"Chặng · CSKH & Kết thúc",ic:"ti-target-arrow",t:"Kết quả đầu ra & AIM",c:"Điểm 4 kỹ năng - hai tỷ lệ đạt AIM",ty:"custom"},
-{k:"baoluu",g:"_",ic:"ti-player-pause",t:"Bảo lưu / Bỏ học",c:"Trong Tính năng khác",ty:"custom",hide:1},
-{k:"magioithieu",g:"_",ic:"ti-gift",t:"Mã giới thiệu",c:"Trong Tính năng khác",ty:"custom",hide:1},
+{k:"baoluu",g:"_",ic:"ti-player-pause",t:"Bảo lưu / Bỏ học",c:"Trong Tính năng khác",ty:"custom"},
+{k:"magioithieu",g:"_",ic:"ti-gift",t:"Mã giới thiệu",c:"Trong Tính năng khác",ty:"custom"},
 /* ===== QUẢN LÝ ===== */
 {k:"baocao",g:"Quản lý",ic:"ti-chart-bar",t:"Tổng quan · Báo cáo & KPI",c:"Điều hành theo SOP",ty:"custom"},
 /* V9.60: bảng công giảng dạy vốn nằm trong Sổ thu học phí (một tab). Nhân sự cần đúng bảng đó
@@ -2735,10 +2736,10 @@ var PAGES=[
 {k:"duyet",g:"Chờ duyệt",ic:"ti-discount-check",t:"Chờ duyệt & quyết định",c:"Hàng chờ phê duyệt của toàn trung tâm",ty:"custom"},
 /* V9.29o: 5 mục con của hub Chờ duyệt - đứng riêng trên menu để người có thẩm quyền thấy thẳng
    việc của mình, go() remap về hub đúng tab (DUYMAP). hide:1 vì chúng không phải trang riêng. */
-{k:"duyetck",g:"_",hide:1,ic:"ti-discount-2",t:"Duyệt chiết khấu",c:"Chiết khấu vượt ngưỡng chờ quản lý",ty:"custom"},
-{k:"duyethoan",g:"_",hide:1,ic:"ti-arrow-back-up",t:"Duyệt hoàn tiền",c:"Hoàn tiền theo mốc SOP",ty:"custom"},
-{k:"duyetnghi",g:"_",hide:1,ic:"ti-user-question",t:"Duyệt xin nghỉ học",c:"Học viên báo nghỉ chờ học vụ duyệt",ty:"custom"},
-{k:"duyetthu",g:"_",hide:1,ic:"ti-receipt",t:"Xác nhận thu tiền",c:"Kế toán đối soát khoản đã ghi",ty:"custom"},
+{k:"duyetck",g:"_",ic:"ti-discount-2",t:"Duyệt chiết khấu",c:"Chiết khấu vượt ngưỡng chờ quản lý",ty:"custom"},
+{k:"duyethoan",g:"_",ic:"ti-arrow-back-up",t:"Duyệt hoàn tiền",c:"Hoàn tiền theo mốc SOP",ty:"custom"},
+{k:"duyetnghi",g:"_",ic:"ti-user-question",t:"Duyệt xin nghỉ học",c:"Học viên báo nghỉ chờ học vụ duyệt",ty:"custom"},
+{k:"duyetthu",g:"_",ic:"ti-receipt",t:"Xác nhận thu tiền",c:"Kế toán đối soát khoản đã ghi",ty:"custom"},
 /* V9.99u - "Việc chờ nhận" ĐÃ VỀ TRANG GIAO VIỆC (anh Luân: *"a thấy trong giao việc có: việc
    của tôi, tôi đã giao, tổng hợp và báo cáo. Sao em ko đưa việc chờ nhận vào luôn"*). Đúng: nó
    là một LÁT CẮT của "việc của tôi" (những việc tôi chưa bấm Nhận), không phải một hàng chờ
@@ -2747,7 +2748,7 @@ var PAGES=[
 {k:"duyetgiao",g:"_",hide:1,ic:"ti-inbox",t:"Việc chờ nhận",c:"Đã gộp vào Quản lý việc giao & nhận",ty:"custom"},
 {k:"hoidap",g:"Quản lý",ic:"ti-message-question",t:"Hỏi đáp",c:"Hỏi về một học viên, hoặc hỏi chỗ cấu hình",ty:"custom"},
 {k:"khac",g:"Quản lý",ic:"ti-adjustments",t:"Tính năng khác",c:"Bảo lưu · Mã giới thiệu · Bàn giao lead",ty:"custom"},
-{k:"banggiao",g:"_",ic:"ti-arrows-exchange",t:"Bàn giao lead",c:"Trong Tính năng khác",ty:"custom",hide:1},
+{k:"banggiao",g:"_",ic:"ti-arrows-exchange",t:"Bàn giao lead",c:"Trong Tính năng khác",ty:"custom"},
 {k:"settings",g:"Quản lý",ic:"ti-settings",t:"Cài đặt hệ thống",c:"Cấu hình",ty:"custom"},
 /* ẩn khỏi menu, giữ cho luồng gọi tới */
 {k:"nhanvien",g:"_",ic:"ti-id-badge",t:"Danh sách Nhân viên",c:"Quản lý ở Cài đặt",ty:"list",hide:1},
@@ -2955,6 +2956,19 @@ var ROLESCOPE={
       khoá cửa ghi thì phân quyền chỉ là trang trí - câu này đã ghi trên màn từ V9.41.
    3. Luôn có nút trả về mặc định, từng chức danh và toàn bộ. */
 function qtCfg(){var c=(DATA.config=DATA.config||{});c.quyenTrang=c.quyenTrang||{};return c.quyenTrang}
+/* ═══ V2 08/08 - CỜ `hide` TỪNG MANG HAI NGHĨA, VÀ CHUYỆN ĐÓ CẮN THẬT ═══════════════════════
+   `hide:1` được dùng cho HAI việc khác hẳn nhau:
+     · "không đứng trên menu" - đúng ở V1, vì 22 trang ấy là TAB của sáu hub;
+     · "không cho cấu hình"   - vì hàm này (và màn Menu, bảng phân quyền, hộp tìm toàn app)
+       đều lọc theo `!p.hide`.
+   V2 đưa 22 trang ấy LÊN MENU mà không ai gỡ cờ. Hậu quả đo được 08/08: **Lead · Test · Tư vấn ·
+   Thanh toán · Buổi học · WOW · Duyệt chiết khấu · Khiếu nại · Bảo lưu... không có trong màn
+   Cài đặt > Phân quyền trang, không bật/tắt được trong màn Menu, và KHÔNG TÌM RA trong hộp tìm.**
+   Trái thẳng luật anh Luân đặt 31/07: *"đưa mấy cái đó vào cài đặt đi, để sau này IT hiểu ý đồ
+   của anh là có thể bật tắt bất cứ thứ gì."*
+   Đã gỡ cờ cho đúng 22 trang đang đứng trên menu. `hide` từ nay chỉ còn MỘT nghĩa: trang chi
+   tiết mở ra từ một dòng (hồ sơ 360, hồ sơ GV, Vận hành lớp...), không có mục menu riêng.
+   `_checkv2.js` luật L2 canh: không trang ẩn nào lọt lên menu, và ngược lại. */
 function qtMoiTrang(){return PAGES.filter(function(p){return !p.hide}).map(function(p){return p.k})}
 /* Mặc định theo ROLESCOPE; nhóm khai "*" nghĩa là thấy hết. */
 function qtMacDinh(g,k){var b=ROLESCOPE[g];if(!b)return false;
@@ -3508,6 +3522,19 @@ function isRisk(v){return /at_risk|off_track/.test(ecode(v))}
    còn đa số dừng ở ngăn kéo là đủ. */
 var LISTCFG={
 hocvien:{code:"DL09",filt:"student_status",ro:1,sub:"Học viên (DL09) - lọc theo trạng thái / nguy cơ / lớp / khóa",extra:"hvExtraFilter",
+ /* ═══ V2 08/08 - TRANG NÀY TỪNG KHÔNG CÓ MỘT CON SỐ NÀO Ở ĐẦU ══════════════════════════════
+    Anh Luân chốt V2: *"mỗi trang là nghiệp vụ riêng, và nó có thẻ, có chip lọc, có cảnh báo của
+    riêng nó."* Học viên là trang nằm trong NHỊP NGÀY của ba chức danh (Học vụ, ACA, Trưởng phòng
+    Học vụ) - vậy mà mở ra là một bảng 193 dòng, không một con số dẫn đường.
+    `_checkkhuon` vẫn báo xanh vì phạm vi của nó là hình dạng V1 (chỉ soi 23 trang theo chặng);
+    `_checkv2` hỏi đúng tập trang thì lộ ra ngay. Ba thẻ dưới đây đọc CÙNG hàm với ba chip lọc
+    ngay dưới (`stuRisk`, `stuAca`, ngưỡng vắng của CH2), nên thẻ và chip không thể lệch nhau. */
+ the:function(all){
+  var nv=num(paramOf("thresholdAtRisk_absences",2));
+  return [["ti-alert-triangle",all.filter(stuRisk).length,"Nguy cơ bỏ học","#E24B4A","dấu hiệu có trước cả tuần"],
+   ["ti-chart-line",all.filter(stuAca).length,"Nguy cơ học thuật","#E08A1E","điểm tụt - đặt buổi WOW kèm"],
+   ["ti-calendar-x",all.filter(function(s){var A=riskAuto(s.student_id)||{};return num(A.abs)>=nv}).length,
+    "Vắng từ "+nv+" buổi","#7C3AED","gọi hỏi trước khi thành bỏ học"]]},
  /* V2 - CHIP LỌC PHẢI KHỚP VỚI CON SỐ TRÊN MÀN. Anh Luân đưa ca thật: *"Học vụ muốn có danh sách
     các học viên nghỉ học nhiều, và xếp theo lớp chẳng hạn, họ đủ thông tin ko, có đủ nghiệp vụ
     ko?"* Đo thật: dữ liệu CÓ (44 học viên vắng từ 2 buổi, 29 vắng từ 3, nhiều nhất 13 buổi), cột
@@ -9292,7 +9319,13 @@ function renderBanlam(){
  var h='<div class="bwhero"><div class="bwl"><div class="bwg">'+esc(greet)+', '+esc(meNm)+'</div>'+
   '<div class="bwsub"><span><b>'+tasks.length+'</b> việc cần xử lý</span>'+
    (over.length?('<span class="bwdot">·</span><span class="bwover">'+over.length+' quá hạn</span>'):'')+
-   (apChip?('<span class="bwdot">·</span>'+apChip):'')+'</div></div>'+
+   (apChip?('<span class="bwdot">·</span>'+apChip):'')+'</div>'+
+  /* V2 08/08 - BÀN LÀM VIỆC CHƯA BAO GIỜ NÓI NÓ LÀ CÁI GÌ. Ô chào có tên người và số việc, nhưng
+     không một câu nào nói trang này gom gì và đọc thế nào - người mới mở ra thấy một dải ô màu
+     rồi tự đoán. Anh Luân chốt V2: *"bàn làm việc em đổi thành: các chỉ số số cảnh báo đi, nó
+     tổng hợp những thứ bất thường ở các trang nghiệp vụ để cảnh báo, các nhân sự sẽ tự biết mình
+     cần làm gì."* Câu dưới đây nói đúng điều ấy, và `_checkkhuon` K1 canh nó từ nay. */
+  '<div class="bwctx">Mọi chỗ bất thường từ các trang nghiệp vụ của bạn gom về đây - đỏ là gấp, vàng sắp tới hạn. Bấm một ô để mở trang đẻ ra con số đó.</div></div>'+
   '<div class="bwr"><div class="bwsearch"><i class="ti ti-search"></i><input placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.CHAYSRCH||"")+'" oninput="chaySrch(this.value)" autocomplete="off"><div class="pkres" id="bwac" style="position:absolute;top:100%;left:0;right:0;z-index:30;background:#fff;color:var(--text);text-align:left;border-radius:0 0 10px 10px;box-shadow:0 8px 24px rgba(0,0,0,.18)"></div></div>'+
   '<span class="bwsrchhint" id="bwsrchhint"></span></div></div>'; /* V9.18b: hint phải nằm NGOÀI hộp tìm - nằm trong là chữ trắng trên nền trắng + bóp placeholder (Luân bắt lỗi) */
  /* V2 KHÚC 5 - DẢI CẢNH BÁO ĐẶT NGAY DƯỚI Ô CHÀO, TRÊN MỌI THỨ KHÁC.
@@ -12562,6 +12595,18 @@ function btHub(embed){
  var lop=find("DL10","class_id",cid)||{};var mode=window.BTMODE||"giao";
  var enr=rows("DL08").filter(function(e){return e.class_id===cid});
  var h=embed?'':'<div class="phead" data-tour="phead"><div><div class="t">Bài tập</div><div class="s">Chọn lớp và buổi, rồi giao bài cho cả lớp hoặc chấm bài từng học viên - đúng cách giáo viên làm việc</div></div></div>';
+ /* V2 08/08 - trang này vừa được mở quyền cho giáo viên và ACA (trước đó khai `hide:1`, app giục
+    họ chấm 12 bài mà không có cửa vào). Mở ra thì mọi luật chung của V2 mới áp được - và luật
+    đầu tiên là trang nghiệp vụ phải có dải thẻ. Ba thẻ đọc CÙNG hàm `btChoCham` mà nhịp ngày và
+    chip "Chờ chấm - mọi lớp" đang đọc. */
+ if(!embed){var _BT=srows("DL13");
+  h+=statStrip([
+   (function(){var n=_BT.filter(btChoCham).length;
+    return ["ti-writing",n,"Bài đã nộp, chờ chấm","#E24B4A",n?"chấm trễ thì buổi sau không biết lớp yếu chỗ nào":"chấm hết rồi"]})(),
+   (function(){var n=_BT.filter(function(x){return !hwSubmitted(x)&&!hwGraded(x)}).length;
+    return ["ti-inbox",n,"Đã giao, chưa thu","#E08A1E",n?"nhắc học viên trước hạn":"thu đủ cả"]})(),
+   (function(){var n=_BT.filter(hwGraded).length;
+    return ["ti-checks",n,"Đã chấm xong","#2E9E6B",""]})()],"baitap")}
  h+='<div class="fbar">';
  if(!embed)h+='<span class="lbl">Lớp</span><select class="sel" onchange="window.BTCLASS=this.value;reRender(CUR)">'+(cls.length?cls.map(function(c){return '<option value="'+esc(c.class_id)+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id+" - "+c.class_name)+'</option>'}).join(""):'<option>(không có lớp)</option>')+'</select>';
  var sesL=ddSessions(cid);
@@ -15194,8 +15239,14 @@ function renderKetqua(){
   if(f.loai==="mot"&&!r.l11)return false;
   if(f.loai==="nhom"&&r.l11)return false;
   return true});
- var h=pageHead("Điểm đầu ra từng học viên và tỷ lệ đạt AIM theo hai mốc: thi thử cuối khóa tại trung tâm và kỳ thi IELTS thật",
-  "",'<button class="btn primary" onclick="kqNhapThat()"><i class="ti ti-award"></i>Nhập điểm thi thật</button>');
+ /* V2 08/08 - CÂU MÔ TẢ TRUYỀN NHẦM Ô, NÊN TRANG NÀY CHƯA BAO GIỜ CÓ CÂU MÔ TẢ.
+    `pageHead(t,s,btn)` chỉ vẽ ô THỨ HAI (`s`) - tiêu đề đã có ở thanh trên từ UX-23, nên `t` bị
+    bỏ qua hoàn toàn. Trang này truyền câu mô tả vào `t` và để `s` rỗng, thành ra đầu trang là
+    một dải trắng. `_checkkhuon` mục K1 bắt được ngay khi phạm vi thước đổi sang tập trang V2 -
+    ở phạm vi cũ (23 trang theo chặng) trang này không hề bị soi. */
+ var h=pageHead("Kết quả đầu ra",
+  "Điểm đầu ra từng học viên và tỷ lệ đạt AIM theo hai mốc: thi thử cuối khóa tại trung tâm và kỳ thi IELTS thật",
+  '<button class="btn primary" onclick="kqNhapThat()"><i class="ti ti-award"></i>Nhập điểm thi thật</button>');
  /* Câu đầu trang giữ trong 150 ký tự (luật `_checkaudit`): đoạn dài hơn thì người ta không đọc,
     họ lướt qua. Phần giải thích chi tiết đưa vào chú thích rê chuột - ai cần thì có, ai không
     cần thì không phải bước qua nó mỗi lần vào trang. */
@@ -19800,8 +19851,16 @@ function renderTracuu(){
   h+='</div>'}
  return h+'</div></div>'}
 function renderNhansu(){
+ /* V2 08/08 - ba thẻ đọc cùng hàm với chip "Hồ sơ còn thiếu" của danh sách nhúng ngay dưới
+    (`hsThieuMot`), nên thẻ và chip không thể nói hai con số. */
+ var A=srows("DL01");
  return pageHead("Nhân sự",
   "Danh sách toàn bộ người đang làm việc tại trung tâm: chức danh, cơ sở, email đăng nhập và tình trạng.","")
+  +statStrip([
+   ["ti-users",A.filter(staffActive).length,"Đang làm việc","#2E5A88",""],
+   (function(){var n=A.filter(hsThieuMot).length;
+    return ["ti-id-badge-2",n,"Hồ sơ còn thiếu","#E08A1E",n?"chưa có chức danh hoặc chưa gắn cơ sở":"hồ sơ đủ cả"]})(),
+   ["ti-user-minus",A.filter(function(x){return !staffActive(x)}).length,"Đã nghỉ việc","#6B7887","giữ để tra lịch sử"]],"nhansu")
   +renderList("nhanvien",1)}
 function renderBangcong(){
  return pageHead("Bảng công giảng dạy",
@@ -19824,6 +19883,17 @@ function renderSothu(){var tab=window.STTAB||"da";
 function gvTab(k){window.GVTAB=k;reRender("giangvien")}
 function renderGiangvien(){var tab=window.GVTAB||"ds";
  var h=pageHead("Giảng viên & NV WOW","Hồ sơ đội ngũ đứng lớp (DL01) và bảng công giảng dạy của chính họ.","");
+ /* V2 08/08 - trang này nằm trong nhịp ngày của Nhân sự và ACA mà mở ra không một con số nào.
+    Ba thẻ đọc THẲNG lịch dạy thật (DL11), không chép lại phép đếm ở đâu khác. */
+ if(tab==="ds")h+=statStrip([
+  (function(){var t0=new Date();t0.setHours(0,0,0,0);
+   var n={};srows("DL11").forEach(function(x){var d=pvnd(x.session_date);
+    if(d&&sameDay(d,t0)&&String(x.teacher_id||"").trim())n[x.teacher_id]=1});
+   return ["ti-chalkboard",Object.keys(n).length,"Giảng viên có lớp hôm nay","#2E5A88","đang đứng lớp"]})(),
+  (function(){var n=bcThieuMoc().length;
+   return ["ti-clock-exclamation",n,"Buổi thiếu mốc giờ vào/ra","#E08A1E",n?"thiếu mốc thì tính công sai":"đủ mốc cả"]})(),
+  (function(){var n=srows("DL10").filter(lopThieuGV).length;
+   return ["ti-user-off",n,"Lớp đang mở chưa có GV chính","#E24B4A",n?"gán người trước khi tới buổi":"lớp nào cũng có GV"]})()],"giangvien");
  /* V9.99z5 - tab "Bảng công giảng dạy" hỏi ĐÚNG một cửa với mục menu cùng tên (`navVis`), nên
     thanh tab và thanh menu không thể nói hai đằng. Trước bản này mọi chức danh xem được trang
     Giảng viên đều bấm được bảng công - tức đọc được giờ dạy dùng để chốt lương của cả trung

@@ -51,17 +51,14 @@ const TRAN_THIEU_NUT  = 12;  /* trang chưa có nút hành động chính */
    Khai một chỗ này mạnh hơn để trần bằng 1: trần chỉ nói "còn một trang thiếu", còn bản khai nói
    RÕ trang nào và VÌ SAO. Trần bằng 0 cộng bản khai = từ nay mọi trang nghiệp vụ hoặc có thẻ,
    hoặc nói được vì sao không cần - không còn chỗ nào lọt qua trong im lặng. */
-const KHONGTHE = {
-  lichtuan: "lich tuan la mot BUC TRANH THOI GIAN - ban than luoi lich da la cach doc nhanh nhat " +
-            "(nhin mot cai la thay tuan nay day bao nhieu, o nao trong). Dat mot dai the so o tren " +
-            "no la noi lai bang chu cai ma mat vua doc bang hinh - them mot cho phai doc, khong " +
-            "them mot thong tin nao. Nhung con so ve buoi trong tuan da co trang Buoi hom nay lo.",
-};
+/* V2 08/08 - `lichtuan` roi khoi bang nay vi no khong con la TRANG NGHIEP VU: bang khai chung
+   `_v2def.js` xep no vao dien "luoi thoi gian, khong phai danh sach ho so", kem dung ly do cu -
+   luoi lich da la cach doc nhanh nhat, dat mot dai the so o tren no la noi lai bang chu cai ma
+   mat vua doc bang hinh. Khai o MOT cho, khong khai hai noi. */
+const KHONGTHE = {};
 
 /* Trang CHỈ ĐỂ ĐỌC - không có nút hành động là đúng, nhưng phải khai kèm lý do đọc được. */
 const CHIDOC = {
-  lichtuan: "lich tuan la BUC TRANH thoi gian - viec dat/doi lich nam o trang cua chinh buoi do; " +
-            "them mot nut ghi o day la de mot cua ghi thu hai cho cung mot viec (pham RB1).",
   phong:    "trang doi chieu phong va gio - no CHI RA cho dung, con sua thi sua o lich cua lop.",
   buoihnay: "lat cat theo ngay cua buoi hoc - moi viec tren buoi deu mo tu chinh dong buoi do.",
 };
@@ -106,11 +103,18 @@ const do_ = [], thieu = {the: [], loc: [], nut: [], cau: [], rong: [], hub: []};
 /* 25 trang nghiệp vụ - lấy từ chính bản khai `HUBTAB` (nó nay là bản khai "trang nào là một
    nghiệp vụ", không còn là bản khai hub). Không gõ tay danh sách: gõ tay là thêm một nghiệp vụ
    mới thì quên thêm vào đây, và bộ kiểm im lặng bỏ sót đúng trang mới nhất. */
-const NV = [];
-try { for (const h in HUBTAB) { const m = HUBTAB[h].m || {}; for (const t in m) if (NV.indexOf(m[t]) < 0) NV.push(m[t]); } }
-catch (e) { console.log("CHECKKHUON DO: khong doc duoc ban khai nghiep vu"); process.exit(1); }
-
+/* ═══ V2 08/08 - PHAM VI CUA THUOC NAY TUNG LA HINH DANG V1 ════════════════════════════════
+   Cau cu: `NV` dung tu `HUBTAB` - bang TAB CUA SAU HUB BAN V1. No bao "23 trang nghiep vu |
+   thieu the 0/0" nghe rat yen tam, trong khi BON trang nghiep vu THAT dung tren menu V2 (Hoc
+   vien, Giang vien, Bai tap, Nhan su) khong he bi soi - va ca bon deu thieu dai the.
+   Thuoc bao xanh vi NO DEM SAI TAP TRANG, khong phai vi app dung.
+   Anh Luan 08/08: *"v2 ko phai v1, no co dac thu rieng cua no."*
+   Nay hoi ban khai chung `_v2def.js`: trang KHONG AN, DUNG TREN MENU, tru nhung trang da khai
+   ro ly do khong thuoc dien. Them mot trang nghiep vu vao menu la no tu bi soi, khong phai nho
+   sua thuoc - do la khac biet giua mot ban khai va mot danh sach chep tay. */
 try { setRole("all"); applyScope(""); } catch (e) {}
+const NV = require("./_v2def.js").trangNghiepVu(global);
+if (!NV.length) { console.log("CHECKKHUON DO: khong doc duoc tap trang nghiep vu"); process.exit(1); }
 
 /* Bóc chữ hiện ra khỏi HTML - đo trên thứ NGƯỜI DÙNG ĐỌC, không đo mã nguồn. */
 function chu(h) { return String(h || "").replace(/<[^>]*>/g, " ").replace(/&[a-z]+;/g, " ").replace(/\s+/g, " ").trim(); }
@@ -131,7 +135,13 @@ NV.forEach(k => {
   /* Lấy ĐÚNG khối câu (`<div class="s">...`), không lấy cả vùng đầu trang: `pageHead` gắn BẢNG
      VIỆC ngay sau đó, ăn lan sang đấy là đếm cả một cái bảng vào độ dài một câu - lại một phép
      đo phóng đại. Đo cái gì thì phải bám đúng cái đó. */
-  const mHead = h.match(/class="phead[^"]*"[\s\S]{0,80}?class="s"[^>]*>([\s\S]{0,1200}?)<\/div>/);
+  /* V2 08/08 - HAI HÌNH DẠNG ĐẦU TRANG, CÙNG MỘT CÂU HỎI. Hầu hết trang dùng `pageHead` (khối
+     `.phead` + dòng `.s`), riêng Bàn làm việc có ô CHÀO (`.bwhero`) - hình dạng khác vì nó là
+     trang đáp, không phải trang danh sách. Câu hỏi không đổi: TRANG NÀY CÓ NÓI NÓ LÀ CÁI GÌ
+     KHÔNG. Hỏi cả hai chỗ thì trang nào cũng phải trả lời, không trang nào lách được bằng cách
+     dựng đầu trang kiểu riêng. */
+  const mHead = h.match(/class="phead[^"]*"[\s\S]{0,80}?class="s"[^>]*>([\s\S]{0,1200}?)<\/div>/)
+             || h.match(/class="bwctx"[^>]*>([\s\S]{0,1200}?)<\/div>/);
   const cau = mHead ? chu(mHead[1]) : "";
   if (!cau) thieu.cau.push(k + " (khong co cau ngu canh)");
   else if (cau.length > 150) thieu.cau.push(k + " (cau dau trang " + cau.length + " ky tu, tran 150)");
@@ -154,7 +164,16 @@ NV.forEach(k => {
      đang lọc được thật. Đã cắn: trang Lead có chip lọc nhanh (`qfToggle`) chạy hẳn hoi - đo được
      bấm chip "Tới hẹn liên hệ" thì 20 dòng còn 2 - mà bộ kiểm vẫn ghi "chưa có lọc", vì bản đầu
      chỉ dò `fset(` và `class="fbar"`. */
-  if (!/class="fbar|class="chipf|onclick="fset\(|onclick="qfToggle\(/.test(h)) thieu.loc.push(k);
+  /* V2 08/08 - HOI THEO THU NGUOI DUNG NHIN THAY, KHONG HOI THEO TEN HAM.
+     Cau tren van con thieu: no do BON dau hieu, ma app co it nhat SAU cach dat chip -
+     `fset` (trang tac vu) · `qfToggle` (chip tuy bien) · `toggleFilt` (chip trang thai) ·
+     `window.XLFILT` (Xep lop) · `viecOnly` (Viec hom nay) · `window.GATAB` (Giao an).
+     Cham oan nam trang dang loc duoc that. Va do la lan CAN THU HAI cung mot kieu - ghi chu
+     ngay tren da ke lan thu nhat roi.
+     Cach hoi dung: dai chip la mot THANH PHAN co hinh dang rieng (`<button class="segb">` dung
+     trong `<div class="seg">`) - hoi thang no thi them mot kieu chip moi cung tu duoc dem,
+     khong phai nho sua thuoc. Do tren chuoi HTML that, dung hoi lai ten ham. */
+  if (!/class="fbar|class="chipf|<button class="segb/.test(h)) thieu.loc.push(k);
 
   /* K5 - KHÔNG BAO GIỜ ĐỂ MỘT KHOẢNG TRẮNG. Hỏi đúng câu: trang có dòng dữ liệu nào không -
      nếu KHÔNG có thì phải có lời nói vì sao (`.empty`). Bản đầu hỏi ngược ("có khối rỗng không")
@@ -188,8 +207,8 @@ if (thieu.rong.length) do_.push("K5 trang thai rong khong biet noi: " + thieu.ro
 if (thieu.hub.length)  do_.push("K6 CON DINH TOI HUB - trang nghiep vu van ve thanh tab hub cu: " + thieu.hub.join(", "));
 
 if (thieu.the.length > TRAN_THIEU_THE) do_.push("K3 thieu dai the: " + thieu.the.length + " trang, qua tran " + TRAN_THIEU_THE + " - " + thieu.the.slice(0,5).join(", "));
-if (thieu.loc.length > TRAN_THIEU_LOC) do_.push("K4 thieu chip loc: " + thieu.loc.length + " trang, qua tran " + TRAN_THIEU_LOC + " - " + thieu.loc.slice(0,5).join(", "));
-if (thieu.nut.length > TRAN_THIEU_NUT) do_.push("K2 thieu nut hanh dong: " + thieu.nut.length + " trang, qua tran " + TRAN_THIEU_NUT + " - " + thieu.nut.slice(0,5).join(", "));
+if (thieu.loc.length > TRAN_THIEU_LOC) do_.push("K4 thieu chip loc: " + thieu.loc.length + " trang, qua tran " + TRAN_THIEU_LOC + " - " + thieu.loc.join(", "));
+if (thieu.nut.length > TRAN_THIEU_NUT) do_.push("K2 thieu nut hanh dong: " + thieu.nut.length + " trang, qua tran " + TRAN_THIEU_NUT + " - " + thieu.nut.join(", "));
 
 console.log("  " + NV.length + " trang nghiep vu | thieu the " + thieu.the.length + "/" + TRAN_THIEU_THE +
             " · thieu loc " + thieu.loc.length + "/" + TRAN_THIEU_LOC +
