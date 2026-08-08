@@ -150,17 +150,23 @@ const vais=[...new Set(nguoi.map(s=>String(s.role||"")))].filter(Boolean).sort()
    (trong.length?(" | sach viec: "+trong.length+" chuc danh"):""));
 })();
 
-/* ═══ L5 · MỖI TRANG NGHIỆP VỤ CÓ DẢI THẺ ═══════════════════════════════════════════════════ */
+/* ═══ L5 · MỖI TRANG NGHIỆP VỤ CÓ DẢI THẺ - CANH Ở `_checkkhuon`, KHÔNG CANH LẠI Ở ĐÂY ══════
+   Anh Luân 08/08: *"Ở v2 có nhất thiết 40 bộ kiểm ko? Hội đồng xem có dư thừa gì ko?"*
+   Đo ra: chính em vừa tạo một chỗ TRÙNG trong ngày hôm nay. Luật "trang nghiệp vụ phải có dải
+   thẻ" là mục K3 của `_checkkhuon` từ trước; sáng nay em viết lại nó thành L5 ở đây, cùng một
+   phép thử (`class="bstats"`), cùng một tập trang (cả hai đọc `_v2def.js`).
+   MỘT LUẬT ĐO HAI CHỖ KHÔNG AN TOÀN HƠN - nó chỉ tạo hai nơi phải giữ đồng bộ, và ngày nào đó
+   hai nơi nói hai đằng thì người sửa không biết tin cái nào. Đó đúng là con bệnh mà cả hai
+   thước ấy sinh ra để bắt.
+   Luật L5 VẪN CÒN NGUYÊN trong bản chốt của hội đồng - chỉ là nó có đúng MỘT cái thước, và cái
+   thước ấy tên là `_checkkhuon` mục K3. Ghi ở đây để người sau khỏi tưởng luật bị bỏ. */
 (function(){
  try{gateEnter("")}catch(e){}
- const M=menuKeysAll();
- const nv=Object.keys(M).filter(k=>PBK[k]&&!PBK[k].hide&&!KHONG_NGHIEP_VU[k]);
- const thieu=nv.filter(k=>!/class="bstats/.test(ve(k)));
- t("L5 · moi trang nghiep vu tren menu deu co dai the so ("+nv.length+" trang)", thieu.length===0,
-   thieu.join(" · ")+" => lam dai the, hoac khai ly do o KHONG_NGHIEP_VU");
+ const nv=V2.trangNghiepVu(global);
+ ghi.push(nv.length+" trang nghiep vu tren menu | "+Object.keys(KHONG_NGHIEP_VU).length+
+  " trang khai ro khong thuoc dien | dai the: xem _checkkhuon muc K3");
  const thua=Object.keys(KHONG_NGHIEP_VU).filter(k=>!PBK[k]);
  t("L5 · ban khai khong-phai-nghiep-vu khong nhac trang da bien mat", thua.length===0, thua.join(" · "));
- ghi.push(nv.length+" trang nghiep vu tren menu | "+Object.keys(KHONG_NGHIEP_VU).length+" trang khai ro khong thuoc dien");
 })();
 
 /* ── in ── */

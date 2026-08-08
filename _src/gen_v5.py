@@ -3799,6 +3799,30 @@ var THEDEF={
   ["nl_moi","Lead mới chưa chạm","Khách vừa vào hệ thống, chưa ai gọi hay nhắn lần nào - phản hồi trong hạn SLA là việc gấp nhất. Danh sách: bấm chip \"Mới\" ở thanh lọc ngay dưới."],
   ["nl_hen","Tới hẹn liên hệ","Khách có mốc hẹn liên hệ đã tới hoặc đã qua, và chưa chốt cũng chưa từ chối. Danh sách: cột Hẹn liên hệ ở bảng dưới, xếp theo mốc gần nhất."],
   ["nl_khong","Chưa ai phụ trách","Lead chưa gán nhân viên nào - không ai nhận thì không ai gọi. Danh sách: cột NV phụ trách để trống ở bảng dưới."]]},
+ /* V2 08/08 - BỐN DẢI THẺ MỚI. Chúng sinh ra khi `_checkkhuon` đổi phạm vi sang tập trang V2
+    (23 -> 33) và lộ ra bốn trang nghiệp vụ thật chưa có một con số nào ở đầu. Mỗi ô phải khai ở
+    đây kèm câu giải thích + CHỈ RÕ tìm danh sách của con số đó ở đâu - `_checkux` canh: số ô vẽ
+    ra phải khớp số ô khai, và mỗi ô phải nói được nó dẫn tới đâu. Một con số không dẫn tới đâu
+    là đúng con bệnh anh Luân bắt hai lần: *"báo 2 học viên nguy cơ mà a chẳng thấy đâu"*. */
+ hocvien:{t:"Học viên",the:[
+  ["hv_nguyco","Nguy cơ bỏ học","Học viên có cờ nguy cơ chuyên cần hoặc học thuật - dấu hiệu luôn có trước cả tuần. Danh sách: bấm chip \"Nguy cơ\" ở thanh lọc ngay dưới."],
+  ["hv_hocthuat","Nguy cơ học thuật","Điểm đang tụt so với lộ trình - đặt buổi WOW kèm trước khi thành bỏ học. Danh sách: bấm chip \"Nguy cơ học thuật\"."],
+  ["hv_vang","Vắng nhiều buổi","Số buổi vắng đã chạm ngưỡng cấu hình ở CH2. Danh sách: bấm chip \"Vắng từ N buổi\", hoặc xếp cột \"Vắng (buổi)\"."]]},
+ giangvien:{t:"Giảng viên & NV WOW",the:[
+  ["gv_homnay","Giảng viên có lớp hôm nay","Đếm người có ít nhất một buổi dạy trong ngày. Danh sách: trang Buổi hôm nay bày đủ từng buổi kèm giảng viên."],
+  ["gv_moc","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy xong mà thiếu mốc giờ - thiếu là tính công sai. Danh sách: tab Bảng công giảng dạy ngay trên trang này."],
+  ["gv_trong","Lớp đang mở chưa có GV chính","Lớp đang chạy mà chưa gán giảng viên chính. Danh sách: trang Lớp học, cột Giảng viên để trống."]]},
+ baitap:{t:"Giao & chấm Bài tập",the:[
+  ["bt_cham","Bài đã nộp, chờ chấm","Học viên đã nộp mà chưa có điểm. Danh sách: bấm chip \"Chờ chấm - mọi lớp\" ở thanh chế độ ngay dưới."],
+  ["bt_thu","Đã giao, chưa thu","Bài đã giao mà chưa ghi nhận nộp hay không nộp. Danh sách: chọn lớp rồi vào chế độ \"Thu bài\"."],
+  /* Thước đòi MỌI ô phải nói tìm danh sách ở đâu - kể cả ô chỉ để biết. Đúng: một con số không
+     dẫn tới đâu là con bệnh anh Luân bắt hai lần (*"báo 2 học viên nguy cơ mà a chẳng thấy đâu"*),
+     và "ô này chỉ để xem thôi" là đúng cái câu người ta hay dùng để né luật ấy. */
+  ["bt_xong","Đã chấm xong","Số bài đã có điểm. Danh sách: sổ Bài tập trong trang Tra cứu, cột Điểm và Ngày chấm."]]},
+ nhansu:{t:"Nhân sự",the:[
+  ["ns_dang","Đang làm việc","Người còn đang làm tại trung tâm. Danh sách: bấm chip \"Đang làm việc\" ở bảng ngay dưới."],
+  ["ns_thieu","Hồ sơ còn thiếu","Chưa có chức danh, hoặc vai cần cơ sở mà chưa gắn cơ sở. Danh sách: bấm chip \"Hồ sơ còn thiếu\"."],
+  ["ns_nghi","Đã nghỉ việc","Giữ lại để tra lịch sử. Danh sách: bấm chip \"Đã nghỉ việc\"."]]},
  lop:{t:"Lớp học",the:[
   ["lop_chay","Lớp đang học","Lớp đang chạy buổi. Danh sách: bấm chip \"Đang học\" ở thanh lọc ngay dưới."],
   ["lop_mo","Đang tuyển / chờ mở","Lớp đã lên kế hoạch hoặc đang tuyển thêm học viên. Danh sách: bấm chip tương ứng ở thanh lọc."],
@@ -13217,7 +13241,24 @@ var APPPARAMS=[
  /* V9.41: SOP có mã nhắc riêng cho "học viên im ắng quá lâu" (NA067) - naFor đọc tham số này để
     quyết định. Thêm luật mà quên ô sửa là lại đẻ ra hằng số cắm cứng; _check16 canh hai chiều. */
  ["P6 · Học viên nguy cơ","slaActivity_inactive_days","Học viên không có hoạt động nào (điểm danh, bài tập, WOW) quá bao nhiêu ngày thì phải hỏi thăm","ngày",7]];
-function pvnd(s){var m=String(s||"").match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);if(!m)return null;return new Date(+m[3],+m[2]-1,+m[1],m[4]?+m[4]:0,m[5]?+m[5]:0)}
+/* ═══ V2 08/08 - NHỚ MỐC THỜI GIAN ĐÃ ĐỌC ═══════════════════════════════════════════════════
+   Anh Luân hỏi V2 có cần 40 bộ kiểm không. Đo giờ từng bộ rồi soi hồ sơ chạy thì chỗ nóng nhất
+   KHÔNG nằm trong bộ kiểm mà nằm trong app: biểu thức đọc ngày dưới đây chiếm ~4% toàn bộ thời
+   gian, vì mỗi lần vẽ một trang là nó đọc lại từ đầu hàng nghìn chuỗi ngày Y HỆT NHAU.
+   Đây không phải chuyện của riêng verify - **người dùng thật trên điện thoại trả đúng cái giá
+   đó mỗi lần bấm một chip lọc.**
+   NHỚ MỐC (số), KHÔNG NHỚ ĐỐI TƯỢNG `Date`: ba chỗ trong app gọi `pvnd(...)` rồi sửa thẳng vào
+   kết quả (`d.setHours(0,0,0,0)`) - dùng chung một đối tượng thì chỗ này sửa, chỗ kia lãnh, và
+   đó là loại lỗi im lặng tệ nhất. Trả về `Date` mới mỗi lần, chỉ bỏ được phần ĐẮT là khớp chuỗi.
+   Bộ nhớ đệm gắn theo CHUỖI nên dữ liệu đổi cũng không sai: chuỗi khác thì khoá khác. */
+var _PVND={},_PVNDN=0;
+function pvnd(s){
+ var k=String(s||"");if(!k)return null;
+ if(k in _PVND){var c=_PVND[k];return c==null?null:new Date(c)}
+ var m=k.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+ var d=m?new Date(+m[3],+m[2]-1,+m[1],m[4]?+m[4]:0,m[5]?+m[5]:0):null;
+ if(_PVNDN<20000){_PVND[k]=d?d.getTime():null;_PVNDN++}
+ return d}
 function hoursSince(s){var d=pvnd(s);return d?(Date.now()-d.getTime())/3600000:null}
 function nowStr(){var d=new Date();function p(n){return n<10?"0"+n:n}return p(d.getDate())+"/"+p(d.getMonth()+1)+"/"+d.getFullYear()+" "+p(d.getHours())+":"+p(d.getMinutes())}
 function obState(o){var sent=!!(o.class_info_sent_at&&String(o.class_info_sent_at).trim());var confirmed=/confirmed/.test(ecode(o.class_confirmation_status));var rejected=ecode(o.class_confirmation_status)==="rejected";var done=/completed/.test(ecode(o.onboarding_status));var infoLim=paramOf("slaClassInfoZalo_hours",24),obLim=paramOf("slaOBT_hours",48);var hs=hoursSince(o.assigned_at);return {sent:sent,confirmed:confirmed,rejected:rejected,done:done,infoOverdue:!sent&&hs!=null&&hs>infoLim,obOverdue:!done&&hs!=null&&hs>obLim}}
