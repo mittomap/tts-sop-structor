@@ -3625,6 +3625,26 @@ function colMenuHTML(key){var cfg=LISTCFG[key];if(window.COLMENU!==key)return ''
    Bộ kiểm _checkux canh: dải nào gọi statStrip mà không khai ở đây là đỏ; số thẻ khai lệch với
    số thẻ vẽ ra thật cũng đỏ; thẻ nào còn onclick cũng đỏ. */
 var THEDEF={
+ /* ═══ V2 KHÚC 2b - BỐN HÀNG CHỜ PHÊ DUYỆT CÓ DẢI THẺ RIÊNG ════════════════════════════════
+    Anh Luân tả V2: *"mỗi trang là nghiệp vụ riêng, và nó có THẺ, có chip lọc, có cảnh báo của
+    riêng nó"*. Bốn hàng chờ này tách ra thành bốn trang ở Khúc 2a nhưng chưa có thẻ nào.
+    LUẬT KHI THÊM THẺ (RB2): con số phải lấy từ ĐÚNG hàm mà thân trang đang dùng - `duyCkList`,
+    `duyRefundList`, `absQueue`, `duyPayList`. Viết lại phép đếm ở dải thẻ là đẻ ra đúng con bệnh
+    anh Luân bắt hai lần trong hai ngày: cái thẻ và cái bảng hỏi hai hàm khác nhau cho cùng một
+    câu hỏi, số không sai nhưng nó KHÔNG DẪN TỚI ĐÂU. */
+ duyetck:{t:"Duyệt chiết khấu",the:[
+  ["dck_cho","Đơn chờ duyệt","Đơn đăng ký có chiết khấu vượt mức tự quyết, đang chờ người có thẩm quyền gật. Danh sách: ngay dưới dải thẻ này."],
+  ["dck_vuot","Vượt mức tự quyết","Trong số đơn chờ, đếm riêng đơn có số tiền giảm vượt ngưỡng tự quyết (chỉnh ở Cài đặt, thresholdDiscount_approval). Danh sách: đơn nào vượt đều có chip đỏ ở dòng."],
+  ["dck_tien","Tổng tiền đang giảm","Cộng phần giảm của mọi đơn đang chờ - đây là số tiền trung tâm sẽ bớt nếu duyệt hết. Danh sách: cột Giảm ở từng đơn dưới."]]},
+ duyethoan:{t:"Duyệt hoàn tiền",the:[
+  ["dho_cho","Yêu cầu chờ xử lý","Yêu cầu hoàn tiền đang chờ quyết định. Danh sách: ngay dưới dải thẻ này."],
+  ["dho_tien","Tổng tiền chờ hoàn","Cộng số đã thu của các đơn đang xin hoàn - số tiền có thể phải trả lại. Danh sách: cột số tiền ở từng yêu cầu dưới."]]},
+ duyetnghi:{t:"Duyệt xin nghỉ học",the:[
+  ["dng_cho","Đơn chờ duyệt","Học viên đã báo nghỉ, chờ học vụ duyệt. Duyệt rồi thì buổi đó không tính vắng. Danh sách: ngay dưới dải thẻ này."],
+  ["dng_bu","Có xin học bù","Trong số đơn chờ, đếm riêng người muốn học bù - duyệt xong còn phải xếp buổi bù cho họ. Danh sách: đơn nào xin bù đều ghi rõ ở dòng."]]},
+ duyetthu:{t:"Xác nhận thu tiền",the:[
+  ["dth_cho","Khoản chờ đối soát","Khoản thu đã ghi nhận mà kế toán chưa xác nhận tiền về tài khoản. Danh sách: ngay dưới dải thẻ này."],
+  ["dth_tien","Tổng tiền chờ đối soát","Cộng số tiền của các khoản chờ - chưa đối soát thì chưa chắc đã về. Danh sách: cột số tiền ở từng khoản dưới."]]},
  lopruiro:{t:"Vận hành lớp - cần xử lý",the:[
   ["lr_nguyco","Học viên nguy cơ","Học viên của lớp này đang bị đánh dấu nguy cơ - vắng nhiều hoặc điểm học thuật dưới ngưỡng. Muốn xem: tab Học viên ngay dưới, cột trạng thái có chip đỏ."],
   ["lr_chuadd","Buổi chưa điểm danh","Buổi ĐÃ dạy xong mà chưa có một dòng điểm danh nào. Buổi chưa tới thì không tính - chưa dạy thì chưa phải việc. Muốn xem: tab Điểm danh."],
@@ -21295,10 +21315,25 @@ RENDER.ychv      = function(){return renderYcHV()};           /* tự có đầu
 RENDER.khaosat   = function(){return renderReview()};         /* embed rỗng -> tự vẽ đầu trang */
 RENDER.buoihnay  = function(){return nvHead("buoihnay")+renderHtToday(1)};
 RENDER.lichtuan  = function(){return nvHead("lichtuan")+renderLichTuan(1)};
-RENDER.duyetck   = function(){return nvHead("duyetck")+duyCkHTML(ckThreshold())+_duyAi()};
-RENDER.duyethoan = function(){return nvHead("duyethoan")+duyHoanHTML()+_duyAi()};
-RENDER.duyetnghi = function(){return nvHead("duyetnghi")+duyNghiHTML()+_duyAi()};
-RENDER.duyetthu  = function(){return nvHead("duyetthu")+duyThuHTML()+_duyAi()};
+/* Dải thẻ của bốn hàng chờ - mỗi con số gọi ĐÚNG hàm mà thân trang bên dưới đang dùng, nên
+   thẻ và bảng không bao giờ nói hai con số khác nhau. */
+RENDER.duyetck   = function(){var L=duyCkList(),TH=ckThreshold();
+ return nvHead("duyetck")+statStrip([
+  ["ti-discount-2",L.length,"Đơn chờ duyệt","#E08A1E",""],
+  ["ti-alert-triangle",L.filter(function(e){return num(e.discount_amount)>TH}).length,"Vượt mức tự quyết","#E24B4A",""],
+  ["ti-cash",vnd(L.reduce(function(a,e){return a+num(e.discount_amount)},0)),"Tổng tiền đang giảm","#6B7887",""]],"duyetck")+duyCkHTML(TH)+_duyAi()};
+RENDER.duyethoan = function(){var L=duyRefundList();
+ return nvHead("duyethoan")+statStrip([
+  ["ti-arrow-back-up",L.length,"Yêu cầu chờ xử lý","#E08A1E",""],
+  ["ti-cash",vnd(L.reduce(function(a,e){return a+num(e.paid_amount)},0)),"Tổng tiền chờ hoàn","#6B7887",""]],"duyethoan")+duyHoanHTML()+_duyAi()};
+RENDER.duyetnghi = function(){var L=absQueue();
+ return nvHead("duyetnghi")+statStrip([
+  ["ti-user-question",L.length,"Đơn chờ duyệt","#E08A1E",""],
+  ["ti-repeat",L.filter(function(a){return String(a.absence_want_makeup||"").trim()&&!/^(0|no|false|khong)$/i.test(String(a.absence_want_makeup))}).length,"Có xin học bù","#3B82C4",""]],"duyetnghi")+duyNghiHTML()+_duyAi()};
+RENDER.duyetthu  = function(){var L=duyPayList();
+ return nvHead("duyetthu")+statStrip([
+  ["ti-receipt",L.length,"Khoản chờ đối soát","#E08A1E",""],
+  ["ti-cash",vnd(L.reduce(function(a,p){return a+num(p.amount)},0)),"Tổng tiền chờ đối soát","#6B7887",""]],"duyetthu")+duyThuHTML()+_duyAi()};
 
 /* ═══ SÁU HUB THÀNH BÍ DANH, KHÔNG THÀNH TRANG CHẾT ════════════════════════════════════════
    Sáu khoá hub (`tuyensinh` `hoctap` `cskh` `khac` `duyet` `giangvien`) vẫn còn đầy rẫy trong

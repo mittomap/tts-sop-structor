@@ -38,7 +38,9 @@ const FS = require("fs"), PATH = require("path");
 const APP = process.env.ITTS_APP || PATH.join(__dirname, "_APP.js");
 
 /* ---- trần: SỐ ĐO ĐƯỢC lúc dựng bộ này. Chỉ được HẠ, không bao giờ nâng. ---- */
-const TRAN_THIEU_THE  = 16;  /* trang nghiệp vụ chưa có dải thẻ riêng */
+/* 16 -> 10: Khúc 2b đã cho bốn hàng chờ phê duyệt dải thẻ riêng. Trần HẠ theo, đúng luật chốt
+   kéo xuống - sửa được trang nào thì hạ xuống đúng số mới, không bao giờ nâng lên. */
+const TRAN_THIEU_THE  = 10;  /* trang nghiệp vụ chưa có dải thẻ riêng */
 /* 12 = SỐ ĐO ĐƯỢC. Bản đầu em đặt 8 - một con số ĐOÁN, và nó đỏ ngay. Trần phải là số đo được
    thật: đặt thấp hơn thực tế thì lần nào cũng đỏ, mà một bộ kiểm đỏ mãi thì người ta tắt nó đi.
    Danh sách 12 trang in ra ngay dưới bảng tổng kết - sửa được trang nào thì HẠ trần xuống. */
