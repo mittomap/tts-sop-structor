@@ -167,6 +167,13 @@ chay "_checkroi menu co lam roi khong" "CHECKROI (OK|BO QUA)" node _checkroi.js
 # mot kieu thi nguoi dung phai hoc lai bo cuc o tung trang.
 # Bo nay do TUNG TRANG theo sau mat cua khuon, tren chu HIEN RA chu khong tren ma nguon.
 chay "_checkkhuon khuon trang nghiep vu" "CHECKKHUON (OK|BO QUA)" node _checkkhuon.js
+# V2 RB1 (anh Luan: "cung 1 nghiep vu, ma o ban hien tai co the lam duoc o rat nhieu noi, se lam
+# cho nhan su bi roi"). Do khong phai bang cach dem cua ghi - 146 cua tren 24 bang la 146 NGHIEP
+# VU KHAC NHAU, khong cua nao thua. Do bang dau vet khong cai duoc: HAI HAM CUNG PHAT RA MOT `id=`
+# cho o nhap, tuc hai ban dung cho mot form. Va no khong chi la chuyen gon gang - ngan keo mo de
+# len trang thi getElementById vo trung ban o duoi, app ghi mot con so KHAC con so nguoi ta go
+# (bay so 4 cua BAN_GIAO_V2, da can that).
+chay "_checkmotcua mot nghiep vu mot cua ghi" "CHECKMOTCUA (OK|BO QUA)" node _checkmotcua.js
 chay "_checkmoi khong moi roi duoi" "TONG:" node _checkmoi.js
 
 echo
