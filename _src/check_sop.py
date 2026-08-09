@@ -186,7 +186,6 @@ TRIG_BOQUA = {
     # ngay), app CO sinh ra tinh huong nay that - giu trong danh sach bo qua la khai gian.
     "NA045": "Nhan 'khieu nai da dong' - trang thai XONG, con viec hoi lai HV thi da co luat rieng "
              "(slaComplaintFollowup_days).",
-    "NA056": "Ma cu cua 'da tu van chua tao don' - app dung NA001 (con han) va NA055 (qua han).",
     "NA059": "Nhan 'da hoan tien xong' - trang thai XONG.",
     "NA068": "Nhan 'HV dang hoc binh thuong' - khong co viec gi.",
     "NA069": "Nhan 'HV da tot nghiep' - trang thai XONG.",

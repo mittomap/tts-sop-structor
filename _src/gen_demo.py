@@ -1413,6 +1413,18 @@ def add_survey(s,cid,stype,kind):
         sub=sent+days(2)
         row.update(submitted_date=F(sub),within_3_days="Có",satisfaction_score=2,nps_score=4,
             negative_comments="Phòng học hơi ồn",follow_up_needed="",notes=F(sent+days(3))+": đã follow-up bởi "+random.choice([a[1] for a in ACAD]))
+    elif kind=="answered_fresh":
+        # PHIEU VUA NOP TRONG 48 GIO, DIEM TOT -> tinh huong NA037 cua so trigger HD3.
+        # BAY DA CAN 09/08: truoc day KHONG co phieu nao duoc thiet ke cho tinh huong nay - no
+        # duoc phu HOAN TOAN DO MAY, nho mot nhanh `sent` roi vao khoang 5-9 ngay truoc cong
+        # them 1-5 ngay nen thinh thoang cham dung hom nay. Doi du lieu mot chut la chuoi ngau
+        # nhien lech, khong con phieu nao roi vao, va `check_sop.py` do ngay (LUAT CUNG SO 0).
+        # Mot tinh huong SOP duoc phu do may thi som muon cung mat - phai co ban ghi DAT RIENG.
+        sub=NOW-dt.timedelta(hours=random.choice([6,18,30]))
+        row.update(sent_date=F(sub-days(2)), submitted_date=F(sub), within_3_days="Có",
+            satisfaction_score=random.choice([4,5]), nps_score=random.choice([9,10]),
+            progress_perception="Tiến bộ rõ",
+            positive_comments="Cô chữa bài kỹ, có ví dụ dễ hiểu")
     elif kind=="waiting":
         row.update(sent_date=F(NOW-days(random.randint(0,2))))
     surveys.append(row)
@@ -1423,6 +1435,10 @@ for cid in ["LOP-IELTS-6.5-04","LOP-IELTS-6.0-12"]:
     for sid in rosters[cid][:4]:
         add_survey(SBY[sid],cid,"week_4 (Tuần 4)","answered")
 for i in range(3): add_survey(SBY[rosters[RUN[i]][8 if len(rosters[RUN[i]])>8 else -1]],RUN[i],"week_4 (Tuần 4)","low")
+# Ba phieu VUA NOP trong 48 gio, diem tot - tinh huong NA037. Ba cai chu khong mot: mot ban ghi
+# duy nhat thi chi can mot lan doi du lieu la lai mat, va lan sau cung khong ai biet vi sao.
+for i in range(3):
+    add_survey(SBY[rosters[RUN[i]][0]], RUN[i], "week_1 (Tuần 1)", "answered_fresh")
 for i in range(2): add_survey(SBY[rosters[RUN[i]][-2]],RUN[i],"week_1 (Tuần 1)","low_handled")
 for i in range(5): add_survey(SBY[rosters[RUN[i%len(RUN)]][-1]],RUN[i%len(RUN)],"week_8 (Tuần 8)","waiting")
 for cid in ["LOP-IELTS-6.5-04"]:

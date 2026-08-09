@@ -241,6 +241,27 @@
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 39 BỘ KIỂM (08/08). V1 mốc cũ: V9.99z12, 34 bộ, bản dựng `829572`.**
 >
+> ### ⚠️ 09/08 - VERIFY TRỌN BỘ BẮT LẠI EM MỘT LỖ LUẬT CỨNG SỐ 0 (và đây là lý do có luật ấy)
+>
+> Sửa xong giờ mấy buổi WOW, chạy verify thì `check_sop.py` **KHÔNG ĐẠT**:
+> *"SOT 1 TINH HUONG SOP MO TA MA APP KHONG SINH RA: NA037"* + *"KHAI TRIG_BOQUA THUA: NA056"*.
+>
+> **NA037** = *khảo sát vừa nộp trong 48 giờ, điểm hài lòng tốt*. Đổi dữ liệu làm lệch chuỗi ngẫu
+> nhiên nên không còn phiếu nào rơi vào tình huống ấy.
+>
+> **Đi tới gốc thì thấy chuyện đáng nói hơn cái lỗi: trước nay NA037 được phủ HOÀN TOÀN DO MAY.**
+> Không có bản ghi nào được thiết kế cho nó - nó trúng nhờ một nhánh `sent` rơi vào 5-9 ngày trước
+> cộng 1-5 ngày nên thỉnh thoảng chạm đúng hôm nay.
+> **MỘT TÌNH HUỐNG SOP ĐƯỢC PHỦ DO MAY THÌ SỚM MUỘN CŨNG MẤT - VÀ LẦN SAU CŨNG KHÔNG AI BIẾT VÌ SAO.**
+> Vá: thêm `kind="answered_fresh"` đặt riêng cho tình huống này, **ba phiếu chứ không một** (một
+> bản ghi duy nhất thì chỉ cần một lần đổi dữ liệu là lại mất). Gỡ **NA056** khỏi `TRIG_BOQUA` vì
+> app nay đã sinh ra nó - **một bản khai "cố ý bỏ qua" đã hết đúng mà để lại là nói dối chính mình**.
+>
+> **VÀ ĐÂY CHÍNH LÀ LÝ DO LUẬT CỨNG BẮT CHẠY TRỌN BỘ TRƯỚC KHI ĐẨY, KHÔNG NGOẠI LỆ.** Bản sửa này
+> chỉ đụng vào *giờ của mấy buổi WOW* - nghe vô hại tới mức dễ tin là không cần đo lại. Nó làm
+> thủng một tình huống SOP ở **một bảng khác hẳn** (DL15 khảo sát). Đúng cái mà mục "HAI TẦNG CHẠY
+> BỘ KIỂM" trong CLAUDE.md đã ghi: ranh giới đặt ở lúc ĐẨY, không đặt ở loại thay đổi.
+
 > ### 🟠 09/08 - VÒNG NĂM: APP SẠCH TRÊN ĐIỆN THOẠI, NHƯNG DỮ LIỆU CÓ BUỔI HỌC LÚC 2 GIỜ SÁNG
 >
 > **PHẦN MỘT - BẤM THẬT TRÊN ĐIỆN THOẠI.** Vùng tối cuối cùng: `_checkbam` và `_checknv` (hai bộ

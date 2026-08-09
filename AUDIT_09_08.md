@@ -578,3 +578,36 @@ hoàn tiền có việc) · `check_logic` ĐẠT, 0 bản ghi lỗi.**
 
 Bài học vòng này: **hai bộ kiểm dữ liệu chỉ hỏi về QUAN HỆ giữa các mốc, không hỏi một mốc có
 HỢP LÝ VỚI ĐỜI THẬT không.** Dữ liệu nhất quán hoàn hảo vẫn có thể vô lý hoàn toàn.
+
+
+## Và verify trọn bộ bắt lại em một lỗ LUẬT CỨNG SỐ 0
+
+Chạy verify sau khi sửa dữ liệu thì `check_sop.py` **KHÔNG ĐẠT**:
+
+```
+SOT 1 TINH HUONG SOP MO TA MA APP KHONG SINH RA:
+   X NA037   submitted_date đã có
+KHAI TRIG_BOQUA THUA - app DA sinh ra nhung van con trong danh sach bo qua:
+   - NA056
+```
+
+**NA037** = *khảo sát vừa nộp trong 48 giờ, điểm hài lòng tốt*. Đổi dữ liệu làm lệch chuỗi ngẫu
+nhiên, và không còn phiếu nào rơi vào tình huống ấy.
+
+Đi tới gốc thì thấy chuyện đáng nói hơn cái lỗi: **trước nay NA037 được phủ HOÀN TOÀN DO MAY.**
+Không có bản ghi nào được thiết kế cho nó - nó trúng nhờ một nhánh `sent` rơi vào khoảng 5-9 ngày
+trước cộng thêm 1-5 ngày nên thỉnh thoảng chạm đúng hôm nay. Chỉ cần đổi dữ liệu một chút là mất.
+
+> **Một tình huống SOP được phủ do may thì sớm muộn cũng mất - và lần sau cũng không ai biết vì sao.**
+
+Vá: thêm `kind="answered_fresh"` - phiếu đặt riêng cho tình huống này, **ba phiếu chứ không một**
+(một bản ghi duy nhất thì chỉ cần một lần đổi dữ liệu là lại mất). Và gỡ **NA056** khỏi
+`TRIG_BOQUA` vì app nay đã sinh ra nó - một bản khai "cố ý bỏ qua" đã hết đúng thì phải gỡ, để nó
+lại là nói dối chính mình.
+
+`check_sop.py` **ĐẠT** trở lại: 357 cột · 93 tình huống HD3 · 51 chỉ số BC2 · 31 hành động CH3 ·
+22 màn VH/BC.
+
+**Đây chính là lý do luật cứng của dự án bắt chạy TRỌN BỘ trước khi đẩy, không ngoại lệ.** Bản
+sửa này chỉ đụng vào *giờ của mấy buổi WOW* - nghe vô hại tới mức dễ tin là không cần đo lại. Nó
+làm thủng một tình huống SOP ở một bảng khác hẳn (DL15 khảo sát).
