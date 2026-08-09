@@ -4047,6 +4047,10 @@ var THEDEF={
      dẫn tới đâu là con bệnh anh Luân bắt hai lần (*"báo 2 học viên nguy cơ mà a chẳng thấy đâu"*),
      và "ô này chỉ để xem thôi" là đúng cái câu người ta hay dùng để né luật ấy. */
   ["bt_xong","Đã chấm xong","Số bài đã có điểm. Danh sách: sổ Bài tập trong trang Tra cứu, cột Điểm và Ngày chấm."]]},
+ bangcong:{t:"Bảng công giảng dạy",the:[
+  ["bc_nguoi","Giảng viên có buổi thiếu mốc","Đếm NGƯỜI đang vướng, không đếm buổi - vì việc phải làm là gọi từng người bổ sung mốc giờ. Danh sách: bấm chip \"Buổi thiếu mốc giờ\" ở thanh ngay dưới."],
+  ["bc_buoi","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy xong mà thiếu mốc vào hoặc mốc ra - thiếu là tính công sai. Danh sách: cùng chip \"Buổi thiếu mốc giờ\"."],
+  ["bc_du","Buổi đủ mốc, tính công được","Số buổi đã đủ hai mốc, chốt công được ngay. Danh sách: bảng ngay dưới, cột Giờ dạy."]]},
  nhansu:{t:"Nhân sự",the:[
   ["ns_dang","Đang làm việc","Người còn đang làm tại trung tâm. Danh sách: bấm chip \"Đang làm việc\" ở bảng ngay dưới."],
   ["ns_thieu","Hồ sơ còn thiếu","Chưa có chức danh, hoặc vai cần cơ sở mà chưa gắn cơ sở. Danh sách: bấm chip \"Hồ sơ còn thiếu\"."],
@@ -13806,6 +13810,15 @@ function filterBar(p,cur,opts,cnt){
   '<span class="tbdiv"></span>';
  return tbar(tim+segHTML(cur,opts,"fset('"+p+"','{k}');reRender(CUR)"),
   '<span class="tbcnt">'+cnt+' '+dvi(p)+'</span>'+fltBarHTML(p,1))}
+/* ═══ V2 09/08 - DẢI CHIP KHÔNG KÈM Ô TÌM ═══════════════════════════════════════════════════
+   `filterBar` luôn kèm một ô tìm ở đầu - đúng cho trang chưa có ô nào. Nhưng bốn trang em vừa
+   thêm chip (Bảng công · Mã giới thiệu · GV dự phòng · Phòng học) ĐÃ CÓ ô tìm hoặc thanh chọn
+   riêng, nên gọi `filterBar` là đẻ ra HAI Ô TÌM trên cùng một trang - người dùng gõ vào ô nào
+   cũng được nhưng hai ô không nói chuyện với nhau. `_checkux` bắt ngay trong lượt verify đầu.
+   Hàm này vẽ ĐÚNG dải chip, không kèm gì thêm. */
+function chipBar(p,cur,opts,cnt){
+ return tbar(segHTML(cur,opts,"fset('"+p+"','{k}');reRender(CUR)"),
+  (cnt==null?"":'<span class="tbcnt">'+cnt+' '+dvi(p)+'</span>'));}
 function stepBar(a){var h='<div class="steps">';a.forEach(function(s,i){h+=stepHTML(s[0],s[1]);if(i<a.length-1)h+='<div class="stpc'+(s[1]?" done":"")+'"></div>'});return h+'</div>'}
 function enumOpts(name){var a=ENUM[name]||[];return a.map(function(f){return '<option value="'+esc(f)+'">'+esc(f)+'</option>'}).join("")}
 function fldV(id){var el=document.getElementById(id);return el?el.value:""}
@@ -16797,7 +16810,7 @@ function renderMaGioiThieu(embed){
   return true});
  h+=tbar(srchHTML(window.MGQ||"","window.MGQ=this.value;reRenderKeep(CUR)","Tìm tên, SĐT hoặc mã...",300),
   '<span class="tbcnt">'+list.length+'/'+amb.length+' học viên</span>');
- h+=filterBar("magioithieu",mgF,[["all","Tất cả",amb.length],
+ h+=chipBar("magioithieu",mgF,[["all","Tất cả",amb.length],
   ["cho","Thưởng còn treo",nCho,nCho?"red":""],
   ["chay","Đã có người đăng ký",nChay]],list.length);
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên chủ mã</th><th>Mã giới thiệu</th><th>Lượt dùng</th><th>Đã đăng ký</th>'+(dsLevel("tien")==="none"?'':'<th>Ưu đãi đã cấp</th>')+'<th>Thưởng</th><th></th></tr></thead><tbody>';
@@ -17758,13 +17771,17 @@ function renderGvdp(embed){
  var gvF=fget("gvdp");
  var _nTrong=ses.filter(function(x){return !String(x.teacher_id||"").trim()}).length;
  var _nHuy=ses.filter(function(x){return isc(x.session_status,"cancelled")}).length;
- h+=filterBar("gvdp",gvF,[["all","Tất cả buổi",ses.length],
-  ["trong","Chưa có giáo viên",_nTrong,_nTrong?"red":""],
-  ["huy","Đã huỷ",_nHuy,_nHuy?"amber":""]],ses.length);
+ var _sesAll=ses.length;
  if(gvF==="trong")ses=ses.filter(function(x){return !String(x.teacher_id||"").trim()});
  else if(gvF==="huy")ses=ses.filter(function(x){return isc(x.session_status,"cancelled")});
  ses=fltApply("gvdp",ses);
  h+=pgBar("gvdp",ses.length);
+ /* V2 09/08 - DẢI CHIP ĐẶT SAU Ô TÌM. Thứ tự chuẩn của app (V9.52): [ô tìm] [dải chip] - đọc
+    trái sang phải, thu hẹp thô trước rồi tinh sau. `pgBar` là thứ vẽ ô tìm ở trang này nên chip
+    phải đứng SAU nó. `_checkux` bắt được ngay lượt verify đầu. */
+ h+=chipBar("gvdp",gvF,[["all","Tất cả buổi",_sesAll],
+  ["trong","Chưa có giáo viên",_nTrong,_nTrong?"red":""],
+  ["huy","Đã huỷ",_nHuy,_nHuy?"amber":""]],null);
  h+='<div class="panel"><div class="ph"><b>Buổi học trong ngày</b><span class="mut" style="font-size:11.5px">bấm "Đẩy người thay" để xem ai nhận được</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Lớp</th><th>Cơ sở / hình thức</th><th>GV đang phụ trách</th><th>Người thay được</th><th></th></tr></thead><tbody>';
  if(!ses.length)h+='<tr><td class="empty" colspan="6">Ngày này không có buổi học nào.</td></tr>';
  ses.forEach(function(x){var c=find("DL10","class_id",x.class_id)||{};
@@ -17961,11 +17978,14 @@ function renderPhong(embed){
   /* V9.57: bo o "Lop online - khong rang buoc phong": tren mot trang ve XEP PHONG, dem lop
      KHONG can phong la thong tin nen, khong ai quyet gi tu no. Cau da noi ro o dong ghi chu. */
   ],"phong");
- h+=filterBar("phong",pgF,[["all","Tất cả",clAll.length],
+ h+=pgBar("phong",cl.length);
+ /* V2 09/08 - DẢI CHIP ĐẶT SAU Ô TÌM. Thứ tự chuẩn của app (V9.52): [ô tìm] [dải chip] - đọc
+    trái sang phải, thu hẹp thô trước rồi tinh sau. `pgBar` là thứ vẽ ô tìm ở trang này nên chip
+    phải đứng SAU nó. `_checkux` bắt được ngay lượt verify đầu. */
+ h+=chipBar("phong",pgF,[["all","Tất cả",clAll.length],
   ["phong","Đụng phòng",byT.phong,byT.phong?"red":""],
   ["lop","Lớp đụng giờ chính nó",byT.lop,byT.lop?"amber":""],
-  ["gv","Giảng viên đụng giờ",byT.gv,byT.gv?"red":""]],cl.length);
- h+=pgBar("phong",cl.length);
+  ["gv","Giảng viên đụng giờ",byT.gv,byT.gv?"red":""]],null);
  h+='<div class="panel"><div class="ph"><b>Các điểm đụng ('+cl.length+')</b><span class="mut" style="font-size:11.5px">hai mục cách nhau dưới '+slaChip("sessionSpan_hours",2,"giờ")+' thì coi là đụng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Loại</th><th>Ngày giờ</th><th>Chi tiết</th><th>Cơ sở</th><th></th></tr></thead><tbody>';
  if(!cl.length)h+='<tr><td class="empty" colspan="5">Không có điểm đụng nào - lịch sạch.</td></tr>';
  cl.slice(0,80).forEach(function(x){var d=pvnd(x.a.session_date);
@@ -20062,6 +20082,12 @@ function renderCong(){
   '</select>',
   '<span class="tbcnt">'+L.filter(function(x){return x.n||x.wow||x.test}).length+' giảng viên</span>');
  h+=pgBar("cong",L.filter(function(x){return x.n||x.wow||x.test}).length);
+ /* V2 09/08 - CHIP "Buổi thiếu mốc giờ" đặt Ở ĐÂY, ngay sau ô tìm của chính bảng - thứ tự chuẩn
+    của app là [ô tìm] [dải chip]. Bản đầu em đặt nó ở `renderBangcong` (trước khi gọi hàm này),
+    thành ra chip đứng TRƯỚC ô tìm và trang có hai ô tìm - `_checkux` bắt cả hai lỗi cùng lúc. */
+ (function(){var _tm=bcThieuMoc();
+  h+=chipBar("bangcong",bcLoc(),[["all","Tất cả giảng viên",null],
+   ["thieu","Buổi thiếu mốc giờ",_tm.length,_tm.length?"red":""]],null)})();
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Người dạy</th><th>Cơ sở</th><th>Buổi lớp</th><th>Giờ dạy</th><th>Chia 1-1 / nhóm</th><th>Chia theo ca</th><th>Trong đó online</th><th>Buổi WOW (giờ kèm)</th><th>Ca test</th><th>Vào trễ</th><th>Chưa ghi nội dung</th>'+(xTien?"<th>Tiền công tạm tính</th>":"")+'</tr></thead><tbody>';
  if(!L.filter(function(x){return x.n||x.wow||x.test}).length)h+='<tr><td class="empty" colspan="'+(xTien?12:11)+'">Tháng này chưa có buổi dạy nào hoàn thành.</td></tr>';
  L.forEach(function(x){if(!x.n&&!x.wow&&!x.test)return;
@@ -20222,12 +20248,16 @@ function renderBangcong(){
  return pageHead("Bảng công giảng dạy",
   "Giờ đứng lớp, ca WOW 1-1 và ca test đầu vào của từng giảng viên trong tháng - dùng để đối chiếu trước khi chốt công.","")
   +statStrip([
-   ["ti-clock-check",xong.length,"Buổi đã dạy xong trong sổ","#2E5A88",""],
+   /* V2 09/08 - Ô ĐẦU TIÊN TỪNG LÀ "Buổi đã dạy xong trong sổ" - SỐ TÍCH LUỸ, đọc xong không
+      quyết được gì, sáng mai đọc lại vẫn gần y hệt. Đúng loại ô anh Luân cho bỏ ở V9.57 và
+      `_checkux` canh từ đó. Đổi sang: BAO NHIÊU NGƯỜI đang bị vướng - đó là thứ quyết định
+      hôm nay phải gọi ai. */
+   (function(){var ng={};thieu.forEach(function(x){if(x.teacher_id)ng[x.teacher_id]=1});
+    var n=Object.keys(ng).length;
+    return ["ti-user-exclamation",n,"Giảng viên có buổi thiếu mốc","#E08A1E",n?"gọi từng người bổ sung trước khi chốt công":"không ai vướng"]})(),
    (function(){var n=thieu.length;
     return ["ti-clock-exclamation",n,"Buổi thiếu mốc giờ vào/ra","#E24B4A",n?"thiếu mốc thì tính công sai - soát trước khi chốt":"đủ mốc cả"]})(),
    ["ti-checks",xong.length-thieu.length,"Buổi đủ mốc, tính công được","#2E9E6B",""]],"bangcong")
-  +filterBar("bangcong",bcLoc(),[["all","Tất cả giảng viên",0],
-    ["thieu","Buổi thiếu mốc giờ",thieu.length,thieu.length?"red":""]],0)
   +renderCong()}
 /* V9.64 (anh Luân: *"công giảng dạy tự nhiên lại nằm trong sổ thu học phí, vô lý"* -> *"phải nằm
    ở Giảng viên chứ"*). Đúng, và lý do cũ là một lý do sai: gộp vì "cùng là tiền". Nhưng sổ thu
@@ -23285,7 +23315,17 @@ function go(key,noHist){
     chet mot loat cua trong im lang. Chung dan tiep toi trang nghiep vu dau tien nguoi do XEM
     DUOC (`hubDich`), khong nhay dai vao tab mac dinh: hub Cho duyet co nam hang cho cua nam
     nguoi khac nhau, hoc vu chi co Don xin nghi - nhay vao Chiet khau la moi roi duoi. */
- if(typeof HUBTAB!=="undefined"&&HUBTAB[key]&&key!=="giangvien"){
+ /* ═══ V2 09/08 - `duyet` KHÔNG PHẢI BÍ DANH, NÓ LÀ TRANG GỘP THẬT ══════════════════════════
+    Năm hub V1 nay là bí danh: bấm vào thì `hubDich` đưa sang trang nghiệp vụ thật. Đúng cho bốn
+    cái (`tuyensinh` `hoctap` `cskh` `khac`) vì tab của chúng đã là trang riêng.
+    NHƯNG `duyet` khác hẳn: nó trả lời MỘT câu hỏi mà không trang con nào trả lời được - *"còn
+    gì chờ tôi quyết?"* - bằng cách gom cả bốn hàng chờ.
+    Đo được 09/08: nhịp ngày của Giám đốc nói *"Duyệt hàng chờ quyết định - 16 việc"*, bấm vào
+    thì `hubDich` đẩy sang `duyetck` hiện **4**. Đúng con bệnh anh Luân bắt hai lần: số nói một
+    đằng, trang hiện một nẻo. Chuyện này nằm im vì `duyet` không đứng trên menu nên không bộ kiểm
+    nào đi qua nó bằng đường người dùng thật đi.
+    Cho nó qua thẳng, như `giangvien` đã được cho qua từ trước. */
+ if(typeof HUBTAB!=="undefined"&&HUBTAB[key]&&key!=="giangvien"&&key!=="duyet"){
    var _d2=hubDich(key);if(_d2&&PBK[_d2])key=_d2}
  var p=PBK[key];if(!p)return;
  if(!canSee(key)&&SENSITIVE[key]){

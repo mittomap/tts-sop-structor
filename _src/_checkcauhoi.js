@@ -144,6 +144,20 @@ vais.forEach(v=>{
   /* C3 */
   if(!coLoiMenu(k,M))khongMenu.push(nhan+" -> "+k);
   tieuChi++;
+  /* ═══ C5 · BẤM VÀO CÓ RƠI ĐÚNG TRANG ĐÃ KHAI KHÔNG ═══════════════════════════════════════
+     Thêm 09/08 sau khi bắt được một ca THẬT: dòng nhịp của Giám đốc khai trang `duyet` và nói
+     "16 việc chờ quyết định", nhưng `go('duyet')` bị `hubDich` đẩy sang `duyetck` - trang ấy
+     hiện 4. Số nói một đằng, trang hiện một nẻo.
+     Bốn câu trước KHÔNG bắt được, vì cả bốn đều hỏi về TRANG ĐÃ KHAI, không hỏi "đi tới thì rơi
+     vào đâu". Nay đi THẬT bằng `go()` - đúng hàm người dùng bấm - rồi xem `CUR` dừng ở đâu. */
+  try{
+   const cuTruoc=CUR;
+   go(k);
+   const den=CUR;
+   CUR=cuTruoc;
+   if(den&&den!==k)doi.push(nhan+": khai trang \""+k+"\" ma bam vao lai roi vao \""+den+"\" - con so tren nhip la cua trang khai, khong phai cua trang toi noi");
+  }catch(e){}
+  tieuChi++;
   /* C4 */
   if(q.hab)return;                       /* thói quen: không có hàng chờ nào để đếm */
   if(!q.chip){
