@@ -671,7 +671,28 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
  var soChu=tap(/font-size:\s*[0-9.]+px/g).length;
  var soGoc=tap(/border-radius:\s*[0-9]+px/g).length;
  t("bang mau khong phinh tro lai (<=110 ma, truoc 202): "+soMau, soMau<=110);
- t("thang co chu giu gon (<=20 buoc, truoc 28): "+soChu, soChu<=20);
+ t("thang co chu giu gon (<=16 buoc, truoc 28): "+soChu, soChu<=16);
+ /* ═══ SAN CO CHU 11px (anh Luan 09/08: *"Cứ chọn 1 size hợp lý"*) ═══════════════════════════
+    Do truoc khi chon, tren kho dien thoai 390px: **1.470 luot chu duoi 11px** tren 26 kieu -
+    9px, 9.5px, 10px, 10.5px. Nhung khi CHUP SAT vao xem thi 10px doc rat ro o mat do diem anh
+    that; em da NOI "10px kho doc" truoc khi NHIN, va noi sai.
+    Van chon nang san, vi mot ly do khac va that hon: **tieng Viet co dau**. Dau nga, dau hoi,
+    dau mu chong len nhau theo chieu DOC - co chu cang nho thi phan dau cang mat net, trong khi
+    tieng Anh cung co chu ay van du. Mot app tieng Viet phai rong rai hon o day.
+    Chon 11px chu khong phai 10 hay 12:
+      · no DA LA mot bac co san trong thang (128 khai bao truoc khi doi) - nang len khong de bac moi;
+      · gop luon bon bac 9 / 9.5 / 10 / 10.5 vao mot, thang tu 20 bac con 16 - dung huong ma bo
+        kiem nay sinh ra de giu;
+      · khop muc toi thieu 11pt cua huong dan giao dien iOS.
+    Doi 117 khai bao CSS + 4 khai bao SVG. Do lai sau khi doi: `_checkmat` xanh tren CA HAI kho
+    man (khong cho nao bi cat them), bieu do 31 nhan chu **0 cap chong nhau**.
+    Tu day KHONG duoc de mot co chu nao duoi 11px lot vao lai. */
+ var duoiSan=tap(/font-size:\s*(?:[0-9]|10)(?:\.[0-9]+)?px/g)
+   .filter(function(x){return parseFloat(x.replace(/[^0-9.]/g,""))<11});
+ var svgNho=tap(/font-size="(?:[0-9]|10)(?:\.[0-9]+)?"/g)
+   .filter(function(x){return parseFloat(x.replace(/[^0-9.]/g,""))<11});
+ t("khong co chu nao duoi san 11px (tieng Viet co dau, co nho la mat net dau)",
+   !duoiSan.length&&!svgNho.length, duoiSan.concat(svgNho).join(", "));
  t("thang bo goc giu gon (<=10 buoc, truoc 17): "+soGoc, soGoc<=10);
  /* hai thanh cong cu phai cung mot bo do - dat canh nhau moi khong so le */
  var f=(CSS_ALL.match(/\.fbar\{([^}]*)\}/)||[])[1]||"";

@@ -3629,7 +3629,7 @@ function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sa
   rows("DL07").forEach(function(p){
    if(myE[p.enrollment_id])rev+=num(p.amount);
    if(String(p.received_by||"")===id)revTay+=num(p.amount)});
-  h+='<tr><td><a class="lnk" onclick="openNSQuick(\''+esc(id)+'\')"><b>'+esc(sv.full_name)+'</b></a><div class="mut" style="font-size:10.5px">'+esc(id)+'</div></td><td>'+nL+'</td><td>'+tp.length+'</td><td'+(tp.length?' data-tip="'+esc(pctG(ok,tp.length,"lượt liên hệ "+_ng+" ngày qua là gặp được khách"))+'"':' data-tip="'+_ng+' ngày qua chưa có lượt liên hệ nào"')+'>'+(tp.length?Math.round(ok*100/tp.length)+"%":"—")+'</td><td>'+nE7+'</td><td>'+nE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums"><b>'+vnd(rev)+'</b></td>'+
+  h+='<tr><td><a class="lnk" onclick="openNSQuick(\''+esc(id)+'\')"><b>'+esc(sv.full_name)+'</b></a><div class="mut" style="font-size:11px">'+esc(id)+'</div></td><td>'+nL+'</td><td>'+tp.length+'</td><td'+(tp.length?' data-tip="'+esc(pctG(ok,tp.length,"lượt liên hệ "+_ng+" ngày qua là gặp được khách"))+'"':' data-tip="'+_ng+' ngày qua chưa có lượt liên hệ nào"')+'>'+(tp.length?Math.round(ok*100/tp.length)+"%":"—")+'</td><td>'+nE7+'</td><td>'+nE+'</td><td style="text-align:right;font-variant-numeric:tabular-nums"><b>'+vnd(rev)+'</b></td>'+
    '<td style="text-align:right;font-variant-numeric:tabular-nums" class="mut">'+vnd(revTay)+'</td></tr>'});
  var tL=0,tT=0,tO=0,tE7=0,tE=0,tR=0,tRt=0;
  sales.forEach(function(sv){var id=sv.staff_id;var myL={};rows("DL02").forEach(function(l){if(String(l.assigned_to||"")===id){myL[l.lead_id]=1;tL++}});
@@ -7498,7 +7498,7 @@ function renderReview(embed){var p="review",fil=fget(p);
  view.forEach(function(i){var c=i.c;
   var rcls=i.rate==null?"":(i.rate>=kpiTh(/^SRR/,0.6)?"green":"red");
   var scls=i.ss==null?"":(i.ss>=kpiTh(/^SS/,4.5)?"green":"amber");
-  h+='<tr data-mo="rvLichSu" data-mo-arg="'+esc(c.class_id)+'"><td><b>'+esc(c.class_name||c.class_id)+'</b><div class="mut" style="font-size:10.5px">'+esc(c.class_id)+'</div></td>'+
+  h+='<tr data-mo="rvLichSu" data-mo-arg="'+esc(c.class_id)+'"><td><b>'+esc(c.class_name||c.class_id)+'</b><div class="mut" style="font-size:11px">'+esc(c.class_id)+'</div></td>'+
    '<td>'+i.stu+'</td><td>'+i.mine.length+'</td><td>'+i.sub.length+'</td>'+
    '<td>'+(i.rate==null?'<span class="mut" data-tip="Lớp này chưa gửi phiếu khảo sát nào nên chưa tính được">—</span>':'<span class="chip '+rcls+'" data-tip="'+esc(pctG(i.sub.length,i.mine.length,"phiếu đã gửi được học viên trả lời")+" · ngưỡng đạt "+Math.round(kpiTh(/^SRR/,0.6)*100)+"% (CH6 · SRR)")+'">'+Math.round(i.rate*100)+'%</span>')+'</td>'+
    '<td>'+(i.ss==null?'<span class="mut">—</span>':'<span class="chip '+scls+'">'+i.ss.toFixed(1)+'/5</span>')+'</td>'+
@@ -8026,8 +8026,8 @@ function renderGiaoan(){var tab=window.GATAB||"ga";
  if(!pls.length)h+='<tr><td class="empty" colspan="6">Khóa này chưa có giáo án.</td></tr>';
  pls.slice(0,40).forEach(function(p){var b=hwB(p.hw_bank_id);var dd=num(p.due_days);
   h+='<tr><td><b>Buổi '+esc(p.session_number)+'</b></td><td style="font-size:11.5px">'+esc(p.topic||"")+'</td>'+
-   '<td>'+(b?'<b style="font-size:11.5px">'+esc(b.title)+'</b><div class="mut" style="font-size:10.5px">'+esc(elabel(b.skill)||b.skill)+' · '+esc(b.level||"")+'</div>':'<span class="mut">chưa đặt</span>')+'</td>'+
-   '<td>'+(dd?'<b>+'+dd+' ngày</b><div class="mut" style="font-size:10.5px">sau buổi học</div>':'<span class="mut">theo mặc định ('+dueFall()+' ngày)</span>')+'</td>'+
+   '<td>'+(b?'<b style="font-size:11.5px">'+esc(b.title)+'</b><div class="mut" style="font-size:11px">'+esc(elabel(b.skill)||b.skill)+' · '+esc(b.level||"")+'</div>':'<span class="mut">chưa đặt</span>')+'</td>'+
+   '<td>'+(dd?'<b>+'+dd+' ngày</b><div class="mut" style="font-size:11px">sau buổi học</div>':'<span class="mut">theo mặc định ('+dueFall()+' ngày)</span>')+'</td>'+
    '<td style="max-width:340px;white-space:normal;font-size:11px;color:var(--muted)">'+esc(p.prep_note||"")+'</td>'+
    '<td><button class="btn sm" onclick="gaForm(\''+esc(p.plan_id)+'\')"><i class="ti ti-edit"></i>Sửa</button></td></tr>'});
  if(pls.length>40)h+='<tr><td class="empty" colspan="6">... còn '+(pls.length-40)+' buổi.</td></tr>';
@@ -8512,8 +8512,8 @@ function svgBarsV(items,opt){opt=opt||{};var n=items.length,step=52,W=Math.max(n
  var s='<svg viewBox="0 0 '+W+' '+(H+26)+'" width="100%" preserveAspectRatio="xMidYMid meet" style="max-height:'+(H+26)+'px">';
  items.forEach(function(it,i){var bh=Math.max(1,Math.round((it[1]/mx)*(H-24)));var x=14+i*step,y=H-bh;
   s+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+bh+'" rx="4" fill="'+(opt.color||'#2F6BFF')+'"/>';
-  s+='<text x="'+(x+bw/2)+'" y="'+(y-4)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#3A4756">'+esc(opt.fmt?opt.fmt(it[1]):it[1])+'</text>';
-  s+='<text x="'+(x+bw/2)+'" y="'+(H+15)+'" text-anchor="middle" font-size="9.5" fill="#6B7887">'+esc(it[0])+'</text>';});
+  s+='<text x="'+(x+bw/2)+'" y="'+(y-4)+'" text-anchor="middle" font-size="11" font-weight="700" fill="#3A4756">'+esc(opt.fmt?opt.fmt(it[1]):it[1])+'</text>';
+  s+='<text x="'+(x+bw/2)+'" y="'+(H+15)+'" text-anchor="middle" font-size="11" fill="#6B7887">'+esc(it[0])+'</text>';});
  return s+'</svg>'}
 function svgDonut(segs){var tot=segs.reduce(function(a,b){return a+b[1]},0)||1;var R=52,r=31,cx=60,cy=64,a0=-Math.PI/2;
  var s='<svg viewBox="0 0 250 132" width="100%" preserveAspectRatio="xMidYMid meet" style="max-height:150px">';
@@ -8521,8 +8521,8 @@ function svgDonut(segs){var tot=segs.reduce(function(a,b){return a+b[1]},0)||1;v
   var x0=(cx+R*Math.cos(a0)).toFixed(1),y0=(cy+R*Math.sin(a0)).toFixed(1),x1=(cx+R*Math.cos(a1)).toFixed(1),y1=(cy+R*Math.sin(a1)).toFixed(1);
   var xi1=(cx+r*Math.cos(a1)).toFixed(1),yi1=(cy+r*Math.sin(a1)).toFixed(1),xi0=(cx+r*Math.cos(a0)).toFixed(1),yi0=(cy+r*Math.sin(a0)).toFixed(1);
   s+='<path d="M'+x0+' '+y0+' A'+R+' '+R+' 0 '+big+' 1 '+x1+' '+y1+' L'+xi1+' '+yi1+' A'+r+' '+r+' 0 '+big+' 0 '+xi0+' '+yi0+' Z" fill="'+g[2]+'"/>';a0=a1;});
- s+='<text x="60" y="60" text-anchor="middle" font-size="18" font-weight="800" fill="#1E2A38">'+tot+'</text><text x="60" y="77" text-anchor="middle" font-size="9" fill="#6B7887">tổng</text>';
- var ly=20;segs.forEach(function(g){s+='<rect x="126" y="'+(ly-9)+'" width="10" height="10" rx="2" fill="'+g[2]+'"/><text x="141" y="'+ly+'" font-size="10.5" fill="#3A4756">'+esc(g[0])+' ('+g[1]+')</text>';ly+=19;});
+ s+='<text x="60" y="60" text-anchor="middle" font-size="18" font-weight="800" fill="#1E2A38">'+tot+'</text><text x="60" y="77" text-anchor="middle" font-size="11" fill="#6B7887">tổng</text>';
+ var ly=20;segs.forEach(function(g){s+='<rect x="126" y="'+(ly-9)+'" width="10" height="10" rx="2" fill="'+g[2]+'"/><text x="141" y="'+ly+'" font-size="11" fill="#3A4756">'+esc(g[0])+' ('+g[1]+')</text>';ly+=19;});
  return s+'</svg>'}
 /* ===== KPI THEO SOP: tính thẳng từ dữ liệu vận hành, so với ngưỡng CH6 ===== */
 /* Lọc một bảng theo KỲ SỐ LIỆU đang chọn trên trang (window.REPKY). Trước đây kpiCompute
@@ -9054,14 +9054,14 @@ function kpiQuy(code,v,th,dir){var d=kpiNum(code);var fee=kpiAvgFee();
 /* Xu hướng: chỉ bật cho nhóm A. Nhóm B (CVR/TBR/PCR/RER/AR...) mẫu số là LÔ CẦN THỜI GIAN CHÍN -
    lead vào tháng này chưa kịp đăng ký, so với toàn kỳ ra 17% so 46% là so BẬY. */
 function kpiTrendHTML(code){
- if(!KPITREND[code])return '<span class="mut" style="font-size:10.5px">Không so kỳ trước - lô dữ liệu cần thời gian chín, so sẽ ra kết luận sai</span>';
+ if(!KPITREND[code])return '<span class="mut" style="font-size:11px">Không so kỳ trước - lô dữ liệu cần thời gian chín, so sẽ ra kết luận sai</span>';
  var keep=window.REPKY;var now=kpiCompute()[code];
  window.REPKY=(keep==="m0"||!keep||keep==="all")?"90":"all";var prev=kpiCompute()[code];
  window.REPKY=keep;
  if(now==null||prev==null)return "";
- var dl=now-prev;if(Math.abs(dl)<1e-9)return '<span class="mut" style="font-size:10.5px">Không đổi so kỳ đối chiếu</span>';
+ var dl=now-prev;if(Math.abs(dl)<1e-9)return '<span class="mut" style="font-size:11px">Không đổi so kỳ đối chiếu</span>';
  var up=dl>0;var good=(KPIBAND[code]==="thang5"||KPIBAND[code]==="nps")?up:up;
- return '<span style="font-size:10.5px;color:'+(good?"#16A34A":"#DC2626")+'">'+(up?"▲":"▼")+" "+kpiFmt(code,Math.abs(dl))+' so kỳ đối chiếu</span>'}
+ return '<span style="font-size:11px;color:'+(good?"#16A34A":"#DC2626")+'">'+(up?"▲":"▼")+" "+kpiFmt(code,Math.abs(dl))+' so kỳ đối chiếu</span>'}
 function kpiSection(){var comp=kpiCompute();var ch6=(DATA.config&&DATA.config.ch6)||[];
  if(!ch6.length)return '<div class="sechd">KPI theo SOP</div><div class="panel"><div class="empty">Chưa nạp được ngưỡng KPI (CH6).</div></div>';
  ch6=ch6.filter(kpiCoMien);
@@ -9318,7 +9318,7 @@ function baocaoThan(_xemAi){
  function cnt(arr,re){return arr.filter(function(r){return re.test(ecode(r))}).length}
  var att=[["Đều",cnt(S.map(function(r){return r.attendance_progress_status}),/on_track/)],["Nguy cơ",cnt(S.map(function(r){return r.attendance_progress_status}),/at_risk/)],["Sa sút",cnt(S.map(function(r){return r.attendance_progress_status}),/off_track/)]];
  var aca=[["Tiến bộ",cnt(S.map(function(r){return r.academic_progress_status}),/on_track/)],["Nguy cơ",cnt(S.map(function(r){return r.academic_progress_status}),/at_risk/)],["Lệch",cnt(S.map(function(r){return r.academic_progress_status}),/off_track/)]];
- var _bAca='<div class="chartp"><h4>Chuyên cần &amp; Học thuật (số HV)</h4><div class="grid2"><div>'+svgBarsV(att,{color:"#2F6BFF",h:120})+'<div class="mut" style="text-align:center;font-size:10.5px">Chuyên cần</div></div><div>'+svgBarsV(aca,{color:"#7C3AED",h:120})+'<div class="mut" style="text-align:center;font-size:10.5px">Học thuật</div></div></div></div>';
+ var _bAca='<div class="chartp"><h4>Chuyên cần &amp; Học thuật (số HV)</h4><div class="grid2"><div>'+svgBarsV(att,{color:"#2F6BFF",h:120})+'<div class="mut" style="text-align:center;font-size:11px">Chuyên cần</div></div><div>'+svgBarsV(aca,{color:"#7C3AED",h:120})+'<div class="mut" style="text-align:center;font-size:11px">Học thuật</div></div></div></div>';
  if(_coLead){
   function uniqLead(code){var m={};rows(code).forEach(function(x){if(x.lead_id)m[x.lead_id]=1});return Object.keys(m).length}
   var funnel=[["Lead",L.length],["Đặt test",uniqLead("DL03")],["Tư vấn",uniqLead("DL04")],["Đăng ký",E.length],["Đang học",S.filter(function(r){return/active|studying/.test(ecode(r.student_status))}).length]];
@@ -10046,7 +10046,7 @@ function aiPhat(q){
   var el=document.getElementById("aiTraLoi");if(!el)return;
   if(err){el.innerHTML='<div class="mut" style="font-size:11.5px"><i class="ti ti-plug-x"></i> AI không phản hồi ('+esc(String(err))+') - phần trả lời máy ở trên vẫn đủ dùng.</div>';return}
   el.innerHTML='<div class="aiHd"><i class="ti ti-sparkles"></i>AI diễn giải · '+esc(AIPROV[a.prov].t)+
-   '<span class="mut" style="margin-left:auto;font-size:10.5px">số liệu lấy theo phần máy ở trên</span></div>'+
+   '<span class="mut" style="margin-left:auto;font-size:11px">số liệu lấy theo phần máy ở trên</span></div>'+
    '<div class="aiTx">'+esc(text).split("\n").join("<br>")+'</div>'})}
 function aiThu(){
  var a=aiCfg();
@@ -10239,12 +10239,12 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   if(qDaSua)h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-pencil"></i>Đang có <b>'+qDaSua+' ô</b> khác mặc định. '
    +'<button class="btn sm" onclick="qtVeMacDinh(\'\')"><i class="ti ti-restore"></i>Trả toàn bộ về mặc định</button></div>';
   h+='<div class="tbwrap" data-tour="quyentrang"><table class="tb"><thead><tr><th style="min-width:190px">Trang</th>';
-  QG.forEach(function(g){h+='<th style="text-align:center;font-size:10.5px;line-height:1.3">'+esc(GRPT[g]||g)+'<br><span class="mut" style="font-weight:600">'+(CNT[g]||0)+' người</span></th>'});
+  QG.forEach(function(g){h+='<th style="text-align:center;font-size:11px;line-height:1.3">'+esc(GRPT[g]||g)+'<br><span class="mut" style="font-weight:600">'+(CNT[g]||0)+' người</span></th>'});
   h+='</tr></thead><tbody>';
   var qNhom="";
   PAGES.filter(function(pg){return !pg.hide}).forEach(function(pg){
    if(pg.g!==qNhom){qNhom=pg.g;
-    h+='<tr><td colspan="'+(QG.length+1)+'" style="background:var(--bg);font-weight:800;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)">'+esc(qNhom)+'</td></tr>'}
+    h+='<tr><td colspan="'+(QG.length+1)+'" style="background:var(--bg);font-weight:800;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)">'+esc(qNhom)+'</td></tr>'}
    h+='<tr><td style="font-size:12px"><i class="ti '+esc(pg.ic||"ti-file")+'" style="margin-right:6px;color:var(--muted)"></i>'+esc(pg.t)+'</td>';
    QG.forEach(function(g){var on=qtOn(g,pg.k),sua=qtSua(g,pg.k);
     var laDap=(ROLESCOPE[g].land===pg.k);
@@ -10286,7 +10286,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   ["lead","hocvien","lop","tien","baocao","viec","nhansu"].forEach(function(d){h+='<th title="'+esc(DSDOMT[d])+'">'+esc(DSDOMT[d])+'</th>'});
   h+='</tr></thead><tbody>';
   Object.keys(DSDEF).forEach(function(g){var lock=(g==="quantri"||g==="dieuhanh");
-   h+='<tr><td><b>'+esc(GRPT[g]||g)+'</b>'+(CNT[g]?'<div class="mut" style="font-size:10.5px">'+CNT[g]+' người</div>':'')+'</td>';
+   h+='<tr><td><b>'+esc(GRPT[g]||g)+'</b>'+(CNT[g]?'<div class="mut" style="font-size:11px">'+CNT[g]+' người</div>':'')+'</td>';
    ["lead","hocvien","lop","tien","baocao","viec","nhansu"].forEach(function(d){
     var cur=(P.m[g]&&P.m[g][d])||DSDEF[g][d];
     if(lock){h+='<td><span class="chip gray">Toàn bộ</span></td>';return}
@@ -10398,7 +10398,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
    }else{                                                               /* số */
     inp='<input id="cf_'+esc(name)+'" value="'+esc(val)+'" inputmode="numeric" style="width:96px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit">';
    }
-   return '<tr id="cfrow_'+esc(name)+'"><td><b style="font-size:11.5px">'+esc(name)+'</b>'+(sheetName&&sheetName!==name?'<div class="mut" style="font-size:10.5px">trên sheet: '+esc(sheetName)+'</div>':'')+'</td>'+
+   return '<tr id="cfrow_'+esc(name)+'"><td><b style="font-size:11.5px">'+esc(name)+'</b>'+(sheetName&&sheetName!==name?'<div class="mut" style="font-size:11px">trên sheet: '+esc(sheetName)+'</div>':'')+'</td>'+
     '<td style="max-width:420px;white-space:normal;font-size:11px;color:var(--muted)">'+esc(meaning)+'</td>'+
     '<td>'+inp+'</td>'+
     '<td style="font-size:11.5px">'+esc(unit)+'</td>'+
@@ -10509,8 +10509,8 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   order.forEach(function(sh){
    h+='<div class="panel"><div class="ph"><b><i class="ti ti-file-text" style="margin-right:6px"></i>'+esc(sh)+'</b><span class="mut" style="font-size:11.5px">'+bySheet[sh].length+' thông điệp</span></div><div class="tbwrap"><table class="dt"><thead><tr><th style="width:74px">Mã</th><th>Mẫu câu (sửa ở đây)</th><th style="width:150px">Khi nào hiện</th><th style="width:110px">Ai làm</th><th style="width:80px"></th></tr></thead><tbody>';
    bySheet[sh].forEach(function(m){var idx=ch4List().indexOf(m);var pv=msgText(m.code);/* V9.29: neo de msgGo nhay toi */
-    h+='<tr><td><code style="font-size:11px">'+esc(m.code)+'</code>'+(m.params&&m.params.length?'<div class="mut" style="font-size:10px">'+esc(m.params.join(", "))+'</div>':'')+'</td>'+
-     '<td><textarea id="msg_'+idx+'" rows="2" style="width:100%;min-width:280px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-family:inherit;font-size:11.5px">'+esc(m.tmpl)+'</textarea>'+(pv&&pv!==m.tmpl?'<div class="mut" style="font-size:10.5px;margin-top:2px">→ '+esc(pv)+'</div>':'')+'</td>'+
+    h+='<tr><td><code style="font-size:11px">'+esc(m.code)+'</code>'+(m.params&&m.params.length?'<div class="mut" style="font-size:11px">'+esc(m.params.join(", "))+'</div>':'')+'</td>'+
+     '<td><textarea id="msg_'+idx+'" rows="2" style="width:100%;min-width:280px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-family:inherit;font-size:11.5px">'+esc(m.tmpl)+'</textarea>'+(pv&&pv!==m.tmpl?'<div class="mut" style="font-size:11px;margin-top:2px">→ '+esc(pv)+'</div>':'')+'</td>'+
      '<td style="font-size:11px;color:var(--muted);white-space:normal">'+esc(msgWhen(m.code))+'</td>'+
      '<td style="font-size:11px">'+esc(m.owner||"-")+'</td>'+
      '<td><button class="btn sm" onclick="saveMsg('+idx+')"><i class="ti ti-device-floppy"></i>Lưu</button></td></tr>'});
@@ -10522,7 +10522,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th style="width:210px">Chặng</th><th>Các câu gợi ý (mỗi dòng một câu)</th><th style="width:150px"></th></tr></thead><tbody>';
   Object.keys(RTOUCHDEF).forEach(function(k){var S=JBY[k]||{};var cur=rtList(k);
    var def=(RTOUCHDEF[k]||[]).join("\n"),now=cur.join("\n");
-   h+='<tr><td><b>'+esc(S.t||k)+'</b><div class="mut" style="font-size:10.5px">'+esc(k)+'</div></td>'+
+   h+='<tr><td><b>'+esc(S.t||k)+'</b><div class="mut" style="font-size:11px">'+esc(k)+'</div></td>'+
     '<td><textarea id="rt_'+esc(k)+'" rows="'+Math.max(2,cur.length)+'" style="width:100%;min-width:300px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-family:inherit;font-size:11.5px">'+esc(now)+'</textarea></td>'+
     '<td><button class="btn sm" onclick="rtSave(\''+esc(k)+'\')"><i class="ti ti-device-floppy"></i>Lưu</button>'+
     (now!==def?' <button class="btn sm" onclick="rtReset(\''+esc(k)+'\')" data-tip="Trả về bản gốc xuất xưởng"><i class="ti ti-restore"></i></button>':'')+'</td></tr>'});
@@ -10537,9 +10537,9 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
   ks.forEach(function(en){var arr=ENUM[en]||[];
    h+='<div class="panel"><div class="ph"><b><i class="ti ti-list" style="margin-right:6px"></i>'+esc(en.replace("enum_",""))+'</b><span class="mut" style="font-size:11.5px">'+arr.length+' giá trị · '+esc(en)+'</span></div><div class="tbwrap"><table class="dt"><thead><tr><th style="width:180px">Mã (không đổi)</th><th>Nhãn hiển thị</th><th style="width:150px"></th></tr></thead><tbody>';
    arr.forEach(function(v,i){var cd=ecode(v),lb=elabel(v)||v;var used=enumUsage(en,cd);
-    h+='<tr><td><code style="font-size:11px">'+esc(cd)+'</code>'+(used?'<div class="mut" style="font-size:10.5px">đang dùng ở '+used+' dòng</div>':'<div class="mut" style="font-size:10.5px">chưa dùng</div>')+'</td>'+
+    h+='<tr><td><code style="font-size:11px">'+esc(cd)+'</code>'+(used?'<div class="mut" style="font-size:11px">đang dùng ở '+used+' dòng</div>':'<div class="mut" style="font-size:11px">chưa dùng</div>')+'</td>'+
      '<td><input id="en_'+esc(en)+'_'+i+'" value="'+esc(lb)+'" style="width:100%;max-width:420px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit">'+
-     (used?'<label style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--muted);margin-top:3px"><input type="checkbox" id="ens_'+esc(en)+'_'+i+'" checked>cập nhật luôn '+used+' dòng dữ liệu đang dùng</label>':'')+'</td>'+
+     (used?'<label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);margin-top:3px"><input type="checkbox" id="ens_'+esc(en)+'_'+i+'" checked>cập nhật luôn '+used+' dòng dữ liệu đang dùng</label>':'')+'</td>'+
      '<td><button class="btn sm" onclick="enumSave(\''+esc(en)+'\','+i+')"><i class="ti ti-device-floppy"></i>Lưu</button> '+
      /* V9.29v (hội đồng audit): 291 nút xoá chỉ có cái thùng rác, không nhãn cũng không chú thích -
         người dùng bàn phím và người đọc màn hình không biết nút này làm gì, mà đây lại là nút XOÁ. */
@@ -11977,7 +11977,7 @@ function dupWarnHTML(dup){if(!dup)return "";
  var r=dup.rec;var nm=r.full_name||"";var ph=r.phone_number||"";
  var who=(dup.type==="lead")?("lead "+(r.lead_id||"")+(r.assigned_to_name?" · NV phụ trách: "+r.assigned_to_name:"")):("học viên "+(r.student_id||""));
  var open="window.__liDraft={n:fldV(\'li_name\'),p:fldV(\'li_phone\'),t:fldV(\'li_note\')};"+((dup.type==="lead")?('leadDetail(\''+esc(r.lead_id)+'\')'):('openStuQuick(\''+esc(r.student_id)+'\')'));
- return '<div class="ctxcontent ccred" style="margin-bottom:10px"><div class="cch"><i class="ti ti-alert-triangle"></i> SỐ NÀY ĐÃ CÓ TRONG HỆ THỐNG</div><div class="ccb" style="font-size:12px">'+esc(nm)+' ('+esc(ph)+') - '+esc(who)+'.<br>Kiểm tra hồ sơ cũ trước khi tạo mới để không hai người cùng chăm một khách.<div style="margin-top:8px"><button class="btn sm" onclick="'+open+'"><i class="ti ti-id-badge-2"></i>Xem hồ sơ cũ</button> <span class="mut" style="font-size:10.5px">mở lại "Khách mới liên hệ đến" thì nội dung đang nhập vẫn còn</span></div></div></div>'}
+ return '<div class="ctxcontent ccred" style="margin-bottom:10px"><div class="cch"><i class="ti ti-alert-triangle"></i> SỐ NÀY ĐÃ CÓ TRONG HỆ THỐNG</div><div class="ccb" style="font-size:12px">'+esc(nm)+' ('+esc(ph)+') - '+esc(who)+'.<br>Kiểm tra hồ sơ cũ trước khi tạo mới để không hai người cùng chăm một khách.<div style="margin-top:8px"><button class="btn sm" onclick="'+open+'"><i class="ti ti-id-badge-2"></i>Xem hồ sơ cũ</button> <span class="mut" style="font-size:11px">mở lại "Khách mới liên hệ đến" thì nội dung đang nhập vẫn còn</span></div></div></div>'}
 function leadInbound(){window.__dupOK="";var dr=window.__liDraft||{};window.__liDraft=null;
  var h='<div class="dcard"><h4><i class="ti ti-message-plus"></i>Khách mới liên hệ đến</h4>';
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Khách lạ gọi tới / nhắn Zalo hỏi thông tin: ghi MỘT LẦN là có đủ lead + lượt liên hệ đầu (chiều: khách chủ động). Đừng để khách nhắn mà không được ghi lại.</div>';
@@ -12984,7 +12984,7 @@ function fuNeed(v){var s=String(v||"").trim();return s!==""&&!/^(không|khong|no
 function svTplBox(code){var t=SVTPL[ecode(code)||code];
  if(!t)return '<div class="fhint">Đợt này chưa có bộ câu mẫu.</div>';
  return '<div class="svtpl"><b>'+esc(t.t)+'</b><ol>'+t.q.map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ol>'+
-  '<div class="mut" style="font-size:10.5px">Bộ câu này gửi kèm phiếu cho học viên. Sửa được ở ô bên dưới.</div></div>'}
+  '<div class="mut" style="font-size:11px">Bộ câu này gửi kèm phiếu cho học viên. Sửa được ở ô bên dưới.</div></div>'}
 function svPick(v){var b=document.getElementById("sv_tplbox");if(b)b.innerHTML=svTplBox(v);
  var t=SVTPL[ecode(v)||v];var ta=document.getElementById("sv_qs");
  if(ta&&t)ta.value=t.q.join("\n")}
@@ -13787,7 +13787,7 @@ function renderTrangHV(){
      (days==null?"":(days<0?("quá hạn "+Math.abs(days)+" ngày"):(days===0?"đến hạn HÔM NAY":("còn "+days+" ngày"))));
     h+='<div class="hvschr '+cls+'"><span class="hvschn">Đợt '+esc(x.installment_no)+'/'+esc(x.installment_of)+'</span>'+
      '<span class="hvschd2">'+esc(x.due_date||"")+'</span>'+
-     '<span class="hvscha"><b>'+vnd(num(x.due_amount))+'</b>'+(num(x.paid_amount)>0&&!paidF?'<br><span class="mut" style="font-size:10.5px">đã đóng '+vnd(num(x.paid_amount))+'</span>':'')+'</span>'+
+     '<span class="hvscha"><b>'+vnd(num(x.due_amount))+'</b>'+(num(x.paid_amount)>0&&!paidF?'<br><span class="mut" style="font-size:11px">đã đóng '+vnd(num(x.paid_amount))+'</span>':'')+'</span>'+
      '<span class="hvschs">'+esc(say)+'</span></div>'});
    h+='</div>'}
   else h+=hvDueOne(enr,rem);
@@ -15363,7 +15363,7 @@ function renderHtLop(embed){var fil=window.HTLOPQ||"all";
    return '<span class="chip '+(v>=t?"green":"red")+'" data-tip="'+esc(pctG(tu,mau,dvi)+" · ngưỡng đạt "+Math.round(t*100)+"% (Cài đặt > CH6)")+'">'+p+'</span>'}
   /* Thẻ 1-1 / Nhóm đứng trước tên lớp - bảng này là bảng RIÊNG của hub Học tập, không đi qua
      bộ vẽ ô của danh sách DL10, nên phải gắn ở đây nữa. Đây đúng là bảng anh Luân nhìn hằng ngày. */
-  h+='<tr><td>'+lopThe(c)+'<a class="lnk" onclick="openLopQuick(\''+esc(c.class_id)+'\')"><b>'+esc(c.class_name||c.class_id)+'</b></a><div class="mut" style="font-size:10.5px">'+esc(c.class_id)+'</div></td>'+
+  h+='<tr><td>'+lopThe(c)+'<a class="lnk" onclick="openLopQuick(\''+esc(c.class_id)+'\')"><b>'+esc(c.class_name||c.class_id)+'</b></a><div class="mut" style="font-size:11px">'+esc(c.class_id)+'</div></td>'+
    '<td>'+esc(c.main_teacher_id?((find("DL01","staff_id",c.main_teacher_id)||{}).full_name||c.main_teacher_id):"chưa gán")+'</td>'+
    '<td>'+m.si+'/'+esc(c.class_capacity||"?")+'</td>'+
    '<td>'+pchip(m.atr,m.atrT,m.attCo,m.attTong,"lượt điểm danh có mặt")+'</td><td>'+pchip(m.hcr,m.hcrT,m.hwNop,m.hwTong,"bài đã nộp")+'</td>'+
@@ -15510,7 +15510,7 @@ function renderLichTuan(embed){
   var label;
   if(k==="__test")label="<b>Test đầu vào</b>";
   else if(k==="__nogv")label='<b style="color:var(--red)">Chưa gán GV</b>';
-  else if(mode==="gv"){var g=find("DL01","staff_id",k);label="<b>"+esc(g?g.full_name:k)+"</b><div class=\'mut\' style=\'font-size:10px\'>"+esc(k)+"</div>"}
+  else if(mode==="gv"){var g=find("DL01","staff_id",k);label="<b>"+esc(g?g.full_name:k)+"</b><div class=\'mut\' style=\'font-size:11px\'>"+esc(k)+"</div>"}
   else{var c2=find("DL10","class_id",k);label="<b>"+esc(c2?(c2.class_name||k):k)+"</b>"}
   /* V9.93: bấm cả dòng lịch tuần là mở hồ sơ giảng viên (chế độ xếp theo GV) hoặc bảng lớp
      (chế độ xếp theo lớp) - trước đây cả dòng câm, chỉ nhìn được. */
@@ -16789,7 +16789,7 @@ function tourMenu(lv){var L=lv||window.TOURLVSEL||"";
   any=true;
   var mine=T.role&&me&&(elabel(me.role)||"").indexOf(T.role.split(" ")[0])>=0;
   h+='<div class="tourmi" onclick="tourAsk(\''+k+'\')"><span class="tmi"><i class="ti '+(T.ic||"ti-book")+'"></i></span>'+
-   '<div style="flex:1"><b>'+esc(T.t)+(T.role?' <span class="chip '+(mine?"green":"gray")+'" style="font-size:10px">'+esc(T.role)+'</span>':'')+'</b>'+
+   '<div style="flex:1"><b>'+esc(T.t)+(T.role?' <span class="chip '+(mine?"green":"gray")+'" style="font-size:11px">'+esc(T.role)+'</span>':'')+'</b>'+
    '<span>'+esc(T.d)+'</span></div><span class="chip" style="align-self:center">'+T.steps.length+' bước</span></div>'});
  if(!any)h+='<div class="empty">Chưa có bài hướng dẫn ở cấp độ này.</div>';
  h+='</div>';
@@ -17428,8 +17428,8 @@ function tkCard(t,side){var s=tkSt(t),TY=TKTYPE[tkType(t)]||TKTYPE.assign,P=TKPR
  var h='<div class="tkrow'+(tkOver(t)?" over":"")+'" onclick="tkOpen(\''+esc(t.task_id)+'\')">';
  h+='<span class="tkic" title="'+esc(TY.d)+'"><i class="ti '+TY.ic+'"></i></span>';
  h+='<div class="tkmain"><div class="tktt">'+esc(t.title||"(không tiêu đề)")+
-  (tkReq(t)?' <span class="chip red" style="font-size:10px">BẮT BUỘC</span>':' <span class="chip gray" style="font-size:10px">không bắt buộc</span>')+
-  (P.c?' <span class="chip '+P.c+'" style="font-size:10px">'+esc(P.t)+'</span>':'')+'</div>';
+  (tkReq(t)?' <span class="chip red" style="font-size:11px">BẮT BUỘC</span>':' <span class="chip gray" style="font-size:11px">không bắt buộc</span>')+
+  (P.c?' <span class="chip '+P.c+'" style="font-size:11px">'+esc(P.t)+'</span>':'')+'</div>';
  h+='<div class="tkmeta">'+esc(TY.t)+' · '+who+' · <b'+(tkOver(t)?' style="color:var(--red)"':'')+'>'+esc(tkDueTxt(t))+'</b>'+
   (t.related_id?' · <a class="lnk" '+tkRelGo(t)+'>'+esc(tkRelLabel(t))+'</a>':'')+
   (nc?' · <i class="ti ti-message-circle" style="font-size:12px"></i> '+nc:'')+'</div></div>';
@@ -22288,7 +22288,7 @@ function demoGateHV(){var el=document.getElementById("login");if(!el){bootHV();r
    (PH
      ?('<button class="pill" style="margin-top:7px" onclick="event.stopPropagation();gateEnterHV(\''+esc(x.student_id)+'\')"><i class="ti ti-user"></i>Xem như học viên</button>')
      :(_gh?('<button class="pill" style="margin-top:7px" onclick="event.stopPropagation();gateEnterPH(\''+esc(x.student_id)+'\')"><i class="ti ti-users"></i>Vào như phụ huynh</button>')
-          :('<div class="mut" style="font-size:10.5px;margin-top:7px">chưa khai số người đồng hành</div>')))+
+          :('<div class="mut" style="font-size:11px;margin-top:7px">chưa khai số người đồng hành</div>')))+
    '</div>'});
  h+='</div>';
  if(q&&stu.length>12)h+='<div style="font-size:11.5px;color:var(--muted);text-align:center;margin-top:8px">... và '+(stu.length-12)+' kết quả nữa - gõ rõ hơn.</div>';

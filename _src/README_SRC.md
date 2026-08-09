@@ -726,3 +726,24 @@ Sua 9 cho dung thanh cong cu. **Do lai: 0 tren ca bon kho, 16 trang.**
 **DA CHUNG MINH THUOC SONG** - viec ma moi thuoc moi deu nen lam mot lan: tra lai ban cu thi no
 DO 5 cho, va vao thi XANH. Mot cai thuoc chua bao gio do la mot cai thuoc chua ai biet no co chay
 khong.
+
+### SAN CO CHU 11px (`_checkux`, anh Luan chot 09/08: *"Cu chon 1 size hop ly"*)
+
+Do truoc khi chon, kho dien thoai 390px: **1.470 luot chu duoi 11px** tren 26 kieu (9 / 9.5 / 10 /
+10.5px). Nhung khi CHUP SAT vao xem o mat do diem anh that (3x) thi **10px doc rat ro**. Nguoi do
+da NOI "10px kho doc" truoc khi NHIN, va noi sai - ghi lai vi do dung cai benh ma dot audit nay
+sinh ra de chua.
+
+Van chon nang san, vi mot ly do khac va that hon: **tieng Viet co dau**. Dau nga, dau hoi, dau mu
+chong len nhau theo chieu DOC - co chu cang nho thi phan dau cang mat net, trong khi tieng Anh
+cung co chu ay van du.
+
+**Chon 11px** vi: no DA LA bac co san (128 khai bao, khong de bac moi) · gop luon bon bac 9/9.5/10/
+10.5 vao mot, **thang tu 20 bac con 16** · khop muc toi thieu 11pt cua huong dan iOS · 12px thi qua
+tay (12px la bac chu than, nang chu phu len bang chu than la mat thu bac thi giac).
+
+Doi 117 khai bao CSS + 4 khai bao SVG. Do lai: `_checkmat` xanh tren CA HAI kho man, bieu do 31
+nhan chu **0 cap chong nhau**.
+
+Phep hoi quet ca `font-size:` cua CSS lan `font-size="` cua SVG. **Da chung minh thuoc song**: cam
+mot cho 10px vao ban dung thi no do ngay, go ra thi xanh.

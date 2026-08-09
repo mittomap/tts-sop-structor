@@ -241,6 +241,34 @@
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 39 BỘ KIỂM (08/08). V1 mốc cũ: V9.99z12, 34 bộ, bản dựng `829572`.**
 >
+> ### 📐 09/08 - SÀN CỠ CHỮ 11px (anh Luân: *"Cứ chọn 1 size hợp lý"*)
+>
+> **Anh giao em quyết định. Em đo trước, và phép đo đầu tiên cho thấy EM ĐÃ NÓI SAI.**
+> Vòng ba em khai *"18 chỗ chữ 10px trên điện thoại"* và ngụ ý đó là vấn đề. Đo tử tế: **1.470
+> lượt chữ dưới 11px trên 26 kiểu**, 18 trang. Nhưng **chụp sát** vào đúng mấy chỗ ấy ở mật độ
+> điểm ảnh thật (3×) thì **10px đọc rất rõ** - chữ đậm, tương phản cao, nằm trên viên thuốc màu
+> nhạt, đứng cạnh chữ 13px thì đọc ra ngay là chữ phụ, đúng ý đồ.
+> **Em đã NÓI "10px khó đọc" trước khi NHÌN.** Ghi thẳng, vì đó đúng cái bệnh cả ba vòng audit
+> này sinh ra để chữa.
+>
+> **VẪN CHỌN NÂNG SÀN, nhưng vì một lý do khác và thật hơn: TIẾNG VIỆT CÓ DẤU.** Dấu ngã, dấu
+> hỏi, dấu mũ chồng lên nhau theo chiều **dọc** - cỡ càng nhỏ thì phần dấu càng mất nét, trong
+> khi tiếng Anh cùng cỡ ấy vẫn đủ. Một app tiếng Việt phải rộng rãi hơn ở chỗ này.
+>
+> **CHỌN 11px, không phải 10 hay 12:** nó **đã là bậc có sẵn** (128 khai báo) nên nâng lên không
+> đẻ bậc mới · gộp luôn bốn bậc 9 / 9.5 / 10 / 10.5 vào một, **thang từ 20 bậc còn 16** - đúng
+> hướng `_checkux` sinh ra để giữ · khớp mức tối thiểu 11pt của hướng dẫn giao diện iOS · còn
+> 12px thì quá tay: 12px đang là bậc chữ thân, nâng chữ phụ lên bằng chữ thân là **mất thứ bậc
+> thị giác**, đúng cái `_checkux` gọi là *"mắt không phân biệt được nhưng tay phải nhớ cả năm bậc"*.
+>
+> **ĐỔI:** 117 khai báo CSS + 4 khai báo SVG lên 11px, gộp nốt một bậc 13.5px lẻ về 13px.
+> **ĐO LẠI:** `_checkmat` xanh trên CẢ HAI khổ màn (không chỗ nào bị cắt thêm) · biểu đồ Báo cáo
+> **31 nhãn chữ, 0 cặp chồng nhau** ở cả hai khổ - nhãn trục tháng trước 9.5px nay 11px, rõ hơn hẳn.
+>
+> **THƯỚC GIỮ SÀN, và đã chứng minh nó sống:** thêm vào `_checkux` phép hỏi *không cỡ chữ nào dưới
+> 11px*, quét cả `font-size:` của CSS lẫn `font-size="` của SVG. Cắm thử một chỗ 10px vào bản
+> dựng → **đỏ ngay**; gỡ ra → xanh. `_checkux` nay 212 tiêu chí.
+
 > ### 🔵 09/08 (tối) - VÒNG BA: MỘT PHÉP ĐO ĐẶT SAI CHỖ, VÀ CÂU TRẢ LỜI "CHƯA HOÀN HẢO"
 >
 > **Bản dựng `d69a67`.** Anh Luân hỏi *"Hoàn hảo chưa e"*. Em trả lời **CHƯA**, kèm con số làm

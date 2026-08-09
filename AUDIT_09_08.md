@@ -378,3 +378,69 @@ thì nó đang ngăn cách hai thứ không nằm cạnh nhau - vô nghĩa và t
   thiết kế, không phải bản vá - cần anh Luân chốt.
 - **Chưa ai dùng thật trên điện thoại thật** - máy đo được "không vỡ", không đo được "cầm điện
   thoại làm xong một việc có mệt không".
+
+
+---
+
+# SÀN CỠ CHỮ - anh Luân chốt 09/08: *"Cứ chọn 1 size hợp lý"*
+
+## Em đo trước, rồi mới chọn - và phép đo đầu tiên cho thấy em đã nói sai
+
+Vòng ba em khai *"18 chỗ dùng chữ 10px và một chỗ 9.5px trên điện thoại"* và ngụ ý đó là vấn đề.
+Đo lại cho tử tế: **1.470 lượt chữ dưới 11px trên 26 kiểu**, ở 18 trang, khổ 390px.
+
+Nhưng khi **chụp sát** vào đúng mấy chỗ ấy ở mật độ điểm ảnh thật (3×), thì **10px đọc rất rõ** -
+chữ đậm, tương phản cao, nằm trên viên thuốc màu nhạt, và đứng cạnh chữ 13px thì đọc ra ngay là
+chữ phụ, đúng ý đồ.
+
+**Em đã NÓI "10px khó đọc" trước khi NHÌN, và nói sai.** Ghi lại thẳng, vì đó đúng cái bệnh mà cả
+ba vòng audit này sinh ra để chữa.
+
+## Vẫn chọn nâng sàn - nhưng vì một lý do khác, và thật hơn
+
+**Tiếng Việt có dấu.** Dấu ngã, dấu hỏi, dấu mũ chồng lên nhau theo chiều **dọc** - cỡ chữ càng
+nhỏ thì phần dấu càng mất nét, trong khi tiếng Anh cùng cỡ ấy vẫn đủ. Một app tiếng Việt phải
+rộng rãi hơn ở chỗ này. Đó là lý do đứng vững được, không phải cảm giác.
+
+## Chọn 11px - vì sao không phải 10, không phải 12
+
+| Lý do | |
+|---|---|
+| **Đã là bậc có sẵn** | 11px vốn có 128 khai báo trong app - nâng lên không đẻ bậc mới, không phá thang |
+| **Gọn thang** | gộp luôn bốn bậc 9 / 9.5 / 10 / 10.5 vào một: thang **từ 20 bậc còn 16** - đúng hướng `_checkux` sinh ra để giữ |
+| **Khớp chuẩn ngoài** | 11pt là mức tối thiểu trong hướng dẫn giao diện iOS |
+| **12px thì quá tay** | 12px đang là bậc của chữ thân; nâng chữ phụ lên bằng chữ thân là mất thứ bậc thị giác - đúng cái `_checkux` gọi là "mắt không phân biệt được nhưng tay phải nhớ cả năm bậc" |
+
+## Đổi những gì, và đo lại ra sao
+
+- **117 khai báo CSS** + **4 khai báo SVG** nâng lên 11px. Gộp nốt một bậc 13.5px lẻ loi về 13px.
+- `_checkmat` **xanh trên CẢ HAI khổ màn** sau khi đổi - không chỗ nào bị cắt thêm.
+- Biểu đồ Báo cáo: **31 nhãn chữ, 0 cặp chồng nhau** ở cả khổ máy tính lẫn điện thoại. Nhãn trục
+  tháng trước ở 9.5px nay 11px, nhìn rõ hơn hẳn.
+- `_checkux` lên **212 tiêu chí**.
+
+## Thước giữ sàn - và đã chứng minh nó sống
+
+Thêm vào `_checkux`: *không cỡ chữ nào dưới 11px*, quét cả `font-size:` của CSS lẫn `font-size="`
+của SVG. **Thử thật:** cắm một chỗ 10px vào bản dựng → thước đỏ ngay. Gỡ ra → xanh.
+
+*Một cái thước chưa bao giờ đỏ là một cái thước chưa ai biết nó có chạy không.*
+
+## Một hệ quả của chính bản vá này - ghi thẳng
+
+Trên khổ điện thoại, hàng KPI của trang Báo cáo chở **năm thứ trên một hàng 390px**: mã (LRT) ·
+tên chỉ số · giá trị · ngưỡng · trạng thái. Tên chỉ số **vốn đã bị cắt từ trước** ("TB phút từ
+le…"); nâng cỡ chữ lên 11px làm nó cắt sớm hơn **một ký tự** ("TB phút từ l…").
+
+`_checkmat` không báo, vì `.mut` đã được khai là *"chữ phụ mờ - phần bị cắt là chú thích thêm"*.
+Nhưng ở đây **nó không phải chú thích thêm, nó là TÊN của chỉ số** - đọc "LRT · TB phút từ l…"
+thì không biết chỉ số ấy đo cái gì.
+
+**Chưa sửa trong lượt này**, và nói rõ lý do: bản vá đúng cho nó là **cho tên chỉ số xuống dòng
+riêng trên khổ hẹp** - một thay đổi bố cục, không phải một thay đổi cỡ chữ. Sửa nó ngay lúc verify
+đã chạy được nửa đường là đánh đổi 37 phút đo lại lấy một ký tự. Ghi vào VIỆC TỒN để làm cho tử tế.
+
+Đáng chú ý hơn cái lỗi: **dòng khai ngoại lệ của `.mut` trong `_checkmat` đang nói không đúng cho
+mọi trường hợp.** Nó cho rằng chữ mang lớp `mut` luôn là chú thích phụ - trong khi ở hàng KPI,
+`mut` đang mang tên chỉ số. Một ngoại lệ khai quá rộng thì nó che luôn những chỗ đáng lẽ phải đỏ.
+Đây mới là thứ phải sửa trước, và cũng vào VIỆC TỒN.
