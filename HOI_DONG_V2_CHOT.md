@@ -209,3 +209,53 @@ gian của NGƯỜI ngồi đọc lỗi - sai hướng.
 - **Chi phí chữa ở app, không chữa bằng cách bỏ thước** - và bản vá ấy làm app nhanh lên cho
   người dùng thật, không chỉ cho verify.
 - Nguyên tắc rút ra: **khi bộ kiểm chậm, hỏi "app đang làm gì mà chậm" trước khi hỏi "bỏ bộ nào".**
+
+---
+
+## Phần 5 - **Khúc 2c: hội đồng đề nghị KHÔNG LÀM** (đo 09/08)
+
+`BAN_GIAO_V2.md` xếp Khúc 2c là *"đổi tên `HUBTAB` → `NGHIEPVU`, xoá các hàm vẽ hub đã chết"*.
+Đo lại hiện trạng thì **cả hai vế đều không còn đúng**.
+
+### Vế 1 - đổi tên `HUBTAB`: sửa 30 chỗ để được một cái tên đẹp hơn
+
+`HUBTAB` không còn là "bảng tab của hub" - nó đã thành **bảng bí danh**, và đang gánh việc thật ở
+năm nơi: `hubDich` (đưa link cũ sang trang nghiệp vụ) · `noQuyenTheoTrang` (nở quyền từ tab sang
+trang) · `navCur` (tô sáng mục menu) · `goHub` · phần nở tab trong `buildScope`.
+
+Đổi tên là sửa ~30 chỗ, rủi ro thật, và **không đổi một thứ gì trên màn hình của nhân viên**.
+
+### Vế 2 - "hàm vẽ hub đã chết": ĐO RA LÀ KHÔNG CHẾT
+
+Đóng vai đủ **16 chức danh × 5 hub**: không trường hợp nào rơi vào hàm vẽ hub, vì `hubDich` luôn
+tìm được một trang con người đó xem được. Nghe thì đúng là chết.
+
+Nhưng đọc `go()` thì thấy chúng là **lưới an toàn**:
+
+```
+if(HUBTAB[key] && ...){ var d=hubDich(key); if(d&&PBK[d]) key=d }   // không tìm được -> ở lại hub
+```
+
+Ngày nào anh Luân tắt hết trang con của một nhóm trong **Cài đặt › Phân quyền trang**, `hubDich`
+trả về rỗng và app rơi vào hàm vẽ hub. Xoá đi thì lúc ấy là **trang trắng**, không phải một câu
+thông báo. Một nhánh chưa chạy bao giờ không có nghĩa là nhánh chết - nó có nghĩa là **chưa ai
+rơi vào đó**.
+
+### Ngoại lệ đã tách ra: `duyet` KHÔNG phải bí danh
+
+Bốn hub `tuyensinh` · `hoctap` · `cskh` · `khac` đúng là bí danh - tab của chúng đã là trang riêng,
+nên chuyển hướng là đúng.
+
+`duyet` thì khác: nó trả lời **một câu hỏi mà không trang con nào trả lời được** - *"còn gì chờ
+tôi quyết?"* - bằng cách gom cả bốn hàng chờ. Đo 09/08: nhịp ngày của Giám đốc nói *"16 việc chờ
+quyết định"*, bấm vào thì `hubDich` đẩy sang `duyetck` hiện **4**. Đã cho `duyet` qua thẳng; nay
+nhịp 16 = trang gộp 4+2+4+6.
+
+**Và chuyện đó nằm im vì không bộ kiểm nào đi qua nó bằng đường người dùng thật đi.** Đã thêm
+`_checkcauhoi` mục **C5**: bấm dòng nhịp bằng chính hàm `go()` rồi xem `CUR` dừng ở đâu.
+
+### Chốt
+
+- **Không đổi tên `HUBTAB`**, nhưng ghi rõ ở đầu bảng rằng nó nay là bảng BÍ DANH.
+- **Không xoá hàm vẽ hub** - chúng là lưới an toàn cho trường hợp một nhóm bị tắt hết trang con.
+- Khúc 2c coi như **đã xong bằng cách chứng minh không cần làm**, chứ không phải bỏ dở.

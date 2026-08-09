@@ -23406,6 +23406,24 @@ function navVis(k){var r=RBK[CURROLE],rs=SCOPE();
    Để nó lại trong bảng này là `navCur` còn đi hỏi `hubSubKey("giangvien")`, gặp `GVTAB="cong"`
    còn treo từ lần trước thì nó nhường sáng cho một mục con không còn thuộc về nó - bấm Giảng
    viên mà không mục nào sáng (`_check11` bắt được). */
+/* ═══ BẢNG NÀY NAY LÀ BẢNG **BÍ DANH**, KHÔNG CÒN LÀ "TAB CỦA HUB" (chốt 09/08) ═══════════════
+   `BAN_GIAO_V2.md` xếp Khúc 2c là *"đổi tên HUBTAB → NGHIEPVU, xoá các hàm vẽ hub đã chết"*.
+   Hội đồng đo lại 09/08 và ĐỀ NGHỊ KHÔNG LÀM - lý do đầy đủ ở `HOI_DONG_V2_CHOT.md` Phần 5:
+
+   · ĐỔI TÊN: bảng này đang gánh việc thật ở năm nơi - `hubDich` (đưa link cũ sang trang nghiệp
+     vụ), `noQuyenTheoTrang` (nở quyền từ tab sang trang), `navCur` (tô sáng mục menu), `goHub`,
+     và phần nở tab trong `buildScope`. Sửa ~30 chỗ để được một cái tên đọc hợp lý hơn, mà KHÔNG
+     đổi một thứ gì trên màn hình nhân viên.
+
+   · "HÀM VẼ HUB ĐÃ CHẾT": đóng vai đủ 16 chức danh × 5 hub - không trường hợp nào rơi vào chúng,
+     vì `hubDich` luôn tìm được một trang con. Nhưng chúng là LƯỚI AN TOÀN: ngày nào tắt hết trang
+     con của một nhóm trong Cài đặt › Phân quyền trang thì `hubDich` trả rỗng và app rơi vào đây.
+     Xoá đi thì lúc ấy là TRANG TRẮNG. **Một nhánh chưa chạy bao giờ không phải nhánh chết - nó
+     chỉ là nhánh chưa ai rơi vào.**
+
+   NGOẠI LỆ: `duyet` KHÔNG phải bí danh. Bốn cái kia (`tuyensinh` `hoctap` `cskh` `khac`) có tab
+   đã là trang riêng nên chuyển hướng là đúng; còn `duyet` trả lời một câu hỏi mà không trang con
+   nào trả lời được - *"còn gì chờ tôi quyết?"*. `go()` cho nó qua thẳng (xem ghi chú tại đó). */
 var HUBTAB={
  tuyensinh:{v:"TSTAB",d:"lead",m:{lead:"nhaplead",test:"test",tuvan:"tuvan",thanhtoan:"thanhtoan",reup:"reup"}},
  hoctap:{v:"HTTAB",d:"lop",m:{today:"buoihnay",lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp",phong:"phong"}},
