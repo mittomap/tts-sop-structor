@@ -189,6 +189,19 @@ rồi vẽ mọi trang - gộp lại tiết kiệm khoảng 4 phút. **Không n�
 một dòng đỏ **gọi tên đúng một luật**. Gộp thành một bộ khổng lồ là đổi 4 phút của MÁY lấy thời
 gian của NGƯỜI ngồi đọc lỗi - sai hướng.
 
+### Kết quả đo lại sau khi sửa (trọn bộ, chạy sạch)
+
+| | Trước | Sau |
+|---|---|---|
+| **Tổng thời gian trọn bộ** | **50m27s** | **31m30s** |
+| `_check18` | 19m28 | 7m09 |
+| `_checknv` | 4m03 | 2m48 |
+| `_checkui` | 6m36 | 5m57 |
+| `_check16` | 1m17 | 42s |
+| Số bộ kiểm | 39 | **40** (thêm `_checkv2`) |
+
+**Thêm một bộ, mà nhanh hơn 19 phút.** Vì cái phải sửa không phải số bộ - là chỗ app chậm.
+
 ### Chốt
 
 - **Giữ nguyên số bộ.** Không cắt bộ nào.
