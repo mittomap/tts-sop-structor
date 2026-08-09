@@ -2789,7 +2789,22 @@ var CURSTAFF="";
    chỉ khác là lối đi vòng qua một hàm nên bộ kiểm dò theo `go('...')` không thấy.
    Nên `ban` xếp cùng nhóm với `hoso`/`hosogv`/`hosonv`/`hosokhoa`: TRANG CHI TIẾT mở ra từ một
    danh sách, ai mở được danh sách thì đọc được chi tiết. */
-var VIEW_ALWAYS={ban:1,hoso:1,hosogv:1,hosonv:1,hosokhoa:1,chay:1,chang:1,lop:1,viec:1,dashboard:1,tracuu:1,pipeline:1,nhanvien:1,khoahoc:1,tranghv:1,nhaplead:1,lienhe:1,test:1,tuvan:1,thanhtoan:1,diemdanh:1,buoihoc:1,baitap:1,wow:1,review:1,khaosat:1,ghinhan:1,khieunai:1,baoluu:1,magioithieu:1,banggiao:1,canhan:1};
+/* ═══ V2 08/08 - "AI CŨNG XEM ĐƯỢC" LÀ CỬA THOÁT CỦA V1, KHÔNG CÒN ĐÚNG Ở V2 ════════════════
+   Bảng này cho `canSee()` trả TRUE bất kể chức danh. Ở V1 nó cần thiết: mười lăm trang dưới đây
+   là TAB của sáu hub, vào được từ rất nhiều chỗ (nút trong thân trang, bài hướng dẫn, link cũ),
+   nên khoá theo `pages` thì gãy đường đi khắp nơi.
+   Sang V2 chúng là TRANG THẬT, có mục menu riêng, có quyền riêng khai trong `ROLESCOPE` và sửa
+   được ở màn Cài đặt. Để chúng ở đây nghĩa là **phân quyền chỉ là trang trí** - đúng câu app tự
+   ghi trên màn Cài đặt từ V9.41: *"Giấu lối vào mà không khoá cửa ghi thì phân quyền chỉ là
+   trang trí."*
+   ĐO ĐƯỢC 08/08: đóng vai một giáo viên (miền tiền khai `none`) thì `canSee("thanhtoan")` vẫn
+   TRUE - họ mở được trang Học phí bằng đường dẫn thẳng. Trang vẽ ra rỗng vì dữ liệu đã cắt theo
+   phạm vi, nhưng câu mô tả vẫn nói "công nợ" - `_checkmien` bắt 58 chỗ như vậy trên các chức danh.
+   Chuyện này chỉ lộ ra sau khi gỡ cờ `hide` cho 22 trang: TRANG BỊ GIẤU LÀ TRANG KHÔNG AI ĐO.
+   GIỮ LẠI trong bảng: trang chi tiết mở từ một dòng (hồ sơ 360, hồ sơ GV/NV/khoá, chạy quy
+   trình...) - chúng không có quyền riêng theo chức danh, và `canPid` gác dữ liệu ở tầng dưới;
+   cộng `viec` và `canhan` là hai trang mọi chức danh đều có thật. */
+var VIEW_ALWAYS={ban:1,hoso:1,hosogv:1,hosonv:1,hosokhoa:1,chay:1,chang:1,viec:1,dashboard:1,pipeline:1,nhanvien:1,khoahoc:1,tranghv:1,lienhe:1,diemdanh:1,review:1,canhan:1};
 var SENSITIVE={duyet:1,settings:1,baocao:1};
 /* ═══ V9.99t - CHUÔNG VÀ "VIỆC HÔM NAY" PHẢI LÀ VIỆC CỦA CHÍNH CHỨC DANH ĐÓ ════════════════
    Anh Luân 05/08, đang đứng ở Trưởng phòng ACA: *"chỗ việc hôm nay, a đang ở trưởng phòng ACA,
@@ -2913,7 +2928,13 @@ var ROLESCOPE={
     Báo cáo với 36 con số doanh thu và công nợ toàn trung tâm - trong khi CH3 chỉ giao cho
     marketing hai việc: nhập lead mới và chăm lại khách cũ. `noTien` cắt mọi khối tiền. */
  marketing:{match:/^marketing/,land:"tuyensinh",ctx:{TSTAB:"lead"},
-  pages:["viec","banlam","tuyensinh","khac","hocvien","reup","duyet"],
+  /* V2 08/08 - KHAI ĐÚNG TRANG, ĐỪNG KHAI CẢ HUB. Dòng cũ khai `tuyensinh` (hub), mà V2 nở hub
+     thành MỌI tab của nó - trong đó có `thanhtoan`. Hậu quả: cả ba chức danh Marketing mở được
+     trang Học phí, trái thẳng luật V9.60 (*"Marketing KHÔNG xem tiền"*) mà chính dòng ghi chú
+     ngay trên đang khai. `_checkmien` bắt được sau khi gỡ cờ `hide` cho 22 trang - trước đó
+     `thanhtoan` bị giấu nên không ai đo.
+     CH3 giao Marketing đúng hai việc: nhập lead mới và chăm lại khách cũ. Khai đúng hai trang ấy. */
+  pages:["viec","banlam","nhaplead","khac","hocvien","reup","duyet"],
   tabs:{khac:["magioithieu"],duyet:["banggiao"]},
   /* V9.99z10 - hai hàng chờ THẬT của Marketing theo CH3: lead mới về (họ nhập, phải chắc có
      người nhận) và khách cũ tới hẹn chăm lại. Phần còn lại của phễu là việc của Tư vấn. */
@@ -9432,8 +9453,11 @@ function renderYcHV(){
   ["ti-inbox",_ycMoi,"Chưa ai nhận","#E24B4A",_ycMoi?"nhận trong ngày":""],
   ["ti-messages",L.length,"Tổng yêu cầu đang mở","#3B82C4",""]],"ychv")+
   '<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>'+
-  'Yêu cầu học viên gửi từ Cổng học viên. Hệ thống tự chuyển tới học vụ, riêng yêu cầu về tiền thì chuyển kế toán, hạn nhận việc lấy theo <b>'+
-  slaChip("slaTaskAccept_hours",4,"giờ")+'</b>. Nhận và trả lời ngay trong thẻ dưới đây.</div>';
+  /* V2 08/08 - 184 ký tự, quá trần 150. Cùng lý do với trang GV dự phòng: trang này từng khai
+     `hide:1` nên chưa bao giờ bị soi. Phần "chuyển cho ai" vào chú thích rê chuột. */
+  'Yêu cầu gửi từ Cổng học viên, hạn nhận việc <b>'+slaChip("slaTaskAccept_hours",4,"giờ")+'</b>. '+
+  '<span data-tip="Hệ thống tự chuyển tới học vụ; riêng yêu cầu về tiền thì chuyển kế toán.">Ai nhận?</span> '+
+  'Nhận và trả lời ngay trong thẻ dưới đây.</div>';
  h+='<div class="panel"><div class="pbody">';
  if(!L.length)h+='<div class="empty">Chưa có yêu cầu nào gửi lên từ Cổng học viên.</div>';
  L.forEach(function(t){h+=tkCard(t,"mine")});
@@ -16516,7 +16540,10 @@ function renderMaGioiThieu(embed){
     được "giảm 500.000đ", "2.000.000đ ưu đãi đã cấp" ngay trên trang Mã giới thiệu. Chương trình
     giới thiệu là việc của họ, nhưng số tiền thì không. */
  if(dsLevel("tien")!=="none")
-  h+='<div class="notebar"><i class="ti ti-discount-2"></i>Chính sách hiện tại (Cài đặt → CH2): bạn được giới thiệu <b data-tip="Mức giảm cho người ĐƯỢC giới thiệu, áp dụng cho khóa đầu tiên - lấy từ Cài đặt > CH2 (chính sách giới thiệu), không cắm cứng trong app">giảm '+esc(off.txt)+'</b> khi đăng ký khóa đầu · người giới thiệu nhận <b>'+esc(reward)+'</b>.</div>';
+  /* V2 08/08 - 168 ký tự, quá trần 150. Trang này cũng vừa hết `hide` nên lần đầu bị soi.
+     Bỏ chữ "Chính sách hiện tại (Cài đặt → CH2)" ở đầu - nguồn của con số đã nằm trong chú
+     thích rê chuột của chính con số ấy rồi, nói hai lần là dài mà không thêm gì. */
+  h+='<div class="notebar"><i class="ti ti-discount-2"></i>Người được giới thiệu <b data-tip="Mức giảm cho người ĐƯỢC giới thiệu, áp dụng cho khóa đầu tiên - lấy từ Cài đặt > CH2 (chính sách giới thiệu), không cắm cứng trong app">giảm '+esc(off.txt)+'</b> khi đăng ký khóa đầu · người giới thiệu nhận <b>'+esc(reward)+'</b>.</div>';
  h+=statStrip([
   /* ═══ V9.57 (anh Luân): bốn ô cũ ở đây đều là SỐ TÍCH LUỸ - "HV đã tạo mã", "lượt bạn dùng mã",
      "bạn đã đăng ký", "ưu đãi đã cấp". Đọc thì vui, nhưng sáng mai đọc lại vẫn gần y hệt và
@@ -17459,11 +17486,16 @@ function renderGvdp(embed){
     ra điều đó, nên người dùng đi tìm một cái nút không tồn tại. Không có danh sách "GV dự phòng"
     khai trước vì một danh sách khai tay sẽ lạc hậu ngay khi lịch đổi; app tính thẳng từ lịch dạy
     thật. Nay nói thẳng ra trên màn. */
+ /* V2 08/08 - CÂU NHẮC 395 KÝ TỰ, QUÁ TRẦN 150. Trang này trước đây khai `hide:1` nên chưa bao
+    giờ bị `_checkaudit` soi; gỡ cờ xong là lộ ngay. Luật của app: câu đầu trang phải đọc HẾT
+    trong một nhịp mắt, phần dài đưa vào chú thích rê chuột - ai cần thì có, ai không thì không
+    phải lướt qua. Giữ nguyên đủ ý, chỉ đổi chỗ đặt. */
  h+='<div class="notebar"><i class="ti ti-info-circle"></i>'+
-  '<b>Không cần đăng ký trước.</b> Không có danh sách "giáo viên dự phòng" khai tay - app tự tính người thay được cho TỪNG BUỔI: '+
-  'ai trống lịch đúng khung giờ đó, dạy được ở cơ sở của lớp (hoặc lớp online), và không vượt số buổi/ngày. '+
-  'Muốn ai đó nhận thay thì bấm <b>Đẩy người thay</b> ở dòng buổi tương ứng. '+
-  'Giáo viên nghỉ cả ngày thì để trống lịch của họ - họ tự rơi vào nhóm "trống lịch cả ngày" ở ô bên trên.</div>';
+  '<b>Không cần đăng ký trước.</b> App tự tính ai thay được cho từng buổi. '+
+  '<span data-tip="Người thay được = trống lịch đúng khung giờ đó, dạy được ở cơ sở của lớp (hoặc lớp online), '+
+  'và không vượt số buổi/ngày. Giáo viên nghỉ cả ngày thì để trống lịch của họ - họ tự rơi vào nhóm '+
+  '&quot;trống lịch cả ngày&quot; ở ô bên trên.">App tính thế nào?</span> '+
+  'Bấm <b>Đẩy người thay</b> ở dòng buổi tương ứng.</div>';
  h+=statStrip([
   ["ti-calendar",ses.length,"Buổi trong ngày","#3B82C4",noGv.length?(noGv.length+" buổi chưa có GV"):"đã có GV đủ"],
   ["ti-user-check",free.length+"/"+GV.length,"Giáo viên trống lịch cả ngày","#16A34A","có thể nhận thay"],
@@ -18389,7 +18421,10 @@ var TOURS={
   {p:"tuvan",sel:'@txt:Cập nhật chốt',t:"Chốt và tạo đăng ký",d:"Khách đồng ý thì tạo phiếu đăng ký, chọn khóa và ưu đãi. Ưu đãi vượt ngưỡng sẽ tự chuyển quản lý duyệt - bạn không cần đi xin.",hint:"Bấm Cập nhật chốt trên một hồ sơ đã tư vấn xong.",chk:function(){return tourMore("dk")}},
   {p:"thanhtoan",sel:'@txt:Ghi nhận khoản thu',t:"Thu tiền và gửi xác nhận",d:"Thu đủ hoặc thu theo đợt đều được. Thu xong in phiếu và bấm nút copy tin nhắn Zalo gửi khách ngay.",hint:"Bấm 'Ghi nhận khoản thu' ở đầu trang (hoặc 'Ghi nhận thanh toán' trên một đăng ký còn nợ), nhập số tiền rồi Lưu.",chk:function(){return tourMore("thu")}},
   {p:"giaoviec",sel:'@man',t:"Việc sếp giao cho bạn",d:"Ngoài khách, bạn còn nhận việc từ quản lý ở đây. Nhận việc, làm xong bấm Báo xong, có gì vướng thì trao đổi ngay trong việc.",hint:"Xong một ngày của tư vấn viên!"}]},
- tn_hocvu:{lv:"trainghiem",role:"Học vụ - CSKH",t:"Một ngày của Học vụ",ic:"ti-school",d:"8 bước - xếp lớp, theo lớp, chăm học viên",steps:[
+ /* V2 08/08 - thêm bước KHIẾU NẠI, và sửa số bước cho đúng: dòng cũ ghi "8 bước" trong khi bài
+    có 10 - chữ nói một đằng, bài chạy một nẻo. Trang Khiếu nại vừa hết `hide` nên `_checktour`
+    mới soi tới và báo không bài nào đi qua nó; mà xử lý khiếu nại đúng là việc của Học vụ/CSKH. */
+ tn_hocvu:{lv:"trainghiem",role:"Học vụ - CSKH",t:"Một ngày của Học vụ",ic:"ti-school",d:"11 bước - xếp lớp, theo lớp, chăm học viên",steps:[
   /* V9.63: kênh học viên gửi yêu cầu là việc của học vụ, mà bài này chưa nói tới - anh Luân nhắc
      đúng luật đã chốt: mỗi lần đổi app phải soát lại tour và Trợ lý. */
   {p:"ychv",sel:'@man',t:"Học viên nhắn gì cho trung tâm",d:"Học viên gửi yêu cầu từ Cổng học viên - xin nghỉ, xin học bù, hỏi lịch, báo đã chuyển khoản. Hệ thống tự chuyển tới bạn kèm hạn nhận việc; yêu cầu về tiền thì sang kế toán.",hint:"Bấm Nhận việc ở một thẻ rồi trả lời ngay trong thẻ đó."},
@@ -18404,6 +18439,7 @@ var TOURS={
   {p:"buoihoc",sel:'@txt:Chờ ghi nhận xét',t:"Nhắc giáo viên ghi nhận xét",d:"Buổi dạy xong mà quá hạn chưa có nhận xét sẽ hiện đỏ ở đây. Đây là việc học vụ phải đốc thúc hằng tuần.",hint:"Bấm chip 'Chờ ghi nhận xét' để lọc, rồi ghi nhận xét cho một buổi trong danh sách.",chk:function(){return (window.TOURB&&rows("DL11").filter(function(x){return bhState(x).note}).length>(window.TOURB.nx||0))}},
   {p:"hocvien",sel:'@txt:Nguy cơ',t:"Học viên nguy cơ",d:"Lọc nhanh những học viên vắng nhiều hoặc tiến bộ chậm để gọi hỏi thăm trước khi phụ huynh phàn nàn.",hint:"Bấm chip lọc 'Nguy cơ', mở một học viên rồi ghi lần chăm."},
   {p:"khaosat",sel:'@man',t:"Khảo sát và phản hồi",d:"Gửi khảo sát định kỳ theo lớp, tiếp nhận góp ý, xử lý khiếu nại. Điểm hài lòng thấp sẽ tự bật việc follow-up.",hint:"Xem tab Khảo sát."},
+  {p:"khieunai",sel:'@man',t:"Khiếu nại của học viên",d:"Phiếu khiếu nại có mức độ và hạn xử lý riêng - mức CAO thì hạn ngắn hơn. Nhận, cử người xử lý, rồi đóng phiếu kèm cách giải quyết; học viên đọc được kết quả ở cổng của họ.",hint:"Mở một phiếu chưa đóng rồi ghi hướng xử lý."},
   {p:"baoluu",sel:'@man',t:"Giữ chân học viên muốn nghỉ",d:"Học viên xin bảo lưu hoặc có ý bỏ học nằm ở đây - gọi giữ chân, hẹn ngày quay lại, hoặc chốt bảo lưu có hạn.",hint:"Bấm Tiếp theo - còn một bước cuối khóa."},
   /* AC2 - trang Kết quả đầu ra sinh ra 07/08 theo yêu cầu của Trưởng phòng ACA. Trang mới mà
      không có bài hướng dẫn nào đi qua thì người nhận bàn giao không biết nó tồn tại;
@@ -18414,8 +18450,11 @@ var TOURS={
     quyền cho giáo viên (trước đó app giục họ chấm 12 bài mà không có cửa nào vào) - `_checktour`
     bắt ngay: không một bài hướng dẫn nào đi qua trang ấy. Mở một trang mà không dẫn đường tới nó
     thì người dùng vẫn không biết nó tồn tại. Bài này thành 6 bước, không phải 5. */
- tn_giaovien:{lv:"trainghiem",role:"Giáo viên",t:"Một ngày của Giáo viên",ic:"ti-chalkboard",d:"6 bước - dạy, điểm danh, giao bài, chấm bài",steps:[
+ tn_giaovien:{lv:"trainghiem",role:"Giáo viên",t:"Một ngày của Giáo viên",ic:"ti-chalkboard",d:"7 bước - lịch tuần, dạy, điểm danh, giao bài, chấm bài",steps:[
   {p:"buoihnay",sel:'@man',t:"Hôm nay bạn dạy gì",d:"Vào app là thấy ngay buổi dạy hôm nay, chủ đề buổi, bài tập sẽ giao và lời dặn từ giáo án khóa.",hint:"Xem thẻ buổi học của bạn."},
+  /* V2 08/08 - Lịch tuần vừa hết `hide`, `_checktour` báo không bài nào đi qua. Đây đúng là thứ
+     giáo viên xem đầu tuần, nên nó vào bài của họ chứ không phải khai lý do bỏ qua. */
+  {p:"lichtuan",sel:'@man',t:"Cả tuần của bạn nhìn một lần",d:"Lưới lịch cho thấy tuần này bạn dạy buổi nào, lớp nào, ở đâu - và chỗ nào còn trống. Xem đầu tuần để biết trước ngày nào dày, ngày nào rảnh.",hint:"Nhìn lướt lưới lịch rồi bấm Tiếp theo."},
   {p:"banglop",sel:'@txt:Buổi học & điểm danh',t:"Vào lớp và điểm danh",d:"Bấm Bắt đầu lớp để mở cổng điểm danh. Vắng có phép hay không phép đều ghi rõ, vắng phải ghi lý do.",hint:"Bấm tab 'Buổi học & điểm danh' của lớp, đánh dấu vài học viên rồi Lưu buổi học."},
   {p:"banglop",sel:'@txt:Giao & chấm bài tập',t:"Giao bài tập",d:"Giao một bài chung cho cả lớp hoặc bài riêng cho từng học viên. Hạn nộp tự tính theo giáo án khóa, sửa được.",hint:"Bấm tab 'Giao & chấm bài tập' rồi giao một bài mới."},
   {p:"baitap",sel:'@txt:Chờ chấm',t:"Còn bài nào bạn chưa chấm",d:"Ba chế độ đầu bắt chọn trước một lớp và một buổi. Chip 'Chờ chấm - mọi lớp' gom hết bài đã nộp mà chưa chấm của MỌI lớp bạn dạy vào một bảng, mỗi dòng một nút nhảy thẳng vào chấm.",hint:"Bấm chip 'Chờ chấm - mọi lớp' rồi chấm một bài."},
