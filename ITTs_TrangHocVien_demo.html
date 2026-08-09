@@ -681,6 +681,15 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .bwsub{font-size:12px;opacity:.9;margin-top:3px;line-height:1.5;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 .bwsub b{color:#fff}
 .bwdot{opacity:.45}
+/* Dấu ngăn + mục đi sau nó là MỘT khối: xuống dòng thì xuống cùng nhau. Xem ghi chú ở chỗ dựng
+   dòng chào - dấu "·" treo cuối dòng trên khổ điện thoại. */
+.bwit{display:inline-flex;align-items:center;gap:7px}
+/* KHỔ HẸP THÌ BỎ HẲN DẤU NGĂN. Bọc dấu ngăn cùng mục sau nó chữa được cảnh nó treo CUỐI dòng,
+   nhưng đo lại trên màn 390px thì nó chuyển sang đứng ĐẦU dòng hai - một dấu chấm lơ lửng
+   trước cụm "Hẹn kế", vẫn lạ mắt y như cũ. Dấu ngăn chỉ có nghĩa khi hai thứ nó ngăn nằm CÙNG
+   một dòng; xuống dòng rồi thì chính cái xuống dòng đã ngăn hộ. Trên khổ hẹp, `gap:7px` của
+   `.bwsub` làm nốt việc còn lại. Ngắt tại 560px - mốc đã có sẵn trong bảng, không đẻ mốc mới. */
+@media(max-width:560px){.bwsub .bwdot{display:none}}
 /* V9.31: cung benh voi .notebar - inline-flex + gap:5px be cau "Hen ke: <b>19:30</b> - Ten khach"
    thanh ba manh cach nhau. Chip nay la MOT CAU, khong phai mot hang o. */
 .bwap{display:inline-block;background:#ffffff1f;border-radius:999px;padding:3px 9px;
@@ -1250,6 +1259,19 @@ body.drwon .asstfab,body.navon .asstfab{opacity:0;pointer-events:none;transition
 .cfnu{font-size:10.5px;color:var(--muted);min-width:38px}
 /* Dải thẻ buổi (Vận hành lớp) - gọn, bấm chọn buổi để điểm danh ngay dưới */
 .tbdiv{display:inline-block;width:1px;height:20px;background:var(--line);margin:0 4px;vertical-align:middle}
+/* VẠCH NGĂN LÀ MỘT PHẦN CỦA NHÓM ĐI SAU NÓ, KHÔNG PHẢI MỘT PHẦN TỬ ĐỨNG RIÊNG.
+   Bẫy cắn 09/08, nhìn thấy trên khổ máy tính bảng 768px: giữa hai hàng chip có **một dòng trống
+   chỉ chứa đúng một vạch dọc** - `.tbdiv` là phần tử flex riêng nên khi thanh công cụ xuống dòng,
+   nó ở lại một mình và chiếm trọn một hàng cao 40px. Đo được ở MỌI khổ, không riêng màn hẹp:
+   điện thoại 10 chỗ · máy tính bảng 7 · laptop 6 · **máy tính 1440 vẫn 3**.
+   Cùng họ với dấu "·" mồ côi vá cùng ngày, nhưng thước chữ không thấy nó: đây là một vạch vẽ
+   bằng CSS, không mang chữ nào.
+   Nay vạch là `::before` của nhóm đi sau: xuống dòng thì nó đi theo nhóm, không bao giờ còn lại
+   một mình. Và dưới 560px thì bỏ hẳn - xuống dòng rồi thì chính cái xuống dòng đã ngăn hộ, đúng
+   lý do đã ghi ở `.bwdot`. */
+.tbgr{display:inline-flex;align-items:center;gap:8px}
+.tbgr::before{content:"";width:1px;height:20px;background:var(--line);flex:0 0 auto}
+@media(max-width:560px){.tbgr::before{display:none}.tbgr{gap:0}}
 /* V9.67: trên điện thoại phễu XUỐNG DÒNG thay vì cuộn ngang. Một khung cuộn ngang lồng trong
    khung cuộn dọc là thứ khó dùng nhất trên cảm ứng - vuốt một cái không biết mình đang cuộn cái
    nào; và đo được là chính nó làm khung nội dung cuộn thêm 14px. Sáu bước xếp hai hàng vẫn đọc
@@ -4814,7 +4836,7 @@ function fltBarHTML(pg,daCoTim){
   '<button class="btn sm" onclick="pgExport(\''+esc(pg)+'\')" data-tip="Tải '+nRow+' dòng đang hiện ra tệp CSV - mở được bằng Excel"><i class="ti ti-table"></i>Xuất</button>';
  if(!fltAxes(pg).length)return h;
  var n=fltOn(pg),st=fltSt(pg);
- h+='<span class="tbdiv"></span><button class="btn'+(n?" primary":"")+' sm" onclick="fltOpen(\''+esc(pg)+'\')" data-tip="Lọc sâu: người phụ trách, khoảng thời gian, lớp, khóa... kết hợp được và lưu được"><i class="ti ti-filter"></i>Bộ lọc'+(n?" ("+n+")":"")+'</button>';
+ h+='<span class="tbgr"><button class="btn'+(n?" primary":"")+' sm" onclick="fltOpen(\''+esc(pg)+'\')" data-tip="Lọc sâu: người phụ trách, khoảng thời gian, lớp, khóa... kết hợp được và lưu được"><i class="ti ti-filter"></i>Bộ lọc'+(n?" ("+n+")":"")+'</button></span>';
  if(n){h+='<span class="fltchips">';
   fltAxes(pg).forEach(function(a){var v=st[a.k];if(!v)return;
    var txt="";
@@ -4894,12 +4916,12 @@ function renderList(key,emb){
   var segs=opts.map(function(c){return [c,seen[c].lb,seen[c].n,stCls(c)]});
   if(segs.length)left+=segHTML(fa,segs,"toggleFilt('"+key+"','{k}')")}
  if(cfg.qf){   /* chip lọc tuỳ biến, tách bằng gạch dọc cho khỏi lẫn với chip trạng thái */
-  left+='<span class="tbdiv"></span>'+segHTML(qk?[qk]:[],cfg.qf.map(function(x){return [x[0],x[1],all.filter(x[2]).length,x[3]||"red"]}),"qfToggle('"+key+"','{k}')")}
+  left+='<span class="tbgr">'+segHTML(qk?[qk]:[],cfg.qf.map(function(x){return [x[0],x[1],all.filter(x[2]).length,x[3]||"red"]}),"qfToggle('"+key+"','{k}')")+'</span>'}
  if(key==="hocvien"){
-  left+='<span class="tbdiv"></span><select class="sel" onchange="window.HVFCLS=this.value;reRender(CUR)"><option value="">Mọi lớp</option>'+
+  left+='<span class="tbgr"><select class="sel" onchange="window.HVFCLS=this.value;reRender(CUR)"><option value="">Mọi lớp</option>'+
    rows("DL10").map(function(c){return '<option value="'+esc(c.class_id)+'"'+(c.class_id===(window.HVFCLS||"")?" selected":"")+'>'+esc(c.class_name||c.class_id)+'</option>'}).join("")+'</select>'+
   '<select class="sel" onchange="window.HVFCRS=this.value;reRender(CUR)"><option value="">Mọi khóa</option>'+
-   rows("DL05").map(function(c){return '<option value="'+esc(c.course_id)+'"'+(c.course_id===(window.HVFCRS||"")?" selected":"")+'>'+esc(c.course_name||c.course_id)+'</option>'}).join("")+'</select>'}
+   rows("DL05").map(function(c){return '<option value="'+esc(c.course_id)+'"'+(c.course_id===(window.HVFCRS||"")?" selected":"")+'>'+esc(c.course_name||c.course_id)+'</option>'}).join("")+'</select></span>'}
  var nHid=HIDECOL[key]?Object.keys(HIDECOL[key]).length:0;
  var hvF=(key==="hocvien")&&(window.HVFCLS||window.HVFCRS);
  var _f2=fltOn(key);
@@ -7723,6 +7745,12 @@ function pkNhac(s){var n=0,i,nhan="";
   if(s.options[i].value!=="")n++;
   else if(!nhan)nhan=String(s.options[i].textContent||s.options[i].text||"").trim();}
  nhan=nhan.replace(/^-+\s*/,"").replace(/\s*-+$/,"").trim();
+ /* NHÃN DÀI THÌ THÔI ĐUÔI. Đo trên khổ điện thoại 390px (09/08): ô "Xem việc của" có nhãn
+    "Toàn hệ thống (chính tôi)" - thêm "· gõ để tìm (33)" vào là chuỗi cần 264px trong khi ô chỉ
+    có 235px, tức chính bản vá thêm nhãn lại làm cắt chữ ở chỗ khác. Nhãn là thứ PHẢI đọc được;
+    "gõ để tìm" chỉ là lời mời, thiếu nó người ta vẫn gõ được vào ô. Nhãn ngắn thì giữ cả hai,
+    nhãn dài thì giữ cái phải đọc. */
+ if(nhan.length>16)return nhan;
  return nhan?(nhan+" · gõ để tìm ("+n+")"):("Gõ để tìm trong "+n+" lựa chọn");}
 /* Ô gõ luôn hiển thị đúng thứ <select> đang giữ - gọi lại sau mỗi lần chọn hoặc mỗi lần app tự
    đặt giá trị. Không có bước này thì ô gõ và giá trị thật lệch nhau mà không ai hay. */
@@ -9649,8 +9677,18 @@ function renderBanlam(){
  var apChip=nextAp?('<span class="bwap" onclick="chayQSet(\'appt\')" data-tip="lọc danh sách còn đúng các cuộc hẹn"><i class="ti ti-clock"></i>Hẹn kế: <b>'+esc((function(){var d=jNF(nextAp);var hh=("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);var td=new Date();var sameDay=d.getDate()===td.getDate()&&d.getMonth()===td.getMonth();return hh+(sameDay?" hôm nay":" "+("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2))})())+'</b> · '+esc(nextAp.name)+'</span>'):'';
  var h='<div class="bwhero"><div class="bwl"><div class="bwg">'+esc(greet)+', '+esc(meNm)+'</div>'+
   '<div class="bwsub"><span><b>'+tasks.length+'</b> việc cần xử lý</span>'+
-   (over.length?('<span class="bwdot">·</span><span class="bwover">'+over.length+' quá hạn</span>'):'')+
-   (apChip?('<span class="bwdot">·</span>'+apChip):'')+'</div>'+
+   /* DẤU NGĂN PHẢI ĐI LIỀN MỤC SAU NÓ. Bẫy cắn 09/08, nhìn thấy trên khổ điện thoại 390px:
+      dòng chào đọc thành *"72 việc cần xử lý · 54 quá hạn ·"* - một dấu chấm giữa **treo lơ
+      lửng ở cuối dòng**, vì mục thứ ba (Hẹn kế) rớt xuống dòng dưới còn dấu ngăn của nó thì ở
+      lại. `.bwsub` là flex-wrap, mà mỗi dấu ngăn lại là MỘT phần tử flex riêng - nên nó đứt
+      khỏi mục nó đi kèm được.
+      `_checkmat` có sẵn phép đo "dấu ngăn mồ côi" (M4) và nó xanh - vì bộ ấy cố ý chỉ đo MỘT
+      khổ màn 1440px cho rẻ. Mà lỗi này chỉ sinh ra khi chữ XUỐNG DÒNG, tức chỉ ở khổ hẹp.
+      **Đo một lỗi-do-xuống-dòng ở khổ rộng nhất là đo đúng cái trường hợp nó không thể xảy ra.**
+      Nay bọc dấu ngăn cùng mục sau nó trong một phần tử: hai thứ xuống dòng cùng nhau hoặc
+      không thứ nào xuống. */
+   (over.length?('<span class="bwit"><span class="bwdot">·</span><span class="bwover">'+over.length+' quá hạn</span></span>'):'')+
+   (apChip?('<span class="bwit"><span class="bwdot">·</span>'+apChip+'</span>'):'')+'</div>'+
   /* V2 08/08 - BÀN LÀM VIỆC CHƯA BAO GIỜ NÓI NÓ LÀ CÁI GÌ. Ô chào có tên người và số việc, nhưng
      không một câu nào nói trang này gom gì và đọc thế nào - người mới mở ra thấy một dải ô màu
      rồi tự đoán. Anh Luân chốt V2: *"bàn làm việc em đổi thành: các chỉ số số cảnh báo đi, nó
@@ -11727,7 +11765,9 @@ function renderBanggiao(embed){
  h+='<span class="lbl">Trả lại ngày</span><input class="sel" id="bgUntil" style="width:130px" placeholder="dd/mm/yyyy" value="'+esc(window.BGUNTIL||"")+'" onchange="window.BGUNTIL=this.value" data-tip="Để trống = chuyển hẳn. Điền ngày = bàn giao TẠM, hết ngày đó lead tự quay về NV cũ.">';
  h+='<button class="btn primary" onclick="doHandover()"><i class="ti ti-arrows-exchange"></i>Bàn giao đã chọn</button>';
  var orphan=rows("DL02").filter(function(l){return !String(l.assigned_to||"").trim()&&!isc(l.lead_status,"converted","rejected","unreachable")}).length;
- if(orphan)h+='<span class="sep"></span><button class="btn" onclick="bgSplitOrphans()"><i class="ti ti-users"></i>Chia đều '+orphan+' lead chưa có NV</button>';
+ /* Vạch ngăn đi cùng nút - xem ghi chú ở `.tbgr`. Trên khổ 390px nút này rớt xuống dòng riêng,
+    để vạch `.sep` ở lại một mình cuối dòng trên. */
+ if(orphan)h+='<span class="tbgr"><button class="btn" onclick="bgSplitOrphans()"><i class="ti ti-users"></i>Chia đều '+orphan+' lead chưa có NV</button></span>';
  h+='</div>';
  /* V9.29p: dải số cho biết BÀN GIAO CÓ ĐÁNG LÀM KHÔNG - ai đang ôm bao nhiêu, bao nhiêu lead
     không có ai phụ trách, bao nhiêu lead quá hạn liên hệ. Trước đây phải tự đếm bằng mắt. */
@@ -11943,11 +11983,11 @@ function renderNhatky(){
   ["ti-arrow-back-up",nUndone,"Dòng đã hoàn tác","#D51920",""]],"nhatky");
  var tbs={};L.forEach(function(e){if(e.sheet)tbs[e.sheet]=1});
  var bar='<span class="pgq"><i class="ti ti-search"></i><input value="'+esc(window.NKQ||"")+'" placeholder="Tìm trong trang này..." oninput="nkSet(\'NKQ\',this.value)" aria-label="Tìm trong nhật ký"></span>';
- bar+='<span class="tbdiv"></span><span class="lbl">Bảng</span><select class="sel qsel" onchange="nkSet(\'NKTB\',this.value)"><option value="">Tất cả</option>';
+ bar+='<span class="tbgr"><span class="lbl">Bảng</span><select class="sel qsel" onchange="nkSet(\'NKTB\',this.value)"><option value="">Tất cả</option>';
  Object.keys(tbs).sort().forEach(function(c){bar+='<option value="'+esc(c)+'"'+(window.NKTB===c?" selected":"")+'>'+esc(sheetVN(c))+'</option>'});
  bar+='</select><span class="lbl">Người</span><select class="sel qsel" onchange="nkSet(\'NKWHO\',this.value)"><option value="">Tất cả</option>';
  Object.keys(whos).forEach(function(s){bar+='<option value="'+esc(s)+'"'+(window.NKWHO===s?" selected":"")+'>'+esc(whos[s])+'</option>'});
- bar+='</select>';
+ bar+='</select></span>';
  h+=tbar(bar,'<span class="tbcnt">'+F.length+' dòng</span><button class="btn sm" onclick="pgExport(\'nhatky\')" data-tip="Tải '+F.length+' dòng đang hiện ra tệp CSV"><i class="ti ti-table"></i>Xuất</button>');
  if(!F.length)return h+'<div class="tbwrap"><table class="tb"><tbody><tr><td class="empty">'+
   (L.length?'Không có dòng nào khớp điều kiện lọc - bỏ bớt điều kiện rồi thử lại.':'Chưa có thao tác nào được ghi trong buổi làm việc này. Sửa một dữ liệu bất kỳ rồi quay lại đây.')+'</td></tr></tbody></table></div>';
@@ -13742,13 +13782,13 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
   if(fil==="all")h+='<div class="sechd">Đang onboarding</div>';
  }
  if(fil==="chuaxep"){   /* chip này hỏi về DL06 (đơn đã đóng đủ), không hỏi về DL08 - bảng dưới lui */
-  h+=tbar(timHTML("xeplop")+xlSegs(fil,obs,wait),'<span class="tbcnt">'+wait.length+' hồ sơ</span>');
+  h+=tbar(timHTML("xeplop")+'<span class="tbgr">'+xlSegs(fil,obs,wait)+'</span>','<span class="tbcnt">'+wait.length+' hồ sơ</span>');
   if(!wait.length)h+='<div class="empty">Không còn ai đóng đủ tiền mà chưa xếp lớp.</div>';
   return h}
  /* V9.28: trang này tự dựng thanh công cụ và KHÔNG có biến p (nó dùng window.XLFILT),
     nên phải ghi thẳng mã trang - viết p ở đây là tham chiếu biến không tồn tại, lọc câm luôn. */
  view=fltApply("xeplop",view);
- h+=tbar(timHTML("xeplop")+xlSegs(fil,obs,wait),
+ h+=tbar(timHTML("xeplop")+'<span class="tbgr">'+xlSegs(fil,obs,wait)+'</span>',
   '<span class="tbcnt">'+view.length+' hồ sơ</span>'+fltBarHTML("xeplop",1));
  h+='<div class="obcards rows" data-tour="obcards">';if(!view.length)h+='<div class="empty">Không có hồ sơ phù hợp.</div>';
  var MIX=jIndex();
@@ -13934,7 +13974,7 @@ function srchHTML(val,fn,ph,w){return '<div class="srch" style="max-width:'+(w||
 function timHTML(pg){var q=pgqGet(pg);
  return '<span class="pgq"><i class="ti ti-search"></i><input value="'+esc(q)+'" placeholder="Tìm trong trang này..." oninput="pgqSet(\''+esc(pg)+'\',this.value)" aria-label="Tìm trong trang này"></span>'+
   (q?'<button class="pill" onclick="pgqSet(\''+esc(pg)+'\',\'\')" data-tip="Xoá từ khoá tìm"><i class="ti ti-x"></i></button>':'')+
-  '<span class="tbdiv"></span>'}
+  ''}   /* vạch ngăn nay do `.tbgr` bọc dải chip lo - xem ghi chú ở `.tbgr` */
 /* ĐƠN VỊ ĐẾM - gọi đúng tên thứ đang đếm. Trước đây filterBar cắm cứng chữ "hồ sơ" cho MỌI
    trang: màn Buổi học ghi "146 hồ sơ", màn Khiếu nại cũng "hồ sơ". Đo bằng phép đếm biến thể
    thấy 20 cách ghi số dòng khác nhau - loại lỗi chỉ lộ ra khi so các trang VỚI NHAU. */
@@ -13954,10 +13994,11 @@ function filterBar(p,cur,opts,cnt){
     Trái = thu hẹp danh sách (thứ dùng nhiều nhất, nên nằm đầu tầm mắt);
     phải = kết quả và công cụ. Sửa ở HÀM CHUNG nên mọi trang đi qua nó đổi theo cùng lúc. */
  var q=pgqGet(p);
+ /* KHÔNG gắn vạch ngăn ở đây nữa: nó là `::before` của `.tbgr` bọc dải chip ngay dưới, nên
+    vạch luôn đi cùng dải chip thay vì đứng riêng một mình. Để cả hai là vẽ hai vạch. */
  var tim='<span class="pgq"><i class="ti ti-search"></i><input value="'+esc(q)+'" placeholder="Tìm trong trang này..." oninput="pgqSet(\''+esc(p)+'\',this.value)" aria-label="Tìm trong trang này"></span>'+
-  (q?'<button class="pill" onclick="pgqSet(\''+esc(p)+'\',\'\')" data-tip="Xoá từ khoá tìm"><i class="ti ti-x"></i></button>':'')+
-  '<span class="tbdiv"></span>';
- return tbar(tim+segHTML(cur,opts,"fset('"+p+"','{k}');reRender(CUR)"),
+  (q?'<button class="pill" onclick="pgqSet(\''+esc(p)+'\',\'\')" data-tip="Xoá từ khoá tìm"><i class="ti ti-x"></i></button>':'');
+ return tbar(tim+'<span class="tbgr">'+segHTML(cur,opts,"fset('"+p+"','{k}');reRender(CUR)")+'</span>',
   '<span class="tbcnt">'+cnt+' '+dvi(p)+'</span>'+fltBarHTML(p,1))}
 /* ═══ V2 09/08 - DẢI CHIP KHÔNG KÈM Ô TÌM ═══════════════════════════════════════════════════
    `filterBar` luôn kèm một ô tìm ở đầu - đúng cho trang chưa có ô nào. Nhưng bốn trang em vừa
@@ -19985,10 +20026,10 @@ function renderGiaoviec(){
   ["ti-send",gLive.length,"Tôi giao, đang chạy","#0D9488","theo dõi tiến độ","tkTabSet('given');tkFset('live')"]],"giaoviec");}
  /* V9.99u - TAB "VIỆC CHỜ NHẬN" đứng ĐẦU: đây là việc chưa ai đụng vào, người giao đang chờ,
     nên nó gấp hơn cả việc đang làm. Con số trên tab là việc CỦA CHÍNH NGƯỜI ĐANG ĐĂNG NHẬP. */
- h+=tbar(timHTML("giaoviec")+segHTML(tab,[["wait","Việc chờ nhận",mWait.length||"",mWait.length?"red":""],
+ h+=tbar(timHTML("giaoviec")+'<span class="tbgr">'+segHTML(tab,[["wait","Việc chờ nhận",mWait.length||"",mWait.length?"red":""],
    ["mine","Việc của tôi",mLive.length||"",mOver.length?"red":""],
    ["given","Tôi đã giao",gLive.length||"",gWait.length?"amber":""],
-   ["report","Tổng hợp & báo cáo",null,""]],"tkTabSet('{k}')"),
+   ["report","Tổng hợp & báo cáo",null,""]],"tkTabSet('{k}')")+'</span>',
   (tab==="report"||tab==="wait")?"":segHTML(f,[["live","Đang chạy",null,""]]
    .concat(tab==="given"?[["cho","Chờ tôi xác nhận",gWait.length||"",gWait.length?"amber":""]]:[])
    .concat([["all","Tất cả",null,""],["done","Đã xong",null,""]]),"tkFset('{k}')"));

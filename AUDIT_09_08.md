@@ -279,3 +279,102 @@ người ta đi tìm, còn đèn xanh thì người ta đi ngủ.*
   một lượt đẩy là đổi một rủi ro thật lấy một cái gọn mắt. Ghi vào VIỆC TỒN để rà lại tử tế.
   (Có một chi tiết đáng nhớ khi rà: `openDangky` nhận **lead_id** chứ không phải mã đăng ký - gọi
   nhầm là nó ném lỗi ngay. Một hàm chết mà còn cạm bẫy thì càng nên dọn, chỉ là dọn đúng lúc.)
+
+
+---
+
+# VÒNG BA - 09/08 (tối), bản dựng `d69a67`
+
+Anh Luân hỏi *"Hoàn hảo chưa e"*. Em trả lời **chưa**, và lý do em nói vậy là một con số: vòng
+một ra 6 lỗi, vòng hai ra 7 lỗi - **tốc độ tìm ra lỗi không giảm**. Nếu đã gần hoàn hảo thì vòng
+sau phải ra ít hơn hẳn vòng trước.
+
+Vòng ba nhắm thẳng vào chỗ em đã tự khai là chưa chạm tới: **khổ màn điện thoại**, vì hai vòng
+trước đã chứng minh một điều - *chỗ nào chưa ai nhìn, chỗ đó có lỗi*.
+
+## Cái tìm ra lớn nhất không phải một lỗi giao diện, mà là MỘT PHÉP ĐO ĐẶT SAI CHỖ
+
+`_checkmat` có sẵn phép đo **M4 "dấu ngăn mồ côi"** - dựng ra từ chính một lỗi anh Luân bắt được
+04/08 (breadcrumb rớt dòng để lại dấu "›" treo). Nó xanh suốt từ đó tới nay.
+
+Nhưng bộ ấy **cố ý chỉ đo một khổ màn 1440px cho rẻ**. Mà "dấu ngăn mồ côi" là **lỗi DO XUỐNG
+DÒNG** - chữ chỉ xuống dòng khi khung hẹp.
+
+> **Đo một lỗi-do-xuống-dòng ở khổ màn RỘNG NHẤT là đo đúng cái trường hợp nó không thể xảy ra.**
+
+Mở app ở khổ 390px thì thấy ngay: dòng chào đọc thành *"72 việc cần xử lý · 54 quá hạn ·"* -
+một dấu chấm giữa **treo lơ lửng cuối dòng**, vì mục thứ ba rớt xuống dòng dưới còn dấu ngăn của
+nó ở lại. Đúng cái M4 sinh ra để bắt, và M4 chưa bao giờ nhìn một màn hẹp.
+
+**Vá gốc:** `_checkmat` nay đo **HAI khổ màn** (máy tính 1440 + điện thoại 390). Ngay lượt chạy
+đầu tiên sau khi thêm khổ, nó bắt được **năm chỗ nữa** chưa ai từng đo.
+
+## Bốn lỗi thật của vòng ba
+
+| # | Lỗi | Vá |
+|---|---|---|
+| 1 | Dấu "·" treo cuối dòng ở dòng chào (khổ ≤560px) | bọc dấu ngăn cùng mục sau nó (`.bwit`), rồi **ẩn hẳn dấu ngăn dưới 560px** - xuống dòng rồi thì chính cái xuống dòng đã ngăn hộ |
+| 2 | Nhãn ô chọn "Toàn hệ thống (chính tôi) · gõ để tìm (33)" cần 264px mà ô chỉ có 235px | nhãn dài hơn 16 ký tự thì bỏ phần "gõ để tìm" - **nhãn là thứ PHẢI đọc, lời mời gõ thì thiếu vẫn gõ được** |
+| 3 | Trần ngoại lệ nút Trợ lý (6) không còn đúng khi đo hai khổ màn | nới lên 12 kèm lý do: cùng một cái nút, soi trên hai khổ thì số chỗ nó tình cờ đè lên cũng gấp đôi |
+
+Lỗi số 2 là **lỗi do chính bản vá vòng hai của em đẻ ra**: thêm nhãn vào ô chọn giúp màn máy tính,
+nhưng làm cắt chữ trên điện thoại. Ghi lại thẳng - *một bản vá cho dễ dùng lấy mất một thứ đang
+dùng được*, đúng câu em vừa viết cho một lỗi khác trong cùng ngày.
+
+## Và một lần nữa, thước của chính em sai
+
+Em dựng thước "nút bấm quá bé trên điện thoại" với ngưỡng 28px, nó báo **34 chỗ**. Đọc kỹ thì
+gần hết là **chữ nội dòng**: một cái tên học viên rộng 27px nhưng **cao 46px** - ngón tay bấm
+thừa sức. `_checkui` đã có luật đúng cho việc này từ lâu (chỉ tính nút thật: `button`/`select`/
+`input`, ngưỡng 24px) và **ghi rõ ngay trong mã**: *"Link chữ trong câu cao 15px là bình thường -
+bắt nó là báo nhầm hàng loạt"*. Em viết lại một cái thước đã có, và viết dở hơn bản cũ.
+
+**LUẬT rút ra: trước khi dựng một phép đo mới, đi hỏi xem app đã có phép đo ấy chưa - và nếu có,
+đọc lý do người ta đặt ngưỡng như thế.**
+
+## Lỗi thứ tư - và là lỗi đắt nhất vòng này: VẠCH NGĂN MỒ CÔI
+
+Nhìn khổ **máy tính bảng 768px** thì thấy giữa hai hàng chip có **một dòng trống chỉ chứa đúng
+một vạch dọc** - cao 40px, không nội dung gì khác. `.tbdiv` là một phần tử flex **đứng riêng**,
+nên khi thanh công cụ xuống dòng, nó ở lại một mình và chiếm trọn một hàng.
+
+Đây là **họ hàng của lỗi dấu "·"** vừa vá cùng ngày, nhưng thước chữ M4 không thấy nó: M4 tìm dấu
+ngăn bằng **ký tự** (`·›|`), còn vạch này **vẽ bằng CSS** - `textContent` của nó rỗng.
+
+**Đo được ở MỌI khổ, không riêng màn hẹp:**
+
+| Khổ màn | Số vạch ngăn mồ côi |
+|---|---|
+| Điện thoại 390px | 10 |
+| Máy tính bảng 768px | 7 |
+| Laptop 1024px | 6 |
+| **Máy tính 1440px** | **3** |
+
+Tức là nó vẫn hỏng ngay trên khổ mà mọi bộ kiểm đang đo - chỉ là chưa ai nhìn.
+
+**Vá:** vạch ngăn nay là `::before` của nhóm đi sau nó (`.tbgr`), nên xuống dòng thì nó đi theo
+nhóm, không bao giờ còn lại một mình; và dưới 560px bỏ hẳn. Sửa 9 chỗ dựng thanh công cụ.
+**Đo lại: 0 chỗ trên cả bốn khổ, 16 trang.**
+
+Trong lúc vá còn lộ một lỗi phụ do chính bản vá: `filterBar` vừa giữ vạch cũ vừa thêm `.tbgr`
+nên vẽ **hai vạch** cạnh nhau - bắt được ngay vì em đo lại sau mỗi bước thay vì đo một lần ở cuối.
+
+**Thước mới M7 trong `_checkmat`:** một vạch ngăn mà trên cùng một dòng bên phải nó không còn gì
+thì nó đang ngăn cách hai thứ không nằm cạnh nhau - vô nghĩa và trông như rác.
+**Đã chứng minh thước sống:** trả lại bản cũ thì nó đỏ 5 chỗ, vá vào thì xanh.
+
+## Cái vòng ba xác nhận là CHẮC
+
+- **0 cuộn ngang** trên 42 lượt đo (14 trang × 3 khổ: 390px, 360px, 768px). Khung dựng chắc.
+- Bố cục điện thoại đọc được thật: một cột, dải cảnh báo xếp dọc, mỗi ô có số + nhãn + trang đích
+  + mũi tên, vùng bấm rộng cả hàng.
+- `_checkmat` nay đo **2.764 chuỗi chữ trên 20 trang × 2 khổ màn**, xanh.
+
+## Vẫn còn chưa chạm tới
+
+- **Khổ ngang điện thoại (844×390)** và **máy tính bảng** - `_checkui` có đo, nhưng chưa ai NHÌN.
+- **Cỡ chữ trên điện thoại**: đo được 18 chỗ dùng chữ 10px và một chỗ 9.5px (nhãn trục biểu đồ
+  Báo cáo). Chưa đổi vì app chưa có luật cỡ chữ tối thiểu, và đặt một luật như thế là quyết định
+  thiết kế, không phải bản vá - cần anh Luân chốt.
+- **Chưa ai dùng thật trên điện thoại thật** - máy đo được "không vỡ", không đo được "cầm điện
+  thoại làm xong một việc có mệt không".

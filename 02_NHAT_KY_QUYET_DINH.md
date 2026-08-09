@@ -241,6 +241,63 @@
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 39 BỘ KIỂM (08/08). V1 mốc cũ: V9.99z12, 34 bộ, bản dựng `829572`.**
 >
+> ### 🔵 09/08 (tối) - VÒNG BA: MỘT PHÉP ĐO ĐẶT SAI CHỖ, VÀ CÂU TRẢ LỜI "CHƯA HOÀN HẢO"
+>
+> **Bản dựng `d69a67`.** Anh Luân hỏi *"Hoàn hảo chưa e"*. Em trả lời **CHƯA**, kèm con số làm
+> bằng chứng: **vòng một 6 lỗi, vòng hai 7 lỗi - tốc độ tìm ra lỗi KHÔNG GIẢM.** Nếu đã gần hoàn
+> hảo thì vòng sau phải ra ít hơn hẳn vòng trước. Nói "xong rồi" lúc này là nói cho anh yên tâm,
+> không phải nói thật.
+>
+> **CÁI TÌM RA LỚN NHẤT VÒNG NÀY KHÔNG PHẢI MỘT LỖI GIAO DIỆN, MÀ LÀ MỘT PHÉP ĐO ĐẶT SAI CHỖ.**
+> `_checkmat` có sẵn phép đo **M4 "dấu ngăn mồ côi"** - dựng ra từ chính lỗi anh Luân bắt 04/08
+> (breadcrumb rớt dòng để lại dấu "›" treo). Nó xanh suốt từ đó. Nhưng bộ ấy **cố ý chỉ đo một
+> khổ 1440px cho rẻ**, mà "dấu ngăn mồ côi" là **lỗi DO XUỐNG DÒNG** - chữ chỉ xuống dòng khi
+> khung hẹp.
+> **ĐO MỘT LỖI-DO-XUỐNG-DÒNG Ở KHỔ MÀN RỘNG NHẤT LÀ ĐO ĐÚNG CÁI TRƯỜNG HỢP NÓ KHÔNG THỂ XẢY RA.**
+> Mở app ở 390px là thấy ngay: dòng chào đọc thành *"72 việc cần xử lý · 54 quá hạn ·"* - dấu
+> chấm giữa treo lơ lửng cuối dòng.
+> Vá gốc: `_checkmat` nay đo **HAI khổ màn** (1440 + 390). Ngay lượt đầu sau khi thêm khổ, nó bắt
+> thêm **5 chỗ** chưa ai từng đo. Nay 2.764 chuỗi trên 20 trang × 2 khổ.
+>
+> **BỐN LỖI THẬT:** dấu "·" treo cuối dòng (vá hai lớp: bọc dấu ngăn cùng mục sau nó, rồi **ẩn hẳn
+> dấu ngăn dưới 560px** - xuống dòng rồi thì chính cái xuống dòng đã ngăn hộ) · nhãn ô chọn
+> "Toàn hệ thống (chính tôi) · gõ để tìm (33)" cần 264px mà ô chỉ có 235px · trần ngoại lệ nút
+> Trợ lý 6 → 12 (cùng một cái nút soi trên hai khổ thì số chỗ nó đè lên cũng gấp đôi - giữ 6 là
+> một cái trần nghiêm khắc GIẢ, nó đỏ vì lý do không liên quan tới chất lượng app).
+>
+> **Lỗi thứ hai là do CHÍNH BẢN VÁ VÒNG HAI của em đẻ ra**: thêm nhãn vào ô chọn giúp màn máy
+> tính, nhưng làm cắt chữ trên điện thoại. Luật mới: nhãn dài hơn 16 ký tự thì bỏ phần "gõ để
+> tìm" - **nhãn là thứ PHẢI đọc, lời mời gõ thì thiếu vẫn gõ được.**
+>
+> **VÀ MỘT LẦN NỮA, THƯỚC CỦA CHÍNH EM SAI.** Em dựng thước "nút bấm quá bé trên điện thoại"
+> ngưỡng 28px, nó báo **34 chỗ**. Đọc kỹ thì gần hết là CHỮ NỘI DÒNG: một tên học viên rộng 27px
+> nhưng **cao 46px** - ngón tay bấm thừa sức. `_checkui` đã có luật đúng từ lâu (chỉ tính nút
+> thật, ngưỡng 24px) và ghi rõ ngay trong mã: *"Link chữ trong câu cao 15px là bình thường - bắt
+> nó là báo nhầm hàng loạt"*. **Em viết lại một cái thước đã có, và viết dở hơn bản cũ.**
+> **LUẬT: trước khi dựng một phép đo mới, đi hỏi xem app đã có phép đo ấy chưa - và nếu có, đọc
+> lý do người ta đặt ngưỡng như thế.**
+>
+> **LỖI THỨ TƯ, ĐẮT NHẤT VÒNG NÀY - VẠCH NGĂN MỒ CÔI.** Nhìn khổ máy tính bảng 768px thấy giữa
+> hai hàng chip có **một dòng trống chỉ chứa đúng một vạch dọc**, cao 40px. `.tbdiv` là phần tử
+> flex ĐỨNG RIÊNG nên khi thanh công cụ xuống dòng thì nó ở lại một mình.
+> Họ hàng của lỗi dấu "·" vá cùng ngày, nhưng **M4 không thấy vì nó tìm dấu ngăn bằng KÝ TỰ, còn
+> vạch này vẽ bằng CSS - `textContent` rỗng**.
+> Đo được ở MỌI khổ: điện thoại **10** · máy tính bảng **7** · laptop **6** · **máy tính 1440 vẫn
+> 3**. Tức là nó vẫn hỏng ngay trên khổ mà mọi bộ kiểm đang đo - chỉ là chưa ai nhìn.
+> Vá: vạch nay là `::before` của nhóm đi sau (`.tbgr`), xuống dòng thì đi theo nhóm; dưới 560px
+> bỏ hẳn. Sửa 9 chỗ. **Đo lại: 0 trên cả bốn khổ, 16 trang.**
+> Thêm **M7** vào `_checkmat`, và **chứng minh thước sống**: trả lại bản cũ thì đỏ 5 chỗ, vá vào
+> thì xanh.
+>
+> **CÁI VÒNG BA XÁC NHẬN LÀ CHẮC:** 0 cuộn ngang trên 42 lượt đo (14 trang × 3 khổ 390/360/768).
+> Bố cục điện thoại đọc được thật - một cột, dải cảnh báo xếp dọc, mỗi ô có số + nhãn + trang
+> đích + mũi tên, vùng bấm rộng cả hàng.
+>
+> **CÒN TỒN, khai thẳng:** khổ ngang điện thoại và máy tính bảng máy có đo nhưng **chưa ai nhìn**
+> · 18 chỗ dùng chữ 10px và một chỗ 9.5px trên điện thoại - **chưa đổi**, vì app chưa có luật cỡ
+> chữ tối thiểu và đặt một luật như thế là quyết định thiết kế, cần anh Luân chốt · chưa ai cầm
+> điện thoại thật làm xong một việc.
+
 > ### 🔴🔴 09/08 (chiều tối) - VÒNG HAI: BẢY LỖI NỮA, TRONG ĐÓ MỘT TÍNH NĂNG CHẾT LẶNG LẼ MỘT TUẦN
 >
 > **Bản dựng `fe8454`.** Anh Luân: *"Triển đến khi hoàn hảo"*. Vòng một dạy một bài rất đắt, nên

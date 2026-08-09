@@ -73,7 +73,17 @@ const CAT_OK = [
   const do_ = [];
   let soDo = 0;
 
-  const ctx = await browser.newContext({viewport: {width: 1440, height: 900}});
+  /* HAI KHỔ MÀN, KHÔNG PHẢI MỘT. Bộ này vốn cố ý chỉ đo 1440px cho rẻ - đúng với ba phép đo
+     đầu (chữ rộng hơn khung, bị phủ lên, hai khối đè nhau đều xảy ra ở mọi khổ). Nhưng phép đo
+     M4 "dấu ngăn mồ côi" và M6 "con số bị bẻ đôi" đều là **lỗi DO XUỐNG DÒNG** - mà chữ chỉ
+     xuống dòng khi khung hẹp. Đo một lỗi-do-xuống-dòng ở khổ RỘNG NHẤT là đo đúng cái trường
+     hợp nó không thể xảy ra, rồi báo xanh.
+     Bẫy cắn 09/08: dòng chào trên Trang bắt đầu đọc thành *"72 việc cần xử lý · 54 quá hạn ·"*
+     ở khổ điện thoại - một dấu chấm giữa treo lơ lửng cuối dòng. M4 sinh ra để bắt đúng chuyện
+     đó, và nó xanh suốt vì chưa bao giờ nhìn một màn hẹp.
+     Thêm khổ 390px (điện thoại). Vẫn rẻ: cả hai khổ cộng lại dưới một phút. */
+  for (const V of [{n:"maytinh",w:1440,h:900},{n:"dienthoai",w:390,h:844}]) {
+  const ctx = await browser.newContext({viewport: {width: V.w, height: V.h}});
   const page = await ctx.newPage();
   await page.addInitScript(() => { try {
     sessionStorage.setItem("ITTS_WHO", "");
@@ -120,6 +130,13 @@ const CAT_OK = [
       const boQua = (el) => {
         const dm = ten(el) + " " + String(el.className || "");
         for (const x of CAT_OK) if (x.khop.test(dm)) return true;
+        /* Ô CHỌN TRÊN KHỔ HẸP: giá trị đang chọn là tên lớp / tên buổi đầy đủ, dài 350-400px -
+           một màn 390px không có cách nào chứa hết mà vẫn còn chỗ cho nhãn và nút. Chấp nhận cắt
+           Ở ĐÂY, và chỉ ở đây, vì ba lý do đọc được: (a) danh sách xổ ra hiện đủ tên, (b) ngay
+           dưới thanh chọn là khối thông tin in lại đầy đủ tên lớp và tên buổi, (c) gõ để tìm vẫn
+           chạy. Trên khổ máy tính thì KHÔNG tha - ở đó cắt chữ là do bố cục sai, và 09/08 đã vá
+           đúng một ca như thế trên trang Bài tập. */
+        if (window.innerWidth <= 480 && /\bpki\b/.test(String(el.className || ""))) return true;
         return false;
       };
 
@@ -240,7 +257,32 @@ const CAT_OK = [
             ra.thucThe.push(x + '  (trong "' + t.slice(Math.max(0, i - 26), i + x.length + 14).replace(/\s+/g, " ").trim() + '")');
           });
         }
-        const la = [...than.querySelectorAll("*")].filter(el =>
+          /* M7 - VẠCH NGĂN MỒ CÔI (họ hàng của M4, nhưng M4 chỉ thấy dấu ngăn bằng CHỮ).
+           Bẫy cắn 09/08, nhìn thấy trên khổ máy tính bảng 768px: giữa hai hàng chip có **một
+           dòng trống chỉ chứa đúng một vạch dọc**. `.tbdiv` là một phần tử flex ĐỨNG RIÊNG, nên
+           khi thanh công cụ xuống dòng nó ở lại một mình và chiếm trọn một hàng cao 40px.
+           M4 không thấy vì nó tìm dấu ngăn bằng ký tự (·›|); vạch này vẽ bằng CSS, không mang
+           chữ nào - `textContent` của nó rỗng.
+           Đo được lúc tìm ra, ở MỌI khổ chứ không riêng màn hẹp: điện thoại 10 chỗ · máy tính
+           bảng 7 · laptop 6 · **máy tính 1440 vẫn 3**.
+           Phép hỏi: một vạch ngăn mà trên CÙNG MỘT DÒNG bên phải nó không còn gì, thì nó đang
+           ngăn cách hai thứ không nằm cạnh nhau - tức là nó vô nghĩa và trông như rác. */
+        than.querySelectorAll(".tbdiv,.sep,.tbgr").forEach(el => {
+          const r = el.getBoundingClientRect();
+          if (r.height === 0 || r.width === 0) return;
+          if (el.classList.contains("tbgr")) return;   /* .tbgr mang vạch trong `::before`, không bao giờ đứng riêng */
+          let sau = false;
+          const anh = el.parentElement ? [...el.parentElement.children] : [];
+          anh.forEach(x => {
+            if (sau || x === el) return;
+            const r2 = x.getBoundingClientRect();
+            if (r2.width === 0 || r2.height === 0) return;
+            if (r2.left >= r.right - 1 && Math.abs((r2.top + r2.bottom) / 2 - (r.top + r.bottom) / 2) < 12) sau = true;
+          });
+          if (!sau) ra.moCoi.push('vach ngan "' + (el.className || el.tagName) + '" mot minh cuoi dong');
+        });
+
+      const la = [...than.querySelectorAll("*")].filter(el =>
           el.children.length === 0 && (el.textContent || "").trim().length > 0 && nhinThay(el));
         for (let i = 0; i < la.length; i++) for (let j = i + 1; j < la.length; j++) {
           const x = la[i], y = la[j];
@@ -258,9 +300,9 @@ const CAT_OK = [
       return ra;
     }, [k, CAT_OK.map(x => ({k: x.khop.source, f: x.khop.flags, ly: x.ly}))]);
 
-    if (r.loi) { do_.push(k + ": " + r.loi); continue; }
+    if (r.loi) { do_.push(V.n + " · " + k + ": " + r.loi); continue; }
     soDo += r.dem || 0;
-    const gom = (ds, nhan) => [...new Set(ds)].slice(0, 4).forEach(x => do_.push(k + " | " + nhan + ": " + x));
+    const gom = (ds, nhan) => [...new Set(ds)].slice(0, 4).forEach(x => do_.push(V.n + " · " + k + " | " + nhan + ": " + x));
     gom(r.hep, "O HEP GIUA KHOANG TRONG");
     gom(r.cat, "CHU BI CAT");
     gom(r.che, "BI PHU LEN - khong bam duoc");
@@ -270,6 +312,8 @@ const CAT_OK = [
     gom(r.soVo, "CON SO BI BE DOI GIUA HAI CHU SO");
   }
 
+  await ctx.close();
+  }
   await browser.close();
 
   /* ── PHẦN KHÔNG THỂ BỎ, KHAI CÓ GIỚI HẠN ───────────────────────────────────────────────
@@ -291,7 +335,11 @@ const CAT_OK = [
      ngay lan dau - do la thu ho lam MOI NGAY, con o bi che la nhung dong TINH CO troi toi goc
      duoi phai o mot nac cuon, cuon them mot chut la het.
      Van in ra du 6 cho moi lan chay, va qua 6 la do - de mai kia nhan nut dai ra thi biet ngay. */
-  const TRAN_FAB = 6;
+  /* TRẦN 6 -> 12 khi bộ này đo HAI khổ màn (09/08). Không phải nới luật: cùng một cái nút Trợ
+     lý, nay được soi trên hai khổ thay vì một, nên số chỗ nó tình cờ nằm đè lên cũng gấp đôi.
+     Trần phải nói về CÙNG MỘT PHÉP ĐO thì con số mới có nghĩa - giữ 6 khi đã đo gấp đôi là một
+     cái trần nghiêm khắc giả, nó sẽ đỏ vì lý do không liên quan tới chất lượng app. */
+  const TRAN_FAB = 12;
   const doFab = do_.filter(x => /asstfab/.test(x));
   if (doFab.length && doFab.length <= TRAN_FAB) {
     doFab.forEach(x => { const i = do_.indexOf(x); if (i >= 0) do_.splice(i, 1); });
@@ -306,6 +354,6 @@ const CAT_OK = [
     console.log("CHECKMAT DO");
     process.exit(0);
   }
-  console.log("CHECKMAT OK: " + TRANG.length + " trang, " + soDo + " chuoi chu do bang thuoc that -"
+  console.log("CHECKMAT OK: " + TRANG.length + " trang x 2 kho man (may tinh + dien thoai), " + soDo + " chuoi chu do bang thuoc that -"
     + " khong chu nao bi cat, khong nut nao bi phu len, khong dau ngan nao mo coi");
 })();

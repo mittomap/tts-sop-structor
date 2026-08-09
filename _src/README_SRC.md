@@ -665,3 +665,64 @@ soi cua chinh se khong bao gio thay ba loi kia.*
 
 **THUOC DO SAI THI DEN XANH CON NGUY HIEM HON DEN DO - vi den do thi nguoi ta di tim, con den xanh
 thi nguoi ta di ngu.**
+
+## 09/08 VONG BA - `_checkmat` DO HAI KHO MAN (1440 + 390)
+
+Cai tim ra lon nhat vong nay khong phai mot loi giao dien, ma la **mot phep do dat sai cho**.
+
+`_checkmat` co san phep do **M4 "dau ngan mo coi"** - dung ra tu chinh loi anh Luan bat 04/08
+(breadcrumb rot dong de lai dau "›" treo). No xanh suot tu do toi nay. Nhung bo nay **co y chi do
+mot kho man 1440px cho re** - va "dau ngan mo coi" la **LOI DO XUONG DONG**, ma chu chi xuong dong
+khi khung hep.
+
+> **DO MOT LOI-DO-XUONG-DONG O KHO MAN RONG NHAT LA DO DUNG CAI TRUONG HOP NO KHONG THE XAY RA.**
+
+Mo app o 390px la thay ngay: dong chao doc thanh *"72 viec can xu ly · 54 qua han ·"* - mot dau
+cham giua treo lo lung cuoi dong, vi muc thu ba rot xuong dong duoi con dau ngan cua no o lai.
+
+**Nay `_checkmat` do HAI kho man** (`maytinh` 1440x900 + `dienthoai` 390x844). Nhan loi mang ten
+kho o dau dong. Ngay luot chay dau tien sau khi them kho, no bat them **nam cho** chua ai tung do.
+Van re: ca hai kho duoi mot phut, nen bo nay o nguyen TANG NHANH.
+
+Hai dieu chinh di kem, deu la quyet dinh co ly do:
+- **TRAN_FAB 6 -> 12.** Khong phai noi luat: cung mot cai nut Tro ly, nay duoc soi tren hai kho
+  thay vi mot, nen so cho no tinh co nam de len cung gap doi. **Tran phai noi ve CUNG MOT PHEP DO
+  thi con so moi co nghia** - giu 6 khi da do gap doi la mot cai tran nghiem khac GIA, no se do vi
+  ly do khong lien quan toi chat luong app.
+- **Cho phep cat chu o `input.pki` KHI VA CHI KHI kho man <= 480px**, kem ba ly do doc duoc: danh
+  sach xo ra hien du ten · ngay duoi thanh chon la khoi thong tin in lai day du · go de tim van
+  chay. Tren kho may tinh thi KHONG tha - o do cat chu la do bo cuc sai, va 09/08 da va dung mot
+  ca nhu the tren trang Bai tap.
+
+**BAY CUA CHINH NGUOI DO, ghi lai vi no dat:** em dung mot thuoc moi "nut bam qua be tren dien
+thoai" nguong 28px, no bao **34 cho**. Doc ky thi gan het la **chu noi dong**: mot ten hoc vien
+rong 27px nhung **cao 46px** - ngon tay bam thua suc. `_checkui` DA CO luat dung cho viec nay tu
+lau (chi tinh nut that: `button`/`select`/`input` khong phai checkbox, hoac lop `btn|pill|tbtn|
+stab|chipbtn`; nguong 24px) va **ghi ro ngay trong ma**: *"Link chu trong cau cao 15px la binh
+thuong - bat no la bao nham hang loat"*.
+**Em viet lai mot cai thuoc da co, va viet do hon ban cu.**
+**LUAT: truoc khi dung mot phep do moi, di hoi xem app da co phep do ay chua - va neu co, doc ly
+do nguoi ta dat nguong nhu the.**
+
+### M7 - VACH NGAN MO COI (`_checkmat`, dat 09/08)
+
+Ho hang cua M4, nhung M4 khong the thay: **M4 tim dau ngan bang KY TU** (`·›|`), con vach ngan
+`.tbdiv` / `.sep` **ve bang CSS** - `textContent` cua no RONG.
+
+Nhin kho may tinh bang 768px thi thay giua hai hang chip co **mot dong trong chi chua dung mot
+vach doc**, cao 40px. `.tbdiv` la phan tu flex DUNG RIENG nen khi thanh cong cu xuong dong, no o
+lai mot minh va chiem tron mot hang.
+
+Do duoc o MOI KHO, khong rieng man hep: **dien thoai 10 · may tinh bang 7 · laptop 6 · may tinh
+1440 van 3**. Tuc la no van hong ngay tren kho ma moi bo kiem dang do - chi la chua ai nhin.
+
+Phep hoi: mot vach ngan ma tren CUNG MOT DONG ben phai no khong con gi, thi no dang ngan cach hai
+thu khong nam canh nhau - vo nghia va trong nhu rac.
+
+Va: vach nay la `::before` cua nhom di sau no (`.tbgr`), nen xuong dong thi no di theo nhom, khong
+bao gio con lai mot minh; duoi 560px bo han (xuong dong roi thi chinh cai xuong dong da ngan ho).
+Sua 9 cho dung thanh cong cu. **Do lai: 0 tren ca bon kho, 16 trang.**
+
+**DA CHUNG MINH THUOC SONG** - viec ma moi thuoc moi deu nen lam mot lan: tra lai ban cu thi no
+DO 5 cho, va vao thi XANH. Mot cai thuoc chua bao gio do la mot cai thuoc chua ai biet no co chay
+khong.
