@@ -36,7 +36,7 @@
 const FS=require("fs"),PATH=require("path");
 
 /* ---- trần (chốt kéo xuống) ---- */
-const TRAN_KHONG_CHIP = 7;   /* dòng nhịp CÓ SỐ ĐẾM mà chưa khai chip đích */
+const TRAN_KHONG_CHIP = 2;   /* dòng nhịp CÓ SỐ ĐẾM mà chưa khai chip đích */
 /* 1 = dòng "Duyệt hàng chờ quyết định" của cấp điều hành, trỏ vào trang gộp `duyet`.
    Em đã THỬ cho nó một mục menu rồi GỠ RA: `_check11` đòi nhóm "Chờ duyệt" mỗi mục phải là một
    TRANG THẬT (nguyên tắc V2), và đo ra hậu quả thật - bấm `duyet` thì mục sáng lại là `duyetck`

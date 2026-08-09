@@ -9445,13 +9445,33 @@ function ychvList(){return srows("DL23").filter(function(t){return isc(t.task_ty
 function ychvCho(){return ychvList().filter(function(t){return isc(t.task_status,"new")}).length}
 function renderYcHV(){
  var h0=nvHead("ychv");
- var L=ychvList().slice().sort(function(a,b){
+ var Lall=ychvList().slice().sort(function(a,b){
   var na=isc(a.task_status,"new")?0:1,nb=isc(b.task_status,"new")?0:1;if(na!==nb)return na-nb;
   return (pvnd(b.created_time)||0)-(pvnd(a.created_time)||0)});
+ var L=Lall;
  var _ycMoi=L.filter(function(x){return isc(x.task_status,"new")}).length;
+ /* V2 09/08 - THÊM CHIP LỌC. Trang này có hai thẻ số từ lâu mà không có đường bấm tới danh
+    sách của từng số - người ta đọc "3 chưa ai nhận" rồi phải tự dò trong cả hộp. Đúng con bệnh
+    anh Luân bắt hai lần: *"báo 2 học viên nguy cơ mà a chẳng thấy đâu"*. Chip đếm bằng CÙNG
+    phép thử với thẻ ngay trên, nên hai chỗ không thể nói hai con số. */
+ var _ycF=fget("ychv");
+ var _ycQua=L.filter(function(x){var a=hoursSince(x.created_time);
+   return isc(x.task_status,"new")&&a!=null&&a>num(paramOf("slaTaskAccept_hours",4))});
  var h=h0+statStrip([
   ["ti-inbox",_ycMoi,"Chưa ai nhận","#E24B4A",_ycMoi?"nhận trong ngày":""],
   ["ti-messages",L.length,"Tổng yêu cầu đang mở","#3B82C4",""]],"ychv")+
+  (function(){
+   /* Lọc THẬT rồi mới vẽ - dải chip chỉ để nhìn thì còn tệ hơn không có, vì người ta bấm rồi
+      tưởng đã lọc. `_checkkhuon` đo trên chuỗi HTML nên chip giả vẫn qua được thước; luật này
+      phải giữ bằng tay và bằng mắt người viết. */
+   var qua={};_ycQua.forEach(function(x){qua[x.task_id]=1});
+   if(_ycF==="moi")L=Lall.filter(function(x){return isc(x.task_status,"new")});
+   else if(_ycF==="quahan")L=Lall.filter(function(x){return qua[x.task_id]});
+   else if(_ycF==="dangxuly")L=Lall.filter(function(x){return !isc(x.task_status,"new")});
+   return filterBar("ychv",_ycF,[["all","Tất cả",Lall.length],
+    ["moi","Chưa ai nhận",_ycMoi,_ycMoi?"red":""],
+    ["quahan","Quá hạn nhận",_ycQua.length,_ycQua.length?"red":""],
+    ["dangxuly","Đang xử lý",Lall.length-_ycMoi]],L.length)})()+
   '<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>'+
   /* V2 08/08 - 184 ký tự, quá trần 150. Cùng lý do với trang GV dự phòng: trang này từng khai
      `hide:1` nên chưa bao giờ bị soi. Phần "chuyển cho ai" vào chú thích rê chuột. */
@@ -16555,9 +16575,24 @@ function renderMaGioiThieu(embed){
    return ["ti-phone-call",String(con),"Dùng mã nhưng chưa đăng ký","#E24B4A",
     con?"gọi chốt - họ đã quan tâm sẵn rồi":"đã chốt hết"]})()],"magioithieu");
  var q=vnorm(window.MGQ||"");
- var list=amb.filter(function(g){return !q||vnorm(g.name+" "+g.code).indexOf(q)>=0});
+ /* V2 09/08 - THÊM CHIP LỌC. Nhịp cuối ngày của Marketing là *"xem mã giới thiệu ai đang chạy -
+    khách cũ giới thiệu là nguồn rẻ nhất, đừng để thưởng treo"*, đếm ra số thưởng còn chờ chi;
+    mà trang này chỉ có ô tìm theo tên, không có cách nào lọc riêng nhóm ấy ra.
+    Đếm bằng chính `mgtChoChi()` mà nhịp ngày đang đếm - một phép đếm, hai chỗ đọc. */
+ var mgF=fget("magioithieu");
+ var choChi={};try{mgtChoChi().forEach(function(r){var k=r.referrer_student_id||r.referrer_name;if(k)choChi[k]=1})}catch(e){}
+ var nCho=amb.filter(function(g){return choChi[g.sid]||choChi[g.name]}).length;
+ var nChay=amb.filter(function(g){return g.enrolled>0}).length;
+ var list=amb.filter(function(g){
+  if(!(!q||vnorm(g.name+" "+g.code).indexOf(q)>=0))return false;
+  if(mgF==="cho")return !!(choChi[g.sid]||choChi[g.name]);
+  if(mgF==="chay")return g.enrolled>0;
+  return true});
  h+=tbar(srchHTML(window.MGQ||"","window.MGQ=this.value;reRenderKeep(CUR)","Tìm tên, SĐT hoặc mã...",300),
   '<span class="tbcnt">'+list.length+'/'+amb.length+' học viên</span>');
+ h+=filterBar("magioithieu",mgF,[["all","Tất cả",amb.length],
+  ["cho","Thưởng còn treo",nCho,nCho?"red":""],
+  ["chay","Đã có người đăng ký",nChay]],list.length);
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên chủ mã</th><th>Mã giới thiệu</th><th>Lượt dùng</th><th>Đã đăng ký</th>'+(dsLevel("tien")==="none"?'':'<th>Ưu đãi đã cấp</th>')+'<th>Thưởng</th><th></th></tr></thead><tbody>';
  if(!list.length)h+='<tr><td class="empty" colspan="7">Chưa có mã giới thiệu nào được dùng.</td></tr>';
  list.forEach(function(g){
@@ -17509,6 +17544,18 @@ function renderGvdp(embed){
   '<button class="pill" onclick="gvdpSet(\''+esc(fmtYMD(new Date(day.getTime()-864e5)))+'\')"><i class="ti ti-chevron-left"></i>Hôm trước</button>'+
   '<button class="pill" onclick="gvdpSet(\''+esc(fmtYMD(new Date(day.getTime()+864e5)))+'\')">Hôm sau<i class="ti ti-chevron-right"></i></button>',
   '<span class="tbcnt">'+ses.length+' buổi</span>');
+ /* V2 09/08 - THÊM CHIP LỌC. Nhịp sáng của Trưởng phòng ACA là *"lớp thiếu giáo viên hôm nay -
+    buổi không có người dạy là buổi phải huỷ"*, và thẻ số ngay trên trang đã nói ra con số ấy;
+    nhưng bảng bên dưới đổ hết mọi buổi trong ngày, muốn tìm buổi trống thì phải dò cột.
+    Đếm bằng chính phép thử mà thẻ và `gvdpThieu()` của nhịp ngày đang dùng. */
+ var gvF=fget("gvdp");
+ var _nTrong=ses.filter(function(x){return !String(x.teacher_id||"").trim()}).length;
+ var _nHuy=ses.filter(function(x){return isc(x.session_status,"cancelled")}).length;
+ h+=filterBar("gvdp",gvF,[["all","Tất cả buổi",ses.length],
+  ["trong","Chưa có giáo viên",_nTrong,_nTrong?"red":""],
+  ["huy","Đã huỷ",_nHuy,_nHuy?"amber":""]],ses.length);
+ if(gvF==="trong")ses=ses.filter(function(x){return !String(x.teacher_id||"").trim()});
+ else if(gvF==="huy")ses=ses.filter(function(x){return isc(x.session_status,"cancelled")});
  ses=fltApply("gvdp",ses);
  h+=pgBar("gvdp",ses.length);
  h+='<div class="panel"><div class="ph"><b>Buổi học trong ngày</b><span class="mut" style="font-size:11.5px">bấm "Đẩy người thay" để xem ai nhận được</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Lớp</th><th>Cơ sở / hình thức</th><th>GV đang phụ trách</th><th>Người thay được</th><th></th></tr></thead><tbody>';
@@ -17689,8 +17736,13 @@ function noRoomList(){
   if(clsOnline(c)||isc(c.class_status,"finished","cancelled"))return false;
   return !roomOf(c)})}
 function renderPhong(embed){
- var cl=fltApply("phong",clashList()),nr=noRoomList();
- var byT={phong:0,lop:0,gv:0};cl.forEach(function(x){byT[x.t]++});
+ var clAll=fltApply("phong",clashList()),nr=noRoomList();
+ var byT={phong:0,lop:0,gv:0};clAll.forEach(function(x){byT[x.t]++});
+ /* V2 09/08 - THÊM CHIP LỌC. Ba thẻ số (đụng phòng / đụng lớp / đụng GV) có từ lâu mà không có
+    đường bấm tới danh sách của từng loại - trang này gom cả ba loại đụng vào một danh sách phẳng,
+    đọc "5 đụng phòng" rồi phải tự dò. Chip đếm bằng chính `byT` mà thẻ đang đọc. */
+ var pgF=fget("phong");
+ var cl=(pgF==="phong"||pgF==="lop"||pgF==="gv")?clAll.filter(function(x){return x.t===pgF}):clAll;
  var onl=srows("DL10").filter(clsOnline).length;
  var h=embed?'':pageHead("Phòng học & đụng lịch","Soi đụng phòng, đụng giờ của lớp và của giáo viên trên toàn bộ lịch. Lớp online không tính đụng phòng - 'phòng' của nó là link riêng.","");
  h+=statStrip([
@@ -17702,6 +17754,10 @@ function renderPhong(embed){
   /* V9.57: bo o "Lop online - khong rang buoc phong": tren mot trang ve XEP PHONG, dem lop
      KHONG can phong la thong tin nen, khong ai quyet gi tu no. Cau da noi ro o dong ghi chu. */
   ],"phong");
+ h+=filterBar("phong",pgF,[["all","Tất cả",clAll.length],
+  ["phong","Đụng phòng",byT.phong,byT.phong?"red":""],
+  ["lop","Lớp đụng giờ chính nó",byT.lop,byT.lop?"amber":""],
+  ["gv","Giảng viên đụng giờ",byT.gv,byT.gv?"red":""]],cl.length);
  h+=pgBar("phong",cl.length);
  h+='<div class="panel"><div class="ph"><b>Các điểm đụng ('+cl.length+')</b><span class="mut" style="font-size:11.5px">hai mục cách nhau dưới '+slaChip("sessionSpan_hours",2,"giờ")+' thì coi là đụng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Loại</th><th>Ngày giờ</th><th>Chi tiết</th><th>Cơ sở</th><th></th></tr></thead><tbody>';
  if(!cl.length)h+='<tr><td class="empty" colspan="5">Không có điểm đụng nào - lịch sạch.</td></tr>';
@@ -19740,6 +19796,13 @@ function renderCong(){
  var L=fltApply("cong",congThang(ym).map(function(x){return {ma:x.g.staff_id,ten:x.g.full_name,
    co_so:elabel(x.g.branch)||x.g.branch||"",buoi:x.n,gio_day:Math.round(x.gio*10)/10,buoi_wow:x.wow,ca_test:x.test,online:x.onl,tre:x.late,chua_nhan_xet:x.noNote,
    tien_cong:x.tien,_x:x}}).filter(function(r){return r.buoi||r.buoi_wow||r.ca_test})).map(function(r){return r._x});
+ /* V2 09/08 - CHIP PHẢI LỌC THẬT. Chip "Buổi thiếu mốc giờ" ở đầu trang mà bảng không đổi thì
+    còn tệ hơn không có chip: người ta bấm rồi tưởng đã lọc. `_checkkhuon` đo trên chuỗi HTML nên
+    một chip giả vẫn qua được thước - luật này phải giữ bằng tay. Lọc xuống đúng những giảng viên
+    CÒN buổi thiếu mốc, dùng chung `bcThieuMoc()` với dải thẻ ngay trên. */
+ if(typeof bcLoc==="function"&&bcLoc()==="thieu"){
+  var _tm={};bcThieuMoc().forEach(function(x){if(x.teacher_id)_tm[String(x.teacher_id)]=1});
+  L=L.filter(function(x){return _tm[String(x.g.staff_id)]})}
  var tot=L.reduce(function(a,x){return a+x.n},0),totW=L.reduce(function(a,x){return a+x.wow},0),tien=L.reduce(function(a,x){return a+x.tien},0);
  var totG=L.reduce(function(a,x){return a+x.gio},0),totThieu=L.reduce(function(a,x){return a+x.thieuGio},0);
  var tot11=L.reduce(function(a,x){return a+(x.gio11||0)},0),totNhom=L.reduce(function(a,x){return a+(x.gioNhom||0)},0);
@@ -19942,9 +20005,22 @@ function renderNhansu(){
     return ["ti-id-badge-2",n,"Hồ sơ còn thiếu","#E08A1E",n?"chưa có chức danh hoặc chưa gắn cơ sở":"hồ sơ đủ cả"]})(),
    ["ti-user-minus",A.filter(function(x){return !staffActive(x)}).length,"Đã nghỉ việc","#6B7887","giữ để tra lịch sử"]],"nhansu")
   +renderList("nhanvien",1)}
+/* V2 09/08 - THÊM DẢI THẺ + CHIP. Nhịp sáng của Nhân sự là *"đối chiếu bảng công giảng viên -
+   buổi thiếu mốc giờ vào/ra thì tính công sai"*, đếm ra một con số cụ thể; mà trang này mở ra
+   không có số nào và không có cách nào lọc riêng những buổi thiếu mốc. Thẻ và chip đọc chung
+   `bcThieuMoc()` - đúng hàm nhịp ngày đang đếm. */
+function bcLoc(){return fget("bangcong")}
 function renderBangcong(){
+ var thieu=bcThieuMoc(),xong=srows("DL11").filter(function(x){return isc(x.session_status,"completed")});
  return pageHead("Bảng công giảng dạy",
   "Giờ đứng lớp, ca WOW 1-1 và ca test đầu vào của từng giảng viên trong tháng - dùng để đối chiếu trước khi chốt công.","")
+  +statStrip([
+   ["ti-clock-check",xong.length,"Buổi đã dạy xong trong sổ","#2E5A88",""],
+   (function(){var n=thieu.length;
+    return ["ti-clock-exclamation",n,"Buổi thiếu mốc giờ vào/ra","#E24B4A",n?"thiếu mốc thì tính công sai - soát trước khi chốt":"đủ mốc cả"]})(),
+   ["ti-checks",xong.length-thieu.length,"Buổi đủ mốc, tính công được","#2E9E6B",""]],"bangcong")
+  +filterBar("bangcong",bcLoc(),[["all","Tất cả giảng viên",0],
+    ["thieu","Buổi thiếu mốc giờ",thieu.length,thieu.length?"red":""]],0)
   +renderCong()}
 /* V9.64 (anh Luân: *"công giảng dạy tự nhiên lại nằm trong sổ thu học phí, vô lý"* -> *"phải nằm
    ở Giảng viên chứ"*). Đúng, và lý do cũ là một lý do sai: gộp vì "cùng là tiền". Nhưng sổ thu
@@ -22242,7 +22318,7 @@ var NHIP={
   ["ngay","Học viên nguy cơ học thuật","Điểm tụt là dấu hiệu sớm nhất, thấy trước khi họ nghỉ","hocvien",
    function(){return qfDem("hocvien","hocthuat")},"qf:hocthuat"],
   ["ngay","Lớp thiếu giáo viên hôm nay","Buổi không có người dạy là buổi phải huỷ - biết sớm còn xoay được","gvdp",
-   function(){return gvdpThieu().length}],
+   function(){return gvdpThieu().length},"trong"],
   ["chieu","Giáo án và ngân hàng bài của khoá","Khoá chưa đủ giáo án là lớp sau lại dạy chay","giaoan",
    function(){return gaThieuKhoa().length}]],
  hocvu:[
@@ -22317,7 +22393,7 @@ var NHIP={
   ["chieu","Khơi lại kho khách cũ","Khách đã nguội vẫn rẻ hơn khách mới - mỗi ngày chạm lại một ít","reup",
    function(){return reupToiHen().length},"toihen"],
   ["chieu","Xem mã giới thiệu ai đang chạy","Khách cũ giới thiệu là nguồn rẻ nhất, đừng để thưởng treo","magioithieu",
-   function(){return mgtChoChi().length}]],
+   function(){return mgtChoChi().length},"cho"]],
  /* V9.44 - NHỊP NGÀY CHO NHÓM HỖ TRỢ (HR, IT, bảo vệ, tạp vụ). Họ không đụng vào phễu hay lớp
     học, chỉ làm việc qua module Giao việc - nhưng "không có nhịp" khác hẳn "nhịp ngắn". */
  hotro:[
@@ -22336,7 +22412,7 @@ var NHIP={
   ["sang","Soát danh sách nhân sự","Ai mới vào, ai đã nghỉ, ai chưa có chức danh hoặc chưa gắn cơ sở","nhansu",
    function(){return qfDem("nhanvien","thieu")},"qf:nhanvien/thieu"],
   ["ngay","Đối chiếu bảng công giảng viên","Buổi thiếu mốc giờ vào/ra thì tính công sai - soát trước khi chốt","bangcong",
-   function(){return bcThieuMoc().length}],
+   function(){return bcThieuMoc().length},"thieu"],
   ["chieu","Làm và báo xong việc đang giữ","Báo xong ngay lúc làm xong, đừng để dồn cuối tuần","giaoviec",
    function(){return tkScopeMine().filter(tkLive).length},"tk:mine/live"]],
  /* V2 08/08 - NHỊP CỦA CẤP ĐIỀU HÀNH. Trước đây năm dòng này dùng `slaItems()` - hàng chờ

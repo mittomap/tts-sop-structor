@@ -44,7 +44,10 @@ const TRAN_THIEU_THE  = 0;   /* trang nghiệp vụ chưa có dải thẻ riêng
 /* 12 = SỐ ĐO ĐƯỢC. Bản đầu em đặt 8 - một con số ĐOÁN, và nó đỏ ngay. Trần phải là số đo được
    thật: đặt thấp hơn thực tế thì lần nào cũng đỏ, mà một bộ kiểm đỏ mãi thì người ta tắt nó đi.
    Danh sách 12 trang in ra ngay dưới bảng tổng kết - sửa được trang nào thì HẠ trần xuống. */
-const TRAN_THIEU_LOC  = 11;  /* trang chưa có chip lọc */
+/* V2 09/08 - HẠ 11 -> 4. Bốn trang còn lại (`duyetck` `duyethoan` `duyetnghi` `duyetthu`) CHÍNH
+   LÀ hàng chờ: vào là thấy đủ, không có gì để lọc thêm - cùng lý do đã khai ở `_checkcauhoi`.
+   Năm trang vừa làm chip trong đợt này: ychv · phong · bangcong · magioithieu · gvdp. */
+const TRAN_THIEU_LOC = 4;
 const TRAN_THIEU_NUT  = 12;  /* trang chưa có nút hành động chính */
 
 /* Trang KHÔNG CẦN DẢI THẺ - phải khai kèm lý do đọc được, y như `CHIDOC`.
