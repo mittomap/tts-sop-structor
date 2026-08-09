@@ -747,3 +747,33 @@ nhan chu **0 cap chong nhau**.
 
 Phep hoi quet ca `font-size:` cua CSS lan `font-size="` cua SVG. **Da chung minh thuoc song**: cam
 mot cho 10px vao ban dung thi no do ngay, go ra thi xanh.
+
+### M8 - HOI THANG TRINH DUYET XEM NO CO DANG CAT CHU KHONG (`_checkmat`, dat 09/08)
+
+M1 tu dung mot the an roi do lai be rong chu voi dung font - ky va dung - nhung no chi chay tren
+mot **DANH SACH THE CO DINH**: `input, .bsn, .bsl, .crb, h1..h4, b, .chip, button`.
+**Lop nao khong co ten trong danh sach ay la mot vung toi.**
+
+Doi cau hoi: **hoi thang trinh duyet `scrollWidth > clientWidth`**. No biet chinh xac no vua cat
+cai gi, cho MOI phan tu chu khong rieng vai lop, va re hon (khong dung the do, khong phai khop font).
+
+Do lan dau ra **100 cho dang bi cat chu**:
+- **`.kpin` (ten chi so KPI): 40 cho bi cat NGAY TREN KHO MAY TINH 1440px**, cho nang nhat mat
+  **148px - qua nua cai ten**. Trang Bao cao co 51 chi so theo bang BC2 cua SOP; doc ra "TB phut
+  tu l…" thi khong biet chi so ay do gi. No nam do tu lau, khong ai thay, vi **thuoc chi nhin vao
+  cho no duoc bao nhin**.
+- `.obm` (dong phu tren the hang dang gap): 18 cho - nhung day la cat CO Y.
+
+**Phan biet "cat vi hong" voi "cat vi co y"** la phan quan trong nhat cua phep hoi nay:
+- `.kpin` - hang KPI KHONG co trang thai mo nao ca, cat la mat luon -> cho XUONG DONG thay vi cat.
+- `.obm` - the dang gap, bam mo ra thi `.obcard.open` go `nowrap` va hien du -> giu nguyen, khai
+  ngoai le kem dung ly do do.
+- o trong bang -> da khai o `CAT_OK` (bang co cot keo duoc va nut Cot).
+
+Do lai sau khi va: **100 -> 18, va 18 cho con lai deu la cho cat co y.**
+
+**DA CHUNG MINH THUOC SONG:** tra `.kpin` ve ban cat chu thi no do ngay 8 cho, kem ten va so px bi
+mat; va lai thi xanh.
+
+**BAI HOC: DUNG TU DO CAI MA TRINH DUYET DA BIET.** Mot phep do tu dung bao gio cung kem mot danh
+sach "do cai gi" - va cai danh sach ay chinh la vung toi.

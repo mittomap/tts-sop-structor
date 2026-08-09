@@ -444,3 +444,60 @@ riêng trên khổ hẹp** - một thay đổi bố cục, không phải một t
 mọi trường hợp.** Nó cho rằng chữ mang lớp `mut` luôn là chú thích phụ - trong khi ở hàng KPI,
 `mut` đang mang tên chỉ số. Một ngoại lệ khai quá rộng thì nó che luôn những chỗ đáng lẽ phải đỏ.
 Đây mới là thứ phải sửa trước, và cũng vào VIỆC TỒN.
+
+
+---
+
+# VÒNG BỐN - dọn hai việc tồn, và tìm ra 100 chỗ chữ bị cắt
+
+Em tự ghi hai việc tồn ở cuối vòng ba, và nói rõ cái nào phải sửa trước. Vòng này làm đúng thứ tự
+ấy - và cái "phải sửa trước" hoá ra dẫn tới một lỗ to hơn nhiều.
+
+## 1. Ngoại lệ khai quá rộng - gỡ ra thì thấy nó KHÔNG che gì cả
+
+`_checkmat` khai `.mut` là *"chữ phụ mờ - phần bị cắt là chú thích thêm"*. Em ngờ nó khai quá rộng
+vì trên hàng KPI, `mut` đang mang **tên chỉ số**. Gỡ hẳn ngoại lệ ra rồi chạy lại: **vẫn xanh**.
+
+Nghĩa là ngoại lệ ấy không che gì trong tập đang đo - nhưng em **vẫn nhìn thấy** chữ bị cắt trên
+màn. Hai chuyện đó chỉ cùng đúng nếu **phép đo không nhìn tới chỗ ấy**. Và đúng thế.
+
+## 2. Phép đo M1 chỉ soi một DANH SÁCH THẺ CỐ ĐỊNH
+
+M1 tự dựng một thẻ ẩn rồi đo lại bề rộng chữ với đúng font - kỹ và đúng. Nhưng nó chỉ chạy trên
+`input, .bsn, .bsl, .crb, h1..h4, b, .chip, button`. **Lớp nào không có tên trong danh sách ấy là
+một vùng tối.** `.kpin` (tên chỉ số) không có trong đó.
+
+Đổi câu hỏi: thay vì tự đo, **hỏi thẳng trình duyệt `scrollWidth > clientWidth`** - nó biết chính
+xác nó vừa cắt cái gì, cho MỌI phần tử chứ không riêng vài lớp, và rẻ hơn (không dựng thẻ đo,
+không phải khớp font).
+
+**Kết quả đo lần đầu: 100 chỗ đang bị cắt chữ.**
+
+| Chỗ | Số lượng | Mất nhiều nhất |
+|---|---|---|
+| `.kpin` - tên chỉ số KPI, **khổ máy tính 1440px** | **40** | **148px** |
+| `.kpin` - khổ điện thoại | 42 | 148px |
+| `.obm` - dòng phụ trên thẻ hàng đang gấp | 18 | 317px |
+
+**40 tên chỉ số bị cắt ngay trên màn máy tính đầy đủ.** Trang Báo cáo có 51 chỉ số theo bảng BC2
+của SOP; đọc ra *"TB phút từ l…"* thì người xem không biết chỉ số ấy đo gì. Nó nằm đó từ lâu,
+không ai thấy, vì thước chỉ nhìn vào chỗ nó được bảo nhìn.
+
+## 3. Phân biệt "cắt vì hỏng" với "cắt vì cố ý"
+
+- `.kpin`: hàng KPI **không có trạng thái mở nào cả** - cắt ở đây là mất luôn cái tên. → cho
+  **xuống dòng** thay vì cắt (hàng cao thêm một dòng còn hơn một cái tên không đọc được).
+- `.obm`: cắt là **cố ý** - thẻ đang gấp, bấm mở ra thì `.obcard.open` gỡ `nowrap` và hiện đủ.
+  → giữ nguyên, khai ngoại lệ kèm đúng lý do đó.
+
+**Đo lại: 100 → 18, và 18 chỗ còn lại đều là chỗ cắt cố ý.**
+
+## 4. Thước M8, và lại chứng minh nó sống
+
+Thêm vào `_checkmat`: *trình duyệt có đang cắt chữ ở đâu không* - hỏi `scrollWidth`, bỏ qua ô
+trong bảng (đã khai lý do) và `.obm` trong thẻ gấp (khai lý do riêng).
+**Thử thật:** trả lại `.kpin` về bản cắt chữ → thước **đỏ ngay 8 chỗ**, kèm tên và số px bị mất.
+Vá lại → xanh.
+
+Bài học của vòng này gọn hơn ba vòng trước: **đừng tự đo cái mà trình duyệt đã biết.** Một phép đo
+tự dựng bao giờ cũng kèm một danh sách "đo cái gì" - và cái danh sách ấy chính là vùng tối.

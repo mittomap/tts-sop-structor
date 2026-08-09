@@ -1993,11 +1993,23 @@ body.drsz .drawer{transition:none}
 .kpiph{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:12px;margin-bottom:16px}
 .kpipanel{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .kpiphh{font-size:11.5px;font-weight:800;color:var(--navy);padding:10px 14px;background:linear-gradient(180deg,#FAFBFD,#fff);border-bottom:1px solid var(--line)}
-.kpirow{display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:1px solid #FAFBFD}
+.kpirow{display:flex;align-items:flex-start;gap:8px;padding:7px 14px;border-bottom:1px solid #FAFBFD}
 .kpirow:last-child{border-bottom:0}
 .kpil{flex:1;min-width:0;display:flex;align-items:center;gap:7px}
 .kpic{font-size:11px;font-weight:800;color:var(--muted);background:var(--bg);border-radius:3px;padding:2px 5px;flex:none}
-.kpin{font-size:11.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* TÊN CHỈ SỐ ĐƯỢC PHÉP XUỐNG DÒNG, KHÔNG BỊ CẮT.
+   Bẫy cắn 09/08: hỏi thẳng trình duyệt `scrollWidth > clientWidth` thì ra **40 tên chỉ số bị cắt
+   ngay trên khổ máy tính 1440px** (và 42 trên điện thoại), chỗ nặng nhất mất **148px** - tức là
+   quá nửa cái tên. Trang Báo cáo có 51 chỉ số theo bảng BC2 của SOP; 40 cái đọc ra "TB phút từ
+   l…" thì người xem không biết chỉ số ấy đo gì.
+   Vì sao thước cũ không thấy: phép đo M1 dựng một thẻ ẩn để tự đo bề rộng chữ, nhưng nó chỉ soi
+   một DANH SÁCH THẺ CỐ ĐỊNH (`input, .bsn, .bsl, .crb, h1..h4, b, .chip, button`) - `.kpin`
+   không nằm trong đó, nên nó là vùng tối. Cùng họ với "trang không nằm trên đường đi thì không
+   ai đo": ở đây là "lớp không nằm trong danh sách thì không ai đo".
+   Khác `.obm` - chỗ ấy cắt là CỐ Ý (thẻ đang gấp, bấm mở ra là hiện đủ, `.obcard.open` gỡ nowrap).
+   Hàng KPI không có trạng thái mở nào cả: cắt ở đây là mất luôn.
+   Cho xuống dòng thay vì cắt - hàng cao thêm một dòng còn hơn một cái tên không đọc được. */
+.kpin{font-size:11.5px;color:var(--text);white-space:normal;overflow-wrap:anywhere;line-height:1.35}
 .kpiv{font-size:12.5px;font-weight:800;flex:none;min-width:52px;text-align:right}
 .kpiv.green{color:var(--green)}.kpiv.red{color:var(--red)}.kpiv.gray{color:var(--muted)}
 .kpig{font-size:11px;color:var(--muted);flex:none;min-width:64px;text-align:right;white-space:nowrap}

@@ -241,6 +241,38 @@
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 39 BỘ KIỂM (08/08). V1 mốc cũ: V9.99z12, 34 bộ, bản dựng `829572`.**
 >
+> ### 🟣 09/08 - VÒNG BỐN: 40 TÊN CHỈ SỐ BỊ CẮT NGAY TRÊN MÀN MÁY TÍNH, KHÔNG AI THẤY
+>
+> Em tự ghi hai việc tồn cuối vòng ba và nói rõ cái nào phải sửa trước. Làm đúng thứ tự ấy - và
+> cái "phải sửa trước" dẫn tới một lỗ to hơn nhiều.
+>
+> **1. Gỡ ngoại lệ khai quá rộng ra thì thấy nó KHÔNG che gì cả.** `_checkmat` khai `.mut` là
+> *"chữ phụ mờ - phần bị cắt là chú thích thêm"*. Gỡ hẳn ra, chạy lại: **vẫn xanh**. Nhưng em
+> **vẫn nhìn thấy** chữ bị cắt trên màn. Hai chuyện đó chỉ cùng đúng nếu **phép đo không nhìn tới
+> chỗ ấy**.
+>
+> **2. VÀ ĐÚNG THẾ: M1 CHỈ SOI MỘT DANH SÁCH THẺ CỐ ĐỊNH.** Nó tự dựng một thẻ ẩn rồi đo lại bề
+> rộng chữ với đúng font - kỹ và đúng - nhưng chỉ chạy trên `input, .bsn, .bsl, .crb, h1..h4, b,
+> .chip, button`. **Lớp nào không có tên trong danh sách ấy là một vùng tối.** `.kpin` (tên chỉ
+> số) không có trong đó.
+> Đổi câu hỏi: **hỏi thẳng trình duyệt `scrollWidth > clientWidth`**. Đo lần đầu ra **100 chỗ
+> đang bị cắt chữ**, trong đó **40 TÊN CHỈ SỐ KPI bị cắt NGAY TRÊN KHỔ MÁY TÍNH 1440px**, chỗ
+> nặng nhất mất **148px - quá nửa cái tên**. Trang Báo cáo có 51 chỉ số theo bảng BC2 của SOP;
+> đọc ra *"TB phút từ l…"* thì không biết chỉ số ấy đo gì. Nó nằm đó từ lâu, không ai thấy, vì
+> **thước chỉ nhìn vào chỗ nó được bảo nhìn**.
+>
+> **3. PHÂN BIỆT "CẮT VÌ HỎNG" VỚI "CẮT VÌ CỐ Ý".** `.kpin`: hàng KPI không có trạng thái mở nào
+> cả, cắt là mất luôn → cho **xuống dòng** (hàng cao thêm một dòng còn hơn một cái tên không đọc
+> được). `.obm`: cắt là **cố ý** - thẻ đang gấp, bấm mở thì `.obcard.open` gỡ `nowrap` và hiện đủ
+> → giữ nguyên, khai ngoại lệ kèm đúng lý do đó. **Đo lại: 100 → 18, và 18 chỗ còn lại đều là
+> chỗ cắt cố ý.**
+>
+> **4. THƯỚC M8, VÀ LẠI CHỨNG MINH NÓ SỐNG:** trả `.kpin` về bản cắt chữ → **đỏ ngay 8 chỗ**, kèm
+> tên và số px bị mất; vá lại → xanh.
+>
+> **BÀI HỌC VÒNG NÀY, gọn hơn ba vòng trước: ĐỪNG TỰ ĐO CÁI MÀ TRÌNH DUYỆT ĐÃ BIẾT.** Một phép đo
+> tự dựng bao giờ cũng kèm một danh sách "đo cái gì" - và **cái danh sách ấy chính là vùng tối**.
+
 > ### 📐 09/08 - SÀN CỠ CHỮ 11px (anh Luân: *"Cứ chọn 1 size hợp lý"*)
 >
 > **Anh giao em quyết định. Em đo trước, và phép đo đầu tiên cho thấy EM ĐÃ NÓI SAI.**

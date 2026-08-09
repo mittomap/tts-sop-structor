@@ -57,7 +57,11 @@ const TRANG = ["banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","hocvi
 /* Chỗ được phép cắt chữ, kèm lý do đọc được. Thêm dòng vào đây là một quyết định. */
 const CAT_OK = [
   {khop: /^\.dt /, ly: "Ô trong bảng dữ liệu: bảng có cột kéo được và nút Cột để tắt bớt; ép mọi ô đủ rộng thì bảng nào cũng cuộn ngang."},
-  {khop: /(^|\s)mut(\s|$)/, ly: "Chữ phụ mờ - phần bị cắt là chú thích thêm, không phải thông tin phải đọc."},
+  /* NGOẠI LỆ NÀY ĐÃ KHAI QUÁ RỘNG - tạm gỡ để xem nó đang che những gì.
+     Tìm ra 09/08: trên hàng KPI của trang Báo cáo, chữ mang lớp `mut` không phải chú thích phụ -
+     nó là **TÊN CỦA CHỈ SỐ** ("TB phút từ lead tới cuộc gọi đầu"). Đọc "LRT · TB phút từ l…" thì
+     không biết chỉ số ấy đo cái gì. Lớp `mut` chỉ nói về MÀU (chữ mờ), không nói về VAI TRÒ.
+     Khai ngoại lệ theo màu là khai theo thứ dễ nhìn thấy thay vì thứ đang hỏi. */
 ];
 
 (async () => {
@@ -113,7 +117,7 @@ const CAT_OK = [
       await new Promise(r => setTimeout(r, 340));
       const c = document.getElementById("content");
       if (!c) return {loi: "khong co than trang"};
-      const ra = {cat: [], che: [], hep: [], moCoi: [], deNhau: [], thucThe: [], soVo: [], dem: 0};
+      const ra = {cat: [], che: [], hep: [], moCoi: [], deNhau: [], thucThe: [], soVo: [], batNat: [], dem: 0};
 
       /* Thước đo bề rộng THẬT của một đoạn chữ với đúng font của nó. Dựng một lần, dùng lại. */
       const do_ = document.createElement("span");
@@ -225,6 +229,32 @@ const CAT_OK = [
           return r.width > 0 && r.height > 0;
         };
         const than = document.getElementById("content"); if (!than) return;
+        /* M8 - HỎI THẲNG TRÌNH DUYỆT XEM NÓ CÓ ĐANG CẮT CHỮ KHÔNG.
+           M1 tự dựng một thẻ ẩn rồi đo lại bề rộng chữ - đúng, nhưng nó chỉ soi một **DANH SÁCH
+           THẺ CỐ ĐỊNH** (`input, .bsn, .bsl, .crb, h1..h4, b, .chip, button`). Lớp nào không có
+           tên trong danh sách ấy là một vùng tối.
+           Bẫy cắn 09/08: hỏi `scrollWidth > clientWidth` thì ra **100 chỗ đang bị cắt**, trong đó
+           **40 tên chỉ số KPI bị cắt ngay trên khổ máy tính 1440px** (chỗ nặng nhất mất 148px,
+           quá nửa cái tên) - `.kpin` không nằm trong danh sách nên M1 chưa từng nhìn nó.
+           Cùng họ với "trang không nằm trên đường đi thì không ai đo", lần này là "lớp không nằm
+           trong danh sách thì không ai đo". Chữa tận gốc: **đừng tự đo, hãy hỏi trình duyệt** -
+           nó biết chính xác nó vừa cắt cái gì, và nó biết cho MỌI phần tử chứ không riêng vài lớp.
+           Rẻ hơn nữa: không phải dựng thẻ đo, không phải khớp font. */
+        than.querySelectorAll("*").forEach(el => {
+          if (el.children.length) return;
+          const t = (el.textContent || "").trim(); if (t.length < 4) return;
+          const cs = getComputedStyle(el); if (cs.display === "none") return;
+          if (el.getBoundingClientRect().width === 0) return;
+          if (el.scrollWidth <= el.clientWidth + 1) return;
+          const cl = String(el.className || "");
+          /* Ô trong bảng: đã khai lý do ở CAT_OK (bảng có cột kéo được và nút Cột). */
+          if (el.closest("table")) return;
+          /* `.obm` trong thẻ hàng đang GẤP: cắt là CỐ Ý - bấm mở thẻ ra thì `.obcard.open` gỡ
+             nowrap và hiện đủ. Đây là ngoại lệ nói được lý do, không phải chỗ bỏ qua cho yên. */
+          if (/\bobm\b/.test(cl) && el.closest(".obcards.rows") && !el.closest(".obcard.open")) return;
+          ra.batNat.push('"' + t.slice(0, 30) + '" (.' + (cl.split(" ")[0] || el.tagName) +
+                         ") bi cat " + (el.scrollWidth - el.clientWidth) + "px");
+        });
         /* M5 - CON SỐ BỊ BẺ ĐÔI GIỮA HAI CHỮ SỐ.
            Bẫy cắn 09/08, tìm ra bằng mắt: ô "Tiền công tạm tính" hiện `10.660.0` rồi xuống dòng
            `00đ`. `.bsn{overflow-wrap:anywhere}` đúng cho CHỮ dài (thà xuống dòng còn hơn tràn),
@@ -310,6 +340,7 @@ const CAT_OK = [
     gom(r.deNhau, "HAI KHOI CHU DE LEN NHAU");
     gom(r.thucThe, "THUC THE HTML LO RA MAN - escape hai lan");
     gom(r.soVo, "CON SO BI BE DOI GIUA HAI CHU SO");
+    gom(r.batNat, "TRINH DUYET DANG CAT CHU (hoi scrollWidth)");
   }
 
   await ctx.close();
