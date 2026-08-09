@@ -363,6 +363,24 @@ w8 = [s(w,"wow_id") for w in R("DL14") if code(w.get("wow_status")) in ("booked"
 rep("VUA", "7h WOW 'Da dat/Xac nhan' nhung ngay day DA QUA", w8)
 w9 = [s(w,"wow_id") for w in R("DL14") if code(w.get("wow_status"))=="no_show" and not s(w,"wow_no_show_reason")]
 rep("NHE", "7i WOW 'HV khong den' nhung khong ghi ly do", w9)
+# 7j - BUOI DA HEN LICH PHAI ROI VAO GIO TRUNG TAM MO CUA.
+# BAY DA CAN 09/08, nhin thay tren man Lich tuan: co buoi WOW ghi 01:49 sang va 02:49 sang, va
+# 63/90 buoi cung chung phut :49. Goc: `NOW` trong gen_demo.py giu nguyen GIO PHUT LUC CHAY
+# PIPELINE, roi moi moc `NOW - n ngay` thua huong dung cai phut ay - do duoc 910 moc tren toan
+# bo du lieu mang phut :49.
+# Khong bo kiem nao thay, vi ca hai bo du lieu deu chi hoi ve QUAN HE giua cac moc (truoc/sau,
+# co/khong) chu khong hoi mot moc co HOP LE VOI DOI THAT khong. Mot buoi hoc luc 2 gio sang thi
+# moi quan he thoi gian cua no van dung het - no chi vo ly voi nguoi doc.
+# Chi hoi BUOI DA HEN LICH: mot lan thu tien hay mot cuoc goi luc 07:49 la hoan toan that.
+_gioMo, _gioDong = 6, 22
+w10 = ["%s (%s)" % (s(w,"wow_id"), s(w,"wow_session_date")) for w in R("DL14")
+       if dt(w.get("wow_session_date"))
+       and not (_gioMo <= dt(w.get("wow_session_date")).hour < _gioDong)]
+rep("NANG", "7j WOW hen vao gio trung tam DONG CUA (ngoai %dh-%dh)" % (_gioMo, _gioDong), w10)
+b10 = ["%s (%s)" % (s(x,"session_id"), s(x,"session_date")) for x in R("DL11")
+       if dt(x.get("session_date"))
+       and not (_gioMo <= dt(x.get("session_date")).hour < _gioDong)]
+rep("NANG", "7k Buoi hoc xep vao gio trung tam DONG CUA (ngoai %dh-%dh)" % (_gioMo, _gioDong), b10)
 
 # ══ 8. KHAO SAT + KHIEU NAI + PHAN HOI ═══════════════════════════════════
 s1 = [s(x,"survey_id") for x in R("DL15") if dt(x.get("sent_date")) and dt(x.get("submitted_date"))

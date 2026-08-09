@@ -777,3 +777,42 @@ mat; va lai thi xanh.
 
 **BAI HOC: DUNG TU DO CAI MA TRINH DUYET DA BIET.** Mot phep do tu dung bao gio cung kem mot danh
 sach "do cai gi" - va cai danh sach ay chinh la vung toi.
+
+### 7j + 7k trong `check_logic.py` - BUOI DA HEN LICH PHAI ROI VAO GIO TRUNG TAM MO CUA (09/08)
+
+Nhin man Lich tuan bang mat thi thay **buoi WOW ghi 01:49 sang va 02:49 sang**, va moi gio WOW deu
+ket thuc bang phut **:49**.
+
+Goc: `NOW = datetime.now()` trong `gen_demo.py` giu nguyen **gio phut luc chay pipeline**, roi moi
+moc dung bang `NOW - n ngay` thua huong dung cai phut ay. Do duoc **910 moc thoi gian tren toan bo
+du lieu mang phut :49**.
+
+**VI SAO KHONG BO KIEM NAO THAY - cau nay phai nho:** ca `check_data.py` lan `check_logic.py` deu
+chi hoi ve **QUAN HE** giua cac moc (truoc/sau, co/khong), **khong hoi mot moc co HOP LY VOI DOI
+THAT khong**. Mot buoi hoc luc 2 gio sang thi moi quan he thoi gian cua no van dung het - no chi vo
+ly voi nguoi doc. **Du lieu nhat quan hoan hao van co the vo ly hoan toan.**
+
+**SUA CHO DUNG MUC, khong sua tat:** phut :49 tren mot lan THU TIEN hay mot CUOC GOI la hoan toan
+that - nguoi ta tra tien luc 7 gio 49 duoc. Cai vo ly la mot buoi DA HEN LICH. Nen chi buoi WOW
+(DL14) va ca test (DL03) moi di qua ham nan gio `gioHoc` / `gioTest` trong `gen_demo.py`.
+
+Buoi WOW ngoai gio **2 -> 0** · ca test ngoai gio **18 -> 0** · gio WOW het don 60/90 vao 7h.
+
+**BAN VA DAU TIEN CUA CHINH NGUOI SUA CUNG SAI:** snap mu sang khung 9/15/19 day mot buoi "da hoan
+thanh" sang **19h HOM NAY - tuc tuong lai**; `check_logic` bat ngay (luat 7g). Phai dat moc tuong
+minh (toi qua 19h / hai hom truoc 19h) thay vi snap roi cau may.
+
+**DA CHUNG MINH THUOC SONG:** cam mot buoi luc 02:49 vao du lieu thi 7j do ngay; go ra thi xanh.
+
+### Luat 17 trong `fixdata.py` - DON DANG KY KHONG THE CO TRUOC LEAD (09/08)
+
+`check_data` khai loi nay la **"loi vua"** nen bo kiem van DAT - va vi the no nam do lau ma khong ai
+di toi goc. Nhung mot don dang ky ghi ngay SOM HON luc khach lien he lan dau la chuyen khong the
+xay ra.
+
+**KEO MOC TAO LEAD VE SOM HON, khong day don dang ky muon di:** `lead_created_time` nam o DAU day
+chuyen nen doi no khong lam lech gi phia sau; con `enrollment_time` thi phieu thu, lich dong dot,
+han xac nhan lop deu treo vao - day no di la keo theo ca chum.
+
+Dat o **cuoi** `fixdata.py`, dung bai hoc da ghi san ngay tren luat 16: *mot luat bat bien phai
+dung sau NGUOI GHI CUOI CUNG; dung giua thi no chi canh duoc phan viec phia truoc no*.

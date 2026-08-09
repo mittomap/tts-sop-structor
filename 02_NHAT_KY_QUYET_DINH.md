@@ -241,6 +241,47 @@
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 39 BỘ KIỂM (08/08). V1 mốc cũ: V9.99z12, 34 bộ, bản dựng `829572`.**
 >
+> ### 🟠 09/08 - VÒNG NĂM: APP SẠCH TRÊN ĐIỆN THOẠI, NHƯNG DỮ LIỆU CÓ BUỔI HỌC LÚC 2 GIỜ SÁNG
+>
+> **PHẦN MỘT - BẤM THẬT TRÊN ĐIỆN THOẠI.** Vùng tối cuối cùng: `_checkbam` và `_checknv` (hai bộ
+> bấm thật) **đều chạy ở 1440×900**; trên điện thoại chưa ai bấm gì cả. Dựng phép đo riêng:
+> **233 nút bấm thật, 46 ngăn kéo mở ra, 0 lỗi JS, 0 nút không với tới được, 0 nút bị phủ lên**,
+> và **3/4 việc đi trọn được** (mở form → điền → cuộn tới nút Lưu → bấm).
+> **Đây là vòng đầu tiên không tìm ra lỗi app nào.** Câu hỏi nó đặt ra thì `_checkui` đã canh sẵn
+> phần lớn, nên **KHÔNG thêm bộ kiểm** - đúng luật hội đồng 08/08.
+> Nhưng **thước của em sai hai lần**: (a) cuộn thân ngăn kéo xuống ĐÁY rồi hỏi "nút có trong màn
+> không" → tố oan **27 nút** của một ngăn kéo Bộ lọc dài, trong khi đó là nội dung cuộn được;
+> (b) không đóng **hộp xác nhận** sau mỗi lần bấm → lớp phủ `cfmask` che mọi thứ và bộ kiểm báo
+> **23 chỗ "nút bị phủ lên"** trong khi thứ phủ lên chính là cái hộp nó vừa mở ra.
+>
+> **PHẦN HAI - NHÌN LỊCH TUẦN BẰNG MẮT: BA LỖI DỮ LIỆU.**
+> Màn Lịch tuần có **buổi WOW ghi 01:49 sáng và 02:49 sáng**, và mọi giờ WOW đều kết thúc bằng
+> phút **:49**. Gốc: `NOW = datetime.now()` trong `gen_demo.py` giữ nguyên **giờ phút lúc chạy
+> pipeline**, rồi mọi mốc `NOW − n ngày` thừa hưởng đúng cái phút ấy.
+> **Đo được: 910 mốc thời gian trên toàn bộ dữ liệu mang phút :49.**
+> **VÌ SAO KHÔNG BỘ KIỂM NÀO THẤY - câu này phải nhớ:** cả `check_data.py` lẫn `check_logic.py`
+> đều chỉ hỏi về **QUAN HỆ** giữa các mốc (trước/sau, có/không), **không hỏi một mốc có HỢP LÝ
+> VỚI ĐỜI THẬT không**. Một buổi học lúc 2 giờ sáng thì mọi quan hệ thời gian của nó vẫn đúng
+> hết - nó chỉ vô lý với người đọc. **Dữ liệu nhất quán hoàn hảo vẫn có thể vô lý hoàn toàn.**
+> **SỬA CHO ĐÚNG MỨC:** phút :49 trên một lần THU TIỀN hay một CUỘC GỌI là hoàn toàn thật - người
+> ta trả tiền lúc 7 giờ 49 được. Cái vô lý là **buổi ĐÃ HẸN LỊCH**. Chỉ WOW (DL14) và ca test
+> (DL03) đi qua hàm nắn giờ. Buổi WOW ngoài giờ **2 → 0** · ca test ngoài giờ **18 → 0** · giờ WOW
+> hết dồn 60/90 vào 7h, nay rải 9h/15h/17h/19h.
+> **Và bản vá đầu tiên của chính em cũng sai:** snap mù sang khung 9/15/19 đẩy một buổi "đã hoàn
+> thành" sang **19h HÔM NAY - tức tương lai**; `check_logic` bắt ngay (luật 7g). Phải đặt mốc
+> tường minh thay vì snap rồi cầu may.
+>
+> **LỖI THỨ BA, tìm ra trong lúc dọn:** `check_data` khai *"đăng ký trước khi có lead"* là **"lỗi
+> vừa"** nên bộ kiểm vẫn ĐẠT - và vì thế nó nằm đó lâu mà không ai đi tới gốc. Vá bằng một **luật
+> bất biến** ở cuối `fixdata.py`: **kéo mốc tạo lead về sớm hơn**, KHÔNG đẩy đơn đăng ký muộn đi -
+> `lead_created_time` ở đầu dây chuyền nên đổi nó không lệch gì phía sau, còn `enrollment_time`
+> thì phiếu thu, lịch đóng đợt, hạn xác nhận lớp đều treo vào. Đặt ở CUỐI dây chuyền, đúng bài
+> học đã ghi sẵn ngay trên luật 16.
+> Kết quả: `check_data` **ĐẠT** (1 lỗi vừa, và đó là cái cố ý) · `check_logic` **ĐẠT, 0 bản ghi lỗi**.
+>
+> **HAI THƯỚC MỚI 7j + 7k trong `check_logic.py`** - *buổi đã hẹn lịch phải rơi vào giờ trung tâm
+> mở cửa*. **Đã chứng minh thước sống:** cắm một buổi lúc 02:49 → đỏ ngay; gỡ ra → xanh.
+
 > ### 🟣 09/08 - VÒNG BỐN: 40 TÊN CHỈ SỐ BỊ CẮT NGAY TRÊN MÀN MÁY TÍNH, KHÔNG AI THẤY
 >
 > Em tự ghi hai việc tồn cuối vòng ba và nói rõ cái nào phải sửa trước. Làm đúng thứ tự ấy - và

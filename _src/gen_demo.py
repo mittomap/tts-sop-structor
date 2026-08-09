@@ -12,6 +12,33 @@ def FD(d): # dd/mm/YYYY
     return d.strftime("%d/%m/%Y")
 def days(n): return dt.timedelta(days=n)
 
+# GIO CUA MOT BUOI DA HEN LICH
+# BAY DA CAN 09/08, nhin thay tren man Lich tuan: co buoi WOW ghi 01:49 sang va 02:49 sang,
+# con 63/90 buoi thi cung chung phut :49.
+# Goc: NOW giu nguyen GIO PHUT LUC CHAY PIPELINE (hom ay chay luc 07:49), roi moi moc dung bang
+# NOW - n ngay deu thua huong dung cai phut ay. Do duoc 910 moc thoi gian tren toan bo du lieu
+# mang phut :49.
+# SUA CHO DUNG MUC, khong sua tat: phut :49 tren mot lan THU TIEN hay mot CUOC GOI la hoan toan
+# that - nguoi ta tra tien luc 7 gio 49 duoc. Cai vo ly la MOT BUOI DA HEN LICH luc 1 gio 49
+# sang: buoi hoc, buoi WOW, ca test deu la thu trung tam xep truoc theo khung gio day.
+# Nen chi nhung moc ay moi di qua ham nay.
+def gioHoc(d, khung=None):
+    # Dua mot moc thoi gian ve dung khung gio day cua trung tam, giu nguyen NGAY.
+    if khung is None:
+        khung = [9, 15, 17, 19]
+    return d.replace(hour=random.choice(khung), minute=random.choice([0, 0, 30]))
+
+def gioTest(d, moc):
+    # Ca test dau vao: keo ve khung gio test (9/14/16/19) ma VAN O QUA KHU so voi `moc`.
+    # Vi sao can rieng ham nay: cac nhanh DL03 dung `NOW - n gio` de dung nen "con han cham bai"
+    # hay "qua han goi lai" - neu chi snap gio mu thi mot ca test 5 gio truoc co the bi day sang
+    # 19h HOM NAY, tuc tuong lai. Da cắn dung loi do o DL14 ngay truoc do.
+    for h in (19, 16, 14, 9):
+        t = d.replace(hour=h, minute=0)
+        if t < moc:
+            return t
+    return (d - dt.timedelta(days=1)).replace(hour=19, minute=0)
+
 # dữ liệu nằm CẠNH script (cùng thư mục gen_v5.py) - đọc bản cũ làm giống, ghi đè lại chính nó
 P = os.path.join(os.path.dirname(os.path.abspath(__file__)), "demo_data_big.json")
 old = json.load(open(P, encoding="utf-8"))
@@ -682,15 +709,18 @@ def add_test(L, kind):
         d=TODAY+days(tb_n%18+1); d=d.replace(hour=random.choice([9,14,19]))   # V9.59: chia đều 18 ngày tới, không bốc ngẫu nhiên
         t.update(test_date=F(d))
     elif kind=="await_grade":
-        d=NOW-dt.timedelta(hours=random.choice([5,8,11,14,18,20]));
+        # Ca test cung phai roi vao gio trung tam mo cua - xem ghi chu o `gioHoc`.
+        # Giu nguyen KHOANG CACH (de con/qua han cham bai), chi keo gio ve khung lam viec.
+        d=NOW-dt.timedelta(hours=random.choice([5,8,11,14,18,20]))
+        d=gioTest(d, NOW)
         t.update(test_date=F(d),test_attendance_status="on_time (Đúng giờ)",test_attendance_time=F(d))
     elif kind=="graded_wait_consult":
-        d=NOW-dt.timedelta(hours=random.randint(22,40)); sc=round(random.uniform(3.5,6.0)*2)/2
+        d=gioTest(NOW-dt.timedelta(hours=random.randint(22,40)), NOW); sc=round(random.uniform(3.5,6.0)*2)/2
         t.update(test_date=F(d),test_attendance_status="on_time (Đúng giờ)",test_attendance_time=F(d),test_status="graded (Đã chấm xong)",
             overall_score=str(sc),skill_listening=str(sc),skill_reading=str(sc),skill_writing=str(max(1,sc-0.5)),skill_speaking=str(sc),
             result_time=F(NOW-dt.timedelta(hours=random.randint(6,18))),post_test_status="awaiting_consultation (Có KQ, chờ tư vấn)",graded_by=gv[0])
     elif kind=="noshow":
-        d=NOW-dt.timedelta(hours=(15 if tb_n%2 else 40))   # 1 ca mới vắng (vàng) + 1 ca quá hạn gọi lại (đỏ)
+        d=gioTest(NOW-dt.timedelta(hours=(15 if tb_n%2 else 40)), NOW)   # 1 ca mới vắng (vàng) + 1 ca quá hạn gọi lại (đỏ)
         t.update(test_date=F(d),test_attendance_status="no_show (Vắng mặt)",test_no_show_reason=random.choice(["Quên lịch","Bận đột xuất","Không liên lạc được"]),
                  booking_note=F(d)+": vắng, chờ hẹn lại")
     elif kind=="rebooked":
@@ -1298,22 +1328,33 @@ def add_wow(s,kind,off=None):
          "staff_id":gv[0],"staff_name":gv[1],"wow_status":"booked (Đã đặt)","wow_content_note":"","wow_outcome":"","wow_no_show_reason":"",
          "quota_deducted":"no","sla_content_note_24h":"","notes":"","next_action":""}
     if kind=="done":
-        d=NOW-days(random.randint(2,40))
+        d=gioHoc(NOW-days(random.randint(2,40)))
         row.update(booking_date=F(d-days(2)),wow_session_date=F(d),wow_status="completed (Đã hoàn thành)",quota_deducted="yes",
             wow_content_note="Luyện "+skill.split(" ")[0]+", HV nắm được phương pháp",wow_outcome=random.choice(["improved (Tiến bộ rõ rệt)","improved (Tiến bộ rõ rệt)","needs_more (Cần thêm buổi)"]),
             sla_content_note_24h="Đúng hạn")
     elif kind=="done_nonote":
-        d=NOW-dt.timedelta(hours=(10 if wow_n%2 else 30))   # 1 còn trong hạn ghi 24h (vàng) + 1 quá hạn (đỏ)
+        # Hai buoi nay co MOT VIEC: mot buoi con trong han ghi chu 24h (vang), mot buoi da qua
+        # han (do). Truoc day dung NOW - 10/30 gio, nen no thua huong phut cua dong ho luc chay
+        # pipeline va roi ra nhung gio vo ly (01:49 sang).
+        # LAN VA DAU TIEN CUA CHINH EM CUNG SAI: snap mu sang khung 9/15/19 co the day buoi
+        # "da hoan thanh" sang 19h HOM NAY - tuc TUONG LAI. `check_logic.py` bat ngay (luat 7g).
+        # Nay dat MOC TUONG MINH, va moc nao cung o qua khu theo dung ve cua no.
+        if wow_n%2:
+            d=(NOW-days(1)).replace(hour=19,minute=0)          # toi qua - con trong 24h
+            if (NOW-d).total_seconds()/3600 >= 24:
+                d=NOW.replace(hour=9,minute=0)                 # da qua 19h roi thi lay sang nay
+        else:
+            d=(NOW-days(2)).replace(hour=19,minute=0)          # hai hom truoc - da qua han   # 1 còn trong hạn ghi 24h (vàng) + 1 quá hạn (đỏ)
         row.update(booking_date=F(d-days(2)),wow_session_date=F(d),wow_status="completed (Đã hoàn thành)",quota_deducted="yes")
     elif kind=="upcoming":
         d=TODAY+days(off if off is not None else random.randint(1,6)); d=d.replace(hour=random.choice([9,15,19]))
         row.update(booking_date=F(NOW-days(1)),wow_session_date=F(d),wow_status=random.choice(["booked (Đã đặt)","confirmed (Đã xác nhận)"]))
     elif kind=="noshow":
-        d=NOW-days(random.randint(3,15))
+        d=gioHoc(NOW-days(random.randint(3,15)))
         row.update(booking_date=F(d-days(2)),wow_session_date=F(d),wow_status="no_show (HV không đến)",quota_deducted="yes",
             wow_no_show_reason=random.choice(["forgot (Quên lịch)","personal (Lý do cá nhân)","no_contact (Không liên lạc được)"]))
     elif kind=="cancelled":
-        d=NOW-days(random.randint(3,20))
+        d=gioHoc(NOW-days(random.randint(3,20)))
         row.update(booking_date=F(d-days(3)),wow_session_date=F(d),wow_status="cancelled (Đã hủy)",quota_deducted="no")
     wows.append(row); return row
 active=[s for s in students if s["student_status"].startswith("active")]

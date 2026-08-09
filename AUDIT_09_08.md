@@ -501,3 +501,80 @@ Vá lại → xanh.
 
 Bài học của vòng này gọn hơn ba vòng trước: **đừng tự đo cái mà trình duyệt đã biết.** Một phép đo
 tự dựng bao giờ cũng kèm một danh sách "đo cái gì" - và cái danh sách ấy chính là vùng tối.
+
+
+---
+
+# VÒNG NĂM - bấm thật trên điện thoại, và ba lỗi DỮ LIỆU DEMO
+
+## Phần một: bấm thật trên khổ điện thoại - và app SẠCH
+
+Vùng tối cuối cùng em còn khai: `_checkbam` và `_checknv` (hai bộ bấm thật) **đều chạy ở
+1440×900**. Trên điện thoại chưa ai bấm gì cả - mới chỉ có `_checkui` MỞ trang ra đo hình học.
+
+Dựng phép đo riêng cho màn hẹp và chạy:
+- **233 nút bấm thật** trên 16 trang, khổ 390×844 có cảm ứng → **46 ngăn kéo mở ra, 0 lỗi JS**.
+- Cuộn tới từng nút rồi hỏi: **0 nút không với tới được, 0 nút bị cái khác phủ lên**.
+- **3/4 việc đi trọn được**: mở form → điền → cuộn tới nút Lưu → bấm. Việc thứ tư là cửa hai
+  bước (bấm ra một ngăn kéo trung gian), script dừng sớm chứ app không tắc.
+
+**Đây là vòng đầu tiên trong năm vòng không tìm ra lỗi app nào.** Và câu hỏi nó đặt ra thì
+`_checkui` đã canh sẵn phần lớn (bề rộng ngăn kéo trên màn hẹp, cỡ nút đóng, nội dung tràn ra
+ngoài ngăn kéo). Nên em **không thêm bộ kiểm** - đúng luật hội đồng 08/08: thêm một bộ là thêm
+một chỗ phải nuôi. Chỉ ghi lại bằng chứng.
+
+**Hai lần thước của chính em sai trong phần này**, ghi thẳng vì cả hai đều cùng một bệnh:
+1. Cuộn thân ngăn kéo xuống **đáy** rồi hỏi "nút có trong màn không" → tố oan **27 nút** của một
+   ngăn kéo Bộ lọc dài. Nút ở phía trên tất nhiên trượt ra ngoài; đó là **nội dung cuộn được**,
+   không phải lỗi.
+2. Không đóng **hộp xác nhận** sau mỗi lần bấm → từ lúc một nút mở hộp xác nhận trở đi, lớp phủ
+   `cfmask` che mọi thứ, và bộ kiểm báo **23 chỗ "nút bị phủ lên"** trong khi thứ phủ lên chính
+   là cái hộp do nó vừa mở ra.
+Cả hai đều là **rác của phép đo**, không phải lỗi app. Dọn xong: 0 chỗ xấu.
+
+## Phần hai: nhìn Lịch tuần bằng mắt - ba lỗi DỮ LIỆU
+
+Mở màn Lịch tuần thì thấy **buổi WOW ghi 01:49 sáng và 02:49 sáng**, và mọi giờ WOW đều kết thúc
+bằng phút **:49**.
+
+**Gốc:** `NOW = datetime.now()` trong `gen_demo.py` giữ nguyên **giờ phút lúc chạy pipeline** (hôm
+ấy 07:49), rồi mọi mốc dựng bằng `NOW − n ngày` thừa hưởng đúng cái phút ấy.
+**Đo được: 910 mốc thời gian trên toàn bộ dữ liệu mang phút :49.**
+
+**Vì sao không bộ kiểm nào thấy:** cả `check_data.py` lẫn `check_logic.py` đều chỉ hỏi về **quan
+hệ** giữa các mốc (trước/sau, có/không), không hỏi một mốc có **hợp lệ với đời thật** không. Một
+buổi học lúc 2 giờ sáng thì mọi quan hệ thời gian của nó vẫn đúng hết - nó chỉ vô lý với người đọc.
+
+**Sửa cho ĐÚNG MỨC, không sửa tất:** phút :49 trên một lần **thu tiền** hay một **cuộc gọi** là
+hoàn toàn thật - người ta trả tiền lúc 7 giờ 49 được. Cái vô lý là **một buổi ĐÃ HẸN LỊCH**. Nên
+chỉ buổi WOW (DL14) và ca test (DL03) mới đi qua hàm nắn giờ.
+
+| Lỗi | Trước | Sau |
+|---|---|---|
+| Buổi WOW ngoài giờ 6h-22h | 2 | **0** |
+| Ca test ngoài giờ 6h-22h | 18 | **0** |
+| Giờ WOW dồn một khung | 60/90 ở 7h | rải 9h/15h/17h/19h |
+
+**Và bản vá đầu tiên của chính em cũng sai:** snap mù sang khung 9/15/19 đẩy một buổi "đã hoàn
+thành" sang **19h HÔM NAY - tức tương lai**. `check_logic.py` bắt ngay (luật 7g). Phải đặt mốc
+tường minh (tối qua 19h / hai hôm trước 19h) thay vì snap rồi cầu may.
+
+**Lỗi thứ ba, tìm ra trong lúc dọn:** `check_data` khai *"đăng ký trước khi có lead"* là **"lỗi
+vừa"** nên bộ kiểm vẫn ĐẠT - và vì thế nó nằm đó lâu mà không ai đi tới gốc. Nhưng một đơn đăng ký
+ghi ngày **sớm hơn** lúc khách liên hệ lần đầu là chuyện không thể xảy ra.
+Vá bằng một **luật bất biến** ở cuối `fixdata.py`: **kéo mốc tạo lead về sớm hơn**, không đẩy đơn
+đăng ký muộn đi - `lead_created_time` nằm ở đầu dây chuyền nên đổi nó không làm lệch gì phía sau,
+còn `enrollment_time` thì phiếu thu, lịch đóng đợt, hạn xác nhận lớp đều treo vào.
+Đặt ở **cuối** dây chuyền, đúng bài học đã ghi sẵn ngay trên luật 16: *một luật bất biến phải
+đứng sau người ghi cuối cùng*.
+
+**Kết quả: `check_data` ĐẠT (1 lỗi vừa - và đó là cái cố ý: đơn đã huỷ chờ hoàn tiền, để hàng chờ
+hoàn tiền có việc) · `check_logic` ĐẠT, 0 bản ghi lỗi.**
+
+## Hai thước mới trong `check_logic.py`
+
+**7j** (buổi WOW) và **7k** (buổi học) - *buổi đã hẹn lịch phải rơi vào giờ trung tâm mở cửa*.
+**Đã chứng minh thước sống:** cắm một buổi lúc 02:49 vào dữ liệu → **đỏ ngay**; gỡ ra → xanh.
+
+Bài học vòng này: **hai bộ kiểm dữ liệu chỉ hỏi về QUAN HỆ giữa các mốc, không hỏi một mốc có
+HỢP LÝ VỚI ĐỜI THẬT không.** Dữ liệu nhất quán hoàn hảo vẫn có thể vô lý hoàn toàn.

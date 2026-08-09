@@ -2599,6 +2599,35 @@ for _p in dl.get("DL07", []):
             _sua += 1
 log.append("16. Phieu thu kep vao khoang [ngay dang ky ... bay gio]: chinh %d phieu" % _sua)
 
+# 17. LUAT BAT BIEN: MOT DON DANG KY KHONG THE CO TRUOC KHI CO LEAD
+# Bat duoc 09/08. `check_data` khai la "loi vua" nen bo kiem van DAT, va vi the no nam do lau
+# ma khong ai di toi goc. Nhung mot don dang ky ghi ngay SOM HON luc khach lien he lan dau la
+# mot chuyen khong the xay ra - mo dung ho so do ra la thay ngay.
+# KEO MOC TAO LEAD VE SOM HON, chu khong day don dang ky muon di: `lead_created_time` nam o
+# DAU day chuyen, doi no khong lam lech thu gi phia sau; con `enrollment_time` thi phieu thu,
+# lich dong dot, han xac nhan lop deu treo vao - day no di la keo theo ca chum.
+# Dat sau luat 16 va truoc luc ghi file: day la NGUOI GHI CUOI CUNG, dung bai hoc da ghi ngay
+# tren dau muc 16 - mot luat bat bien phai dung o CUOI day chuyen.
+_lead = {r.get("lead_id"): r for r in dl.get("DL02", []) if r.get("lead_id")}
+_soKeo = 0
+for _e in dl.get("DL06", []):
+    _lid = _e.get("lead_id")
+    if not _lid or _lid not in _lead:
+        continue
+    try:
+        _te = _dt2.datetime.strptime(str(_e.get("enrollment_time", ""))[:16], "%d/%m/%Y %H:%M")
+        _tl = _dt2.datetime.strptime(str(_lead[_lid].get("lead_created_time", ""))[:16], "%d/%m/%Y %H:%M")
+    except Exception:
+        continue
+    if _tl <= _te:
+        continue
+    # lead phai co truoc don it nhat 1 ngay - khach lien he roi moi tu van roi moi dang ky
+    _moi = (_te - _dt2.timedelta(days=_rnd2.randint(1, 5))).replace(
+        hour=_rnd2.choice([9, 10, 14, 16, 19]), minute=_rnd2.choice([0, 15, 30]))
+    _lead[_lid]["lead_created_time"] = _moi.strftime("%d/%m/%Y %H:%M")
+    _soKeo += 1
+log.append("17. Don dang ky co truoc lead: keo moc tao lead ve som %d ho so" % _soKeo)
+
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("  12. Da tao DL22 referral +", len(dl["DL22"]), "luot | DL19 thuong:", len(dl["DL19"]))
 for _l in log[-6:]: print("  "+_l)
