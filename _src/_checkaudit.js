@@ -1052,32 +1052,29 @@ var TAT_BOQUA={
    dài **33.691 ký tự** và ôm luôn cả chục hàm khác (`wowNote`, form đặt buổi...). Ô `<select
    id="wa_stu">` nằm trong FORM ĐẶT BUỔI - một ô nhập của cửa ghi - bị tính thành ô của
    `renderWow`. **Đo một khúc văn bản rồi gọi nó là thân hàm thì kết quả nào cũng có vẻ đúng.**
-   Nay cắt thân hàm bằng ĐẾM NGOẶC, đúng như trình duyệt hiểu. */
-(function(){
- var src=""; try{src=FS.readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8')}catch(e){}
- t("đọc được thân app để soi ô chọn người", !!src);
- if(!src)return;
 
- /* Cắt thân hàm bằng đếm ngoặc - bỏ qua ngoặc nằm trong chuỗi và trong chú thích. */
- function thanHam(s,tu){
-  var i=s.indexOf("{",tu); if(i<0)return "";
-  var sau=1,j=i+1,nhay=0,thoat=false;
-  while(j<s.length&&sau>0){
-   var c=s[j];
-   if(nhay){
-    if(thoat)thoat=false;
-    else if(c==="\\")thoat=true;
-    else if(c===nhay)nhay=0;
-   }else if(c==='"'||c==="'"||c==="`"){nhay=c}
-   else if(c==="/"&&s[j+1]==="*"){var k=s.indexOf("*/",j+2);j=(k<0?s.length:k+1)}
-   else if(c==="/"&&s[j+1]==="/"){var k2=s.indexOf("\n",j+2);j=(k2<0?s.length:k2)}
-   else if(c==="{")sau++;
-   else if(c==="}")sau--;
-   j++;
-   if(j-i>400000)break;              /* chặn an toàn, không hàm nào dài thế */
-  }
-  return s.slice(i,j);
- }
+   BẢN THỨ HAI CẮT BẰNG ĐẾM NGOẶC - VÀ CŨNG SAI, phát hiện 09/08 lúc dựng M12/M13 trên cùng bộ
+   đếm ấy: nó không hiểu BIỂU THỨC CHÍNH QUY. Gặp `.replace(/'/g,"")` thì dấu nháy nằm trong
+   `/'/g` bị hiểu là mở chuỗi, và bộ đếm trôi tới hết file - đo thử thấy "thân" `ghSearch` dài
+   **858.581 ký tự**. Ở M12 cái trôi ấy làm ĐỎ OAN nên lộ ngay; ở M10 nó làm **XANH OAN** và
+   không lộ: đoạn nuốt vào gần như chắc chắn có chữ `banQuanLy` ở đâu đó, thế là mọi hàm đều
+   "đã hỏi phạm vi". Chặn `400000` chỉ giấu triệu chứng chứ không chữa.
+
+   NAY KHÔNG CẮT NỮA - HỎI THẲNG MÁY JS. App được nạp bằng `vm.runInThisContext`, mọi hàm cấp
+   cao nhất là hàm THẬT trong `global`; `fn.toString()` trả đúng nguồn của riêng nó, do chính
+   máy JS cắt. Hàm lồng bên trong thì nằm trong nguồn của hàm cha, vẫn được soi cùng cha.
+   Bài học chung của cả hai lần: **đừng tự dựng bộ phân tích cú pháp khi thứ hiểu cú pháp đang
+   nằm ngay đó.** */
+(function(){
+ var HAM=[];
+ try{Object.getOwnPropertyNames(global).forEach(function(k){
+   var f=null; try{f=global[k]}catch(e){return}
+   if(typeof f!=="function")return;
+   var s=""; try{s=Function.prototype.toString.call(f)}catch(e){return}
+   if(s)HAM.push([k,s]);
+ })}catch(e){}
+ t("hỏi được máy JS lấy nguồn từng hàm để soi ô chọn người", HAM.length>200, HAM.length+" hàm");
+ if(!HAM.length)return;
 
  /* Ngoại lệ, phải nói được VÌ SAO. Chỉ khai khi CHÍNH TRANG chứa nó đã là cửa khoá - lúc ấy
     câu hỏi phạm vi nằm ở cửa vào, hỏi lại lần nữa trong hàm là thừa. Khai vì "chắc không sao"
@@ -1088,11 +1085,9 @@ var TAT_BOQUA={
              "chan ngay o cua vao trang settings, chi Giam doc mo duoc. Cua khoa dat o TRANG, "+
              "khong dat trong ham"
  };
- var re=/function\s+([A-Za-z0-9_$]+)\s*\(/g, m, ngo=[], soHam=0, soCoOChon=0;
- while((m=re.exec(src))){
-  var ten=m[1];
-  var than=thanHam(src,m.index+m[0].length);
-  if(!than)continue;
+ var ngo=[], soHam=0, soCoOChon=0;
+ HAM.forEach(function(H){
+  var ten=H[0], than=H[1];
   soHam++;
   /* Ô CHỌN ĐỔI MÀN NHÌN, hỏi cho ĐÚNG: `onchange` của nó phải VẼ LẠI MÀN (`reRender` / `go(`)
      hoặc đặt một biến toàn cục quyết định màn hình xem gì (`window.X=`).
@@ -1103,15 +1098,14 @@ var TAT_BOQUA={
      Hai thứ trông giống hệt nhau trong HTML mà khác hẳn về nghĩa: một bên là CỬA XEM, một bên
      là Ô NHẬP. Phân biệt bằng chỗ `onchange` dẫn tới, không bằng sự có mặt của nó. */
   var coONhin=/<select[^>]*\sonchange="[^"]*(?:reRender|go\(|window\.[A-Za-z0-9_]+\s*=)/.test(than);
-  if(!coONhin)continue;
+  if(!coONhin)return;
   /* danh sách người: lấy từ bảng nhân sự và in ra `staff_id` */
-  if(!/rows\("DL01"\)/.test(than))continue;
-  if(!/staff_id/.test(than))continue;
+  if(!/rows\("DL01"\)/.test(than))return;
+  if(!/staff_id/.test(than))return;
   soCoOChon++;
-  if(OCHON_BOQUA[ten])continue;
+  if(OCHON_BOQUA[ten])return;
   if(!/banQuanLy\(|myTeam\(|banToanQuyen\(|SCOPE\(|CURSTAFF/.test(than))ngo.push(ten);
- }
- t("cắt được thân hàm để soi ("+soHam+" hàm)", soHam>200, soHam+" hàm");
+ });
  t("mọi ô chọn NGƯỜI đổi màn nhìn đều đi qua một câu hỏi phạm vi ("+soCoOChon+" ô)",
    !ngo.length, ngo.slice(0,6).join(", "));
 })();
@@ -1171,9 +1165,189 @@ var TAT_BOQUA={
  t("cột tính của bảng Học viên in đúng con số hàm tính ra", !lech.length, lech.slice(0,5).join(" | "));
 })();
 
+/* ═════════ M12 + M13 - Ô TÌM TỰ DỰNG LÀM KHÁC LUẬT NHÀ (đặt 09/08) ══════════════════════
+   App có BỐN ô tìm tự dựng (`pkSearch`, `chaySrch`, `pqSearch`, `ghSearch`) - khác với ô chọn
+   `.pk` được `pkQuet` nâng cấp hàng loạt. Bốn cái ấy mỗi cái viết tay một lần, và chính vì viết
+   tay nên **luật nhà không tự áp được**: chỗ nào quên là quên lặng lẽ, vì ô vẫn tìm ra kết quả,
+   chỉ ra THIẾU. Hai luật nhà bị phá, mỗi luật đúng một chỗ, tìm ra 09/08 khi đi trọn một việc
+   trên khổ điện thoại 390px:
+
+   M12 - GÕ KHÔNG DẤU PHẢI RA. `vnorm` bỏ dấu và đổi đ->d; ba ô dùng nó, `ghSearch` thì dùng
+   `toLowerCase()` trơn. Đo thật: trên form Ghi nhận phản hồi, gõ "tran" ra **3** người - và
+   không ai trong 3 người ấy tên Trần, họ là "Trang" trùng chữ; gõ "Trần" mới ra **7**. Một cửa
+   ghi của SOP bỏ sót 7 người mà mọi cửa khác tìm ra. Trên điện thoại thì bắt gõ dấu là bắt làm
+   cái việc chậm nhất.
+
+   M13 - TÊN TRONG DÒNG GỢI Ý PHẢI LÀ CHỮ TRƠN. `nguoiLnk` sinh `<a onclick="event.stopPropa-
+   gation();openQuick(...)">`; đặt nó vào trong một dòng gợi ý mà chính dòng ấy mang `onclick`
+   chọn thì cái tên - thứ to nhất, đậm nhất, đúng chỗ tay người bấm - nuốt mất cú bấm chọn rồi
+   thay luôn ngăn kéo. Đo thật trên `pqSearch`: bấm vào tên xong thì `pq_enr` biến mất cùng cả
+   hộp gợi ý, luồng thu tiền đứt giữa chừng. Ô tên chỉ chiếm 9% diện tích dòng nhưng là chỗ mắt
+   nhìn vào.
+
+   VÌ SAO PHẢI ĐO Ở NGUỒN CHỨ KHÔNG ĐO TRÊN MÀN: cả hai lỗi này màn hình vẫn vẽ ra đẹp, không
+   lỗi JS, không ô trống. Muốn bắt trên màn thì phải nghĩ ra đúng cái tên có dấu, đúng cái dòng
+   gợi ý - tức là phải nhớ. Hỏi ở nguồn thì bắt được CẢ HỌ: thêm ô tìm thứ năm mà quên luật là
+   đỏ ngay, không cần ai nghĩ ra trường hợp. */
+/* KHÔNG TỰ CẮT THÂN HÀM NỮA - HỎI THẲNG MÁY JS. Bẫy cắn ngay lúc dựng chính hai thước này
+   (09/08): bản đầu đếm ngoặc để cắt thân hàm, y như M10. Nhưng bộ đếm ngoặc tự viết KHÔNG HIỂU
+   BIỂU THỨC CHÍNH QUY: gặp `.replace(/'/g,"")` nó thấy dấu nháy trong `/'/g` là tưởng mở chuỗi,
+   rồi trôi mãi - thân `ghSearch` đo ra **858.581 ký tự**, nuốt cả nửa file. Hậu quả: 2 trong 4
+   chỗ báo đỏ là RÁC (mã của `pqSearch` bị tính vào `ghSearch`, `toLowerCase` của `wowUseQuota`
+   bị tính vào `pkSearch`). App được nạp bằng `vm.runInThisContext` nên mọi hàm là hàm THẬT trong
+   `global` - `fn.toString()` cho đúng nguồn của riêng nó, do chính máy JS cắt. Cùng một bài học
+   với M10 v1: đừng tự dựng bộ phân tích cú pháp khi thứ hiểu cú pháp đang nằm ngay đó. */
+(function(){
+ var ten=[];
+ try{Object.getOwnPropertyNames(global).forEach(function(k){
+   var f=null; try{f=global[k]}catch(e){return}
+   if(typeof f!=="function")return;
+   var s=""; try{s=Function.prototype.toString.call(f)}catch(e){return}
+   if(s.indexOf('class="pkitem"')>=0)ten.push([k,s]);
+ })}catch(e){}
+ t("tìm thấy các hàm vẽ dòng gợi ý ô tìm ("+ten.length+" hàm: "+ten.map(function(x){return x[0]}).join(", ")+")", ten.length>=3);
+ if(!ten.length)return;
+
+ /* M12 - mọi ô tìm phải lọc qua `vnorm`, không được `toLowerCase()` trơn trên tên người */
+ var thoDau=[];
+ ten.forEach(function(x){
+  var th=x[1].replace(/\/\*[\s\S]*?\*\//g,"");                 /* bỏ chú thích: chính đoạn giải
+     thích luật cũng nhắc tên hàm, đọc cả chú thích là đọc phải cái mình vừa viết */
+  if(/(full_name|student_id_name)[^;]{0,40}toLowerCase\(\)/.test(th)||
+     /toLowerCase\(\)[^;]{0,40}(full_name|student_id_name)/.test(th))
+   thoDau.push(x[0]+": lọc tên bằng toLowerCase() trơn - gõ không dấu sẽ không ra");
+  else if(th.indexOf("vnorm")<0&&/rows\(\s*"DL0[269]"/.test(th))
+   thoDau.push(x[0]+": lọc DL mà không đi qua vnorm");});
+ t("mọi ô tìm tự dựng đều bỏ dấu bằng `vnorm` (gõ \"tran\" ra được \"Trần\")", !thoDau.length, thoDau.join(" | "));
+
+ /* M13 - dòng gợi ý MANG onclick chọn thì bên trong không được có liên kết nuốt cú bấm */
+ var nuot=[];
+ ten.forEach(function(x){
+  var th=x[1].replace(/\/\*[\s\S]*?\*\//g,"");
+  /* cắt lấy từng mẩu chuỗi HTML dựng một dòng gợi ý CÓ onclick */
+  var r2=/class="pkitem"(?![^]{0,40}\bmut\b)[\s\S]{0,900}?<\/div>/g,mm;
+  while((mm=r2.exec(th))){
+   var doan=mm[0];
+   if(doan.indexOf("onclick")<0)continue;                       /* dòng "Không thấy" thì thôi */
+   var xau=["nguoiLnk","nsLnk","lopLnk","khoaLnk"].filter(function(f){return doan.indexOf(f+"(")>=0});
+   if(xau.length)nuot.push(x[0]+": tên trong dòng gợi ý bọc bằng "+xau.join("/")+" - `<a>` này gọi stopPropagation nên bấm vào tên là mất cú chọn");}});
+ t("tên trong dòng gợi ý là chữ trơn, bấm vào chọn được (không bọc liên kết hồ sơ)", !nuot.length, nuot.join(" | "));
+
+ /* M13b - Ô TÌM PHẢI TỰ KHAI MÌNH LÀ Ô TÌM. `pkQuet` gắn `data-pktim="1"` cho mọi ô tìm nó tự
+    dựng, và `_checknv` (bộ kiểm đóng vai nhân viên điền form) đọc đúng dấu ấy để BỎ QUA - vì
+    điền chữ mẫu vào ô tìm là lọc sạch danh sách rồi form không chọn được gì, lỗi lại đổ lên đầu
+    app. Ba ô tìm VIẾT TAY thì không ai gắn dấu (đo 09/08), nên `_checknv` gõ "Máy thử tự điền"
+    thẳng vào chúng và đo trên một form đã hỏng - đèn vẫn xanh, phép đo thì sai. Đây là kiểu
+    hỏng tệ nhất: bộ kiểm không báo gì cả, nó chỉ thôi không còn đo cái mình tưởng nó đang đo. */
+ var src2=""; try{src2=FS.readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8')}catch(e){}
+ var khongKhai=[], soOTim=0, i2=0;
+ while(src2){
+  var k=src2.indexOf('class="pkres"',i2); if(k<0)break; i2=k+13;
+  /* Lùi qua Ô ẨN đi kèm. Ô tìm nào cũng có một `<input type="hidden">` giữ mã thật, và nó nằm
+     ĐÚNG GIỮA ô tìm với hộp gợi ý - lùi một bước là vớ phải nó, rồi kết tội ô ẩn không khai
+     `data-pktim` (đo 09/08: `f_'+k+'` và `gh_sid` bị tố oan). Ô ẩn thì bộ điền form đã tự tránh. */
+  var truoc=src2.slice(Math.max(0,k-500),k), the="", v=truoc.length;
+  for(;;){
+   v=truoc.lastIndexOf("<input",v-1); if(v<0)break;
+   var t2=truoc.slice(v);
+   if(/^<input[^>]{0,120}type="hidden"/.test(t2))continue;
+   the=t2; break;
+  }
+  if(!the)continue;
+  soOTim++;
+  if(the.indexOf("data-pktim")<0)
+   khongKhai.push((the.match(/id="([^"]{0,20})"/)||[0,"(không tên)"])[1]);
+ }
+ t("mọi ô tìm tự dựng đều tự khai `data-pktim` để bộ điền form biết mà tránh ("+soOTim+" ô)",
+   !khongKhai.length, khongKhai.slice(0,5).join(", "));
+})();
+
+/* ═════════ M14 - DẤU SAO CÓ NÓI THẬT KHÔNG (đặt 09/08) ══════════════════════════════════
+   Form nói với người dùng bằng đúng một ký hiệu: dấu `*` nghĩa là "ô này bắt buộc". Đó là một
+   LỜI HỨA, và lời hứa ấy hỏng theo hai chiều - chiều nào cũng bắt người dùng đoán:
+     · ô CÓ sao mà bỏ trống vẫn lưu được -> bản ghi thủng mà không ai hay;
+     · ô KHÔNG sao mà bỏ trống lại bị chặn -> người ta điền đủ mọi chỗ có sao, bấm Lưu, bị từ
+       chối, rồi phải mò xem còn thiếu gì. Trên điện thoại thì mỗi lần mò là một lần gõ lại.
+   Chiều thứ hai là chiều đau hơn, và không bộ kiểm nào đang hỏi.
+
+   ĐO ĐƯỢC 09/08, tìm ra bằng cách đi trọn một việc trên khổ 390px: form **Đặt buổi WOW** có hai
+   ô mang sao (Trọng tâm buổi, Vì sao cần buổi này) - nên người dùng học được rằng sao nghĩa là
+   bắt buộc - nhưng `wowAddSave` lại chặn ở ô **"Học viên (kèm quota WOW còn lại)"**, ô duy nhất
+   trong form KHÔNG mang sao. Quét cả app ra **11 ô** cùng bệnh, so với 8 ô làm đúng: tức là
+   phần nhiều các cửa ghi đang im lặng về điều kiện của chính mình.
+
+   PHÉP HỎI (đọc mã nguồn, không cần chạy - vì câu hỏi là câu hỏi về lời hứa, không về hành vi):
+   mọi id bị `xxSave()` chặn bằng `if(!fldV("id")){toast(...)}` đều phải có `<i>*</i>` trên nhãn
+   của khối `.fld` chứa nó. Hỏi ở nguồn thì bắt được CẢ HỌ: thêm một cửa ghi mới mà quên đánh
+   dấu là đỏ ngay, không cần ai nhớ ra form nào. */
+(function(){
+ var src=""; try{src=FS.readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8')}catch(e){}
+ t("đọc được thân app để soi dấu sao", !!src);
+ if(!src)return;
+ /* Ngoại lệ, khai kèm lý do ĐỌC ĐƯỢC - và lý do phải là lý do của app, không phải lý do của
+    thước. Chỗ này là giới hạn của thước, nói thẳng ra như vậy. */
+ var SAO_BOQUA={
+  pq_enr:"o AN di kem o tim `pq_srch`; dau sao nam tren nhan chung cua ca khoi "+
+         "(\"Dang ky con cong no *\") chu khong sat canh id nay - da doc tan mat 09/08"
+ };
+ /* GIỮ CẢ VỊ TRÍ CỦA CỬA CHẶN, không chỉ tên ô. Lý do đo được 09/08: `sv_sat` là id dùng ở
+    HAI form khác nhau - ô "Hài lòng (1-5)" trong màn nhân viên ghi kết quả khảo sát, và ô "Bạn
+    hài lòng mức nào? *" trong phiếu học viên tự điền. Bản đầu lấy `indexOf` tức ô ĐẦU TIÊN gặp,
+    thành ra đọc nhãn của form này rồi đem xử tội form kia. Nay ghép ô với cửa chặn GẦN NÓ NHẤT. */
+ var chan=new Map(), m;
+ function ghi(id,noi,at){if(!chan.has(id))chan.set(id,{noi:noi,at:at})}
+ var r1=/var\s+([A-Za-z_$][\w$]*)\s*=\s*fldV\("([\w]+)"\)\s*;\s*if\s*\(\s*!\s*\1\s*(?:\.trim\(\)\s*)?\)\s*\{\s*toast\(\s*"([^"]{0,70})/g;
+ while((m=r1.exec(src)))chan.set(m[2],{noi:m[3],at:m.index});
+ var r2=/if\s*\(\s*!\s*fldV\("([\w]+)"\)\s*(?:\.trim\(\)\s*)?\)\s*\{\s*toast\(\s*"([^"]{0,70})/g;
+ while((m=r2.exec(src)))ghi(m[1],m[2],m.index);
+ var r3=/var\s+([A-Za-z_$][\w$]*)\s*=\s*fldV\("([\w]+)"\)[\s\S]{0,120}?if\s*\(\s*!\s*\1\s*(?:\.trim\(\))?\s*\)\s*\{\s*toast\(\s*"([^"]{0,70})/g;
+ while((m=r3.exec(src)))ghi(m[2],m[3],m.index);
+ /* GHÉP NHÃN VỚI Ô BẰNG CÁCH QUÉT NGƯỢC, đừng cắt khối. Bản đầu cắt `<div class="fld">` thành
+    khối rồi gán mọi id trong khối - và nó KHÔNG ĐỌC ĐƯỢC hai ô (`ab_mk`, `bk_phqh`), cả hai đều
+    báo nhãn "?" trong khi dấu sao đã nằm sẵn trên mã. Một thước không đọc được thứ cần đọc mà
+    vẫn kết luận thì nó đang đoán. Nay: từ chính ô lùi lại tìm `<label>` gần nhất, và chặn không
+    cho mượn nhãn của ô bên cạnh (giữa nhãn và ô không được có `<div class="fld` khác). */
+ function nhanTruoc(idx){
+  var dau=src.lastIndexOf("<label>",idx); if(dau<0||idx-dau>600)return null;
+  var cuoi=src.indexOf("</label>",dau); if(cuoi<0||cuoi>idx)return null;
+  if(src.slice(cuoi,idx).indexOf('<div class="fld')>=0)return null;   /* nhãn của ô khác */
+  return src.slice(dau+7,cuoi);
+ }
+ var nhanCua=new Map(), khongDoc=[];
+ function coSao(id,at){
+  var i=-1,gan=1e18,j=0,mo='id="'+id+'"';
+  for(;;){var k=src.indexOf(mo,j); if(k<0)break; var d=Math.abs(k-at); if(d<gan){gan=d;i=k} j=k+1}
+  if(i>=0){
+   var lb=nhanTruoc(i);
+   if(lb===null){khongDoc.push(id+" (thấy ô nhưng không lần ra nhãn)");return null}
+   nhanCua.set(id,lb.replace(/<[^>]*>/g,"").replace(/\s+/g," ").trim().slice(0,34));
+   return /<i>\s*\*\s*<\/i>/.test(lb);
+  }
+  /* Ô do HÀM DỰNG CHUNG sinh ra: id là biến nên không có `id="..."` nào trong nguồn. Hỏi ở chỗ
+     GỌI: hàm dựng phải được bảo là ô này bắt buộc. Hiện chỉ `bkSel(id,nhãn,enum,mặc định,bắt)`. */
+  var g=new RegExp('\\bbkSel\\(\\s*"'+id+'"\\s*,\\s*"([^"]{0,40})"[^)]*?,\\s*([^),]+)\\)').exec(src);
+  if(g){nhanCua.set(id,g[1]); return !/^\s*(0|""|''|false|null)?\s*$/.test(g[2])}
+  khongDoc.push(id+" (không thấy ô ở đâu trong nguồn)");
+  return null;
+ }
+ var thieu=[], sao=0;
+ chan.forEach(function(noi,id){
+  if(SAO_BOQUA[id])return;
+  var c=coSao(id,noi.at);
+  if(c===true){sao++;return}
+  if(c===null)return;                        /* đọc không được thì báo riêng, đừng kết tội */
+  thieu.push(id+' ("'+(nhanCua.get(id)||"?")+'" - app chặn: "'+noi.noi+'")');
+ });
+ t("đọc được bản khai ô của các form ("+chan.size+" ô bị chặn khi trống, lần ra nhãn "+(chan.size-khongDoc.length-1)+")",
+   chan.size>=8);
+ t("lần ra được nhãn của mọi ô bị chặn (đọc không được thì ĐỎ, không lặng lẽ bỏ)",
+   !khongDoc.length, khongDoc.slice(0,4).join(" | "));
+ t("mọi ô bị cửa ghi chặn khi bỏ trống đều mang dấu sao trên nhãn", !thieu.length, thieu.slice(0,6).join(" | "));
+})();
+
 /* ═════════════════════════════════════════════════════════════════════════════════════════ */
 if(bad.length){
  console.log("CHECKAUDIT DO ("+bad.length+"/"+n+"):");
  bad.forEach(function(b){console.log("  - "+b)});
  process.exit(1)}
-console.log("CHECKAUDIT OK: "+n+" tieu chi | 11 phuong phap tim loi (8 cua anh Luan + M9 ba cau cai nhau tren mot man, M10 o chon mo cua, M11 kieu o khai ra ma bo ve o khong biet), nay may chay lai");
+console.log("CHECKAUDIT OK: "+n+" tieu chi | 14 phuong phap tim loi (8 cua anh Luan + M9 ba cau cai nhau tren mot man, M10 o chon mo cua, M11 kieu o khai ra ma bo ve o khong biet, M12 o tim khong bo dau, M13 ten trong goi y nuot cu bam, M14 dau sao co noi that khong), nay may chay lai");

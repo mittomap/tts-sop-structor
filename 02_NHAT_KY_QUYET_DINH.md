@@ -241,6 +241,57 @@
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 39 BỘ KIỂM (08/08). V1 mốc cũ: V9.99z12, 34 bộ, bản dựng `829572`.**
 >
+> ### 🔵 09/08 - VÒNG SÁU: ĐI TRỌN MỘT VIỆC TRÊN ĐIỆN THOẠI, VÀ MỘT BỘ ĐẾM NGOẶC LÀM XANH OAN
+>
+> Vòng này bỏ lối soi từng màn. Câu hỏi khác hẳn: **một người ngồi trên điện thoại 390px có LÀM
+> XONG được một việc không** - mở form, điền, bấm Lưu, và có bản ghi thật. `_checknv` đi trọn việc
+> ấy từ lâu, nhưng ở **1440×900**. Bốn lỗ dưới đây đều nằm ngoài tầm mọi bộ kiểm cũ.
+>
+> **1. Ô tìm của form Ghi nhận phản hồi không bỏ dấu.** App có bốn ô tìm viết tay; ba cái lọc qua
+> `vnorm`, riêng `ghSearch` dùng `toLowerCase()` trơn. Đo thật: gõ **"tran" ra 3 người** - và
+> không ai trong ba người ấy tên Trần, họ là "Trang" trùng chữ; gõ **"Trần" mới ra 7**. Một cửa
+> ghi của SOP bỏ sót 7 người mà mọi cửa khác tìm ra. Trên điện thoại, bắt gõ đúng dấu là bắt làm
+> cái việc chậm nhất.
+>
+> **2. Bấm vào cái tên trong gợi ý thu tiền thì mất luôn luồng.** Tên được bọc bằng `nguoiLnk`,
+> mà hàm ấy sinh `<a onclick="event.stopPropagation();openQuick(...)">`. Cái tên là thứ to nhất,
+> đậm nhất, đúng chỗ tay người bấm - bấm xong thì `stopPropagation` nuốt mất cú chọn và
+> `openQuick` thay luôn ngăn kéo. Đo thật: `pq_enr` biến mất cùng cả hộp gợi ý, luồng thu tiền
+> đứt giữa chừng.
+>
+> **3. Ba ô tìm viết tay không tự khai `data-pktim` - và điều đó làm HỎNG MỘT BỘ KIỂM ĐANG XANH.**
+> `_checknv` đọc dấu ấy để biết đâu là ô TÌM mà tránh (điền chữ mẫu vào ô tìm là lọc sạch danh
+> sách rồi form không chọn được gì). Ba ô không có dấu nên nó gõ "Máy thử tự điền" thẳng vào và
+> **đo trên một form đã hỏng**. Đèn vẫn xanh. *Kiểu hỏng tệ nhất: bộ kiểm không báo gì cả, nó chỉ
+> thôi không còn đo cái mình tưởng nó đang đo.*
+>
+> **4. Dấu sao nói dối ở 11 chỗ.** Form nói với người dùng bằng đúng một ký hiệu: `*` nghĩa là bắt
+> buộc. Trên form **Đặt buổi WOW** có hai ô mang sao - nên người dùng học được rằng sao nghĩa là
+> bắt buộc - nhưng cửa ghi lại chặn ở ô **"Học viên (kèm quota WOW còn lại)"**, ô duy nhất trong
+> form KHÔNG mang sao. Người ta điền đủ mọi chỗ có sao, bấm Đặt buổi, bị từ chối, rồi phải mò xem
+> còn thiếu gì. Quét cả app ra **11 ô** cùng bệnh so với 8 ô làm đúng - tức phần nhiều các cửa ghi
+> đang im lặng về điều kiện của chính mình.
+>
+> **BA LẦN LIÊN TIẾP MỘT BỘ CẮT THÂN HÀM TỰ VIẾT LÀM HỎNG PHÉP ĐO - VÀ LẦN NÀY NÓ LÀM XANH OAN.**
+> M10 bản một cắt thân hàm bằng cách tách chuỗi ("thân" `renderWow` dài 33.691 ký tự). Bản hai -
+> và M12/M13 bản một dùng chung - cắt bằng **đếm ngoặc**, nhưng bộ đếm ấy **không hiểu biểu thức
+> chính quy**: gặp `.replace(/'/g,"")` thì dấu nháy nằm trong `/'/g` bị hiểu là mở chuỗi, rồi trôi
+> tới hết file. Đo thử: "thân" `ghSearch` dài **858.581 ký tự**. Ở M12 cái trôi ấy làm ĐỎ OAN nên
+> lộ ngay; ở M10 nó làm **XANH OAN** và không lộ - đoạn nuốt vào gần như chắc chắn có chữ
+> `banQuanLy` ở đâu đó, thế là mọi hàm đều "đã hỏi phạm vi". Chặn `400000` chỉ giấu triệu chứng.
+> Nay cả ba hỏi thẳng máy JS: app nạp bằng `vm.runInThisContext` nên mọi hàm cấp cao nhất là hàm
+> THẬT trong `global`, `fn.toString()` trả đúng nguồn của riêng nó.
+> **ĐỪNG TỰ DỰNG BỘ PHÂN TÍCH CÚ PHÁP KHI THỨ HIỂU CÚ PHÁP ĐANG NẰM NGAY ĐÓ.**
+>
+> **Và hai lần chính thước M14 tố oan, cả hai đều vì đoán chỗ không đọc được:** ghép nhãn với ô
+> bằng cách cắt khối `.fld` (hai ô báo nhãn "?" trong khi dấu sao đã nằm sẵn - *một thước không
+> đọc được thứ cần đọc mà vẫn kết luận thì nó đang đoán*), và lấy ô ĐẦU TIÊN gặp trong nguồn trong
+> khi `sv_sat` là id dùng ở **hai form khác nhau** (ô "Hài lòng (1-5)" bên nhân viên và ô "Bạn hài
+> lòng mức nào? *" trong phiếu học viên tự điền) - đọc nhãn của form này rồi đem xử tội form kia.
+>
+> **Kết vòng sáu: 5 chỗ vá, 4 thước mới (M12, M13, M13b, M14), `_checkaudit` 68 -> 73 tiêu chí.**
+> Mọi thước mới đều được bắt ĐỎ trước bằng cách dựng lại đúng lỗi, rồi mới nhận đèn xanh.
+
 > ### ⚠️ 09/08 - VERIFY TRỌN BỘ BẮT LẠI EM MỘT LỖ LUẬT CỨNG SỐ 0 (và đây là lý do có luật ấy)
 >
 > Sửa xong giờ mấy buổi WOW, chạy verify thì `check_sop.py` **KHÔNG ĐẠT**:

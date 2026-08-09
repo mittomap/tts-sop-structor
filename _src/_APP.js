@@ -2591,7 +2591,7 @@ function formHTML(key,opts){opts=opts||{};var cfg=LISTCFG[key]; var src=EDIT[key
   if(ty==="ta"){h+='<textarea id="f_'+k+'">'+esc(cur)+'</textarea>'}
   else if(ty==="@lead"||ty==="@student"){var ent=(ty==="@lead")?"lead":"student"; var pv=cur||""; var pl="";
     if(pv){var rr=find(ent==="lead"?"DL02":"DL09",ent==="lead"?"lead_id":"student_id",pv); pl=rr?(rr.full_name+" - "+rr.phone_number):pv}
-    h+='<input id="pk_'+k+'" placeholder="Gõ số điện thoại hoặc tên..." value="'+esc(pl)+'" oninput="pkSearch(\''+k+'\',\''+ent+'\')" autocomplete="off"><input type="hidden" id="f_'+k+'" value="'+esc(pv)+'"><div class="pkres" id="pkr_'+k+'"></div>'}
+    h+='<input id="pk_'+k+'" data-pktim="1" placeholder="Gõ số điện thoại hoặc tên..." value="'+esc(pl)+'" oninput="pkSearch(\''+k+'\',\''+ent+'\')" autocomplete="off"><input type="hidden" id="f_'+k+'" value="'+esc(pv)+'"><div class="pkres" id="pkr_'+k+'"></div>'}
   else if(ty==="@cres"){h+='<select id="f_'+k+'">'+cresOpts(ecode(src.result_note)||"connected")+'</select>'}
   else if(ty==="@course"||ty==="@class"){var code=(ty==="@course")?"DL05":"DL10", idf=(ty==="@course")?"course_id":"class_id", nmf=(ty==="@course")?"course_name":"class_name";
     h+='<select id="f_'+k+'"><option value="">-- chọn --</option>'+rows(code).map(function(x){var s=(String(x[idf])===cur);return '<option'+(s?" selected":"")+' value="'+esc(x[idf])+'">'+esc(x[idf])+" - "+esc(x[nmf])+'</option>'}).join("")+'</select>'}
@@ -4467,7 +4467,7 @@ function openComplaint(id){var c=find("DL17","complaint_id",id);if(!c){toast("Kh
    String(c.student_feedback_after||"").trim()?"var(--blue)":"var(--amber)");h+=ctxRows([["Kết quả",esc(elabel(c.complaint_result)||c.complaint_result||"-")],["Đóng lúc",esc(c.resolution_time||"-")]]);}
  else if(isNew){h+='<div class="dact"><button class="btn primary" onclick="confirmRun(\'Bạn nhận xử lý khiếu nại này? Khiếu nại sẽ được gán cho bạn và chuyển sang Đang xử lý.\',\'knClaim\',\''+esc(id)+'\')"><i class="ti ti-user-check"></i>Nhận khiếu nại</button><button class="btn danger" onclick="confirmRun(\'Leo thang khiếu nại này lên quản lý cấp cao?\',\'knEscalate\',\''+esc(id)+'\')"><i class="ti ti-arrow-up"></i>Leo thang</button></div>';}
  else if(!working){h+='<div class="dact"><button class="btn primary" onclick="confirmRun(\'Bắt đầu xử lý khiếu nại này?\',\'knStart\',\''+esc(id)+'\')"><i class="ti ti-tool"></i>Bắt đầu xử lý</button><button class="btn danger" onclick="confirmRun(\'Leo thang khiếu nại này lên quản lý cấp cao?\',\'knEscalate\',\''+esc(id)+'\')"><i class="ti ti-arrow-up"></i>Leo thang</button></div>';}
- else{h+='<div class="fld"><label>Kết quả xử lý</label><select id="kr_res">'+enumOpts("enum_complaint_result")+'</select></div><div class="fld full"><label>Cách xử lý / phản hồi học viên</label><textarea id="kr_note" rows="3" placeholder="Mô tả hướng giải quyết, cam kết, đền bù (nếu có)..."></textarea></div><div class="dact"><button class="btn green" onclick="knResolveSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Đóng khiếu nại</button><button class="btn danger" onclick="confirmRun(\'Leo thang khiếu nại này lên quản lý cấp cao?\',\'knEscalate\',\''+esc(id)+'\')"><i class="ti ti-arrow-up"></i>Leo thang</button></div>';}
+ else{h+='<div class="fld"><label>Kết quả xử lý</label><select id="kr_res">'+enumOpts("enum_complaint_result")+'</select></div><div class="fld full"><label>Cách xử lý / phản hồi học viên <i>*</i></label><textarea id="kr_note" rows="3" placeholder="Mô tả hướng giải quyết, cam kết, đền bù (nếu có)..."></textarea></div><div class="dact"><button class="btn green" onclick="knResolveSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Đóng khiếu nại</button><button class="btn danger" onclick="confirmRun(\'Leo thang khiếu nại này lên quản lý cấp cao?\',\'knEscalate\',\''+esc(id)+'\')"><i class="ti ti-arrow-up"></i>Leo thang</button></div>';}
  h+='</div>';openDrawer("Khiếu nại · "+(c.student_id_name||c.student_id),h)}
 function slaRow(it){var age=it.age!=null?'<span class="agebadge '+it.sev+'">'+esc(fmtAge(it.age))+'</span>':'';
  var btn=it.lead?'<button class="btn sm" onclick="leadDetail(\''+esc(it.lead)+'\')"><i class="ti ti-external-link"></i> Xử lý</button>':(it.act?'<button class="btn primary sm" onclick="slaAct(\''+it.act+'\',\''+esc(String(it.rid))+'\')"><i class="ti ti-tool"></i> Xử lý</button>':(it.hoso?'<button class="btn sm" onclick="openHoso(\''+esc(it.hoso)+'\')"><i class="ti ti-id-badge-2"></i> Hồ sơ</button>':(it.page?'<button class="btn sm" onclick="jumpFlow(\''+it.page+'\',\''+(it.filter||"")+'\')"><i class="ti ti-arrow-right"></i> Xử lý</button>':'')));
@@ -5004,7 +5004,7 @@ function absForm(attId){
   var opts=absMakeupOpts(a);
   h+='<div class="sechd" style="margin-top:14px">Xếp buổi học bù cho riêng học viên này</div>';
   if(!opts.length)h+='<div class="mut" style="font-size:12px">Chưa có buổi nào phía trước để xếp bù.</div>';
-  else{h+='<div class="fld full"><label>Chọn buổi học bù</label><select id="ab_mk">'+
+  else{h+='<div class="fld full"><label>Chọn buổi học bù <i>*</i></label><select id="ab_mk">'+
    opts.map(function(x){var c=find("DL10","class_id",x.class_id)||{};
     return '<option value="'+esc(x.session_id)+'">'+esc((c.class_name||x.class_id)+" · buổi "+(x.session_number||"?")+" · "+(x.session_date||""))+'</option>'}).join("")+
    '</select></div>'+
@@ -6959,7 +6959,7 @@ function renderChayHome(){var all0=jAll();
  var q=window.CHAYQ||"over";
  var h=pageHead("Chạy quy trình","Chọn một người bên dưới - app dắt qua từng màn theo đúng chặng người đó đang đứng. Bấm một người là chạy; đang trong hàng đợi thì làm xong người này sang người kế.","");
  /* tìm nhanh */
- h+='<div class="fbar"><div class="srch" style="max-width:460px"><i class="ti ti-search"></i><input placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.CHAYSRCH||"")+'" oninput="chaySrch(this.value)"></div></div>';
+ h+='<div class="fbar"><div class="srch" style="max-width:460px"><i class="ti ti-search"></i><input data-pktim="1" placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.CHAYSRCH||"")+'" oninput="chaySrch(this.value)"></div></div>';
  /* chip chọn hàng đợi */
  h+='<div class="fbar"><span class="lbl">Nhóm</span><div class="fchips">'+
   '<button class="fchip'+(q==="over"?" on red":"")+'" onclick="chayQSet(\'over\')">Cần xử lý ('+over+')</button>'+
@@ -7323,7 +7323,7 @@ function renderBanlam(){
      tổng hợp những thứ bất thường ở các trang nghiệp vụ để cảnh báo, các nhân sự sẽ tự biết mình
      cần làm gì."* Câu dưới đây nói đúng điều ấy, và `_checkkhuon` K1 canh nó từ nay. */
   '<div class="bwctx">Mọi chỗ bất thường từ các trang nghiệp vụ của bạn gom về đây - đỏ là gấp, vàng sắp tới hạn. Bấm một ô để mở trang đẻ ra con số đó.</div></div>'+
-  '<div class="bwr"><div class="bwsearch"><i class="ti ti-search"></i><input placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.CHAYSRCH||"")+'" oninput="chaySrch(this.value)" autocomplete="off"><div class="pkres" id="bwac" style="position:absolute;top:100%;left:0;right:0;z-index:30;background:#fff;color:var(--text);text-align:left;border-radius:0 0 10px 10px;box-shadow:0 8px 24px rgba(0,0,0,.18)"></div></div>'+
+  '<div class="bwr"><div class="bwsearch"><i class="ti ti-search"></i><input data-pktim="1" placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.CHAYSRCH||"")+'" oninput="chaySrch(this.value)" autocomplete="off"><div class="pkres" id="bwac" style="position:absolute;top:100%;left:0;right:0;z-index:30;background:#fff;color:var(--text);text-align:left;border-radius:0 0 10px 10px;box-shadow:0 8px 24px rgba(0,0,0,.18)"></div></div>'+
   '<span class="bwsrchhint" id="bwsrchhint"></span></div></div>'; /* V9.18b: hint phải nằm NGOÀI hộp tìm - nằm trong là chữ trắng trên nền trắng + bóp placeholder (Luân bắt lỗi) */
  /* V2 KHÚC 5 - DẢI CẢNH BÁO ĐẶT NGAY DƯỚI Ô CHÀO, TRÊN MỌI THỨ KHÁC.
     Anh Luân: *"bàn làm việc em đổi thành: các chỉ số số cảnh báo đi, nó tổng hợp những thứ bất
@@ -7645,7 +7645,7 @@ function renderGhinhan(embed){var p="ghinhan",fil=fget(p);
 function ghForm(){
  var h='<div class="dcard"><h4><i class="ti ti-message-plus"></i>Ghi nhận phản hồi</h4>';
  var _gp=window.__ghpre?find("DL09","student_id",window.__ghpre):null;window.__ghpre="";
- h+='<div class="fld full"><label>Học viên / Khách <i>*</i></label><input id="gh_pk" placeholder="Gõ SĐT hoặc tên..." value="'+(_gp?esc(_gp.full_name+" - "+_gp.phone_number):"")+'" oninput="ghSearch(this.value)" autocomplete="off"><input type="hidden" id="gh_sid" value="'+(_gp?esc(_gp.student_id):"")+'"><div class="pkres" id="gh_res"></div></div>';
+ h+='<div class="fld full"><label>Học viên / Khách <i>*</i></label><input id="gh_pk" data-pktim="1" placeholder="Gõ SĐT hoặc tên..." value="'+(_gp?esc(_gp.full_name+" - "+_gp.phone_number):"")+'" oninput="ghSearch(this.value)" autocomplete="off"><input type="hidden" id="gh_sid" value="'+(_gp?esc(_gp.student_id):"")+'"><div class="pkres" id="gh_res"></div></div>';
  h+='<div class="fld"><label>Kênh nhận</label><select id="gh_ch">'+enumOpts("enum_feedback_channel")+'</select></div>';
  h+='<div class="fld"><label>Sắc thái</label><select id="gh_type" onchange="ghType(this.value)">'+enumOpts("enum_feedback_type")+'</select></div>';
  h+='<div class="fld"><label>Danh mục</label><select id="gh_cat">'+enumOpts("enum_feedback_category")+'</select></div>';
@@ -7654,8 +7654,14 @@ function ghForm(){
  h+='<div class="fld full" id="gh_negbox" style="display:none"><div class="notebar" style="margin:0"><i class="ti ti-alert-triangle"></i>Phản hồi tiêu cực - sau khi lưu có thể bấm "Chuyển thành khiếu nại" để mở hồ sơ xử lý.</div></div>';
  h+='<div class="dact"><button class="btn primary" onclick="ghSave()"><i class="ti ti-device-floppy"></i>Lưu phản hồi</button></div></div>';
  openDrawer("Ghi nhận phản hồi",h)}
-function ghSearch(q){var box=document.getElementById("gh_res");if(!box)return;q=String(q||"").toLowerCase().trim();if(q.length<2){box.innerHTML="";return}
- var r=rows("DL09").filter(function(x){return String(x.full_name||"").toLowerCase().indexOf(q)>=0||phoneHit(x.phone_number,q)}).slice(0,8);
+/* GÕ KHÔNG DẤU PHẢI RA. Bẫy đo được 09/08 trên khổ điện thoại: ô tìm này là ô DUY NHẤT trong
+   app dùng `toLowerCase()` trơn, trong khi `pkSearch`, `pqSearch` và `chaySrch` đều đi qua
+   `vnorm` (bỏ dấu, đ->d). Hậu quả đo thật: gõ "tran" ra 3 người - và không ai trong 3 người ấy
+   tên Trần, họ là "Trang" trùng chữ; gõ "Trần" mới ra 7 người. Tức là cửa ghi phản hồi bỏ sót
+   đúng 7 người mà mọi ô tìm khác tìm ra. Trên điện thoại, bắt gõ đúng dấu là bắt làm cái việc
+   chậm nhất. `_checkaudit` M12 canh chuyện này. */
+function ghSearch(q){var box=document.getElementById("gh_res");if(!box)return;q=vnorm(q||"").trim();if(q.length<2){box.innerHTML="";return}
+ var r=rows("DL09").filter(function(x){return vnorm(x.full_name||"").indexOf(q)>=0||phoneHit(x.phone_number,q)}).slice(0,8);
  box.innerHTML=r.map(function(x){var lab=(x.full_name+" - "+x.phone_number).replace(/'/g,"");return '<div class="pkitem" onclick="ghPick(\''+x.student_id+'\',\''+esc(lab)+'\')"><b>'+esc(x.full_name)+'</b> <span class="mut">'+esc(x.phone_number)+'</span></div>'}).join("")||'<div class="pkitem mut">Không thấy</div>'}
 function ghPick(id,lab){document.getElementById("gh_sid").value=id;document.getElementById("gh_pk").value=lab;document.getElementById("gh_res").innerHTML=""}
 function ghType(v){var b=document.getElementById("gh_negbox");if(b)b.style.display=isc(v,"negative")?"block":"none"}
@@ -11455,7 +11461,7 @@ function obReject(id){obMark(id,{class_confirmation_status:eFull("enum_class_con
 function obChange(id){var o=find("DL08","onboarding_id",id);if(!o){toast("Không thấy hồ sơ.");return}
  var h='<div class="dcard"><h4><i class="ti ti-transfer"></i>Đổi lớp - '+esc(o.student_id_name||o.student_id)+'</h4>';
  h+=ctxRows([["Lớp hiện tại",esc(o.class_id_name||o.class_id||"-")],["Đã đổi",num(o.placement_change_count)+" lần"],["Khóa của HV",esc(stuCourse(o.student_id).course_name||"-")]]);
- h+='<div class="fld"><label>Lớp mới (ưu tiên đúng khóa)</label><select id="oc_cls"><option value="">-- chọn lớp --</option>'+classOptsFor(o.student_id,o.class_id)+'</select></div>';
+ h+='<div class="fld"><label>Lớp mới (ưu tiên đúng khóa) <i>*</i></label><select id="oc_cls"><option value="">-- chọn lớp --</option>'+classOptsFor(o.student_id,o.class_id)+'</select></div>';
  h+='<div class="fld"><label>Lý do đổi</label><input id="oc_reason" placeholder="vd: HV từ chối lịch T3-5-7 / đổi cơ sở"></div>';
  h+='<div class="fld full"><button class="btn primary" onclick="obChangeSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Đổi lớp (gửi lại thông tin lớp mới)</button></div></div>';
  openDrawer("Đổi lớp",h)}
@@ -12016,7 +12022,7 @@ function payQuick(){
  var h='<div class="dcard"><h4><i class="ti ti-cash"></i>Ghi nhận khoản thu</h4>';
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Khách mang tiền tới nộp mà chưa đi qua màn tư vấn? Chọn đăng ký còn công nợ để thu ngay.</div>';
  h+='<div class="fld full"><label>Đăng ký còn công nợ <i>*</i> <span class="mut" style="font-weight:400">(gõ tên/SĐT học viên để tìm)</span></label>'+
-  '<input id="pq_srch" placeholder="Gõ tên hoặc SĐT..." oninput="pqSearch()" autocomplete="off"><div class="pkres" id="pq_res"></div><input type="hidden" id="pq_enr"></div>';
+  '<input id="pq_srch" data-pktim="1" placeholder="Gõ tên hoặc SĐT..." oninput="pqSearch()" autocomplete="off"><div class="pkres" id="pq_res"></div><input type="hidden" id="pq_enr"></div>';
  h+='<div class="dact"><button class="btn primary" onclick="payQuickGo()"><i class="ti ti-arrow-right"></i>Mở form thu tiền</button></div></div>';
  openDrawer("Ghi nhận khoản thu",h)}
 function pqSearch(){var q=vnorm(fldV("pq_srch")||"").trim();var box=document.getElementById("pq_res");if(!box)return;
@@ -12026,14 +12032,21 @@ function pqSearch(){var q=vnorm(fldV("pq_srch")||"").trim();var box=document.get
   var st=find("DL09","student_id",x.student_id)||{};
   return vnorm(x.student_id_name||"").indexOf(q)>=0||phoneHit(st.phone_number,q)}).slice(0,8);
  box.innerHTML=res.length?res.map(function(x){
-  return '<div class="pkitem" onclick="document.getElementById(\'pq_enr\').value=\''+esc(x.enrollment_id)+'\';document.getElementById(\'pq_srch\').value=\''+esc(String(x.student_id_name||x.student_id).replace(/'/g,""))+'\';this.parentNode.innerHTML=\'\'"><b>'+nguoiLnk(x.student_id,x.student_id_name)+'</b> <span class="mut">'+esc(x.course_id_name||"")+' · còn '+vnd(num(x.remaining_amount))+'</span></div>'}).join(""):'<div class="pkitem mut">Không thấy đăng ký còn nợ nào khớp</div>'}
+  /* TÊN TRONG DÒNG GỢI Ý PHẢI LÀ CHỮ TRƠN, KHÔNG PHẢI LIÊN KẾT. Bẫy đo được 09/08: chỗ này
+     từng bọc tên bằng `nguoiLnk` - mà `nguoiLnk` sinh ra `<a onclick="event.stopPropagation();
+     openQuick(...)">`. Cái tên là thứ to nhất, đậm nhất trong dòng, tay người bấm thẳng vào đó;
+     bấm xong thì `stopPropagation` nuốt mất cú bấm chọn, `openQuick` thay luôn ngăn kéo - đo
+     thật thấy `pq_enr` biến mất cùng cả hộp gợi ý, luồng thu tiền đi tong giữa chừng. Ba ô tìm
+     còn lại (`pkSearch`, `ghSearch`) đều để tên trơn; chỗ này là chỗ duy nhất làm khác.
+     `_checkaudit` M13 canh chuyện này. */
+  return '<div class="pkitem" onclick="document.getElementById(\'pq_enr\').value=\''+esc(x.enrollment_id)+'\';document.getElementById(\'pq_srch\').value=\''+esc(String(x.student_id_name||x.student_id).replace(/'/g,""))+'\';this.parentNode.innerHTML=\'\'"><b>'+esc(String(x.student_id_name||x.student_id))+'</b> <span class="mut">'+esc(x.course_id_name||"")+' · còn '+vnd(num(x.remaining_amount))+'</span></div>'}).join(""):'<div class="pkitem mut">Không thấy đăng ký còn nợ nào khớp</div>'}
 function payQuickGo(){var id=fldV("pq_enr");if(!id){toast("Gõ tên/SĐT rồi chọn trong gợi ý.");return}closeModal();payForm(id)}
 function tvQuick(){
  var leads=rows("DL02").filter(function(l){return !isc(l.lead_status,"converted")});
  var h='<div class="dcard"><h4><i class="ti ti-messages"></i>Tạo phiếu tư vấn</h4>';
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Khách <b>bỏ qua test</b> (đã có điểm IELTS sẵn, hoặc chỉ muốn nghe tư vấn) thì tạo phiếu tư vấn thẳng từ đây.</div>';
  h+='<div class="fld full"><label>Khách <i>*</i> <span class="mut" style="font-weight:400">(gõ 2 ký tự tên/SĐT để tìm)</span></label>'+
-  '<input id="pk_tvq_lead" placeholder="Gõ tên hoặc SĐT..." oninput="pkSearch(\'tvq_lead\',\'lead\')" autocomplete="off"><div class="pkres" id="pkr_tvq_lead"></div><input type="hidden" id="f_tvq_lead"></div>';
+  '<input id="pk_tvq_lead" data-pktim="1" placeholder="Gõ tên hoặc SĐT..." oninput="pkSearch(\'tvq_lead\',\'lead\')" autocomplete="off"><div class="pkres" id="pkr_tvq_lead"></div><input type="hidden" id="f_tvq_lead"></div>';
  h+='<div class="fld full"><label>Lý do bỏ qua test</label><input id="tvq_note" placeholder="vd: đã có chứng chỉ 6.0, chỉ cần tư vấn lộ trình"></div>';
  h+='<div class="dact"><button class="btn primary" onclick="tvQuickSave()"><i class="ti ti-check"></i>Tạo phiếu tư vấn</button></div></div>';
  openDrawer("Tư vấn không qua test",h)}
@@ -12850,7 +12863,7 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=srows("DL14");
 function wowNote(id){var w=find("DL14","wow_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-notes"></i>Ghi nội dung buổi WOW - '+esc(w.student_name||w.student_id)+'</h4>';
  h+=ctxRows([["Ngày buổi",esc(w.wow_session_date||"-")],["Kỹ năng",esc(elabel(w.wow_skill)||w.wow_skill||"-")],["Loại buổi",esc(elabel(w.wow_session_type)||w.wow_session_type||"-")],["Trọng tâm",esc(w.wow_content_focus||"-")]]);
- h+='<div class="fld full"><label>Nội dung đã dạy</label><textarea id="w_note" rows="3" placeholder="Tóm tắt nội dung, điểm HV làm được / cần cải thiện..."></textarea></div>';
+ h+='<div class="fld full"><label>Nội dung đã dạy <i>*</i></label><textarea id="w_note" rows="3" placeholder="Tóm tắt nội dung, điểm HV làm được / cần cải thiện..."></textarea></div>';
  h+='<div class="fld"><label>Kết quả</label><select id="w_out">'+enumOpts("enum_wow_outcome")+'</select></div>';
  h+='<div class="fld full"><button class="btn primary" onclick="wowNoteSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Lưu nội dung</button></div></div>';
  openDrawer("Ghi nội dung buổi WOW",h)}
@@ -12894,7 +12907,7 @@ function wowRescheduleRun(id,force){var d=(fldV("wr_date")||"").trim();
  closeModal()}
 function wowAdd(psid){var h='<div class="dcard"><h4><i class="ti ti-star"></i>Đặt buổi WOW 1-1</h4>';
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Buổi WOW trừ vào quota còn lại của học viên - hết quota thì phải cấp thêm ở màn Quota WOW trước. Chọn ngày giờ xong hệ thống báo ngay GV đó có trùng lịch không. GV được đặt có '+slaChip("slaWowConfirm_hours",24)+' để xác nhận.</div>';
- h+='<div class="fld"><label>Học viên (kèm quota WOW còn lại)</label><select id="wa_stu"><option value="">-- chọn --</option>'+rows("DL09").map(function(s){var q=String(s.wow_quota_remaining||"");return '<option value="'+esc(s.student_id)+'"'+(psid&&s.student_id===psid?" selected":"")+'>'+esc((s.full_name||s.student_id)+" · "+(s.phone_number||"")+(q!==""?" · quota "+q:""))+'</option>'}).join("")+'</select></div>';
+ h+='<div class="fld"><label>Học viên (kèm quota WOW còn lại) <i>*</i></label><select id="wa_stu"><option value="">-- chọn --</option>'+rows("DL09").map(function(s){var q=String(s.wow_quota_remaining||"");return '<option value="'+esc(s.student_id)+'"'+(psid&&s.student_id===psid?" selected":"")+'>'+esc((s.full_name||s.student_id)+" · "+(s.phone_number||"")+(q!==""?" · quota "+q:""))+'</option>'}).join("")+'</select></div>';
  h+='<div class="fld"><label>Kỹ năng</label><select id="wa_skill">'+enumOpts("enum_homework_skill")+'</select></div>';
  h+='<div class="fld"><label>Loại buổi</label><select id="wa_type">'+enumOpts("enum_wow_session_type")+'</select></div>';
  h+='<div class="fld"><label>GV WOW dạy buổi</label><select id="wa_staff"><option value="">-- chọn GV --</option>'+rows("DL01").filter(function(x){return /wow/.test(ecode(x.role))&&!/inactive/.test(ecode(x.status))}).map(function(x){return '<option value="'+esc(x.staff_id)+'">'+esc(x.full_name+" · "+(elabel(x.role)||""))+'</option>'}).join("")+'</select></div>';
@@ -12991,7 +13004,7 @@ function svPick(v){var b=document.getElementById("sv_tplbox");if(b)b.innerHTML=s
 function svSend(){var first=(ENUM.enum_survey_type||["week_1 (Tuần 1)"])[0];
  var h='<div class="dcard"><h4><i class="ti ti-send"></i>Gửi khảo sát</h4>';
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Chọn đợt là có sẵn bộ câu chuẩn - sửa thoải mái trước khi gửi. Phiếu gửi đi nằm ở hàng chờ trả lời; có trả lời rồi thì phải tổng hợp trong '+slaChip("slaSurveyReport_hours",48)+', quá hạn tự nổi thành việc nhắc.</div>';
- h+='<div class="fld"><label>Học viên</label><select id="sv_stu"><option value="">-- chọn --</option>'+rows("DL09").filter(function(s){return /active/.test(ecode(s.student_status))}).map(function(s){return '<option value="'+esc(s.student_id)+'">'+esc((s.full_name||s.student_id)+" · "+(s.phone_number||""))+'</option>'}).join("")+'</select></div>';
+ h+='<div class="fld"><label>Học viên <i>*</i></label><select id="sv_stu"><option value="">-- chọn --</option>'+rows("DL09").filter(function(s){return /active/.test(ecode(s.student_status))}).map(function(s){return '<option value="'+esc(s.student_id)+'">'+esc((s.full_name||s.student_id)+" · "+(s.phone_number||""))+'</option>'}).join("")+'</select></div>';
  h+='<div class="fld"><label>Đợt khảo sát (chọn đợt là có sẵn bộ câu)</label><select id="sv_type" onchange="svPick(this.value)">'+enumOpts("enum_survey_type")+'</select></div>';
  h+='<div class="fld full" id="sv_tplbox">'+svTplBox(first)+'</div>';
  h+='<div class="fld full"><label>Bộ câu hỏi gửi kèm (mỗi dòng một câu, sửa thoải mái)</label><textarea id="sv_qs" rows="5">'+esc((SVTPL[ecode(first)]||{q:[]}).q.join("\n"))+'</textarea></div>';
@@ -13059,7 +13072,7 @@ function fbResolve(id){var f=find("DL16","feedback_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-check"></i>Xử lý phản hồi - '+esc(f.student_id_name||f.student_id)+'</h4>';
  h+=ctxContent("Nội dung phản hồi",f.feedback_content,"var(--blue)");
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Đóng phản hồi thì phải ghi rõ đã xử lý thế nào - đây là phần cấp trên đọc lại khi rà. Nếu việc đã vượt mức góp ý thông thường, dùng nút Chuyển thành khiếu nại thay vì đóng ở đây.</div>';
- h+='<div class="fld full"><label>Đã xử lý thế nào</label><textarea id="fb_note" rows="3"></textarea></div>';
+ h+='<div class="fld full"><label>Đã xử lý thế nào <i>*</i></label><textarea id="fb_note" rows="3"></textarea></div>';
  h+='<div class="fld full"><button class="btn green" onclick="fbResolveSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Đóng phản hồi</button></div></div>';
  openDrawer("Xử lý phản hồi",h)}
 function fbResolveSave(id){
@@ -13119,7 +13132,7 @@ function knAssign(id){var c=find("DL17","complaint_id",id)||{};var sevc=ecode(c.
  var h='<div class="dcard"><h4><i class="ti ti-user-plus"></i>Phân công xử lý khiếu nại</h4>';
  h+=ctxRows([["Học viên",esc(c.student_id_name||c.student_id)],["Lớp",esc(c.class_id_name||c.class_id||"-")],["Loại",esc(elabel(c.complaint_type)||c.complaint_type||"-")],["Mức độ",'<span class="chip '+(sevc==="high"?"red":sevc==="medium"?"amber":"")+'">'+esc(elabel(c.complaint_severity)||sevc)+'</span>'],["Tiếp nhận",esc(c.complaint_time||"-")]]);
  h+=ctxContent("Nội dung khiếu nại",c.complaint_content,sevc==="high"?"var(--red)":"var(--amber)");
- h+='<div class="fld"><label>Giao cho người xử lý</label><select id="kn_h"><option value="">-- chọn --</option>'+rows("DL01").map(function(x){return '<option value="'+esc(x.full_name)+'">'+esc(x.full_name+" · "+(elabel(x.role)||x.role||""))+'</option>'}).join("")+'</select></div>';
+ h+='<div class="fld"><label>Giao cho người xử lý <i>*</i></label><select id="kn_h"><option value="">-- chọn --</option>'+rows("DL01").map(function(x){return '<option value="'+esc(x.full_name)+'">'+esc(x.full_name+" · "+(elabel(x.role)||x.role||""))+'</option>'}).join("")+'</select></div>';
  h+='<div class="fld full"><button class="btn primary" onclick="knAssignSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Phân công</button></div></div>';
  openDrawer("Phân công khiếu nại",h)}
 function knAssignSave(id){var hh=fldV("kn_h");if(!hh){toast("Chọn người xử lý.");return}knUpd(id,{assigned_handler:hh,assigned_at:nowStr(),complaint_status:eFull("enum_complaint_status","assigned")},"Đã phân công cho "+hh+".")}
@@ -13128,7 +13141,7 @@ function knResolve(id){var c=find("DL17","complaint_id",id)||{};var sevc=ecode(c
  h+=ctxRows([["Học viên",esc(c.student_id_name||c.student_id)],["Lớp",esc(c.class_id_name||c.class_id||"-")],["Loại",esc(elabel(c.complaint_type)||c.complaint_type||"-")],["Mức độ",'<span class="chip '+(sevc==="high"?"red":sevc==="medium"?"amber":"")+'">'+esc(elabel(c.complaint_severity)||sevc)+'</span>'],["Kênh",esc(elabel(c.complaint_channel)||c.complaint_channel||"-")],["Tiếp nhận",esc(c.complaint_time||"-")],["Người xử lý",esc(c.assigned_handler||"-")]]);
  h+=ctxContent("Nội dung khiếu nại",c.complaint_content,sevc==="high"?"var(--red)":"var(--amber)");
  h+='<div class="fld"><label>Kết quả xử lý</label><select id="kr_res">'+enumOpts("enum_complaint_result")+'</select></div>';
- h+='<div class="fld full"><label>Cách xử lý / phản hồi học viên</label><textarea id="kr_note" rows="3" placeholder="Mô tả hướng giải quyết, cam kết, đền bù (nếu có)..."></textarea></div>';
+ h+='<div class="fld full"><label>Cách xử lý / phản hồi học viên <i>*</i></label><textarea id="kr_note" rows="3" placeholder="Mô tả hướng giải quyết, cam kết, đền bù (nếu có)..."></textarea></div>';
  /* V9.40d - cột SOP student_feedback_after. Đóng khiếu nại mà không hỏi lại em có chấp nhận
     cách xử lý không thì mới đóng cái phiếu, chưa đóng cái bực. */
  h+='<div class="fld full"><label>Học viên nói gì sau khi nghe cách xử lý</label><textarea id="kr_hv" rows="2" placeholder="vd: HV hài lòng với hướng xử lý / HV chưa hài lòng nhưng chấp nhận học bù">'+esc(c.student_feedback_after||"")+'</textarea>'+
@@ -13147,7 +13160,7 @@ function knResolveSave(id){if(chanAct("kn_duyet"))return;var n=fldV("kr_note");i
   "Đã đóng khiếu nại - cảnh báo SLA tắt."+(String(fldV("kr_hv")||"").trim()?"":" CHƯA ghi phản hồi của học viên - việc hỏi lại vẫn còn trong hàng chờ."))}
 function knAdd(){var h='<div class="dcard"><h4><i class="ti ti-alert-triangle"></i>Tiếp nhận khiếu nại</h4>';
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Nhận vào là bắt đầu chạy hạn xử lý theo mức độ - mức cao chỉ có '+slaChip("slaComplaintHigh_hours",4)+'. Chọn đúng mức thực tế: chọn cao hơn thực tế mà không xử kịp thì hồ sơ bị báo đỏ oan.</div>';
- h+='<div class="fld"><label>Học viên</label><select id="ka_stu"><option value="">-- chọn --</option>'+rows("DL09").map(function(s){return '<option value="'+esc(s.student_id)+'">'+esc((s.full_name||s.student_id)+" · "+(s.phone_number||""))+'</option>'}).join("")+'</select></div>';
+ h+='<div class="fld"><label>Học viên <i>*</i></label><select id="ka_stu"><option value="">-- chọn --</option>'+rows("DL09").map(function(s){return '<option value="'+esc(s.student_id)+'">'+esc((s.full_name||s.student_id)+" · "+(s.phone_number||""))+'</option>'}).join("")+'</select></div>';
  h+='<div class="fld"><label>Kênh</label><select id="ka_ch">'+enumOpts("enum_complaint_channel")+'</select></div>';
  h+='<div class="fld"><label>Loại</label><select id="ka_type">'+enumOpts("enum_complaint_type")+'</select></div>';
  h+='<div class="fld"><label>Mức độ</label><select id="ka_sev">'+enumOpts("enum_complaint_severity")+'</select></div>';
@@ -13196,7 +13209,7 @@ function renderKetthuc(){var p="ketthuc",fil=fget(p);var all=srows("DL18");
 function ktGen(){var cands=rows("DL10").filter(function(c){return /in_progress|finished/.test(ecode(c.class_status))});
  var h='<div class="dcard"><h4><i class="ti ti-school-off"></i>Tạo hồ sơ kết thúc cho cả lớp</h4>';
  h+='<div class="notebar" style="margin-bottom:12px"><i class="ti ti-info-circle"></i>Tạo 1 hồ sơ kết thúc (DL18) cho mỗi HV trong lớp CHƯA có hồ sơ - sau đó nhập kết quả đầu ra từng học viên.</div>';
- h+='<div class="fld"><label>Lớp (đang học / đã kết thúc)</label><select id="kg_cls" onchange="ktGenPreview(this.value)"><option value="">-- chọn lớp --</option>'+cands.map(function(c){return '<option value="'+esc(c.class_id)+'">'+esc(c.class_id+" - "+c.class_name+" ("+(elabel(c.class_status)||"")+")")+'</option>'}).join("")+'</select></div>';
+ h+='<div class="fld"><label>Lớp (đang học / đã kết thúc) <i>*</i></label><select id="kg_cls" onchange="ktGenPreview(this.value)"><option value="">-- chọn lớp --</option>'+cands.map(function(c){return '<option value="'+esc(c.class_id)+'">'+esc(c.class_id+" - "+c.class_name+" ("+(elabel(c.class_status)||"")+")")+'</option>'}).join("")+'</select></div>';
  h+='<div id="kg_prev" class="mut" style="font-size:12px;margin:4px 0 10px">Chọn lớp để xem số HV sẽ tạo.</div>';
  h+='<div class="fld full"><button class="btn primary" onclick="ktGenSave()"><i class="ti ti-check"></i>Tạo hồ sơ kết thúc</button></div></div>';
  openDrawer("Tạo hồ sơ kết thúc",h)}
@@ -19462,9 +19475,12 @@ function ttDanhSach(ttk){
    lặng nhảy trang. */
 function bkTieu(t,ic){return '<div class="dcard"><h4><i class="ti '+ic+'"></i>'+esc(t)+'</h4>'}
 /* Ô chọn dựng từ danh mục CH1 - không gõ tay lựa chọn nào, thêm giá trị ở Cài đặt là ô này có ngay. */
-function bkSel(id,lb,en,mac){
+/* `bat`: ô này bỏ trống là cửa ghi chặn - phải nói ra bằng dấu sao. Thiếu tham số ấy thì hàm
+   dựng chung này không có cách nào đánh dấu, và `bk_phqh` đã nằm trong 11 ô bị chặn mà không
+   mang sao (đo 09/08). `_checkaudit` M14 canh chuyện này. */
+function bkSel(id,lb,en,mac,bat){
  var a=ENUM[en]||[];
- return '<div class="fld"><label>'+esc(lb)+'</label><select id="'+id+'">'+
+ return '<div class="fld"><label>'+esc(lb)+(bat?' <i>*</i>':'')+'</label><select id="'+id+'">'+
   a.map(function(x){return '<option value="'+esc(x)+'"'+(mac&&ecode(x)===mac?" selected":"")+'>'+esc(elabel(x)||x)+'</option>'}).join("")+
   '</select></div>'}
 function bkO(id,lb,ty,val,hint){
@@ -19632,7 +19648,7 @@ function bkLuuPHNguyCo(pid){
 function bkPHQuanHe(P){
  var h='<div class="notebar"><i class="ti ti-id-badge"></i>Đang đồng hành cùng <b>'+
   esc(phCon(P).map(function(c){return c.full_name||c.student_id}).join(", "))+'</b>.</div>';
- h+='<div class="rform">'+bkSel("bk_phqh","Quan hệ với học viên","enum_guardian_relation")+'</div>';
+ h+='<div class="rform">'+bkSel("bk_phqh","Quan hệ với học viên","enum_guardian_relation","",1)+'</div>';
  h+=bkLuu("bkLuuPHQuanHe('"+esc(P.ph_id)+"')","Lưu quan hệ");
  return h}
 function bkLuuPHQuanHe(pid){
@@ -22272,7 +22288,7 @@ function demoGateHV(){var el=document.getElementById("login");if(!el){bootHV();r
    :'Chọn học viên để vào trang của bạn ấy, hoặc bấm <b>Vào như phụ huynh</b> để xem đúng những gì người đồng hành nhìn thấy. Bản demo - dữ liệu thật của trung tâm, trình bày theo cách dành cho người xem.')+'</p>'+
   '<div style="margin:2px 0 10px"><button class="pill'+(PH?"":" on")+'" onclick="hvPHmodeSet(0)"><i class="ti ti-user"></i>Tôi là học viên</button> '+
   '<button class="pill'+(PH?" on":"")+'" onclick="hvPHmodeSet(1)"><i class="ti ti-users"></i>Tôi là phụ huynh</button></div>'+
-  '<input placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.__hvgq||"")+'" oninput="window.__hvgq=this.value;demoGateHV();var i=document.querySelector(\'#login input\');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}" style="width:100%;max-width:380px;height:36px;border:1px solid var(--line);border-radius:8px;padding:0 12px;font-family:inherit;margin:4px 0 14px"></div>';
+  '<input data-pktim="1" placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.__hvgq||"")+'" oninput="window.__hvgq=this.value;demoGateHV();var i=document.querySelector(\'#login input\');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}" style="width:100%;max-width:380px;height:36px;border:1px solid var(--line);border-radius:8px;padding:0 12px;font-family:inherit;margin:4px 0 14px"></div>';
  if(!q)h+='<div style="font-size:11.5px;color:var(--muted);margin:-6px 0 10px">10 hồ sơ có dữ liệu đầy đủ nhất để demo - muốn người khác thì gõ tên vào ô tìm.</div>';
  h+='<div class="rgrid" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr))">';
  stu.slice(0,q?12:10).forEach(function(x){

@@ -611,3 +611,75 @@ lại là nói dối chính mình.
 **Đây chính là lý do luật cứng của dự án bắt chạy TRỌN BỘ trước khi đẩy, không ngoại lệ.** Bản
 sửa này chỉ đụng vào *giờ của mấy buổi WOW* - nghe vô hại tới mức dễ tin là không cần đo lại. Nó
 làm thủng một tình huống SOP ở một bảng khác hẳn (DL15 khảo sát).
+
+# VÒNG SÁU - đi trọn một việc trên điện thoại, và một bộ đếm ngoặc làm xanh oan
+
+Vòng này bỏ lối soi từng màn. Sau khi nhìn thêm hai màn nữa (`khieunai`, `reup`) đều sạch, em đổi
+chiến thuật: **quét toàn app tìm thêm ca của những lớp lỗi đã bắt được**, rồi hỏi một câu chưa ai
+hỏi - *một người ngồi trên điện thoại 390px có LÀM XONG được một việc không*: mở form, điền, bấm
+Lưu, và có bản ghi thật. `_checknv` đi trọn việc ấy từ lâu, nhưng ở **1440×900**.
+
+## Quét lớp M9b trên 27 trang: sạch
+
+16 chỗ máy báo đều là **nhãn enum CH1 viết nguyên văn** (`needs_more (Cần thêm buổi)`,
+`not_improved (Chưa cải thiện)`) - đó là *kết quả đã ghi* của buổi học xong, không phải câu ra
+lệnh còn sót. Lớp lỗi ấy chỉ có đúng một ca, đã vá ở vòng hai.
+
+## Bốn chỗ hỏng, đều chỉ lộ khi đi trọn cả đường
+
+| # | Chỗ | Đo được |
+|---|---|---|
+| 1 | `ghSearch` không bỏ dấu | gõ "tran" ra **3** người, không ai tên Trần (toàn "Trang" trùng chữ); gõ "Trần" ra **7** |
+| 2 | Tên trong gợi ý thu tiền bọc `nguoiLnk` | bấm vào tên -> `pq_enr` và cả hộp gợi ý biến mất, luồng thu tiền đứt |
+| 3 | 3 ô tìm viết tay không khai `data-pktim` | `_checknv` gõ chữ mẫu vào ô tìm rồi **đo trên form đã hỏng** - đèn vẫn xanh |
+| 4 | Dấu sao nói dối | **11 ô** bị cửa ghi chặn mà nhãn không mang `*`, so với 8 ô làm đúng |
+
+**Chỗ số 1 và số 2 có cùng một hình dạng:** app có một luật nhà làm đúng ở ba chỗ, và phá đúng ở
+một chỗ. Bốn ô tìm viết tay - ba cái lọc qua `vnorm`, một cái không; ba cái để tên trơn, một cái
+bọc liên kết. Chính vì viết tay nên luật nhà không tự áp được, và chỗ nào quên là quên lặng lẽ:
+ô vẫn tìm ra kết quả, chỉ ra **thiếu**.
+
+**Chỗ số 4 là lỗi đau nhất với người dùng.** Form nói bằng đúng một ký hiệu: `*` nghĩa là bắt
+buộc. Trên form **Đặt buổi WOW** có hai ô mang sao (Trọng tâm buổi, Vì sao cần buổi này) - nên
+người dùng học được rằng sao nghĩa là bắt buộc - nhưng cửa ghi lại chặn ở ô **"Học viên (kèm quota
+WOW còn lại)"**, ô duy nhất trong form KHÔNG mang sao. Điền đủ mọi chỗ có sao, bấm Đặt buổi, bị từ
+chối, rồi phải mò xem còn thiếu gì. Trên điện thoại thì mỗi lần mò là một lần gõ lại.
+
+## Thước cũ làm XANH OAN - lỗi nặng nhất của vòng này
+
+Ba lần liên tiếp một bộ cắt thân hàm tự viết làm hỏng phép đo. M10 bản một cắt bằng cách tách
+chuỗi ("thân" `renderWow` dài 33.691 ký tự). Bản hai - và M12/M13 bản một dùng chung - cắt bằng
+**đếm ngoặc**, nhưng bộ đếm ấy **không hiểu biểu thức chính quy**: gặp `.replace(/'/g,"")` thì dấu
+nháy nằm trong `/'/g` bị hiểu là mở chuỗi rồi trôi tới hết file. Đo thử: "thân" `ghSearch` dài
+**858.581 ký tự**.
+
+Ở M12 cái trôi ấy làm ĐỎ OAN nên lộ ngay. Ở M10 nó làm **XANH OAN** và không lộ - đoạn nuốt vào
+gần như chắc chắn có chữ `banQuanLy` ở đâu đó, thế là mọi hàm đều "đã hỏi phạm vi". Chặn `400000`
+ký tự chỉ giấu triệu chứng chứ không chữa.
+
+Nay cả ba hỏi thẳng máy JS: app nạp bằng `vm.runInThisContext` nên mọi hàm cấp cao nhất là hàm
+THẬT trong `global`, `fn.toString()` trả đúng nguồn của riêng nó, do chính máy JS cắt.
+**Đừng tự dựng bộ phân tích cú pháp khi thứ hiểu cú pháp đang nằm ngay đó.**
+
+## Hai lần thước M14 tố oan
+
+- **Ghép nhãn bằng cách cắt khối `.fld`**: hai ô (`ab_mk`, `bk_phqh`) báo nhãn "?" trong khi dấu
+  sao đã nằm sẵn trên mã. *Một thước không đọc được thứ cần đọc mà vẫn kết luận thì nó đang đoán.*
+  Nay quét ngược từ chính ô về nhãn gần nhất, và chặn không cho mượn nhãn của ô bên cạnh. Thước
+  cũng có một tiêu chí riêng: **đọc không ra nhãn thì ĐỎ**, không lặng lẽ bỏ.
+- **Lấy ô đầu tiên gặp trong nguồn**: `sv_sat` là id dùng ở **hai form khác nhau** - ô "Hài lòng
+  (1-5)" bên nhân viên và ô "Bạn hài lòng mức nào? \*" trong phiếu học viên tự điền. Thước đọc nhãn
+  của form này rồi đem xử tội form kia. Nay ghép ô với cửa chặn **gần nó nhất**.
+
+## Một chỗ em soi rồi kết luận KHÔNG PHẢI LỖI
+
+Bốn ô tìm viết tay không xổ danh sách khi chạm vào, khác với ô chọn `.pk` (chạm là xổ cả danh
+sách). Em đã cân: bốn ô ấy tìm trên bảng hàng nghìn dòng nên "xổ cả danh sách" vô nghĩa, và cả bốn
+đều ghi rõ lời mời ngay trong ô ("Gõ tên hoặc SĐT..."); còn `.pk` bọc một `<select>` có số lựa
+chọn hữu hạn nên xổ được. Hai thiết kế trả lời hai tình huống khác nhau - không sửa.
+
+## Kết vòng sáu
+
+5 chỗ vá · 4 thước mới (M12, M13, M13b, M14) · `_checkaudit` 68 -> 73 tiêu chí · 14 phương pháp
+tìm lỗi. Mọi thước mới đều được bắt **ĐỎ trước** bằng cách dựng lại đúng lỗi, rồi mới nhận đèn
+xanh - kể cả bản cuối sau khi đã sửa hai lần tố oan.

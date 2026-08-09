@@ -816,3 +816,55 @@ han xac nhan lop deu treo vao - day no di la keo theo ca chum.
 
 Dat o **cuoi** `fixdata.py`, dung bai hoc da ghi san ngay tren luat 16: *mot luat bat bien phai
 dung sau NGUOI GHI CUOI CUNG; dung giua thi no chi canh duoc phan viec phia truoc no*.
+
+## 09/08 VONG SAU - DI TRON MOT VIEC TREN KHO DIEN THOAI (M12, M13, M13b, M14)
+
+Vong nay khong soi tung man nua. Cau hoi khac han: **mot nguoi ngoi tren dien thoai 390px co LAM
+XONG duoc mot viec khong** - mo form, dien, bam Luu, va co ban ghi that. `_checknv` da di tron
+viec ay tu lau, nhung o **1440x900**. Bon lo hong duoi day deu nam ngoai tam nhin cua moi bo kiem
+cu, va deu chi lo ra khi di tron ca duong.
+
+- **M12 - O TIM KHONG BO DAU.** App co BON o tim VIET TAY (`pkSearch`, `chaySrch`, `pqSearch`,
+  `ghSearch`) - khac voi o chon `.pk` duoc `pkQuet` nang cap hang loat. Ba cai loc qua `vnorm`
+  (bo dau, d->d); rieng `ghSearch` dung `toLowerCase()` tron. Do that tren form **Ghi nhan phan
+  hoi**: go "tran" ra **3** nguoi - va khong ai trong 3 nguoi ay ten Tran, ho la "Trang" trung
+  chu; go "Tran" (co dau) moi ra **7**. Mot cua ghi cua SOP bo sot 7 nguoi ma moi cua khac tim
+  ra. Tren dien thoai, bat go dung dau la bat lam cai viec cham nhat.
+- **M13 - TEN TRONG DONG GOI Y NUOT CU BAM.** `nguoiLnk` sinh `<a onclick="event.stopPropagation();
+  openQuick(...)">`. Dat no vao trong mot dong goi y ma chinh dong ay mang `onclick` CHON, thi cai
+  ten - thu to nhat, dam nhat, dung cho tay nguoi bam - nuot mat cu bam chon roi thay luon ngan
+  keo. Do that tren `pqSearch`: bam vao ten xong thi `pq_enr` bien mat cung ca hop goi y, luong
+  thu tien dut giua chung. O ten chi chiem **9% dien tich dong** nhung la cho mat nhin vao.
+- **M13b - O TIM PHAI TU KHAI MINH LA O TIM.** `pkQuet` gan `data-pktim="1"` cho moi o tim no tu
+  dung, va `_checknv` doc dung dau ay de BO QUA - dien chu mau vao o tim la loc sach danh sach
+  roi form khong chon duoc gi. Ba o tim viet tay thi khong ai gan dau, nen `_checknv` go "May thu
+  tu dien" thang vao chung va **do tren mot form da hong** - den van xanh, phep do thi sai. *Kieu
+  hong te nhat: bo kiem khong bao gi ca, no chi thoi khong con do cai minh tuong no dang do.*
+- **M14 - DAU SAO CO NOI THAT KHONG.** Form noi voi nguoi dung bang dung mot ky hieu: `*` nghia la
+  bat buoc. Do la mot LOI HUA, va no hong theo hai chieu - chieu nao cung bat nguoi ta doan. Chieu
+  dau (co sao ma bo trong van luu duoc) thi ban ghi thung. **Chieu thu hai dau hon va khong bo
+  kiem nao dang hoi**: o KHONG sao ma bo trong lai bi chan - nguoi ta dien du moi cho co sao, bam
+  Luu, bi tu choi, roi phai mo xem con thieu gi. Tim ra tren form **Dat buoi WOW**: hai o mang sao
+  (Trong tam buoi, Vi sao can buoi nay) - nen nguoi dung hoc duoc rang sao nghia la bat buoc -
+  nhung `wowAddSave` lai chan o **"Hoc vien (kem quota WOW con lai)"**, o duy nhat trong form
+  KHONG mang sao. Quet ca app ra **11 o** cung benh, so voi 8 o lam dung: phan nhieu cac cua ghi
+  dang im lang ve dieu kien cua chinh minh.
+
+**BA LAN LIEN TIEP MOT BO CAT THAN HAM TU VIET LAM HONG PHEP DO - va lan nay no lam XANH OAN.**
+M10 v1 cat than ham bang cach tach chuoi -> "than" `renderWow` dai 33.691 ky tu. M10 v2 (va M12/M13
+v1 dung chung) cat bang DEM NGOAC - va bo dem **khong hieu bieu thuc chinh quy**: gap
+`.replace(/'/g,"")` thi dau nhay nam trong `/'/g` bi hieu la mo chuoi, roi troi toi het file. Do
+thu: "than" `ghSearch` dai **858.581 ky tu**. O M12 cai troi ay lam DO OAN nen lo ngay; o M10 no
+lam **XANH OAN** va khong lo - doan nuot vao gan nhu chac chan co chu `banQuanLy` o dau do, the la
+moi ham deu "da hoi pham vi". Chan `400000` chi giau trieu chung.
+**Nay ca ba deu hoi thang may JS.** App duoc nap bang `vm.runInThisContext` nen moi ham cap cao
+nhat la ham THAT trong `global`; `fn.toString()` tra dung nguon cua rieng no, do chinh may JS cat.
+*Dung tu dung bo phan tich cu phap khi thu hieu cu phap dang nam ngay do.*
+
+**VA HAI LAN THUOC M14 TO OAN, ca hai deu vi doan cho khong doc duoc:**
+(a) ghep nhan voi o bang cach CAT KHOI `<div class="fld">` - hai o (`ab_mk`, `bk_phqh`) bao nhan
+"?" trong khi dau sao da nam san tren ma. *Mot thuoc khong doc duoc thu can doc ma van ket luan
+thi no dang doan.* Nay quet NGUOC tu chinh o ve nhan gan nhat, va chan khong cho muon nhan cua o
+ben canh. (b) lay o DAU TIEN gap trong nguon - trong khi `sv_sat` la id dung o HAI form khac nhau
+(o "Hai long (1-5)" ben nhan vien, va o "Ban hai long muc nao? *" trong phieu hoc vien tu dien),
+thanh ra doc nhan cua form nay roi dem xu toi form kia. Nay ghep o voi cua chan **GAN NO NHAT**.
