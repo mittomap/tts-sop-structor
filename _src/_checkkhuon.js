@@ -48,7 +48,12 @@ const TRAN_THIEU_THE  = 0;   /* trang nghiệp vụ chưa có dải thẻ riêng
    LÀ hàng chờ: vào là thấy đủ, không có gì để lọc thêm - cùng lý do đã khai ở `_checkcauhoi`.
    Năm trang vừa làm chip trong đợt này: ychv · phong · bangcong · magioithieu · gvdp. */
 const TRAN_THIEU_LOC = 4;
-const TRAN_THIEU_NUT  = 12;  /* trang chưa có nút hành động chính */
+/* V2 09/08 - HẠ 12 -> 0. Năm trang cuối cùng đã xong: `magioithieu` và `giaoan` được DỰNG CỬA
+   GHI còn thiếu (trao thưởng, soạn giáo án mới - cả hai đều là lỗ hổng LUẬT SỐ 0 thật, app nhắc
+   mà không ai làm được); `duyetck`/`duyetthu` đổi nút cho đồng bộ với hai anh em của nó;
+   `bangcong` khai CHIDOC vì nó là bảng đối chiếu, sửa thì sửa ở chính buổi học.
+   Từ nay MỌI trang nghiệp vụ hoặc có nút hành động, hoặc nói được vì sao không cần. */
+const TRAN_THIEU_NUT = 0;  /* trang chưa có nút hành động chính */
 
 /* Trang KHÔNG CẦN DẢI THẺ - phải khai kèm lý do đọc được, y như `CHIDOC`.
    Khai một chỗ này mạnh hơn để trần bằng 1: trần chỉ nói "còn một trang thiếu", còn bản khai nói
@@ -62,6 +67,10 @@ const KHONGTHE = {};
 
 /* Trang CHỈ ĐỂ ĐỌC - không có nút hành động là đúng, nhưng phải khai kèm lý do đọc được. */
 const CHIDOC = {
+  bangcong: "bang DOI CHIEU truoc khi chot cong - no CHI RA cho lech (buoi thieu moc gio vao/ra), " +
+            "con SUA thi sua o chinh buoi hoc do (moc gio ghi luc diem danh). Dat mot nut ghi o day " +
+            "la de mot cua ghi thu hai cho cung mot viec, pham RB1. Chip \"Buoi thieu moc gio\" da " +
+            "loc ra dung nhom can goi, va nut Xuat de mang bang di doi chieu voi ke toan.",
   phong:    "trang doi chieu phong va gio - no CHI RA cho dung, con sua thi sua o lich cua lop.",
   buoihnay: "lat cat theo ngay cua buoi hoc - moi viec tren buoi deu mo tu chinh dong buoi do.",
 };
@@ -211,8 +220,9 @@ if (thieu.hub.length)  do_.push("K6 CON DINH TOI HUB - trang nghiep vu van ve th
 
 if (thieu.the.length > TRAN_THIEU_THE) do_.push("K3 thieu dai the: " + thieu.the.length + " trang, qua tran " + TRAN_THIEU_THE + " - " + thieu.the.slice(0,5).join(", "));
 if (thieu.loc.length > TRAN_THIEU_LOC) do_.push("K4 thieu chip loc: " + thieu.loc.length + " trang, qua tran " + TRAN_THIEU_LOC + " - " + thieu.loc.join(", "));
-if (thieu.nut.length > TRAN_THIEU_NUT) do_.push("K2 thieu nut hanh dong: " + thieu.nut.length + " trang, qua tran " + TRAN_THIEU_NUT + " - " + thieu.nut.join(", "));
+if (thieu.nut.length > TRAN_THIEU_NUT) do_.push("K2 thieu nut hanh dong: " + thieu.nut.length + " trang, qua tran " + TRAN_THIEU_NUT + " - " + thieu.nut.join(" | "));
 
+if(thieu.nut.length)console.log("  chua co nut hanh dong: " + thieu.nut.join(" "));
 console.log("  " + NV.length + " trang nghiep vu | thieu the " + thieu.the.length + "/" + TRAN_THIEU_THE +
             " · thieu loc " + thieu.loc.length + "/" + TRAN_THIEU_LOC +
             " · thieu nut " + thieu.nut.length + "/" + TRAN_THIEU_NUT);

@@ -6874,7 +6874,7 @@ function duyThuHTML(){var L=fltApply("duyetthu",duyPayList());
    '<td>'+nguoiLnk(e.student_id,p.student_id_name||e.student_id_name,"-")+'</td>'+
    '<td style="font-variant-numeric:tabular-nums"><b>'+vnd(num(p.amount))+'</b></td>'+
    '<td>'+esc(elabel(p.payment_method)||"-")+'</td><td>'+esc(p.received_by_name||p.received_by||"-")+'</td>'+
-   '<td><button class="btn green sm" onclick="payVerify(\''+esc(p.enrollment_id)+'\')"><i class="ti ti-check"></i>Đã đối soát</button></td></tr>'});
+   '<td><button class="btn primary sm" onclick="payVerify(\''+esc(p.enrollment_id)+'\')"><i class="ti ti-check"></i>Đã đối soát</button></td></tr>'});
  return h+'</tbody></table></div>'+xemTiepBtn("duythu",L.length,30)+'</div>'}
 /* --- tab VIỆC CHỜ NHẬN: DL23 trạng thái "new" - người được giao chưa bấm nhận --- */
 function duyGiaoHTML(){var L=fltApply("duyetgiao",duyTaskList());
@@ -6928,7 +6928,7 @@ function duyCkHTML(TH){
  h+='<div class="sechd">Chiết khấu chờ duyệt ('+ck.length+')</div><div class="panel"><div class="pbody">';
  if(!ck.length)h+='<div class="empty">Không có chiết khấu nào chờ duyệt.</div>';
  ck.forEach(function(r){var id=esc(r.enrollment_id);var pct=num(r.total_fee)?Math.round(num(r.discount_amount)/num(r.total_fee)*100):0;
-  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+duyWho(r)+' - '+esc(r.course_id_name||r.course_id)+'</div><div class="amt">'+money(r.discount_amount)+'đ <span style="font-size:12px;color:var(--muted);font-weight:600" data-tip="'+esc(pctG(num(r.discount_amount),num(r.total_fee),"đồng chiết khấu trên học phí gốc"))+'">('+pct+'% / học phí gốc '+money(r.total_fee)+'đ)</span></div><div class="rs">Loại: '+esc(elabel(r.discount_type)||"-")+' - Lý do: '+esc(r.discount_reason||"-")+'</div></div><div class="act">'+duyXemBtn(r)+'<button class="btn green" onclick="confirmRun(\'Duyệt chiết khấu '+money(r.discount_amount)+'đ cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi tên bạn là người duyệt.\',\'duyetOK\',\''+id+'\')"><i class="ti ti-check"></i>Duyệt</button><button class="btn danger" onclick="confirmRun(\'TỪ CHỐI chiết khấu này? Chiết khấu về 0 và học phí tính lại.\',\'duyetNo\',\''+id+'\')"><i class="ti ti-x"></i>Từ chối</button></div></div>'});
+  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+duyWho(r)+' - '+esc(r.course_id_name||r.course_id)+'</div><div class="amt">'+money(r.discount_amount)+'đ <span style="font-size:12px;color:var(--muted);font-weight:600" data-tip="'+esc(pctG(num(r.discount_amount),num(r.total_fee),"đồng chiết khấu trên học phí gốc"))+'">('+pct+'% / học phí gốc '+money(r.total_fee)+'đ)</span></div><div class="rs">Loại: '+esc(elabel(r.discount_type)||"-")+' - Lý do: '+esc(r.discount_reason||"-")+'</div></div><div class="act">'+duyXemBtn(r)+'<button class="btn primary" onclick="confirmRun(\'Duyệt chiết khấu '+money(r.discount_amount)+'đ cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi tên bạn là người duyệt.\',\'duyetOK\',\''+id+'\')"><i class="ti ti-check"></i>Duyệt</button><button class="btn danger" onclick="confirmRun(\'TỪ CHỐI chiết khấu này? Chiết khấu về 0 và học phí tính lại.\',\'duyetNo\',\''+id+'\')"><i class="ti ti-x"></i>Từ chối</button></div></div>'});
  h+='</div></div>';
  if(appr.length){h+='<div class="sechd">Đã quyết định gần đây</div><div class="panel"><div class="pbody">';
   appr.slice(0,8).forEach(function(r){var rej=/từ chối|tu choi/i.test(String(r.discount_approved_by));h+='<div class="appcard done"><div class="info"><div class="id">'+esc(r.enrollment_id)+'</div><div class="big">'+esc(r.student_id_name||r.student_id)+' - chiết khấu '+money(r.discount_amount)+'đ</div><div class="rs">'+duyetAiTen(r.discount_approved_by)+(r.discount_approved_at?' · '+esc(r.discount_approved_at):'')+'</div></div><div class="act"><span class="chip '+(rej?"red":"green")+'" style="padding:6px 12px">'+(rej?"Đã từ chối":"Đã duyệt")+'</span></div></div>'});
@@ -10026,7 +10026,8 @@ function planSrcChip(src){return src==="lớp"?'<span class="chip amber">giáo v
 function renderGiaoan(){var tab=window.GATAB||"ga";
  var h=pageHead("Kho bài tập & Giáo án khóa",
   "Đặt sẵn cho TỪNG BUỔI của mỗi khóa: bài tập về nhà + lời dặn dò. Mọi lớp thuộc khóa đó tự áp dụng; giáo viên vẫn đổi riêng được ở Bảng lớp.",
-  tab==="kho"?'<button class="btn primary" onclick="hwbForm()"><i class="ti ti-plus"></i>Thêm bài vào kho</button>':'');
+  tab==="kho"?'<button class="btn primary" onclick="hwbForm()"><i class="ti ti-plus"></i>Thêm bài vào kho</button>'
+   :'<button class="btn primary" onclick="gaMoi()"><i class="ti ti-notes"></i>Soạn giáo án cho buổi</button>');
  /* V9.29p (mảng 5): trang này trước đây không có dải số - mở ra không biết kho đang thiếu chỗ nào. */
  (function(){var pl=rows("DL21"),bank=hwBank();
   var crs=rows("DL05").filter(function(c){return isc(c.status,"active")});
@@ -10124,6 +10125,44 @@ function hwbSave(id){var t=(fldV("hb_title")||"").trim();if(!t){toast("Nhập t�
  else{v.hw_bank_id="HWB-"+String(rows("DL20").length+1).padStart?("HWB-"+("00"+(rows("DL20").length+1)).slice(-3)):("HWB-"+(rows("DL20").length+1));
   v.created_by=myName();rows("DL20").push(v);toast("Đã thêm bài vào kho.")}
  window.HBFILE="";closeModal();reRender("giaoan")}
+/* ═══ V2 09/08 - CỬA GHI "SOẠN GIÁO ÁN CHO BUỔI" - TRƯỚC BẢN NÀY KHÔNG HỀ CÓ ═══════════════════
+   `gaForm`/`gaSave` chỉ SỬA giáo án đã có (`if(!p)return`). Không một hàm nào tạo dòng DL21 mới.
+   Nhưng nhịp ngày của Trưởng phòng ACA có dòng *"Giáo án và ngân hàng bài của khoá - khoá chưa
+   đủ giáo án là lớp sau lại dạy chay"*, đếm bằng `gaThieuKhoa()`. Nghĩa là app NHẮC người ta
+   soạn giáo án cho khoá còn thiếu, mà không có nút nào soạn.
+   Hôm nay con số đó đang bằng 0 (dữ liệu demo khoá nào cũng có giáo án) nên chưa ai vấp - nhưng
+   một lỗ hổng chưa ai rơi vào vẫn là lỗ hổng. Đúng LUẬT CỨNG SỐ 0: SOP mô tả, app có nhắc, mà
+   người phải làm không có cửa.
+   Cùng họ với lỗi thưởng giới thiệu tìm được nửa giờ trước, và cùng một lý do: trang này từng
+   khai `hide:1`. */
+function gaMoi(){
+ var crs=rows("DL05").filter(function(c){return isc(c.status,"active")});
+ if(!crs.length){toast("Chưa có khoá học nào đang mở.");return}
+ var h='<div class="dcard"><h4><i class="ti ti-notes"></i>Soạn giáo án cho một buổi</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-alert-triangle"></i>Giáo án gắn theo KHOÁ, áp dụng cho <b>mọi lớp</b> thuộc khoá đó. Giáo viên vẫn đổi riêng được ở Bảng lớp.</div>';
+ h+='<div class="fgrid">'+
+  '<div class="fld"><label>Khoá học</label><select id="gm_khoa">'+
+   crs.map(function(c){return '<option value="'+esc(c.course_id)+'">'+esc(c.course_name||c.course_id)+'</option>'}).join("")+
+   '</select><div class="fhint">Chỉ hiện khoá đang mở.</div></div>'+
+  '<div class="fld"><label>Buổi số</label><input id="gm_buoi" type="number" min="1" step="1" placeholder="vd: 1">'+
+   '<div class="fhint">Buổi thứ mấy trong khoá. Trùng buổi đã có thì app báo, không ghi đè.</div></div>'+
+  '<div class="fld" style="grid-column:1/-1"><label>Chủ đề buổi</label><input id="gm_topic" placeholder="vd: Writing Task 2 - Opinion essay"></div>'+
+  '<div class="fld" style="grid-column:1/-1"><label>Lời dặn chuẩn bị</label><input id="gm_note" placeholder="vd: in sẵn đề mẫu, mang loa nghe"></div>'+
+  '<div class="fld"><label>Hạn nộp bài (ngày sau buổi)</label><input id="gm_due" type="number" min="0" step="1" placeholder="'+esc(String(paramOf("hwDueDefault_days",3)))+'">'+
+   '<div class="fhint">Để trống thì lấy mặc định hệ thống.</div></div></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="gaMoiLuu()"><i class="ti ti-device-floppy"></i>Lưu giáo án</button>'+
+  '<button class="btn" onclick="closeModal()">Huỷ</button></div></div>';
+ openDrawer("Soạn giáo án cho buổi",h)}
+function gaMoiLuu(){
+ var cid=fldV("gm_khoa"),bs=num(fldV("gm_buoi"));
+ if(!cid||!bs){toast("Chọn khoá và nhập số buổi đã.");return}
+ var trung=rows("DL21").filter(function(x){return String(x.course_id||"")===String(cid)&&num(x.session_number)===bs})[0];
+ if(trung){toast("Khoá này đã có giáo án buổi "+bs+" - mở dòng đó ra sửa thay vì tạo trùng.");return}
+ var c=find("DL05","course_id",cid)||{};
+ var o={course_id:cid,course_id_name:c.course_name||cid,session_number:bs,
+  topic:fldV("gm_topic"),prep_note:fldV("gm_note"),
+  due_days:fldV("gm_due")||String(paramOf("hwDueDefault_days",3)),hw_bank_id:"",hw_title:"",materials_link:""};
+ jSaveRow("DL21",o,function(){closeModal();toast("Đã lưu giáo án buổi "+bs+" cho khoá "+(c.course_name||cid)+".");reRender(CUR)})}
 function gaForm(pid){var p=find("DL21","plan_id",pid);if(!p)return;
  var h='<div class="dcard"><h4><i class="ti ti-notes"></i>Giáo án buổi '+esc(p.session_number)+' · '+esc(p.course_id_name||p.course_id)+'</h4>';
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-alert-triangle"></i>Áp dụng cho <b>mọi lớp</b> thuộc khóa này.</div>';
@@ -16617,6 +16656,21 @@ function renderMaGioiThieu(embed){
    '<td>'+(g.enrolled?'<span class="chip blue">'+g.enrolled+' × thưởng</span>':'<span class="mut">chưa</span>')+'</td>'+
    '<td><button class="btn sm" onclick="mgDetail(\''+esc(g.sid||g.name)+'\')"><i class="ti ti-list-details"></i>Bạn được giới thiệu</button></td></tr>'});
  h+='</tbody></table></div></div>';
+ /* V2 09/08 - BẢNG THƯỞNG CÒN TREO, kèm nút trao. Trước bản này con số "thưởng còn treo" xuất
+    hiện ở ba nơi (nhịp ngày Marketing, dải thẻ trang này, hàng chờ SLA) mà KHÔNG có màn nào bày
+    ra từng phần thưởng, cũng không có nút nào gỡ nó. Đếm mà không làm được thì con số ấy chỉ
+    tăng - đúng con bệnh anh Luân bắt hai lần: *"báo N mà a chẳng thấy đâu"*. */
+ (function(){var cho=mgtChoChi();
+  h+='<div class="sechd">Thưởng còn treo, chưa trao ('+cho.length+')</div>';
+  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Người giới thiệu</th><th>Bạn được giới thiệu</th><th>Phần thưởng</th><th>Ghi nhận lúc</th><th></th></tr></thead><tbody>';
+  if(!cho.length)h+='<tr><td class="empty" colspan="5">Không còn phần thưởng nào treo - đã trao hết.</td></tr>';
+  cho.forEach(function(r){
+   h+='<tr><td>'+(r.referrer_student_id?nguoiLnk(r.referrer_student_id,r.referrer_name,""):esc(r.referrer_name||"-"))+'</td>'+
+    '<td>'+esc(r.referred_name||"-")+'</td>'+
+    '<td>'+esc(r.reward_content||"-")+'</td>'+
+    '<td>'+esc(String(r.created_at||"").slice(0,10)||"-")+'</td>'+
+    '<td><button class="btn primary sm" onclick="mgtTrao(\''+esc(r.reward_id)+'\')"><i class="ti ti-gift"></i>Trao thưởng</button></td></tr>'});
+  h+='</tbody></table></div></div>'})();
  return h}
 function mgDetail(key){var ev=rows("DL22").filter(function(x){return String(x.referrer_student_id||x.referrer_name)===String(key)});
  if(!ev.length){toast("Không có dữ liệu.");return}
@@ -17202,6 +17256,39 @@ function ttToiHan(){return srows("DL06").filter(function(e){var s=pinfo(e),du=pv
 function reupToiHen(){return tsReupList().filter(function(J){var nf=jNF(J);return !!(nf&&nf<=endToday())})}
 /* Mã giới thiệu có thưởng còn treo, chưa chi. */
 function mgtChoChi(){return srows("DL19").filter(function(r){return isc(r.reward_status,"pending")})}
+/* ═══ V2 09/08 - CỬA GHI "TRAO THƯỞNG" - TRƯỚC BẢN NÀY KHÔNG HỀ CÓ ═══════════════════════════
+   Đo được khi soi năm trang nghiệp vụ chưa có nút hành động: bảng DL19 có đủ cột để ghi việc
+   trao thưởng (`reward_status` · `granted_at` · `granted_by` · `note`), app ĐẾM thưởng còn treo
+   ở ba nơi (nhịp ngày của Marketing, dải thẻ trang Mã giới thiệu, và hàng chờ SLA), nhưng
+   **không một cửa ghi nào đổi được `reward_status`**. Người ta bị nhắc mỗi ngày "2 thưởng còn
+   treo" mà không có cách nào gỡ - con số đó chỉ có thể tăng.
+   Đúng LUẬT CỨNG SỐ 0: SOP mô tả, dữ liệu có cột, app có nhắc, mà người phải làm không có nút.
+   Chuyện này nằm im vì trang Mã giới thiệu từng khai `hide:1` - lại một lần nữa: TRANG BỊ GIẤU
+   LÀ TRANG KHÔNG AI ĐO. */
+function mgtTrao(id){
+ var r=find("DL19","reward_id",id);if(!r){toast("Không thấy phần thưởng này");return}
+ var da=!isc(r.reward_status,"pending");
+ var h='<div class="dcard"><h4><i class="ti ti-gift"></i>Trao thưởng giới thiệu</h4>';
+ h+=ctxRows([["Người giới thiệu",esc(r.referrer_name||r.referrer_student_id||"-")],
+  ["Bạn được giới thiệu",esc(r.referred_name||"-")],
+  ["Mã",esc(r.referral_code||"-")],
+  ["Phần thưởng",'<b>'+esc(r.reward_content||paramStr("referralReferrer_reward","1 buổi WOW 1-1 miễn phí"))+'</b>'],
+  ["Tình trạng",esc(elabel(r.reward_status)||r.reward_status||"-")]]
+  .concat(da?[["Đã trao lúc",esc(r.granted_at||"-")],["Người trao",esc(r.granted_by||"-")]]:[]));
+ if(da){h+='<div class="notebar" style="margin-top:10px"><i class="ti ti-circle-check"></i>Phần thưởng này đã trao rồi.</div></div>';
+  openDrawer("Trao thưởng giới thiệu",h);return}
+ h+='<div class="fgrid"><div class="fld"><label>Ghi chú khi trao</label>'+
+  '<input id="mg_note" placeholder="vd: đã cấp 1 buổi WOW vào lịch tuần sau">'+
+  '<div class="fhint">Ghi lại đã trao bằng cách nào - lần sau người khác đọc còn hiểu.</div></div></div>';
+ h+='<div class="dact">'+
+  '<button class="btn primary" onclick="mgtTraoLuu(\''+esc(id)+'\')"><i class="ti ti-gift"></i>Đã trao thưởng</button>'+
+  '<button class="btn" onclick="closeModal()">Để sau</button></div></div>';
+ openDrawer("Trao thưởng giới thiệu",h)}
+function mgtTraoLuu(id){
+ var note=fldV("mg_note");
+ markRow("DL19","reward_id",id,{reward_status:eFull("enum_reward_status","granted"),
+  granted_at:nowStr(),granted_by:myName(),note:note},
+  "Đã ghi nhận trao thưởng. Người giới thiệu không còn nằm trong hàng chờ.")}
 /* Buổi đã dạy xong mà thiếu mốc giờ vào hoặc ra - thiếu là tính công sai. */
 function bcThieuMoc(){return srows("DL11").filter(function(x){return isc(x.session_status,"completed")&&
  !(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())})}
@@ -18246,7 +18333,11 @@ function ckDuyet(eid){var r=find("DL06","enrollment_id",eid);if(!r){toast("Khôn
    '<div class="dact"><button class="btn" onclick="closeModal();openQuick(\''+esc(r.student_id||r.lead_id||"")+'\')"><i class="ti ti-eye"></i>Xem nhanh người này</button></div></div>';
   openDrawer("Chiết khấu chờ duyệt",h);return}
  h+='<div class="dact">'+
-  '<button class="btn green" onclick="confirmRun(\'Duyệt chiết khấu '+esc(vnd(num(r.discount_amount)))+' cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi tên bạn là người duyệt.\',\'duyetOK\',\''+esc(eid)+'\')"><i class="ti ti-check"></i>Duyệt</button>'+
+  /* V2 09/08 - ĐỔI `green` -> `primary` cho ĐỒNG BỘ. Bốn hàng chờ duyệt là bốn anh em cùng một
+     việc, mà hai cái dùng `btn primary` (Xin nghỉ, Hoàn tiền) còn hai cái dùng `btn green`
+     (Chiết khấu, Xác nhận thu). Cùng một hành động mà hai màu là bắt mắt người dùng học hai lần
+     - đúng luật đối xứng `_checkaudit` canh. Chọn `primary` vì hai trong bốn đã dùng nó. */
+  '<button class="btn primary" onclick="confirmRun(\'Duyệt chiết khấu '+esc(vnd(num(r.discount_amount)))+' cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi tên bạn là người duyệt.\',\'duyetOK\',\''+esc(eid)+'\')"><i class="ti ti-check"></i>Duyệt</button>'+
   '<button class="btn danger" onclick="confirmRun(\'TỪ CHỐI chiết khấu này? Chiết khấu về 0 và học phí tính lại theo giá gốc.\',\'duyetNo\',\''+esc(eid)+'\')"><i class="ti ti-x"></i>Từ chối</button>'+
   '<button class="btn" onclick="closeModal();openQuick(\''+esc(r.student_id||r.lead_id||"")+'\')"><i class="ti ti-eye"></i>Xem nhanh người này</button></div></div>';
  openDrawer("Duyệt chiết khấu",h)}
@@ -24546,7 +24637,14 @@ DOORS = {
  # con so la sai ca chi so dau ra cua trung tam.
  "DL18b":["kqNhapThatSave"],
  "DL20":["hwbSave","sesSave"],
- "DL21":["gaSave"],
+ # V2 09/08 - THEM `gaMoiLuu`: cua ghi TAO giao an moi. Truoc do DL21 chi co `gaSave` (SUA cai
+ # da co) - khong mot ham nao tao dong moi, trong khi nhip ngay cua Truong phong ACA dem "khoa
+ # chua co giao an". App nhac ma khong ai soan duoc. Dung LUAT SO 0.
+ "DL21":["gaSave","gaMoiLuu"],
+ # V2 09/08 - DL19 (thuong gioi thieu) TRUOC DAY KHONG CO CUA GHI NAO. App dem "thuong con treo"
+ # o ba noi - nhip ngay Marketing, dai the trang Ma gioi thieu, hang cho SLA - ma khong ham nao
+ # doi duoc `reward_status`. Con so ay chi co the tang.
+ "DL19":["mgtTraoLuu"],
  "DL23":["hvReq","tkNewSave"],
  "DL24":["hvAskSaySave","tkSay"],
 }

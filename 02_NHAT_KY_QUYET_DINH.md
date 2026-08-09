@@ -241,6 +241,54 @@
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 39 BỘ KIỂM (08/08). V1 mốc cũ: V9.99z12, 34 bộ, bản dựng `829572`.**
 >
+> ### 🟢 09/08 - DỌN NỐT VIỆC TỒN, VÀ TÌM RA HAI LỖ HỔNG LUẬT SỐ 0
+>
+> Anh Luân: *"Ủa còn việc sao ko làm mà lại rảnh???"* - đúng, em liệt kê bốn việc tồn rồi bảo
+> mình rảnh. Làm tiếp thì lòi ra bốn thứ, hai trong đó là lỗ hổng thật.
+>
+> **1. CHIP LỌC cho 5 trang** (`ychv` · `phong` · `bangcong` · `magioithieu` · `gvdp`).
+> Trang nghiệp vụ thiếu chip **9 → 4** · câu nhịp chưa bấm ra được danh sách **7 → 2**.
+> Bốn trang còn lại (`duyetck` `duyethoan` `duyetnghi` `duyetthu`) CHÍNH LÀ hàng chờ - vào là
+> thấy đủ. Trần `TRAN_THIEU_LOC` 11 → **4**, `TRAN_KHONG_CHIP` 7 → **2**.
+>
+> **2. TRANG GỘP "CHỜ DUYỆT" BẤM VÀO RƠI SAI CHỖ.** Giám đốc đọc *"16 việc chờ quyết định"*,
+> bấm vào rơi vào `duyetck` hiện **4**. Gốc: `duyet` bị xếp chung với năm hub V1 nên `go()` tự
+> chuyển hướng. Nhưng `duyet` khác bốn hub kia - nó trả lời MỘT câu hỏi mà không trang con nào
+> trả lời được. Cho qua thẳng; nay khớp 4+2+4+6 = 16.
+> **Và chuyện đó nằm im vì bốn câu hỏi của `_checkcauhoi` đều hỏi về TRANG ĐÃ KHAI, không hỏi
+> "đi tới thì rơi vào đâu".** Thêm mục **C5**: bấm bằng chính hàm `go()` rồi xem `CUR` dừng ở
+> đâu. Đã chứng minh nó bắt được (cố tình trỏ nhịp vào hub `tuyensinh` → thước báo ngay).
+> Tiêu chí 279 → **353**.
+>
+> **3. HAI LỖ HỔNG LUẬT SỐ 0 - app nhắc mà không ai làm được:**
+> · **Thưởng giới thiệu không có cửa nào để chi.** DL19 có đủ cột (`granted_at` `granted_by`
+>   `note`), app đếm "thưởng còn treo" ở BA nơi (nhịp Marketing, dải thẻ, hàng chờ SLA), mà
+>   **không một hàm nào đổi được `reward_status`** - con số ấy chỉ có thể tăng.
+> · **Giáo án không có cửa nào tạo mới.** `gaForm` chỉ SỬA (`if(!p)return`). Nhịp của Trưởng
+>   phòng ACA đếm "khoá chưa có giáo án" mà không ai soạn được. Hôm nay số ấy đang bằng 0 nên
+>   chưa ai vấp - **một lỗ hổng chưa ai rơi vào vẫn là lỗ hổng.**
+> Đã dựng cả hai cửa ghi (`mgtTraoLuu`, `gaMoiLuu`), khai vào `DOORTB`: 25 → **26 bảng, 127 hàm**.
+> `_check15` bắt được ngay lúc em quên khai - đúng việc của nó.
+>
+> **4. Bốn hàng chờ duyệt mất đối xứng**: hai cái nút xanh lá, hai cái nút xanh dương, cùng một
+> hành động. Đã thống nhất. `bangcong` khai chỉ-đọc kèm lý do (bảng ĐỐI CHIẾU, sửa ở chính buổi
+> học - đặt nút ghi ở đây là cửa ghi thứ hai cho cùng một việc, phạm RB1).
+> **Trần `TRAN_THIEU_NUT` 12 → 0**: từ nay mọi trang nghiệp vụ hoặc có nút, hoặc nói được vì sao không.
+>
+> **KHÚC 2c - hội đồng đề nghị KHÔNG LÀM**, lý do đo được ở `HOI_DONG_V2_CHOT.md` Phần 5: đổi
+> tên `HUBTAB` là sửa ~30 chỗ để được một cái tên đẹp hơn; còn "hàm vẽ hub đã chết" thì KHÔNG
+> chết - chúng là lưới an toàn khi một nhóm bị tắt hết trang con. **Một nhánh chưa chạy bao giờ
+> không phải nhánh chết - nó chỉ là nhánh chưa ai rơi vào.**
+>
+> ### 🔴 BA LỖI CỦA CHÍNH EM TRONG ĐỢT 09/08, THƯỚC BẮT HẾT
+> 1. **Hai ô tìm trên một trang** - `filterBar` luôn tự kèm ô tìm, mà 4 trang đã có sẵn. Đã tách
+>    ra hàm `chipBar` chỉ vẽ dải chip.
+> 2. **Chip đặt TRƯỚC ô tìm** ở ba trang - thứ tự chuẩn là `[ô tìm][dải chip]`.
+> 3. **Thêm một thẻ SỐ TÍCH LUỸ** ("Buổi đã dạy xong trong sổ") - đúng loại thẻ anh Luân cho bỏ
+>    ở V9.57. Đổi sang "Giảng viên có buổi thiếu mốc": đếm NGƯỜI đang vướng.
+> Cộng một chỗ suýt lọt: chip trên Bảng công lúc đầu **vẽ ra mà không lọc thật**. Bộ kiểm đo trên
+> chuỗi HTML nên chip giả vẫn qua được thước - **luật này phải giữ bằng tay**.
+>
 > ### 🟢 08/08 (chiều) - ANH LUÂN GIAO QUYẾT SỐ TRANG: *"E toàn quyết định có bao nhiêu trang là phù hợp"*
 >
 > **Em chốt: KHÔNG bớt trang nào. Bớt số trang MỘT NGƯỜI PHẢI NHÌN.**
