@@ -2316,7 +2316,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">09/08/2026 · <b>aa40f9</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">09/08/2026 · <b>8b7802</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -10378,8 +10378,12 @@ function gaMoi(){
    '<div class="fhint">Buổi thứ mấy trong khoá. Trùng buổi đã có thì app báo, không ghi đè.</div></div>'+
   '<div class="fld" style="grid-column:1/-1"><label>Chủ đề buổi</label><input id="gm_topic" placeholder="vd: Writing Task 2 - Opinion essay"></div>'+
   '<div class="fld" style="grid-column:1/-1"><label>Lời dặn chuẩn bị</label><input id="gm_note" placeholder="vd: in sẵn đề mẫu, mang loa nghe"></div>'+
-  '<div class="fld"><label>Hạn nộp bài (ngày sau buổi)</label><input id="gm_due" type="number" min="0" step="1" placeholder="'+esc(String(paramOf("hwDueDefault_days",3)))+'">'+
-   '<div class="fhint">Để trống thì lấy mặc định hệ thống.</div></div></div>';
+  /* V2 09/08 - `_checkux` bắt em BỊA TÊN THAM SỐ (`hwDueDefault_days` không có trong CH2).
+     Tên thật là `homeworkDueFallback_days`, và app đã có sẵn `dueFall()` đọc nó - dùng đúng hàm
+     ấy thay vì gõ lại tên tham số, thì không bịa được nữa. Đây là lần thứ tư trong hai ngày em
+     đoán một cái tên thay vì hỏi thẳng mã. */
+  '<div class="fld"><label>Hạn nộp bài (ngày sau buổi)</label><input id="gm_due" type="number" min="0" step="1" placeholder="'+esc(String(dueFall()))+'">'+
+   '<div class="fhint">Để trống thì lấy mặc định của hệ thống ('+slaChip("homeworkDueFallback_days",5,"ngày")+').</div></div></div>';
  h+='<div class="dact"><button class="btn primary" onclick="gaMoiLuu()"><i class="ti ti-device-floppy"></i>Lưu giáo án</button>'+
   '<button class="btn" onclick="closeModal()">Huỷ</button></div></div>';
  openDrawer("Soạn giáo án cho buổi",h)}
@@ -10391,7 +10395,7 @@ function gaMoiLuu(){
  var c=find("DL05","course_id",cid)||{};
  var o={course_id:cid,course_id_name:c.course_name||cid,session_number:bs,
   topic:fldV("gm_topic"),prep_note:fldV("gm_note"),
-  due_days:fldV("gm_due")||String(paramOf("hwDueDefault_days",3)),hw_bank_id:"",hw_title:"",materials_link:""};
+  due_days:fldV("gm_due")||String(dueFall()),hw_bank_id:"",hw_title:"",materials_link:""};
  jSaveRow("DL21",o,function(){closeModal();toast("Đã lưu giáo án buổi "+bs+" cho khoá "+(c.course_name||cid)+".");reRender(CUR)})}
 function gaForm(pid){var p=find("DL21","plan_id",pid);if(!p)return;
  var h='<div class="dcard"><h4><i class="ti ti-notes"></i>Giáo án buổi '+esc(p.session_number)+' · '+esc(p.course_id_name||p.course_id)+'</h4>';
