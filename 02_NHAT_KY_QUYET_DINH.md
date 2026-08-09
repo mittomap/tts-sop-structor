@@ -241,6 +241,73 @@
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 39 BỘ KIỂM (08/08). V1 mốc cũ: V9.99z12, 34 bộ, bản dựng `829572`.**
 >
+> ### 🔴 09/08 (chiều) - CHẠY TRỌN AUDIT: 40 BỘ KIỂM XANH HẾT MÀ NGỒI NHÌN MÀN HÌNH VẪN RA SÁU LỖI
+>
+> **Bản dựng `2d12de`. Biên bản đầy đủ: `AUDIT_09_08.md`.**
+>
+> Đây là câu đáng nhớ nhất của cả dự án cho tới nay: **`./verify.sh` xanh hết, 0 chỗ đỏ, 31 phút
+> 41 giây - rồi mở app ra đọc như người dùng lần đầu thì vẫn còn sáu chỗ sai, hai trong đó là RÒ
+> RỈ PHẠM VI DỮ LIỆU THẬT.** Không chỗ nào do bộ kiểm báo. Tất cả do NGỒI NHÌN.
+>
+> **HAI LỖ RÒ RỈ PHẠM VI (mảng 6 của giao thức audit - mảng hỏng im lặng nhất):**
+> · Ô **"Của giảng viên"** trên Buổi hôm nay: một giáo viên thường được chọn xem số của **14
+>   giảng viên** khác - buổi dạy, bài chờ chấm, buổi nợ nhận xét.
+> · Ô **"Từ NV"** trên Bàn giao lead, nặng hơn: nhân viên tư vấn thường chọn đồng nghiệp bất kỳ ở
+>   cả 5 cơ sở rồi **đọc trọn sổ lead của người đó kèm tên và số điện thoại**.
+> Cả hai đều dựng thẳng `rows("DL01")` rồi lọc theo vai - **không hỏi phạm vi lấy một câu**, trong
+> khi app đã có sẵn đúng hai hàm cần hỏi (`banQuanLy()` và `myTeam()`).
+> Đúng họ hàng với lỗ V9.91 (Leader Tư vấn Cơ sở 1 nhìn thấy 82 học viên toàn hệ thống).
+>
+> **VÌ SAO 40 BỘ KIỂM KHÔNG THẤY - câu này phải nhớ:** `_checknguoi` so **SỐ DÒNG** danh sách giữa
+> những người cùng chức danh. Mà một ô chọn **không làm đổi số dòng nào cả** - nó chỉ mở một cánh
+> cửa. **Phạm vi dữ liệu không chỉ là "tôi thấy bao nhiêu dòng", nó còn là "tôi đổi được sang nhìn
+> ai".** Thước đo đúng một vế thì vế kia trống trơn mà đèn vẫn xanh.
+>
+> **LỖ LUẬT SỐ 0 - MÀN HÌNH NÓI NGƯỢC VỚI CHÍNH APP.** Đọc ngăn kéo 360 của HV061 thì trên MỘT màn
+> có ba câu cãi nhau: chip **"Nguy cơ"** + *"vì sao: thiếu 3 bài (ngưỡng 3)"* ở đầu, và ở cuối
+> *"Việc cần làm theo SOP · **NA018**: HV đang học đều và ổn định. **Không cần làm gì thêm.**"*
+> Gốc: `jNaCode` chọn câu việc **theo CHẶNG** (`JNA.learning=["NA018",""]`), không hỏi hồ sơ có
+> đang gắn cờ nguy cơ không. `naFor("DL09",S)` - hàm `check_sop.py` chạy thật trên 93 tình huống
+> HD3 - trả đúng NA015/NA016/NA017/NA064/NA065.
+> **Đo được: 13/13 học viên đang học mà có nguy cơ đều bị màn hình bảo "không cần làm gì thêm".**
+> SOP mô tả năm mức can thiệp, app TÍNH ĐƯỢC cả năm, mà chỗ người ta thật sự đọc lại in câu mặc
+> định của chặng. **App biết mà không nói ra thì cũng bằng không biết - tệ hơn, nó còn trấn an
+> nhầm.** Vá ở `jInfo` (cửa duy nhất mọi màn hành trình lấy `na`), 13 → **0**.
+>
+> **THỰC THỂ HTML SỐNG TRÊN MÀN.** Tiêu đề ngăn kéo Bộ lọc hiện `Tư vấn &amp; Đăng ký sau test` -
+> `openDrawer` đặt tiêu đề bằng `textContent` mà chỗ gọi lại `esc()` trước, tức escape **hai lần**;
+> 16 trang có dấu "&" đều dính. Không bộ kiểm nào thấy vì cả `_checkbam` lẫn `_checkmat` **chỉ soi
+> THÂN** ngăn kéo và thân trang - **tiêu đề ngăn kéo là một vùng không ai đo**.
+> Phải hỏi ở tầng `textContent`, không hỏi `innerHTML`: trong mã nguồn `&amp;` là cách viết ĐÚNG
+> của một dấu "&", không phân biệt được.
+>
+> **DẢI THẺ KHÔNG CÓ NHÃN.** Trang bắt đầu là trang DUY NHẤT không gọi `pageHead`, nên cũng là
+> trang duy nhất mất câu ngữ cảnh mà mọi trang khác được `pageHead` phát cho: một hàng số với nút
+> "Thẻ (1/1)" lơ lửng, không câu nào nói đây là số của cái gì. Khai `ttl` trong `THEDEF`, nhãn
+> đứng đúng hàng nút đã có - nay ghi "HÀNG CHỜ TRÊN HÀNH TRÌNH KHÁCH".
+>
+> **BA THƯỚC MỚI DỰNG TRONG ĐỢT NÀY** (không thêm bộ kiểm nào, chỉ hỏi thêm câu ở bộ đã có):
+> · `_checknguoi`: người không phải quản lý mà màn bày ô chọn mang mã nhân viên người khác → đỏ.
+>   Chỉ soi ô **đổi màn nhìn** (có `onchange`), không soi ô nhập của cửa ghi - bản đầu gộp cả hai
+>   nên tố oan đúng cái nút mà nghiệp vụ bàn giao không thể thiếu. Ngoại lệ khai kèm lý do đọc được.
+> · `_checkbam`: hỏi **cả tiêu đề lẫn thân** ngăn kéo, thêm thực thể HTML vào danh sách chữ máy.
+> · `_checkmat`: quét chữ **người đọc thấy** trên 15 trang tìm thực thể còn sống.
+>
+> **BẪY EM TỰ CẮN TRONG ĐỢT NÀY - ghi lại vì cùng một họ, lặp năm lần:**
+> · Truyền **mã chức danh** ("ceo","teacher") vào `gateEnter` - hàm ấy tìm `find("DL01","staff_id")`,
+>   không thấy thì rơi về nhóm mặc định, nên **cả sáu người cùng đáp xuống `giaoviec`, menu 0 mục**.
+>   Thước sai, app đúng.
+> · Dùng **một tab** cho nhiều người: tính năng "F5 giữ nguyên trang" ghi địa chỉ vào URL, nên từ
+>   người thứ hai trở đi ai cũng rơi về trang của người đầu. Phải một tab mới cho mỗi người.
+> · Build ra **gốc repo** (`ITTS_OUT=$PWD`) rồi trích JS bằng mặc định (`_src`) - đúng cái bẫy đã
+>   ghi sẵn trong `extract_js.py`. `_APP.js` là bản CŨ, và mọi phép đo sau đó sai trong im lặng.
+> · Dùng `myTeam()` cho người thường: hàm ấy gom cả "cùng phòng, cấp thấp hơn". Nó sinh ra để trả
+>   lời *"đội của một quản lý gồm ai"*; hỏi nó thay cho *"tôi được xem sổ của ai"* là mượn một câu
+>   trả lời gần đúng - **gần đúng trong phân quyền là sai**.
+> · Gọi `naFor(s)` một tham số (thật ra là `naFor(sheet,r)`) → đếm ra 0 chỗ lệch, suýt kết luận
+>   "không có vấn đề gì".
+> **LUẬT: khi số đo ra vô lý, đọc lại PHÉP ĐO trước khi đọc lại app.** Năm lần trong một buổi.
+
 > ### 🟢 09/08 - DỌN NỐT VIỆC TỒN, VÀ TÌM RA HAI LỖ HỔNG LUẬT SỐ 0
 >
 > Anh Luân: *"Ủa còn việc sao ko làm mà lại rảnh???"* - đúng, em liệt kê bốn việc tồn rồi bảo

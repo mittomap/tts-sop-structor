@@ -718,6 +718,10 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .bstatsw{position:relative;margin-bottom:16px}
 .bstatsw .bstats{margin-bottom:0}
 .thewrap{position:relative;display:flex;justify-content:flex-end;margin-bottom:6px}
+/* Dải thẻ có NHÃN (khai `ttl` trong THEDEF): nhãn đứng bên trái, nút "Thẻ (n/N)" vẫn canh phải -
+   dùng đúng hàng đã có sẵn, không dựng thêm khối nào. Chỉ những trang KHÔNG gọi `pageHead` mới
+   cần: ở các trang khác, tiêu đề trang ngay trên đã nói dải thẻ này của cái gì. */
+.thewrap.cottl{justify-content:space-between;align-items:center}
 .thewrap .colmenu{top:calc(100% + 4px);min-width:250px}
 /* ===== V9.27 NGON NGU CHUNG: BAM DUOC vs CHI DE XEM =====
    Truoc day o bam duoc va o chi hien so trong y het nhau nen nguoi dung khong biet cho nao bam duoc.
@@ -2316,7 +2320,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">09/08/2026 · <b>8b7802</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">09/08/2026 · <b>2d12de</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -4190,7 +4194,7 @@ var THEDEF={
   ["bv_mk_thuong","Thưởng giới thiệu chưa trao","Bạn được giới thiệu đã đăng ký mà người giới thiệu chưa nhận thưởng. Hứa mà không trao là mất uy tín chương trình. Danh sách: mở trang Mã giới thiệu."],
   ["bv_no_phi","Đơn còn nợ phí","Đăng ký còn hiệu lực mà vẫn còn tiền chưa thu. Danh sách: trang Tuyển sinh, bước Thanh toán."],
   ["bv_thu_soat","Phiếu thu chờ đối soát","Phiếu thu đã ghi mà kế toán chưa xác nhận. Danh sách: Chờ duyệt › Xác nhận thu tiền."]]},
- banlam:{t:"Trang bắt đầu",the:[
+ banlam:{t:"Trang bắt đầu",ttl:"Hàng chờ trên hành trình khách",the:[
   ["bl0_appt","Tới hẹn hôm nay","Số hồ sơ có lịch hẹn liên hệ rơi vào hôm nay, cộng phần đã quá hẹn từ hôm trước. Danh sách: chip Tới hẹn / quá hẹn. ngay dưới."],
   ["bl0_risk","Học viên nguy cơ","Học viên đang bị đánh dấu nguy cơ trên trục chuyên cần hoặc trục học thuật, toàn trung tâm. Danh sách: Học viên nguy cơ."],
   ["bl0_wow","WOW chờ xử lý","Buổi WOW đã đặt/đã xác nhận chưa dạy, cộng buổi đã dạy mà coach chưa ghi nội dung. Danh sách: WOW."],
@@ -4373,7 +4377,15 @@ function theBoxIn(key){var parts=THEHTML[key]||[];
  var hien=0,tong=parts.length,body="";
  parts.forEach(function(p){if(theHidden(p[0]))return;hien++;body+=p[1]});
  var neo=(THEDEF[key]&&THEDEF[key].neo)||"bstats";
- return '<div class="thewrap"><button class="btn'+(hien<tong?" primary":"")+' sm" onclick="theMenuToggle(\''+esc(key)+'\')" data-tip="Chọn thẻ nào hiện trên trang này - giống nút Cột của bảng. Lựa chọn được nhớ lại và không mất khi reset dữ liệu demo."><i class="ti ti-layout-cards"></i>Thẻ ('+hien+'/'+tong+')</button>'+theMenuHTML(key)+'</div>'+
+ /* NHÃN CỦA DẢI. Tìm ra lúc audit tay 09/08: trên Trang bắt đầu, dải thẻ này nằm kẹp giữa panel
+    "KPI của tôi" và panel "Nhịp ngày của bạn" - hai bên đều có tiêu đề, còn nó thì trơ một hàng
+    số với một nút "Thẻ (1/1)" lơ lửng, không câu nào nói đây là số của cái gì. Trang bắt đầu là
+    trang DUY NHẤT không gọi `pageHead` (xem ghi chú V9.60), nên nó cũng là trang duy nhất mất
+    câu ngữ cảnh mà mọi trang khác được `pageHead` phát cho. Khai `ttl` là vá đúng chỗ thủng đó,
+    và chỉ trang nào khai mới có - trang có `pageHead` mà thêm nhãn là nói hai lần. */
+ var ttl=(THEDEF[key]&&THEDEF[key].ttl)||"";
+ return '<div class="thewrap'+(ttl?" cottl":"")+'">'+(ttl?'<span class="tblbl">'+esc(ttl)+'</span>':'')+
+  '<button class="btn'+(hien<tong?" primary":"")+' sm" onclick="theMenuToggle(\''+esc(key)+'\')" data-tip="Chọn thẻ nào hiện trên trang này - giống nút Cột của bảng. Lựa chọn được nhớ lại và không mất khi reset dữ liệu demo."><i class="ti ti-layout-cards"></i>Thẻ ('+hien+'/'+tong+')</button>'+theMenuHTML(key)+'</div>'+
   (neo==="bstats"
   /* Viết THẲNG chuỗi `data-tour="bstats"` cho trường hợp mặc định: bộ kiểm hướng dẫn quét MÃ
      NGUỒN tìm literal, ghép biến là neo "tàng hình" với nó - đúng cái bẫy đã ghi ở V9.60. */
@@ -4769,7 +4781,13 @@ function fltOpen(pg){var ax=fltAxes(pg);if(!ax.length){toast("Trang này chưa k
  h+='<div class="dact"><button class="btn primary" onclick="closeModal()"><i class="ti ti-check"></i>Xem '+n+' dòng</button>'+
   '<button class="btn" onclick="fltSaveForm(\''+esc(pg)+'\')"><i class="ti ti-bookmark"></i>Lưu bộ lọc này</button>'+
   (fltOn(pg)?'<button class="btn" onclick="fltClear(\''+esc(pg)+'\');closeModal()"><i class="ti ti-filter-off"></i>Bỏ hết lọc</button>':'')+'</div></div>';
- openDrawer("Bộ lọc · "+esc((PBK[pg]||{}).t||pg),h)}
+ /* KHÔNG `esc()` chỗ này: `openDrawer` đặt tiêu đề bằng `textContent`, nên chuỗi đã escape sẽ
+    hiện NGUYÊN thực thể ra màn - "Tư vấn &amp; Đăng ký sau test". Bẫy cắn 09/08, tìm ra lúc
+    audit tay: 20 trang có dấu "&" trong tên đều lộ chữ máy trên đầu ngăn kéo Bộ lọc, mà không
+    bộ kiểm nào đi qua vì cả `_checkbam` lẫn `_checkmat` chỉ soi THÂN ngăn kéo và thân trang.
+    Escape hai lần và không escape lần nào đều sai; đúng là escape ĐÚNG MỘT LẦN, ở đúng tầng
+    nó được ghép vào HTML - `textContent` đã là tầng an toàn rồi. */
+ openDrawer("Bộ lọc · "+((PBK[pg]||{}).t||pg),h)}
 function fltDropRun(arg){var i=String(arg).indexOf("|");fltDrop(String(arg).slice(0,i),String(arg).slice(i+1))}
 /* nút + chip trên thanh công cụ: lúc nào cũng thấy mình đang lọc những gì, gỡ được từng cái */
 /* Thanh gọn cho trang KHÔNG có dải tab lọc: chỉ ô tìm + nút xuất + số dòng. Dùng lại đúng
@@ -8741,7 +8759,24 @@ function jInfo(pid,ix){var C=jCtx(pid,ix);var k=jStageOf(C);var S=JBY[k]||JBY.ne
  var over=(lim>0&&ageH!=null&&ageH>lim);
  var miss=S.need(C)||[];
  var act=S.act(C);
- var naCode=jNaCode(k,over);var naMsg=msgText(naCode);
+ var naCode=jNaCode(k,over);
+ /* ═══ LUẬT SỐ 0 - MÀN HÌNH NÓI NGƯỢC VỚI CHÍNH APP (tìm ra khi audit tay 09/08) ═══
+    Đọc ngăn kéo 360 của HV061 như người dùng lần đầu thì gặp ba câu cãi nhau trên MỘT màn:
+      · đầu ngăn kéo: chip "Nguy cơ", kèm "VÌ SAO GẮN CỜ: thiếu 3 bài (ngưỡng 3)"
+      · cuối ngăn kéo: "Việc cần làm theo SOP · NA018: HV đang học đều và ổn định. Không cần
+        làm gì thêm."
+    Gốc: `jNaCode` chọn câu việc THEO CHẶNG (`JNA.learning=["NA018",""]`) - nó không hỏi hồ sơ
+    này có đang bị gắn cờ nguy cơ hay không. Trong khi `naFor("DL09",S)` - hàm mà `check_sop.py`
+    chạy thật trên 93 tình huống của sổ trigger HD3 - trả đúng NA015/NA016/NA017/NA064/NA065.
+    Đo được: 13/13 học viên đang học mà có nguy cơ đều bị màn hình bảo "không cần làm gì thêm".
+    Đây đúng cái LUẬT SỐ 0 cấm: SOP mô tả năm mức can thiệp, app TÍNH ĐƯỢC cả năm, nhưng chỗ
+    người ta thật sự đọc lại in câu mặc định của chặng. App biết mà không nói ra thì cũng bằng
+    không biết - tệ hơn, nó còn trấn an nhầm.
+    Vá ở ĐÚNG một chỗ: `jInfo` là cửa duy nhất mọi màn hành trình (thẻ chặng, hồ sơ 360, Chạy
+    quy trình, chuông) lấy `na`/`naMsg`, nên sửa đây là mười mấy màn cùng đúng, không phải vá
+    từng màn. Chỉ đè khi hồ sơ là HỌC VIÊN và đang có cờ nguy cơ - còn lại giữ nguyên câu chặng. */
+ try{if(C.S&&stuRisk(C.S)){var _naR=naFor("DL09",C.S);if(_naR&&msgText(_naR))naCode=_naR}}catch(e){}
+ var naMsg=msgText(naCode);
  return {C:C,k:k,S:S,since:since,ageH:ageH,sla:lim,over:over,miss:miss,act:act,na:naCode,naMsg:naMsg,
   name:C.name,phone:C.phone,owner:C.ownerName||C.owner}}
 function jAll(){var ix=jIndex(),out=[],seen={};
@@ -11631,11 +11666,39 @@ function baocaoThan(_xemAi){
 function revByMonth(){var m={};srows("DL07").forEach(function(p){var d=pvnd(p.payment_time);if(!d)return;var k=d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2);m[k]=(m[k]||0)+num(p.amount)});var ks=Object.keys(m).sort().slice(-6);return ks.map(function(k){return [k.slice(5)+"/"+k.slice(2,4),Math.round(m[k]/1000000)]})}
 
 function renderBanggiao(embed){
- var staff=rows("DL01").filter(function(s){return /sales/.test(ecode(s.role))});
- var src=window.BGSRC||(staff[0]&&staff[0].staff_id)||"";
- var others=staff.filter(function(s){return s.staff_id!==src});
+ /* ═══ RÒ RỈ PHẠM VI - tìm ra khi audit tay 09/08, đóng vai NV017 (NV Tư vấn Cơ sở 3) ═══
+    Ô "Từ NV" trước bản này liệt kê THẲNG mọi nhân viên tư vấn của cả 5 cơ sở, và chọn ai là cả
+    trang đổi theo người đó: dải số "Lead NV này đang ôm", danh sách lead đầy đủ kèm tên, số điện
+    thoại, trạng thái. Một nhân viên tư vấn Cơ sở 3 đọc trọn sổ lead của đồng nghiệp Cơ sở 1 -
+    trong khi mọi bảng khác của họ đều đã cắt đúng theo cơ sở. Đây là lỗ NẶNG hơn ô "Của giảng
+    viên" cùng đợt: nó không chỉ lộ con số, nó lộ cả danh sách khách kèm số điện thoại.
+    LUẬT: bàn giao lead CỦA MÌNH thì ai cũng làm được (nghỉ phép, quá tải); chuyển lead GIỮA HAI
+    NGƯỜI KHÁC là việc của quản lý.
+    ĐỪNG DÙNG `myTeam()` CHO NGƯỜI THƯỜNG - đo được 09/08: `myTeam()` gom cả "cùng phòng, cấp
+    thấp hơn", nên với NV017 (NV Tư vấn Cơ sở 3) nó vẫn trả về thêm NV024. Hàm ấy sinh ra để
+    trả lời "đội CỦA MỘT QUẢN LÝ gồm ai", hỏi nó thay cho câu "tôi được xem sổ của ai" là mượn
+    một câu trả lời gần đúng - mà gần đúng trong phân quyền là sai. Nên tách thẳng hai vế.
+    Ô "Sang NV" giữ nguyên cả danh sách: đó là người NHẬN, cho đi thì không đọc được gì của họ. */
+ var bgQL=false;try{bgQL=banQuanLy()}catch(e){}
+ var bgTeam=null;
+ if(!bgQL)bgTeam=(function(){var o={};if(CURSTAFF)o[CURSTAFF]=1;return o})();
+ else if(!(function(){try{return banToanQuyen()}catch(e){return false}})()){try{bgTeam=myTeam()}catch(e){bgTeam=null}}
+ var staffAll=rows("DL01").filter(function(s){return /sales/.test(ecode(s.role))});
+ var staff=staffAll.filter(function(s){return !bgTeam||bgTeam[s.staff_id]});
+ var src=(bgQL?window.BGSRC:"")||"";
+ if(src&&!staff.some(function(s){return s.staff_id===src}))src="";
+ if(!src)src=(staff.some(function(s){return s.staff_id===CURSTAFF})?CURSTAFF:((staff[0]&&staff[0].staff_id)||CURSTAFF||""));
+ var others=staffAll.filter(function(s){return s.staff_id!==src});
  var h=embed?'':'<div class="phead" data-tour="phead"><div><div class="t">Bàn giao lead</div><div class="s">Chuyển lead từ một NV sang NV khác (khi nghỉ / quá tải). NV nhận mới thấy lead, NV cũ không còn thấy.</div></div></div>';
- h+='<div class="fbar"><span class="lbl">Từ NV</span><select class="sel" onchange="window.BGSRC=this.value;reRender(CUR)">'+staff.map(function(s){return '<option value="'+esc(s.staff_id)+'"'+(s.staff_id===src?" selected":"")+'>'+esc(s.staff_id+" - "+s.full_name)+'</option>'}).join("")+'</select>';
+ /* Không phải quản lý thì KHÔNG bày ô chọn - chỉ có một lựa chọn là chính mình, mà một ô chọn
+    chỉ có một dòng (hoặc rỗng, như đo được ở NV017) là mời người ta bấm vào một cái không mở ra
+    gì. Ghi thẳng tên mình cho họ đọc, đúng chỗ ô chọn từng đứng. */
+ h+='<div class="fbar"><span class="lbl">Từ NV</span>'+
+  (bgQL
+   ?'<select class="sel" onchange="window.BGSRC=this.value;reRender(CUR)">'+staff.map(function(s){return '<option value="'+esc(s.staff_id)+'"'+(s.staff_id===src?" selected":"")+'>'+esc(s.staff_id+" - "+s.full_name)+'</option>'}).join("")+'</select>'
+   :(src
+     ?'<b>'+esc(src+" - "+(((find("DL01","staff_id",src))||{}).full_name||"bạn"))+'</b><span class="mut" style="font-size:11.5px;margin-left:6px">bạn chỉ bàn giao được lead của chính mình</span>'
+     :'<span class="mut" style="font-size:11.5px">chức danh của bạn không giữ sổ lead nên không có gì để bàn giao</span>'));
  h+='<span class="lbl">Sang NV</span><select class="sel" id="bgDest">'+others.map(function(s){return '<option value="'+esc(s.staff_id)+'">'+esc(s.staff_id+" - "+s.full_name)+'</option>'}).join("")+'</select>';
  /* V9.64 (anh Luân: *"chỗ này bàn giao mà thiếu tính năng thời gian trả lại nè"*).
     Đúng, và cái sót ở đây khó thấy hơn một tính năng chưa làm: BÀN GIAO TẠM ĐÃ CÓ SẴN - hai cột
@@ -17600,17 +17663,34 @@ function renderHtLop(embed){var fil=window.HTLOPQ||"all";
    '<td><button class="btn sm" onclick="openLop(\''+esc(c.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Vận hành</button></td></tr>'});
  return h+'</tbody></table></div></div>'}
 function renderHtToday(embed){
- var gvs=rows("DL01").filter(function(x){return /teacher|wow/.test(ecode(x.role))});
+ /* ═══ RÒ RỈ PHẠM VI DỮ LIỆU - tìm ra khi audit tay 09/08, đóng vai NV005 (Giáo viên ACA) ═══
+    Ô "Của giảng viên" trước bản này liệt kê THẲNG `rows("DL01")` lọc theo vai, không hỏi phạm
+    vi lấy một câu. Đo được: một giáo viên thường mở Buổi hôm nay là có ngay ô chọn 14 giảng
+    viên, bấm sang ai cũng thấy đủ số buổi, bài chờ chấm, buổi nợ nhận xét của người đó.
+    Đúng họ hàng với lỗ đã cắn ở V9.91 (Leader Tư vấn Cơ sở 1 khai "team" mà nhìn thấy 82 học
+    viên toàn hệ thống): danh sách người được dựng bằng một phép lọc RIÊNG thay vì hỏi lại luật
+    phạm vi chung. App đã có sẵn đúng hai câu hỏi cần: `banQuanLy()` - người này có được xem
+    việc của người khác không, và `myTeam()` - đội của họ gồm ai. Chỉ là ô này chưa hỏi.
+    Người không phải quản lý: KHÔNG vẽ ô chọn, và ghim `gid` vào chính họ - không còn cửa nào
+    để đặt `window.HTGV` sang người khác từ màn này. */
  var me=find("DL01","staff_id",CURSTAFF);
- var gid=window.HTGV||((me&&/teacher|wow/.test(ecode(me.role)))?me.staff_id:"")||"";
+ var htQL=false;try{htQL=banQuanLy()}catch(e){}
+ var htTeam=null;
+ if(htQL&&!(function(){try{return banToanQuyen()}catch(e){return false}})()){try{htTeam=myTeam()}catch(e){htTeam=null}}
+ var gvs=rows("DL01").filter(function(x){return /teacher|wow/.test(ecode(x.role))&&(!htTeam||htTeam[x.staff_id])});
+ var gid=(htQL?window.HTGV:"")||((me&&/teacher|wow/.test(ecode(me.role)))?me.staff_id:"")||"";
+ if(htQL&&gid&&!gvs.some(function(g){return g.staff_id===gid})&&gid!==(me||{}).staff_id)gid="";
  var today=new Date();
  var ses=srows("DL11").filter(function(x){var d=pvnd(x.session_date);return d&&sameDay(d,today)&&(!gid||String(x.teacher_id||"")===gid)});
  ses.sort(function(a,b){return (pvnd(a.session_date)||0)-(pvnd(b.session_date)||0)});
  var hwQ=srows("DL13").filter(function(x){return hwSubmitted(x)&&!hwGraded(x)&&(!gid||String(x.teacher_id||"")===gid)});
  var owe=srows("DL11").filter(function(x){var st=bhState(x);return st.done&&!st.note&&(!gid||String(x.teacher_id||"")===gid)});
  var wowT=srows("DL14").filter(function(w){var d=pvnd(w.wow_session_date);return d&&sameDay(d,today)&&(!gid||String(w.staff_id||"")===gid)&&!isc(w.wow_status,"cancelled")});
- var h='<div class="fbar"><span class="lbl">Của giảng viên</span><select class="sel" onchange="window.HTGV=this.value;reRender(CUR)"><option value="">-- tất cả GV --</option>'+
-  gvs.map(function(g){return '<option value="'+esc(g.staff_id)+'"'+(g.staff_id===gid?" selected":"")+'>'+esc(g.staff_id+" - "+g.full_name)+'</option>'}).join("")+'</select></div>';
+ var h=htQL
+  ?'<div class="fbar"><span class="lbl">Của giảng viên</span><select class="sel" onchange="window.HTGV=this.value;reRender(CUR)"><option value="">'+
+   esc(htTeam?"-- cả đội của tôi --":"-- tất cả GV --")+'</option>'+
+   gvs.map(function(g){return '<option value="'+esc(g.staff_id)+'"'+(g.staff_id===gid?" selected":"")+'>'+esc(g.staff_id+" - "+g.full_name)+'</option>'}).join("")+'</select></div>'
+  :'';
  h+=statStrip([["ti-calendar-check",ses.length,"Buổi dạy hôm nay","#2E5A88",""],
   ["ti-star",wowT.length,"Buổi WOW hôm nay","#DB2777",""],
   ["ti-book",hwQ.length,"Bài chờ chấm","#7C3AED","SLA "+slaChip("slaHomeworkGrading_hours",48)],

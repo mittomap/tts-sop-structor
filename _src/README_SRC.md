@@ -566,3 +566,40 @@ Chi tiet "vi sao" o `02_NHAT_KY_QUYET_DINH.md`. O day chi ghi nhung cho **cham v
   `banlam` - trang dap cua **ban v5**. O v6 moi chuc danh dap xuong `ban` nen neo roi ra ngoai.
   Nay `p` doc `V6()`. **Luat lai lan nua: ban do nao cam cung theo mot ban build thi ban kia se
   lang le mat tinh nang.**
+
+## 09/08 - BA PHEP HOI MOI, SINH RA TU MOT DOT AUDIT TAY (khong them bo kiem nao)
+
+`./verify.sh` xanh het 31m41s, 0 cho do - roi ngoi nhin man hinh van ra **sau loi**, hai trong do
+la **ro ri pham vi du lieu that**. Ba phep hoi duoi day va dung ba lo hong ay, gan vao bo kiem DA
+CO chu khong dung them bo moi (hoi dong 08/08: them mot bo la them mot cho phai nuoi).
+
+- **`_checknguoi` - O CHON NGUOI KHAC.** Nguoi **khong phai quan ly** ma man hinh bay ra `<select>`
+  mang ma nhan vien cua nguoi khac thi do. Bat duoc hai lo that: o *"Cua giang vien"* tren Buoi hom
+  nay (giao vien thuong chon xem so cua **14 giang vien** khac) va o *"Tu NV"* tren Ban giao lead
+  (nhan vien tu van thuong doc **tron so lead cua dong nghiep ca 5 co so, kem ten va so dien thoai**).
+  **VI SAO 40 BO KIEM CU KHONG THAY - cau nay phai nho:** `_checknguoi` von so **SO DONG** danh sach
+  giua nhung nguoi cung chuc danh. Mot o chon **khong lam doi so dong nao ca** - no chi mo mot canh
+  cua. *Pham vi du lieu khong chi la "toi thay bao nhieu dong", no con la "toi doi duoc sang nhin ai".*
+  **Chi soi o DOI MAN NHIN** (co `onchange` ve lai trang), khong soi o nhap cua cua ghi: ban dau gop
+  ca hai nen to oan `id="bgDest"` - o chon NGUOI NHAN, ma nghiep vu ban giao khong the thieu. Cho
+  di thi khong doc duoc gi cua nguoi kia. Ngoai le khai o `ROR_BOQUA` kem **ly do doc duoc**.
+
+- **`_checkbam` - HOI CA TIEU DE NGAN KEO, KHONG CHI THAN.** Cau cu chi soi `than.chu`, nen **tieu de
+  ngan keo la mot vung KHONG AI DO**. Do la cho lot `Tu van &amp; Dang ky sau test`: `openDrawer` dat
+  tieu de bang `textContent` ma cho goi lai `esc()` truoc - escape HAI LAN, 16 trang co dau "&" deu
+  dinh. Nay danh sach chu may co them thuc the HTML (`&amp;` `&lt;` `&gt;` `&quot;` `&nbsp;` `&#nn;`):
+  mot thuc the con song tren man luon luon la dau hieu escape hai lan.
+
+- **`_checkmat` - QUET THUC THE HTML TREN CHU NGUOI DOC THAY.** Cung con benh, do o tam ca app: 15
+  trang, doc `textContent`. **Phai hoi o tang `textContent`, khong hoi `innerHTML`** - trong ma nguon
+  `&amp;` la cach viet DUNG cua mot dau "&", khong phan biet duoc.
+
+**Bay cua chinh nguoi do, ghi lai vi mot buoi cắn nam lan, deu mot ho:**
+truyen **ma chuc danh** vao `gateEnter` (no doi ma NHAN VIEN, khong thay thi roi ve nhom mac dinh -
+ca sau nguoi cung dap xuong `giaoviec`) · dung **mot tab** cho nhieu nguoi (tinh nang "F5 giu nguyen
+trang" ghi dia chi vao URL nen tu nguoi thu hai tro di ai cung roi ve trang nguoi dau) · build ra
+**goc repo** roi trich JS bang **mac dinh `_src`** (dung bay da ghi san trong `extract_js.py`, `_APP.js`
+la ban CU) · goi `naFor(s)` mot tham so (that ra `naFor(sheet,r)`) roi dem ra 0 · dung `myTeam()` cho
+nguoi thuong (ham ay gom ca "cung phong, cap thap hon" - no tra loi *"doi cua mot quan ly gom ai"*,
+khong tra loi *"toi duoc xem so cua ai"*).
+**LUAT: khi so do ra vo ly, doc lai PHEP DO truoc khi doc lai app.**

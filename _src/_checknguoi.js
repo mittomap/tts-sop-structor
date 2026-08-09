@@ -24,6 +24,13 @@
 
    Chạy: ITTS_APP=./_APP.js node _checknguoi.js */
 
+/* Trang co o chon nguoi ma KHONG phai lo ro - moi dong phai noi duoc VI SAO. */
+const ROR_BOQUA = {
+  ketqua: "ba o loc cua trang Ket qua dau ra dung tu CHINH danh sach ket qua nguoi nay dang mo " +
+          "(bien `all` da qua pham vi); ten giang vien trong o la ten da hien san o cot ben canh - " +
+          "loc lai mot danh sach dang mo khong mo them cua nao",
+};
+
 const APP = process.env.ITTS_APP || "./_APP.js";
 const FS = require("fs");
 
@@ -121,6 +128,11 @@ function motNguoi(S) {
      `canSee` từng mục - và tố oan cả 37 người là "menu bày ra 30 mấy mục không được xem", trong
      khi `navCay()` chỉ là CÂY ĐẦY ĐỦ còn `buildNav` mới lọc bằng `navVis` trước khi vẽ. Đo cái
      danh mục thay cho cái menu thì con số nào cũng to và cũng sai. */
+  let quanLy = true; try { quanLy = !!banQuanLy(); } catch (e) {}
+  const roRi = [];
+  /* NGOẠI LỆ, PHẢI CÓ LÝ DO ĐỌC ĐƯỢC - im lặng bỏ qua một trang là cách lỗ rò biến mất khỏi
+     phép canh. Chỉ được khai ở đây khi ô chọn dựng TỪ CHÍNH dữ liệu người xem đã thấy: lọc lại
+     một danh sách đang mở không mở thêm cửa nào. Khai vì "trang này chắc không sao" là sai. */
   let muc = [];
   try {
     buildNav();
@@ -143,9 +155,37 @@ function motNguoi(S) {
     soTrang++;
     if (/ngoài phạm vi chức danh của bạn/.test(h)) duoi.push(k);
     if (trangTrong(h)) trong.push(k);
+
+    /* 4b. Ô CHỌN NGƯỜI KHÁC trên màn của người KHÔNG PHẢI QUẢN LÝ.
+       BAY DA CAN 09/08, tim ra bang tay khi dong vai NV005 (Giao vien ACA): trang Buoi hom nay
+       bay ra o "Cua giang vien" liet ke thang 14 giang vien - bam sang ai cung thay du so buoi,
+       bai cho cham, buoi no nhan xet cua nguoi do. Ho hang voi lo V9.91 (Leader Tu van Co so 1
+       khai "team" ma nhin thay 82 hoc vien toan he thong): danh sach nguoi duoc dung bang mot
+       phep loc RIENG thay vi hoi lai luat pham vi chung (`banQuanLy` + `myTeam`).
+       Vi sao khong bo kiem nao thay: `_checknguoi` von so SO DONG danh sach giua nhung nguoi
+       cung chuc danh - ma o chon khong lam doi so dong nao ca, no chi mo mot canh cua. Pham vi
+       du lieu khong chi la "toi thay bao nhieu dong", no con la "toi doi duoc sang nhin ai".
+       Phep hoi: mo o chon nao co ma nhan vien cua NGUOI KHAC thi nguoi xem phai la quan ly. */
+    if (!quanLy && !ROR_BOQUA[k]) {
+      /* CHỈ SOI Ô CHỌN ĐỔI MÀN NHÌN, không soi ô nhập của cửa ghi.
+         Hai thứ trông giống nhau trong HTML mà khác hẳn về nghĩa: ô có `onchange` đặt biến rồi
+         `reRender` là NGƯỜI XEM đang đổi sang nhìn sổ của ai đó - đúng thứ phải chặn; ô không có
+         onchange (vd `id="bgDest"` của Bàn giao lead) là Ô NHẬP: người ta chọn NGƯỜI NHẬN để
+         giao lead đi, cho đi thì không đọc được gì của người kia. Bản đầu của phép hỏi này gộp
+         cả hai nên tố oan đúng cái nút mà nghiệp vụ bàn giao không thể thiếu. */
+      const dsSel = (h.match(/<select[\s\S]{0,4000}?<\/select>/g) || [])
+        .filter(s => /^<select[^>]*\sonchange=/.test(s));
+      dsSel.forEach(s => {
+        const ma = [...new Set((s.match(/value="(NV\d+)"/g) || []).map(x => x.slice(7, -1)))]
+          .filter(x => x !== S.staff_id);
+        if (ma.length) roRi.push(k + ": o chon nguoi khac (" + ma.length + " nguoi: " + ma.slice(0, 4).join(",") + ")");
+      });
+    }
   });
   R.trong = trong;
   if (duoi.length) R.loi.push("menu MOI ROI DUOI - bam vao chi nhan man tu choi: " + duoi.join(", "));
+  R.roRi = [...new Set(roRi)];
+  R.roRi.forEach(x => R.loi.push("RO RI PHAM VI - nguoi nay khong phai quan ly ma " + x));
 
   /* 5. việc của chính họ, hoặc chỉ đường */
   let cuaToi = 0, hoSo = 0;

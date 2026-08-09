@@ -190,8 +190,15 @@ const BOQUA = {
             if (moc && dayDu.indexOf(moc) < 0)
               do_.push(nhan(nhanO + ': ngan keo mo ra KHONG NHAC toi ho so vua bam ("' + moc + '" khong co trong "' +
                 sau.keoTen + '")'));
-            /* (b) KHONG LO CHU MAY ra man hinh */
-            const may = (than.chu.match(/undefined|NaN|\[object Object\]|\bnull\b/) || [])[0];
+            /* (b) KHONG LO CHU MAY ra man hinh - HOI CA TIEU DE, KHONG CHI THAN.
+               BAY DA CAN 09/08 (tim ra bang tay, khong bo kiem nao thay): `openDrawer` dat tieu de
+               bang `textContent`, ma cho goi lai `esc()` truoc khi truyen vao - nen 20 trang co
+               dau "&" trong ten deu hien "Tu van &amp; Dang ky sau test" tren dau ngan keo Bo loc.
+               Cau nay von chi soi `than.chu` (than ngan keo) nen tieu de la mot vung KHONG AI DO.
+               Nay hoi ca hai, va them thuc the HTML vao danh sach chu may: mot thuc the con song
+               tren man la dau hieu escape hai lan, luon luon la loi. */
+            const chuMan = (sau.keoTen || "") + " " + than.chu;
+            const may = (chuMan.match(/undefined|NaN|\[object Object\]|\bnull\b|&(?:amp|lt|gt|quot|nbsp|#\d+);/) || [])[0];
             if (may) do_.push(nhan(nhanO + ": ngan keo lo chu may '" + may + "' ra man hinh"));
             /* (c) KHONG PHAI NGO CUT: hoac co viec de lam tiep, hoac du day la ban doc */
             if (!than.nut && than.chu.length < 400)

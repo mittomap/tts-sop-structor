@@ -95,7 +95,7 @@ const CAT_OK = [
       await new Promise(r => setTimeout(r, 340));
       const c = document.getElementById("content");
       if (!c) return {loi: "khong co than trang"};
-      const ra = {cat: [], che: [], hep: [], moCoi: [], deNhau: [], dem: 0};
+      const ra = {cat: [], che: [], hep: [], moCoi: [], deNhau: [], thucThe: [], dem: 0};
 
       /* Thước đo bề rộng THẬT của một đoạn chữ với đúng font của nó. Dựng một lần, dùng lại. */
       const do_ = document.createElement("span");
@@ -200,6 +200,19 @@ const CAT_OK = [
           return r.width > 0 && r.height > 0;
         };
         const than = document.getElementById("content"); if (!than) return;
+        /* THUC THE HTML CON SONG TREN MAN - dau hieu escape HAI LAN.
+           Bay cắn 09/08: `openDrawer` dat tieu de bang `textContent` ma cho goi lai `esc()` truoc,
+           nen ten trang co dau "&" hien nguyen "&amp;". Doc bang `textContent` moi thay: doc
+           `innerHTML` thi "&amp;" la cach viet DUNG cua mot dau "&", khong phan biet duoc.
+           Vi the phai hoi o tang chu NGUOI DOC THAY, dung o tang ma nguon. */
+        {
+          const t = String(than.textContent || "");
+          const m = t.match(/&(?:amp|lt|gt|quot|apos|nbsp|#\d+);/g);
+          if (m) [...new Set(m)].forEach(x => {
+            const i = t.indexOf(x);
+            ra.thucThe.push(x + '  (trong "' + t.slice(Math.max(0, i - 26), i + x.length + 14).replace(/\s+/g, " ").trim() + '")');
+          });
+        }
         const la = [...than.querySelectorAll("*")].filter(el =>
           el.children.length === 0 && (el.textContent || "").trim().length > 0 && nhinThay(el));
         for (let i = 0; i < la.length; i++) for (let j = i + 1; j < la.length; j++) {
@@ -226,6 +239,7 @@ const CAT_OK = [
     gom(r.che, "BI PHU LEN - khong bam duoc");
     gom(r.moCoi, "DAU NGAN MO COI");
     gom(r.deNhau, "HAI KHOI CHU DE LEN NHAU");
+    gom(r.thucThe, "THUC THE HTML LO RA MAN - escape hai lan");
   }
 
   await browser.close();
