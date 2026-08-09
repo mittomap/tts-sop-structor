@@ -651,8 +651,23 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
     /* KHONG DUOC IM LANG BO QUA. Ban dau khoi nay bat loi roi `return` - va tren ban build CU
        (chua co hvXungLoc) no nem loi, txt rong, dem ra 0 "ban", the la bo kiem BAO XANH tren
        dung cai ban dang hong. Ve khong duoc thi phai DO. */
-    try{txt=String(hvXungLoc(renderTrangHV())).replace(/<[^>]*>/g," ").replace(/\s+/g," ")}
-    catch(e){conBan.push(q+": KHONG VE DUOC - "+e.message);return}
+    /* ĐO CẢ MÀN, KHÔNG CHỈ THÂN TRANG. Bẫy cắn 09/08, tìm ra bằng MẮT: nội dung nói đúng
+       "KHÓA CỦA ÔNG" mà menu ben trai van "Khoa cua ban". Cau nay von chi do
+       `hvXungLoc(renderTrangHV())` - dung cai phan da di qua cua doi xung ho - nen no bao xanh
+       trong khi ba loi di vong (menu `hvNav`, thanh tren `hvTopPaint`, dong tieu de `hvTopTitle`)
+       deu ghi thang `innerHTML` va giu nguyen chu "ban".
+       LUAT: do CAI NGUOI TA NHIN THAY, dung do cai minh nghi la ho nhin thay. Mot cua ra ma co
+       ba loi di vong thi no khong con la cua ra - va thuoc chi soi cua chinh se khong bao gio
+       thay ba loi kia. */
+    var phan=[];
+    try{phan.push(String(hvXungLoc(renderTrangHV())))}
+    catch(e){conBan.push(q+": KHONG VE DUOC than trang - "+e.message);return}
+    /* Menu + thanh tren: goi THAT roi doc lai DOM gia, dung doan chung viet gi. */
+    try{hvNav();phan.push(String((STORE.hvNav||{}).innerHTML||""))}catch(e){}
+    try{hvTopPaint();phan.push(String((STORE.hvTools||{}).innerHTML||""))}catch(e){}
+    try{(typeof HVSEC!=="undefined"?HVSEC:[]).forEach(function(x){
+      hvTopTitle(x[0]);phan.push(String((STORE.hvTopS||{}).textContent||""))})}catch(e){}
+    txt=phan.join(" ").replace(/<[^>]*>/g," ").replace(/\s+/g," ");
     if(txt.length<400){conBan.push(q+": ve ra gan nhu rong ("+txt.length+" ky tu)");return}
     var soBan=(txt.replace(/b\u1ea1n b\u00e8/gi," ").match(/\bb\u1ea1n\b/gi)||[]).length;
     if(soBan)conBan.push(q+": "+soBan+" cho");

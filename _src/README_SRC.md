@@ -603,3 +603,65 @@ la ban CU) · goi `naFor(s)` mot tham so (that ra `naFor(sheet,r)`) roi dem ra 0
 nguoi thuong (ham ay gom ca "cung phong, cap thap hon" - no tra loi *"doi cua mot quan ly gom ai"*,
 khong tra loi *"toi duoc xem so cua ai"*).
 **LUAT: khi so do ra vo ly, doc lai PHEP DO truoc khi doc lai app.**
+
+## 09/08 VONG HAI - BON PHEP HOI NUA TRONG `_checkaudit` (M9, M9b, M10, M11)
+
+Vong hai cua dot audit: soi rong hon bang MAT (16 trang + hai cong + ngan keo mo bang cua that),
+ra them **bay loi that**, van khong loi nao do bo kiem bao. Bon phep hoi duoi day sinh ra tu dung
+bay loi ay - va ca bon deu gan vao `_checkaudit`, khong dung them bo kiem moi.
+
+- **M9 - BA CAU CAI NHAU TREN MOT MAN.** Doc TRON mot man roi hoi cac cau tren man co noi nguoc
+  nhau khong. Bat duoc lo LUAT SO 0 to nhat tuan: ngan keo 360 vua ghi *"nguy co - thieu 3 bai"* o
+  dau, vua ghi *"NA018: dang hoc deu va on dinh, khong can lam gi them"* o cuoi. **13/13 hoc vien
+  dang hoc ma co nguy co** deu bi tran an nguoc. Phep hoi: ma viec SOP man hinh in ra (`jInfo().na`)
+  phai khop ma `naFor("DL09", ho so)` tinh duoc, moi khi ho so dang co co nguy co.
+  *Vi sao 40 bo kiem khong thay:* `check_sop.py` canh HAM `naFor` (dung), `_checkbam` canh ngan
+  keo co noi dung (dung), `_checklap` canh khong noi hai lan (dung). Khong bo nao hoi: **cai ham
+  tinh dung ay co duoc in ra man khong.** Cho noi giua ham dung va man hinh la mot vung trong.
+
+- **M9b - CAU RA LENH CON SONG TREN HO SO DA XONG.** The WOW mang chip "Xong" ma van ghi *"can xac
+  nhan giang vien... roi bao lai hoc vien do"* - **39/46 buoi** hoc vien tu dat. Goc: tron CAU SU
+  THAT ("hoc vien tu dat qua cong" - dung moi luc) voi CAU VIEC ("can xac nhan" - chi dung o nac
+  cho). *Mot man hinh noi doi vai cho nho thi nguoi dung thoi tin ca nhung cho no noi that.*
+  **Phep hoi nay sai HAI lan truoc khi dung** - ghi lai vi ca hai deu la bai hoc chung:
+  (1) soi chuoi HTML TRON TRANG -> do ca khi app da dung, vi trang luon co 13 buoi con o nac cho
+      va chung hien cau giuc la DUNG;
+  (2) cat theo the roi doc NHAN CHIP de doan trang thai -> van sai, vi chip la chip TIEN DO:
+      `booked`, `confirmed`, `cancelled` **cung hien "Dang xu ly"**.
+  Ban ba khop tung the ve DUNG BAN GHI cua no (ten hoc vien + ngay gio) roi hoi DL14. Chinh luot
+  do ay lo them mot loi that: **3 buoi da HUY deo chip "Dang xu ly"** - bac thang chip khong co
+  nhanh nao cho `cancelled`.
+
+- **M10 - O CHON MO CUA.** Doc MA NGUON tim moi o chon DOI MAN NHIN (`<select ... onchange=` co
+  `reRender`/`go(`/`window.X=`) dung danh sach nguoi tu `rows("DL01")` ma khong di qua mot cau hoi
+  pham vi. Bo sung cho `_checknguoi` (ve THAT tung trang tren menu tung nguoi): ve trang chi thay
+  nhung trang minh nghi ra de ve, doc ma thi thay ca nhung cho minh quen mat la co.
+  **Ban dau cat "than ham" bang tach chuoi o moi `function render[A-Z]`** - "than" cua `renderWow`
+  dai **33.691 ky tu**, om luon chuc ham khac, nen o `<select id="wa_stu">` cua FORM DAT BUOI bi
+  tinh thanh o cua `renderWow`. Nay cat bang DEM NGOAC.
+  Phan biet CUA XEM voi O NHAP bang cho `onchange` dan toi, khong bang su co mat cua no: `tk_to`
+  (chon nguoi NHAN viec) co `onchange="tkTypeAuto()"` nhung khong doi mot dong du lieu nao tren man.
+
+- **M11 - KIEU O KHAI RA MA BO VE O KHONG BIET.** Bang Hoc vien khai hai cot `calcso`, con `cell()`
+  chi hoi `calc`/`calcmoney` o cua vao - hai cot roi xuong nhanh chung, doc mot khoa khong ton tai,
+  in dau "-". **10/20 dong dau** ghi "-" trong khi may dem 1-3 bai thieu. Tinh nang duoc viet DUNG
+  roi chet ngay o cua vao va song chet lang le gan mot tuan, vi bang van ve ra binh thuong voi mot
+  dau gach **trong rat hop le**. *Cai chet lang le nhat cua mot tinh nang la no van ve ra duoc.*
+  Hai phep hoi: (a) CAU TRUC - moi kieu o khai trong `LISTCFG[*].cols` deu phai co ten trong than
+  `cell()` (bat duoc CA HO, khong can ai nghi ra truong hop cu the); (b) THUC TE - cot tinh ra so
+  > 0 thi khong duoc in dau gach.
+  **Ban dau tim chuoi trong ca CHU THICH** - mot cai ten chi duoc NHAC TOI trong ghi chu cung lam
+  no xanh, ke ca ghi chu vua viet ra de giai thich ban va. Nay boc chu thich truoc khi hoi.
+
+**`_checkmat` them 5 trang + 2 phep do.** Vua dung xong phep do "so bi be doi giua hai chu so" thi
+no bao xanh ngay - vi `bangcong`, trang DUY NHAT co loi ay, khong nam trong danh sach 15 trang no
+di qua. Dung cai bay ghi san o dau chinh file do. Them 5 trang (`bangcong` `giangvien` `baitap`
+`lichtuan` `tracuu` - deu la KIEU BO CUC rieng cua V2) thi bat ngay 2 loi khac chua ai tung do.
+
+**`_check14` do CA MAN cong phu huynh**, khong chi than trang: menu (`hvNav`), thanh tren
+(`hvTopPaint`), dong tieu de (`hvTopTitle`). Ba cho ay deu ghi thang `innerHTML`, di vong qua cua
+doi xung ho `hvXungLoc`. *Mot cua ra ma co ba loi di vong thi no khong con la cua ra - va thuoc chi
+soi cua chinh se khong bao gio thay ba loi kia.*
+
+**THUOC DO SAI THI DEN XANH CON NGUY HIEM HON DEN DO - vi den do thi nguoi ta di tim, con den xanh
+thi nguoi ta di ngu.**

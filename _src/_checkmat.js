@@ -43,8 +43,16 @@ const PATHS = ["/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
    Bai hoc: mot bo kiem "di qua cac trang chinh" thi cai gi khong nam tren duong di deu la vung
    toi. Danh sach nay phai phu du KIEU BO CUC, va "trang viec theo nhip ngay" la mot kieu rieng
    khong trang nao khac co. */
+/* V2 09/08 - THEM NAM TRANG. Lo "so bi be doi" (`10.660.0` / `00đ`) nam o `bangcong`, va
+   `bangcong` KHONG CO trong danh sach nay - nen phep do M6 vua dung xong da xanh ngay lap tuc
+   mot cach vo nghia. Dung cai bay ghi o dau file, lan nay tu can minh: mot bo kiem "di qua cac
+   trang chinh" thi cai gi khong nam tren duong di deu la vung toi.
+   Nam trang them vao deu la KIEU BO CUC rieng cua ban V2: dai the nhieu o mang so tien
+   (`bangcong`), trang ho so nguoi (`giangvien`), trang hai tang danh sach (`baitap`), trang
+   luoi thoi gian (`lichtuan`), trang muc luc (`tracuu`). */
 const TRANG = ["banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","hocvien",
-               "giaoviec","duyet","baocao","nhansu","khac","canhan","settings","viec"];
+               "giaoviec","duyet","baocao","nhansu","khac","canhan","settings","viec",
+               "bangcong","giangvien","baitap","lichtuan","tracuu"];
 
 /* Chỗ được phép cắt chữ, kèm lý do đọc được. Thêm dòng vào đây là một quyết định. */
 const CAT_OK = [
@@ -95,7 +103,7 @@ const CAT_OK = [
       await new Promise(r => setTimeout(r, 340));
       const c = document.getElementById("content");
       if (!c) return {loi: "khong co than trang"};
-      const ra = {cat: [], che: [], hep: [], moCoi: [], deNhau: [], thucThe: [], dem: 0};
+      const ra = {cat: [], che: [], hep: [], moCoi: [], deNhau: [], thucThe: [], soVo: [], dem: 0};
 
       /* Thước đo bề rộng THẬT của một đoạn chữ với đúng font của nó. Dựng một lần, dùng lại. */
       const do_ = document.createElement("span");
@@ -200,6 +208,25 @@ const CAT_OK = [
           return r.width > 0 && r.height > 0;
         };
         const than = document.getElementById("content"); if (!than) return;
+        /* M5 - CON SỐ BỊ BẺ ĐÔI GIỮA HAI CHỮ SỐ.
+           Bẫy cắn 09/08, tìm ra bằng mắt: ô "Tiền công tạm tính" hiện `10.660.0` rồi xuống dòng
+           `00đ`. `.bsn{overflow-wrap:anywhere}` đúng cho CHỮ dài (thà xuống dòng còn hơn tràn),
+           nhưng với một CON SỐ thì xuống dòng giữa chừng đọc ra một số khác hẳn - hại hơn tràn.
+           Bốn phép đo cũ không thấy: M1 hỏi "chữ có rộng hơn chỗ nó có không" - nó KHÔNG rộng
+           hơn, nó vừa khít vì đã tự bẻ; M3 hỏi ô hẹp giữa khoảng trống - chỗ này không thừa chỗ.
+           Phép hỏi: một ô chỉ chứa số + dấu ngăn + đơn vị mà cao hơn 1,6 lần chiều cao dòng thì
+           nó đang nằm trên hai dòng, tức đã bị bẻ. */
+        than.querySelectorAll(".bsn, .kpin, .bignum").forEach(el => {
+          const t = (el.textContent || "").trim();
+          if (!/^[\d.,\s]+(đ|h|%|đ\/giờ)?$/.test(t)) return;
+          if (!nhinThay(el)) return;
+          const cs = getComputedStyle(el);
+          const caoDong = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.2;
+          const r = el.getBoundingClientRect();
+          if (r.height > caoDong * 1.6)
+            ra.soVo.push('"' + t + '" nam tren ' + Math.round(r.height / caoDong) + ' dong (cao ' +
+                         Math.round(r.height) + 'px, dong ' + Math.round(caoDong) + 'px)');
+        });
         /* THUC THE HTML CON SONG TREN MAN - dau hieu escape HAI LAN.
            Bay cắn 09/08: `openDrawer` dat tieu de bang `textContent` ma cho goi lai `esc()` truoc,
            nen ten trang co dau "&" hien nguyen "&amp;". Doc bang `textContent` moi thay: doc
@@ -240,6 +267,7 @@ const CAT_OK = [
     gom(r.moCoi, "DAU NGAN MO COI");
     gom(r.deNhau, "HAI KHOI CHU DE LEN NHAU");
     gom(r.thucThe, "THUC THE HTML LO RA MAN - escape hai lan");
+    gom(r.soVo, "CON SO BI BE DOI GIUA HAI CHU SO");
   }
 
   await browser.close();

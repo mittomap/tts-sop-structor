@@ -485,6 +485,23 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .rcard.khoa{position:relative;opacity:.45;cursor:default;filter:grayscale(.7)}
 .rcard.khoa:hover{border-color:var(--line);box-shadow:none;transform:none}
 .rcard .gklock{position:absolute;top:8px;right:9px;font-size:13px;color:var(--muted)}
+/* THẺ MANG SỐ DÀI CHIẾM HAI CỘT. Tìm ra khi audit tay 09/08: trên Bảng công giảng dạy, ô
+   "Tiền công tạm tính" hiện `10.660.0` xuống dòng `00đ` - một con số bị bẻ đôi GIỮA HAI CHỮ SỐ,
+   đọc thành một số khác hẳn. Gốc là `.bsn{overflow-wrap:anywhere}`: luật ấy đúng cho chữ dài
+   (thà xuống dòng còn hơn tràn), nhưng với một con số thì xuống dòng giữa chừng còn tệ hơn tràn.
+   Đo thật trước khi sửa: thẻ rộng 158px, ô chữ còn 88px, mà chuỗi cần 114px ở cỡ 20px - và
+   **103px ở 18px, 97px ở 17px**. Tức là thu nhỏ chữ KHÔNG cứu được, có hạ ba bậc vẫn không vừa;
+   thẻ buộc phải rộng ra. Cho nó chiếm hai cột của chính lưới đã có - không thêm cỡ chữ, không
+   thêm khối, không đụng thẻ nào khác. */
+/* NGẮT DÒNG TRONG MỘT THANH `.fbar` (thanh vốn đã `flex-wrap:wrap`). Dùng khi một thanh chở cả
+   ô chọn dài lẫn một nhóm nút: để chung một hàng thì trình duyệt chia đều chỗ, và ô chọn là thứ
+   bị bóp. Đo được 09/08 ở trang Bài tập, tỷ lệ 100%: hai ô chọn còn 261px trong khi giá trị đang
+   chọn cần 392px - cắt mất đuôi tên lớp và tên bài. Cho nhóm nút xuống hàng của nó thì mỗi ô
+   chọn được nguyên nửa thanh. Không thêm khối, không thêm cỡ chữ - chỉ nói với dòng chảy sẵn có
+   rằng chỗ này phải xuống dòng. */
+.fbar>.fbbr{flex-basis:100%;height:0;margin:0;padding:0;border:0}
+.bstat.w2{grid-column:span 2}
+.bstat.w2 .bsn{overflow-wrap:normal}
 .bstatsw{position:relative;margin-bottom:16px}
 .bstatsw .bstats{margin-bottom:0}
 .thewrap{position:relative;display:flex;justify-content:flex-end;margin-bottom:6px}
@@ -3745,7 +3762,19 @@ function cell(r,col,sheet){var k=col[0],ty=col[2],v=r[k];
  /* V9.40: cột TÍNH - không đọc một ô nào của dòng, mà đếm từ bảng khác. Dùng cho "khóa này bán
     được bao nhiêu đơn" - con số quan trọng nhất của một dòng danh mục sản phẩm mà bảng gốc
     không có. Khóa 0 đơn tô đỏ để nó không trông giống khóa đang bán chạy. */
- if(ty==="calc"||ty==="calcmoney"){
+ /* `calcso` PHẢI có trong câu điều kiện này. Bẫy cắn từ V9.42 tới 09/08 - gần một tuần:
+    cửa vào chỉ hỏi `calc` và `calcmoney`, nên hai cột `calcso` (**Vắng (buổi)** và **Thiếu bài**
+    của bảng Học viên) không bao giờ đi vào đây; chúng rơi xuống nhánh chung, đọc `r["__vang"]`
+    - một khoá KHÔNG TỒN TẠI trong hàng - rồi in ra dấu "-". Bên trong khối này đã có sẵn dòng
+    xử lý `calcso` từ đầu, viết đúng, chỉ là không ai gọi tới.
+    Đo được lúc tìm ra: 10/20 dòng đầu bảng Học viên ghi "-" ở cột Thiếu bài trong khi máy đếm
+    1-3 bài thiếu cho chính những em ấy - trong đó có Trần Khánh Vy, người mà hồ sơ 360 nói rõ
+    "thiếu 3 bài (ngưỡng 3)". Một sự thật, hai chỗ, hai câu trả lời.
+    Đáng nói hơn: chính ghi chú V9.42 ngay dưới đây đã viết *"không có ba con số này thì cờ nguy
+    cơ chỉ là một cái nhãn"* - tính năng được viết ra vì lý do đó, rồi chết ngay ở cửa vào và
+    không ai hay, vì bảng vẫn vẽ ra bình thường với một dấu gạch trông rất hợp lệ.
+    LUẬT: thêm một KIỂU Ô mới thì phải đi hỏi lại MỌI câu điều kiện đang phân nhánh theo kiểu ô. */
+ if(ty==="calc"||ty==="calcmoney"||ty==="calcso"){
   var cv=calcCol(k,r,sheet);
   /* V9.63 (anh Luân: *"mấy cái từ như: chưa bán được đồng nào cấu hình ở đâu đấy?"*) - đúng,
      ba câu này là CHỮ HIỆN RA cho người dùng mà lại cắm cứng trong mã. Nay đi qua sổ đoạn gợi ý,
@@ -7474,9 +7503,20 @@ function pkMot(s){
  box.addEventListener("focusout",function(){setTimeout(function(){
   try{if(!box.contains(document.activeElement))pkDong(box)}catch(e){pkDong(box)}},0)});
  pkDongBo(box)}
-function pkNhac(s){var n=0,i;
- for(i=0;i<s.options.length;i++)if(s.options[i].value!=="")n++;
- return "Gõ để tìm trong "+n+" lựa chọn";}
+/* CÂU GỢI Ý PHẢI GIỮ LẠI CÁI NHÃN. Bẫy cắn 09/08, tìm ra bằng mắt trên trang Học viên: hai ô
+   lọc đứng cạnh nhau, cả hai chỉ ghi "Gõ để tìm trong 26 lựa chọn" / "Gõ để tìm trong 16 lựa
+   chọn" - không có gì nói ô nào là Lớp, ô nào là Khóa.
+   Gốc: `<select>` gốc mang dòng đầu "Mọi lớp" / "Mọi khóa" - chính dòng đó là nhãn, và nó hiện
+   ra khi chưa chọn gì. Nhưng lúc app đổi ô chọn thành ô GÕ TÌM thì câu gợi ý này thay chỗ nó,
+   và cái nhãn biến mất. Một bản vá cho dễ dùng (gõ để tìm) lấy mất một thứ đang dùng được.
+   Nay giữ cả hai, và giữ NGẮN: anh Luân đã kêu một lần vì mấy ô này hẹp, câu dài là bị cắt
+   (V9.99f). "Mọi lớp · gõ để tìm (26)" vừa nói mình là ô gì, vừa nói gõ được, vừa lọt khung. */
+function pkNhac(s){var n=0,i,nhan="";
+ for(i=0;i<s.options.length;i++){
+  if(s.options[i].value!=="")n++;
+  else if(!nhan)nhan=String(s.options[i].textContent||s.options[i].text||"").trim();}
+ nhan=nhan.replace(/^-+\s*/,"").replace(/\s*-+$/,"").trim();
+ return nhan?(nhan+" · gõ để tìm ("+n+")"):("Gõ để tìm trong "+n+" lựa chọn");}
 /* Ô gõ luôn hiển thị đúng thứ <select> đang giữ - gọi lại sau mỗi lần chọn hoặc mỗi lần app tự
    đặt giá trị. Không có bước này thì ô gõ và giá trị thật lệch nhau mà không ai hay. */
 function pkDongBo(box){var s=box.querySelector("select"),inp=box.querySelector("input.pki");
@@ -12799,7 +12839,10 @@ function btHub(embed){
     Chế độ mới liệt kê thẳng bài đã nộp chưa chấm của mọi lớp, mỗi dòng một nút nhảy đúng vào
     lớp + bài ấy ở chế độ Chấm. Số trên chip đếm bằng `btChoCham` - đúng hàm nhịp ngày dùng. */
  var _chua=srows("DL13").filter(btChoCham);
- h+='<div class="sep"></div>'+segHTML(mode,[["giao","Giao bài"],["thu","Thu bài"],["cham","Chấm bài"],
+ /* Nhóm nút chế độ xuống hàng riêng - xem ghi chú ở `.fbbr`. Hai ô chọn trên thanh này mang
+    giá trị dài (tên lớp + mã lớp · buổi + ngày + tên bài); chia hàng với bốn nút là chúng bị
+    bóp còn 261px và cắt mất đuôi. */
+ h+='<div class="fbbr"></div>'+segHTML(mode,[["giao","Giao bài"],["thu","Thu bài"],["cham","Chấm bài"],
   ["chocham","Chờ chấm - mọi lớp",_chua.length,_chua.length?"red":""]],"window.BTMODE='{k}';reRender(CUR)")+'</div>';
  if(mode==="chocham"){
   h+='<div class="panel"><div class="ph"><b>Bài đã nộp, chưa chấm - mọi lớp ('+_chua.length+')</b></div><div class="pbody">';
@@ -14867,7 +14910,13 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=srows("DL14");
  h+='<div class="obcards rows" data-tour="obcards">';if(!view.length)h+='<div class="empty">Không có buổi WOW phù hợp.</div>';
  var MIX=jIndex();
  view.forEach(function(w){var s=st(w);var id=w.wow_id;
-  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(w.student_id,w.student_name)+'</b><div class="obm">'+esc(elabel(w.wow_skill)||w.wow_skill||"")+' · '+esc(w.wow_session_date||"")+'</div></div>'+mstripFor(w.student_id,MIX)+(s.overdue?'<span class="chip red">Quá hạn ghi chú</span>':(s.noshow?'<span class="chip">HV vắng</span>':(s.note?'<span class="chip green">Xong</span>':'<span class="chip amber">Đang xử lý</span>')))+'</div>';
+  /* BUỔI ĐÃ HUỶ PHẢI NÓI LÀ ĐÃ HUỶ. Bẫy cắn 09/08, lộ ra khi đối chiếu chip trên thẻ với trạng
+     thái thật trong DL14: bậc thang chip cũ chỉ hỏi quá hạn / vắng / đã ghi nội dung, không có
+     nhánh nào cho `cancelled` - nên **3 buổi đã huỷ đeo chip "Đang xử lý"**, tức app nói với
+     người trực rằng một buổi đã bỏ vẫn đang chạy. Huỷ thắng mọi nhánh khác: một buổi đã bỏ thì
+     không còn "quá hạn ghi chú", cũng không còn "HV vắng" - nó đơn giản là không diễn ra nữa. */
+  var _huy=isc(w.wow_status,"cancelled");
+  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(w.student_id,w.student_name)+'</b><div class="obm">'+esc(elabel(w.wow_skill)||w.wow_skill||"")+' · '+esc(w.wow_session_date||"")+'</div></div>'+mstripFor(w.student_id,MIX)+(_huy?'<span class="chip">Đã huỷ</span>':(s.overdue?'<span class="chip red">Quá hạn ghi chú</span>':(s.noshow?'<span class="chip">HV vắng</span>':(s.note?'<span class="chip green">Xong</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div>';
   h+=stepBar([["Đặt buổi",s.booked],["Xác nhận",s.confirmed],["Đã dạy",s.done],["Ghi nội dung",s.note]]);
   /* (Luân 28/07) Buổi WOW đặt xong mà nhân viên KHÔNG xem nhanh được lý do và bối cảnh thì
      phải mở hồ sơ ra dò - nhất là buổi HỌC VIÊN TỰ ĐẶT qua cổng. Gom đủ ở đây: ai đặt, muốn
@@ -14892,7 +14941,17 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=srows("DL14");
   if(w.wow_no_show_reason)_bits.push(["ti-user-x","Lý do vắng",elabel(w.wow_no_show_reason)||w.wow_no_show_reason]);
   if(w.wow_outcome)_bits.push(["ti-trending-up","Kết quả buổi",elabel(w.wow_outcome)||w.wow_outcome]);
   h+='<div class="wowinfo'+(_self?" self":"")+'">';
-  if(_self)h+='<div class="wowself"><i class="ti ti-device-mobile"></i>Học viên TỰ ĐẶT qua cổng - cần xác nhận giảng viên và giờ chính thức rồi báo lại học viên đó.</div>';
+  /* TÁCH CÂU SỰ THẬT KHỎI CÂU RA LỆNH. Bẫy cắn 09/08, đọc bằng mắt trên trang WOW: một thẻ mang
+     chip "Xong" mà ngay dưới vẫn ghi *"cần xác nhận giảng viên và giờ chính thức rồi báo lại học
+     viên đó"* - app giục làm một việc đã làm xong. Đo được: **39/46 buổi học viên tự đặt** đang ở
+     trạng thái đã xác nhận / đã dạy / đã huỷ mà vẫn đeo câu giục ấy.
+     "Học viên tự đặt qua cổng" là MỘT SỰ THẬT - đúng ở mọi trạng thái, và nó có ích (biết buổi
+     này từ đâu ra). Còn "cần xác nhận rồi báo lại" là MỘT VIỆC - chỉ đúng khi buổi còn ở nấc chờ
+     xác nhận. Trộn hai thứ vào một câu thì tới lúc việc xong, câu ấy thành lời nói dối nhỏ; và
+     một màn hình nói dối vài chỗ nhỏ thì người dùng thôi tin cả những chỗ nó nói thật. */
+  if(_self){var _cxn=isc(w.wow_status,"booked");
+   h+='<div class="wowself"><i class="ti ti-device-mobile"></i>Học viên TỰ ĐẶT qua cổng'+
+    (_cxn?' - cần xác nhận giảng viên và giờ chính thức rồi báo lại học viên đó.':'.')+'</div>'}
   _bits.forEach(function(b){h+='<div class="wowib"><i class="ti '+b[0]+'"></i><span><b>'+esc(b[1])+':</b> '+esc(b[2])+'</span></div>'});
   if(_req)h+='<div class="wowib"><i class="ti ti-message"></i><span><b>Yêu cầu gốc của học viên:</b> '+
    esc(String(_req.content||"").split("\n").join(" · "))+' <button class="pill" onclick="tkOpen(\''+esc(_req.task_id)+'\')">Mở yêu cầu</button></span></div>';
@@ -16877,7 +16936,12 @@ function statStrip(items,key,ids){
    var gi=t[6]||"";                                   /* câu giải thích con số (động) */
    var tip=id?theTip(id):"";                          /* câu chú thích (cấu hình, tĩnh) */
    var full=tip&&gi?(tip+" — "+gi):(tip||gi);
-   return [id,'<div class="bstat ro"'+(id?' data-the="'+esc(id)+'"':'')+(full?' data-tip="'+esc(full)+'"':'')+'>'+
+   /* Số dài (tiền, giờ cộng dồn) thì cho thẻ chiếm hai cột - xem ghi chú ở `.bstat.w2`.
+      Hỏi ĐÚNG cái gây hại: chuỗi từ 10 ký tự trở lên VÀ chỉ gồm chữ số, dấu ngăn nhóm, đơn vị.
+      Một câu chữ dài xuống dòng thì vẫn đọc được; một con số bị bẻ đôi thì thành số khác. */
+   var _v=String(t[1]==null?"":t[1]);
+   var _w2=(_v.length>=10 && /^[\d.,\s]+(đ|h|%|đ\/giờ)?$/.test(_v));
+   return [id,'<div class="bstat ro'+(_w2?" w2":"")+'"'+(id?' data-the="'+esc(id)+'"':'')+(full?' data-tip="'+esc(full)+'"':'')+'>'+
     '<span class="bsic" style="background:'+t[3]+'18;color:'+t[3]+'"><i class="ti '+t[0]+'"></i></span>'+
     '<div><div class="bsn">'+esc(String(t[1]))+'</div><div class="bsl">'+esc(t[2])+(t[4]?' · '+t[4]:'')+'</div></div></div>']});
   THEHTML[key]=parts;
@@ -24138,7 +24202,7 @@ function hvTopTitle(id){
  b.textContent=hvPH()?"Cổng phụ huynh":"Cổng học viên";
  var nm="";HVSEC.forEach(function(x){if(x[0]===id)nm=x[1]});
  var who="";try{var S=find("DL09","student_id",window.HVID)||{};who=S.full_name||""}catch(e){}
- s.textContent=(nm||"")+(nm&&who?" · ":"")+(who||"")||"-"}
+ s.textContent=hvXungLoc((nm||"")+(nm&&who?" · ":"")+(who||""))||"-"}   /* xem ghi chú ở `hvNav` */
 /* Công cụ trên thanh: chỉ những thứ người học/phụ huynh thật sự dùng tới. Gọi trung tâm lấy
    từ hotline trong Cài đặt - chưa khai hotline thì không vẽ nút gọi (không hứa suông). */
 function hvTopPaint(){var t=document.getElementById("hvTools");if(!t)return;
@@ -24155,7 +24219,7 @@ function hvTopPaint(){var t=document.getElementById("hvTools");if(!t)return;
  h+='<button class="tbtn" onclick="congDoiMo()" aria-label="Đổi cổng" data-tip="Đổi cổng - sang cổng nhân viên hoặc cổng phụ huynh, dữ liệu vẫn là một"><i class="ti ti-arrows-exchange"></i></button>';
  h+='<button class="tbtn" onclick="gateSwitchHV()" aria-label="Đổi người đang xem" data-tip="Đổi người đang xem - quay về màn chọn của cổng này"><i class="ti ti-user-check"></i></button>';
  if(CANLS&&!SVR)h+='<button class="tbtn" onclick="demoResetHoi()" aria-label="Dựng lại demo" data-tip="Dựng lại demo về nguyên bản - cấu hình đã chỉnh vẫn giữ"><i class="ti ti-refresh"></i></button>';
- t.innerHTML=h}
+ t.innerHTML=hvXungLoc(h)}   /* qua cửa đổi xưng hô - xem ghi chú ở `hvNav` */
 /* ═══ V9.65 - HUY HIỆU "VIỆC CẦN BẠN XỬ LÝ" Ở CỔNG HỌC VIÊN ══════════════════════════════
    Mục lục cổng học viên đã có nhóm "Cần bạn xử lý" từ lâu, nhưng nó chỉ là một CÁI TÊN: mở cổng
    ra không biết trong đó có việc hay không, phải bấm vào từng mục mới thấy. Đúng cái bẫy đã ghi:
@@ -24210,7 +24274,13 @@ function hvNav(){var h="",BK={};
    var n=num((window.HVDEM||{})[x[0]]);
    h+='<div class="hvni" data-s="'+x[0]+'" onclick="hvGo(\''+x[0]+'\')"><i class="ti '+x[2]+'"></i><span>'+esc(x[1])+'</span>'+
     (n?('<span class="dot">'+(n>99?"99+":n)+'</span>'):'')+'</div>'})});
- document.getElementById("hvNav").innerHTML=h}
+ /* QUA CỬA ĐỔI XƯNG HÔ. Bẫy cắn 09/08, tìm ra bằng mắt khi mở cổng phụ huynh: nội dung nói
+    đúng "KHÓA CỦA ÔNG" mà menu bên trái vẫn "Khóa của bạn" - hai chỗ trên cùng một màn xưng hô
+    khác nhau. Chính ghi chú của `hvXungLoc` đã lo trước chuyện này (*"sửa tay 39 chuỗi là 39 cơ
+    hội quên một chỗ"*), nhưng cửa ra ấy chỉ được nối vào THÂN trang; menu, thanh trên và dòng
+    tiêu đề đều ghi thẳng `innerHTML`. Một cửa ra mà có ba lối đi vòng thì nó không còn là cửa ra.
+    `_check14` báo xanh vì nó cũng chỉ đo `hvXungLoc(renderTrangHV())` - đúng cái phần đã đúng. */
+ document.getElementById("hvNav").innerHTML=hvXungLoc(h)}
 /* Băng nhận diện đầu trang cho chế độ phụ huynh: đang xem trang của ai, thấy gì và KHÔNG thấy
    gì. Nói thẳng phần bị ẩn là chuyện riêng của em - phụ huynh hiểu ngay, và em cũng yên tâm
    rằng những gì mình nói riêng với trung tâm thì vẫn là riêng. */

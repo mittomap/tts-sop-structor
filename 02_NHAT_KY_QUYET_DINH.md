@@ -241,6 +241,66 @@
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 39 BỘ KIỂM (08/08). V1 mốc cũ: V9.99z12, 34 bộ, bản dựng `829572`.**
 >
+> ### 🔴🔴 09/08 (chiều tối) - VÒNG HAI: BẢY LỖI NỮA, TRONG ĐÓ MỘT TÍNH NĂNG CHẾT LẶNG LẼ MỘT TUẦN
+>
+> **Bản dựng `fe8454`.** Anh Luân: *"Triển đến khi hoàn hảo"*. Vòng một dạy một bài rất đắt, nên
+> vòng hai làm đúng theo bài đó: **soi rộng hơn bằng mắt, và mỗi lỗi tìm ra thì dựng ngay thước.**
+> Kết quả: thêm **bảy lỗi thật**, vẫn không lỗi nào do bộ kiểm báo.
+>
+> **1. HAI CỘT CHẾT TỪ V9.42 - đáng sợ nhất.** Bảng Học viên khai hai cột kiểu `calcso` (**Vắng
+> (buổi)** và **Thiếu bài**), còn `cell()` - bộ vẽ ô dùng chung - chỉ hỏi `ty==="calc"||
+> ty==="calcmoney"` ở cửa vào. Hai cột ấy không bao giờ đi vào nhánh tính; chúng rơi xuống nhánh
+> chung, đọc một khoá KHÔNG TỒN TẠI rồi in dấu `-`. Đo được: **10/20 dòng đầu ghi `-` trong khi
+> máy đếm 1-3 bài thiếu** cho chính những em đó - gồm cả em mà hồ sơ 360 nói rõ "thiếu 3 bài".
+> Chính ghi chú V9.42 đã viết: *"không có ba con số này thì cờ nguy cơ chỉ là một cái nhãn"*.
+> **Tính năng được viết ra ĐÚNG, rồi chết ngay ở cửa vào, và sống chết lặng lẽ gần một tuần** -
+> vì bảng vẫn vẽ ra bình thường, chỉ có một dấu gạch **trông rất hợp lệ**.
+> **Cái chết lặng lẽ nhất của một tính năng là nó vẫn vẽ ra được.**
+> LUẬT: thêm một KIỂU Ô mới thì phải đi hỏi lại MỌI câu điều kiện đang phân nhánh theo kiểu ô.
+>
+> **2. CỔNG PHỤ HUYNH XƯNG HÔ HAI KIỂU TRÊN MỘT MÀN.** Nội dung nói đúng "KHÓA CỦA ÔNG", menu bên
+> trái vẫn "Khóa của bạn". App có sẵn `hvXungLoc` - một CỬA RA đổi xưng hô, kèm ghi chú *"sửa tay
+> 39 chuỗi là 39 cơ hội quên một chỗ"* - nhưng cửa ấy chỉ được nối vào THÂN trang; menu, thanh
+> trên và dòng tiêu đề đều ghi thẳng `innerHTML`. **Một cửa ra mà có ba lối đi vòng thì nó không
+> còn là cửa ra.** `_check14` báo xanh vì nó cũng chỉ đo `hvXungLoc(renderTrangHV())` - đúng cái
+> phần đã đúng. Nay `_check14` đo CẢ MÀN; tắt bộ lọc thử thì nó lộ lại 7 chỗ, tức thước sống thật.
+>
+> **3-5. BA LỖI HÌNH HỌC + NGỮ CẢNH.** Số tiền `10.660.0` xuống dòng `00đ` (một con số bị bẻ đôi
+> đọc thành số khác - đo trước khi sửa: thẻ 158px, ô chữ 88px, chuỗi cần 114px ở 20px và **vẫn
+> 97px ở 17px**, nên thu nhỏ chữ không cứu được, thẻ buộc phải rộng ra) · hai ô chọn trên trang
+> Bài tập bị bóp còn 261px trong khi cần 392px, cắt mất đuôi tên lớp · hai ô lọc cạnh nhau đều
+> chỉ ghi "Gõ để tìm trong N lựa chọn" vì lúc app đổi `<select>` thành ô gõ tìm thì cái nhãn
+> ("Mọi lớp" / "Mọi khóa") bị câu gợi ý thay mất. **Một bản vá cho dễ dùng lấy mất một thứ đang
+> dùng được.**
+>
+> **6-7. HAI LỖI TRÊN TRANG WOW.** Thẻ mang chip "Xong" mà vẫn ghi *"cần xác nhận giảng viên...
+> rồi báo lại học viên đó"* - đo được **39/46 buổi** học viên tự đặt. Gốc là trộn CÂU SỰ THẬT
+> ("học viên tự đặt qua cổng" - đúng mọi lúc) với CÂU RA LỆNH ("cần xác nhận" - chỉ đúng ở nấc
+> chờ). *Một màn hình nói dối vài chỗ nhỏ thì người dùng thôi tin cả những chỗ nó nói thật.*
+> Và chính lượt đo ấy lộ thêm: **3 buổi đã HUỶ đeo chip "Đang xử lý"** - bậc thang chip không có
+> nhánh nào cho `cancelled`.
+>
+> **NĂM THƯỚC MỚI, không thêm bộ kiểm nào** (hội đồng 08/08: thêm một bộ là thêm một chỗ phải
+> nuôi): `_checkaudit` có thêm **M9** (ba câu cãi nhau trên một màn) · **M9b** (câu ra lệnh còn
+> sống trên hồ sơ đã xong) · **M10** (ô chọn mở cửa) · **M11** (kiểu ô khai ra mà bộ vẽ ô không
+> biết) - nay 66 tiêu chí; `_checkmat` thêm 5 trang và 2 phép đo; `_check14` đo cả màn.
+>
+> **BA BẪY CỦA CHÍNH NGƯỜI ĐO trong vòng này - cùng một bài học:**
+> · `_checkmat` **xanh một cách vô nghĩa** ngay sau khi dựng xong phép đo "số bị bẻ đôi", vì
+>   `bangcong` - trang DUY NHẤT có lỗi ấy - không nằm trong danh sách 15 trang nó đi qua. Đúng cái
+>   bẫy ghi sẵn ở đầu chính file đó. Thêm 5 trang thì bắt ngay 2 lỗi khác chưa ai từng đo.
+> · **M10 bản đầu** cắt "thân hàm" bằng tách chuỗi, nên "thân" của `renderWow` dài **33.691 ký tự**
+>   và ôm luôn chục hàm khác - tố oan hai chỗ. Nay cắt bằng ĐẾM NGOẶC.
+> · **M11 bản đầu** tìm chuỗi trong cả CHÚ THÍCH, nên một cái tên chỉ được nhắc trong ghi chú cũng
+>   làm nó xanh - kể cả ghi chú do chính mình vừa viết để giải thích bản vá. Nay bóc chú thích trước.
+> · **M9b sai HAI lần**: bản đầu soi cả trang (đỏ oan vì trang luôn có 13 buổi còn ở nấc chờ, hiện
+>   câu giục là ĐÚNG); bản hai đọc NHÃN CHIP để đoán trạng thái - vẫn sai, vì `booked`, `confirmed`
+>   và `cancelled` **cùng hiện "Đang xử lý"**. Đoán trạng thái từ một nhãn gộp ba trạng thái thì
+>   đoán kiểu gì cũng trượt. Bản ba khớp từng thẻ về đúng bản ghi (tên + ngày giờ) rồi hỏi DL14.
+>
+> **THƯỚC ĐO SAI THÌ ĐÈN XANH CÒN NGUY HIỂM HƠN ĐÈN ĐỎ - vì đèn đỏ thì người ta đi tìm, còn đèn
+> xanh thì người ta đi ngủ.**
+
 > ### 🔴 09/08 (chiều) - CHẠY TRỌN AUDIT: 40 BỘ KIỂM XANH HẾT MÀ NGỒI NHÌN MÀN HÌNH VẪN RA SÁU LỖI
 >
 > **Bản dựng `2d12de`. Biên bản đầy đủ: `AUDIT_09_08.md`.**

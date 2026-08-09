@@ -205,3 +205,77 @@ trên 26 lớp: mọi con số trên thẻ đều tìm được dấu vết ở 
 **Giới hạn còn tồn của bản demo:** không backend · dữ liệu nằm trong localStorage từng máy · phân
 quyền thi hành ở trình duyệt (đúng cho demo, ngoài đời phải chặn ở máy chủ) · dữ liệu là dữ liệu
 mẫu.
+
+
+---
+
+# VÒNG HAI - 09/08 (chiều tối), bản dựng `fe8454`
+
+Anh Luân: *"Triển đến khi hoàn hảo"*. Vòng một đã cho một bài học rất đắt: **40 bộ kiểm xanh hết
+mà ngồi nhìn màn hình vẫn ra sáu lỗi**. Nên vòng hai làm đúng theo bài học ấy: soi rộng hơn bằng
+mắt (16 trang nghiệp vụ + cổng học viên + cổng phụ huynh + ngăn kéo mở bằng cửa thật), và mỗi lỗi
+tìm ra thì **dựng ngay một cái thước** để nó không quay lại.
+
+## Bảy lỗi thật của vòng hai - không lỗi nào do bộ kiểm báo
+
+| # | Lỗi | Quy mô đo được | Vá ở đâu |
+|---|---|---|---|
+| 1 | **Hai cột chết từ V9.42**: "Vắng (buổi)" và "Thiếu bài" của bảng Học viên in dấu `-` | **10/20 dòng đầu** ghi `-` trong khi máy đếm 1-3 bài thiếu | `cell()` thiếu `calcso` ở câu điều kiện |
+| 2 | **Cổng phụ huynh xưng hô hai kiểu trên một màn**: nội dung "Khóa của ông", menu "Khóa của bạn" | **7 chỗ** trong menu + thanh trên + dòng tiêu đề | ba cửa ghi `innerHTML` đi vòng qua `hvXungLoc` |
+| 3 | **Số tiền bị bẻ đôi giữa hai chữ số**: `10.660.0` xuống dòng `00đ` | 1 ô, trang Bảng công | `.bstat.w2` - thẻ số dài chiếm hai cột |
+| 4 | **Hai ô chọn bị bóp, cắt mất đuôi** tên lớp và tên bài | cần 392px, chỉ có 261px | `.fbbr` - nhóm nút xuống hàng riêng |
+| 5 | **Ô lọc mất nhãn**: hai ô cạnh nhau đều chỉ ghi "Gõ để tìm trong N lựa chọn" | mọi ô chọn dài trong app | `pkNhac` giữ lại nhãn: "Mọi lớp · gõ để tìm (26)" |
+| 6 | **Câu giục việc đã làm xong**: thẻ "Xong" mà vẫn ghi "cần xác nhận... rồi báo lại học viên" | **39/46 buổi** học viên tự đặt | tách câu SỰ THẬT khỏi câu VIỆC |
+| 7 | **Buổi WOW đã huỷ đeo chip "Đang xử lý"** | 3 buổi | thêm nhánh `cancelled`, huỷ thắng mọi nhánh |
+
+Lỗi số 1 đáng sợ nhất: **tính năng ấy được viết ra đúng, rồi chết ngay ở cửa vào và sống chết
+lặng lẽ gần một tuần** - vì bảng vẫn vẽ ra bình thường, chỉ có một dấu gạch trông rất hợp lệ ở
+chỗ đáng lẽ là con số. Chính ghi chú V9.42 đã viết: *"không có ba con số này thì cờ nguy cơ chỉ
+là một cái nhãn"*. Cái chết lặng lẽ nhất của một tính năng là **nó vẫn vẽ ra được**.
+
+## Năm thước mới - không thêm bộ kiểm nào, chỉ hỏi thêm câu ở bộ đã có
+
+- **M9 (`_checkaudit`) - ba câu cãi nhau trên một màn.** Mọi hồ sơ có cờ nguy cơ, mã việc SOP mà
+  màn hình in ra phải khớp mã `naFor` tính được. Đây là phép hỏi bắt được lỗ NA018 của vòng một.
+- **M9b (`_checkaudit`) - câu ra lệnh còn sống trên hồ sơ đã xong.** Thẻ WOW đã qua nấc chờ thì
+  không được còn câu giục; buổi đã huỷ phải nói là đã huỷ.
+- **M10 (`_checkaudit`) - ô chọn mở cửa.** Đọc mã nguồn tìm mọi ô chọn ĐỔI MÀN NHÌN dựng danh
+  sách người từ DL01 mà không đi qua câu hỏi phạm vi.
+- **M11 (`_checkaudit`) - kiểu ô khai ra mà bộ vẽ ô không biết.** Mọi kiểu ô khai trong bảng đều
+  phải có tên trong thân `cell()`; và cột tính ra số > 0 thì không được in dấu gạch.
+- **`_checkmat` +5 trang, +2 phép đo**: thực thể HTML lộ ra màn · con số bị bẻ đôi giữa hai chữ số.
+- **`_check14` đo CẢ MÀN** cổng phụ huynh (menu + thanh trên + dòng tiêu đề), không chỉ thân trang.
+
+## Ba bẫy của chính người đo, trong vòng này
+
+1. **`_checkmat` xanh một cách vô nghĩa.** Vừa dựng xong phép đo "số bị bẻ đôi" thì nó báo xanh
+   ngay - vì `bangcong`, trang DUY NHẤT có lỗi ấy, **không nằm trong danh sách 15 trang** nó đi
+   qua. Đúng cái bẫy ghi sẵn ở đầu chính file đó. Thêm 5 trang thì nó bắt ngay 2 lỗi khác chưa ai
+   từng đo.
+2. **M10 bản đầu cắt "thân hàm" bằng cách tách chuỗi**, nên "thân" của `renderWow` dài 33.691 ký
+   tự và ôm luôn chục hàm khác - tố oan hai chỗ. Nay cắt bằng đếm ngoặc.
+3. **M11 bản đầu tìm chuỗi trong cả chú thích**, nên một cái tên chỉ được NHẮC TỚI trong ghi chú
+   cũng làm nó xanh - kể cả ghi chú do chính mình vừa viết ra để giải thích bản vá. Nay bóc chú
+   thích trước khi hỏi.
+
+**Cả ba đều là một bài học:** *thước đo sai thì đèn xanh còn nguy hiểm hơn đèn đỏ, vì đèn đỏ thì
+người ta đi tìm, còn đèn xanh thì người ta đi ngủ.*
+
+## Vẫn khai thẳng: những gì vòng hai chưa chạm tới
+
+- **Chưa có thước cho "màn hình in đúng câu `naFor` trả về" ở diện rộng.** M9 chỉ hỏi hồ sơ có cờ
+  nguy cơ; các nhánh khác của `jNaCode` vẫn chưa được đối chiếu.
+- **M10 chỉ đọc mã nguồn** - nó thấy chỗ nào KHÔNG hỏi phạm vi, nhưng không chứng minh được chỗ
+  có hỏi thì hỏi ĐÚNG.
+- **Ngăn kéo mới đọc tay 3 cái** (Học viên 360, Lớp, Khóa học); còn ngăn kéo của Lead, Buổi học,
+  Đăng ký, Nhân viên chưa mở bằng cửa thật để đọc chữ.
+- **Chưa soi khổ màn hẹp bằng mắt** - `_checkui` đo 5 khổ bằng máy, nhưng "nhịp đọc trên điện
+  thoại" thì máy không nói được.
+- **Bảy cửa mở form không có ai gọi** (`openDangky` `openTest` `openTuvan` `openThu` `openWowFor`
+  `openXeplopFor` `openKetthucFor`). Đã kiểm: **không phải cửa thiếu** - mỗi form ấy đều còn một
+  lối vào SỐNG khác (nút "Ghi nhận khoản thu", "Đặt buổi WOW", hành động trên dòng...), nên đây là
+  bảy hàm bọc thừa còn sót lại của một bản giao diện cũ, không phải nghiệp vụ mất cửa. **Cố ý
+  KHÔNG xoá trong đợt này**: LUẬT SỐ 0 nói thêm thì được bớt thì không, và xoá bảy hàm ngay trước
+  một lượt đẩy là đổi một rủi ro thật lấy một cái gọn mắt. Ghi vào VIỆC TỒN để rà lại tử tế.
+  (Có một chi tiết đáng nhớ khi rà: `openDangky` nhận **lead_id** chứ không phải mã đăng ký - gọi
+  nhầm là nó ném lỗi ngay. Một hàm chết mà còn cạm bẫy thì càng nên dọn, chỉ là dọn đúng lúc.)

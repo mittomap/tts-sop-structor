@@ -934,9 +934,246 @@ var TAT_BOQUA={
  t("mọi chỗ SOP mô tả mà app bỏ qua đều có lý do đọc được", !rong.length, rong.slice(0,6).join(", "));
 })();
 
+/* ═════════ M9 - BA CÂU CÃI NHAU TRÊN MỘT MÀN (phương pháp thứ chín, đặt 09/08) ═══════════
+   Tám phương pháp trên rút từ 43 phát hiện của anh Luân. Đợt audit 09/08 sinh ra phương pháp
+   thứ chín, và nó bắt được lỗ LUẬT SỐ 0 to nhất của cả tuần: **đọc TRỌN một màn rồi hỏi các câu
+   trên màn có nói ngược nhau không.**
+
+   Chuyện đã xảy ra: mở ngăn kéo 360 của HV061 thì đầu ngăn kéo là chip "Nguy cơ" kèm câu *"vì
+   sao: máy thấy vượt ngưỡng - thiếu 3 bài"*, còn cuối ngăn kéo lại ghi *"Việc cần làm theo SOP ·
+   NA018: HV đang học đều và ổn định. Không cần làm gì thêm."* Hai câu ấy cách nhau đúng một màn
+   hình, và chúng phủ định nhau. Gốc: `jNaCode` chọn câu việc THEO CHẶNG (`JNA.learning`), không
+   hỏi hồ sơ có đang bị gắn cờ nguy cơ không - trong khi `naFor("DL09",S)` (hàm mà `check_sop.py`
+   chạy thật trên 93 tình huống HD3) trả đúng NA015/NA016/NA017/NA064/NA065.
+   Đo được lúc ấy: **13/13 học viên đang học mà có nguy cơ đều bị màn hình bảo "không cần làm gì
+   thêm"** - app TÍNH ĐƯỢC việc phải làm mà màn hình lại trấn an ngược.
+
+   VÌ SAO 40 BỘ KIỂM KHÔNG THẤY: `check_sop.py` canh **HÀM** `naFor` (đúng), `_checkbam` canh ngăn
+   kéo **có nội dung và có nút** (đúng), `_checklap` canh **không nói hai lần** (đúng). Không bộ
+   nào hỏi: *cái hàm tính đúng ấy có được in ra màn không.* Chỗ nối giữa hàm đúng và màn hình là
+   một vùng trống - và một chỗ nối không ai canh thì hỏng trong im lặng.
+
+   PHÉP HỎI: với MỌI hồ sơ học viên, mã việc SOP mà tầng hành trình đưa ra màn (`jInfo().na`) phải
+   khớp mã mà `naFor("DL09", hồ sơ)` tính ra, MỖI KHI hồ sơ đang có cờ nguy cơ. Ngoài cờ nguy cơ
+   thì câu theo chặng vẫn đúng - chặng là ngữ cảnh, không phải mâu thuẫn. */
+(function(){
+ if(typeof jIndex!=="function"||typeof jInfo!=="function"||typeof naFor!=="function"){
+  t("đo được tầng hành trình", false, "thiếu jIndex/jInfo/naFor"); return}
+ var ix; try{ix=jIndex()}catch(e){t("dựng được bảng tra hành trình",false,String(e.message).slice(0,60));return}
+ var soHV=0, nguyCo=0, lech=[];
+ (DL.DL09||[]).forEach(function(S){
+  soHV++;
+  var r=false; try{r=stuRisk(S)}catch(e){}
+  if(!r)return;
+  nguyCo++;
+  var man="", that="";
+  try{man=(jInfo(S.student_id,ix)||{}).na||""}catch(e){}
+  try{that=naFor("DL09",S)||""}catch(e){}
+  if(!that)return;                       /* không tính được thì không có gì để đối chiếu */
+  if(man!==that)lech.push(S.student_id+": màn in "+(man||"(trống)")+" · app tính "+that);
+ });
+ t("đọc được hồ sơ học viên để đối chiếu", soHV>0, soHV+" hồ sơ");
+ t("mọi hồ sơ có cờ nguy cơ đều được màn hình in ĐÚNG việc SOP mà app tính ra ("+nguyCo+" hồ sơ)",
+   !lech.length, lech.slice(0,5).join(" | "));
+})();
+
+/* ═════════ M9b - CÂU RA LỆNH CÒN SỐNG TRÊN HỒ SƠ ĐÃ XONG ════════════════════════════════
+   Cùng phương pháp M9 (đọc trọn một màn rồi hỏi các câu có cãi nhau không), bắt một dạng khác:
+   không phải hai con số lệch, mà **một lời giục việc đã làm xong**.
+   Tìm ra 09/08 trên trang Buổi WOW: thẻ mang chip "Xong" mà ngay dưới vẫn ghi *"cần xác nhận
+   giảng viên và giờ chính thức rồi báo lại học viên đó"*. Đo được: **39/46 buổi học viên tự đặt**
+   đã xác nhận / đã dạy / đã huỷ mà vẫn đeo câu giục. Gốc là trộn hai loại câu vào một chuỗi:
+   "Học viên tự đặt qua cổng" là SỰ THẬT (đúng mọi lúc), "cần xác nhận rồi báo lại" là VIỆC (chỉ
+   đúng ở nấc chờ). Tới lúc việc xong, câu ấy thành một lời nói dối nhỏ - và một màn hình nói dối
+   vài chỗ nhỏ thì người dùng thôi tin cả những chỗ nó nói thật.
+
+   HAI BẢN ĐẦU CỦA PHÉP HỎI NÀY ĐỀU SAI, ghi lại vì cùng một bài học:
+   (1) soi chuỗi HTML của TRỌN TRANG -> đỏ cả khi app đã đúng, vì trang luôn có 13 buổi còn ở nấc
+       chờ và chúng hiện câu giục là ĐÚNG. Hỏi cả trang thì không phân biệt "câu giục ở chỗ sai"
+       với "câu giục ở chỗ đúng".
+   (2) cắt theo thẻ rồi đọc NHÃN CHIP để đoán trạng thái -> vẫn sai, vì chip là chip TIẾN ĐỘ:
+       `booked`, `confirmed` và `cancelled` cùng hiện "Đang xử lý". Đoán trạng thái từ một nhãn
+       gộp ba trạng thái thì đoán kiểu gì cũng trượt.
+   Bản này khớp từng thẻ về ĐÚNG BẢN GHI của nó (tên học viên + ngày giờ), rồi hỏi trạng thái
+   thật trong DL14. Đối chiếu được 91/92 mảnh; mảnh không khớp là phần đầu trang, không phải thẻ.
+   (Chính lượt đo này lộ thêm một lỗi thật: 3 buổi `cancelled` đeo chip "Đang xử lý" - đã vá.) */
+(function(){
+ var h="";
+ try{CUR="wow";if(window.FILT)FILT.wow=[];h=String(RENDER.wow?RENDER.wow():"")}catch(e){}
+ t("vẽ được trang Buổi WOW để soi từng thẻ", h.length>500);
+ if(h.length<=500)return;
+ /* bảng tra: "tên học viên|ngày giờ" -> trạng thái thật */
+ var tra={};
+ (DL.DL14||[]).forEach(function(w){
+  var S=find("DL09","student_id",w.student_id)||{};
+  tra[(S.full_name||"")+"|"+String(w.wow_session_date||"").slice(0,16)]=String(w.wow_status||"");
+ });
+ var giuc=[], soThe=0, khopDuoc=0;
+ h.split('<div class="obcard').slice(1).forEach(function(x){
+  soThe++;
+  var tho=x.replace(/<[^>]*>/g," ").replace(/\s+/g," ");
+  var m=tho.match(/^"?>?\s*([^·]{2,40}?)\s+(?:Nghe|Nói|Đọc|Viết|Ngữ pháp|Từ vựng)\s*·\s*(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2})/);
+  if(!m)return;
+  var st=tra[m[1].trim()+"|"+m[2]]; if(!st)return;
+  khopDuoc++;
+  if(isc(st,"booked"))return;                    /* còn ở nấc chờ - câu giục là ĐÚNG */
+  if(/cần xác nhận giảng viên/.test(x))giuc.push(m[1].trim()+" ("+st+")");
+ });
+ t("khớp được thẻ WOW về đúng bản ghi của nó ("+khopDuoc+"/"+soThe+" thẻ)", khopDuoc>60);
+ t("thẻ WOW đã qua nấc chờ thì không còn câu giục 'cần xác nhận'", !giuc.length,
+   giuc.slice(0,4).join(" | "));
+ /* Và chip trên thẻ phải nói đúng buổi đã huỷ - lỗi tìm ra cùng lượt đo này. */
+ var huy=[];
+ h.split('<div class="obcard').slice(1).forEach(function(x){
+  var tho=x.replace(/<[^>]*>/g," ").replace(/\s+/g," ");
+  var m=tho.match(/^"?>?\s*([^·]{2,40}?)\s+(?:Nghe|Nói|Đọc|Viết|Ngữ pháp|Từ vựng)\s*·\s*(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2})/);
+  if(!m)return;
+  var st=tra[m[1].trim()+"|"+m[2]]; if(!st||!isc(st,"cancelled"))return;
+  if(/Đang xử lý|Xong|HV vắng|Quá hạn ghi chú/.test(x)&&!/Đã huỷ/.test(x))
+   huy.push(m[1].trim());
+ });
+ t("buổi WOW đã huỷ hiện đúng là đã huỷ, không phải 'Đang xử lý'", !huy.length, huy.slice(0,4).join(", "));
+})();
+
+/* ═════════ M10 - Ô CHỌN MỞ CỬA (phương pháp thứ mười, đặt 09/08) ═════════════════════════
+   Cùng đợt audit 09/08, hai lỗ rò rỉ phạm vi dữ liệu đều nằm ở một chỗ không ai ngờ: **một ô
+   `<select>`**. Ô "Của giảng viên" cho giáo viên thường xem số của 14 giảng viên khác; ô "Từ NV"
+   cho nhân viên tư vấn thường đọc trọn sổ lead của đồng nghiệp cả 5 cơ sở.
+   `_checknguoi` nay canh chuyện đó bằng cách VẼ THẬT các trang trên menu của từng người. Bộ kiểm
+   này canh vế còn lại: **đọc MÃ NGUỒN** để hỏi *"còn chỗ nào nữa không"* - vẽ trang chỉ thấy
+   những trang mình nghĩ ra để vẽ, đọc mã thì thấy cả những chỗ mình quên mất là có.
+
+   PHÉP HỎI: một hàm vừa dựng ô chọn ĐỔI MÀN NHÌN (`<select ... onchange=...>`) vừa lấy danh sách
+   người từ `rows("DL01")`, thì trong chính hàm ấy phải có một câu hỏi phạm vi
+   (`banQuanLy` / `myTeam` / `banToanQuyen` / `SCOPE` / `CURSTAFF`).
+
+   BẢN ĐẦU CỦA PHÉP HỎI NÀY TỰ TỐ OAN HAI CHỖ - ghi lại vì đúng cái bẫy nó sinh ra để bắt:
+   nó cắt "thân hàm" bằng cách tách chuỗi ở mỗi `function render[A-Z]`, nên "thân" của `renderWow`
+   dài **33.691 ký tự** và ôm luôn cả chục hàm khác (`wowNote`, form đặt buổi...). Ô `<select
+   id="wa_stu">` nằm trong FORM ĐẶT BUỔI - một ô nhập của cửa ghi - bị tính thành ô của
+   `renderWow`. **Đo một khúc văn bản rồi gọi nó là thân hàm thì kết quả nào cũng có vẻ đúng.**
+   Nay cắt thân hàm bằng ĐẾM NGOẶC, đúng như trình duyệt hiểu. */
+(function(){
+ var src=""; try{src=FS.readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8')}catch(e){}
+ t("đọc được thân app để soi ô chọn người", !!src);
+ if(!src)return;
+
+ /* Cắt thân hàm bằng đếm ngoặc - bỏ qua ngoặc nằm trong chuỗi và trong chú thích. */
+ function thanHam(s,tu){
+  var i=s.indexOf("{",tu); if(i<0)return "";
+  var sau=1,j=i+1,nhay=0,thoat=false;
+  while(j<s.length&&sau>0){
+   var c=s[j];
+   if(nhay){
+    if(thoat)thoat=false;
+    else if(c==="\\")thoat=true;
+    else if(c===nhay)nhay=0;
+   }else if(c==='"'||c==="'"||c==="`"){nhay=c}
+   else if(c==="/"&&s[j+1]==="*"){var k=s.indexOf("*/",j+2);j=(k<0?s.length:k+1)}
+   else if(c==="/"&&s[j+1]==="/"){var k2=s.indexOf("\n",j+2);j=(k2<0?s.length:k2)}
+   else if(c==="{")sau++;
+   else if(c==="}")sau--;
+   j++;
+   if(j-i>400000)break;              /* chặn an toàn, không hàm nào dài thế */
+  }
+  return s.slice(i,j);
+ }
+
+ /* Ngoại lệ, phải nói được VÌ SAO. Chỉ khai khi CHÍNH TRANG chứa nó đã là cửa khoá - lúc ấy
+    câu hỏi phạm vi nằm ở cửa vào, hỏi lại lần nữa trong hàm là thừa. Khai vì "chắc không sao"
+    là sai, và là cách một lỗ rò biến mất khỏi phép canh. */
+ var OCHON_BOQUA={
+  giaGioHTML:"bang don gia gio day, nam trong tab Gia gio cua trang Cai dat - do duoc 09/08: "+
+             "ca 5 chuc danh thu (giao vien, tu van, marketing, TP Hoc vu, TP Ke toan) deu bi "+
+             "chan ngay o cua vao trang settings, chi Giam doc mo duoc. Cua khoa dat o TRANG, "+
+             "khong dat trong ham"
+ };
+ var re=/function\s+([A-Za-z0-9_$]+)\s*\(/g, m, ngo=[], soHam=0, soCoOChon=0;
+ while((m=re.exec(src))){
+  var ten=m[1];
+  var than=thanHam(src,m.index+m[0].length);
+  if(!than)continue;
+  soHam++;
+  /* Ô CHỌN ĐỔI MÀN NHÌN, hỏi cho ĐÚNG: `onchange` của nó phải VẼ LẠI MÀN (`reRender` / `go(`)
+     hoặc đặt một biến toàn cục quyết định màn hình xem gì (`window.X=`).
+     Chỉ hỏi "có onchange không" là chưa đủ - đã tố oan `tkNew`: ô `<select id="tk_to"
+     onchange="tkTypeAuto()">` là ô chọn NGƯỜI NHẬN VIỆC của form Giao việc mới; `tkTypeAuto`
+     chỉ đoán lại loại việc theo quan hệ cấp trên - cấp dưới, nó không đổi một dòng dữ liệu nào
+     trên màn. Giao việc ĐI cho ai thì không đọc được gì của người ấy.
+     Hai thứ trông giống hệt nhau trong HTML mà khác hẳn về nghĩa: một bên là CỬA XEM, một bên
+     là Ô NHẬP. Phân biệt bằng chỗ `onchange` dẫn tới, không bằng sự có mặt của nó. */
+  var coONhin=/<select[^>]*\sonchange="[^"]*(?:reRender|go\(|window\.[A-Za-z0-9_]+\s*=)/.test(than);
+  if(!coONhin)continue;
+  /* danh sách người: lấy từ bảng nhân sự và in ra `staff_id` */
+  if(!/rows\("DL01"\)/.test(than))continue;
+  if(!/staff_id/.test(than))continue;
+  soCoOChon++;
+  if(OCHON_BOQUA[ten])continue;
+  if(!/banQuanLy\(|myTeam\(|banToanQuyen\(|SCOPE\(|CURSTAFF/.test(than))ngo.push(ten);
+ }
+ t("cắt được thân hàm để soi ("+soHam+" hàm)", soHam>200, soHam+" hàm");
+ t("mọi ô chọn NGƯỜI đổi màn nhìn đều đi qua một câu hỏi phạm vi ("+soCoOChon+" ô)",
+   !ngo.length, ngo.slice(0,6).join(", "));
+})();
+
+/* ═════════ M11 - KIỂU Ô KHAI RA MÀ BỘ VẼ Ô KHÔNG BIẾT (đặt 09/08) ════════════════════════
+   Bẫy vừa cắn, và nó sống gần một tuần mà không ai hay: bảng Học viên khai hai cột kiểu
+   `calcso` (**Vắng (buổi)**, **Thiếu bài**), còn `cell()` - bộ vẽ ô dùng chung - chỉ hỏi
+   `ty==="calc"||ty==="calcmoney"` ở cửa vào. Hai cột ấy không bao giờ đi vào nhánh tính; chúng
+   rơi xuống nhánh chung, đọc `r["__vang"]` (một khoá không tồn tại) rồi in dấu "-".
+   Đo được lúc tìm ra: **10/20 dòng đầu ghi "-" ở cột Thiếu bài trong khi máy đếm 1-3 bài thiếu
+   cho chính những em đó** - trong đó có học viên mà hồ sơ 360 nói rõ "thiếu 3 bài (ngưỡng 3)".
+
+   VÌ SAO KHÔNG BỘ KIỂM NÀO THẤY: bảng vẫn vẽ ra bình thường, không lỗi JS, không ô trống, không
+   cuộn ngang - chỉ có một dấu gạch **trông rất hợp lệ** ở chỗ đáng lẽ là con số. `_checkdem` đối
+   chiếu số trên THẺ với danh sách, không đối chiếu CỘT với hàm tính. `_checkmat` đo hình học.
+   Cái chết lặng lẽ nhất của một tính năng là nó vẫn vẽ ra được.
+
+   HAI PHÉP HỎI:
+   (a) CẤU TRÚC - mọi kiểu ô khai trong `LISTCFG[*].cols` đều phải có tên trong thân `cell()`.
+       Đây mới là phép hỏi bắt được CẢ HỌ: thêm một kiểu ô mới mà quên nối là đỏ ngay, không
+       cần ai nghĩ ra trường hợp cụ thể.
+   (b) THỰC TẾ - với bảng Học viên, không dòng nào được in "-" ở cột mà hàm tính trả về số > 0. */
+(function(){
+ var src=""; try{src=FS.readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8')}catch(e){}
+ if(!src){t("đọc được thân app để soi kiểu ô", false); return}
+ /* (a) mọi kiểu ô khai ra đều được `cell()` biết mặt */
+ var i=src.indexOf("function cell(r,col,sheet)");
+ var than=i<0?"":src.slice(i,i+6000);
+ /* BÓC CHÚ THÍCH TRƯỚC KHI HỎI. Không bóc thì một cái tên chỉ được NHẮC TỚI trong ghi chú cũng
+    làm phép hỏi này xanh - đúng loại "đèn xanh trên một phép đo đã mất" mà dự án này cấm. Chính
+    ghi chú giải thích bản vá `calcso` có chứa chuỗi `ty==="calcmoney"`; để nguyên là bộ kiểm tự
+    ru ngủ mình bằng lời mình vừa viết. */
+ than=than.replace(/\/\*[\s\S]*?\*\//g," ").replace(/(^|[^:])\/\/[^\n]*/g,"$1 ");
+ t("tìm được bộ vẽ ô dùng chung `cell()`", !!than);
+ var kieu={}, soCot=0;
+ try{Object.keys(LISTCFG||{}).forEach(function(pg){
+   ((LISTCFG[pg]||{}).cols||[]).forEach(function(c){soCot++;if(c[2])kieu[c[2]]=(kieu[c[2]]||0)+1})})}catch(e){}
+ var la=Object.keys(kieu);
+ t("đọc được bản khai cột của các bảng ("+soCot+" cột, "+la.length+" kiểu ô)", la.length>3);
+ var khongBiet=la.filter(function(k){return than.indexOf('"'+k+'"')<0});
+ t("mọi kiểu ô khai trong bảng đều được `cell()` xử lý", !khongBiet.length,
+   khongBiet.map(function(k){return k+" ("+kieu[k]+" cột)"}).join(", "));
+
+ /* (b) cột tính ra số > 0 thì không được in dấu gạch */
+ var lech=[];
+ try{
+  var cfg=LISTCFG["hocvien"]||{};
+  var cotTinh=(cfg.cols||[]).filter(function(c){return /^calc/.test(String(c[2]||""))});
+  (DL.DL09||[]).slice(0,60).forEach(function(r){
+   cotTinh.forEach(function(c){
+    var so=0; try{so=calcCol(c[0],r,"DL09")}catch(e){}
+    if(!(so>0))return;
+    var o=""; try{o=String(cell(r,c,"DL09")||"")}catch(e){o="LOI"}
+    if(/>-<|>\s*-\s*</.test(o)||o.indexOf(String(so))<0)
+     lech.push(r.student_id+" · "+c[1]+": ô vẽ ra \""+o.replace(/<[^>]*>/g,"").trim()+"\" mà hàm tính ra "+so);
+   })})}catch(e){lech.push("khong do duoc: "+String(e.message).slice(0,60))}
+ t("cột tính của bảng Học viên in đúng con số hàm tính ra", !lech.length, lech.slice(0,5).join(" | "));
+})();
+
 /* ═════════════════════════════════════════════════════════════════════════════════════════ */
 if(bad.length){
  console.log("CHECKAUDIT DO ("+bad.length+"/"+n+"):");
  bad.forEach(function(b){console.log("  - "+b)});
  process.exit(1)}
-console.log("CHECKAUDIT OK: "+n+" tieu chi | 8 phuong phap anh Luan dung de tim loi, nay may chay lai");
+console.log("CHECKAUDIT OK: "+n+" tieu chi | 11 phuong phap tim loi (8 cua anh Luan + M9 ba cau cai nhau tren mot man, M10 o chon mo cua, M11 kieu o khai ra ma bo ve o khong biet), nay may chay lai");
