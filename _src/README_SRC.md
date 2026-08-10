@@ -868,3 +868,39 @@ thi no dang doan.* Nay quet NGUOC tu chinh o ve nhan gan nhat, va chan khong cho
 ben canh. (b) lay o DAU TIEN gap trong nguon - trong khi `sv_sat` la id dung o HAI form khac nhau
 (o "Hai long (1-5)" ben nhan vien, va o "Ban hai long muc nao? *" trong phieu hoc vien tu dien),
 thanh ra doc nhan cua form nay roi dem xu toi form kia. Nay ghep o voi cua chan **GAN NO NHAT**.
+
+## 09/08 VONG BAY - NUT DAN VE CHO DANG DUNG, VA MOT BO TO MAU DO BANG CHUOI CON (M15, M16)
+
+- **M15 - NUT HUA DAN DI MA DAN VE CHINH CHO DANG DUNG.** Thuoc nhom M4 cua anh Luan (*"cai nay
+  de lam gi"*). Quet ca **76 trang**: so `nhanvien` khai `lam:"nhansu"` va cung duoc nhung ngay
+  trong trang `nhansu`, nen giua trang Nhan su co mot nut **"Sang Nhan su de lam"** - nam trong
+  man, nhin ro, bam vao `CUR` giu nguyen, than trang giu nguyen, khong mot chu nao doi. Cung hinh
+  dang: ba nut "Mo Khao sat & Phan hoi" nam tren chinh trang Khao sat.
+  *Mot nut hua dan di ma khong dan dau ca thi TE HON la khong co nut: nguoi ta bam, khong thay gi,
+  roi bat dau ngo ca nhung nut khac tren man.*
+  Phai VE THAT tung trang moi hoi duoc - `CUR` chi co luc chay, doc ma nguon khong bao gio thay.
+- **M16 - CHIP TO MAU THEO MOT THU, CHU LAI NOI THU KHAC.** The tren trang Ket thuc to chip theo
+  **buoc quy trinh** (co ket qua ma chua chot -> ho phach) trong khi CHU ben trong la **ket qua
+  hoc tap**. Ca ba ket qua deu ra ho phach: em "Dat muc tieu" va em "Khong cai thien dang ke"
+  trong y het nhau, con bang ngay canh thi ve dung mau xanh. *Mau la thu nguoi ta doc TRUOC khi
+  doc chu; to sai mau la dan sai ngay o cai liec dau tien.*
+
+**VA THUOC M16 LOI RA MOT LOI CO SAN MA KHONG AI NHAM TOI: `stCls` do bang CHUOI CON TRAN.**
+Do tren tron **217 ma enum that**:
+  · `inactive` chua chu `active` -> to **XANH**. Nguoi da nghi viec mang dung cai mau cua nguoi
+    dang lam viec. Day la kieu sai te nhat cua mau: no khong im lang, no NOI NGUOC.
+  · `partially_achieved` chua chu `achieved` -> cung **XANH**, trong khi nhan cua no la
+    "Tien bo ro nhung chua du".
+Con 18 ma khac cung khop chuoi con nhung vo hai vi roi dung mau (`cancelled_by_itts`,
+`homework_missing`, `late_submission`...). Nay hai luat, doc duoc thanh loi:
+  (1) ma trung TRON VEN mot tu khoa thi tu khoa ay thang;
+  (2) khop mot khuc chi tinh khi khuc ay la mot DOAN tron ven giua hai dau `_`.
+`rescheduled` mat khop `scheduled` theo luat (2) nen khai thang vao danh sach ho phach.
+**Doi chieu cu-moi tren tron 217 ma: dung 2 ma doi mau, ca hai la hai loi tren.** Do la cho dang
+so nhat khi dong vao mot ham dung chung - nen do HET chu khong do mau.
+
+**M16 BAN DAU TO OAN 60 CHO** - ghi lai vi dung cai bay no sinh ra de bat: no doi chieu MOI nhan
+enum voi `stCls`, ke ca chuc danh ("Giam doc (CEO)") va co so ("Co so 1"). `stCls` la bo to mau
+cho TRANG THAI; gap thu no khong biet thi tra "gray" - ma chip khong gan lop mau thi trong cung
+xam y het. Nay chi hoi nhung gia tri `stCls` THAT SU NHAN RA. *Hoi cai minh khong co tham quyen
+hoi thi con so nao cung vo nghia.*

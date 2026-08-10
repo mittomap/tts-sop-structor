@@ -132,7 +132,16 @@ trong khung chat**.
    "⭐ HIỆN TRẠNG" + VIỆC TỒN. App đổi tính năng thì thêm mục vào `ITTs_WebApp_v5_README.md`.
 2. Đẩy repo này: phiên cloud Claude Code tự `git add -A` + commit `cap nhat <ngay gio>` + push
    (từ 28/07 chiều phiên cloud có quyền ghi cả 2 repo); làm trên máy Luân thì chạy `./push.sh`.
-3. Nếu 3 file app ở gốc có bản mới: **CHẠY `./update.sh` trong repo demo** - đừng chép tay:
+3. **ĐẨY RA TRANG DEMO CÔNG KHAI THÌ PHẢI HỎI ANH LUÂN TRƯỚC** (đặt 09/08, sau một lần làm sai).
+   Bước dưới đây viết từ thời V1, lúc nhánh đang làm **chính là** bản phát hành. Từ khi có V2 thì
+   không còn đúng tự động nữa: **V1 là V1, V2 là V2** - hai dòng sản phẩm riêng. V2 nằm trên nhánh
+   riêng chưa nhập `main`, còn trang demo công khai đang phục vụ **V1** (mã dựng `829572`).
+   Ngày 09/08 em chạy `./update.sh` theo đúng chữ của bước này và đẩy bản V2 đè lên trang demo V1;
+   anh Luân bắt được, phải revert. Dấu hiệu lẽ ra phải đọc ra: **sáu vòng trong ngày không vòng nào
+   đẩy demo** - một thói quen bị bỏ sáu lần liên tiếp không phải là quên, nó là một quyết định mà
+   mình chưa biết lý do. Đẩy ra ngoài là việc hướng RA NGOÀI, không suy ra từ một dòng luật cũ.
+   Anh Luân đã đồng ý rồi thì mới chạy:
+   Nếu 3 file app ở gốc có bản mới: **CHẠY `./update.sh` trong repo demo** - đừng chép tay:
    ```
    cd ~/itts-sop-demo && ITTS_SRC=/home/user/tts-sop-structor ./update.sh
    ```

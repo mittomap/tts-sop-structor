@@ -484,10 +484,39 @@ function seqNo(code,idk,pad){var mx=0;rows(code).forEach(function(r){var m=Strin
  if(m){var v=parseInt(m[1],10);if(v>mx)mx=v}});var n=mx+1,z=String(n);
  pad=pad||3;while(z.length<pad)z="0"+z;return z}
 function naCls(s){s=String(s||"");if(/ ngay| gấp|GỌI|NGUY|GẤP/.test(s))return"red";if(/Không cần làm gì/.test(s))return"green";return s?"amber":"gray"}
+/* KHỚP TRỌN MÃ THẮNG KHỚP MỘT KHÚC, VÀ KHÚC PHẢI NẰM ĐÚNG RANH GIỚI `_`.
+   Bản cũ dò bằng CHUỖI CON trần, không ranh giới - `_checkaudit` M16 bắt được hai chỗ nó tô sai
+   mà không ai hay (đo 09/08 trên 217 mã enum thật):
+     · `inactive` chứa chữ `active` -> tô **XANH**. Người đã nghỉ việc mang đúng cái màu của
+       người đang làm việc. Đây là kiểu sai tệ nhất của màu: nó không im lặng, nó nói ngược.
+     · `partially_achieved` chứa chữ `achieved` -> cũng **XANH**, trong khi nhãn của nó là
+       "Tiến bộ rõ nhưng chưa đủ".
+   Còn 18 mã khác cũng khớp chuỗi con nhưng vô hại vì rơi đúng màu (`cancelled_by_itts`,
+   `homework_missing`, `late_submission`...) - luật mới giữ nguyên chúng, vì khúc của chúng nằm
+   đúng đầu mã hoặc ngay sau một dấu `_`.
+   Hai luật, đọc được thành lời: (1) mã trùng TRỌN VẸN một từ khoá thì từ khoá ấy thắng;
+   (2) khớp một khúc chỉ tính khi khúc ấy là một ĐOẠN trọn vẹn giữa hai dấu `_`.
+   `rescheduled` mất khớp `scheduled` theo luật (2) nên khai thẳng vào danh sách hổ phách. */
+var STCLS={
+ red:["at_risk","off_track","rejected","unreachable","no_response","escalated","high","overdue",
+      "no_show","missing","cancelled","refunded","unpaid","not_achieved","dropped","failed"],
+ green:["on_track","on_time","completed","confirmed","resolved","converted","paid",
+        "submitted_on_time","graded","passed","active","achieved","good","interested","improved"],
+ amber:["pending","considering","new","processing","partial","partially_achieved","medium",
+        "scheduled","rescheduled","booked","in_progress","assigned","submitted_late","late",
+        "average","awaiting","not_contacted","contacted","planning"]};
+function stKhuc(c,ds){for(var i=0;i<ds.length;i++){var t=ds[i],j=c.indexOf(t);
+ while(j>=0){
+  if((j===0||c.charAt(j-1)==="_")&&(j+t.length===c.length||c.charAt(j+t.length)==="_"))return true;
+  j=c.indexOf(t,j+1)}}
+ return false}
 function stCls(v){var c=ecode(v);
- if(/at_risk|off_track|rejected|unreachable|no_response|escalated|high|overdue|no_show|missing|cancelled|refunded|unpaid|not_achieved|dropped|failed/.test(c))return"red";
- if(/on_track|on_time|completed|confirmed|resolved|converted|paid|submitted_on_time|graded|passed|active|achieved|good|interested|improved/.test(c))return"green";
- if(/pending|considering|new|processing|partial|medium|scheduled|booked|in_progress|assigned|submitted_late|late|average|awaiting|not_contacted|contacted|planning/.test(c))return"amber";
+ if(STCLS.red.indexOf(c)>=0)return"red";
+ if(STCLS.green.indexOf(c)>=0)return"green";
+ if(STCLS.amber.indexOf(c)>=0)return"amber";
+ if(stKhuc(c,STCLS.red))return"red";
+ if(stKhuc(c,STCLS.green))return"green";
+ if(stKhuc(c,STCLS.amber))return"amber";
  return"gray"}
 
 var ENUMMAP={lead_source:"enum_lead_source",lead_status:"enum_lead_status",lead_qualification_status:"enum_lead_qualification_status",
@@ -2578,7 +2607,12 @@ function renderList(key,emb){
   fltBarHTML(key,1)+   /* trang danh sách đã có ô tìm riêng ở tầng trên */
   (fa.length||q||qk||hvF||_f2?'<button class="btn sm" onclick="clearFilt(\''+key+'\')"><i class="ti ti-x"></i>Xóa lọc</button>':'')+
   '<div class="colwrap"><button class="btn'+(nHid?" primary":"")+' sm" onclick="colMenuToggle(\''+key+'\')"><i class="ti ti-columns"></i>Cột'+(nHid?" ("+(cfg.cols.length-1-nHid)+"/"+(cfg.cols.length-1)+")":"")+'</button>'+colMenuHTML(key)+'</div>'+
-  (cfg.lam&&PBK[cfg.lam]?('<button class="btn sm" onclick="go(\''+esc(cfg.lam)+'\')" data-tip="Sổ này chỉ để tra cứu - bấm để sang chỗ làm việc thật"><i class="ti ti-arrow-right"></i>Sang '+esc(PBK[cfg.lam].t)+' để làm</button>'):'');
+  /* ĐỪNG MỜI NGƯỜI TA SANG CHỖ HỌ ĐANG ĐỨNG. Đo được 09/08: sổ `nhanvien` khai `lam:"nhansu"`
+     và cũng được nhúng ngay trong trang `nhansu`, nên giữa trang Nhân sự có một nút "Sang Nhân
+     sự để làm" - nằm trong màn, nhìn rõ, bấm vào không đổi một chữ nào (`CUR` giữ nguyên, thân
+     trang giữ nguyên). Một nút hứa dẫn đi mà không dẫn đâu cả thì tệ hơn là không có nút: người
+     ta bấm, không thấy gì, rồi bắt đầu ngờ cả những nút khác. `_checkaudit` M15 canh chuyện này. */
+  (cfg.lam&&PBK[cfg.lam]&&CUR!==cfg.lam?('<button class="btn sm" onclick="go(\''+esc(cfg.lam)+'\')" data-tip="Sổ này chỉ để tra cứu - bấm để sang chỗ làm việc thật"><i class="ti ti-arrow-right"></i>Sang '+esc(PBK[cfg.lam].t)+' để làm</button>'):'');
  h+=_theNV+tbar2(left,duoi);
  h+='<div class="panel">'+tableHTML(cfg,view,key)+'</div>';
  if(pages>1||total>20)h+='<div class="pgbar"><button class="btn sm" '+(pg<=0?"disabled":"")+' onclick="pageGo(\''+key+'\','+(pg-1)+')"><i class="ti ti-chevron-left"></i>Trước</button><span class="cnt">Trang '+(pg+1)+' / '+pages+'</span><button class="btn sm" '+(pg>=pages-1?"disabled":"")+' onclick="pageGo(\''+key+'\','+(pg+1)+')">Sau<i class="ti ti-chevron-right"></i></button>'+
@@ -7509,7 +7543,7 @@ function renderReview(embed){var p="review",fil=fget(p);
    '<button class="btn sm" onclick="openLop(\''+esc(c.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Bảng lớp</button></div></td></tr>'});
  h+='</tbody></table></div></div>';
  var recent=sv.slice().sort(function(a,b){return (pvnd(b.sent_date)||0)-(pvnd(a.sent_date)||0)}).slice(0,12);
- h+='<div class="panel"><div class="ph"><b>Phiếu gần đây ('+recent.length+')</b><div class="mini"><button class="pill" onclick="window.KSTAB=\'ks\';go(\'khaosat\')">Mở Khảo sát & Phản hồi</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Học viên</th><th>Lớp</th><th>Đợt</th><th>Gửi</th><th>Trạng thái</th><th>Hài lòng</th></tr></thead><tbody>';
+ h+='<div class="panel"><div class="ph"><b>Phiếu gần đây ('+recent.length+')</b><div class="mini">\'+(CUR!=="khaosat"?\'<button class="pill" onclick="window.KSTAB=\\\'ks\\\';go(\\\'khaosat\\\')">Mở Khảo sát &amp; Phản hồi</button>\':\'\')+\'</div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Học viên</th><th>Lớp</th><th>Đợt</th><th>Gửi</th><th>Trạng thái</th><th>Hài lòng</th></tr></thead><tbody>';
  recent.forEach(function(v){var sub=String(v.submitted_date||"").trim();
   h+='<tr data-mo="svXem" data-mo-arg="'+esc(v.survey_id)+'"><td>'+esc(v.survey_id)+'</td><td>'+esc(v.student_name||v.student_id)+'</td><td>'+lopLnk(v.class_id,v.class_id_name,"-")+'</td><td>'+esc(elabel(v.survey_type)||"-")+'</td><td>'+esc(v.sent_date||"-")+'</td>'+
    '<td>'+(sub?'<span class="chip green">đã trả lời</span>':'<span class="chip amber">chờ</span>')+'</td>'+
@@ -13195,7 +13229,7 @@ function renderKetthuc(){var p="ketthuc",fil=fget(p);var all=srows("DL18");
  h+='<div class="obcards rows" data-tour="obcards">';if(!view.length)h+='<div class="empty">Không có hồ sơ phù hợp.</div>';
  var MIX=jIndex();
  view.forEach(function(r){var s=st(r);var id=r.course_end_id;
-  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(r.student_id,r.student_id_name)+'</b><div class="obm">'+lopLnk(r.class_id,r.class_id_name,"")+(r.final_test_score?" · Overall "+esc(r.final_test_score):"")+'</div></div>'+mstripFor(r.student_id,MIX)+(s.closed?'<span class="chip green">Xong</span>':(s.scored?'<span class="chip amber">'+esc(elabel(r.achievement_status)||"Đã có KQ")+'</span>':'<span class="chip">Chờ kết quả</span>'))+'</div>';
+  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(r.student_id,r.student_id_name)+'</b><div class="obm">'+lopLnk(r.class_id,r.class_id_name,"")+(r.final_test_score?" · Overall "+esc(r.final_test_score):"")+'</div></div>'+mstripFor(r.student_id,MIX)+(s.closed?'<span class="chip green">Xong</span>':(s.scored?'<span class="chip '+(r.achievement_status?stCls(r.achievement_status):"")+'">'+esc(elabel(r.achievement_status)||"Đã có KQ")+'</span>':'<span class="chip">Chờ kết quả</span>'))+'</div>';
   h+=stepBar([["Kết thúc",true],["Kết quả đầu ra",s.scored],["Mời tái ĐK",s.invited],["Chốt",s.closed]]);
   h+='<div class="obact">';
   if(!s.scored)h+='<button class="btn primary sm" onclick="ktResult(\''+esc(id)+'\')"><i class="ti ti-writing"></i>Nhập kết quả đầu ra</button>';

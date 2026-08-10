@@ -1345,9 +1345,92 @@ var TAT_BOQUA={
  t("mọi ô bị cửa ghi chặn khi bỏ trống đều mang dấu sao trên nhãn", !thieu.length, thieu.slice(0,6).join(" | "));
 })();
 
+/* ═════════ M15 - NÚT HỨA DẪN ĐI MÀ DẪN VỀ CHÍNH CHỖ ĐANG ĐỨNG (đặt 09/08) ═══════════════
+   Thuộc nhóm M4 (DƯ THỪA & RỖNG) của anh Luân: *"cái này để làm gì / khác gì cái kia"*.
+   Đo được 09/08 khi quét cả 76 trang: sổ `nhanvien` khai `lam:"nhansu"` và cũng được nhúng ngay
+   trong trang `nhansu`, nên **giữa trang Nhân sự có một nút "Sang Nhân sự để làm"** - nằm trong
+   màn, nhìn rõ, bấm vào `CUR` giữ nguyên, thân trang giữ nguyên, không một chữ nào đổi. Cùng
+   hình dạng: ba nút "Mở Khảo sát & Phản hồi" nằm trên chính trang Khảo sát.
+   Một nút hứa dẫn đi mà không dẫn đâu cả thì TỆ HƠN là không có nút: người ta bấm, không thấy
+   gì, rồi bắt đầu ngờ cả những nút khác trên màn.
+   PHÉP HỎI: vẽ THẬT từng trang rồi tìm nút nào mang `go('<chính trang này>')`. Phải vẽ thật vì
+   `CUR` chỉ có lúc chạy - đọc mã nguồn không bao giờ thấy được. */
+(function(){
+ var xau=[], soTrang=0;
+ Object.keys(PBK||{}).forEach(function(pg){
+  var h=veTrang(pg);
+  if(!h||h.indexOf("__LOI__")===0)return;
+  soTrang++;
+  var re=/onclick="([^"]*)"/g, m;
+  while((m=re.exec(h))){
+   var oc=m[1].replace(/&#39;|&quot;/g,"'");
+   var g=oc.match(/(?:^|;)\s*go\(\s*['"]([\w-]+)['"]\s*\)/);
+   if(!g||g[1]!==pg)continue;
+   /* Nút CÒN LÀM VIỆC KHÁC thì không tính: đóng ngăn kéo rồi `go` về trang nền là có đổi thật
+      (ngăn kéo biến mất). Chỉ bắt nút mà `go` là toàn bộ việc của nó. */
+   var conLai=oc.replace(/(?:^|;)\s*go\(\s*['"][\w-]+['"]\s*\)\s*;?/,"").trim();
+   if(conLai)continue;
+   xau.push(pg+' · "'+chuThay(h.slice(m.index,m.index+260)).slice(0,40).trim()+'"');
+  }
+ });
+ t("vẽ được các trang để soi nút dẫn đường ("+soTrang+" trang)", soTrang>30, soTrang+" trang");
+ t("không nút nào mời người dùng sang đúng trang họ đang đứng", !xau.length, xau.slice(0,6).join(" | "));
+})();
+
+/* ═════════ M16 - CHIP TÔ MÀU THEO MỘT THỨ, CHỮ LẠI NÓI THỨ KHÁC (đặt 09/08) ══════════════
+   App có MỘT chỗ quyết định màu cho mọi trạng thái: `stCls(v)`. Chỗ nào vẽ chip mang NHÃN của
+   một giá trị enum mà không hỏi `stCls` thì nó đang tự bịa một màu - và hai chỗ cùng nói một
+   sự thật sẽ ra hai màu khác nhau.
+   Đo được 09/08: thẻ trên trang Kết thúc tô chip theo **bước quy trình** (có kết quả mà chưa
+   chốt -> hổ phách) trong khi CHỮ bên trong là **kết quả học tập**. Hậu quả: cả ba kết quả đều
+   ra hổ phách - em "Đạt mục tiêu" và em "Không cải thiện đáng kể" trông y hệt nhau, còn bảng
+   ngay cạnh thì vẽ đúng màu xanh cho `achieved`. Màu là thứ người ta đọc TRƯỚC khi đọc chữ;
+   tô sai màu là dẫn sai ngay ở cái liếc đầu tiên.
+
+   THƯỚC NÀY ĐÃ TỐ OAN 60 CHỖ Ở BẢN ĐẦU, ghi lại vì đúng cái bẫy nó sinh ra để bắt: nó đối chiếu
+   MỌI nhãn enum với `stCls`, kể cả chức danh ("Giám đốc (CEO)") và cơ sở ("Cơ sở 1"). `stCls`
+   là bộ tô màu cho TRẠNG THÁI, gặp thứ nó không biết thì trả "gray" - mà chip không gắn lớp màu
+   thì trông cũng xám y hệt. Nay chỉ hỏi những giá trị `stCls` THẬT SỰ NHẬN RA (không rơi vào
+   "gray"), và chỉ khi chip có gắn một lớp màu. Hỏi cái mình không có thẩm quyền hỏi thì con số
+   nào cũng vô nghĩa. */
+(function(){
+ /* từ điển nhãn -> giá trị; nhãn trùng ở hai danh mục thì bỏ, vì không biết chip đang nói cái nào */
+ var d=new Map();
+ try{
+  var E=(DATA&&DATA.enums)||ENUM||{};
+  Object.keys(E).forEach(function(dm){(E[dm]||[]).forEach(function(v){
+   var nh=""; try{nh=elabel(v)}catch(e){}
+   if(!nh)return;
+   if(d.has(nh)&&d.get(nh)!==v)d.set(nh,null); else if(!d.has(nh))d.set(nh,v);
+  })});
+ }catch(e){}
+ t("đọc được từ điển nhãn enum để soi màu chip ("+d.size+" nhãn)", d.size>60, d.size+" nhãn");
+ var sai=new Map(), soChip=0;
+ Object.keys(PBK||{}).forEach(function(pg){
+  var h=veTrang(pg);
+  if(!h||h.indexOf("__LOI__")===0)return;
+  var re=/<span class="chip([^"]*)">([^<]{1,44})<\/span>/g, m;
+  while((m=re.exec(h))){
+   soChip++;
+   var lop=String(m[1]||"").trim();
+   if(!lop)continue;                                   /* không gắn màu thì không có gì để sai */
+   var chu=String(m[2]).replace(/&amp;/g,"&").trim();
+   var v=d.get(chu); if(!v)continue;
+   var dung=""; try{dung=stCls(v)}catch(e){continue}
+   if(dung==="gray")continue;                          /* `stCls` không nhận ra -> không có thẩm quyền phán */
+   if(lop===dung)continue;
+   var key=pg+"|"+chu+"|"+lop;
+   if(!sai.has(key))sai.set(key,pg+' · "'+chu+'" ('+v+') đang tô '+lop+' mà stCls nói '+dung);
+  }
+ });
+ t("đọc được chip trên các trang để soi màu ("+soChip+" chip)", soChip>200, soChip+" chip");
+ t("chip mang nhãn enum đều tô đúng màu `stCls` quy định cho chính giá trị ấy",
+   !sai.size, [...sai.values()].slice(0,5).join(" | "));
+})();
+
 /* ═════════════════════════════════════════════════════════════════════════════════════════ */
 if(bad.length){
  console.log("CHECKAUDIT DO ("+bad.length+"/"+n+"):");
  bad.forEach(function(b){console.log("  - "+b)});
  process.exit(1)}
-console.log("CHECKAUDIT OK: "+n+" tieu chi | 14 phuong phap tim loi (8 cua anh Luan + M9 ba cau cai nhau tren mot man, M10 o chon mo cua, M11 kieu o khai ra ma bo ve o khong biet, M12 o tim khong bo dau, M13 ten trong goi y nuot cu bam, M14 dau sao co noi that khong), nay may chay lai");
+console.log("CHECKAUDIT OK: "+n+" tieu chi | 16 phuong phap tim loi (8 cua anh Luan + M9 ba cau cai nhau tren mot man, M10 o chon mo cua, M11 kieu o khai ra ma bo ve o khong biet, M12 o tim khong bo dau, M13 ten trong goi y nuot cu bam, M14 dau sao co noi that khong, M15 nut dan ve chinh cho dang dung, M16 chip to mau theo mot thu chu lai noi thu khac), nay may chay lai");

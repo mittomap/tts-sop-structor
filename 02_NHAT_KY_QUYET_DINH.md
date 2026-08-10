@@ -241,6 +241,51 @@
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 39 BỘ KIỂM (08/08). V1 mốc cũ: V9.99z12, 34 bộ, bản dựng `829572`.**
 >
+> ### 🔴 09/08 - EM ĐẨY BẢN V2 ĐÈ LÊN TRANG DEMO V1. ANH LUÂN BẮT ĐƯỢC, ĐÃ TRẢ VỀ.
+>
+> Kết vòng sáu em chạy `./update.sh` trong repo demo theo đúng bước 3 của `CLAUDE.md`. Nó chép
+> bản V2 `818663` đè lên trang demo công khai và push. Anh Luân hỏi lại: *"Vấn đề là, phiên này
+> làm v2 mà"* · *"V1 là v1, v2 là v2, em đùa à"*. Em revert `87d6539`, `git diff 030351c HEAD`
+> không ra một dòng nào - trang demo về đúng bản 07/08, mã dựng `829572`.
+>
+> **VÌ SAO SAI:** luật *"kết phiên thì chạy `./update.sh`"* viết từ thời V1, lúc nhánh đang làm
+> **chính là** bản phát hành. Nay V2 nằm trên nhánh riêng **chưa nhập `main`** (`main` còn ở
+> V9.22), còn trang demo công khai đang phục vụ V1. Hai dòng sản phẩm riêng, hai địa chỉ riêng.
+> Em đọc một dòng luật cũ rồi suy ra một việc hướng RA NGOÀI.
+>
+> **LUẬT MỚI, CAO HƠN BƯỚC 3 CỦA `CLAUDE.md`:** *đẩy ra trang công khai là việc hướng ra ngoài -
+> phải hỏi anh Luân, không suy ra từ luật cũ.* Và dấu hiệu lẽ ra phải đọc được: **sáu vòng trong
+> ngày không vòng nào đẩy demo**. Một thói quen bị bỏ sáu lần liên tiếp không phải là quên - nó
+> là một quyết định mà mình chưa biết lý do.
+>
+> ### 🔵 09/08 - VÒNG BẢY: NÚT DẪN VỀ CHỖ ĐANG ĐỨNG, VÀ BỘ TÔ MÀU DÒ BẰNG CHUỖI CON
+>
+> **1. Nút hứa dẫn đi mà dẫn về chính chỗ đang đứng.** Quét cả **76 trang**: sổ `nhanvien` khai
+> `lam:"nhansu"` và cũng được nhúng ngay trong trang `nhansu`, nên giữa trang Nhân sự có một nút
+> **"Sang Nhân sự để làm"** - nằm trong màn, nhìn rõ, bấm vào không đổi một chữ. Cùng hình dạng:
+> ba nút "Mở Khảo sát & Phản hồi" trên chính trang Khảo sát. *Một nút hứa dẫn đi mà không dẫn đâu
+> cả thì tệ hơn là không có nút: người ta bấm, không thấy gì, rồi bắt đầu ngờ cả những nút khác.*
+>
+> **2. Chip tô màu theo một thứ, chữ lại nói thứ khác.** Thẻ trang Kết thúc tô theo **bước quy
+> trình** (có kết quả mà chưa chốt → hổ phách) trong khi chữ bên trong là **kết quả học tập**.
+> Cả ba kết quả đều ra hổ phách: em "Đạt mục tiêu" và em "Không cải thiện đáng kể" trông y hệt
+> nhau, còn bảng ngay cạnh vẽ đúng xanh.
+>
+> **3. VÀ THƯỚC MỚI LÔI RA MỘT LỖI CÓ SẴN MÀ EM KHÔNG NHẮM TỚI:** `stCls` - bộ tô màu dùng chung
+> cho mọi trạng thái - dò bằng **chuỗi con trần, không ranh giới**. Đo trên trọn **217 mã enum
+> thật**: `inactive` chứa chữ `active` nên tô **XANH** - người đã nghỉ việc mang đúng cái màu của
+> người đang làm việc; `partially_achieved` chứa chữ `achieved` nên cũng **XANH** trong khi nhãn
+> là "Tiến bộ rõ nhưng chưa đủ". *Đây là kiểu sai tệ nhất của màu: nó không im lặng, nó nói ngược.*
+> Nay hai luật đọc được thành lời: **mã trùng trọn vẹn một từ khoá thì từ khoá ấy thắng**, và
+> **khớp một khúc chỉ tính khi khúc ấy là một đoạn trọn vẹn giữa hai dấu `_`**.
+> Đối chiếu cũ-mới trên trọn 217 mã: **đúng 2 mã đổi màu**, cả hai là hai lỗi trên, không cái nào
+> đổi ngoài ý muốn. Động vào một hàm dùng chung thì phải đo HẾT, không đo mẫu.
+>
+> **M16 bản đầu tố oan 60 chỗ** vì đem cả chức danh ("Giám đốc (CEO)") và cơ sở ("Cơ sở 1") ra đối
+> chiếu với `stCls` - trong khi đó là bộ tô màu cho TRẠNG THÁI, gặp thứ lạ thì trả "gray", mà chip
+> không gắn màu trông cũng xám y hệt. *Hỏi cái mình không có thẩm quyền hỏi thì con số nào cũng
+> vô nghĩa.*
+
 > ### 🔵 09/08 - VÒNG SÁU: ĐI TRỌN MỘT VIỆC TRÊN ĐIỆN THOẠI, VÀ MỘT BỘ ĐẾM NGOẶC LÀM XANH OAN
 >
 > Vòng này bỏ lối soi từng màn. Câu hỏi khác hẳn: **một người ngồi trên điện thoại 390px có LÀM
