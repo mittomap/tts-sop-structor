@@ -983,3 +983,36 @@ Nay DOI CAU HOI chu khong xoa thuoc, dung bai hoc da ghi tu Khuc 2: *moi lan do 
 la mot lan phai di hoi lai tung cai thuoc "nen xoa, hay nen DOI CAU HOI"*. Thuoc moi hoi hai ve:
 trang van phai noi ky ap cho cai gi, va khong duoc hua qua tay. Ca hai ve deu da bi bat DO tren
 ban co cau cu truoc khi nhan xanh.
+
+## 10/08 - ANH LUAN BAT: "bam them moi o Lead & khai thac ko duoc nhi" (M19)
+
+Sau 39 bo kiem va muoi vong verify, **cai nut "Them moi" chua tung duoc ai bam thu.**
+Hong o **4/4 trang** co nut ay (Khoa hoc, Tuyen sinh, Lead & khai thac, Ghi nhan lien he) - vi
+`newForm` la ham dung chung. Bam vao: khong mo form, khong bao gi, khong loi JS.
+
+**GOC:** khung form chi sinh ra khi `pf` dung -
+`var pf=(window.PREFILL&&window.PREFILL[key])||EDIT[key]` - ma `newForm` dat **ca hai ve null**.
+`pf` rong nen khung khong bao gio duoc ve, roi `getElementById("formPanel")` tra null va cau
+`if(p)` nuot luon. Duong mo form DANG CHAY DUOC (`openNext`) thi dat `window.PREFILL[key]={}` -
+mot vat rong nhung CO THAT.
+
+**VI SAO NO SONG LAU MA KHONG AI HAY:** ngay tren `renderList` co mot chu thich viet
+*"`newForm()` dat `pf` roi ve lai, nen khung van hien ra dung luc can"* - **ma lam nguoc loi chu
+thich**. Va chinh chu thich ay con ta san trieu chung: *"bam vao thi khong ghi, khong mo form,
+cung khong noi gi - nguoi that se bam lai vai lan roi bo di"*. Tuc **da co nguoi nghi toi dung
+con loi nay, viet no ra, roi tin rang minh da xu ly** - va loi chu thich do tran an moi nguoi sau.
+*Chu thich la loi hua cua nguoi viet, khong phai bang chung ve ma.*
+Con bo kiem: `_checknv` co dong vai nhan vien dien form that, nhung no vao form qua NGAN KEO,
+khong qua `newForm`. Ca 39 bo di khap app ma khong bo nao bam cai nut ay roi hoi *"co form dung
+duoc khong"*.
+
+**BA LAN DUNG THUOC M19 DEU SAI TRUOC KHI NO THANH THUOC THAT:**
+1. Ban dau **tu dung lai viec ma ban va lam** (`window.PREFILL[key]={}` roi ve) - tuc kiem DUONG
+   VE, khong kiem CAI NUT. Xanh y het tren ca ban hong lan ban da va: do trang tri.
+2. Ban hai goi `newForm()` roi `veTrang()` them mot luot - ma `PREFILL` la co DUNG MOT LAN roi tu
+   xoa (`if(pf)window.PREFILL=null`). Luot thu hai khong con co, khong co khung, nen **do oan ca
+   ban da va**. Nay xoa than trang, bam, roi doc dung thu cai bam ay de lai.
+3. Ban "chua va" dung de doi chung **khong he chua va**: chep ca thu muc `_src` (trong do co
+   `_APP.js` cua ban MOI), thay moi `gen_v5.py`, dung lai HTML nhung **quen trich lai `_APP.js`**.
+   Hai ben do ra do dai y het nhau (17192 / 40856 / 21893) - dung cai bay ma chinh `extract_js.py`
+   ghi canh bao trong file. Trich lai xong moi ra 15229 / 37780 / 19535 va `coFormPanel=false`.

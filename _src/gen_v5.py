@@ -5365,7 +5365,22 @@ function saveForm(key){var cfg=LISTCFG[key];var o={},idk=cfg.cols[0][0]; var mis
  function _ins(nid){o[idk]=nid;rows(cfg.code).unshift(o);toast("Đã lưu "+nid+".");go(key)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi lưu: "+((res&&res.error)||""));return}_ins(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave(cfg.code,o)}else{_ins(o[idk])}}
 function openEdit(key,id){var cfg=LISTCFG[key];var rec=find(cfg.code,cfg.cols[0][0],id);if(!rec){toast("Không thấy bản ghi");return}window.PREFILL=null;EDIT[key]=rec;listPaint(key,1)}
-function newForm(key){EDIT[key]=null;window.PREFILL=null;listPaint(key,1);var p=document.getElementById("formPanel");if(p)p.classList.remove("hidden")}
+/* ANH LUÂN BẮT 10/08: *"bấm thêm mới ở Lead & khai thác ko được nhỉ"* - và nó hỏng ở MỌI trang
+   danh sách có form, không riêng Lead.
+   Gốc: khung form chỉ được vẽ khi `pf` đúng - `var pf=(window.PREFILL&&window.PREFILL[key])||EDIT[key]`
+   - mà hàm này lại đặt **cả hai về null**. `pf` rỗng nên khung không bao giờ sinh ra, rồi
+   `getElementById("formPanel")` trả null và câu `if(p)` nuốt luôn. Bấm: không mở form, không báo,
+   không lỗi JS. Đúng "kiểu hỏng nguy hiểm nhất" mà chú thích ở `renderList` đã tả sẵn:
+   *người thật sẽ bấm lại vài lần rồi bỏ đi.*
+   Cay hơn: chính chú thích trên `renderList` viết *"`newForm()` đặt `pf` rồi vẽ lại"* - **mã làm
+   ngược lời chú thích**, và lời chú thích ấy trấn an nên không ai đi đọc lại mã.
+   Nay làm y như `openNext` - đường mở form ĐANG CHẠY ĐƯỢC: đặt một vật rỗng nhưng CÓ THẬT.
+   Và không im lặng nữa: không dựng được khung thì phải nói ra. `_checkaudit` M19 canh chuyện này. */
+function newForm(key){EDIT[key]=null;window.PREFILL={};window.PREFILL[key]={};listPaint(key,1);
+ var p=document.getElementById("formPanel");
+ if(!p){toast("Sổ này chưa mở cửa thêm bản ghi ngay trên trang.",3000);return}
+ p.classList.remove("hidden");
+ try{p.scrollIntoView({block:"center"})}catch(e){}}
 function cancelEdit(key){EDIT[key]=null;listPaint(key,1)}
 /* V9.27 (anh Luân bắt lỗi): đổi trạng thái ở bảng xong thấy "chẳng có gì thay đổi".
    Gốc: hàm này KHÔNG tự gọi persistSoon. Nó chỉ được lưu NHỜ MAY - khi bảng nằm trong hub thì

@@ -1522,9 +1522,63 @@ var TAT_BOQUA={
    !xau.length, xau.join(", "));
 })();
 
+/* ═════════ M19 - NÚT MỞ FORM PHẢI MỞ RA MỘT FORM DÙNG ĐƯỢC (đặt 10/08) ══════════════════
+   ANH LUÂN BẮT: *"bấm thêm mới ở Lead & khai thác ko được nhỉ"*. Đo ra: hỏng ở **4/4 trang** có
+   nút ấy (Khóa học, Tuyển sinh, Lead & khai thác, Ghi nhận liên hệ) - vì `newForm` là hàm dùng
+   chung. Bấm vào: không mở form, không báo gì, không lỗi JS.
+
+   GỐC: khung form chỉ sinh ra khi `pf` đúng -
+   `var pf=(window.PREFILL&&window.PREFILL[key])||EDIT[key]` - mà `newForm` đặt **cả hai về null**.
+   `pf` rỗng nên khung không bao giờ được vẽ, rồi `getElementById("formPanel")` trả null và câu
+   `if(p)` nuốt luôn. Đường mở form ĐANG CHẠY ĐƯỢC (`openNext`) thì đặt `window.PREFILL[key]={}`
+   - một vật rỗng nhưng CÓ THẬT.
+
+   VÌ SAO NÓ SỐNG LÂU MÀ KHÔNG AI HAY: ngay trên `renderList` có một chú thích viết *"`newForm()`
+   đặt `pf` rồi vẽ lại, nên khung vẫn hiện ra đúng lúc cần"* - **mã làm ngược lời chú thích**.
+   Và chính chú thích ấy còn tả sẵn triệu chứng: *"bấm vào thì không ghi, không mở form, cũng
+   không nói gì - người thật sẽ bấm lại vài lần rồi bỏ đi"*. Lời chú thích trấn an nên không ai
+   đi đọc lại mã. *Chú thích là lời hứa của người viết, không phải bằng chứng về mã.*
+
+   PHÉP HỎI: vẽ THẬT từng trang, tìm nút "Thêm mới", bấm, rồi đòi khung `formPanel` phải hiện,
+   phải có ô nhập và phải có nút Lưu. Không hỏi "hàm có được gọi không" - hỏi *"người ta có điền
+   được vào cái gì không"*. */
+(function(){
+ var xau=[], soNut=0;
+ Object.keys(PBK||{}).forEach(function(pg){
+  var h=veTrang(pg);
+  if(!h||h.indexOf("__LOI__")===0)return;
+  if(!/onclick="newForm\('([\w-]+)'\)"/.test(h))return;
+  soNut++;
+  var key=(h.match(/onclick="newForm\('([\w-]+)'\)"/)||[])[1]||pg;
+  /* GỌI CHÍNH `newForm()`, ĐỪNG DỰNG LẠI VIỆC CỦA NÓ. Bản đầu của thước này tự đặt
+     `window.PREFILL[key]={}` rồi vẽ - tức nó kiểm ĐƯỜNG VẼ, không kiểm CÁI NÚT. Kết quả: xanh y
+     hệt trên cả bản hỏng lẫn bản đã vá, tức là đồ trang trí. Cùng một bệnh với M18 bản đầu, và
+     với chính con lỗi nó đang canh: **tin vào điều mình tưởng hàm kia làm.** */
+  /* ĐỌC CHÍNH CÁI MÀ NÚT VỪA VẼ RA, ĐỪNG VẼ LẠI LẦN NỮA. `renderList` dùng `PREFILL` một lần
+     rồi XOÁ nó (`if(pf)window.PREFILL=null` - một cái cờ dùng một lần). Nên bản trước gọi
+     `newForm()` xong lại `veTrang()` thêm lượt nữa thì lượt ấy không còn cờ, không có khung, và
+     thước báo đỏ oan CẢ TRÊN BẢN ĐÃ VÁ. Nay xoá thân trang, bấm, rồi đọc đúng thứ cái bấm ấy để
+     lại - y như mắt người dùng nhìn. */
+  var sau="";
+  try{CUR=pg;var _el=document.getElementById("content");_el.innerHTML="";newForm(key);sau=String(_el.innerHTML||"")}
+  catch(e){sau="__LOI__"+e.message}
+  try{window.PREFILL=null;EDIT[key]=null}catch(e){}
+  if(!sau||sau.indexOf("__LOI__")===0){xau.push(pg+": vẽ lại lỗi");return}
+  var i=sau.indexOf('id="formPanel"');
+  if(i<0){xau.push(pg+' · "Thêm mới" bấm xong không dựng ra khung form nào');return}
+  var doan=sau.slice(i,i+9000);
+  var soO=(doan.match(/<(input|select|textarea)\b/g)||[]).length;
+  var coLuu=/<button[^>]*>(?:(?!<\/button>)[\s\S]){0,120}?(Lưu|Thêm|Tạo)/.test(doan);
+  if(!soO)xau.push(pg+": khung form dựng ra mà không có ô nhập nào");
+  else if(!coLuu)xau.push(pg+": khung form có "+soO+" ô mà không có nút Lưu");
+ });
+ t("tìm được các trang có nút mở form tại chỗ ("+soNut+" trang)", soNut>=3, soNut+" trang");
+ t("nút \"Thêm mới\" nào cũng mở ra một form có ô nhập và nút Lưu", !xau.length, xau.slice(0,5).join(" | "));
+})();
+
 /* ═════════════════════════════════════════════════════════════════════════════════════════ */
 if(bad.length){
  console.log("CHECKAUDIT DO ("+bad.length+"/"+n+"):");
  bad.forEach(function(b){console.log("  - "+b)});
  process.exit(1)}
-console.log("CHECKAUDIT OK: "+n+" tieu chi | 18 phuong phap tim loi (8 cua anh Luan + M9 ba cau cai nhau tren mot man, M10 o chon mo cua, M11 kieu o khai ra ma bo ve o khong biet, M12 o tim khong bo dau, M13 ten trong goi y nuot cu bam, M14 dau sao co noi that khong, M15 nut dan ve chinh cho dang dung, M16 chip to mau theo mot thu chu lai noi thu khac, M17 hai ham cung noi ve mot chi so ma doc hai dam dong, M18 bang khong nghe bo chon ky phai tu khai moc), nay may chay lai");
+console.log("CHECKAUDIT OK: "+n+" tieu chi | 19 phuong phap tim loi (8 cua anh Luan + M9 ba cau cai nhau tren mot man, M10 o chon mo cua, M11 kieu o khai ra ma bo ve o khong biet, M12 o tim khong bo dau, M13 ten trong goi y nuot cu bam, M14 dau sao co noi that khong, M15 nut dan ve chinh cho dang dung, M16 chip to mau theo mot thu chu lai noi thu khac, M17 hai ham cung noi ve mot chi so ma doc hai dam dong, M18 bang khong nghe bo chon ky phai tu khai moc, M19 nut mo form phai mo ra form dung duoc), nay may chay lai");
