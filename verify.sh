@@ -197,6 +197,12 @@ echo "${Dam}== 4. DU LIEU DEMO ==${Het}"
 # dong ket luan on dinh.
 chay "check_logic.py"  "KET QUA: DAT"        python3 check_logic.py
 chay "check_data.py"   "KET QUA: DAT"        python3 check_data.py
+# 10/08 - anh Luan: "Gieo luon, de moi lan a bam reset demo thi ngon luon nhi". Do ra: ba hat
+# giong DA cam tu lau ma chay pipeline hai lan trong cung mot phut van ra 23 bang khac nhau, vi
+# gen_demo doc lai chinh dau ra cua lan truoc. Da cat bang demo_base.json; bo kiem nay dung lai
+# HAI LAN roi so tung bang de vong lap ay khong lang le noi lai. No tu cat giu va tra lai
+# demo_data_big.json nguyen ven (da do sha256 truoc/sau).
+chay "check_taolai.py" "KET QUA: DAT"        python3 check_taolai.py
 # V9.40d (anh Luan chot): "neu chung ta de thieu sot nhung gi SOP da tung mo ta... nghia la
 # chung ta sai". Bo kiem nay doc THANG file SOP goc va doi chieu 357 cot voi app - cot nao app
 # khong dung phai khai ly do co y bo qua. Truoc do viec "da phu het SOP chua" chi dua vao tri nho,

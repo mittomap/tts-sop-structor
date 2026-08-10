@@ -63,9 +63,32 @@ def gioTest(d, moc):
             return t
     return (d - dt.timedelta(days=1)).replace(hour=19, minute=0)
 
-# dữ liệu nằm CẠNH script (cùng thư mục gen_v5.py) - đọc bản cũ làm giống, ghi đè lại chính nó
+# dữ liệu nằm CẠNH script (cùng thư mục gen_v5.py)
 P = os.path.join(os.path.dirname(os.path.abspath(__file__)), "demo_data_big.json")
-old = json.load(open(P, encoding="utf-8"))
+
+# ── BẢN GỐC ĐÓNG BĂNG - CẮT VÒNG "ĐỌC LẠI CHÍNH MÌNH" (10/08) ────────────────────────────────
+# Anh Luân: *"Gieo luôn, để mỗi lần a bấm reset demo thì ngon luôn nhỉ"*.
+# Đo trước khi làm thì lòi ra: **ba hạt giống ĐÃ cắm sẵn từ lâu** (`random.seed(7)` ở đây,
+# 20260722 ở `fixdata`, 2307 ở `seed_giaoviec`) mà chạy pipeline hai lần trong CÙNG MỘT PHÚT vẫn
+# ra **23 bảng khác nhau**. Không phải lỗi hạt giống, và cũng không phải thứ tự duyệt `set`
+# (thử với PYTHONHASHSEED cố định: vẫn khác).
+# Gốc: dòng này trước đây đọc `demo_data_big.json` - tức **đầu ra của chính lần chạy trước** -
+# rồi bê nguyên DL01 nhân sự, DL05 khóa, DL10 lớp, DL09, DL02 sang. Pipeline không phải hàm của
+# (hạt giống, ngày chạy) mà là hàm của (hạt giống, ngày chạy, **kết quả lần trước**). Kết quả lần
+# trước lại mang dấu vết của `fixdata` - thế là mỗi lượt chạy trôi thêm một ít, không lượt nào
+# quay lại được. Gieo hạt bao nhiêu cũng không cứu nổi một vòng lặp.
+# Đã chứng minh đúng gốc: giữ NGUYÊN đầu vào rồi chạy `gen_demo` hai lần -> **0 bảng khác**.
+# Nay đọc `demo_base.json`, một bản chụp ĐỨNG YÊN của đúng năm bảng ấy. Sửa giống thì sửa file
+# base (hoặc sửa ở mã sinh), đừng để nó tự bồi đắp qua từng lượt chạy.
+_BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "demo_base.json")
+if os.path.exists(_BASE):
+    old = json.load(open(_BASE, encoding="utf-8"))
+else:
+    # Không có bản gốc thì vẫn chạy được, nhưng PHẢI kêu lên - im lặng rơi về lối cũ là quay lại
+    # đúng cái vòng lặp vừa cắt, mà không ai hay.
+    print("CANH BAO: khong thay demo_base.json - doc tam demo_data_big.json (ban chay TRUOC), "
+          "ket qua se KHONG lap lai duoc. Dung `python3 lam_base.py` de dung lai ban goc.")
+    old = json.load(open(P, encoding="utf-8"))
 odl = old["dl"] if "dl" in old else old
 
 # ── V9.60: CỔNG NHÂN VIÊN CHỈ GIỮ CÁC BỘ PHẬN CÓ TRONG SOP ────────────────────────────────

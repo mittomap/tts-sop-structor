@@ -45,6 +45,13 @@ Chủ dự án: Luân. Mọi phiên làm việc (Claude Code hay Claude Cowork) 
   là bảng Giao việc (DL23 36 việc + DL24 67 bình luận) biến mất không một tiếng động - phải
   `check_logic.py` mới lộ ra (11 lỗi mã tham chiếu chết). Chạy pipeline xong LUÔN chạy cả
   `check_data.py` và `check_logic.py`, cả hai phải ĐẠT.
+  **`gen_demo.py` đọc GIỐNG từ `_src/demo_base.json` - một bản chụp ĐỨNG YÊN, KHÔNG đọc lại
+  `demo_data_big.json` nữa** (đặt 10/08). Trước đó nó đọc chính đầu ra của lượt chạy trước, nên
+  pipeline là hàm của *(hạt giống, ngày chạy, **kết quả lần trước**)*: ba hạt giống đã cắm sẵn từ
+  lâu mà chạy hai lần trong cùng một phút vẫn ra **23 bảng khác nhau**. *Gieo hạt bao nhiêu cũng
+  không cứu nổi một vòng lặp.* Muốn CHỐT LẠI giống mới thì chạy `python3 lam_base.py` - đó là một
+  quyết định, không phải một bước thường ngày. `check_taolai.py` (đã nằm trong `./verify.sh`)
+  dựng lại hai lần rồi so từng bảng để vòng lặp ấy không lặng lẽ nối lại.
 - Thêm icon ti-* mới = dựng lại font subset theo công thức trong README_SRC (thiếu là _tall.js báo).
 
 ## Anh Luân nói "audit" = chạy trọn `GIAO_THUC_AUDIT.md`

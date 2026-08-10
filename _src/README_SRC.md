@@ -1142,3 +1142,43 @@ DUNG DINH DANG ngay voi ca do pipeline sinh khong (chinh cho nay `fmtD` sai them
 no tra "dd/mm" trong khi ca co san la "dd/mm/YYYY"); ca moi co mac dinh la `available` khong; co
 roi dung mot khung cua luoi khong; va dang ky lai cung khoang do co bi nhan doi khong.
 **Da tu thu:** va `fmtD` nguoc lai vao ban build roi chay - do dung 3 tieu chi.
+
+## 10/08 - "GIEO LUON" - VA HOA RA HAT GIONG DA CAM TU LAU, MA VAN KHONG LAP LAI DUOC
+
+Anh Luan: *"Gieo luon, de moi lan a bam reset demo thi ngon luon nhi"*.
+
+**Do truoc khi lam** - va lo ra em bao cao sai o luot truoc: pipeline **DA gieo hat tu lau**.
+`random.seed(7)` trong `gen_demo.py`, `random.seed(20260722)` trong `fixdata.py`,
+`random.seed(2307)` trong `seed_giaoviec.py`. Ba cho, deu co san.
+
+Nhung chay trong lai HAI LAN trong **cung mot phut** (cung `meta.anchor`) thi ra **23 bang khac
+nhau**. Loai tru tung kha nang:
+- khong phai hat giong - ca ba deu co;
+- khong phai thu tu duyet `set` - dat `PYTHONHASHSEED=0` cho ca hai luot, van khac;
+- va phep do quyet dinh: giu NGUYEN dau vao roi chay `gen_demo` hai lan -> **0 bang khac**.
+
+Goc: `gen_demo.py` doc `demo_data_big.json` - **dau ra cua chinh lan chay truoc** - roi be nguyen
+nam bang sang (`odl["DL01"]`, `DL02`, `DL05`, `DL09`, `DL10`) cong `enums` + `config`. Ma dau ra
+lan truoc lai mang dau vet cua `fixdata`. Nen pipeline khong phai ham cua *(hat giong, ngay chay)*
+ma la ham cua *(hat giong, ngay chay, ket qua lan truoc)* - moi luot troi them mot it, khong luot
+nao quay lai duoc.
+
+*Gieo hat bao nhieu cung khong cuu noi mot vong lap.*
+
+**Da cat:** them `demo_base.json` - ban chup DUNG YEN cua dung nam bang ay (374 KB). `gen_demo`
+doc no; khong co thi van chay duoc nhung IN CANH BAO (im lang roi ve loi cu la quay lai dung cai
+vong vua cat ma khong ai hay). Muon chot lai giong moi thi chay `lam_base.py` - mot quyet dinh
+co chu dich, khong phai buoc thuong ngay.
+
+**Da canh:** `check_taolai.py` (trong `./verify.sh`) dung lai demo HAI LAN roi so tung bang, tung
+dong. No tu cat giu `demo_data_big.json` va tra lai nguyen ven - da do sha256 truoc/sau, khop.
+Moc neo lay theo gio chay nen hai luot co the vat qua ranh mot phut: thu toi ba luot de bat mot
+cap cung moc, khong duoc thi khai **CHUA KET LUAN** chu khong bao do bay - *mot bo kiem chap chon
+la mot bo kiem bi bo qua*.
+**Da tu thu hai kieu:** bo mat `demo_base.json` -> do; cho `gen_demo` doc lai dau ra cua no -> do,
+va in ra dung danh sach bang lech.
+
+**Mot dieu phai noi ro voi anh Luan, vi no doi ky vong:** nut **Reset demo** trong app KHONG chay
+lai pipeline Python - no khoi phuc tu ban du lieu da nuong san trong `ITTs_data.js`, nen tu truoc
+den nay bam bao nhieu lan cung ra dung mot trang thai (`_checkreset` canh dieu do). Cai vua sua an
+vao LUC DUNG LAI du lieu: tu nay dung lai bao nhieu lan cung ra dung bo so cu.

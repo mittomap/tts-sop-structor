@@ -243,6 +243,38 @@
 > đã lên https://mittomap.github.io/itts-sop-demo-v2/ . V1 mốc cũ: V9.99z12, 34 bộ, `829572`,
 > https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới trong phiên này.**
 >
+> ### 🟢 10/08 - "GIEO LUÔN" - VÀ HOÁ RA HẠT GIỐNG ĐÃ CẮM TỪ LÂU, MÀ VẪN KHÔNG LẶP LẠI ĐƯỢC
+>
+> Anh Luân: *"Gieo luôn, để mỗi lần a bấm reset demo thì ngon luôn nhỉ"*.
+>
+> **Đo trước khi làm — và lòi ra em báo cáo sai ở lượt trước:** pipeline **ĐÃ gieo hạt từ lâu**,
+> ba chỗ: `random.seed(7)` trong `gen_demo`, `20260722` trong `fixdata`, `2307` trong
+> `seed_giaoviec`. Vậy mà chạy trọn pipeline **hai lần trong cùng một phút** (cùng `meta.anchor`)
+> vẫn ra **23 bảng khác nhau**. Loại trừ từng khả năng: không phải hạt giống (cả ba đều có) ·
+> không phải thứ tự duyệt `set` (đặt `PYTHONHASHSEED=0` cho cả hai lượt, vẫn khác) · và phép đo
+> quyết định: **giữ NGUYÊN đầu vào rồi chạy `gen_demo` hai lần → 0 bảng khác.**
+>
+> **Gốc:** `gen_demo` đọc `demo_data_big.json` — **đầu ra của chính lượt chạy trước** — rồi bê
+> nguyên năm bảng sang (DL01, DL02, DL05, DL09, DL10) cộng `enums`/`config`. Mà đầu ra lượt trước
+> lại mang dấu vết của `fixdata`. Nên pipeline không phải hàm của *(hạt giống, ngày chạy)* mà là
+> hàm của *(hạt giống, ngày chạy, **kết quả lần trước**)* — mỗi lượt trôi thêm một ít, không lượt
+> nào quay lại được. ***Gieo hạt bao nhiêu cũng không cứu nổi một vòng lặp.***
+>
+> **Đã cắt:** `demo_base.json` — bản chụp ĐỨNG YÊN của đúng năm bảng ấy. Không có nó thì vẫn chạy
+> được nhưng **in cảnh báo**: im lặng rơi về lối cũ là quay lại đúng cái vòng vừa cắt mà không ai
+> hay. Chốt lại giống mới thì chạy `lam_base.py` — một quyết định có chủ đích, không phải bước
+> thường ngày. **Đã canh:** `check_taolai.py` dựng lại demo hai lần rồi so từng bảng từng dòng, đã
+> nối vào `./verify.sh`; nó tự cất giữ và trả lại `demo_data_big.json` nguyên vẹn (đo sha256
+> trước/sau, khớp). Mốc neo lấy theo giờ chạy nên hai lượt có thể vắt qua ranh một phút: thử tới
+> ba lượt để bắt một cặp cùng mốc, không được thì khai **CHƯA KẾT LUẬN** chứ không báo đỏ bậy —
+> *một bộ kiểm chập chờn là một bộ kiểm bị bỏ qua*. Đã tự thử hai kiểu: bỏ mất bản gốc → đỏ; cho
+> `gen_demo` đọc lại đầu ra của nó → đỏ, in đúng danh sách bảng lệch.
+>
+> **Một điều phải nói rõ vì nó đổi kỳ vọng:** nút **Reset demo** trong app KHÔNG chạy lại pipeline
+> Python — nó khôi phục từ bản dữ liệu đã nướng sẵn trong `ITTs_data.js`, nên từ trước đến nay anh
+> bấm bao nhiêu lần cũng ra đúng một trạng thái. Cái vừa sửa ăn vào **lúc dựng lại dữ liệu**: từ
+> nay dựng lại bao nhiêu lần cũng ra đúng bộ số cũ, và bộ kiểm cũng lặp lại được.
+>
 > ### 🟢 10/08 - LỊCH TRỰC NV WOW: ANH LUÂN GỌI TÊN MỘT MẢNG SOP MÀ 39 BỘ KIỂM KHÔNG CÓ CỬA ĐỂ THẤY
 >
 > Anh Luân: *"Book wow hiện tại là đang mặc định lúc nào cũng có người, nhưng trên thực tế, người
