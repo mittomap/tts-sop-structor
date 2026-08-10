@@ -239,7 +239,9 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 39 BỘ KIỂM (08/08). V1 mốc cũ: V9.99z12, 34 bộ, bản dựng `829572`.**
+> **Phiên bản: V2 — 39 BỘ KIỂM. Bản dựng đang chạy: `edeca7` (10/08), verify TRỌN BỘ xanh hết,
+> đã lên https://mittomap.github.io/itts-sop-demo-v2/ . V1 mốc cũ: V9.99z12, 34 bộ, `829572`,
+> https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới trong phiên này.**
 >
 > ### 🟢 10/08 - LỊCH TRỰC NV WOW: ANH LUÂN GỌI TÊN MỘT MẢNG SOP MÀ 39 BỘ KIỂM KHÔNG CÓ CỬA ĐỂ THẤY
 >
