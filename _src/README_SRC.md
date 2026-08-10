@@ -1016,3 +1016,23 @@ duoc khong"*.
    `_APP.js` cua ban MOI), thay moi `gen_v5.py`, dung lai HTML nhung **quen trich lai `_APP.js`**.
    Hai ben do ra do dai y het nhau (17192 / 40856 / 21893) - dung cai bay ma chinh `extract_js.py`
    ghi canh bao trong file. Trich lai xong moi ra 15229 / 37780 / 19535 va `coFormPanel=false`.
+
+## 10/08 - LUAT SO 2 CUA EM: PHEP DO PHAI CO DOI CHUNG, KE CA KHI NO BAO "0 LOI"
+
+Anh Luan hoi thang: *"Ở phiên này em mắc rất nhiều lỗi ngớ ngẩn, có lý do gì ko thế?"* - va anh
+liet ke dung: goi bien khong co, day V2 sang cong V1, loi kieu "bam khong an", trong khi ton rat
+nhieu vong verify. Goc chung cua gan het cac loi ay: **tin dieu minh tuong, thay vi tra dieu that.**
+
+Sau cau hoi do, khi di quet not vung "nut tren tung dong" (137 nut, chua ai bam bao gio), phep do
+cua em **suyt bao cao sai HAI LAN THEO HAI CHIEU NGUOC NHAU** trong cung mot buoi:
+1. Ban dau bao **12 cho kha nghi** (`runStart`, `openHoso`) - nghe rat co thanh tich. Tra ham thi
+   ca hai deu ket bang `go(...)`: chung CHUYEN TRANG, va do la ket qua DUNG. 12 cho ay la rac.
+2. Sua tieu chi xong no bao **0** - nhung bai tu thu luc do **khong tim duoc nut de thu** (chi tim
+   tren mot trang roi bo cuoc). Nen so 0 ay cung chua co gia tri.
+Phai sua bai tu thu (di tim tren MOI trang), thay no bat duoc loi gia, moi doc duoc so 0 kia.
+
+**Nen tu day moi phep do phai mang san mot BAI TU THU:** be hong dung cai thu no dang canh, roi
+xem no co keu khong. Khong keu thi moi con so no dua ra - **ke ca so 0** - deu vo nghia.
+Da dung ngay trong lan dau: thuoc "bam nut dau trang" bao 12 cho kha nghi, nhung khi chay doi
+chung tren ban chua va thi no **khong bat duoc chinh con loi anh Luan vua bao**. Neu khong chay
+doi chung, em da mang 12 cho rac di bao cao nhu phat hien.
