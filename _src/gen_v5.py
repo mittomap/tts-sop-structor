@@ -2780,6 +2780,12 @@ var PAGES=[
 {k:"buoihoc",g:"_",ic:"ti-calendar-check",t:"Theo dõi nhận xét buổi",c:"SLA ghi nhận xét toàn bộ lớp",ty:"custom"},
 {k:"baitap",g:"_",ic:"ti-book",t:"Giao & chấm Bài tập",c:"Bài tập",ty:"custom"},
 {k:"wow",g:"_",ic:"ti-star",t:"Buổi WOW 1-1",c:"Kèm riêng",ty:"custom"},
+/* LỊCH TRỰC NV WOW - anh Luân đặt 10/08: *"mỗi người team wow có thể tự book lịch làm việc của
+   mình, họ có thể chọn được ngày, giờ, nó lưu vào lịch tổng và học viên có thể chọn dựa trên
+   lịch này"*. SOP đã thiết kế sẵn màn này ("BẢNG TRỰC NV WOW - THEO THÁNG": lưới cột=ngày,
+   hàng=khung giờ, **ô trống = không ai trực**) và đã khai sẵn danh mục `enum_wow_slot_status`
+   (available/booked/taught/off) - app trước nay không dùng chữ nào trong đó. */
+{k:"lichwow",g:"_",ic:"ti-calendar-clock",t:"Lịch trực WOW",c:"NV WOW tự đăng ký ca - học viên chỉ đặt được trong ca đã đăng ký",ty:"custom"},
 {k:"gvdp",g:"_",ic:"ti-user-plus",t:"GV dự phòng theo ngày",c:"Ai thay được khi GV nghỉ đột xuất",ty:"custom"},
 /* V9.99z5 (anh Luân 05/08: *"lệch nhau giữa nghiệp vụ bên trong và trang trên sidebar là do
    thiết kế vậy hả em, hay do sót nhỉ"* + *"bên sidebar giống như 1 cái bản đồ vậy, họ biết
@@ -11819,7 +11825,7 @@ var SHEETVN={DL01:"Nhân sự",DL02:"Lead",DL02b:"Lượt chạm lead",DL03:"Tes
  DL09:"Học viên",DL10:"Lớp học",DL11:"Buổi học",DL11b:"Lịch sử đổi lịch",DL12:"Điểm danh",DL13:"Bài tập",DL14:"Buổi WOW",
  DL15:"Khảo sát",DL16:"Ghi nhận phản hồi",DL17:"Khiếu nại",DL18:"Kết thúc khóa",DL18b:"Kỳ thi IELTS thật",DL19:"Nhật ký hệ thống",
  DL20:"Giáo án - Buổi & Bài tập",DL21:"Giáo án chi tiết",DL22:"Tham số",DL23:"Việc được giao",
- DL24:"Trao đổi trong việc",DL25:"Nhật ký thao tác"};
+ DL24:"Trao đổi trong việc",DL25:"Nhật ký thao tác",DL26:"Lịch trực NV WOW"};
 function sheetVN(c){return SHEETVN[c]?(SHEETVN[c]+" ("+c+")"):(c||"")}
 function logForRow(code,id){return logRows().filter(function(e){
  return e.sheet===code&&String(e.row_id)===String(id)})}
@@ -14995,6 +15001,129 @@ function wowGrantSave(){
  if(SVR)google.script.run.apiUpdate("DL09",sid,{wow_extra_approved:s.wow_extra_approved,wow_extra_purchased:s.wow_extra_purchased,wow_quota_remaining:s.wow_quota_remaining,notes:s.notes});
  toast("Đã cấp thêm "+n+" lượt WOW cho "+(s.full_name||sid)+" - còn "+s.wow_quota_remaining+" lượt.",4200);
  closeModal();reRender(CUR);persistSoon()}
+/* ═══ LỊCH TRỰC NV WOW ═══════════════════════════════════════════════════════════════════
+   Anh Luân đặt 10/08: *"mỗi người team wow có thể tự book lịch làm việc của mình, họ có thể chọn
+   được ngày, giờ, nó lưu vào lịch tổng và học viên có thể chọn dựa trên lịch này"*.
+   SOP đã thiết kế sẵn: "BẢNG TRỰC NV WOW - THEO THÁNG", lưới cột = ngày, hàng = khung giờ,
+   **ô trống = không ai trực**; cộng bảng tổng giờ trực và cột "Buổi đã book" lấy từ DL14 để
+   đối chiếu giờ trực với buổi thực tế. Danh mục `enum_wow_slot_status` cũng có sẵn trong dữ liệu
+   từ đầu (available/booked/taught/off) mà app chưa dùng chữ nào.
+   Khung giờ KHÔNG gõ cứng ở đây - đi qua CH2 như mọi hằng số nghiệp vụ khác. */
+function lwKhung(){return String(paramOf("wowSlotHours","09:00,15:00,17:00,19:00")).split(",")
+ .map(function(x){return String(x).trim()}).filter(Boolean)}
+function lwSlots(){return srows("DL26")}
+function lwLaWow(){return doiWOW().indexOf(String(CURSTAFF||""))>=0}
+/* Slot còn đặt được: đúng trạng thái `available` VÀ chưa qua giờ. Hai vế, thiếu vế nào cũng sai:
+   chỉ hỏi trạng thái thì đặt được vào ca hôm qua; chỉ hỏi giờ thì đặt chồng lên ca đã có người. */
+function lwRanh(sl,tuKhi){var d=pvnd(sl.slot_datetime);
+ return isc(sl.wow_slot_status,"available") && d && d.getTime()>(tuKhi||Date.now())}
+function lwThang(){return window.LWTHANG||(function(){var n=new Date();
+ return n.getFullYear()+"-"+("0"+(n.getMonth()+1)).slice(-2)})()}
+function lwDoiThang(v){window.LWTHANG=v;reRender("lichwow")}
+function renderLichWow(){
+ var thang=lwThang(), pn=thang.split("-"), nam=+pn[0], thg=+pn[1];
+ var soNgay=new Date(nam,thg,0).getDate();
+ var all=lwSlots().filter(function(x){var d=pvnd(x.slot_datetime);
+  return d&&d.getFullYear()===nam&&(d.getMonth()+1)===thg});
+ var khung=lwKhung();
+ var h='<div class="phead" data-tour="phead"><div><div class="t">Lịch trực NV WOW</div>'+
+  '<div class="s">Mỗi NV WOW tự đăng ký ca của mình. Học viên và học vụ chỉ đặt được buổi WOW vào ca đã đăng ký - ô trống nghĩa là không ai trực.</div></div>'+
+  '<div class="sp">'+(lwLaWow()?'<button class="btn primary" onclick="lwDangKy()"><i class="ti ti-calendar-plus"></i>Đăng ký ca của tôi</button>':'')+
+  '<button class="btn" onclick="go(\'wow\')"><i class="ti ti-star"></i>Sổ buổi WOW</button></div></div>';
+ /* chọn tháng */
+ var opt="";
+ for(var k=-2;k<=2;k++){var d0=new Date(nam,thg-1+k,1);
+  var v=d0.getFullYear()+"-"+("0"+(d0.getMonth()+1)).slice(-2);
+  opt+='<option value="'+v+'"'+(v===thang?" selected":"")+'>Tháng '+(d0.getMonth()+1)+"/"+d0.getFullYear()+'</option>'}
+ h+=tbar('<span class="tblbl">Tháng</span><select class="sel" onchange="lwDoiThang(this.value)">'+opt+'</select>'+
+  '<span class="mut" style="font-size:11px;margin-left:10px">'+all.length+' ca đã đăng ký trong tháng</span>',"");
+ /* ── LƯỚI TRỰC: cột = ngày, hàng = khung giờ, ô trống = không ai trực ── */
+ var ix={};
+ all.forEach(function(x){var d=pvnd(x.slot_datetime);if(!d)return;
+  var key=d.getDate()+"|"+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);
+  (ix[key]=ix[key]||[]).push(x)});
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-table" style="margin-right:6px"></i>Lưới trực tháng '+thg+"/"+nam+'</b>'+
+  '<span class="mut" style="font-size:11.5px">ô trống = không ai trực · số liệu: đúng tháng đang chọn</span></div>'+
+  '<div class="tbwrap"><table class="dt"><thead><tr><th>Khung giờ</th>';
+ for(var n=1;n<=soNgay;n++)h+='<th style="text-align:center">'+n+'</th>';
+ h+='</tr></thead><tbody>';
+ khung.forEach(function(g){
+  h+='<tr><td><b>'+esc(g)+'</b></td>';
+  for(var n=1;n<=soNgay;n++){
+   var ds=ix[n+"|"+g]||[];
+   if(!ds.length){h+='<td class="mut" style="text-align:center">·</td>';continue}
+   var chu=ds.map(function(x){return String(x.staff_id||"")+(x.branch?("-"+String(ecode(x.branch)||"").replace("branch_","CS")):"")}).join(", ");
+   var co=ds.filter(function(x){return isc(x.wow_slot_status,"booked","taught")}).length;
+   h+='<td style="text-align:center" data-tip="'+esc(ds.map(function(x){return x.staff_name+" · "+elabel(x.wow_slot_status)}).join(" | "))+'">'+
+    '<span class="chip '+(co?(co>=ds.length?"green":"amber"):"")+'">'+esc(chu)+'</span></td>'}
+  h+='</tr>'});
+ h+='</tbody></table></div></div>';
+ /* ── TỔNG GIỜ TRỰC THEO NV + đối chiếu với buổi thật (SOP đòi đúng cột này) ── */
+ var per={};
+ all.forEach(function(x){var id=String(x.staff_id||"");if(!per[id])per[id]={ten:x.staff_name||id,ca:0,ban:0,nghi:0};
+  per[id].ca++;
+  if(isc(x.wow_slot_status,"booked","taught"))per[id].ban++;
+  if(isc(x.wow_slot_status,"off"))per[id].nghi++});
+ var buoi={};
+ srows("DL14").forEach(function(w){var d=pvnd(w.wow_session_date);
+  if(!d||d.getFullYear()!==nam||(d.getMonth()+1)!==thg)return;
+  if(isc(w.wow_status,"cancelled"))return;
+  var id=String(w.staff_id||"");buoi[id]=(buoi[id]||0)+1});
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-clock-hour-4" style="margin-right:6px"></i>Tổng giờ trực theo NV WOW</b>'+
+  '<span class="mut" style="font-size:11.5px">đối chiếu ca đã đăng ký với buổi thực tế trong DL14 · số liệu: đúng tháng đang chọn</span></div>'+
+  '<div class="tbwrap"><table class="dt"><thead><tr><th>NV WOW</th><th>Ca đăng ký</th><th>Ca đã có người đặt</th><th>Ca nghỉ/bận</th><th>Buổi đã book (DL14)</th><th>Đối chiếu</th></tr></thead><tbody>';
+ var ids=Object.keys(per).sort();
+ if(!ids.length)h+='<tr><td class="empty" colspan="6">Chưa ai đăng ký ca trong tháng này - học viên sẽ không đặt được buổi WOW nào.</td></tr>';
+ ids.forEach(function(id){var v=per[id],b=buoi[id]||0;
+  var lech=(b!==v.ban);
+  h+='<tr><td><b>'+esc(v.ten)+'</b> <span class="mut">'+esc(id)+'</span></td><td>'+v.ca+'</td><td>'+v.ban+'</td><td>'+v.nghi+'</td><td>'+b+'</td>'+
+   '<td>'+(lech?'<span class="chip amber" data-tip="Số buổi trong sổ WOW không bằng số ca đã có người đặt - có buổi đặt ngoài ca trực, hoặc ca đã đặt mà buổi bị huỷ">lệch '+Math.abs(b-v.ban)+'</span>'
+      :'<span class="chip green">khớp</span>')+'</td></tr>'});
+ h+='</tbody></table></div></div>';
+ return h}
+/* Cửa đăng ký ca: NV WOW chọn NGÀY và tick KHUNG GIỜ - đúng lời anh Luân "chọn được ngày, giờ".
+   Không cho người này đăng ký hộ người kia: ca là cam kết có mặt, ký thay là hứa thay. */
+function lwDangKy(){
+ if(!lwLaWow()){toast("Chỉ NV WOW mới đăng ký được ca trực của mình.");return}
+ var khung=lwKhung();
+ var h='<div class="dcard"><h4><i class="ti ti-calendar-plus"></i>Đăng ký ca trực của tôi</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Ca bạn đăng ký sẽ hiện trên lịch tổng, và học viên chỉ đặt được buổi WOW vào những ca này.</div>';
+ h+='<div class="fld"><label>Từ ngày <i>*</i></label><input id="lw_tu" type="date" value="'+isoDay(1)+'"></div>';
+ h+='<div class="fld"><label>Đến ngày <i>*</i></label><input id="lw_den" type="date" value="'+isoDay(7)+'"></div>';
+ h+='<div class="fld full"><label>Khung giờ <i>*</i></label><div class="fchips">'+
+  khung.map(function(g,i){return '<label class="fchip"><input type="checkbox" id="lw_g'+i+'" value="'+esc(g)+'"'+(i===0?" checked":"")+'> '+esc(g)+'</label>'}).join("")+
+  '</div><div class="fhint">Tick khung nào là nhận trực khung đó, mọi ngày trong khoảng trên.</div></div>';
+ h+='<div class="fld"><label>Cơ sở <i>*</i></label><select id="lw_cs">'+enumOpts("enum_branch")+'</select></div>';
+ h+='<div class="fld full"><label>Ghi chú</label><input id="lw_note" placeholder="vd: chỉ nhận Speaking"></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="lwSave()"><i class="ti ti-device-floppy"></i>Đăng ký ca</button>'+
+  '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
+ openDrawer("Đăng ký ca trực",h)}
+function lwSave(){
+ if(!actGuard("lwSave"))return;
+ var tu=fldV("lw_tu"),den=fldV("lw_den");
+ if(!tu||!den){toast("Chọn khoảng ngày bạn nhận trực.");return}
+ var d1=pvnd(fromISOdt(tu)),d2=pvnd(fromISOdt(den));
+ if(!d1||!d2||d2<d1){toast("Đến ngày phải sau Từ ngày.");return}
+ var khung=lwKhung(),chon=[];
+ khung.forEach(function(g,i){var e=document.getElementById("lw_g"+i);if(e&&e.checked)chon.push(g)});
+ if(!chon.length){toast("Tick ít nhất một khung giờ.");return}
+ var toi=num(paramOf("wowSlotMaxDays",60));
+ if((d2-d1)/86400000>toi){toast("Mỗi lần đăng ký tối đa "+toi+" ngày.");return}
+ var co={};lwSlots().forEach(function(x){if(String(x.staff_id||"")===String(CURSTAFF))co[x.slot_datetime]=1});
+ var them=0,bo=0,me=find("DL01","staff_id",CURSTAFF)||{};
+ for(var d=new Date(d1.getTime());d<=d2;d=new Date(d.getTime()+86400000)){
+  chon.forEach(function(g){
+   var hh=g.split(":"),khi=new Date(d.getFullYear(),d.getMonth(),d.getDate(),+hh[0],+(hh[1]||0));
+   var dt=fmtDT(khi);
+   if(co[dt]){bo++;return}                                   /* đã đăng ký rồi thì thôi, không nhân đôi */
+   jSaveRow("DL26",{slot_id:"SLOT-"+seqNo("DL26","slot_id",4),staff_id:CURSTAFF,staff_name:me.full_name||CURSTAFF,
+     slot_date:fmtD(khi),slot_time:g,slot_datetime:dt,branch:fldV("lw_cs"),
+     wow_slot_status:eFull("enum_wow_slot_status","available"),wow_id:"",
+     registered_at:nowStr(),note:fldV("lw_note")});
+   co[dt]=1;them++})}
+ closeModal();
+ toast("Đã đăng ký "+them+" ca trực"+(bo?(" · bỏ qua "+bo+" ca đã có sẵn"):"")+".",4200);
+ reRender("lichwow")}
 function renderWow(embed){var p="wow",fil=fget(p);var all=srows("DL14");
  function st(w){var code=ecode(w.wow_status);var done=code==="completed";var confirmed=done||code==="confirmed";var booked=confirmed||code==="booked";var noshow=code==="no_show";var note=!!(w.wow_content_note&&String(w.wow_content_note).trim());var overdue=done&&!note&&hoursSince(w.wow_session_date)!=null&&hoursSince(w.wow_session_date)>paramOf("slaWowNote_hours",24);return {booked:booked,confirmed:confirmed,done:done,noshow:noshow,note:note,overdue:overdue}}
  /* V2 08/08 - ba chip dưới đây đổi sang ĐÚNG hàm mà nhịp ngày đang đếm (`wowChoXN`, `wowChoGhi`,
@@ -22422,7 +22551,7 @@ function banNutHoSo(ttk,r){
  if(ttk==="hocvien")return '<button class="btn" onclick="window.HOSO=\''+esc(r.student_id)+'\';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>';
  return '<button class="btn" onclick="openLop(\''+esc(r.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Mở lớp</button>'}
 
-var RENDER={ban:renderBan,canhan:renderCanhan,dsphuhuynh:renderSoPH,hoidap:renderHoidap,tracuu:renderTracuu,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,ketqua:renderKetqua,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
+var RENDER={ban:renderBan,canhan:renderCanhan,dsphuhuynh:renderSoPH,hoidap:renderHoidap,tracuu:renderTracuu,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,lichwow:renderLichWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,ketqua:renderKetqua,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
 /* ═══ V2 - 25 NGHIỆP VỤ, 25 TRANG ═══════════════════════════════════════════════════════════
    Anh Luân: *"Mỗi nghiệp vụ 1 trang, vẫn sắp xếp được theo chặng trên sidebar, nhưng mỗi trang
    là nghiệp vụ riêng, và nó có thẻ, có chip lọc, có cảnh báo của riêng nó."*
@@ -23674,7 +23803,7 @@ var NAVTREE=[
     lối nào. Hub CSKH có 4 tab mà menu chỉ có tên hub. Anh Luân: *"bên sidebar giống như 1 cái
     bản đồ vậy, họ biết mình cần tìm gì ở đâu"* - thiếu một mục là mất một chỗ trên bản đồ.
     Thứ tự các mục con xếp ĐÚNG THỨ TỰ THANH TAB của hub, để menu và màn hình đọc như nhau. */
- {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","giaoan","baitap","khaosat","ghinhan","khieunai","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","giaoan","baitap","khaosat","ghinhan","khieunai","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow","lichwow"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","ketqua","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có

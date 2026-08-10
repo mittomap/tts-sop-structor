@@ -1941,6 +1941,21 @@ log.append("14octodecies. Dang ky: gieo %d ca cho qua han, %d ca du coc con treo
 # chạy và check_sop báo đỏ.
 # Đây đúng là loại bẫy đã ghi trong nhật ký: DỮ LIỆU DEMO PHẢI DIỄN ĐỦ MỌI TÌNH HUỐNG SOP, nếu
 # không thì một luật có thật cũng nằm im mà không ai biết. Gieo THUẬN chứ không xoá gì: lấy một
+def _gioLui(gio_it_nhat):
+    """Lui ve QUA KHU it nhat `gio_it_nhat` gio, nhung phai roi vao KHUNG GIO DAY cua trung tam.
+
+    QUA MIN HEN GIO THEO DONG HO, bat duoc 10/08: cho nay truoc viet `NOW - 5 gio` tron. Pipeline
+    chay luc 13:47 thi ra 08:47 - lot; chay luc 09:28 thi ra **04:28** - mot buoi WOW luc 4 gio
+    sang. Tuc bam "Reset demo" buoi sang duoc mot ban demo hong, bam buoi chieu duoc ban lanh, ma
+    khong ai doi mot dong ma nao. `check_logic` luat 7j sinh ra de bat dung ca nay va no da bat.
+    Cung mot ho voi bay loi gio da vá 09/08 - lan nay o `fixdata` chu khong o `gen_demo`."""
+    moc = NOW - datetime.timedelta(hours=gio_it_nhat)
+    for h in (19, 17, 15, 9):
+        t = moc.replace(hour=h, minute=0, second=0, microsecond=0)
+        if t <= moc:
+            return t
+    return (moc - datetime.timedelta(days=1)).replace(hour=19, minute=0, second=0, microsecond=0)
+
 # buổi đã xác nhận, kéo giờ hẹn lùi lại quá khứ - đúng câu chuyện "giờ hẹn qua rồi mà chưa ai bấm
 # bắt đầu, buổi có diễn ra không?".
 _wCf = [w for w in R("DL14")
@@ -1949,7 +1964,7 @@ _wCf = [w for w in R("DL14")
 _g32 = 0
 if _wCf:
     _w32 = _wCf[0]
-    _w32["wow_session_date"] = fmt(NOW - datetime.timedelta(hours=5))
+    _w32["wow_session_date"] = fmt(_gioLui(5))
     _g32 = 1
 else:
     # không có buổi nào đã xác nhận thì nâng một buổi đã đặt lên "đã xác nhận" rồi kéo lùi giờ -
@@ -1958,7 +1973,7 @@ else:
     if _wBk:
         _w32 = _wBk[0]
         _w32["wow_status"] = eF("enum_wow_status", "confirmed")
-        _w32["wow_session_date"] = fmt(NOW - datetime.timedelta(hours=5))
+        _w32["wow_session_date"] = fmt(_gioLui(5))
         _g32 = 1
 log.append("14octodecies-bis. WOW: gieo %d ca da xac nhan ma qua gio hen (NA032)" % _g32)
 
@@ -2627,6 +2642,53 @@ for _e in dl.get("DL06", []):
     _lead[_lid]["lead_created_time"] = _moi.strftime("%d/%m/%Y %H:%M")
     _soKeo += 1
 log.append("17. Don dang ky co truoc lead: keo moc tao lead ve som %d ho so" % _soKeo)
+
+# ---- 18. LICH TRUC WOW (DL26) PHAI KHOP VOI SO BUOI WOW (DL14) ----
+# Dat o CUOI CUNG, dung bai hoc da ghi tren luat 16-17: *mot luat bat bien phai dung sau NGUOI
+# GHI CUOI CUNG*. DL26 duoc dung trong `gen_demo`, nhung chinh `fixdata` con doi gio mot so buoi
+# WOW o cac luat tren (vd 14octodecies-bis keo mot buoi ve qua khu). Doi gio xong ma khong doi
+# ca thi lich truc va so buoi noi nguoc nhau - va cot "Doi chieu" cua man Lich truc bat duoc
+# ngay: bao "lech 2" o lan chay dau.
+# Hai chieu, phai lam ca hai thi moi kin:
+#   · buoi CON SONG ma ca khong con giu -> mo/gan lai ca dung gio do;
+#   · ca dang giu mot buoi da doi gio hoac da huy -> tra ca ve `available`, xoa ma buoi.
+_slots = d["dl"].setdefault("DL26", [])
+_wowSong = {}
+for _w in R("DL14"):
+    _dt = str(_w.get("wow_session_date") or "").strip()
+    if not _dt or str(_w.get("wow_status") or "").startswith("cancelled"): continue
+    _wowSong[(str(_w.get("staff_id") or ""), _dt)] = _w
+_byKey = {}
+_traVe = 0
+for _s in _slots:
+    _k = (str(_s.get("staff_id") or ""), str(_s.get("slot_datetime") or ""))
+    _byKey[_k] = _s
+    _w = _wowSong.get(_k)
+    if _w:
+        _s["wow_id"] = _w["wow_id"]
+        _s["wow_slot_status"] = eF("enum_wow_slot_status",
+            "taught" if str(_w.get("wow_status") or "").startswith("completed") else "booked")
+    elif str(_s.get("wow_id") or "").strip():
+        _s["wow_id"] = ""
+        _s["wow_slot_status"] = eF("enum_wow_slot_status", "available")
+        _traVe += 1
+_moThem = 0
+_mx = 0
+for _s in _slots:
+    try: _mx = max(_mx, int(str(_s.get("slot_id") or "").split("-")[-1]))
+    except Exception: pass
+for (_sid, _dtxt), _w in _wowSong.items():
+    if (_sid, _dtxt) in _byKey: continue
+    _mx += 1
+    _slots.append({"slot_id": "SLOT-%04d" % _mx, "staff_id": _sid,
+        "staff_name": _w.get("staff_name") or _sid,
+        "slot_date": _dtxt.split(" ")[0], "slot_time": (_dtxt.split(" ") + [""])[1],
+        "slot_datetime": _dtxt, "branch": "",
+        "wow_slot_status": eF("enum_wow_slot_status",
+            "taught" if str(_w.get("wow_status") or "").startswith("completed") else "booked"),
+        "wow_id": _w["wow_id"], "registered_at": _dtxt, "note": "mở thêm cho buổi đã đổi giờ"})
+    _moThem += 1
+log.append("18. Lich truc WOW khop so buoi: tra %d ca ve trong, mo them %d ca" % (_traVe, _moThem))
 
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("  12. Da tao DL22 referral +", len(dl["DL22"]), "luot | DL19 thuong:", len(dl["DL19"]))

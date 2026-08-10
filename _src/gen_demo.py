@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # SINH DEMO MỚI TOÀN BỘ - neo quanh NGÀY CHẠY, phủ đủ tính năng app, liên kết chặt.
 import json, random, datetime as dt, os
+import collections
 
 random.seed(7)
 NOW = dt.datetime.now().replace(second=0, microsecond=0)
@@ -27,6 +28,22 @@ def gioHoc(d, khung=None):
     if khung is None:
         khung = [9, 15, 17, 19]
     return d.replace(hour=random.choice(khung), minute=random.choice([0, 0, 30]))
+
+def gioKQ(gio_thi, moc=None):
+    """Gio TRA KET QUA phai sinh ra TU gio thi, khong boc rieng.
+
+    BAY BAT DUOC 10/08 (`check_logic` luat 13c): `graded_wait_consult` va `late` boc `test_date`
+    mot lan va `result_time = NOW - 6..18h` mot lan KHAC. Ma `gioTest` snap gio thi ve khung
+    19:00 mien la truoc NOW - tuc no co the day gio thi MUON HON trong ngay. Hai lan boc doc lap
+    gap nhau la nguoc nhan qua: TB-2026-083 thi 09/08 19:00 ma ket qua ghi 09/08 18:36 -
+    **cham truoc khi thi 24 phut**.
+    Hai con so noi ve mot chuoi nhan qua thi phai TINH TU NHAU, khong duoc boc rieng roi mong
+    chung khong dam nhau."""
+    if moc is None: moc = NOW
+    t = gio_thi + dt.timedelta(hours=random.randint(2, 18))
+    if t > moc: t = moc - dt.timedelta(minutes=random.randint(5, 90))
+    if t <= gio_thi: t = gio_thi + dt.timedelta(minutes=random.randint(45, 120))
+    return t
 
 def gioTest(d, moc):
     # Ca test dau vao: keo ve khung gio test (9/14/16/19) ma VAN O QUA KHU so voi `moc`.
@@ -718,7 +735,7 @@ def add_test(L, kind):
         d=gioTest(NOW-dt.timedelta(hours=random.randint(22,40)), NOW); sc=round(random.uniform(3.5,6.0)*2)/2
         t.update(test_date=F(d),test_attendance_status="on_time (Đúng giờ)",test_attendance_time=F(d),test_status="graded (Đã chấm xong)",
             overall_score=str(sc),skill_listening=str(sc),skill_reading=str(sc),skill_writing=str(max(1,sc-0.5)),skill_speaking=str(sc),
-            result_time=F(NOW-dt.timedelta(hours=random.randint(6,18))),post_test_status="awaiting_consultation (Có KQ, chờ tư vấn)",graded_by=gv[0])
+            result_time=F(gioKQ(d)),post_test_status="awaiting_consultation (Có KQ, chờ tư vấn)",graded_by=gv[0])
     elif kind=="noshow":
         d=gioTest(NOW-dt.timedelta(hours=(15 if tb_n%2 else 40)), NOW)   # 1 ca mới vắng (vàng) + 1 ca quá hạn gọi lại (đỏ)
         t.update(test_date=F(d),test_attendance_status="no_show (Vắng mặt)",test_no_show_reason=random.choice(["Quên lịch","Bận đột xuất","Không liên lạc được"]),
@@ -732,7 +749,7 @@ def add_test(L, kind):
         d=NOW-days(random.randint(2,6)); sc=round(random.uniform(3.5,5.5)*2)/2
         t.update(test_date=F(d),test_attendance_status="late (Đến trễ)",test_attendance_time=F(d+dt.timedelta(minutes=25)),
             test_status="graded (Đã chấm xong)",overall_score=str(sc),skill_listening=str(sc),skill_reading=str(sc),
-            skill_writing=str(max(1,sc-0.5)),skill_speaking=str(sc),result_time=F(NOW-dt.timedelta(hours=random.randint(6,20))),
+            skill_writing=str(max(1,sc-0.5)),skill_speaking=str(sc),result_time=F(gioKQ(d)),
             post_test_status="consulted (Đã tư vấn xong)",graded_by=gv[0],booking_note="HV đến trễ 25 phút, vẫn kịp làm bài")
     elif kind=="cancelled_bk":
         d=NOW-days(random.randint(1,5))
@@ -1756,9 +1773,99 @@ for _p in pays:
     except Exception: continue
     if _a<_b: _p["payment_time"]=F(_b+dt.timedelta(hours=random.randint(1,20)))
 
+# ---------- GO DAT TRUNG GV WOW (buoi 1-1 thi mot GV khong day hai nguoi cung luc) ----------
+# Bat duoc 10/08 boi chinh phep kiem dinh vua viet cho DL26: 6 cap buoi trung (GV, gio), trong
+# do mot cap con la CUNG MOT HOC VIEN hai buoi cung luc (WOW-006 va WOW-016). `check_data.py` va
+# `check_logic.py` chua tung hoi cau nay - chung hoi quan he giua cac moc thoi gian, khong hoi
+# "mot nguoi co the o hai cho cung luc khong".
+# Go bang cach doi GIO (giu nguyen GV va NGAY) sang mot khung con trong; het khung thi doi GV.
+_ban={}
+for _w in wows:
+    _d=str(_w.get("wow_session_date") or "").strip()
+    if not _d or str(_w.get("wow_status","")).startswith("cancelled"): continue
+    _k=(_w["staff_id"],_d)
+    if _k not in _ban: _ban[_k]=_w["wow_id"]; continue
+    try: _khi=dt.datetime.strptime(_d,"%d/%m/%Y %H:%M")
+    except Exception: continue
+    _xong=False
+    for _h in [9,15,17,19]:
+        _m=_khi.replace(hour=_h)
+        if (_w["staff_id"],F(_m)) not in _ban:
+            _w["wow_session_date"]=F(_m); _ban[(_w["staff_id"],F(_m))]=_w["wow_id"]; _xong=True; break
+    if _xong: continue
+    for _nv in WOWS:
+        if _nv[0]==_w["staff_id"]: continue
+        if (_nv[0],_d) not in _ban:
+            _w["staff_id"],_w["staff_name"]=_nv[0],_nv[1]; _ban[(_nv[0],_d)]=_w["wow_id"]; _xong=True; break
+    if not _xong: _w["wow_status"]="cancelled (Đã hủy)"   # het cho that thi khai thang, dung giau
+
+# ---------- DL26 · LICH TRUC NV WOW (SOP: "BANG TRUC NV WOW - THEO THANG") ----------
+# Anh Luan dat 10/08: *"moi nguoi team wow co the tu book lich lam viec cua minh... no luu vao
+# lich tong va hoc vien co the chon dua tren lich nay"*. SOP da thiet ke san man nay - luoi
+# cot=ngay, hang=khung gio, **o trong = khong ai truc** - va da co san danh muc
+# `enum_wow_slot_status`: available / booked / taught / off. App truoc nay khong dung chu nao.
+#
+# LUAT SINH, viet ra de doc lai duoc:
+#  · moi NV WOW dang ky ca trong cua so [-30 ngay, +30 ngay], nghi ngau nhien mot so ngay;
+#  · khung gio dung DUNG khung day cua trung tam (cung nguon voi `gioHoc`), khong bia khung moi;
+#  · slot nao trung gio mot buoi WOW da co thi mang dung trang thai cua buoi ay:
+#    buoi da hoan thanh -> `taught`, buoi con treo -> `booked`, va giu ma buoi de doi chieu;
+#  · mot phan nho slot de `off (Nghi/Ban)` - de man hinh co ca ba trang thai that, khong phai
+#    chi hai. Danh muc khai bon gia tri thi demo phai cho thay du bon, khong thi mot gia tri
+#    song trong danh muc ma chet tren man.
+# **Slot phai PHU HET buoi WOW da co**: neu mot buoi nam ngoai moi ca truc thi lich tong va so
+# buoi that noi nguoc nhau ngay tu ngay dau - dung cai ma SOP bao la phai doi chieu.
+KHUNG_TRUC=[9,15,17,19]
+wow_slots=[]; _sl=0
+_wowByKey={}
+# BUOI DA HUY THI CA TRA VE TRONG. Cot doi chieu cua man Lich truc bat duoc ngay lan chay dau:
+# ca ba NV deu "lech" vi buoi huy van giu ca. Doi song: huy roi thi gio do ai dat cung duoc.
+for _w in wows:
+    _d=str(_w.get("wow_session_date") or "").strip()
+    if not _d or str(_w.get("wow_status","")).startswith("cancelled"): continue
+    _wowByKey.setdefault((_w["staff_id"],_d),[]).append(_w)
+def _themSlot(nv, khi, trang_thai, wid=""):
+    global _sl
+    _sl+=1
+    return {"slot_id":"SLOT-%04d"%_sl,"staff_id":nv[0],"staff_name":nv[1],
+            "slot_date":FD(khi),"slot_time":khi.strftime("%H:%M"),
+            "slot_datetime":F(khi),"branch":random.choice(BRANCHES),
+            "wow_slot_status":trang_thai,"wow_id":wid,
+            "registered_at":F(khi-days(random.randint(3,10))),"note":""}
+for _nv in WOWS:
+    for _off in range(-30,31):
+        _ngay=(NOW+days(_off)).replace(hour=0,minute=0)
+        if _ngay.weekday()==6 and random.random()<0.7: continue      # chu nhat phan lon nghi
+        if random.random()<0.18: continue                            # ngay nghi rai rac
+        for _h in random.sample(KHUNG_TRUC, random.randint(2,len(KHUNG_TRUC))):
+            _khi=_ngay.replace(hour=_h,minute=0)
+            _co=_wowByKey.get((_nv[0],F(_khi)))
+            if _co:
+                _w=_co[0]
+                _tt="taught (Đã dạy xong)" if str(_w.get("wow_status","")).startswith("completed") else "booked (Đã có người đặt)"
+                wow_slots.append(_themSlot(_nv,_khi,_tt,_w["wow_id"]))
+            elif _off<0:
+                # ca da qua ma khong ai dat: van la ca da dang ky, chi la trong
+                wow_slots.append(_themSlot(_nv,_khi,"available (Còn trống)"))
+            elif random.random()<0.12:
+                wow_slots.append(_themSlot(_nv,_khi,"off (Nghỉ/Bận)"))
+            else:
+                wow_slots.append(_themSlot(_nv,_khi,"available (Còn trống)"))
+# PHU HET buoi WOW da co: buoi nao chua co slot thi mo them mot ca dung gio do
+_daCo={(x["staff_id"],x["slot_datetime"]) for x in wow_slots}
+for _w in wows:
+    _d=str(_w.get("wow_session_date") or "").strip()
+    if not _d or str(_w.get("wow_status","")).startswith("cancelled") or (_w["staff_id"],_d) in _daCo: continue
+    try: _khi=dt.datetime.strptime(_d,"%d/%m/%Y %H:%M")
+    except Exception: continue
+    _nv=(_w["staff_id"], _w.get("staff_name") or _w["staff_id"])
+    _tt="taught (Đã dạy xong)" if str(_w.get("wow_status","")).startswith("completed") else "booked (Đã có người đặt)"
+    wow_slots.append(_themSlot(_nv,_khi,_tt,_w["wow_id"]))
+    _daCo.add((_w["staff_id"],_d))
+
 dl_new={"DL01":STAFF,"DL02":leads,"DL02b":tps,"DL03":tests,"DL04":cons_rows,"DL05":COURSES,"DL06":enrs,"DL07":pays,
         "DL08":obs,"DL09":students,"DL10":CLS,"DL11":sessions,"DL12":atts,"DL13":hws,"DL14":wows,"DL15":surveys,
-        "DL16":fbs,"DL17":kns,"DL18":ces}
+        "DL16":fbs,"DL17":kns,"DL18":ces,"DL26":wow_slots}
 out={"dl":dl_new,"enums":old.get("enums"),"config":old.get("config")}
 
 # ---------- KIỂM ĐỊNH ----------
@@ -1769,6 +1876,35 @@ pkmap={"DL02":"lead_id","DL02b":"touchpoint_id","DL03":"test_booking_id","DL04":
 for k,pk in pkmap.items():
     ids=[r[pk] for r in dl_new[k]]
     chk(len(ids)==len(set(ids)),k+" trùng PK")
+# --- DL26 lich truc WOW: kiem dinh ngay tai nguon ---
+# Sinh ra roi phai HOI LAI, khong tin tay minh vua viet. Ba cau:
+_slotKey={(x["staff_id"],x["slot_datetime"]) for x in wow_slots}
+chk(len({x["slot_id"] for x in wow_slots})==len(wow_slots),"DL26 trung slot_id")
+chk(len(_slotKey)==len(wow_slots),"DL26 trung ca (cung NV, cung gio)")
+_sot=[w["wow_id"] for w in wows if str(w.get("wow_session_date") or "").strip()
+      and not str(w.get("wow_status","")).startswith("cancelled")
+      and (w["staff_id"],str(w["wow_session_date"]).strip()) not in _slotKey]
+chk(not _sot,"DL26 khong phu het buoi WOW - sot %d buoi (%s)"%(len(_sot),", ".join(_sot[:4])))
+# moi buoi da co phai duoc slot ghi nhan bang dung ma buoi, khong chi trung gio
+_link={x["wow_id"] for x in wow_slots if str(x.get("wow_id") or "").strip()}
+_thieu=[w["wow_id"] for w in wows if str(w.get("wow_session_date") or "").strip()
+        and not str(w.get("wow_status","")).startswith("cancelled") and w["wow_id"] not in _link]
+chk(not _thieu,"DL26 co ca trung gio ma khong noi ma buoi - %d buoi (%s)"%(len(_thieu),", ".join(_thieu[:4])))
+# CA DA CO NGUOI DAT phai BANG so buoi that (khong tinh buoi huy) - dung cot doi chieu ma SOP doi
+_caBan=collections.Counter(x["staff_id"] for x in wow_slots
+                           if str(x["wow_slot_status"]).split(" ")[0] in ("booked","taught"))
+_buoiThat=collections.Counter(w["staff_id"] for w in wows
+                              if str(w.get("wow_session_date") or "").strip()
+                              and not str(w.get("wow_status","")).startswith("cancelled"))
+for _nv in set(list(_caBan)+list(_buoiThat)):
+    chk(_caBan[_nv]==_buoiThat[_nv],
+        "DL26 %s: %d ca da dat nhung %d buoi that - lich truc va so WOW noi nguoc nhau"%(_nv,_caBan[_nv],_buoiThat[_nv]))
+
+# danh muc khai bon gia tri thi demo phai cho thay du bon
+_tt={str(x["wow_slot_status"]).split(" ")[0] for x in wow_slots}
+for _c in ["available","booked","taught","off"]:
+    chk(_c in _tt,"DL26 thieu trang thai '%s' - danh muc khai ma man hinh khong bao gio thay"%_c)
+
 lead_ids={L["lead_id"] for L in leads}; stu_ids={s["student_id"] for s in students}
 cls_ids={c["class_id"] for c in CLS}; ses_ids={s["session_id"] for s in sessions}; enr_ids={e["enrollment_id"] for e in enrs}
 for t in tps: chk(t["lead_id"] in lead_ids,"TP lead?")
