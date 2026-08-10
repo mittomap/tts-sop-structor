@@ -155,9 +155,21 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
  var hw=veDrawer(function(){hvWowAsk()});
  t("hvWowAsk ve duoc", typeof hw==="string"&&hw.indexOf("LOI:")!==0);
  if(typeof hw==="string"&&hw.indexOf("LOI:")!==0){
-  var d1=moiDate(hw);
-  t("hvWowAsk - ngay mong muon dien san ngay mai", d1.length===1&&(d1[0].match(/value="([^"]*)"/)||[])[1]===isoDay(1));
-  t("hvWowAsk - chan chon ngay da qua", /min="/.test(d1[0]))}
+  /* DOI CAU HOI, KHONG XOA THUOC (10/08). Hai phep canh cu doi mot O NGAY dien san ngay mai va
+     co `min` de chan ngay da qua. Anh Luan doi thiet ke: *"nguoi dung chi duoc chon book wow dua
+     tren lich lam viec da dang ky cua team wow thoi"* - nen o ngay go tay da bi thay bang o CHON
+     CA TRUC. Y DINH cu van dung (khong cho dat vao qua khu) nhung nay dung DO CAU TAO: danh sach
+     chi liet ke ca con trong va chua qua gio. Thuoc moi hoi thang cai y dinh ay, va hoi chat hon:
+     khong con o nao go duoc gio tu do, va khong ca nao chao ra da qua gio. */
+  t("hvWowAsk - chon CA TRUC co that, khong go gio tu do",
+    /id="hvw_slot"/.test(hw) && !/id="hvw_date"/.test(hw) && !/id="hvw_gio"/.test(hw));
+  var _op=(hw.match(/<option value="SLOT-[^"]*"[^>]*>[^<]*<\/option>/g)||[]);
+  t("hvWowAsk - co ca de chon ("+_op.length+" ca)", _op.length>0);
+  var _qua=_op.filter(function(o){
+    var m=o.match(/>(\d{2}\/\d{2}\/\d{4} \d{2}:\d{2})/);
+    if(!m)return false;var p=m[1].split(/[\/ :]/);
+    return new Date(+p[2],+p[1]-1,+p[0],+p[3],+p[4]).getTime()<=Date.now()});
+  t("hvWowAsk - khong chao ra ca nao da qua gio", !_qua.length, _qua.slice(0,2).join(" | "))}
  var hp=veDrawer(function(){hvPaidNotify((rows("DL06").filter(function(x){return x.student_id===hs.student_id})[0]||e).enrollment_id)});
  t("hvPaidNotify ve duoc", typeof hp==="string"&&hp.indexOf("LOI:")!==0);
  if(typeof hp==="string"&&hp.indexOf("LOI:")!==0){

@@ -43,6 +43,13 @@ def gioKQ(gio_thi, moc=None):
     t = gio_thi + dt.timedelta(hours=random.randint(2, 18))
     if t > moc: t = moc - dt.timedelta(minutes=random.randint(5, 90))
     if t <= gio_thi: t = gio_thi + dt.timedelta(minutes=random.randint(45, 120))
+    # CHAM BAI CUNG LA VIEC CUA NGUOI, KHONG AI CHAM LUC 2 GIO SANG. Ban dau cua chinh ham nay
+    # sinh ra `TB-2026-084` cham luc **02:00** - vi cong 2-18 gio vao mot ca thi buoi toi la tran
+    # sang dem. Va sai roi lam sai kieu khac.
+    if t.hour < 8:  t = t.replace(hour=random.randint(8, 11))
+    if t.hour > 21: t = t.replace(hour=random.randint(18, 21))
+    if t <= gio_thi: t = gio_thi + dt.timedelta(minutes=random.randint(45, 120))
+    if t > moc:      t = moc - dt.timedelta(minutes=random.randint(5, 90))
     return t
 
 def gioTest(d, moc):
@@ -804,6 +811,36 @@ for s in students:
     add_cons(lead_of[s["student_id"]],"won",class_course.get(next((cid for cid,r in rosters.items() if s["student_id"] in r),None)) )
 for kind,n in [("todo",1),("interested",8),("dropped",4),("noresp",3)]:
     for _ in range(n): add_cons(next(pi,random.choice(pipe)),kind)
+# NA056 - "Da cham, chua chuyen trang thai": PHAI GIEO CO CHU DICH, dung tien le NA037.
+# App tra NA056 khi hoi du BON dieu kien mot luc: da co diem · post_test_status KHONG rong va
+# chua `consulted` · lead DA CO phieu tu van · va ket qua con TRONG han slaCVT (24h). Truoc nay
+# no duoc phu do MAY - mot bo du lieu doi la mat, va `check_sop` bat ngay (KHONG DAT 10/08).
+# *Mot tinh huong SOP duoc phu do may thi som muon cung mat.* Gieo hai ca cho chac, mot ca doi
+# la van con mot ca.
+_na056=0
+for _t in tests:
+    if _na056>=2: break
+    if not str(_t.get("test_status","")).startswith("graded"): continue
+    if str(_t.get("post_test_status","")).startswith("consulted"): continue
+    _L=next((x for x in leads if x["lead_id"]==_t["lead_id"]), None)
+    if not _L or _L["lead_id"] in cons_of: continue
+    _t["post_test_status"]="awaiting_consultation (Có KQ, chờ tư vấn)"
+    # DAT CA HAI MOC MOT LUOT, dung chinh mot cai roi mong cai kia khong dung. Ban dau em chi ep
+    # `result_time` ve trong han 24h - va no roi TRUOC gio thi o hai phieu (`check_logic` 13c bat
+    # ngay). Nay: keo gio thi ve 12-18h truoc, roi cham sau do 1-3h. Vua thuan nhan qua, vua con
+    # trong han SLA - hai dieu kien ay phai dung CUNG LUC thi moi ra NA056.
+    _thi = gioTest(NOW - dt.timedelta(hours=random.randint(12, 18)), NOW)
+    _kq  = _thi + dt.timedelta(hours=random.randint(1, 3))
+    if _kq >= NOW: _kq = NOW - dt.timedelta(minutes=random.randint(20, 90))
+    if _kq <= _thi: _thi = _kq - dt.timedelta(hours=2)
+    _t["test_date"]=F(_thi)
+    if str(_t.get("test_attendance_time") or "").strip(): _t["test_attendance_time"]=F(_thi)
+    _t["result_time"]=F(_kq)
+    _c=add_cons(_L,"todo")
+    _c["consultation_status"]="not_consulted (Chưa tư vấn)"
+    _na056+=1
+if _na056<2: raise SystemExit("KHONG GIEO DU NA056 (%d/2) - tinh huong SOP nay se mat phu"%_na056)
+
 for c in cons_rows: c["test_booking_id"]=tb_of.get(c["lead_id"],"")
 
 # ================= DL06 + DL07 =================
@@ -1868,6 +1905,22 @@ dl_new={"DL01":STAFF,"DL02":leads,"DL02b":tps,"DL03":tests,"DL04":cons_rows,"DL0
         "DL16":fbs,"DL17":kns,"DL18":ces,"DL26":wow_slots}
 out={"dl":dl_new,"enums":old.get("enums"),"config":old.get("config")}
 
+# ---------- CH2: hai tham so cua LICH TRUC WOW ----------
+# LUAT DU AN: moi hang so nghiep vu di qua CH2, va `_check16`/`_check18` doi moi tham so app DOC
+# thi phai co O SUA trong man Cai dat - khong thi anh Luan thay mot con so ma khong doi duoc.
+# Verify tron bo bat ngay lan dau: "khong con tham so app doc ma khong co o sua (wowSlotHours,
+# wowSlotMaxDays)". Them tai NGUON de moi lan dung lai deu co, khong phai va tay vao JSON.
+_ch2 = (out.get("config") or {}).setdefault("ch2", [])
+_daCoCh2 = {str(x.get("name")) for x in _ch2}
+for _t in [
+    {"name":"wowSlotHours","value":"09:00,15:00,17:00,19:00","unit":"khung giờ",
+     "meaning":"Các khung giờ NV WOW được đăng ký trực trong ngày. Học viên và học vụ chỉ đặt được buổi WOW vào những khung này.",
+     "suggested":"4 khung: sáng 09:00, chiều 15:00 và 17:00, tối 19:00. Thêm khung thì team WOW đăng ký được nhiều ca hơn."},
+    {"name":"wowSlotMaxDays","value":60,"unit":"ngày",
+     "meaning":"Mỗi lần đăng ký ca trực, NV WOW được nhận tối đa bao nhiêu ngày liên tiếp.",
+     "suggested":"60 ngày (khoảng 2 tháng). Đặt ngắn hơn nếu muốn team đăng ký lại theo tháng."}]:
+    if _t["name"] not in _daCoCh2: _ch2.append(_t)
+
 # ---------- KIỂM ĐỊNH ----------
 err=[]
 def chk(cond,msg):
@@ -2010,7 +2063,14 @@ _sanphang["buổi WOW"]=_phuDeu(wows,"wow_session_date",
     lambda w: w["wow_status"].split(" ")[0] in ("booked","confirmed"),
     [9,15,19], 2, truoc=("booking_date",))
 _sanphang["test đầu vào"]=_phuDeu(tests,"test_date",
-    lambda t: t["booking_status"].startswith("booked") and not t["test_attendance_status"],
+    # DUNG DOI NGAY MOT CA TEST DA DIEN RA. Dieu kien cu chi hoi `test_attendance_status`, nen
+    # mot phieu DA CHAM ma o diem danh con trong van bi doi ngay thi - keo gio thi ve SAU gio
+    # cham. `check_logic` 13c bat duoc hai phieu (TB-2026-095, -097: thi 07/08 ma cham 05/08).
+    # Da co ket qua, da co gio diem danh, hay da chot trang thai thi ca ay thuoc ve qua khu.
+    lambda t: t["booking_status"].startswith("booked") and not t["test_attendance_status"]
+              and not str(t.get("test_attendance_time") or "").strip()
+              and not str(t.get("result_time") or "").strip()
+              and not str(t.get("test_status") or "").strip(),
     [9,14,19], 2)
 print("SAN PHANG THEO NGAY (doi ngay, khong them dong):",
       ", ".join("%s %d dong"%(k,v) for k,v in _sanphang.items()))

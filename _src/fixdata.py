@@ -1411,6 +1411,25 @@ if _vfix or _mfix:
 # nó soi trên dữ liệu ĐANG MỞ nên bắt được thứ bộ kiểm lúc sinh dữ liệu bỏ sót.
 # Vá: đẩy giờ test ra sau giờ tạo lead ít nhất 2 tiếng (cùng ngày thì lùi sang khung sau).
 _tfix = 0
+def _keoTheoTest(t):
+    """Doi `test_date` thi phai keo theo GIO DIEM DANH va GIO CHAM.
+
+    LOP LOI: *doi mot moc ma bo quen moc phu thuoc.* Luat 14septies day gio thi ra sau (khi phieu
+    hen truoc luc tao lead) va 14undecies keo gio thi ve qua khu - ca hai deu khong dung toi
+    `result_time`, nen gio cham roi ve TRUOC gio thi. `check_logic` 13c bat duoc TB-2026-095 va
+    -097 (thi 07/08 ma cham 05/08). Mot moc thoi gian khong dung mot minh: no dung trong mot
+    chuoi nhan qua, va doi mot mat xich thi phai doi ca doan sau no."""
+    _td = dt(t.get("test_date"))
+    if not _td: return
+    _at = dt(t.get("test_attendance_time"))
+    if _at and _at < _td: t["test_attendance_time"] = fmt(_td)
+    _rt = dt(t.get("result_time"))
+    if _rt and _rt <= _td:
+        _moi = _td + datetime.timedelta(hours=random.randint(1, 3))
+        if _moi > NOW: _moi = NOW - datetime.timedelta(minutes=20)
+        if _moi <= _td: _moi = _td + datetime.timedelta(minutes=45)
+        t["result_time"] = fmt(_moi)
+
 for t in dl.get("DL03", []):
     L = IDX["DL02"].get(str(t.get("lead_id") or ""))
     if not L:
@@ -1418,6 +1437,7 @@ for t in dl.get("DL03", []):
     a, b = dt(L.get("lead_created_time")), dt(t.get("test_date"))
     if a and b and b < a:
         t["test_date"] = fmt(a + datetime.timedelta(hours=2))
+        _keoTheoTest(t)
         _tfix += 1
 log.append("14septies. Thứ tự: đẩy %d phiếu test bị hẹn TRƯỚC giờ tạo lead ra sau ít nhất 2 tiếng"
            % _tfix)
@@ -1548,6 +1568,7 @@ for r in dl.get("DL03", []):
     td = dt(r.get("test_date"))
     if td and td > NOW - datetime.timedelta(hours=6):
         r["test_date"] = fmt(NOW - datetime.timedelta(hours=6))
+        _keoTheoTest(r)
         _ttfix += 1
 log.append("14undecies. Test: kéo %d buổi ĐÃ điểm danh dự thi về quá khứ (chống trôi theo đồng hồ)"
            % _ttfix)

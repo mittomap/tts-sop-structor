@@ -59,7 +59,16 @@ const APP = process.env.ITTS_APP || PATH.join(__dirname, "_APP.js");
    Nợ còn lại: `academic_staff` và `academic_manager` đang 26 mục - nhóm chặng B của họ có 13 mục
    (lớp học, giáo án, bài tập, buổi hôm nay, lịch tuần, GV dự phòng, phòng học...). Đó là việc
    hằng ngày thật, không gom được như sổ tra cứu; muốn ngắn thì phải tách chặng, để dịp sau. */
-const TRAN_MUC   = 44;   /* mục menu của một chức danh */
+/* ═══ 10/08: 44 -> 45, VÌ THÊM MỘT MÀN SOP ĐÃ MÔ TẢ MÀ APP BỎ SÓT ═══════════════════════
+   Anh Luân đặt: *"mỗi người team wow có thể tự book lịch làm việc của mình... học viên có thể
+   chọn dựa trên lịch này"*. Tra SOP thì đó không phải tính năng mới mà là một mảng SOP bỏ sót:
+   SOP có sẵn màn "BẢNG TRỰC NV WOW - THEO THÁNG" và cả danh mục `enum_wow_slot_status`
+   (nằm trong `ITTs_data.js` từ đầu, app dùng 0 lần). Thêm trang `lichwow` là TRẢ một món nợ
+   SOP, không phải nhét thêm một mục cho vui.
+   Đúng thủ tục mà chính đoạn trên đặt ra: trần chỉ để menu không dài thêm TRONG IM LẶNG - nâng
+   thì phải khai thẳng lý do. Đây là lý do, và món nợ vẫn ghi: `academic_staff`/`academic_manager`
+   còn 26 mục, muốn ngắn thì phải tách chặng. */
+const TRAN_MUC   = 45;   /* mục menu của một chức danh */
 const TRAN_NHOM  = 20;   /* mục trong MỘT nhóm */
 const TRAN_TRONG = 2;    /* mục mở ra trống, trên toàn bộ chức danh */
 

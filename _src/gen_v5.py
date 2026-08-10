@@ -2997,7 +2997,10 @@ var ROLESCOPE={
     bài hướng dẫn của chính họ dẫn sang Tuyển sinh rồi bị chặn. Mở đúng một tab test, không mở
     cả hub tuyển sinh. */
  wow:{match:/^wow/,land:"hoctap",ctx:{HTTAB:"wow"},
-  pages:["viec","hocvien","giangvien","hoctap","banglop","tuyensinh"],
+  /* `lichwow` mở cho chính đội WOW: họ là người ĐĂNG KÝ ca của mình, không ai ký thay được.
+     Thiếu trang này trong phạm vi thì bài hướng dẫn trỏ vào một chỗ họ không vào được -
+     `_checktour` bắt đúng chuyện đó (10/08). */
+  pages:["viec","hocvien","giangvien","hoctap","banglop","tuyensinh","lichwow"],
   /* Đội WOW kèm 1-1: không xếp giáo viên thay, không gỡ đụng phòng, không canh SLA nhận xét
      buổi của lớp ACA. Ba tab ấy thuộc Học vụ / ACA. */
   tabs:{tuyensinh:["test"],hoctap:["buoihnay","lichtuan","lop","wow"]},blocks:["test_grading","wowq","risk"],mine:0,mineBtn:0,kpi:0,bell:["WOW","Giao việc"]},
@@ -3917,6 +3920,14 @@ function colMenuHTML(key){var cfg=LISTCFG[key];if(window.COLMENU!==key)return ''
    Bộ kiểm _checkux canh: dải nào gọi statStrip mà không khai ở đây là đỏ; số thẻ khai lệch với
    số thẻ vẽ ra thật cũng đỏ; thẻ nào còn onclick cũng đỏ. */
 var THEDEF={
+ /* V2 10/08 - dải thẻ của màn Lịch trực WOW. Ô thứ tư là ô quan trọng nhất của cả màn: những
+    ngày KHÔNG AI TRỰC chính là những ngày học viên mở app ra và không đặt được buổi nào - SOP
+    gọi ô trống trong lưới là "không ai trực", thẻ này đếm hộ để không phải rà mắt cả lưới. */
+ lichwow:{t:"Lịch trực WOW",the:[
+  ["lw_tron","Ca còn trống đặt được","Ca đã đăng ký, chưa ai đặt và chưa qua giờ - đây là phần học viên chọn được ngay. Danh sách: ô có màu nhạt trong lưới ngay dưới."],
+  ["lw_dat","Ca đã có người đặt","Ca đã gắn với một buổi WOW (đang chờ dạy hoặc đã dạy xong). Danh sách: ô màu xanh/hổ phách trong lưới ngay dưới."],
+  ["lw_nv","NV WOW có đăng ký ca","Số người của team WOW có ít nhất một ca trong tháng này. Danh sách: bảng Tổng giờ trực ở cuối trang."],
+  ["lw_trong","Ngày không ai trực","Số ngày trong tháng không một ai đăng ký ca nào - học viên mở app ra là không đặt được buổi WOW. Danh sách: cột nào toàn dấu chấm trong lưới ngay dưới."]]},
   /* ═══ V2 KHÚC 2b đợt 3 ═══════════════════════════════════════════════════════════════════ */
  nhaplead:{t:"Lead & khai thác",the:[
   ["nl_moi","Lead mới chưa chạm","Khách vừa vào hệ thống, chưa ai gọi hay nhắn lần nào - phản hồi trong hạn SLA là việc gấp nhất. Danh sách: bấm chip \"Mới\" ở thanh lọc ngay dưới."],
@@ -15020,6 +15031,7 @@ function lwRanh(sl,tuKhi){var d=pvnd(sl.slot_datetime);
 function lwThang(){return window.LWTHANG||(function(){var n=new Date();
  return n.getFullYear()+"-"+("0"+(n.getMonth()+1)).slice(-2)})()}
 function lwDoiThang(v){window.LWTHANG=v;reRender("lichwow")}
+function lwLoc(v){window.LWNV=v||"";reRender("lichwow")}
 function renderLichWow(){
  var thang=lwThang(), pn=thang.split("-"), nam=+pn[0], thg=+pn[1];
  var soNgay=new Date(nam,thg,0).getDate();
@@ -15035,8 +15047,26 @@ function renderLichWow(){
  for(var k=-2;k<=2;k++){var d0=new Date(nam,thg-1+k,1);
   var v=d0.getFullYear()+"-"+("0"+(d0.getMonth()+1)).slice(-2);
   opt+='<option value="'+v+'"'+(v===thang?" selected":"")+'>Tháng '+(d0.getMonth()+1)+"/"+d0.getFullYear()+'</option>'}
+ /* DẢI THẺ: bốn con số người quản lý team WOW cần liếc một cái là biết. Số cuối - "ngày không
+    ai trực" - là con số quan trọng nhất của màn này: đó chính là những ngày học viên mở app ra
+    và không đặt được buổi nào. SOP gọi ô trống là "không ai trực"; thẻ này đếm hộ. */
+ var _now=Date.now();
+ var _tron=all.filter(function(x){return lwRanh(x,_now)}).length;
+ var _dat=all.filter(function(x){return isc(x.wow_slot_status,"booked","taught")}).length;
+ var _nv={};all.forEach(function(x){_nv[String(x.staff_id||"")]=1});
+ var _coCa={};all.forEach(function(x){var d=pvnd(x.slot_datetime);if(d)_coCa[d.getDate()]=1});
+ var _trong=0;for(var _n=1;_n<=soNgay;_n++)if(!_coCa[_n])_trong++;
+ h+=statStrip([["ti-calendar-check",_tron,"Ca còn trống đặt được","#16A34A","học viên chọn được ngay"],
+   ["ti-user-check",_dat,"Ca đã có người đặt","#3B82C4",""],
+   ["ti-users",Object.keys(_nv).length,"NV WOW có đăng ký ca","#2E5A88",""],
+   ["ti-calendar-off",_trong,"Ngày không ai trực","#E08A1E","học viên mở app ra là không đặt được"]],"lichwow");
+ /* CHIP LỌC theo người: team ba bốn người thì xem lịch của riêng một người là việc thường ngày. */
+ var _dsNv=[["","Cả team"]].concat(doiWOW().map(function(id){var st=find("DL01","staff_id",id)||{};
+   return [id,(st.full_name||id).split(" ").slice(-2).join(" ")]}));
  h+=tbar('<span class="tblbl">Tháng</span><select class="sel" onchange="lwDoiThang(this.value)">'+opt+'</select>'+
+  segHTML(window.LWNV||"",_dsNv,'lwLoc(\'{v}\')')+
   '<span class="mut" style="font-size:11px;margin-left:10px">'+all.length+' ca đã đăng ký trong tháng</span>',"");
+ if(window.LWNV)all=all.filter(function(x){return String(x.staff_id||"")===window.LWNV});
  /* ── LƯỚI TRỰC: cột = ngày, hàng = khung giờ, ô trống = không ai trực ── */
  var ix={};
  all.forEach(function(x){var d=pvnd(x.slot_datetime);if(!d)return;
@@ -15054,8 +15084,11 @@ function renderLichWow(){
    if(!ds.length){h+='<td class="mut" style="text-align:center">·</td>';continue}
    var chu=ds.map(function(x){return String(x.staff_id||"")+(x.branch?("-"+String(ecode(x.branch)||"").replace("branch_","CS")):"")}).join(", ");
    var co=ds.filter(function(x){return isc(x.wow_slot_status,"booked","taught")}).length;
-   h+='<td style="text-align:center" data-tip="'+esc(ds.map(function(x){return x.staff_name+" · "+elabel(x.wow_slot_status)}).join(" | "))+'">'+
-    '<span class="chip '+(co?(co>=ds.length?"green":"amber"):"")+'">'+esc(chu)+'</span></td>'}
+   /* Ô LƯỚI PHẢI BẤM ĐƯỢC. `_checkbam` bắt đúng chỗ này: bấm vào ô mà không mở gì, không báo
+      gì - đúng cái "kiểu hỏng nguy hiểm nhất" mà dự án đã ghi. Ô là nơi dày thông tin nhất của
+      màn, người ta bấm vào là chuyện đương nhiên. */
+   h+='<td style="text-align:center"><button class="chip '+(co?(co>=ds.length?"green":"amber"):"")+
+    '" onclick="lwXemO(\''+esc(g)+'\','+n+')" data-tip="Bấm để xem chi tiết ca trực khung này">'+esc(chu)+'</button></td>'}
   h+='</tr>'});
  h+='</tbody></table></div></div>';
  /* ── TỔNG GIỜ TRỰC THEO NV + đối chiếu với buổi thật (SOP đòi đúng cột này) ── */
@@ -15083,6 +15116,22 @@ function renderLichWow(){
  return h}
 /* Cửa đăng ký ca: NV WOW chọn NGÀY và tick KHUNG GIỜ - đúng lời anh Luân "chọn được ngày, giờ".
    Không cho người này đăng ký hộ người kia: ca là cam kết có mặt, ký thay là hứa thay. */
+/* Xem chi tiết một ô lưới: ai trực, ở cơ sở nào, ca nào còn trống, ca nào ai đã đặt. */
+function lwXemO(gio,ngay){
+ var pn=lwThang().split("-"),nam=+pn[0],thg=+pn[1];
+ var ds=lwSlots().filter(function(x){var d=pvnd(x.slot_datetime);
+  return d&&d.getFullYear()===nam&&(d.getMonth()+1)===thg&&d.getDate()===ngay&&
+   ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)===gio});
+ var h='<div class="dcard"><h4><i class="ti ti-calendar-event"></i>Ca '+esc(gio)+" ngày "+ngay+"/"+thg+"/"+nam+'</h4>';
+ if(!ds.length)h+='<div class="empty">Khung giờ này không ai trực - học viên không đặt được buổi WOW vào đây.</div>';
+ else{h+='<div class="tbwrap"><table class="dt"><thead><tr><th>NV WOW</th><th>Cơ sở</th><th>Trạng thái</th><th>Buổi đã đặt</th></tr></thead><tbody>';
+  ds.forEach(function(x){var w=x.wow_id?find("DL14","wow_id",x.wow_id):null;
+   h+='<tr><td><b>'+esc(x.staff_name||x.staff_id)+'</b></td><td>'+esc(elabel(x.branch)||"-")+'</td>'+
+    '<td><span class="chip '+stCls(x.wow_slot_status)+'">'+esc(elabel(x.wow_slot_status))+'</span></td>'+
+    '<td>'+(w?esc((w.student_name||w.student_id)+" · "+(elabel(w.wow_skill)||"")):'<span class="mut">-</span>')+'</td></tr>'});
+  h+='</tbody></table></div>'}
+ h+='<div class="dact"><button class="btn" onclick="closeModal()">Đóng</button></div></div>';
+ openDrawer("Chi tiết ca trực",h)}
 function lwDangKy(){
  if(!lwLaWow()){toast("Chỉ NV WOW mới đăng ký được ca trực của mình.");return}
  var khung=lwKhung();
@@ -19089,6 +19138,10 @@ var TOURS={
   {p:"test",sel:'@man',t:"Chấm test đầu vào",d:"Chấm bài test là việc của NV WOW chứ không phải giáo viên đứng lớp - bảng phân quyền CH3 của SOP ghi rõ. Nhập bốn kỹ năng, điểm tổng tự tính trung bình.",hint:"Mở một phiếu test chờ chấm."},
   {p:"test",sel:'@tbar',t:"Viết academic_note",d:"Nhận xét học thuật là thứ nhân viên tư vấn dùng để tư vấn lộ trình. Chấm điểm mà không viết nhận xét thì người sau không biết nói gì với khách.",hint:"Nhìn chip Chờ chấm và Đã chấm."},
   {p:"wow",sel:'@txt:Chờ ghi nội dung',t:"Ghi nội dung và kết quả buổi kèm",d:"Dạy xong ghi ngay: kèm gì, học viên tiến bộ hay chưa. Chỉ số WOR (tỷ lệ buổi có tiến bộ) tính từ đúng ô này, và giáo viên chủ nhiệm đọc nó để biết đã kèm gì.",hint:"Bấm chip Chờ ghi nội dung."},
+  /* V2 10/08 - bước cho màn Lịch trực WOW. `_checktour` bắt đúng: thêm một trang nghiệp vụ mà
+     không bài nào đi qua thì người dùng không bao giờ tìm ra nó. Bước này đặt ngay sau hai bước
+     WOW để mạch tự nhiên: dạy buổi -> ghi kết quả -> và muốn có buổi thì phải có ca trực. */
+  {p:"lichwow",sel:'@man',t:"Đăng ký ca trực của bạn",d:"Học viên chỉ đặt được buổi WOW vào khung giờ bạn đã đăng ký trực - ô trống trong lưới nghĩa là hôm đó không ai trực và không ai đặt được. Bấm \"Đăng ký ca của tôi\" để chọn ngày và khung giờ bạn nhận.",hint:"Đăng ký ca cho tuần tới, rồi xem lại lưới - cột nào toàn dấu chấm là ngày chưa ai trực."},
   {p:"hocvien",sel:'@tbarct',t:"Học viên nào cần đặt buổi kèm",d:"Em nào yếu học thuật thì SOP bảo đặt buổi WOW kèm. Lọc nhanh Nguy cơ cho ra đúng nhóm đó, kèm số buổi vắng và số bài thiếu để biết nặng nhẹ.",hint:"Xong một ngày của giáo viên WOW!"}]},
  tn_marketing:{lv:"trainghiem",role:"Marketing",t:"Một ngày của Marketing",ic:"ti-speakerphone",d:"5 bước - nguồn lead, chất lượng lead, kho khách cũ",steps:[
   {p:"nhaplead",sel:'@man',t:"Đêm qua lead về từ đâu",d:"Mỗi lead ghi rõ nguồn. Nguồn nào đang đổ về nhiều mà chất lượng kém thì phải biết trong ngày, không đợi cuối tháng mới cộng sổ.",hint:"Nhìn cột Nguồn trong danh sách lead."},
