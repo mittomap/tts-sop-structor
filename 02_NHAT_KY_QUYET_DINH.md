@@ -248,15 +248,21 @@
 > làm v2 mà"* · *"V1 là v1, v2 là v2, em đùa à"*. Em revert `87d6539`, `git diff 030351c HEAD`
 > không ra một dòng nào - trang demo về đúng bản 07/08, mã dựng `829572`.
 >
-> **VÌ SAO SAI:** luật *"kết phiên thì chạy `./update.sh`"* viết từ thời V1, lúc nhánh đang làm
-> **chính là** bản phát hành. Nay V2 nằm trên nhánh riêng **chưa nhập `main`** (`main` còn ở
-> V9.22), còn trang demo công khai đang phục vụ V1. Hai dòng sản phẩm riêng, hai địa chỉ riêng.
-> Em đọc một dòng luật cũ rồi suy ra một việc hướng RA NGOÀI.
+> **VÌ SAO SAI - VÀ GỐC KHÔNG PHẢI CHỖ EM TƯỞNG.** Ban đầu em ghi là "đọc luật cũ rồi suy ra".
+> Tra kỹ hơn thì gốc nặng hơn thế: **V2 CÓ NHÀ RIÊNG** - repo `mittomap/itts-sop-demo-v2` →
+> https://mittomap.github.io/itts-sop-demo-v2/ - và **vòng 1-5 đã lên đó đầy đủ, ba lần trong
+> ngày 09/08 (11:48, 12:58, 14:24, mã dựng `c3262e`)**. Em không hề đi tra chỗ ấy. Em mở repo
+> demo **V1**, thấy nó dừng ở 07/08, rồi kết luận *"cả sáu vòng hôm nay chưa từng lên online"* -
+> một câu SAI HOÀN TOÀN - và lấy chính câu sai ấy làm lý do để đẩy.
+> **ĐỌC TRẠNG THÁI Ở REPO NÀY RỒI HÀNH ĐỘNG LÊN REPO KIA LÀ CÁCH NHANH NHẤT ĐỂ LÀM HỎNG MỘT THỨ
+> ĐANG CHẠY TỐT.** Và cái "dấu hiệu lẽ ra phải đọc ra" mà em tự nghĩ ra lúc ấy - *"sáu vòng không
+> vòng nào đẩy demo"* - cũng là bịa: demo V2 đã đẩy ba lần. Một suy luận dựng trên số liệu đọc
+> nhầm thì nghe càng có lý càng nguy.
 >
-> **LUẬT MỚI, CAO HƠN BƯỚC 3 CỦA `CLAUDE.md`:** *đẩy ra trang công khai là việc hướng ra ngoài -
-> phải hỏi anh Luân, không suy ra từ luật cũ.* Và dấu hiệu lẽ ra phải đọc được: **sáu vòng trong
-> ngày không vòng nào đẩy demo**. Một thói quen bị bỏ sáu lần liên tiếp không phải là quên - nó
-> là một quyết định mà mình chưa biết lý do.
+> **LUẬT MỚI (đã ghi thẳng vào bước 3 của `CLAUDE.md`):** hai dòng sản phẩm, hai địa chỉ riêng -
+> đang làm V2 thì đẩy vào `itts-sop-demo-v2`, không đụng `itts-sop-demo`. **Trước khi đẩy, đọc mã
+> bản dựng của ĐÚNG repo mình sắp đẩy vào.** Đẩy sang dòng sản phẩm không phải cái đang làm thì
+> phải hỏi anh Luân trước.
 >
 > ### 🔵 09/08 - VÒNG BẢY: NÚT DẪN VỀ CHỖ ĐANG ĐỨNG, VÀ BỘ TÔ MÀU DÒ BẰNG CHUỖI CON
 >
