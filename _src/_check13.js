@@ -94,7 +94,17 @@ ok++;
 (function(){var h=RENDER.baocao();
  var a=h.indexOf("3 việc nên làm tuần này"),b=h.indexOf("Tình hình kinh doanh");
  t("khoi 3 viec nam TREN khoi tinh hinh kinh doanh", a>=0&&b>=0&&a<b);
- t("noi ro ky so lieu ap cho TOAN BO chi so", h.indexOf("áp cho TOÀN BỘ chỉ số")>=0);})();
+ /* ĐỔI CÂU HỎI, KHÔNG XOÁ THƯỚC (10/08). Phép canh cũ đòi trang phải chứa đúng chuỗi
+    "áp cho TOÀN BỘ chỉ số". Ý định của nó đúng - **trang phải nói cho người đọc biết kỳ áp cho
+    cái gì** - nhưng câu mà nó canh thì SAI: hỏi thẳng `fn.toString()`, `baocaoBranch` và
+    `staffPerfSection` không có một lời gọi `inRep`/`repF`/`repRange` nào, và "Hiệu suất đội tư
+    vấn" còn tự khai ngay trên tiêu đề là *"đăng ký & doanh thu: toàn kỳ dữ liệu"* - tức app tự
+    mâu thuẫn với chính mình cách nhau vài dòng. Một cái thước canh cho một lời hứa sai thì nó
+    đang giữ cái sai đứng yên.
+    Nay canh đúng ý định ban đầu: trang vẫn phải nói kỳ áp cho cái gì, nhưng KHÔNG được hứa quá
+    tay. `_checkaudit` M18 canh vế còn lại - bảng nào không lọc theo kỳ thì phải tự khai mốc. */
+ t("noi ro ky so lieu ap cho cai gi", h.indexOf("Kỳ này áp cho các chỉ số KPI bên dưới")>=0);
+ t("khong hua qua tay rang ky ap cho TOAN BO", h.indexOf("áp cho TOÀN BỘ chỉ số")<0);})();
 
 /* --- 9. hien thi 3 tang --- */
 (function(){var h=kpiSection();

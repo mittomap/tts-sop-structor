@@ -973,3 +973,13 @@ vao, va ho dien cai quang vua bam tren man.
 Va mot lan **to oan**: ban dau doi moi ham phai TU goi `repF`, nen `kpiSection` bi cham do -
 trong khi dong dau cua no la `var comp=kpiCompute()`, tuc no loc ky GIAN TIEP. *Doi moi ham phai
 tu loc la doi sai tang: viec loc nam o cho lay so, khong nam o cho ve bang.*
+
+**VA VERIFY TRON BO BAT LAI VONG CHIN: `_check13` CO SAN MOT THUOC CANH DUNG CAU HUA SAI AY.**
+Phep canh cu: `t("noi ro ky so lieu ap cho TOAN BO chi so", h.indexOf("áp cho TOÀN BỘ chỉ số")>=0)`
+- mot dong tro, khong kem ly do. Tuc cau hua ay khong phai viet au: co nguoi da dat thuoc giu no.
+**Y DINH cua thuoc thi DUNG** (trang phai noi cho nguoi doc biet ky ap cho cai gi), **cau ma no
+canh thi SAI**. Mot cai thuoc canh cho mot loi hua sai thi no dang giu cai sai dung yen.
+Nay DOI CAU HOI chu khong xoa thuoc, dung bai hoc da ghi tu Khuc 2: *moi lan do mot tang cau truc
+la mot lan phai di hoi lai tung cai thuoc "nen xoa, hay nen DOI CAU HOI"*. Thuoc moi hoi hai ve:
+trang van phai noi ky ap cho cai gi, va khong duoc hua qua tay. Ca hai ve deu da bi bat DO tren
+ban co cau cu truoc khi nhan xanh.
