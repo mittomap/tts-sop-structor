@@ -241,6 +241,70 @@
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 39 BỘ KIỂM (08/08). V1 mốc cũ: V9.99z12, 34 bộ, bản dựng `829572`.**
 >
+> ### 🟢 10/08 - LỊCH TRỰC NV WOW: ANH LUÂN GỌI TÊN MỘT MẢNG SOP MÀ 39 BỘ KIỂM KHÔNG CÓ CỬA ĐỂ THẤY
+>
+> Anh Luân: *"Book wow hiện tại là đang mặc định lúc nào cũng có người, nhưng trên thực tế, người
+> dùng chỉ được chọn book wow dựa trên lịch làm việc đã đăng ký của team wow thôi"* — rồi giao
+> luôn việc: *"E tạo chức năng, để mỗi người team wow có thể tự book lịch làm việc của mình, họ
+> có thể chọn được ngày, giờ, nó lưu vào lịch tổng và học viên có thể chọn dựa trên lịch này."*
+>
+> **Tra SOP trước khi dựng — và SOP đã mô tả sẵn từ đầu:** màn **"BẢNG TRỰC NV WOW - THEO THÁNG"**
+> (lưới cột = ngày, hàng = khung giờ, **ô trống = không ai trực**), kèm **"TỔNG GIỜ TRỰC THEO NV
+> WOW"** có cột "Buổi đã book" lấy từ DL14 để đối chiếu giờ trực với buổi thật. Danh mục
+> `enum_wow_slot_status` (available/booked/taught/off) **đã nằm trong `ITTs_data.js` từ đầu mà app
+> dùng 0 lần.** Tức đây không phải tính năng mới — đây là **LUẬT CỨNG SỐ 0: một thứ SOP đã mô tả
+> mà app làm sót.**
+>
+> **Vì sao 39 bộ kiểm không thấy — mở file SOP ra đếm sheet mới thấy gốc:** file có **52 sheet**, và
+> sheet thứ 30 tên là **`DL19. Lịch làm việc WOW`** — tức đây là **một bảng DL được đánh số**,
+> ngang hàng DL01..DL18, chứ không phải "SOP có nhắc đâu đó". `check_sop.py` lọc sheet theo `^DL\d`
+> (DL19 **khớp**), rồi đi tìm một hàng tiêu đề gồm các ô `snake_case`. DL19 vẽ theo **LƯỚI** nên
+> không có hàng ấy → `best` rỗng → `continue`. **Bỏ qua trong im lặng.** Con số in ra vẫn đẹp:
+> *"bảng dữ liệu: 19"*, và không ai đối chiếu 19 với 20.
+> *Một phép đo bỏ qua cái nó không hiểu, rồi in ra con số của những cái nó hiểu — con số ấy trông
+> y như một con số đầy đủ.*
+> **Đã bịt:** `check_sop.py` nay lấy cả danh sách sheet `^DL\d` rồi trừ đi những bảng đọc được cột;
+> bảng nào chênh ra **phải khai kèm BẰNG CHỨNG app đã làm** (những chuỗi phải có thật trong
+> `gen_v5.py`). Khai suông không tính. Đã tự thử hai chiều: gỡ một chuỗi bằng chứng → đỏ; bỏ dòng
+> khai → đỏ. **Lưu ý số hiệu:** DL19 của **app** là "Thưởng giới thiệu" — trùng số với SOP, nên
+> bảng lịch trực mang số **DL26**.
+>
+> **Đọc kỹ sheet ấy thì lòi tiếp BA THỨ em đã làm thiếu**, đúng diện LUẬT CỨNG SỐ 0: **13 khung giờ**
+> 08:30→21:30 (em đặt 4 khung cho gọn — 4 < 13 là BỚT) · cột **"Cam kết/tháng"** (SOP ghi 40) và cột
+> **"Tình trạng"** (SOP tự ghi chú mẫu *"Thiếu 11h"*) — thiếu hai cột này thì bảng tổng chỉ ĐẾM, không
+> trả lời được câu người quản lý team WOW thật sự hỏi là **ai đang trực thiếu so với cam kết** · dòng
+> **"Lượt trực/ngày"** dưới lưới và dòng **thứ** trên đầu cột ngày. Đã bổ sung cả ba.
+>
+> **Đo được trên bản CŨ trước khi vá:** đặt được một buổi WOW lúc **03:00 sáng ngày 01/01/2030**,
+> app còn báo lại *"Đã đặt buổi WOW cho Trần Khánh Vy"* như một việc bình thường. Ô giờ là
+> `datetime-local` trống trơn; `waBusy()` chỉ NHẮC "GV bận trong ngày này", còn trống thì in thẳng
+> *"GV rảnh cả ngày"* — **app tự khẳng định một điều nó không có cách nào biết.**
+>
+> **Đã làm:** bảng **DL26 Lịch trực NV WOW** · màn **Lịch trực WOW** (lưới tháng bấm được từng ô,
+> dải 4 thẻ, chip lọc theo người, bảng tổng giờ trực đối chiếu buổi thật) · cửa **tự đăng ký ca**
+> cho từng NV WOW (chọn ngày + tick khung giờ; **không ai ký hộ ai được** — ca là cam kết có mặt) ·
+> **cả hai đường đặt buổi WOW** (học vụ `wowAddSave` và học viên `hvWowSave`) nay **chỉ chọn được
+> ca đã đăng ký còn trống**, ô giờ tự do đã gỡ bỏ.
+>
+> **BẪY LỚN NHẤT KHI DỰNG THƯỚC M20 — APP BỌC LẠI CÁC CỬA GHI:** `wowAddSave.toString()` trả về
+> thân của **lớp bọc ghi nhật ký**, đúng 375 ký tự, giống hệt `hvWowSave.toString()`, không một
+> chữ `DL26` nào. Thước báo đỏ trên **chính bản đã vá**. Đã kiểm lại toàn bộ: `kpiCompute` (12.738
+> ký tự), `kpiNum` (4.414), `baocaoBranch` (3.747), `staffPerfSection` (5.883) đều là thân THẬT
+> nên M17/M18 không dính — **chỉ cửa ghi bị bọc.** M20 nay đọc thẳng nguồn, và cái chốt: **lát cắt
+> ngắn bất thường thì ĐỎ**, không cho một lát cắt hụt lặng lẽ đi qua rồi kết luận.
+> *`fn.toString()` cho ta thứ đang chạy, không phải thứ mình viết — hai cái đó không phải lúc nào
+> cũng là một.*
+>
+> **Hệ miễn dịch của dự án bắt 9 thứ mà em không tự nhớ ra được** khi thêm một tính năng: thiếu
+> tình huống SOP NA056 · chấm bài trước khi thi (truy ra `fixdata` luật 14septies/14undecies đổi
+> `test_date` mà **bỏ quên `test_attendance_time` và `result_time`** — cả một lớp lỗi "đổi một mốc,
+> quên mốc phụ thuộc") · hai tham số CH2 app đọc mà màn Cài đặt không có ô sửa · hai thước canh
+> **thiết kế cũ** (ô ngày tự do) nay phải đổi câu hỏi · em **bịa một màu mới** làm bảng màu phình
+> 111 > trần 110 · màn mới thiếu dải thẻ và chip lọc · ô lưới bấm không ra gì · trang mới không
+> bài hướng dẫn nào đi qua (**và lòi ra `lichwow` chưa nằm trong phạm vi của chính chức danh WOW**)
+> · menu 45 mục quá trần 44 (nâng trần **kèm lý do viết ra**, đúng thủ tục file ấy tự đặt).
+> **Không cái nào trong 9 cái là do em nghĩ ra — tất cả đều do máy hỏi.**
+>
 > ### 🔵 10/08 - VÒNG CHÍN: TRANG BÁO CÁO HỨA MỘT ĐẰNG, CÁC BẢNG ĐẾM MỘT NẺO
 >
 > Trang Báo cáo có bộ chọn kỳ, và ngay dưới nó app **tự in một câu hứa**: *"Kỳ này áp cho TOÀN BỘ

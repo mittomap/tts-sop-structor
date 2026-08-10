@@ -366,6 +366,13 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .task .na{font-size:12px;margin-top:7px;background:#FAFBFD;border:1px dashed #D5DEE8;border-radius:6px;padding:6px 9px;color:#3A4756}
 .task .ac{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
 .chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;display:inline-block}
+/* Ô lưới Lịch trực là NÚT, không phải nhãn - nên nó phải đủ to để ngón tay bấm. `.chip` trần chỉ
+   cao 22px, dưới ngưỡng chạm 24px mà `_checkui` canh trên khổ điện thoại. Cái chuẩn ấy không
+   phải để làm đẹp: một cái nút nhỏ hơn đầu ngón tay là một cái nút bấm ba lần mới trúng. */
+/* Nền nhạt là phần BẮT BUỘC, không phải trang trí: `.chip` trần không khai nền, nên một ô lưới
+   chưa ai đặt sẽ hiện ra như chữ trơn - nhìn không ra là bấm được. Ô đã đặt có `.chip.green` /
+   `.chip.amber` khai sau dòng này nên vẫn đè lên đúng màu của nó. */
+.chip.lwo{min-height:26px;padding:5px 9px;border:0;cursor:pointer;font-family:inherit;background:var(--gray);color:var(--navy)}
 /* THẺ LOẠI LỚP (anh Luân 06/08). `.chip` trần KHÔNG có nền - nền nằm ở các lớp phụ red/amber/
    green/gray. Lượt đầu em viết `class="chip"` cho lớp nhóm nên nó ra chữ trơn, nhìn như lỗi
    chứ không như một cái thẻ. Nay khai riêng: gọn hơn chip thường (đứng trước tên nên không
@@ -1146,6 +1153,10 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .planbar .pbi{display:flex;flex-direction:column;gap:1px;min-width:0}
 .planbar .pbi span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;font-weight:700}
 .planbar .pbi b{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
+/* Trên khổ điện thoại thì CHO XUỐNG DÒNG thay vì cắt. `_checkmat` đo được tên chủ đề buổi bị
+   cắt đúng 3px - tức cái ellipsis chỉ nuốt một chữ cái cuối, vừa xấu vừa vô ích. Cắt bằng dấu
+   ba chấm là cách xử tử tế khi chỗ THIẾU NHIỀU; thiếu 3px thì cho nó rơi xuống dòng. */
+@media(max-width:600px){.planbar .pbi b{white-space:normal;max-width:none;overflow:visible}}
 .psub{display:flex;align-items:center;gap:10px;padding:11px 16px;border-top:1px solid var(--line);background:#FAFBFD}
 .psub b{font-size:12.5px;font-weight:700}.psub .mini{margin-left:auto;display:flex;gap:6px}
 .stepn{font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--navy);background:rgba(46,90,136,.10);border-radius:20px;padding:3px 8px;flex:none}
@@ -1930,7 +1941,10 @@ body.drsz .drawer{transition:none}
 .gcnum{font-size:20px;font-weight:800;color:var(--navy);line-height:1}
 .gclbl{font-size:11.5px;color:var(--muted);margin-top:2px}
 .bizrow{display:flex;gap:12px;margin-bottom:18px;align-items:stretch}
-.biztiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;flex:1;align-content:start}
+/* 168px chứ không phải 148px: ô doanh thu in số tiền đầy đủ ("1.175.766.666đ") ở cỡ 17px đậm,
+   mà 148px trừ hai bên đệm chỉ còn ~120px - `_checkmat` đo được đúng 3px bị cắt. Rút gọn số tiền
+   cho vừa ô thì mất con số thật; nới ô ra thì không mất gì ngoài một cột trên hàng. */
+.biztiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;flex:1;align-content:start}
 .biztile{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
 .bti{font-size:18px}.btv{font-size:17px;font-weight:800;color:var(--navy);margin-top:5px;line-height:1.1}.btl{font-size:11px;color:var(--muted);margin-top:3px}
 .bizchart{width:300px;flex:0 0 auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px}
@@ -2965,7 +2979,10 @@ var ROLESCOPE={
  aca:{match:/^aca_/,land:"hoctap",ctx:{HTTAB:"lop"},
   /* V9.99z5 - thêm `bangcong`: người phụ trách chuyên môn là người duyệt giờ dạy của giảng viên
      và của đội WOW trước khi chốt lương. Trước đây bảng ấy chỉ Nhân sự và CEO có. */
-  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan","baitap","ketqua","bangcong"],
+  /* V2 10/08 - thêm `lichwow`: Trưởng phòng ACA là người đọc cột "Thiếu ...h" của bảng Tổng giờ
+     trực. Chính họ duyệt giờ của đội WOW ở `bangcong`, mà giờ công thì bắt nguồn từ ca trực -
+     cho họ xem bảng công mà không cho xem lịch trực là cắt mất nửa đầu của câu chuyện. */
+  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan","baitap","ketqua","bangcong","lichwow"],
   blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:1,mgr:1,
   /* V9.99y (anh Luân 05/08): *"Trưởng phòng aca cũng quản lý toàn bộ team Wow, em đừng quên"*.
      Đội WOW nằm trong phòng ACA nên phạm vi NGƯỜI đã đúng sẵn; thiếu là cái chuông - 21 việc
@@ -2977,7 +2994,10 @@ var ROLESCOPE={
      ĐO LẠI trên bản build, đừng tin vào việc script in ra "ok". */
   bell:["Giảng viên chuyên môn","WOW","Giao việc"]},
  hocvu:{match:/^academic/,land:"xeplop",
-  pages:["viec","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ychv","ketthuc","ketqua","khac","duyet"],
+  /* V2 10/08 - thêm `lichwow`: HỌC VỤ CHÍNH LÀ NGƯỜI BẤM "Thêm buổi WOW". Từ bản này cửa ấy chỉ
+     nhận ca đã đăng ký, nên không cho họ xem lịch trực là bắt họ chọn trong bóng tối: mở form ra
+     thấy "chưa có ca trực nào còn trống" mà không biết hỏi ai, ngày nào trống. */
+  pages:["viec","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ychv","ketthuc","ketqua","khac","duyet","lichwow"],
   tabs:{khac:["baoluu"],duyet:["duyetnghi"]},
   blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:1,kpi:1,bell:["Học vụ","CSKH","Giao việc"]},
  /* V9.99z5 - GIÁO VIÊN không xếp người dạy thay và không gỡ đụng phòng: hai màn ấy là cửa
@@ -13468,6 +13488,11 @@ var APPPARAMS=[
  ["Công giảng dạy & đơn giá giờ","testPayPerCase","Tiền công một CA TEST đầu vào (coi + chấm) - tính theo LẦN, không theo giờ","đ/lần",120000],
  ["Công giảng dạy & đơn giá giờ","wowPayPerSession","Tiền công một buổi WOW 1-1 (buổi kèm riêng, tính tách khỏi buổi lớp)","đ/buổi",250000],
  ["P7 · Buổi WOW 1-1","wowGrantMax_perTime","Mỗi lần cấp thêm tối đa bao nhiêu lượt WOW cho một học viên","lượt",3],
+ /* V2 10/08 - hai tham số của Lịch trực WOW. Khai ở đây thì màn Cài đặt mới đẻ ra ô sửa;
+    `_check16` hỏi đúng chiều ngược lại: app ĐỌC tham số nào thì tham số ấy phải có ô sửa. */
+ ["P7 · Buổi WOW 1-1","wowSlotHours","Các khung giờ NV WOW được đăng ký ca trực, ngăn nhau bằng dấu phẩy (đổi ở đây là lưới Lịch trực WOW đổi theo)","khung giờ","08:30,09:30,10:30,11:30,12:30,13:30,14:30,15:30,16:30,17:30,18:30,19:30,20:30"],
+ ["P7 · Buổi WOW 1-1","wowSlotMaxDays","NV WOW được đăng ký ca trực trước tối đa bao nhiêu ngày","ngày",60],
+ ["P7 · Buổi WOW 1-1","wowCommitHours_month","Mỗi NV WOW cam kết trực bao nhiêu giờ một tháng (bảng Tổng giờ trực lấy đây làm mốc để báo thiếu)","giờ/tháng",40],
  ["Hẹn giờ mặc định","apptSoon_hours","Nút hẹn nhanh \"N tiếng nữa\" - N là bao nhiêu","giờ",2],
  ["Hẹn giờ mặc định","apptMorning_hour","Giờ hẹn buổi sáng dùng cho các nút gợi ý","giờ trong ngày",9],
  ["Hẹn giờ mặc định","apptNoon_hour","Giờ hẹn đầu giờ chiều dùng cho các nút gợi ý","giờ trong ngày",14],
@@ -15019,8 +15044,14 @@ function wowGrantSave(){
    **ô trống = không ai trực**; cộng bảng tổng giờ trực và cột "Buổi đã book" lấy từ DL14 để
    đối chiếu giờ trực với buổi thực tế. Danh mục `enum_wow_slot_status` cũng có sẵn trong dữ liệu
    từ đầu (available/booked/taught/off) mà app chưa dùng chữ nào.
-   Khung giờ KHÔNG gõ cứng ở đây - đi qua CH2 như mọi hằng số nghiệp vụ khác. */
-function lwKhung(){return String(paramOf("wowSlotHours","09:00,15:00,17:00,19:00")).split(",")
+   Khung giờ KHÔNG gõ cứng ở đây - đi qua CH2 như mọi hằng số nghiệp vụ khác.
+   ĐỌC BẰNG `paramStr`, KHÔNG PHẢI `paramOf` (bắt được 10/08): `paramOf` chạy `Number(value)` rồi
+   thấy NaN là trả mặc định - mà "09:00,15:00,..." thì NaN chắc chắn. Dùng nhầm hàm ở đây nghĩa là
+   trung tâm vào Cài đặt sửa khung giờ, bấm Lưu, app vẫn chạy y khung cũ mà không báo gì. */
+/* 13 KHUNG GIỜ LÀ CON SỐ CỦA SOP, KHÔNG PHẢI EM CHỌN: sheet `DL19. Lịch làm việc WOW` liệt kê
+   đúng 13 hàng 08:30-09:30 ... 20:30-21:30. Bản đầu em đặt 4 khung cho gọn - đó là BỚT so với
+   SOP, phạm LUẬT CỨNG SỐ 0. */
+function lwKhung(){return String(paramStr("wowSlotHours","08:30,09:30,10:30,11:30,12:30,13:30,14:30,15:30,16:30,17:30,18:30,19:30,20:30")).split(",")
  .map(function(x){return String(x).trim()}).filter(Boolean)}
 function lwSlots(){return srows("DL26")}
 function lwLaWow(){return doiWOW().indexOf(String(CURSTAFF||""))>=0}
@@ -15075,26 +15106,41 @@ function renderLichWow(){
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-table" style="margin-right:6px"></i>Lưới trực tháng '+thg+"/"+nam+'</b>'+
   '<span class="mut" style="font-size:11.5px">ô trống = không ai trực · số liệu: đúng tháng đang chọn</span></div>'+
   '<div class="tbwrap"><table class="dt"><thead><tr><th>Khung giờ</th>';
- for(var n=1;n<=soNgay;n++)h+='<th style="text-align:center">'+n+'</th>';
+ /* SOP để HAI dòng tiêu đề: số ngày và THỨ. Thiếu dòng thứ thì người xếp ca phải tự nhẩm
+    "ngày 14 là thứ mấy" - mà xếp ca thì thứ mới là thứ người ta nghĩ tới, không phải số ngày. */
+ var _THU=["CN","T2","T3","T4","T5","T6","T7"];
+ for(var n=1;n<=soNgay;n++){var _t=_THU[new Date(nam,thg-1,n).getDay()];
+  h+='<th style="text-align:center">'+n+'<div class="mut" style="font-weight:400;font-size:10px">'+_t+'</div></th>'}
  h+='</tr></thead><tbody>';
+ var _ngayDem={};
  khung.forEach(function(g){
   h+='<tr><td><b>'+esc(g)+'</b></td>';
   for(var n=1;n<=soNgay;n++){
    var ds=ix[n+"|"+g]||[];
    if(!ds.length){h+='<td class="mut" style="text-align:center">·</td>';continue}
+   _ngayDem[n]=(_ngayDem[n]||0)+ds.length;
    var chu=ds.map(function(x){return String(x.staff_id||"")+(x.branch?("-"+String(ecode(x.branch)||"").replace("branch_","CS")):"")}).join(", ");
    var co=ds.filter(function(x){return isc(x.wow_slot_status,"booked","taught")}).length;
    /* Ô LƯỚI PHẢI BẤM ĐƯỢC. `_checkbam` bắt đúng chỗ này: bấm vào ô mà không mở gì, không báo
       gì - đúng cái "kiểu hỏng nguy hiểm nhất" mà dự án đã ghi. Ô là nơi dày thông tin nhất của
       màn, người ta bấm vào là chuyện đương nhiên. */
-   h+='<td style="text-align:center"><button class="chip '+(co?(co>=ds.length?"green":"amber"):"")+
+   h+='<td style="text-align:center"><button class="chip lwo '+(co?(co>=ds.length?"green":"amber"):"")+
     '" onclick="lwXemO(\''+esc(g)+'\','+n+')" data-tip="Bấm để xem chi tiết ca trực khung này">'+esc(chu)+'</button></td>'}
   h+='</tr>'});
+ /* DÒNG "LƯỢT TRỰC/NGÀY" - SOP có sẵn dòng này dưới lưới. Nó trả lời câu khác với ô trống: ngày
+    nào MỎNG người chứ chưa hẳn trống - tức ngày dễ vỡ nếu một người báo bận. */
+ h+='<tr><td><b>Lượt trực/ngày</b></td>';
+ for(var n2=1;n2<=soNgay;n2++){var _sl2=_ngayDem[n2]||0;
+  h+='<td style="text-align:center"'+(_sl2?'':' class="mut"')+'>'+(_sl2?('<b>'+_sl2+'</b>'):'0')+'</td>'}
+ h+='</tr>';
  h+='</tbody></table></div></div>';
  /* ── TỔNG GIỜ TRỰC THEO NV + đối chiếu với buổi thật (SOP đòi đúng cột này) ── */
  var per={};
- all.forEach(function(x){var id=String(x.staff_id||"");if(!per[id])per[id]={ten:x.staff_name||id,ca:0,ban:0,nghi:0};
+ all.forEach(function(x){var id=String(x.staff_id||"");if(!per[id])per[id]={ten:x.staff_name||id,ca:0,ban:0,nghi:0,cs:{}};
   per[id].ca++;
+  /* GIỮ NGUYÊN VĂN giá trị enum (dạng "code (Nhãn)"), đừng cắt lấy code: `elabel` moi được nhãn
+     tiếng Việt là nhờ cặp ngoặc ấy - đưa code trần vào thì nó trả lại đúng code trần lên màn. */
+  if(String(x.branch||"").trim())per[id].cs[String(x.branch)]=(per[id].cs[String(x.branch)]||0)+1;
   if(isc(x.wow_slot_status,"booked","taught"))per[id].ban++;
   if(isc(x.wow_slot_status,"off"))per[id].nghi++});
  var buoi={};
@@ -15102,14 +15148,27 @@ function renderLichWow(){
   if(!d||d.getFullYear()!==nam||(d.getMonth()+1)!==thg)return;
   if(isc(w.wow_status,"cancelled"))return;
   var id=String(w.staff_id||"");buoi[id]=(buoi[id]||0)+1});
+ /* CỘT "CAM KẾT/THÁNG" VÀ "TÌNH TRẠNG" LÀ CỦA SOP, KHÔNG PHẢI EM THÊM CHO ĐẸP: sheet DL19 có sẵn
+    hai cột ấy và tự ghi ra chữ mẫu *"Thiếu 11h"*. Không có chúng thì bảng này chỉ đếm, không trả
+    lời được câu người quản lý team WOW thật sự hỏi: **ai đang trực thiếu so với cam kết.**
+    Mỗi ô lưới = 1 giờ (SOP: 08:30-09:30...), nên số giờ trực = số ca KHÔNG tính ca đã báo nghỉ. */
+ var _cam=num(paramOf("wowCommitHours_month",40));
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-clock-hour-4" style="margin-right:6px"></i>Tổng giờ trực theo NV WOW</b>'+
-  '<span class="mut" style="font-size:11.5px">đối chiếu ca đã đăng ký với buổi thực tế trong DL14 · số liệu: đúng tháng đang chọn</span></div>'+
-  '<div class="tbwrap"><table class="dt"><thead><tr><th>NV WOW</th><th>Ca đăng ký</th><th>Ca đã có người đặt</th><th>Ca nghỉ/bận</th><th>Buổi đã book (DL14)</th><th>Đối chiếu</th></tr></thead><tbody>';
+  '<span class="mut" style="font-size:11.5px">đối chiếu ca đã đăng ký với buổi thực tế trong DL14 · mỗi ca 1 giờ · số liệu: đúng tháng đang chọn</span></div>'+
+  '<div class="tbwrap"><table class="dt"><thead><tr><th>NV WOW</th><th>Cơ sở chính</th><th>Cam kết/tháng</th><th>Giờ trực tháng</th><th>Tình trạng</th><th>Ca đã có người đặt</th><th>Ca nghỉ/bận</th><th>Buổi đã book (DL14)</th><th>Đối chiếu</th></tr></thead><tbody>';
  var ids=Object.keys(per).sort();
- if(!ids.length)h+='<tr><td class="empty" colspan="6">Chưa ai đăng ký ca trong tháng này - học viên sẽ không đặt được buổi WOW nào.</td></tr>';
+ if(!ids.length)h+='<tr><td class="empty" colspan="9">Chưa ai đăng ký ca trong tháng này - học viên sẽ không đặt được buổi WOW nào.</td></tr>';
  ids.forEach(function(id){var v=per[id],b=buoi[id]||0;
   var lech=(b!==v.ban);
-  h+='<tr><td><b>'+esc(v.ten)+'</b> <span class="mut">'+esc(id)+'</span></td><td>'+v.ca+'</td><td>'+v.ban+'</td><td>'+v.nghi+'</td><td>'+b+'</td>'+
+  var gio=v.ca-v.nghi;                                  /* ca đã báo nghỉ không tính là giờ trực */
+  var thieu=_cam-gio;
+  var csTop=Object.keys(v.cs).sort(function(a,c){return v.cs[c]-v.cs[a]})[0]||"";
+  h+='<tr><td><b>'+esc(v.ten)+'</b> <span class="mut">'+esc(id)+'</span></td>'+
+   '<td>'+(csTop?esc(elabel(csTop)||csTop):'<span class="mut">-</span>')+'</td>'+
+   '<td>'+_cam+'h</td><td><b>'+gio+'h</b></td>'+
+   '<td>'+(thieu>0?'<span class="chip '+(thieu>_cam/2?"red":"amber")+'" data-tip="Cam kết '+_cam+'h nhưng mới đăng ký '+gio+'h trong tháng này">Thiếu '+thieu+'h</span>'
+      :'<span class="chip green">Đủ giờ</span>')+'</td>'+
+   '<td>'+v.ban+'</td><td>'+v.nghi+'</td><td>'+b+'</td>'+
    '<td>'+(lech?'<span class="chip amber" data-tip="Số buổi trong sổ WOW không bằng số ca đã có người đặt - có buổi đặt ngoài ca trực, hoặc ca đã đặt mà buổi bị huỷ">lệch '+Math.abs(b-v.ban)+'</span>'
       :'<span class="chip green">khớp</span>')+'</td></tr>'});
  h+='</tbody></table></div></div>';
@@ -15348,13 +15407,25 @@ function wowAdd(psid){var h='<div class="dcard"><h4><i class="ti ti-star"></i>Đ
  openDrawer("Đặt buổi WOW",h)}
 /* Danh sách ca còn đặt được, xếp theo thời gian. Nhãn nói đủ ba thứ người đặt cần biết:
    khi nào, ai trực, ở đâu - không bắt họ mở màn khác ra tra. */
+/* GOM THEO NGÀY. SOP mở 13 khung giờ mỗi ngày nên số ca còn trống lên tới vài trăm - một cái
+   danh sách phẳng dài như vậy thì có đủ thông tin mà vẫn không chọn được. `<optgroup>` cho người
+   ta nhảy theo ngày, là cách người ta nghĩ khi đặt lịch. */
 function waSlotOpts(){
  var ds=srows("DL26").filter(function(x){return lwRanh(x)})
   .sort(function(a,b){var x=pvnd(a.slot_datetime),y=pvnd(b.slot_datetime);return (x?x.getTime():0)-(y?y.getTime():0)});
  if(!ds.length)return '<option value="">-- chưa có ca trực nào còn trống --</option>';
- return '<option value="">-- chọn ca trực --</option>'+ds.map(function(x){
-  return '<option value="'+esc(x.slot_id)+'" data-gv="'+esc(x.staff_id)+'" data-khi="'+esc(x.slot_datetime)+'">'+
-   esc(x.slot_datetime+" · "+(x.staff_name||x.staff_id)+(x.branch?(" · "+(elabel(x.branch)||"")):""))+'</option>'}).join("")}
+ var h='<option value="">-- chọn ca trực --</option>',ngay="";
+ ds.forEach(function(x){
+  var d=pvnd(x.slot_datetime),nd=d?fmtD(d):"";
+  if(nd!==ngay){if(ngay)h+='</optgroup>';ngay=nd;
+   h+='<optgroup label="'+esc(nd+(d?(" · "+["Chủ nhật","Thứ 2","Thứ 3","Thứ 4","Thứ 5","Thứ 6","Thứ 7"][d.getDay()]):""))+'">'}
+  /* CHỮ TRONG TỪNG DÒNG PHẢI CÓ ĐỦ NGÀY, đừng trông vào nhãn `<optgroup>`: ô chọn nào đủ dài
+     cũng bị `pkMot` nâng cấp thành ô tìm, mà `pkVe` dựng lại danh sách từ `select.options` -
+     nhãn nhóm rơi mất. Rút ngày ra khỏi dòng là người dùng ô tìm chỉ còn thấy giờ trần. */
+  h+='<option value="'+esc(x.slot_id)+'" data-gv="'+esc(x.staff_id)+'" data-khi="'+esc(x.slot_datetime)+'">'+
+   esc(x.slot_datetime+" · "+(x.staff_name||x.staff_id)+(x.branch?(" · "+(elabel(x.branch)||"")):""))+'</option>'});
+ if(ngay)h+='</optgroup>';
+ return h}
 /* Chọn ca xong thì điền hộ GV và giờ - hai ô ấy là HỆ QUẢ của ca, không phải hai câu hỏi riêng. */
 function waChonCa(){
  var id=fldV("wa_slot");var sl=find("DL26","slot_id",id);
@@ -25157,6 +25228,11 @@ DOORS = {
  # o ba noi - nhip ngay Marketing, dai the trang Ma gioi thieu, hang cho SLA - ma khong ham nao
  # doi duoc `reward_status`. Con so ay chi co the tang.
  "DL19":["mgtTraoLuu"],
+ # V2 10/08 - DL26 (lich truc NV WOW). `lwSave` la cua dang ky ca. Hai cua dat buoi WOW cung
+ # doi bang nay (danh dau ca sang `booked` + ghi ma buoi vao ca), nen chung phai co ten o day:
+ # bo quet cua _check15 chi thay `DL.DL26.unshift` nen KHONG tu tim ra hai cua kia, ma mot cua
+ # ghi khong khai thi nhat ky thao tac khong chup lai bang - hoan tac se hoan thieu.
+ "DL26":["lwSave","hvWowSave","wowAddSave"],
  "DL23":["hvReq","tkNewSave"],
  "DL24":["hvAskSaySave","tkSay"],
 }

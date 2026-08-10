@@ -797,6 +797,40 @@ if SCH:
                       "installmentDepositPercent") if x not in _ch2]
     rep("NANG", "17i Tham so cau hinh dong theo dot THIEU trong CH2", p9)
 
+# ══ 18. LICH TRUC NV WOW (DL26) - SOP sheet "DL19. Lich lam viec WOW" ════
+# Dat o CUOI vi DL26 la thu bi NHIEU NGUOI GHI NHAT: gen_demo sinh, fixdata luat 18 sua, va
+# trong app thi ca hai cua dat buoi WOW deu doi trang thai ca. Mot bat bien co nhieu nguoi ghi
+# thi phai kiem sau NGUOI GHI CUOI CUNG - day la cho do.
+_khungTxt = set()
+for _c in (d.get("config") or {}).get("ch2", []):
+    if str(_c.get("name")) == "wowSlotHours":
+        _khungTxt = {g.strip() for g in str(_c.get("value") or "").split(",") if g.strip()}
+_sl = R("DL26")
+rep("NANG", "18a Tham so wowSlotHours THIEU trong CH2",
+    [] if _khungTxt else ["wowSlotHours"])
+if _khungTxt:
+    # CA LECH KHUNG: bang tong van dem no, con luoi thi khong ve ra - hai cho tren cung mot man
+    # noi hai chuyen ma khong ai biet ben nao dung.
+    rep("NANG", "18b Ca truc WOW lech khung gio (luoi khong ve ra duoc)",
+        [s(x, "slot_id") for x in _sl
+         if (s(x, "slot_datetime").split(" ") + [""])[1] not in _khungTxt])
+_slKey = {(s(x, "staff_id"), s(x, "slot_datetime")) for x in _sl}
+# BUOI KHONG NAM TREN CA: dung cai anh Luan goi ten - app tu nhan la luc nao cung co nguoi truc.
+rep("NANG", "18c Buoi WOW con song ma KHONG nam tren mot ca truc nao",
+    [s(w, "wow_id") for w in R("DL14")
+     if s(w, "wow_session_date") and code(w.get("wow_status")) != "cancelled"
+     and (s(w, "staff_id"), s(w, "wow_session_date")) not in _slKey])
+# CA GIU MA BUOI CHET / GIU MA BUOI DA HUY
+_wowId = {s(w, "wow_id"): w for w in R("DL14")}
+rep("NANG", "18d Ca truc giu ma buoi khong co that",
+    [s(x, "slot_id") for x in _sl if s(x, "wow_id") and s(x, "wow_id") not in _wowId])
+rep("NANG", "18e Ca truc bao 'da co nguoi dat' ma khong noi toi buoi nao",
+    [s(x, "slot_id") for x in _sl
+     if code(x.get("wow_slot_status")) in ("booked", "taught") and not s(x, "wow_id")])
+rep("NANG", "18f Ca truc con 'trong' ma van giu ma buoi",
+    [s(x, "slot_id") for x in _sl
+     if code(x.get("wow_slot_status")) in ("available", "off") and s(x, "wow_id")])
+
 # ══ IN KET QUA ═══════════════════════════════════════════════════════════
 # CA CO Y: nhung luat duoi day KHONG phai loi - du lieu demo co tinh dung nhu vay de man hinh
 # co canh bao ma xem. Truoc V9.40 chung bi cong chung vao "TONG BAN GHI LOI" va verify.sh doi

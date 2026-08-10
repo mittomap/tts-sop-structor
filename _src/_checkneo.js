@@ -63,7 +63,11 @@ const NEO_CHUNG = {
     "Trang Giao việc, trùng với tn_sale 8/8. Cùng một màn dạy cho hai người: sale nhận việc "
     + "từ quản lý, giáo viên nhận việc từ học vụ. Cả hai bước đều giới thiệu CẢ màn nên không "
     + "tách nhỏ được.",
-  "tn_wow 2/5":
+  /* 10/08 - đổi khoá `tn_wow 2/5` -> `tn_wow 2/6` vì bài WOW nay có thêm bước Lịch trực. KHOÁ
+     THEO MÃ BƯỚC MANG SẴN TỔNG SỐ BƯỚC, nên thêm một bước vào bài là khoá trượt và chỗ đã khai
+     tự bung ra đỏ. Đó là ĐẶC TÍNH chứ không phải lỗi: nó buộc người thêm bước phải đọc lại lời
+     khai xem còn đúng không, thay vì để một dòng miễn trừ sống mãi qua mọi lần sửa. */
+  "tn_wow 2/6":
     "Trang Test đầu vào, trùng với tn_sale 4/8. Sale đặt lịch test cho khách; NV WOW là người "
     + "CHẤM bài test đó (bảng phân quyền CH3 của SOP giao vậy). Hai đầu của cùng một việc.",
   "tn_marketing 5/5":

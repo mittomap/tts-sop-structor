@@ -93,9 +93,16 @@ t("bang lich dong theo dot DL06b co du lieu", rows("DL06b").length>0);
  var h=renderTrangHV();
  t("(c) cong hien nut Dat buoi WOW", h.indexOf("hvWowAsk(")>=0);
  var n0=rows("DL14").length,nT=rows("DL23").length;
- var d=new Date(Date.now()+5*864e5);
- function z(n){return n<10?"0"+n:n}
- reset();setF({hvw_skill:"Speaking (Nói)",hvw_date:d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate()),hvw_gio:"sau 19h",hvw_focus:"Part 2"});
+ /* ĐỔI CÂU HỎI, KHÔNG XOÁ THƯỚC (10/08). Bản cũ gõ `hvw_date` + `hvw_gio` - hai ô CHỮ TỰ DO của
+    thiết kế cũ, nay đã gỡ. Anh Luân chốt: *"người dùng chỉ được chọn book wow dựa trên lịch làm
+    việc đã đăng ký của team wow thôi"*, nên cửa này nay chỉ nhận `hvw_slot` là MỘT CA CÓ THẬT.
+    ĐÁNG CHÚ Ý: hai tiêu chí chặn ở cuối khối (ngày đã qua, hết lượt) vẫn XANH sau khi đổi thiết
+    kế - nhưng xanh VÌ LÝ DO SAI: cửa từ chối ngay ở bước chọn ca, chưa kịp chạy tới đoạn luật mà
+    chúng định canh. Một tiêu chí xanh nhờ hỏng ở bước trước nó thì không canh gì cả. */
+ function caRanh(){return rows("DL26").filter(function(x){return lwRanh(x)})[0]}
+ var ca=caRanh();
+ if(!ca){bad.push("khong co ca truc WOW nao con trong de kiem");return}
+ reset();setF({hvw_skill:"Speaking (Nói)",hvw_slot:ca.slot_id,hvw_focus:"Part 2"});
  hvWowSave();
  t("(c) dat WOW -> sinh 1 buoi trong DL14", rows("DL14").length===n0+1);
  var w=rows("DL14")[0];
@@ -103,17 +110,32 @@ t("bang lich dong theo dot DL06b co du lieu", rows("DL06b").length>0);
  t("(c) buoi ghi dung loai HV tu dat", isc(w.wow_session_type,"self_booked"));
  t("(c) CHUA day thi CHUA tru quota", String(w.quota_deducted).toLowerCase()==="no");
  t("(c) dat WOW -> sinh yeu cau cho hoc vu", rows("DL23").length===nT+1);
- /* dat ngay QUA KHU phai bi chan */
- var n1=rows("DL14").length;
- reset();setF({hvw_skill:"Writing (Viết)",hvw_date:"2020-01-01"});
+ /* HAI VE CUA "lich tong": buoi phai gan dung NGUOI va GIO cua ca, va ca phai bi danh dau da dat
+    - khong thi hai hoc vien cung dat mot ca ma app khong biet. */
+ t("(c) buoi lay dung GIANG VIEN cua ca truc", String(w.staff_id||"")===String(ca.staff_id||""));
+ t("(c) buoi lay dung GIO cua ca truc", String(w.wow_session_date||"")===String(ca.slot_datetime||""));
+ t("(c) ca truc chuyen sang DA DAT va tro nguoc ve buoi", isc(ca.wow_slot_status,"booked")&&ca.wow_id===w.wow_id);
+ t("(c) ca vua dat khong con hien ra cho nguoi sau chon", !lwRanh(ca));
+ /* KHONG chon ca thi khong duoc dat - day la chinh cai luat anh Luan dat */
+ var nS=rows("DL14").length;
+ reset();setF({hvw_skill:"Writing (Viết)"});
  hvWowSave();
- t("(c) chan dat buoi WOW o ngay DA QUA", rows("DL14").length===n1);
- /* het quota phai bi chan */
- var S0=rows("DL09").filter(function(x){return num(x.wow_quota_remaining)<=0})[0];
- if(S0){window.HVID=S0.student_id;var n2=rows("DL14").length;
-  reset();setF({hvw_skill:"Reading (Đọc)",hvw_date:d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())});
+ t("(c) khong chon ca truc thi KHONG dat duoc", rows("DL14").length===nS);
+ /* ca DA QUA GIO thi khong duoc dat (thay cho phep cu "go ngay qua khu") */
+ var caCu=rows("DL26").filter(function(x){var dd=pvnd(x.slot_datetime);return dd&&dd.getTime()<Date.now()})[0];
+ if(!caCu){bad.push("khong co ca truc DA QUA de kiem")}
+ else{var n1=rows("DL14").length;
+  reset();setF({hvw_skill:"Writing (Viết)",hvw_slot:caCu.slot_id});
   hvWowSave();
-  t("(c) het luot WOW thi chan dat them", rows("DL14").length===n2)}
+  t("(c) chan dat buoi WOW vao ca DA QUA GIO", rows("DL14").length===n1)}
+ /* het quota phai bi chan - lan nay dua CA HOP LE vao, de ly do tu choi DUY NHAT la het luot */
+ var S0=rows("DL09").filter(function(x){return num(x.wow_quota_remaining)<=0})[0];
+ var ca2=caRanh();
+ if(S0&&ca2){window.HVID=S0.student_id;var n2=rows("DL14").length;
+  reset();setF({hvw_skill:"Reading (Đọc)",hvw_slot:ca2.slot_id});
+  hvWowSave();
+  t("(c) het luot WOW thi chan dat them (du ca con trong)", rows("DL14").length===n2);
+  t("(c) bi chan vi het luot thi KHONG duoc chiem mat ca truc", lwRanh(ca2))}
 })();
 
 /* ---- 5. (h) LICH DONG HOC PHI THEO DOT + bao da chuyen khoan ---- */

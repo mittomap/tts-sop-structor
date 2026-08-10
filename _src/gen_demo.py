@@ -1370,6 +1370,21 @@ for s in students:
     if ts: s["last_learning_activity_time"]=max(ts,key=lambda x:dt.datetime.strptime(x,"%d/%m/%Y %H:%M"))
 
 # ================= DL14 WOW =================
+# 13 khung gio 08:30-09:30 ... 20:30-21:30 - LAY THANG TU SHEET `DL19. Lich lam viec WOW` cua SOP,
+# khong phai em tu chon. Ban dau em dat 4 khung cho gon; do la BOT so voi SOP.
+# KHAI O DAY chu khong o phan DL26 ben duoi, vi buoi WOW phai roi DUNG khung ngay tu luc sinh:
+# mot buoi nam ngoai luoi thi `fixdata` luat 18 se mo cho no mot ca ngoai luoi, ma ca ngoai luoi
+# thi BANG TONG dem duoc con LUOI khong ve ra - hai cho tren cung mot man noi hai chuyen.
+KHUNG_TRUC=[(8,30),(9,30),(10,30),(11,30),(12,30),(13,30),(14,30),(15,30),(16,30),(17,30),(18,30),(19,30),(20,30)]
+def _napKhung(d):
+    """Keo mot moc buoi WOW ve dung khung gio gan nhat, GIU NGUYEN ben qua khu / tuong lai.
+
+    Giu nguyen ben la phan quan trong: keo mot buoi 'da hoan thanh' sang 20:30 hom nay la day no
+    sang TUONG LAI - `check_logic.py` luat 7g bat ngay. Da can dung lan dau khi snap mu."""
+    ung=[d.replace(hour=h,minute=m,second=0,microsecond=0) for h,m in KHUNG_TRUC]
+    qua=(d<=NOW)
+    hop=[c for c in ung if (c<=NOW)==qua] or ung
+    return min(hop,key=lambda c: abs((c-d).total_seconds()))
 wows=[]; wow_n=0
 def add_wow(s,kind,off=None):
     global wow_n; wow_n+=1
@@ -1410,7 +1425,14 @@ def add_wow(s,kind,off=None):
     elif kind=="cancelled":
         d=gioHoc(NOW-days(random.randint(3,20)))
         row.update(booking_date=F(d-days(3)),wow_session_date=F(d),wow_status="cancelled (Đã hủy)",quota_deducted="no")
+    if row["wow_session_date"]:
+        row["wow_session_date"]=F(_napKhung(dt.datetime.strptime(row["wow_session_date"],"%d/%m/%Y %H:%M")))
     wows.append(row); return row
+def _napWowRow(w):
+    """Dung khi mot cho khac gan de wow_session_date sau khi add_wow() da chay."""
+    if w.get("wow_session_date"):
+        w["wow_session_date"]=F(_napKhung(dt.datetime.strptime(w["wow_session_date"],"%d/%m/%Y %H:%M")))
+    return w
 active=[s for s in students if s["student_status"].startswith("active")]
 for _ in range(38): add_wow(random.choice(active),"done")
 for _ in range(2): add_wow(random.choice(active),"done_nonote")
@@ -1418,8 +1440,8 @@ for _ in range(2): add_wow(random.choice(active),"done_nonote")
 # (coach, học viên, phụ huynh). Nay 26 buổi rải đều 18 ngày.
 for i in range(26): add_wow(random.choice(active),"upcoming",off=(i%18)+1)
 # 2 buổi WOW ngay HÔM NAY chưa dạy (1 đã đặt + 1 đã xác nhận, xếp giờ chiều tối)
-_w_td1=add_wow(random.choice(active),"upcoming",off=0); _w_td1["wow_session_date"]=F(TODAY+dt.timedelta(hours=17)); _w_td1["wow_status"]="booked (Đã đặt)"
-_w_td2=add_wow(random.choice(active),"upcoming",off=0); _w_td2["wow_session_date"]=F(TODAY+dt.timedelta(hours=19)); _w_td2["wow_status"]="confirmed (Đã xác nhận)"
+_w_td1=add_wow(random.choice(active),"upcoming",off=0); _w_td1["wow_session_date"]=F(TODAY+dt.timedelta(hours=17)); _w_td1["wow_status"]="booked (Đã đặt)"; _napWowRow(_w_td1)
+_w_td2=add_wow(random.choice(active),"upcoming",off=0); _w_td2["wow_session_date"]=F(TODAY+dt.timedelta(hours=19)); _w_td2["wow_status"]="confirmed (Đã xác nhận)"; _napWowRow(_w_td2)
 for _ in range(5): add_wow(random.choice(active),"noshow")
 for _ in range(3): add_wow(random.choice(active),"cancelled")
 # 1 buổi ghi nội dung TRỄ hạn 24h (đã ghi nhưng muộn)
@@ -1852,7 +1874,7 @@ for _w in wows:
 #    song trong danh muc ma chet tren man.
 # **Slot phai PHU HET buoi WOW da co**: neu mot buoi nam ngoai moi ca truc thi lich tong va so
 # buoi that noi nguoc nhau ngay tu ngay dau - dung cai ma SOP bao la phai doi chieu.
-KHUNG_TRUC=[9,15,17,19]
+# KHUNG_TRUC khai o phan DL14 ben tren - buoi WOW phai roi dung khung ngay tu luc sinh.
 wow_slots=[]; _sl=0
 _wowByKey={}
 # BUOI DA HUY THI CA TRA VE TRONG. Cot doi chieu cua man Lich truc bat duoc ngay lan chay dau:
@@ -1874,8 +1896,10 @@ for _nv in WOWS:
         _ngay=(NOW+days(_off)).replace(hour=0,minute=0)
         if _ngay.weekday()==6 and random.random()<0.7: continue      # chu nhat phan lon nghi
         if random.random()<0.18: continue                            # ngay nghi rai rac
-        for _h in random.sample(KHUNG_TRUC, random.randint(2,len(KHUNG_TRUC))):
-            _khi=_ngay.replace(hour=_h,minute=0)
+        # 2-5 ca/ngay: SOP dat cam ket 40h/thang, tuc khoang 2 gio moi ngay lam viec - khong ai
+        # truc lien 13 tieng. Lay mau tu 13 khung chu khong lay het.
+        for _hm in random.sample(KHUNG_TRUC, random.randint(2,5)):
+            _khi=_ngay.replace(hour=_hm[0],minute=_hm[1])
             _co=_wowByKey.get((_nv[0],F(_khi)))
             if _co:
                 _w=_co[0]
@@ -1911,15 +1935,25 @@ out={"dl":dl_new,"enums":old.get("enums"),"config":old.get("config")}
 # Verify tron bo bat ngay lan dau: "khong con tham so app doc ma khong co o sua (wowSlotHours,
 # wowSlotMaxDays)". Them tai NGUON de moi lan dung lai deu co, khong phai va tay vao JSON.
 _ch2 = (out.get("config") or {}).setdefault("ch2", [])
-_daCoCh2 = {str(x.get("name")) for x in _ch2}
+_ch2By = {str(x.get("name")): x for x in _ch2}
 for _t in [
-    {"name":"wowSlotHours","value":"09:00,15:00,17:00,19:00","unit":"khung giờ",
+    {"name":"wowSlotHours","value":"08:30,09:30,10:30,11:30,12:30,13:30,14:30,15:30,16:30,17:30,18:30,19:30,20:30","unit":"khung giờ",
      "meaning":"Các khung giờ NV WOW được đăng ký trực trong ngày. Học viên và học vụ chỉ đặt được buổi WOW vào những khung này.",
-     "suggested":"4 khung: sáng 09:00, chiều 15:00 và 17:00, tối 19:00. Thêm khung thì team WOW đăng ký được nhiều ca hơn."},
+     "suggested":"13 khung 1 giờ, 08:30 tới 21:30 - đúng lưới trực SOP mô tả ở sheet DL19. Bớt khung thì team WOW mất chỗ để nhận ca."},
     {"name":"wowSlotMaxDays","value":60,"unit":"ngày",
      "meaning":"Mỗi lần đăng ký ca trực, NV WOW được nhận tối đa bao nhiêu ngày liên tiếp.",
-     "suggested":"60 ngày (khoảng 2 tháng). Đặt ngắn hơn nếu muốn team đăng ký lại theo tháng."}]:
-    if _t["name"] not in _daCoCh2: _ch2.append(_t)
+     "suggested":"60 ngày (khoảng 2 tháng). Đặt ngắn hơn nếu muốn team đăng ký lại theo tháng."},
+    {"name":"wowCommitHours_month","value":40,"unit":"giờ/tháng",
+     "meaning":"Mỗi NV WOW cam kết trực bao nhiêu giờ một tháng. Bảng Tổng giờ trực lấy mốc này để báo 'Thiếu ...h'.",
+     "suggested":"40 giờ/tháng - đúng con số cột 'Cam kết/tháng' trong sheet DL19 của SOP."}]:
+    # GHI DE, KHONG PHAI "chua co thi them". Ban dau em viet `if ten not in daCo: append` - va no
+    # da can ngay: `gen_demo` doc lai `config` tu chinh demo_data_big.json cua lan chay TRUOC, nen
+    # gia tri cu (4 khung gio) song sot qua moi lan dung lai, de len ban moi. Ca 537 ca truc bi
+    # cham "lech khung" trong khi ma nguon da doi tu lau. File nay LA NGUON cua ban mau demo -
+    # nguon thi phai ghi de, khong nhuong cho ban sao cu.
+    _cu = _ch2By.get(_t["name"])
+    if _cu is None: _ch2.append(_t); _ch2By[_t["name"]] = _t
+    else: _cu.update(_t)
 
 # ---------- KIỂM ĐỊNH ----------
 err=[]
@@ -1952,6 +1986,13 @@ _buoiThat=collections.Counter(w["staff_id"] for w in wows
 for _nv in set(list(_caBan)+list(_buoiThat)):
     chk(_caBan[_nv]==_buoiThat[_nv],
         "DL26 %s: %d ca da dat nhung %d buoi that - lich truc va so WOW noi nguoc nhau"%(_nv,_caBan[_nv],_buoiThat[_nv]))
+
+# MOI CA PHAI NAM DUNG MOT KHUNG GIO CUA LUOI. Ca lech khung thi bang tong van dem no, con luoi
+# thi khong ve ra - hai cho tren cung mot man noi hai chuyen ma khong ai biet ben nao dung.
+_khungTxt={"%02d:%02d"%(h,m) for h,m in KHUNG_TRUC}
+_lech=[x["slot_id"] for x in wow_slots if str(x.get("slot_time") or "") not in _khungTxt]
+chk(not _lech,"DL26 co %d ca lech khung gio (%s) - luoi truc se khong ve ra chung"
+    %(len(_lech),", ".join(_lech[:4])))
 
 # danh muc khai bon gia tri thi demo phai cho thay du bon
 _tt={str(x["wow_slot_status"]).split(" ")[0] for x in wow_slots}

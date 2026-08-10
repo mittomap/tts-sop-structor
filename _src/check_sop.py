@@ -89,6 +89,35 @@ def _oCua(z, rels, rid, ss):
     return out
 
 
+# ── BANG DL VE THEO KIEU LUOI (khong co hang tieu de cot) ────────────────────
+# `_cols()` di tim mot hang tieu de gom cac o dang `snake_case`. Bang nao trong SOP ve theo LUOI
+# (cot = ngay, hang = khung gio) thi KHONG co hang ay - va truoc 10/08 no bi BO QUA TRONG IM
+# LANG: khong mot dong nao bao, so "bang du lieu" in ra van dep.
+#
+# Do dung la cach `DL19. Lich lam viec WOW` tron thoat khoi ca 39 bo kiem. SOP mo ta no hang
+# thang - luoi truc, tong gio truc, cam ket 40h - ma khong phep do nao cua du an nhin thay. Phai
+# doi anh Luan noi ra thi moi biet.
+#
+# Nay: bang DL nao khong doc duoc cot thi PHAI khai o day, KEM BANG CHUNG app da lam - la nhung
+# chuoi phai co that trong gen_v5.py. Khai suong khong duoc tinh; khai roi ma app go mat thi do.
+LUOI = {
+    "DL19": ("Lich lam viec WOW. SOP ve theo LUOI (cot = ngay, hang = khung gio, o trong = khong "
+             "ai truc) nen khong co hang tieu de cot de doc. App lam thanh bang DL26 + man "
+             "`Lich truc WOW`: NV WOW tu dang ky ca, hoc vien/hoc vu chi dat buoi WOW vao ca da "
+             "dang ky. LUU Y SO HIEU: DL19 cua APP la 'Thuong gioi thieu' - trung so voi SOP, nen "
+             "bang lich truc mang so DL26.",
+             ["DL26", "renderLichWow", "lwSave", "wowSlotHours", "wowCommitHours_month",
+              "Lượt trực/ngày", "Tổng giờ trực theo NV WOW", "Cam kết/tháng", "Thiếu "]),
+}
+
+
+def _dl_sheets():
+    """MOI ten bang DL co trong file SOP - ke ca bang khong doc duoc cot."""
+    z = zipfile.ZipFile(SOP)
+    ten = re.findall(r'<sheet name="([^"]+)"', z.read("xl/workbook.xml").decode("utf-8", "ignore"))
+    return [t.split(".")[0] for t in ten if re.match(r"^DL\d", t)]
+
+
 def _cols():
     """Ten cot cua tung bang DL trong file SOP goc."""
     z = zipfile.ZipFile(SOP)
@@ -136,6 +165,30 @@ if not os.path.exists(SOP):
 COLS = _cols()
 SRC = open(os.path.join(SD, "gen_v5.py"), encoding="utf-8").read()
 
+# ── 0. KHONG BANG DL NAO DUOC BIEN MAT KHONG MOT TIENG DONG ──────────────────
+_bo = [s for s in _dl_sheets() if s not in COLS]
+_loi0 = []
+for _s in _bo:
+    if _s not in LUOI:
+        _loi0.append("   X %s: SOP co bang nay ma check_sop khong doc duoc cot nao, va khong ai "
+                     "khai ly do. Khai vao LUOI kem bang chung app da lam." % _s)
+        continue
+    _ly, _bc = LUOI[_s]
+    _thieu = [b for b in _bc if b not in SRC]
+    if _thieu:
+        _loi0.append("   X %s: da khai la app co lam, nhung gen_v5.py KHONG con dau vet: %s"
+                     % (_s, ", ".join(_thieu)))
+for _s in list(LUOI):
+    if _s not in _bo:
+        _loi0.append("   X %s: khai LUOI thua - bang nay nay da doc duoc cot binh thuong, bo dong "
+                     "khai di de no vao dien do cot nhu moi bang khac." % _s)
+if _loi0:
+    print("BANG DL BI BO QUA MA KHONG AI KHAI (%d):" % len(_loi0))
+    for _x in _loi0:
+        print(_x)
+    print("KET QUA: KHONG DAT")
+    sys.exit(1)
+
 tong = 0
 sot = []
 thua_boqua = []
@@ -152,7 +205,8 @@ for tb, cols in COLS.items():
 print("=" * 78)
 print("DOI CHIEU SOP GOC <-> APP")
 print("  file SOP     : %s" % os.path.basename(SOP))
-print("  bang du lieu : %d" % len(COLS))
+print("  bang du lieu : %d doc duoc cot + %d ve theo luoi (da khai): %s"
+      % (len(COLS), len(_bo), ", ".join(_bo) or "khong"))
 print("  cot SOP mo ta: %d" % tong)
 print("  co y khong dung (da khai ly do): %d" % len(BOQUA))
 print()

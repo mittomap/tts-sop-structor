@@ -1072,3 +1072,46 @@ M18 khong dinh - **chi cua ghi bi boc**. M20 nay doc thang nguon, va cai CHOT: l
 thuong thi DO, khong cho mot lat cat hut lang le di qua roi ket luan.
 *`fn.toString()` cho ta thu dang chay, khong phai thu minh viet - hai cai do khong phai luc nao
 cung la mot.*
+
+## 10/08 - MO FILE SOP RA DOC THI THAY: `DL19. Lich lam viec WOW` LA MOT SHEET CHINH THUC
+
+Sau khi dung xong man Lich truc WOW, em mo `ITTs_Operations_Template_v4.xlsx` ra dem sheet. Co
+**52 sheet**, va sheet thu 30 ten la **`DL19. Lich lam viec WOW`**. Tuc mang nay khong phai
+"SOP co nhac toi dau do" - no la MOT BANG DL DUOC DANH SO, ngang hang voi DL01..DL18.
+
+**Vi sao `check_sop.py` khong thay:** `_cols()` loc sheet theo `^DL\d` (DL19 KHOP), roi di tim
+mot hang tieu de gom cac o dang `snake_case`. DL19 ve theo **LUOI** (cot = ngay, hang = khung
+gio) nen khong co hang ay -> `best` rong -> `continue`. **Bo qua trong im lang.** So in ra van
+dep: *"bang du lieu: 19"*, va khong ai doi chieu 19 voi 20.
+
+*Mot phep do bo qua cai no khong hieu, roi in ra con so cua nhung cai no hieu - con so ay trong
+nhu mot con so day du.*
+
+**Da bit:** `check_sop.py` nay lay ca `_dl_sheets()` (moi ten `^DL\d` trong workbook) roi tru di
+nhung bang doc duoc cot. Bang nao chenh ra PHAI khai trong `LUOI` **kem bang chung app da lam** -
+la nhung chuoi phai co that trong `gen_v5.py`. Khai suong khong tinh; khai roi ma sau nay ai go
+mat `renderLichWow` la do. Da tu thu hai chieu: go mot chuoi bang chung -> do; bo dong khai ->
+do (va con bat luon dong khai thua).
+
+**Doc ky sheet ay ra thi lo tiep BA THU EM DA LAM THIEU** - dung dien LUAT CUNG SO 0:
+- **13 khung gio** 08:30-09:30 ... 20:30-21:30. Em dat **4 khung** cho gon. 4 < 13 la BOT.
+- **Cot "Cam ket/thang"** (SOP ghi 40) va **cot "Tinh trang"** (SOP tu ghi chu mau *"Thieu 11h"*).
+  Thieu hai cot nay thi bang tong chi DEM, khong tra loi duoc cau nguoi quan ly team WOW that su
+  hoi: **ai dang truc thieu so voi cam ket.**
+- **Dong "Luot truc/ngay"** duoi luoi, va **dong THU** (T2..CN) tren dau cot ngay.
+
+**Va mot bay day chuyen ma viec doi 4 -> 13 khung lam lo ra:** buoi WOW trong `gen_demo` sinh o
+gio :00 (`gioHoc`, `random.choice([9,15,19])`), con luoi truc o :30. Khong buoi nao roi dung ca
+-> `fixdata` luat 18 se **mo them mot ca dung gio buoi do**, tuc **ca NGOAI LUOI**: bang tong dem
+duoc ma luoi khong ve ra. Hai cho tren cung mot man noi hai chuyen. Da nap ca hai dau: `_napKhung`
+trong `gen_demo` (giu nguyen ben qua khu / tuong lai - snap mu la day buoi "da hoan thanh" sang
+tuong lai, `check_logic` luat 7g bat ngay) va **luat 18a** trong `fixdata` doc khung tu CH2.
+Them 6 luat `18a-18f` vao `check_logic.py` vi DL26 la bang **nhieu nguoi ghi nhat**: gen_demo
+sinh, fixdata sua, roi trong app ca hai cua dat buoi WOW deu doi trang thai ca - *mot bat bien
+nhieu nguoi ghi thi phai kiem sau NGUOI GHI CUOI CUNG*.
+
+**Mot loi that nua bat duoc trong lucdon:** `lwKhung()` doc khung gio bang `paramOf`, ma `paramOf`
+chay `Number(value)` roi thay NaN la tra ve mac dinh - "08:30,09:30,..." thi NaN chac chan. Tuc
+trung tam vao Cai dat sua khung gio, bam Luu, app van chay y khung cu **ma khong bao gi**. Doi
+sang `paramStr`. Cung ho voi bay "dung nham ham doc" - khong bo kiem nao co cua thay, vi ca hai
+duong deu tra ve mot chuoi hop le.

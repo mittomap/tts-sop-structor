@@ -2674,6 +2674,36 @@ log.append("17. Don dang ky co truoc lead: keo moc tao lead ve som %d ho so" % _
 #   · buoi CON SONG ma ca khong con giu -> mo/gan lai ca dung gio do;
 #   · ca dang giu mot buoi da doi gio hoac da huy -> tra ca ve `available`, xoa ma buoi.
 _slots = d["dl"].setdefault("DL26", [])
+# 18a. NAP BUOI VE DUNG KHUNG GIO TRUOC DA. Cac luat tren doi gio buoi WOW theo nhu cau rieng
+# cua chung (keo ve qua khu, day sang tuong lai) va khong luat nao biet den luoi truc. Neu de
+# nguyen thi buoc mo ca ben duoi se de ra CA NGOAI LUOI: bang tong dem duoc ma luoi khong ve ra.
+# Khung gio doc tu CH2 (`wowSlotHours`) - cung mot nguon voi app, khong go lai o day.
+_khungCfg = ""
+for _c in (d.get("config") or {}).get("ch2", []):
+    if str(_c.get("name")) == "wowSlotHours": _khungCfg = str(_c.get("value") or "")
+_khung = []
+for _g in _khungCfg.split(","):
+    _g = _g.strip()
+    if not _g: continue
+    try:
+        _hh, _mm = _g.split(":"); _khung.append((int(_hh), int(_mm)))
+    except Exception: pass
+_soNap = 0
+if _khung:
+    for _w in R("DL14"):
+        _dt = str(_w.get("wow_session_date") or "").strip()
+        if not _dt or str(_w.get("wow_status") or "").startswith("cancelled"): continue
+        try: _cu = _dt2.datetime.strptime(_dt, "%d/%m/%Y %H:%M")
+        except Exception: continue
+        if (_cu.hour, _cu.minute) in _khung: continue
+        _ung = [_cu.replace(hour=_h, minute=_m) for _h, _m in _khung]
+        _qua = (_cu <= NOW)
+        _hop = [c for c in _ung if (c <= NOW) == _qua] or _ung
+        _moi = min(_hop, key=lambda c: abs((c - _cu).total_seconds()))
+        _w["wow_session_date"] = _moi.strftime("%d/%m/%Y %H:%M")
+        _soNap += 1
+log.append("18a. Nap buoi WOW ve dung khung gio luoi truc: %d buoi" % _soNap)
+
 _wowSong = {}
 for _w in R("DL14"):
     _dt = str(_w.get("wow_session_date") or "").strip()

@@ -2,6 +2,26 @@
 
 > `ITTs_WebApp_v5_demo.html` là bản app: mở bằng trình duyệt, mọi thao tác ghi thật vào bộ nhớ trình duyệt. **Lớp Google Sheets đã cho nghỉ hưu 30/07** - không còn bản `.gs` nào, mọi cấu hình nằm trong màn Cài đặt của chính app. Khi anh Luân chốt nền tảng backend, 66 chỗ ghi trong app đã có sẵn đường nối ra máy chủ (xem khối ghi chú tại `var SVR=` trong `gen_v5.py`).
 
+## ⭐ MỚI 10/08/2026 — **Lịch trực WOW**: đặt buổi WOW nay bám vào ca trực có thật
+
+Trước đây app mặc định **lúc nào cũng có người trực**: ô giờ để trống trơn, gõ 03:00 sáng ngày
+01/01/2030 app vẫn nhận và báo *"Đã đặt buổi WOW cho ..."*. SOP thì đã mô tả sẵn màn **"Bảng trực
+NV WOW - theo tháng"** (ô trống = không ai trực) và danh mục `enum_wow_slot_status` — app chưa
+dùng tới.
+
+Nay có ba phần:
+
+1. **Mỗi NV WOW tự đăng ký ca của mình** — trang **Lịch trực WOW**, nút *Đăng ký ca trực*: chọn
+   ngày, tick các khung giờ (mặc định 09:00 · 15:00 · 17:00 · 19:00, sửa được ở Cài đặt →
+   `wowSlotHours`). **Không ai đăng ký hộ ai được** — ca là cam kết có mặt, ký thay là hứa thay.
+2. **Lịch tổng nhìn một cái là biết** — lưới cột = ngày, hàng = khung giờ; bấm vào ô ra chi tiết
+   ai trực, ca nào còn trống. Dải 4 thẻ ở đầu trang, trong đó thẻ **"Ngày không ai trực"** là con
+   số quan trọng nhất: đó chính là những ngày học viên mở app ra và không đặt được buổi nào. Cuối
+   trang là bảng **Tổng giờ trực theo NV** đối chiếu với buổi WOW thật (đúng cột SOP đòi).
+3. **Cả hai đường đặt buổi WOW đều đi qua lịch này** — học vụ (*Thêm buổi WOW*) và học viên (*Xin
+   buổi WOW* ở cổng học viên) nay chỉ **chọn được ca đã đăng ký và còn trống**; ô ngày/giờ tự do
+   đã gỡ. Đặt xong ca tự chuyển sang `booked` nên không hai người đặt trùng một ca.
+
 ## ⭐ V2 (08/08/2026) — mở app ra là thấy VIỆC CỦA HÔM NAY
 
 > Anh Luân: *"Hệ thống lớn, nhưng quá khó dùng thì chết ngay. Như v1, a ko chắc nhân viên sale

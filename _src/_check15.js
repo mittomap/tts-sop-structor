@@ -66,24 +66,39 @@ t("BAT BIEN: da tru luot WOW <=> buoi da dien ra (tren du lieu dang co)", invQuo
 (function(){
  var S=rows("DL09").filter(function(x){return num(x.wow_quota_remaining)>1})[0];
  if(!S){bad.push("khong co HV con luot WOW de lai thu");return}
- var d=new Date(Date.now()+6*864e5);function z(n){return n<10?"0"+n:n}
- var iso=d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate());
+ /* 10/08 - HAI CUA NAY NAY DEU DI QUA CA TRUC (DL26), khong con go ngay/gio tu do. Phep lai
+    phai lai dung duong nguoi dung di: khong co ca thi ca hai cua deu tu choi ngay tu dong dau,
+    va moi tieu chi phia sau se xanh VI KHONG CO GI XAY RA - dung cai kieu xanh vo nghia. */
+ function caRanh(){return rows("DL26").filter(function(x){return lwRanh(x)})[0]}
+ var ca1=caRanh();
+ if(!ca1){bad.push("khong co ca truc WOW con trong de lai thu");return}
  /* cua 1: hoc vien tu dat qua cong */
  window.HVID=S.student_id;
  var n0=rows("DL14").length;
- reset();setF({hvw_skill:"Speaking (Nói)",hvw_date:iso,hvw_focus:"Part 2"});
+ reset();setF({hvw_skill:"Speaking (Nói)",hvw_slot:ca1.slot_id,hvw_focus:"Part 2"});
  hvWowSave();
  var w1=rows("DL14")[0];
  t("cua CONG HOC VIEN: dat xong CHUA tru luot", rows("DL14").length===n0+1&&String(w1.quota_deducted).toLowerCase()==="no");
- /* cua 2: nhan vien dat ho */
- var gvw=rows("DL01").filter(function(x){return /wow/.test(ecode(x.role))&&isc(x.status,"active")})[0]||{};
+ /* cua 2: nhan vien dat ho - phai la CA KHAC, vi ca vua roi da bi cua 1 chiem */
+ var ca2=caRanh();
+ if(!ca2){bad.push("khong con ca truc thu hai de lai cua nhan vien");return}
  reset();setF({wa_stu:S.student_id,wa_skill:"Writing (Viết)",wa_type:"academic_support (Hỗ trợ học thuật)",
-  wa_staff:gvw.staff_id||"",wa_date:iso+"T19:00",wa_focus:"Task 2",wa_by:"academic_hv (Học vụ)",wa_why:"Em nay Writing yeu nhat"});
+  wa_slot:ca2.slot_id,wa_focus:"Task 2",wa_by:"academic_hv (Học vụ)",wa_why:"Em nay Writing yeu nhat"});
  var n1=rows("DL14").length;
  wowAddSave(true);
  var w2=rows("DL14")[0];
  t("cua NHAN VIEN: dat xong CHUA tru luot (bang voi cua cong)", rows("DL14").length===n1+1&&String(w2.quota_deducted).toLowerCase()==="no");
  t("HAI CUA ghi giong nhau o cot quota_deducted", String(w1.quota_deducted)===String(w2.quota_deducted));
+ /* BAT BIEN GIUA HAI CUA (dung ho loi ma bo kiem nay sinh ra de canh): mot ca truc chi de duoc
+    MOT buoi. Ca cua nao quen danh dau ca thi ca do nhan tiep nguoi thu hai ma khong ai hay. */
+ t("cua CONG: dat xong thi ca truc bi danh dau va khong con nhan nguoi khac",
+   isc(ca1.wow_slot_status,"booked")&&ca1.wow_id===w1.wow_id&&!lwRanh(ca1));
+ t("cua NHAN VIEN: dat xong thi ca truc bi danh dau va khong con nhan nguoi khac",
+   isc(ca2.wow_slot_status,"booked")&&ca2.wow_id===w2.wow_id&&!lwRanh(ca2));
+ t("HAI CUA khong the roi vao cung mot ca", ca1.slot_id!==ca2.slot_id);
+ t("HAI CUA deu lay GIO tu ca truc, khong tu dat gio",
+   String(w1.wow_session_date||"")===String(ca1.slot_datetime||"")&&
+   String(w2.wow_session_date||"")===String(ca2.slot_datetime||""));
  t("cua NHAN VIEN bat ghi VI SAO can buoi nay", !!String(w2.notes||"").trim());
  t("cua NHAN VIEN bat ghi TRONG TAM buoi", !!String(w2.wow_content_focus||"").trim());
  t("ca hai cua deu ghi NGUOI DAT", !!String(w1.wow_booked_by||"").trim()&&!!String(w2.wow_booked_by||"").trim());
