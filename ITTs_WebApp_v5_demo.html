@@ -2371,7 +2371,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">10/08/2026 · <b>1a2bcd</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">10/08/2026 · <b>738314</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -9950,7 +9950,7 @@ function renderReview(embed){var p="review",fil=fget(p);
    '<button class="btn sm" onclick="openLop(\''+esc(c.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Bảng lớp</button></div></td></tr>'});
  h+='</tbody></table></div></div>';
  var recent=sv.slice().sort(function(a,b){return (pvnd(b.sent_date)||0)-(pvnd(a.sent_date)||0)}).slice(0,12);
- h+='<div class="panel"><div class="ph"><b>Phiếu gần đây ('+recent.length+')</b><div class="mini">\'+(CUR!=="khaosat"?\'<button class="pill" onclick="window.KSTAB=\\\'ks\\\';go(\\\'khaosat\\\')">Mở Khảo sát &amp; Phản hồi</button>\':\'\')+\'</div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Học viên</th><th>Lớp</th><th>Đợt</th><th>Gửi</th><th>Trạng thái</th><th>Hài lòng</th></tr></thead><tbody>';
+ h+='<div class="panel"><div class="ph"><b>Phiếu gần đây ('+recent.length+')</b>'+(CUR!=="khaosat"?'<div class="mini"><button class="pill" onclick="window.KSTAB=\'ks\';go(\'khaosat\')">Mở Khảo sát & Phản hồi</button></div>':'')+'</div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Học viên</th><th>Lớp</th><th>Đợt</th><th>Gửi</th><th>Trạng thái</th><th>Hài lòng</th></tr></thead><tbody>';
  recent.forEach(function(v){var sub=String(v.submitted_date||"").trim();
   h+='<tr data-mo="svXem" data-mo-arg="'+esc(v.survey_id)+'"><td>'+esc(v.survey_id)+'</td><td>'+esc(v.student_name||v.student_id)+'</td><td>'+lopLnk(v.class_id,v.class_id_name,"-")+'</td><td>'+esc(elabel(v.survey_type)||"-")+'</td><td>'+esc(v.sent_date||"-")+'</td>'+
    '<td>'+(sub?'<span class="chip green">đã trả lời</span>':'<span class="chip amber">chờ</span>')+'</td>'+
