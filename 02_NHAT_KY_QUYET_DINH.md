@@ -241,6 +241,38 @@
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 39 BỘ KIỂM (08/08). V1 mốc cũ: V9.99z12, 34 bộ, bản dựng `829572`.**
 >
+> ### 🔵 10/08 - VÒNG TÁM: CON SỐ BÁO ĐỘNG VÀ CÂU GIẢI THÍCH CỦA NÓ ĐẾM HAI ĐÁM ĐÔNG
+>
+> Màn Báo cáo in con số, rồi in ngay dưới một câu giải thích. Hai thứ ấy do **hai hàm khác nhau**
+> sinh ra: `kpiCompute()` tính giá trị, `kpiNum(code)` dựng câu giải thích. Và chúng đọc dữ liệu
+> khác nhau - `kpiCompute` lọc mọi bảng theo **kỳ báo cáo**, `kpiNum` lấy dữ liệu trần.
+>
+> **Đo được: đổi kỳ từ "toàn kỳ" sang "30 ngày" thì 16/17 chỉ số đổi số, 0/17 câu giải thích đổi.**
+> Trên màn thật, kỳ 30 ngày in nguyên một dòng:
+> *"CVR Lead đăng ký + cọc **17%** ≥ 40% **Báo động** · Phễu vỡ... **85/193 lead đã thành học
+> viên**"* - mà 85/193 là **44%**. Câu giải thích nói ngược lại chính lời báo động đứng cạnh nó,
+> và nó chỉ hiện ra **đúng lúc chỉ số vào diện báo động** - tức đúng lúc người ta sắp hành động.
+>
+> Vá xong: **12/17 câu giải thích nay đổi theo kỳ**; 4 cái không đổi là trùng hợp thật (`CLR` mẫu
+> số 88 → 17 nhưng tử số vẫn 4, vì câu của nó chỉ trích tử số - việc đang tồn thì tự nhiên là
+> việc gần đây). **Đó là lý do phép hỏi phải đặt ở NGUỒN chứ không đặt ở số liệu hôm nay:** đo
+> bằng số thì có ngày hai bên tình cờ bằng nhau rồi đèn xanh, và chính cái đúng ấy che mất cái sai.
+> M17 hỏi **giao kèo giữa hai hàm** - bảng nào `kpiCompute` lọc theo kỳ thì `kpiNum` phải lọc
+> bảng ấy, đúng trường ngày ấy.
+>
+> **BA LẦN THƯỚC CỦA EM SAI TRƯỚC KHI RA ĐƯỢC KẾT LUẬN NÀY - cả ba cùng một họ:**
+> 1. Đối chiếu hai hàm như **tử số/mẫu số** → báo 16/16 lệch. Sai: `kpiNum` trả về hai con số
+>    **phụ** để dựng câu chú thích, không phải một tỉ lệ. Bằng chứng nằm ngay trong kết quả:
+>    `CUR` cho "65/12" = 541% - *"còn trống 65 chỗ ở 12 lớp"*, hai đại lượng khác nhau. Em đọc
+>    chữ *"con số con THẬT đứng sau mỗi chỉ số"* rồi tự hiểu thành tử/mẫu.
+> 2. Đặt kỳ báo cáo bằng `window.REPFROM` / `window.REP` - **hai biến không tồn tại**. Kỳ thật nằm
+>    ở `window.REPKY`. Hai lượt đo ra kết quả giống hệt nhau, tức lượt thứ hai **vô nghĩa mà vẫn
+>    in ra như thật**.
+> 3. Kết luận "16 chỉ số lệch" khi **chưa hề mở trang Báo cáo ra xem** câu giải thích có trên màn
+>    không.
+> *Một phát hiện chỉ là thật khi nó có trên màn - và một phép đo chỉ đúng khi mình biết nó đang
+> hỏi cái gì.*
+
 > ### 🔴 09/08 - EM ĐẨY BẢN V2 ĐÈ LÊN TRANG DEMO V1. ANH LUÂN BẮT ĐƯỢC, ĐÃ TRẢ VỀ.
 >
 > Kết vòng sáu em chạy `./update.sh` trong repo demo theo đúng bước 3 của `CLAUDE.md`. Nó chép

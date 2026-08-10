@@ -904,3 +904,37 @@ enum voi `stCls`, ke ca chuc danh ("Giam doc (CEO)") va co so ("Co so 1"). `stCl
 cho TRANG THAI; gap thu no khong biet thi tra "gray" - ma chip khong gan lop mau thi trong cung
 xam y het. Nay chi hoi nhung gia tri `stCls` THAT SU NHAN RA. *Hoi cai minh khong co tham quyen
 hoi thi con so nao cung vo nghia.*
+
+## 10/08 VONG TAM - CON SO VA CAU GIAI THICH CUA NO DOC HAI DAM DONG (M17)
+
+Man Bao cao in con so, roi in ngay duoi mot cau giai thich. Hai thu ay do HAI HAM khac nhau sinh
+ra: `kpiCompute()` tinh gia tri, `kpiNum(code)` dung cau giai thich. Va chung doc du lieu khac
+nhau: `kpiCompute` loc moi bang theo KY BAO CAO (`repF`), `kpiNum` lay `srows(...)` tran.
+
+**Do duoc:** doi ky tu "toan ky" sang "30 ngay" thi **16/17 chi so doi so, 0/17 cau giai thich
+doi**. Tren man that, ky 30 ngay in nguyen mot dong:
+> *CVR Lead dang ky + coc **17%** >= 40% **Bao dong** · Pheu vo... **85/193 lead da thanh hoc vien***
+
+85/193 la **44%**. Cau giai thich noi nguoc lai chinh loi bao dong dung canh no - va no chi hien
+ra DUNG LUC chi so vao dien bao dong, tuc dung luc nguoi ta sap hanh dong theo no.
+
+Va sau khi va: **12/17 cau giai thich nay doi theo ky**, con 4 cai khong doi la TRUNG HOP THAT
+(`CLR` mau so 88 -> 17 nhung tu so van 4, vi cau cua no chi trich tu so - viec dang ton thi tu
+nhien la viec gan day). Do la vi sao **phep hoi dat o NGUON chu khong dat o so lieu hom nay**:
+do bang so thi co ngay hai ben tinh co bang nhau roi den xanh, va chinh cai dung ay che mat cai
+sai. M17 hoi GIAO KEO giua hai ham - bang nao `kpiCompute` loc theo ky thi `kpiNum` phai loc bang
+ay, dung truong ngay ay. Them mot chi so moi doc them mot bang ma quen loc la do ngay.
+Ca DL12 (diem danh) khong co moc thoi gian rieng nen ca hai ham phai loc no qua buoi hoc thuoc ky
+- M17 xet rieng ve nay.
+
+**BA LAN THUOC CUA EM SAI TRUOC KHI RA DUOC KET LUAN NAY, ghi lai vi ca ba cung mot ho:**
+1. Doi chieu `kpiCompute` voi `kpiNum` nhu TU SO/MAU SO -> bao 16/16 lech. Sai: `kpiNum` tra ve
+   hai con so PHU de dung cau chu thich, khong phai mot ti le. Bang chung nam ngay trong ket qua:
+   `CUR` cho "65/12" = 541% - *"con trong 65 cho o 12 lop"*, hai dai luong khac nhau. Em doc chu
+   *"con so con THAT dung sau moi chi so"* roi tu hieu thanh tu/mau.
+2. Dat ky bao cao bang `window.REPFROM` / `window.REP` - hai bien khong ton tai. Ky that nam o
+   `window.REPKY` ("all"|"m0"|"30"|"90"). Hai luot do ra ket qua giong het nhau, tuc luot thu hai
+   VO NGHIA ma van in ra nhu that.
+3. Ket luan "16 chi so lech" khi chua he mo trang bao cao ra xem cau giai thich CO TREN MAN khong.
+*Mot phat hien chi la that khi no co tren man - va mot phep do chi dung khi minh biet no dang
+hoi cai gi.*

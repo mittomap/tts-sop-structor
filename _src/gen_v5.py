@@ -10998,9 +10998,24 @@ var KPIARC={LRT:"A",TBR:"A",CVR:"A",PCR:"A",CAR:"A",CLR:"B",CUR:"B",ATR:"B",UAR:
    (lead tháng này chưa kịp đăng ký) -> so kỳ trước là so bậy, TUYỆT ĐỐI không hiện mũi tên. */
 var KPITREND={LRT:1,ATR:1,UAR:1,HCR:1,GCR7:1,TNR:1,SS:1,NPS:1,CLR:1,CUR:1};
 
+/* CÂU GIẢI THÍCH PHẢI ĐẾM ĐÚNG ĐÁM ĐÔNG MÀ CON SỐ ĐANG NÓI TỚI.
+   Bẫy đo được 09/08: `kpiCompute()` lọc mọi bảng theo KỲ BÁO CÁO (`repF`), còn hàm này - hàm
+   sinh ra chính câu chú thích in ngay dưới con số - lấy `srows(...)` trần, không lọc kỳ.
+   Đo thật: đổi kỳ từ "toàn kỳ" sang "30 ngày" thì **16/17 chỉ số đổi số, 0/17 câu giải thích
+   đổi**. Trên màn Báo cáo, kỳ 30 ngày in ra nguyên một dòng:
+     *"CVR Lead đăng ký + cọc **17%** ≥ 40% **Báo động**... **85/193 lead đã thành học viên**"*
+   85/193 là 44% - câu giải thích nói ngược lại chính lời báo động đứng cạnh nó. Và nó chỉ hiện
+   ra ĐÚNG LÚC chỉ số vào diện báo động, tức đúng lúc người ta sắp hành động theo nó.
+   Nay chép nguyên bộ lọc của `kpiCompute` - từng bảng đúng trường ngày của nó, kể cả ca DL12
+   không có mốc riêng nên phải lọc qua buổi học thuộc kỳ. `_checkaudit` M17 canh chuyện này. */
 function kpiNum(code){          /* con số con THẬT đứng sau mỗi chỉ số */
- var L=srows("DL02"),T=srows("DL03"),E=srows("DL06"),OB=srows("DL08"),CL=srows("DL10"),
-     AT=srows("DL12"),HW=srows("DL13"),SV=srows("DL15"),CE=srows("DL18"),SE=srows("DL11");
+ var L=repF(srows("DL02"),"lead_created_time"),T=repF(srows("DL03"),"test_date"),
+     E=repF(srows("DL06"),"enrollment_time"),OB=repF(srows("DL08"),"assigned_at"),
+     CL=srows("DL10"),HW=repF(srows("DL13"),"homework_assigned_time"),
+     SV=repF(srows("DL15"),"sent_date"),CE=repF(srows("DL18"),"course_completion_time"),
+     SE=repF(srows("DL11"),"session_date");
+ var _seIn={};SE.forEach(function(x){_seIn[String(x.session_id||"")]=1});
+ var AT=repRange().from?srows("DL12").filter(function(a){return _seIn[String(a.session_id||"")]}):srows("DL12");
  function c(a,f){var n=0;a.forEach(function(x){if(f(x))n++});return n}
  switch(code){
   case "LRT":{var slow=c(L,function(l){var x=hoursSince(l.lead_created_time);

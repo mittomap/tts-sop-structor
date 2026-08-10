@@ -1428,9 +1428,58 @@ var TAT_BOQUA={
    !sai.size, [...sai.values()].slice(0,5).join(" | "));
 })();
 
+/* ═════════ M17 - HAI HÀM CÙNG NÓI VỀ MỘT CHỈ SỐ MÀ ĐỌC HAI ĐÁM ĐÔNG (đặt 09/08) ═════════
+   Màn Báo cáo in con số, rồi in ngay dưới nó một câu giải thích *"85/193 lead đã thành học
+   viên"*. Hai thứ ấy do HAI HÀM khác nhau sinh ra: `kpiCompute()` tính giá trị, `kpiNum(code)`
+   dựng câu giải thích. Và chúng đọc dữ liệu khác nhau: `kpiCompute` lọc mọi bảng theo KỲ BÁO
+   CÁO (`repF`), `kpiNum` thì lấy `srows(...)` trần.
+
+   ĐO ĐƯỢC 09/08: đổi kỳ từ "toàn kỳ" sang "30 ngày" thì **16/17 chỉ số đổi số, 0/17 câu giải
+   thích đổi**. Trên màn thật, kỳ 30 ngày in nguyên một dòng:
+     *"CVR Lead đăng ký + cọc **17%** ≥ 40% **Báo động** · Phễu vỡ... **85/193 lead đã thành học
+     viên**"* - mà 85/193 là **44%**. Câu giải thích nói ngược lại chính lời báo động đứng cạnh
+   nó, và nó chỉ hiện ra ĐÚNG LÚC chỉ số vào diện báo động - tức đúng lúc người ta sắp hành động.
+
+   PHÉP HỎI ĐẶT Ở NGUỒN, KHÔNG ĐẶT Ở SỐ LIỆU HÔM NAY: bảng nào `kpiCompute` lọc theo kỳ thì
+   `kpiNum` cũng phải lọc bảng ấy, đúng trường ngày ấy. Đo bằng số liệu thì có ngày hai bên tình
+   cờ bằng nhau rồi đèn xanh (đã thấy: 4 chỉ số có tử số không đổi vì việc đang tồn vốn là việc
+   gần đây - đúng, nhưng nếu chỉ đo số thì cái đúng ấy che mất cái sai). Hỏi ở giao kèo giữa hai
+   hàm thì thêm một chỉ số mới đọc thêm một bảng mà quên lọc là đỏ ngay. */
+(function(){
+ var A="",B="";
+ try{A=Function.prototype.toString.call(global.kpiCompute)}catch(e){}
+ try{B=Function.prototype.toString.call(global.kpiNum)}catch(e){}
+ t("đọc được nguồn `kpiCompute` và `kpiNum` để đối chiếu", !!A&&!!B);
+ if(!A||!B)return;
+ /* bảng nào `kpiCompute` lọc theo kỳ, và bằng trường ngày nào */
+ var loc={}, m, re=/repF\(\s*srows\("(DL\d+)"\)\s*,\s*"([\w]+)"\s*\)/g;
+ while((m=re.exec(A)))loc[m[1]]=m[2];
+ t("`kpiCompute` khai rõ bảng nào lọc theo kỳ ("+Object.keys(loc).length+" bảng)", Object.keys(loc).length>=8);
+ /* bảng nào `kpiNum` đọc, và đọc qua bộ lọc hay đọc trần */
+ var doc={}, re2=/(repF\(\s*)?srows\("(DL\d+)"\)(\s*,\s*"([\w]+)"\s*\))?/g;
+ while((m=re2.exec(B))){
+  var b=m[2]; if(!b)continue;
+  if(m[1]&&m[4])doc[b]=m[4]; else if(!(b in doc))doc[b]="(tran)";
+ }
+ var xau=[];
+ Object.keys(doc).forEach(function(b){
+  if(!(b in loc))return;                       /* `kpiCompute` không lọc bảng này -> không đòi */
+  if(b==="DL12")return;                        /* DL12 không có mốc riêng, lọc qua buổi học - xét riêng bên dưới */
+  if(doc[b]==="(tran)")xau.push(b+" đọc trần (kpiCompute lọc theo `"+loc[b]+"`)");
+  else if(doc[b]!==loc[b])xau.push(b+" lọc theo `"+doc[b]+"` mà kpiCompute lọc theo `"+loc[b]+"`");
+ });
+ t("`kpiNum` lọc theo kỳ đúng như `kpiCompute` ("+Object.keys(doc).length+" bảng nó đọc)",
+   !xau.length, xau.slice(0,6).join(" | "));
+ /* DL12 (điểm danh) không mang mốc thời gian riêng - cả hai hàm phải lọc nó qua buổi học thuộc kỳ */
+ var d12A=/DL12"\)\.filter\(/.test(A)&&/_seIn/.test(A);
+ var d12B=!/srows\("DL12"\)/.test(B)||(/DL12"\)\.filter\(/.test(B)&&/_seIn/.test(B));
+ t("bảng điểm danh DL12 (không có mốc riêng) được cả hai hàm lọc qua buổi học thuộc kỳ",
+   d12A&&d12B, "kpiCompute="+d12A+" kpiNum="+d12B);
+})();
+
 /* ═════════════════════════════════════════════════════════════════════════════════════════ */
 if(bad.length){
  console.log("CHECKAUDIT DO ("+bad.length+"/"+n+"):");
  bad.forEach(function(b){console.log("  - "+b)});
  process.exit(1)}
-console.log("CHECKAUDIT OK: "+n+" tieu chi | 16 phuong phap tim loi (8 cua anh Luan + M9 ba cau cai nhau tren mot man, M10 o chon mo cua, M11 kieu o khai ra ma bo ve o khong biet, M12 o tim khong bo dau, M13 ten trong goi y nuot cu bam, M14 dau sao co noi that khong, M15 nut dan ve chinh cho dang dung, M16 chip to mau theo mot thu chu lai noi thu khac), nay may chay lai");
+console.log("CHECKAUDIT OK: "+n+" tieu chi | 17 phuong phap tim loi (8 cua anh Luan + M9 ba cau cai nhau tren mot man, M10 o chon mo cua, M11 kieu o khai ra ma bo ve o khong biet, M12 o tim khong bo dau, M13 ten trong goi y nuot cu bam, M14 dau sao co noi that khong, M15 nut dan ve chinh cho dang dung, M16 chip to mau theo mot thu chu lai noi thu khac, M17 hai ham cung noi ve mot chi so ma doc hai dam dong), nay may chay lai");
