@@ -1576,9 +1576,58 @@ var TAT_BOQUA={
  t("nút \"Thêm mới\" nào cũng mở ra một form có ô nhập và nút Lưu", !xau.length, xau.slice(0,5).join(" | "));
 })();
 
+/* ═════════ M20 - BUỔI WOW CHỈ ĐẶT ĐƯỢC VÀO CA TRỰC ĐÃ ĐĂNG KÝ (đặt 10/08) ═══════════════
+   Anh Luân đặt: *"Book wow hiện tại là đang mặc định lúc nào cũng có người, nhưng trên thực tế,
+   người dùng chỉ được chọn book wow dựa trên lịch làm việc đã đăng ký của team wow thôi."*
+   Đo trên bản trước khi vá: đặt được một buổi WOW lúc **03:00 sáng ngày 01/01/2030** - app còn
+   báo lại *"Đã đặt buổi WOW cho Trần Khánh Vy"* như một việc bình thường. Ô giờ là `datetime-local`
+   trống trơn, và `waBusy()` chỉ NHẮC "GV bận trong ngày này"; trống thì nó in *"GV rảnh cả ngày"*
+   - app tự khẳng định một điều nó không có cách nào biết.
+
+   HAI PHÉP HỎI, vì hỏng được ở hai tầng khác nhau:
+   (a) CỬA: cả hai đường đặt buổi - của học vụ (`wowAddSave`) và của học viên (`hvWowSave`) -
+       phải đi qua bảng ca trực. Hỏi ở nguồn thì thêm một cửa đặt thứ ba mà quên nối là đỏ ngay.
+   (b) DỮ LIỆU: mọi buổi WOW còn sống phải NẰM TRÊN một ca trực có thật của đúng người ấy. Vế
+       này bắt được cả những buổi lọt vào bằng đường khác - kể cả đường mà hôm nay chưa ai nghĩ ra. */
+(function(){
+ /* KHÔNG DÙNG `fn.toString()` CHO CỬA GHI. Bẫy cắn ngay lúc dựng thước này (10/08): app BỌC
+    lại mọi cửa ghi bằng một lớp ghi nhật ký, nên `wowAddSave.toString()` trả về thân của LỚP BỌC
+    - đúng **375 ký tự**, giống hệt `hvWowSave.toString()`, và tất nhiên không có chữ `DL26` nào.
+    Thước báo đỏ trên cả bản ĐÃ VÁ. Đã kiểm lại: `kpiCompute` (12.738 ký tự), `kpiNum` (4.414),
+    `baocaoBranch` (3.747) đều là thân THẬT nên M17/M18 không dính - chỉ cửa ghi bị bọc.
+    Nay đọc thẳng NGUỒN, cắt từ `\nfunction <tên>` tới `\nfunction ` kế tiếp (app khai hàm cấp
+    cao nhất ở cột 0 - đọc được, kiểm được). Và cài CHỐT: lát cắt ngắn bất thường thì ĐỎ, không
+    cho một lát cắt hụt lặng lẽ đi qua rồi kết luận. */
+ var src=""; try{src=FS.readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8')}catch(e){}
+ function than(ten){
+  var i=src.indexOf("\nfunction "+ten+"(");
+  if(i<0)return "";
+  var j=src.indexOf("\nfunction ", i+10);
+  return src.slice(i, j<0?src.length:j);
+ }
+ var A=than("wowAddSave"), B=than("hvWowSave");
+ t("đọc được thân THẬT của hai cửa đặt buổi WOW (không phải lớp bọc nhật ký)",
+   A.length>800 && B.length>800, "wowAddSave="+A.length+" hvWowSave="+B.length+" ký tự");
+ var thieu=[];
+ if(A&&!/DL26|lwRanh\(/.test(A))thieu.push("wowAddSave (cửa học vụ)");
+ if(B&&!/DL26|lwRanh\(/.test(B))thieu.push("hvWowSave (cửa học viên)");
+ t("mọi cửa đặt buổi WOW đều đi qua bảng ca trực DL26", !thieu.length, thieu.join(", "));
+
+ var ca={};
+ try{(DL.DL26||[]).forEach(function(x){ca[String(x.staff_id||"")+"|"+String(x.slot_datetime||"")]=x})}catch(e){}
+ t("đọc được bảng ca trực DL26 ("+Object.keys(ca).length+" ca)", Object.keys(ca).length>50);
+ var ngoai=[];
+ try{(DL.DL14||[]).forEach(function(w){
+  if(isc(w.wow_status,"cancelled"))return;
+  var d=String(w.wow_session_date||"").trim(); if(!d)return;
+  if(!ca[String(w.staff_id||"")+"|"+d])ngoai.push(w.wow_id+" ("+(w.staff_name||w.staff_id)+" "+d+")");
+ })}catch(e){ngoai.push("khong doc duoc: "+String(e.message).slice(0,40))}
+ t("không buổi WOW nào nằm ngoài ca trực của chính người dạy", !ngoai.length, ngoai.slice(0,5).join(" | "));
+})();
+
 /* ═════════════════════════════════════════════════════════════════════════════════════════ */
 if(bad.length){
  console.log("CHECKAUDIT DO ("+bad.length+"/"+n+"):");
  bad.forEach(function(b){console.log("  - "+b)});
  process.exit(1)}
-console.log("CHECKAUDIT OK: "+n+" tieu chi | 19 phuong phap tim loi (8 cua anh Luan + M9 ba cau cai nhau tren mot man, M10 o chon mo cua, M11 kieu o khai ra ma bo ve o khong biet, M12 o tim khong bo dau, M13 ten trong goi y nuot cu bam, M14 dau sao co noi that khong, M15 nut dan ve chinh cho dang dung, M16 chip to mau theo mot thu chu lai noi thu khac, M17 hai ham cung noi ve mot chi so ma doc hai dam dong, M18 bang khong nghe bo chon ky phai tu khai moc, M19 nut mo form phai mo ra form dung duoc), nay may chay lai");
+console.log("CHECKAUDIT OK: "+n+" tieu chi | 20 phuong phap tim loi (8 cua anh Luan + M9 ba cau cai nhau tren mot man, M10 o chon mo cua, M11 kieu o khai ra ma bo ve o khong biet, M12 o tim khong bo dau, M13 ten trong goi y nuot cu bam, M14 dau sao co noi that khong, M15 nut dan ve chinh cho dang dung, M16 chip to mau theo mot thu chu lai noi thu khac, M17 hai ham cung noi ve mot chi so ma doc hai dam dong, M18 bang khong nghe bo chon ky phai tu khai moc, M19 nut mo form phai mo ra form dung duoc, M20 buoi WOW chi dat duoc vao ca truc), nay may chay lai");

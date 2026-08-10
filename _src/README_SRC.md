@@ -1036,3 +1036,39 @@ xem no co keu khong. Khong keu thi moi con so no dua ra - **ke ca so 0** - deu v
 Da dung ngay trong lan dau: thuoc "bam nut dau trang" bao 12 cho kha nghi, nhung khi chay doi
 chung tren ban chua va thi no **khong bat duoc chinh con loi anh Luan vua bao**. Neu khong chay
 doi chung, em da mang 12 cho rac di bao cao nhu phat hien.
+
+## 10/08 - LICH TRUC NV WOW: MOT MANG SOP BO SOT, ANH LUAN GOI TEN (M20)
+
+Anh Luan: *"Book wow hien tai la dang mac dinh luc nao cung co nguoi, nhung tren thuc te, nguoi
+dung chi duoc chon book wow dua tren lich lam viec da dang ky cua team wow thoi."* va
+*"moi nguoi team wow co the tu book lich lam viec cua minh... no luu vao lich tong va hoc vien
+co the chon dua tren lich nay"*.
+
+**Tra SOP truoc khi dung - va SOP da co san:**
+- man **"BANG TRUC NV WOW - THEO THANG"**: luoi cot=ngay, hang=khung gio, **o trong = khong ai
+  truc**; kem "TONG GIO TRUC THEO NV WOW" va cot "Buoi da book" lay tu DL14 de **doi chieu gio
+  truc voi buoi thuc te**;
+- danh muc `enum_wow_slot_status` (available/booked/taught/off) **da nam trong `ITTs_data.js` tu
+  dau ma app dung 0 lan** - tu vung co san, chi thieu man va luat.
+**Vi sao 39 bo kiem khong thay:** `check_sop.py` diem danh 357 cot tu **18 sheet**, ma chinh SOP
+ghi *"18 sheet + lich WOW"* - bang truc nam NGOAI pham vi moi phep do hien co.
+
+**Do duoc tren ban truoc khi va:** dat duoc mot buoi WOW luc **03:00 sang ngay 01/01/2030**, app
+con bao lai *"Da dat buoi WOW cho Tran Khanh Vy"* nhu mot viec binh thuong. O gio la
+`datetime-local` trong tron; `waBusy()` chi NHAC "GV ban trong ngay nay", con trong thi in thang
+*"GV ranh ca ngay"* - app tu khang dinh mot dieu no khong co cach nao biet.
+
+**M20 hoi hai tang, vi hong duoc o hai tang:**
+(a) CUA - ca hai duong dat buoi (`wowAddSave` cua hoc vu, `hvWowSave` cua hoc vien) phai di qua
+    DL26. Hoi o nguon thi them mot cua thu ba ma quen noi la do ngay.
+(b) DU LIEU - moi buoi WOW con song phai NAM TREN mot ca truc co that cua dung nguoi ay. Ve nay
+    bat duoc ca nhung buoi lot vao bang duong khac, ke ca duong hom nay chua ai nghi ra.
+
+**BAY LON NHAT KHI DUNG THUOC NAY - APP BOC LAI CAC CUA GHI:** `wowAddSave.toString()` tra ve
+than cua LOP BOC ghi nhat ky - dung **375 ky tu**, giong het `hvWowSave.toString()`, khong co chu
+`DL26` nao. Thuoc bao do tren **ca ban da va**. Da kiem lai toan bo: `kpiCompute` (12.738 ky tu),
+`kpiNum` (4.414), `baocaoBranch` (3.747), `staffPerfSection` (5.883) deu la than THAT, nen M17 va
+M18 khong dinh - **chi cua ghi bi boc**. M20 nay doc thang nguon, va cai CHOT: lat cat ngan bat
+thuong thi DO, khong cho mot lat cat hut lang le di qua roi ket luan.
+*`fn.toString()` cho ta thu dang chay, khong phai thu minh viet - hai cai do khong phai luc nao
+cung la mot.*

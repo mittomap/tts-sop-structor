@@ -13104,7 +13104,14 @@ function wowAdd(psid){var h='<div class="dcard"><h4><i class="ti ti-star"></i>Đ
  h+='<div class="fld"><label>Kỹ năng</label><select id="wa_skill">'+enumOpts("enum_homework_skill")+'</select></div>';
  h+='<div class="fld"><label>Loại buổi</label><select id="wa_type">'+enumOpts("enum_wow_session_type")+'</select></div>';
  h+='<div class="fld"><label>GV WOW dạy buổi</label><select id="wa_staff"><option value="">-- chọn GV --</option>'+rows("DL01").filter(function(x){return /wow/.test(ecode(x.role))&&!/inactive/.test(ecode(x.status))}).map(function(x){return '<option value="'+esc(x.staff_id)+'">'+esc(x.full_name+" · "+(elabel(x.role)||""))+'</option>'}).join("")+'</select></div>';
- h+='<div class="fld"><label>Ngày giờ buổi</label><input id="wa_date" type="datetime-local" onchange="waBusy()"></div>';
+ /* CHỌN CA TRỰC, KHÔNG GÕ GIỜ TỰ DO. Anh Luân đặt 10/08: *"người dùng chỉ được chọn book wow
+    dựa trên lịch làm việc đã đăng ký của team wow thôi"*. Trước đây ô này là `datetime-local`
+    trống trơn - gõ giờ nào cũng đặt được, và `waBusy()` chỉ NHẮC "GV bận trong ngày này", còn
+    trống thì in thẳng *"GV rảnh cả ngày"* - tức app tự khẳng định một điều nó không biết.
+    Nay chỉ liệt kê ca CÒN TRỐNG và CHƯA QUA GIỜ; chọn ca là biết luôn GV nào, khỏi chọn hai lần. */
+ h+='<div class="fld full"><label>Ca trực còn trống <i>*</i></label><select id="wa_slot" onchange="waChonCa()">'+waSlotOpts()+'</select>'+
+  '<div class="fhint">Chỉ hiện ca mà NV WOW đã đăng ký trực và chưa có ai đặt. Không thấy ca nào phù hợp thì nhờ team WOW đăng ký thêm ở màn <b>Lịch trực WOW</b>.</div></div>';
+ h+='<div class="fld"><label>Ngày giờ buổi</label><input id="wa_date" type="datetime-local" onchange="waBusy()" readonly data-tip="Giờ lấy từ ca trực đã chọn"></div>';
  h+='<div class="fld full" id="wa_busy"></div>';
  h+='<div class="fld full"><label>Trọng tâm buổi <i>*</i></label><input id="wa_focus" placeholder="vd: Writing Task 2 - opinion essay / phát âm ending sounds"></div>';
  /* Ai đề xuất buổi này và VÌ SAO cần - mọi đường đặt WOW đều phải ghi đủ, không riêng đường
@@ -13113,6 +13120,23 @@ function wowAdd(psid){var h='<div class="dcard"><h4><i class="ti ti-star"></i>Đ
  h+='<div class="fld full"><label>Vì sao cần buổi này <i>*</i></label><textarea id="wa_why" rows="2" placeholder="vd: em này Speaking 4.5, thấp hơn hẳn 3 kỹ năng còn lại; hoặc: GV chủ nhiệm đề xuất sau buổi 12"></textarea></div>';
  h+='<div class="fld full"><button class="btn primary" onclick="wowAddSave()"><i class="ti ti-check"></i>Đặt buổi</button></div></div>';
  openDrawer("Đặt buổi WOW",h)}
+/* Danh sách ca còn đặt được, xếp theo thời gian. Nhãn nói đủ ba thứ người đặt cần biết:
+   khi nào, ai trực, ở đâu - không bắt họ mở màn khác ra tra. */
+function waSlotOpts(){
+ var ds=srows("DL26").filter(function(x){return lwRanh(x)})
+  .sort(function(a,b){var x=pvnd(a.slot_datetime),y=pvnd(b.slot_datetime);return (x?x.getTime():0)-(y?y.getTime():0)});
+ if(!ds.length)return '<option value="">-- chưa có ca trực nào còn trống --</option>';
+ return '<option value="">-- chọn ca trực --</option>'+ds.map(function(x){
+  return '<option value="'+esc(x.slot_id)+'" data-gv="'+esc(x.staff_id)+'" data-khi="'+esc(x.slot_datetime)+'">'+
+   esc(x.slot_datetime+" · "+(x.staff_name||x.staff_id)+(x.branch?(" · "+(elabel(x.branch)||"")):""))+'</option>'}).join("")}
+/* Chọn ca xong thì điền hộ GV và giờ - hai ô ấy là HỆ QUẢ của ca, không phải hai câu hỏi riêng. */
+function waChonCa(){
+ var id=fldV("wa_slot");var sl=find("DL26","slot_id",id);
+ var g=document.getElementById("wa_staff"),d=document.getElementById("wa_date");
+ if(!sl){if(d)d.value="";waBusy();return}
+ if(g)g.value=sl.staff_id;
+ if(d)d.value=toISOdt(sl.slot_datetime);
+ waBusy()}
 function waBusy(){var box=document.getElementById("wa_busy");if(!box)return;
  var gid=fldV("wa_staff");var dv=(fldV("wa_date")||"").trim();
  if(!gid||!dv){box.innerHTML="";return}
@@ -13131,8 +13155,14 @@ function wowAddSave(force){var sid=fldV("wa_stu");if(!sid){toast("Chọn học v
   isc(x.wow_status,"booked","confirmed")&&String(x.quota_deducted||"").toLowerCase()!=="yes"}).length;
  if(s.wow_quota_remaining!==undefined&&String(s.wow_quota_remaining)!==""&&rem-held<=0){
   toast("HV "+(s.full_name||sid)+" không còn lượt trống: còn "+rem+" lượt nhưng đang giữ "+held+" buổi chưa dạy.",5200);closeModal();wowGrantForm(sid);return}
- var gvId=fldV("wa_staff");var gv=gvId?(find("DL01","staff_id",gvId)||{}):{};
- var wdRaw=(fldV("wa_date")||"").trim();var wd=wdRaw?fromISOdt(wdRaw):"";
+ /* CA TRỰC LÀ CỬA VÀO, KHÔNG PHẢI LỜI NHẮC. Trước đây `waBusy()` chỉ in một dòng gợi ý rồi
+    vẫn cho lưu - tức app biết GV bận mà vẫn để người ta đặt chồng lên. Nay không có ca thì
+    không có buổi. */
+ var _slId=fldV("wa_slot");var _sl=_slId?find("DL26","slot_id",_slId):null;
+ if(!_sl){toast("Chọn một ca trực còn trống - buổi WOW chỉ đặt được vào ca mà NV WOW đã đăng ký.",4600);return}
+ if(!lwRanh(_sl)){toast("Ca này vừa có người đặt hoặc đã qua giờ - chọn ca khác nhé.",4600);return}
+ var gvId=_sl.staff_id;var gv=find("DL01","staff_id",gvId)||{};
+ var wd=_sl.slot_datetime;
  if(!force&&gvId&&wd){var cl=schedClash(gvId,pvnd(wd));
   if(cl){confirmRun("GV "+(gv.full_name||gvId)+" đã có "+cl+" (cách dưới 2h). VẪN đặt buổi WOW này?",function(){wowAddSave(true)});return}}
  var _focus=(fldV("wa_focus")||"").trim();if(!_focus){toast("Ghi trọng tâm buổi để GV biết dạy gì.");return}
@@ -13146,8 +13176,13 @@ function wowAddSave(force){var sid=fldV("wa_stu");if(!sid){toast("Chọn học v
   quota_deducted:"no",
   wow_content_note:"",wow_outcome:"",wow_no_show_reason:"",sla_content_note_24h:"",
   notes:_why,next_action:"Xác nhận lịch với học viên rồi chuẩn bị nội dung."};
- function d(nid){w.wow_id=nid;rows("DL14").unshift(w);persistSoon();
-  toast("Đã đặt buổi WOW cho "+(s.full_name||sid)+" - lượt chỉ trừ sau khi buổi diễn ra.",4200);closeModal();reRender(CUR)}
+ /* Đặt buổi xong thì CA PHẢI ĐỔI TRẠNG THÁI. Thiếu bước này thì hai người cùng đặt được một
+    ca, và cột "Đối chiếu" của màn Lịch trực sẽ báo lệch ngay hôm sau. Ghi cả mã buổi vào ca -
+    SOP đòi đối chiếu giờ trực với buổi thực tế, mà đối chiếu thì phải có sợi dây nối hai bên. */
+ function d(nid){w.wow_id=nid;rows("DL14").unshift(w);
+  try{_sl.wow_slot_status=eFull("enum_wow_slot_status","booked");_sl.wow_id=nid}catch(e){}
+  persistSoon();
+  toast("Đã đặt buổi WOW cho "+(s.full_name||sid)+" vào ca "+_sl.slot_datetime+" của "+(gv.full_name||gvId)+" - lượt chỉ trừ sau khi buổi diễn ra.",4600);closeModal();reRender(CUR)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL14",w)}else{d("WOW-"+seqNo("DL14","wow_id"))}}
 /* ===== P8 Khảo sát & Phản hồi (DL15 + DL16) ===== */
 /* BỘ CÂU HỎI CHUẨN THEO ĐỢT KHẢO SÁT.
@@ -14571,8 +14606,12 @@ function hvWowAsk(){
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Buổi kèm riêng đã nằm trong gói học của bạn. Chọn kỹ năng yếu nhất và khung giờ - trung tâm xác nhận lại giảng viên và giờ chính thức.</div>';
  /* danh sách kỹ năng lấy NGUYÊN VĂN từ danh mục CH1, không gõ tay 4 chuỗi ở đây */
  h+='<div class="fld"><label>Kỹ năng muốn kèm <i>*</i></label><select id="hvw_skill">'+enumOpts("enum_homework_skill")+'</select></div>';
- h+='<div class="fld"><label>Ngày mong muốn <i>*</i></label><input id="hvw_date" type="date" min="'+isoDay(1)+'" value="'+isoDay(1)+'"><div class="fhint">Mặc định là ngày mai - chọn xa hơn nếu bạn bận.</div></div>';
- h+='<div class="fld full"><label>Khung giờ mong muốn</label><input id="hvw_gio" placeholder="vd: sau 19h các ngày trong tuần"></div>';
+ /* CHỌN CA THẬT, KHÔNG GÕ ƯỚC NGUYỆN. Anh Luân đặt 10/08: *"người dùng chỉ được chọn book wow
+    dựa trên lịch làm việc đã đăng ký của team wow thôi"*. Bản cũ hỏi "Ngày mong muốn" cộng một
+    ô CHỮ TỰ DO "Khung giờ mong muốn" (*"vd: sau 19h các ngày trong tuần"*) rồi để trung tâm tự
+    xoay - tức app hứa hộ một thứ nó chưa biết có ai trực hay không, và học viên chờ. */
+ h+='<div class="fld full"><label>Chọn ca trực còn trống <i>*</i></label><select id="hvw_slot">'+waSlotOpts()+'</select>'+
+  '<div class="fhint">Đây là những khung giờ thầy cô WOW đã đăng ký trực và còn trống. Chọn xong là trung tâm xác nhận, không phải chờ xếp lịch.</div></div>';
  h+='<div class="fld full"><label>Bạn muốn tập trung vào phần nào</label><textarea id="hvw_focus" rows="2" placeholder="vd: em hay bí ý ở Speaking part 2"></textarea></div>';
  h+='<div class="dact"><button class="btn primary" onclick="hvWowSave()"><i class="ti ti-send"></i>Gửi yêu cầu đặt buổi</button>'+
   '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
@@ -14580,9 +14619,12 @@ function hvWowAsk(){
 function hvWowSave(){
  if(!actGuard("hvWow"))return;
  var S=hvMe();if(!S){toast("Chưa xác định được hồ sơ của bạn.");return}
- var d=(fldV("hvw_date")||"").trim();if(!d){toast("Chọn ngày bạn muốn học.");return}
- var when=fromISOdt(d);
- if(pvnd(when)&&pvnd(when).getTime()<hvT0()){toast("Ngày bạn chọn đã qua - chọn ngày khác nhé.");return}
+ /* Học viên chọn CA THẬT: chọn xong là có luôn giảng viên và giờ chính thức, không còn cảnh
+    gửi một ước nguyện rồi ngồi chờ trung tâm xếp. */
+ var _slId=fldV("hvw_slot");var _sl=_slId?find("DL26","slot_id",_slId):null;
+ if(!_sl){toast("Chọn một ca trực còn trống nhé.");return}
+ if(!lwRanh(_sl)){toast("Ca này vừa có bạn khác đặt mất rồi - chọn ca khác nhé.",4600);hvWowAsk();return}
+ var when=_sl.slot_datetime;
  var left=num(S.wow_quota_remaining);
  if(left<=0){toast("Bạn đã dùng hết lượt WOW của khóa"+(hvHotline()?(" - gọi "+hvHotline()+" nếu cần thêm."):"."),4600);return}
  var _pend=rows("DL14").filter(function(x){return String(x.student_id||"")===S.student_id&&
@@ -14594,19 +14636,20 @@ function hvWowSave(){
   wow_session_type:eFull("enum_wow_session_type","self_booked"),
   wow_booked_by:eFull("enum_wow_booked_by","student"),
   wow_skill:fldV("hvw_skill"),wow_content_focus:(fldV("hvw_focus")||"").trim(),
-  staff_id:"",staff_name:"",wow_status:eFull("enum_wow_status","booked"),
+  staff_id:_sl.staff_id,staff_name:_sl.staff_name||"",wow_status:eFull("enum_wow_status","booked"),
   wow_content_note:"",wow_outcome:"",wow_no_show_reason:"",
   quota_deducted:"no",   /* CHƯA dạy thì CHƯA trừ quota - trừ lúc đặt là trừ oan nếu buổi bị hủy */
-  sla_content_note_24h:"",notes:"Học viên tự đặt qua cổng"+((fldV("hvw_gio")||"").trim()?" · khung giờ mong muốn: "+(fldV("hvw_gio")||"").trim():""),
-  next_action:"Xác nhận giảng viên và giờ chính thức với học viên."};
+  sla_content_note_24h:"",notes:"Học viên tự đặt qua cổng · ca trực "+_sl.slot_id,
+  next_action:"Xác nhận lại với học viên rồi chuẩn bị nội dung buổi."};
  DL.DL14=DL.DL14||[];DL.DL14.unshift(w);
+ try{_sl.wow_slot_status=eFull("enum_wow_slot_status","booked");_sl.wow_id=w.wow_id}catch(e){}
  if(SVR)try{google.script.run.apiSave("DL14",w)}catch(e){}
  hvReq("Học viên tự đặt buổi WOW 1-1",
-  "Kỹ năng: "+w.wow_skill+"\nNgày mong muốn: "+when+((fldV("hvw_gio")||"").trim()?"\nKhung giờ: "+(fldV("hvw_gio")||"").trim():"")+
+  "Kỹ năng: "+w.wow_skill+"\nCa đã chọn: "+when+" · "+(_sl.staff_name||_sl.staff_id)+
   (w.wow_content_focus?"\nMuốn tập trung: "+w.wow_content_focus:"")+"\nMã buổi: "+w.wow_id,
   "hocvu",["wow",w.wow_id,"Buổi WOW "+w.wow_skill]);
  persistSoon();closeModal();
- toast("Đã gửi yêu cầu đặt buổi WOW. Trung tâm sẽ xác nhận giảng viên và giờ chính thức.",4600);
+ toast("Đã đặt buổi WOW lúc "+when+" với "+(_sl.staff_name||_sl.staff_id)+". Trung tâm sẽ nhắn xác nhận lại.",5000);
  hvReRender()}
 
 /* ---- (h) BÁO ĐÃ CHUYỂN KHOẢN ---- */
