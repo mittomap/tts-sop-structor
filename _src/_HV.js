@@ -12919,7 +12919,10 @@ function renderLichWow(){
     "ngày 14 là thứ mấy" - mà xếp ca thì thứ mới là thứ người ta nghĩ tới, không phải số ngày. */
  var _THU=["CN","T2","T3","T4","T5","T6","T7"];
  for(var n=1;n<=soNgay;n++){var _t=_THU[new Date(nam,thg-1,n).getDay()];
-  h+='<th style="text-align:center">'+n+'<div class="mut" style="font-weight:400;font-size:10px">'+_t+'</div></th>'}
+  /* 11px chứ không phải 10px: dự án đã chốt SÀN 11px cho mọi cỡ chữ (tiếng Việt có dấu, nhỏ hơn
+     là mất nét dấu), và thang cỡ chữ chốt tối đa 16 bậc. Gõ 10px ở đây là phá cả hai cùng lúc -
+     `_checkux` bắt ngay: bậc thứ 17, và một cỡ dưới sàn. */
+  h+='<th style="text-align:center">'+n+'<div class="mut" style="font-weight:400;font-size:11px">'+_t+'</div></th>'}
  h+='</tr></thead><tbody>';
  var _ngayDem={};
  khung.forEach(function(g){
