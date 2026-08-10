@@ -15225,7 +15225,7 @@ function lwSave(){
    var dt=fmtDT(khi);
    if(co[dt]){bo++;return}                                   /* đã đăng ký rồi thì thôi, không nhân đôi */
    jSaveRow("DL26",{slot_id:"SLOT-"+seqNo("DL26","slot_id",4),staff_id:CURSTAFF,staff_name:me.full_name||CURSTAFF,
-     slot_date:fmtD(khi),slot_time:g,slot_datetime:dt,branch:fldV("lw_cs"),
+     slot_date:vnd2(khi),slot_time:g,slot_datetime:dt,branch:fldV("lw_cs"),
      wow_slot_status:eFull("enum_wow_slot_status","available"),wow_id:"",
      registered_at:nowStr(),note:fldV("lw_note")});
    co[dt]=1;them++})}
@@ -15416,7 +15416,7 @@ function waSlotOpts(){
  if(!ds.length)return '<option value="">-- chưa có ca trực nào còn trống --</option>';
  var h='<option value="">-- chọn ca trực --</option>',ngay="";
  ds.forEach(function(x){
-  var d=pvnd(x.slot_datetime),nd=d?fmtD(d):"";
+  var d=pvnd(x.slot_datetime),nd=d?vnd2(d):"";
   if(nd!==ngay){if(ngay)h+='</optgroup>';ngay=nd;
    h+='<optgroup label="'+esc(nd+(d?(" · "+["Chủ nhật","Thứ 2","Thứ 3","Thứ 4","Thứ 5","Thứ 6","Thứ 7"][d.getDay()]):""))+'">'}
   /* CHỮ TRONG TỪNG DÒNG PHẢI CÓ ĐỦ NGÀY, đừng trông vào nhãn `<optgroup>`: ô chọn nào đủ dài

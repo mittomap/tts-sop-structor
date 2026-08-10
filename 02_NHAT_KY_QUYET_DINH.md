@@ -295,6 +295,21 @@
 > *`fn.toString()` cho ta thứ đang chạy, không phải thứ mình viết — hai cái đó không phải lúc nào
 > cũng là một.*
 >
+> **VÀ CÁI NẶNG NHẤT, LÒI RA GẦN CUỐI: cửa đăng ký ca trực CHẾT TỪ LÚC SINH RA.** `lwSave` gọi
+> `fmtD()`, mà `fmtD` **không phải hàm toàn cục** — nó là một hàm cục bộ nằm bên trong một hàm
+> khác. NV WOW mở form, chọn ngày, tick khung giờ, bấm Lưu → **ReferenceError**, không một ca nào
+> được tạo, và không một dòng báo nào cho người dùng. **Sống qua ba vòng verify trọn bộ.**
+> Vì sao không bộ nào thấy: `_tall` vẽ mọi trang — nhưng `lwSave` không nằm trên đường vẽ trang,
+> nó nằm sau một cú bấm · `_checkdrawer` MỞ 27 ngăn kéo — nhưng chỉ mở, không bấm Lưu ·
+> `_check15` ĐIỂM DANH cửa ghi bằng cách đọc mã nguồn rồi đối khai tên — đọc tên thì không bao giờ
+> biết thân hàm có chạy được không · `_checknv` điền form rồi lưu — nhưng nó không đi qua trang
+> `lichwow`. ***Điểm danh một cái cửa không phải là thử mở nó.***
+> Bắt được là nhờ một **biến cố**, không nhờ phép đo nào hỏi đúng: em đổi `waSlotOpts` sang gom
+> theo ngày, cũng dùng `fmtD`, và lần này nó nằm trên đường `_check14` đi qua nên ném ngay.
+> Đã bịt: `_check15` nay **lái thật** cửa đăng ký ca (đặt danh tính một NV WOW, điền khoảng ngày,
+> tick khung giờ, gọi `lwSave()`, rồi hỏi lại 5 điều) — và đã tự thử bằng cách vá `fmtD` ngược
+> vào bản build: đỏ đúng 3 tiêu chí.
+>
 > **Hệ miễn dịch của dự án bắt 9 thứ mà em không tự nhớ ra được** khi thêm một tính năng: thiếu
 > tình huống SOP NA056 · chấm bài trước khi thi (truy ra `fixdata` luật 14septies/14undecies đổi
 > `test_date` mà **bỏ quên `test_attendance_time` và `result_time`** — cả một lớp lỗi "đổi một mốc,

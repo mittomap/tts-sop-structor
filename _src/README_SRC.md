@@ -1115,3 +1115,30 @@ chay `Number(value)` roi thay NaN la tra ve mac dinh - "08:30,09:30,..." thi NaN
 trung tam vao Cai dat sua khung gio, bam Luu, app van chay y khung cu **ma khong bao gi**. Doi
 sang `paramStr`. Cung ho voi bay "dung nham ham doc" - khong bo kiem nao co cua thay, vi ca hai
 duong deu tra ve mot chuoi hop le.
+
+## 10/08 - CUA DANG KY CA TRUC CHET TU LUC SINH RA, BA VONG VERIFY DI QUA KHONG AI THAY
+
+`lwSave` - cua ghi cua ca tinh nang Lich truc WOW - goi `fmtD()`. Ma `fmtD` **khong phai ham
+toan cuc**: no la mot ham CUC BO nam ben trong mot ham khac (thut le, trong khoi lich tuan).
+Nghia la NV WOW mo form "Dang ky ca truc", chon ngay, tick khung gio, bam Luu ->
+**ReferenceError**, khong mot ca nao duoc tao, va nguoi dung khong nhan duoc mot dong bao nao.
+
+Cai nay song qua **ba vong verify tron bo**. Vi sao khong bo nao thay:
+- `_tall` ve moi trang - nhung `lwSave` khong nam tren duong ve trang, no nam sau mot cu bam.
+- `_checkdrawer` MO 27 ngan keo - nhung chi mo, khong bam Luu.
+- `_check15` DIEM DANH cua ghi bang cach doc ma nguon roi doi khai ten - doc ten thi khong bao
+  gio biet than ham co chay duoc hay khong.
+- `_checknv` (nhan vien ao) dien form roi luu - nhung no khong di qua trang `lichwow`.
+
+*Diem danh mot cai cua khong phai la thu mo no.*
+
+Bat duoc la nho `_check14`, va nho mot bien co: em doi `waSlotOpts` sang gom theo ngay bang
+`<optgroup>`, cung dung `fmtD`, va lan nay no nam tren duong ma `_check14` di qua nen no NEM
+NGAY. Tuc lo hong lo ra vi mot thay doi khac, khong phai vi phep do nao hoi dung.
+
+**Da bit:** `_check15` khuc 2b LAI THAT cua dang ky ca - dat CURSTAFF thanh mot NV WOW, dien
+khoang ngay + tick khung gio, goi `lwSave()`, roi hoi lai: co sinh ra ca that khong; ca moi co
+DUNG DINH DANG ngay voi ca do pipeline sinh khong (chinh cho nay `fmtD` sai them mot lan nua -
+no tra "dd/mm" trong khi ca co san la "dd/mm/YYYY"); ca moi co mac dinh la `available` khong; co
+roi dung mot khung cua luoi khong; va dang ky lai cung khoang do co bi nhan doi khong.
+**Da tu thu:** va `fmtD` nguoc lai vao ban build roi chay - do dung 3 tieu chi.

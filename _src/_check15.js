@@ -116,6 +116,43 @@ t("BAT BIEN: da tru luot WOW <=> buoi da dien ra (tren du lieu dang co)", invQuo
  t("BAT BIEN van dung sau khi lai het cac cua", invQuota().length===0);
 })();
 
+/* ============ 2b. LAI THU CUA DANG KY CA TRUC (lwSave) ============
+   VI SAO PHAI CO KHUC NAY - mot bai hoc dat 10/08: `lwSave` goi `fmtD()`, ma `fmtD` la ham CUC
+   BO nam trong mot ham khac, khong phai ham toan cuc. Tuc **bam Luu la nem ReferenceError**,
+   cua dang ky ca truc CHET tu luc sinh ra. Ba vong verify tron bo di qua ma khong bo nao kip.
+   Vi sao khong ai thay: `_check15` truoc day chi DIEM DANH cua ghi bang cach doc ma nguon roi
+   doi khai ten - doc ten thi khong bao gio biet than ham co chay duoc hay khong; con bo kiem
+   trinh duyet thi khong mo cai ngan keo ay ra.
+   *Diem danh mot cai cua khong phai la thu mo no.* Nay lai that. */
+(function(){
+ var nv=rows("DL01").filter(function(x){return /^wow/.test(ecode(x.role))&&isc(x.status,"active")})[0];
+ if(!nv){bad.push("khong co NV WOW dang lam viec de lai cua dang ky ca");return}
+ var cu=CURSTAFF;CURSTAFF=nv.staff_id;
+ var n0=rows("DL26").length;
+ function iso(n){var d=new Date(Date.now()+n*864e5);
+  return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
+ reset();FIELDS={lw_tu:iso(40),lw_den:iso(41),lw_cs:"branch_cs1 (Cơ sở 1)",lw_note:"",chk_lw_g0:1};
+ try{lwSave()}catch(e){bad.push("lwSave NEM LOI: "+e.message)}
+ var them=rows("DL26").length-n0;
+ t("cua DANG KY CA TRUC chay duoc va sinh ra ca that", them>0);
+ var moi=rows("DL26").filter(function(x){return String(x.staff_id||"")===nv.staff_id&&
+   String(x.slot_id||"").indexOf("SLOT-")===0}).sort(function(a,b){
+   return String(b.registered_at||"").localeCompare(String(a.registered_at||""))})[0];
+ /* Ca vua dang ky phai DUNG DINH DANG voi ca do pipeline sinh, khong thi luoi va bang tong
+    nhin thay hai kieu du lieu khac nhau tren cung mot bang. */
+ var mau=rows("DL26").filter(function(x){return x!==moi&&String(x.slot_date||"").trim()})[0];
+ if(moi&&mau)t("ca moi dang ky ghi ngay dung dinh dang voi ca co san",
+   String(moi.slot_date||"").length===String(mau.slot_date||"").length);
+ if(moi)t("ca moi dang ky mac dinh la CON TRONG", isc(moi.wow_slot_status,"available")&&!String(moi.wow_id||"").trim());
+ if(moi)t("ca moi dang ky roi dung mot khung gio cua luoi", lwKhung().indexOf(String(moi.slot_time||""))>=0);
+ /* dang ky lai DUNG KHOANG DO thi khong duoc nhan doi */
+ var n1=rows("DL26").length;
+ reset();FIELDS={lw_tu:iso(40),lw_den:iso(41),lw_cs:"branch_cs1 (Cơ sở 1)",lw_note:"",chk_lw_g0:1};
+ try{lwSave()}catch(e){bad.push("lwSave lan hai NEM LOI: "+e.message)}
+ t("dang ky lai cung khung do KHONG nhan doi ca", rows("DL26").length===n1);
+ CURSTAFF=cu;
+})();
+
 /* ============ 3. BAT BIEN TIEN ============ */
 t("BAT BIEN: con lai = hoc phi - da dong (moi don chua huy)",
   rows("DL06").filter(function(e){return !isc(e.enrollment_status,"cancelled")&&
