@@ -241,6 +241,40 @@
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 39 BỘ KIỂM (08/08). V1 mốc cũ: V9.99z12, 34 bộ, bản dựng `829572`.**
 >
+> ### 🔵 10/08 - VÒNG CHÍN: TRANG BÁO CÁO HỨA MỘT ĐẰNG, CÁC BẢNG ĐẾM MỘT NẺO
+>
+> Trang Báo cáo có bộ chọn kỳ, và ngay dưới nó app **tự in một câu hứa**: *"Kỳ này áp cho TOÀN BỘ
+> chỉ số bên dưới."* Hỏi thẳng `fn.toString()`: `baocaoBranch` và `staffPerfSection` không có
+> **một lời gọi** `inRep`/`repF`/`repRange` nào. Câu hứa ấy sai.
+>
+> **Nhưng bốn bảng đứng yên không sai như nhau - và đây là chỗ suýt làm em vá nhầm:** hai bảng là
+> ảnh chụp hiện trạng (đứng yên là đúng bản chất); **"Hiệu suất đội tư vấn" tự khai đủ hai mốc
+> ngay trên tiêu đề** (*"liên hệ & kết nối: 7 ngày gần nhất · đăng ký & doanh thu: toàn kỳ dữ
+> liệu"*) - trung thực, không phải lỗi; chỉ "So sánh theo cơ sở" là khai cách gộp mà không khai
+> mốc thời gian. Nên thứ hỏng thật là **câu hứa ở đầu trang** - nó mâu thuẫn ngay với dòng chữ của
+> chính cái bảng nằm bên dưới nó - cộng một bảng chưa khai mốc.
+> **Luật rút ra: không đòi bảng phải lọc theo kỳ, đòi nó NÓI RA nó đang đếm quãng nào.** Một con
+> số không nói mình đếm quãng nào thì người đọc tự điền quãng vào - và họ điền cái quãng vừa bấm.
+>
+> **BỐN LẦN PHÉP ĐO CỦA EM SAI TRƯỚC KHI RA ĐƯỢC KẾT LUẬN NÀY, cả bốn cùng một họ:**
+> 1. Đoán tên biến tab của trang Báo cáo (`bcTabs`, `BCTAB`) - **không tồn tại**, trang này không
+>    có tab.
+> 2. Gọi `go("baocao")` khi **đang ở** trang đó → `go()` thấy `CUR` không đổi nên bỏ qua việc vẽ
+>    lại. Lượt đo thứ hai là **ảnh cũ**, mọi khối "đứng yên" một cách giả tạo, và nó báo **0/4
+>    đổi**. Sửa bằng cách ra trang khác rồi quay lại; kiểm chứng bằng độ dài thân trang (11207 so
+>    11644). *Thiếu bước kiểm chứng ấy thì không cách nào biết phép đo đã chết.*
+> 3. Kết luận *"`staffPerfSection` lừa người đọc, anh chọn 30 ngày sẽ tin 228 triệu là của 30
+>    ngày"* khi mới đọc **thân hàm** mà chưa đọc **cái tiêu đề chính nó in ra**. Suýt đi sửa cột
+>    doanh thu của một bảng đang trung thực.
+> 4. M18 bản đầu cắt trang thành khối theo `<div class="panel"` rồi so hai kỳ - **cắt sai** vì
+>    khối lồng nhau làm một mẩu ăn sang khối bên cạnh, khiến bảng cơ sở bị chấm là "có đổi" và
+>    **thoát khỏi phép kiểm**. Tiêu chí ấy không bao giờ đỏ được, tức là đồ trang trí. Nay hỏi
+>    từng HÀM, không cắt HTML - và bắt **cả hai** tiêu chí phải đỏ được trước khi nhận xanh.
+>
+> Cộng một lần **tố oan**: bản đầu đòi mỗi hàm phải TỰ gọi `repF`, nên `kpiSection` bị chấm đỏ -
+> trong khi dòng đầu của nó là `var comp=kpiCompute()`, tức nó lọc kỳ **gián tiếp**. *Đòi mỗi hàm
+> phải tự lọc là đòi sai tầng: việc lọc nằm ở chỗ lấy số, không nằm ở chỗ vẽ bảng.*
+
 > ### 🔵 10/08 - VÒNG TÁM: CON SỐ BÁO ĐỘNG VÀ CÂU GIẢI THÍCH CỦA NÓ ĐẾM HAI ĐÁM ĐÔNG
 >
 > Màn Báo cáo in con số, rồi in ngay dưới một câu giải thích. Hai thứ ấy do **hai hàm khác nhau**

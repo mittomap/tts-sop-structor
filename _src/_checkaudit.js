@@ -1477,9 +1477,54 @@ var TAT_BOQUA={
    d12A&&d12B, "kpiCompute="+d12A+" kpiNum="+d12B);
 })();
 
+/* ═════════ M18 - BẢNG KHÔNG NGHE BỘ CHỌN KỲ THÌ PHẢI TỰ KHAI MỐC CỦA NÓ (đặt 10/08) ═════
+   Trang Báo cáo có một bộ chọn kỳ, và ngay dưới nó app tự in một câu hứa. Câu cũ là *"Kỳ này áp
+   cho TOÀN BỘ chỉ số bên dưới."* - **và nó sai**: `baocaoBranch` và `staffPerfSection` không có
+   một lời gọi `inRep`/`repF`/`repRange` nào (hỏi thẳng `fn.toString()`, không đoán).
+
+   BỐN BẢNG ĐỨNG YÊN KHÔNG SAI NHƯ NHAU - đây là chỗ suýt làm em vá nhầm:
+   · "Học viên nguy cơ", "Khối lượng việc" là ẢNH CHỤP HIỆN TRẠNG - đứng yên là đúng bản chất;
+   · "Hiệu suất đội tư vấn" **tự khai đủ hai mốc ngay trên tiêu đề** (*"liên hệ & kết nối: 7 ngày
+     gần nhất · đăng ký & doanh thu: toàn kỳ dữ liệu"*) - trung thực, không phải lỗi. Em đã suýt
+     đi sửa cột doanh thu của nó vì mới đọc thân hàm mà chưa đọc tiêu đề nó in ra;
+   · "So sánh theo cơ sở" khai cách GỘP mà không khai mốc THỜI GIAN nào - chỗ này mới thiếu.
+   Nên thứ hỏng thật là **câu hứa ở đầu trang**, cộng một bảng chưa khai mốc.
+
+   PHÉP HỎI ĐẶT Ở NGUỒN, KHÔNG CẮT HTML. Bản đầu cắt trang thành khối theo `<div class="panel"`
+   rồi so dãy số hai kỳ - và **cắt sai**: khối lồng nhau làm một mẩu ăn sang khối bên cạnh, khiến
+   bảng cơ sở bị chấm là "có đổi" và thoát khỏi phép kiểm. Tiêu chí ấy không bao giờ đỏ được, tức
+   là đồ trang trí. Nay hỏi từng HÀM dựng bảng: hàm nào không gọi `inRep`/`repF`/`repRange` thì
+   trong chuỗi HTML nó sinh ra phải có một câu khai mốc thời gian.
+   Không đòi bảng phải lọc theo kỳ - **đòi nó nói ra nó đang đếm quãng nào.** Một con số không nói
+   mình đếm quãng nào thì người đọc tự điền quãng vào, và họ điền cái quãng vừa bấm trên màn. */
+(function(){
+ var TEN=["baocaoBranch","staffPerfSection","srcPerfSection","bizSection","deptSection","kpiSection","upcomingSection"];
+ var KHAI=/toàn kỳ|toàn bộ dữ liệu|ngày gần nhất|hiện tại|đang mở|đang theo dõi|hôm nay|tại thời điểm|kỳ dữ liệu|sắp tới|tuần này/i;
+ var src=""; try{src=FS.readFileSync((process.env.ITTS_APP||'./_APP.js'),'utf8')}catch(e){}
+ t("câu ở đầu trang Báo cáo không hứa quá tay (không nói kỳ áp cho TOÀN BỘ)",
+   !!src && src.indexOf("Kỳ này áp cho TOÀN BỘ")<0, "câu hứa cũ vẫn còn trong nguồn");
+ var doc=0, xau=[];
+ TEN.forEach(function(n){
+  var s2=""; try{s2=Function.prototype.toString.call(global[n])}catch(e){return}
+  if(!s2)return;
+  doc++;
+  /* NGHE BỘ CHỌN KỲ GIÁN TIẾP CŨNG LÀ NGHE. `kpiSection` không gọi `repF` một lần nào, nhưng
+     dòng đầu của nó là `var comp=kpiCompute()` - mà `kpiCompute` lọc trọn theo kỳ (và từ 09/08
+     `kpiNum` cũng vậy, xem M17). Bản đầu của thước này tố oan đúng chỗ ấy: đòi mỗi hàm phải TỰ
+     lọc là đòi sai tầng - việc lọc nằm ở chỗ lấy số, không nằm ở chỗ vẽ bảng. */
+  if(/inRep\(|repF\(|repRange\(|kpiCompute\(|kpiNum\(/.test(s2))return;
+  if(!/class="panel"/.test(s2))return;                   /* không vẽ bảng thì thôi */
+  if(KHAI.test(s2))return;                               /* đã tự khai mốc */
+  xau.push(n);
+ });
+ t("đọc được các hàm dựng bảng của trang Báo cáo ("+doc+"/"+TEN.length+")", doc>=6, doc+" hàm");
+ t("hàm dựng bảng nào không lọc theo kỳ đều tự khai mốc thời gian trên tiêu đề",
+   !xau.length, xau.join(", "));
+})();
+
 /* ═════════════════════════════════════════════════════════════════════════════════════════ */
 if(bad.length){
  console.log("CHECKAUDIT DO ("+bad.length+"/"+n+"):");
  bad.forEach(function(b){console.log("  - "+b)});
  process.exit(1)}
-console.log("CHECKAUDIT OK: "+n+" tieu chi | 17 phuong phap tim loi (8 cua anh Luan + M9 ba cau cai nhau tren mot man, M10 o chon mo cua, M11 kieu o khai ra ma bo ve o khong biet, M12 o tim khong bo dau, M13 ten trong goi y nuot cu bam, M14 dau sao co noi that khong, M15 nut dan ve chinh cho dang dung, M16 chip to mau theo mot thu chu lai noi thu khac, M17 hai ham cung noi ve mot chi so ma doc hai dam dong), nay may chay lai");
+console.log("CHECKAUDIT OK: "+n+" tieu chi | 18 phuong phap tim loi (8 cua anh Luan + M9 ba cau cai nhau tren mot man, M10 o chon mo cua, M11 kieu o khai ra ma bo ve o khong biet, M12 o tim khong bo dau, M13 ten trong goi y nuot cu bam, M14 dau sao co noi that khong, M15 nut dan ve chinh cho dang dung, M16 chip to mau theo mot thu chu lai noi thu khac, M17 hai ham cung noi ve mot chi so ma doc hai dam dong, M18 bang khong nghe bo chon ky phai tu khai moc), nay may chay lai");

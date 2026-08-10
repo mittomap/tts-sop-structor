@@ -938,3 +938,38 @@ Ca DL12 (diem danh) khong co moc thoi gian rieng nen ca hai ham phai loc no qua 
 3. Ket luan "16 chi so lech" khi chua he mo trang bao cao ra xem cau giai thich CO TREN MAN khong.
 *Mot phat hien chi la that khi no co tren man - va mot phep do chi dung khi minh biet no dang
 hoi cai gi.*
+
+## 10/08 VONG CHIN - TRANG BAO CAO HUA MOT DANG, CAC BANG DEM MOT NEO (M18)
+
+Trang Bao cao co mot bo chon ky, va ngay duoi no app TU IN mot cau hua. Cau cu:
+*"Ky nay ap cho TOAN BO chi so ben duoi."* - **va no sai**: hoi thang `fn.toString()`,
+`baocaoBranch` va `staffPerfSection` khong co MOT loi goi `inRep`/`repF`/`repRange` nao.
+
+**BON BANG DUNG YEN KHONG SAI NHU NHAU - va day la cho suyt lam em va nham:**
+- "Hoc vien nguy co", "Khoi luong viec" la ANH CHUP HIEN TRANG - dung yen la dung ban chat;
+- "Hieu suat doi tu van" **tu khai du hai moc ngay tren tieu de** (*"lien he & ket noi: 7 ngay
+  gan nhat · dang ky & doanh thu: toan ky du lieu"*) - TRUNG THUC, khong phai loi. Em da suyt di
+  sua cot doanh thu cua no vi moi doc than ham ma **chua doc cai tieu de chinh no in ra**;
+- "So sanh theo co so" khai cach GOP ("theo co so cua LOP") ma khong khai moc THOI GIAN nao.
+
+Nen thu hong that la **cau hua o dau trang** - no mau thuan ngay voi dong chu cua chinh cai bang
+nam ben duoi no - cong mot bang chua khai moc. Va: **khong doi bang phai loc theo ky, doi no NOI
+RA no dang dem quang nao.** Mot con so khong noi minh dem quang nao thi nguoi doc tu dien quang
+vao, va ho dien cai quang vua bam tren man.
+
+**BON LAN PHEP DO CUA EM SAI TRUOC KHI RA DUOC KET LUAN NAY - ghi lai vi ca bon cung mot ho:**
+1. `bc.js` doan ten bien tab (`bcTabs`, `BCTAB`) - **khong ton tai**. Trang bao cao la mot trang
+   dai, khong co tab.
+2. `bc2.js` goi `go("baocao")` khi DANG O trang do - `go()` thay `CUR` khong doi nen bo qua viec
+   ve lai. Luot thu hai la ANH CU, moi khoi deu "dung yen" mot cach gia tao, va no bao **0/4 doi**.
+   Sua bang cach RA TRANG KHAC roi quay lai; kiem chung ngay bang do dai than trang (11207 vs
+   11644) - thieu buoc kiem chung ay thi khong cach nao biet phep do da chet.
+3. Ket luan "`staffPerfSection` lua nguoi doc" khi moi doc THAN HAM ma chua doc TIEU DE no in ra.
+   Suyt di sua cot doanh thu cua mot bang dang trung thuc.
+4. M18 ban dau cat trang thanh khoi theo `<div class="panel"` roi so day so hai ky - **cat sai**
+   vi khoi long nhau lam mot mau an sang khoi ben canh, khien bang co so bi cham la "co doi" va
+   THOAT khoi phep kiem. Tieu chi ay khong bao gio do duoc, tuc la do trang tri.
+   Nay hoi tung HAM, khong cat HTML.
+Va mot lan **to oan**: ban dau doi moi ham phai TU goi `repF`, nen `kpiSection` bi cham do -
+trong khi dong dau cua no la `var comp=kpiCompute()`, tuc no loc ky GIAN TIEP. *Doi moi ham phai
+tu loc la doi sai tang: viec loc nam o cho lay so, khong nam o cho ve bang.*

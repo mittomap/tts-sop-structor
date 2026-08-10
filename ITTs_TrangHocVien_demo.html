@@ -11650,7 +11650,7 @@ function baocaoBranch(){
   if(!isc(e.enrollment_status,"cancelled"))k.debt+=num(e.remaining_amount)});
  var list=Object.keys(K).map(function(b){return K[b]}).sort(function(a,b){return b.stu-a.stu});
  if(!list.length)return "";
- var h='<div class="panel"><div class="ph"><b><i class="ti ti-building" style="margin-right:6px"></i>So sánh theo cơ sở</b><span class="mut" style="font-size:11.5px">tính theo cơ sở của LỚP - nơi việc học thật sự diễn ra; lớp online tách riêng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Cơ sở</th><th>Lớp</th><th>Trong đó online</th><th>Học viên</th><th>HV nguy cơ</th><th>Giáo viên</th><th>Buổi đã dạy</th><th>Tỷ lệ có nhận xét</th><th>Đã thu</th><th>Còn nợ</th></tr></thead><tbody>';
+ var h='<div class="panel"><div class="ph"><b><i class="ti ti-building" style="margin-right:6px"></i>So sánh theo cơ sở</b><span class="mut" style="font-size:11.5px">tính theo cơ sở của LỚP - nơi việc học thật sự diễn ra; lớp online tách riêng · số liệu: toàn kỳ dữ liệu</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Cơ sở</th><th>Lớp</th><th>Trong đó online</th><th>Học viên</th><th>HV nguy cơ</th><th>Giáo viên</th><th>Buổi đã dạy</th><th>Tỷ lệ có nhận xét</th><th>Đã thu</th><th>Còn nợ</th></tr></thead><tbody>';
  list.forEach(function(k){
   var tnr=k.ses?Math.round(k.note/k.ses*100):null;
   var rr=k.stu?Math.round(k.risk/k.stu*100):0;
@@ -11728,7 +11728,7 @@ function baocaoThan(_xemAi){
  var h='<div class="phead" data-tour="phead"><div><div class="t">Chỉ số &amp; KPI · '+esc(_bcTen)+'</div><div class="s">'+esc(_bcCau)+'</div></div>'+
   '<div class="sp"><button class="btn" onclick="go(\'banlam\')"><i class="ti ti-checklist"></i>Trang bắt đầu</button><button class="btn" onclick="window.SETTAB=\'ch6\';go(\'settings\')"><i class="ti ti-adjustments"></i>Ngưỡng KPI</button></div></div>';
  h+=tbar('<span class="tblbl">Kỳ số liệu</span>'+segHTML(window.REPKY||"all",[["m0","Tháng này"],["30","30 ngày"],["90","90 ngày"],["all","Toàn kỳ"]],"window.REPKY='{k}';reRender(CUR)")+
-  '<span class="mut" style="font-size:11px;margin-left:10px">Kỳ này áp cho TOÀN BỘ chỉ số bên dưới.</span>',"");
+  '<span class="mut" style="font-size:11px;margin-left:10px">Kỳ này áp cho các chỉ số KPI bên dưới. Bảng nào dùng mốc thời gian riêng thì ghi rõ ngay trên tiêu đề của nó.</span>',"");
  /* Ô chọn người ngay trên trang này - quản lý mở Chỉ số ra là chọn được luôn, không phải quay
     về trang đáp mới đổi được người. Dùng CHUNG một ô với "Xem việc của" (cùng `window.BANAI`)
     nên chuông, Việc hôm nay, bảng việc và trang này luôn nói về cùng một người. */
