@@ -1387,7 +1387,12 @@ table.dt tbody tr.clk.on td{font-weight:600}
 /* Trên khổ điện thoại thì CHO XUỐNG DÒNG thay vì cắt. `_checkmat` đo được tên chủ đề buổi bị
    cắt đúng 3px - tức cái ellipsis chỉ nuốt một chữ cái cuối, vừa xấu vừa vô ích. Cắt bằng dấu
    ba chấm là cách xử tử tế khi chỗ THIẾU NHIỀU; thiếu 3px thì cho nó rơi xuống dòng. */
-@media(max-width:600px){.planbar .pbi b{white-space:normal;max-width:none;overflow:visible}}
+/* Và cho ô XUỐNG DÒNG THẬT trên khổ hẹp. `.planbar` vốn đã khai `flex-wrap:wrap`, nhưng
+   `.pbi{min-width:0}` cho phép ô co xuống dưới cả bề rộng một chữ, nên bốn ô vẫn nằm lì trên một
+   hàng và ô cuối chỉ còn 38px - chữ tràn ra 3px. Đặt `min-width` mới là thứ khiến `flex-wrap`
+   có việc để làm; con số 132px chọn để hai ô một hàng vừa khổ 390px, không đẩy trang cuộn ngang. */
+@media(max-width:600px){.planbar .pbi b{white-space:normal;max-width:none;overflow:visible}
+ .planbar .pbi{min-width:132px}}
 .psub{display:flex;align-items:center;gap:10px;padding:11px 16px;border-top:1px solid var(--line);background:#FAFBFD}
 .psub b{font-size:12.5px;font-weight:700}.psub .mini{margin-left:auto;display:flex;gap:6px}
 .stepn{font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--navy);background:rgba(46,90,136,.10);border-radius:20px;padding:3px 8px;flex:none}
@@ -15318,7 +15323,10 @@ function renderLichWow(){
     "ngày 14 là thứ mấy" - mà xếp ca thì thứ mới là thứ người ta nghĩ tới, không phải số ngày. */
  var _THU=["CN","T2","T3","T4","T5","T6","T7"];
  for(var n=1;n<=soNgay;n++){var _t=_THU[new Date(nam,thg-1,n).getDay()];
-  h+='<th style="text-align:center">'+n+'<div class="mut" style="font-weight:400;font-size:10px">'+_t+'</div></th>'}
+  /* 11px chứ không phải 10px: dự án đã chốt SÀN 11px cho mọi cỡ chữ (tiếng Việt có dấu, nhỏ hơn
+     là mất nét dấu), và thang cỡ chữ chốt tối đa 16 bậc. Gõ 10px ở đây là phá cả hai cùng lúc -
+     `_checkux` bắt ngay: bậc thứ 17, và một cỡ dưới sàn. */
+  h+='<th style="text-align:center">'+n+'<div class="mut" style="font-weight:400;font-size:11px">'+_t+'</div></th>'}
  h+='</tr></thead><tbody>';
  var _ngayDem={};
  khung.forEach(function(g){
