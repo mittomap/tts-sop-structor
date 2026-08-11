@@ -487,5 +487,38 @@ t("Hoi dap nam trong menu, khong bi giau", PBK["hoidap"]&&!PBK["hoidap"].hide);
   if(k)t("muc so lieu '"+m.k+"' co nut mo man lam viec va co loi giai thich", !!k.go&&!!k.giai)});
 })();
 
+/* ── CH5 THUAT NGU: hoi nghia mot chu viet tat thi phai tra loi duoc ────────────────────────
+   Them 10/08. SOP danh han mot sheet `CH5. Thuat ngu` cho 26 chu viet tat, va app KHONG co cho
+   nao tra nghia - trong khi 12 ma trong so do (GLA, CVT, PLR48, OBT, VLR, TAR, ARR, CIR, RR,
+   ENR, FB, TV) CO chay trong app va hien len man dang "GLA qua han".
+   `check_sop.py` canh ve SOP (du chu chua). Khuc nay canh ve APP: hoi that thi co tra loi that
+   khong - dung bai hoc `lwSave` hom nay: **diem danh mot cai cua khong phai la thu mo no**.
+   Va canh ca chieu nguoc lai: nhanh tu dien khong duoc CUOP cau cua nhanh dem so. */
+(function(){
+ t("app co bang thuat ngu TUDIEN", typeof TUDIEN!=="undefined"&&TUDIEN.length>=26);
+ if(typeof TUDIEN==="undefined")return;
+ var hut=[],rong=[];
+ TUDIEN.forEach(function(td){
+  var R=null;try{R=qaTraLoi(td[0]+" là gì")}catch(e){}
+  if(!R||R.loai!=="tudien"||!R.td||R.td[0]!==td[0])hut.push(td[0]);
+  if(!String(td[2]||"").trim()||!String(td[3]||"").trim())rong.push(td[0])});
+ t("hoi nghia TUNG chu viet tat deu ra dung chu do"+(hut.length?" (hut: "+hut.join(", ")+")":""), hut.length===0);
+ t("moi chu viet tat deu co nghia tieng Viet va cho dung"+(rong.length?" (thieu: "+rong.join(", ")+")":""), rong.length===0);
+ /* Chieu nguoc: cau hoi SO va cau hoi CHI SO khong duoc roi vao tu dien. "HV" nam trong hang
+    tram cau binh thuong - noi long phep khop la tu dien cuop het. */
+ var g1=null,g2=null,g3=null;
+ try{g1=qaTraLoi("có bao nhiêu học viên nguy cơ")}catch(e){}
+ try{g2=qaTraLoi("CVR đang bao nhiêu")}catch(e){}
+ try{g3=qaTraLoi("ai chưa đóng học phí")}catch(e){}
+ t("cau hoi DEM SO khong bi nhanh tu dien cuop", !!g1&&g1.loai==="so");
+ t("cau hoi CHI SO van ra con so song, khong ra tu dien", !!g2&&g2.loai==="kpi");
+ t("cau hoi DANH SACH khong bi nhanh tu dien cuop", !!g3&&g3.loai==="so");
+ /* Bang phai VE RA duoc va phai bay san khi chua hoi gi - mot cuon tu dien chi mo ra khi da
+    biet phai hoi gi thi nguoi can no nhat khong bao gio tim thay. */
+ var h="";try{window.QAQ="";h=RENDER.hoidap()}catch(e){}
+ t("trang Hoi dap bay san bang thuat ngu khi chua hoi gi", h.indexOf("Thuật ngữ viết tắt")>=0);
+ t("bang thuat ngu ve ra du 26 chu", TUDIEN.every(function(td){return h.indexOf(">"+td[0]+"<")>=0}));
+})();
+
 console.log(bad.length?("CHECKQA FAIL ("+bad.length+"):\n  "+bad.join("\n  ")):"CHECKQA OK: "+ok+" tieu chi");
 process.exit(bad.length?1:0);

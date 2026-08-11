@@ -1182,3 +1182,41 @@ va in ra dung danh sach bang lech.
 lai pipeline Python - no khoi phuc tu ban du lieu da nuong san trong `ITTs_data.js`, nen tu truoc
 den nay bam bao nhieu lan cung ra dung mot trang thai (`_checkreset` canh dieu do). Cai vua sua an
 vao LUC DUNG LAI du lieu: tu nay dung lai bao nhieu lan cung ra dung bo so cu.
+
+## 10/08 - DEM LAI CA 52 SHEET SOP: CON DUNG MOT MANG TRANG - `CH5. Thuat ngu`
+
+Anh Luan hoi: *"Con tinh nang nao chua co ko?"*. Bai hoc DL19 con nong nen lan nay khong tra loi
+bang tri nho: mo file SOP ra, liet ke ca 52 sheet, roi hoi tung sheet mot xem phep do nao dang
+soi no.
+
+Ket qua: 44 sheet co nguoi soi. **8 sheet khong ai soi**: HD0, HD1, HD2, CH1, CH2, CH4, CH5, CH6.
+Doi chieu tay tung cai:
+- **CH1** danh muc: SOP 174 ma / app 225 ma -> **thieu 0** (app la tap cha - "them thi duoc").
+- **CH2** tham so: SOP 61 / app 73 dong cau hinh -> **thieu 0**.
+- **CH4** cau nhac viec: SOP 94 ma -> app co du **94/94**.
+- **CH6** nguong KPI: da duoc canh gian tiep qua mat BC2 (51 chi so phai co dong nguong CH6).
+- **HD2** quy trinh: 10 phase -> app phu bang hanh trinh P1-P10 + 15 bai huong dan.
+- **HD0/HD1**: trang chu + huong dan doc file Excel, khong phai nghiep vu.
+- **CH5 thuat ngu (26 chu viet tat): APP KHONG CO CHO NAO TRA.**
+
+Dau nhat la **12 ma**: GLA, CVT, PLR48, OBT, VLR, TAR, ARR, CIR, RR, ENR, FB, TV. Chung CO chay
+trong app - la ma SLA / ma chi so - va hien len man duoi dang *"GLA qua han"*. Nguoi moi doc man
+hinh xong khong co cho nao tra duoc GLA la gi. App moi dien giai 17/51 chi so (KPIDOC).
+
+**Da lam - dat trong HOI DAP chu khong de mot trang moi.** Do la cho nguoi ta di hoi "cai nay la
+gi"; them mot trang nua la nguoc voi chinh luat V2 ("bot so trang mot nguoi phai nhin").
+- `TUDIEN`: 26 dong ghi NGUYEN VAN theo CH5 (viet tat · ten day du · nghia · dung o dau).
+- `tdTim(q)`: tra mot chu. **HOI CHAT CO CHU DICH** - chi nhan khi nguoi ta DANG HOI NGHIA (go
+  tron mot chu, hoac kem "la gi / nghia la / viet tat"). Noi long ra la no CUOP cau cua nhanh dem
+  so: "co bao nhieu HV nguy co" ma roi vao tu dien thi te hon han khong tra loi.
+- Bang thuat ngu BAY SAN tren trang Hoi dap khi chua hoi gi - *mot cuon tu dien chi mo ra khi da
+  biet phai hoi gi thi nguoi can no nhat khong bao gio tim thay*.
+- Ma nao la chi so CH6 thi co them nut mo dien giai - hai thu do noi ve cung mot ma.
+
+**Hai chot canh, hai tang khac nhau** (dung bai hoc `lwSave` cung ngay):
+- `check_sop.py` mat thu SAU - CH5: doi CA HAI chu viet tat VA nghia tieng Viet phai co trong
+  `gen_v5.py`. Chi doi moi chu viet tat thi "TV"/"FB" trung voi hang tram chuoi khac, xanh ma
+  khong canh gi. Tu thu: doi mot chu trong nghia -> do dung dong do.
+- `_checkqa.js`: goi THAT `qaTraLoi("<ma> la gi")` cho ca 26 ma, va canh ca chieu nguoc lai (cau
+  dem so / cau chi so khong duoc roi vao tu dien). Tu thu: tat nhanh tu dien -> do, liet ke du 26.
+*Diem danh mot cai cua khong phai la thu mo no* - nen mot mat doc ma nguon, mot mat lai that.

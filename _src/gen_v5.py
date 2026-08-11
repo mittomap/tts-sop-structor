@@ -21353,6 +21353,75 @@ var QASO=[
      function(c){return "kết thúc "+String(c.class_end_date||"").slice(0,10)+" · "+num(c.current_enrollment)+" HV"},null)}}}];
 /* Chỉ số KPI: hỏi "CVR bao nhiêu" thì trả về đúng con số app đang tính, kèm ngưỡng CH6 và mức
    đạt/chưa đạt - rồi mở thẳng phần diễn giải đã có sẵn. */
+/* ═══ CH5 · THUẬT NGỮ VIẾT TẮT ══════════════════════════════════════════════════════════════
+   SOP dành hẳn một sheet `CH5. Thuật ngữ` cho 26 chữ viết tắt, và app **không có chỗ nào tra**.
+   Tìm ra 10/08 khi đếm lại cả 52 sheet: CH1/CH2/CH4 app phủ đủ (còn nhiều hơn SOP), riêng CH5
+   thì trắng. Phạm LUẬT CỨNG SỐ 0 - "để thiếu sót những gì SOP đã từng mô tả, nghĩa là chúng ta sai".
+   Đau nhất là 12 mã: GLA, CVT, PLR48, OBT, VLR, TAR, ARR, CIR, RR, ENR, FB, TV. Chúng CÓ chạy
+   trong app (là mã SLA / mã chỉ số), hiện lên màn dưới dạng "GLA quá hạn" - mà không một chỗ nào
+   nói GLA là gì. Người mới vào đọc màn hình xong không tra được.
+   Ghi NGUYÊN VĂN theo CH5, bốn cột: viết tắt · tên đầy đủ · nghĩa tiếng Việt · dùng ở đâu. */
+var TUDIEN=[
+ ["HV","","Học viên","Người đang/đã học tại trung tâm."],
+ ["NV","","Nhân viên","Nhân sự nội bộ (tư vấn, học vụ, GV...)."],
+ ["GV","","Giáo viên","Người dạy lớp."],
+ ["TV","","Tư vấn viên","NV tư vấn, chăm sóc khách trước khi đăng ký."],
+ ["Lead","","Khách tiềm năng","Người mới quan tâm, chưa đăng ký. Sổ DL02."],
+ ["ENR","Enrollment","Đăng ký khóa học","Một lượt HV đăng ký 1 khóa. Sổ DL06."],
+ ["WOW","","Buổi học kèm 1-1 đặc biệt","Buổi kèm riêng cho HV (tên gọi nội bộ ITTs). Sổ DL14."],
+ ["KN","","Khiếu nại","Phàn nàn/khiếu nại của HV. Sổ DL17."],
+ ["FB","Feedback","Phản hồi","Góp ý/đánh giá của HV. Sổ DL16."],
+ ["SLA","Service Level Agreement","Cam kết thời gian xử lý tối đa","Mốc thời gian tối đa cho 1 việc. Cấu hình ở CH2."],
+ ["KPI","Key Performance Indicator","Chỉ số đo hiệu quả","Các tỷ lệ đánh giá hoạt động. Xem ở Báo cáo & KPI."],
+ ["LRT","Lead Response Time","Thời gian phản hồi lead mới","Tối đa bao lâu phải gọi lead mới. Tham số slaLRT_minutes."],
+ ["GLA","","Thời hạn chấm bài test đầu vào","Tối đa bao lâu phải chấm xong test khách. Tham số slaGLA_hours."],
+ ["CVT","Consultation Time","Thời hạn tư vấn sau khi có kết quả test","Tham số slaCVT_hours."],
+ ["PLR48","Placement 48h","Thời hạn xếp lớp","Đăng ký xác nhận thì tối đa 48h phải xếp lớp. Tham số slaPLR48_hours."],
+ ["OBT","Onboarding Time","Thời hạn hoàn tất nhập học","Tham số slaOBT_hours."],
+ ["VLR","Valid Lead Rate","Tỷ lệ lead đạt chuẩn","Ngưỡng kpiThreshold_VLR."],
+ ["TAR","Test Attendance Rate","Tỷ lệ khách đặt test có đến làm","Ngưỡng kpiThreshold_TAR."],
+ ["CVR","Conversion Rate","Tỷ lệ chuyển lead thành HV","Ngưỡng kpiThreshold_CVR."],
+ ["PCR","Payment Completion Rate","Tỷ lệ thu đủ học phí","Ngưỡng kpiThreshold_PCR."],
+ ["ATR","Attendance Rate","Tỷ lệ chuyên cần","Ngưỡng kpiThreshold_ATR."],
+ ["UAR","Unexcused Absence Rate","Tỷ lệ vắng không phép","Ngưỡng kpiThreshold_UAR (mức tối đa)."],
+ ["ARR","At-Risk Rate","Tỷ lệ HV có nguy cơ","Ngưỡng kpiThreshold_ARR (mức tối đa)."],
+ ["CIR","Complaint Incidence Rate","Tỷ lệ phát sinh khiếu nại/tháng","Ngưỡng kpiThreshold_CIR (mức tối đa)."],
+ ["RR","Resolution Rate","Tỷ lệ giải quyết khiếu nại thành công","Ngưỡng kpiThreshold_RR."],
+ ["RER","Re-enrollment Rate","Tỷ lệ tái ghi danh","Ngưỡng kpiThreshold_RER."]];
+/* Tra một chữ viết tắt. HỎI CHẶT CÓ CHỦ ĐÍCH: "HV", "NV", "TV" nằm trong hàng trăm câu hỏi bình
+   thường ("có bao nhiêu HV nguy cơ"), nên nhánh này chỉ nhận khi người ta ĐANG HỎI NGHĨA - gõ
+   trống một chữ, hoặc kèm "là gì / nghĩa là / viết tắt / viết tắt của". Nới ra là nó cướp câu
+   của nhánh đếm số, mà cướp câu thì tệ hơn hẳn không trả lời. */
+function tdTim(q){
+ var raw=String(q||"").trim();if(!raw)return null;
+ var hoa=raw.toUpperCase();
+ var hoiNghia=/(LÀ GÌ|LA GI|NGHĨA LÀ|NGHIA LA|VIẾT TẮT|VIET TAT|NGHĨA CỦA|NGHIA CUA)/.test(hoa);
+ var chiMotTu=/^[A-Za-z0-9]{1,8}\??$/.test(raw);
+ if(!hoiNghia&&!chiMotTu)return null;
+ for(var i=0;i<TUDIEN.length;i++){var t=TUDIEN[i][0].toUpperCase();
+  if(new RegExp("(^|[^A-Z0-9])"+t+"([^A-Z0-9]|$)").test(hoa))return TUDIEN[i]}
+ return null}
+/* Dải thuật ngữ vẽ ngay trên trang Hỏi đáp - có ô lọc, vì 26 dòng thì đọc mắt được nhưng lọc
+   vẫn nhanh hơn. Mã nào là chỉ số CH6 thì gắn thêm nút mở diễn giải: hai thứ ấy nói về cùng
+   một mã, để rời nhau là bắt người ta tự nối. */
+function tdLoc(v){window.TDQ=v||"";reRender("hoidap")}
+function tdBang(){
+ var q=vnorm(String(window.TDQ||"").trim());
+ var ds=TUDIEN.filter(function(t){if(!q)return true;
+  return vnorm(t[0]+" "+t[1]+" "+t[2]+" "+t[3]).indexOf(q)>=0});
+ var ch6=(DATA.config&&DATA.config.ch6)||[];
+ var coKpi={};ch6.forEach(function(c){coKpi[String(c.code||"").toUpperCase()]=1});
+ var h='<div class="panel"><div class="ph"><b><i class="ti ti-abc" style="margin-right:6px"></i>Thuật ngữ viết tắt</b>'+
+  '<span class="mut" style="font-size:11.5px">'+TUDIEN.length+' chữ viết tắt dùng trong app và trong SOP (CH5)</span></div>';
+ h+='<div class="pbody"><input id="td_q" value="'+esc(window.TDQ||"")+'" placeholder="Lọc theo chữ viết tắt hoặc theo nghĩa" data-pktim="1" style="width:100%;max-width:320px;height:34px;border:1px solid var(--line);border-radius:8px;padding:0 11px;font-family:inherit;font-size:13px" oninput="clearTimeout(window._tdt);window._tdt=setTimeout(function(){tdLoc(document.getElementById(\'td_q\').value)},350)"></div>';
+ h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Viết tắt</th><th>Tên đầy đủ</th><th>Nghĩa tiếng Việt</th><th>Dùng ở đâu</th></tr></thead><tbody>';
+ if(!ds.length)h+='<tr><td class="empty" colspan="4">Không có chữ nào khớp "'+esc(window.TDQ||"")+'".</td></tr>';
+ ds.forEach(function(t){
+  h+='<tr><td><b>'+esc(t[0])+'</b></td><td>'+(t[1]?esc(t[1]):'<span class="mut">-</span>')+'</td>'+
+   '<td>'+esc(t[2])+'</td><td class="mut">'+esc(t[3])+
+   (coKpi[t[0].toUpperCase()]?' <button class="pill" onclick="kpiOpen('+JSON.stringify(t[0]).split('"').join("&quot;")+')">Xem chỉ số</button>':'')+'</td></tr>'});
+ h+='</tbody></table></div></div>';
+ return h}
 function qaKPI(q){
  var z=qaChuan(q),ch6=(DATA.config&&DATA.config.ch6)||[];
  var hoa=String(q||"").toUpperCase();
@@ -21403,16 +21472,20 @@ function qaTraLoi(cau){
  var ht=qaTimHeThong(q,6);
  var yd=qaYDinh(q);
  var kp=qaKPI(q);
- var so=kp?null:qaSoTim(q);
+ /* TRA THUẬT NGỮ (CH5). Đặt TRƯỚC nhánh chỉ số vì có mã chỉ nằm trong CH5 chứ không có trong CH6
+    (GLA, CVT, PLR48, OBT...), nhưng `tdTim` chỉ nhận khi người ta ĐANG HỎI NGHĨA, nên "CVR đang
+    bao nhiêu" vẫn rơi vào nhánh chỉ số với con số sống. */
+ var td=tdTim(q);
+ var so=(kp||td)?null:qaSoTim(q);
  /* THỨ TỰ ƯU TIÊN, và vì sao đúng thứ tự này:
     1. NGƯỜI - hỏi trúng một cái tên đủ chắc thì không còn gì để bàn.
     2. CHỈ SỐ - gõ đúng mã CH6 là câu hỏi rõ nhất trong mọi câu hỏi.
     3. SỐ LIỆU - "bao nhiêu / ai / danh sách"; nhánh này TỰ TỪ CHỐI khi câu có "ở đâu / chỗ nào"
        nên không cướp câu của nhánh cấu hình.
     4. CHỖ CẤU HÌNH. 5. Bí thì ghi vào sổ câu hỏi chưa trả lời được. */
- var loai=(ng.length&&ng[0].d>=70)?"nguoi":(kp?"kpi":(so?"so":(ht.length?"hethong":(ng.length?"nguoi":"bi"))));
+ var loai=(ng.length&&ng[0].d>=70)?"nguoi":(td?"tudien":(kp?"kpi":(so?"so":(ht.length?"hethong":(ng.length?"nguoi":"bi")))));
  if(loai==="bi")qaGhiHut(q);
- return {q:q,loai:loai,nguoi:ng,hethong:ht,yd:yd,so:so,kpi:kp}}
+ return {q:q,loai:loai,nguoi:ng,hethong:ht,yd:yd,so:so,kpi:kp,td:td}}
 /* Khi bí: đừng trả về màn trắng. Gợi ý những thứ GẦN NHẤT mà app có - vài cái tên hao hao, vài
    chỗ cấu hình hao hao - để người hỏi bấm tiếp thay vì bỏ cuộc. */
 function qaGoiY(q){
@@ -21457,7 +21530,7 @@ function qaViDuList(){
  return [(s&&s.full_name?s.full_name+" đang có cảnh báo gì":"học viên nào đang có cảnh báo"),
   "có bao nhiêu học viên nguy cơ","ai chưa đóng học phí","hôm nay tôi phải làm gì",
   (c&&c.class_id?("lớp "+c.class_id+" thế nào rồi"):"lớp nào sắp kết thúc"),
-  "CVR đang bao nhiêu","đổi ngưỡng nợ quá hạn ở đâu","hạn chấm bài là bao lâu"]}
+  "CVR đang bao nhiêu","GLA là gì","đổi ngưỡng nợ quá hạn ở đâu","hạn chấm bài là bao lâu"]}
 function renderHoidap(){
  var q=window.QAQ||"";
  var h=pageHead("Hỏi đáp","Hỏi bằng tiếng Việt - về một học viên, hoặc về chỗ cấu hình trong app");
@@ -21469,7 +21542,9 @@ function renderHoidap(){
  h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px" data-tour="qavd"><span class="mut" style="font-size:11px;align-self:center">Thử:</span>';
  qaViDuList().forEach(function(s){h+='<button class="pill" onclick="qaViDu('+JSON.stringify(s).split('"').join("&quot;")+')">'+esc(s)+'</button>'});
  h+='</div></div></div>';
- if(!q)return h;
+ /* Chưa hỏi gì thì BÀY SẴN bảng thuật ngữ. Một cuốn từ điển chỉ mở ra khi đã biết phải hỏi gì
+    thì người cần nó nhất - người mới, chưa biết GLA là gì - không bao giờ tìm thấy. */
+ if(!q)return h+tdBang();
  h+=aiKhoiHTML(q);   /* AI dien giai (neu bat) - dung tren, cau tra loi may ngay duoi */
  var R=qaTraLoi(q);
  if(R.loai==="nguoi"&&R.nguoi.length>1){
@@ -21511,6 +21586,18 @@ function renderHoidap(){
    '<button class="btn" onclick="'+qaMoHoSo(K).split('"').join("&quot;")+'"><i class="ti '+qaLoaiIc(K.loai)+'"></i>'+esc(qaMoNhan(K))+'</button>'+
    '</div>';
   h+='</div></div>';
+  return h}
+ if(R.loai==="tudien"&&R.td){
+  var TD=R.td;
+  var _ch6=(DATA.config&&DATA.config.ch6)||[];
+  var _laKpi=_ch6.some(function(c){return String(c.code||"").toUpperCase()===TD[0].toUpperCase()});
+  h+='<div class="panel"><div class="ph"><b><i class="ti ti-abc" style="margin-right:6px"></i>'+esc(TD[0])+' · '+esc(TD[2])+'</b></div><div class="pbody">';
+  if(TD[1])h+='<div style="font-size:13px;margin-bottom:6px">Viết tắt của <b>'+esc(TD[1])+'</b>.</div>';
+  h+='<div style="font-size:13px">'+esc(TD[3])+'</div>';
+  h+='<div class="fhint" style="margin-top:10px">Chữ viết tắt lấy nguyên văn từ bảng CH5 của SOP.</div>';
+  if(_laKpi)h+='<div style="margin-top:12px"><button class="btn primary" onclick="kpiOpen('+JSON.stringify(TD[0]).split('"').join("&quot;")+')"><i class="ti ti-zoom-scan"></i>Xem con số và việc nên làm</button></div>';
+  h+='</div></div>';
+  h+=tdBang();
   return h}
  if(R.loai==="kpi"&&R.kpi){
   var KP=R.kpi;

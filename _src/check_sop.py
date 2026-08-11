@@ -732,6 +732,66 @@ if _vhloi:
     print("KET QUA: KHONG DAT")
     sys.exit(1)
 
+
+# ═══ PHAN 6: CH5 THUAT NGU - APP CO CHO TRA NGHIA KHONG? ═════════════════════════════════════
+# Them 10/08. Truoc do khong phep do nao doc sheet CH5, va hoa ra app **khong co cho nao tra
+# nghia mot chu viet tat** - trong khi 12 ma trong so do (GLA, CVT, PLR48, OBT, VLR, TAR, ARR,
+# CIR, RR, ENR, FB, TV) CO chay trong app, hien len man duoi dang "GLA qua han", ma khong mot
+# dong nao noi GLA la gi. Nguoi moi doc man hinh xong khong tra duoc.
+# Cung ho voi DL19: mot sheet SOP ma khong mat nao cua bo kiem soi toi.
 print()
-print("KET QUA: DAT - cot SOP, so trigger HD3, chi so BC2, phan quyen CH3, man VH va bang BC "
-      "deu duoc app phu, hoac da khai ly do.")
+print("=" * 78)
+print("CH5 THUAT NGU <-> APP")
+CH5_BOQUA = {}
+_ch5 = []
+try:
+    _z5 = zipfile.ZipFile(SOP)
+    _rl5 = dict(re.findall(r'Id="(rId\d+)"[^>]*Target="([^"]+)"',
+                           _z5.read("xl/_rels/workbook.xml.rels").decode("utf-8", "ignore")))
+    _sh5 = dict((n.split(".")[0], r) for n, r in re.findall(
+        r'<sheet name="([^"]+)"[^>]*r:id="(rId\d+)"',
+        _z5.read("xl/workbook.xml").decode("utf-8", "ignore")))
+    _ss5 = _sst(_z5)
+    _c5 = re.compile(r'<c\b([^>]*?)(?:/>|>(.*?)</c>)', re.S)
+    _v5 = re.compile(r"<v>(.*?)</v>", re.S)
+    for _r in re.findall(r"<row[^>]*>(.*?)</row>",
+                         _z5.read("xl/" + _rl5[_sh5["CH5"]]).decode("utf-8", "ignore"), re.S):
+        _o = []
+        for _m in _c5.finditer(_r):
+            _a = _m.group(1) or ""
+            _x = _v5.search(_m.group(2) or "")
+            _x = _x.group(1) if _x else ""
+            if 't="s"' in _a and _x.isdigit() and int(_x) < len(_ss5):
+                _x = _ss5[int(_x)]
+            _o.append(str(_x).strip())
+        if len(_o) >= 3 and _o[0] and _o[0] != "Viet tat" and _o[0] != "Viết tắt" \
+                and re.match(r"^[A-Za-z][A-Za-z0-9_/-]{1,12}$", _o[0]):
+            _ch5.append((_o[0], _o[2]))
+except Exception as _e:
+    print("  KHONG DOC DUOC sheet CH5: %s" % _e)
+
+print("  chu viet tat SOP    : %d" % len(_ch5))
+_sot5 = []
+for _tat, _nghia in _ch5:
+    if _tat in CH5_BOQUA:
+        continue
+    # Doi CA HAI: chu viet tat VA nghia tieng Viet. Chi doi moi chu viet tat thi "TV" hay "FB"
+    # trung voi hang tram chuoi khac trong ma nguon, va phep do se xanh ma khong canh gi.
+    if ('"%s"' % _tat) not in SRC or ('"%s"' % _nghia) not in SRC:
+        _sot5.append("%s (%s)" % (_tat, _nghia))
+print("  app co giai nghia   : %d" % (len(_ch5) - len(_sot5)))
+if _sot5:
+    print()
+    print("SOT %d CHU VIET TAT SOP MO TA MA APP KHONG GIAI NGHIA:" % len(_sot5))
+    for _x in _sot5:
+        print("   X %s" % _x)
+    print()
+    print("Them vao bang TUDIEN trong gen_v5.py (ghi NGUYEN VAN theo CH5), HOAC khai vao "
+          "CH5_BOQUA KEM LY DO.")
+    print("KET QUA: KHONG DAT")
+    sys.exit(1)
+print("  KET QUA CH5: DAT - moi chu viet tat SOP mo ta deu co cho tra nghia trong app.")
+
+print()
+print("KET QUA: DAT - cot SOP, so trigger HD3, chi so BC2, phan quyen CH3, man VH, bang BC va "
+      "thuat ngu CH5 deu duoc app phu, hoac da khai ly do.")

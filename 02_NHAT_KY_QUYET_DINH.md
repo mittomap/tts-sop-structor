@@ -243,6 +243,36 @@
 > đã lên https://mittomap.github.io/itts-sop-demo-v2/ . V1 mốc cũ: V9.99z12, 34 bộ, `829572`,
 > https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới trong phiên này.**
 >
+> ### 🟢 10/08 - "CÒN TÍNH NĂNG NÀO CHƯA CÓ KO?" - ĐẾM LẠI CẢ 52 SHEET, CÒN ĐÚNG MỘT MẢNG TRẮNG
+>
+> Bài học DL19 còn nóng nên lần này em không trả lời bằng trí nhớ: mở file SOP ra, liệt kê cả **52
+> sheet**, rồi hỏi từng sheet một xem phép đo nào đang soi nó. **44 sheet có người soi. 8 sheet
+> không ai soi**: HD0, HD1, HD2, CH1, CH2, CH4, CH5, CH6. Đối chiếu tay từng cái:
+> **CH1** danh mục SOP 174 mã / app 225 → thiếu 0 (app là tập cha — "thêm thì được") · **CH2** tham
+> số SOP 61 / app 73 → thiếu 0 · **CH4** câu nhắc việc SOP 94 mã → app có đủ **94/94** · **CH6** đã
+> được canh gián tiếp qua mặt BC2 · **HD2** 10 phase → app phủ bằng hành trình P1-P10 · HD0/HD1 là
+> hướng dẫn đọc file Excel, không phải nghiệp vụ.
+> **Còn đúng một mảng trắng: `CH5. Thuật ngữ` — 26 chữ viết tắt, app không có chỗ nào tra.**
+>
+> Đau nhất là **12 mã**: GLA, CVT, PLR48, OBT, VLR, TAR, ARR, CIR, RR, ENR, FB, TV. Chúng **có chạy
+> trong app** — là mã SLA / mã chỉ số — và hiện lên màn dưới dạng *"GLA quá hạn"*. Người mới đọc
+> màn hình xong không có chỗ nào tra được GLA là gì. App mới diễn giải 17/51 chỉ số.
+>
+> **Đã làm — đặt trong HỎI ĐÁP chứ không đẻ một trang mới.** Đó là chỗ người ta đi hỏi "cái này là
+> gì"; thêm một trang nữa là ngược với chính luật V2 (*bớt số trang một người phải nhìn*). Bảng
+> `TUDIEN` 26 dòng ghi nguyên văn theo CH5; hỏi "GLA là gì" ra ngay; mã nào là chỉ số CH6 thì có
+> thêm nút mở diễn giải. Bảng **bày sẵn** khi chưa hỏi gì — *một cuốn từ điển chỉ mở ra khi đã biết
+> phải hỏi gì thì người cần nó nhất không bao giờ tìm thấy*.
+> **Phép khớp hỏi CHẶT có chủ đích:** chỉ nhận khi người ta đang hỏi nghĩa (gõ trọn một chữ, hoặc
+> kèm "là gì / nghĩa là / viết tắt"). Nới ra là nó **cướp câu** của nhánh đếm số — "có bao nhiêu HV
+> nguy cơ" mà rơi vào từ điển thì tệ hơn hẳn không trả lời.
+>
+> **Hai chốt canh, hai tầng khác nhau** (đúng bài học `lwSave` cùng ngày): `check_sop.py` có mặt thứ
+> sáu — CH5, đòi **cả hai** chữ viết tắt VÀ nghĩa tiếng Việt phải có trong nguồn (chỉ đòi mỗi chữ
+> viết tắt thì "TV"/"FB" trùng với hàng trăm chuỗi khác, xanh mà không canh gì) · `_checkqa` **gọi
+> thật** `qaTraLoi("<mã> là gì")` cho cả 26 mã, và canh cả chiều ngược lại. Đã tự thử cả hai: đổi
+> một chữ trong nghĩa → đỏ đúng dòng đó; tắt nhánh từ điển → đỏ, liệt kê đủ 26.
+>
 > ### 🟢 10/08 - "GIEO LUÔN" - VÀ HOÁ RA HẠT GIỐNG ĐÃ CẮM TỪ LÂU, MÀ VẪN KHÔNG LẶP LẠI ĐƯỢC
 >
 > Anh Luân: *"Gieo luôn, để mỗi lần a bấm reset demo thì ngon luôn nhỉ"*.
