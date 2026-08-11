@@ -1220,3 +1220,32 @@ gi"; them mot trang nua la nguoc voi chinh luat V2 ("bot so trang mot nguoi phai
 - `_checkqa.js`: goi THAT `qaTraLoi("<ma> la gi")` cho ca 26 ma, va canh ca chieu nguoc lai (cau
   dem so / cau chi so khong duoc roi vao tu dien). Tu thu: tat nhanh tu dien -> do, liet ke du 26.
 *Diem danh mot cai cua khong phai la thu mo no* - nen mot mat doc ma nguon, mot mat lai that.
+
+## 11/08 - MOT BO KIEM TUT TU 27 XUONG 17 MA VAN IN "OK"
+
+Sau khi them tu dien CH5, `_checkdrawer` bao *"mo that **17** ngan keo tren 15 trang"* - ba vong
+truoc deu la **27**. Van la dong chu XANH.
+
+**Bo kiem nay chi hoi mot cau:** ngan keo nao MO DUOC thi hinh hoc cua no co sai khong (o mot dong
+ma cao qua, tho ra ngoai, khe trong, o det). No **khong bao gio hoi** "lan nay mo duoc it hon han
+lan truoc thi sao". Mat 10 be mat tuong tac ma khong mot tieng dong.
+
+**Truy goc - va khong phai loi ma:** `git diff` cho thay ca 97 dong sua deu nam trong khu Hoi dap,
+khong dong nao cham 15 trang ma `_checkdrawer` di qua. Thu con lai duy nhat doi trong `ITTs_data.js`
+la **hai dong**: `__gen="10/08/2026"` -> `"11/08/2026"`. Dong ho vat qua nua dem. Du lieu demo con
+neo ngay 10/08, nen "buoi hom nay" thanh buoi hom qua, va 10 cai nut mo ngan keo khong con duoc
+ve ra nua.
+
+Tuc **du lieu demo cu di MOT ngay la app rong di mot mang** - va nguoi mo demo se thay dung cai
+rong ay. Do dung la thu phai KEU.
+
+**Da lam hai viec:**
+1. Dung lai pipeline theo ngay moi (11/08). Nho ban goc dong bang hom qua, bo so van la bo so cu,
+   chi doi moc thoi gian - dung cai gia tri cua viec cat vong lap.
+2. **Cam SAN 24 vao `_checkdrawer`**, kem cau nhac dung viec phai lam khi tut. San dat duoi muc 27
+   do duoc khi du lieu tuoi, tren han muc 17 cua ban da cu mot ngay. Da do lai: du lieu tuoi ->
+   27, xanh; ban cu -> 17, do va in ra dung lenh dung lai pipeline.
+
+*Mot bo kiem do CHAT LUONG cua nhung thu no cham toi, ma khong dem xem no cham duoc bao nhieu thu,
+thi no im lang dung luc pham vi cua no teo lai.* Cung ho voi luat "no silent caps": cho nao bo bot
+pham vi thi phai noi ra, khong thi xanh doc thanh "da phu het".

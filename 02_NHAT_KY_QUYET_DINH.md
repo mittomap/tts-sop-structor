@@ -243,6 +243,29 @@
 > đã lên https://mittomap.github.io/itts-sop-demo-v2/ . V1 mốc cũ: V9.99z12, 34 bộ, `829572`,
 > https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới trong phiên này.**
 >
+> ### 🔵 11/08 - MỘT BỘ KIỂM TỤT TỪ 27 XUỐNG 17 MÀ VẪN IN "OK"
+>
+> Sau khi thêm từ điển CH5, `_checkdrawer` báo *"mở thật **17** ngăn kéo trên 15 trang"* — ba vòng
+> trước đều là **27**. Vẫn là dòng chữ XANH.
+> **Bộ kiểm ấy chỉ hỏi một câu:** ngăn kéo nào MỞ ĐƯỢC thì hình học có sai không. Nó **không bao
+> giờ hỏi** "lần này mở được ít hơn hẳn lần trước thì sao". Mất 10 bề mặt tương tác, không một
+> tiếng động.
+>
+> **Truy gốc — và không phải lỗi mã:** `git diff` cho thấy cả 97 dòng sửa đều nằm trong khu Hỏi
+> đáp, không dòng nào chạm 15 trang mà nó đi qua. Thứ còn lại duy nhất đổi trong `ITTs_data.js` là
+> **hai dòng**: `__gen="10/08/2026"` → `"11/08/2026"`. **Đồng hồ vắt qua nửa đêm.** Dữ liệu demo
+> còn neo ngày 10/08 nên "buổi hôm nay" thành buổi hôm qua, và 10 cái nút mở ngăn kéo không còn
+> được vẽ ra. Tức **dữ liệu demo cũ đi một ngày là app rỗng đi một mảng** — và người mở demo sẽ
+> thấy đúng cái rỗng ấy.
+>
+> **Đã làm hai việc:** dựng lại pipeline theo ngày mới (nhờ bản gốc đóng băng hôm qua, bộ số vẫn là
+> bộ số cũ, chỉ đổi mốc thời gian — đúng cái giá trị của việc cắt vòng lặp) · **cắm SÀN 24** vào
+> `_checkdrawer` kèm câu nhắc đúng việc phải làm khi tụt. Đã đo lại: dữ liệu tươi → 27, xanh; bản
+> cũ → 17, đỏ và in ra đúng lệnh dựng lại pipeline.
+>
+> *Một bộ kiểm đo CHẤT LƯỢNG của những thứ nó chạm tới, mà không đếm xem nó chạm được bao nhiêu
+> thứ, thì nó im lặng đúng lúc phạm vi của nó teo lại.*
+>
 > ### 🟢 10/08 - "CÒN TÍNH NĂNG NÀO CHƯA CÓ KO?" - ĐẾM LẠI CẢ 52 SHEET, CÒN ĐÚNG MỘT MẢNG TRẮNG
 >
 > Bài học DL19 còn nóng nên lần này em không trả lời bằng trí nhớ: mở file SOP ra, liệt kê cả **52

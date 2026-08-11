@@ -95,5 +95,21 @@ const TRANG=["banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","hocvien
  const ds=Object.keys(gom);
  await b.close();
  if(ds.length){console.log("CHECKDRAWER DO ("+ds.length+"):");ds.slice(0,40).forEach(x=>console.log("  - "+x));process.exit(1)}
- console.log("CHECKDRAWER OK: mo that "+soDrawer+" ngan keo tren "+TRANG.length+" trang - khong o nao cao sai, khong cho nao tho ra, khong khe trong, khong o det");
+ /* SAN PHAM VI - THEM 11/08. Bo kiem nay tung tut tu 27 ngan keo xuong 17 ma van in "OK":
+    no chi bao LOI HINH HOC cua nhung ngan keo no mo duoc, khong ai hoi "lan nay mo duoc it hon
+    han lan truoc thi sao". Mat 10 be mat do ma khong mot tieng dong.
+    Goc lan ay khong phai loi ma: dong ho vat qua nua dem, du lieu demo con neo ngay hom truoc,
+    nen "buoi hom nay" thanh buoi hom qua va 10 nut khong con duoc ve ra. Nhung do dung la thu
+    phai KEU: du lieu demo cu di mot ngay la app rong di mot mang, va nguoi mo demo se thay.
+    San dat 24 - duoi muc 27 do duoc khi du lieu tuoi, tren han muc 17 cua ban da cu mot ngay.
+    Tut xuong duoi san thi DO, kem cau nhac dung viec phai lam. */
+ var SAN=24;
+ if(soDrawer<SAN){
+  console.log("CHECKDRAWER DO: chi mo duoc "+soDrawer+" ngan keo, duoi san "+SAN+".");
+  console.log("  Thuong la du lieu demo da cu hon ngay chay - dung lai pipeline roi build lai:");
+  console.log("  cd _src && python3 gen_demo.py && python3 seed_giaoan.py && python3 mkdemo.py && python3 fixdata.py && python3 seed_giaoviec.py");
+  console.log("  Neu du lieu da tuoi ma van thieu thi la mot loat nut that su khong con duoc ve ra.");
+  process.exit(1);
+ }
+ console.log("CHECKDRAWER OK: mo that "+soDrawer+" ngan keo tren "+TRANG.length+" trang (san "+SAN+") - khong o nao cao sai, khong cho nao tho ra, khong khe trong, khong o det");
 })().catch(e=>{console.log("ERR",e.message);process.exit(1)});
