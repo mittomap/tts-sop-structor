@@ -842,6 +842,41 @@ rep("NANG", "18f Ca truc con 'trong' ma van giu ma buoi",
     [s(x, "slot_id") for x in _sl
      if code(x.get("wow_slot_status")) in ("available", "off") and s(x, "wow_id")])
 
+# ══ 18g-18j: DIEM BUOI WOW (WOW-3) ═══════════════════════════════════════
+# Man "Chi tiet dang ky" ve bon o FC/LR/GRA/PR + Overall theo dung man OLMS. Bon o ay chi dung
+# neu du lieu dung sau lung no. Bon cau hoi, moi cau bat mot cach noi doi khac nhau:
+_DIEM4 = ("wow_score_fc", "wow_score_lr", "wow_score_gra", "wow_score_pr")
+def _fl(v):
+    try: return float(str(v).strip())
+    except Exception: return None
+# (1) Buoi CHUA day ma da co diem = bia. Buoi sap toi khong the biet truoc HV noi hay do.
+rep("NANG", "18g Buoi WOW chua day xong ma da co diem",
+    [s(w, "wow_id") for w in R("DL14")
+     if code(w.get("wow_status")) != "completed"
+     and any(s(w, k) for k in _DIEM4 + ("wow_overall",))])
+# (2) Da day xong thi phai co DU bon tieu chi hoac KHONG co cai nao - nua voi la man hinh in ra
+#     mot khoang trong ngay giua bon o, va Overall tinh tren so lieu khuyet.
+rep("VUA", "18h Buoi WOW da day co diem nhung khong du bon tieu chi",
+    [s(w, "wow_id") for w in R("DL14")
+     if code(w.get("wow_status")) == "completed"
+     and 0 < len([k for k in _DIEM4 if s(w, k)]) < 4])
+# (3) Diem phai nam trong thang IELTS 0-9 va dung buoc 0.5.
+rep("NANG", "18i Diem WOW ngoai thang 0-9 hoac lech buoc 0.5",
+    [s(w, "wow_id") for w in R("DL14")
+     for k in _DIEM4 + ("wow_overall",)
+     if s(w, k) and (_fl(w.get(k)) is None or not (0 <= _fl(w.get(k)) <= 9)
+                     or abs(_fl(w.get(k)) * 2 - round(_fl(w.get(k)) * 2)) > 1e-9)])
+# (4) Overall phai BANG trung binh bon tieu chi lam tron 0.5. Neu khong thi hai con so tren cung
+#     mot man hinh noi hai chuyen khac nhau - dung benh "hai nguoi nhin hai file khac nhau".
+def _ovlech(w):
+    ds = [_fl(w.get(k)) for k in _DIEM4]
+    if any(d is None for d in ds): return False
+    ov = _fl(w.get("wow_overall"))
+    if ov is None: return False
+    return abs(ov - round(sum(ds) / 4 * 2) / 2) > 1e-9
+rep("NANG", "18j Overall WOW khong khop trung binh bon tieu chi",
+    [s(w, "wow_id") for w in R("DL14") if _ovlech(w)])
+
 # ══ IN KET QUA ═══════════════════════════════════════════════════════════
 # CA CO Y: nhung luat duoi day KHONG phai loi - du lieu demo co tinh dung nhu vay de man hinh
 # co canh bao ma xem. Truoc V9.40 chung bi cong chung vao "TONG BAN GHI LOI" va verify.sh doi

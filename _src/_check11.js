@@ -81,8 +81,11 @@ t("NAVTREE co 8 nhom (them nhom Cho duyet)", NAVTREE.length===8);
 /* V2 - nam hang cho phe duyet nay la NAM TRANG doc lap, khong con la nam tab cua mot hub.
    Hoi `DUYMAP[k]` va `navOwner(k)==="duyet"` la hoi ve quan he cha-con da khong con.
    Giu nguyen dieu can bao ve: du nam muc, khong lan `duyetgiao`, va moi muc la TRANG THAT. */
-t("nhom Cho duyet co du 5 muc phe duyet, moi muc la mot trang that", (function(){var G=NAVTREE.filter(function(x){return x.g==="Chờ duyệt"})[0];
- return G&&G.items.length===5&&G.items.indexOf("duyetgiao")<0&&G.items.every(function(k){return !!PBK[k]&&typeof RENDER[k]==="function"})})());
+/* 12/08: 5 -> 6 muc. Them "Duyet doi dot dong" (SALE-4 + SALE-5). Dieu can bao ve khong doi:
+   khong lan `duyetgiao` (no la mot TAB cua Giao viec, khong phai hang cho phe duyet), va moi
+   muc phai la mot TRANG THAT co ham ve. */
+t("nhom Cho duyet co du 6 muc phe duyet, moi muc la mot trang that", (function(){var G=NAVTREE.filter(function(x){return x.g==="Chờ duyệt"})[0];
+ return G&&G.items.length===6&&G.items.indexOf("duyetgiao")<0&&G.items.every(function(k){return !!PBK[k]&&typeof RENDER[k]==="function"})})());
 t("Viec cho nhan la mot TAB cua trang Giao viec", (function(){
  window.TKTAB="wait";var o="";try{o=RENDER.giaoviec()}catch(e){}
  return /tkTabSet\('wait'\)/.test(o)&&/Việc chờ nhận/.test(o)})());

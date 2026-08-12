@@ -233,6 +233,9 @@ echo "${Dam}== 5. KIEM THU TREN TRINH DUYET THAT ==${Het}"
 # (mot kho man, 14 trang, ~50 giay) nen khong co ly do gi de no vang mat o tang nhanh.
 chay "_checkmat do bang mat" "CHECKMAT (OK|BO QUA)" node _checkmat.js
 chay "_checkdrawer hinh hoc ngan keo" "CHECKDRAWER OK" node _checkdrawer.js
+# V2 12/08 - ACA doi "ten hoc vien o dau cung bam duoc". Do bang trinh duyet, khong bang regex:
+# ban regex dau tien dem 428 cho, that ra chi 101. Xem dau file _checklink.js.
+chay "_checklink ten nguoi bam duoc" "CHECKLINK OK" node _checklink.js
 chay "_checkcrumb vet duong di" "CHECKCRUMB OK" node _checkcrumb.js
 chay "_checklap khong noi hai lan" "CHECKLAP OK" node _checklap.js
 if [ $NHANH -eq 1 ]; then

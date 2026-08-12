@@ -184,10 +184,23 @@ t("bang lich dong theo dot DL06b co du lieu", rows("DL06b").length>0);
 })();
 
 /* ---- 7. LUAT CUNG ---- */
+/* CAT DUNG THAN HAM, KHONG DO BANG CUA SO KY TU CO DINH.
+   Ban cu hoi "trong 700 / 2600 ky tu sau `function X` co thay actGuard / persistSoon khong".
+   Ngay 12/08 no DO oan: `hvWowSave` dai them mot doan (WOW-2 them loai bai + lop + bon o diem)
+   nen `persistSoon()` bi day ra moc 3474 - VAN NAM TRONG THAN HAM (than dai 4013), chi la cua so
+   do hut. Mot bo kiem ma ket qua phu thuoc vao THAN HAM DAI BAO NHIEU thi no do do dai, khong do
+   cai no noi la dang do - va lan sau ai them mot dong tu te cung se thay mau do.
+   Ma nguon nay moi ham deu bat dau o dau dong, nen cat tu `function X` toi `\nfunction ` ke tiep
+   la ranh gioi that. */
+function than(f){
+ var i=SRC.indexOf("function "+f+"(");
+ if(i<0)return "";
+ var j=SRC.indexOf("\nfunction ",i+5);
+ return SRC.slice(i,j<0?SRC.length:j)}
 ["hvClassConfirm","hvClassRejectSave","hvAbsentSave","hvWowSave","hvPaidNotifySave"].forEach(function(f){
- t(f+" chan bam hai lan", new RegExp("function "+f+"[\\s\\S]{0,700}?actGuard\\(").test(SRC))});
+ t(f+" chan bam hai lan", /actGuard\(/.test(than(f)))});
 ["hvReq","hvClassConfirm","hvClassRejectSave","hvAbsentSave","hvWowSave"].forEach(function(f){
- t(f+" co goi persistSoon", new RegExp("function "+f+"[\\s\\S]{0,2600}?persistSoon\\(\\)").test(SRC))});
+ t(f+" co goi persistSoon", /persistSoon\(\)/.test(than(f)))});
 t("khong cam cung ngay nhac truoc han (doc CH2)", /paramOf\("installmentRemind_days"/.test(SRC));
 t("khong cam cung so ngay qua han (doc CH2)", /paramOf\("installmentLate_days"/.test(SRC));
 

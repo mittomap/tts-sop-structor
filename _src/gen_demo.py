@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # SINH DEMO MỚI TOÀN BỘ - neo quanh NGÀY CHẠY, phủ đủ tính năng app, liên kết chặt.
 import json, random, datetime as dt, os
-import collections
+import collections, unicodedata
 
 random.seed(7)
 NOW = dt.datetime.now().replace(second=0, microsecond=0)
@@ -134,6 +134,31 @@ for _st in STAFF:
     _kw = LEADER_TUVAN.get(_st.get("staff_id"))
     if _kw:
         _st["role"], _st["branch"] = _kw
+# ═══ V2 12/08 (SALE-8) - CAY BAO CAO CUA PHONG TU VAN PHAI DUNG BA CAP ════════════════════
+# Trưởng phòng Tư vấn: *"phân thành 2 cấp: em thấy hết tất cả các số liệu / leader center: được
+# thấy số liệu của bạn đó và những nhân viên dưới bạn đó"*. Anh Luân chốt phạm vi tính THEO CHI
+# NHÁNH, và bổ sung: *"nếu chi nhánh chưa có leader, thì chỉ mỗi trưởng phòng tư vấn có thể xem"*.
+# Cơ chế trong app (`myTeam`) đã đúng sẵn. Cái SAI nằm ở DỮ LIỆU: đo ra thì cây `reports_to` của
+# phòng Tư vấn lộn xộn - NV024 báo cáo cho NV022 (cũng là nhân viên, không phải leader) · NV022 /
+# NV025 / NV026 báo thẳng Trưởng phòng dù cơ sở của họ CÓ leader · NV023 (Cơ sở 2) lại báo cho
+# leader Cơ sở 3 · NV001 và NV002 không có ai quản.
+# Với cây sai thì cùng một app cho ra hai câu trả lời khác nhau về cùng một câu hỏi phân quyền -
+# và đó đúng là thứ không thể phát hiện bằng mắt. Dựng lại bằng LUẬT, không kê tay từng người:
+#   nhân viên  -> leader CÙNG CƠ SỞ nếu có, không có leader thì báo thẳng Trưởng phòng
+#   leader     -> Trưởng phòng
+#   trưởng phòng -> giữ nguyên (báo cáo lên Giám đốc)
+# Nhờ vậy Cơ sở 1 / Cơ sở 4 / Cơ sở Online không có leader, và số liệu ba nơi đó CHỈ Trưởng phòng
+# xem được - đúng câu anh Luân dặn, không phải viết thêm một dòng luật nào trong app.
+_tvTP = next((s["staff_id"] for s in STAFF if str(s.get("role", "")).startswith("sales_manager")), "")
+_tvLeader = {str(s.get("branch") or ""): s["staff_id"]
+             for s in STAFF if str(s.get("role", "")).startswith("sales_leader")}
+if _tvTP:
+    for _st in STAFF:
+        _r = str(_st.get("role") or "")
+        if _r.startswith("sales_leader"):
+            _st["reports_to"] = _tvTP
+        elif _r.startswith("sales_staff"):
+            _st["reports_to"] = _tvLeader.get(str(_st.get("branch") or ""), _tvTP)
 # ═══ V9.99v - NGƯỜI NGHỈ VIỆC, VIỆC BÀN GIAO LẠI CHO AI ═══════════════════════════════════
 # Anh Luân 05/08: *"Bạn Đào kế toán nghỉ rồi, em đẩy hết dữ liệu demo qua trưởng phòng kế toán
 # luôn nghen"*. Bỏ NGAY Ở ĐÂY, trước khi mọi bảng được sinh ra - như vậy không dòng nào trong
@@ -1822,6 +1847,93 @@ for h in hws:
     elif hs.startswith("submitted") and not str(h["graded_at"]).strip(): h["next_action"]="Chấm bài trong 48h (slaHomeworkGrading_hours)."
     elif hs.startswith("missing"): h["next_action"]="Nhắc HV nộp bù + báo học vụ nếu tái diễn."
     else: h["next_action"]=""
+# ═══ V2 12/08 (SALE-2 / SALE-3) - COT CON THIEU CHO LEAD VA HOC VIEN ═════════════════════
+# SALE-2, anh Luân chốt: *"trường hợp 1 số điện thoại khác có liên kết với 1 lead có sẵn, thì cho
+# phép kết nối vào như số liên hệ thứ 2 hoặc số liên hệ của người thân"*. DL02 chỉ có ĐÚNG MỘT cột
+# `phone_number` - không có chỗ nào để đặt số thứ hai, nên phải thêm cột, theo đúng lối DL09 đã có
+# sẵn `emergency_contact_name/phone/relation`.
+# SALE-3: app phải hiện nút "gửi email" khi có email và "gửi Zalo" khi có Zalo. Dữ liệu đang lệch
+# đúng hai chiều ngược nhau - LEAD có `zalo_id` mà không có email, HỌC VIÊN có `email` mà không có
+# Zalo - nên ở mỗi cổng luôn có đúng một nút không bao giờ hiện. Bù cột còn thiếu cho cả hai.
+_HOP_MAIL = ["gmail.com", "gmail.com", "yahoo.com", "outlook.com"]
+def _mailTu(ten, ma):
+    kd = unicodedata.normalize("NFD", str(ten or "")).replace("đ", "d").replace("Đ", "D")
+    kt = "".join(c for c in kd.lower() if "a" <= c <= "z") or "hv"
+    return kt[:14] + str(ma or "")[-3:] + "@" + random.choice(_HOP_MAIL)
+_QUANHE = ["Bố", "Mẹ", "Anh/Chị", "Người thân", "Số phụ của khách"]
+for _l in leads:
+    _l.setdefault("email", "")
+    if not str(_l.get("email") or "").strip() and random.random() < 0.62:
+        _l["email"] = _mailTu(_l.get("full_name"), _l.get("lead_id"))
+    # Số liên hệ thứ hai: chỉ MỘT PHẦN lead có - ngoài đời cũng vậy, và demo phải cho thấy CẢ HAI
+    # trường hợp (có số phụ / không có) thì màn hình mới lộ ra được cả hai lối đi.
+    _l.setdefault("phone_2", ""); _l.setdefault("phone_2_relation", "")
+    if not str(_l.get("phone_2") or "").strip() and random.random() < 0.28:
+        _l["phone_2"] = phone(); _l["phone_2_relation"] = random.choice(_QUANHE)
+    # SALE-9: NGAY DUOC GIAO. Khong co cot nay thi moc "om qua lau" phai muon tam ngay TAO lead -
+    # hai chuyen khac han: mot lead tao thang 5 co the vua duoc giao cho nguoi moi tuan truoc.
+    # Mac dinh giao ngay khi tao; mot phan lead da qua tay nen ngay giao tre hon (ban giao truoc do).
+    if str(_l.get("assigned_to") or "").strip():
+        _t0 = _l.get("lead_created_time") or ""
+        try:
+            _d0 = dt.datetime.strptime(_t0, "%d/%m/%Y %H:%M")
+            _l.setdefault("assigned_at", F(_d0 + days(random.choice([0, 0, 0, 3, 7, 14]))))
+        except Exception:
+            _l.setdefault("assigned_at", _t0)
+    else:
+        _l.setdefault("assigned_at", "")
+for _s in students:
+    _s.setdefault("zalo_id", "")
+    if not str(_s.get("zalo_id") or "").strip() and random.random() < 0.7:
+        _s["zalo_id"] = str(_s.get("phone_number") or "")
+
+# ---------- WOW-3: BON TIEU CHI CHAM SPEAKING + LOAI BAI / HINH THUC / PHAN THI ----------
+# Team WOW hoi *"viec nhap ket qua da nam ben OLMS - xem xet lai nhap ben nao"*; anh Luan chot
+# *"e cu lam tren app cua minh, sau nay dev tinh, cho nao trung lap dev tu can"*. App vi the GIU
+# o nhap ket qua. Man "Chi tiet dang ky" (lwXemO) da ve san sau o FC/LR/GRA/PR + Overall theo
+# dung man OLMS team dung - nhung DL14 khong he co cot nao trong so do, nen mo ra thay "-" het.
+# Ve mot cai o roi khong bao gio do vao thi cai o do la trang tri. Gieo tai NGUON.
+_WOW_LOAI=["practice (Luyện tập)","entry_test (Test đầu vào)","midterm (Kiểm tra giữa khóa)","final (Kiểm tra cuối khóa)"]
+_WOW_PHAN={"Speaking (Nói)":["Part 1","Part 2","Part 3","Part 1 + Part 2","Full test"],
+           "Writing (Viết)":["Task 1","Task 2","Task 1 + Task 2"],
+           "Listening (Nghe)":["Section 1-2","Section 3-4","Full test"],
+           "Reading (Đọc)":["Passage 1","Passage 2-3","Full test"]}
+_bandCuaHV={}
+for _l in leads:
+    if str(_l.get("target_band") or "").strip(): _bandCuaHV[_l["lead_id"]]=str(_l["target_band"]).strip()
+_leadCuaHV={}
+for _e in enrs:
+    if _e.get("student_id") and _e.get("lead_id"): _leadCuaHV.setdefault(_e["student_id"],_e["lead_id"])
+_clsCuaHV={}
+for _o in obs:
+    if _o.get("student_id") and _o.get("class_id"): _clsCuaHV.setdefault(_o["student_id"],_o["class_id"])
+_tenLop={c["class_id"]:c.get("class_name") or c["class_id"] for c in CLS}
+def _lamTron5(x): return round(x*2)/2.0
+for w in wows:
+    _cid=_clsCuaHV.get(w["student_id"],"")
+    w["class_id"]=_cid
+    w["class_id_name"]=_tenLop.get(_cid,"")
+    w["target_band"]=_bandCuaHV.get(_leadCuaHV.get(w["student_id"],""),"")
+    # Loai bai: buoi HV tu dat gan nhu luon la LUYEN TAP (dung cai WOW-2 cho vao thang, khong cho
+    # xac nhan); ba loai con lai la bai KIEM TRA nen van phai NV WOW xac nhan.
+    if str(w.get("wow_booked_by","")).startswith("student"):
+        w["wow_lesson_type"]=_WOW_LOAI[0] if random.random()<0.85 else random.choice(_WOW_LOAI[1:])
+    else:
+        w["wow_lesson_type"]=random.choice(_WOW_LOAI)
+    w["wow_mode"]=random.choice(["online (Trực tuyến)","offline (Tại trung tâm)","offline (Tại trung tâm)"])
+    w["wow_parts"]=random.choice(_WOW_PHAN.get(w["wow_skill"],["Full test"]))
+    # Diem CHI CO o buoi da day xong - buoi sap toi ma da co diem la vo ly, `check_logic` bat.
+    if str(w.get("wow_status","")).startswith("completed"):
+        _b=6.0
+        try: _b=float(str(w["target_band"]).split("-")[0]) if w["target_band"] else 6.0
+        except Exception: _b=6.0
+        _diem=[]
+        for _k in ("wow_score_fc","wow_score_lr","wow_score_gra","wow_score_pr"):
+            _v=min(9.0,max(3.0,_lamTron5(_b+random.choice([-1.0,-0.5,-0.5,0,0,0.5]))))
+            w[_k]=("%g"%_v); _diem.append(_v)
+        w["wow_overall"]="%g"%_lamTron5(sum(_diem)/4.0)
+    else:
+        for _k in ("wow_score_fc","wow_score_lr","wow_score_gra","wow_score_pr","wow_overall"): w[_k]=""
 for w in wows:
     ws_=w["wow_status"]
     if ws_.startswith("booked"): w["next_action"]="Xác nhận buổi với HV + GV."
@@ -1984,6 +2096,12 @@ out["enums"] = _en
 _ss = _en.setdefault("enum_wow_slot_status", [])
 if not any(str(x).startswith("unavailable") for x in _ss):
     _ss.append("unavailable (Không nhận)")
+# WOW-2/WOW-3: hai danh muc moi. `wow_lesson_type` khong phai trang tri - no la thu QUYET DINH
+# buoi HV tu dat co phai cho NV WOW xac nhan khong (luyen tap thi vao thang, bai kiem tra thi cho).
+# Ghi de bang danh sach chuan de ban base cu khong giu lai bo gia tri thieu.
+_en["enum_wow_lesson_type"]=["practice (Luyện tập)","entry_test (Test đầu vào)",
+                             "midterm (Kiểm tra giữa khóa)","final (Kiểm tra cuối khóa)"]
+_en["enum_wow_mode"]=["online (Trực tuyến)","offline (Tại trung tâm)"]
 
 _ch2 = (out.get("config") or {}).setdefault("ch2", [])
 _ch2By = {str(x.get("name")): x for x in _ch2}
@@ -2201,6 +2319,23 @@ for s_ in _xong[-2:]:
     s_["class_end_actual"]=""; s_["teacher_late_minutes"]=""
     s_["notes"]=(s_.get("notes") or "").strip() or "GV quên bấm giờ ra - nhân sự nhắc bổ sung"
     _ochet.append("buoi thieu moc gio")
+# 3. LEAD QUA HAN CHAM SOC (V2 12/08, SALE-9). Do that tren ban demo: 82 lead con song, KHONG
+#    MOT LEAD NAO qua moc - the "Du dieu kien thu ve" hien 0 va nut "Thu lead qua han" khong co
+#    so, tuc mot tinh nang vua dung xong ma nguoi mo demo khong bao gio nhin thay.
+#    Gieo DU HAI VE de ca hai moc deu co dip len tieng: bon lead "bo be" (lau khong ai lien he)
+#    va ba lead "om lau" (duoc giao tu lau ma van chua ra ket qua, tuy van co lien he gan day).
+_ung=[L for L in leads if L["lead_status"].split(" ")[0] in ("new","contacted","test_done")
+      and L.get("assigned_to")]
+for L in _ung[:4]:
+    _cu=NOW-days(random.randint(18,40))
+    L["last_contact_time"]=F(_cu)
+    L["next_followup_time"]=""
+    L["lead_note"]=(L.get("lead_note") or "").strip()
+    _ochet.append("lead qua han cham soc (bo be)")
+for L in _ung[4:7]:
+    L["assigned_at"]=F(NOW-days(random.randint(50,80)))
+    L["last_contact_time"]=F(NOW-days(random.randint(1,5)))    # van goi, nhung om mai khong ra
+    _ochet.append("lead om qua lau")
 print("O CHET DA GIEO TINH HUONG:", ", ".join(sorted(set(_ochet))) or "khong con")
 # feature coverage
 def cnt(pred,arr): return sum(1 for x in arr if pred(x))

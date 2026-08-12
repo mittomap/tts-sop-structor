@@ -147,6 +147,49 @@ t("hoan tien goi ham loi insSync", /function duyetRefundRun[\s\S]{0,2000}?insSyn
  t("dot dau chiem dung ty le da chon", Math.abs(num(L[0].due_amount)-Math.round(num(e.final_fee)*0.4/1000)*1000)<=1000);
 })();
 
+/* ---- 5b. DOI DOT DONG PHAI QUA MOT NGUOI DUYET (V2 12/08, SALE-4 + SALE-5) ----
+   Truong phong Tu van: *"khi ban sale chia lai dot dong thi em se phai duyet qua thi moi hop le
+   nha anh, chu khong chia tum lum ta la"*. Do CA HAI VE: nguoi khong co quyen thi KHONG duoc ghi
+   vao DL06b (phai de lai mot yeu cau), nguoi co quyen thi ghi thang.
+   Cau dau tien la cau da bat duoc mot loi that: tai khoan toan quyen mang ma "ADMIN" - khong co
+   trong DL01 - nen ban dau `dotAiDuyet()` khoa luon cua duyet cua chinh nguoi co moi quyen. */
+(function(){
+ var e=rows("DL06").filter(function(x){return !isc(x.enrollment_status,"cancelled")&&num(x.final_fee)>0})[1]
+     ||rows("DL06").filter(function(x){return !isc(x.enrollment_status,"cancelled")&&num(x.final_fee)>0})[0];
+ setRole("all");
+ t("tai khoan toan quyen duyet duoc doi dot dong", dotAiDuyet()===true);
+ var _cs=CURSTAFF;
+ var sale=rows("DL01").filter(function(s){return /^sales_staff/.test(ecode(s.role))})[0];
+ var tp=rows("DL01").filter(function(s){return /_manager$/.test(ecode(s.role))})[0];
+ var ke=rows("DL01").filter(function(s){return /^account/.test(ecode(s.role))})[0];
+ /* DONG VAI CHO DUNG: doi moi CURSTAFF thi PHAM VI van la cua tai khoan toan quyen, va
+    `dotAiDuyet()` hoi pham vi truoc. Phai vao bang dung cua nhu nguoi that: GATE_SID + setRole. */
+ /* Vao dung nhu `_checkmien` va `_checknguoi` da lam: GATE_SID + applyScope + setRole("all").
+    `setRole("<ten vai>")` mot minh khong dung - khoa vai khong phai khoa nhom pham vi. */
+ function vao(sid){window.GATE_SID=sid;applyScope(sid);setRole("all");}
+ vao(sale?sale.staff_id:"NV001");
+ t("NV tu van KHONG duyet duoc doi dot dong", dotAiDuyet()===false);
+ if(tp){vao(tp.staff_id);t("truong phong duyet duoc", dotAiDuyet()===true)}
+ if(ke){vao(ke.staff_id);t("phong ke toan duyet duoc", dotAiDuyet()===true)}
+ /* NV tu van bam Luu lich dot -> KHONG duoc doi DL06b, phai de lai mot yeu cau cho duyet */
+ vao(sale?sale.staff_id:"NV001");
+ var truoc=insOf(e.enrollment_id).length, choTruoc=dotCho().length;
+ var d=new Date(Date.now()+3*864e5);function z(n){return n<10?"0"+n:n}
+ reset();setF({ip_n:"4",ip_d0:d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate()),ip_gap:"20",ip_dep:"50"});
+ insPlanSave(e.enrollment_id);
+ t("sale chia lai dot -> lich dot GIU NGUYEN", insOf(e.enrollment_id).length===truoc);
+ t("sale chia lai dot -> de lai mot yeu cau cho duyet", dotCho().length===choTruoc+1);
+ /* nguoi co quyen DUYET -> lich dot doi that theo dung yeu cau */
+ window.GATE_SID="";applyScope("");setRole("all");
+ var yc=dotCho().filter(function(r){return String(r.enrollment_id)===String(e.enrollment_id)})[0];
+ reset();dotDuyet(yc.req_id);
+ t("duyet xong -> lich dot doi that theo yeu cau", insOf(e.enrollment_id).length===4);
+ t("duyet xong -> yeu cau khong con nam trong hang cho", dotCho().indexOf(yc)<0);
+ t("duyet xong -> van giu tong tien = hoc phi",
+   Math.abs(insOf(e.enrollment_id).reduce(function(a,x){return a+num(x.due_amount)},0)-num(e.final_fee))<=1);
+ window.GATE_SID="";applyScope("");setRole("all");CURSTAFF=_cs;
+})();
+
 /* ---- 6. IN LICH DOT VAO PHIEU + cau hinh ---- */
 t("phieu in co LICH DONG THEO DOT", /LỊCH ĐÓNG HỌC PHÍ THEO ĐỢT/.test(SRC));
 ["installmentGap_days","installmentRemind_days","installmentLate_days","installmentDepositPercent"].forEach(function(k){

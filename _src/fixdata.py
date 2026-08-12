@@ -1214,6 +1214,80 @@ log.append("14d. Lịch đóng theo đợt: %d đợt cho %d đơn (quá hạn %
            "| thêm 4 tham số CH2 | next_payment_due nay suy ra từ đợt chưa đóng gần nhất"
            % (len(sched), len(set(x["enrollment_id"] for x in sched)), _od, _du, _up))
 
+# ═══ 14z. DL27 - YEU CAU DOI DOT DONG (V2 12/08, SALE-4 + SALE-5) ═══════════════════════════
+# Truong phong Tu van: *"cho cho duyet nay duoc cho em xin them cai duyet gia han dot dong nua"*
+# va *"khi ban sale chia lai dot dong thi em se phai duyet qua thi moi hop le"*.
+# Gieo NGAY SAU khi DL06b co that - dat o gen_demo.py thi chua co dot nao de tro toi.
+# Bon yeu cau, du bon loi di: cho duyet (gia han, co anh minh chung) · cho duyet (chia lai dot) ·
+# da duyet · da tu choi. Hang cho nao mo ra cung phai co viec that, khong thi nguoi xem demo ket
+# luan "chua lam" - da can dung mot lan voi bang Giao viec.
+_dotSale = [s for s in dl["DL01"] if str(s.get("role", "")).startswith("sales_staff")]
+_dotTP = next((s for s in dl["DL01"] if str(s.get("role", "")).startswith("sales_manager")), None)
+_donDot = {}
+for _x in sched:
+    _donDot.setdefault(str(_x.get("enrollment_id")), []).append(_x)
+_donCo = [e for e in dl["DL06"] if str(e.get("enrollment_id")) in _donDot
+          and len(_donDot[str(e.get("enrollment_id"))]) > 1]
+_donCo.sort(key=lambda e: str(e.get("enrollment_id")))      # thu tu on dinh, khong theo thu tu bam
+
+
+def _dotReq(i, don, loai, tt, lydo, minhchung="", duyetBoi=None, ghichu=""):
+    _ds = sorted(_donDot[str(don["enrollment_id"])], key=lambda x: int(x.get("installment_no") or 0))
+    _chua = [x for x in _ds if not str(x.get("status", "")).startswith("paid")]
+    _dot = _chua[0] if _chua else _ds[0]
+    _hanCu = str(_dot.get("due_date") or "")
+    _hanMoi = ""
+    if _hanCu:
+        try:
+            _hanMoi = (datetime.datetime.strptime(_hanCu, "%d/%m/%Y")
+                       + datetime.timedelta(days=[7, 10, 14][i % 3])).strftime("%d/%m/%Y")
+        except Exception:
+            _hanMoi = ""
+    _gui = _dotSale[i % len(_dotSale)] if _dotSale else {}
+    _laGiaHan = loai.startswith("extend")
+    return {"req_id": "YCD-%03d" % i,
+            "req_time": fmt(NOW - datetime.timedelta(days=[2, 4, 6, 9][i % 4])),
+            "req_by": _gui.get("staff_id", ""), "req_by_name": _gui.get("full_name", ""),
+            "req_type": loai,
+            "enrollment_id": don["enrollment_id"],
+            "student_id": don.get("student_id", ""),
+            "student_id_name": don.get("student_id_name", ""),
+            "installment_no": str(_dot.get("installment_no") or "") if _laGiaHan else "",
+            "due_old": _hanCu if _laGiaHan else "",
+            "due_new": _hanMoi if _laGiaHan else "",
+            "amount": str(int(float(don.get("final_fee") or don.get("total_fee") or 0) or 0)),
+            "plan": "" if _laGiaHan else json.dumps({"n": 3, "gap": 30, "dep": 40, "d0": ""}),
+            "reason": lydo, "evidence": minhchung,
+            "req_status": tt,
+            "decided_by": (duyetBoi or {}).get("staff_id", ""),
+            "decided_by_name": (duyetBoi or {}).get("full_name", ""),
+            "decided_at": fmt(NOW - datetime.timedelta(days=1)) if duyetBoi else "",
+            "decide_note": ghichu}
+
+
+_dotReqs = []
+if _donCo:
+    _m = [_donCo[k % len(_donCo)] for k in range(4)]
+    _dotReqs.append(_dotReq(1, _m[0], "extend (Xin gia hạn đợt)", "pending (Chờ duyệt)",
+                            "Khách báo lương công ty trả chậm, xin lùi hạn 10 ngày.",
+                            "https://drive.google.com/file/d/demo-zalo-gia-han/view"))
+    _dotReqs.append(_dotReq(2, _m[1], "replan (Xin chia lại đợt)", "pending (Chờ duyệt)",
+                            "Khách xin chia 3 đợt thay vì 2, đợt đầu 40%."))
+    _dotReqs.append(_dotReq(3, _m[2], "extend (Xin gia hạn đợt)", "approved (Đã duyệt)",
+                            "Phụ huynh đi công tác, xin lùi một tuần.",
+                            "https://drive.google.com/file/d/demo-zalo-cong-tac/view", _dotTP, ""))
+    _dotReqs.append(_dotReq(4, _m[3], "extend (Xin gia hạn đợt)", "rejected (Đã từ chối)",
+                            "Khách xin lùi thêm lần thứ ba.", "", _dotTP,
+                            "Đã gia hạn 2 lần, không lùi thêm - hẹn khách đóng đúng hạn."))
+dl["DL27"] = _dotReqs
+# Danh muc cua bang moi: khai o NGUON de moi lan dung lai deu co, va de nhan enum in ra dung
+# nguyen van CH1 ("code (Nhãn tiếng Việt)").
+_enm = d.setdefault("enums", {})
+_enm["enum_dot_req_type"] = ["extend (Xin gia hạn đợt)", "replan (Xin chia lại đợt)"]
+_enm["enum_request_status"] = ["pending (Chờ duyệt)", "approved (Đã duyệt)", "rejected (Đã từ chối)"]
+log.append("14z. DL27 yêu cầu đổi đợt đóng: %d yêu cầu (%d chờ duyệt) + 2 danh mục mới"
+           % (len(_dotReqs), sum(1 for x in _dotReqs if x["req_status"].startswith("pending"))))
+
 # ═══ 14ter. ĐƠN XIN NGHỈ ĐANG CHỜ DUYỆT (V9.29) ══════════════════════════
 # Màn duyệt xin nghỉ mở ra mà rỗng thì không ai biết nó tồn tại - đúng nguyên tắc
 # "hàng chờ quyết định phải SỐNG" mà hội đồng đã chốt. Gieo vài đơn thật cho các buổi
