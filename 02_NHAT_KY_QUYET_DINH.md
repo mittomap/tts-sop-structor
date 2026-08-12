@@ -266,6 +266,42 @@
 > *Một bộ kiểm đo CHẤT LƯỢNG của những thứ nó chạm tới, mà không đếm xem nó chạm được bao nhiêu
 > thứ, thì nó im lặng đúng lúc phạm vi của nó teo lại.*
 >
+> ### 🟠 11/08 - "THIẾT KẾ NÀY NHÌN LUỘM THUỘM QUÁ EM" - VÀ PHÉP ĐO M6 NÓ SINH RA
+>
+> Anh Luân gửi ảnh chụp dải **Cần chú ý**. Đúng, và chỗ hỏng nằm ở ngay ô đầu tiên.
+>
+> **Gốc, đo bằng trình duyệt chứ không nhìn bằng mắt:** `.cbso` không bị chặn bề rộng. Số tiền
+> "181.900.000đ" cỡ 18px đậm ăn **122px** trong một ô rộng 272px, nên nhãn bên cạnh chỉ còn
+> **75px** — câu "Đến hạn thu, tính tới hôm nay" rơi **một chữ mỗi dòng, 3 dòng**. Lưới lại bắt
+> mọi ô cùng hàng cao bằng nhau, nên **một ô hỏng kéo cả hàng cao gấp rưỡi** (78px so với 48px).
+> Đó là lý do nhìn vào thấy luộm thuộm — không phải "màu xấu" hay "chữ xấu".
+>
+> **Hai lối chữa đều sai, không chọn cái nào:** rút gọn số tiền là BỚT thông tin (đúng cái luật đã
+> giữ hôm 10/08 khi nới rộng ô doanh thu thay vì viết tắt); thu nhỏ chữ thì 122px xuống 99px, vẫn
+> chật. **Cho ô mang số tiền chiếm HAI CỘT** thì giữ nguyên con số thật mà nhãn vẫn nằm trọn một
+> dòng. Đo trước/sau ở ba khổ màn: nhãn **75px/3 dòng → 378px/1 dòng**, số mức chiều cao khác nhau
+> **48·63·78 → 50·63**, điện thoại phần lớn về đều 50px.
+>
+> **PHÉP ĐO MỚI - M6 "chữ bị bóp thành một cột hẹp".** Năm phép đo cũ đều không thấy, và đều có lý
+> do đọc được: M1 hỏi "chữ có rộng hơn chỗ nó có không" → KHÔNG, nó vừa khít vì đã tự xuống dòng ·
+> M3 hỏi ô hẹp giữa khoảng trống → chỗ này không thừa chỗ · M5 chỉ soi ô CHỈ CHỨA SỐ · `_checkui`
+> hỏi tràn ngang và nút quá nhỏ → đều không dính. **Chữ vẫn đọc được, không cắt, không tràn. Nó
+> chỉ XẤU — và trước hôm nay không thước nào đo được cái xấu.**
+> Câu hỏi của M6 đặt **tổng quát**: *một khối chữ xuống từ 3 dòng trở lên MÀ bề rộng chưa tới 40%
+> khối cha thì nó không "dài" — nó đang bị một thằng anh em cùng hàng bóp lại.*
+>
+> **M6 làm được hai việc ngay lượt chạy đầu:** bắt **chính lỗi em vừa tạo ra** (cắm `nowrap +
+> ellipsis` cho ô rộng, mà trên điện thoại ô ấy quay về một cột → nhãn bị cắt 15px; đã bỏ hẳn) ·
+> và lòi ra **9 chỗ cùng một họ ở các màn khác trên khổ điện thoại** — hàng tiêu đề khối `.ph` và
+> hàng bước `.psub`: tiêu đề, câu gợi ý và cụm nút giành nhau một hàng 360px rồi cả ba cùng vỡ.
+> Nặng nhất: `<b>Học viên nhận bài (10)</b>` còn **34px, vỡ 5 dòng**. Chữa bằng `flex-wrap`.
+> Một lần ném oan phải gỡ: lượt đầu M6 báo 43 chỗ, gần hết là ô trong bảng — bảng có cột kéo được,
+> ép ô bảng không được hẹp là ép bảng phải rộng vô hạn. Đã miễn, dùng lý do đã khai sẵn ở `batNat`.
+>
+> **Và một bẫy của chính phép đo, cắn ngay khi dựng:** lượt đầu probe in ra **toàn số 0** — 12 ô
+> tìm thấy mà cái nào cũng rộng 0px. Không phải app hỏng: `div.app` đang `display:none` vì màn
+> đăng nhập che. ***Đo một thứ đang bị che thì mọi con số đều là 0, và số 0 trông y hệt một kết quả.***
+>
 > ### 🟢 10/08 - "CÒN TÍNH NĂNG NÀO CHƯA CÓ KO?" - ĐẾM LẠI CẢ 52 SHEET, CÒN ĐÚNG MỘT MẢNG TRẮNG
 >
 > Bài học DL19 còn nóng nên lần này em không trả lời bằng trí nhớ: mở file SOP ra, liệt kê cả **52

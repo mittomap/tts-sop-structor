@@ -1249,3 +1249,56 @@ rong ay. Do dung la thu phai KEU.
 *Mot bo kiem do CHAT LUONG cua nhung thu no cham toi, ma khong dem xem no cham duoc bao nhieu thu,
 thi no im lang dung luc pham vi cua no teo lai.* Cung ho voi luat "no silent caps": cho nao bo bot
 pham vi thi phai noi ra, khong thi xanh doc thanh "da phu het".
+
+## 11/08 - "THIET KE NAY NHIN LUOM THUOM QUA EM" - VA PHEP DO MOI (M6) NO SINH RA
+
+Anh Luan gui anh chup dai **Can chu y** roi noi mot cau. Dung, va cho hong nam o dung o dau tien.
+
+**Goc, do bang trinh duyet chu khong nhin bang mat:** `.cbso` KHONG bi chan be rong. So tien
+"181.900.000d" co 18px dam an **122px** trong mot o rong 272px, nen `.cbtx` ben canh chi con
+**75px** - va cau "Den han thu, tinh toi hom nay" roi **MOT CHU MOI DONG, 3 dong**. Luoi lai bat
+moi o cung hang cao bang nhau, nen **mot o hong keo ca hang cao gap ruoi** (78px so voi 48px).
+Do la ly do nhin vao thay luom thuom, chu khong phai "mau xau" hay "chu xau".
+
+**Hai loi chua deu sai, khong chon cai nao:** rut gon so tien la BOT thong tin (dung cai luat da
+giu hom 10/08 khi noi rong o doanh thu thay vi viet tat); thu nho chu thi 122px xuong 99px, van
+chat. **Cho o mang so tien CHIEM HAI COT** thi giu nguyen con so that ma nhan van nam tron mot
+dong. Cong `flex:none` cho `.cbso` - thieu no thi o so vua khong chiu co vua khong nhuong cho.
+
+Do truoc/sau, 3 kho man, bang trinh duyet that:
+
+| | truoc | sau |
+|---|---|---|
+| nhan o tien (1440px) | 75px, **3 dong** | 378px, **1 dong** |
+| so muc chieu cao khac nhau | 48 / 63 / 78 | 50 / 63 |
+| dien thoai 390px | 48 / 63 | phan lon 50 |
+
+**PHEP DO MOI - M6 "chu bi bop thanh mot cot hep"** trong `_checkmat.js`. Nam phep do cu deu
+khong thay, va deu co ly do rieng doc duoc:
+- **M1** hoi "chu co rong hon cho no co khong" -> KHONG, no vua khit vi da tu xuong dong;
+- **M3** hoi o hep giua khoang trong -> cho nay khong thua cho;
+- **M5** chi soi cac o CHI CHUA SO;
+- `_checkui` hoi tran ngang / nut qua nho -> deu khong dinh.
+Chu van doc duoc, khong cat, khong tran. **No chi XAU** - va truoc hom nay khong thuoc nao do
+duoc cai xau.
+Cau hoi cua M6, dat TONG QUAT chu khong canh rieng dai canh bao: *mot khoi chu xuong tu 3 dong
+tro len MA be rong chua toi 40% khoi cha thi no khong "dai" - no dang bi mot thang anh em cung
+hang bop lai.*
+
+**M6 lam duoc hai viec ngay lan chay dau:**
+1. **Bat chinh loi em vua tao ra**: em cam `nowrap + ellipsis` cho o rong, ma tren dien thoai o
+   ay quay ve mot cot -> nhan bi CAT 15px. Da bo han cai nowrap (do ra nhan nam tron mot dong
+   that roi, cai nowrap khong giai quyet gi ma chi de ra mot cho cat chu).
+2. **Lo ra 9 cho CUNG MOT HO o cac man khac, tren kho dien thoai** - deu la hang tieu de khoi
+   (`.ph`) va hang buoc (`.psub`): tieu de, cau goi y va cum nut gianh nhau mot hang 360px roi
+   ca ba cung vo. Nang nhat: `<b>Hoc vien nhan bai (10)</b>` con **34px, vo 5 dong**; cau goi y
+   con **38px, vo 10 dong**. Chua bang `flex-wrap` o kho hep.
+
+**Mot lan nem oan phai go:** ban dau M6 bao 43 cho, gan het la `.TD`/`.TH` - o trong bang. Bang
+co cot keo duoc va nut Cot, nguoi dung tu chinh be rong; ep o bang khong duoc hep la ep bang phai
+rong vo han. Da mien o bang, dung ly do da khai san o phep `batNat`.
+
+**Va mot bay cua chinh phep do, cắn ngay khi dung:** luot dau probe in ra **toan so 0** - 12 o
+tim thay ma cai nao cung rong 0px. Khong phai app hong: `div.app` dang `display:none` vi man
+DANG NHAP che, harness phai tu khai "da chao roi" vao localStorage nhu `_checkui` van lam. *Do
+mot thu dang bi che thi moi con so deu la 0, va so 0 trong y het mot ket qua.*

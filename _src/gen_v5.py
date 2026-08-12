@@ -351,6 +351,14 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .cols{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}@media(max-width:1050px){.cols{grid-template-columns:1fr}}
 .panel{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:16px}
 .ph{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+/* KHỔ ĐIỆN THOẠI: cho tiêu đề khối XUỐNG DÒNG thay vì tranh chỗ với dòng chú thích bên cạnh.
+   Phép đo M6 (thêm 11/08, sau khi anh Luân nói dải cảnh báo "nhìn luộm thuộm") đo được 9 chỗ
+   cùng một họ với ô số tiền: trên màn 390px, `<b>Học viên nhận bài (10)</b>` bị bóp còn **34px**
+   và vỡ thành **5 dòng**, vì nó phải chia một hàng 360px với dòng chú thích đứng cạnh.
+   Không chữ nào bị cắt, không chỗ nào tràn - nên bốn phép đo cũ đều xanh. Nó chỉ XẤU.
+   Cho `flex-wrap` là tiêu đề chiếm trọn một dòng, chú thích rơi xuống dòng dưới - dài thêm một
+   dòng nhưng đọc được, thay vì hai cột chữ vụn cạnh nhau. */
+@media(max-width:620px){.ph{flex-wrap:wrap}.ph .mini{margin-left:0}}
 .ph b{font-size:13px;font-weight:700}.ph .mini{margin-left:auto;display:flex;gap:6px}
 .pbody{padding:6px 6px}
 /* `white-space:nowrap` + `inline-flex`: nut cao 29px ma chu rot xuong hai dong thi chu tran ra
@@ -1163,6 +1171,10 @@ table.dt tbody tr.clk.on td{font-weight:600}
 @media(max-width:600px){.planbar .pbi b{white-space:normal;max-width:none;overflow:visible}
  .planbar .pbi{min-width:132px}}
 .psub{display:flex;align-items:center;gap:10px;padding:11px 16px;border-top:1px solid var(--line);background:#FAFBFD}
+/* Cùng bệnh với `.ph`, nặng hơn vì hàng này có tới BỐN thứ: số bước · tiêu đề · câu gợi ý · cụm
+   nút. Trên màn 390px, `<b>Học viên nhận bài (10)</b>` bị bóp còn 34px và vỡ 5 dòng, câu gợi ý
+   còn 38px vỡ 10 dòng. Cho xuống dòng ở khổ hẹp. */
+@media(max-width:620px){.psub{flex-wrap:wrap}.psub .mini{margin-left:0;width:100%}}
 .psub b{font-size:12.5px;font-weight:700}.psub .mini{margin-left:auto;display:flex;gap:6px}
 .stepn{font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--navy);background:rgba(46,90,136,.10);border-radius:20px;padding:3px 8px;flex:none}
 .pfoot{display:flex;align-items:center;justify-content:flex-end;gap:14px;padding:12px 15px;border-top:1px solid var(--line);background:#FAFBFD;border-radius:0 0 11px 11px}
@@ -1608,12 +1620,23 @@ table.dt tbody tr.clk.on td{font-weight:600}
    dùng `border-left:3px` màu đỏ/vàng để nói mức độ - `_checkux` bắt ngay, và luật đúng: một dải
    màu ở mép là trang trí, nó không mang thông tin nào mà chính con số và cái chấm không nói được.
    Nay mức độ nói bằng hai thứ đọc được: MÀU CỦA CON SỐ, và một CHẤM TRẠNG THÁI có hình. */
-.cbo{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer;background:#fff}
+.cbo{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer;background:#fff;min-height:50px}
+/* Ô mang SỐ TIỀN chiếm HAI cột. Anh Luân 11/08: *"thiết kế này nhìn luộm thuộm quá em"* - và
+   đúng ở chỗ tệ nhất: `.cbso` không bị chặn bề rộng, nên "181.900.000đ" cỡ 18px đậm ăn ~130px
+   trong một ô rộng 230px, `.cbtx` còn ~37px và nhãn "Đến hạn thu, tính tới hôm nay" rơi MỘT CHỮ
+   MỖI DÒNG. Lưới lại bắt mọi ô cùng hàng cao bằng nhau, nên một ô hỏng kéo cả hàng cao gấp đôi.
+   Hai lối chữa đều sai: rút gọn số tiền là BỚT thông tin, mà thu nhỏ chữ thì vẫn chật.
+   Cho nó hai cột là giữ nguyên con số thật mà nhãn vẫn nằm trọn một dòng. */
+.cbo.rong{grid-column:span 2}
+@media(max-width:620px){.cbo.rong{grid-column:auto}}
 .cbo:hover{background:var(--bg)}
 .cbcham{width:8px;height:8px;border-radius:50%;flex:none;background:var(--muted)}
 .cbo.do .cbcham{background:var(--red)}
 .cbo.vang .cbcham{background:var(--amber)}
-.cbso{font-size:18px;font-weight:800;min-width:34px;text-align:center;color:var(--navy)}
+/* `flex:none` là phần bắt buộc: thiếu nó thì ô số vừa không chịu co, vừa không nhường chỗ -
+   nó cứ đẩy `.cbtx` hẹp lại cho tới khi chữ vỡ vụn. */
+.cbso{font-size:18px;font-weight:800;min-width:34px;text-align:center;color:var(--navy);flex:none}
+.cbso.dai{font-size:15px;letter-spacing:-.2px}
 .cbo.do .cbso{color:var(--red)}
 .cbo.vang .cbso{color:var(--amber)}
 .cbtx{flex:1;min-width:0}
@@ -22933,8 +22956,11 @@ function canhBaoHTML(){
   '<div class="pbody"><div class="cbwrap">';
  L.slice(0,12).forEach(function(x){
   var p=PBK[x.trang]||{};
-  h+='<div class="cbo '+x.muc+'" onclick="go(\''+esc(x.trang)+'\')" title="'+esc((x.viSao||"")+" — Bấm để mở trang "+(p.t||x.trang))+'">'+
-   '<span class="cbcham"></span><div class="cbso">'+esc(String(x.so))+'</div>'+
+  /* Dài hơn 6 ký tự thì đó không còn là một con số đếm được bằng mắt - đó là số tiền. Cho ô
+     rộng gấp đôi và hạ cỡ chữ, thay vì ép cái nhãn bên cạnh vỡ ra. */
+  var _dai=String(x.so).length>6;
+  h+='<div class="cbo '+x.muc+(_dai?' rong':'')+'" onclick="go(\''+esc(x.trang)+'\')" title="'+esc((x.viSao||"")+" — Bấm để mở trang "+(p.t||x.trang))+'">'+
+   '<span class="cbcham"></span><div class="cbso'+(_dai?' dai':'')+'">'+esc(String(x.so))+'</div>'+
    '<div class="cbtx"><div class="cbn">'+esc(x.nhan)+'</div><div class="cbp">'+esc(p.t||x.trang)+'</div></div>'+
    '<i class="ti ti-chevron-right cbmui"></i></div>'});
  return h+'</div></div></div>'}

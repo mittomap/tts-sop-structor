@@ -117,7 +117,7 @@ const CAT_OK = [
       await new Promise(r => setTimeout(r, 340));
       const c = document.getElementById("content");
       if (!c) return {loi: "khong co than trang"};
-      const ra = {cat: [], che: [], hep: [], moCoi: [], deNhau: [], thucThe: [], soVo: [], batNat: [], dem: 0};
+      const ra = {cat: [], che: [], hep: [], moCoi: [], deNhau: [], thucThe: [], soVo: [], batNat: [], bopCot: [], dem: 0};
 
       /* Thước đo bề rộng THẬT của một đoạn chữ với đúng font của nó. Dựng một lần, dùng lại. */
       const do_ = document.createElement("span");
@@ -274,6 +274,43 @@ const CAT_OK = [
             ra.soVo.push('"' + t + '" nam tren ' + Math.round(r.height / caoDong) + ' dong (cao ' +
                          Math.round(r.height) + 'px, dong ' + Math.round(caoDong) + 'px)');
         });
+        /* M6 - CHU BI BOP THANH MOT COT HEP.
+           Anh Luan 11/08 nhin dai "Can chu y" roi noi: *"thiet ke nay nhin luom thuom qua em"*.
+           Do ra: o mang so tien "181.900.000d" khong bi chan be rong, no an 122px trong mot o
+           272px, nen cai NHAN ben canh chi con 75px va cau "Den han thu, tinh toi hom nay" roi
+           MOT CHU MOI DONG - 3 dong. Luoi lai bat moi o cung hang cao bang nhau, nen mot o hong
+           keo ca hang cao gap ruoi.
+           Nam phep do cu deu khong thay, va deu co ly do rieng: M1 hoi "chu co rong hon cho no
+           co khong" - KHONG, no vua khit vi da tu xuong dong; M3 hoi o hep giua khoang trong -
+           cho nay khong thua cho; M5 chi soi cac o CHI CHUA SO; `_checkui` hoi tran ngang va nut
+           qua nho - deu khong dinh. Chu van doc duoc, khong cat, khong tran. No chi XAU.
+           Phep hoi moi, tong quat chu khong canh rieng dai canh bao: mot khoi chu xuong tu 3
+           dong tro len MA be rong cua no chua toi 40% cua khoi cha, thi no khong "dai" - no dang
+           bi mot thang anh em cung hang bop lai. Nguong 40% dat de mot cot chu doc that (vd cot
+           hep trong bang 3 cot) khong bi cham oan. */
+        than.querySelectorAll("*").forEach(el => {
+          if (el.children.length) return;
+          const t = (el.textContent || "").trim();
+          if (t.length < 12) return;                 /* chu ngan thi 3 dong la do co y, khong phai bi bop */
+          if (!nhinThay(el)) return;
+          /* O TRONG BANG: mien, cung ly do da khai o phep `batNat` - bang co cot keo duoc va nut
+             Cot, nguoi dung tu chinh be rong duoc. Ep moi o bang khong duoc hep la ep bang phai
+             rong ra vo han. Da do: khong mien thi 43 cho, gan het la `.TD`/`.TH`. */
+          if (el.closest("table")) return;
+          const cs = getComputedStyle(el);
+          if (cs.writingMode && cs.writingMode.indexOf("vertical") === 0) return;   /* chu doc la co y */
+          const caoDong = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.2;
+          const r = el.getBoundingClientRect();
+          if (!r.width || !caoDong) return;
+          const soDong = Math.round(r.height / caoDong);
+          if (soDong < 3) return;
+          const cha = el.parentElement && el.parentElement.getBoundingClientRect();
+          if (!cha || !cha.width) return;
+          if (r.width / cha.width >= 0.4) return;
+          ra.bopCot.push('"' + t.slice(0, 30) + '" (.' + ((String(el.className || "").split(" ")[0]) || el.tagName) +
+                         ") bi bop con " + Math.round(r.width) + "px trong khoi rong " +
+                         Math.round(cha.width) + "px -> vo " + soDong + " dong");
+        });
         /* THUC THE HTML CON SONG TREN MAN - dau hieu escape HAI LAN.
            Bay cắn 09/08: `openDrawer` dat tieu de bang `textContent` ma cho goi lai `esc()` truoc,
            nen ten trang co dau "&" hien nguyen "&amp;". Doc bang `textContent` moi thay: doc
@@ -341,6 +378,7 @@ const CAT_OK = [
     gom(r.thucThe, "THUC THE HTML LO RA MAN - escape hai lan");
     gom(r.soVo, "CON SO BI BE DOI GIUA HAI CHU SO");
     gom(r.batNat, "TRINH DUYET DANG CAT CHU (hoi scrollWidth)");
+    gom(r.bopCot, "CHU BI BOP THANH MOT COT HEP");
   }
 
   await ctx.close();
