@@ -767,6 +767,16 @@ def add_test(L, kind):
        "test_status":"pending (Chưa có kết quả)","overall_score":"","skill_listening":"","skill_reading":"","skill_writing":"","skill_speaking":"",
        "academic_note":"","result_time":"","post_test_status":"","graded_by":"","auto_trigger_hint":"","next_action":"","lead_id_name":L["full_name"]}
     gv=random.choice(WOWS)
+    # V2 12/08 (SALE-6). Sale: *"chỗ test đầu vào em cần hiện lên tên WOW làm test. Ngoài ra cho
+    # thêm hình thức test: test tại trung tâm hay làm bài thi thật tại hội đồng thi"*.
+    # Hai cột mới, và cả hai đều phải có NGAY LÚC ĐẶT LỊCH - `graded_by` chỉ có sau khi chấm
+    # (42/159 phiếu đang trống) nên nó không trả lời được câu sale cần nói với khách: "em làm
+    # test với thầy nào". Người coi test và người chấm có thể khác nhau, app giữ cả hai.
+    t["test_proctor_id"]=gv[0]; t["test_proctor_name"]=gv[1]
+    t["test_kind"]=("official (Thi thật tại hội đồng)" if random.random()<0.18
+                    else "mock (Thi thử tại trung tâm)")
+    if t["test_kind"].startswith("official"):
+        t["test_format"]="offline (Offline tại trung tâm)"   # thi that thi khong the online
     if kind=="done":
         d=dt.datetime.strptime(L["lead_created_time"],"%d/%m/%Y %H:%M")+days(random.randint(2,5)); d=d.replace(hour=9,minute=0)
         sc=round(random.uniform(3.0,6.0)*2)/2
@@ -2102,6 +2112,9 @@ if not any(str(x).startswith("unavailable") for x in _ss):
 _en["enum_wow_lesson_type"]=["practice (Luyện tập)","entry_test (Test đầu vào)",
                              "midterm (Kiểm tra giữa khóa)","final (Kiểm tra cuối khóa)"]
 _en["enum_wow_mode"]=["online (Trực tuyến)","offline (Tại trung tâm)"]
+# SALE-6: tach "hinh thuc test" thanh HAI cau hoi. `enum_test_format` giu nguyen (online/offline),
+# `enum_test_kind` la cau hoi thu hai - thi thu hay thi that. Hai chuyen doc lap nhau.
+_en["enum_test_kind"]=["mock (Thi thử tại trung tâm)","official (Thi thật tại hội đồng)"]
 
 _ch2 = (out.get("config") or {}).setdefault("ch2", [])
 _ch2By = {str(x.get("name")): x for x in _ch2}

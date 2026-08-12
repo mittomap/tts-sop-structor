@@ -2755,7 +2755,7 @@ function stCls(v){var c=ecode(v);
 
 var ENUMMAP={lead_source:"enum_lead_source",lead_status:"enum_lead_status",lead_qualification_status:"enum_lead_qualification_status",
 student_type:"enum_student_type",learning_mode:"enum_learning_mode",learning_goal:"enum_learning_goal_type",channel:"enum_contact_channel",
-direction:"enum_contact_direction",test_format:"enum_test_format",booking_status:"enum_booking_status",test_status:"enum_test_status",
+direction:"enum_contact_direction",test_format:"enum_test_format",test_kind:"enum_test_kind",booking_status:"enum_booking_status",test_status:"enum_test_status",
 test_attendance_status:"enum_test_attendance_status",post_test_status:"enum_post_test_status",consultation_status:"enum_consultation_status",
 conversion_status:"enum_conversion_status",enrollment_status:"enum_enrollment_status",discount_type:"enum_discount_type",
 payment_method:"enum_payment_method",payment_status:"enum_payment_status",placement_status:"enum_placement_status",
@@ -3808,8 +3808,8 @@ lienhe:{code:"DL02b",filt:"channel",
  cols:[["touchpoint_id","Mã"],["customer_name","Khách"],["contact_time","Thời gian"],["channel","Kênh","enum"],["direction","Chiều","enum"],["content","Nội dung"],["result_note","Kết quả / hẹn"]],
  form:[["lead_id","Chọn khách (gõ SĐT/tên)","@lead",1],["channel","Kênh liên hệ","enum_contact_channel",1],["direction","Chiều","enum_contact_direction"],["__cres","Kết quả liên hệ","@cres",1],["content","Nội dung trao đổi / ghi chú","ta"],["next_followup_time","Hẹn liên hệ lại (để trống = tự đặt theo kết quả)"]],idp:"TP-2026-"},
 test:{code:"DL03",filt:"test_status",
- cols:[["test_booking_id","Mã"],["lead_id_name","Khách"],["test_date","Ngày test"],["test_format","Hình thức","enum"],["booking_status","Đặt lịch","chip"],["test_attendance_status","Điểm danh","chip"],["overall_score","Điểm"],["test_status","Chấm bài","chip"]],
- form:[["lead_id","Chọn khách (gõ SĐT/tên)","@lead",1],["test_date","Ngày giờ test"],["test_format","Hình thức","enum_test_format"],["booking_status","Trạng thái đặt lịch","enum_booking_status"],["test_attendance_status","Điểm danh test","enum_test_attendance_status"],["skill_listening","Listening"],["skill_reading","Reading"],["skill_writing","Writing"],["skill_speaking","Speaking"],["overall_score","Điểm tổng"],["academic_note","Nhận xét học thuật","ta"]],idp:"TB-2026-"},
+ cols:[["test_booking_id","Mã"],["lead_id_name","Khách"],["test_date","Ngày test"],["test_kind","Loại bài","enum"],["test_format","Hình thức","enum"],["test_proctor_name","NV WOW coi test"],["booking_status","Đặt lịch","chip"],["test_attendance_status","Điểm danh","chip"],["overall_score","Điểm"],["test_status","Chấm bài","chip"]],
+ form:[["lead_id","Chọn khách (gõ SĐT/tên)","@lead",1],["test_date","Ngày giờ test"],["test_kind","Thi thử hay thi thật","enum_test_kind"],["test_format","Học online hay tại trung tâm","enum_test_format"],["test_proctor_id","NV WOW coi test","@wow"],["booking_status","Trạng thái đặt lịch","enum_booking_status"],["test_attendance_status","Điểm danh test","enum_test_attendance_status"],["skill_listening","Listening"],["skill_reading","Reading"],["skill_writing","Writing"],["skill_speaking","Speaking"],["overall_score","Điểm tổng"],["academic_note","Nhận xét học thuật","ta"]],idp:"TB-2026-"},
 tuvan:{code:"DL06",filt:"enrollment_status",
  cols:[["enrollment_id","Mã ĐK"],["student_id_name","Học viên"],["course_id_name","Khóa"],["enrollment_status","Trạng thái","chip"],["final_fee","Học phí","money"],["paid_amount","Đã đóng","money"],["remaining_amount","Còn lại","money"],["next_action","Việc cần làm","na"]],
  form:[["lead_id","Chọn khách (gõ SĐT/tên)","@lead",1],["course_id","Khóa học","@course",1],["enrollment_status","Trạng thái ĐK","enum_enrollment_status"],["total_fee","Học phí gốc"],["discount_amount","Chiết khấu"],["discount_type","Loại CK","enum_discount_type"],["discount_reason","Lý do CK"],["notes","Ghi chú","ta"]],idp:"ENR-2026-"},
@@ -4499,7 +4499,7 @@ var FLTDEF={
  nhaplead:[fxEnum("lead_status","Trạng thái lead"),fxStaff("assigned_to","Người phụ trách"),
   fxEnum("lead_source","Nguồn khách"),fxEnum("branch","Cơ sở"),fxEnum("lead_qualification_status","Mức độ tiềm năng"),
   fxDate("lead_created_time","Ngày vào hệ thống"),fxDate("next_followup_time","Hẹn liên hệ lại")],
- test:[fxEnum("test_status","Trạng thái chấm"),fxEnum("test_format","Hình thức test"),
+ test:[fxEnum("test_status","Trạng thái chấm"),fxEnum("test_kind","Thi thử / thi thật"),fxEnum("test_format","Hình thức test"),
   fxEnum("test_attendance_status","Dự test"),fxEnum("post_test_status","Sau khi có KQ"),
   fxStaff("graded_by","Người chấm"),fxDate("test_date","Ngày test")],
  tuvan:[fxEnum("enrollment_status","Trạng thái đơn"),fxEnum("payment_status","Tình trạng thu"),
@@ -4896,6 +4896,7 @@ function formHTML(key,opts){opts=opts||{};var cfg=LISTCFG[key]; var src=EDIT[key
     if(pv){var rr=find(ent==="lead"?"DL02":"DL09",ent==="lead"?"lead_id":"student_id",pv); pl=rr?(rr.full_name+" - "+rr.phone_number):pv}
     h+='<input id="pk_'+k+'" data-pktim="1" placeholder="Gõ số điện thoại hoặc tên..." value="'+esc(pl)+'" oninput="pkSearch(\''+k+'\',\''+ent+'\')" autocomplete="off"><input type="hidden" id="f_'+k+'" value="'+esc(pv)+'"><div class="pkres" id="pkr_'+k+'"></div>'}
   else if(ty==="@cres"){h+='<select id="f_'+k+'">'+cresOpts(ecode(src.result_note)||"connected")+'</select>'}
+  else if(ty==="@wow"){h+='<select id="f_'+k+'">'+wowNVOpts(cur)+'</select>'}
   else if(ty==="@course"||ty==="@class"){var code=(ty==="@course")?"DL05":"DL10", idf=(ty==="@course")?"course_id":"class_id", nmf=(ty==="@course")?"course_name":"class_name";
     h+='<select id="f_'+k+'"><option value="">-- chọn --</option>'+rows(code).map(function(x){var s=(String(x[idf])===cur);return '<option'+(s?" selected":"")+' value="'+esc(x[idf])+'">'+esc(x[idf])+" - "+esc(x[nmf])+'</option>'}).join("")+'</select>'}
   else if(ty&&ENUM[ty]){h+='<select id="f_'+k+'"><option value="">-- chọn --</option>'+ENUM[ty].map(function(o){var s=(ecode(o)===ecode(cur));return '<option'+(s?" selected":"")+'>'+esc(o)+'</option>'}).join("")+'</select>'}
@@ -5349,6 +5350,17 @@ function openLopQuick(cid){var c=find("DL10","class_id",cid);if(!c){toast("Khôn
    nhân sự, khóa học - nếu chỉ sửa học viên thì ba loại kia lại lệch nhịp.
    isGVRole dùng chung với renderHosoGV/renderHosoNV: một định nghĩa "ai là giảng viên". */
 function isGVRole(s){if(!s)return false;return /teacher|giang/i.test(ecode(s.role)+" "+String(s.role||""))}
+/* ═══ V2 12/08 (SALE-6) - NGƯỜI COI TEST ═══════════════════════════════════════════════════════
+   Sale cần nói với khách "em làm test với thầy/cô nào" NGAY LÚC ĐẶT LỊCH, mà `graded_by` chỉ có
+   sau khi chấm. Nên có cột riêng, và danh sách chọn phải là ĐÚNG đội WOW - không bày cả 36 nhân
+   sự ra để người ta tự đoán ai là WOW. */
+function wowNVList(){return rows("DL01").filter(function(x){
+ return /wow/.test(ecode(x.role))&&!/inactive|nghỉ/i.test(String(x.status||""))})}
+function wowNVOpts(sel){var a=wowNVList();
+ return '<option value="">-- chưa phân người coi test --</option>'+
+  a.map(function(x){return '<option value="'+esc(x.staff_id)+'"'+(String(sel||"")===String(x.staff_id)?" selected":"")+'>'+
+   esc(x.staff_id+" - "+x.full_name)+'</option>'}).join("")}
+function nsTen(sid){if(!sid)return "";var x=find("DL01","staff_id",sid);return (x&&x.full_name)||String(sid)}
 function nsLnk(id,nm,fb){
  /* anh Luân (30/07): "hiện tên chứ, người dùng mà hiện ID làm gì, ai hiểu đâu". Nơi gọi quên
     đưa tên (hoặc đưa sai trường) thì tầng chung tự tra DL01 - không màn nào được chìa mã thô. */
@@ -5429,6 +5441,7 @@ function saveForm(key){var cfg=LISTCFG[key];var o={},idk=cfg.cols[0][0]; var mis
   if(f[2]==="@lead"&&v){var Lx=find("DL02","lead_id",v);if(Lx){o.lead_id_name=Lx.full_name;o.customer_name=Lx.full_name}}
   if(f[2]==="@student"&&v){var Sx=find("DL09","student_id",v);if(Sx){o.student_id_name=Sx.full_name;o.student_name=Sx.full_name}}
   if(f[2]==="@course"&&v){var Cx=find("DL05","course_id",v);if(Cx)o.course_id_name=Cx.course_name}
+  if(f[2]==="@wow")o[f[0].replace(/_id$/,"_name")]=nsTen(v);
   if(f[2]==="@class"&&v){var Kx=find("DL10","class_id",v);if(Kx)o.class_id_name=Kx.class_name}});
  if(miss.length){toast("Còn thiếu: "+miss.join(", "));return}
  var verr=validateForm(o);if(verr){toast(verr);return}
@@ -6347,6 +6360,19 @@ function slaItems(){var out=jTasks();
    var nhan=(c.class_name||c.class_id)+" · "+lopLoai(c)+(clsOnline(c)?" (online)":(c.branch?" · "+(elabel(c.branch)||c.branch):""));
    if(minS>0&&si<minS){
     var red=left<=dec;
+    /* ═══ V2 12/08 (HỌC VỤ-3) - THẺ NÀY THUỘC CẢ HAI PHÒNG ═══════════════════════════════════
+       Học vụ nói *"học vụ không có chức năng lấp đầy lớp"* và xin bỏ thẻ; anh Luân giữ lại và
+       nói rõ vì sao: *"vấn đề là nhìn thấy lớp chưa đủ khai giảng, để có thể phối hợp với sale,
+       sale cũng thấy thẻ này mà"*. Đo thật thì SALE KHÔNG THẤY: chuông và Việc hôm nay cắt theo
+       `cat`, thẻ này mang cat "Học vụ", còn Tư vấn chỉ nhận "Tuyển sinh" + "Giao việc" - cả 9
+       chức danh sale đều đếm 0.
+       Đổi cat sang "Tuyển sinh" thì Học vụ mất thẻ (họ chỉ nhận "Học vụ"/"CSKH"/"Giao việc"),
+       nên phải PHÁT HAI BẢN - mỗi phòng một việc khác nhau trên cùng một sự kiện: học vụ QUYẾT
+       (dồn lớp, lùi ngày, hủy sớm), sale LẤP ĐẦY. Cùng một cái thiếu, hai người làm hai việc. */
+    add("Tuyển sinh","Lớp sắp khai giảng thiếu sĩ số",red?"red":"amber","ti-calendar-exclamation",nhan,
+     (red?"HẾT GIỜ CÂN NHẮC - ":"")+"Còn "+left+" ngày là khai giảng, sĩ số "+si+"/"+(cap||"?")+
+     " (tối thiểu "+minS+") - còn "+(minS-si)+" chỗ để đẩy học viên vào",
+     -left*24,"xeplop",null,{act:"molop",rid:c.class_id,prm:"classMinStudents"});
     add("Học vụ","Lớp sắp khai giảng thiếu sĩ số",red?"red":"amber","ti-calendar-exclamation",nhan,
      (red?"HẾT GIỜ CÂN NHẮC - ":"")+"Còn "+left+" ngày là khai giảng, sĩ số "+si+"/"+(cap||"?")+
      " (tối thiểu "+minS+") - thiếu "+(minS-si)+" người. Quyết: dồn lớp, lùi ngày hay hủy sớm",
@@ -6360,6 +6386,70 @@ function slaItems(){var out=jTasks();
     add("Học vụ","Lớp sắp khai giảng chưa có giáo viên",left<=dec?"red":"amber","ti-user-question",nhan,
      "Còn "+left+" ngày là khai giảng mà chưa gán giáo viên chính",
      -left*24,"xeplop",null,{act:"molop",rid:c.class_id,prm:"thresholdClassStart_days"})})})();
+ /* ═══ V2 12/08 (HỌC VỤ-1) - BỐN NHÓM VIỆC CẤP LỚP ════════════════════════════════════════════
+    Học vụ: *"trong nhóm việc cho em thêm việc của các nhóm lớp, ví dụ: lớp Mas0808 sắp final,
+    lớp Private Mỹ Tiên đã hoàn thành 24 giờ học"*. Đo trước khi làm: trong hơn 40 nhóm việc đang
+    có, ĐÚNG MỘT nhóm ở cấp lớp ("Lớp sắp khai giảng thiếu sĩ số"); tất cả còn lại là việc của
+    MỘT NGƯỜI (lead / học viên / buổi / bài). Học vụ nói đúng - họ vận hành theo LỚP, mà bảng việc
+    lại chỉ biết nói theo người. Anh Luân: *"thoải mái đi em, e cân cho đầy đủ"*.
+    Ngưỡng của cả bốn nhóm đều qua CH2, không cắm cứng số nào. */
+ (function(){
+  var dFinal=num(paramOf("classFinalNear_days",21))||21;
+  var dEnd=num(paramOf("classEndNear_days",21))||21;
+  var pctH=num(paramOf("classHoursDonePct",100))||100;
+  var pctR=num(paramOf("classRiskSharePct",30))||30;
+  var t0=new Date();t0.setHours(0,0,0,0);
+  srows("DL10").forEach(function(c){
+   if(!/^(open|in_progress)$/.test(ecode(c.class_status)))return;
+   var nhan=(c.class_name||c.class_id)+" · "+lopLoai(c)+(c.branch?" · "+(elabel(c.branch)||c.branch):"");
+   var ses=rows("DL11").filter(function(x){return x.class_id===c.class_id&&!isc(x.session_status,"cancelled")});
+   /* (1) LỚP SẮP THI FINAL - đúng ví dụ học vụ đưa ("lớp Mas0808 sắp final"). Buổi thi đã có
+      cột riêng trong DL11 (`sesThiSave` ghi), nên hỏi thẳng dữ liệu chứ không đoán theo buổi cuối. */
+   (function(){
+    /* Buổi thi nằm ở `session_type` (regular / mid / final) - hỏi đúng cột chứ đừng dò chữ
+       trong tiêu đề buổi: tiêu đề là chữ người gõ, cột là thứ `sesThiSave` ghi. */
+    var thi=ses.filter(function(x){return ecode(x.session_type)==="final"})
+      .map(function(x){return {x:x,d:pvnd(x.session_date)}}).filter(function(o){return o.d})
+      .sort(function(a,b){return a.d-b.d})[0];
+    if(!thi)return;
+    var left=Math.round((thi.d.getTime()-t0.getTime())/864e5);
+    if(left<0||left>dFinal)return;
+    add("Học vụ","Lớp sắp thi cuối khóa",left<=2?"red":"amber","ti-certificate",nhan,
+     "Còn "+left+" ngày là thi Final ("+(thi.x.session_date||"")+") - soát phòng thi, đề, và danh sách dự thi",
+     -left*24,"banglop",null,{page:"banglop",set:{BLCLASS:c.class_id},prm:"classFinalNear_days"})})();
+   /* (2) LỚP ĐÃ HỌC ĐỦ SỐ GIỜ CAM KẾT - ví dụ thứ hai học vụ đưa ("lớp Private Mỹ Tiên đã hoàn
+      thành 24 giờ học"). Đếm buổi ĐÃ DẠY trên tổng buổi của khóa. */
+   (function(){
+    var tong=ses.length||num(c.total_sessions)||num(c.duration_sessions);
+    if(!tong)return;
+    var xong=ses.filter(function(x){return isc(x.session_status,"completed")}).length;
+    var p=Math.round(xong/tong*100);
+    if(p<pctH)return;
+    add("Học vụ","Lớp đã học đủ giờ cam kết","amber","ti-clock-check",nhan,
+     "Đã dạy "+xong+"/"+tong+" buổi ("+p+"%) - chốt kết quả đầu ra, gửi khảo sát và mời tái đăng ký",
+     0,"banglop",null,{page:"banglop",set:{BLCLASS:c.class_id},prm:"classHoursDonePct"})})();
+   /* (3) LỚP SẮP KẾT THÚC KHÓA - nối với kế hoạch khai giảng lớp kế tiếp. Học vụ nói thẳng nhu
+      cầu này ở HỌC VỤ-3: *"kiểm tra thời gian kết thúc lớp cũ để làm kế hoạch khai giảng"*. */
+   (function(){
+    var d=pvnd(c.class_end_date);if(!d)return;
+    var left=Math.round((d.getTime()-t0.getTime())/864e5);
+    if(left<0||left>dEnd)return;
+    add("Học vụ","Lớp sắp kết thúc khóa",left<=3?"amber":"","ti-flag-check",nhan,
+     "Còn "+left+" ngày là kết thúc ("+(c.class_end_date||"")+") - lên kế hoạch lớp kế tiếp cho học viên lớp này",
+     -left*24,"xeplop",null,{act:"molop",rid:c.class_id,prm:"classEndNear_days"})})();
+   /* (4) LỚP CÓ NHIỀU HỌC VIÊN NGUY CƠ - cả lớp đuối chứ không riêng một em. Đây là việc của
+      LỚP: một em đuối thì kèm em đó, một phần ba lớp đuối thì phải xem lại giáo viên, giáo án
+      hoặc trình độ đầu vào - hai việc khác hẳn nhau, mà bảng việc trước nay chỉ biết nói cái đầu. */
+   (function(){
+    var enr=rows("DL08").filter(function(o){return o.class_id===c.class_id&&o.student_id});
+    if(enr.length<3)return;
+    var ng=enr.filter(function(o){var s=find("DL09","student_id",o.student_id);return s&&stuRisk(s)}).length;
+    if(!ng)return;
+    var p=Math.round(ng/enr.length*100);
+    if(p<pctR)return;
+    add("Học vụ","Lớp có nhiều học viên nguy cơ",p>=50?"red":"amber","ti-users-minus",nhan,
+     ng+"/"+enr.length+" học viên ("+p+"%) đang nguy cơ - xem lại giáo viên, giáo án hoặc trình độ đầu vào của cả lớp",
+     0,"banglop",null,{page:"banglop",set:{BLCLASS:c.class_id},prm:"classRiskSharePct"})})()})})();
  /* V9.40 - THƯỞNG GIỚI THIỆU TREO. Kênh giới thiệu ra 147,5tr doanh thu từ đúng 5 học viên -
     tỷ lệ chốt cao nhất trong mọi nguồn. Vậy mà có 2 phần thưởng treo 76 và 48 ngày không ai
     nhắc: trang Khác chỉ ĐẾM số thưởng chờ, không nói khoản đó treo bao lâu. Trao thưởng chậm
@@ -9025,10 +9115,15 @@ var RSTEP={
  test_book:{t:"Đặt lịch test đầu vào",sub:"Chốt giờ test với khách. Test xong mới có căn cứ tư vấn lộ trình.",
   fields:function(C){return [
    ["test_date","Ngày giờ test","dt",null,1],
-   ["test_format","Hình thức","enum","enum_test_format",1,eFull("enum_test_format","offline")],
+   /* SALE-6: HAI cau hoi rieng, va nguoi coi test gan NGAY LUC DAT LICH. */
+   ["test_kind","Thi thử hay thi thật","enum","enum_test_kind",1,eFull("enum_test_kind","mock")],
+   ["test_format","Học online hay tại trung tâm","enum","enum_test_format",1,eFull("enum_test_format","offline")],
+   ["test_proctor_id","NV WOW coi test","sel",wowNVOpts(),0,""],
    ["booking_note","Ghi chú","text","vd: khách xin test online buổi tối"]]},
   save:function(C,cb){var o={lead_id:C.L.lead_id,lead_id_name:C.L.full_name,test_date:rfV("test_date"),
-    test_format:rfV("test_format"),booking_status:eFull("enum_booking_status","booked"),booking_note:rfV("booking_note"),
+    test_format:rfV("test_format"),test_kind:rfV("test_kind"),
+    test_proctor_id:rfV("test_proctor_id"),test_proctor_name:nsTen(rfV("test_proctor_id")),
+    booking_status:eFull("enum_booking_status","booked"),booking_note:rfV("booking_note"),
     test_status:eFull("enum_test_status","pending")};
    jSaveRow("DL03",o,function(id){cb("Đã đặt lịch test "+rfV("test_date"))})},
   alt:[{lb:"Khách không muốn test - tư vấn thẳng",ic:"ti-messages",fn:"runSkipTest"},{lb:"Khách từ chối / không quan tâm",ic:"ti-user-x",fn:"runReject"}]},
@@ -12140,7 +12235,7 @@ var SHEETVN={DL01:"Nhân sự",DL02:"Lead",DL02b:"Lượt chạm lead",DL03:"Tes
  DL15:"Khảo sát",DL16:"Ghi nhận phản hồi",DL17:"Khiếu nại",DL18:"Kết thúc khóa",DL18b:"Kỳ thi IELTS thật",DL19:"Nhật ký hệ thống",
  DL20:"Giáo án - Buổi & Bài tập",DL21:"Giáo án chi tiết",DL22:"Tham số",DL23:"Việc được giao",
  DL24:"Trao đổi trong việc",DL25:"Nhật ký thao tác",DL26:"Lịch trực NV WOW",
- DL27:"Yêu cầu đổi đợt đóng"};
+ DL27:"Yêu cầu đổi đợt đóng",DL28:"Giảng viên dự phòng theo tháng"};
 function sheetVN(c){return SHEETVN[c]?(SHEETVN[c]+" ("+c+")"):(c||"")}
 function logForRow(code,id){return logRows().filter(function(e){
  return e.sheet===code&&String(e.row_id)===String(id)})}
@@ -13304,8 +13399,23 @@ function btHub(embed){
  if(!cid){h+='<div class="panel"><div class="empty">Chọn một lớp để bắt đầu.</div></div>';return h}
  if(!embed)h+=classBar(cid);
  if(mode==="giao"){
-  var bank=(function(){var s={},o=[];hwBank().forEach(function(b){if(!s[b.title]){s[b.title]=1;o.push(b.title)}});
-   uniqTitles().forEach(function(t){if(!s[t]){s[t]=1;o.push(t)}});return o})();
+  /* ═══ V2 12/08 (ACA-1) - KHO BÀI LỌC THEO KỸ NĂNG ═══════════════════════════════════════
+     ACA: *"vị trí của trường 'Kỹ năng' đổi với 'Bài trong kho', các thông tin của 'Bài trong kho'
+     sẽ phụ thuộc theo 'Kỹ năng'"*. Anh Luân chốt thêm hai vế mềm: CHƯA chọn kỹ năng thì vẫn hiện
+     đủ kho (ai biết sẵn tên bài thì chọn thẳng, không ép thêm một bước), và chọn "Mixed (Tổng hợp)"
+     là MỞ CẢ KHO - vì kho DL20 chỉ gắn 6 kỹ năng, danh mục CH1 có 7, dư đúng "Mixed"; lọc đúng
+     nghĩa thì Mixed ra rỗng. KHÔNG sửa danh mục CH1 để chiều một cái ô. */
+  var preSk=(SP&&SP.hw)?String(SP.hw.skill||""):"";
+  var btSk=(window.BTSKILL!=null)?String(window.BTSKILL):preSk;
+  var btMoKho=(!btSk||ecode(btSk)==="mixed");
+  var bank=(function(){var s={},o=[];
+   hwBank().forEach(function(b){
+    if(!btMoKho&&String(b.skill||"")!==btSk)return;
+    if(!s[b.title]){s[b.title]=1;o.push(b.title)}});
+   /* Bài đã từng giao (uniqTitles) không mang cột kỹ năng, nên chỉ gộp vào khi MỞ CẢ KHO -
+      nhét chúng vào danh sách đã lọc là nói dối cái nhãn "chỉ bài Writing". */
+   if(btMoKho)uniqTitles().forEach(function(t){if(!s[t]){s[t]=1;o.push(t)}});
+   return o})();
   var bsrc=window.BTSRC||"bank";
   var preT=(SP&&SP.hw)?SP.hw.title:"", preDue=SP?toISOdt(SP.dueDate,true):"";
   var mode2=window.BTWHO==="each"?"each":"all";
@@ -13330,15 +13440,24 @@ function btHub(embed){
   h+='<div class="substep"><div class="sst"><i class="ti ti-corner-down-right"></i>Bước 2 · Bài tập giao chung</div>';
   h+='<div class="fld full"><label>Nguồn bài tập</label>'+segHTML(bsrc,[["bank","Chọn bài đã có"],["new","Soạn bài mới / tải lên"]],"window.BTSRC='{k}';reRender(CUR)")+'</div>';
   if(bsrc==="bank"){
-   h+='<div class="fld full"><label>Bài trong kho ('+bank.length+' bài) <i style="color:var(--red)">*</i></label><select id="bt_title"><option value="">-- chọn bài đã dùng --</option>'+bank.map(function(b){return '<option value="'+esc(b)+'"'+(b===preT?" selected":"")+'>'+esc(b)+'</option>'}).join("")+'</select></div>';
+   /* ACA-1: KỸ NĂNG ĐỨNG TRƯỚC, kho bài đứng sau và lọc theo nó. */
+   h+='<div class="fld full"><label>Kỹ năng</label><select id="bt_skill" onchange="window.BTSKILL=this.value;reRender(CUR)"><option value="">-- tất cả kỹ năng --</option>'+
+    (ENUM.enum_homework_skill||[]).map(function(o){return '<option'+(o===btSk?" selected":"")+'>'+esc(o)+'</option>'}).join("")+'</select>'+
+    '<div class="fhint">'+(btMoKho
+      ?(btSk?'"Tổng hợp" nên kho mở hết - '+bank.length+' bài.':'Chưa chọn kỹ năng nên kho hiện đủ '+bank.length+' bài. Chọn một kỹ năng để lọc bớt.')
+      :('Kho đang lọc theo <b>'+esc(elabel(btSk)||btSk)+'</b> - '+bank.length+' bài.'))+'</div></div>';
+   h+='<div class="fld full"><label>Bài trong kho ('+bank.length+' bài) <i style="color:var(--red)">*</i></label><select id="bt_title"><option value="">-- chọn bài đã dùng --</option>'+bank.map(function(b){return '<option value="'+esc(b)+'"'+(b===preT?" selected":"")+'>'+esc(b)+'</option>'}).join("")+'</select>'+
+    (bank.length?'':'<div class="fhint">Kỹ năng này chưa có bài nào trong kho - chọn kỹ năng khác, hoặc chuyển sang <b>Soạn bài mới / tải lên</b>.</div>')+'</div>';
   }else{
    h+='<div class="fld full"><label>Tên bài mới <i style="color:var(--red)">*</i></label><input id="bt_title" placeholder="vd: Writing Task 2 - Opinion essay"></div>';
    h+='<div class="fld full"><label>Đề bài / hướng dẫn</label><textarea id="bt_desc" rows="2" placeholder="Yêu cầu, độ dài, tiêu chí chấm..."></textarea></div>';
    h+='<div class="fld full"><label>Tệp đính kèm</label><input id="bt_file" type="file" onchange="btFilePick(this)"><div id="bt_fileinfo" class="fhint">Chưa chọn tệp. Có thể dán link Drive vào ô dưới thay cho tải lên.</div></div>';
    h+='<div class="fld full"><label>Hoặc link đề bài</label><input id="bt_link" placeholder="https://drive.google.com/..."></div>';
   }
-  var preSk=(SP&&SP.hw)?String(SP.hw.skill||""):"";
-  h+='<div class="fld"><label>Kỹ năng</label><select id="bt_skill"><option value="">-- chọn --</option>'+(ENUM.enum_homework_skill||[]).map(function(o){return '<option'+(o===preSk?" selected":"")+'>'+esc(o)+'</option>'}).join("")+'</select></div>';
+  /* Nguồn "Soạn bài mới" thì kho không tham gia, nên ô Kỹ năng ở lại đúng chỗ cũ (dưới tên bài) -
+     nó chỉ còn là thuộc tính của bài sắp soạn, không lọc gì cả. */
+  if(bsrc!=="bank")
+   h+='<div class="fld"><label>Kỹ năng</label><select id="bt_skill"><option value="">-- chọn --</option>'+(ENUM.enum_homework_skill||[]).map(function(o){return '<option'+(o===btSk?" selected":"")+'>'+esc(o)+'</option>'}).join("")+'</select></div>';
   h+='<div class="fld"><label>Hạn nộp chung</label><input id="bt_due" type="date" value="'+esc(preDue)+'">'+
    (SP&&SP.dueDays?'<div class="fhint">Lấy theo giáo án: ngày học + '+SP.dueDays+' ngày. Sửa ở đây chỉ đổi cho lần giao này.</div>':'')+'</div>';
   h+='<div class="fld full"><label class="ckline"><input type="checkbox" id="bt_perdue" onchange="btTogglePerDue(this.checked)">Đặt hạn nộp riêng cho từng học viên</label></div>';
@@ -13857,6 +13976,12 @@ var APPPARAMS=[
  ["P7 · Buổi WOW 1-1","slaWowConfirm_hours","Hạn giáo viên WOW xác nhận một buổi vừa được đặt","giờ",24],
  ["P6 · Học viên nguy cơ","riskIgnore_days","Học vụ xem rồi bấm 'tạm bỏ qua' thì máy im bao nhiêu ngày trước khi nhắc lại","ngày",14],
  ["P5 · Xếp lớp & nhập học","thresholdClassStart_days","Còn bao nhiêu ngày tới khai giảng thì lớp vào diện theo dõi sĩ số","ngày",14],
+ /* V2 12/08 (HỌC VỤ-1) - bốn ngưỡng của bốn nhóm việc cấp lớp. Học vụ vận hành theo LỚP, mà
+    bảng việc trước nay chỉ biết nói theo người. */
+ ["P5 · Xếp lớp & nhập học","classFinalNear_days","Còn bao nhiêu ngày tới buổi thi cuối khóa thì nhắc học vụ soát phòng thi, đề và danh sách dự thi (ba tuần là đủ để đặt phòng, in đề và chốt danh sách)","ngày",21],
+ ["P5 · Xếp lớp & nhập học","classEndNear_days","Còn bao nhiêu ngày tới ngày kết thúc lớp thì nhắc lên kế hoạch lớp kế tiếp","ngày",21],
+ ["P5 · Xếp lớp & nhập học","classHoursDonePct","Lớp dạy được bao nhiêu % số buổi thì coi là đã đủ giờ cam kết (chốt đầu ra, mời tái đăng ký)","%",100],
+ ["P5 · Xếp lớp & nhập học","classRiskSharePct","Bao nhiêu % học viên của lớp bị đánh dấu nguy cơ thì báo động CẢ LỚP chứ không riêng từng em","%",30],
  ["P5 · Xếp lớp & nhập học","classMinStudents","Sĩ số tối thiểu để một lớp khai giảng - dưới mức này phải quyết dồn lớp, lùi ngày hoặc hủy sớm","học viên",6],
  ["P5 · Xếp lớp & nhập học","classDecide_days","Còn bao nhiêu ngày tới khai giảng mà vẫn thiếu sĩ số thì chuyển đỏ - hết giờ cân nhắc, phải quyết","ngày",7],
  ["P7 · Buổi WOW 1-1","slaWowNote_hours","Hạn ghi nội dung sau buổi WOW 1-1","giờ",24],
@@ -14542,7 +14667,9 @@ function testQuickAdd(){
  h+='<div class="fld"><label>Nguồn</label><select id="tq_src">'+enumOpts("enum_lead_source")+'</select></div>';
  h+='<div class="fld"><label>Người giới thiệu (nếu có)</label><input id="tq_ref" placeholder="tên HV / phụ huynh giới thiệu"></div>';
  h+='<div class="fld"><label>Ngày giờ test <i>*</i></label><input id="tq_date" type="datetime-local"></div>';
- h+='<div class="fld"><label>Hình thức test</label><select id="tq_fmt">'+enumOpts("enum_test_format")+'</select></div>';
+ h+='<div class="fld"><label>Thi thử hay thi thật</label><select id="tq_kind">'+enumOpts("enum_test_kind")+'</select></div>';
+ h+='<div class="fld"><label>Học online hay tại trung tâm</label><select id="tq_fmt">'+enumOpts("enum_test_format")+'</select></div>';
+ h+='<div class="fld"><label>NV WOW coi test</label><select id="tq_wow">'+wowNVOpts()+'</select><div class="fhint">Gán ngay để sale nói được với khách "em làm test với thầy/cô nào". Người CHẤM có thể là người khác - app giữ cả hai.</div></div>';
  h+='<div class="dact"><button class="btn primary" onclick="testQuickSave()"><i class="ti ti-check"></i>Tạo lead + đặt lịch test</button></div></div>';
  openDrawer("Test ngay cho khách mới",h)}
 function testQuickSave(){
@@ -14565,6 +14692,7 @@ function testQuickSave(){
   lead_note:"Khách yêu cầu test ngay"+(ref?" · giới thiệu bởi "+ref:""),
   next_action:"Đã hẹn test - đến giờ ghi nhận HV dự test."},function(lid){
   jSaveRow("DL03",{lead_id:lid,lead_id_name:nm,test_date:fromISOdt(dt),test_format:fldV("tq_fmt"),
+   test_kind:fldV("tq_kind"),test_proctor_id:fldV("tq_wow"),test_proctor_name:nsTen(fldV("tq_wow")),
    booking_status:eFull("enum_booking_status","booked"),test_status:eFull("enum_test_status","pending"),
    booking_note:"Tạo nhanh tại trang Test đầu vào (khách đòi test ngay)"},function(bid){
    /* Cửa này cũng phải ghi LƯỢT LIÊN HỆ ĐẦU như "Khách mới liên hệ đến", nếu không
@@ -14807,7 +14935,8 @@ function renderTest(embed){var p="test",fil=fget(p);var all=srows("DL03");
  h+='<div class="obcards rows" data-tour="obcards">';if(!view.length)h+='<div class="empty">Không có hồ sơ phù hợp.</div>';
  var MIX=jIndex();
  view.forEach(function(r){var s=st(r);var id=r.test_booking_id;
-  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(r.lead_id,r.lead_id_name)+'</b><div class="obm">Test '+esc(r.test_date||"")+' · '+esc(elabel(r.test_format)||r.test_format||"")+(r.test_no_show_reason?' · <span style="color:var(--amber)">vắng: '+esc(r.test_no_show_reason)+'</span>':'')+'</div></div>'+mstripFor(r.lead_id,MIX)+(s.refused?'<span class="chip red">Khách từ chối test</span>':(s.overdue?'<span class="chip red">Quá hạn chấm</span>':(s.consulted?'<span class="chip green">Xong</span>':(s.noshow?'<span class="chip amber">Vắng test</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div>';
+  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(r.lead_id,r.lead_id_name)+'</b><div class="obm">Test '+esc(r.test_date||"")+' · '+esc(elabel(r.test_kind)||"")+' · '+esc(elabel(r.test_format)||r.test_format||"")+
+     (r.test_proctor_name?' · NV WOW '+esc(r.test_proctor_name):'')+(r.test_no_show_reason?' · <span style="color:var(--amber)">vắng: '+esc(r.test_no_show_reason)+'</span>':'')+'</div></div>'+mstripFor(r.lead_id,MIX)+(s.refused?'<span class="chip red">Khách từ chối test</span>':(s.overdue?'<span class="chip red">Quá hạn chấm</span>':(s.consulted?'<span class="chip green">Xong</span>':(s.noshow?'<span class="chip amber">Vắng test</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div>';
   h+=stepBar([["Đặt lịch",s.booked],["Dự test",s.att],["Chấm điểm",s.graded],["Tư vấn",s.consulted]]);
   h+='<div class="obact">';
   if(s.refused){h+='<button class="btn sm" onclick="testRebook(\''+esc(id)+'\')"><i class="ti ti-calendar-plus"></i>Đặt lại lịch</button>';}
@@ -18851,8 +18980,12 @@ function gvBackup(ses){
   var sameCls=rows("DL11").some(function(x){return String(x.teacher_id||"")===g.staff_id&&x.class_id===ses.class_id});
   var sameCourse=rows("DL10").some(function(c2){return c2.course_id===c.course_id&&
    (String(c2.main_teacher_id||"")===g.staff_id||rows("DL11").some(function(x){return x.class_id===c2.class_id&&String(x.teacher_id||"")===g.staff_id}))});
-  var score=(sameCls?100:0)+(sameCourse?40:0)+(okBr?20:0)-(busy?1000:0);
+  /* V2 12/08 (HỌC VỤ-2): người đã NHẬN LỜI trực dự phòng tháng này lên đầu - trống lịch mới là
+     điều kiện cần, nhận lời mới là điều kiện đủ. */
+  var duPhong=false;try{duPhong=gvdpLaDuPhong(g.staff_id,when||new Date())}catch(e){}
+  var score=(duPhong?200:0)+(sameCls?100:0)+(sameCourse?40:0)+(okBr?20:0)-(busy?1000:0);
   var why=[];
+  if(duPhong)why.push("đã nhận lời trực dự phòng tháng này");
   if(sameCls)why.push("đã dạy chính lớp này");
   else if(sameCourse)why.push("đã dạy khóa "+(c.course_id_name||c.course_id||""));
   if(onl)why.push("lớp online - ai cũng dạy được");
@@ -18951,6 +19084,56 @@ function gvBackupForm(sesId){
   noL.forEach(function(r){h+='<div class="absrow" style="opacity:.7"><div class="absi"><b>'+esc(r.g.full_name)+'</b><span>'+esc(r.no)+'</span></div></div>'});
   h+='</div>'}
  openDrawer("Giáo viên dự phòng",h+'</div>')}
+/* ═══ V2 12/08 (HỌC VỤ-2) - SỔ ĐĂNG KÝ GV DỰ PHÒNG THEO THÁNG (DL28) ══════════════════════════
+   Khai theo THÁNG chứ không khai một lần rồi để đó: lịch giảng viên đổi theo học kỳ, một danh
+   sách khai một lần là danh sách sai sau ba tháng. Người khai: Trưởng phòng ACA (anh Luân chốt). */
+function gvdpKyThang(d){d=d||new Date();function z(n){return n<10?"0"+n:n}
+ return z(d.getMonth()+1)+"/"+d.getFullYear()}
+function gvdpThang(d){var k=(typeof d==="string")?d:gvdpKyThang(d);
+ return (rows("DL28")||[]).filter(function(x){return String(x.thang||"")===k})}
+function gvdpLaDuPhong(sid,d){var k=(typeof d==="string")?d:gvdpKyThang(d);
+ return gvdpThang(k).some(function(x){return String(x.staff_id||"")===String(sid||"")})}
+function gvdpAiKhai(){
+ if(banToanQuyen())return true;
+ var me=CURSTAFF?find("DL01","staff_id",CURSTAFF):null;
+ if(!CURSTAFF)return true;
+ if(!me)return false;
+ return /^(aca|academic)_manager$/.test(ecode(me.role))||ecode(me.role)==="ceo"}
+function gvdpThangForm(k){
+ k=k||gvdpKyThang(gvdpDay());
+ var da={};gvdpThang(k).forEach(function(x){da[String(x.staff_id)]=x});
+ var GV=rows("DL01").filter(isGVRole);
+ var suaDuoc=gvdpAiKhai();
+ var h='<div class="dcard"><h4><i class="ti ti-clipboard-list"></i>Giảng viên dự phòng tháng '+esc(k)+'</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Đây là danh sách giảng viên đã <b>nhận lời</b> trực dự phòng trong tháng. App vẫn tự tính ai TRỐNG LỊCH cho từng buổi - danh sách này chỉ đẩy người đã nhận lời lên đầu, không thay phép tính đó.</div>';
+ if(!suaDuoc)h+='<div class="notebar nbamber" style="margin:0 0 10px"><i class="ti ti-lock"></i>Chỉ Trưởng phòng ACA khai được danh sách này. Bạn xem được, không sửa được.</div>';
+ h+='<div class="tbwrap" style="max-height:340px;overflow:auto"><table class="dt"><thead><tr>'+(suaDuoc?'<th style="width:34px"></th>':'')+'<th>Giảng viên</th><th>Cơ sở</th><th>Ghi chú</th></tr></thead><tbody>';
+ if(!GV.length)h+='<tr><td class="empty" colspan="4">Chưa có giảng viên nào trong hệ thống.</td></tr>';
+ GV.forEach(function(g){var r=da[String(g.staff_id)];
+  h+='<tr>'+(suaDuoc?('<td><input type="checkbox" class="gdck" value="'+esc(g.staff_id)+'"'+(r?" checked":"")+'></td>'):'')+
+   '<td>'+nsLnk(g.staff_id,g.full_name,"")+'</td>'+
+   '<td>'+esc(elabel(g.branch)||g.branch||"-")+'</td>'+
+   '<td>'+(suaDuoc
+     ?('<input class="gdnote" data-sid="'+esc(g.staff_id)+'" value="'+esc(r?(r.ghi_chu||""):"")+'" placeholder="vd: chỉ nhận ca tối" style="width:100%;height:28px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:12px">')
+     :(r?esc(r.ghi_chu||"—"):'<span class="mut">chưa đăng ký</span>'))+'</td></tr>'});
+ h+='</tbody></table></div>';
+ h+='<div class="dact">'+(suaDuoc
+   ?('<button class="btn primary" onclick="gvdpThangLuu(\''+esc(k)+'\')"><i class="ti ti-device-floppy"></i>Lưu danh sách tháng '+esc(k)+'</button>')
+   :'')+'<button class="btn" onclick="closeModal()">Đóng</button></div></div>';
+ openDrawer("Giảng viên dự phòng theo tháng",h)}
+function gvdpThangLuu(k){
+ if(!gvdpAiKhai()){toast("Chỉ Trưởng phòng ACA khai được danh sách giảng viên dự phòng.");return}
+ if(!actGuard("gvdpThang:"+k))return;
+ var ghi={};[].forEach.call(document.querySelectorAll(".gdnote"),function(e){ghi[e.getAttribute("data-sid")]=String(e.value||"").trim()});
+ var chon=[];[].forEach.call(document.querySelectorAll(".gdck:checked"),function(e){chon.push(e.value)});
+ DL.DL28=(DL.DL28||[]).filter(function(x){return String(x.thang||"")!==String(k)});
+ chon.forEach(function(sid){var g=find("DL01","staff_id",sid)||{};
+  DL.DL28.push({gvdp_id:"GVDP-"+seqNo("DL28","gvdp_id",3),thang:k,
+   staff_id:sid,staff_name:g.full_name||sid,branch:g.branch||"",
+   ghi_chu:ghi[sid]||"",nguoi_khai:CURSTAFF||"",nguoi_khai_ten:myName(),khai_luc:nowStr()})});
+ persistSoon();closeModal();
+ toast("Đã lưu "+chon.length+" giảng viên dự phòng cho tháng "+k+".",4600);
+ reRender(CUR)}
 /* MÀN "GV DỰ PHÒNG THEO NGÀY": chọn ngày, thấy từng buổi hôm đó và ai đang trống để đẩy lên. */
 function gvdpDay(){var d=pvnd(window.GVDPD||"");if(d)return d;var t=new Date();t.setHours(0,0,0,0);return t}
 function gvdpSet(v){window.GVDPD=v;reRender(CUR)}
@@ -18973,6 +19156,18 @@ function renderGvdp(embed){
     giờ bị `_checkaudit` soi; gỡ cờ xong là lộ ngay. Luật của app: câu đầu trang phải đọc HẾT
     trong một nhịp mắt, phần dài đưa vào chú thích rê chuột - ai cần thì có, ai không thì không
     phải lướt qua. Giữ nguyên đủ ý, chỉ đổi chỗ đặt. */
+ /* ═══ V2 12/08 (HỌC VỤ-2) - DANH SÁCH GV DỰ PHÒNG KHAI THEO THÁNG ═══════════════════════════
+    Học vụ xin một danh sách giảng viên dự phòng; anh Luân chốt *"danh sách giảng viên dự phòng
+    thì có thể là mình sẽ nhập vào mỗi tháng, cái đó thì để trưởng phòng ACA nhập"*.
+    App vẫn TÍNH ai thay được từ lịch dạy thật - đó là thứ không bao giờ lạc hậu. Danh sách khai
+    tay KHÔNG thay thế phép tính ấy, nó trả lời một câu khác mà phép tính không trả lời được:
+    "tháng này ai đã NHẬN LỜI trực dự phòng". Một người trống lịch chưa chắc đã đồng ý dạy thay.
+    Hai câu hỏi khác nhau nên hai nguồn, và màn hình bày cả hai cạnh nhau. */
+ (function(){var ds=gvdpThang(day),co=ds.length;
+  h+='<div class="notebar '+(co?'nbgreen':'nbamber')+'"><i class="ti ti-clipboard-list"></i>'+
+   '<b>Đăng ký dự phòng tháng '+esc(gvdpKyThang(day))+':</b> '+
+   (co?(co+' giảng viên đã nhận lời - họ được xếp lên đầu danh sách người thay.'):'chưa ai đăng ký. Trưởng phòng ACA khai đầu tháng.')+
+   ' <button class="btn sm" onclick="gvdpThangForm(\''+esc(gvdpKyThang(day))+'\')"><i class="ti ti-edit"></i>'+(gvdpAiKhai()?'Khai danh sách tháng':'Xem danh sách tháng')+'</button></div>'})();
  h+='<div class="notebar"><i class="ti ti-info-circle"></i>'+
   '<b>Không cần đăng ký trước.</b> App tự tính ai thay được cho từng buổi. '+
   '<span data-tip="Người thay được = trống lịch đúng khung giờ đó, dạy được ở cơ sở của lớp (hoặc lớp online), '+
@@ -19469,6 +19664,30 @@ function moLop(cid){var c=find("DL10","class_id",cid);if(!c){toast("Không thấ
    '<td>'+num(x.current_enrollment)+'/'+(num(x.class_capacity)||"?")+'</td><td>'+esc(x.class_start_date||"-")+'</td>'+
    '<td>'+esc(clsOnline(x)?"online":(elabel(x.branch)||x.branch||"-"))+'</td></tr>'});
   h+='</tbody></table></div>'}
+ /* ═══ V2 12/08 (HỌC VỤ-3) - SALE ĐẨY THẲNG HỌC VIÊN VÀO LỚP ĐÃ LÊN KẾ HOẠCH ══════════════════
+    Anh Luân: *"sale có thể đẩy thẳng vào lớp đã lên kế hoạch"*. Trước bản này lấp lớp chỉ đi
+    được từ phía HỌC VIÊN (`xepFor` - chọn một em rồi tìm lớp cho em đó), mà người nhìn thấy lớp
+    thiếu chỗ lại đang đứng ở phía LỚP. Hai chiều của cùng một việc, app mới có một.
+    Danh sách chỉ lấy học viên ĐÃ ĐÓNG TIỀN XÁC NHẬN mà CHƯA có hồ sơ xếp lớp - không bày ra
+    những em đang học lớp khác để rồi phải chặn lại lúc lưu. */
+ (function(){
+  var haveOb={};rows("DL08").forEach(function(o){haveOb[o.student_id]=1});
+  var cho=srows("DL06").filter(function(e){
+   return /confirmed/.test(ecode(e.enrollment_status))&&e.student_id&&!haveOb[e.student_id]});
+  var dungKhoa=cho.filter(function(e){return String(e.course_id||"")===String(c.course_id||"")});
+  var conCho=(!cap||si<cap);
+  h+='<div class="dsec">Đẩy học viên vào lớp này ('+dungKhoa.length+' em đúng khóa đang chờ xếp)</div>';
+  if(!conCho)h+='<div class="empty">Lớp đã đủ sức chứa '+cap+' - không đẩy thêm được.</div>';
+  else if(!cho.length)h+='<div class="empty">Không còn học viên nào đã đóng tiền mà chưa xếp lớp.</div>';
+  else{
+   h+='<div class="fld full"><label>Chọn học viên</label>'+
+    '<select id="ml_hv"><option value="">-- chọn học viên --</option>'+
+    dungKhoa.map(function(e){return '<option value="'+esc(e.student_id)+'">'+esc((e.student_id_name||e.student_id)+" · đúng khóa")+'</option>'}).join("")+
+    cho.filter(function(e){return String(e.course_id||"")!==String(c.course_id||"")})
+       .map(function(e){return '<option value="'+esc(e.student_id)+'">'+esc((e.student_id_name||e.student_id)+" · khóa khác: "+(e.course_id_name||e.course_id||"?"))+'</option>'}).join("")+
+    '</select><div class="fhint">Em nào ĐÚNG KHÓA của lớp thì xếp trước - xếp sai khóa app sẽ chặn lúc lưu.</div></div>';
+   h+='<div class="fld full"><button class="btn primary" onclick="lopDayHV(\''+esc(cid)+'\')"><i class="ti ti-user-plus"></i>Đẩy vào lớp này</button></div>'}
+ })();
  h+='<div class="dsec">Quyết</div>';
  h+='<div class="fld"><label>Lùi ngày khai giảng sang</label><input id="ml_date" type="date" min="'+isoDay(1)+'" value="'+isoCong(c.class_start_date,paramOf("classDecide_days",7))+'"><div class="fhint">Điền sẵn = khai giảng cũ lùi thêm '+slaChip("classDecide_days",7)+' - đủ một vòng quyết nữa, đổi được.</div></div>';
  h+='<div class="fld"><label>Lý do (bắt buộc khi lùi ngày hoặc hủy)</label><input id="ml_why" placeholder="vd: chưa đủ sĩ số, dồn về lớp LOP-... khai giảng 20/09"></div>';
@@ -19479,6 +19698,27 @@ function moLop(cid){var c=find("DL10","class_id",cid);if(!c){toast("Không thấ
   '<button class="btn danger" onclick="moLopCancel(\''+esc(cid)+'\')"><i class="ti ti-calendar-off"></i>Hủy lớp</button>'+
   '</div></div>';
  openDrawer("Lớp sắp khai giảng",h)}
+/* Cùng một cửa ghi với `xepMoiLuu` - chỉ khác chỗ lấy hai mã. Không đẻ đường ghi thứ hai vào
+   DL08: hai đường ghi cùng một bảng là hai chỗ để quên cập nhật sĩ số. */
+function lopDayHV(cid){
+ var sid=fldV("ml_hv");
+ if(!sid){toast("Chọn học viên trước.");return}
+ var g=bizGuard("DL08",{class_id:cid,student_id:sid});if(g){toast(g);return}
+ if(!actGuard("lopDay:"+cid+":"+sid))return;
+ var s=find("DL09","student_id",sid)||{},c=find("DL10","class_id",cid)||{};
+ var enr=rows("DL06").filter(function(e){return e.student_id===sid})[0]||{};
+ var o={enrollment_id:enr.enrollment_id||"",student_id:sid,student_id_name:s.full_name,
+  class_id:cid,class_id_name:c.class_name,
+  placement_status:eFull("enum_placement_status","confirmed"),assigned_at:nowStr(),
+  placement_note:nowStr()+": đẩy thẳng vào lớp từ màn lớp sắp khai giảng ("+myName()+")",
+  onboarding_status:eFull("enum_onboarding_status","in_progress")};
+ o.onboarding_id="OB-"+seqNo("DL08","onboarding_id");
+ rows("DL08").unshift(o);
+ c.current_enrollment=String(num(c.current_enrollment)+1);
+ if(SVR)try{google.script.run.apiSave("DL08",o)}catch(e){}
+ persistSoon();closeModal();
+ toast("Đã đẩy "+(s.full_name||sid)+" vào "+(c.class_name||cid)+" (sĩ số "+c.current_enrollment+"/"+(c.class_capacity||"?")+"). Bước tiếp: gửi thông tin lớp.",5000);
+ reRender(CUR)}
 function moLopDelay(cid){var dv=(fldV("ml_date")||"").trim(),why=String(fldV("ml_why")||"").trim();
  if(!dv){toast("Chọn ngày khai giảng mới.");return}
  if(!why){toast("Ghi lý do lùi ngày - học viên và giáo viên sẽ hỏi.");return}
@@ -26076,7 +26316,7 @@ DOORS = {
  "DL06":["cancelEnrollRun","paySave","rfNeed","runCancelEnroll","tvEnrollSave","insSync","debtRemind"],
  "DL06b":["insPlanSave","dotApDung"],
  "DL07":["duyetRefundRun","paySave","payVerifyRun","rfNeed"],
- "DL08":["hvClassConfirm","hvClassRejectSave","midSave","obMark","rfNeed","xepMoiLuu","obChangeSave","obFinish"],
+ "DL08":["hvClassConfirm","hvClassRejectSave","lopDayHV","midSave","obMark","rfNeed","xepMoiLuu","obChangeSave","obFinish"],
  "DL09":["bkLuuPHNguyCo","bkLuuPHQuanHe","blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave","riskCareSave","riskFlagRun","riskIgnoreSave","dhSave"],
  "DL10":["xepMoiLuu","obChangeSave","rfNeed","clsSetTeacher","moLopDelay","moLopCancelRun"],
  "DL11":["bhCancelRun","bhDone","bhMakeupSave","bhNoteSave","bkLuuMocGio","ddSave","sessEnd","sessStart","sesSetTeacher","clsSetTeacher","sesThiSave","doiSave"],
@@ -26109,6 +26349,8 @@ DOORS = {
  # V2 12/08 (SALE-4/SALE-5): moi thay doi dot dong di qua bang nay truoc khi vao DL06b.
  # wowRefuseRun (WOW-2): NV WOW tu choi buoi HV tu dat - ghi DL14 va mo lai o DL26.
  "DL27":["dotTao","dotDuyet","dotTuChoiRun"],
+ # V2 12/08 (HOC VU-2): danh sach GV du phong khai theo THANG, truong phong ACA nhap.
+ "DL28":["gvdpThangLuu"],
  "DL23":["hvReq","tkNewSave"],
  "DL24":["hvAskSaySave","tkSay"],
 }

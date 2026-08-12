@@ -1214,6 +1214,128 @@ log.append("14d. Lịch đóng theo đợt: %d đợt cho %d đơn (quá hạn %
            "| thêm 4 tham số CH2 | next_payment_due nay suy ra từ đợt chưa đóng gần nhất"
            % (len(sched), len(set(x["enrollment_id"] for x in sched)), _od, _du, _up))
 
+# ═══ 14x. NGAY KET THUC LOP PHAI KHOP BUOI HOC CUOI (V2 12/08) ═════════════════════════════
+# Lo ra khi dung nhom viec "Lop sap ket thuc khoa" (HOC VU-1): do that thi `class_end_date` cua
+# MOI lop dang chay deu nam SAU buoi hoc cuoi cua chinh no tu 75 den 306 ngay. Mot lop day xong
+# buoi cuoi ngay 28/08 ma so ghi "ket thuc 11/11" - hai con so cua cung mot lop noi hai chuyen.
+# Khong ai bat duoc bang mat vi khong man nao dat hai con so canh nhau; chi khi co mot nhom viec
+# DEM NGUOC toi ngay ket thuc thi no moi lo ra - va luc do no lo ra bang cach im lang (khong lop
+# nao vao nhom, trong khi thuc te co sau lop sap xong).
+# Lay ngay buoi hoc cuoi lam ngay ket thuc: lop ket thuc khi day xong buoi cuoi, khong phai khi
+# mot con so nao do trong bang noi vay.
+_lopBuoi = {}
+for _s in dl["DL11"]:
+    if str(_s.get("session_status", "")).startswith("cancelled"):
+        continue
+    try:
+        _d = datetime.datetime.strptime(str(_s.get("session_date") or ""), "%d/%m/%Y %H:%M")
+    except Exception:
+        continue
+    _k = str(_s.get("class_id") or "")
+    if _k and (_k not in _lopBuoi or _d > _lopBuoi[_k]):
+        _lopBuoi[_k] = _d
+_suaEnd = 0
+for _c in dl["DL10"]:
+    _d = _lopBuoi.get(str(_c.get("class_id") or ""))
+    if not _d:
+        continue
+    _moi = _d.strftime("%d/%m/%Y")
+    if str(_c.get("class_end_date") or "") != _moi:
+        _c["class_end_date"] = _moi
+        _suaEnd += 1
+# BU DIEM GIUA KHOA CHO NHUNG LOP VUA QUA NUA CHANG. `gen_demo` gieo mid_* bang khung ngay cua
+# lop, ma khung ngay ay chi dung SAU khi sua o tren - nen 71 ho so cua 9 lop bong nhien "qua nua
+# chang ma chua co diem giua khoa" (luat 1b). Do khong phai loi moi: no da o day tu truoc, chi bi
+# ngay ket thuc sai che di - lop nao cung trong nhu con som. Sua ngay ket thuc la keo no ra anh
+# sang, va cho no phai bu ngay tai day, khong doi lan chay sau.
+_ob_lop = {}
+for _o in dl["DL08"]:
+    if _o.get("class_id"):
+        _ob_lop.setdefault(str(_o["class_id"]), []).append(_o)
+_buMid = 0
+for _c in dl["DL10"]:
+    if not str(_c.get("class_status", "")).startswith(("finished", "in_progress")):
+        continue
+    try:
+        _a = datetime.datetime.strptime(str(_c.get("class_start_date") or ""), "%d/%m/%Y")
+        _b = datetime.datetime.strptime(str(_c.get("class_end_date") or ""), "%d/%m/%Y")
+    except Exception:
+        continue
+    _giua = _a + (_b - _a) / 2
+    if _giua > NOW:
+        continue                      # chua qua nua chang thi TRONG la dung
+    for _o in _ob_lop.get(str(_c.get("class_id")), []):
+        if str(_o.get("mid_overall") or "").strip():
+            continue
+        # Bon ky nang sinh TRUOC, overall SUY RA tu trung binh lam tron 0.5 - dung cong thuc
+        # `gen_demo` dang dung, khong de hai noi tinh hai kieu.
+        _bs = round(random.uniform(4.0, 6.5) * 2) / 2
+        _l = max(1, round((_bs + random.uniform(-.5, .5)) * 2) / 2)
+        _r = max(1, round((_bs + random.uniform(-.5, .5)) * 2) / 2)
+        _w = max(1, round((_bs - 0.5) * 2) / 2)
+        _sp = max(1, round((_bs + random.uniform(-.5, .5)) * 2) / 2)
+        _o["mid_listening"] = str(_l); _o["mid_reading"] = str(_r)
+        _o["mid_writing"] = str(_w);   _o["mid_speaking"] = str(_sp)
+        _o["mid_overall"] = str(round((_l + _r + _w + _sp) / 4 * 2) / 2)
+        _o["mid_test_date"] = _giua.strftime("%d/%m/%Y")
+        _buMid += 1
+
+# LOP DA DAY DU SO BUOI CAM KET: hom nay khong lop nao dat 100% (cao nhat 76%), nen nhom viec
+# "Lop da hoc du gio cam ket" dung ra la RONG. Da thu gieo bang cach keo mot lop 'finished' ve
+# 'in_progress' - va no CHOI LAI ba luat khac cung mot luc (9f ngay ket thuc da qua, 1b thieu
+# ho so giua ky, 2b hoc vien 'hoan thanh khoa' ma van nam trong lop dang hoc). Dung luat du an:
+# *"O nao DUNG la nen bang 0 thi khai o RONGDUOC trong bo kiem kem ly do, chu khong gieo bua du
+# lieu xau cho the sang len."* Nen KHONG gieo - khai o `_checkdemo` la duoc phep rong.
+
+# ═══ 14y. DL03 - BU HAI COT MOI CHO PHIEU TEST SINH O CHO KHAC (V2 12/08, SALE-6) ══════════
+# `gen_demo` gan `test_kind` + `test_proctor_*` cho moi phieu no sinh ra, nhung 57/159 phieu ra
+# doi o cac buoc SAU (mkdemo / cac khoi gieo tinh huong trong chinh file nay) nen thieu hai cot.
+# Do that: cot moi khai ma mot phan ba bang de trong thi bang danh sach hien mot cot lo cho -
+# nguoi xem demo ket luan "chua lam" chu khong ket luan "du lieu con thieu".
+# Bu O DAY, sau khi MOI nguon da sinh xong - dung cho duy nhat noi biet du ca bang.
+_wowNV = [s for s in dl["DL01"] if "wow" in str(s.get("role", "")).split(" ")[0]
+          and not re.search(r"inactive|nghỉ", str(s.get("status", "")))]
+_buKind = _buNguoi = 0
+for _i, _t in enumerate(dl.get("DL03", [])):
+    if not str(_t.get("test_kind") or "").strip():
+        # Phieu bu gan het la thi thu - thi that o hoi dong la ca hiem, giu dung ty le voi phan tren.
+        _t["test_kind"] = ("official (Thi thật tại hội đồng)" if _i % 6 == 0
+                           else "mock (Thi thử tại trung tâm)")
+        if _t["test_kind"].startswith("official"):
+            _t["test_format"] = "offline (Offline tại trung tâm)"
+        _buKind += 1
+    if not str(_t.get("test_proctor_id") or "").strip() and _wowNV:
+        _nv = _wowNV[_i % len(_wowNV)]
+        _t["test_proctor_id"] = _nv["staff_id"]
+        _t["test_proctor_name"] = _nv.get("full_name", "")
+        _buNguoi += 1
+log.append("14y. DL03 bù cột SALE-6: %d phiếu thêm loại bài, %d phiếu thêm NV WOW coi test"
+           % (_buKind, _buNguoi))
+
+# ═══ 14w. DL28 - GIANG VIEN DU PHONG KHAI THEO THANG (V2 12/08, HOC VU-2) ══════════════════
+# Anh Luan: *"danh sach giang vien du phong thi co the la minh se nhap vao moi thang, cai do thi
+# de truong phong ACA nhap"*. Gieo THANG NAY va THANG TRUOC - hai thang thi man hinh moi cho thay
+# day la mot so khai theo ky, khong phai mot danh sach khai mot lan roi de do.
+_gvAll = [g for g in dl["DL01"] if "teacher" in str(g.get("role", "")).split(" ")[0]
+          and not re.search(r"inactive|nghỉ", str(g.get("status", "")))]
+_acaTP = next((s for s in dl["DL01"]
+               if re.match(r"^(aca|academic)_manager", str(s.get("role", "")))), None)
+_GHI = ["chỉ nhận ca tối", "", "cuối tuần thì báo trước 1 ngày", "", "nhận cả Cơ sở 2 và Cơ sở 3", ""]
+_thangNay = NOW.strftime("%m/%Y")
+_thangTruoc = (NOW.replace(day=1) - datetime.timedelta(days=1)).strftime("%m/%Y")
+_gvdp = []
+for _ky, _n in ((_thangTruoc, 4), (_thangNay, 5)):
+    for _i, _g in enumerate(_gvAll[:_n]):
+        _gvdp.append({"gvdp_id": "GVDP-%03d" % (len(_gvdp) + 1), "thang": _ky,
+                      "staff_id": _g["staff_id"], "staff_name": _g.get("full_name", ""),
+                      "branch": _g.get("branch", ""), "ghi_chu": _GHI[_i % len(_GHI)],
+                      "nguoi_khai": (_acaTP or {}).get("staff_id", ""),
+                      "nguoi_khai_ten": (_acaTP or {}).get("full_name", ""),
+                      "khai_luc": fmt(NOW - datetime.timedelta(days=3 if _ky == _thangNay else 33))})
+dl["DL28"] = _gvdp
+log.append("14w. DL28 giảng viên dự phòng: %d đăng ký cho 2 tháng (%s, %s)"
+           % (len(_gvdp), _thangTruoc, _thangNay))
+
 # ═══ 14z. DL27 - YEU CAU DOI DOT DONG (V2 12/08, SALE-4 + SALE-5) ═══════════════════════════
 # Truong phong Tu van: *"cho cho duyet nay duoc cho em xin them cai duyet gia han dot dong nua"*
 # va *"khi ban sale chia lai dot dong thi em se phai duyet qua thi moi hop le"*.
