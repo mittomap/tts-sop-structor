@@ -239,7 +239,7 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 40 BỘ KIỂM. Bản dựng đang chạy: `f00e4b` (11/08), verify TRỌN BỘ xanh hết,
+> **Phiên bản: V2 — 40 BỘ KIỂM. Bản dựng đang chạy: `035db1` (11/08), verify TRỌN BỘ xanh hết,
 > đã lên https://mittomap.github.io/itts-sop-demo-v2/ . V1 mốc cũ: V9.99z12, 34 bộ, `829572`,
 > https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới trong phiên này.**
 >
