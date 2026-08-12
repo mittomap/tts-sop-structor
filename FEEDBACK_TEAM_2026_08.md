@@ -300,6 +300,44 @@ kết quả, chờ tư vấn → Tư vấn sau test → Đang tư vấn → Ch�
 
 ---
 
+## WOW
+
+### WOW-1 · Lịch WOW — ✅ ĐÃ CHỐT: DỰNG LẠI BÁM THEO OLMS (anh Luân gửi 3 ảnh màn thật)
+> *"Việc book WOW - thực hiện trên lịch wow bên OLMS - đặt như thế này không biết ca nào trống ca
+> nào đã có lịch - khả năng trùng lịch cao"*
+
+Anh Luân: *"em cứ bám thử, nếu cần thứ thử đổi cấu hình cho phù hợp"*.
+
+**Bản em dựng 10/08 theo SOP DL19 KHÁC khá nhiều với màn thật team đang dùng:**
+
+| | Bản đang có (SOP DL19) | OLMS trong ảnh |
+|---|---|---|
+| Khung giờ | 13 khung **1 giờ**, 08:30→21:30 | **30 phút**, 09:00→21:30 |
+| Gom ca | không | **3 ca**: sáng 09:00-12:30 · chiều 12:30-17:30 · tối 17:30-21:30 |
+| Lưới | cột = ngày trong **tháng** | cột = ngày trong **TUẦN**, mỗi ngày tách theo **từng NV trực** |
+| Trạng thái ô | available/booked/taught/off | thêm **UNAVAILABLE** cho từng ô 30 phút |
+| Nội dung ô | tên NV + cơ sở | tên học viên · **loại bài** · mã lớp · **band mục tiêu** · tag **ONL** · tag **VẮNG MẶT** |
+| Chi tiết ô | ai trực, trạng thái | học viên · lớp · loại bài · hình thức · **phần thi** · **điểm FC/LR/GRA/PR + Overall** · kết quả từ WOW |
+| Cấu hình | khung giờ, ngày đăng ký trước, cam kết giờ/tháng | **số tuần HV xem trước (2)** · **số ngày phải đặt trước (1)** · **số ngày tối thiểu được huỷ (1)** |
+
+**Loại bài thấy trong ảnh:** ENTRY TEST · MIDTERM - SPEAKING · FINAL - SPEAKING · WOW SESSION
+(LUYỆN TẬP) · WRITING (cả 2 task). **Phần thi:** PART 1, PART 2, PART 3.
+**Điểm:** FC · LR · GRA · PR + OVERALL SCORE (đúng khung chấm Speaking IELTS).
+
+**Việc phải làm:**
+1. DL26 đổi sang ô **30 phút**, thêm trạng thái `unavailable`; gom hiển thị theo 3 ca.
+2. Màn Lịch trực WOW đổi sang **xem theo tuần**, cột = ngày, mỗi ngày tách theo NV đang trực
+   (kèm cơ sở của người đó), ô trống bấm `+` để đặt.
+3. DL14 thêm: loại bài · phần thi · hình thức (ONL/tại trung tâm) · điểm FC/LR/GRA/PR + overall ·
+   kết quả từ WOW.
+4. **Ba tham số CH2 mới** và phải ĐƯỢC ÁP THẬT vào cửa đặt/huỷ: số tuần học viên xem trước ·
+   số ngày phải đặt trước · số ngày tối thiểu được huỷ.
+
+### WOW-2 · Bỏ bước chờ xác nhận cho HV tự đặt — ⏳ CHƯA HỎI
+### WOW-3 · Nhập kết quả bên nào (app hay OLMS) — ⏳ anh Luân chưa chốt ranh giới
+
+---
+
 ## Tình hình
 
 **Đã hỏi 18/26.** Xong ACA (10) và SALE (10).
