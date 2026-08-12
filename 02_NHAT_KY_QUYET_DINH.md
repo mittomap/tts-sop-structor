@@ -249,9 +249,9 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 41 BỘ KIỂM. Bản dựng: xem BUILD ID mới nhất ở cuối mục 12/08 bên dưới.
-> Địa chỉ V2: https://mittomap.github.io/itts-sop-demo-v2/ . V1 mốc cũ: V9.99z12, 34 bộ, `829572`,
-> https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+> **Phiên bản: V2 — 41 BỘ KIỂM. Bản dựng đang chạy: `3f6ac9` (12/08), verify TRỌN BỘ xanh hết
+> (41 bộ, 35 phút), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
 > ### 🟢 12/08 - LÀM TRỌN 26 MỤC FEEDBACK CỦA BỐN TEAM (ACA · SALE · WOW · HỌC VỤ)
 >
@@ -291,6 +291,28 @@
 >    `persistSoon()` bị đẩy ra mốc 3474 - VẪN NẰM TRONG THÂN HÀM (thân dài 4013). Đã đổi sang
 >    **cắt đúng thân hàm**. *Một bộ kiểm mà kết quả phụ thuộc vào thân hàm dài bao nhiêu thì nó
 >    đang đo độ dài, không đo cái nó nói là đang đo.*
+>
+> **VÀ CHÍN CHỖ ĐỎ CỦA VERIFY TRỌN BỘ - BA TRONG SỐ ĐÓ LÀ LỖI CỦA CHÍNH BỘ KIỂM:**
+>
+> Nặng nhất là **`_checkdrawer`**. Nó chỉ gọi `closeDrawer()` mà **không đóng hộp xác nhận**, nên
+> bấm trúng một nút mở `confirmRun` là cái mặt nạ dính lại vĩnh viễn - mọi cú bấm sau rơi vào mặt
+> nạ và app nhảy sang trang khác (đo thật: bấm nút thứ 9 ở trang Chờ duyệt xong thì `CUR` thành
+> `settings`), toàn bộ phần còn lại của trang bị phí.
+> Hai tab mới của đợt này chỉ làm **lệch chỉ số nút**, thế là con số tụt 27 → 17 - trông y hệt một
+> hồi quy thật. Vá xong thì cùng một bản dựng mở được **49 ngăn kéo**, không một lỗi hình học nào.
+> Nghĩa là bộ kiểm ấy bấy lâu **chỉ soi được một phần ba số bề mặt nó tưởng đang soi**, và cái sàn
+> 24 đặt hôm 11/08 chính là đặt theo con số đo được LÚC CÒN HỎNG - giữ nguyên là để dành chỗ cho
+> cái hỏng ấy quay lại. Sàn mới: 40.
+> *Một bộ kiểm mà kết quả phụ thuộc vào vị trí ngẫu nhiên của một cái nút thì nó báo động sai, và
+> lần sau ai cũng phải đi truy một thứ không hỏng.*
+>
+> `_checkroi` trần menu 45 → 48: **48 mục CHỈ xảy ra với CEO** - tài khoản cố ý thấy mọi thứ; chức
+> danh làm việc thật cao nhất là Học vụ với 27 mục. Chia nhóm thêm cho riêng CEO là dựng một tầng
+> menu mà 15 chức danh còn lại không bao giờ chạm tới.
+>
+> Sáu chỗ còn lại là việc thật, đã sửa hết. Một chi tiết phải sửa hai lần mới đúng: **bảng màu
+> phình 110 → 112** vì hai mã màu pha cho biểu đồ. Đổi sang màu app đã có rồi mà VẪN 112 - hoá ra
+> hai mã ấy còn nằm trong chính câu chú thích vừa viết, mà bộ kiểm quét cả file dựng.
 >
 > **MỘT LẦN ĐỊNH GIEO BỪA RỒI GỠ RA:** nhóm việc "Lớp đã học đủ giờ cam kết" hôm nay rỗng (lớp
 > cao nhất mới 76%). Em thử kéo một lớp `finished` về `in_progress` cho thẻ sáng lên - và nó
