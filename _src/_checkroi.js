@@ -68,7 +68,16 @@ const APP = process.env.ITTS_APP || PATH.join(__dirname, "_APP.js");
    Đúng thủ tục mà chính đoạn trên đặt ra: trần chỉ để menu không dài thêm TRONG IM LẶNG - nâng
    thì phải khai thẳng lý do. Đây là lý do, và món nợ vẫn ghi: `academic_staff`/`academic_manager`
    còn 26 mục, muốn ngắn thì phải tách chặng. */
-const TRAN_MUC   = 45;   /* mục menu của một chức danh */
+/* ═══ 12/08: 45 -> 48, VÌ ĐỢT FEEDBACK BỐN TEAM THÊM BA MÀN NGHIỆP VỤ THẬT ═══════════════
+   Ba trang mới đều là thứ một team xin và anh Luân chốt làm: `duyetdot` (SALE-4/5 - đổi đợt
+   đóng phải qua duyệt) · `duyethd` (SALE-7 - hợp đồng cam kết hai chữ ký) · `tinnhan` (SALE-3 -
+   sổ tin đã gửi). Không phải nhét thêm mục cho vui.
+   ĐO TRƯỚC KHI NÂNG, và đây là lý do nâng chứ không gộp nhóm: **48 mục chỉ xảy ra với CEO** -
+   tài khoản cố ý thấy mọi thứ. Chức danh làm việc thật cao nhất là Học vụ với **27 mục**, dưới
+   trần một khoảng rộng. Chia nhóm thêm cho riêng CEO là dựng một tầng menu mà 15 chức danh còn
+   lại không bao giờ chạm tới.
+   Món nợ vẫn ghi nguyên: muốn CEO ngắn lại thì phải tách chặng, để dịp sau. */
+const TRAN_MUC   = 48;   /* mục menu của một chức danh */
 const TRAN_NHOM  = 20;   /* mục trong MỘT nhóm */
 const TRAN_TRONG = 2;    /* mục mở ra trống, trên toàn bộ chức danh */
 

@@ -494,6 +494,16 @@ Chi tiet "vi sao" o `02_NHAT_KY_QUYET_DINH.md`. O day chi ghi nhung cho **cham v
   `_checkmat` co y chi do mot kho man nen no khong the thay. Ban cu do lai: 22px o 1440 nhung
   **41px o 1100 va 60px o 860** (hai va ba dong). Ban moi: 22px o ca ba.
   Da tu thu lai cai thuoc: chay tren ban CU thi no do dung hai kho man hep.
+- **`_checklink.js` (MOI, 12/08)** - **TEN NGUOI PHAI BAM DUOC O MOI CHO**. ACA doi
+  *"ten hoc vien o dau cung bam duoc de mo thong tin nhanh"*, anh Luan chot: lam.
+  No VE THAT tung trang roi hoi TRINH DUYET, khong doc chuoi va khong doan cu phap: voi moi NODE
+  CHU chua ten mot hoc vien that trong DL09, hoi `closest("a,button,[onclick],select,option")`.
+  Chinh trinh duyet tra loi "cho nay bam duoc hay khong", nen ket qua bang dung cai nguoi dung thay.
+  **Ban do dau tien viet bang regex dem ra 428 cho tren 24 trang - GAP BON LAN su that (101),**
+  vi no chi ngo lai 220 ky tu tim the mo va khong thay noi `<div onclick>` boc ca dong.
+  *Dung tu dung bo phan tich cu phap khi thu hieu cu phap dang nam ngay do.*
+  Nguong 3: hai dang duoc mien co ly do doc duoc - ten nam trong CAU CHU TU DO nguoi dung go
+  (ly do chiet khau), va ten o TIEU DE TRANG HO SO cua chinh hoc vien do. Kem SAN PHAM VI 30 trang.
 - **`_checkdrawer.js` (MOI, V9.99z10)** - **HINH HOC CUA NGAN KEO**, do bang Chromium that.
   Anh Luan 05/08 kem anh chup: *"co vai loi css o drawer em"* - o chon hoc vien cao 224px, chua
   mot mang trang gan nua man hinh. Goc: `.pk{flex:1 1 224px}` dat hoi V9.99f de noi CHIEU RONG,

@@ -87,8 +87,22 @@ const TRANG=["banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","hocvien
     return ra;
    });
    if(kq){soDrawer++; kq.forEach(x=>loi.push(tr+" · nut \""+mo+"\" · "+x.l+" ["+x.c+"]"));}
-   await page.evaluate(()=>{try{closeDrawer()}catch(e){try{document.getElementById("drawer").classList.remove("on")}catch(e2){}}});
-   await page.waitForTimeout(120);
+   /* ═══ 12/08 - DON SACH HAN SAU MOI CU BAM ═══════════════════════════════════════════════
+      Ban cu chi goi `closeDrawer()`. Nhung tren trang co nut mo HOP XAC NHAN (`confirmRun`),
+      cai mat na `.cfmask.on` dinh lai VINH VIEN - moi cu bam sau do roi vao mat na, app nhay
+      lung tung sang trang khac (do that: bam nut thu 9 o trang `duyet` xong thi CUR thanh
+      `settings`), va toan bo phan con lai cua trang bi phi.
+      Hau qua: so ngan keo mo duoc PHU THUOC VAO VI TRI ngau nhien cua mot cai nut - them hai
+      tab moi la tut tu 27 xuong 17 ma khong co gi hong that. Mot bo kiem doc ket qua tu may
+      rui cua chi so thi no bao dong sai, va lan sau ai cung phai di truy mot cai khong hong.
+      Nay dong CA BA (ngan keo, hop xac nhan, mat na menu) va QUAY VE dung trang neu bi lac. */
+   await page.evaluate(k=>{
+    try{closeDrawer()}catch(e){try{document.getElementById("drawer").classList.remove("on")}catch(e2){}}
+    try{closeConfirm()}catch(e){}
+    document.querySelectorAll(".cfmask.on,.modal.on,.mask.on").forEach(x=>x.classList.remove("on"));
+    try{if(typeof CUR!=="undefined"&&CUR!==k)go(k)}catch(e){}
+   },tr);
+   await page.waitForTimeout(140);
   }
  }
  const gom={}; loi.forEach(x=>gom[x]=1);
@@ -103,7 +117,12 @@ const TRANG=["banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","hocvien
     phai KEU: du lieu demo cu di mot ngay la app rong di mot mang, va nguoi mo demo se thay.
     San dat 24 - duoi muc 27 do duoc khi du lieu tuoi, tren han muc 17 cua ban da cu mot ngay.
     Tut xuong duoi san thi DO, kem cau nhac dung viec phai lam. */
- var SAN=24;
+ /* 12/08 - SAN 24 -> 40. Sau khi vá chỗ mặt nạ dính, cùng một bản dựng mở được 49 ngăn kéo
+    chứ không phải 17: bộ kiểm này bấy lâu chỉ soi được MỘT PHẦN BA số bề mặt nó tưởng đang soi.
+    Sàn cũ 24 đặt theo con số 27 đo được lúc còn hỏng - giữ nguyên là để dành chỗ cho chính cái
+    hỏng ấy quay lại. Sàn mới 40: dưới 49 một khoảng đủ cho dữ liệu trôi theo ngày, nhưng trên
+    hẳn mức 17 của bản còn hỏng. */
+ var SAN=40;
  if(soDrawer<SAN){
   console.log("CHECKDRAWER DO: chi mo duoc "+soDrawer+" ngan keo, duoi san "+SAN+".");
   console.log("  Thuong la du lieu demo da cu hon ngay chay - dung lai pipeline roi build lai:");

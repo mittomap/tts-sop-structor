@@ -1373,7 +1373,7 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .wsci label{display:block;cursor:pointer;margin-bottom:5px}
 .wsci b{font-size:12.5px;font-weight:700;color:var(--navy);display:block}
 .wsci small{display:block;color:var(--muted);font-size:11px;margin-top:1px}
-.wsci input{width:100%;height:32px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-family:inherit;font-size:13px}
+.wsci input{width:100%;height:32px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:13px}
 /* dải nút trong thẻ trùng số - xuống dòng được, không bóp chữ (luật M6 của _checkmat) */
 .dupact{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 /* V2 12/08 (SALE-1) - hai biểu đồ của đội tư vấn. Lưới TỰ CO: trên điện thoại xếp dọc, trên
@@ -1382,10 +1382,15 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .chwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .chpie{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:center}
 .chleg{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px}
-.chli{display:flex;align-items:center;gap:6px;font-size:11.5px;white-space:nowrap}
-.chdot{width:10px;height:10px;border-radius:3px;flex:none}
-.chli .chln{font-weight:600;color:var(--navy)}
-.chli b{font-variant-numeric:tabular-nums}
+.chli{display:flex;align-items:center;gap:6px;font-size:11.5px;white-space:nowrap;flex:none}
+.chdot{width:10px;height:10px;border-radius:2px;flex:none}
+.chli .chln{font-weight:600;color:var(--navy);flex:none}
+.chli .mut{flex:none}
+/* `flex:none` chứ không để co: `.chli` là hàng flex, mà một `<b>` chứa "25%" bị bóp còn 26px
+   trong khi nó cần 27px - thiếu ĐÚNG MỘT pixel, và hàng thì còn thừa 218px. `_checkmat` bắt
+   được (phép đo M3: ô hẹp giữa khoảng trống). Một pixel không ai nhìn ra, nhưng nó là dấu hiệu
+   ô đang co - dữ liệu khác một chút là chữ vỡ thật. */
+.chli b{font-variant-numeric:tabular-nums;flex:none;min-width:34px;text-align:right}
 .rbwrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:12px}
 .rbrow{display:flex;align-items:center;gap:12px;padding:9px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .rbrow:last-child{border-bottom:0}
@@ -2449,7 +2454,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">12/08/2026 · <b>264a68</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">12/08/2026 · <b>3f6ac9</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -4324,17 +4329,17 @@ var THEDEF={
     câu hỏi, số không sai nhưng nó KHÔNG DẪN TỚI ĐÂU. */
  tinnhan:{t:"Sổ tin đã gửi",the:[
   ["tn_tong","Tin đã gửi","Tổng số email và tin Zalo app đã gửi cho khách, trong phạm vi bạn xem được. Danh sách: bảng ngay dưới."],
-  ["tn_mail","Qua email","Số tin gửi bằng email - chỉ hiện nút gửi email khi hồ sơ khách có địa chỉ email."],
-  ["tn_zalo","Qua Zalo","Số tin gửi bằng Zalo - chỉ hiện nút gửi Zalo khi hồ sơ khách có Zalo."],
-  ["tn_today","Gửi hôm nay","Số tin gửi trong ngày hôm nay. Lọc: ô Thời gian ở thanh trên."]]},
+  ["tn_mail","Qua email","Số tin gửi bằng email - chỉ hiện nút gửi email khi hồ sơ khách có địa chỉ email. Danh sách: bấm chip Email ở thanh lọc ngay dưới."],
+  ["tn_zalo","Qua Zalo","Số tin gửi bằng Zalo - chỉ hiện nút gửi Zalo khi hồ sơ khách có Zalo. Danh sách: bấm chip Zalo ở thanh lọc ngay dưới."],
+  ["tn_today","Gửi hôm nay","Số tin gửi trong ngày hôm nay. Danh sách: chọn Hôm nay ở ô Thời gian trên thanh lọc, bảng ngay dưới lọc theo."]]},
  duyethd:{t:"Duyệt hợp đồng cam kết",the:[
   ["hd_cho","Hợp đồng chờ duyệt","Số hợp đồng cam kết đầu ra chưa đủ hai chữ ký (Trưởng phòng Tư vấn và Giám đốc). Danh sách: ngay dưới dải này."],
-  ["hd_mot","Mới có một chữ ký","Hợp đồng đã được một trong hai người duyệt, còn chờ người kia. Thiếu một chữ ký là học viên chưa xếp lớp được."],
-  ["hd_band","Band cam kết trung bình","Trung bình band mục tiêu của các hợp đồng đang chờ - nhìn nhanh xem đợt này sale cam kết cao hay thấp."]]},
+  ["hd_mot","Mới có một chữ ký","Hợp đồng đã được một trong hai người duyệt, còn chờ người kia. Thiếu một chữ ký là học viên chưa xếp lớp được. Danh sách: bảng ngay dưới, nhìn hai chip trạng thái của từng dòng."],
+  ["hd_band","Band cam kết trung bình","Trung bình band mục tiêu của các hợp đồng đang chờ - nhìn nhanh xem đợt này sale cam kết cao hay thấp. Danh sách: bảng ngay dưới, cột band của từng dòng."]]},
  duyetdot:{t:"Duyệt đổi đợt đóng",the:[
   ["dd_cho","Yêu cầu chờ duyệt","Số yêu cầu đổi đợt đóng đang chờ quyết. Danh sách: ngay dưới dải này."],
   ["dd_gh","Xin gia hạn một đợt","Yêu cầu lùi hạn ĐÚNG MỘT đợt, thường kèm ảnh trao đổi với khách. Danh sách: dưới, nhìn dòng ghi hạn cũ → hạn mới."],
-  ["dd_cl","Xin chia lại cả lịch","Yêu cầu chia lại toàn bộ lịch đợt của đơn (đổi số đợt, khoảng cách, tỷ lệ đợt đầu). Duyệt là dựng lại lịch ngay."]]},
+  ["dd_cl","Xin chia lại cả lịch","Yêu cầu chia lại toàn bộ lịch đợt của đơn (đổi số đợt, khoảng cách, tỷ lệ đợt đầu). Duyệt là dựng lại lịch ngay. Danh sách: bảng ngay dưới, dòng nào ghi \"Chia lại thành N đợt\"."]]},
  duyetck:{t:"Duyệt chiết khấu",the:[
   ["dck_cho","Đơn chờ duyệt","Đơn đăng ký có chiết khấu vượt mức tự quyết, đang chờ người có thẩm quyền gật. Danh sách: ngay dưới dải thẻ này."],
   ["dck_vuot","Vượt mức tự quyết","Trong số đơn chờ, đếm riêng đơn có số tiền giảm vượt ngưỡng tự quyết (chỉnh ở Cài đặt, thresholdDiscount_approval). Danh sách: đơn nào vượt đều có chip đỏ ở dòng."],
@@ -4441,7 +4446,7 @@ var THEDEF={
   ["kq_that","Đạt AIM · kỳ thi IELTS thật","Tỷ lệ học viên có điểm Overall kỳ thi IELTS chính thức đạt hoặc vượt band mục tiêu. Thi nhiều lần thì tính theo cách chọn khai ở aimOfficialPick. Danh sách: bảng chi tiết cuối trang, cột Overall thật."],
   ["kq_chua","Chưa đi thi thật","Đếm học viên đã học xong nhưng sổ kỳ thi IELTS thật chưa có lượt nào. Danh sách: bảng chi tiết cuối trang, cột Overall thật ghi \"chưa có điểm\". Nhập điểm bằng nút ở đầu trang."]]},
  banglop:{t:"Bảng lớp - một lớp",the:[
-  ["bl_off","Số buổi off còn lại","Giáo viên chính của lớp còn được nghỉ mấy buổi trong khóa này, trên quota khai ở teacherOffQuota_course. Đếm buổi của lớp do người khác GV chính dạy - mỗi lần đổi người dạy đều phải chọn lý do và được ghi vào vết của buổi. Sĩ số vẫn nằm ở khối thông tin lớp ngay dưới dải này."],
+  ["bl_off","Số buổi off còn lại","Giáo viên chính của lớp còn được nghỉ mấy buổi trong khóa này, trên quota khai ở teacherOffQuota_course. Đếm buổi của lớp do người khác GV chính dạy. Danh sách: tab Buổi học ngay dưới, buổi nào đổi giáo viên đều ghi lý do trong vết của buổi. Sĩ số vẫn nằm ở khối thông tin lớp."],
   ["bl_atr","Chuyên cần (ATR)","Tỷ lệ buổi có mặt trên tổng buổi đã điểm danh của cả lớp, so với ngưỡng ATR ở Ngưỡng KPI. Muốn xem chi tiết: tab Điểm danh."],
   ["bl_hcr","Nộp bài (HCR)","Tỷ lệ bài tập đã nộp trên tổng bài đã giao của cả lớp, so với ngưỡng HCR. Muốn xem chi tiết: tab Bài tập."],
   ["bl_risk","HV nguy cơ","Số học viên của lớp đang bị đánh dấu nguy cơ (chuyên cần hoặc học thuật). Danh sách: bảng học viên dưới, nhìn hai cột trạng thái."],
@@ -6277,7 +6282,12 @@ function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sa
    3. Sale nói "4 chi nhánh", dữ liệu có 5 cơ sở + Online. Anh Luân: *"chỉ vẽ cơ sở có số liệu
       trong kỳ"* - nên số cột do dữ liệu quyết, không cắm cứng 4. */
 function svgEsc(t){return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
-var SALEMAU=["#3B82C4","#16A34A","#E08A1E","#DB2777","#6B4FA0","#0E9AA7","#E24B4A","#7C7F86"];
+/* Tám màu LẤY TỪ bảng màu app đang dùng, không pha màu mới: `_checkux` canh bảng màu không phình
+   trở lại (đã từng 202 mã, kéo về 110). Hai màu em pha lúc đầu đẩy lên 112 - đổi sang hai mã app
+   đã có. Một biểu đồ không đáng để cả sản phẩm thêm hai màu.
+   (Và chính câu chú thích này cũng phải sạch: bộ kiểm quét cả file dựng, mà chú thích nằm trong
+   chuỗi HTML nên hai mã màu viết ra ở đây vẫn bị đếm - đã cắn một lần.) */
+var SALEMAU=["#3B82C4","#16A34A","#E08A1E","#DB2777","#6B4FA0","#0D9488","#E24B4A","#6B7887"];
 function saleChart(sales,w0,ng){
  if(!sales||sales.length<1)return "";
  /* Số liệu của từng NV: lượt kết nối trong kỳ và doanh thu toàn kỳ - cùng công thức với bảng
@@ -6311,7 +6321,7 @@ function saleCotChong(D,ng){
  /* lưới ngang + nhãn trục: bốn vạch là đủ đọc, nhiều hơn thành rối */
  for(var gi=0;gi<=4;gi++){var gy=PT+(H-PT-PB)*gi/4,gv=Math.round(max*(4-gi)/4);
   g+='<line x1="'+PL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-8)+'" y2="'+gy.toFixed(1)+'" stroke="#E3E9F0" stroke-width="1"/>'+
-   '<text x="'+(PL-6)+'" y="'+(gy+4).toFixed(1)+'" text-anchor="end" font-size="10" fill="#6B7887">'+gv+'</text>'}
+   '<text x="'+(PL-6)+'" y="'+(gy+4).toFixed(1)+'" text-anchor="end" font-size="11" fill="#6B7887">'+gv+'</text>'}
  ks.forEach(function(k,i){
   var x=PL+8+i*((W-PL-16)/ks.length),y=H-PB,tongK=tong[i];
   br[k].slice().sort(function(a,b){return b.ket-a.ket}).forEach(function(sv){
@@ -6321,12 +6331,12 @@ function saleCotChong(D,ng){
    g+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+hh.toFixed(1)+'" fill="'+sv.mau+'" rx="2">'+
     '<title>'+svgEsc(sv.ten+" · "+sv.ket+" lượt kết nối / "+sv.luot+" lượt liên hệ"+(sv.luot?(" ("+Math.round(sv.ket*100/sv.luot)+"%)"):"")+" · "+sv.dk+" đăng ký mới")+'</title></rect>'});
   g+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(H-PB+15)+'" text-anchor="middle" font-size="11" font-weight="600" fill="#1E2A38">'+svgEsc(k==="__"?"Chưa gán cơ sở":(elabel(k)||k))+'</text>';
-  g+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(H-PB+29)+'" text-anchor="middle" font-size="10.5" fill="#6B7887">'+tongK+' lượt</text>'});
+  g+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(H-PB+29)+'" text-anchor="middle" font-size="11" fill="#6B7887">'+tongK+' lượt</text>'});
  g+='</svg>';
  return '<div class="panel"><div class="ph"><b><i class="ti ti-chart-bar" style="margin-right:6px"></i>Lượt kết nối theo cơ sở</b>'+
   '<span class="mut" style="font-size:11.5px">'+ng+' ngày gần nhất · mỗi màu một nhân viên</span></div>'+
   '<div class="pbody"><div class="chwrap">'+g+'</div>'+saleChu(D)+
-  '<div class="fhint">Đếm <b>số lượt kết nối</b> chứ không chồng tỷ lệ %: ba cái % cộng lại không ra con số nào có nghĩa. Rê chuột vào một mảnh để xem tỷ lệ kết nối của người đó. Cơ sở không có lượt nào trong kỳ thì không vẽ cột.</div></div></div>'}
+  '<div class="fhint" data-tip="Ba cái % cộng lại không ra con số nào có nghĩa, nên cột chồng đếm SỐ LƯỢT. Cơ sở không có lượt nào trong kỳ thì không vẽ cột.">Đếm <b>số lượt kết nối</b>, không chồng tỷ lệ %. Rê chuột vào một mảnh để xem tỷ lệ của người đó.</div></div></div>'}
 /* TRÒN: doanh thu theo NV, kèm % - đúng câu "sale nào thu được bao nhiêu chiếm tỉ lệ bao nhiêu %". */
 function saleTron(D){
  var co=D.filter(function(x){return x.rev>0}).sort(function(a,b){return b.rev-a.rev});
@@ -6350,7 +6360,8 @@ function saleTron(D){
  g+='</svg>';
  var ct='<div class="chleg">'+co.map(function(x){
   return '<div class="chli"><span class="chdot" style="background:'+x.mau+'"></span>'+
-   '<span class="chln">'+esc(x.ten)+'</span><b>'+Math.round(x.rev*100/tong)+'%</b>'+
+   '<span class="chln">'+esc(x.ten)+'</span>'+
+   '<b data-tip="'+esc(pctG(x.rev,tong,"đồng doanh thu của cả đội là do khách của người này đóng"))+'">'+Math.round(x.rev*100/tong)+'%</b>'+
    '<span class="mut">'+vnd(x.rev)+'</span></div>'}).join("")+'</div>';
  return '<div class="panel"><div class="ph"><b><i class="ti ti-chart-pie" style="margin-right:6px"></i>Doanh thu theo nhân viên</b>'+
   '<span class="mut" style="font-size:11.5px">toàn kỳ dữ liệu</span></div>'+
@@ -7625,10 +7636,21 @@ function dotMoTa(r){
  return "Chia lại thành <b>"+esc(String(p.n||"?"))+" đợt</b>"+(p.gap?", cách nhau "+esc(String(p.gap))+" ngày":"")+
   (p.dep?", đợt đầu "+esc(String(p.dep))+"%":"")}
 function duyDotHTML(){
- var q=fltApply("duyetdot",dotCho());
+ var cho0=dotCho();
+ /* Chip lọc: hàng chờ này gộp HAI loại yêu cầu khác hẳn nhau - lùi hạn một đợt là quyết nhanh,
+    chia lại cả lịch là quyết chậm. Người duyệt thường làm gọn từng loại một. */
+ var dF=fget("duyetdot");
+ var nGH=cho0.filter(function(r){return isc(r.req_type,"extend")}).length;
+ var nCL=cho0.filter(function(r){return isc(r.req_type,"replan")}).length;
+ if(dF==="giahan")cho0=cho0.filter(function(r){return isc(r.req_type,"extend")});
+ else if(dF==="chialai")cho0=cho0.filter(function(r){return isc(r.req_type,"replan")});
+ var q=fltApply("duyetdot",cho0);
  var xong=dotList().filter(function(r){return !isc(r.req_status,"pending")}).slice(0,8);
- var h=tbar(srchHTML(fget("q_duyetdot")||"","fset('q_duyetdot',this.value);reRenderKeep(CUR)","Tìm tên học viên hoặc mã đơn...",300),
-  '<span class="tbcnt">'+q.length+' yêu cầu chờ</span>');
+ var h=tbar(srchHTML(fget("q_duyetdot")||"","fset('q_duyetdot',this.value);reRenderKeep(CUR)","Tìm tên, SĐT hoặc mã...",300),
+  '<span class="tbcnt">'+q.length+'/'+dotList().length+' yêu cầu</span>');
+ h+=chipBar("duyetdot",dF,[["all","Tất cả",nGH+nCL],
+  ["giahan","Xin gia hạn đợt",nGH,nGH?"amber":""],
+  ["chialai","Xin chia lại lịch",nCL,nCL?"amber":""]],q.length);
  if(!dotAiDuyet())
   h+='<div class="notebar nbamber"><i class="ti ti-lock"></i>Chức danh của bạn <b>gửi</b> được yêu cầu đổi đợt đóng nhưng không <b>duyệt</b> được - việc quyết thuộc trưởng phòng hoặc phòng kế toán.</div>';
  h+='<div class="panel"><div class="pbody">';
@@ -7839,13 +7861,24 @@ function hdThuBao(id){
   "Tran trong,\nIELTS The Tutors"+(hot?("\nHotline: "+hot):"");
  msgSoan(sid,ks[0].k,"IELTS The Tutors - xác nhận hợp đồng cam kết đầu ra",noi,"camket")}
 function duyHdHTML(){
- var cho=fltApply("duyethd",hdCho());
+ var cho0=hdCho();
+ /* Chip lọc theo ĐANG THIẾU CHỮ KÝ NÀO - đó là câu người duyệt hỏi khi mở màn này: "cái nào
+    đang chờ CHÍNH TÔI". Lọc theo trạng thái chung thì không trả lời được câu ấy. */
+ var hF=fget("duyethd");
+ var nChua=cho0.filter(function(h){return !isc(h.duyet_tuvan,"approved")&&!isc(h.duyet_gd,"approved")}).length;
+ var nMot=cho0.filter(function(h){return isc(h.duyet_tuvan,"approved")!==isc(h.duyet_gd,"approved")}).length;
+ if(hF==="chuaai")cho0=cho0.filter(function(h){return !isc(h.duyet_tuvan,"approved")&&!isc(h.duyet_gd,"approved")});
+ else if(hF==="motky")cho0=cho0.filter(function(h){return isc(h.duyet_tuvan,"approved")!==isc(h.duyet_gd,"approved")});
+ var cho=fltApply("duyethd",cho0);
  var xong=hdList().filter(function(h){return hdDaDu(h)||hdBiTuChoi(h)}).slice(0,8);
  var toi=hdDuyetDuoc();
- var h=tbar(srchHTML(fget("q_duyethd")||"","fset('q_duyethd',this.value);reRenderKeep(CUR)","Tìm tên học viên hoặc mã đơn...",300),
-  '<span class="tbcnt">'+cho.length+' hợp đồng chờ</span>');
- h+='<div class="notebar"><i class="ti ti-info-circle"></i>Mỗi hợp đồng cần <b>ĐỦ HAI CHỮ KÝ</b>: Trưởng phòng Tư vấn và Giám đốc. Thiếu một là học viên chưa sang được bước xếp lớp. '+
-  (toi.length?('Bạn duyệt được ô: <b>'+esc(HDVAI.filter(function(v){return toi.indexOf(v.k)>=0}).map(function(v){return v.lb}).join(", "))+'</b>.'):'Chức danh của bạn <b>xem</b> được nhưng không duyệt được ô nào.')+'</div>';
+ var h=tbar(srchHTML(fget("q_duyethd")||"","fset('q_duyethd',this.value);reRenderKeep(CUR)","Tìm tên, SĐT hoặc mã...",300),
+  '<span class="tbcnt">'+cho.length+'/'+hdList().length+' hợp đồng</span>');
+ h+=chipBar("duyethd",hF,[["all","Tất cả",nChua+nMot],
+  ["chuaai","Chưa ai ký",nChua,nChua?"red":""],
+  ["motky","Mới một chữ ký",nMot,nMot?"amber":""]],cho.length);
+ h+='<div class="notebar" data-tip="Thiếu một chữ ký là học viên chưa sang được bước xếp lớp - app chặn ở cả hai cửa ghi xếp lớp, không chỉ ẩn nút."><i class="ti ti-info-circle"></i>Mỗi hợp đồng cần <b>ĐỦ HAI CHỮ KÝ</b>: Trưởng phòng Tư vấn và Giám đốc. '+
+  (toi.length?('Bạn duyệt được: <b>'+esc(HDVAI.filter(function(v){return toi.indexOf(v.k)>=0}).map(function(v){return v.lb}).join(", "))+'</b>.'):'Bạn <b>xem</b> được, không duyệt được ô nào.')+'</div>';
  h+='<div class="panel"><div class="pbody">';
  if(!cho.length)h+='<div class="empty">Không có hợp đồng cam kết nào đang chờ duyệt.</div>';
  cho.forEach(function(r){
@@ -7854,7 +7887,10 @@ function duyHdHTML(){
    '<div class="amt">'+hdChipHTML(r)+'</div>'+
    '<div class="rs">Khóa '+esc(r.course_id_name||r.course_id||"-")+' · học phí '+vnd(num(r.hoc_phi))+
    (r.han?(' · hạn đạt '+esc(r.han)):'')+' · trình bởi '+esc(r.trinh_boi_ten||"-")+' lúc '+esc(r.trinh_luc||"-")+'</div>'+
-   (r.dieu_kien?('<div class="rs">Điều kiện: '+esc(r.dieu_kien)+'</div>'):'')+
+   /* Câu điều kiện là CHỮ NGƯỜI DÙNG GÕ trong hợp đồng, không phải một con số app tính ra - nhưng
+      trong đó có thể có "%" (vd "đi đủ 90% số buổi"), mà luật của app là mọi con số % phải nói
+      được cách tính. Nói thẳng nó là điều khoản đã thoả thuận, không phải kết quả đo. */
+   (r.dieu_kien?('<div class="rs" data-tip="Điều khoản đã thoả thuận trong hợp đồng - chữ do người lập hợp đồng gõ, không phải con số app tính từ dữ liệu.">Điều kiện: '+esc(r.dieu_kien)+'</div>'):'')+
    '</div><div class="act">'+
    HDVAI.filter(function(v){return toi.indexOf(v.k)>=0&&!isc(r["duyet_"+v.k],"approved")}).map(function(v){
     return '<button class="btn primary sm" onclick="hdQuyet(\''+esc(r.hd_id)+'\',\''+v.k+'\',1)"><i class="ti ti-check"></i>Duyệt ('+esc(v.lb)+')</button>'+
@@ -10547,7 +10583,7 @@ function nvNhanHVSave(sid){
  DL.DL23=DL.DL23||[];DL.DL23.unshift(t);
  if(SVR)try{google.script.run.apiSave("DL23",t)}catch(e){}
  persistSoon();closeModal();
- toast("Đã gửi tin cho "+(S.full_name||sid)+" - em ấy đọc được ở mục Trao đổi với trung tâm.",5000);
+ toast("Đã gửi tin cho "+(S.full_name||sid)+" - học viên đọc được ở mục Trao đổi với trung tâm.",5000);
  reRender(CUR)}
 function ychvList(){return srows("DL23").filter(function(t){return isc(t.task_type,"student_request")})}
 function ychvCho(){return ychvList().filter(function(t){return isc(t.task_status,"new")}).length}
@@ -14605,7 +14641,7 @@ var APPPARAMS=[
  ["P5 · Xếp lớp & nhập học","classFinalNear_days","Còn bao nhiêu ngày tới buổi thi cuối khóa thì nhắc học vụ soát phòng thi, đề và danh sách dự thi (ba tuần là đủ để đặt phòng, in đề và chốt danh sách)","ngày",21],
  ["P5 · Xếp lớp & nhập học","classEndNear_days","Còn bao nhiêu ngày tới ngày kết thúc lớp thì nhắc lên kế hoạch lớp kế tiếp","ngày",21],
  ["P5 · Xếp lớp & nhập học","classHoursDonePct","Lớp dạy được bao nhiêu % số buổi thì coi là đã đủ giờ cam kết (chốt đầu ra, mời tái đăng ký)","%",100],
- ["P5 · Xếp lớp & nhập học","classRiskSharePct","Bao nhiêu % học viên của lớp bị đánh dấu nguy cơ thì báo động CẢ LỚP chứ không riêng từng em","%",30],
+ ["P5 · Xếp lớp & nhập học","classRiskSharePct","Bao nhiêu % học viên của lớp bị đánh dấu nguy cơ thì báo động CẢ LỚP chứ không riêng từng người","%",30],
  ["P5 · Xếp lớp & nhập học","classMinStudents","Sĩ số tối thiểu để một lớp khai giảng - dưới mức này phải quyết dồn lớp, lùi ngày hoặc hủy sớm","học viên",6],
  ["P5 · Xếp lớp & nhập học","classDecide_days","Còn bao nhiêu ngày tới khai giảng mà vẫn thiếu sĩ số thì chuyển đỏ - hết giờ cân nhắc, phải quyết","ngày",7],
  ["P7 · Buổi WOW 1-1","slaWowNote_hours","Hạn ghi nội dung sau buổi WOW 1-1","giờ",24],
@@ -14959,6 +14995,8 @@ var DVI={chay:"hồ sơ",giaoan:"lớp",buoihoc:"buổi",diemdanh:"buổi",baita
  nhaplead:"khách",giaoviec:"việc",viec:"việc",baoluu:"học viên",ketthuc:"học viên",
  test:"lượt test",tuvan:"phiếu tư vấn",thanhtoan:"đăng ký",xeplop:"hồ sơ",magioithieu:"mã",
  bangcong:"giảng viên",nhansu:"người",
+ /* V2 12/08 - ba màn mới của đợt feedback bốn team */
+ tinnhan:"tin",duyetdot:"yêu cầu",duyethd:"hợp đồng",
  /* V2 11/08 - màn Lịch trực WOW đếm bằng Ô TRỰC (mỗi ô 30 phút), không đếm bằng "buổi" như sổ
     WOW: một buổi WOW nằm TRÊN một ô trực, hai thứ khác nhau. Khai vào đây để `_checkux` không
     phải đoán, và để cả app gọi cùng một tên. */
@@ -15900,7 +15938,8 @@ function dotGiaHan(eid,no){
  h+=ctxRows([["Đợt",esc(no)+"/"+esc(s.installment_of||"")],["Hạn hiện tại",esc(s.due_date||"-")],
   ["Số tiền đợt này",vnd(num(s.due_amount))],["Còn phải đóng",vnd(num(s.remaining_amount))]]);
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Yêu cầu này KHÔNG đổi hạn ngay. Nó vào hàng chờ duyệt; người duyệt xem ảnh trao đổi rồi mới chốt.</div>';
- h+='<div class="fld"><label>Hạn mới <i>*</i></label><input id="dg_due" type="date"></div>';
+ /* điền sẵn = hạn cũ cộng một chu kỳ nhắc - đủ một vòng nữa, sửa được */
+ h+='<div class="fld"><label>Hạn mới <i>*</i></label><input id="dg_due" type="date" min="'+isoDay(1)+'" value="'+esc(isoCong(s.due_date,num(paramOf("installmentRemind_days",3))+7))+'"></div>';
  h+='<div class="fld full"><label>Lý do khách xin gia hạn <i>*</i></label><textarea id="dg_ly" rows="2" placeholder="vd: lương công ty trả chậm, khách xin lùi 10 ngày"></textarea></div>';
  h+=attachBox("dg","Ảnh trao đổi với khách (Zalo/tin nhắn)");
  h+='<div class="dact"><button class="btn primary" onclick="dotGiaHanSave(\''+esc(eid)+'\',\''+esc(String(no))+'\')"><i class="ti ti-send"></i>Gửi xin duyệt</button>'+
@@ -16188,7 +16227,10 @@ function renderTinnhan(embed){
   if(!trongKy(m))return false;
   if(q&&vnorm((m.to_name||"")+" "+(m.tieu_de||"")+" "+(m.noi_dung||"")+" "+(m.to_addr||"")).indexOf(q)<0)return false;
   return true}).sort(function(a,b){return (pvnd(b.sent_at)||0)-(pvnd(a.sent_at)||0)});
- var h=embed?'':pageHead("Sổ tin đã gửi","Mọi email và tin Zalo app đã gửi cho khách - ai gửi, gửi gì, gửi lúc nào. Lọc theo lớp, người gửi và khoảng thời gian.","");
+ /* Sổ này là sổ VIỆC ĐÃ LÀM, nhưng nó vẫn phải có một cửa LÀM VIỆC: đứng ở đây mà muốn nhắn
+    thêm cho một khách thì không có lý gì bắt đi vòng qua hồ sơ rồi quay lại. */
+ var h=embed?'':pageHead("Sổ tin đã gửi","Mọi email và tin Zalo app đã gửi cho khách - ai gửi, gửi gì, gửi lúc nào. Lọc theo lớp, người gửi và khoảng thời gian.",
+  '<button class="btn primary" onclick="msgMoi()"><i class="ti ti-send"></i>Soạn tin mới</button>');
  h+=statStrip([
   ["ti-send",all.length,"Tin đã gửi","#3B82C4",""],
   ["ti-mail",all.filter(function(m){return m.kenh==="email"}).length,"Qua email","#6B4FA0",""],
@@ -16199,7 +16241,7 @@ function renderTinnhan(embed){
  function sel(p,cur,opts,lb){
   return '<span class="tblbl">'+esc(lb)+'</span><select class="sel" onchange="fset(\''+p+'\',this.value);reRender(CUR)">'+
    opts.map(function(o){return '<option value="'+esc(o[0])+'"'+(String(cur)===String(o[0])?" selected":"")+'>'+esc(o[1])+'</option>'}).join("")+'</select>'}
- h+=tbar(srchHTML(window.TNQ||"","window.TNQ=this.value;reRenderKeep(CUR)","Tìm tên khách, tiêu đề hoặc nội dung...",280)+
+ h+=tbar(srchHTML(window.TNQ||"","window.TNQ=this.value;reRenderKeep(CUR)","Tìm tên, SĐT hoặc mã...",280)+
   sel("tn_lop",fL,[["all","Tất cả lớp"]].concat(Object.keys(lops).map(function(k){return [k,lops[k]]})),"Lớp")+
   sel("tn_nguoi",fN,[["all","Mọi người gửi"]].concat(Object.keys(ngs).map(function(k){return [k,ngs[k]]})),"Người gửi")+
   sel("tn_tg",fT,[["all","Mọi lúc"],["homnay","Hôm nay"],["7ngay","7 ngày qua"],["30ngay","30 ngày qua"]],"Thời gian"),
@@ -16218,6 +16260,28 @@ function renderTinnhan(embed){
    '<td>'+nsLnk(m.sent_by,m.sent_by_name,"-")+'</td></tr>'});
  h+='</tbody></table></div></div>';
  return h}
+/* Chọn người nhận rồi đi thẳng vào cửa soạn tin đã có - không đẻ đường soạn thứ hai. */
+function msgMoi(){
+ var hv=srows("DL09").filter(function(x){return msgKenhCo(x).length}).slice(0,300);
+ var ld=srows("DL02").filter(function(x){return msgKenhCo(x).length&&!isc(x.lead_status,"converted","rejected")}).slice(0,300);
+ var h='<div class="dcard"><h4><i class="ti ti-send"></i>Soạn tin mới</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Danh sách chỉ hiện người <b>đã có email hoặc Zalo</b> trong hồ sơ - người chưa có địa chỉ thì không gửi được, bổ sung ở hồ sơ trước.</div>';
+ if(!hv.length&&!ld.length){
+  h+='<div class="empty">Chưa có hồ sơ nào có email hoặc Zalo trong phạm vi bạn xem được.</div>';
+  h+='<div class="dact"><button class="btn" onclick="closeModal()">Đóng</button></div></div>';
+  openDrawer("Soạn tin mới",h);return}
+ h+='<div class="fld full"><label>Gửi cho <i>*</i></label><select id="mm_ai"><option value="">-- chọn người nhận --</option>'+
+  (hv.length?('<optgroup label="Học viên">'+hv.map(function(x){return '<option value="'+esc(x.student_id)+'">'+esc((x.full_name||x.student_id)+" · "+msgKenhCo(x).map(function(k){return k.k}).join("/"))+'</option>'}).join("")+'</optgroup>'):'')+
+  (ld.length?('<optgroup label="Khách tiềm năng">'+ld.map(function(x){return '<option value="'+esc(x.lead_id)+'">'+esc((x.full_name||x.lead_id)+" · "+msgKenhCo(x).map(function(k){return k.k}).join("/"))+'</option>'}).join("")+'</optgroup>'):'')+
+  '</select></div>';
+ h+='<div class="fld full"><label>Gửi bằng <i>*</i></label><select id="mm_kenh"><option value="email">Email</option><option value="zalo">Zalo</option></select>'+
+  '<div class="fhint">Chọn kênh mà hồ sơ đó CÓ địa chỉ - không có thì app báo lại ngay.</div></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="msgMoiDi()"><i class="ti ti-arrow-right"></i>Soạn nội dung</button>'+
+  '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
+ openDrawer("Soạn tin mới",h)}
+function msgMoiDi(){
+ var pid=fldV("mm_ai");if(!pid){toast("Chọn người nhận trước.");return}
+ msgSoan(pid,fldV("mm_kenh")||"email")}
 function msgXem(id){var m=find("DL29","msg_id",id);if(!m){toast("Không thấy tin này.");return}
  var h='<div class="dcard"><h4><i class="ti '+(m.kenh==="email"?"ti-mail":"ti-brand-messenger")+'"></i>'+esc(m.msg_id)+'</h4>';
  h+=ctxRows([["Gửi lúc",esc(m.sent_at||"-")],["Kênh",m.kenh==="email"?"Email":"Zalo"],
@@ -16560,7 +16624,11 @@ function renderLichWow(){
  h+='</tr></thead><tbody>';
  khung.forEach(function(g){
   var _c=lwCaCua(g);
-  h+='<tr><td><b>'+esc(g)+'</b>'+(_c?'<div class="mut" style="font-size:11px;font-weight:400">'+esc(_c.t)+'</div>':'')+'</td>';
+  /* V2 12/08 - CẢ DÒNG BẤM ĐƯỢC. `_checkbam` bắt: bấm vào dòng khung giờ đầu tiên KHÔNG CÓ GÌ
+     XẢY RA - vì hàng ấy toàn ô trống nên không có nút nào để trúng. Một dòng bày ra mà bấm vào
+     im lặng là một lần người dùng bị lừa. Dòng này có nghĩa riêng: "khung 9:00 tuần này ai trực,
+     còn chỗ nào" - mở đúng câu ấy ra. */
+  h+='<tr data-mo="lwXemKhung" data-mo-arg="'+esc(g)+'"><td><b>'+esc(g)+'</b>'+(_c?'<div class="mut" style="font-size:11px;font-weight:400">'+esc(_c.t)+'</div>':'')+'</td>';
   cot.forEach(function(c){
    if(c.trong){h+='<td class="mut" style="text-align:center">·</td>';return}
    var o=ix[c.d.toDateString()+"|"+c.nv+"|"+g];
@@ -16575,6 +16643,31 @@ function renderLichWow(){
  h+='</tbody></table></div></div>';
  h+=lwTongGio(tuan);
  return h}
+/* Một KHUNG GIỜ trong tuần: ai trực khung này ngày nào, ô nào còn trống, ô nào đã có người đặt.
+   Trả lời đúng câu người ta hỏi khi nhìn một hàng ngang của lưới. */
+function lwXemKhung(g){
+ if(!g){toast("Không thấy khung giờ này.");return}
+ /* Dùng ĐÚNG khung tuần mà lưới đang vẽ, không tự tính lại: người dùng có thể đang xem tuần
+    trước hoặc tuần sau, mở drawer ra thấy tuần khác là hai bề mặt nói hai chuyện. */
+ var d0=lwTuan(),t0=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()).getTime(),t1=t0+7*864e5;
+ var ds=lwSlots().filter(function(x){
+  if(String(x.slot_time||"")!==String(g))return false;
+  var d=pvnd(x.slot_datetime);return d&&d.getTime()>=t0&&d.getTime()<t1});
+ var _c=lwCaCua(g);
+ var h='<div class="dcard"><h4><i class="ti ti-clock"></i>Khung '+esc(g)+(_c?' · '+esc(_c.t):'')+'</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Tuần này khung giờ '+esc(g)+' có <b>'+ds.length+'</b> ca trực đã đăng ký. Học viên chỉ đặt được buổi WOW vào ô còn trống.</div>';
+ if(!ds.length)h+='<div class="empty">Tuần này chưa ai đăng ký trực khung giờ '+esc(g)+' - học viên không đặt được buổi nào vào giờ này.</div>';
+ else{
+  ds.sort(function(a,b){return (pvnd(a.slot_datetime)||0)-(pvnd(b.slot_datetime)||0)});
+  h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Ngày</th><th>NV WOW</th><th>Cơ sở</th><th>Trạng thái</th><th></th></tr></thead><tbody>';
+  ds.forEach(function(x){var d=pvnd(x.slot_datetime);
+   h+='<tr><td>'+esc(d?vnd2(d):"-")+'</td><td>'+nsLnk(x.staff_id,x.staff_name,"")+'</td>'+
+    '<td>'+esc(elabel(x.branch)||"-")+'</td>'+
+    '<td><span class="chip '+stCls(x.wow_slot_status)+'">'+esc(elabel(x.wow_slot_status)||"-")+'</span></td>'+
+    '<td><button class="btn sm" onclick="lwXemO(\''+esc(x.slot_id)+'\')"><i class="ti ti-list-details"></i>Chi tiết ô</button></td></tr>'});
+  h+='</tbody></table></div>'}
+ h+='<div class="dact"><button class="btn" onclick="closeModal()">Đóng</button></div></div>';
+ openDrawer("Khung giờ trong tuần",h)}
 /* Chữ trong một ô ĐÃ ĐẶT: bám OLMS - tên học viên + loại bài, đủ để liếc một cái là biết ô này
    đang làm gì, không phải mở ra mới biết. */
 function lwNhanO(o){
@@ -16890,7 +16983,7 @@ function wowRefuse(id){var w=find("DL14","wow_id",id);if(!w){toast("Không thấ
  h+=ctxRows([["Lịch",esc(w.wow_session_date||"-")],["Loại bài",esc(elabel(w.wow_lesson_type)||"-")],
   ["Kỹ năng",esc(elabel(w.wow_skill)||w.wow_skill||"-")],["Người đặt",esc(elabel(w.wow_booked_by)||"-")]]);
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Ca trực của bạn sẽ <b>mở lại</b> cho người khác đặt, và học viên được báo lý do để đặt buổi khác. Quota của học viên chưa bị trừ nên không mất lượt nào.</div>';
- h+='<div class="fld full"><label>Lý do từ chối <i>*</i></label><input id="wf_reason" placeholder="vd: ca này thầy đã nhận lớp bù, em đặt giúp thầy ca khác nhé"></div>';
+ h+='<div class="fld full"><label>Lý do từ chối <i>*</i></label><input id="wf_reason" placeholder="vd: ca này thầy đã nhận lớp bù, phiền bạn chọn giúp thầy ca khác nhé"></div>';
  h+='<div class="dact"><button class="btn danger" onclick="wowRefuseRun(\''+esc(id)+'\')"><i class="ti ti-ban"></i>Từ chối & mở lại ca</button>'+
   '<button class="btn" onclick="closeModal()">Thôi</button></div></div>';
  openDrawer("Từ chối buổi WOW",h)}
@@ -20513,7 +20606,7 @@ function moLop(cid){var c=find("DL10","class_id",cid);if(!c){toast("Không thấ
   if(!conCho)h+='<div class="empty">Lớp đã đủ sức chứa '+cap+' - không đẩy thêm được.</div>';
   else if(!cho.length)h+='<div class="empty">Không còn học viên nào đã đóng tiền mà chưa xếp lớp.</div>';
   else{
-   h+='<div class="fld full"><label>Chọn học viên</label>'+
+   h+='<div class="fld full"><label>Chọn học viên <i>*</i></label>'+
     '<select id="ml_hv"><option value="">-- chọn học viên --</option>'+
     dungKhoa.map(function(e){return '<option value="'+esc(e.student_id)+'">'+esc((e.student_id_name||e.student_id)+" · đúng khóa")+'</option>'}).join("")+
     cho.filter(function(e){return String(e.course_id||"")!==String(c.course_id||"")})
@@ -21123,7 +21216,14 @@ var TOURS={
      sau một cửa (menu CEO 60 -> 44). Mở một cửa mới mà không dẫn đường tới nó thì người dùng
      vẫn không biết sổ của mình đi đâu mất - `_checktour` bắt đúng chuyện đó ngay lần chạy đầu:
      "TRANG KHONG BAI HUONG DAN NAO DI QUA: tracuu". */
-  {p:"tracuu",sel:'@man',t:"Sổ sách để tra khi cần",d:"Nghiệp vụ làm ở trang nghiệp vụ; các sổ chỉ-đọc gom hết vào đây thay vì nằm chật thanh menu. Mỗi thẻ nói sổ đó đang có bao nhiêu dòng, và có ô tìm để không cần đọc từng cái.",hint:"Gõ vài chữ vào ô tìm rồi bấm một thẻ để mở sổ."}]},
+  {p:"tracuu",sel:'@man',t:"Sổ sách để tra khi cần",d:"Nghiệp vụ làm ở trang nghiệp vụ; các sổ chỉ-đọc gom hết vào đây thay vì nằm chật thanh menu. Mỗi thẻ nói sổ đó đang có bao nhiêu dòng, và có ô tìm để không cần đọc từng cái.",hint:"Gõ vài chữ vào ô tìm rồi bấm một thẻ để mở sổ."},
+  /* V2 12/08 - BA BƯỚC CHO BA MÀN MỚI của đợt feedback bốn team. `_checktour` bắt ngay lượt
+     verify đầu: *"TRANG KHONG BAI HUONG DAN NAO DI QUA: tinnhan, duyetdot, duyethd"*. Mở một
+     cửa mới mà không dẫn đường tới nó thì người dùng không biết là có - đúng chuyện đã cắn với
+     trang Tra cứu ở bước ngay trên. Cả ba đều thuộc về NGƯỜI QUẢN LÝ nên đặt trong bài này. */
+  {p:"duyetdot",sel:'@man',t:"Đổi đợt đóng phải qua bạn",d:"Sale xin lùi hạn một đợt hoặc xin chia lại cả lịch đợt đều dừng ở đây, kèm ảnh trao đổi với khách. Duyệt là lịch đợt của đơn đổi ngay, không phải ghi một cái dấu rồi để đó.",hint:"Bấm một chip để lọc riêng loại yêu cầu bạn đang muốn quyết."},
+  {p:"duyethd",sel:'@man',t:"Hợp đồng cam kết cần đủ hai chữ ký",d:"Cam kết band đầu ra cần cả Trưởng phòng Tư vấn và Giám đốc duyệt; thiếu một chữ ký là học viên chưa xếp lớp được. Từ chối thì phải ghi lý do để sale sửa lại.",hint:"Bấm chip 'Mới một chữ ký' để thấy cái đang chờ chính bạn."},
+  {p:"tinnhan",sel:'@man',t:"Trung tâm đã nói gì với ai",d:"Mọi email và tin Zalo app đã gửi đều nằm ở đây - ai gửi, gửi gì, gửi lúc nào. Lọc theo lớp, theo người gửi hoặc theo khoảng thời gian khi cần đối chiếu.",hint:"Chọn một lớp ở ô Lớp để xem trung tâm đã nhắn gì cho lớp đó."}]},
  /* ---------- CẤP 3: CHUYÊN NGHIỆP (người cấu hình) ---------- */
  cn_thuonghieu:{lv:"chuyennghiep",t:"Đổi thương hiệu và menu",ic:"ti-palette",d:"5 bước - biến app thành bản của trung tâm bạn",steps:[
   {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'@settabs',t:"Trang Cài đặt là trung tâm điều khiển",d:"9 tab: giao diện, menu, phân quyền, ngưỡng SLA, ngưỡng KPI, câu nhắc việc, danh mục, khóa học, nhân sự. App không cắm cứng con số nào.",hint:"Bấm Tiếp theo."},
@@ -23574,7 +23674,11 @@ var TTSO_NGOAI={
  khoahoc:"sổ danh mục khoá - một khoá là thứ được BÁN, không phải một người hay một lớp được "+
   "phục vụ. Nó là dữ liệu nền của cả bốn thực thể chứ không thuộc riêng thực thể nào.",
  nhanvien:"sổ nhân sự - người trong nhà, cùng họ với sổ Giảng viên. Bốn thực thể là người "+
-  "được phục vụ, nhân viên là người phục vụ."};
+  "được phục vụ, nhân viên là người phục vụ.",
+ /* V2 12/08 (SALE-3) */
+ tinnhan:"sổ VIỆC ĐÃ LÀM, không phải sổ của một thực thể - một tin gửi cho lead, tin sau gửi "+
+  "cho học viên, tin nữa gửi cho phụ huynh. Nó trả lời câu \"trung tâm đã nói gì với ai\", "+
+  "nên xếp theo THỜI GIAN chứ không xếp theo người. Cùng họ với Nhật ký thao tác."};
 /* Phụ huynh KHÔNG có bảng riêng trong SOP - họ nằm trong ba cột người giám hộ của DL09. Nên
    thực thể này được DỰNG từ dữ liệu ấy, gom theo số điện thoại: một số là một người, kèm danh
    sách con. Dựng lại mỗi lần vẽ thì tốn, nên nhớ tạm và xoá khi dữ liệu đổi. */
