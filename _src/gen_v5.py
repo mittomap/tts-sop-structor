@@ -2717,8 +2717,12 @@ function naCls(s){s=String(s||"");if(/ ngay| gấp|GỌI|NGUY|GẤP/.test(s))ret
    (2) khớp một khúc chỉ tính khi khúc ấy là một ĐOẠN trọn vẹn giữa hai dấu `_`.
    `rescheduled` mất khớp `scheduled` theo luật (2) nên khai thẳng vào danh sách hổ phách. */
 var STCLS={
+ /* `unavailable` phải nằm ở đây, không để nó rơi về xám: nó KHÁC `off` ở chỗ NV vẫn trực ca đó,
+    chỉ khung này không nhận - nhưng với người đi đặt lịch thì cả hai đều là "không vào được", nên
+    phải cùng một màu. Lưu ý phép so khớp khúc: "unavailable" có chứa "available" (nhóm xanh), chỉ
+    thoát được nhờ luật ranh giới bằng dấu "_" trong `stKhuc` - khai thẳng vào đây cho chắc tay. */
  red:["at_risk","off_track","rejected","unreachable","no_response","escalated","high","overdue",
-      "no_show","missing","cancelled","refunded","unpaid","not_achieved","dropped","failed"],
+      "no_show","missing","cancelled","refunded","unpaid","not_achieved","dropped","failed","unavailable"],
  green:["on_track","on_time","completed","confirmed","resolved","converted","paid",
         "submitted_on_time","graded","passed","active","achieved","good","interested","improved"],
  amber:["pending","considering","new","processing","partial","partially_achieved","medium",
@@ -13518,9 +13522,18 @@ var APPPARAMS=[
  ["P7 · Buổi WOW 1-1","wowGrantMax_perTime","Mỗi lần cấp thêm tối đa bao nhiêu lượt WOW cho một học viên","lượt",3],
  /* V2 10/08 - hai tham số của Lịch trực WOW. Khai ở đây thì màn Cài đặt mới đẻ ra ô sửa;
     `_check16` hỏi đúng chiều ngược lại: app ĐỌC tham số nào thì tham số ấy phải có ô sửa. */
- ["P7 · Buổi WOW 1-1","wowSlotHours","Các khung giờ NV WOW được đăng ký ca trực, ngăn nhau bằng dấu phẩy (đổi ở đây là lưới Lịch trực WOW đổi theo)","khung giờ","08:30,09:30,10:30,11:30,12:30,13:30,14:30,15:30,16:30,17:30,18:30,19:30,20:30"],
+ /* V2 11/08 - bám theo màn OLMS team dùng thật. Ba ca khai ở đây, khung giờ TỰ SINH ra từ ca
+    cộng độ dài ô, nên đổi giờ mở cửa hay đổi 30↔60 phút đều không phải sửa mã. */
+ ["P7 · Buổi WOW 1-1","wowShifts","Ba ca trực trong ngày, mỗi ca ghi \"Tên|Giờ bắt đầu|Giờ kết thúc\", các ca ngăn nhau bằng dấu phẩy","ca","Ca sáng|09:00|12:30, Ca chiều|12:30|17:30, Ca tối|17:30|21:30"],
+ ["P7 · Buổi WOW 1-1","wowSlotMinutes","Mỗi ô trên lịch trực dài bao nhiêu phút (OLMS đang dùng 30)","phút",30],
  ["P7 · Buổi WOW 1-1","wowSlotMaxDays","NV WOW được đăng ký ca trực trước tối đa bao nhiêu ngày","ngày",60],
  ["P7 · Buổi WOW 1-1","wowCommitHours_month","Mỗi NV WOW cam kết trực bao nhiêu giờ một tháng (bảng Tổng giờ trực lấy đây làm mốc để báo thiếu)","giờ/tháng",40],
+ /* Ba tham số dưới đây LẤY THẲNG TỪ màn "Cấu hình Dashboard Lịch học" của OLMS (ảnh anh Luân gửi
+    11/08). Chúng không phải số trang trí - cả ba đều là LUẬT của việc đặt lịch, và app phải áp
+    thật ở cửa đặt và cửa huỷ, không chỉ hiện ra cho đẹp. */
+ ["P7 · Buổi WOW 1-1","wowWeeksAhead","Học viên xem trước được lịch WOW của bao nhiêu tuần","tuần",2],
+ ["P7 · Buổi WOW 1-1","wowBookLeadDays","Học viên phải đặt buổi WOW trước ít nhất bao nhiêu ngày","ngày",1],
+ ["P7 · Buổi WOW 1-1","wowCancelMinDays","Muốn huỷ buổi WOW thì phải huỷ trước ít nhất bao nhiêu ngày","ngày",1],
  ["Hẹn giờ mặc định","apptSoon_hours","Nút hẹn nhanh \"N tiếng nữa\" - N là bao nhiêu","giờ",2],
  ["Hẹn giờ mặc định","apptMorning_hour","Giờ hẹn buổi sáng dùng cho các nút gợi ý","giờ trong ngày",9],
  ["Hẹn giờ mặc định","apptNoon_hour","Giờ hẹn đầu giờ chiều dùng cho các nút gợi ý","giờ trong ngày",14],
@@ -15076,152 +15089,210 @@ function wowGrantSave(){
    ĐỌC BẰNG `paramStr`, KHÔNG PHẢI `paramOf` (bắt được 10/08): `paramOf` chạy `Number(value)` rồi
    thấy NaN là trả mặc định - mà "09:00,15:00,..." thì NaN chắc chắn. Dùng nhầm hàm ở đây nghĩa là
    trung tâm vào Cài đặt sửa khung giờ, bấm Lưu, app vẫn chạy y khung cũ mà không báo gì. */
-/* 13 KHUNG GIỜ LÀ CON SỐ CỦA SOP, KHÔNG PHẢI EM CHỌN: sheet `DL19. Lịch làm việc WOW` liệt kê
-   đúng 13 hàng 08:30-09:30 ... 20:30-21:30. Bản đầu em đặt 4 khung cho gọn - đó là BỚT so với
-   SOP, phạm LUẬT CỨNG SỐ 0. */
-function lwKhung(){return String(paramStr("wowSlotHours","08:30,09:30,10:30,11:30,12:30,13:30,14:30,15:30,16:30,17:30,18:30,19:30,20:30")).split(",")
- .map(function(x){return String(x).trim()}).filter(Boolean)}
+/* Ô 30 PHÚT, GOM THEO BA CA - bám đúng màn OLMS team đang dùng thật (anh Luân gửi ảnh 11/08,
+   chốt *"em cứ bám thử, nếu cần thứ thử đổi cấu hình cho phù hợp"*).
+   Trước đó bản này làm 13 khung MỘT GIỜ theo sheet `DL19` của SOP. Đo lại trên ảnh OLMS: ô là
+   **30 phút**, chạy 09:00→21:30, và gom thành ba ca sáng/chiều/tối. SOP chỉ là bản phác trên
+   Excel; OLMS là thứ team mở ra mỗi ngày - lấy cái đang chạy làm chuẩn.
+   Ba ca khai trong CH2 nên trung tâm đổi giờ mở cửa là lưới đổi theo, không phải sửa mã. */
+function lwCa(){var t=String(paramStr("wowShifts","Ca sáng|09:00|12:30, Ca chiều|12:30|17:30, Ca tối|17:30|21:30"));
+ return t.split(",").map(function(x){var p=x.split("|").map(function(y){return String(y).trim()});
+  return {t:p[0]||"",tu:p[1]||"",den:p[2]||""}}).filter(function(c){return c.tu&&c.den})}
+function _lwPhut(g){var p=String(g||"").split(":");return (+p[0]||0)*60+(+p[1]||0)}
+function _lwGio(m){return ("0"+Math.floor(m/60)).slice(-2)+":"+("0"+(m%60)).slice(-2)}
+/* Ca nào chứa khung giờ này - dùng để gom lưới và để tô nhãn ca. */
+function lwCaCua(g){var m=_lwPhut(g),ds=lwCa();
+ for(var i=0;i<ds.length;i++)if(m>=_lwPhut(ds[i].tu)&&m<_lwPhut(ds[i].den))return ds[i];
+ return null}
+/* Danh sách khung giờ nay SINH RA từ ba ca + độ dài ô, không gõ tay nữa. Gõ tay 13 chuỗi thì
+   đổi ô từ 60 sang 30 phút là phải gõ lại 26 chuỗi - và gõ sót một cái thì lưới thủng một hàng
+   mà không ai biết. */
+function lwDaiO(){var n=num(paramOf("wowSlotMinutes",30));return (n>=5&&n<=180)?n:30}
+function lwKhung(){var b=lwDaiO(),out=[];
+ lwCa().forEach(function(c){for(var m=_lwPhut(c.tu);m+b<=_lwPhut(c.den);m+=b)out.push(_lwGio(m))});
+ var seen={},ra=[];out.forEach(function(g){if(!seen[g]){seen[g]=1;ra.push(g)}});
+ return ra}
 function lwSlots(){return srows("DL26")}
 function lwLaWow(){return doiWOW().indexOf(String(CURSTAFF||""))>=0}
 /* Slot còn đặt được: đúng trạng thái `available` VÀ chưa qua giờ. Hai vế, thiếu vế nào cũng sai:
    chỉ hỏi trạng thái thì đặt được vào ca hôm qua; chỉ hỏi giờ thì đặt chồng lên ca đã có người. */
-function lwRanh(sl,tuKhi){var d=pvnd(sl.slot_datetime);
- return isc(sl.wow_slot_status,"available") && d && d.getTime()>(tuKhi||Date.now())}
-function lwThang(){return window.LWTHANG||(function(){var n=new Date();
- return n.getFullYear()+"-"+("0"+(n.getMonth()+1)).slice(-2)})()}
-function lwDoiThang(v){window.LWTHANG=v;reRender("lichwow")}
-function lwLoc(v){window.LWNV=v||"";reRender("lichwow")}
+/* Ô CÒN ĐẶT ĐƯỢC KHÔNG - và ba luật của OLMS đều nằm ở đây, không rải rác mỗi nơi một mẩu.
+   `hv` = người đang hỏi là HỌC VIÊN (cổng học viên) hay NHÂN VIÊN. Học vụ đặt hộ thì không bị
+   chặn bởi hạn "đặt trước N ngày" - họ đang xử một việc gấp, còn luật ấy đặt ra để NV WOW kịp
+   soạn nội dung khi HỌC VIÊN tự đặt. */
+function lwRanh(sl,tuKhi,hv){var d=pvnd(sl.slot_datetime);
+ if(!isc(sl.wow_slot_status,"available")||!d)return false;
+ var t=tuKhi||Date.now();
+ if(d.getTime()<=t)return false;
+ if(hv){
+  var lead=num(paramOf("wowBookLeadDays",1));
+  if(d.getTime()-t < lead*864e5)return false;                 /* đặt sát giờ quá thì chặn */
+  var tuan=num(paramOf("wowWeeksAhead",2));
+  if(tuan>0 && d.getTime()-t > tuan*7*864e5)return false;      /* xa quá thì chưa mở cho xem */
+ }
+ return true}
+/* ═══ LỊCH TRỰC WOW - XEM THEO TUẦN, BÁM MÀN OLMS (dựng lại 11/08) ═══════════════════════════
+   Bản đầu (10/08) vẽ lưới THEO THÁNG: cột = ngày 1..31, hàng = khung giờ, mỗi ô gộp mọi NV trực
+   khung đó. Nhìn được toàn cảnh nhưng KHÔNG trả lời được câu người ta hỏi mỗi ngày: *"ca này ai
+   trực, còn chỗ nào trống"* - vì hai người trực cùng khung bị nhét chung một ô.
+   OLMS tách đúng chỗ ấy: **cột = ngày trong TUẦN, mỗi ngày lại chia theo TỪNG NV đang trực**, nên
+   một ô = một người ở một khung giờ - đúng đơn vị mà người đặt lịch cần. Lưới theo tháng đổi sang
+   theo tuần cũng vì thế: 31 ngày × mấy người thì không màn nào chứa nổi. */
+function lwTuan(){return window.LWTUAN||lwDauTuan(new Date())}
+function lwDauTuan(d){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+ var k=(x.getDay()+6)%7;                    /* thứ 2 là đầu tuần, đúng lối người Việt đọc lịch */
+ x.setDate(x.getDate()-k);return x}
+function lwDoiTuan(n){var d=lwTuan();window.LWTUAN=new Date(d.getFullYear(),d.getMonth(),d.getDate()+n*7);reRender("lichwow")}
+function lwVeTuanNay(){window.LWTUAN=null;reRender("lichwow")}
 function renderLichWow(){
- var thang=lwThang(), pn=thang.split("-"), nam=+pn[0], thg=+pn[1];
- var soNgay=new Date(nam,thg,0).getDate();
- var all=lwSlots().filter(function(x){var d=pvnd(x.slot_datetime);
-  return d&&d.getFullYear()===nam&&(d.getMonth()+1)===thg});
- var khung=lwKhung();
- var h='<div class="phead" data-tour="phead"><div><div class="t">Lịch trực NV WOW</div>'+
-  '<div class="s">Mỗi NV WOW tự đăng ký ca của mình. Học viên và học vụ chỉ đặt được buổi WOW vào ca đã đăng ký - ô trống nghĩa là không ai trực.</div></div>'+
-  '<div class="sp">'+(lwLaWow()?'<button class="btn primary" onclick="lwDangKy()"><i class="ti ti-calendar-plus"></i>Đăng ký ca của tôi</button>':'')+
-  '<button class="btn" onclick="go(\'wow\')"><i class="ti ti-star"></i>Sổ buổi WOW</button></div></div>';
- /* chọn tháng */
- var opt="";
- for(var k=-2;k<=2;k++){var d0=new Date(nam,thg-1+k,1);
-  var v=d0.getFullYear()+"-"+("0"+(d0.getMonth()+1)).slice(-2);
-  opt+='<option value="'+v+'"'+(v===thang?" selected":"")+'>Tháng '+(d0.getMonth()+1)+"/"+d0.getFullYear()+'</option>'}
- /* DẢI THẺ: bốn con số người quản lý team WOW cần liếc một cái là biết. Số cuối - "ngày không
-    ai trực" - là con số quan trọng nhất của màn này: đó chính là những ngày học viên mở app ra
-    và không đặt được buổi nào. SOP gọi ô trống là "không ai trực"; thẻ này đếm hộ. */
+ var d0=lwTuan(), ngay=[];
+ for(var i=0;i<7;i++){var d=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()+i);ngay.push(d)}
+ var khung=lwKhung(), all=lwSlots();
+ var t0=ngay[0].getTime(), t1=ngay[6].getTime()+864e5;
+ var tuan=all.filter(function(x){var d=pvnd(x.slot_datetime);return d&&d.getTime()>=t0&&d.getTime()<t1});
+ var h=pageHead("Lịch trực WOW","Ca trực của team WOW theo tuần - học viên chỉ đặt được vào ô còn trống",
+  (lwLaWow()?'<button class="btn primary" onclick="lwDangKy()"><i class="ti ti-calendar-plus"></i>Đăng ký ca của tôi</button>':'')+
+  '<button class="btn" onclick="go(\'settings\')"><i class="ti ti-settings"></i>Cấu hình lịch</button>');
+ /* ── DẢI THẺ ── */
  var _now=Date.now();
- var _tron=all.filter(function(x){return lwRanh(x,_now)}).length;
- var _dat=all.filter(function(x){return isc(x.wow_slot_status,"booked","taught")}).length;
- var _nv={};all.forEach(function(x){_nv[String(x.staff_id||"")]=1});
- var _coCa={};all.forEach(function(x){var d=pvnd(x.slot_datetime);if(d)_coCa[d.getDate()]=1});
- var _trong=0;for(var _n=1;_n<=soNgay;_n++)if(!_coCa[_n])_trong++;
- h+=statStrip([["ti-calendar-check",_tron,"Ca còn trống đặt được","#16A34A","học viên chọn được ngay"],
-   ["ti-user-check",_dat,"Ca đã có người đặt","#3B82C4",""],
-   ["ti-users",Object.keys(_nv).length,"NV WOW có đăng ký ca","#2E5A88",""],
+ var _tron=tuan.filter(function(x){return lwRanh(x,_now)}).length;
+ var _dat=tuan.filter(function(x){return isc(x.wow_slot_status,"booked","taught")}).length;
+ var _nv={};tuan.forEach(function(x){_nv[String(x.staff_id||"")]=1});
+ var _coCa={};tuan.forEach(function(x){var d=pvnd(x.slot_datetime);if(d)_coCa[d.getDay()]=1});
+ var _trong=0;for(var _i=0;_i<7;_i++)if(!_coCa[ngay[_i].getDay()])_trong++;
+ h+=statStrip([["ti-calendar-check",_tron,"Ô còn trống đặt được","#16A34A","học viên chọn được ngay"],
+   ["ti-user-check",_dat,"Ô đã có người đặt","#3B82C4",""],
+   ["ti-users",Object.keys(_nv).length,"NV WOW trực tuần này","#2E5A88",""],
    ["ti-calendar-off",_trong,"Ngày không ai trực","#E08A1E","học viên mở app ra là không đặt được"]],"lichwow");
- /* CHIP LỌC theo người: team ba bốn người thì xem lịch của riêng một người là việc thường ngày. */
- var _dsNv=[["","Cả team"]].concat(doiWOW().map(function(id){var st=find("DL01","staff_id",id)||{};
-   return [id,(st.full_name||id).split(" ").slice(-2).join(" ")]}));
- h+=tbar('<span class="tblbl">Tháng</span><select class="sel" onchange="lwDoiThang(this.value)">'+opt+'</select>'+
-  segHTML(window.LWNV||"",_dsNv,'lwLoc(\'{v}\')')+
-  '<span class="mut" style="font-size:11px;margin-left:10px">'+all.length+' ca đã đăng ký trong tháng</span>',"");
- if(window.LWNV)all=all.filter(function(x){return String(x.staff_id||"")===window.LWNV});
- /* ── LƯỚI TRỰC: cột = ngày, hàng = khung giờ, ô trống = không ai trực ── */
+ /* ── THANH ĐIỀU HƯỚNG TUẦN + CHIP CA ── */
+ var _ca=lwCa();
+ var _caChon=window.LWCA||"";
+ var _dsCa=[["","Cả ngày"]].concat(_ca.map(function(c){return [c.t,c.t+" ("+c.tu+" - "+c.den+")"]}));
+ h+=tbar('<button class="btn sm" onclick="lwDoiTuan(-1)"><i class="ti ti-chevron-left"></i></button>'+
+  '<span class="tblbl" style="margin:0 4px">'+esc(vnd2(ngay[0])+" – "+vnd2(ngay[6]))+'</span>'+
+  '<button class="btn sm" onclick="lwDoiTuan(1)"><i class="ti ti-chevron-right"></i></button>'+
+  '<button class="btn sm" onclick="lwVeTuanNay()">Tuần này</button>'+
+  segHTML(_caChon,_dsCa,'window.LWCA=\'{v}\';reRender(\'lichwow\')'),
+  '<span class="tbcnt">'+tuan.length+' ô trực trong tuần</span>');
+ if(_caChon){var _c=null;_ca.forEach(function(c){if(c.t===_caChon)_c=c});
+  if(_c)khung=khung.filter(function(g){return _lwPhut(g)>=_lwPhut(_c.tu)&&_lwPhut(g)<_lwPhut(_c.den)})}
+ /* ── LƯỚI: cột = NGÀY × NV TRỰC NGÀY ĐÓ, hàng = khung giờ ──
+    Một ô = một người ở một khung. Đó là đơn vị mà cửa đặt buổi thao tác, nên lưới phải cùng đơn
+    vị - lưới gộp người thì nhìn xong vẫn phải mở chỗ khác ra mới đặt được. */
+ var cot=[];   /* [{d:Date, nv:staff_id, ten, cs}] */
+ ngay.forEach(function(d){
+  var ds={};
+  tuan.forEach(function(x){var xd=pvnd(x.slot_datetime);
+   if(xd&&xd.getFullYear()===d.getFullYear()&&xd.getMonth()===d.getMonth()&&xd.getDate()===d.getDate())
+    ds[String(x.staff_id||"")]={ten:x.staff_name||x.staff_id,cs:x.branch||""}});
+  var ids=Object.keys(ds).sort();
+  if(!ids.length){cot.push({d:d,nv:"",ten:"",cs:"",trong:1});return}
+  ids.forEach(function(id){cot.push({d:d,nv:id,ten:ds[id].ten,cs:ds[id].cs})})});
  var ix={};
- all.forEach(function(x){var d=pvnd(x.slot_datetime);if(!d)return;
-  var key=d.getDate()+"|"+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);
-  (ix[key]=ix[key]||[]).push(x)});
- h+='<div class="panel"><div class="ph"><b><i class="ti ti-table" style="margin-right:6px"></i>Lưới trực tháng '+thg+"/"+nam+'</b>'+
-  '<span class="mut" style="font-size:11.5px">ô trống = không ai trực · số liệu: đúng tháng đang chọn</span></div>'+
-  '<div class="tbwrap"><table class="dt"><thead><tr><th>Khung giờ</th>';
- /* SOP để HAI dòng tiêu đề: số ngày và THỨ. Thiếu dòng thứ thì người xếp ca phải tự nhẩm
-    "ngày 14 là thứ mấy" - mà xếp ca thì thứ mới là thứ người ta nghĩ tới, không phải số ngày. */
- var _THU=["CN","T2","T3","T4","T5","T6","T7"];
- for(var n=1;n<=soNgay;n++){var _t=_THU[new Date(nam,thg-1,n).getDay()];
-  /* 11px chứ không phải 10px: dự án đã chốt SÀN 11px cho mọi cỡ chữ (tiếng Việt có dấu, nhỏ hơn
-     là mất nét dấu), và thang cỡ chữ chốt tối đa 16 bậc. Gõ 10px ở đây là phá cả hai cùng lúc -
-     `_checkux` bắt ngay: bậc thứ 17, và một cỡ dưới sàn. */
-  h+='<th style="text-align:center">'+n+'<div class="mut" style="font-weight:400;font-size:11px">'+_t+'</div></th>'}
+ tuan.forEach(function(x){var d=pvnd(x.slot_datetime);if(!d)return;
+  ix[d.toDateString()+"|"+String(x.staff_id||"")+"|"+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)]=x});
+ var THU=["CN","Thứ 2","Thứ 3","Thứ 4","Thứ 5","Thứ 6","Thứ 7"];
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-table" style="margin-right:6px"></i>Bảng đăng ký lịch WOW</b>'+
+  '<span class="mut" style="font-size:11.5px">mỗi ô '+lwDaiO()+' phút · ô trống = chưa ai đặt · số liệu: đúng tuần đang chọn</span></div>'+
+  '<div class="tbwrap"><table class="dt lwgrid"><thead><tr><th>Thời gian</th>';
+ var _dem={};cot.forEach(function(c){var k=c.d.toDateString();_dem[k]=(_dem[k]||0)+1});
+ var _daVe={};
+ cot.forEach(function(c){var k=c.d.toDateString();
+  if(!_daVe[k]){_daVe[k]=1;
+   h+='<th colspan="'+_dem[k]+'" style="text-align:center">'+esc(THU[c.d.getDay()])+' <span class="mut" style="font-weight:400">'+esc(vnd2(c.d))+'</span></th>'}});
+ h+='</tr><tr><th class="mut" style="font-weight:400;font-size:11px">Ca</th>';
+ cot.forEach(function(c){
+  h+='<th style="font-weight:600;font-size:11px">'+(c.trong?'<span class="mut">chưa ai trực</span>':
+   esc(String(c.ten).split(" ").slice(-2).join(" "))+(c.cs?('<div class="mut" style="font-weight:400">'+esc(elabel(c.cs)||"")+'</div>'):''))+'</th>'});
  h+='</tr></thead><tbody>';
- var _ngayDem={};
  khung.forEach(function(g){
-  h+='<tr><td><b>'+esc(g)+'</b></td>';
-  for(var n=1;n<=soNgay;n++){
-   var ds=ix[n+"|"+g]||[];
-   if(!ds.length){h+='<td class="mut" style="text-align:center">·</td>';continue}
-   _ngayDem[n]=(_ngayDem[n]||0)+ds.length;
-   var chu=ds.map(function(x){return String(x.staff_id||"")+(x.branch?("-"+String(ecode(x.branch)||"").replace("branch_","CS")):"")}).join(", ");
-   var co=ds.filter(function(x){return isc(x.wow_slot_status,"booked","taught")}).length;
-   /* Ô LƯỚI PHẢI BẤM ĐƯỢC. `_checkbam` bắt đúng chỗ này: bấm vào ô mà không mở gì, không báo
-      gì - đúng cái "kiểu hỏng nguy hiểm nhất" mà dự án đã ghi. Ô là nơi dày thông tin nhất của
-      màn, người ta bấm vào là chuyện đương nhiên. */
-   h+='<td style="text-align:center"><button class="chip lwo '+(co?(co>=ds.length?"green":"amber"):"")+
-    '" onclick="lwXemO(\''+esc(g)+'\','+n+')" data-tip="Bấm để xem chi tiết ca trực khung này">'+esc(chu)+'</button></td>'}
+  var _c=lwCaCua(g);
+  h+='<tr><td><b>'+esc(g)+'</b>'+(_c?'<div class="mut" style="font-size:10px;font-weight:400">'+esc(_c.t)+'</div>':'')+'</td>';
+  cot.forEach(function(c){
+   if(c.trong){h+='<td class="mut" style="text-align:center">·</td>';return}
+   var o=ix[c.d.toDateString()+"|"+c.nv+"|"+g];
+   if(!o){h+='<td class="mut" style="text-align:center">·</td>';return}
+   var code=ecode(o.wow_slot_status);
+   var cls=(code==="booked"||code==="taught")?"green":((code==="unavailable"||code==="off")?"red":"");
+   var chu=(code==="unavailable"||code==="off")?"Không nhận":
+    ((code==="booked"||code==="taught")?lwNhanO(o):"còn trống");
+   h+='<td style="text-align:center"><button class="chip lwo '+cls+
+    '" onclick="lwXemO(\''+esc(o.slot_id)+'\')" data-tip="Bấm để xem chi tiết ô này">'+esc(chu)+'</button></td>'});
   h+='</tr>'});
- /* DÒNG "LƯỢT TRỰC/NGÀY" - SOP có sẵn dòng này dưới lưới. Nó trả lời câu khác với ô trống: ngày
-    nào MỎNG người chứ chưa hẳn trống - tức ngày dễ vỡ nếu một người báo bận. */
- h+='<tr><td><b>Lượt trực/ngày</b></td>';
- for(var n2=1;n2<=soNgay;n2++){var _sl2=_ngayDem[n2]||0;
-  h+='<td style="text-align:center"'+(_sl2?'':' class="mut"')+'>'+(_sl2?('<b>'+_sl2+'</b>'):'0')+'</td>'}
- h+='</tr>';
  h+='</tbody></table></div></div>';
- /* ── TỔNG GIỜ TRỰC THEO NV + đối chiếu với buổi thật (SOP đòi đúng cột này) ── */
+ h+=lwTongGio(tuan);
+ return h}
+/* Chữ trong một ô ĐÃ ĐẶT: bám OLMS - tên học viên + loại bài, đủ để liếc một cái là biết ô này
+   đang làm gì, không phải mở ra mới biết. */
+function lwNhanO(o){
+ var w=o.wow_id?find("DL14","wow_id",o.wow_id):null;
+ if(!w)return "đã đặt";
+ var ten=String(w.student_name||w.student_id||"").split(" ").slice(-2).join(" ");
+ var loai=elabel(w.wow_lesson_type)||elabel(w.wow_skill)||"";
+ return ten+(loai?(" · "+loai):"")}
+/* ── TỔNG GIỜ TRỰC THEO NV + đối chiếu với buổi thật (SOP đòi đúng cột này) ── */
+function lwTongGio(tuan){
  var per={};
- all.forEach(function(x){var id=String(x.staff_id||"");if(!per[id])per[id]={ten:x.staff_name||id,ca:0,ban:0,nghi:0,cs:{}};
+ tuan.forEach(function(x){var id=String(x.staff_id||"");if(!per[id])per[id]={ten:x.staff_name||id,ca:0,ban:0,nghi:0,cs:{}};
   per[id].ca++;
-  /* GIỮ NGUYÊN VĂN giá trị enum (dạng "code (Nhãn)"), đừng cắt lấy code: `elabel` moi được nhãn
-     tiếng Việt là nhờ cặp ngoặc ấy - đưa code trần vào thì nó trả lại đúng code trần lên màn. */
   if(String(x.branch||"").trim())per[id].cs[String(x.branch)]=(per[id].cs[String(x.branch)]||0)+1;
   if(isc(x.wow_slot_status,"booked","taught"))per[id].ban++;
-  if(isc(x.wow_slot_status,"off"))per[id].nghi++});
- var buoi={};
- srows("DL14").forEach(function(w){var d=pvnd(w.wow_session_date);
-  if(!d||d.getFullYear()!==nam||(d.getMonth()+1)!==thg)return;
-  if(isc(w.wow_status,"cancelled"))return;
-  var id=String(w.staff_id||"");buoi[id]=(buoi[id]||0)+1});
- /* CỘT "CAM KẾT/THÁNG" VÀ "TÌNH TRẠNG" LÀ CỦA SOP, KHÔNG PHẢI EM THÊM CHO ĐẸP: sheet DL19 có sẵn
-    hai cột ấy và tự ghi ra chữ mẫu *"Thiếu 11h"*. Không có chúng thì bảng này chỉ đếm, không trả
-    lời được câu người quản lý team WOW thật sự hỏi: **ai đang trực thiếu so với cam kết.**
-    Mỗi ô lưới = 1 giờ (SOP: 08:30-09:30...), nên số giờ trực = số ca KHÔNG tính ca đã báo nghỉ. */
+  if(isc(x.wow_slot_status,"off","unavailable"))per[id].nghi++});
  var _cam=num(paramOf("wowCommitHours_month",40));
- h+='<div class="panel"><div class="ph"><b><i class="ti ti-clock-hour-4" style="margin-right:6px"></i>Tổng giờ trực theo NV WOW</b>'+
-  '<span class="mut" style="font-size:11.5px">đối chiếu ca đã đăng ký với buổi thực tế trong DL14 · mỗi ca 1 giờ · số liệu: đúng tháng đang chọn</span></div>'+
-  '<div class="tbwrap"><table class="dt"><thead><tr><th>NV WOW</th><th>Cơ sở chính</th><th>Cam kết/tháng</th><th>Giờ trực tháng</th><th>Tình trạng</th><th>Ca đã có người đặt</th><th>Ca nghỉ/bận</th><th>Buổi đã book (DL14)</th><th>Đối chiếu</th></tr></thead><tbody>';
+ var _phut=lwDaiO();
+ var h='<div class="panel"><div class="ph"><b><i class="ti ti-clock-hour-4" style="margin-right:6px"></i>Tổng giờ trực theo NV WOW</b>'+
+  '<span class="mut" style="font-size:11.5px">mỗi ô '+_phut+' phút · cam kết tính theo tháng · số liệu: đúng tuần đang chọn</span></div>'+
+  '<div class="tbwrap"><table class="dt"><thead><tr><th>NV WOW</th><th>Cơ sở chính</th><th>Ô trực tuần này</th><th>Giờ trực tuần này</th><th>Cam kết/tháng</th><th>Ô đã có người đặt</th><th>Ô không nhận</th></tr></thead><tbody>';
  var ids=Object.keys(per).sort();
- if(!ids.length)h+='<tr><td class="empty" colspan="9">Chưa ai đăng ký ca trong tháng này - học viên sẽ không đặt được buổi WOW nào.</td></tr>';
- ids.forEach(function(id){var v=per[id],b=buoi[id]||0;
-  var lech=(b!==v.ban);
-  var gio=v.ca-v.nghi;                                  /* ca đã báo nghỉ không tính là giờ trực */
-  var thieu=_cam-gio;
+ if(!ids.length)h+='<tr><td class="empty" colspan="7">Chưa ai đăng ký ca trong tuần này - học viên sẽ không đặt được buổi WOW nào.</td></tr>';
+ ids.forEach(function(id){var v=per[id];
+  var gio=Math.round((v.ca-v.nghi)*_phut/60*10)/10;
   var csTop=Object.keys(v.cs).sort(function(a,c){return v.cs[c]-v.cs[a]})[0]||"";
   h+='<tr><td><b>'+esc(v.ten)+'</b> <span class="mut">'+esc(id)+'</span></td>'+
    '<td>'+(csTop?esc(elabel(csTop)||csTop):'<span class="mut">-</span>')+'</td>'+
-   '<td>'+_cam+'h</td><td><b>'+gio+'h</b></td>'+
-   '<td>'+(thieu>0?'<span class="chip '+(thieu>_cam/2?"red":"amber")+'" data-tip="Cam kết '+_cam+'h nhưng mới đăng ký '+gio+'h trong tháng này">Thiếu '+thieu+'h</span>'
-      :'<span class="chip green">Đủ giờ</span>')+'</td>'+
-   '<td>'+v.ban+'</td><td>'+v.nghi+'</td><td>'+b+'</td>'+
-   '<td>'+(lech?'<span class="chip amber" data-tip="Số buổi trong sổ WOW không bằng số ca đã có người đặt - có buổi đặt ngoài ca trực, hoặc ca đã đặt mà buổi bị huỷ">lệch '+Math.abs(b-v.ban)+'</span>'
-      :'<span class="chip green">khớp</span>')+'</td></tr>'});
+   '<td>'+v.ca+'</td><td><b>'+gio+'h</b></td><td>'+_cam+'h</td><td>'+v.ban+'</td><td>'+v.nghi+'</td></tr>'});
  h+='</tbody></table></div></div>';
  return h}
-/* Cửa đăng ký ca: NV WOW chọn NGÀY và tick KHUNG GIỜ - đúng lời anh Luân "chọn được ngày, giờ".
-   Không cho người này đăng ký hộ người kia: ca là cam kết có mặt, ký thay là hứa thay. */
-/* Xem chi tiết một ô lưới: ai trực, ở cơ sở nào, ca nào còn trống, ca nào ai đã đặt. */
-function lwXemO(gio,ngay){
- var pn=lwThang().split("-"),nam=+pn[0],thg=+pn[1];
- var ds=lwSlots().filter(function(x){var d=pvnd(x.slot_datetime);
-  return d&&d.getFullYear()===nam&&(d.getMonth()+1)===thg&&d.getDate()===ngay&&
-   ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)===gio});
- var h='<div class="dcard"><h4><i class="ti ti-calendar-event"></i>Ca '+esc(gio)+" ngày "+ngay+"/"+thg+"/"+nam+'</h4>';
- if(!ds.length)h+='<div class="empty">Khung giờ này không ai trực - học viên không đặt được buổi WOW vào đây.</div>';
- else{h+='<div class="tbwrap"><table class="dt"><thead><tr><th>NV WOW</th><th>Cơ sở</th><th>Trạng thái</th><th>Buổi đã đặt</th></tr></thead><tbody>';
-  ds.forEach(function(x){var w=x.wow_id?find("DL14","wow_id",x.wow_id):null;
-   h+='<tr><td><b>'+esc(x.staff_name||x.staff_id)+'</b></td><td>'+esc(elabel(x.branch)||"-")+'</td>'+
-    '<td><span class="chip '+stCls(x.wow_slot_status)+'">'+esc(elabel(x.wow_slot_status))+'</span></td>'+
-    '<td>'+(w?esc((w.student_name||w.student_id)+" · "+(elabel(w.wow_skill)||"")):'<span class="mut">-</span>')+'</td></tr>'});
-  h+='</tbody></table></div>'}
+/* Chi tiết MỘT Ô - bám đúng hộp "Chi tiết đăng ký" của OLMS: học viên · lớp · loại bài · hình
+   thức · phần thi · điểm từng tiêu chí + overall · kết quả từ WOW. Nhận `slot_id` chứ không nhận
+   (giờ, ngày) như bản cũ: lưới nay tách theo từng NV nên một ô đã là một ca cụ thể của một người,
+   không còn phải dò lại. */
+function lwXemO(sid){
+ var x=find("DL26","slot_id",sid);
+ if(!x){toast("Không thấy ô trực này.");return}
+ var d=pvnd(x.slot_datetime);
+ var w=x.wow_id?find("DL14","wow_id",x.wow_id):null;
+ var h='<div class="dcard"><h4><i class="ti ti-calendar-event"></i>'+esc(x.slot_time||"")+' · '+esc(d?vnd2(d):"")+'</h4>';
+ h+=ctxRows([["NV WOW",esc(x.staff_name||x.staff_id||"-")],
+   ["Cơ sở",esc(elabel(x.branch)||"-")],
+   ["Trạng thái ô",'<span class="chip '+stCls(x.wow_slot_status)+'">'+esc(elabel(x.wow_slot_status)||"-")+'</span>']]);
+ if(!w){
+  h+='<div class="notebar" style="margin:10px 0"><i class="ti ti-info-circle"></i>'+
+   (isc(x.wow_slot_status,"off","unavailable")
+    ? 'Ô này NV WOW đã báo không nhận - học viên không đặt được vào đây.'
+    : 'Ô còn trống. Học viên hoặc học vụ đặt được buổi WOW vào đúng ô này.')+'</div>';
+ }else{
+  h+='<div class="sechd">Chi tiết đăng ký</div>';
+  h+=ctxRows([["Học viên",esc(w.student_name||w.student_id||"-")],
+    ["Lớp học",esc(w.class_id_name||w.class_id||"-")],
+    ["Loại bài",esc(elabel(w.wow_lesson_type)||elabel(w.wow_skill)||"-")],
+    ["Hình thức",esc(elabel(w.wow_mode)||"-")],
+    ["Phần thi",esc(w.wow_parts||"-")],
+    ["Band mục tiêu",esc(w.target_band||"-")]]);
+  /* BỐN TIÊU CHÍ CHẤM SPEAKING của IELTS, đúng bốn ô OLMS đang hiện: FC · LR · GRA · PR. */
+  h+='<div class="sechd">Chi tiết điểm số</div><div class="rbwrap"><div class="rbrow">';
+  [["FC","Fluency & Coherence","wow_score_fc"],["LR","Lexical Resource","wow_score_lr"],
+   ["GRA","Grammar","wow_score_gra"],["PR","Pronunciation","wow_score_pr"]].forEach(function(t){
+   h+='<div class="rbl" style="min-width:64px"><b>'+t[0]+'</b><small>'+esc(t[1])+'</small>'+
+    '<div style="font-size:16px;font-weight:800;color:var(--navy)">'+esc(String(w[t[2]]==null||w[t[2]]===""?"-":w[t[2]]))+'</div></div>'});
+  h+='</div></div>';
+  h+='<div class="hvschd" style="margin-top:8px"><div class="hvschh"><i class="ti ti-award"></i>'+
+   '<b>Overall score</b><span class="mut">'+esc(String(w.wow_overall==null||w.wow_overall===""?"chưa chấm":w.wow_overall))+'</span></div></div>';
+  h+='<div class="sechd">Kết quả từ WOW</div>';
+  h+='<div class="fhint">'+(String(w.wow_content_note||"").trim()?esc(w.wow_content_note):"Chưa cập nhật tài liệu.")+'</div>';
+ }
  h+='<div class="dact"><button class="btn" onclick="closeModal()">Đóng</button></div></div>';
- openDrawer("Chi tiết ca trực",h)}
+ openDrawer("Chi tiết ô trực",h)}
 function lwDangKy(){
  if(!lwLaWow()){toast("Chỉ NV WOW mới đăng ký được ca trực của mình.");return}
  var khung=lwKhung();
@@ -15388,6 +15459,12 @@ function wowCancel(id){var w=find("DL14","wow_id",id)||{};
 function wowCancelRun(id){var reason=(fldV("wc_reason")||"").trim();
  if(!reason){toast("Ghi lý do hủy.");return}
  var w=find("DL14","wow_id",id);if(!w)return;
+ /* HUỶ SÁT GIỜ = CA TRỰC BỎ TRỐNG, không ai đặt kịp. OLMS đặt hạn tối thiểu cho việc huỷ, app
+    phải áp thật chứ không chỉ hiện con số ra cho đẹp. */
+ var _minHuy=num(paramOf("wowCancelMinDays",1));
+ var _dHuy=pvnd(w.wow_session_date);
+ if(_minHuy>0&&_dHuy&&_dHuy.getTime()-Date.now()<_minHuy*864e5&&!isc(w.wow_status,"completed","no_show")){
+  toast("Buổi này phải huỷ trước ít nhất "+_minHuy+" ngày. Sát giờ thì báo học vụ xử tay, đừng để ca trực bỏ trống.",5200);return}
  var s=find("DL09","student_id",w.student_id);
  var refunded=false;
  if(/yes/i.test(String(w.quota_deducted||""))&&s){
@@ -15441,8 +15518,10 @@ function wowAdd(psid){var h='<div class="dcard"><h4><i class="ti ti-star"></i>Đ
 /* GOM THEO NGÀY. SOP mở 13 khung giờ mỗi ngày nên số ca còn trống lên tới vài trăm - một cái
    danh sách phẳng dài như vậy thì có đủ thông tin mà vẫn không chọn được. `<optgroup>` cho người
    ta nhảy theo ngày, là cách người ta nghĩ khi đặt lịch. */
-function waSlotOpts(){
- var ds=srows("DL26").filter(function(x){return lwRanh(x)})
+/* `hv=true` khi danh sách này vẽ cho HỌC VIÊN: lúc đó mới áp hạn "đặt trước N ngày" và "chỉ xem
+   trước N tuần". Học vụ đặt hộ thì thấy đủ mọi ô còn trống - họ đang xử việc gấp. */
+function waSlotOpts(hv){
+ var ds=srows("DL26").filter(function(x){return lwRanh(x,null,hv)})
   .sort(function(a,b){var x=pvnd(a.slot_datetime),y=pvnd(b.slot_datetime);return (x?x.getTime():0)-(y?y.getTime():0)});
  if(!ds.length)return '<option value="">-- chưa có ca trực nào còn trống --</option>';
  var h='<option value="">-- chọn ca trực --</option>',ngay="";
@@ -16938,7 +17017,7 @@ function hvWowAsk(){
     dựa trên lịch làm việc đã đăng ký của team wow thôi"*. Bản cũ hỏi "Ngày mong muốn" cộng một
     ô CHỮ TỰ DO "Khung giờ mong muốn" (*"vd: sau 19h các ngày trong tuần"*) rồi để trung tâm tự
     xoay - tức app hứa hộ một thứ nó chưa biết có ai trực hay không, và học viên chờ. */
- h+='<div class="fld full"><label>Chọn ca trực còn trống <i>*</i></label><select id="hvw_slot">'+waSlotOpts()+'</select>'+
+ h+='<div class="fld full"><label>Chọn ca trực còn trống <i>*</i></label><select id="hvw_slot">'+waSlotOpts(true)+'</select>'+
   '<div class="fhint">Đây là những khung giờ thầy cô WOW đã đăng ký trực và còn trống. Chọn xong là trung tâm xác nhận, không phải chờ xếp lịch.</div></div>';
  h+='<div class="fld full"><label>Bạn muốn tập trung vào phần nào</label><textarea id="hvw_focus" rows="2" placeholder="vd: em hay bí ý ở Speaking part 2"></textarea></div>';
  h+='<div class="dact"><button class="btn primary" onclick="hvWowSave()"><i class="ti ti-send"></i>Gửi yêu cầu đặt buổi</button>'+
@@ -16951,7 +17030,9 @@ function hvWowSave(){
     gửi một ước nguyện rồi ngồi chờ trung tâm xếp. */
  var _slId=fldV("hvw_slot");var _sl=_slId?find("DL26","slot_id",_slId):null;
  if(!_sl){toast("Chọn một ca trực còn trống nhé.");return}
- if(!lwRanh(_sl)){toast("Ca này vừa có bạn khác đặt mất rồi - chọn ca khác nhé.",4600);hvWowAsk();return}
+ if(!lwRanh(_sl,null,true)){
+  var _lead=num(paramOf("wowBookLeadDays",1));
+  toast("Ca này không đặt được nữa - hoặc vừa có bạn khác đặt mất, hoặc phải đặt trước ít nhất "+_lead+" ngày.",5200);hvWowAsk();return}
  var when=_sl.slot_datetime;
  var left=num(S.wow_quota_remaining);
  if(left<=0){toast("Bạn đã dùng hết lượt WOW của khóa"+(hvHotline()?(" - gọi "+hvHotline()+" nếu cần thêm."):"."),4600);return}

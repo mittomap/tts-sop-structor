@@ -333,20 +333,75 @@ Anh Luân: *"em cứ bám thử, nếu cần thứ thử đổi cấu hình cho 
 4. **Ba tham số CH2 mới** và phải ĐƯỢC ÁP THẬT vào cửa đặt/huỷ: số tuần học viên xem trước ·
    số ngày phải đặt trước · số ngày tối thiểu được huỷ.
 
-### WOW-2 · Bỏ bước chờ xác nhận cho HV tự đặt — ⏳ CHƯA HỎI
-### WOW-3 · Nhập kết quả bên nào (app hay OLMS) — ⏳ anh Luân chưa chốt ranh giới
+### WOW-2 · Bỏ bước chờ xác nhận cho HV tự đặt — ✅ ĐÃ CHỐT
+> *"bước chờ xác nhận này - nếu Wower k xác nhận thì buổi WOW không được diễn ra? Xem xét bỏ qua
+> bước này đối với trường hợp học viên tự book luyện tập hằng tuần - chỉ cần xác nhận đối với các
+> trường hợp đặc biệt"*
+
+**Anh Luân chốt:**
+- **Học viên tự đặt buổi LUYỆN TẬP → vào thẳng, không chờ xác nhận.** Entry test / Midterm /
+  Final vẫn phải NV WOW xác nhận.
+- **Vẫn báo cho NV WOW** (hiện trên lịch + chuông), **và cho họ quyền TỪ CHỐI kèm lý do** - từ
+  chối thì ô trực mở lại và học viên được báo để đặt buổi khác.
+
+### WOW-3 · Nhập kết quả buổi WOW ở đâu — ✅ ĐÃ CHỐT
+> *"việc nhập kết quả đã nằm bên OLMS - xem xét lại nhập bên nào"*
+
+Anh Luân: *"e cứ làm trên app của mình, sau này dev tính, chỗ nào trùng lặp dev tự cân"*.
+→ App giữ ô nhập kết quả (điểm FC/LR/GRA/PR + overall + kết quả từ WOW). Chỉ số WOR và bảng NV
+WOW trong Báo cáo vì thế còn nguyên nguồn số liệu.
+
+---
+
+## HỌC VỤ
+
+### HỌC VỤ-1 · Thêm nhóm việc cấp LỚP — ✅ ĐÃ CHỐT
+> *"Trong nhóm việc cho em thêm việc của các nhóm lớp, ví dụ: lớp Mas0808 sắp final, lớp Private
+> Mỹ Tiên đã hoàn thành 24 giờ học"*
+
+**Đo được:** trong 40+ nhóm việc hiện có, **chỉ đúng MỘT nhóm ở cấp lớp** ("Lớp sắp khai giảng
+thiếu sĩ số"); còn lại đều là việc của một người (lead / học viên / buổi / bài). Học vụ nói đúng.
+
+**Anh Luân chốt:** *"thoải mái đi em, e cân cho đầy đủ"* → làm **bốn nhóm**, ngưỡng đưa vào CH2:
+lớp **sắp thi Final** · lớp **đã học đủ số giờ cam kết** · lớp **sắp kết thúc khóa** (nối với kế
+hoạch khai giảng) · lớp **có nhiều học viên nguy cơ** (cả lớp đuối chứ không riêng một em).
+
+### HỌC VỤ-2 · "Phần này theo quy trình HR đang quản lý" — ✅ ĐÃ CHỐT (đổi thành việc khác)
+Anh Luân: *"Họ đang nói đến giáo viên dự phòng đấy em, e cứ bỏ qua cái này cũng được, tại cái này
+lúc này mình chốt là học vụ và trưởng phòng aca có thể xử lý, còn danh sách giảng viên dự phòng
+thì có thể là mình sẽ nhập vào mỗi tháng, cái đó thì để trưởng phòng ACA nhập"*.
+
+- **Bỏ** vế "HR quản lý".
+- **Xử lý đổi GV**: Học vụ + Trưởng phòng ACA (khớp đúng phát hiện ở ACA-8: hiện KHÔNG ai vào
+  được trang `gvdp`).
+- **VIỆC MỚI:** danh sách **giảng viên dự phòng nhập theo TỪNG THÁNG**, người nhập là **Trưởng
+  phòng ACA**.
+
+### HỌC VỤ-3 · Lớp chưa đủ sĩ số khai giảng — ✅ ĐÃ CHỐT (bỏ vế lịch tháng)
+> *"Học vụ không có chức năng lấp đầy lớp, chỉ kiểm tra đủ số lượng và thời gian kết thúc lớp cũ
+> để làm kế hoạch khai giảng, cần hiển thị trực quan kế hoạch các lớp khai giảng từng tháng để
+> sale nhìn thấy và fill học viên vào"*
+
+Anh Luân: *"ý họ là họ ko muốn thấy cái thẻ đó. Cứ bỏ qua yêu cầu này. Vấn đề là nhìn thấy lớp
+chưa đủ khai giảng, để có thể phối hợp với sale, sale cũng thấy thẻ này mà"* · *"sale có thể đẩy
+thẳng vào lớp đã lên kế hoạch"*.
+
+- **BỎ** vế "hiển thị trực quan kế hoạch khai giảng từng tháng".
+- Thẻ **"Lớp chưa đủ sĩ số khai giảng"** phải hiện cho **CẢ Học vụ VÀ Sale** - đây mới là thứ họ cần.
+- **Sale đẩy thẳng học viên vào lớp đã lên kế hoạch.**
+- Dữ liệu đã đủ: 10 lớp `planning` + 4 lớp `open` trong demo.
 
 ---
 
 ## Tình hình
 
-**Đã hỏi 18/26.** Xong ACA (10) và SALE (10).
+**ĐÃ HỎI XONG CẢ 26 MỤC.**
 - Chốt LÀM: ACA-1, 2, 4, 5, 6, 8, 9, 10 · SALE-1, 2, 3, 4, 5, 6, 7, 8, 9 (17 mục)
 - Chốt KHÔNG LÀM: ACA-3 (đã có sidebar) · ACA-7 (GV phải quan tâm từng học viên)
 - Ghi nhận, để dev làm sau: SALE-3 phần chặn đăng nhập làm test
 - Chờ ảnh: SALE-10
 
-**Chưa hỏi:** WOW 1-3 · Học vụ 1-3 (6 mục).
+**Không mục nào còn treo.**
 
 ## Việc phát sinh ngoài feedback (tìm ra trong lúc tra)
 

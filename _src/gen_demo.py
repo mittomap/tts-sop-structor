@@ -1393,12 +1393,26 @@ for s in students:
     if ts: s["last_learning_activity_time"]=max(ts,key=lambda x:dt.datetime.strptime(x,"%d/%m/%Y %H:%M"))
 
 # ================= DL14 WOW =================
-# 13 khung gio 08:30-09:30 ... 20:30-21:30 - LAY THANG TU SHEET `DL19. Lich lam viec WOW` cua SOP,
-# khong phai em tu chon. Ban dau em dat 4 khung cho gon; do la BOT so voi SOP.
+# KHUNG GIO SINH TU BA CA, O 30 PHUT - bam dung man OLMS team dung that (anh Luan gui anh 11/08).
+# Truoc do lay 13 khung MOT GIO tu sheet `DL19` cua SOP. SOP la ban phac tren Excel; OLMS la thu
+# ho mo ra moi ngay - lay cai dang chay lam chuan.
 # KHAI O DAY chu khong o phan DL26 ben duoi, vi buoi WOW phai roi DUNG khung ngay tu luc sinh:
 # mot buoi nam ngoai luoi thi `fixdata` luat 18 se mo cho no mot ca ngoai luoi, ma ca ngoai luoi
 # thi BANG TONG dem duoc con LUOI khong ve ra - hai cho tren cung mot man noi hai chuyen.
-KHUNG_TRUC=[(8,30),(9,30),(10,30),(11,30),(12,30),(13,30),(14,30),(15,30),(16,30),(17,30),(18,30),(19,30),(20,30)]
+CA_TRUC=[("Ca sáng","09:00","12:30"),("Ca chiều","12:30","17:30"),("Ca tối","17:30","21:30")]
+O_PHUT=30
+def _khungTu(ca,buoc):
+    ra=[]
+    for _t,_tu,_den in ca:
+        h1,m1=[int(x) for x in _tu.split(":")]; h2,m2=[int(x) for x in _den.split(":")]
+        m=h1*60+m1; het=h2*60+m2
+        while m+buoc<=het:
+            ra.append((m//60,m%60)); m+=buoc
+    seen=set(); out=[]
+    for x in ra:
+        if x not in seen: seen.add(x); out.append(x)
+    return out
+KHUNG_TRUC=_khungTu(CA_TRUC,O_PHUT)
 def _napKhung(d):
     """Keo mot moc buoi WOW ve dung khung gio gan nhat, GIU NGUYEN ben qua khu / tuong lai.
 
@@ -1919,9 +1933,10 @@ for _nv in WOWS:
         _ngay=(NOW+days(_off)).replace(hour=0,minute=0)
         if _ngay.weekday()==6 and random.random()<0.7: continue      # chu nhat phan lon nghi
         if random.random()<0.18: continue                            # ngay nghi rai rac
-        # 2-5 ca/ngay: SOP dat cam ket 40h/thang, tuc khoang 2 gio moi ngay lam viec - khong ai
-        # truc lien 13 tieng. Lay mau tu 13 khung chu khong lay het.
-        for _hm in random.sample(KHUNG_TRUC, random.randint(2,5)):
+        # O 30 phut nen mot nguoi truc lien mot khuc 2-4 tieng = 4-8 o. Lay mot KHUC LIEN TIEP
+        # chu khong boc ngau nhien ray rac: khong ai truc 09:00 roi nghi toi 15:00 roi truc tiep.
+        _n=random.randint(4,8); _b=random.randint(0,max(0,len(KHUNG_TRUC)-_n))
+        for _hm in KHUNG_TRUC[_b:_b+_n]:
             _khi=_ngay.replace(hour=_hm[0],minute=_hm[1])
             _co=_wowByKey.get((_nv[0],F(_khi)))
             if _co:
@@ -1931,8 +1946,12 @@ for _nv in WOWS:
             elif _off<0:
                 # ca da qua ma khong ai dat: van la ca da dang ky, chi la trong
                 wow_slots.append(_themSlot(_nv,_khi,"available (Còn trống)"))
-            elif random.random()<0.12:
+            elif random.random()<0.10:
                 wow_slots.append(_themSlot(_nv,_khi,"off (Nghỉ/Bận)"))
+            elif random.random()<0.12:
+                # OLMS co o UNAVAILABLE rieng: NV co truc ca do nhung khung nay khong nhan.
+                # Danh muc khai bao nhieu gia tri thi demo phai cho thay du bay nhieu.
+                wow_slots.append(_themSlot(_nv,_khi,"unavailable (Không nhận)"))
             else:
                 wow_slots.append(_themSlot(_nv,_khi,"available (Còn trống)"))
 # PHU HET buoi WOW da co: buoi nao chua co slot thi mo them mot ca dung gio do
@@ -1957,12 +1976,33 @@ out={"dl":dl_new,"enums":old.get("enums"),"config":old.get("config")}
 # thi phai co O SUA trong man Cai dat - khong thi anh Luan thay mot con so ma khong doi duoc.
 # Verify tron bo bat ngay lan dau: "khong con tham so app doc ma khong co o sua (wowSlotHours,
 # wowSlotMaxDays)". Them tai NGUON de moi lan dung lai deu co, khong phai va tay vao JSON.
+# DANH MUC: them `unavailable` cho trang thai o truc - OLMS co o "UNAVAILABLE" rieng, khac
+# `off` (bao nghi ca) o cho: NV VAN truc ca do, chi khung nay khong nhan. Upsert tai NGUON,
+# khong sua tay demo_base.json - file base la ban chup dung yen, sua tay la mat dau vet.
+_en = out.setdefault("enums", {}) or {}
+out["enums"] = _en
+_ss = _en.setdefault("enum_wow_slot_status", [])
+if not any(str(x).startswith("unavailable") for x in _ss):
+    _ss.append("unavailable (Không nhận)")
+
 _ch2 = (out.get("config") or {}).setdefault("ch2", [])
 _ch2By = {str(x.get("name")): x for x in _ch2}
 for _t in [
-    {"name":"wowSlotHours","value":"08:30,09:30,10:30,11:30,12:30,13:30,14:30,15:30,16:30,17:30,18:30,19:30,20:30","unit":"khung giờ",
-     "meaning":"Các khung giờ NV WOW được đăng ký trực trong ngày. Học viên và học vụ chỉ đặt được buổi WOW vào những khung này.",
-     "suggested":"13 khung 1 giờ, 08:30 tới 21:30 - đúng lưới trực SOP mô tả ở sheet DL19. Bớt khung thì team WOW mất chỗ để nhận ca."},
+    {"name":"wowShifts","value":"Ca sáng|09:00|12:30, Ca chiều|12:30|17:30, Ca tối|17:30|21:30","unit":"ca",
+     "meaning":"Ba ca trực trong ngày. Mỗi ca ghi \"Tên|Giờ bắt đầu|Giờ kết thúc\", các ca ngăn nhau bằng dấu phẩy. Khung giờ trên lưới tự sinh ra từ đây.",
+     "suggested":"Ba ca sáng/chiều/tối như OLMS đang chạy. Đổi giờ mở cửa thì sửa ở đây, lưới đổi theo."},
+    {"name":"wowSlotMinutes","value":30,"unit":"phút",
+     "meaning":"Mỗi ô trên lịch trực dài bao nhiêu phút.",
+     "suggested":"30 phút - đúng độ dài ô của OLMS. Đổi thành 60 thì lưới tự gộp lại còn một nửa số hàng."},
+    {"name":"wowWeeksAhead","value":2,"unit":"tuần",
+     "meaning":"Học viên xem trước được lịch WOW của bao nhiêu tuần.",
+     "suggested":"2 tuần - đúng con số trong màn Cấu hình của OLMS."},
+    {"name":"wowBookLeadDays","value":1,"unit":"ngày",
+     "meaning":"Học viên phải đặt buổi WOW trước ít nhất bao nhiêu ngày. Đặt sát giờ hơn mức này thì app chặn.",
+     "suggested":"1 ngày - để NV WOW còn kịp chuẩn bị nội dung buổi."},
+    {"name":"wowCancelMinDays","value":1,"unit":"ngày",
+     "meaning":"Muốn huỷ buổi WOW thì phải huỷ trước ít nhất bao nhiêu ngày.",
+     "suggested":"1 ngày - huỷ sát giờ là ca trực bỏ trống, không ai đặt kịp."},
     {"name":"wowSlotMaxDays","value":60,"unit":"ngày",
      "meaning":"Mỗi lần đăng ký ca trực, NV WOW được nhận tối đa bao nhiêu ngày liên tiếp.",
      "suggested":"60 ngày (khoảng 2 tháng). Đặt ngắn hơn nếu muốn team đăng ký lại theo tháng."},
@@ -2019,7 +2059,7 @@ chk(not _lech,"DL26 co %d ca lech khung gio (%s) - luoi truc se khong ve ra chun
 
 # danh muc khai bon gia tri thi demo phai cho thay du bon
 _tt={str(x["wow_slot_status"]).split(" ")[0] for x in wow_slots}
-for _c in ["available","booked","taught","off"]:
+for _c in ["available","booked","taught","off","unavailable"]:
     chk(_c in _tt,"DL26 thieu trang thai '%s' - danh muc khai ma man hinh khong bao gio thay"%_c)
 
 lead_ids={L["lead_id"] for L in leads}; stu_ids={s["student_id"] for s in students}

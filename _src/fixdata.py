@@ -2678,16 +2678,25 @@ _slots = d["dl"].setdefault("DL26", [])
 # cua chung (keo ve qua khu, day sang tuong lai) va khong luat nao biet den luoi truc. Neu de
 # nguyen thi buoc mo ca ben duoi se de ra CA NGOAI LUOI: bang tong dem duoc ma luoi khong ve ra.
 # Khung gio doc tu CH2 (`wowSlotHours`) - cung mot nguon voi app, khong go lai o day.
-_khungCfg = ""
-for _c in (d.get("config") or {}).get("ch2", []):
-    if str(_c.get("name")) == "wowSlotHours": _khungCfg = str(_c.get("value") or "")
+# Khung gio SINH RA tu ba ca + do dai o (bam OLMS, 11/08) - khong con doc mot chuoi khung go tay.
+_cfg = {str(c.get("name")): c.get("value") for c in (d.get("config") or {}).get("ch2", [])}
+_caTxt = str(_cfg.get("wowShifts") or "")
+try: _buoc = int(float(_cfg.get("wowSlotMinutes") or 30))
+except Exception: _buoc = 30
+if _buoc < 5 or _buoc > 180: _buoc = 30
 _khung = []
-for _g in _khungCfg.split(","):
-    _g = _g.strip()
-    if not _g: continue
+for _ca in _caTxt.split(","):
+    _pp = [x.strip() for x in _ca.split("|")]
+    if len(_pp) < 3: continue
     try:
-        _hh, _mm = _g.split(":"); _khung.append((int(_hh), int(_mm)))
-    except Exception: pass
+        _h1, _m1 = [int(x) for x in _pp[1].split(":")]
+        _h2, _m2 = [int(x) for x in _pp[2].split(":")]
+    except Exception: continue
+    _m = _h1 * 60 + _m1; _het = _h2 * 60 + _m2
+    while _m + _buoc <= _het:
+        _k = (_m // 60, _m % 60)
+        if _k not in _khung: _khung.append(_k)
+        _m += _buoc
 _soNap = 0
 if _khung:
     for _w in R("DL14"):

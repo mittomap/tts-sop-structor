@@ -801,13 +801,24 @@ if SCH:
 # Dat o CUOI vi DL26 la thu bi NHIEU NGUOI GHI NHAT: gen_demo sinh, fixdata luat 18 sua, va
 # trong app thi ca hai cua dat buoi WOW deu doi trang thai ca. Mot bat bien co nhieu nguoi ghi
 # thi phai kiem sau NGUOI GHI CUOI CUNG - day la cho do.
+# Khung gio sinh tu ba ca + do dai o (bam OLMS 11/08), khong con doc chuoi khung go tay.
+_cfg2 = {str(c.get("name")): c.get("value") for c in (d.get("config") or {}).get("ch2", [])}
+try: _buoc2 = int(float(_cfg2.get("wowSlotMinutes") or 0))
+except Exception: _buoc2 = 0
 _khungTxt = set()
-for _c in (d.get("config") or {}).get("ch2", []):
-    if str(_c.get("name")) == "wowSlotHours":
-        _khungTxt = {g.strip() for g in str(_c.get("value") or "").split(",") if g.strip()}
+for _ca in str(_cfg2.get("wowShifts") or "").split(","):
+    _pp = [x.strip() for x in _ca.split("|")]
+    if len(_pp) < 3 or not _buoc2: continue
+    try:
+        _h1, _m1 = [int(x) for x in _pp[1].split(":")]
+        _h2, _m2 = [int(x) for x in _pp[2].split(":")]
+    except Exception: continue
+    _m2b = _h1 * 60 + _m1; _het2 = _h2 * 60 + _m2
+    while _m2b + _buoc2 <= _het2:
+        _khungTxt.add("%02d:%02d" % (_m2b // 60, _m2b % 60)); _m2b += _buoc2
 _sl = R("DL26")
-rep("NANG", "18a Tham so wowSlotHours THIEU trong CH2",
-    [] if _khungTxt else ["wowSlotHours"])
+rep("NANG", "18a Tham so wowShifts / wowSlotMinutes THIEU trong CH2",
+    [] if _khungTxt else ["wowShifts hoac wowSlotMinutes"])
 if _khungTxt:
     # CA LECH KHUNG: bang tong van dem no, con luoi thi khong ve ra - hai cho tren cung mot man
     # noi hai chuyen ma khong ai biet ben nao dung.
