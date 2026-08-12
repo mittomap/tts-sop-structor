@@ -146,24 +146,166 @@ nhóm "Mới nhận" và tụt xuống. Vì thế **đề xuất "giữ nguyên 
 **Anh Luân chốt: làm đề xuất thứ hai** - sắp **Tiêu cực → Trung tính → Tích cực**. Danh mục
 `enum_feedback_type` đã có sẵn đúng ba mức, không phải thêm gì.
 
-### ACA-10 · Sort việc của Giáo viên lên trước theo số ngày quá hạn — ⏳ CHỜ ẢNH
+### ACA-10 · Sort việc quá hạn theo số ngày — ✅ ĐÃ CHỐT (có ảnh)
 > *"Sort các việc của Giáo viên lên trước - số ngày quá hạn -"*
 
 **Xung đột cần biết trước khi làm:** thứ tự nhóm việc hiện tại là bản khai `VIECNHOM` xếp theo mạch
 SOP P1→P10, dựng ở V9.48 sau khi chính anh Luân hỏi *"mấy nhóm việc, e sắp xếp thứ tự chuẩn ko nhỉ"*
 và có bộ kiểm bắt mọi nhóm mới phải khai vào đó. Đưa việc giáo viên lên đầu là đạp lên quyết định ấy.
-Anh Luân đang gửi ảnh để xác định đúng màn.
+**Ảnh chỉ đúng màn Việc hôm nay**, khối **"QUÁ HẠN - LÀM NGAY 49"**. Đọc cột ngày trong ảnh:
+*quá 2 · quá 3 · quá 3 · quá 1 · quá 2 · quá 3 · quá 3* - **không sắp theo số ngày quá hạn chút nào.**
+
+**Gốc:** danh sách trong mỗi khối lấy đúng thứ tự của `view`, tức thứ tự NHÓM việc.
+**Và KHÔNG đạp lên V9.48:** `VIECNHOM` quy định thứ tự *nhóm*, còn ba khối Quá hạn / Sắp tới hạn /
+Theo dõi vốn đã cắt ngang thứ tự ấy rồi - sắp theo độ quá hạn bên trong khối "Làm ngay" chỉ là làm
+rõ thêm.
+**Chốt:** trong mỗi khối, việc quá hạn lâu nhất lên đầu. (Phần "ghim riêng việc của giáo viên lên
+trên" anh Luân chưa yêu cầu thêm - để ngỏ.)
+
+---
+
+## SALE
+
+### SALE-1 · Biểu đồ cột chồng + biểu đồ tròn cho số liệu sale — ✅ ĐÃ CHỐT
+> *"số liệu theo dạng biểu đồ cột chồng: Lượt hẹn hôm nay, Tỷ lệ kết nối, đăng ký mới... màu sắc
+> từng nhân viên sale chồng lên nhau, 4 cột tượng trưng cho 4 chi nhánh. Số liệu tiền dạng biểu đồ
+> tròn: sale nào thu được bao nhiêu chiếm tỉ lệ bao nhiêu %"*
+
+**Ba điểm đo được trước khi vẽ:** app gần như chưa có biểu đồ nào (5 chỗ `<svg>`, không hàm vẽ) nên
+phải tự dựng bằng SVG - app chạy offline, không kéo thư viện ngoài · SALE nói 4 chi nhánh, dữ liệu
+có 5 cơ sở + Online · **"tỷ lệ kết nối" là %, chồng cột thì cộng dồn ba cái % lại thành con số vô nghĩa.**
+
+**Anh Luân chốt:**
+- *"em đổi thành số, rồi hiển thị % cũng dễ hơn"* → cột chồng theo **SỐ LƯỢT kết nối**, có ghi kèm %.
+- **Chỉ vẽ cơ sở có số liệu trong kỳ** (cơ sở nào kỳ này trống thì bỏ cột).
+- Vị trí: đặt cạnh bảng "Hiệu suất đội tư vấn" trên Báo cáo (em đề xuất, anh chưa bác).
+
+### SALE-2 · Trùng số điện thoại — ✅ ĐÃ CHỐT (và anh Luân đổi hẳn thiết kế, gọn hơn merge)
+> *"Chỗ số điện thoại nếu như đã có trên hệ thống >> Báo trùng >> Trùng số nào >> Hiện hồ sơ trùng
+> >> Merge 2 hồ sơ lại với nhau"*
+
+**Đang có:** `findDupPhone` báo bằng toast *"SĐT này đã có: <tên> (lead XXX - NV Y). **Bấm lần nữa
+nếu VẪN muốn tạo mới.**"* → tức app CHO tạo trùng.
+
+**Anh Luân chốt - KHÔNG làm merge, chặn từ gốc:**
+1. Nhập SĐT xong là **lead trùng hiện ngay bên dưới ô nhập**, không đợi bấm Lưu.
+2. **Bấm vào lead đó → tự ghi một lượt liên hệ** (DL02b) vào lead có sẵn.
+3. **CHẶN HẲN việc tạo trùng** - bỏ lối "bấm lần nữa nếu vẫn muốn tạo mới".
+4. *"ko cho trùng, nên ko cần gộp"* - bỏ toàn bộ phần merge.
+5. Một SĐT **khác** nhưng cùng một lead → thêm làm **số liên hệ thứ 2 / số người thân**.
+
+**Việc kèm:** DL02 chỉ có đúng một cột `phone_number`, chưa có chỗ cho số phụ → thêm cột số phụ +
+quan hệ, theo đúng lối DL09 đã có `emergency_contact_name/phone/relation`.
+
+### SALE-3 · Gia hạn đợt đóng + hai mốc quá hạn — ✅ ĐÃ CHỐT
+> *"học viên xin gia hạn đợt đóng thì sale được thao tác xin gia hạn và up minh chứng hình ảnh
+> trao đổi rồi chờ em duyệt lại đợt thanh toán... Quá hạn 1 tuần sẽ không được đăng nhập vào hệ
+> thống để làm test. Quá hạn 2 tuần sẽ có mail huỷ cam kết"*
+
+- **Xin gia hạn + ảnh minh chứng → hàng chờ duyệt:** làm. App đã có ô tệp (7 chỗ) nên tải ảnh được.
+- **Quá hạn 1 tuần chặn làm test:** anh Luân *"ghi nhận lại thôi, cái này để a cho dev làm sau"*
+  → **KHÔNG code**, chỉ ghi vào sổ này.
+- **Quá hạn 2 tuần → mail huỷ cam kết:** làm theo phương án sinh việc + soạn sẵn nội dung, và
+  anh Luân mở rộng thêm (nguyên văn): *"nếu họ có email thì hiện nút gửi email. nếu có zalo thì
+  gửi zalo, bấm xong cho soạn nội dung, hiện thông tin gửi, nút gửi, tạo trang lưu trữ các nội
+  dung đã gửi... trang đó cũng có thể lọc theo lớp, theo người quản lý, theo thời gian hoặc bộ
+  lọc hợp lý"*. **Gửi thật để dev làm sau - app chỉ MÔ PHỎNG**, bấm gửi thì lưu vào sổ lưu trữ.
+
+**Việc phát sinh:** app **chưa có sổ tin đã gửi** (`outbox`: 0 chỗ). Phải dựng bảng mới + màn có
+bộ lọc. Và dữ liệu đang lệch: **lead (DL02) có `zalo_id` nhưng không có email; học viên (DL09) có
+`email` nhưng không có zalo** → em sẽ thêm cột còn thiếu cho cả hai để hai nút hiện đúng lúc.
+Anh thấy không cần thì bảo em bỏ.
+
+### SALE-4 · Thêm "duyệt gia hạn đợt đóng" vào hàng chờ duyệt — ✅ LÀM (rõ, không phải hỏi)
+> *"Chỗ chờ duyệt này được cho em xin thêm cái duyệt gia hạn đợt đóng nữa"*
+
+Hàng chờ duyệt hiện có: chiết khấu · hoàn tiền · đơn xin nghỉ. Thêm loại thứ tư.
+
+### SALE-5 · Sale chia lại đợt đóng phải qua duyệt — ✅ LÀM (rõ, không phải hỏi)
+> *"Khi bạn sale chia lại đợt đóng thì em sẽ phải duyệt qua thì mới hợp lệ nha anh, chứ không chia
+> tùm lùm tà la"*
+
+`insPlanSave` đang cho chia đợt trực tiếp, không qua ai. Thêm bước duyệt.
+
+### SALE-6 · Tên NV WOW làm test + hình thức test — ✅ ĐÃ CHỐT
+> *"Chỗ test đầu vào em cần hiện lên tên WOW làm test. Ngoài ra cho thêm hình thức test: test tại
+> trung tâm hay làm bài thi thật tại hội đồng thi"*
+
+**Điểm vênh đo được:** DL03 chỉ có MỘT cột người là `graded_by`, và nó chỉ có SAU khi chấm -
+42/159 phiếu đang trống. Mà sale cần nói với khách *"em làm test với thầy X"* ngay lúc đặt lịch.
+
+**Anh Luân chốt:**
+- **Thêm cột "NV WOW coi test", gán ngay lúc đặt lịch.** Sau chấm xong `graded_by` có thể là người
+  khác - app hiện cả hai.
+- **Tách hình thức thành HAI câu hỏi riêng:** thi thử hay thi thật (tại hội đồng thi) · online hay
+  tại trung tâm. Phải chuyển dữ liệu cũ (`test_format` online/offline) sang cấu trúc mới.
+
+### SALE-7 · Trang hợp đồng cam kết, hai người duyệt — ✅ ĐÃ CHỐT
+> *"em muốn 1 trang làm hợp đồng cam kết trên file này để em duyệt luôn: khi đã duyệt thì tự động
+> gửi mail đến khách hàng, còn nếu reject thì ghi rõ lý do reject để sale update lại. Sẽ có tổng
+> cộng 2 người duyệt hợp đồng là em và Chí, phải duyệt hết thì học viên đó mới được đến bước xếp lớp"*
+
+App **chưa có** hợp đồng cam kết (16 chỗ dùng chữ "cam kết" đều là cam kết đầu ra trong KPI) và
+**chưa có luồng duyệt hai người** nào.
+
+**Anh Luân chốt:**
+- Hai người duyệt = **Trưởng phòng Tư vấn + Giám đốc (CEO)**. Khai theo CHỨC DANH, không theo tên.
+- Nội dung = **cam kết ĐẦU RA (band điểm mục tiêu)**, nối với chỉ số đầu ra đã có.
+- Duyệt đủ **cả hai** mới được sang bước xếp lớp; reject phải ghi lý do để sale sửa lại.
+- Gửi mail sau khi duyệt: dùng chung cơ chế mô phỏng + sổ lưu trữ đã chốt ở SALE-3.
+
+### SALE-8 · Hai cấp xem số liệu — ✅ ĐÃ CHỐT
+> *"phân thành 2 cấp: em thấy hết tất cả các số liệu / leader center: được thấy số liệu của bạn đó
+> và những nhân viên dưới bạn đó"*
+
+**Anh Luân chốt:** phạm vi tính **THEO CHI NHÁNH** - leader thấy mọi sale cùng cơ sở (hợp với chính
+tên chức danh "Sale Leader Chi nhánh"), không tính theo cây báo cáo. Cơ cấu ba cấp NV Tư vấn →
+Sale Leader Chi nhánh → Trưởng phòng Tư vấn là đúng.
+
+**Việc kèm - dọn dữ liệu demo:** cây `reports_to` hiện lộn xộn: NV024 báo cáo cho NV022 (cũng là
+NV Tư vấn, không phải leader) · NV022/025/026 báo thẳng Trưởng phòng, bỏ qua leader · NV001 và
+NV002 không có ai quản. Sửa ở nguồn pipeline cho đúng ba cấp.
+
+#### SALE-8 (bổ sung) · Anh Luân: *"nếu chi nhánh chưa có leader, thì chỉ mỗi trưởng phòng tư vấn có thể xem"*
+Chi nhánh không có ai mang chức danh Sale Leader → số liệu chi nhánh đó chỉ Trưởng phòng Tư vấn
+(và cấp trên) xem được, không rơi vào tay ai khác.
+
+### SALE-9 · Thu lead quá hạn chăm sóc, giao người khác — ✅ ĐÃ CHỐT
+> *"cần chọn lead hàng loạt và lọc được lead của sale nào, trong trường hợp lead quá thời hạn chăm
+> sóc em sẽ thu lead lại rồi đưa cho nhân viên khác hoặc nhân viên mới (đang training) take care"*
+
+**Đã có sẵn:** màn Bàn giao lead lọc được *"Lead NV này đang ôm"*; hai cửa `doHandoverRun` và
+`reassignSave` đều nhận DANH SÁCH nhiều lead - tức chọn hàng loạt đã chạy được. Thiếu đúng vế
+"thu lead quá hạn".
+
+**Anh Luân chốt:**
+- Quá hạn tính **CẢ HAI mốc**, dính một trong hai là vào danh sách thu: (1) lâu ngày không ai chạm
+  tới - tính từ lần liên hệ cuối; (2) ôm quá lâu kể từ ngày được giao. **Mỗi mốc một tham số CH2.**
+- **Thu và giao thẳng cho người mới trong một lần bấm**, *"nhưng nên có 1 màn hiển thị lại để xác
+  nhận"* - xem lại danh sách trước khi chốt.
+
+### SALE-10 · "Làm theo bảng chặng hành trình" — ⏳ CHỜ ẢNH
+> *"Em thích cái giao diện bảng chặng hành trình á, nên mọi cái giao diện này anh làm theo cái bảng
+> chặng hành trình nha"*
+
+Anh Luân: *"ý của trưởng phòng tư vấn là làm bảng chặng hành trình luôn cho loại trang này"* - đang
+gửi ảnh để biết "loại trang này" là những màn nào.
+
+**Hai thứ có thể là "bảng chặng hành trình":** trang **Bản đồ chặng vòng đời học viên**
+(`renderChang`) - đường ray các ga, mỗi ga đếm hồ sơ đang đứng + số quá hạn, bấm ga ra danh sách ·
+và **thanh chặng ngang** (`stepBar`) đã áp ở 11 trang tác vụ.
 
 ---
 
 ## Tình hình
 
-**Đã hỏi 10/26.** Xong ACA (10 mục), trừ ACA-10 chờ ảnh.
-- Chốt LÀM: ACA-1, ACA-2, ACA-4, ACA-5, ACA-6, ACA-8, ACA-9 (7 mục)
-- Chốt KHÔNG LÀM: ACA-3 (đã có sidebar), ACA-7 (GV phải quan tâm từng học viên)
-- Chờ ảnh: ACA-10
+**Đã hỏi 18/26.** Xong ACA (10) và SALE (10).
+- Chốt LÀM: ACA-1, 2, 4, 5, 6, 8, 9, 10 · SALE-1, 2, 3, 4, 5, 6, 7, 8, 9 (17 mục)
+- Chốt KHÔNG LÀM: ACA-3 (đã có sidebar) · ACA-7 (GV phải quan tâm từng học viên)
+- Ghi nhận, để dev làm sau: SALE-3 phần chặn đăng nhập làm test
+- Chờ ảnh: SALE-10
 
-**Chưa hỏi:** SALE 1-10 · WOW 1-3 · Học vụ 1-3 (16 mục).
+**Chưa hỏi:** WOW 1-3 · Học vụ 1-3 (6 mục).
 
 ## Việc phát sinh ngoài feedback (tìm ra trong lúc tra)
 
