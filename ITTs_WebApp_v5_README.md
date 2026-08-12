@@ -2328,3 +2328,110 @@ này chỉ đếm công - đơn giá giờ, đơn giá WOW, đơn giá test và 
   còn thay cả trang bằng sổ dữ liệu thô.
 - Giáo viên và đội WOW không còn tab "GV dự phòng" / "Phòng & đụng lịch" - đó là cửa ghi của
   Học vụ và Trưởng phòng ACA.
+
+---
+
+# Đợt 12/08/2026 — làm theo feedback bốn team (ACA · SALE · WOW · HỌC VỤ)
+
+## Tên người ở đâu cũng bấm được
+Tên học viên trong mọi bảng, mọi thẻ, mọi danh sách nay đều bấm được để mở ngăn kéo xem nhanh
+(chặng, việc kế tiếp, chuyên cần, công nợ). Trước đợt này có **101 chỗ** in tên ra chữ chết.
+Ba chỗ còn lại cố ý không bấm được: tên nằm trong câu chữ tự do người dùng gõ (lý do chiết khấu),
+và tiêu đề trang hồ sơ của chính học viên đó — bấm vào chính mình thì không mở ra gì mới.
+
+## Vận hành lớp: "Số buổi off còn lại" thay cho ô Sĩ số
+Ô đầu dải thẻ thứ hai nay cho biết **giáo viên chính còn được nghỉ mấy buổi trong khóa**. Sĩ số
+không mất — nó vẫn nằm ở khối thông tin lớp ngay dưới dải thẻ.
+Quota lấy từ cấu hình `teacherOffQuota_course` (mặc định 2 buổi/khóa). Đếm bằng số buổi của lớp
+do người **khác** giáo viên chính dạy.
+
+## Đổi giáo viên cho một buổi: lý do là mục chọn BẮT BUỘC
+Ô lý do trước đây có nhưng bỏ trống vẫn đẩy người được, lại là chữ tự do nên không phân biệt được
+"GV nghỉ" với "trung tâm dời lịch". Nay là **mục chọn bắt buộc + ô ghi thêm**, và danh sách lý do
+nằm trong cấu hình `teacherChangeReasons` — thêm/xoá/sửa được, mỗi lý do mang cờ *"có tính là
+buổi off không"*. Vượt quota vẫn cho làm (lớp không thể không có người dạy) nhưng app báo rõ.
+
+## Buổi WOW 1-1
+- **Học viên tự đặt buổi LUYỆN TẬP → vào thẳng, không chờ xác nhận.** Bài kiểm tra (test đầu vào,
+  giữa khóa, cuối khóa) vẫn cần NV WOW xác nhận.
+- Việc đặt lịch **bay thẳng vào chuông của NV WOW trực ca đó**, không rơi vào học vụ chung nữa.
+- **NV WOW được quyền TỪ CHỐI kèm lý do**: ô trực mở lại cho người khác đặt, học viên đọc được
+  đúng câu lý do ở cổng của mình kèm nút đặt buổi khác, và **không mất lượt WOW nào**.
+- **Nhập điểm ngay khi ghi nội dung buổi**: bốn tiêu chí FC · LR · GRA · PR (thang 9, bước 0.5),
+  Overall tự tính trung bình làm tròn 0.5. Nhập nửa vời bị chặn — đủ bốn ô hoặc để trống cả bốn.
+
+## Trùng số điện thoại: chặn từ gốc, không còn lối "bấm lần nữa vẫn tạo"
+Gõ số xong là **hồ sơ trùng hiện ngay bên dưới ô nhập**, kèm ba nút: ghi thẳng một lượt liên hệ
+vào hồ sơ đã có · mở hồ sơ cũ · gắn số đang gõ làm **số liên hệ thứ hai** (của khách hoặc người
+thân). Ba cửa tạo lead đều chặn hẳn việc tạo trùng. Soi trùng tính cả số phụ và số người thân.
+
+## Đợt đóng học phí phải qua một người duyệt
+- **Xin gia hạn một đợt** (kèm ảnh trao đổi với khách) và **xin chia lại cả lịch đợt** đều vào
+  hàng chờ **"Đợt đóng"** trong Chờ duyệt & quyết định.
+- Trưởng phòng trở lên và phòng kế toán ghi thẳng; các chức danh khác gửi yêu cầu.
+- Duyệt là **áp thật vào lịch đợt ngay**, không phải ghi một cái dấu rồi để đó.
+
+## Thu lead quá hạn chăm sóc
+Nút **"Thu lead quá hạn"** ở màn Bàn giao lead. Lead vào danh sách khi dính **một trong hai** mốc:
+quá `leadStale_days` ngày không ai liên hệ, hoặc một NV ôm quá `leadHoldMax_days` ngày kể từ ngày
+được giao. Có màn xem lại trước khi chốt, và **thu rồi giao thẳng cho người mới trong một lần bấm**.
+
+## Hai cấp xem số liệu của phòng Tư vấn
+Cây báo cáo ba cấp NV Tư vấn → Sale Leader Chi nhánh → Trưởng phòng Tư vấn nay dựng bằng LUẬT:
+nhân viên báo cáo cho leader **cùng cơ sở**; cơ sở chưa có leader thì báo thẳng Trưởng phòng — nên
+số liệu ba cơ sở đó **chỉ Trưởng phòng xem được**, đúng như đã chốt.
+
+## Hai biểu đồ cho đội tư vấn (trang Báo cáo)
+- **Cột chồng theo cơ sở**: mỗi cột một cơ sở, mỗi mảnh màu một nhân viên, đếm **số lượt kết nối**
+  (không chồng tỷ lệ % — ba cái % cộng lại không ra con số nào có nghĩa; % nằm trong chú thích rê
+  chuột). Cơ sở không có số liệu trong kỳ thì không vẽ cột.
+- **Biểu đồ tròn doanh thu theo nhân viên**, kèm % từng người.
+Cả hai vẽ bằng SVG ngay trong app — không kéo thư viện ngoài, chạy được offline.
+
+## Test đầu vào: tên NV WOW coi test + tách hai câu hỏi hình thức
+Phiếu test nay ghi **NV WOW coi test ngay lúc đặt lịch** (người chấm có thể là người khác, app giữ
+cả hai), và hình thức tách thành hai câu độc lập: **thi thử hay thi thật tại hội đồng** · **online
+hay tại trung tâm**.
+
+## Hợp đồng cam kết đầu ra — hai chữ ký
+Hàng chờ **"Hợp đồng cam kết"**: nội dung là cam kết band điểm đầu ra kèm điều kiện. Cần **đủ hai
+chữ ký** (Trưởng phòng Tư vấn + Giám đốc) thì học viên mới sang được bước xếp lớp — chặn ở cả hai
+cửa ghi xếp lớp, không chỉ ẩn nút. Từ chối phải ghi lý do để sale sửa lại. Duyệt đủ thì app soạn
+sẵn thư xác nhận gửi khách.
+
+## Gửi email / Zalo và Sổ tin đã gửi
+Hồ sơ có email thì hiện nút **Gửi email**, có Zalo thì hiện **Gửi Zalo** — không bày một cái nút
+bấm vào rồi báo "chưa có địa chỉ". Soạn nội dung, xem lại thông tin gửi, bấm Gửi.
+Trang **Sổ tin đã gửi** lưu mọi tin, lọc theo **lớp · người gửi · thời gian · kênh**.
+Bản demo **không gửi thật** — chỗ nối ra backend đã đánh dấu sẵn trong mã.
+Đợt đóng quá hạn `commitCancel_days` (mặc định 14) ngày sinh việc **gửi thư huỷ cam kết đầu ra**,
+bấm là mở thẳng màn soạn thư với nội dung điền sẵn.
+
+## Bốn nhóm việc cấp LỚP (trước đây chỉ có một)
+Học vụ vận hành theo lớp, mà bảng việc trước nay chỉ biết nói theo từng người. Nay có thêm:
+**lớp sắp thi cuối khóa** · **lớp đã học đủ giờ cam kết** · **lớp sắp kết thúc khóa** · **lớp có
+nhiều học viên nguy cơ** (cả lớp đuối chứ không riêng một em). Ngưỡng của cả bốn đều nằm trong CH2.
+
+## Lớp chưa đủ sĩ số: cả Học vụ và Sale cùng thấy
+Cùng một lớp thiếu người, hai phòng làm hai việc khác nhau: học vụ **QUYẾT** (dồn lớp, lùi ngày,
+hủy sớm), sale **LẤP ĐẦY**. Trong màn lớp sắp khai giảng nay có ô **"Đẩy học viên vào lớp này"** —
+chọn học viên đã đóng tiền mà chưa xếp lớp, đẩy thẳng vào.
+
+## Giảng viên dự phòng khai theo THÁNG
+App vẫn **tự tính** ai thay được cho từng buổi từ lịch dạy thật — đó là thứ không bao giờ lạc hậu.
+Danh sách khai tay trả lời một câu khác: *tháng này ai đã NHẬN LỜI trực dự phòng*. Trưởng phòng ACA
+khai đầu tháng; người đã nhận lời được xếp lên đầu danh sách người thay.
+
+## Giao bài tập: chọn Kỹ năng trước, kho bài lọc theo kỹ năng
+Ô **Kỹ năng** lên trước ô **Bài trong kho**, và kho lọc theo kỹ năng đang chọn. Chưa chọn kỹ năng
+thì vẫn hiện đủ kho (ai biết sẵn tên bài cứ chọn thẳng). Chọn **Mixed (Tổng hợp)** thì mở cả kho.
+
+## "Trao đổi với trung tâm" — bốn chỗ
+1. **Cổng phụ huynh** trước đây không có một đường nào liên hệ trung tâm ngoài nút gọi điện. Nay
+   phụ huynh có **luồng riêng**, tin ghi rõ người gửi là phụ huynh. Luồng riêng của học viên vẫn
+   không mở cho phụ huynh đọc.
+2. **Cổng học viên**: gom về một tên gọi thống nhất.
+3. **Màn nhân viên**: nút **Nhắn cho học viên** — trước đây kênh chỉ chạy một chiều, nhân viên
+   muốn chủ động nhắn thì phải chờ học viên mở lời trước.
+4. **Ngay trên từng thẻ khuyến nghị** ở cổng học viên, và tin **mang theo ngữ cảnh của thẻ** (vắng
+   buổi nào, thiếu bài nào) chứ không mở một ô trống bắt kể lại từ đầu.

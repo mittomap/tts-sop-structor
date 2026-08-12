@@ -995,6 +995,7 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  /* "theo luat SOP cua chang la tao lao, phai ghi ro ra theo cau hinh chu" */
  var it=bellItems(), khong=[];
  it.forEach(function(x){if(!(x.prm||SLAPRM[x.grp])&&khong.indexOf(x.grp)<0)khong.push(x.grp)});
+ if(khong.length>5)console.log("  NHOM CHUA KHAI NGUONG:",khong.join(" | "));
  t("phan lon viec chi ro duoc nguong lay tu dau ("+(it.length-khong.length)+" nhom co)", khong.length<=5);
  t("khong con cau 'theo luat SOP cua chang'", !/theo luật SOP của chặng/.test(SRC));
  t("chua khai nguong thi noi thang ra, khong noi vong vo", /chưa khai ngưỡng - báo kỹ thuật/.test(SRC));

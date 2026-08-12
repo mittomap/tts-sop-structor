@@ -148,6 +148,16 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 📋 12/08 - CÒN TREO SAU ĐỢT FEEDBACK BỐN TEAM
+> 1. **Chặn đăng nhập làm test khi quá hạn 1 tuần** (SALE-3, vế giữa). Anh Luân chốt *"ghi nhận
+>    lại thôi, cái này để a cho dev làm sau"* → CỐ Ý KHÔNG CODE. Đừng ai tưởng là sót.
+> 2. **Gửi email/Zalo THẬT.** App chạy offline nên chỉ MÔ PHỎNG: soạn → xem lại → bấm Gửi → lưu
+>    vào `DL29`. Chỗ nối ra backend đã đánh dấu bằng `google.script.run.apiSave("DL29", ...)`.
+> 3. **Nhóm việc "Lớp đã học đủ giờ cam kết" hôm nay RỖNG** - không lớp nào đạt 100% (cao nhất
+>    76%). Đúng ra là rỗng, không phải hỏng. Xem mục 12/08 ở trên để biết vì sao không gieo bừa.
+> 4. **Chưa có bộ kiểm đọc CHỮ TRÊN MÀN rồi bắt câu tự mâu thuẫn** - đúng họ lỗi đã sinh ra
+>    "còn NaN" và "quá 9 ngày cho một lớp còn 9 ngày nữa mới khai giảng". Nêu từ 11/08, vẫn treo.
+
 > ### ✅ ĐÃ ĐÓNG - GỠ HẲN BẢN V6 + NỘP BẢNG AUDIT 9 MẢNG (06/08)
 > Anh Luân: *"1- bỏ v6, ko được làm ảnh hưởng v5. 2- okey em, tồn thì làm đi."*
 > · Gỡ khỏi nguồn: cờ `ITTS_V6` · `V6()` · `NAVTREE6` · `v6Dap` · máy đổi bản của nút Đổi cổng ·
@@ -239,9 +249,54 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 40 BỘ KIỂM. Bản dựng đang chạy: `035db1` (11/08), verify TRỌN BỘ xanh hết,
-> đã lên https://mittomap.github.io/itts-sop-demo-v2/ . V1 mốc cũ: V9.99z12, 34 bộ, `829572`,
-> https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới trong phiên này.**
+> **Phiên bản: V2 — 41 BỘ KIỂM. Bản dựng: xem BUILD ID mới nhất ở cuối mục 12/08 bên dưới.
+> Địa chỉ V2: https://mittomap.github.io/itts-sop-demo-v2/ . V1 mốc cũ: V9.99z12, 34 bộ, `829572`,
+> https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 12/08 - LÀM TRỌN 26 MỤC FEEDBACK CỦA BỐN TEAM (ACA · SALE · WOW · HỌC VỤ)
+>
+> Anh Luân: *"làm thôi em, chủ động làm lần lượt đến khi hoàn thành, ko cần hỏi ý kiến anh để
+> tiếp tục"*. Sổ quyết định từng mục nằm ở **`FEEDBACK_TEAM_2026_08.md`** (có nguyên văn lời anh).
+>
+> **BỐN BẢNG DỮ LIỆU MỚI:** `DL27` yêu cầu đổi đợt đóng · `DL28` giảng viên dự phòng theo tháng ·
+> `DL29` sổ tin đã gửi · `DL30` hợp đồng cam kết đầu ra. Tất cả gieo Ở NGUỒN pipeline.
+>
+> **MỘT BỘ KIỂM MỚI - `_checklink`** (ACA-2: *"tên học viên ở đâu cũng bấm được"*). Nó hỏi TRÌNH
+> DUYỆT chứ không đọc chuỗi: với mỗi node chữ chứa tên một học viên thật, hỏi
+> `closest("a,button,[onclick]")`. **101 chỗ → 3 chỗ** (ba chỗ còn lại được miễn có lý do đọc
+> được: tên nằm trong câu chữ tự do, và tiêu đề trang hồ sơ của chính em đó).
+> **Bản đo đầu tiên em viết bằng regex đếm ra 428 chỗ trên 24 trang - GẤP BỐN LẦN sự thật**, vì nó
+> chỉ ngó lại 220 ký tự tìm thẻ mở và không thấy nổi `<div onclick>` bọc cả dòng.
+> *Đừng tự dựng bộ phân tích cú pháp khi thứ hiểu cú pháp đang nằm ngay đó.*
+>
+> **NĂM LỖI THẬT LỘ RA TRONG LÚC LÀM - không cái nào nằm trong feedback:**
+> 1. **`class_end_date` của MỌI lớp đang chạy lệch 75-306 ngày** so với buổi học cuối của chính
+>    nó. Một lớp dạy xong buổi cuối 28/08 mà sổ ghi "kết thúc 11/11". Không ai bắt được bằng mắt
+>    vì không màn nào đặt hai con số cạnh nhau - chỉ khi dựng nhóm việc ĐẾM NGƯỢC tới ngày kết
+>    thúc thì nó mới lộ, **và lộ bằng cách im lặng** (không lớp nào vào nhóm, trong khi thực tế
+>    có sáu lớp sắp xong). Sửa xong lại kéo theo **71 hồ sơ thiếu điểm giữa khóa** - chỗ trống ấy
+>    có sẵn từ lâu, bị ngày kết thúc sai che đi. Đã bù ngay tại chỗ sửa.
+> 2. **Tài khoản toàn quyền `ADMIN` không duyệt được đổi đợt đóng** - `dotAiDuyet()` tra DL01
+>    trước, mà "ADMIN" không có trong DL01. `_check16` bắt được vì nó đóng vai `setRole("all")`.
+>    Luật: **hỏi PHẠM VI trước, đừng hỏi bảng nhân sự trước** (đúng lối `banQuanLy()` đã làm).
+> 3. **Sale không thấy thẻ "Lớp sắp khai giảng thiếu sĩ số"** - cả 9 chức danh sale đếm 0, trong
+>    khi anh Luân nói *"sale cũng thấy thẻ này mà"*. Gốc: chuông và Việc hôm nay cắt theo `cat`,
+>    thẻ mang cat "Học vụ" còn Tư vấn chỉ nhận "Tuyển sinh". Nay PHÁT HAI BẢN - học vụ QUYẾT
+>    (dồn lớp / lùi ngày / hủy sớm), sale LẤP ĐẦY. Cùng một cái thiếu, hai người làm hai việc.
+> 4. **`_checkmien` bắt hai chỗ rò ở sổ tin vừa dựng:** Marketing (`tien:"none"`) đọc được tin
+>    nhắc học phí kèm số tiền; Học vụ và Kế toán (`lead:"none"`) đọc được tin về test đầu vào.
+>    Sổ tin chứa VĂN XUÔI người dùng gõ, nên với một miền người ta không được xem thì không có
+>    cách nào an toàn hơn là **loại cả câu chữ chạm tới nó**.
+> 5. **`_check14` đỏ OAN** vì đo bằng cửa sổ 2600 ký tự cố định: `hvWowSave` dài thêm nên
+>    `persistSoon()` bị đẩy ra mốc 3474 - VẪN NẰM TRONG THÂN HÀM (thân dài 4013). Đã đổi sang
+>    **cắt đúng thân hàm**. *Một bộ kiểm mà kết quả phụ thuộc vào thân hàm dài bao nhiêu thì nó
+>    đang đo độ dài, không đo cái nó nói là đang đo.*
+>
+> **MỘT LẦN ĐỊNH GIEO BỪA RỒI GỠ RA:** nhóm việc "Lớp đã học đủ giờ cam kết" hôm nay rỗng (lớp
+> cao nhất mới 76%). Em thử kéo một lớp `finished` về `in_progress` cho thẻ sáng lên - và nó
+> **chọi lại BA luật khác cùng lúc** (9f ngày kết thúc đã qua · 1b thiếu hồ sơ giữa kỳ · 2b học
+> viên "hoàn thành khóa" mà vẫn nằm trong lớp đang học). Gỡ ra, theo đúng luật đã ghi:
+> *"Ô nào ĐÚNG là nên bằng 0 thì khai ở RONGDUOC kèm lý do, chứ không gieo bừa dữ liệu xấu."*
 >
 > ### 🔵 11/08 - MỘT BỘ KIỂM TỤT TỪ 27 XUỐNG 17 MÀ VẪN IN "OK"
 >

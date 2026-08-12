@@ -12,6 +12,32 @@ Sheet CHUNG / QUẢN LÝ / KẾ TOÁN: trống, không có mục nào.
 
 ---
 
+## ✅ TRẠNG THÁI 12/08/2026 — ĐÃ LÀM XONG CẢ 26 MỤC
+
+Anh Luân: *"làm thôi em, chủ động làm lần lượt đến khi hoàn thành, ko cần hỏi ý kiến anh để tiếp tục"*.
+
+| Nhóm | Mục | Trạng thái |
+|---|---|---|
+| ACA | 1 · 2 · 4 · 5 · 6 · 8 · 9 · 10 | **đã làm** |
+| ACA | 3 · 7 | **anh Luân bác** (bỏ nút back-to-home · từ chối bỏ theo dõi từng học viên) |
+| SALE | 1 · 2 · 3 · 4 · 5 · 6 · 7 · 8 · 9 · 10 | **đã làm** |
+| WOW | 1 · 2 · 3 | **đã làm** |
+| HỌC VỤ | 1 · 2 · 3 | **đã làm** |
+
+**Hai vế CỐ Ý KHÔNG LÀM, đã ghi rõ ở đúng mục:**
+- SALE-3, vế "quá hạn 1 tuần chặn đăng nhập làm test" — anh Luân: *"ghi nhận lại thôi, cái này
+  để a cho dev làm sau"*.
+- HỌC VỤ-3, vế "hiển thị trực quan kế hoạch khai giảng từng tháng" — anh Luân bỏ, giữ lại đúng
+  cái họ cần: *"vấn đề là nhìn thấy lớp chưa đủ khai giảng, để có thể phối hợp với sale"*.
+
+**Bốn bảng dữ liệu mới sinh ra từ đợt này:** `DL27` yêu cầu đổi đợt đóng · `DL28` giảng viên dự
+phòng theo tháng · `DL29` sổ tin đã gửi · `DL30` hợp đồng cam kết đầu ra.
+**Một bộ kiểm mới:** `_checklink` (tên người ở đâu cũng bấm được — 101 chỗ → 3 chỗ được miễn).
+**Năm lỗi thật lộ ra trong lúc làm, không nằm trong feedback:** xem mục 12/08 trong
+`02_NHAT_KY_QUYET_DINH.md`.
+
+---
+
 ## ACA
 
 ### ACA-1 · Giao bài tập: đảo vị trí "Kỹ năng" ↔ "Bài trong kho", lọc kho theo kỹ năng — ✅ ĐÃ CHỐT

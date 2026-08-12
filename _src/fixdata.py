@@ -1336,6 +1336,61 @@ dl["DL28"] = _gvdp
 log.append("14w. DL28 giảng viên dự phòng: %d đăng ký cho 2 tháng (%s, %s)"
            % (len(_gvdp), _thangTruoc, _thangNay))
 
+# ═══ 14u. DL30 - HOP DONG CAM KET DAU RA (V2 12/08, SALE-7) ════════════════════════════════
+# Truong phong Tu van: *"phai duyet het thi hoc vien do moi duoc den buoc xep lop"*, hai nguoi
+# duyet la Truong phong Tu van + Giam doc.
+# Gieo DU BON TRANG THAI de hang cho cho thay ca bon loi di, va de luat chan xep lop co dip
+# len tieng that: chua co hop dong · moi mot chu ky · bi tu choi · da du hai chu ky.
+_hdTP = next((s for s in dl["DL01"] if str(s.get("role", "")).startswith("sales_manager")), None)
+_hdGD = next((s for s in dl["DL01"] if str(s.get("role", "")).startswith("ceo")), None)
+_donHD = [e for e in dl["DL06"]
+          if not str(e.get("enrollment_status", "")).startswith("cancelled")
+          and float(e.get("final_fee") or e.get("total_fee") or 0) > 0
+          and str(e.get("student_id") or "").strip()]
+_donHD.sort(key=lambda e: str(e.get("enrollment_id")))
+_bandCua = {}
+for _l in dl["DL02"]:
+    if str(_l.get("target_band") or "").strip():
+        _bandCua[str(_l.get("lead_id"))] = str(_l["target_band"]).strip()
+_CHO = "pending (Chờ duyệt)"
+_OK = "approved (Đã duyệt)"
+_NO = "rejected (Đã từ chối)"
+_hds = []
+_kb = [(_CHO, _CHO, "", ""),                     # chua ai duyet
+       (_OK, _CHO, "", ""),                      # moi Truong phong ky
+       (_CHO, _OK, "", ""),                      # moi Giam doc ky
+       (_OK, _OK, "", ""),                       # du hai chu ky
+       (_NO, _CHO, "Band cam kết cao hơn mức đầu vào cho phép - hạ xuống 6.0 rồi trình lại.", "")]
+for _i, _e in enumerate(_donHD[:5]):
+    _tv, _gd, _lytv, _lygd = _kb[_i % len(_kb)]
+    _band = _bandCua.get(str(_e.get("lead_id")), "") or ["6.0", "6.5", "7.0"][_i % 3]
+    _hds.append({
+        "hd_id": "HD-%03d" % (_i + 1), "enrollment_id": _e["enrollment_id"],
+        "student_id": _e.get("student_id", ""), "student_id_name": _e.get("student_id_name", ""),
+        "course_id": _e.get("course_id", ""), "course_id_name": _e.get("course_id_name", ""),
+        "hoc_phi": str(int(float(_e.get("final_fee") or _e.get("total_fee") or 0))),
+        "target_band": _band,
+        "han": (NOW + datetime.timedelta(days=120 + _i * 10)).strftime("%d/%m/%Y"),
+        "dieu_kien": "Học viên đi đủ 90% số buổi và nộp đủ bài tập. Không đạt band cam kết thì "
+                     "được học lại miễn phí một khóa cùng trình độ.",
+        "duyet_tuvan": _tv, "duyet_gd": _gd,
+        "ly_do_tuvan": _lytv, "ly_do_gd": _lygd,
+        "duyet_tuvan_boi": (_hdTP or {}).get("full_name", "") if _tv != _CHO else "",
+        "duyet_gd_boi": (_hdGD or {}).get("full_name", "") if _gd != _CHO else "",
+        "duyet_tuvan_luc": fmt(NOW - datetime.timedelta(days=2)) if _tv != _CHO else "",
+        "duyet_gd_luc": fmt(NOW - datetime.timedelta(days=1)) if _gd != _CHO else "",
+        "trinh_luc": fmt(NOW - datetime.timedelta(days=4 + _i)),
+        "trinh_boi": "", "trinh_boi_ten": (_e.get("student_id_name") or "") and
+        next((s.get("full_name", "") for s in dl["DL01"]
+              if str(s.get("role", "")).startswith("sales_staff")), "")})
+dl["DL30"] = _hds
+log.append("14u. DL30 hợp đồng cam kết: %d hợp đồng (%d chờ đủ chữ ký, %d đủ hai, %d bị từ chối)"
+           % (len(_hds),
+              sum(1 for x in _hds if _NO not in (x["duyet_tuvan"], x["duyet_gd"])
+                  and not (x["duyet_tuvan"] == _OK and x["duyet_gd"] == _OK)),
+              sum(1 for x in _hds if x["duyet_tuvan"] == _OK and x["duyet_gd"] == _OK),
+              sum(1 for x in _hds if _NO in (x["duyet_tuvan"], x["duyet_gd"]))))
+
 # ═══ 14v. DL29 - SO TIN DA GUI (V2 12/08, SALE-3) ══════════════════════════════════════════
 # Mot so lu tru rong thi khong ai biet no loc duoc gi. Gieo ca HAI kenh (email + Zalo), ca hai
 # loai nguoi nhan (lead + hoc vien), va rai qua nhieu ngay - de ba bo loc anh Luan neu (LOP,
