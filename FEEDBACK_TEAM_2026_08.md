@@ -284,16 +284,19 @@ Chi nhánh không có ai mang chức danh Sale Leader → số liệu chi nhánh
 - **Thu và giao thẳng cho người mới trong một lần bấm**, *"nhưng nên có 1 màn hiển thị lại để xác
   nhận"* - xem lại danh sách trước khi chốt.
 
-### SALE-10 · "Làm theo bảng chặng hành trình" — ⏳ CHỜ ẢNH
+### SALE-10 · "Làm theo bảng chặng hành trình" — ✅ ĐÃ CHỐT (có ảnh)
 > *"Em thích cái giao diện bảng chặng hành trình á, nên mọi cái giao diện này anh làm theo cái bảng
 > chặng hành trình nha"*
 
-Anh Luân: *"ý của trưởng phòng tư vấn là làm bảng chặng hành trình luôn cho loại trang này"* - đang
-gửi ảnh để biết "loại trang này" là những màn nào.
+Anh Luân: *"ý của trưởng phòng tư vấn là làm bảng chặng hành trình luôn cho loại trang này"*.
 
-**Hai thứ có thể là "bảng chặng hành trình":** trang **Bản đồ chặng vòng đời học viên**
-(`renderChang`) - đường ray các ga, mỗi ga đếm hồ sơ đang đứng + số quá hạn, bấm ga ra danh sách ·
-và **thanh chặng ngang** (`stepBar`) đã áp ở 11 trang tác vụ.
+**Ảnh chỉ rõ: trang Việc hôm nay của sale.** Và dải **"NHÓM VIỆC"** trong ảnh CHÍNH LÀ các chặng
+hành trình xếp thành một hàng chip: Lead mới → Đang khai thác → Chưa gặp được → Đã hẹn test → Có
+kết quả, chờ tư vấn → Tư vấn sau test → Đang tư vấn → Chờ tư vấn lộ trình → Chăm lại tới hẹn.
+
+**Chốt:** thay dải chip "NHÓM VIỆC" bằng **đường ray chặng** kiểu trang Bản đồ chặng
+(`renderChang`) - mỗi ga một con số + số quá hạn, bấm ga là lọc danh sách bên dưới.
+Ảnh này cũng xác nhận lại ACA-10: cột ngày là *quá 5·5·5·5·6·7·5·5·7·7·6*, không sắp theo độ quá hạn.
 
 ---
 
