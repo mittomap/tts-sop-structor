@@ -69,9 +69,13 @@ t("BAT BIEN: da tru luot WOW <=> buoi da dien ra (tren du lieu dang co)", invQuo
  /* 10/08 - HAI CUA NAY NAY DEU DI QUA CA TRUC (DL26), khong con go ngay/gio tu do. Phep lai
     phai lai dung duong nguoi dung di: khong co ca thi ca hai cua deu tu choi ngay tu dong dau,
     va moi tieu chi phia sau se xanh VI KHONG CO GI XAY RA - dung cai kieu xanh vo nghia. */
- function caRanh(){return rows("DL26").filter(function(x){return lwRanh(x)})[0]}
- var ca1=caRanh();
- if(!ca1){bad.push("khong co ca truc WOW con trong de lai thu");return}
+ /* 11/08 - hai cửa nay CHẶT KHÁC NHAU (bám OLMS): học viên phải đặt trước `wowBookLeadDays`
+    ngày và chỉ xem trước `wowWeeksAhead` tuần; học vụ đặt hộ thì không bị hạn ấy. Nên phép lái
+    phải lấy ô bằng ĐÚNG luật của người mình đang đóng vai - không thì thước tự dựng một tình
+    huống không có thật rồi chấm app sai. */
+ function caRanh(hv){return rows("DL26").filter(function(x){return lwRanh(x,null,hv)})[0]}
+ var ca1=caRanh(true);
+ if(!ca1){bad.push("khong co ca truc WOW con trong de lai thu (luat hoc vien)");return}
  /* cua 1: hoc vien tu dat qua cong */
  window.HVID=S.student_id;
  var n0=rows("DL14").length;
@@ -80,7 +84,7 @@ t("BAT BIEN: da tru luot WOW <=> buoi da dien ra (tren du lieu dang co)", invQuo
  var w1=rows("DL14")[0];
  t("cua CONG HOC VIEN: dat xong CHUA tru luot", rows("DL14").length===n0+1&&String(w1.quota_deducted).toLowerCase()==="no");
  /* cua 2: nhan vien dat ho - phai la CA KHAC, vi ca vua roi da bi cua 1 chiem */
- var ca2=caRanh();
+ var ca2=caRanh(false);
  if(!ca2){bad.push("khong con ca truc thu hai de lai cua nhan vien");return}
  reset();setF({wa_stu:S.student_id,wa_skill:"Writing (Viết)",wa_type:"academic_support (Hỗ trợ học thuật)",
   wa_slot:ca2.slot_id,wa_focus:"Task 2",wa_by:"academic_hv (Học vụ)",wa_why:"Em nay Writing yeu nhat"});
@@ -129,15 +133,17 @@ t("BAT BIEN: da tru luot WOW <=> buoi da dien ra (tren du lieu dang co)", invQuo
  if(!nv){bad.push("khong co NV WOW dang lam viec de lai cua dang ky ca");return}
  var cu=CURSTAFF;CURSTAFF=nv.staff_id;
  var n0=rows("DL26").length;
+ var truocKhi={};rows("DL26").forEach(function(x){truocKhi[String(x.slot_id)]=1});
  function iso(n){var d=new Date(Date.now()+n*864e5);
   return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
  reset();FIELDS={lw_tu:iso(40),lw_den:iso(41),lw_cs:"branch_cs1 (Cơ sở 1)",lw_note:"",chk_lw_g0:1};
  try{lwSave()}catch(e){bad.push("lwSave NEM LOI: "+e.message)}
  var them=rows("DL26").length-n0;
  t("cua DANG KY CA TRUC chay duoc va sinh ra ca that", them>0);
- var moi=rows("DL26").filter(function(x){return String(x.staff_id||"")===nv.staff_id&&
-   String(x.slot_id||"").indexOf("SLOT-")===0}).sort(function(a,b){
-   return String(b.registered_at||"").localeCompare(String(a.registered_at||""))})[0];
+ /* TÌM Ô VỪA ĐĂNG KÝ BẰNG CÁCH SO TẬP TRƯỚC/SAU, đừng sắp theo `registered_at`: mốc ấy là chuỗi
+    "dd/mm/yyyy HH:MM", mà sắp chuỗi kiểu đó thì "31/07" đứng trên "01/08" - thước sẽ vớ nhầm một
+    ô cũ do pipeline sinh rồi chấm app sai. */
+ var moi=rows("DL26").filter(function(x){return !truocKhi[String(x.slot_id)]})[0];
  /* Ca vua dang ky phai DUNG DINH DANG voi ca do pipeline sinh, khong thi luoi va bang tong
     nhin thay hai kieu du lieu khac nhau tren cung mot bang. */
  var mau=rows("DL26").filter(function(x){return x!==moi&&String(x.slot_date||"").trim()})[0];
@@ -145,6 +151,8 @@ t("BAT BIEN: da tru luot WOW <=> buoi da dien ra (tren du lieu dang co)", invQuo
    String(moi.slot_date||"").length===String(mau.slot_date||"").length);
  if(moi)t("ca moi dang ky mac dinh la CON TRONG", isc(moi.wow_slot_status,"available")&&!String(moi.wow_id||"").trim());
  if(moi)t("ca moi dang ky roi dung mot khung gio cua luoi", lwKhung().indexOf(String(moi.slot_time||""))>=0);
+ if(moi)t("ca moi dang ky dai dung bang do dai o dang cau hinh", (function(){
+   var d=pvnd(moi.slot_datetime);return !!d&&(d.getHours()*60+d.getMinutes())%lwDaiO()===0})());
  /* dang ky lai DUNG KHOANG DO thi khong duoc nhan doi */
  var n1=rows("DL26").length;
  reset();FIELDS={lw_tu:iso(40),lw_den:iso(41),lw_cs:"branch_cs1 (Cơ sở 1)",lw_note:"",chk_lw_g0:1};

@@ -6030,7 +6030,14 @@ function roleTasks(role){var out=[];
  return out}
 function taskOpenBtn(t){if(!t.open)return '';var o=t.open;if(o.t==="lead")return '<button class="btn sm" onclick="leadDetail(\''+esc(String(o.id))+'\')"><i class="ti ti-external-link"></i>Mở</button>';if(o.t==="hoso")return '<button class="btn sm" onclick="openHoso(\''+esc(String(o.sid))+'\')"><i class="ti ti-external-link"></i>Mở hồ sơ</button>';return '<button class="btn sm" onclick="openEdit(\''+o.page+'\',\''+esc(String(o.id))+'\')"><i class="ti ti-external-link"></i>Mở</button>'}
 function taskCard(t){return '<div class="task '+t.cls+'"><div class="ti"><div class="id">'+esc(t.id)+'</div><div class="nm">'+esc(t.title)+' <span class="chip '+t.cls+'">'+(t.cls==="red"?"Gấp":t.cls==="green"?"OK":"Theo dõi")+'</span></div><div class="mt">'+esc(t.sub)+'</div>'+(t.na?'<div class="na">'+esc(t.na)+'</div>':'')+'</div><div class="ac">'+taskOpenBtn(t)+'</div></div>'}
-function fmtAge(h){if(h==null)return"";h=Math.round(h);if(h<0)return"còn "+Math.abs(h<24?h+"h":Math.round(-h/24)+" ngày");if(h<24)return "quá "+h+"h";return "quá "+Math.round(h/24)+" ngày"}
+/* NHÁNH "CÒN HẠN" TỪNG IN RA "còn NaN" - lộ ra 11/08 khi sửa dấu của việc-của-lớp.
+   Bản cũ viết `Math.abs(h<24 ? h+"h" : Math.round(-h/24)+" ngày")`: `Math.abs` được gọi lên một
+   CHUỖI ("-216h") nên trả NaN, và vì `h<0` thì `h<24` luôn đúng nên nhánh kia không bao giờ chạy.
+   Nó nằm im bấy lâu chỉ vì chưa ai truyền số âm vào - tức một lỗi ngủ đông, không phải lỗi mới. */
+function fmtAge(h){if(h==null)return"";h=Math.round(h);
+ if(h<0){var a=-h;return a<24?("còn "+a+"h"):("còn "+Math.round(a/24)+" ngày")}
+ if(h<24)return "quá "+h+"h";
+ return "quá "+Math.round(h/24)+" ngày"}
 var GRPCOLOR={"Tuyển sinh":"#3B82C4","Học vụ":"#7C3AED","Tài chính":"#0D9488","CSKH":"#DB2777"};
 function grpColor(c){return GRPCOLOR[c]||"#6B7887"}
 var TEAMICON={"Tuyển sinh":"ti-user-plus","Học vụ":"ti-school","Tài chính":"ti-cash","CSKH":"ti-headset"};
@@ -6306,11 +6313,16 @@ function slaItems(){var out=jTasks();
     add("Học vụ","Lớp sắp khai giảng thiếu sĩ số",red?"red":"amber","ti-calendar-exclamation",nhan,
      (red?"HẾT GIỜ CÂN NHẮC - ":"")+"Còn "+left+" ngày là khai giảng, sĩ số "+si+"/"+(cap||"?")+
      " (tối thiểu "+minS+") - thiếu "+(minS-si)+" người. Quyết: dồn lớp, lùi ngày hay hủy sớm",
-     left*24,"xeplop",null,{act:"molop",rid:c.class_id,prm:"classMinStudents"})}
+     /* DẤU ÂM LÀ BẮT BUỘC. `fmtAge` quy ước h ÂM = còn hạn, h DƯƠNG = đã quá hạn. `left` là số
+        ngày CÒN LẠI tới khai giảng nên luôn dương - truyền thẳng vào là app in "quá 9 ngày" cho
+        một lớp còn 9 ngày nữa mới mở. Anh Luân nhìn ảnh chụp thấy ngay 11/08: trên cùng một dòng,
+        khối ghi "SẮP TỚI HẠN - CÒN KỊP", nhãn ghi "quá 9 ngày", câu mô tả ghi "Còn 9 ngày là khai
+        giảng" - hai câu chọi lại một câu. */
+     -left*24,"xeplop",null,{act:"molop",rid:c.class_id,prm:"classMinStudents"})}
    if(thieuGV)
     add("Học vụ","Lớp sắp khai giảng chưa có giáo viên",left<=dec?"red":"amber","ti-user-question",nhan,
      "Còn "+left+" ngày là khai giảng mà chưa gán giáo viên chính",
-     left*24,"xeplop",null,{act:"molop",rid:c.class_id,prm:"thresholdClassStart_days"})})})();
+     -left*24,"xeplop",null,{act:"molop",rid:c.class_id,prm:"thresholdClassStart_days"})})})();
  /* V9.40 - THƯỞNG GIỚI THIỆU TREO. Kênh giới thiệu ra 147,5tr doanh thu từ đúng 5 học viên -
     tỷ lệ chốt cao nhất trong mọi nguồn. Vậy mà có 2 phần thưởng treo 76 và 48 ngày không ai
     nhắc: trang Khác chỉ ĐẾM số thưởng chờ, không nói khoản đó treo bao lâu. Trao thưởng chậm
@@ -13940,7 +13952,11 @@ var DVI={chay:"hồ sơ",giaoan:"lớp",buoihoc:"buổi",diemdanh:"buổi",baita
  ghinhan:"phản hồi",review:"lớp",khaosat:"phiếu",banglop:"lớp",hocvien:"học viên",
  nhaplead:"khách",giaoviec:"việc",viec:"việc",baoluu:"học viên",ketthuc:"học viên",
  test:"lượt test",tuvan:"phiếu tư vấn",thanhtoan:"đăng ký",xeplop:"hồ sơ",magioithieu:"mã",
- bangcong:"giảng viên",nhansu:"người"};
+ bangcong:"giảng viên",nhansu:"người",
+ /* V2 11/08 - màn Lịch trực WOW đếm bằng Ô TRỰC (mỗi ô 30 phút), không đếm bằng "buổi" như sổ
+    WOW: một buổi WOW nằm TRÊN một ô trực, hai thứ khác nhau. Khai vào đây để `_checkux` không
+    phải đoán, và để cả app gọi cùng một tên. */
+ lichwow:"ô trực"};
 function dvi(p){return DVI[p]||"dòng"}
 function filterBar(p,cur,opts,cnt){
  /* V9.28: bộ lọc chuyên sâu gắn vào ĐÂY - một chỗ sửa, mọi trang tác vụ dùng filterBar đều có.
@@ -15150,8 +15166,15 @@ function renderLichWow(){
  var khung=lwKhung(), all=lwSlots();
  var t0=ngay[0].getTime(), t1=ngay[6].getTime()+864e5;
  var tuan=all.filter(function(x){var d=pvnd(x.slot_datetime);return d&&d.getTime()>=t0&&d.getTime()<t1});
+ /* NÚT HÀNH ĐỘNG PHẢI CÓ CHO MỌI NGƯỜI MỞ TRANG NÀY, không riêng NV WOW. Bẫy đã cắn ngay:
+    nút "Cấu hình lịch" trỏ sang `settings` mà phần lớn chức danh không vào được, nên
+    `scrubMoiRoiDuoi` gỡ nó đi - trang còn trơ, không một nút nào, và `_checkkhuon` K2 bắt đúng.
+    Học vụ / TP ACA mở màn này là để ĐẶT BUỔI vào ô trống, nên cho họ đúng việc ấy - không phải
+    một cái nút vẽ ra cho đủ. */
  var h=pageHead("Lịch trực WOW","Ca trực của team WOW theo tuần - học viên chỉ đặt được vào ô còn trống",
-  (lwLaWow()?'<button class="btn primary" onclick="lwDangKy()"><i class="ti ti-calendar-plus"></i>Đăng ký ca của tôi</button>':'')+
+  (lwLaWow()
+   ? '<button class="btn primary" onclick="lwDangKy()"><i class="ti ti-calendar-plus"></i>Đăng ký ca của tôi</button>'
+   : '<button class="btn primary" onclick="wowAdd()"><i class="ti ti-plus"></i>Đặt buổi WOW vào ô trống</button>')+
   '<button class="btn" onclick="go(\'settings\')"><i class="ti ti-settings"></i>Cấu hình lịch</button>');
  /* ── DẢI THẺ ── */
  var _now=Date.now();
@@ -15168,12 +15191,12 @@ function renderLichWow(){
  var _ca=lwCa();
  var _caChon=window.LWCA||"";
  var _dsCa=[["","Cả ngày"]].concat(_ca.map(function(c){return [c.t,c.t+" ("+c.tu+" - "+c.den+")"]}));
- h+=tbar('<button class="btn sm" onclick="lwDoiTuan(-1)"><i class="ti ti-chevron-left"></i></button>'+
+ h+=tbar('<button class="btn sm" onclick="lwDoiTuan(-1)" data-tip="Tuần trước" aria-label="Tuần trước"><i class="ti ti-chevron-left"></i></button>'+
   '<span class="tblbl" style="margin:0 4px">'+esc(vnd2(ngay[0])+" – "+vnd2(ngay[6]))+'</span>'+
-  '<button class="btn sm" onclick="lwDoiTuan(1)"><i class="ti ti-chevron-right"></i></button>'+
+  '<button class="btn sm" onclick="lwDoiTuan(1)" data-tip="Tuần sau" aria-label="Tuần sau"><i class="ti ti-chevron-right"></i></button>'+
   '<button class="btn sm" onclick="lwVeTuanNay()">Tuần này</button>'+
   segHTML(_caChon,_dsCa,'window.LWCA=\'{v}\';reRender(\'lichwow\')'),
-  '<span class="tbcnt">'+tuan.length+' ô trực trong tuần</span>');
+  '<span class="tbcnt">'+tuan.length+' ô trực</span>');
  if(_caChon){var _c=null;_ca.forEach(function(c){if(c.t===_caChon)_c=c});
   if(_c)khung=khung.filter(function(g){return _lwPhut(g)>=_lwPhut(_c.tu)&&_lwPhut(g)<_lwPhut(_c.den)})}
  /* ── LƯỚI: cột = NGÀY × NV TRỰC NGÀY ĐÓ, hàng = khung giờ ──
@@ -15207,7 +15230,7 @@ function renderLichWow(){
  h+='</tr></thead><tbody>';
  khung.forEach(function(g){
   var _c=lwCaCua(g);
-  h+='<tr><td><b>'+esc(g)+'</b>'+(_c?'<div class="mut" style="font-size:10px;font-weight:400">'+esc(_c.t)+'</div>':'')+'</td>';
+  h+='<tr><td><b>'+esc(g)+'</b>'+(_c?'<div class="mut" style="font-size:11px;font-weight:400">'+esc(_c.t)+'</div>':'')+'</td>';
   cot.forEach(function(c){
    if(c.trong){h+='<td class="mut" style="text-align:center">·</td>';return}
    var o=ix[c.d.toDateString()+"|"+c.nv+"|"+g];

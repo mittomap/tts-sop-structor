@@ -106,8 +106,9 @@ LUOI = {
              "`Lich truc WOW`: NV WOW tu dang ky ca, hoc vien/hoc vu chi dat buoi WOW vao ca da "
              "dang ky. LUU Y SO HIEU: DL19 cua APP la 'Thuong gioi thieu' - trung so voi SOP, nen "
              "bang lich truc mang so DL26.",
-             ["DL26", "renderLichWow", "lwSave", "wowSlotHours", "wowCommitHours_month",
-              "Lượt trực/ngày", "Tổng giờ trực theo NV WOW", "Cam kết/tháng", "Thiếu "]),
+             ["DL26", "renderLichWow", "lwSave", "wowShifts", "wowSlotMinutes",
+              "wowCommitHours_month", "wowWeeksAhead", "wowBookLeadDays", "wowCancelMinDays",
+              "Bảng đăng ký lịch WOW", "Tổng giờ trực theo NV WOW", "unavailable"]),
 }
 
 

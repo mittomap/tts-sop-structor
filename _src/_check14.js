@@ -99,7 +99,11 @@ t("bang lich dong theo dot DL06b co du lieu", rows("DL06b").length>0);
     ĐÁNG CHÚ Ý: hai tiêu chí chặn ở cuối khối (ngày đã qua, hết lượt) vẫn XANH sau khi đổi thiết
     kế - nhưng xanh VÌ LÝ DO SAI: cửa từ chối ngay ở bước chọn ca, chưa kịp chạy tới đoạn luật mà
     chúng định canh. Một tiêu chí xanh nhờ hỏng ở bước trước nó thì không canh gì cả. */
- function caRanh(){return rows("DL26").filter(function(x){return lwRanh(x)})[0]}
+ /* 11/08 - CỬA CỦA HỌC VIÊN NAY CHẶT HƠN CỬA CỦA NHÂN VIÊN: bám OLMS, học viên phải đặt trước
+    ít nhất `wowBookLeadDays` ngày và chỉ xem trước `wowWeeksAhead` tuần. Phép lái phải hỏi bằng
+    ĐÚNG luật của người mình đang đóng vai - lấy ô mà chỉ học vụ đặt được rồi bắt học viên đặt là
+    thước tự dựng một tình huống không có thật rồi chấm app sai. */
+ function caRanh(){return rows("DL26").filter(function(x){return lwRanh(x,null,true)})[0]}
  var ca=caRanh();
  if(!ca){bad.push("khong co ca truc WOW nao con trong de kiem");return}
  reset();setF({hvw_skill:"Speaking (Nói)",hvw_slot:ca.slot_id,hvw_focus:"Part 2"});
