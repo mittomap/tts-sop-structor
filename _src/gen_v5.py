@@ -2870,6 +2870,8 @@ var PAGES=[
 {k:"ketqua",g:"Chặng · CSKH & Kết thúc",ic:"ti-target-arrow",t:"Kết quả đầu ra & AIM",c:"Điểm 4 kỹ năng - hai tỷ lệ đạt AIM",ty:"custom"},
 {k:"baoluu",g:"_",ic:"ti-player-pause",t:"Bảo lưu / Bỏ học",c:"Trong Tính năng khác",ty:"custom"},
 {k:"magioithieu",g:"_",ic:"ti-gift",t:"Mã giới thiệu",c:"Trong Tính năng khác",ty:"custom"},
+/* V2 12/08 (SALE-3) - sổ lưu mọi email/Zalo app đã gửi cho khách. */
+{k:"tinnhan",g:"Tra cứu",ic:"ti-send",t:"Sổ tin đã gửi",c:"Email và Zalo đã gửi cho khách - lọc theo lớp, người gửi, thời gian",ty:"custom"},
 /* ===== QUẢN LÝ ===== */
 {k:"baocao",g:"Quản lý",ic:"ti-chart-bar",t:"Tổng quan · Báo cáo & KPI",c:"Điều hành theo SOP",ty:"custom"},
 /* V9.60: bảng công giảng dạy vốn nằm trong Sổ thu học phí (một tab). Nhân sự cần đúng bảng đó
@@ -2987,7 +2989,7 @@ var ROLESCOPE={
   tabs:{settings:["tongquan","brand","menu","ch2","ch6","ch4","goiy","the","ch1","tro","nhip",
    "huongdan","qa","staff","giagio","khoa","nhatky"]}},
  tuvan:{match:/^sales/,land:"banlam",
-  pages:["viec","banlam","hanhtrinh","hocvien","giangvien","tuyensinh","ketthuc","ketqua","khac","duyet"],
+  pages:["viec","banlam","hanhtrinh","hocvien","giangvien","tuyensinh","ketthuc","ketqua","khac","duyet","tinnhan"],
   tabs:{khac:["magioithieu"],duyet:["banggiao"]},
   blocks:["appt","new","contacted","test_done","enrolled","reup"],
   mine:1,mineBtn:1,kpi:1,bell:["Tuyển sinh","Giao việc"]},
@@ -3047,7 +3049,7 @@ var ROLESCOPE={
   /* V2 10/08 - thêm `lichwow`: HỌC VỤ CHÍNH LÀ NGƯỜI BẤM "Thêm buổi WOW". Từ bản này cửa ấy chỉ
      nhận ca đã đăng ký, nên không cho họ xem lịch trực là bắt họ chọn trong bóng tối: mở form ra
      thấy "chưa có ca trực nào còn trống" mà không biết hỏi ai, ngày nào trống. */
-  pages:["viec","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ychv","ketthuc","ketqua","khac","duyet","lichwow","gvdp"],
+  pages:["viec","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ychv","ketthuc","ketqua","khac","duyet","lichwow","gvdp","tinnhan"],
   tabs:{khac:["baoluu"],duyet:["duyetnghi"]},
   blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:1,kpi:1,bell:["Học vụ","CSKH","Giao việc"]},
  /* V9.99z5 - GIÁO VIÊN không xếp người dạy thay và không gỡ đụng phòng: hai màn ấy là cửa
@@ -3081,7 +3083,7 @@ var ROLESCOPE={
   /* V2 08/08 - thêm `dsthanhtoan` (Sổ thu học phí): nhịp cuối ngày của kế toán là "nhìn dự thu
      tháng", trỏ thẳng vào sổ ấy - mà trước bản này chỉ quản trị và điều hành được xem. Sổ thu
      học phí là sổ của chính phòng kế toán. */
-  pages:["viec","hocvien","giangvien","tuyensinh","duyet","baocao","bangcong","dsthanhtoan"],   /* V9.99z5: kế toán chốt lương theo bảng công giảng dạy */
+  pages:["viec","hocvien","giangvien","tuyensinh","duyet","baocao","bangcong","dsthanhtoan","tinnhan"],   /* V9.99z5: kế toán chốt lương theo bảng công giảng dạy */
   /* V9.99r - Kế toán chỉ có phần THANH TOÁN của hub Tuyển sinh. Trước đây không khai tab nào
      nên họ bấm được cả Lead, Test đầu vào, Tư vấn & Đăng ký - ba bước họ khai `lead:"none"`,
      mở ra chỉ để nhìn. Khai đúng một tab thì phễu, câu mở đầu và menu cùng thu lại theo. */
@@ -3097,7 +3099,7 @@ var ROLESCOPE={
      ngay trên đang khai. `_checkmien` bắt được sau khi gỡ cờ `hide` cho 22 trang - trước đó
      `thanhtoan` bị giấu nên không ai đo.
      CH3 giao Marketing đúng hai việc: nhập lead mới và chăm lại khách cũ. Khai đúng hai trang ấy. */
-  pages:["viec","banlam","nhaplead","khac","hocvien","reup","duyet"],
+  pages:["viec","banlam","nhaplead","khac","hocvien","reup","duyet","tinnhan"],
   tabs:{khac:["magioithieu"],duyet:["banggiao"]},
   /* V9.99z10 - hai hàng chờ THẬT của Marketing theo CH3: lead mới về (họ nhập, phải chắc có
      người nhận) và khách cũ tới hẹn chăm lại. Phần còn lại của phễu là việc của Tư vấn. */
@@ -4064,6 +4066,11 @@ var THEDEF={
     `duyRefundList`, `absQueue`, `duyPayList`. Viết lại phép đếm ở dải thẻ là đẻ ra đúng con bệnh
     anh Luân bắt hai lần trong hai ngày: cái thẻ và cái bảng hỏi hai hàm khác nhau cho cùng một
     câu hỏi, số không sai nhưng nó KHÔNG DẪN TỚI ĐÂU. */
+ tinnhan:{t:"Sổ tin đã gửi",the:[
+  ["tn_tong","Tin đã gửi","Tổng số email và tin Zalo app đã gửi cho khách, trong phạm vi bạn xem được. Danh sách: bảng ngay dưới."],
+  ["tn_mail","Qua email","Số tin gửi bằng email - chỉ hiện nút gửi email khi hồ sơ khách có địa chỉ email."],
+  ["tn_zalo","Qua Zalo","Số tin gửi bằng Zalo - chỉ hiện nút gửi Zalo khi hồ sơ khách có Zalo."],
+  ["tn_today","Gửi hôm nay","Số tin gửi trong ngày hôm nay. Lọc: ô Thời gian ở thanh trên."]]},
  duyetdot:{t:"Duyệt đổi đợt đóng",the:[
   ["dd_cho","Yêu cầu chờ duyệt","Số yêu cầu đổi đợt đóng đang chờ quyết. Danh sách: ngay dưới dải này."],
   ["dd_gh","Xin gia hạn một đợt","Yêu cầu lùi hạn ĐÚNG MỘT đợt, thường kèm ảnh trao đổi với khách. Danh sách: dưới, nhìn dòng ghi hạn cũ → hạn mới."],
@@ -5313,6 +5320,7 @@ function openStuQuick(sid){var s=find("DL09","student_id",sid);if(!s){toast("Kh�
  h+='<div class="dsec">Thao tác</div><div class="dact">';
  h+='<button class="btn" onclick="closeModal();openHoso(\''+esc(sid)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ đầy đủ</button>';
  h+='<button class="btn" onclick="closeModal();wowAdd(\''+esc(sid)+'\')"><i class="ti ti-star"></i>Đặt buổi WOW</button>';
+ h+=msgBtns(sid);   /* V2 12/08 (SALE-3) - gửi email/Zalo, ghi vào Sổ tin đã gửi */
  h+='<button class="btn '+(risk?"danger":"primary")+'" onclick="closeModal();runStart(\''+esc(sid)+'\')"><i class="ti ti-player-play"></i>'+(risk?"Xử lý nguy cơ (đẩy vào quy trình)":"Đẩy vào quy trình")+'</button>';
  h+='</div>';
  openDrawer(sid+" · "+(s.full_name||""),h)}
@@ -6266,6 +6274,21 @@ function slaItems(){var out=jTasks();
   var _gap=num(paramOf("debtRemindGap_days",3)),_rdays=debtRemindDays(e);
   var _vuaNhac=_rdays!=null&&_rdays<_gap;
   var _nhac=_rdays==null?" · chưa ghi lần nhắc nào":(" · đã nhắc "+Math.max(0,Math.round(_rdays))+" ngày trước");
+  /* ═══ V2 12/08 (SALE-3) - QUÁ HẠN HAI TUẦN: THƯ HUỶ CAM KẾT ═════════════════════════════════
+     Trưởng phòng Tư vấn: *"quá hạn 1 tuần sẽ không được đăng nhập vào hệ thống để làm test. Quá
+     hạn 2 tuần sẽ có mail huỷ cam kết"*. Anh Luân: vế CHẶN ĐĂNG NHẬP *"ghi nhận lại thôi, cái này
+     để a cho dev làm sau"* - nên KHÔNG code. Vế thư huỷ cam kết thì làm: sinh một việc riêng, và
+     nút của việc ấy mở thẳng màn soạn thư với nội dung điền sẵn, gửi xong lưu vào Sổ tin đã gửi.
+     Đây là một việc KHÁC "Thu công nợ": thu tiền là đòi, huỷ cam kết là chấm dứt lời hứa đầu ra -
+     nhét chung một nhóm thì người ta xử như nhau, mà hai cái hậu quả khác hẳn. */
+  (function(){
+   var _cd=num(paramOf("commitCancel_days",14))||14;
+   var _x=_ins[0];if(!_x)return;
+   var _st=insDueState(_x);
+   if(_st.k!=="late"||Math.abs(_st.days)<_cd)return;
+   add("Tài chính","Gửi thư huỷ cam kết đầu ra","red","ti-mail-x",e.student_id_name||e.student_id,
+    "Quá hạn "+Math.abs(_st.days)+" ngày (mốc "+_cd+" ngày) - soạn thư huỷ cam kết đầu ra gửi khách",
+    Math.abs(_st.days)*24,"thanhtoan","due",{act:"huycamket",rid:e.enrollment_id,prm:"commitCancel_days"})})();
   if(_ins.length){var x0=_ins[0],st0=insDueState(x0);
    var _amt=num(x0.remaining_amount)||num(x0.due_amount);
    var _lbl="Đợt "+x0.installment_no+"/"+x0.installment_of+" · "+vnd(_amt)+" · hạn "+(x0.due_date||"?");
@@ -6660,6 +6683,7 @@ function slaAct(act,id){
  if(act==="riskCare")return riskCare(id);
  if(act==="wowmoc")return wowMoc(id);
  if(act==="molop")return moLop(id);
+ if(act==="huycamket")return huyCamKet(id);
  if(act==="abscall")return absCall(id);
  if(act==="ckduyet")return ckDuyet(id);
  if(act==="blcall")return blCallForm(id);
@@ -8221,6 +8245,9 @@ function leadDetail(lid){var L=find("DL02","lead_id",lid);if(!L){toast("Không t
  h+='<div class="dsec">Bước tiếp theo</div><div class="dact">';
  h+='<button class="btn primary" onclick="modalNext(\'lienhe\',\'lead_id='+esc(lid)+'\')"><i class="ti ti-phone"></i>Ghi liên hệ</button>';
  h+='<button class="btn" onclick="reassignLead(\''+esc(lid)+'\')"><i class="ti ti-arrows-exchange"></i>Giao lại NV</button>';
+ /* V2 12/08 (SALE-3): nút gửi chỉ hiện khi hồ sơ CÓ địa chỉ - có email thì hiện Gửi email, có
+    Zalo thì hiện Gửi Zalo. Không bày một cái nút bấm vào rồi báo "chưa có địa chỉ". */
+ h+=msgBtns(lid);
  nextSteps(L,stage).forEach(function(a){if(a.page==="lienhe"||a.page==="__hoso")return;h+='<button class="btn" onclick="modalNext(\''+a.page+'\',\''+encPrefill(a.pf)+'\')"><i class="ti '+a.ic+'"></i>'+a.lb+'</button>'});
  if(sid)h+='<button class="btn" onclick="closeModal();openHoso(\''+esc(sid)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>';
  h+='</div>';
@@ -12235,7 +12262,7 @@ var SHEETVN={DL01:"Nhân sự",DL02:"Lead",DL02b:"Lượt chạm lead",DL03:"Tes
  DL15:"Khảo sát",DL16:"Ghi nhận phản hồi",DL17:"Khiếu nại",DL18:"Kết thúc khóa",DL18b:"Kỳ thi IELTS thật",DL19:"Nhật ký hệ thống",
  DL20:"Giáo án - Buổi & Bài tập",DL21:"Giáo án chi tiết",DL22:"Tham số",DL23:"Việc được giao",
  DL24:"Trao đổi trong việc",DL25:"Nhật ký thao tác",DL26:"Lịch trực NV WOW",
- DL27:"Yêu cầu đổi đợt đóng",DL28:"Giảng viên dự phòng theo tháng"};
+ DL27:"Yêu cầu đổi đợt đóng",DL28:"Giảng viên dự phòng theo tháng",DL29:"Sổ tin đã gửi"};
 function sheetVN(c){return SHEETVN[c]?(SHEETVN[c]+" ("+c+")"):(c||"")}
 function logForRow(code,id){return logRows().filter(function(e){
  return e.sheet===code&&String(e.row_id)===String(id)})}
@@ -15441,6 +15468,165 @@ function printEnroll(eid){var e=find("DL06","enrollment_id",eid)||{};
   '<div class="sm">In từ hệ thống vận hành ITTs - có giá trị xác nhận thông tin, không thay phiếu thu.</div>'+
   '<script>window.print()<\/script></body></html>');
  w.document.close()}
+/* ═══ V2 12/08 (SALE-3) - GỬI EMAIL / ZALO VÀ SỔ LƯU TIN ĐÃ GỬI ═══════════════════════════════
+   Anh Luân: *"nếu họ có email thì hiện nút gửi email. nếu có zalo thì gửi zalo, bấm xong cho soạn
+   nội dung, hiện thông tin gửi, nút gửi, tạo trang lưu trữ các nội dung đã gửi... trang đó cũng
+   có thể lọc theo lớp, theo người quản lý, theo thời gian hoặc bộ lọc hợp lý"*.
+   App CHẠY OFFLINE nên không gửi thật - nó MÔ PHỎNG: soạn, xem lại thông tin gửi, bấm Gửi, và
+   ghi vào sổ DL29. Dev nối đường gửi thật sau; chỗ nối đã đánh dấu bằng `google.script.run`.
+   Trước bản này app chỉ có nút "Copy tin Zalo": người dùng rời app đi dán, quay lại KHÔNG chỗ nào
+   ghi là đã gửi - đúng cái bệnh anh Luân bắt ở nhắc nợ ("báo N mà a chẳng thấy đâu"). */
+function msgKenhCo(r){
+ /* `r` là một dòng DL02 (lead) hoặc DL09 (học viên) - hai bảng khai địa chỉ ở hai bộ cột khác
+    nhau, nên hỏi cả hai chứ đừng giả định. */
+ var out=[];
+ var em=String((r&&(r.email||r.contact_email))||"").trim();
+ var za=String((r&&(r.zalo_id||r.zalo))||"").trim();
+ if(em)out.push({k:"email",lb:"Gửi email",ic:"ti-mail",addr:em});
+ if(za)out.push({k:"zalo",lb:"Gửi Zalo",ic:"ti-brand-messenger",addr:za});
+ return out}
+function msgBtns(pid){
+ var r=find("DL09","student_id",pid)||find("DL02","lead_id",pid);
+ if(!r)return "";
+ var ks=msgKenhCo(r);
+ if(!ks.length)return '<span class="chip amber" data-tip="Hồ sơ này chưa có email và chưa có Zalo - bổ sung ở form sửa hồ sơ thì nút gửi tự hiện">chưa có email/Zalo</span>';
+ return ks.map(function(x){return '<button class="btn sm" onclick="msgSoan(\''+esc(pid)+'\',\''+x.k+'\')"><i class="ti '+x.ic+'"></i>'+esc(x.lb)+'</button>'}).join(" ")}
+function msgAi(pid){
+ var S=find("DL09","student_id",pid);
+ if(S)return {kind:"student",id:S.student_id,name:S.full_name,rec:S};
+ var L=find("DL02","lead_id",pid);
+ if(L)return {kind:"lead",id:L.lead_id,name:L.full_name,rec:L};
+ return null}
+function msgLopCua(pid){
+ var o=rows("DL08").filter(function(x){return String(x.student_id||"")===String(pid)&&x.class_id})[0];
+ return o?{id:o.class_id,name:o.class_id_name||o.class_id}:{id:"",name:""}}
+function msgMau(kind,A){
+ var hot=paramStr("centerHotline","");
+ var ten=A.name||"bạn";
+ if(kind==="email")
+  return "Kinh gui "+ten+",\n\nIELTS The Tutors xin thong bao...\n\nTran trong,\nIELTS The Tutors"+(hot?("\nHotline: "+hot):"");
+ return "IELTS The Tutors gui "+ten+": ..."+(hot?(" Hotline: "+hot):"")}
+function msgSoan(pid,kenh,tieude,noidung,chude){
+ var A=msgAi(pid);if(!A){toast("Không thấy hồ sơ này.");return}
+ var ks=msgKenhCo(A.rec);
+ var K=ks.filter(function(x){return x.k===kenh})[0];
+ if(!K){toast(kenh==="email"?"Hồ sơ này chưa có email.":"Hồ sơ này chưa có Zalo.");return}
+ var lop=(A.kind==="student")?msgLopCua(pid):{id:"",name:""};
+ var h='<div class="dcard"><h4><i class="ti '+K.ic+'"></i>'+esc(K.lb)+' - '+esc(A.name||pid)+'</h4>';
+ h+=ctxRows([["Người nhận",esc(A.name||pid)+" ("+esc(A.kind==="student"?"học viên":"lead")+" "+esc(A.id)+")"],
+  ["Địa chỉ gửi",'<b>'+esc(K.addr)+'</b>'],
+  ["Lớp",esc(lop.name||"-")],
+  ["Người gửi",esc(myName())],
+  ["Gửi lúc",esc(nowStr())]]);
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Bản demo <b>không gửi thật</b> - bấm Gửi là lưu vào <b>Sổ tin đã gửi</b> để đối chiếu. Dev nối đường gửi thật sau, chỗ nối đã đánh dấu sẵn trong mã.</div>';
+ if(kenh==="email")
+  h+='<div class="fld full"><label>Tiêu đề <i>*</i></label><input id="ms_sub" value="'+esc(tieude||("IELTS The Tutors - thông tin gửi "+(A.name||"")))+'"></div>';
+ h+='<div class="fld full"><label>Nội dung <i>*</i></label><textarea id="ms_body" rows="7">'+esc(noidung||msgMau(kenh,A))+'</textarea></div>';
+ h+='<input type="hidden" id="ms_topic" value="'+esc(chude||"")+'">';
+ h+='<div class="dact"><button class="btn primary" onclick="msgGui(\''+esc(pid)+'\',\''+esc(kenh)+'\')"><i class="ti ti-send"></i>Gửi '+(kenh==="email"?"email":"Zalo")+'</button>'+
+  '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
+ openDrawer("Soạn tin gửi khách",h)}
+function msgGui(pid,kenh){
+ var A=msgAi(pid);if(!A){toast("Không thấy hồ sơ này.");return}
+ var K=msgKenhCo(A.rec).filter(function(x){return x.k===kenh})[0];
+ if(!K){toast("Kênh này chưa có địa chỉ.");return}
+ var body=String(fldV("ms_body")||"").trim();
+ if(!body){toast("Nội dung đang trống - viết vào rồi hãy gửi.");return}
+ var sub=(kenh==="email")?String(fldV("ms_sub")||"").trim():"";
+ if(kenh==="email"&&!sub){toast("Email phải có tiêu đề.");return}
+ if(!actGuard("msgGui:"+pid+":"+kenh))return;
+ var lop=(A.kind==="student")?msgLopCua(pid):{id:"",name:""};
+ var m={msg_id:"TIN-"+seqNo("DL29","msg_id",4),sent_at:nowStr(),kenh:kenh,
+  to_kind:A.kind,to_id:A.id,to_name:A.name||"",to_addr:K.addr,
+  tieu_de:sub,noi_dung:body,chu_de:String(fldV("ms_topic")||""),
+  class_id:lop.id,class_id_name:lop.name,
+  sent_by:CURSTAFF||"",sent_by_name:myName()};
+ DL.DL29=DL.DL29||[];DL.DL29.unshift(m);
+ if(SVR)try{google.script.run.apiSave("DL29",m)}catch(e){}   /* CỬA NỐI RA BACKEND GỬI THẬT */
+ persistSoon();closeModal();
+ toast("Đã gửi "+(kenh==="email"?"email":"Zalo")+" tới "+K.addr+" và lưu vào Sổ tin đã gửi.",5000);
+ reRender(CUR)}
+/* ── TRANG SỔ TIN ĐÃ GỬI ─────────────────────────────────────────────────────────────────────
+   Bộ lọc theo đúng ba trục anh Luân nêu: LỚP · NGƯỜI GỬI · THỜI GIAN, cộng kênh (email/Zalo). */
+/* PHẠM VI CỦA SỔ TIN. `_checkmien` bắt ngay lượt đầu: Marketing khai `tien:"none"` mà mở sổ ra
+   đọc được nguyên một tin nhắc học phí kèm số tiền - nội dung tin là dữ liệu của MIỀN KHÁC lọt
+   vào một trang tưởng là vô hại. Luật: ai xem được HỌC VIÊN thì xem cả sổ; còn lại chỉ xem tin
+   CHÍNH MÌNH đã gửi. Và người không được xem tiền thì không đọc tin có nội dung tiền, kể cả tin
+   của chính mình - miền tiền không nhường cho quyền sở hữu. */
+function msgSo(){
+ var a=rows("DL29")||[];
+ if(dsLevel("hocvien")!=="all"){
+  var me=CURSTAFF||"";
+  if(!banToanQuyen())a=a.filter(function(m){return String(m.sent_by||"")===me})}
+ /* Hai lớp lọc cho miền LEAD, vì sổ này chứa VĂN XUÔI người dùng gõ: (1) tin gửi cho một LEAD
+    là dữ liệu miền lead; (2) tin gửi học viên nhưng NỘI DUNG nói chuyện phễu tuyển sinh cũng là
+    miền lead. `_checkmien` bắt đúng vế thứ hai - một tin gửi học viên mà thân tin viết "kết quả
+    test đầu vào". Với miền người ta KHÔNG được xem thì không có cách nào an toàn hơn là loại cả
+    câu chữ chạm tới nó. */
+ if(dsLevel("lead")==="none")a=a.filter(function(m){
+  if(String(m.to_kind||"")==="lead")return false;
+  return !/test đầu vào|test dau vao|tư vấn lộ trình|tu van lo trinh|khách tiềm năng|khach tiem nang/i.test(String(m.tieu_de||"")+" "+String(m.noi_dung||""))});
+ if(dsLevel("tien")==="none")
+  a=a.filter(function(m){return !/học phí|hoc phi|thanh toán|thanh toan|đóng tiền|dong tien|công nợ|cong no|\bđ\b|VND|vnđ/i.test(String(m.tieu_de||"")+" "+String(m.noi_dung||""))});
+ return a}
+function renderTinnhan(embed){
+ var all=msgSo();
+ var fK=fget("tn_kenh"),fL=fget("tn_lop"),fN=fget("tn_nguoi"),fT=fget("tn_tg");
+ var q=vnorm(window.TNQ||"").trim();
+ var t0=new Date();t0.setHours(0,0,0,0);
+ function trongKy(m){
+  if(fT==="all")return true;
+  var d=pvnd(m.sent_at);if(!d)return false;
+  var n={"homnay":0,"7ngay":7,"30ngay":30}[fT];
+  if(n==null)return true;
+  return d.getTime()>=t0.getTime()-n*864e5}
+ var ds=all.filter(function(m){
+  if(fK!=="all"&&String(m.kenh||"")!==fK)return false;
+  if(fL!=="all"&&String(m.class_id||"")!==fL)return false;
+  if(fN!=="all"&&String(m.sent_by||"")!==fN)return false;
+  if(!trongKy(m))return false;
+  if(q&&vnorm((m.to_name||"")+" "+(m.tieu_de||"")+" "+(m.noi_dung||"")+" "+(m.to_addr||"")).indexOf(q)<0)return false;
+  return true}).sort(function(a,b){return (pvnd(b.sent_at)||0)-(pvnd(a.sent_at)||0)});
+ var h=embed?'':pageHead("Sổ tin đã gửi","Mọi email và tin Zalo app đã gửi cho khách - ai gửi, gửi gì, gửi lúc nào. Lọc theo lớp, người gửi và khoảng thời gian.","");
+ h+=statStrip([
+  ["ti-send",all.length,"Tin đã gửi","#3B82C4",""],
+  ["ti-mail",all.filter(function(m){return m.kenh==="email"}).length,"Qua email","#6B4FA0",""],
+  ["ti-brand-messenger",all.filter(function(m){return m.kenh==="zalo"}).length,"Qua Zalo","#16A34A",""],
+  ["ti-clock",all.filter(function(m){var d=pvnd(m.sent_at);return d&&d.getTime()>=t0.getTime()}).length,"Gửi hôm nay","#E08A1E",""]],"tinnhan");
+ var lops={};all.forEach(function(m){if(m.class_id)lops[m.class_id]=m.class_id_name||m.class_id});
+ var ngs={};all.forEach(function(m){if(m.sent_by)ngs[m.sent_by]=m.sent_by_name||m.sent_by});
+ function sel(p,cur,opts,lb){
+  return '<span class="tblbl">'+esc(lb)+'</span><select class="sel" onchange="fset(\''+p+'\',this.value);reRender(CUR)">'+
+   opts.map(function(o){return '<option value="'+esc(o[0])+'"'+(String(cur)===String(o[0])?" selected":"")+'>'+esc(o[1])+'</option>'}).join("")+'</select>'}
+ h+=tbar(srchHTML(window.TNQ||"","window.TNQ=this.value;reRenderKeep(CUR)","Tìm tên khách, tiêu đề hoặc nội dung...",280)+
+  sel("tn_lop",fL,[["all","Tất cả lớp"]].concat(Object.keys(lops).map(function(k){return [k,lops[k]]})),"Lớp")+
+  sel("tn_nguoi",fN,[["all","Mọi người gửi"]].concat(Object.keys(ngs).map(function(k){return [k,ngs[k]]})),"Người gửi")+
+  sel("tn_tg",fT,[["all","Mọi lúc"],["homnay","Hôm nay"],["7ngay","7 ngày qua"],["30ngay","30 ngày qua"]],"Thời gian"),
+  '<span class="tbcnt">'+ds.length+'/'+all.length+' tin</span>');
+ h+=chipBar("tn_kenh",fK,[["all","Tất cả",all.length],
+  ["email","Email",all.filter(function(m){return m.kenh==="email"}).length],
+  ["zalo","Zalo",all.filter(function(m){return m.kenh==="zalo"}).length]],ds.length);
+ h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Gửi lúc</th><th>Kênh</th><th>Người nhận</th><th>Lớp</th><th>Nội dung</th><th>Người gửi</th></tr></thead><tbody>';
+ if(!ds.length)h+='<tr><td class="empty" colspan="6">Chưa có tin nào khớp bộ lọc.</td></tr>';
+ ds.forEach(function(m){
+  h+='<tr data-mo="msgXem" data-mo-arg="'+esc(m.msg_id)+'"><td>'+esc(m.sent_at||"-")+'</td>'+
+   '<td><span class="chip '+(m.kenh==="email"?"blue":"green")+'">'+(m.kenh==="email"?"Email":"Zalo")+'</span></td>'+
+   '<td>'+nguoiLnk(m.to_id,m.to_name,m.to_id)+' <span class="mut" style="font-size:11px">'+esc(m.to_addr||"")+'</span></td>'+
+   '<td>'+(m.class_id?lopLnk(m.class_id,m.class_id_name,m.class_id):'<span class="mut">-</span>')+'</td>'+
+   '<td style="max-width:340px">'+esc((m.tieu_de?m.tieu_de+" — ":"")+String(m.noi_dung||"").replace(/\s+/g," ").slice(0,90))+(String(m.noi_dung||"").length>90?"…":"")+'</td>'+
+   '<td>'+nsLnk(m.sent_by,m.sent_by_name,"-")+'</td></tr>'});
+ h+='</tbody></table></div></div>';
+ return h}
+function msgXem(id){var m=find("DL29","msg_id",id);if(!m){toast("Không thấy tin này.");return}
+ var h='<div class="dcard"><h4><i class="ti '+(m.kenh==="email"?"ti-mail":"ti-brand-messenger")+'"></i>'+esc(m.msg_id)+'</h4>';
+ h+=ctxRows([["Gửi lúc",esc(m.sent_at||"-")],["Kênh",m.kenh==="email"?"Email":"Zalo"],
+  ["Người nhận",nguoiLnk(m.to_id,m.to_name,m.to_id)+" · "+esc(m.to_addr||"")],
+  ["Lớp",esc(m.class_id_name||"-")],["Người gửi",esc(m.sent_by_name||"-")],
+  ["Tiêu đề",esc(m.tieu_de||"-")]]);
+ h+=ctxContent("Nội dung đã gửi",m.noi_dung||"","");
+ h+='<div class="dact"><button class="btn" onclick="hvCopy('+JSON.stringify(String(m.noi_dung||""))+',\'Đã copy nội dung.\')"><i class="ti ti-copy"></i>Copy nội dung</button>'+
+  '<button class="btn" onclick="closeModal()">Đóng</button></div></div>';
+ openDrawer("Tin đã gửi",h)}
 var MSGKH={
  test:function(c){return "IELTS The Tutors xac nhan lich TEST DAU VAO cua "+c.ten+" vao "+c.gio+". Vui long den truoc 10 phut. Can doi lich xin bao lai truoc 24h."+c.hot},
  info:function(c){return "IELTS The Tutors gui thong tin lop cua "+c.ten+": lop "+c.lop+", lich hoc "+c.lich+". Vui long xac nhan de trung tam chot danh sach. Hen gap ban o buoi dau tien!"+c.hot},
@@ -15461,6 +15647,27 @@ function zaloBtn(kind,ctx,rid){var hot=paramStr("centerHotline","");ctx.hot=hot?
  return '<button class="btn sm" onclick="hvCopy(\''+esc(txt.replace(/'/g,""))+'\',\'Đã copy tin - dán vào Zalo cho khách.\')'+sau+'><i class="ti ti-copy"></i>Copy tin Zalo'+(rid?" và ghi đã nhắc":"")+'</button>'}
 /* Ghi mốc nhắc nợ. KHÔNG xoá việc khỏi hàng chờ khi khoản đã QUÁ HẠN - nhắc rồi mà chưa thu
    được thì vẫn là tiền chưa về; chỉ ghi thêm "đã nhắc N ngày trước" để biết ai lâu chưa ai đụng. */
+/* Soạn sẵn thư huỷ cam kết - người dùng đọc lại, sửa nếu cần rồi bấm Gửi (vào Sổ tin đã gửi). */
+function huyCamKet(eid){
+ var e=find("DL06","enrollment_id",eid);if(!e){toast("Không thấy đăng ký.");return}
+ var sid=String(e.student_id||"");
+ if(!sid){toast("Đơn này chưa gắn học viên.");return}
+ var A=msgAi(sid);
+ if(!A){toast("Không thấy hồ sơ học viên.");return}
+ var ks=msgKenhCo(A.rec);
+ if(!ks.length){toast("Hồ sơ "+(A.name||sid)+" chưa có email và chưa có Zalo - bổ sung địa chỉ rồi mới gửi được.",5200);openStuQuick(sid);return}
+ var _x=insOf(eid).filter(function(x){return !isc(x.status,"paid")})[0]||{};
+ var _st=_x.due_date?insDueState(_x):{days:0};
+ var hot=paramStr("centerHotline","");
+ var ten=A.name||sid;
+ var noi="Kinh gui "+ten+",\n\n"+
+  "Khoan hoc phi cua khoa "+(e.course_id_name||e.course_id||"")+" da qua han "+Math.abs(num(_st.days))+" ngay"+
+  (_x.due_date?(" (han "+_x.due_date+")"):"")+", so tien con lai "+vnd(num(e.remaining_amount))+".\n\n"+
+  "Theo quy dinh, sau "+num(paramOf("commitCancel_days",14))+" ngay qua han, trung tam TAM DUNG CAM KET DAU RA "+
+  "cua khoa hoc. Ban van tiep tuc hoc binh thuong; cam ket dau ra se duoc khoi phuc ngay khi hoan tat hoc phi.\n\n"+
+  "Neu can trao doi ve lich dong, ban lien he lai voi trung tam de duoc ho tro.\n\n"+
+  "Tran trong,\nIELTS The Tutors"+(hot?("\nHotline: "+hot):"");
+ msgSoan(sid,ks[0].k,"IELTS The Tutors - thông báo tạm dừng cam kết đầu ra",noi,"huycamket")}
 function debtRemind(eid){var e=find("DL06","enrollment_id",eid);if(!e)return;
  markRow("DL06","enrollment_id",eid,{last_reminded_at:nowStr()},
   "Đã ghi lần nhắc - việc này tạm lùi "+num(paramOf("debtRemindGap_days",3))+" ngày (khoản quá hạn thì vẫn giữ trong hàng chờ).")}
@@ -23823,7 +24030,7 @@ function banNutHoSo(ttk,r){
  if(ttk==="hocvien")return '<button class="btn" onclick="window.HOSO=\''+esc(r.student_id)+'\';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>';
  return '<button class="btn" onclick="openLop(\''+esc(r.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Mở lớp</button>'}
 
-var RENDER={ban:renderBan,canhan:renderCanhan,dsphuhuynh:renderSoPH,hoidap:renderHoidap,tracuu:renderTracuu,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,lichwow:renderLichWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,ketqua:renderKetqua,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong};
+var RENDER={ban:renderBan,canhan:renderCanhan,dsphuhuynh:renderSoPH,hoidap:renderHoidap,tracuu:renderTracuu,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,lichwow:renderLichWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,ketqua:renderKetqua,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong,tinnhan:renderTinnhan};
 /* ═══ V2 - 25 NGHIỆP VỤ, 25 TRANG ═══════════════════════════════════════════════════════════
    Anh Luân: *"Mỗi nghiệp vụ 1 trang, vẫn sắp xếp được theo chặng trên sidebar, nhưng mỗi trang
    là nghiệp vụ riêng, và nó có thẻ, có chip lọc, có cảnh báo của riêng nó."*
@@ -25120,7 +25327,7 @@ var NAVTREE=[
  {g:"Điều hành",items:["baocao","nhansu","bangcong","hoidap","canhan","settings"]},
  /* V2 08/08 - mười sáu cuốn sổ chỉ-đọc rời khỏi cây menu, vào sau một cửa `tracuu` (ghi chú
     dài ở bảng PAGES). `hocvien` và `giangvien` Ở LẠI vì chúng nằm trong nhịp ngày của ba nhóm. */
- {g:"Tra cứu",items:["tracuu","hocvien","giangvien"]}];
+ {g:"Tra cứu",items:["tracuu","hocvien","giangvien","tinnhan"]}];
 /* Danh mục sổ nằm sau cửa Tra cứu. Khai MỘT chỗ, BA nơi đọc: trang `tracuu` vẽ theo nó, `navCur`
    dùng nó để biết "đang đứng trong một cuốn sổ thì mục Tra cứu phải sáng", và `_checkcauhoi`
    dùng nó để biết các sổ ấy VẪN có lối trên menu (qua cửa cha). */
@@ -26351,6 +26558,8 @@ DOORS = {
  "DL27":["dotTao","dotDuyet","dotTuChoiRun"],
  # V2 12/08 (HOC VU-2): danh sach GV du phong khai theo THANG, truong phong ACA nhap.
  "DL28":["gvdpThangLuu"],
+ # V2 12/08 (SALE-3): so luu tin da gui - dev noi duong gui that sau, cho noi da danh dau.
+ "DL29":["msgGui"],
  "DL23":["hvReq","tkNewSave"],
  "DL24":["hvAskSaySave","tkSay"],
 }

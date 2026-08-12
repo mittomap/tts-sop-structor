@@ -1336,6 +1336,67 @@ dl["DL28"] = _gvdp
 log.append("14w. DL28 giảng viên dự phòng: %d đăng ký cho 2 tháng (%s, %s)"
            % (len(_gvdp), _thangTruoc, _thangNay))
 
+# ═══ 14v. DL29 - SO TIN DA GUI (V2 12/08, SALE-3) ══════════════════════════════════════════
+# Mot so lu tru rong thi khong ai biet no loc duoc gi. Gieo ca HAI kenh (email + Zalo), ca hai
+# loai nguoi nhan (lead + hoc vien), va rai qua nhieu ngay - de ba bo loc anh Luan neu (LOP,
+# NGUOI GUI, THOI GIAN) deu co gi de loc.
+_tinMau = [
+    ("zalo", "", "IELTS The Tutors xac nhan lich TEST DAU VAO. Vui long den truoc 10 phut."),
+    ("email", "IELTS The Tutors - thông tin lớp của bạn",
+     "Kinh gui anh/chi,\n\nTrung tam gui thong tin lop va lich hoc. Vui long xac nhan de trung tam chot danh sach.\n\nTran trong,\nIELTS The Tutors"),
+    ("zalo", "", "IELTS The Tutors nhac lich thanh toan dot 2. Ban vui long hoan tat truoc han nhe."),
+    ("email", "IELTS The Tutors - kết quả test đầu vào",
+     "Kinh gui anh/chi,\n\nKet qua test dau vao da co. Trung tam se goi tu van lo trinh trong hom nay.\n\nTran trong,\nIELTS The Tutors"),
+    ("zalo", "", "IELTS The Tutors chuc mung ban da hoan thanh khoa hoc! Trung tam dang co uu dai tai ghi danh."),
+    ("email", "IELTS The Tutors - nhắc hạn đóng học phí",
+     "Kinh gui anh/chi,\n\nDot dong hoc phi sap den han. Vui long hoan tat de giu cho lop cho hoc vien.\n\nTran trong,\nIELTS The Tutors"),
+]
+_nguoiGui = [s for s in dl["DL01"]
+             if re.match(r"^(sales|academic)", str(s.get("role", "")))
+             and not re.search(r"inactive|nghỉ", str(s.get("status", "")))]
+_hvCoDia = [s for s in dl["DL09"] if str(s.get("email") or "").strip() or str(s.get("zalo_id") or "").strip()]
+_leadCoDia = [l for l in dl["DL02"] if str(l.get("email") or "").strip() or str(l.get("zalo_id") or "").strip()]
+_lopCua = {}
+for _o in dl["DL08"]:
+    if _o.get("student_id") and _o.get("class_id"):
+        _lopCua.setdefault(str(_o["student_id"]), (str(_o["class_id"]), str(_o.get("class_id_name") or "")))
+_tin = []
+for _i in range(14):
+    _mau = _tinMau[_i % len(_tinMau)]
+    _kenh = _mau[0]
+    _laHV = (_i % 3) != 2
+    _ng = (_hvCoDia if _laHV else _leadCoDia)
+    if not _ng or not _nguoiGui:
+        break
+    _r = _ng[_i % len(_ng)]
+    _addr = (str(_r.get("email") or "").strip() if _kenh == "email"
+             else str(_r.get("zalo_id") or _r.get("phone_number") or "").strip())
+    if not _addr:
+        _kenh = "zalo" if _kenh == "email" else "email"
+        _addr = (str(_r.get("email") or "").strip() if _kenh == "email"
+                 else str(_r.get("zalo_id") or _r.get("phone_number") or "").strip())
+    if not _addr:
+        continue
+    _g = _nguoiGui[_i % len(_nguoiGui)]
+    _sid = str(_r.get("student_id") or "") if _laHV else ""
+    _lop = _lopCua.get(_sid, ("", ""))
+    _tin.append({"msg_id": "TIN-%04d" % (_i + 1),
+                 "sent_at": fmt(NOW - datetime.timedelta(days=_i, hours=(_i * 3) % 9)),
+                 "kenh": _kenh,
+                 "to_kind": "student" if _laHV else "lead",
+                 "to_id": _sid or str(_r.get("lead_id") or ""),
+                 "to_name": str(_r.get("full_name") or ""),
+                 "to_addr": _addr,
+                 "tieu_de": _mau[1] if _kenh == "email" else "",
+                 "noi_dung": _mau[2], "chu_de": "",
+                 "class_id": _lop[0], "class_id_name": _lop[1],
+                 "sent_by": _g["staff_id"], "sent_by_name": _g.get("full_name", "")})
+dl["DL29"] = _tin
+log.append("14v. DL29 sổ tin đã gửi: %d tin (%d email, %d Zalo) của %d người gửi"
+           % (len(_tin), sum(1 for x in _tin if x["kenh"] == "email"),
+              sum(1 for x in _tin if x["kenh"] == "zalo"),
+              len({x["sent_by"] for x in _tin})))
+
 # ═══ 14z. DL27 - YEU CAU DOI DOT DONG (V2 12/08, SALE-4 + SALE-5) ═══════════════════════════
 # Truong phong Tu van: *"cho cho duyet nay duoc cho em xin them cai duyet gia han dot dong nua"*
 # va *"khi ban sale chia lai dot dong thi em se phai duyet qua thi moi hop le"*.
