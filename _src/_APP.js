@@ -2025,10 +2025,10 @@ var THEDEF={
   ["cg_hen","Có hẹn hôm nay","Hồ sơ ở chặng này có lịch hẹn rơi vào hôm nay. Danh sách: bảng dưới, cột Hẹn."],
   ["cg_thieu","Thiếu dữ liệu","Hồ sơ chưa điền đủ ô bắt buộc của chặng - chưa đủ để đi tiếp. Danh sách: bảng dưới, dòng có dấu cảnh báo."]]},
  giaoviec:{t:"Giao việc nội bộ",the:[
-  ["gv_mine","Việc tôi phải làm","Việc người khác giao cho tôi và chưa xong. Danh sách: bấm tab 'Việc của tôi' ở thanh dưới."],
+  /* 13/08 - "gv_mine" và "gv_given" đã bỏ: cả hai trùng nguyên hai tab ngay dưới. */
   ["gv_over","Quá hạn của tôi","Số việc của tôi đã quá hạn. Danh sách: tab 'Việc của tôi', chip 'Quá hạn'."],
   ["gv_wait","Chờ tôi xác nhận","Việc tôi giao, người nhận đã báo xong và đang chờ tôi gật. Danh sách: tab 'Tôi giao', chip 'Chờ xác nhận'."],
-  ["gv_given","Tôi giao, đang chạy","Việc tôi giao cho người khác và họ đang làm. Danh sách: tab 'Tôi giao', chip 'Đang chạy'."]]},
+  ]},
  tkreport:{t:"Báo cáo giao việc",the:[
   ["tr_tong","Tổng số việc","Tổng số việc đã giao trong toàn trung tâm ở kỳ đang xem. Danh sách: bảng việc ngay dưới."],
   ["tr_done","Đã hoàn thành","Số việc đã đóng, kèm tỷ lệ trên tổng. Danh sách: lọc trạng thái 'hoàn thành' ở bảng dưới."],
@@ -7599,7 +7599,7 @@ function runGiaoLai(pid){
  var l=find("DL02","lead_id",pid);if(!l){toast("Hồ sơ này không phải lead - chưa giao lại được.");return}
  var cu=(l.assigned_to_name||l.assigned_to||"chưa ai");
  var ds=srows("DL01").filter(function(x){return staffActive(x)&&/sales|marketing/.test(ecode(x.role))&&String(x.staff_id)!==String(l.assigned_to)});
- var h='<div class="dcard"><h4><i class="ti ti-user-share"></i>Giao lại lead cho người khác</h4>'+
+ var h='<div class="dcard"><h4><i class="ti ti-arrows-exchange"></i>Giao lại lead cho người khác</h4>'+
   '<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>SOP tình huống <b>NA046</b>: lead đã giao mà quá '+
    esc(String(paramOf("slaLeadReassign_hours",4)))+' giờ chưa gọi thì <b>gọi gấp hoặc giao lại cho NV khác</b>. Đang phụ trách: <b>'+esc(cu)+'</b>.</div>'+
   '<div class="fld"><label>Giao cho <i>*</i></label><select id="gl_dest"><option value="">-- chọn nhân viên --</option>'+
@@ -7917,7 +7917,7 @@ function renderChay(){
      App có màn Bàn giao lead từ lâu nhưng ở đây không có cửa nào tới - người dùng đang đứng
      đúng hồ sơ ấy lại phải rời trang, tự tìm lại tên khách trong một bảng khác. Nay chìa thẳng. */
   ((J.over&&C.L&&String(C.L.assigned_to||"").trim())
-    ?'<button class="btn" onclick="runGiaoLai(\''+esc(C.pid)+'\')"><i class="ti ti-user-share"></i>Giao lại cho NV khác</button>':'')+
+    ?'<button class="btn" onclick="runGiaoLai(\''+esc(C.pid)+'\')"><i class="ti ti-arrows-exchange"></i>Giao lại cho NV khác</button>':'')+
   '</div>';
  h+='<div class="runfoot">';
  if(R.q&&R.i>0)h+='<button class="btn" onclick="runPrev()"><i class="ti ti-arrow-left"></i>Người trước</button>';
@@ -12346,6 +12346,11 @@ var APPPARAMS=[
  ["P1 · Lead & chăm khách","leadHoldMax_days","Một NV được ôm một lead tối đa bao nhiêu ngày kể từ ngày được giao","ngày",45],
  ["P1 · Lead & chăm khách","attemptsNoResponse","Gọi hụt liên tiếp bao nhiêu lần -> chuyển 'Không liên lạc được' + nhắc đổi kênh","lần",3],
  ["P1 · Lead & chăm khách","attemptsUnreachable","Gọi hụt liên tiếp bao nhiêu lần -> chuyển 'Hết cách liên lạc'","lần",5],
+ /* 13/08 - THAM SỐ CỦA SOP MÀ APP ĐỌC NHƯNG KHÔNG CÓ Ô SỬA. `jNaCode` đọc nó từ lâu để sinh
+    NA046 ("lead đã giao mà quá N giờ chưa gọi"), nhưng CH2 của app không khai nên anh Luân
+    không có chỗ nào chỉnh - một hằng số nghiệp vụ nằm ngoài tầm tay người dùng, đúng thứ
+    LUẬT CỨNG cấm. `_check16` và `_checkux` cùng bắt được khi em mở cửa "giao lại lead". */
+ ["P1 · Lead & chăm khách","slaLeadReassign_hours","Lead đã giao cho NV mà quá bao nhiêu giờ chưa gọi thì nhắc gọi gấp hoặc giao lại người khác","giờ",4],
  ["P2 · Test đầu vào & tư vấn","slaTestBookedRemind_hours","Sau khi đặt lịch test, quá bao lâu chưa ghi nhận dự test thì nhắc","giờ",24],
  ["P3 · Đăng ký & chiết khấu","thresholdDiscount_approval","Chiết khấu từ mức này trở lên phải trình quản lý duyệt","VND",1000000],
  ["Giới thiệu bạn bè","referralFriend_discountType","Kiểu ưu đãi cho bạn được giới thiệu","kiểu","percent",["percent","amount"]],
@@ -20041,14 +20046,18 @@ function renderGiaoviec(){
    'Bạn đang <b>sạch việc nội bộ</b> - không có việc ai giao cho bạn, cũng không có việc bạn giao đang chạy. '+
    'Bấm <b>Giao việc mới</b> khi cần nhờ hoặc giao cho người khác.</div>';
  }else{
- h+=statStrip([["ti-checkbox",mLive.length,"Việc tôi phải làm","#2E5A88",mOver.length?(mOver.length+" quá hạn"):"trong hạn","tkTabSet('mine');tkFset('live')"],
-  ["ti-clock-exclamation",mOver.length,"Quá hạn của tôi","#E24B4A",mOver.length?"cần làm ngay":"không có","tkTabSet('mine');tkFset('live')"],
+ /* 13/08 - BỎ HAI Ô ĐẦU. "Việc tôi phải làm" trùng nguyên tab "Việc của tôi" ngay dưới, và
+    "Tôi giao, đang chạy" trùng tab "Tôi giao" - `_checklap` L5 bắt trên 8 chức danh. Hai ô còn
+    lại giữ vì chúng KHÔNG phải là một tab: "Quá hạn của tôi" cắt theo MỐC THỜI GIAN trong tab
+    của tôi (loại T2 - SLA), "Chờ tôi xác nhận" là mắt xích cuối của chuỗi giao việc mà không
+    tab nào lọc riêng ra được. */
+ h+=statStrip([["ti-clock-exclamation",mOver.length,"Quá hạn của tôi","#E24B4A",mOver.length?"cần làm ngay":"không có","tkTabSet('mine');tkFset('live')"],
   /* V9.99z5 - ô này trước đây dẫn sang `tkFset('live')`, mà "live" = mới giao + đã nhận, KHÔNG
      có việc đã BÁO XONG. Nên bấm vào ô "Chờ tôi xác nhận (3)" là mở ra một danh sách không có
      ba việc ấy - mắt xích CUỐI của chuỗi giao việc (người giao xác nhận) không có cửa nào dẫn
      tới. Nay có riêng một nhóm lọc "Chờ tôi xác nhận" và ô số dẫn thẳng vào đó. */
   ["ti-inbox",gWait.length,"Chờ tôi xác nhận","#E08A1E",gWait.length?"người nhận đã báo xong":"không có","tkTabSet('given');tkFset('cho')"],
-  ["ti-send",gLive.length,"Tôi giao, đang chạy","#0D9488","theo dõi tiến độ","tkTabSet('given');tkFset('live')"]],"giaoviec");}
+  ],"giaoviec",["gv_over","gv_wait"]);}
  /* V9.99u - TAB "VIỆC CHỜ NHẬN" đứng ĐẦU: đây là việc chưa ai đụng vào, người giao đang chờ,
     nên nó gấp hơn cả việc đang làm. Con số trên tab là việc CỦA CHÍNH NGƯỜI ĐANG ĐĂNG NHẬP. */
  h+=tbar(timHTML("giaoviec")+'<span class="tbgr">'+segHTML(tab,[["wait","Việc chờ nhận",mWait.length||"",mWait.length?"red":""],
@@ -20740,6 +20749,12 @@ var QATUDIENDEF=[
     phòng ACA gọi điện hỏi "tỷ lệ đạt AIM" chứ không hỏi "tỷ lệ đạt band mục tiêu". Đổi chữ trong
     app thành một từ đúng hơn nhưng không ai nói ngoài đời là bắt người dùng dịch ngược mỗi lần
     đọc. Việc phải làm là ghi nó vào từ điển để người mới tra được. */
+ /* 13/08 - HAI CHỮ MỚI HIỆN RA CÙNG BẢNG NAPT. Bảng "Người phụ trách" của SOP dùng "CEO" và
+    (qua chữ "Quản lý") thì `_checkaudit` đo được cả "QL" trên màn. Chữ nào hiện ra trước mắt
+    người dùng thì phải tra được nghĩa - đó là luật cũ của dự án, và nhập một bảng mới từ SOP
+    thì mang theo cả từ vựng của nó. */
+ ["CEO","giam doc dieu hanh","Người đứng đầu trung tâm. SOP giao cho CEO đúng một tình huống: khiếu nại đã leo thang lên mức cao nhất (NA040) - lúc đó chỉ CEO hoặc quản lý cấp cao mới xử lý tiếp.","Menu > Chờ duyệt & quyết định","go('duyet')"],
+ ["QL","quan ly truc tiep","Người quản lý trực tiếp của một nhân viên (cột reports_to ở sổ Nhân sự). App dùng để leo thang: việc quá hạn thì báo cả quản lý của người đang phụ trách. SOP tự leo thang ở bốn chỗ - khiếu nại mức cao, khiếu nại đã leo thang, giảm giá vượt mức, học viên yếu cả hai mặt.","Menu > Quản lý > Nhân sự","go('nhansu')"],
  ["AIM","band muc tieu dau ra","Band điểm học viên đăng ký nhắm tới khi vào học (ghi ở cột target_band). ĐẠT AIM = điểm Overall của học viên đạt hoặc vượt band đó. App đo hai mốc: điểm bài thi thử cuối khóa tại trung tâm, và điểm kỳ thi IELTS chính thức.","Menu > Chặng CSKH & Kết thúc > Kết quả đầu ra & AIM","go('ketqua')"],
  ["WOW","buổi wow 1-1 kèm riêng","Buổi kèm RIÊNG 1 thầy - 1 trò, nằm trong gói học viên đã mua (mỗi gói có một số lượt gọi là quota). Dùng để chữa đúng kỹ năng học viên đang yếu, tách hẳn khỏi buổi học lớp. Đặt buổi thì trừ quota; hết quota phải được duyệt cấp thêm. Giáo viên WOW phải xác nhận lịch, bấm mốc giờ vào - ra, và ghi nội dung sau buổi.","Menu > C2 Đang học > Buổi WOW 1-1","go('wow')"],
  ["SOP","standard operating procedure quy trinh chuan","Bộ quy trình chuẩn của trung tâm: mỗi việc làm theo thứ tự nào, ai làm, trong bao lâu. App này là SOP chạy được - mọi cảnh báo và hạn giờ đều lấy từ đó.","Cài đặt > Ngưỡng & SLA (CH2)","window.SETTAB='ch2';go('settings')"],

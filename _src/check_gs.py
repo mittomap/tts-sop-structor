@@ -43,7 +43,7 @@ GOC = os.environ.get("ITTS_OUT") or os.path.dirname(SD)
 # ra may chu (tang), hoac vua bo mot cua ghi (giam). Sua bua cho het do la tu tuoc vu khi cua minh.
 # 12/08: 66 -> 73. Bay cua ghi moi cua dot feedback bon team, moi cua noi ra backend dung mot cho:
 #   dotTao · dotDuyet (2 cho: DL27 + DL06b) · msgGui · gvdpThangLuu · hdLuu · lopDayHV · nvNhanHVSave
-SVR_GOI = 73
+SVR_GOI = 74   # +1 (13/08): runGiaoLaiRun - cua ghi 'giao lai lead' theo SOP NA046
 
 XOA = ["ITTs_WebApp.gs", "ITTs_WebApp_v4.gs", "ITTs_Reminders.gs", "ITTs_SeedDemo.gs",
        "ITTs_XuLyDuLieu.gs", "ITTs_Form_NhapLieu.gs", "ITTs_FixCotTinh.gs",

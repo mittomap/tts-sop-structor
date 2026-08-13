@@ -233,10 +233,16 @@ t("khong ep y khi cau khong noi gi", qaYDinh("Nguyễn Văn A")==="");
      3. Chon mot muc thi chi ve DUNG muc do, va duong ra cuoi cung la DAT DI DON TUNG BUOC. */
 (function(){
  setRole("all");cfEnsure();CUR="banlam";
- t("chi con MOT nut o goc (khong con nut Hoi dap rieng)",
-   (SRC.match(/id="qafab"/g)||[]).length===0&&(SRC.match(/id="asstfab"/g)||[]).length>=1);
+ /* 13/08 - HOP DONG DOI (anh Luan): *"cai nut bong den thay vi bat tat cai hoi tro ly, thi em
+    cho no mo form tro ly luon di, bo luon cai Hoi tro ly duoi goc duoi di, phien ko can thiet"*.
+    Tieu chi cu doi `id="asstfab"` phai CO MAT - do la mot CACH LAM. Cai DICH van y nguyen:
+    MOT cua vao, MOT tam, khong con nut Hoi dap rieng lac lai. Nay cua vao la nut bong den tren
+    thanh tieu de, va khong con nut noi nao o goc. */
+ t("chi con MOT cua vao Tro ly (khong con nut Hoi dap rieng, khong con nut noi o goc)",
+   (SRC.match(/id="qafab"/g)||[]).length===0&&(SRC.match(/id="asstfab"/g)||[]).length===0
+   &&(SRC.match(/id="tthBtn"/g)||[]).length===1);
  t("khong con code chet cua tam Hoi dap cu", typeof qaPanVe==="undefined"&&typeof qaFabClick==="undefined");
- t("nut goc goi dung ten Tro ly", /aria-label="Mở Trợ lý"/.test(SRC)&&/Trợ lý - hỏi về một học viên/.test(SRC));
+ t("cua vao goi dung ten Tro ly", /aria-label="Mở Trợ lý"/.test(SRC)&&/Trợ lý - hỏi về một học viên/.test(SRC));
  /* mo tam: phai co O HOI ngay tren cung, VA van con phan viec trong ngay */
  asstOpen();
  var h=document.getElementById("asst").innerHTML;
@@ -394,7 +400,9 @@ t("Hoi dap nam trong menu, khong bi giau", PBK["hoidap"]&&!PBK["hoidap"].hide);
  var khongCmt=SRC.replace(/\/\*[\s\S]*?\*\//g,"");
  var con=(khongCmt.match(/Trợ thủ|trợ thủ|TRỢ THỦ/g)||[]);
  t("ngoai comment khong con chu 'Tro thu' nao ("+con.length+" cho)", con.length===0);
- t("nut topbar gan nhan Tro ly", /aria-label="Bật\/tắt Trợ lý"/.test(SRC));
+ /* 13/08 - nut topbar khong con la CONG TAC bat/tat (cong tac ve dung cho cua mot cau hinh:
+    Cai dat > Tro ly & Nhip ngay); no la CUA VAO. Hoi dung vai moi cua no. */
+ t("nut topbar la CUA VAO Tro ly", /id="tthBtn"[^>]*onclick="asstNut\(\)"/.test(SRC));
  t("tab Cai dat ten Tro ly", /\["tro","Trợ lý","dat"\]/.test(SRC));
 })();
 

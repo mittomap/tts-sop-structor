@@ -1572,7 +1572,12 @@ var TAT_BOQUA={
   if(!soO)xau.push(pg+": khung form dựng ra mà không có ô nhập nào");
   else if(!coLuu)xau.push(pg+": khung form có "+soO+" ô mà không có nút Lưu");
  });
- t("tìm được các trang có nút mở form tại chỗ ("+soNut+" trang)", soNut>=3, soNut+" trang");
+ /* 13/08 - SAN HA 3 -> 2, kem ly do. Trang `nhaplead` mat nut chung "Them moi" vi tu nay so
+    nao khai NUT NGHIEP VU cua chinh no thi thoi ve nut chung (anh Luan: *"them moi, va khach moi
+    lien he den? khac nhau cho nao em, tai sao em lam trung"*). Con hai trang di qua duong
+    `newForm` - van du de thu THAT rang bam nut thi ra mot form co o nhap va nut Luu, tuc muc
+    dich cua phep do van con nguyen. Khong nang lai. */
+ t("tìm được các trang có nút mở form tại chỗ ("+soNut+" trang)", soNut>=2, soNut+" trang");
  t("nút \"Thêm mới\" nào cũng mở ra một form có ô nhập và nút Lưu", !xau.length, xau.slice(0,5).join(" | "));
 })();
 
