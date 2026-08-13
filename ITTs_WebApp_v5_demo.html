@@ -2455,7 +2455,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">13/08/2026 · <b>402cd3</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">13/08/2026 · <b>d2d2d5</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -4299,10 +4299,10 @@ var THEDEF={
  /* V2 13/08 - hai thẻ "kn_moi"/"kn_dang" đã bỏ (trùng hai chip lọc cùng tên cùng số). */
  khieunai:{t:"Xử lý khiếu nại",the:[
   ["kn_tong","Tổng phiếu chưa đóng","Mọi khiếu nại chưa đóng trong phạm vi dữ liệu của bạn. Danh sách: bấm chip \"Tất cả\"."]]},
- baoluu:{t:"Bảo lưu / Bỏ học",the:[
-  ["bl_hold","Đang bảo lưu","Học viên đã dừng có thời hạn - còn quay lại được, và đó là việc phải giữ liên lạc. Danh sách: bấm chip \"Đang bảo lưu\"."],
-  ["bl_drop","Đã bỏ học","Học viên đã dừng hẳn. Danh sách: bấm chip \"Đã bỏ học\"."],
-  ["bl_nohen","Chưa hẹn liên hệ lại","Người đã dừng mà chưa ai đặt lịch gọi lại - để lâu là mất hẳn. Danh sách: bấm chip \"Chưa hẹn liên hệ lại\"."]]},
+ /* V2 13/08 - `baoluu` từng khai ba thẻ; cả ba trùng nguyên ba chip lọc nên đã bỏ.
+    BẢN KHAI PHẢI ĐI THEO: `_checkux` bắt được đúng chỗ này - dải khai mà không bao giờ vẽ ra
+    thì câu chú thích của nó thành chữ CHẾT (anh Luân sửa được ở Cài đặt một cái thẻ không tồn
+    tại). Bỏ dải nào thì gỡ bản khai của dải ấy trong cùng một nhịp. */
  /* V2 13/08 - thẻ "yc_moi" đã bỏ (trùng chip "Chưa ai nhận"). */
  ychv:{t:"Học viên liên hệ",the:[
   ["yc_tong","Tổng yêu cầu đang mở","Mọi yêu cầu chưa đóng trong phạm vi của bạn. Danh sách: toàn bộ bảng ngay dưới."]]},
