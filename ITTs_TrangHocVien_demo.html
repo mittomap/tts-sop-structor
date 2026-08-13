@@ -4019,11 +4019,18 @@ lop:{code:"DL10",
     nói hai đằng. */
  qf:[["l11","Lớp kèm 1-1",function(c){return lopLa11(c)},""],
      ["lnhom","Lớp nhóm",function(c){return !lopLa11(c)},""]],
- /* V2 13/08 - thẻ thứ ba "Đã kết thúc" đã bỏ: chip lọc ngay dưới mang đúng cái tên ấy và đúng
-    con số ấy. Hai thẻ còn lại gộp nhiều trạng thái nên chip không nói thay được. */
- the:function(all){
-  return [["ti-player-play",all.filter(function(c){return isc(c.class_status,"in_progress")}).length,"Lớp đang học","#2E9E6B",""],
-   ["ti-hourglass",all.filter(function(c){return isc(c.class_status,"open","planned")}).length,"Đang tuyển / chờ mở","#E08A1E",""]]},
+ /* ═══ 13/08 - BỎ NỐT HAI THẺ CUỐI (anh Luân: *"vụ thẻ em chưa làm hả, sao mấy cái nhảm nhí
+    còn xuất hiện"*). Sáng nay em giữ chúng lại với lý do "gộp nhiều trạng thái nên chip không
+    nói thay được" - lý do ấy SAI khi đối chiếu số thật: thẻ "Lớp đang học 8" đứng trên chip
+    "Đang học 8", thẻ "Đang tuyển / chờ mở 4" đứng trên chip "Đang tuyển sinh 4".
+    HAI LÝ DO CHÚNG SỐNG SÓT, cả hai đều là lỗi của em:
+    · dải này đi qua bản khai `LISTCFG[key].the` chứ không qua lời gọi dựng dải có mã trang, nên
+      đợt gỡ theo danh sách trang không chạm tới - **một thứ có hai đường dựng thì dọn một đường
+      là còn sót**. (Câu trên cố ý KHÔNG viết tên hàm dựng dải: `_checkux` quét mã nguồn tìm mọi
+      lời gọi hàm ấy, gặp tên hàm trong một dòng ghi chú thì nó chấm là một lời gọi thiếu mã.
+      Bẫy y hệt lần bảng màu đếm trúng hai mã màu nằm trong ghi chú của chính em.);
+    · `_checklap` L5 chỉ bắt khi chip là ĐẦU chuỗi của nhãn thẻ; "lớp đang học" không bắt đầu
+      bằng "đang học" nên nó lọt. Đã nới L5 sang "cùng con số + trùng chữ chính". */
  nut:'<button class="btn primary sm" onclick="go(\'xeplop\')"><i class="ti ti-layout-grid-add"></i>Xếp lớp & Onboarding</button>',filt:"class_status",ro:1,sub:"Lớp học (DL10) - bấm nút Vận hành lớp trên một dòng để vào buổi học, điểm danh, nhận xét và bài tập của lớp đó",
  /* V2 RB3 - CỬA VÀO TRANG CON NẰM TRONG NGĂN KÉO, KHÔNG NẰM TRÊN DÒNG.
     Bản đầu của Khúc 3 đặt một nút "Vận hành lớp" thẳng lên từng dòng - và `_check18` mục 26 bắt
@@ -4303,10 +4310,7 @@ var THEDEF={
   ["bc_du","Buổi đủ mốc, tính công được","Số buổi đã đủ hai mốc, chốt công được ngay. Danh sách: bảng ngay dưới, cột Giờ dạy."]]},
  /* V2 13/08 - `nhansu` từng khai ba thẻ ở đây; cả ba lặp y nguyên ba chip lọc của bảng nhân
     viên nên đã bỏ (xem chú thích ở `renderNhansu`). Không khai lại. */
- lop:{t:"Lớp học",the:[
-  ["lop_chay","Lớp đang học","Lớp đang chạy buổi. Danh sách: bấm chip \"Đang học\" ở thanh lọc ngay dưới."],
-  ["lop_mo","Đang tuyển / chờ mở","Lớp đã lên kế hoạch hoặc đang tuyển thêm học viên. Danh sách: bấm chip tương ứng ở thanh lọc."],
-  /* V2 13/08 - thẻ "lop_xong" đã bỏ (trùng nguyên chip "Đã kết thúc"). */]},
+ /* V2 13/08 - `lop` không còn dải thẻ: cả ba ô đều trùng chip trạng thái ngay dưới. */
  /* V2 13/08 - `buoihoc` từng khai ba thẻ; cả ba trùng nghĩa lẫn số với ba chip lọc nên đã bỏ. */
  /* V2 13/08 - `test` từng khai ba thẻ; cả ba trùng ba chip lọc nên đã bỏ. */
 /* ═══ V2 KHÚC 2b đợt 2 - BA TRANG NỮA CÓ DẢI THẺ RIÊNG ═════════════════════════════════════
@@ -14133,12 +14137,20 @@ function btHub(embed){
     return ["ti-inbox",n,"Đã giao, chưa thu","#E08A1E",n?"nhắc học viên trước hạn":"thu đủ cả"]})(),
    (function(){var n=_BT.filter(hwGraded).length;
     return ["ti-checks",n,"Đã chấm xong","#2E9E6B",""]})()],"baitap")}
+ /* ═══ 13/08 - Ô CHỌN KHÔNG ĐIỀU KHIỂN GÌ THÌ ĐỪNG BÀY RA (anh Luân, kèm ảnh: *"chờ chấm mọi
+    lớp xuất hiện cái chỗ sai logic dễ sợ"*). Chế độ "Chờ chấm - mọi lớp" cố ý PHÁ phạm vi lớp+buổi
+    để trả lời câu cuối ngày của giáo viên ("còn bài nào tôi chưa chấm"). Nội dung đúng, chỗ đứng
+    sai: nó nằm cùng hàng với ba chế độ đang bị hai ô chọn ràng, và hai ô ấy vẫn sáng đèn dù
+    không còn điều khiển gì. Người dùng đổi lớp, bảng không nhúc nhích, và họ mất niềm tin vào
+    cả hai cái ô. Nay ở chế độ này hai ô chọn ẩn đi, và nút được tách sang một nhóm riêng có
+    nhãn "Toàn bộ" để mắt đọc ra ngay đây là một câu hỏi khác cấp. */
+ var _moiLop=(mode==="chocham");
  h+='<div class="fbar">';
- if(!embed)h+='<span class="lbl">Lớp</span><select class="sel" onchange="window.BTCLASS=this.value;reRender(CUR)">'+(cls.length?cls.map(function(c){return '<option value="'+esc(c.class_id)+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id+" - "+c.class_name)+'</option>'}).join(""):'<option>(không có lớp)</option>')+'</select>';
+ if(!embed&&!_moiLop)h+='<span class="lbl">Lớp</span><select class="sel" onchange="window.BTCLASS=this.value;reRender(CUR)">'+(cls.length?cls.map(function(c){return '<option value="'+esc(c.class_id)+'"'+(c.class_id===cid?" selected":"")+'>'+esc(c.class_id+" - "+c.class_name)+'</option>'}).join(""):'<option>(không có lớp)</option>')+'</select>';
  var sesL=ddSessions(cid);
  var sesId=window.BTSESS&&find("DL11","session_id",window.BTSESS)&&find("DL11","session_id",window.BTSESS).class_id===cid?window.BTSESS:((sesL[0]||{}).session_id||"");
  var curSes=find("DL11","session_id",sesId)||null, SP=curSes?sesPlan(curSes):null;
- h+='<span class="lbl">Buổi</span><select class="sel" onchange="window.BTSESS=this.value;reRender(CUR)">'+
+ if(!_moiLop)h+='<span class="lbl">Buổi</span><select class="sel" onchange="window.BTSESS=this.value;reRender(CUR)">'+
   (sesL.length?sesL.map(function(s){var p=sesPlan(s);return '<option value="'+esc(s.session_id)+'"'+(s.session_id===sesId?" selected":"")+'>Buổi '+esc(s.session_number)+(s.session_date?" · "+esc(s.session_date):"")+(p&&p.hw?" · "+esc(p.hw.title):"")+'</option>'}).join(""):'<option>(lớp chưa có buổi)</option>')+'</select>';
  /* V2 08/08 - THÊM MỘT CHẾ ĐỘ: "CHỜ CHẤM - MỌI LỚP".
     Câu hỏi cuối ngày của giáo viên là *"còn bài nào tôi chưa chấm?"* - nhịp ngày đếm ra 12 bài.
@@ -14150,8 +14162,11 @@ function btHub(embed){
  /* Nhóm nút chế độ xuống hàng riêng - xem ghi chú ở `.fbbr`. Hai ô chọn trên thanh này mang
     giá trị dài (tên lớp + mã lớp · buổi + ngày + tên bài); chia hàng với bốn nút là chúng bị
     bóp còn 261px và cắt mất đuôi. */
- h+='<div class="fbbr"></div>'+segHTML(mode,[["giao","Giao bài"],["thu","Thu bài"],["cham","Chấm bài"],
-  ["chocham","Chờ chấm - mọi lớp",_chua.length,_chua.length?"red":""]],"window.BTMODE='{k}';reRender(CUR)")+'</div>';
+ h+='<div class="fbbr"></div>'+
+  '<span class="lbl">Theo buổi</span>'+
+  segHTML(_moiLop?"":mode,[["giao","Giao bài"],["thu","Thu bài"],["cham","Chấm bài"]],"window.BTMODE='{k}';reRender(CUR)")+
+  '<span class="lbl" style="margin-left:14px">Toàn bộ</span>'+
+  segHTML(_moiLop?"chocham":"",[["chocham","Chờ chấm - mọi lớp",_chua.length,_chua.length?"red":""]],"window.BTMODE='{k}';reRender(CUR)")+'</div>';
  if(mode==="chocham"){
   h+='<div class="panel"><div class="ph"><b>Bài đã nộp, chưa chấm - mọi lớp ('+_chua.length+')</b></div><div class="pbody">';
   if(!_chua.length)h+='<div class="empty">Không còn bài nào chờ chấm. Sạch.</div>';

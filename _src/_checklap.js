@@ -111,7 +111,23 @@ const PATHS=["/opt/pw-browsers/chromium-1194/chrome-linux/chrome","/opt/pw-brows
       const thua=dai.slice(ngan.length).trim();
       const tat=!het&&dai.indexOf(ngan)===0&&!!t2.so&&t2.so===c2.so&&
                 thua.split(" ").filter(Boolean).length<=2;
-      if(het||tat){lapThe++; if(!viDu)viDu='the "'+t2.nhan+'" = chip "'+c2.nhan+'"'} })});
+      /* 13/08 lan 3 - CHIP KHONG PHAI LUC NAO CUNG LA DAU CHUOI CUA THE. Anh Luan bat tiep:
+         the "Lop dang hoc 8" dung tren chip "Dang hoc 8", the "Dang tuyen / cho mo 4" dung tren
+         chip "Dang tuyen sinh 4" - ca hai deu lot vi luat cu chi hoi `indexOf(...)===0`.
+         Nay them mot cua nua: CUNG MOT CON SO va chia se it nhat 2 chu co nghia (bo cac hu tu
+         nhu "da","dang","cho","va") thi coi la trung. Hai cai nhan noi ve cung mot thu bang hai
+         cach xep chu van la mot cai nhan. */
+      const HU={da:1,dang:1,cho:1,va:1,cac:1,mot:1,so:1,cua:1,tren:1,trong:1};
+      const chu=t=>t.split(" ").filter(w=>w.length>1&&!HU[w]);
+      const wa=chu(t2.nhan),wb=chu(c2.nhan);
+      const nho=wa.length<=wb.length?wa:wb, lon=wa.length<=wb.length?wb:wa;
+      const con=nho.every(w=>lon.indexOf(w)>=0);      /* chu cua ben ngan nam tron trong ben dai */
+      const giong=!het&&!tat&&!!t2.so&&t2.so===c2.so&&nho.length>=1&&con&&
+                  (lon.length-nho.length)<=2;
+      /* Vi sao phai co ca hai dieu kien: chi doi "nam tron" thi the "Qua han nhieu nhat: Tuyen
+         sinh" bi cham oan boi chip "Qua han" (thua 4 chu - la mot CAU HOI KHAC, chi tinh co cung
+         con so). Chi doi "thua <=2" ma khong doi nam tron thi hai nhan khac han cung bi gom. */
+      if(het||tat||giong){lapThe++; if(!viDu)viDu='the "'+t2.nhan+'" = chip "'+c2.nhan+'"'} })});
     ra.push({pk, banai:c.querySelectorAll(".tbar.banai").length,
              phead:c.querySelectorAll(".phead").length, lapTbar:lap.length, lapNote:lap2,
              lapThe:lapThe, viDu:viDu});

@@ -102,6 +102,7 @@ const KHONGTHE = {
   duyetnghi:   _LYDO_TRUNGCHIP,
   duyetdot:    _LYDO_TRUNGCHIP,
   tinnhan:     _LYDO_TRUNGCHIP,
+  lop:         _LYDO_TRUNGCHIP,   /* 3 the = 3 chip trang thai lop */
 };
 
 /* Trang CHỈ ĐỂ ĐỌC - không có nút hành động là đúng, nhưng phải khai kèm lý do đọc được. */
