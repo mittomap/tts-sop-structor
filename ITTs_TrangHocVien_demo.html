@@ -4304,15 +4304,15 @@ var THEDEF={
     Cùng luật RB2 như đợt 1: con số lấy từ ĐÚNG phép đếm mà thân trang bên dưới đang dùng (chính
     là các con số đang hiện trên chip lọc), không viết lại lần thứ hai. */
  /* V2 13/08 - hai thẻ "kn_moi"/"kn_dang" đã bỏ (trùng hai chip lọc cùng tên cùng số). */
- khieunai:{t:"Xử lý khiếu nại",the:[
-  ["kn_tong","Tổng phiếu chưa đóng","Mọi khiếu nại chưa đóng trong phạm vi dữ liệu của bạn. Danh sách: bấm chip \"Tất cả\"."]]},
+/* V2 13/08 - `khieunai` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
+
  /* V2 13/08 - `baoluu` từng khai ba thẻ; cả ba trùng nguyên ba chip lọc nên đã bỏ.
     BẢN KHAI PHẢI ĐI THEO: `_checkux` bắt được đúng chỗ này - dải khai mà không bao giờ vẽ ra
     thì câu chú thích của nó thành chữ CHẾT (anh Luân sửa được ở Cài đặt một cái thẻ không tồn
     tại). Bỏ dải nào thì gỡ bản khai của dải ấy trong cùng một nhịp. */
  /* V2 13/08 - thẻ "yc_moi" đã bỏ (trùng chip "Chưa ai nhận"). */
- ychv:{t:"Học viên liên hệ",the:[
-  ["yc_tong","Tổng yêu cầu đang mở","Mọi yêu cầu chưa đóng trong phạm vi của bạn. Danh sách: toàn bộ bảng ngay dưới."]]},
+/* V2 13/08 - `ychv` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
+
 /* ═══ V2 KHÚC 2b - BỐN HÀNG CHỜ PHÊ DUYỆT CÓ DẢI THẺ RIÊNG ════════════════════════════════
     Anh Luân tả V2: *"mỗi trang là nghiệp vụ riêng, và nó có THẺ, có chip lọc, có cảnh báo của
     riêng nó"*. Bốn hàng chờ này tách ra thành bốn trang ở Khúc 2a nhưng chưa có thẻ nào.
@@ -4320,31 +4320,23 @@ var THEDEF={
     `duyRefundList`, `absQueue`, `duyPayList`. Viết lại phép đếm ở dải thẻ là đẻ ra đúng con bệnh
     anh Luân bắt hai lần trong hai ngày: cái thẻ và cái bảng hỏi hai hàm khác nhau cho cùng một
     câu hỏi, số không sai nhưng nó KHÔNG DẪN TỚI ĐÂU. */
- tinnhan:{t:"Sổ tin đã gửi",the:[
-  ["tn_tong","Tin đã gửi","Tổng số email và tin Zalo app đã gửi cho khách, trong phạm vi bạn xem được. Danh sách: bảng ngay dưới."],
-  ["tn_mail","Qua email","Số tin gửi bằng email - chỉ hiện nút gửi email khi hồ sơ khách có địa chỉ email. Danh sách: bấm chip Email ở thanh lọc ngay dưới."],
-  ["tn_zalo","Qua Zalo","Số tin gửi bằng Zalo - chỉ hiện nút gửi Zalo khi hồ sơ khách có Zalo. Danh sách: bấm chip Zalo ở thanh lọc ngay dưới."],
-  ["tn_today","Gửi hôm nay","Số tin gửi trong ngày hôm nay. Danh sách: chọn Hôm nay ở ô Thời gian trên thanh lọc, bảng ngay dưới lọc theo."]]},
+/* V2 13/08 - `tinnhan` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
+
  duyethd:{t:"Duyệt hợp đồng cam kết",the:[
-  ["hd_cho","Hợp đồng chờ duyệt","Số hợp đồng cam kết đầu ra chưa đủ hai chữ ký (Trưởng phòng Tư vấn và Giám đốc). Danh sách: ngay dưới dải này."],
-  ["hd_mot","Mới có một chữ ký","Hợp đồng đã được một trong hai người duyệt, còn chờ người kia. Thiếu một chữ ký là học viên chưa xếp lớp được. Danh sách: bảng ngay dưới, nhìn hai chip trạng thái của từng dòng."],
+/* V2 13/08 - các ô ĐẾM ĐƠN đã bỏ (trùng chip); chỉ giữ ô mang TIỀN hoặc CHỈ SỐ - xem THE_NEN_LA_GI.md. */
   ["hd_band","Band cam kết trung bình","Trung bình band mục tiêu của các hợp đồng đang chờ - nhìn nhanh xem đợt này sale cam kết cao hay thấp. Danh sách: bảng ngay dưới, cột band của từng dòng."]]},
- duyetdot:{t:"Duyệt đổi đợt đóng",the:[
-  ["dd_cho","Yêu cầu chờ duyệt","Số yêu cầu đổi đợt đóng đang chờ quyết. Danh sách: ngay dưới dải này."],
-  ["dd_gh","Xin gia hạn một đợt","Yêu cầu lùi hạn ĐÚNG MỘT đợt, thường kèm ảnh trao đổi với khách. Danh sách: dưới, nhìn dòng ghi hạn cũ → hạn mới."],
-  ["dd_cl","Xin chia lại cả lịch","Yêu cầu chia lại toàn bộ lịch đợt của đơn (đổi số đợt, khoảng cách, tỷ lệ đợt đầu). Duyệt là dựng lại lịch ngay. Danh sách: bảng ngay dưới, dòng nào ghi \"Chia lại thành N đợt\"."]]},
+/* V2 13/08 - `duyetdot` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
+
  duyetck:{t:"Duyệt chiết khấu",the:[
-  ["dck_cho","Đơn chờ duyệt","Đơn đăng ký có chiết khấu vượt mức tự quyết, đang chờ người có thẩm quyền gật. Danh sách: ngay dưới dải thẻ này."],
-  ["dck_vuot","Vượt mức tự quyết","Trong số đơn chờ, đếm riêng đơn có số tiền giảm vượt ngưỡng tự quyết (chỉnh ở Cài đặt, thresholdDiscount_approval). Danh sách: đơn nào vượt đều có chip đỏ ở dòng."],
+/* V2 13/08 - các ô ĐẾM ĐƠN đã bỏ (trùng chip); chỉ giữ ô mang TIỀN hoặc CHỈ SỐ - xem THE_NEN_LA_GI.md. */
   ["dck_tien","Tổng tiền đang giảm","Cộng phần giảm của mọi đơn đang chờ - đây là số tiền trung tâm sẽ bớt nếu duyệt hết. Danh sách: cột Giảm ở từng đơn dưới."]]},
  duyethoan:{t:"Duyệt hoàn tiền",the:[
-  ["dho_cho","Yêu cầu chờ xử lý","Yêu cầu hoàn tiền đang chờ quyết định. Danh sách: ngay dưới dải thẻ này."],
+/* V2 13/08 - các ô ĐẾM ĐƠN đã bỏ (trùng chip); chỉ giữ ô mang TIỀN hoặc CHỈ SỐ - xem THE_NEN_LA_GI.md. */
   ["dho_tien","Tổng tiền chờ hoàn","Cộng số đã thu của các đơn đang xin hoàn - số tiền có thể phải trả lại. Danh sách: cột số tiền ở từng yêu cầu dưới."]]},
- duyetnghi:{t:"Duyệt xin nghỉ học",the:[
-  ["dng_cho","Đơn chờ duyệt","Học viên đã báo nghỉ, chờ học vụ duyệt. Duyệt rồi thì buổi đó không tính vắng. Danh sách: ngay dưới dải thẻ này."],
-  ["dng_bu","Có xin học bù","Trong số đơn chờ, đếm riêng người muốn học bù - duyệt xong còn phải xếp buổi bù cho họ. Danh sách: đơn nào xin bù đều ghi rõ ở dòng."]]},
+/* V2 13/08 - `duyetnghi` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
+
  duyetthu:{t:"Xác nhận thu tiền",the:[
-  ["dth_cho","Khoản chờ đối soát","Khoản thu đã ghi nhận mà kế toán chưa xác nhận tiền về tài khoản. Danh sách: ngay dưới dải thẻ này."],
+/* V2 13/08 - ô đếm đơn đã bỏ (trùng chip); giữ ô tiền - xem THE_NEN_LA_GI.md. */
   ["dth_tien","Tổng tiền chờ đối soát","Cộng số tiền của các khoản chờ - chưa đối soát thì chưa chắc đã về. Danh sách: cột số tiền ở từng khoản dưới."]]},
  lopruiro:{t:"Vận hành lớp - cần xử lý",the:[
   ["lr_nguyco","Học viên nguy cơ","Học viên của lớp này đang bị đánh dấu nguy cơ - vắng nhiều hoặc điểm học thuật dưới ngưỡng. Muốn xem: tab Học viên ngay dưới, cột trạng thái có chip đỏ."],
@@ -4426,8 +4418,8 @@ var THEDEF={
  review:{t:"Khảo sát & phản hồi lớp",the:[
   ["rv_cho","Phiếu chờ trả lời","Số phiếu khảo sát đã gửi mà học viên chưa điền. Danh sách: bảng 'Phiếu gần đây' ngay dưới, cột Trạng thái là 'chờ'."],
   ["rv_quen","Gửi quá N ngày chưa ai trả lời","Trong số phiếu chờ, đếm riêng phiếu đã gửi quá số ngày khai ở Ngưỡng & SLA (svNudge_days) - đó là lớp cần gọi nhắc. Danh sách: bấm chip 'Trả lời kém' ở thanh lọc dưới."]]},
- ghinhan:{t:"Ghi nhận phản hồi",the:[
-  ["gn_xau","Phản hồi xấu chưa xử lý","Đếm phản hồi tiêu cực hoặc lời than phiền còn đang mở - để lâu là thành khiếu nại. Danh sách: bấm chip trạng thái 'chưa xử lý' ở thanh lọc dưới."]]},
+/* V2 13/08 - `ghinhan` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
+
  giaoan:{t:"Giáo án & kho bài",the:[
   ["ga_7ng","Buổi sắp dạy chưa có giáo án","Đếm buổi học sắp diễn ra trong khoảng nhìn trước (gaAhead_days) mà chưa gắn giáo án - giáo viên lên lớp không có bài. Danh sách: bấm tab 'Giáo án theo buổi' ở dưới."],
   ["ga_khoa","Khóa chưa có giáo án nào","Đếm khóa học chưa soạn buổi nào - mở lớp là hụt bài ngay. Danh sách: bảng khóa ngay dưới."],
@@ -4459,8 +4451,8 @@ var THEDEF={
     chưa xong" mang mốc SLA 72 giờ. */
  /* V2 13/08 - `xeplop` không còn dải thẻ: cả hai thẻ trùng chip lọc ngay dưới. */
  /* V2 13/08 - `reup` từng khai ba thẻ; cả ba trùng nguyên ba chip lọc nên đã bỏ. */
- tuvan:{t:"Tư vấn",the:[
-  ["tv_drop","Khách từ chối","Số khách đã chốt là không mua - đọc lý do để sửa cách tư vấn. Danh sách: chip 'Từ chối' ở thanh lọc dưới."]]},
+/* V2 13/08 - `tuvan` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
+
  thanhtoan:{t:"Thanh toán & công nợ",the:[
   ["tt_no","Tổng còn nợ","Tổng tiền còn phải thu của mọi đăng ký chưa huỷ, toàn hệ thống. Danh sách: bảng công nợ ngay dưới."],
   ["tt_hom","Tiền đến hạn hôm nay","Tổng tiền của các đợt có hạn đóng rơi vào hôm nay hoặc đã trễ - đây là con số kế toán phải nhìn đầu ngày. Danh sách: mở trang Dự thu theo đợt."]]},
@@ -4469,16 +4461,15 @@ var THEDEF={
   ["ww_gio","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy nhưng coach chưa ghi giờ vào/giờ ra - thiếu mốc thì bảng công tính sai. Danh sách: chip 'Thiếu mốc giờ'."],
   ["ww_cfm","Đã đặt, chờ HV xác nhận","Buổi đã đặt lịch mà học viên chưa xác nhận - gọi chốt giờ. Danh sách: chip trạng thái 'đã đặt'."],
   ["ww_het","HV đã hết lượt WOW","Học viên đã dùng hết quota WOW của khóa - cấp thêm nếu có căn cứ. Danh sách: tab Quota."]]},
- ketthuc:{t:"Kết thúc khóa & tái ghi danh",the:[
-  ["kt_chuamoi","Học xong mà chưa ai mời tái ghi danh","Học viên đã hoàn thành khóa nhưng chưa có ai liên hệ mời học tiếp - để lâu là nguội. Danh sách: chip 'Chưa liên hệ' ở thanh lọc dưới."]]},
+/* V2 13/08 - `ketthuc` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
+
  tranghv:{t:"Cổng học viên (xem hộ)",the:[
   ["hv_att","Chuyên cần","Tỷ lệ buổi có mặt của riêng học viên này. Muốn xem chi tiết: mục Điểm danh trong hồ sơ."],
   ["hv_hw","Bài tập đã nộp","Tỷ lệ bài đã nộp trên tổng bài được giao của học viên này. Muốn xem chi tiết: mục Bài tập."],
   ["hv_diem","Điểm bài tập TB","Điểm trung bình các bài đã được chấm của học viên này. Muốn xem chi tiết: mục Bài tập."],
   ["hv_wow","Buổi WOW còn lại","Số lượt WOW 1-1 học viên còn được dùng theo quota khóa. Muốn xem chi tiết: mục WOW."]]},
- magioithieu:{t:"Mã giới thiệu",the:[
-  ["mg_dung","Lượt bạn dùng mã","Tổng số lượt người quen nhập mã giới thiệu. Danh sách: bảng lượt dùng ngay dưới."],
-  ["mg_chua","Dùng mã nhưng chưa đăng ký","Người đã nhập mã mà chưa chốt đăng ký - họ đã quan tâm rồi, gọi là chốt được. Danh sách: bảng dưới, cột Đăng ký trống."]]},
+/* V2 13/08 - `magioithieu` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
+
  hosogv:{t:"Hồ sơ giảng viên",the:[
   ["gv_day","Buổi đã dạy","Số buổi giảng viên này đã dạy xong. Danh sách: bảng buổi dạy ngay dưới."],
   ["gv_nx","Cần viết nhận xét","Buổi đã dạy mà chưa ghi nhận xét, hạn theo slaTeacherNote_hours. Danh sách: bảng buổi dạy, cột Nhận xét trống."],
@@ -4509,17 +4500,11 @@ var THEDEF={
   ["ht_wow","Buổi WOW hôm nay","Số buổi kèm 1-1 tôi phải dạy hôm nay. Danh sách: bảng WOW ngay dưới."],
   ["ht_hw","Bài chờ chấm","Bài học viên đã nộp mà tôi chưa chấm, hạn theo slaHomeworkGrading_hours. Danh sách: bảng bài tập dưới."],
   ["ht_nx","Buổi nợ nhận xét","Buổi tôi đã dạy mà chưa ghi nhận xét, hạn theo slaTeacherNote_hours. Danh sách: bảng buổi dưới, cột Nhận xét."]]},
- gvdp:{t:"Giáo viên dự phòng",the:[
-  ["dp_ses","Buổi trong ngày","Tổng số buổi học của cả trung tâm trong ngày đang xem. Danh sách: bảng buổi ngay dưới."],
-  ["dp_free","Giáo viên trống lịch cả ngày","Giảng viên hôm nay không có buổi nào - có thể nhận dạy thay. Danh sách: bảng giáo viên dưới."],
-  ["dp_nogv","Buổi hôm nay chưa có GV","Buổi đã lên lịch mà chưa gán giảng viên - giao người ngay, đừng để tới giờ. Danh sách: bảng buổi dưới, cột Giảng viên trống."],
-  ["dp_huy","Buổi đã huỷ hôm nay","Buổi bị huỷ trong ngày - kiểm xem đã báo học viên chưa. Danh sách: bảng buổi dưới, trạng thái 'đã huỷ'."]]},
+/* V2 13/08 - `gvdp` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
+
  /* V2 13/08 - thẻ "ph_dung" đã bỏ (trùng chip "Đụng phòng"). */
- phong:{t:"Phòng học & xung đột lịch",the:[
-  ["ph_lop","Lớp trùng giờ với chính nó","Cùng một lớp bị xếp hai buổi chồng giờ - lỗi xếp lịch lặp. Danh sách: bảng xung đột dưới."],
-  ["ph_gv","Giáo viên trùng giờ","Một giảng viên bị xếp hai buổi cùng giờ - phải đổi người hoặc đổi giờ. Danh sách: bảng xung đột dưới."],
-  ["ph_nr","Lớp tại chỗ chưa có phòng","Lớp học trực tiếp mà chưa gán phòng - tới giờ mới đi tìm phòng là muộn. Danh sách: bảng lớp dưới, cột Phòng trống."],
-  ["ph_nogv","Lớp mở chưa có GV chính","Lớp đang mở mà chưa có giảng viên chính. Danh sách: bảng lớp dưới, cột Giảng viên."]]},
+/* V2 13/08 - `phong` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
+
  chang:{t:"Chạy quy trình theo chặng",the:[
   ["cg_sla","Quá hạn SLA","Số hồ sơ ở chặng đang xem đã quá hạn theo luật SLA của chặng đó. Danh sách: bảng hồ sơ ngay dưới, dòng tô đỏ."],
   ["cg_hen","Có hẹn hôm nay","Hồ sơ ở chặng này có lịch hẹn rơi vào hôm nay. Danh sách: bảng dưới, cột Hẹn."],
@@ -10715,8 +10700,13 @@ function renderYcHV(){
    return isc(x.task_status,"new")&&a!=null&&a>num(paramOf("slaTaskAccept_hours",4))});
  /* V2 13/08 - thẻ "Chưa ai nhận" đã bỏ: chip cùng tên ngay dưới mang đúng con số ấy và bấm lọc
     được. "Tổng yêu cầu đang mở" giữ - chip "Tất cả" đếm cả yêu cầu đã đóng, khác con số này. */
- var h=h0+statStrip([
-  ["ti-messages",L.length,"Tổng yêu cầu đang mở","#3B82C4",""]],"ychv")+
+/* V2 13/08 - BỎ DẢI THẺ. Anh Luân: *"thẻ nó phải mang tính khác biệt, chứ nó như cái chip thì
+   giữ làm gì, sao ko ưu tiên KPI, SLA hoặc mấy cái nhóm quan trọng"*. Dải này chỉ đếm dòng của
+   chính bảng ngay dưới - đúng việc mà chip đang làm, và chip còn bấm lọc được. Luật chốt ở
+   `THE_NEN_LA_GI.md`: thẻ chỉ được mang KPI/tỷ lệ · mốc SLA · tiền-giờ cộng dồn · số đo trên
+   dữ liệu KHÁC bảng dưới · xếp hạng giữa các nhóm. Ngoài năm loại đó là chip, không phải thẻ. */
+ var h=h0+
+
   (function(){
    /* Lọc THẬT rồi mới vẽ - dải chip chỉ để nhìn thì còn tệ hơn không có, vì người ta bấm rồi
       tưởng đã lọc. `_checkkhuon` đo trên chuỗi HTML nên chip giả vẫn qua được thước; luật này
@@ -10927,11 +10917,12 @@ function renderGhinhan(embed){var p="ghinhan",fil=fget(p);
  var h=embed?'':pageHead("Tiếp nhận & xử lý phản hồi","Phản hồi nhận qua gọi / nhắn / gặp trực tiếp - ghi lại ngay để không bỏ sót, phân loại trong "+lim+"h, tiêu cực thì chuyển thành khiếu nại.",
   '<button class="btn primary" onclick="ghForm()"><i class="ti ti-message-plus"></i>Ghi nhận phản hồi mới</button>');
  /* V9.51: 3 o loc doi lot chip ben duoi (chip da mang so) - bo; giu o tong ket */
- h+=statStrip([
-  /* V9.57: o cu dem viec DA LAM XONG - doc cho vui chu khong ai lam gi voi no. Doi sang phan
-     hoi XAU dang mo: do la thu phai xu ly trong ngay, de lau la thanh khieu nai. */
-  (function(){var n=fb.filter(function(x){return !isc(x.feedback_status,"resolved")&&/negative|complaint/.test(ecode(x.feedback_type))}).length;
-   return ["ti-mood-sad",n,"Phản hồi xấu đang mở","#E24B4A",n?"để lâu là thành khiếu nại":"không có cái nào"]})()],"ghinhan");
+/* V2 13/08 - BỎ DẢI THẺ. Anh Luân: *"thẻ nó phải mang tính khác biệt, chứ nó như cái chip thì
+   giữ làm gì, sao ko ưu tiên KPI, SLA hoặc mấy cái nhóm quan trọng"*. Dải này chỉ đếm dòng của
+   chính bảng ngay dưới - đúng việc mà chip đang làm, và chip còn bấm lọc được. Luật chốt ở
+   `THE_NEN_LA_GI.md`: thẻ chỉ được mang KPI/tỷ lệ · mốc SLA · tiền-giờ cộng dồn · số đo trên
+   dữ liệu KHÁC bảng dưới · xếp hạng giữa các nhóm. Ngoài năm loại đó là chip, không phải thẻ. */
+
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả",fb.length],["new","Chờ phân loại",nNew,"amber"],["over","Quá hạn",nOver,"red"],["neg","Tiêu cực chưa xử lý",nNeg,"red"],["open","Chưa đóng",nOpen]],view.length);
  h+='<div class="obcards rows" data-tour="obcards">';
@@ -15927,8 +15918,12 @@ function renderTuvan(embed){var p="tuvan",fil=fget(p);var all=srows("DL04");
  var h=embed?'':pageHead("Tư vấn & Đăng ký sau test","Tư vấn lộ trình sau test - chốt - tạo đăng ký",'<button class="btn primary" onclick="tvQuick()"><i class="ti ti-plus"></i>Tư vấn không qua test</button>');
  /* V9.51: 3 o loc doi lot bo di, so don vao chip; giu MOT o thong tin thuan (khach tu choi -
     khong co nut loc tuong ung, xem de cai thien). */
- h+=statStrip([
-  ["ti-user-x",all.filter(function(c){return isc(c.conversion_status,"dropped")}).length,"Khách từ chối","#6B7887","xem lý do để cải thiện"]],"tuvan");
+/* V2 13/08 - BỎ DẢI THẺ. Anh Luân: *"thẻ nó phải mang tính khác biệt, chứ nó như cái chip thì
+   giữ làm gì, sao ko ưu tiên KPI, SLA hoặc mấy cái nhóm quan trọng"*. Dải này chỉ đếm dòng của
+   chính bảng ngay dưới - đúng việc mà chip đang làm, và chip còn bấm lọc được. Luật chốt ở
+   `THE_NEN_LA_GI.md`: thẻ chỉ được mang KPI/tỷ lệ · mốc SLA · tiền-giờ cộng dồn · số đo trên
+   dữ liệu KHÁC bảng dưới · xếp hạng giữa các nhóm. Ngoài năm loại đó là chip, không phải thẻ. */
+
  view=fltApply(p,view);
  h+=filterBar(p,fil,[["all","Tất cả",all.length],
   ["todo","Chờ tư vấn",all.filter(tvChoTV).length,"amber"],
@@ -16468,11 +16463,12 @@ function renderTinnhan(embed){
     thêm cho một khách thì không có lý gì bắt đi vòng qua hồ sơ rồi quay lại. */
  var h=embed?'':pageHead("Sổ tin đã gửi","Mọi email và tin Zalo app đã gửi cho khách - ai gửi, gửi gì, gửi lúc nào. Lọc theo lớp, người gửi và khoảng thời gian.",
   '<button class="btn primary" onclick="msgMoi()"><i class="ti ti-send"></i>Soạn tin mới</button>');
- h+=statStrip([
-  ["ti-send",all.length,"Tin đã gửi","#3B82C4",""],
-  ["ti-mail",all.filter(function(m){return m.kenh==="email"}).length,"Qua email","#6B4FA0",""],
-  ["ti-brand-messenger",all.filter(function(m){return m.kenh==="zalo"}).length,"Qua Zalo","#16A34A",""],
-  ["ti-clock",all.filter(function(m){var d=pvnd(m.sent_at);return d&&d.getTime()>=t0.getTime()}).length,"Gửi hôm nay","#E08A1E",""]],"tinnhan");
+/* V2 13/08 - BỎ DẢI THẺ. Anh Luân: *"thẻ nó phải mang tính khác biệt, chứ nó như cái chip thì
+   giữ làm gì, sao ko ưu tiên KPI, SLA hoặc mấy cái nhóm quan trọng"*. Dải này chỉ đếm dòng của
+   chính bảng ngay dưới - đúng việc mà chip đang làm, và chip còn bấm lọc được. Luật chốt ở
+   `THE_NEN_LA_GI.md`: thẻ chỉ được mang KPI/tỷ lệ · mốc SLA · tiền-giờ cộng dồn · số đo trên
+   dữ liệu KHÁC bảng dưới · xếp hạng giữa các nhóm. Ngoài năm loại đó là chip, không phải thẻ. */
+
  var lops={};all.forEach(function(m){if(m.class_id)lops[m.class_id]=m.class_id_name||m.class_id});
  var ngs={};all.forEach(function(m){if(m.sent_by)ngs[m.sent_by]=m.sent_by_name||m.sent_by});
  function sel(p,cur,opts,lb){
@@ -17510,8 +17506,12 @@ function renderKhieunai(embed){var p="khieunai",fil=fget(p);var all=srows("DL17"
  /* V2 13/08 - CÒN MỘT THẺ. "Mới tiếp nhận" và "Đang xử lý" đứng ngay trên hai chip cùng nghĩa
     cùng số ("Mới", "Đang xử lý") - bỏ. "Tổng phiếu chưa đóng" giữ: chip "Tất cả" đếm cả phiếu
     đã đóng nên nó là một con số KHÁC, và đây là con số trưởng phòng CSKH nhìn đầu ngày. */
- if(!embed)h+=statStrip([
-  ["ti-folder",all.filter(function(c){return !st(c).resolved}).length,"Tổng phiếu chưa đóng","#6B7887",""]],"khieunai");
+/* V2 13/08 - BỎ DẢI THẺ. Anh Luân: *"thẻ nó phải mang tính khác biệt, chứ nó như cái chip thì
+   giữ làm gì, sao ko ưu tiên KPI, SLA hoặc mấy cái nhóm quan trọng"*. Dải này chỉ đếm dòng của
+   chính bảng ngay dưới - đúng việc mà chip đang làm, và chip còn bấm lọc được. Luật chốt ở
+   `THE_NEN_LA_GI.md`: thẻ chỉ được mang KPI/tỷ lệ · mốc SLA · tiền-giờ cộng dồn · số đo trên
+   dữ liệu KHÁC bảng dưới · xếp hạng giữa các nhóm. Ngoài năm loại đó là chip, không phải thẻ. */
+
  /* V9.51: 4/4 o thong ke la nut loc doi lot - bo dai, so + mau don vao chip loc */
  view=fltApply(p,view);
  h+=filterBar(p,fil,[["all","Tất cả",all.length],
@@ -17579,16 +17579,12 @@ function renderKetthuc(){var p="ketthuc",fil=fget(p);var all=srows("DL18");
  var view=all.filter(function(r){var s=st(r);if(fil==="all")return true;if(fil==="score")return !s.scored;if(fil==="invite")return s.scored&&!s.invited;if(fil==="follow")return s.invited&&!s.closed;return true});
  var h=pageHead("Kết thúc khóa & Tái ghi danh","Nhập kết quả đầu ra - đánh giá mục tiêu - mời & chốt tái ghi danh",'<button class="btn primary" onclick="ktGen()"><i class="ti ti-school-off"></i>Tạo hồ sơ kết thúc cho lớp</button>');
  /* V9.51: 3 o loc doi lot bo, so don vao chip; giu o "Da tai ghi danh" vi mang muc tieu RER */
- h+=statStrip([
-  /* V9.57: o cu dem nguoi DA tai ghi danh - thanh tich, khong phai viec. Nguoi da xong khoa ma
-     CHUA AI MOI moi la thu de lau se nguoi. Chi so RER van con nguyen o luoi KPI. */
-  (function(){var n=all.filter(function(x){return String(x.course_completion_time||"").trim()&&
-     /* V9.66: mã đúng theo CH1 là "rejected", không phải "declined" - viết sai thì HV đã từ chối
-        tái đăng ký vẫn bị đếm vào ô "chưa ai mời", tức là giục nhân viên đi mời lại người đã nói
-        không. Số sai mà không ai nghi, vì nó chỉ lớn hơn sự thật một chút. */
-     !String(x.re_enrollment_contact_time||"").trim()&&!isc(x.re_enrollment_status,"confirmed_with_deposit","rejected")}).length;
-   return ["ti-mail-forward",n,"Xong khóa, chưa ai mời học tiếp","#E24B4A",
-    n?"mời trong lúc còn nhiệt, để nguội là mất":"đã mời hết"]})()],"ketthuc");
+/* V2 13/08 - BỎ DẢI THẺ. Anh Luân: *"thẻ nó phải mang tính khác biệt, chứ nó như cái chip thì
+   giữ làm gì, sao ko ưu tiên KPI, SLA hoặc mấy cái nhóm quan trọng"*. Dải này chỉ đếm dòng của
+   chính bảng ngay dưới - đúng việc mà chip đang làm, và chip còn bấm lọc được. Luật chốt ở
+   `THE_NEN_LA_GI.md`: thẻ chỉ được mang KPI/tỷ lệ · mốc SLA · tiền-giờ cộng dồn · số đo trên
+   dữ liệu KHÁC bảng dưới · xếp hạng giữa các nhóm. Ngoài năm loại đó là chip, không phải thẻ. */
+
  view=fltApply(p,view);
  h+=filterBar(p,fil,[["all","Tất cả",all.length],
   ["score","Chờ nhập kết quả",all.filter(function(x){return !String(x.final_test_score||"").trim()}).length,"amber"],
@@ -19200,16 +19196,12 @@ function renderMaGioiThieu(embed){
      Bỏ chữ "Chính sách hiện tại (Cài đặt → CH2)" ở đầu - nguồn của con số đã nằm trong chú
      thích rê chuột của chính con số ấy rồi, nói hai lần là dài mà không thêm gì. */
   h+='<div class="notebar"><i class="ti ti-discount-2"></i>Người được giới thiệu <b data-tip="Mức giảm cho người ĐƯỢC giới thiệu, áp dụng cho khóa đầu tiên - lấy từ Cài đặt > CH2 (chính sách giới thiệu), không cắm cứng trong app">giảm '+esc(off.txt)+'</b> khi đăng ký khóa đầu · người giới thiệu nhận <b>'+esc(reward)+'</b>.</div>';
- h+=statStrip([
-  /* ═══ V9.57 (anh Luân): bốn ô cũ ở đây đều là SỐ TÍCH LUỸ - "HV đã tạo mã", "lượt bạn dùng mã",
-     "bạn đã đăng ký", "ưu đãi đã cấp". Đọc thì vui, nhưng sáng mai đọc lại vẫn gần y hệt và
-     không ô nào bảo mình phải làm gì. Giữ đúng hai ô: một ô nói QUY MÔ (để biết chương trình có
-     sống không) và một ô nói VIỆC CÒN NỢ - lượt dùng mã chưa thành đăng ký, tức người đã quan
-     tâm mà chưa ai chốt. Đó mới là thứ cần nhìn mỗi ngày. */
-  ["ti-ticket",String(totUses),"Lượt bạn dùng mã","#7C3AED",totEnr+" bạn đã đăng ký","",pctG(totEnr,totUses,"lượt dùng mã đã thành đăng ký thật")],
-  (function(){var con=Math.max(0,totUses-totEnr);
-   return ["ti-phone-call",String(con),"Dùng mã nhưng chưa đăng ký","#E24B4A",
-    con?"gọi chốt - họ đã quan tâm sẵn rồi":"đã chốt hết"]})()],"magioithieu");
+/* V2 13/08 - BỎ DẢI THẺ. Anh Luân: *"thẻ nó phải mang tính khác biệt, chứ nó như cái chip thì
+   giữ làm gì, sao ko ưu tiên KPI, SLA hoặc mấy cái nhóm quan trọng"*. Dải này chỉ đếm dòng của
+   chính bảng ngay dưới - đúng việc mà chip đang làm, và chip còn bấm lọc được. Luật chốt ở
+   `THE_NEN_LA_GI.md`: thẻ chỉ được mang KPI/tỷ lệ · mốc SLA · tiền-giờ cộng dồn · số đo trên
+   dữ liệu KHÁC bảng dưới · xếp hạng giữa các nhóm. Ngoài năm loại đó là chip, không phải thẻ. */
+
  var q=vnorm(window.MGQ||"");
  /* V2 09/08 - THÊM CHIP LỌC. Nhịp cuối ngày của Marketing là *"xem mã giới thiệu ai đang chạy -
     khách cũ giới thiệu là nguồn rẻ nhất, đừng để thưởng treo"*, đếm ra số thưởng còn chờ chi;
@@ -20363,15 +20355,12 @@ function renderGvdp(embed){
   'và không vượt số buổi/ngày. Giáo viên nghỉ cả ngày thì để trống lịch của họ - họ tự rơi vào nhóm '+
   '&quot;trống lịch cả ngày&quot; ở ô bên trên.">App tính thế nào?</span> '+
   'Bấm <b>Đẩy người thay</b> ở dòng buổi tương ứng.</div>';
- h+=statStrip([
-  ["ti-calendar",ses.length,"Buổi trong ngày","#3B82C4",noGv.length?(noGv.length+" buổi chưa có GV"):"đã có GV đủ"],
-  ["ti-user-check",free.length+"/"+GV.length,"Giáo viên trống lịch cả ngày","#16A34A","có thể nhận thay"],
-  /* V9.57: hai o cuoi cu la "Co so co lop hom nay" va "Buoi hoc online" - thong tin nen, biet
-     roi cung khong xep GV thay khac di. Doi sang hai cau hoi that su cua nguoi truc hom nay. */
-  ["ti-user-off",ses.filter(function(x){return !String(x.teacher_id||"").trim()}).length,"Buổi hôm nay chưa có GV","#E24B4A","giao người ngay, đừng để tới giờ"],
-  ["ti-calendar-off",(function(){var t0=new Date();t0.setHours(0,0,0,0);
-    return srows("DL11").filter(function(x){var d=pvnd(x.session_date);
-     return d&&sameDay(d,t0)&&isc(x.session_status,"cancelled")}).length})(),"Buổi đã huỷ hôm nay","#E08A1E","báo học viên chưa?"]],"gvdp");
+/* V2 13/08 - BỎ DẢI THẺ. Anh Luân: *"thẻ nó phải mang tính khác biệt, chứ nó như cái chip thì
+   giữ làm gì, sao ko ưu tiên KPI, SLA hoặc mấy cái nhóm quan trọng"*. Dải này chỉ đếm dòng của
+   chính bảng ngay dưới - đúng việc mà chip đang làm, và chip còn bấm lọc được. Luật chốt ở
+   `THE_NEN_LA_GI.md`: thẻ chỉ được mang KPI/tỷ lệ · mốc SLA · tiền-giờ cộng dồn · số đo trên
+   dữ liệu KHÁC bảng dưới · xếp hạng giữa các nhóm. Ngoài năm loại đó là chip, không phải thẻ. */
+
  h+=tbar('<span class="tblbl">Ngày</span><input type="date" class="sel" value="'+esc(ymd)+'" onchange="gvdpSet(this.value)">'+
   '<button class="pill" onclick="gvdpSet(\''+esc(fmtYMD(new Date(day.getTime()-864e5)))+'\')"><i class="ti ti-chevron-left"></i>Hôm trước</button>'+
   '<button class="pill" onclick="gvdpSet(\''+esc(fmtYMD(new Date(day.getTime()+864e5)))+'\')">Hôm sau<i class="ti ti-chevron-right"></i></button>',
@@ -20583,14 +20572,12 @@ function renderPhong(embed){
  var h=embed?'':pageHead("Phòng học & đụng lịch","Soi đụng phòng, đụng giờ của lớp và của giáo viên trên toàn bộ lịch. Lớp online không tính đụng phòng - 'phòng' của nó là link riêng.","");
  /* V2 13/08 - thẻ "Đụng phòng" đã bỏ: chip cùng tên ngay dưới mang đúng con số ấy. Bốn thẻ còn
     lại giữ - chip "Lớp trùng giờ"/"GV trùng giờ" gọi tên khác và hai thẻ cuối không có chip nào. */
- h+=statStrip([
-  ["ti-calendar-x",byT.lop,"Lớp trùng giờ với chính nó","#DB2777",byT.lop?"xếp lịch bị lặp":"không có"],
-  ["ti-user-exclamation",byT.gv,"Giáo viên trùng giờ","#E08A1E",byT.gv?"cần đổi người hoặc đổi giờ":"không có"],
-  ["ti-map-pin",nr.length,"Lớp tại chỗ chưa có phòng","#7C3AED",nr.length?"tới giờ mới đi tìm phòng":"đủ phòng"],
-  ["ti-user-exclamation",srows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()}).length,"Lớp mở chưa có GV chính","#DB2777","giao lớp ngay"],
-  /* V9.57: bo o "Lop online - khong rang buoc phong": tren mot trang ve XEP PHONG, dem lop
-     KHONG can phong la thong tin nen, khong ai quyet gi tu no. Cau da noi ro o dong ghi chu. */
-  ],"phong");
+/* V2 13/08 - BỎ DẢI THẺ. Anh Luân: *"thẻ nó phải mang tính khác biệt, chứ nó như cái chip thì
+   giữ làm gì, sao ko ưu tiên KPI, SLA hoặc mấy cái nhóm quan trọng"*. Dải này chỉ đếm dòng của
+   chính bảng ngay dưới - đúng việc mà chip đang làm, và chip còn bấm lọc được. Luật chốt ở
+   `THE_NEN_LA_GI.md`: thẻ chỉ được mang KPI/tỷ lệ · mốc SLA · tiền-giờ cộng dồn · số đo trên
+   dữ liệu KHÁC bảng dưới · xếp hạng giữa các nhóm. Ngoài năm loại đó là chip, không phải thẻ. */
+
  h+=pgBar("phong",cl.length);
  /* V2 09/08 - DẢI CHIP ĐẶT SAU Ô TÌM. Thứ tự chuẩn của app (V9.52): [ô tìm] [dải chip] - đọc
     trái sang phải, thu hẹp thô trước rồi tinh sau. `pgBar` là thứ vẽ ô tìm ở trang này nên chip
@@ -25069,32 +25056,32 @@ RENDER.lichtuan  = function(){return nvHead("lichtuan")+renderLichTuan(1)};
    thẻ và bảng không bao giờ nói hai con số khác nhau. */
 RENDER.duyetck   = function(){var L=duyCkList(),TH=ckThreshold();
  return nvHead("duyetck")+statStrip([
-  ["ti-discount-2",L.length,"Đơn chờ duyệt","#E08A1E",""],
-  ["ti-alert-triangle",L.filter(function(e){return num(e.discount_amount)>TH}).length,"Vượt mức tự quyết","#E24B4A",""],
+  /* V2 13/08 - ô đếm đơn đã bỏ (chip ngay dưới đếm đúng con số ấy). Giữ lại ô TIỀN:
+     chip đếm dòng, không cộng được tiền - đó là loại thẻ duy nhất trang này cần. */
   ["ti-cash",vnd(L.reduce(function(a,e){return a+num(e.discount_amount)},0)),"Tổng tiền đang giảm","#6B7887",""]],"duyetck")+duyCkHTML(TH)+_duyAi()};
 RENDER.duyethoan = function(){var L=duyRefundList();
  return nvHead("duyethoan")+statStrip([
-  ["ti-arrow-back-up",L.length,"Yêu cầu chờ xử lý","#E08A1E",""],
+  /* V2 13/08 - ô đếm đơn đã bỏ (chip ngay dưới đếm đúng con số ấy). Giữ lại ô TIỀN:
+     chip đếm dòng, không cộng được tiền - đó là loại thẻ duy nhất trang này cần. */
   ["ti-cash",vnd(L.reduce(function(a,e){return a+num(e.paid_amount)},0)),"Tổng tiền chờ hoàn","#6B7887",""]],"duyethoan")+duyHoanHTML()+_duyAi()};
 RENDER.duyetnghi = function(){var L=absQueue();
- return nvHead("duyetnghi")+statStrip([
-  ["ti-user-question",L.length,"Đơn chờ duyệt","#E08A1E",""],
-  ["ti-repeat",L.filter(function(a){return String(a.absence_want_makeup||"").trim()&&!/^(0|no|false|khong)$/i.test(String(a.absence_want_makeup))}).length,"Có xin học bù","#3B82C4",""]],"duyetnghi")+duyNghiHTML()+_duyAi()};
+/* V2 13/08 - BỎ DẢI THẺ: cả hai ô đều là số đếm của chip ngay dưới. Trang này không có ô
+   tiền nào để giữ (đơn xin nghỉ không mang số tiền), nên bỏ trọn. */
+ return nvHead("duyetnghi")+duyNghiHTML()+_duyAi()};
 RENDER.duyetthu  = function(){var L=duyPayList();
  return nvHead("duyetthu")+statStrip([
-  ["ti-receipt",L.length,"Khoản chờ đối soát","#E08A1E",""],
+  /* V2 13/08 - ô đếm đơn đã bỏ (chip ngay dưới đếm đúng con số ấy). Giữ lại ô TIỀN:
+     chip đếm dòng, không cộng được tiền - đó là loại thẻ duy nhất trang này cần. */
   ["ti-cash",vnd(L.reduce(function(a,p){return a+num(p.amount)},0)),"Tổng tiền chờ đối soát","#6B7887",""]],"duyetthu")+duyThuHTML()+_duyAi()};
 RENDER.duyethd   = function(){var L=hdCho();
  return nvHead("duyethd")+statStrip([
-  ["ti-file-certificate",L.length,"Hợp đồng chờ duyệt","#E08A1E",""],
-  ["ti-writing-sign",L.filter(function(h){return isc(h.duyet_tuvan,"approved")!==isc(h.duyet_gd,"approved")}).length,"Mới có một chữ ký","#3B82C4",""],
-  ["ti-target",(function(){var b=L.map(function(h){return num(h.target_band)}).filter(function(x){return x>0});
-    return b.length?(Math.round(b.reduce(function(a,x){return a+x},0)/b.length*10)/10):"—"})(),"Band cam kết trung bình","#6B4FA0",""]],"duyethd")+duyHdHTML()+_duyAi()};
+  /* V2 13/08 - hai ô đếm đơn đã bỏ (trùng chip). Giữ "Band cam kết trung bình": đó là một
+     CHỈ SỐ, không phải số đếm - chip không có cách nào tính trung bình. */
+  (function(){var b=L.map(function(r){return num(r.committed_band)}).filter(function(x){return x>0});
+    return ["ti-target",b.length?(Math.round(b.reduce(function(a,x){return a+x},0)/b.length*10)/10):"—","Band cam kết trung bình","#6B4FA0",""]})()],"duyethd")+duyHdHTML()+_duyAi()};
 RENDER.duyetdot  = function(){var L=dotCho();
- return nvHead("duyetdot")+statStrip([
-  ["ti-calendar-dollar",L.length,"Yêu cầu chờ duyệt","#E08A1E",""],
-  ["ti-clock-plus",L.filter(function(r){return isc(r.req_type,"extend")}).length,"Xin gia hạn một đợt","#3B82C4",""],
-  ["ti-layout-list",L.filter(function(r){return isc(r.req_type,"replan")}).length,"Xin chia lại cả lịch","#6B4FA0",""]],"duyetdot")+duyDotHTML()+_duyAi()};
+/* V2 13/08 - BỎ DẢI THẺ: ba ô đều là số đếm của ba chip ngay dưới. */
+ return nvHead("duyetdot")+duyDotHTML()+_duyAi()};
 
 /* ═══ SÁU HUB THÀNH BÍ DANH, KHÔNG THÀNH TRANG CHẾT ════════════════════════════════════════
    Sáu khoá hub (`tuyensinh` `hoctap` `cskh` `khac` `duyet` `giangvien`) vẫn còn đầy rẫy trong

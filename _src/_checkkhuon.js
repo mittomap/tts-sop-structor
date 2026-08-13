@@ -84,6 +84,24 @@ const KHONGTHE = {
   nhansu:   _LYDO_TRUNGCHIP,   /* 3 the = 3 chip: Dang lam viec · Ho so con thieu · Da nghi viec */
   hocvien:  _LYDO_TRUNGCHIP,   /* 3 the = 3 chip: Nguy co · Nguy co hoc thuat · Vang nhieu */
   xeplop:   _LYDO_TRUNGCHIP,   /* 2 the = 2 chip: Cho xep lop · Chua hoan tat (moc SLA da xuong hang ghi chu) */
+  /* ═══ 13/08 dot 2 - anh Luan chot LUAT VE LOAI THE: *"the no phai mang tinh khac biet, chu no
+     nhu cai chip thi giu lam gi, sao ko uu tien KPI, SLA hoac may cai nhom quan trong"*.
+     Do ca app: 125 the, 110 cai (88%) chi la MOT SO DEM DONG. Luat + bang phan tich tung trang
+     nam o `THE_NEN_LA_GI.md`; the chi duoc mang 5 loai: KPI/ty le · moc SLA · tien-gio cong don ·
+     so do tren du lieu KHAC bang duoi · xep hang giua cac nhom.
+     Muoi mot trang duoi day khong con the vi CA DAI cua chung chi dem dong. Trang nao co the
+     thay bang mot chi so that (nhom B trong tai lieu) thi se lam sau va go khai o day. */
+  ychv:     _LYDO_TRUNGCHIP,
+  tuvan:    _LYDO_TRUNGCHIP,
+  ghinhan:  _LYDO_TRUNGCHIP,
+  khieunai: _LYDO_TRUNGCHIP,
+  gvdp:     _LYDO_TRUNGCHIP,
+  phong:    _LYDO_TRUNGCHIP,
+  ketthuc:  _LYDO_TRUNGCHIP,
+  magioithieu: _LYDO_TRUNGCHIP,
+  duyetnghi:   _LYDO_TRUNGCHIP,
+  duyetdot:    _LYDO_TRUNGCHIP,
+  tinnhan:     _LYDO_TRUNGCHIP,
 };
 
 /* Trang CHỈ ĐỂ ĐỌC - không có nút hành động là đúng, nhưng phải khai kèm lý do đọc được. */
