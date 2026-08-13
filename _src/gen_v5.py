@@ -4229,7 +4229,7 @@ var THEDEF={
  giaoan:{t:"Giáo án & kho bài",the:[
   ["ga_7ng","Buổi sắp dạy chưa có giáo án","Đếm buổi học sắp diễn ra trong khoảng nhìn trước (gaAhead_days) mà chưa gắn giáo án - giáo viên lên lớp không có bài. Danh sách: bấm tab 'Giáo án theo buổi' ở dưới."],
   ["ga_khoa","Khóa chưa có giáo án nào","Đếm khóa học chưa soạn buổi nào - mở lớp là hụt bài ngay. Danh sách: bảng khóa ngay dưới."],
-  ["ga_kho","Bài trong kho","Tổng số bài đang có trong kho học liệu, kèm số bài chưa dùng ở đâu. Danh sách: bấm tab 'Kho bài'."],
+  /* 13/08 - "ga_kho" đã bỏ (trùng tab "Kho bài tập"). */
   ["ga_hw","Buổi chưa gắn bài tập","Đếm buổi đã có giáo án nhưng chưa gắn bài về nhà. Danh sách: bấm tab 'Giáo án theo buổi'."]]},
  ketqua:{t:"Kết quả đầu ra & tỷ lệ đạt AIM",the:[
   ["kq_hv","Học viên đã học xong","Đếm hồ sơ kết thúc khóa ở trạng thái hoàn thành, trong phạm vi bộ lọc đang chọn. Danh sách: bảng chi tiết cuối trang."],
@@ -4263,7 +4263,7 @@ var THEDEF={
   ["tt_no","Tổng còn nợ","Tổng tiền còn phải thu của mọi đăng ký chưa huỷ, toàn hệ thống. Danh sách: bảng công nợ ngay dưới."],
   ["tt_hom","Tiền đến hạn hôm nay","Tổng tiền của các đợt có hạn đóng rơi vào hôm nay hoặc đã trễ - đây là con số kế toán phải nhìn đầu ngày. Danh sách: mở trang Dự thu theo đợt."]]},
  wow:{t:"WOW 1-1",the:[
-  ["ww_today","Buổi WOW hôm nay","Số buổi WOW xếp trong ngày hôm nay và chưa huỷ. Danh sách: bảng buổi WOW dưới, lọc theo ngày."],
+  /* 13/08 - "ww_today" đã bỏ (trùng chip "Buổi hôm nay"). */
   ["ww_gio","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy nhưng coach chưa ghi giờ vào/giờ ra - thiếu mốc thì bảng công tính sai. Danh sách: chip 'Thiếu mốc giờ'."],
   ["ww_cfm","Đã đặt, chờ HV xác nhận","Buổi đã đặt lịch mà học viên chưa xác nhận - gọi chốt giờ. Danh sách: chip trạng thái 'đã đặt'."],
   ["ww_het","HV đã hết lượt WOW","Học viên đã dùng hết quota WOW của khóa - cấp thêm nếu có căn cứ. Danh sách: tab Quota."]]},
@@ -11228,7 +11228,9 @@ function renderGiaoan(){var tab=window.GATAB||"ga";
      return !pl.some(function(g){return String(g.session_id||"")===String(x.session_id)})}).length;
     return ["ti-notes",n,"Buổi sắp dạy chưa có giáo án","#E24B4A",(n?"soạn trước, đừng để tới giờ dạy":"đã soạn đủ")+" · nhìn trước "+slaChip("gaAhead_days",7,"ngày")]})(),
    ["ti-file-alert",noPlan,"Khóa chưa có giáo án nào","#E24B4A",noPlan?"soạn để lớp có bài":"đủ cả"],
-   ["ti-book",bank.length,"Bài trong kho","#0D9488",orphan?(orphan+" bài chưa dùng ở đâu"):"đều đang dùng","window.GATAB='kho';reRender('giaoan')"],
+   /* 13/08 - bỏ ô "Bài trong kho": nó đếm đúng con số của tab "Kho bài tập" ngay dưới, mà tab
+      thì bấm được. Ba ô còn lại giữ - cả ba đều là thứ THIẾU (buổi chưa có giáo án, khóa chưa
+      có giáo án, buổi chưa gắn bài tập), không tab nào lọc ra được. */
    ["ti-clipboard-x",noHw,"Buổi chưa gắn bài tập","#E08A1E","học viên không có bài về nhà","window.GATAB='ga';reRender('giaoan')"]],"giaoan")})();
  h+=tbar(segHTML(tab,[["ga","Giáo án theo khóa",rows("DL21").length],["kho","Kho bài tập",hwBank().length]],"window.GATAB='{k}';reRender('giaoan')"),"");
  if(tab==="kho"){
@@ -16975,9 +16977,7 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=srows("DL14");
  h+=statStrip([
   /* V9.57: o cu la "Da day xong" - so tich luy tron doi, chi tang, khong doi hoi quyet dinh gi.
      Doi sang buoi CUA HOM NAY: do la thu WOW coach phai nhin dau ca. */
-  (function(){var t0=new Date();var n=all.filter(function(w){var d=pvnd(w.wow_session_date);
-    return d&&sameDay(d,t0)&&!isc(w.wow_status,"cancelled")}).length;
-   return ["ti-calendar-star",n,"Buổi WOW hôm nay","#0D9488",n?"chuẩn bị nội dung trước giờ":"hôm nay không có buổi nào"]})(),
+  /* 13/08 - bỏ hẳn ô "Buổi WOW hôm nay": chip "Buổi hôm nay" ngay dưới mang đúng con số ấy. */
   /* V9.57: o cu la "Gio kem da ghi nhan 47h" - so tich luy tron doi, khong ai quyet gi tu no.
      Thu dang gia lai nam o cau phu ben duoi ("3 buoi thieu moc gio"). Dua no len lam so chinh. */
   (function(){var thieu=_done.filter(function(w){return !wowHours(w)}).length;
