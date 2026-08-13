@@ -314,6 +314,55 @@
 > phình 110 → 112** vì hai mã màu pha cho biểu đồ. Đổi sang màu app đã có rồi mà VẪN 112 - hoá ra
 > hai mã ấy còn nằm trong chính câu chú thích vừa viết, mà bộ kiểm quét cả file dựng.
 >
+> ### 🟣 12/08 - BỐN LUẬT BÀI TẬP MỌI NGƯỜI THÔNG BÁO (anh Luân chuyển lại, đã gật cả hai đề xuất)
+>
+> Nguyên văn: *"1. Hạn nộp BTVN mặc định 3 ngày kể từ giờ diễn ra buổi học, không phân biệt GV có
+> giao sớm hay trễ. 2. Giáo viên bắt buộc giao BTVN và điểm danh trong 12 tiếng kể từ giờ diễn ra
+> buổi học. 3. Quá thời hạn nộp BTVN mặc định sẽ được cộng thêm 1 ngày nhưng sẽ đánh dấu là 'Nộp
+> trễ'. 4. Giáo viên có 2 ngày kể từ hạn nộp hoặc hạn nộp trễ để chấm. Quá hạn sẽ đánh dấu là Chấm
+> trễ. Học viên phải đảm bảo 90% khối lượng BTVN và tham gia đầy đủ 2 bài kiểm tra Midterm/Final."*
+>
+> **BA THAM SỐ ĐỔI THẲNG:** `homeworkDueFallback_days` 5→3 · `attendanceGrace_hours` 24→12 ·
+> `HCR` ở CH6 0.8→0.9 (upsert tại nguồn `gen_demo.py`, KHÔNG sửa tay `demo_base.json`).
+> Vế *"không phân biệt GV giao sớm hay trễ"* app đã làm ĐÚNG SẴN: `dueAfter(session_date, ...)`
+> neo vào GIỜ BUỔI HỌC, không neo vào lúc giao.
+>
+> **BỐN KHÁI NIỆM APP CHƯA HỀ CÓ, PHẢI DỰNG:**
+> 1. `homeworkLateGrace_days`=1. Trước bản này một bài chỉ có ĐÚNG MỘT mốc (`homework_due_date`);
+>    ba luật còn lại của anh không có chỗ nào để sống. Nay bốn mốc: hạn nộp → hạn nộp trễ → hạn
+>    chấm. Kiểm chứng trên bài thật: 30/07 → 31/07 → 02/08, đánh đúng "Chấm trễ".
+> 2. **HẠN CHẤM NEO LẠI CHỖ - đây là lỗi thật đã chạy lâu nay.** Bản cũ đếm 48h từ
+>    `homework_submitted_time`, nên **học viên nộp sớm ba ngày là giáo viên bị tính quá hạn sớm
+>    ba ngày** - phạt người chấm vì học viên chăm. Anh Luân nói rõ *"2 ngày kể từ hạn nộp hoặc hạn
+>    nộp trễ"*, nay neo đúng vậy.
+> 3. `homeworkAssign_hours`=12. Vế ĐIỂM DANH app canh từ lâu; vế **GIAO BÀI thì không có luật
+>    nào** - buổi dạy xong không ai giao bài cũng chẳng chỗ nào kêu, học viên ngồi chờ một cái bài
+>    không tới.
+> 4. Chuẩn hoàn thành khóa (90% BTVN + đủ Midterm/Final) qua `hvDuDieuKien()` - MỘT hàm, ba màn
+>    đọc chung: cổng học viên, hồ sơ, và nhóm việc của học vụ khi lớp sắp kết thúc.
+>
+> **HAI CHỖ CHỈNH TAY Ở DỮ LIỆU - ANH LUÂN GẬT CẢ HAI ("đồng ý, gật"):**
+> · Giáo án khóa đang ghi đè hạn nộp bằng 2/3/4/5/6 ngày, nên tham số mặc định **gần như không
+>   bao giờ được dùng**. Đưa hết về 3, GIỮ cơ chế ghi đè, để lại ĐÚNG MỘT ngoại lệ (buổi luyện
+>   viết luận nới 5 ngày, lời dặn ngay bên cạnh nói vì sao).
+> · Nhóm việc "Chưa giao bài tập" đo ra **316/368 buổi**. Kẹp còn 7 ngày trở lại (`homeworkAssignWindow_days`)
+>   → 4 việc. Lý do KHÔNG phải để giấu số: một bảng việc dài vô lý thì người ta bỏ qua CẢ BẢNG, kể
+>   cả những dòng thật. Buổi ba tháng trước không giao bài được nữa - đó là chuyện của báo cáo
+>   chất lượng, không phải việc hôm nay.
+>
+> **MỘT LỖI NGOÀI LỀ, PHỤ THUỘC ĐỒNG HỒ:** dựng lại pipeline lúc **02:41** thì buổi "đang diễn ra"
+> (gieo bằng `NOW - 40 phút`) rơi vào 2 giờ sáng - ngoài giờ mở cửa, `check_logic` luật 7k đỏ.
+> Lỗi nằm đó từ đầu, chỉ chưa ai chạy pipeline vào giờ ấy. Cùng họ với bẫy "đồng hồ vắt qua nửa
+> đêm" hôm 11/08. Đã kẹp vào khung 6h-22h.
+> *Một khối dữ liệu neo vào giờ chạy thì nó đúng hay sai tuỳ lúc người ta bấm, mà không ai đọc mã
+> ra được điều đó.*
+>
+> **VÀ MỘT CHỖ SUÝT LÀM HỎNG TRẢI NGHIỆM:** dải chuẩn hoàn thành khóa lúc đầu báo "bạn còn thiếu
+> điểm Final" cho **76/85 học viên** - phần lớn chỉ vì chưa tới kỳ thi, lớp còn học vài tháng.
+> Dọa người ta bằng một thứ chưa tới lượt thì họ quen bỏ qua dòng cảnh báo, rồi lúc thiếu thật
+> cũng không ai đọc. Nay chỉ liệt kê Midterm/Final khi lớp SẮP KẾT THÚC; còn tỷ lệ bài tập thì nói
+> mỗi ngày - đó là thứ học viên làm được ngay hôm nay. *Chưa tới lượt không phải là thiếu.*
+>
 > ### 🔴 12/08 (cuối ngày) - ANH LUÂN HỎI "TỪNG CHỨC DANH ĐÃ ĐỦ CHƯA, CÓ SAI SÓT GÌ KHÔNG"
 >
 > Đo bằng cách đóng vai **cả 33 nhân viên**, và câu hỏi ấy lôi ra hai lỗi thật:

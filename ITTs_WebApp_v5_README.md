@@ -2435,3 +2435,43 @@ thì vẫn hiện đủ kho (ai biết sẵn tên bài cứ chọn thẳng). Ch�
    muốn chủ động nhắn thì phải chờ học viên mở lời trước.
 4. **Ngay trên từng thẻ khuyến nghị** ở cổng học viên, và tin **mang theo ngữ cảnh của thẻ** (vắng
    buổi nào, thiếu bài nào) chứ không mở một ô trống bắt kể lại từ đầu.
+
+---
+
+# Đợt 12/08/2026 (chiều) — bốn luật bài tập mới
+
+## Hạn nộp bài: 3 ngày kể từ GIỜ DIỄN RA BUỔI HỌC
+Không tính từ lúc giáo viên bấm giao bài — nên **giao sớm hay giao trễ đều cùng một hạn**, học
+viên luôn biết trước ngày phải nộp. Khóa nào cần khác 3 ngày thì khai riêng trong giáo án; ví dụ
+buổi luyện viết luận nới thành 5 ngày, và lời dặn của buổi nói rõ vì sao.
+
+## Giáo viên có 12 tiếng sau buổi học để điểm danh và giao bài
+Cả hai đều tính từ giờ diễn ra buổi học. Quá 12 tiếng thì hiện ở bảng việc của giảng viên.
+Nhóm việc **"Chưa giao bài tập sau buổi học"** là nhóm mới — trước đây buổi dạy xong mà không ai
+giao bài thì không chỗ nào kêu. Nhóm này chỉ giữ buổi trong **7 ngày trở lại**: buổi ba tháng
+trước thì không giao bài được nữa, đó là chuyện của báo cáo chất lượng chứ không phải việc hôm nay.
+
+## Nộp trễ: được thêm 1 ngày, nhưng đánh dấu rõ
+Một bài tập nay có **bốn mốc** thay vì một:
+**hạn nộp** → **hạn nộp trễ** (hạn nộp + 1 ngày) → **hạn chấm**.
+Nộp trong khoảng gia hạn vẫn nhận, ghi **"Nộp trễ"**. Quá nữa là **Không nộp**.
+
+## Hạn chấm: 2 ngày kể từ hạn nộp — hoặc hạn nộp trễ nếu bài nộp trễ
+Trước đợt này app đếm 48 giờ **từ lúc học viên nộp**, nên học viên nộp sớm ba ngày thì giáo viên
+bị tính quá hạn sớm ba ngày — phạt người chấm vì học viên chăm. Nay neo vào **hạn nộp**, đúng như
+quy định. Chấm sau mốc đó thì đánh **"Chấm trễ"**.
+
+## Chuẩn hoàn thành khóa: 90% bài tập + đủ hai bài Midterm và Final
+Hiện ở ba chỗ, cùng một câu chữ:
+- **Cổng học viên** — ngay dưới dải tiến độ. Trong lúc còn học thì chỉ nói tỷ lệ bài tập (thứ làm
+  được ngay hôm nay); hai bài kiểm tra chỉ được liệt kê là "còn thiếu" khi **lớp sắp kết thúc** —
+  chưa tới lượt thi thì không phải là thiếu.
+- **Hồ sơ học viên** — chip đủ / chưa đủ điều kiện.
+- **Bảng việc của học vụ** — nhóm *"Học viên chưa đủ điều kiện hoàn thành khóa"*, chỉ hiện khi lớp
+  còn dưới ngưỡng `classEndNear_days` là kết thúc, để còn kịp nhắc nộp bù và xếp lịch thi.
+
+## Đổi ở đâu
+Tất cả nằm trong **Cài đặt → Ngưỡng SLA** (`homeworkDueFallback_days`, `attendanceGrace_hours`,
+`homeworkAssign_hours`, `homeworkAssignWindow_days`, `homeworkLateGrace_days`,
+`slaHomeworkGrading_hours`) và **Cài đặt → Ngưỡng KPI** (chỉ số `HCR` — nay 90%).
+Không con số nào cắm cứng trong mã.
