@@ -249,8 +249,8 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 41 BỘ KIỂM. Bản dựng đang chạy: `3f6ac9` (12/08), verify TRỌN BỘ xanh hết
-> (41 bộ, 35 phút), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> **Phiên bản: V2 — 41 BỘ KIỂM. Bản dựng đang chạy: `feac3f` (12/08), verify TRỌN BỘ xanh hết
+> (41 bộ, 37 phút), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
 > ### 🟢 12/08 - LÀM TRỌN 26 MỤC FEEDBACK CỦA BỐN TEAM (ACA · SALE · WOW · HỌC VỤ)
@@ -313,6 +313,43 @@
 > Sáu chỗ còn lại là việc thật, đã sửa hết. Một chi tiết phải sửa hai lần mới đúng: **bảng màu
 > phình 110 → 112** vì hai mã màu pha cho biểu đồ. Đổi sang màu app đã có rồi mà VẪN 112 - hoá ra
 > hai mã ấy còn nằm trong chính câu chú thích vừa viết, mà bộ kiểm quét cả file dựng.
+>
+> ### 🔴 12/08 (cuối ngày) - ANH LUÂN HỎI "TỪNG CHỨC DANH ĐÃ ĐỦ CHƯA, CÓ SAI SÓT GÌ KHÔNG"
+>
+> Đo bằng cách đóng vai **cả 33 nhân viên**, và câu hỏi ấy lôi ra hai lỗi thật:
+>
+> **1. Chuông và trang Việc hôm nay nói HAI CON SỐ.** Cả ba chức danh Marketing thấy chuông báo
+> **9 việc** trong khi trang Việc hôm nay đổ ra **59** - lệch 50, và 50 việc thừa ấy đều là việc
+> của Tư vấn (tư vấn sau test, đang tư vấn, chờ chốt lộ trình).
+> Gốc: luật `bellGrp` (khai hẹp hơn một bậc, dựng 05/08 đúng cho ca Marketing này) chỉ được áp
+> trong `bellItems`, còn `workAll` - thứ dựng nên trang Việc hôm nay - thì không.
+> **Đây là bệnh ĐÃ TỪNG ĐƯỢC CHỮA, nhưng chữa ở MỘT bề mặt.** Nó sống được ba tuần vì hai con số
+> nằm ở hai chỗ khác nhau trên màn hình, **không bao giờ đứng cạnh nhau để chọi** - người dùng
+> nhìn cái nào cũng tin cái đó.
+> Không chỉ vá: gộp về **một hàm lọc `viecLoc`**, hai đường gọi, nên hai bề mặt không thể trôi
+> khỏi nhau nữa. `_checkngay` cắm thêm phép đo ĐẶT HAI CON SỐ ẤY CẠNH NHAU cho 17 chức danh, lệch
+> là ĐỎ.
+> *Chữa một bề mặt của một luật là để dành nguyên cái lỗi ở bề mặt còn lại.*
+>
+> **2. 12/33 nhân viên bấm vào mục "Giao việc" của chính mình thấy TRỐNG.** 43 việc chia cho 33
+> người là thừa về SỐ LƯỢNG - cái thiếu là chia đủ NGƯỜI. Hai lớp bảo đảm cũ (theo bộ phận, theo
+> chức danh có cửa đăng nhập) đều đúng phần của nó, nhưng cả hai dừng ở mức "nhóm nào cũng có
+> người có việc" - mà người ngồi làm không mở app bằng nhóm, họ mở bằng tên mình.
+> **Và lượt vá đầu vẫn sót 2 người:** em hỏi "có việc không" thay vì "có việc ĐANG SỐNG không" -
+> hai người ấy có đúng một việc nhưng đã khép, nên mục menu vẫn trắng. *Một cuốn sổ toàn việc đã
+> xong thì với người ngồi làm nó rỗng y như chưa có gì.*
+>
+> **BA CHỖ ĐO ĐƯỢC MÀ CHƯA SỬA - là lựa chọn thiết kế, chờ anh Luân quyết:**
+> · NV WOW thấy việc người khác gấp **5,9 lần** việc mình (41 so với 7); TP ACA gấp 2,3 lần;
+>   Marketing gấp 3,2 lần. Không phải lỗi phân quyền - họ xem đúng phạm vi - nhưng phải lọc bằng
+>   mắt. Đề xuất: bật sẵn nút "chỉ việc của tôi" cho ba nhóm này.
+> · Nhân sự có **0 việc tự sinh** (đúng thiết kế - SOP không giao họ hành động nào với học viên)
+>   nhưng vẫn thấy 22 việc của bộ phận khác trên màn.
+> · Giáo viên có **12 mục menu cho 4 việc**; trang Lịch tuần và Giảng viên mở ra rất mỏng với họ.
+>
+> **KHAI THẲNG PHẦN CHƯA ĐO ĐƯỢC:** mọi con số trên đo CẤU TRÚC (có việc không, có đường đi
+> không, có nói cùng một con số không). Chúng KHÔNG đo được một nhân viên thật ngồi xuống có thấy
+> nhanh tay hay không - cái đó phải cho người dùng thử một buổi rồi hỏi.
 >
 > **MỘT LẦN ĐỊNH GIEO BỪA RỒI GỠ RA:** nhóm việc "Lớp đã học đủ giờ cam kết" hôm nay rỗng (lớp
 > cao nhất mới 76%). Em thử kéo một lớp `finished` về `in_progress` cho thẻ sáng lên - và nó
