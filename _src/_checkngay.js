@@ -143,13 +143,24 @@ function motNgay(A, dsTT) {
     trong.push(k);
   });
 
+  /* ═══ 12/08 - CHUONG VA TRANG VIEC HOM NAY PHAI NOI CUNG MOT CON SO ═══════════════════════
+     Do bang cach dong vai 33 nhan vien: **ca ba chuc danh Marketing thay chuong bao 9 viec ma
+     trang Viec hom nay do ra 59** - lech 50, va 50 viec thua deu la viec cua Tu van. Goc: luat
+     `bellGrp` (khai hep hon mot bac) chi duoc ap trong `bellItems`, con `workAll` - thu dung nen
+     trang Viec hom nay - thi khong.
+     KHONG AI THAY vi hai con so nam o hai cho khac nhau tren man hinh, khong bao gio dung canh
+     nhau de choi. Bo kiem nay dat chung canh nhau. */
+  let lechChuong = 0;
+  try { lechChuong = Math.abs((workAll() || []).length - (bellItems() || []).length); } catch (e) {}
+
   /* có chỉ đường không - hỏi trên MÀN VẼ THẬT, không hỏi mã nguồn */
   let chiDuong = false;
   try { CUR = "ban"; window.BANMO = ""; chiDuong = /Việc của bạn ở/.test(String(renderBan() || "")); }
   catch (e) {}
 
   return {vai: A.vai, hoSo: hoSo, coViec: coViec, cuaToi: cuaToi, cuaNguoiKhac: cuaNguoiKhac,
-          bangViec: bangViec, dap: dap, buoc: buoc, trong: trong, chiDuong: chiDuong};
+          bangViec: bangViec, dap: dap, buoc: buoc, trong: trong, chiDuong: chiDuong,
+          lechChuong: lechChuong};
 }
 
 (function () {
@@ -187,6 +198,11 @@ function motNgay(A, dsTT) {
     if (r.trong.length)
       canh.push(r.vai + ": " + r.trong.length + " muc tren menu cua ho mo ra TRONG - " +
         r.trong.join(", "));
+    /* 6. CHUONG VA TRANG VIEC HOM NAY NOI HAI CON SO - do la LOI, khong phai ghi chu:
+       cung mot nguoi, cung mot cau hoi "toi con bao nhieu viec", hai cho tra loi khac nhau. */
+    if (r.lechChuong)
+      xau.push(r.vai + ": chuong va trang Viec hom nay LECH " + r.lechChuong +
+        " viec - cung mot nguoi ma hai be mat noi hai con so");
   });
 
   /* 7. BÀI HƯỚNG DẪN CÓ ĐANG TẢ ĐÚNG APP KHÔNG.

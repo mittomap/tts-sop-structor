@@ -21396,10 +21396,9 @@ function workSort(L){
   return (num(b.age)||0)-(num(a.age)||0)})}
 /* Toàn bộ việc đang tồn CỦA NGƯỜI ĐANG NGỒI ĐÂY (đã lọc theo chuông của chức danh, như trợ thủ cũ) */
 function workAll(){
- var rs=SCOPE(),L=[];
+ var L=[];
  try{L=slaItems()}catch(e){return []}
- if(Array.isArray(rs.bell))L=L.filter(function(x){return rs.bell.indexOf(x.cat)>=0});
- return workSort(L)}
+ return workSort(viecLoc(L))}
 function workQueue(){var C=tthCfg();var L=workAll();
  return C.batch>0?L.slice(0,C.batch):L}
 /* Dựng một BÀI HƯỚNG DẪN SỐNG từ hàng chờ - mỗi việc một bước. */
@@ -24696,24 +24695,31 @@ function reRenderKeep(k){var el=document.getElementById("content");var sc=el.scr
 function navBody(open){try{document.body.classList.toggle("navon",!!open)}catch(e){}}
 function toggleNav(){var s=document.getElementById("sidebar"),m=document.getElementById("navmask");if(!s)return;var open=s.classList.toggle("open");if(m)m.classList.toggle("on",open);navBody(open)}
 function closeNav(){var s=document.getElementById("sidebar"),m=document.getElementById("navmask");if(s)s.classList.remove("open");if(m)m.classList.remove("on");navBody(false)}
-function bellItems(){var rs=SCOPE();var items=slaItems();
- if(rs.bell!=="*")items=items.filter(function(x){return rs.bell.indexOf(x.cat)>=0});
- /* ═══ V9.99z10 - CẮT THEO NHÓM VIỆC, KHÔNG CHỈ THEO BỘ PHẬN ═════════════════════════════════
-    Chuông cắt theo `cat` (bộ phận) là đủ cho hầu hết chức danh, nhưng KHÔNG đủ cho Marketing:
-    cả phễu tuyển sinh mang chung một `cat` là "Tuyển sinh", nên họ nhận nguyên hàng chờ của Tư
-    vấn. Đo 05/08: NV Marketing mở app thấy **50 việc, trong đó 43 là việc của Tư vấn** - tư vấn
-    sau test, đang tư vấn, chờ chốt lộ trình... CH3 giao cho Marketing đúng hai việc: nhập lead
-    mới và chăm lại khách cũ. Anh Luân: *"người nào đăng nhập thì họ thấy cái thuộc về họ hoặc
-    cái họ phụ trách thôi"*.
-    `bellGrp` là bản khai HẸP HƠN một bậc: chức danh nào khai thì chỉ nhận đúng những nhóm việc
-    ấy (cộng các bộ phận khác trong `bell` - vd nhóm Giao việc vẫn về đủ). */
+/* ═══ MỘT NGUỒN SỰ THẬT CHO "VIỆC CỦA NGƯỜI ĐANG ĐĂNG NHẬP" ═══════════════════════════════════
+   Chuông, trang Việc hôm nay và bảng việc PHẢI nói cùng một con số. Trước bản này chúng không:
+   `bellItems` cắt theo cả `bell` (bộ phận) LẪN `bellGrp` (nhóm việc) LẪN `BANAI` (đang xem việc
+   của ai), còn `workAll` - thứ dựng nên trang Việc hôm nay - chỉ cắt theo `bell`.
+   ĐO ĐƯỢC 12/08, đóng vai cả 33 nhân viên: **cả ba chức danh Marketing thấy chuông báo 9 việc
+   trong khi trang Việc hôm nay đổ ra 59** - lệch 50, và 50 việc thừa ấy đều là việc của Tư vấn
+   (tư vấn sau test, đang tư vấn, chờ chốt lộ trình). Đúng con bệnh đã chữa hôm 05/08 cho cái
+   chuông, nhưng chữa ở MỘT bề mặt nên bề mặt kia vẫn hỏng nguyên - và không ai thấy, vì hai con
+   số nằm ở hai chỗ khác nhau trên màn hình, không bao giờ đứng cạnh nhau để chọi.
+   `bellGrp` là bản khai HẸP HƠN một bậc: chức danh nào khai thì chỉ nhận đúng những nhóm việc ấy
+   (cộng các bộ phận khác trong `bell` - vd nhóm Giao việc vẫn về đủ). CH3 giao Marketing đúng
+   hai việc: nhập lead mới và chăm lại khách cũ. Anh Luân: *"người nào đăng nhập thì họ thấy cái
+   thuộc về họ hoặc cái họ phụ trách thôi"*.
+   Nay MỘT hàm lọc, hai đường gọi - hai bề mặt không thể trôi khỏi nhau nữa. */
+function viecLoc(items){
+ var rs=SCOPE();
+ if(Array.isArray(rs.bell))items=items.filter(function(x){return rs.bell.indexOf(x.cat)>=0});
  if(rs.bellGrp&&rs.bellGrp.length)items=items.filter(function(x){
   return rs.bellGrp.indexOf(x.grp)>=0||rs.bell==="*"||(x.cat!=="Tuyển sinh")});
- /* Đang lọc theo một người (quản lý bấm "Xem việc của") thì mọi bề mặt việc cùng lọc theo -
-    chuông, Việc hôm nay và bảng việc phải nói cùng một con số. */
+ /* Đang lọc theo một người (quản lý bấm "Xem việc của") thì mọi bề mặt việc cùng lọc theo. */
  var ai=window.BANAI||"";
  if(ai)items=items.filter(function(x){return bvCuaAi(x,ai)});
  return items}
+function bellItems(){var items=[];try{items=slaItems()}catch(e){return []}
+ return viecLoc(items)}
 function updateBellBadge(){var b=document.getElementById("bellN");if(!b)return;
  var rs=SCOPE();var btn=b.parentNode;
  if(Array.isArray(rs.bell)&&!rs.bell.length){b.style.display="none";if(btn&&btn.style)btn.style.display="none";return}

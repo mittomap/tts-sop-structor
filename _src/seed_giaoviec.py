@@ -358,6 +358,46 @@ def main():
         add(bs, who, random.choice(pool), "assign", "new", True, 22, -3,
             related=pick_related())
 
+    # ---- 3bis-d. MỌI NHÂN VIÊN ĐANG LÀM ĐỀU PHẢI CÓ ÍT NHẤT MỘT VIỆC (12/08) ----
+    # Đo được 12/08 bằng cách đóng vai CẢ 33 nhân viên (`_checknguoi`): **12 người mở mục
+    # "Giao việc" trên menu của chính mình ra thấy TRỐNG** - 5 giáo viên, 2 sale leader, 2 NV tư
+    # vấn, 1 NV WOW, 1 trưởng phòng marketing, 1 marketing leader.
+    # Hai lớp bảo đảm ở trên (3bis-b theo BỘ PHẬN, 3bis-c theo CHỨC DANH CÓ CỬA ĐĂNG NHẬP) đều
+    # đúng phần của nó, nhưng cả hai đều dừng ở mức "nhóm nào cũng có người có việc" - mà người
+    # ngồi làm việc không mở app bằng nhóm, họ mở bằng tên mình. Một bộ phận đủ việc vẫn để lọt
+    # từng cá nhân trắng tay, và mỗi người như vậy là một mục menu bấm vào thấy rỗng.
+    # 43 việc trên 33 người là quá đủ về SỐ LƯỢNG - cái thiếu là chia cho ĐỦ NGƯỜI, không phải
+    # thêm việc. Nên khối này chỉ bù đúng phần còn thiếu.
+    # HỎI "CÓ VIỆC ĐANG SỐNG KHÔNG", KHÔNG HỎI "CÓ VIỆC KHÔNG". Lượt đầu em hỏi câu thứ hai và
+    # còn sót hai người: cả hai ĐỀU có đúng một việc, nhưng việc ấy đã khép (confirmed/done), nên
+    # mục "Giao việc" của họ vẫn mở ra trắng. Một cuốn sổ toàn việc đã xong thì với người ngồi
+    # làm việc nó rỗng y như chưa có gì.
+    _SONG = ("new", "accepted")
+    _daCo = {r["assignee_id"] for r in rows
+             if r["task_status"].split("(")[0].strip() in _SONG}
+    _bu = 0
+    for x in sorted(staff, key=lambda z: z["staff_id"]):
+        if x["staff_id"] in _daCo or x["staff_id"] == "ADMIN":
+            continue
+        bs = boss_of(x)
+        if not bs or bs["staff_id"] == x["staff_id"]:
+            bs = next((z for z in staff if lvl(z.get("role")) >= 2
+                       and z["staff_id"] != x["staff_id"]), None)
+        if not bs:
+            continue
+        pool = [y for y in SCEN if y[2] == x.get("department")] or SCEN
+        # CHỈ TRẠNG THÁI CÒN SỐNG. Lượt đầu em rải cả "done" cho đỡ đơn điệu - và bốn người rơi
+        # đúng vào đó vẫn thấy mục "Giao việc" TRỐNG, vì việc duy nhất của họ đã khép lại nên tab
+        # mặc định (việc đang chạy) không có dòng nào. Việc đã xong không cứu được một mục menu
+        # rỗng; mục đích của khối này là để không ai bấm vào thấy trắng.
+        _tt = ["accepted", "new"][_bu % 2]
+        add(bs, x, pool[_bu % len(pool)], "assign", _tt, (_bu % 3 != 2), 26 + _bu, -6 - _bu,
+            related=pick_related())
+        _daCo.add(x["staff_id"])
+        _bu += 1
+    if _bu:
+        print("  3bis-d: bu %d viec cho %d nhan vien chua duoc giao viec nao" % (_bu, _bu))
+
     # ---- 3b. QUYỀN TẠM THEO VIỆC (câu hỏi của Luân 28/07) ----
     # Việc dính hồ sơ học viên thì người nhận PHẢI được mở quyền, nhưng quyền là thứ đi mượn:
     # có MỨC rõ (chỉ xem / xem và sửa), có HẠN rõ (mặc định = hạn việc + số ngày ân hạn),
