@@ -22,6 +22,7 @@
  *  L2  Dau trang (`.phead`) - toi da MOT
  *  L3  Hai khoi `.tbar` giong het nhau tung ky tu
  *  L4  Hai `.notebar` cung mot cau chu
+ *  L5  Mot the thong ke va mot chip loc mang cung mot nhan (ke ca ban viet tat + cung con so)
  *
  * Chay: ITTS_OUT=<out> node _checklap.js
  */
@@ -66,8 +67,45 @@ const PATHS=["/opt/pw-browsers/chromium-1194/chrome-linux/chrome","/opt/pw-brows
     const d={},lap=[]; tbs.forEach(x=>{d[x]=(d[x]||0)+1; if(d[x]===2)lap.push(x.slice(0,50))});
     const nbs=[...c.querySelectorAll(".notebar")].map(e=>(e.textContent||"").trim()).filter(Boolean);
     const d2={}; let lap2=0; nbs.forEach(x=>{d2[x]=(d2[x]||0)+1; if(d2[x]===2)lap2++});
+    /* L5 - DAI THE VA DAI CHIP KHONG DUOC NOI CUNG MOT THU (anh Luan 13/08, kem anh man Xep
+       lop: *"the va chip loc co ve de bi trung nhau dung ko? neu trung thi bo the"*).
+       So sanh NHAN da chuan hoa. Bat ca hai kieu trung:
+        · trung y het  ("Dang lam viec 33" tren "Dang lam viec 33")
+        · chip la BAN VIET TAT cua the VA cung mot con so (chip "Qua han ghi" vs the "Qua han
+          ghi nhan xet") - ten ngan hon thi van la mot cau hoi.
+       Chip mang so VA bam loc duoc, the chi mang so; nen cai phai di la the. */
+    const chuan=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")
+      .replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+    /* MIEN DAI BANG VIEC THEO CHUC DANH (`bangviec`/`bangduyet`). Do khong phai mot dai o
+       thong ke trang tri: no la BANG BC9 CUA SOP, 38 hang cho khai san trong `BVMA`, va LUAT
+       CUNG SO 0 cam bot bat cu thu gi SOP da mo ta. Tren `banlam` dung mot o trong 9 o trung
+       ten voi mot chip ("Lead moi") - bo o do la bot mot hang cho cua SOP de doi lay mot cho
+       do trong bo kiem. Chip thi khong bo duoc (no la bo loc that). Nen mien, va khai ly do. */
+    const _the=[...c.querySelectorAll(".bstat")].filter(e=>{
+      const w=e.closest("[data-thekey]"); const k=w?w.getAttribute("data-thekey"):"";
+      return k!=="bangviec"&&k!=="bangduyet"}).map(e=>({
+      so:((e.querySelector(".bsn")||{}).textContent||"").trim(),
+      nhan:chuan(((e.querySelector(".bsl")||{}).textContent||"").split("·")[0])}));
+    const _chip=[...c.querySelectorAll(".chipbar .chip, .segb, .chipb")].map(e=>{
+      const s=(e.textContent||"").trim(),m=s.match(/^(.*?)(\d+)$/);
+      return m?{nhan:chuan(m[1]),so:m[2]}:{nhan:chuan(s),so:""}});
+    let lapThe=0,viDu="";
+    _the.forEach(t2=>{ if(!t2.nhan)return;
+     _chip.forEach(c2=>{ if(!c2.nhan)return;
+      const het=t2.nhan===c2.nhan;
+      /* "Viet tat" = phan THUA khong qua 2 chu ("qua han ghi" -> "qua han ghi nhan xet",
+         "cho tu van" -> "cho tu van sau test"). Tha rong hon la bat oan: the "Qua han nhieu
+         nhat: Tuyen sinh" thua 4 chu so voi chip "Qua han" - do la MOT CAU HOI KHAC (xep hang
+         mang viec), chi tinh co cung con so khi ca doi quan viec qua han nam trong mot mang. */
+      const dai=t2.nhan.length>=c2.nhan.length?t2.nhan:c2.nhan;
+      const ngan=t2.nhan.length>=c2.nhan.length?c2.nhan:t2.nhan;
+      const thua=dai.slice(ngan.length).trim();
+      const tat=!het&&dai.indexOf(ngan)===0&&!!t2.so&&t2.so===c2.so&&
+                thua.split(" ").filter(Boolean).length<=2;
+      if(het||tat){lapThe++; if(!viDu)viDu='the "'+t2.nhan+'" = chip "'+c2.nhan+'"'} })});
     ra.push({pk, banai:c.querySelectorAll(".tbar.banai").length,
-             phead:c.querySelectorAll(".phead").length, lapTbar:lap.length, lapNote:lap2});
+             phead:c.querySelectorAll(".phead").length, lapTbar:lap.length, lapNote:lap2,
+             lapThe:lapThe, viDu:viDu});
    }
    return ra;
   },p.sid);
@@ -78,6 +116,7 @@ const PATHS=["/opt/pw-browsers/chromium-1194/chrome-linux/chrome","/opt/pw-brows
    t('co '+r.phead+' dau trang (toi da 1)', r.phead<=1);
    t(r.lapTbar+' khoi thanh cong cu lap y het', r.lapTbar===0);
    t(r.lapNote+' notebar lap cau', r.lapNote===0);
+   t(r.lapThe+' the noi trung voi chip loc ('+(r.viDu||"")+')', r.lapThe===0);
   });
  }
  await b.close();

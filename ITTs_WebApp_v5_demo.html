@@ -2455,7 +2455,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">13/08/2026 · <b>4ae3c0</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">13/08/2026 · <b>402cd3</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -3977,12 +3977,11 @@ hocvien:{code:"DL09",filt:"student_status",ro:1,sub:"Học viên (DL09) - lọc 
     `_checkkhuon` vẫn báo xanh vì phạm vi của nó là hình dạng V1 (chỉ soi 23 trang theo chặng);
     `_checkv2` hỏi đúng tập trang thì lộ ra ngay. Ba thẻ dưới đây đọc CÙNG hàm với ba chip lọc
     ngay dưới (`stuRisk`, `stuAca`, ngưỡng vắng của CH2), nên thẻ và chip không thể lệch nhau. */
- the:function(all){
-  var nv=num(paramOf("thresholdAtRisk_absences",2));
-  return [["ti-alert-triangle",all.filter(stuRisk).length,"Nguy cơ bỏ học","#E24B4A","dấu hiệu có trước cả tuần"],
-   ["ti-chart-line",all.filter(stuAca).length,"Nguy cơ học thuật","#E08A1E","điểm tụt - đặt buổi WOW kèm"],
-   ["ti-calendar-x",all.filter(function(s){var A=riskAuto(s.student_id)||{};return num(A.abs)>=nv}).length,
-    "Vắng từ "+nv+" buổi","#7C3AED","gọi hỏi trước khi thành bỏ học"]]},
+ /* V2 13/08 - BỎ HẲN BA THẺ. Đoạn trên kể chuyện ba chip sinh ra để dẫn tới đúng con số của ba
+    thẻ; làm xong thì hai dải nói y hệt nhau, đo thật trên mọi chức danh đều 7/7 · 2/2 · 7/7.
+    Chip mang số VÀ lọc được, thẻ chỉ mang số - anh Luân 13/08: *"nếu trùng thì bỏ thẻ"*.
+    Chú ý: `nv` (ngưỡng vắng qua CH2) không mất - nhãn chip "Vắng nhiều" vẫn đọc chính tham số
+    ấy ở `qf` ngay dưới. */
  /* V2 - CHIP LỌC PHẢI KHỚP VỚI CON SỐ TRÊN MÀN. Anh Luân đưa ca thật: *"Học vụ muốn có danh sách
     các học viên nghỉ học nhiều, và xếp theo lớp chẳng hạn, họ đủ thông tin ko, có đủ nghiệp vụ
     ko?"* Đo thật: dữ liệu CÓ (44 học viên vắng từ 2 buổi, 29 vắng từ 3, nhiều nhất 13 buổi), cột
@@ -4004,10 +4003,11 @@ hocvien:{code:"DL09",filt:"student_status",ro:1,sub:"Học viên (DL09) - lọc 
  cols:[["student_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["student_status","Trạng thái","chip"],["attendance_progress_status","Chuyên cần","chip"],["academic_progress_status","Học thuật","chip"],["attendance_risk_reason","Lý do CC","enum"],["academic_risk_reason","Lý do HT","enum"],["__vang","Vắng (buổi)","calcso"],["__thieubai","Thiếu bài","calcso"],["last_learning_activity_time","Hoạt động cuối","lau"],["wow_quota_remaining","WOW còn"]]},
 lop:{code:"DL10",
  /* Đọc thẳng trạng thái lớp - cùng thứ chip lọc ngay dưới đang lọc. */
+ /* V2 13/08 - thẻ thứ ba "Đã kết thúc" đã bỏ: chip lọc ngay dưới mang đúng cái tên ấy và đúng
+    con số ấy. Hai thẻ còn lại gộp nhiều trạng thái nên chip không nói thay được. */
  the:function(all){
   return [["ti-player-play",all.filter(function(c){return isc(c.class_status,"in_progress")}).length,"Lớp đang học","#2E9E6B",""],
-   ["ti-hourglass",all.filter(function(c){return isc(c.class_status,"open","planned")}).length,"Đang tuyển / chờ mở","#E08A1E",""],
-   ["ti-flag-check",all.filter(function(c){return isc(c.class_status,"finished")}).length,"Đã kết thúc","#6B7887",""]]},
+   ["ti-hourglass",all.filter(function(c){return isc(c.class_status,"open","planned")}).length,"Đang tuyển / chờ mở","#E08A1E",""]]},
  nut:'<button class="btn primary sm" onclick="go(\'xeplop\')"><i class="ti ti-layout-grid-add"></i>Xếp lớp & Onboarding</button>',filt:"class_status",ro:1,sub:"Lớp học (DL10) - bấm nút Vận hành lớp trên một dòng để vào buổi học, điểm danh, nhận xét và bài tập của lớp đó",
  /* V2 RB3 - CỬA VÀO TRANG CON NẰM TRONG NGĂN KÉO, KHÔNG NẰM TRÊN DÒNG.
     Bản đầu của Khúc 3 đặt một nút "Vận hành lớp" thẳng lên từng dòng - và `_check18` mục 26 bắt
@@ -4060,11 +4060,11 @@ nhaplead:{code:"DL02",filt:"lead_status",
      ["khongai","Chưa ai phụ trách",function(l){return !String(l.assigned_to||"").trim()&&!isc(l.lead_status,"converted","rejected")}],
      ["dem","Về trong 24h qua",function(l){var t=hoursSince(l.lead_created_time);return t!=null&&t<=24}],
      ["xau","Không đạt chuẩn",function(l){return /not_qualified|unqualified/.test(ecode(l.lead_qualification_status))}]],
- /* Ba con số này đọc thẳng trạng thái lead và mốc hẹn - đúng thứ thanh lọc ngay dưới đang lọc. */
- the:function(all){var hn=new Date();
-  return [["ti-user-plus",all.filter(function(l){return isc(l.lead_status,"new")}).length,"Lead mới chưa chạm","#E24B4A","gọi trong hạn SLA"],
-   ["ti-phone-call",all.filter(function(l){var d=pvnd(l.next_followup_time);return d&&d<=hn&&!isc(l.lead_status,"converted","rejected")}).length,"Tới hẹn liên hệ","#E08A1E","gọi hôm nay"],
-   ["ti-user-off",all.filter(function(l){return !String(l.assigned_to||"").trim()&&!isc(l.lead_status,"converted","rejected")}).length,"Chưa ai phụ trách","#6B7887","giao người"]]},
+ /* V2 13/08 - BỎ HẲN BA THẺ. Đoạn trên kể chuyện ba chip sinh ra để KHỚP với ba thẻ; nay khớp
+    xong thì hai dải nói y hệt nhau, thẻ chỉ là bản chép không bấm được của chip.
+    Và một trong ba chỗ còn nói SAI LỆCH: thẻ "Tới hẹn liên hệ" đếm mốc hẹn <= GIỜ NÀY (20),
+    chip cùng tên đếm <= HẾT HÔM NAY (24) - hai con số dưới một cái tên, ngay cạnh nhau. Câu hỏi
+    của người bán hàng là "hôm nay phải gọi ai", nên chip đúng; thẻ đi. */
  nut:'<button class="btn primary sm" onclick="leadInbound()"><i class="ti ti-message-plus"></i>Khách mới liên hệ đến</button>',sub:"Khách tiềm năng (DL02) - lọc theo trạng thái, nguồn, nhân viên phụ trách",act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"lead_id"},{lb:"Ghi liên hệ",ic:"ti-phone",fn:"openLienhe",arg:"lead_id"}],
  cols:[["lead_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["lead_created_time","Vào hệ thống"],["lead_status","Trạng thái","chip"],["contact_count","Lượt LH"],["next_followup_time","Hẹn liên hệ"],["assigned_to_name","NV phụ trách"],["next_action","Việc cần làm","na"]],
  form:[["full_name","Họ tên",0,1],["phone_number","SĐT",0,1],["zalo_id","Zalo (SĐT/nick)",0],["lead_source","Nguồn","enum_lead_source",1],["student_type","Đối tượng","enum_student_type"],["learning_goal","Mục tiêu học","enum_learning_goal_type"],["target_band","Điểm mục tiêu"],["learning_mode","Hình thức","enum_learning_mode"],["expected_start_time","Dự kiến bắt đầu"],["availability_schedule","Lịch rảnh"],["lead_qualification_status","Mức đủ ĐK","enum_lead_qualification_status"],["branch","Cơ sở","enum_branch"],["lead_note","Ghi chú trao đổi","ta"]],idp:"L-2026-"},
@@ -4263,19 +4263,13 @@ var THEDEF={
   ["lw_nv","NV WOW có đăng ký ca","Số người của team WOW có ít nhất một ca trong tháng này. Danh sách: bảng Tổng giờ trực ở cuối trang."],
   ["lw_trong","Ngày không ai trực","Số ngày trong tháng không một ai đăng ký ca nào - học viên mở app ra là không đặt được buổi WOW. Danh sách: cột nào toàn dấu chấm trong lưới ngay dưới."]]},
   /* ═══ V2 KHÚC 2b đợt 3 ═══════════════════════════════════════════════════════════════════ */
- nhaplead:{t:"Lead & khai thác",the:[
-  ["nl_moi","Lead mới chưa chạm","Khách vừa vào hệ thống, chưa ai gọi hay nhắn lần nào - phản hồi trong hạn SLA là việc gấp nhất. Danh sách: bấm chip \"Mới\" ở thanh lọc ngay dưới."],
-  ["nl_hen","Tới hẹn liên hệ","Khách có mốc hẹn liên hệ đã tới hoặc đã qua, và chưa chốt cũng chưa từ chối. Danh sách: cột Hẹn liên hệ ở bảng dưới, xếp theo mốc gần nhất."],
-  ["nl_khong","Chưa ai phụ trách","Lead chưa gán nhân viên nào - không ai nhận thì không ai gọi. Danh sách: cột NV phụ trách để trống ở bảng dưới."]]},
+ /* V2 13/08 - `nhaplead` từng khai ba thẻ; cả ba trùng nguyên ba chip lọc nên đã bỏ. */
  /* V2 08/08 - BỐN DẢI THẺ MỚI. Chúng sinh ra khi `_checkkhuon` đổi phạm vi sang tập trang V2
     (23 -> 33) và lộ ra bốn trang nghiệp vụ thật chưa có một con số nào ở đầu. Mỗi ô phải khai ở
     đây kèm câu giải thích + CHỈ RÕ tìm danh sách của con số đó ở đâu - `_checkux` canh: số ô vẽ
     ra phải khớp số ô khai, và mỗi ô phải nói được nó dẫn tới đâu. Một con số không dẫn tới đâu
     là đúng con bệnh anh Luân bắt hai lần: *"báo 2 học viên nguy cơ mà a chẳng thấy đâu"*. */
- hocvien:{t:"Học viên",the:[
-  ["hv_nguyco","Nguy cơ bỏ học","Học viên có cờ nguy cơ chuyên cần hoặc học thuật - dấu hiệu luôn có trước cả tuần. Danh sách: bấm chip \"Nguy cơ\" ở thanh lọc ngay dưới."],
-  ["hv_hocthuat","Nguy cơ học thuật","Điểm đang tụt so với lộ trình - đặt buổi WOW kèm trước khi thành bỏ học. Danh sách: bấm chip \"Nguy cơ học thuật\"."],
-  ["hv_vang","Vắng nhiều buổi","Số buổi vắng đã chạm ngưỡng cấu hình ở CH2. Danh sách: bấm chip \"Vắng từ N buổi\", hoặc xếp cột \"Vắng (buổi)\"."]]},
+ /* V2 13/08 - `hocvien` từng khai ba thẻ; cả ba trùng nguyên ba chip lọc nên đã bỏ. */
  giangvien:{t:"Giảng viên & NV WOW",the:[
   ["gv_homnay","Giảng viên có lớp hôm nay","Đếm người có ít nhất một buổi dạy trong ngày. Danh sách: trang Buổi hôm nay bày đủ từng buổi kèm giảng viên."],
   ["gv_moc","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy xong mà thiếu mốc giờ - thiếu là tính công sai. Danh sách: tab Bảng công giảng dạy ngay trên trang này."],
@@ -4289,37 +4283,28 @@ var THEDEF={
   ["bt_xong","Đã chấm xong","Số bài đã có điểm. Danh sách: sổ Bài tập trong trang Tra cứu, cột Điểm và Ngày chấm."]]},
  bangcong:{t:"Bảng công giảng dạy",the:[
   ["bc_nguoi","Giảng viên có buổi thiếu mốc","Đếm NGƯỜI đang vướng, không đếm buổi - vì việc phải làm là gọi từng người bổ sung mốc giờ. Danh sách: bấm chip \"Buổi thiếu mốc giờ\" ở thanh ngay dưới."],
-  ["bc_buoi","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy xong mà thiếu mốc vào hoặc mốc ra - thiếu là tính công sai. Danh sách: cùng chip \"Buổi thiếu mốc giờ\"."],
+  /* V2 13/08 - thẻ "bc_buoi" đã bỏ (trùng chip "Buổi thiếu mốc giờ"). */
   ["bc_du","Buổi đủ mốc, tính công được","Số buổi đã đủ hai mốc, chốt công được ngay. Danh sách: bảng ngay dưới, cột Giờ dạy."]]},
- nhansu:{t:"Nhân sự",the:[
-  ["ns_dang","Đang làm việc","Người còn đang làm tại trung tâm. Danh sách: bấm chip \"Đang làm việc\" ở bảng ngay dưới."],
-  ["ns_thieu","Hồ sơ còn thiếu","Chưa có chức danh, hoặc vai cần cơ sở mà chưa gắn cơ sở. Danh sách: bấm chip \"Hồ sơ còn thiếu\"."],
-  ["ns_nghi","Đã nghỉ việc","Giữ lại để tra lịch sử. Danh sách: bấm chip \"Đã nghỉ việc\"."]]},
+ /* V2 13/08 - `nhansu` từng khai ba thẻ ở đây; cả ba lặp y nguyên ba chip lọc của bảng nhân
+    viên nên đã bỏ (xem chú thích ở `renderNhansu`). Không khai lại. */
  lop:{t:"Lớp học",the:[
   ["lop_chay","Lớp đang học","Lớp đang chạy buổi. Danh sách: bấm chip \"Đang học\" ở thanh lọc ngay dưới."],
   ["lop_mo","Đang tuyển / chờ mở","Lớp đã lên kế hoạch hoặc đang tuyển thêm học viên. Danh sách: bấm chip tương ứng ở thanh lọc."],
-  ["lop_xong","Đã kết thúc","Lớp đã dạy xong - mở ra để tra cứu lại buổi, điểm danh và kết quả. Danh sách: bấm chip \"Đã kết thúc\"."]]},
- buoihoc:{t:"Theo dõi nhận xét buổi",the:[
-  ["bh_cho","Chờ ghi nhận xét","Buổi đã dạy xong mà giảng viên chưa ghi nhận xét, vẫn còn trong hạn. Danh sách: bấm chip \"Chờ ghi nhận xét\" ở thanh lọc ngay dưới."],
-  ["bh_qua","Quá hạn ghi nhận xét","Buổi dạy xong đã quá ngưỡng giờ ghi nhận xét (chỉnh ở Cài đặt, slaTeacherNote_hours) - đây là việc học vụ phải đốc thúc. Danh sách: bấm chip \"Quá hạn ghi\"."],
-  ["bh_tre","Giảng viên vào trễ","Buổi có ghi nhận số phút giảng viên vào muộn. Danh sách: bấm chip \"GV vào trễ\"."]]},
- test:{t:"Test đầu vào",the:[
-  ["te_lich","Chờ đặt lịch","Khách đã nhận phiếu test mà chưa có lịch thi - đặt sớm thì tỷ lệ dự test cao hơn. Danh sách: bấm chip \"Chờ đặt lịch\" ở thanh lọc ngay dưới."],
-  ["te_cham","Chờ chấm","Khách đã dự test mà chưa ai chấm - chấm chậm là khách nguội. Danh sách: bấm chip \"Chờ chấm\"."],
-  ["te_tuvan","Chờ tư vấn sau test","Đã có điểm mà chưa tư vấn lộ trình - đây là bước chốt. Danh sách: bấm chip \"Chờ tư vấn\"."]]},
+  /* V2 13/08 - thẻ "lop_xong" đã bỏ (trùng nguyên chip "Đã kết thúc"). */]},
+ /* V2 13/08 - `buoihoc` từng khai ba thẻ; cả ba trùng nghĩa lẫn số với ba chip lọc nên đã bỏ. */
+ /* V2 13/08 - `test` từng khai ba thẻ; cả ba trùng ba chip lọc nên đã bỏ. */
 /* ═══ V2 KHÚC 2b đợt 2 - BA TRANG NỮA CÓ DẢI THẺ RIÊNG ═════════════════════════════════════
     Cùng luật RB2 như đợt 1: con số lấy từ ĐÚNG phép đếm mà thân trang bên dưới đang dùng (chính
     là các con số đang hiện trên chip lọc), không viết lại lần thứ hai. */
+ /* V2 13/08 - hai thẻ "kn_moi"/"kn_dang" đã bỏ (trùng hai chip lọc cùng tên cùng số). */
  khieunai:{t:"Xử lý khiếu nại",the:[
-  ["kn_moi","Mới tiếp nhận","Khiếu nại vừa nhận, chưa cử người xử lý. Danh sách: bấm chip \"Mới\" ở thanh lọc ngay dưới."],
-  ["kn_dang","Đang xử lý","Đã có người nhận và đang làm - gồm cả phiếu đã đẩy lên cấp trên. Danh sách: bấm chip \"Đang xử lý\"."],
   ["kn_tong","Tổng phiếu chưa đóng","Mọi khiếu nại chưa đóng trong phạm vi dữ liệu của bạn. Danh sách: bấm chip \"Tất cả\"."]]},
  baoluu:{t:"Bảo lưu / Bỏ học",the:[
   ["bl_hold","Đang bảo lưu","Học viên đã dừng có thời hạn - còn quay lại được, và đó là việc phải giữ liên lạc. Danh sách: bấm chip \"Đang bảo lưu\"."],
   ["bl_drop","Đã bỏ học","Học viên đã dừng hẳn. Danh sách: bấm chip \"Đã bỏ học\"."],
   ["bl_nohen","Chưa hẹn liên hệ lại","Người đã dừng mà chưa ai đặt lịch gọi lại - để lâu là mất hẳn. Danh sách: bấm chip \"Chưa hẹn liên hệ lại\"."]]},
+ /* V2 13/08 - thẻ "yc_moi" đã bỏ (trùng chip "Chưa ai nhận"). */
  ychv:{t:"Học viên liên hệ",the:[
-  ["yc_moi","Chưa ai nhận","Yêu cầu và câu hỏi học viên gửi từ Cổng học viên mà chưa ai nhận xử lý. Danh sách: các dòng có chip \"Mới\" nằm trên đầu bảng dưới."],
   ["yc_tong","Tổng yêu cầu đang mở","Mọi yêu cầu chưa đóng trong phạm vi của bạn. Danh sách: toàn bộ bảng ngay dưới."]]},
 /* ═══ V2 KHÚC 2b - BỐN HÀNG CHỜ PHÊ DUYỆT CÓ DẢI THẺ RIÊNG ════════════════════════════════
     Anh Luân tả V2: *"mỗi trang là nghiệp vụ riêng, và nó có THẺ, có chip lọc, có cảnh báo của
@@ -4366,12 +4351,12 @@ var THEDEF={
   ["ph_no","Còn nợ học phí","Cộng phần còn lại của MỌI đơn của MỌI con người ấy. Một người có hai con, mỗi con nợ một ít, thì đây là con số họ thật sự phải trả. Muốn xem: chip vàng ở cuối mỗi dòng."],
   ["ph_rui","Có con đang cảnh báo","Người có ít nhất một con đang ở mức đỏ về chuyên cần hoặc học thuật - cần chủ động liên hệ sớm. Muốn xem: chip đỏ ở cuối dòng ghi mấy con."]]},
  ban:{t:"Bàn làm việc",the:[
-  ["ban_co","Còn việc của bộ phận","Số hồ sơ trong phạm vi của bạn mà chức danh của bạn còn việc phải làm với họ. Quản lý đang xem thay một người thì đây là số của CHÍNH NGƯỜI ẤY. Danh sách: chính bảng ngay dưới dải này."],
+  /* V2 13/08 - thẻ "ban_co" đã bỏ: con số ấy đã nằm sẵn trên nút chọn thực thể và trên tiêu đề
+     bảng ngay dưới - ba lần một con số trên một màn. */
   ["ban_gap","Có việc gấp","Trong số hồ sơ còn việc, đếm riêng những hồ sơ có ít nhất một việc mức ĐỎ - làm trước. Danh sách: bảng dưới xếp hồ sơ có việc gấp lên đầu."],
   ["ban_sach","Đang sạch việc","Hồ sơ trong phạm vi của bạn, không còn việc nào chờ xử lý. Danh sách: bảng dưới chỉ liệt kê hồ sơ còn việc, nên phần còn lại chính là nhóm này."]]},
+ /* V2 13/08 - hai thẻ "vc_red"/"vc_amber" đã bỏ (trùng nguyên hai chip ở thanh Mức độ). */
  viec:{t:"Việc hôm nay",the:[
-  ["vc_red","Quá hạn","Đếm những việc đã QUÁ hạn SLA - mỗi loại việc một luật hạn riêng, tất cả đặt ở Cài đặt nhóm Ngưỡng &amp; SLA. Danh sách: bấm chip 'Quá hạn' ở thanh Mức độ ngay dưới."],
-  ["vc_amber","Sắp tới hạn","Đếm những việc CHƯA quá hạn nhưng sắp tới nơi - còn kịp làm hôm nay. Danh sách: bấm chip 'Sắp tới hạn' ở thanh Mức độ ngay dưới."],
   ["vc_old","Nợ quá N ngày","Trong số việc quá hạn, đếm riêng những việc đã để mốc quá số ngày khai ở Ngưỡng & SLA (viecOldAlert_days). Nợ càng lâu càng khó cứu. Danh sách: bấm chip 'Quá hạn' ở thanh Mức độ rồi nhìn phần ghi số ngày trễ của từng dòng."],
   ["vc_team","Quá hạn nhiều nhất","Bộ phận đang ôm nhiều việc QUÁ HẠN nhất (xếp theo quá hạn chứ không theo tổng việc) - hôm nay nên dồn người sang đó. Danh sách: chọn đúng bộ phận đó ở thanh Bộ phận ngay dưới."]]},
  /* `neo` khác "bstats": dải này nằm CÙNG TRANG với dải thẻ của trang (Trang bắt đầu có cả hai).
@@ -4468,10 +4453,7 @@ var THEDEF={
  xeplop:{t:"Xếp lớp & onboarding",the:[
   ["xl_cho","Đã thu · chờ xếp lớp","Học viên đã đóng tiền nhưng chưa được xếp vào lớp nào - đây là bước đầu tiên phải làm. Danh sách: bảng ngay dưới dải thẻ."],
   ["xl_ob","Onboarding chưa xong","Số hồ sơ onboarding chưa đủ bước, hạn theo slaOBT_hours. Danh sách: bấm chip 'Chưa hoàn tất' ở thanh lọc dưới."]]},
- reup:{t:"Chăm lại khách cũ",the:[
-  ["ru_nc","Chưa gặp được","Lead đã gọi nhưng không liên lạc được - nên đổi kênh Zalo/SMS. Danh sách: bấm chip 'Chưa gặp được' ở thanh lọc dưới."],
-  ["ru_lost","Đã mất / từ chối","Khách đã từ chối hoặc bỏ cuộc - vẫn nên chăm lại định kỳ. Danh sách: chip 'Đã mất'."],
-  ["ru_due","Tới hẹn chăm lại","Khách cũ đã tới ngày hẹn chăm lại theo chu kỳ khai ở Ngưỡng & SLA. Danh sách: chip 'Tới hẹn'."]]},
+ /* V2 13/08 - `reup` từng khai ba thẻ; cả ba trùng nguyên ba chip lọc nên đã bỏ. */
  tuvan:{t:"Tư vấn",the:[
   ["tv_drop","Khách từ chối","Số khách đã chốt là không mua - đọc lý do để sửa cách tư vấn. Danh sách: chip 'Từ chối' ở thanh lọc dưới."]]},
  thanhtoan:{t:"Thanh toán & công nợ",the:[
@@ -4527,8 +4509,8 @@ var THEDEF={
   ["dp_free","Giáo viên trống lịch cả ngày","Giảng viên hôm nay không có buổi nào - có thể nhận dạy thay. Danh sách: bảng giáo viên dưới."],
   ["dp_nogv","Buổi hôm nay chưa có GV","Buổi đã lên lịch mà chưa gán giảng viên - giao người ngay, đừng để tới giờ. Danh sách: bảng buổi dưới, cột Giảng viên trống."],
   ["dp_huy","Buổi đã huỷ hôm nay","Buổi bị huỷ trong ngày - kiểm xem đã báo học viên chưa. Danh sách: bảng buổi dưới, trạng thái 'đã huỷ'."]]},
+ /* V2 13/08 - thẻ "ph_dung" đã bỏ (trùng chip "Đụng phòng"). */
  phong:{t:"Phòng học & xung đột lịch",the:[
-  ["ph_dung","Đụng phòng","Hai lớp bị xếp cùng một phòng cùng một giờ. Danh sách: bảng xung đột ngay dưới."],
   ["ph_lop","Lớp trùng giờ với chính nó","Cùng một lớp bị xếp hai buổi chồng giờ - lỗi xếp lịch lặp. Danh sách: bảng xung đột dưới."],
   ["ph_gv","Giáo viên trùng giờ","Một giảng viên bị xếp hai buổi cùng giờ - phải đổi người hoặc đổi giờ. Danh sách: bảng xung đột dưới."],
   ["ph_nr","Lớp tại chỗ chưa có phòng","Lớp học trực tiếp mà chưa gán phòng - tới giờ mới đi tìm phòng là muộn. Danh sách: bảng lớp dưới, cột Phòng trống."],
@@ -7494,9 +7476,10 @@ function renderViec(){var items=bellItems();
   "");   /* V9.59: nút "Bỏ lọc mức độ" bỏ đi - chip "Tất cả" ở thanh Mức độ đã làm đúng việc đó */
  /* V9.59: dải thẻ ở đây trước là dải BẤM ĐƯỢC (bấm ô nào lọc ô đó). Nay thẻ chỉ để xem - việc
     lọc dời hẳn xuống thanh "Mức độ" ngay dưới, để một việc chỉ có ĐÚNG MỘT chỗ làm. */
+ /* V2 13/08 - HAI THẺ "Quá hạn" và "Sắp tới hạn" ĐÃ BỎ: thanh Mức độ ngay dưới có đúng hai chip
+    cùng tên cùng số, và chip thì bấm lọc được. Hai thẻ còn lại giữ vì không chip nào nói thay:
+    "Nợ quá N ngày" cắt theo tuổi việc, "Quá hạn nhiều nhất" xếp hạng mảng việc. */
  h+=statStrip([
-  ["ti-alert-triangle",redn,"Quá hạn","#E24B4A","làm ngay"],
-  ["ti-clock",ambn,"Sắp tới hạn","#E08A1E","còn kịp"],
   /* ═══ V9.57 (anh Luân): "thẻ phải đại diện cho 1 vấn đề quan trọng, xem nhanh và NGÀY NÀO CŨNG
      PHẢI XEM". Hai thẻ cũ ở đây trượt cả hai vế:
      · "Tổng việc đang nợ · toàn trung tâm" LẶP đúng chip "Tất cả" ngay bên dưới - hai chỗ nói
@@ -10688,8 +10671,9 @@ function renderYcHV(){
  var _ycF=fget("ychv");
  var _ycQua=L.filter(function(x){var a=hoursSince(x.created_time);
    return isc(x.task_status,"new")&&a!=null&&a>num(paramOf("slaTaskAccept_hours",4))});
+ /* V2 13/08 - thẻ "Chưa ai nhận" đã bỏ: chip cùng tên ngay dưới mang đúng con số ấy và bấm lọc
+    được. "Tổng yêu cầu đang mở" giữ - chip "Tất cả" đếm cả yêu cầu đã đóng, khác con số này. */
  var h=h0+statStrip([
-  ["ti-inbox",_ycMoi,"Chưa ai nhận","#E24B4A",_ycMoi?"nhận trong ngày":""],
   ["ti-messages",L.length,"Tổng yêu cầu đang mở","#3B82C4",""]],"ychv")+
   (function(){
    /* Lọc THẬT rồi mới vẽ - dải chip chỉ để nhìn thì còn tệ hơn không có, vì người ta bấm rồi
@@ -15696,9 +15680,10 @@ function renderReupTab(){
  var nNC=L.filter(function(J){return J.k==="no_contact"}).length,nLost=L.length-nNC;
  var t0=new Date();t0.setHours(0,0,0,0);
  var due=L.filter(function(J){var nf=jNF(J);return nf&&nf<=endToday()}).length;
- var h=h0+statStrip([["ti-phone-off",nNC,"Chưa gặp được","#E08A1E","đổi kênh Zalo/SMS"],
-  ["ti-user-x",nLost,"Đã mất / từ chối","#6B7887","chăm lại định kỳ"],
-  ["ti-calendar-event",due,"Tới hẹn chăm lại","#E24B4A",due?"gọi hôm nay":""]],"reup");
+ /* V2 13/08 - BỎ DẢI THẺ. Ba thẻ cũ mang đúng ba nhãn và đúng ba con số của ba chip ngay dưới
+    ("Chưa gặp được", "Đã mất / từ chối", "Tới hẹn chăm lại") - đọc hai lần cùng một thứ. Câu
+    hướng dẫn của từng thẻ không mất: notebar ngay dưới thanh chip vẫn nói cách xử lý. */
+ var h=h0;
  h+=filterBar("reup",fil,[["all","Tất cả",L.length],
   ["nguoi","Chưa gặp được",nNC,nNC?"amber":""],
   ["mat","Đã mất / từ chối",nLost],
@@ -15719,12 +15704,9 @@ function renderTest(embed){var p="test",fil=fget(p);var all=srows("DL03");
  var view=all.filter(function(r){var s=st(r);if(fil==="all")return true;if(fil==="book")return !s.booked;if(fil==="grade")return s.att&&!s.graded;if(fil==="consult")return s.graded&&!s.consulted;if(fil==="overdue")return s.overdue;return true});
  var h=embed?'':pageHead("Test đầu vào","Đặt lịch test - HV dự test - chấm điểm - tư vấn sau test",'<button class="btn primary" onclick="testQuickAdd()"><i class="ti ti-plus"></i>Khách muốn test ngay</button>');
  var _s=all.map(st);
- /* V2 Khúc 2b - dải thẻ dùng lại ĐÚNG `_s` mà chip lọc ngay dưới đang dùng: một phép đếm, hai
-    chỗ đọc. Thẻ và chip không bao giờ nói hai con số. */
- if(!embed)h+=statStrip([
-  ["ti-calendar-plus",_s.filter(function(x){return !x.booked&&!x.refused}).length,"Chờ đặt lịch","#E08A1E","đặt sớm thì tỷ lệ dự test cao hơn"],
-  ["ti-writing",_s.filter(function(x){return x.att&&!x.graded}).length,"Chờ chấm","#E24B4A","chấm chậm là khách nguội"],
-  ["ti-messages",_s.filter(function(x){return x.graded&&!x.consulted}).length,"Chờ tư vấn sau test","#3B82C4","bước chốt"]],"test");
+ /* V2 13/08 - BỎ HẲN DẢI THẺ. Cả ba thẻ đứng ngay trên ba chip nói cùng một thứ với cùng một con
+    số: "Chờ đặt lịch", "Chờ chấm", và "Chờ tư vấn sau test" (chip gọi ngắn là "Chờ tư vấn" -
+    tên ngắn hơn thì vẫn là một câu hỏi). Chip mang số VÀ bấm lọc được; thẻ chỉ mang số. */
  /* V9.51: 4/4 o thong ke deu la nut loc doi lot chip ben duoi - bo dai, SO DON VAO CHIP.
     Han cham (GLA/CVT) da co banh rang o form va notebar, khong mat duong toi Cai dat. */
  view=fltApply(p,view);
@@ -17405,9 +17387,10 @@ function renderKhieunai(embed){var p="khieunai",fil=fget(p);var all=srows("DL17"
  var h=embed?'':pageHead("Tiếp nhận & Xử lý Khiếu nại","Tiếp nhận - phân công - xử lý - đóng (SLA theo mức độ)",'<button class="btn primary" onclick="knAdd()"><i class="ti ti-plus"></i>Tiếp nhận khiếu nại</button>');
  /* V2 Khúc 2b - dải thẻ của trang Khiếu nại. Ba con số gọi lại ĐÚNG `st()` của chính hàm này -
     cũng là phép đếm đang hiện trên chip lọc ngay dưới, nên thẻ và chip không bao giờ lệch nhau. */
+ /* V2 13/08 - CÒN MỘT THẺ. "Mới tiếp nhận" và "Đang xử lý" đứng ngay trên hai chip cùng nghĩa
+    cùng số ("Mới", "Đang xử lý") - bỏ. "Tổng phiếu chưa đóng" giữ: chip "Tất cả" đếm cả phiếu
+    đã đóng nên nó là một con số KHÁC, và đây là con số trưởng phòng CSKH nhìn đầu ngày. */
  if(!embed)h+=statStrip([
-  ["ti-alert-triangle",all.filter(function(c){return !st(c).assigned}).length,"Mới tiếp nhận","#E08A1E","cử người xử lý"],
-  ["ti-progress",all.filter(function(c){var x=st(c);return x.assigned&&!x.resolved}).length,"Đang xử lý","#3B82C4",""],
   ["ti-folder",all.filter(function(c){return !st(c).resolved}).length,"Tổng phiếu chưa đóng","#6B7887",""]],"khieunai");
  /* V9.51: 4/4 o thong ke la nut loc doi lot - bo dai, so + mau don vao chip loc */
  view=fltApply(p,view);
@@ -20478,8 +20461,9 @@ function renderPhong(embed){
  var cl=(pgF==="phong"||pgF==="lop"||pgF==="gv")?clAll.filter(function(x){return x.t===pgF}):clAll;
  var onl=srows("DL10").filter(clsOnline).length;
  var h=embed?'':pageHead("Phòng học & đụng lịch","Soi đụng phòng, đụng giờ của lớp và của giáo viên trên toàn bộ lịch. Lớp online không tính đụng phòng - 'phòng' của nó là link riêng.","");
+ /* V2 13/08 - thẻ "Đụng phòng" đã bỏ: chip cùng tên ngay dưới mang đúng con số ấy. Bốn thẻ còn
+    lại giữ - chip "Lớp trùng giờ"/"GV trùng giờ" gọi tên khác và hai thẻ cuối không có chip nào. */
  h+=statStrip([
-  ["ti-layout-grid",byT.phong,"Đụng phòng","#E24B4A",byT.phong?"hai lớp cùng một phòng":"không có"],
   ["ti-calendar-x",byT.lop,"Lớp trùng giờ với chính nó","#DB2777",byT.lop?"xếp lịch bị lặp":"không có"],
   ["ti-user-exclamation",byT.gv,"Giáo viên trùng giờ","#E08A1E",byT.gv?"cần đổi người hoặc đổi giờ":"không có"],
   ["ti-map-pin",nr.length,"Lớp tại chỗ chưa có phòng","#7C3AED",nr.length?"tới giờ mới đi tìm phòng":"đủ phòng"],
@@ -20560,12 +20544,11 @@ function renderBuoihoc(embed){var p="buoihoc",fil=fget(p);var all=srows("DL11");
  var nOver=all.filter(function(s){return bhState(s).noteOver}).length;
  var h=embed?'':pageHead("Buổi học & nhận xét giảng viên","Theo dõi SLA ghi nhận xét (hạn "+slaChip("slaTeacherNote_hours",48)+" sau buổi). Nhận xét chung có thể ghi ngay khi điểm danh xong ở trang Điểm danh — hai nơi cùng một ô.",
   nOver?'<span class="chip red">'+nOver+' buổi quá hạn ghi nhận xét</span>':'');
- /* V2 Khúc 2b - dải thẻ dùng lại ĐÚNG `bhState()` mà chip lọc ngay dưới đang dùng. `nOver` ở
-    dòng trên cũng là con số ấy - một phép đếm, ba chỗ đọc, nên không có chỗ nào lệch được. */
- if(!embed)h+=statStrip([
-  ["ti-writing",all.filter(function(x){var st2=bhState(x);return st2.done&&!st2.note&&!st2.noteOver}).length,"Chờ ghi nhận xét","#E08A1E",""],
-  ["ti-alarm",nOver,"Quá hạn ghi nhận xét","#E24B4A",nOver?"đốc thúc hôm nay":""],
-  ["ti-clock-exclamation",all.filter(function(x){return bhState(x).late}).length,"Giảng viên vào trễ","#6B7887",""]],"buoihoc");
+ /* V2 13/08 - BỎ HẲN DẢI THẺ. Cả ba thẻ đứng ngay trên ba chip cùng nghĩa cùng số ("Chờ ghi
+    nhận xét", "Quá hạn ghi", "GV vào trễ"), mà thẻ đầu còn nói LỆCH: nó đếm buổi chưa nhận xét
+    và CÒN TRONG HẠN (0), chip cùng tên đếm mọi buổi chưa nhận xét (20). Hai con số dưới một cái
+    tên, cách nhau một dòng. Con số quá hạn không mất: dòng chip đỏ trên đầu trang vẫn nói.
+    (V9.51 đã bỏ dải này một lần vì đúng lý do ấy - sang V2 nó mọc lại.) */
  /* V9.51: 4 o thong ke deu la nut loc doi lot - bo dai, so don vao chip loc ben duoi */
  /* V9.29: giáo viên phải biết TRƯỚC giờ dạy ai đã báo nghỉ - app hứa với học viên là "báo trước
     giúp giảng viên chuẩn bị phần bù", trước đây GV chỉ thấy lúc mở điểm danh (tức là đã tới giờ). */
@@ -20935,13 +20918,13 @@ function renderBaoluu(embed){var p="baoluu",fil=fget(p);
  var nHold=all.length-nDrop;
  var h=embed?'':pageHead("Bảo lưu / Bỏ học","Học viên đang dừng học - liên hệ giữ chân, chốt bảo lưu hoặc mời quay lại. SOP: nhắc trước khi hết hạn bảo lưu "+num(paramOf("thresholdPauseRemind_days",14))+" ngày.",
   '<span class="chip amber">'+nHold+' bảo lưu</span> <span class="chip red">'+nDrop+' bỏ học</span>');
- /* V2 Khúc 2b - dải thẻ của trang Bảo lưu. Ba con số dùng lại đúng `nHold`/`nDrop` mà đầu trang
-    và chip lọc đang dùng - một phép đếm, ba chỗ đọc. */
- if(!embed)h+=statStrip([
-  ["ti-player-pause",nHold,"Đang bảo lưu","#E08A1E","giữ liên lạc"],
-  ["ti-user-x",nDrop,"Đã bỏ học","#E24B4A",""],
-  ["ti-calendar-off",all.filter(function(s2){return !String(s2.next_followup_time||"").trim()}).length,"Chưa hẹn liên hệ lại","#6B7887","đặt lịch gọi"]],"baoluu");
- /* V9.51: 4/4 o thong ke la nut loc doi lot - bo dai, so don vao chip loc */
+ /* ═══ 13/08 - MỘT MÀN MỘT BỘ ĐIỀU KHIỂN (anh Luân) ══════════════════════════════════════════
+    *"thẻ và chip lọc có vẻ dễ bị trùng nhau đúng ko? nếu trùng thì bỏ thẻ, thiết kế chip lọc cho
+    đẹp là ngon rồi"*. Đo cả app: 13 màn trùng, 3 chỗ hai bên nói hai con số khác nhau.
+    LẦN THỨ HAI cùng một bệnh - V9.51 đã chốt y hệt, V2 dựng lại. */
+ /* Cả BA thẻ ở đây trùng y hệt ba chip lọc ngay dưới - và dòng ghi chú V9.51 nằm ngay đây đã
+    nói "4/4 ô thống kê là nút lọc đội lốt, bỏ dải, số dồn vào chip lọc". V2 dựng lại đúng cái
+    vừa bỏ. Nay bỏ hẳn, chip giữ nguyên số. */
  view=fltApply(p,view);
  h+=filterBar(p,fil,[["all","Tất cả",all.length],["hold","Đang bảo lưu",nHold,"amber"],
   ["drop","Đã bỏ học",nDrop,"red"],
@@ -21236,7 +21219,7 @@ var TOURS={
  tq_ban:{lv:"thamquan",chi:"6",t:"Bàn làm việc - mở một người, làm hết việc",ic:"ti-focus-2",d:"4 bước - thực thể trung tâm của từng giai đoạn",steps:[
   {p:"ban",sel:'@man',t:"Mỗi giai đoạn có một thực thể trung tâm",d:"Bốn đối tượng được phục vụ: KHÁCH · HỌC VIÊN · PHỤ HUYNH · LỚP. Chưa học thì khách là trung tâm - mọi việc nhằm đưa họ vào lớp; đã học thì học viên và lớp là trung tâm; phụ huynh là người trả tiền và người cần được báo cáo. Bàn làm việc gom theo đúng bốn trục đó.",hint:"Bấm Tiếp theo."},
   {p:"ban",sel:'@bantt',t:"Chọn thực thể bạn đang làm việc cùng",d:"App tự mở sẵn thực thể hợp với chức danh của bạn: tư vấn và marketing thì Khách, kế toán thì Học viên, học vụ và giảng viên thì Lớp. Con số trên mỗi nút là số hồ sơ còn việc của riêng bạn - không có số nghĩa là thực thể đó đang sạch việc với bạn.",hint:"Bấm thử một thực thể khác để so."},
-  {p:"ban",sel:'@bstats',t:"Ba con số của bàn",d:"Bao nhiêu hồ sơ còn việc của tôi, bao nhiêu có việc gấp, bao nhiêu đang sạch. Hồ sơ sạch là hồ sơ không cần đụng tới - đó mới là đích.",hint:"Nhìn ba ô."},
+  {p:"ban",sel:'@bstats',t:"Hai con số của bàn",d:"Bao nhiêu hồ sơ có việc gấp, bao nhiêu đang sạch. Hồ sơ sạch là hồ sơ không cần đụng tới - đó mới là đích. Còn tổng số hồ sơ còn việc thì nằm ngay trên nút chọn thực thể.",hint:"Nhìn hai ô."},
   {p:"ban",sel:'@man',t:"Mở một hồ sơ là thấy trọn việc",d:"Bấm một dòng: app hiện hồ sơ gọn và TẤT CẢ việc mà chức danh của bạn được làm với người đó, theo bảng phân quyền CH3 của SOP. Mỗi việc một nút - làm ngay, không phải đi tìm trang.",hint:"Xong phần Bàn làm việc!"}]},
  tq_sotracuu:{lv:"thamquan",t:"Sổ tra cứu - tìm gì cũng ra",ic:"ti-list-search",d:"5 bước - bộ lọc nhiều trục, chọn cột, xuất file",steps:[
   {p:"dskhieunai",sel:'@man',t:"Sổ tra cứu là gì",d:"Mỗi bảng dữ liệu của SOP có một sổ tra cứu riêng: khiếu nại, bài tập, điểm danh, buổi WOW, phiếu thu... Sổ là nơi TRA, còn nơi LÀM là các trang nghiệp vụ - nút đầu trang luôn chỉ sang đó.",hint:"Nhìn dòng phụ đề: nó ghi rõ sổ này đọc bảng DL nào."},
@@ -22796,16 +22779,13 @@ function renderTracuu(){
   h+='</div>'}
  return h+'</div></div>'}
 function renderNhansu(){
- /* V2 08/08 - ba thẻ đọc cùng hàm với chip "Hồ sơ còn thiếu" của danh sách nhúng ngay dưới
-    (`hsThieuMot`), nên thẻ và chip không thể nói hai con số. */
- var A=srows("DL01");
+ /* V2 13/08 - BỎ HẲN DẢI THẺ. Ba thẻ ở đây đọc đúng ba hàm mà ba chip lọc ngay dưới đang đọc
+    (`staffActive`, `hsThieuMot`, phần còn lại), nên chúng lặp lại nguyên văn cả nhãn lẫn con số:
+    "Đang làm việc 33" nằm trên "Đang làm việc 33". Anh Luân 13/08: *"thẻ và chip lọc có vẻ dễ bị
+    trùng nhau... nếu trùng thì bỏ thẻ"*. Chip đã mang số VÀ bấm được; thẻ chỉ mang số. Giữa hai
+    thứ nói cùng một điều, bỏ cái không bấm được. */
  return pageHead("Nhân sự",
   "Danh sách toàn bộ người đang làm việc tại trung tâm: chức danh, cơ sở, email đăng nhập và tình trạng.","")
-  +statStrip([
-   ["ti-users",A.filter(staffActive).length,"Đang làm việc","#2E5A88",""],
-   (function(){var n=A.filter(hsThieuMot).length;
-    return ["ti-id-badge-2",n,"Hồ sơ còn thiếu","#E08A1E",n?"chưa có chức danh hoặc chưa gắn cơ sở":"hồ sơ đủ cả"]})(),
-   ["ti-user-minus",A.filter(function(x){return !staffActive(x)}).length,"Đã nghỉ việc","#6B7887","giữ để tra lịch sử"]],"nhansu")
   +renderList("nhanvien",1)}
 /* V2 09/08 - THÊM DẢI THẺ + CHIP. Nhịp sáng của Nhân sự là *"đối chiếu bảng công giảng viên -
    buổi thiếu mốc giờ vào/ra thì tính công sai"*, đếm ra một con số cụ thể; mà trang này mở ra
@@ -22824,8 +22804,9 @@ function renderBangcong(){
    (function(){var ng={};thieu.forEach(function(x){if(x.teacher_id)ng[x.teacher_id]=1});
     var n=Object.keys(ng).length;
     return ["ti-user-exclamation",n,"Giảng viên có buổi thiếu mốc","#E08A1E",n?"gọi từng người bổ sung trước khi chốt công":"không ai vướng"]})(),
-   (function(){var n=thieu.length;
-    return ["ti-clock-exclamation",n,"Buổi thiếu mốc giờ vào/ra","#E24B4A",n?"thiếu mốc thì tính công sai - soát trước khi chốt":"đủ mốc cả"]})(),
+   /* V2 13/08 - thẻ "Buổi thiếu mốc giờ vào/ra" đã bỏ: chip "Buổi thiếu mốc giờ" ngay dưới mang
+      đúng con số ấy. Thẻ đầu giữ vì nó đếm NGƯỜI chứ không đếm buổi - việc phải làm là gọi từng
+      người, nên đó là con số khác hẳn. */
    ["ti-checks",xong.length-thieu.length,"Buổi đủ mốc, tính công được","#2E9E6B",""]],"bangcong")
   +renderCong()}
 /* V9.64 (anh Luân: *"công giảng dạy tự nhiên lại nằm trong sổ thu học phí, vô lý"* -> *"phải nằm
@@ -24800,11 +24781,13 @@ function renderBan(){
  var one=mo?DS.filter(function(z){return z.ma===mo})[0]:null;
  if(one)return h+banThe(ttk,one);
  /* dải số của chính màn này - đếm trên tập đang đứng, không mượn số nơi khác */
+ /* V2 13/08 - thẻ đầu ("<Thực thể> còn việc của <bạn>") đã bỏ. Con số ấy hiện BA LẦN trên cùng
+    một màn: trên nút chọn thực thể ngay trên, trên thẻ, rồi trên tiêu đề bảng ngay dưới. Nút
+    chọn thực thể là chỗ giữ nó - nút đó bấm được và nói cả bốn thực thể một lượt. */
  h+=statStrip([
-  ["ti-inbox",coViec.length,T.t+" còn việc của "+banAiTen(),T.col,"trong "+DS.length+" hồ sơ thuộc phạm vi của bạn"],
   ["ti-alert-triangle",coViec.filter(function(z){return z.do_}).length,"Có việc gấp","#E24B4A","làm trước"],
   ["ti-checks",DS.length-coViec.length,"Đang sạch việc","#16A34A","không cần đụng tới"]],"ban",
-  ["ban_co","ban_gap","ban_sach"]);
+  ["ban_gap","ban_sach"]);
  h+='<div class="panel"><div class="ph"><b><i class="ti '+T.ic+'" style="margin-right:6px"></i>'+
   esc(T.t)+' còn việc của '+esc(banAiTen())+' ('+coViec.length+')</b><span class="mut" style="margin-left:auto;font-size:11px">bấm một dòng để mở bàn làm việc</span></div><div class="pbody">';
  if(!coViec.length)h+='<div class="empty">Không còn '+esc(T.t.toLowerCase())+' nào cần bạn xử lý. '+

@@ -482,6 +482,17 @@ Chi tiet "vi sao" o `02_NHAT_KY_QUYET_DINH.md`. O day chi ghi nhung cho **cham v
   duoc thu nguoc tren ban CU va phai DO o do, truoc khi duoc tin.**
   Bon phep dem tren 16 chuc danh / 856 tieu chi: thanh "Xem viec cua" toi da MOT · dau trang toi
   da MOT · hai khoi `.tbar` giong het nhau · hai `.notebar` cung mot cau.
+  **L5 (them 13/08) - THE VA CHIP LOC KHONG DUOC NOI CUNG MOT THU.** Anh Luan kem anh man Xep
+  lop: *"the va chip loc co ve de bi trung nhau dung ko? neu trung thi bo the"*. Do that: **13
+  man** co mot the va mot chip mang y nguyen mot nhan, **3 cho hai ben con noi HAI CON SO** (Xep
+  lop 2/3 - chip thieu mot dieu kien ma the co; Lead 20/24 - the do moc hen den GIO NAY, chip den
+  HET HOM NAY; Buoi hoc 0/20 - the dem "chua nhan xet va CON TRONG HAN", chip dem moi buoi chua
+  nhan xet). Luat: **hai dai cung mot man noi cung mot dieu thi bo dai KHONG BAM DUOC** - chip
+  mang so va loc duoc, the chi mang so.
+  **BAY: ban do dau HEP QUA.** No chi khop nhan Y HET nen bo sot chip viet tat - sua 5 man xong
+  do lai con 8, tuong sap xong. Noi sang "mot ben la ban viet tat cua ben kia VA cung mot con so"
+  thi lo them 5 cho nua (the "Qua han ghi nhan xet" vs chip "Qua han ghi"...). *Ten ngan hon thi
+  van la mot cau hoi.*
 - **`_checkcrumb.js` (MOI, V9.99z10)** - **VET DUONG DI PHAI NAM TRON MOT HANG**. Anh Luan 05/08
   kem anh: *"em nen co phuong an cho breadcrumb nhe, no rot hang rat xau neu dai"*. Trong chinh
   anh do con loi thu hai: mot moc dung LIEN NHAU HAI LAN.

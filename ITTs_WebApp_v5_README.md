@@ -2475,3 +2475,34 @@ Tất cả nằm trong **Cài đặt → Ngưỡng SLA** (`homeworkDueFallback_d
 `homeworkAssign_hours`, `homeworkAssignWindow_days`, `homeworkLateGrace_days`,
 `slaHomeworkGrading_hours`) và **Cài đặt → Ngưỡng KPI** (chỉ số `HCR` — nay 90%).
 Không con số nào cắm cứng trong mã.
+
+---
+
+# Cập nhật 13/08 — Bỏ thẻ trùng nhãn với chip lọc
+
+Anh Luân gửi ảnh màn Xếp lớp: *"thẻ và chip lọc có vẻ dễ bị trùng nhau đúng ko? nếu trùng thì bỏ
+thẻ, thiết kế chip lọc cho đẹp là ngon rồi, lại gọn gàng nữa"*.
+
+## Trùng thì bỏ thẻ, giữ chip
+Mười ba màn có một dải thẻ và một dải chip nói cùng một thứ - "Đang làm việc 33" nằm ngay trên
+"Đang làm việc 33". Chip mang số **và** bấm lọc được; thẻ chỉ mang số. Nên bỏ thẻ.
+
+Sáu màn nay không còn dải thẻ (Nhân sự · Chăm lại khách cũ · Lead · Test đầu vào · Theo dõi nhận
+xét buổi · Học viên) - mở ra là dải chip có số ngay đầu trang. Tám màn còn lại giữ những thẻ mà **không chip
+nào nói thay được**: "Nợ quá N ngày" (cắt theo tuổi việc), "Quá hạn nhiều nhất" (xếp hạng mảng
+việc), "Tổng phiếu chưa đóng" (chip "Tất cả" đếm cả phiếu đã đóng - con số khác), "Giảng viên có
+buổi thiếu mốc" (đếm NGƯỜI chứ không đếm buổi).
+
+## Ba chỗ thẻ và chip đang nói hai con số khác nhau
+Không phải chuyện gọn mắt - ba chỗ này là lỗi thật, dọn thẻ mới lộ ra:
+- **Xếp lớp · "Chờ gửi thông tin lớp"**: thẻ 2, chip 3. Chip thiếu một điều kiện mà thẻ có. Sửa
+  công thức chip trước, rồi mới bỏ thẻ.
+- **Lead · "Tới hẹn liên hệ"**: thẻ đếm mốc hẹn tới **giờ này** (20), chip đếm tới **hết hôm nay**
+  (24). Câu hỏi thật là "hôm nay phải gọi ai" - chip đúng.
+- **Buổi học · "Chờ ghi nhận xét"**: thẻ đếm buổi chưa nhận xét mà **còn trong hạn** (0), chip đếm
+  mọi buổi chưa nhận xét (20).
+
+## Thứ chỉ thẻ có thì chuyển chỗ, không xoá
+Màn Xếp lớp có hai mốc SLA kèm bánh răng chỉnh ngưỡng nằm trong thẻ. Nay chúng nằm ở dòng ngay
+dưới dải chip: *"Hạn gửi thông tin lớp 24h - hạn hoàn tất onboarding 72h - quá là vào nhóm Quá
+hạn."* Bấm vào con số vẫn mở thẳng Cài đặt.

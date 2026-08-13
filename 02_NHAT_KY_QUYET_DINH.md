@@ -253,6 +253,58 @@
 > (46 bước, 0 chỗ đỏ), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
+> ### 🟢 13/08 - BỎ THẺ TRÙNG NHÃN VỚI CHIP LỌC: 13 MÀN → 0
+>
+> Anh Luân gửi ảnh màn Xếp lớp: *"hình như, sau khi chuyển sang v2, thẻ và chip lọc có vẻ dễ bị
+> trùng nhau đúng ko? nếu trùng thì bỏ thẻ, thiết kế chip lọc cho đẹp là ngon rồi, lại gọn gàng
+> nữa"*. Đúng, và **đây là lần thứ hai cùng một cái bệnh**: V9.51 anh đã chốt y hệt cho màn Chờ
+> duyệt (*"chip tab đã mang số, dải ô thống kê bỏ hẳn"*) — sang V2, dựng 33 trang nghiệp vụ mỗi
+> trang một dải thẻ, nó mọc lại ở 13 màn khác.
+>
+> **Không chữa bằng mắt — dựng một phép đo (`_dolap.js`).** Vẽ thật mọi trang rồi so nhãn thẻ với
+> nhãn chip. Bản đo đầu (khớp y hệt) ra **13 màn**, trong đó **3 chỗ hai bên nói HAI CON SỐ**.
+> Sửa 5 màn xong đo lại còn 8 — nhưng đó là vì phép đo còn hẹp: nó **không thấy chip viết tắt**.
+> Nới sang "một bên là bản viết tắt của bên kia VÀ cùng một con số" thì lộ thêm 5 chỗ nữa
+> (thẻ "Quá hạn ghi nhận xét" vs chip "Quá hạn ghi", thẻ "Chờ tư vấn sau test" vs chip
+> "Chờ tư vấn"...). **Tên ngắn hơn thì vẫn là một câu hỏi.** Cuối cùng: **0 chỗ trùng.**
+>
+> **BA CHỖ THẺ VÀ CHIP NÓI HAI CON SỐ - cả ba là lỗi thật, không phải chuyện thẩm mỹ:**
+> · Xếp lớp "Chờ gửi thông tin lớp": thẻ 2 / chip 3 — chip thiếu điều kiện `o.class_id` mà thẻ có.
+>   **Sửa công thức chip**, rồi mới bỏ thẻ.
+> · Lead "Tới hẹn liên hệ": thẻ đếm mốc hẹn ≤ **GIỜ NÀY** (20), chip đếm ≤ **HẾT HÔM NAY** (24).
+> · Buổi học "Chờ ghi nhận xét": thẻ đếm buổi chưa nhận xét **và còn trong hạn** (0), chip đếm
+>   mọi buổi chưa nhận xét (20). Một cái tên, hai phép đếm, đứng cách nhau một dòng.
+> Hai chỗ sau: câu hỏi của người dùng là câu chip đang hỏi, nên **chip đúng, thẻ đi**.
+>
+> **Luật rút ra:** *hai dải cùng một màn mà nói cùng một điều thì bỏ dải KHÔNG BẤM ĐƯỢC.* Chip
+> mang số **và** lọc được; thẻ chỉ mang số. Và *hai con số dưới một cái tên thì cái tên là chỗ
+> hỏng, không phải con số.*
+>
+> **Thứ chỉ thẻ có thì CHUYỂN CHỖ, không xoá:** mốc SLA kèm bánh răng chỉnh ngưỡng ở màn Xếp lớp
+> nay nằm ở dòng ngay dưới dải chip — không mất đường tới Cài đặt.
+>
+> **15 màn đã dọn:** `xeplop` `baoluu` `nhansu` `reup` `nhaplead` `test` `buoihoc` `viec`
+> `khieunai` `phong` `ychv` `ban` `bangcong` `hoctap(lop)` `hocvien`. Sáu màn mất hẳn dải thẻ
+> (`nhansu` `reup` `nhaplead` `test` `buoihoc` `hocvien`) — `_checkkhuon` mục K3 vẫn xanh vì ý của
+> K3 là *"người mở trang phải thấy ngay hình dạng bằng con số"*, mà dải chip có số làm đúng việc ấy.
+>
+> **PHÉP ĐO TẠM THÀNH LUẬT THƯỜNG TRỰC - `_checklap` mục L5.** Bản đo rời (`_dolap.js`) chạy dưới
+> vai "toàn quyền", nên nó chỉ thấy dải chip của một người. Gộp vào `_checklap` - bộ kiểm đã có
+> sẵn đúng đề bài (*"một màn không được nói hai lần cùng một thứ"*) và đã **đăng nhập thật bằng
+> một người cho MỖI chức danh** - thì lộ thêm 3 chỗ nữa mà bản rời không thấy: rõ nhất là màn
+> **Học viên**, ba thẻ trùng ba chip trên **cả 16 chức danh** (7/7 · 2/2 · 7/7).
+> *Một phép đo chạy dưới một vai thì nó chỉ biết những gì vai đó nhìn thấy.*
+>
+> **HAI CHỖ L5 BẮT OAN - phải nới luật chứ không sửa app:**
+> · Thẻ **"Quá hạn nhiều nhất: Tuyển sinh 6"** vs chip **"Quá hạn 6"**. Nhân viên sale chỉ có một
+>   mảng việc nên toàn bộ việc quá hạn nằm trong mảng ấy - hai con số bằng nhau **do dữ liệu**,
+>   không phải do hai chỗ hỏi cùng một câu. Nới: phần chữ THỪA không được quá 2 chữ mới coi là
+>   viết tắt (ở đây thừa 4 chữ). *Cùng một con số không có nghĩa là cùng một câu hỏi.*
+> · Thẻ **"Lead mới (chưa LH)"** trong **bảng việc theo chức danh** vs chip "Lead mới". Dải ấy là
+>   **bảng BC9 của SOP**, 38 hàng chờ khai sẵn trong `BVMA` - bỏ một ô là **BỚT một thứ SOP đã mô
+>   tả**, đúng thứ LUẬT CỨNG SỐ 0 cấm. Miễn dải `bangviec`/`bangduyet`, khai lý do ngay trong bộ
+>   kiểm. *Dọn cho gọn không được phép ăn vào phần SOP đã mô tả.*
+>
 > ### 🟢 12/08 - LÀM TRỌN 26 MỤC FEEDBACK CỦA BỐN TEAM (ACA · SALE · WOW · HỌC VỤ)
 >
 > Anh Luân: *"làm thôi em, chủ động làm lần lượt đến khi hoàn thành, ko cần hỏi ý kiến anh để
