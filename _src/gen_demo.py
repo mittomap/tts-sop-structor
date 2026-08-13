@@ -1916,7 +1916,7 @@ for _s in students:
 # o nhap ket qua. Man "Chi tiet dang ky" (lwXemO) da ve san sau o FC/LR/GRA/PR + Overall theo
 # dung man OLMS team dung - nhung DL14 khong he co cot nao trong so do, nen mo ra thay "-" het.
 # Ve mot cai o roi khong bao gio do vao thi cai o do la trang tri. Gieo tai NGUON.
-_WOW_LOAI=["practice (Luyện tập)","entry_test (Test đầu vào)","midterm (Kiểm tra giữa khóa)","final (Kiểm tra cuối khóa)"]
+_WOW_LOAI=["practice (Luyện tập)","entry_test (Kiểm tra đầu khóa)","midterm (Kiểm tra giữa khóa)","final (Kiểm tra cuối khóa)"]
 _WOW_PHAN={"Speaking (Nói)":["Part 1","Part 2","Part 3","Part 1 + Part 2","Full test"],
            "Writing (Viết)":["Task 1","Task 2","Task 1 + Task 2"],
            "Listening (Nghe)":["Section 1-2","Section 3-4","Full test"],
@@ -2122,7 +2122,14 @@ if not any(str(x).startswith("unavailable") for x in _ss):
 # WOW-2/WOW-3: hai danh muc moi. `wow_lesson_type` khong phai trang tri - no la thu QUYET DINH
 # buoi HV tu dat co phai cho NV WOW xac nhan khong (luyen tap thi vao thang, bai kiem tra thi cho).
 # Ghi de bang danh sach chuan de ban base cu khong giu lai bo gia tri thieu.
-_en["enum_wow_lesson_type"]=["practice (Luyện tập)","entry_test (Test đầu vào)",
+# 12/08 - NHAN LA "Kiem tra dau khoa", KHONG PHAI "Test dau vao". Hai thu KHAC HAN nhau ma luc
+# dau em dat cung mot ten:
+#   · "Test dau vao" (DL03) = bai test mot LEAD lam TRUOC khi ghi danh - viec cua phe tuyen sinh
+#   · WOW `entry_test`      = bai kiem tra trinh do cua mot HOC VIEN DA GHI DANH, dau khoa hoc
+# `_checkmien` bat duoc vi chu "Test dau vao" hien tren Lich truc WOW cho Truong phong ACA -
+# nguoi khai `lead:"none"`. Doi ten khong phai de lach bo kiem: no la ten DUNG HON, va cai lech
+# ten ay chinh la thu lam bo kiem tuong day la du lieu mien lead.
+_en["enum_wow_lesson_type"]=["practice (Luyện tập)","entry_test (Kiểm tra đầu khóa)",
                              "midterm (Kiểm tra giữa khóa)","final (Kiểm tra cuối khóa)"]
 _en["enum_wow_mode"]=["online (Trực tuyến)","offline (Tại trung tâm)"]
 # SALE-6: tach "hinh thuc test" thanh HAI cau hoi. `enum_test_format` giu nguyen (online/offline),
