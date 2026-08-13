@@ -2194,17 +2194,26 @@ body.drsz .drawer{transition:none}
 .tipbox:after{content:"";position:absolute;left:var(--tipx,50%);margin-left:-6px;border:6px solid transparent;border-top-color:#1E2A38;bottom:-12px}
 .tipbox.below:after{bottom:auto;top:-12px;border-top-color:transparent;border-bottom-color:#1E2A38}
 /* ===== V9.15 NODE TANG 1 - nrail: duong ray ga tren trang CHANG ===== */
-.nrail{display:flex;align-items:flex-start;overflow-x:auto;padding:16px 10px 12px;background:linear-gradient(180deg,#fff,#FAFBFD);border:1px solid var(--line);border-radius:12px;margin-bottom:12px}
-.nst{display:flex;flex-direction:column;align-items:center;gap:7px;min-width:88px;cursor:pointer;position:relative;padding:0 5px;flex:0 0 auto}
+/* ═══ 13/08 - RAY CHẶNG PHẢI VỪA MÀN, KHÔNG ĐẺ THANH TRƯỢT (anh Luân: *"bị thanh trượt uổng
+   quá, e scale hợp lý đi"*). Bản cũ khoá cứng mỗi ga 88px và `flex:0 0 auto` - tức các ga TỪ
+   CHỐI co lại - nên 10 ga + 9 đoạn nối + vạch ngăn luôn dài hơn khung 1440 và luôn có một thanh
+   trượt ngang nằm dưới. Một thanh trượt ngang trong một khung đang cuộn dọc là thứ khó dùng
+   nhất: vuốt một cái không biết mình đang cuộn cái nào (đã ghi ở `.jline` từ V9.67, nhưng ray
+   này dựng sau nên không hưởng).
+   Nay các ga CHIA ĐỀU và co được (`flex:1 1`), đoạn nối co theo; màn hẹp thì mới cho cuộn -
+   ép 10 ga vào một màn 900px là chữ nhỏ tới mức không đọc được. */
+.nrail{display:flex;align-items:flex-start;overflow-x:visible;padding:16px 10px 12px;background:linear-gradient(180deg,#fff,#FAFBFD);border:1px solid var(--line);border-radius:12px;margin-bottom:12px}
+.nst{display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0;max-width:124px;cursor:pointer;position:relative;padding:0 3px;flex:1 1 76px}
 .nsd{width:44px;height:44px;border-radius:50%;background:#FAFBFD;color:#7A8694;display:flex;align-items:center;justify-content:center;font-size:20px;position:relative;border:2px solid transparent;transition:.15s}
 .nst:hover .nsd{border-color:var(--mscol,#2E5A88);color:var(--mscol,#2E5A88)}
 .nst.has .nsd{background:#fff;border-color:var(--mscol,#2E5A88);color:var(--mscol,#2E5A88)}
 .nst.on .nsd{background:var(--mscol,#2E5A88);border-color:var(--mscol,#2E5A88);color:#fff;box-shadow:0 5px 16px rgba(16,32,58,.22)}
 .nsn{position:absolute;top:-7px;right:-9px;background:#5A6675;color:#fff;border-radius:20px;font-size:11px;font-weight:800;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;padding:0 5px;border:2px solid #fff}
 .nsn.hot{background:var(--red)}
-.nsl{font-size:11px;font-weight:700;color:var(--navy);text-align:center;max-width:96px;line-height:1.25}
+.nsl{font-size:11px;font-weight:700;color:var(--navy);text-align:center;max-width:100%;line-height:1.25}
 .nst .nso{font-size:11px;font-weight:700;color:var(--red)}
-.nscw{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-width:34px;flex:1 0 34px;padding-top:20px}
+.nscw{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-width:20px;flex:1 1 26px;padding-top:20px}
+@media(max-width:900px){.nrail{overflow-x:auto}.nst{flex:0 0 auto;min-width:84px}.nscw{flex:0 0 30px}}
 .nsc{height:3px;width:100%;min-width:24px;background:#E3E9F0;border-radius:3px}
 .nscp{font-size:11px;font-weight:800;color:var(--muted);margin-top:4px;white-space:nowrap}
 .nst.ghost .nsd{border:2px dashed #C4D2E4;background:#fff;color:var(--muted)}
