@@ -5094,6 +5094,39 @@ function stuGone(s){return /dropped|graduated|transferred/.test(ecode(s&&s.stude
 function stuAtt(s){return !!s&&(isRisk(s.attendance_progress_status)||(!ignRisk(s)&&riskAuto(s.student_id).att))}
 function stuAca(s){return !!s&&(isRisk(s.academic_progress_status)||(!ignRisk(s)&&riskAuto(s.student_id).aca))}
 function stuRisk(s){return stuAtt(s)||stuAca(s)}
+/* ═══ 12/08 - ĐIỀU KIỆN HOÀN THÀNH KHÓA (anh Luân thông báo) ═════════════════════════════════
+   *"Học viên phải đảm bảo 90% khối lượng BTVN và tham gia đầy đủ 2 bài kiểm tra Midterm/Final."*
+   Ba điều kiện, ba nguồn khác nhau, và trước bản này KHÔNG chỗ nào gộp lại để trả lời câu
+   "em này có đủ điều kiện tốt nghiệp chưa":
+     · bài tập  - DL13, so với ngưỡng HCR ở CH6 (nay 90%)
+     · midterm  - DL08.mid_overall (học vụ nhập ở màn giữa kỳ)
+     · final    - DL18.final_test_score (hồ sơ kết thúc khóa)
+   Trả về đủ ba vế để màn nào cũng nói được CÙNG MỘT câu, không mỗi chỗ tự tính một kiểu. */
+function hvDuDieuKien(sid){
+ if(!sid)return null;
+ var nguong=kpiTh(/^HCR/,0.9);
+ var HW=rows("DL13").filter(function(h){return String(h.student_id||"")===String(sid)});
+ var nop=HW.filter(hwSubmitted).length;
+ var pct=HW.length?(nop/HW.length):null;
+ var ob=rows("DL08").filter(function(o){return String(o.student_id||"")===String(sid)&&o.class_id})[0]||{};
+ var ce=rows("DL18").filter(function(c){return String(c.student_id||"")===String(sid)})[0]||{};
+ var coMid=!!String(ob.mid_overall||"").trim();
+ var coFinal=!!String(ce.final_test_score||"").trim();
+ var okBai=(pct!=null&&pct>=nguong);
+ /* `ds` là danh sách CÒN THIẾU, dùng chung cho mọi màn - không màn nào tự soạn lại câu, để
+    học viên, học vụ và bảng việc không nói ba kiểu về cùng một chuẩn. */
+ var ds=[];
+ if(!okBai)ds.push("bài tập "+(pct==null?"chưa có bài nào":(Math.round(pct*100)+"%"))+" (cần "+Math.round(nguong*100)+"%)");
+ if(!coMid)ds.push("chưa có điểm Midterm");
+ if(!coFinal)ds.push("chưa có điểm Final");
+ return {nguong:nguong,soBai:HW.length,nop:nop,pct:pct,okBai:okBai,
+  mid:coMid,final:coFinal,du:(okBai&&coMid&&coFinal),ds:ds}}
+/* Chip dùng chung cho mọi màn - một câu, một cách nói. */
+function hvDuChip(sid){
+ var D=hvDuDieuKien(sid);if(!D||!D.soBai)return "";
+ return D.du
+  ? '<span class="chip green" data-tip="Đủ cả ba: bài tập '+Math.round((D.pct||0)*100)+'% (cần '+Math.round(D.nguong*100)+'%), có điểm Midterm, có điểm Final">Đủ điều kiện hoàn thành</span>'
+  : '<span class="chip amber" data-tip="Chuẩn hoàn thành khóa: nộp đủ '+Math.round(D.nguong*100)+'% bài tập và có đủ điểm Midterm + Final. Còn thiếu: '+esc(D.ds.join(" · "))+'">Chưa đủ điều kiện: '+esc(D.ds.join(" · "))+'</span>'}
 /* ===== NĂM MỨC CAN THIỆP (V9.41 - theo đúng sổ trigger HD3 của SOP) =================
    NA014 yếu cả hai      -> họp 4 bên GẤP
    NA015 học thuật rớt lộ trình -> họp 3 bên trong 24 giờ
@@ -6285,9 +6318,10 @@ var VIECNHOM=[
  /* V2 12/08 (HỌC VỤ-1) - bốn nhóm việc CẤP LỚP. Xếp ngay sau nhóm xếp lớp vì chúng là nhịp vận
     hành của cùng một lớp, đi từ lúc mở tới lúc đóng. */
  "Lớp sắp thi cuối khóa","Lớp đã học đủ giờ cam kết","Lớp sắp kết thúc khóa",
- "Lớp có nhiều học viên nguy cơ",
+ "Học viên chưa đủ điều kiện hoàn thành khóa","Lớp có nhiều học viên nguy cơ",
  /* P6 · Buổi học, điểm danh, bài tập */
- "Ghi nhận xét buổi","Chấm bài tập","Buổi thiếu mốc giờ vào/ra","Duyệt xin nghỉ học","Gọi hỏi thăm HV vắng",
+ "Ghi nhận xét buổi","Chưa giao bài tập sau buổi học","Chấm bài tập","Buổi thiếu mốc giờ vào/ra",
+ "Duyệt xin nghỉ học","Gọi hỏi thăm HV vắng",
  /* P6 · Học viên nguy cơ - năm mức của SOP, gấp nhất lên trước */
  "Máy thấy nguy cơ - chưa gắn cờ","Nguy cơ - HỌP 4 BÊN GẤP","Nguy cơ - HỌP 3 BÊN trong 24h",
  "Nguy cơ - HỌP 3 BÊN gấp","Nguy cơ - ĐẶT BUỔI WOW KÈM","Nguy cơ - GỌI trong 24-48h",
@@ -6492,19 +6526,52 @@ function slaItems(){var out=jTasks();
     360 của học viên - mà trang đó KHÔNG có nút chấm bài nào, còn viết "HV đang học đều, không
     cần làm gì thêm". Nghĩa là app chỉ ra đúng việc rồi dẫn vào ngõ cụt. Trong khi màn chấm thật
     (btJumpGrade) mở một lượt là chấm cả lớp cùng một bài. Nay một dòng việc = một lượt mở màn. */
+ /* 12/08 - HẠN CHẤM NEO VÀO HẠN NỘP, KHÔNG NEO VÀO GIỜ NỘP. Bản cũ đếm `hoursSince(giờ nộp)`,
+    nên học viên nộp sớm ba ngày là giáo viên bị tính quá hạn sớm ba ngày - phạt người chấm vì
+    học viên chăm. Anh Luân: *"giáo viên có 2 ngày kể từ hạn nộp hoặc hạn nộp trễ để chấm"*. */
  (function(){var lim=paramOf("slaHomeworkGrading_hours",48),G={};
   srows("DL13").forEach(function(hw){
    if(!hwSubmitted(hw)||hwGraded(hw))return;
-   var age=hoursSince(hw.homework_submitted_time||hw.homework_assigned_time);
+   var hc=hwHanCham(hw);
+   var qua=hc?((Date.now()-hc.getTime())/36e5):null;   /* dương = đã quá hạn chấm */
    var k=String(hw.class_id||"")+"|"+String(hw.homework_title||"");
    if(!G[k])G[k]={cls:hw.class_id_name||hw.class_id||"",title:hw.homework_title||"(chưa đặt tên bài)",
-    cid:hw.class_id||"",n:0,over:0,age:null};
+    cid:hw.class_id||"",n:0,over:0,age:null,han:hc};
    var g=G[k];g.n++;
-   if(age!=null){if(age>lim)g.over++;if(g.age==null||age>g.age)g.age=age}});
+   if(qua!=null){if(qua>0)g.over++;if(g.age==null||qua>g.age)g.age=qua}});
   Object.keys(G).forEach(function(k){var g=G[k];if(!g.over)return;
    add("Giảng viên chuyên môn","Chấm bài tập","red","ti-book",g.cls,
-    "Bài \""+g.title+"\": "+g.over+"/"+g.n+" bài quá hạn chấm (hạn "+lim+"h) - mở một lượt chấm cả lớp",
+    "Bài \""+g.title+"\": "+g.over+"/"+g.n+" bài ĐÃ QUÁ HẠN CHẤM"+(g.han?(" (hạn chấm "+vnd2(g.han)+")"):"")+
+    " - hạn là "+lim+"h kể từ hạn nộp (hoặc hạn nộp trễ). Mở một lượt chấm cả lớp",
     g.age,"banglop",null,{act:"grade",rid:k,prm:"slaHomeworkGrading_hours"})})})();
+ /* ═══ 12/08 - GIÁO VIÊN PHẢI GIAO BÀI TRONG 12 TIẾNG SAU BUỔI HỌC ═══════════════════════════
+    Anh Luân: *"giáo viên bắt buộc giao BTVN và điểm danh trong 12 tiếng kể từ giờ diễn ra buổi
+    học"*. Vế ĐIỂM DANH app đã canh từ lâu (`attendanceGrace_hours`, nay 12h). Vế GIAO BÀI thì
+    **chưa có luật nào** - buổi dạy xong mà không ai giao bài thì không chỗ nào kêu, học viên
+    ngồi chờ một cái bài không tới. */
+ (function(){
+  var lim=num(paramOf("homeworkAssign_hours",12))||12;
+  var coBai={};srows("DL13").forEach(function(h){if(h.session_id)coBai[h.session_id]=1});
+  srows("DL11").forEach(function(s){
+   if(!isc(s.session_status,"completed"))return;
+   if(coBai[s.session_id])return;
+   /* Buổi có giáo án khai KHÔNG giao bài thì không phải việc - hỏi giáo án trước khi kêu. */
+   var P=null;try{P=sesPlan(s)}catch(e){}
+   if(P&&P.hw&&String(P.hw.khongGiao||"")==="1")return;
+   var age=hoursSince(s.session_date);
+   if(age==null||age<=lim)return;
+   /* TRẦN THỜI GIAN, và đây không phải để giấu số. Đo thật trên bản demo: **316/368 buổi đã dạy
+      không có bài tập nào** - đổ hết vào bảng việc là một danh sách không ai xử được, mà một
+      bảng việc dài vô lý thì người ta bỏ qua CẢ BẢNG, kể cả những dòng thật.
+      Buổi dạy từ ba tháng trước thì không còn giao bài được nữa - đó là chuyện của báo cáo chất
+      lượng, không phải việc hôm nay. Bảng việc chỉ giữ phần CÒN LÀM ĐƯỢC: trong `homeworkAssignWindow_days`
+      ngày trở lại. Phần cũ hơn vẫn nhìn thấy ở tỷ lệ nộp bài (HCR) của lớp. */
+   var win=num(paramOf("homeworkAssignWindow_days",7))||7;
+   if(age>win*24)return;
+   add("Giảng viên chuyên môn","Chưa giao bài tập sau buổi học",age>lim*2?"red":"amber","ti-book-off",
+    (s.class_id_name||s.class_id||"")+" · buổi "+(s.session_number||"?"),
+    "Buổi dạy xong "+Math.round(age)+"h mà chưa giao bài tập - hạn giao là "+lim+"h kể từ giờ buổi học",
+    age,"banglop",null,{page:"banglop",set:{BLCLASS:s.class_id,BLTAB:"baitap"},prm:"homeworkAssign_hours"})})})();
  /* ===== LỚP SẮP KHAI GIẢNG CÓ ĐỦ NGƯỜI KHÔNG =====================================
     V9.40. Đo trên dữ liệu: 13 lớp đã lên lịch khai giảng với 174 ghế trống, trong đó 3 lớp
     ĐANG TUYỂN SINH khai giảng trong 6-14 ngày với sĩ số 3/20, 0/14 và 0/12. Nhịp đăng ký thật
@@ -6605,6 +6672,24 @@ function slaItems(){var out=jTasks();
     add("Học vụ","Lớp sắp kết thúc khóa",left<=3?"amber":"","ti-flag-check",nhan,
      "Còn "+left+" ngày là kết thúc ("+(c.class_end_date||"")+") - lên kế hoạch lớp kế tiếp cho học viên lớp này",
      -left*24,"xeplop",null,{act:"molop",rid:c.class_id,prm:"classEndNear_days"})})();
+   /* ═══ 12/08 - HỌC VIÊN CHƯA ĐỦ ĐIỀU KIỆN HOÀN THÀNH KHÓA ═══════════════════════════════════
+      Anh Luân: *"học viên phải đảm bảo 90% khối lượng BTVN và tham gia đầy đủ 2 bài kiểm tra
+      Midterm/Final"*. Một chuẩn mà chỉ hiện lúc kết thúc khóa thì đã muộn - lúc ấy không còn
+      đường cứu. Nên báo khi lớp SẮP kết thúc, còn kịp nhắc em nộp bù và xếp lịch thi.
+      Đếm theo LỚP chứ không réo từng em: học vụ xử lý cả lớp một lượt. */
+   (function(){
+    var d=pvnd(c.class_end_date);if(!d)return;
+    var left=Math.round((d.getTime()-t0.getTime())/864e5);
+    if(left<0||left>dEnd)return;
+    var enr=rows("DL08").filter(function(o){return o.class_id===c.class_id&&o.student_id});
+    if(!enr.length)return;
+    var thieu=enr.filter(function(o){var D=null;try{D=hvDuDieuKien(o.student_id)}catch(e){}
+     return D&&D.soBai&&!D.du});
+    if(!thieu.length)return;
+    add("Học vụ","Học viên chưa đủ điều kiện hoàn thành khóa",left<=7?"red":"amber","ti-clipboard-x",nhan,
+     thieu.length+"/"+enr.length+" học viên chưa đạt chuẩn (nộp đủ "+Math.round(kpiTh(/^HCR/,0.9)*100)+
+     "% bài tập + có đủ điểm Midterm và Final) mà lớp còn "+left+" ngày là kết thúc - nhắc nộp bù và xếp lịch thi ngay",
+     -left*24,"banglop",null,{page:"banglop",set:{BLCLASS:c.class_id,BLTAB:"hocvien"},prm:"classEndNear_days"})})();
    /* (4) LỚP CÓ NHIỀU HỌC VIÊN NGUY CƠ - cả lớp đuối chứ không riêng một em. Đây là việc của
       LỚP: một em đuối thì kèm em đó, một phần ba lớp đuối thì phải xem lại giáo viên, giáo án
       hoặc trình độ đầu vào - hai việc khác hẳn nhau, mà bảng việc trước nay chỉ biết nói cái đầu. */
@@ -7088,6 +7173,7 @@ function slaRow(it){var age=it.age!=null?'<span class="agebadge '+it.sev+'">'+es
 /* Drawer XEM NHANH một việc: ai - việc gì - trễ bao lâu - bộ phận nào - ngưỡng lấy từ đâu - làm gì tiếp */
 var SLAPRM={"Gọi hỏi thăm HV vắng":["slaAbsenceCall_hours",24],"Duyệt xin nghỉ học":["slaTaskAccept_hours",4],
  "Ghi nhận xét buổi":["slaTeacherNote_hours",48],"Chấm bài tập":["slaHomeworkGrading_hours",48],
+ "Chưa giao bài tập sau buổi học":["homeworkAssign_hours",12],
  "Chấm test đầu vào":["slaGLA_hours",24],"Chờ chấm test":["slaTestResult_hours",24],
  "Ghi nội dung WOW":["slaWowNote_hours",24],"Xử lý khiếu nại":["slaComplaintHigh_hours",4],
  /* V9.63: các nhóm việc sinh từ bảng DL23 - hạn đều tính từ ngưỡng trong CH2, khai vào đây để
@@ -10925,7 +11011,7 @@ function sesPlan(s){
   plan:pl, cl:cl}}
 /* Hạn nộp = ngày học + N ngày. Không có giáo án thì rơi về mức mặc định của trung tâm.
    V9.29o: trước đây là hằng số 5 nằm trong code - trung tâm đổi nếp là phải sửa code. */
-function dueFall(){return num(paramOf("homeworkDueFallback_days",5))||5}
+function dueFall(){return num(paramOf("homeworkDueFallback_days",3))||3}
 function dueAfter(sesDate,n){var d=pvnd(sesDate);if(!d||!n)return "";
  var x=new Date(d.getTime()+n*864e5);return fmtDT(x).slice(0,10)}
 function dueChip(P){if(!P||!P.dueDays)return '<span class="mut">chưa đặt hạn</span>';
@@ -11064,7 +11150,7 @@ function gaMoi(){
      ấy thay vì gõ lại tên tham số, thì không bịa được nữa. Đây là lần thứ tư trong hai ngày em
      đoán một cái tên thay vì hỏi thẳng mã. */
   '<div class="fld"><label>Hạn nộp bài (ngày sau buổi)</label><input id="gm_due" type="number" min="0" step="1" placeholder="'+esc(String(dueFall()))+'">'+
-   '<div class="fhint">Để trống thì lấy mặc định của hệ thống ('+slaChip("homeworkDueFallback_days",5,"ngày")+').</div></div></div>';
+   '<div class="fhint">Để trống thì lấy mặc định của hệ thống ('+slaChip("homeworkDueFallback_days",3,"ngày")+').</div></div></div>';
  h+='<div class="dact"><button class="btn primary" onclick="gaMoiLuu()"><i class="ti ti-device-floppy"></i>Lưu giáo án</button>'+
   '<button class="btn" onclick="closeModal()">Huỷ</button></div></div>';
  openDrawer("Soạn giáo án cho buổi",h)}
@@ -11337,7 +11423,7 @@ function renderBanglop(){
     offDa?("GV chính đã nghỉ "+offDa+" buổi"):"GV chính chưa nghỉ buổi nào","",
     "Đếm buổi của lớp do người KHÁC giáo viên chính dạy (mỗi lần đổi người dạy đều ghi vết kèm lý do). Quota "+gvOffQuota()+" buổi lấy từ cấu hình teacherOffQuota_course. Danh sách: tab Buổi học, buổi nào đổi GV có ghi trong vết."],
    ["ti-checkbox",attP==null?"—":Math.round(attP*100)+"%","Chuyên cần (ATR)",(attP!=null&&attP>=kpiTh(/^ATR/,0.85))?"#16A34A":"#E24B4A","mục tiêu ≥ "+kpiChip(/^ATR/,0.85,1),"",attP==null?"Lớp chưa có buổi nào được điểm danh":pctG(pres,att.length,"lượt điểm danh có mặt (đúng giờ hoặc đi trễ)")],
-   ["ti-book",hcrP==null?"—":Math.round(hcrP*100)+"%","Nộp bài (HCR)",(hcrP!=null&&hcrP>=kpiTh(/^HCR/,0.8))?"#16A34A":"#E08A1E","mục tiêu ≥ "+kpiChip(/^HCR/,0.8,1),"",hcrP==null?"Lớp chưa giao bài nào":pctG(hwSub,hw.length,"bài đã nộp")],
+   ["ti-book",hcrP==null?"—":Math.round(hcrP*100)+"%","Nộp bài (HCR)",(hcrP!=null&&hcrP>=kpiTh(/^HCR/,0.9))?"#16A34A":"#E08A1E","mục tiêu ≥ "+kpiChip(/^HCR/,0.9,1),"",hcrP==null?"Lớp chưa giao bài nào":pctG(hwSub,hw.length,"bài đã nộp")],
    ["ti-user-exclamation",risk,"HV nguy cơ",risk?"#DB2777":"#16A34A",risk?"cần can thiệp":"ổn"],
    ["ti-thumb-up",ss==null?"—":ss.toFixed(1)+"/5","Hài lòng (SS)",(ss!=null&&ss>=kpiTh(/^SS/,4.5))?"#16A34A":"#E08A1E","mục tiêu ≥ "+kpiTh(/^SS/,4.5)]],"banglop");
  })();
@@ -12598,7 +12684,7 @@ function dataHealth(){var out=[];
  /* V9.29q: PHẢI dùng ĐÚNG cửa sổ ân hạn của bộ kiểm dữ liệu (_checkdata F4) - buổi vừa dạy xong
     trong ngày là HÀNG CHỜ bình thường, không phải lỗi. Trước đây màn này không có cửa sổ nên nó
     và bộ kiểm nói hai con số khác nhau về cùng một chuyện. */
- var _grace=num(paramOf("attendanceGrace_hours",24))||24;
+ var _grace=num(paramOf("attendanceGrace_hours",12))||24;
  var noAtt=rows("DL11").filter(function(s){if(!isc(s.session_status,"completed")||attSes[s.session_id])return false;
   if(!rows("DL08").some(function(o){return o.class_id===s.class_id}))return false;
   var a=hoursSince(s.session_date);return a==null||a>_grace}).length;
@@ -12624,7 +12710,7 @@ function renderHealth(){var items=dataHealth();
     Chính nó vừa bắt được 3 phiếu test hẹn TRƯỚC giờ tạo lead mà 132 luật kia bỏ sót.
     LUẬT MỚI: bộ kiểm bắt màn này phải SẠCH trên dữ liệu gốc - còn dòng nào tức là hai bên đang
     nói khác nhau, và phải sửa cho khớp chứ không được để đó. */
- var h='<div class="notebar"><i class="ti ti-stethoscope"></i>Soi <b>dữ liệu đang mở</b> (kể cả phần bạn vừa sửa trong buổi demo) bằng 9 nhóm quy tắc. Khác với bộ kiểm chạy lúc sinh dữ liệu: cái đó chỉ soi bản gốc. Hàng chờ công việc bình thường (chiết khấu chờ duyệt, buổi vừa dạy chưa điểm danh trong '+(num(paramOf("attendanceGrace_hours",24))||24)+'h) KHÔNG tính là lỗi - xem ở <b>Chờ duyệt</b>. Bấm một dòng để nhảy tới nơi sửa.</div>';
+ var h='<div class="notebar"><i class="ti ti-stethoscope"></i>Soi <b>dữ liệu đang mở</b> (kể cả phần bạn vừa sửa trong buổi demo) bằng 9 nhóm quy tắc. Khác với bộ kiểm chạy lúc sinh dữ liệu: cái đó chỉ soi bản gốc. Hàng chờ công việc bình thường (chiết khấu chờ duyệt, buổi vừa dạy chưa điểm danh trong '+(num(paramOf("attendanceGrace_hours",12))||24)+'h) KHÔNG tính là lỗi - xem ở <b>Chờ duyệt</b>. Bấm một dòng để nhảy tới nơi sửa.</div>';
  h+='<div class="hstat">'+
   '<div class="hs '+(by.nang.length?"red":"green")+'"><b>'+by.nang.length+'</b><span>Nghiêm trọng</span></div>'+
   '<div class="hs '+(by.vua.length?"amber":"green")+'"><b>'+by.vua.length+'</b><span>Cần sửa</span></div>'+
@@ -14296,8 +14382,18 @@ var APPPARAMS=[
  ["Hệ thống & dữ liệu demo","demoAutoShift_days","Dữ liệu demo cũ hơn hôm nay bao nhiêu ngày thì app tự kéo về hiện tại (0 = không tự kéo)","ngày",7],
  ["Hệ thống & dữ liệu demo","auditLogKeep_rows","Nhật ký thao tác giữ lại bao nhiêu dòng gần nhất","dòng",500],
  ["Hệ thống & dữ liệu demo","undoWindow_seconds","Làm xong một thao tác thì nút Hoàn tác hiện bao lâu","giây",25],
- ["P6 · Buổi học, điểm danh & bài tập","attendanceGrace_hours","Buổi dạy xong bao lâu thì BẮT BUỘC phải có điểm danh (trong khoảng này còn coi là hàng chờ)","giờ",24],
- ["P6 · Buổi học, điểm danh & bài tập","homeworkDueFallback_days","Hạn nộp bài mặc định khi giáo án không ghi rõ (tính từ ngày học)","ngày",5],
+ ["P6 · Buổi học, điểm danh & bài tập","attendanceGrace_hours","Kể từ GIỜ DIỄN RA BUỔI HỌC, giáo viên có bao nhiêu tiếng để điểm danh (trong khoảng này còn coi là hàng chờ, quá là quá hạn)","giờ",12],
+ /* ═══ 12/08 - BỐN LUẬT BÀI TẬP ANH LUÂN THÔNG BÁO ═══════════════════════════════════════════
+    *"1. Hạn nộp BTVN mặc định 3 ngày kể từ giờ diễn ra buổi học, không phân biệt GV có giao sớm
+    hay trễ. 2. Giáo viên bắt buộc giao BTVN và điểm danh trong 12 tiếng kể từ giờ diễn ra buổi
+    học. 3. Quá thời hạn nộp mặc định sẽ được cộng thêm 1 ngày nhưng đánh dấu là 'Nộp trễ'.
+    4. Giáo viên có 2 ngày kể từ hạn nộp hoặc hạn nộp trễ để chấm. Quá hạn sẽ đánh dấu là Chấm trễ."*
+    Vế "không phân biệt GV giao sớm hay trễ" app đã làm ĐÚNG SẴN: `dueAfter(session_date, ...)`
+    neo vào GIỜ BUỔI HỌC chứ không neo vào lúc giao. Chỉ đổi con số. */
+ ["P6 · Buổi học, điểm danh & bài tập","homeworkDueFallback_days","Hạn nộp bài mặc định, tính từ GIỜ DIỄN RA BUỔI HỌC (không tính từ lúc giáo viên giao bài, nên giao sớm hay trễ đều cùng một hạn)","ngày",3],
+ ["P6 · Buổi học, điểm danh & bài tập","homeworkAssign_hours","Kể từ GIỜ DIỄN RA BUỔI HỌC, giáo viên có bao nhiêu tiếng để giao bài tập về nhà","giờ",12],
+ ["P6 · Buổi học, điểm danh & bài tập","homeworkAssignWindow_days","Buổi dạy xong quá bao nhiêu ngày thì thôi nhắc giao bài (quá lâu thì không giao được nữa - đó là chuyện của báo cáo chất lượng, không phải việc hôm nay)","ngày",7],
+ ["P6 · Buổi học, điểm danh & bài tập","homeworkLateGrace_days","Quá hạn nộp thì học viên còn được nộp thêm bao nhiêu ngày - nộp trong khoảng này vẫn nhận nhưng đánh dấu \"Nộp trễ\"; quá nữa là KHÔNG NỘP","ngày",1],
  ["Công giảng dạy & đơn giá giờ","teacherPayPerSession","Tiền công một buổi dạy (dùng để tạm tính bảng công tháng)","đ/buổi",250000],
  ["Công giảng dạy & đơn giá giờ","teacherPayPerHour","Đơn giá GIỜ dạy dùng khi bảng đơn giá chưa khai ô nào khớp","đ/giờ",180000],
  ["Công giảng dạy & đơn giá giờ","shiftNoon_hour","Buổi bắt đầu từ giờ này trở đi tính là CA CHIỀU","giờ trong ngày",12],
@@ -14804,7 +14900,33 @@ function hwGraded(x){return !!(String((x&&x.graded_at)||"").trim()||String((x&&x
    Enum thật: not_assigned · assigned · submitted_on_time · submitted_late · missing
    (KHÔNG có mã "submitted" hay "graded" - chấm bài nhận biết qua graded_at/homework_score). */
 function hwSubmitted(x){return !!(String((x&&x.homework_submitted_time)||"").trim()||isc(x&&x.homework_status,"submitted_on_time","submitted_late"))}
-function hwLate(x){return isc(x&&x.homework_status,"submitted_late")||/^(có|co|yes|true|1)$/i.test(String((x&&x.is_late)||"").trim())}
+/* ═══ 12/08 - BỐN MỐC THỜI GIAN CỦA MỘT BÀI TẬP (anh Luân thông báo) ═════════════════════════
+   Trước bản này app chỉ biết ĐÚNG MỘT mốc: `homework_due_date`. Ba luật còn lại của anh Luân
+   không có chỗ nào để sống:
+     · hạn nộp TRỄ  = hạn nộp + `homeworkLateGrace_days` (nộp trong khoảng này vẫn nhận, đánh
+       dấu "Nộp trễ"; quá nữa mới là KHÔNG NỘP)
+     · hạn CHẤM     = 2 ngày kể từ HẠN NỘP, hoặc kể từ HẠN NỘP TRỄ nếu bài nộp trễ
+   Mốc chấm phải neo vào HẠN NỘP chứ không neo vào GIỜ NỘP: bản cũ đếm từ `homework_submitted_time`,
+   nên một học viên nộp sớm ba ngày là giáo viên bị tính quá hạn chấm sớm ba ngày - phạt người
+   chấm vì học viên chăm. Anh Luân nói rõ *"2 ngày kể từ hạn nộp hoặc hạn nộp trễ"*. */
+function hwHan(x){return pvnd(x&&x.homework_due_date)}
+function hwGiaHan(){var n=num(paramOf("homeworkLateGrace_days",1));return n>0?n:1}
+function hwHanTre(x){var d=hwHan(x);return d?new Date(d.getTime()+hwGiaHan()*864e5):null}
+function hwHanCham(x){
+ var d=hwLate(x)?hwHanTre(x):hwHan(x);
+ if(!d)return null;
+ return new Date(d.getTime()+(num(paramOf("slaHomeworkGrading_hours",48))||48)*36e5)}
+/* Chấm trễ = chấm SAU hạn chấm. Chưa chấm mà đã quá hạn cũng là trễ. */
+function hwChamTre(x){
+ var h=hwHanCham(x);if(!h)return false;
+ var g=pvnd(x&&x.graded_at);
+ return g?(g.getTime()>h.getTime()):(hwSubmitted(x)&&Date.now()>h.getTime())}
+function hwLate(x){
+ if(isc(x&&x.homework_status,"submitted_late")||/^(có|co|yes|true|1)$/i.test(String((x&&x.is_late)||"").trim()))return true;
+ /* Nhãn trong dữ liệu là nguồn chính, nhưng NGÀY vẫn phải nói được: bài nộp sau hạn mà nhãn
+    chưa kịp đổi thì vẫn là nộp trễ. */
+ var d=hwHan(x),sub=pvnd(x&&x.homework_submitted_time);
+ return !!(d&&sub&&sub.getTime()>d.getTime())}
 /* Thang điểm của một bài. SOP khai cột score_type; hiện dữ liệu chỉ dùng "band" (0-9 bước 0.5),
    nhưng bài luyện kỹ năng lẻ có thể chấm thang 10 - nên đọc từ cột chứ không cắm cứng. */
 function hwThangMa(x){var v=String((x&&x.score_type)||"").trim();return v||"band"}
@@ -17885,9 +18007,34 @@ function renderTrangHV(){
  h+='<div class="sechd" id="s-tiendo">Tiến độ của bạn</div>';
  h+=statStrip([
   ["ti-checkbox",attP==null?"—":attP+"%","Chuyên cần",(attP!=null&&attP>=Math.round(kpiTh(/^ATR/,0.85)*100))?"#16A34A":"#E24B4A",attOK+"/"+attAll+" buổi có mặt","",pctG(attOK,attAll,"buổi có mặt (tính cả đi trễ)")],
-  ["ti-book",hwP==null?"—":hwP+"%","Bài tập đã nộp",(hwP!=null&&hwP>=Math.round(kpiTh(/^HCR/,0.8)*100))?"#16A34A":"#E08A1E",hwSub+"/"+hwAll+" bài","",pctG(hwSub,hwAll,"bài đã nộp trên tổng số bài được giao")],
+  ["ti-book",hwP==null?"—":hwP+"%","Bài tập đã nộp",(hwP!=null&&hwP>=Math.round(kpiTh(/^HCR/,0.9)*100))?"#16A34A":"#E08A1E",hwSub+"/"+hwAll+" bài","",pctG(hwSub,hwAll,"bài đã nộp trên tổng số bài được giao")],
   ["ti-writing",scAvg||"—","Điểm bài tập TB",scAvg?"#3B82C4":"#6B7887",sc.length?("từ "+sc.length+" bài đã chấm"):"chưa có điểm"],
   ["ti-star",wowLeft,"Buổi WOW còn lại","#DB2777","đã dùng "+wowUsed+" buổi"]],"tranghv");
+ /* 12/08 - CHUẨN HOÀN THÀNH KHÓA hiện ngay dưới dải tiến độ. Anh Luân thông báo: *"học viên phải
+    đảm bảo 90% khối lượng BTVN và tham gia đầy đủ 2 bài kiểm tra Midterm/Final"*. Nói cho học
+    viên biết TRƯỚC, ngay chỗ họ nhìn tiến độ - đừng để tới cuối khóa mới báo là thiếu. */
+ (function(){var D=null;try{D=hvDuDieuKien(S.student_id)}catch(e){}
+  if(!D||!D.soBai)return;
+  /* CHƯA THI KHÔNG PHẢI LÀ THIẾU. Đo được: 76/85 học viên "chưa đủ điều kiện" - phần lớn chỉ vì
+     chưa tới kỳ thi Midterm/Final, mà lớp còn học vài tháng nữa. Báo "bạn còn thiếu điểm Final"
+     cho một em đang học tuần thứ hai là dọa người ta bằng một thứ chưa tới lượt, và người đọc sẽ
+     quen với việc bỏ qua dòng cảnh báo ấy - rồi tới lúc thiếu thật cũng không ai đọc.
+     Nên chỉ liệt kê Midterm/Final khi lớp SẮP KẾT THÚC (cùng ngưỡng với việc của học vụ). Còn
+     tỷ lệ bài tập thì nói mỗi ngày - đó là thứ em ấy làm được ngay hôm nay. */
+  var sapXong=false;
+  try{var _c=lop&&find("DL10","class_id",lop.class_id);var _d=_c&&pvnd(_c.class_end_date);
+   if(_d)sapXong=((_d.getTime()-Date.now())/864e5)<=(num(paramOf("classEndNear_days",21))||21)}catch(e){}
+  var pctTxt=(D.pct==null?"chưa có bài nào":(Math.round(D.pct*100)+"%"));
+  var xanh=D.du||(D.okBai&&!sapXong);
+  h+='<div class="hvdan '+(xanh?"nbgreen":"nbamber")+'" style="margin:0 0 14px"><i class="ti '+(xanh?"ti-circle-check":"ti-alert-triangle")+'"></i><span>'+
+   '<b>Chuẩn hoàn thành khóa:</b> nộp đủ <b>'+Math.round(D.nguong*100)+'%</b> bài tập và tham gia <b>cả hai</b> bài kiểm tra Midterm + Final. '+
+   (D.du
+    ?('Bạn đã đạt đủ cả ba - nộp '+pctTxt+' bài tập, có điểm Midterm và Final.')
+    :(sapXong
+      ?('Lớp sắp kết thúc mà bạn còn thiếu: <b>'+esc(D.ds.join(" · "))+'</b>. Liên hệ trung tâm để nộp bù hoặc xếp lịch thi.')
+      :('Bạn đang nộp <b>'+pctTxt+'</b> bài tập'+(D.okBai?' - đã trên chuẩn, giữ nhịp nhé.':' - cần lên '+Math.round(D.nguong*100)+'%.')+
+        ' Hai bài kiểm tra sẽ tính khi tới kỳ thi.')))+
+   '</span></div>'})();
  /* điểm test đầu vào theo kỹ năng */
  if(t.overall_score){
   var sk=[["Listening",num(t.skill_listening)],["Reading",num(t.skill_reading)],["Writing",num(t.skill_writing)],["Speaking",num(t.skill_speaking)]].filter(function(x){return x[1]>0});
@@ -24855,7 +25002,7 @@ var NHIP={
    function(){var t=new Date();return srows("DL11").filter(function(x){var d=pvnd(x.session_date);
     return d&&sameDay(d,t)&&String(x.teacher_id||"")===(CURSTAFF||"")}).length}],
   ["ngay","Điểm danh ngay khi vào lớp","Điểm danh muộn là số chuyên cần sai cả tháng","banglop",
-   function(){var g=num(paramOf("attendanceGrace_hours",24));
+   function(){var g=num(paramOf("attendanceGrace_hours",12));
     return srows("DL11").filter(function(x){if(!isc(x.session_status,"completed"))return false;
      if(String(x.teacher_id||"")!==(CURSTAFF||""))return false;
      var a=hoursSince(x.session_date);if(a==null||a>g)return false;

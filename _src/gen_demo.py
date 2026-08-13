@@ -1212,8 +1212,21 @@ _cancel_ids={s["session_id"] for s in sessions if s["session_status"].startswith
 _demo_cls={"LOP-IELTS-6.5-04","LOP-IELTS-7.0-02"}
 _live=next((s for s in sessions if s["session_status"].startswith("scheduled") and s["class_id"] not in _demo_cls),None)
 if _live:
-    _live.update(session_date=F(NOW-dt.timedelta(minutes=40)),class_start_scheduled=F(NOW-dt.timedelta(minutes=40)),
-        class_start_actual=F(NOW-dt.timedelta(minutes=35)),session_status="in_progress (Đang diễn ra)",teacher_late_minutes=5)
+    # ═══ BUỔI "ĐANG DIỄN RA" PHẢI NẰM TRONG GIỜ MỞ CỬA, KỂ CẢ KHI CHẠY LÚC 2 GIỜ SÁNG ═══════
+    # Bẫy phụ thuộc ĐỒNG HỒ, cắn 13/08 lúc 02:41: khối này lấy thẳng `NOW - 40 phút`, nên chạy
+    # pipeline ban đêm là buổi học rơi vào 02:41 và `check_logic` luật 7k đỏ ("buổi xếp vào giờ
+    # trung tâm ĐÓNG CỬA"). Không phải lỗi mới - nó nằm đây từ đầu, chỉ chưa ai chạy vào giờ đó.
+    # Cùng họ với cái bẫy "đồng hồ vắt qua nửa đêm" đã ghi hôm 11/08: một khối dữ liệu neo vào
+    # giờ chạy thì nó đúng hay sai tuỳ lúc người ta bấm, mà không ai đọc mã ra được điều đó.
+    # Nay kẹp vào khung 6h-22h: chạy trong giờ thì y như cũ, chạy ngoài giờ thì lùi về buổi tối
+    # gần nhất - vẫn là một buổi "đang diễn ra" hợp lý để demo.
+    _liveAt = NOW - dt.timedelta(minutes=40)
+    if not (6 <= _liveAt.hour < 22):
+        _liveAt = (_liveAt.replace(hour=19, minute=30, second=0, microsecond=0)
+                   - (days(1) if _liveAt.hour < 6 else days(0)))
+    _live.update(session_date=F(_liveAt), class_start_scheduled=F(_liveAt),
+        class_start_actual=F(_liveAt + dt.timedelta(minutes=5)),
+        session_status="in_progress (Đang diễn ra)", teacher_late_minutes=5)
 
 # MỖI GIẢNG VIÊN có ít nhất 1 buổi HÔM NAY: GV nào trống lịch hôm nay thì thêm 1 buổi
 # HỌC BÙ hôm nay cho lớp GV đó chủ nhiệm (bù cho các buổi đã hủy "học bù tuần sau").
@@ -2115,6 +2128,16 @@ _en["enum_wow_mode"]=["online (Trực tuyến)","offline (Tại trung tâm)"]
 # SALE-6: tach "hinh thuc test" thanh HAI cau hoi. `enum_test_format` giu nguyen (online/offline),
 # `enum_test_kind` la cau hoi thu hai - thi thu hay thi that. Hai chuyen doc lap nhau.
 _en["enum_test_kind"]=["mock (Thi thử tại trung tâm)","official (Thi thật tại hội đồng)"]
+
+# ═══ 12/08 - NGUONG HCR 0.8 -> 0.9 (anh Luan thong bao) ════════════════════════════════════
+# *"Hoc vien phai dam bao 90% khoi luong BTVN va tham gia day du 2 bai kiem tra Midterm/Final."*
+# Nguong nay nam o CH6 (bang chi so), khong phai CH2. Upsert TAI NGUON chu khong sua tay
+# `demo_base.json` - file base la ban chup dung yen, sua tay la mat dau vet.
+_ch6 = (out.get("config") or {}).setdefault("ch6", [])
+for _k in _ch6:
+    if str(_k.get("code")) == "HCR":
+        _k["threshold"] = 0.9
+        _k["name"] = "Homework Completion Rate - Tỷ lệ hoàn thành bài tập (chuẩn tốt nghiệp: 90%)"
 
 _ch2 = (out.get("config") or {}).setdefault("ch2", [])
 _ch2By = {str(x.get("name")): x for x in _ch2}

@@ -49,23 +49,29 @@ BY = {r["title"]: r["hw_bank_id"] for r in dl["DL20"]}
 # ---------------- DL21 · GIÁO ÁN KHÓA ----------------
 # Vòng lặp 8 buổi cho mọi khóa: mỗi buổi có chủ đề + bài mặc định + lời dặn mặc định
 # + HẠN NỘP mặc định (số ngày sau buổi học). Bài viết cho hạn dài hơn bài ngữ pháp.
+# ═══ 12/08 - HẠN NỘP BÀI VỀ ĐÚNG 3 NGÀY Ở MỌI GIÁO ÁN ═══════════════════════════════════════
+# Anh Luân thông báo: *"hạn nộp BTVN mặc định 3 ngày kể từ giờ diễn ra buổi học, không phân biệt
+# GV có giao sớm hay trễ"*. Trước đó giáo án rải 2/3/4/5/6 ngày tuỳ bài, nên tham số mặc định
+# `homeworkDueFallback_days` gần như KHÔNG BAO GIỜ được dùng - giáo án ghi đè hết.
+# Đổi ở đây để bản demo nói đúng luật đang chạy. Cơ chế ghi đè theo khóa/lớp GIỮ NGUYÊN: khóa
+# nào cần khác 3 ngày vẫn khai được, chỉ là mặc định nay khớp lời anh công bố.
 CYCLE = [
     ("Listening - bắt ý chính",      "Listening dictation Unit 5",
      "Trước buổi: nghe lại Unit 5 một lượt, ghi ra 5 từ nghe không rõ để hỏi trên lớp.", 3),
     ("Reading - skimming & scanning", "Reading passage - Matching headings",
      "Trước buổi: đọc trước bài đọc trong giáo trình, gạch chân câu chủ đề mỗi đoạn.", 3),
     ("Writing Task 1 - biểu đồ",     "Writing Task 1 - Line graph",
-     "Trước buổi: xem lại từ vựng mô tả xu hướng (increase, decline, fluctuate...).", 5),
+     "Trước buổi: xem lại từ vựng mô tả xu hướng (increase, decline, fluctuate...).", 3),
     ("Speaking Part 1 - trả lời tự nhiên", "Speaking Part 1 - Hobbies record",
-     "Trước buổi: chuẩn bị 3 chủ đề bản thân (sở thích, quê quán, công việc) để nói thử.", 4),
+     "Trước buổi: chuẩn bị 3 chủ đề bản thân (sở thích, quê quán, công việc) để nói thử.", 3),
     ("Ngữ pháp trọng tâm",           "Grammar - Conditionals worksheet",
-     "Trước buổi: ôn lại 3 loại câu điều kiện, mang theo lỗi sai buổi trước để chữa.", 2),
+     "Trước buổi: ôn lại 3 loại câu điều kiện, mang theo lỗi sai buổi trước để chữa.", 3),
     ("Listening - dạng bài khó",     "Listening Section 3 - Cam 18",
      "Trước buổi: nghe 1 lần Section 3 bất kỳ, tự chấm để biết mình yếu chỗ nào.", 3),
     ("Reading - True/False/Not Given","Reading TF/NG - Cam 17",
      "Trước buổi: xem lại quy tắc phân biệt False và Not Given.", 3),
     ("Writing Task 2 - luận điểm",   "Writing Task 2 - Opinion essay",
-     "Trước buổi: chọn 1 đề Task 2 và lập dàn ý 4 đoạn, mang lên lớp chữa.", 6),
+     "Trước buổi: chọn 1 đề Task 2 và lập dàn ý 4 đoạn, mang lên lớp chữa.", 3),
 ]
 MAXSES = 40   # lịch lớp nay kéo dài hơn (buổi tương lai 1-3 tuần) - giáo án phủ tới buổi 40
 dl["DL21"] = []
@@ -88,10 +94,13 @@ for s in dl.get("DL11", []):
     s.setdefault("prep_note", "")    # trống = dùng lời dặn mặc định của khóa
     s.setdefault("hw_due_days", "")  # trống = dùng hạn nộp mặc định của khóa
 
-# vài buổi được giáo viên chỉnh riêng cho sinh động
-tweaks = {1: ("HWB-009", "Lớp mình yếu Task 2 nên buổi này đổi sang luyện viết luận. Mang laptop nhé.", 7),
+# Vài buổi được giáo viên chỉnh riêng - GIỮ để bản demo cho thấy cơ chế ghi đè theo buổi vẫn
+# chạy. Nhưng con số phải ĐỌC RA LÀ MỘT NGOẠI LỆ CÓ LÝ DO, không chọi lại luật đang công bố:
+# hạn chuẩn nay là 3 ngày, nên buổi luyện viết luận nới lên 5 ngày là hợp (lời dặn ngay bên cạnh
+# đã nói vì sao). Bỏ hẳn ca 2 ngày - ngắn hơn chuẩn mà không có lý do gì thì chỉ gây nhiễu.
+tweaks = {1: ("HWB-009", "Lớp mình yếu Task 2 nên buổi này đổi sang luyện viết luận - hạn nộp nới thành 5 ngày. Mang laptop nhé.", 5),
           3: ("", "Buổi này có kiểm tra nhanh 15 phút đầu giờ, ôn lại từ vựng tuần trước.", ""),
-          5: ("HWB-012", "", 2)}
+          5: ("HWB-012", "", "")}
 byc = {}
 for s in dl.get("DL11", []):
     byc.setdefault(s.get("class_id"), []).append(s)
