@@ -4218,12 +4218,12 @@ var THEDEF={
   ["nk_today","Hôm nay","Số thao tác ghi trong ngày hôm nay. Danh sách: lọc theo ngày ở thanh lọc dưới."],
   ["nk_nguoi","Người thao tác","Số người khác nhau đã ghi dữ liệu trong sổ này. Muốn xem: cột Người ở bảng dưới."],
   ["nk_undo","Dòng đã hoàn tác","Số thao tác đã bị bấm hoàn tác - dữ liệu đã trả về giá trị cũ. Muốn xem: bảng dưới, dòng có dấu hoàn tác."]]},
+ /* 13/08 - ba thẻ trùng nhãn với chip lọc đã bỏ (xl_send · xl_cfm · xl_over); hai thẻ còn lại
+    nói thứ chip không nói: "chờ xếp lớp" là hàng đợi TRƯỚC khi vào onboarding, còn "onboarding
+    chưa xong" mang mốc SLA 72 giờ. */
  xeplop:{t:"Xếp lớp & onboarding",the:[
-  ["xl_cho","Đã thu · chờ xếp lớp","Học viên đã đóng tiền nhưng chưa được xếp vào lớp nào - đây là bước đầu tiên phải làm. Danh sách: bấm chip 'Chưa hoàn tất' ở thanh lọc dưới rồi nhìn cột Lớp còn trống."],
-  ["xl_send","Chờ gửi thông tin lớp","Đã xếp lớp nhưng chưa gửi thông tin lớp cho học viên, hạn theo slaClassInfoZalo_hours. Danh sách: bấm chip 'Chờ gửi thông tin lớp' ở thanh lọc dưới."],
-  ["xl_cfm","Chờ HV xác nhận lớp","Đã gửi thông tin mà học viên chưa xác nhận sẽ đi học. Danh sách: bấm chip 'Chờ HV xác nhận' ở thanh lọc dưới."],
-  ["xl_ob","Onboarding chưa xong","Số hồ sơ onboarding chưa đủ bước, hạn theo slaOBT_hours. Danh sách: bấm chip 'Chưa hoàn tất' ở thanh lọc dưới."],
-  ["xl_over","Quá hạn","Số hồ sơ đã vi phạm hạn gửi thông tin hoặc hạn onboarding. Danh sách: bấm chip 'Quá hạn' ở thanh lọc dưới."]]},
+  ["xl_cho","Đã thu · chờ xếp lớp","Học viên đã đóng tiền nhưng chưa được xếp vào lớp nào - đây là bước đầu tiên phải làm. Danh sách: bảng ngay dưới dải thẻ."],
+  ["xl_ob","Onboarding chưa xong","Số hồ sơ onboarding chưa đủ bước, hạn theo slaOBT_hours. Danh sách: bấm chip 'Chưa hoàn tất' ở thanh lọc dưới."]]},
  reup:{t:"Chăm lại khách cũ",the:[
   ["ru_nc","Chưa gặp được","Lead đã gọi nhưng không liên lạc được - nên đổi kênh Zalo/SMS. Danh sách: bấm chip 'Chưa gặp được' ở thanh lọc dưới."],
   ["ru_lost","Đã mất / từ chối","Khách đã từ chối hoặc bỏ cuộc - vẫn nên chăm lại định kỳ. Danh sách: chip 'Đã mất'."],
@@ -14612,23 +14612,35 @@ function xlWaiting(){/* Đăng ký đã xác nhận (đã cọc/đóng) nhưng C
 function xlSegs(fil,obs,wait){
  return segHTML(fil,[["all","Tất cả",obs.length],
   ["chuaxep","Chờ xếp lớp",wait.length,wait.length?"red":""],
-  ["sendinfo","Chờ gửi thông tin lớp",obs.filter(function(o){return !obState(o).sent}).length,"amber"],
+  /* 13/08 - CHIP THUA CONG THUC CUA THE. Do that: the ghi 2, chip ghi 3 - cung mot man, cung
+     mot cai ten. Goc: the hoi them `o.class_id` (chua xep lop thi lay gi ma gui thong tin lop),
+     chip thi khong. Bo the ma khong sua chip la GIU LAI DUNG CON SO SAI. */
+  ["sendinfo","Chờ gửi thông tin lớp",obs.filter(function(o){return o.class_id&&!obState(o).sent}).length,"amber"],
   ["confirm","Chờ HV xác nhận",obs.filter(function(o){var s=obState(o);return s.sent&&!s.confirmed}).length],
   ["finish","Chưa hoàn tất",obs.filter(function(o){return !obState(o).done}).length],
   ["overdue","Quá hạn",obs.filter(function(o){var s=obState(o);return s.infoOverdue||s.obOverdue}).length,"red"]],
-  "window.XLFILT='{k}';reRender('xeplop')")}
+  "window.XLFILT='{k}';reRender('xeplop')")+
+  /* Mốc SLA vốn nằm trên thẻ "Chờ gửi thông tin lớp" - thẻ bỏ rồi thì mốc phải có chỗ khác,
+     kèm bánh răng chỉnh ngưỡng. Đặt ngay dưới dải chip, đúng chỗ người ta vừa bấm. */
+  '<div class="fhint" style="margin:6px 0 0">Hạn gửi thông tin lớp '+slaChip("slaClassInfoZalo_hours",24)+
+  ' · hạn hoàn tất onboarding '+slaChip("slaOBT_hours",72)+' - quá là vào nhóm Quá hạn.</div>'}
 function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
  var wait=xlWaiting();
- var view=obs.filter(function(o){var s=obState(o);if(fil==="all")return true;if(fil==="sendinfo")return !s.sent;if(fil==="confirm")return s.sent&&!s.confirmed;if(fil==="finish")return !s.done;if(fil==="overdue")return s.infoOverdue||s.obOverdue;return true});
+ var view=obs.filter(function(o){var s=obState(o);if(fil==="all")return true;if(fil==="sendinfo")return o.class_id&&!s.sent;if(fil==="confirm")return s.sent&&!s.confirmed;if(fil==="finish")return !s.done;if(fil==="overdue")return s.infoOverdue||s.obOverdue;return true});
  var h='<div class="phead" data-tour="phead"><div><div class="t">Xếp lớp & Onboarding</div><div class="s">Từ lúc đóng đủ tiền → xếp lớp → gửi thông tin → HV xác nhận → hoàn tất. Mỗi bước có dấu hoàn thành để tắt cảnh báo</div></div><div class="sp"><button class="btn primary" onclick="openXepMoi()"><i class="ti ti-plus"></i>Xếp lớp học viên</button></div></div>';
  h+=bvSau();   /* V9.60: ba trang đáp này KHÔNG gọi pageHead nên bảng việc của Tư vấn, Học vụ và
                  Quản lý CHƯA TỪNG hiện ra - gắn tay tại đây, và bộ kiểm canh từ nay. */
+ /* ═══ 13/08 - MỘT MÀN MỘT BỘ ĐIỀU KHIỂN (anh Luân, xem ảnh chụp màn này) ════════════════════
+    *"thẻ và chip lọc có vẻ dễ bị trùng nhau đúng ko? nếu trùng thì bỏ thẻ, thiết kế chip lọc cho
+    đẹp là ngon rồi, lại gọn gàng nữa"*.
+    Đúng, và đây là LẦN THỨ HAI cùng một bệnh: V9.51 anh đã chốt y hệt cho màn Chờ duyệt
+    (*"chip tab đã mang số, dải ô thống kê bỏ hẳn"*), sang V2 nó mọc lại ở 13 màn khác.
+    Đo cả app: 13 màn có thẻ và chip nói cùng một thứ, trong đó 3 chỗ hai bên nói HAI CON SỐ.
+    Bỏ những thẻ TRÙNG NHÃN với chip; giữ thẻ nào chip không nói được. Thứ chỉ thẻ có (mốc SLA
+    kèm bánh răng chỉnh ngưỡng) chuyển xuống dòng ngay dưới dải chip - không mất, chỉ đổi chỗ. */
  h+=statStrip([
   ["ti-user-plus",wait.length,"Đã thu · chờ xếp lớp",wait.length?"#DB2777":"#16A34A","bước đầu tiên"],
-  ["ti-send",obs.filter(function(o){var s=obState(o);return o.class_id&&!s.sent}).length,"Chờ gửi thông tin lớp","#E08A1E","SLA "+slaChip("slaClassInfoZalo_hours",24),"window.XLFILT='sendinfo';reRender('xeplop')"],
-  ["ti-checks",obs.filter(function(o){var s=obState(o);return s.sent&&!s.confirmed}).length,"Chờ HV xác nhận lớp","#7C3AED","gọi chốt giờ học","window.XLFILT='confirm';reRender('xeplop')"],
-  ["ti-layout-grid-add",obs.filter(function(o){return !isc(o.onboarding_status,"completed")}).length,"Onboarding chưa xong","#3B82C4","SLA "+slaChip("slaOBT_hours",72),"window.XLFILT='finish';reRender('xeplop')"],
-  ["ti-alert-triangle",obs.filter(function(o){var s=obState(o);return s.infoOverdue||s.obOverdue}).length,"Quá hạn","#E24B4A","vi phạm PLR48/OBT","window.XLFILT='overdue';reRender('xeplop')"]],"xeplop");
+  ["ti-layout-grid-add",obs.filter(function(o){return !isc(o.onboarding_status,"completed")}).length,"Onboarding chưa xong","#3B82C4","SLA "+slaChip("slaOBT_hours",72),"window.XLFILT='finish';reRender('xeplop')"]],"xeplop");
  /* HÀNG ĐỢI CHỜ XẾP LỚP - trước đây bị giấu sau nút, nay thành danh sách như trong hành trình */
  /* V2 08/08 - HÀNG "ĐÃ ĐÓNG ĐỦ · CHỜ XẾP LỚP" NAY CÓ CHIP RIÊNG.
     Đây là câu hỏi đầu ngày của Học vụ ("Xếp lớp cho học viên đã đóng đủ"), mà trước bản này nó
