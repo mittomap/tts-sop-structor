@@ -6838,7 +6838,16 @@ function arcXem(k){
 function arcDs(){return ARCS.filter(function(A){return arcXem(A.k)})}
 /* chặng đang mở mà chức danh này không được xem thì lùi về chặng đầu tiên họ có */
 function arcHopLe(k){if(arcXem(k))return k;var d=arcDs();return d.length?d[0].k:""}
-function goArc(a){window.ARC=a;window.CHANGK="";go("chang")}
+/* ═══ 13/08 - NHẢY CHẶNG MÀ SIDEBAR ĐỨNG IM (anh Luân, kèm ảnh ga "← C2 Đang học"):
+   *"bấm vào đây nó nhảy chặng mà bên sidebar im re"*.
+   Gốc: hàm này tự đặt `window.ARC` rồi gọi `go("chang")` - tức truyền KHOÁ TRANG. Nhưng `go()`
+   tìm nhóm menu bằng KHOÁ GỐC người dùng bấm (`navGroupOf(key0)`), mà "chang" không thuộc nhóm
+   chặng nào - bốn nhóm chặng trên menu mang khoá `changA..changD`. Không tìm ra nhóm thì không
+   mở nhóm, không tô sáng: thân trang đổi hẳn sang chặng khác trong khi menu vẫn chỉ vào chặng cũ.
+   Nay truyền thẳng khoá chặng; `go()` đã có sẵn nhánh `ARCMAP` để tự đổi nó thành trang `chang`
+   VÀ tự xoá `CHANGK`. Bớt một chỗ đặt tay, và menu đi theo.
+   *Đi vòng qua cái cửa chung rồi tự làm phần việc của nó thì phần nó làm hộ mình sẽ mất.* */
+function goArc(a){go(a)}
 /* NODE TANG 2 - dai hat hanh trinh gan tren tung dong danh sach.
    Nhin 1 giay biet: nguoi nay o chang lon nao (C1..C4), toi hat thu may, co qua han khong.
    Hat to = dang dung o day; hat mo = da qua; hat xam = chua toi; hinh thoi do = re nhanh. */
