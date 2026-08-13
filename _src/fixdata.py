@@ -2719,15 +2719,40 @@ if not _dh:
             continue
         _ng = _nvHV[_n5 % len(_nvHV)]
         _n5 += 1
+        _pv = "ca_khoa (Buổi này và các buổi sau)" if _n5 % 2 else "mot_buoi (Chỉ buổi này)"
+        # ═══ 13/08 - SỔ PHẢI KỂ ĐÚNG CÁI ĐÃ XẢY RA ══════════════════════════════════════════
+        # Anh Luân, kèm ảnh: *"sao cái logic dời buổi học nó quái dị vầy em? tháng 8 dời cho
+        # tháng 7, rồi dời 2 ngày mà ghi lùi 2 ngày, rồi cũng chẳng thấy lịch buổi thay đổi gì"*.
+        # Đo cả 6 dòng: KHÔNG dòng nào khớp. Bản cũ tính `ngay_moi = ngày hiện tại + dịch` rồi
+        # ghi vào sổ mà KHÔNG BAO GIỜ đổi `session_date` - sổ khai "đã dời sang 27/07" trong khi
+        # buổi vẫn nằm ở 25/07. Và `thoi_diem` gieo ngẫu nhiên 1-20 ngày trước NOW nên ra cảnh
+        # một người ngày 01/08 ngồi dời một buổi đã học xong từ 25/07.
+        #
+        # BẢN VÁ ĐẦU CỦA EM SAI HƯỚNG: em đi ĐỔI `session_date` cho khớp sổ. Chạy lại pipeline
+        # ra **336 chỗ đỏ** - vì dời một buổi KHÔNG PHẢI đổi một ô, nó là cả một chuỗi: điểm
+        # danh của buổi ấy, giờ check-in, ngày kết thúc lớp, đụng phòng, đụng giáo viên. Dịch
+        # ngày mà bỏ lại cả chuỗi thì chỉ đổi một lời nói dối này lấy một lời nói dối khác.
+        #
+        # Hướng đúng: LỊCH THẬT LÀ KẾT QUẢ, SỔ KỂ LẠI ĐƯỜNG ĐI TỚI NÓ. Ngày mới = đúng ngày
+        # buổi đang có; ngày cũ = ngày ấy trừ đi số ngày dời; thời điểm ghi đặt TRƯỚC ngày cũ
+        # (dời lịch là việc báo trước, không phải khai sau). Không đụng một ô nào của DL11 nên
+        # không kéo theo chuỗi hệ quả nào.
+        _moi = _cu
+        try:
+            _dcu = _d0 - datetime.timedelta(days=_dich)
+            _cu = _dcu.strftime("%d/%m/%Y") + _moi[10:]
+            _tdiem = (_dcu - datetime.timedelta(days=_rnd5.randint(1, 3))).strftime("%d/%m/%Y") + " 09:%02d" % _rnd5.randint(0, 59)
+        except Exception:
+            continue
         _dh.append({
             "change_id": "DOI-%03d" % _n5,
             "class_id": _c.get("class_id", ""), "class_id_name": _c.get("class_name", ""),
             "session_id": _s5.get("session_id", ""), "session_number": _s5.get("session_number", ""),
-            "pham_vi": ("ca_khoa (Buổi này và các buổi sau)" if _n5 % 2 else "mot_buoi (Chỉ buổi này)"),
+            "pham_vi": _pv,
             "ngay_cu": _cu, "ngay_moi": _moi, "so_ngay_doi": _dich,
             "ly_do": _rnd5.choice(_lyDo),
             "nguoi_doi": _ng.get("staff_id", ""), "nguoi_doi_name": _ng.get("full_name", ""),
-            "thoi_diem": fmt(NOW - datetime.timedelta(days=_rnd5.randint(1, 20))),
+            "thoi_diem": _tdiem,
             "next_action": ""})
 log.append("14i. Lich su doi lich (DL11b): %d lan doi" % len(_dh))
 

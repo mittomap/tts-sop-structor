@@ -888,6 +888,37 @@ COY = {
         "co y - de trang Giao viec luon co viec qua han mau do; so nay tang dan theo ngay",
 }
 ORD = {"NANG":0,"VUA":1,"NHE":2}
+# ══ 19. SO LICH SU DOI LICH PHAI KHOP VOI NGAY THAT CUA BUOI (13/08) ═════════════════════
+# Anh Luan bat bang mat, kem anh: *"sao cai logic doi buoi hoc no quai di vay em? thang 8 doi
+# cho thang 7, roi doi 2 ngay ma ghi lui 2 ngay, roi cung chang thay lich buoi thay doi gi"*.
+# Do ca 6 dong: KHONG dong nao khop. Bo gieo tinh `ngay_moi` roi ghi vao DL11b ma khong bao gio
+# ghi lai `session_date` cua DL11 - so khai "da doi sang 27/07" trong khi buoi van nam o 25/07.
+# Day la DU LIEU NOI DOI: mot bang tu khai mot su kien ma phan con lai cua du lieu phu nhan.
+# Ba mat phai dung cung luc, thieu mat nao cung la mot cau chuyen khong the xay ra that:
+#   19a  ngay_moi phai DUNG BANG session_date hien tai cua chinh buoi do;
+#   19b  thoi diem ghi so phai TRUOC ngay_cu (doi lich la viec bao truoc, khong phai khai sau);
+#   19c  pham vi "ca khoa" thi moi buoi SAU phai da dich dung so ngay ay.
+_dh19 = R("DL11b")
+_ses19 = {s(x, "session_id"): x for x in R("DL11")}
+_a19, _b19, _c19 = [], [], []
+for _r in _dh19:
+    _sx = _ses19.get(s(_r, "session_id"))
+    if not _sx: continue
+    _nm, _that = s(_r, "ngay_moi"), s(_sx, "session_date")
+    if _nm and _that and _nm != _that:
+        _a19.append("%s: so ghi %s, DL11 dang la %s" % (s(_r, "session_id"), _nm, _that))
+    _td, _nc = dt(s(_r, "thoi_diem")), dt(s(_r, "ngay_cu"))
+    if _td and _nc and _td > _nc:
+        _b19.append("%s: ghi luc %s ma ngay cu la %s" % (s(_r, "session_id"), s(_r, "thoi_diem"), s(_r, "ngay_cu")))
+    if "ca_khoa" in s(_r, "pham_vi"):
+        _cid, _sn = s(_r, "class_id"), n(_r.get("session_number")) or 0
+        _sau = [x for x in R("DL11") if s(x, "class_id") == _cid and (n(x.get("session_number")) or 0) > _sn]
+        if _sau and dt(s(_sau[0], "session_date")) and _nc and dt(s(_sau[0], "session_date")) < _nc:
+            _c19.append("%s: pham vi ca khoa ma buoi sau van nam truoc ngay cu" % s(_r, "session_id"))
+rep("NANG", "19a. so doi lich khai ngay moi khong khop ngay that cua buoi", _a19)
+rep("NANG", "19b. ghi so doi lich SAU khi buoi da dien ra", _b19)
+rep("VUA", "19c. pham vi ca khoa ma cac buoi sau khong dich theo", _c19)
+
 print("\n" + "="*90)
 tot = 0
 coy_tot = 0
