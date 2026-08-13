@@ -284,9 +284,27 @@
 > nay nằm ở dòng ngay dưới dải chip — không mất đường tới Cài đặt.
 >
 > **15 màn đã dọn:** `xeplop` `baoluu` `nhansu` `reup` `nhaplead` `test` `buoihoc` `viec`
-> `khieunai` `phong` `ychv` `ban` `bangcong` `hoctap(lop)` `hocvien`. Sáu màn mất hẳn dải thẻ
-> (`nhansu` `reup` `nhaplead` `test` `buoihoc` `hocvien`) — `_checkkhuon` mục K3 vẫn xanh vì ý của
-> K3 là *"người mở trang phải thấy ngay hình dạng bằng con số"*, mà dải chip có số làm đúng việc ấy.
+> `khieunai` `phong` `ychv` `ban` `bangcong` `hoctap(lop)` `hocvien`. **Bảy màn mất hẳn dải thẻ**
+> (`nhaplead` `test` `reup` `buoihoc` `baoluu` `nhansu` `hocvien`) — khai miễn ở `_checkkhuon`
+> mục **KHONGTHE** kèm lý do đọc được. Ý của K3 không mất: nó đòi *"người mở trang phải thấy ngay
+> hình dạng của trang bằng con số"*, mà dải chip có số làm đúng việc ấy — **chỉ khác là con số ở
+> đó bấm được**. K3 chỉ biết hỏi `class="bstats"`, tức nó hỏi một CÁCH làm chứ không hỏi cái ĐÍCH.
+> *Gặp thước đo hỏi sai câu thì khai miễn kèm lý do, đừng dựng lại cái vừa bỏ cho vừa lòng thước.*
+> `_checklap` L5 khoá chiều ngược lại (thẻ nói trùng chip là đỏ) — không thể vừa bỏ thẻ vừa để
+> trang trống số.
+>
+> **HAI CHỖ ĐỎ CỦA VERIFY - cả hai đều là BẢN KHAI ĐI SAU CÁI ĐƯỢC KHAI:**
+> 1. `_checkux`: bỏ dải thẻ màn Bảo lưu mà để lại bản khai ba thẻ trong `THEDEF`. Khai mà không
+>    bao giờ vẽ ra thì câu chú thích thành **chữ chết** — anh Luân mở Cài đặt tab Thẻ vẫn sửa được
+>    một cái thẻ không tồn tại.
+> 2. `_checkkhuon` K3: bảy trang vừa bỏ thẻ chưa khai `KHONGTHE`.
+> *Bỏ một thứ thì phải gỡ mọi bản khai của nó trong cùng một nhịp — bản khai sống lâu hơn cái nó
+> khai là cách app nói dối một cách chân thành.*
+>
+> **VÀ MỘT BẪY MÔI TRƯỜNG:** `gen_v5.py`/`extract_js.py` ghi ra `$ITTS_OUT` (mặc định = cạnh
+> script). Chạy tay `python3 gen_v5.py` trong `_src` thì bản dựng rơi vào `_src/`, còn bộ kiểm lại
+> đọc bản ở gốc repo — **hai bên nhìn hai file khác nhau**, y hệt bẫy đã cắn nguyên ngày 05/08.
+> Đo tay thì luôn đặt `ITTS_OUT=<gốc repo>`; `verify.sh` tự đặt hộ.
 >
 > **PHÉP ĐO TẠM THÀNH LUẬT THƯỜNG TRỰC - `_checklap` mục L5.** Bản đo rời (`_dolap.js`) chạy dưới
 > vai "toàn quyền", nên nó chỉ thấy dải chip của một người. Gộp vào `_checklap` - bộ kiểm đã có

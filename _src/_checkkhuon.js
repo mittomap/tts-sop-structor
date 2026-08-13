@@ -63,7 +63,27 @@ const TRAN_THIEU_NUT = 0;  /* trang chưa có nút hành động chính */
    `_v2def.js` xep no vao dien "luoi thoi gian, khong phai danh sach ho so", kem dung ly do cu -
    luoi lich da la cach doc nhanh nhat, dat mot dai the so o tren no la noi lai bang chu cai ma
    mat vua doc bang hinh. Khai o MOT cho, khong khai hai noi. */
-const KHONGTHE = {};
+/* V2 13/08 - BẢY TRANG KHAI Ở ĐÂY, CÙNG MỘT LÝ DO. Anh Luân kèm ảnh màn Xếp lớp: *"thẻ và chip
+   lọc có vẻ dễ bị trùng nhau đúng ko? nếu trùng thì bỏ thẻ, thiết kế chip lọc cho đẹp là ngon
+   rồi, lại gọn gàng nữa"*. Bảy trang này có dải thẻ nói Y NGUYÊN dải chip ngay dưới nó - cùng
+   nhãn, cùng con số, mà chip còn bấm lọc được. Bỏ thẻ, giữ chip.
+   Ý của K3 KHÔNG mất: nó đòi *"người mở trang phải thấy ngay hình dạng của trang bằng con số"*,
+   và dải chip có số làm đúng việc ấy - chỉ khác là con số ở đó BẤM ĐƯỢC. K3 chỉ biết hỏi
+   `class="bstats"`, tức nó hỏi đúng một CÁCH làm chứ không hỏi cái ĐÍCH; nên bảy trang này khai
+   miễn ở đây thay vì đi dựng lại thẻ cho vừa lòng thước đo.
+   `_checklap` mục L5 canh chiều ngược lại: trang nào để thẻ nói trùng chip là đỏ. Hai bộ khoá
+   nhau - không thể vừa bỏ thẻ vừa để trang trống số. */
+const _LYDO_TRUNGCHIP = "da bo dai the vi no trung nguyen nhan + con so voi dai chip ngay duoi; " +
+  "dai chip mang so VA bam loc duoc (anh Luan 13/08: 'neu trung thi bo the')";
+const KHONGTHE = {
+  nhaplead: _LYDO_TRUNGCHIP,   /* 3 the = 3 chip: Lead moi chua cham · Toi hen lien he · Chua ai phu trach */
+  test:     _LYDO_TRUNGCHIP,   /* 3 the = 3 chip: Cho dat lich · Cho cham · Cho tu van sau test */
+  reup:     _LYDO_TRUNGCHIP,   /* 3 the = 3 chip: Chua gap duoc · Da mat/tu choi · Toi hen cham lai */
+  buoihoc:  _LYDO_TRUNGCHIP,   /* 3 the = 3 chip: Cho ghi nhan xet · Qua han ghi · GV vao tre */
+  baoluu:   _LYDO_TRUNGCHIP,   /* 3 the = 3 chip: Dang bao luu · Da bo hoc · Chua hen lien he lai */
+  nhansu:   _LYDO_TRUNGCHIP,   /* 3 the = 3 chip: Dang lam viec · Ho so con thieu · Da nghi viec */
+  hocvien:  _LYDO_TRUNGCHIP,   /* 3 the = 3 chip: Nguy co · Nguy co hoc thuat · Vang nhieu */
+};
 
 /* Trang CHỈ ĐỂ ĐỌC - không có nút hành động là đúng, nhưng phải khai kèm lý do đọc được. */
 const CHIDOC = {
