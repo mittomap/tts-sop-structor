@@ -432,6 +432,87 @@ console.log(Object.keys(ra).sort().join(","));
         except OSError:
             pass
 
+# ═══ 13/08 - LY DO BO QUA PHAI CON KHOP VOI SOP ════════════════════════════════════════════
+# Bo kiem cu chi hoi "ma nay co trong danh sach bo qua khong" - KHONG BAO GIO hoi "ly do khai o
+# do con dung khong". Do that: **5/6 ly do khong chia se MOT CHU nao voi tinh huong SOP mo ta**.
+#   NA045  SOP: "Quan tam hoc tiep"      | app khai: "nhan 'khieu nai da dong'"
+#   NA059  SOP: "Dang ky da huy"         | app khai: "nhan 'da hoan tien xong'"
+#   NA069  SOP: "Con han ghi nhan xet"   | app khai: "nhan 'HV da tot nghiep'"
+#   NA074  SOP: "Qua han tru quota"      | app khai: "nhan 'da gui khao sat'"
+#   NA080  SOP: "Uu tien thap qua han"   | app khai: "nhan 'phan hoi tich cuc'"
+# Nguyen nhan: file SOP duoc sua, so hieu NA xe dich, danh sach mien thi nam nguyen. Ket qua la
+# **nam tinh huong nghiep vu that bi mien bang mot to giay phep cap cho viec khac** - va bo kiem
+# xanh suot vi no chi dem ma, khong doc chu.
+# *Mot ban khai mien tru khong duoc kiem thi cai no bao ve khong phai la quyet dinh, ma la quen.*
+def _hd3_rows_all():
+    """Moi hang cua HD3, giu nguyen thu tu cot - de doc duoc cot theo TIEU DE."""
+    z = zipfile.ZipFile(SOP)
+    rels = dict(re.findall(r'Id="(rId\d+)"[^>]*Target="([^"]+)"',
+                           z.read("xl/_rels/workbook.xml.rels").decode("utf-8", "ignore")))
+    sheets = re.findall(r'<sheet name="([^"]+)"[^>]*r:id="(rId\d+)"',
+                        z.read("xl/workbook.xml").decode("utf-8", "ignore"))
+    ss = _sst(z)
+    cell = re.compile(r'<c\b([^>]*?)(?:/>|>(.*?)</c>)', re.S)
+    val = re.compile(r'<v>(.*?)</v>', re.S)
+    out = []
+    for name, rid in sheets:
+        if not name.startswith("HD3"):
+            continue
+        xml = z.read("xl/" + rels[rid]).decode("utf-8", "ignore")
+        for row in re.findall(r"<row[^>]*>(.*?)</row>", xml, re.S):
+            vals = []
+            for m in cell.finditer(row):
+                attrs = m.group(1) or ""
+                v = val.search(m.group(2) or "")
+                v = v.group(1) if v else ""
+                if 't="s"' in attrs and v.isdigit() and int(v) < len(ss):
+                    v = ss[int(v)]
+                vals.append(str(v).strip())
+            out.append(vals)
+    return out
+
+
+def _kd(t):
+    import unicodedata
+    return "".join(c for c in unicodedata.normalize("NFD", str(t or ""))
+                   if unicodedata.category(c) != "Mn").strip()
+
+
+_hd3_all = _hd3_rows_all()
+_i_ma_th = _i_th_th = None
+for _r in _hd3_all:
+    if "Ma" in [_kd(x) for x in _r] and "Tinh huong" in [_kd(x) for x in _r]:
+        _h = [_kd(x) for x in _r]
+        _i_ma_th, _i_th_th = _h.index("Ma"), _h.index("Tinh huong")
+        break
+_hd3_th = {}
+for _r in (_hd3_all if _i_ma_th is not None else []):
+    if len(_r) > max(_i_ma_th, _i_th_th) and re.match(r"^NA\d+$", _r[_i_ma_th].strip()):
+        _hd3_th[_r[_i_ma_th].strip()] = _r[_i_th_th].strip()
+
+
+def _tu(t):
+    return set(w for w in re.sub(r"[^a-z0-9 ]", " ", _kd(t).lower()).split() if len(w) > 2)
+
+
+_lech_ly = []
+for _m in sorted(TRIG_BOQUA):
+    _sop_th = _hd3_th.get(_m, "")
+    _ly = TRIG_BOQUA[_m]
+    _ly = _ly if isinstance(_ly, str) else " ".join(_ly)
+    if _sop_th and not (_tu(_sop_th) & _tu(_ly)):
+        _lech_ly.append((_m, _sop_th, _ly[:70]))
+if _lech_ly:
+    print()
+    print("LY DO BO QUA DA CU - khong con noi ve tinh huong ma SOP dat cho ma do:")
+    for _m, _t, _l in _lech_ly:
+        print("   X %s | SOP goi day la '%s' | app khai '%s'" % (_m, _t, _l))
+    print()
+    print("So hieu NA trong SOP co the da xe dich. Doc lai HD3 roi HOAC lam that tinh huong do, "
+          "HOAC viet lai ly do cho khop. Mot ban khai mien tru sai la mot lo hong LUAT CUNG SO 0.")
+    print("KET QUA: KHONG DAT")
+    sys.exit(1)
+
 thieu = sorted(m for m in TRIG if m not in SINH and m not in TRIG_BOQUA)
 thua = sorted(m for m in TRIG_BOQUA if m in SINH)
 # dong dung san PHAI ra dung ma da hen - ra khac (hoac rong) la nhanh naFor do da hong
@@ -881,6 +962,97 @@ if _sot7 or _lech7:
     sys.exit(1)
 print("  KET QUA MAT 7: DAT - moi tinh huong SOP giao cho ai, app deu biet.")
 
+# ═══ MAT THU TAM - BON SHEET CAU HINH CH1 / CH2 / CH4 / CH6 (13/08) ════════════════════════
+# Anh Luan hoi: *"Tuc la, e chua phu duoc toan bo sop, e ko du kha nang do ha, hay e chua audit
+# day du"*. Do that thi ra cau tra loi thu ba: **audit do SO DONG QUA DUOC, chua bao gio do SO
+# CAU HOI DUOC DAT.** Do lai theo sheet: 45/52 sheet co it nhat mot mat hoi toi, 7 sheet khong
+# mat nao hoi - va bon trong so do la CH1 / CH2 / CH4 / CH6, tuc **bon LUAT CUNG cua du an**
+# (moi hang so qua paramOf · cau nhac qua msgText · nguong KPI qua kpiTh · nhan enum nguyen van
+# theo CH1). App co ban sao noi bo cua ca bon, nhung khong gi kiem ban sao ay con khop goc khong.
+# Do tay luc phat hien: CH2 thieu 25/61 tham so, CH1 thieu 1/57 nhom enum, CH4 thieu 2/94 ma.
+# Mat nay bien phep do tay ay thanh mot cai thuoc chay moi lan.
+CH_BOQUA = {
+    # khai o day nhung muc SOP co ma app CO Y khong lam, KEM LY DO doc duoc.
+}
+print()
+print("=" * 78)
+print("MAT 8 - BON SHEET CAU HINH CH1 / CH2 / CH4 / CH6 (bon luat cung cua du an)")
+print("=" * 78)
+
+
+def _sheet_rows(pre):
+    z = zipfile.ZipFile(SOP)
+    rels = dict(re.findall(r'Id="(rId\d+)"[^>]*Target="([^"]+)"',
+                           z.read("xl/_rels/workbook.xml.rels").decode("utf-8", "ignore")))
+    sheets = re.findall(r'<sheet name="([^"]+)"[^>]*r:id="(rId\d+)"',
+                        z.read("xl/workbook.xml").decode("utf-8", "ignore"))
+    ss = _sst(z)
+    cell = re.compile(r'<c\b([^>]*?)(?:/>|>(.*?)</c>)', re.S)
+    val = re.compile(r'<v>(.*?)</v>', re.S)
+    out = []
+    for name, rid in sheets:
+        if not name.startswith(pre):
+            continue
+        xml = z.read("xl/" + rels[rid]).decode("utf-8", "ignore")
+        for row in re.findall(r"<row[^>]*>(.*?)</row>", xml, re.S):
+            vals = []
+            for m in cell.finditer(row):
+                attrs = m.group(1) or ""
+                v = val.search(m.group(2) or "")
+                v = v.group(1) if v else ""
+                if 't="s"' in attrs and v.isdigit() and int(v) < len(ss):
+                    v = ss[int(v)]
+                vals.append(str(v).strip())
+            out.append(vals)
+    return out
+
+
+_ch = [
+    # (sheet, ten mat, cach lay khoa tu cot 0, cach hoi app)
+    ("CH1", "nhom enum (nhan hien tren man)",
+     lambda v: v.split(" - ")[0].strip() if re.match(r"^[a-z][a-z0-9_]+ - ", v) else "",
+     lambda k: ('"enum_%s"' % k) in SRC or ('"%s"' % k) in SRC),
+    ("CH2", "tham so nghiep vu (paramOf)",
+     lambda v: v if re.match(r"^[a-z][A-Za-z0-9_]{5,}$", v) else "",
+     lambda k: ('"%s"' % k) in SRC),
+    ("CH4", "cau nhac viec (msgText)",
+     lambda v: v if re.match(r"^NA\d+$", v) else "",
+     lambda k: ('"%s"' % k) in SRC),
+    ("CH6", "nguong KPI (kpiTh)",
+     lambda v: v if re.match(r"^[A-Z][A-Z0-9]{1,5}$", v) else "",
+     lambda k: re.search(r"\b%s\b" % re.escape(k), SRC) is not None),
+]
+_sot8 = []
+for _pre, _ten, _lay, _hoi in _ch:
+    _keys, _seen = [], set()
+    for _r in _sheet_rows(_pre):
+        if not _r:
+            continue
+        _k = _lay(_r[0])
+        if _k and _k not in _seen:
+            _seen.add(_k)
+            _keys.append(_k)
+    _thieu = [k for k in _keys if not _hoi(k) and (_pre + ":" + k) not in CH_BOQUA]
+    print("  %-4s %-34s SOP %3d | app %3d | thieu %d"
+          % (_pre, _ten, len(_keys), len(_keys) - len(_thieu), len(_thieu)))
+    if _thieu:
+        _sot8.append((_pre, _ten, _thieu))
+if _sot8:
+    print()
+    for _pre, _ten, _thieu in _sot8:
+        print("SOT %d muc o %s (%s):" % (len(_thieu), _pre, _ten))
+        for _x in _thieu[:25]:
+            print("   X %s" % _x)
+        if len(_thieu) > 25:
+            print("   ... con %d muc nua" % (len(_thieu) - 25))
+    print()
+    print("Them vao app (CH2 -> bang tham so o man Cai dat; CH4 -> bang cau nhac; CH6 -> bang "
+          "nguong; CH1 -> bang enum), HOAC khai vao CH_BOQUA trong check_sop.py KEM LY DO.")
+    print("KET QUA: KHONG DAT")
+    sys.exit(1)
+print("  KET QUA MAT 8: DAT - bon sheet cau hinh deu duoc app phu, hoac da khai ly do.")
+
 print()
 print("KET QUA: DAT - cot SOP, so trigger HD3, chi so BC2, phan quyen CH3, man VH, bang BC, "
-      "thuat ngu CH5 va nguoi phu trach HD3 deu duoc app phu, hoac da khai ly do.")
+      "thuat ngu CH5, nguoi phu trach HD3 va bon sheet cau hinh CH1/CH2/CH4/CH6 deu duoc app "
+      "phu, hoac da khai ly do.")
