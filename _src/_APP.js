@@ -2596,7 +2596,14 @@ function renderList(key,emb){
     o trang thai an nua. */
  if(!cfg.ro&&pf)h+='<div class="panel'+(pf?'':' hidden')+'" id="formPanel"><div class="ph"><b>'+(ed?("Sửa "+esc(String(ed[cfg.cols[0][0]]))):"Thêm bản ghi mới")+'</b><div class="mini">'+(ed?'<button class="pill" onclick="cancelEdit(\''+key+'\')">Hủy sửa</button>':'')+'<button class="pill" onclick="toggleForm(\''+key+'\')">Đóng</button></div></div>'+formHTML(key)+'</div>';
  /* THANH CÔNG CỤ CHUẨN: [tìm] [chip lọc có số đếm] ...... [số dòng] [Xóa lọc] [Cột] */
- var left=srchHTML(SEARCH[key]||"","listSearch('"+key+"',this.value)","Tìm trong trang này...",270);
+ /* V2 13/08 - THANH LỌC CỦA SỔ DANH SÁCH GỘP LẠI MỘT KHỐI CÓ NHÃN. Trước bản này trang Lead
+    dựng ra BỐN khung trắng xếp dọc: ô tìm một khung, dải chip trạng thái một khung, dải chip lọc
+    nhanh một khung, thanh công cụ một khung - hơn 200px chiều cao trước khi tới dòng đầu tiên của
+    bảng, mà hai dải chip giữa thì vẽ giống hệt nhau nên không biết dải nào lọc gì.
+    Nay mỗi nhóm một HÀNG có nhãn trong cùng một khung. `_loc` gom các hàng lại theo đúng thứ tự
+    đọc: tìm → trạng thái → lọc nhanh → lọc riêng của sổ. */
+ var _loc=[];
+ _loc.push(locR("",srchHTML(SEARCH[key]||"","listSearch('"+key+"',this.value)","Tìm trong trang này...",270)));
  if(cfg.filt){var seen={},opts=[];
   all.forEach(function(r){var c=ecode(r[cfg.filt]);if(!c)return;if(!seen[c]){seen[c]={n:0,lb:elabel(r[cfg.filt])};opts.push(c)}seen[c].n++});
   /* xếp chip lọc THEO ĐÚNG THỨ TỰ trong danh mục (thứ tự quy trình), lạ thì xuống cuối */
@@ -2604,14 +2611,14 @@ function renderList(key,emb){
   opts.sort(function(a,b){var ia=(ord[a]===undefined?999:ord[a]),ib=(ord[b]===undefined?999:ord[b]);
    if(ia!==ib)return ia-ib;return String(seen[a].lb).localeCompare(String(seen[b].lb),"vi")});
   var segs=opts.map(function(c){return [c,seen[c].lb,seen[c].n,stCls(c)]});
-  if(segs.length)left+=segHTML(fa,segs,"toggleFilt('"+key+"','{k}')")}
- if(cfg.qf){   /* chip lọc tuỳ biến, tách bằng gạch dọc cho khỏi lẫn với chip trạng thái */
-  left+='<span class="tbgr">'+segHTML(qk?[qk]:[],cfg.qf.map(function(x){return [x[0],x[1],all.filter(x[2]).length,x[3]||"red"]}),"qfToggle('"+key+"','{k}')")+'</span>'}
+  if(segs.length)_loc.push(locR(locNhan(cfg.filt),segHTML(fa,segs,"toggleFilt('"+key+"','{k}')"),1))}
+ if(cfg.qf){   /* chip lọc tuỳ biến - trước tách bằng một vạch dọc, nay tách bằng chính cái nhãn */
+  _loc.push(locR("Lọc nhanh",segHTML(qk?[qk]:[],cfg.qf.map(function(x){return [x[0],x[1],all.filter(x[2]).length,x[3]||"red"]}),"qfToggle('"+key+"','{k}')"),1))}
  if(key==="hocvien"){
-  left+='<span class="tbgr"><select class="sel" onchange="window.HVFCLS=this.value;reRender(CUR)"><option value="">Mọi lớp</option>'+
+  _loc.push(locR("Lớp & khóa",'<select class="sel" onchange="window.HVFCLS=this.value;reRender(CUR)"><option value="">Mọi lớp</option>'+
    rows("DL10").map(function(c){return '<option value="'+esc(c.class_id)+'"'+(c.class_id===(window.HVFCLS||"")?" selected":"")+'>'+esc(c.class_name||c.class_id)+'</option>'}).join("")+'</select>'+
   '<select class="sel" onchange="window.HVFCRS=this.value;reRender(CUR)"><option value="">Mọi khóa</option>'+
-   rows("DL05").map(function(c){return '<option value="'+esc(c.course_id)+'"'+(c.course_id===(window.HVFCRS||"")?" selected":"")+'>'+esc(c.course_name||c.course_id)+'</option>'}).join("")+'</select></span>'}
+   rows("DL05").map(function(c){return '<option value="'+esc(c.course_id)+'"'+(c.course_id===(window.HVFCRS||"")?" selected":"")+'>'+esc(c.course_name||c.course_id)+'</option>'}).join("")+'</select>'))}
  var nHid=HIDECOL[key]?Object.keys(HIDECOL[key]).length:0;
  var hvF=(key==="hocvien")&&(window.HVFCLS||window.HVFCRS);
  var _f2=fltOn(key);
@@ -2646,7 +2653,7 @@ function renderList(key,emb){
      trang giữ nguyên). Một nút hứa dẫn đi mà không dẫn đâu cả thì tệ hơn là không có nút: người
      ta bấm, không thấy gì, rồi bắt đầu ngờ cả những nút khác. `_checkaudit` M15 canh chuyện này. */
   (cfg.lam&&PBK[cfg.lam]&&CUR!==cfg.lam?('<button class="btn sm" onclick="go(\''+esc(cfg.lam)+'\')" data-tip="Sổ này chỉ để tra cứu - bấm để sang chỗ làm việc thật"><i class="ti ti-arrow-right"></i>Sang '+esc(PBK[cfg.lam].t)+' để làm</button>'):'');
- h+=_theNV+tbar2(left,duoi);
+ h+=_theNV+locKhoi(_loc,duoi,"tbarct");
  h+='<div class="panel">'+tableHTML(cfg,view,key)+'</div>';
  if(pages>1||total>20)h+='<div class="pgbar"><button class="btn sm" '+(pg<=0?"disabled":"")+' onclick="pageGo(\''+key+'\','+(pg-1)+')"><i class="ti ti-chevron-left"></i>Trước</button><span class="cnt">Trang '+(pg+1)+' / '+pages+'</span><button class="btn sm" '+(pg>=pages-1?"disabled":"")+' onclick="pageGo(\''+key+'\','+(pg+1)+')">Sau<i class="ti ti-chevron-right"></i></button>'+
   '<select class="sel" style="height:30px" onchange="window.PSZ=window.PSZ||{};window.PSZ[\''+key+'\']=parseInt(this.value);PAGE[\''+key+'\']=0;reRender(CUR)">'+[20,50,100].map(function(n){return '<option value="'+n+'"'+(n===psz?" selected":"")+'>'+n+' dòng/trang</option>'}).join("")+'</select></div>';
@@ -5020,7 +5027,10 @@ function renderViec(){var items=bellItems();
  /* V9.59: lọc theo mức độ nay là một THANH LỌC đúng nghĩa, không còn nấp trong cái nút "Chỉ quá
     hạn" và trong mấy cái thẻ. Một việc - một chỗ làm. */
  var msegs=[["","Tất cả",items.length,""],["red","Quá hạn",redn,"red"],["amber","Sắp tới hạn",ambn,"amber"]];
- h+=tbar('<span class="tblbl">Mức độ</span>'+segHTML(sev||"",msegs,"viecOnly('{k}')","viec_mucdo"),"");
+ /* V2 13/08 - BA DẢI, MỘT KHUNG. Trước bản này mỗi dải tự mang một khung trắng có viền, ba khung
+    xếp dọc ăn hơn 200px trước khi tới việc đầu tiên - mà ba cái nhãn ("Mức độ" / "Mảng việc" /
+    "Nhóm việc") lại không thẳng cột với nhau vì mỗi khung một bề rộng. Nay ba HÀNG trong một
+    khung: nhãn thẳng một cột, mắt quét dọc đúng một mép. */
  var tsegs=[["all","Tất cả",base.length,""]];
  teams.forEach(function(t){if(teamC[t])tsegs.push([t,t,teamC[t],""])});
  /* V9.99z7 (anh Luân 05/08, kèm ảnh dải chip "Tất cả 7 · Tuyển sinh 6 · Giao việc 1"): *"dùng
@@ -5031,10 +5041,12 @@ function renderViec(){var items=bellItems();
     bảy, và cái sai lại là cái người ta nhìn thấy đầu tiên khi chỉ còn hai chip.
     "Mảng việc" đúng cho cả bảy, và không đụng với dải "Nhóm việc" ngay dưới (dải ấy lọc theo
     từng hàng chờ cụ thể: Lead quá hạn, Mời tái ghi danh...). */
- h+=tbar('<span class="tblbl">Mảng việc</span>'+segHTML(team,tsegs,"viecTeam('{k}')","viec_bophan"),"");
  var gsegs=[["all","Tất cả nhóm",scoped.length,""]];
  grpOrder.forEach(function(g){gsegs.push([String(g).replace(/'/g,""),g,grpC[g],""])});
- h+=tbar('<span class="tblbl">Nhóm việc</span>'+segHTML(grp,gsegs,"window.VIECGRP='{k}';reRender('viec')","viec_nhom"),
+ h+=locKhoi([
+  locR("Mức độ",segHTML(sev||"",msegs,"viecOnly('{k}')","viec_mucdo")),
+  locR("Mảng việc",segHTML(team,tsegs,"viecTeam('{k}')","viec_bophan")),
+  locR("Nhóm việc",segHTML(grp,gsegs,"window.VIECGRP='{k}';reRender('viec')","viec_nhom"))],
   '<span class="tbcnt">'+view.length+' việc</span>');
  /* GOM THEO ĐỘ GẤP - trước đây đổ một danh sách phẳng, đỏ lẫn vàng lẫn xám, không biết bắt đầu từ đâu */
  var BUCK=[["red","Quá hạn - làm ngay","ti-alert-triangle","var(--red)"],
@@ -6008,7 +6020,7 @@ function asstHeMo(){
     if(window.TOUR&&window.TOUR.on)return;
     var a=asstEl();if(!a||a.classList.contains("on"))return;
     asstOpen();
-    setTimeout(function(){try{asstClose();nhacCho("asstfab",4)}catch(e){}},3200)}
+    setTimeout(function(){try{asstClose();nhacCho("tthBtn",4)}catch(e){}},3200)}
    catch(e){}},1400)}
  catch(e){}}
 /* ═══ TỶ LỆ HIỂN THỊ ════════════════════════════════════════════════════════════════════════
@@ -10626,9 +10638,9 @@ function renderTro(){
  h+='<div class="jgrid"><div>';
  h+='<div class="fld full"><label>Bật Trợ lý cho mọi người</label>'+
   '<select onchange="tthSet(\'on\',+this.value);reRender(\'settings\')">'+
-  '<option value="1"'+(C.on?" selected":"")+'>Bật - nút Trợ lý ở góc dưới bên phải</option>'+
+  '<option value="1"'+(C.on?" selected":"")+'>Bật - mở bằng nút bóng đèn trên thanh tiêu đề</option>'+
   '<option value="0"'+(C.on?"":" selected")+'>Tắt - không hiện nút nào</option></select>'+
-  '<div class="mut" style="font-size:11.5px;margin-top:4px">Trợ lý nằm ở <b>một nút tròn góc dưới bên phải</b>, không chen vào thân trang. Bấm vào bung ra: việc kế tiếp, nhịp ngày, và nút dọn từng bước.</div></div>';
+  '<div class="mut" style="font-size:11.5px;margin-top:4px">Trợ lý mở bằng <b>nút bóng đèn trên thanh tiêu đề</b>, không chen vào thân trang. Bấm vào bung ra: việc kế tiếp, nhịp ngày, và nút dọn từng bước.</div></div>';
  h+='<div class="fld full"><label>Mỗi lượt dọn bao nhiêu việc</label>'+
   '<input type="number" min="1" max="50" value="'+esc(String(C.batch))+'" oninput="tthSet(\'batch\',Math.max(1,num(this.value)||1))">'+
   '<div class="mut" style="font-size:11.5px;margin-top:4px">Dọn hết một lượt rồi mở lại - chia nhỏ để người ta thấy về đích, thay vì nhìn 40 việc rồi nản.</div></div>';
@@ -10657,7 +10669,7 @@ function renderTro(){
 /* Nhịp ngày tách thành tab riêng: hai thứ khác nhau (một cái xếp việc, một cái nhắc thói quen theo
    buổi), nhét chung một màn thì màn nào cũng dài mà chẳng cái nào rõ. */
 function renderNhip(){
- var h='<div class="notebar"><i class="ti ti-calendar"></i><b>Nhịp ngày</b> là bảng nhắc theo chức danh, hiện trong tấm Trợ lý ở góc dưới bên phải (3 ô: Đầu ngày / Trong ngày / Cuối ngày). Sửa ở đây áp ngay cho mọi người cùng chức danh.</div>';
+ var h='<div class="notebar"><i class="ti ti-calendar"></i><b>Nhịp ngày</b> là bảng nhắc theo chức danh, hiện trong tấm Trợ lý (mở bằng nút bóng đèn trên thanh tiêu đề, 3 ô: Đầu ngày / Trong ngày / Cuối ngày). Sửa ở đây áp ngay cho mọi người cùng chức danh.</div>';
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-calendar" style="margin-right:6px"></i>Nhịp ngày theo chức danh</b>'+
   '<button class="btn sm" onclick="nhipReset()"><i class="ti ti-restore"></i>Về mặc định</button></div><div class="pbody">';
  h+='<div class="mut" style="font-size:11.5px;margin:0 0 10px;line-height:1.6">Dòng có <b>hàng chờ</b> thì app đếm được và báo "sạch" khi về 0. Dòng <b>thói quen</b> (bạn tự thêm) không có gì để đếm nên app chỉ ghi "nên xem" - <b>không</b> gắn mác đã xong, vì gắn bừa là nói láo với người trực ca.</div>';
@@ -12356,11 +12368,18 @@ function xlSegs(fil,obs,wait){
   ["confirm","Chờ HV xác nhận",obs.filter(function(o){var s=obState(o);return s.sent&&!s.confirmed}).length],
   ["finish","Chưa hoàn tất",obs.filter(function(o){return !obState(o).done}).length],
   ["overdue","Quá hạn",obs.filter(function(o){var s=obState(o);return s.infoOverdue||s.obOverdue}).length,"red"]],
-  "window.XLFILT='{k}';reRender('xeplop')")+
-  /* Mốc SLA vốn nằm trên thẻ "Chờ gửi thông tin lớp" - thẻ bỏ rồi thì mốc phải có chỗ khác,
-     kèm bánh răng chỉnh ngưỡng. Đặt ngay dưới dải chip, đúng chỗ người ta vừa bấm. */
-  '<div class="fhint" style="margin:6px 0 0">Hạn gửi thông tin lớp '+slaChip("slaClassInfoZalo_hours",24)+
-  ' · hạn hoàn tất onboarding '+slaChip("slaOBT_hours",72)+' - quá là vào nhóm Quá hạn.</div>'}
+  "window.XLFILT='{k}';reRender('xeplop')")}
+/* Mốc SLA vốn nằm trên thẻ "Chờ gửi thông tin lớp"; thẻ bỏ rồi thì mốc phải có chỗ khác, kèm
+   bánh răng chỉnh ngưỡng. V2 13/08 - trước nó đứng CẠNH dải chip nên bị dồn sang mép phải và
+   gãy câu giữa chừng ("- quá là vào nhóm Quá hạn." rơi xuống một mình ở góc). Nay là một HÀNG
+   GHI CHÚ chạy hết bề ngang, nằm dưới cùng khối lọc - đọc trọn câu, không tranh chỗ với chip. */
+function xlNote(){
+ return 'Hạn gửi thông tin lớp '+slaChip("slaClassInfoZalo_hours",24)+
+  ' · hạn hoàn tất onboarding '+slaChip("slaOBT_hours",72)+' - quá là vào nhóm Quá hạn.'}
+function xlLoc(fil,obs,wait,ct){
+ return locKhoi([locR("",timHTML("xeplop")),
+  locR("Bước onboarding",xlSegs(fil,obs,wait)),
+  locR("",xlNote(),0,"locnote")],ct)}
 function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
  var wait=xlWaiting();
  var view=obs.filter(function(o){var s=obState(o);if(fil==="all")return true;if(fil==="sendinfo")return o.class_id&&!s.sent;if(fil==="confirm")return s.sent&&!s.confirmed;if(fil==="finish")return !s.done;if(fil==="overdue")return s.infoOverdue||s.obOverdue;return true});
@@ -12395,14 +12414,13 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
   if(fil==="all")h+='<div class="sechd">Đang onboarding</div>';
  }
  if(fil==="chuaxep"){   /* chip này hỏi về DL06 (đơn đã đóng đủ), không hỏi về DL08 - bảng dưới lui */
-  h+=tbar(timHTML("xeplop")+'<span class="tbgr">'+xlSegs(fil,obs,wait)+'</span>','<span class="tbcnt">'+wait.length+' hồ sơ</span>');
+  h+=xlLoc(fil,obs,wait,'<span class="tbcnt">'+wait.length+' hồ sơ</span>');
   if(!wait.length)h+='<div class="empty">Không còn ai đóng đủ tiền mà chưa xếp lớp.</div>';
   return h}
  /* V9.28: trang này tự dựng thanh công cụ và KHÔNG có biến p (nó dùng window.XLFILT),
     nên phải ghi thẳng mã trang - viết p ở đây là tham chiếu biến không tồn tại, lọc câm luôn. */
  view=fltApply("xeplop",view);
- h+=tbar(timHTML("xeplop")+'<span class="tbgr">'+xlSegs(fil,obs,wait)+'</span>',
-  '<span class="tbcnt">'+view.length+' hồ sơ</span>'+fltBarHTML("xeplop",1));
+ h+=xlLoc(fil,obs,wait,'<span class="tbcnt">'+view.length+' hồ sơ</span>'+fltBarHTML("xeplop",1));
  h+='<div class="obcards rows" data-tour="obcards">';if(!view.length)h+='<div class="empty">Không có hồ sơ phù hợp.</div>';
  var MIX=jIndex();
  view.forEach(function(o){var s=obState(o);var sid=o.student_id;
@@ -12555,7 +12573,11 @@ function segHTML(cur,opts,onTpl,id){
      phía trước, để họ biết"*): segHTML đã biết mình đang ở kiểu nào - `cur` là MẢNG tức chọn
      nhiều, là chuỗi tức chọn một. Vậy chỉ cần một lớp CSS: nhóm chọn nhiều thì mỗi nút có ô
      vuông nhỏ phía trước, bật thì ô tô đầy. Một chỗ sửa, mọi nhóm chọn nhiều trong app hưởng. */
-  var cls=(isArr?" mul":"")+(chon(o)?" on":"")+(o[3]?" "+o[3]:"");
+  /* V2 13/08 - chip đếm 0 mờ đi. Một dải 12 chip mà chip nào cũng đậm như nhau thì mắt phải đọc
+     hết 12 con số mới biết chỗ nào có việc; mờ những chỗ rỗng là làm hộ việc ấy. Vẫn bấm được -
+     lọc ra "không có gì" cũng là một câu trả lời người ta cần. */
+  var rong=(o[2]===0||o[2]==="0");
+  var cls=(isArr?" mul":"")+(chon(o)?" on":"")+(o[3]?" "+o[3]:"")+(rong&&!chon(o)?" zero":"");
   return '<button class="segb'+cls+'" onclick="'+onTpl.split("{k}").join(o[0])+'">'+esc(o[1])+
    (o[2]!=null&&o[2]!==""?'<i class="segn">'+o[2]+'</i>':'')+'</button>'}
  id=id||("seg"+opts.length);
@@ -12573,6 +12595,23 @@ function segHTML(cur,opts,onTpl,id){
  return '<div class="seg">'+hien.map(nut).join("")+
   '<button class="segb segmo" onclick="segMo(\''+esc(id)+'\')"><i class="ti ti-dots"></i>+'+an+' nhóm khác</button></div>'}
 function tbar(left,right){return '<div class="tbar" data-tour="tbar">'+(left||"")+'<div class="tbsp"></div>'+(right||"")+'</div>'}
+/* ═══ V2 13/08 - MỘT HÀNG CỦA THANH LỌC: [NHÃN NHÓM] [dải chip] ═════════════════════════════
+   `nhan` là câu trả lời cho "dải này lọc theo cái gì" - thứ mà trang Lead thiếu hẳn nên hai dải
+   chip xếp chồng nhìn y hệt nhau. `nhieu=true` thì nhãn nói thêm "chọn nhiều" (một lần cho cả
+   nhóm, thay cho ô vuông trên từng chip - xem ghi chú CSS ở `.segb.mul`).
+   Hàng không có nhãn (ô tìm) vẫn dùng được: nhãn rỗng thì cột nhãn không vẽ. */
+function locR(nhan,noiDung,nhieu,cls){
+ if(!noiDung)return "";
+ return '<div class="locr'+(cls?" "+cls:"")+'">'+
+  (nhan?('<span class="loclb">'+esc(nhan)+(nhieu?'<em>chọn nhiều</em>':'')+'</span>'):'')+
+  '<div class="locv">'+noiDung+'</div></div>'}
+/* Gộp các hàng lọc thành MỘT khối có đúng MỘT khung. `neo` giữ nguyên mã neo của thanh cũ để
+   bài hướng dẫn không trỏ vào chỗ trống - đổi giao diện thì đổi, đừng làm gãy đường dẫn. */
+function locKhoi(rows,ct,neo){
+ var r=(rows||[]).filter(Boolean);
+ if(ct)r.push('<div class="locr locct">'+ct+'</div>');
+ if(!r.length)return "";
+ return '<div class="tbar loc" data-tour="'+(neo||"tbar")+'">'+r.join("")+'</div>'}
 /* V9.64: thanh công cụ HAI TẦNG - tầng trên là thứ THAY ĐỔI theo dữ liệu (ô tìm, dải chip lọc),
    tầng dưới là bộ công cụ CỐ ĐỊNH của trang. Cùng một khung .tbar để hai kiểu thanh không trôi
    khỏi nhau về màu, viền, bo góc. */
@@ -12604,7 +12643,14 @@ var DVI={chay:"hồ sơ",giaoan:"lớp",buoihoc:"buổi",diemdanh:"buổi",baita
     phải đoán, và để cả app gọi cùng một tên. */
  lichwow:"ô trực"};
 function dvi(p){return DVI[p]||"dòng"}
-function filterBar(p,cur,opts,cnt){
+/* V2 13/08 - NHÃN CỦA DẢI CHIP TRẠNG THÁI. Hầu hết sổ lọc theo một cột `*_status` nên "Trạng
+   thái" đúng và không cần khai. Bốn cột không phải trạng thái thì phải gọi đúng tên nó, nếu
+   không cái nhãn vừa thêm vào lại thành một chỗ nói sai - tệ hơn là không có nhãn.
+   Suy từ CHÍNH tên cột (`cfg.filt`) chứ không kê bảng theo tên sổ: thêm sổ mới là tự có nhãn,
+   không phải nhớ khai thêm một chỗ nữa. */
+var LOCNHAN={channel:"Kênh liên hệ",payment_method:"Hình thức",debt:"Công nợ",survey_type:"Loại phiếu"};
+function locNhan(f){return LOCNHAN[String(f||"")]||"Trạng thái"}
+function filterBar(p,cur,opts,cnt,nhan){
  /* V9.28: bộ lọc chuyên sâu gắn vào ĐÂY - một chỗ sửa, mọi trang tác vụ dùng filterBar đều có.
     Tab/chip nghiệp vụ bên trái giữ nguyên; bộ lọc nằm bên phải và chỉ thu hẹp trong tab đang mở. */
  /* V9.52 (anh Luân: "vị trí đặt để, cách thiết kế bộ lọc, nói chung chưa đồng bộ trong thiết
@@ -12618,7 +12664,11 @@ function filterBar(p,cur,opts,cnt){
     vạch luôn đi cùng dải chip thay vì đứng riêng một mình. Để cả hai là vẽ hai vạch. */
  var tim='<span class="pgq"><i class="ti ti-search"></i><input value="'+esc(q)+'" placeholder="Tìm trong trang này..." oninput="pgqSet(\''+esc(p)+'\',this.value)" aria-label="Tìm trong trang này"></span>'+
   (q?'<button class="pill" onclick="pgqSet(\''+esc(p)+'\',\'\')" data-tip="Xoá từ khoá tìm"><i class="ti ti-x"></i></button>':'');
- return tbar(tim+'<span class="tbgr">'+segHTML(cur,opts,"fset('"+p+"','{k}');reRender(CUR)")+'</span>',
+ /* V2 13/08 - ba thứ từng nằm chung MỘT hàng flex-wrap (ô tìm · dải chip · số dòng · Bộ lọc) nay
+    thành ba HÀNG có nhãn trong một khung. Cùng chiều cao mà đọc được ngay dải nào lọc gì; và số
+    dòng thôi trôi theo độ dài dải chip. Nhãn mặc định là "Trạng thái" vì mọi trang tác vụ đều
+    lọc theo bước của quy trình; trang nào khác thì truyền `nhan` riêng. */
+ return locKhoi([locR("",tim),locR(nhan||"Trạng thái",segHTML(cur,opts,"fset('"+p+"','{k}');reRender(CUR)"))],
   '<span class="tbcnt">'+cnt+' '+dvi(p)+'</span>'+fltBarHTML(p,1))}
 /* ═══ V2 09/08 - DẢI CHIP KHÔNG KÈM Ô TÌM ═══════════════════════════════════════════════════
    `filterBar` luôn kèm một ô tìm ở đầu - đúng cho trang chưa có ô nào. Nhưng bốn trang em vừa
@@ -12626,8 +12676,8 @@ function filterBar(p,cur,opts,cnt){
    riêng, nên gọi `filterBar` là đẻ ra HAI Ô TÌM trên cùng một trang - người dùng gõ vào ô nào
    cũng được nhưng hai ô không nói chuyện với nhau. `_checkux` bắt ngay trong lượt verify đầu.
    Hàm này vẽ ĐÚNG dải chip, không kèm gì thêm. */
-function chipBar(p,cur,opts,cnt){
- return tbar(segHTML(cur,opts,"fset('"+p+"','{k}');reRender(CUR)"),
+function chipBar(p,cur,opts,cnt,nhan){
+ return locKhoi([locR(nhan||"Trạng thái",segHTML(cur,opts,"fset('"+p+"','{k}');reRender(CUR)"))],
   (cnt==null?"":'<span class="tbcnt">'+cnt+' '+dvi(p)+'</span>'));}
 function stepBar(a){var h='<div class="steps">';a.forEach(function(s,i){h+=stepHTML(s[0],s[1]);if(i<a.length-1)h+='<div class="stpc'+(s[1]?" done":"")+'"></div>'});return h+'</div>'}
 /* `sel`: giá trị đang có của dòng - mở form sửa mà mục chọn nhảy về đầu danh sách là người dùng
@@ -18973,7 +19023,7 @@ function tourRestart(){if(!TOUR.key)return;TOUR.i=0;tourShow()}
 function tourNext(){var T=TOURS[TOUR.key];if(!T)return;
  if(TOUR.i>=T.steps.length-1){
   if(T.live){var con=tourWorkLeft();tourEnd();
-   if(con>0){toast("Hết lượt này. Còn "+con+" việc chưa xong - mở Trợ lý để dọn tiếp.",5200);nhacCho("asstfab",5)}
+   if(con>0){toast("Hết lượt này. Còn "+con+" việc chưa xong - mở Trợ lý để dọn tiếp.",5200);nhacCho("tthBtn",5)}
    else toast("Sạch hàng chờ. Không còn việc nào đang chờ bạn.",4200);
    nhacCho("tourBtn",5);
    return}
@@ -20415,7 +20465,7 @@ var QADEF=[
  {h:"app có gửi tin nhắn zalo sms email thật không",d:"Bản demo KHÔNG gửi thật. App soạn sẵn nội dung chuẩn theo CH4 và ghi nhận là đã gửi, còn việc gửi đi cần nối backend - 66 điểm nối đã chừa sẵn trong mã nguồn.",o:"Cài đặt > Thông điệp nhắc việc (CH4)",go:"window.SETTAB='ch4';go('settings')"},
  {h:"dữ liệu lưu ở đâu · mất dữ liệu không · reset có mất cấu hình không",d:"Bản demo lưu trong trình duyệt của máy đang mở. Cấu hình nằm ở ô nhớ RIÊNG nên bấm reset dữ liệu demo KHÔNG làm mất ngưỡng, câu nhắc, danh mục hay phân quyền.",o:"Cài đặt > Bắt đầu ở đây",go:"window.SETTAB='tongquan';go('settings')"},
  {h:"tại sao tôi không thấy trang này · bị ẩn menu · không có quyền",d:"Mỗi chức danh chỉ thấy phần việc của mình. Ba tầng: thấy trang nào, thấy dữ liệu của ai, được bấm nút gì. Vào bảng phân quyền rồi đóng vai đúng chức danh đó để xem họ thấy gì.",o:"Cài đặt > Phân quyền & Phạm vi",go:"window.SETTAB='phanquyen';go('settings')"},
- {h:"làm sao xem lại bài hướng dẫn tham quan · bật lại hướng dẫn",d:"Bài hướng dẫn không mất đi sau khi xem. Mở lại bất cứ lúc nào ở Cài đặt, hoặc bấm nút Trợ lý ở góc dưới bên phải.",o:"Cài đặt > Bài hướng dẫn",go:"window.SETTAB='huongdan';go('settings')"}];
+ {h:"làm sao xem lại bài hướng dẫn tham quan · bật lại hướng dẫn",d:"Bài hướng dẫn không mất đi sau khi xem. Mở lại bất cứ lúc nào ở Cài đặt, hoặc bấm nút bóng đèn trên thanh tiêu đề để mở Trợ lý.",o:"Cài đặt > Bài hướng dẫn",go:"window.SETTAB='huongdan';go('settings')"}];
 function qaCfg(){var c=(DATA.config=DATA.config||{});var q=(c.qa=c.qa||{});
  if(!q.muc)q.muc=QADEF.map(function(x){return {h:x.h,d:x.d,o:x.o,go:x.go}});
  if(!q.hut)q.hut=[];
@@ -23019,13 +23069,19 @@ function tthKey(){var me="";try{me=tkMeId()||CURSTAFF||""}catch(e){me=CURSTAFF||
 function tthOn(){try{var v=localStorage.getItem(tthKey());return v===null?true:v==="1"}catch(e){return true}}
 function tthToggle(){try{localStorage.setItem(tthKey(),tthOn()?"0":"1")}catch(e){}
  tthBtn();asstTick();reRender(CUR);
- toast(tthOn()?"Đã bật Trợ lý - nút tròn ở góc dưới bên phải.":"Đã tắt Trợ lý. Bật lại ở nút bóng đèn trên thanh tiêu đề.")}
+ toast(tthOn()?"Đã bật Trợ lý - bấm nút bóng đèn trên thanh tiêu đề để mở."
+              :"Đã tắt Trợ lý. Bật lại ở Cài đặt > Trợ lý & Nhịp ngày.")}
+/* V2 13/08 - bóng đèn nay là CỬA VÀO Trợ lý, không còn là công tắc. Nó vẫn phải nói được ba
+   trạng thái, vì cả ba đều đổi ý nghĩa cú bấm: đang mở tấm · đang dọn việc dở · Trợ lý bị tắt. */
 function tthBtn(){var b=document.getElementById("tthBtn");if(!b)return;
- var on=tthOn();
- b.className="tbtn"+(on?" on":"");
- b.setAttribute("aria-label",on?"Tắt Trợ lý":"Bật Trợ lý");
- b.setAttribute("data-tip",on?"Trợ lý đang BẬT. Bấm để tắt.":"Trợ lý đang TẮT. Bấm để bật lại.");
- b.innerHTML='<i class="ti '+(on?"ti-bulb":"ti-bulb")+'"></i>'}
+ var bat=asstBat(),mo=false,chay=(TOUR.on&&TOUR.min);
+ try{mo=asstOn()}catch(e){}
+ b.className="tbtn"+(mo||chay?" on":"");
+ b.setAttribute("aria-label",bat?"Mở Trợ lý":"Trợ lý đang tắt");
+ b.setAttribute("data-tip",chay?"Đang dọn việc dở - bấm để mở lại đúng chỗ đang làm"
+  :(bat?"Trợ lý - hỏi về một học viên, một lớp, hay chỗ cấu hình"
+       :"Trợ lý đang TẮT. Bật lại ở Cài đặt > Trợ lý & Nhịp ngày."));
+ b.innerHTML='<i class="ti '+(chay?"ti-checklist":"ti-bulb")+'"></i>'}
 /* Việc của TRANG NÀY, của CHÍNH người đang đăng nhập - lấy thẳng từ slaItems, không khai lại. */
 
 
@@ -23051,16 +23107,21 @@ function asstEl(){
  var a=document.getElementById("asst");
  if(!a){a=document.createElement("div");a.id="asst";a.className="asst";document.body.appendChild(a)}
  return a}
-function asstFabEl(){
- var f=document.getElementById("asstfab");
- if(!f){f=document.createElement("button");f.id="asstfab";f.className="asstfab";
-  f.setAttribute("aria-label","Mở Trợ lý");document.body.appendChild(f)}
- if(!f.onclick)f.onclick=asstFabClick;
- return f}
-/* Một nút, hai vai: đang dọn việc dở mà thu gọn thì mở lại đúng chỗ đang dọn; còn lại thì bung tấm
-   trợ thủ. Hai nút chồng nhau một góc là thứ chắc chắn sẽ che nhau. */
-function asstFabClick(){
+/* ═══ V2 13/08 - NÚT NỔI GÓC DƯỚI BỎ HẲN, BÓNG ĐÈN MỞ THẲNG TRỢ LÝ ═══════════════════════════
+   Anh Luân: *"cái nút bóng đèn thay vì bật tắt cái hỏi trợ lý, thì em cho nó mở form trợ lý
+   luôn đi, bỏ luôn cái Hỏi trợ lý dưới góc dưới đi, phiền ko cần thiết"*.
+   Đúng, và cái nút nổi ấy đã tốn của dự án nhiều hơn nó đáng: nó CHE NỘI DUNG (`_checkmat` bắt
+   7 chỗ không bấm được trên 14 trang), phải vá bằng `pointer-events` tách vai icon/nhãn, rồi
+   phải chừa 96px cuối mỗi trang, rồi phải ẩn đi mỗi khi mở ngăn kéo hay menu. Ba lớp vá cho
+   một nút chỉ để MỞ một tấm mà thanh tiêu đề đã có sẵn chỗ đặt.
+   Bóng đèn nay MỞ TRỢ LÝ. Công tắc bật/tắt Trợ lý không mất - nó về đúng chỗ của một cấu hình:
+   **Cài đặt > Trợ lý & Nhịp ngày**. Một nút trên thanh tiêu đề nên LÀM một việc, không nên vừa
+   là công tắc vừa là cửa vào.
+   Vai thứ hai của nút nổi (đang dọn việc dở mà thu gọn thì mở lại đúng chỗ) chuyển sang bóng đèn
+   luôn - nếu không thì lượt dọn đang chạy mất đường quay lại. */
+function asstNut(){
  if(TOUR.on&&TOUR.min){tourOpenBack();return}
+ if(!asstBat()){toast("Trợ lý đang tắt. Bật lại ở Cài đặt > Trợ lý & Nhịp ngày.",4200);return}
  asstToggle()}
 function asstOn(){return !!(document.getElementById("asst")||{}).classList&&document.getElementById("asst").classList.contains("on")}
 function asstToggle(){var a=asstEl();if(a.classList.contains("on"))asstClose();else asstOpen()}
@@ -23075,17 +23136,9 @@ var NHIPBUOI2=[["sang","Đầu ngày"],["ngay","Trong ngày"],["chieu","Cuối n
 function asstBuoiSet(b){window.ASSTBUOI=(window.ASSTBUOI===b?"":b);asstPaint()}
 function asstPaint(){
  if(!asstBat())return;
- var f=asstFabEl(),a=asstEl();
- var L=[],do_=0;
- try{L=workAll();do_=L.filter(function(x){return x.sev==="red"}).length}catch(e){}
- var chay=(TOUR.on&&TOUR.min);
- f.className="asstfab"+(do_?" hot":"")+(chay?" run":"");
- /* V9.99z3 - nút nổi không còn đếm việc: Trợ lý nay chỉ để HỎI, mà một con số việc trên nút
-    thì hứa một thứ tấm bên trong không làm nữa. Việc vẫn đếm ở chuông trên thanh trên. */
- f.innerHTML=(chay?'<i class="ti ti-checklist"></i><b>'+tourWorkLeft()+'</b> <span>đang dọn</span>'
-  :'<i class="ti ti-bulb"></i><span>Hỏi Trợ lý</span>');
- f.setAttribute("data-tip",chay?"Đang dọn việc dở - bấm để mở lại đúng chỗ đang làm"
-  :"Trợ lý - hỏi về một học viên, một lớp, hoặc chỗ cấu hình");
+ var a=asstEl();
+ /* Nút nổi đã bỏ (13/08) - trạng thái "đang dọn việc dở" nay hiện trên chính nút bóng đèn. */
+ tthBtn();
  if(!a.classList.contains("on"))return;
  a.innerHTML=asstHTML()}
 /* Dựng chuỗi tách khỏi chỗ gắn vào màn hình: bộ kiểm đọc được nội dung thật mà không cần DOM,
@@ -23269,9 +23322,8 @@ function asstBoQua(){
 function asstBat(){try{return !!tthCfg().on&&tthOn()!==false}catch(e){return true}}
 function asstTick(){
  try{
-  var f=document.getElementById("asstfab");
-  if(asstBat()){if(f)f.style.display="";asstPaint();return}
-  if(f)f.style.display="none";
+  if(asstBat()){asstPaint();return}
+  tthBtn();
   var a=document.getElementById("asst");if(a)a.classList.remove("on");
   if(TOUR.on&&(TOURS[TOUR.key]||{}).live)tourEnd();   /* tắt trợ thủ thì dừng luôn lượt dọn */
  }catch(e){}}
@@ -24209,7 +24261,7 @@ function helloMaybe(){
   '<div class="helloacts">'+
   '<button class="btn primary" onclick="helloTour()"><i class="ti ti-school"></i>Chọn bài tham quan</button>'+
   '<button class="btn" onclick="helloDong()"><i class="ti ti-compass"></i>Tự khám phá</button></div>'+
-  '<div class="hellonote"><i class="ti ti-bulb"></i>Góc dưới bên phải có nút <b>Trợ lý</b> - hỏi tên một học viên, hỏi chỗ cấu hình, hay nhờ dắt dọn việc từng bước đều được. Muốn xem lại hướng dẫn thì bấm nút <b>?</b> trên thanh tiêu đề.</div>'+
+  '<div class="hellonote"><i class="ti ti-bulb"></i>Nút <b>bóng đèn</b> trên thanh tiêu đề mở <b>Trợ lý</b> - hỏi tên một học viên, hỏi chỗ cấu hình, hay nhờ dắt dọn việc từng bước đều được. Muốn xem lại hướng dẫn thì bấm nút <b>?</b> ngay cạnh.</div>'+
   '</div>';
  d.onclick=function(ev){if(ev.target===d)helloDong()};
  document.body.appendChild(d)}
