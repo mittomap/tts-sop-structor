@@ -169,6 +169,8 @@ hạn, nút Làm/Để sau) → **3 chip nhịp ngày** bấm được (Đầu n
 
 - `asstHTML()` **dựng chuỗi**, `asstPaint()` chỉ gắn vào DOM. Tách ra để bộ kiểm đọc được nội dung
   thật mà không cần DOM giả - và để đọc mã là thấy ngay "tấm trợ thủ gồm những gì".
+  **MAT 7 (them 13/08) - CO T "NGUOI PHU TRACH" CUA HD3.** Anh Luan hoi *"Sop co noi ko?"* ve chuyen qua SLA thi cham ai. Doc HD3 thi thay no co han mot cot ten **"Nguoi phu trach"**, khai cho **81/95 tinh huong** - va app KHONG NHAP MOT DONG NAO cua cot ay: biet ma NA, biet cau nhac, biet nguong, nhung khong biet AI PHAI LAM. SOP mo ta ma app bo sot - dung thu luat cung so 0 cam, va sau mat dang canh khong mat nao hoi toi no. Da nhap thanh bang `NAPT` trong `gen_v5.py`; mat 7 canh bang ay khong lech (thieu ma hoac chep sai chu deu do). *Mot cot du lieu ma khong bo kiem nao hoi toi thi no vang mat ma khong ai hay.*
+
 - **Một nút, hai vai** (`asstFabClick`): đang dọn việc dở mà thu gọn thì mở lại đúng chỗ đang dọn;
   còn lại thì bung tấm trợ thủ. Hai nút chồng nhau một góc là thứ chắc chắn sẽ che nhau.
 - `asstTick()` gọi từ mọi đường vẽ lại màn hình → con số trên nút và việc kế tiếp luôn đúng.

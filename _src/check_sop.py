@@ -793,6 +793,94 @@ if _sot5:
     sys.exit(1)
 print("  KET QUA CH5: DAT - moi chu viet tat SOP mo ta deu co cho tra nghia trong app.")
 
+# ═══ MAT THU BAY - CO T "NGUOI PHU TRACH" CUA HD3 (13/08) ══════════════════════════════════
+# Anh Luan hoi *"Sop co noi ko?"* ve chuyen cham ai khi qua SLA. Doc HD3 thi thay no co han mot
+# cot ten "Nguoi phu trach", khai cho 81/95 tinh huong - va app KHONG NHAP MOT DONG NAO cua cot
+# ay. App biet ma NA, biet cau nhac, biet nguong, nhung khong biet AI PHAI LAM. SOP mo ta ma app
+# bo sot: dung thu LUAT CUNG SO 0 cam. Da nhap thanh bang NAPT trong gen_v5.py; muc nay canh cho
+# bang ay khong lech khoi SOP (thieu ma, hoac chep sai chu).
 print()
-print("KET QUA: DAT - cot SOP, so trigger HD3, chi so BC2, phan quyen CH3, man VH, bang BC va "
-      "thuat ngu CH5 deu duoc app phu, hoac da khai ly do.")
+print("=" * 78)
+print("MAT 7 - CO T 'NGUOI PHU TRACH' CUA SO TRIGGER HD3 (ai phai lam viec nay)")
+print("=" * 78)
+# Doc lai HD3 nhung lan nay giu CA HANG, de lay duoc cot "Nguoi phu trach" theo dung vi tri
+# tieu de - khong dem cot theo so thu tu cam cung (SOP them mot cot la lech het).
+def _kd(t):
+    """bo dau tieng Viet - so tieu de cot khong phu thuoc dau"""
+    import unicodedata
+    return "".join(c for c in unicodedata.normalize("NFD", str(t or ""))
+                   if unicodedata.category(c) != "Mn").strip()
+
+
+def _hd3_pt():
+    z = zipfile.ZipFile(SOP)
+    rels = dict(re.findall(r'Id="(rId\d+)"[^>]*Target="([^"]+)"',
+                           z.read("xl/_rels/workbook.xml.rels").decode("utf-8", "ignore")))
+    sheets = re.findall(r'<sheet name="([^"]+)"[^>]*r:id="(rId\d+)"',
+                        z.read("xl/workbook.xml").decode("utf-8", "ignore"))
+    ss = _sst(z)
+    cell = re.compile(r'<c\b([^>]*?)(?:/>|>(.*?)</c>)', re.S)
+    val = re.compile(r'<v>(.*?)</v>', re.S)
+    out, hdr = {}, None
+    for name, rid in sheets:
+        if not name.startswith("HD3"):
+            continue
+        xml = z.read("xl/" + rels[rid]).decode("utf-8", "ignore")
+        for row in re.findall(r"<row[^>]*>(.*?)</row>", xml, re.S):
+            vals = []
+            for m in cell.finditer(row):
+                attrs = m.group(1) or ""
+                v = val.search(m.group(2) or "")
+                v = v.group(1) if v else ""
+                if 't="s"' in attrs and v.isdigit() and int(v) < len(ss):
+                    v = ss[int(v)]
+                vals.append(str(v).strip())
+            if hdr is None and "Nguoi phu trach" in [_kd(x) for x in vals]:
+                hdr = [_kd(x) for x in vals]
+                continue
+            if hdr is None:
+                continue
+            try:
+                i_ma = hdr.index("Ma")
+                i_pt = hdr.index("Nguoi phu trach")
+            except ValueError:
+                continue
+            if len(vals) <= max(i_ma, i_pt):
+                continue
+            ma = vals[i_ma]
+            if not re.match(r"^NA\d+$", ma):
+                continue
+            ph = vals[i_pt]
+            if ph and ph != "-":
+                out[ma] = ph
+    return out
+
+_pt = _hd3_pt()
+_m7 = re.search(r"var NAPT=\{(.*?)\};", SRC, re.S)
+_app7 = {}
+if _m7:
+    for _k, _v in re.findall(r'(NA\d+):"([^"]*)"', _m7.group(1)):
+        _app7[_k] = _v
+print("  SOP khai nguoi phu trach : %d tinh huong" % len(_pt))
+print("  app nhap duoc            : %d" % len(_app7))
+_sot7 = [m for m in sorted(_pt) if m not in _app7]
+_lech7 = [(m, _pt[m], _app7[m]) for m in sorted(_pt) if m in _app7 and _app7[m] != _pt[m]]
+if _sot7 or _lech7:
+    print()
+    if _sot7:
+        print("SOT %d MA - SOP khai nguoi phu trach ma app khong co:" % len(_sot7))
+        for _x in _sot7[:12]:
+            print("   X %s -> SOP ghi '%s'" % (_x, _pt[_x]))
+    if _lech7:
+        print("LECH %d MA - app chep khac SOP:" % len(_lech7))
+        for _x in _lech7[:12]:
+            print("   X %s | SOP: '%s' | app: '%s'" % _x)
+    print()
+    print("Sua bang NAPT trong gen_v5.py cho khop NGUYEN VAN cot 'Nguoi phu trach' cua HD3.")
+    print("KET QUA: KHONG DAT")
+    sys.exit(1)
+print("  KET QUA MAT 7: DAT - moi tinh huong SOP giao cho ai, app deu biet.")
+
+print()
+print("KET QUA: DAT - cot SOP, so trigger HD3, chi so BC2, phan quyen CH3, man VH, bang BC, "
+      "thuat ngu CH5 va nguoi phu trach HD3 deu duoc app phu, hoac da khai ly do.")

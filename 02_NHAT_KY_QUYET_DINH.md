@@ -254,6 +254,50 @@
 > Mốc cũ: `c6ea8b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
+> ### 🟢 13/08 - SOP ĐÃ KHAI "AI PHẢI LÀM VIỆC NÀY" TỪ ĐẦU, APP CHƯA NHẬP MỘT DÒNG
+>
+> Anh Luân hỏi một câu tưởng nhỏ: *"Chạm người phụ trách chứ ai em, nếu quá sla thì quản lý cũng
+> được chạm luôn chứ sao. Sop có nói ko?"* - và câu trả lời làm lộ một lỗ hổng LUẬT CỨNG SỐ 0.
+>
+> **Sổ trigger HD3 có hẳn một cột tên "Người phụ trách", khai cho 81/95 tình huống.** App biết mã
+> NA, biết câu nhắc, biết ngưỡng - **không nhập một dòng nào của cột ấy**, tức không biết AI PHẢI
+> LÀM. Bốn mặt `check_sop.py` đang canh (cột DL · tình huống HD3 · chỉ số BC2 · phân quyền CH3)
+> đều không hỏi tới cột đó, nên nó nằm im.
+>
+> **Và nó trả lời luôn câu EM ĐI HỎI ANH hôm trước.** Em từng liệt kê bốn bước rồi hỏi anh
+> *"chờ chấm test thì chạm ai - WOW hay khách?"*. SOP đã ghi sẵn: **Người chấm test**. Em hỏi
+> người một thứ nằm trong tài liệu. *Canh bằng máy, không bằng trí nhớ - kể cả khi cái cần tra
+> là một câu hỏi nghiệp vụ.*
+>
+> **SOP nói gì về leo thang:** có, nhưng chỉ **bốn chỗ rời rạc** - NA038 khiếu nại mức cao quá
+> hạn ("Học vụ + Quản lý") · NA040 đã leo thang ("CEO") · NA061 giảm giá vượt mức ("Quản lý") ·
+> NA014 học viên yếu cả hai mặt ("Học vụ + Quản lý"). **Không có luật chung "quá SLA thì báo
+> quản lý".** Luật anh Luân vừa nói là một khái quát hoá SOP chưa có - đúng diện *"thấy một thứ
+> SOP không có mà nên có → đề xuất rồi làm"*, nên đã làm.
+>
+> **Đã làm:** nhập cột ấy thành bảng `NAPT` (81 mã, chép nguyên văn) · `check_sop.py` thêm **mặt
+> thứ bảy** canh bảng ấy không lệch khỏi SOP (thiếu mã hoặc chép sai chữ đều đỏ) · khối dự phòng
+> ở màn Chạy quy trình nói đủ **ba tầng**: người đang giữ hồ sơ (tên thật) → chức danh SOP giao
+> cho tình huống → và khi quá hạn thì thêm quản lý trực tiếp (`reports_to`) · và mở **cửa giao
+> lại lead** ngay tại chỗ, vì NA046 nói rõ *"gọi gấp **hoặc giao lại cho NV khác**"* mà app chỉ
+> làm được vế đầu.
+>
+> Đo thật: *"Chạm ai: Nguyễn Thị Phương Duyên (đang phụ trách hồ sơ) · theo SOP tình huống NA010
+> là Học vụ · đã quá hạn nên báo cả quản lý Trần Thị Thanh Hà"*.
+>
+> ### 🟠 13/08 - HAI TAB NGANG HÀNG Ở MÀN CHẠY QUY TRÌNH LÀ LỖI MÔ HÌNH
+>
+> Anh Luân: *"1 tab là nghiệp vụ chặng, tab còn lại là ghi điểm chạm, nó ko phù hợp với thói quen
+> sử dụng thông thường... chứ ko có ai hiểu là chuyển tab lúc này đâu."*
+>
+> Đúng, và là lỗi MÔ HÌNH chứ không phải giao diện. Em bày hai lựa chọn **ngang hàng**, trong khi
+> thực tế chúng là **một quyết định hai nhánh**, và nhánh hai chỉ tồn tại khi nhánh một không làm
+> được: *có kết quả thì nhập; chưa có thì ghi lại vì sao và hẹn lại.* Hai tab ngang nhau bắt người
+> dùng tự nghĩ ra cái ánh xạ ấy - mà trong đầu họ đang là "chưa chấm được, ghi một câu rồi hẹn
+> lại", không ai nghĩ tới "đổi tab".
+> Nay bước chính đứng một mình; nhánh dự phòng là một khối riêng cuối bước, mở đầu bằng đúng câu
+> họ đang nghĩ, kèm mốc đã chờ/đã quá hạn và tên người phải chạm.
+>
 > ### 🔴 13/08 - ĐỔI LUẬT: ĐẨY TRƯỚC, VERIFY SAU (anh Luân chốt)
 >
 > > *"push đâu có mất thời gian, push để a trải nghiệm, còn e vẫn sửa tiếp ở dưới mà, sợ gì, sửa

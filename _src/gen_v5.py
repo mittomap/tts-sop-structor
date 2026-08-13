@@ -1341,6 +1341,8 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .runalt{margin:10px 18px 0;padding:11px 14px;background:var(--bg);border:1px dashed var(--line);border-radius:10px}
 .ratt{font-size:12.5px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .ratd{font-size:11.5px;color:var(--muted);line-height:1.55;margin:3px 0 8px}
+.ratw{font-size:11.5px;color:var(--navy);line-height:1.6;margin:0 0 8px;display:flex;gap:6px;align-items:flex-start}
+.ratw>i{margin-top:2px;flex:0 0 auto;color:var(--muted)}
 .rtsum{display:flex;align-items:center;gap:7px;padding:9px 18px;background:var(--amberb);color:#8A6D1F;font-size:11.5px;border-bottom:1px solid var(--line)}
 .rtlist{padding:10px 18px;border-bottom:1px solid var(--line);background:#FAFBFD;display:flex;flex-direction:column;gap:7px;max-height:200px;overflow-y:auto}
 .rtlh{font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--muted);text-transform:uppercase}
@@ -9829,6 +9831,83 @@ function rtReset(k){DATA.config=DATA.config||{};
 function runTouches(J){var since=pvnd(J.since);
  var t=(J.C.tps||[]).filter(function(x){var d=pvnd(x.contact_time);return d&&(!since||d.getTime()>=since.getTime())});
  t.sort(function(a,b){return (pvnd(b.contact_time)||0)-(pvnd(a.contact_time)||0)});return t}
+/* ═══ 13/08 - AI PHẢI LÀM VIỆC NÀY: NHẬP TỪ SỔ TRIGGER HD3 CỦA SOP ═══════════════════════
+   Anh Luân hỏi *"chạm người phụ trách chứ ai em, nếu quá sla thì quản lý cũng được chạm luôn
+   chứ sao. Sop có nói ko?"* - câu trả lời làm lộ một lỗ hổng LUẬT CỨNG SỐ 0.
+   Sổ trigger HD3 có hẳn một cột tên **"Người phụ trách"**, khai cho **81/95 tình huống** (14 chỗ
+   còn lại SOP để trống). App biết mã NA, biết câu nhắc, biết ngưỡng - nhưng **không nhập một
+   dòng nào của cột ấy**, tức không biết AI PHẢI LÀM. SOP mô tả mà app bỏ sót - đúng thứ luật
+   cứng số 0 cấm.
+   Nó cũng là câu trả lời cho câu EM ĐI HỎI ANH hôm trước ("chờ chấm test thì chạm ai?") - SOP
+   đã ghi sẵn: **Người chấm test**. *Canh bằng máy, không bằng trí nhớ.*
+   Chép NGUYÊN VĂN từ HD3; `check_sop.py` canh mặt thứ NĂM để bảng này không lệch khỏi SOP. */
+var NAPT={
+ NA001:"NV Tư vấn",NA002:"NV Tư vấn",NA003:"NV Tư vấn",NA004:"NV Tư vấn",
+ NA005:"NV Tư vấn / Học vụ",NA006:"NV Tư vấn",NA007:"NV Tư vấn",NA010:"Học vụ",NA011:"Học vụ",
+ NA012:"Học vụ",NA013:"Học vụ",NA014:"Học vụ + Quản lý",NA015:"Học vụ",NA016:"Học vụ",
+ NA017:"Học vụ",NA019:"Giáo viên",NA020:"Giáo viên",NA021:"Giáo viên",NA022:"Giáo viên",
+ NA023:"Học vụ",NA024:"Học vụ",NA025:"Giáo viên / Học vụ",NA026:"Học vụ",NA027:"Giáo viên",
+ NA029:"Giáo viên",NA030:"Giáo viên",NA031:"Học vụ",NA032:"NV WOW",NA033:"NV WOW",NA034:"NV WOW",
+ NA035:"NV WOW",NA036:"Học vụ",NA038:"Học vụ + Quản lý",NA039:"Học vụ",NA040:"CEO",
+ NA042:"NV Tư vấn",NA043:"NV Tư vấn",NA045:"NV Tư vấn",NA046:"NV Tư vấn",NA047:"NV Tư vấn",
+ NA048:"NV Tư vấn",NA049:"NV Tư vấn",NA050:"NV Tư vấn",NA051:"NV Tư vấn",NA052:"NV Tư vấn",
+ NA054:"Người chấm test",NA055:"Người chấm test",NA056:"NV Tư vấn",NA057:"NV Tư vấn",
+ NA059:"Kế toán / Học vụ",NA060:"NV Tư vấn / Học vụ",NA061:"Quản lý",NA062:"Học vụ",
+ NA063:"Học vụ",NA064:"Học vụ",NA065:"Học vụ",NA066:"Học vụ",NA067:"Học vụ",NA068:"Học vụ / GV",
+ NA069:"Giáo viên",NA070:"Học vụ",NA071:"Giáo viên",NA072:"Giáo viên",NA074:"NV WOW / Học vụ",
+ NA075:"Học vụ",NA076:"Học vụ",NA078:"Học vụ",NA079:"Học vụ",NA080:"Học vụ",NA081:"Học vụ",
+ NA082:"Học vụ",NA083:"Học vụ / Tư vấn",NA085:"Học vụ / hệ thống",NA086:"NV Tư vấn",
+ NA087:"Kế toán / Học vụ",NA088:"Kế toán / Học vụ",NA089:"Học vụ",NA090:"Học vụ",NA091:"Học vụ",
+ NA092:"Học vụ",NA093:"Học vụ"};
+/* Chức danh SOP giao cho tình huống này - nguyên văn HD3, rỗng nếu SOP để trống */
+function naPhuTrach(na){return NAPT[String(na||"").trim()]||""}
+/* NGƯỜI phụ trách chính hồ sơ này (tên thật, không phải chức danh). Lead thì đọc `assigned_to`;
+   học viên thì đọc GV chính của lớp em ấy đang học - đó là người hằng ngày chạm tới em đó. */
+function jNguoiPT(C){
+ try{
+  if(C.L&&String(C.L.assigned_to||"").trim())
+   return {id:C.L.assigned_to,ten:C.L.assigned_to_name||C.L.assigned_to};
+  if(C.S){var ob=rows("DL08").filter(function(o){return String(o.student_id)===String(C.S.student_id)&&o.class_id})[0];
+   var cl=ob?find("DL10","class_id",ob.class_id):null;
+   if(cl&&String(cl.main_teacher_id||"").trim())
+    return {id:cl.main_teacher_id,ten:cl.main_teacher_id_name||cl.main_teacher_id};}
+ }catch(e){}
+ return null}
+/* Quản lý trực tiếp của một người - dùng khi việc đã QUÁ HẠN (anh Luân 13/08: *"nếu quá sla thì
+   quản lý cũng được chạm luôn chứ sao"*). SOP chỉ leo thang ở khiếu nại/tiền/HV nguy cơ
+   (NA038 · NA040 · NA061 · NA014) chứ chưa có luật chung; đây là phần THÊM anh chốt - luật cứng
+   số 0 cho phép thêm, cấm bớt. */
+function jQuanLy(sid){
+ if(!sid)return null;
+ var s2=find("DL01","staff_id",sid);if(!s2)return null;
+ var q=String(s2.reports_to||"").trim();if(!q)return null;
+ var q2=find("DL01","staff_id",q);
+ return {id:q,ten:(s2.reports_to_name||(q2&&q2.full_name)||q)}}
+/* ═══ 13/08 - GIAO LẠI NGAY TẠI CHỖ (SOP NA046: "gọi gấp hoặc giao lại cho NV khác") ══════
+   Ngăn kéo gọn cho ĐÚNG một hồ sơ: chọn người nhận, ghi lý do, xong. Ghi bằng chính `bgGhi` -
+   cùng cửa ghi với màn Bàn giao lead, nên lịch sử bàn giao chỉ có MỘT dạng, không đẻ dạng thứ hai. */
+function runGiaoLai(pid){
+ var l=find("DL02","lead_id",pid);if(!l){toast("Hồ sơ này không phải lead - chưa giao lại được.");return}
+ var cu=(l.assigned_to_name||l.assigned_to||"chưa ai");
+ var ds=srows("DL01").filter(function(x){return staffActive(x)&&/sales|marketing/.test(ecode(x.role))&&String(x.staff_id)!==String(l.assigned_to)});
+ var h='<div class="dcard"><h4><i class="ti ti-user-share"></i>Giao lại lead cho người khác</h4>'+
+  '<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>SOP tình huống <b>NA046</b>: lead đã giao mà quá '+
+   esc(String(paramOf("slaLeadReassign_hours",4)))+' giờ chưa gọi thì <b>gọi gấp hoặc giao lại cho NV khác</b>. Đang phụ trách: <b>'+esc(cu)+'</b>.</div>'+
+  '<div class="fld"><label>Giao cho <i>*</i></label><select id="gl_dest"><option value="">-- chọn nhân viên --</option>'+
+   ds.map(function(x){return '<option value="'+esc(x.staff_id)+'">'+esc(x.full_name)+' · '+esc(elabel(x.role)||x.role||"")+'</option>'}).join("")+'</select></div>'+
+  '<div class="fld full"><label>Lý do giao lại</label><textarea id="gl_ly" rows="2" placeholder="vd: NV cũ nghỉ phép, lead quá hạn gọi"></textarea></div>'+
+  '<div class="dact"><button class="btn primary" onclick="runGiaoLaiRun(\''+esc(pid)+'\')"><i class="ti ti-check"></i>Giao lại</button></div></div>';
+ openDrawer("Giao lại lead",h)}
+function runGiaoLaiRun(pid){
+ if(chanAct("lead_giao"))return;   /* CH3: chức danh nào được giao/bàn giao lead */
+ var l=find("DL02","lead_id",pid);if(!l)return;
+ var dest=fldV("gl_dest");if(!dest){toast("Chọn người nhận.");return}
+ var dn=find("DL01","staff_id",dest);
+ var by=(CURSTAFF&&(find("DL01","staff_id",CURSTAFF)||{}).full_name)||"Quản lý";
+ var ly=(fldV("gl_ly")||"").trim();
+ var v=bgGhi(l,dest,dn?dn.full_name:dest,"",by+(ly?" - "+ly:""));
+ if(SVR)google.script.run.apiUpdate("DL02",pid,v);
+ closeModal();toast("Đã giao lại lead cho "+(dn?dn.full_name:dest)+".");reRender(CUR)}
 function runTouchFields(J){var sug=rtList(J.k);
  return [["channel","Kênh","enum","enum_contact_channel",1,eFull("enum_contact_channel","phone")],
   ["cres","Kết quả","cres",null,1,"connected"],
@@ -10115,7 +10194,22 @@ function renderChay(){
   (J.over?' <span class="chip red">đã quá hạn '+(J.ageH>24?Math.floor(J.ageH/24)+" ngày":Math.round(J.ageH)+" giờ")+'</span>'
         :(J.ageH!=null?' <span class="chip amber">đã chờ '+(J.ageH>24?Math.floor(J.ageH/24)+" ngày":Math.round(J.ageH)+" giờ")+'</span>':''))+'</div>'+
   '<div class="ratd">Ghi lại vì sao chưa làm được và hẹn lại - hồ sơ vẫn nằm ở chặng "'+esc(J.S.t)+'", đồng hồ SLA vẫn chạy.</div>'+
-  '<button class="btn" onclick="runSnooze()"><i class="ti ti-phone-plus"></i>Ghi liên hệ / ghi chú'+(tps.length?' ('+tps.length+' lần đã chạm)':'')+'</button></div>';
+  /* BA TẦNG "CHẠM AI", theo đúng thứ tự người ta nghĩ: người đang giữ hồ sơ -> chức danh SOP
+     giao cho tình huống này -> và khi đã quá hạn thì thêm quản lý của người ấy. */
+  (function(){var PT=jNguoiPT(C),SOPPT=naPhuTrach(J.na),QL=(J.over&&PT)?jQuanLy(PT.id):null;
+   if(!PT&&!SOPPT)return "";
+   var r='<div class="ratw"><i class="ti ti-user-check"></i><span>Chạm ai: ';
+   if(PT)r+='<b>'+nsLnk(PT.id,PT.ten,PT.ten)+'</b> (đang phụ trách hồ sơ)';
+   if(SOPPT)r+=(PT?' · ':'')+'theo SOP tình huống '+esc(J.na||"")+' là <b>'+esc(SOPPT)+'</b>';
+   if(QL)r+=' · đã quá hạn nên báo cả quản lý <b>'+nsLnk(QL.id,QL.ten,QL.ten)+'</b>';
+   return r+'</span></div>'})()+
+  '<button class="btn" onclick="runSnooze()"><i class="ti ti-phone-plus"></i>Ghi liên hệ / ghi chú'+(tps.length?' ('+tps.length+' lần đã chạm)':'')+'</button>'+
+  /* SOP NA046 nói HAI đường cho lead quá hạn chưa gọi: *"gọi gấp HOẶC GIAO LẠI cho NV khác"*.
+     App có màn Bàn giao lead từ lâu nhưng ở đây không có cửa nào tới - người dùng đang đứng
+     đúng hồ sơ ấy lại phải rời trang, tự tìm lại tên khách trong một bảng khác. Nay chìa thẳng. */
+  ((J.over&&C.L&&String(C.L.assigned_to||"").trim())
+    ?'<button class="btn" onclick="runGiaoLai(\''+esc(C.pid)+'\')"><i class="ti ti-user-share"></i>Giao lại cho NV khác</button>':'')+
+  '</div>';
  h+='<div class="runfoot">';
  if(R.q&&R.i>0)h+='<button class="btn" onclick="runPrev()"><i class="ti ti-arrow-left"></i>Người trước</button>';
  (ST.alt||[]).forEach(function(a){h+='<button class="btn" onclick="'+a.fn+'()"><i class="ti '+a.ic+'"></i>'+esc(a.lb)+'</button>'});
@@ -27364,7 +27458,7 @@ HV_SHELL = r"""
 # Them mot ham ghi moi ma quen khai -> _check15 BAO DO (no tu do nguon ra ban khai that).
 DOORS = {
  "DL01":["staffAdd","staffSave","gvBioSave","bkLuuHoSoGV","bkLuuEmailGV","cnLuu"],
- "DL02":["bkLuuTuVan","bgSplitOrphansRun","bgThuRun","doHandoverRun","dupThemSoSave","leadInboundSave","reassignSave","runGiveUpDo","runRejectSave","testQuickSave","touchLead","tvEnrollSave"],
+ "DL02":["bkLuuTuVan","bgSplitOrphansRun","bgThuRun","doHandoverRun","dupThemSoSave","leadInboundSave","reassignSave","runGiaoLaiRun","runGiveUpDo","runRejectSave","testQuickSave","touchLead","tvEnrollSave"],
  "DL02b":["bkLuuLienHe","bkLuuNhacTest","dupGhiLuot","leadInboundSave","rfNeed","runRejectSave","runTouchSave","testQuickSave"],
  "DL03":["bkLuuTest","bkLuuTuVan","bkLuuNhacTest","rfNeed","testAttend","testBook","testNoShowSave","testQuickSave","testRebookSave","testRefuse","testResultSave","tvSave","testEnd"],
  "DL04":["bkLuuTuVan","rfNeed","runSkipTest","tvCloseSave","tvEnrollSave","tvQuickSave","tvSave","testConsult"],
