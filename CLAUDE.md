@@ -20,18 +20,30 @@ Chủ dự án: Luân. Mọi phiên làm việc (Claude Code hay Claude Cowork) 
 - NGUỒN DUY NHẤT: `_src/gen_v5.py` (generator Python chứa toàn bộ HTML/CSS/JS trong chuỗi).
   KHÔNG BAO GIỜ sửa tay 3 file build ở gốc repo: `ITTs_WebApp_v5_demo.html`,
   `ITTs_TrangHocVien_demo.html`, `ITTs_data.js` - sửa gen_v5.py rồi build lại.
-- **HAI TẦNG CHẠY BỘ KIỂM (anh Luân hỏi 06/08: *"có thật sự cần chạy lại toàn bộ với mọi trường
-  hợp không?"*). Chốt: CÓ phân tầng, nhưng ranh giới đặt ở lúc ĐẨY, không đặt ở loại thay đổi.**
-  · **Đang làm dở** → chạy `./verify.sh --nhanh` (~8 phút, bỏ phần trình duyệt), hoặc chạy thẳng
-    vài bộ liên quan (`node _checkmien.js`, `node _checklap.js`...). Sửa tới sửa lui thì dùng cái này.
-  · **Trước khi ĐẨY** → chạy TRỌN BỘ, không ngoại lệ, kể cả khi chỉ sửa một chữ.
+- **ĐẨY TRƯỚC, VERIFY SAU - anh Luân đổi luật 13/08.** Nguyên văn: *"push đâu có mất thời gian,
+  push để a trải nghiệm, còn e vẫn sửa tiếp ở dưới mà, sợ gì, sửa luật đi, cứ push hết trước khi
+  verify, xanh hết thì xong, đỏ thì sửa, xong lại push rồi verify, có gì đâu"*.
+  **Nhịp mới: sửa xong → commit → PUSH (cả nguồn lẫn bản demo) → rồi mới chạy verify trọn bộ →
+  đỏ thì sửa → push tiếp → verify lại.** Không giữ bản dựng lại chờ verify nữa.
+  **Vì sao luật cũ sai:** luật cũ (06/08) bắt chạy trọn bộ TRƯỚC khi đẩy, và ngày 13/08 nó làm
+  anh Luân ngồi chờ **hơn một tiếng** qua ba lượt verify liên tiếp trong khi bản dựng đã nằm sẵn
+  ở gốc repo. Cái giá em tưởng là "23 phút của MÁY" hoá ra là **thời gian THẬT của anh** - đúng
+  cái điều mục "LUÔN ĐỂ ANH LUÂN THẤY MÌNH ĐANG CHẠY" đã dặn mà em vẫn phạm bằng đường khác.
+  Đây là bản demo nội bộ, không phải bản chạy tiền của khách: **một chỗ đỏ tồn vài chục phút trên
+  demo rẻ hơn nhiều so với việc anh không có gì để bấm.**
+- **VẪN PHẢI CHẠY TRỌN BỘ, chỉ là chạy SAU khi đẩy - không được bỏ.**
+  · Đang làm dở → `./verify.sh --nhanh` (~8 phút, bỏ phần trình duyệt), hoặc chạy thẳng vài bộ
+    liên quan (`node _checkmien.js`, `node _checklap.js`...).
+  · Đẩy xong → chạy TRỌN BỘ, không ngoại lệ, kể cả khi chỉ sửa một chữ. **Đỏ thì sửa và đẩy
+    tiếp ngay, đừng để qua phiên.**
   **Vì sao không tha cho "chỉ sửa chữ":** `check_sop.py` đòi những CHUỖI CHỮ CHÍNH XÁC phải có
   trên màn (VH0 phải có "Tìm tên, SĐT hoặc mã", VH8 phải có "Đơn còn nợ phí"...). Đổi câu chữ là
   chạm đúng chỗ LUẬT CỨNG SỐ 0 đang canh - thủng mà không ai hay. Ngày 06/08 một đợt sửa văn
   phong đụng 145 chuỗi; nếu tin "chỉ là chữ" thì đã đẩy mù.
   **Và ba lần trong một ngày 05-06/08 một bản vá "trông vô hại" làm đỏ chỗ khác:** vá CSS thuần
   làm hỏng drawer · thêm một cái cờ làm đỏ `_checkux` · gỡ v6 suýt để lọt hai chỗ.
-  23 phút đó là thời gian của MÁY, chạy nền; cái giá duy nhất là chờ trước lúc đẩy.
+  Ngày 13/08 đúng ba lượt verify liên tiếp mỗi lượt bắt một chỗ đỏ khác nhau - **bộ kiểm vẫn là
+  thứ duy nhất bắt được những chỗ đó, chỉ là nó không có quyền chặn tay anh Luân.**
 - Build + verify: **một lệnh duy nhất `./verify.sh`** ở gốc repo (build -> trích JS -> 14 bộ kiểm ->
   in bảng xanh/đỏ, mã thoát khác 0 là có chỗ đỏ). `./verify.sh --nhanh` bỏ phần trình duyệt.
   Chi tiết từng bộ kiểm canh điều gì: `_src/README_SRC.md`. Người mới nhận bàn giao đọc `BAN_GIAO_DEV.md`.
