@@ -249,8 +249,8 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 41 BỘ KIỂM. Bản dựng đang chạy: `feac3f` (12/08), verify TRỌN BỘ xanh hết
-> (41 bộ, 37 phút), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> **Phiên bản: V2 — 41 BỘ KIỂM. Bản dựng đang chạy: `c6ea8b` (13/08), verify TRỌN BỘ xanh hết
+> (46 bước, 0 chỗ đỏ), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
 > ### 🟢 12/08 - LÀM TRỌN 26 MỤC FEEDBACK CỦA BỐN TEAM (ACA · SALE · WOW · HỌC VỤ)
@@ -313,6 +313,29 @@
 > Sáu chỗ còn lại là việc thật, đã sửa hết. Một chi tiết phải sửa hai lần mới đúng: **bảng màu
 > phình 110 → 112** vì hai mã màu pha cho biểu đồ. Đổi sang màu app đã có rồi mà VẪN 112 - hoá ra
 > hai mã ấy còn nằm trong chính câu chú thích vừa viết, mà bộ kiểm quét cả file dựng.
+>
+> ### ⚫ 13/08 - EM BÁO SAI TIẾN ĐỘ MỘT TIẾNG, VÌ ĐỌC LOG MÀ KHÔNG HỎI TIẾN TRÌNH
+>
+> Anh Luân hỏi *"tới đâu rồi em"*, em trả lời *"đang chạy, xanh tới `_check15`, còn 38 phút"*.
+> **Sai.** Verify đã chết từ 04:09; lúc đó là 05:11. Em chỉ `tail` file log rồi suy ra "đang
+> chạy" - mà một file log ngừng lớn trông y hệt một file log đang chờ bước dài.
+> Rồi anh hỏi *"sao ko thấy em nhấp nháy running task"* - và đó mới là câu chỉ đúng chỗ hỏng:
+> **nhãn việc chạy không tới được màn hình anh** (đã đo 07/08, anh chụp lại chỉ thấy một dấu sao
+> xoay). Thứ duy nhất tới được anh là chữ em viết ra - mà lần này chữ em viết lại sai.
+>
+> **Dựng bộ canh gác - và bộ đầu tiên hỏng CẢ HAI VẾ, im lặng suốt 30 phút:**
+> · đếm số bước bằng `grep '^\s+(v|X) '` mà **không bóc mã màu ANSI** → luôn đọc ra **0**, nên
+>   ngưỡng "xong thêm 8 bước thì báo" không bao giờ chạm.
+> · hỏi còn sống bằng `pgrep -f "verify.sh"` → **bắt trúng chính nó** (chuỗi "verify.sh" nằm
+>   trong thân script canh gác), nên lúc nào cũng thấy "còn chạy".
+> Hai lỗi ngược chiều cộng lại thành im lặng tuyệt đối. **Đúng cùng một họ với cái pkill tự giết
+> mình đã cắn trước đây** - một phép đo mà đối tượng đo bao gồm cả chính người đo.
+>
+> Bản vá: đo bằng **PID thật** (`kill -0 $PID`, không thể tự bắt mình) và **bóc mã màu trước khi
+> đếm**. Và quan trọng nhất: nó báo **cả khi verify chết giữa chừng**, không chỉ báo lúc xong -
+> vì im lặng trông y hệt "đang chạy", đó chính là thứ vừa làm anh chờ một tiếng.
+>
+> *Đọc dấu vết một tiến trình để lại không phải là hỏi nó còn sống không.*
 >
 > ### 🟣 12/08 - BỐN LUẬT BÀI TẬP MỌI NGƯỜI THÔNG BÁO (anh Luân chuyển lại, đã gật cả hai đề xuất)
 >
