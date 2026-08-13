@@ -7779,10 +7779,19 @@ function renderChay(){
  var ST=RSTEP[sk];var tab=R.tab||"main";
  var tps=runTouches(J);
  h+='<div class="runcard">';
- /* 2 tab: đẩy bước tiếp | ghi điểm chạm (chưa qua bước) */
- h+='<div class="runtabs">'+
-  '<button class="rtb'+(tab==="main"?" on":"")+'" onclick="runTab(\'main\')"><i class="ti '+J.S.ic+'"></i>Bước tiếp: '+esc(ST.t)+'</button>'+
-  '<button class="rtb'+(tab==="touch"?" on":"")+'" onclick="runTab(\'touch\')"><i class="ti ti-phone-plus"></i>Ghi điểm chạm'+(tps.length?' ('+tps.length+')':'')+'</button></div>';
+ /* ═══ 13/08 - BỎ HAI TAB NGANG HÀNG (anh Luân, kèm ảnh màn Chờ chấm test) ═══════════════════
+    *"1 tab là nghiệp vụ chặng, tab còn lại là ghi điểm chạm, nó ko phù hợp với thói quen sử dụng
+    thông thường... nếu người ta ko nhập kết quả test ở giai đoạn chờ chấm test, mà có phát sinh,
+    thì rõ ràng người ta ghi liên hệ hoặc ghi chú đúng ko, chứ ko có ai hiểu là chuyển tab lúc
+    này đâu."*
+    Đúng, và đây là lỗi MÔ HÌNH chứ không phải lỗi giao diện. Em bày ra hai lựa chọn NGANG HÀNG,
+    trong khi thực tế chúng là MỘT quyết định có HAI NHÁNH, và nhánh hai chỉ tồn tại khi nhánh
+    một không làm được: *có kết quả thì nhập; chưa có thì ghi lại vì sao chưa có và hẹn lại.*
+    Hai tab ngang nhau bắt người dùng tự nghĩ ra cái ánh xạ ấy - mà không ai nghĩ tới việc "đổi
+    tab" khi trong đầu họ đang là "chưa chấm được, ghi một câu rồi hẹn lại".
+    Nay: bước chính đứng một mình; nhánh dự phòng nằm CUỐI bước chính, mở đầu bằng đúng câu hỏi
+    người dùng đang có trong đầu, kèm mốc SLA còn lại. Không tab nào cả.
+    (Khi đang ở nhánh dự phòng thì vẫn có đường quay lại bước chính - xem `runfoot` của nhánh.) */
  if(tab==="touch"){
   h+='<div class="runh"><span class="runi" style="background:var(--amberb);color:var(--amber)"><i class="ti ti-phone-plus"></i></span><div><div class="runt">Ghi điểm chạm - chưa qua bước</div><div class="runs">Khách chưa sẵn sàng đi tiếp? Ghi lại lần chạm này và hẹn lịch chạm sau. Hồ sơ vẫn nằm ở chặng "'+esc(J.S.t)+'".</div></div></div>';
   h+='<div class="runctx">'+runCtx(J,sk)+'</div>';
@@ -7807,10 +7816,20 @@ function renderChay(){
   h+='</div>'}
  if(tps.length)h+='<div class="rtsum"><i class="ti ti-history"></i>Đã <b>'+tps.length+' lần chạm</b> ở chặng này'+(tps[0]?(' · gần nhất '+esc(tps[0].contact_time)+' - '+esc(cresLabel(ecode(tps[0].result_note))||elabel(tps[0].channel))):'')+(C.L&&C.L.next_followup_time?(' · hẹn lại '+esc(C.L.next_followup_time)):'')+'</div>';
  h+='<div class="pbody">'+rfHTML(fs,C)+'</div>';
+ /* ═══ NHÁNH DỰ PHÒNG - đặt NGAY DƯỚI form, mở đầu bằng đúng câu người dùng đang nghĩ ═══════
+    Trước bản này nhánh này là một TAB ngang hàng ở đầu thẻ, cộng một cái nút chữ nhỏ lẫn giữa
+    hàng nút cuối ("Chưa qua bước - ghi điểm chạm"). Cả hai đều bắt người dùng tự dịch từ
+    "chưa chấm được, ghi một câu rồi hẹn lại" sang "à, phải bấm cái tab kia". Nay nó là một
+    KHỐI RIÊNG, hỏi thẳng câu họ đang có trong đầu, và nói rõ hồ sơ ở lại chặng nào, đồng hồ
+    SLA vẫn chạy hay đã quá. */
+ h+='<div class="runalt"><div class="ratt">'+esc(ST.chua||('Chưa làm được bước "'+ST.t+'"?'))+
+  (J.over?' <span class="chip red">đã quá hạn '+(J.ageH>24?Math.floor(J.ageH/24)+" ngày":Math.round(J.ageH)+" giờ")+'</span>'
+        :(J.ageH!=null?' <span class="chip amber">đã chờ '+(J.ageH>24?Math.floor(J.ageH/24)+" ngày":Math.round(J.ageH)+" giờ")+'</span>':''))+'</div>'+
+  '<div class="ratd">Ghi lại vì sao chưa làm được và hẹn lại - hồ sơ vẫn nằm ở chặng "'+esc(J.S.t)+'", đồng hồ SLA vẫn chạy.</div>'+
+  '<button class="btn" onclick="runSnooze()"><i class="ti ti-phone-plus"></i>Ghi liên hệ / ghi chú'+(tps.length?' ('+tps.length+' lần đã chạm)':'')+'</button></div>';
  h+='<div class="runfoot">';
  if(R.q&&R.i>0)h+='<button class="btn" onclick="runPrev()"><i class="ti ti-arrow-left"></i>Người trước</button>';
  (ST.alt||[]).forEach(function(a){h+='<button class="btn" onclick="'+a.fn+'()"><i class="ti '+a.ic+'"></i>'+esc(a.lb)+'</button>'});
- h+='<button class="btn" onclick="runSnooze()"><i class="ti ti-phone-plus"></i>Chưa qua bước - ghi điểm chạm</button>';
  h+='<button class="btn primary lg" onclick="runSave()"><i class="ti ti-device-floppy"></i>Lưu & tiếp tục</button>';
  if(R.q)h+='<button class="btn" onclick="runNext()">Người tiếp theo <i class="ti ti-arrow-right"></i></button>';
  h+='</div></div>';

@@ -252,7 +252,16 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
     luon xanh ma chang bao ve duoc gi: dung loai "kiem gia" du an nay van bat. Nay soi asstHTML(). */
  var HTMLF=fs.readFileSync(OUT+'/ITTs_WebApp_v5_demo.html','utf8');
  t("có trợ thủ + công tắc trên thanh tiêu đề", typeof asstHTML==="function"&&typeof tthToggle==="function"&&/id="tthBtn"/.test(HTMLF));
- t("V9.35 tro thu co NUT rieng o goc trong ca hai cong", /id="asstfab"/.test(HTMLF)&&/id="asstfab"/.test(fs.readFileSync(OUT+'/ITTs_TrangHocVien_demo.html','utf8')));
+ /* ═══ 13/08 - HOP DONG DOI: KHONG CON NUT NOI O GOC ════════════════════════════════════════
+    Anh Luan: *"cai nut bong den thay vi bat tat cai hoi tro ly, thi em cho no mo form tro ly
+    luon di, bo luon cai Hoi tro ly duoi goc duoi di, phien ko can thiet"*.
+    Tieu chi cu doi `id="asstfab"` co mat o ca hai cong - do la mot CACH LAM, khong phai cai
+    DICH. Dich la: "moi cong deu co MOT cua vao Tro ly, va cua ay khong che noi dung". Nay hoi
+    dung dich do: nut bong den tren thanh tieu de co o ca hai cong, VA khong con nut noi nao. */
+ var HVF=fs.readFileSync(OUT+'/ITTs_TrangHocVien_demo.html','utf8');
+ t("moi cong deu co mot cua vao Tro ly tren thanh tieu de", /id="tthBtn"/.test(HTMLF)&&/id="tthBtn"/.test(HVF));
+ t("cua ay mo THANG tam Tro ly (khong con la cong tac bat/tat)", /id="tthBtn"[^>]*onclick="asstNut\(\)"/.test(HTMLF));
+ t("khong con nut noi che noi dung o goc duoi", !/id="asstfab"/.test(HTMLF)&&!/id="asstfab"/.test(HVF));
  t("mặc định BẬT", tthOn()===true);
  /* LUẬT CỨNG: trợ thủ ĐỌC slaItems, KHÔNG khai lại việc lần thứ hai */
  var SRCn=SRC0.replace(/\/\*[\s\S]*?\*\//g,"");
