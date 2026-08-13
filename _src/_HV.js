@@ -2753,7 +2753,20 @@ function normLienhe(o){
  if(!String(o.direction||"").trim())o.direction=eFull("enum_contact_direction","outbound");
  return o}
 function toggleForm(key){var p=document.getElementById("formPanel");if(p)p.classList.toggle("hidden")}
-function rlist(key){if(typeof CUR!=="undefined"&&CUR!==key&&RENDER[CUR]){reRender(CUR);return}document.getElementById("content").innerHTML=renderList(key)}
+/* ═══ 13/08 - BẤM CHIP LÀM BAY MẤT THẺ VÀ ĐẦU TRANG (anh Luân, kèm hai ảnh màn Giảng viên) ═══
+   *"sao bấm vào chip, nó mất mấy cái thẻ và 1 số nội dung ở trên"*.
+   Gốc: điều kiện `CUR!==key`. Ý ban đầu là một phép tối ưu - "đang đứng ĐÚNG sổ này thì vẽ lại
+   mỗi cái bảng cho nhanh, khỏi dựng cả trang". Nó sai vì **trang và sổ trùng tên nhau không có
+   nghĩa là trang CHỈ có sổ**: `giangvien` là một trang có dải thẻ + thanh tab (Danh sách / Bảng
+   công) rồi mới tới bảng; `hocvien`, `nhansu`, `nhaplead` cũng vậy. Vẽ đè `#content` bằng riêng
+   `renderList` là **xoá sạch mọi thứ trang ấy đắp thêm** - thẻ, tab, đầu trang, khối cảnh báo.
+   Người dùng bấm một cái chip lọc và thấy nửa trang biến mất; bấm lần nữa cũng không về, phải
+   rời trang rồi quay lại.
+   Nay: hễ trang hiện tại có hàm vẽ riêng thì LUÔN vẽ lại cả trang. Nhánh vẽ trống chỉ còn dành
+   cho sổ đứng một mình, không thuộc trang nào.
+   *Một phép tối ưu dựa trên "hai cái tên giống nhau" là một phép đoán, không phải một phép suy.* */
+function rlist(key){if(typeof CUR!=="undefined"&&RENDER[CUR]){reRender(CUR);return}
+ document.getElementById("content").innerHTML=renderList(key)}
 function toggleFilt(key,v){var a=FILT[key]||[];var i=a.indexOf(v);if(i>=0)a.splice(i,1);else a.push(v);FILT[key]=a;PAGE[key]=0;rlist(key)}
 function __clearHVF(){window.HVFCLS="";window.HVFCRS=""}
 function clearFilt(key){__clearHVF();FILT[key]=[];if(window.QF)window.QF[key]=null;
