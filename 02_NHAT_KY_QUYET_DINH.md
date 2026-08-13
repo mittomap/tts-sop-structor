@@ -249,9 +249,33 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 41 BỘ KIỂM. Bản dựng đang chạy: `c6ea8b` (13/08), verify TRỌN BỘ xanh hết
-> (46 bước, 0 chỗ đỏ), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> **Phiên bản: V2 — 41 BỘ KIỂM. Bản dựng đang chạy: `d2d2d5` (13/08), đã lên
+> https://mittomap.github.io/itts-sop-demo-v2/ . Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
+> Mốc cũ: `c6ea8b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🔴 13/08 - ĐỔI LUẬT: ĐẨY TRƯỚC, VERIFY SAU (anh Luân chốt)
+>
+> > *"push đâu có mất thời gian, push để a trải nghiệm, còn e vẫn sửa tiếp ở dưới mà, sợ gì, sửa
+> > luật đi, cứ push hết trước khi verify, xanh hết thì xong, đỏ thì sửa, xong lại push rồi
+> > verify, có gì đâu"*
+>
+> **Nhịp mới: sửa xong → commit → PUSH (cả nguồn lẫn bản demo) → rồi mới verify trọn bộ → đỏ thì
+> sửa → push tiếp → verify lại.** Không giữ bản dựng lại chờ verify nữa. Đã sửa `CLAUDE.md`.
+>
+> **Vì sao luật cũ sai.** Luật cũ đặt 06/08 và tự khai lý do là *"23 phút đó là thời gian của MÁY,
+> chạy nền; cái giá duy nhất là chờ trước lúc đẩy"*. Câu ấy **đếm sai người trả giá**: ngày 13/08
+> nó bắt anh Luân ngồi chờ **hơn một tiếng** qua ba lượt verify liên tiếp, trong khi bản dựng đã
+> nằm sẵn ở gốc repo từ lượt đầu. Em còn ba lần viết ra "em cố ý chưa push, luật là..." - tức là
+> **em lấy luật của anh ra chặn chính anh**, và mỗi lần chặn lại nói thêm một câu để anh chờ tiếp.
+>
+> Đây là bản demo nội bộ, không phải bản chạy tiền của khách: **một chỗ đỏ tồn vài chục phút trên
+> demo rẻ hơn nhiều so với việc anh không có gì để bấm.** Bộ kiểm vẫn chạy trọn bộ, vẫn bắt được
+> những chỗ không ai đoán ra - ba lượt hôm nay mỗi lượt bắt một chỗ đỏ khác nhau - **nó chỉ mất
+> quyền chặn tay anh Luân.**
+>
+> *Một luật an toàn mà cái giá của nó rơi vào người đang chờ thì nó không còn là luật an toàn,
+> nó là chỗ nấp.*
 >
 > ### 🟢 13/08 - BỎ THẺ TRÙNG NHÃN VỚI CHIP LỌC: 13 MÀN → 0
 >
