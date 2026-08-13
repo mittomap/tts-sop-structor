@@ -674,9 +674,9 @@ var PAGES=[
 {k:"settings",g:"Quản lý",ic:"ti-settings",t:"Cài đặt hệ thống",c:"Cấu hình",ty:"custom"},
 /* ẩn khỏi menu, giữ cho luồng gọi tới */
 {k:"nhanvien",g:"_",ic:"ti-id-badge",t:"Danh sách Nhân viên",c:"Quản lý ở Cài đặt",ty:"list",hide:1},
-{k:"hosogv",g:"_",ic:"ti-chalkboard",t:"Hồ sơ Giảng viên",c:"Lớp · buổi · bài · KPI",ty:"custom",hide:1},
-{k:"hosonv",g:"_",ic:"ti-id-badge",t:"Hồ sơ Nhân viên",c:"Bảng việc theo vai trò",ty:"custom",hide:1},
-{k:"hosokhoa",g:"_",ic:"ti-school",t:"Hồ sơ Khóa học",c:"Lớp · doanh thu · đầu ra",ty:"custom",hide:1},
+{k:"hosogv",g:"Hồ sơ",ic:"ti-chalkboard",t:"Hồ sơ Giảng viên",c:"Lớp · buổi · bài · KPI",ty:"custom",hide:1},
+{k:"hosonv",g:"Hồ sơ",ic:"ti-id-badge",t:"Hồ sơ Nhân viên",c:"Bảng việc theo vai trò",ty:"custom",hide:1},
+{k:"hosokhoa",g:"Hồ sơ",ic:"ti-school",t:"Hồ sơ Khóa học",c:"Lớp · doanh thu · đầu ra",ty:"custom",hide:1},
 {k:"dashboard",g:"_",ic:"ti-layout-dashboard",t:"Tổng quan",c:"Đã gộp vào Báo cáo & KPI",ty:"custom",hide:1},
 {k:"viec",g:"_",ic:"ti-checklist",t:"Việc hôm nay",c:"Toàn bộ việc tới hạn hôm nay, gom theo nhóm và theo bộ phận",ty:"custom"},
 {k:"hoso",g:"_",ic:"ti-id-badge-2",t:"Hồ sơ hành trình 360",c:"",ty:"custom",hide:1},
@@ -760,7 +760,7 @@ var ROLESCOPE={
   tabs:{settings:["tongquan","brand","menu","ch2","ch6","ch4","goiy","the","ch1","tro","nhip",
    "huongdan","qa","staff","giagio","khoa","nhatky"]}},
  tuvan:{match:/^sales/,land:"banlam",
-  pages:["viec","banlam","hanhtrinh","hocvien","giangvien","tuyensinh","ketthuc","ketqua","khac","duyet","tinnhan"],
+  pages:["viec","banlam","hanhtrinh","hocvien","giangvien","hosogv","tuyensinh","ketthuc","ketqua","khac","duyet","tinnhan"],
   tabs:{khac:["magioithieu"],duyet:["banggiao"]},
   blocks:["appt","new","contacted","test_done","enrolled","reup"],
   mine:1,mineBtn:1,kpi:1,bell:["Tuyển sinh","Giao việc"]},
@@ -805,7 +805,7 @@ var ROLESCOPE={
      Đo trước khi sửa: đóng vai đủ 16 chức danh rồi hỏi `navVis("gvdp")` - CHỈ quản trị mở được,
      trong khi chú thích trong mã khai đây là cửa ghi của Học vụ / TP ACA. Chú thích nói một đằng,
      cấu hình chạy một nẻo - và cái chạy thì thắng. */
-  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan","baitap","ketqua","bangcong","lichwow","gvdp"],
+  pages:["viec","hocvien","giangvien","hosogv","banglop","hoctap","hosokhoa","giaoan","baitap","ketqua","bangcong","lichwow","gvdp"],
   blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:1,mgr:1,
   /* V9.99y (anh Luân 05/08): *"Trưởng phòng aca cũng quản lý toàn bộ team Wow, em đừng quên"*.
      Đội WOW nằm trong phòng ACA nên phạm vi NGƯỜI đã đúng sẵn; thiếu là cái chuông - 21 việc
@@ -820,7 +820,7 @@ var ROLESCOPE={
   /* V2 10/08 - thêm `lichwow`: HỌC VỤ CHÍNH LÀ NGƯỜI BẤM "Thêm buổi WOW". Từ bản này cửa ấy chỉ
      nhận ca đã đăng ký, nên không cho họ xem lịch trực là bắt họ chọn trong bóng tối: mở form ra
      thấy "chưa có ca trực nào còn trống" mà không biết hỏi ai, ngày nào trống. */
-  pages:["viec","hocvien","giangvien","xeplop","banglop","hoctap","giaoan","cskh","ychv","ketthuc","ketqua","khac","duyet","lichwow","gvdp","tinnhan"],
+  pages:["viec","hocvien","giangvien","hosogv","xeplop","banglop","hoctap","hosokhoa","giaoan","cskh","ychv","ketthuc","ketqua","khac","duyet","lichwow","gvdp","tinnhan"],
   tabs:{khac:["baoluu"],duyet:["duyetnghi"]},
   blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:1,kpi:1,bell:["Học vụ","CSKH","Giao việc"]},
  /* V9.99z5 - GIÁO VIÊN không xếp người dạy thay và không gỡ đụng phòng: hai màn ấy là cửa
@@ -833,7 +833,7 @@ var ROLESCOPE={
      hành có nó trong phạm vi: giáo viên được app giục đi chấm bài rồi bị chặn ở cửa.
      Đúng LUẬT SỐ 0 - SOP mô tả, app có trang, người phải làm không có lối vào là SÓT, không phải
      là "ngoài phạm vi". */
-  pages:["viec","hocvien","giangvien","banglop","hoctap","giaoan","baitap"],
+  pages:["viec","hocvien","giangvien","hosogv","banglop","hoctap","hosokhoa","giaoan","baitap"],
   tabs:{hoctap:["buoihnay","lichtuan","lop","buoihoc","wow"]},
   blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:0,bell:["Giảng viên chuyên môn","Giao việc"]},
  /* V9.60: CH3 giao cho NV WOW việc CHẤM TEST ĐẦU VÀO, mà phạm vi trang lại không có màn test -
@@ -843,7 +843,7 @@ var ROLESCOPE={
   /* `lichwow` mở cho chính đội WOW: họ là người ĐĂNG KÝ ca của mình, không ai ký thay được.
      Thiếu trang này trong phạm vi thì bài hướng dẫn trỏ vào một chỗ họ không vào được -
      `_checktour` bắt đúng chuyện đó (10/08). */
-  pages:["viec","hocvien","giangvien","hoctap","banglop","tuyensinh","lichwow"],
+  pages:["viec","hocvien","giangvien","hosogv","hoctap","hosokhoa","banglop","tuyensinh","lichwow"],
   /* Đội WOW kèm 1-1: không xếp giáo viên thay, không gỡ đụng phòng, không canh SLA nhận xét
      buổi của lớp ACA. Ba tab ấy thuộc Học vụ / ACA. */
   tabs:{tuyensinh:["test"],hoctap:["buoihnay","lichtuan","lop","wow"]},blocks:["test_grading","wowq","risk"],mine:0,mineBtn:0,kpi:0,bell:["WOW","Giao việc"]},
@@ -854,7 +854,7 @@ var ROLESCOPE={
   /* V2 08/08 - thêm `dsthanhtoan` (Sổ thu học phí): nhịp cuối ngày của kế toán là "nhìn dự thu
      tháng", trỏ thẳng vào sổ ấy - mà trước bản này chỉ quản trị và điều hành được xem. Sổ thu
      học phí là sổ của chính phòng kế toán. */
-  pages:["viec","hocvien","giangvien","tuyensinh","duyet","baocao","bangcong","dsthanhtoan","tinnhan"],   /* V9.99z5: kế toán chốt lương theo bảng công giảng dạy */
+  pages:["viec","hocvien","giangvien","hosogv","tuyensinh","duyet","baocao","bangcong","dsthanhtoan","tinnhan"],   /* V9.99z5: kế toán chốt lương theo bảng công giảng dạy */
   /* V9.99r - Kế toán chỉ có phần THANH TOÁN của hub Tuyển sinh. Trước đây không khai tab nào
      nên họ bấm được cả Lead, Test đầu vào, Tư vấn & Đăng ký - ba bước họ khai `lead:"none"`,
      mở ra chỉ để nhìn. Khai đúng một tab thì phễu, câu mở đầu và menu cùng thu lại theo. */
@@ -881,7 +881,7 @@ var ROLESCOPE={
     thật của họ là con người: ai đang làm ở đâu, giảng viên tháng này dạy bao nhiêu giờ, và
     hộp việc nội bộ. */
  nhansu:{match:/^hr_/,land:"nhansu",
-  pages:["viec","giaoviec","nhansu","giangvien","bangcong"],
+  pages:["viec","giaoviec","nhansu","hosonv","giangvien","hosogv","bangcong"],
   blocks:[],mine:0,mineBtn:0,kpi:0,noHV:1,bell:["Giao việc"]},
  /* Nhóm DỰ PHÒNG: một chức danh lạ (trung tâm thêm vai mới mà chưa khai ở đây) rơi vào đây.
     Nó phải là chỗ AN TOÀN NHẤT - chỉ hộp việc nội bộ, không trang nào khác. */
@@ -1512,6 +1512,15 @@ hocvien:{code:"DL09",filt:"student_status",ro:1,sub:"Học viên (DL09) - lọc 
  cols:[["student_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["student_status","Trạng thái","chip"],["attendance_progress_status","Chuyên cần","chip"],["academic_progress_status","Học thuật","chip"],["attendance_risk_reason","Lý do CC","enum"],["academic_risk_reason","Lý do HT","enum"],["__vang","Vắng (buổi)","calcso"],["__thieubai","Thiếu bài","calcso"],["last_learning_activity_time","Hoạt động cuối","lau"],["wow_quota_remaining","WOW còn"]]},
 lop:{code:"DL10",
  /* Đọc thẳng trạng thái lớp - cùng thứ chip lọc ngay dưới đang lọc. */
+ /* ═══ 13/08 - THIẾU CHIP LỌC 1-1 / NHÓM (anh Luân, kèm ảnh sổ Lớp học: *"điển hình của thiếu
+    chức năng nè, chẳng thấy lọc được lớp 1-1 và lớp nhóm"*).
+    App VẼ cái thẻ "Nhóm" / "1-1" trước mỗi tên lớp từ lâu (`lopThe`), tức nó BIẾT sự phân biệt
+    ấy và coi đó là thứ đáng in ra ở mọi bảng - nhưng không có cách nào lọc theo. Người dùng đọc
+    được nhãn mà không tách được nhóm: đúng con bệnh "con số/nhãn không dẫn tới đâu" đã bắt hai
+    lần. Chip đọc thẳng `lopLa11` - cùng hàm mà cái thẻ đang đọc, nên nhãn và bộ lọc không thể
+    nói hai đằng. */
+ qf:[["l11","Lớp kèm 1-1",function(c){return lopLa11(c)},""],
+     ["lnhom","Lớp nhóm",function(c){return !lopLa11(c)},""]],
  /* V2 13/08 - thẻ thứ ba "Đã kết thúc" đã bỏ: chip lọc ngay dưới mang đúng cái tên ấy và đúng
     con số ấy. Hai thẻ còn lại gộp nhiều trạng thái nên chip không nói thay được. */
  the:function(all){
@@ -23824,7 +23833,7 @@ var NAVTREE=[
  /* V9.99s - HAI TRANG CỦA PHÒNG NHÂN SỰ CHƯA BAO GIỜ CÓ MẶT TRÊN MENU. Đo được 05/08 bằng cách
     dựng THẬT thanh menu của từng chức danh: Trưởng phòng Nhân sự chỉ có 4 mục - Việc hôm nay,
     Giao việc, Việc chờ nhận, Giảng viên - trong khi `ROLESCOPE.nhansu` khai `pages:["viec",
-    "giaoviec","nhansu","giangvien","bangcong","duyet"]` và TRANG ĐÁP của họ là `nhansu`.
+    "giaoviec","nhansu","hosonv","giangvien","hosogv","bangcong","duyet"]` và TRANG ĐÁP của họ là `nhansu`.
     `navVis("nhansu")` trả true, `_check11` hỏi navVis nên báo xanh - nhưng `NAVTREE` không có
     hai khoá ấy ở bất kỳ nhóm nào, mà menu chỉ vẽ những gì có trong cây. Nghĩa là họ đăng nhập
     vào rơi thẳng xuống một trang KHÔNG CÓ MỤC MENU nào sáng, y hệt con bệnh trang Hỏi đáp anh

@@ -49,14 +49,23 @@ Người ta mở một phần mềm vận hành theo đúng ba đường, không
 
 Đường anh tả: *danh sách giảng viên → bấm một người → xem chỉ số + lớp họ phụ trách*.
 
-Đo trong mã:
-- Trang **`hosogv` "Hồ sơ Giảng viên" CÓ TỒN TẠI** - nhưng khai `g:"_"`, tức **không có mặt trên
-  menu**. Chỉ tới được bằng cách bấm trúng tên trong một bảng.
-- Nó hiện **số lớp đang phụ trách** - nhưng **không có chỉ số nào của người đó**: không giờ dạy
-  tháng này, không tỷ lệ buổi có nhận xét đúng hạn, không tỷ lệ chấm bài đúng hạn, không số buổi
-  vào trễ. Toàn bộ những con số ấy app **có tính**, nhưng tính ở `bangcong` và `buoihoc` - hai
-  trang khác, và tính cho **cả trung tâm**, không cắt theo một người.
-- Không có đường ngược lại: từ hồ sơ giảng viên **không bấm sang được** danh sách lớp của họ.
+### ⚠️ SỬA LẠI - bản đầu của mục này em viết SAI
+
+Bản đầu em ghi *"hồ sơ giảng viên không có chỉ số nào, không dẫn sang lớp của họ"*. **Sai.** Em
+grep 18 dòng đầu hàm rồi kết luận cho cả hàm dài 60 dòng. Đọc trọn `renderHosoGV` thì nó **đã có
+đủ**: ba KPI đối chiếu ngưỡng CH6 (**TNR** tỷ lệ buổi có nhận xét · **GCR7** tỷ lệ bài đã chấm ·
+**ADC** kỷ luật vào lớp đúng giờ), bảng **Lớp đang phụ trách** kèm nút mở bảng lớp, bảng **Buổi
+cần ghi nhận xét**, bảng **Công giảng dạy theo tháng**, bảng **Bài tập chờ chấm**. Và
+`go("hosogv")` khi chưa chọn ai thì ra một **trang chọn giảng viên** - đúng cái "cổng danh sách
+giảng viên" anh nói.
+
+*Đọc một phần của cái mình đang kết luận về, rồi kết luận cho cả cái - đó là cùng một lỗi với
+`_check14` đo bằng cửa sổ ký tự và với phép đo cắt nhãn ở dấu "·". Ba lần trong một ngày.*
+
+**Vậy vấn đề THẬT là gì:** ba trang hồ sơ (`hosogv` · `hosonv` · `hosokhoa`) đều **tồn tại, đều
+đầy đủ, và cả ba đều khai `g:"_"` - không mục nào có mặt trên sidebar.** Chỉ tới được nếu bấm
+trúng một cái tên trong bảng nào đó. Nội dung không thiếu; **cửa vào thì không có.**
+Và vẫn thiếu thật hai thứ: **hồ sơ của một LỚP** và **cổng danh sách NV WOW**.
 
 Cùng bệnh với **Lớp** và **NV WOW**: có sổ, có trang vận hành, nhưng không có **trang hồ sơ của
 một lớp / một NV WOW** gom trọn "người này/lớp này đang thế nào".
@@ -79,7 +88,8 @@ một lớp / một NV WOW** gom trọn "người này/lớp này đang thế n�
 | Chỗ thiếu | Hậu quả |
 |---|---|
 | **Không có cửa nào TẠO LỚP MỚI** | Sổ lớp khai `ro:1`; tìm cả mã không có `newClass`/`lopMoi`. Mở một lớp là việc gốc của Học vụ mà app không làm được - đây là lỗ hổng **LUẬT CỨNG SỐ 0**, không phải chuyện bố cục. |
-| **Hồ sơ giảng viên không có chỉ số** | Không trả lời được câu anh vừa hỏi. Số liệu đã có sẵn ở `bangcong`/`buoihoc`, chỉ thiếu chỗ cắt theo một người. |
+| **Ba trang hồ sơ không có mặt trên menu** (`hosogv` `hosonv` `hosokhoa`, đều khai `g:"_"`) | Nội dung đầy đủ mà không ai tìm ra - xem phần sửa lại ở mục 2 |
+| **Sổ Lớp học không lọc được 1-1 / Nhóm** | App vẽ nhãn "1-1"/"Nhóm" trước mọi tên lớp nhưng không có chip lọc theo - nhãn không dẫn tới đâu |
 | **Không có hồ sơ 360 của một LỚP** | `banglop` là màn *vận hành* lớp (điểm danh, nhận xét), không phải màn *xem lớp này đang thế nào*. |
 | **Không có cổng "danh sách NV WOW"** | WOW có sổ buổi (`dswow`) và lịch trực, nhưng không có danh sách người + chỉ số của họ. |
 | Từ hồ sơ một người **không đi tiếp được** | Cụt đường: xem xong phải quay ra menu tìm tiếp. |
