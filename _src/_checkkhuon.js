@@ -83,6 +83,7 @@ const KHONGTHE = {
   baoluu:   _LYDO_TRUNGCHIP,   /* 3 the = 3 chip: Dang bao luu · Da bo hoc · Chua hen lien he lai */
   nhansu:   _LYDO_TRUNGCHIP,   /* 3 the = 3 chip: Dang lam viec · Ho so con thieu · Da nghi viec */
   hocvien:  _LYDO_TRUNGCHIP,   /* 3 the = 3 chip: Nguy co · Nguy co hoc thuat · Vang nhieu */
+  xeplop:   _LYDO_TRUNGCHIP,   /* 2 the = 2 chip: Cho xep lop · Chua hoan tat (moc SLA da xuong hang ghi chu) */
 };
 
 /* Trang CHỈ ĐỂ ĐỌC - không có nút hành động là đúng, nhưng phải khai kèm lý do đọc được. */

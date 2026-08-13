@@ -81,11 +81,20 @@ const PATHS=["/opt/pw-browsers/chromium-1194/chrome-linux/chrome","/opt/pw-brows
        CUNG SO 0 cam bot bat cu thu gi SOP da mo ta. Tren `banlam` dung mot o trong 9 o trung
        ten voi mot chip ("Lead moi") - bo o do la bot mot hang cho cua SOP de doi lay mot cho
        do trong bo kiem. Chip thi khong bo duoc (no la bo loc that). Nen mien, va khai ly do. */
-    const _the=[...c.querySelectorAll(".bstat")].filter(e=>{
+    /* 13/08 - ĐỌC CẢ NHÃN, KHÔNG CẮT Ở DẤU "·". Bản đầu lấy `split("·")[0]`, nên thẻ
+       "Đã thu · chờ xếp lớp" chỉ được so bằng hai chữ "Đã thu" và lọt qua, trong khi chip ngay
+       dưới tên đúng là "Chờ xếp lớp" cùng con số - anh Luân bắt được bằng mắt.
+       Nay mỗi thẻ sinh HAI cách đọc: nguyên nhãn, và từng khúc tách bởi "·". Trùng ở cách đọc
+       nào cũng là trùng. *Cắt bớt đầu vào của phép đo là tự đặt ra một chỗ mù.* */
+    const _the=[];
+    [...c.querySelectorAll(".bstat")].filter(e=>{
       const w=e.closest("[data-thekey]"); const k=w?w.getAttribute("data-thekey"):"";
-      return k!=="bangviec"&&k!=="bangduyet"}).map(e=>({
-      so:((e.querySelector(".bsn")||{}).textContent||"").trim(),
-      nhan:chuan(((e.querySelector(".bsl")||{}).textContent||"").split("·")[0])}));
+      return k!=="bangviec"&&k!=="bangduyet"}).forEach(e=>{
+      const so=((e.querySelector(".bsn")||{}).textContent||"").trim();
+      const raw=((e.querySelector(".bsl")||{}).textContent||"");
+      const cach=[chuan(raw)].concat(raw.split("·").map(chuan));
+      const da={};
+      cach.forEach(n=>{if(n&&!da[n]){da[n]=1;_the.push({so:so,nhan:n})}})});
     const _chip=[...c.querySelectorAll(".chipbar .chip, .segb, .chipb")].map(e=>{
       const s=(e.textContent||"").trim(),m=s.match(/^(.*?)(\d+)$/);
       return m?{nhan:chuan(m[1]),so:m[2]}:{nhan:chuan(s),so:""}});

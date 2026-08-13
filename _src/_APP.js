@@ -1959,9 +1959,7 @@ var THEDEF={
  /* 13/08 - ba thẻ trùng nhãn với chip lọc đã bỏ (xl_send · xl_cfm · xl_over); hai thẻ còn lại
     nói thứ chip không nói: "chờ xếp lớp" là hàng đợi TRƯỚC khi vào onboarding, còn "onboarding
     chưa xong" mang mốc SLA 72 giờ. */
- xeplop:{t:"Xếp lớp & onboarding",the:[
-  ["xl_cho","Đã thu · chờ xếp lớp","Học viên đã đóng tiền nhưng chưa được xếp vào lớp nào - đây là bước đầu tiên phải làm. Danh sách: bảng ngay dưới dải thẻ."],
-  ["xl_ob","Onboarding chưa xong","Số hồ sơ onboarding chưa đủ bước, hạn theo slaOBT_hours. Danh sách: bấm chip 'Chưa hoàn tất' ở thanh lọc dưới."]]},
+ /* V2 13/08 - `xeplop` không còn dải thẻ: cả hai thẻ trùng chip lọc ngay dưới. */
  /* V2 13/08 - `reup` từng khai ba thẻ; cả ba trùng nguyên ba chip lọc nên đã bỏ. */
  tuvan:{t:"Tư vấn",the:[
   ["tv_drop","Khách từ chối","Số khách đã chốt là không mua - đọc lý do để sửa cách tư vấn. Danh sách: chip 'Từ chối' ở thanh lọc dưới."]]},
@@ -2568,7 +2566,19 @@ function renderList(key,emb){
    /* V9.63 (bài học X2): sổ chỉ-xem có ghi "nghiệp vụ làm ở hub CSKH" nhưng đó là CHỮ, người đọc
       phải tự đi tìm. Nay là NÚT bấm sang thẳng chỗ làm việc. */
    '</div>'+
- '<div class="sp">'+(cfg.ro?'':'<button class="btn primary" onclick="newForm(\''+key+'\')"><i class="ti ti-plus"></i>Thêm mới</button>')+'</div></div>');
+ /* ═══ 13/08 - MỘT TRANG MỘT CỬA TẠO MỚI (anh Luân, kèm ảnh màn Lead) ═══════════════════════
+    *"thêm mới, và khách mới liên hệ đến? khác nhau chỗ nào em, tại sao em làm trùng, chỗ nào
+    làm em bị lặp như vậy?"*
+    Chỗ làm lặp nằm ở ĐÂY. Hai nơi độc lập cùng có quyền đặt một nút tạo mới lên một trang:
+     · `renderList` vẽ "Thêm mới" cho MỌI sổ không phải chỉ-đọc - giả định của V1, hồi đó trang
+       danh sách là sổ dữ liệu thô, việc duy nhất làm được với nó là thêm một dòng;
+     · V2 mở thêm `LISTCFG[key].nut` để trang danh sách mang được NÚT NGHIỆP VỤ của chính nó
+       (tách hub thành trang thì các nút nghiệp vụ rơi mất, đúng thứ luật cứng số 0 cấm).
+    Không bên nào biết bên kia. Đo cả 17 sổ: hôm nay chỉ `nhaplead` trúng cả hai, nhưng cái máy
+    đẻ ra nó thì sổ nào thêm nút nghiệp vụ cũng sẽ trúng.
+    Luật: **sổ đã khai nút nghiệp vụ của mình thì thôi vẽ nút chung.** Nút nghiệp vụ luôn là cái
+    đúng hơn - nó đi qua cửa quyền CH3, nó ghi đủ các bảng SOP đòi, nút chung chỉ đẻ một dòng. */
+ '<div class="sp">'+((cfg.ro||cfg.nut)?'':'<button class="btn primary" onclick="newForm(\''+key+'\')"><i class="ti ti-plus"></i>Thêm mới</button>')+'</div></div>');
  /* V2 - BẢNG VIỆC CỦA TÔI PHẢI TỚI ĐƯỢC CẢ TRANG DANH SÁCH.
     `pageHead()` gắn bảng việc (BC5-BC9 của SOP) ở một chỗ dùng chung - nhưng `renderList` KHÔNG
     gọi `pageHead`, nó tự dựng đầu trang bằng tay. Ở V1 chuyện đó vô hại vì không chức danh nào
@@ -12407,16 +12417,29 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
     Đo cả app: 13 màn có thẻ và chip nói cùng một thứ, trong đó 3 chỗ hai bên nói HAI CON SỐ.
     Bỏ những thẻ TRÙNG NHÃN với chip; giữ thẻ nào chip không nói được. Thứ chỉ thẻ có (mốc SLA
     kèm bánh răng chỉnh ngưỡng) chuyển xuống dòng ngay dưới dải chip - không mất, chỉ đổi chỗ. */
- h+=statStrip([
-  ["ti-user-plus",wait.length,"Đã thu · chờ xếp lớp",wait.length?"#DB2777":"#16A34A","bước đầu tiên"],
-  ["ti-layout-grid-add",obs.filter(function(o){return !isc(o.onboarding_status,"completed")}).length,"Onboarding chưa xong","#3B82C4","SLA "+slaChip("slaOBT_hours",72),"window.XLFILT='finish';reRender('xeplop')"]],"xeplop");
+ /* ═══ 13/08 - BỎ NỐT HAI THẺ CUỐI (anh Luân: *"đã thu chờ xếp lớp, mà bên dưới có chip chờ
+    xếp lớp rồi thì cần quái gì thẻ em"*). Đúng, và hai thẻ này lọt qua lượt dọn buổi sáng vì
+    PHÉP ĐO của em cắt nhãn ở dấu "·" rồi chỉ so nửa đầu: "Đã thu · chờ xếp lớp" bị đem so bằng
+    hai chữ "Đã thu", nên nó không khớp chip "Chờ xếp lớp" dù cùng con số. Thẻ thứ hai
+    ("Onboarding chưa xong") cũng là chip "Chưa hoàn tất" nói bằng chữ khác.
+    Mốc SLA kèm bánh răng không mất - nó đã nằm ở hàng ghi chú ngay dưới dải chip (`xlNote`).
+    `_checklap` L5 nay đọc CẢ nhãn lẫn từng khúc tách bởi "·" để chỗ mù này không mở lại. */
  /* HÀNG ĐỢI CHỜ XẾP LỚP - trước đây bị giấu sau nút, nay thành danh sách như trong hành trình */
  /* V2 08/08 - HÀNG "ĐÃ ĐÓNG ĐỦ · CHỜ XẾP LỚP" NAY CÓ CHIP RIÊNG.
     Đây là câu hỏi đầu ngày của Học vụ ("Xếp lớp cho học viên đã đóng đủ"), mà trước bản này nó
     chỉ hiện khi chip đang ở "Tất cả" - tức là muốn thấy nó thì phải KHÔNG lọc gì cả, giữa một
     trang có hai bảng. Nhịp ngày bấm vào chỉ mở được trang chứ không tách được đúng hàng ấy.
     Nay có chip "Chờ xếp lớp": bật lên thì bảng onboarding lui, chỉ còn đúng danh sách này. */
- if(wait.length&&(fil==="all"||fil==="chuaxep")){
+ /* ═══ 13/08 - HÀNG ĐỢI NÀY KHÔNG PHẢI CỦA DẢI CHIP DƯỚI NÓ (anh Luân: *"bấm vào chip khác là
+    cái bảng đã đóng đủ tiền biến mất liền, e phải xem lại logic thiết kế từng trang đi em ơi"*).
+    Điều kiện cũ là `fil==="all"||fil==="chuaxep"` - tức dải chip **BƯỚC ONBOARDING** (lọc DL08)
+    lại quyết định số phận của một bảng đọc **DL06** (đơn đã đóng đủ tiền, chưa có hồ sơ xếp lớp).
+    Hai danh sách khác nhau, một cái điều khiển; bấm "Chờ gửi thông tin lớp" là mất luôn hàng đợi
+    quan trọng nhất của Học vụ mà không ai giải thích vì sao.
+    Nay bảng này luôn hiện khi còn người chờ. Chip "Chờ xếp lớp" vẫn giữ vai TẬP TRUNG (bấm vào
+    thì lui bảng onboarding, chỉ còn đúng hàng đợi này) - đó là thu hẹp có chủ ý, khác hẳn việc
+    một dải chip lặng lẽ giấu mất một khối nó không sở hữu. */
+ if(wait.length){
   h+='<div class="sechd" style="display:flex;align-items:center;gap:8px"><i class="ti ti-user-plus" style="color:var(--red)"></i>Đã đóng đủ tiền · chờ xếp lớp ('+wait.length+')</div>';
   h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Khóa đã đăng ký</th><th>Ngày đóng đủ</th><th></th></tr></thead><tbody>';
   wait.forEach(function(e){var lastPay="";var ps=srows("DL07").filter(function(p){return String(p.enrollment_id)===String(e.enrollment_id)&&num(p.amount)>0});if(ps.length)lastPay=ps[ps.length-1].payment_time||"";
@@ -13097,32 +13120,59 @@ function dupNoiHTML(){
   g.map(function(x){return '<button class="btn sm" onclick="dupThemSo(\''+esc(x.lead_id)+'\')"><i class="ti ti-link"></i>'+esc(x.full_name||x.lead_id)+' · '+esc(x.phone_number||"")+'</button>'}).join("")+
   '</div></div></div>'}
 function leadInbound(){var dr=window.__liDraft||{};window.__liDraft=null;
- var h='<div class="dcard"><h4><i class="ti ti-message-plus"></i>Khách mới liên hệ đến</h4>';
- h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Khách lạ gọi tới / nhắn Zalo hỏi thông tin: ghi MỘT LẦN là có đủ lead + lượt liên hệ đầu (chiều: khách chủ động). Đừng để khách nhắn mà không được ghi lại.</div>';
+ /* ═══ 13/08 - MỘT CỬA, HAI NHÁNH (anh Luân: *"thêm mới, và khách mới liên hệ đến? khác nhau
+    chỗ nào em, tại sao em làm trùng"*). Nút chung "Thêm mới" đã bỏ ở trang danh sách; nếu chỉ bỏ
+    thôi thì MẤT một việc thật: nhập một lead CHƯA ai liên hệ (danh sách từ sự kiện, từ marketing
+    đẩy sang). Bỏ mà không thay là đúng thứ luật cứng số 0 cấm.
+    Nên cửa này nay có hai nhánh, chọn ngay dòng đầu. Cả hai đi chung một cửa nên đều được soát
+    trùng số điện thoại - chính chỗ mà nút "Thêm mới" cũ là một lối vòng. */
+ var md=(window.__LIMODE==="tunhap")?"tunhap":"den";
+ var h='<div class="dcard"><h4><i class="ti ti-message-plus"></i>Thêm khách mới</h4>';
+ h+='<div class="seg" style="margin:0 0 10px"><button class="segb'+(md==="den"?" on":"")+'" onclick="liMode(\'den\')">Khách liên hệ đến</button>'+
+   '<button class="segb'+(md==="tunhap"?" on":"")+'" onclick="liMode(\'tunhap\')">Tự nhập, chưa liên hệ</button></div>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>'+
+   (md==="den"?'Khách lạ gọi tới / nhắn Zalo hỏi thông tin: ghi MỘT LẦN là có đủ lead + lượt liên hệ đầu (chiều: khách chủ động). Đừng để khách nhắn mà không được ghi lại.'
+             :'Nhập một khách CHƯA ai liên hệ (danh sách sự kiện, marketing đẩy sang). App không ghi lượt liên hệ nào, và khách vào nhóm "Lead mới chưa chạm" để đội tư vấn gọi.')+'</div>';
  h+='<div id="li_dup"></div>';
  h+='<div class="fld"><label>Họ tên <i>*</i></label><input id="li_name" value="'+esc(dr.n||"")+'" placeholder="Nguyễn Văn A"></div>';
  h+='<div class="fld"><label>Số điện thoại / Zalo <i>*</i></label><input id="li_phone" value="'+esc(dr.p||"")+'" placeholder="09xxxxxxxx" oninput="liDupCheck()"></div>';
- h+='<div class="fld"><label>Khách liên hệ qua</label><select id="li_channel">'+enumOpts("enum_contact_channel")+'</select></div>';
  h+='<div class="fld"><label>Nguồn (khách biết mình từ đâu)</label><select id="li_src">'+enumOpts("enum_lead_source")+'</select></div>';
- h+='<div class="fld full"><label>Khách hỏi gì / trao đổi gì <i>*</i></label><textarea id="li_note" rows="3" placeholder="vd: hỏi học phí khóa 6.5, muốn học tối 3-5-7">'+esc(dr.t||"")+'</textarea></div>';
+ h+=(md==="den"?'<div class="fld"><label>Khách liên hệ qua</label><select id="li_channel">'+enumOpts("enum_contact_channel")+'</select></div>':'');
+ h+='<div class="fld full"><label>'+(md==="den"?'Khách hỏi gì / trao đổi gì <i>*</i>':'Ghi chú (không bắt buộc)')+'</label><textarea id="li_note" rows="3" placeholder="'+(md==="den"?"vd: hỏi học phí khóa 6.5, muốn học tối 3-5-7":"vd: lấy từ danh sách hội thảo 12/08")+'">'+esc(dr.t||"")+'</textarea></div>';
  h+='<div class="fld"><label>Hẹn liên hệ lại</label><input id="li_next" type="datetime-local">'+dtQuickHTML("li_next")+'</div>';
- h+='<div class="dact"><button class="btn primary" onclick="leadInboundSave()"><i class="ti ti-check"></i>Ghi nhận khách mới</button></div></div>';
- openDrawer("Khách mới liên hệ đến",h)}
+ h+='<div class="dact"><button class="btn primary" onclick="leadInboundSave()"><i class="ti ti-check"></i>'+(md==="den"?"Ghi nhận khách mới":"Thêm vào sổ lead")+'</button></div></div>';
+ openDrawer("Thêm khách mới",h)}
+/* Đổi nhánh thì GIỮ LẠI thứ người ta đã gõ - bắt gõ lại là cách nhanh nhất để họ thôi đổi nhánh. */
+function liMode(m){
+ window.__liDraft={n:fldV("li_name"),p:fldV("li_phone"),t:fldV("li_note")};
+ window.__LIMODE=m;leadInbound()}
 function liDupCheck(){var box=document.getElementById("li_dup");if(!box)return;
  var dup=findDupPhone(fldV("li_phone"));window.__dupFound=dup?1:0;
  box.innerHTML=dup?dupWarnHTML(dup):dupNoiHTML()}
 function leadInboundSave(){
  if(chanAct("lead_new"))return;   /* CH3: chuc danh nao duoc nhap lead moi */
  if(!actGuard("leadInbound"))return;   /* bấm 2 lần = 2 lead trùng cùng một số */
+ var md=(window.__LIMODE==="tunhap")?"tunhap":"den";
  var nm=(fldV("li_name")||"").trim(),ph=(fldV("li_phone")||"").trim(),note=(fldV("li_note")||"").trim();
  if(!nm||!ph){toast("Nhập họ tên và số điện thoại.");return}
  if(!/^0\d{9,10}$/.test(phoneKey(ph))){toast("Số điện thoại chưa hợp lệ (10-11 số, bắt đầu bằng 0).");return}
- if(!note){toast("Ghi lại khách hỏi gì - đó là vốn để chăm tiếp.");return}
+ if(md==="den"&&!note){toast("Ghi lại khách hỏi gì - đó là vốn để chăm tiếp.");return}
  /* V2 12/08 (SALE-2) - CHẶN HẲN, không còn lối "bấm lần nữa vẫn tạo mới". */
  var dup=findDupPhone(ph);
  if(dup){liDupCheck();
   toast("Số này đã có hồ sơ ("+(dup.rec.full_name||"")+"). Không tạo hồ sơ trùng - dùng nút \"Ghi lượt liên hệ vào hồ sơ này\" ở trên.",5200);return}
  var nx=(fldV("li_next")||"").trim();
+ /* Nhánh "tự nhập": KHÔNG đẻ lượt liên hệ, KHÔNG đặt first_call_time, trạng thái để `new` -
+    khách rơi đúng vào nhóm "Lead mới chưa chạm" để đội tư vấn còn biết mà gọi. Ghi một lượt
+    liên hệ không có thật là làm hỏng chính con số SLA phản hồi đang canh việc ấy. */
+ if(md==="tunhap"){
+  jSaveRow("DL02",{full_name:nm,phone_number:phoneNorm(ph),lead_source:fldV("li_src"),
+   lead_status:eFull("enum_lead_status","new"),lead_created_time:nowStr(),
+   assigned_to:CURSTAFF||"",assigned_to_name:myName(),contact_count:0,
+   next_followup_time:nx?fromISOdt(nx):"",lead_note:note},function(lid){
+   closeModal();toast("Đã thêm "+lid+" vào sổ lead - chưa liên hệ, đang chờ gọi.");
+   window.CHAYQ="new";reRender(CUR)});
+  return}
  jSaveRow("DL02",{full_name:nm,phone_number:phoneNorm(ph),lead_source:fldV("li_src"),
   lead_status:eFull("enum_lead_status","contacted"),lead_created_time:nowStr(),first_call_time:nowStr(),
   assigned_to:CURSTAFF||"",assigned_to_name:myName(),contact_count:1,last_contact_time:nowStr(),
@@ -20400,7 +20450,17 @@ function renderGiangvien(){var tab=window.GVTAB||"ds";
  var h=pageHead("Giảng viên & NV WOW","Hồ sơ đội ngũ đứng lớp (DL01) và bảng công giảng dạy của chính họ.","");
  /* V2 08/08 - trang này nằm trong nhịp ngày của Nhân sự và ACA mà mở ra không một con số nào.
     Ba thẻ đọc THẲNG lịch dạy thật (DL11), không chép lại phép đếm ở đâu khác. */
- if(tab==="ds")h+=statStrip([
+ /* ═══ 13/08 - DẢI THẺ LÊN TRÊN THANH TAB (anh Luân: *"3 cái thẻ này là của chip danh sách đúng
+    ko, vì khi bấm vào bảng công giảng dạy thì ko còn thấy nữa??? nếu vậy thì đây là thiết kế sai
+    logic hay sao???"*) - ĐÚNG LÀ SAI.
+    Ba con số này nói về ĐỘI NGŨ ĐỨNG LỚP: ai có lớp hôm nay, buổi nào thiếu mốc giờ, lớp nào
+    chưa có GV chính. Chúng là chuyện của CẢ TRANG, không phải của riêng tab Danh sách. Rào chúng
+    sau `if(tab==="ds")` là để một cái tab quyết định xem người ta có được thấy chuyện của cả
+    trang không - mà trớ trêu nhất: ô "Buổi thiếu mốc giờ vào/ra" chính là con số của tab Bảng
+    công, và nó biến mất đúng lúc người ta mở tab ấy.
+    Luật rút ra: **dải thẻ nằm ở đúng tầm của thứ nó mô tả.** Mô tả cả trang thì đứng TRÊN thanh
+    tab và ở lại; mô tả một tab thì nằm trong tab ấy. */
+ h+=statStrip([
   (function(){var t0=new Date();t0.setHours(0,0,0,0);
    var n={};srows("DL11").forEach(function(x){var d=pvnd(x.session_date);
     if(d&&sameDay(d,t0)&&String(x.teacher_id||"").trim())n[x.teacher_id]=1});
