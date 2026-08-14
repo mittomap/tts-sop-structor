@@ -36,7 +36,14 @@ const PATHS=["/opt/pw-browsers/chromium-1194/chrome-linux/chrome","/opt/pw-brows
    bao dong dung ve con so nhung sai ve nguyen nhan: khong be mat nao mat, chi la thuoc thoi di
    qua cho chung dang dung. *Danh sach trang cam cung thi moi lan kien truc doi la mot lan bao
    dong gia - lan thu tu trong ngay mot ban do cam cung noi sai.* */
-const TRANG=["viec","banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","hocvien","giaoviec","duyet","baocao","nhansu","khac","canhan","xeplop","giangvien"];
+/* 14/08 - THUOC CHI MO TAB MAC DINH CUA MOI TRANG, nen mot be mat nam o tab thu hai thi no khong
+   bao gio di qua. Lo ra khi gop "Hoc vien lien he" vao Giao viec: 8 the yeu cau hoc vien (moi the
+   mo mot ngan keo) chuyen sang tab "Tu hoc vien" va bien mat khoi pham vi do, du app khong mat gi.
+   Nay khai duoc dang `trang#tab`. Va them `socamket` - mot trang MOI dung 14/08, moi dong co nut
+   "Xem ban da ky" mo ngan keo, chua bao gio duoc di qua.
+   *Mot bo kiem chi soi mat tien thi cai gi lui vao trong deu an toan tuyet doi - va do khong phai
+   la an toan, do la khong ai nhin.* */
+const TRANG=["viec","socamket","giaoviec#hv","banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","hocvien","giaoviec","duyet","baocao","nhansu","khac","canhan","xeplop","giangvien"];
 (async()=>{
  let chromium; try{chromium=require("playwright").chromium}catch(e){console.log("CHECKDRAWER BO QUA: chua cai playwright");process.exit(0)} const fs=require("fs"),path=require("path");
  const exe=PATHS.find(p=>{try{return fs.existsSync(p)}catch(e){return false}});
@@ -50,7 +57,13 @@ const TRANG=["viec","banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","
  await page.evaluate(()=>{try{if(typeof asstDong==="function")asstDong()}catch(e){}});
  const loi=[]; let soDrawer=0;
  for(const tr of TRANG){
-  await page.evaluate(k=>{try{go(k)}catch(e){}},tr);
+  await page.evaluate(k=>{try{
+    var i=String(k).indexOf("#");
+    if(i>0){var t2=String(k).slice(0,i),tb=String(k).slice(i+1);
+     if(t2==="giaoviec"){window.TKTAB=tb;window.TKF="all"}
+     go(t2); try{reRender(t2)}catch(e2){} return}
+    try{window.TKTAB="mine";window.TKF="live"}catch(e3){}
+    go(k)}catch(e){}},tr);
   await page.waitForTimeout(350);
   const n=await page.evaluate(()=>document.querySelectorAll("#content button").length);
   for(let i=0;i<Math.min(n,26);i++){
@@ -106,7 +119,8 @@ const TRANG=["viec","banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","
     try{closeDrawer()}catch(e){try{document.getElementById("drawer").classList.remove("on")}catch(e2){}}
     try{closeConfirm()}catch(e){}
     document.querySelectorAll(".cfmask.on,.modal.on,.mask.on").forEach(x=>x.classList.remove("on"));
-    try{if(typeof CUR!=="undefined"&&CUR!==k)go(k)}catch(e){}
+    try{var _i=String(k).indexOf("#");var _k=(_i>0?String(k).slice(0,_i):k);
+      if(typeof CUR!=="undefined"&&CUR!==_k)go(_k)}catch(e){}
    },tr);
    await page.waitForTimeout(140);
   }
