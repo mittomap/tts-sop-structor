@@ -2937,7 +2937,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>2c3058</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>717bbc</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -18816,6 +18816,11 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=srows("DL14");
    esc(String(_req.content||"").split("\n").join(" · "))+' <button class="pill" onclick="tkOpen(\''+esc(_req.task_id)+'\')">Mở yêu cầu</button></span></div>';
   h+='</div>';
   h+='<div class="obact">';
+  /* V2 14/08 - LỐI VÀO MÀN VẬN HÀNH, ĐẶT NGAY TRÊN THẺ CỦA SỔ. Em khai trong bộ kiểm là màn ấy
+     "mở từ Buổi hôm nay HOẶC sổ Buổi WOW 1-1" nhưng chỉ nối lối thứ nhất - anh Luân mở sổ ra tìm
+     thì không thấy: *"trang vận hành buổi wow đâu"*. Một lời khai có hai lối mà chỉ dựng một lối
+     thì lời khai ấy sai, và cái sai nằm im cho tới khi có người đi đúng lối còn thiếu. */
+  h+='<button class="btn sm" onclick="bwPick(\''+esc(id)+'\')" data-tip="Mở màn vận hành buổi WOW này - đủ ngữ cảnh học viên, lượt còn lại và buổi trước"><i class="ti ti-layout-list"></i>Vận hành buổi</button>';
   var _daBd=!!String(w.wow_start_actual||"").trim(),_daKt=!!String(w.wow_end_actual||"").trim();
   if(!s.confirmed&&!s.noshow)h+='<button class="btn primary sm" onclick="confirmRun(\'Xác nhận buổi WOW này?\',\'wowConfirm\',\''+esc(id)+'\')"><i class="ti ti-check"></i>Xác nhận</button>';
   /* WOW-2: buổi HỌC VIÊN tự đặt vào ca của mình - NV WOW được quyền TỪ CHỐI kèm lý do, ca mở lại.
@@ -28345,7 +28350,7 @@ var NAVTREE=[
     lối nào. Hub CSKH có 4 tab mà menu chỉ có tên hub. Anh Luân: *"bên sidebar giống như 1 cái
     bản đồ vậy, họ biết mình cần tìm gì ở đâu"* - thiếu một mục là mất một chỗ trên bản đồ.
     Thứ tự các mục con xếp ĐÚNG THỨ TỰ THANH TAB của hub, để menu và màn hình đọc như nhau. */
- {g:arcGrpName("changB"),arc:"changB",items:["changB","buoihnay","wow","xeplop","baitap","giaoan","buoihoc","khaosat","ghinhan","khieunai","lichtuan","lichwow","gvdp","phong","socamket"]},
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","buoihnay","lop","hocvien","giangvien","wow","xeplop","baitap","giaoan","buoihoc","khaosat","ghinhan","khieunai","lichtuan","lichwow","gvdp","phong","socamket"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","ketqua","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
@@ -28386,7 +28391,7 @@ var NAVTREE=[
     ở PAGES từ lúc dựng, mà nhóm "Tra cứu" trên cây menu thì chưa ai thêm tên nó vào - tức bản
     khai đúng ý mà không ai đọc. `_checkv2` L3 bắt: trang xem được, không có mục menu, không có
     trang cha. Đúng con bệnh anh Luân bắt ba lần rồi: *"a tìm trên sidebar ko thấy"*. */
- {g:"Tra cứu",items:["tracuu","hocvien","giangvien","lop","tinnhan"]}];
+ {g:"Tra cứu",items:["tracuu","tinnhan"]}];
 /* Danh mục sổ nằm sau cửa Tra cứu. Khai MỘT chỗ, BA nơi đọc: trang `tracuu` vẽ theo nó, `navCur`
    dùng nó để biết "đang đứng trong một cuốn sổ thì mục Tra cứu phải sáng", và `_checkcauhoi`
    dùng nó để biết các sổ ấy VẪN có lối trên menu (qua cửa cha). */
@@ -28418,6 +28423,17 @@ var NAVSUB={changA:"chang",changB:"chang",changC:"chang",changD:"chang",
  /* Cùng lối với `banglop`: mở từ một dòng, không có mục menu riêng, nên khai cha để khi đang
     đứng trong một buổi thì mục "Buổi WOW 1-1" trên sidebar SÁNG. */
  banwow:"buoihnay"};
+/* ═══ V2 14/08 - THỤT VÀO CHỈ ĐỂ NHÌN, KHÔNG ĐỤNG TỚI QUYỀN (anh Luân: *"2 cái kia lên cùng chỗ
+   với lớp chứ, làm con của buổi hôm nay"* - hai cái ấy là sổ Học viên và sổ Giảng viên) ══════
+   Ba sổ Lớp học · Học viên · Giảng viên nay đứng ngay dưới "Buổi hôm nay" và thụt vào một bậc.
+   NHƯNG KHÔNG khai bằng `NAVSUB`: `navVis` cho xem một trang nếu người đó có quyền vào trang
+   CHA - `if(r.pages.indexOf(o)<0&&r.pages.indexOf(k)<0)return false`. Khai cha là `buoihnay`
+   thì mọi chức danh có "Buổi hôm nay" bỗng nhìn thấy luôn sổ Học viên và sổ Giảng viên, tức
+   NỚI QUYỀN XEM DỮ LIỆU bằng một thay đổi tưởng chỉ là trang trí.
+   `NAVTHUT` chỉ nói MỘT điều: vẽ thụt vào. Không ai đọc nó để xét quyền, không ai đọc nó để
+   quyết mục nào sáng. *Muốn đổi HÌNH thì đừng mượn cái bảng đang giữ QUYỀN - mượn một lần là
+   lần sau không ai dám sửa nó nữa.* */
+var NAVTHUT={lop:"buoihnay",hocvien:"buoihnay",giangvien:"buoihnay",wow:"buoihnay"};
 function navOwner(k){return NAVSUB[k]||k}
 function navItemMeta(k){
  if(/^chang[A-D]$/.test(k)){var A=ARCBK[k];return {t:uiItemLabel(k),ic:"ti-route",arc:A}}
@@ -28602,7 +28618,7 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
    "Test đầu vào" -> cũng vậy. Trước đây hai người ấy thấy nhóm "C1 · Khách tiềm năng".) */
 var NAVPHANG=[
  {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:"Lớp học & Giảng dạy",items:["buoihnay","wow","xeplop","baitap","giaoan","buoihoc","lichtuan","lichwow","gvdp","phong","socamket"]},
+ {g:"Lớp học & Giảng dạy",items:["buoihnay","lop","hocvien","giangvien","wow","xeplop","baitap","giaoan","buoihoc","lichtuan","lichwow","gvdp","phong","socamket"]},
  {g:"Chăm sóc & Sau khóa",items:["khaosat","ghinhan","khieunai","baoluu","ketthuc","ketqua","magioithieu"]}];
 /* ═══ V2 14/08 - KỆ TRONG MỘT NHÓM MENU (anh Luân: *"em đã check xem trên sidebar nên sắp xếp
    thế nào chưa, a thấy chắp vá quá"*) ══════════════════════════════════════════════════════
@@ -28640,14 +28656,14 @@ NAVKE[arcGrpName("changB")]=[
     sang một cái sổ. Chữa đúng chỗ ấy - xem `NAVSUB` bên dưới.
     `wow` GIỮ LẠI ở kệ làm việc: "Buổi WOW 1-1" không phải sổ tra cứu, nó là màn có đủ nút xác
     nhận / bắt đầu / kết thúc / ghi nội dung - người ta LÀM ở đó hằng ngày. */
- ["Làm hằng ngày",["buoihnay","wow","xeplop","baitap","giaoan"]],
+ ["Làm hằng ngày",["buoihnay","lop","hocvien","giangvien","wow","xeplop","baitap","giaoan"]],
  ["Theo dõi chất lượng",["buoihoc","khaosat","ghinhan","khieunai"]],
  ["Lịch & sổ tra cứu",["lichtuan","lichwow","gvdp","phong","socamket"]]];
 /* Cây PHẲNG chia nhóm khác cây chặng: khảo sát / phản hồi / khiếu nại nằm ở nhóm "Chăm sóc &
    Sau khóa", không ở đây. Khai kệ riêng theo ĐÚNG thành viên của nhóm này - dùng chung bảng
    với cây chặng thì kệ "Theo dõi chất lượng" chỉ còn một mục mà vẫn đội một cái tiêu đề. */
 NAVKE["Lớp học & Giảng dạy"]=[
- ["Làm hằng ngày",["buoihnay","wow","xeplop","baitap","giaoan"]],
+ ["Làm hằng ngày",["buoihnay","lop","hocvien","giangvien","wow","xeplop","baitap","giaoan"]],
  ["Theo dõi chất lượng",["buoihoc"]],
  ["Lịch & sổ tra cứu",["lichtuan","lichwow","gvdp","phong","socamket"]]];
 /* Nhóm này 7 mục - DƯỚI ngưỡng 8 nên KHÔNG chia kệ: hai tiêu đề cho bảy dòng là tiêu đề nhiều
@@ -28788,9 +28804,11 @@ function buildNav(){
       ấy nên thụt vào một bậc. Màn nào lại là TAB của một hub (GV dự phòng, Phòng học, Buổi WOW
       thuộc hub Học tập) thì thụt thêm một bậc nữa - đọc ra đúng ba tầng: chặng > hub > tab. */
    var _laHub=navOwner(k)!==k&&G.items.indexOf(navOwner(k))>=0;
+   /* Thụt thêm theo `NAVTHUT` - bảng CHỈ nói hình thức, xem ghi chú ở chỗ khai nó. */
+   var _thut=NAVTHUT[k]&&G.items.indexOf(NAVTHUT[k])>=0;
    var _trongArc=!!G.arc&&!/^chang[A-D]$/.test(k);
-   var isSub=_laHub||_trongArc;
-   var isSub2=_laHub&&_trongArc;
+   var isSub=_laHub||_trongArc||_thut;
+   var isSub2=(_laHub&&_trongArc)||(_thut&&_trongArc);
    h+='<div class="navitem'+(isArc?" chang":"")+(isSub2?" sub sub2":(isSub?" sub":""))+(navCur(k)?" on":(navAnc(k)?" anc":(ORPHAN&&k===NAVFROM?" from":"")))+(k===window.__NAVHIT?" hit":"")+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
     ' data-k="'+k+'" title="'+esc(m.t)+'" onclick="'+(HUBTAB[k]?"goHub":"go")+'(\''+k+'\')"><i class="ti '+m.ic+'"></i><span>'+esc(m.t)+'</span>'+
     (n?'<span class="dot">'+(n>99?"99+":n)+'</span>':'')+'</div>'});
