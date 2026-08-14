@@ -3009,7 +3009,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>b9c417</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>5cbde7</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -4698,7 +4698,7 @@ giangvien:{code:"DL01",ro:1,sub:"Giảng viên & NV WOW (DL01) - lọc nhanh đ�
  
  pre:function(s){return /teacher|wow|giảng|giang/.test(ecode(s.role))||/giảng|giang|teacher/i.test(String(s.role))},
  cols:[["staff_id","Mã"],["full_name","Họ tên"],["role","Vai trò","enum"],["phone","SĐT"],["email","Email"],["branch","Cơ sở","enum"],
-  ["__lop","Lớp đang dạy","calcnum"],["__wow","Buổi WOW tháng","calcnum"],["__test","Ca test tháng","calcnum"],["__hv","Học viên","calcnum"],["__buoi7","Buổi 7 ngày tới","calcnum"],
+  ["__lop","Lớp đang dạy","calcnum"],["__lopxong","Lớp đã dạy xong","calcnum"],["__wow","Buổi WOW tháng","calcnum"],["__test","Ca test tháng","calcnum"],["__hv","Học viên","calcnum"],["__buoi7","Buổi 7 ngày tới","calcnum"],
   ["__nxno","Nợ nhận xét","calcso"],["__baicho","Bài chờ chấm","calcso"],["__giothang","Giờ dạy tháng","calcnum"],
   ["status","Trạng thái","chip"]]},
 nhanvien:{code:"DL01",filt:"status",ro:1,lam:"nhansu",sub:"Toàn bộ nhân sự (DL01)",
@@ -4833,12 +4833,14 @@ function gvTaiBang(){
     *Một bảng in ra 0 cho nguyên một chức danh thì người đọc trách app, không trách cái bảng.* */
  var _hvSet={};
  function o(id){id=String(id||"");if(!id)return null;
-  if(!M[id]){M[id]={__lop:0,__hv:0,__buoi7:0,__nxno:0,__baicho:0,__giothang:0,__wow:0,__test:0};_hvSet[id]={}}
+  if(!M[id]){M[id]={__lop:0,__lopxong:0,__hv:0,__buoi7:0,__nxno:0,__baicho:0,__giothang:0,__wow:0,__test:0};_hvSet[id]={}}
   return M[id]}
  try{
   srows("DL10").forEach(function(c){
-   if(isc(c.class_status,"cancelled","ended"))return;
    var t=o(c.main_teacher_id);if(!t)return;
+   /* Lớp ĐÃ ĐÓNG đếm riêng - đó là bề dày, không phải tải hiện tại. Gộp vào một cột thì con số
+      "đang dạy" phồng lên và người xếp lớp đọc sai tải của người ta. */
+   if(isc(c.class_status,"finished","cancelled","ended")){t.__lopxong++;return}
    t.__lop++;t.__hv+=num(c.current_enrollment)});
   var nay=new Date(),d0=new Date(nay.getFullYear(),nay.getMonth(),nay.getDate()),
       d7=new Date(d0.getTime()+7*864e5),
@@ -21532,10 +21534,27 @@ function renderHosoGV(){var id=window.GVID;var g=find("DL01","staff_id",id);
   ["TNR","Tỷ lệ buổi có nhận xét đầy đủ",tnrV==null?"-":Math.round(tnrV*100)+"%",tnrV==null?null:(tnrV>=kpiTh(/^TNR/,0.9)),"≥ "+kpiChip(/^TNR/,0.9,1)],
   ["GCR7","Tỷ lệ bài đã chấm",gcrV==null?"-":Math.round(gcrV*100)+"%",gcrV==null?null:(gcrV>=kpiTh(/^GCR7/,1)),"≥ "+kpiChip(/^GCR7/,1,1)],
   ["ADC","Kỷ luật vào lớp đúng giờ",adcV==null?"-":Math.round(adcV*100)+"%",adcV==null?null:(adcV>=kpiTh(/^ADC/,0.95)),"≥ "+kpiChip(/^ADC/,0.95,1)]]);
- h+='<div class="panel"><div class="ph"><b>Lớp đang phụ trách ('+cls.length+')</b></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Tên lớp</th><th>Trạng thái</th><th>Sĩ số</th><th>Lịch</th><th>Khai giảng</th><th>Thao tác</th></tr></thead><tbody>';
- if(!cls.length)h+='<tr><td class="empty" colspan="7">Chưa phụ trách lớp nào.</td></tr>';
- cls.forEach(function(c){h+='<tr><td>'+esc(c.class_id)+'</td><td>'+esc(c.class_name)+'</td><td><span class="chip '+stCls(c.class_status)+'">'+esc(elabel(c.class_status))+'</span></td><td>'+esc(c.current_enrollment||0)+'/'+esc(c.class_capacity||0)+'</td><td>'+esc(c.class_schedule||"")+'</td><td>'+esc(c.class_start_date||"")+'</td><td><button class="btn sm" onclick="openLop(\''+esc(c.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Bảng lớp</button></td></tr>'});
- h+='</tbody></table></div></div>';
+ /* ═══ V2 14/08 (anh Luân: *"các lớp đã kết thúc, hoặc các lớp giảng viên đó đã từng phụ trách,
+    thì ở 2 trang: lớp học và giáo viên đã có session nào hiển thị cái đó chưa"*) ═══════════════
+    Đo trước khi sửa: bảng này KHÔNG lọc trạng thái, nên nó ĐÃ liệt kê cả lớp đã kết thúc - chỉ
+    là gộp chung dưới cái nhãn "Lớp đang phụ trách". Nhãn nói dối, và nói dối theo hướng tệ nhất:
+    người quản lý đọc "đang phụ trách 3 lớp" rồi xếp thêm việc, trong khi một lớp trong đó đã
+    đóng từ tháng trước. Đo trên dữ liệu: 2/6 giảng viên đầu tiên có đúng tình huống ấy.
+    Nay tách hai khối. Lịch sử KHÔNG bị bỏ đi - nó là thứ trả lời "người này đã từng dạy gì",
+    câu mà ai xếp lớp cũng hỏi - chỉ là nó phải đứng ở khối của nó.
+    *Một cái nhãn sai còn tệ hơn một cột thiếu: cột thiếu thì người ta đi tìm, nhãn sai thì
+    người ta tin.* */
+ function _lopBang(nhan,ds,rong){
+  var o='<div class="panel"><div class="ph"><b>'+esc(nhan)+' ('+ds.length+')</b></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Tên lớp</th><th>Trạng thái</th><th>Sĩ số</th><th>Lịch</th><th>Khai giảng</th><th>Thao tác</th></tr></thead><tbody>';
+  if(!ds.length)o+='<tr><td class="empty" colspan="7">'+esc(rong)+'</td></tr>';
+  ds.forEach(function(c){o+='<tr><td>'+esc(c.class_id)+'</td><td>'+esc(c.class_name)+'</td><td><span class="chip '+stCls(c.class_status)+'">'+esc(elabel(c.class_status))+'</span></td><td>'+esc(c.current_enrollment||0)+'/'+esc(c.class_capacity||0)+'</td><td>'+esc(c.class_schedule||"")+'</td><td>'+esc(c.class_start_date||"")+'</td><td><button class="btn sm" onclick="openLop(\''+esc(c.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Bảng lớp</button></td></tr>'});
+  return o+'</tbody></table></div></div>'}
+ var _clsXong=cls.filter(function(c){return isc(c.class_status,"finished","cancelled")});
+ var _clsNay=cls.filter(function(c){return !isc(c.class_status,"finished","cancelled")});
+ h+=_lopBang("Lớp đang phụ trách",_clsNay,"Chưa phụ trách lớp nào đang chạy.");
+ /* Khối lịch sử chỉ hiện khi CÓ - một bảng rỗng mang tên "đã dạy xong" trên hồ sơ người mới vào
+    không nói được gì, chỉ tốn một khung. */
+ if(_clsXong.length)h+=_lopBang("Lớp đã dạy xong",_clsXong,"");
  h+='<div class="panel"><div class="ph"><b>Buổi cần ghi nhận xét ('+noNote.length+')</b><div class="mini"><button class="pill" onclick="go(\'buoihoc\')">Mở trang '+esc((PBK.buoihoc||{}).t||"Buổi học")+'</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Buổi</th><th>Ngày</th><th>Tình trạng</th><th>Thao tác</th></tr></thead><tbody>';
  if(!noNote.length)h+='<tr><td class="empty" colspan="5">Đã ghi nhận xét đầy đủ - tốt!</td></tr>';
  noNote.slice(0,25).forEach(function(s){var st=bhState(s);
@@ -24915,6 +24934,31 @@ function renderCong(){
  var noNote=L.reduce(function(a,x){return a+x.noNote},0);
  var h='<div class="notebar"><i class="ti ti-info-circle"></i><span data-tip="Tính theo giờ dạy thật, từ giờ vào lớp tới giờ kết thúc. Đơn giá tra theo giảng viên x loại ngày x ca. Giờ vào - ra của buổi WOW và ca test vẫn ghi nhận để quản lý ca, nhưng không nhân vào tiền. Căn cứ tính là buổi đã dạy xong - cùng một định nghĩa với KPI và hồ sơ giáo viên."><b>Màn này tính và đối chiếu công</b>, chưa nối bảng lương.<i class="ti ti-info-circle gyti"></i></span> <a class="lnk" onclick="window.SETTAB=\'giagio\';go(\'settings\')">Sửa đơn giá</a>.</div>';
  var xTien=true;try{xTien=(dsLevel("tien")!=="none")}catch(e){xTien=true}
+ /* ═══ V2 14/08 (anh Luân: *"ở trang bảng công ko hiện bảng giá hả"*) ═══════════════════════
+    Không - trang này chỉ có một cái link "Sửa đơn giá" dẫn sang Cài đặt. Nhưng người ngồi đối
+    chiếu công thì câu hỏi đầu tiên là *"đang tính theo giá nào"*, và họ phải rời trang, đọc ở
+    một màn khác, rồi quay lại nhớ bằng đầu. Đơn giá có xuất hiện rải rác trong cột "Chia theo
+    ca" ("tối 13.3h x 200.000đ") nhưng đó là giá của TỪNG người từng ca - không đọc ra được bảng
+    giá đang áp cho cả đội.
+    Nay bảng giá nằm ngay đây, CHỈ ĐỌC (sửa vẫn ở Cài đặt - một cửa ghi một chỗ). Đọc thẳng
+    `rateGet("",...)` và ba tham số CH2, không chép lại một phép tính nào: bảng công và bảng giá
+    phải cùng một nguồn, không thì có ngày hai chỗ nói hai giá.
+    Chỉ hiện cho người xem được miền tiền - cùng luật đã áp cho cột "Tiền công tạm tính". */
+ if(xTien){
+  h+='<div class="panel"><div class="ph"><b><i class="ti ti-clock-dollar" style="margin-right:6px"></i>Đơn giá đang áp</b>'+
+   '<span class="mut" style="font-size:11.5px">mức mặc định của cả đội · ai có mức riêng thì lấy mức riêng</span>'+
+   '<div class="mini"><button class="pill" onclick="window.SETTAB=\'giagio\';go(\'settings\')"><i class="ti ti-edit"></i>Sửa đơn giá</button></div></div>'+
+   '<div class="tbwrap"><table class="dt"><thead><tr><th>Loại ngày</th>'+
+   SHIFTK.map(function(k){return '<th>'+esc(k[1])+'</th>'}).join("")+'</tr></thead><tbody>';
+  DAYK.forEach(function(d){
+   h+='<tr><td><b>'+esc(d[1])+'</b></td>'+SHIFTK.map(function(k){
+    var v=rateGet("",d[0],k[0]);
+    return '<td style="font-variant-numeric:tabular-nums">'+(v!=null&&v>0
+     ?('<b>'+vnd(v)+'</b><span class="mut" style="font-size:11px">/giờ</span>')
+     :('<span class="mut" data-tip="Ca này chưa khai mức mặc định - đang lấy tham số chung">'+vnd(num(paramOf("teacherPayPerHour",180000)))+'/giờ · chung</span>'))+'</td>'}).join("")+'</tr>'});
+  h+='</tbody></table></div><div class="pbody" style="padding-top:0">'+
+   '<div class="fhint">Buổi WOW 1-1: <b>'+vnd(wowRate())+'</b>/buổi · Ca test đầu vào: <b>'+vnd(testRate())+'</b>/lần - hai việc này trả theo LẦN, không nhân giờ. '+
+   'Ranh giới ca: trước '+slaChip("shiftNoon_hour",12,"h")+' là ca sáng, tới '+slaChip("shiftEvening_hour",17,"h")+' là ca chiều, sau đó là ca tối.</div></div></div>'}
  h+=statStrip([
   ["ti-school",tot,"Buổi lớp đã dạy trong tháng","#3B82C4",L.length+" giảng viên"],
   ["ti-clock-hour-4",(Math.round(totG*10)/10)+"h","Tổng giờ dạy","#2E5A88",totThieu?(totThieu+" buổi thiếu giờ vào/ra"):"đủ giờ vào - giờ ra","",
