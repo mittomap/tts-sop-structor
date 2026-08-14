@@ -7886,7 +7886,7 @@ function runTouchSave(){var R=window.RUN;if(!R)return;var J=jInfo(R.pid),C=J.C;
   var S=C.S;if(!S){toast("Không ghi được điểm chạm.");return}
   var line=nowStr()+": "+(elabel(rfV("channel"))||"")+" - "+(cresLabel(rfV("cres"))||"")+(body?(" - "+body):"");
   jUpdRow("DL09",S.student_id,{learning_followup_note:(S.learning_followup_note?S.learning_followup_note+" | ":"")+line},
-   function(){R.msg="Đã ghi điểm chạm vào hồ sơ học viên.";R.tab="touch";reRender("chay")});return}
+   function(){R.msg="Đã ghi điểm chạm vào hồ sơ học viên.";runTouchXong(R,0)});return}
  var o={lead_id:C.L.lead_id,customer_name:C.L.full_name,contact_time:nowStr(),channel:rfV("channel"),
   direction:eFull("enum_contact_direction","outbound"),content:body,staff_id:CURSTAFF||"",staff_id_name:myName(),
   __cres:rfV("cres"),next_followup_time:rfV("next_followup_time")};
@@ -7894,9 +7894,33 @@ function runTouchSave(){var R=window.RUN;if(!R)return;var J=jInfo(R.pid),C=J.C;
  jSaveRow("DL02b",o,function(){touchLead(o);
   var J2=jInfo(R.pid);var n=runTouches(J2).length;
   R.msg="Đã ghi điểm chạm thứ "+n+" ở chặng \""+J2.S.t+"\""+(J2.C.L.next_followup_time?(" · hẹn lại "+J2.C.L.next_followup_time):"")+(J2.k!==J.k?(" → chuyển sang: "+J2.S.t):"");
-  R.tab=(J2.k!==J.k)?"main":"touch";toast(R.msg);reRender("chay")})}
+  toast(R.msg);runTouchXong(R,J2.k!==J.k)})}
+/* Lưu xong thì hạ cánh ở ĐÚNG chỗ vừa đứng. Mở từ ô trượt trong khối dự phòng thì đóng ô lại,
+   ở nguyên bước chính, giữ chỗ cuộn - người ta vừa ghi một câu chứ không đi đâu cả. Mở từ tab
+   "touch" (lối vào cũ) thì giữ nguyên nếp cũ. Đổi chặng thì luôn về bước chính: chặng đã khác
+   nên form ở trên cũng đã là form khác, giữ chỗ cuộn lúc này là giữ một chỗ không còn nữa. */
+function runTouchXong(R,doiChang){
+ if(doiChang){R.altOpen=0;R.tab="main";reRender("chay");return}
+ if(R.altOpen){R.altOpen=0;reRenderKeep("chay");return}
+ R.tab="touch";reRender("chay")}
 function runTab(t){var R=window.RUN;if(!R)return;R.tab=t;R.msg="";reRender("chay")}
-function runSnooze(){var R=window.RUN;if(!R)return;R.tab="touch";R.msg="";reRender("chay")}
+/* ═══ V2 14/08 - MỞ TẠI CHỖ, KHÔNG ĐỔI TAB ═════════════════════════════════════════════════
+   Anh Luân: *"sao bấm ghi liên hệ nó lại nhảy đi chỗ khác, e cho nó hiện cái form nhập đó trượt
+   xuống cùng chỗ cho đẹp"*.
+   Bản cũ đặt `R.tab="touch"` rồi vẽ lại cả trang: form bước chính BIẾN MẤT, thay bằng một màn
+   khác, và màn cuộn về đầu. Người ta đang đọc dở lịch sử liên hệ ở giữa trang thì cả trang bị
+   thay - mất chỗ đứng, phải tìm lại từ đầu xem mình đang ở đâu.
+   Nay: chỉ bật một cái cờ, `reRenderKeep` giữ nguyên chỗ cuộn, form trượt xuống ngay dưới nút.
+   Bước chính vẫn nằm nguyên phía trên - hai lối ra cùng nhìn thấy một lúc, đúng như tình huống
+   thật ("chấm được thì nhập điểm, chưa chấm được thì ghi một câu").
+   Tab "touch" GIỮ NGUYÊN, không gỡ: nó còn là chỗ hạ cánh sau khi lưu ở vài lối vào khác. */
+function runSnooze(){var R=window.RUN;if(!R)return;
+ R.altOpen=!R.altOpen;R.msg="";
+ reRenderKeep("chay");
+ if(R.altOpen)setTimeout(function(){try{
+  var el=document.querySelector(".runalt");
+  if(el&&el.scrollIntoView)el.scrollIntoView({block:"nearest",behavior:"smooth"});
+  var f=document.getElementById("r_content2");if(f&&f.focus)f.focus()}catch(e){}},60)}
 /* chặng -> màn thao tác */
 function rStepKey(J){var k=J.k;
  if(k==="new"||k==="no_contact"||k==="lost"||k==="contacted")return k==="contacted"?"test_book":"contact";
@@ -7915,7 +7939,9 @@ function rStepKey(J){var k=J.k;
 function runStart(pid,queue){window.RUN={pid:pid,q:queue||null,i:0,msg:""};go("chay")}
 /* xem trước hàng đợi: hiện danh sách người + chặng, chọn ai để bắt đầu (không tự nhảy) */
 function runQueuePreview(list,title){if(!list.length){toast("Không có hồ sơ nào.");return}window.RUN={q:list,i:0,preview:1,title:title||"Hàng đợi",msg:""};go("chay")}
-function runPick(i){var R=window.RUN;if(!R||!R.q)return;R.i=i;R.pid=R.q[i];R.preview=0;R.msg="";reRender("chay")}
+/* Đổi sang người khác thì ĐÓNG ô ghi đang mở: nó là ô của hồ sơ vừa rồi, để mở nguyên qua
+   người mới là mời người ta gõ một câu vào nhầm hồ sơ. */
+function runPick(i){var R=window.RUN;if(!R||!R.q)return;R.i=i;R.pid=R.q[i];R.preview=0;R.msg="";R.altOpen=0;reRender("chay")}
 function runStartQueue(){runPick(0)}
 function renderRunPreview(){var R=window.RUN;var list=R.q||[];
  var h='<div class="runwrap">';
@@ -7947,9 +7973,9 @@ function runQueueFromTasks(){var seen={},L=[];
  window.CHAYQ="over";window.RUN=null;go("banlam")}
 function runQueueStage(k){window.CHAYQ=k;window.RUN=null;go("banlam")}
 function runNext(){var R=window.RUN;if(!R)return;
- if(R.q&&R.i<R.q.length-1){R.i++;R.pid=R.q[R.i];R.msg="";reRender("chay")}
+ if(R.q&&R.i<R.q.length-1){R.i++;R.pid=R.q[R.i];R.msg="";R.altOpen=0;reRender("chay")}
  else{toast("Đã xong hàng đợi.");go("hanhtrinh")}}
-function runPrev(){var R=window.RUN;if(!R||!R.q||R.i<=0)return;R.i--;R.pid=R.q[R.i];R.msg="";reRender("chay")}
+function runPrev(){var R=window.RUN;if(!R||!R.q||R.i<=0)return;R.i--;R.pid=R.q[R.i];R.msg="";R.altOpen=0;reRender("chay")}
 function runSave(){var R=window.RUN;if(!R)return;var J=jInfo(R.pid);var sk=rStepKey(J);if(!sk)return;
  var ST=RSTEP[sk];var fs=ST.fields(J.C);
  var miss=rfNeed(fs);if(miss.length){toast("Còn thiếu: "+miss.join(", "));return}
@@ -8170,12 +8196,18 @@ function renderChay(){
    if(QL)r+=' · đã quá hạn nên báo cả quản lý <b>'+nsLnk(QL.id,QL.ten,QL.ten)+'</b>';
    return r+'</span></div>'})()+
   runLichSu(C)+
-  '<button class="btn alt" onclick="runSnooze()"><i class="ti ti-phone-plus"></i>Ghi liên hệ / ghi chú'+(tps.length?' ('+tps.length+' lần ở chặng này)':'')+'</button>'+
+  '<button class="btn alt'+(R.altOpen?" mo":"")+'" onclick="runSnooze()"><i class="ti ti-'+(R.altOpen?"chevron-up":"phone-plus")+'"></i>'+
+   (R.altOpen?"Đóng ô ghi liên hệ":("Ghi liên hệ / ghi chú"+(tps.length?' ('+tps.length+' lần ở chặng này)':'')))+'</button>'+
   /* SOP NA046 nói HAI đường cho lead quá hạn chưa gọi: *"gọi gấp HOẶC GIAO LẠI cho NV khác"*.
      App có màn Bàn giao lead từ lâu nhưng ở đây không có cửa nào tới - người dùng đang đứng
      đúng hồ sơ ấy lại phải rời trang, tự tìm lại tên khách trong một bảng khác. Nay chìa thẳng. */
   ((J.over&&C.L&&String(C.L.assigned_to||"").trim())
     ?'<button class="btn" onclick="runGiaoLai(\''+esc(C.pid)+'\')"><i class="ti ti-arrows-exchange"></i>Giao lại cho NV khác</button>':'')+
+  /* Ô GHI TRƯỢT XUỐNG NGAY TẠI CHỖ. Dùng lại đúng `runTouchFields` + `runTouchSave` của tab
+     "touch" - một bản gốc, hai chỗ hiện; chép đôi thì sớm muộn hai bên hỏi khác nhau. */
+  (R.altOpen?('<div class="ratform">'+rfHTML(runTouchFields(J),C)+
+    '<div class="ratfa"><button class="btn alt" onclick="runTouchSave()"><i class="ti ti-device-floppy"></i>Lưu điểm chạm</button>'+
+    '<span class="fhint" style="margin:0">Lưu xong hồ sơ vẫn ở chặng "'+esc(J.S.t)+'" - trừ khi kết quả liên hệ tự đẩy nó sang chặng khác.</span></div></div>'):'')+
   '</div>';
  h+='<div class="runfoot">';
  if(R.q&&R.i>0)h+='<button class="btn" onclick="runPrev()"><i class="ti ti-arrow-left"></i>Người trước</button>';
