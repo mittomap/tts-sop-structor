@@ -29,3 +29,6 @@ _src/_APP6.js
 # rac do python sinh ra khi kiem cu phap
 __pycache__/
 *.pyc
+
+# File nhap cua cac ban do chay song song (chuyen gia soi giao dien) - khong phai ma nguon
+_*_tmp.js
