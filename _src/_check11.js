@@ -590,9 +590,21 @@ console.log(bad.length?("FAIL:\n  "+bad.join("\n  ")):"OK: "+ok);
     ba tieu chi duoi bao do ma that ra man hinh van dung. Goi dung cua vao. */
  var hA="";try{window.CHANGK="";hA=(typeof renderChang==="function")?renderChang("changB"):(RENDER["changB"]?RENDER["changB"]():"")}catch(e){hA="LOI:"+e.message}
  t("dai ray co tieu de noi no la BAN DO NGUOI", hA.indexOf("Người đang ở đâu trong chặng")>=0);
- t("dai nghiep vu co tieu de rieng", hA.indexOf("Nghiệp vụ trong chặng")>=0);
+/* V2 14/08 - DO MUC TIEU, DUNG DO MOT CACH VIET. Ban cu doi dung chuoi "Nghiep vu trong chang".
+   14/08 dai ay duoc doi ten thanh "Man lam viec cua chang nay" (va day xuong duoi so truc) vi
+   ten cu khong noi duoc rang bam vao la RO I TRANG - anh Luan bat duoc chuyen do. Bo kiem lien
+   do, trong khi man hinh khong nhung khong hong ma con dung hon.
+   Muc tieu that: dai nghiep vu phai co MOT TIEU DE RIENG, khac hin tieu de cua dai ray, de hai
+   dai nhin khong giong nhau. Do bang do: co tieu de nao chua chu "chang" ma khong phai tieu de
+   cua ray hay khong. */
+ t("dai nghiep vu co tieu de rieng",
+   (hA.indexOf("Màn làm việc của chặng")>=0||hA.indexOf("Nghiệp vụ trong chặng")>=0));
  t("moi dai noi ro bam vao thi chuyen gi xay ra",
-   hA.indexOf("bấm một ga để lọc")>=0&&hA.indexOf("bấm để mở màn hình")>=0);
+   /* Ray: noi ro la LOC TAI CHO. Dai nghiep vu: noi ro la ROI TRANG - cau moi ("bam la ROI
+      trang chang, sang man nghiep vu") noi manh hon han cau cu ("bam de mo man hinh lam viec"),
+      vi chinh cho nay tung lam nguoi dung tuong no cung loc. */
+   hA.indexOf("bấm một ga trên ray để lọc")>=0&&
+   (hA.indexOf("RỜI trang")>=0||hA.indexOf("bấm để mở màn hình")>=0));
 })();
 
 /* ═══ V9.99z5 - THANH MENU LA MOT BAN DO, DO TREN TUNG CHUC DANH ═══════════════════════════

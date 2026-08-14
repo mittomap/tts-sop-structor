@@ -2094,7 +2094,16 @@ body.drsz .drawer{transition:none}
    moi dong mot cho. Xuong hang duoi ten thi no luon bat dau tu cung mot mep trai, va hang
    tren chi con mot viec la doc ten. */
 .obcards.rows .obcard .obh{flex:1 1 0;min-width:0;overflow:hidden;display:block}
-.obcards.rows .obcard .obst{display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:nowrap;min-width:0}
+/* Cum nay bi day sang PHAI vi mot trong may thu ben trong (dai chi so mstrip / chip trang thai)
+   mang san  tu cho khac - hoi do no dung cung hang voi ten va can duoc day ve
+   mep phai. Xuong hang rieng roi thi cai le tu dong ay thanh vo nghia, ma no van con day.
+   *Doi mot thu sang cho khac thi phai go luon may cai neo no mang theo tu cho cu.* */
+/* Cum nay bi day sang PHAI vi mot trong may thu ben trong (dai chi so mstrip / chip trang
+   thai) mang san margin-left:auto tu cho khac - hoi do no dung CUNG HANG voi ten va can duoc
+   day ve mep phai. Xuong hang rieng roi thi cai le tu dong ay thanh vo nghia, ma no van con
+   day. *Doi mot thu sang cho khac thi phai go luon may cai neo no mang theo tu cho cu.* */
+.obcards.rows .obcard .obst{display:flex;align-items:center;justify-content:flex-start;gap:8px;margin-top:5px;flex-wrap:nowrap;min-width:0}
+.obcards.rows .obcard .obst>*{margin-left:0!important}
 /* Khoi ten van dang la FLEX (khai o dong tren), nen `.obst` du da duoc boc rieng van nam CUNG
    HANG voi ten - them mot cai the boc thoi chua du, phai doi luon cach xep cua cai bao no.
    Nay khoi ten la block: hang mot = ten + lop (mot dong, cat bang ba cham), hang hai = `.obst`. */
@@ -3099,6 +3108,12 @@ var PAGES=[
 {k:"dsbaitap",g:"Tra cứu",ic:"ti-book",t:"Sổ bài tập",c:"Tra cứu bài tập",ty:"list"},
 {k:"dswow",g:"Tra cứu",ic:"ti-star",t:"Sổ WOW 1-1",c:"Tra cứu buổi WOW",ty:"list"},
 {k:"dsphuhuynh",g:"Tra cứu",ic:"ti-users",t:"Sổ phụ huynh",c:"Người đồng hành và các con",ty:"custom"},
+/* V2 14/08 - SO CAM KET DA KY (anh Luan chot). Dau da ky nam rai trong tung ho so onboarding,
+   muon biet "ai da ky, ky ban nao" thi phai mo tung ho so mot ma do. So nay gom lai mot cho, va
+   quan trong nhat la chi ra duoc AI DANG KY O BAN CU - vi noi dung sua duoc o Cai dat, nen sau
+   moi lan sua se co mot nhom nguoi mang chu ky vao mot ban khong con hieu luc. Khong co man nay
+   thi cai nhom do vo hinh. */
+{k:"socamket",g:"Tra cứu",ic:"ti-file-check",t:"Sổ cam kết đã ký",c:"Ai đã ký quy định lớp học, ký bản nào, ký bằng đường nào",ty:"custom"},
 /* V9.92 - trang meta cua dot dung thu: khong phai nghiep vu SOP, nhung la cho duy nhat
    giu cho gop y khong troi. Ai cung thay duoc (VIEW_ALWAYS) vi ai cung co quyen gop y. */
 /* V9.94: trang CA NHAN - thoi quen cua mot nguoi tren mot may, khac han Cai dat cua trung tam. */
@@ -4391,6 +4406,10 @@ var THEDEF={
   ["lr_chuanx","Buổi quá hạn chưa nhận xét","Buổi dạy xong đã quá ngưỡng giờ ghi nhận xét (chỉnh ở Cài đặt, slaTeacherNote_hours) mà giáo viên chưa ghi. Muốn xem: tab Buổi học, dòng nào quá hạn hiện đỏ."],
   ["lr_chuacham","Bài đã nộp chưa chấm","Học viên đã nộp mà chưa ai chấm - nộp rồi để đó là người học chờ vô ích. Muốn xem: tab Bài tập."],
   ["lr_no","Học viên còn nợ","Đếm số học viên của lớp còn khoản phải thu, cộng mọi đơn chưa huỷ của người đó. Một người nợ hai đơn vẫn tính là một. Muốn xem: trang Thanh toán, lọc theo lớp."]]},
+ socamket:{t:"Sổ cam kết đã ký",ttl:"Tình hình ký cam kết",the:[
+  ["ck_ban","Đã ký bản hiện hành","Tỷ lệ hồ sơ đã ký mà chữ ký nằm ở BẢN QUY ĐỊNH ĐANG CÓ HIỆU LỰC. Nội dung sửa được ở Cài đặt, nên sau mỗi lần sửa sẽ có một nhóm người mang chữ ký vào bản cũ - tỷ lệ này là thứ nói ra điều đó. Danh sách: bảng ngay dưới, cột Bản."],
+  ["ck_cu","Đang giữ chữ ký ở bản cũ","Số hồ sơ đã ký nhưng ký vào một bản quy định đã bị thay. Họ VẪN tính là đã ký - nhưng học vụ cần biết để quyết có mời ký lại không. Danh sách: bảng dưới, dòng có chip vàng ở cột Bản."],
+  ["ck_chua","Chưa ký","Hồ sơ onboarding chưa có dấu ký và cũng chưa từ chối - đang chờ học viên bấm đồng ý ở cổng của họ. Danh sách: trang Xếp lớp & Onboarding, chip \"Chờ HV ký cam kết\"."]]},
  dsphuhuynh:{t:"Sổ phụ huynh",the:[
   /* 14/08 - "ph_nguoi" và "ph_nhieu" đã bỏ: một cái là số dòng của bảng ngay dưới, cái kia là
      một phép lọc của chính bảng ấy. Tên từng con vẫn nằm ở cột thứ hai của mỗi dòng. */
@@ -11791,6 +11810,22 @@ function renderHoso(){
    kv("Đã giới thiệu",_used>0?('<span class="chip green">'+_used+' bạn</span>'):'<span class="mut">chưa có</span>')+
    '<div style="margin-top:8px"><button class="btn sm" onclick="hvCopy(\''+esc(_code)+'\',\'Đã sao chép mã '+esc(_code)+'\')"><i class="ti ti-copy"></i>Sao chép mã</button></div>');}
  h+='</div></div><div>';
+ /* V2 14/08 - BAN CAM KET DA KY, dat NGAY TREN dong thoi gian. Day la giay to co suc nang phap
+    ly cua ho so: khi tranh chap ve nghi hoc, bao luu hay hoan phi thi cau hoi dau tien la "em ay
+    da ky cai gi". Nen no phai doc duoc NGUYEN VAN ban DA KY (ban chup luu luc bam), khong phai
+    ban dang hien hanh o Cai dat - hai ban ay co the da khac nhau tu lau. */
+ (function(){var _ob=(C.ob||[]).filter(function(x){return String(x.commit_at||"").trim()})
+   .sort(function(a,b){return (pvnd(b.commit_at)||0)-(pvnd(a.commit_at)||0)})[0];
+  if(!_ob)return;
+  var _cu=String(_ob.commit_version||"")&&String(_ob.commit_version||"")!==commitVer();
+  h+='<div class="panel"><div class="ph"><b><i class="ti ti-file-check" style="margin-right:6px"></i>Quy định &amp; cam kết đã ký</b>'+
+   (_cu?'<span class="chip amber" style="margin-left:auto">ký ở bản cũ '+esc(_ob.commit_version)+' · bản hiện hành '+esc(commitVer())+'</span>':'<span class="chip green" style="margin-left:auto">bản hiện hành</span>')+
+   '</div><div class="pbody">'+
+   ctxRows([["Ký lúc",esc(_ob.commit_at||"-")],["Bản",esc(_ob.commit_version||"-")],
+    ["Đường ký",esc(_ob.commit_kenh||"học viên tự ký ở cổng")],
+    ["Người ghi nhận",esc(_ob.commit_by?nsTen(_ob.commit_by):"-")],
+    ["Ảnh bản đã ký",esc(_ob.commit_anh||"-")]])+
+   commitHTML(_ob.commit_text,_ob.commit_version)+'</div></div>'})();
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-timeline" style="margin-right:6px"></i>Dòng thời gian</b></div><div class="pbody">'+jTimeline(C)+'</div></div>';
  /* V9.31: "AI ĐÃ SỬA HỒ SƠ NÀY" - dòng thời gian kể chuyện NGHIỆP VỤ (đã test, đã đóng tiền),
     còn cái này kể chuyện THAO TÁC (ai bấm gì, đổi ô nào). Hai câu hỏi khác nhau, để cạnh nhau
@@ -25717,6 +25752,47 @@ function phNo(P){var t=0;phCon(P).forEach(function(c){
   ttDonCua(c.student_id).forEach(function(e){t+=num(e.remaining_amount)})});return t}
 function phNguyCo(P){return phCon(P).filter(function(c){
   return stCls(c.attendance_progress_status)==="red"||stCls(c.academic_progress_status)==="red"}).length}
+function renderSoCamKet(){
+ var ban=commitVer();
+ var ds=srows("DL08").filter(function(o){return String(o.commit_at||"").trim()})
+  .sort(function(a,b){return (pvnd(b.commit_at)||0)-(pvnd(a.commit_at)||0)});
+ var cu=ds.filter(function(o){return String(o.commit_version||"")!==ban});
+ var tt=srows("DL08").filter(function(o){return isc(o.class_confirmation_status,"confirmed")});
+ var chua=srows("DL08").filter(function(o){return !isc(o.class_confirmation_status,"confirmed")&&!isc(o.class_confirmation_status,"rejected")});
+ var h=pageHead("Sổ cam kết đã ký","Ai đã ký quy định lớp học và cam kết, ký bản nào, ký bằng đường nào - và ai còn đang ký ở bản cũ");
+ h+=statStrip([
+  (function(){var tl=tt.length?Math.round((tt.length-cu.length)*100/tt.length):null;
+   return ["ti-file-check",(tl==null?"-":tl+"%"),"Đã ký bản hiện hành",(tl==null?"#6B7887":(tl>=100?"#2E9E6B":"#E08A1E")),
+    (tt.length-cu.length)+"/"+tt.length+" hồ sơ · bản "+ban]})(),
+  ["ti-history",cu.length,"Đang giữ chữ ký ở bản cũ",(cu.length?"#E08A1E":"#2E9E6B"),cu.length?"cân nhắc mời ký lại":"không còn ai"],
+  ["ti-clock",chua.length,"Chưa ký",(chua.length?"#E24B4A":"#2E9E6B"),"đang chờ học viên ký ở cổng"]],"socamket",["ck_ban","ck_cu","ck_chua"]);
+ h+='<div class="panel"><div class="ph"><b>Danh sách đã ký ('+ds.length+')</b><span class="mut" style="margin-left:auto;font-size:11px">bấm tên để mở hồ sơ đầy đủ</span></div><div class="pbody">';
+ if(!ds.length)h+='<div class="empty">Chưa có hồ sơ nào ký cam kết.</div>';
+ else{
+  h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Lớp</th><th>Ký lúc</th><th>Bản</th><th>Đường ký</th><th>Người ghi nhận</th><th>Ảnh</th><th></th></tr></thead><tbody>';
+  ds.forEach(function(o){var _cu=String(o.commit_version||"")!==ban;
+   h+='<tr><td>'+nguoiLnk(o.student_id,o.student_id_name)+'</td>'+
+    '<td>'+lopLnk(o.class_id,o.class_id_name,"chưa xếp")+'</td>'+
+    '<td>'+esc(o.commit_at||"")+'</td>'+
+    '<td>'+(_cu?'<span class="chip amber">'+esc(o.commit_version||"?")+' · bản cũ</span>':'<span class="chip green">'+esc(o.commit_version||"")+'</span>')+'</td>'+
+    '<td>'+esc(o.commit_kenh||"học viên tự ký ở cổng")+'</td>'+
+    '<td>'+esc(o.commit_by?nsTen(o.commit_by):"-")+'</td>'+
+    '<td>'+(o.commit_anh?'<span class="chip blue">có ảnh</span>':'<span class="mut">-</span>')+'</td>'+
+    '<td><button class="btn sm" onclick="ckXem(\''+esc(o.onboarding_id)+'\')"><i class="ti ti-file-text"></i>Xem bản đã ký</button></td></tr>'});
+  h+='</tbody></table></div>';}
+ h+='</div></div>';
+ return h}
+/* Mo NGUYEN VAN ban DA KY cua mot ho so - khong phai ban dang hien hanh o Cai dat. Hai ban ay co
+   the da khac nhau tu lau, va thu co gia tri lam bang chung la ban ho DA doc luc bam. */
+function ckXem(obid){var o=find("DL08","onboarding_id",obid);if(!o){toast("Không thấy hồ sơ.");return}
+ var h='<div class="dcard"><h4><i class="ti ti-file-check"></i>Bản cam kết đã ký - '+esc(o.student_id_name||o.student_id||"")+'</h4>';
+ h+=ctxRows([["Lớp",esc(o.class_id_name||o.class_id||"-")],["Ký lúc",esc(o.commit_at||"-")],
+  ["Bản",esc(o.commit_version||"-")+(String(o.commit_version||"")!==commitVer()?" (bản cũ - hiện hành là "+esc(commitVer())+")":"")],
+  ["Đường ký",esc(o.commit_kenh||"học viên tự ký ở cổng")],
+  ["Người ghi nhận",esc(o.commit_by?nsTen(o.commit_by):"-")],
+  ["Ảnh bản đã ký",esc(o.commit_anh||"-")]]);
+ h+=commitHTML(o.commit_text,o.commit_version)+'</div>';
+ openDrawer("Bản cam kết đã ký",h)}
 function renderSoPH(){
  var ds=phDS().filter(function(P){
    try{return phCon(P).some(function(c){return canRow("DL09",c)})}catch(e){return true}});
@@ -25940,7 +26016,7 @@ function banNutHoSo(ttk,r){
  if(ttk==="hocvien")return '<button class="btn" onclick="window.HOSO=\''+esc(r.student_id)+'\';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>';
  return '<button class="btn" onclick="openLop(\''+esc(r.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Mở lớp</button>'}
 
-var RENDER={ban:renderBan,canhan:renderCanhan,dsphuhuynh:renderSoPH,hoidap:renderHoidap,tracuu:renderTracuu,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,lichwow:renderLichWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,ketqua:renderKetqua,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong,tinnhan:renderTinnhan};
+var RENDER={ban:renderBan,canhan:renderCanhan,dsphuhuynh:renderSoPH,socamket:renderSoCamKet,hoidap:renderHoidap,tracuu:renderTracuu,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,lichwow:renderLichWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,ketqua:renderKetqua,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong,tinnhan:renderTinnhan};
 /* ═══ V2 - 25 NGHIỆP VỤ, 25 TRANG ═══════════════════════════════════════════════════════════
    Anh Luân: *"Mỗi nghiệp vụ 1 trang, vẫn sắp xếp được theo chặng trên sidebar, nhưng mỗi trang
    là nghiệp vụ riêng, và nó có thẻ, có chip lọc, có cảnh báo của riêng nó."*

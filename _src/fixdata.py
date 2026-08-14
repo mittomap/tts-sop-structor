@@ -3303,6 +3303,40 @@ for _i, _s in enumerate(_dsNX):
 log.append("19. Cot moi: cancel_reason (DL11/DL14) + duyet nhan xet %d da duyet / %d cho duyet"
            % (_daSoat, _choSoat))
 
+# ═══ 20. QUY DINH LOP HOC & CAM KET - GIEO DAU DA KY (14/08) ═════════════════════════════
+# Cua ky moi luu bon cot: ban chup noi dung, so hieu ban, ai ghi nhan, ky bang duong nao.
+# PHAI GHI CHO MOI DONG DL08 ke ca dong de trong - `check_logic` luat 14a doi moi dong trong
+# cung mot bang phai CUNG BO COT. Them cot cho vai dong roi bo qua so con lai la bang ay lech
+# ngay, ma cai lech do khong hien ra mat cho toi luc ai do mo dung mot dong thieu cot.
+_BANCK = "1.0"
+_TXTCK = (u"1. Đi học đúng giờ. Vào lớp trễ quá 15 phút tính là buổi muộn.\n"
+          u"2. Nghỉ học phải báo trước ít nhất 24 giờ qua học vụ; nghỉ không báo tính là vắng không phép.\n"
+          u"3. Làm và nộp bài tập về nhà đúng hạn giáo viên giao.\n"
+          u"4. Giữ trật tự, tôn trọng giáo viên và các bạn cùng lớp.\n"
+          u"5. Học phí đã đóng được bảo lưu theo chính sách của trung tâm; không hoàn tiền khi đã học quá số buổi quy định.\n"
+          u"6. Trung tâm có quyền đổi giáo viên hoặc dời lịch khi có lý do chính đáng, và sẽ báo trước cho học viên.")
+_daKy = 0
+_nvGhi = [x for x in R("DL01") if str(x.get("staff_id") or "").strip()][:5]
+for _i, _o in enumerate(R("DL08")):
+    for _k in ("commit_version", "commit_text", "commit_at", "commit_by", "commit_kenh", "commit_anh"):
+        _o.setdefault(_k, "")
+    if "confirmed" not in code(_o.get("class_confirmation_status")):
+        continue
+    _moc = dt(_o.get("confirmation_time")) or NOW
+    _o["commit_version"] = _BANCK
+    _o["commit_text"] = _TXTCK
+    _o["commit_at"] = fmt(_moc)
+    # Cu bay ho so thi mot ho so ky TAI TRUNG TAM (co anh, co nguoi ghi nhan); con lai tu ky
+    # o cong hoc vien - de demo co ca hai duong, doc ho so la thay khac nhau cho nao.
+    if _nvGhi and _i % 7 == 0:
+        _nv = _nvGhi[_i % len(_nvGhi)]
+        _o["commit_by"] = str(_nv.get("staff_id") or "")
+        _o["commit_kenh"] = u"tại trung tâm"
+        _o["commit_anh"] = u"cam-ket-%s.jpg" % str(_o.get("student_id") or "")
+    _daKy += 1
+log.append("20. Cam ket lop hoc: %d ho so co dau da ky / %d ho so onboarding"
+           % (_daKy, len(R("DL08"))))
+
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("  12. Da tao DL22 referral +", len(dl["DL22"]), "luot | DL19 thuong:", len(dl["DL19"]))
 for _l in log[-6:]: print("  "+_l)
