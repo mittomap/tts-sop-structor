@@ -4831,8 +4831,16 @@ function gvTaiBang(){
     if(!String(w.wow_content_note||"").trim())t.__nxno++;
     if(d&&d>=m0){
      t.__wow++;
-     var a2=pvnd(w.wow_start_actual),z2=pvnd(w.wow_end_actual);
-     if(a2&&z2&&z2>a2)t.__giothang+=Math.round((z2-a2)/36e5);
+     /* ═══ (anh Luân: *"muốn tách biệt thì cứ phân biệt bằng cột: giờ dạy của giáo viên, buổi
+        wow và buổi test của wow coach"*) ═════════════════════════════════════════════════════
+        Bản trước em CỘNG giờ WOW vào cột "Giờ dạy tháng" cho WOW coach khỏi trống - tức là nhét
+        hai đơn vị đo khác nhau vào một cột để cột nào cũng có số. Nhưng đó đúng là kiểu làm mà
+        bảng công đã tránh từ V9.40c: lớp trả theo GIỜ, WOW và test trả theo LẦN. Gộp lại thì con
+        số 6 ở cột "Giờ dạy tháng" của một WOW coach không so được với con số 19 của giáo viên -
+        hai cái đo hai thứ.
+        Nay mỗi việc một cột, cột nào không phải việc của người đó thì để 0. Số 0 ở đây nói đúng
+        một điều thật: *người này không làm việc ấy* - và cột bên cạnh nói họ làm việc gì.
+        *Đừng lấp một ô trống bằng một con số đo thứ khác - ô trống thành thật hơn.* */
      /* "Học viên" của một WOW coach là số em KHÁC NHAU đã kèm trong tháng - không phải sĩ số
         lớp (họ không có lớp). Cùng một câu hỏi "đang phụ trách bao nhiêu em", đo bằng thứ có
         thật ở mỗi đường làm việc. */
