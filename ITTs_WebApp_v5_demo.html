@@ -2862,7 +2862,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>7da055</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>ce2a41</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -3657,7 +3657,11 @@ var SENSITIVE={duyet:1,settings:1,baocao:1};
      Kế toán           -> Tài chính
    "Giao việc" thì mọi chức danh đều có - đó là hộp việc nội bộ, ai cũng nhận được. */
 var ROLESCOPE={
- quantri:{match:null,land:"banlam",pages:"*",blocks:"*",mine:0,mineBtn:0,kpi:0,bell:"*"},
+ /* V2 14/08 BƯỚC 2 - TRANG ĐÁP ĐỔI TỪ `banlam` SANG `viec`. Bàn làm việc nay là Việc hôm nay:
+    nó ôm nhịp ngày, "Cần chú ý" và bảng việc theo chức danh. Để trang đáp ở `banlam` thì mở
+    app ra không thấy nhịp ngày của mình - `_checkv2` L1 bắt đúng ba chức danh sale ngay lượt
+    chạy đầu sau khi dời khối. *Dời một khối thì phải dời cả chỗ người ta đứng để nhìn nó.* */
+ quantri:{match:null,land:"viec",pages:"*",blocks:"*",mine:0,mineBtn:0,kpi:0,bell:"*"},
  /* V9.99m (anh Luân 04/08: *"CEO em cũng cho full quyền mọi thứ giống Admin, trừ mấy cái quyền
     liên quan đến hệ thống"*).
     Đo trước khi sửa: CEO ĐÃ bằng đúng Admin - 36 trang, 31 hành động CH3, 20 tab Cài đặt, không
@@ -3672,7 +3676,7 @@ var ROLESCOPE={
  dieuhanh:{match:/^ceo$/,land:"baocao",pages:"*",blocks:"*",mine:0,mineBtn:0,kpi:0,bell:"*",
   tabs:{settings:["tongquan","brand","menu","ch2","ch6","ch4","goiy","the","ch1","tro","nhip",
    "huongdan","qa","staff","giagio","khoa","nhatky"]}},
- tuvan:{match:/^sales/,land:"banlam",
+ tuvan:{match:/^sales/,land:"viec",
   pages:["viec","banlam","hanhtrinh","hocvien","giangvien","hosogv","tuyensinh","ketthuc","ketqua","khac","duyet","tinnhan"],
   tabs:{khac:["magioithieu"],duyet:["banggiao"]},
   blocks:["appt","new","contacted","test_done","enrolled","reup"],
@@ -3955,7 +3959,7 @@ function applyScope(sid){var eff;
     cùng một tab - nhìn y như trang bị đơ.
     Nay dựng THẲNG từ ROLESCOPE.quantri chứ không mượn nhóm khác rồi vá: mượn rồi vá thì bỏ sót
     một ô là im lặng sai, và không ai đọc ra được. */
- if(!sid){eff=({group:"quantri",land:"banlam",pages:"*",blocks:"*",bell:"*",tabs:null,
+ if(!sid){eff=({group:"quantri",land:"viec",pages:"*",blocks:"*",bell:"*",tabs:null,
    lite:0,kpi:0,mine:0,mineBtn:0,name:"Quản trị viên · toàn quyền"})}
  else{var st=find("DL01","staff_id",sid);eff=buildScope(st?ecode(st.role):"")}
  window.SCOPEEFF=eff;window.MINEONLY=eff.mine?1:0;
@@ -8160,9 +8164,22 @@ function renderViec(){var items=bellItems();
   var x=VIECNHOMBY[a],y=VIECNHOMBY[b];
   return (x==null?9999:x)-(y==null?9999:y)||(a<b?-1:a>b?1:0)});
  var view=scoped.filter(function(it){return grp==="all"||it.grp===grp});
+ /* ═══ V2 14/08 - GỘP HAI BÀN LÀM VIỆC VỀ MỘT (anh Luân: *"thói quen của 1 người là ko thích
+    vào 2 trang kiểu vậy, mà chỉ cần 1 trang thì phải"* · *"việc hôm nay có vẻ đang tốt hơn, xem
+    trang bắt đầu có gì hay thì mang sang, còn ko quan trọng thì bỏ đi"*) ══════════════════════
+    Đo trước khi gộp, 16 chức danh:
+    · Nhịp ngày có ở CẢ HAI trang.
+    · "Cần chú ý" và "Bảng việc theo chức danh" chỉ có ở Trang bắt đầu.
+    · Danh sách: Trang bắt đầu 1.475 hồ sơ hành trình khách · Việc hôm nay 2.329 mục trên MỌI bảng.
+    · Và điểm quyết định: **Trang bắt đầu là trang đáp của đúng 3/16 chức danh**. 13 chức danh
+      còn lại đáp xuống trang nghiệp vụ của họ, không bao giờ đi qua Trang bắt đầu - mà vẫn phải
+      nhìn nó nằm đầu sidebar và vẫn bị vẽ lại nhịp ngày lần thứ hai.
+    Nay hai khối đáng giá ấy về đây, chỗ có danh sách đầy đủ hơn. Trang bắt đầu co lại còn đúng
+    phần riêng của nó: chạy quy trình cho TỪNG hồ sơ và bản đồ chặng. */
  var h=pageHead("Việc hôm nay",
-  "Mọi việc trung tâm đang nợ, gom từ toàn bộ luật SLA. Đây là chỗ dọn việc; muốn xử lý từng người thì vào Trang bắt đầu.",
-  "");   /* V9.59: nút "Bỏ lọc mức độ" bỏ đi - chip "Tất cả" ở thanh Mức độ đã làm đúng việc đó */
+  "Bàn làm việc của bạn: chỗ bất thường cần để mắt, nhịp việc theo buổi, và mọi việc trung tâm đang nợ theo luật SLA. Muốn chạy quy trình cho từng hồ sơ thì vào Chạy quy trình & Bản đồ chặng.",
+  "");
+ h+=canhBaoHTML();   /* V9.59: nút "Bỏ lọc mức độ" bỏ đi - chip "Tất cả" ở thanh Mức độ đã làm đúng việc đó */
  /* V9.59: dải thẻ ở đây trước là dải BẤM ĐƯỢC (bấm ô nào lọc ô đó). Nay thẻ chỉ để xem - việc
     lọc dời hẳn xuống thanh "Mức độ" ngay dưới, để một việc chỉ có ĐÚNG MỘT chỗ làm. */
  /* V2 13/08 - HAI THẺ "Quá hạn" và "Sắp tới hạn" ĐÃ BỎ: thanh Mức độ ngay dưới có đúng hai chip
@@ -8197,6 +8214,10 @@ function renderViec(){var items=bellItems();
  /* V9.99z5: nhịp ngày của chức danh đứng ngay đây - đọc "hôm nay tôi làm gì theo buổi" trước,
     rồi mới xuống hàng chờ chi tiết. Trang khác không có khối này (một việc một chỗ). */
  h+=nhipPanel();
+ /* Bảng việc theo chức danh (BC9) chuyển từ Trang bắt đầu sang đây. Nó trả lời "việc của CHỨC
+    DANH tôi", còn danh sách dưới trả lời "việc của TOÀN trung tâm đang nợ" - hai câu khác nhau,
+    đứng cùng một trang thì đọc một lượt là đủ, không phải mở trang thứ hai. */
+ try{h+=bangViecHTML()}catch(e){}
  /* V9.59: lọc theo mức độ nay là một THANH LỌC đúng nghĩa, không còn nấp trong cái nút "Chỉ quá
     hạn" và trong mấy cái thẻ. Một việc - một chỗ làm. */
  var msegs=[["","Tất cả",items.length,""],["red","Quá hạn",redn,"red"],["amber","Sắp tới hạn",ambn,"amber"]];
@@ -11608,9 +11629,15 @@ function renderBanlam(){
  /* Nhịp ngày vốn đi kèm bảng việc trong `bvSau()`; ở riêng trang này em tách nó ra để ghép
     cặp với "Cần chú ý". Tách bằng cách gọi thẳng HAI hàm con mà `bvSau()` vẫn gọi, không viết
     lại phép dựng nào - trang khác vẫn dùng `bvSau()` y như cũ. */
- var _cbao=canhBaoHTML(), _nhip="";
- try{_nhip=nhipSau()}catch(e){_nhip=""}
- h+=_nhip?('<div class="bl2c">'+_cbao+_nhip+'</div>'):_cbao;
+ /* ═══ V2 14/08 BƯỚC 2 - TRANG NÀY CO LẠI CÒN ĐÚNG PHẦN RIÊNG CỦA NÓ ═══════════════════════
+    "Cần chú ý", "Nhịp ngày" và "Bảng việc theo chức danh" đã sang trang Việc hôm nay (xem ghi
+    chú ở `renderViec`). Giữ lại ở đây là nói hai lần một chuyện trên hai trang - đúng thứ anh
+    Luân vừa chỉ. Phần RIÊNG của trang này, không trang nào khác có: chạy quy trình cho TỪNG hồ
+    sơ theo đúng chặng người đó đang đứng, và bản đồ chặng.
+    Vẫn giữ một đường dẫn sang Việc hôm nay để ai quen vào đây không bị cụt. */
+ h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>'+
+  'Chỗ bất thường, nhịp ngày và bảng việc của chức danh nay gom ở <b>Việc hôm nay</b>. '+
+  '<a class="lnk" onclick="go(\'viec\')">Mở Việc hôm nay</a></div>';
  function cS(k){return all0.filter(function(J){return J.k===k&&J.act}).length}
  var nRisk=srows("DL09").filter(stuRisk).length;
  var nDebt=srows("DL06").filter(function(e){return num(e.remaining_amount)>0&&!/cancel/.test(ecode(e.enrollment_status))}).length;
@@ -11645,9 +11672,7 @@ function renderBanlam(){
   "banlam",blocks.map(function(b){return b[6]}));
  /* V9.18: GỘP "Hành trình" vào Trang bắt đầu - một trang, hai góc nhìn (danh sách chạy / bảng chặng) */
  var vw=window.BLVIEW||"list";
- h+=bangViecHTML();   /* V9.60: Trang bắt đầu cũng không gọi pageHead - bảng việc của Tư vấn và
-                 của Quản lý vì thế chưa từng hiện. Gắn sau dải thẻ, trước thanh chọn góc nhìn.
-                 (Nhịp ngày - vế còn lại của `bvSau()` - đã lên trên, ghép cặp với "Cần chú ý".) */
+ /* Bảng việc theo chức danh đã sang Việc hôm nay (bước 2, 14/08) - không vẽ lại ở đây. */
  h+='<div style="margin:2px 0 10px">'+segHTML(vw,[["list","Chạy quy trình",null,""],["board","Bảng chặng - hành trình",null,""]],"window.BLVIEW='{k}';reRender(CUR)")+'</div>';
  if(vw==="board"){h+=renderHanhtrinh(1);return h}   /* KPI đã nằm trên đầu trang */
  /* CHẠY QUY TRÌNH gộp thẳng vào đây: chip lọc + danh sách người */
