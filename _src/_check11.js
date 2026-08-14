@@ -673,6 +673,12 @@ console.log(bad.length?("FAIL:\n  "+bad.join("\n  ")):"OK: "+ok);
    for(var tb in mm)NV25[mm[tb]]=1});
   Object.keys(NV25).forEach(function(tr){
    if(!PBK[tr])return;
+   /* 14/08 - BO QUA TRANG DA KHAI `hide`. `HUBTAB.m` la ban khai "25 nghiep vu rieng" viet tu
+      thoi con hub; mot nghiep vu trong do co the ve sau duoc GOP vao trang khac va khoa trang cu
+      thanh BI DANH (`ychv` -> tab "Tu hoc vien" cua Giao viec, 14/08). Trang bi danh van con de
+      moi loi cu khong chet, nhung no khai `hide` - doi no phai co muc menu la doi mot thu da co
+      y khong con dung mot minh. *Ban khai cu van dung ve NGHIEP VU, chi khong con dung ve TRANG.* */
+   if(PBK[tr].hide)return;
    var thay=false;try{thay=navVis(tr)}catch(e){return}
    if(thay&&menu.indexOf(tr)<0)xTab.push(vai+" xem duoc trang "+tr+" ma khong co muc tren sidebar");
    if(!thay&&menu.indexOf(tr)>=0)xTab.push(vai+" khong duoc xem "+tr+" ma menu van moi vao")});

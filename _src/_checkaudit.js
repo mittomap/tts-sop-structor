@@ -178,7 +178,16 @@ setRole("all");
     khi app khong he doi. Hoi THANG cai bang do luc chay - dung do khoang cach chu. */
  var oCskh=!!(typeof HUBTAB!=="undefined"&&HUBTAB.cskh&&HUBTAB.cskh.m&&HUBTAB.cskh.m.ychv==="ychv");
  t("cổng nhân viên có màn nhận yêu cầu học viên (hub CSKH)", oCskh);
- t("yêu cầu học viên có mục riêng trên menu trái", /items:\["banlam","viec","ychv"/.test(SRC));
+ /* 14/08 - HOI DUNG DIEU CAN BAO VE, KHONG HOI DUNG MOT CHUOI KHAI. Cau cu do chinh xac chuoi
+    `items:["banlam","viec","ychv"` trong ma nguon - tuc no canh CACH VIET, khong canh viec
+    "nguoi ta co loi vao yeu cau hoc vien khong". Tu 14/08 `ychv` la BI DANH, noi dung nam o tab
+    "Tu hoc vien" cua Giao viec, va Giao viec thi CO muc menu. Dieu can bao ve van nguyen: phai
+    co MOT loi tren sidebar di toi cho nhan yeu cau hoc vien.
+    *Mot phep do bam vao cach viet se do khi cach viet doi, du dieu no canh van con nguyen.* */
+ var loiYc=/{g:"Làm việc",items:\[[^\]]*"giaoviec"/.test(SRC);
+ var tabYc=/\["hv","Từ học viên"/.test(SRC)&&/if\(key==="ychv"\)\{window\.TKTAB="hv"/.test(SRC);
+ t("yêu cầu học viên có lối vào từ sidebar (tab Từ học viên của Giao việc)", loiYc&&tabYc,
+   "menu Giao việc: "+loiYc+" · tab + bí danh: "+tabYc);
 })();
 
 /* --- Nghiệp vụ có ĐỦ HAI CHIỀU chưa: giao đi thì lấy lại được không ---
@@ -464,10 +473,15 @@ var CH3_NGOAIBAN={
     Luật rút ra: đo trên hàm con là đo một nhánh; phải đo trên CỬA VÀO THẬT mới đủ mọi nhánh. */
  /* V9.99z11 - khoi do "ban v6 dap xuong dau" da bo cung voi ban v6 (anh Luan 06/08:
     *"bo v6, ko duoc lam anh huong v5"*). Giu lai dung ve con y nghia: ban dang chay phai dap
-    xuong Trang bat dau. */
+    xuong BAN LAM VIEC.
+    14/08 - BAN LAM VIEC NAY LA `viec`, KHONG CON LA `banlam`. Anh Luan cho gop hai trang:
+    *"viec hom nay co ve dang tot hon, xem trang bat dau co gi hay thi mang sang"*. Trang bat dau
+    co lai con Chay quy trinh + Ban do chang, con nhip ngay / Can chu y / bang viec chuc danh da
+    ve `viec`. Thuoc nay hoi "co dap xuong ban lam viec khong" chu khong hoi "co dap xuong DUNG
+    CAI TEN banlam khong" - nen sua ten, giu nguyen dieu can bao ve. */
  (function(){
   applyScope("");
-  t("moi loi vao deu dap xuong Trang bat dau", SCOPE().land==="banlam", "dang dap xuong "+SCOPE().land);
+  t("moi loi vao deu dap xuong ban lam viec (Viec hom nay)", SCOPE().land==="viec", "dang dap xuong "+SCOPE().land);
   applyScope("");CURSTAFF="";
  })();
 

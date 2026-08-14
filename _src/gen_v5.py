@@ -3302,7 +3302,11 @@ var PAGES=[
    việc quan trọng nên nó phải có ĐƯỜNG RIÊNG trên menu trái, không bắt người ta nhớ rằng nó
    nằm trong tab thứ tư của trang CSKH. Không đẻ trang mới: khoá này là bí danh, go() đưa về
    đúng hub CSKH mở sẵn tab đó - y như cách các hàng Chờ duyệt đang làm. */
-{k:"ychv",g:"_",ic:"ti-school",t:"Học viên liên hệ",c:"Học viên gửi lên từ Cổng học viên - nhận và trả lời ngay",ty:"custom"},
+/* V2 14/08 - `hide:1`: đây KHÔNG còn là một trang, nó là BÍ DANH trỏ sang tab "Từ học viên" của
+   Giao việc. Giữ bản khai để mọi chỗ đang đọc tên/biểu tượng của nó (ô cảnh báo `bv_ychv`, nhịp
+   ngày, bảng việc) vẫn có cái để đọc; nhưng khai `hide` để không bộ kiểm nào còn đòi nó phải có
+   mục menu - `_check11` bắt đúng ba chức danh "xem được trang mà không có mục trên sidebar". */
+{k:"ychv",g:"_",hide:1,ic:"ti-school",t:"Học viên liên hệ",c:"Học viên gửi lên từ Cổng học viên - nhận và trả lời ngay",ty:"custom"},
 /* 4 trang con gộp vào hub CSKH - ẩn khỏi menu, vẫn dùng được qua hub */
 {k:"review",g:"_",ic:"ti-clipboard-check",t:"Gửi khảo sát theo lớp",c:"Gửi khảo sát cho cả lớp",ty:"custom",hide:1},
 {k:"khaosat",g:"_",ic:"ti-clipboard-text",t:"Khảo sát & Phản hồi",c:"Theo dõi phiếu - xử lý phản hồi",ty:"custom"},
@@ -4652,7 +4656,7 @@ var THEDEF={
  banggiao:{t:"Bàn giao lead",the:[
   ["bg_om","Tuổi trung bình lead đang ôm","Trung bình số ngày kể từ lúc lead được giao cho nhân viên đang chọn, kèm lead lâu nhất và trần ôm leadHoldMax_days. Bảng dưới đếm được bao nhiêu lead, nhưng không cộng được trung bình - mà 40 lead trung bình 6 ngày với 40 lead trung bình 52 ngày là hai chuyện khác hẳn. Danh sách: bảng lead ngay dưới, cột Ngày giao."],
   ["bg_orph","Lead chưa có ai phụ trách","Lead chưa gán cho ai - không ai gọi thì nguội. Danh sách: bấm chính ô này, ô chọn \"Từ NV\" nhảy sang mục (chưa có ai phụ trách) và bảng lead ngay dưới liệt kê đúng bấy nhiêu dòng."],
-  ["bg_due","Quá hẹn liên hệ của NV này","Số lead nhân viên này phụ trách đã quá hẹn liên hệ, kèm mức trễ NẶNG NHẤT tính bằng ngày - trễ 2 giờ và trễ 3 tuần không phải một chuyện. Danh sách: bảng lead dưới, cột Hẹn liên hệ."],
+  ["bg_due","Quá hẹn liên hệ của NV này","Số lead nhân viên này phụ trách đã quá hẹn liên hệ, kèm mức trễ NẶNG NHẤT tính bằng ngày - trễ vài giờ và trễ vài tuần không phải một chuyện. Danh sách: bảng lead dưới, cột Hẹn liên hệ."],
   ["bg_thu","Đủ điều kiện thu về","Lead dính một trong hai mốc chăm sóc của trung tâm: quá leadStale_days ngày không ai liên hệ, hoặc một NV ôm quá leadHoldMax_days ngày. Khác ô bên trái - ô kia đo cái hẹn NV tự đặt, ô này đo mốc của trung tâm. Danh sách: nút Thu lead quá hạn ở thanh trên."]]},
  nhatky:{t:"Nhật ký thao tác",the:[
   ["nk_tong","Thao tác đã ghi","Tổng số dòng nhật ký đang giữ (có trần, cũ nhất bị đẩy ra). Muốn xem: bảng nhật ký ngay dưới."],
@@ -13588,9 +13592,8 @@ function baocaoThan(_xemAi){
     Không gom chúng về đây (bảng việc phải nằm chỗ người ta bắt đầu ngày, đó là chủ ý cũ), nhưng
     phải CHỈ ĐƯỜNG. *Một báo cáo có thật mà người cần nó không biết đường tới thì với họ là chưa có.* */
  h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-map-2"></i>'+
-  'Trang này giữ <b>BC2 chỉ số KPI</b>, <b>BC3 phễu khách</b> và khối lượng việc theo nhân viên. '+
-  'Bảng <b>Học viên nguy cơ</b> (BC1) nằm ở sổ Học viên; các bảng việc theo chức danh (BC5-BC9) '+
-  'hiện ở trang đáp của từng người. '+
+  'Trang này giữ chỉ số KPI và phễu khách. '+
+  '<span data-tip="BC2 chỉ số KPI, BC3 phễu khách và khối lượng việc theo nhân viên nằm ngay trang này. Bảng Học viên nguy cơ (BC1) nằm ở sổ Học viên. Các bảng việc theo chức danh (BC5-BC9) hiện ở trang đáp của từng người.">Báo cáo khác ở đâu?</span> '+
   '<a class="lnk" onclick="go(\'hocvien\')">Mở sổ Học viên</a></div>';
  h+=kpiTop3Section();
  /* Bảng so sánh 5 cơ sở là câu hỏi của người điều hành chuỗi ("cơ sở nào đang gánh") - một nhân
@@ -25303,7 +25306,12 @@ var TTSO_NGOAI={
  /* V2 12/08 (SALE-3) */
  tinnhan:"sổ VIỆC ĐÃ LÀM, không phải sổ của một thực thể - một tin gửi cho lead, tin sau gửi "+
   "cho học viên, tin nữa gửi cho phụ huynh. Nó trả lời câu \"trung tâm đã nói gì với ai\", "+
-  "nên xếp theo THỜI GIAN chứ không xếp theo người. Cùng họ với Nhật ký thao tác."};
+  "nên xếp theo THỜI GIAN chứ không xếp theo người. Cùng họ với Nhật ký thao tác.",
+ /* V2 14/08 */
+ socamket:"sổ CHỨNG TỪ, không phải sổ của một thực thể - mỗi dòng là một LẦN KÝ vào một BẢN "+
+  "quy định, gắn với hồ sơ nhập học chứ không gắn với người. Cùng một học viên đổi lớp rồi ký "+
+  "lại thì có hai dòng, và cái người ta tra là 'bản nào đã được ký', không phải 'người này là ai'. "+
+  "Cùng họ với Nhật ký thao tác và sổ Tin nhắn."};
 /* Phụ huynh KHÔNG có bảng riêng trong SOP - họ nằm trong ba cột người giám hộ của DL09. Nên
    thực thể này được DỰNG từ dữ liệu ấy, gom theo số điện thoại: một số là một người, kèm danh
    sách con. Dựng lại mỗi lần vẽ thì tốn, nên nhớ tạm và xoá khi dữ liệu đổi. */

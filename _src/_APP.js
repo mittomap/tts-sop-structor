@@ -640,7 +640,11 @@ var PAGES=[
    việc quan trọng nên nó phải có ĐƯỜNG RIÊNG trên menu trái, không bắt người ta nhớ rằng nó
    nằm trong tab thứ tư của trang CSKH. Không đẻ trang mới: khoá này là bí danh, go() đưa về
    đúng hub CSKH mở sẵn tab đó - y như cách các hàng Chờ duyệt đang làm. */
-{k:"ychv",g:"_",ic:"ti-school",t:"Học viên liên hệ",c:"Học viên gửi lên từ Cổng học viên - nhận và trả lời ngay",ty:"custom"},
+/* V2 14/08 - `hide:1`: đây KHÔNG còn là một trang, nó là BÍ DANH trỏ sang tab "Từ học viên" của
+   Giao việc. Giữ bản khai để mọi chỗ đang đọc tên/biểu tượng của nó (ô cảnh báo `bv_ychv`, nhịp
+   ngày, bảng việc) vẫn có cái để đọc; nhưng khai `hide` để không bộ kiểm nào còn đòi nó phải có
+   mục menu - `_check11` bắt đúng ba chức danh "xem được trang mà không có mục trên sidebar". */
+{k:"ychv",g:"_",hide:1,ic:"ti-school",t:"Học viên liên hệ",c:"Học viên gửi lên từ Cổng học viên - nhận và trả lời ngay",ty:"custom"},
 /* 4 trang con gộp vào hub CSKH - ẩn khỏi menu, vẫn dùng được qua hub */
 {k:"review",g:"_",ic:"ti-clipboard-check",t:"Gửi khảo sát theo lớp",c:"Gửi khảo sát cho cả lớp",ty:"custom",hide:1},
 {k:"khaosat",g:"_",ic:"ti-clipboard-text",t:"Khảo sát & Phản hồi",c:"Theo dõi phiếu - xử lý phản hồi",ty:"custom"},
@@ -1990,7 +1994,7 @@ var THEDEF={
  banggiao:{t:"Bàn giao lead",the:[
   ["bg_om","Tuổi trung bình lead đang ôm","Trung bình số ngày kể từ lúc lead được giao cho nhân viên đang chọn, kèm lead lâu nhất và trần ôm leadHoldMax_days. Bảng dưới đếm được bao nhiêu lead, nhưng không cộng được trung bình - mà 40 lead trung bình 6 ngày với 40 lead trung bình 52 ngày là hai chuyện khác hẳn. Danh sách: bảng lead ngay dưới, cột Ngày giao."],
   ["bg_orph","Lead chưa có ai phụ trách","Lead chưa gán cho ai - không ai gọi thì nguội. Danh sách: bấm chính ô này, ô chọn \"Từ NV\" nhảy sang mục (chưa có ai phụ trách) và bảng lead ngay dưới liệt kê đúng bấy nhiêu dòng."],
-  ["bg_due","Quá hẹn liên hệ của NV này","Số lead nhân viên này phụ trách đã quá hẹn liên hệ, kèm mức trễ NẶNG NHẤT tính bằng ngày - trễ 2 giờ và trễ 3 tuần không phải một chuyện. Danh sách: bảng lead dưới, cột Hẹn liên hệ."],
+  ["bg_due","Quá hẹn liên hệ của NV này","Số lead nhân viên này phụ trách đã quá hẹn liên hệ, kèm mức trễ NẶNG NHẤT tính bằng ngày - trễ vài giờ và trễ vài tuần không phải một chuyện. Danh sách: bảng lead dưới, cột Hẹn liên hệ."],
   ["bg_thu","Đủ điều kiện thu về","Lead dính một trong hai mốc chăm sóc của trung tâm: quá leadStale_days ngày không ai liên hệ, hoặc một NV ôm quá leadHoldMax_days ngày. Khác ô bên trái - ô kia đo cái hẹn NV tự đặt, ô này đo mốc của trung tâm. Danh sách: nút Thu lead quá hạn ở thanh trên."]]},
  nhatky:{t:"Nhật ký thao tác",the:[
   ["nk_tong","Thao tác đã ghi","Tổng số dòng nhật ký đang giữ (có trần, cũ nhất bị đẩy ra). Muốn xem: bảng nhật ký ngay dưới."],
@@ -10915,6 +10919,20 @@ function baocaoThan(_xemAi){
     nên chuông, Việc hôm nay, bảng việc và trang này luôn nói về cùng một người. */
  h+=banAiHTML();
  h+=bvSau();   /* chọn kỳ số liệu xong mới tới bảng việc của Ban Giám đốc */
+ /* ═══ V2 14/08 - NÓI RÕ BÁO CÁO NÀO KHÔNG NẰM Ở ĐÂY (anh Luân: *"kiểm định trang này đủ nội
+    dung chưa nha"*) ══════════════════════════════════════════════════════════════════════════
+    Kiểm bằng máy, đóng đủ 16 chức danh, dò cả 9 bảng BC1-BC9 trên MỌI trang. Kết quả: đủ, không
+    bảng nào mất (BC4 đã khai lý do lệch có chủ ý - app dùng cửa sổ 30 ngày trượt thay vì tháng
+    lịch). Nhưng chúng **nằm rải sáu trang**, và trang Chỉ số - nơi người ta vào để hỏi "tình
+    hình thế nào" - không nói một câu nào về chuyện đó:
+      BC1 Học viên nguy cơ 2 trục -> sổ Học viên · BC5 Bảng NV Tư vấn, BC6 NV WOW, BC7 Giảng
+      viên, BC8 Học vụ, BC9 Quản lý -> bảng việc, hiện ở TRANG ĐÁP của đúng chức danh ấy.
+    Không gom chúng về đây (bảng việc phải nằm chỗ người ta bắt đầu ngày, đó là chủ ý cũ), nhưng
+    phải CHỈ ĐƯỜNG. *Một báo cáo có thật mà người cần nó không biết đường tới thì với họ là chưa có.* */
+ h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-map-2"></i>'+
+  'Trang này giữ chỉ số KPI và phễu khách. '+
+  '<span data-tip="BC2 chỉ số KPI, BC3 phễu khách và khối lượng việc theo nhân viên nằm ngay trang này. Bảng Học viên nguy cơ (BC1) nằm ở sổ Học viên. Các bảng việc theo chức danh (BC5-BC9) hiện ở trang đáp của từng người.">Báo cáo khác ở đâu?</span> '+
+  '<a class="lnk" onclick="go(\'hocvien\')">Mở sổ Học viên</a></div>';
  h+=kpiTop3Section();
  /* Bảng so sánh 5 cơ sở là câu hỏi của người điều hành chuỗi ("cơ sở nào đang gánh") - một nhân
     viên nhìn bảng ấy không quyết được gì, mà số của họ cũng chỉ nằm ở đúng một ô. */
@@ -22626,7 +22644,12 @@ var TTSO_NGOAI={
  /* V2 12/08 (SALE-3) */
  tinnhan:"sổ VIỆC ĐÃ LÀM, không phải sổ của một thực thể - một tin gửi cho lead, tin sau gửi "+
   "cho học viên, tin nữa gửi cho phụ huynh. Nó trả lời câu \"trung tâm đã nói gì với ai\", "+
-  "nên xếp theo THỜI GIAN chứ không xếp theo người. Cùng họ với Nhật ký thao tác."};
+  "nên xếp theo THỜI GIAN chứ không xếp theo người. Cùng họ với Nhật ký thao tác.",
+ /* V2 14/08 */
+ socamket:"sổ CHỨNG TỪ, không phải sổ của một thực thể - mỗi dòng là một LẦN KÝ vào một BẢN "+
+  "quy định, gắn với hồ sơ nhập học chứ không gắn với người. Cùng một học viên đổi lớp rồi ký "+
+  "lại thì có hai dòng, và cái người ta tra là 'bản nào đã được ký', không phải 'người này là ai'. "+
+  "Cùng họ với Nhật ký thao tác và sổ Tin nhắn."};
 /* Phụ huynh KHÔNG có bảng riêng trong SOP - họ nằm trong ba cột người giám hộ của DL09. Nên
    thực thể này được DỰNG từ dữ liệu ấy, gom theo số điện thoại: một số là một người, kèm danh
    sách con. Dựng lại mỗi lần vẽ thì tốn, nên nhớ tạm và xoá khi dữ liệu đổi. */
@@ -25111,7 +25134,11 @@ var NAVTREE=[
     thì nó nằm trong một nhóm ĐANG GẬP - mở app không thấy gì. Mà nó vốn KHÔNG thuộc chặng nào:
     học viên liên hệ được ở bất kỳ chặng nào, và đó là việc phải xử trong ngày. Chỗ của nó là
     nhóm Làm việc, cạnh Việc hôm nay và Giao việc. */
- {g:"Làm việc",items:["viec","banlam","giaoviec"]}, /* V9.18: hanhtrinh gộp vào banlam (go() tự remap) */
+ /* V2 14/08 (anh Luân: *"đưa Tổng quan - Báo cáo & KPI lên bên dưới Trang bắt đầu nhé"*).
+    `baocao` rời nhóm "Điều hành" về đây, đứng ngay dưới Trang bắt đầu. Rời HẲN chứ không chép:
+    một trang nằm ở hai nhóm thì bấm một mục là hai mục cùng sáng - đúng lỗi `_check11` bắt được
+    sáng nay khi em cho `banglop` lên menu trong lúc `lop` đã là cha nó. */
+ {g:"Làm việc",items:["viec","banlam","baocao","giaoviec"]}, /* V9.18: hanhtrinh gộp vào banlam (go() tự remap) */
  /* V9.29n (anh Luân): "Chặng 1" -> "C1". Tên nhóm nay SINH TỪ ARCS (arcGrpName) chứ không gõ tay:
     trước đây số chặng và tên chặng nằm cả ở ARCS lẫn ở đây, đổi một chỗ là hai chỗ nói khác nhau. */
  {g:arcGrpName("changA"),arc:"changA",items:["changA","nhaplead","test","tuvan","thanhtoan","reup"]},
@@ -25124,7 +25151,7 @@ var NAVTREE=[
     lối nào. Hub CSKH có 4 tab mà menu chỉ có tên hub. Anh Luân: *"bên sidebar giống như 1 cái
     bản đồ vậy, họ biết mình cần tìm gì ở đâu"* - thiếu một mục là mất một chỗ trên bản đồ.
     Thứ tự các mục con xếp ĐÚNG THỨ TỰ THANH TAB của hub, để menu và màn hình đọc như nhau. */
- {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","giaoan","baitap","khaosat","ghinhan","khieunai","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow","lichwow"]},
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","buoihnay","baitap","giaoan","wow","buoihoc","khaosat","ghinhan","khieunai","lichtuan","lichwow","gvdp","phong","lop"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","ketqua","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
@@ -25158,7 +25185,7 @@ var NAVTREE=[
     Luân bắt được hôm 04/08 (*"a tìm trên sidebar ko thấy"*).
     Bài học lặp lại lần thứ hai: hỏi `navVis` là hỏi "có ĐƯỢC PHÉP thấy không", không phải "có
     CHỖ ĐỨNG trên menu không". Hai câu khác nhau, và cái thước phải hỏi câu thứ hai. */
- {g:"Điều hành",items:["baocao","nhansu","bangcong","hoidap","canhan","settings"]},
+ {g:"Điều hành",items:["nhansu","bangcong","hoidap","canhan","settings"]},
  /* V2 08/08 - mười sáu cuốn sổ chỉ-đọc rời khỏi cây menu, vào sau một cửa `tracuu` (ghi chú
     dài ở bảng PAGES). `hocvien` và `giangvien` Ở LẠI vì chúng nằm trong nhịp ngày của ba nhóm. */
  /* V2 14/08 - `socamket` (Sổ cam kết đã ký, dựng cùng ngày) VÀO ĐÂY. Nó đã khai `g:"Tra cứu"`
@@ -25371,8 +25398,41 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
    "Test đầu vào" -> cũng vậy. Trước đây hai người ấy thấy nhóm "C1 · Khách tiềm năng".) */
 var NAVPHANG=[
  {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:"Lớp học & Giảng dạy",items:["xeplop","giaoan","baitap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow","lichwow"]},
+ {g:"Lớp học & Giảng dạy",items:["xeplop","buoihnay","baitap","giaoan","wow","buoihoc","lichtuan","lichwow","gvdp","phong","lop"]},
  {g:"Chăm sóc & Sau khóa",items:["khaosat","ghinhan","khieunai","baoluu","ketthuc","ketqua","magioithieu"]}];
+/* ═══ V2 14/08 - KỆ TRONG MỘT NHÓM MENU (anh Luân: *"em đã check xem trên sidebar nên sắp xếp
+   thế nào chưa, a thấy chắp vá quá"*) ══════════════════════════════════════════════════════
+   Đúng là chắp vá: cả ngày em mới chỉ VÁ TỪNG LỖ (thêm `socamket`, thêm `lichwow`, thêm
+   `banglop` rồi phải gỡ ra vì `lop` vốn đã là cha nó). Chưa lần nào ngồi xem cả cây menu.
+   Đo ra chỗ đau nhất: nhóm C2 ôm **15 mục** trong một cột dài, và trong đó lẫn BA LOẠI khác
+   hẳn nhau - màn làm hằng ngày · màn theo dõi · sổ tra cứu. Xếp chung một mạch thì mắt không
+   có chỗ bám: đọc tới mục thứ chín người ta đã quên mục thứ hai nói gì.
+   Đo bằng `NHIP` (nhịp ngày của từng chức danh, tức thứ người ta THẬT SỰ mở mỗi ngày): chỉ
+   **8/15** mục có mặt trong nhịp của bất kỳ chức danh nào. `buoihoc` được 3 chức danh nhắc;
+   `khaosat`, `ghinhan`, `khieunai`, `lichtuan`, `lop`, `lichwow` KHÔNG chức danh nào - chúng
+   là sổ tra khi cần, không phải việc hằng ngày, mà đang nằm lẫn giữa các màn hằng ngày.
+   `NAVKE` chia một nhóm thành các KỆ có tiêu đề. Cố ý KHÔNG nhét tiêu đề vào `G.items`: mảng
+   ấy là danh sách KHÓA TRANG mà chục chỗ khác đang đọc (`navGroupOf`, `trangNghiepVu`,
+   `_check11`, `_checkv2` L3b...). Nhét một chuỗi không phải khóa trang vào đó là gài một quả
+   mìn cho mọi chỗ ấy. *Thêm một chiều thông tin thì mở một bảng mới, đừng nhồi vào bảng cũ.*
+   Mục nào chưa xếp kệ thì rơi xuống kệ cuối - không bao giờ biến mất. */
+var NAVKE={};
+NAVKE[arcGrpName("changB")]=[
+ ["Làm hằng ngày",["xeplop","buoihnay","baitap","giaoan","wow"]],
+ ["Theo dõi chất lượng",["buoihoc","khaosat","ghinhan","khieunai"]],
+ ["Lịch & sổ tra cứu",["lichtuan","lichwow","gvdp","phong","lop"]]];
+/* Cây PHẲNG chia nhóm khác cây chặng: khảo sát / phản hồi / khiếu nại nằm ở nhóm "Chăm sóc &
+   Sau khóa", không ở đây. Khai kệ riêng theo ĐÚNG thành viên của nhóm này - dùng chung bảng
+   với cây chặng thì kệ "Theo dõi chất lượng" chỉ còn một mục mà vẫn đội một cái tiêu đề. */
+NAVKE["Lớp học & Giảng dạy"]=[
+ ["Làm hằng ngày",["xeplop","buoihnay","baitap","giaoan","wow"]],
+ ["Theo dõi chất lượng",["buoihoc"]],
+ ["Lịch & sổ tra cứu",["lichtuan","lichwow","gvdp","phong","lop"]]];
+NAVKE["Chăm sóc & Sau khóa"]=[
+ ["Đang chăm",["khaosat","ghinhan","khieunai","baoluu"]],
+ ["Sau khóa",["ketthuc","ketqua","magioithieu"]]];
+/* Kệ của một mục: trả về chỉ số kệ, hoặc số lớn nếu chưa xếp (rơi xuống cuối). */
+function navKeCua(ke,k){for(var i=0;i<ke.length;i++)if(ke[i][1].indexOf(k)>=0)return i;return 999}
 function navCayV5(){
  if(arcMode()==="chang")return NAVTREE;
  var out=[],xong=false;
@@ -25487,7 +25547,18 @@ function buildNav(){
    (!open&&gb?'<span class="dot">'+(gb>99?"99+":gb)+'</span>':'')+'</div>';
   if(!open)return;
   h+='<div class="navgrp">';
+  /* Có khai kệ thì xếp lại thứ tự theo kệ và chèn tiêu đề kệ khi sang kệ mới. Mục "Bản đồ chặng"
+     (changA..D) là mục CHA của cả nhóm nên luôn đứng trên mọi kệ, không thuộc kệ nào. */
+  var _ke=NAVKE[G.g]||null, _keDang=-1;
+  if(_ke){items=items.slice().sort(function(x,y){
+    var ax=/^chang[A-D]$/.test(x)?-1:navKeCua(_ke,x), ay=/^chang[A-D]$/.test(y)?-1:navKeCua(_ke,y);
+    if(ax!==ay)return ax-ay;
+    if(ax<0||ax>=_ke.length)return 0;
+    return _ke[ax][1].indexOf(x)-_ke[ax][1].indexOf(y)})}
   items.forEach(function(k){var m=navItemMeta(k),n=navBadge(k);
+   if(_ke&&!/^chang[A-D]$/.test(k)){var _ki=navKeCua(_ke,k);
+    if(_ki!==_keDang){_keDang=_ki;
+     h+='<div class="navke">'+esc(_ki<_ke.length?_ke[_ki][0]:"Khác")+'</div>'}}
    var isArc=/^chang[A-D]$/.test(k);
    /* Mục con của một hub thụt vào - trước đây hub và mục con của nó nằm ngang hàng nhau trên
       menu, nhìn không ra cái nào chứa cái nào. */
