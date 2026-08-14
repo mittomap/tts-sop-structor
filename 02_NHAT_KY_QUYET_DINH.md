@@ -148,6 +148,20 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 📋 14/08 khuya - CÒN TREO SAU ĐỢT GỘP TRANG
+> 1. **Dải 5 thẻ Bảng quản lý (BC9) chữ chen ba dòng.** Nhãn thẻ mang số sống từ CH2 nhúng giữa
+>    câu ("Đổi lớp từ **2 lần** · quá **1 lần** ⚙ miễn duyệt - cần quản lý phê duyệt") nên một ô
+>    220px phải đựng ba dòng chữ 11px. Chưa sửa vì rút chữ là chạm `_checkkhuon` K3b (thẻ phải nói
+>    được tìm ở đâu / tính thế nào) - phải nghĩ cách khác, không phải cắt bớt.
+> 2. **`renderBanlam` ở chế độ KHÔNG nhúng nay là mã không ai gọi tới.** `go("banlam")` remap sang
+>    `viec`, nên nhánh `embed=0` (ô chào, notebar, công tắc list/board) chỉ còn `RENDER.banlam` gọi
+>    - mà `RENDER.banlam` cũng không còn lối vào. Chưa gỡ vì `_probe_vhbc` và vài bộ kiểm còn vẽ
+>    qua `RENDER`; gỡ thì phải đi sửa chúng cùng lượt.
+> 3. **Chưa đo lại phần "Theo chặng" bằng ảnh chụp** sau khi gộp - hai cách xem kia đã soi bằng
+>    ảnh, cách xem thứ ba mới chỉ xanh bộ kiểm.
+> 4. **Cân nhắc gitignore `_src/_APP.js` / `_src/_HV.js`** - mỗi lượt verify ghi lại ~12MB vào git.
+>    Đã nêu 14/08, anh Luân chưa trả lời nên chưa làm.
+
 > ### ✅ 14/08 tối - ĐÓNG SỔ HAI BẢN BÁO CÁO CHUYÊN GIA (và bản báo cáo sai nhiều hơn đúng)
 >
 > Anh Luân: *"tồn gì làm hết 1 lần đi em"*. Làm hết. Nhưng việc lớn nhất hoá ra là **ĐO LẠI**:
@@ -278,11 +292,89 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 41 BỘ KIỂM, XANH HẾT 41/41 (verify trọn bộ chạy liền, 14/08 tối, hai lượt
-> liên tiếp trên hai bản dựng khác nhau). Bản dựng đang chạy: `868f3f` (14/08), đã lên
-> https://mittomap.github.io/itts-sop-demo-v2/ . Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `a1bda4`, `519e91`, `dc6eb3`, `3f0446`, `39083f`, `d2d2d5`, `c6ea8b`.
+> **Phiên bản: V2 — 41 BỘ KIỂM, XANH HẾT 41/41 (verify trọn bộ 14/08 khuya). Bản dựng đang chạy:
+> `a6046c` (14/08), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
+> Mốc cũ: `868f3f`, `a1bda4`, `519e91`, `dc6eb3`, `3f0446`, `39083f`, `d2d2d5`, `c6ea8b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 14/08 khuya - BA TRANG VỀ MỘT, BẢNG CÔNG TÁCH HAI ĐỘI, VÀ SÁU CHỖ ĐỎ TỰ MÌNH GÂY RA
+>
+> **1. Việc hôm nay + Chạy quy trình + Bản đồ chặng = MỘT trang, ba cách xem.**
+> Anh Luân: *"tại sao ko thiết kế lại, để nó có thể ở 1 trang thôi. Có thể chọn cách xem mà"* rồi
+> ngay sau: *"vấn đề là em phải thiết kế lại toàn bộ trang đó để nó tối ưu, chứ nếu em chỉ gom vào
+> mà không bố cục lại theo cách tốt hơn, sẽ rất rối"*.
+> Đo trước khi gộp: ba cách xem gần như KHÔNG trùng nhau - chỉ **57/313** mục việc gắn với một hồ
+> sơ trên hành trình; 256 việc còn lại là việc của lớp/buổi/phiếu thu/giáo án, và 141/191 hồ sơ
+> đang chờ mà chưa quá hạn nên chưa sinh việc nào. **Ba câu hỏi khác nhau, và chính vì thế mà
+> chúng thuộc về một trang**: cùng một vùng làm việc, đổi cách nhìn.
+> Ba tầng: đầu trang không đổi theo cách xem (KPI · [Cần chú ý | Nhịp ngày] hai cột · bảng việc
+> chức danh) → công tắc MANG SỐ (313 việc / 191 hồ sơ - chính hai con số ấy trả lời câu anh hỏi
+> mà không cần ai giải thích) → vùng làm việc đổi theo công tắc, bộ lọc nằm TRONG cách xem của nó.
+> `banlam` và `hanhtrinh` thành bí danh; hơn hai chục lối cũ đổi tên ở đúng một chỗ trong `go()`.
+>
+> **2. "Xấu quá" - và những chỗ chỉ nhìn bằng ảnh chụp mới thấy.** Anh Luân: *"dễ hiểu, nhưng
+> thiết kế thì xấu quá"* · *"chưa gì vào thôi đã thấy nó kém rồi"*. Em chụp màn rồi tự soi:
+> · trang đọc ra là **thẻ - panel - thẻ**, hai nút "Thẻ (n/n)" giống hệt nhau ở hai chỗ cách nhau
+>   nửa màn, mỗi cái chiếm một HÀNG RỖNG chỉ để đứng canh phải → nút nhập vào hàng tiêu đề của
+>   thứ nó điều khiển, bỏ hai hàng ở đúng chỗ đắt nhất là đầu trang;
+> · tên panel vỡ hai dòng ("Cần chú / ý") vì `.ph` là flex và câu mô tả dài bóp nó → `flex:none`;
+> · ô cảnh báo trong nửa trang cho ra bốn hàng ba nhịp khác nhau → một cột, số thẳng một mép;
+> · dải HAI thẻ bị `auto-fit` kéo mỗi thẻ ra 560px, đứng cạnh dải NĂM thẻ 220px thì đọc ra như
+>   hai loại thành phần khác nhau → dải ít thẻ giữ đúng khổ, để trống phần thừa;
+> · **số trên chip đang chọn biến mất** - `.segb.on .segn` là chữ trắng trên nền trắng mờ, đúng
+>   với chip lọc nền navy nhưng sai với công tắc gạt nền trắng. *Đổi nền của một trạng thái thì
+>   phải đi xem lại mọi thứ đang tô màu theo nền cũ.*
+>
+> **3. "Cột thao tác này là tàn dư, hay do nó lỗi gì?"** - LỖI, và là tàn dư của một ĐIỀU KIỆN.
+> Điều kiện dựng cột có ba vế, vế thứ ba là "có dòng nào đang treo việc SLA không". Vế ấy đúng hồi
+> cột còn vẽ nút "Làm ngay"; sáng cùng ngày em bỏ nút ấy (nó trùng nút "Xử lý") mà **quên bỏ vế
+> điều kiện đã dựng cột vì nó**. Đo được **22 chỗ** trên 8 nhóm chức danh.
+> *Điều kiện dựng một cột phải nhắc tới đúng những thứ cột đó vẽ ra.*
+>
+> **4. "Từ chối cam kết chỉ là trạng thái"** - anh Luân phải nói BA lượt em mới nghe ra đúng câu.
+> Lượt 1 em chữa cái NHÃN, lượt 2 em chữa cái Ô (chữ tràn khỏi nút 136px, bị cắt ở chữ "đồng").
+> Lượt 3 anh nói thẳng: *"học viên chưa xác nhận thì chưa xác nhận, học viên từ chối thì hiện học
+> viên từ chối, còn học viên ký trực tiếp thì dùng nút ghi nhận ký trực tiếp"*. Việc ký hay không
+> ký là việc CỦA HỌC VIÊN; trung tâm chỉ có đúng một việc - ghi lại ca ký giấy tại quầy. Nút bị gỡ
+> khỏi hàng, cửa ghi `obReject` chuyển vào ngăn kéo "Ghi nhận ký tại TT" (luật số 0: không bớt).
+> *Trước khi đặt một cái nút, hỏi việc đó ai làm. Việc của người khác thì mình chỉ hiện ra.*
+>
+> **5. Trang Giảng viên và Bảng công.** Anh Luân: *"trang giảng viên ít thông tin quá em"* → thêm
+> 9 cột đếm từ DL10/DL11/DL13/DL14/DL03. Nhưng bản đầu chỉ đọc công việc của giáo viên LỚP nên hai
+> WOW coach hiện **0 ở cả sáu cột** - anh đọc ra ngay: *"hình như mới chỉ chấm công cho giáo viên
+> mà ko chấm cho wow coach hả"*. Bảng công thì CÓ chấm cho WOW từ lâu; cái sai là mấy cột mới.
+> *Một bảng in ra 0 cho nguyên một chức danh thì người đọc trách app, không trách cái bảng.*
+> Rồi anh chốt cách tách: *"cứ phân biệt bằng cột: giờ dạy của giáo viên, buổi wow và buổi test
+> của wow coach"* - nên "Giờ dạy tháng" thôi cộng giờ WOW vào (lớp trả theo GIỜ, WOW và test trả
+> theo LẦN). *Đừng lấp một ô trống bằng một con số đo thứ khác - ô trống thành thật hơn.*
+> Bảng công tách hai khối theo VAI (không theo số liệu - tách theo số thì một giáo viên tình cờ
+> chấm một ca test là nhảy bảng, bảng không đứng yên thì không ai đối chiếu được), mỗi khối bỏ
+> cột nào cả khối đều rỗng, và đổi tên thành **"Bảng công giảng dạy & WOW"**.
+>
+> **6. Sáu chỗ đỏ của verify - năm cái là hệ quả trực tiếp của những thứ vừa đổi.**
+>
+> | Chỗ đỏ | Nguyên nhân | Bài học |
+> |---|---|---|
+> | 4 sổ mất đường ra | bỏ cột Thao tác rỗng - chúng đang tựa vào chính cột ấy | *gỡ một thứ rỗng thì phải xem ai đang tựa vào nó* |
+> | nhịp ngày vs chip bảng công | sửa chip theo tháng mà quên dòng nhịp đếm toàn thời gian | *sửa phạm vi một con số thì sửa mọi chỗ nói lại nó* |
+> | `_checkbam` bảng giá | bảng giá dùng `table.dt` - mỗi dòng bị coi là bản ghi bấm được | *chọn lớp CSS theo bản chất dữ liệu, không theo dáng* |
+> | `_check16` slug | thước neo vào MỘT CÁI TÊN (`"trang-bat-dau"`) | *neo vào LUẬT, đừng neo vào một giá trị* |
+> | `_checkux` nút Thẻ | thước neo vào CHỖ ĐẶT thay vì hỏi nút có tồn tại không | *canh MỤC TIÊU, đừng canh CÁCH LÀM* |
+> | `_checkdrawer` tụt 3 | gộp trang thì số bề mặt riêng biệt giảm - hệ quả đúng | *mở rộng phạm vi đo thì được, nới thước thì không* |
+>
+> Hai lỗi thật không liên quan tới hôm nay cũng lộ ra: kiểu ô `date` khai ở ba cột hồ sơ học viên
+> mà `cell()` chưa có nhánh (in ra chuỗi thô - **đúng cái bẫy `calcso` đã cắn gần một tuần hồi
+> 09/08, và người viết ghi chú ấy vẫn cắn lại nó lúc thêm `calcnum` hôm nay**), và chip "Đã xác
+> nhận" ở trang Vận hành buổi WOW tự chọn màu thay vì hỏi `stCls`.
+>
+> **7. Mục sáng trên sidebar và vệt đường đi phải đọc CÙNG MỘT NGUỒN.** Anh Luân gửi ảnh màn Chạy
+> quy trình: breadcrumb ghi "Việc hôm nay · Theo người" trong khi sidebar sáng ở "Lead & khai
+> thác". Hai chỗ trả lời cùng một câu "tôi vừa từ đâu tới" bằng hai nguồn (`NAVHIST` và một biến
+> nhớ riêng `NAVFROM`) - đi thẳng thì trùng, bấm Back một nhịp là tách ra.
+> *Hai nguồn cho một sự thật thì sớm muộn cũng thành hai sự thật.*
+> Và anh đề xuất luôn cái hay hơn: *"thay vì ghi đang mở, có thể ghi là Lớp học -> Chấm bài"* -
+> mục sáng nay mang một dòng phụ nói CHỖ ĐANG ĐỨNG bên trong trang ("Vận hành lớp · Chấm bài").
 >
 > ### 🟢 14/08 tối - DỌN 13 CHỖ ĐỎ SAU ĐỢT GỘP, VÀ MỘT BÀI HỌC LẶP NĂM LẦN TRONG NGÀY
 >
