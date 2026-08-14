@@ -25443,10 +25443,17 @@ var NAVSUB={changA:"chang",changB:"chang",changC:"chang",changD:"chang",
     1 buổi diễn ra hôm nay, nó nhảy vào Lớp học"*.
     Neo vào `buoihnay`: đi lối chính thì mục sáng ở ngay chỗ vừa bấm. Đi lối tra cứu thì mục sáng
     lệch một nấc - chấp nhận được, vì lối ấy ít người đi và người đi lối ấy đã biết mình đang tra. */
- banglop:"buoihnay",
+ /* 14/08 lượt 2 (anh Luân: *"mở vận hành lớp, nó sáng chỗ lớp học mới đúng em"*). Trả về `lop`.
+    Lượt trước em neo sang `buoihnay` là để chữa đúng câu anh nói khi ấy - bấm một buổi thì mục
+    sáng nhảy sang một cái sổ nằm tận kệ tra cứu. Nay CHỖ ĐẶT đã đổi: sổ Lớp học đứng ngay dưới
+    "Buổi hôm nay", thụt vào một bậc. Cái làm câu trả lời cũ đúng đã biến mất, nên câu trả lời
+    ấy hết đúng theo.
+    *Neo đúng chỗ chứa nó, chỉ cần chỗ ấy nằm gần lối người ta vừa đi qua - dời cái sổ lại gần
+    thì không phải bẻ cong cái neo nữa.* */
+ banglop:"lop",
  /* Cùng lối với `banglop`: mở từ một dòng, không có mục menu riêng, nên khai cha để khi đang
     đứng trong một buổi thì mục "Buổi WOW 1-1" trên sidebar SÁNG. */
- banwow:"buoihnay"};
+ banwow:"wow"};
 /* ═══ V2 14/08 - THỤT VÀO CHỈ ĐỂ NHÌN, KHÔNG ĐỤNG TỚI QUYỀN (anh Luân: *"2 cái kia lên cùng chỗ
    với lớp chứ, làm con của buổi hôm nay"* - hai cái ấy là sổ Học viên và sổ Giảng viên) ══════
    Ba sổ Lớp học · Học viên · Giảng viên nay đứng ngay dưới "Buổi hôm nay" và thụt vào một bậc.
