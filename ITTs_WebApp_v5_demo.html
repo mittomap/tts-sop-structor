@@ -2937,7 +2937,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>cb852d</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>c56ac9</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -28350,7 +28350,7 @@ var NAVTREE=[
     lối nào. Hub CSKH có 4 tab mà menu chỉ có tên hub. Anh Luân: *"bên sidebar giống như 1 cái
     bản đồ vậy, họ biết mình cần tìm gì ở đâu"* - thiếu một mục là mất một chỗ trên bản đồ.
     Thứ tự các mục con xếp ĐÚNG THỨ TỰ THANH TAB của hub, để menu và màn hình đọc như nhau. */
- {g:arcGrpName("changB"),arc:"changB",items:["changB","buoihnay","lop","hocvien","giangvien","wow","xeplop","baitap","giaoan","buoihoc","khaosat","ghinhan","khieunai","lichtuan","lichwow","gvdp","phong","socamket"]},
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","buoihnay","lop","wow","hocvien","giangvien","xeplop","baitap","giaoan","buoihoc","khaosat","ghinhan","khieunai","lichtuan","lichwow","gvdp","phong","socamket"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","ketqua","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
@@ -28625,7 +28625,7 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
    "Test đầu vào" -> cũng vậy. Trước đây hai người ấy thấy nhóm "C1 · Khách tiềm năng".) */
 var NAVPHANG=[
  {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:"Lớp học & Giảng dạy",items:["buoihnay","lop","hocvien","giangvien","wow","xeplop","baitap","giaoan","buoihoc","lichtuan","lichwow","gvdp","phong","socamket"]},
+ {g:"Lớp học & Giảng dạy",items:["buoihnay","lop","wow","hocvien","giangvien","xeplop","baitap","giaoan","buoihoc","lichtuan","lichwow","gvdp","phong","socamket"]},
  {g:"Chăm sóc & Sau khóa",items:["khaosat","ghinhan","khieunai","baoluu","ketthuc","ketqua","magioithieu"]}];
 /* ═══ V2 14/08 - KỆ TRONG MỘT NHÓM MENU (anh Luân: *"em đã check xem trên sidebar nên sắp xếp
    thế nào chưa, a thấy chắp vá quá"*) ══════════════════════════════════════════════════════
@@ -28663,14 +28663,14 @@ NAVKE[arcGrpName("changB")]=[
     sang một cái sổ. Chữa đúng chỗ ấy - xem `NAVSUB` bên dưới.
     `wow` GIỮ LẠI ở kệ làm việc: "Buổi WOW 1-1" không phải sổ tra cứu, nó là màn có đủ nút xác
     nhận / bắt đầu / kết thúc / ghi nội dung - người ta LÀM ở đó hằng ngày. */
- ["Làm hằng ngày",["buoihnay","lop","hocvien","giangvien","wow","xeplop","baitap","giaoan"]],
+ ["Làm hằng ngày",["buoihnay","lop","wow","hocvien","giangvien","xeplop","baitap","giaoan"]],
  ["Theo dõi chất lượng",["buoihoc","khaosat","ghinhan","khieunai"]],
  ["Lịch & sổ tra cứu",["lichtuan","lichwow","gvdp","phong","socamket"]]];
 /* Cây PHẲNG chia nhóm khác cây chặng: khảo sát / phản hồi / khiếu nại nằm ở nhóm "Chăm sóc &
    Sau khóa", không ở đây. Khai kệ riêng theo ĐÚNG thành viên của nhóm này - dùng chung bảng
    với cây chặng thì kệ "Theo dõi chất lượng" chỉ còn một mục mà vẫn đội một cái tiêu đề. */
 NAVKE["Lớp học & Giảng dạy"]=[
- ["Làm hằng ngày",["buoihnay","lop","hocvien","giangvien","wow","xeplop","baitap","giaoan"]],
+ ["Làm hằng ngày",["buoihnay","lop","wow","hocvien","giangvien","xeplop","baitap","giaoan"]],
  ["Theo dõi chất lượng",["buoihoc"]],
  ["Lịch & sổ tra cứu",["lichtuan","lichwow","gvdp","phong","socamket"]]];
 /* Nhóm này 7 mục - DƯỚI ngưỡng 8 nên KHÔNG chia kệ: hai tiêu đề cho bảy dòng là tiêu đề nhiều
