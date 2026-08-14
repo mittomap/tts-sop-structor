@@ -1124,6 +1124,9 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
    "vao tren sidebar. Dong khai nay giu lai vi trang van con nhieu cua mo tu cho khac.)",
   ychv:"Hoc vien lien he - tu 14/08 la BI DANH, `go('ychv')` remap sang tab 'Tu hoc vien' cua "+
    "Giao viec. Giu khoa trang de moi loi cu (o canh bao, nhip ngay, bang viec, link da gui) khong chet.",
+  banwow:"van hanh MOT buoi WOW 1-1 - mo tu mot dong o trang Buoi hom nay hoac so Buoi WOW 1-1 "+
+   "(cung khuon voi `banglop`: cha tren menu la so, khong co muc menu rieng). Trong trang van co "+
+   "o xo chon nhanh buoi khac nen vao roi khong bi ket o mot buoi.",
   diemdanh:"diem danh MOT buoi cua MOT lop - mo tu nut 'Diem danh lop nay' o Van hanh lop va tu "+
    "the buoi hoc. No luon di kem mot lop cu the (window.DDCLASS), khong co nghia khi dung mot minh, "+
    "nen khong dat muc menu rieng.",

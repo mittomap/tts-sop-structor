@@ -149,6 +149,7 @@ var TOUR_BOQUA={
  hosogv:"nhu tren", hosonv:"nhu tren", hosokhoa:"nhu tren",
  chay:"man chay quy trinh, tour bai 'Khong can vao Cai dat' da di qua bang neo @chaybody",
  hanhtrinh:"da gop vao banlam (go() remap)",
+ banwow:"man van hanh mot buoi WOW - mo tu Buoi hom nay / so Buoi WOW; bai tn_wow da di qua nghiep vu nay o so",
  ychv:"da gop vao tab 'Tu hoc vien' cua Giao viec (14/08, go() remap) - bai tn_hocvu di qua no o day",
  /* V2 - `bangcong` NGUOC LAI: no khong con gop vao trang Giang vien nua, no la mot trang
     nghiep vu rieng cua Nhan su, va bai "Bang cong giang day" da di thang qua no. Bo dong khai

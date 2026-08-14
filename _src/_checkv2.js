@@ -155,6 +155,22 @@ const vais=[...new Set(nguoi.map(s=>String(s.role||"")))].filter(Boolean).sort()
    Object.keys(trongKe).forEach(k=>{if((G.items||[]).indexOf(k)<0)thuaKe.push(g+" > "+k)});
   });
   t("L3c · nhom co ke thi khong muc nao roi xuong ke Khac", sotKe.length===0, sotKe.join(" · "));
+  /* ═══ L3d · CHIA KE THEO NGUONG, KHONG CHIA THEO CAM GIAC (14/08) ═════════════════════════
+     Anh Luan: *"tuc la chang Khach tiem nang chua duoc phan nhom tot nhu chang dang hoc"*.
+     Do that: "Dang hoc" 14 muc, "Khach tiem nang" 5 muc. C2 can ke vi mot cot 14 dong khong co
+     cho bam mat; chia ke cho 5 dong thi them 2-3 dong tieu de - DAI HON chu khong gon hon.
+     Nen luat khong phai "nhom nao cung chia ke", ma la MOT NGUONG:
+       >= 8 muc  -> phai co ke (khong thi mat khong co cho bam)
+       <  8 muc  -> khong duoc co ke (tieu de nhieu hon noi dung la nhieu)
+     *Nhat quan khong co nghia la doi xu giong nhau voi moi thu - nghia la ap CUNG MOT LUAT.* */
+  var NGUONG=8, phaiKe=[], thuaKe2=[];
+  (NAVTREE.concat(NAVPHANG)).forEach(function(G){
+   var n=(G.items||[]).filter(function(k){return PBK[k]&&!PBK[k].hide&&!/^chang[A-D]$/.test(k)}).length;
+   var coKe=!!NAVKE[G.g];
+   if(n>=NGUONG&&!coKe)phaiKe.push(G.g+" ("+n+" muc)");
+   if(n<NGUONG&&coKe)thuaKe2.push(G.g+" ("+n+" muc)")});
+  t("L3d · nhom tu "+NGUONG+" muc tro len deu da chia ke", phaiKe.length===0, phaiKe.join(" · "));
+  t("L3d · nhom duoi "+NGUONG+" muc thi khong bay tieu de ke", thuaKe2.length===0, thuaKe2.join(" · "));
   t("L3c · ban khai ke khong nhac trang da roi khoi nhom", thuaKe.length===0, thuaKe.join(" · "));
  }catch(e){t("L3c · doc duoc bang khai ke NAVKE", false, String(e.message).slice(0,80))}
 })();
