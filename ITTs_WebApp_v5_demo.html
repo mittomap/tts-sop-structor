@@ -2790,7 +2790,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>8e29a1</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>e87627</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -5095,7 +5095,9 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
    var _co=!!(_sla&&_sla.act);
    h+='<td><div class="rowact">'+(cfg.ro?'':'<button class="btn sm" onclick="openEdit(\''+key+'\',\''+id+'\')"><i class="ti ti-edit"></i>Sửa</button>')+
    act.map(function(a,ai){var _nb=(_co&&ai===0);
-    return '<button class="btn sm'+(_nb?" primary":"")+'" onclick="'+a.fn+'(\''+esc(String(r[a.arg]||""))+'\')"'+
+    /* Thứ tự class là `btn <màu> sm`, không phải `btn sm <màu>` - `_checkux` canh đúng một thứ
+       tự để hai chỗ viết khác nhau không thành hai biến thể của cùng một nút. */
+    return '<button class="btn'+(_nb?" primary":"")+' sm" onclick="'+a.fn+'(\''+esc(String(r[a.arg]||""))+'\')"'+
      (_nb?' data-tip="'+esc("Đang có việc: "+String(_sla.what||"").slice(0,90))+'"':'')+
      '><i class="ti '+a.ic+'"></i>'+a.lb+'</button>'}).join("")+'</div></td>'}
   h+='</tr>'});

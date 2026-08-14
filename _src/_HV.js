@@ -1559,7 +1559,7 @@ lop:{code:"DL10",
       Bẫy y hệt lần bảng màu đếm trúng hai mã màu nằm trong ghi chú của chính em.);
     · `_checklap` L5 chỉ bắt khi chip là ĐẦU chuỗi của nhãn thẻ; "lớp đang học" không bắt đầu
       bằng "đang học" nên nó lọt. Đã nới L5 sang "cùng con số + trùng chữ chính". */
- nut:'<button class="btn primary sm" onclick="go(\'xeplop\')"><i class="ti ti-layout-grid-add"></i>Xếp lớp & Onboarding</button>',filt:"class_status",ro:1,sub:"Lớp học (DL10) - bấm nút Vận hành lớp trên một dòng để vào buổi học, điểm danh, nhận xét và bài tập của lớp đó",
+ nut:'<button class="btn primary" onclick="go(\'xeplop\')"><i class="ti ti-layout-grid-add"></i>Xếp lớp & Onboarding</button>',filt:"class_status",ro:1,sub:"Lớp học (DL10) - bấm nút Vận hành lớp trên một dòng để vào buổi học, điểm danh, nhận xét và bài tập của lớp đó",
  /* V2 RB3 - CỬA VÀO TRANG CON NẰM TRONG NGĂN KÉO, KHÔNG NẰM TRÊN DÒNG.
     Bản đầu của Khúc 3 đặt một nút "Vận hành lớp" thẳng lên từng dòng - và `_check18` mục 26 bắt
     ngay: **nút hàng của bảng danh sách phải mở NGĂN KÉO, không được rời trang**. Luật ấy là lời
@@ -1616,7 +1616,7 @@ nhaplead:{code:"DL02",filt:"lead_status",
     Và một trong ba chỗ còn nói SAI LỆCH: thẻ "Tới hẹn liên hệ" đếm mốc hẹn <= GIỜ NÀY (20),
     chip cùng tên đếm <= HẾT HÔM NAY (24) - hai con số dưới một cái tên, ngay cạnh nhau. Câu hỏi
     của người bán hàng là "hôm nay phải gọi ai", nên chip đúng; thẻ đi. */
- nut:'<button class="btn primary sm" onclick="leadInbound()"><i class="ti ti-message-plus"></i>Khách mới liên hệ đến</button>',sub:"Khách tiềm năng (DL02) - lọc theo trạng thái, nguồn, nhân viên phụ trách",act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"lead_id"},{lb:"Ghi liên hệ",ic:"ti-phone",fn:"openLienhe",arg:"lead_id"}],
+ nut:'<button class="btn primary" onclick="leadInbound()"><i class="ti ti-message-plus"></i>Khách mới liên hệ đến</button>',sub:"Khách tiềm năng (DL02) - lọc theo trạng thái, nguồn, nhân viên phụ trách",act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"lead_id"},{lb:"Ghi liên hệ",ic:"ti-phone",fn:"openLienhe",arg:"lead_id"}],
  cols:[["lead_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["lead_created_time","Vào hệ thống"],["lead_status","Trạng thái","chip"],["contact_count","Lượt LH"],["next_followup_time","Hẹn liên hệ"],["assigned_to_name","NV phụ trách"],["next_action","Việc cần làm","na"]],
  form:[["full_name","Họ tên",0,1],["phone_number","SĐT",0,1],["zalo_id","Zalo (SĐT/nick)",0],["lead_source","Nguồn","enum_lead_source",1],["student_type","Đối tượng","enum_student_type"],["learning_goal","Mục tiêu học","enum_learning_goal_type"],["target_band","Điểm mục tiêu"],["learning_mode","Hình thức","enum_learning_mode"],["expected_start_time","Dự kiến bắt đầu"],["availability_schedule","Lịch rảnh"],["lead_qualification_status","Mức đủ ĐK","enum_lead_qualification_status"],["branch","Cơ sở","enum_branch"],["lead_note","Ghi chú trao đổi","ta"]],idp:"L-2026-"},
 lienhe:{code:"DL02b",filt:"channel",
@@ -2269,7 +2269,9 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
    var _co=!!(_sla&&_sla.act);
    h+='<td><div class="rowact">'+(cfg.ro?'':'<button class="btn sm" onclick="openEdit(\''+key+'\',\''+id+'\')"><i class="ti ti-edit"></i>Sửa</button>')+
    act.map(function(a,ai){var _nb=(_co&&ai===0);
-    return '<button class="btn sm'+(_nb?" primary":"")+'" onclick="'+a.fn+'(\''+esc(String(r[a.arg]||""))+'\')"'+
+    /* Thứ tự class là `btn <màu> sm`, không phải `btn sm <màu>` - `_checkux` canh đúng một thứ
+       tự để hai chỗ viết khác nhau không thành hai biến thể của cùng một nút. */
+    return '<button class="btn'+(_nb?" primary":"")+' sm" onclick="'+a.fn+'(\''+esc(String(r[a.arg]||""))+'\')"'+
      (_nb?' data-tip="'+esc("Đang có việc: "+String(_sla.what||"").slice(0,90))+'"':'')+
      '><i class="ti '+a.ic+'"></i>'+a.lb+'</button>'}).join("")+'</div></td>'}
   h+='</tr>'});
@@ -2729,7 +2731,13 @@ function renderList(key,emb){
  window.THEROI=window.THEROI||{};
  window.THEROI[key]=(!emb&&typeof cfg.the==="function")?1:0;
  if(!emb&&typeof cfg.the==="function"){try{_theNV=statStrip(cfg.the(all),key)}catch(e){_theNV=""}}
- var duoi=_nutNV+'<span class="tbcnt">'+total+' dòng'+(fa.length||q||qk||hvF||_f2?" (đã lọc)":"")+'</span>'+
+ /* V2 14/08 - NÚT NGHIỆP VỤ ĐI VỀ GÓC PHẢI, KHÔNG ĐỨNG GIỮA ĐÁM CÔNG CỤ (anh Luân: *"lại ở
+    cái vị trí vô thưởng vô phạt kiểu này"*). Trước đó `_nutNV` là phần tử ĐẦU của cụm điều
+    khiển, nên "Khách mới liên hệ đến" bị kẹp giữa ô tìm và chữ "0 dòng (đã lọc)" - lửng lơ
+    giữa hàng, không tựa vào mép nào. Nay nó xuống CUỐI cụm, dính mép phải của thanh, có một
+    vạch tóc ngăn với bộ công cụ: *một hành động chính thì phải có GÓC của nó, chứ không thể
+    trôi trong hàng cùng mấy cái nút tra cứu.* */
+ var duoi='<span class="tbcnt">'+total+' dòng'+(fa.length||q||qk||hvF||_f2?" (đã lọc)":"")+'</span>'+
   fltBarHTML(key,1)+   /* trang danh sách đã có ô tìm riêng ở tầng trên */
   (fa.length||q||qk||hvF||_f2?'<button class="btn sm" onclick="clearFilt(\''+key+'\')"><i class="ti ti-x"></i>Xóa lọc</button>':'')+
   '<div class="colwrap"><button class="btn'+(nHid?" primary":"")+' sm" onclick="colMenuToggle(\''+key+'\')"><i class="ti ti-columns"></i>Cột'+(nHid?" ("+(cfg.cols.length-1-nHid)+"/"+(cfg.cols.length-1)+")":"")+'</button>'+colMenuHTML(key)+'</div>'+
@@ -2739,7 +2747,8 @@ function renderList(key,emb){
      sự để làm" - nằm trong màn, nhìn rõ, bấm vào không đổi một chữ nào (`CUR` giữ nguyên, thân
      trang giữ nguyên). Một nút hứa dẫn đi mà không dẫn đâu cả thì tệ hơn là không có nút: người
      ta bấm, không thấy gì, rồi bắt đầu ngờ cả những nút khác. `_checkaudit` M15 canh chuyện này. */
-  (cfg.lam&&PBK[cfg.lam]&&CUR!==cfg.lam?('<button class="btn sm" onclick="go(\''+esc(cfg.lam)+'\')" data-tip="Sổ này chỉ để tra cứu - bấm để sang chỗ làm việc thật"><i class="ti ti-arrow-right"></i>Sang '+esc(PBK[cfg.lam].t)+' để làm</button>'):'');
+  (cfg.lam&&PBK[cfg.lam]&&CUR!==cfg.lam?('<button class="btn sm" onclick="go(\''+esc(cfg.lam)+'\')" data-tip="Sổ này chỉ để tra cứu - bấm để sang chỗ làm việc thật"><i class="ti ti-arrow-right"></i>Sang '+esc(PBK[cfg.lam].t)+' để làm</button>'):'')+
+  (_nutNV?('<span class="ctnut">'+_nutNV+'</span>'):'');
  h+=_theNV+locKhoi(_loc,duoi,"tbarct");
  h+='<div class="panel">'+tableHTML(cfg,view,key)+'</div>';
  if(pages>1||total>20)h+='<div class="pgbar"><button class="btn sm" '+(pg<=0?"disabled":"")+' onclick="pageGo(\''+key+'\','+(pg-1)+')"><i class="ti ti-chevron-left"></i>Trước</button><span class="cnt">Trang '+(pg+1)+' / '+pages+'</span><button class="btn sm" '+(pg>=pages-1?"disabled":"")+' onclick="pageGo(\''+key+'\','+(pg+1)+')">Sau<i class="ti ti-chevron-right"></i></button>'+
