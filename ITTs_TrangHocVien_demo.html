@@ -746,7 +746,19 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .rsb{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 14px;font-family:inherit;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer}
 .rsb:hover{border-color:var(--blue)}
 .rsb.on{background:var(--blue);border-color:var(--blue);color:#fff}
-.runfoot{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;padding:14px 18px;border-top:1px solid var(--line);background:var(--bg)}
+/* V2 14/08 (anh Luân: *"bố cục mấy cái nút cho đẹp chứ em làm vậy nhìn 1 nùi"*). Chín cái nút
+   cùng cỡ, cùng màu, canh PHẢI rồi tự xuống dòng - nên hàng trên thừa chỗ, hàng dưới lệch, và
+   không có gì nói cái nào đi với cái nào. Ba việc, không thêm một màu nào:
+   1. Canh TRÁI. Nút xuống dòng theo thứ tự đọc, mép trái thẳng hàng, không còn hai hàng so le.
+   2. GOM THEO NHÓM bằng khoảng cách - `.rfg` là một cụm, giữa hai cụm là một khe rộng gấp đôi
+      khe trong cụm. Mắt đọc ra ba cụm mà không cần vẽ thêm đường kẻ nào.
+   3. Nút ĐI TIẾP bị đẩy hẳn sang phải (`margin-left:auto`) - nó không cùng loại với mấy nút kia:
+      tám nút trước là "làm gì đó với người này", nút cuối là "xong người này rồi". */
+.runfoot{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-start;padding:14px 18px;border-top:1px solid var(--line);background:var(--bg)}
+.runfoot .rfg{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.runfoot .rfg+.rfg{margin-left:16px}
+.runfoot .rfend{margin-left:auto;display:flex;gap:8px;align-items:center}
+@media(max-width:900px){.runfoot .rfg+.rfg{margin-left:0}.runfoot .rfend{margin-left:0;width:100%}}
 .btn.lg{height:42px;padding:0 20px;font-size:14px}
 .rundone{display:flex;align-items:center;gap:8px;background:var(--greenb);color:#116149;border-radius:10px;padding:10px 14px;font-size:12.5px;font-weight:700;margin-bottom:12px}
 .rqbox{display:flex;flex-wrap:wrap;gap:10px}
@@ -1726,6 +1738,16 @@ table.dt tbody tr.clk.on td{font-weight:600}
  scrollbar-width:thin;scrollbar-color:transparent transparent;
  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 18px),transparent 100%);
  mask-image:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 18px),transparent 100%)}
+.jstepw{position:relative}
+/* Nút mũi tên ĐÈ LÊN mép dải. Nền trắng đặc + đổ bóng để nó nổi hẳn khỏi nội dung phía sau -
+   một cái mép mờ thì người ta đọc ra "hết rồi", còn một cái nút thì đọc ra "còn nữa, bấm đi". */
+.jsnav{position:absolute;top:50%;margin-top:-15px;width:30px;height:30px;border-radius:50%;
+ border:1px solid var(--line);background:#fff;color:var(--navy);cursor:pointer;z-index:3;
+ display:none;align-items:center;justify-content:center;font-size:16px;
+ box-shadow:0 2px 8px rgba(30,42,56,.16)}
+.jsnav:hover{background:var(--navy);border-color:var(--navy);color:#fff}
+.jsnav.l{left:6px}.jsnav.r{right:6px}
+.jstepw.cl .jsnav.l{display:flex}.jstepw.cr .jsnav.r{display:flex}
 .jstep::-webkit-scrollbar{height:6px}
 .jstep::-webkit-scrollbar-track{background:transparent}
 .jstep::-webkit-scrollbar-thumb{background:transparent;border-radius:3px}
@@ -1978,10 +2000,25 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .rost .rn{flex:1;font-weight:600;font-size:13px}
 /* Hàng tiêu đề của bảng điểm danh: mượn nguyên bộ khung flex của dòng dữ liệu, chỉ thay nội dung
    trong mỗi cụm bằng một cái nhãn. Nhãn canh giữa cụm để nó chỉ đúng vào chùm nút bên dưới. */
+/* LỆCH LÀ VÌ HAI HÀNG ĐO BẰNG HAI THƯỚC KHÁC NHAU (anh Luân: *"lệch lệch kiểu gì ấy"*).
+   Hàng tiêu đề rộng theo ĐỘ DÀI CHỮ trên nó, hàng dữ liệu rộng theo CHÙM NÚT bên dưới - không
+   có gì buộc hai bề rộng ấy bằng nhau, nên nhãn trôi lệch khỏi cụm nó gọi tên. Mượn class chưa
+   đủ; phải buộc bằng một CON SỐ CHUNG.
+   Hai biến dưới đây là bản gốc duy nhất của bề rộng ấy: nút đọc nó, tiêu đề tính lại từ nó
+   (bề rộng cụm = n nút + (n-1) khe). Sau này đổi cỡ nút hay thêm bớt một nút thì sửa đúng một
+   chỗ, tiêu đề tự theo - không phải canh tay bằng px rồi lệch trong im lặng.
+   Nút trạng thái nay cùng một bề rộng ("Có mặt" và "Vắng K" dài ngắn khác nhau) - đúng ý anh Luân
+   ở bảng việc: cùng một bảng thì ít nhất phải tương đồng về kích thước. */
+:root{--ddattw:78px;--ddattg:5px;--ddpfw:40px;--ddpfg:3px}
+.attb{min-width:var(--ddattw);display:inline-flex;align-items:center;justify-content:center}
+.pfb{width:var(--ddpfw)}
 .rost.dhd{border-bottom:1px solid var(--line);background:var(--bg);padding:7px 6px;position:sticky;top:0;z-index:2}
 .rost.dhd .rn,.rost.dhd .dhl{font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
-.rost.dhd .dhl{display:flex;align-items:center;justify-content:center;white-space:nowrap}
-.rost.dhd .ddnote{border:0;background:transparent;height:auto;padding:0}
+.rost.dhd .dhl{display:flex;align-items:center;white-space:nowrap;overflow:hidden}
+.rost.dhd .att.dhl{flex:0 0 auto;width:calc(var(--ddattw)*5 + var(--ddattg)*4);justify-content:center}
+.rost.dhd .pfseg.dhl{flex:0 0 auto;width:calc(var(--ddpfw)*3 + var(--ddpfg)*2);justify-content:center;font-size:11px}
+.rost.dhd .ddnote{border:0;background:transparent;height:auto;padding:0 0 0 8px;justify-content:flex-start}
+@media(max-width:1180px){.rost.dhd .pfseg.dhl{font-size:11px;letter-spacing:0}}
 .att{display:flex;gap:5px}.attb{height:28px;padding:0 10px;border-radius:6px;border:1px solid var(--line);background:#fff;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;color:#5A6675}
 .attb.p.on{background:var(--green);border-color:var(--green);color:#fff}.attb.l.on{background:var(--amber);border-color:var(--amber);color:#fff}.attb.a.on{background:var(--red);border-color:var(--red);color:#fff}.attb.mk.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .ddrow{flex-wrap:wrap}
@@ -8714,7 +8751,7 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
     nút là lệch hết mà không ai hay. */
  if(enr.length)h+='<div class="rost dhd"><div class="rn">Học viên</div>'+
    '<div class="att dhl">Điểm danh</div>'+
-   '<div class="pfseg dhl" data-tip="T = Tốt · B = Bình thường · Y = Yếu">Đánh giá buổi</div>'+
+   '<div class="pfseg dhl" data-tip="Đánh giá học viên trong buổi: T = Tốt · B = Bình thường · Y = Yếu">Đánh giá</div>'+
    '<div class="ddnote dhl">Ghi chú riêng</div></div>';
  enr.forEach(function(e){var sid=e.student_id,s=find("DL09","student_id",sid)||{};
   var cur=rows("DL12").filter(function(r){return r.student_id===sid&&r.session_id===sess})[0];
@@ -10858,8 +10895,10 @@ function renderChay(){
    var _lopHV=(J.C.obMain&&String(J.C.obMain.class_id||""))||"";
    if(_lopHV){var _lopR=find("DL10","class_id",_lopHV);
     h+='<button class="btn primary" onclick="openLop(\''+esc(_lopHV)+'\')" data-tip="Mở Bảng lớp: sĩ số, chuyên cần, bài tập, buổi học, giáo viên"><i class="ti ti-users-group"></i>Lớp '+esc((_lopR&&_lopR.class_name)||_lopHV)+'</button>'}
-   h+='<button class="btn" onclick="runWow(\''+esc(R.pid)+'\')"><i class="ti ti-star"></i>Đặt WOW</button><button class="btn" onclick="runReviewOne(\''+esc(R.pid)+'\')"><i class="ti ti-clipboard-check"></i>Gửi khảo sát</button><button class="btn" onclick="runFeedbackOne(\''+esc(R.pid)+'\')"><i class="ti ti-message-plus"></i>Ghi phản hồi</button><button class="btn" onclick="runComplaintOne(\''+esc(R.pid)+'\')"><i class="ti ti-alert-triangle"></i>Khiếu nại</button><button class="btn" onclick="runDiemdanhClass(\''+esc(R.pid)+'\')"><i class="ti ti-checkbox"></i>Điểm danh lớp</button><button class="btn" onclick="runFlagRisk()"><i class="ti ti-user-exclamation"></i>Báo nguy cơ</button><button class="btn danger" onclick="runDropout()"><i class="ti ti-player-pause"></i>HV dừng học</button>'}
-  h+='<button class="btn" onclick="jOpen(\''+esc(R.pid)+'\')"><i class="ti ti-id-badge-2"></i>Xem hồ sơ</button>'+(R.q?'<button class="btn primary" onclick="runNext()">Người tiếp theo <i class="ti ti-arrow-right"></i></button>':'')+'</div>';
+   h+='<div class="rfg">'+'<button class="btn" onclick="runWow(\''+esc(R.pid)+'\')"><i class="ti ti-star"></i>Đặt WOW</button><button class="btn" onclick="runReviewOne(\''+esc(R.pid)+'\')"><i class="ti ti-clipboard-check"></i>Gửi khảo sát</button><button class="btn" onclick="runFeedbackOne(\''+esc(R.pid)+'\')"><i class="ti ti-message-plus"></i>Ghi phản hồi</button><button class="btn" onclick="runComplaintOne(\''+esc(R.pid)+'\')"><i class="ti ti-alert-triangle"></i>Khiếu nại</button><button class="btn" onclick="runDiemdanhClass(\''+esc(R.pid)+'\')"><i class="ti ti-checkbox"></i>Điểm danh lớp</button></div><div class="rfg"><button class="btn" onclick="runFlagRisk()"><i class="ti ti-user-exclamation"></i>Báo nguy cơ</button><button class="btn danger" onclick="runDropout()"><i class="ti ti-player-pause"></i>HV dừng học</button></div>'}
+  /* Cum CUOI: "xong nguoi nay roi" - khac loai han voi may nut phia truoc ("lam gi do voi
+     nguoi nay"), nen no bi day sang han mep phai thay vi dung lan trong hang. */
+  h+='<div class="rfend">'+'<button class="btn" onclick="jOpen(\''+esc(R.pid)+'\')"><i class="ti ti-id-badge-2"></i>Xem hồ sơ</button>'+(R.q?'<button class="btn primary" onclick="runNext()">Người tiếp theo <i class="ti ti-arrow-right"></i></button>':'')+'</div></div>';
   h+=jNextHint(J);h+='</div>';
   return h+'</div>'}
  var ST=RSTEP[sk];var tab=R.tab||"main";
@@ -11082,7 +11121,10 @@ function jReviewRows(C,k){var a=[];function ad(x,y){a.push([x,y])}
   ad("Trạng thái đặt",elabel(t.booking_status));ad("Ghi chú đặt lịch",t.booking_note)}
  else if(k==="test_grading"){ad("Dự test",elabel(t.test_attendance_status));ad("Vào phòng lúc",t.test_attendance_time);
   ad("Bắt đầu / kết thúc",[t.test_start_actual,t.test_end_actual].filter(function(x){return x}).join(" → "));
-  ad("Người chấm",t.graded_by);ad("Trạng thái chấm",elabel(t.test_status))}
+  /* V2 14/08 (anh Luân: *"người chấm e để tên chứ, ai để mã id"*). Ô này in thẳng `graded_by`
+     - một mã như NV003. Mã là thứ MÁY tra nhau, không phải thứ người đọc. App đã có `nsTen()`
+     để đổi mã nhân sự ra tên; chỗ này chỉ là chưa gọi. */
+  ad("Người chấm",nsTen(t.graded_by));ad("Trạng thái chấm",elabel(t.test_status))}
  else if(k==="test_done"){ad("Điểm tổng (overall)",t.overall_score);
   ad("L/R/W/S",lrws.filter(function(x){return x!==""&&x!=null}).length?lrws.join(" / "):"");
   ad("Nhận xét GV",t.academic_note);ad("Trả kết quả lúc",t.result_time)}
@@ -11711,7 +11753,22 @@ function renderHanhtrinh(embed){ /* V9.18: thân trang dùng được cả khi N
 /* ===== MÀN 2: HỒ SƠ HÀNH TRÌNH MỘT NGƯỜI ===== */
 function jOpen(pid){if(pid!==window.JPID)window.HSTAB="in";window.JPID=pid;go("hoso")}
 function hosoGoStage(pid,k){window.RUN={pid:pid,q:null,i:0,msg:"",viewStep:k};go("chay")}
-function jStepper(J,clickable){var cur=J.S.idx,h='<div class="jstep">';
+/* V2 14/08 (anh Luân: *"bóng mờ tam giác hoặc hình dạng gì đó đè hẳn vào trong người ta mới
+   biết chỗ đó có thể kéo qua lại"*). Đúng. Lượt trước em chỉ làm MỜ DẦN hai mép - nhẹ tới mức
+   nó đọc ra như "hết rồi" chứ không phải "còn nữa". Một cái mép mờ không mời ai kéo cả.
+   Nay: mờ mép GIỮ (nó nói "còn nữa"), cộng thêm một nút mũi tên tròn ĐÈ HẲN LÊN mép - vừa là
+   dấu hiệu nhìn thấy được, vừa bấm được để trượt, cho người không quen kéo ngang bằng chuột.
+   Nút chỉ hiện ở phía CÒN nội dung: cuộn tới cuối thì nút phải tự tắt, không mời đi tiếp vào
+   chỗ trống. `onscroll` gắn thẳng trên thẻ vì app nạp màn bằng innerHTML - thẻ script trong
+   chuỗi HTML sẽ không chạy, còn thuộc tính sự kiện thì chạy. */
+function jsFade(el){try{var w=el.parentNode;if(!w)return;
+ var het=el.scrollWidth-el.clientWidth;
+ w.classList.toggle("cl",el.scrollLeft>4);
+ w.classList.toggle("cr",het>4&&el.scrollLeft<het-4)}catch(e){}}
+function jsScroll(b,dir){try{var el=b.parentNode.querySelector(".jstep");if(!el)return;
+ el.scrollBy({left:dir*Math.max(200,Math.round(el.clientWidth*0.6)),behavior:"smooth"});
+ setTimeout(function(){jsFade(el)},260)}catch(e){}}
+function jStepper(J,clickable){var cur=J.S.idx,h='<div class="jstepw cr"><div class="jstep" onscroll="jsFade(this)">';
  var mode=(clickable===true)?"run":clickable;var pid=J.C.pid;
  var cure=JMAIN.indexOf(J.k);var vs=(mode==="run"&&window.RUN)?window.RUN.viewStep:"";
  JMAIN.forEach(function(k,i){var S=JBY[k];var st=(cure<0)?"todo":(i<cure?"done":(i===cure?"now":"todo"));
@@ -11719,9 +11776,18 @@ function jStepper(J,clickable){var cur=J.S.idx,h='<div class="jstep">';
   var canClick=mode&&(st==="done"||st==="now");
   var sel=(vs===k)?" sel":"";
   var oc=canClick?(mode==="hoso"?(' onclick="hosoGoStage(\''+pid+'\',\''+k+'\')"'):(' onclick="runGoStep(\''+k+'\')"')):"";
-  h+='<div class="jsi '+st+sel+(canClick?" clk":"")+'"'+oc+'><div class="jsd"><i class="ti '+(st==="done"?"ti-check":S.ic)+'"></i></div><div class="jsl">'+esc(S.t)+'</div><div class="jsw">'+esc(String(when).slice(0,10)||"")+'</div></div>';
+  /* V2 14/08 (anh Luân: *"hover vào chưa có mô tả công dụng của chặng ta"*). Dải chặng chỉ ghi
+     TÊN chặng và ngày - người mới nhìn vào không biết "Chờ chấm test" nghĩa là ai đang phải
+     làm gì. Câu mô tả ấy app CÓ SẴN (`S.d`, chính câu đang hiện ở thẻ bước và ở khối "Tiếp
+     theo sẽ là"), chỉ là dải chặng chưa mượn. Kèm luôn người lo và hạn - ba thứ ấy trả lời
+     trọn câu "chặng này để làm gì, ai làm, trong bao lâu". */
+  var _tip=[S.t,(S.d||""),(S.who?("Người lo: "+S.who):""),(S.sla!=null?("hạn "+(S.sla>=48?(Math.round(S.sla/24)+" ngày"):(S.sla+" giờ"))):"")].filter(function(x){return x}).join(" — ");
+  h+='<div class="jsi '+st+sel+(canClick?" clk":"")+'"'+oc+' data-tip="'+esc(_tip)+'"'+'><div class="jsd"><i class="ti '+(st==="done"?"ti-check":S.ic)+'"></i></div><div class="jsl">'+esc(S.t)+'</div><div class="jsw">'+esc(String(when).slice(0,10)||"")+'</div></div>';
   if(i<JMAIN.length-1)h+='<div class="jsc '+(i<cure?"done":"")+'"></div>'});
  h+='</div>';
+ /* Hai nut mui ten DE LEN mep, chi hien phia con noi dung (lop cl/cr do `jsFade` bat/tat). */
+ h+='<button class="jsnav l" onclick="jsScroll(this,-1)" aria-label="Xem chặng trước" data-tip="Kéo dải chặng sang trái"><i class="ti ti-chevron-left"></i></button>'+
+  '<button class="jsnav r" onclick="jsScroll(this,1)" aria-label="Xem chặng sau" data-tip="Kéo dải chặng sang phải"><i class="ti ti-chevron-right"></i></button></div>';
  if(mode)h+='<div class="jshint"><i class="ti ti-hand-finger"></i>Bấm vào một bước để '+(mode==="hoso"?"vào xử lý / xem lại bước đó.":"xem lại / cập nhật bước đã qua, hoặc làm bước hiện tại bên dưới.")+'</div>';
  if(J.S.branch)h+='<div class="dnote nbred"><b>Nhánh rẽ: '+esc(J.S.t)+'.</b> '+esc(J.S.why)+'</div>';
  return h}

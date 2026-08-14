@@ -6089,7 +6089,7 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
     nút là lệch hết mà không ai hay. */
  if(enr.length)h+='<div class="rost dhd"><div class="rn">Học viên</div>'+
    '<div class="att dhl">Điểm danh</div>'+
-   '<div class="pfseg dhl" data-tip="T = Tốt · B = Bình thường · Y = Yếu">Đánh giá buổi</div>'+
+   '<div class="pfseg dhl" data-tip="Đánh giá học viên trong buổi: T = Tốt · B = Bình thường · Y = Yếu">Đánh giá</div>'+
    '<div class="ddnote dhl">Ghi chú riêng</div></div>';
  enr.forEach(function(e){var sid=e.student_id,s=find("DL09","student_id",sid)||{};
   var cur=rows("DL12").filter(function(r){return r.student_id===sid&&r.session_id===sess})[0];
@@ -8233,8 +8233,10 @@ function renderChay(){
    var _lopHV=(J.C.obMain&&String(J.C.obMain.class_id||""))||"";
    if(_lopHV){var _lopR=find("DL10","class_id",_lopHV);
     h+='<button class="btn primary" onclick="openLop(\''+esc(_lopHV)+'\')" data-tip="Mở Bảng lớp: sĩ số, chuyên cần, bài tập, buổi học, giáo viên"><i class="ti ti-users-group"></i>Lớp '+esc((_lopR&&_lopR.class_name)||_lopHV)+'</button>'}
-   h+='<button class="btn" onclick="runWow(\''+esc(R.pid)+'\')"><i class="ti ti-star"></i>Đặt WOW</button><button class="btn" onclick="runReviewOne(\''+esc(R.pid)+'\')"><i class="ti ti-clipboard-check"></i>Gửi khảo sát</button><button class="btn" onclick="runFeedbackOne(\''+esc(R.pid)+'\')"><i class="ti ti-message-plus"></i>Ghi phản hồi</button><button class="btn" onclick="runComplaintOne(\''+esc(R.pid)+'\')"><i class="ti ti-alert-triangle"></i>Khiếu nại</button><button class="btn" onclick="runDiemdanhClass(\''+esc(R.pid)+'\')"><i class="ti ti-checkbox"></i>Điểm danh lớp</button><button class="btn" onclick="runFlagRisk()"><i class="ti ti-user-exclamation"></i>Báo nguy cơ</button><button class="btn danger" onclick="runDropout()"><i class="ti ti-player-pause"></i>HV dừng học</button>'}
-  h+='<button class="btn" onclick="jOpen(\''+esc(R.pid)+'\')"><i class="ti ti-id-badge-2"></i>Xem hồ sơ</button>'+(R.q?'<button class="btn primary" onclick="runNext()">Người tiếp theo <i class="ti ti-arrow-right"></i></button>':'')+'</div>';
+   h+='<div class="rfg">'+'<button class="btn" onclick="runWow(\''+esc(R.pid)+'\')"><i class="ti ti-star"></i>Đặt WOW</button><button class="btn" onclick="runReviewOne(\''+esc(R.pid)+'\')"><i class="ti ti-clipboard-check"></i>Gửi khảo sát</button><button class="btn" onclick="runFeedbackOne(\''+esc(R.pid)+'\')"><i class="ti ti-message-plus"></i>Ghi phản hồi</button><button class="btn" onclick="runComplaintOne(\''+esc(R.pid)+'\')"><i class="ti ti-alert-triangle"></i>Khiếu nại</button><button class="btn" onclick="runDiemdanhClass(\''+esc(R.pid)+'\')"><i class="ti ti-checkbox"></i>Điểm danh lớp</button></div><div class="rfg"><button class="btn" onclick="runFlagRisk()"><i class="ti ti-user-exclamation"></i>Báo nguy cơ</button><button class="btn danger" onclick="runDropout()"><i class="ti ti-player-pause"></i>HV dừng học</button></div>'}
+  /* Cum CUOI: "xong nguoi nay roi" - khac loai han voi may nut phia truoc ("lam gi do voi
+     nguoi nay"), nen no bi day sang han mep phai thay vi dung lan trong hang. */
+  h+='<div class="rfend">'+'<button class="btn" onclick="jOpen(\''+esc(R.pid)+'\')"><i class="ti ti-id-badge-2"></i>Xem hồ sơ</button>'+(R.q?'<button class="btn primary" onclick="runNext()">Người tiếp theo <i class="ti ti-arrow-right"></i></button>':'')+'</div></div>';
   h+=jNextHint(J);h+='</div>';
   return h+'</div>'}
  var ST=RSTEP[sk];var tab=R.tab||"main";
@@ -8457,7 +8459,10 @@ function jReviewRows(C,k){var a=[];function ad(x,y){a.push([x,y])}
   ad("Trạng thái đặt",elabel(t.booking_status));ad("Ghi chú đặt lịch",t.booking_note)}
  else if(k==="test_grading"){ad("Dự test",elabel(t.test_attendance_status));ad("Vào phòng lúc",t.test_attendance_time);
   ad("Bắt đầu / kết thúc",[t.test_start_actual,t.test_end_actual].filter(function(x){return x}).join(" → "));
-  ad("Người chấm",t.graded_by);ad("Trạng thái chấm",elabel(t.test_status))}
+  /* V2 14/08 (anh Luân: *"người chấm e để tên chứ, ai để mã id"*). Ô này in thẳng `graded_by`
+     - một mã như NV003. Mã là thứ MÁY tra nhau, không phải thứ người đọc. App đã có `nsTen()`
+     để đổi mã nhân sự ra tên; chỗ này chỉ là chưa gọi. */
+  ad("Người chấm",nsTen(t.graded_by));ad("Trạng thái chấm",elabel(t.test_status))}
  else if(k==="test_done"){ad("Điểm tổng (overall)",t.overall_score);
   ad("L/R/W/S",lrws.filter(function(x){return x!==""&&x!=null}).length?lrws.join(" / "):"");
   ad("Nhận xét GV",t.academic_note);ad("Trả kết quả lúc",t.result_time)}
@@ -9086,7 +9091,22 @@ function renderHanhtrinh(embed){ /* V9.18: thân trang dùng được cả khi N
 /* ===== MÀN 2: HỒ SƠ HÀNH TRÌNH MỘT NGƯỜI ===== */
 function jOpen(pid){if(pid!==window.JPID)window.HSTAB="in";window.JPID=pid;go("hoso")}
 function hosoGoStage(pid,k){window.RUN={pid:pid,q:null,i:0,msg:"",viewStep:k};go("chay")}
-function jStepper(J,clickable){var cur=J.S.idx,h='<div class="jstep">';
+/* V2 14/08 (anh Luân: *"bóng mờ tam giác hoặc hình dạng gì đó đè hẳn vào trong người ta mới
+   biết chỗ đó có thể kéo qua lại"*). Đúng. Lượt trước em chỉ làm MỜ DẦN hai mép - nhẹ tới mức
+   nó đọc ra như "hết rồi" chứ không phải "còn nữa". Một cái mép mờ không mời ai kéo cả.
+   Nay: mờ mép GIỮ (nó nói "còn nữa"), cộng thêm một nút mũi tên tròn ĐÈ HẲN LÊN mép - vừa là
+   dấu hiệu nhìn thấy được, vừa bấm được để trượt, cho người không quen kéo ngang bằng chuột.
+   Nút chỉ hiện ở phía CÒN nội dung: cuộn tới cuối thì nút phải tự tắt, không mời đi tiếp vào
+   chỗ trống. `onscroll` gắn thẳng trên thẻ vì app nạp màn bằng innerHTML - thẻ script trong
+   chuỗi HTML sẽ không chạy, còn thuộc tính sự kiện thì chạy. */
+function jsFade(el){try{var w=el.parentNode;if(!w)return;
+ var het=el.scrollWidth-el.clientWidth;
+ w.classList.toggle("cl",el.scrollLeft>4);
+ w.classList.toggle("cr",het>4&&el.scrollLeft<het-4)}catch(e){}}
+function jsScroll(b,dir){try{var el=b.parentNode.querySelector(".jstep");if(!el)return;
+ el.scrollBy({left:dir*Math.max(200,Math.round(el.clientWidth*0.6)),behavior:"smooth"});
+ setTimeout(function(){jsFade(el)},260)}catch(e){}}
+function jStepper(J,clickable){var cur=J.S.idx,h='<div class="jstepw cr"><div class="jstep" onscroll="jsFade(this)">';
  var mode=(clickable===true)?"run":clickable;var pid=J.C.pid;
  var cure=JMAIN.indexOf(J.k);var vs=(mode==="run"&&window.RUN)?window.RUN.viewStep:"";
  JMAIN.forEach(function(k,i){var S=JBY[k];var st=(cure<0)?"todo":(i<cure?"done":(i===cure?"now":"todo"));
@@ -9094,9 +9114,18 @@ function jStepper(J,clickable){var cur=J.S.idx,h='<div class="jstep">';
   var canClick=mode&&(st==="done"||st==="now");
   var sel=(vs===k)?" sel":"";
   var oc=canClick?(mode==="hoso"?(' onclick="hosoGoStage(\''+pid+'\',\''+k+'\')"'):(' onclick="runGoStep(\''+k+'\')"')):"";
-  h+='<div class="jsi '+st+sel+(canClick?" clk":"")+'"'+oc+'><div class="jsd"><i class="ti '+(st==="done"?"ti-check":S.ic)+'"></i></div><div class="jsl">'+esc(S.t)+'</div><div class="jsw">'+esc(String(when).slice(0,10)||"")+'</div></div>';
+  /* V2 14/08 (anh Luân: *"hover vào chưa có mô tả công dụng của chặng ta"*). Dải chặng chỉ ghi
+     TÊN chặng và ngày - người mới nhìn vào không biết "Chờ chấm test" nghĩa là ai đang phải
+     làm gì. Câu mô tả ấy app CÓ SẴN (`S.d`, chính câu đang hiện ở thẻ bước và ở khối "Tiếp
+     theo sẽ là"), chỉ là dải chặng chưa mượn. Kèm luôn người lo và hạn - ba thứ ấy trả lời
+     trọn câu "chặng này để làm gì, ai làm, trong bao lâu". */
+  var _tip=[S.t,(S.d||""),(S.who?("Người lo: "+S.who):""),(S.sla!=null?("hạn "+(S.sla>=48?(Math.round(S.sla/24)+" ngày"):(S.sla+" giờ"))):"")].filter(function(x){return x}).join(" — ");
+  h+='<div class="jsi '+st+sel+(canClick?" clk":"")+'"'+oc+' data-tip="'+esc(_tip)+'"'+'><div class="jsd"><i class="ti '+(st==="done"?"ti-check":S.ic)+'"></i></div><div class="jsl">'+esc(S.t)+'</div><div class="jsw">'+esc(String(when).slice(0,10)||"")+'</div></div>';
   if(i<JMAIN.length-1)h+='<div class="jsc '+(i<cure?"done":"")+'"></div>'});
  h+='</div>';
+ /* Hai nut mui ten DE LEN mep, chi hien phia con noi dung (lop cl/cr do `jsFade` bat/tat). */
+ h+='<button class="jsnav l" onclick="jsScroll(this,-1)" aria-label="Xem chặng trước" data-tip="Kéo dải chặng sang trái"><i class="ti ti-chevron-left"></i></button>'+
+  '<button class="jsnav r" onclick="jsScroll(this,1)" aria-label="Xem chặng sau" data-tip="Kéo dải chặng sang phải"><i class="ti ti-chevron-right"></i></button></div>';
  if(mode)h+='<div class="jshint"><i class="ti ti-hand-finger"></i>Bấm vào một bước để '+(mode==="hoso"?"vào xử lý / xem lại bước đó.":"xem lại / cập nhật bước đã qua, hoặc làm bước hiện tại bên dưới.")+'</div>';
  if(J.S.branch)h+='<div class="dnote nbred"><b>Nhánh rẽ: '+esc(J.S.t)+'.</b> '+esc(J.S.why)+'</div>';
  return h}
