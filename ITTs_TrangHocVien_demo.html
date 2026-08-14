@@ -466,9 +466,17 @@ tr.cfhl>td{background:#FFF6D8}
    nằm ngay dưới thanh trên, luôn ở đó chừng nào còn ở chế độ xem thử, và mang sẵn nút mở khoá. */
 /* V9.63 (anh Luân): dải này từng nền vàng - đứng cạnh các chỉ số đang tô vàng thì trùng màu,
    nhìn rối. Đổi sang xanh nhạt: nó là dải TRẠNG THÁI, không phải cảnh báo, nên không cần vàng. */
-.cfbar{display:none;align-items:center;gap:9px;background:#E8F1FA;border-bottom:1px solid var(--line);
- color:var(--navyd);font-size:12px;font-weight:600;padding:7px 22px;flex-shrink:0}
-.cfbar.on{display:flex}
+/* ═══ V2 14/08 - DẢI "DỮ LIỆU DEMO" LÊN THANH TRÊN (anh Luân: *"em thì lại đang phung phí hàng
+   quá, làm nội dung chính bị đẩy xuống dưới rất uổng"*) ══════════════════════════════════════
+   Đo bằng trình duyệt thật, 67 trang, khung 1512x900: dải này cao 41px và có mặt trên **cả 67
+   trang**, tổng cộng **2.747px** đẩy nội dung xuống - trong khi nó nói đúng MỘT câu, câu ấy
+   không đổi theo trang, và người ta đọc một lần là nhớ cả buổi.
+   *Thứ không đổi theo trang thì không được lấy một hàng của mọi trang.* Nay nó là một viên chip
+   nằm cạnh tên trang trên thanh 60px vốn đã có sẵn - vẫn đọc được, mà giá đứng bằng 0px. */
+.cfbar{display:none;align-items:center;gap:8px;background:#E8F1FA;border-radius:20px;
+ color:var(--navyd);font-size:11.5px;font-weight:600;padding:4px 10px;flex:0 0 auto;white-space:nowrap}
+.cfbar.on{display:inline-flex}
+.cfbar .btn.sm{height:24px;padding:0 8px;font-size:11px}
 /* V9.63b (anh Luân: *"cái checkbox nhìn thô và choáng chỗ quá"*): ô 13px tô đặc trông như một
    khối màu chen vào giữa nút. Nay nhỏ lại 10px, viền nhạt, và khi bật thì vẽ DẤU TÍCH mảnh chứ
    không tô đầy - nhẹ mắt mà vẫn nói được "chỗ này chọn nhiều cái cùng lúc". */
@@ -514,11 +522,10 @@ tr.cfhl>td{background:#FFF6D8}
    dung: nền trắng như thanh trên để thành một khối liền với vỏ app, thêm một vạch màu mảnh bên
    trái làm dấu, chữ và icon lấy màu hổ phách trầm. Không dùng nền vàng đặc - đây là trạng thái,
    không phải cảnh báo (cùng lý do đã bỏ nền vàng ở V9.63). */
-.cfbar.demo{background:#fff;border-bottom-color:var(--line);color:#7A5B12;
- box-shadow:inset 3px 0 0 var(--amber)}
+.cfbar.demo{background:#FFF7E6;color:#7A5B12;box-shadow:none}
 .cfbar.demo i{color:var(--amber)}
 .cfbar i{font-size:15px;flex:none}
-.cfbar span{flex:1;min-width:0}
+.cfbar span{flex:0 0 auto;min-width:0}
 .topbar{height:60px;flex-shrink:0;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 22px}
 .topbar h1{font-size:17px;font-weight:700}.topbar .crumb{font-size:11px;color:var(--muted);font-weight:500;margin-top:1px}
 /* V9.99z10 (anh Luân, kèm ảnh: *"em nên có phương án cho breadcrumb nhé, nó rớt hàng rất xấu
@@ -608,6 +615,16 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .ic.gray{background:var(--gray);color:#5A6675}.sub.gray{color:var(--muted)}
 .cols{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}@media(max-width:1050px){.cols{grid-template-columns:1fr}}
 .panel{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:16px}
+/* ═══ V2 14/08 - HAI TẤM TÓM TẮT ĐỨNG CẠNH NHAU (anh Luân: *"2 bảng này nên 2 cột nhỉ, chứ cái
+   này trên, cái kia dưới thì khó theo dõi"*) ════════════════════════════════════════════════
+   Đo trên Trang bắt đầu, khung 1512x900: dòng việc ĐẦU TIÊN nằm ở **y=895px** - tức mở app ra
+   không thấy một việc nào, phải cuộn. Trên nó là năm khối tóm tắt xếp chồng, trong đó "Cần chú
+   ý" (170px) và "Nhịp ngày của bạn" (184px) đều trả lời cùng một câu - *hôm nay tôi phải để mắt
+   vào đâu* - mà lại nằm hai tầng cách nhau một dải thẻ.
+   Xếp cạnh nhau thì đọc một lượt là xong và lấy lại được chiều cao của tấm thấp hơn. */
+.bl2c{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.bl2c>.panel{margin-bottom:16px}
+@media(max-width:1200px){.bl2c{grid-template-columns:1fr;gap:0}}
 .ph{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
 /* KHỔ ĐIỆN THOẠI: cho tiêu đề khối XUỐNG DÒNG thay vì tranh chỗ với dòng chú thích bên cạnh.
    Phép đo M6 (thêm 11/08, sau khi anh Luân nói dải cảnh báo "nhìn luộm thuộm") đo được 9 chỗ
@@ -2714,7 +2731,7 @@ body.drsz .drawer{transition:none}
  .navmask.on{display:block;position:fixed;inset:0;background:#0006;z-index:55}
  .content{padding:16px 14px}
  .topbar{padding:0 14px;gap:10px}
- .cfbar{padding:7px 14px}
+ .cfbar{padding:3px 8px}
  .topbar h1{font-size:15px}
  .rolesel span{display:none}
  .phead{flex-wrap:wrap;align-items:flex-start}
@@ -2817,9 +2834,9 @@ body.drsz .drawer{transition:none}
     <div class="hvtop">
       <button class="tbtn hvtoggle" onclick="hvToggleSide()" aria-label="Mục lục"><i class="ti ti-menu-2"></i></button>
       <div class="hvtt"><b id="hvTopT">Cổng học viên</b><small id="hvTopS">-</small></div>
+      <div class="cfbar" id="cfBar"></div>
       <div class="hvtools" id="hvTools"></div>
     </div>
-    <div class="cfbar" id="cfBar"></div>
     <main class="hvmain" id="hvMain"><div id="hvBody"></div></main>
   </div>
 </div>
@@ -11520,7 +11537,12 @@ function renderBanlam(){
     thường ở các trang nghiệp vụ để cảnh báo, các nhân sự sẽ tự biết mình cần làm gì."*
     Đặt ở đây chứ không đặt cuối trang: thứ người ta cần biết trước nhất phải nằm chỗ mắt chạm
     đầu tiên. Mỗi ô bấm được, đi thẳng tới trang nghiệp vụ đẻ ra con số ấy. */
- h+=canhBaoHTML();
+ /* Nhịp ngày vốn đi kèm bảng việc trong `bvSau()`; ở riêng trang này em tách nó ra để ghép
+    cặp với "Cần chú ý". Tách bằng cách gọi thẳng HAI hàm con mà `bvSau()` vẫn gọi, không viết
+    lại phép dựng nào - trang khác vẫn dùng `bvSau()` y như cũ. */
+ var _cbao=canhBaoHTML(), _nhip="";
+ try{_nhip=nhipSau()}catch(e){_nhip=""}
+ h+=_nhip?('<div class="bl2c">'+_cbao+_nhip+'</div>'):_cbao;
  function cS(k){return all0.filter(function(J){return J.k===k&&J.act}).length}
  var nRisk=srows("DL09").filter(stuRisk).length;
  var nDebt=srows("DL06").filter(function(e){return num(e.remaining_amount)>0&&!/cancel/.test(ecode(e.enrollment_status))}).length;
@@ -11555,8 +11577,9 @@ function renderBanlam(){
   "banlam",blocks.map(function(b){return b[6]}));
  /* V9.18: GỘP "Hành trình" vào Trang bắt đầu - một trang, hai góc nhìn (danh sách chạy / bảng chặng) */
  var vw=window.BLVIEW||"list";
- h+=bvSau();   /* V9.60: Trang bắt đầu cũng không gọi pageHead - bảng việc của Tư vấn và của
-                 Quản lý vì thế chưa từng hiện. Gắn sau dải thẻ, trước thanh chọn góc nhìn. */
+ h+=bangViecHTML();   /* V9.60: Trang bắt đầu cũng không gọi pageHead - bảng việc của Tư vấn và
+                 của Quản lý vì thế chưa từng hiện. Gắn sau dải thẻ, trước thanh chọn góc nhìn.
+                 (Nhịp ngày - vế còn lại của `bvSau()` - đã lên trên, ghép cặp với "Cần chú ý".) */
  h+='<div style="margin:2px 0 10px">'+segHTML(vw,[["list","Chạy quy trình",null,""],["board","Bảng chặng - hành trình",null,""]],"window.BLVIEW='{k}';reRender(CUR)")+'</div>';
  if(vw==="board"){h+=renderHanhtrinh(1);return h}   /* KPI đã nằm trên đầu trang */
  /* CHẠY QUY TRÌNH gộp thẳng vào đây: chip lọc + danh sách người */
@@ -27792,7 +27815,11 @@ var NAVTREE=[
  {g:"Điều hành",items:["baocao","nhansu","bangcong","hoidap","canhan","settings"]},
  /* V2 08/08 - mười sáu cuốn sổ chỉ-đọc rời khỏi cây menu, vào sau một cửa `tracuu` (ghi chú
     dài ở bảng PAGES). `hocvien` và `giangvien` Ở LẠI vì chúng nằm trong nhịp ngày của ba nhóm. */
- {g:"Tra cứu",items:["tracuu","hocvien","giangvien","tinnhan"]}];
+ /* V2 14/08 - `socamket` (Sổ cam kết đã ký, dựng cùng ngày) VÀO ĐÂY. Nó đã khai `g:"Tra cứu"`
+    ở PAGES từ lúc dựng, mà nhóm "Tra cứu" trên cây menu thì chưa ai thêm tên nó vào - tức bản
+    khai đúng ý mà không ai đọc. `_checkv2` L3 bắt: trang xem được, không có mục menu, không có
+    trang cha. Đúng con bệnh anh Luân bắt ba lần rồi: *"a tìm trên sidebar ko thấy"*. */
+ {g:"Tra cứu",items:["tracuu","hocvien","giangvien","socamket","tinnhan"]}];
 /* Danh mục sổ nằm sau cửa Tra cứu. Khai MỘT chỗ, BA nơi đọc: trang `tracuu` vẽ theo nó, `navCur`
    dùng nó để biết "đang đứng trong một cuốn sổ thì mục Tra cứu phải sáng", và `_checkcauhoi`
    dùng nó để biết các sổ ấy VẪN có lối trên menu (qua cửa cha). */
@@ -27998,7 +28025,7 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
    "Test đầu vào" -> cũng vậy. Trước đây hai người ấy thấy nhóm "C1 · Khách tiềm năng".) */
 var NAVPHANG=[
  {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:"Lớp học & Giảng dạy",items:["xeplop","giaoan","baitap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
+ {g:"Lớp học & Giảng dạy",items:["xeplop","giaoan","baitap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow","lichwow"]},
  {g:"Chăm sóc & Sau khóa",items:["khaosat","ghinhan","khieunai","baoluu","ketthuc","ketqua","magioithieu"]}];
 function navCayV5(){
  if(arcMode()==="chang")return NAVTREE;

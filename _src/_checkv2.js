@@ -120,6 +120,24 @@ const vais=[...new Set(nguoi.map(s=>String(s.role||"")))].filter(Boolean).sort()
   try{CUR=p.k;if(!navCurKey())toi.push(p.k+" (cha "+cha+")")}catch(e){toi.push(p.k+" (loi)")}
  });
  t("L3 · dung o trang con thi muc cua cha SANG tren sidebar", toi.length===0, toi.join(" · "));
+ /* ═══ L3b · HAI CÂY MENU PHẢI DẪN TỚI CÙNG MỘT TẬP TRANG (14/08) ═══════════════════════════
+    App có HAI cây: `NAVTREE` (xếp theo chặng) và `NAVPHANG` (xếp phẳng, thay chỗ bốn nhóm
+    chặng). `NAVPHANG` là BẢN CHÉP TAY THỨ HAI của cùng một tập trang - thêm một trang vào nhóm
+    chặng mà quên chép sang là trang ấy biến mất khỏi menu phẳng, im lặng.
+    Đã xảy ra thật: `lichwow` (Lịch trực WOW) nằm trong nhóm C2 của `NAVTREE` từ lâu mà chưa bao
+    giờ có trong `NAVPHANG`, nên 4 chức danh dùng menu phẳng không có lối vào. `_checkv2` L3 cũ
+    KHÔNG bắt được vì nó chỉ đo cây đang chạy - mà cây đang chạy lúc kiểm là cây theo chặng.
+    *Hai bảng cùng tả một thứ thì sớm muộn nói hai đằng - đây là lần thứ ba trong dự án.* */
+ const chang=[],phang={};
+ try{NAVTREE.forEach(G=>{if(G.arc)(G.items||[]).forEach(k=>chang.push(k))})}catch(e){}
+ try{NAVPHANG.forEach(G=>(G.items||[]).forEach(k=>{phang[k]=1}))}catch(e){}
+ /* Bốn mục bản đồ chặng (changA..D) CỐ Ý không có trong cây phẳng - cây phẳng bỏ hẳn khái niệm
+    chặng, đó là điểm khác nhau giữa hai cây chứ không phải chỗ sót. */
+ const sot=chang.filter(k=>!phang[k]&&!/^chang[A-Z]$/.test(k)&&PBK[k]&&!PBK[k].hide);
+ t("L3b · trang nao trong nhom chang cung co mat o cay menu phang", sot.length===0,
+   sot.join(" · ")+" => them vao NAVPHANG, khong thi menu phang mat loi vao");
+ const du=Object.keys(phang).filter(k=>!PBK[k]);
+ t("L3b · cay menu phang khong nhac trang khong co that", du.length===0, du.join(" · "));
 })();
 
 /* ═══ L4 · SỐ NÓI RA PHẢI BẤM ĐƯỢC ══════════════════════════════════════════════════════════ */

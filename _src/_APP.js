@@ -2861,7 +2861,13 @@ function toggleForm(key){var p=document.getElementById("formPanel");if(p)p.class
    Nay: hễ trang hiện tại có hàm vẽ riêng thì LUÔN vẽ lại cả trang. Nhánh vẽ trống chỉ còn dành
    cho sổ đứng một mình, không thuộc trang nào.
    *Một phép tối ưu dựa trên "hai cái tên giống nhau" là một phép đoán, không phải một phép suy.* */
-function rlist(key){if(typeof CUR!=="undefined"&&RENDER[CUR]){reRender(CUR);return}
+/* Ghi địa chỉ Ở ĐÂY, trước khi rẽ nhánh - vì HAI nhánh dưới không cùng đi qua `reRender` (nhánh
+   sổ đứng một mình vẽ thẳng vào `innerHTML`). Đặt lời ghi trong một nhánh thôi thì trang nào rơi
+   vào nhánh kia sẽ bấm chip mà thanh địa chỉ đứng im - đúng chỗ anh Luân bắt được 14/08:
+   *"a bấm chip, có thấy link đổi đâu em"*. Mọi sổ danh sách thuần (`nhaplead`, `test`, `hocvien`
+   ...) đều rơi vào nhánh kia, tức là gần hết các trang có chip. */
+function rlist(key){try{reRenderURL()}catch(e){}
+ if(typeof CUR!=="undefined"&&RENDER[CUR]){reRender(CUR);return}
  document.getElementById("content").innerHTML=renderList(key)}
 function toggleFilt(key,v){var a=FILT[key]||[];var i=a.indexOf(v);if(i>=0)a.splice(i,1);else a.push(v);FILT[key]=a;PAGE[key]=0;rlist(key)}
 function __clearHVF(){window.HVFCLS="";window.HVFCRS=""}
@@ -24644,8 +24650,13 @@ function ctxApply(qs,k){
   if(nm==="qf"){try{_qf=decodeURIComponent(val)}catch(e){}return}
   var t=M[nm];if(!t)return;
   try{window[t]=decodeURIComponent(val)}catch(e){}});
- /* Không có khoá trang truyền vào thì tự đọc lại từ địa chỉ - hai chỗ gọi hàm này đều lấy trang
-    từ cùng một nguồn ấy, nên không lệch. */
+ /* PHẢI truyền khoá trang vào, KHÔNG được lấy `hashKey()` làm dự phòng ở đây. Lúc `ctxApply`
+    chạy trong `enter()` thì `setRole` đã kịp ghi đè thanh địa chỉ bằng trang đáp của chức danh -
+    đúng cái bẫy mà `_checkf5` đã dựng ra để canh, và em vừa cắn lại nó lần thứ hai bằng một
+    đường khác: `hashKey()` đọc `location.search` SỐNG nên trả về trang mặc định, còn `ctxVao`
+    là bản chụp từ trước nên vẫn đúng. Hai nguồn khác nhau cho cùng một câu hỏi.
+    `hashKey()` chỉ còn là lối chót cho lời gọi nào quên truyền - và nếu quên thì chip không được
+    khôi phục chứ không đặt bừa vào nhầm sổ. */
  try{var lk=ctxSoCua(k||hashKey());
   if(lk){
    if(_flt!==null)FILT[lk]=_flt?_flt.split("~"):[];
@@ -24655,7 +24666,7 @@ function ctxApply(qs,k){
 function hashApply(){var k=hashKey();
  if(!k||k===window.HASHCUR)return;
  if(!hashOK(k))return;
- ctxApply();          /* đặt lại hồ sơ/lớp/tab TRƯỚC khi vẽ, không thì vẽ ra trang trống */
+ ctxApply(null,k);    /* đặt lại hồ sơ/lớp/tab/chip TRƯỚC khi vẽ, không thì vẽ ra trang trống */
  go(k,true)}   /* true = đang do Back/Forward, đừng đẩy thêm mốc nữa */
 function go(key,noHist){
  /* V9.27: nhớ lại mục menu đang sáng TRƯỚC khi rời đi. Trang nào không có mục riêng trên menu
@@ -24946,7 +24957,11 @@ var NAVTREE=[
  {g:"Điều hành",items:["baocao","nhansu","bangcong","hoidap","canhan","settings"]},
  /* V2 08/08 - mười sáu cuốn sổ chỉ-đọc rời khỏi cây menu, vào sau một cửa `tracuu` (ghi chú
     dài ở bảng PAGES). `hocvien` và `giangvien` Ở LẠI vì chúng nằm trong nhịp ngày của ba nhóm. */
- {g:"Tra cứu",items:["tracuu","hocvien","giangvien","tinnhan"]}];
+ /* V2 14/08 - `socamket` (Sổ cam kết đã ký, dựng cùng ngày) VÀO ĐÂY. Nó đã khai `g:"Tra cứu"`
+    ở PAGES từ lúc dựng, mà nhóm "Tra cứu" trên cây menu thì chưa ai thêm tên nó vào - tức bản
+    khai đúng ý mà không ai đọc. `_checkv2` L3 bắt: trang xem được, không có mục menu, không có
+    trang cha. Đúng con bệnh anh Luân bắt ba lần rồi: *"a tìm trên sidebar ko thấy"*. */
+ {g:"Tra cứu",items:["tracuu","hocvien","giangvien","socamket","tinnhan"]}];
 /* Danh mục sổ nằm sau cửa Tra cứu. Khai MỘT chỗ, BA nơi đọc: trang `tracuu` vẽ theo nó, `navCur`
    dùng nó để biết "đang đứng trong một cuốn sổ thì mục Tra cứu phải sáng", và `_checkcauhoi`
    dùng nó để biết các sổ ấy VẪN có lối trên menu (qua cửa cha). */
@@ -25152,7 +25167,7 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
    "Test đầu vào" -> cũng vậy. Trước đây hai người ấy thấy nhóm "C1 · Khách tiềm năng".) */
 var NAVPHANG=[
  {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:"Lớp học & Giảng dạy",items:["xeplop","giaoan","baitap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow"]},
+ {g:"Lớp học & Giảng dạy",items:["xeplop","giaoan","baitap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow","lichwow"]},
  {g:"Chăm sóc & Sau khóa",items:["khaosat","ghinhan","khieunai","baoluu","ketthuc","ketqua","magioithieu"]}];
 function navCayV5(){
  if(arcMode()==="chang")return NAVTREE;
@@ -25457,7 +25472,7 @@ function enter(k){
  try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{rtEnsure()}catch(e){}try{autoReturnHandovers()}catch(e){}document.getElementById("login").style.display="none";document.getElementById("app").style.display="flex";setRole(k);try{helloMaybe()}catch(e){}
  /* Giờ mới đi tới chỗ đã đọc được lúc nãy (F5, hoặc mở link người khác gửi). Ngữ cảnh phải đặt
     TRƯỚC `go` - đặt sau thì trang đã vẽ xong bằng hồ sơ rỗng rồi. */
- try{if(hashOK(hkVao)){ctxApply(ctxVao);go(hkVao)}}catch(e){}
+ try{if(hashOK(hkVao)){ctxApply(ctxVao,hkVao);go(hkVao)}}catch(e){}
  /* người dùng sửa tay thanh địa chỉ / bấm Back về hash cũ */
  try{if(!window.__hashOn){window.__hashOn=1;
   window.addEventListener("hashchange",function(){try{hashApply()}catch(e){}});

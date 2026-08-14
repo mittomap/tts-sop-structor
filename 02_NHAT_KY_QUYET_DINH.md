@@ -148,6 +148,50 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 📋 14/08 - HAI BẢN BÁO CÁO CHUYÊN GIA CHƯA ÁP (anh Luân: *"chưa áp sao ko báo đó là việc tồn, rồi lỡ sót thì sao"*)
+> Ngày 14/08 em mời bốn "chuyên gia" (bốn phiên đo độc lập, cùng mô hình, ngữ cảnh trắng, bắt buộc
+> ra số). **Áp hai, còn hai** - và em đã KHÔNG ghi hai cái còn lại vào đây, đúng lỗi anh Luân bắt:
+> một việc chưa làm mà không nằm trong VIỆC TỒN thì nó không tồn tại với phiên sau.
+>
+> **A · BỐ CỤC - chưa áp, tất cả đều là số đo được:**
+> 1. `cfbar` gộp lên `topbar` - lấy lại **2.501px** chiều dọc cộng dồn trên 37 trang.
+> 2. `phead` một dòng gộp lên `topbar` - **2.394px**.
+> 3. `thewrap` thôi chiếm hàng riêng - **1.023px**.
+> 4. Gộp thanh đếm dòng với thanh Xuất - **877px**.
+> 5. `hanhtrinh` và `banlam` là **hai trang DUY NHẤT mở ra không thấy một dòng dữ liệu nào** trên
+>    màn đầu - phải cắt bớt phần đầu trang.
+> 6. `hoso` lưới `jgrid` để trống **1.030px**.
+> 7. **129 lưới so le** (số ô không chia hết cho số cột, hàng cuối hụt).
+> 8. Tám luật bố cục kiểm được bằng máy mà bản báo cáo đề nghị thêm vào `_checkux`.
+>
+> **B · THỨ TỰ TRÊN SIDEBAR - chưa áp** (anh Luân hỏi lại 14/08: *"sắp xếp trang trên sidebar có
+> báo cáo ko em"*). Đo lại bằng máy hôm nay, đóng vai đủ **16 chức danh** ở **cả hai chế độ menu**:
+> **48 chỗ "trang xem được mà không có mục menu"**, trong đó:
+> · `lichwow` - có trong `NAVTREE` nhóm C2 nhưng **thiếu hẳn trong `NAVPHANG`**, nên ở chế độ menu
+>   phẳng thì 4 chức danh (teacher, aca_manager, hr_manager, hr_leader) không có lối vào.
+> · `socamket` (Sổ cam kết, dựng 14/08) chưa có mục menu lẫn trang cha - `_checkv2` L3 đang đỏ vì nó.
+> · `banglop`, `dsthanhtoan`, `duyet` nằm trong nhịp việc mà không đứng trên menu.
+> · 15 sổ tra cứu `ds*` (dsbaitap, dsbuoihoc, dsdangky...) - phải xét xem chúng là sổ nhúng
+>   (thì khai `DUOC_MO_COI`) hay là trang thật (thì cho mục menu). **Chưa xét.**
+> · Nhóm C2 đang ôm **15 mục** trong một nhóm - bản báo cáo đề nghị tách ba kệ.
+> · `banggiao` xếp nhầm trong nhóm "Chờ duyệt".
+> · 6 luật thứ tự bản báo cáo đề nghị thêm vào `_check11`.
+>
+> **C · CÒN LẠI CỦA HAI BẢN ĐÃ ÁP:**
+> · `min-width` cho nút trong **264 ô hành động** lệch cỡ · hạ nút đặc thứ hai ở **11 bảng + 6 màn**
+>   · xoá `.btn.hvcall-dark`, gộp `.btn.ghost`/`.lg`/`.alt` · viết 8 luật thành phần vào `_checkux`.
+> · Thống nhất Giảng viên/Giáo viên/GV (**200 chỗ**, riêng `gvdp` dùng cả ba trong một màn) · gỡ
+>   "sheet DL04/DL06/DL17" và 10 tên cột kỹ thuật khỏi câu CH4 · dọn 14 chuỗi nói kiểu nói chuyện
+>   trong Cài đặt · thống nhất Xoá/Xóa, Huỷ/Hủy (**trừ nhãn enum CH1 - khoá nguyên văn**).
+>
+> **D · THẺ BẤM ĐƯỢC:** **356 thẻ vẽ ra mà không bấm được** + **12 thẻ không có câu "Danh sách"**.
+> Mới sửa đúng một cái (`bg_orph`). Cần một bộ kiểm thường trực: thẻ có câu "Danh sách: ..." thì
+> phải bấm được, và chỗ nó dẫn tới phải có đúng chừng ấy dòng.
+>
+> **E · CHẠY `./verify.sh` TRỌN BỘ MỘT LƯỢT LIỀN** - ngày 14/08 ba lượt đều hỏng giữa chừng, hai
+> lượt do chính em dựng lại bản mới lúc nó đang chạy, một lượt do em `pkill` trúng chính vỏ lệnh
+> của nó. Chưa có lượt nào chạy trọn từ đầu tới cuối trong ngày.
+
 > ### 📋 12/08 - CÒN TREO SAU ĐỢT FEEDBACK BỐN TEAM
 > 1. **Chặn đăng nhập làm test khi quá hạn 1 tuần** (SALE-3, vế giữa). Anh Luân chốt *"ghi nhận
 >    lại thôi, cái này để a cho dev làm sau"* → CỐ Ý KHÔNG CODE. Đừng ai tưởng là sót.
