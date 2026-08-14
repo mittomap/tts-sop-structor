@@ -666,7 +666,11 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    Cho `flex-wrap` là tiêu đề chiếm trọn một dòng, chú thích rơi xuống dòng dưới - dài thêm một
    dòng nhưng đọc được, thay vì hai cột chữ vụn cạnh nhau. */
 @media(max-width:620px){.ph{flex-wrap:wrap}.ph .mini{margin-left:0}}
-.ph b{font-size:13px;font-weight:700}.ph .mini{margin-left:auto;display:flex;gap:6px}
+/* `flex:none` cho tiêu đề: `.ph` là flex, mà câu mô tả bên phải dài thì nó bóp cái tên panel
+   cho tới khi vỡ - chụp màn thấy "Cần chú / ý" và "Nhịp ngày của / bạn" đứt làm hai dòng, xấu
+   nhất đúng ở chỗ mắt chạm đầu tiên. Tên panel là thứ KHÔNG được co; câu mô tả mới là thứ nhường. */
+.ph b{font-size:13px;font-weight:700;flex:none}.ph .mini{margin-left:auto;display:flex;gap:6px;min-width:0}
+.ph .mini.mut{display:block;line-height:1.4}
 .pbody{padding:6px 6px}
 /* `white-space:nowrap` + `inline-flex`: nut cao 29px ma chu rot xuong hai dong thi chu tran ra
    ngoai vien, nhin nhu vo. Anh Luan 07/08 chup lai dung canh do o hai nut "Doi khoa hoc" /
@@ -1675,6 +1679,11 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .seg.segsx .segb{border:0;background:transparent;color:var(--muted);font-weight:700;border-radius:6px}
 .seg.segsx .segb:hover{color:var(--navy)}
 .seg.segsx .segb.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(30,42,56,.14)}
+/* Ô đếm của chip ĐANG CHỌN vốn là "chữ trắng trên nền trắng mờ" - đúng trên chip lọc (nền navy
+   đặc), nhưng công tắc gạt lại tô nền TRẮNG cho cái đang chọn, nên con số biến mất sạch. Nhìn ra
+   ngay khi chụp màn: "Theo việc 315" có số lúc chưa chọn, bấm vào thì số bay mất.
+   *Đổi nền của một trạng thái thì phải đi xem lại mọi thứ đang tô màu theo nền cũ.* */
+.seg.segsx .segb.on .segn{background:var(--bg);color:var(--navy)}
 /* ═══ V2 14/08 - HÀNG CÔNG TẮC CÁCH XEM của trang Việc hôm nay ═══════════════════════════════
    Anh Luân: *"tại sao ko thiết kế lại, để nó có thể ở 1 trang thôi. Có thể chọn cách xem mà"*.
    Hàng này là ĐƯỜNG RANH giữa phần đầu trang (không đổi theo cách xem) và vùng làm việc (đổi
@@ -2224,6 +2233,15 @@ table.dt tbody tr.clk.on td{font-weight:600}
 /* V2 Khúc 5 - dải cảnh báo trên trang đáp. Dùng đúng biến màu và bậc bo góc đang có, không đẻ
    thêm mã màu mới (`_checkux` nhóm 9 chốt trần 110 mã màu · 20 bậc chữ · 10 bậc bo góc). */
 .cbwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+/* ═══ V2 14/08 - ĐỨNG CẠNH "NHỊP NGÀY" THÌ XẾP MỘT CỘT ═══════════════════════════════════════
+   Trong `.bl2c` panel chỉ còn nửa bề ngang, `auto-fill 230px` ra đúng HAI cột - mà ô mang số
+   tiền lại chiếm hai cột (span 2). Kết quả đo trên ảnh chụp: hàng 1 một ô rộng · hàng 2 hai ô ·
+   hàng 3 một ô rộng · hàng 4 một ô lẻ bỏ trống nửa hàng. Bốn hàng, ba nhịp khác nhau, không con
+   số nào thẳng cột với con số nào.
+   Một cột thì mọi con số thẳng đúng một mép, mọi nhãn thẳng đúng một mép, và ô tiền không phải
+   xin phần của ai. Hẹp hơn nhưng đọc được - *thẳng thớm là thứ mắt đọc, không phải số cột.* */
+.bl2c .cbwrap{grid-template-columns:1fr}
+.bl2c .cbo.rong{grid-column:auto}
 /* V2 08/08 - lưới thẻ của trang Tra cứu. Không dải viền màu trang trí (luật W5): mỗi thẻ chỉ
    có viền mảnh như mọi ô khác trong app, phân biệt bằng icon và con số chứ không bằng màu. */
 .bwctx{font-size:11.5px;color:#5A6675;line-height:1.6;margin-top:6px;max-width:640px}
@@ -2556,12 +2574,17 @@ body.drsz .drawer{transition:none}
    ra nhu khoang cach 28px trong khi khe that chi 8px. Nut lap day o thi khe giua hai nut dung
    bang khe flex, va nut trong cung mot cot cung mot be rong luon. */
 .obcards.rows .obcard .obsl.a{width:168px}
-.obcards.rows .obcard .obsl.a2{width:136px}
+/* Bề rộng ô = bề rộng NHÃN DÀI NHẤT ô ấy phải chứa, không phải một con số cho đẹp mắt lúc viết.
+   Ô a2 chứa "Ghi nhận từ chối" (icon + 16 ký tự). */
+.obcards.rows .obcard .obsl.a2{width:150px}
 .obcards.rows .obcard .obsl.b{width:104px}
 .obcards.rows .obcard .obsl.c{width:96px}
 .obcards.rows .obcard .obsl.d{width:88px}
 .obcards.rows .obcard .obact{gap:6px}
-.obcards.rows .obcard .obsl .btn{white-space:nowrap;width:100%;justify-content:center}
+/* `overflow:hidden` + `text-overflow:ellipsis` KHÔNG phải để giấu lỗi - nó là cái phanh: nhãn
+   nào lỡ dài hơn ô thì cụt bằng dấu ba chấm ở TRONG nút, chứ không tràn ra đè lên nút bên cạnh.
+   Chữ cụt còn đọc ra là "chỗ này thiếu bề ngang"; chữ tràn thì đọc ra là "app hỏng". */
+.obcards.rows .obcard .obsl .btn{white-space:nowrap;width:100%;justify-content:center;overflow:hidden;text-overflow:ellipsis}
 /* Bề rộng SÀN cho hai ô cố định vừa mở (Bảo lưu · Tiếp nhận phản hồi): ô rỗng vẫn giữ đúng chỗ
    của nút vắng mặt, nên dòng có nút và dòng không có nút vẫn thẳng một cột. Dưới 900px bỏ sàn -
    ở khổ ấy dải nút đã xuống dòng nên giữ chỗ trống chỉ tổ phí. */
@@ -5256,8 +5279,18 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
   h+='<th style="cursor:pointer" onclick="listSort(\''+key+'\',\''+c[0]+'\')" title="sắp xếp">'+esc(c[1])+(on?(so.dir>0?' ▲':' ▼'):'')+'</th>'});
  /* V9.63 (anh Luân: *"cột thao tác ở các sổ ko thấy gì nhỉ"*): sổ chỉ-xem không có nút Sửa,
     không khai act, và phần lớn dòng cũng không có nút SLA - nên cột này rỗng từ đầu tới cuối.
-    Một cột không bao giờ có gì thì đừng dựng cột. Hỏi trước khi vẽ: cột này có nội dung không. */
- var coTT=(!cfg.ro)||(act&&act.length>0)||data.some(function(r){try{return !!rowSlaBtn(r,pk)}catch(e){return false}});
+    Một cột không bao giờ có gì thì đừng dựng cột. Hỏi trước khi vẽ: cột này có nội dung không.
+    ═══ V2 14/08 (anh Luân, kèm ảnh một cột "THAO TÁC" trống trơn): *"cột thao tác này là tàn dư,
+    hay do nó lỗi gì?"* - LỖI, và là tàn dư của một điều kiện chứ không phải của cột.
+    Câu hỏi cũ có ba vế, vế thứ ba là `data.some(rowSlaBtn)` - "có dòng nào đang treo việc SLA
+    không". Vế ấy đúng hồi cột này còn vẽ một nút "Làm ngay" cho những dòng đó. Nhưng sáng nay
+    chính em bỏ nút "Làm ngay" (nó trùng nút "Xử lý"), mà **quên bỏ vế điều kiện đã dựng cột vì
+    nó**. Từ lúc ấy: sổ nào có dòng treo việc thì cột vẫn mọc lên, còn bên trong không còn gì để
+    vẽ. Đo được 22 chỗ trên 8 nhóm chức danh - sổ Lớp, Test, Đăng ký, WOW, Khiếu nại.
+    Nay hỏi ĐÚNG THỨ SẼ ĐƯỢC VẼ, không hỏi thứ khiến ta muốn vẽ:
+    *"Điều kiện dựng một cột phải nhắc tới đúng những thứ cột đó vẽ ra - bỏ một nút thì phải đi
+    hỏi lại xem còn ai đang mượn nó làm lý do tồn tại."* */
+ var coTT=(!cfg.ro)||(act&&act.length>0);
  if(coTT)h+='<th>Thao tác</th>';
  h+='</tr></thead><tbody>';
  if(!data.length){var isF=(SEARCH[key]||(FILT[key]||[]).length||(window.QF||{})[key]||((key==="hocvien")&&(window.HVFCLS||window.HVFCRS)));
@@ -8421,12 +8454,23 @@ function renderViec(){var items=bellItems();
     một trang đáp thì phải dời theo mọi thứ người ta quen thấy khi vừa mở app. */
  var _rsV=SCOPE();
  if(_rsV.kpi){try{h+=myKpiHTML()}catch(e){}}
- h+=(_nhip?('<div class="bl2c">'+_cbao+_nhip+'</div>'):_cbao)+_the;
+ /* ═══ V2 14/08 (anh Luân: *"dễ hiểu, nhưng thiết kế thì xấu quá"*) ═══════════════════════════
+    Chụp màn rồi nhìn thì thấy ngay: trang đang đọc ra là **thẻ - panel - thẻ**. Dải 5 thẻ Bảng
+    quản lý, rồi hai tấm Cần chú ý / Nhịp ngày chen vào giữa, rồi lại một dải 2 thẻ nữa - kèm
+    HAI cái nút "Thẻ (5/5)" và "Thẻ (2/2)" trông y hệt nhau ở hai chỗ cách nhau nửa màn. Mắt
+    không gom được cái nào thuộc cái nào.
+    Hai thẻ ấy đo đúng thứ mà cách xem "Theo việc" nói (việc nợ quá N ngày · mảng việc quá hạn
+    nhiều nhất) - chúng KHÔNG phải đầu trang, chúng là phần mở đầu của một cách xem. Dời xuống
+    dưới công tắc là hết cảnh thẻ-panel-thẻ, đầu trang còn đúng MỘT dải thẻ, mà hai thẻ kia lại
+    về đúng chỗ nói được điều của nó.
+    *Một thứ đặt sai chỗ thì dù đẹp cỡ nào cũng làm hỏng nhịp đọc của cả trang.* */
+ h+=(_nhip?('<div class="bl2c">'+_cbao+_nhip+'</div>'):_cbao);
  h+=viecCongTac(items.length);
  /* Hai cách xem kia là THÂN của hai trang cũ, gọi ở chế độ nhúng (bỏ đầu trang riêng của
     chúng). Không chép lại một dòng dựng nào: trang cũ sửa gì thì ở đây hưởng nấy. */
  if(VIECVW()==="nguoi")return h+renderBanlam(1);
  if(VIECVW()==="chang")return h+renderHanhtrinh(1);
+ h+=_the;
  /* KHÔNG gọi `bangViecHTML()` ở đây. Bảng việc theo chức danh tự lên trang này ngay khi trang
     đáp đổi sang `viec`: `pageHead` đã gọi `bvSau()` -> `bangViecHTML()`, mà hàm ấy tự im ở mọi
     trang KHÔNG phải trang đáp (`if(CUR!==dap)return ""`). Em gọi thêm một lần nữa nên bảng in
@@ -16520,9 +16564,19 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
     đầu thẻ (dòng `s.rejected` phía trên). Một chuỗi đứng hai vai - vừa là trạng thái vừa là nút
     - thì người đọc chọn vai quen thuộc hơn, tức là trạng thái.
     Nay nhãn mở đầu bằng động từ, song song với hai nút cạnh nó ("Ghi nhận ký tại TT", "Đổi lớp").
-    *Nút phải nói việc nó LÀM, không nói tình hình nó GHI LẠI.* */
+    *Nút phải nói việc nó LÀM, không nói tình hình nó GHI LẠI.*
+    ═══ 14/08 CHIỀU - ANH LUÂN VẪN THẤY Y HỆT, VÌ CHỮ BỊ CẮT ═════════════════════════════════
+    Anh gửi lại đúng hàng nút ấy: *"ủa cái vụ trạng thái xác nhận cam kết e chưa làm à, e quên???"*
+    Nhãn ĐÃ đổi rồi - cái hỏng là hình. Ô `.obsl.a2` rộng cứng 136px, nút bên trong `width:100%`
+    và `white-space:nowrap`, mà "Ghi nhận HV chưa đồng ý" cần ~190px: chữ tràn khỏi nút, chạy
+    sang đè lên ô "Đổi lớp" và bị cắt cụt ở chữ "đồng". Đọc trên màn ra một mẩu chữ đỏ lửng lơ
+    giữa hàng nút - trông đúng như một cái nhãn trạng thái bị nhét nhầm chỗ, tức là y hệt cái
+    anh phàn nàn lần đầu.
+    Chữa cả hai đầu: nhãn rút còn "Ghi nhận từ chối" (vẫn là động từ), câu đầy đủ chuyển sang
+    chú thích rê chuột và hộp xác nhận; ô nới cho vừa nhãn dài nhất nó phải chứa.
+    *Sửa xong một chữ mà không đo lại cái ô đựng nó thì người ta vẫn nhìn thấy lỗi cũ.* */
  h+='<div class="obsl a2">'+((!s.rejected&&s.sent&&!s.confirmed)
-   ?'<button class="btn danger sm" onclick="confirmRun(\'Ghi nhận học viên CHƯA ĐỒNG Ý quy định lớp học và cam kết? Hãy liên hệ giải thích, hoặc đổi lớp nếu vướng lịch.\',\'obReject\',\''+_oid+'\')"><i class="ti ti-user-x"></i>Ghi nhận HV chưa đồng ý</button>'
+   ?'<button class="btn danger sm" data-tip="Học viên không đồng ý quy định lớp học và cam kết" onclick="confirmRun(\'Ghi nhận học viên CHƯA ĐỒNG Ý quy định lớp học và cam kết? Hãy liên hệ giải thích, hoặc đổi lớp nếu vướng lịch.\',\'obReject\',\''+_oid+'\')"><i class="ti ti-user-x"></i>Ghi nhận từ chối</button>'
    :'')+'</div>';
   /* THU TU CUOI HANG (anh Luan: *"hoan tat, va ho so ... em cho no ve ben phai"*). "Ho so"
      co o MOI dong; "Hoan tat" thi khong - no bien mat khi da hoan tat hoac HV tu choi, nhung

@@ -2295,8 +2295,18 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
   h+='<th style="cursor:pointer" onclick="listSort(\''+key+'\',\''+c[0]+'\')" title="sắp xếp">'+esc(c[1])+(on?(so.dir>0?' ▲':' ▼'):'')+'</th>'});
  /* V9.63 (anh Luân: *"cột thao tác ở các sổ ko thấy gì nhỉ"*): sổ chỉ-xem không có nút Sửa,
     không khai act, và phần lớn dòng cũng không có nút SLA - nên cột này rỗng từ đầu tới cuối.
-    Một cột không bao giờ có gì thì đừng dựng cột. Hỏi trước khi vẽ: cột này có nội dung không. */
- var coTT=(!cfg.ro)||(act&&act.length>0)||data.some(function(r){try{return !!rowSlaBtn(r,pk)}catch(e){return false}});
+    Một cột không bao giờ có gì thì đừng dựng cột. Hỏi trước khi vẽ: cột này có nội dung không.
+    ═══ V2 14/08 (anh Luân, kèm ảnh một cột "THAO TÁC" trống trơn): *"cột thao tác này là tàn dư,
+    hay do nó lỗi gì?"* - LỖI, và là tàn dư của một điều kiện chứ không phải của cột.
+    Câu hỏi cũ có ba vế, vế thứ ba là `data.some(rowSlaBtn)` - "có dòng nào đang treo việc SLA
+    không". Vế ấy đúng hồi cột này còn vẽ một nút "Làm ngay" cho những dòng đó. Nhưng sáng nay
+    chính em bỏ nút "Làm ngay" (nó trùng nút "Xử lý"), mà **quên bỏ vế điều kiện đã dựng cột vì
+    nó**. Từ lúc ấy: sổ nào có dòng treo việc thì cột vẫn mọc lên, còn bên trong không còn gì để
+    vẽ. Đo được 22 chỗ trên 8 nhóm chức danh - sổ Lớp, Test, Đăng ký, WOW, Khiếu nại.
+    Nay hỏi ĐÚNG THỨ SẼ ĐƯỢC VẼ, không hỏi thứ khiến ta muốn vẽ:
+    *"Điều kiện dựng một cột phải nhắc tới đúng những thứ cột đó vẽ ra - bỏ một nút thì phải đi
+    hỏi lại xem còn ai đang mượn nó làm lý do tồn tại."* */
+ var coTT=(!cfg.ro)||(act&&act.length>0);
  if(coTT)h+='<th>Thao tác</th>';
  h+='</tr></thead><tbody>';
  if(!data.length){var isF=(SEARCH[key]||(FILT[key]||[]).length||(window.QF||{})[key]||((key==="hocvien")&&(window.HVFCLS||window.HVFCRS)));
@@ -5460,12 +5470,23 @@ function renderViec(){var items=bellItems();
     một trang đáp thì phải dời theo mọi thứ người ta quen thấy khi vừa mở app. */
  var _rsV=SCOPE();
  if(_rsV.kpi){try{h+=myKpiHTML()}catch(e){}}
- h+=(_nhip?('<div class="bl2c">'+_cbao+_nhip+'</div>'):_cbao)+_the;
+ /* ═══ V2 14/08 (anh Luân: *"dễ hiểu, nhưng thiết kế thì xấu quá"*) ═══════════════════════════
+    Chụp màn rồi nhìn thì thấy ngay: trang đang đọc ra là **thẻ - panel - thẻ**. Dải 5 thẻ Bảng
+    quản lý, rồi hai tấm Cần chú ý / Nhịp ngày chen vào giữa, rồi lại một dải 2 thẻ nữa - kèm
+    HAI cái nút "Thẻ (5/5)" và "Thẻ (2/2)" trông y hệt nhau ở hai chỗ cách nhau nửa màn. Mắt
+    không gom được cái nào thuộc cái nào.
+    Hai thẻ ấy đo đúng thứ mà cách xem "Theo việc" nói (việc nợ quá N ngày · mảng việc quá hạn
+    nhiều nhất) - chúng KHÔNG phải đầu trang, chúng là phần mở đầu của một cách xem. Dời xuống
+    dưới công tắc là hết cảnh thẻ-panel-thẻ, đầu trang còn đúng MỘT dải thẻ, mà hai thẻ kia lại
+    về đúng chỗ nói được điều của nó.
+    *Một thứ đặt sai chỗ thì dù đẹp cỡ nào cũng làm hỏng nhịp đọc của cả trang.* */
+ h+=(_nhip?('<div class="bl2c">'+_cbao+_nhip+'</div>'):_cbao);
  h+=viecCongTac(items.length);
  /* Hai cách xem kia là THÂN của hai trang cũ, gọi ở chế độ nhúng (bỏ đầu trang riêng của
     chúng). Không chép lại một dòng dựng nào: trang cũ sửa gì thì ở đây hưởng nấy. */
  if(VIECVW()==="nguoi")return h+renderBanlam(1);
  if(VIECVW()==="chang")return h+renderHanhtrinh(1);
+ h+=_the;
  /* KHÔNG gọi `bangViecHTML()` ở đây. Bảng việc theo chức danh tự lên trang này ngay khi trang
     đáp đổi sang `viec`: `pageHead` đã gọi `bvSau()` -> `bangViecHTML()`, mà hàm ấy tự im ở mọi
     trang KHÔNG phải trang đáp (`if(CUR!==dap)return ""`). Em gọi thêm một lần nữa nên bảng in
@@ -13559,9 +13580,19 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
     đầu thẻ (dòng `s.rejected` phía trên). Một chuỗi đứng hai vai - vừa là trạng thái vừa là nút
     - thì người đọc chọn vai quen thuộc hơn, tức là trạng thái.
     Nay nhãn mở đầu bằng động từ, song song với hai nút cạnh nó ("Ghi nhận ký tại TT", "Đổi lớp").
-    *Nút phải nói việc nó LÀM, không nói tình hình nó GHI LẠI.* */
+    *Nút phải nói việc nó LÀM, không nói tình hình nó GHI LẠI.*
+    ═══ 14/08 CHIỀU - ANH LUÂN VẪN THẤY Y HỆT, VÌ CHỮ BỊ CẮT ═════════════════════════════════
+    Anh gửi lại đúng hàng nút ấy: *"ủa cái vụ trạng thái xác nhận cam kết e chưa làm à, e quên???"*
+    Nhãn ĐÃ đổi rồi - cái hỏng là hình. Ô `.obsl.a2` rộng cứng 136px, nút bên trong `width:100%`
+    và `white-space:nowrap`, mà "Ghi nhận HV chưa đồng ý" cần ~190px: chữ tràn khỏi nút, chạy
+    sang đè lên ô "Đổi lớp" và bị cắt cụt ở chữ "đồng". Đọc trên màn ra một mẩu chữ đỏ lửng lơ
+    giữa hàng nút - trông đúng như một cái nhãn trạng thái bị nhét nhầm chỗ, tức là y hệt cái
+    anh phàn nàn lần đầu.
+    Chữa cả hai đầu: nhãn rút còn "Ghi nhận từ chối" (vẫn là động từ), câu đầy đủ chuyển sang
+    chú thích rê chuột và hộp xác nhận; ô nới cho vừa nhãn dài nhất nó phải chứa.
+    *Sửa xong một chữ mà không đo lại cái ô đựng nó thì người ta vẫn nhìn thấy lỗi cũ.* */
  h+='<div class="obsl a2">'+((!s.rejected&&s.sent&&!s.confirmed)
-   ?'<button class="btn danger sm" onclick="confirmRun(\'Ghi nhận học viên CHƯA ĐỒNG Ý quy định lớp học và cam kết? Hãy liên hệ giải thích, hoặc đổi lớp nếu vướng lịch.\',\'obReject\',\''+_oid+'\')"><i class="ti ti-user-x"></i>Ghi nhận HV chưa đồng ý</button>'
+   ?'<button class="btn danger sm" data-tip="Học viên không đồng ý quy định lớp học và cam kết" onclick="confirmRun(\'Ghi nhận học viên CHƯA ĐỒNG Ý quy định lớp học và cam kết? Hãy liên hệ giải thích, hoặc đổi lớp nếu vướng lịch.\',\'obReject\',\''+_oid+'\')"><i class="ti ti-user-x"></i>Ghi nhận từ chối</button>'
    :'')+'</div>';
   /* THU TU CUOI HANG (anh Luan: *"hoan tat, va ho so ... em cho no ve ben phai"*). "Ho so"
      co o MOI dong; "Hoan tat" thi khong - no bien mat khi da hoan tat hoac HV tu choi, nhung
