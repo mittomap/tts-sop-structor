@@ -324,6 +324,41 @@
 > dữ liệu gốc (đúng lời anh Luân: bấm Reset demo là kéo demo về trạng thái hoàn hảo). Chọn giữ
 > màn sạch, khai NA074 ở `TRIG_BOQUA` kèm đúng lý do ấy - **chọn xong thì phải nói ra đã chọn gì.**
 >
+> ### 🟢 14/08 - LỊCH SỬ LIÊN HỆ VÀO THẲNG NHÁNH DỰ PHÒNG, VÀ MỘT VẠCH MÀU BỊ BỘ KIỂM CHẶN
+>
+> Anh Luân, kèm ảnh màn Chạy quy trình: *"thiết kế hơi xấu em, với lại nếu vậy mình thêm luôn lịch
+> sử liên hệ hiện bên dưới luôn ở mỗi chặng, để dễ xem, e thấy sao? e có phản biện gì ko"*.
+>
+> **Đồng ý cả hai, và lý do sâu hơn "cho dễ xem":** khối ấy đang bảo người ta *"ghi lại vì sao chưa
+> làm được và hẹn lại"* mà **không cho thấy trước đó ai đã ghi gì** - tức bắt viết mù, gọi lại đúng
+> câu người hôm qua đã gọi, hẹn đè lên cái hẹn đang có.
+>
+> **Ba chỗ em phản biện lại chính đề xuất (về LIỀU LƯỢNG, không phải về hướng):**
+> 1. **Không dựng ở mọi chặng.** Lịch sử liên hệ gắn với một CON NGƯỜI. Chặng nào chủ thể không
+>    phải người (buổi học, lớp, phiếu thu) thì `runLichSu()` trả rỗng - **một cái hộp rỗng thường
+>    trực còn tệ hơn không có**, vì nó dạy người ta rằng chỗ đó không đáng nhìn, rồi họ bỏ qua cả
+>    lúc nó có nội dung.
+> 2. **Chỉ ba lượt gần nhất + "Xem tất cả (n)".** Một lead có thể trên hai chục điểm chạm; đổ hết
+>    là màn Chạy quy trình thành hố cuộn và nút hành động bị đẩy khỏi màn.
+> 3. **Nằm TRÊN nút ghi, không phải cuối trang.** Đọc lịch sử sau khi đã quyết xong thì bằng không.
+>
+> Và một chỗ suýt sai lặng lẽ: "Xem tất cả" lúc đầu em nối vào `openLienhe()` - nhưng hàm ấy là
+> **cửa GHI một điểm chạm mới** (`modalNext`), không phải chỗ đọc lại. Hứa "xem" rồi bày ra một cái
+> form trống là đúng loại nút dối. Nay nối vào `leadDetail()`.
+>
+> **`_checkux` chặn đúng một chỗ em vừa vẽ:** để khối bớt xấu em thay viền đứt nét bằng thẻ trắng
+> **cộng một vạch màu 3px chạy dọc mép trái** - đỏ ngay, LUẬT W5 cấm dải viền màu trang trí kể cả
+> dựng bằng `::before`. Luật ấy đúng: *một vạch màu ở mép không tự nói được nó nghĩa gì, người đọc
+> phải đoán.* Nay dùng một **huy hiệu tròn có icon rẽ nhánh** ở đầu tiêu đề - vừa nổi, vừa mang
+> luôn nghĩa "đây là nhánh rẽ".
+>
+> ### 🟢 14/08 - SỔ LỚP: HAI TRỤC LỌC CÓ DỮ LIỆU MÀ KHÔNG CHO HỎI
+>
+> Anh Luân (ảnh trang Lớp học): *"điển hình của thiếu chức năng nè, chẳng thấy lọc được lớp 11 và
+> lớp nhóm"*. Thêm **Trình độ lớp** (`class_level` - cột có sẵn từ đầu, có dữ liệu mà không có
+> trục, tức app biết mà không cho hỏi) và **Loại lớp** (Lớp nhóm / Kèm riêng 1-1) suy từ sĩ số tối
+> đa bằng `fxCalc`, không đẻ thêm một cột phải nuôi.
+>
 > ### 🔴 14/08 - BẪY `ITTS_OUT` CẮN LẠI, LẦN THỨ BA
 >
 > Chạy `python3 _src/extract_js.py` từ gốc repo mà quên `ITTS_OUT`, nó trích **bản build cũ nằm

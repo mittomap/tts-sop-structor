@@ -7480,6 +7480,13 @@ function jUpdRow(code,id,vals,cb){jIdInit();var idk=JIDK[code]||"id";var r=find(
 function rfHTML(fs,C){var h='<div class="rform">';
  fs.forEach(function(f){var id="r_"+f[0],lb=f[1],ty=f[2]||"text",op=f[3],req=f[4],dv=(f[5]!==undefined?f[5]:"");
   if(ty==="attach"){h+=attachBox(f[0],lb);return}
+  /* KHỐI ĐIỂM BAND: bốn ô một hàng đều nhau + ô điểm tổng tự tính. `op` là mảng [mã, nhãn]. */
+  if(ty==="band"){h+='<div class="rband"><div class="rbg">'+
+   (op||[]).map(function(b){return '<div class="rbc"><label>'+esc(b[1])+(req?' <i>*</i>':'')+'</label>'+
+    '<input id="r_'+esc(b[0])+'" type="number" step="0.5" min="0" max="9" inputmode="decimal" oninput="rfBandOv()"></div>'}).join("")+
+   '</div><div class="rbov"><div class="k">Điểm tổng</div><div class="v" id="r_bandov">-</div></div></div>';
+   if(f[6])h+='<div class="fhint" style="flex:1 1 100%;margin-top:-4px">'+esc(f[6])+'</div>';
+   return}
   var full=(ty==="ta"||ty==="seg")?" full":"";
   h+='<div class="fld'+full+'"><label>'+esc(lb)+(req?' <i>*</i>':'')+'</label>';
   if(ty==="ta")h+='<textarea id="'+id+'" rows="3">'+esc(dv)+'</textarea>';
@@ -7533,7 +7540,21 @@ function dtQuickHTML(id){var now=Date.now();
  return '<div class="dtq">'+items.map(function(r){var d=r[1]();
   return '<button type="button" class="pill" data-q="'+r[0]+'" data-tip="Đặt thành '+esc(dtDMY(d)+" "+dtHHMM(d))+'" onclick="dtPreset(\''+id+'\',\''+r[0]+'\')">'+esc(r[2](d))+'</button>'}).join("")+'</div>'}
 function rfV(k){var e=document.getElementById("r_"+k);if(!e)return "";return normDT(k,String(e.value||"").trim())}
-function rfNeed(fs){var m=[];fs.forEach(function(f){if(f[4]&&!rfV(f[0]))m.push(f[1])});return m}
+/* Điểm tổng tính NGAY khi gõ, bằng ĐÚNG công thức mà hàm save dùng (trung bình 4 kỹ năng, làm
+   tròn về bội 0.5). Một chỗ tính, hai chỗ hiện thì kiểu gì cũng có ngày lệch - nên hàm này chỉ
+   được phép nói lại cái mà save sẽ ghi, không được tự nghĩ ra cách làm tròn riêng. */
+function rfBandOv(){var e=document.getElementById("r_bandov");if(!e)return;
+ var ks=["skill_listening","skill_reading","skill_writing","skill_speaking"],v=[],i;
+ for(i=0;i<ks.length;i++){var x=document.getElementById("r_"+ks[i]);
+  if(!x||String(x.value||"").trim()==="")return void(e.textContent="-");
+  v.push(num(x.value))}
+ e.textContent=String(Math.round(((v[0]+v[1]+v[2]+v[3])/4)*2)/2)}
+/* Ô nào bắt buộc mà còn trống thì trả về NHÃN của nó. Khối "band" không có ô nhập mang mã của
+   chính nó - mã nằm ở từng cột con - nên phải hỏi xuống từng cột, không thì bốn ô điểm để trống
+   vẫn lọt qua cửa và người dùng bấm Lưu ra một điểm tổng bằng 0. */
+function rfNeed(fs){var m=[];fs.forEach(function(f){
+ if(f[2]==="band"){if(f[4])(f[3]||[]).forEach(function(b){if(!rfV(b[0]))m.push(b[1])});return}
+ if(f[4]&&!rfV(f[0]))m.push(f[1])});return m}
 /* --- KHAI BÁO MÀN THAO TÁC CHO TỪNG CHẶNG --- */
 var RSTEP={
  contact:{t:"Gọi & ghi kết quả",sub:"Gọi/nhắn cho khách rồi chọn đúng kết quả - hệ thống tự đặt lịch nhắc lại.",
@@ -7574,8 +7595,9 @@ var RSTEP={
    else jUpdRow("DL03",t.test_booking_id,{test_attendance_status:eFull("enum_test_attendance_status",a),test_attendance_time:nowStr()},function(){cb("Đã ghi nhận khách dự test")})}},
  test_grade:{t:"Nhập kết quả test",sub:"Chấm 4 kỹ năng, hệ thống tự tính điểm tổng và chuyển sang bước tư vấn.",
   fields:function(C){return [
-   ["skill_listening","Listening","num",null,1],["skill_reading","Reading","num",null,1],
-   ["skill_writing","Writing","num",null,1],["skill_speaking","Speaking","num",null,1],
+   ["__band","Điểm 4 kỹ năng","band",
+    [["skill_listening","Listening"],["skill_reading","Reading"],["skill_writing","Writing"],["skill_speaking","Speaking"]],
+    1,"","Nhập theo thang band 0-9, bước 0.5. Điểm tổng tự tính, không phải gõ."],
    ["academic_note","Nhận xét học thuật","ta",null,0,"","Điểm mạnh / điểm yếu để NV tư vấn nói đúng trọng tâm."]]},
   save:function(C,cb){var t=C.testMain;
    var L=num(rfV("skill_listening")),R=num(rfV("skill_reading")),W=num(rfV("skill_writing")),S=num(rfV("skill_speaking"));
@@ -8148,7 +8170,7 @@ function renderChay(){
    if(QL)r+=' · đã quá hạn nên báo cả quản lý <b>'+nsLnk(QL.id,QL.ten,QL.ten)+'</b>';
    return r+'</span></div>'})()+
   runLichSu(C)+
-  '<button class="btn" onclick="runSnooze()"><i class="ti ti-phone-plus"></i>Ghi liên hệ / ghi chú'+(tps.length?' ('+tps.length+' lần ở chặng này)':'')+'</button>'+
+  '<button class="btn alt" onclick="runSnooze()"><i class="ti ti-phone-plus"></i>Ghi liên hệ / ghi chú'+(tps.length?' ('+tps.length+' lần ở chặng này)':'')+'</button>'+
   /* SOP NA046 nói HAI đường cho lead quá hạn chưa gọi: *"gọi gấp HOẶC GIAO LẠI cho NV khác"*.
      App có màn Bàn giao lead từ lâu nhưng ở đây không có cửa nào tới - người dùng đang đứng
      đúng hồ sơ ấy lại phải rời trang, tự tìm lại tên khách trong một bảng khác. Nay chìa thẳng. */
