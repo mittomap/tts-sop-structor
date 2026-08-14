@@ -762,8 +762,14 @@ VHBC = {
     "VH8": {"t": "Viec - Thu hoc phi", "can": ["Đơn còn nợ phí"]},
     "VH9": {"t": "Viec - Lop sap khai giang", "can": ["sắp khai giảng"]},
     "VH10": {"t": "Viec - Khieu nai", "can": ["Khiếu nại đang xử lý"]},
+    # 14/08 - DOI HAI CHUOI BANG CHUNG, KHONG NOI LONG PHEP DO. SOP mo ta VH11 la "Khoi luong
+    # viec theo NV"; hai chuoi "Lead dang giu" / "Nhap hoc do" chi la BANG CHUNG do nguoi viet
+    # bo kiem chon de chung minh man ay co ve that - SOP khong he bat phai dung dung hai chu ay.
+    # Ma "do" trong tieng Viet doc ra la KEM, trong khi y that la DANG DO; "dang giu" thi lech
+    # voi tu chuan "phu trach" dung o moi cho khac. Doi nhan cho dung tieng Viet, va doi luon
+    # chuoi bang chung theo - GIU nguyen so luong tieu chi, chi doi cai duoc lay lam bang chung.
     "VH11": {"t": "Khoi luong viec theo NV", "can": ["Khối lượng việc theo nhân viên",
-                                                     "Lead đang giữ", "Nhập học dở"]},
+                                                     "Lead phụ trách", "Nhập học chưa xong"]},
     "BC1": {"t": "Bang HV nguy co 2 truc", "can": ["Vắng (buổi)", "Thiếu bài", "Hoạt động cuối"]},
     "BC2": {"t": "Bang chi so KPI", "can": ["KPI theo SOP · CH6"]},
     "BC3": {"t": "Pheu khach tiem nang", "can": ["Phễu"]},
