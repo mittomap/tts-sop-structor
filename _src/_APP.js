@@ -5029,7 +5029,7 @@ function cfBarSync(){var b=document.getElementById("cfBar");if(!b)return;
     (Trạng thái "Chế độ xem thử" bên trên VẪN giữ nhãn - nó cảnh báo rằng chỉnh gì cũng không
     lưu được, đó là thứ người ta cần đọc chứ không suy ra được từ tên nút.) */
  b.className="cfbar on demo";
- b.innerHTML='<button class="btn sm" onclick="demoResetHoi()" data-tip="Đây là bản demo: mọi thao tác chạy thật nhưng chỉ lưu trên máy này, không ảnh hưởng số liệu thật. Bấm để dựng lại bộ dữ liệu mẫu."><i class="ti ti-refresh"></i>Dựng lại demo</button>'}
+ b.innerHTML='<button class="btn sm" onclick="demoResetHoi()" title="Dựng lại demo" data-tip="Đây là bản demo: mọi thao tác chạy thật nhưng chỉ lưu trên máy này, không ảnh hưởng số liệu thật. Bấm để dựng lại bộ dữ liệu mẫu."><i class="ti ti-refresh"></i><span class="cfbtxt">Dựng lại demo</span></button>'}
 function cfGhiDuoc(){return cfMode()==="that"}
 /* Hộp hỏi mật khẩu dùng chung. `xong` là TÊN hàm (chuỗi) - đi qua cfnGet như confirmRun, để
    không phải nhét hàm vào thuộc tính onclick. */
@@ -18973,11 +18973,19 @@ function renderGvdp(embed){
  if(!ses.length)h+='<tr><td class="empty" colspan="6">Ngày này không có buổi học nào.</td></tr>';
  ses.forEach(function(x){var c=find("DL10","class_id",x.class_id)||{};
   var d=pvnd(x.session_date);var n=gvBackup(x).filter(function(r){return r.ok}).length;
-  h+='<tr><td>'+esc(d?hhmmOf(d):"")+'</td><td>'+lopLnk(x.class_id,x.class_id_name,"")+' <span class="mut">buổi '+esc(x.session_number||"?")+'</span></td>'+
+  /* V2 14/08 - BẤM VÀO DÒNG PHẢI CÓ CHUYỆN GÌ XẢY RA. `_checkbam` bấm thật 159 dòng trên 72
+     màn và ba dòng IM LẶNG đều ở bảng này: dòng trông y hệt mọi dòng bấm được khác của app
+     (con trỏ, viền hover) mà bấm vào không mở gì, không đổi trang, không báo gì.
+     Cho nó mở ô xem nhanh của LỚP - đúng thứ người ta cần khi đang tìm người dạy thay: lớp
+     này là lớp gì, ai đang phụ trách, tiến độ tới đâu. Nút "Đề xuất người dạy thay" và cái
+     link tên lớp đã tự chặn nổi bọt nên không đá nhau.
+     *Một dòng trông bấm được mà bấm vào im lặng thì tệ hơn một dòng không bấm được: người ta
+     bấm lại lần nữa, rồi bắt đầu ngờ cả những dòng khác.* */
+  h+='<tr onclick="openLopQuick(\''+esc(x.class_id)+'\')" style="cursor:pointer" title="Xem nhanh lớp này"><td>'+esc(d?hhmmOf(d):"")+'</td><td>'+lopLnk(x.class_id,x.class_id_name,"")+' <span class="mut">buổi '+esc(x.session_number||"?")+'</span></td>'+
    '<td>'+(clsOnline(c)?'<span class="chip blue">Online</span>':'<span class="chip">'+esc(elabel(c.branch)||c.branch||"-")+'</span> <span class="mut" style="font-size:11px">'+esc(elabel(c.learning_mode)||"")+'</span>')+'</td>'+
    '<td>'+(String(x.teacher_id||"").trim()?nsLnk(x.teacher_id,x.teacher_id_name,""):'<span class="chip red">chưa gán</span>')+'</td>'+
    '<td>'+(n?'<span class="chip green">'+n+' người</span>':'<span class="chip red">không có ai</span>')+'</td>'+
-   '<td><button class="btn primary sm" onclick="gvBackupForm(\''+esc(x.session_id)+'\')"><i class="ti ti-user-plus"></i>Đề xuất người dạy thay</button></td></tr>'});
+   '<td><button class="btn primary sm" onclick="event.stopPropagation();gvBackupForm(\''+esc(x.session_id)+'\')"><i class="ti ti-user-plus"></i>Đề xuất người dạy thay</button></td></tr>'});
  h+='</tbody></table></div></div>';
  h+='<div class="panel"><div class="ph"><b>Giáo viên trống lịch hôm nay ('+free.length+')</b><span class="mut" style="font-size:11.5px">không có buổi nào trong ngày - nguồn dự phòng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giáo viên</th><th>Cơ sở</th><th>Đã dạy ở</th><th>Buổi hôm nay</th></tr></thead><tbody>';
  if(!free.length)h+='<tr><td class="empty" colspan="4">Hôm nay giáo viên nào cũng có lịch - không còn người dự phòng.</td></tr>';
