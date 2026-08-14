@@ -2074,7 +2074,7 @@ body.drsz .drawer{transition:none}
 .obcards.rows .wowinfo{flex:1 1 100%;width:100%}
 .obcards.rows .obcard .obh{flex:1 1 300px;margin:0;align-items:center;flex-wrap:wrap;min-width:0}
 .obcards.rows .obcard .obh>div:first-child{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0}
-.obcards.rows .obcard .obm{margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
+.obcards.rows .obcard .obm{margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:none;min-width:0}
 .obcards.rows .obcard .steps,.obcards.rows .obcard .obm2{display:none}
 /* V9.67: `nowrap` chỉ đúng khi màn ĐỦ RỘNG. Đo ở 834px (iPad dọc): dải nút của một buổi WOW dài
    694px, cộng phần tên và giờ ở bên trái là trang phải cuộn ngang. Nay mặc định XUỐNG DÒNG, chỉ
@@ -2089,13 +2089,24 @@ body.drsz .drawer{transition:none}
    (Cụm giữa - chip C2, chấm tiến trình, chip trạng thái - nằm trong `.obh` nên còn trôi theo phần
    tên; tách nó thành cột riêng là việc còn lại, đã ghi ở bàn giao.) */
 .obcards.rows .obcard{flex-wrap:nowrap}
-.obcards.rows .obcard .obh{flex:1 1 auto;min-width:0}
+.obcards.rows .obcard .obh{flex:1 1 0;min-width:0;overflow:hidden;flex-wrap:nowrap}
+.obcards.rows .obcard .obh>div:first-child{flex-wrap:nowrap;min-width:0;overflow:hidden}
 .obcards.rows .obcard .obact{flex:0 0 auto;display:flex;justify-content:flex-end;gap:8px;flex-wrap:nowrap;margin-left:0}
-.obcards.rows .obcard .obsl{display:flex;gap:8px;justify-content:flex-end;flex:0 0 auto}
-.obcards.rows .obcard .obsl.a{width:300px}
-.obcards.rows .obcard .obsl.b{width:126px}
-.obcards.rows .obcard .obsl.c{width:112px}
-.obcards.rows .obcard .obsl.d{width:104px}
+/* MOT DONG, MOI LOAI NUT MOT COT (anh Luan: *"a thich nhu cu hon, nhung cac nut co tinh chat
+   giong nhau thi lam thanh 1 cot la no het roi"*). Lan truoc em chot be rong o nhung khong chot
+   phan TEN - ma ten lop o day dai toi 43 ky tu ("PRIVATE Nguyen Loan - 36H OFF CN4 (07/2026)"),
+   nen no day cot nut xuong dong hai. Chot ca hai dau: ten co gian nhung KHONG duoc lan sang
+   phan nut (cat bang ba cham, re chuot doc du), cot nut giu nguyen vi tri.
+   O trai gon lai 176px: du cho "Da gui thong tin lop" va "HV da xac nhan" - hai nut cung mot
+   tinh chat (buoc hien tai) nen chung mot cot. "HV tu choi" tach ra cot rieng vi no la loi
+   THOAT, khac tinh chat. */
+.obcards.rows .obcard .obsl{display:flex;gap:8px;justify-content:flex-start;flex:0 0 auto}
+.obcards.rows .obcard .obsl.a{width:176px}
+.obcards.rows .obcard .obsl.a2{width:126px}
+.obcards.rows .obcard .obsl.b{width:118px}
+.obcards.rows .obcard .obsl.c{width:106px}
+.obcards.rows .obcard .obsl.d{width:98px}
+.obcards.rows .obcard .obsl .btn{white-space:nowrap}
 @media(max-width:1280px){.obcards.rows .obcard{flex-wrap:wrap}
  .obcards.rows .obcard .obact{width:100%;flex-wrap:wrap}}
 @media(min-width:1200px){.obcards.rows .obcard .obact{flex-wrap:nowrap}}
@@ -15651,18 +15662,25 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
      de chung don sat nhau thi dong nao thieu nut la moi thu truot ngang - "Hoan tat" nam mot
      cho khac o tung dong. Nay bon o: [buoc hien tai] [Hoan tat] [Doi lop] [Ho so]; o nao
      khong co nut thi de TRONG chu khong don. Trong ma thang hang doc nhanh hon kin ma so le. */
-  h+='<div class="obact"><div class="obsl a">';
-  if(s.rejected)h+='<button class="btn primary sm" onclick="obChange(\''+esc(o.onboarding_id)+'\')"><i class="ti ti-transfer"></i>Đổi lớp khác</button>';
-  else{
-   if(!s.sent)h+='<button class="btn primary sm" onclick="confirmRun(\'Xác nhận đã gửi thông tin lớp cho học viên?\',\'obSendInfo\',\''+esc(o.onboarding_id)+'\')"><i class="ti ti-send"></i>Đã gửi thông tin lớp</button>';
-   else if(!s.confirmed)h+='<button class="btn sm" onclick="confirmRun(\'Xác nhận học viên đã đồng ý lớp?\',\'obConfirm\',\''+esc(o.onboarding_id)+'\')"><i class="ti ti-check"></i>HV đã xác nhận</button>'+
-    '<button class="btn danger sm" onclick="confirmRun(\'Ghi nhận học viên TỪ CHỐI lớp này? Sau đó hãy đổi lớp khác.\',\'obReject\',\''+esc(o.onboarding_id)+'\')"><i class="ti ti-user-x"></i>HV từ chối</button>';
-   h+='</div><div class="obsl b">';
-   if(!s.done)h+='<button class="btn green sm" onclick="confirmRun(\'Đánh dấu hoàn tất onboarding cho học viên?\',\'obFinish\',\''+esc(o.onboarding_id)+'\')"><i class="ti ti-flag"></i>Hoàn tất</button>';
-   h+='</div><div class="obsl c">';
-   if(o.class_id&&!s.done)h+='<button class="btn sm" onclick="obChange(\''+esc(o.onboarding_id)+'\')"><i class="ti ti-transfer"></i>Đổi lớp</button>';
-  }
-  h+='</div><div class="obsl d">'+'<button class="btn sm" onclick="openHoso(\''+esc(sid)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button></div></div></div>';
+  /* NAM O LUON LUON DUOC MO, ke ca khi trong. Ban truoc em mo o a2/b/c BEN TRONG mot nhanh if,
+     nen trang thai nao khong vao nhanh ay la o do khong ton tai - cot lech ngay, va so the div
+     khong khop. *Cot chi thang khi moi dong deu co du bay nhieu o, du o do rong.* */
+  var _oid=esc(o.onboarding_id);
+  h+='<div class="obact">';
+  h+='<div class="obsl a">'+(s.rejected
+   ?'<button class="btn primary sm" onclick="obChange(\''+_oid+'\')"><i class="ti ti-transfer"></i>Đổi lớp khác</button>'
+   :(!s.sent?'<button class="btn primary sm" onclick="confirmRun(\'Xác nhận đã gửi thông tin lớp cho học viên?\',\'obSendInfo\',\''+_oid+'\')"><i class="ti ti-send"></i>Đã gửi thông tin lớp</button>'
+    :(!s.confirmed?'<button class="btn sm" onclick="confirmRun(\'Xác nhận học viên đã đồng ý quy định lớp học và cam kết?\',\'obConfirm\',\''+_oid+'\')"><i class="ti ti-check"></i>HV đã xác nhận</button>':'')))+'</div>';
+  h+='<div class="obsl a2">'+((!s.rejected&&s.sent&&!s.confirmed)
+   ?'<button class="btn danger sm" onclick="confirmRun(\'Ghi nhận học viên TỪ CHỐI lớp này? Sau đó hãy đổi lớp khác.\',\'obReject\',\''+_oid+'\')"><i class="ti ti-user-x"></i>HV từ chối</button>'
+   :'')+'</div>';
+  h+='<div class="obsl b">'+((!s.rejected&&!s.done)
+   ?'<button class="btn green sm" onclick="confirmRun(\'Đánh dấu hoàn tất onboarding cho học viên?\',\'obFinish\',\''+_oid+'\')"><i class="ti ti-flag"></i>Hoàn tất</button>'
+   :'')+'</div>';
+  h+='<div class="obsl c">'+((!s.rejected&&o.class_id&&!s.done)
+   ?'<button class="btn sm" onclick="obChange(\''+_oid+'\')"><i class="ti ti-transfer"></i>Đổi lớp</button>'
+   :'')+'</div>';
+  h+='<div class="obsl d">'+'<button class="btn sm" onclick="openHoso(\''+esc(sid)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button>'+'</div></div></div>';
  });
  h+='</div>';return h}
 function obMark(id,vals,msg){var r=find("DL08","onboarding_id",id);function d(){if(r)for(var k in vals)r[k]=vals[k];toast(msg);reRender(CUR)}

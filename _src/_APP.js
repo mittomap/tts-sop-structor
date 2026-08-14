@@ -13171,18 +13171,25 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
      de chung don sat nhau thi dong nao thieu nut la moi thu truot ngang - "Hoan tat" nam mot
      cho khac o tung dong. Nay bon o: [buoc hien tai] [Hoan tat] [Doi lop] [Ho so]; o nao
      khong co nut thi de TRONG chu khong don. Trong ma thang hang doc nhanh hon kin ma so le. */
-  h+='<div class="obact"><div class="obsl a">';
-  if(s.rejected)h+='<button class="btn primary sm" onclick="obChange(\''+esc(o.onboarding_id)+'\')"><i class="ti ti-transfer"></i>Đổi lớp khác</button>';
-  else{
-   if(!s.sent)h+='<button class="btn primary sm" onclick="confirmRun(\'Xác nhận đã gửi thông tin lớp cho học viên?\',\'obSendInfo\',\''+esc(o.onboarding_id)+'\')"><i class="ti ti-send"></i>Đã gửi thông tin lớp</button>';
-   else if(!s.confirmed)h+='<button class="btn sm" onclick="confirmRun(\'Xác nhận học viên đã đồng ý lớp?\',\'obConfirm\',\''+esc(o.onboarding_id)+'\')"><i class="ti ti-check"></i>HV đã xác nhận</button>'+
-    '<button class="btn danger sm" onclick="confirmRun(\'Ghi nhận học viên TỪ CHỐI lớp này? Sau đó hãy đổi lớp khác.\',\'obReject\',\''+esc(o.onboarding_id)+'\')"><i class="ti ti-user-x"></i>HV từ chối</button>';
-   h+='</div><div class="obsl b">';
-   if(!s.done)h+='<button class="btn green sm" onclick="confirmRun(\'Đánh dấu hoàn tất onboarding cho học viên?\',\'obFinish\',\''+esc(o.onboarding_id)+'\')"><i class="ti ti-flag"></i>Hoàn tất</button>';
-   h+='</div><div class="obsl c">';
-   if(o.class_id&&!s.done)h+='<button class="btn sm" onclick="obChange(\''+esc(o.onboarding_id)+'\')"><i class="ti ti-transfer"></i>Đổi lớp</button>';
-  }
-  h+='</div><div class="obsl d">'+'<button class="btn sm" onclick="openHoso(\''+esc(sid)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button></div></div></div>';
+  /* NAM O LUON LUON DUOC MO, ke ca khi trong. Ban truoc em mo o a2/b/c BEN TRONG mot nhanh if,
+     nen trang thai nao khong vao nhanh ay la o do khong ton tai - cot lech ngay, va so the div
+     khong khop. *Cot chi thang khi moi dong deu co du bay nhieu o, du o do rong.* */
+  var _oid=esc(o.onboarding_id);
+  h+='<div class="obact">';
+  h+='<div class="obsl a">'+(s.rejected
+   ?'<button class="btn primary sm" onclick="obChange(\''+_oid+'\')"><i class="ti ti-transfer"></i>Đổi lớp khác</button>'
+   :(!s.sent?'<button class="btn primary sm" onclick="confirmRun(\'Xác nhận đã gửi thông tin lớp cho học viên?\',\'obSendInfo\',\''+_oid+'\')"><i class="ti ti-send"></i>Đã gửi thông tin lớp</button>'
+    :(!s.confirmed?'<button class="btn sm" onclick="confirmRun(\'Xác nhận học viên đã đồng ý quy định lớp học và cam kết?\',\'obConfirm\',\''+_oid+'\')"><i class="ti ti-check"></i>HV đã xác nhận</button>':'')))+'</div>';
+  h+='<div class="obsl a2">'+((!s.rejected&&s.sent&&!s.confirmed)
+   ?'<button class="btn danger sm" onclick="confirmRun(\'Ghi nhận học viên TỪ CHỐI lớp này? Sau đó hãy đổi lớp khác.\',\'obReject\',\''+_oid+'\')"><i class="ti ti-user-x"></i>HV từ chối</button>'
+   :'')+'</div>';
+  h+='<div class="obsl b">'+((!s.rejected&&!s.done)
+   ?'<button class="btn green sm" onclick="confirmRun(\'Đánh dấu hoàn tất onboarding cho học viên?\',\'obFinish\',\''+_oid+'\')"><i class="ti ti-flag"></i>Hoàn tất</button>'
+   :'')+'</div>';
+  h+='<div class="obsl c">'+((!s.rejected&&o.class_id&&!s.done)
+   ?'<button class="btn sm" onclick="obChange(\''+_oid+'\')"><i class="ti ti-transfer"></i>Đổi lớp</button>'
+   :'')+'</div>';
+  h+='<div class="obsl d">'+'<button class="btn sm" onclick="openHoso(\''+esc(sid)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button>'+'</div></div></div>';
  });
  h+='</div>';return h}
 function obMark(id,vals,msg){var r=find("DL08","onboarding_id",id);function d(){if(r)for(var k in vals)r[k]=vals[k];toast(msg);reRender(CUR)}
