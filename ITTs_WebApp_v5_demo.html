@@ -2730,7 +2730,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>86401a</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>dff5cf</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -15957,7 +15957,7 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
  var MIX=jIndex();
  view.forEach(function(o){var s=obState(o);var sid=o.student_id;
   var chg=num(o.placement_change_count);
-  h+='<div class="obcard"><div class="obh"><div><div class="obten"><b>'+nguoiLnk(sid,o.student_id_name)+'</b><div class="obm">Lớp: '+lopLnk(o.class_id,o.class_id_name,"chưa xếp")+' · '+esc(sid||"")+(chg?' · <span style="color:var(--amber)">đã đổi lớp '+chg+' lần</span>':'')+'</div></div>'+'<div class="obst">'+mstripFor(sid,MIX)+(s.rejected?'<span class="chip red">HV từ chối lớp</span>':(s.infoOverdue?'<span class="chip red">Quá hạn gửi info</span>':(s.obOverdue?'<span class="chip red">Quá hạn onboarding</span>':(s.done?'<span class="chip green">Hoàn tất</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div></div></div>';
+  h+='<div class="obcard"><div class="obh"><div><div class="obten"><b>'+nguoiLnk(sid,o.student_id_name)+'</b><div class="obm">Lớp: '+lopLnk(o.class_id,o.class_id_name,"chưa xếp")+' · '+esc(sid||"")+(chg?' · <span style="color:var(--amber)">đã đổi lớp '+chg+' lần</span>':'')+'</div></div>'+'<div class="obst">'+mstripFor(sid,MIX)+(s.rejected?'<span class="chip red">HV chưa xác nhận cam kết</span>':(s.infoOverdue?'<span class="chip red">Quá hạn gửi info</span>':(s.obOverdue?'<span class="chip red">Quá hạn onboarding</span>':(s.done?'<span class="chip green">Hoàn tất</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div></div></div>';
   h+='<div class="steps">'+stepHTML("Xếp lớp",true)+stepHTML("Gửi info",s.sent)+stepHTML("HV ký cam kết",s.confirmed)+stepHTML("Hoàn tất",s.done)+'</div>';
   /* MOI NUT MOT O CO DINH. So nut doi theo trang thai (dong thi 4 nut, dong thi 2), nen neu
      de chung don sat nhau thi dong nao thieu nut la moi thu truot ngang - "Hoan tat" nam mot
@@ -15973,7 +15973,7 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
    :(!s.sent?'<button class="btn primary sm" onclick="confirmRun(\'Xác nhận đã gửi thông tin lớp cho học viên?\',\'obSendInfo\',\''+_oid+'\')"><i class="ti ti-send"></i>Đã gửi thông tin lớp</button>'
     :(!s.confirmed?'<button class="btn sm" onclick="obConfirmForm(\''+_oid+'\')"><i class="ti ti-check"></i>Ghi nhận ký tại TT</button>':'')))+'</div>';
   h+='<div class="obsl a2">'+((!s.rejected&&s.sent&&!s.confirmed)
-   ?'<button class="btn danger sm" onclick="confirmRun(\'Ghi nhận học viên CHƯA ĐỒNG Ý quy định lớp học và cam kết? Hãy liên hệ giải thích, hoặc đổi lớp nếu vướng lịch.\',\'obReject\',\''+_oid+'\')"><i class="ti ti-user-x"></i>HV chưa đồng ý</button>'
+   ?'<button class="btn danger sm" onclick="confirmRun(\'Ghi nhận học viên CHƯA ĐỒNG Ý quy định lớp học và cam kết? Hãy liên hệ giải thích, hoặc đổi lớp nếu vướng lịch.\',\'obReject\',\''+_oid+'\')"><i class="ti ti-user-x"></i>HV chưa xác nhận cam kết</button>'
    :'')+'</div>';
   /* THU TU CUOI HANG (anh Luan: *"hoan tat, va ho so ... em cho no ve ben phai"*). "Ho so"
      co o MOI dong; "Hoan tat" thi khong - no bien mat khi da hoan tat hoac HV tu choi, nhung
@@ -16039,7 +16039,7 @@ function obConfirmRun(id){
   onboarding_note:(o.onboarding_note?o.onboarding_note+" | ":"")+("Ký cam kết tại TT "+nowStr()+(note?" - "+note:""))},
   "Đã ghi nhận học viên ký cam kết tại trung tâm (bản "+commitVer()+"), kèm ảnh bản đã ký.")}
 function obFinish(id){obMark(id,{onboarding_status:eFull("enum_onboarding_status","completed"),onboarding_completed_at:nowStr()},"Đã hoàn tất onboarding.")}
-function obReject(id){obMark(id,{class_confirmation_status:eFull("enum_class_confirmation_status","rejected")},"Đã ghi nhận HV từ chối lớp - hãy đổi lớp khác.")}
+function obReject(id){obMark(id,{class_confirmation_status:eFull("enum_class_confirmation_status","rejected")},"Đã ghi nhận HV chưa xác nhận cam kết - hãy đổi lớp khác.")}
 function obChange(id){var o=find("DL08","onboarding_id",id);if(!o){toast("Không thấy hồ sơ.");return}
  var h='<div class="dcard"><h4><i class="ti ti-transfer"></i>Đổi lớp - '+esc(o.student_id_name||o.student_id)+'</h4>';
  h+=ctxRows([["Lớp hiện tại",esc(o.class_id_name||o.class_id||"-")],["Đã đổi",num(o.placement_change_count)+" lần"],["Khóa của HV",esc(stuCourse(o.student_id).course_name||"-")]]);
