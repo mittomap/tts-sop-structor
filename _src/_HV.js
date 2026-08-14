@@ -13169,20 +13169,31 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
     Nay bảng này luôn hiện khi còn người chờ. Chip "Chờ xếp lớp" vẫn giữ vai TẬP TRUNG (bấm vào
     thì lui bảng onboarding, chỉ còn đúng hàng đợi này) - đó là thu hẹp có chủ ý, khác hẳn việc
     một dải chip lặng lẽ giấu mất một khối nó không sở hữu. */
+ /* ═══ V2 14/08 (anh Luan: *"loi gi ta, so 1 ma ko co gi"*) ═════════════════════════════
+    Bang "cho xep lop" duoc noi vao `h` NGAY TAI DAY, tuc TREN thanh chip. Chon chip "Cho xep
+    lop" thi thanh chip roi xuong duoi cung, duoi no khong con gi - nhin y het mot trang rong,
+    trong khi chip van ghi 1 va dong dem van ghi "1 ho so". Con so dung, cho dat sai.
+    Nay bang duoc dung vao mot BIEN roi moi dat vao dung cho o tung nhanh: nhanh "cho xep lop"
+    thi chip truoc - bang sau; nhanh "tat ca" thi bang dung dau (do la viec gap nhat cua trang)
+    roi toi chip va danh sach onboarding.
+    *Mot con so dung ma cho dat sai thi nguoi dung van doc ra la app hong.* */
+ var _bangCho="";
  if(wait.length){
-  h+='<div class="sechd" style="display:flex;align-items:center;gap:8px"><i class="ti ti-user-plus" style="color:var(--red)"></i>Đã đóng đủ tiền · chờ xếp lớp ('+wait.length+')</div>';
-  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Khóa đã đăng ký</th><th>Ngày đóng đủ</th><th></th></tr></thead><tbody>';
+  _bangCho+='<div class="sechd" style="display:flex;align-items:center;gap:8px"><i class="ti ti-user-plus" style="color:var(--red)"></i>Đã đóng đủ tiền · chờ xếp lớp ('+wait.length+')</div>';
+  _bangCho+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Khóa đã đăng ký</th><th>Ngày đóng đủ</th><th></th></tr></thead><tbody>';
   wait.forEach(function(e){var lastPay="";var ps=srows("DL07").filter(function(p){return String(p.enrollment_id)===String(e.enrollment_id)&&num(p.amount)>0});if(ps.length)lastPay=ps[ps.length-1].payment_time||"";
-   h+='<tr><td>'+nguoiLnk(e.student_id,e.student_id_name,e.student_id)+'</td>'+
+   _bangCho+='<tr><td>'+nguoiLnk(e.student_id,e.student_id_name,e.student_id)+'</td>'+
     '<td>'+esc(e.course_id_name||e.course_id||"-")+'</td><td>'+esc(String(lastPay).slice(0,10)||"-")+'</td>'+
     '<td><button class="btn primary sm" onclick="xepFor(\''+esc(e.student_id)+'\')"><i class="ti ti-layout-grid-add"></i>Xếp vào lớp</button></td></tr>'});
-  h+='</tbody></table></div></div>';
+  _bangCho+='</tbody></table></div></div>';
   if(fil==="all")h+='<div class="sechd">Đang onboarding</div>';
  }
- if(fil==="chuaxep"){   /* chip này hỏi về DL06 (đơn đã đóng đủ), không hỏi về DL08 - bảng dưới lui */
+ if(fil==="chuaxep"){   /* chip nay hoi ve DL06 (don da dong du), khong hoi ve DL08 */
   h+=xlLoc(fil,obs,wait,'<span class="tbcnt">'+wait.length+' hồ sơ</span>');
+  h+=_bangCho;
   if(!wait.length)h+='<div class="empty">Không còn ai đóng đủ tiền mà chưa xếp lớp.</div>';
   return h}
+ if(fil==="all")h+=_bangCho+(wait.length?'<div class="sechd">Đang onboarding</div>':"");
  /* V9.28: trang này tự dựng thanh công cụ và KHÔNG có biến p (nó dùng window.XLFILT),
     nên phải ghi thẳng mã trang - viết p ở đây là tham chiếu biến không tồn tại, lọc câm luôn. */
  view=fltApply("xeplop",view);
@@ -23646,7 +23657,18 @@ function hubDich(k){
 function dashJump(key){var m={urgent:"viec",newlead:"nhaplead",consider:"viec",convert:"tuvan",risk:"viec",onboard:"xeplop",approve:"duyet",debt:"thanhtoan",complaint:"khieunai",ungraded:"baitap",testpend:"test",wowbook:"wow",unverified:"thanhtoan",classes:"banglop"};var pg=m[key];if(pg&&RBK[CURROLE].pages.indexOf(pg)>=0)go(pg);else go("viec")}
 
 /* ---------- router ---------- */
+/* ═══ V2 14/08 (anh Luân: *"lúc a đổi chip nó ko đổi link, hèn gì"*) ═══════════════════════
+   Anh chỉ trúng chỗ em đo hụt. Sáng nay em khai chip lọc vào `CTXTRANG` rồi chạy thử: ghi biến
+   vào địa chỉ, xoá biến, đọc lại từ địa chỉ - sáu ca đều OK, và em báo là xong.
+   Nhưng em đo CÁI ỐNG DẪN, không đo ĐƯỜNG NGƯỜI DÙNG THẬT ĐI: bấm một chip thì app gọi
+   `reRender`, mà `reRender` chưa bao giờ ghi lại thanh địa chỉ - chỉ `go()` mới ghi. Nên biến
+   có đổi, màn có đổi, mà cái link thì đứng yên; F5 đọc link cũ nên về chip cũ.
+   *Một phép thử đi đúng đường mình vừa lắp thì bao giờ cũng xanh - phải thử đường người dùng đi.*
+   Nay mọi lần vẽ lại đều cập nhật địa chỉ, dùng `replaceState` (deGhi=true) chứ không đẩy thêm
+   mốc lịch sử: bấm mười cái chip mà đẻ mười mốc thì nút Back của trình duyệt thành vô dụng. */
+function reRenderURL(){try{if(typeof CUR!=="undefined"&&CUR)hashSet(CUR,true)}catch(e){}}
 function reRender(k){try{setTimeout(tourTick,240)}catch(e){}   /* người dùng làm tay không qua nút của guide - guide vẫn phải biết */
+ try{reRenderURL()}catch(e){}
  var el=document.getElementById("content");
  /* V2 - BẪY ĐÃ CẮN: dòng này chỉ hỏi `RENDER[k]`, mà trang kiểu DANH SÁCH không có mục trong
     `RENDER` - chúng vẽ bằng `renderList`. Trước V2 các trang ấy (`nhaplead`, `lop`) không bao giờ
@@ -23664,7 +23686,8 @@ function reRender(k){try{setTimeout(tourTick,240)}catch(e){}   /* người dùng
     ghi - một công đôi việc. */
  try{buildNav()}catch(e){}
  updateBellBadge();asstTick();persistSoon()}
-function reRenderKeep(k){var el=document.getElementById("content");var sc=el.scrollTop;var p=PBK[k];
+function reRenderKeep(k){try{reRenderURL()}catch(e){}
+ var el=document.getElementById("content");var sc=el.scrollTop;var p=PBK[k];
  el.innerHTML=scrubMan((p&&p.ty==="list")?renderList(k):RENDER[k]());donLapTrenMan(el);asstTick();el.scrollTop=sc;try{buildNav()}catch(e){}var i=el.querySelector(".srch input");if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}persistSoon()}
 /* V9.67: mở ngăn kéo menu thì GIẤU nút Trợ lý nổi. Trên điện thoại nút đó nằm đúng chỗ chân
    sidebar (dòng tên người đăng nhập) nên che mất - và bấm vào là trúng nút Trợ lý chứ không
