@@ -1732,6 +1732,12 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .kv .k{color:var(--muted)}.kv .v{font-weight:600;text-align:left;min-width:0;overflow-wrap:anywhere}
 .rost{display:flex;align-items:center;gap:10px;padding:9px 6px;border-bottom:1px solid #EEF2F6}
 .rost .rn{flex:1;font-weight:600;font-size:13px}
+/* Hàng tiêu đề của bảng điểm danh: mượn nguyên bộ khung flex của dòng dữ liệu, chỉ thay nội dung
+   trong mỗi cụm bằng một cái nhãn. Nhãn canh giữa cụm để nó chỉ đúng vào chùm nút bên dưới. */
+.rost.dhd{border-bottom:1px solid var(--line);background:var(--bg);padding:7px 6px;position:sticky;top:0;z-index:2}
+.rost.dhd .rn,.rost.dhd .dhl{font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.rost.dhd .dhl{display:flex;align-items:center;justify-content:center;white-space:nowrap}
+.rost.dhd .ddnote{border:0;background:transparent;height:auto;padding:0}
 .att{display:flex;gap:5px}.attb{height:28px;padding:0 10px;border-radius:6px;border:1px solid var(--line);background:#fff;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;color:#5A6675}
 .attb.p.on{background:var(--green);border-color:var(--green);color:#fff}.attb.l.on{background:var(--amber);border-color:var(--amber);color:#fff}.attb.a.on{background:var(--red);border-color:var(--red);color:#fff}.attb.mk.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .ddrow{flex-wrap:wrap}
@@ -8478,6 +8484,17 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
  }
  h+='<div class="panel"><div class="ph"><b>'+esc(lop.class_name||cid)+'</b><span class="cnt" style="margin-left:8px">sĩ số '+(enr.length||lop.current_enrollment||0)+'/'+(lop.class_capacity||"-")+' · đã điểm danh '+done+'/'+enr.length+'</span><div class="mini"><button class="btn green sm" onclick="ddSave()"><i class="ti ti-device-floppy"></i>Lưu buổi học</button></div></div><div class="pbody">';
  if(!enr.length)h+='<div class="empty">Lớp chưa có học viên được xếp.</div>';
+ /* V2 14/08 (anh Luân: *"chỗ này em nên có header để phân biệt cột điểm danh, cột đánh giá nha"*).
+    Mỗi dòng có BA cụm đứng liền nhau mà không cụm nào được gọi tên: năm nút trạng thái, ba nút
+    T/B/Y, rồi ô ghi chú. T-B-Y chỉ có `title` - phải rê chuột mới biết là "Tốt / Bình thường /
+    Yếu", mà đang điểm danh 14 em cho nhanh thì không ai rê chuột.
+    Hàng tiêu đề dùng ĐÚNG những lớp CSS của dòng dữ liệu (`.att`, `.pfseg`, `.ddnote`) nên nhãn
+    tự nằm khít trên cụm nó gọi tên - không canh tay bằng px, vì canh tay thì thêm bớt một cái
+    nút là lệch hết mà không ai hay. */
+ if(enr.length)h+='<div class="rost dhd"><div class="rn">Học viên</div>'+
+   '<div class="att dhl">Điểm danh</div>'+
+   '<div class="pfseg dhl" data-tip="T = Tốt · B = Bình thường · Y = Yếu">Đánh giá buổi</div>'+
+   '<div class="ddnote dhl">Ghi chú riêng</div></div>';
  enr.forEach(function(e){var sid=e.student_id,s=find("DL09","student_id",sid)||{};
   var cur=rows("DL12").filter(function(r){return r.student_id===sid&&r.session_id===sess})[0];
   var code=cur?ecode(cur.attendance_status):"";var abs=cur?ecode(cur.absence_type):"";var perf=cur?ecode(cur.in_class_performance):"";
@@ -10608,7 +10625,19 @@ function renderChay(){
   h+='<div class="runcard"><div class="runh"><span class="runi"><i class="ti '+J.S.ic+'"></i></span><div><div class="runt">'+esc(J.S.t)+'</div><div class="runs">'+esc(J.S.why)+'</div></div></div>';
   h+='<div class="pbody"><div class="empty">'+(J.k==="learning"?'Học viên đang học - <b>chăm sóc trong lúc học</b> bằng các nút bên dưới (WOW, review, phản hồi, khiếu nại, điểm danh), hoặc báo nguy cơ / ghi nhận dừng học.':'Chặng này không có thao tác bắt buộc.')+'</div></div>';
   h+='<div class="runfoot">';
-  if(J.k==="learning"){h+='<button class="btn" onclick="runWow(\''+esc(R.pid)+'\')"><i class="ti ti-star"></i>Đặt WOW</button><button class="btn" onclick="runReviewOne(\''+esc(R.pid)+'\')"><i class="ti ti-clipboard-check"></i>Gửi khảo sát</button><button class="btn" onclick="runFeedbackOne(\''+esc(R.pid)+'\')"><i class="ti ti-message-plus"></i>Ghi phản hồi</button><button class="btn" onclick="runComplaintOne(\''+esc(R.pid)+'\')"><i class="ti ti-alert-triangle"></i>Khiếu nại</button><button class="btn" onclick="runDiemdanhClass(\''+esc(R.pid)+'\')"><i class="ti ti-checkbox"></i>Điểm danh lớp</button><button class="btn" onclick="runFlagRisk()"><i class="ti ti-user-exclamation"></i>Báo nguy cơ</button><button class="btn danger" onclick="runDropout()"><i class="ti ti-player-pause"></i>HV dừng học</button>'}
+  /* V2 14/08 (anh Luân: *"chỗ đang học này a thấy thiếu việc bấm chuyển qua thông tin chi tiết
+     của lớp đang học em"*). Bảy nút của chặng này đều là "làm MỘT VIỆC với học viên"; không nút
+     nào mở được cái LỚP em ấy đang ngồi - trong khi ở chặng Đang học gần như mọi câu hỏi đều
+     dính tới lớp: lớp tới buổi mấy, chuyên cần cả lớp ra sao, ai đang dạy, buổi tới khi nào.
+     `openLop()` có sẵn từ lâu, chỉ là chỗ này chưa gọi - *một cửa đã dựng mà không lối nào dẫn
+     tới thì cũng bằng chưa có*. Nút mang luôn TÊN LỚP chứ không ghi chung chung "Xem lớp": đọc
+     là biết mình sắp mở lớp nào, khỏi bấm để kiểm tra. Đặt ĐẦU hàng vì nó là cái khung cảnh, còn
+     sáu nút sau là các việc lẻ làm bên trong khung cảnh ấy. */
+  if(J.k==="learning"){
+   var _lopHV=(J.C.obMain&&String(J.C.obMain.class_id||""))||"";
+   if(_lopHV){var _lopR=find("DL10","class_id",_lopHV);
+    h+='<button class="btn primary" onclick="openLop(\''+esc(_lopHV)+'\')" data-tip="Mở Bảng lớp: sĩ số, chuyên cần, bài tập, buổi học, giáo viên"><i class="ti ti-users-group"></i>Lớp '+esc((_lopR&&_lopR.class_name)||_lopHV)+'</button>'}
+   h+='<button class="btn" onclick="runWow(\''+esc(R.pid)+'\')"><i class="ti ti-star"></i>Đặt WOW</button><button class="btn" onclick="runReviewOne(\''+esc(R.pid)+'\')"><i class="ti ti-clipboard-check"></i>Gửi khảo sát</button><button class="btn" onclick="runFeedbackOne(\''+esc(R.pid)+'\')"><i class="ti ti-message-plus"></i>Ghi phản hồi</button><button class="btn" onclick="runComplaintOne(\''+esc(R.pid)+'\')"><i class="ti ti-alert-triangle"></i>Khiếu nại</button><button class="btn" onclick="runDiemdanhClass(\''+esc(R.pid)+'\')"><i class="ti ti-checkbox"></i>Điểm danh lớp</button><button class="btn" onclick="runFlagRisk()"><i class="ti ti-user-exclamation"></i>Báo nguy cơ</button><button class="btn danger" onclick="runDropout()"><i class="ti ti-player-pause"></i>HV dừng học</button>'}
   h+='<button class="btn" onclick="jOpen(\''+esc(R.pid)+'\')"><i class="ti ti-id-badge-2"></i>Xem hồ sơ</button>'+(R.q?'<button class="btn primary" onclick="runNext()">Người tiếp theo <i class="ti ti-arrow-right"></i></button>':'')+'</div>';
   h+=jNextHint(J);h+='</div>';
   return h+'</div>'}
