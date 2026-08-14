@@ -278,10 +278,10 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 41 BỘ KIỂM, XANH HẾT 41/41 (verify trọn bộ 35 phút, 14/08 tối).
-> Bản dựng đang chạy: `a1bda4` (14/08), đã lên
+> **Phiên bản: V2 — 41 BỘ KIỂM, XANH HẾT 41/41 (verify trọn bộ chạy liền, 14/08 tối, hai lượt
+> liên tiếp trên hai bản dựng khác nhau). Bản dựng đang chạy: `868f3f` (14/08), đã lên
 > https://mittomap.github.io/itts-sop-demo-v2/ . Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `519e91`, `dc6eb3`, `3f0446`, `39083f`, `d2d2d5`, `c6ea8b`.
+> Mốc cũ: `a1bda4`, `519e91`, `dc6eb3`, `3f0446`, `39083f`, `d2d2d5`, `c6ea8b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
 > ### 🟢 14/08 tối - DỌN 13 CHỖ ĐỎ SAU ĐỢT GỘP, VÀ MỘT BÀI HỌC LẶP NĂM LẦN TRONG NGÀY
