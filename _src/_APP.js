@@ -8685,7 +8685,12 @@ function renderBanlam(){
     thường ở các trang nghiệp vụ để cảnh báo, các nhân sự sẽ tự biết mình cần làm gì."*
     Đặt ở đây chứ không đặt cuối trang: thứ người ta cần biết trước nhất phải nằm chỗ mắt chạm
     đầu tiên. Mỗi ô bấm được, đi thẳng tới trang nghiệp vụ đẻ ra con số ấy. */
- h+=canhBaoHTML();
+ /* Nhịp ngày vốn đi kèm bảng việc trong `bvSau()`; ở riêng trang này em tách nó ra để ghép
+    cặp với "Cần chú ý". Tách bằng cách gọi thẳng HAI hàm con mà `bvSau()` vẫn gọi, không viết
+    lại phép dựng nào - trang khác vẫn dùng `bvSau()` y như cũ. */
+ var _cbao=canhBaoHTML(), _nhip="";
+ try{_nhip=nhipSau()}catch(e){_nhip=""}
+ h+=_nhip?('<div class="bl2c">'+_cbao+_nhip+'</div>'):_cbao;
  function cS(k){return all0.filter(function(J){return J.k===k&&J.act}).length}
  var nRisk=srows("DL09").filter(stuRisk).length;
  var nDebt=srows("DL06").filter(function(e){return num(e.remaining_amount)>0&&!/cancel/.test(ecode(e.enrollment_status))}).length;
@@ -8720,8 +8725,9 @@ function renderBanlam(){
   "banlam",blocks.map(function(b){return b[6]}));
  /* V9.18: GỘP "Hành trình" vào Trang bắt đầu - một trang, hai góc nhìn (danh sách chạy / bảng chặng) */
  var vw=window.BLVIEW||"list";
- h+=bvSau();   /* V9.60: Trang bắt đầu cũng không gọi pageHead - bảng việc của Tư vấn và của
-                 Quản lý vì thế chưa từng hiện. Gắn sau dải thẻ, trước thanh chọn góc nhìn. */
+ h+=bangViecHTML();   /* V9.60: Trang bắt đầu cũng không gọi pageHead - bảng việc của Tư vấn và
+                 của Quản lý vì thế chưa từng hiện. Gắn sau dải thẻ, trước thanh chọn góc nhìn.
+                 (Nhịp ngày - vế còn lại của `bvSau()` - đã lên trên, ghép cặp với "Cần chú ý".) */
  h+='<div style="margin:2px 0 10px">'+segHTML(vw,[["list","Chạy quy trình",null,""],["board","Bảng chặng - hành trình",null,""]],"window.BLVIEW='{k}';reRender(CUR)")+'</div>';
  if(vw==="board"){h+=renderHanhtrinh(1);return h}   /* KPI đã nằm trên đầu trang */
  /* CHẠY QUY TRÌNH gộp thẳng vào đây: chip lọc + danh sách người */
