@@ -12310,7 +12310,7 @@ function btHub(embed){
  h+='<div class="fbbr"></div>'+
   '<span class="lbl">Theo buổi</span>'+
   segHTML(_moiLop?"":mode,[["giao","Giao bài"],["thu","Thu bài"],["cham","Chấm bài"]],"window.BTMODE='{k}';reRender(CUR)")+
-  '<span class="lbl" style="margin-left:14px">Toàn bộ</span>'+
+  '<span class="fbsep" aria-hidden="true"></span><span class="lbl">Toàn bộ</span>'+
   segHTML(_moiLop?"chocham":"",[["chocham","Chờ chấm - mọi lớp",_chua.length,_chua.length?"red":""]],"window.BTMODE='{k}';reRender(CUR)")+'</div>';
  if(mode==="chocham"){
   h+='<div class="panel"><div class="ph"><b>Bài đã nộp, chưa chấm - mọi lớp ('+_chua.length+')</b></div><div class="pbody">';
@@ -13165,7 +13165,7 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
  var MIX=jIndex();
  view.forEach(function(o){var s=obState(o);var sid=o.student_id;
   var chg=num(o.placement_change_count);
-  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(sid,o.student_id_name)+'</b><div class="obm">Lớp: '+lopLnk(o.class_id,o.class_id_name,"chưa xếp")+' · '+esc(sid||"")+(chg?' · <span style="color:var(--amber)">đã đổi lớp '+chg+' lần</span>':'')+'</div></div>'+mstripFor(sid,MIX)+(s.rejected?'<span class="chip red">HV từ chối lớp</span>':(s.infoOverdue?'<span class="chip red">Quá hạn gửi info</span>':(s.obOverdue?'<span class="chip red">Quá hạn onboarding</span>':(s.done?'<span class="chip green">Hoàn tất</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div>';
+  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(sid,o.student_id_name)+'</b><div class="obm">Lớp: '+lopLnk(o.class_id,o.class_id_name,"chưa xếp")+' · '+esc(sid||"")+(chg?' · <span style="color:var(--amber)">đã đổi lớp '+chg+' lần</span>':'')+'</div>'+'<div class="obst">'+mstripFor(sid,MIX)+(s.rejected?'<span class="chip red">HV từ chối lớp</span>':(s.infoOverdue?'<span class="chip red">Quá hạn gửi info</span>':(s.obOverdue?'<span class="chip red">Quá hạn onboarding</span>':(s.done?'<span class="chip green">Hoàn tất</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div></div></div>';
   h+='<div class="steps">'+stepHTML("Xếp lớp",true)+stepHTML("Gửi info",s.sent)+stepHTML("HV xác nhận",s.confirmed)+stepHTML("Hoàn tất",s.done)+'</div>';
   /* MOI NUT MOT O CO DINH. So nut doi theo trang thai (dong thi 4 nut, dong thi 2), nen neu
      de chung don sat nhau thi dong nao thieu nut la moi thu truot ngang - "Hoan tat" nam mot
@@ -13183,11 +13183,16 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
   h+='<div class="obsl a2">'+((!s.rejected&&s.sent&&!s.confirmed)
    ?'<button class="btn danger sm" onclick="confirmRun(\'Ghi nhận học viên TỪ CHỐI lớp này? Sau đó hãy đổi lớp khác.\',\'obReject\',\''+_oid+'\')"><i class="ti ti-user-x"></i>HV từ chối</button>'
    :'')+'</div>';
-  h+='<div class="obsl b">'+((!s.rejected&&!s.done)
-   ?'<button class="btn green sm" onclick="confirmRun(\'Đánh dấu hoàn tất onboarding cho học viên?\',\'obFinish\',\''+_oid+'\')"><i class="ti ti-flag"></i>Hoàn tất</button>'
-   :'')+'</div>';
+  /* THU TU CUOI HANG (anh Luan: *"hoan tat, va ho so ... em cho no ve ben phai"*). "Ho so"
+     co o MOI dong; "Hoan tat" thi khong - no bien mat khi da hoan tat hoac HV tu choi, nhung
+     O CUA NO van giu cho nen cot khong xe dich. Hai cai nay la diem NEO cua hang: mat quet
+     tu phai sang trai bao gio cung gap chung truoc, nen chung dung sat mep phai, con may nut
+     doi theo trang thai lui vao trong. */
   h+='<div class="obsl c">'+((!s.rejected&&o.class_id&&!s.done)
    ?'<button class="btn sm" onclick="obChange(\''+_oid+'\')"><i class="ti ti-transfer"></i>Đổi lớp</button>'
+   :'')+'</div>';
+  h+='<div class="obsl b">'+((!s.rejected&&!s.done)
+   ?'<button class="btn green sm" onclick="confirmRun(\'Đánh dấu hoàn tất onboarding cho học viên?\',\'obFinish\',\''+_oid+'\')"><i class="ti ti-flag"></i>Hoàn tất</button>'
    :'')+'</div>';
   h+='<div class="obsl d">'+'<button class="btn sm" onclick="openHoso(\''+esc(sid)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button>'+'</div></div></div>';
  });

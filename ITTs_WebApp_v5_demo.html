@@ -2333,7 +2333,12 @@ body.drsz .drawer{transition:none}
    (Cụm giữa - chip C2, chấm tiến trình, chip trạng thái - nằm trong `.obh` nên còn trôi theo phần
    tên; tách nó thành cột riêng là việc còn lại, đã ghi ở bàn giao.) */
 .obcards.rows .obcard{flex-wrap:nowrap}
-.obcards.rows .obcard .obh{flex:1 1 0;min-width:0;overflow:hidden;flex-wrap:nowrap}
+/* V2 14/08 (anh Luan: *"cho nay em de 1 hang ben duoi ten la xong, se gon a"*). Chip trang
+   thai truoc day dung CUNG HANG voi ten, sau phan lop dai loang ngoang - nen no bi day di
+   moi dong mot cho. Xuong hang duoi ten thi no luon bat dau tu cung mot mep trai, va hang
+   tren chi con mot viec la doc ten. */
+.obcards.rows .obcard .obh{flex:1 1 0;min-width:0;overflow:hidden;display:block}
+.obcards.rows .obcard .obst{display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:nowrap;min-width:0}
 .obcards.rows .obcard .obh>div:first-child{flex-wrap:nowrap;min-width:0;overflow:hidden}
 .obcards.rows .obcard .obact{flex:0 0 auto;display:flex;justify-content:flex-end;gap:8px;flex-wrap:nowrap;margin-left:0}
 /* MOT DONG, MOI LOAI NUT MOT COT (anh Luan: *"a thich nhu cu hon, nhung cac nut co tinh chat
@@ -2520,6 +2525,12 @@ body.drsz .drawer{transition:none}
    Đặt ở CỘT chứ không đặt ở nút: nút vẫn là nút bình thường ở mọi chỗ khác trong app. */
 .slaa{flex:0 0 auto;min-width:132px;display:flex;justify-content:flex-end}
 .slaa .btn{width:100%;justify-content:center}
+/* V2 14/08 (anh Luan: *"e thiet ke ko tach biet duoc 2 phan a"*). Hai nhom chip dung lien nhau
+   tren cung mot hang, cung mot kieu vien bo tron - mat doc ra BON tab ngang hang, trong khi
+   chung la hai cau hoi KHAC CAP: ba cai dau loc trong DUNG buoi dang chon, cai cuoi co y PHA
+   pham vi lop+buoi de soi ca trung tam. Nham hai thu do la bam nham roi khong hieu vi sao bang
+   doi han. Mot cai nhan thoi thi chua du tach - phai co mot vach ngan that. */
+.fbsep{flex:0 0 auto;width:1px;align-self:stretch;min-height:24px;background:var(--line);margin:0 14px}
 .fbar.sub{margin-top:-6px;background:#FAFBFD}
 .fbar.sub .lbl{color:var(--muted)}
 .rkpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:14px}
@@ -2699,7 +2710,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>c882ec</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>751ead</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -15045,7 +15056,7 @@ function btHub(embed){
  h+='<div class="fbbr"></div>'+
   '<span class="lbl">Theo buổi</span>'+
   segHTML(_moiLop?"":mode,[["giao","Giao bài"],["thu","Thu bài"],["cham","Chấm bài"]],"window.BTMODE='{k}';reRender(CUR)")+
-  '<span class="lbl" style="margin-left:14px">Toàn bộ</span>'+
+  '<span class="fbsep" aria-hidden="true"></span><span class="lbl">Toàn bộ</span>'+
   segHTML(_moiLop?"chocham":"",[["chocham","Chờ chấm - mọi lớp",_chua.length,_chua.length?"red":""]],"window.BTMODE='{k}';reRender(CUR)")+'</div>';
  if(mode==="chocham"){
   h+='<div class="panel"><div class="ph"><b>Bài đã nộp, chưa chấm - mọi lớp ('+_chua.length+')</b></div><div class="pbody">';
@@ -15900,7 +15911,7 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
  var MIX=jIndex();
  view.forEach(function(o){var s=obState(o);var sid=o.student_id;
   var chg=num(o.placement_change_count);
-  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(sid,o.student_id_name)+'</b><div class="obm">Lớp: '+lopLnk(o.class_id,o.class_id_name,"chưa xếp")+' · '+esc(sid||"")+(chg?' · <span style="color:var(--amber)">đã đổi lớp '+chg+' lần</span>':'')+'</div></div>'+mstripFor(sid,MIX)+(s.rejected?'<span class="chip red">HV từ chối lớp</span>':(s.infoOverdue?'<span class="chip red">Quá hạn gửi info</span>':(s.obOverdue?'<span class="chip red">Quá hạn onboarding</span>':(s.done?'<span class="chip green">Hoàn tất</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div>';
+  h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(sid,o.student_id_name)+'</b><div class="obm">Lớp: '+lopLnk(o.class_id,o.class_id_name,"chưa xếp")+' · '+esc(sid||"")+(chg?' · <span style="color:var(--amber)">đã đổi lớp '+chg+' lần</span>':'')+'</div>'+'<div class="obst">'+mstripFor(sid,MIX)+(s.rejected?'<span class="chip red">HV từ chối lớp</span>':(s.infoOverdue?'<span class="chip red">Quá hạn gửi info</span>':(s.obOverdue?'<span class="chip red">Quá hạn onboarding</span>':(s.done?'<span class="chip green">Hoàn tất</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div></div></div>';
   h+='<div class="steps">'+stepHTML("Xếp lớp",true)+stepHTML("Gửi info",s.sent)+stepHTML("HV xác nhận",s.confirmed)+stepHTML("Hoàn tất",s.done)+'</div>';
   /* MOI NUT MOT O CO DINH. So nut doi theo trang thai (dong thi 4 nut, dong thi 2), nen neu
      de chung don sat nhau thi dong nao thieu nut la moi thu truot ngang - "Hoan tat" nam mot
@@ -15918,11 +15929,16 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
   h+='<div class="obsl a2">'+((!s.rejected&&s.sent&&!s.confirmed)
    ?'<button class="btn danger sm" onclick="confirmRun(\'Ghi nhận học viên TỪ CHỐI lớp này? Sau đó hãy đổi lớp khác.\',\'obReject\',\''+_oid+'\')"><i class="ti ti-user-x"></i>HV từ chối</button>'
    :'')+'</div>';
-  h+='<div class="obsl b">'+((!s.rejected&&!s.done)
-   ?'<button class="btn green sm" onclick="confirmRun(\'Đánh dấu hoàn tất onboarding cho học viên?\',\'obFinish\',\''+_oid+'\')"><i class="ti ti-flag"></i>Hoàn tất</button>'
-   :'')+'</div>';
+  /* THU TU CUOI HANG (anh Luan: *"hoan tat, va ho so ... em cho no ve ben phai"*). "Ho so"
+     co o MOI dong; "Hoan tat" thi khong - no bien mat khi da hoan tat hoac HV tu choi, nhung
+     O CUA NO van giu cho nen cot khong xe dich. Hai cai nay la diem NEO cua hang: mat quet
+     tu phai sang trai bao gio cung gap chung truoc, nen chung dung sat mep phai, con may nut
+     doi theo trang thai lui vao trong. */
   h+='<div class="obsl c">'+((!s.rejected&&o.class_id&&!s.done)
    ?'<button class="btn sm" onclick="obChange(\''+_oid+'\')"><i class="ti ti-transfer"></i>Đổi lớp</button>'
+   :'')+'</div>';
+  h+='<div class="obsl b">'+((!s.rejected&&!s.done)
+   ?'<button class="btn green sm" onclick="confirmRun(\'Đánh dấu hoàn tất onboarding cho học viên?\',\'obFinish\',\''+_oid+'\')"><i class="ti ti-flag"></i>Hoàn tất</button>'
    :'')+'</div>';
   h+='<div class="obsl d">'+'<button class="btn sm" onclick="openHoso(\''+esc(sid)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button>'+'</div></div></div>';
  });
