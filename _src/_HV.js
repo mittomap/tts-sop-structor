@@ -4916,7 +4916,7 @@ function openOB(id){var o=find("DL08","onboarding_id",id);if(!o){toast("Không t
  h+=ctxRows([["Lớp",esc(o.class_id_name||o.class_id||"chưa xếp")],["Xếp lúc",esc(o.assigned_at||"-")],["HV ký cam kết",esc(elabel(o.class_confirmation_status)||"-")]]);
  h+='<div class="steps" style="margin:14px 0">'+stepHTML("Xếp lớp",true)+stepHTML("Gửi info",s.sent)+stepHTML("HV ký cam kết",s.confirmed)+stepHTML("Hoàn tất",s.done)+'</div><div class="dact">';
  if(!s.sent)h+='<button class="btn primary" onclick="obSendInfo(\''+esc(id)+'\');closeModal()"><i class="ti ti-send"></i>Đã gửi thông tin lớp</button>';
- else if(!s.confirmed)h+='<button class="btn" onclick="obConfirm(\''+esc(id)+'\');closeModal()"><i class="ti ti-check"></i>HV đã ký cam kết</button>';
+ else if(!s.confirmed)h+='<button class="btn" onclick="obConfirm(\''+esc(id)+'\');closeModal()"><i class="ti ti-check"></i>Ghi nhận ký tại TT</button>';
  if(!s.done)h+='<button class="btn green" onclick="obFinish(\''+esc(id)+'\');closeModal()"><i class="ti ti-flag"></i>Hoàn tất onboarding</button>';
  h+='<button class="btn" onclick="closeModal();openHoso(\''+esc(o.student_id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ HV</button></div></div>';
  openDrawer("Onboarding · "+(o.student_id_name||o.student_id),h)}
@@ -13179,7 +13179,7 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
   h+='<div class="obsl a">'+(s.rejected
    ?'<button class="btn primary sm" onclick="obChange(\''+_oid+'\')"><i class="ti ti-transfer"></i>Đổi lớp khác</button>'
    :(!s.sent?'<button class="btn primary sm" onclick="confirmRun(\'Xác nhận đã gửi thông tin lớp cho học viên?\',\'obSendInfo\',\''+_oid+'\')"><i class="ti ti-send"></i>Đã gửi thông tin lớp</button>'
-    :(!s.confirmed?'<button class="btn sm" onclick="confirmRun(\'Xác nhận học viên đã đồng ý quy định lớp học và cam kết?\',\'obConfirm\',\''+_oid+'\')"><i class="ti ti-check"></i>HV đã ký cam kết</button>':'')))+'</div>';
+    :(!s.confirmed?'<button class="btn sm" onclick="confirmRun(\'Học viên đã ký cam kết TẠI TRUNG TÂM? Chỉ bấm khi bạn thật sự thấy họ ký - còn để họ tự ký ở cổng thì đừng bấm.\',\'obConfirm\',\''+_oid+'\')"><i class="ti ti-check"></i>Ghi nhận ký tại TT</button>':'')))+'</div>';
   h+='<div class="obsl a2">'+((!s.rejected&&s.sent&&!s.confirmed)
    ?'<button class="btn danger sm" onclick="confirmRun(\'Ghi nhận học viên CHƯA ĐỒNG Ý quy định lớp học và cam kết? Hãy liên hệ giải thích, hoặc đổi lớp nếu vướng lịch.\',\'obReject\',\''+_oid+'\')"><i class="ti ti-user-x"></i>HV chưa đồng ý</button>'
    :'')+'</div>';
@@ -13210,7 +13210,20 @@ function obSendInfoRun(id){var o=find("DL08","onboarding_id",id)||{};var note=fl
  var v={class_info_sent_at:nowStr()};
  if(note.trim())v.onboarding_note=(o.onboarding_note?o.onboarding_note+" | ":"")+note.trim();
  obMark(id,v,"Đã đánh dấu gửi thông tin lớp - cảnh báo quá hạn tắt.")}
-function obConfirm(id){obMark(id,{class_confirmation_status:eFull("enum_class_confirmation_status","confirmed"),confirmation_time:nowStr()},"HV đã ký cam kết lớp.")}
+/* V2 14/08 (anh Luan: *"cho nay la nhan tu dong, dau con la nut nua phai ko em"*).
+   Gan dung, va cho em de ho thi anh chi trung: tu nay CHINH HOC VIEN ky o cong cua ho, nen mot
+   cai nut de nhan vien bam ho la mo cua cho viec "ky thay" - chu ky mat nghia ngay.
+   Nhung KHONG bo han nut: doi that co em ky giay tai trung tam, hoc vu phai ghi nhan lai duoc.
+   Nen nut doi thanh GHI NHAN KY TAI TRUNG TAM, va ban ghi phai noi ro no khong phai tu phuc vu:
+   luu `commit_by` = nguoi ghi nhan, `commit_kenh` = "tai trung tam". Ky o cong thi hai o nay
+   trong - doc ho so la biet ngay ai da ky va ky bang duong nao.
+   VA PHAI LUU BAN CHUP O CA HAI DUONG. Ban truoc em chi chup o cua cong hoc vien, nen ho so nao
+   do hoc vu ghi nhan thi co dau "da ky" ma khong co gi de chi ra da ky vao cai gi - dung cai
+   benh ma chinh em vua canh bao o khoi cau hinh. */
+function obConfirm(id){obMark(id,{class_confirmation_status:eFull("enum_class_confirmation_status","confirmed"),
+ confirmation_time:nowStr(),commit_version:commitVer(),commit_text:commitText(),commit_at:nowStr(),
+ commit_by:(CURSTAFF||""),commit_kenh:"tại trung tâm"},
+ "Đã ghi nhận học viên ký cam kết tại trung tâm (bản "+commitVer()+").")}
 function obFinish(id){obMark(id,{onboarding_status:eFull("enum_onboarding_status","completed"),onboarding_completed_at:nowStr()},"Đã hoàn tất onboarding.")}
 function obReject(id){obMark(id,{class_confirmation_status:eFull("enum_class_confirmation_status","rejected")},"Đã ghi nhận HV từ chối lớp - hãy đổi lớp khác.")}
 function obChange(id){var o=find("DL08","onboarding_id",id);if(!o){toast("Không thấy hồ sơ.");return}
@@ -23627,7 +23640,7 @@ document.addEventListener("click",function(e){var n=document.getElementById("not
 /* V9.46: ô này từng ghi "MGQ" - một cái tên KHÔNG TỒN TẠI ở đâu khác trong app (biến thật tên là
    MSGQ). Nghĩa là suốt thời gian qua ô tìm thông điệp CH4 không hề được dọn khi điều hướng. Sửa
    đúng tên, và khai thêm CFQ (ô tìm tham số CH2 mới) để nó cũng được dọn theo. */
-var NAVCTX=["HOSO","JPID","RUNPID","GVID","NVID","KHID","BLCLASS","GACRS","GATAB","BTCLASS","BTSESS","DDCLASS","SETTAB","MSGQ","CFQ"];
+var NAVCTX=["HOSO","JPID","RUNPID","XLFILT","BTMODE","VIECSEV","VIECTEAM","VIECGRP","VIECSX","LWCA","GVID","NVID","KHID","BLCLASS","GACRS","GATAB","BTCLASS","BTSESS","DDCLASS","SETTAB","MSGQ","CFQ"];
 function navSnap(){var s={};NAVCTX.forEach(function(k){if(window[k]!=null&&window[k]!=="")s[k]=window[k]});return s}
 function navApply(s){s=s||{};NAVCTX.forEach(function(k){window[k]=s[k]!=null?s[k]:null});}
 function crumbLabel(key,ctx){ctx=ctx||{};var p=PBK[key];var t=p?p.t:key;
@@ -24386,8 +24399,16 @@ function ctxKeys(){var K=NAVCTX.slice();
    Trang không khai ở đây thì địa chỉ chỉ có tên trang - đúng, vì trang ấy không có "chỗ đứng bên
    trong". Thêm một trang chi tiết mới mà quên khai thì `_checkf5` báo đỏ. */
 var CTXTRANG={hoso:["HOSO"],hosogv:["GVID"],hosonv:["NVID"],hosokhoa:["KHID"],
- banglop:["BLCLASS"],diemdanh:["DDCLASS"],baitap:["BTCLASS","BTSESS"],giaoan:["GACRS","GATAB"],
- settings:["SETTAB","MSGQ","CFQ"],chay:["RUNPID"]};
+ banglop:["BLCLASS"],diemdanh:["DDCLASS"],giaoan:["GACRS","GATAB"],
+ /* V2 14/08 (anh Luân: *"ví dụ đang ở chip nào, f5 về lại đúng chip đó luôn em làm được ko"*).
+   Được, và nên - vì cùng một họ với chuyện F5 mất hồ sơ đang chạy đã vá sáng nay. Chip lọc là
+   một phần của "chỗ đang đứng": lọc ra 2 hồ sơ chờ gửi info rồi F5 mà về Tất cả 88 dòng thì
+   người ta phải lọc lại từ đầu, và cái link gửi cho đồng nghiệp cũng không mở ra đúng thứ mình
+   đang nói tới. Bốn trang có chip lọc thật đều khai ở đây; trang nào không khai thì địa chỉ chỉ
+   có tên trang - đúng, vì trang ấy không có chỗ đứng bên trong. */
+settings:["SETTAB","MSGQ","CFQ"],chay:["RUNPID"],
+ xeplop:["XLFILT"],baitap:["BTCLASS","BTSESS","BTMODE"],lichwow:["LWCA"],
+ viec:["VIECSEV","VIECTEAM","VIECGRP","VIECSX"]};
 /* Khoá ngữ cảnh của MỘT trang: phần khai ở trên, cộng biến tab nếu trang đó là hub (lấy thẳng
    từ HUBTAB). Sang V2 mỗi nghiệp vụ một trang thì vế hub tự rỗng. */
 function ctxCuaTrang(k){var K=(CTXTRANG[k]||[]).slice();
