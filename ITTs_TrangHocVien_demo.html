@@ -882,6 +882,16 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .bwcta2{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:10px 14px;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600}
 .bwcta2:hover{background:rgba(255,255,255,.22)}
 .bstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin-bottom:16px}
+/* ═══ V2 14/08 - DẢI ÍT THẺ THÌ ĐỪNG KÉO THẺ RA CHO ĐẦY HÀNG ════════════════════════════════
+   `auto-fit` gom các cột rỗng lại, nên một dải HAI thẻ thì mỗi thẻ phình ra ~560px: một cái ô
+   to bằng nửa màn hình để đựng một con số hai chữ số và một dòng chữ ngắn. Đứng ngay dưới một
+   dải NĂM thẻ mỗi cái 220px thì hai kích cỡ ấy đọc ra như hai loại thành phần khác nhau, trong
+   khi chúng là cùng một loại. Anh Luân nhìn cả trang một lượt và nói *"thiết kế thì xấu quá"* -
+   đây là một trong những chỗ làm vỡ nhịp.
+   Ít thẻ thì giữ đúng khổ thẻ và để trống phần thừa bên phải. *Khoảng trống thẳng hàng đọc dễ
+   hơn một cái ô bị kéo giãn cho vừa chỗ.* */
+.bstats.itfew{grid-template-columns:repeat(auto-fill,minmax(250px,296px));justify-content:start}
+@media(max-width:700px){.bstats.itfew{grid-template-columns:1fr}}
 .bstat{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 13px;transition:.15s}
 /* V9.67: cùng lý do với `.jgrid>*` - khối chữ trong thẻ phải chịu hẹp lại, nếu không một câu phụ
    chú dài ("Đến hạn thu, tính tới hôm nay") đẩy cả trang Thu học phí cuộn ngang trên điện thoại. */
@@ -2574,9 +2584,6 @@ body.drsz .drawer{transition:none}
    ra nhu khoang cach 28px trong khi khe that chi 8px. Nut lap day o thi khe giua hai nut dung
    bang khe flex, va nut trong cung mot cot cung mot be rong luon. */
 .obcards.rows .obcard .obsl.a{width:168px}
-/* Bề rộng ô = bề rộng NHÃN DÀI NHẤT ô ấy phải chứa, không phải một con số cho đẹp mắt lúc viết.
-   Ô a2 chứa "Ghi nhận từ chối" (icon + 16 ký tự). */
-.obcards.rows .obcard .obsl.a2{width:150px}
 .obcards.rows .obcard .obsl.b{width:104px}
 .obcards.rows .obcard .obsl.c{width:96px}
 .obcards.rows .obcard .obsl.d{width:88px}
@@ -16543,7 +16550,7 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
  var MIX=jIndex();
  view.forEach(function(o){var s=obState(o);var sid=o.student_id;
   var chg=num(o.placement_change_count);
-  h+='<div class="obcard"><div class="obh"><div><div class="obten"><b>'+nguoiLnk(sid,o.student_id_name)+'</b><div class="obm">Lớp: '+lopLnk(o.class_id,o.class_id_name,"chưa xếp")+' · '+esc(sid||"")+(chg?' · <span style="color:var(--amber)">đã đổi lớp '+chg+' lần</span>':'')+'</div></div>'+'<div class="obst">'+mstripFor(sid,MIX)+(s.rejected?'<span class="chip red">HV chưa xác nhận cam kết</span>':(s.infoOverdue?'<span class="chip red">Quá hạn gửi info</span>':(s.obOverdue?'<span class="chip red">Quá hạn onboarding</span>':(s.done?'<span class="chip green">Hoàn tất</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div></div></div>';
+  h+='<div class="obcard"><div class="obh"><div><div class="obten"><b>'+nguoiLnk(sid,o.student_id_name)+'</b><div class="obm">Lớp: '+lopLnk(o.class_id,o.class_id_name,"chưa xếp")+' · '+esc(sid||"")+(chg?' · <span style="color:var(--amber)">đã đổi lớp '+chg+' lần</span>':'')+'</div></div>'+'<div class="obst">'+mstripFor(sid,MIX)+(s.rejected?'<span class="chip red">HV từ chối cam kết</span>':(s.infoOverdue?'<span class="chip red">Quá hạn gửi info</span>':(s.obOverdue?'<span class="chip red">Quá hạn onboarding</span>':(s.done?'<span class="chip green">Hoàn tất</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div></div></div>';
   h+='<div class="steps">'+stepHTML("Xếp lớp",true)+stepHTML("Gửi info",s.sent)+stepHTML("HV ký cam kết",s.confirmed)+stepHTML("Hoàn tất",s.done)+'</div>';
   /* MOI NUT MOT O CO DINH. So nut doi theo trang thai (dong thi 4 nut, dong thi 2), nen neu
      de chung don sat nhau thi dong nao thieu nut la moi thu truot ngang - "Hoan tat" nam mot
@@ -16558,26 +16565,21 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
    ?'<button class="btn primary sm" onclick="obChange(\''+_oid+'\')"><i class="ti ti-transfer"></i>Đổi lớp khác</button>'
    :(!s.sent?'<button class="btn primary sm" onclick="confirmRun(\'Xác nhận đã gửi thông tin lớp cho học viên?\',\'obSendInfo\',\''+_oid+'\')"><i class="ti ti-send"></i>Đã gửi thông tin lớp</button>'
     :(!s.confirmed?'<button class="btn sm" onclick="obConfirmForm(\''+_oid+'\')"><i class="ti ti-check"></i>Ghi nhận ký tại TT</button>':'')))+'</div>';
-  /* V2 14/08 (anh Luân: *"học viên chưa xác nhận cam kết chỉ là trạng thái mà em làm nhìn như
-    nút vậy"*). Nó LÀ nút thật - cửa ghi `obReject`. Cái sai nằm ở NHÃN: "HV chưa xác nhận cam
-    kết" là một câu tả tình hình, mà đúng cái chuỗi ấy còn đang được dùng làm CHIP TRẠNG THÁI ở
-    đầu thẻ (dòng `s.rejected` phía trên). Một chuỗi đứng hai vai - vừa là trạng thái vừa là nút
-    - thì người đọc chọn vai quen thuộc hơn, tức là trạng thái.
-    Nay nhãn mở đầu bằng động từ, song song với hai nút cạnh nó ("Ghi nhận ký tại TT", "Đổi lớp").
-    *Nút phải nói việc nó LÀM, không nói tình hình nó GHI LẠI.*
-    ═══ 14/08 CHIỀU - ANH LUÂN VẪN THẤY Y HỆT, VÌ CHỮ BỊ CẮT ═════════════════════════════════
-    Anh gửi lại đúng hàng nút ấy: *"ủa cái vụ trạng thái xác nhận cam kết e chưa làm à, e quên???"*
-    Nhãn ĐÃ đổi rồi - cái hỏng là hình. Ô `.obsl.a2` rộng cứng 136px, nút bên trong `width:100%`
-    và `white-space:nowrap`, mà "Ghi nhận HV chưa đồng ý" cần ~190px: chữ tràn khỏi nút, chạy
-    sang đè lên ô "Đổi lớp" và bị cắt cụt ở chữ "đồng". Đọc trên màn ra một mẩu chữ đỏ lửng lơ
-    giữa hàng nút - trông đúng như một cái nhãn trạng thái bị nhét nhầm chỗ, tức là y hệt cái
-    anh phàn nàn lần đầu.
-    Chữa cả hai đầu: nhãn rút còn "Ghi nhận từ chối" (vẫn là động từ), câu đầy đủ chuyển sang
-    chú thích rê chuột và hộp xác nhận; ô nới cho vừa nhãn dài nhất nó phải chứa.
-    *Sửa xong một chữ mà không đo lại cái ô đựng nó thì người ta vẫn nhìn thấy lỗi cũ.* */
- h+='<div class="obsl a2">'+((!s.rejected&&s.sent&&!s.confirmed)
-   ?'<button class="btn danger sm" data-tip="Học viên không đồng ý quy định lớp học và cam kết" onclick="confirmRun(\'Ghi nhận học viên CHƯA ĐỒNG Ý quy định lớp học và cam kết? Hãy liên hệ giải thích, hoặc đổi lớp nếu vướng lịch.\',\'obReject\',\''+_oid+'\')"><i class="ti ti-user-x"></i>Ghi nhận từ chối</button>'
-   :'')+'</div>';
+  /* ═══ V2 14/08 - "TỪ CHỐI" LÀ TRẠNG THÁI, KHÔNG PHẢI MỘT CÁI NÚT ════════════════════════
+     Anh Luân phải nói ba lượt em mới nghe ra đúng câu. Lượt 1: *"học viên chưa xác nhận cam kết
+     chỉ là trạng thái mà em làm nhìn như nút vậy"* - em chữa cái NHÃN. Lượt 2 anh gửi lại ảnh
+     hàng nút, em chữa cái Ô (chữ bị cắt). Lượt 3 anh nói thẳng ra điều em bỏ qua hai lần:
+     *"ví dụ như học viên chưa xác nhận thì chưa xác nhận, học viên từ chối thì hiện học viên từ
+     chối, còn học viên ký trực tiếp thì dùng nút ghi nhận ký trực tiếp"*.
+     Đúng, và đây là chuyện BẢN CHẤT chứ không phải chữ nghĩa: việc ký hay không ký là việc CỦA
+     HỌC VIÊN, làm ở cổng của họ. Trung tâm chỉ có ĐÚNG MỘT việc để làm ở đây - ghi lại trường
+     hợp học viên ký giấy trực tiếp tại quầy, vì đường đó không đi qua cổng nên máy không tự biết.
+     Ba trạng thái kia (chưa xác nhận · đã ký · từ chối) tự đến, chỉ cần HIỆN RA.
+     Nên cái nút bị gỡ khỏi hàng. Cửa ghi `obReject` KHÔNG mất (luật số 0: thêm được, bớt thì
+     không) - có thật những ca học viên nói qua điện thoại là không đồng ý, và học vụ phải ghi
+     lại. Nó chuyển vào trong ngăn kéo "Ghi nhận ký cam kết tại trung tâm", đúng chỗ của nó: đó
+     là màn ghi KẾT QUẢ của việc đi xin chữ ký, mà kết quả thì có hai chiều.
+     *Trước khi đặt một cái nút, hỏi việc đó ai làm. Việc của người khác thì mình chỉ hiện ra.* */
   /* THU TU CUOI HANG (anh Luan: *"hoan tat, va ho so ... em cho no ve ben phai"*). "Ho so"
      co o MOI dong; "Hoan tat" thi khong - no bien mat khi da hoan tat hoac HV tu choi, nhung
      O CUA NO van giu cho nen cot khong xe dich. Hai cai nay la diem NEO cua hang: mat quet
@@ -16628,7 +16630,14 @@ function obConfirmForm(id){var o=find("DL08","onboarding_id",id);if(!o){toast("K
  h+=commitHTML(null,commitVer());
  h+=attachBox("obk","Ảnh bản cam kết đã ký (bắt buộc)");
  h+='<div class="fld full"><label>Ghi chú</label><input id="obk_note" placeholder="vd: ký tại quầy, có phụ huynh đi cùng"></div>';
- h+='<div class="fld full"><button class="btn primary" onclick="obConfirmRun(\''+esc(id)+'\')"><i class="ti ti-check"></i>Ghi nhận đã ký</button></div></div>';
+ h+='<div class="fld full"><button class="btn primary" onclick="obConfirmRun(\''+esc(id)+'\')"><i class="ti ti-check"></i>Ghi nhận đã ký</button></div>';
+ /* Chiều còn lại của cùng một việc: đi xin chữ ký mà học viên nói không đồng ý. Để ở ĐÂY chứ
+    không để thành một cái nút ngoài thẻ - ngoài thẻ thì nó đứng ngang hàng với hành động chính
+    và đọc ra như một trạng thái bị nhét nhầm chỗ (xem ghi chú ở `renderXeplop`). Trong này thì
+    thứ tự đọc đúng: "tôi đang ghi kết quả xin chữ ký" -> ký rồi, hoặc không đồng ý. */
+ h+='<div class="fhint" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line)">'+
+  'Học viên nói KHÔNG đồng ý quy định lớp học? Ghi lại để hồ sơ đứng đúng trạng thái, rồi liên hệ giải thích hoặc đổi lớp nếu vướng lịch.'+
+  '</div><div class="fld full"><button class="btn danger" onclick="closeModal();confirmRun(\'Ghi nhận học viên CHƯA ĐỒNG Ý quy định lớp học và cam kết?\',\'obReject\',\''+esc(id)+'\')"><i class="ti ti-user-x"></i>Học viên không đồng ý</button></div></div>';
  openDrawer("Ghi nhận ký cam kết",h)}
 function obConfirmRun(id){
  var anh=attachVal("obk");
@@ -21257,7 +21266,7 @@ function statStrip(items,key,ids){
   return '<div class="bstatsw" data-thekey="'+esc(key)+'">'+theBoxIn(key)+'</div>'}
  /* Dải hàng chờ việc KHÔNG mang neo `bstats` - neo của nó là tiêu đề `bangviec`. Trước bản này
     cả hai dải cùng mang một neo nên bài hướng dẫn tô sáng nhầm dải. */
- return '<div class="bstats">'+items.map(function(t){
+ return '<div class="bstats'+(items.length<=3?" itfew":"")+'">'+items.map(function(t){
  var act=t[5]||"";
  /* V9.54: ô thứ 7 = CÂU GIẢI THÍCH con số này ở đâu ra. Anh Luân: "mấy con số như kiểu 95% là
     tính như thế nào, e ghi chú cụ thể ở hover cho anh". Chú thích gắn lên CẢ Ô chứ không riêng
