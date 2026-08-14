@@ -397,14 +397,34 @@ const PROBE = () => {
         luot += n;
       }
       /* CONG TAC bat/tat tro thu phai TAT THAT - bam ma khong tat gi la thu lam nguoi dung het tin app */
+      /* ═══ V2 14/08 - VIET LAI: DO MUC TIEU, DUNG DO PHUONG PHAP ══════════════════════════
+         Ban cu do bang `#asstfab` - CAI NUT NOI o goc man. Anh Luan da bao bo han no ("bo luon
+         cai Hoi tro ly duoi goc duoi di, phien ko can thiet"), nut bong den tren thanh dau nay
+         mo thang Tro thu. Nen bo kiem nay do mot thu KHONG CON TON TAI: no do vinh vien, va ba
+         dong do ay khong noi gi ve viec Tro thu con dung hay khong.
+         Bai hoc (da cat ba lan trong du an): mot bo kiem gac PHUONG PHAP thi doi phuong phap la
+         no do oan; gac MUC TIEU thi doi phuong phap bao nhieu lan no van dung.
+         Muc tieu that, ba dieu:
+           1. KHONG con nut noi nao o goc man (chinh cai anh Luan bao bo).
+           2. Nut bong den tren thanh dau CO that va mo duoc bang Tro thu.
+           3. Tat Tro thu o Cai dat thi bam nut bong den KHONG mo bang - va phai noi ra
+              (khong duoc im lang), roi bat lai thi mo duoc. */
       const ct = await page.evaluate(() => {
-        const nut = () => { const f = document.getElementById("asstfab"); return !!f && getComputedStyle(f).display !== "none"; };
-        const truoc = nut();
-        tthToggle(); const sauTat = nut(); const coTat = tthOn();
-        tthToggle(); const sauBat = nut();
-        tthSet("on", 0); asstTick(); const sauTatCauHinh = nut();
-        tthSet("on", 1); asstTick();
-        return {truoc, sauTat, coTat, sauBat, sauTatCauHinh};
+        const bang = () => { const a = document.querySelector(".asst"); return !!a && a.classList.contains("on"); };
+        const dong = () => { try { asstClose(); } catch (e) {} };
+        dong();
+        const conFab = !!document.querySelector(".asstfab, #asstfab");
+        const coNutDau = !!document.getElementById("tthBtn");
+        /* bat san Tro thu roi bam nut dau - bang phai mo */
+        tthSet("on", 1); try { if (tthOn() === false) tthToggle(); } catch (e) {}
+        asstNut(); const moDuoc = bang(); dong();
+        /* tat o Cai dat -> bam nut dau thi KHONG mo, nhung phai co loi nhac hien ra */
+        tthSet("on", 0);
+        asstNut(); const moKhiTat = bang(); dong();
+        const coNhac = !!document.querySelector(".toast, #toast");
+        tthSet("on", 1);
+        asstNut(); const moLai = bang(); dong();
+        return {conFab, coNutDau, moDuoc, moKhiTat, coNhac, moLai};
       });
       /* V9.40 - HOP XAC NHAN PHAI BAM TOI DUOC KE CA KHI DANG MO NGAN KEO / TAM TRO THU.
          Loi da xay ra that: .cfmask de z-index 95, thap hon .mask (170), .drawer (171) va .asst
@@ -446,10 +466,12 @@ const PROBE = () => {
         if (!cf.trongMan) bad.push(nhan("hop xac nhan nam ngoai vung nhin - phai cuon moi thay"));
       }
       luot++;
-      if (!ct.truoc) bad.push(nhan("mac dinh tro thu phai HIEN nut goc"));
-      if (ct.sauTat) bad.push(nhan("bam nut bong den TAT tro thu ma nut goc VAN CON"));
-      if (!ct.sauBat) bad.push(nhan("bat lai tro thu ma nut goc khong hien"));
-      if (ct.sauTatCauHinh) bad.push(nhan("tat tro thu o CAU HINH ma nut goc van con"));
+      if (ct.conFab) bad.push(nhan("van con nut Tro thu NOI o goc man - anh Luan da bao bo han"));
+      if (!ct.coNutDau) bad.push(nhan("khong thay nut bong den tren thanh dau - mat loi vao Tro thu"));
+      if (!ct.moDuoc) bad.push(nhan("bam nut bong den ma bang Tro thu KHONG mo"));
+      if (ct.moKhiTat) bad.push(nhan("da TAT Tro thu o Cai dat ma bam nut van mo bang"));
+      if (!ct.coNhac) bad.push(nhan("Tro thu dang tat ma bam nut khong noi mot loi nao - bam vao khoang khong"));
+      if (!ct.moLai) bad.push(nhan("bat lai Tro thu o Cai dat ma bam nut van khong mo duoc"));
       luot++;
     }
     /* V9.62: tu ban nay `go("settings")` HOI CHE DO truoc (chi trai nghiem / cong thuc) va KHONG

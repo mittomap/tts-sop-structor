@@ -5260,22 +5260,48 @@ function renderViec(){var items=bellItems();
  h+=locKhoi([
   locR("Mức độ",segHTML(sev||"",msegs,"viecOnly('{k}')","viec_mucdo")),
   locR("Mảng việc",segHTML(team,tsegs,"viecTeam('{k}')","viec_bophan")),
-  locR("Nhóm việc",segHTML(grp,gsegs,"window.VIECGRP='{k}';reRender('viec')","viec_nhom"))],
+  locR("Nhóm việc",segHTML(grp,gsegs,"window.VIECGRP='{k}';reRender('viec')","viec_nhom")),
+  /* V2 14/08 (anh Luân: *"hay em cho chọn cách sắp xếp đi: theo nhóm, theo thời gian, theo quá
+     hạn gì đó"*). Trước đây danh sách CHỈ có một cách xếp - gom theo độ gấp - và cách ấy cắm
+     cứng trong mã, không ai đổi được. Nó đúng cho câu hỏi "sáng nay làm gì trước", nhưng sai cho
+     hai câu hỏi khác cũng có thật: *"phòng nào đang ngập việc"* (theo nhóm) và *"có gì mới rơi
+     vào trong lúc tôi đi vắng"* (theo thời gian). Một danh sách phục vụ ba câu hỏi thì phải cho
+     người ta nói mình đang hỏi câu nào. */
+  locR("Sắp xếp",segHTML(window.VIECSX||"gap",
+   [["gap","Theo độ gấp",0,""],["nhom","Theo nhóm việc",0,""],["moi","Mới nhất trước",0,""]],
+   "window.VIECSX='{k}';reRender('viec')","viec_sapxep"))],
   '<span class="tbcnt">'+view.length+' việc</span>');
  /* GOM THEO ĐỘ GẤP - trước đây đổ một danh sách phẳng, đỏ lẫn vàng lẫn xám, không biết bắt đầu từ đâu */
- var BUCK=[["red","Quá hạn - làm ngay","ti-alert-triangle","var(--red)"],
-           ["amber","Sắp tới hạn - còn kịp","ti-clock","var(--amber)"],
-           ["","Theo dõi","ti-eye","var(--muted)"]];
+ var _sx=window.VIECSX||"gap";
+ var BUCK;
+ if(_sx==="nhom"){
+  /* Theo NHÓM VIỆC, thứ tự nhóm lấy từ bản khai `VIECNHOM` (đã là thứ tự vòng đời SOP) - không
+     xếp theo bảng chữ cái: A-B-C là thứ tự của từ điển, không phải của một ngày làm việc. */
+  var _co={};view.forEach(function(it){_co[it.grp||it.cat]=1});
+  BUCK=VIECNHOM.filter(function(g){return _co[g]}).map(function(g){return [g,g,"ti-folder","var(--navy)","grp"]});
+  Object.keys(_co).forEach(function(g){if(VIECNHOM.indexOf(g)<0)BUCK.push([g,g,"ti-folder","var(--muted)","grp"])});
+ }else if(_sx==="moi"){
+  BUCK=[["","Mới nhất trước","ti-clock-play","var(--blue)","moi"]];
+ }else{
+  BUCK=[["red","Quá hạn - làm ngay","ti-alert-triangle","var(--red)"],
+        ["amber","Sắp tới hạn - còn kịp","ti-clock","var(--amber)"],
+        ["","Theo dõi","ti-eye","var(--muted)"]];
+ }
  var shown=0, CAP=120;
  BUCK.forEach(function(B){
-  var part=view.filter(function(it){return (it.sev||"")===B[0]});
+  var part=(B[4]==="grp")?view.filter(function(it){return (it.grp||it.cat)===B[0]})
+        :(B[4]==="moi")?view.slice()
+        :view.filter(function(it){return (it.sev||"")===B[0]});
   /* ACA-10 (feedback team 11/08): *"Sort các việc của Giáo viên lên trước - số ngày quá hạn -"*.
      Ảnh anh Luân gửi cho thấy khối "QUÁ HẠN - LÀM NGAY" xếp *quá 2 · quá 3 · quá 3 · quá 1 · quá 2*
      - không theo độ quá hạn chút nào, vì danh sách lấy đúng thứ tự NHÓM việc.
      Sắp ở đây KHÔNG đạp lên quyết định V9.48: bản khai `VIECNHOM` quy định thứ tự *nhóm*, còn ba
      khối Quá hạn / Sắp tới hạn / Theo dõi vốn đã cắt ngang thứ tự ấy rồi. Trong một khối đã mang
      nghĩa "làm ngay" thì câu hỏi duy nhất còn lại là *cái nào trễ lâu nhất*. */
-  part.sort(function(x,y){var ax=(x.age==null?-1e9:x.age),ay=(y.age==null?-1e9:y.age);return ay-ax});
+  /* "Mới nhất trước" đảo chiều đúng phép so ấy: tuổi nhỏ nhất lên đầu. Việc không có tuổi
+     (không gắn đồng hồ nào) xuống cuối ở cả hai chiều - nó không trả lời được câu nào trong hai. */
+  if(B[4]==="moi")part.sort(function(x,y){var ax=(x.age==null?1e9:x.age),ay=(y.age==null?1e9:y.age);return ax-ay});
+  else part.sort(function(x,y){var ax=(x.age==null?-1e9:x.age),ay=(y.age==null?-1e9:y.age);return ay-ax});
   if(!part.length)return;
   h+='<div class="viechd"><i class="ti '+B[2]+'" style="color:'+B[3]+'"></i>'+
    esc(B[1])+' <b>'+part.length+'</b></div>';

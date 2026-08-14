@@ -709,8 +709,13 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    Nay bốn ô điểm đi thành MỘT KHỐI bốn cột đều nhau, ô nhập hẹp đúng cỡ một con số, kèm ô Điểm
    tổng tự tính hiện ngay bên cạnh - phần "hệ thống tự tính điểm tổng" mà lời mô tả bước này hứa
    từ lâu nhưng người nhập không hề thấy cho tới lúc bấm Lưu. */
-.rband{flex:1 1 100%;display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px}
-.rbg{flex:1 1 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+/* V2 14/08 (anh Luân: *"thiếu cân đối ra sao đó"*). Bốn cột `1fr` kéo hết bề ngang thẻ, mà ô nhập
+   bên trong chỉ rộng 110px - nên mỗi cột thừa một khoảng trống bên phải, và ô Điểm tổng bị đẩy
+   sang tận mép kia. Nhìn xuống là bốn ô lơ lửng cách nhau rất xa với một ô lạc lõng ở cuối.
+   Cột cố định 128px + cả khối dồn về trái: bốn ô điểm và ô Điểm tổng thành MỘT CỤM đọc liền
+   mạch, đúng như cách người ta gõ chúng (bốn số rồi liếc sang kết quả). */
+.rband{flex:1 1 100%;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:flex-start;gap:12px}
+.rbg{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,128px);gap:12px}
 .rbc{display:flex;flex-direction:column;gap:5px}
 .rform .rbc input{max-width:110px;text-align:center;font-weight:700;font-size:14px}
 /* Ô Điểm tổng: nền `--bg` trên thẻ trắng đọc ra như một ô BỊ KHOÁ. Nó không bị khoá - nó là kết
@@ -720,7 +725,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
  background:rgba(46,90,136,.07);text-align:center}
 .rbov .k{font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--muted);text-transform:uppercase}
 .rbov .v{font-size:20px;font-weight:800;color:var(--navy);line-height:1.25}
-@media(max-width:760px){.rbg{grid-template-columns:repeat(2,minmax(0,1fr))}.rform .rbc input{max-width:none}}
+@media(max-width:760px){.rbg{grid-template-columns:repeat(2,minmax(0,1fr));width:100%}.rband{display:block}.rbov{margin-top:12px}.rform .rbc input{max-width:none}}
 /* ═══ V2 14/08 (anh Luân: *"tổng thể cứ mờ mờ ko có điểm nhấn kiểu gì á em"*) ═══════════════
    Đo lại bằng chính ảnh anh gửi: màn Chạy quy trình là **trắng trên trắng**. Thẻ trắng, ô nhập
    nền trắng, viền ô là `--line` (#E3E9F0) - gần như tan vào nền thẻ. Nhìn xuống chỉ thấy mấy
@@ -1529,6 +1534,11 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .locr.locct{background:var(--bg);align-items:center;gap:8px}
 .locr.locct .tbcnt{margin-right:auto}
 .locr.locnote{background:var(--bg);font-size:11.5px;color:var(--muted);line-height:1.55;display:block}
+/* HÀNG GHI CHÚ LÀ MỘT CÂU VĂN, KHÔNG PHẢI MỘT HÀNG CHIP. `.locv` mặc định là flex - mỗi mẩu chữ
+   và mỗi con chip trong câu thành MỘT Ô FLEX, nên câu bị bẻ vụn thành ba cột đứng cạnh nhau.
+   Đặt `display:block` cho hàng ngoài là chưa đủ: cái bẻ câu nằm ở lớp `.locv` bên trong.
+   (`_checkui` bắt được vì nó đo TRÊN TRÌNH DUYỆT THẬT - đọc mã nguồn thì HTML hoàn toàn đúng.) */
+.locr.locnote .locv{display:block}
 @media(max-width:860px){.locr{flex-direction:column;gap:5px}
  .loclb{line-height:1.4;min-width:0}.loclb em{display:inline;margin:0 0 0 6px}}
 /* Trong thanh lọc, dải chip KHÔNG mang khung riêng - khung của khối đã bao rồi. Ngoài thanh lọc
@@ -2410,7 +2420,13 @@ body.drsz .drawer{transition:none}
 .agebadge{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:1px 6px;margin-left:6px}
 /* V9.99s - huy hieu tuoi viec ("quá 15h", "quá 10 ngày") dung MAU BAO DONG lam MAU CHU: #E08A1E tren nen #FFF6D8 chi duoc tuong phan 2.5, doc bang mat la chu chim vao nen. Da co san cap mau dam hon dung cho dung viec nay o `.chip` (#854F0B / #A32D2D) - dung lai chinh no de toan app chi co MOT thang mau chu tren nen canh bao. */
 .agebadge.red{background:var(--redb);color:#A32D2D}.agebadge.amber{background:var(--amberb);color:#854F0B}
-.slaa{flex:0 0 auto}
+/* V2 14/08 (anh Luân: *"do nó cùng 1 bảng, e nên làm cho nó tương đồng ít nhất là về kích thước"*).
+   Nút của mỗi dòng rộng theo ĐỘ DÀI CHỮ trên nó, nên trong cùng một bảng có nút "Làm ngay" dài,
+   nút "Hồ sơ" ngắn, nút "Sang màn xử lý" dài hơn nữa - mép trái của chúng so le, mắt đọc xuống
+   bị gãy nhịp ở từng dòng. Chốt một bề rộng chung: chữ vẫn nói đúng việc, còn cái cột thì thẳng.
+   Đặt ở CỘT chứ không đặt ở nút: nút vẫn là nút bình thường ở mọi chỗ khác trong app. */
+.slaa{flex:0 0 auto;min-width:132px;display:flex;justify-content:flex-end}
+.slaa .btn{width:100%;justify-content:center}
 .fbar.sub{margin-top:-6px;background:#FAFBFD}
 .fbar.sub .lbl{color:var(--muted)}
 .rkpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:14px}
@@ -2590,7 +2606,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>847361</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>4d780c</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -7886,22 +7902,48 @@ function renderViec(){var items=bellItems();
  h+=locKhoi([
   locR("Mức độ",segHTML(sev||"",msegs,"viecOnly('{k}')","viec_mucdo")),
   locR("Mảng việc",segHTML(team,tsegs,"viecTeam('{k}')","viec_bophan")),
-  locR("Nhóm việc",segHTML(grp,gsegs,"window.VIECGRP='{k}';reRender('viec')","viec_nhom"))],
+  locR("Nhóm việc",segHTML(grp,gsegs,"window.VIECGRP='{k}';reRender('viec')","viec_nhom")),
+  /* V2 14/08 (anh Luân: *"hay em cho chọn cách sắp xếp đi: theo nhóm, theo thời gian, theo quá
+     hạn gì đó"*). Trước đây danh sách CHỈ có một cách xếp - gom theo độ gấp - và cách ấy cắm
+     cứng trong mã, không ai đổi được. Nó đúng cho câu hỏi "sáng nay làm gì trước", nhưng sai cho
+     hai câu hỏi khác cũng có thật: *"phòng nào đang ngập việc"* (theo nhóm) và *"có gì mới rơi
+     vào trong lúc tôi đi vắng"* (theo thời gian). Một danh sách phục vụ ba câu hỏi thì phải cho
+     người ta nói mình đang hỏi câu nào. */
+  locR("Sắp xếp",segHTML(window.VIECSX||"gap",
+   [["gap","Theo độ gấp",0,""],["nhom","Theo nhóm việc",0,""],["moi","Mới nhất trước",0,""]],
+   "window.VIECSX='{k}';reRender('viec')","viec_sapxep"))],
   '<span class="tbcnt">'+view.length+' việc</span>');
  /* GOM THEO ĐỘ GẤP - trước đây đổ một danh sách phẳng, đỏ lẫn vàng lẫn xám, không biết bắt đầu từ đâu */
- var BUCK=[["red","Quá hạn - làm ngay","ti-alert-triangle","var(--red)"],
-           ["amber","Sắp tới hạn - còn kịp","ti-clock","var(--amber)"],
-           ["","Theo dõi","ti-eye","var(--muted)"]];
+ var _sx=window.VIECSX||"gap";
+ var BUCK;
+ if(_sx==="nhom"){
+  /* Theo NHÓM VIỆC, thứ tự nhóm lấy từ bản khai `VIECNHOM` (đã là thứ tự vòng đời SOP) - không
+     xếp theo bảng chữ cái: A-B-C là thứ tự của từ điển, không phải của một ngày làm việc. */
+  var _co={};view.forEach(function(it){_co[it.grp||it.cat]=1});
+  BUCK=VIECNHOM.filter(function(g){return _co[g]}).map(function(g){return [g,g,"ti-folder","var(--navy)","grp"]});
+  Object.keys(_co).forEach(function(g){if(VIECNHOM.indexOf(g)<0)BUCK.push([g,g,"ti-folder","var(--muted)","grp"])});
+ }else if(_sx==="moi"){
+  BUCK=[["","Mới nhất trước","ti-clock-play","var(--blue)","moi"]];
+ }else{
+  BUCK=[["red","Quá hạn - làm ngay","ti-alert-triangle","var(--red)"],
+        ["amber","Sắp tới hạn - còn kịp","ti-clock","var(--amber)"],
+        ["","Theo dõi","ti-eye","var(--muted)"]];
+ }
  var shown=0, CAP=120;
  BUCK.forEach(function(B){
-  var part=view.filter(function(it){return (it.sev||"")===B[0]});
+  var part=(B[4]==="grp")?view.filter(function(it){return (it.grp||it.cat)===B[0]})
+        :(B[4]==="moi")?view.slice()
+        :view.filter(function(it){return (it.sev||"")===B[0]});
   /* ACA-10 (feedback team 11/08): *"Sort các việc của Giáo viên lên trước - số ngày quá hạn -"*.
      Ảnh anh Luân gửi cho thấy khối "QUÁ HẠN - LÀM NGAY" xếp *quá 2 · quá 3 · quá 3 · quá 1 · quá 2*
      - không theo độ quá hạn chút nào, vì danh sách lấy đúng thứ tự NHÓM việc.
      Sắp ở đây KHÔNG đạp lên quyết định V9.48: bản khai `VIECNHOM` quy định thứ tự *nhóm*, còn ba
      khối Quá hạn / Sắp tới hạn / Theo dõi vốn đã cắt ngang thứ tự ấy rồi. Trong một khối đã mang
      nghĩa "làm ngay" thì câu hỏi duy nhất còn lại là *cái nào trễ lâu nhất*. */
-  part.sort(function(x,y){var ax=(x.age==null?-1e9:x.age),ay=(y.age==null?-1e9:y.age);return ay-ax});
+  /* "Mới nhất trước" đảo chiều đúng phép so ấy: tuổi nhỏ nhất lên đầu. Việc không có tuổi
+     (không gắn đồng hồ nào) xuống cuối ở cả hai chiều - nó không trả lời được câu nào trong hai. */
+  if(B[4]==="moi")part.sort(function(x,y){var ax=(x.age==null?1e9:x.age),ay=(y.age==null?1e9:y.age);return ax-ay});
+  else part.sort(function(x,y){var ax=(x.age==null?-1e9:x.age),ay=(y.age==null?-1e9:y.age);return ay-ax});
   if(!part.length)return;
   h+='<div class="viechd"><i class="ti '+B[2]+'" style="color:'+B[3]+'"></i>'+
    esc(B[1])+' <b>'+part.length+'</b></div>';
