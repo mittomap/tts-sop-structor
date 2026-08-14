@@ -1675,6 +1675,17 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .seg.segsx .segb{border:0;background:transparent;color:var(--muted);font-weight:700;border-radius:6px}
 .seg.segsx .segb:hover{color:var(--navy)}
 .seg.segsx .segb.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(30,42,56,.14)}
+/* ═══ V2 14/08 - HÀNG CÔNG TẮC CÁCH XEM của trang Việc hôm nay ═══════════════════════════════
+   Anh Luân: *"tại sao ko thiết kế lại, để nó có thể ở 1 trang thôi. Có thể chọn cách xem mà"*.
+   Hàng này là ĐƯỜNG RANH giữa phần đầu trang (không đổi theo cách xem) và vùng làm việc (đổi
+   theo công tắc) - nên nó có một vạch kẻ trên đầu: mắt phải thấy được chỗ trang "chuyển tay".
+   Vạch 1px, không phải dải màu - luật W5 cấm dải viền trang trí.
+   Câu bên phải trả lời "đang nhìn cái gì" ngay tại chỗ, thay cho việc bắt người ta bấm thử ba
+   cái rồi tự đoán. */
+.viecvw{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:16px 0 12px;padding-top:14px;border-top:1px solid var(--line)}
+.viecvwc{flex:1 1 220px;min-width:0;color:var(--muted);font-size:12px;line-height:1.5}
+.viecvwc b{color:var(--navy);font-weight:700}
+@media(max-width:700px){.viecvw{gap:8px}.viecvwc{flex-basis:100%}}
 .segb.zero{opacity:.45}
 .segb.zero:hover,.segb.zero.on{opacity:1}
 /* V9.47: nút mở/thu dải chip dài - phải KHÁC hẳn các chip lọc để mắt không nhầm nó là một nhóm */
@@ -3399,7 +3410,7 @@ function notiDiff(by){var pre=window.__preBell;window.__preBell=null;if(!pre)ret
  var f0=fresh[0];
  var tt=fresh.length===1?((f0.grp||f0.cat||"Việc mới cần xử lý")+(by?" - từ "+by:"")):("Có "+fresh.length+" việc mới cần xử lý"+(by?" - từ "+by:""));
  var sub=fresh.slice(0,2).map(function(x){return (x.who?x.who+": ":"")+(x.what||"")}).join("  ·  ")+(fresh.length>2?"  ·  +"+(fresh.length-2)+" việc khác":"");
- notiShow(tt,sub,f0.page||"banlam",red)}
+ notiShow(tt,sub,f0.page||"viec",red)}
 /* V9.47: nạp CẤU HÌNH trước, DỮ LIỆU sau. Thứ tự này quan trọng - nếu còn `LSKEY` (đang giữa buổi
    demo) thì bản cấu hình trong đó mới nhất nên được đè lên; nếu vừa reset dữ liệu thì `LSKEY` đã
    mất, và cấu hình trong `CFKEY` sống sót đúng như anh Luân muốn. */
@@ -3504,7 +3515,10 @@ var PAGES=[
    khác làm - chạy quy trình cho TỪNG hồ sơ theo chặng người đó đang đứng (1.475 hồ sơ), và bản
    đồ chặng. Giữ chức năng, bỏ lời hứa sai: tên và biểu tượng nay nói đúng việc nó làm.
    *Hai trang khác việc thì được phép cùng tồn tại - nhưng không được phép cùng tự xưng là nhà.* */
-{k:"banlam",g:"Vận hành",ic:"ti-player-play",t:"Chạy quy trình & Bản đồ chặng",c:"Dắt từng hồ sơ qua đúng chặng, hoặc xem cả hành trình trên một bảng",ty:"custom"},
+/* V2 14/08 - `hide`: hai trang này nay là CÁCH XEM của Việc hôm nay, không còn đứng riêng
+   trên menu. Giữ bản khai vì mọi chỗ đang đọc tên/biểu tượng của chúng (thẻ bl0_*, gợi ý Trợ
+   lý, bài hướng dẫn, nút "Về trang chính") vẫn tra vào đây. */
+{k:"banlam",g:"Vận hành",hide:1,ic:"ti-player-play",t:"Chạy quy trình & Bản đồ chặng",c:"Dắt từng hồ sơ qua đúng chặng, hoặc xem cả hành trình trên một bảng",ty:"custom"},
 {k:"ban",g:"Vận hành",ic:"ti-focus-2",t:"Bàn làm việc",c:"Mở một khách, học viên hay lớp là thấy trọn việc của bạn với họ",ty:"custom"},
 /* V9.99u (anh Luân 05/08): *"Giao việc, e đổi thành: Quản lý việc giao & nhận là xong"* - tên
    cũ chỉ nói một nửa việc trang này làm (giao đi), trong khi nửa còn lại (nhận về, chờ nhận,
@@ -3512,7 +3526,7 @@ var PAGES=[
 {k:"giaoviec",g:"Vận hành",ic:"ti-clipboard-list",t:"Quản lý việc giao & nhận",c:"Giao - nhận - phối hợp - nhờ hỗ trợ",ty:"custom"},
 {k:"chay",g:"_",hide:1,ic:"ti-player-play",t:"Chạy quy trình",c:"Dắt từng bước theo hành trình",ty:"custom"},
 {k:"chang",g:"_",hide:1,ic:"ti-route",t:"Tổng quan chặng",c:"Bản đồ một chặng vòng đời",ty:"custom"},
-{k:"hanhtrinh",g:"Vận hành",ic:"ti-route",t:"Hành trình học viên",c:"Toàn bộ theo chặng",ty:"custom"},
+{k:"hanhtrinh",g:"Vận hành",hide:1,ic:"ti-route",t:"Hành trình học viên",c:"Toàn bộ theo chặng",ty:"custom"},
 /* ===== TRA CỨU - chỉ những danh sách thật sự cần khi làm việc ===== */
 /* ═══ V2 08/08 - MỘT CỬA CHO CÁC SỔ TRA CỨU ═════════════════════════════════════════════════
    Anh Luân 08/08 giao em quyết số trang: *"E toàn quyết định có bao nhiêu trang là phù hợp."*
@@ -4465,7 +4479,7 @@ function dsDeny(what){return '<div class="panel" style="max-width:560px;margin:3
  '<i class="ti ti-lock" style="font-size:34px;color:var(--muted)"></i>'+
  '<div style="font-weight:800;font-size:15px;margin:10px 0 6px">'+esc(what||"Nội dung này")+' nằm ngoài phạm vi dữ liệu của bạn</div>'+
  '<div class="mut" style="font-size:12.5px;margin-bottom:14px">Chức danh của bạn chỉ xem được phần dữ liệu được giao. Cần xem thêm thì nhờ quản lý cấp quyền ở <b>Cài đặt &gt; Phân quyền &amp; Phạm vi dữ liệu</b>.</div>'+
- '<button class="btn primary" onclick="go(SCOPE().land||\'banlam\')"><i class="ti ti-home"></i>Về trang chính</button></div>'}
+ '<button class="btn primary" onclick="go(SCOPE().land||\'viec\')"><i class="ti ti-home"></i>Về trang chính</button></div>'}
 function scopeList(code,arr){ /* CỔ CHAI 1: mọi trang danh sách (renderList) + phễu */
  if(!CURSTAFF||!dsCfg().on)return arr;
  var dom=DSDOM[code];if(!dom||dsLevel(dom)==="all")return arr;
@@ -4658,7 +4672,7 @@ khoahoc:{code:"DL05",filt:"status",sub:"Khóa học - sản phẩm & học phí 
  form:[["course_id","Mã khóa (vd CRS-IELTS65-04)",0,1],["course_name","Tên khóa",0,1],["course_level","Trình độ","enum_class_level",1],["duration_sessions","Số buổi"],["duration_months","Số tháng"],["list_price","Học phí niêm yết (đ)",0,1],["wow_quota_default","Quota WOW mặc định"],["learning_mode_supported","Hình thức hỗ trợ (online/offline/hybrid)"],["description","Mô tả khóa","ta"],["status","Trạng thái (active / inactive)"]],idp:"CRS-"},
 };
 
-var CURROLE="sales", CUR="banlam", SEARCH={}, FILT={}, PAGE={}, PSIZE=20;
+var CURROLE="sales", CUR="viec", SEARCH={}, FILT={}, PAGE={}, PSIZE=20;
 
 /* ---------- render helpers ---------- */
 /* Cột tính: nhớ tạm theo DVER vì bảng danh mục vẽ lại liên tục. */
@@ -6702,9 +6716,9 @@ function mkKhoCu(){return scopeList("DL02",rows("DL02")).filter(function(l){
    Bẫy này đã cắn ở phiên trước với `placement_time` / `reservation_end_date`. */
 function mkThuongTreo(){return rows("DL19").filter(function(r){
  return String(r.referred_name||"").trim()&&!String(r.granted_at||"").trim()}).length}
-var BVLAND={tuvan:["banlam",null],marketing:["tuyensinh","lead"],hocvu:["xeplop",null],aca:["hoctap","lop"],
+var BVLAND={tuvan:["viec",null],marketing:["tuyensinh","lead"],hocvu:["xeplop",null],aca:["hoctap","lop"],
  giaovien:["hoctap","today"],wow:["hoctap","wow"],ketoan:["tuyensinh","thanhtoan"],
- hotro:["giaoviec",null],nhansu:["nhansu",null],dieuhanh:["baocao",null],quantri:["banlam",null]};
+ hotro:["giaoviec",null],nhansu:["nhansu",null],dieuhanh:["baocao",null],quantri:["viec",null]};
 /* Nhóm vai -> bảng việc của chính nhóm đó. Marketing dùng chung bảng tuyển sinh (SOP không tách). */
 function bvKhoi(g){g=g||(SCOPE().group||"quantri");
  /* V9.65: BỎ dòng ép `if(g==="marketing")g="tuvan"` - Marketing nay có bảng của chính họ. */
@@ -8265,6 +8279,40 @@ function slaOpen(key){
  h+='</div></div>';
  openDrawer("Xem nhanh việc",h)}
 function viecTeam(t){window.VIECTEAM=t;window.VIECGRP="all";reRender("viec")}
+/* ═══ V2 14/08 - BA CÁCH XEM CỦA MỘT BÀN LÀM VIỆC ══════════════════════════════════════════
+   Bản khai đứng ở ĐÂY, không rải trong hàm dựng: thêm một cách xem thứ tư mai này là thêm một
+   dòng, không phải đi sửa ba chỗ. Cột thứ ba là câu "đang nhìn cái gì" - nó phải nằm cạnh
+   chính cái tên nó giải thích, kẻo hai thứ trôi khỏi nhau sau vài lần sửa. */
+/* Cột 4 là MÃ TRANG CŨ mà cách xem ấy vốn là - dùng để hỏi quyền. Gộp ba trang thì quyền phải
+   gộp theo: bốn nhóm (học vụ, ACA, giáo viên, WOW, kế toán) đã bị cắt `banlam`/`hanhtrinh` khỏi
+   phạm vi từ V9.99p vì đo ra "0 thẻ, 0 dòng" - biến chúng thành hai cái công tắc luôn hiện là
+   trả lại đúng hai màn trắng ấy cho họ, chỉ khác chỗ đứng.
+   *Gộp trang thì phải mang theo cả bản khai quyền của từng trang, không chỉ mang phần dựng.* */
+var VIECVWDEF=[
+ ["viec","Theo việc","mọi việc đang nợ theo luật SLA, gom theo độ gấp - làm từ trên xuống là hết ngày.",""],
+ ["nguoi","Theo người","từng hồ sơ trên hành trình khách. Bấm một người, app dắt qua đúng chặng người đó đang đứng.","banlam"],
+ ["chang","Theo chặng","cùng ngần ấy hồ sơ nhưng xếp thành bản đồ chặng - để nhìn ra chỗ đang tắc, không phải để làm từng việc.","hanhtrinh"]];
+function viecVWCo(V){if(!V[3])return true;try{return canSee(V[3])}catch(e){return true}}
+function viecVWList(){return VIECVWDEF.filter(viecVWCo)}
+function VIECVW(){var v=window.VIECVIEW||"viec",L=viecVWList();
+ for(var i=0;i<L.length;i++)if(L[i][0]===v)return v;
+ return "viec"}
+function viecVWSet(k){window.VIECVIEW=k;reRender("viec")}
+/* Công tắc MANG SỐ. Chính hai con số ấy trả lời câu anh Luân hỏi ("ba cái này khác nhau thế
+   nào") mà không cần ai giải thích: 313 việc đang nợ / 191 hồ sơ đang chờ - hai tập gần như
+   rời nhau (đo được: chỉ 57 mục trùng). "Theo chặng" cố ý KHÔNG mang số: nó nhìn đúng tập hồ
+   sơ của "Theo người", chỉ xếp khác - gắn thêm một con số y hệt là mời người ta so hai thứ
+   vốn bằng nhau. */
+function viecCongTac(soViec){
+ var vw=VIECVW(),L=viecVWList(),cur=L[0]||VIECVWDEF[0],so={viec:soViec,nguoi:"",chang:""};
+ try{so.nguoi=jAll().filter(function(J){return J.act}).length}catch(e){so.nguoi=""}
+ var opts=L.map(function(V){if(V[0]===vw)cur=V;return [V[0],V[1],so[V[0]],""]});
+ /* Chỉ còn một cách xem thì KHÔNG vẽ công tắc: một cái công tắc có đúng một nấc là một câu hỏi
+    không có câu trả lời nào khác - nó chỉ tốn một hàng và mời người ta bấm vào chỗ không đi đâu.
+    Câu "đang nhìn cái gì" thì vẫn giữ, vì nó vẫn nói được một điều thật. */
+ return '<div class="viecvw" data-tour="viecvw">'+
+  (opts.length>1?segHTML(vw,opts,"viecVWSet('{k}')","viec_cachxem","segsx"):"")+
+  '<div class="viecvwc">Đang xem <b>'+esc(cur[1])+'</b> - '+esc(cur[2])+'</div></div>'}
 function renderViec(){var items=bellItems();
  var team=window.VIECTEAM||"all",grp=window.VIECGRP||"all";
  var sev=window.VIECSEV||(window.VIECOD?"red":"");   /* V9.29: MỘT biến cho mức độ; VIECOD là lối tắt cũ của "chỉ quá hạn" */
@@ -8311,13 +8359,34 @@ function renderViec(){var items=bellItems();
  var h=pageHead("Việc hôm nay",
   "Bàn làm việc của bạn: chỗ bất thường, nhịp việc theo buổi, và mọi việc đang nợ theo luật SLA.",
   "");
- h+=canhBaoHTML();   /* V9.59: nút "Bỏ lọc mức độ" bỏ đi - chip "Tất cả" ở thanh Mức độ đã làm đúng việc đó */
+ /* ═══ V2 14/08 - MỘT TRANG, BA CÁCH XEM, BỐ CỤC LẠI BA TẦNG ════════════════════════════════
+    Anh Luân: *"tại sao ko thiết kế lại, để nó có thể ở 1 trang thôi. Có thể chọn cách xem mà"*
+    và ngay sau đó: *"vấn đề là em phải thiết kế lại toàn bộ trang đó để nó tối ưu, chứ nếu em
+    chỉ gom vào mà không bố cục lại theo cách tốt hơn, sẽ rất rối"*. Đúng - gom ba thứ vào một
+    trang đang có SÁU khối trước danh sách thì thành trang rối hơn cả ba trang cũ.
+    Đo trước khi thiết kế: ba cách xem gần như KHÔNG trùng nhau - chỉ 57/313 mục việc gắn với
+    một hồ sơ trên hành trình; 256 việc còn lại là việc của lớp/buổi/phiếu thu/giáo án (không
+    dính ai trên hành trình), và 141/191 hồ sơ đang chờ mà chưa quá hạn nên chưa sinh việc nào.
+    Nên đây KHÔNG phải ba bản sao của một thứ - chúng là ba câu hỏi khác nhau, và chính vì thế
+    mà chúng thuộc về một trang: cùng một vùng làm việc, đổi cách nhìn.
+    BA TẦNG:
+      1 · Đầu trang - KHÔNG đổi theo cách xem: bảng việc chức danh · [Cần chú ý | Nhịp ngày]
+          xếp HAI CỘT (trước đây hai tấm này xếp chồng, ăn thêm một tấm chiều cao) · thẻ SLA.
+      2 · Công tắc cách xem, MANG SỐ của từng cách. Chính con số ấy trả lời câu anh hỏi ban nãy
+          ("ba cái này khác nhau thế nào") mà không cần ai giải thích: 313 việc / 191 hồ sơ.
+      3 · Vùng làm việc, đổi theo công tắc. Bộ lọc của "Theo việc" nay nằm TRONG tầng này chứ
+          không treo trên công tắc nữa - trước đây ai chọn cách xem khác vẫn thấy ba dải lọc của
+          việc nằm phía trên, lọc không ăn vào cái gì.
+    *Gộp trang không phải là xếp ba thứ chồng lên nhau - là tìm ra chỗ chúng dùng chung rồi cho
+    phần khác nhau thay phiên đứng vào đúng một chỗ.* */
+ var _cbao=canhBaoHTML(), _nhip="", _the="";
+ try{_nhip=nhipPanel()}catch(e){_nhip=""}
  /* V9.59: dải thẻ ở đây trước là dải BẤM ĐƯỢC (bấm ô nào lọc ô đó). Nay thẻ chỉ để xem - việc
     lọc dời hẳn xuống thanh "Mức độ" ngay dưới, để một việc chỉ có ĐÚNG MỘT chỗ làm. */
  /* V2 13/08 - HAI THẺ "Quá hạn" và "Sắp tới hạn" ĐÃ BỎ: thanh Mức độ ngay dưới có đúng hai chip
     cùng tên cùng số, và chip thì bấm lọc được. Hai thẻ còn lại giữ vì không chip nào nói thay:
     "Nợ quá N ngày" cắt theo tuổi việc, "Quá hạn nhiều nhất" xếp hạng mảng việc. */
- h+=statStrip([
+ _the=statStrip([
   /* ═══ V9.57 (anh Luân): "thẻ phải đại diện cho 1 vấn đề quan trọng, xem nhanh và NGÀY NÀO CŨNG
      PHẢI XEM". Hai thẻ cũ ở đây trượt cả hai vế:
      · "Tổng việc đang nợ · toàn trung tâm" LẶP đúng chip "Tất cả" ngay bên dưới - hai chỗ nói
@@ -8345,7 +8414,19 @@ function renderViec(){var items=bellItems();
              :["ti-users-group","-","Quá hạn nhiều nhất","#0D9488","chưa bộ phận nào quá hạn"]})()],"viec");
  /* V9.99z5: nhịp ngày của chức danh đứng ngay đây - đọc "hôm nay tôi làm gì theo buổi" trước,
     rồi mới xuống hàng chờ chi tiết. Trang khác không có khối này (một việc một chỗ). */
- h+=nhipPanel();
+ /* Lắp ba tầng. Hai tấm tóm tắt đứng CẠNH nhau, không chồng lên nhau.
+    "KPI của tôi" lên ĐẦU: quyết định V9.29 nói *"mở app là biết mình đang đứng đâu, rồi mới tới
+    việc phải làm"*, mà khối ấy vốn nằm trên Trang bắt đầu - từ lúc trang đáp dời sang đây (bước
+    2, cùng ngày) thì ba chức danh có KPI mở app ra không còn thấy số của chính mình nữa. Dời
+    một trang đáp thì phải dời theo mọi thứ người ta quen thấy khi vừa mở app. */
+ var _rsV=SCOPE();
+ if(_rsV.kpi){try{h+=myKpiHTML()}catch(e){}}
+ h+=(_nhip?('<div class="bl2c">'+_cbao+_nhip+'</div>'):_cbao)+_the;
+ h+=viecCongTac(items.length);
+ /* Hai cách xem kia là THÂN của hai trang cũ, gọi ở chế độ nhúng (bỏ đầu trang riêng của
+    chúng). Không chép lại một dòng dựng nào: trang cũ sửa gì thì ở đây hưởng nấy. */
+ if(VIECVW()==="nguoi")return h+renderBanlam(1);
+ if(VIECVW()==="chang")return h+renderHanhtrinh(1);
  /* KHÔNG gọi `bangViecHTML()` ở đây. Bảng việc theo chức danh tự lên trang này ngay khi trang
     đáp đổi sang `viec`: `pageHead` đã gọi `bvSau()` -> `bangViecHTML()`, mà hàm ấy tự im ở mọi
     trang KHÔNG phải trang đáp (`if(CUR!==dap)return ""`). Em gọi thêm một lần nữa nên bảng in
@@ -11295,21 +11376,6 @@ function chayListHTML(list,qfn){list=list||chayList();qfn=qfn||"chayList";
    '<button class="btn primary sm" onclick="event.stopPropagation();runStart(\''+esc(J.C.pid)+'\','+qfn+'().map(function(x){return x.C.pid}))" aria-label="Chạy quy trình cho '+esc(J.name)+'"><i class="ti ti-player-play"></i>Xử lý</button></div>'});
  if(list.length>60)h+='<div class="mut" style="font-size:11px;padding:6px">... còn '+(list.length-60)+' hồ sơ, dùng ô tìm hoặc lọc chặng để thu hẹp.</div>';
  return h+'</div>'}
-function renderChayHome(){var all0=jAll();
- var over=all0.filter(function(J){return J.act&&(J.over||J.miss.length)}).length;
- var q=window.CHAYQ||"over";
- var h=pageHead("Chạy quy trình","Chọn một người bên dưới - app dắt qua từng màn theo đúng chặng người đó đang đứng. Bấm một người là chạy; đang trong hàng đợi thì làm xong người này sang người kế.","");
- /* tìm nhanh */
- h+='<div class="fbar"><div class="srch" style="max-width:460px"><i class="ti ti-search"></i><input data-pktim="1" placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.CHAYSRCH||"")+'" oninput="chaySrch(this.value)"></div></div>';
- /* chip chọn hàng đợi */
- h+='<div class="fbar"><span class="lbl">Nhóm</span><div class="fchips">'+
-  '<button class="fchip'+(q==="over"?" on red":"")+'" onclick="chayQSet(\'over\')">Cần xử lý ('+over+')</button>'+
-  '<button class="fchip'+(q==="all"?" on":"")+'" onclick="chayQSet(\'all\')">Tất cả</button>'+
-  JMAIN.map(function(k){var S=JBY[k];var n=all0.filter(function(J){return J.k===k&&J.act}).length;
-   return n?('<button class="fchip'+(q===k?" on":"")+'" onclick="chayQSet(\''+k+'\')">'+esc(S.t)+' ('+n+')</button>'):''}).join("")+
-  '</div></div>';
- h+='<div class="panel"><div class="pbody"><div id="chaybody" data-tour="chaybody">'+chayListHTML()+'</div></div></div>';
- return h}
 /* ═══ V2 14/08 - F5 Ở MÀN CHẠY QUY TRÌNH KHÔNG CÒN MẤT NGƯỜI ĐANG CHẠY ══════════════════════
    Anh Luân: *"chỗ chạy quy trình của 1 bạn nào đó hình như refresh lại là mất, hay e gắn id lên
    link đi, để giữ nguyên được"*.
@@ -11711,7 +11777,12 @@ function myKpiHTML(){var me=find("DL01","staff_id",CURSTAFF);if(!me)return "";
   ["ti-phone-call",(cW.length?Math.round(okW.length*100/cW.length)+"%":"-"),"Tỷ lệ kết nối "+_nhan,"#2E9E6B",okW.length+"/"+cW.length+" lượt gặp được"],
   ["ti-clipboard-check",enrW.length,"Đăng ký mới "+_nhan,"#7C3AED","khách tôi phụ trách"],
   ["ti-cash",vnd(revW),"Tiền thu "+_nhan,"#0D9488","khoản tôi ghi nhận"]],"mykpi")+'</div>'}
-function renderBanlam(){
+/* `embed=1`: thân trang này được NHÚNG làm cách xem "Theo người" của trang Việc hôm nay (V2
+   14/08). Lúc ấy bỏ ba thứ vì trang cha đã có rồi: ô chào + đầu trang, biển chỉ đường sang
+   Việc hôm nay (đứng trong chính Việc hôm nay thì nó trỏ vào chỗ đang đứng), và công tắc
+   danh sách/bảng chặng (công tắc cách xem của trang cha đã ôm cả ba). "KPI của tôi" cũng lên
+   trang cha - nó phải thấy được ở MỌI cách xem, không riêng cách xem này. */
+function renderBanlam(embed){
  var meId=CURSTAFF||"", meNm=myName();
  var hour=new Date().getHours();var greet=hour<11?"Chào buổi sáng":hour<14?"Chào buổi trưa":hour<18?"Chào buổi chiều":"Chào buổi tối";
  var tasks=jTasks();
@@ -11733,7 +11804,12 @@ function renderBanlam(){
  all0.forEach(function(J){var nf=jNF(J);if(nf&&nf>=nowT&&(!nextAp||nf<jNF(nextAp)))nextAp=J});
  /* Một dòng tóm tắt thay cho ba dòng: số việc · số quá hạn · hẹn kế tiếp (bấm được). */
  var apChip=nextAp?('<span class="bwap" onclick="chayQSet(\'appt\')" data-tip="lọc danh sách còn đúng các cuộc hẹn"><i class="ti ti-clock"></i>Hẹn kế: <b>'+esc((function(){var d=jNF(nextAp);var hh=("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);var td=new Date();var sameDay=d.getDate()===td.getDate()&&d.getMonth()===td.getMonth();return hh+(sameDay?" hôm nay":" "+("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2))})())+'</b> · '+esc(nextAp.name)+'</span>'):'';
- var h='<div class="bwhero"><div class="bwl"><div class="bwg">'+esc(greet)+', '+esc(meNm)+'</div>'+
+ /* Ô tìm là thứ DUY NHẤT trong ô chào mà cách xem này không sống thiếu được (VH0 "Tìm kiếm
+    nhanh" của SOP nằm ở đây). Nhúng thì giữ đúng ô tìm, bỏ phần chào - trang cha đã chào rồi. */
+ var h=embed?('<div class="fbar"><div class="srch" style="max-width:460px"><i class="ti ti-search"></i>'+
+   '<input data-pktim="1" placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.CHAYSRCH||"")+'" oninput="chaySrch(this.value)" autocomplete="off"></div>'+
+   '<span class="bwsrchhint" id="bwsrchhint"></span></div>'):
+  ('<div class="bwhero"><div class="bwl"><div class="bwg">'+esc(greet)+', '+esc(meNm)+'</div>'+
   '<div class="bwsub"><span><b>'+tasks.length+'</b> việc cần xử lý</span>'+
    /* DẤU NGĂN PHẢI ĐI LIỀN MỤC SAU NÓ. Bẫy cắn 09/08, nhìn thấy trên khổ điện thoại 390px:
       dòng chào đọc thành *"72 việc cần xử lý · 54 quá hạn ·"* - một dấu chấm giữa **treo lơ
@@ -11754,7 +11830,7 @@ function renderBanlam(){
      cần làm gì."* Câu dưới đây nói đúng điều ấy, và `_checkkhuon` K1 canh nó từ nay. */
   '<div class="bwctx">Mọi chỗ bất thường từ các trang nghiệp vụ của bạn gom về đây - đỏ là gấp, vàng sắp tới hạn. Bấm một ô để mở trang đẻ ra con số đó.</div></div>'+
   '<div class="bwr"><div class="bwsearch"><i class="ti ti-search"></i><input data-pktim="1" placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.CHAYSRCH||"")+'" oninput="chaySrch(this.value)" autocomplete="off"><div class="pkres" id="bwac" style="position:absolute;top:100%;left:0;right:0;z-index:30;background:#fff;color:var(--text);text-align:left;border-radius:0 0 10px 10px;box-shadow:0 8px 24px rgba(0,0,0,.18)"></div></div>'+
-  '<span class="bwsrchhint" id="bwsrchhint"></span></div></div>'; /* V9.18b: hint phải nằm NGOÀI hộp tìm - nằm trong là chữ trắng trên nền trắng + bóp placeholder (Luân bắt lỗi) */
+  '<span class="bwsrchhint" id="bwsrchhint"></span></div></div>'); /* V9.18b: hint phải nằm NGOÀI hộp tìm - nằm trong là chữ trắng trên nền trắng + bóp placeholder (Luân bắt lỗi) */
  /* V2 KHÚC 5 - DẢI CẢNH BÁO ĐẶT NGAY DƯỚI Ô CHÀO, TRÊN MỌI THỨ KHÁC.
     Anh Luân: *"bàn làm việc em đổi thành: các chỉ số số cảnh báo đi, nó tổng hợp những thứ bất
     thường ở các trang nghiệp vụ để cảnh báo, các nhân sự sẽ tự biết mình cần làm gì."*
@@ -11769,7 +11845,7 @@ function renderBanlam(){
     Luân vừa chỉ. Phần RIÊNG của trang này, không trang nào khác có: chạy quy trình cho TỪNG hồ
     sơ theo đúng chặng người đó đang đứng, và bản đồ chặng.
     Vẫn giữ một đường dẫn sang Việc hôm nay để ai quen vào đây không bị cụt. */
- h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>'+
+ if(!embed)h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>'+
   'Chỗ bất thường, nhịp ngày và bảng việc của chức danh nay gom ở <b>Việc hôm nay</b>. '+
   '<a class="lnk" onclick="go(\'viec\')">Mở Việc hôm nay</a></div>';
  function cS(k){return all0.filter(function(J){return J.k===k&&J.act}).length}
@@ -11800,15 +11876,19 @@ function renderBanlam(){
  /* V9.29 (anh Luân): "KPI của tôi" trước đây rơi xuống ĐÁY trang - phải cuộn hết danh sách mới
     thấy số của chính mình, vô lý. Đưa lên ngay dưới lời chào: mở app là biết mình đang đứng đâu,
     rồi mới tới việc phải làm. */
- if(rsB.kpi)h+=myKpiHTML();
+ if(rsB.kpi&&!embed)h+=myKpiHTML();
  if(blocks.length)h+=statStrip(blocks.map(function(b){
   return [b[0],b[1],b[2],b[3],"","",(window.MINEONLY&&b[5])?"Ô này đếm TOÀN trung tâm - không lọc theo \"Chỉ khách của tôi\"":""]}),
   "banlam",blocks.map(function(b){return b[6]}));
  /* V9.18: GỘP "Hành trình" vào Trang bắt đầu - một trang, hai góc nhìn (danh sách chạy / bảng chặng) */
  var vw=window.BLVIEW||"list";
  /* Bảng việc theo chức danh đã sang Việc hôm nay (bước 2, 14/08) - không vẽ lại ở đây. */
- h+='<div style="margin:2px 0 10px">'+segHTML(vw,[["list","Chạy quy trình",null,""],["board","Bảng chặng - hành trình",null,""]],"window.BLVIEW='{k}';reRender(CUR)")+'</div>';
- if(vw==="board"){h+=renderHanhtrinh(1);return h}   /* KPI đã nằm trên đầu trang */
+ /* Nhúng thì KHÔNG vẽ công tắc này: trang cha đã có công tắc ba cách xem ôm trọn cả hai lựa
+    chọn ở đây. Hai công tắc chồng nhau là hai chỗ nói cùng một chuyện, và chúng lệch nhau ngay
+    lần đầu người ta bấm cái dưới. */
+ if(!embed){
+  h+='<div style="margin:2px 0 10px">'+segHTML(vw,[["list","Chạy quy trình",null,""],["board","Bảng chặng - hành trình",null,""]],"window.BLVIEW='{k}';reRender(CUR)")+'</div>';
+  if(vw==="board"){h+=renderHanhtrinh(1);return h}}   /* KPI đã nằm trên đầu trang */
  /* CHẠY QUY TRÌNH gộp thẳng vào đây: chip lọc + danh sách người */
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-player-play" style="margin-right:6px"></i>Chạy quy trình</b><div class="mini"><button class="btn sm" onclick="leadInbound()"><i class="ti ti-message-plus"></i>Khách mới liên hệ đến</button></div></div>';
  var actN=all0.filter(function(J){return J.act}).length;
@@ -13932,7 +14012,7 @@ function baocaoThan(_xemAi){
    ?"Chỉ số của ĐỘI BẠN - mọi con số dưới đây chỉ đếm phần dữ liệu thuộc phạm vi bạn quản lý, không phải toàn trung tâm. Ngưỡng dùng chung của trung tâm (CH6)."
    :"Chỉ số của RIÊNG BẠN - mọi con số dưới đây chỉ đếm hồ sơ, lớp và việc do chính bạn phụ trách. Ngưỡng so sánh dùng chung của trung tâm (CH6).";
  var h='<div class="phead" data-tour="phead"><div><div class="t">Chỉ số &amp; KPI · '+esc(_bcTen)+'</div><div class="s">'+esc(_bcCau)+'</div></div>'+
-  '<div class="sp"><button class="btn" onclick="go(\'banlam\')"><i class="ti ti-checklist"></i>Trang bắt đầu</button><button class="btn" onclick="window.SETTAB=\'ch6\';go(\'settings\')"><i class="ti ti-adjustments"></i>Ngưỡng KPI</button></div></div>';
+  '<div class="sp"><button class="btn" onclick="go(\'banlam\')"><i class="ti ti-checklist"></i>Chạy quy trình</button><button class="btn" onclick="window.SETTAB=\'ch6\';go(\'settings\')"><i class="ti ti-adjustments"></i>Ngưỡng KPI</button></div></div>';
  h+=tbar('<span class="tblbl">Kỳ số liệu</span>'+segHTML(window.REPKY||"all",[["m0","Tháng này"],["30","30 ngày"],["90","90 ngày"],["all","Toàn kỳ"]],"window.REPKY='{k}';reRender(CUR)")+
   '<span class="mut" style="font-size:11px;margin-left:10px">Kỳ này áp cho các chỉ số KPI bên dưới. Bảng nào dùng mốc thời gian riêng thì ghi rõ ngay trên tiêu đề của nó.</span>',"");
  /* Ô chọn người ngay trên trang này - quản lý mở Chỉ số ra là chọn được luôn, không phải quay
@@ -27227,7 +27307,7 @@ document.addEventListener("click",function(e){var n=document.getElementById("not
 /* V9.46: ô này từng ghi "MGQ" - một cái tên KHÔNG TỒN TẠI ở đâu khác trong app (biến thật tên là
    MSGQ). Nghĩa là suốt thời gian qua ô tìm thông điệp CH4 không hề được dọn khi điều hướng. Sửa
    đúng tên, và khai thêm CFQ (ô tìm tham số CH2 mới) để nó cũng được dọn theo. */
-var NAVCTX=["HOSO","JPID","RUNPID","XLFILT","BTMODE","VIECSEV","VIECTEAM","VIECGRP","VIECSX","LWCA","GVID","NVID","KHID","BLCLASS","GACRS","GATAB","BTCLASS","BTSESS","DDCLASS","SETTAB","MSGQ","CFQ"];
+var NAVCTX=["HOSO","JPID","RUNPID","XLFILT","BTMODE","VIECVIEW","VIECSEV","VIECTEAM","VIECGRP","VIECSX","LWCA","GVID","NVID","KHID","BLCLASS","GACRS","GATAB","BTCLASS","BTSESS","DDCLASS","SETTAB","MSGQ","CFQ"];
 function navSnap(){var s={};NAVCTX.forEach(function(k){if(window[k]!=null&&window[k]!=="")s[k]=window[k]});return s}
 function navApply(s){s=s||{};NAVCTX.forEach(function(k){window[k]=s[k]!=null?s[k]:null});}
 function crumbLabel(key,ctx){ctx=ctx||{};var p=PBK[key];var t=p?p.t:key;
@@ -27243,7 +27323,10 @@ function crumbLabel(key,ctx){ctx=ctx||{};var p=PBK[key];var t=p?p.t:key;
  else if(HUBTAB[key]){var sk=hubSubKey(key);
   if(sk&&PBK[sk]&&String(p.t||"").indexOf(PBK[sk].t)<0)t=p.t+" · "+PBK[sk].t}
  else if(key==="chang"){var A9=ARCBK[window.ARC||"changA"];if(A9)t=A9.t}
- else if(key==="banlam"&&window.BLVIEW==="board")t=p.t+" · Bảng chặng";
+ /* V2 14/08: Việc hôm nay có ba cách xem - vệt đường đi phải nói đang ở cách nào, không thì
+    ba màn rất khác nhau cùng đọc ra một cái tên. */
+ else if(key==="viec"){var _vv=VIECVW();if(_vv!=="viec"){
+  for(var _i=0;_i<VIECVWDEF.length;_i++)if(VIECVWDEF[_i][0]===_vv)t=p.t+" · "+VIECVWDEF[_i][1]}}
  return t}
 /* V9.19 - BREADCRUMB = VỆT ĐƯỜNG ĐI THẬT (Luân: "làm lại breadcrumb để phục vụ back trang").
    [←] Trang bắt đầu › ... › Trang trước › **Trang hiện tại** - mỗi mốc BẤM ĐƯỢC để nhảy thẳng về đó
@@ -27917,7 +28000,7 @@ var KMAP={};
 /* Mã tab TRÙNG mã mục menu - cố ý. Đặt hai tên cho cùng một thứ ("ck" ở tab, "duyetck" ở menu)
    là sớm muộn có chỗ tra nhầm bảng; đây đúng là lớp lỗi vừa cắn ở scopeTabs. */
 var DUYMAP={};
-function goAlias(k){return !!(TSMAP[k]||ARCMAP[k]||CSMAP[k]||HTMAP[k]||KMAP[k]||DUYMAP[k]||k==="hanhtrinh")}
+function goAlias(k){return !!(TSMAP[k]||ARCMAP[k]||CSMAP[k]||HTMAP[k]||KMAP[k]||DUYMAP[k]||k==="hanhtrinh"||k==="banlam")}
 /* ===== V9.29c (anh Luân): MỖI TRANG MỘT ĐỊA CHỈ - F5 KHÔNG MẤT CHỖ ĐANG ĐỨNG =====
    "mỗi lần anh refresh là mất tiêu nơi anh đang đứng". App là một trang duy nhất nên trước đây
    nạp lại là quay về Trang bắt đầu. Nay go() ghi #/<khóa trang> vào thanh địa chỉ và lúc vào app
@@ -27995,7 +28078,7 @@ var CTXTRANG={hoso:["HOSO"],hosogv:["GVID"],hosonv:["NVID"],hosokhoa:["KHID"],
    có tên trang - đúng, vì trang ấy không có chỗ đứng bên trong. */
 settings:["SETTAB","MSGQ","CFQ"],chay:["RUNPID"],
  xeplop:["XLFILT"],baitap:["BTCLASS","BTSESS","BTMODE"],lichwow:["LWCA"],
- viec:["VIECSEV","VIECTEAM","VIECGRP","VIECSX"],socamket:["CKF"]};
+ viec:["VIECVIEW","VIECSEV","VIECTEAM","VIECGRP","VIECSX"],socamket:["CKF"]};
 /* Khoá ngữ cảnh của MỘT trang: phần khai ở trên, cộng biến tab nếu trang đó là hub (lấy thẳng
    từ HUBTAB). Sang V2 mỗi nghiệp vụ một trang thì vế hub tự rỗng. */
 function ctxCuaTrang(k){var K=(CTXTRANG[k]||[]).slice();
@@ -28079,7 +28162,14 @@ function go(key,noHist){
     và đẩy ngược về tab Lead. Bốn mục con của Tuyển sinh đứng im y hệt lỗi "đơ đơ" đã sửa. */
  var _bamGoc=key;
  if(TSMAP[key]){window.TSTAB=TSMAP[key];key="tuyensinh"}
- if(key==="hanhtrinh"){window.BLVIEW="board";key="banlam"} /* V9.18: Hành trình đã gộp vào Trang bắt đầu (góc nhìn bảng chặng) */
+ /* ═══ V2 14/08 BƯỚC 4 - BA TRANG VỀ MỘT, HAI TÊN CŨ THÀNH BÍ DANH ══════════════════════
+    Anh Luân: *"tại sao ko thiết kế lại, để nó có thể ở 1 trang thôi. Có thể chọn cách xem mà"*.
+    `banlam` (Chạy quy trình) và `hanhtrinh` (Bản đồ chặng) nay là HAI CÁCH XEM của `viec`.
+    Hơn hai chục chỗ trong app vẫn gọi `go("banlam")` / `go("hanhtrinh")` - ô thẻ, nhịp ngày,
+    gợi ý Trợ lý, bài hướng dẫn, nút "Thoát" của màn chạy. Đổi tên ở ĐÂY, đúng một chỗ, thay vì
+    đi sửa hơn hai chục lời gọi rồi sót một cái và nó chết câm. */
+ if(key==="hanhtrinh"){window.VIECVIEW="chang";key="viec"}
+ if(key==="banlam"){window.VIECVIEW="nguoi";key="viec"}
  /* V9.64: bảng công giảng dạy nay là một tab của trang Giảng viên. 4 chỗ trong app đang gọi
     go('bangcong') (ô thẻ Nhân sự, trợ lý, nhịp ngày, tour) - remap ở ĐÂY chứ không đi sửa 4 chỗ,
     để mai kia có chỗ thứ 5 gọi tên cũ thì vẫn tới đúng nơi. */
@@ -28143,7 +28233,7 @@ function go(key,noHist){
    '<i class="ti ti-lock" style="font-size:34px;color:var(--muted)"></i>'+
    '<div style="font-weight:800;font-size:15px;margin:10px 0 6px">Trang "'+esc(p.t)+'" ngoài phạm vi chức danh của bạn</div>'+
    '<div class="mut" style="font-size:12.5px;margin-bottom:14px">Cần xem thì nhờ quản lý, hoặc vào lại bằng cổng Quản trị viên.</div>'+
-   '<button class="btn primary" onclick="go(SCOPE().land||\'banlam\')"><i class="ti ti-home"></i>Về trang chính</button></div>';
+   '<button class="btn primary" onclick="go(SCOPE().land||\'viec\')"><i class="ti ti-home"></i>Về trang chính</button></div>';
   el0.scrollTop=0;closeNav();closeBell();return}
  if(!noHist&&CUR&&CUR!==key){window.NAVHIST=window.NAVHIST||[];
   var hh=window.NAVHIST,dup=-1;
@@ -28311,7 +28401,7 @@ var NAVTREE=[
  /* V2 14/08 (anh Luân: *"Hỏi đáp đưa lên trên, bên dưới Quản lý việc giao & nhận"*). Hỏi đáp là
    thứ người ta mở giữa lúc ĐANG LÀM ("chỗ này làm sao"), không phải việc của người điều hành -
    nó thuộc nhóm Làm việc, đứng ngay sau Giao việc. */
-{g:"Làm việc",items:["viec","giaoviec","hoidap","banlam","baocao"]}, /* V9.18: hanhtrinh gộp vào banlam (go() tự remap) */
+{g:"Làm việc",items:["viec","giaoviec","hoidap","baocao"]}, /* V2 14/08: banlam + hanhtrinh gộp vào viec, thành hai cách xem (go() tự remap) */
  /* V9.29n (anh Luân): "Chặng 1" -> "C1". Tên nhóm nay SINH TỪ ARCS (arcGrpName) chứ không gõ tay:
     trước đây số chặng và tên chặng nằm cả ở ARCS lẫn ở đây, đổi một chỗ là hai chỗ nói khác nhau. */
  {g:arcGrpName("changA"),arc:"changA",items:["changA","nhaplead","test","tuvan","thanhtoan","reup"]},
@@ -28821,7 +28911,7 @@ function setRole(k){CURROLE=k;var r=RBK[k];
  var _mav=document.getElementById("meAv");
  if(_av){_mav.innerHTML='<img src="'+esc(_av)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">'}
  else{_mav.innerHTML="";_mav.textContent=(st.full_name||"?").trim().slice(-1).toUpperCase()==""?"?":(st.full_name.trim().split(" ").pop()[0]||"?")}
- buildNav();try{tthBtn()}catch(e){}go(SCOPE().land||"banlam")}
+ buildNav();try{tthBtn()}catch(e){}go(SCOPE().land||"viec")}
 function toast(m,ms,kind){var t=document.getElementById("toast");t.textContent=m;
  if(kind==="err"){t.classList.add("err");if(!ms)ms=6000}else t.classList.remove("err");
  t.classList.add("show");clearTimeout(window._tt);window._tt=setTimeout(function(){t.classList.remove("show");t.classList.remove("err")},ms||1900)}

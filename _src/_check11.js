@@ -278,14 +278,23 @@ t("V9.18 mstrip co pid -> bam duoc (clk + mstripOpen)", (function(){var s=mstrip
 t("V9.18 mstrip khong pid -> khong clk (dung trong sopBlock)", mstrip("contacted",false).indexOf("clk")<0);
 t("V9.18 mstripOpen mo drawer tung chang", (function(){var L1=rows("DL02")[0];
  try{mstripOpen(L1.lead_id)}catch(e){return false}return typeof mstripOpen==="function"})());
+/* V2 14/08 - GOP THEM MOT BUOC NUA: `banlam` va `hanhtrinh` nay la HAI CACH XEM cua `viec`.
+   Cau kiem GIU NGUYEN DIEU CAN BAO VE (hai loi cu con song, va moi loi ra dung mot man khac
+   nhau), chi doi cho hoi: truoc hoi "go(hanhtrinh) co ve CUR=banlam khong", nay hoi "go(...)
+   co dan toi dung CACH XEM khong". Neo vao TEN TRANG thi bo kiem chet moi lan kien truc doi;
+   neo vao DIEU NGUOI DUNG NHAN DUOC thi no song qua. */
 go("hanhtrinh");
-t("V9.18 go(hanhtrinh) -> banlam goc nhin bang chang", CUR==="banlam"&&window.BLVIEW==="board");
-t("V9.18 banlam view board co jboard + jflow", (function(){var o=RENDER.banlam();
+t("V9.18 go(hanhtrinh) -> Viec hom nay, cach xem theo chang", CUR==="viec"&&VIECVW()==="chang");
+t("V9.18 cach xem theo chang co jboard + jflow", (function(){var o=RENDER.viec();
  return o.indexOf("jboard")>=0&&o.indexOf("jflow")>=0})());
-window.BLVIEW="list";
-t("V9.18 banlam view list co Chay quy trinh", RENDER.banlam().indexOf("Chạy quy trình")>=0);
-t("V9.18 menu Lam viec: banlam (hanhtrinh da gop) + giaoviec", (function(){var g=NAVTREE.filter(function(x){return x.g==="Làm việc"})[0];
- return g&&g.items.indexOf("banlam")>=0&&g.items.indexOf("hanhtrinh")<0})());
+go("banlam");
+t("V9.18 go(banlam) -> Viec hom nay, cach xem theo nguoi", CUR==="viec"&&VIECVW()==="nguoi");
+t("V9.18 cach xem theo nguoi co Chay quy trinh", RENDER.viec().indexOf("Chạy quy trình")>=0);
+t("V9.18 cong tac ba cach xem hien du ba nut", (function(){var o=viecCongTac(0);
+ return o.indexOf("viecVWSet('viec')")>=0&&o.indexOf("viecVWSet('nguoi')")>=0&&o.indexOf("viecVWSet('chang')")>=0})());
+window.VIECVIEW="viec";
+t("V9.18 menu Lam viec: viec om ca banlam + hanhtrinh", (function(){var g=NAVTREE.filter(function(x){return x.g==="Làm việc"})[0];
+ return g&&g.items.indexOf("viec")>=0&&g.items.indexOf("banlam")<0&&g.items.indexOf("hanhtrinh")<0})());
 /* V2 08/08 - DOI CAU HOI, KHONG XOA LUAT. Cau cu dem MUC TREN MENU cua nhom "Tra cứu" (>=15).
    Nay muoi sau cuon so chi-doc vao sau MOT CUA `tracuu` de menu CEO tu 60 muc xuong 45 (anh Luan
    giao quyet so trang 08/08; chot: khong bot trang nao, bot so trang MOT NGUOI PHAI NHIN).
@@ -340,7 +349,7 @@ t("V9.18 chip trang thai khoa dac mau (fill-)", (function(){
 t("V9.18 tab demo gon: co nut dung lai demo, het huong dan dai", (function(){window.SETTAB="demo";var o=RENDER.settings();window.SETTAB="ch2";
  return o.indexOf("demoResetHoi()")>=0&&o.indexOf("Cách demo hai cổng")<0})());
 CUR="banlam";window.BLVIEW="list";
-t("V9.18b hint o tim hero nam NGOAI hop tim (khong de len input)", RENDER.banlam().indexOf('</div><span class="bwsrchhint"')>=0);
+t("V9.18b hint o tim hero nam NGOAI hop tim (khong de len input)", renderBanlam().indexOf('</div><span class="bwsrchhint"')>=0);
 
 /* --- 10. V9.19: bam nghiep vu trong chang -> sidebar danh dau + breadcrumb vet duong di --- */
 applyScope("");CURROLE="all";
