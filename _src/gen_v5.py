@@ -13577,6 +13577,21 @@ function baocaoThan(_xemAi){
     nên chuông, Việc hôm nay, bảng việc và trang này luôn nói về cùng một người. */
  h+=banAiHTML();
  h+=bvSau();   /* chọn kỳ số liệu xong mới tới bảng việc của Ban Giám đốc */
+ /* ═══ V2 14/08 - NÓI RÕ BÁO CÁO NÀO KHÔNG NẰM Ở ĐÂY (anh Luân: *"kiểm định trang này đủ nội
+    dung chưa nha"*) ══════════════════════════════════════════════════════════════════════════
+    Kiểm bằng máy, đóng đủ 16 chức danh, dò cả 9 bảng BC1-BC9 trên MỌI trang. Kết quả: đủ, không
+    bảng nào mất (BC4 đã khai lý do lệch có chủ ý - app dùng cửa sổ 30 ngày trượt thay vì tháng
+    lịch). Nhưng chúng **nằm rải sáu trang**, và trang Chỉ số - nơi người ta vào để hỏi "tình
+    hình thế nào" - không nói một câu nào về chuyện đó:
+      BC1 Học viên nguy cơ 2 trục -> sổ Học viên · BC5 Bảng NV Tư vấn, BC6 NV WOW, BC7 Giảng
+      viên, BC8 Học vụ, BC9 Quản lý -> bảng việc, hiện ở TRANG ĐÁP của đúng chức danh ấy.
+    Không gom chúng về đây (bảng việc phải nằm chỗ người ta bắt đầu ngày, đó là chủ ý cũ), nhưng
+    phải CHỈ ĐƯỜNG. *Một báo cáo có thật mà người cần nó không biết đường tới thì với họ là chưa có.* */
+ h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-map-2"></i>'+
+  'Trang này giữ <b>BC2 chỉ số KPI</b>, <b>BC3 phễu khách</b> và khối lượng việc theo nhân viên. '+
+  'Bảng <b>Học viên nguy cơ</b> (BC1) nằm ở sổ Học viên; các bảng việc theo chức danh (BC5-BC9) '+
+  'hiện ở trang đáp của từng người. '+
+  '<a class="lnk" onclick="go(\'hocvien\')">Mở sổ Học viên</a></div>';
  h+=kpiTop3Section();
  /* Bảng so sánh 5 cơ sở là câu hỏi của người điều hành chuỗi ("cơ sở nào đang gánh") - một nhân
     viên nhìn bảng ấy không quyết được gì, mà số của họ cũng chỉ nằm ở đúng một ô. */
@@ -27773,7 +27788,11 @@ var NAVTREE=[
     thì nó nằm trong một nhóm ĐANG GẬP - mở app không thấy gì. Mà nó vốn KHÔNG thuộc chặng nào:
     học viên liên hệ được ở bất kỳ chặng nào, và đó là việc phải xử trong ngày. Chỗ của nó là
     nhóm Làm việc, cạnh Việc hôm nay và Giao việc. */
- {g:"Làm việc",items:["viec","banlam","giaoviec"]}, /* V9.18: hanhtrinh gộp vào banlam (go() tự remap) */
+ /* V2 14/08 (anh Luân: *"đưa Tổng quan - Báo cáo & KPI lên bên dưới Trang bắt đầu nhé"*).
+    `baocao` rời nhóm "Điều hành" về đây, đứng ngay dưới Trang bắt đầu. Rời HẲN chứ không chép:
+    một trang nằm ở hai nhóm thì bấm một mục là hai mục cùng sáng - đúng lỗi `_check11` bắt được
+    sáng nay khi em cho `banglop` lên menu trong lúc `lop` đã là cha nó. */
+ {g:"Làm việc",items:["viec","banlam","baocao","giaoviec"]}, /* V9.18: hanhtrinh gộp vào banlam (go() tự remap) */
  /* V9.29n (anh Luân): "Chặng 1" -> "C1". Tên nhóm nay SINH TỪ ARCS (arcGrpName) chứ không gõ tay:
     trước đây số chặng và tên chặng nằm cả ở ARCS lẫn ở đây, đổi một chỗ là hai chỗ nói khác nhau. */
  {g:arcGrpName("changA"),arc:"changA",items:["changA","nhaplead","test","tuvan","thanhtoan","reup"]},
@@ -27820,7 +27839,7 @@ var NAVTREE=[
     Luân bắt được hôm 04/08 (*"a tìm trên sidebar ko thấy"*).
     Bài học lặp lại lần thứ hai: hỏi `navVis` là hỏi "có ĐƯỢC PHÉP thấy không", không phải "có
     CHỖ ĐỨNG trên menu không". Hai câu khác nhau, và cái thước phải hỏi câu thứ hai. */
- {g:"Điều hành",items:["baocao","nhansu","bangcong","hoidap","canhan","settings"]},
+ {g:"Điều hành",items:["nhansu","bangcong","hoidap","canhan","settings"]},
  /* V2 08/08 - mười sáu cuốn sổ chỉ-đọc rời khỏi cây menu, vào sau một cửa `tracuu` (ghi chú
     dài ở bảng PAGES). `hocvien` và `giangvien` Ở LẠI vì chúng nằm trong nhịp ngày của ba nhóm. */
  /* V2 14/08 - `socamket` (Sổ cam kết đã ký, dựng cùng ngày) VÀO ĐÂY. Nó đã khai `g:"Tra cứu"`
