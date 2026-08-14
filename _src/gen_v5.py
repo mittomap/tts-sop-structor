@@ -410,7 +410,11 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    ý" (170px) và "Nhịp ngày của bạn" (184px) đều trả lời cùng một câu - *hôm nay tôi phải để mắt
    vào đâu* - mà lại nằm hai tầng cách nhau một dải thẻ.
    Xếp cạnh nhau thì đọc một lượt là xong và lấy lại được chiều cao của tấm thấp hơn. */
-.bl2c{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+/* `stretch` chứ không `start`: hai tấm đặt cạnh nhau mà đáy lệch nhau vài chục pixel thì đọc
+   ra như một cái bị hụt. Bằng đáy thì cặp ấy thành MỘT khối trong mắt, đúng điều muốn nói. */
+.bl2c{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
+.bl2c>.panel{display:flex;flex-direction:column}
+.bl2c>.panel>.pbody{flex:1 1 auto}
 .bl2c>.panel{margin-bottom:16px}
 @media(max-width:1200px){.bl2c{grid-template-columns:1fr;gap:0}}
 .ph{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
@@ -1912,6 +1916,13 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .notebar>i{margin-right:8px;vertical-align:-2px}
 .notebar>.btn,.notebar>button{margin-left:8px;vertical-align:-3px}
 .sechd{font-size:12.5px;font-weight:800;color:#3A4756;margin:14px 4px 4px;text-transform:uppercase;letter-spacing:.4px}
+/* Hàng tiêu đề của một dải: [tên + câu mô tả] đẩy [nút điều khiển] về mép phải. Nút đứng cạnh
+   thứ nó điều khiển, và câu mô tả không còn phải đẻ ra một hàng riêng cho nó. */
+.sechdw{display:flex;align-items:flex-end;gap:12px;margin-bottom:8px}
+.sechdw .sechd{margin:14px 0 0;flex:1 1 auto;min-width:0}
+.sechdw .sechd .fhint{margin:3px 0 0;text-transform:none;letter-spacing:0;font-weight:500}
+.sechdn{flex:none;position:relative}
+@media(max-width:700px){.sechdw{flex-wrap:wrap}}
 .appcard{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:10px 4px;display:flex;gap:16px;align-items:center}
 .appcard .info{flex:1}.appcard .id{font-size:11px;color:var(--navy);font-weight:700}.appcard .big{font-size:14px;font-weight:700;margin:2px 0 4px}
 .appcard .amt{font-size:20px;font-weight:800;color:var(--navy)}.appcard .rs{font-size:12px;color:var(--muted);margin-top:3px}
@@ -4385,7 +4396,21 @@ lop:{code:"DL10",
       Bẫy y hệt lần bảng màu đếm trúng hai mã màu nằm trong ghi chú của chính em.);
     · `_checklap` L5 chỉ bắt khi chip là ĐẦU chuỗi của nhãn thẻ; "lớp đang học" không bắt đầu
       bằng "đang học" nên nó lọt. Đã nới L5 sang "cùng con số + trùng chữ chính". */
- nut:'<button class="btn primary" onclick="go(\'xeplop\')"><i class="ti ti-layout-grid-add"></i>Xếp lớp & Onboarding</button>',filt:"class_status",ro:1,sub:"Lớp học (DL10) - bấm nút Vận hành lớp trên một dòng để vào buổi học, điểm danh, nhận xét và bài tập của lớp đó",
+ /* ═══ V2 14/08 (anh Luân: *"ở trang lớp học, có cái nút xếp lớp onboarding là theo logic cũ
+    rồi đúng ko"*) - đúng, hai chỗ cùng một bệnh ══════════════════════════════════════════════
+    · Nút ấy đeo lớp `primary`, tức nút ĐẬM NHẤT trang, đứng ở góc phải đầu trang - chỗ dành cho
+      HÀNH ĐỘNG CHÍNH. Nhưng sổ Lớp học là sổ CHỈ XEM (`ro:1`), nó không có hành động ghi nào,
+      và việc cái nút ấy làm là RỜI TRANG sang một trang đã có mục riêng trên menu (Xếp lớp &
+      Onboarding nằm ngay trong kệ của chặng Đang học). Mời người ta rời đi bằng cái nút to nhất
+      màn là nói với họ "chỗ này không có gì để làm" - đúng thứ anh Luân từng kêu về mấy cái thẻ
+      bấm vào nhảy trang khác. Giữ lối tắt (đang xem lớp mà muốn xếp người vào lớp là có thật),
+      nhưng hạ về nút thường.
+    · Câu mô tả thì hứa một thứ KHÔNG CÒN: *"bấm nút Vận hành lớp trên một dòng"*. Từ V2 RB3 nút
+      ấy đã dời vào NGĂN KÉO (bấm một dòng ra ngăn kéo, trong ngăn kéo mới có nút đi tiếp) - có
+      lý do đàng hoàng, ghi ngay dưới đây. Nhưng câu mô tả ở lại với bản cũ, nên nó chỉ người ta
+      đi tìm một cái nút không tồn tại.
+    *Đổi chỗ một cái nút thì phải đi sửa mọi câu chữ đang chỉ đường tới nó.* */
+ nut:'<button class="btn" onclick="go(\'xeplop\')"><i class="ti ti-layout-grid-add"></i>Xếp lớp & Onboarding</button>',filt:"class_status",ro:1,sub:"Lớp học (DL10) - bấm một dòng để mở ngăn kéo của lớp đó; trong ngăn kéo có nút sang Vận hành lớp để điểm danh, nhận xét và bài tập",
  /* V2 RB3 - CỬA VÀO TRANG CON NẰM TRONG NGĂN KÉO, KHÔNG NẰM TRÊN DÒNG.
     Bản đầu của Khúc 3 đặt một nút "Vận hành lớp" thẳng lên từng dòng - và `_check18` mục 26 bắt
     ngay: **nút hàng của bảng danh sách phải mở NGĂN KÉO, không được rời trang**. Luật ấy là lời
@@ -4408,7 +4433,10 @@ giangvien:{code:"DL01",ro:1,sub:"Giảng viên & NV WOW (DL01) - lọc nhanh đ�
      ["gv","Chỉ giảng viên lớp",function(x){return /teacher/.test(ecode(x.role))},"blue"]],
  
  pre:function(s){return /teacher|wow|giảng|giang/.test(ecode(s.role))||/giảng|giang|teacher/i.test(String(s.role))},
- cols:[["staff_id","Mã"],["full_name","Họ tên"],["role","Vai trò","enum"],["phone","SĐT"],["email","Email"],["branch","Cơ sở","enum"],["status","Trạng thái","chip"]]},
+ cols:[["staff_id","Mã"],["full_name","Họ tên"],["role","Vai trò","enum"],["phone","SĐT"],["email","Email"],["branch","Cơ sở","enum"],
+  ["__lop","Lớp đang dạy","calcnum"],["__hv","Học viên","calcnum"],["__buoi7","Buổi 7 ngày tới","calcnum"],
+  ["__nxno","Nợ nhận xét","calcso"],["__baicho","Bài chờ chấm","calcso"],["__giothang","Giờ dạy tháng","calcnum"],
+  ["status","Trạng thái","chip"]]},
 nhanvien:{code:"DL01",filt:"status",ro:1,lam:"nhansu",sub:"Toàn bộ nhân sự (DL01)",
  /* V2 08/08 - chip "Hồ sơ còn thiếu": nhịp sáng của Nhân sự là *"soát danh sách nhân sự - ai mới
     vào, ai đã nghỉ, ai chưa có chức danh hoặc chưa gắn cơ sở"*. App đã có `hsThieu()` đếm ra con
@@ -4510,7 +4538,50 @@ function calcCol(k,r,sheet){
   var A=riskAuto(r.student_id)||{abs:0,miss:0};
   if(k==="__vang")return A.abs||0;
   if(k==="__thieubai")return A.miss||0;}
+ /* ═══ V2 14/08 (anh Luân: *"trang giảng viên ít thông tin quá em. còn nhiều thông tin có thể
+    hiển thị theo giảng viên mà"*) ══════════════════════════════════════════════════════════
+    Đúng - bảng này đang là danh bạ: tên · vai trò · SĐT · email · cơ sở · trạng thái. Sáu cột ấy
+    trả lời "gọi cho ai", không trả lời câu người quản lý hỏi mỗi ngày: *ai đang gánh nặng nhất,
+    ai đang nợ việc*. Mà app ĐÃ có sẵn mọi con số ấy, chỉ nằm rải ở bảng khác.
+    Sáu cột dưới đây đếm từ DL10 / DL11 / DL13 - không cột nào có sẵn trong DL01, nên tất cả phải
+    đi đường `calc`. Ba cột đầu là TẢI (trung tính), ba cột sau là NỢ (đỏ khi > 0).
+    Đếm một lượt rồi nhớ lại theo mã người: bảng 13 dòng x 6 cột mà mỗi ô tự quét DL11 609 dòng
+    thì là 47 nghìn lượt duyệt cho một lần vẽ bảng. */
+ if(sheet==="DL01"){var T=gvTaiBang()[String(r.staff_id||"")]||{};return num(T[k])||0}
  return 0}
+/* Bảng tải của giảng viên - tính MỘT lần cho MỖI LƯỢT VẼ. Không cache lâu hơn thế: dữ liệu demo
+   sửa được ngay trong app, mà một con số nhớ quá lâu thì nó nói dối đúng lúc người ta vừa sửa
+   xong và đang nhìn để kiểm chứng. `renderList` xoá bộ nhớ này trước mỗi lượt dựng bảng.
+   Vì sao vẫn phải nhớ trong một lượt: 13 dòng x 6 cột mà mỗi ô tự quét DL11 609 dòng là 47 nghìn
+   lượt duyệt cho một lần vẽ bảng. */
+function gvTaiBang(){
+ if(window.__gvTai)return window.__gvTai;
+ var M={};
+ function o(id){id=String(id||"");if(!id)return null;
+  return M[id]||(M[id]={__lop:0,__hv:0,__buoi7:0,__nxno:0,__baicho:0,__giothang:0})}
+ try{
+  srows("DL10").forEach(function(c){
+   if(isc(c.class_status,"cancelled","ended"))return;
+   var t=o(c.main_teacher_id);if(!t)return;
+   t.__lop++;t.__hv+=num(c.current_enrollment)});
+  var nay=new Date(),d0=new Date(nay.getFullYear(),nay.getMonth(),nay.getDate()),
+      d7=new Date(d0.getTime()+7*864e5),
+      m0=new Date(nay.getFullYear(),nay.getMonth(),1);
+  srows("DL11").forEach(function(b){
+   var t=o(b.teacher_id);if(!t)return;
+   var d=pvnd(b.session_date);
+   if(d&&d>=d0&&d<d7&&!isc(b.session_status,"cancelled"))t.__buoi7++;
+   /* Nợ nhận xét: buổi đã dạy xong mà chưa có nhận xét. Cùng phép thử bảng việc dùng - đừng
+      viết lại điều kiện, hai chỗ hiểu khác nhau là hai con số khác nhau cho một câu hỏi. */
+   if(isc(b.session_status,"completed")&&!isc(b.has_teacher_note,"yes"))t.__nxno++;
+   if(d&&d>=m0&&isc(b.session_status,"completed")){
+    var a=pvnd(b.class_start_actual),z=pvnd(b.class_end_actual);
+    if(a&&z&&z>a)t.__giothang+=Math.round((z-a)/36e5)}});
+  srows("DL13").forEach(function(w){
+   var t=o(w.teacher_id);if(!t)return;
+   if(String(w.homework_submitted_time||"").trim()&&!String(w.graded_at||"").trim())t.__baicho++});
+ }catch(e){}
+ window.__gvTai=M;return M}
 /* ═══ LỚP 1-1 HAY LỚP NHÓM ═══════════════════════════════════════════════════════════════
    Anh Luân chốt 06/08 (TP ACA hỏi qua điện thoại): *"suy ra từ sĩ số để đặt tên thôi em, hiện
    chỉ có 2 loại thôi: 1-1 hoặc nhóm, nên lớp mà có sĩ số max 1 người thì nó là 1-1"*.
@@ -4557,13 +4628,25 @@ function cell(r,col,sheet){var k=col[0],ty=col[2],v=r[k];
     cơ chỉ là một cái nhãn"* - tính năng được viết ra vì lý do đó, rồi chết ngay ở cửa vào và
     không ai hay, vì bảng vẫn vẽ ra bình thường với một dấu gạch trông rất hợp lệ.
     LUẬT: thêm một KIỂU Ô mới thì phải đi hỏi lại MỌI câu điều kiện đang phân nhánh theo kiểu ô. */
- if(ty==="calc"||ty==="calcmoney"||ty==="calcso"){
+ /* `calcnum` phải có TRONG CÂU ĐIỀU KIỆN NÀY, không chỉ trong thân khối. Ghi chú ngay trên đã
+    kể đúng cái bẫy ấy (calcso viết đúng bên trong mà không ai gọi tới, chết câm gần một tuần) -
+    và người viết ghi chú vẫn cắn lại nó lúc thêm `calcnum`: ba cột tải của giảng viên in ra dấu
+    "-" trông rất hợp lệ, phải dựng bảng ra đọc mới thấy.
+    *Đọc lại luật mình vừa viết thì dễ; đi làm đúng nó ở dòng mã kế bên mới là chuyện khác.* */
+ if(ty==="calc"||ty==="calcmoney"||ty==="calcso"||ty==="calcnum"){
   var cv=calcCol(k,r,sheet);
   /* V9.63 (anh Luân: *"mấy cái từ như: chưa bán được đồng nào cấu hình ở đâu đấy?"*) - đúng,
      ba câu này là CHỮ HIỆN RA cho người dùng mà lại cắm cứng trong mã. Nay đi qua sổ đoạn gợi ý,
      sửa được ở Cài đặt > Câu chữ trong app như mọi đoạn khác. */
   if(ty==="calcmoney")return cv?money(cv):'<span class="chip red">'+goiyG("gy_chua_ban_duoc_dong_4b71","Chưa có doanh thu")+'</span>';
   if(ty==="calcso")return cv?('<b style="color:var(--red)">'+cv+'</b>'):'<span class="mut">0</span>';
+  /* `calcnum` - cột đếm TRUNG TÍNH. Ba kiểu tính có sẵn đều mang sẵn một phán xét: `calc` coi 0
+     là lỗi (chip đỏ "0 đơn"), `calcso` coi >0 là lỗi (tô đỏ), `calcmoney` là tiền. Nhưng "giảng
+     viên này đang dạy mấy lớp" thì 0 không sai mà 5 cũng không sai - nó chỉ là một con số. Tô
+     màu cho nó là nói dối bằng màu.
+     LUẬT ở ngay trên: thêm một KIỂU Ô là phải đi hỏi lại MỌI câu điều kiện phân nhánh theo kiểu
+     ô. Đã đi: khối này, và câu chọn "ô có bọc liên kết không" trong `tableHTML`. */
+  if(ty==="calcnum")return cv?('<b>'+cv+'</b>'):'<span class="mut">0</span>';
   return cv?('<b>'+cv+'</b>'):'<span class="chip red">'+goiyG("gy_khoa_chua_co_don_9c28","0 đơn")+'</span>'}
  /* "lâu chưa" - mốc thời gian đọc thành "3 ngày trước", vì con số ngày mới là thứ dùng để quyết
     định, còn chuỗi 29/07/2026 14:05 thì người đọc phải tự trừ trong đầu. */
@@ -4986,8 +5069,8 @@ function theBoxIn(key){var parts=THEHTML[key]||[];
   (neo==="bstats"
   /* Viết THẲNG chuỗi `data-tour="bstats"` cho trường hợp mặc định: bộ kiểm hướng dẫn quét MÃ
      NGUỒN tìm literal, ghép biến là neo "tàng hình" với nó - đúng cái bẫy đã ghi ở V9.60. */
-  ?'<div class="bstats" data-tour="bstats">'
-  :'<div class="bstats" data-tour="bvstats">')+body+'</div>'}
+  ?'<div class="bstats'+(hien<=3?" itfew":"")+'" data-tour="bstats">'
+  :'<div class="bstats'+(hien<=3?" itfew":"")+'" data-tour="bvstats">')+body+'</div>'}
 /* ═══════════ V9.36 - BẤM TÊN LÀ RA NGĂN KÉO, Ở MỌI BẢNG ═══════════
    (anh Luân: "a nhớ học viên có làm drawer rồi mà sao mấy trang này chưa có")
    Trước đây tableHTML nối ngăn kéo bằng cách LIỆT KÊ TÊN TRANG - đúng 6 trang được nối tay, 23
@@ -5091,7 +5174,7 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
  data.forEach(function(r){var id=esc(String(r[pk]||""));h+='<tr data-mo="lstXem" data-mo-arg="'+esc(key+"|"+String(r[pk]||""))+'">';
   cols.forEach(function(c){
     if(!cfg.ro&&cfg.filt&&c[0]===cfg.filt&&ENUMMAP[cfg.filt]&&ENUM[ENUMMAP[cfg.filt]]){h+='<td>'+qsel(key,id,cfg.filt,r[c[0]])+'</td>';return}
-    var lk=(c[2]==="chip"||c[2]==="enum"||c[2]==="money"||c[2]==="na"||c[2]==="calcso"||c[2]==="lau")?null:cellLnk(r,c,cfg);
+    var lk=(c[2]==="chip"||c[2]==="enum"||c[2]==="money"||c[2]==="na"||c[2]==="calcso"||c[2]==="calcnum"||c[2]==="lau")?null:cellLnk(r,c,cfg);
     /* THẺ 1-1 / NHÓM ĐỨNG TRƯỚC TÊN LỚP (anh Luân 06/08). Gắn ở ĐÂY chứ không ở trong `cell()`:
        cột tên lớp không khai kiểu nên nó được bọc thành LIÊN KẾT ở dòng trên và `return` ngay,
        không bao giờ chạy tới `cell()`. Đặt nhầm chỗ thì thẻ không hiện mà cũng không báo lỗi -
@@ -5478,7 +5561,7 @@ function fltBarHTML(pg,daCoTim){
     '<i class="ti ti-x" onclick="fltAxClear(\''+esc(pg)+'\',\''+esc(a.k)+'\')" data-tip="Bỏ điều kiện này"></i></span>'});
   h+='</span>'}
  return h}
-function renderList(key,emb){
+function renderList(key,emb){window.__gvTai=null;   /* số đếm theo giảng viên: tươi lại mỗi lượt vẽ */
  var cfg=LISTCFG[key], p=PBK[key], q=vnorm(SEARCH[key]||""), fa=FILT[key]||[];
  hideInit(key);var all=scopeList(cfg.code, rows(cfg.code)); if(cfg.pre)all=all.filter(cfg.pre); var data=all;
  if(q)data=data.filter(function(r){return cfg.cols.some(function(c){return vnorm(r[c[0]]).indexOf(q)>=0})});
@@ -6577,8 +6660,19 @@ function hsThieuMot(x){
  return VAI_CO_SO.test(ecode(x.role)||"")&&!String(x.branch||"").trim()}
 function hsThieu(){return rows("DL01").filter(hsThieuMot)}
 var BVMA={"Học viên liên hệ":"bv_ychv","Lead mới (chưa LH)":"bv_lead_new","Lead đang khai thác":"bv_lead_work","Test sắp tới":"bv_test_up","Tư vấn cần làm":"bv_tv_can","Test chờ chấm":"bv_test_wait","Test đã chấm":"bv_test_done","WOW sắp tới":"bv_wow_up","WOW có tiến bộ":"bv_wow_imp","Buổi đã hoàn thành":"bv_ses_done","Cần viết nhận xét buổi":"bv_ses_note","Bài tập chờ chấm":"bv_hw_wait","HV nguy cơ học thuật":"bv_risk_aca","Nhập học chưa xong":"bv_ob_open","Học viên nguy cơ":"bv_risk_stu","Phản hồi chờ phân loại":"bv_fb_new","Khiếu nại đang xử lý":"bv_kn_open","Chiết khấu cần duyệt":"bv_ck_duyet","Đổi lớp từ N lần":"bv_doilop2","Lead mới N ngày":"bv_mk_moi","Lead chưa ai phụ trách":"bv_mk_orph","Nguồn đang kém":"bv_mk_yeu","Khách cũ chờ chạy lại":"bv_mk_cu","Thưởng giới thiệu chưa trao":"bv_mk_thuong","Khiếu nại mức CAO":"bv_kn_high","Khiếu nại đã leo thang":"bv_kn_esc","Hoàn tiền chờ duyệt":"bv_hoan","Việc mới chờ nhận":"bv_tk_new","Đang làm":"bv_tk_doing","Quá hạn":"bv_tk_late","Chờ người giao xác nhận":"bv_tk_wait","Hồ sơ nhân sự còn thiếu":"bv_hs_thieu","Buổi thiếu mốc giờ vào/ra":"bv_gio_thieu","Buổi quá hạn nhận xét":"bv_aca_note","Buổi hôm nay chưa có giáo viên":"bv_aca_gv","Học viên đuối học thuật":"bv_aca_risk","Đơn còn nợ phí":"bv_no_phi","Phiếu thu chờ đối soát":"bv_thu_soat"};
+/* ═══ V2 14/08 (anh Luân: *"chưa gì vào thôi đã thấy nó kém rồi"*) ═════════════════════════
+   Khối này đang tốn BA HÀNG trước khi tới con số đầu tiên: một hàng tiêu đề, một hàng mô tả, và
+   một hàng CHỈ ĐỂ ĐỰNG cái nút "Thẻ (5/5)" canh phải. Hàng thứ ba là hàng rỗng đúng nghĩa - nó
+   không mang chữ nào, chỉ đẩy mọi thứ xuống thêm 34px, và cái nút thì trôi lơ lửng không dính
+   vào khối nào nên mắt không biết nó điều khiển cái gì.
+   Cơ chế để nút đi chỗ khác ĐÃ CÓ SẴN (`THEROI`, dựng hồi đưa nút Thẻ xuống cạnh nút Cột ở các
+   sổ) - khối này chỉ chưa dùng. Nay tiêu đề và nút chung một hàng: nút đứng ngay cạnh thứ nó
+   điều khiển, và trang bớt một hàng ở đúng chỗ đắt nhất - đầu trang.
+   *Một cái nút không có hàng xóm thì không ai đoán ra nó làm gì.* */
 function bvStrip(t,bc,d,o,tour){
  if(!o.length)return "";
+ window.THEROI=window.THEROI||{};window.THEROI.bangviec=1;
+ var _nut="";try{_nut=theNutHTML("bangviec")}catch(e){_nut=""}
  /* Viết thẳng cả hai chuỗi literal (`data-tour="bangviec"` và `data-tour="bangduyet"`) chứ
     không ghép biến - bộ kiểm quét mã nguồn tìm literal đó; ghép biến là neo TÀNG HÌNH với bộ
     kiểm, khai có mà máy không thấy.
@@ -6587,9 +6681,11 @@ function bvStrip(t,bc,d,o,tour){
     trên. Hai khối cùng một neo trên một trang thì `tourFind` lấy cái đầu tiên - bài hướng dẫn
     nói về bảng việc lại khoanh đúng hoặc khoanh nhầm TÙY HÊN. `_checktour` bắt được khi bảng
     việc dời sang trang Việc hôm nay. *Nhận một tham số rồi không dùng nó là một lời khai dối.* */
- return '<div class="sechd"'+(tour==="bangduyet"?' data-tour="bangduyet"':(tour?' data-tour="bangviec"':''))+'>'+esc(t)+
-  ' <span style="font-weight:600;text-transform:none;letter-spacing:0" class="mut">· '+esc(bc)+'</span></div>'+
-  '<div class="fhint" style="margin:-4px 0 8px">'+esc(d)+' Rê chuột vào một ô để biết nó đếm gì và xem danh sách ở đâu.</div>'+
+ return '<div class="sechdw">'+
+  '<div class="sechd"'+(tour==="bangduyet"?' data-tour="bangduyet"':(tour?' data-tour="bangviec"':''))+'>'+esc(t)+
+  ' <span style="font-weight:600;text-transform:none;letter-spacing:0" class="mut">· '+esc(bc)+'</span>'+
+  '<div class="fhint">'+esc(d)+' Rê chuột vào một ô để biết nó đếm gì và xem danh sách ở đâu.</div></div>'+
+  (_nut?('<div class="sechdn">'+_nut+'</div>'):'')+'</div>'+
   statStrip(o,"bangviec",o.map(function(x){return bvMa(x[2])}))}
 /* V9.64: tên ô thẻ nay có thể MANG SỐ SỐNG lấy từ CH2 ("Đổi lớp từ 2 lần" - số 2 là tham số).
    Tra bảng chú thích bằng nguyên văn tên thì đổi tham số một cái là mất chú thích, mà mất im
@@ -8129,12 +8225,15 @@ function viecCongTac(soViec){
  var vw=VIECVW(),L=viecVWList(),cur=L[0]||VIECVWDEF[0],so={viec:soViec,nguoi:"",chang:""};
  try{so.nguoi=jAll().filter(function(J){return J.act}).length}catch(e){so.nguoi=""}
  var opts=L.map(function(V){if(V[0]===vw)cur=V;return [V[0],V[1],so[V[0]],""]});
+ /* Nút chọn thẻ chỉ có nghĩa ở cách xem "Theo việc" - dải thẻ SLA nằm trong đúng cách xem ấy. */
+ var _nut="";if(vw==="viec"){try{_nut=theNutHTML("viec")}catch(e){_nut=""}}
  /* Chỉ còn một cách xem thì KHÔNG vẽ công tắc: một cái công tắc có đúng một nấc là một câu hỏi
     không có câu trả lời nào khác - nó chỉ tốn một hàng và mời người ta bấm vào chỗ không đi đâu.
     Câu "đang nhìn cái gì" thì vẫn giữ, vì nó vẫn nói được một điều thật. */
  return '<div class="viecvw" data-tour="viecvw">'+
   (opts.length>1?segHTML(vw,opts,"viecVWSet('{k}')","viec_cachxem","segsx"):"")+
-  '<div class="viecvwc">Đang xem <b>'+esc(cur[1])+'</b> - '+esc(cur[2])+'</div></div>'}
+  '<div class="viecvwc">Đang xem <b>'+esc(cur[1])+'</b> - '+esc(cur[2])+'</div>'+
+  (_nut?('<div class="sechdn">'+_nut+'</div>'):'')+'</div>'}
 function renderViec(){var items=bellItems();
  var team=window.VIECTEAM||"all",grp=window.VIECGRP||"all";
  var sev=window.VIECSEV||(window.VIECOD?"red":"");   /* V9.29: MỘT biến cho mức độ; VIECOD là lối tắt cũ của "chỉ quá hạn" */
@@ -8208,6 +8307,10 @@ function renderViec(){var items=bellItems();
  /* V2 13/08 - HAI THẺ "Quá hạn" và "Sắp tới hạn" ĐÃ BỎ: thanh Mức độ ngay dưới có đúng hai chip
     cùng tên cùng số, và chip thì bấm lọc được. Hai thẻ còn lại giữ vì không chip nào nói thay:
     "Nợ quá N ngày" cắt theo tuổi việc, "Quá hạn nhiều nhất" xếp hạng mảng việc. */
+ /* Cùng lý do với `bvStrip`: nút "Thẻ (2/2)" của dải này vốn chiếm nguyên một hàng rỗng ngay
+    dưới công tắc. Hàng công tắc còn thừa chỗ ở mép phải, mà nút thì điều khiển đúng dải nằm ngay
+    dưới công tắc - cho hai thứ về một hàng. */
+ window.THEROI=window.THEROI||{};window.THEROI.viec=1;
  _the=statStrip([
   /* ═══ V9.57 (anh Luân): "thẻ phải đại diện cho 1 vấn đề quan trọng, xem nhanh và NGÀY NÀO CŨNG
      PHẢI XEM". Hai thẻ cũ ở đây trượt cả hai vế:
@@ -27032,7 +27135,10 @@ function canhBaoHTML(){
    '<div class="empty">Không có cảnh báo nào từ các trang nghiệp vụ trong phạm vi của bạn - mọi việc đang trong hạn.</div></div></div>';
  var nDo=L.filter(function(x){return x.muc==="do"}).length;
  var h='<div class="panel" data-tour="canhbao"><div class="ph"><b><i class="ti ti-bell-ringing" style="margin-right:6px"></i>Cần chú ý</b>'+
-  '<div class="mini mut">'+L.length+' chỗ bất thường'+(nDo?(' · '+nDo+' gấp'):'')+' - gom từ các trang nghiệp vụ của bạn</div></div>'+
+  /* Câu giải thích đầy đủ chuyển vào chú thích rê chuột: trong hàng tiêu đề của một tấm chỉ
+     rộng nửa trang, nó ăn hai dòng và đẩy cả tấm cao thêm. Chữ vẫn còn nguyên trong màn (bộ kiểm
+     vẫn đọc được, người vẫn tra được), chỉ là không chiếm chỗ khi chưa ai hỏi tới. */
+  '<div class="mini mut" data-tip="Gom từ các trang nghiệp vụ của bạn - mỗi ô là một chỗ bất thường ở một trang, bấm vào là mở đúng trang đó.">'+L.length+' chỗ bất thường'+(nDo?(' · '+nDo+' gấp'):'')+'</div></div>'+
   '<div class="pbody"><div class="cbwrap">';
  L.slice(0,12).forEach(function(x){
   var p=PBK[x.trang]||{};
@@ -27502,7 +27608,7 @@ function nhipPanel(){
     chỗ. `_checkneo` bắt đúng hai cặp bước khoanh trùng vì chuyện này. Nó đã có neo riêng
     (`@nhipngay`) cho bài nào muốn nói về chính nó. */
  var h='<div class="panel nhipwrap" data-tour="nhipngay"><div class="ph"><b>Nhịp ngày của bạn</b>'+
-  '<span class="mut" style="font-size:11.5px">Việc nên làm theo buổi - hàng chờ có số đếm, thói quen ghi "nên xem"</span></div><div class="nhipg">';
+  '<span class="mut" style="font-size:11.5px" data-tip="Hàng chờ có số đếm là việc phải làm; thói quen thì ghi &quot;nên xem&quot;.">Việc nên làm theo buổi</span></div><div class="nhipg">';
  NHIPBUOI2.forEach(function(B){
   var R=L.filter(function(x){return x.buoi===B[0]});
   if(!R.length)return;
@@ -28598,6 +28704,24 @@ function navCay(){return navCayV5()}
    mục con có mặt trên menu rồi nhường sáng cho nó - mà mục con ấy không tồn tại ở v6, thành ra
    cả menu không có gì sáng. */
 function navInTree(k){var T=navCay();for(var i=0;i<T.length;i++)if(T[i].items.indexOf(k)>=0)return true;return false}
+/* ═══ V2 14/08 - "TÔI VỪA TỪ ĐÂU TỚI" CHỈ ĐƯỢC CÓ MỘT CÂU TRẢ LỜI ═══════════════════════════
+   Anh Luân gửi ảnh màn Chạy quy trình: vệt đường đi ghi *"Việc hôm nay · Theo người › Chạy quy
+   trình"* trong khi sidebar lại sáng ở *"Lead & khai thác"* kèm nhãn "đang mở". Anh hỏi
+   *"vào bài cổng nào nó phải thể hiện ở cổng đó chứ"* - đúng, và hai chỗ ấy đang trả lời cùng
+   MỘT câu hỏi bằng HAI nguồn khác nhau:
+     · vệt đường đi đọc `NAVHIST` - lịch sử thật, có cắt vòng lặp, có lùi khi bấm Back;
+     · mục sáng mờ đọc `NAVFROM` - một biến nhớ riêng, ghi lại "mục đang sáng ngay trước lần
+       `go()` này". Đi thẳng thì hai cái trùng nhau, nhưng chỉ cần bấm Back một nhịp (hoặc đi
+       qua hai trang mồ côi liền nhau) là chúng tách ra và chỉ hai chỗ khác nhau.
+   Nay mục sáng mờ hỏi ĐÚNG cái vệt mà breadcrumb đang hiện: mốc gần nhất trong vệt có mặt trên
+   menu. Hai chỗ nói một câu thì không bao giờ cãi nhau được nữa. `NAVFROM` giữ làm lưới đỡ cho
+   trường hợp vệt rỗng (vào thẳng bằng link).
+   *Hai nguồn cho một sự thật thì sớm muộn cũng thành hai sự thật.* */
+function navFromKey(){var h=window.NAVHIST||[];
+ for(var i=h.length-1;i>=0;i--){var k=h[i].key,o=navOwner(k);
+  try{if(navInTree(o)&&navVis(o))return o}catch(e){}
+  try{if(navInTree(k)&&navVis(k))return k}catch(e){}}
+ return NAVFROM}
 /* V9.99z5 - bấm vào tên hub thì hub mở tab mặc định, và mục con ứng với tab ấy sáng (đúng chỗ
    đang đứng). Nhưng hàng của chính hub lại tối như chưa hề đi qua - nhìn ra là "đang ở đâu đó
    trong nhóm này" thì hơn. `navAnc` bật lớp mờ cho hàng cha khi một mục con của nó đang sáng. */
@@ -28673,6 +28797,8 @@ function buildNav(){
  window.__NAVJ=null;try{window.__NAVJ=jAll()}catch(e){}   /* tính 1 lần cho mọi badge */
  var h="";
  var ORPHAN=!navAnyCur();   /* trang hiện tại không có mục riêng trên menu */
+ /* Tính MỘT lần cho cả cây - và chỉ khi cần, vì nó duyệt ngược cả vệt đường đi. */
+ var _navFrom=ORPHAN?navFromKey():"";
  /* V9.99v - HÀM VẼ MENU CẮM CỨNG `NAVTREE`, KHÔNG HỎI `navCay()`.
     Anh Luân 05/08 gửi ảnh: Trưởng phòng ACA vẫn thấy nhóm "C2 · ĐANG HỌC" dù `arcMode()` đã trả
     "phang" và `arcXem` đã trả rỗng. Không phải cache - hàm này đọc thẳng NAVTREE nên toàn bộ
@@ -28725,7 +28851,7 @@ function buildNav(){
    var _trongArc=!!G.arc&&!/^chang[A-D]$/.test(k);
    var isSub=_laHub||_trongArc||_thut;
    var isSub2=(_laHub&&_trongArc)||(_thut&&_trongArc);
-   h+='<div class="navitem'+(isArc?" chang":"")+(isSub2?" sub sub2":(isSub?" sub":""))+(navCur(k)?" on":(navAnc(k)?" anc":(ORPHAN&&k===NAVFROM?" from":"")))+(k===window.__NAVHIT?" hit":"")+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
+   h+='<div class="navitem'+(isArc?" chang":"")+(isSub2?" sub sub2":(isSub?" sub":""))+(navCur(k)?" on":(navAnc(k)?" anc":(ORPHAN&&k===_navFrom?" from":"")))+(k===window.__NAVHIT?" hit":"")+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
     ' data-k="'+k+'" title="'+esc(m.t)+'" onclick="'+(HUBTAB[k]?"goHub":"go")+'(\''+k+'\')"><i class="ti '+m.ic+'"></i><span>'+esc(m.t)+'</span>'+
     (n?'<span class="dot">'+(n>99?"99+":n)+'</span>':'')+'</div>'});
   h+='</div>'});
