@@ -30,7 +30,13 @@
  */
 const OUT=process.env.O||process.env.ITTS_OUT||".";
 const PATHS=["/opt/pw-browsers/chromium-1194/chrome-linux/chrome","/opt/pw-browsers/chromium/chrome-linux/chrome"];
-const TRANG=["banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","hocvien","giaoviec","duyet","baocao","nhansu","khac","canhan","xeplop","giangvien"];
+/* 14/08 - THEM `viec`. Danh sach nay cam cung, va hom nay ba khoi mo duoc ngan keo ("Can chu y",
+   nhip ngay, bang viec theo chuc danh) da DOI CHO tu `banlam` sang `viec` khi gop hai ban lam
+   viec lam mot. Thuoc khong di theo thi so ngan keo mo duoc tut tu 40+ xuong 34 va bao do - mot
+   bao dong dung ve con so nhung sai ve nguyen nhan: khong be mat nao mat, chi la thuoc thoi di
+   qua cho chung dang dung. *Danh sach trang cam cung thi moi lan kien truc doi la mot lan bao
+   dong gia - lan thu tu trong ngay mot ban do cam cung noi sai.* */
+const TRANG=["viec","banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","hocvien","giaoviec","duyet","baocao","nhansu","khac","canhan","xeplop","giangvien"];
 (async()=>{
  let chromium; try{chromium=require("playwright").chromium}catch(e){console.log("CHECKDRAWER BO QUA: chua cai playwright");process.exit(0)} const fs=require("fs"),path=require("path");
  const exe=PATHS.find(p=>{try{return fs.existsSync(p)}catch(e){return false}});

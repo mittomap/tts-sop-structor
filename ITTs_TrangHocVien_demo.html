@@ -2639,7 +2639,10 @@ body.drsz .drawer{transition:none}
 @media(max-width:640px){
  .obcards.rows .obcard .obh{flex:1 1 100%;overflow:visible}
  .obcards.rows .obcard .obh>div:first-child{overflow:visible}
- .obcards.rows .obcard .obm{max-width:100%;white-space:normal}
+ /* Ở khổ điện thoại cho dòng khoá/giờ một HÀNG RIÊNG. Ở khổ rộng nó là `display:inline` nối
+    ngay sau tên cho gọn, nhưng nối vào một cái tên `nowrap` thì cả cụm không tìm được chỗ ngắt
+    và thò ra 35px - đo trên `buoihoc` ở 390px. */
+ .obcards.rows .obcard .obm{max-width:100%;white-space:normal;display:block;margin-left:0}
  .obcards.rows .obcard .paybar{flex:1 1 100%;margin-bottom:2px}}
 /* Ô chọn dài (tên lớp đầy đủ) không được đẩy trang rộng ra - cắt đuôi trong khung là đủ. */
 @media(max-width:560px){.sel{max-width:100%}.fbar,.tbar{flex-wrap:wrap}}
