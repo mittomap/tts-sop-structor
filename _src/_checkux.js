@@ -580,6 +580,20 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
    if(m[1]==="option")continue;
    var attr=m[2]||"",truoc=h.slice(Math.max(0,m.index-420),m.index+60);tong++;
    var co=/data-tip="[^"]{10,}|title="[^"]{10,}/.test(attr)||/data-tip="[^"]{10,}"/.test(truoc);
+   /* 14/08 - CUA SO 420 KY TU LA MOT THUOC MONG MANH. Chu thich cua mot o the nam tren THE BAO
+      (`.bstat`), con con so % nam sau hai lop div ben trong. Hom nay o the dai them ~25 ky tu
+      (nhan va phu chu tach lam hai dong cho de doc) va bon con so roi ra ngoai cua so - trong
+      khi chu thich VAN CO, nguoi dung re chuot van doc duoc. Do la bo kiem sai, khong phai app.
+      Nay khi cua so hep khong thay gi thi hoi tiep theo QUAN HE BAO NHAU: tim the mo cua o gan
+      nhat truoc do va doc chu thich cua chinh no. Day khong phai noi long thuoc - dieu can bao
+      ve van y nguyen (moi con so % phai noi duoc cach tinh), chi la hoi dung cho de tim cau
+      tra loi. *Do quan he thi ben; do khoang cach ky tu thi vo khi cach viet doi.* */
+   if(!co){
+    var xa=h.slice(Math.max(0,m.index-2000),m.index);
+    var mo=Math.max(xa.lastIndexOf('<div class="bstat'), xa.lastIndexOf('<div class="cbo '));
+    if(mo>=0){var het=xa.indexOf(">",mo);
+     var the=(het>=0)?xa.slice(mo,het+1):xa.slice(mo);
+     if(/data-tip="[^"]{10,}|title="[^"]{10,}/.test(the))co=true}}
    if(!co){var fn=(attr.match(/data-tipfn="([^"]+)"/)||[])[1],ta=(attr.match(/data-tipa="([^"]*)"/)||[])[1]||"";
     if(fn&&TIPFNS[fn]){try{co=String(TIPFNS[fn](ta.replace(/&quot;/g,'"').replace(/&amp;/g,"&").split("|"))||"").length>=15}catch(e){}}}
    if(!co)thieu.push(k+": "+m[3].trim())}});

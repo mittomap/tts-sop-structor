@@ -615,6 +615,17 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .rqbox{display:flex;flex-wrap:wrap;gap:10px}
 /* V9.27: dai chao cu chiem gan nua man hinh cho 3 dong chu + mot o tim to dung. Nay gon lai
    MOT BANG: ben trai loi chao + mot dong tom tat, ben phai o tim - cung mot hang. */
+/* ═══ BẪY ĐÃ CẮN 14/08 - CẮT CSS THEO KHOẢNG DÒNG LÀ CẮT MÙ ═══════════════════════════════
+   Ô chào lớn `.bwhero` không còn ai dùng sau khi gỡ nhánh "không nhúng" của `renderBanlam`, và
+   em định dọn nó cho sạch: cắt từ dòng `.bwhero{` tới dòng `.bwsrchhint`. Hai cái tên ấy đứng
+   gần nhau trong TRÍ NHỚ của em, nhưng trong file chúng cách nhau **49.071 ký tự** - ở giữa là
+   gần 200 lớp: toàn bộ dải thẻ (`.bstat`, `.bstats`, `.bsic`, `.bsn`, `.bsl`), cả cổng học viên
+   (`.hv*`), Trợ lý, bài hướng dẫn, bảng `.tb`, `.chip`, `.fbar`...
+   Ảnh chụp ngay sau đó cho thấy dải Bảng quản lý VỠ HOÀN TOÀN - mất khung, icon và chữ đổ dọc
+   thành một cột chữ trần. May là em chụp màn để soi việc khác chứ không phải để kiểm chỗ này.
+   Nay để nguyên khối CSS. CSS thừa vài chục dòng thì vô hại; cắt nhầm thì hỏng cả app, và bộ
+   kiểm chữ nghĩa không bắt được - phải có người nhìn mới thấy.
+   *Đừng bao giờ cắt một khoảng file bằng hai cái mốc mà mình chưa đo khoảng cách giữa chúng.* */
 .bwhero{display:flex;gap:16px;flex-wrap:wrap;align-items:center;background:linear-gradient(120deg,#0F2A4A,#1E4A7A);
  border-radius:12px;padding:14px 18px;margin-bottom:14px;color:#fff}
 .bwl{flex:1 1 300px;min-width:0}
@@ -3490,7 +3501,11 @@ var PAGES=[
 /* V9.60: bảng công giảng dạy vốn nằm trong Sổ thu học phí (một tab). Nhân sự cần đúng bảng đó
    để chốt lương mà KHÔNG được nhìn học phí, nên nó có một cửa riêng. Cùng một hàm vẽ, hai lối
    vào - không nhân đôi bảng, không nhân đôi số. */
-{k:"bangcong",g:"Quản lý",ic:"ti-clock-dollar",t:"Bảng công giảng dạy & WOW",c:"Giờ đứng lớp · buổi WOW 1-1 · ca test",ty:"custom"},
+/* V2 14/08 - RÚT TÊN CHO VỪA MỘT DÒNG TRÊN SIDEBAR. Bản trước đặt "Bảng công giảng dạy & WOW"
+   (25 ký tự) và nó bị cắt thành "Bảng công giảng dạy & W..." - mục menu phải nằm gọn một dòng,
+   luật đã ghi ở `.navitem`. Bỏ chữ "Bảng" vì nó thừa (mở ra đúng là một cái bảng), giữ đủ hai
+   vế mà anh Luân yêu cầu. *Tên trang phải vừa chỗ nó phải đứng, không chỉ vừa ý người đặt.* */
+{k:"bangcong",g:"Quản lý",ic:"ti-clock-dollar",t:"Công giảng dạy & WOW",c:"Giờ đứng lớp · buổi WOW 1-1 · ca test",ty:"custom"},
 /* V9.60: Nhân sự cần DANH SÁCH NGƯỜI. Bảng nguồn `nhanvien` vốn là trang ẩn (chỉ tới được từ
    Cài đặt), nên bộ phận Nhân sự đáp vào đó là đáp vào một trang không có mục trên menu - vào
    được nhưng không quay lại được. Mở một cửa có tên đàng hoàng, dùng lại đúng bảng đó. */
@@ -4822,7 +4837,7 @@ var THEDEF={
   ["bt_hcr","Nộp bài (HCR)","Tỷ lệ bài đã nộp trên tổng bài đã giao trong phạm vi đang xem, so với ngưỡng HCR ở Ngưỡng KPI. Chip đếm dòng nên không chia được mẫu số - đây là thứ chỉ thẻ nói được. Danh sách: chọn lớp rồi vào chế độ \"Thu bài\" để thấy bài chưa nộp."],
   ["bt_qhan","Bài quá hạn chấm","Bài học viên đã nộp mà quá ngưỡng slaHomeworkGrading_hours vẫn chưa có điểm - đo bằng ĐỒNG HỒ, khác chip \"Chờ chấm\" (chip đếm mọi bài chờ, kể cả bài vừa nộp xong). Danh sách: bấm chip \"Chờ chấm - mọi lớp\" ở thanh chế độ ngay dưới."],
   ["bt_diem","Điểm trung bình bài đã chấm","Trung bình cộng điểm của những bài đã có điểm trong phạm vi đang xem - lớp đang làm được tới đâu, chứ không phải bao nhiêu bài. Danh sách: sổ Bài tập trong trang Tra cứu, cột Điểm."]]},
- bangcong:{t:"Bảng công giảng dạy & WOW",the:[
+ bangcong:{t:"Công giảng dạy & WOW",the:[
   ["bc_nguoi","Giảng viên có buổi thiếu mốc","Đếm NGƯỜI đang vướng, không đếm buổi - vì việc phải làm là gọi từng người bổ sung mốc giờ. Danh sách: bấm chip \"Buổi thiếu mốc giờ\" ở thanh ngay dưới."],
   /* V2 13/08 - thẻ "bc_buoi" đã bỏ (trùng chip "Buổi thiếu mốc giờ"). */
   ["bc_du","Buổi đủ mốc, tính công được","Số buổi đã đủ hai mốc, chốt công được ngay. Danh sách: bảng ngay dưới, cột Giờ dạy."]]},
@@ -11414,7 +11429,19 @@ function renderChay(){
  var R=window.RUN;
  if((!R||!R.pid)&&window.RUNPID)R=runRestore();
  if(R&&R.preview&&R.q&&R.q.length)return renderRunPreview();
- if(!R||!R.pid){return renderBanlam()}
+ /* ═══ V2 14/08 - MÀN CHẠY KHÔNG CÓ AI ĐANG CHẠY THÌ DẪN VỀ ĐÚNG CHỖ CHỌN NGƯỜI ═════════════
+    Trước bản này nó trả về `renderBanlam()` ở chế độ ĐẦY ĐỦ - tức vẽ lại nguyên Trang bắt đầu
+    cũ: ô chào "Chào buổi sáng", một biển chỉ đường ghi *"Chỗ bất thường, nhịp ngày và bảng việc
+    nay gom ở Việc hôm nay"*, và một công tắc "Chạy quy trình / Bảng chặng - hành trình". Cả ba
+    đều lạc ngữ cảnh từ lúc gộp ba trang: biển chỉ đường trỏ sang chỗ mà chính màn này đang là
+    một phần của nó, còn công tắc thì trùng với công tắc ba cách xem ở trang cha.
+    Nay: một câu đầu trang nói thẳng đang thiếu gì, rồi tới đúng phần chọn người. Và nhờ vậy
+    nhánh "không nhúng" của `renderBanlam` hết chỗ gọi - gỡ được nó ở dưới.
+    *Một màn trống nên chỉ đường tới bước kế, đừng vẽ lại một trang đã không còn.* */
+ if(!R||!R.pid){
+  return pageHead("Chạy quy trình",
+   "Chưa chọn hồ sơ nào. Bấm một người bên dưới - app dắt qua từng màn theo đúng chặng người đó đang đứng.","")
+   +renderBanlam(1)}
  window.RUNPID=R.pid;   /* để lần vẽ sau và thanh địa chỉ luôn nói đúng người đang chạy */
  var J=jInfo(R.pid),C=J.C,sk=rStepKey(J);
  var qtxt=R.q?(" · hồ sơ "+(R.i+1)+"/"+R.q.length):"";
@@ -11796,8 +11823,7 @@ function myKpiHTML(){var me=find("DL01","staff_id",CURSTAFF);if(!me)return "";
    danh sách/bảng chặng (công tắc cách xem của trang cha đã ôm cả ba). "KPI của tôi" cũng lên
    trang cha - nó phải thấy được ở MỌI cách xem, không riêng cách xem này. */
 function renderBanlam(embed){
- var meId=CURSTAFF||"", meNm=myName();
- var hour=new Date().getHours();var greet=hour<11?"Chào buổi sáng":hour<14?"Chào buổi trưa":hour<18?"Chào buổi chiều":"Chào buổi tối";
+ var meId=CURSTAFF||"";
  var tasks=jTasks();
  var rsH=SCOPE();
  if(Array.isArray(rsH.bell))tasks=tasks.filter(function(t){return rsH.bell.indexOf(t.cat)>=0});
@@ -11813,37 +11839,20 @@ function renderBanlam(embed){
  var apptToday=apptL.filter(function(J){return jNF(J)>=t00}).length;
  var apptStale=apptL.length-apptToday;
  var apptN=apptL.length;
- var nextAp=null;var nowT=new Date();
- all0.forEach(function(J){var nf=jNF(J);if(nf&&nf>=nowT&&(!nextAp||nf<jNF(nextAp)))nextAp=J});
- /* Một dòng tóm tắt thay cho ba dòng: số việc · số quá hạn · hẹn kế tiếp (bấm được). */
- var apChip=nextAp?('<span class="bwap" onclick="chayQSet(\'appt\')" data-tip="lọc danh sách còn đúng các cuộc hẹn"><i class="ti ti-clock"></i>Hẹn kế: <b>'+esc((function(){var d=jNF(nextAp);var hh=("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);var td=new Date();var sameDay=d.getDate()===td.getDate()&&d.getMonth()===td.getMonth();return hh+(sameDay?" hôm nay":" "+("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2))})())+'</b> · '+esc(nextAp.name)+'</span>'):'';
- /* Ô tìm là thứ DUY NHẤT trong ô chào mà cách xem này không sống thiếu được (VH0 "Tìm kiếm
-    nhanh" của SOP nằm ở đây). Nhúng thì giữ đúng ô tìm, bỏ phần chào - trang cha đã chào rồi. */
- var h=embed?('<div class="fbar"><div class="srch" style="max-width:460px"><i class="ti ti-search"></i>'+
-   '<input data-pktim="1" placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.CHAYSRCH||"")+'" oninput="chaySrch(this.value)" autocomplete="off"></div>'+
-   '<span class="bwsrchhint" id="bwsrchhint"></span></div>'):
-  ('<div class="bwhero"><div class="bwl"><div class="bwg">'+esc(greet)+', '+esc(meNm)+'</div>'+
-  '<div class="bwsub"><span><b>'+tasks.length+'</b> việc cần xử lý</span>'+
-   /* DẤU NGĂN PHẢI ĐI LIỀN MỤC SAU NÓ. Bẫy cắn 09/08, nhìn thấy trên khổ điện thoại 390px:
-      dòng chào đọc thành *"72 việc cần xử lý · 54 quá hạn ·"* - một dấu chấm giữa **treo lơ
-      lửng ở cuối dòng**, vì mục thứ ba (Hẹn kế) rớt xuống dòng dưới còn dấu ngăn của nó thì ở
-      lại. `.bwsub` là flex-wrap, mà mỗi dấu ngăn lại là MỘT phần tử flex riêng - nên nó đứt
-      khỏi mục nó đi kèm được.
-      `_checkmat` có sẵn phép đo "dấu ngăn mồ côi" (M4) và nó xanh - vì bộ ấy cố ý chỉ đo MỘT
-      khổ màn 1440px cho rẻ. Mà lỗi này chỉ sinh ra khi chữ XUỐNG DÒNG, tức chỉ ở khổ hẹp.
-      **Đo một lỗi-do-xuống-dòng ở khổ rộng nhất là đo đúng cái trường hợp nó không thể xảy ra.**
-      Nay bọc dấu ngăn cùng mục sau nó trong một phần tử: hai thứ xuống dòng cùng nhau hoặc
-      không thứ nào xuống. */
-   (over.length?('<span class="bwit"><span class="bwdot">·</span><span class="bwover">'+over.length+' quá hạn</span></span>'):'')+
-   (apChip?('<span class="bwit"><span class="bwdot">·</span>'+apChip+'</span>'):'')+'</div>'+
-  /* V2 08/08 - BÀN LÀM VIỆC CHƯA BAO GIỜ NÓI NÓ LÀ CÁI GÌ. Ô chào có tên người và số việc, nhưng
-     không một câu nào nói trang này gom gì và đọc thế nào - người mới mở ra thấy một dải ô màu
-     rồi tự đoán. Anh Luân chốt V2: *"bàn làm việc em đổi thành: các chỉ số số cảnh báo đi, nó
-     tổng hợp những thứ bất thường ở các trang nghiệp vụ để cảnh báo, các nhân sự sẽ tự biết mình
-     cần làm gì."* Câu dưới đây nói đúng điều ấy, và `_checkkhuon` K1 canh nó từ nay. */
-  '<div class="bwctx">Mọi chỗ bất thường từ các trang nghiệp vụ của bạn gom về đây - đỏ là gấp, vàng sắp tới hạn. Bấm một ô để mở trang đẻ ra con số đó.</div></div>'+
-  '<div class="bwr"><div class="bwsearch"><i class="ti ti-search"></i><input data-pktim="1" placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.CHAYSRCH||"")+'" oninput="chaySrch(this.value)" autocomplete="off"><div class="pkres" id="bwac" style="position:absolute;top:100%;left:0;right:0;z-index:30;background:#fff;color:var(--text);text-align:left;border-radius:0 0 10px 10px;box-shadow:0 8px 24px rgba(0,0,0,.18)"></div></div>'+
-  '<span class="bwsrchhint" id="bwsrchhint"></span></div></div>'); /* V9.18b: hint phải nằm NGOÀI hộp tìm - nằm trong là chữ trắng trên nền trắng + bóp placeholder (Luân bắt lỗi) */
+ /* ═══ V2 14/08 - HÀM NÀY CHỈ CÒN MỘT CHẾ ĐỘ: NHÚNG ════════════════════════════════════════
+    Nhánh "đầy đủ" (ô chào lớn + biển chỉ đường + công tắc danh sách/bảng chặng) là phần còn lại
+    của Trang bắt đầu cũ. Sau khi ba trang gộp về Việc hôm nay, nó chỉ còn đúng một chỗ gọi tới:
+    màn Chạy quy trình lúc chưa chọn hồ sơ nào - mà chỗ ấy vừa được sửa để tự nói câu của mình.
+    Gỡ nhánh đi thay vì để nó nằm đó: mã chỉ còn bộ kiểm chạy qua là mã sống nhờ bộ kiểm, và nó
+    sẽ lặng lẽ lệch khỏi phần thật sau vài lần sửa.
+    GIỮ ô tìm - đó là màn VH0 "Tìm kiếm nhanh" của SOP, và là thứ duy nhất trong ô chào cũ mà
+    cách xem này không sống thiếu được. Câu chào, dòng tóm tắt việc và chip "Hẹn kế" thì trang
+    cha đã nói bằng cách khác (bảng việc chức danh, thẻ SLA, chip Tới hẹn ngay dưới).
+    `embed` giữ trong chữ ký vì bốn chỗ gọi đang truyền `1` - bỏ tham số là phải đi sửa cả bốn,
+    mà chúng đang đúng. */
+ var h='<div class="fbar"><div class="srch" style="max-width:460px"><i class="ti ti-search"></i>'+
+  '<input data-pktim="1" placeholder="Tìm tên, SĐT hoặc mã..." value="'+esc(window.CHAYSRCH||"")+'" oninput="chaySrch(this.value)" autocomplete="off"></div>'+
+  '<span class="bwsrchhint" id="bwsrchhint"></span></div>';
  /* V2 KHÚC 5 - DẢI CẢNH BÁO ĐẶT NGAY DƯỚI Ô CHÀO, TRÊN MỌI THỨ KHÁC.
     Anh Luân: *"bàn làm việc em đổi thành: các chỉ số số cảnh báo đi, nó tổng hợp những thứ bất
     thường ở các trang nghiệp vụ để cảnh báo, các nhân sự sẽ tự biết mình cần làm gì."*
@@ -21226,7 +21235,7 @@ function statStrip(items,key,ids){
    var _w2=(_v.length>=10 && /^[\d.,\s]+(đ|h|%|đ\/giờ)?$/.test(_v));
    return [id,'<div class="bstat ro'+(_w2?" w2":"")+'"'+(id?' data-the="'+esc(id)+'"':'')+(full?' data-tip="'+esc(full)+'"':'')+'>'+
     '<span class="bsic" style="background:'+t[3]+'18;color:'+t[3]+'"><i class="ti '+t[0]+'"></i></span>'+
-    '<div><div class="bsn">'+esc(String(t[1]))+'</div><div class="bsl">'+esc(t[2])+(t[4]?' · '+t[4]:'')+'</div></div></div>']});
+    '<div class="bstx"><div class="bsn">'+esc(String(t[1]))+'</div><div class="bsl">'+esc(t[2])+'</div>'+(t[4]?('<div class="bsp">'+t[4]+'</div>'):'')+'</div></div>']});
   THEHTML[key]=parts;
   return '<div class="bstatsw" data-thekey="'+esc(key)+'">'+theBoxIn(key)+'</div>'}
  /* Dải hàng chờ việc KHÔNG mang neo `bstats` - neo của nó là tiêu đề `bangviec`. Trước bản này
@@ -21240,7 +21249,7 @@ function statStrip(items,key,ids){
  return '<div class="bstat'+(act?'':' static')+'"'+(act?' onclick="'+act+'" data-tip="'+esc(gi?(gi+" · "+bamDiDau(act)):bamDiDau(act))+'"':(gi?' data-tip="'+esc(gi)+'" style="cursor:default"':' style="cursor:default"'))+'><span class="bsic" style="background:'+t[3]+'18;color:'+t[3]+'"><i class="ti '+t[0]+'"></i></span>'+
   /* V9.29: phần phụ chú (t[4]) là chuỗi do lập trình viên viết, không phải dữ liệu người dùng nhập,
      nên KHÔNG esc để gắn được chip bánh răng "sửa ở đây". Tên và số vẫn esc như cũ. */
-  '<div><div class="bsn">'+esc(String(t[1]))+'</div><div class="bsl">'+esc(t[2])+(t[4]?' · '+t[4]:'')+'</div></div></div>'}).join("")+'</div>'}
+  '<div class="bstx"><div class="bsn">'+esc(String(t[1]))+'</div><div class="bsl">'+esc(t[2])+'</div>'+(t[4]?('<div class="bsp">'+t[4]+'</div>'):'')+'</div></div>'}).join("")+'</div>'}
 function kpiMini(rows2){/* rows2 = [mã, tên, giá trị, đạt?, mục tiêu] */
  return '<div class="kpipanel" style="margin-bottom:16px"><div class="kpiphh">KPI & SLA của riêng người này (ngưỡng CH6)</div>'+
   rows2.map(function(r){var cls=(r[3]==null?"gray":(r[3]?"green":"red"));
@@ -23396,7 +23405,7 @@ var TOURS={
      Giảng viên nữa - `_checktour` bắt ngay), chỉ đổi neo sang thân trang.
      Luật rút ra: neo theo CHỮ chỉ chắc khi chữ ấy là duy nhất trên màn - thêm một mục menu
      trùng tên là neo lệch, mà lệch kiểu này chỉ lộ ra ở khổ điện thoại. */
-  {p:"bangcong",sel:'@man',t:"Bảng công giảng dạy & WOW",d:"Giờ đứng lớp, ca WOW 1-1 và ca test đầu vào của từng giảng viên trong tháng. Buổi nào thiếu mốc giờ vào - giờ ra thì tính công sai, phải soát trước khi chốt lương.",hint:"Xem cột giờ dạy và cột buổi thiếu mốc giờ."},
+  {p:"bangcong",sel:'@man',t:"Công giảng dạy & WOW",d:"Giờ đứng lớp, ca WOW 1-1 và ca test đầu vào của từng giảng viên trong tháng. Buổi nào thiếu mốc giờ vào - giờ ra thì tính công sai, phải soát trước khi chốt lương.",hint:"Xem cột giờ dạy và cột buổi thiếu mốc giờ."},
   {p:"giaoviec",ctx:function(){window.TKTAB="wait";window.TKF="live"},sel:'@txt:Nhận việc',t:"Việc nội bộ",d:"Việc người khác giao cho bạn nằm ở đây. Bấm Nhận là người giao biết việc đã tới tay; báo xong ngay lúc làm xong.",hint:"Xong một ngày của Nhân sự!"}]},
  tn_ketoan:{lv:"trainghiem",role:"Kế toán",t:"Một ngày của Kế toán",ic:"ti-cash",d:"5 bước - thu, đối soát, công nợ, hoàn tiền",steps:[
   {p:"thanhtoan",sel:'@txt:Ghi nhận khoản thu',t:"Thu học phí",d:"Thu tiền mặt hay chuyển khoản đều ghi ở đây, in phiếu thu ngay. Đóng theo đợt thì ghi hẹn thu đợt sau.",hint:"Bấm 'Ghi nhận khoản thu' ở đầu trang, chọn đăng ký còn nợ, nhập số tiền rồi Lưu.",chk:function(){return tourMore("thu")}},
@@ -24987,7 +24996,7 @@ function renderBangcong(){
  /* Tên cũ "Bảng công giảng dạy" nói thiếu đúng một nửa số người trong bảng (anh Luân: *"nên bổ
     sung vào đó phần của wow"*). Đội WOW không "giảng dạy" theo nghĩa đứng lớp, nên đọc tên trang
     xong không ai nghĩ công của mình nằm trong đó - dù nó đã nằm trong đó từ lâu. */
- return pageHead("Bảng công giảng dạy & WOW",
+ return pageHead("Công giảng dạy & WOW",
   "Giờ đứng lớp của giảng viên · buổi WOW 1-1 và ca test đầu vào của WOW coach - đối chiếu trước khi chốt công.","")
   +statStrip([
    /* V2 09/08 - Ô ĐẦU TIÊN TỪNG LÀ "Buổi đã dạy xong trong sổ" - SỐ TÍCH LUỸ, đọc xong không
