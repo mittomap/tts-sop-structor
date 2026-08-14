@@ -91,7 +91,6 @@ const KHONGTHE = {
      so do tren du lieu KHAC bang duoi · xep hang giua cac nhom.
      Muoi mot trang duoi day khong con the vi CA DAI cua chung chi dem dong. Trang nao co the
      thay bang mot chi so that (nhom B trong tai lieu) thi se lam sau va go khai o day. */
-  ychv:     _LYDO_TRUNGCHIP,
   tuvan:    _LYDO_TRUNGCHIP,
   ghinhan:  _LYDO_TRUNGCHIP,
   khieunai: _LYDO_TRUNGCHIP,

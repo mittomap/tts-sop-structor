@@ -2129,11 +2129,15 @@ function theSync(key){var box=document.querySelector('.bstatsw[data-thekey="'+ke
 /* Nút "Thẻ (n/N)" tách riêng ra một hàm để dùng được ở HAI chỗ: hàng riêng phía trên dải (trang
    không có hàng công cụ) và hàng công cụ cạnh nút "Cột" (mọi sổ danh sách). Một bản gốc, hai chỗ
    gọi - không chép đôi, để đừng có ngày hai cái nút cùng tên mà đếm khác nhau. */
+/* `data-thek` = dải thẻ này thuộc TRANG NÀO. Cần từ 14/08, khi trang Việc hôm nay nhận thêm
+   bảng việc theo chức danh: một trang nay có thể mang HAI dải thẻ, mà `_checkux` lại tìm chuỗi
+   "Thẻ (n/m)" ĐẦU TIÊN trên trang rồi coi đó là dải của trang - nên nó đo nhầm sang dải kia và
+   báo đỏ oan. *Hễ một thứ có thể xuất hiện hai lần trên một màn thì nó phải tự khai mình là ai.* */
 function theNutHTML(key){var parts=THEHTML[key]||[];
  var hien=0,tong=parts.length;
  parts.forEach(function(p){if(!theHidden(p[0]))hien++});
  if(!tong)return '';
- return '<button class="btn'+(hien<tong?" primary":"")+' sm" onclick="theMenuToggle(\''+esc(key)+'\')" data-tip="Chọn thẻ nào hiện trên trang này - giống nút Cột của bảng. Lựa chọn được nhớ lại và không mất khi reset dữ liệu demo."><i class="ti ti-layout-cards"></i>Thẻ ('+hien+'/'+tong+')</button>'+theMenuHTML(key)}
+ return '<button data-thek="'+esc(key)+'" class="btn'+(hien<tong?" primary":"")+' sm" onclick="theMenuToggle(\''+esc(key)+'\')" data-tip="Chọn thẻ nào hiện trên trang này - giống nút Cột của bảng. Lựa chọn được nhớ lại và không mất khi reset dữ liệu demo."><i class="ti ti-layout-cards"></i>Thẻ ('+hien+'/'+tong+')</button>'+theMenuHTML(key)}
 function theBoxIn(key){var parts=THEHTML[key]||[];
  var hien=0,tong=parts.length,body="";
  parts.forEach(function(p){if(theHidden(p[0]))return;hien++;body+=p[1]});
@@ -3716,9 +3720,15 @@ function hsThieu(){return rows("DL01").filter(hsThieuMot)}
 var BVMA={"Học viên liên hệ":"bv_ychv","Lead mới (chưa LH)":"bv_lead_new","Lead đang khai thác":"bv_lead_work","Test sắp tới":"bv_test_up","Tư vấn cần làm":"bv_tv_can","Test chờ chấm":"bv_test_wait","Test đã chấm":"bv_test_done","WOW sắp tới":"bv_wow_up","WOW có tiến bộ":"bv_wow_imp","Buổi đã hoàn thành":"bv_ses_done","Cần viết nhận xét buổi":"bv_ses_note","Bài tập chờ chấm":"bv_hw_wait","HV nguy cơ học thuật":"bv_risk_aca","Nhập học chưa xong":"bv_ob_open","Học viên nguy cơ":"bv_risk_stu","Phản hồi chờ phân loại":"bv_fb_new","Khiếu nại đang xử lý":"bv_kn_open","Chiết khấu cần duyệt":"bv_ck_duyet","Đổi lớp từ N lần":"bv_doilop2","Lead mới N ngày":"bv_mk_moi","Lead chưa ai phụ trách":"bv_mk_orph","Nguồn đang kém":"bv_mk_yeu","Khách cũ chờ chạy lại":"bv_mk_cu","Thưởng giới thiệu chưa trao":"bv_mk_thuong","Khiếu nại mức CAO":"bv_kn_high","Khiếu nại đã leo thang":"bv_kn_esc","Hoàn tiền chờ duyệt":"bv_hoan","Việc mới chờ nhận":"bv_tk_new","Đang làm":"bv_tk_doing","Quá hạn":"bv_tk_late","Chờ người giao xác nhận":"bv_tk_wait","Hồ sơ nhân sự còn thiếu":"bv_hs_thieu","Buổi thiếu mốc giờ vào/ra":"bv_gio_thieu","Buổi quá hạn nhận xét":"bv_aca_note","Buổi hôm nay chưa có giáo viên":"bv_aca_gv","Học viên đuối học thuật":"bv_aca_risk","Đơn còn nợ phí":"bv_no_phi","Phiếu thu chờ đối soát":"bv_thu_soat"};
 function bvStrip(t,bc,d,o,tour){
  if(!o.length)return "";
- /* Viết thẳng chuỗi data-tour="bangviec" chứ không ghép biến - bộ kiểm quét mã nguồn tìm
-    literal đó; ghép biến là neo TÀNG HÌNH với bộ kiểm, khai có mà máy không thấy. */
- return '<div class="sechd"'+(tour?' data-tour="bangviec"':'')+'>'+esc(t)+
+ /* Viết thẳng cả hai chuỗi literal (`data-tour="bangviec"` và `data-tour="bangduyet"`) chứ
+    không ghép biến - bộ kiểm quét mã nguồn tìm literal đó; ghép biến là neo TÀNG HÌNH với bộ
+    kiểm, khai có mà máy không thấy.
+    V2 14/08 - LỖI CÓ SẴN: hàm này NHẬN tên neo qua tham số `tour` rồi vẫn in cứng "bangviec"
+    cho mọi lời gọi, nên khối "Chờ bạn phê duyệt" (gọi với "bangduyet") cũng đeo neo của khối
+    trên. Hai khối cùng một neo trên một trang thì `tourFind` lấy cái đầu tiên - bài hướng dẫn
+    nói về bảng việc lại khoanh đúng hoặc khoanh nhầm TÙY HÊN. `_checktour` bắt được khi bảng
+    việc dời sang trang Việc hôm nay. *Nhận một tham số rồi không dùng nó là một lời khai dối.* */
+ return '<div class="sechd"'+(tour==="bangduyet"?' data-tour="bangduyet"':(tour?' data-tour="bangviec"':''))+'>'+esc(t)+
   ' <span style="font-weight:600;text-transform:none;letter-spacing:0" class="mut">· '+esc(bc)+'</span></div>'+
   '<div class="fhint" style="margin:-4px 0 8px">'+esc(d)+' Rê chuột vào một ô để biết nó đếm gì và xem danh sách ở đâu.</div>'+
   statStrip(o,"bangviec",o.map(function(x){return bvMa(x[2])}))}
@@ -5276,7 +5286,7 @@ function renderViec(){var items=bellItems();
     Nay hai khối đáng giá ấy về đây, chỗ có danh sách đầy đủ hơn. Trang bắt đầu co lại còn đúng
     phần riêng của nó: chạy quy trình cho TỪNG hồ sơ và bản đồ chặng. */
  var h=pageHead("Việc hôm nay",
-  "Bàn làm việc của bạn: chỗ bất thường cần để mắt, nhịp việc theo buổi, và mọi việc trung tâm đang nợ theo luật SLA. Muốn chạy quy trình cho từng hồ sơ thì vào Chạy quy trình & Bản đồ chặng.",
+  "Bàn làm việc của bạn: chỗ bất thường, nhịp việc theo buổi, và mọi việc đang nợ theo luật SLA.",
   "");
  h+=canhBaoHTML();   /* V9.59: nút "Bỏ lọc mức độ" bỏ đi - chip "Tất cả" ở thanh Mức độ đã làm đúng việc đó */
  /* V9.59: dải thẻ ở đây trước là dải BẤM ĐƯỢC (bấm ô nào lọc ô đó). Nay thẻ chỉ để xem - việc
@@ -5313,10 +5323,12 @@ function renderViec(){var items=bellItems();
  /* V9.99z5: nhịp ngày của chức danh đứng ngay đây - đọc "hôm nay tôi làm gì theo buổi" trước,
     rồi mới xuống hàng chờ chi tiết. Trang khác không có khối này (một việc một chỗ). */
  h+=nhipPanel();
- /* Bảng việc theo chức danh (BC9) chuyển từ Trang bắt đầu sang đây. Nó trả lời "việc của CHỨC
-    DANH tôi", còn danh sách dưới trả lời "việc của TOÀN trung tâm đang nợ" - hai câu khác nhau,
-    đứng cùng một trang thì đọc một lượt là đủ, không phải mở trang thứ hai. */
- try{h+=bangViecHTML()}catch(e){}
+ /* KHÔNG gọi `bangViecHTML()` ở đây. Bảng việc theo chức danh tự lên trang này ngay khi trang
+    đáp đổi sang `viec`: `pageHead` đã gọi `bvSau()` -> `bangViecHTML()`, mà hàm ấy tự im ở mọi
+    trang KHÔNG phải trang đáp (`if(CUR!==dap)return ""`). Em gọi thêm một lần nữa nên bảng in
+    HAI LẦN, và `_checktour` bắt qua neo `@bangviec` xuất hiện x2 - `tourFind` lấy cái đầu tiên
+    nên bài hướng dẫn khoanh đúng hay sai là tùy hên.
+    *Trước khi thêm một lời gọi, hỏi xem thứ mình muốn đã tự tới chưa.* */
  /* V9.59: lọc theo mức độ nay là một THANH LỌC đúng nghĩa, không còn nấp trong cái nút "Chỉ quá
     hạn" và trong mấy cái thẻ. Một việc - một chỗ làm. */
  var msegs=[["","Tất cả",items.length,""],["red","Quá hạn",redn,"red"],["amber","Sắp tới hạn",ambn,"amber"]];
@@ -19975,7 +19987,7 @@ var TOURS={
  tn_hocvu:{lv:"trainghiem",role:"Học vụ - CSKH",t:"Một ngày của Học vụ",ic:"ti-school",d:"12 bước - xếp lớp, cam kết, theo lớp, chăm học viên",steps:[
   /* V9.63: kênh học viên gửi yêu cầu là việc của học vụ, mà bài này chưa nói tới - anh Luân nhắc
      đúng luật đã chốt: mỗi lần đổi app phải soát lại tour và Trợ lý. */
-  {p:"ychv",sel:'@man',t:"Học viên nhắn gì cho trung tâm",d:"Học viên gửi yêu cầu từ Cổng học viên - xin nghỉ, xin học bù, hỏi lịch, báo đã chuyển khoản. Hệ thống tự chuyển tới bạn kèm hạn nhận việc; yêu cầu về tiền thì sang kế toán.",hint:"Bấm Nhận việc ở một thẻ rồi trả lời ngay trong thẻ đó."},
+  {p:"giaoviec",ctx:function(){window.TKTAB="hv";window.TKF="live"},sel:'@man',t:"Học viên nhắn gì cho trung tâm",d:"Học viên gửi yêu cầu từ Cổng học viên - xin nghỉ, xin học bù, hỏi lịch, báo đã chuyển khoản. Chúng về tab Từ học viên của Giao việc, kèm hạn nhận việc; yêu cầu về tiền thì sang kế toán.",hint:"Bấm Nhận việc ở một thẻ rồi trả lời ngay trong thẻ đó."},
   /* `ctx` đặt chip "Chờ xếp lớp" TRƯỚC khi khoanh. Bắt buộc từ 14/08: bảng chờ xếp lớp không
      còn được chép lại ở nhánh "tất cả" (anh Luân: *"đã có chip bên dưới rồi"*), nên chữ "Xếp
      vào lớp" chỉ có ở đúng chip ấy. `_checktour` bắt được ngay lượt chạy đầu sau khi gỡ -
@@ -20041,8 +20053,15 @@ var TOURS={
  tn_hotro:{lv:"trainghiem",role:"Nhóm hỗ trợ (HR, IT...)",t:"Một ngày của nhóm hỗ trợ",ic:"ti-tool",d:"3 bước - nhận việc, làm, báo xong",steps:[
   /* Bảng việc nằm ở TRANG ĐÁP, mà trang đáp của bản 5 là Trang bắt đầu còn bản 6 là Bàn làm
      việc - cắm cứng "banlam" thì sang v6 bước này trỏ vào chỗ không có neo. */
-  {p:"banlam",sel:'@bangviec',t:"Bảng việc của bạn",d:"Nhóm hỗ trợ không đụng vào phễu hay lớp học - bạn làm việc qua trang Quản lý việc giao & nhận. Bốn con số đầu trang cho biết việc mới, đang làm, quá hạn và việc chờ người giao xác nhận.",hint:"Nhìn bốn ô đầu trang."},
-  {p:"giaoviec",sel:'@txt:Nhận việc',t:"Nhận việc được giao",d:"Bấm Nhận là người giao biết việc đã tới tay bạn. Việc bắt buộc thì không từ chối được; việc thường thì từ chối phải ghi lý do.",hint:"Bấm 'Nhận việc' trên một việc mới được giao."},
+  /* V2 14/08 - hai bước này neo vào khối ĐÃ DỜI sang trang Việc hôm nay (bước 1 của đợt gộp
+     bàn làm việc). `_checktour` bắt ngay lượt chạy đầu - đúng vai của nó: dời một khối thì mọi
+     bài hướng dẫn trỏ vào khối ấy phải đi theo, không thì bài chạy tới đó là khoanh vào chỗ
+     trống mà không ai hay. */
+  {p:"viec",sel:'@bangviec',t:"Bảng việc của bạn",d:"Nhóm hỗ trợ không đụng vào phễu hay lớp học - bạn làm việc qua trang Quản lý việc giao & nhận. Bốn con số đầu trang cho biết việc mới, đang làm, quá hạn và việc chờ người giao xác nhận.",hint:"Nhìn bốn ô đầu trang."},
+  /* `ctx` khai RÕ tab, không ăn theo tab mặc định: từ 14/08 trang này có thêm tab "Từ học
+     viên", và một bài khác đặt `TKTAB="hv"` thì bước này thừa hưởng trạng thái ấy rồi tìm chữ
+     "Nhận việc" ở một tab không có nó. *Bước hướng dẫn phải tự dựng lấy chỗ đứng của mình.* */
+  {p:"giaoviec",ctx:function(){window.TKTAB="wait";window.TKF="live"},sel:'@txt:Nhận việc',t:"Nhận việc được giao",d:"Bấm Nhận là người giao biết việc đã tới tay bạn. Việc bắt buộc thì không từ chối được; việc thường thì từ chối phải ghi lý do.",hint:"Bấm 'Nhận việc' trên một việc mới được giao."},
   {p:"giaoviec",sel:'@tbar',t:"Báo xong ngay lúc làm xong",d:"Báo xong kèm ghi chú, người giao xác nhận là việc đóng. Không làm kịp thì báo lại sớm - im lặng mới là vấn đề.",hint:"Xong một ngày của nhóm hỗ trợ!"}]},
  tn_nhansu:{lv:"trainghiem",role:"Nhân sự",t:"Một ngày của Nhân sự",ic:"ti-id-badge",d:"4 bước - hồ sơ người, bảng công, việc nội bộ",steps:[
   {p:"nhansu",sel:'@man',t:"Danh sách người của trung tâm",d:"Toàn bộ nhân sự đang làm việc: chức danh, cơ sở, email đăng nhập và tình trạng. Đây là màn chính của bạn - Nhân sự không đụng vào hồ sơ học viên hay doanh thu.",hint:"Nhìn qua danh sách, để ý ai chưa có cơ sở."},
@@ -20055,7 +20074,7 @@ var TOURS={
      Luật rút ra: neo theo CHỮ chỉ chắc khi chữ ấy là duy nhất trên màn - thêm một mục menu
      trùng tên là neo lệch, mà lệch kiểu này chỉ lộ ra ở khổ điện thoại. */
   {p:"bangcong",sel:'@man',t:"Bảng công giảng dạy",d:"Giờ đứng lớp, ca WOW 1-1 và ca test đầu vào của từng giảng viên trong tháng. Buổi nào thiếu mốc giờ vào - giờ ra thì tính công sai, phải soát trước khi chốt lương.",hint:"Xem cột giờ dạy và cột buổi thiếu mốc giờ."},
-  {p:"giaoviec",sel:'@txt:Nhận việc',t:"Việc nội bộ",d:"Việc người khác giao cho bạn nằm ở đây. Bấm Nhận là người giao biết việc đã tới tay; báo xong ngay lúc làm xong.",hint:"Xong một ngày của Nhân sự!"}]},
+  {p:"giaoviec",ctx:function(){window.TKTAB="wait";window.TKF="live"},sel:'@txt:Nhận việc',t:"Việc nội bộ",d:"Việc người khác giao cho bạn nằm ở đây. Bấm Nhận là người giao biết việc đã tới tay; báo xong ngay lúc làm xong.",hint:"Xong một ngày của Nhân sự!"}]},
  tn_ketoan:{lv:"trainghiem",role:"Kế toán",t:"Một ngày của Kế toán",ic:"ti-cash",d:"5 bước - thu, đối soát, công nợ, hoàn tiền",steps:[
   {p:"thanhtoan",sel:'@txt:Ghi nhận khoản thu',t:"Thu học phí",d:"Thu tiền mặt hay chuyển khoản đều ghi ở đây, in phiếu thu ngay. Đóng theo đợt thì ghi hẹn thu đợt sau.",hint:"Bấm 'Ghi nhận khoản thu' ở đầu trang, chọn đăng ký còn nợ, nhập số tiền rồi Lưu.",chk:function(){return tourMore("thu")}},
   {p:"thanhtoan",sel:'@obcards',t:"Đối soát khoản thu",d:"Tư vấn viên thu hộ thì kế toán phải xác nhận lại. Khoản chưa xác nhận hiện chip hổ phách.",hint:"Bấm chip Chờ xác nhận, mở một khoản và bấm Xác nhận đã nhận.",chk:function(){return (window.TOURB&&rows("DL07").filter(function(x){return String(x.verified_by||"").trim()}).length>(window.TOURB.xacnhan||0))}},
@@ -20069,7 +20088,7 @@ var TOURS={
      app chưa có chỗ nào gom bất thường lại. Khúc 5 đẻ ra đúng cái chỗ ấy: dải cảnh báo gom mọi
      bất thường từ các trang nghiệp vụ, mỗi ô bấm được đi thẳng tới trang đẻ ra con số.
      Tiện thể gỡ luôn một chỗ khoanh trùng với `tn_sale 1/8` mà `_checkneo` vừa bắt. */
-  {p:"banlam",sel:'@canhbao',t:"Điểm nghẽn toàn trung tâm",d:"Dải này gom mọi chỗ bất thường từ các trang nghiệp vụ trong phạm vi của bạn - đỏ là gấp, vàng là sắp tới hạn. Mỗi ô bấm được, đi thẳng tới trang đẻ ra con số đó.",hint:"Bấm ô đỏ đầu tiên."},
+  {p:"viec",sel:'@canhbao',t:"Điểm nghẽn toàn trung tâm",d:"Dải này gom mọi chỗ bất thường từ các trang nghiệp vụ trong phạm vi của bạn - đỏ là gấp, vàng là sắp tới hạn. Mỗi ô bấm được, đi thẳng tới trang đẻ ra con số đó.",hint:"Bấm ô đỏ đầu tiên."},
   /* V2 - BƯỚC NÀY TỪNG DẠY TRÙNG. `_checkneo` bắt nó khoanh cùng chỗ với `tq_tong 5/10` ("Bản đồ
      một chặng"), và đọc lại thì đúng là trùng THẬT chứ không phải hai góc nhìn: cả hai cùng chỉ
      vào dải chặng và cùng nói "nhìn tỷ lệ giữa các ga là biết tắc ở đâu".
@@ -21002,6 +21021,20 @@ function renderGiaoviec(){
  var mine=tkScopeMine(),given=tkScopeGiven();
  var mLive=mine.filter(tkLive),mOver=mine.filter(tkOver);
  var mWait=mine.filter(function(t){return tkSt(t)==="new"});
+ /* ═══ V2 14/08 BƯỚC 3 - TRANG "HỌC VIÊN LIÊN HỆ" VỀ ĐÂY THÀNH MỘT TAB ═══════════════════════
+    Đo trước khi gộp: DL23 có 57 dòng (42 assign · 8 student_request · 4 peer · 3 support).
+    Trang Học viên liên hệ đọc đúng 8 dòng `student_request`; trang này đọc CẢ 57 và không lọc
+    `task_type` - tức **100% nội dung trang kia là tập con của trang này**, cùng thẻ, cùng nút,
+    cùng cửa ghi, mà trang kia còn thiếu nút Giao việc mới, thiếu Từ chối, thiếu tab báo cáo.
+    Ai thấy trang nào: 3 chức danh thấy cả hai · **13 chức danh chỉ thấy trang này** · 0 chức
+    danh chỉ thấy trang kia. Và 2/8 yêu cầu đang giao cho `accounting_manager` - người KHÔNG mở
+    được trang kia; với họ loại việc này trước nay không có tên trên màn.
+    *Một trang mà toàn bộ nội dung là tập con của trang khác thì nó không phải một trang, nó là
+    một BỘ LỌC - và bộ lọc ấy lại yếu hơn chính cái nó lọc.* */
+ var hvAll=[];try{hvAll=ychvList()}catch(e){hvAll=[]}
+ var hvWait=hvAll.filter(function(t){return tkSt(t)==="new"});
+ var hvQua=hvAll.filter(function(t){var a=hoursSince(t.created_time);
+  return tkSt(t)==="new"&&a!=null&&a>num(paramOf("slaTaskAccept_hours",4))});
  var gWait=given.filter(function(t){return tkSt(t)==="done"});
  var gLive=given.filter(tkLive);
  var h=pageHead("Giao việc & Phối hợp",
@@ -21033,13 +21066,26 @@ function renderGiaoviec(){
  h+=tbar(timHTML("giaoviec")+'<span class="tbgr">'+segHTML(tab,[["wait","Việc chờ nhận",mWait.length||"",mWait.length?"red":""],
    ["mine","Việc của tôi",mLive.length||"",mOver.length?"red":""],
    ["given","Tôi đã giao",gLive.length||"",gWait.length?"amber":""],
+   ["hv","Từ học viên",hvWait.length||"",hvQua.length?"red":""],
    ["report","Tổng hợp & báo cáo",null,""]],"tkTabSet('{k}')")+'</span>',
   (tab==="report"||tab==="wait")?"":segHTML(f,[["live","Đang chạy",null,""]]
    .concat(tab==="given"?[["cho","Chờ tôi xác nhận",gWait.length||"",gWait.length?"amber":""]]:[])
+   /* Hai chip SLA NHẬN VIỆC chỉ có nghĩa ở tab Từ học viên - đó là thứ duy nhất trang cũ có mà
+      trang này chưa có, nên phải mang sang cho đủ, không được để rơi. */
+   .concat(tab==="hv"?[["chuanhan","Chưa ai nhận",hvWait.length||"",hvWait.length?"red":""],
+                       ["quahannhan","Quá hạn nhận",hvQua.length||"",hvQua.length?"red":""]]:[])
    .concat([["all","Tất cả",null,""],["done","Đã xong",null,""],["huy","Đã hủy / từ chối",null,""]]),"tkFset('{k}')"));
  if(tab==="report")return h+tkReport();
- var list=(tab==="wait")?mWait:(tab==="mine")?mine:given;
- if(tab!=="wait"){
+ var list=(tab==="wait")?mWait:(tab==="mine")?mine:(tab==="hv")?hvAll:given;
+ if(tab==="hv"){
+  var _qua={};hvQua.forEach(function(x){_qua[x.task_id]=1});
+  if(f==="chuanhan")list=hvWait;
+  else if(f==="quahannhan")list=hvQua;
+  else if(f==="live")list=list.filter(tkLive);
+  else if(f==="done")list=list.filter(function(t){return tkSt(t)==="confirmed"||tkSt(t)==="done"});
+  else if(f==="huy")list=list.filter(function(t){return tkSt(t)==="cancelled"||tkSt(t)==="declined"});
+ }
+ else if(tab!=="wait"){
   if(f==="live")list=list.filter(tkLive);
   else if(f==="cho")list=list.filter(function(t){return tkSt(t)==="done"});
   else if(f==="done")list=list.filter(function(t){return tkSt(t)==="confirmed"||tkSt(t)==="done"})
@@ -24851,6 +24897,11 @@ function go(key,noHist){
     "Việc chờ nhận" của trang Quản lý việc giao & nhận. Đổi chỗ một màn thì phải để lại lối,
     không thì mai kia có một nút bấm vào mà không đi đâu cả. */
  if(key==="duyetgiao"){window.TKTAB="wait";key="giaoviec"}
+ /* V2 14/08 BƯỚC 3 - `ychv` nay là BÍ DANH, không còn là trang. Mọi lối cũ (ô cảnh báo, nhịp
+    ngày, bảng việc, link đã gửi, bài hướng dẫn) vẫn gọi `go("ychv")` và vẫn tới đúng chỗ - chỉ
+    là chỗ ấy nay nằm trong Giao việc. Giữ bí danh thay vì xoá: xoá đi thì mọi lối cũ chết câm,
+    mà chúng nhiều hơn ta nhớ. */
+ if(key==="ychv"){window.TKTAB="hv";key="giaoviec"}
  if(ARCMAP[key]){if(window.ARC!==key)window.CHANGK="";window.ARC=key;key="chang"}
  if(CSMAP[key]){window.CSTAB=CSMAP[key];key="cskh"}
  if(HTMAP[key]){window.HTTAB=HTMAP[key];key="hoctap"}
@@ -25060,7 +25111,7 @@ var NAVTREE=[
     thì nó nằm trong một nhóm ĐANG GẬP - mở app không thấy gì. Mà nó vốn KHÔNG thuộc chặng nào:
     học viên liên hệ được ở bất kỳ chặng nào, và đó là việc phải xử trong ngày. Chỗ của nó là
     nhóm Làm việc, cạnh Việc hôm nay và Giao việc. */
- {g:"Làm việc",items:["banlam","viec","ychv","giaoviec"]}, /* V9.18: hanhtrinh gộp vào banlam (go() tự remap) */
+ {g:"Làm việc",items:["viec","banlam","giaoviec"]}, /* V9.18: hanhtrinh gộp vào banlam (go() tự remap) */
  /* V9.29n (anh Luân): "Chặng 1" -> "C1". Tên nhóm nay SINH TỪ ARCS (arcGrpName) chứ không gõ tay:
     trước đây số chặng và tên chặng nằm cả ở ARCS lẫn ở đây, đổi một chỗ là hai chỗ nói khác nhau. */
  {g:arcGrpName("changA"),arc:"changA",items:["changA","nhaplead","test","tuvan","thanhtoan","reup"]},

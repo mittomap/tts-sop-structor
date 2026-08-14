@@ -38,6 +38,9 @@ const DUOC_MO_COI = {
   duyet:     "hub V1 gom bốn hàng chờ - nhịp ngày và Việc hôm nay dẫn tới; bốn hàng chờ con đều đứng trên menu",
   khac:      "hub V1, nay là bí danh",
   hanhtrinh: "bản đồ hành trình - vào từ Bàn làm việc và từ hồ sơ 360",
+  ychv:      "Học viên liên hệ nay là BÍ DANH (14/08): `go('ychv')` đưa sang tab 'Từ học viên' của "+
+             "Giao việc. Đo được 100% nội dung của nó là tập con của Giao việc, mà nó lại thiếu "+
+             "nút Giao việc mới / Từ chối / tab báo cáo. Giữ khoá trang để mọi lối cũ không chết.",
 };
 
 /* Tập trang nghiệp vụ, tính từ TRẠNG THÁI THẬT của app đang nạp (truyền `global` vào).

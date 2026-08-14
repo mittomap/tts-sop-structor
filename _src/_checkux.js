@@ -929,12 +929,16 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
   var k="viec",id=THEDEF[k].the[0][0],tong=THEDEF[k].the.length;
   CUR=k;var truoc="";try{truoc=RENDER[k]()}catch(e){}
   var coTruoc=truoc.indexOf('data-the="'+id+'"')>=0;
-  var demTruoc=/Thẻ \((\d+)\/(\d+)\)/.exec(truoc);
+  /* Hoi DUNG dai the cua trang nay (`data-thek`), khong lay chuoi "The (n/m)" dau tien: tu
+     14/08 trang Viec hom nay mang HAI dai the (dai cua no + bang viec theo chuc danh), lay cai
+     dau tien la do nham dai kia. */
+  var reDem=new RegExp('data-thek="'+k+'"[^>]*>[\\s\\S]{0,400}?Thẻ \\((\\d+)\\/(\\d+)\\)');
+  var demTruoc=reDem.exec(truoc);
   DATA.config=DATA.config||{};DATA.config.theHide=DATA.config.theHide||{};
   DATA.config.theHide[id]=1;
   var sau="";try{sau=RENDER[k]()}catch(e){}
   var coSau=sau.indexOf('data-the="'+id+'"')>=0;
-  var demSau=/Thẻ \((\d+)\/(\d+)\)/.exec(sau);
+  var demSau=reDem.exec(sau);
   delete DATA.config.theHide[id];
   t("truoc khi tat: the co mat va nut dem du "+tong, coTruoc&&demTruoc&&+demTruoc[1]===tong&&+demTruoc[2]===tong);
   t("tat mot the thi the do BIEN MAT khoi trang that", coTruoc&&!coSau);
@@ -1094,6 +1098,8 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
    "van co o xo chon nhanh lop khac, nen vao roi khong bi ket o mot lop. "+
    "(14/08: nay CO ca muc menu rieng - no duoc khai la man lam viec cua chang 2 ma khong co loi "+
    "vao tren sidebar. Dong khai nay giu lai vi trang van con nhieu cua mo tu cho khac.)",
+  ychv:"Hoc vien lien he - tu 14/08 la BI DANH, `go('ychv')` remap sang tab 'Tu hoc vien' cua "+
+   "Giao viec. Giu khoa trang de moi loi cu (o canh bao, nhip ngay, bang viec, link da gui) khong chet.",
   diemdanh:"diem danh MOT buoi cua MOT lop - mo tu nut 'Diem danh lop nay' o Van hanh lop va tu "+
    "the buoi hoc. No luon di kem mot lop cu the (window.DDCLASS), khong co nghia khi dung mot minh, "+
    "nen khong dat muc menu rieng.",
