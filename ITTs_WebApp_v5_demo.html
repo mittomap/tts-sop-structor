@@ -2862,7 +2862,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>8cc309</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>1cf93a</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -11712,8 +11712,13 @@ function ychvList(){return srows("DL23").filter(function(t){return isc(t.task_ty
 function ychvCho(){return ychvList().filter(function(t){return isc(t.task_status,"new")}).length}
 function renderYcHV(){
  var h0=nvHead("ychv");
+ /* Thứ tự: chưa ai nhận lên đầu, việc ĐÃ ĐÓNG (xong / hủy / từ chối) chìm xuống đáy, còn lại
+    xếp theo mới nhất. Trước đây chỉ tách "new" với "phần còn lại", nên một việc đã hủy từ tuần
+    trước vẫn có thể nằm trên một việc đang làm dở. */
+ function _ycHang(t){if(isc(t.task_status,"new"))return 0;
+  if(isc(t.task_status,"done","confirmed","cancelled","declined"))return 2;return 1}
  var Lall=ychvList().slice().sort(function(a,b){
-  var na=isc(a.task_status,"new")?0:1,nb=isc(b.task_status,"new")?0:1;if(na!==nb)return na-nb;
+  var na=_ycHang(a),nb=_ycHang(b);if(na!==nb)return na-nb;
   return (pvnd(b.created_time)||0)-(pvnd(a.created_time)||0)});
  var L=Lall;
  var _ycMoi=L.filter(function(x){return isc(x.task_status,"new")}).length;
@@ -11738,13 +11743,30 @@ function renderYcHV(){
       tưởng đã lọc. `_checkkhuon` đo trên chuỗi HTML nên chip giả vẫn qua được thước; luật này
       phải giữ bằng tay và bằng mắt người viết. */
    var qua={};_ycQua.forEach(function(x){qua[x.task_id]=1});
+   /* ═══ V2 14/08 - VIỆC ĐÃ HỦY KHÔNG CÒN BỊ ĐẾM LÀ "ĐANG XỬ LÝ" ═══════════════════════════
+      Anh Luân hỏi: *"bấm vào hủy (vì đã hướng dẫn học viên), hủy rồi thì task hủy nằm ở đâu"*.
+      Đo thật (chạy `tkCancelRun` rồi hỏi lại): việc vẫn nằm nguyên trên trang này - đúng, không
+      xoá là đúng, phải giữ được vết. Nhưng nó rơi vào chip "Đang xử lý", vì chip ấy khai là
+      *"khác new"* - một định nghĩa theo lối LOẠI TRỪ, nên hễ có thêm một trạng thái mới nào thì
+      nó tự động hút vào. Kết quả: app đếm một việc đã đóng là việc đang chạy, và người phụ
+      trách nhìn con số ấy tưởng còn nợ.
+      Nay ba trạng thái cuối đời có chip riêng, và mỗi chip hỏi ĐÚNG trạng thái của nó thay vì
+      hỏi "không phải cái kia". *Một bộ lọc khai bằng phép trừ thì mọi thứ chưa ai nghĩ tới đều
+      rơi vào nó.* */
+   var _dang=Lall.filter(function(x){return isc(x.task_status,"accepted")});
+   var _xong=Lall.filter(function(x){return isc(x.task_status,"done","confirmed")});
+   var _huy=Lall.filter(function(x){return isc(x.task_status,"cancelled","declined")});
    if(_ycF==="moi")L=Lall.filter(function(x){return isc(x.task_status,"new")});
    else if(_ycF==="quahan")L=Lall.filter(function(x){return qua[x.task_id]});
-   else if(_ycF==="dangxuly")L=Lall.filter(function(x){return !isc(x.task_status,"new")});
+   else if(_ycF==="dangxuly")L=_dang;
+   else if(_ycF==="xong")L=_xong;
+   else if(_ycF==="huy")L=_huy;
    return filterBar("ychv",_ycF,[["all","Tất cả",Lall.length],
     ["moi","Chưa ai nhận",_ycMoi,_ycMoi?"red":""],
     ["quahan","Quá hạn nhận",_ycQua.length,_ycQua.length?"red":""],
-    ["dangxuly","Đang xử lý",Lall.length-_ycMoi]],L.length)})()+
+    ["dangxuly","Đang xử lý",_dang.length],
+    ["xong","Đã xong",_xong.length,_xong.length?"green":""],
+    ["huy","Đã hủy / từ chối",_huy.length]],L.length)})()+
   '<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>'+
   /* V2 08/08 - 184 ký tự, quá trần 150. Cùng lý do với trang GV dự phòng: trang này từng khai
      `hide:1` nên chưa bao giờ bị soi. Phần "chuyển cho ai" vào chú thích rê chuột. */
