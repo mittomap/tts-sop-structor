@@ -8232,7 +8232,7 @@ function renderChay(){
   if(J.k==="learning"){
    var _lopHV=(J.C.obMain&&String(J.C.obMain.class_id||""))||"";
    if(_lopHV){var _lopR=find("DL10","class_id",_lopHV);
-    h+='<button class="btn primary" onclick="openLop(\''+esc(_lopHV)+'\')" data-tip="Mở Bảng lớp: sĩ số, chuyên cần, bài tập, buổi học, giáo viên"><i class="ti ti-users-group"></i>Lớp '+esc((_lopR&&_lopR.class_name)||_lopHV)+'</button>'}
+    h+='<div class="rfcls">'+'<button class="btn primary" onclick="openLop(\''+esc(_lopHV)+'\')" data-tip="Mở Bảng lớp: sĩ số, chuyên cần, bài tập, buổi học, giáo viên"><i class="ti ti-users-group"></i>Lớp '+esc((_lopR&&_lopR.class_name)||_lopHV)+'</button></div>'}
    h+='<div class="rfg">'+'<button class="btn" onclick="runWow(\''+esc(R.pid)+'\')"><i class="ti ti-star"></i>Đặt WOW</button><button class="btn" onclick="runReviewOne(\''+esc(R.pid)+'\')"><i class="ti ti-clipboard-check"></i>Gửi khảo sát</button><button class="btn" onclick="runFeedbackOne(\''+esc(R.pid)+'\')"><i class="ti ti-message-plus"></i>Ghi phản hồi</button><button class="btn" onclick="runComplaintOne(\''+esc(R.pid)+'\')"><i class="ti ti-alert-triangle"></i>Khiếu nại</button><button class="btn" onclick="runDiemdanhClass(\''+esc(R.pid)+'\')"><i class="ti ti-checkbox"></i>Điểm danh lớp</button></div><div class="rfg"><button class="btn" onclick="runFlagRisk()"><i class="ti ti-user-exclamation"></i>Báo nguy cơ</button><button class="btn danger" onclick="runDropout()"><i class="ti ti-player-pause"></i>HV dừng học</button></div>'}
   /* Cum CUOI: "xong nguoi nay roi" - khac loai han voi may nut phia truoc ("lam gi do voi
      nguoi nay"), nen no bi day sang han mep phai thay vi dung lan trong hang. */
