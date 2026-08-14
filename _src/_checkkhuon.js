@@ -280,6 +280,25 @@ if (thieu.hub.length)  do_.push("K6 CON DINH TOI HUB - trang nghiep vu van ve th
  if(thieuCau.length)do_.push("K3b the khong noi duoc tim o dau / tinh the nao: "+thieuCau.length+
    " - "+thieuCau.slice(0,6).join(", ")+" => them cau chi duong vao cot mo ta cua THEDEF");
 })();
+/* ═══ K6 · SO CANG NANG CANG PHAI NHIEU TRUC LOC (14/08) ═══════════════════════════════════
+   Anh Luan: *"co the no thieu cot, thieu bo loc cung nen"*. Do bang chinh `fltAxes()` (KHONG doc
+   bang khai `FLTDEF` - lan dau em doc bang khai roi bao 16 so thieu loc, so that la 3; `fltAxes`
+   con gop them GUONG cua trang nghiep vu cung bang va truc TU SINH tu cot dang hien).
+   Nguong theo so dong: so nao tren 100 dong ma chi co <=2 truc loc thi nguoi dung khong co cach
+   nao thu hep - `dsbuoihoc` 609 dong, `dsbaitap` 384 dong deu tung roi vao canh do.
+   *Mot so tra cuu khong loc duoc thi no khong phai so, no la mot dong giay.* */
+(function(){
+ var ngheo=[];
+ try{Object.keys(LISTCFG).forEach(function(k){
+  var n=0;try{n=fltAxes(k).length}catch(e){n=0}
+  var d=0;try{d=(rows(LISTCFG[k].code)||[]).length}catch(e){}
+  /* Chi doi voi SO doc ca bang (`ty==="list"`). Trang lam viec theo mot lop/mot buoi thi so dong
+     cua bang DL khong phai so dong tren man - doi no nhieu truc loc la doi sai cho. */
+  var laSo=false;try{laSo=!!(PBK[k]&&PBK[k].ty==="list")}catch(e){}
+  if(laSo&&d>100&&n<=2)ngheo.push(k+" ("+d+" dong, "+n+" truc)")})}catch(e){ngheo.push("loi doc: "+e.message)}
+ if(ngheo.length)do_.push("K6 so nang ma ngheo truc loc: "+ngheo.join(" · ")+
+   " => khai FLTDEF cho trang nghiep vu cung bang (so tu muon qua FLTGUONG)");
+})();
 if (thieu.the.length > TRAN_THIEU_THE) do_.push("K3 thieu dai the: " + thieu.the.length + " trang, qua tran " + TRAN_THIEU_THE + " - " + thieu.the.slice(0,5).join(", "));
 if (thieu.loc.length > TRAN_THIEU_LOC) do_.push("K4 thieu chip loc: " + thieu.loc.length + " trang, qua tran " + TRAN_THIEU_LOC + " - " + thieu.loc.join(", "));
 if (thieu.nut.length > TRAN_THIEU_NUT) do_.push("K2 thieu nut hanh dong: " + thieu.nut.length + " trang, qua tran " + TRAN_THIEU_NUT + " - " + thieu.nut.join(" | "));

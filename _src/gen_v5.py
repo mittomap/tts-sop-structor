@@ -3271,7 +3271,16 @@ cancel_reason:"enum_cancel_reason"}
 
 var PAGES=[
 /* ===== V5.2 - trang chủ Bàn làm việc ===== */
-{k:"banlam",g:"Vận hành",ic:"ti-home",t:"Trang bắt đầu",c:"Việc hôm nay + bảng chặng hành trình",ty:"custom"},
+/* ═══ V2 14/08 - ĐỔI TÊN, KHÔNG CÒN LÀ "TRANG BẮT ĐẦU" (anh Luân: *"ủa em để lại cả 2 trang
+   việc hôm nay và trang bắt đầu hả"*) ════════════════════════════════════════════════════════
+   Có, và câu hỏi đúng chỗ. Đợt gộp chiều nay đã lấy hết phần TRÙNG ra khỏi trang này (nhịp ngày,
+   "Cần chú ý", bảng việc theo chức danh đều sang Việc hôm nay), nhưng em để nguyên cái TÊN -
+   nên nó vẫn tự xưng là trang chủ thứ hai, vẫn đeo biểu tượng ngôi nhà, và vẫn không phải trang
+   đáp của ai. Đo lại nội dung còn lại: đúng hai thứ, cả hai đều là việc riêng không trang nào
+   khác làm - chạy quy trình cho TỪNG hồ sơ theo chặng người đó đang đứng (1.475 hồ sơ), và bản
+   đồ chặng. Giữ chức năng, bỏ lời hứa sai: tên và biểu tượng nay nói đúng việc nó làm.
+   *Hai trang khác việc thì được phép cùng tồn tại - nhưng không được phép cùng tự xưng là nhà.* */
+{k:"banlam",g:"Vận hành",ic:"ti-player-play",t:"Chạy quy trình & Bản đồ chặng",c:"Dắt từng hồ sơ qua đúng chặng, hoặc xem cả hành trình trên một bảng",ty:"custom"},
 {k:"ban",g:"Vận hành",ic:"ti-focus-2",t:"Bàn làm việc",c:"Mở một khách, học viên hay lớp là thấy trọn việc của bạn với họ",ty:"custom"},
 /* V9.99u (anh Luân 05/08): *"Giao việc, e đổi thành: Quản lý việc giao & nhận là xong"* - tên
    cũ chỉ nói một nửa việc trang này làm (giao đi), trong khi nửa còn lại (nhận về, chờ nhận,
@@ -4280,7 +4289,25 @@ hocvien:{code:"DL09",filt:"student_status",ro:1,sub:"Học viên (DL09) - lọc 
      ["vangnhieu","Vắng nhiều",function(s){var A=riskAuto(s.student_id)||{};
        return num(A.abs)>=num(paramOf("thresholdAtRisk_absences",2))}]],
  act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"student_id"}],
- cols:[["student_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["student_status","Trạng thái","chip"],["attendance_progress_status","Chuyên cần","chip"],["academic_progress_status","Học thuật","chip"],["attendance_risk_reason","Lý do CC","enum"],["academic_risk_reason","Lý do HT","enum"],["__vang","Vắng (buổi)","calcso"],["__thieubai","Thiếu bài","calcso"],["last_learning_activity_time","Hoạt động cuối","lau"],["wow_quota_remaining","WOW còn"]]},
+ cols:[["student_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["student_status","Trạng thái","chip"],["attendance_progress_status","Chuyên cần","chip"],["academic_progress_status","Học thuật","chip"],["attendance_risk_reason","Lý do CC","enum"],["academic_risk_reason","Lý do HT","enum"],["__vang","Vắng (buổi)","calcso"],["__thieubai","Thiếu bài","calcso"],["last_learning_activity_time","Hoạt động cuối","lau"],["wow_quota_remaining","WOW còn"],
+   /* ═══ V2 14/08 - MƯỜI HAI CỘT HỒ SƠ, MẶC ĐỊNH ẨN (anh Luân: *"có thể nó thiếu cột"*) ══════
+      Đo bằng máy: DL09 có 40 cột, sổ hiện 12, và **18 cột không thấy ở CẢ bảng lẫn hồ sơ 360**.
+      Trong đó có `emergency_contact_phone` và `emergency_contact_relation` - đúng chỗ CLAUDE.md
+      ghi là đã cắn một lần: *"hồ sơ phụ huynh bị xếp nhầm là việc phòng ban khác trong khi SOP
+      có mô tả (DL09 có sẵn ba cột emergency_contact_* từ đầu)"*. Cột `emergency_contact_name`
+      đã hiện ở đâu đó, hai cột kia thì không - tức số điện thoại gọi khi khẩn cấp KHÔNG CÓ CHỖ
+      NÀO ĐỌC ĐƯỢC. Đây là LUẬT CỨNG SỐ 0: SOP mô tả, app có chỗ lưu, mà người dùng không thấy.
+      Khai đủ ở đây, mặc định ẨN (ai cần thì bật ở nút "Cột") - hiện hết 24 cột thì bảng không
+      đọc được, mà giấu hẳn thì bằng không có. Sáu cột máy móc nội bộ (`next_action`,
+      `contact_primary`, `payer_side`, `first_enrollment_id`, `risk_ignore_until`,
+      `risk_ignore_reason`) CỐ Ý không khai: chúng là bánh răng của app, không phải thông tin
+      người dùng đọc - `risk_ignore_*` đã có màn riêng ở chỗ tạm bỏ qua nguy cơ. */
+   ["email","Email"],["dob","Ngày sinh","date"],["gender","Giới tính","enum"],
+   ["student_type","Loại học viên","enum"],["address","Địa chỉ"],
+   ["emergency_contact_phone","SĐT liên hệ khẩn"],["emergency_contact_relation","Quan hệ với HV","enum"],
+   ["branch","Cơ sở","enum"],["joined_at","Ngày vào học","date"],
+   ["pause_until","Tạm dừng tới","date"],["learning_followup_note","Ghi chú theo dõi học"],
+   ["notes","Ghi chú"]]},
 lop:{code:"DL10",
  /* Đọc thẳng trạng thái lớp - cùng thứ chip lọc ngay dưới đang lọc. */
  /* ═══ 13/08 - THIẾU CHIP LỌC 1-1 / NHÓM (anh Luân, kèm ảnh sổ Lớp học: *"điển hình của thiếu
@@ -4514,7 +4541,12 @@ var HIDECOL={};
    ra ngoài danh sách, hiện lù lù. Nay thành LUẬT: cột nào là mã thì mặc định ẩn - hết đuôi _id,
    _code, hoặc chính là cột khoá của bảng. Cột *_id_name là TÊN người/lớp, không phải mã - vẫn hiện.
    Ai cần mã thì bật lại ở nút "Cột" trên thanh công cụ. */
-var DEFHIDE={phone_number:1,phone:1,contact_count:1,assigned_to_name:1};
+var DEFHIDE={phone_number:1,phone:1,contact_count:1,assigned_to_name:1,
+ /* 14/08 - 12 cột hồ sơ vừa khai thêm cho sổ Học viên: có mặt trong nút "Cột" để ai cần thì bật,
+    nhưng mặc định ẩn để bảng vẫn đọc được ở bề ngang bình thường. */
+ email:1,dob:1,gender:1,student_type:1,address:1,emergency_contact_phone:1,
+ emergency_contact_relation:1,branch:1,joined_at:1,pause_until:1,
+ learning_followup_note:1,notes:1};
 function laCotMa(ck){ck=String(ck||"");
  if(/_id_name$/.test(ck))return false;
  return /_id$/.test(ck)||/_code$/.test(ck)||/^ma_/.test(ck)}
@@ -5123,9 +5155,35 @@ var FLTDEF={
   fxEnum("learning_mode_supported","Hình thức hỗ trợ")],
  giaoviec:[fxEnum("task_status","Trạng thái việc"),fxEnum("task_type","Loại việc"),fxEnum("priority","Độ ưu tiên"),
   fxStaff("assignee_id","Người nhận"),fxStaff("assigner_id","Người giao"),
-  fxDate("due_time","Hạn hoàn thành"),fxDate("created_time","Ngày giao")]};
+  fxDate("due_time","Hạn hoàn thành"),fxDate("created_time","Ngày giao")],
+ /* ═══ V2 14/08 - HAI SỔ NẶNG NHẤT MÀ NGHÈO TRỤC LỌC NHẤT (anh Luân: *"có thể nó thiếu cột,
+    thiếu bộ lọc cũng nên"*) ══════════════════════════════════════════════════════════════════
+    Đo bằng chính `fltAxes()`: chỉ **3/29 sổ có ≤2 trục lọc**, và cả ba đều thuộc hai bảng này -
+    `dsbuoihoc` **609 dòng** với 2 trục, `baitap`/`dsbaitap` **384 dòng** với 2 trục.
+    Vì sao nghèo: `fltAxes` gộp ba nguồn - khai tay `FLTDEF`, gương của trang nghiệp vụ cùng
+    bảng (`FLTGUONG`), rồi tự sinh từ cột đang hiện. Hai trang `buoihoc` và `baitap` chưa bao
+    giờ có dòng khai tay, nên sổ tra cứu của chúng KHÔNG CÓ GƯƠNG ĐỂ MƯỢN và rơi hết xuống lưới
+    an toàn - mà lưới ấy chỉ đọc được 6 cột đang hiện.
+    Khai ở TRANG NGHIỆP VỤ chứ không khai ở sổ: `FLTGUONG` đã nối `dsbuoihoc->buoihoc` và
+    `dsbaitap->baitap` từ trước, nên khai một chỗ là cả hai cùng giàu lên. */
+ buoihoc:[fxEnum("session_status","Trạng thái buổi"),fxEnum("session_type","Loại buổi"),
+  fxStaff("teacher_id","Giáo viên dạy"),fxDate("session_date","Ngày học"),
+  fxEnum("has_teacher_note","Đã ghi nhận xét"),fxEnum("teacher_note_within_sla","Nhận xét kịp hạn"),
+  fxDate("teacher_note_completed_at","Ngày ghi nhận xét")],
+ /* Khai duoi ten SO `dsbaitap`, KHONG duoi ten trang `baitap`: `baitap` la trang lam viec theo
+    MOT lop + MOT buoi (co hai o chon rieng), nen mot bo loc sau tren toan bang se da nhau voi
+    hai o ay - `_check17` bat dung: no doi trang co khai truc loc thi phai co thanh loc that.
+    So `dsbaitap` moi la cho doc ca 384 dong. *Truc loc thuoc ve cho NHIN CA BANG, khong thuoc
+    ve cho dang dung mot buoi.* */
+ dsbaitap:[fxEnum("homework_status","Trạng thái bài"),fxEnum("skill","Kỹ năng"),
+  fxStaff("teacher_id","Giáo viên chấm"),fxDate("homework_due_date","Hạn nộp"),
+  fxDate("homework_submitted_time","Ngày nộp"),fxEnum("is_late","Nộp trễ"),
+  fxEnum("graded_within_48h","Chấm kịp hạn"),fxEnum("score_type","Loại điểm")]};
 /* bảng nguồn của mỗi trang - trang không nằm trong LISTCFG thì khai ở đây */
-var FLTSRC={giaoviec:"DL23",ghinhan:"DL16",review:"DL15"};
+/* 14/08 - `buoihoc` va `baitap` la trang TU VE (khong qua renderList) nen khong co `code` de
+   `fltCode` doc. Khai bang nguon o day thi truc loc vua khai moi tro dung cot that, va so tra
+   cuu cung bang moi muon duoc qua `FLTGUONG`. */
+var FLTSRC={giaoviec:"DL23",ghinhan:"DL16",review:"DL15",buoihoc:"DL11"};
 function fltCode(pg){return FLTSRC[pg]||((LISTCFG[pg]||{}).code)||""}
 /* V9.64 - TRỤC LỌC TỰ SINH TỪ CHÍNH CÁC CỘT ĐANG HIỆN.
    Luật: cột nào người dùng đang NHÌN THẤY và nó là trạng thái/phân loại (enum, chip) hoặc là mốc
@@ -27894,7 +27952,7 @@ var NAVTREE=[
     `baocao` rời nhóm "Điều hành" về đây, đứng ngay dưới Trang bắt đầu. Rời HẲN chứ không chép:
     một trang nằm ở hai nhóm thì bấm một mục là hai mục cùng sáng - đúng lỗi `_check11` bắt được
     sáng nay khi em cho `banglop` lên menu trong lúc `lop` đã là cha nó. */
- {g:"Làm việc",items:["viec","banlam","baocao","giaoviec"]}, /* V9.18: hanhtrinh gộp vào banlam (go() tự remap) */
+ {g:"Làm việc",items:["viec","giaoviec","banlam","baocao"]}, /* V9.18: hanhtrinh gộp vào banlam (go() tự remap) */
  /* V9.29n (anh Luân): "Chặng 1" -> "C1". Tên nhóm nay SINH TỪ ARCS (arcGrpName) chứ không gõ tay:
     trước đây số chặng và tên chặng nằm cả ở ARCS lẫn ở đây, đổi một chỗ là hai chỗ nói khác nhau. */
  {g:arcGrpName("changA"),arc:"changA",items:["changA","nhaplead","test","tuvan","thanhtoan","reup"]},
