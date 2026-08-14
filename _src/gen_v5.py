@@ -4681,6 +4681,15 @@ function cell(r,col,sheet){var k=col[0],ty=col[2],v=r[k];
  if(ty==="enum")return esc(elabel(v))||"<span class=mut>-</span>";
  if(ty==="chip"){if(v==null||v==="")return"<span class=mut>-</span>";return '<span class="chip '+stCls(v)+'">'+esc(elabel(v))+'</span>'}
  if(ty==="money")return v?money(v):"<span class=mut>-</span>";
+ /* `date` - MỘT NGÀY, không phải một mốc giờ. Ba cột hồ sơ học viên (ngày sinh, ngày vào học,
+    tạm dừng tới) khai kiểu này từ sáng nay mà `cell()` chưa có nhánh, nên chúng rơi xuống nhánh
+    chung và in ra nguyên chuỗi thô trong dữ liệu. `_checkaudit` bắt đúng: *mọi kiểu ô khai trong
+    bảng đều phải được `cell()` xử lý* - khai một kiểu mà không ai đọc thì kiểu ấy chỉ là chú
+    thích cho người viết mã, người dùng không nhận được gì.
+    Khác `lau` ở chỗ: `lau` đọc thành "3 ngày trước" vì nó đo ĐỘ CŨ; ngày sinh thì phải là ngày. */
+ if(ty==="date"){if(v==null||String(v).trim()==="")return "<span class=mut>-</span>";
+  var _d=pvnd(v);if(!_d)return esc(String(v));
+  return '<span style="font-variant-numeric:tabular-nums">'+("0"+_d.getDate()).slice(-2)+"/"+("0"+(_d.getMonth()+1)).slice(-2)+"/"+_d.getFullYear()+'</span>'}
  /* V9.40: cột TÍNH - không đọc một ô nào của dòng, mà đếm từ bảng khác. Dùng cho "khóa này bán
     được bao nhiêu đơn" - con số quan trọng nhất của một dòng danh mục sản phẩm mà bảng gốc
     không có. Khóa 0 đơn tô đỏ để nó không trông giống khóa đang bán chạy. */
@@ -18728,7 +18737,10 @@ function renderBanWow(){
   '<div class="mini">'+(s.noshow?'<span class="chip red">Học viên không đến</span>':
    (s.done?(s.note?'<span class="chip green">Đã dạy · đã ghi nội dung</span>':
      (s.overdue?'<span class="chip red">Đã dạy · QUÁ HẠN ghi nội dung</span>':'<span class="chip amber">Đã dạy · chưa ghi nội dung</span>')):
-    (s.confirmed?'<span class="chip blue">Đã xác nhận</span>':'<span class="chip amber">Chờ xác nhận</span>')))+'</div></div><div class="pbody">';
+    /* Màu chip phải hỏi `stCls` chứ không tự chọn: cùng một trạng thái mà màn này tô xanh dương,
+       màn kia tô xanh lá thì người dùng học màu ở chỗ này rồi đọc sai ở chỗ kia. `_checkaudit`
+       canh đúng chuyện đó và bắt được ô này (tô blue trong khi stCls nói green). */
+    (s.confirmed?'<span class="chip '+stCls("confirmed")+'">Đã xác nhận</span>':'<span class="chip amber">Chờ xác nhận</span>')))+'</div></div><div class="pbody">';
  h+=stepBar([["Đặt buổi",s.booked],["Xác nhận",s.confirmed],["Đã dạy",s.done],["Ghi nội dung",s.note]]);
  h+=ctxRows([["Học viên",nguoiLnk(w.student_id,w.student_id_name)],
   ["Ngày giờ",esc(w.wow_session_date||"-")],
@@ -24704,7 +24716,12 @@ function renderCong(){
   h+='<div class="panel"><div class="ph"><b><i class="ti ti-clock-dollar" style="margin-right:6px"></i>Đơn giá đang áp</b>'+
    '<span class="mut" style="font-size:11.5px">mức mặc định của cả đội · ai có mức riêng thì lấy mức riêng</span>'+
    '<div class="mini"><button class="pill" onclick="window.SETTAB=\'giagio\';go(\'settings\')"><i class="ti ti-edit"></i>Sửa đơn giá</button></div></div>'+
-   '<div class="tbwrap"><table class="dt"><thead><tr><th>Loại ngày</th>'+
+   /* `table.tb` chứ không `table.dt`: `.dt` là bảng DỮ LIỆU - mỗi dòng là một bản ghi bấm vào
+      mở ra được, và `_checkbam` bấm thử từng dòng của mọi `.dt` rồi bắt lỗi dòng nào bấm không
+      có gì xảy ra. Bảng giá thì mỗi dòng là một MỨC GIÁ, không phải bản ghi; sửa giá đi cửa
+      Cài đặt. Dùng đúng lớp bảng là nói đúng với người dùng lẫn với bộ kiểm rằng dòng này không
+      bấm được. *Chọn lớp CSS theo bản chất của dữ liệu, không theo dáng mình muốn.* */
+   '<div class="tbwrap"><table class="tb"><thead><tr><th>Loại ngày</th>'+
    SHIFTK.map(function(k){return '<th>'+esc(k[1])+'</th>'}).join("")+'</tr></thead><tbody>';
   DAYK.forEach(function(d){
    h+='<tr><td><b>'+esc(d[1])+'</b></td>'+SHIFTK.map(function(k){
@@ -24713,8 +24730,9 @@ function renderCong(){
      ?('<b>'+vnd(v)+'</b><span class="mut" style="font-size:11px">/giờ</span>')
      :('<span class="mut" data-tip="Ca này chưa khai mức mặc định - đang lấy tham số chung">'+vnd(num(paramOf("teacherPayPerHour",180000)))+'/giờ · chung</span>'))+'</td>'}).join("")+'</tr>'});
   h+='</tbody></table></div><div class="pbody" style="padding-top:0">'+
-   '<div class="fhint">Buổi WOW 1-1: <b>'+vnd(wowRate())+'</b>/buổi · Ca test đầu vào: <b>'+vnd(testRate())+'</b>/lần - hai việc này trả theo LẦN, không nhân giờ. '+
-   'Ranh giới ca: trước '+slaChip("shiftNoon_hour",12,"h")+' là ca sáng, tới '+slaChip("shiftEvening_hour",17,"h")+' là ca chiều, sau đó là ca tối.</div></div></div>'}
+   '<div class="fhint" data-tip="Hai việc này trả theo LẦN, không nhân giờ. Ranh giới ca tính theo giờ bắt đầu buổi: trước giờ trưa là ca sáng, tới giờ chiều là ca chiều, sau đó là ca tối - hai mốc ấy đặt ở Cài đặt nhóm CH2.">'+
+   'WOW 1-1: <b>'+vnd(wowRate())+'</b>/buổi · Ca test: <b>'+vnd(testRate())+'</b>/lần'+
+   '<i class="ti ti-info-circle gyti"></i></div></div></div>'}
  h+=statStrip([
   ["ti-school",tot,"Buổi lớp đã dạy trong tháng","#3B82C4",L.length+" giảng viên"],
   ["ti-clock-hour-4",(Math.round(totG*10)/10)+"h","Tổng giờ dạy","#2E5A88",totThieu?(totThieu+" buổi thiếu giờ vào/ra"):"đủ giờ vào - giờ ra","",
@@ -26006,8 +26024,12 @@ var TTHE=[
    MENU KHÔNG PHÌNH RA: 15 mục vẫn nguyên ở nhóm Tra cứu cho ai muốn vào thẳng. Đây là thêm
    một lối, không phải dời chỗ - dời chỗ là bắt người quen tay đi học lại. */
 var TTSO_NGOAI={
- giangvien:"sổ nguồn lực, không phải một trong bốn đối tượng được phục vụ - giảng viên là "+
-  "người phục vụ. Vẫn ở nhóm Tra cứu như mọi sổ khác.",
+ /* V2 14/08 - HAI SỔ NÀY ĐÃ RỜI NHÓM TRA CỨU, nên bản khai không được nhắc tới chúng nữa.
+    `giangvien` nay đứng trong kệ "Làm hằng ngày" của chặng Đang học (ngay dưới Buổi hôm nay,
+    cạnh sổ Học viên - anh Luân: *"2 cái kia lên cùng chỗ với lớp chứ"*), `socamket` sang kệ
+    "Lịch & sổ tra cứu" của cùng chặng. Bản khai này chỉ nói về nhóm Tra cứu; giữ tên đã rời đi
+    thì nó thành một lời khai về thứ không còn ở đó - `_checkaudit` bắt đúng.
+    *Dời một mục đi thì phải đi gỡ tên nó khỏi mọi bản khai đang nói về chỗ cũ.* */
  /* V9.99z11 - hai sổ này lộ ra khi gỡ v6: thước cũ đọc nhóm Tra cứu của cây menu v6 (15 sổ),
     nay đọc cây V5 (18 sổ) nên hai sổ chưa từng được hỏi tới. Cả hai đều đứng ngoài có lý. */
  khoahoc:"sổ danh mục khoá - một khoá là thứ được BÁN, không phải một người hay một lớp được "+
@@ -26018,11 +26040,13 @@ var TTSO_NGOAI={
  tinnhan:"sổ VIỆC ĐÃ LÀM, không phải sổ của một thực thể - một tin gửi cho lead, tin sau gửi "+
   "cho học viên, tin nữa gửi cho phụ huynh. Nó trả lời câu \"trung tâm đã nói gì với ai\", "+
   "nên xếp theo THỜI GIAN chứ không xếp theo người. Cùng họ với Nhật ký thao tác.",
- /* V2 14/08 */
- socamket:"sổ CHỨNG TỪ, không phải sổ của một thực thể - mỗi dòng là một LẦN KÝ vào một BẢN "+
-  "quy định, gắn với hồ sơ nhập học chứ không gắn với người. Cùng một học viên đổi lớp rồi ký "+
-  "lại thì có hai dòng, và cái người ta tra là 'bản nào đã được ký', không phải 'người này là ai'. "+
-  "Cùng họ với Nhật ký thao tác và sổ Tin nhắn."};
+ /* `socamket` đã sang kệ "Lịch & sổ tra cứu" của chặng Đang học nên không còn là một mục trong
+    bảng khai này. Giữ lời giải thích lại đây vì nó vẫn đúng và vẫn đáng đọc:
+    socamket = sổ CHỨNG TỪ, không phải sổ của một thực thể - mỗi dòng là một LẦN KÝ vào một BẢN
+   quy định, gắn với hồ sơ nhập học chứ không gắn với người. Cùng một học viên đổi lớp rồi ký
+   lại thì có hai dòng, và cái người ta tra là "bản nào đã được ký", không phải "người này là ai".
+   Cùng họ với Nhật ký thao tác và sổ Tin nhắn. */
+ };
 /* Phụ huynh KHÔNG có bảng riêng trong SOP - họ nằm trong ba cột người giám hộ của DL09. Nên
    thực thể này được DỰNG từ dữ liệu ấy, gom theo số điện thoại: một số là một người, kèm danh
    sách con. Dựng lại mỗi lần vẽ thì tốn, nên nhớ tạm và xoá khi dữ liệu đổi. */
@@ -27614,7 +27638,12 @@ var NHIP={
   ["sang","Soát danh sách nhân sự","Ai mới vào, ai đã nghỉ, ai chưa có chức danh hoặc chưa gắn cơ sở","nhansu",
    function(){return qfDem("nhanvien","thieu")},"qf:nhanvien/thieu"],
   ["ngay","Đối chiếu bảng công giảng viên","Buổi thiếu mốc giờ vào/ra thì tính công sai - soát trước khi chốt","bangcong",
-   function(){return bcThieuMoc().length},"thieu"],
+   /* Cùng phạm vi với chip "Buổi thiếu mốc giờ" trên trang bảng công: THÁNG ĐANG XEM. Trước bản
+      này dòng nhịp đếm toàn thời gian còn chip đếm theo tháng - bấm từ nhịp sang thì thấy hai
+      con số khác nhau cho cùng một câu hỏi, đúng thứ `_checkcauhoi` canh (và nó bắt được ngay
+      lượt chạy đầu sau khi em sửa cái chip).
+      *Sửa phạm vi của một con số thì phải đi sửa mọi chỗ đang nói lại con số ấy.* */
+   function(){return bcThieuMoc(congYM()).length},"thieu"],
   ["chieu","Làm và báo xong việc đang giữ","Báo xong ngay lúc làm xong, đừng để dồn cuối tuần","giaoviec",
    function(){return tkScopeMine().filter(tkLive).length},"tk:mine/live"]],
  /* V2 08/08 - NHỊP CỦA CẤP ĐIỀU HÀNH. Trước đây năm dòng này dùng `slaItems()` - hàng chờ
@@ -28470,7 +28499,13 @@ function navToggle(g){window.NAVOPEN=window.NAVOPEN||{};
 /* ===== V9.18: TRA CỨU MỞ RỘNG (Luân 28/07) - nhóm Tra cứu = nơi "muốn xem gì đó dạng danh sách",
    bổ sung sổ CHỈ XEM cho mọi bảng nghiệp vụ chính, xếp theo dòng nghiệp vụ. Đây là đảo lại V6.0
    CHO RIÊNG nhóm Tra cứu; trang tác vụ theo chặng vẫn là nơi LÀM VIỆC (các sổ này ro:1, không nút sửa). */
-function mkRO(src,sub){var c={};for(var k in src)c[k]=src[k];c.ro=1;if(sub)c.sub=sub;return c}
+/* `lam` = trang LÀM VIỆC THẬT của cuốn sổ này. Bốn sổ dựng bằng `mkRO` trước đây đi được ra
+   ngoài nhờ cột "Thao tác", mà cột ấy vừa bị gỡ (nó rỗng ở mọi dòng - xem ghi chú `coTT`), nên
+   chúng thành ngõ cụt: mở ra tra được, nhưng muốn làm gì thì phải tự mò menu. Khai `lam` là trả
+   lại đường ra bằng cửa chính thức của app - nút "Sang <trang> để làm" mọc ở cả hàng công cụ lẫn
+   trong ngăn kéo của từng dòng.
+   *Gỡ một thứ rỗng thì phải đi xem có ai đang tựa vào nó không.* */
+function mkRO(src,sub,lam){var c={};for(var k in src)c[k]=src[k];c.ro=1;if(sub)c.sub=sub;if(lam)c.lam=lam;return c}
 /* V9.64 (anh Luân: *"có nhiều trang em không làm bộ lọc, nên a ko biết nếu cần thì xem ở đâu,
    ví dụ anh muốn xem có bao nhiêu khiếu nại về lịch học"*).
    Đo ra: 13/13 sổ Tra cứu KHÔNG có nút Bộ lọc nào, chỉ có ô tìm chữ. Nguyên nhân không phải
@@ -28489,7 +28524,7 @@ LISTCFG.dstest={code:"DL03",filt:"test_status",ro:1,lam:"test",sub:"Sổ test đ
  cols:[["test_booking_id","Mã"],["lead_id_name","Khách"],["test_date","Ngày test"],["test_format","Hình thức","enum"],["test_attendance_status","Dự test","chip"],["test_status","Chấm","chip"],["overall_score","Overall"]]};
 LISTCFG.dstuvan={code:"DL04",filt:"conversion_status",ro:1,lam:"tuvan",sub:"Sổ tư vấn (DL04) - chỉ xem; tư vấn ở Tuyển sinh",
  cols:[["consultation_id","Mã"],["customer_name_display","Khách"],["consultation_time","Thời điểm"],["recommended_course","Khóa đề xuất"],["consultation_status","Trạng thái","chip"],["conversion_status","Kết quả","chip"]]};
-LISTCFG.dsdangky=mkRO(LISTCFG.tuvan,"Sổ đăng ký khóa (DL06) - chỉ xem; tạo/sửa ở Tuyển sinh");
+LISTCFG.dsdangky=mkRO(LISTCFG.tuvan,"Sổ đăng ký khóa (DL06) - chỉ xem; tạo/sửa ở Tuyển sinh","tuvan");
 /* V9.29c (anh Luân): "còn thiếu 1 trang dự thu nhỉ - nằm trong sổ thu học phí cũng được".
    Sổ thu chỉ ghi tiền ĐÃ VÀO, không ai trả lời được "tháng sau thu về bao nhiêu". Dự thu là tab
    thứ hai của chính sổ đó: tiền CÒN PHẢI THU, xếp theo hạn từng đợt.
@@ -28506,12 +28541,12 @@ LISTCFG.dsbuoihoc={code:"DL11",filt:"session_status",ro:1,lam:"hoctap",sub:"Sổ
 LISTCFG.dsdiemdanh={code:"DL12",filt:"attendance_status",ro:1,lam:"banglop",sub:"Sổ điểm danh (DL12) - chỉ xem; điểm danh ở Vận hành lớp",
  cols:[["attendance_id","Mã"],["student_name","Học viên"],["session_id","Buổi"],["attendance_status","Điểm danh","chip"],["check_in_time","Giờ vào"],["in_class_performance","Trong lớp","enum"]]};
 LISTCFG.dsbaitap=mkRO(LISTCFG.baitap,"Sổ bài tập (DL13) - chỉ xem; giao/chấm ở Vận hành lớp");LISTCFG.dsbaitap.lam="baitap";
-LISTCFG.dswow=mkRO(LISTCFG.wow,"Sổ WOW 1-1 (DL14) - chỉ xem; đặt/xử lý ở hub Học tập");
-LISTCFG.dsketthuc=mkRO(LISTCFG.ketthuc,"Sổ kết thúc khóa (DL18) - chỉ xem; xử lý ở C4");
+LISTCFG.dswow=mkRO(LISTCFG.wow,"Sổ WOW 1-1 (DL14) - chỉ xem; đặt/xử lý ở hub Học tập","wow");
+LISTCFG.dsketthuc=mkRO(LISTCFG.ketthuc,"Sổ kết thúc khóa (DL18) - chỉ xem; xử lý ở C4","ketthuc");
 LISTCFG.dskhaosat={code:"DL15",filt:"survey_type",ro:1,lam:"cskh",sub:"Sổ khảo sát định kỳ (DL15) - chỉ xem; gửi/xử lý ở hub CSKH",
  cols:[["survey_id","Mã"],["student_name","Học viên"],["survey_type","Đợt","enum"],["sent_date","Gửi"],["submitted_date","Trả lời"],["satisfaction_score","Hài lòng"],["follow_up_needed","Cần follow-up","enum"]]};
 LISTCFG.dsphanhoi=mkRO(LISTCFG.khaosat,"Sổ phản hồi / góp ý (DL16) - chỉ xem; xử lý ở hub CSKH");LISTCFG.dsphanhoi.lam="cskh";
-LISTCFG.dskhieunai=mkRO(LISTCFG.khieunai,"Sổ khiếu nại (DL17) - chỉ xem; xử lý ở hub CSKH");
+LISTCFG.dskhieunai=mkRO(LISTCFG.khieunai,"Sổ khiếu nại (DL17) - chỉ xem; xử lý ở hub CSKH","khieunai");
 
 var NAVTREE=[
  /* V9.29: "Việc hôm nay" trước đây khai hide:1 - vào được từ chuông và các ô Tổng quan nhưng

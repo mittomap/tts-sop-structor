@@ -501,7 +501,9 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  tv5("menu ve dung: nhom mo co lop open", (nav.match(/navlbl open/g)||[]).length===3);
  tv5("menu ve dung: 5 nhom con lai khong co lop open", (nav.match(/class="navlbl(?! open)/g)||[]).length===5);
  t("nhom gap lai thi khong ve muc ben trong", nav.indexOf('data-k="nhaplead"')<0);
- tv5("nhom mo van ve du muc ben trong", nav.indexOf('data-k="banlam"')>=0&&nav.indexOf('data-k="baocao"')>=0);
+ /* 14/08 - doi muc lam bang chung: `banlam` da roi khoi menu (nay la mot CACH XEM cua Viec hom
+    nay). Dieu can bao ve khong doi: nhom DANG MO thi phai ve du muc ben trong no. */
+ tv5("nhom mo van ve du muc ben trong", nav.indexOf('data-k="viec"')>=0&&nav.indexOf('data-k="baocao"')>=0);
  t("nhom gap lai van hien badge tong so viec", /navlbl(?! open)[^>]*>[\s\S]{0,400}?class="dot"/.test(nav));
  /* nguoi dung tu mo thi phai nho */
  navToggle(arcGrpName("changA"));
@@ -930,6 +932,9 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
 /* ---- 27. DRAWER XEM NHANH tren trang Viec hom nay (V9.29, anh Luan bat thieu) ---- */
 (function(){
  setRole("all");
+ /* 14/08 - trang Viec hom nay nay co BA CACH XEM. Khoi kiem nay do danh sach viec, tuc cach xem
+    "Theo viec" - phai noi ra, khong thi no do mot cach xem khac roi bao thieu dong viec. */
+ window.VIECVIEW="viec";
  window.VIECTEAM="all";window.VIECGRP="all";window.VIECSEV="";window.VIECOD=false;
  var o=RENDER["viec"]();
  t("moi dong viec bam duoc", (o.match(/class="slarow clk"/g)||[]).length>0);
@@ -1468,7 +1473,16 @@ t("chi con MOT ten cho viec dung lai demo", (function(){
  t("mot dinh nghia ai la giang vien", typeof isGVRole==="function");
 
  /* (b) DIA CHI: moi trang mot slug tieng Viet khong dau, sinh tu chinh ten trang */
- t("slug lay tu ten trang", pgSlug("banlam")==="trang-bat-dau");
+ /* 14/08 - CAU HOI CU NEO VAO MOT CAI TEN: `pgSlug("banlam")==="trang-bat-dau"`. Trang do da
+    doi ten hai lan trong ngay (thanh "Chay quy trinh & Ban do chang", roi thanh BI DANH cua Viec
+    hom nay) va bo kiem do vi mot ly do khong lien quan gi toi chat luong app - dia chi VAN sinh
+    dung tu ten, chi la ten khac.
+    Nay hoi dung DIEU CAN BAO VE: slug phai la ban khong dau cua chinh ten trang. Doi ten thi
+    slug tu doi theo, va cau kiem van dung. *Neo vao LUAT, dung neo vao mot gia tri.* */
+ t("slug lay tu ten trang", PAGES.every(function(x){
+  var t0=String((PBK[x.k]||{}).t||"");if(!t0)return true;
+  var g=slugify(t0)||x.k;
+  return pgSlug(x.k)===g||new RegExp("^"+g+"-\\d+$").test(pgSlug(x.k))}));
  t("slug khong dau, khong ky tu la", PAGES.every(function(x){return /^[a-z0-9-]+$/.test(pgSlug(x.k))}));
  var dup={},trung=[];
  PAGES.forEach(function(x){var g=pgSlug(x.k);if(dup[g])trung.push(g);dup[g]=x.k});
@@ -1479,9 +1493,9 @@ t("chi con MOT ten cho viec dung lai demo", (function(){
  /* trang gop (nhaplead -> hub Tuyen sinh tab lead) van phai co dia chi rieng, khong thi F5 mat tab */
  t("trang gop van co dia chi rieng", hashOK("nhaplead")&&hashOK("changA")&&hashOK("magioithieu"));
  /* doc dia chi: ca ?slug lan #/slug (link ban cu) */
- location.search="?trang-bat-dau";location.hash="";
+ location.search="?"+pgSlug("banlam");location.hash="";
  t("doc duoc ?slug", hashKey()==="banlam");
- location.search="";location.hash="#/trang-bat-dau";
+ location.search="";location.hash="#/"+pgSlug("banlam");
  t("doc duoc #/slug cua ban cu", hashKey()==="banlam");
  location.search="?utm_source=fb";location.hash="";
  t("tham so la khong bi nham la ten trang", hashKey()==="");

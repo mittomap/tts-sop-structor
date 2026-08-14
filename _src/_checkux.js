@@ -926,7 +926,14 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
   try{h=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){return}
   var re=/<div class="bstatsw" data-thekey="([a-z_]+)">([\s\S]*?)<div class="bstats"/g,m;
   while((m=re.exec(h))){soDai++;
-   if(!/Thẻ \(\d+\/\d+\)/.test(m[2]))thieuNut.push(k+"/"+m[1])}
+   /* 14/08 - HOI DUNG DIEU CAN BAO VE: dai the phai CO nut chon the, khong phai nut
+      phai NAM TRONG khoi cua dai. App co san co che `THEROI` cho phep dat nut o cho
+      khac (canh nut Cot o cac so, canh tieu de dai o bang viec, canh cong tac o trang
+      Viec hom nay) - dung de bo hai hang RONG chi de dung mot cai nut canh phai. Cau
+      kiem cu neo vao CHO DAT nen no do ngay khi nut doi cho, du nguoi dung van bam
+      duoc y nguyen. Nut mang `data-thek="<ma dai>"` o MOI duong dat - hoi dau vet ay.
+      *Bo kiem phai canh MUC TIEU, dung canh CACH LAM.* */
+   if(!(/Thẻ \(\d+\/\d+\)/.test(m[2])||h.indexOf('data-thek="'+m[1]+'"')>=0))thieuNut.push(k+"/"+m[1])}
   var re2=/<div class="bstat ro"[^>]*>/g,m2;
   while((m2=re2.exec(h)))if(/onclick/.test(m2[0]))coOnclick.push(k)});
  t("dai the tren trang deu co nut Thẻ (n/N) de an/hien ("+soDai+" dai)"+(thieuNut.length?" - THIEU: "+thieuNut.slice(0,4).join(","):""), soDai>0&&thieuNut.length===0);
@@ -1113,6 +1120,10 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
     giu muc menu cu sang mo (NAVFROM) nen nguoi dung khong mat dau minh dang o nhanh nao.
     Moi dong duoi day phai noi duoc MO RA TU DAU - khong khai duoc thi la ngo cut. */
  var CHITIET={
+  banlam:"Chay quy trinh & Ban do chang - tu 14/08 la BI DANH: `go('banlam')` remap sang trang "+
+   "Viec hom nay, cach xem 'Theo nguoi' (`go('hanhtrinh')` sang cach xem 'Theo chang'). Ba trang "+
+   "gop ve mot, doi cach xem bang cong tac ngay tren vung lam viec. Giu khoa trang de hon hai chuc "+
+   "loi cu (o the, nhip ngay, goi y Tro ly, bai huong dan, nut Thoat cua man chay) khong chet cam.",
   hoso:"ho so mot hoc vien - mo tu So hoc vien va tu moi bang viec",
   hosogv:"ho so mot giang vien - mo tu so Giang vien",
   hosonv:"ho so mot nhan vien - mo tu so Nhan vien va man Nhan su",

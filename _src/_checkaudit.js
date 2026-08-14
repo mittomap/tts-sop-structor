@@ -497,6 +497,10 @@ var CH3_NGOAIBAN={
    ban:"trang chi tiet mo ra tu So nguoi dong hanh (phMo) - cung ho voi hoso/hosogv/hosonv, "+
     "khong dung o menu vi no luon duoc mo kem mot ho so cu the.",
    hanhtrinh:"goc nhin bang chang cua Trang bat dau - cung mot trang, mo bang nut 'Xem theo chang'.",
+   banwow:"V2 14/08 - Van hanh buoi WOW 1-1 la TRANG CON cua so 'Buoi WOW 1-1', mo ra bang cach "+
+    "bam mot buoi o Buoi hom nay hoac o so ay (cung khuon voi `banglop`). Trong trang co o xo chon "+
+    "nhanh buoi khac nen vao roi khong bi ket o mot buoi. `NAVSUB.banwow='wow'` nen dung trong do "+
+    "thi muc 'Buoi WOW 1-1' tren sidebar sang.",
    banglop:"V2 RB3 - Van hanh lop la TRANG CON cua Lop hoc, mo ra bang cach bam mot lop o trang "+
     "Lop hoc (anh Luan: 'trang van hanh lop, no la trang con cua lop hoc moi dung em nhi'). "+
     "V1 de nguoc: banglop dung tren menu con lop bi an, nen phai vao thang man van hanh roi chon "+

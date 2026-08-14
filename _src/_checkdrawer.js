@@ -43,7 +43,16 @@ const PATHS=["/opt/pw-browsers/chromium-1194/chrome-linux/chrome","/opt/pw-brows
    "Xem ban da ky" mo ngan keo, chua bao gio duoc di qua.
    *Mot bo kiem chi soi mat tien thi cai gi lui vao trong deu an toan tuyet doi - va do khong phai
    la an toan, do la khong ai nhin.* */
-const TRANG=["viec","socamket","giaoviec#hv","banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","hocvien","giaoviec","duyet","baocao","nhansu","khac","canhan","xeplop","giangvien"];
+/* 14/08 - THEM BA TRANG. Ba trang nay hoac moi sinh, hoac vua doi lon trong ngay, va khong
+   trang nao trong danh sach cu cham toi be mat cua chung:
+   · `banwow` - Van hanh buoi WOW 1-1, trang moi dung hom nay (song hanh voi `banglop`).
+   · `bangcong` - vua tach lam hai bang theo vai va them bang don gia.
+   · `lop` - so Lop hoc, cua chinh de vao `banglop`.
+   Va mot ghi chu ve con so: `viec` voi `banlam` nay la MOT trang hai cach xem, nen phan dau
+   trang cua chung giong het nhau - gop trang thi so BE MAT RIENG BIET giam di, do la he qua
+   dung chu khong phai mat tinh nang. Bu lai bang cach do THEM trang that, khong bang cach ha
+   san: *mo rong pham vi do thi duoc, noi long thuoc thi khong.* */
+const TRANG=["viec","socamket","giaoviec#hv","banlam","tuyensinh","hoctap","banglop","banwow","bangcong","lop","cskh","thanhtoan","hocvien","giaoviec","duyet","baocao","nhansu","khac","canhan","xeplop","giangvien"];
 (async()=>{
  let chromium; try{chromium=require("playwright").chromium}catch(e){console.log("CHECKDRAWER BO QUA: chua cai playwright");process.exit(0)} const fs=require("fs"),path=require("path");
  const exe=PATHS.find(p=>{try{return fs.existsSync(p)}catch(e){return false}});
