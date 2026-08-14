@@ -380,8 +380,15 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .btn.sm{height:30px;padding:0 10px;font-size:11.5px}
 /* Tiêu đề KỆ trong một nhóm menu - nhỏ hơn và nhạt hơn hẳn tên nhóm để đọc ra đúng ba tầng:
    NHÓM > kệ > mục. Không dùng viền hay nền: đây là một cái nhãn, không phải một cái nút. */
-.navke{font-size:10.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;
- color:#8FA3BC;padding:10px 12px 4px 34px;user-select:none}
+/* Dùng lại ĐÚNG mã màu và cỡ chữ đã có trong app: `#B9C6D6` (đã dùng 11 chỗ) và 11px. Bảng màu
+   chạm trần 110 mã và thang cỡ chữ chạm trần 16 bậc - `_checkux` bắt ngay khi em cắm một mã xám
+   mới với cỡ 10.5px, thành 111 mã và 17 bậc. *Thêm một cái nhãn mới không phải lý do để mua
+   thêm một bậc trong thang - trong thang đã có bậc dùng được.*
+   VÀ ĐỪNG VIẾT MÃ MÀU RA TRONG CHÚ THÍCH: khối chú thích này nằm trong chuỗi CSS nên nó được
+   in THẲNG vào file dựng, mà thước đếm mã hex trên chính file ấy - nhắc tên mã trong lời giải
+   thích là tự cộng thêm một mã. Dự án đã cắn đúng bẫy này một lần với dải viền màu. */
+.navke{font-size:11px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;
+ color:#B9C6D6;opacity:.75;padding:10px 12px 4px 34px;user-select:none}
 .navke:first-child{padding-top:2px}
 .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px;margin-bottom:20px}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px;cursor:pointer}
@@ -13639,9 +13646,14 @@ function baocaoThan(_xemAi){
       viên, BC8 Học vụ, BC9 Quản lý -> bảng việc, hiện ở TRANG ĐÁP của đúng chức danh ấy.
     Không gom chúng về đây (bảng việc phải nằm chỗ người ta bắt đầu ngày, đó là chủ ý cũ), nhưng
     phải CHỈ ĐƯỜNG. *Một báo cáo có thật mà người cần nó không biết đường tới thì với họ là chưa có.* */
- h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-map-2"></i>'+
-  'Trang này giữ chỉ số KPI và phễu khách. '+
-  '<span data-tip="BC2 chỉ số KPI, BC3 phễu khách và khối lượng việc theo nhân viên nằm ngay trang này. Bảng Học viên nguy cơ (BC1) nằm ở sổ Học viên. Các bảng việc theo chức danh (BC5-BC9) hiện ở trang đáp của từng người.">Báo cáo khác ở đâu?</span> '+
+ h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>'+
+  'Trang này giữ các chỉ số KPI theo SOP. '+
+  /* Câu về BC3 chỉ hiện cho người ĐƯỢC XEM miền khách tiềm năng. `_checkmien` bắt đúng: giáo
+     viên mở trang Chỉ số ra và đọc thấy một từ của miền lead ngay trên màn - app rò một chữ
+     cũng là rò. *Câu giải thích cũng là dữ liệu; nó phải đi qua đúng cái cửa mà số liệu đi qua.* */
+  ((function(){try{return navVis("nhaplead")}catch(e){return false}})()
+    ?'<span data-tip="BC2 chỉ số KPI và BC3 phễu khách nằm ngay trang này, cùng khối lượng việc theo nhân viên.">Gồm những bảng nào?</span> ':'')+
+  '<span data-tip="Bảng Học viên nguy cơ (BC1) nằm ở sổ Học viên. Các bảng việc theo chức danh (BC5-BC9) hiện ở trang đáp của từng người.">Báo cáo khác ở đâu?</span> '+
   '<a class="lnk" onclick="go(\'hocvien\')">Mở sổ Học viên</a></div>';
  h+=kpiTop3Section();
  /* Bảng so sánh 5 cơ sở là câu hỏi của người điều hành chuỗi ("cơ sở nào đang gánh") - một nhân

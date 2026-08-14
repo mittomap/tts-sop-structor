@@ -10929,9 +10929,14 @@ function baocaoThan(_xemAi){
       viên, BC8 Học vụ, BC9 Quản lý -> bảng việc, hiện ở TRANG ĐÁP của đúng chức danh ấy.
     Không gom chúng về đây (bảng việc phải nằm chỗ người ta bắt đầu ngày, đó là chủ ý cũ), nhưng
     phải CHỈ ĐƯỜNG. *Một báo cáo có thật mà người cần nó không biết đường tới thì với họ là chưa có.* */
- h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-map-2"></i>'+
-  'Trang này giữ chỉ số KPI và phễu khách. '+
-  '<span data-tip="BC2 chỉ số KPI, BC3 phễu khách và khối lượng việc theo nhân viên nằm ngay trang này. Bảng Học viên nguy cơ (BC1) nằm ở sổ Học viên. Các bảng việc theo chức danh (BC5-BC9) hiện ở trang đáp của từng người.">Báo cáo khác ở đâu?</span> '+
+ h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>'+
+  'Trang này giữ các chỉ số KPI theo SOP. '+
+  /* Câu về BC3 chỉ hiện cho người ĐƯỢC XEM miền khách tiềm năng. `_checkmien` bắt đúng: giáo
+     viên mở trang Chỉ số ra và đọc thấy một từ của miền lead ngay trên màn - app rò một chữ
+     cũng là rò. *Câu giải thích cũng là dữ liệu; nó phải đi qua đúng cái cửa mà số liệu đi qua.* */
+  ((function(){try{return navVis("nhaplead")}catch(e){return false}})()
+    ?'<span data-tip="BC2 chỉ số KPI và BC3 phễu khách nằm ngay trang này, cùng khối lượng việc theo nhân viên.">Gồm những bảng nào?</span> ':'')+
+  '<span data-tip="Bảng Học viên nguy cơ (BC1) nằm ở sổ Học viên. Các bảng việc theo chức danh (BC5-BC9) hiện ở trang đáp của từng người.">Báo cáo khác ở đâu?</span> '+
   '<a class="lnk" onclick="go(\'hocvien\')">Mở sổ Học viên</a></div>';
  h+=kpiTop3Section();
  /* Bảng so sánh 5 cơ sở là câu hỏi của người điều hành chuỗi ("cơ sở nào đang gánh") - một nhân
