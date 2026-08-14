@@ -2232,8 +2232,22 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
     if(lk){h+='<td>'+_the+lk+'</td>';return}
     if(_the){h+='<td>'+_the+cell(r,c,cfg.code)+'</td>';return}
     h+='<td'+(c[2]==="money"?' style="text-align:right;font-variant-numeric:tabular-nums"':'')+'>'+cell(r,c,cfg.code)+'</td>'});
-  if(coTT)h+='<td><div class="rowact">'+rowSlaBtn(r,pk)+(cfg.ro?'':'<button class="btn sm" onclick="openEdit(\''+key+'\',\''+id+'\')"><i class="ti ti-edit"></i>Sửa</button>')+
-   act.map(function(a){return '<button class="btn sm" onclick="'+a.fn+'(\''+esc(String(r[a.arg]||""))+'\')"><i class="ti '+a.ic+'"></i>'+a.lb+'</button>'}).join("")+'</div></td>';
+  /* ═══ V2 14/08 (anh Luân: *"nút làm ngay với xử lý trùng nhau nhỉ"*) ═════════════════════
+     Trùng thật. "Làm ngay" mở đúng ô ghi của việc đang treo trên dòng; "Xử lý" mở màn Chạy quy
+     trình của chính người đó - mà BƯỚC HIỆN TẠI của màn ấy chính là cái việc đang treo. Hai cửa
+     vào cùng một việc, khác nhau mỗi chỗ đi kèm bao nhiêu ngữ cảnh; đứng cạnh nhau trên một dòng
+     thì người ta chỉ thấy hai nút giống hệt.
+     Bỏ "Làm ngay", giữ "Xử lý" - vì màn Chạy quy trình chở nhiều hơn hẳn (chặng đang đứng, câu
+     SOP, lịch sử liên hệ, nhánh dự phòng), còn ô ghi lẻ thì nó cũng mở được ngay bên trong.
+     Nhưng KHÔNG mất thông tin "dòng này đang có việc": nút "Xử lý" của dòng ấy **đậm lên** và
+     mang luôn câu việc trong chú thích. Một nút, độ đậm nói có việc hay không. */
+  if(coTT){var _sla=null;try{_sla=rowActMap()[String(r[pk]==null?"":r[pk])]||null}catch(e){_sla=null}
+   var _co=!!(_sla&&_sla.act);
+   h+='<td><div class="rowact">'+(cfg.ro?'':'<button class="btn sm" onclick="openEdit(\''+key+'\',\''+id+'\')"><i class="ti ti-edit"></i>Sửa</button>')+
+   act.map(function(a,ai){var _nb=(_co&&ai===0);
+    return '<button class="btn sm'+(_nb?" primary":"")+'" onclick="'+a.fn+'(\''+esc(String(r[a.arg]||""))+'\')"'+
+     (_nb?' data-tip="'+esc("Đang có việc: "+String(_sla.what||"").slice(0,90))+'"':'')+
+     '><i class="ti '+a.ic+'"></i>'+a.lb+'</button>'}).join("")+'</div></td>'}
   h+='</tr>'});
  return h+'</tbody></table></div>'}
 
@@ -5090,7 +5104,22 @@ function openComplaint(id){var c=find("DL17","complaint_id",id);if(!c){toast("Kh
  else{h+='<div class="fld"><label>Kết quả xử lý</label><select id="kr_res">'+enumOpts("enum_complaint_result")+'</select></div><div class="fld full"><label>Cách xử lý / phản hồi học viên <i>*</i></label><textarea id="kr_note" rows="3" placeholder="Mô tả hướng giải quyết, cam kết, đền bù (nếu có)..."></textarea></div><div class="dact"><button class="btn green" onclick="knResolveSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Đóng khiếu nại</button><button class="btn danger" onclick="confirmRun(\'Leo thang khiếu nại này lên quản lý cấp cao?\',\'knEscalate\',\''+esc(id)+'\')"><i class="ti ti-arrow-up"></i>Leo thang</button></div>';}
  h+='</div>';openDrawer("Khiếu nại · "+(c.student_id_name||c.student_id),h)}
 function slaRow(it){var age=it.age!=null?'<span class="agebadge '+it.sev+'">'+esc(fmtAge(it.age))+'</span>':'';
- var btn=it.lead?'<button class="btn sm" onclick="leadDetail(\''+esc(it.lead)+'\')"><i class="ti ti-external-link"></i> Xử lý</button>':(it.act?'<button class="btn primary sm" onclick="slaAct(\''+it.act+'\',\''+esc(String(it.rid))+'\')"><i class="ti ti-tool"></i> Xử lý</button>':(it.hoso?'<button class="btn sm" onclick="openHoso(\''+esc(it.hoso)+'\')"><i class="ti ti-id-badge-2"></i> Hồ sơ</button>':(it.page?'<button class="btn sm" onclick="jumpFlow(\''+it.page+'\',\''+(it.filter||"")+'\')"><i class="ti ti-arrow-right"></i> Xử lý</button>':'')));
+ /* ═══ V2 14/08 (anh Luân: *"sự khác nhau ở các thiết kế nút đến từ lý do gì em"*) ══════════
+    Bốn nhánh dưới đây có thật và mỗi nhánh dẫn đi một nơi khác nhau - nhưng BA trong bốn cùng
+    đặt tên "Xử lý", nên cùng một chữ mà bấm ra ba kết cục: mở ngăn kéo lead · mở ô ghi tại chỗ ·
+    nhảy sang trang khác. Người dùng không có cách nào đoán, phải bấm thử mới biết.
+    VÀ THỨ TỰ HỎI ĐANG SAI: `lead` hỏi TRƯỚC `act`, nên một việc CÓ CỬA GHI THẬT mà hồ sơ là lead
+    thì vẫn rơi vào nhánh "mở ngăn kéo" - *cửa mạnh nhất thua cái điều kiện yếu nhất*, và người ta
+    mất đúng cái nút làm được việc.
+    Nay: hỏi `act` trước, và mỗi nhánh mang MỘT TÊN RIÊNG đúng việc nó làm. Bảng chữ còn ba mức,
+    đọc là biết trước chuyện gì sắp xảy ra:
+      · đặc navy + cờ lê = LÀM NGAY TẠI CHỖ (ô ghi bật ra, không rời màn)
+      · viền + thẻ hồ sơ = MỞ HỒ SƠ để xem rồi tự quyết
+      · viền + mũi tên   = RỜI TRANG sang màn nghiệp vụ */
+ var btn=it.act?'<button class="btn primary sm" onclick="slaAct(\''+it.act+'\',\''+esc(String(it.rid))+'\')"><i class="ti ti-tool"></i> Làm ngay</button>'
+  :(it.lead?'<button class="btn sm" onclick="leadDetail(\''+esc(it.lead)+'\')"><i class="ti ti-id-badge-2"></i> Hồ sơ</button>'
+  :(it.hoso?'<button class="btn sm" onclick="openHoso(\''+esc(it.hoso)+'\')"><i class="ti ti-id-badge-2"></i> Hồ sơ</button>'
+  :(it.page?'<button class="btn sm" onclick="jumpFlow(\''+it.page+'\',\''+(it.filter||"")+'\')"><i class="ti ti-arrow-right"></i> Sang màn xử lý</button>':'')));
  var gc=grpColor(it.cat);
  /* V9.29 (anh Luân): dòng việc trước đây chỉ có nút "Xử lý" - bấm là nhảy thẳng vào màn xử lý,
     không có bước xem nhanh "việc này là gì, của ai, trễ bao lâu, ngưỡng lấy ở đâu". Nay bấm vào
@@ -7936,12 +7965,12 @@ function rStepKey(J){var k=J.k;
  if(k==="reenroll")return "reinvite";
  return null}
 /* ===== MÀN CHẠY QUY TRÌNH ===== */
-function runStart(pid,queue){window.RUN={pid:pid,q:queue||null,i:0,msg:""};go("chay")}
+function runStart(pid,queue){window.RUN={pid:pid,q:queue||null,i:0,msg:""};window.RUNPID=pid;go("chay")}
 /* xem trước hàng đợi: hiện danh sách người + chặng, chọn ai để bắt đầu (không tự nhảy) */
 function runQueuePreview(list,title){if(!list.length){toast("Không có hồ sơ nào.");return}window.RUN={q:list,i:0,preview:1,title:title||"Hàng đợi",msg:""};go("chay")}
 /* Đổi sang người khác thì ĐÓNG ô ghi đang mở: nó là ô của hồ sơ vừa rồi, để mở nguyên qua
    người mới là mời người ta gõ một câu vào nhầm hồ sơ. */
-function runPick(i){var R=window.RUN;if(!R||!R.q)return;R.i=i;R.pid=R.q[i];R.preview=0;R.msg="";R.altOpen=0;reRender("chay")}
+function runPick(i){var R=window.RUN;if(!R||!R.q)return;R.i=i;R.pid=R.q[i];R.preview=0;R.msg="";R.altOpen=0;window.RUNPID=R.pid;reRender("chay")}
 function runStartQueue(){runPick(0)}
 function renderRunPreview(){var R=window.RUN;var list=R.q||[];
  var h='<div class="runwrap">';
@@ -7973,9 +8002,9 @@ function runQueueFromTasks(){var seen={},L=[];
  window.CHAYQ="over";window.RUN=null;go("banlam")}
 function runQueueStage(k){window.CHAYQ=k;window.RUN=null;go("banlam")}
 function runNext(){var R=window.RUN;if(!R)return;
- if(R.q&&R.i<R.q.length-1){R.i++;R.pid=R.q[R.i];R.msg="";R.altOpen=0;reRender("chay")}
+ if(R.q&&R.i<R.q.length-1){R.i++;R.pid=R.q[R.i];R.msg="";R.altOpen=0;window.RUNPID=R.pid;reRender("chay")}
  else{toast("Đã xong hàng đợi.");go("hanhtrinh")}}
-function runPrev(){var R=window.RUN;if(!R||!R.q||R.i<=0)return;R.i--;R.pid=R.q[R.i];R.msg="";R.altOpen=0;reRender("chay")}
+function runPrev(){var R=window.RUN;if(!R||!R.q||R.i<=0)return;R.i--;R.pid=R.q[R.i];R.msg="";R.altOpen=0;window.RUNPID=R.pid;reRender("chay")}
 function runSave(){var R=window.RUN;if(!R)return;var J=jInfo(R.pid);var sk=rStepKey(J);if(!sk)return;
  var ST=RSTEP[sk];var fs=ST.fields(J.C);
  var miss=rfNeed(fs);if(miss.length){toast("Còn thiếu: "+miss.join(", "));return}
@@ -8108,10 +8137,33 @@ function renderChayHome(){var all0=jAll();
   '</div></div>';
  h+='<div class="panel"><div class="pbody"><div id="chaybody" data-tour="chaybody">'+chayListHTML()+'</div></div></div>';
  return h}
+/* ═══ V2 14/08 - F5 Ở MÀN CHẠY QUY TRÌNH KHÔNG CÒN MẤT NGƯỜI ĐANG CHẠY ══════════════════════
+   Anh Luân: *"chỗ chạy quy trình của 1 bạn nào đó hình như refresh lại là mất, hay e gắn id lên
+   link đi, để giữ nguyên được"*.
+   Đúng. `window.RUN` là biến trong BỘ NHỚ - nạp lại trang là sạch, và `renderChay` gặp `!R.pid`
+   thì lặng lẽ trả về Trang bắt đầu: người ta F5 giữa chừng, màn đổi hẳn sang trang khác mà không
+   một câu nào nói vì sao.
+   Bảng `CTXTRANG` từ trước đã khai `chay:["JPID"]` - nhưng `JPID` là biến của trang HỒ SƠ, không
+   ai đặt nó khi chạy quy trình. Tức bản khai ấy đúng ý mà trỏ nhầm biến, nên địa chỉ hoặc để
+   trống hoặc mang theo mã của một hồ sơ đã mở từ lúc nào. *Một bản khai trỏ nhầm chỗ thì im lặng
+   y như không khai.* Nay có `RUNPID` riêng: `runStart`/`runPick`/`runNext`/`runPrev` đặt nó, địa
+   chỉ ghi nó, và nạp lại thì dựng lại `window.RUN` từ nó.
+   Hàng đợi (`R.q`) CỐ Ý không nhét vào địa chỉ: nó có thể là hàng trăm mã, thanh địa chỉ không
+   phải chỗ chứa danh sách. Nạp lại thì mở đúng người ấy ở dạng lẻ - mất nút "Người tiếp theo"
+   nhưng giữ được đúng hồ sơ, và đó là cái người ta cần khi lỡ tay F5. */
+function runRestore(){
+ var pid=String(window.RUNPID||"").trim();
+ if(!pid)return null;
+ var ok=false;try{ok=!!jInfo(pid)}catch(e){ok=false}
+ if(!ok){window.RUNPID="";return null}
+ window.RUN={pid:pid,q:null,i:0,msg:""};
+ return window.RUN}
 function renderChay(){
  var R=window.RUN;
+ if((!R||!R.pid)&&window.RUNPID)R=runRestore();
  if(R&&R.preview&&R.q&&R.q.length)return renderRunPreview();
  if(!R||!R.pid){return renderBanlam()}
+ window.RUNPID=R.pid;   /* để lần vẽ sau và thanh địa chỉ luôn nói đúng người đang chạy */
  var J=jInfo(R.pid),C=J.C,sk=rStepKey(J);
  var qtxt=R.q?(" · hồ sơ "+(R.i+1)+"/"+R.q.length):"";
  var h='<div class="runwrap">';
@@ -23375,7 +23427,7 @@ document.addEventListener("click",function(e){var n=document.getElementById("not
 /* V9.46: ô này từng ghi "MGQ" - một cái tên KHÔNG TỒN TẠI ở đâu khác trong app (biến thật tên là
    MSGQ). Nghĩa là suốt thời gian qua ô tìm thông điệp CH4 không hề được dọn khi điều hướng. Sửa
    đúng tên, và khai thêm CFQ (ô tìm tham số CH2 mới) để nó cũng được dọn theo. */
-var NAVCTX=["HOSO","JPID","GVID","NVID","KHID","BLCLASS","GACRS","GATAB","BTCLASS","BTSESS","DDCLASS","SETTAB","MSGQ","CFQ"];
+var NAVCTX=["HOSO","JPID","RUNPID","GVID","NVID","KHID","BLCLASS","GACRS","GATAB","BTCLASS","BTSESS","DDCLASS","SETTAB","MSGQ","CFQ"];
 function navSnap(){var s={};NAVCTX.forEach(function(k){if(window[k]!=null&&window[k]!=="")s[k]=window[k]});return s}
 function navApply(s){s=s||{};NAVCTX.forEach(function(k){window[k]=s[k]!=null?s[k]:null});}
 function crumbLabel(key,ctx){ctx=ctx||{};var p=PBK[key];var t=p?p.t:key;
@@ -24135,7 +24187,7 @@ function ctxKeys(){var K=NAVCTX.slice();
    trong". Thêm một trang chi tiết mới mà quên khai thì `_checkf5` báo đỏ. */
 var CTXTRANG={hoso:["HOSO"],hosogv:["GVID"],hosonv:["NVID"],hosokhoa:["KHID"],
  banglop:["BLCLASS"],diemdanh:["DDCLASS"],baitap:["BTCLASS","BTSESS"],giaoan:["GACRS","GATAB"],
- settings:["SETTAB","MSGQ","CFQ"],chay:["JPID"]};
+ settings:["SETTAB","MSGQ","CFQ"],chay:["RUNPID"]};
 /* Khoá ngữ cảnh của MỘT trang: phần khai ở trên, cộng biến tab nếu trang đó là hub (lấy thẳng
    từ HUBTAB). Sang V2 mỗi nghiệp vụ một trang thì vế hub tự rỗng. */
 function ctxCuaTrang(k){var K=(CTXTRANG[k]||[]).slice();
