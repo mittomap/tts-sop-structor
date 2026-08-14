@@ -138,6 +138,25 @@ const vais=[...new Set(nguoi.map(s=>String(s.role||"")))].filter(Boolean).sort()
    sot.join(" · ")+" => them vao NAVPHANG, khong thi menu phang mat loi vao");
  const du=Object.keys(phang).filter(k=>!PBK[k]);
  t("L3b · cay menu phang khong nhac trang khong co that", du.length===0, du.join(" · "));
+ /* ═══ L3c · NHOM CO KE THI MOI MUC PHAI THUOC DUNG MOT KE (14/08) ══════════════════════════
+    `NAVKE` chia mot nhom menu thanh cac ke co tieu de. Muc nao chua xep ke thi roi xuong ke
+    "Khac" o cuoi - khong mat, nhung do la mot cho SOT im lang: them mot trang vao nhom ma quen
+    xep ke thi no tu dong tut xuong day duoi mot cai tieu de vo nghia.
+    Va bang khai thua cung sai: xep ke cho mot trang khong con trong nhom thi dong khai nam lai
+    vinh vien, lan sau ai doc cung tuong trang do van o day. */
+ try{
+  const sotKe=[],thuaKe=[];
+  Object.keys(NAVKE).forEach(g=>{
+   const G=(NAVTREE.concat(NAVPHANG)).find(x=>x.g===g);
+   if(!G)return thuaKe.push(g+" (khong co nhom nao ten nay)");
+   const trongKe={};NAVKE[g].forEach(k=>k[1].forEach(x=>{trongKe[x]=1}));
+   (G.items||[]).forEach(k=>{if(/^chang[A-D]$/.test(k))return;
+    if(!trongKe[k])sotKe.push(g+" > "+k)});
+   Object.keys(trongKe).forEach(k=>{if((G.items||[]).indexOf(k)<0)thuaKe.push(g+" > "+k)});
+  });
+  t("L3c · nhom co ke thi khong muc nao roi xuong ke Khac", sotKe.length===0, sotKe.join(" · "));
+  t("L3c · ban khai ke khong nhac trang da roi khoi nhom", thuaKe.length===0, thuaKe.join(" · "));
+ }catch(e){t("L3c · doc duoc bang khai ke NAVKE", false, String(e.message).slice(0,80))}
 })();
 
 /* ═══ L4 · SỐ NÓI RA PHẢI BẤM ĐƯỢC ══════════════════════════════════════════════════════════ */

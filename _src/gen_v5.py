@@ -369,6 +369,11 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .btn.primary{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700}.btn.primary:hover{background:var(--navyd)}
 .btn.green{background:var(--green);border-color:var(--green);color:#fff;font-weight:700}.btn.danger{background:#fff;border-color:#F0B4B4;color:var(--red)}.btn.danger:hover{background:var(--redb)}
 .btn.sm{height:30px;padding:0 10px;font-size:11.5px}
+/* Tiêu đề KỆ trong một nhóm menu - nhỏ hơn và nhạt hơn hẳn tên nhóm để đọc ra đúng ba tầng:
+   NHÓM > kệ > mục. Không dùng viền hay nền: đây là một cái nhãn, không phải một cái nút. */
+.navke{font-size:10.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;
+ color:#8FA3BC;padding:10px 12px 4px 34px;user-select:none}
+.navke:first-child{padding-top:2px}
 .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px;margin-bottom:20px}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px;cursor:pointer}
 .kpi:hover{border-color:#C4D2E4}
@@ -27781,7 +27786,7 @@ var NAVTREE=[
     lối nào. Hub CSKH có 4 tab mà menu chỉ có tên hub. Anh Luân: *"bên sidebar giống như 1 cái
     bản đồ vậy, họ biết mình cần tìm gì ở đâu"* - thiếu một mục là mất một chỗ trên bản đồ.
     Thứ tự các mục con xếp ĐÚNG THỨ TỰ THANH TAB của hub, để menu và màn hình đọc như nhau. */
- {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","giaoan","baitap","khaosat","ghinhan","khieunai","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow","lichwow"]},
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","buoihnay","baitap","giaoan","wow","buoihoc","khaosat","ghinhan","khieunai","lichtuan","lichwow","gvdp","phong","lop"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","ketqua","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
@@ -28028,8 +28033,41 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
    "Test đầu vào" -> cũng vậy. Trước đây hai người ấy thấy nhóm "C1 · Khách tiềm năng".) */
 var NAVPHANG=[
  {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:"Lớp học & Giảng dạy",items:["xeplop","giaoan","baitap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow","lichwow"]},
+ {g:"Lớp học & Giảng dạy",items:["xeplop","buoihnay","baitap","giaoan","wow","buoihoc","lichtuan","lichwow","gvdp","phong","lop"]},
  {g:"Chăm sóc & Sau khóa",items:["khaosat","ghinhan","khieunai","baoluu","ketthuc","ketqua","magioithieu"]}];
+/* ═══ V2 14/08 - KỆ TRONG MỘT NHÓM MENU (anh Luân: *"em đã check xem trên sidebar nên sắp xếp
+   thế nào chưa, a thấy chắp vá quá"*) ══════════════════════════════════════════════════════
+   Đúng là chắp vá: cả ngày em mới chỉ VÁ TỪNG LỖ (thêm `socamket`, thêm `lichwow`, thêm
+   `banglop` rồi phải gỡ ra vì `lop` vốn đã là cha nó). Chưa lần nào ngồi xem cả cây menu.
+   Đo ra chỗ đau nhất: nhóm C2 ôm **15 mục** trong một cột dài, và trong đó lẫn BA LOẠI khác
+   hẳn nhau - màn làm hằng ngày · màn theo dõi · sổ tra cứu. Xếp chung một mạch thì mắt không
+   có chỗ bám: đọc tới mục thứ chín người ta đã quên mục thứ hai nói gì.
+   Đo bằng `NHIP` (nhịp ngày của từng chức danh, tức thứ người ta THẬT SỰ mở mỗi ngày): chỉ
+   **8/15** mục có mặt trong nhịp của bất kỳ chức danh nào. `buoihoc` được 3 chức danh nhắc;
+   `khaosat`, `ghinhan`, `khieunai`, `lichtuan`, `lop`, `lichwow` KHÔNG chức danh nào - chúng
+   là sổ tra khi cần, không phải việc hằng ngày, mà đang nằm lẫn giữa các màn hằng ngày.
+   `NAVKE` chia một nhóm thành các KỆ có tiêu đề. Cố ý KHÔNG nhét tiêu đề vào `G.items`: mảng
+   ấy là danh sách KHÓA TRANG mà chục chỗ khác đang đọc (`navGroupOf`, `trangNghiepVu`,
+   `_check11`, `_checkv2` L3b...). Nhét một chuỗi không phải khóa trang vào đó là gài một quả
+   mìn cho mọi chỗ ấy. *Thêm một chiều thông tin thì mở một bảng mới, đừng nhồi vào bảng cũ.*
+   Mục nào chưa xếp kệ thì rơi xuống kệ cuối - không bao giờ biến mất. */
+var NAVKE={};
+NAVKE[arcGrpName("changB")]=[
+ ["Làm hằng ngày",["xeplop","buoihnay","baitap","giaoan","wow"]],
+ ["Theo dõi chất lượng",["buoihoc","khaosat","ghinhan","khieunai"]],
+ ["Lịch & sổ tra cứu",["lichtuan","lichwow","gvdp","phong","lop"]]];
+/* Cây PHẲNG chia nhóm khác cây chặng: khảo sát / phản hồi / khiếu nại nằm ở nhóm "Chăm sóc &
+   Sau khóa", không ở đây. Khai kệ riêng theo ĐÚNG thành viên của nhóm này - dùng chung bảng
+   với cây chặng thì kệ "Theo dõi chất lượng" chỉ còn một mục mà vẫn đội một cái tiêu đề. */
+NAVKE["Lớp học & Giảng dạy"]=[
+ ["Làm hằng ngày",["xeplop","buoihnay","baitap","giaoan","wow"]],
+ ["Theo dõi chất lượng",["buoihoc"]],
+ ["Lịch & sổ tra cứu",["lichtuan","lichwow","gvdp","phong","lop"]]];
+NAVKE["Chăm sóc & Sau khóa"]=[
+ ["Đang chăm",["khaosat","ghinhan","khieunai","baoluu"]],
+ ["Sau khóa",["ketthuc","ketqua","magioithieu"]]];
+/* Kệ của một mục: trả về chỉ số kệ, hoặc số lớn nếu chưa xếp (rơi xuống cuối). */
+function navKeCua(ke,k){for(var i=0;i<ke.length;i++)if(ke[i][1].indexOf(k)>=0)return i;return 999}
 function navCayV5(){
  if(arcMode()==="chang")return NAVTREE;
  var out=[],xong=false;
@@ -28144,7 +28182,18 @@ function buildNav(){
    (!open&&gb?'<span class="dot">'+(gb>99?"99+":gb)+'</span>':'')+'</div>';
   if(!open)return;
   h+='<div class="navgrp">';
+  /* Có khai kệ thì xếp lại thứ tự theo kệ và chèn tiêu đề kệ khi sang kệ mới. Mục "Bản đồ chặng"
+     (changA..D) là mục CHA của cả nhóm nên luôn đứng trên mọi kệ, không thuộc kệ nào. */
+  var _ke=NAVKE[G.g]||null, _keDang=-1;
+  if(_ke){items=items.slice().sort(function(x,y){
+    var ax=/^chang[A-D]$/.test(x)?-1:navKeCua(_ke,x), ay=/^chang[A-D]$/.test(y)?-1:navKeCua(_ke,y);
+    if(ax!==ay)return ax-ay;
+    if(ax<0||ax>=_ke.length)return 0;
+    return _ke[ax][1].indexOf(x)-_ke[ax][1].indexOf(y)})}
   items.forEach(function(k){var m=navItemMeta(k),n=navBadge(k);
+   if(_ke&&!/^chang[A-D]$/.test(k)){var _ki=navKeCua(_ke,k);
+    if(_ki!==_keDang){_keDang=_ki;
+     h+='<div class="navke">'+esc(_ki<_ke.length?_ke[_ki][0]:"Khác")+'</div>'}}
    var isArc=/^chang[A-D]$/.test(k);
    /* Mục con của một hub thụt vào - trước đây hub và mục con của nó nằm ngang hàng nhau trên
       menu, nhìn không ra cái nào chứa cái nào. */
