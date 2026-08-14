@@ -151,6 +151,9 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .abschip{margin-left:8px;cursor:pointer;border:0;font-family:inherit}
 .abschip i{margin-right:4px}
 /* V9.29: tieu de nhom theo do gap trong trang Viec hom nay */
+.viecgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;align-items:start}
+@media(max-width:1100px){.viecgrid{grid-template-columns:1fr}}
+.viecbk{min-width:0}
 .viechd{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;letter-spacing:.3px;
  text-transform:uppercase;color:#5A6675;margin:14px 0 7px}
 .viechd b{color:var(--navy)}
@@ -1312,6 +1315,9 @@ table.dt tbody tr.clk.on td{font-weight:600}
  text-transform:none;color:var(--muted);opacity:.7;line-height:1;margin-top:-8px}
 .locv{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .locr.locct{background:var(--bg);align-items:center;gap:8px}
+/* Phan dieu khien khi da nhap vao hang chip: day sang mep phai, khong lan cho cua chip. */
+.locct2{margin-left:auto;display:flex;align-items:center;gap:8px;flex:0 0 auto;padding-left:12px}
+@media(max-width:900px){.locct2{margin-left:0;flex:1 1 100%;padding-left:0;margin-top:6px}}
 .locr.locct .tbcnt{margin-right:auto}
 .locr.locnote{background:var(--bg);font-size:11.5px;color:var(--muted);line-height:1.55;display:block}
 /* HÀNG GHI CHÚ LÀ MỘT CÂU VĂN, KHÔNG PHẢI MỘT HÀNG CHIP. `.locv` mặc định là flex - mỗi mẩu chữ
@@ -2112,6 +2118,12 @@ body.drsz .drawer{transition:none}
 .obcards.rows .obcard .obh .obten{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .obcards.rows .obcard .obm{display:inline;margin-left:8px}
 .obcards.rows .obcard .obact{flex:0 0 auto;display:flex;justify-content:flex-end;gap:8px;flex-wrap:nowrap;margin-left:0}
+/* (anh Luan: *"kich thuoc nut cung trang ma lai chenh lech kieu nay thi lam sao ma dep"*).
+   Nut rong theo do dai chu nen "Xu ly" va "Xem lai" khac co ngay trong mot bang. Chot mot be
+   rong toi thieu chung cho moi nut trong hang cua so: chu van noi dung viec, con cot thi thang.
+   Dat o hang cua SO (`.obcards.rows`) chu khong dat toan app - nut trong ngan keo hay tren
+   thanh cong cu van tu do theo noi dung cua no. */
+.obcards.rows .obcard .obact>.btn{min-width:106px;justify-content:center}
 /* MOT DONG, MOI LOAI NUT MOT COT (anh Luan: *"a thich nhu cu hon, nhung cac nut co tinh chat
    giong nhau thi lam thanh 1 cot la no het roi"*). Lan truoc em chot be rong o nhung khong chot
    phan TEN - ma ten lop o day dai toi 43 ky tu ("PRIVATE Nguyen Loan - 36H OFF CN4 (07/2026)"),
@@ -4504,7 +4516,7 @@ var THEDEF={
   ["bl_ss","Hài lòng (SS)","Điểm hài lòng trung bình lớp này trên thang 5, so với ngưỡng SS. Muốn xem chi tiết: trang Khảo sát & Phản hồi."]]},
  banggiao:{t:"Bàn giao lead",the:[
   ["bg_om","Tuổi trung bình lead đang ôm","Trung bình số ngày kể từ lúc lead được giao cho nhân viên đang chọn, kèm lead lâu nhất và trần ôm leadHoldMax_days. Bảng dưới đếm được bao nhiêu lead, nhưng không cộng được trung bình - mà 40 lead trung bình 6 ngày với 40 lead trung bình 52 ngày là hai chuyện khác hẳn. Danh sách: bảng lead ngay dưới, cột Ngày giao."],
-  ["bg_orph","Lead chưa có ai phụ trách","Lead chưa gán cho ai - không ai gọi thì nguội. Danh sách: bảng lead dưới, cột Phụ trách trống."],
+  ["bg_orph","Lead chưa có ai phụ trách","Lead chưa gán cho ai - không ai gọi thì nguội. Danh sách: bấm chính ô này, ô chọn \"Từ NV\" nhảy sang mục (chưa có ai phụ trách) và bảng lead ngay dưới liệt kê đúng bấy nhiêu dòng."],
   ["bg_due","Quá hẹn liên hệ của NV này","Số lead nhân viên này phụ trách đã quá hẹn liên hệ, kèm mức trễ NẶNG NHẤT tính bằng ngày - trễ 2 giờ và trễ 3 tuần không phải một chuyện. Danh sách: bảng lead dưới, cột Hẹn liên hệ."],
   ["bg_thu","Đủ điều kiện thu về","Lead dính một trong hai mốc chăm sóc của trung tâm: quá leadStale_days ngày không ai liên hệ, hoặc một NV ôm quá leadHoldMax_days ngày. Khác ô bên trái - ô kia đo cái hẹn NV tự đặt, ô này đo mốc của trung tâm. Danh sách: nút Thu lead quá hạn ở thanh trên."]]},
  nhatky:{t:"Nhật ký thao tác",the:[
@@ -7816,7 +7828,10 @@ function renderViec(){var items=bellItems();
   locR("Sắp xếp",segHTML(window.VIECSX||"gap",
    [["gap","Theo độ gấp",0,""],["nhom","Theo nhóm việc",0,""],["moi","Mới nhất trước",0,""]],
    "window.VIECSX='{k}';reRender('viec')","viec_sapxep"))],
-  '<span class="tbcnt">'+view.length+' việc</span>');
+  /* (anh Luan: *"tong so viec nay cung la 1 dang du thua dung ko, vi thuong o chip cung co"*).
+     Dung - chip "Tat ca" da mang dung con so ay. Mot con so noi lai dieu chip vua noi thi chi
+     ton cho, ma cho o dau trang la cho dat nhat. */
+  "");
  /* GOM THEO ĐỘ GẤP - trước đây đổ một danh sách phẳng, đỏ lẫn vàng lẫn xám, không biết bắt đầu từ đâu */
  var _sx=window.VIECSX||"gap";
  var BUCK;
@@ -7834,6 +7849,11 @@ function renderViec(){var items=bellItems();
         ["","Theo dõi","ti-eye","var(--muted)"]];
  }
  var shown=0, CAP=120;
+ /* (anh Luan: *"2 bang nay nen 2 cot nhi, chu cai nay tren, cai kia duoi thi kho theo doi"*).
+    Ba khoi xep doc thi khoi thu hai bat dau o dau do duoi day man - muon liec "sap toi han con
+    may cai" la phai cuon, ma cuon xuong thi mat khoi "qua han" khoi tam mat. Hai cot cho hai
+    khoi nam canh nhau, so duoc voi nhau trong mot cai nhin. Man hep thi tu ve mot cot. */
+ h+='<div class="viecgrid">';
  BUCK.forEach(function(B){
   var part=(B[4]==="grp")?view.filter(function(it){return (it.grp||it.cat)===B[0]})
         :(B[4]==="moi")?view.slice()
@@ -7849,14 +7869,15 @@ function renderViec(){var items=bellItems();
   if(B[4]==="moi")part.sort(function(x,y){var ax=(x.age==null?1e9:x.age),ay=(y.age==null?1e9:y.age);return ax-ay});
   else part.sort(function(x,y){var ax=(x.age==null?-1e9:x.age),ay=(y.age==null?-1e9:y.age);return ay-ax});
   if(!part.length)return;
-  h+='<div class="viechd"><i class="ti '+B[2]+'" style="color:'+B[3]+'"></i>'+
+  h+='<div class="viecbk"><div class="viechd"><i class="ti '+B[2]+'" style="color:'+B[3]+'"></i>'+
    esc(B[1])+' <b>'+part.length+'</b></div>';
   h+='<div class="panel"><div class="pbody slalist">';
   var lim=Math.max(0,CAP-shown);
   part.slice(0,lim).forEach(function(it){h+=slaRow(it)});
   shown+=Math.min(part.length,lim);
   if(part.length>lim)h+='<div class="pmore">... còn '+(part.length-lim)+' việc nữa ở nhóm này - chọn một Nhóm việc ở trên để xem hết</div>';
-  h+='</div></div>'});
+  h+='</div></div></div>'});
+ h+='</div>';
  if(!view.length)h+='<div class="panel"><div class="pbody"><div class="empty">Không có việc nào ở bộ lọc này.</div></div></div>';
  return h}
 /* bấm ô số trên dải: lọc theo mức độ, giữ nguyên bộ phận và nhóm việc đang chọn */
@@ -13369,9 +13390,20 @@ function renderBanggiao(embed){
  else if(!(function(){try{return banToanQuyen()}catch(e){return false}})()){try{bgTeam=myTeam()}catch(e){bgTeam=null}}
  var staffAll=rows("DL01").filter(function(s){return /sales/.test(ecode(s.role))});
  var staff=staffAll.filter(function(s){return !bgTeam||bgTeam[s.staff_id]});
+/* ═══ V2 14/08 (anh Luân: *"kiểm tra logic, a ko xem được theo hướng dẫn của thẻ này"* - ô
+   "Lead chưa có ai phụ trách", đi từ Trang bắt đầu qua) ══════════════════════════════════
+   Ô ấy đếm lead VÔ CHỦ trên toàn hệ thống, rồi bảo "Danh sách: bảng lead dưới, cột Phụ trách
+   trống". Nhưng bảng dưới chỉ hiện lead CỦA MỘT NV ĐƯỢC CHỌN - mà lead vô chủ thì không thuộc
+   NV nào, nên nó KHÔNG BAO GIỜ nằm trong bảng ấy. Con số đúng, câu chỉ đường sai, và người ta
+   đi theo nó thì đi vào chỗ trống.
+   *Một ô số chỉ đáng tin khi chỗ nó chỉ tới thật sự có bấy nhiêu dòng.*
+   Nay ô chọn "Từ NV" có thêm một mục **(chưa có ai phụ trách)**; ô số nhảy thẳng vào mục ấy. */
+var BGORPH="__orph";
  var src=(bgQL?window.BGSRC:"")||"";
- if(src&&!staff.some(function(s){return s.staff_id===src}))src="";
+ if(src===BGORPH&&!bgQL)src="";   /* không phải quản lý thì không có ô chọn, cũng không có mục này */
+ if(src&&src!==BGORPH&&!staff.some(function(s){return s.staff_id===src}))src="";
  if(!src)src=(staff.some(function(s){return s.staff_id===CURSTAFF})?CURSTAFF:((staff[0]&&staff[0].staff_id)||CURSTAFF||""));
+ var laOrph=(src===BGORPH);
  var others=staffAll.filter(function(s){return s.staff_id!==src});
  var h=embed?'':'<div class="phead" data-tour="phead"><div><div class="t">Bàn giao lead</div><div class="s">Chuyển lead từ một NV sang NV khác (khi nghỉ / quá tải). NV nhận mới thấy lead, NV cũ không còn thấy.</div></div></div>';
  /* Không phải quản lý thì KHÔNG bày ô chọn - chỉ có một lựa chọn là chính mình, mà một ô chọn
@@ -13379,7 +13411,7 @@ function renderBanggiao(embed){
     gì. Ghi thẳng tên mình cho họ đọc, đúng chỗ ô chọn từng đứng. */
  h+='<div class="fbar"><span class="lbl">Từ NV</span>'+
   (bgQL
-   ?'<select class="sel" onchange="window.BGSRC=this.value;reRender(CUR)">'+staff.map(function(s){return '<option value="'+esc(s.staff_id)+'"'+(s.staff_id===src?" selected":"")+'>'+esc(s.staff_id+" - "+s.full_name)+'</option>'}).join("")+'</select>'
+   ?'<select class="sel" onchange="window.BGSRC=this.value;reRender(CUR)">'+'<option value="'+BGORPH+'"'+(laOrph?" selected":"")+'>(chưa có ai phụ trách)</option>'+staff.map(function(s){return '<option value="'+esc(s.staff_id)+'"'+(s.staff_id===src?" selected":"")+'>'+esc(s.staff_id+" - "+s.full_name)+'</option>'}).join("")+'</select>'
    :(src
      ?'<b>'+esc(src+" - "+(((find("DL01","staff_id",src))||{}).full_name||"bạn"))+'</b><span class="mut" style="font-size:11.5px;margin-left:6px">bạn chỉ bàn giao được lead của chính mình</span>'
      :'<span class="mut" style="font-size:11.5px">chức danh của bạn không giữ sổ lead nên không có gì để bàn giao</span>'));
@@ -13407,7 +13439,8 @@ function renderBanggiao(embed){
     không có ai phụ trách, bao nhiêu lead quá hạn liên hệ. Trước đây phải tự đếm bằng mắt. */
  (function(){var L=rows("DL02");
   var live=function(l){return !isc(l.lead_status,"converted","rejected","unreachable")};
-  var mine=L.filter(function(l){return String(l.assigned_to||"")===src&&live(l)});
+  /* Muc "(chua co ai phu trach)": loc dung lead VO CHU, khong loc theo ma NV nao. */
+  var mine=L.filter(function(l){return (laOrph?!String(l.assigned_to||"").trim():String(l.assigned_to||"")===src)&&live(l)});
   var orph=L.filter(function(l){return !String(l.assigned_to||"").trim()&&live(l)});
   var due=mine.filter(function(l){var d=pvnd(l.next_followup_time);return d&&d.getTime()<Date.now()});
   var perBr={};L.forEach(function(l){if(!live(l))return;var st=find("DL01","staff_id",l.assigned_to);if(st&&st.branch)perBr[st.branch]=1});
@@ -13423,7 +13456,11 @@ function renderBanggiao(embed){
     return ["ti-hourglass",(Math.round(tb)+" ngày"),"Tuổi trung bình lead đang ôm",
      (tb>num(paramOf("leadHoldMax_days",45))?"#E24B4A":(tb>14?"#E08A1E":"#2E9E6B")),
      mine.length+" lead · lâu nhất "+Math.round(mx)+" ngày · trần ôm "+slaChip("leadHoldMax_days",45,"ngày")]})(),
-   ["ti-user-off",orph.length,"Lead chưa có ai phụ trách","#E24B4A",orph.length?"chia sớm, tránh để nguội":"không còn"],
+   /* Bấm vào là NHẢY THẲNG vào mục "(chưa có ai phụ trách)" của ô chọn - đúng chỗ chứa
+      bấy nhiêu dòng. Trước đây ô này không bấm được, và câu chỉ đường của nó trỏ vào một
+      cái bảng không bao giờ chứa chúng. */
+   ["ti-user-off",orph.length,"Lead chưa có ai phụ trách","#E24B4A",orph.length?"chia sớm, tránh để nguội":"không còn",
+    "window.BGSRC='__orph';reRender('banggiao')"],
    /* V9.57: bo o "Co so dang co lead song" va "Nhan vien tu van" - ca hai la thong tin nen,
       biet roi cung khong ban giao khac di. Giu lai dung cai phai quyet: lead qua han lien he. */
    (function(){/* quá hẹn thì quá BAO LÂU - một dòng quá 2 giờ và một dòng quá 3 tuần khác nhau */
@@ -13436,7 +13473,7 @@ function renderBanggiao(embed){
       thể đúng hẹn mà vẫn bị ôm 60 ngày không ra kết quả. */
    (function(){var nT=bgThuDS(src).length;
     return ["ti-recharging",nT,"Đủ điều kiện thu về","#DB2777",nT?"quá mốc chăm sóc - thu rồi giao người khác":"không có lead nào quá mốc"]})()],"banggiao")})();
- var allLeads=rows("DL02").filter(function(l){return String(l.assigned_to||"")===src});
+ var allLeads=rows("DL02").filter(function(l){return laOrph?!String(l.assigned_to||"").trim():String(l.assigned_to||"")===src});
  var q=vnorm(window.BGQ||"").trim();var stf=window.BGST||"all";
  var stCount={};allLeads.forEach(function(l){var c=ecode(l.lead_status);if(c)stCount[c]=(stCount[c]||0)+1});
  var leads=allLeads.filter(function(l){
@@ -15967,9 +16004,24 @@ function locR(nhan,noiDung,nhieu,cls){
   '<div class="locv">'+noiDung+'</div></div>'}
 /* Gộp các hàng lọc thành MỘT khối có đúng MỘT khung. `neo` giữ nguyên mã neo của thanh cũ để
    bài hướng dẫn không trỏ vào chỗ trống - đổi giao diện thì đổi, đừng làm gãy đường dẫn. */
+/* ═══ V2 14/08 (anh Luân: *"em thì lại đang phung phí hàng quá, làm nội dung chính bị đẩy xuống
+   dưới rất uổng"*) ═══════════════════════════════════════════════════════════════════════════
+   Đúng. Hàng điều khiển (dòng đếm + nút Xuất + Bộ lọc) đang chiếm NGUYÊN một hàng chỉ để chứa
+   vài chữ và hai cái nút - trong khi hàng chip ngay trên nó thừa chỗ ở mép phải. Mỗi trang mất
+   một hàng, mà mất hàng ở đầu trang thì đẩy nội dung chính xuống - thứ người ta mở trang ra để
+   xem lại là thứ phải cuộn mới thấy.
+   Nay: nếu khối lọc CÓ ít nhất một hàng chip, phần điều khiển đi vào mép phải của HÀNG ĐẦU thay
+   vì đẻ hàng mới. Không còn hàng chip nào (trang chỉ có nút) thì mới giữ hàng riêng - lúc đó
+   không có chỗ nào để nhập vào.
+   Một dòng sửa ở đây, mọi trang dùng `locKhoi` gọn theo - không phải đi vá từng trang. */
 function locKhoi(rows,ct,neo){
  var r=(rows||[]).filter(Boolean);
- if(ct)r.push('<div class="locr locct">'+ct+'</div>');
+ if(ct){
+  if(r.length){
+   var i=r.length-1;   /* nhập vào hàng CUỐI của khối chip: hàng đầu hay là ô tìm, chèn vào đó thì ô tìm bị bóp */
+   r[i]=r[i].replace(/<\/div>\s*$/, '<span class="locct2">'+ct+'</span></div>');
+  }else r.push('<div class="locr locct">'+ct+'</div>');
+ }
  if(!r.length)return "";
  return '<div class="tbar loc" data-tour="'+(neo||"tbar")+'">'+r.join("")+'</div>'}
 /* V9.64: thanh công cụ HAI TẦNG - tầng trên là thứ THAY ĐỔI theo dữ liệu (ô tìm, dải chip lọc),
