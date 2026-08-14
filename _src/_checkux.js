@@ -724,6 +724,30 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
   try{h=(PBK[k]&&PBK[k].ty==="list")?renderList(k):RENDER[k]()}catch(e){return}
   loanNut+=(h.match(/class="btn sm (primary|danger|green)"/g)||[]).length});
  t("class nut viet mot thu tu duy nhat (btn <mau> sm)", loanNut===0);
+ /* ═══ HAI LUAT THANH PHAN CHOT LAI 14/08 ═══════════════════════════════════════════════════
+    Anh Luan: *"kich thuoc nut cung trang ma lai chenh lech kieu nay thi lam sao ma dep duoc"*
+    va *"do no cung 1 bang, e nen lam cho no tuong dong it nhat la ve kich thuoc"*.
+    (1) Nut trong MOT o hanh dong phai co mot be rong SAN chung - do duoc 40/64 o co hai nut ma
+        nhan chenh nhau qua 4 ky tu, nen hai nut rong khac han va ca cot rang cua doc xuong.
+    (2) Lop nut nao khai trong CSS thi phai co cho GOI no - khai mot lop roi khong ai dung la mot
+        loi hua chet nam lai vinh vien.
+    GHI LAI MOT SAI CUA CHINH PHEP DO (2): ban dau em dem lop `.btn.hvcall-dark` tren MOT file
+    (ban nhan vien) roi ket luan "ma chet" - trong khi no duoc goi o CONG HOC VIEN, mot file khac.
+    *Dem tren mot nua pham vi roi ket luan cho ca pham vi la cach chac chan nhat de xoa nham mot
+    thu dang chay.* Nay hoi tren MA NGUON, noi ca hai ban deu sinh ra tu do. */
+ var sanNut=/\.rowact \.btn\{[^}]*min-width:\s*\d+px/.test(CSS_ALL);
+ t("nut trong mot o hanh dong co be rong san chung (.rowact .btn min-width)", sanNut);
+ var GENSRC="";try{GENSRC=require('fs').readFileSync(require('path').join(__dirname,'gen_v5.py'),'utf8')}catch(e){}
+ var lopChet=[];
+ (CSS_ALL.match(/\.btn\.[a-zA-Z][\w-]*(?=[{,: ])/g)||[]).forEach(function(m){
+  var ten=m.slice(5);
+  if(lopChet.indexOf(ten)>=0)return;
+  /* Hoi tren NGUON: lop co the duoc ghep bang bien ("btn "+cls) hoac truyen vao mot ham
+     (`hvCallHTML(..., "hvcall-dark")`) - do tren HTML dung mot ban se bo sot. */
+  var re=new RegExp('["\'\\s]'+ten.replace(/[-]/g,"\\-")+'["\'\\s]');
+  if(GENSRC&&!re.test(GENSRC))lopChet.push(ten)});
+ t("khong lop nut nao khai trong CSS ma khong cho nao goi"+(lopChet.length?" - CHET: "+lopChet.slice(0,6).join(", "):""),
+   lopChet.length===0);
 })();
 /* ═══════ V9.57 - THẺ PHẢI LÀ MỘT VIỆC PHẢI QUYẾT HÔM NAY ═══════
    Anh Luân: "thẻ phải đại diện cho 1 vấn đề quan trọng, xem nhanh và NGÀY NÀO CŨNG PHẢI XEM,

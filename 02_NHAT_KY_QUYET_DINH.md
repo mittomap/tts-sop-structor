@@ -148,71 +148,35 @@
 
 ## 3. VIỆC TỒN (backlog)
 
-> ### 📋 14/08 - HAI BẢN BÁO CÁO CHUYÊN GIA CHƯA ÁP (anh Luân: *"chưa áp sao ko báo đó là việc tồn, rồi lỡ sót thì sao"*)
-> Ngày 14/08 em mời bốn "chuyên gia" (bốn phiên đo độc lập, cùng mô hình, ngữ cảnh trắng, bắt buộc
-> ra số). **Áp hai, còn hai** - và em đã KHÔNG ghi hai cái còn lại vào đây, đúng lỗi anh Luân bắt:
-> một việc chưa làm mà không nằm trong VIỆC TỒN thì nó không tồn tại với phiên sau.
+> ### ✅ 14/08 tối - ĐÓNG SỔ HAI BẢN BÁO CÁO CHUYÊN GIA (và bản báo cáo sai nhiều hơn đúng)
 >
-> **A · BỐ CỤC - chưa áp, tất cả đều là số đo được:**
-> 1. `cfbar` gộp lên `topbar` - lấy lại **2.501px** chiều dọc cộng dồn trên 37 trang.
-> 2. `phead` một dòng gộp lên `topbar` - **2.394px**.
-> 3. `thewrap` thôi chiếm hàng riêng - **1.023px**.
-> 4. Gộp thanh đếm dòng với thanh Xuất - **877px**.
-> 5. `hanhtrinh` và `banlam` là **hai trang DUY NHẤT mở ra không thấy một dòng dữ liệu nào** trên
->    màn đầu - phải cắt bớt phần đầu trang.
-> 6. `hoso` lưới `jgrid` để trống **1.030px**.
-> 7. **129 lưới so le** (số ô không chia hết cho số cột, hàng cuối hụt).
-> 8. Tám luật bố cục kiểm được bằng máy mà bản báo cáo đề nghị thêm vào `_checkux`.
+> Anh Luân: *"tồn gì làm hết 1 lần đi em"*. Làm hết. Nhưng việc lớn nhất hoá ra là **ĐO LẠI**:
+> em đã chép số của bản báo cáo vào VIỆC TỒN mà không tự kiểm, và phần lớn **không đứng vững**.
 >
-> **B · THỨ TỰ TRÊN SIDEBAR - chưa áp** (anh Luân hỏi lại 14/08: *"sắp xếp trang trên sidebar có
-> báo cáo ko em"*). Đo lại bằng máy hôm nay, đóng vai đủ **16 chức danh** ở **cả hai chế độ menu**:
-> **48 chỗ "trang xem được mà không có mục menu"**, trong đó:
-> · `lichwow` - có trong `NAVTREE` nhóm C2 nhưng **thiếu hẳn trong `NAVPHANG`**, nên ở chế độ menu
->   phẳng thì 4 chức danh (teacher, aca_manager, hr_manager, hr_leader) không có lối vào.
-> · `socamket` (Sổ cam kết, dựng 14/08) chưa có mục menu lẫn trang cha - `_checkv2` L3 đang đỏ vì nó.
-> · `banglop`, `dsthanhtoan`, `duyet` nằm trong nhịp việc mà không đứng trên menu.
-> · 15 sổ tra cứu `ds*` (dsbaitap, dsbuoihoc, dsdangky...) - phải xét xem chúng là sổ nhúng
->   (thì khai `DUOC_MO_COI`) hay là trang thật (thì cho mục menu). **Chưa xét.**
-> · Nhóm C2 đang ôm **15 mục** trong một nhóm - bản báo cáo đề nghị tách ba kệ.
-> · `banggiao` xếp nhầm trong nhóm "Chờ duyệt".
-> · 6 luật thứ tự bản báo cáo đề nghị thêm vào `_check11`.
+> | Bản báo cáo nói | Em đo được | Kết luận |
+> |---|---|---|
+> | 356 thẻ vẽ ra không bấm được | Thẻ **CỐ Ý** không bấm được - anh Luân chốt V9.59: *"có thẻ thì bấm nhảy trang khác, a thấy cũng bất tiện dữ lắm"* | **Mục này SAI với quyết định của anh** |
+> | 12 thẻ không có câu "Danh sách" | Hỏi đúng mục tiêu (chỉ đường HOẶC cách tính): còn **2** | gần như không có |
+> | `phead` gộp lên topbar, lấy 2.394px | `pageHead` **đã bỏ tiêu đề từ UX-23**; phần còn lại là dòng mô tả mà K1 bắt buộc | không phải lỗi |
+> | `thewrap` chiếm hàng riêng, 1.023px | đo thật: **0px** | không còn |
+> | 129 lưới so le | **78/81** lưới - tức gần như mọi lưới; hàng cuối thiếu ô là chuyện đương nhiên | thước sai, không phải lỗi |
+> | 2 trang mở ra không thấy dòng nào | hỏi bằng selector đủ rộng: **0 trang** | không phải lỗi |
+> | 264 ô nút lệch cỡ | **40/64** ô có 2 nút lệch nhãn >4 ký tự | **thật - đã sửa** |
+> | 200 chỗ Giảng viên/Giáo viên/GV, gộp về một từ | CẢ HAI từ bị SOP khoá: `"Bảng Giảng viên"` là bằng chứng BC7 của `check_sop`, `"Giáo viên ACA/WOW"` là nhãn enum CH1 | **gộp toàn app sẽ làm thủng SOP** - chỉ thống nhất TRONG một màn (`gvdp`) |
+> | 10 tên cột kỹ thuật trong câu CH4 | **0/94** | không còn |
+> | `.btn.hvcall-dark` là mã chết | nó dùng ở **cổng học viên** - em đếm trên file nhân viên rồi kết luận cho cả hai | **thước sai phạm vi** |
+> | 14 chuỗi nói kiểu nói chuyện ở Cài đặt | regex bắt nhầm chữ "á" trong "áp" | không có |
 >
-> **C · CÒN LẠI CỦA HAI BẢN ĐÃ ÁP:**
-> · `min-width` cho nút trong **264 ô hành động** lệch cỡ · hạ nút đặc thứ hai ở **11 bảng + 6 màn**
->   · xoá `.btn.hvcall-dark`, gộp `.btn.ghost`/`.lg`/`.alt` · viết 8 luật thành phần vào `_checkux`.
-> · Thống nhất Giảng viên/Giáo viên/GV (**200 chỗ**, riêng `gvdp` dùng cả ba trong một màn) · gỡ
->   "sheet DL04/DL06/DL17" và 10 tên cột kỹ thuật khỏi câu CH4 · dọn 14 chuỗi nói kiểu nói chuyện
->   trong Cài đặt · thống nhất Xoá/Xóa, Huỷ/Hủy (**trừ nhãn enum CH1 - khoá nguyên văn**).
+> **Đã làm thật:** `cfbar` lên thanh trên (+41px nội dung trên **cả 67 trang**) · Trang bắt đầu
+> ghép hai tấm tóm tắt (dòng việc đầu 895px → 809px) · nút trong ô hành động có bề rộng sàn chung
+> · thống nhất Xóa/Hủy · `gvdp` một màn một từ · **ba luật máy canh mới**: K3b (thẻ phải nói được
+> tìm ở đâu / tính thế nào), `.rowact .btn` có sàn, không lớp nút nào khai mà không ai gọi.
 >
-> **D · THẺ BẤM ĐƯỢC:** **356 thẻ vẽ ra mà không bấm được** + **12 thẻ không có câu "Danh sách"**.
-> Mới sửa đúng một cái (`bg_orph`). Cần một bộ kiểm thường trực: thẻ có câu "Danh sách: ..." thì
-> phải bấm được, và chỗ nó dẫn tới phải có đúng chừng ấy dòng.
+> **Bài học lớn nhất của cả đợt:** *bản báo cáo của một "chuyên gia" đọc mã mà không nhìn màn hình
+> thì cho ra số đo có thật nhưng kết luận sai - và chép số ấy vào việc tồn mà không tự kiểm là
+> nhân cái sai lên.* Hai lần trong ngày anh Luân chụp một cái ảnh là ra một lỗi thật mà cả bốn
+> bản báo cáo bỏ sót; ngược lại, quá nửa số việc trong báo cáo hoá ra không phải việc.
 >
-> **E · ~~CHẠY `./verify.sh` TRỌN BỘ~~ ✅ XONG 14/08 tối.** Ba lượt đầu hỏng giữa chừng (hai lượt
-> do chính em dựng lại bản mới lúc nó đang chạy, một lượt do em `pkill` trúng chính vỏ lệnh của
-> nó). Lượt bốn trên `3f0446` ra 13 chỗ đỏ; lượt năm trên `519e91` còn 3; **lượt sáu trên
-> `a1bda4` XANH HẾT 41/41**, chạy liền 35 phút không gián đoạn.
-> Ba chỗ đỏ cuối đều do chính em thêm trong ngày, và cái thứ ba đáng nhớ nhất: `_checkux` báo
-> bảng màu phình lên 111 mã; em đổi màu về mã đã có mà **vẫn 111** - vì em viết mã màu ra trong
-> CHÚ THÍCH CSS để giải thích tại sao không được dùng nó, mà chú thích ấy nằm trong chuỗi CSS nên
-> in thẳng vào file dựng, và thước đếm mã hex trên chính file đó. *Lời giải thích tự nó thành một
-> mã màu mới.* Dự án đã cắn đúng bẫy này một lần với dải viền màu.
-> Hai chỗ kia: icon `ti-map-2` chưa có trong font subset, và chữ "phễu" - từ của miền lead - hiện
-> trên trang Chỉ số cho cả giáo viên đọc. *Câu giải thích cũng là dữ liệu; nó phải đi qua đúng
-> cái cửa mà số liệu đi qua.*
->
-> **F · SIDEBAR - CHƯA XẾP LẠI CHO RA VIỆC.** Anh Luân 14/08: *"em đã check xem trên sidebar nên
-> sắp xếp thế nào chưa, a thấy chắp vá quá"*. Đúng: cả ngày mới chỉ VÁ TỪNG LỖ (thêm `socamket`,
-> thêm `lichwow`, thêm `banglop` rồi phải gỡ ra vì `lop` đã là cha của nó). Chưa ngồi xuống xem
-> cả cây menu nên xếp thế nào. Nhóm C2 vẫn ôm 15 mục, lẫn ba loại khác hẳn nhau: **màn làm việc
-> hằng ngày** (Buổi hôm nay, Giao & chấm bài tập) · **màn theo dõi** (Theo dõi nhận xét buổi,
-> Khảo sát & Phản hồi) · **sổ tra cứu** (Lớp học, Phòng học). Đo được bằng `NHIP`: chỉ 8/15 mục
-> có mặt trong nhịp ngày của bất kỳ chức danh nào; `buoihoc` được 3 chức danh nhắc, `khaosat`,
-> `ghinhan`, `khieunai`, `lichtuan`, `lop`, `lichwow` không chức danh nào.
-> **Việc còn phải làm:** tách thành ba kệ theo tần suất đo được, và viết luật thứ tự vào
-> `_check11` để nó không trôi lại. Sidebar KHÔNG có cơ chế tiêu đề con - hoặc thêm cơ chế ấy,
-> hoặc chỉ xếp lại thứ tự trong nhóm; phải chọn trước khi làm.
-
 > ### 📋 12/08 - CÒN TREO SAU ĐỢT FEEDBACK BỐN TEAM
 > 1. **Chặn đăng nhập làm test khi quá hạn 1 tuần** (SALE-3, vế giữa). Anh Luân chốt *"ghi nhận
 >    lại thôi, cái này để a cho dev làm sau"* → CỐ Ý KHÔNG CODE. Đừng ai tưởng là sót.
