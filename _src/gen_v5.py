@@ -7826,7 +7826,12 @@ function renderViec(){var items=bellItems();
      vào trong lúc tôi đi vắng"* (theo thời gian). Một danh sách phục vụ ba câu hỏi thì phải cho
      người ta nói mình đang hỏi câu nào. */
   locR("Sắp xếp",segHTML(window.VIECSX||"gap",
-   [["gap","Theo độ gấp",0,""],["nhom","Theo nhóm việc",0,""],["moi","Mới nhất trước",0,""]],
+   /* (anh Luân: *"ủa vậy cái chip sắp xếp phải đổi phải ko em"*). Đúng - lỗi do chính em gây
+      ra lúc thêm trục này: em truyền số 0 vào ô đếm, nên ba chip sắp xếp hiện "0" y như ba
+      chip lọc rỗng. Mà chip lọc mang số vì nó nói "lọc ra được bấy nhiêu dòng"; chip SẮP XẾP
+      không lọc gì cả - nó chỉ đổi thứ tự, số dòng giữ nguyên. Cho nó một con số là hứa một
+      điều nó không làm, và số 0 lại còn đọc ra như "không có gì ở đây". Bỏ hẳn ô đếm. */
+   [["gap","Theo độ gấp"],["nhom","Theo nhóm việc"],["moi","Mới nhất trước"]],
    "window.VIECSX='{k}';reRender('viec')","viec_sapxep"))],
   /* (anh Luan: *"tong so viec nay cung la 1 dang du thua dung ko, vi thuong o chip cung co"*).
      Dung - chip "Tat ca" da mang dung con so ay. Mot con so noi lai dieu chip vua noi thi chi
@@ -7848,7 +7853,11 @@ function renderViec(){var items=bellItems();
         ["amber","Sắp tới hạn - còn kịp","ti-clock","var(--amber)"],
         ["","Theo dõi","ti-eye","var(--muted)"]];
  }
- var shown=0, CAP=120;
+ /* TRẦN HIỂN THỊ TÍNH THEO TỪNG KHỐI, không dùng chung một túi. Bản cũ trừ dần từ một hạn
+    mức 120 chung, nên khối đầu ăn hết và khối thứ hai chỉ còn đúng một dòng chữ "... còn 134
+    việc nữa" - xếp dọc thì còn đỡ, chứ sang hai cột là nguyên một cột trống hoác cạnh một cột
+    đầy. *Trần dùng chung thì khối nào đứng trước ăn hết phần của khối sau.* */
+ var CAP=60;
  /* (anh Luan: *"2 bang nay nen 2 cot nhi, chu cai nay tren, cai kia duoi thi kho theo doi"*).
     Ba khoi xep doc thi khoi thu hai bat dau o dau do duoi day man - muon liec "sap toi han con
     may cai" la phai cuon, ma cuon xuong thi mat khoi "qua han" khoi tam mat. Hai cot cho hai
@@ -7872,9 +7881,8 @@ function renderViec(){var items=bellItems();
   h+='<div class="viecbk"><div class="viechd"><i class="ti '+B[2]+'" style="color:'+B[3]+'"></i>'+
    esc(B[1])+' <b>'+part.length+'</b></div>';
   h+='<div class="panel"><div class="pbody slalist">';
-  var lim=Math.max(0,CAP-shown);
+  var lim=CAP;
   part.slice(0,lim).forEach(function(it){h+=slaRow(it)});
-  shown+=Math.min(part.length,lim);
   if(part.length>lim)h+='<div class="pmore">... còn '+(part.length-lim)+' việc nữa ở nhóm này - chọn một Nhóm việc ở trên để xem hết</div>';
   h+='</div></div></div>'});
  h+='</div>';
