@@ -56,7 +56,26 @@ Ba câu hỏi để loại nhanh một cái thẻ:
 | `ketqua` | 58% đạt AIM thi thử · 80% đạt AIM thi thật | T1 |
 | `viec` | Nợ quá 3 ngày · Quá hạn nhiều nhất: Học vụ | T2 + T5 |
 
-### Nhóm B - nên ĐỔI, không nên bỏ
+### Nhóm B - nên ĐỔI, không nên bỏ — **ĐÃ LÀM XONG 14/08**
+
+Tám trang dưới đây đã đổi thật, ghi lại đúng cái đã dựng để lần sau khỏi đoán:
+
+| Trang | Thẻ mới đã dựng |
+|---|---|
+| `baitap` | **Nộp bài (HCR) %** so ngưỡng KPI · **Bài quá hạn chấm** (mốc `slaHomeworkGrading_hours` + bánh răng) · **Điểm trung bình bài đã chấm** |
+| `wow` | Giữ **Buổi thiếu mốc giờ** · **Buổi WOW có tiến bộ (WOR) %** so ngưỡng · **Lượt WOW còn lại toàn trung tâm** |
+| `lichwow` | **% ô trực đã được đặt** · **NV WOW trực tuần này** kèm số ô/người · giữ **Ngày không ai trực** |
+| `giaoan` | **% buổi sắp dạy đã có giáo án** · **Buổi chưa soạn gần nhất còn mấy ngày** · **% buổi đã soạn có gắn bài về nhà** |
+| `banggiao` | **Tuổi trung bình lead đang ôm** (kèm trần `leadHoldMax_days`) · giữ lead vô chủ · **Quá hẹn liên hệ** kèm mức trễ nặng nhất · giữ **Đủ điều kiện thu về** |
+| `chang` | Còn **một** ô: **Hồ sơ quá hạn SLA của chặng** kèm mức trễ nặng nhất + chính con số mốc. Hai ô "Có hẹn hôm nay" / "Thiếu dữ liệu" đã bỏ |
+| `dsphuhuynh` | **Tổng nợ học phí gộp theo phụ huynh** (tiền, không phải số người) · giữ **Có con đang cảnh báo**. Hai ô đếm người đã bỏ |
+| `giangvien` | **Giờ dạy trung bình mỗi GV tháng này** · giữ hai ô SLA (thiếu mốc giờ, lớp chưa có GV chính) |
+
+Một chỗ tự sửa lại chính mình: 13/08 em bỏ ô "Bài trong kho" của `giaoan` rồi kết luận ba ô còn
+lại *"đều là thứ THIẾU nên giữ"*. Kết luận ấy hụt một nhịp - **thiếu-hay-không không phải tiêu
+chuẩn, KHÁC LOẠI VỚI CHIP mới là**. Cả ba vẫn đang là số đếm dòng, nay đã đổi hết.
+
+Bản gốc của bảng phân tích (giữ nguyên để đối chiếu):
 
 Những trang này cần thẻ, nhưng đang cắm nhầm loại. Đổi sang KPI/SLA đúng nhịp của trang:
 

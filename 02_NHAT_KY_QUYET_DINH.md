@@ -249,10 +249,88 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 41 BỘ KIỂM. Bản dựng đang chạy: `d2d2d5` (13/08), đã lên
+> **Phiên bản: V2 — 41 BỘ KIỂM. Bản dựng đang chạy: `39083f` (14/08), đã lên
 > https://mittomap.github.io/itts-sop-demo-v2/ . Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `c6ea8b`.
+> Mốc cũ: `d2d2d5`, `c6ea8b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 14/08 - `check_sop` ĐẠT TRỌN TÁM MẶT, LẦN ĐẦU TIÊN
+>
+> Trước hôm nay mặt 8 (bốn sheet cấu hình) còn thủng: CH1 56/57, CH2 55/61. Nay **CH1 57/57 ·
+> CH2 61/61 · CH4 94/94 · CH6 47/47**, cộng 93 tình huống HD3, 357 cột DL, 51 chỉ số BC2,
+> 31 quyền CH3, 22 màn VH/BC, 26 thuật ngữ CH5, 81 người phụ trách HD3.
+>
+> **Sáu tham số CH2 cuối cùng, và một lối tắt em suýt đi.** Hôm qua em định khai miễn trừ ba
+> trong sáu cái với lý do *"khác khái niệm với tham số app đang có"*. Mở SOP đọc từng dòng mô tả
+> thì cả sáu đều là luật CÓ THẬT và app CÓ SẴN dữ liệu để chạy. **"Khác khái niệm" là một câu
+> trả lời, không phải một phép đo** - em đã định lấy nó thay cho việc đọc file. Cả sáu nay chạy
+> thật trong `slaItems()`: `slaQuote_days` (báo giá sau tư vấn) · `slaPaymentConfirm_days`
+> (soát phiếu thu) · `slaWowBooking_hours` (chốt lịch WOW) · `slaENR_cancel_hours` (đăng ký treo)
+> · `slaComplaintClose_days` (gộp làm ngưỡng đỏ của chính dòng việc khiếu nại, không đẻ dòng thứ
+> hai) · `slaNoteReview_hours` - cái cuối cần thêm hẳn một cửa ghi.
+>
+> **Cửa mới: HỌC VỤ DUYỆT NHẬN XÉT BUỔI (`bhNoteDuyet`).** SOP tách hai bước mà app gộp làm một:
+> GV *ghi* nhận xét, rồi học vụ *đọc lại* trong 24 giờ. Vì sao bước này không thừa: chính đoạn
+> nhận xét ấy hiện nguyên văn ở cổng học viên và cổng phụ huynh - một câu viết vội hay lỡ nặng
+> lời là đi thẳng ra ngoài, không qua mắt ai. Hai lối ra, không phải một: **Duyệt** và **Trả lại
+> GV viết lại**.
+>
+> **BẪY TRONG CHÍNH CỬA MỚI ẤY, tự bắt được trước khi đẩy:** lúc đầu nút "Trả lại" chỉ xoá
+> `has_teacher_note` + `teacher_note_completed_at`. Nhưng `bhState()` tính `note` bằng
+> `yesv(has_teacher_note) || teacher_note_summary` - đoạn văn còn nguyên thì `note` vẫn true,
+> buổi KHÔNG quay lại hàng chờ của GV, và cái nút thành một cú bấm không làm gì. *Cùng họ với
+> bẫy `testConsult` đã ghi: một cú bấm biến việc CHƯA LÀM thành việc ĐÃ LÀM.* Sửa: xoá cả đoạn
+> văn nhưng **cất nó vào `note_returned_draft`** kèm `note_returned_at`, để GV mở form lên thấy
+> lại bản nháp cũ và lời người duyệt - chứ không phải một ô trống.
+>
+> **CH1 `cancel_reason`:** hai cửa hủy (buổi học, buổi WOW) trước chỉ hỏi một ô CHỮ TỰ DO. Ô ấy
+> trả lời được "vì sao" nhưng không trả lời được **"AI hủy"** - mà chính câu thứ hai mới đếm
+> được: bao nhiêu buổi trung tâm hủy, bao nhiêu buổi học viên hủy. Gõ chữ thì mỗi người gõ một
+> kiểu, cộng lại không ra con số nào. Nay hỏi cả hai (ô chọn + ô chữ), thêm helper `eSelect()`.
+>
+> ### 🟢 14/08 - THẺ NHÓM B: TÁM TRANG ĐỔI TỪ ĐẾM DÒNG SANG KPI/SLA/TIỀN
+>
+> Đợt 13/08 mới dọn nhóm C (bỏ hẳn). Nay làm nốt nhóm B theo `THE_NEN_LA_GI.md`: `baitap` ·
+> `wow` · `lichwow` · `giaoan` · `banggiao` · `chang` · `dsphuhuynh` · `giangvien`. Chi tiết
+> từng trang nằm trong chính file ấy.
+>
+> **Chỗ em tự sửa lại kết luận của chính mình:** 13/08 em bỏ ô "Bài trong kho" của `giaoan` rồi
+> viết vào mã rằng ba ô còn lại *"đều là thứ THIẾU (buổi chưa có giáo án, khóa chưa có giáo án,
+> buổi chưa gắn bài tập), không tab nào lọc ra được"* nên giữ. Câu ấy hụt một nhịp:
+> **thiếu-hay-không không phải tiêu chuẩn, KHÁC LOẠI VỚI CHIP mới là.** Cả ba vẫn là số đếm dòng.
+>
+> **Và một hàng bị lấy lại:** anh Luân *"cấu hình thẻ, nó chiếm 1 hàng uổng quá, e có cách khác
+> ko"*. Nút "Thẻ (n/N)" trước đây luôn chiếm nguyên một hàng chỉ để đứng một mình canh phải,
+> trong khi ngay dưới đã có hàng công cụ chứa nút "Cột (n/N)" - đúng anh em sinh đôi của nó. Nay
+> mọi sổ danh sách để hai nút cạnh nhau; trang không có hàng công cụ thì giữ nguyên (bỏ hàng đi
+> là mất luôn cái nút). Kèm một chỗ dễ quên: `theSync()` phải vẽ lại **cả nút bên ngoài hộp**,
+> không thì ẩn một thẻ xong nút vẫn ghi số cũ.
+>
+> ### 🟢 14/08 - BA BẪY GIEO DỮ LIỆU TRONG CÙNG MỘT KHỐI (14j)
+>
+> Khối gieo 5 tình huống SOP thêm hôm qua làm đỏ `check_logic` ba lần liên tiếp, ba nguyên nhân
+> khác nhau nhưng **cùng một họ: gắn một mốc thời gian mà không hỏi nó đứng cạnh cái gì.**
+> 1. `NOW - 45 phút` và `NOW - 2 giờ` neo vào ĐỒNG HỒ LÚC CHẠY. Chạy lúc 00:56 sáng thì đẻ ra một
+>    buổi học lúc 00:11 và một buổi lúc 22:56 - luật 7k bắt cả hai. **Đã có sẵn `_gioLui()` ở ngay
+>    dưới trong cùng file** để trị đúng bệnh này (vá 10/08), em viết mốc mới mà không dùng lại nó.
+>    *Có sẵn một cái thang thì đừng leo tay.*
+> 2. Đổi giờ một buổi là có thể đụng giáo viên/phòng/lớp của buổi khác (13n/13p so bằng phút khít).
+>    Nay `_mocRanh()` lùi dần từng giờ cho tới khi không đụng ai, và vẫn lùi TRONG khung giờ dạy.
+> 3. Khai một hồ sơ "đã hoàn thành khóa" từ `NOW - 30 ngày` mà lớp ấy kết thúc muộn hơn - 13j bắt.
+>    *Mốc thời gian gắn vào một hồ sơ phải đứng sau mốc mà hồ sơ ấy phụ thuộc.*
+>
+> Và một chỗ **hai bộ kiểm đòi hai điều ngược nhau**: gieo NA074 (quá hạn trừ quota WOW) để
+> `check_sop` thấy được thì lại làm bẩn màn "Sức khoẻ dữ liệu" mà `_check16` đòi phải SẠCH trên
+> dữ liệu gốc (đúng lời anh Luân: bấm Reset demo là kéo demo về trạng thái hoàn hảo). Chọn giữ
+> màn sạch, khai NA074 ở `TRIG_BOQUA` kèm đúng lý do ấy - **chọn xong thì phải nói ra đã chọn gì.**
+>
+> ### 🔴 14/08 - BẪY `ITTS_OUT` CẮN LẠI, LẦN THỨ BA
+>
+> Chạy `python3 _src/extract_js.py` từ gốc repo mà quên `ITTS_OUT`, nó trích **bản build cũ nằm
+> trong `_src/` từ 13/08** (ba file ấy bị `.gitignore` nên không ai thấy). Kết quả: `check_sop`
+> báo 91/93 trigger sinh ra trong khi dữ liệu thật chỉ cho 86 - em suýt đi sửa những tình huống
+> vốn không hỏng. Cái bẫy này được ghi NGUYÊN MỘT ĐOẠN ở đầu chính `extract_js.py`, em vẫn cắn.
+> **Đã xoá hẳn ba file build cũ trong `_src/`** để lần sau không còn bản cũ nào nằm đó mà trích.
 >
 > ### 🟢 13/08 - SOP ĐÃ KHAI "AI PHẢI LÀM VIỆC NÀY" TỪ ĐẦU, APP CHƯA NHẬP MỘT DÒNG
 >

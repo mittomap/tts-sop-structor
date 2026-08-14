@@ -3266,7 +3266,8 @@ for _s in R("DL11"):
     if code(_s.get("session_status")) == "cancelled" and not str(_s.get("cancel_reason") or "").strip():
         _s["cancel_reason"] = eF("enum_cancel_reason",
             random.choice(["cancelled_by_itts", "cancelled_by_itts", "cancelled_by_student"]))
-    for _k in ("note_reviewed_at", "note_reviewed_by", "note_reviewed_by_name", "note_review_note"):
+    for _k in ("note_reviewed_at", "note_reviewed_by", "note_reviewed_by_name", "note_review_note",
+               "note_returned_at", "note_returned_draft"):
         _s.setdefault(_k, "")
 for _w in R("DL14"):
     _w.setdefault("cancel_reason", "")
