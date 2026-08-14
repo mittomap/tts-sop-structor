@@ -895,6 +895,17 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    Ít thẻ thì giữ đúng khổ thẻ và để trống phần thừa bên phải. *Khoảng trống thẳng hàng đọc dễ
    hơn một cái ô bị kéo giãn cho vừa chỗ.* */
 .bstats.itfew{grid-template-columns:repeat(auto-fill,minmax(250px,296px));justify-content:start}
+/* ═══ V2 14/08 (anh Luân, kèm ảnh cột Trạng thái của bảng bài tập: *"vẫn còn nhiều chỗ chưa sắp
+   xếp chuẩn cột nha"*) ═══════════════════════════════════════════════════════════════════════
+   Ô ấy đựng HAI thứ khác loại: một chip trạng thái rồi một cái nút. Chip thì dài ngắn tuỳ nội
+   dung ("Đã nộp đúng hạn" ngắn hơn "Đã nộp · trễ 1 ngày" chừng 30px), mà nút thì đứng NGAY SAU
+   chip - nên mười hai cái nút "Chấm" trong một bảng nằm ở mười hai toạ độ khác nhau. Mắt quét
+   dọc một cột nút mà cột ấy răng cưa thì đọc rất mệt, và đó là cột người ta bấm nhiều nhất.
+   Chữa bằng chỗ ĐẶT chứ không bằng bề rộng chip: trạng thái bám mép trái, nút dạt mép phải. Cột
+   có bề rộng chung nên mọi nút thẳng đúng một mép, chip dài bao nhiêu cũng không đẩy được nút.
+   *Muốn hai thứ thẳng cột thì neo chúng vào MÉP, đừng neo vào nhau.* */
+.cellact{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.cellact>.btn{flex:none}
 @media(max-width:700px){.bstats.itfew{grid-template-columns:1fr}}
 .bstat{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 13px;transition:.15s}
 /* V9.67: cùng lý do với `.jgrid>*` - khối chữ trong thẻ phải chịu hẹp lại, nếu không một câu phụ
@@ -2989,7 +3000,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>c3c0db</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>4bbc58</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -4678,7 +4689,7 @@ giangvien:{code:"DL01",ro:1,sub:"Giảng viên & NV WOW (DL01) - lọc nhanh đ�
  
  pre:function(s){return /teacher|wow|giảng|giang/.test(ecode(s.role))||/giảng|giang|teacher/i.test(String(s.role))},
  cols:[["staff_id","Mã"],["full_name","Họ tên"],["role","Vai trò","enum"],["phone","SĐT"],["email","Email"],["branch","Cơ sở","enum"],
-  ["__lop","Lớp đang dạy","calcnum"],["__hv","Học viên","calcnum"],["__buoi7","Buổi 7 ngày tới","calcnum"],
+  ["__lop","Lớp đang dạy","calcnum"],["__wow","Buổi WOW tháng","calcnum"],["__test","Ca test tháng","calcnum"],["__hv","Học viên","calcnum"],["__buoi7","Buổi 7 ngày tới","calcnum"],
   ["__nxno","Nợ nhận xét","calcso"],["__baicho","Bài chờ chấm","calcso"],["__giothang","Giờ dạy tháng","calcnum"],
   ["status","Trạng thái","chip"]]},
 nhanvien:{code:"DL01",filt:"status",ro:1,lam:"nhansu",sub:"Toàn bộ nhân sự (DL01)",
@@ -4801,8 +4812,20 @@ function calcCol(k,r,sheet){
 function gvTaiBang(){
  if(window.__gvTai)return window.__gvTai;
  var M={};
+ /* ═══ V2 14/08 (anh Luân, nhìn bảng thấy hai giáo viên WOW toàn số 0: *"giờ dạy tháng của wow
+    chưa có nhỉ, hình như mới chỉ chấm công cho giáo viên mà ko chấm cho wow coach hả"*) ═══════
+    Bảng công thì CÓ chấm cho WOW từ lâu (`isCongRole` bao cả vai WOW, `congThang` đếm buổi và
+    giờ từ DL14). Cái sai là mấy cột em vừa thêm sáng nay: chúng chỉ đọc DL10/DL11/DL13 - tức chỉ
+    đọc công việc của giáo viên LỚP - nên hai người WOW hiện 0 ở cả sáu cột.
+    Và đó là kiểu sai nguy hiểm: một hàng toàn số 0 không đọc ra "bảng này đo thiếu", nó đọc ra
+    "app không làm phần này" - anh Luân kết luận đúng như vậy, hợp lý với thứ anh nhìn thấy.
+    Nay mỗi con số hỏi CẢ HAI đường làm việc: buổi lớp (DL11) và buổi WOW 1-1 (DL14). Thêm cột
+    "Buổi WOW tháng" để đội WOW có con số của chính họ chứ không phải đi ké cột của người khác.
+    *Một bảng in ra 0 cho nguyên một chức danh thì người đọc trách app, không trách cái bảng.* */
+ var _hvSet={};
  function o(id){id=String(id||"");if(!id)return null;
-  return M[id]||(M[id]={__lop:0,__hv:0,__buoi7:0,__nxno:0,__baicho:0,__giothang:0})}
+  if(!M[id]){M[id]={__lop:0,__hv:0,__buoi7:0,__nxno:0,__baicho:0,__giothang:0,__wow:0,__test:0};_hvSet[id]={}}
+  return M[id]}
  try{
   srows("DL10").forEach(function(c){
    if(isc(c.class_status,"cancelled","ended"))return;
@@ -4824,6 +4847,32 @@ function gvTaiBang(){
   srows("DL13").forEach(function(w){
    var t=o(w.teacher_id);if(!t)return;
    if(String(w.homework_submitted_time||"").trim()&&!String(w.graded_at||"").trim())t.__baicho++});
+  /* Buổi WOW 1-1: cùng bốn câu hỏi, khác bảng. Phép thử "chưa ghi nội dung" lấy đúng phép mà
+     bảng công đang dùng cho WOW - hai chỗ hiểu khác nhau là hai con số cho một câu hỏi. */
+  srows("DL14").forEach(function(w){
+   var t=o(w.staff_id);if(!t)return;
+   var d=pvnd(w.wow_session_date);
+   if(d&&d>=d0&&d<d7&&!isc(w.wow_status,"cancelled"))t.__buoi7++;
+   if(isc(w.wow_status,"completed")){
+    if(!String(w.wow_content_note||"").trim())t.__nxno++;
+    if(d&&d>=m0){
+     t.__wow++;
+     var a2=pvnd(w.wow_start_actual),z2=pvnd(w.wow_end_actual);
+     if(a2&&z2&&z2>a2)t.__giothang+=Math.round((z2-a2)/36e5);
+     /* "Học viên" của một WOW coach là số em KHÁC NHAU đã kèm trong tháng - không phải sĩ số
+        lớp (họ không có lớp). Cùng một câu hỏi "đang phụ trách bao nhiêu em", đo bằng thứ có
+        thật ở mỗi đường làm việc. */
+     var sid=String(w.student_id||"");
+     if(sid&&!_hvSet[String(w.staff_id||"")][sid]){_hvSet[String(w.staff_id||"")][sid]=1;t.__hv++}}}});
+  /* Ca test đầu vào (anh Luân: *"1 buổi wow, 1 buổi test cũng là công sức của wow coach mà"*).
+     Bảng công đã tính từ lâu - tính theo LẦN CHẤM, người chấm là `graded_by`. Cột này hỏi đúng
+     câu ấy để hai chỗ không ra hai số. Đội WOW là đội chấm test đầu vào, nên thiếu cột này là
+     bỏ sót đúng một trong ba đầu việc của họ. */
+  srows("DL03").forEach(function(x){
+   var t=o(x.graded_by);if(!t)return;
+   if(!isc(x.test_status,"graded"))return;
+   var d=pvnd(x.result_time||x.test_attendance_time||x.test_date);
+   if(d&&d>=m0)t.__test++});
  }catch(e){}
  window.__gvTai=M;return M}
 /* ═══ LỚP 1-1 HAY LỚP NHÓM ═══════════════════════════════════════════════════════════════
@@ -21490,7 +21539,7 @@ function renderHosoGV(){var id=window.GVID;var g=find("DL01","staff_id",id);
   h+='</tbody></table></div></div>'})();
  h+='<div class="panel"><div class="ph"><b>Bài tập chờ chấm ('+hwWait.length+')</b><div class="mini"><button class="pill" onclick="go(\'baitap\')">Mở trang Bài tập</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Bài</th><th>Kỹ năng</th><th>Nộp lúc</th><th>Trạng thái</th></tr></thead><tbody>';
  if(!hwWait.length)h+='<tr><td class="empty" colspan="5">Không còn bài chờ chấm.</td></tr>';
- hwWait.slice(0,25).forEach(function(x){h+='<tr><td>'+nguoiLnk(x.student_id,x.student_name)+'</td><td>'+esc(x.homework_title||"")+'</td><td>'+esc(elabel(x.skill)||"")+'</td><td>'+esc(x.homework_submitted_time||"")+'</td><td>'+hwChip(x)+' <button class="btn primary sm" onclick="btJumpGrade(\''+esc(x.class_id||"")+'\',\''+esc(String(x.homework_title||"").replace(/'/g,""))+'\')"><i class="ti ti-writing"></i>Chấm</button></td></tr>'});
+ hwWait.slice(0,25).forEach(function(x){h+='<tr><td>'+nguoiLnk(x.student_id,x.student_name)+'</td><td>'+esc(x.homework_title||"")+'</td><td>'+esc(elabel(x.skill)||"")+'</td><td>'+esc(x.homework_submitted_time||"")+'</td><td><div class="cellact">'+hwChip(x)+'<button class="btn primary sm" onclick="btJumpGrade(\''+esc(x.class_id||"")+'\',\''+esc(String(x.homework_title||"").replace(/'/g,""))+'\')"><i class="ti ti-writing"></i>Chấm</button></div></td></tr>'});
  return h+'</tbody></table></div></div>'}
 /* ---------- HỒ SƠ NHÂN VIÊN theo vai trò (BC5 tư vấn / BC6 WOW / BC8 học vụ) ---------- */
 function openNV(id){window.NVID=id;go("hosonv")}
