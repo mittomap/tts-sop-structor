@@ -13167,16 +13167,22 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
   var chg=num(o.placement_change_count);
   h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(sid,o.student_id_name)+'</b><div class="obm">Lớp: '+lopLnk(o.class_id,o.class_id_name,"chưa xếp")+' · '+esc(sid||"")+(chg?' · <span style="color:var(--amber)">đã đổi lớp '+chg+' lần</span>':'')+'</div></div>'+mstripFor(sid,MIX)+(s.rejected?'<span class="chip red">HV từ chối lớp</span>':(s.infoOverdue?'<span class="chip red">Quá hạn gửi info</span>':(s.obOverdue?'<span class="chip red">Quá hạn onboarding</span>':(s.done?'<span class="chip green">Hoàn tất</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div>';
   h+='<div class="steps">'+stepHTML("Xếp lớp",true)+stepHTML("Gửi info",s.sent)+stepHTML("HV xác nhận",s.confirmed)+stepHTML("Hoàn tất",s.done)+'</div>';
-  h+='<div class="obact">';
+  /* MOI NUT MOT O CO DINH. So nut doi theo trang thai (dong thi 4 nut, dong thi 2), nen neu
+     de chung don sat nhau thi dong nao thieu nut la moi thu truot ngang - "Hoan tat" nam mot
+     cho khac o tung dong. Nay bon o: [buoc hien tai] [Hoan tat] [Doi lop] [Ho so]; o nao
+     khong co nut thi de TRONG chu khong don. Trong ma thang hang doc nhanh hon kin ma so le. */
+  h+='<div class="obact"><div class="obsl a">';
   if(s.rejected)h+='<button class="btn primary sm" onclick="obChange(\''+esc(o.onboarding_id)+'\')"><i class="ti ti-transfer"></i>Đổi lớp khác</button>';
   else{
    if(!s.sent)h+='<button class="btn primary sm" onclick="confirmRun(\'Xác nhận đã gửi thông tin lớp cho học viên?\',\'obSendInfo\',\''+esc(o.onboarding_id)+'\')"><i class="ti ti-send"></i>Đã gửi thông tin lớp</button>';
    else if(!s.confirmed)h+='<button class="btn sm" onclick="confirmRun(\'Xác nhận học viên đã đồng ý lớp?\',\'obConfirm\',\''+esc(o.onboarding_id)+'\')"><i class="ti ti-check"></i>HV đã xác nhận</button>'+
     '<button class="btn danger sm" onclick="confirmRun(\'Ghi nhận học viên TỪ CHỐI lớp này? Sau đó hãy đổi lớp khác.\',\'obReject\',\''+esc(o.onboarding_id)+'\')"><i class="ti ti-user-x"></i>HV từ chối</button>';
+   h+='</div><div class="obsl b">';
    if(!s.done)h+='<button class="btn green sm" onclick="confirmRun(\'Đánh dấu hoàn tất onboarding cho học viên?\',\'obFinish\',\''+esc(o.onboarding_id)+'\')"><i class="ti ti-flag"></i>Hoàn tất</button>';
+   h+='</div><div class="obsl c">';
    if(o.class_id&&!s.done)h+='<button class="btn sm" onclick="obChange(\''+esc(o.onboarding_id)+'\')"><i class="ti ti-transfer"></i>Đổi lớp</button>';
   }
-  h+='<button class="btn sm" onclick="openHoso(\''+esc(sid)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button></div></div>';
+  h+='</div><div class="obsl d">'+'<button class="btn sm" onclick="openHoso(\''+esc(sid)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button></div></div></div>';
  });
  h+='</div>';return h}
 function obMark(id,vals,msg){var r=find("DL08","onboarding_id",id);function d(){if(r)for(var k in vals)r[k]=vals[k];toast(msg);reRender(CUR)}
@@ -16476,11 +16482,17 @@ function renderTrangHV(){
  /* (d) TỰ XÁC NHẬN LỚP - trước đây cổng ghi "chờ bạn xác nhận" mà KHÔNG cho bấm, học viên
     không có cách nào xác nhận ngoài gọi điện. Đây là lỗi trải nghiệm rõ nhất của cổng. */
  if(lop&&ob.onboarding_id&&!clsOK&&!isc(ob.class_confirmation_status,"rejected")){
-  h+='<div class="hvask"><div class="hvaskh"><i class="ti ti-circle-check"></i><b>Bạn có nhận lớp '+esc(lop.class_name)+' không?</b></div>'+
-   '<div class="hvaskb">Lịch học: <b>'+esc(lop.class_schedule||"")+'</b>'+(lop.class_start_date?' · khai giảng <b>'+esc(lop.class_start_date)+'</b>':'')+
-   (lop.venue_or_zoom_link?' · '+esc(lop.venue_or_zoom_link):'')+'. Xác nhận sớm để trung tâm giữ chỗ và gửi tài liệu cho bạn.</div>'+
-   '<div class="hvaskf"><button class="btn primary sm" onclick="hvClassConfirm(\''+esc(ob.onboarding_id)+'\',1)"><i class="ti ti-check"></i>Tôi nhận lớp này</button>'+
-   '<button class="btn sm" onclick="hvClassReject(\''+esc(ob.onboarding_id)+'\')"><i class="ti ti-x"></i>Lịch này không hợp, xin đổi</button></div></div>'}
+  /* V2 14/08 - HOI DUNG CAU CHUA AI HOI (anh Luan chot). Truoc day cong hoi "Ban co nhan
+     lop nay khong?". Toi luc nay thi tu van va hoc vu DA chot lop voi hoc vien roi - hoi lai
+     la hoi mot cau da co cau tra loi. Cau chua ai hoi, va la cau co suc nang khi sau nay tranh
+     chap ve nghi hoc, bao luu, hoan phi, la: ban co hieu va cam ket tuan thu quy dinh lop hoc.
+     Noi dung hien NGUYEN VAN ngay tai cho ky - khong giau sau mot duong dan, vi ky vao thu
+     minh chua doc thi chu ky ay khong co nghia gi. Thong tin lop van giu o khoi tren. */
+  h+='<div class="hvask"><div class="hvaskh"><i class="ti ti-file-check"></i><b>Xác nhận quy định lớp học &amp; cam kết</b></div>'+
+   '<div class="hvaskb">Đọc kỹ nội dung dưới đây rồi bấm đồng ý. Bản bạn đã đồng ý được lưu trong hồ sơ và xem lại được bất cứ lúc nào.</div>'+
+   commitHTML(null,commitVer())+
+   '<div class="hvaskf"><button class="btn primary sm" onclick="hvClassConfirm(\''+esc(ob.onboarding_id)+'\',1)"><i class="ti ti-check"></i>Tôi đã đọc và đồng ý</button>'+
+   '<button class="btn sm" onclick="hvClassReject(\''+esc(ob.onboarding_id)+'\')"><i class="ti ti-x"></i>Tôi có thắc mắc, xin liên hệ lại</button></div></div>'}
  if(isc(ob.class_confirmation_status,"rejected"))
   h+='<div class="notebar" style="margin-bottom:16px"><i class="ti ti-info-circle"></i>Bạn đã báo lịch lớp này không hợp. Trung tâm đang tìm lớp khác và sẽ liên hệ lại với bạn.</div>';
  /* HỌC PHÍ: tổng - ưu đãi - đã đóng - CÒN LẠI đặt cạnh nhau cho dễ đối chiếu */
