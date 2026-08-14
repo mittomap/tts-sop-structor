@@ -573,7 +573,7 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
 .tbtn .n{position:absolute;top:-5px;right:-5px;background:var(--red);color:#fff;font-size:11px;font-weight:700;min-width:16px;height:16px;border-radius:999px;padding:0 4px;box-sizing:border-box;line-height:1;white-space:nowrap;display:flex;align-items:center;justify-content:center}
 /* V9.99f (anh Luân: *"có vài chỗ a thấy ko bấm được nhé"*, kèm ảnh nút "Cột (9/11)" bị che).
    Đo được bằng `elementFromPoint`: nút Trợ lý nổi ở góc dưới phải che mất 8 nút của nội dung
-   (Xử lý · Ghi liên hệ · Hồ sơ · Huỷ đăng ký · Gửi đợt · Bảng lớp...). Nút nổi luôn ở đó, nên
+   (Xử lý · Ghi liên hệ · Hồ sơ · Hủy đăng ký · Gửi đợt · Bảng lớp...). Nút nổi luôn ở đó, nên
    dòng nào trôi tới đúng góc ấy là bấm không được - người dùng bấm hai ba lần rồi bỏ đi.
    Chừa chỗ ở ĐÁY vùng cuộn đủ cao hơn nút nổi (39px + 18px lề + thở): cuối danh sách luôn cuộn
    qua được nút, không còn dòng nào bị kẹt vĩnh viễn dưới nó. */
@@ -2269,7 +2269,16 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .pkitem:first-child{border-top:1px solid var(--line)}
 .pkitem:hover{background:#FAFBFD}.pkitem b{font-weight:600}
 .pgbar{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:14px}
+/* ═══ V2 14/08 - NÚT TRONG MỘT Ô HÀNH ĐỘNG PHẢI BẰNG CỠ NHAU ═══════════════════════════════
+   Anh Luân: *"kích thước nút cùng trang mà lại chênh lệch kiểu này thì làm sao mà đẹp được"* ·
+   *"do nó cùng 1 bảng, e nên làm cho nó tương đồng ít nhất là về kích thước"*.
+   Đo được: **40/64 ô có từ hai nút** mà nhãn chênh nhau quá 4 ký tự ("Sửa" cạnh "Ghi liên hệ"),
+   nên hai nút rộng khác hẳn nhau và cả cột răng cưa dọc xuống. Cho một bề rộng SÀN chung: nút
+   ngắn nở ra bằng nút dài, nút dài hơn sàn thì giữ nguyên. Chữ căn giữa để hai nút cùng nhịp.
+   *Bằng nhau không cần mọi nút cùng một bề rộng - chỉ cần chúng khởi hành từ cùng một sàn.* */
 .rowact{display:flex;gap:6px}
+.rowact .btn{min-width:104px;justify-content:center}
+@media(max-width:900px){.rowact .btn{min-width:0}}
 .btn.sm[disabled]{opacity:.4;cursor:default}
 .btn.sm[disabled]:hover{background:#fff;border-color:var(--line)}
 .fchips{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
@@ -2922,7 +2931,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>a1bda4</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>868f3f</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -2955,7 +2964,7 @@ body.drsz .drawer{transition:none}
 
 
 <div class="mask" id="mask" onclick="closeModal()"></div>
-<div class="cfmask" id="cfm"><div class="cfbox"><div class="cfh"><i class="ti ti-alert-triangle"></i> Xác nhận thao tác</div><div class="cfmsg" id="cfmMsg"></div><div class="fld full" style="margin:2px 0 10px"><label>Ghi chú (không bắt buộc)</label><textarea id="cfmNote" rows="2" placeholder="Lý do, số liệu đã đối chiếu, ai đồng ý... - lưu vào nhật ký để sau này tra lại"></textarea></div><div class="cfa"><button class="btn" onclick="closeConfirm()">Huỷ</button><button class="btn primary" onclick="confirmYes()">Xác nhận</button></div></div></div>
+<div class="cfmask" id="cfm"><div class="cfbox"><div class="cfh"><i class="ti ti-alert-triangle"></i> Xác nhận thao tác</div><div class="cfmsg" id="cfmMsg"></div><div class="fld full" style="margin:2px 0 10px"><label>Ghi chú (không bắt buộc)</label><textarea id="cfmNote" rows="2" placeholder="Lý do, số liệu đã đối chiếu, ai đồng ý... - lưu vào nhật ký để sau này tra lại"></textarea></div><div class="cfa"><button class="btn" onclick="closeConfirm()">Hủy</button><button class="btn primary" onclick="confirmYes()">Xác nhận</button></div></div></div>
 <div class="drawer" id="drawer" role="dialog" aria-modal="true"><div class="drszr" id="drszr" title="Kéo để đổi độ rộng - bấm đúp để về mặc định"></div><div class="dh"><b id="drawerTitle">Chi tiết</b><button class="x" onclick="closeModal()" aria-label="Đóng">&times;</button></div><div class="dbody" id="drawerBody"></div></div>
 
 <script src="ITTs_data.js"></script>
@@ -3586,7 +3595,14 @@ var PAGES=[
    hàng=khung giờ, **ô trống = không ai trực**) và đã khai sẵn danh mục `enum_wow_slot_status`
    (available/booked/taught/off) - app trước nay không dùng chữ nào trong đó. */
 {k:"lichwow",g:"_",ic:"ti-calendar-clock",t:"Lịch trực WOW",c:"NV WOW tự đăng ký ca - học viên chỉ đặt được trong ca đã đăng ký",ty:"custom"},
-{k:"gvdp",g:"_",ic:"ti-user-plus",t:"GV dự phòng theo ngày",c:"Ai thay được khi GV nghỉ đột xuất",ty:"custom"},
+/* V2 14/08 - MỘT MÀN, MỘT TỪ. Màn này trước dùng cả ba: "GV" (3 chỗ), "Giáo viên" (4), "Giảng
+   viên" (2). Chọn "Giáo viên" vì trang liệt kê TỪNG NGƯỜI và đó đúng là nhãn chức danh trong
+   CH1 ("Giáo viên ACA", "Giáo viên WOW").
+   KHÔNG gộp toàn app như bản báo cáo đề nghị (200 chỗ): đo ra hai từ có hai nghĩa và CẢ HAI
+   đều bị SOP khoá - "Bảng Giảng viên" là chuỗi bằng chứng BC7 của `check_sop`, còn "Giáo viên
+   ACA/WOW" là nhãn enum CH1 phải ghi nguyên văn. *Thống nhất từ vựng là việc trong PHẠM VI
+   một màn; ép cả app về một từ ở đây là làm thủng SOP.* */
+{k:"gvdp",g:"_",ic:"ti-user-plus",t:"Giáo viên dự phòng theo ngày",c:"Ai thay được khi giáo viên nghỉ đột xuất",ty:"custom"},
 /* V9.99z5 (anh Luân 05/08: *"lệch nhau giữa nghiệp vụ bên trong và trang trên sidebar là do
    thiết kế vậy hả em, hay do sót nhỉ"* + *"bên sidebar giống như 1 cái bản đồ vậy, họ biết
    mình cần tìm gì ở đâu"*): hai tab "Hôm nay" và "Lịch tuần" của hub Học tập chưa bao giờ có
@@ -3681,7 +3697,7 @@ var CURSTAFF="";
    riêng của v6: không nằm trong cây menu V5, không nằm trong phạm vi của chức danh nào.
    ĐO LẠI THÌ KHÔNG PHẢI VẬY: trang **Sổ người đồng hành** của bản V5 bấm vào một dòng là gọi
    `phMo()` -> `go("ban")` với thực thể đặt sẵn là phụ huynh. Tức `ban` đang làm TRANG HỒ SƠ
-   PHỤ HUYNH của V5. Xoá nó là xoá một tính năng V5 đang chạy - đúng cái anh Luân dặn không
+   PHỤ HUYNH của V5. Xóa nó là xoá một tính năng V5 đang chạy - đúng cái anh Luân dặn không
    được làm.
    Và nó còn đang hỏng sẵn: vì không ở trong phạm vi ai cả, bấm một phụ huynh là ăn ngay dòng
    "Trang ngoài phạm vi chức danh của bạn" - cùng họ với 67 chỗ "mời rồi đuổi" đã vá 05/08,
@@ -5514,7 +5530,7 @@ function fltOpen(pg){var ax=fltAxes(pg);if(!ax.length){toast("Trang này chưa k
  var sv=fltSaved(pg);
  if(sv.length){h+='<div class="fltsec"><div class="fltlb">Bộ lọc đã lưu của bạn</div><div class="fltops">'+
   sv.map(function(f){return '<span class="pill fltsv" onclick="fltUse(\''+esc(pg)+'\',\''+esc(f.name)+'\')"><i class="ti ti-bookmark"></i>'+esc(f.name)+
-   '<i class="ti ti-x fltx" onclick="event.stopPropagation();confirmRun(\'Xoá bộ lọc &quot;'+esc(f.name)+'&quot;?\',\'fltDropRun\',\''+esc(pg)+'|'+esc(f.name)+'\')"></i></span>'}).join("")+
+   '<i class="ti ti-x fltx" onclick="event.stopPropagation();confirmRun(\'Xóa bộ lọc &quot;'+esc(f.name)+'&quot;?\',\'fltDropRun\',\''+esc(pg)+'|'+esc(f.name)+'\')"></i></span>'}).join("")+
   '</div></div>'}
  ax.forEach(function(a){
   var cur=st[a.k];
@@ -5568,7 +5584,7 @@ function fltBarHTML(pg,daCoTim){
  /* NGOẶC BAO TRỌN nhánh ba ngôi: viết `a?'':(x)+y` thì JS hiểu là `a?'':((x)+y)` - nút Xuất
     rơi vào nhánh else và biến mất khỏi 8 trang. Đã cắn ngay trong phiên này. */
  var h=(daCoTim?'':('<span class="pgq"><i class="ti ti-search"></i><input value="'+esc(q)+'" placeholder="Tìm trong trang này..." oninput="pgqSet(\''+esc(pg)+'\',this.value)" aria-label="Tìm trong trang này"></span>'+
-  (q?'<button class="pill" onclick="pgqSet(\''+esc(pg)+'\',\'\')" data-tip="Xoá từ khoá tìm"><i class="ti ti-x"></i></button>':'')))+
+  (q?'<button class="pill" onclick="pgqSet(\''+esc(pg)+'\',\'\')" data-tip="Xóa từ khoá tìm"><i class="ti ti-x"></i></button>':'')))+
   '<button class="btn sm" onclick="pgExport(\''+esc(pg)+'\')" data-tip="Tải '+nRow+' dòng đang hiện ra tệp CSV - mở được bằng Excel"><i class="ti ti-table"></i>Xuất</button>';
  if(!fltAxes(pg).length)return h;
  var n=fltOn(pg),st=fltSt(pg);
@@ -8003,7 +8019,7 @@ function pwHoi(tieude,mota,xong){
   '<div id="pw_loi" class="fhint" style="color:var(--red);min-height:16px"></div>'+
   '<div style="display:flex;gap:8px;margin-top:6px">'+
   '<button class="btn primary" onclick="pwXacNhan()"><i class="ti ti-lock-open"></i>Mở khoá</button>'+
-  '<button class="btn" onclick="closeModal()"><i class="ti ti-x"></i>Huỷ</button></div></div>';
+  '<button class="btn" onclick="closeModal()"><i class="ti ti-x"></i>Hủy</button></div></div>';
  openDrawer("Cần mật khẩu",h);
  setTimeout(function(){var e=document.getElementById("pw_in");if(e&&e.focus)e.focus()},120)}
 function pwXacNhan(){
@@ -9550,7 +9566,7 @@ function moNutXem(box){
  for(i=0;i<bs.length;i++){t=String(bs[i].textContent||"");
   if(!moNutDu(t))return bs[i]}
  return null}
-function moNutDu(t){return /Xoá|Xóa|Huỷ|Hủy|Từ chối|Leo thang|Xuất|Dựng lại|Đóng/i.test(String(t||""))}
+function moNutDu(t){return /Xóa|Xóa|Hủy|Hủy|Từ chối|Leo thang|Xuất|Dựng lại|Đóng/i.test(String(t||""))}
 
 /* ═══ TRANG CÁ NHÂN (V9.94) ═════════════════════════════════════════════════════════════════
    Anh Luân 03/08: *"hình như mình còn thiếu trang cá nhân để tùy chỉnh nhỉ, ví dụ đổi avatar,
@@ -9593,7 +9609,7 @@ function cnLuu(){
  if(em&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){toastErr("Email chưa đúng dạng.");return}
  markRow("DL01","staff_id",sid,{email:em,phone:sd},"Đã lưu thông tin liên hệ của bạn.");
  go("canhan")}
-function cnXoaThoiQuen(){confirmRun("Xoá mọi thói quen đã lưu trên MÁY NÀY (tỷ lệ hiển thị, bề rộng ngăn kéo, cột đã ẩn, bộ lọc đã lưu, ảnh đại diện)? Dữ liệu công việc không bị đụng tới.","cnXoaThoiQuenRun","")}
+function cnXoaThoiQuen(){confirmRun("Xóa mọi thói quen đã lưu trên MÁY NÀY (tỷ lệ hiển thị, bề rộng ngăn kéo, cột đã ẩn, bộ lọc đã lưu, ảnh đại diện)? Dữ liệu công việc không bị đụng tới.","cnXoaThoiQuenRun","")}
 function cnXoaThoiQuenRun(){
  try{var bo=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);
    if(/^ITTS_(AV_|ZOOM|DRW|FLT|HIDECOL|TTH)/.test(String(k||"")))bo.push(k)}
@@ -9652,7 +9668,7 @@ function renderCanhan(){
  h+='</div>';
  h+='<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">'+
   '<button class="btn" onclick="drwReset()"><i class="ti ti-arrows-horizontal"></i>Đặt lại bề rộng ngăn kéo</button>'+
-  '<button class="btn" onclick="cnXoaThoiQuen()"><i class="ti ti-eraser"></i>Xoá mọi thói quen trên máy này</button></div>';
+  '<button class="btn" onclick="cnXoaThoiQuen()"><i class="ti ti-eraser"></i>Xóa mọi thói quen trên máy này</button></div>';
  h+='</div></div>';
  return h}
 function mkLuu2(){var v="";try{v=String((document.getElementById("mk_in2")||{}).value||"").trim()}catch(e){}
@@ -12655,7 +12671,7 @@ function gaMoi(){
   '<div class="fld"><label>Hạn nộp bài (ngày sau buổi)</label><input id="gm_due" type="number" min="0" step="1" placeholder="'+esc(String(dueFall()))+'">'+
    '<div class="fhint">Để trống thì lấy mặc định của hệ thống ('+slaChip("homeworkDueFallback_days",3,"ngày")+').</div></div></div>';
  h+='<div class="dact"><button class="btn primary" onclick="gaMoiLuu()"><i class="ti ti-device-floppy"></i>Lưu giáo án</button>'+
-  '<button class="btn" onclick="closeModal()">Huỷ</button></div></div>';
+  '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
  openDrawer("Soạn giáo án cho buổi",h)}
 function gaMoiLuu(){
  var cid=fldV("gm_khoa"),bs=num(fldV("gm_buoi"));
@@ -14808,7 +14824,7 @@ function renderSetQA(){
    '<div class="fld full"><label>Chỉ chỗ (hiện kèm câu trả lời)</label><input id="qao_'+i+'" value="'+esc(m.o||"")+'" placeholder="vd: Cài đặt > Thương hiệu & Màu"></div>'+
    '<div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">'+
    '<button class="btn primary sm" onclick="qaMucLuu('+i+')"><i class="ti ti-device-floppy"></i>Lưu</button>'+
-   '<button class="btn danger sm" onclick="qaMucXoa('+i+')" aria-label="Xoá mục hỏi đáp này"><i class="ti ti-trash"></i>Xoá</button>'+
+   '<button class="btn danger sm" onclick="qaMucXoa('+i+')" aria-label="Xóa mục hỏi đáp này"><i class="ti ti-trash"></i>Xóa</button>'+
    (m.go?'<span class="mut" style="font-size:11px">có nút mở thẳng tới nơi</span>':'')+'</div></div>'});
  h+='</div></div>';
  /* ---- TỪ ĐIỂN THUẬT NGỮ (V9.52) ---- */
@@ -15270,7 +15286,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
      '<td><button class="btn sm" onclick="enumSave(\''+esc(en)+'\','+i+')"><i class="ti ti-device-floppy"></i>Lưu</button> '+
      /* V9.29v (hội đồng audit): 291 nút xoá chỉ có cái thùng rác, không nhãn cũng không chú thích -
         người dùng bàn phím và người đọc màn hình không biết nút này làm gì, mà đây lại là nút XOÁ. */
-     '<button class="btn danger sm" onclick="enumDelAsk(\''+esc(en)+'\','+i+')" aria-label="Xoá giá trị '+esc(cd)+' khỏi danh mục '+esc(en)+'" data-tip="Xoá giá trị này khỏi danh mục"><i class="ti ti-trash"></i></button></td></tr>'});
+     '<button class="btn danger sm" onclick="enumDelAsk(\''+esc(en)+'\','+i+')" aria-label="Xóa giá trị '+esc(cd)+' khỏi danh mục '+esc(en)+'" data-tip="Xóa giá trị này khỏi danh mục"><i class="ti ti-trash"></i></button></td></tr>'});
    h+='<tr><td><input id="enn_'+esc(en)+'_c" placeholder="mã_moi" style="width:100%;height:30px;border:1px dashed var(--line);border-radius:6px;padding:0 8px;font-family:inherit"></td>'+
     '<td><input id="enn_'+esc(en)+'_l" placeholder="Nhãn hiển thị" style="width:100%;max-width:420px;height:30px;border:1px dashed var(--line);border-radius:6px;padding:0 8px;font-family:inherit"></td>'+
     '<td><button class="btn primary sm" onclick="enumAdd(\''+esc(en)+'\')"><i class="ti ti-plus"></i>Thêm</button></td></tr>';
@@ -16650,7 +16666,7 @@ function srchHTML(val,fn,ph,w){return '<div class="srch" style="max-width:'+(w||
    thanh riêng thì gọi hàm này thay vì tự viết một ô tìm kiểu khác. */
 function timHTML(pg){var q=pgqGet(pg);
  return '<span class="pgq"><i class="ti ti-search"></i><input value="'+esc(q)+'" placeholder="Tìm trong trang này..." oninput="pgqSet(\''+esc(pg)+'\',this.value)" aria-label="Tìm trong trang này"></span>'+
-  (q?'<button class="pill" onclick="pgqSet(\''+esc(pg)+'\',\'\')" data-tip="Xoá từ khoá tìm"><i class="ti ti-x"></i></button>':'')+
+  (q?'<button class="pill" onclick="pgqSet(\''+esc(pg)+'\',\'\')" data-tip="Xóa từ khoá tìm"><i class="ti ti-x"></i></button>':'')+
   ''}   /* vạch ngăn nay do `.tbgr` bọc dải chip lo - xem ghi chú ở `.tbgr` */
 /* ĐƠN VỊ ĐẾM - gọi đúng tên thứ đang đếm. Trước đây filterBar cắm cứng chữ "hồ sơ" cho MỌI
    trang: màn Buổi học ghi "146 hồ sơ", màn Khiếu nại cũng "hồ sơ". Đo bằng phép đếm biến thể
@@ -16687,7 +16703,7 @@ function filterBar(p,cur,opts,cnt,nhan){
  /* KHÔNG gắn vạch ngăn ở đây nữa: nó là `::before` của `.tbgr` bọc dải chip ngay dưới, nên
     vạch luôn đi cùng dải chip thay vì đứng riêng một mình. Để cả hai là vẽ hai vạch. */
  var tim='<span class="pgq"><i class="ti ti-search"></i><input value="'+esc(q)+'" placeholder="Tìm trong trang này..." oninput="pgqSet(\''+esc(p)+'\',this.value)" aria-label="Tìm trong trang này"></span>'+
-  (q?'<button class="pill" onclick="pgqSet(\''+esc(p)+'\',\'\')" data-tip="Xoá từ khoá tìm"><i class="ti ti-x"></i></button>':'');
+  (q?'<button class="pill" onclick="pgqSet(\''+esc(p)+'\',\'\')" data-tip="Xóa từ khoá tìm"><i class="ti ti-x"></i></button>':'');
  /* V2 13/08 - ba thứ từng nằm chung MỘT hàng flex-wrap (ô tìm · dải chip · số dòng · Bộ lọc) nay
     thành ba HÀNG có nhãn trong một khung. Cùng chiều cao mà đọc được ngay dải nào lọc gì; và số
     dòng thôi trôi theo độ dài dải chip. Nhãn mặc định là "Trạng thái" vì mọi trang tác vụ đều
@@ -16925,7 +16941,7 @@ function logCmp(before){
    if(Object.keys(d).length)logAct("Cập nhật",code,id,d,"",{kind:"upd"})}
   for(id in b){if(id in af)continue;
    if((LOGSEEN[code+"|"+id]||{})["*"])continue;
-   logAct("Xoá",code,id,{},"Xoá một dòng ở bảng "+sheetVN(code),{kind:"del",truoc:b[id]})}})}
+   logAct("Xóa",code,id,{},"Xóa một dòng ở bảng "+sheetVN(code),{kind:"del",truoc:b[id]})}})}
 /* Bọc TẤT CẢ cửa ghi đã khai: chụp trước - cho chạy - chụp sau - so. Làm một lần lúc khởi động,
    không phải đi sửa từng cửa; cửa ghi viết sau này chỉ cần khai tên là tự có nhật ký. */
 function logArm(){
@@ -18578,7 +18594,7 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=srows("DL14");
   /* BUỔI ĐÃ HUỶ PHẢI NÓI LÀ ĐÃ HUỶ. Bẫy cắn 09/08, lộ ra khi đối chiếu chip trên thẻ với trạng
      thái thật trong DL14: bậc thang chip cũ chỉ hỏi quá hạn / vắng / đã ghi nội dung, không có
      nhánh nào cho `cancelled` - nên **3 buổi đã huỷ đeo chip "Đang xử lý"**, tức app nói với
-     người trực rằng một buổi đã bỏ vẫn đang chạy. Huỷ thắng mọi nhánh khác: một buổi đã bỏ thì
+     người trực rằng một buổi đã bỏ vẫn đang chạy. Hủy thắng mọi nhánh khác: một buổi đã bỏ thì
      không còn "quá hạn ghi chú", cũng không còn "HV vắng" - nó đơn giản là không diễn ra nữa. */
   var _huy=isc(w.wow_status,"cancelled");
   h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(w.student_id,w.student_name)+'</b><div class="obm">'+esc(elabel(w.wow_skill)||w.wow_skill||"")+' · '+esc(w.wow_session_date||"")+'</div></div>'+mstripFor(w.student_id,MIX)+(_huy?'<span class="chip">Đã huỷ</span>':(s.overdue?'<span class="chip red">Quá hạn ghi chú</span>':(s.noshow?'<span class="chip">HV vắng</span>':(s.note?'<span class="chip green">Xong</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div>';
@@ -21903,7 +21919,7 @@ function renderGvdp(embed){
    ' <button class="btn sm" onclick="gvdpThangForm(\''+esc(gvdpKyThang(day))+'\')"><i class="ti ti-edit"></i>'+(gvdpAiKhai()?'Khai danh sách tháng':'Xem danh sách tháng')+'</button></div>'})();
  h+='<div class="notebar"><i class="ti ti-info-circle"></i>'+
   '<b>Không cần đăng ký trước.</b> App tự tính ai thay được cho từng buổi. '+
-  '<span data-tip="Giảng viên thay thế = trống lịch đúng khung giờ đó, dạy được ở cơ sở của lớp (hoặc lớp online), '+
+  '<span data-tip="Giáo viên thay thế = trống lịch đúng khung giờ đó, dạy được ở cơ sở của lớp (hoặc lớp online), '+
   'và không vượt số buổi/ngày. Giáo viên nghỉ cả ngày thì để trống lịch của họ - họ tự rơi vào nhóm '+
   '&quot;trống lịch cả ngày&quot; ở ô bên trên.">App tính thế nào?</span> '+
   'Bấm <b>Đề xuất người dạy thay</b> ở dòng buổi tương ứng.</div>';
@@ -21935,7 +21951,7 @@ function renderGvdp(embed){
  h+=chipBar("gvdp",gvF,[["all","Tất cả buổi",_sesAll],
   ["trong","Chưa có giáo viên",_nTrong,_nTrong?"red":""],
   ["huy","Đã huỷ",_nHuy,_nHuy?"amber":""]],null);
- h+='<div class="panel"><div class="ph"><b>Buổi học trong ngày</b><span class="mut" style="font-size:11.5px">bấm "Đề xuất người dạy thay" để xem ai nhận được</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Lớp</th><th>Cơ sở / hình thức</th><th>GV đang phụ trách</th><th>Giảng viên thay thế</th><th></th></tr></thead><tbody>';
+ h+='<div class="panel"><div class="ph"><b>Buổi học trong ngày</b><span class="mut" style="font-size:11.5px">bấm "Đề xuất người dạy thay" để xem ai nhận được</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Lớp</th><th>Cơ sở / hình thức</th><th>Giáo viên đang phụ trách</th><th>Giáo viên thay thế</th><th></th></tr></thead><tbody>';
  if(!ses.length)h+='<tr><td class="empty" colspan="6">Ngày này không có buổi học nào.</td></tr>';
  ses.forEach(function(x){var c=find("DL10","class_id",x.class_id)||{};
   var d=pvnd(x.session_date);var n=gvBackup(x).filter(function(r){return r.ok}).length;
@@ -24551,7 +24567,7 @@ function renderTracuu(){
  h+='<div class="panel"><div class="ph"><b>'+hien.length+' sổ</b>'+
   (q?'<span class="mut" style="font-size:11.5px">lọc theo "'+esc(window.TCQ)+'" - toàn bộ có '+co.length+' sổ</span>':
      '<span class="mut" style="font-size:11.5px">bấm một thẻ để mở sổ</span>')+'</div><div class="pbody">';
- if(!hien.length)h+='<div class="empty">'+(co.length?'Không có sổ nào khớp "'+esc(window.TCQ)+'". Xoá từ khoá để xem đủ '+co.length+' sổ.'
+ if(!hien.length)h+='<div class="empty">'+(co.length?'Không có sổ nào khớp "'+esc(window.TCQ)+'". Xóa từ khoá để xem đủ '+co.length+' sổ.'
    :'Chức danh của bạn chưa được cấp sổ tra cứu nào. Cấp thêm ở Cài đặt &rsaquo; Phân quyền trang.')+'</div>';
  else{
   h+='<div class="tcgrid">';
@@ -25432,7 +25448,7 @@ function renderHoidap(){
  h+='<div class="panel"><div class="pbody">';
  h+='<div style="display:flex;gap:8px;flex-wrap:wrap" data-tour="qabox"><input id="qa_q" value="'+esc(q)+'" placeholder="vd: bạn Minh Anh có cảnh báo gì, giờ phải làm gì?" style="flex:1;min-width:260px;height:38px;border:1px solid var(--line);border-radius:8px;padding:0 12px;font-family:inherit;font-size:13px" onkeydown="if(event.key===\'Enter\')qaHoi()">'+
   '<button class="btn primary" onclick="qaHoi()"><i class="ti ti-search"></i>Hỏi</button>'+
-  (q?'<button class="btn" onclick="qaXoa()"><i class="ti ti-x"></i>Xoá</button>':'')+'</div>';
+  (q?'<button class="btn" onclick="qaXoa()"><i class="ti ti-x"></i>Xóa</button>':'')+'</div>';
  h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px" data-tour="qavd"><span class="mut" style="font-size:11px;align-self:center">Thử:</span>';
  qaViDuList().forEach(function(s){h+='<button class="pill" onclick="qaViDu('+JSON.stringify(s).split('"').join("&quot;")+')">'+esc(s)+'</button>'});
  h+='</div></div></div>';
@@ -26731,7 +26747,7 @@ function banThe(ttk,z){
     kia. Thấy được, nhưng KHÔNG có nút Làm: quyền chặn tay, không che mắt. */
  /* GẤP LẠI, KHÔNG BỎ ĐI. Đo được: Marketing mở hồ sơ ra thấy 26 việc của mình bên cạnh 85 việc
     của bộ phận khác - gấp 3.3 lần. Ở v5 khối này nằm sâu trong trang nghiệp vụ nên ít ai vấp;
-    ở v6 nó nằm ngay màn đáp, ngày nào cũng phải lướt qua. Xoá đi thì phạm đúng luật đã chốt
+    ở v6 nó nằm ngay màn đáp, ngày nào cũng phải lướt qua. Xóa đi thì phạm đúng luật đã chốt
     (quyền chặn TAY, không che MẮT), nên chỉ gấp: một dòng nói rõ có bao nhiêu việc và đang chờ
     những bộ phận nào, bấm mới mở. Dùng thẻ <details> gốc của trình duyệt - không thêm JS, không
     thêm trạng thái phải nhớ, và người dùng bàn phím vẫn mở được. */
@@ -26860,7 +26876,7 @@ RENDER.duyetdot  = function(){var L=dotCho();
 /* ═══ SÁU HUB THÀNH BÍ DANH, KHÔNG THÀNH TRANG CHẾT ════════════════════════════════════════
    Sáu khoá hub (`tuyensinh` `hoctap` `cskh` `khac` `duyet` `giangvien`) vẫn còn đầy rẫy trong
    app: bài hướng dẫn trỏ vào, trang đáp của chức danh trỏ vào, nút trong thân trang trỏ vào,
-   và link người dùng đã gửi cho nhau. Xoá chúng là làm chết một loạt cửa trong im lặng.
+   và link người dùng đã gửi cho nhau. Xóa chúng là làm chết một loạt cửa trong im lặng.
    Nên chúng ở lại - nhưng chỉ còn là BÍ DANH: bấm vào thì đi thẳng tới trang nghiệp vụ đầu tiên
    mà người đó có quyền xem. Không còn màn hub nào có dải tab.
    VÌ SAO PHẢI HỎI "NGƯỜI ĐÓ CÓ QUYỀN XEM KHÔNG" chứ không nhảy đại vào tab mặc định: hub Chờ
@@ -27543,7 +27559,7 @@ function asstHTML(){
  var _q=window.ASSTQ||"";
  h+='<div class="qaAsk"><span class="qaGlow" style="flex:1;min-width:0;display:flex"><input id="asst_q" value="'+esc(_q)+'" placeholder="Hỏi tên học viên, hoặc chỗ cấu hình…" onkeydown="if(event.key===\'Enter\')asstQHoi()"></span>'+
   '<button class="btn primary sm" onclick="asstQHoi()" aria-label="Hỏi"><i class="ti ti-search"></i></button>'+
-  (_q?'<button class="btn sm" onclick="asstQXoa()" aria-label="Xoá câu hỏi"><i class="ti ti-x"></i></button>':'')+'</div>';
+  (_q?'<button class="btn sm" onclick="asstQXoa()" aria-label="Xóa câu hỏi"><i class="ti ti-x"></i></button>':'')+'</div>';
  if(_q)return h+asstTraLoi(_q)+aiKhoiHTML(_q);
  /* Chưa hỏi gì thì gợi ý vài câu hỏi THẬT - một ô nhập trống không nói cho người ta biết hỏi
     được những gì. Tên học viên lấy từ đúng phạm vi của người đang đăng nhập. */
@@ -28255,7 +28271,7 @@ function navVis(k){var r=RBK[CURROLE],rs=SCOPE();
    · "HÀM VẼ HUB ĐÃ CHẾT": đóng vai đủ 16 chức danh × 5 hub - không trường hợp nào rơi vào chúng,
      vì `hubDich` luôn tìm được một trang con. Nhưng chúng là LƯỚI AN TOÀN: ngày nào tắt hết trang
      con của một nhóm trong Cài đặt › Phân quyền trang thì `hubDich` trả rỗng và app rơi vào đây.
-     Xoá đi thì lúc ấy là TRANG TRẮNG. **Một nhánh chưa chạy bao giờ không phải nhánh chết - nó
+     Xóa đi thì lúc ấy là TRANG TRẮNG. **Một nhánh chưa chạy bao giờ không phải nhánh chết - nó
      chỉ là nhánh chưa ai rơi vào.**
 
    NGOẠI LỆ: `duyet` KHÔNG phải bí danh. Bốn cái kia (`tuyensinh` `hoctap` `cskh` `khac`) có tab

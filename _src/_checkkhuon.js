@@ -263,6 +263,23 @@ if (thieu.cau.length)  do_.push("K1 cau ngu canh: " + thieu.cau.length + " trang
 if (thieu.rong.length) do_.push("K5 trang thai rong khong biet noi: " + thieu.rong.length + " trang - " + thieu.rong.slice(0,4).join(", "));
 if (thieu.hub.length)  do_.push("K6 CON DINH TOI HUB - trang nghiep vu van ve thanh tab hub cu: " + thieu.hub.join(", "));
 
+/* ═══ K3b · MOI THE PHAI NOI DUOC "TIM O DAU" HOAC "TINH THE NAO" (14/08) ═══════════════════
+   Anh Luan chot V9.59: *"co the thi bam nhay trang khac, a thay cung bat tien du lam"* - nen the
+   CO Y khong bam duoc. Cai gia phai tra cho quyet dinh ay la CHU THICH phai ganh: doc con so
+   xong nguoi ta phai biet di dau de thay tung dong, hoac con so ay chia cho cai gi. Truoc hom
+   nay khong thuoc nao canh ve ay - tuc no la mot loi hua, khong phai mot luat.
+   GHI LAI MOT SAI CUA CHINH PHEP DO NAY: ban dau tim DUNG cum chu "Danh sach" roi bao 23 the
+   thieu, trong khi 8 cai da co cau chi duong viet la "Muon xem: ...". Hoi MUC TIEU, dung hoi
+   mot cum tu - do lai cho dung thi chi con 2. */
+(function(){
+ var thieuCau=[];
+ try{Object.keys(THEDEF).forEach(function(k){(THEDEF[k].the||[]).forEach(function(t){
+  var mo=String(t[2]||"");
+  if(!/Danh sách|Muốn xem|Mở |bấm chip|tab |cách tính|Công thức|Rê chuột|= /i.test(mo))
+   thieuCau.push(k+"/"+t[0])})})}catch(e){thieuCau.push("khong doc duoc THEDEF: "+e.message)}
+ if(thieuCau.length)do_.push("K3b the khong noi duoc tim o dau / tinh the nao: "+thieuCau.length+
+   " - "+thieuCau.slice(0,6).join(", ")+" => them cau chi duong vao cot mo ta cua THEDEF");
+})();
 if (thieu.the.length > TRAN_THIEU_THE) do_.push("K3 thieu dai the: " + thieu.the.length + " trang, qua tran " + TRAN_THIEU_THE + " - " + thieu.the.slice(0,5).join(", "));
 if (thieu.loc.length > TRAN_THIEU_LOC) do_.push("K4 thieu chip loc: " + thieu.loc.length + " trang, qua tran " + TRAN_THIEU_LOC + " - " + thieu.loc.join(", "));
 if (thieu.nut.length > TRAN_THIEU_NUT) do_.push("K2 thieu nut hanh dong: " + thieu.nut.length + " trang, qua tran " + TRAN_THIEU_NUT + " - " + thieu.nut.join(" | "));
