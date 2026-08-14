@@ -12899,6 +12899,18 @@ var APPPARAMS=[
  ["Giới thiệu bạn bè","referralFriend_discountType","Kiểu ưu đãi cho bạn được giới thiệu","kiểu","percent",["percent","amount"]],
  ["Giới thiệu bạn bè","referralFriend_discount","Mức giảm cho bạn được giới thiệu (nếu percent thì nhập 10 = 10%, nếu amount thì nhập số tiền)","% hoặc VND",10],
  ["Giới thiệu bạn bè","referralReferrer_reward","Phần thưởng cho học viên giới thiệu (mô tả tự do)","chữ","1 buổi WOW 1-1 miễn phí cho mỗi bạn đăng ký thành công","text"],
+ /* ═══ V2 14/08 - QUY ĐỊNH LỚP HỌC & CAM KẾT (anh Luân chốt) ════════════════════════════
+    Đổi NGHĨA của bước "HV xác nhận" chứ không bỏ bước: tới lúc được xếp lớp thì tư vấn và học
+    vụ đã chốt lớp với học viên rồi, bắt xác nhận lại "đồng ý lớp" là hỏi một câu đã có câu
+    trả lời. Câu CHƯA ai hỏi - và là câu có sức nặng khi sau này tranh chấp về nghỉ học, bảo
+    lưu, hoàn phí - là "tôi hiểu và tuân thủ quy định lớp học".
+    Cột `class_confirmation_status`/`confirmation_time` của SOP GIỮ NGUYÊN (LUẬT CỨNG SỐ 0:
+    thêm thì được, bớt thì không) - chỉ đổi điều được xác nhận và thêm dấu vết.
+    PHIÊN BẢN là phần không được quên: nội dung sửa được ở đây, nên một chữ ký tháng trước là
+    ký vào BẢN CŨ. Chỉ lưu "đã xác nhận" thì cái dấu ấy mất giá trị ngay lần đầu ai sửa một
+    dòng, mà không ai hay. Nên mỗi lần xác nhận lưu kèm SỐ HIỆU BẢN + BẢN CHỤP nguyên văn. */
+ ["Quy định & cam kết lớp học","commitVersion","Số hiệu bản quy định hiện hành. Sửa nội dung thì tăng số này lên - người đã ký bản cũ vẫn tính là đã ký, nhưng hồ sơ ghi rõ họ ký ở bản nào","bản","1.0","text"],
+ ["Quy định & cam kết lớp học","commitText","Nội dung quy định lớp học và cam kết mà học viên phải đọc rồi bấm đồng ý. Mỗi dòng một điều","chữ","1. Đi học đúng giờ. Vào lớp trễ quá 15 phút tính là buổi muộn.\n2. Nghỉ học phải báo trước ít nhất 24 giờ qua học vụ; nghỉ không báo tính là vắng không phép.\n3. Làm và nộp bài tập về nhà đúng hạn giáo viên giao.\n4. Giữ trật tự, tôn trọng giáo viên và các bạn cùng lớp.\n5. Học phí đã đóng được bảo lưu theo chính sách của trung tâm; không hoàn tiền khi đã học quá số buổi quy định.\n6. Trung tâm có quyền đổi giáo viên hoặc dời lịch khi có lý do chính đáng, và sẽ báo trước cho học viên.","text"],
  ["Trung tâm","centerHotline","Hotline hiện trong tin nhắn xác nhận và phiếu thu","chữ","","text"],
  ["P10 · Kết thúc khóa & tái đăng ký","thresholdPauseRemind_days","Nhắc gọi mời HV bảo lưu quay lại TRƯỚC hạn bao nhiêu ngày","ngày",14],
  /* AC2 - học viên thi IELTS thật nhiều lần thì lấy lượt nào để tính đạt AIM. Anh Luân chọn
@@ -17042,14 +17054,31 @@ function hvMe(){var sid=window.HVID||window.JPID||"";
  return S}
 
 /* ---- (d) TỰ XÁC NHẬN LỚP ---- */
+/* Nội dung quy định hiện hành + số hiệu bản. Một bản gốc duy nhất, mọi màn đều đọc từ đây -
+   cổng học viên, hồ sơ 360, sổ đã xác nhận và cửa ghi đều phải nói CÙNG một nội dung. */
+function commitText(){try{return String(paramStr("commitText","")||"")}catch(e){return String(paramOf("commitText","")||"")}}
+function commitVer(){return String(paramOf("commitVersion","1.0")||"1.0")}
+function commitDong(){return commitText().split(/\r?\n/).map(function(x){return x.trim()}).filter(function(x){return x})}
+/* Vẽ nguyên văn nội dung - dùng ở BA chỗ (cổng HV lúc ký, hồ sơ 360 lúc tra lại, sổ đã ký).
+   `txt` truyền vào là BẢN CHỤP đã lưu; không truyền thì lấy bản hiện hành. */
+function commitHTML(txt,ver){
+ var ds=String(txt==null?commitText():txt).split(/\r?\n/).map(function(x){return x.trim()}).filter(function(x){return x});
+ if(!ds.length)return '<div class="mut">(chưa khai nội dung quy định - vào Cài đặt > Quy định &amp; cam kết lớp học)</div>';
+ return '<div class="ctxcontent ccblue"><div class="cch">Quy định lớp học &amp; cam kết'+(ver?(' · bản '+esc(ver)):"")+'</div>'+
+  '<div class="ccb">'+ds.map(function(x){return esc(x)}).join("<br>")+'</div></div>'}
 function hvClassConfirm(obid){
  if(!actGuard("hvClassConfirm:"+obid))return;
  var o=find("DL08","onboarding_id",obid);if(!o){toast("Không thấy hồ sơ xếp lớp.");return}
  o.class_confirmation_status=eFull("enum_class_confirmation_status","confirmed");
  o.confirmation_time=nowStr();
- if(SVR)try{google.script.run.apiUpdate("DL08",obid,{class_confirmation_status:o.class_confirmation_status,confirmation_time:o.confirmation_time})}catch(e){}
+ /* BẢN CHỤP, không phải đường dẫn tới bản đang sửa. Nội dung ở Cài đặt đổi được bất cứ lúc
+    nào; nếu chỉ lưu "đã đồng ý" thì cái dấu này mất nghĩa ngay lần sửa đầu tiên. */
+ o.commit_version=commitVer();
+ o.commit_text=commitText();
+ o.commit_at=o.confirmation_time;
+ if(SVR)try{google.script.run.apiUpdate("DL08",obid,{class_confirmation_status:o.class_confirmation_status,confirmation_time:o.confirmation_time,commit_version:o.commit_version,commit_text:o.commit_text,commit_at:o.commit_at})}catch(e){}
  persistSoon();
- toast("Đã ghi nhận: bạn nhận lớp này. Trung tâm sẽ gửi tài liệu và nhắc lịch buổi đầu.",4200);
+ toast("Đã ghi nhận bạn đồng ý quy định lớp học và cam kết (bản "+commitVer()+"). Nội dung đã đồng ý được lưu trong hồ sơ của bạn.",4600);
  hvReRender()}
 function hvClassReject(obid){
  var h='<div class="dcard"><h4><i class="ti ti-calendar-x"></i>Lịch lớp này không hợp</h4>';
