@@ -188,9 +188,18 @@
 > Mới sửa đúng một cái (`bg_orph`). Cần một bộ kiểm thường trực: thẻ có câu "Danh sách: ..." thì
 > phải bấm được, và chỗ nó dẫn tới phải có đúng chừng ấy dòng.
 >
-> **E · CHẠY `./verify.sh` TRỌN BỘ MỘT LƯỢT LIỀN** - ngày 14/08 ba lượt đều hỏng giữa chừng, hai
-> lượt do chính em dựng lại bản mới lúc nó đang chạy, một lượt do em `pkill` trúng chính vỏ lệnh
-> của nó. Lượt thứ tư chạy trên bản `3f0446` (14/08 chiều, sau đợt gộp bàn làm việc).
+> **E · ~~CHẠY `./verify.sh` TRỌN BỘ~~ ✅ XONG 14/08 tối.** Ba lượt đầu hỏng giữa chừng (hai lượt
+> do chính em dựng lại bản mới lúc nó đang chạy, một lượt do em `pkill` trúng chính vỏ lệnh của
+> nó). Lượt bốn trên `3f0446` ra 13 chỗ đỏ; lượt năm trên `519e91` còn 3; **lượt sáu trên
+> `a1bda4` XANH HẾT 41/41**, chạy liền 35 phút không gián đoạn.
+> Ba chỗ đỏ cuối đều do chính em thêm trong ngày, và cái thứ ba đáng nhớ nhất: `_checkux` báo
+> bảng màu phình lên 111 mã; em đổi màu về mã đã có mà **vẫn 111** - vì em viết mã màu ra trong
+> CHÚ THÍCH CSS để giải thích tại sao không được dùng nó, mà chú thích ấy nằm trong chuỗi CSS nên
+> in thẳng vào file dựng, và thước đếm mã hex trên chính file đó. *Lời giải thích tự nó thành một
+> mã màu mới.* Dự án đã cắn đúng bẫy này một lần với dải viền màu.
+> Hai chỗ kia: icon `ti-map-2` chưa có trong font subset, và chữ "phễu" - từ của miền lead - hiện
+> trên trang Chỉ số cho cả giáo viên đọc. *Câu giải thích cũng là dữ liệu; nó phải đi qua đúng
+> cái cửa mà số liệu đi qua.*
 >
 > **F · SIDEBAR - CHƯA XẾP LẠI CHO RA VIỆC.** Anh Luân 14/08: *"em đã check xem trên sidebar nên
 > sắp xếp thế nào chưa, a thấy chắp vá quá"*. Đúng: cả ngày mới chỉ VÁ TỪNG LỖ (thêm `socamket`,
@@ -305,9 +314,10 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 41 BỘ KIỂM. Bản dựng đang chạy: `519e91` (14/08), đã lên
+> **Phiên bản: V2 — 41 BỘ KIỂM, XANH HẾT 41/41 (verify trọn bộ 35 phút, 14/08 tối).
+> Bản dựng đang chạy: `a1bda4` (14/08), đã lên
 > https://mittomap.github.io/itts-sop-demo-v2/ . Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `dc6eb3`, `3f0446`, `39083f`, `d2d2d5`, `c6ea8b`.
+> Mốc cũ: `519e91`, `dc6eb3`, `3f0446`, `39083f`, `d2d2d5`, `c6ea8b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
 > ### 🟢 14/08 tối - DỌN 13 CHỖ ĐỎ SAU ĐỢT GỘP, VÀ MỘT BÀI HỌC LẶP NĂM LẦN TRONG NGÀY
