@@ -2862,7 +2862,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>1cf93a</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>7da055</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -23912,13 +23912,19 @@ function renderGiaoviec(){
    ["report","Tổng hợp & báo cáo",null,""]],"tkTabSet('{k}')")+'</span>',
   (tab==="report"||tab==="wait")?"":segHTML(f,[["live","Đang chạy",null,""]]
    .concat(tab==="given"?[["cho","Chờ tôi xác nhận",gWait.length||"",gWait.length?"amber":""]]:[])
-   .concat([["all","Tất cả",null,""],["done","Đã xong",null,""]]),"tkFset('{k}')"));
+   .concat([["all","Tất cả",null,""],["done","Đã xong",null,""],["huy","Đã hủy / từ chối",null,""]]),"tkFset('{k}')"));
  if(tab==="report")return h+tkReport();
  var list=(tab==="wait")?mWait:(tab==="mine")?mine:given;
  if(tab!=="wait"){
   if(f==="live")list=list.filter(tkLive);
   else if(f==="cho")list=list.filter(function(t){return tkSt(t)==="done"});
-  else if(f==="done")list=list.filter(function(t){return tkSt(t)==="confirmed"||tkSt(t)==="done"})}
+  else if(f==="done")list=list.filter(function(t){return tkSt(t)==="confirmed"||tkSt(t)==="done"})
+  /* V2 14/08 - CHIP "ĐÃ HỦY" (anh Luân: *"mà cái task đã hủy xem ở đâu"*). Đo trước khi thêm:
+     việc đã hủy VẪN còn, nhưng chỉ hiện ở chip "Tất cả" - tức muốn tìm nó thì phải biết trước
+     rằng nó không nằm ở "Đang chạy" cũng không nằm ở "Đã xong", rồi mở cả danh sách ra dò.
+     Ba chip kia đều nói tên một trạng thái, riêng trạng thái này không có tên trên màn.
+     *Một bản ghi còn trong dữ liệu mà không có lối gọi tên nó ra thì với người dùng là đã mất.* */
+  else if(f==="huy")list=list.filter(function(t){return tkSt(t)==="cancelled"||tkSt(t)==="declined"})}
  /* V9.28: bộ lọc chuyên sâu chồng LÊN TRÊN tab, không thay tab: tab chọn "việc của tôi / tôi đã giao",
     bộ lọc thu hẹp tiếp theo người nhận, hạn, độ ưu tiên... */
  var _n0=list.length; list=fltApply("giaoviec",list);
