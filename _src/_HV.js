@@ -1890,7 +1890,6 @@ var THEDEF={
   ["lr_no","Học viên còn nợ","Đếm số học viên của lớp còn khoản phải thu, cộng mọi đơn chưa huỷ của người đó. Một người nợ hai đơn vẫn tính là một. Muốn xem: trang Thanh toán, lọc theo lớp."]]},
  socamket:{t:"Sổ cam kết đã ký",ttl:"Tình hình ký cam kết",the:[
   ["ck_ban","Đã ký bản hiện hành","Tỷ lệ hồ sơ đã ký mà chữ ký nằm ở BẢN QUY ĐỊNH ĐANG CÓ HIỆU LỰC. Nội dung sửa được ở Cài đặt, nên sau mỗi lần sửa sẽ có một nhóm người mang chữ ký vào bản cũ - tỷ lệ này là thứ nói ra điều đó. Danh sách: bảng ngay dưới, cột Bản."],
-  ["ck_cu","Đang giữ chữ ký ở bản cũ","Số hồ sơ đã ký nhưng ký vào một bản quy định đã bị thay. Họ VẪN tính là đã ký - nhưng học vụ cần biết để quyết có mời ký lại không. Danh sách: bảng dưới, dòng có chip vàng ở cột Bản."],
   ["ck_chua","Chưa ký","Hồ sơ onboarding chưa có dấu ký và cũng chưa từ chối - đang chờ học viên bấm đồng ý ở cổng của họ. Danh sách: trang Xếp lớp & Onboarding, chip \"Chờ HV ký cam kết\"."]]},
  dsphuhuynh:{t:"Sổ phụ huynh",the:[
   /* 14/08 - "ph_nguoi" và "ph_nhieu" đã bỏ: một cái là số dòng của bảng ngay dưới, cái kia là
@@ -9366,7 +9365,7 @@ function renderHoso(){
  (function(){var _ob=(C.ob||[]).filter(function(x){return String(x.commit_at||"").trim()})
    .sort(function(a,b){return (pvnd(b.commit_at)||0)-(pvnd(a.commit_at)||0)})[0];
   if(!_ob)return;
-  var _cu=String(_ob.commit_version||"")&&String(_ob.commit_version||"")!==commitVer();
+  var _cu=ckVerCu(_ob.commit_version,commitVer());
   h+='<div class="panel"><div class="ph"><b><i class="ti ti-file-check" style="margin-right:6px"></i>Quy định &amp; cam kết đã ký</b>'+
    (_cu?'<span class="chip amber" style="margin-left:auto">ký ở bản cũ '+esc(_ob.commit_version)+' · bản hiện hành '+esc(commitVer())+'</span>':'<span class="chip green" style="margin-left:auto">bản hiện hành</span>')+
    '</div><div class="pbody">'+
@@ -13299,7 +13298,10 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
     Và nó kéo theo một lỗi thật anh Luân chụp được: nhãn "Đang onboarding" in HAI LẦN trên nhánh
     này - một cái nằm ngay TRÊN bảng chờ (sai chỗ, vì bảng ấy không phải onboarding), một cái
     nằm dưới. Gỡ bảng thì gỡ luôn cái nhãn lạc chỗ. */
- if(fil==="all")h+='<div class="sechd">Đang onboarding</div>';
+ /* Nhãn "Đang onboarding" cũng gỡ nốt (anh Luân: *"cái chữ này có thừa ko"* - có). Nó sinh ra
+    để NGĂN bảng chờ xếp lớp ở trên với danh sách onboarding ở dưới; bảng đi rồi thì nó không
+    ngăn cái gì với cái gì nữa, chỉ còn đứng một mình nhắc lại đúng tên trang mà thanh tiêu đề
+    đã ghi. *Một cái nhãn chỉ có nghĩa khi có hai thứ cần phân biệt.* */
  /* V9.28: trang này tự dựng thanh công cụ và KHÔNG có biến p (nó dùng window.XLFILT),
     nên phải ghi thẳng mã trang - viết p ở đây là tham chiếu biến không tồn tại, lọc câm luôn. */
  view=fltApply("xeplop",view);
@@ -13323,8 +13325,15 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
    ?'<button class="btn primary sm" onclick="obChange(\''+_oid+'\')"><i class="ti ti-transfer"></i>Đổi lớp khác</button>'
    :(!s.sent?'<button class="btn primary sm" onclick="confirmRun(\'Xác nhận đã gửi thông tin lớp cho học viên?\',\'obSendInfo\',\''+_oid+'\')"><i class="ti ti-send"></i>Đã gửi thông tin lớp</button>'
     :(!s.confirmed?'<button class="btn sm" onclick="obConfirmForm(\''+_oid+'\')"><i class="ti ti-check"></i>Ghi nhận ký tại TT</button>':'')))+'</div>';
-  h+='<div class="obsl a2">'+((!s.rejected&&s.sent&&!s.confirmed)
-   ?'<button class="btn danger sm" onclick="confirmRun(\'Ghi nhận học viên CHƯA ĐỒNG Ý quy định lớp học và cam kết? Hãy liên hệ giải thích, hoặc đổi lớp nếu vướng lịch.\',\'obReject\',\''+_oid+'\')"><i class="ti ti-user-x"></i>HV chưa xác nhận cam kết</button>'
+  /* V2 14/08 (anh Luân: *"học viên chưa xác nhận cam kết chỉ là trạng thái mà em làm nhìn như
+    nút vậy"*). Nó LÀ nút thật - cửa ghi `obReject`. Cái sai nằm ở NHÃN: "HV chưa xác nhận cam
+    kết" là một câu tả tình hình, mà đúng cái chuỗi ấy còn đang được dùng làm CHIP TRẠNG THÁI ở
+    đầu thẻ (dòng `s.rejected` phía trên). Một chuỗi đứng hai vai - vừa là trạng thái vừa là nút
+    - thì người đọc chọn vai quen thuộc hơn, tức là trạng thái.
+    Nay nhãn mở đầu bằng động từ, song song với hai nút cạnh nó ("Ghi nhận ký tại TT", "Đổi lớp").
+    *Nút phải nói việc nó LÀM, không nói tình hình nó GHI LẠI.* */
+ h+='<div class="obsl a2">'+((!s.rejected&&s.sent&&!s.confirmed)
+   ?'<button class="btn danger sm" onclick="confirmRun(\'Ghi nhận học viên CHƯA ĐỒNG Ý quy định lớp học và cam kết? Hãy liên hệ giải thích, hoặc đổi lớp nếu vướng lịch.\',\'obReject\',\''+_oid+'\')"><i class="ti ti-user-x"></i>Ghi nhận HV chưa đồng ý</button>'
    :'')+'</div>';
   /* THU TU CUOI HANG (anh Luan: *"hoan tat, va ho so ... em cho no ve ben phai"*). "Ho so"
      co o MOI dong; "Hoan tat" thi khong - no bien mat khi da hoan tat hoac HV tu choi, nhung
@@ -17282,6 +17291,16 @@ function hvMe(){var sid=window.HVID||window.JPID||"";
    cổng học viên, hồ sơ 360, sổ đã xác nhận và cửa ghi đều phải nói CÙNG một nội dung. */
 function commitText(){try{return String(paramStr("commitText","")||"")}catch(e){return String(paramOf("commitText","")||"")}}
 function commitVer(){return String(paramOf("commitVersion","1.0")||"1.0")}
+/* ═══ V2 14/08 - "1.0" VÀ "1" LÀ CÙNG MỘT BẢN (anh Luân: *"1.0 và 1 khác nhau???"*) ═════════
+   Không khác. Nhưng phép so trước đây là so CHUỖI THÔ, mà số bản đi qua hai đường khác nhau:
+   dữ liệu demo gieo sẵn chuỗi "1.0", còn `paramOf` đọc ngưỡng CH2 ra thì đã bị ép về số rồi mới
+   đổi lại thành chuỗi, thành "1". Hai chuỗi khác nhau nên CẢ SỔ bị chấm là "ký ở bản cũ" - một
+   lời buộc tội sai, và tệ hơn là nó sai theo hướng khiến người ta đi mời cả trung tâm ký lại.
+   *Số thì phải so như số. Một cái nhãn phiên bản không phải là một chuỗi ký tự bất kỳ.* */
+function ckVerNorm(v){var t=String(v==null?"":v).trim();
+ if(/^\d+(\.\d+)?$/.test(t))return String(parseFloat(t));
+ return t}
+function ckVerCu(v,ban){var a=ckVerNorm(v);if(!a)return false;return a!==ckVerNorm(ban)}
 function commitDong(){return commitText().split(/\r?\n/).map(function(x){return x.trim()}).filter(function(x){return x})}
 /* Vẽ nguyên văn nội dung - dùng ở BA chỗ (cổng HV lúc ký, hồ sơ 360 lúc tra lại, sổ đã ký).
    `txt` truyền vào là BẢN CHỤP đã lưu; không truyền thì lấy bản hiện hành. */
@@ -23378,7 +23397,7 @@ function renderSoCamKet(){
  var ban=commitVer();
  var ds=srows("DL08").filter(function(o){return String(o.commit_at||"").trim()})
   .sort(function(a,b){return (pvnd(b.commit_at)||0)-(pvnd(a.commit_at)||0)});
- var cu=ds.filter(function(o){return String(o.commit_version||"")!==ban});
+ var cu=ds.filter(function(o){return ckVerCu(o.commit_version,ban)});
  var tt=srows("DL08").filter(function(o){return isc(o.class_confirmation_status,"confirmed")});
  var chua=srows("DL08").filter(function(o){return !isc(o.class_confirmation_status,"confirmed")&&!isc(o.class_confirmation_status,"rejected")});
  /* `_checkkhuon` K2 đòi mỗi trang nghiệp vụ có một nút hành động ở đầu trang. Nút ở đây CỐ Ý
@@ -23390,15 +23409,18 @@ function renderSoCamKet(){
   (function(){var tl=tt.length?Math.round((tt.length-cu.length)*100/tt.length):null;
    return ["ti-file-check",(tl==null?"-":tl+"%"),"Đã ký bản hiện hành",(tl==null?"#6B7887":(tl>=100?"#2E9E6B":"#E08A1E")),
     (tt.length-cu.length)+"/"+tt.length+" hồ sơ · bản "+ban]})(),
-  ["ti-history",cu.length,"Đang giữ chữ ký ở bản cũ",(cu.length?"#E08A1E":"#2E9E6B"),cu.length?"cân nhắc mời ký lại":"không còn ai"],
-  ["ti-clock",chua.length,"Chưa ký",(chua.length?"#E24B4A":"#2E9E6B"),"đang chờ học viên ký ở cổng"]],"socamket",["ck_ban","ck_cu","ck_chua"]);
+  /* Ô "Đang giữ chữ ký ở bản cũ" ĐÃ BỎ (14/08). Nó là một con số đếm dòng, mà chip lọc ngay dưới
+     nay đếm đúng con số ấy - `_checklap` L5 bắt trúng, và đúng luật đã ghi trong THE_NEN_LA_GI:
+     *thẻ trả lời câu của chip thì nó chỉ còn là một cái chip không bấm được*. Con số vẫn còn ở
+     hai chỗ: mẫu số của ô tỷ lệ bên trái, và chính cái chip. */
+  ["ti-clock",chua.length,"Chưa ký",(chua.length?"#E24B4A":"#2E9E6B"),"đang chờ học viên ký ở cổng"]],"socamket",["ck_ban","ck_chua"]);
  /* `_checkkhuon` K4 đòi trang nghiệp vụ có dải chip lọc. Ba chip dưới đây KHÔNG phải chip cho
     có: chúng trả lời đúng ba câu người ta hỏi cuốn sổ này - *ai đang giữ chữ ký ở bản cũ* (mời
     ký lại), *ai ký tại trung tâm* (phải có ảnh bản giấy), *ai ký tại trung tâm mà thiếu ảnh*
     (chỗ hở trong hồ sơ). Đăng ký ở `CTXTRANG` nên F5 giữ nguyên chip, đúng nhịp đã đặt hôm nay. */
  var ckf=String(window.CKF||"");
  function _tt(o){return /trung tâm/i.test(String(o.commit_kenh||""))}
- var _fn={cu:function(o){return String(o.commit_version||"")!==ban},
+ var _fn={cu:function(o){return ckVerCu(o.commit_version,ban)},
           tt:_tt,
           hoanh:function(o){return _tt(o)&&!String(o.commit_anh||"").trim()}};
  var view=(_fn[ckf]?ds.filter(_fn[ckf]):ds);
@@ -23413,7 +23435,7 @@ function renderSoCamKet(){
  if(!view.length)h+='<div class="empty">'+(ckf?"Không có hồ sơ nào khớp chip lọc đang chọn.":"Chưa có hồ sơ nào ký cam kết.")+'</div>';
  else{
   h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Lớp</th><th>Ký lúc</th><th>Bản</th><th>Hình thức ký</th><th>Người ghi nhận</th><th>Ảnh</th><th></th></tr></thead><tbody>';
-  view.forEach(function(o){var _cu=String(o.commit_version||"")!==ban;
+  view.forEach(function(o){var _cu=ckVerCu(o.commit_version,ban);
    h+='<tr><td>'+nguoiLnk(o.student_id,o.student_id_name)+'</td>'+
     '<td>'+lopLnk(o.class_id,o.class_id_name,"chưa xếp")+'</td>'+
     '<td>'+esc(o.commit_at||"")+'</td>'+
@@ -23437,7 +23459,7 @@ function ckXemBanHienHanh(){
 function ckXem(obid){var o=find("DL08","onboarding_id",obid);if(!o){toast("Không thấy hồ sơ.");return}
  var h='<div class="dcard"><h4><i class="ti ti-file-check"></i>Bản cam kết đã ký - '+esc(o.student_id_name||o.student_id||"")+'</h4>';
  h+=ctxRows([["Lớp",esc(o.class_id_name||o.class_id||"-")],["Ký lúc",esc(o.commit_at||"-")],
-  ["Bản",esc(o.commit_version||"-")+(String(o.commit_version||"")!==commitVer()?" (bản cũ - hiện hành là "+esc(commitVer())+")":"")],
+  ["Bản",esc(o.commit_version||"-")+(ckVerCu(o.commit_version,commitVer())?" (bản cũ - hiện hành là "+esc(commitVer())+")":"")],
   ["Hình thức ký",esc(o.commit_kenh||"học viên tự ký ở cổng")],
   ["Người ghi nhận",esc(o.commit_by?nsTen(o.commit_by):"-")],
   ["Ảnh bản đã ký",esc(o.commit_anh||"-")]]);
@@ -24998,7 +25020,7 @@ var NAVTREE=[
     lối nào. Hub CSKH có 4 tab mà menu chỉ có tên hub. Anh Luân: *"bên sidebar giống như 1 cái
     bản đồ vậy, họ biết mình cần tìm gì ở đâu"* - thiếu một mục là mất một chỗ trên bản đồ.
     Thứ tự các mục con xếp ĐÚNG THỨ TỰ THANH TAB của hub, để menu và màn hình đọc như nhau. */
- {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","banglop","giaoan","baitap","khaosat","ghinhan","khieunai","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow","lichwow"]},
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","giaoan","baitap","khaosat","ghinhan","khieunai","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow","lichwow"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","ketqua","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
@@ -25245,7 +25267,7 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
    "Test đầu vào" -> cũng vậy. Trước đây hai người ấy thấy nhóm "C1 · Khách tiềm năng".) */
 var NAVPHANG=[
  {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:"Lớp học & Giảng dạy",items:["xeplop","banglop","giaoan","baitap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow","lichwow"]},
+ {g:"Lớp học & Giảng dạy",items:["xeplop","giaoan","baitap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow","lichwow"]},
  {g:"Chăm sóc & Sau khóa",items:["khaosat","ghinhan","khieunai","baoluu","ketthuc","ketqua","magioithieu"]}];
 function navCayV5(){
  if(arcMode()==="chang")return NAVTREE;
