@@ -2826,7 +2826,13 @@ session_status:"enum_session_status",session_type:"enum_session_type",homework_s
 wow_skill:"enum_homework_skill",wow_status:"enum_wow_status",wow_outcome:"enum_wow_outcome",survey_type:"enum_survey_type",
 feedback_channel:"enum_feedback_channel",feedback_type:"enum_feedback_type",feedback_category:"enum_feedback_category",feedback_status:"enum_feedback_status",
 complaint_channel:"enum_complaint_channel",complaint_type:"enum_complaint_type",complaint_severity:"enum_complaint_severity",
-complaint_status:"enum_complaint_status",achievement_status:"enum_achievement_status",re_enrollment_status:"enum_re_enrollment_status"}
+complaint_status:"enum_complaint_status",achievement_status:"enum_achievement_status",re_enrollment_status:"enum_re_enrollment_status",
+/* 14/08 - CH1 `cancel_reason` (Lý do hủy - buổi WOW / buổi học). Nhóm enum DUY NHẤT của CH1 mà
+   app chưa có. Hai cửa hủy (`bhCancel`, `wowCancel`) trước đây chỉ hỏi một ô CHỮ TỰ DO - trả lời
+   được câu "vì sao" nhưng không trả lời được câu "AI hủy", mà chính câu thứ hai mới là câu đếm
+   được: bao nhiêu buổi trung tâm hủy, bao nhiêu buổi học viên hủy. Gõ chữ thì mỗi người gõ một
+   kiểu, cộng lại không ra con số nào. Nay hỏi cả hai: một ô chọn (ai) + một ô chữ (vì sao). */
+cancel_reason:"enum_cancel_reason"}
 
 var PAGES=[
 /* ===== V5.2 - trang chủ Bàn làm việc ===== */
@@ -6773,16 +6779,135 @@ function slaItems(){var out=jTasks();
  /* V9.40d - KHÉP VÒNG KHIẾU NẠI. SOP có cột student_feedback_after; đóng phiếu mà không hỏi lại
     em có chấp nhận cách xử lý không thì trung tâm không bao giờ biết mình xử đúng hay chỉ làm cho
     xong. Đây cũng là nhóm khách dễ bỏ học nhất - và dễ kể lại cho người khác nghe nhất. */
- (function(){var kd=num(paramOf("slaComplaintFollowup_days",3))||3;
+ /* 13/08 - HAI MỐC TRÊN CÙNG MỘT CÁI ĐUÔI. SOP đặt `slaComplaintFollowup_days` = 3 ngày (hỏi lại
+    học viên) và `slaComplaintClose_days` = 7 ngày ("xử lý xong thì trong 7 ngày gọi xác nhận +
+    ĐÓNG case"). App chỉ đọc cái thứ nhất. Không tách thành hai dòng việc - cùng một hồ sơ, cùng
+    một việc phải làm; tách ra là bắt người ta đọc hai lần rồi tự hiểu hai dòng ấy là một. Nên:
+    một dòng, hai ngưỡng - quá 3 ngày là vàng (nhắc hỏi), quá 7 ngày là đỏ (phải đóng hẳn). */
+ (function(){var kd=num(paramOf("slaComplaintFollowup_days",3))||3,
+              cd=num(paramOf("slaComplaintClose_days",7))||7;
   srows("DL17").forEach(function(c){
    if(!isc(c.complaint_status,"resolved"))return;
    if(String(c.student_feedback_after||"").trim())return;
    var ah=hoursSince(c.resolution_time);if(ah==null)return;
-   add("CSKH","Hỏi lại HV sau khi đóng khiếu nại",ah>kd*24?"red":"amber","ti-mood-search",
+   var qua=ah>cd*24;
+   add("CSKH","Hỏi lại HV sau khi đóng khiếu nại",qua?"red":(ah>kd*24?"amber":"amber"),"ti-mood-search",
     c.student_id_name||c.student_id,
-    (ah>kd*24?("QUÁ HẠN "+Math.round(ah/24)+" ngày - "):"")+"Đã đóng khiếu nại "+(c.resolution_time||"")+
-    " mà chưa ghi học viên nói gì - gọi lại xác nhận học viên đã ổn (hạn "+kd+" ngày)",
-    ah,"khieunai","",{act:"complaint",rid:c.complaint_id,hoso:c.student_id,prm:"slaComplaintFollowup_days"})})})();
+    (qua?("QUÁ HẠN ĐÓNG HỒ SƠ "+Math.round(ah/24)+" ngày - "):(ah>kd*24?("Đã "+Math.round(ah/24)+" ngày - "):""))+
+    "Đã xử lý xong khiếu nại "+(c.resolution_time||"")+
+    " mà chưa ghi học viên nói gì - gọi lại xác nhận học viên đã ổn (hỏi lại trong "+kd+" ngày, đóng hồ sơ trong "+cd+" ngày)",
+    ah,"khieunai","",{act:"complaint",rid:c.complaint_id,hoso:c.student_id,
+     prm:qua?"slaComplaintClose_days":"slaComplaintFollowup_days"})})})();
+/* ═══ 14/08 - SÁU LUẬT SLA CUỐI CÙNG CỦA CH2 ═══════════════════════════════════════════════
+    Sau đợt 13/08, CH2 còn sáu tham số SOP đặt mà app không đọc. Hôm qua em định khai miễn trừ
+    ba trong sáu cái với lý do "khác khái niệm" - đọc kỹ lại SOP thì cả sáu đều là luật CÓ THẬT
+    và app CÓ SẴN dữ liệu để chạy. *"Khác khái niệm" là một câu trả lời, không phải một phép đo* -
+    em đã định lấy nó thay cho việc mở file SOP ra đọc từng dòng mô tả. Đọc rồi thì cả sáu làm
+    được hết, chỉ có một cái (duyệt nhận xét) là cần thêm cửa ghi. */
+ /* 1. slaQuote_days - tư vấn xong thì mai phải có báo giá. Khách còn nóng thì chốt, để nguội là mất. */
+ (function(){var qd=num(paramOf("slaQuote_days",1))||1;
+  srows("DL04").forEach(function(c){
+   if(!isc(c.consultation_status,"consulted"))return;
+   if(!isc(c.conversion_status,"undecided","interested"))return;
+   var ah=hoursSince(c.consultation_time);if(ah==null||ah<=qd*24)return;
+   add("Tuyển sinh","Chưa gửi báo giá sau buổi tư vấn",ah>qd*48?"red":"amber","ti-file-dollar",
+    c.customer_name_display||c.lead_id,
+    "Tư vấn xong "+Math.round(ah/24)+" ngày mà khách vẫn chưa quyết (hạn gửi báo giá "+qd+" ngày) - gửi báo giá và gọi chốt",
+    ah,"tuvan","",{hoso:c.lead_id,prm:"slaQuote_days"})})})();
+ /* 2. slaPaymentConfirm_days - thu tiền xong phải có người soát và gửi xác nhận, để khách yên tâm
+       là tiền đã vào đúng chỗ. Cột `verified_by` có sẵn từ đầu mà không luật nào nhìn tới. */
+ (function(){var pd=num(paramOf("slaPaymentConfirm_days",1))||1;
+  srows("DL07").forEach(function(p){
+   if(String(p.verified_by||"").trim())return;
+   var ah=hoursSince(p.payment_time);if(ah==null||ah<=pd*24)return;
+   add("Tài chính","Phiếu thu chưa soát, chưa gửi xác nhận",ah>pd*48?"red":"amber","ti-receipt-2",
+    p.student_id_name||p.student_id,
+    "Thu "+vnd(num(p.amount))+" ngày "+(p.payment_time||"")+" mà chưa ai soát (hạn "+pd+" ngày) - đối chiếu rồi gửi phiếu thu cho khách",
+    ah,"thuchi","",{hoso:p.student_id,prm:"slaPaymentConfirm_days"})})})();
+ /* 3. slaWowBooking_hours - buổi WOW đặt rồi phải chốt lịch trong 24 giờ. SOP: "buổi WOW là cam
+       kết chăm sóc - không để trôi". App đếm được số buổi "đã đặt" nhưng không biết cái nào đã treo quá lâu. */
+ (function(){var wb=num(paramOf("slaWowBooking_hours",24))||24;
+  srows("DL14").forEach(function(w){
+   if(!isc(w.wow_status,"booked"))return;
+   var ah=hoursSince(w.booking_date);if(ah==null||ah<=wb)return;
+   add("WOW","Booking WOW chưa chốt lịch",ah>wb*2?"red":"amber","ti-calendar-question",
+    w.student_name||w.student_id,
+    "Đặt "+Math.round(ah)+" giờ trước mà chưa xác nhận lịch (hạn "+wb+" giờ) - chốt giờ với học viên rồi chuyển 'Đã xác nhận'",
+    ah,"wow","",{hoso:w.student_id,prm:"slaWowBooking_hours"})})})();
+ /* 4. slaENR_cancel_hours - đăng ký nằm "chờ xác nhận" quá lâu thì đề xuất hủy hẳn. Giữ một chỗ
+       ảo trong lớp là chặn một người thật muốn vào. */
+ (function(){var ec=num(paramOf("slaENR_cancel_hours",72))||72;
+  srows("DL06").forEach(function(e){
+   if(!isc(e.enrollment_status,"pending"))return;
+   var ah=hoursSince(e.enrollment_time);if(ah==null||ah<=ec)return;
+   add("Tuyển sinh","Đăng ký chờ quá lâu - cân nhắc hủy",ah>ec*2?"red":"amber","ti-user-question",
+    e.student_id_name||e.student_id,
+    "Đăng ký treo \"chờ xác nhận\" đã "+Math.round(ah)+" giờ (hạn "+ec+" giờ) - gọi chốt, hoặc hủy để trả chỗ cho người khác",
+    ah,"dangky","",{hoso:e.student_id,prm:"slaENR_cancel_hours"})})})();
+ /* 5. slaNoteReview_hours - HỌC VỤ DUYỆT NHẬN XÉT CỦA GIÁO VIÊN. Đây là cái duy nhất trong sáu
+       cái cần thêm cửa ghi: app có chỗ GV *ghi* nhận xét (slaTeacherNote_hours) nhưng không có
+       bước ai *đọc lại*. SOP đặt riêng 24 giờ cho bước ấy với lý do "phát hiện sớm vấn đề trong
+       note" - đoạn nhận xét này học viên và phụ huynh đọc được, gửi thẳng ra ngoài mà không ai
+       soát là một cửa hở. Cửa duyệt: `bhNoteDuyet()`. */
+ (function(){var nr=num(paramOf("slaNoteReview_hours",24))||24;
+  srows("DL11").forEach(function(s){
+   if(!String(s.teacher_note_completed_at||"").trim())return;
+   if(String(s.note_reviewed_at||"").trim())return;
+   var ah=hoursSince(s.teacher_note_completed_at);if(ah==null||ah<=nr)return;
+   add("Học vụ","Nhận xét buổi chưa ai duyệt",ah>nr*2?"red":"amber","ti-eye-check",
+    s.class_id_name||s.class_id,
+    "GV "+(s.teacher_id_name||s.teacher_id||"")+" nộp nhận xét buổi "+(s.session_number||"")+" đã "+Math.round(ah)+
+    " giờ mà chưa ai duyệt (hạn "+nr+" giờ) - đoạn này học viên và phụ huynh đọc được",
+    ah,"buoihoc","",{act:"bhNoteDuyet",rid:s.session_id,prm:"slaNoteReview_hours"})})})();
+/* ═══ 13/08 - BỐN LUẬT SLA SOP ĐẶT MÀ APP CHƯA ĐỌC ═════════════════════════════════════════
+    Mặt 8 của `check_sop` đo được: CH2 khai 61 tham số, app dùng 36. Bốn cái dưới đây có dữ liệu
+    sẵn để làm THẬT - làm luôn, vì thêm một ô cấu hình mà không luật nào đọc là một tính năng giả.
+    Ba cái còn lại cần thêm cột dữ liệu hoặc thêm hẳn một bước duyệt, khai ở `CH_BOQUA` để không
+    mất dấu chứ không dựng vội. */
+ /* 1. slaApproval_days - hạn để cấp trên gật một yêu cầu. SOP: "Yêu cầu được duyệt nhanh, không
+       tắc nghẽn". App có sáu hàng chờ duyệt mà không hàng nào biết mình đã chờ quá lâu. */
+ (function(){var ad=num(paramOf("slaApproval_days",1))||1;
+  srows("DL06").forEach(function(e){
+   var dis=num(e.discount_amount);
+   if(!(dis>0)||String(e.discount_approved_by||"").trim())return;
+   if(dis<num(paramOf("thresholdDiscount_approval",1000000)))return;
+   var ah=hoursSince(e.enrollment_time);if(ah==null||ah<=ad*24)return;
+   add("Tài chính","Yêu cầu chờ duyệt quá hạn","red","ti-gavel",
+    e.student_id_name||e.student_id,
+    "Chiết khấu "+vnd(dis)+" chờ duyệt đã "+Math.round(ah/24)+" ngày (hạn "+ad+" ngày) - duyệt hoặc trả lời để đơn đi tiếp",
+    ah,"duyetck","",{hoso:e.student_id,prm:"slaApproval_days"})})})();
+ /* 2. slaSurveyCollect_days - gửi khảo sát rồi bao lâu chưa ai trả lời thì phải nhắc. Trước đây
+       app đếm được số phiếu ấy nhưng KHÔNG có ngưỡng cấu hình, nên con số "quá 5 ngày" là một
+       hằng số cắm trong lời chú thích, không ai chỉnh được. */
+ (function(){var sd=num(paramOf("slaSurveyCollect_days",7))||7;
+  srows("DL15").forEach(function(v){
+   if(String(v.submitted_date||"").trim())return;
+   var ah=hoursSince(v.sent_date);if(ah==null||ah<=sd*24)return;
+   add("CSKH","Khảo sát gửi rồi chưa ai trả lời",ah>sd*48?"red":"amber","ti-clipboard-x",
+    v.student_name||v.student_id,
+    "Gửi "+Math.round(ah/24)+" ngày trước mà chưa nhận phiếu (hạn "+sd+" ngày) - nhắc học viên nộp",
+    ah,"khaosat","",{hoso:v.student_id,prm:"slaSurveyCollect_days"})})})();
+ /* 3. slaRiskFlagUpdate_hours - HV có tín hiệu yếu mà cờ nguy cơ chưa được ai xem lại. SOP đặt
+       48 giờ: cờ để lâu không soát thì nó thành trang trí, người ta thôi tin. */
+ (function(){var rh=num(paramOf("slaRiskFlagUpdate_hours",48))||48;
+  srows("DL09").forEach(function(x){
+   if(!stuRisk(x))return;
+   var ah=hoursSince(x.last_learning_activity_time);if(ah==null||ah<=rh)return;
+   add("Học vụ","Cờ nguy cơ chưa được soát lại",ah>rh*2?"red":"amber","ti-alert-triangle",
+    x.full_name||x.student_id,
+    "Đang gắn cờ nguy cơ mà "+Math.round(ah)+" giờ chưa thấy hoạt động mới (hạn soát "+rh+" giờ) - xem lại còn đúng không",
+    ah,"hocvien","",{hoso:x.student_id,prm:"slaRiskFlagUpdate_hours"})})})();
+ /* 4. thresholdReenrollLost_days - quá bao lâu sau khi xong khoá mà chưa tái ghi danh thì coi
+       như MẤT. Không có mốc này thì danh sách "mời học lại" phình mãi, không ai dám đóng dòng nào. */
+ (function(){var rl=num(paramOf("thresholdReenrollLost_days",90))||90;
+  srows("DL18").forEach(function(c){
+   if(isc(c.re_enrollment_status,"confirmed_with_deposit","rejected"))return;
+   if(String(c.next_enrollment_id||"").trim())return;
+   var ah=hoursSince(c.course_completion_time);if(ah==null||ah<=rl*24)return;
+   add("Tuyển sinh","Quá hạn mời học lại - nên chốt là mất","amber","ti-user-x",
+    c.student_id_name||c.student_id,
+    "Xong khoá "+Math.round(ah/24)+" ngày mà chưa tái ghi danh (mốc "+rl+" ngày) - gọi lần cuối hoặc đóng hồ sơ",
+    ah,"ketthuc","",{hoso:c.student_id,prm:"thresholdReenrollLost_days"})})})();
  /* Bảo lưu sắp hết hạn: gọi mời quay lại TRƯỚC thresholdPauseRemind_days ngày */
  (function(){var rmd=paramOf("thresholdPauseRemind_days",14);
   srows("DL09").forEach(function(x){if(!isc(x.student_status,"transferred","dropped"))return;
@@ -6981,6 +7106,7 @@ function slaAct(act,id){
  if(act==="grade"){var _g=String(id||"").split("|");return btJumpGrade(_g[0],_g[1]||"")}
  if(act==="absForm")return absForm(id);
  if(act==="bhNoteForm")return bhNoteForm(id);
+ if(act==="bhNoteDuyet")return bhNoteDuyet(id);
  if(act==="tvform")return tvForm(id);
  if(act==="testgrade")return testResult(id);
  if(act==="testconsult")return testConsult(id);
@@ -14053,6 +14179,15 @@ function saveMsg(idx){var a=ch4List();var m=a[idx];if(!m){toast("Không thấy t
  function d(){m.tmpl=v;persistSoon();toast("Đã lưu thông điệp "+m.code);reRender("settings")}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(res&&res.ok===false){toast("Lỗi: "+(res.error||""));return}d()}).withFailureHandler(function(er){toast("Lỗi kết nối: "+er.message)}).apiSaveMsg(m.code,v)}else{d()}}
 function eFull(en,code){var a=ENUM[en]||[];for(var i=0;i<a.length;i++){if(ecode(a[i])===code||a[i].indexOf(code)===0)return a[i]}return code}
+/* Ô CHỌN dựng thẳng từ một nhóm enum của CH1. Giá trị lưu là NGUYÊN VĂN chuỗi CH1 ("code (Nhãn
+   tiếng Việt)") chứ không phải mã trần - đúng LUẬT CỨNG về nhãn enum, và nhờ vậy `elabel()` đọc
+   lại được tên tiếng Việt mà không cần tra bảng. Nhóm nào chưa có trong dữ liệu thì trả về ô chữ
+   thay vì một select rỗng: một cái select không có lựa chọn nào là một cửa cụt câm lặng. */
+function eSelect(id,en,mac){var a=ENUM[en]||[];
+ if(!a.length)return '<input id="'+esc(id)+'" placeholder="(chưa có danh mục '+esc(en)+')">';
+ var d=eFull(en,mac||"");
+ return '<select id="'+esc(id)+'">'+a.map(function(o){
+  return '<option'+(o===d?" selected":"")+'>'+esc(o)+'</option>'}).join("")+'</select>'}
 function uniqTitles(){var s={},o=[];rows("DL13").forEach(function(r){var t=r.homework_title;if(t&&!s[t]){s[t]=1;o.push(t)}});return o}
 function renderBaitap(){return btHub(false)}
 /* Từ dòng "chờ chấm" nhảy thẳng vào đúng lớp + đúng bài ở chế độ Chấm - không bắt người ta
@@ -14674,8 +14809,24 @@ var APPPARAMS=[
     dung tinh huong SOP mo ta (NA074 tru quota WOW, NA083/NA045 xep khoa tai ghi danh). */
  ["P7 · Buổi WOW 1-1","slaWowQuotaCheck_hours","Sau buổi WOW bao lâu phải kiểm và trừ lượt (quota) - quá thì nhắc","giờ",24],
  ["P10 · Kết thúc khóa & tái đăng ký","slaReenrollSchedule_days","HV nói quan tâm học tiếp rồi, bao lâu phải chốt được lịch khóa mới","ngày",14],
+ /* 13/08 - bon tham so SOP dat ma app chua co o sua; ca bon vua duoc noi vao mot luat that
+    trong `slaItems()` - khong them mot o cau hinh nao ma khong ai doc. */
+ ["P3 · Đăng ký & chiết khấu","slaApproval_days","Cấp trên có bao nhiêu ngày để gật một yêu cầu (chiết khấu, hoàn tiền...) trước khi tính là trễ","ngày",1],
+ ["P8-P9 · Khảo sát, phản hồi & khiếu nại","slaSurveyCollect_days","Gửi khảo sát rồi bao nhiêu ngày chưa nhận phiếu thì nhắc học viên","ngày",7],
+ ["P6 · Học viên nguy cơ","slaRiskFlagUpdate_hours","Cờ nguy cơ để bao lâu không ai soát lại thì nhắc xem còn đúng không","giờ",48],
+ ["P10 · Kết thúc khóa & tái đăng ký","thresholdReenrollLost_days","Xong khóa quá bao nhiêu ngày mà chưa tái ghi danh thì coi như đã mất","ngày",90],
  ["P1 · Lead & chăm khách","slaLeadReassign_hours","Lead đã giao cho NV mà quá bao nhiêu giờ chưa gọi thì nhắc gọi gấp hoặc giao lại người khác","giờ",4],
  ["P2 · Test đầu vào & tư vấn","slaTestBookedRemind_hours","Sau khi đặt lịch test, quá bao lâu chưa ghi nhận dự test thì nhắc","giờ",24],
+ /* 14/08 - SÁU THAM SỐ CUỐI CÙNG CỦA CH2. Cả sáu đều đã được nối vào một luật THẬT trong
+    `slaItems()` cùng lượt - xem khối "SÁU LUẬT SLA CUỐI CÙNG CỦA CH2". Không mở ô cấu hình nào
+    mà không có luật đọc: một cái bánh răng xoay không ăn vào đâu còn tệ hơn là không có bánh răng,
+    vì người dùng chỉnh nó rồi tưởng mình đã đổi được điều gì đó. */
+ ["P2 · Test đầu vào & tư vấn","slaQuote_days","Tư vấn xong thì trong bao nhiêu ngày phải gửi được báo giá cho khách","ngày",1],
+ ["P4 · Học phí, đợt đóng & công nợ","slaPaymentConfirm_days","Thu tiền xong thì trong bao nhiêu ngày phải soát phiếu và gửi xác nhận cho khách","ngày",1],
+ ["P6 · Buổi học, điểm danh & bài tập","slaNoteReview_hours","Học vụ có bao nhiêu giờ để duyệt nhận xét buổi của GV trước khi nó hiện với học viên và phụ huynh","giờ",24],
+ ["P7 · Buổi WOW 1-1","slaWowBooking_hours","Một booking WOW đặt rồi thì trong bao nhiêu giờ phải chốt được lịch","giờ",24],
+ ["P8-P9 · Khảo sát, phản hồi & khiếu nại","slaComplaintClose_days","Xử lý xong khiếu nại thì trong bao nhiêu ngày phải gọi xác nhận và đóng hẳn hồ sơ","ngày",7],
+ ["P3 · Đăng ký & chiết khấu","slaENR_cancel_hours","Đăng ký nằm \"chờ xác nhận\" quá bao nhiêu giờ thì đề xuất hủy để trả chỗ","giờ",72],
  ["P3 · Đăng ký & chiết khấu","thresholdDiscount_approval","Chiết khấu từ mức này trở lên phải trình quản lý duyệt","VND",1000000],
  ["Giới thiệu bạn bè","referralFriend_discountType","Kiểu ưu đãi cho bạn được giới thiệu","kiểu","percent",["percent","amount"]],
  ["Giới thiệu bạn bè","referralFriend_discount","Mức giảm cho bạn được giới thiệu (nếu percent thì nhập 10 = 10%, nếu amount thì nhập số tiền)","% hoặc VND",10],
@@ -17155,6 +17306,7 @@ function wowCancel(id){var w=find("DL14","wow_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-x"></i>Hủy buổi WOW - '+esc(w.student_name||w.student_id)+'</h4>';
  h+=ctxRows([["Lịch",esc(w.wow_session_date||"-")],["GV",esc(w.staff_name||w.staff_id||"-")],["Quota đã trừ",esc(w.quota_deducted||"-")]]);
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Hủy DO TRUNG TÂM/GV thì quota được HOÀN cho học viên. HV không đến thì dùng nút "HV không đến" (không hoàn).</div>';
+ h+='<div class="fld"><label>Phía hủy <i>*</i></label>'+eSelect("wc_side","enum_cancel_reason","cancelled_by_itts")+'</div>';
  h+='<div class="fld full"><label>Lý do hủy <i>*</i></label><input id="wc_reason" placeholder="vd: GV bận đột xuất"></div>';
  h+='<div class="dact"><button class="btn danger" onclick="wowCancelRun(\''+esc(id)+'\')"><i class="ti ti-x"></i>Hủy & hoàn quota</button></div></div>';
  openDrawer("Hủy buổi WOW",h)}
@@ -17174,8 +17326,9 @@ function wowCancelRun(id){var reason=(fldV("wc_reason")||"").trim();
   if(String(s.wow_quota_remaining)!=="")s.wow_quota_remaining=String(num(s.wow_quota_remaining)+1);
   if(SVR)google.script.run.apiUpdate("DL09",s.student_id,{wow_quota_used:s.wow_quota_used,wow_quota_remaining:s.wow_quota_remaining});
   refunded=true}
- markRow("DL14","wow_id",id,{wow_status:eFull("enum_wow_status","cancelled"),quota_deducted:"no",
-  notes:(w.notes?w.notes+" | ":"")+"Hủy "+nowStr()+" bởi "+myName()+": "+reason+(refunded?" (đã hoàn quota)":"")},
+ var wside=(fldV("wc_side")||"").trim()||eFull("enum_cancel_reason","cancelled_by_itts");
+ markRow("DL14","wow_id",id,{wow_status:eFull("enum_wow_status","cancelled"),quota_deducted:"no",cancel_reason:wside,
+  notes:(w.notes?w.notes+" | ":"")+"Hủy "+nowStr()+" ("+elabel(wside)+") bởi "+myName()+": "+reason+(refunded?" (đã hoàn quota)":"")},
   "Đã hủy buổi WOW"+(refunded?" - quota hoàn lại cho HV (còn "+(s?s.wow_quota_remaining:"?")+")":"")+".","wow");
  closeModal()}
 /* ═══ V2 12/08 (WOW-2) - NV WOW TỪ CHỐI BUỔI HỌC VIÊN TỰ ĐẶT ═══════════════════════════════════
@@ -20676,6 +20829,7 @@ function schedClash(staffId,when){/* quét DL11 + DL14 của cùng người tron
 function bhCancel(id){var st=find("DL11","session_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-calendar-cog"></i>Hủy buổi - '+esc(st.class_id_name||st.class_id||"")+' buổi '+esc(st.session_number||"")+'</h4>';
  h+=ctxRows([["Ngày dạy",esc(st.session_date||"-")],["Giảng viên",esc(st.teacher_id_name||st.teacher_id||"-")]]);
+ h+='<div class="fld"><label>Phía hủy <i>*</i></label>'+eSelect("bc_side","enum_cancel_reason","cancelled_by_itts")+'</div>';
  h+='<div class="fld full"><label>Lý do hủy <i>*</i></label><input id="bc_reason" list="bc_rs" placeholder="chọn hoặc gõ lý do"><datalist id="bc_rs"><option value="GV bận đột xuất"></option><option value="GV ốm"></option><option value="Lớp vắng quá nửa"></option><option value="Ngày lễ / sự kiện trung tâm"></option><option value="Sự cố phòng học / kỹ thuật"></option></datalist></div>';
  h+='<label class="ckline" style="margin:2px 0 10px"><input type="checkbox" id="bc_informed"> Đã báo học viên trong lớp về việc hủy buổi</label>';
  h+='<div class="dact"><button class="btn danger" onclick="bhCancelRun(\''+esc(id)+'\')"><i class="ti ti-x"></i>Hủy buổi</button></div></div>';
@@ -20685,8 +20839,10 @@ function bhCancelRun(id){var reason=(fldV("bc_reason")||"").trim();
  var ck=document.getElementById("bc_informed");var informed=ck&&ck.checked;
  if(!informed){toast("Báo học viên TRƯỚC rồi hãy hủy - tích ô xác nhận đã báo.",4200);return}
  var st=find("DL11","session_id",id)||{};
- markRow("DL11","session_id",id,{session_status:eFull("enum_session_status","cancelled"),
-  notes:(st.notes?st.notes+" | ":"")+"Hủy "+nowStr()+": "+reason+" (đã báo HV)"},"Đã hủy buổi ("+reason+"). Hãy xếp lịch dạy bù.");
+ var side=(fldV("bc_side")||"").trim()||eFull("enum_cancel_reason","cancelled_by_itts");
+ markRow("DL11","session_id",id,{session_status:eFull("enum_session_status","cancelled"),cancel_reason:side,
+  notes:(st.notes?st.notes+" | ":"")+"Hủy "+nowStr()+" ("+elabel(side)+"): "+reason+" (đã báo HV)"},
+  "Đã hủy buổi - "+elabel(side)+" ("+reason+"). Hãy xếp lịch dạy bù.");
  closeModal()}
 /* ═══════════ AC6 · NHẬN XÉT BUỔI DẠNG TÍCH CHỌN + CHẤM ĐIỂM (RUBRIC) ════════════════════
    Trưởng phòng ACA 06/08: nhận xét buổi nên có phần TÍCH CHỌN và CHẤM ĐIỂM, không chỉ một ô
@@ -20772,6 +20928,37 @@ function bhNoteSave(id){var v=(fldV("bh_note")||"").trim();
   rubric_diem:sd,rubric_tich:st2,rubric_tb:(tb==null?"":String(tb)),
   session_status:eFull("enum_session_status","completed")},
   "Đã lưu nhận xét buổi học."+(tb!=null?(" Điểm buổi dạy: "+tb+"/5."):""));
+ closeModal()}
+/* ═══ 14/08 - HỌC VỤ DUYỆT NHẬN XÉT CỦA GIÁO VIÊN (CH2 slaNoteReview_hours = 24 giờ) ═════════
+   SOP tách hai bước mà app trước đây gộp làm một: GV *ghi* nhận xét (slaTeacherNote_hours), rồi
+   học vụ *đọc lại* trong 24 giờ - lý do SOP ghi là "phát hiện sớm vấn đề trong note".
+   Vì sao bước này không thừa: chính ô nhận xét ấy hiện nguyên văn ở cổng học viên và cổng phụ
+   huynh (xem dòng hint trong `bhNoteForm`). Một đoạn viết vội, viết tắt nội bộ, hay lỡ nặng lời
+   về một em nào đó là đi thẳng ra ngoài, không qua mắt ai. Cửa này là con mắt ấy.
+   Hai lối ra, không phải một: DUYỆT (đóng việc) và TRẢ LẠI GV VIẾT LẠI (mở lại việc cho GV) -
+   chỉ có nút "đã đọc" thì người duyệt không có cách nào nói "đoạn này không ổn". */
+function bhNoteDuyet(id){var s=find("DL11","session_id",id);if(!s){toast("Không thấy buổi học.");return}
+ var nx=String(s.teacher_note_summary||"").trim();
+ var h='<div class="dcard"><h4><i class="ti ti-eye-check"></i>Duyệt nhận xét buổi - '+esc(s.class_id_name||s.class_id)+' buổi '+esc(s.session_number||"")+'</h4>';
+ h+=ctxRows([["Ngày học",esc(s.session_date||"-")],["Giảng viên",esc(s.teacher_id_name||s.teacher_id||"-")],
+  ["GV nộp lúc",esc(s.teacher_note_completed_at||"-")],["Hạn duyệt",slaChip("slaNoteReview_hours",24)+" giờ sau khi GV nộp"]]);
+ h+='<div class="fhint" style="margin:2px 0 8px">Đoạn dưới đây học viên và phụ huynh đọc được ở cổng của họ - duyệt xong là nó đi ra ngoài.</div>';
+ h+='<div class="ctxcontent ccblue"><div class="cch">Nhận xét giảng viên đã nộp</div>'+
+    '<div class="ccb">'+(nx?esc(nx):'(GV chưa viết gì)')+'</div></div>';
+ h+='<div class="fld full"><label>Ghi chú của người duyệt (không hiện cho học viên)</label><textarea id="nd_gc" rows="2" placeholder="Ví dụ: nhận xét ổn; hoặc nêu chỗ cần GV viết lại..."></textarea></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="bhNoteDuyetSave(\''+esc(id)+'\',1)"><i class="ti ti-check"></i>Duyệt - cho hiện với HV</button>'+
+    '<button class="btn" onclick="bhNoteDuyetSave(\''+esc(id)+'\',0)"><i class="ti ti-arrow-back-up"></i>Trả lại GV viết lại</button></div></div>';
+ openDrawer("Duyệt nhận xét buổi học",h)}
+function bhNoteDuyetSave(id,ok){var gc=(fldV("nd_gc")||"").trim();
+ if(!ok&&!gc){toast("Trả lại thì phải nói rõ cần sửa chỗ nào - nhập ghi chú giúp em.");return}
+ if(ok)markRow("DL11","session_id",id,{note_reviewed_at:nowStr(),note_reviewed_by:CURSTAFF||"web",
+   note_reviewed_by_name:myName()||"Đã duyệt",note_review_note:gc},"Đã duyệt nhận xét - học viên và phụ huynh đọc được rồi.");
+ /* TRẢ LẠI = XOÁ HẲN MỐC GV NỘP, không phải chỉ gắn một cái cờ. Nếu giữ `teacher_note_completed_at`
+    thì đồng hồ 48 giờ của GV coi như đã dừng, việc rời hàng chờ của GV và không bao giờ quay lại -
+    đúng cái bẫy "một cú bấm biến việc CHƯA LÀM thành việc ĐÃ LÀM" đã cắn ở `testConsult`. */
+ else markRow("DL11","session_id",id,{has_teacher_note:"",teacher_note_completed_at:"",
+   note_reviewed_at:"",note_reviewed_by:"",note_reviewed_by_name:"",note_review_note:gc},
+   "Đã trả lại giảng viên viết lại - việc ghi nhận xét quay về hàng chờ của GV.");
  closeModal()}
 /* ═══════ V9.29t - ĐỔI GIÁO VIÊN CHÍNH CỦA LỚP (việc tồn đợt 2 - khối giáo viên/lớp) ═══════
    Đổi GV cho MỘT buổi đã có (sesSetTeacher). Nhưng khi một giáo viên nghỉ hẳn / chuyển cơ sở thì

@@ -886,13 +886,6 @@ rep("NANG", "18j Overall WOW khong khop trung binh bon tieu chi",
 COY = {
     "10k Viec chua xong va DA QUA HAN (demo canh bao do)":
         "co y - de trang Giao viec luon co viec qua han mau do; so nay tang dan theo ngay",
-    # 13/08 - SOP co han mot tinh huong cho chuyen nay: NA074 "Qua han tru quota" (wow_status =
-    # completed + quota_deducted khong TRUE + da qua slaWowQuotaCheck_hours). App lam that tinh
-    # huong ay, va demo phai co DUNG MOT dong roi vao no thi bo kiem SOP moi thay - neu khong,
-    # mot tinh huong da lam dung van bi bao la "app khong sinh ra".
-    # *Mot luat du lieu cam dung cai ma SOP mo ta thi mot trong hai ben dang sai; o day la luat.*
-    "7a WOW da day/HV vang nhung KHONG tru quota":
-        "co y - gieo DUNG 1 buoi de tinh huong NA074 cua SOP (qua han tru quota) co that tren demo",
 }
 ORD = {"NANG":0,"VUA":1,"NHE":2}
 # ══ 19. SO LICH SU DOI LICH PHAI KHOP VOI NGAY THAT CUA BUOI (13/08) ═════════════════════

@@ -2768,41 +2768,70 @@ _bo68 = None
 # Doi gio mot buoi la co the DUNG giao vien / DUNG phong voi buoi khac - `check_logic` 13n/13p
 # bat ngay. (Da can: lan dau em doi bua mot buoi sang NOW-45p, trung dung khung gio cua buoi
 # "dang dien ra" ma `gen_demo` gieo theo dong ho.) Nen phai TIM mot buoi khong dung ai.
-_moc68 = NOW - datetime.timedelta(minutes=45)
-_key68 = _moc68.strftime("%d/%m/%Y %H:%M")
+#
+# BAY THU HAI, CUNG MOT KHOI, CAN NGAY DEM 14/08: `NOW - 45 phut` va `NOW - 2 gio` la hai moc
+# TINH THEO DONG HO LUC CHAY PIPELINE. Lan chay luc 00:56 sang de ra mot buoi hoc luc 00:11 va
+# mot buoi luc 22:56 - `check_logic` 7k bat ca hai ("buoi xep vao gio trung tam DONG CUA").
+# Dung ho voi bay da vá 09/08 va 10/08, va o ngay duoi kia `_gioLui()` da duoc dung ra de tri
+# no. Em viet moc moi ma khong dung lai no - *co san mot cai thang thi dung leo tay.*
+def _mocRanh(ss, moc, thu=8):
+    """lui `moc` dan cho toi khi khong con dung giao vien / lop / phong cua buoi khac.
+
+    13n va 13p so bang PHUT KHIT NHAU, nen chi can lui mot gio la thoat; nhung phai lui
+    trong khung gio day, khong duoc lui ra khoi 6h-22h (luat 7k)."""
+    t = moc
+    for _ in range(thu):
+        if not _dungAi(ss, t):
+            return t
+        t = t - datetime.timedelta(hours=1)
+        if t.hour < 6:
+            t = (t - datetime.timedelta(days=1)).replace(hour=19)
+    return None
 
 
-def _ban68(ss, gv, ph):
-    """gio nay giao vien ay hoac phong ay da co buoi khac chua"""
+def _dungAi(ss, moc):
+    """dung phut `moc` da co buoi khac CUNG giao vien / CUNG lop / CUNG phong chua"""
+    key = moc.strftime("%d/%m/%Y %H:%M")
+    gv = str(ss.get("teacher_id") or "")
+    lop = str(ss.get("class_id") or "")
+    ph = str((IDX["DL10"].get(lop) or {}).get("venue_or_zoom_link") or "")
     for _o in R("DL11"):
         if _o is ss:
             continue
-        if str(_o.get("session_date") or "")[:16] != _key68:
+        if str(_o.get("session_date") or "")[:16] != key:
             continue
         if gv and str(_o.get("teacher_id") or "") == gv:
             return True
-        if ph and str(_o.get("room") or "") == ph:
+        if lop and str(_o.get("class_id") or "") == lop:
+            return True          # mot lop khong the co hai buoi cung mot phut
+        _oph = str((IDX["DL10"].get(str(_o.get("class_id") or "")) or {}).get("venue_or_zoom_link") or "")
+        if ph and _oph == ph:
             return True
     return False
 
 
+_moc68 = _gioLui(0.75)          # "45 phut truoc", nhung neo vao gio day chu khong vao dong ho
 for _c68 in [x for x in R("DL11") if code(x.get("session_status")) == "scheduled"]:
-    if _ban68(_c68, str(_c68.get("teacher_id") or ""), str(_c68.get("room") or "")):
+    _t68 = _mocRanh(_c68, _moc68)
+    if not _t68:
         continue
-    _bo68 = _c68                # NA068 - qua gio vao lop 45 phut ma buoi chua bat dau (nguong 30)
-    _bo68["session_date"] = fmt(_moc68)
+    _bo68 = _c68                # NA068 - qua gio vao lop ma buoi chua bat dau (nguong 30 phut)
+    _bo68["session_date"] = fmt(_t68)
     _bo68["class_start_scheduled"] = _bo68["session_date"]
     _n14j.append("NA068")
     break
 
-_ss69 = [x for x in R("DL11") if code(x.get("session_status")) == "completed"
-         and not str(x.get("teacher_note_summary") or "").strip() and x is not _bo68]
-if _ss69:                      # NA069 - vua day xong 2 gio, chua ghi nhan xet, CON TRONG HAN
+# NA069 - vua day xong, chua ghi nhan xet, CON TRONG HAN (han slaTeacherNote_hours = 48 gio).
+# Lui them 2 gio nua so voi moc cua NA068 de hai buoi khong roi trung mot phut.
+_moc69 = _gioLui(0.75) - datetime.timedelta(hours=2)
+for _s69 in [x for x in R("DL11") if code(x.get("session_status")) == "completed"
+             and not str(x.get("teacher_note_summary") or "").strip() and x is not _bo68]:
+    _t69 = _mocRanh(_s69, _moc69)
+    if not _t69:
+        continue
     # DOI MOT BUOI LA CA MOT CHUOI (bai hoc sang nay o so doi lich): giờ check-in cua diem danh
     # neo vao NGAY cua buoi, doi buoi ma bo lai diem danh thi `check_logic` 4c do ngay.
-    _m69 = NOW - datetime.timedelta(hours=2)
-    _s69 = _ss69[0]
-    _s69["session_date"] = fmt(_m69)
+    _s69["session_date"] = fmt(_t69)
     _sid69 = str(_s69.get("session_id") or "")
     for _at in R("DL12"):
         if str(_at.get("session_id") or "") != _sid69:
@@ -2811,33 +2840,62 @@ if _ss69:                      # NA069 - vua day xong 2 gio, chua ghi nhan xet, 
         if not _ci:
             continue
         _gio = _ci[-5:] if len(_ci) >= 5 and ":" in _ci[-5:] else "00:00"
-        _at["check_in_time"] = _m69.strftime("%d/%m/%Y") + " " + _gio
+        _at["check_in_time"] = _t69.strftime("%d/%m/%Y") + " " + _gio
     _n14j.append("NA069")
+    break
 
-_ce45 = [x for x in R("DL18") if code(x.get("re_enrollment_status")) == "interested"]
-if _ce45:                      # NA045 - quan tam hoc tiep, CON TRONG HAN xep khoa (nguong 14 ngay)
-    _ce45[0]["course_completion_time"] = fmt(NOW - datetime.timedelta(days=3))
-    _ce45[0]["next_enrollment_id"] = ""
+# BAY THU BA, CUNG MOT KHOI: mot ho so "da hoan thanh khoa" khong the mang moc hoan thanh SOM
+# HON ngay ket thuc lop (`check_logic` 13j). Em dat bua `NOW - 30 ngay` cho NA083 va trung ngay
+# mot lop ket thuc 20/07 - khai la hoc xong tu 15/07. *Moc thoi gian nao gan vao mot ho so cung
+# phai dung sau cai moc ma ho so ay phu thuoc.*
+def _ktLop(r):
+    """ngay ket thuc lop cua mot dong DL18 - None neu khong tra ra duoc"""
+    return dt((IDX["DL10"].get(str(r.get("class_id") or "")) or {}).get("class_end_date"))
+
+
+def _mocXongKhoa(r, ngayTruoc):
+    """moc hoan thanh khoa cach day `ngayTruoc` ngay, nhung khong som hon ngay ket thuc lop"""
+    moc = NOW - datetime.timedelta(days=ngayTruoc)
+    kt = _ktLop(r)
+    if kt and kt.date() > moc.date():
+        return None
+    return moc.replace(hour=19, minute=0, second=0, microsecond=0)
+
+
+_ce45 = None
+for _r45 in [x for x in R("DL18") if code(x.get("re_enrollment_status")) == "interested"]:
+    _m45 = _mocXongKhoa(_r45, 3)     # NA045 - quan tam hoc tiep, CON TRONG HAN xep khoa (14 ngay)
+    if not _m45:
+        continue
+    _r45["course_completion_time"] = fmt(_m45)
+    _r45["next_enrollment_id"] = ""
+    _ce45 = _r45
     _n14j.append("NA045")
+    break
+
 # NA083 can mot dong THU HAI cung trang thai "quan tam" nhung DA QUA HAN xep khoa. Demo chi co
 # dung MOT dong interested (da dung cho NA045), nen doi them mot ho so da xong khoa sang trang
 # thai ay - dung nguoi khac, khong dam len dong cua NA045.
-_ce83 = [x for x in R("DL18")
-         if x is not (_ce45[0] if _ce45 else None)
-         and "completed" in code(x.get("student_status"))
-         and str(x.get("final_test_score") or "").strip()
-         and not str(x.get("next_enrollment_id") or "").strip()]
-if _ce83:
-    _ce83[0]["re_enrollment_status"] = "interested (Quan tâm học tiếp)"
-    _ce83[0]["course_completion_time"] = fmt(NOW - datetime.timedelta(days=30))
+for _r83 in [x for x in R("DL18")
+             if x is not _ce45
+             and "completed" in code(x.get("student_status"))
+             and str(x.get("final_test_score") or "").strip()
+             and not str(x.get("next_enrollment_id") or "").strip()]:
+    _m83 = _mocXongKhoa(_r83, 30)    # qua han 14 ngay -> app phai keu NA083
+    if not _m83:
+        continue
+    _r83["re_enrollment_status"] = "interested (Quan tâm học tiếp)"
+    _r83["course_completion_time"] = fmt(_m83)
     _n14j.append("NA083")
+    break
 
-_w74 = [x for x in R("DL14") if code(x.get("wow_status")) == "completed"
-        and str(x.get("wow_content_note") or "").strip() and str(x.get("wow_outcome") or "").strip()]
-if _w74:                       # NA074 - WOW xong 30 gio ma chua tru quota (nguong 24)
-    _w74[0]["quota_deducted"] = ""
-    _w74[0]["wow_session_date"] = fmt(NOW - datetime.timedelta(hours=30))
-    _n14j.append("NA074")
+# NA074 (qua han tru quota WOW) KHONG GIEO. Tinh huong nay theo dinh nghia LA MOT LOI DU LIEU:
+# buoi da day ma chua tru quota. Man "Suc khoe du lieu" cua app coi do la mot cho phai don, va
+# `_check16` doi man ay SACH tren du lieu goc - dung theo loi anh Luan ("bam Reset demo la keo
+# demo ve trang thai hoan hao"). Gieo mot ca de bo kiem SOP thay duoc thi lai lam ban chinh cai
+# man phai sach. App CO lam tinh huong nay (naFor DL14 tra NA074 khi qua slaWowQuotaCheck_hours);
+# khai o TRIG_BOQUA thay vi gieo. *Hai bo kiem doi hai dieu nguoc nhau thi phai chon, va chon xong
+# phai noi ra da chon gi.*
 
 # naFor(DL17) hoi theo THU TU: da xong -> da leo thang -> chua co nguoi xu ly -> roi moi toi
 # muc do. Nen dong gieo phai vuot qua ca ba cua truoc, khong thi no dung o NA041/NA040/NA081.
@@ -3192,6 +3250,57 @@ for (_sid, _dtxt), _w in _wowSong.items():
         "wow_id": _w["wow_id"], "registered_at": _dtxt, "note": "mở thêm cho buổi đã đổi giờ"})
     _moThem += 1
 log.append("18. Lich truc WOW khop so buoi: tra %d ca ve trong, mo them %d ca" % (_traVe, _moThem))
+
+# ═══ 19. HAI CUA MOI CUA APP CAN CHO DE GHI (14/08) ══════════════════════════════════════════
+# a) `cancel_reason` - nhom enum DUY NHAT cua CH1 ma app chua co. Nay hai cua huy (buoi hoc,
+#    buoi WOW) hoi them "phia huy", nen du lieu demo phai co san cot ay, khong thi mo mot buoi
+#    da huy tu truoc ra chi thay o trong.
+# b) `note_reviewed_at` + ba cot di kem - buoc HOC VU DUYET NHAN XET (CH2 slaNoteReview_hours).
+#
+# PHAI GHI CHO MOI DONG, KE CA DONG DE TRONG. `check_logic` luat 14a doi moi dong trong cung mot
+# bang phai CUNG BO COT ("app render o trong" neu lech). Them cot cho vai dong roi bo qua so con
+# lai la bang ay lech ngay - va cai lech ay khong hien ra mat cho toi luc ai do mo dung mot dong
+# thieu cot. *Them mot cot la them cho CA BANG, khong phai cho may dong minh dang nghi toi.*
+for _s in R("DL11"):
+    _s.setdefault("cancel_reason", "")
+    if code(_s.get("session_status")) == "cancelled" and not str(_s.get("cancel_reason") or "").strip():
+        _s["cancel_reason"] = eF("enum_cancel_reason",
+            random.choice(["cancelled_by_itts", "cancelled_by_itts", "cancelled_by_student"]))
+    for _k in ("note_reviewed_at", "note_reviewed_by", "note_reviewed_by_name", "note_review_note"):
+        _s.setdefault(_k, "")
+for _w in R("DL14"):
+    _w.setdefault("cancel_reason", "")
+    if code(_w.get("wow_status")) == "cancelled" and not str(_w.get("cancel_reason") or "").strip():
+        _w["cancel_reason"] = eF("enum_cancel_reason",
+            random.choice(["cancelled_by_itts", "cancelled_by_student"]))
+
+# Duyet nhan xet: hau het da duyet xong (2-6 gio sau khi GV nop), chua het de con viec ma lam.
+# Nguong SOP la 24 gio, nen de lai vai buoi NOP DA LAU ma chua ai duyet - do la viec do that.
+_daSoat = 0
+_choSoat = 0
+_dsNX = [x for x in R("DL11") if str(x.get("teacher_note_completed_at") or "").strip()]
+_dsNX.sort(key=lambda x: dt(x.get("teacher_note_completed_at")) or NOW)
+_nvHV = [x for x in R("DL01") if str(x.get("staff_id") or "").strip()][:6] or R("DL01")[:1]
+for _i, _s in enumerate(_dsNX):
+    _mocNop = dt(_s.get("teacher_note_completed_at"))
+    if not _mocNop:
+        continue
+    # de lai 6 buoi NOP GAN DAY NHAT chua duyet: nhung buoi qua 24 gio thanh viec do, so con lai
+    # con trong han - dung mot hang cho co ca hai mau, khong phai mot hang toan do
+    if _i >= len(_dsNX) - 6:
+        _choSoat += 1
+        continue
+    _mocSoat = _mocNop + datetime.timedelta(hours=2 + (_i % 5))
+    if _mocSoat > NOW:                 # khong ai duyet duoc mot thu chua toi gio
+        _choSoat += 1
+        continue
+    _nv = _nvHV[_i % len(_nvHV)] if _nvHV else None
+    _s["note_reviewed_at"] = fmt(_mocSoat)
+    _s["note_reviewed_by"] = str((_nv or {}).get("staff_id") or "")
+    _s["note_reviewed_by_name"] = str((_nv or {}).get("full_name") or "")
+    _daSoat += 1
+log.append("19. Cot moi: cancel_reason (DL11/DL14) + duyet nhan xet %d da duyet / %d cho duyet"
+           % (_daSoat, _choSoat))
 
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("  12. Da tao DL22 referral +", len(dl["DL22"]), "luot | DL19 thuong:", len(dl["DL19"]))

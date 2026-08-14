@@ -243,6 +243,11 @@ TRIG_BOQUA = {
     # Nay moi ly do deu doi chieu duoc voi cot "Tinh huong" cua HD3 - va bon ma da duoc LAM THAT
     # thay vi mien tru: NA045 (Quan tam hoc tiep), NA068 (Qua gio vao lop chua bat dau),
     # NA069 (Con han ghi nhan xet), NA080 (Uu tien thap qua han - von da lam dung tu truoc).
+    "NA074": ("Qua han tru quota WOW - APP CO LAM (naFor DL14 tra NA074 khi qua "
+              "slaWowQuotaCheck_hours), nhung KHONG GIEO duoc tren demo: tinh huong nay theo dinh "
+              "nghia LA MOT LOI DU LIEU (buoi da day ma chua tru quota), ma man 'Suc khoe du lieu' "
+              "phai SACH tren du lieu goc (_check16, va loi anh Luan 'bam Reset demo la keo demo "
+              "ve trang thai hoan hao'). Hai bo kiem doi hai dieu nguoc nhau - chon giu man sach."),
     "NA059": ("Dang ky da huy - SOP KHAI TRUNG mot tinh huong o HAI SHEET: CH4 dat ma NA008, HD3 "
               "dat ma NA059, cung mot cau 'Dang ky da huy. Viec can lam: kiem tra va xu ly hoan "
               "tien'. App lam NA008 (ban CH4). Khong phai thieu - la mot ma trung."),
