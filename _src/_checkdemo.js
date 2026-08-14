@@ -195,16 +195,31 @@ for(var k=28;k<35;k++){
     buổi WOW nào không" thì ngày nào cũng ra 0, mà đó là đúng theo SOP chứ không phải lỗi.
     Đã cắn: bản đầu bộ kiểm này hỏi nhầm người rồi báo đỏ suốt bảy thứ. Hỏi đúng người: NV WOW,
     ở đúng tab của họ. */
+ /* 14/08 - HOI DU LIEU, DUNG HOI NHAN CUA MOT CAI THE. Ban cu doc so tren the "Buoi WOW hom
+    nay"; the ay da bo ngay 14/08 theo luat the (`THE_NEN_LA_GI.md`: the chi duoc mang KPI/ty le,
+    moc SLA, tien-gio cong don, so do tren du lieu KHAC bang duoi, hoac xep hang giua cac nhom -
+    mot con so dem dong thi lam chip). The di, thuoc doc ra `null`, va no bao do BA NGAY lien
+    trong khi du lieu van du: do lai DL14 ra 87 buoi, bay ngay toi deu co buoi (2,1,2,2,3,2,2).
+    DIEU CAN BAO VE khong doi: thu nay co NV WOW nao phai day buoi 1-1 khong. Hoi thang du lieu
+    trong PHAM VI cua chinh nguoi do - van la cau hoi cu, chi khong con phu thuoc vao viec man
+    hinh co ve con so ay ra bang mot cai the hay khong.
+    *Thuoc bam vao mot nhan hien thi se do khi nhan doi, du dieu no canh van con nguyen* - lan
+    thu nam trong ngay. */
  var WOW=rows("DL01").filter(function(s){return mapRoleCode(ecode(s.role))==="wow"});
  WOW.forEach(function(nv){
   try{applyScope(nv.staff_id);CURSTAFF=nv.staff_id;window.HTTAB="wow";CUR="hoctap";
-   var b=soTrenThe(RENDER.hoctap(),"Buổi WOW hôm nay");
-   if(b===null){oThieu=oThieu||("NV WOW "+nv.staff_id+" · Buổi WOW hôm nay");return}
-   if(parseInt(b,10)>0)coWow++;
+   RENDER.hoctap();                       /* van ve that de bat loi ve trang */
+   var hn=new Date();
+   var n=srows("DL14").filter(function(w){
+    if(String(w.staff_id||"")!==String(nv.staff_id))return false;
+    var ms=pvnd(w.wow_session_date);if(!ms)return false;
+    var d=new Date(ms);
+    return d.getDate()===hn.getDate()&&d.getMonth()===hn.getMonth()&&d.getFullYear()===hn.getFullYear()}).length;
+   if(n>0)coWow++;
   }catch(e){veLoi=veLoi||(nv.staff_id+": "+e.message)}});
  applyScope("");CURSTAFF="";
  t("vẽ được màn Hôm nay của mọi giảng viên và NV WOW ("+info.thu+")",!veLoi,veLoi);
- t("hai ô buổi dạy / buổi WOW còn đúng nhãn ("+info.thu+")",!oThieu,
+ t("ô buổi dạy hôm nay của giảng viên còn đúng nhãn ("+info.thu+")",!oThieu,
    "không đọc được ô ở "+oThieu+" - đổi nhãn ô thì sửa cả bộ kiểm");
  t("thứ "+info.thu+": có giảng viên phải lên lớp",coSes>0,
    "cả "+GV.length+" giảng viên đều rảnh - mở app đúng thứ này thì lịch dạy trống trơn");
