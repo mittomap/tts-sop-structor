@@ -5292,8 +5292,13 @@ function renderViec(){var items=bellItems();
      vào trong lúc tôi đi vắng"* (theo thời gian). Một danh sách phục vụ ba câu hỏi thì phải cho
      người ta nói mình đang hỏi câu nào. */
   locR("Sắp xếp",segHTML(window.VIECSX||"gap",
-   [["gap","Theo độ gấp",0,""],["nhom","Theo nhóm việc",0,""],["moi","Mới nhất trước",0,""]],
-   "window.VIECSX='{k}';reRender('viec')","viec_sapxep"))],
+   /* (anh Luân: *"ủa vậy cái chip sắp xếp phải đổi phải ko em"*). Đúng - lỗi do chính em gây
+      ra lúc thêm trục này: em truyền số 0 vào ô đếm, nên ba chip sắp xếp hiện "0" y như ba
+      chip lọc rỗng. Mà chip lọc mang số vì nó nói "lọc ra được bấy nhiêu dòng"; chip SẮP XẾP
+      không lọc gì cả - nó chỉ đổi thứ tự, số dòng giữ nguyên. Cho nó một con số là hứa một
+      điều nó không làm, và số 0 lại còn đọc ra như "không có gì ở đây". Bỏ hẳn ô đếm. */
+   [["gap","Theo độ gấp"],["nhom","Theo nhóm việc"],["moi","Mới nhất trước"]],
+   "window.VIECSX='{k}';reRender('viec')","viec_sapxep","segsx"))],
   /* (anh Luan: *"tong so viec nay cung la 1 dang du thua dung ko, vi thuong o chip cung co"*).
      Dung - chip "Tat ca" da mang dung con so ay. Mot con so noi lai dieu chip vua noi thi chi
      ton cho, ma cho o dau trang la cho dat nhat. */
@@ -5314,7 +5319,11 @@ function renderViec(){var items=bellItems();
         ["amber","Sắp tới hạn - còn kịp","ti-clock","var(--amber)"],
         ["","Theo dõi","ti-eye","var(--muted)"]];
  }
- var shown=0, CAP=120;
+ /* TRẦN HIỂN THỊ TÍNH THEO TỪNG KHỐI, không dùng chung một túi. Bản cũ trừ dần từ một hạn
+    mức 120 chung, nên khối đầu ăn hết và khối thứ hai chỉ còn đúng một dòng chữ "... còn 134
+    việc nữa" - xếp dọc thì còn đỡ, chứ sang hai cột là nguyên một cột trống hoác cạnh một cột
+    đầy. *Trần dùng chung thì khối nào đứng trước ăn hết phần của khối sau.* */
+ var CAP=60;
  /* (anh Luan: *"2 bang nay nen 2 cot nhi, chu cai nay tren, cai kia duoi thi kho theo doi"*).
     Ba khoi xep doc thi khoi thu hai bat dau o dau do duoi day man - muon liec "sap toi han con
     may cai" la phai cuon, ma cuon xuong thi mat khoi "qua han" khoi tam mat. Hai cot cho hai
@@ -5338,9 +5347,8 @@ function renderViec(){var items=bellItems();
   h+='<div class="viecbk"><div class="viechd"><i class="ti '+B[2]+'" style="color:'+B[3]+'"></i>'+
    esc(B[1])+' <b>'+part.length+'</b></div>';
   h+='<div class="panel"><div class="pbody slalist">';
-  var lim=Math.max(0,CAP-shown);
+  var lim=CAP;
   part.slice(0,lim).forEach(function(it){h+=slaRow(it)});
-  shown+=Math.min(part.length,lim);
   if(part.length>lim)h+='<div class="pmore">... còn '+(part.length-lim)+' việc nữa ở nhóm này - chọn một Nhóm việc ở trên để xem hết</div>';
   h+='</div></div></div>'});
  h+='</div>';
@@ -8332,8 +8340,16 @@ function renderChay(){
    if(QL)r+=' · đã quá hạn nên báo cả quản lý <b>'+nsLnk(QL.id,QL.ten,QL.ten)+'</b>';
    return r+'</span></div>'})()+
   runLichSu(C)+
-  '<button class="btn alt'+(R.altOpen?" mo":"")+'" onclick="runSnooze()"><i class="ti ti-'+(R.altOpen?"chevron-up":"phone-plus")+'"></i>'+
-   (R.altOpen?"Đóng ô ghi liên hệ":("Ghi liên hệ / ghi chú"+(tps.length?' ('+tps.length+' lần ở chặng này)':'')))+'</button>'+
+  /* ═══ V2 14/08 - MỘT KHỐI, MỘT NÚT ĐẶC MÀU (anh Luân: *"nút để gần nhau nhìn đúng tởm"*) ══
+     Khối này từng có HAI nút hổ phách to bằng nhau: "Đóng ô ghi liên hệ" và "Lưu điểm chạm",
+     cộng nút navy "Lưu & tiếp tục" ngay dưới - ba nút to sát nhau, không cái nào nhường cái nào.
+     Gốc là em cho cái NẮP mặc đồ của HÀNH ĐỘNG. "Đóng" không làm gì với dữ liệu cả, nó chỉ gập
+     một khối lại; cho nó nền đặc là bắt mắt dừng ở một thứ không đáng dừng.
+     Luật rút ra và từ nay theo: **một khối chỉ có MỘT nút đặc màu - đúng cái việc của khối đó.**
+     Mở rồi thì nút mở thành một nút chữ nhạt, nhỏ, nằm nép; nút đặc màu duy nhất là "Lưu". */
+  (R.altOpen
+   ?'<button class="btn sm ghost" onclick="runSnooze()"><i class="ti ti-chevron-up"></i>Đóng ô ghi</button>'
+   :'<button class="btn alt" onclick="runSnooze()"><i class="ti ti-phone-plus"></i>Ghi liên hệ / ghi chú'+(tps.length?' ('+tps.length+' lần ở chặng này)':'')+'</button>')+
   /* SOP NA046 nói HAI đường cho lead quá hạn chưa gọi: *"gọi gấp HOẶC GIAO LẠI cho NV khác"*.
      App có màn Bàn giao lead từ lâu nhưng ở đây không có cửa nào tới - người dùng đang đứng
      đúng hồ sơ ấy lại phải rời trang, tự tìm lại tên khách trong một bảng khác. Nay chìa thẳng. */
@@ -8449,7 +8465,7 @@ function jNextHint(J){var ci=JMAIN.indexOf(J.k);if(ci<0||ci>=JMAIN.length-1)retu
  return '<div class="jnext2"><div class="jn2t"><i class="ti ti-arrow-bounce"></i>TIẾP THEO SẼ LÀ</div>'+
   '<div class="jn2b"><span class="jn2i"><i class="ti '+N.ic+'"></i></span><div><div class="jn2n">'+esc(N.t)+'</div><div class="jn2w">'+esc(N.why)+'</div>'+
   (need.length?'<div class="jn2m"><i class="ti ti-file-alert"></i>Bước đó cần: '+esc(need.join(", "))+'</div>':'')+
-  '<div class="jn2o">Người lo: '+esc(N.owner)+' · hạn '+(N.sla()<24?Math.round(N.sla())+" giờ":Math.round(N.sla()/24)+" ngày")+'</div></div></div></div>'}
+  '<div class="jn2o">Người phụ trách: '+esc(N.owner)+' · hạn '+(N.sla()<24?Math.round(N.sla())+" giờ":Math.round(N.sla()/24)+" ngày")+'</div></div></div></div>'}
 /* XEM LẠI / CẬP NHẬT MỘT BƯỚC ĐÃ QUA trong luồng */
 function runGoStep(k){var R=window.RUN;if(!R)return;R.viewStep=k;R.msg="";R.tab="main";reRender("chay")}
 function runBackNow(){var R=window.RUN;if(!R)return;R.viewStep="";reRender("chay")}
@@ -9163,7 +9179,7 @@ function jStepper(J,clickable){var cur=J.S.idx,h='<div class="jstepw cr"><div cl
   /* Ngưỡng của chặng khai bằng GIỜ, nhưng có chặng chỉ vài phút (SLA phản hồi lead 15 phút =
      0.25 giờ). In "hạn 0.25 giờ" là bắt người đọc tự nhân nhẩm - đổi ra đơn vị người ta nói. */
   function _han(g){return g>=48?(Math.round(g/24)+" ngày"):(g>=1?((Math.round(g*10)/10)+" giờ"):(Math.round(g*60)+" phút"))}
-  var _tip=[S.t,(S.why||S.d||""),(_who?("Người lo: "+_who):""),(_sla>0?("hạn "+_han(_sla)):"")]
+  var _tip=[S.t,(S.why||S.d||""),(_who?("Người phụ trách: "+_who):""),(_sla>0?("hạn "+_han(_sla)):"")]
    .filter(function(x){return x}).join(" — ");
   h+='<div class="jsi '+st+sel+(canClick?" clk":"")+'"'+oc+' data-tip="'+esc(_tip)+'"'+'><div class="jsd"><i class="ti '+(st==="done"?"ti-check":S.ic)+'"></i></div><div class="jsl">'+esc(S.t)+'</div><div class="jsw">'+esc(String(when).slice(0,10)||"")+'</div></div>';
   if(i<JMAIN.length-1)h+='<div class="jsc '+(i<cure?"done":"")+'"></div>'});
@@ -13428,7 +13444,7 @@ function bvSau(){var a="";try{a=nhipSau()}catch(e){}
 var SEGMAX=10;
 var SEGMO={};
 function segMo(id){SEGMO[id]=!SEGMO[id];reRender(CUR)}
-function segHTML(cur,opts,onTpl,id){
+function segHTML(cur,opts,onTpl,id,cls2){
  var isArr=(Object.prototype.toString.call(cur)==="[object Array]");
  function chon(o){return isArr?(cur.indexOf(o[0])>=0):(cur===o[0])}
  function nut(o){
@@ -13445,7 +13461,7 @@ function segHTML(cur,opts,onTpl,id){
    (o[2]!=null&&o[2]!==""?'<i class="segn">'+o[2]+'</i>':'')+'</button>'}
  id=id||("seg"+opts.length);
  if(opts.length<=SEGMAX||SEGMO[id])
-  return '<div class="seg">'+opts.map(nut).join("")+
+  return '<div class="seg'+(cls2?" "+cls2:"")+'">'+opts.map(nut).join("")+
    (opts.length>SEGMAX?'<button class="segb segmo" onclick="segMo(\''+esc(id)+'\')"><i class="ti ti-chevron-up"></i>Thu gọn</button>':'')+'</div>';
  /* Mục ĐẦU TIÊN luôn giữ (thường là "Tất cả"), mục đang chọn luôn giữ, còn lại xếp theo số việc. */
  var giu=[],con=[];
@@ -13455,7 +13471,7 @@ function segHTML(cur,opts,onTpl,id){
  var an=opts.length-hien.length;
  /* giữ đúng thứ tự gốc để mắt không phải học lại vị trí mỗi lần số việc đổi */
  hien.sort(function(a,b){return opts.indexOf(a)-opts.indexOf(b)});
- return '<div class="seg">'+hien.map(nut).join("")+
+ return '<div class="seg'+(cls2?" "+cls2:"")+'">'+hien.map(nut).join("")+
   '<button class="segb segmo" onclick="segMo(\''+esc(id)+'\')"><i class="ti ti-dots"></i>+'+an+' nhóm khác</button></div>'}
 function tbar(left,right){return '<div class="tbar" data-tour="tbar">'+(left||"")+'<div class="tbsp"></div>'+(right||"")+'</div>'}
 /* ═══ V2 13/08 - MỘT HÀNG CỦA THANH LỌC: [NHÃN NHÓM] [dải chip] ═════════════════════════════
@@ -13484,7 +13500,14 @@ function locKhoi(rows,ct,neo){
  var r=(rows||[]).filter(Boolean);
  if(ct){
   if(r.length){
-   var i=r.length-1;   /* nhập vào hàng CUỐI của khối chip: hàng đầu hay là ô tìm, chèn vào đó thì ô tìm bị bóp */
+   /* V2 14/08 - NHẬP VÀO HÀNG ĐẦU, KHÔNG PHẢI HÀNG CUỐI (anh Luân: *"xấu quá trời ơi"*).
+      Bản trước em nhét cụm điều khiển vào hàng chip CUỐI, sợ ô tìm ở hàng đầu bị bóp. Nhưng
+      hàng chip thì XUỐNG DÒNG khi nhiều chip - nên cụm điều khiển rơi vào giữa đám chip, cắt
+      ngang mạch đọc, đúng cái anh Luân vừa chụp. Còn hàng đầu (ô tìm) thì trống hơn nửa bề
+      ngang và KHÔNG bao giờ xuống dòng - ô tìm rộng cố định 280px, cụm điều khiển đẩy sang mép
+      phải là vừa khít.
+      *Chọn hàng để nhập vào thì phải chọn hàng KHÔNG XUỐNG DÒNG, không phải hàng còn chỗ.* */
+   var i=0;
    r[i]=r[i].replace(/<\/div>\s*$/, '<span class="locct2">'+ct+'</span></div>');
   }else r.push('<div class="locr locct">'+ct+'</div>');
  }
