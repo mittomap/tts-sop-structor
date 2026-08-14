@@ -190,7 +190,19 @@
 >
 > **E · CHẠY `./verify.sh` TRỌN BỘ MỘT LƯỢT LIỀN** - ngày 14/08 ba lượt đều hỏng giữa chừng, hai
 > lượt do chính em dựng lại bản mới lúc nó đang chạy, một lượt do em `pkill` trúng chính vỏ lệnh
-> của nó. Chưa có lượt nào chạy trọn từ đầu tới cuối trong ngày.
+> của nó. Lượt thứ tư chạy trên bản `3f0446` (14/08 chiều, sau đợt gộp bàn làm việc).
+>
+> **F · SIDEBAR - CHƯA XẾP LẠI CHO RA VIỆC.** Anh Luân 14/08: *"em đã check xem trên sidebar nên
+> sắp xếp thế nào chưa, a thấy chắp vá quá"*. Đúng: cả ngày mới chỉ VÁ TỪNG LỖ (thêm `socamket`,
+> thêm `lichwow`, thêm `banglop` rồi phải gỡ ra vì `lop` đã là cha của nó). Chưa ngồi xuống xem
+> cả cây menu nên xếp thế nào. Nhóm C2 vẫn ôm 15 mục, lẫn ba loại khác hẳn nhau: **màn làm việc
+> hằng ngày** (Buổi hôm nay, Giao & chấm bài tập) · **màn theo dõi** (Theo dõi nhận xét buổi,
+> Khảo sát & Phản hồi) · **sổ tra cứu** (Lớp học, Phòng học). Đo được bằng `NHIP`: chỉ 8/15 mục
+> có mặt trong nhịp ngày của bất kỳ chức danh nào; `buoihoc` được 3 chức danh nhắc, `khaosat`,
+> `ghinhan`, `khieunai`, `lichtuan`, `lop`, `lichwow` không chức danh nào.
+> **Việc còn phải làm:** tách thành ba kệ theo tần suất đo được, và viết luật thứ tự vào
+> `_check11` để nó không trôi lại. Sidebar KHÔNG có cơ chế tiêu đề con - hoặc thêm cơ chế ấy,
+> hoặc chỉ xếp lại thứ tự trong nhóm; phải chọn trước khi làm.
 
 > ### 📋 12/08 - CÒN TREO SAU ĐỢT FEEDBACK BỐN TEAM
 > 1. **Chặn đăng nhập làm test khi quá hạn 1 tuần** (SALE-3, vế giữa). Anh Luân chốt *"ghi nhận
@@ -293,10 +305,48 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 41 BỘ KIỂM. Bản dựng đang chạy: `39083f` (14/08), đã lên
+> **Phiên bản: V2 — 41 BỘ KIỂM. Bản dựng đang chạy: `3f0446` (14/08), đã lên
 > https://mittomap.github.io/itts-sop-demo-v2/ . Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `d2d2d5`, `c6ea8b`.
+> Mốc cũ: `39083f`, `d2d2d5`, `c6ea8b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 14/08 chiều - GỘP HAI CẶP TRANG CHỒNG CHÉO (anh Luân đặt hàng, ba bước)
+>
+> Anh Luân: *"em nghiên cứu việc chồng chéo của 2 trang này cho anh, cần thiết thì thiết kế chuẩn
+> mực gộp lại"* · *"thói quen của 1 người là ko thích vào 2 trang kiểu vậy, mà chỉ cần 1 trang thì
+> phải"* · *"việc hôm nay có vẻ đang tốt hơn, xem trang bắt đầu có gì hay thì mang sang"*.
+>
+> **Đo trước, không đoán.** Hai cặp, số đo dán ngay trong mã nguồn:
+>
+> | | Học viên liên hệ ↔ Giao việc | Trang bắt đầu ↔ Việc hôm nay |
+> |---|---|---|
+> | Dữ liệu | 8/57 dòng DL23 · **tập con hoàn toàn** | 1.475 hồ sơ hành trình vs **2.329 mục việc** |
+> | Khối trùng | cùng thẻ, cùng nút, cùng cửa ghi | nhịp ngày có ở CẢ HAI |
+> | Ai thấy | 3 thấy cả hai · **13 chỉ thấy Giao việc** · 0 chỉ thấy trang kia | Trang bắt đầu là trang đáp của **3/16** chức danh |
+>
+> Kết luận: *một trang mà toàn bộ nội dung là tập con của trang khác thì nó không phải một trang,
+> nó là một BỘ LỌC - và bộ lọc ấy lại yếu hơn chính cái nó lọc* (thiếu nút Giao việc mới, thiếu
+> Từ chối, thiếu tab báo cáo). Còn 2/8 yêu cầu đang giao cho `accounting_manager` - người KHÔNG mở
+> được trang cũ; với họ loại việc này trước nay **không có tên trên màn**.
+>
+> **Đã làm:**
+> 1. **Việc hôm nay = bàn làm việc duy nhất** - ôm "Cần chú ý" + nhịp ngày + bảng việc chức danh.
+> 2. **Trang bắt đầu co lại** còn Chạy quy trình + Bản đồ chặng. Trang đáp của 3 chức danh sale
+>    đổi sang `viec` - `_checkv2` L1 bắt ngay khi em dời khối mà quên dời chỗ người ta đứng.
+> 3. **Học viên liên hệ thành tab "Từ học viên"** của Giao việc, mang theo hai chip SLA nhận việc.
+>    `ychv` giữ làm BÍ DANH (`go()` remap) để mọi lối cũ - ô cảnh báo, nhịp ngày, bảng việc, link
+>    đã gửi, bài hướng dẫn - không chết.
+>
+> **Bốn bẫy đã cắn trong đợt này, bộ kiểm bắt hết:**
+> · Dời khối mà quên dời trang đáp → 3 chức danh mở app không thấy nhịp ngày.
+> · Gọi thêm `bangViecHTML()` trong khi `pageHead` đã tự gọi `bvSau()` → bảng in HAI LẦN, neo
+>   `@bangviec` x2, `tourFind` lấy cái đầu tiên nên bài hướng dẫn khoanh đúng-sai tùy hên.
+>   *Trước khi thêm một lời gọi, hỏi xem thứ mình muốn đã tự tới chưa.*
+> · `bvStrip` NHẬN tên neo qua tham số rồi vẫn in cứng `"bangviec"` cho mọi lời gọi - lỗi có sẵn,
+>   chỉ lộ ra khi bảng việc đổi trang. *Nhận một tham số rồi không dùng nó là một lời khai dối.*
+> · `_checkux` tìm chuỗi "Thẻ (n/m)" ĐẦU TIÊN rồi coi là dải của trang - trang Việc hôm nay nay
+>   mang hai dải nên nó đo nhầm. Đã cho mỗi dải tự khai `data-thek`.
+>   *Hễ một thứ có thể xuất hiện hai lần trên một màn thì nó phải tự khai mình là ai.*
 >
 > ### 🟢 14/08 - `check_sop` ĐẠT TRỌN TÁM MẶT, LẦN ĐẦU TIÊN
 >
