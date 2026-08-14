@@ -477,6 +477,15 @@ tr.cfhl>td{background:#FFF6D8}
  color:var(--navyd);font-size:11.5px;font-weight:600;padding:4px 10px;flex:0 0 auto;white-space:nowrap}
 .cfbar.on{display:inline-flex}
 .cfbar .btn.sm{height:24px;padding:0 8px;font-size:11px}
+/* ═══ V2 14/08 - NÚT DEMO KHÔNG ĐƯỢC ĂN CHỖ CỦA VỆT ĐƯỜNG ĐI ════════════════════════════════
+   Đo ở khổ 860px: cụm "Dựng lại demo" rộng **288px** trên thanh 60px, bóp khối tiêu đề + vệt
+   đường đi từ 308px xuống còn **12px** - `_checkcrumb` báo vệt bị cắt cụt ở mép phải. Chính em
+   gây ra lúc chuyển nút này lên thanh trên chiều nay.
+   Thứ tự nhường chỗ phải theo mức cần: vệt đường đi nói NGƯỜI TA ĐANG Ở ĐÂU - mất nó là mất
+   phương hướng; nút dựng lại demo là một tiện ích, thu về còn cái biểu tượng vẫn bấm được, và
+   dưới 900px thì lui hẳn. *Chỗ chật thì thứ nói "tôi đang ở đâu" được giữ trước.* */
+@media(max-width:1200px){.cfbar .cfbtxt{display:none}.cfbar .btn.sm{padding:0 6px}}
+@media(max-width:900px){.cfbar{display:none!important}}
 /* V9.63b (anh Luân: *"cái checkbox nhìn thô và choáng chỗ quá"*): ô 13px tô đặc trông như một
    khối màu chen vào giữa nút. Nay nhỏ lại 10px, viền nhạt, và khi bật thì vẽ DẤU TÍCH mảnh chứ
    không tô đầy - nhẹ mắt mà vẫn nói được "chỗ này chọn nhiều cái cùng lúc". */
@@ -2897,7 +2906,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>51e090</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>593ebb</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -7965,7 +7974,7 @@ function cfBarSync(){var b=document.getElementById("cfBar");if(!b)return;
     (Trạng thái "Chế độ xem thử" bên trên VẪN giữ nhãn - nó cảnh báo rằng chỉnh gì cũng không
     lưu được, đó là thứ người ta cần đọc chứ không suy ra được từ tên nút.) */
  b.className="cfbar on demo";
- b.innerHTML='<button class="btn sm" onclick="demoResetHoi()" data-tip="Đây là bản demo: mọi thao tác chạy thật nhưng chỉ lưu trên máy này, không ảnh hưởng số liệu thật. Bấm để dựng lại bộ dữ liệu mẫu."><i class="ti ti-refresh"></i>Dựng lại demo</button>'}
+ b.innerHTML='<button class="btn sm" onclick="demoResetHoi()" title="Dựng lại demo" data-tip="Đây là bản demo: mọi thao tác chạy thật nhưng chỉ lưu trên máy này, không ảnh hưởng số liệu thật. Bấm để dựng lại bộ dữ liệu mẫu."><i class="ti ti-refresh"></i><span class="cfbtxt">Dựng lại demo</span></button>'}
 function cfGhiDuoc(){return cfMode()==="that"}
 /* Hộp hỏi mật khẩu dùng chung. `xong` là TÊN hàm (chuỗi) - đi qua cfnGet như confirmRun, để
    không phải nhét hàm vào thuộc tính onclick. */
@@ -21909,11 +21918,19 @@ function renderGvdp(embed){
  if(!ses.length)h+='<tr><td class="empty" colspan="6">Ngày này không có buổi học nào.</td></tr>';
  ses.forEach(function(x){var c=find("DL10","class_id",x.class_id)||{};
   var d=pvnd(x.session_date);var n=gvBackup(x).filter(function(r){return r.ok}).length;
-  h+='<tr><td>'+esc(d?hhmmOf(d):"")+'</td><td>'+lopLnk(x.class_id,x.class_id_name,"")+' <span class="mut">buổi '+esc(x.session_number||"?")+'</span></td>'+
+  /* V2 14/08 - BẤM VÀO DÒNG PHẢI CÓ CHUYỆN GÌ XẢY RA. `_checkbam` bấm thật 159 dòng trên 72
+     màn và ba dòng IM LẶNG đều ở bảng này: dòng trông y hệt mọi dòng bấm được khác của app
+     (con trỏ, viền hover) mà bấm vào không mở gì, không đổi trang, không báo gì.
+     Cho nó mở ô xem nhanh của LỚP - đúng thứ người ta cần khi đang tìm người dạy thay: lớp
+     này là lớp gì, ai đang phụ trách, tiến độ tới đâu. Nút "Đề xuất người dạy thay" và cái
+     link tên lớp đã tự chặn nổi bọt nên không đá nhau.
+     *Một dòng trông bấm được mà bấm vào im lặng thì tệ hơn một dòng không bấm được: người ta
+     bấm lại lần nữa, rồi bắt đầu ngờ cả những dòng khác.* */
+  h+='<tr onclick="openLopQuick(\''+esc(x.class_id)+'\')" style="cursor:pointer" title="Xem nhanh lớp này"><td>'+esc(d?hhmmOf(d):"")+'</td><td>'+lopLnk(x.class_id,x.class_id_name,"")+' <span class="mut">buổi '+esc(x.session_number||"?")+'</span></td>'+
    '<td>'+(clsOnline(c)?'<span class="chip blue">Online</span>':'<span class="chip">'+esc(elabel(c.branch)||c.branch||"-")+'</span> <span class="mut" style="font-size:11px">'+esc(elabel(c.learning_mode)||"")+'</span>')+'</td>'+
    '<td>'+(String(x.teacher_id||"").trim()?nsLnk(x.teacher_id,x.teacher_id_name,""):'<span class="chip red">chưa gán</span>')+'</td>'+
    '<td>'+(n?'<span class="chip green">'+n+' người</span>':'<span class="chip red">không có ai</span>')+'</td>'+
-   '<td><button class="btn primary sm" onclick="gvBackupForm(\''+esc(x.session_id)+'\')"><i class="ti ti-user-plus"></i>Đề xuất người dạy thay</button></td></tr>'});
+   '<td><button class="btn primary sm" onclick="event.stopPropagation();gvBackupForm(\''+esc(x.session_id)+'\')"><i class="ti ti-user-plus"></i>Đề xuất người dạy thay</button></td></tr>'});
  h+='</tbody></table></div></div>';
  h+='<div class="panel"><div class="ph"><b>Giáo viên trống lịch hôm nay ('+free.length+')</b><span class="mut" style="font-size:11.5px">không có buổi nào trong ngày - nguồn dự phòng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giáo viên</th><th>Cơ sở</th><th>Đã dạy ở</th><th>Buổi hôm nay</th></tr></thead><tbody>';
  if(!free.length)h+='<tr><td class="empty" colspan="4">Hôm nay giáo viên nào cũng có lịch - không còn người dự phòng.</td></tr>';
