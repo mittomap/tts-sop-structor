@@ -25,6 +25,16 @@ Chủ dự án: Luân. Mọi phiên làm việc (Claude Code hay Claude Cowork) 
   verify, xanh hết thì xong, đỏ thì sửa, xong lại push rồi verify, có gì đâu"*.
   **Nhịp mới: sửa xong → commit → PUSH (cả nguồn lẫn bản demo) → rồi mới chạy verify trọn bộ →
   đỏ thì sửa → push tiếp → verify lại.** Không giữ bản dựng lại chờ verify nữa.
+  **VERIFY LÀ THỨ PHẢI NHƯỜNG, KHÔNG PHẢI BẢN DỰNG (bổ sung 14/08).** Anh Luân phải nhắc lại
+  đúng luật này: *"rõ ràng, cứ sửa hoặc làm mới gì xong thì đẩy trước đi rồi verify sau, a nói
+  hoài mà, đổ luật đi"*. Em đã dựng lại đúng cái hành vi cũ bằng một đường khác: verify đang
+  chạy thì em **giữ bản dựng lại**, khai là "để khỏi phá lượt verify" - nghe có lý mà kết quả y
+  hệt luật cũ, anh ngồi chờ một thứ đã xong từ lâu. Và lượt verify ấy đang đo **một bản dựng sắp
+  bị thay**, tức nó vô nghĩa ngay lúc đang chạy.
+  **Sửa xong mà verify đang chạy thì GIẾT LƯỢT VERIFY, dựng, đẩy, rồi chạy lượt mới.**
+  Cách giết cho đúng (đã cắn một lần với `pkill -f "verify.sh"` bắn trúng chính vỏ lệnh của
+  mình, thoát 144): `ps -eo pid,args | grep "[v]erify.sh"` lấy PID rồi `kill` đúng những PID đó.
+  *Một lượt verify tốn 35 phút của MÁY; giữ bản dựng lại tốn 35 phút của ANH.*
   **Vì sao luật cũ sai:** luật cũ (06/08) bắt chạy trọn bộ TRƯỚC khi đẩy, và ngày 13/08 nó làm
   anh Luân ngồi chờ **hơn một tiếng** qua ba lượt verify liên tiếp trong khi bản dựng đã nằm sẵn
   ở gốc repo. Cái giá em tưởng là "23 phút của MÁY" hoá ra là **thời gian THẬT của anh** - đúng
