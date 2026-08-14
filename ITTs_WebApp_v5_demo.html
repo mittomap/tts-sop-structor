@@ -330,6 +330,15 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .navitem.anc i{opacity:1}
 .navitem.from{background:#ffffff14;color:#CFE0F7}
 .navitem.from i{opacity:.95}
+/* Mục đang sáng có nhãn CHỖ ĐANG ĐỨNG thì không cần nhãn "đang mở" nữa - cái nhãn kia nói được
+   nhiều hơn hẳn, mà hai nhãn cùng lúc trên một dòng hẹp thì chen nhau. */
+.navitem.cocho:after{display:none!important}
+.navtx{display:flex;flex-direction:column;min-width:0;flex:1 1 auto}
+.navnm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Dòng phụ: nhỏ hơn, mờ hơn tên mục - nó là chú thích của tên, không phải một mục thứ hai. */
+.navcho{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;opacity:.8;
+ margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.navcho i{font-size:11px;flex:none;opacity:.75}
 .navitem.from:after{content:"đang mở";margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.4px;
  text-transform:uppercase;color:#8FB2D8;background:#ffffff12;border-radius:6px;padding:1px 5px;flex:none}
 .navitem.chang.from:after{content:"đang mở";width:auto;height:auto;border-radius:6px;background:#ffffff12;opacity:1}
@@ -3000,7 +3009,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>1bc021</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>b9c417</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -21933,8 +21942,22 @@ function mgtTraoLuu(id){
   granted_at:nowStr(),granted_by:myName(),note:note},
   "Đã ghi nhận trao thưởng. Người giới thiệu không còn nằm trong hàng chờ.")}
 /* Buổi đã dạy xong mà thiếu mốc giờ vào hoặc ra - thiếu là tính công sai. */
-function bcThieuMoc(){return srows("DL11").filter(function(x){return isc(x.session_status,"completed")&&
- !(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())})}
+/* ═══ V2 14/08 (anh Luân, kèm ảnh chip "Buổi thiếu mốc giờ 2" bấm vào ra bảng rỗng: *"lỗi
+   nhỉ"*) ══════════════════════════════════════════════════════════════════════════════════
+   Đúng là lỗi, và gốc là hai phép đo lệch phạm vi thời gian: hàm này đếm buổi thiếu mốc của
+   MỌI THÁNG, còn bảng công thì chỉ có những người có buổi TRONG THÁNG ĐANG CHỌN. Hai buổi
+   thiếu mốc ấy thuộc tháng khác, nên lọc xuống còn 0 người - chip hứa 2, bảng đưa 0.
+   Nay hàm nhận tháng: truyền `ym` thì đếm trong đúng tháng ấy (chip và bảng cùng một phạm vi),
+   không truyền thì giữ nguyên toàn thời gian - ô cảnh báo và bảng việc cần con số toàn cục,
+   chúng không có tháng nào để mà lọc.
+   *Một cái chip chỉ đúng khi nó đếm trên đúng tập mà bảng bên dưới đang vẽ.* */
+function bcThieuMoc(ym){var r=srows("DL11").filter(function(x){return isc(x.session_status,"completed")&&
+ !(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())});
+ if(!ym)return r;
+ return r.filter(function(x){var d=pvnd(x.session_date);if(!d)return false;
+  return (d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2))===ym})}
+/* Tháng đang xem của bảng công - MỘT nguồn cho mọi chỗ hỏi tới nó. */
+function congYM(){var mo=congMonths();return window.CONGM||mo[0]||""}
 function yesv(x){return /^(true|1|yes|y|có|x)$/i.test(String(x==null?"":x).trim())}
 /* ===== HUB HỌC TẬP: Lớp học · Nhận xét buổi (SLA) · Buổi WOW 1-1 - gộp các trang giảng dạy rời ===== */
 function htGo(tab){window.HTTAB=tab;go("hoctap")}
@@ -24880,8 +24903,9 @@ function renderCong(){
     còn tệ hơn không có chip: người ta bấm rồi tưởng đã lọc. `_checkkhuon` đo trên chuỗi HTML nên
     một chip giả vẫn qua được thước - luật này phải giữ bằng tay. Lọc xuống đúng những giảng viên
     CÒN buổi thiếu mốc, dùng chung `bcThieuMoc()` với dải thẻ ngay trên. */
- if(typeof bcLoc==="function"&&bcLoc()==="thieu"){
-  var _tm={};bcThieuMoc().forEach(function(x){if(x.teacher_id)_tm[String(x.teacher_id)]=1});
+ var _locThieu=(typeof bcLoc==="function"&&bcLoc()==="thieu");
+ if(_locThieu){
+  var _tm={};bcThieuMoc(ym).forEach(function(x){if(x.teacher_id)_tm[String(x.teacher_id)]=1});
   L=L.filter(function(x){return _tm[String(x.g.staff_id)]})}
  var tot=L.reduce(function(a,x){return a+x.n},0),totW=L.reduce(function(a,x){return a+x.wow},0),tien=L.reduce(function(a,x){return a+x.tien},0);
  var totG=L.reduce(function(a,x){return a+x.gio},0),totThieu=L.reduce(function(a,x){return a+x.thieuGio},0);
@@ -24938,7 +24962,7 @@ function renderCong(){
  /* V2 09/08 - CHIP "Buổi thiếu mốc giờ" đặt Ở ĐÂY, ngay sau ô tìm của chính bảng - thứ tự chuẩn
     của app là [ô tìm] [dải chip]. Bản đầu em đặt nó ở `renderBangcong` (trước khi gọi hàm này),
     thành ra chip đứng TRƯỚC ô tìm và trang có hai ô tìm - `_checkux` bắt cả hai lỗi cùng lúc. */
- (function(){var _tm=bcThieuMoc();
+ (function(){var _tm=bcThieuMoc(ym);
   h+=chipBar("bangcong",bcLoc(),[["all","Tất cả giảng viên",null],
    ["thieu","Buổi thiếu mốc giờ",_tm.length,_tm.length?"red":""]],null)})();
  /* ═══ V2 14/08 - HAI ĐỘI, HAI BẢNG (anh Luân: *"nên bổ sung vào đó phần của wow, phân biệt
@@ -24998,7 +25022,12 @@ function renderCong(){
  var _lv=L.filter(function(x){return x.n||x.wow||x.test});
  var _wow=_lv.filter(function(x){return /wow/.test(ecode(x.g.role))});
  var _gv=_lv.filter(function(x){return !/wow/.test(ecode(x.g.role))});
- if(!_lv.length)h+='<div class="panel"><div class="pbody"><div class="empty">Tháng này chưa có buổi dạy nào hoàn thành.</div></div></div>';
+ /* Câu khi trống phải nói ĐÚNG cái vừa xảy ra. "Tháng này chưa có buổi dạy nào hoàn thành" là
+    sai khi người ta vừa bấm một chip lọc - tháng có buổi, chỉ là chip cắt hết. Nói nhầm nguyên
+    nhân thì người dùng đi tìm sai chỗ. */
+ if(!_lv.length)h+='<div class="panel"><div class="pbody"><div class="empty">'+
+  (_locThieu?'Tháng này không giảng viên nào còn buổi thiếu mốc giờ. <button class="btn sm" onclick="fset(\'bangcong\',\'all\');reRender(CUR)" style="margin-left:8px"><i class="ti ti-x"></i>Bỏ lọc</button>'
+   :'Tháng này chưa có buổi dạy nào hoàn thành.')+'</div></div></div>';
  h+=congBang("Giảng viên lớp ("+_gv.length+")",
    "Công tính theo GIỜ đứng lớp thật - từ giờ vào lớp tới giờ kết thúc của buổi đã dạy xong. Đơn giá tra theo giảng viên x loại ngày x ca.",_gv);
  h+=congBang("WOW coach ("+_wow.length+")",
@@ -25135,7 +25164,8 @@ function renderNhansu(){
    `bcThieuMoc()` - đúng hàm nhịp ngày đang đếm. */
 function bcLoc(){return fget("bangcong")}
 function renderBangcong(){
- var thieu=bcThieuMoc(),xong=srows("DL11").filter(function(x){return isc(x.session_status,"completed")});
+ var _ym=congYM();
+ var thieu=bcThieuMoc(_ym),xong=srows("DL11").filter(function(x){return isc(x.session_status,"completed")});
  /* Tên cũ "Bảng công giảng dạy" nói thiếu đúng một nửa số người trong bảng (anh Luân: *"nên bổ
     sung vào đó phần của wow"*). Đội WOW không "giảng dạy" theo nghĩa đứng lớp, nên đọc tên trang
     xong không ai nghĩ công của mình nằm trong đó - dù nó đã nằm trong đó từ lâu. */
@@ -29062,6 +29092,34 @@ function navInTree(k){var T=navCay();for(var i=0;i<T.length;i++)if(T[i].items.in
    menu. Hai chỗ nói một câu thì không bao giờ cãi nhau được nữa. `NAVFROM` giữ làm lưới đỡ cho
    trường hợp vệt rỗng (vào thẳng bằng link).
    *Hai nguồn cho một sự thật thì sớm muộn cũng thành hai sự thật.* */
+/* ═══ V2 14/08 - MỤC SÁNG NÓI LUÔN ĐANG Ở ĐÂU BÊN TRONG (anh Luân: *"thay vì ghi đang mở như ở
+   1 số dòng trên sidebar, có thể ghi là Lớp học -> Chấm bài"*) ═══════════════════════════════
+   Đúng chỗ hụt: mục sáng chỉ nói được tới cấp TRANG. Anh đang đứng ở chip "Chấm bài" của tab
+   "Giao & chấm bài tập" trong Vận hành lớp - ba nấc sâu hơn cái tên "Lớp học" đang sáng. Nhìn
+   sidebar không đọc ra mình đang làm gì, mà sidebar là chỗ người ta liếc để định vị.
+   Bản khai này trả lời "chỗ đang đứng bên trong trang" cho những trang có nhiều nấc. Khai chứ
+   không đoán: mỗi trang lưu nấc của nó trong một biến riêng (`BLTAB`, `BTMODE`...), không có
+   quy tắc chung nào để suy ra, và đoán sai thì sidebar nói một đằng màn hình một nẻo.
+   Trang nào không khai thì không hiện gì - im lặng đúng hơn là đoán bừa. */
+var NAVCHO={
+ banglop:function(){var t=window.BLTAB||"buoi";
+  if(t==="baitap"){var m=window.BTMODE||"giao";
+   return {giao:"Giao bài",thu:"Thu bài",cham:"Chấm bài",chocham:"Chờ chấm - mọi lớp"}[m]||"Giao & chấm bài tập"}
+  return {buoi:"Buổi học & điểm danh",hocvien:"Học viên",ketqua:"Kết quả đầu ra"}[t]||""},
+ viec:function(){var v=VIECVW();
+  for(var i=0;i<VIECVWDEF.length;i++)if(VIECVWDEF[i][0]===v&&v!=="viec")return VIECVWDEF[i][1];
+  return ""},
+ giangvien:function(){return (window.GVTAB==="cong")?"Bảng công":""},
+ giaoviec:function(){return {wait:"Việc chờ nhận",hv:"Từ học viên"}[window.TKTAB]||""}};
+/* Chuỗi hiện sau mũi tên trên mục đang sáng. Hai nguồn ghép lại, đúng thứ tự người đi:
+   tên TRANG CON (nếu mục sáng là trang cha) rồi tới NẤC BÊN TRONG trang ấy. */
+function navChoTxt(k){
+ var out=[];
+ try{
+  if(CUR!==k&&PBK[CUR]&&PBK[CUR].t)out.push(PBK[CUR].t);
+  var f=NAVCHO[CUR];if(f){var t=f();if(t)out.push(t)}
+ }catch(e){return ""}
+ return out.join(" · ")}
 function navFromKey(){var h=window.NAVHIST||[];
  for(var i=h.length-1;i>=0;i--){var k=h[i].key,o=navOwner(k);
   try{if(navInTree(o)&&navVis(o))return o}catch(e){}
@@ -29196,8 +29254,11 @@ function buildNav(){
    var _trongArc=!!G.arc&&!/^chang[A-D]$/.test(k);
    var isSub=_laHub||_trongArc||_thut;
    var isSub2=(_laHub&&_trongArc)||(_thut&&_trongArc);
-   h+='<div class="navitem'+(isArc?" chang":"")+(isSub2?" sub sub2":(isSub?" sub":""))+(navCur(k)?" on":(navAnc(k)?" anc":(ORPHAN&&k===_navFrom?" from":"")))+(k===window.__NAVHIT?" hit":"")+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
-    ' data-k="'+k+'" title="'+esc(m.t)+'" onclick="'+(HUBTAB[k]?"goHub":"go")+'(\''+k+'\')"><i class="ti '+m.ic+'"></i><span>'+esc(m.t)+'</span>'+
+   var _cho=(navCur(k)||(ORPHAN&&k===_navFrom))?navChoTxt(k):"";
+   h+='<div class="navitem'+(isArc?" chang":"")+(isSub2?" sub sub2":(isSub?" sub":""))+(navCur(k)?" on":(navAnc(k)?" anc":(ORPHAN&&k===_navFrom?" from":"")))+(_cho?" cocho":"")+(k===window.__NAVHIT?" hit":"")+'"'+((isArc&&m.arc)?' style="--acol:'+m.arc.col+'"':'')+
+    ' data-k="'+k+'" title="'+esc(m.t+(_cho?(" - "+_cho):""))+'" onclick="'+(HUBTAB[k]?"goHub":"go")+'(\''+k+'\')"><i class="ti '+m.ic+'"></i>'+
+    '<span class="navtx"><span class="navnm">'+esc(m.t)+'</span>'+
+     (_cho?('<span class="navcho"><i class="ti ti-corner-down-right"></i>'+esc(_cho)+'</span>'):'')+'</span>'+
     (n?'<span class="dot">'+(n>99?"99+":n)+'</span>':'')+'</div>'});
   h+='</div>'});
  /* ═══ V9.99z7 - THANH MENU KHÔNG ĐƯỢC NHẢY VỀ ĐẦU MỖI LẦN VẼ LẠI ═══════════════════════════
