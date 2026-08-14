@@ -1621,7 +1621,13 @@ table.dt tbody tr.clk.on td{font-weight:600}
    dải viền màu trang trí mà luật W5 cấm (W5 chặn border-left >=3px và mọi border-left-color). */
 .ctnut{display:flex;align-items:center;padding-left:10px;margin-left:2px;border-left:1px solid var(--line)}
 @media(max-width:900px){.ctnut{border-left:0;padding-left:0;margin-left:auto}}
-@media(max-width:900px){.locct2{margin-left:0;flex:1 1 100%;padding-left:0;margin-top:6px}}
+/* Khổ hẹp: cụm điều khiển vừa xuống hàng riêng vừa PHẢI cho các nút bên trong xuống dòng.
+   Thiếu vế thứ hai thì nó chiếm trọn một hàng mà vẫn dài 539px - đo ở 390px, `#content` thừa
+   176px, người dùng phải vuốt ngang. Chính em gây ra hôm nay lúc gộp cụm này vào hàng lọc.
+   *Cho một khối xuống hàng riêng không có nghĩa là nó vừa hàng - phải cho cả ruột nó xuống dòng.* */
+@media(max-width:900px){.locct2{margin-left:0;flex:1 1 100%;padding-left:0;margin-top:6px;flex-wrap:wrap}
+ .locct2 .ctnut{border-left:0;padding-left:0;margin-left:0;flex:1 1 100%}
+ .locct2 .ctnut .btn{width:100%;justify-content:center}}
 .locr.locct .tbcnt{margin-right:auto}
 .locr.locnote{background:var(--bg);font-size:11.5px;color:var(--muted);line-height:1.55;display:block}
 /* HÀNG GHI CHÚ LÀ MỘT CÂU VĂN, KHÔNG PHẢI MỘT HÀNG CHIP. `.locv` mặc định là flex - mỗi mẩu chữ
@@ -2906,7 +2912,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>593ebb</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>dc6eb3</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
