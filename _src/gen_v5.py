@@ -9390,7 +9390,22 @@ function naFor(sheet,r){
   if(isc(r.session_status,"completed")){
    var _st=bhState(r);
    if(_st.note)return "NA022";                              /* đã xong, đã ghi nhận xét */
-   return "NA021"}                                          /* đã xong, chưa ghi nhận xét */
+   /* ═══ 13/08 - TÁCH NA069 KHỎI NA021 (SOP phân biệt, app thì không) ══════════════════════
+      SOP: NA021 = "Quá hạn ghi nhận xét" (đã quá `slaTeacherNote_hours`); NA069 = "Còn hạn ghi
+      nhận xét" (chưa quá). App trước đây trả NA021 cho CẢ HAI, tức mọi buổi vừa dạy xong đã bị
+      gọi là QUÁ HẠN ngay từ phút đầu - thổi phồng con số quá hạn và làm mất hẳn tình huống
+      "còn kịp, nhắc nhẹ". NA069 nằm trong danh sách miễn trừ với lý do "nhãn HV đã tốt nghiệp"
+      - một lý do của số hiệu cũ, không liên quan gì tới buổi học. */
+   return _st.noteOver?"NA021":"NA069"}
+  /* ═══ 13/08 - NA068: QUÁ GIỜ VÀO LỚP MÀ BUỔI CHƯA BẮT ĐẦU ═══════════════════════════════
+     SOP: `session_status = scheduled` và quá `slaTeacherAttendance_minutes` phút kể từ giờ vào
+     lớp mà buổi chưa mở - "kiểm tra giáo viên và điểm danh ngay", phụ trách Học vụ / GV.
+     Đây là một việc GẤP có thật (lớp đang ngồi chờ), và nó bị miễn trừ bằng lý do "nhãn HV đang
+     học bình thường - không có việc gì". Nay làm thật. */
+  if(isc(r.session_status,"scheduled")){
+   var _bd=pvnd(r.class_start_scheduled||r.session_date);
+   if(_bd){var _tre=(Date.now()-_bd.getTime())/60000;
+    if(_tre>P("slaTeacherAttendance_minutes",30))return "NA068"}}
   /* SOP: NA019 = buổi sắp tới, giáo viên chuẩn bị giáo án. Trước đây app dùng nhầm mã này cho
      "đã dạy xong còn trong hạn ghi nhận xét" - sai nghĩa, và làm tình huống chuẩn bị giáo án
      biến mất khỏi mọi màn. */
@@ -9420,7 +9435,11 @@ function naFor(sheet,r){
    if(!String(r.wow_content_note||"").trim()){var hw2=hSince(r.wow_session_date);
     return (hw2!=null&&hw2>P("slaWowNote_hours",24))?"NA075":"NA076"}
    if(!String(r.wow_outcome||"").trim())return "NA034";
-   if(!/^(y|c|t|1)/i.test(String(r.quota_deducted||"")))return "NA074";
+   /* 13/08 - SOP doi DU HAI VE: chua tru quota VA da qua `slaWowQuotaCheck_hours` ke tu buoi.
+      App truoc day chi hoi ve dau, nen mot buoi vua xong da bi goi la "qua han tru quota". */
+   if(!/^(y|c|t|1)/i.test(String(r.quota_deducted||""))){
+    var _hq=hSince(r.wow_session_date);
+    if(_hq!=null&&_hq>P("slaWowQuotaCheck_hours",24))return "NA074"}
    return "NA034"}
   var sd=pvnd(r.wow_session_date);
   if(sd&&sd.getTime()<Date.now())return "NA032";
@@ -9450,7 +9469,15 @@ function naFor(sheet,r){
   if(isc(r.re_enrollment_status,"rejected"))return "NA084";
   if(isc(r.student_status,"dropped"))return "NA043";
   if(!num(r.final_test_score))return "NA082";
-  if(isc(r.re_enrollment_status,"interested"))return "NA083";
+  /* ═══ 13/08 - TÁCH NA045 KHỎI NA083. SOP: NA083 = "Quan tâm, chưa xếp khóa (QUÁ HẠN)" - phải
+     có ĐỦ BA vế: interested + chưa có đăng ký mới + đã quá `slaReenrollSchedule_days`. NA045 =
+     "Quan tâm học tiếp", tức mới quan tâm, còn trong hạn. App trước đây trả NA083 cho MỌI hồ sơ
+     interested - gọi tất cả là quá hạn ngay khi họ vừa nói "có quan tâm". */
+  if(isc(r.re_enrollment_status,"interested")){
+   var _cn=String(r.next_enrollment_id||"").trim();
+   var _hc=hSince(r.course_completion_time);
+   if(!_cn&&_hc!=null&&_hc>P("slaReenrollSchedule_days",14)*24)return "NA083";
+   return "NA045"}
   var he=hSince(r.course_completion_time);
   return (he!=null&&he>P("slaReenroll_days",3)*24)?"NA042":"NA045"}
  return ""}
@@ -14643,6 +14670,10 @@ var APPPARAMS=[
     NA046 ("lead đã giao mà quá N giờ chưa gọi"), nhưng CH2 của app không khai nên anh Luân
     không có chỗ nào chỉnh - một hằng số nghiệp vụ nằm ngoài tầm tay người dùng, đúng thứ
     LUẬT CỨNG cấm. `_check16` và `_checkux` cùng bắt được khi em mở cửa "giao lại lead". */
+ /* 13/08 - hai tham so SOP dat ma app chua co o sua; ca hai vua duoc noi vao naFor de lam
+    dung tinh huong SOP mo ta (NA074 tru quota WOW, NA083/NA045 xep khoa tai ghi danh). */
+ ["P7 · Buổi WOW 1-1","slaWowQuotaCheck_hours","Sau buổi WOW bao lâu phải kiểm và trừ lượt (quota) - quá thì nhắc","giờ",24],
+ ["P10 · Kết thúc khóa & tái đăng ký","slaReenrollSchedule_days","HV nói quan tâm học tiếp rồi, bao lâu phải chốt được lịch khóa mới","ngày",14],
  ["P1 · Lead & chăm khách","slaLeadReassign_hours","Lead đã giao cho NV mà quá bao nhiêu giờ chưa gọi thì nhắc gọi gấp hoặc giao lại người khác","giờ",4],
  ["P2 · Test đầu vào & tư vấn","slaTestBookedRemind_hours","Sau khi đặt lịch test, quá bao lâu chưa ghi nhận dự test thì nhắc","giờ",24],
  ["P3 · Đăng ký & chiết khấu","thresholdDiscount_approval","Chiết khấu từ mức này trở lên phải trình quản lý duyệt","VND",1000000],

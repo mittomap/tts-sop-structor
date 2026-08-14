@@ -2756,6 +2756,112 @@ if not _dh:
             "next_action": ""})
 log.append("14i. Lich su doi lich (DL11b): %d lan doi" % len(_dh))
 
+# ═══ 14j. GIEO 5 TINH HUONG SOP MA APP CO LAM NHUNG DEMO CHUA CHAM TOI (13/08) ═════════════
+# `check_sop` mat 2 do bang cach CHAY THAT naFor() tren moi dong du lieu roi xem ma nao hien ra.
+# Nghia la mot tinh huong DA DUOC LAM DUNG trong ma van bi bao "app khong sinh ra" chi vi DEMO
+# KHONG CO DONG NAO ROI VAO TRANG THAI DO. Nam ma duoi day dung kieu ay - va cung la nam ma vua
+# duoc go khoi danh sach mien tru (ly do mien deu da cu, noi ve mot tinh huong khac han).
+# Gieo dung MOT dong cho moi tinh huong: du de bo kiem thay, va du de anh Luan bam vao xem that.
+_n14j = []
+_bo68 = None
+
+# Doi gio mot buoi la co the DUNG giao vien / DUNG phong voi buoi khac - `check_logic` 13n/13p
+# bat ngay. (Da can: lan dau em doi bua mot buoi sang NOW-45p, trung dung khung gio cua buoi
+# "dang dien ra" ma `gen_demo` gieo theo dong ho.) Nen phai TIM mot buoi khong dung ai.
+_moc68 = NOW - datetime.timedelta(minutes=45)
+_key68 = _moc68.strftime("%d/%m/%Y %H:%M")
+
+
+def _ban68(ss, gv, ph):
+    """gio nay giao vien ay hoac phong ay da co buoi khac chua"""
+    for _o in R("DL11"):
+        if _o is ss:
+            continue
+        if str(_o.get("session_date") or "")[:16] != _key68:
+            continue
+        if gv and str(_o.get("teacher_id") or "") == gv:
+            return True
+        if ph and str(_o.get("room") or "") == ph:
+            return True
+    return False
+
+
+for _c68 in [x for x in R("DL11") if code(x.get("session_status")) == "scheduled"]:
+    if _ban68(_c68, str(_c68.get("teacher_id") or ""), str(_c68.get("room") or "")):
+        continue
+    _bo68 = _c68                # NA068 - qua gio vao lop 45 phut ma buoi chua bat dau (nguong 30)
+    _bo68["session_date"] = fmt(_moc68)
+    _bo68["class_start_scheduled"] = _bo68["session_date"]
+    _n14j.append("NA068")
+    break
+
+_ss69 = [x for x in R("DL11") if code(x.get("session_status")) == "completed"
+         and not str(x.get("teacher_note_summary") or "").strip() and x is not _bo68]
+if _ss69:                      # NA069 - vua day xong 2 gio, chua ghi nhan xet, CON TRONG HAN
+    # DOI MOT BUOI LA CA MOT CHUOI (bai hoc sang nay o so doi lich): giờ check-in cua diem danh
+    # neo vao NGAY cua buoi, doi buoi ma bo lai diem danh thi `check_logic` 4c do ngay.
+    _m69 = NOW - datetime.timedelta(hours=2)
+    _s69 = _ss69[0]
+    _s69["session_date"] = fmt(_m69)
+    _sid69 = str(_s69.get("session_id") or "")
+    for _at in R("DL12"):
+        if str(_at.get("session_id") or "") != _sid69:
+            continue
+        _ci = str(_at.get("check_in_time") or "").strip()
+        if not _ci:
+            continue
+        _gio = _ci[-5:] if len(_ci) >= 5 and ":" in _ci[-5:] else "00:00"
+        _at["check_in_time"] = _m69.strftime("%d/%m/%Y") + " " + _gio
+    _n14j.append("NA069")
+
+_ce45 = [x for x in R("DL18") if code(x.get("re_enrollment_status")) == "interested"]
+if _ce45:                      # NA045 - quan tam hoc tiep, CON TRONG HAN xep khoa (nguong 14 ngay)
+    _ce45[0]["course_completion_time"] = fmt(NOW - datetime.timedelta(days=3))
+    _ce45[0]["next_enrollment_id"] = ""
+    _n14j.append("NA045")
+# NA083 can mot dong THU HAI cung trang thai "quan tam" nhung DA QUA HAN xep khoa. Demo chi co
+# dung MOT dong interested (da dung cho NA045), nen doi them mot ho so da xong khoa sang trang
+# thai ay - dung nguoi khac, khong dam len dong cua NA045.
+_ce83 = [x for x in R("DL18")
+         if x is not (_ce45[0] if _ce45 else None)
+         and "completed" in code(x.get("student_status"))
+         and str(x.get("final_test_score") or "").strip()
+         and not str(x.get("next_enrollment_id") or "").strip()]
+if _ce83:
+    _ce83[0]["re_enrollment_status"] = "interested (Quan tâm học tiếp)"
+    _ce83[0]["course_completion_time"] = fmt(NOW - datetime.timedelta(days=30))
+    _n14j.append("NA083")
+
+_w74 = [x for x in R("DL14") if code(x.get("wow_status")) == "completed"
+        and str(x.get("wow_content_note") or "").strip() and str(x.get("wow_outcome") or "").strip()]
+if _w74:                       # NA074 - WOW xong 30 gio ma chua tru quota (nguong 24)
+    _w74[0]["quota_deducted"] = ""
+    _w74[0]["wow_session_date"] = fmt(NOW - datetime.timedelta(hours=30))
+    _n14j.append("NA074")
+
+# naFor(DL17) hoi theo THU TU: da xong -> da leo thang -> chua co nguoi xu ly -> roi moi toi
+# muc do. Nen dong gieo phai vuot qua ca ba cua truoc, khong thi no dung o NA041/NA040/NA081.
+_k80 = [x for x in R("DL17")
+        if not str(x.get("resolution_time") or "").strip()
+        and "resolved" not in code(x.get("complaint_status"))
+        and not str(x.get("escalated_to") or "").strip()
+        and str(x.get("assigned_handler") or "").strip()]
+if not _k80:
+    _k80 = [x for x in R("DL17") if not str(x.get("resolution_time") or "").strip()][:1]
+    if _k80 and R("DL01"):
+        _k80[0]["escalated_to"] = ""
+        _k80[0]["complaint_status"] = "in_progress (Đang xử lý)"
+        _k80[0]["assigned_handler"] = R("DL01")[0].get("staff_id", "")
+if _k80:                       # NA080 - khieu nai muc THAP qua han
+    # NGUONG THAT LA 7 NGAY (SOP NA080: "qua 7 ngay, cau hinh slaKN_low_hours"), khong phai 72
+    # gio nhu gia tri du phong trong ma. Gieo 100 gio thi chua qua nguong -> ma van khong hien.
+    # *Gieo mot tinh huong qua han thi phai doc NGUONG THAT, dung lay so du phong trong code.*
+    _k80[0]["complaint_severity"] = "low (Thấp)"
+    _k80[0]["complaint_time"] = fmt(NOW - datetime.timedelta(days=10))
+    _n14j.append("NA080")
+
+log.append("14j. Gieo tinh huong SOP chua cham toi: %s" % (", ".join(_n14j) or "khong"))
+
 # ═══ 14h. NA067 - HỌC VIÊN IM LẶNG QUÁ LÂU, GIEO THẲNG ═══════════════════════════════════
 # `check_sop` báo SOP mô tả NA067 mà app không sinh ra. Đào ra: `last_learning_activity_time`
 # lấy từ mốc hoạt động THẬT (điểm danh / bài tập / WOW), nên chỉ cần dữ liệu dày lên một chút

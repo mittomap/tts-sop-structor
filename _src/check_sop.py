@@ -237,15 +237,15 @@ print("KET QUA COT: DAT - moi cot SOP mo ta deu duoc app dung, hoac da khai ly d
 # Khong soi ma nguon - soi ma nguon chi biet "co viet" chu khong biet "co chay".
 
 TRIG_BOQUA = {
-    # NA037 da bo khoi danh sach nay 31/07: sau khi gieo lai du lieu demo (WOW trai deu 18
-    # ngay), app CO sinh ra tinh huong nay that - giu trong danh sach bo qua la khai gian.
-    "NA045": "Nhan 'khieu nai da dong' - trang thai XONG, con viec hoi lai HV thi da co luat rieng "
-             "(slaComplaintFollowup_days).",
-    "NA059": "Nhan 'da hoan tien xong' - trang thai XONG.",
-    "NA068": "Nhan 'HV dang hoc binh thuong' - khong co viec gi.",
-    "NA069": "Nhan 'HV da tot nghiep' - trang thai XONG.",
-    "NA074": "Nhan 'da gui khao sat' - app dung NA073 (cho tra loi) va NA075 (qua han chua tra loi).",
-    "NA080": "Nhan 'phan hoi tich cuc, da ghi nhan' - khong co viec gi.",
+    # ═══ 13/08 - VIET LAI TRON BO. Nam ban khai o day da CU: chung noi ve mot tinh huong khac
+    # han cai ma SOP hien nay dat cho ma do (so hieu NA xe dich khi file SOP duoc sua). Bo kiem
+    # xanh suot vi no chi hoi "ma nay co trong danh sach khong", khong hoi "ly do con dung khong".
+    # Nay moi ly do deu doi chieu duoc voi cot "Tinh huong" cua HD3 - va bon ma da duoc LAM THAT
+    # thay vi mien tru: NA045 (Quan tam hoc tiep), NA068 (Qua gio vao lop chua bat dau),
+    # NA069 (Con han ghi nhan xet), NA080 (Uu tien thap qua han - von da lam dung tu truoc).
+    "NA059": ("Dang ky da huy - SOP KHAI TRUNG mot tinh huong o HAI SHEET: CH4 dat ma NA008, HD3 "
+              "dat ma NA059, cung mot cau 'Dang ky da huy. Viec can lam: kiem tra va xu ly hoan "
+              "tien'. App lam NA008 (ban CH4). Khong phai thieu - la mot ma trung."),
 }
 
 # ── TINH HUONG CHI SONG TRONG MOT CUA SO NGAN ────────────────────────────────
@@ -972,7 +972,27 @@ print("  KET QUA MAT 7: DAT - moi tinh huong SOP giao cho ai, app deu biet.")
 # Do tay luc phat hien: CH2 thieu 25/61 tham so, CH1 thieu 1/57 nhom enum, CH4 thieu 2/94 ma.
 # Mat nay bien phep do tay ay thanh mot cai thuoc chay moi lan.
 CH_BOQUA = {
-    # khai o day nhung muc SOP co ma app CO Y khong lam, KEM LY DO doc duoc.
+    # ═══ Khai o day nhung muc SOP co ma app CO Y khong lam, KEM LY DO doc duoc. ═══
+    # 11 dong "kpiThreshold_*" cua CH2 la BAN TRUNG cua CH6: SOP dat nguong KPI o CA HAI SHEET,
+    # CH2 duoi dang tham so va CH6 duoi dang bang nguong. App di theo CH6 (`kpiTh`) vi do la noi
+    # SOP ghi day du huong dat, phase va cach doc. Lam ca hai la de HAI cho sua cho MOT con so -
+    # dung thu du an cam tu dau ("mot su that, mot cho").
+    "CH2:kpiThreshold_VLR": "trung CH6 (VLR) - app dung CH6 qua kpiTh()",
+    "CH2:kpiThreshold_TAR": "trung CH6 (TAR) - app dung CH6 qua kpiTh()",
+    "CH2:kpiThreshold_CVR": "trung CH6 (CVR) - app dung CH6 qua kpiTh()",
+    "CH2:kpiThreshold_PCR": "trung CH6 (PCR) - app dung CH6 qua kpiTh()",
+    "CH2:kpiThreshold_ATR": "trung CH6 (ATR) - app dung CH6 qua kpiTh()",
+    "CH2:kpiThreshold_UAR": "trung CH6 (UAR) - app dung CH6 qua kpiTh()",
+    "CH2:kpiThreshold_ARR": "trung CH6 (ARR) - app dung CH6 qua kpiTh()",
+    "CH2:kpiThreshold_CIR": "trung CH6 (CIR) - app dung CH6 qua kpiTh()",
+    "CH2:kpiThreshold_RR":  "trung CH6 (RR) - app dung CH6 qua kpiTh()",
+    "CH2:kpiThreshold_RER": "trung CH6 (RER) - app dung CH6 qua kpiTh()",
+    # Hai muc app CO nhung dat ten khac - cung mot khai niem, khong phai thieu:
+    "CH2:thresholdPlacementChange_count":
+        "app dat ten `placementChange_free_times` (so lan doi lop truoc khi phai trinh quan ly)",
+    "CH2:wowQuota_default_sessions":
+        "app luu quota theo TUNG HOC VIEN o cot DL09.wow_quota_default (goi khac nhau thi quota "
+        "khac nhau), khong dung mot con so chung cho ca trung tam",
 }
 print()
 print("=" * 78)
