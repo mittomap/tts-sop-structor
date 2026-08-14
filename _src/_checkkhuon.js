@@ -192,7 +192,13 @@ NV.forEach(k => {
      trang đáp, không phải trang danh sách. Câu hỏi không đổi: TRANG NÀY CÓ NÓI NÓ LÀ CÁI GÌ
      KHÔNG. Hỏi cả hai chỗ thì trang nào cũng phải trả lời, không trang nào lách được bằng cách
      dựng đầu trang kiểu riêng. */
-  const mHead = h.match(/class="phead[^"]*"[\s\S]{0,80}?class="s"[^>]*>([\s\S]{0,1200}?)<\/div>/)
+  /* Cua so 80 ky tu giua `class="phead"` va `class="s"` la mot con so chon bua, va no vua cham
+     oan `banglop`: tieu de trang ay co mot HUY HIEU LOP (`lopThe`) cong ten lop, rieng chung da
+     hon 80 ky tu - cau ngu canh nam ngay duoi tieu de nhung thuoc do khong voi toi.
+     Luat can canh MUC TIEU ("trang co noi no la cai gi khong"), khong canh CACH LAM ("cau do
+     phai nam trong 80 byte dau"). Noi rong cua so len 400 - van du gan de khong bat nham cau
+     cua mot khoi phead khac. */
+  const mHead = h.match(/class="phead[^"]*"[\s\S]{0,400}?class="s"[^>]*>([\s\S]{0,1200}?)<\/div>/)
              || h.match(/class="bwctx"[^>]*>([\s\S]{0,1200}?)<\/div>/);
   const cau = mHead ? chu(mHead[1]) : "";
   if (!cau) thieu.cau.push(k + " (khong co cau ngu canh)");

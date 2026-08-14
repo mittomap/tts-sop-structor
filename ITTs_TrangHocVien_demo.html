@@ -522,7 +522,7 @@ tr.cfhl>td{background:#FFF6D8}
    dung: nền trắng như thanh trên để thành một khối liền với vỏ app, thêm một vạch màu mảnh bên
    trái làm dấu, chữ và icon lấy màu hổ phách trầm. Không dùng nền vàng đặc - đây là trạng thái,
    không phải cảnh báo (cùng lý do đã bỏ nền vàng ở V9.63). */
-.cfbar.demo{background:#FFF7E6;color:#7A5B12;box-shadow:none}
+.cfbar.demo{background:transparent;color:#7A5B12;box-shadow:none;padding:0}
 .cfbar.demo i{color:var(--amber)}
 .cfbar i{font-size:15px;flex:none}
 .cfbar span{flex:0 0 auto;min-width:0}
@@ -3684,7 +3684,11 @@ var ROLESCOPE={
   /* V2 10/08 - thêm `lichwow`: HỌC VỤ CHÍNH LÀ NGƯỜI BẤM "Thêm buổi WOW". Từ bản này cửa ấy chỉ
      nhận ca đã đăng ký, nên không cho họ xem lịch trực là bắt họ chọn trong bóng tối: mở form ra
      thấy "chưa có ca trực nào còn trống" mà không biết hỏi ai, ngày nào trống. */
-  pages:["viec","hocvien","giangvien","hosogv","xeplop","banglop","hoctap","hosokhoa","giaoan","cskh","ychv","ketthuc","ketqua","khac","duyet","lichwow","gvdp","tinnhan"],
+  /* V2 14/08 - thêm `socamket`: HỌC VỤ CHÍNH LÀ NGƯỜI GHI NHẬN chữ ký cam kết ký tại trung tâm
+     (`obConfirmRun` là cửa ghi của họ, và cửa ấy bắt buộc đính ảnh bản giấy). Ghi vào một cuốn
+     sổ mà không được mở chính cuốn sổ ấy ra tra là vô lý; `_checktour` bắt được ngay khi em thêm
+     một bước hướng dẫn trỏ vào sổ này cho Học vụ. */
+  pages:["viec","hocvien","giangvien","hosogv","xeplop","banglop","hoctap","hosokhoa","giaoan","cskh","ychv","ketthuc","ketqua","khac","duyet","lichwow","gvdp","tinnhan","socamket"],
   tabs:{khac:["baoluu"],duyet:["duyetnghi"]},
   blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:1,kpi:1,bell:["Học vụ","CSKH","Giao việc"]},
  /* V9.99z5 - GIÁO VIÊN không xếp người dạy thay và không gỡ đụng phòng: hai màn ấy là cửa
@@ -6109,7 +6113,18 @@ function openLopQuick(cid){var c=find("DL10","class_id",cid);if(!c){toast("Khôn
  var cap=num(c.class_capacity),si=num(c.current_enrollment)||enr.length,full=cap&&si>=cap;
  var stt=ecode(c.class_status);
  var h='<div style="margin-bottom:10px"><span class="chip '+(stt==="in_progress"?"green":stt==="open"?"blue":stt==="finished"?"gray":"amber")+'">'+esc(elabel(c.class_status)||"-")+'</span></div>';
- h+=ctxRows([["Khóa",c.course_id_name],["Trình độ",esc(elabel(c.class_level)||c.class_level||"-")],["GV chính",c.main_teacher_id_name],["Sĩ số",si+"/"+(cap||"?")+(full?" · đầy":"")],["Lịch",c.class_schedule],["Khai giảng",c.class_start_date],["Tiến độ buổi",totalSess?(taught+"/"+totalSess+" buổi"):"-"]]);
+ /* V2 14/08 (anh Luân: *"thêm 1 dòng thông tin: buổi học sắp tới (hiển thị buổi - ngày)"*).
+    "Tiến độ buổi" nói lớp đã đi được bao xa, nhưng câu người ta hỏi khi mở nhanh một lớp thường
+    là câu kế: *bao giờ lớp này học tiếp*. Lấy buổi CHƯA DẠY gần nhất còn ở phía trước, bỏ buổi
+    đã huỷ - buổi huỷ vẫn nằm trong DL11 và nếu không lọc thì nó chiếm mất chỗ "sắp tới". */
+ var _buoiToi=(function(){var now=(new Date()).getTime(),best=null,bt=0;
+  sess.forEach(function(x){var t=pvnd(x.session_date);
+   if(!t||t<now)return;
+   if(isc(x.session_status,"cancelled")||isc(x.session_status,"completed"))return;
+   if(!best||t<bt){best=x;bt=t}});
+  if(!best)return "-";
+  return "Buổi "+esc(String(best.session_number||"?"))+" · "+esc(String(best.session_date||"").slice(0,16))})();
+ h+=ctxRows([["Khóa",c.course_id_name],["Trình độ",esc(elabel(c.class_level)||c.class_level||"-")],["GV chính",c.main_teacher_id_name],["Sĩ số",si+"/"+(cap||"?")+(full?" · đầy":"")],["Lịch",c.class_schedule],["Khai giảng",c.class_start_date],["Tiến độ buổi",totalSess?(taught+"/"+totalSess+" buổi"):"-"],["Buổi học sắp tới",_buoiToi]]);
  var al=[];
  if(risk.length)al.push('<i class="ti ti-alert-triangle" style="color:var(--red)"></i> '+risk.length+' HV nguy cơ');
  if(noNote)al.push('<i class="ti ti-notes" style="color:var(--amber)"></i> '+noNote+' buổi chưa nhận xét');
@@ -7842,9 +7857,14 @@ function cfBarSync(){var b=document.getElementById("cfBar");if(!b)return;
   return}
  /* Đã mở quyền ghi thì vẫn phải nói rõ đây là BẢN DEMO: thao tác chạy thật nhưng dữ liệu là dữ
     liệu mẫu và chỉ nằm trên máy này. Người xem demo hay tưởng mình đang đụng vào số thật. */
+ /* V2 14/08 (anh Luân: *"để 1 nút dựng lại demo là đủ em"*): bỏ nhãn "Dữ liệu demo". Nhãn ấy
+    nói một trạng thái KHÔNG BAO GIỜ ĐỔI trong suốt bản demo - đọc lần đầu là biết, những lần sau
+    nó chỉ còn chiếm chỗ cạnh tên trang. Câu giải thích không mất, nó chuyển vào chú thích của
+    chính cái nút. Giữ nguyên nút Dựng lại demo: trước khi giao anh Luân bấm đúng nút này.
+    (Trạng thái "Chế độ xem thử" bên trên VẪN giữ nhãn - nó cảnh báo rằng chỉnh gì cũng không
+    lưu được, đó là thứ người ta cần đọc chứ không suy ra được từ tên nút.) */
  b.className="cfbar on demo";
- b.innerHTML='<i class="ti ti-info-circle"></i><span data-tip="Mọi thao tác chạy thật nhưng chỉ lưu trên máy này, không ảnh hưởng số liệu thật."><b>Dữ liệu demo</b></span>'+
-  '<button class="btn sm" onclick="demoResetHoi()"><i class="ti ti-refresh"></i>Dựng lại demo</button>'}
+ b.innerHTML='<button class="btn sm" onclick="demoResetHoi()" data-tip="Đây là bản demo: mọi thao tác chạy thật nhưng chỉ lưu trên máy này, không ảnh hưởng số liệu thật. Bấm để dựng lại bộ dữ liệu mẫu."><i class="ti ti-refresh"></i>Dựng lại demo</button>'}
 function cfGhiDuoc(){return cfMode()==="that"}
 /* Hộp hỏi mật khẩu dùng chung. `xong` là TÊN hàm (chuỗi) - đi qua cfnGet như confirmRun, để
    không phải nhét hàm vào thuộc tính onclick. */
@@ -12653,8 +12673,20 @@ function renderBanglop(){
     Khai Ở ĐẦU HÀM: cả ô đếm lẫn viên buổi đều đọc nó, mà ô đếm chạy trước - khai ở giữa
     thì `var` được kéo lên nhưng GIÁ TRỊ thì chưa, và ô đếm đọc phải undefined. */
  var coDD={};srows("DL12").forEach(function(a){coDD[a.session_id]=1});
- var h='<div class="phead" data-tour="phead"><div><div class="t">Vận hành lớp · '+lopThe(lop)+esc(lop.class_name||cid)+'</div><div class="s">Buổi học · điểm danh · nhận xét · giao & chấm bài tập - tất cả cho lớp này ở một chỗ</div></div>'+
- '<div class="sp"><select class="sel" onchange="window.BLCLASS=this.value;window.DDSESS=null;window.BTSESS=null;reRender(CUR)">';
+ /* V2 14/08 - `banglop` LÊN MENU nên phải theo khuôn trang nghiệp vụ, và khuôn đòi một NÚT
+    HÀNH ĐỘNG ở đầu trang (`_checkkhuon` K2). Trước đó đầu trang chỉ có ô chọn lớp - một cái
+    điều khiển, không phải một việc. Việc chính của màn này là điểm danh, nên nút dẫn thẳng
+    sang đó và MANG THEO lớp đang mở.
+    Chỉ vẽ nút khi người đang ngồi thật sự vào được trang Điểm danh - mời người ta tới chỗ họ
+    bị chặn thì tệ hơn là không mời (67 chỗ "mời rồi đuổi" 05/08 đã dạy đúng bài đó).
+    Dựng NÚT RA MỘT BIẾN RỒI MỚI NỐI, đừng chèn một khối lệnh vào giữa biểu thức nối chuỗi:
+    lượt đầu em nhét thẳng một hàm tự gọi vào sau dấu `+` của `var h=...`, thành ra `h` bị gán
+    đè bằng giá trị trả về (undefined) và cái nút biến mất không một tiếng động - `_checkkhuon`
+    vẫn báo đỏ đúng chỗ cũ nên em tưởng bản vá chưa ăn. */
+ var _nutDD="";
+ try{if(navVis("diemdanh"))_nutDD='<div class="sp"><button class="btn primary" onclick="window.DDCLASS=window.BLCLASS;go(\'diemdanh\')"><i class="ti ti-user-check"></i>Điểm danh lớp này</button></div>'}catch(e){_nutDD=""}
+ var h='<div class="phead" data-tour="phead"><div><div class="t">Vận hành lớp · '+lopThe(lop)+esc(lop.class_name||cid)+'</div><div class="s">Buổi học · điểm danh · nhận xét · giao & chấm bài tập - tất cả cho lớp này ở một chỗ</div></div>'+_nutDD;
+ h+='<div class="sp"><select class="sel" onchange="window.BLCLASS=this.value;window.DDSESS=null;window.BTSESS=null;reRender(CUR)">';
  /* Ô chọn phải nói lớp nào ĐÃ KẾT THÚC. Trước bản này nó liệt kê hết mọi lớp như nhau, nên bảo
     người ta "mở một lớp đã kết thúc ra xem kết quả đầu ra" là bảo họ đoán. */
  cls.forEach(function(c){var _xong=isc(c.class_status,"finished");
@@ -16105,14 +16137,21 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
     '<td>'+esc(e.course_id_name||e.course_id||"-")+'</td><td>'+esc(String(lastPay).slice(0,10)||"-")+'</td>'+
     '<td><button class="btn primary sm" onclick="xepFor(\''+esc(e.student_id)+'\')"><i class="ti ti-layout-grid-add"></i>Xếp vào lớp</button></td></tr>'});
   _bangCho+='</tbody></table></div></div>';
-  if(fil==="all")h+='<div class="sechd">Đang onboarding</div>';
  }
  if(fil==="chuaxep"){   /* chip nay hoi ve DL06 (don da dong du), khong hoi ve DL08 */
   h+=xlLoc(fil,obs,wait,'<span class="tbcnt">'+wait.length+' hồ sơ</span>');
   h+=_bangCho;
   if(!wait.length)h+='<div class="empty">Không còn ai đóng đủ tiền mà chưa xếp lớp.</div>';
   return h}
- if(fil==="all")h+=_bangCho+(wait.length?'<div class="sechd">Đang onboarding</div>':"");
+ /* ═══ V2 14/08 - NHÁNH "TẤT CẢ" THÔI CHÉP LẠI BẢNG CHỜ XẾP LỚP ════════════════════════════
+    Anh Luân: *"chắc bỏ luôn cái này em, đã có chip bên dưới rồi"*. Đúng: chip "Chờ xếp lớp"
+    ngay dưới đã mang đúng con số ấy và bấm vào là ra đúng bảng ấy - dựng thêm một bản chép ở
+    đầu nhánh "tất cả" là nói hai lần một chuyện, mà lần nào cũng chiếm chỗ của nội dung chính.
+    Không mất gì: bảng vẫn còn nguyên ở nhánh `chuaxep`, số vẫn còn trên chip.
+    Và nó kéo theo một lỗi thật anh Luân chụp được: nhãn "Đang onboarding" in HAI LẦN trên nhánh
+    này - một cái nằm ngay TRÊN bảng chờ (sai chỗ, vì bảng ấy không phải onboarding), một cái
+    nằm dưới. Gỡ bảng thì gỡ luôn cái nhãn lạc chỗ. */
+ if(fil==="all")h+='<div class="sechd">Đang onboarding</div>';
  /* V9.28: trang này tự dựng thanh công cụ và KHÔNG có biến p (nó dùng window.XLFILT),
     nên phải ghi thẳng mã trang - viết p ở đây là tham chiếu biến không tồn tại, lọc câm luôn. */
  view=fltApply("xeplop",view);
@@ -22719,11 +22758,16 @@ var TOURS={
  /* V2 08/08 - thêm bước KHIẾU NẠI, và sửa số bước cho đúng: dòng cũ ghi "8 bước" trong khi bài
     có 10 - chữ nói một đằng, bài chạy một nẻo. Trang Khiếu nại vừa hết `hide` nên `_checktour`
     mới soi tới và báo không bài nào đi qua nó; mà xử lý khiếu nại đúng là việc của Học vụ/CSKH. */
- tn_hocvu:{lv:"trainghiem",role:"Học vụ - CSKH",t:"Một ngày của Học vụ",ic:"ti-school",d:"11 bước - xếp lớp, theo lớp, chăm học viên",steps:[
+ tn_hocvu:{lv:"trainghiem",role:"Học vụ - CSKH",t:"Một ngày của Học vụ",ic:"ti-school",d:"12 bước - xếp lớp, cam kết, theo lớp, chăm học viên",steps:[
   /* V9.63: kênh học viên gửi yêu cầu là việc của học vụ, mà bài này chưa nói tới - anh Luân nhắc
      đúng luật đã chốt: mỗi lần đổi app phải soát lại tour và Trợ lý. */
   {p:"ychv",sel:'@man',t:"Học viên nhắn gì cho trung tâm",d:"Học viên gửi yêu cầu từ Cổng học viên - xin nghỉ, xin học bù, hỏi lịch, báo đã chuyển khoản. Hệ thống tự chuyển tới bạn kèm hạn nhận việc; yêu cầu về tiền thì sang kế toán.",hint:"Bấm Nhận việc ở một thẻ rồi trả lời ngay trong thẻ đó."},
-  {p:"xeplop",sel:'@txt:Xếp vào lớp',t:"Xếp lớp cho học viên mới",d:"Học viên đóng tiền xong về đây. Chọn lớp phù hợp trình độ và lịch học, gửi thông tin lớp, chờ học viên xác nhận rồi hoàn tất nhập học.",hint:"Bấm Xếp lớp trên một học viên đang chờ, chọn lớp rồi Lưu.",chk:function(){return tourMore("ob")}},
+  /* `ctx` đặt chip "Chờ xếp lớp" TRƯỚC khi khoanh. Bắt buộc từ 14/08: bảng chờ xếp lớp không
+     còn được chép lại ở nhánh "tất cả" (anh Luân: *"đã có chip bên dưới rồi"*), nên chữ "Xếp
+     vào lớp" chỉ có ở đúng chip ấy. `_checktour` bắt được ngay lượt chạy đầu sau khi gỡ -
+     đúng vai của nó: *bước chạy được không có nghĩa là chỗ nó trỏ vẫn còn.* */
+  {p:"xeplop",ctx:function(){window.XLFILT="chuaxep"},sel:'@txt:Xếp vào lớp',t:"Xếp lớp cho học viên mới",d:"Học viên đóng tiền xong về đây. Chọn lớp phù hợp trình độ và lịch học, gửi thông tin lớp, chờ học viên xác nhận rồi hoàn tất nhập học.",hint:"Bấm Xếp lớp trên một học viên đang chờ, chọn lớp rồi Lưu.",chk:function(){return tourMore("ob")}},
+  {p:"socamket",sel:'@man',t:"Ai đã ký quy định lớp và cam kết",d:"Học viên phải xác nhận quy định lớp học và cam kết trước khi vào lớp. Sổ này ghi ai ký, ký bản nào, ký ở cổng hay ký giấy tại trung tâm. Ký tại trung tâm thì bắt buộc đính ảnh bản đã ký.",hint:"Bấm chip 'Đang giữ bản cũ' để tìm người cần mời ký lại bản mới."},
   /* V2 - LỜI HƯỚNG DẪN PHẢI ĐỔI THEO ĐƯỜNG ĐI. Hai bước này viết cho bản có hub: bước đầu kể tên
      ba TAB ("Tab Hôm nay... tab Lớp học... tab Lịch tuần") mà V2 không còn tab nào - chúng là ba
      TRANG riêng trên sidebar; bước sau neo vào chữ "Vận hành" của mục menu cũ, mà mục ấy đã rời
@@ -26189,18 +26233,39 @@ function renderSoCamKet(){
  var cu=ds.filter(function(o){return String(o.commit_version||"")!==ban});
  var tt=srows("DL08").filter(function(o){return isc(o.class_confirmation_status,"confirmed")});
  var chua=srows("DL08").filter(function(o){return !isc(o.class_confirmation_status,"confirmed")&&!isc(o.class_confirmation_status,"rejected")});
- var h=pageHead("Sổ cam kết đã ký","Ai đã ký quy định lớp học và cam kết, ký bản nào, ký bằng đường nào - và ai còn đang ký ở bản cũ");
+ /* `_checkkhuon` K2 đòi mỗi trang nghiệp vụ có một nút hành động ở đầu trang. Nút ở đây CỐ Ý
+    là cửa ĐỌC, không phải cửa ghi: xem nguyên văn bản đang phát hành, để đối chiếu với bản mà
+    từng người đã ký. Muốn sửa nội dung thì vào Cài đặt - đó mới là chỗ của nó. */
+ var h=pageHead("Sổ cam kết đã ký","Ai đã ký quy định lớp học và cam kết, ký bản nào, ký bằng đường nào - và ai còn đang ký ở bản cũ",
+  '<button class="btn primary" onclick="ckXemBanHienHanh()"><i class="ti ti-file-text"></i>Xem bản đang phát hành</button>');
  h+=statStrip([
   (function(){var tl=tt.length?Math.round((tt.length-cu.length)*100/tt.length):null;
    return ["ti-file-check",(tl==null?"-":tl+"%"),"Đã ký bản hiện hành",(tl==null?"#6B7887":(tl>=100?"#2E9E6B":"#E08A1E")),
     (tt.length-cu.length)+"/"+tt.length+" hồ sơ · bản "+ban]})(),
   ["ti-history",cu.length,"Đang giữ chữ ký ở bản cũ",(cu.length?"#E08A1E":"#2E9E6B"),cu.length?"cân nhắc mời ký lại":"không còn ai"],
   ["ti-clock",chua.length,"Chưa ký",(chua.length?"#E24B4A":"#2E9E6B"),"đang chờ học viên ký ở cổng"]],"socamket",["ck_ban","ck_cu","ck_chua"]);
- h+='<div class="panel"><div class="ph"><b>Danh sách đã ký ('+ds.length+')</b><span class="mut" style="margin-left:auto;font-size:11px">bấm tên để mở hồ sơ đầy đủ</span></div><div class="pbody">';
- if(!ds.length)h+='<div class="empty">Chưa có hồ sơ nào ký cam kết.</div>';
+ /* `_checkkhuon` K4 đòi trang nghiệp vụ có dải chip lọc. Ba chip dưới đây KHÔNG phải chip cho
+    có: chúng trả lời đúng ba câu người ta hỏi cuốn sổ này - *ai đang giữ chữ ký ở bản cũ* (mời
+    ký lại), *ai ký tại trung tâm* (phải có ảnh bản giấy), *ai ký tại trung tâm mà thiếu ảnh*
+    (chỗ hở trong hồ sơ). Đăng ký ở `CTXTRANG` nên F5 giữ nguyên chip, đúng nhịp đã đặt hôm nay. */
+ var ckf=String(window.CKF||"");
+ function _tt(o){return /trung tâm/i.test(String(o.commit_kenh||""))}
+ var _fn={cu:function(o){return String(o.commit_version||"")!==ban},
+          tt:_tt,
+          hoanh:function(o){return _tt(o)&&!String(o.commit_anh||"").trim()}};
+ var view=(_fn[ckf]?ds.filter(_fn[ckf]):ds);
+ h+=locKhoi([locR("Lọc",segHTML(ckf,[
+   ["","Tất cả",ds.length,""],
+   ["cu","Đang giữ bản cũ",ds.filter(_fn.cu).length,"amber"],
+   ["tt","Ký tại trung tâm",ds.filter(_fn.tt).length,""],
+   ["hoanh","Ký tại trung tâm mà thiếu ảnh",ds.filter(_fn.hoanh).length,"red"]],
+   "window.CKF='{k}';reRender(CUR)"),1)],
+  '<span class="tbcnt">'+view.length+' hồ sơ'+(ckf?" (đã lọc)":"")+'</span>',"cktbar");
+ h+='<div class="panel"><div class="ph"><b>Danh sách đã ký ('+view.length+')</b><span class="mut" style="margin-left:auto;font-size:11px">bấm tên để mở hồ sơ đầy đủ</span></div><div class="pbody">';
+ if(!view.length)h+='<div class="empty">'+(ckf?"Không có hồ sơ nào khớp chip lọc đang chọn.":"Chưa có hồ sơ nào ký cam kết.")+'</div>';
  else{
   h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Lớp</th><th>Ký lúc</th><th>Bản</th><th>Hình thức ký</th><th>Người ghi nhận</th><th>Ảnh</th><th></th></tr></thead><tbody>';
-  ds.forEach(function(o){var _cu=String(o.commit_version||"")!==ban;
+  view.forEach(function(o){var _cu=String(o.commit_version||"")!==ban;
    h+='<tr><td>'+nguoiLnk(o.student_id,o.student_id_name)+'</td>'+
     '<td>'+lopLnk(o.class_id,o.class_id_name,"chưa xếp")+'</td>'+
     '<td>'+esc(o.commit_at||"")+'</td>'+
@@ -26214,6 +26279,13 @@ function renderSoCamKet(){
  return h}
 /* Mo NGUYEN VAN ban DA KY cua mot ho so - khong phai ban dang hien hanh o Cai dat. Hai ban ay co
    the da khac nhau tu lau, va thu co gia tri lam bang chung la ban ho DA doc luc bam. */
+/* Ban DANG PHAT HANH (o Cai dat), khac han `ckXem` - cai kia mo ban MOT NGUOI DA KY. Hai thu
+   nay co the da khac nhau tu lau, va do chinh la ly do so nay ton tai. */
+function ckXemBanHienHanh(){
+ openDrawer("Bản quy định & cam kết đang phát hành",
+  '<div class="dcard"><h4><i class="ti ti-file-text"></i>Bản '+esc(commitVer())+' - đang phát hành</h4>'+
+  '<div class="fhint" style="margin:0 0 10px">Đây là bản học viên ký từ hôm nay. Sửa nội dung ở Cài đặt; ai đã ký bản cũ vẫn giữ nguyên bản họ đã đọc.</div>'+
+  commitHTML(commitText(),commitVer())+'</div>')}
 function ckXem(obid){var o=find("DL08","onboarding_id",obid);if(!o){toast("Không thấy hồ sơ.");return}
  var h='<div class="dcard"><h4><i class="ti ti-file-check"></i>Bản cam kết đã ký - '+esc(o.student_id_name||o.student_id||"")+'</h4>';
  h+=ctxRows([["Lớp",esc(o.class_id_name||o.class_id||"-")],["Ký lúc",esc(o.commit_at||"-")],
@@ -27461,7 +27533,7 @@ var CTXTRANG={hoso:["HOSO"],hosogv:["GVID"],hosonv:["NVID"],hosokhoa:["KHID"],
    có tên trang - đúng, vì trang ấy không có chỗ đứng bên trong. */
 settings:["SETTAB","MSGQ","CFQ"],chay:["RUNPID"],
  xeplop:["XLFILT"],baitap:["BTCLASS","BTSESS","BTMODE"],lichwow:["LWCA"],
- viec:["VIECSEV","VIECTEAM","VIECGRP","VIECSX"]};
+ viec:["VIECSEV","VIECTEAM","VIECGRP","VIECSX"],socamket:["CKF"]};
 /* Khoá ngữ cảnh của MỘT trang: phần khai ở trên, cộng biến tab nếu trang đó là hub (lấy thẳng
    từ HUBTAB). Sang V2 mỗi nghiệp vụ một trang thì vế hub tự rỗng. */
 function ctxCuaTrang(k){var K=(CTXTRANG[k]||[]).slice();
@@ -27778,7 +27850,7 @@ var NAVTREE=[
     lối nào. Hub CSKH có 4 tab mà menu chỉ có tên hub. Anh Luân: *"bên sidebar giống như 1 cái
     bản đồ vậy, họ biết mình cần tìm gì ở đâu"* - thiếu một mục là mất một chỗ trên bản đồ.
     Thứ tự các mục con xếp ĐÚNG THỨ TỰ THANH TAB của hub, để menu và màn hình đọc như nhau. */
- {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","giaoan","baitap","khaosat","ghinhan","khieunai","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow","lichwow"]},
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","xeplop","banglop","giaoan","baitap","khaosat","ghinhan","khieunai","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow","lichwow"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","ketqua","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
@@ -28025,7 +28097,7 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
    "Test đầu vào" -> cũng vậy. Trước đây hai người ấy thấy nhóm "C1 · Khách tiềm năng".) */
 var NAVPHANG=[
  {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:"Lớp học & Giảng dạy",items:["xeplop","giaoan","baitap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow","lichwow"]},
+ {g:"Lớp học & Giảng dạy",items:["xeplop","banglop","giaoan","baitap","buoihnay","lichtuan","gvdp","phong","lop","buoihoc","wow","lichwow"]},
  {g:"Chăm sóc & Sau khóa",items:["khaosat","ghinhan","khieunai","baoluu","ketthuc","ketqua","magioithieu"]}];
 function navCayV5(){
  if(arcMode()==="chang")return NAVTREE;
