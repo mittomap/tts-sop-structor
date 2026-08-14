@@ -757,8 +757,15 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .runfoot{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-start;padding:14px 18px;border-top:1px solid var(--line);background:var(--bg)}
 .runfoot .rfg{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .runfoot .rfg+.rfg{margin-left:16px}
-.runfoot .rfend{margin-left:auto;display:flex;gap:8px;align-items:center}
-@media(max-width:900px){.runfoot .rfg+.rfg{margin-left:0}.runfoot .rfend{margin-left:0;width:100%}}
+/* `margin-left:auto` chi dep khi MOI THU nam tron mot hang. O day tam nut khong bao gio vua
+   mot hang, nen cum cuoi bi day sang phai cua HANG THU HAI - de lai mot cai lo trong giua
+   "HV dung hoc" va "Xem ho so". Day sang phai nhung khong biet minh dang o hang nao thi khong
+   phai la canh le, do la mot cai ho.
+   Nay cum cuoi LUON dung mot hang rieng, canh phai, co mot vach ngan mo phia tren. Hai nhom
+   viec khac loai nam tren hai hang khac nhau - doc ra ngay, va khong hang nao con lo trong. */
+.runfoot .rfend{flex:0 0 100%;display:flex;gap:8px;align-items:center;justify-content:flex-end;
+ margin-left:0;margin-top:4px;padding-top:10px;border-top:1px solid var(--line)}
+@media(max-width:900px){.runfoot .rfg+.rfg{margin-left:0}.runfoot .rfend{justify-content:flex-start}}
 .btn.lg{height:42px;padding:0 20px;font-size:14px}
 .rundone{display:flex;align-items:center;gap:8px;background:var(--greenb);color:#116149;border-radius:10px;padding:10px 14px;font-size:12.5px;font-weight:700;margin-bottom:12px}
 .rqbox{display:flex;flex-wrap:wrap;gap:10px}
@@ -1997,7 +2004,16 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .kv:last-child{border-bottom:0}
 .kv .k{color:var(--muted)}.kv .v{font-weight:600;text-align:left;min-width:0;overflow-wrap:anywhere}
 .rost{display:flex;align-items:center;gap:10px;padding:9px 6px;border-bottom:1px solid #EEF2F6}
-.rost .rn{flex:1;font-weight:600;font-size:13px}
+/* V2 14/08 (anh Luân: *"canh cột cho hợp lý em, mỗi dòng đúng 1 dòng, đừng rớt là tốt nhất"*).
+   Cột tên để `flex:1` nên nó co giãn theo tên DÀI NHẤT trong lớp; gặp một em tên dài cộng mã
+   cộng chip giờ vào là cả cụm rớt xuống dòng hai, và riêng dòng ấy cao gấp đôi - đọc xuống bị
+   vấp đúng một nhịp. Chốt bề rộng cột tên và CẤM xuống dòng: tên quá dài thì cắt bằng dấu ba
+   chấm (rê chuột vẫn đọc đủ), còn hàng thì luôn đúng một dòng. */
+.rost .rn{flex:0 0 300px;max-width:300px;min-width:0;font-weight:600;font-size:13px;
+ display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rost .rn>*{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.rost{flex-wrap:nowrap}
+@media(max-width:1280px){.rost .rn{flex:0 0 220px;max-width:220px}}
 /* Hàng tiêu đề của bảng điểm danh: mượn nguyên bộ khung flex của dòng dữ liệu, chỉ thay nội dung
    trong mỗi cụm bằng một cái nhãn. Nhãn canh giữa cụm để nó chỉ đúng vào chùm nút bên dưới. */
 /* LỆCH LÀ VÌ HAI HÀNG ĐO BẰNG HAI THƯỚC KHÁC NHAU (anh Luân: *"lệch lệch kiểu gì ấy"*).
