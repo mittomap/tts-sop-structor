@@ -2670,7 +2670,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>ab93ce</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">14/08/2026 · <b>5d0a72</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -3780,7 +3780,21 @@ function scrubMan(h){try{return scrubMoiRoiDuoi(h)}catch(e){return h}}
    Nay dọn trên DOM SAU KHI đã dựng xong: hỏi trình duyệt "có mấy phần tử `.tbar.banai`", giữ
    cái đầu, bỏ phần còn lại. Không nhớ gì nên không rò, và đếm bằng chính bộ đếm của trình
    duyệt nên không trượt. */
-function donLapTrenMan(el){try{
+/* V2 14/08 (anh Luân: *"1 chặng được chọn nên cố gắng đẩy nó vào giữa em"*). Dải chặng luôn
+   mở ở vị trí cuộn 0, nên chặng đang đứng - thứ DUY NHẤT người ta cần nhìn - có thể nằm khuất
+   ngoài mép phải, phải tự kéo mới thấy. Sau mỗi lần vẽ, đẩy chặng đang chọn (hoặc chặng hiện
+   tại) vào giữa dải. Dùng `scrollLeft` trực tiếp thay vì `scrollIntoView`: hàm kia cuộn CẢ
+   TRANG theo, tức vừa vẽ xong màn đã tự nhảy đi chỗ khác. */
+function jsCenter(root){try{
+ var w=(root||document).querySelectorAll(".jstepw");
+ for(var i=0;i<w.length;i++){var el=w[i].querySelector(".jstep");if(!el)continue;
+  var it=el.querySelector(".jsi.sel")||el.querySelector(".jsi.now");if(!it)continue;
+  var het=el.scrollWidth-el.clientWidth;if(het<=4)continue;
+  var x=it.offsetLeft-(el.clientWidth-it.offsetWidth)/2;
+  el.scrollLeft=Math.max(0,Math.min(het,x));
+  jsFade(el)}}catch(e){}}
+function donLapTrenMan(el){try{jsCenter(el)}catch(e){}
+ try{
  if(!el)return;
  var ds=el.querySelectorAll(".tbar.banai");
  for(var i=1;i<ds.length;i++){try{ds[i].remove()}catch(e){}}
@@ -11867,6 +11881,32 @@ function jTimeline(C){
  C.wow.forEach(function(w){add(w.wow_session_date,"ti-star","Buổi WOW "+(elabel(w.wow_skill)||""),elabel(w.wow_status)||"","blue")});
  C.sv.forEach(function(s){add(s.submitted_date,"ti-clipboard-text","Khảo sát "+(elabel(s.survey_type)||""),"Hài lòng "+(s.satisfaction_score||"-")+"/5",(num(s.satisfaction_score)<=3?"amber":"green"))});
  C.kn.forEach(function(k){add(k.complaint_time,"ti-alert-triangle","Khiếu nại "+(elabel(k.complaint_type)||""),elabel(k.complaint_status)||"","red")});
+ /* V2 14/08 - HAI MẢNG CÒN THIẾU CỦA "HỌC RA SAO TRONG LỚP". Dòng thời gian trước đây đi từ
+    lead vào hệ thống tới kết thúc khóa, có cả WOW, khảo sát, khiếu nại - nhưng KHÔNG có bài
+    tập và KHÔNG có nhận xét buổi của giáo viên. Nghĩa là mở hồ sơ ra thì thấy em ấy đi VÀO lớp
+    thế nào, mà không thấy em ấy HỌC ra sao trong lớp - đúng hai thứ mà người chăm học viên cần
+    nhất khi gọi cho phụ huynh. Lấy theo mã học viên, cắt ở 12 mốc gần nhất mỗi loại để dòng
+    thời gian không bị một lớp học dài nuốt mất mọi mốc khác. */
+ (function(){var sid=C.sid;if(!sid)return;
+  var hw=rows("DL13").filter(function(x){return String(x.student_id||"")===sid});
+  hw.sort(function(a,b){return (pvnd(b.homework_assigned_time)||0)-(pvnd(a.homework_assigned_time)||0)});
+  hw.slice(0,12).forEach(function(x){
+   var diem=String(x.homework_score||"").trim();
+   if(diem)add(x.graded_at||x.homework_submitted_time,"ti-checks","Bài tập đã chấm",
+    (x.homework_title||"")+" - điểm "+diem,"green");
+   else if(String(x.homework_submitted_time||"").trim())add(x.homework_submitted_time,"ti-upload","Nộp bài tập",
+    (x.homework_title||"")+" - chờ chấm","amber");
+   else add(x.homework_assigned_time,"ti-book","Giao bài tập",
+    (x.homework_title||"")+(x.homework_due_date?(" - hạn "+x.homework_due_date):""),"blue")});
+  /* Nhận xét buổi nằm ở DL11 (theo LỚP), nên phải bắc qua điểm danh của chính em này mới biết
+     em ấy có mặt ở buổi nào - lấy thẳng theo lớp là gán nhầm nhận xét của buổi em ấy vắng. */
+  var coBuoi={};(C.att||[]).forEach(function(a){coBuoi[String(a.session_id||"")]=1});
+  var ses=rows("DL11").filter(function(s){return coBuoi[String(s.session_id||"")]&&String(s.teacher_note_summary||"").trim()});
+  ses.sort(function(a,b){return (pvnd(b.session_date)||0)-(pvnd(a.session_date)||0)});
+  ses.slice(0,12).forEach(function(s){
+   add(s.teacher_note_completed_at||s.session_date,"ti-writing","Nhận xét buổi "+(s.session_number||""),
+    (s.teacher_id_name||s.teacher_id||"")+": "+String(s.teacher_note_summary||"").slice(0,120),"blue")});
+ })();
  C.ce.forEach(function(c){add(c.course_completion_time,"ti-award","Kết thúc khóa","Điểm "+(c.final_test_score||"-")+" · "+(elabel(c.achievement_status)||""),"green")});
  ev=ev.filter(function(e){return pvnd(e.t)});
  ev.sort(function(a,b){return (pvnd(b.t)||0)-(pvnd(a.t)||0)});
@@ -15724,6 +15764,15 @@ function classOptsFor(sid,exceptCid){var cc=stuCourse(sid);var all=rows("DL10").
 function xmStuChanged(sid){var el=document.getElementById("xm_cls");if(el)el.innerHTML='<option value="">-- chọn lớp --</option>'+classOptsFor(sid,"")}
 function stepHTML(label,done){return '<div class="stp '+(done?"done":"")+'"><span class="stpdot">'+(done?'<i class="ti ti-check"></i>':'')+'</span><span>'+esc(label)+'</span></div>'}
 /* stepper NGANG 1 dòng: chấm+nhãn cùng hàng, có đường nối giữa các bước */
+/* Nút "Xếp lớp học viên" ở đầu trang: CHỈ hiện khi hàng đợi RỖNG. Khi có người chờ, bảng ngay
+   dưới đã bày sẵn từng người kèm khóa đã đăng ký và ngày đóng đủ, bấm thẳng "Xếp vào lớp" -
+   nó cho ngữ cảnh để quyết, còn cái nút thì bắt chọn tên trong một dropdown rồi tự tra. Hai
+   cửa vào cùng một việc, một cửa hơn hẳn.
+   Nhưng không bỏ trắng: hàng đợi rỗng thì bảng biến mất, lúc ấy vẫn cần một cửa xếp tay cho
+   trường hợp ngoại lệ. Nhãn đổi thành "Xếp lớp thủ công" để nói đúng việc nó làm. */
+function xlNutThem(wait){
+ if((wait||[]).length)return "";
+ return '<button class="btn" onclick="openXepMoi()" data-tip="Không còn ai trong hàng chờ - dùng khi cần xếp tay một trường hợp ngoại lệ"><i class="ti ti-plus"></i>Xếp lớp thủ công</button>'}
 function xlWaiting(){/* Đăng ký đã xác nhận (đã cọc/đóng) nhưng CHƯA có hồ sơ xếp lớp (DL08) = chặng "chờ xếp lớp".
    Dùng ĐÚNG tập của nút "Xếp lớp học viên" để hàng đợi và nút luôn khớp nhau. */
  var haveOb={};rows("DL08").forEach(function(o){haveOb[o.student_id]=1});
@@ -15755,7 +15804,7 @@ function xlLoc(fil,obs,wait,ct){
 function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
  var wait=xlWaiting();
  var view=obs.filter(function(o){var s=obState(o);if(fil==="all")return true;if(fil==="sendinfo")return o.class_id&&!s.sent;if(fil==="confirm")return s.sent&&!s.confirmed;if(fil==="finish")return !s.done;if(fil==="overdue")return s.infoOverdue||s.obOverdue;return true});
- var h='<div class="phead" data-tour="phead"><div><div class="t">Xếp lớp & Onboarding</div><div class="s">Từ lúc đóng đủ tiền → xếp lớp → gửi thông tin → HV xác nhận → hoàn tất. Mỗi bước có dấu hoàn thành để tắt cảnh báo</div></div><div class="sp"><button class="btn primary" onclick="openXepMoi()"><i class="ti ti-plus"></i>Xếp lớp học viên</button></div></div>';
+ var h='<div class="phead" data-tour="phead"><div><div class="t">Xếp lớp & Onboarding</div><div class="s">Từ lúc đóng đủ tiền → xếp lớp → gửi thông tin → HV xác nhận → hoàn tất. Mỗi bước có dấu hoàn thành để tắt cảnh báo</div></div><div class="sp">'+xlNutThem(wait)+'</div></div>';
  h+=bvSau();   /* V9.60: ba trang đáp này KHÔNG gọi pageHead nên bảng việc của Tư vấn, Học vụ và
                  Quản lý CHƯA TỪNG hiện ra - gắn tay tại đây, và bộ kiểm canh từ nay. */
  /* ═══ 13/08 - MỘT MÀN MỘT BỘ ĐIỀU KHIỂN (anh Luân, xem ảnh chụp màn này) ════════════════════
@@ -15870,8 +15919,16 @@ function xepFor(sid){var s=find("DL09","student_id",sid)||{};var e=rows("DL06").
  h+='<div class="fld"><label>Chọn lớp (ưu tiên đúng khóa của học viên) <i>*</i></label><select id="xm_cls"><option value="">-- chọn lớp --</option>'+classOptsFor(sid,"")+'</select></div>';
  h+='<div class="fld full"><button class="btn primary" onclick="xepMoiLuu()"><i class="ti ti-check"></i>Gán vào lớp</button></div></div>';
  openDrawer("Xếp lớp học viên",h)}
-function openXepMoi(){var haveOb={};rows("DL08").forEach(function(o){haveOb[o.student_id]=1});
- var ready=rows("DL06").filter(function(e){return /confirmed/.test(ecode(e.enrollment_status))&&!haveOb[e.student_id]});var classes=rows("DL10");
+/* V2 14/08 (anh Luân: *"cái nút + xếp lớp học viên có dư ko em, vì đã có cái bảng ở dưới"*).
+   Dư thật, và dư theo nghĩa đen: hàm này lọc "đơn đã xác nhận mà chưa có hồ sơ xếp lớp" bằng
+   một bản CHÉP TAY của đúng phép lọc `xlWaiting()` - chính chú thích của `xlWaiting` đã ghi
+   "dùng ĐÚNG tập của nút Xếp lớp học viên để hàng đợi và nút luôn khớp nhau", tức người viết
+   biết hai chỗ phải khớp mà vẫn để hai bản. *Hai bản chép tay của cùng một câu hỏi thì sớm
+   muộn trả lời khác nhau.* Nay một bản gốc duy nhất.
+   Còn cái nút thì xem `xlNutThem()`: bảng dưới bày sẵn từng người kèm khóa và ngày đóng đủ,
+   bấm thẳng "Xếp vào lớp" - hơn hẳn một dropdown bắt nhớ tên. Nên nút chỉ còn giữ cho trường
+   hợp hàng đợi RỖNG (vẫn cần một cửa xếp tay), và đổi tên cho đúng việc nó làm. */
+function openXepMoi(){var ready=xlWaiting();var classes=rows("DL10");
  var h='<div class="dcard"><h4><i class="ti ti-layout-grid-add"></i>Xếp lớp cho học viên</h4>';
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Danh sách chỉ hiện học viên đã đăng ký xác nhận mà chưa có hồ sơ xếp lớp ('+ready.length+' học viên). Chọn học viên trước thì ô lớp tự lọc theo đúng khóa của học viên đó - lớp đã đầy hoặc sai khóa sẽ bị chặn khi lưu.</div>';
  h+='<div class="fld"><label>Học viên (đã đăng ký, chưa xếp lớp)</label><select id="xm_stu" onchange="xmStuChanged(this.value)"><option value="">-- chọn --</option>'+ready.map(function(e){return '<option value="'+esc(e.student_id)+'">'+esc((e.student_id_name||e.student_id)+" - "+(e.course_id_name||""))+'</option>'}).join("")+'</select></div>';
