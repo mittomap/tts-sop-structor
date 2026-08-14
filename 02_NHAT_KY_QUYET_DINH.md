@@ -305,10 +305,40 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 41 BỘ KIỂM. Bản dựng đang chạy: `3f0446` (14/08), đã lên
+> **Phiên bản: V2 — 41 BỘ KIỂM. Bản dựng đang chạy: `519e91` (14/08), đã lên
 > https://mittomap.github.io/itts-sop-demo-v2/ . Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `39083f`, `d2d2d5`, `c6ea8b`.
+> Mốc cũ: `dc6eb3`, `3f0446`, `39083f`, `d2d2d5`, `c6ea8b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 14/08 tối - DỌN 13 CHỖ ĐỎ SAU ĐỢT GỘP, VÀ MỘT BÀI HỌC LẶP NĂM LẦN TRONG NGÀY
+>
+> `./verify.sh` chạy trọn trên bản `3f0446` ra **13 chỗ đỏ**. Dọn hết. Đáng ghi không phải là
+> con số, mà là **cùng một bệnh lặp năm lần**: một BẢN ĐỒ CẮM CỨNG trong bộ kiểm nói sai sau khi
+> kiến trúc đổi, và mỗi lần nó báo đỏ đúng về con số nhưng sai về nguyên nhân.
+>
+> | Thước | Bảng cắm cứng | Nó bảo | Sự thật |
+> |---|---|---|---|
+> | `_probe_vhbc` | `BVLAND[group][0]` | mất bảng BC5 | bảng vẫn hiện, chỉ đổi trang đáp |
+> | `_check11` | `HUBTAB.m` | trang xem được mà thiếu mục menu | trang ấy đã thành bí danh |
+> | `_checkaudit` | chuỗi `items:["banlam","viec","ychv"` | mất lối vào | lối vào chuyển sang một tab |
+> | `_check14` | tên trang `ychv` | bốn tiêu chí hỏng | điều cần bảo vệ còn nguyên |
+> | `_checkdrawer` | mảng `TRANG` viết tay | tụt 6 ngăn kéo | bề mặt dời chỗ, thước không đi theo |
+>
+> **Luật rút ra, ghi vào cả năm file: thước phải HỎI TRẠNG THÁI THẬT, đừng đọc bảng gốc; và
+> thước phải canh MỤC TIÊU, đừng canh CÁCH VIẾT.** Một phép đo bám vào cách viết sẽ đổ khi cách
+> viết đổi, dù điều nó canh vẫn còn nguyên.
+>
+> **Ba lỗi em tự gây ra trong ngày, bộ kiểm bắt lại được cả ba** - chuỗi nhân quả đáng nhớ:
+> · Nút "Dựng lại demo" đưa lên thanh trên → rộng **288px**, bóp khối vệt đường đi còn **12px**.
+> · Vá `_checkmat` bằng cách bỏ `overflow:hidden` → chữ dài nong khung ra, `_checkui` từ 5px
+>   thành **176px tràn ngang**. *Một bản vá cho thước này có thể là lỗi mới cho thước kia.*
+> · Cụm điều khiển gộp vào hàng lọc: cho nó xuống hàng riêng nhưng quên cho RUỘT nó xuống dòng,
+>   nên vẫn dài 539px trên màn 390px. *Cho một khối xuống hàng riêng không có nghĩa là nó vừa hàng.*
+>
+> **Một lỗi có sẵn lộ ra nhờ đợt gộp:** `bvStrip` NHẬN tên neo qua tham số rồi vẫn in cứng
+> `data-tour="bangviec"` cho mọi lời gọi - hai khối cùng một neo, `tourFind` lấy cái đầu tiên nên
+> bài hướng dẫn khoanh đúng hay sai là tùy hên. *Nhận một tham số rồi không dùng nó là một lời
+> khai dối.*
 >
 > ### 🟢 14/08 chiều - GỘP HAI CẶP TRANG CHỒNG CHÉO (anh Luân đặt hàng, ba bước)
 >
