@@ -15411,7 +15411,15 @@ function renderLichWow(){
   (lwLaWow()
    ? '<button class="btn primary" onclick="lwDangKy()"><i class="ti ti-calendar-plus"></i>Đăng ký ca của tôi</button>'
    : '<button class="btn primary" onclick="wowAdd()"><i class="ti ti-plus"></i>Đặt buổi WOW vào ô trống</button>')+
-  '<button class="btn" onclick="go(\'settings\')"><i class="ti ti-settings"></i>Cấu hình lịch</button>');
+  /* V2 14/08 (anh Luân: *"bấm vào cấu hình lịch nó nhảy bậy"*). Nút này gọi `go('settings')`
+     TRẦN - không đặt tab, nên nó rơi vào đúng cái tab mà `window.SETTAB` còn nhớ từ lần trước;
+     ai vừa xem tab Thương hiệu thì bấm "Cấu hình lịch" ra màn Thương hiệu. Với người chưa vào
+     Cài đặt lần nào thì rơi vào tab mặc định - cũng không phải chỗ có tham số lịch.
+     Nay mở ĐÚNG tab CH2 và lọc sẵn về nhóm tham số ô trực WOW (`wowSlot`), tức bấm một cái là
+     nhìn thấy ngay hai thứ điều khiển cái lịch này: độ dài một ô và đặt trước tối đa mấy ngày.
+     *Một nút "cấu hình X" mà không nói X nằm ở tab nào thì nó không dẫn đi đâu cả - nó chỉ mở
+     Cài đặt rồi bỏ người ta ở đó.* */
+  '<button class="btn" onclick="window.SETTAB=\'ch2\';window.CFQ=\'wowSlot\';go(\'settings\')" data-tip="Mở Cài đặt > Ngưỡng &amp; SLA, lọc sẵn tới tham số ô trực WOW"><i class="ti ti-settings"></i>Cấu hình lịch</button>');
  /* ── DẢI THẺ ── */
  var _now=Date.now();
  var _tron=tuan.filter(function(x){return lwRanh(x,_now)}).length;
@@ -18235,7 +18243,7 @@ function renderHosoGV(){var id=window.GVID;var g=find("DL01","staff_id",id);
  if(!cls.length)h+='<tr><td class="empty" colspan="7">Chưa phụ trách lớp nào.</td></tr>';
  cls.forEach(function(c){h+='<tr><td>'+esc(c.class_id)+'</td><td>'+esc(c.class_name)+'</td><td><span class="chip '+stCls(c.class_status)+'">'+esc(elabel(c.class_status))+'</span></td><td>'+esc(c.current_enrollment||0)+'/'+esc(c.class_capacity||0)+'</td><td>'+esc(c.class_schedule||"")+'</td><td>'+esc(c.class_start_date||"")+'</td><td><button class="btn sm" onclick="openLop(\''+esc(c.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Bảng lớp</button></td></tr>'});
  h+='</tbody></table></div></div>';
- h+='<div class="panel"><div class="ph"><b>Buổi cần ghi nhận xét ('+noNote.length+')</b><div class="mini"><button class="pill" onclick="go(\'buoihoc\')">Mở trang Buổi học</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Buổi</th><th>Ngày</th><th>Tình trạng</th><th>Thao tác</th></tr></thead><tbody>';
+ h+='<div class="panel"><div class="ph"><b>Buổi cần ghi nhận xét ('+noNote.length+')</b><div class="mini"><button class="pill" onclick="go(\'buoihoc\')">Mở trang '+esc((PBK.buoihoc||{}).t||"Buổi học")+'</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Buổi</th><th>Ngày</th><th>Tình trạng</th><th>Thao tác</th></tr></thead><tbody>';
  if(!noNote.length)h+='<tr><td class="empty" colspan="5">Đã ghi nhận xét đầy đủ - tốt!</td></tr>';
  noNote.slice(0,25).forEach(function(s){var st=bhState(s);
   h+='<tr><td>'+lopLnk(s.class_id,s.class_id_name,"")+'</td><td>'+esc(s.session_number||"")+'</td><td>'+esc(s.session_date||"")+'</td><td>'+(st.noteOver?'<span class="chip red">Quá hạn</span>':'<span class="chip amber">Chờ ghi</span>')+'</td><td><button class="btn primary sm" onclick="bhNoteForm(\''+esc(s.session_id)+'\')"><i class="ti ti-writing"></i>Ghi nhận xét</button></td></tr>'});
@@ -18305,7 +18313,7 @@ function renderHosoNV(){var id=window.NVID;var s=find("DL01","staff_id",id);
    ["ti-star",wUp.length,"WOW sắp tới","#DB2777","đã đặt lịch"],
    ["ti-thumb-up",wDone.length,"WOW đã dạy","#0D9488",wImp.length+" tiến bộ"]],"hosonv_wow");
   h+=kpiMini([["WOR","Tỷ lệ buổi WOW có tiến bộ",worV==null?"-":Math.round(worV*100)+"%",worV==null?null:(worV>=kpiTh(/^WOR/,0.6)),"≥ "+kpiChip(/^WOR/,0.6,1)]]);
-  h+='<div class="panel"><div class="ph"><b>Buổi WOW sắp tới ('+wUp.length+')</b><div class="mini"><button class="pill" onclick="go(\'wow\')">Mở trang WOW</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Loại buổi</th><th>Kỹ năng</th><th>Ngày</th><th>Trạng thái</th></tr></thead><tbody>';
+  h+='<div class="panel"><div class="ph"><b>Buổi WOW sắp tới ('+wUp.length+')</b><div class="mini"><button class="pill" onclick="go(\'wow\')">Mở trang '+esc((PBK.wow||{}).t||"WOW")+'</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên</th><th>Loại buổi</th><th>Kỹ năng</th><th>Ngày</th><th>Trạng thái</th></tr></thead><tbody>';
   if(!wUp.length)h+='<tr><td class="empty" colspan="5">Không có buổi nào sắp tới.</td></tr>';
   wUp.slice(0,25).forEach(function(x){h+='<tr><td>'+nguoiLnk(x.student_id,x.student_name)+'</td><td>'+esc(elabel(x.wow_session_type)||"")+'</td><td>'+esc(elabel(x.wow_skill)||"")+'</td><td>'+esc(x.wow_session_date||"")+'</td><td><span class="chip '+stCls(x.wow_status)+'">'+esc(elabel(x.wow_status))+'</span></td></tr>'});
   h+='</tbody></table></div></div>'}
@@ -18777,7 +18785,7 @@ function renderHtToday(embed){
     kê và không có nút nào bấm - ba panel bên dưới đều lọc DL11/DL13 theo teacher_id, mà giáo
     viên WOW (wow_coach) có 0 dòng ở cả hai bảng đó. Nghĩa là coach mở app buổi sáng thì màn
     hình nói với họ "hôm nay anh hết việc", trong khi họ sở hữu toàn bộ 70 buổi WOW của trung tâm. */
- h+='<div class="panel"><div class="ph"><b><i class="ti ti-star" style="margin-right:6px"></i>Buổi WOW hôm nay ('+wowT.length+')</b><div class="mini"><button class="pill" onclick="go(\'wow\')">Mở trang WOW</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Học viên</th><th>Kỹ năng</th><th>Trọng tâm</th><th>Trạng thái</th><th></th></tr></thead><tbody>';
+ h+='<div class="panel"><div class="ph"><b><i class="ti ti-star" style="margin-right:6px"></i>Buổi WOW hôm nay ('+wowT.length+')</b><div class="mini"><button class="pill" onclick="go(\'wow\')">Mở trang '+esc((PBK.wow||{}).t||"WOW")+'</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Học viên</th><th>Kỹ năng</th><th>Trọng tâm</th><th>Trạng thái</th><th></th></tr></thead><tbody>';
  if(!wowT.length)h+='<tr><td class="empty" colspan="6">Hôm nay không có buổi WOW nào'+(gid?' của người này':'')+'.</td></tr>';
  wowT.sort(function(a,b){return (pvnd(a.wow_session_date)||0)-(pvnd(b.wow_session_date)||0)});
  wowT.forEach(function(w){var d=pvnd(w.wow_session_date);
@@ -25345,7 +25353,10 @@ var NAVTREE=[
     `baocao` rời nhóm "Điều hành" về đây, đứng ngay dưới Trang bắt đầu. Rời HẲN chứ không chép:
     một trang nằm ở hai nhóm thì bấm một mục là hai mục cùng sáng - đúng lỗi `_check11` bắt được
     sáng nay khi em cho `banglop` lên menu trong lúc `lop` đã là cha nó. */
- {g:"Làm việc",items:["viec","giaoviec","banlam","baocao"]}, /* V9.18: hanhtrinh gộp vào banlam (go() tự remap) */
+ /* V2 14/08 (anh Luân: *"Hỏi đáp đưa lên trên, bên dưới Quản lý việc giao & nhận"*). Hỏi đáp là
+   thứ người ta mở giữa lúc ĐANG LÀM ("chỗ này làm sao"), không phải việc của người điều hành -
+   nó thuộc nhóm Làm việc, đứng ngay sau Giao việc. */
+{g:"Làm việc",items:["viec","giaoviec","hoidap","banlam","baocao"]}, /* V9.18: hanhtrinh gộp vào banlam (go() tự remap) */
  /* V9.29n (anh Luân): "Chặng 1" -> "C1". Tên nhóm nay SINH TỪ ARCS (arcGrpName) chứ không gõ tay:
     trước đây số chặng và tên chặng nằm cả ở ARCS lẫn ở đây, đổi một chỗ là hai chỗ nói khác nhau. */
  {g:arcGrpName("changA"),arc:"changA",items:["changA","nhaplead","test","tuvan","thanhtoan","reup"]},
@@ -25358,7 +25369,7 @@ var NAVTREE=[
     lối nào. Hub CSKH có 4 tab mà menu chỉ có tên hub. Anh Luân: *"bên sidebar giống như 1 cái
     bản đồ vậy, họ biết mình cần tìm gì ở đâu"* - thiếu một mục là mất một chỗ trên bản đồ.
     Thứ tự các mục con xếp ĐÚNG THỨ TỰ THANH TAB của hub, để menu và màn hình đọc như nhau. */
- {g:arcGrpName("changB"),arc:"changB",items:["changB","buoihnay","wow","xeplop","baitap","giaoan","buoihoc","khaosat","ghinhan","khieunai","lichtuan","lichwow","gvdp","phong"]},
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","buoihnay","wow","xeplop","baitap","giaoan","buoihoc","khaosat","ghinhan","khieunai","lichtuan","lichwow","gvdp","phong","socamket"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","ketqua","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
@@ -25392,14 +25403,14 @@ var NAVTREE=[
     Luân bắt được hôm 04/08 (*"a tìm trên sidebar ko thấy"*).
     Bài học lặp lại lần thứ hai: hỏi `navVis` là hỏi "có ĐƯỢC PHÉP thấy không", không phải "có
     CHỖ ĐỨNG trên menu không". Hai câu khác nhau, và cái thước phải hỏi câu thứ hai. */
- {g:"Điều hành",items:["nhansu","bangcong","hoidap","canhan","settings"]},
+ {g:"Điều hành",items:["nhansu","bangcong","canhan","settings"]},
  /* V2 08/08 - mười sáu cuốn sổ chỉ-đọc rời khỏi cây menu, vào sau một cửa `tracuu` (ghi chú
     dài ở bảng PAGES). `hocvien` và `giangvien` Ở LẠI vì chúng nằm trong nhịp ngày của ba nhóm. */
  /* V2 14/08 - `socamket` (Sổ cam kết đã ký, dựng cùng ngày) VÀO ĐÂY. Nó đã khai `g:"Tra cứu"`
     ở PAGES từ lúc dựng, mà nhóm "Tra cứu" trên cây menu thì chưa ai thêm tên nó vào - tức bản
     khai đúng ý mà không ai đọc. `_checkv2` L3 bắt: trang xem được, không có mục menu, không có
     trang cha. Đúng con bệnh anh Luân bắt ba lần rồi: *"a tìm trên sidebar ko thấy"*. */
- {g:"Tra cứu",items:["tracuu","hocvien","giangvien","lop","socamket","tinnhan"]}];
+ {g:"Tra cứu",items:["tracuu","hocvien","giangvien","lop","tinnhan"]}];
 /* Danh mục sổ nằm sau cửa Tra cứu. Khai MỘT chỗ, BA nơi đọc: trang `tracuu` vẽ theo nó, `navCur`
    dùng nó để biết "đang đứng trong một cuốn sổ thì mục Tra cứu phải sáng", và `_checkcauhoi`
    dùng nó để biết các sổ ấy VẪN có lối trên menu (qua cửa cha). */
@@ -25615,7 +25626,7 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
    "Test đầu vào" -> cũng vậy. Trước đây hai người ấy thấy nhóm "C1 · Khách tiềm năng".) */
 var NAVPHANG=[
  {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
- {g:"Lớp học & Giảng dạy",items:["buoihnay","wow","xeplop","baitap","giaoan","buoihoc","lichtuan","lichwow","gvdp","phong"]},
+ {g:"Lớp học & Giảng dạy",items:["buoihnay","wow","xeplop","baitap","giaoan","buoihoc","lichtuan","lichwow","gvdp","phong","socamket"]},
  {g:"Chăm sóc & Sau khóa",items:["khaosat","ghinhan","khieunai","baoluu","ketthuc","ketqua","magioithieu"]}];
 /* ═══ V2 14/08 - KỆ TRONG MỘT NHÓM MENU (anh Luân: *"em đã check xem trên sidebar nên sắp xếp
    thế nào chưa, a thấy chắp vá quá"*) ══════════════════════════════════════════════════════
@@ -25655,14 +25666,14 @@ NAVKE[arcGrpName("changB")]=[
     nhận / bắt đầu / kết thúc / ghi nội dung - người ta LÀM ở đó hằng ngày. */
  ["Làm hằng ngày",["buoihnay","wow","xeplop","baitap","giaoan"]],
  ["Theo dõi chất lượng",["buoihoc","khaosat","ghinhan","khieunai"]],
- ["Lịch & phòng",["lichtuan","lichwow","gvdp","phong"]]];
+ ["Lịch & sổ tra cứu",["lichtuan","lichwow","gvdp","phong","socamket"]]];
 /* Cây PHẲNG chia nhóm khác cây chặng: khảo sát / phản hồi / khiếu nại nằm ở nhóm "Chăm sóc &
    Sau khóa", không ở đây. Khai kệ riêng theo ĐÚNG thành viên của nhóm này - dùng chung bảng
    với cây chặng thì kệ "Theo dõi chất lượng" chỉ còn một mục mà vẫn đội một cái tiêu đề. */
 NAVKE["Lớp học & Giảng dạy"]=[
  ["Làm hằng ngày",["buoihnay","wow","xeplop","baitap","giaoan"]],
  ["Theo dõi chất lượng",["buoihoc"]],
- ["Lịch & phòng",["lichtuan","lichwow","gvdp","phong"]]];
+ ["Lịch & sổ tra cứu",["lichtuan","lichwow","gvdp","phong","socamket"]]];
 /* Nhóm này 7 mục - DƯỚI ngưỡng 8 nên KHÔNG chia kệ: hai tiêu đề cho bảy dòng là tiêu đề nhiều
    hơn nội dung. Luật ngưỡng ở `_checkv2` L3d. */
 /* Kệ của một mục: trả về chỉ số kệ, hoặc số lớn nếu chưa xếp (rơi xuống cuối). */
