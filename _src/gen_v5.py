@@ -18572,6 +18572,11 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=srows("DL14");
    esc(String(_req.content||"").split("\n").join(" · "))+' <button class="pill" onclick="tkOpen(\''+esc(_req.task_id)+'\')">Mở yêu cầu</button></span></div>';
   h+='</div>';
   h+='<div class="obact">';
+  /* V2 14/08 - LỐI VÀO MÀN VẬN HÀNH, ĐẶT NGAY TRÊN THẺ CỦA SỔ. Em khai trong bộ kiểm là màn ấy
+     "mở từ Buổi hôm nay HOẶC sổ Buổi WOW 1-1" nhưng chỉ nối lối thứ nhất - anh Luân mở sổ ra tìm
+     thì không thấy: *"trang vận hành buổi wow đâu"*. Một lời khai có hai lối mà chỉ dựng một lối
+     thì lời khai ấy sai, và cái sai nằm im cho tới khi có người đi đúng lối còn thiếu. */
+  h+='<button class="btn sm" onclick="bwPick(\''+esc(id)+'\')" data-tip="Mở màn vận hành buổi WOW này - đủ ngữ cảnh học viên, lượt còn lại và buổi trước"><i class="ti ti-layout-list"></i>Vận hành buổi</button>';
   var _daBd=!!String(w.wow_start_actual||"").trim(),_daKt=!!String(w.wow_end_actual||"").trim();
   if(!s.confirmed&&!s.noshow)h+='<button class="btn primary sm" onclick="confirmRun(\'Xác nhận buổi WOW này?\',\'wowConfirm\',\''+esc(id)+'\')"><i class="ti ti-check"></i>Xác nhận</button>';
   /* WOW-2: buổi HỌC VIÊN tự đặt vào ca của mình - NV WOW được quyền TỪ CHỐI kèm lý do, ca mở lại.
@@ -28184,7 +28189,7 @@ var NAVSUB={changA:"chang",changB:"chang",changC:"chang",changD:"chang",
    `NAVTHUT` chỉ nói MỘT điều: vẽ thụt vào. Không ai đọc nó để xét quyền, không ai đọc nó để
    quyết mục nào sáng. *Muốn đổi HÌNH thì đừng mượn cái bảng đang giữ QUYỀN - mượn một lần là
    lần sau không ai dám sửa nó nữa.* */
-var NAVTHUT={lop:"buoihnay",hocvien:"buoihnay",giangvien:"buoihnay"};
+var NAVTHUT={lop:"buoihnay",hocvien:"buoihnay",giangvien:"buoihnay",wow:"buoihnay"};
 function navOwner(k){return NAVSUB[k]||k}
 function navItemMeta(k){
  if(/^chang[A-D]$/.test(k)){var A=ARCBK[k];return {t:uiItemLabel(k),ic:"ti-route",arc:A}}
