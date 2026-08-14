@@ -11560,7 +11560,19 @@ function jStepper(J,clickable){var cur=J.S.idx,h='<div class="jstepw cr"><div cl
      làm gì. Câu mô tả ấy app CÓ SẴN (`S.d`, chính câu đang hiện ở thẻ bước và ở khối "Tiếp
      theo sẽ là"), chỉ là dải chặng chưa mượn. Kèm luôn người lo và hạn - ba thứ ấy trả lời
      trọn câu "chặng này để làm gì, ai làm, trong bao lâu". */
-  var _tip=[S.t,(S.d||""),(S.who?("Người lo: "+S.who):""),(S.sla!=null?("hạn "+(S.sla>=48?(Math.round(S.sla/24)+" ngày"):(S.sla+" giờ"))):"")].filter(function(x){return x}).join(" — ");
+  /* `S.sla` và `S.who` trong bản khai chặng có thể là HÀM (đọc ngưỡng từ CH2 lúc chạy) chứ
+     không phải giá trị. Lấy thẳng thì chuỗi nhận nguyên THÂN HÀM - đúng cái anh Luân vừa
+     chụp được: "hạn function(){return paramOf(...)} giờ". Gọi nó ra trước, và chỉ ghép vào
+     câu khi kết quả là một con số thật. */
+  function _giatri(v){try{return (typeof v==="function")?v():v}catch(e){return null}}
+  /* Câu mô tả chặng nằm ở khoá `why` (không phải `d`), người phụ trách ở `owner`. Lấy nhầm tên
+     khoá thì chuỗi rỗng - và một cái tooltip rỗng thì im lặng y như không có tooltip. */
+  var _sla=num(_giatri(S.sla)),_who=_giatri(S.owner)||_giatri(S.who);
+  /* Ngưỡng của chặng khai bằng GIỜ, nhưng có chặng chỉ vài phút (SLA phản hồi lead 15 phút =
+     0.25 giờ). In "hạn 0.25 giờ" là bắt người đọc tự nhân nhẩm - đổi ra đơn vị người ta nói. */
+  function _han(g){return g>=48?(Math.round(g/24)+" ngày"):(g>=1?((Math.round(g*10)/10)+" giờ"):(Math.round(g*60)+" phút"))}
+  var _tip=[S.t,(S.why||S.d||""),(_who?("Người lo: "+_who):""),(_sla>0?("hạn "+_han(_sla)):"")]
+   .filter(function(x){return x}).join(" — ");
   h+='<div class="jsi '+st+sel+(canClick?" clk":"")+'"'+oc+' data-tip="'+esc(_tip)+'"'+'><div class="jsd"><i class="ti '+(st==="done"?"ti-check":S.ic)+'"></i></div><div class="jsl">'+esc(S.t)+'</div><div class="jsw">'+esc(String(when).slice(0,10)||"")+'</div></div>';
   if(i<JMAIN.length-1)h+='<div class="jsc '+(i<cure?"done":"")+'"></div>'});
  h+='</div>';
