@@ -56,6 +56,14 @@ const CA = [
      (Lần thứ hai trong dự án một bộ kiểm tố oan vì đóng vai bằng cửa sai - lần trước là
       `applyScope` thay vì `gateEnter` ở `_checkreset`.) */
   {ten:"Cai dat - tab Nguong CH2",  di:`gateEnter("");cfSetMode("that");window.SETTAB="ch2";go("settings")`, hoi:`({t:CUR,tab:window.SETTAB||""})`},
+  /* Anh Luân 14/08: *"a bấm chip, có thấy link đổi đâu em, cho nên khi a f5, sẽ bị khôi phục lại
+     chip mặc định của trang á"*. Ca này đi ĐÚNG ĐƯỜNG NGƯỜI DÙNG BẤM - gọi thẳng `qfToggle` và
+     `toggleFilt`, hai hàm mà cái chip khai trong `onclick` - chứ KHÔNG gọi `ctxQuery`.
+     Vì sao phải nói rõ: bản vá lần trước nối lại đường ghi địa chỉ rồi đo bằng chính `ctxQuery`,
+     thấy ra chuỗi nên báo xong; mà `ctxQuery` lúc ấy chưa biết đọc `FILT`/`QF`, nên đường thì
+     thông mà không có gì chảy qua. *Đo cái ống mình vừa nối thì bao giờ cũng thấy thông.* */
+  {ten:"chip loc cua so danh sach", di:`go("nhaplead");qfToggle("nhaplead","moi");toggleFilt("nhaplead",ecode((ENUM["enum_lead_status"]||[])[0]||""))`,
+                                                                                             hoi:`({t:CUR,qf:(window.QF&&window.QF.nhaplead)||"",flt:(FILT.nhaplead||[]).join("~")})`},
 ];
 
 (async () => {

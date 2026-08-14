@@ -1667,13 +1667,33 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .colmi{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--navy);padding:5px 6px;border-radius:6px;cursor:pointer}
 .colmi:hover{background:var(--bg)}
 .rvq{display:flex;flex-direction:column;gap:8px}
-.rvqi{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;background:#fff}
+/* ═══ V2 14/08 - SỔ TRỰC CHẶNG XẾP THÀNH CỘT (anh Luân: *"sắp xếp thẳng cột mới đẹp"*) ══════
+   Trước hôm nay `.rvqi` là `display:flex` và cột tên chỉ có `min-width:150px` - tức nó KHÔNG có
+   bề rộng, nó nở theo chữ. Mà chữ trong ô ấy là *tên khách + tên người phụ trách + tuổi hồ sơ +
+   (có khi) "trễ hẹn khách 11/08"*, dài ngắn tuỳ dòng. Hệ quả: ray chặng, chip trạng thái, chip
+   quá hạn, việc kế tiếp - mỗi dòng bắt đầu ở một mốc khác nhau, đọc dọc xuống thành bậc thang.
+   Nay là LƯỚI: trong CSS Grid, bề rộng một cột là CHUNG cho mọi hàng, nên tự nó thẳng - không
+   phải căn tay từng dòng. Cột `auto` rộng bằng nội dung rộng nhất của chính cột đó (ray dài
+   nhất, chip dài nhất), vẫn chung một mốc.
+   Ô "quá hạn / thiếu dữ liệu" được cấp MỘT CỘT RIÊNG rộng cố định, kể cả khi dòng ấy không có
+   gì để hiện. *Bài học đã cắn ba lần: hễ một ô chỉ mọc ra trong một nhánh `if` thì những dòng
+   không đi qua nhánh ấy sẽ thiếu hẳn một ô, và cả hàng trượt đi một nấc.* */
+.rvqi{display:grid;grid-template-columns:24px minmax(0,1.5fr) auto auto 74px minmax(0,1fr) auto;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;background:#fff}
 .rvqi:hover{border-color:var(--blue);box-shadow:0 2px 10px rgba(0,0,0,.06)}
 .rvqn{width:24px;height:24px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--muted);flex:0 0 auto}
-.rvqm{min-width:150px}
-.rvqnm{font-size:13px;font-weight:700;color:var(--navy)}
-.rvqp{font-size:11px;color:var(--muted)}
-.rvqa{flex:1;font-size:11.5px;color:var(--muted)}
+.rvqm{min-width:0}
+.rvqnm{font-size:13px;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rvqp{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Ray chặng: bỏ `margin-left:auto` mà nó mang theo từ thời hàng còn là flex - trong lưới, cái
+   đẩy-sang-phải ấy vô nghĩa mà lại làm ray rời khỏi mốc cột. */
+.rvqs{display:flex;align-items:center;min-width:0}
+.rvqs .mstrip{margin-left:0}
+.rvqi>.chip{justify-self:start}
+.rvqw{display:flex;align-items:center}
+.rvqa{font-size:11.5px;color:var(--muted);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Màn hẹp thì lưới bảy cột không đủ chỗ - trả về hàng xuống dòng như cũ, thà so le còn hơn bóp
+   nát từng cột. */
+@media(max-width:1100px){.rvqi{display:flex;flex-wrap:wrap}.rvqm{min-width:150px}.rvqa{flex:1}}
 .bwrow{display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:8px;cursor:pointer}
 .bwrow:hover{background:var(--bg)}
 .bwd{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
@@ -5664,7 +5684,13 @@ function toggleForm(key){var p=document.getElementById("formPanel");if(p)p.class
    Nay: hễ trang hiện tại có hàm vẽ riêng thì LUÔN vẽ lại cả trang. Nhánh vẽ trống chỉ còn dành
    cho sổ đứng một mình, không thuộc trang nào.
    *Một phép tối ưu dựa trên "hai cái tên giống nhau" là một phép đoán, không phải một phép suy.* */
-function rlist(key){if(typeof CUR!=="undefined"&&RENDER[CUR]){reRender(CUR);return}
+/* Ghi địa chỉ Ở ĐÂY, trước khi rẽ nhánh - vì HAI nhánh dưới không cùng đi qua `reRender` (nhánh
+   sổ đứng một mình vẽ thẳng vào `innerHTML`). Đặt lời ghi trong một nhánh thôi thì trang nào rơi
+   vào nhánh kia sẽ bấm chip mà thanh địa chỉ đứng im - đúng chỗ anh Luân bắt được 14/08:
+   *"a bấm chip, có thấy link đổi đâu em"*. Mọi sổ danh sách thuần (`nhaplead`, `test`, `hocvien`
+   ...) đều rơi vào nhánh kia, tức là gần hết các trang có chip. */
+function rlist(key){try{reRenderURL()}catch(e){}
+ if(typeof CUR!=="undefined"&&RENDER[CUR]){reRender(CUR);return}
  document.getElementById("content").innerHTML=renderList(key)}
 function toggleFilt(key,v){var a=FILT[key]||[];var i=a.indexOf(v);if(i>=0)a.splice(i,1);else a.push(v);FILT[key]=a;PAGE[key]=0;rlist(key)}
 function __clearHVF(){window.HVFCLS="";window.HVFCRS=""}
@@ -11006,9 +11032,14 @@ function chayListHTML(list,qfn){list=list||chayList();qfn=qfn||"chayList";
    '<div class="rvqm"><div class="rvqnm">'+esc(J.name)+'</div><div class="rvqp">'+esc(J.phone||"")+(J.owner?" · phụ trách "+esc(J.owner):"")+(age?" · "+age:"")+
     (function(){var nf=jNF(J);if(!nf)return "";var td=new Date();var same=nf.getDate()===td.getDate()&&nf.getMonth()===td.getMonth()&&nf.getFullYear()===td.getFullYear();
      if(!same&&nf<td)return ' · <span style="color:var(--red);font-weight:700">trễ hẹn khách '+("0"+nf.getDate()).slice(-2)+"/"+("0"+(nf.getMonth()+1)).slice(-2)+'</span>';
-     if(same)return ' · <b style="color:var(--navy)">hẹn '+("0"+nf.getHours()).slice(-2)+":"+("0"+nf.getMinutes()).slice(-2)+' hôm nay</b>';return ""})()+'</div></div>'+mstrip(J.k,J.over)+
+     if(same)return ' · <b style="color:var(--navy)">hẹn '+("0"+nf.getHours()).slice(-2)+":"+("0"+nf.getMinutes()).slice(-2)+' hôm nay</b>';return ""})()+'</div></div>'+
+   /* Bảy ô, LUÔN đủ bảy - `mstrip` trả về chuỗi rỗng khi chặng lạ, còn chip "quá hạn" thì chỉ
+      có ở vài dòng. Bọc mỗi thứ trong một ô riêng để dòng thiếu nội dung vẫn giữ đủ ô, không
+      trượt cột. */
+   '<div class="rvqs">'+mstrip(J.k,J.over)+'</div>'+
    '<span class="chip '+J.S.cls+'">'+esc(J.S.t)+'</span>'+
-   '<div class="rvqa">'+(J.over?'<span class="chip red" style="margin-right:6px">quá hạn</span>':(J.miss.length?'<span class="chip amber" style="margin-right:6px">thiếu dữ liệu</span>':''))+esc(J.act?J.act.lb:"-")+'</div>'+
+   '<div class="rvqw">'+(J.over?'<span class="chip red">quá hạn</span>':(J.miss.length?'<span class="chip amber">thiếu dữ liệu</span>':''))+'</div>'+
+   '<div class="rvqa">'+esc(J.act?J.act.lb:"-")+'</div>'+
    '<button class="btn primary sm" onclick="event.stopPropagation();runStart(\''+esc(J.C.pid)+'\','+qfn+'().map(function(x){return x.C.pid}))" aria-label="Chạy quy trình cho '+esc(J.name)+'"><i class="ti ti-player-play"></i>Xử lý</button></div>'});
  if(list.length>60)h+='<div class="mut" style="font-size:11px;padding:6px">... còn '+(list.length-60)+' hồ sơ, dùng ô tìm hoặc lọc chặng để thu hẹp.</div>';
  return h+'</div>'}
@@ -27401,6 +27432,19 @@ settings:["SETTAB","MSGQ","CFQ"],chay:["RUNPID"],
 function ctxCuaTrang(k){var K=(CTXTRANG[k]||[]).slice();
  try{if(HUBTAB[k]&&HUBTAB[k].v)K.push(HUBTAB[k].v)}catch(e){}
  return K}
+/* ═══ V2 14/08 - CHIP LỌC CỦA SỔ DANH SÁCH CŨNG PHẢI VÀO ĐỊA CHỈ ════════════════════════════
+   Anh Luân: *"a bấm chip, có thấy link đổi đâu em, cho nên khi a f5, sẽ bị khôi phục lại chip
+   mặc định của trang á"*. Đúng, và lần trước em vá HỤT: em nối lại cái ống (`reRender` nay có
+   gọi `reRenderURL`) rồi đo chính cái ống ấy, thấy thông thì báo xong. Nhưng ống thông mà
+   KHÔNG CÓ GÌ CHẢY QUA - vì `ctxQuery` chỉ biết đọc biến TOÀN CỤC có tên khai trong `CTXTRANG`,
+   trong khi chip lọc của sổ danh sách nằm ở `FILT[key]` và `QF[key]` - hai cái BẢNG tra theo
+   khoá sổ, không phải biến toàn cục. Bảng khai ở trên có ghi "bốn trang có chip lọc thật đều
+   khai ở đây": câu ấy sai, bốn trang ấy dùng biến riêng (`XLFILT`, `VIECSEV`...), còn hơn hai
+   chục sổ dùng chung `FILT`/`QF` thì chưa trang nào được ghi vào địa chỉ.
+   *Đo cái ống mình vừa nối thì bao giờ cũng thấy thông. Phải đi đúng đường mà người dùng bấm.*
+   Nay hai tham số dùng chung cho MỌI sổ, không phải khai từng trang: `flt` (chip lọc trạng
+   thái, chọn được nhiều nên nối bằng "~") và `qf` (chip lọc nhanh, mỗi lần một cái). */
+function ctxSoCua(k){try{return (k&&LISTCFG[k]&&PBK[k]&&PBK[k].ty==="list")?k:""}catch(e){return ""}}
 function ctxQuery(k){var s="";
  ctxCuaTrang(k).forEach(function(k2){var v=window[k2];
   if(v===null||v===undefined||v==="")return;
@@ -27409,19 +27453,43 @@ function ctxQuery(k){var s="";
      ngắn: một chuỗi tìm bị cắt còn tệ hơn không nhớ, vì nạp lại ra kết quả khác mà không ai ngờ. */
   if(v.length>80)return;
   s+="&"+k2.toLowerCase()+"="+encodeURIComponent(v)});
+ try{var lk=ctxSoCua(k);
+  if(lk){
+   var _f=(FILT[lk]||[]).filter(Boolean);
+   if(_f.length)s+="&flt="+encodeURIComponent(_f.join("~"));
+   var _q=(window.QF&&window.QF[lk])||"";
+   if(_q)s+="&qf="+encodeURIComponent(String(_q));
+  }}catch(e){}
  return s}
 /* Đọc ngữ cảnh TỪ địa chỉ và đặt lại vào app. Chỉ nhận đúng những khoá đã khai trong ctxKeys -
    người ta gõ thêm tham số lạ vào thanh địa chỉ thì app không đặt bừa biến toàn cục theo. */
-function ctxApply(qs){
- var M={};ctxKeys().forEach(function(k){M[k.toLowerCase()]=k});
+function ctxApply(qs,k){
+ var M={};ctxKeys().forEach(function(k2){M[k2.toLowerCase()]=k2});
+ var _flt=null,_qf=null;
  String(qs!=null?qs:(location.search||"")).replace(/^\?/,"").split("&").forEach(function(x){
   var i=x.indexOf("=");if(i<0)return;
-  var t=M[x.slice(0,i)];if(!t)return;
-  try{window[t]=decodeURIComponent(x.slice(i+1))}catch(e){}})}
+  var nm=x.slice(0,i),val=x.slice(i+1);
+  if(nm==="flt"){try{_flt=decodeURIComponent(val)}catch(e){}return}
+  if(nm==="qf"){try{_qf=decodeURIComponent(val)}catch(e){}return}
+  var t=M[nm];if(!t)return;
+  try{window[t]=decodeURIComponent(val)}catch(e){}});
+ /* PHẢI truyền khoá trang vào, KHÔNG được lấy `hashKey()` làm dự phòng ở đây. Lúc `ctxApply`
+    chạy trong `enter()` thì `setRole` đã kịp ghi đè thanh địa chỉ bằng trang đáp của chức danh -
+    đúng cái bẫy mà `_checkf5` đã dựng ra để canh, và em vừa cắn lại nó lần thứ hai bằng một
+    đường khác: `hashKey()` đọc `location.search` SỐNG nên trả về trang mặc định, còn `ctxVao`
+    là bản chụp từ trước nên vẫn đúng. Hai nguồn khác nhau cho cùng một câu hỏi.
+    `hashKey()` chỉ còn là lối chót cho lời gọi nào quên truyền - và nếu quên thì chip không được
+    khôi phục chứ không đặt bừa vào nhầm sổ. */
+ try{var lk=ctxSoCua(k||hashKey());
+  if(lk){
+   if(_flt!==null)FILT[lk]=_flt?_flt.split("~"):[];
+   if(_qf!==null){window.QF=window.QF||{};window.QF[lk]=_qf||null}
+   if(_flt!==null||_qf!==null)PAGE[lk]=0;
+  }}catch(e){}}
 function hashApply(){var k=hashKey();
  if(!k||k===window.HASHCUR)return;
  if(!hashOK(k))return;
- ctxApply();          /* đặt lại hồ sơ/lớp/tab TRƯỚC khi vẽ, không thì vẽ ra trang trống */
+ ctxApply(null,k);    /* đặt lại hồ sơ/lớp/tab/chip TRƯỚC khi vẽ, không thì vẽ ra trang trống */
  go(k,true)}   /* true = đang do Back/Forward, đừng đẩy thêm mốc nữa */
 function go(key,noHist){
  /* V9.27: nhớ lại mục menu đang sáng TRƯỚC khi rời đi. Trang nào không có mục riêng trên menu
@@ -28223,7 +28291,7 @@ function enter(k){
  try{deriveAll()}catch(e){}try{cfEnsure()}catch(e){}try{rtEnsure()}catch(e){}try{autoReturnHandovers()}catch(e){}document.getElementById("login").style.display="none";document.getElementById("app").style.display="flex";setRole(k);try{helloMaybe()}catch(e){}
  /* Giờ mới đi tới chỗ đã đọc được lúc nãy (F5, hoặc mở link người khác gửi). Ngữ cảnh phải đặt
     TRƯỚC `go` - đặt sau thì trang đã vẽ xong bằng hồ sơ rỗng rồi. */
- try{if(hashOK(hkVao)){ctxApply(ctxVao);go(hkVao)}}catch(e){}
+ try{if(hashOK(hkVao)){ctxApply(ctxVao,hkVao);go(hkVao)}}catch(e){}
  /* người dùng sửa tay thanh địa chỉ / bấm Back về hash cũ */
  try{if(!window.__hashOn){window.__hashOn=1;
   window.addEventListener("hashchange",function(){try{hashApply()}catch(e){}});

@@ -8203,9 +8203,14 @@ function chayListHTML(list,qfn){list=list||chayList();qfn=qfn||"chayList";
    '<div class="rvqm"><div class="rvqnm">'+esc(J.name)+'</div><div class="rvqp">'+esc(J.phone||"")+(J.owner?" · phụ trách "+esc(J.owner):"")+(age?" · "+age:"")+
     (function(){var nf=jNF(J);if(!nf)return "";var td=new Date();var same=nf.getDate()===td.getDate()&&nf.getMonth()===td.getMonth()&&nf.getFullYear()===td.getFullYear();
      if(!same&&nf<td)return ' · <span style="color:var(--red);font-weight:700">trễ hẹn khách '+("0"+nf.getDate()).slice(-2)+"/"+("0"+(nf.getMonth()+1)).slice(-2)+'</span>';
-     if(same)return ' · <b style="color:var(--navy)">hẹn '+("0"+nf.getHours()).slice(-2)+":"+("0"+nf.getMinutes()).slice(-2)+' hôm nay</b>';return ""})()+'</div></div>'+mstrip(J.k,J.over)+
+     if(same)return ' · <b style="color:var(--navy)">hẹn '+("0"+nf.getHours()).slice(-2)+":"+("0"+nf.getMinutes()).slice(-2)+' hôm nay</b>';return ""})()+'</div></div>'+
+   /* Bảy ô, LUÔN đủ bảy - `mstrip` trả về chuỗi rỗng khi chặng lạ, còn chip "quá hạn" thì chỉ
+      có ở vài dòng. Bọc mỗi thứ trong một ô riêng để dòng thiếu nội dung vẫn giữ đủ ô, không
+      trượt cột. */
+   '<div class="rvqs">'+mstrip(J.k,J.over)+'</div>'+
    '<span class="chip '+J.S.cls+'">'+esc(J.S.t)+'</span>'+
-   '<div class="rvqa">'+(J.over?'<span class="chip red" style="margin-right:6px">quá hạn</span>':(J.miss.length?'<span class="chip amber" style="margin-right:6px">thiếu dữ liệu</span>':''))+esc(J.act?J.act.lb:"-")+'</div>'+
+   '<div class="rvqw">'+(J.over?'<span class="chip red">quá hạn</span>':(J.miss.length?'<span class="chip amber">thiếu dữ liệu</span>':''))+'</div>'+
+   '<div class="rvqa">'+esc(J.act?J.act.lb:"-")+'</div>'+
    '<button class="btn primary sm" onclick="event.stopPropagation();runStart(\''+esc(J.C.pid)+'\','+qfn+'().map(function(x){return x.C.pid}))" aria-label="Chạy quy trình cho '+esc(J.name)+'"><i class="ti ti-player-play"></i>Xử lý</button></div>'});
  if(list.length>60)h+='<div class="mut" style="font-size:11px;padding:6px">... còn '+(list.length-60)+' hồ sơ, dùng ô tìm hoặc lọc chặng để thu hẹp.</div>';
  return h+'</div>'}
@@ -24598,6 +24603,19 @@ settings:["SETTAB","MSGQ","CFQ"],chay:["RUNPID"],
 function ctxCuaTrang(k){var K=(CTXTRANG[k]||[]).slice();
  try{if(HUBTAB[k]&&HUBTAB[k].v)K.push(HUBTAB[k].v)}catch(e){}
  return K}
+/* ═══ V2 14/08 - CHIP LỌC CỦA SỔ DANH SÁCH CŨNG PHẢI VÀO ĐỊA CHỈ ════════════════════════════
+   Anh Luân: *"a bấm chip, có thấy link đổi đâu em, cho nên khi a f5, sẽ bị khôi phục lại chip
+   mặc định của trang á"*. Đúng, và lần trước em vá HỤT: em nối lại cái ống (`reRender` nay có
+   gọi `reRenderURL`) rồi đo chính cái ống ấy, thấy thông thì báo xong. Nhưng ống thông mà
+   KHÔNG CÓ GÌ CHẢY QUA - vì `ctxQuery` chỉ biết đọc biến TOÀN CỤC có tên khai trong `CTXTRANG`,
+   trong khi chip lọc của sổ danh sách nằm ở `FILT[key]` và `QF[key]` - hai cái BẢNG tra theo
+   khoá sổ, không phải biến toàn cục. Bảng khai ở trên có ghi "bốn trang có chip lọc thật đều
+   khai ở đây": câu ấy sai, bốn trang ấy dùng biến riêng (`XLFILT`, `VIECSEV`...), còn hơn hai
+   chục sổ dùng chung `FILT`/`QF` thì chưa trang nào được ghi vào địa chỉ.
+   *Đo cái ống mình vừa nối thì bao giờ cũng thấy thông. Phải đi đúng đường mà người dùng bấm.*
+   Nay hai tham số dùng chung cho MỌI sổ, không phải khai từng trang: `flt` (chip lọc trạng
+   thái, chọn được nhiều nên nối bằng "~") và `qf` (chip lọc nhanh, mỗi lần một cái). */
+function ctxSoCua(k){try{return (k&&LISTCFG[k]&&PBK[k]&&PBK[k].ty==="list")?k:""}catch(e){return ""}}
 function ctxQuery(k){var s="";
  ctxCuaTrang(k).forEach(function(k2){var v=window[k2];
   if(v===null||v===undefined||v==="")return;
@@ -24606,15 +24624,34 @@ function ctxQuery(k){var s="";
      ngắn: một chuỗi tìm bị cắt còn tệ hơn không nhớ, vì nạp lại ra kết quả khác mà không ai ngờ. */
   if(v.length>80)return;
   s+="&"+k2.toLowerCase()+"="+encodeURIComponent(v)});
+ try{var lk=ctxSoCua(k);
+  if(lk){
+   var _f=(FILT[lk]||[]).filter(Boolean);
+   if(_f.length)s+="&flt="+encodeURIComponent(_f.join("~"));
+   var _q=(window.QF&&window.QF[lk])||"";
+   if(_q)s+="&qf="+encodeURIComponent(String(_q));
+  }}catch(e){}
  return s}
 /* Đọc ngữ cảnh TỪ địa chỉ và đặt lại vào app. Chỉ nhận đúng những khoá đã khai trong ctxKeys -
    người ta gõ thêm tham số lạ vào thanh địa chỉ thì app không đặt bừa biến toàn cục theo. */
-function ctxApply(qs){
- var M={};ctxKeys().forEach(function(k){M[k.toLowerCase()]=k});
+function ctxApply(qs,k){
+ var M={};ctxKeys().forEach(function(k2){M[k2.toLowerCase()]=k2});
+ var _flt=null,_qf=null;
  String(qs!=null?qs:(location.search||"")).replace(/^\?/,"").split("&").forEach(function(x){
   var i=x.indexOf("=");if(i<0)return;
-  var t=M[x.slice(0,i)];if(!t)return;
-  try{window[t]=decodeURIComponent(x.slice(i+1))}catch(e){}})}
+  var nm=x.slice(0,i),val=x.slice(i+1);
+  if(nm==="flt"){try{_flt=decodeURIComponent(val)}catch(e){}return}
+  if(nm==="qf"){try{_qf=decodeURIComponent(val)}catch(e){}return}
+  var t=M[nm];if(!t)return;
+  try{window[t]=decodeURIComponent(val)}catch(e){}});
+ /* Không có khoá trang truyền vào thì tự đọc lại từ địa chỉ - hai chỗ gọi hàm này đều lấy trang
+    từ cùng một nguồn ấy, nên không lệch. */
+ try{var lk=ctxSoCua(k||hashKey());
+  if(lk){
+   if(_flt!==null)FILT[lk]=_flt?_flt.split("~"):[];
+   if(_qf!==null){window.QF=window.QF||{};window.QF[lk]=_qf||null}
+   if(_flt!==null||_qf!==null)PAGE[lk]=0;
+  }}catch(e){}}
 function hashApply(){var k=hashKey();
  if(!k||k===window.HASHCUR)return;
  if(!hashOK(k))return;
