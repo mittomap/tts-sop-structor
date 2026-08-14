@@ -1480,7 +1480,7 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .rvqn{width:24px;height:24px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--muted);flex:0 0 auto}
 .rvqm{min-width:0}
 .rvqnm{font-size:13px;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rvqp{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rvqp{font-size:11px;color:var(--muted);white-space:normal}
 /* Ray chặng: bỏ `margin-left:auto` mà nó mang theo từ thời hàng còn là flex - trong lưới, cái
    đẩy-sang-phải ấy vô nghĩa mà lại làm ray rời khỏi mốc cột. */
 .rvqs{display:flex;align-items:center;min-width:0}
@@ -1492,9 +1492,16 @@ table.dt tbody tr.clk.on td{font-weight:600}
    nát từng cột. Trình duyệt không biết `subgrid` cũng rơi về đúng lối ấy: nếu để nguyên thì
    `grid-template-columns:subgrid` thành giá trị lỗi, cả hàng dồn thành một cột dọc - hỏng nặng
    hơn hẳn cái so le mà nó định chữa. */
-@media(max-width:1100px){.rvq{display:flex;flex-direction:column}.rvqi{display:flex;flex-wrap:wrap}.rvqm{min-width:150px}.rvqa{flex:1}}
+/* Ở khổ hẹp bỏ luôn `nowrap`/`ellipsis` của cột việc kế tiếp: cắt đuôi chỉ hợp lý khi cột có
+   một bề rộng đàng hoàng. Trên điện thoại nó co còn vài chục pixel, và `_checkmat` đo được
+   trình duyệt đang cắt mất tới 60px của câu "Hoàn tất onboarding" - tức mất luôn phần nói
+   PHẢI LÀM GÌ. *Thà xuống dòng còn hơn cắt mất vế quan trọng nhất của câu.* */
+@media(max-width:1100px){.rvq{display:flex;flex-direction:column}.rvqi{display:flex;flex-wrap:wrap}.rvqm{min-width:150px}
+ .rvqa{flex:1 1 100%;white-space:normal;overflow:visible;text-overflow:clip}
+ .rvqnm,.rvqp{white-space:normal;overflow:visible;text-overflow:clip}}
 @supports not (grid-template-columns:subgrid){
- .rvq{display:flex;flex-direction:column}.rvqi{display:flex;flex-wrap:wrap}.rvqm{min-width:150px}.rvqa{flex:1}}
+ .rvq{display:flex;flex-direction:column}.rvqi{display:flex;flex-wrap:wrap}.rvqm{min-width:150px}
+ .rvqa{flex:1 1 100%;white-space:normal;overflow:visible;text-overflow:clip}}
 .bwrow{display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:8px;cursor:pointer}
 .bwrow:hover{background:var(--bg)}
 .bwd{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
@@ -2205,7 +2212,7 @@ body.drsz .drawer{transition:none}
 .obcards.rows .wowinfo{flex:1 1 100%;width:100%}
 .obcards.rows .obcard .obh{flex:1 1 300px;margin:0;align-items:center;flex-wrap:wrap;min-width:0}
 .obcards.rows .obcard .obh>div:first-child{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0}
-.obcards.rows .obcard .obm{margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:none;min-width:0}
+.obcards.rows .obcard .obm{margin:0;white-space:normal;overflow:visible;max-width:none;min-width:0}
 .obcards.rows .obcard .steps,.obcards.rows .obcard .obm2{display:none}
 /* V9.67: `nowrap` chỉ đúng khi màn ĐỦ RỘNG. Đo ở 834px (iPad dọc): dải nút của một buổi WOW dài
    694px, cộng phần tên và giờ ở bên trái là trang phải cuộn ngang. Nay mặc định XUỐNG DÒNG, chỉ
@@ -2362,6 +2369,19 @@ body.drsz .drawer{transition:none}
  .obcards.rows .obcard .obact{margin-left:0;flex-wrap:wrap}
  .obcards.rows .obcard{flex-wrap:wrap}
  .obact .btn{max-width:100%}}
+/* ═══ V2 14/08 - KHỔ ĐIỆN THOẠI: KHỐI TÊN VÀ DẢI TIỀN PHẢI XUỐNG DÒNG, KHÔNG CHEN NHAU ═══════
+   `_checkmat` M5 đo được ở 390px: khối tên (`.obh`) bị bóp còn **43px** trong khi tên người đã
+   rộng 76px và dòng khoá - mã đơn rộng 185px; dải tiền bên cạnh chiếm 281px. Hai thứ nằm cùng
+   một hàng flex, `.obh` mang `flex:1 1 0` nên nó nhường hết chỗ rồi tự co lại tới mức không đọc
+   được - chữ tràn ra đè lên dải tiền, đọc thành "Pre-IELTS 4 tháng · ENR- Đã thu 12.500.000đ".
+   `overflow:hidden` giấu được cái tràn nhưng không chữa được cái gốc: một cột 43px thì cắt cụt
+   cả tên người. Ở khổ này cho mỗi thứ trọn một dòng - dài hơn một chút nhưng đọc được.
+   *Bóp một cột xuống dưới mức đọc được thì không còn là bố cục, đó là giấu dữ liệu.* */
+@media(max-width:640px){
+ .obcards.rows .obcard .obh{flex:1 1 100%;overflow:visible}
+ .obcards.rows .obcard .obh>div:first-child{overflow:visible}
+ .obcards.rows .obcard .obm{max-width:100%;white-space:normal}
+ .obcards.rows .obcard .paybar{flex:1 1 100%;margin-bottom:2px}}
 /* Ô chọn dài (tên lớp đầy đủ) không được đẩy trang rộng ra - cắt đuôi trong khung là đủ. */
 @media(max-width:560px){.sel{max-width:100%}.fbar,.tbar{flex-wrap:wrap}}
 .obcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
@@ -2426,7 +2446,17 @@ body.drsz .drawer{transition:none}
 .slaic.red{background:var(--redb);color:var(--red)}.slaic.amber{background:var(--amberb);color:var(--amber)}
 .slat{flex:1;min-width:0}
 .slaw{font-size:13px;font-weight:700;color:var(--navy)}
-.slad{font-size:11.5px;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ═══ V2 14/08 - THÔI CẮT DÒNG PHỤ, CHO NÓ XUỐNG DÒNG ═══════════════════════════════════════
+   `_checkmat` M5 báo "hai khối chữ đè lên nhau" ở ba chỗ, và cả ba cùng một hình: một dòng phụ
+   mang `white-space:nowrap` + `overflow:hidden` + `ellipsis`, bên trong có mấy viên chip
+   (`.slacat`, `.agebadge`). Khung cha cắt được phần chữ, nhưng CHIP thì vẫn nằm ở toạ độ thật
+   của nó - lòi ra ngoài khung và đè lên khối bên cạnh. Mắt thấy chip bị cắt cụt, máy thấy hai
+   khối chồng nhau; cả hai đều đúng.
+   Cho xuống dòng thay vì cắt: dòng dài thì cao thêm một dòng, còn hơn mất hẳn mốc thời gian
+   ("quá 1 ngày") hay tên mảng việc - đó là vế quan trọng nhất của câu.
+   *Cắt chữ chỉ an toàn khi thứ bị cắt là phần đuôi không ai cần; hễ trong đó có một cái chip
+   thì cắt là mất thông tin, chưa kể chip không chịu bị cắt.* */
+.slad{font-size:11.5px;color:var(--muted);margin-top:1px;white-space:normal;overflow:visible}
 .slacat{display:inline-block;font-size:11px;background:#EEF2F6;color:#5A6675;border-radius:6px;padding:1px 6px;margin-left:4px;white-space:nowrap}
 .agebadge{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:1px 6px;margin-left:6px}
 /* V9.99s - huy hieu tuoi viec ("quá 15h", "quá 10 ngày") dung MAU BAO DONG lam MAU CHU: #E08A1E tren nen #FFF6D8 chi duoc tuong phan 2.5, doc bang mat la chu chim vao nen. Da co san cap mau dam hon dung cho dung viec nay o `.chip` (#854F0B / #A32D2D) - dung lai chinh no de toan app chi co MOT thang mau chu tren nen canh bao. */
