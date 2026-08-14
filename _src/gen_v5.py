@@ -1422,7 +1422,15 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .colmh{font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--muted);text-transform:uppercase;padding:4px 6px 6px}
 .colmi{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--navy);padding:5px 6px;border-radius:6px;cursor:pointer}
 .colmi:hover{background:var(--bg)}
-.rvq{display:flex;flex-direction:column;gap:8px}
+/* Khung lưới đặt ở CẢ SỔ, không đặt ở từng hàng. Đây là chỗ em làm sai lượt đầu: `display:grid`
+   trên `.rvqi` biến MỖI HÀNG thành một cái lưới riêng, mà bề rộng cột chỉ dùng chung trong cùng
+   một khung - nên cột vẫn tính theo nội dung của chính hàng đó, đo ra ba mốc lệch nhau 24-32px.
+   Đúng cái anh Luân chụp: *"lệch nè em"*.
+   Nay `.rvq` giữ bảy cột, mỗi hàng `grid-template-columns:subgrid` mượn lại đúng bảy cột ấy -
+   giữ được viền và nền của hàng (nó vẫn là một cái thẻ) mà mốc cột thì chung cho cả sổ.
+   *Cột chỉ thẳng khi chúng được đo cùng một lần, không phải khi chúng được khai giống nhau.* */
+.rvq{display:grid;grid-template-columns:24px minmax(0,1.5fr) auto auto 74px minmax(0,1fr) auto;gap:8px 12px}
+.rvq>.mut{grid-column:1/-1}
 /* ═══ V2 14/08 - SỔ TRỰC CHẶNG XẾP THÀNH CỘT (anh Luân: *"sắp xếp thẳng cột mới đẹp"*) ══════
    Trước hôm nay `.rvqi` là `display:flex` và cột tên chỉ có `min-width:150px` - tức nó KHÔNG có
    bề rộng, nó nở theo chữ. Mà chữ trong ô ấy là *tên khách + tên người phụ trách + tuổi hồ sơ +
@@ -1434,7 +1442,7 @@ table.dt tbody tr.clk.on td{font-weight:600}
    Ô "quá hạn / thiếu dữ liệu" được cấp MỘT CỘT RIÊNG rộng cố định, kể cả khi dòng ấy không có
    gì để hiện. *Bài học đã cắn ba lần: hễ một ô chỉ mọc ra trong một nhánh `if` thì những dòng
    không đi qua nhánh ấy sẽ thiếu hẳn một ô, và cả hàng trượt đi một nấc.* */
-.rvqi{display:grid;grid-template-columns:24px minmax(0,1.5fr) auto auto 74px minmax(0,1fr) auto;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;background:#fff}
+.rvqi{grid-column:1/-1;display:grid;grid-template-columns:subgrid;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;background:#fff}
 .rvqi:hover{border-color:var(--blue);box-shadow:0 2px 10px rgba(0,0,0,.06)}
 .rvqn{width:24px;height:24px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--muted);flex:0 0 auto}
 .rvqm{min-width:0}
@@ -1448,8 +1456,12 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .rvqw{display:flex;align-items:center}
 .rvqa{font-size:11.5px;color:var(--muted);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* Màn hẹp thì lưới bảy cột không đủ chỗ - trả về hàng xuống dòng như cũ, thà so le còn hơn bóp
-   nát từng cột. */
-@media(max-width:1100px){.rvqi{display:flex;flex-wrap:wrap}.rvqm{min-width:150px}.rvqa{flex:1}}
+   nát từng cột. Trình duyệt không biết `subgrid` cũng rơi về đúng lối ấy: nếu để nguyên thì
+   `grid-template-columns:subgrid` thành giá trị lỗi, cả hàng dồn thành một cột dọc - hỏng nặng
+   hơn hẳn cái so le mà nó định chữa. */
+@media(max-width:1100px){.rvq{display:flex;flex-direction:column}.rvqi{display:flex;flex-wrap:wrap}.rvqm{min-width:150px}.rvqa{flex:1}}
+@supports not (grid-template-columns:subgrid){
+ .rvq{display:flex;flex-direction:column}.rvqi{display:flex;flex-wrap:wrap}.rvqm{min-width:150px}.rvqa{flex:1}}
 .bwrow{display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:8px;cursor:pointer}
 .bwrow:hover{background:var(--bg)}
 .bwd{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
