@@ -3481,7 +3481,7 @@ var PAGES=[
 /* V9.60: bảng công giảng dạy vốn nằm trong Sổ thu học phí (một tab). Nhân sự cần đúng bảng đó
    để chốt lương mà KHÔNG được nhìn học phí, nên nó có một cửa riêng. Cùng một hàm vẽ, hai lối
    vào - không nhân đôi bảng, không nhân đôi số. */
-{k:"bangcong",g:"Quản lý",ic:"ti-clock-dollar",t:"Bảng công giảng dạy",c:"Giờ dạy · ca WOW · ca test",ty:"custom"},
+{k:"bangcong",g:"Quản lý",ic:"ti-clock-dollar",t:"Bảng công giảng dạy & WOW",c:"Giờ đứng lớp · buổi WOW 1-1 · ca test",ty:"custom"},
 /* V9.60: Nhân sự cần DANH SÁCH NGƯỜI. Bảng nguồn `nhanvien` vốn là trang ẩn (chỉ tới được từ
    Cài đặt), nên bộ phận Nhân sự đáp vào đó là đáp vào một trang không có mục trên menu - vào
    được nhưng không quay lại được. Mở một cửa có tên đàng hoàng, dùng lại đúng bảng đó. */
@@ -4802,7 +4802,7 @@ var THEDEF={
   ["bt_hcr","Nộp bài (HCR)","Tỷ lệ bài đã nộp trên tổng bài đã giao trong phạm vi đang xem, so với ngưỡng HCR ở Ngưỡng KPI. Chip đếm dòng nên không chia được mẫu số - đây là thứ chỉ thẻ nói được. Danh sách: chọn lớp rồi vào chế độ \"Thu bài\" để thấy bài chưa nộp."],
   ["bt_qhan","Bài quá hạn chấm","Bài học viên đã nộp mà quá ngưỡng slaHomeworkGrading_hours vẫn chưa có điểm - đo bằng ĐỒNG HỒ, khác chip \"Chờ chấm\" (chip đếm mọi bài chờ, kể cả bài vừa nộp xong). Danh sách: bấm chip \"Chờ chấm - mọi lớp\" ở thanh chế độ ngay dưới."],
   ["bt_diem","Điểm trung bình bài đã chấm","Trung bình cộng điểm của những bài đã có điểm trong phạm vi đang xem - lớp đang làm được tới đâu, chứ không phải bao nhiêu bài. Danh sách: sổ Bài tập trong trang Tra cứu, cột Điểm."]]},
- bangcong:{t:"Bảng công giảng dạy",the:[
+ bangcong:{t:"Bảng công giảng dạy & WOW",the:[
   ["bc_nguoi","Giảng viên có buổi thiếu mốc","Đếm NGƯỜI đang vướng, không đếm buổi - vì việc phải làm là gọi từng người bổ sung mốc giờ. Danh sách: bấm chip \"Buổi thiếu mốc giờ\" ở thanh ngay dưới."],
   /* V2 13/08 - thẻ "bc_buoi" đã bỏ (trùng chip "Buổi thiếu mốc giờ"). */
   ["bc_du","Buổi đủ mốc, tính công được","Số buổi đã đủ hai mốc, chốt công được ngay. Danh sách: bảng ngay dưới, cột Giờ dạy."]]},
@@ -23342,7 +23342,7 @@ var TOURS={
      Giảng viên nữa - `_checktour` bắt ngay), chỉ đổi neo sang thân trang.
      Luật rút ra: neo theo CHỮ chỉ chắc khi chữ ấy là duy nhất trên màn - thêm một mục menu
      trùng tên là neo lệch, mà lệch kiểu này chỉ lộ ra ở khổ điện thoại. */
-  {p:"bangcong",sel:'@man',t:"Bảng công giảng dạy",d:"Giờ đứng lớp, ca WOW 1-1 và ca test đầu vào của từng giảng viên trong tháng. Buổi nào thiếu mốc giờ vào - giờ ra thì tính công sai, phải soát trước khi chốt lương.",hint:"Xem cột giờ dạy và cột buổi thiếu mốc giờ."},
+  {p:"bangcong",sel:'@man',t:"Bảng công giảng dạy & WOW",d:"Giờ đứng lớp, ca WOW 1-1 và ca test đầu vào của từng giảng viên trong tháng. Buổi nào thiếu mốc giờ vào - giờ ra thì tính công sai, phải soát trước khi chốt lương.",hint:"Xem cột giờ dạy và cột buổi thiếu mốc giờ."},
   {p:"giaoviec",ctx:function(){window.TKTAB="wait";window.TKF="live"},sel:'@txt:Nhận việc',t:"Việc nội bộ",d:"Việc người khác giao cho bạn nằm ở đây. Bấm Nhận là người giao biết việc đã tới tay; báo xong ngay lúc làm xong.",hint:"Xong một ngày của Nhân sự!"}]},
  tn_ketoan:{lv:"trainghiem",role:"Kế toán",t:"Một ngày của Kế toán",ic:"ti-cash",d:"5 bước - thu, đối soát, công nợ, hoàn tiền",steps:[
   {p:"thanhtoan",sel:'@txt:Ghi nhận khoản thu',t:"Thu học phí",d:"Thu tiền mặt hay chuyển khoản đều ghi ở đây, in phiếu thu ngay. Đóng theo đợt thì ghi hẹn thu đợt sau.",hint:"Bấm 'Ghi nhận khoản thu' ở đầu trang, chọn đăng ký còn nợ, nhập số tiền rồi Lưu.",chk:function(){return tourMore("thu")}},
@@ -24697,28 +24697,69 @@ function renderCong(){
  (function(){var _tm=bcThieuMoc();
   h+=chipBar("bangcong",bcLoc(),[["all","Tất cả giảng viên",null],
    ["thieu","Buổi thiếu mốc giờ",_tm.length,_tm.length?"red":""]],null)})();
- h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Người dạy</th><th>Cơ sở</th><th>Buổi lớp</th><th>Giờ dạy</th><th>Chia 1-1 / nhóm</th><th>Chia theo ca</th><th>Trong đó online</th><th>Buổi WOW (giờ kèm)</th><th>Ca test</th><th>Vào trễ</th><th>Chưa ghi nội dung</th>'+(xTien?"<th>Tiền công tạm tính</th>":"")+'</tr></thead><tbody>';
- if(!L.filter(function(x){return x.n||x.wow||x.test}).length)h+='<tr><td class="empty" colspan="'+(xTien?12:11)+'">Tháng này chưa có buổi dạy nào hoàn thành.</td></tr>';
- L.forEach(function(x){if(!x.n&&!x.wow&&!x.test)return;
-  /* V9.93: bấm cả dòng là mở hồ sơ chính người đó - trước đây chỉ có cái tên là bấm được, phần
-     còn lại của dòng câm (`_checkbam` bắt). */
-  h+='<tr data-mo="openNSQuick" data-mo-arg="'+esc(x.g.staff_id)+'"><td>'+nsLnk(x.g.staff_id,x.g.full_name,"")+'</td>'+
-   '<td>'+esc(elabel(x.g.branch)||x.g.branch||"-")+'</td>'+
-   '<td><b>'+x.n+'</b></td>'+
-   '<td><b>'+(Math.round(x.gio*10)/10)+'h</b>'+(x.thieuGio?' <span class="chip red" data-tip="Buổi đã dạy xong mà không ghi giờ vào - giờ ra, không tính công được">'+x.thieuGio+' buổi thiếu giờ</span>':'')+'</td>'+
-   /* AC3 - tách 1-1 với lớp nhóm. Đọc thẳng con số `congThang()` đã chia sẵn, không cộng lại ở
-      đây: hai nơi cùng đọc một nguồn thì không thể nói hai số. */
-   '<td>'+(x.gio11?('<span class="knb" data-tip="'+esc(x.n11+" buổi kèm riêng 1-1 trong tháng")+'"><i>1-1</i>'+(Math.round(x.gio11*10)/10)+'h</span>'):'<span class="mut">-</span>')+
-     (x.gioNhom?(' <span class="knb" data-tip="'+esc(x.nNhom+" buổi lớp nhóm trong tháng")+'"><i>NHÓM</i>'+(Math.round(x.gioNhom*10)/10)+'h</span>'):'')+'</td>'+
-   '<td style="font-size:11.5px">'+esc(caText(x.theoCa,xTien)||"-")+'</td>'+
-   '<td>'+(x.onl?'<span class="chip blue">'+x.onl+'</span>':'<span class="mut">0</span>')+'</td>'+
-   '<td>'+(x.wow?('<span class="chip" style="background:#FCE7F3;color:#9D174D">'+x.wow+'</span> <span class="mut" style="font-size:11px">'+(Math.round(x.gioWow*10)/10)+'h'+(x.thieuWow?(' · '+x.thieuWow+' thiếu mốc'):'')+'</span>'):'<span class="mut">0</span>')+'</td>'+
-   '<td>'+(x.test?('<span class="chip" style="background:#EDE9FE;color:#5B21B6">'+x.test+'</span>'):'<span class="mut">0</span>')+'</td>'+
-   '<td>'+(x.late?'<span class="chip amber">'+x.late+'</span>':'0')+'</td>'+
-   '<td>'+(x.noNote?'<span class="chip red">'+x.noNote+'</span>':'<span class="chip green">0</span>')+'</td>'+
-   (xTien?('<td style="font-variant-numeric:tabular-nums"><b>'+vnd(x.tien)+'</b></td>'):'')+'</tr>'});
- h+='<tr style="background:#FAFBFD;font-weight:800"><td colspan="2">TỔNG</td><td>'+tot+'</td><td>'+(Math.round(totG*10)/10)+'h</td><td colspan="2"></td><td>'+totW+'</td><td>'+totT+'</td><td></td><td>'+noNote+'</td>'+(xTien?('<td style="font-variant-numeric:tabular-nums">'+vnd(tien)+'</td>'):'')+'</tr>';
- return h+'</tbody></table></div></div>'}
+ /* ═══ V2 14/08 - HAI ĐỘI, HAI BẢNG (anh Luân: *"nên bổ sung vào đó phần của wow, phân biệt
+    cách hiển thị giữa giảng viên và wow"*) ══════════════════════════════════════════════════
+    Bảng cũ là MỘT bảng 12 cột cho cả hai đội, nên đọc ra đầy số 0: WOW coach có 0 ở Buổi lớp ·
+    Giờ dạy · Chia 1-1/nhóm · Chia theo ca · Online (năm cột), còn giáo viên lớp có 0 ở Buổi WOW
+    và Ca test. Quá nửa mặt bảng là những con số 0 nói đúng một điều - *người này không làm việc
+    ấy* - mà lại chiếm chỗ y như một con số thật.
+    Nay tách theo VAI, không tách theo số liệu: ai mang vai WOW thì vào bảng WOW, còn lại vào
+    bảng giảng viên lớp. Tách theo số thì một giáo viên tháng này tình cờ chấm một ca test là
+    nhảy bảng, tháng sau lại nhảy về - bảng không đứng yên thì không ai đối chiếu được.
+    Và trong MỖI bảng, cột nào cả khối đều rỗng thì không dựng - cùng luật vừa áp cho cột "Thao
+    tác" của các sổ: *hỏi trước khi vẽ, cột này có nội dung không.*
+    Đơn giá thì vẫn một sổ: lớp trả theo GIỜ, WOW và test trả theo LẦN (V9.40c) - hai bảng chỉ
+    khác chỗ đứng, không khác cách tính. */
+ var COT=[
+  {k:"ten",t:"Người dạy",co:function(){return true},ve:function(x){return nsLnk(x.g.staff_id,x.g.full_name,"")}},
+  {k:"cs",t:"Cơ sở",co:function(){return true},ve:function(x){return esc(elabel(x.g.branch)||x.g.branch||"-")}},
+  {k:"n",t:"Buổi lớp",co:function(x){return x.n>0},ve:function(x){return '<b>'+x.n+'</b>'},tong:function(a,x){return a+x.n}},
+  {k:"gio",t:"Giờ dạy",co:function(x){return x.gio>0||x.thieuGio>0},tong:function(a,x){return a+x.gio},dv:"h",
+   ve:function(x){return '<b>'+(Math.round(x.gio*10)/10)+'h</b>'+(x.thieuGio?' <span class="chip red" data-tip="Buổi đã dạy xong mà không ghi giờ vào - giờ ra, không tính công được">'+x.thieuGio+' buổi thiếu giờ</span>':'')}},
+  /* AC3 - tách 1-1 với lớp nhóm. Đọc thẳng con số `congThang()` đã chia sẵn, không cộng lại ở
+     đây: hai nơi cùng đọc một nguồn thì không thể nói hai số. */
+  {k:"chia",t:"Chia 1-1 / nhóm",co:function(x){return x.gio11>0||x.gioNhom>0},
+   ve:function(x){return (x.gio11?('<span class="knb" data-tip="'+esc(x.n11+" buổi kèm riêng 1-1 trong tháng")+'"><i>1-1</i>'+(Math.round(x.gio11*10)/10)+'h</span>'):'<span class="mut">-</span>')+
+    (x.gioNhom?(' <span class="knb" data-tip="'+esc(x.nNhom+" buổi lớp nhóm trong tháng")+'"><i>NHÓM</i>'+(Math.round(x.gioNhom*10)/10)+'h</span>'):'')}},
+  {k:"ca",t:"Chia theo ca",co:function(x){return !!caText(x.theoCa,xTien)},
+   ve:function(x){return '<span style="font-size:11.5px">'+esc(caText(x.theoCa,xTien)||"-")+'</span>'}},
+  {k:"onl",t:"Trong đó online",co:function(x){return x.onl>0},ve:function(x){return x.onl?'<span class="chip blue">'+x.onl+'</span>':'<span class="mut">0</span>'}},
+  {k:"wow",t:"Buổi WOW (giờ kèm)",co:function(x){return x.wow>0},tong:function(a,x){return a+x.wow},
+   ve:function(x){return x.wow?('<span class="chip" style="background:#FCE7F3;color:#9D174D">'+x.wow+'</span> <span class="mut" style="font-size:11px">'+(Math.round(x.gioWow*10)/10)+'h'+(x.thieuWow?(' · '+x.thieuWow+' thiếu mốc'):'')+'</span>'):'<span class="mut">0</span>'}},
+  {k:"test",t:"Ca test",co:function(x){return x.test>0},tong:function(a,x){return a+x.test},
+   ve:function(x){return x.test?('<span class="chip" style="background:#EDE9FE;color:#5B21B6">'+x.test+'</span>'):'<span class="mut">0</span>'}},
+  {k:"tre",t:"Vào trễ",co:function(x){return x.late>0},ve:function(x){return x.late?'<span class="chip amber">'+x.late+'</span>':'0'}},
+  {k:"nonote",t:"Chưa ghi nội dung",co:function(){return true},tong:function(a,x){return a+x.noNote},
+   ve:function(x){return x.noNote?'<span class="chip red">'+x.noNote+'</span>':'<span class="chip green">0</span>'}},
+  {k:"tien",t:"Tiền công tạm tính",co:function(){return xTien},tong:function(a,x){return a+x.tien},tiende:1,
+   ve:function(x){return '<span style="font-variant-numeric:tabular-nums"><b>'+vnd(x.tien)+'</b></span>'}}];
+ function congBang(nhan,giai,ds){
+  if(!ds.length)return "";
+  var cols=COT.filter(function(c){return ds.some(function(x){return c.co(x)})});
+  var o='<div class="sechdw"><div class="sechd">'+esc(nhan)+
+   '<div class="fhint">'+esc(giai)+'</div></div></div>'+
+   '<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr>'+
+   cols.map(function(c){return '<th>'+esc(c.t)+'</th>'}).join("")+'</tr></thead><tbody>';
+  ds.forEach(function(x){
+   /* V9.93: bấm cả dòng là mở hồ sơ chính người đó - trước đây chỉ có cái tên là bấm được, phần
+      còn lại của dòng câm (`_checkbam` bắt). */
+   o+='<tr data-mo="openNSQuick" data-mo-arg="'+esc(x.g.staff_id)+'">'+
+    cols.map(function(c){return '<td>'+c.ve(x)+'</td>'}).join("")+'</tr>'});
+  o+='<tr style="background:#FAFBFD;font-weight:800">'+cols.map(function(c,i){
+   if(i===0)return '<td>TỔNG</td>';
+   if(!c.tong)return '<td></td>';
+   var v=ds.reduce(c.tong,0);
+   return '<td>'+(c.tiende?vnd(v):(c.dv==="h"?((Math.round(v*10)/10)+"h"):v))+'</td>'}).join("")+'</tr>';
+  return o+'</tbody></table></div></div>'}
+ var _lv=L.filter(function(x){return x.n||x.wow||x.test});
+ var _wow=_lv.filter(function(x){return /wow/.test(ecode(x.g.role))});
+ var _gv=_lv.filter(function(x){return !/wow/.test(ecode(x.g.role))});
+ if(!_lv.length)h+='<div class="panel"><div class="pbody"><div class="empty">Tháng này chưa có buổi dạy nào hoàn thành.</div></div></div>';
+ h+=congBang("Giảng viên lớp ("+_gv.length+")",
+   "Công tính theo GIỜ đứng lớp thật - từ giờ vào lớp tới giờ kết thúc của buổi đã dạy xong. Đơn giá tra theo giảng viên x loại ngày x ca.",_gv);
+ h+=congBang("WOW coach ("+_wow.length+")",
+   "Công tính theo LẦN, không theo giờ: mỗi buổi WOW 1-1 và mỗi ca test đầu vào đã chấm là một lần. Giờ vào - ra của buổi WOW vẫn ghi để quản lý ca.",_wow);
+ return h}
 /* ===== SỔ THU HỌC PHÍ: tab ĐÃ THU (DL07) + tab DỰ THU (DL06b) ===== */
 function sothuTab(k){window.STTAB=k;reRender("dsthanhtoan")}
 /* Gom mọi đợt CHƯA đóng đủ thành danh sách dự thu. Mỗi dòng = một đợt của một đơn.
@@ -24851,8 +24892,11 @@ function renderNhansu(){
 function bcLoc(){return fget("bangcong")}
 function renderBangcong(){
  var thieu=bcThieuMoc(),xong=srows("DL11").filter(function(x){return isc(x.session_status,"completed")});
- return pageHead("Bảng công giảng dạy",
-  "Giờ đứng lớp, ca WOW 1-1 và ca test đầu vào của từng giảng viên trong tháng - dùng để đối chiếu trước khi chốt công.","")
+ /* Tên cũ "Bảng công giảng dạy" nói thiếu đúng một nửa số người trong bảng (anh Luân: *"nên bổ
+    sung vào đó phần của wow"*). Đội WOW không "giảng dạy" theo nghĩa đứng lớp, nên đọc tên trang
+    xong không ai nghĩ công của mình nằm trong đó - dù nó đã nằm trong đó từ lâu. */
+ return pageHead("Bảng công giảng dạy & WOW",
+  "Giờ đứng lớp của giảng viên · buổi WOW 1-1 và ca test đầu vào của WOW coach - đối chiếu trước khi chốt công.","")
   +statStrip([
    /* V2 09/08 - Ô ĐẦU TIÊN TỪNG LÀ "Buổi đã dạy xong trong sổ" - SỐ TÍCH LUỸ, đọc xong không
       quyết được gì, sáng mai đọc lại vẫn gần y hệt. Đúng loại ô anh Luân cho bỏ ở V9.57 và
