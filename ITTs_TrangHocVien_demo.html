@@ -15866,6 +15866,12 @@ var CFNHOM=[
  ["P7 · Buổi WOW 1-1","Hạn xác nhận buổi mới đặt, hạn ghi nội dung sau buổi, mỗi lần cấp thêm tối đa mấy lượt, và bao lâu không bấm kết thúc thì máy tự chốt.",["hoctap","dswow"]],
  ["P8-P9 · Khảo sát, phản hồi & khiếu nại","Điểm hài lòng dưới mức nào thì phải hỏi lại, hạn phân loại phản hồi, và ba mức hạn xử lý khiếu nại theo độ nghiêm trọng.",["cskh","viec"]],
  ["P10 · Kết thúc khóa & tái đăng ký","Trước khi hết khóa bao nhiêu ngày thì chuẩn bị, bao lâu phải mời tái đăng ký, và học viên bảo lưu bao lâu thì nhắc lại.",["ketthuc","viec"]],
+ /* V2 14/08 - NHÓM CÒN THIẾU BẢN KHAI. Hai tham số của tính năng cam kết (dựng sáng nay) đã có
+    trong `APPPARAMS` nhưng chưa có dòng nào trong `CFNHOM` - `_check16` bắt đúng: nhóm không khai
+    thì màn Cài đặt vẫn hiện tham số, nhưng nó rơi xuống cuối không tiêu đề, không câu giải thích,
+    và không ai biết nó thuộc chặng nào của hành trình. *Thêm một tham số thì phải khai luôn nó
+    thuộc họ nào - bảng tham số không có họ thì người đi tìm không mò ra.* */
+ ["Quy định & cam kết lớp học","Nội dung quy định lớp và cam kết mà học viên phải xác nhận trước khi vào lớp, cùng số hiệu bản hiện hành. Sửa nội dung thì tăng số bản lên - người đã ký bản cũ vẫn tính là đã ký, hồ sơ ghi rõ họ ký ở bản nào.",["socamket","xeplop"]],
  /* V9.64b: ba tham số cửa sổ thời gian của các bảng số là MỘT HỌ thật - chúng cùng trả lời một
     câu "nhìn lại / nhìn tới bao nhiêu ngày". Nhét vào nhóm P1 (SLA gọi khách) là xếp nhầm họ, mà
     xếp nhầm họ thì người đi tìm không bao giờ mò ra. */
@@ -22885,7 +22891,7 @@ var TOURS={
  tn_hocvu:{lv:"trainghiem",role:"Học vụ - CSKH",t:"Một ngày của Học vụ",ic:"ti-school",d:"12 bước - xếp lớp, cam kết, theo lớp, chăm học viên",steps:[
   /* V9.63: kênh học viên gửi yêu cầu là việc của học vụ, mà bài này chưa nói tới - anh Luân nhắc
      đúng luật đã chốt: mỗi lần đổi app phải soát lại tour và Trợ lý. */
-  {p:"giaoviec",ctx:function(){window.TKTAB="hv";window.TKF="live"},sel:'@man',t:"Học viên nhắn gì cho trung tâm",d:"Học viên gửi yêu cầu từ Cổng học viên - xin nghỉ, xin học bù, hỏi lịch, báo đã chuyển khoản. Chúng về tab Từ học viên của Giao việc, kèm hạn nhận việc; yêu cầu về tiền thì sang kế toán.",hint:"Bấm Nhận việc ở một thẻ rồi trả lời ngay trong thẻ đó."},
+  {p:"giaoviec",ctx:function(){window.TKTAB="hv";window.TKF="live"},sel:'@ychvtab',t:"Học viên nhắn gì cho trung tâm",d:"Học viên gửi yêu cầu từ Cổng học viên - xin nghỉ, xin học bù, hỏi lịch, báo đã chuyển khoản. Chúng về tab Từ học viên của Giao việc, kèm hạn nhận việc; yêu cầu về tiền thì sang kế toán.",hint:"Bấm Nhận việc ở một thẻ rồi trả lời ngay trong thẻ đó."},
   /* `ctx` đặt chip "Chờ xếp lớp" TRƯỚC khi khoanh. Bắt buộc từ 14/08: bảng chờ xếp lớp không
      còn được chép lại ở nhánh "tất cả" (anh Luân: *"đã có chip bên dưới rồi"*), nên chữ "Xếp
      vào lớp" chỉ có ở đúng chip ấy. `_checktour` bắt được ngay lượt chạy đầu sau khi gỡ -
@@ -24002,8 +24008,12 @@ function renderGiaoviec(){
   var oa=tkOver(a)?0:1,ob=tkOver(b)?0:1;if(oa!==ob)return oa-ob;
   var la=tkLive(a)?0:1,lb=tkLive(b)?0:1;if(la!==lb)return la-lb;
   return (pvnd(a.due_time)||0)-(pvnd(b.due_time)||0)});
- h+='<div class="panel"><div class="pbody">';
- if(!list.length)h+='<div class="empty">'+(tab==="wait"?"Không có việc nào đang chờ bạn bấm Nhận.":tab==="mine"?"Không có việc nào ở nhóm này.":"Bạn chưa giao việc nào ở nhóm này - bấm <b>Giao việc mới</b> để bắt đầu.")+'</div>';
+ /* Neo RIÊNG cho tab "Từ học viên". Không có nó thì bài hướng dẫn của Học vụ (nói về yêu cầu
+    học viên) và bài của Sale (nói về việc nội bộ) cùng khoanh vào `@man` của trang này - hai
+    bước khác nhau tô sáng đúng một chỗ, tức ít nhất một bước đang trỏ sai. `_checkneo` bắt
+    ngay lượt chạy đầu sau khi gộp trang. */
+ h+='<div class="panel"'+(tab==="hv"?' data-tour="ychvtab"':'')+'><div class="pbody">';
+ if(!list.length)h+='<div class="empty">'+(tab==="wait"?"Không có việc nào đang chờ bạn bấm Nhận.":tab==="hv"?"Chưa có yêu cầu nào từ Cổng học viên ở nhóm này.":tab==="mine"?"Không có việc nào ở nhóm này.":"Bạn chưa giao việc nào ở nhóm này - bấm <b>Giao việc mới</b> để bắt đầu.")+'</div>';
  list.forEach(function(t){h+=tkCard(t,tab==="wait"?"mine":tab)});
  h+='</div></div>';
  return h}

@@ -625,13 +625,20 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
   CURSTAFF=cu;
  })();
 
- /* --- 5quinq. MUC RIENG TREN MENU TRAI (V9.63) --- */
+ /* --- 5quinq. LOI VAO TREN MENU TRAI (V9.63, doi cau hoi 14/08) --- */
  (function(){
-  t("co khoa trang rieng cho Hoc vien lien he", PAGES.some(function(x){return x.k==="ychv"}));
-  var G=NAVTREE.filter(function(x){return x.items.indexOf("ychv")>=0})[0];
-  t("muc nam tren menu trai", !!G);
-  t("muc nam o nhom LAM VIEC (khong chon trong nhom chang dang gap)", !!G&&G.g==="Làm việc");
-  t("muc co so viec dang cho", navBadge("ychv")===ychvCho());
+  /* 14/08 - `ychv` KHONG CON LA MOT TRANG, no la BI DANH trong sang tab "Tu hoc vien" cua Giao
+     viec. Do truoc khi gop: 8/57 dong DL23, 100% la tap con cua Giao viec, cung the cung nut
+     cung cua ghi, ma trang cu con thieu nut Giao viec moi / Tu choi / tab bao cao; 13/16 chuc
+     danh chi thay Giao viec, 0 chuc danh chi thay trang cu.
+     DIEU CAN BAO VE KHONG DOI: phai co MOT loi tren sidebar di toi cho nhan yeu cau hoc vien,
+     bam vao la toi dung cho, va dang o do thi muc menu sang. Ba cau duoi hoi dung ba dieu ay,
+     chi khong con hoi "co mot muc ten ychv" nua.
+     *Thuoc phai canh MUC TIEU, dung canh CACH LAM - lan thu tu trong ngay.* */
+  t("co khoa trang rieng cho Hoc vien lien he (giu lam bi danh)", PAGES.some(function(x){return x.k==="ychv"}));
+  var G=NAVTREE.filter(function(x){return x.items.indexOf("giaoviec")>=0})[0];
+  t("loi vao nam tren menu trai", !!G);
+  t("loi vao nam o nhom LAM VIEC (khong chon trong nhom chang dang gap)", !!G&&G.g==="Làm việc");
   /* V2 - DOI CAU HOI. "Hoc vien lien he" tung la TAB thu tu cua hub CSKH; anh Luan bat 05/08
      (*"cai tab tren sidebar thong bao tu hoc vien dau?"*) nen no duoc cho mot muc menu rieng,
      con man hinh thi van la hub mo san tab do. Sang V2 no la MOT TRANG THAT.
@@ -639,10 +646,13 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
      muc do sang - chi la nay hoi thang bang `go()` chu khong hoi qua mot bang doi ten. */
   var cu=CUR;
   go("ychv");
-  t("bam vao muc la toi dung trang Hoc vien lien he", CUR==="ychv");
-  t("dang o trang do thi muc tren menu sang", navCur("ychv")===true);
+  t("bam vao loi cu van toi dung cho nhan yeu cau hoc vien", CUR==="giaoviec"&&window.TKTAB==="hv");
+  t("dang o do thi muc tren menu sang", navCur("giaoviec")===true);
+  var hTab="";try{hTab=renderGiaoviec()}catch(e){}
+  t("tab Tu hoc vien co that va dang mo", /Từ học viên/.test(hTab));
+  t("so yeu cau dang cho van dem dung", (ychvList()||[]).filter(function(x){return tkSt(x)==="new"}).length===ychvCho());
   go("khaosat");
-  t("dang o trang khac thi muc do KHONG sang", navCur("ychv")===false);
+  t("dang o trang khac thi muc do KHONG sang", navCur("giaoviec")===false);
   CUR=cu;
  })();
 

@@ -46,8 +46,16 @@ Object.keys(LISTCFG).forEach(function(k){try{HTML["ds:"+k]=renderList(k)}catch(e
   var rs=SCOPE(),key=rs.group+(rs.mgr?"_mgr":"");
   if(seen[key])return;seen[key]=1;
   var L=(typeof BVLAND!=="undefined")&&BVLAND[rs.group];if(!L)return;
-  CUR=L[0];
-  if(L[1]){if(L[0]==="tuyensinh")window.TSTAB=L[1];if(L[0]==="hoctap")window.HTTAB=L[1]}
+  /* 14/08 - HOI TRANG DAP THAT (`SCOPE().land`), DUNG DOC BANG CAM CUNG `BVLAND`.
+     `bangViecHTML()` tu no da hoi `SCOPE().land` va tu im khi `CUR` khac trang dap. Probe nay
+     thi dat `CUR=BVLAND[group][0]` - mot ban do viet tu thoi truoc. Ngay 14/08 trang dap cua ba
+     chuc danh sale doi tu `banlam` sang `viec` (gop ban lam viec), the la probe dat CUR="banlam",
+     ham tra ve chuoi rong, va check_sop bao "BC5 Bang NV Tu van khong thay" - trong khi bang ay
+     dang hien ngon lanh tren trang Viec hom nay.
+     Dung cai loi da ghi ngay trong `bangViecHTML`: *ban do nao cam cung theo mot ban build thi
+     ban kia se lang le mat tinh nang - phai hoi trang thai that.* */
+  CUR=(rs.land||L[0]);
+  if(L[1]&&CUR===L[0]){if(L[0]==="tuyensinh")window.TSTAB=L[1];if(L[0]==="hoctap")window.HTTAB=L[1]}
   try{HTML["bv:"+key]=bangViecHTML()}catch(e){}});
  window.GATE_SID="";setRole("all");applyScope("")})();
 
