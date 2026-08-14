@@ -15692,7 +15692,7 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
   h+='<div class="obsl a">'+(s.rejected
    ?'<button class="btn primary sm" onclick="obChange(\''+_oid+'\')"><i class="ti ti-transfer"></i>Đổi lớp khác</button>'
    :(!s.sent?'<button class="btn primary sm" onclick="confirmRun(\'Xác nhận đã gửi thông tin lớp cho học viên?\',\'obSendInfo\',\''+_oid+'\')"><i class="ti ti-send"></i>Đã gửi thông tin lớp</button>'
-    :(!s.confirmed?'<button class="btn sm" onclick="confirmRun(\'Học viên đã ký cam kết TẠI TRUNG TÂM? Chỉ bấm khi bạn thật sự thấy họ ký - còn để họ tự ký ở cổng thì đừng bấm.\',\'obConfirm\',\''+_oid+'\')"><i class="ti ti-check"></i>Ghi nhận ký tại TT</button>':'')))+'</div>';
+    :(!s.confirmed?'<button class="btn sm" onclick="obConfirmForm(\''+_oid+'\')"><i class="ti ti-check"></i>Ghi nhận ký tại TT</button>':'')))+'</div>';
   h+='<div class="obsl a2">'+((!s.rejected&&s.sent&&!s.confirmed)
    ?'<button class="btn danger sm" onclick="confirmRun(\'Ghi nhận học viên CHƯA ĐỒNG Ý quy định lớp học và cam kết? Hãy liên hệ giải thích, hoặc đổi lớp nếu vướng lịch.\',\'obReject\',\''+_oid+'\')"><i class="ti ti-user-x"></i>HV chưa đồng ý</button>'
    :'')+'</div>';
@@ -15733,10 +15733,32 @@ function obSendInfoRun(id){var o=find("DL08","onboarding_id",id)||{};var note=fl
    VA PHAI LUU BAN CHUP O CA HAI DUONG. Ban truoc em chi chup o cua cong hoc vien, nen ho so nao
    do hoc vu ghi nhan thi co dau "da ky" ma khong co gi de chi ra da ky vao cai gi - dung cai
    benh ma chinh em vua canh bao o khoi cau hinh. */
-function obConfirm(id){obMark(id,{class_confirmation_status:eFull("enum_class_confirmation_status","confirmed"),
- confirmation_time:nowStr(),commit_version:commitVer(),commit_text:commitText(),commit_at:nowStr(),
- commit_by:(CURSTAFF||""),commit_kenh:"tại trung tâm"},
- "Đã ghi nhận học viên ký cam kết tại trung tâm (bản "+commitVer()+").")}
+function obConfirmForm(id){var o=find("DL08","onboarding_id",id);if(!o){toast("Khong thay ho so.");return}
+ /* V2 14/08 (anh Luan: *"neu ky tai trung tam, khi hoc vu bam xac nhan, phai upload anh moi duoc em"*).
+    Dung, va no vua vit kin dung cai cua em vua mo. Ghi nhan "ky tai trung tam" ma khong can bang
+    chung thi no y het cai nut bam ho cu - chi khac moi cai ten. Anh chup to giay co chu ky la
+    thu DUY NHAT phan biet "em ay da ky that" voi "co nguoi bam ho".
+    Nen anh la BAT BUOC o duong nay, va chi o duong nay: ky o cong hoc vien thi chinh cu bam cua
+    ho da la bang chung, khong ai phai chup gi. */
+ var h='<div class="dcard"><h4><i class="ti ti-file-check"></i>Ghi nhận ký cam kết tại trung tâm - '+esc(o.student_id_name||o.student_id||"")+'</h4>';
+ h+=ctxRows([["Lớp",esc(o.class_id_name||o.class_id||"-")],["Bản quy định",esc(commitVer())]]);
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Chỉ ghi nhận khi bạn <b>thật sự thấy học viên ký</b>. Học viên tự ký ở cổng của họ thì không cần bấm đây.</div>';
+ h+=commitHTML(null,commitVer());
+ h+=attachBox("obk","Ảnh bản cam kết đã ký (bắt buộc)");
+ h+='<div class="fld full"><label>Ghi chú</label><input id="obk_note" placeholder="vd: ký tại quầy, có phụ huynh đi cùng"></div>';
+ h+='<div class="fld full"><button class="btn primary" onclick="obConfirmRun(\''+esc(id)+'\')"><i class="ti ti-check"></i>Ghi nhận đã ký</button></div></div>';
+ openDrawer("Ghi nhận ký cam kết",h)}
+function obConfirmRun(id){
+ var anh=attachVal("obk");
+ if(!anh){toast("Phải đính ảnh bản cam kết đã ký thì mới ghi nhận được - không có ảnh thì để học viên tự ký ở cổng.",5200);return}
+ var o=find("DL08","onboarding_id",id)||{};
+ var note=(fldV("obk_note")||"").trim()+attachLine("obk");
+ closeModal();
+ obMark(id,{class_confirmation_status:eFull("enum_class_confirmation_status","confirmed"),
+  confirmation_time:nowStr(),commit_version:commitVer(),commit_text:commitText(),commit_at:nowStr(),
+  commit_by:(CURSTAFF||""),commit_kenh:"tại trung tâm",commit_anh:anh,
+  onboarding_note:(o.onboarding_note?o.onboarding_note+" | ":"")+("Ký cam kết tại TT "+nowStr()+(note?" - "+note:""))},
+  "Đã ghi nhận học viên ký cam kết tại trung tâm (bản "+commitVer()+"), kèm ảnh bản đã ký.")}
 function obFinish(id){obMark(id,{onboarding_status:eFull("enum_onboarding_status","completed"),onboarding_completed_at:nowStr()},"Đã hoàn tất onboarding.")}
 function obReject(id){obMark(id,{class_confirmation_status:eFull("enum_class_confirmation_status","rejected")},"Đã ghi nhận HV từ chối lớp - hãy đổi lớp khác.")}
 function obChange(id){var o=find("DL08","onboarding_id",id);if(!o){toast("Không thấy hồ sơ.");return}
@@ -28434,7 +28456,7 @@ DOORS = {
  "DL06":["cancelEnrollRun","paySave","rfNeed","runCancelEnroll","tvEnrollSave","insSync","debtRemind"],
  "DL06b":["insPlanSave","dotApDung"],
  "DL07":["duyetRefundRun","paySave","payVerifyRun","rfNeed"],
- "DL08":["hvClassConfirm","hvClassRejectSave","lopDayHV","midSave","obMark","rfNeed","xepMoiLuu","obChangeSave","obFinish"],
+ "DL08":["hvClassConfirm","hvClassRejectSave","lopDayHV","midSave","obMark","obConfirmRun","rfNeed","xepMoiLuu","obChangeSave","obFinish"],
  "DL09":["bkLuuPHNguyCo","bkLuuPHQuanHe","blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave","riskCareSave","riskFlagRun","riskIgnoreSave","dhSave"],
  "DL10":["xepMoiLuu","obChangeSave","rfNeed","clsSetTeacher","moLopDelay","moLopCancelRun"],
  "DL11":["bhCancelRun","bhDone","bhMakeupSave","bhNoteDuyetSave","bhNoteSave","bkLuuMocGio","ddSave","sessEnd","sessStart","sesSetTeacher","clsSetTeacher","sesThiSave","doiSave"],
