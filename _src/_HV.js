@@ -9393,6 +9393,41 @@ var CTDEF=[
  ["wowcoach","WOW coach","ti-user-star","gom mọi buổi WOW của từng coach: số buổi, điểm trung bình, tỷ lệ học viên có tiến bộ."],
  ["nv","Nhân viên","ti-id-badge","chất lượng chăm sóc: phiếu người ấy phụ trách, phản hồi người ấy phân loại, khiếu nại người ấy xử."],
  ["vande","Vấn đề","ti-alert-hexagon","gom theo nhóm chuyện học viên kêu - biết trung tâm đang hỏng ở MẢNG nào, không phải ai hỏng."]];
+/* ═══ V2 15/08 - "CHƯA AI ĐÁNH GIÁ LẦN NÀO" ═════════════════════════════════════════════════
+   Bảng này vốn chỉ dựng từ PHIẾU: có phiếu thì có dòng. Nên nó trả lời được "ai đang bị chấm
+   kém" mà KHÔNG trả lời được câu ngay cạnh đó - **"chỗ nào chưa ai nói gì bao giờ"**.
+   Hai câu ấy khác hẳn nhau về hậu quả: một lớp bị chấm 3.2/5 thì ta biết mà chữa; một lớp chạy
+   suốt bốn tháng mà **không một phiếu nào** thì ta không biết nó thế nào, và cái không biết ấy
+   nguy hơn cái điểm thấp - nó không hiện ra ở bất kỳ con số nào.
+   *Bảng dựng từ dữ liệu đã có thì im lặng luôn đọc ra là "không có vấn đề" - trong khi im lặng
+   thường là chưa ai đi hỏi.*
+
+   Muốn hỏi được câu ấy thì phải khai VŨ TRỤ của từng trục: tập những thứ ĐÁNG LẼ đánh giá được.
+   Khai chứ không suy: mỗi trục có một luật riêng về "đáng lẽ", và đoán sai thì bảng đổ oan.
+   · Buổi học chỉ tính buổi ĐÃ DẠY XONG - buổi chưa dạy mà kể là "chưa ai đánh giá" thì vô lý.
+   · Buổi WOW chỉ tính buổi đã kết thúc - im lặng ở đây nghĩa là COACH CHƯA CHẤM, khác hẳn.
+   · Hai trục KHÔNG khai vũ trụ, có lý do: "Nhân viên" (người chưa xử phiếu nào không phải là
+     người chưa được đánh giá - họ chỉ không làm việc ấy) và "Vấn đề" (một nhóm vấn đề chỉ tồn
+     tại khi có người kêu; liệt kê nhóm chưa ai kêu là liệt kê chuyện chưa xảy ra). */
+function ctVuTru(k){
+ function tenNV(id){return nsTen(id)||id}
+ function vaiNV(id){var x=find("DL01","staff_id",id);return x?(elabel(x.role)||""):""}
+ if(k==="lop")return srows("DL10").map(function(c){
+  return {id:c.class_id,ten:c.class_name||c.class_id,go:"openLop",
+   phu:tenNV(c.main_teacher_id),moc:c.class_start_date}});
+ if(k==="buoi")return srows("DL11").filter(function(x){return isc(x.session_status,"completed")})
+  .map(function(x){return {id:x.session_id,ten:(x.class_id_name||x.class_id)+" · buổi "+(x.session_number||"?"),
+   go:"",phu:x.teacher_id_name||tenNV(x.teacher_id),moc:x.session_date}});
+ if(k==="gv")return srows("DL01").filter(function(x){return /teacher/.test(ecode(x.role))})
+  .map(function(x){return {id:x.staff_id,ten:x.full_name||x.staff_id,go:"openGV",phu:vaiNV(x.staff_id),moc:""}});
+ if(k==="wowcoach")return srows("DL01").filter(function(x){return /wow/.test(ecode(x.role))})
+  .map(function(x){return {id:x.staff_id,ten:x.full_name||x.staff_id,go:"openNSQuick",phu:vaiNV(x.staff_id),moc:""}});
+ if(k==="wowbuoi")return srows("DL14").filter(function(w){return isc(w.wow_status,"completed")})
+  .map(function(w){return {id:w.wow_id,ten:(w.student_name||w.student_id)+" · "+(elabel(w.wow_skill)||elabel(w.wow_session_type)||"WOW"),
+   go:"wowMoc",phu:w.staff_name||tenNV(w.staff_id),moc:w.wow_session_date}});
+ return null}
+function CTCHE(){var v=window.CTCHE_||"co";return (v==="khong"||v==="all")?v:"co"}
+function ctCheSet(v){window.CTCHE_=v;reRender("cskh")}
 function CTVW(){var v=window.CTSUB||"lop";
  for(var i=0;i<CTDEF.length;i++)if(CTDEF[i][0]===v)return v;
  return "lop"}
@@ -9400,7 +9435,9 @@ function ctSet(k){window.CTSUB=k;reRender("cskh")}
 function ctTB(a){if(!a.length)return null;var t=0;for(var i=0;i<a.length;i++)t+=a[i];return t/a.length}
 function ctSo(v){return v==null?"-":(Math.round(v*10)/10)}
 /* Gom phiếu về từng chủ thể. Trả về mảng thùng, mỗi thùng mang đủ bốn sổ để phần vẽ tự chọn cột. */
-function ctRows(k){
+/* `che` = "co" (mặc định, chỉ chủ thể đã có phiếu) · "khong" (chỉ chủ thể chưa ai đánh giá) ·
+   "all" (cả hai). Trục nào không khai vũ trụ thì mọi giá trị đều cho ra một kết quả. */
+function ctRows(k,che){
  var SV=srows("DL15"),FB=srows("DL16"),KN=srows("DL17"),WO=srows("DL14");
  var SES={},LOP={};
  srows("DL11").forEach(function(x){SES[String(x.session_id||"")]=x});
@@ -9461,7 +9498,23 @@ function ctRows(k){
   KN.forEach(function(c){var m=ecode(c.complaint_type);if(!m)return;var kk=CTVANDE[m]||m;
    var b=B(kk,(M[kk]&&M[kk].ten)||elabel(c.complaint_type)||kk,"");if(b)b.kn.push(c)});
  }
- return ds}
+ che=che||"co";
+ if(che==="co")return ds;
+ var VT=ctVuTru(k);
+ /* Trục không khai vũ trụ thì tập im lặng là RỖNG, không phải "cả bảng". Trả `ds` ở đây là trả
+    lời sai một câu hỏi khác: hỏi "ai chưa ai đánh giá" mà nhận về "mọi người đã được đánh giá".
+    Phần vẽ hiện đang ép `che="co"` cho hai trục ấy nên trên màn không lộ ra - nhưng một hàm nói
+    dối khi không ai nghe thì vẫn nói dối với người gọi tiếp theo. */
+ if(!VT)return che==="khong"?[]:ds;
+ var im=[];
+ VT.forEach(function(v){var id=String(v.id||"").trim();if(!id||M[id])return;
+  var b={id:id,ten:v.ten||id,go:v.go||"",phu:v.phu||"",arg:id,moc:v.moc||"",
+   sv:[],fb:[],kn:[],wow:[]};
+  M[id]=b;im.push(b)});
+ /* Danh sách im lặng xếp MỚI NHẤT LÊN ĐẦU: buổi vừa dạy tuần này mà chưa ai hỏi thì còn kịp đi
+    hỏi; buổi từ tám tháng trước thì hỏi cũng không ai nhớ để trả lời. */
+ im.sort(function(a,b){return (pvnd(b.moc)||0)-(pvnd(a.moc)||0)});
+ return che==="khong"?im:ds.concat(im)}
 /* Cột tự ẩn khi cả bảng không có gì để đổ vào - cùng khuôn với bảng công giảng dạy: khai một
    bộ cột chung rồi để dữ liệu quyết định cột nào đứng lại. Bảy trục dùng chung một hàm vẽ,
    không đẻ bảy cái bảng. */
@@ -9479,6 +9532,12 @@ function ctColHTML(ds){
     return b.go?('<a class="lnk" onclick="'+b.go+'(\''+esc(b.arg||b.id)+'\')">'+esc(b.ten)+'</a>')
                :('<b>'+esc(b.ten)+'</b>')}},
   {t:"Thuộc về",co:function(b){return b.phu},cls:"",ve:function(b){return b.phu?esc(b.phu):'<span class="mut">-</span>'}},
+  /* Dòng im lặng không có một con số nào, nên mọi cột sau đây đều in "-". Một hàng toàn gạch
+     ngang đọc ra là "app hỏng" chứ không đọc ra "chưa ai đánh giá" - phải có một ô NÓI RA. */
+  {t:"Tình trạng",co:function(b){return !b.sv.length&&!b.fb.length&&!b.kn.length&&!b.wow.length},cls:"",
+   ve:function(b){return (b.sv.length||b.fb.length||b.kn.length||b.wow.length)
+    ?'<span class="chip green">đã có phiếu</span>'
+    :'<span class="chip gray">chưa ai đánh giá</span>'}},
   {t:"Khảo sát",co:function(b){return b.sv.length},cls:"phai",ve:function(b){return b.sv.length||'<span class="mut">-</span>'}},
   {t:"Hài lòng",co:function(b){return _sv(b).length},cls:"phai",ve:function(b){var v=ctTB(_sv(b));
     if(v==null)return '<span class="mut">-</span>';
@@ -9521,7 +9580,9 @@ function ctThe(ten,meta,chip,nut){
 function ctXem(arg){
  var p=String(arg||""),i=p.indexOf("|");if(i<0)return;
  var k=p.slice(0,i),id=decodeURIComponent(p.slice(i+1));
- var ds=ctRows(k),b=null;
+ /* Hỏi "all": một dòng im lặng cũng phải mở ra được, để người ta thấy TẬN MẮT là rỗng thật,
+    chứ không phải bấm vào thì app báo "không thấy chủ thể này" rồi tưởng hỏng. */
+ var ds=ctRows(k,"all"),b=null;
  for(var j=0;j<ds.length;j++)if(ds[j].id===id){b=ds[j];break}
  if(!b){toast("Không thấy chủ thể này trong bảng.");return}
  var CUA=ctCua(k),thSS=kpiTh(/\bSS\b|hài lòng/i,4);
@@ -9589,29 +9650,53 @@ function ctXem(arg){
 /* Chọn trục KHÔNG dùng lại dải công tắc lớn của trang. Hai dải giống hệt nhau chồng lên nhau thì
    mắt không đọc ra cái nào là cấp trên: người ta tưởng đây là bảy tab ngang hàng với bốn tab kia.
    Dải chip là điều khiển CẤP HAI vốn có của app - đúng thứ bậc, và không phải học thêm hình gì. */
+/* Trần dòng cho danh sách im lặng. 351 buổi chưa ai hỏi tới thì in hết ra là một bức tường, mà
+   người đọc chỉ cần biết CON SỐ và vài chục cái gần nhất để đi hỏi. Dùng đúng cách app đang làm
+   ở trang Phản hồi: cắt bớt thì NÓI RA đã cắt bao nhiêu. *Cắt âm thầm đọc ra là "hết rồi".* */
+var CTTRAN=60;
 function renderCskhDiem(){
- var k=CTVW();
+ var k=CTVW(),che=CTCHE();
  var so={};CTDEF.forEach(function(V){try{so[V[0]]=ctRows(V[0]).length}catch(e){so[V[0]]=""}});
  var h=tbar(segHTML(k,CTDEF.map(function(V){return [V[0],V[1],so[V[0]]||"",""]}),"ctSet('{k}')"),"");
  var CUA=ctCua(k);
- var ds=ctRows(k);
+ var coVT=!!ctVuTru(k);
+ if(!coVT)che="co";
+ var nCo=so[k]||0,nTong=coVT?ctVuTru(k).length:nCo,nIm=Math.max(0,nTong-nCo);
+ var ds=ctRows(k,che);
  var C=ctColHTML(ds);
  /* Xếp KÉM NHẤT LÊN ĐẦU. Bảng chất lượng mà xếp theo mã hay theo tên thì người đọc phải tự dò -
-    mà chỗ cần chữa mới là thứ họ mở bảng này để tìm. */
- ds.sort(function(a,b){var A=C.diem(a),B=C.diem(b);
+    mà chỗ cần chữa mới là thứ họ mở bảng này để tìm.
+    Trừ danh sách IM LẶNG: ở đó không có gì để so kém hơn hay kém ít, `ctRows` đã xếp sẵn theo
+    mốc mới nhất - xếp lại theo điểm là xếp một cột toàn giá trị rỗng. */
+ if(che!=="khong")ds.sort(function(a,b){var A=C.diem(a),B=C.diem(b);
   return (B.mo-A.mo)||(B.xau-A.xau)||((A.d==null?99:A.d)-(B.d==null?99:B.d))});
- if(!ds.length)return h+'<div class="panel"><div class="pbody"><div class="empty">'+
-  'Chưa có phiếu nào neo vào '+esc(String(CUA[1]).toLowerCase())+
-  ' - khảo sát, phản hồi hoặc buổi WOW phải mang mã của chủ thể thì mới cộng vào đây được.</div></div></div>';
- var o=h+'<div class="panel"><div class="ph"><b>'+esc(CUA[1])+' ('+ds.length+')</b>'+
-  '<div class="fhint">'+esc(CUA[3])+' Kém nhất xếp lên đầu: còn khiếu nại mở, rồi phản hồi tiêu cực, rồi điểm hài lòng thấp. '+
-  'Bấm một dòng để đọc nguyên văn phiếu; bấm cái tên để mở hồ sơ.</div></div>'+
+ var loc=coVT?('<div class="mini">'+
+  [["co","Đã có đánh giá",nCo],["khong","Chưa ai đánh giá",nIm],["all","Tất cả",nTong]]
+   .map(function(x){return '<button class="pill'+(che===x[0]?" on":"")+'" onclick="ctCheSet(\''+x[0]+'\')">'+
+    esc(x[1])+' <b>'+x[2]+'</b></button>'}).join("")+'</div>'):'';
+ if(!ds.length)return h+'<div class="panel"><div class="ph"><b>'+esc(CUA[1])+' (0)</b>'+loc+'</div>'+
+  '<div class="pbody"><div class="empty">'+
+  (che==="khong"?('Mọi '+esc(String(CUA[1]).toLowerCase())+' đều đã có ít nhất một phiếu - không còn chỗ nào im lặng.')
+   :('Chưa có phiếu nào neo vào '+esc(String(CUA[1]).toLowerCase())+
+     ' - khảo sát, phản hồi hoặc buổi WOW phải mang mã của chủ thể thì mới cộng vào đây được.'))+
+  '</div></div></div>';
+ /* Câu dẫn đổi theo cái đang xem. Giữ nguyên một câu cho cả ba là nói sai một phần ba số lần. */
+ var dan=(che==="khong")
+  ? ('Đây là ' + esc(String(CUA[1]).toLowerCase()) + ' chưa một ai nói gì tới - không phải điểm kém, mà là KHÔNG BIẾT. Mới nhất xếp lên đầu vì còn kịp đi hỏi.')
+  : (esc(CUA[3])+' Kém nhất xếp lên đầu: còn khiếu nại mở, rồi phản hồi tiêu cực, rồi điểm hài lòng thấp.');
+ var o=h+'<div class="panel"><div class="ph"><b>'+esc(CUA[1])+' ('+ds.length+')</b>'+loc+'</div>'+
+  '<div class="ph" style="border-bottom:0;padding-bottom:0"><div class="fhint">'+dan+
+  ' Bấm một dòng để đọc nguyên văn phiếu; bấm cái tên để mở hồ sơ.'+
+  (coVT?(' <b>'+nCo+'/'+nTong+'</b> đã có ít nhất một phiếu.'):'')+'</div></div>'+
   '<div class="tbwrap"><table class="dt"><thead><tr>'+
   C.cot.map(function(c){return '<th'+(c.cls?(' class="'+c.cls+'"'):'')+'>'+esc(c.t)+'</th>'}).join("")+
   '</tr></thead><tbody>';
- ds.forEach(function(b){o+='<tr data-mo="ctXem" data-mo-arg="'+esc(k+"|"+ctArg(b.id))+'">'+C.cot.map(function(c){
+ ds.slice(0,CTTRAN).forEach(function(b){o+='<tr data-mo="ctXem" data-mo-arg="'+esc(k+"|"+ctArg(b.id))+'">'+C.cot.map(function(c){
   return '<td'+(c.cls?(' class="'+c.cls+'"'):'')+'>'+c.ve(b)+'</td>'}).join("")+'</tr>'});
- return o+'</tbody></table></div></div>'}
+ o+='</tbody></table></div>';
+ if(ds.length>CTTRAN)o+='<div class="pbody"><div class="fhint">Đang hiện '+CTTRAN+' dòng đầu, còn <b>'+
+  (ds.length-CTTRAN)+'</b> dòng nữa - đổi trục hoặc đổi bộ lọc phía trên để thu hẹp.</div></div>';
+ return o+'</div>'}
 /* ═══ V2 15/08 - BẢN KHAI CÁCH XEM CỦA TRANG GỘP ═════════════════════════════════════════════
    Bốn tab là bốn KÊNH của cùng một việc: nghe học viên. Câu mô tả nói luôn CHIỀU ĐI, nên ba
    dòng `.csway` cũ (mỗi dòng một mũi tên TT→HV / HV→TT) không còn lý do tồn tại - chúng nói

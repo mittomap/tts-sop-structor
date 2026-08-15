@@ -148,14 +148,11 @@
 
 ## 3. VIỆC TỒN (backlog)
 
-> ### 📋 15/08 chiều - CÒN TREO
-> 1. **Bảng "Điểm theo chủ thể" trục NHÂN VIÊN mới có 3 người** - vì `assigned_staff` của DL15
->    chỉ có 2 người khác nhau (đội CSKH thật sự chỉ có hai NV trong DL01). Đúng dữ liệu, nhưng
->    mỏng. Chưa đụng vì đó là chuyện gieo thêm nhân sự, không phải chuyện của màn hình này.
-> 2. **Khiếu nại tính vào giảng viên: hiện chỉ đếm `complaint_type = teacher`.** Đã khai rõ trong
->    mã và đã báo anh Luân; nếu anh muốn tính mọi vụ của lớp vào người phụ trách thì đổi một dòng.
-> 3. **Trục "Buổi học" chỉ liệt kê buổi ĐÃ CÓ người nói tới (18 buổi)**, không kể buổi im lặng -
->    cố ý, nhưng chưa có cách xem "buổi nào chưa ai đánh giá lần nào".
+> ### 📋 15/08 chiều - ĐÃ XỬ (anh Luân: *"Bỏ 1,2 làm 3"*)
+> 1. ~~Trục NHÂN VIÊN mới có 3 người~~ **ANH LUÂN BỎ** - đúng dữ liệu, đội CSKH thật sự có hai NV.
+> 2. ~~Khiếu nại vào giảng viên chỉ đếm `complaint_type = teacher`~~ **ANH LUÂN BỎ** - giữ nguyên
+>    luật hiện tại: một vụ học phí ở lớp thầy A không tính vào thầy A.
+> 3. ~~Chưa có cách xem "chưa ai đánh giá lần nào"~~ **XONG** - xem mục 8 ở trên.
 >
 > ### 📋 15/08 - CÒN TREO
 > 1. **`check_taolai` đỏ ĐÚNG MỘT LẦN lúc 04:5x rồi không tái hiện.** Chạy tay ngay sau đó ĐẠT,
@@ -410,6 +407,31 @@
 > · `_checkkhuon` K6 (cấm vẽ thanh tab hub cũ, TRỪ trang gộp thật) · `_checkv2` L2 (cấm hub BÍ
 > DANH đứng trên menu). Mục `_check16` này đã lật BA lần trong đời nó, mà điều cần bảo vệ không
 > đổi một ly suốt ba lần: **đường vào cũ không được vỡ.**
+>
+> **8. "Chưa ai đánh giá lần nào" - và vì sao câu ấy quan trọng hơn câu "ai đang kém".**
+> Anh Luân: *"Bỏ 1,2 làm 3"*. Bảng Điểm theo chủ thể vốn dựng TỪ PHIẾU: có phiếu thì có dòng.
+> Nên nó trả lời được *"ai đang bị chấm kém"* mà không trả lời được câu ngay cạnh đó -
+> **"chỗ nào chưa một ai nói gì bao giờ"**. Hai câu khác hẳn nhau về hậu quả: một lớp bị chấm
+> 3.2/5 thì ta biết mà chữa; một lớp chạy suốt bốn tháng mà KHÔNG một phiếu nào thì ta không biết
+> nó thế nào - và cái không biết ấy nguy hơn cái điểm thấp, vì nó không hiện ra ở bất kỳ con số
+> nào. *Bảng dựng từ dữ liệu đã có thì im lặng luôn đọc ra là "không có vấn đề" - trong khi im
+> lặng thường chỉ có nghĩa là chưa ai đi hỏi.*
+> Đo được ngay khi bật lên: **17/26 lớp** và **351/369 buổi đã dạy** chưa một ai đánh giá lần nào;
+> 4/10 giảng viên chưa có phiếu nào; 2 buổi WOW đã kết thúc mà coach chưa chấm.
+> Phải khai **VŨ TRỤ** của từng trục (tập những thứ ĐÁNG LẼ đánh giá được) chứ không suy - mỗi
+> trục một luật: buổi học chỉ tính buổi ĐÃ DẠY XONG (buổi chưa dạy mà kể là "chưa ai đánh giá"
+> thì vô lý), buổi WOW chỉ tính buổi đã kết thúc (im lặng ở đây nghĩa là COACH CHƯA CHẤM).
+> **Hai trục CỐ Ý không khai vũ trụ:** "Nhân viên" (người chưa xử phiếu nào không phải là người
+> chưa được đánh giá - họ chỉ không làm việc ấy) và "Vấn đề" (một nhóm vấn đề chỉ tồn tại khi có
+> người kêu; liệt kê nhóm chưa ai kêu là liệt kê chuyện chưa xảy ra).
+> Ba chi tiết nhỏ mà thiếu là hỏng: · cột **"Tình trạng"** - một hàng toàn gạch ngang đọc ra là
+> "app hỏng" chứ không đọc ra "chưa ai đánh giá", phải có một ô NÓI RA; · danh sách im lặng xếp
+> **mới nhất lên đầu** (buổi tuần này còn kịp đi hỏi, buổi tám tháng trước thì hỏi cũng không ai
+> nhớ) chứ không xếp theo điểm - xếp theo một cột toàn rỗng là xếp bừa; · trần 60 dòng và **NÓI
+> RA đã cắt bao nhiêu** - *cắt âm thầm thì đọc ra là "hết rồi"*.
+> Và một chỗ nói dối đã sửa trước khi ai kịp gặp: trục không khai vũ trụ mà bị hỏi "ai im lặng"
+> thì trả về RỖNG, không trả về cả bảng. Phần vẽ đang ép về "co" nên trên màn không lộ - nhưng
+> *một hàm nói dối lúc không ai nghe thì vẫn nói dối với người gọi tiếp theo.*
 >
 > ### 🟢 14/08 khuya - BA TRANG VỀ MỘT, BẢNG CÔNG TÁCH HAI ĐỘI, VÀ SÁU CHỖ ĐỎ TỰ MÌNH GÂY RA
 >
