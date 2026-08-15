@@ -1049,7 +1049,13 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .giapn{display:grid;grid-template-columns:minmax(0,1fr) 232px;gap:0;align-items:stretch}
 .giatb{width:100%}
 .giatb th:first-child,.giatb td:first-child{width:26%}
-.giatb th:not(:first-child),.giatb td:not(:first-child){text-align:right}
+/* ═══ V2 15/08 (anh Luân, kèm ảnh: *"header và nội dung canh giống nhau đi cho đẹp, ví dụ canh
+   trái đi"*) ═══════════════════════════════════════════════════════════════════════════════════
+   Em cho cả hai căn PHẢI, nhưng ô giá là "160.000đ" đậm rồi "/giờ" nhỏ mờ - hai cỡ chữ khác nhau
+   nên mép phải của chúng không trùng mép phải của header, đọc ra vẫn lệch. Căn TRÁI thì cả header
+   lẫn số bắt đầu ở đúng một mép, không phụ thuộc phần đuôi dài ngắn ra sao.
+   *Căn phải chỉ thẳng khi mọi ô kết thúc giống nhau - có một cái đuôi khác cỡ là hỏng.* */
+.giatb th:not(:first-child),.giatb td:not(:first-child){text-align:left}
 .gialan{border-left:1px solid var(--line);padding:10px 16px 12px;display:flex;flex-direction:column;gap:8px}
 .gialh{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
 .gialr{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:12.5px}
@@ -1554,7 +1560,10 @@ table.dt tbody tr.clk.on td{font-weight:600}
    cái nút đang được nhấn xuống. Tab khác: trong suốt, chữ mờ. Không mua thêm màu (bảng màu chạm
    trần 110 mã) và không mua thêm cỡ chữ - 14px đã có trong thang.
    *Muốn một thứ nổi bật thì cho nó một cái NỀN riêng, đừng chỉ tô đậm chữ trên cùng một nền.* */
-.viecvw{margin:18px 0 14px;background:var(--bg);border:1px solid var(--line);border-radius:14px;
+/* Bo góc 12px - bậc ĐÃ CÓ trong thang. Bản trước em đặt 14px, một bậc chưa ai dùng, và `_checkux`
+   bắt ngay: thang bo góc nhảy từ 10 lên 11 bậc (trần 10). Bảng màu chạm trần 110 mã thì bo góc
+   cũng có trần của nó - mỗi bậc mới là một biến thể người dùng phải học thêm mà không được gì. */
+.viecvw{margin:18px 0 14px;background:var(--bg);border:1px solid var(--line);border-radius:12px;
  padding:8px 8px 0;box-shadow:0 1px 2px rgba(30,42,56,.05)}
 .viectab{display:flex;gap:4px;flex-wrap:wrap}
 .viectb{border:0;background:transparent;font-family:inherit;font-size:14px;font-weight:700;
