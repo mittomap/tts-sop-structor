@@ -148,6 +148,19 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 📋 15/08 tối - HÀNG CHỜ (anh Luân giao, chưa làm)
+> 1. Xếp người dạy thay **ngay từ buổi học trong Vận hành lớp** (anh hỏi: *"hoặc là ở buổi học
+>    trong vận hành lớp đúng ko"*) - chưa kiểm đường đó có sẵn chưa.
+> 2. Chọn tuần bằng **danh sách** thay vì bấm từng tuần - hai chỗ: Lịch tuần, Lịch trực WOW.
+>    *"trường hợp người ta muốn xem các mốc xa, bấm như hiện tại sẽ bất tiện"*.
+> 3. **Đánh dấu** chỗ nào bấm vào sẽ hiện drawer thông tin nhanh.
+> 4. Bỏ nút "Đã gửi thông tin lớp" -> cho chọn **cách gửi + mẫu gửi**, trạng thái đọc từ Sổ tin
+>    đã gửi. *"hệ thống hiển thị được đã gửi hay chưa qua lịch sử mà"*.
+> 5. Hàng trống trong bảng - thêm thông tin hữu ích; và **chặng vẽ trực quan hơn** thay vì dấu chấm.
+> 6. **69 ô tên cơ sở ở 6 bảng dựng tay vẫn bẻ dòng** (gvdp, baocao, dashboard, bangcong, lichwow,
+>    giangvien:cong). Sổ danh sách đi qua `tableHTML` đã xong; sáu bảng này mỗi cái ghép chuỗi một
+>    kiểu nên vá từng chỗ lần nào cũng sót - cần một đường chung.
+>
 > ### 📋 15/08 chiều - ĐÃ XỬ (anh Luân: *"Bỏ 1,2 làm 3"*)
 > 1. ~~Trục NHÂN VIÊN mới có 3 người~~ **ANH LUÂN BỎ** - đúng dữ liệu, đội CSKH thật sự có hai NV.
 > 2. ~~Khiếu nại vào giảng viên chỉ đếm `complaint_type = teacher`~~ **ANH LUÂN BỎ** - giữ nguyên
@@ -318,10 +331,73 @@
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 15/08 chiều). Bản dựng đang chạy:
-> `37f39a` (15/08), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> `f46a05` (15/08 tối), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `f40ff4`, `33ad75`, `6fc7a9`, `652360`, `fbfec7`, `46a0f2`, `a6046c`, `882082`, `868f3f`.
+> Mốc cũ: `2f6620`, `c7d1a0`, `553234`, `5bdbec`, `8cf2fe`, `37f39a`, `f40ff4`, `33ad75`, `6fc7a9`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 15/08 tối - GIÁO VIÊN DẠY THAY: BỎ PHÉP TỰ ĐOÁN, VÀ BỐN LỖI IM LẶNG BỊ LÔI RA
+>
+> **1. Một giả định gốc bị lật.** Anh Luân: *"Đó là đúng với nhân viên fulltime thôi em, giáo
+> viên parttime họ đâu có mặt sẵn, họ dạy theo lịch đăng ký như wow coach vậy á, cho nên chỗ này
+> ko tự tính được đâu, cần phải đăng ký danh sách dự phòng đi em."*
+> Trang GV dự phòng TỰ TÍNH người thay từ *"trống lịch đúng giờ + đúng cơ sở + chưa quá số buổi"*.
+> Phép tính ấy chỉ đúng với người CÓ MẶT SẴN. Giáo viên làm theo ca thì **trống lịch không có
+> nghĩa là rảnh - nó chỉ có nghĩa là hôm ấy họ không đến.** App bày tên họ ra như một lựa chọn có
+> sẵn; học vụ gọi mười người thì tám người không nhấc máy, mà bảng vẫn xanh.
+> *Một phép tính đúng về mặt số học vẫn sai nếu nó đo một thứ mà thực tế không có.*
+> Dựng **DL31 · sổ ca dạy thay**, đúng khuôn ca trực WOW (DL26). Phép tính cũ KHÔNG xoá (LUẬT
+> CỨNG SỐ 0) - nó tụt xuống hạng hai, dán nhãn *"trống lịch nhưng chưa đăng ký, phải hỏi trước"*.
+> **HAI CHIỀU, một sự thật:** xếp người từ màn buổi học thì ca tự chuyển sang "đã dùng"; gán từ sổ
+> ca thì buổi cũng đổi giáo viên. Thiếu một đầu là hôm sau xếp trùng người mà không gì chặn lại.
+>
+> **2. BỐN LỖI IM LẶNG - loại tệ nhất, vì màn vẫn đầy dữ liệu:**
+> · **Ô chọn ngày của trang ấy chưa bao giờ chạy.** `<input type="date">` trả ISO `2026-08-18`,
+>   `pvnd` chỉ đọc `dd/mm/yyyy` → null → lặng lẽ rơi về hôm nay. Rất có thể chính là điều anh gặp
+>   khi hỏi *"sao lại là dự phòng trong ngày nhỉ, a chọn ngày nào mà chẳng được"*. Và lượt đó em
+>   trả lời *"trang vẫn luôn chọn được ngày bất kỳ, cái sai chỉ là cái tên"* - **em nói sai**.
+>   *Một ô nhập trả về định dạng A mà hàm đọc chỉ hiểu định dạng B thì cái ô ấy là đồ trang trí.*
+> · **Tiêu đề đếm một kiểu, bảng đổ ra một kiểu**: "trống lịch hôm nay (7)" mà thân bảng đổ cả 10.
+> · **"Xem N chỗ cần chú ý" không làm gì**: nó đặt `KPIF="lo"` - đúng giá trị mặc định sẵn có.
+>   Đo bằng trình duyệt: bảng cách tầm nhìn 1414px trước khi bấm, 60px sau khi bấm.
+>   *Một nút đổi trạng thái sang đúng cái đang có là một nút không tồn tại - và người bấm không
+>   kết luận "không có gì đổi", họ kết luận "app hỏng".*
+> · **Trang ấy chạy trên một tập rỗng**: mọi buổi chưa có giáo viên đều là buổi ĐÃ HUỶ, tức "buổi
+>   cần người thay" luôn bằng 0. Gieo đúng tình huống anh mô tả: ba buổi sắp tới bị gỡ giáo viên.
+>
+> **3. "Hướng dẫn hứa thứ không có trên màn" - quét 70 màn, và gốc là một bộ kiểm của chính mình.**
+> Anh Luân: *"chọn theo chức danh rồi chọn người, mà danh sách chỉ có người? bao nhiêu chỗ bị
+> hướng dẫn sai kiểu này"* · *"e giải thích giúp tại sao chỗ này có link mở sổ học viên đc ko"*.
+> Đo: 1 câu tả ô chọn hai tầng trong khi ô một tầng · **4 câu HỎI in ra màn mà đáp án chỉ nằm
+> trong chú thích rê chuột** · 4 câu bảo "rê chuột" trong khi chú thích CHỈ nghe `mouseover`.
+> **Luật "đoạn nhắc ≤150 ký tự, phần dài đưa vào chú thích rê chuột" là luật đúng, nhưng LỐI
+> THOÁT nó chỉ ra lại dẫn vào nơi nửa số thiết bị không tới được.** Nay chú thích nghe thêm
+> `touchstart`, bốn câu hỏi trả lời thẳng, chức danh viết vào TỪNG DÒNG của ô chọn (đừng trông
+> vào nhãn `<optgroup>` - bài học đã ghi trong file này từ 11/08 mà em vẫn phạm lại).
+>
+> **4. Ba chỗ "đỏ theo đồng hồ" - hôm qua xanh, hôm nay đỏ, không ai sửa gì.**
+> NA069 (mọi buổi chưa ghi nhận xét đều đã quá hạn) · hai buổi cùng một lớp cách nhau 66 phút ·
+> chữ bị cắt trên điện thoại vì hôm nay một học viên tên dài lại đúng lúc bị gắn chip nguy cơ.
+> Cả ba đều chặn TẠI NGUỒN pipeline hoặc tại CƠ CHẾ, không vá theo ca cụ thể.
+> *Một chỗ đỏ đi theo dữ liệu thì vá đúng một cái tên là vá cho hôm nay thôi.*
+>
+> **5. Hai bẫy CSS cắn ngay trong lúc sửa:**
+> · `vertical-align:-6px` cho bánh răng - con số ma thửa cho đúng một cỡ chữ; đo bằng thước thật
+>   ra **10/10 bánh răng thấp hơn tâm hàng 5px**. Đổi sang canh theo tâm thì tự đúng mọi cỡ.
+> · Đặt `@media(max-width:700px)` TRƯỚC `@media(max-width:1280px)`: ở khổ 390px cả hai cùng khớp,
+>   cái viết sau thắng, nên luật mới không bao giờ chạy - mà đọc mã lên thì trông như đã chữa.
+>   *Hai media query cùng khớp thì cái viết SAU thắng - đặt trước là viết một luật không chạy.*
+>   Chỉ biết là chưa ăn vì ĐO LẠI trên trình duyệt, không đọc mã rồi tin.
+>
+> **6. Kỳ số liệu có ngày bắt đầu / kết thúc** (anh Luân: *"thường thì những nơi cho chọn thời
+> gian thì sẽ có ngày bắt đầu và ngày kết thúc nữa"*). Chỗ hụt sâu hơn: bốn nấc cũ đều CHỈ CÓ ĐẦU
+> DƯỚI - `inRep` xưa nay chỉ hỏi `d >= from`. Nên app không thể trả lời *"tháng trước ra sao"*.
+> Đầu trên lấy HẾT NGÀY (23:59:59) - cắt ở nửa đêm là mất trắng cả ngày cuối, im lặng. Gõ ngược
+> thứ tự thì tự đảo và nói ra. Kỳ tuỳ chọn so với cửa sổ ngay trước nó, dài đúng bằng nó.
+>
+> **7. Ô hoàn tiền** (anh Luân: *"thiếu mấy cái như: ca hoàn, tiền hoàn..."*): khoản hoàn ghi
+> thành DÒNG THU ÂM nên "Doanh thu đã thu" là số RÒNG - đã trừ mà không nói.
+> *Một con số đã bị trừ mà không khai phần trừ thì nó giấu đúng cái phần người ta cần biết.*
 >
 > ### 🟢 15/08 chiều - GỘP CSKH VỀ MỘT TRANG, ĐIỂM THEO CHỦ THỂ, VÀ MỘT DẢI TAB PHẢI LÀM BA LƯỢT
 >
