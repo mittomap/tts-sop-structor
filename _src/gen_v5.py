@@ -3624,7 +3624,13 @@ var PAGES=[
    đều bị SOP khoá - "Bảng Giảng viên" là chuỗi bằng chứng BC7 của `check_sop`, còn "Giáo viên
    ACA/WOW" là nhãn enum CH1 phải ghi nguyên văn. *Thống nhất từ vựng là việc trong PHẠM VI
    một màn; ép cả app về một từ ở đây là làm thủng SOP.* */
-{k:"gvdp",g:"_",ic:"ti-user-plus",t:"Giáo viên dự phòng theo ngày",c:"Ai thay được khi giáo viên nghỉ đột xuất",ty:"custom"},
+/* V2 15/08 (anh Luân: *"mà sao lại là dự phòng trong ngày nhỉ, a chọn ngày nào mà chẳng được.
+   Ví dụ giáo viên báo nghỉ 3 ngày nữa, thì phải chọn 3 ngày nữa để đẩy giảng viên dạy thay
+   chứ"*). Trang VẪN LUÔN chọn được ngày bất kỳ - ô chọn ngày nằm ngay trên bảng. Cái sai là
+   CÁI TÊN: "theo ngày" đọc ra như "chỉ hôm nay", nên anh không nghĩ tới chuyện bấm sang ngày
+   khác. *Một cái tên hẹp hơn tính năng thì nó khoá bớt tính năng, không ai đi thử phần còn lại.*
+   Tên mới nói việc phải làm, không nói cách bày dữ liệu. */
+{k:"gvdp",g:"_",ic:"ti-user-plus",t:"Xếp người dạy thay",c:"Giáo viên nghỉ - chọn ngày, xếp người đã đăng ký ca",ty:"custom"},
 /* V9.99z5 (anh Luân 05/08: *"lệch nhau giữa nghiệp vụ bên trong và trang trên sidebar là do
    thiết kế vậy hả em, hay do sót nhỉ"* + *"bên sidebar giống như 1 cái bản đồ vậy, họ biết
    mình cần tìm gì ở đâu"*): hai tab "Hôm nay" và "Lịch tuần" của hub Học tập chưa bao giờ có
@@ -22933,14 +22939,19 @@ function gvBackup(ses){
   /* V2 12/08 (HỌC VỤ-2): người đã NHẬN LỜI trực dự phòng tháng này lên đầu - trống lịch mới là
      điều kiện cần, nhận lời mới là điều kiện đủ. */
   var duPhong=false;try{duPhong=gvdpLaDuPhong(g.staff_id,when||new Date())}catch(e){}
-  var score=(duPhong?200:0)+(sameCls?100:0)+(sameCourse?40:0)+(okBr?20:0)-(busy?1000:0);
+  /* V2 15/08 - ĐĂNG KÝ CA là điều kiện mạnh nhất, mạnh hơn cả "đã dạy lớp này". Người quen lớp
+     mà hôm ấy không đến trung tâm thì vẫn không dạy được; người đã đăng ký ca thì chắc chắn có
+     mặt. Nên 500 điểm, cao hơn mọi vế còn lại cộng lại. */
+  var dangKy=false;try{dangKy=dpChoBuoi(ses).some(function(x){return String(x.staff_id||"")===g.staff_id})}catch(e){}
+  var score=(dangKy?500:0)+(duPhong?200:0)+(sameCls?100:0)+(sameCourse?40:0)+(okBr?20:0)-(busy?1000:0);
   var why=[];
+  if(dangKy)why.push("ĐÃ ĐĂNG KÝ ca dạy thay đúng giờ này");
   if(duPhong)why.push("đã nhận lời trực dự phòng tháng này");
   if(sameCls)why.push("đã dạy chính lớp này");
   else if(sameCourse)why.push("đã dạy khóa "+(c.course_id_name||c.course_id||""));
   if(onl)why.push("lớp online - ai cũng dạy được");
   else if(okBr)why.push("có mặt được ở "+(elabel(c.branch)||c.branch||"cơ sở này"));
-  out.push({g:g,ok:okBr&&!busy,busy:busy,okBr:okBr,score:score,
+  out.push({g:g,ok:okBr&&!busy,busy:busy,okBr:okBr,score:score,dangKy:dangKy,
    why:why.join(" · "),
    no:busy?("đang bận: "+busy.t+" "+busy.lb):(!okBr?("không ở "+(elabel(c.branch)||c.branch)):"")});});
  out.sort(function(a,b){return b.score-a.score});
@@ -23037,6 +23048,105 @@ function gvBackupForm(sesId){
 /* ═══ V2 12/08 (HỌC VỤ-2) - SỔ ĐĂNG KÝ GV DỰ PHÒNG THEO THÁNG (DL28) ══════════════════════════
    Khai theo THÁNG chứ không khai một lần rồi để đó: lịch giảng viên đổi theo học kỳ, một danh
    sách khai một lần là danh sách sai sau ba tháng. Người khai: Trưởng phòng ACA (anh Luân chốt). */
+/* ═══ V2 15/08 - SỔ ĐĂNG KÝ CA DẠY THAY (DL31) ══════════════════════════════════════════════
+   Anh Luân lật lại một GIẢ ĐỊNH GỐC của trang này: *"Đó là đúng với nhân viên fulltime thôi em,
+   giáo viên parttime họ đâu có mặt sẵn, họ dạy theo lịch đăng ký như wow coach vậy á, cho nên
+   chỗ này ko tự tính được đâu, cần phải đăng ký danh sách dự phòng đi em."*
+
+   Anh đúng, và cái sai của bản cũ nặng hơn một lỗi hiển thị. Trang này TỰ TÍNH người thay từ
+   "trống lịch đúng giờ + đúng cơ sở + chưa quá số buổi". Phép tính ấy chỉ đúng với người CÓ MẶT
+   SẴN ở trung tâm. Giáo viên làm theo ca thì **trống lịch không có nghĩa là rảnh - nó chỉ có
+   nghĩa là hôm ấy họ không đến.** App bày tên họ ra như một lựa chọn có sẵn, học vụ gọi đi mười
+   người thì tám người không nhấc máy, và bảng vẫn xanh.
+   *Một phép tính đúng về mặt số học vẫn sai nếu nó đo một thứ mà thực tế không có.*
+
+   Nay có sổ đăng ký, đúng khuôn ca trực WOW (DL26) vì đó chính là mô hình anh chỉ ra: một dòng
+   = một người + một ngày + một khung giờ + một cơ sở.
+   Phép tính cũ KHÔNG bị xoá - LUẬT CỨNG SỐ 0 không cho bớt. Nó tụt xuống làm gợi ý HẠNG HAI và
+   được dán nhãn đúng bản chất: *"trống lịch nhưng chưa đăng ký - phải hỏi trước"*. Người đã
+   đăng ký đứng trên, vì với họ ta biết chắc họ nhận. */
+function dpAll(){return rows("DL31")||[]}
+function dpPhut(t){var m=String(t||"").match(/(\d{1,2}):(\d{2})/);return m?(+m[1]*60+ +m[2]):null}
+function dpNgay(x){return pvnd(String(x.slot_date||"")+" 00:00")}
+function dpTuan(d0){var t0=d0.getTime(),t1=t0+7*864e5;
+ return dpAll().filter(function(x){var d=dpNgay(x);return d&&d.getTime()>=t0&&d.getTime()<t1})}
+function dpConTrong(x){return !isc(x.dp_status,"cancelled")&&!String(x.session_id||"").trim()}
+/* Ca đăng ký có PHỦ được một buổi học không: cùng ngày, giờ buổi nằm trong khung đã đăng ký, và
+   cùng cơ sở (lớp online thì không ràng buộc cơ sở). Hỏi đủ ba vế - thiếu vế cơ sở là xếp một
+   người ở Cơ sở 1 sang dạy lớp Cơ sở 5. */
+function dpPhuBuoi(x,ses,cls){
+ if(!dpConTrong(x))return false;
+ var d=pvnd(ses.session_date);if(!d)return false;
+ var dx=dpNgay(x);if(!dx||!sameDay(dx,d))return false;
+ var gio=d.getHours()*60+d.getMinutes();
+ var tu=dpPhut(x.slot_from),den=dpPhut(x.slot_to);
+ if(tu==null||den==null)return false;
+ if(gio<tu||gio>=den)return false;
+ var onl=cls?clsOnline(cls):false;
+ if(onl)return true;
+ var cb=String((cls&&cls.branch)||"");
+ return !cb||ecode(x.branch)===ecode(cb)}
+function dpChoBuoi(ses){var cls=find("DL10","class_id",ses.class_id);
+ var cur=String(ses.teacher_id||"");
+ return dpAll().filter(function(x){return String(x.staff_id||"")!==cur&&dpPhuBuoi(x,ses,cls)})}
+function dpDaDangKy(sid,when){var d=when||new Date();
+ return dpAll().some(function(x){var dx=dpNgay(x);
+  return String(x.staff_id||"")===String(sid||"")&&dx&&Math.abs(dx.getTime()-d.getTime())<8*864e5})}
+/* Cửa ghi: đăng ký một ca dạy thay. Giáo viên tự đăng ký cho mình; Trưởng phòng ACA / học vụ
+   khai hộ được (gọi điện hỏi rồi ghi lại - đó là cách nó diễn ra thật). */
+function dpAiKhaiHo(){if(banToanQuyen())return true;
+ var me=CURSTAFF?find("DL01","staff_id",CURSTAFF):null;
+ if(!CURSTAFF)return true;if(!me)return false;
+ return /^(aca|academic)_manager$/.test(ecode(me.role))||ecode(me.role)==="ceo"||ecode(me.role)==="academic_staff"}
+function dpCaCH2(){return [["08:00","12:00","Ca sáng"],["13:00","17:00","Ca chiều"],["17:30","21:30","Ca tối"]]}
+function dpForm(sid){
+ var me=CURSTAFF?find("DL01","staff_id",CURSTAFF):null;
+ var laGV=me&&isGVRole(me);
+ var khaiHo=dpAiKhaiHo();
+ if(!laGV&&!khaiHo){toast("Chỉ giáo viên tự đăng ký, hoặc Trưởng phòng ACA / học vụ khai hộ.");return}
+ var GV=rows("DL01").filter(isGVRole);
+ var chon=sid||(laGV?me.staff_id:"");
+ var h='<div class="dcard"><h4><i class="ti ti-calendar-plus"></i>Đăng ký ca dạy thay</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>'+
+  'Đăng ký nghĩa là <b>hôm ấy có mặt và nhận dạy thay</b> nếu có lớp cần. Học vụ xếp người theo '+
+  'đúng sổ này trước, nên đăng ký rồi thì đừng để lỡ.</div>';
+ h+='<div class="fld"><label>Giáo viên '+(laGV&&!khaiHo?'':'<i>*</i>')+'</label>'+
+  (laGV&&!khaiHo
+   ?('<input value="'+esc(me.full_name||me.staff_id)+'" disabled><input type="hidden" id="dp_gv" value="'+esc(me.staff_id)+'">')
+   :('<select id="dp_gv"><option value="">-- chọn giáo viên --</option>'+GV.map(function(g){
+      return '<option value="'+esc(g.staff_id)+'"'+(g.staff_id===chon?" selected":"")+'>'+esc((g.full_name||g.staff_id)+" · "+(elabel(g.branch)||"-"))+'</option>'}).join("")+'</select>'))+
+  '</div>';
+ h+='<div class="fld"><label>Ngày <i>*</i></label><input id="dp_ngay" type="date" value="'+esc(fmtYMD(gvdpDay()))+'"></div>';
+ h+='<div class="fld"><label>Khung giờ <i>*</i></label><select id="dp_ca">'+
+  dpCaCH2().map(function(c){return '<option value="'+c[0]+"|"+c[1]+'">'+esc(c[2]+" ("+c[0]+" - "+c[1]+")")+'</option>'}).join("")+
+  '</select></div>';
+ h+='<div class="fld"><label>Cơ sở nhận dạy</label><select id="dp_cs"><option value="">-- theo cơ sở của tôi --</option>'+
+  enumOpts("enum_branch")+
+  '</select></div>';
+ h+='<div class="fld full"><label>Ghi chú</label><input id="dp_ghi" placeholder="vd: chỉ nhận lớp Foundation"></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="dpLuu()"><i class="ti ti-device-floppy"></i>Đăng ký ca</button>'+
+  '<button class="btn" onclick="closeModal()">Đóng</button></div></div>';
+ openDrawer("Đăng ký ca dạy thay",h)}
+function dpLuu(){
+ var sid=fldV("dp_gv"),ng=fldV("dp_ngay"),ca=String(fldV("dp_ca")||"").split("|");
+ if(!sid){toast("Chọn giáo viên.");return}
+ if(!ng||ca.length<2){toast("Chọn ngày và khung giờ.");return}
+ var g=find("DL01","staff_id",sid)||{};
+ var dmy=vnd2(new Date(ng+"T00:00:00"));
+ var cs=fldV("dp_cs")||g.branch||"";
+ /* Trùng ca thì KHÔNG đẻ dòng thứ hai - một người một khung giờ một ngày chỉ có một trạng thái.
+    Hai dòng trùng nhau là hai câu trả lời cho cùng một câu hỏi, và bảng sẽ đếm đôi. */
+ var trung=dpAll().some(function(x){return String(x.staff_id||"")===sid&&
+   String(x.slot_date||"")===dmy&&String(x.slot_from||"")===ca[0]&&!isc(x.dp_status,"cancelled")});
+ if(trung){toast("Giáo viên này đã đăng ký đúng ca đó rồi.");return}
+ if(!actGuard("dpLuu:"+sid+dmy+ca[0]))return;
+ DL.DL31=(DL.DL31||[]);
+ DL.DL31.push({dp_id:"DP-"+seqNo("DL31","dp_id",4),staff_id:sid,staff_name:g.full_name||sid,
+  slot_date:dmy,slot_from:ca[0],slot_to:ca[1],slot_datetime:dmy+" "+ca[0],branch:cs,
+  dp_status:"available (Còn trống)",session_id:"",registered_at:nowStr(),note:fldV("dp_ghi")||""});
+ persistSoon();closeModal();
+ toast("Đã đăng ký ca dạy thay "+dmy+" "+ca[0]+"-"+ca[1]+" cho "+(g.full_name||sid)+".",4600);
+ reRender(CUR)}
 function gvdpKyThang(d){d=d||new Date();function z(n){return n<10?"0"+n:n}
  return z(d.getMonth()+1)+"/"+d.getFullYear()}
 function gvdpThang(d){var k=(typeof d==="string")?d:gvdpKyThang(d);
@@ -23096,7 +23206,7 @@ function renderGvdp(embed){
  var noGv=ses.filter(function(x){return !String(x.teacher_id||"").trim()});
  var free=GV.filter(function(g){return !busyMap[g.staff_id]});
  var ymd=fmtYMD(day);
- var h=embed?'':pageHead("Giáo viên dự phòng theo ngày","Một giáo viên nghỉ đột xuất thì ai đẩy lên được - tính theo lịch dạy thật, cơ sở của lớp và hình thức học.","");
+ var h=embed?'':pageHead("Xếp người dạy thay","Giáo viên nghỉ - chọn ĐÚNG NGÀY buổi đó (hôm nay hay tuần sau đều được), rồi xếp người đã đăng ký ca dạy thay đúng giờ và đúng cơ sở.","");
  /* V9.99z (anh Luân 05/08): *"đăng ký giáo viên dự phòng ở đâu em nhỉ, tức là mình tạo giáo viên
     dự phòng ở đâu"* - câu hỏi đúng chỗ đau: màn này KHÔNG có bước đăng ký nào, mà cũng không nói
     ra điều đó, nên người dùng đi tìm một cái nút không tồn tại. Không có danh sách "GV dự phòng"
@@ -23118,14 +23228,15 @@ function renderGvdp(embed){
    '<b>Đăng ký dự phòng tháng '+esc(gvdpKyThang(day))+':</b> '+
    (co?(co+' giảng viên đã nhận lời - họ được xếp lên đầu danh sách người thay.'):'chưa ai đăng ký. Trưởng phòng ACA khai đầu tháng.')+
    ' <button class="btn sm" onclick="gvdpThangForm(\''+esc(gvdpKyThang(day))+'\')"><i class="ti ti-edit"></i>'+(gvdpAiKhai()?'Khai danh sách tháng':'Xem danh sách tháng')+'</button></div>'})();
- h+='<div class="notebar"><i class="ti ti-info-circle"></i>'+
-  /* V2 15/08 - câu hỏi "App tính thế nào?" bỏ đi, luật tính viết thẳng ra. Chú thích vẫn giữ
-     phần dài (giáo viên nghỉ cả ngày thì rơi vào nhóm nào), nhưng nó gắn vào một CÂU KỂ - chú
-     thích được phép làm rõ thêm, không được là chỗ duy nhất trả lời một câu hỏi đã in ra. */
-  '<b>Không cần đăng ký trước.</b> '+
-  '<span data-tip="Giáo viên nghỉ cả ngày thì để trống lịch của họ - họ tự rơi vào nhóm '+
-  '&quot;trống lịch cả ngày&quot; ở ô bên trên.">App tự tính người thay: trống lịch đúng giờ, '+
-  'đúng cơ sở, chưa quá số buổi/ngày.</span> Bấm <b>Đề xuất người dạy thay</b> ở dòng buổi.</div>';
+ /* V2 15/08 - CÂU NÀY TỪNG NÓI SAI SỰ THẬT. Nó viết "Không cần đăng ký trước - app tự tính
+    người thay", trong khi giáo viên làm theo ca không hề có mặt sẵn. Nay nói đúng thứ tự: đăng
+    ký là nguồn chính, phép tính chỉ là gợi ý hạng hai và phải hỏi lại người ta. */
+ (function(){var _dk=dpTuan(new Date(day.getFullYear(),day.getMonth(),day.getDate()-3)).length;
+  h+='<div class="notebar '+(_dk?'nbgreen':'nbamber')+'"><i class="ti ti-calendar-check"></i>'+
+   '<b>Xếp theo CA ĐÃ ĐĂNG KÝ.</b> Giáo viên đăng ký ca rảnh như WOW coach; '+
+   (_dk?(_dk+' ca quanh ngày này.'):'quanh ngày này chưa ai đăng ký ca nào.')+
+   ' Người chỉ trống lịch mà chưa đăng ký vẫn hiện, nhưng phải hỏi trước. '+
+   '<button class="btn sm" onclick="dpForm()"><i class="ti ti-calendar-plus"></i>Đăng ký ca dạy thay</button></div>'})();
 /* V2 13/08 - BỎ DẢI THẺ. Anh Luân: *"thẻ nó phải mang tính khác biệt, chứ nó như cái chip thì
    giữ làm gì, sao ko ưu tiên KPI, SLA hoặc mấy cái nhóm quan trọng"*. Dải này chỉ đếm dòng của
    chính bảng ngay dưới - đúng việc mà chip đang làm, và chip còn bấm lọc được. Luật chốt ở

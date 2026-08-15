@@ -405,6 +405,122 @@ log.append("21. Con han ghi nhan xet (NA069): %d buoi trong cua so %dh, %s"
               ("go nhan xet cua %s de tinh huong nay luon co that" % _goNX) if _goNX
               else "da co %d buoi chua ghi - khong phai gieo" % len(_conHan)))
 
+# ═══ 22. DL31 · CA DAY THAY DA DANG KY (15/08) ═══════════════════════════════════════════
+# Anh Luan: *"giao vien parttime ho dau co mat san, ho day theo lich dang ky nhu wow coach vay
+# a, cho nen cho nay ko tu tinh duoc dau, can phai dang ky danh sach du phong di em"*.
+#
+# Trang "GV du phong" cu TU TINH nguoi thay tu cho trong lich + dung co so + chua qua so buoi.
+# Phep tinh ay chi dung voi nguoi CO MAT SAN o trung tam - tuc nhan vien fulltime. Giao vien
+# ACA phan lon lam theo ca: trong lich khong co nghia la ranh, no chi co nghia la HOM AY HO
+# KHONG DEN. App bay ra ten ho nhu mot lua chon san la bay ra mot lua chon khong ton tai.
+#
+# Nen phai co SO DANG KY, dung khuon voi ca truc WOW (DL26): mot dong = mot nguoi + mot ngay +
+# mot khung gio + mot co so. Gieo tat dinh (theo chi so, khong boc tham) de check_taolai on.
+_CA_DP = [("08:00", "12:00"), ("13:00", "17:00"), ("17:30", "21:30")]
+_gvDs = [x for x in R("DL01")
+         if "teacher" in code(x.get("role") or "") and code(x.get("status") or "") in ("active", "")]
+_gvDs.sort(key=lambda x: str(x.get("staff_id") or ""))
+_dp = d["dl"].setdefault("DL31", [])
+
+
+def _caChua(gio):
+    """Khung ca PHU duoc gio nay - de ca dang ky trum len buoi hoc that."""
+    for _a, _b in _CA_DP:
+        if _a <= gio < _b:
+            return (_a, _b)
+    return None
+
+
+if not _dp:
+    _n = 0
+    # (1) GIEO THEO BUOI CO THAT TRUOC. Buoi chua co giao vien la dung cho tinh nang nay phuc vu;
+    #     neu khong ai dang ky trung gio + trung co so thi man hinh ra bang rong va nguoi xem ket
+    #     luan la tinh nang hong, chu khong ket luan la demo thieu du lieu.
+    #     *Gieo du lieu cho mot tinh nang thi phai gieo vao dung cho no doc, khong gieo rai deu.*
+    _lop = {str(x.get("class_id") or ""): x for x in R("DL10")}
+    # BUOI CAN NGUOI THAY: do that ra 0 buoi. Moi buoi chua co teacher_id deu la buoi DA HUY,
+    # nen man "xep nguoi day thay" xua nay khong co gi de xep - tinh nang chinh cua trang chay
+    # tren mot tap rong ma khong ai biet.
+    # Anh Luan mo ta dung tinh huong that: *"giao vien bao nghi 3 ngay nua, thi phai chon 3 ngay
+    # nua de day giang vien day thay"*. Nen gieo dung tinh huong ay: BA buoi sap toi bi go giao
+    # vien va ghi ly do, de trang co viec that ma lam.
+    _sapToi = [x for x in R("DL11")
+               if code(x.get("session_status") or "") not in ("cancelled",)
+               and str(x.get("teacher_id") or "").strip()
+               and dt(x.get("session_date")) and NOW < dt(x.get("session_date")) <= NOW + datetime.timedelta(days=9)]
+    _sapToi.sort(key=lambda x: (dt(x.get("session_date")), str(x.get("session_id") or "")))
+    _nghi = 0
+    for _se in _sapToi:
+        if _nghi >= 3:
+            break
+        if not _caChua(dt(_se.get("session_date")).strftime("%H:%M")):
+            continue
+        _se["notes"] = ((str(_se.get("notes") or "") + " ").strip()
+                        + " GV báo nghỉ - cần xếp người dạy thay.").strip()
+        _se["teacher_id"] = ""
+        _se["teacher_id_name"] = ""
+        _nghi += 1
+    _thieu = [x for x in R("DL11")
+              if not str(x.get("teacher_id") or "").strip()
+              and code(x.get("session_status") or "") not in ("cancelled",)]
+    _thieu.sort(key=lambda x: str(x.get("session_id") or ""))
+    for _j, _se in enumerate(_thieu):
+        _dd = dt(_se.get("session_date"))
+        if not _dd:
+            continue
+        _ca = _caChua(_dd.strftime("%H:%M"))
+        if not _ca:
+            continue
+        _cl = _lop.get(str(_se.get("class_id") or "")) or {}
+        _br = str(_cl.get("branch") or "")
+        # hai nguoi cho moi buoi -> hoc vu con duoc chon, khong bi ep mot lua chon duy nhat
+        _ung = [g for g in _gvDs if not _br or str(g.get("branch") or "") == _br] or _gvDs
+        for _t in range(2):
+            if not _ung:
+                break
+            _g = _ung[(_j + _t) % len(_ung)]
+            _dmy = _dd.strftime("%d/%m/%Y")
+            if any(str(x["staff_id"]) == str(_g.get("staff_id")) and x["slot_date"] == _dmy
+                   and x["slot_from"] == _ca[0] for x in _dp):
+                continue
+            _n += 1
+            _dp.append({
+                "dp_id": "DP-%04d" % _n,
+                "staff_id": _g.get("staff_id") or "", "staff_name": _g.get("full_name") or "",
+                "slot_date": _dmy, "slot_from": _ca[0], "slot_to": _ca[1],
+                "slot_datetime": _dmy + " " + _ca[0], "branch": _g.get("branch") or "",
+                "dp_status": "available (Còn trống)", "session_id": "",
+                "registered_at": (_dd - datetime.timedelta(days=4)).strftime("%d/%m/%Y %H:%M"),
+                "note": "",
+            })
+    # (2) roi moi rai them cho lich trong tuan khong bi thua ngay trong
+    for _i, _g in enumerate(_gvDs):
+        for _k in range(-3, 11):
+            _ngay = NOW + datetime.timedelta(days=_k)
+            if (_i + _k) % 4 != 0:
+                continue
+            _ca = _CA_DP[(_i + _k) % len(_CA_DP)]
+            _dmy = _ngay.strftime("%d/%m/%Y")
+            if any(str(x["staff_id"]) == str(_g.get("staff_id")) and x["slot_date"] == _dmy
+                   and x["slot_from"] == _ca[0] for x in _dp):
+                continue
+            _n += 1
+            _dp.append({
+                "dp_id": "DP-%04d" % _n,
+                "staff_id": _g.get("staff_id") or "",
+                "staff_name": _g.get("full_name") or "",
+                "slot_date": _dmy,
+                "slot_from": _ca[0],
+                "slot_to": _ca[1],
+                "slot_datetime": _dmy + " " + _ca[0],
+                "branch": _g.get("branch") or "",
+                "dp_status": "available (Con trong)",
+                "session_id": "",
+                "registered_at": (_ngay - datetime.timedelta(days=5)).strftime("%d/%m/%Y %H:%M"),
+                "note": "",
+            })
+    log.append("22. DL31 ca day thay: gieo %d ca dang ky cho %d giao vien" % (_n, len(_gvDs)))
+
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("=" * 70)
 print("VA DU LIEU DEMO — XONG")
