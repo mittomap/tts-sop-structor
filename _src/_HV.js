@@ -5547,7 +5547,7 @@ function viecTeam(t){window.VIECTEAM=t;window.VIECGRP="all";reRender("viec")}
 var VIECVWDEF=[
  ["viec","Theo việc","mọi việc đang nợ theo luật SLA, gom theo độ gấp - làm từ trên xuống là hết ngày.","","ti-checklist"],
  ["nguoi","Theo người","từng hồ sơ trên hành trình khách. Bấm một người, app dắt qua đúng chặng người đó đang đứng.","banlam","ti-user-search"],
- ["chang","Theo chặng","cùng ngần ấy hồ sơ nhưng xếp thành bản đồ chặng - để nhìn ra chỗ đang tắc, không phải để làm từng việc.","hanhtrinh","ti-route"]];
+ ["chang","Theo chặng","cùng ngần ấy hồ sơ, xếp thành bản đồ chặng để nhìn ra chỗ đang tắc. Bấm một cột hoặc một thẻ để xử lý; việc vận hành lớp thì làm ở hub Học tập & Giảng dạy.","hanhtrinh","ti-route"]];
 function viecVWCo(V){if(!V[3])return true;try{return canSee(V[3])}catch(e){return true}}
 function viecVWList(){return VIECVWDEF.filter(viecVWCo)}
 function VIECVW(){var v=window.VIECVIEW||"viec",L=viecVWList();
@@ -9579,7 +9579,16 @@ function renderHanhtrinh(embed){ /* V9.18: thân trang dùng được cả khi N
  var byK={};JSTAGE.forEach(function(s){byK[s.k]=[]});
  list.forEach(function(J){byK[J.k].push(J)});
  var nOver=base.filter(function(J){return J.over}).length,nMiss=base.filter(function(J){return J.miss.length}).length;
- var h=embed?'<div class="notebar" style="margin-top:2px"><i class="ti ti-route"></i>Bảng chặng: toàn bộ khách &amp; học viên xếp theo CHẶNG đang đứng - bấm cột/thẻ để xử lý. Việc vận hành lớp làm trong hub Học tập &amp; Giảng dạy.</div>'
+ /* ═══ V2 15/08 (anh Luân: *"ở ảnh em chụp, còn có thêm 1 dòng màu vàng em thấy ko??? e làm
+    thiếu đồng bộ quá"*) ═══════════════════════════════════════════════════════════════════════
+    Đúng: ở cách xem "Theo chặng" có HAI câu giải thích chồng nhau - câu của công tắc ("cùng ngần
+    ấy hồ sơ nhưng xếp thành bản đồ chặng...") và cái dải vàng này. Hai cách xem kia chỉ có một
+    câu. Ba cách xem là ba anh em ruột mà một đứa mặc thêm áo, nhìn vào là biết ngay lệch.
+    Nội dung riêng của dải vàng - *bấm cột/thẻ để xử lý, việc vận hành lớp làm ở hub Học tập* -
+    không mất: nó nhập vào chính câu mô tả của cách xem "Theo chặng" (`VIECVWDEF`), nên vẫn đọc
+    được ở đúng chỗ mà không đẻ thêm một dải nữa.
+    *Ba thứ song song thì phải mặc một kiểu - thêm một mảnh cho riêng một đứa là làm hỏng cả bộ.* */
+ var h=embed?""
   :pageHead("Hành trình học viên","Toàn bộ khách & học viên xếp theo CHẶNG KHÁCH đang đứng - mỗi người một việc kế tiếp. Việc VẬN HÀNH LỚP (điểm danh, bài tập, nhận xét buổi) không nằm ở đây - làm trong hub Học tập & Giảng dạy.",
   '<button class="btn" onclick="go(\'hoctap\')"><i class="ti ti-school"></i>Sang Học tập & Giảng dạy</button>');
  var lf=srchHTML(F.q,"window.JF.q=this.value;reRenderKeep(CUR)","Tìm tên, SĐT hoặc mã...",250)+

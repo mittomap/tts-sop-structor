@@ -1541,40 +1541,39 @@ table.dt tbody tr.clk.on td{font-weight:600}
    Vạch 1px, không phải dải màu - luật W5 cấm dải viền trang trí.
    Câu bên phải trả lời "đang nhìn cái gì" ngay tại chỗ, thay cho việc bắt người ta bấm thử ba
    cái rồi tự đoán. */
-/* ═══ V2 14/08 lượt 2 (anh Luân: *"Theo chặng, theo người, theo việc quan trọng như vậy mà e
-   thì thiết kế chìm nghỉm"*) ════════════════════════════════════════════════════════════════
-   Đúng. Bản trước em mặc cho nó bộ đồ của chip SẮP XẾP - nền chìm, chữ 12.5px mờ, cái đang chọn
-   là một thẻ trắng nhỏ. Thứ ấy hợp với "đổi thứ tự danh sách", nhưng đây là công tắc ĐỔI CẢ VÙNG
-   LÀM VIỆC: bấm một cái là toàn bộ nửa dưới trang thành một màn khác. Một quyết định lớn cỡ đó
-   mà mặc áo của một tuỳ chọn nhỏ thì mắt lướt qua không dừng lại.
-   App đã có hai hình mang hai nghĩa (viên tròn = LỌC · góc vuông = HÀNH ĐỘNG). Cách xem là loại
-   thứ BA, nên nó lấy hình thứ ba: **THANH TAB có gạch chân** - hình mà ai cũng đọc ra là "đây là
-   những màn song song, đang đứng ở màn này". Không mua thêm màu (bảng màu đã chạm trần 110 mã),
-   không mua thêm cỡ chữ - chỉ dùng ĐỘ ĐẬM, GẠCH CHÂN và KHOẢNG TRỐNG.
-   Gạch chân 2px dưới tab đang chọn KHÔNG phạm luật W5: luật ấy cấm dải viền màu TRANG TRÍ ở mép
-   trái, còn gạch này mang đúng một tin không thứ gì khác nói thay - "bạn đang ở đây". */
-.viecvw{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;margin:18px 0 14px;
- border-bottom:1px solid var(--line)}
-.viectab{display:flex;gap:2px;flex:none;margin-bottom:-1px}
-.viectb{border:0;background:transparent;font-family:inherit;font-size:13px;font-weight:700;
- color:var(--muted);padding:9px 14px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
- white-space:nowrap;border-bottom:2px solid transparent;transition:.12s}
-.viectb:hover{color:var(--navy);background:var(--bg);border-radius:8px 8px 0 0}
-.viectb.on{color:var(--navy);border-bottom-color:var(--navy)}
-.viectb i.ti{font-size:15px;opacity:.85}
-.viectb .segn{font-style:normal;font-size:11.5px;font-weight:800;background:var(--bg);color:var(--muted);
- border-radius:20px;padding:1px 7px;min-width:17px;text-align:center}
-.viectb.on .segn{background:rgba(30,42,56,.09);color:var(--navy)}
-.viecvwc{flex:1 1 220px;min-width:0;color:var(--muted);font-size:12px;line-height:1.5;padding-bottom:9px}
+/* ═══ V2 15/08 lượt 3 (anh Luân: *"a vẫn chưa thấy nó nổi bật (3 tab này quan trọng lắm)... và
+   phần des, a thấy em làm quá chìm, nó là 1 dòng cùng mã màu nền ở bên phải"*) ═══════════════════
+   Hai lượt trước em đã đổi từ chip sắp xếp sang tab gạch chân, nhưng vẫn chưa tới: gạch chân là
+   thứ nhẹ nhất trong họ hàng tab, còn câu mô tả thì bị đẩy sang phải, chữ 12px màu mờ, trôi giữa
+   nền trắng - đọc như một dòng chú thích thừa chứ không như câu trả lời cho "tôi đang xem gì".
+   Nay công tắc là MỘT KHỐI RIÊNG có nền, viền và bóng nhẹ - nó tự tách khỏi mặt trang thay vì
+   nằm chìm trong đó. Bên trong khối: hàng tab lớn ở trên, câu mô tả NGAY DƯỚI trong cùng khối
+   (không phải bên phải), nên hai thứ đọc thành một cụm - đúng nghĩa "đang xem cái này, nó là
+   cái này".
+   Tab đang chọn: nền TRẮNG NỔI trên nền chìm của khối, có bóng, chữ navy đậm 14px - hình của một
+   cái nút đang được nhấn xuống. Tab khác: trong suốt, chữ mờ. Không mua thêm màu (bảng màu chạm
+   trần 110 mã) và không mua thêm cỡ chữ - 14px đã có trong thang.
+   *Muốn một thứ nổi bật thì cho nó một cái NỀN riêng, đừng chỉ tô đậm chữ trên cùng một nền.* */
+.viecvw{margin:18px 0 14px;background:var(--bg);border:1px solid var(--line);border-radius:14px;
+ padding:8px 8px 0;box-shadow:0 1px 2px rgba(30,42,56,.05)}
+.viectab{display:flex;gap:4px;flex-wrap:wrap}
+.viectb{border:0;background:transparent;font-family:inherit;font-size:14px;font-weight:700;
+ color:var(--muted);padding:10px 18px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+ white-space:nowrap;border-radius:10px;transition:.14s}
+.viectb:hover{color:var(--navy);background:rgba(255,255,255,.65)}
+.viectb.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(30,42,56,.16)}
+.viectb i.ti{font-size:17px;opacity:.9}
+.viectb .segn{font-style:normal;font-size:12px;font-weight:800;background:rgba(30,42,56,.07);
+ color:var(--muted);border-radius:20px;padding:1px 8px;min-width:18px;text-align:center}
+.viectb.on .segn{background:var(--gray);color:var(--navy)}
+/* Câu mô tả nằm TRONG khối, ngay dưới hàng tab - không còn trôi sang phải trên nền trắng. */
+.viecvwc{color:var(--muted);font-size:12.5px;line-height:1.5;padding:9px 10px 11px;
+ border-top:1px solid var(--line);margin-top:8px}
 .viecvwc b{color:var(--navy);font-weight:700}
-/* Khổ điện thoại: ba tab kèm icon ăn ~420px trên màn 390px nên đẩy cả trang cuộn ngang 57px
-   (`_checkui` bắt trên ba lối vào cùng trỏ về trang này). Bỏ icon và bóp đệm là ba tab vừa một
-   hàng; cho `.viectab` được xuống dòng làm lưới đỡ, phòng khi thêm cách xem thứ tư.
-   *Thứ vừa khít ở màn rộng là thứ đầu tiên tràn ở màn hẹp.* */
-@media(max-width:700px){.viecvw{gap:8px}.viecvwc{flex-basis:100%}
- .viectab{flex-wrap:wrap}
- .viectb{padding:8px 9px 9px;font-size:12.5px;gap:5px}
- .viectb i.ti{display:none}}
+@media(max-width:700px){.viecvw{padding:6px 6px 0}
+ .viectb{padding:9px 11px;font-size:13px;gap:6px}
+ .viectb i.ti{display:none}
+ .viecvwc{font-size:12px;padding:8px 6px 10px}}
 .segb.zero{opacity:.45}
 .segb.zero:hover,.segb.zero.on{opacity:1}
 /* V9.47: nút mở/thu dải chip dài - phải KHÁC hẳn các chip lọc để mắt không nhầm nó là một nhóm */
@@ -8452,7 +8451,7 @@ function viecTeam(t){window.VIECTEAM=t;window.VIECGRP="all";reRender("viec")}
 var VIECVWDEF=[
  ["viec","Theo việc","mọi việc đang nợ theo luật SLA, gom theo độ gấp - làm từ trên xuống là hết ngày.","","ti-checklist"],
  ["nguoi","Theo người","từng hồ sơ trên hành trình khách. Bấm một người, app dắt qua đúng chặng người đó đang đứng.","banlam","ti-user-search"],
- ["chang","Theo chặng","cùng ngần ấy hồ sơ nhưng xếp thành bản đồ chặng - để nhìn ra chỗ đang tắc, không phải để làm từng việc.","hanhtrinh","ti-route"]];
+ ["chang","Theo chặng","cùng ngần ấy hồ sơ, xếp thành bản đồ chặng để nhìn ra chỗ đang tắc. Bấm một cột hoặc một thẻ để xử lý; việc vận hành lớp thì làm ở hub Học tập & Giảng dạy.","hanhtrinh","ti-route"]];
 function viecVWCo(V){if(!V[3])return true;try{return canSee(V[3])}catch(e){return true}}
 function viecVWList(){return VIECVWDEF.filter(viecVWCo)}
 function VIECVW(){var v=window.VIECVIEW||"viec",L=viecVWList();
@@ -12484,7 +12483,16 @@ function renderHanhtrinh(embed){ /* V9.18: thân trang dùng được cả khi N
  var byK={};JSTAGE.forEach(function(s){byK[s.k]=[]});
  list.forEach(function(J){byK[J.k].push(J)});
  var nOver=base.filter(function(J){return J.over}).length,nMiss=base.filter(function(J){return J.miss.length}).length;
- var h=embed?'<div class="notebar" style="margin-top:2px"><i class="ti ti-route"></i>Bảng chặng: toàn bộ khách &amp; học viên xếp theo CHẶNG đang đứng - bấm cột/thẻ để xử lý. Việc vận hành lớp làm trong hub Học tập &amp; Giảng dạy.</div>'
+ /* ═══ V2 15/08 (anh Luân: *"ở ảnh em chụp, còn có thêm 1 dòng màu vàng em thấy ko??? e làm
+    thiếu đồng bộ quá"*) ═══════════════════════════════════════════════════════════════════════
+    Đúng: ở cách xem "Theo chặng" có HAI câu giải thích chồng nhau - câu của công tắc ("cùng ngần
+    ấy hồ sơ nhưng xếp thành bản đồ chặng...") và cái dải vàng này. Hai cách xem kia chỉ có một
+    câu. Ba cách xem là ba anh em ruột mà một đứa mặc thêm áo, nhìn vào là biết ngay lệch.
+    Nội dung riêng của dải vàng - *bấm cột/thẻ để xử lý, việc vận hành lớp làm ở hub Học tập* -
+    không mất: nó nhập vào chính câu mô tả của cách xem "Theo chặng" (`VIECVWDEF`), nên vẫn đọc
+    được ở đúng chỗ mà không đẻ thêm một dải nữa.
+    *Ba thứ song song thì phải mặc một kiểu - thêm một mảnh cho riêng một đứa là làm hỏng cả bộ.* */
+ var h=embed?""
   :pageHead("Hành trình học viên","Toàn bộ khách & học viên xếp theo CHẶNG KHÁCH đang đứng - mỗi người một việc kế tiếp. Việc VẬN HÀNH LỚP (điểm danh, bài tập, nhận xét buổi) không nằm ở đây - làm trong hub Học tập & Giảng dạy.",
   '<button class="btn" onclick="go(\'hoctap\')"><i class="ti ti-school"></i>Sang Học tập & Giảng dạy</button>');
  var lf=srchHTML(F.q,"window.JF.q=this.value;reRenderKeep(CUR)","Tìm tên, SĐT hoặc mã...",250)+
