@@ -763,7 +763,21 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    `overflow:visible` nên phần thò ra đội cả khung nội dung cuộn ngang 14px trên điện thoại.
    `.bsl` đã có `overflow-wrap:anywhere` từ trước - thiếu đúng dòng SỐ, tức nửa cái luật. */
 .bsn{font-size:20px;font-weight:800;color:var(--navy);line-height:1.1;overflow-wrap:anywhere}
-.bsl{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+/* ═══ BẪY ĐÃ CẮN LẦN HAI TRONG NGÀY 15/08 - KHÔI PHỤC CSS BẰNG BẢN CŨ THÌ ĐÈ MẤT BẢN MỚI ═════
+   Sáng nay em cắt nhầm 49.071 ký tự CSS, và chữa bằng cách lấy nguyên khối ấy từ `git show HEAD`
+   dán lại. Chữa được cái vỡ trước mắt, nhưng bản HEAD là bản TRƯỚC hai luật em vừa thêm vào
+   chính khối đó (`.bstx` và `.bsp` - tách nhãn thẻ khỏi dòng phụ). Dán đè xong hai luật biến mất
+   trong im lặng: HTML vẫn in ra `class="bsp"`, trình duyệt không có luật nào cho nó nên dòng phụ
+   mất cỡ chữ, mất độ mờ, mất phép ngắt chữ - và `_checkmat` bắt được ở khổ điện thoại ("chữ bị
+   cắt 2px"), tức phải chạy tới bộ đo bằng trình duyệt mới lộ.
+   *Khôi phục từ một bản cũ là một phép GHI ĐÈ, không phải phép vá - phải hỏi lại bản cũ ấy thiếu
+   những gì mình vừa thêm.* */
+.bsl{font-size:11px;color:var(--muted);overflow-wrap:anywhere;line-height:1.35}
+.bstx{min-width:0;flex:1 1 auto}
+/* `word-break` đi kèm `overflow-wrap`: chuỗi "250.000đ/buổi · 16h kèm" không có khoảng trắng ở
+   chỗ cần ngắt, riêng `overflow-wrap:anywhere` vẫn để nó thò ra 2px trên khổ điện thoại. */
+.bsp{font-size:11px;color:var(--muted);opacity:.78;line-height:1.35;margin-top:2px;
+ overflow-wrap:anywhere;word-break:break-word;min-width:0}
 .bwgh{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.3px;color:var(--muted);text-transform:uppercase;margin:12px 0 6px}
 .bwgc{background:var(--bg);border-radius:20px;padding:0 8px;font-size:11px}
 /* ===== THANH CÔNG CỤ CHUẨN - dùng cho MỌI trang có bộ lọc ===== */
@@ -1569,7 +1583,14 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .viectb.on .segn{background:rgba(30,42,56,.09);color:var(--navy)}
 .viecvwc{flex:1 1 220px;min-width:0;color:var(--muted);font-size:12px;line-height:1.5;padding-bottom:9px}
 .viecvwc b{color:var(--navy);font-weight:700}
-@media(max-width:700px){.viecvw{gap:8px}.viecvwc{flex-basis:100%}.viectb{padding:9px 10px 10px}}
+/* Khổ điện thoại: ba tab kèm icon ăn ~420px trên màn 390px nên đẩy cả trang cuộn ngang 57px
+   (`_checkui` bắt trên ba lối vào cùng trỏ về trang này). Bỏ icon và bóp đệm là ba tab vừa một
+   hàng; cho `.viectab` được xuống dòng làm lưới đỡ, phòng khi thêm cách xem thứ tư.
+   *Thứ vừa khít ở màn rộng là thứ đầu tiên tràn ở màn hẹp.* */
+@media(max-width:700px){.viecvw{gap:8px}.viecvwc{flex-basis:100%}
+ .viectab{flex-wrap:wrap}
+ .viectb{padding:8px 9px 9px;font-size:12.5px;gap:5px}
+ .viectb i.ti{display:none}}
 .segb.zero{opacity:.45}
 .segb.zero:hover,.segb.zero.on{opacity:1}
 /* V9.47: nút mở/thu dải chip dài - phải KHÁC hẳn các chip lọc để mắt không nhầm nó là một nhóm */
