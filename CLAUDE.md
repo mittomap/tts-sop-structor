@@ -32,8 +32,20 @@ Chủ dự án: Luân. Mọi phiên làm việc (Claude Code hay Claude Cowork) 
   hệt luật cũ, anh ngồi chờ một thứ đã xong từ lâu. Và lượt verify ấy đang đo **một bản dựng sắp
   bị thay**, tức nó vô nghĩa ngay lúc đang chạy.
   **Sửa xong mà verify đang chạy thì GIẾT LƯỢT VERIFY, dựng, đẩy, rồi chạy lượt mới.**
-  Cách giết cho đúng (đã cắn một lần với `pkill -f "verify.sh"` bắn trúng chính vỏ lệnh của
-  mình, thoát 144): `ps -eo pid,args | grep "[v]erify.sh"` lấy PID rồi `kill` đúng những PID đó.
+  **CÁCH GIẾT CHO ĐÚNG - đã cắn HAI lần, lần sau nặng hơn lần trước:**
+  · Lần 1: `pkill -f "verify.sh"` bắn trúng chính vỏ lệnh của mình, thoát 144.
+  · Lần 2 (14/08): `ps -eo pid,args | grep "[v]erify.sh"` rồi `kill` - và nó bắn trúng **chính
+    tiến trình `claude` đang chạy phiên này**. Vì sao: dòng lệnh của `claude` mang theo TOÀN BỘ
+    system prompt (`--append-system-prompt "..."`), mà trong đó có chữ *verify*. `ps -eo args`
+    in ra cả cục ấy nên grep khớp. Mẹo `[v]` chỉ tránh được việc grep khớp chính nó, không tránh
+    được chuyện này. Lại thoát 144, lần này là tự bắn vào chân mình.
+  · **Cách đúng:** lọc theo TÊN TIẾN TRÌNH, không lọc theo chuỗi trong dòng lệnh:
+    ```
+    pgrep -x -f '/bin/bash ./verify.sh'          # hoặc:
+    ps -eo pid,comm,args | awk '$2=="bash" && /verify\.sh/ {print $1}'
+    ```
+    Và **đừng bao giờ gộp lệnh giết với lệnh chạy vào cùng một dòng** - dòng lệnh mới cũng chứa
+    "verify.sh" nên nó tự nằm trong tầm bắn. Giết ở một lượt, chạy ở lượt sau.
   *Một lượt verify tốn 35 phút của MÁY; giữ bản dựng lại tốn 35 phút của ANH.*
   **Vì sao luật cũ sai:** luật cũ (06/08) bắt chạy trọn bộ TRƯỚC khi đẩy, và ngày 13/08 nó làm
   anh Luân ngồi chờ **hơn một tiếng** qua ba lượt verify liên tiếp trong khi bản dựng đã nằm sẵn
