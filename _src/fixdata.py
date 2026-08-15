@@ -521,6 +521,47 @@ if not _dp:
             })
     log.append("22. DL31 ca day thay: gieo %d ca dang ky cho %d giao vien" % (_n, len(_gvDs)))
 
+# ═══ 23. HAI BUOI CUA CUNG MOT LOP KHONG DUOC DUNG GIO (15/08) ═══════════════════════════
+# `_checkmat`... khong, `_check16` bat: "khong lop nao trung gio voi chinh no" - do ra SES-050
+# (14:00) va SES-051 (15:06) cung lop LOP-IELTS-6.0-12, cach nhau 66 phut, duoi nguong
+# `sessionSpan_hours` = 2h. Mot lop khong the hoc hai buoi chong len nhau - do la du lieu sai,
+# khong phai mot ca "co y de demo co gi ma xem".
+#
+# Va no la mot cho DO THEO DONG HO nua: lich sinh ra roi duoc keo theo ngay chay, nen hai buoi
+# co the roi gan nhau o lan chay nay ma khong roi o lan chay truoc. Kieu do ay xuat hien roi bien
+# mat ma khong ai sua gi - phai chan tai nguon, khong the doi no tu khoi.
+#
+# Chan bang cach DAY BUOI SAU sang ngay hom sau, giu nguyen gio: giu thu tu buoi, giu so buoi,
+# va khong dung vao buoi dau (buoi dau thuong da neo vao diem danh / bai tap).
+_SPAN_H = 2.0
+try:
+    for _p in (d.get("config", {}).get("ch2") or []):
+        if str(_p.get("code") or _p.get("key") or "") == "sessionSpan_hours":
+            _SPAN_H = float(n(_p.get("value") or _p.get("val") or 2)) or 2.0
+except Exception:
+    pass
+_theoLop = {}
+for _se in R("DL11"):
+    if code(_se.get("session_status") or "") == "cancelled":
+        continue
+    _theoLop.setdefault(str(_se.get("class_id") or ""), []).append(_se)
+_day = 0
+for _cid, _ds in _theoLop.items():
+    _ds.sort(key=lambda x: (dt(x.get("session_date")) or datetime.datetime(1900, 1, 1),
+                            str(x.get("session_id") or "")))
+    for _i in range(1, len(_ds)):
+        _a, _b = dt(_ds[_i - 1].get("session_date")), dt(_ds[_i].get("session_date"))
+        if not _a or not _b:
+            continue
+        while _b and (_b - _a).total_seconds() / 3600.0 < _SPAN_H:
+            _b = _b + datetime.timedelta(days=1)
+            _day += 1
+        if _b != dt(_ds[_i].get("session_date")):
+            _ds[_i]["session_date"] = fmt(_b)
+            if str(_ds[_i].get("class_start_scheduled") or "").strip():
+                _ds[_i]["class_start_scheduled"] = fmt(_b)
+log.append("23. Buoi trung gio trong cung mot lop: day %d buoi sang ngay hom sau" % _day)
+
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("=" * 70)
 print("VA DU LIEU DEMO — XONG")

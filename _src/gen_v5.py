@@ -532,6 +532,14 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    những bảng dựng TAY, không đi qua `tableHTML`, nên một luật chỉ áp cho bảng chung là bỏ sót
    đúng chỗ anh Luân chụp được. Đo ra 94 ô như thế trên 7 màn. */
 .khongbe{white-space:nowrap}
+/* ═══ V2 15/08 - TRÊN ĐIỆN THOẠI THÌ THÔI CẤM BẺ ═══════════════════════════════════════════
+   `_checkmat` bắt ngay lượt verify sau khi em thêm luật này: khổ điện thoại, trang Bài tập,
+   "HV044" bị cắt 13px và chip "nguy cơ học thuật" bị cắt 28px. Đúng - cấm bẻ dòng nghĩa là ô
+   ĐÒI đủ bề rộng, mà màn 390px thì không có đủ để mà chia; không bẻ được thì nó bị cắt.
+   Cái em chữa là chuyện của MÀN RỘNG (cột "Cơ sở 5" gãy đôi trong khi thừa chỗ). Trên màn hẹp,
+   xuống dòng là hành vi ĐÚNG - chữ dài hơn màn thì phải xuống, không có lựa chọn nào khác.
+   *Một luật chữa cho màn rộng mà áp cả cho màn hẹp thì nó đổi một chỗ xấu lấy một chỗ mất chữ.* */
+@media(max-width:700px){.khongbe{white-space:normal}}
 /* Dùng lại đúng mã màu của đường kẻ NGANG (`#EEF2F6`) chứ không pha thêm một mã nhạt hơn: bảng
    màu app chạm trần 110 mã, thêm một mã cho một cái vạch là tiêu mất suất của một thứ đáng hơn -
    `_checkux` bắt ngay lượt chạy đầu (111/110). Và kẻ dọc cùng màu kẻ ngang thì lưới bảng đọc ra
@@ -14913,7 +14921,7 @@ function baocaoThan(_xemAi){
    (_rr.dao?'<span class="chip amber">đã đảo lại cho đúng thứ tự</span>':'')+'</span>'):'';
  h+=tbar('<span class="tblbl">Kỳ số liệu</span>'+
   segHTML(_rk,[["m0","Tháng này"],["30","30 ngày"],["90","90 ngày"],["all","Toàn kỳ"],["tuy","Tuỳ chọn"]],"repKySet('{k}')")+_oNgay+
-  '<span class="mut" style="font-size:11px;margin-left:10px">Đang tính theo <b>'+esc(_rr.lb)+'</b> - áp cho các chỉ số KPI bên dưới. Bảng nào dùng mốc riêng thì ghi rõ trên tiêu đề của nó.</span>',"");
+  '<span class="mut" style="font-size:11px;margin-left:10px">Đang tính theo <b>'+esc(_rr.lb)+'</b>. Kỳ này áp cho các chỉ số KPI bên dưới. Bảng nào dùng mốc thời gian riêng thì ghi rõ ngay trên tiêu đề của nó.</span>',"");
  /* Ô chọn người ngay trên trang này - quản lý mở Chỉ số ra là chọn được luôn, không phải quay
     về trang đáp mới đổi được người. Dùng CHUNG một ô với "Xem việc của" (cùng `window.BANAI`)
     nên chuông, Việc hôm nay, bảng việc và trang này luôn nói về cùng một người. */
@@ -17725,7 +17733,11 @@ var DVI={chay:"hồ sơ",giaoan:"lớp",buoihoc:"buổi",diemdanh:"buổi",baita
  /* V2 11/08 - màn Lịch trực WOW đếm bằng Ô TRỰC (mỗi ô 30 phút), không đếm bằng "buổi" như sổ
     WOW: một buổi WOW nằm TRÊN một ô trực, hai thứ khác nhau. Khai vào đây để `_checkux` không
     phải đoán, và để cả app gọi cùng một tên. */
- lichwow:"ô trực"};
+ lichwow:"ô trực",
+ /* V2 15/08 - sổ ca dạy thay đếm bằng CA ĐĂNG KÝ: một ca là một người nhận một khung giờ một
+    ngày. Không đếm bằng "buổi" (buổi là của lớp, một ca có thể phủ nhiều buổi hoặc không buổi
+    nào) và không đếm bằng "người" (một người đăng ký nhiều ca trong tuần). */
+ gvdp:"ca"};
 function dvi(p){return DVI[p]||"dòng"}
 /* V2 13/08 - NHÃN CỦA DẢI CHIP TRẠNG THÁI. Hầu hết sổ lọc theo một cột `*_status` nên "Trạng
    thái" đúng và không cần khai. Bốn cột không phải trạng thái thì phải gọi đúng tên nó, nếu
@@ -23303,10 +23315,10 @@ function renderGvdp(embed){
     ký là nguồn chính, phép tính chỉ là gợi ý hạng hai và phải hỏi lại người ta. */
  (function(){var _dk=dpTuan(new Date(day.getFullYear(),day.getMonth(),day.getDate()-3)).length;
   h+='<div class="notebar '+(_dk?'nbgreen':'nbamber')+'"><i class="ti ti-calendar-check"></i>'+
-   '<b>Xếp theo CA ĐÃ ĐĂNG KÝ.</b> Giáo viên đăng ký ca rảnh như WOW coach; '+
-   (_dk?(_dk+' ca quanh ngày này.'):'quanh ngày này chưa ai đăng ký ca nào.')+
-   ' Người chỉ trống lịch mà chưa đăng ký vẫn hiện, nhưng phải hỏi trước. '+
-   '<button class="btn sm" onclick="dpForm()"><i class="ti ti-calendar-plus"></i>Đăng ký ca dạy thay</button></div>'})();
+   '<b>Xếp theo ca đã đăng ký</b> - '+
+   (_dk?(_dk+' ca quanh ngày này.'):'quanh ngày này chưa ai đăng ký.')+
+   ' Người chỉ trống lịch thì phải hỏi trước. '+
+   '<button class="btn sm" onclick="dpForm()"><i class="ti ti-calendar-plus"></i>Đăng ký ca</button></div>'})();
 /* V2 13/08 - BỎ DẢI THẺ. Anh Luân: *"thẻ nó phải mang tính khác biệt, chứ nó như cái chip thì
    giữ làm gì, sao ko ưu tiên KPI, SLA hoặc mấy cái nhóm quan trọng"*. Dải này chỉ đếm dòng của
    chính bảng ngay dưới - đúng việc mà chip đang làm, và chip còn bấm lọc được. Luật chốt ở
@@ -23573,7 +23585,11 @@ function dpSoHTML(){
         "dpCsSet('{k}')","dp_cs_loc"))
     :'')+
   '<button class="btn sm" onclick="dpForm()"><i class="ti ti-calendar-plus"></i>Đăng ký ca</button>',
-  '<span class="tbcnt">'+ds.length+' ca · '+nTrong+' còn trống</span>');
+  /* `tbcnt` chỉ được mang SỐ + ĐƠN VỊ, không nhét thêm vế nào: `_checkux` đọc đúng khuôn ấy để
+     đối chiếu đơn vị với bảng DVI, nhét thêm chữ là nó đọc ra một đơn vị không có thật. Phần
+     "còn trống" là một con số KHÁC, nên nó đứng thành một vế riêng. */
+  '<span class="tbcnt">'+ds.length+' ca</span>'+
+  '<span class="mut" style="font-size:11.5px;align-self:center">'+nTrong+' còn trống</span>');
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr>'+
   '<th>Giáo viên</th><th>Ngày</th><th>Khung giờ</th><th>Cơ sở nhận dạy</th><th>Trạng thái</th>'+
   '<th>Đã gán buổi</th><th>Đăng ký lúc</th><th>Ghi chú</th><th></th></tr></thead><tbody>';
@@ -31263,6 +31279,10 @@ DOORS = {
  "DL27":["dotTao","dotDuyet","dotTuChoiRun"],
  # V2 12/08 (HOC VU-2): danh sach GV du phong khai theo THANG, truong phong ACA nhap.
  "DL28":["gvdpThangLuu"],
+ # V2 15/08 - DL31 so ca day thay co HAI cua ghi: `dpLuu` (dang ky mot ca) va `sesSetTeacher`
+ # (xep nguoi xong thi danh dau ca da dung - cua ay ghi ca DL11 lan DL31, khai du ca hai cho
+ # thi kiem ke moi doc ra duoc duong di that cua du lieu).
+ "DL31":["dpLuu","sesSetTeacher"],
  # V2 12/08 (SALE-3): so luu tin da gui - dev noi duong gui that sau, cho noi da danh dau.
  "DL29":["msgGui"],
  # V2 12/08 (SALE-7): hop dong cam ket dau ra - can DU HAI chu ky moi qua buoc xep lop.
