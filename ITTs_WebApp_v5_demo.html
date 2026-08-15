@@ -1529,11 +1529,10 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .tssl{font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap}
 .tsstep.on .tssl{color:var(--navy);font-weight:700}
 .tsarr{display:flex;align-items:center;color:#B9C6D6;flex:0 0 auto}
-.csway{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:12px;display:flex;flex-direction:column;gap:6px}
-.cwrow{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.cwdir{display:inline-flex;align-items:center;gap:5px;font-weight:800;font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap}
-.cwdir.out{background:#EEF2F6;color:#2E5A88}
-.cwdir.in{background:#FBF0EF;color:#B4433F}
+/* V2 15/08 - GỠ `.csway` THEO TÊN, không cắt theo vị trí. Năm luật này chỉ phục vụ ba dòng
+   giải thích chiều đi ở đầu trang CSKH; các câu ấy nay nằm trong câu mô tả của công tắc cách
+   xem, nên khối cũ không còn chỗ gọi (đo: 0 chỗ trong nguồn sau khi sửa `renderCskh`).
+   *Dọn mã chết bằng TÊN, đừng cắt một khoảng file bằng hai cái mốc mà mình chưa đo khoảng cách.* */
 .guidebox{border:1px solid var(--line);background:linear-gradient(180deg,#FAFBFD,#fff);border-radius:10px;padding:12px;margin-bottom:12px}
 .guidebox .gbh{font-weight:800;font-size:12.5px;color:var(--navy);display:flex;align-items:center;gap:6px;margin-bottom:8px}
 .guidebox .gbrow{display:flex;gap:8px;align-items:flex-start;padding:3px 0;font-size:12.5px}
@@ -3118,7 +3117,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">15/08/2026 · <b>6d90cf</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">15/08/2026 · <b>871397</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -3815,7 +3814,26 @@ var PAGES=[
 {k:"lichtuan",g:"_",ic:"ti-calendar-week",t:"Lịch tuần",c:"Toàn bộ buổi của tuần theo lớp và theo phòng",ty:"custom"},
 {k:"phong",g:"_",ic:"ti-layout-grid",t:"Phòng học & trùng lịch",c:"Trùng phòng, trùng giờ, lớp chưa có phòng",ty:"custom"},
 /* ===== THEO CHẶNG P8-P10: CSKH & KẾT THÚC ===== */
-{k:"cskh",g:"Chặng · CSKH & Kết thúc",ic:"ti-headset",t:"CSKH · Khảo sát & Phản hồi",c:"Khảo sát (TT→HV) · Góp ý & Khiếu nại (HV→TT)",ty:"custom"},
+/* ═══ V2 15/08 - GỘP KHẢO SÁT + PHẢN HỒI + KHIẾU NẠI VỀ MỘT TRANG ═══════════════════════════
+   Anh Luân, kèm ảnh sidebar: *"2 trang này khác nhau gì ko, nếu gộp lại?"* rồi *"hoặc có thể gộp
+   cả khiếu nại vào luôn"* · *"khảo sát - phản hồi - khiếu nại, tụi nó có vẻ cùng nhóm chủ đề hả"*.
+
+   Đo ra chỗ đau, và nó tệ hơn anh thấy: app đang có **BỐN cửa cho BA màn**.
+   · `khaosat` -> `renderReview()` - sổ DL15, đơn vị làm việc là **LỚP** (lớp nào chưa gửi phiếu).
+   · `ghinhan` -> `renderGhinhan()` - sổ DL16, đơn vị là **PHIẾU** (phân loại trong 24h).
+   · `khieunai` -> `renderKhieunai()` - sổ DL17, đơn vị là **VỤ** (nhận, xử lý, đóng).
+   · `cskh` -> hub gom đúng ba cái trên + Học viên liên hệ, **trùng tên y hệt** trang con thứ nhất
+     ("CSKH · Khảo sát & Phản hồi" vs "Khảo sát & Phản hồi") mà lại nằm ở NHÓM MENU KHÁC.
+   Thêm một lỗi tên: trang `khaosat` tên là "Khảo sát & Phản hồi" nhưng bên trong KHÔNG có một
+   dòng phản hồi nào - nó thuần DL15. Anh đọc menu thấy hai dòng cùng nói "phản hồi" là đúng.
+
+   Ba sổ này là MỘT vòng nghiệp vụ: trung tâm đo (khảo sát) -> học viên nói (phản hồi) -> nặng
+   thì thành vụ (khiếu nại). Cùng chủ thể bị chấm, cùng người xử lý, cùng chỉ số SS/NPS. Nên nó
+   đi đúng đường mà "Việc hôm nay" đã đi: MỘT trang, một dải công tắc cách xem.
+   `cskh` thôi làm bí danh, trở lại là TRANG GỘP THẬT (khai trong `HUBTHAT` cùng `duyet`);
+   ba trang con khai `hide:1` - vẫn dựng được, vẫn vào được bằng link cũ, chỉ không đứng riêng
+   trên menu nữa. *Bốn cửa vào ba phòng thì người ta không nhớ nổi phòng nào ở sau cửa nào.* */
+{k:"cskh",g:"Chặng · CSKH & Kết thúc",ic:"ti-headset",t:"CSKH · Tiếng nói học viên",c:"Khảo sát · Phản hồi · Khiếu nại · Yêu cầu HV",ty:"custom"},
 /* V9.63 (anh Luân: *"cái tab trên sidebar thông báo từ học viên đâu?"*): học viên liên hệ là
    việc quan trọng nên nó phải có ĐƯỜNG RIÊNG trên menu trái, không bắt người ta nhớ rằng nó
    nằm trong tab thứ tư của trang CSKH. Không đẻ trang mới: khoá này là bí danh, go() đưa về
@@ -3827,9 +3845,12 @@ var PAGES=[
 {k:"ychv",g:"_",hide:1,ic:"ti-school",t:"Học viên liên hệ",c:"Học viên gửi lên từ Cổng học viên - nhận và trả lời ngay",ty:"custom"},
 /* 4 trang con gộp vào hub CSKH - ẩn khỏi menu, vẫn dùng được qua hub */
 {k:"review",g:"_",ic:"ti-clipboard-check",t:"Gửi khảo sát theo lớp",c:"Gửi khảo sát cho cả lớp",ty:"custom",hide:1},
-{k:"khaosat",g:"_",ic:"ti-clipboard-text",t:"Khảo sát & Phản hồi",c:"Theo dõi phiếu - xử lý phản hồi",ty:"custom"},
-{k:"ghinhan",g:"_",ic:"ti-message-plus",t:"Tiếp nhận & xử lý phản hồi",c:"Nhận qua gọi/nhắn, không qua form",ty:"custom"},
-{k:"khieunai",g:"_",ic:"ti-alert-triangle",t:"Xử lý Khiếu nại",c:"Tiếp nhận - xử lý - đóng",ty:"custom"},
+/* V2 15/08 - `hide:1` + ĐỔI TÊN CHO ĐÚNG NỘI DUNG. `khaosat` không hề có phản hồi trong đó;
+   `ghinhan` mới là chỗ của phản hồi. Giữ nguyên khoá trang và hàm vẽ - chỉ rút chúng khỏi menu
+   và cho `go()` dắt vào đúng tab của trang gộp (xem `CSMAP`). */
+{k:"khaosat",g:"_",hide:1,ic:"ti-clipboard-text",t:"Khảo sát định kỳ",c:"Đã gộp vào CSKH · Tiếng nói học viên",ty:"custom"},
+{k:"ghinhan",g:"_",hide:1,ic:"ti-message-plus",t:"Phản hồi & Góp ý",c:"Đã gộp vào CSKH · Tiếng nói học viên",ty:"custom"},
+{k:"khieunai",g:"_",hide:1,ic:"ti-alert-triangle",t:"Xử lý Khiếu nại",c:"Đã gộp vào CSKH · Tiếng nói học viên",ty:"custom"},
 {k:"ketthuc",g:"Chặng · CSKH & Kết thúc",ic:"ti-flag",t:"Kết thúc & Tái ĐK",c:"Đầu ra - mời học tiếp",ty:"custom"},
 /* AC2 (Trưởng phòng ACA hỏi 06/08): app có chỗ NHẬP điểm đầu ra (Kết thúc & Tái ĐK) nhưng không
    có chỗ nào ĐỌC lại theo lớp, theo giảng viên, theo chi nhánh, theo loại lớp. Đây là chỗ đọc. */
@@ -4213,6 +4234,25 @@ function buildScope(code){
  if(eff.pages!=="*"&&eff.tabs)for(var _hub in eff.tabs)(eff.tabs[_hub]||[]).forEach(function(_t){
   var _k=((typeof HUBTAB!=="undefined"&&HUBTAB[_hub]&&HUBTAB[_hub].m)||{})[_t]||_t;
   if(PBK[_k]&&eff.pages.indexOf(_k)<0)eff.pages.push(_k)});
+ /* ═══ V2 15/08 - NỞ NGƯỢC: CÓ TRANG CON THÌ PHẢI CÓ CỬA VÀO HUB GỘP ═══════════════════════
+    Dòng ngay trên nở từ TAB sang TRANG (V2 dỡ hub, quyền viết bằng tên tab phải hiểu ra trang).
+    Nay có chiều ngược lại: hai hub trong `HUBTHAT` gộp trang con lại và trang con rút khỏi menu,
+    nên bản khai quyền viết bằng tên trang con (`khaosat`, `ghinhan`, `khieunai`) phải mở được
+    cái cửa mới. Chỉ nở cho hub GỘP THẬT - bốn hub còn lại vẫn là bí danh, cấp quyền cho chúng
+    là đẻ ra mục menu dẫn sang chỗ khác.
+    ĐIỀU KIỆN ĐỌC TỪ DỮ LIỆU, không viết tay tên hub: chỉ nở khi MỌI trang con của hub đã `hide`,
+    tức hub là cửa DUY NHẤT còn lại. `duyet` cũng nằm trong `HUBTHAT` nhưng năm trang con của nó
+    vẫn đứng riêng trên menu - nở cho nó là tự ý thêm một mục menu cho gần hết chức danh, một
+    thay đổi không ai yêu cầu. *Điều kiện suy từ trạng thái thật thì mai kia đổi trạng thái là
+    nó tự đúng; điều kiện viết tay tên trang thì mai kia phải nhớ sửa - và không ai nhớ.*
+    *Gộp trang thì phải mang theo cả bản khai quyền của từng trang, không chỉ mang phần dựng.* */
+ if(eff.pages!=="*"&&typeof HUBTHAT!=="undefined")for(var _hb in HUBTHAT){
+  if(!PBK[_hb]||eff.pages.indexOf(_hb)>=0)continue;
+  var _mm=((typeof HUBTAB!=="undefined"&&HUBTAB[_hb])||{}).m||{},_co=false,_an=true;
+  for(var _t3 in _mm){var _kc=_mm[_t3];if(!PBK[_kc])continue;
+   if(!PBK[_kc].hide)_an=false;
+   if(eff.pages.indexOf(_kc)>=0)_co=true}
+  if(_co&&_an)eff.pages.push(_hb)}
  /* V2 08/08 - CỬA `tracuu` MỞ THEO NỘI DUNG, KHÔNG MỞ SẴN CHO TẤT CẢ. Mười sáu cuốn sổ chỉ-đọc
     nay vào sau cửa này; ai có ÍT NHẤT MỘT cuốn thì có cửa, ai không có cuốn nào thì không - mở
     một cái cửa dẫn vào phòng trống còn tệ hơn không có cửa (`_checkroi` gọi đó là "mục mở ra
@@ -8705,7 +8745,31 @@ var VIECVWDEF=[
  ["viec","Theo việc","mọi việc đang nợ theo luật SLA, gom theo độ gấp - làm từ trên xuống là hết ngày.","","ti-checklist"],
  ["nguoi","Theo người","từng hồ sơ trên hành trình khách. Bấm một người, app dắt qua đúng chặng người đó đang đứng.","banlam","ti-user-search"],
  ["chang","Theo chặng","cùng ngần ấy hồ sơ, xếp thành bản đồ chặng để nhìn ra chỗ đang tắc. Bấm một cột hoặc một thẻ để xử lý; việc vận hành lớp thì làm ở hub Học tập & Giảng dạy.","hanhtrinh","ti-route"]];
-function viecVWCo(V){if(!V[3])return true;try{return canSee(V[3])}catch(e){return true}}
+/* ═══ V2 15/08 - CÔNG TẮC CÁCH XEM TÁCH RA DÙNG CHUNG ════════════════════════════════════════
+   Dải này dựng cho "Việc hôm nay". Nay trang CSKH gộp (Khảo sát + Phản hồi + Khiếu nại + Yêu
+   cầu HV) cần đúng dải ấy - anh Luân: *"Sẽ có vài tab tương tự của việc hôm nay"*.
+   Chép lần thứ hai là có HAI sự thật cho một thành phần: lần sau sửa cỡ chữ hay bỏ góc ở một
+   chỗ thì chỗ kia lệch, mà không bộ kiểm nào biết hai chỗ ấy đáng lẽ phải giống nhau.
+   Hình dạng một dòng giữ NGUYÊN như `VIECVWDEF` đang có, nên không phải sửa chỗ gọi cũ:
+   [khoá, nhãn, câu mô tả, khoá quyền (rỗng = ai cũng thấy), icon]. */
+function vwCo(V){if(!V[3])return true;try{return canSee(V[3])}catch(e){return true}}
+/* Nhãn của một cách xem - dùng cho tiêu đề trang và mục sáng trên sidebar. Đọc CÙNG bảng mà
+   công tắc đang đọc: hai nơi lấy tên từ hai chỗ là sớm muộn sidebar nói một đằng, tab một nẻo -
+   đúng cái anh Luân bắt được ở breadcrumb hôm 13/08. */
+function vwNhan(D,v){for(var i=0;i<D.length;i++)if(D[i][0]===v)return D[i][1];return ""}
+function vwBar(D,vw,fn,so,tour){
+ var L=D.filter(vwCo),cur=L[0]||D[0];so=so||{};
+ var _tabs=L.map(function(V){if(V[0]===vw)cur=V;
+  return '<button class="viectb'+(V[0]===vw?" on":"")+'" role="tab" aria-selected="'+(V[0]===vw?"true":"false")+
+   '" onclick="'+fn.replace("{k}",V[0])+'"><i class="ti '+V[4]+'"></i>'+esc(V[1])+
+   (so[V[0]]!==""&&so[V[0]]!=null?('<i class="segn">'+so[V[0]]+'</i>'):'')+'</button>'}).join("");
+ /* Chỉ còn một cách xem thì KHÔNG vẽ công tắc: một cái công tắc có đúng một nấc là một câu hỏi
+    không có câu trả lời nào khác - nó chỉ tốn một hàng và mời người ta bấm vào chỗ không đi đâu.
+    Câu "đang nhìn cái gì" thì vẫn giữ, vì nó vẫn nói được một điều thật. */
+ return '<div class="viecvw"'+(tour?(' data-tour="'+esc(tour)+'"'):'')+'>'+
+  (L.length>1?('<div class="viectab" role="tablist">'+_tabs+'</div>'):"")+
+  '<div class="viecvwc">Đang xem <b>'+esc(cur[1])+'</b> - '+esc(cur[2])+'</div></div>'}
+function viecVWCo(V){return vwCo(V)}
 function viecVWList(){return VIECVWDEF.filter(viecVWCo)}
 function VIECVW(){var v=window.VIECVIEW||"viec",L=viecVWList();
  for(var i=0;i<L.length;i++)if(L[i][0]===v)return v;
@@ -8717,18 +8781,9 @@ function viecVWSet(k){window.VIECVIEW=k;reRender("viec")}
    sơ của "Theo người", chỉ xếp khác - gắn thêm một con số y hệt là mời người ta so hai thứ
    vốn bằng nhau. */
 function viecCongTac(soViec){
- var vw=VIECVW(),L=viecVWList(),cur=L[0]||VIECVWDEF[0],so={viec:soViec,nguoi:"",chang:""};
+ var so={viec:soViec,nguoi:"",chang:""};
  try{so.nguoi=jAll().filter(function(J){return J.act}).length}catch(e){so.nguoi=""}
- var _tabs=L.map(function(V){if(V[0]===vw)cur=V;
-  return '<button class="viectb'+(V[0]===vw?" on":"")+'" role="tab" aria-selected="'+(V[0]===vw?"true":"false")+
-   '" onclick="viecVWSet(\''+V[0]+'\')"><i class="ti '+V[4]+'"></i>'+esc(V[1])+
-   (so[V[0]]!==""&&so[V[0]]!=null?('<i class="segn">'+so[V[0]]+'</i>'):'')+'</button>'}).join("");
- /* Chỉ còn một cách xem thì KHÔNG vẽ công tắc: một cái công tắc có đúng một nấc là một câu hỏi
-    không có câu trả lời nào khác - nó chỉ tốn một hàng và mời người ta bấm vào chỗ không đi đâu.
-    Câu "đang nhìn cái gì" thì vẫn giữ, vì nó vẫn nói được một điều thật. */
- return '<div class="viecvw" data-tour="viecvw">'+
-  (L.length>1?('<div class="viectab" role="tablist">'+_tabs+'</div>'):"")+
-  '<div class="viecvwc">Đang xem <b>'+esc(cur[1])+'</b> - '+esc(cur[2])+'</div></div>'}
+ return vwBar(VIECVWDEF,VIECVW(),"viecVWSet('{k}')",so,"viecvw")}
 function renderViec(){var items=bellItems();
  var team=window.VIECTEAM||"all",grp=window.VIECGRP||"all";
  var sev=window.VIECSEV||(window.VIECOD?"red":"");   /* V9.29: MỘT biến cho mức độ; VIECOD là lối tắt cũ của "chỉ quá hạn" */
@@ -12339,7 +12394,10 @@ function renderBanlam(embed){
 /* ===== TÁC VỤ: TẠO REVIEW GỬI LỚP (khảo sát định kỳ cho cả lớp) ===== */
 /* ===== HUB CSKH 2 CHIỀU: Khảo sát (TT→HV) · Phản hồi/Góp ý & Khiếu nại (HV→TT) ===== */
 function csGo(tab){window.CSTAB=tab;go("cskh")}
-function csTabSet(tab){for(var k in CSMAP)if(CSMAP[k]===tab){go(k);return}window.CSTAB=tab;reRender(CUR)}
+/* V2 15/08 - vòng lặp cũ dò `CSMAP` để "nếu tab này đã là một trang thì đi thẳng tới trang".
+   Nay chiều đi ngược lại: trang con là bí danh trỏ VÀO tab, nên dò ngược là quay đầu chạy vòng.
+   Đổi tab thì chỉ đổi tab; đứng ở chỗ khác thì mới cần `go`. */
+function csTabSet(tab){window.CSTAB=tab;if(CUR!=="cskh"){go("cskh");return}reRender("cskh")}
 /* ===== YÊU CẦU TỪ HỌC VIÊN (V9.63 - anh Luân hỏi "nghiệp vụ này nên ở đâu") =====
    Học viên gửi yêu cầu được từ lúc được cấp cổng vào, và gửi được ở BẤT KỲ chặng nào - nó không
    thuộc C1/C2/C3/C4. Vậy nó phải nằm ở chỗ dành cho việc xuyên chặng, và đúng chỗ đó là hub CSKH:
@@ -12451,21 +12509,33 @@ function renderYcHV(){
  L.forEach(function(t){h+=tkCard(t,"mine")});
  h+='</div></div>';
  return h}
+/* ═══ V2 15/08 - BẢN KHAI CÁCH XEM CỦA TRANG GỘP ═════════════════════════════════════════════
+   Bốn tab là bốn KÊNH của cùng một việc: nghe học viên. Câu mô tả nói luôn CHIỀU ĐI, nên ba
+   dòng `.csway` cũ (mỗi dòng một mũi tên TT→HV / HV→TT) không còn lý do tồn tại - chúng nói
+   đúng những điều này, chỉ là nói ở một khối riêng phía trên, thành ra người đọc phải ghép hai
+   chỗ mới hiểu một thứ. Anh Luân đã bắt đúng bệnh ấy ở trang Việc hôm nay: *"phần des... nó là
+   1 dòng cùng mã màu nền ở bên phải, ngoài ra... còn có thêm 1 dòng màu vàng em thấy ko???
+   e làm thiếu đồng bộ quá."* - lời giải thích phải nằm TRONG khối công tắc, đúng một chỗ.
+   Cột 4 là KHOÁ QUYỀN: mỗi tab chỉ hiện với người xem được trang con của nó. Không có cột này
+   thì gộp trang thành mở cửa - người chỉ được xem Khiếu nại sẽ đọc được cả sổ Khảo sát. */
+var CSVWDEF=[
+ ["khaosat","Khảo sát","trung tâm chủ động đo (TT → HV): phiếu định kỳ theo tuần học; xem lớp nào chưa gửi, lớp nào trả lời kém.","khaosat","ti-clipboard-text"],
+ ["phanhoi","Phản hồi & Góp ý","học viên tự nói (HV → TT): gửi từ Cổng học viên, hoặc nhân viên ghi hộ khi nhận qua gọi / nhắn / gặp trực tiếp; phân loại trong hạn rồi theo tới khi đóng.","ghinhan","ti-message-plus"],
+ ["khieunai","Khiếu nại","phản hồi đã thành vụ (HV → TT): cử người xử lý, hạn tính theo mức độ, chỉ đóng khi học viên chấp nhận cách giải quyết.","khieunai","ti-alert-triangle"],
+ ["ychv","Yêu cầu từ học viên","câu hỏi và đề nghị gửi từ Cổng học viên (HV → TT): app chuyển thẳng tới học vụ, hoặc kế toán nếu là chuyện tiền, kèm hạn nhận việc.","ychv","ti-school"]];
+function CSVW(){var v=window.CSTAB||"khaosat",L=CSVWDEF.filter(vwCo);
+ for(var i=0;i<L.length;i++)if(L[i][0]===v)return v;
+ return (L[0]||CSVWDEF[0])[0]}
 function renderCskh(){
- var tab=window.CSTAB||"khaosat";
+ var tab=CSVW();
  var sv=srows("DL15"),fb=srows("DL16"),kn=srows("DL17");
  var nSvWait=sv.filter(function(v){return !String(v.submitted_date||"").trim()}).length;
  var nFbOpen=fb.filter(function(f){return !isc(f.feedback_status,"resolved")}).length;
  var nKnOpen=kn.filter(function(c){return !isc(c.complaint_status,"resolved")}).length;
  var nYcWait=ychvCho();
- var actBtn=(tab==="khaosat")?'<button class="btn primary" onclick="rvForm()"><i class="ti ti-send"></i>Gửi đợt khảo sát</button>':(tab==="phanhoi")?'<button class="btn primary" onclick="ghForm()"><i class="ti ti-message-plus"></i>Ghi nhận phản hồi</button>':'<button class="btn primary" onclick="knAdd()"><i class="ti ti-plus"></i>Tiếp nhận khiếu nại</button>';
- var h=pageHead("CSKH · Khảo sát & Phản hồi","Hai chiều rõ ràng: Trung tâm gửi khảo sát cho học viên; học viên gửi góp ý / khiếu nại từ Cổng học viên. Mọi phiếu đều theo dõi trạng thái tới khi đóng."+hubCau("cskh",tab),actBtn);
- h+='<div class="csway">'+
-  '<div class="cwrow"><span class="cwdir out"><i class="ti ti-arrow-right"></i> Trung tâm → Học viên</span> <b>Khảo sát</b> định kỳ - HV nhận &amp; trả lời trong Cổng học viên.</div>'+
-  '<div class="cwrow"><span class="cwdir in"><i class="ti ti-arrow-left"></i> Học viên → Trung tâm</span> <b>Góp ý &amp; Khiếu nại</b> - HV gửi từ Cổng học viên (hoặc NV ghi hộ khi nhận qua gọi/nhắn), trung tâm xử lý &amp; phản hồi lại.</div>'+
-  '<div class="cwrow"><span class="cwdir in"><i class="ti ti-arrow-left"></i> Học viên → Trung tâm</span> <b>Yêu cầu &amp; câu hỏi</b> - HV gửi từ Cổng học viên, hệ thống tự chuyển tới học vụ (hoặc kế toán nếu là chuyện tiền) kèm hạn nhận việc.</div>'+
-  '</div>';
- h+=tbar(segHTML(tab,scopeTabs("cskh",[["khaosat","Khảo sát (TT→HV)",nSvWait||"",nSvWait?"amber":""],["phanhoi","Phản hồi / Góp ý",nFbOpen||"",nFbOpen?"amber":""],["khieunai","Khiếu nại",nKnOpen||"",nKnOpen?"red":""],["ychv","Học viên liên hệ",nYcWait||"",nYcWait?"amber":""]]),"csTabSet('{k}')"),"");
+ var actBtn=(tab==="khaosat")?'<button class="btn primary" onclick="rvForm()"><i class="ti ti-send"></i>Gửi đợt khảo sát</button>':(tab==="phanhoi")?'<button class="btn primary" onclick="ghForm()"><i class="ti ti-message-plus"></i>Ghi nhận phản hồi</button>':(tab==="khieunai")?'<button class="btn primary" onclick="knAdd()"><i class="ti ti-plus"></i>Tiếp nhận khiếu nại</button>':"";
+ var h=pageHead("CSKH · Tiếng nói học viên","Một vòng khép kín: trung tâm đo bằng khảo sát, học viên nói bằng phản hồi, nặng thì thành khiếu nại - cùng chủ thể bị chấm, cùng chỉ số hài lòng, nên xem chung một chỗ.",actBtn);
+ h+=vwBar(CSVWDEF,tab,"csTabSet('{k}')",{khaosat:nSvWait||"",phanhoi:nFbOpen||"",khieunai:nKnOpen||"",ychv:nYcWait||""},"csvw");
  if(tab==="khaosat")h+=renderReview(1);
  else if(tab==="phanhoi")h+=renderGhinhan(1);
  else if(tab==="ychv")h+=renderYcHV();
@@ -14239,12 +14309,42 @@ function kpiSection(){var comp=kpiCompute();var ch6=(DATA.config&&DATA.config.ch
     vì đó chính là chỗ dữ liệu đang thiếu. */
  if(bcMuc()==="mine")ch6=ch6.filter(function(k){var c=comp[k.code];return !(c==null||isNaN(c))});
  if(!ch6.length)return '<div class="sechd">KPI theo SOP</div><div class="panel"><div class="empty">Chưa có chỉ số nào tính được cho riêng bạn trong kỳ này - làm việc trên hồ sơ của mình rồi số sẽ hiện ra.</div></div>';
+ /* Khai trước, gán sau khi lọc theo mức - gom hai lần khai làm một để không có bản đồ chặng nào
+    dựng từ danh sách CHƯA lọc rồi lặng lẽ lệch với bảng vẽ ra. */
  var byPhase={},order=[];
+ /* ═══ V2 15/08 (anh Luân: *"Tổng quan · Báo cáo & KPI, a cần bố cục chuyên nghiệp"*) ══════════
+    Đo trước khi sửa: Tư vấn và cấp điều hành nhận **51 dòng chỉ số đổ một mạch** trong một trang
+    dài 91.767 ký tự; giáo viên 29 dòng. Trong số ấy phần lớn là chỉ số ĐANG ĐẠT - đọc xong không
+    quyết gì, mà lại nằm xen giữa những chỉ số đang hỏng nên chính chỗ hỏng bị loãng.
+    Nay bảng mặc định chỉ hiện **chỗ CẦN CHÚ Ý** (báo động · cảnh báo · hụt nhẹ), kèm một dải bấm
+    được để mở từng mức hoặc mở hết. Không giấu gì cả: mỗi mức có con số của nó ngay trên dải, và
+    con số ấy chính là cách trả lời câu "sức khỏe chung ra sao" trong một cái liếc.
+    *Một bảng 51 dòng không phải là đầy đủ hơn - nó là 51 dòng để người đọc tự tìm ra 6 dòng đáng
+    đọc, và phần lớn người ta bỏ cuộc trước khi tìm xong.* */
+ var mucN=kpiSucKhoe(ch6,comp);
+ var nLo=mucN.baodong+mucN.canhbao+mucN.hut;
+ var kf=window.KPIF||"lo";
+ if(kf==="lo"&&!nLo)kf="all";      /* không có gì đáng lo thì đừng mở ra một bảng rỗng */
+ function _giu(k){var c=comp[k.code];
+  var sv=(c==null||isNaN(c))?"chuadu":kpiSev(k.code,c,Number(k.threshold),k.dir);
+  if(sv==="tot")sv="dat";
+  if(kf==="all")return true;
+  if(kf==="lo")return sv==="baodong"||sv==="canhbao"||sv==="hut";
+  return sv===kf}
+ var h='<div class="sechd" data-tour="kpibang">KPI theo SOP · CH6 <span style="font-weight:600;text-transform:none;letter-spacing:0" class="mut">· '+ch6.length+' chỉ số trong phạm vi của bạn</span></div>';
+ h+=locKhoi([locR("Mức",segHTML(kf,[
+   ["lo","Cần chú ý",nLo,nLo?"red":""],
+   ["baodong","Báo động",mucN.baodong,mucN.baodong?"red":""],
+   ["canhbao","Cảnh báo",mucN.canhbao,mucN.canhbao?"amber":""],
+   ["hut","Hụt nhẹ",mucN.hut,mucN.hut?"amber":""],
+   ["dat","Đang đạt",mucN.dat,mucN.dat?"green":""],
+   ["chuadu","Chưa đủ dữ liệu",mucN.chuadu,""],
+   ["all","Tất cả",ch6.length,""]],"window.KPIF='{k}';reRender('baocao')","kpi_muc"))],"");
+ ch6=ch6.filter(_giu);
+ byPhase={};order=[];
  ch6.forEach(function(k){var p=k.phase||"-";if(!byPhase[p]){byPhase[p]=[];order.push(p)}byPhase[p].push(k)});
  order.sort(function(a,b){return (parseInt(String(a).replace(/[^0-9]/g,""),10)||99)-(parseInt(String(b).replace(/[^0-9]/g,""),10)||99)});
- var okN=0,badN=0,naN=0;
- ch6.forEach(function(k){var c=comp[k.code];if(c==null||isNaN(c)){naN++;return}kpiOK(k.dir,c,Number(k.threshold))?okN++:badN++});
- var h='<div class="sechd">KPI theo SOP · CH6 ('+ch6.length+' chỉ số) <span style="font-weight:600;text-transform:none;letter-spacing:0">· <b style="color:var(--green)">'+okN+' đạt</b> · <b style="color:var(--red)">'+badN+' chưa đạt</b> · <span class="mut">'+naN+' chưa đủ dữ liệu</span></span></div>';
+ if(!ch6.length)h+='<div class="panel"><div class="pbody"><div class="empty">Không có chỉ số nào ở mức này.</div></div></div>';
  h+='<div class="kpiph">';
  order.forEach(function(ph){
   h+='<div class="kpipanel"><div class="kpiphh">'+esc(KPIPH[ph]||ph)+'</div>';
@@ -14309,6 +14409,19 @@ function kpiOpen(code){
 var KPIMIEN={P1:"lead",P2:"lead",P3:"lead",P4:"tien",P5:"hocvien",P6:"hocvien",P7:"lop",
  P8:"hocvien",P9:"hocvien",P10:"hocvien"};
 function kpiCoMien(k){var d=KPIMIEN[k&&k.phase];return !d||dsLevel(d)!=="none"}
+/* ═══ SỨC KHỎE CHỈ SỐ - MỘT PHÉP ĐẾM, HAI CHỖ ĐỌC ══════════════════════════════════════════
+   Dòng tình hình ở đầu trang và dải lọc trong bảng KPI nói cùng một chuyện. Viết hai lần thì
+   sớm muộn hai chỗ nói hai số - đúng cái bệnh `_checkcauhoi` từng bắt (nhịp ngày đếm toàn trung
+   tâm còn trang đếm theo phạm vi, người dùng đọc "57 việc" rồi mở ra thấy 7).
+   Gộp "tốt" vào "đạt": người đọc chỉ cần biết ĐẠT hay KHÔNG, còn đạt-vượt-xa là chuyện của bảng
+   chi tiết. */
+function kpiSucKhoe(ch6,comp){
+ var m={baodong:0,canhbao:0,hut:0,dat:0,chuadu:0,tong:0};
+ (ch6||[]).forEach(function(k){var c=comp[k.code];
+  var sv=(c==null||isNaN(c))?"chuadu":kpiSev(k.code,c,Number(k.threshold),k.dir);
+  if(sv==="tot")sv="dat";
+  m[sv]=(m[sv]||0)+1;m.tong++});
+ return m}
 function kpiTop3(){
  var comp=kpiCompute();var ch6=(DATA.config&&DATA.config.ch6)||[];
  var cand=[];
@@ -14331,6 +14444,34 @@ function kpiTop3(){
    đây neo `@man` - vỏ trang thì bài nào cũng trỏ được, nên nó khoanh trùng chỗ với bước 5 của
    bài Kế toán. `_checkneo`: *"hai bước khác nhau khoanh cùng một chỗ thì ít nhất một bước đang
    trỏ sai"*. */
+/* ═══ V2 15/08 - DÒNG TÌNH HÌNH CỦA CHÍNH CHỨC DANH ĐANG XEM ═══════════════════════════════
+   Anh Luân: *"các cảnh báo và đề xuất thực sự hữu ích cho từng vị trí"*. Máy đề xuất đã có
+   (`kpiTop3` chọn theo mức lệch ngưỡng x mức ảnh hưởng, lọc theo miền dữ liệu của vai) - cái
+   thiếu là một câu mở đầu nói thẳng NGƯỜI NÀY đang đứng ở đâu, trước khi đổ ba việc vào mặt họ.
+   Một dòng, đọc trong hai giây: bao nhiêu chỉ số thuộc phạm vi của bạn, mấy cái đang báo động,
+   mấy cái đạt - và chỉ số nặng nhất tên gì. Bấm là nhảy thẳng xuống bảng đã lọc sẵn đúng mức ấy.
+   Không có gì đáng lo thì câu đổi hẳn giọng chứ không in ra một dãy số 0.
+   *Trước khi bảo người ta làm gì, nói cho họ biết họ đang đứng ở đâu.* */
+function kpiTinhHinh(){
+ var comp,ch6;
+ try{comp=kpiCompute();ch6=((DATA.config&&DATA.config.ch6)||[]).filter(kpiCoMien)}catch(e){return ""}
+ if(!ch6.length)return "";
+ var m=kpiSucKhoe(ch6,comp);
+ var nLo=m.baodong+m.canhbao+m.hut;
+ var top=[];try{top=kpiTop3()}catch(e){top=[]}
+ var nang=top[0];
+ if(!nLo)return '<div class="notebar nbgreen" data-tour="kpitinhhinh"><i class="ti ti-shield-check"></i>'+
+  '<b>'+m.tong+' chỉ số trong phạm vi của bạn đều đang đạt ngưỡng.</b> Tuần này không có chỗ nào phải chữa cháy - '+
+  'giữ nhịp và theo dõi tiếp.'+(m.chuadu?(' <span class="mut">'+m.chuadu+' chỉ số chưa đủ dữ liệu để tính.</span>'):'')+'</div>';
+ return '<div class="notebar" data-tour="kpitinhhinh"><i class="ti ti-activity-heartbeat"></i>'+
+  'Trong <b>'+m.tong+'</b> chỉ số thuộc phạm vi của bạn: '+
+  (m.baodong?('<b style="color:var(--red)">'+m.baodong+' báo động</b> · '):'')+
+  (m.canhbao?('<b style="color:var(--amber)">'+m.canhbao+' cảnh báo</b> · '):'')+
+  (m.hut?('<b style="color:var(--amber)">'+m.hut+' hụt nhẹ</b> · '):'')+
+  '<b style="color:var(--green)">'+m.dat+' đạt</b>'+
+  (m.chuadu?(' · <span class="mut">'+m.chuadu+' chưa đủ dữ liệu</span>'):'')+'. '+
+  (nang?('Nặng nhất là <b>'+esc(nang.name)+'</b> ('+esc(nang.code)+'). '):'')+
+  '<a class="lnk" onclick="window.KPIF=\'lo\';reRender(\'baocao\')">Xem '+nLo+' chỗ cần chú ý</a></div>';}
 function kpiTop3Section(){
  var top=kpiTop3();
  if(!top.length)return '<div class="sechd" data-tour="kpitop">3 việc nên làm tuần này</div>'+
@@ -14482,6 +14623,8 @@ function baocaoThan(_xemAi){
     ?'<span data-tip="BC2 chỉ số KPI và BC3 phễu khách nằm ngay trang này, cùng khối lượng việc theo nhân viên.">Gồm những bảng nào?</span> ':'')+
   '<span data-tip="Bảng Học viên nguy cơ (BC1) nằm ở sổ Học viên. Các bảng việc theo chức danh (BC5-BC9) hiện ở trang đáp của từng người.">Báo cáo khác ở đâu?</span> '+
   '<a class="lnk" onclick="go(\'hocvien\')">Mở sổ Học viên</a></div>';
+ /* Dòng tình hình đứng TRƯỚC ba việc nên làm: biết mình đang ở đâu rồi mới đọc phải làm gì. */
+ h+=kpiTinhHinh();
  h+=kpiTop3Section();
  /* Bảng so sánh 5 cơ sở là câu hỏi của người điều hành chuỗi ("cơ sở nào đang gánh") - một nhân
     viên nhìn bảng ấy không quyết được gì, mà số của họ cũng chỉ nằm ở đúng một ô. */
@@ -27924,6 +28067,10 @@ function crumbLabel(key,ctx){ctx=ctx||{};var p=PBK[key];var t=p?p.t:key;
  /* V9.19: hub/trang nhiều góc nhìn phải nói RÕ đang ở tab nào - breadcrumb mới có nghĩa */
  /* V9.99z7: đừng nói lại thứ đã nói. Hub "CSKH · Khảo sát & Phản hồi" mà tab cũng tên "Khảo
     sát & Phản hồi" thì ghép ra "CSKH · Khảo sát & Phản hồi · Khảo sát & Phản hồi". */
+ /* V2 15/08 - `cskh` lấy tên tab từ `CSVWDEF`, KHÔNG lấy từ tên trang con. Trang con nay ẩn và
+    mang tên đầy đủ ("Xử lý Khiếu nại"), còn tab mang tên ngắn ("Khiếu nại"); đọc hai bảng khác
+    nhau thì vệt đường đi ghi một đằng, cái tab đang sáng ghi một nẻo. */
+ else if(key==="cskh"){var _cn=vwNhan(CSVWDEF,CSVW());if(_cn)t=p.t+" · "+_cn}
  else if(HUBTAB[key]){var sk=hubSubKey(key);
   if(sk&&PBK[sk]&&String(p.t||"").indexOf(PBK[sk].t)<0)t=p.t+" · "+PBK[sk].t}
  else if(key==="chang"){var A9=ARCBK[window.ARC||"changA"];if(A9)t=A9.t}
@@ -28600,8 +28747,12 @@ function navJump(i){var h=window.NAVHIST;if(!h||i<0||i>=h.length)return;var targ
 var TSMAP={};
 var ARCMAP={changA:1,changB:1,changC:1,changD:1};
 /* `review` (Gửi khảo sát theo lớp) và `khaosat` hiện dùng CHUNG một hàm vẽ - đó là một bản dựng
-   trùng, thuộc RB1, xử ở Khúc 4. Tới lúc đó gỡ nốt dòng này. */
-var CSMAP={review:"khaosat"};
+   trùng, thuộc RB1, xử ở Khúc 4. Tới lúc đó gỡ nốt dòng này.
+   V2 15/08 - ba trang con nay `hide:1`, nên mọi lối cũ trỏ tới chúng phải dắt vào ĐÚNG TAB của
+   trang gộp. Không xoá khoá trang: `go("khieunai")` nằm rải trong ô cảnh báo `bv_kn_*`, nhịp
+   ngày, bảng việc, KPI `GOIYDEF`, bài hướng dẫn và cả link người dùng đã lưu - xoá là làm chết
+   một loạt cửa trong im lặng. */
+var CSMAP={review:"khaosat",khaosat:"khaosat",ghinhan:"phanhoi",khieunai:"khieunai"};
 var HTMAP={};
 var KMAP={};
 /* V9.29o: bàn giao lead rời hub "Tính năng khác" sang hub "Chờ duyệt" - nó là một QUYẾT ĐỊNH
@@ -28832,7 +28983,11 @@ function go(key,noHist){
     đằng, trang hiện một nẻo. Chuyện này nằm im vì `duyet` không đứng trên menu nên không bộ kiểm
     nào đi qua nó bằng đường người dùng thật đi.
     Cho nó qua thẳng, như `giangvien` đã được cho qua từ trước. */
- if(typeof HUBTAB!=="undefined"&&HUBTAB[key]&&key!=="giangvien"&&key!=="duyet"){
+ /* V2 15/08 - ngoại lệ đọc từ `HUBTHAT` chứ không viết tay từng tên: `cskh` nay cũng là trang
+    gộp thật (Khảo sát + Phản hồi + Khiếu nại + Yêu cầu HV), đẩy nó sang trang con là xoá đúng
+    cái vừa gộp. */
+ if(typeof HUBTAB!=="undefined"&&HUBTAB[key]&&key!=="giangvien"&&
+    !(typeof HUBTHAT!=="undefined"&&HUBTHAT[key])){
    var _d2=hubDich(key);if(_d2&&PBK[_d2])key=_d2}
  var p=PBK[key];if(!p)return;
  if(!canSee(key)&&SENSITIVE[key]){
@@ -29029,7 +29184,11 @@ var NAVTREE=[
     lối nào. Hub CSKH có 4 tab mà menu chỉ có tên hub. Anh Luân: *"bên sidebar giống như 1 cái
     bản đồ vậy, họ biết mình cần tìm gì ở đâu"* - thiếu một mục là mất một chỗ trên bản đồ.
     Thứ tự các mục con xếp ĐÚNG THỨ TỰ THANH TAB của hub, để menu và màn hình đọc như nhau. */
- {g:arcGrpName("changB"),arc:"changB",items:["changB","buoihnay","lop","wow","hocvien","giangvien","xeplop","baitap","giaoan","buoihoc","khaosat","ghinhan","khieunai","lichtuan","lichwow","gvdp","phong","socamket"]},
+ /* V2 15/08 - ba mục `khaosat` + `ghinhan` + `khieunai` thay bằng MỘT mục `cskh`. Giữ nguyên
+    CHỖ ĐỨNG cũ (kệ "Theo dõi chất lượng" của nhóm này) chứ không dời sang nhóm CSKH & Kết thúc:
+    người ta vẫn mở nó trong lúc lớp đang chạy, và dời chỗ cùng lúc với gộp trang là bắt người
+    dùng học lại hai thứ trong một lần. */
+ {g:arcGrpName("changB"),arc:"changB",items:["changB","buoihnay","lop","wow","hocvien","giangvien","xeplop","baitap","giaoan","buoihoc","cskh","lichtuan","lichwow","gvdp","phong","socamket"]},
  {g:arcGrpName("changC"),arc:"changC",items:["changC","baoluu"]},
  {g:arcGrpName("changD"),arc:"changD",items:["changD","ketthuc","ketqua","magioithieu"]},
  /* V9.29o (anh Luân): mọi hàng chờ QUYẾT ĐỊNH gom về một nhóm riêng - nó thuộc về người có
@@ -29189,6 +29348,17 @@ var HUBTAB={
  cskh:{v:"CSTAB",d:"khaosat",m:{khaosat:"khaosat",phanhoi:"ghinhan",khieunai:"khieunai",ychv:"ychv"}},
  khac:{v:"KTAB",d:"baoluu",m:{baoluu:"baoluu",magioithieu:"magioithieu"}},
  duyet:{v:"DUYTAB",d:"duyetck",m:{duyetck:"duyetck",duyethoan:"duyethoan",duyetnghi:"duyetnghi",duyetthu:"duyetthu",banggiao:"banggiao"}}};
+/* ═══ HUB GỘP THẬT - KHÔNG PHẢI BÍ DANH ══════════════════════════════════════════════════════
+   Trước đây `go()` viết thẳng `key!=="duyet"` để chừa một ngoại lệ. Nay có hai cái, và một luật
+   chỉ áp cho một trang thì không phải luật - khai thành BẢNG để mọi chỗ hỏi cùng một nguồn.
+   Hai hub này khác bốn hub kia ở chỗ: **chúng trả lời một câu hỏi mà không trang con nào trả lời
+   được**. `duyet` - *"còn gì chờ tôi quyết?"*. `cskh` - *"học viên đang nói gì với mình?"*, câu
+   này phải cộng cả ba sổ DL15 + DL16 + DL17 mới trả lời được.
+   Bảng này gánh HAI việc, cố ý để chung một chỗ: (1) `go()` cho qua thẳng, không đẩy sang trang
+   con; (2) `buildScope` mở CỬA - ai có ít nhất một trang con thì có hub. Thiếu việc (2) thì đúng
+   ngày ta ẩn trang con đi là ta khoá cửa của gần hết chức danh, vì bản khai quyền của họ viết
+   bằng tên TRANG CON (`khaosat`, `ghinhan`, `khieunai`), chỉ hai chức danh có chữ `cskh`. */
+var HUBTHAT={duyet:1,cskh:1};
 /* V9.33: TAB MẶC ĐỊNH của mỗi hub trước đây khai ở BA nơi và cả ba khai khác nhau: hàm vẽ để
    "lop", HUBTAB để "today", còn navVis lại để "today". Kết quả: mở hub Học tập thì màn hình ra
    tab Lớp học nhưng sidebar và breadcrumb tưởng đang ở tab Hôm nay. Nay CHỈ HUBTAB.d nói, hai
@@ -29210,10 +29380,9 @@ var HUBCAU={
   lop:"Đang mở Lớp học - lớp đang chạy; bấm một lớp để vào Vận hành lớp.",
   buoihoc:"Đang mở Nhận xét buổi - buổi đã dạy mà nhận xét còn thiếu, tính theo hạn SLA.",
   wow:"Đang mở Buổi WOW 1-1 - lịch hẹn, xác nhận và ghi nội dung sau buổi."},
- cskh:{khaosat:"Đang mở Khảo sát - trung tâm gửi phiếu, theo dõi lớp nào chưa trả lời.",
-  phanhoi:"Đang mở Phản hồi / Góp ý - học viên gửi lên, theo tới khi đóng phiếu.",
-  khieunai:"Đang mở Khiếu nại - phân loại, cử người xử lý rồi trả lời lại học viên.",
-  ychv:"Đang mở Học viên liên hệ - yêu cầu và câu hỏi gửi từ Cổng học viên."},
+ /* V2 15/08 - `cskh` KHÔNG còn ở bảng này. Trang gộp nói câu "đang xem gì" bằng công tắc cách
+    xem (`CSVWDEF`), ngay trong khối tab - giữ thêm một câu ở đây là hai nguồn cho một sự thật,
+    và người đọc thấy hai câu gần giống nhau cách nhau ba dòng. */
  khac:{baoluu:"Đang mở Bảo lưu / Bỏ học - học viên đã dừng, giữ liên lạc để kéo lại.",
   magioithieu:"Đang mở Mã giới thiệu - mã của học viên, lượt giới thiệu và thưởng."},
  duyet:{duyetck:"Đang mở Chiết khấu - đơn giảm học phí vượt mức tự quyết, chờ người có quyền duyệt.",
@@ -29305,7 +29474,10 @@ function hubSubKey(hub){var H=HUBTAB[hub];if(!H)return "";return H.m[hubTab(hub)
 var NAVPHANG=[
  {g:"Tuyển sinh & Thu tiền",items:["nhaplead","test","tuvan","thanhtoan","reup"]},
  {g:"Lớp học & Giảng dạy",items:["buoihnay","lop","wow","hocvien","giangvien","xeplop","baitap","giaoan","buoihoc","lichtuan","lichwow","gvdp","phong","socamket"]},
- {g:"Chăm sóc & Sau khóa",items:["khaosat","ghinhan","khieunai","baoluu","ketthuc","ketqua","magioithieu"]}];
+ /* V2 15/08 - ba mục khảo sát / phản hồi / khiếu nại gộp thành `cskh`. Danh sách này là danh
+    sách KHOÁ TRANG mà nhiều chỗ đọc (`navGroupOf`, `trangNghiepVu`, `_check11`, `_checkv2`),
+    nên phải đổi ở đây chứ không chỉ trông vào `hide:1` lọc hộ. */
+ {g:"Chăm sóc & Sau khóa",items:["cskh","baoluu","ketthuc","ketqua","magioithieu"]}];
 /* ═══ V2 14/08 - KỆ TRONG MỘT NHÓM MENU (anh Luân: *"em đã check xem trên sidebar nên sắp xếp
    thế nào chưa, a thấy chắp vá quá"*) ══════════════════════════════════════════════════════
    Đúng là chắp vá: cả ngày em mới chỉ VÁ TỪNG LỖ (thêm `socamket`, thêm `lichwow`, thêm
@@ -29343,7 +29515,8 @@ NAVKE[arcGrpName("changB")]=[
     `wow` GIỮ LẠI ở kệ làm việc: "Buổi WOW 1-1" không phải sổ tra cứu, nó là màn có đủ nút xác
     nhận / bắt đầu / kết thúc / ghi nội dung - người ta LÀM ở đó hằng ngày. */
  ["Làm hằng ngày",["buoihnay","lop","wow","hocvien","giangvien","xeplop","baitap","giaoan"]],
- ["Theo dõi chất lượng",["buoihoc","khaosat","ghinhan","khieunai"]],
+ /* V2 15/08 - ba mục gộp thành một: `cskh` đứng đúng chỗ ba mục cũ đang đứng. */
+ ["Theo dõi chất lượng",["buoihoc","cskh"]],
  ["Lịch & sổ tra cứu",["lichtuan","lichwow","gvdp","phong","socamket"]]];
 /* Cây PHẲNG chia nhóm khác cây chặng: khảo sát / phản hồi / khiếu nại nằm ở nhóm "Chăm sóc &
    Sau khóa", không ở đây. Khai kệ riêng theo ĐÚNG thành viên của nhóm này - dùng chung bảng
@@ -29395,9 +29568,8 @@ var NAVCHO={
   if(t==="baitap"){var m=window.BTMODE||"giao";
    return {giao:"Giao bài",thu:"Thu bài",cham:"Chấm bài",chocham:"Chờ chấm - mọi lớp"}[m]||"Giao & chấm bài tập"}
   return {buoi:"Buổi học & điểm danh",hocvien:"Học viên",ketqua:"Kết quả đầu ra"}[t]||""},
- viec:function(){var v=VIECVW();
-  for(var i=0;i<VIECVWDEF.length;i++)if(VIECVWDEF[i][0]===v&&v!=="viec")return VIECVWDEF[i][1];
-  return ""},
+ viec:function(){var v=VIECVW();return v==="viec"?"":vwNhan(VIECVWDEF,v)},
+ cskh:function(){return vwNhan(CSVWDEF,CSVW())},
  giangvien:function(){return (window.GVTAB==="cong")?"Bảng công":""},
  giaoviec:function(){return {wait:"Việc chờ nhận",hv:"Từ học viên"}[window.TKTAB]||""}};
 /* Chuỗi hiện sau mũi tên trên mục đang sáng. Hai nguồn ghép lại, đúng thứ tự người đi:
