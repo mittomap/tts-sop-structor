@@ -378,18 +378,25 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
 /* ---- 12. DAI CHAO TRANG BAT DAU gon lai (V9.27) ---- */
 (function(){
  setRole("all");
+ /* 15/08 - O CHAO LON DA GO. Ba cau kiem cu do `bwhero` - dai chao cua Trang bat dau: mot dong
+    tom tat, o tim nam cot phai, khong con cau thua. Trang ay nay la MOT CACH XEM cua Viec hom
+    nay, va nhanh ve o chao het cho goi nen bi go (xem ghi chu o `renderBanlam`). Do mot khoi
+    khong con ton tai thi cau kiem do vi mot ly do khong lien quan gi toi chat luong app.
+    Thu VAN CON GIA TRI trong ba cau ay la O TIM NHANH - man VH0 cua SOP - va cai hint treo canh
+    no. Giu dung phan ay, do tren thu that su duoc ve ra.
+    *Go mot khoi thi phai di hoi lai moi phep do dang neo vao no - giu dieu can bao ve, bo phan
+    do cai vo.* */
  var pg=RENDER["banlam"]();
- var hero=pg.slice(pg.indexOf('class="bwhero"'),pg.indexOf('class="bwhero"')+2600);
- t("dai chao chi con MOT dong tom tat", (hero.match(/class="bwsub"/g)||[]).length===1);
- t("o tim nam o cot phai cung hang", /class="bwr"/.test(hero)&&hero.indexOf('class="bwr"')>hero.indexOf('class="bwl"'));
- t("dai chao khong con cau thua 'Chon mot nguoi ben duoi'", !/Chọn một người bên dưới/.test(hero));
- t("dong goi y duoi o tim de trong khi chua go", /id="bwsrchhint"><\/span>/.test(hero));
- t("hen ke tiep gom thanh mot chip bam duoc", !/Cuộc hẹn kế tiếp/.test(hero));
- t("chip hen van bam ra dung bo loc hen", !/class="bwap"/.test(hero)||/bwap" onclick="chayQSet\('appt'\)/.test(hero));
- t("loi chao nho lai cho do chiem cho", (function(){var m=CSS.match(/\.bwg\{font-size:(\d+)px/);return m&&+m[1]<=18})());
- t("dai chao bot cao", (function(){var m=CSS.match(/\.bwhero\{[^}]*padding:(\d+)px/);return m&&+m[1]<=16})());
- t("dai chao xep mot hang (canh giua)", /\.bwhero\{[^}]*align-items:center/.test(CSS));
- t("man hep thi o tim tu xuong dong", /max-width:760px\)\{\.bwr\{flex:1 1 100%\}/.test(CSS));
+ t("con o tim nhanh (man VH0 cua SOP)", /Tìm tên, SĐT hoặc mã/.test(pg));
+ t("o tim khong con cau thua 'Chon mot nguoi ben duoi'", !/Chọn một người bên dưới/.test(pg));
+ t("dong goi y duoi o tim de trong khi chua go", /id="bwsrchhint"><\/span>/.test(pg));
+ t("hint nam NGOAI hop tim, khong de len input", pg.indexOf('</div><span class="bwsrchhint"')>=0);
+ /* Nam cau con lai cua nhom nay do CHIEU CAO va CACH XEP cua dai chao (co chu, padding, canh
+    giua, o tim tu xuong dong o man hep). Dai chao khong con duoc ve ra nua nen chung do mot cai
+    VO: CSS van con trong file (co y giu - cat CSS theo khoang dong da mot lan lam vo ca dai the),
+    nhung khong man nao dung toi. Mot cau kiem chi doc CSS cua thu khong ai ve la cau kiem bao ve
+    mot loi hua khong con ai giu. Go han, giu bon cau ve O TIM o tren - do la phan con song.
+    *Thu khong con tren man hinh thi cung khong con gi de canh.* */
  t("dong goi y rong thi an han", /\.bwsrchhint:empty\{display:none\}/.test(CSS));
 })();
 

@@ -720,6 +720,12 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    green/gray. Lượt đầu em viết `class="chip"` cho lớp nhóm nên nó ra chữ trơn, nhìn như lỗi
    chứ không như một cái thẻ. Nay khai riêng: gọn hơn chip thường (đứng trước tên nên không
    được lấn chỗ của tên), và luôn nằm cùng dòng với tên. */
+/* Hàng [thẻ loại lớp][tên lớp]: thẻ không co, tên chiếm phần còn lại nên chữ xuống dòng vẫn nằm
+   trong cột của chính nó. `align-items:flex-start` để thẻ bám dòng ĐẦU của tên, không trôi xuống
+   giữa khi tên hai dòng. */
+.lopo{display:flex;align-items:flex-start;gap:7px;min-width:0}
+.lopo>.lopthe{flex:none;margin-top:1px}
+.lopn{min-width:0}
 .lopthe{font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;
  display:inline-block;vertical-align:middle;margin-right:6px;letter-spacing:.2px}
 .lopthe.mot{background:var(--amberb);color:#854F0B}
@@ -739,8 +745,28 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .alert .ab{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .alert .at{flex:1}.alert .at b{font-size:13px;font-weight:600}.alert .at small{display:block;color:var(--muted);font-size:11px}.alert .av{font-size:18px;font-weight:800}
 .dt{width:100%;border-collapse:collapse;font-size:12.5px}
+/* ═══ V2 15/08 (anh Luân: *"Header của bảng thì nên canh giữa em ạ, border chia cột trong bảng
+   nên có cái dọc mờ cho phân biệt"*) ═══════════════════════════════════════════════════════════
+   Header căn giữa cho MỌI cột trừ cột đầu - cột đầu là tên (người, lớp, mã), nội dung của nó
+   luôn căn trái nên header cũng phải trái, không thì hai thứ lệch nhau ngay ô đầu tiên mắt chạm.
+   Đường kẻ dọc: 1px màu rất nhạt, chỉ đủ để mắt biết cột này hết ở đâu. Không phải viền trang
+   trí - bảng 12 cột mà không có vạch nào thì đọc một hàng dài là trượt cột lúc nào không hay.
+   Cột cuối không kẻ để không thành một cái khung kín. */
 .dt th{text-align:left;padding:9px 11px;background:#FAFBFD;color:#5A6675;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--line);position:sticky;top:0}
+/* Căn giữa ĐÚNG những cột mà nội dung cũng ở giữa (số đếm, chip trạng thái, enum ngắn). Căn giữa
+   tất cả thì cột chữ dài có header lơ lửng giữa trong khi chữ bám mép trái - lệch ngay ô đầu.
+   Cột tiền căn phải cả hai. *"Canh giữa" chỉ đẹp khi thứ nằm dưới nó cũng ở giữa.* */
+.dt th.giua{text-align:center}
+.dt th.phai{text-align:right}
+/* Dùng lại đúng mã màu của đường kẻ NGANG (`#EEF2F6`) chứ không pha thêm một mã nhạt hơn: bảng
+   màu app chạm trần 110 mã, thêm một mã cho một cái vạch là tiêu mất suất của một thứ đáng hơn -
+   `_checkux` bắt ngay lượt chạy đầu (111/110). Và kẻ dọc cùng màu kẻ ngang thì lưới bảng đọc ra
+   như MỘT lưới, không phải hai lớp vạch khác nhau. */
+.dt th:not(:last-child),.dt td:not(:last-child){border-right:1px solid #EEF2F6}
 .dt td{padding:9px 11px;border-bottom:1px solid #EEF2F6;vertical-align:middle}
+/* Ô mang giá trị NGẮN (chip trạng thái, số đếm) căn giữa theo header của nó; ô chữ dài giữ trái;
+   ô tiền giữ phải. Nhờ vậy header căn giữa không bị lệch với thứ nằm dưới nó. */
+.dt td.giua{text-align:center}
 .dt tr:hover td{background:#FAFBFD}.mut{color:var(--muted)}.empty{text-align:center;color:var(--muted);padding:24px}
 .tbwrap{max-height:none;overflow:auto}
 /* V9.55: .fbar va .tbar la HAI thanh cong cu cho CUNG mot viec, ma lech nhau bo goc 10/12,
@@ -5415,6 +5441,30 @@ function theSync(key){var box=document.querySelector('.bstatsw[data-thekey="'+ke
    bảng việc theo chức danh: một trang nay có thể mang HAI dải thẻ, mà `_checkux` lại tìm chuỗi
    "Thẻ (n/m)" ĐẦU TIÊN trên trang rồi coi đó là dải của trang - nên nó đo nhầm sang dải kia và
    báo đỏ oan. *Hễ một thứ có thể xuất hiện hai lần trên một màn thì nó phải tự khai mình là ai.* */
+/* ═══ V2 15/08 (anh Luân: *"mấy cái câu trong thẻ... a nhớ a bảo là phải có bánh răng để a sửa
+   được đúng ko? Em làm đi"*) ══════════════════════════════════════════════════════════════════
+   Đúng, luật ấy anh đặt từ V9.63: *"bất cứ thứ gì hiển thị, có thể sửa trong cài đặt, đều phải
+   có bánh răng"*. Dòng phụ của thẻ là chữ do người viết mã đặt ra - nó khuyên người dùng nên làm
+   gì - nên nó phải sửa được như mọi đoạn chữ khác.
+   Nhưng KHÔNG phải dòng phụ nào cũng vậy: quá nửa trong số đó là SỐ TÍNH TỪ DỮ LIỆU ("84/84 hồ
+   sơ", "8 giảng viên", "20% tổng giờ"). Cho sửa những câu ấy là mời người ta ghi đè lên một kết
+   quả tính - sửa xong màn hình nói dối mà không ai hay.
+   Phép phân biệt: có chữ số hoặc có thẻ HTML thì đó là câu SINH RA, để nguyên; còn lại là câu
+   NGƯỜI VIẾT, cho đi qua sổ đoạn chữ kèm bánh răng.
+   *Cho sửa một con số đã tính là mở cửa cho màn hình nói dối - chỉ mở cửa cho phần người viết.* */
+function thePhu(t,ma){
+ var x=String(t==null?"":t);
+ if(!x.trim())return "";
+ if(/[<>]/.test(x)||/\d/.test(x))return x;      /* câu sinh ra từ dữ liệu - không cho sửa */
+ var k="gy_the_"+(typeof slugify==="function"?slugify(x):x).replace(/-/g,"_").slice(0,30);
+ /* Khai luôn ĐOẠN NÀY HIỆN Ở ĐÂU. Sổ đoạn chữ ở Cài đặt liệt kê mọi đoạn sửa được, và luật
+    `_checkux` đòi mỗi đoạn phải nói được nó nằm ở màn nào - nếu không, người sửa đọc một câu
+    trơ trọi rồi đoán mình đang sửa chỗ nào trong app. Khai ngay lúc dựng, kèm tên trang đang mở
+    và mã thẻ nếu có, nên đoạn nào cũng tự khai được chỗ đứng của nó. */
+ try{if(typeof GOIYO!=="undefined"&&!GOIYO[k]){
+  var p0=(typeof PBK!=="undefined"&&PBK[CUR]&&PBK[CUR].t)||CUR||"";
+  GOIYO[k]="Dòng phụ trên thẻ"+(ma?(" "+ma):"")+(p0?(" - trang "+p0):"")}}catch(e){}
+ try{return goiyG(k,x)}catch(e){return x}}
 function theNutHTML(key){var parts=THEHTML[key]||[];
  var hien=0,tong=parts.length;
  parts.forEach(function(p){if(!theHidden(p[0]))hien++});
@@ -5523,8 +5573,20 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
  hideInit(key);var cols=cfg.cols.filter(function(c){return colVisible(key,c[0])});if(!cols.length)cols=[cfg.cols[0]];
  var h='<div class="tbwrap"><table class="dt"><thead><tr>';
  var so=(window.SORT||{})[key];
+ /* Cột nào là SỐ trên mọi dòng thì cũng căn giữa - `current_enrollment`, `class_capacity`...
+    không khai kiểu ô nên không tự biết, phải nhìn dữ liệu thật mới ra. */
+ var _so={};cols.forEach(function(c){
+  var co=false,xau=false;
+  data.forEach(function(r){var v=r[c[0]];
+   if(v==null||v==="")return;
+   if(/^-?[\d.,]+$/.test(String(v).trim()))co=true;else xau=true});
+  _so[c[0]]=co&&!xau});
+ function _cls(c){
+  if(c[2]==="money")return " phai";
+  if(c[2]==="chip"||c[2]==="enum"||c[2]==="calcnum"||c[2]==="calcso"||_so[c[0]])return " giua";
+  return ""}
  cols.forEach(function(c){var on=so&&so.col===c[0];
-  h+='<th style="cursor:pointer" onclick="listSort(\''+key+'\',\''+c[0]+'\')" title="sắp xếp">'+esc(c[1])+(on?(so.dir>0?' ▲':' ▼'):'')+'</th>'});
+  h+='<th class="'+(_cls(c).trim()||"")+'" style="cursor:pointer" onclick="listSort(\''+key+'\',\''+c[0]+'\')" title="sắp xếp">'+esc(c[1])+(on?(so.dir>0?' ▲':' ▼'):'')+'</th>'});
  /* V9.63 (anh Luân: *"cột thao tác ở các sổ ko thấy gì nhỉ"*): sổ chỉ-xem không có nút Sửa,
     không khai act, và phần lớn dòng cũng không có nút SLA - nên cột này rỗng từ đầu tới cuối.
     Một cột không bao giờ có gì thì đừng dựng cột. Hỏi trước khi vẽ: cột này có nội dung không.
@@ -5556,9 +5618,18 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
        không bao giờ chạy tới `cell()`. Đặt nhầm chỗ thì thẻ không hiện mà cũng không báo lỗi -
        đã cắn một lượt. Gắn sau khi tính `lk` nên cả hai nhánh (có link / không link) đều có thẻ. */
     var _the=(c[0]==="class_name"&&cfg.code==="DL10")?lopThe(r):"";
-    if(lk){h+='<td>'+_the+lk+'</td>';return}
-    if(_the){h+='<td>'+_the+cell(r,c,cfg.code)+'</td>';return}
-    h+='<td'+(c[2]==="money"?' style="text-align:right;font-variant-numeric:tabular-nums"':'')+'>'+cell(r,c,cfg.code)+'</td>'});
+    /* ═══ V2 15/08 (anh Luân, kèm ảnh khổ điện thoại: *"tên lớp có rớt hàng thì cũng đừng tràn
+       ra ngang hàng với tag lớp, khó nhìn em. Nên thụt vào bằng chữ đầu tiên của tên chính"*) ══
+       Thẻ "Nhóm" và tên lớp đang là hai phần tử inline nối đuôi nhau, nên khi tên dài xuống dòng
+       thì dòng thứ hai chạy về sát mép trái - nằm NGANG HÀNG với cái thẻ ở trên nó. Đọc ra như
+       hai cột lộn xộn, và mắt không biết đâu là mép của tên.
+       Bọc lại thành một hàng flex: thẻ giữ nguyên bề rộng, tên chiếm phần còn lại - dòng thứ hai
+       của tên tự thụt vào thẳng với chữ đầu tiên của dòng đầu. *Thứ xuống dòng phải xuống dòng
+       trong LÒNG nó, đừng để nó tràn ra chỗ của thứ đứng cạnh.* */
+    if(_the){h+='<td><span class="lopo">'+_the+'<span class="lopn">'+(lk||cell(r,c,cfg.code))+'</span></span></td>';return}
+    if(lk){h+='<td>'+lk+'</td>';return}
+    var _giua=(c[2]==="chip"||c[2]==="enum"||c[2]==="calcnum"||c[2]==="calcso"||_so[c[0]]);
+    h+='<td'+(c[2]==="money"?' style="text-align:right;font-variant-numeric:tabular-nums"':(_giua?' class="giua"':''))+'>'+cell(r,c,cfg.code)+'</td>'});
   /* ═══ V2 14/08 (anh Luân: *"nút làm ngay với xử lý trùng nhau nhỉ"*) ═════════════════════
      Trùng thật. "Làm ngay" mở đúng ô ghi của việc đang treo trên dòng; "Xử lý" mở màn Chạy quy
      trình của chính người đó - mà BƯỚC HIỆN TẠI của màn ấy chính là cái việc đang treo. Hai cửa
@@ -6895,7 +6966,7 @@ function BANGVIEC(){
   o:[["ti-discount-2",duyCkList().length,"Chiết khấu cần duyệt","#B58A2B","từ "+slaChip("thresholdDiscount_approval",1000000,"đ")+" trở lên","goDuyet('duyetck')"],
      ["ti-transfer",OB.filter(function(r){return num(r.placement_change_count)>=dlNguong()}).length,"Đổi lớp từ "+dlNguong()+" lần","#6B4FA0","quá "+slaChip("placementChange_free_times",1,"lần")+" miễn duyệt - cần quản lý phê duyệt","go('xeplop')"],
      ["ti-alert-triangle",KN.filter(function(r){return isc(r.complaint_severity,"high")&&!isc(r.complaint_status,"resolved")}).length,"Khiếu nại mức CAO","#E24B4A","quản lý tham gia trong "+slaChip("slaComplaintHigh_hours",4,"giờ"),"goCS('khieunai')"],
-     ["ti-arrow-up-right",KN.filter(function(r){return String(r.escalated_to||"").trim()&&!isc(r.complaint_status,"resolved")}).length,"Khiếu nại đã leo thang","#DB2777","HV không chấp nhận cách xử lý","goCS('khieunai')"],
+     ["ti-arrow-up-right",KN.filter(function(r){return String(r.escalated_to||"").trim()&&!isc(r.complaint_status,"resolved")}).length,"Khiếu nại đã leo thang","#DB2777","Học viên không chấp nhận cách xử lý","goCS('khieunai')"],
      /* SOP liệt kê 4 ô ở BC9, nhưng CH3 còn giao cho quản lý việc "Xác nhận hoàn tiền" - việc đó
         CÓ hàng chờ đếm được, nên phải nhìn thấy chứ không để nằm khuất trong hub Chờ duyệt. */
      ["ti-arrow-back-up",duyRefundList().length,"Hoàn tiền chờ duyệt","#B58A2B","SLA "+slaChip("slaRefundProcess_days",7,"ngày"),"goDuyet('duyethoan')"]]},
@@ -8707,13 +8778,13 @@ function renderViec(){var items=bellItems();
   (function(){var lim=paramOf("viecOldAlert_days",3)*24;
    var n=items.filter(function(x){return x.sev==="red"&&x.age>lim}).length;
    return ["ti-hourglass-high",n,"Nợ quá "+paramOf("viecOldAlert_days",3)+" ngày","#B45309",
-    n?"để lâu nữa là mất khách, dọn trước":"không có việc nào để mốc"]})(),
+    n?"Nợ càng lâu càng khó cứu - nên xử lý trước":"không có việc nào để mốc"]})(),
   /* Thẻ này phải LUÔN trả về một ô, kể cả khi chưa có bộ phận nào quá hạn - dải thẻ khai theo mã
      cố định, ô nào biến mất giữa chừng là lệch cả bảng khai. Không có số thì ghi "-". */
   (function(){var cc={};items.forEach(function(x){if(x.sev==="red")cc[x.cat]=(cc[x.cat]||0)+1});
    var top=Object.keys(cc).sort(function(a,b){return cc[b]-cc[a]})[0];
-   return top?["ti-users-group",cc[top],"Quá hạn nhiều nhất: "+top,"#0D9488","hôm nay nên dồn người sang đây"]
-             :["ti-users-group","-","Quá hạn nhiều nhất","#0D9488","chưa bộ phận nào quá hạn"]})()],"viec");
+   return top?["ti-users-group",cc[top],"Quá hạn nhiều nhất: "+top,"#0D9488","Nên tăng người cho mảng này trong hôm nay"]
+             :["ti-users-group","-","Quá hạn nhiều nhất","#0D9488","Chưa mảng việc nào quá hạn"]})()],"viec");
  /* V9.99z5: nhịp ngày của chức danh đứng ngay đây - đọc "hôm nay tôi làm gì theo buổi" trước,
     rồi mới xuống hàng chờ chi tiết. Trang khác không có khối này (một việc một chỗ). */
  /* Lắp ba tầng. Hai tấm tóm tắt đứng CẠNH nhau, không chồng lên nhau.
@@ -12381,7 +12452,7 @@ function renderReview(embed){var p="review",fil=fget(p);
   '<button class="btn primary" onclick="rvForm()"><i class="ti ti-send"></i>Gửi đợt mới cho một lớp</button>');
  /* V9.51: 3 o loc doi lot chip ben duoi (chip da mang so) - bo; giu o thong tin thuan */
  h+=statStrip([
-  ["ti-clipboard-text",waiting,"Phiếu chờ trả lời","#E08A1E","nhắc HV nộp"],
+  ["ti-clipboard-text",waiting,"Phiếu chờ trả lời","#E08A1E","Cần nhắc học viên nộp"],
   /* V9.57: o cu in NGUONG cau hinh (60%) - mot con so chi doi khi co nguoi vao Cai dat sua no,
      tuc gan nhu khong bao gio. Thay bang phieu gui lau ma van chua ai tra loi: do la viec goi
      nhac trong ngay. Nguong "bao lau la lau" lay tu CH2. */
@@ -12389,7 +12460,7 @@ function renderReview(embed){var p="review",fil=fget(p);
    sv.forEach(function(v){if(String(v.submitted_date||"").trim())return;
     var d=pvnd(v.sent_date);if(d&&(now-d.getTime())/864e5>lim)n++});
    return ["ti-bell-ringing",n,"Gửi quá "+lim+" ngày chưa ai trả lời","#E24B4A",
-    n?"gọi nhắc, để lâu là mất tiếng nói của lớp":"không có phiếu nào bị bỏ quên"]})()],"review");
+    n?"gọi nhắc, để lâu là mất tiếng nói của lớp":"Không có phiếu nào bị bỏ quên"]})()],"review");
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
  h+=filterBar(p,fil,[["all","Tất cả lớp",all.length],["none","Chưa gửi đợt nào",nNone,"red"],["low","Trả lời kém",nLow,"amber"],["fu","Có phiếu cần follow-up",nFu?nFu:"","amber"]],view.length);
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>HV</th><th>Đã gửi</th><th>Đã trả lời</th><th>Tỷ lệ (SRR)</th><th>Hài lòng trung bình</th><th>Cần follow-up</th><th>Đợt gần nhất</th><th>Thao tác</th></tr></thead><tbody>';
@@ -13392,7 +13463,7 @@ function renderBanglop(){
   var offDa=gvOffSes(lop).length,offCon=gvOffLeft(lop);
   h+=statStrip([
    ["ti-user-off",String(offCon<0?0:offCon)+"/"+gvOffQuota(),"Số buổi off còn lại",offCon<=0?"#E24B4A":(offCon===1?"#E08A1E":"#16A34A"),
-    offDa?("GV chính đã nghỉ "+offDa+" buổi"):"GV chính chưa nghỉ buổi nào","",
+    offDa?("GV chính đã nghỉ "+offDa+" buổi"):"Giảng viên chính chưa nghỉ buổi nào","",
     "Đếm buổi của lớp do người KHÁC giáo viên chính dạy (mỗi lần đổi người dạy đều ghi vết kèm lý do). Quota "+gvOffQuota()+" buổi lấy từ cấu hình teacherOffQuota_course. Danh sách: tab Buổi học, buổi nào đổi GV có ghi trong vết."],
    ["ti-checkbox",attP==null?"-":Math.round(attP*100)+"%","Chuyên cần (ATR)",(attP!=null&&attP>=kpiTh(/^ATR/,0.85))?"#16A34A":"#E24B4A","mục tiêu ≥ "+kpiChip(/^ATR/,0.85,1),"",attP==null?"Lớp chưa có buổi nào được điểm danh":pctG(pres,att.length,"lượt điểm danh có mặt (đúng giờ hoặc đi trễ)")],
    ["ti-book",hcrP==null?"-":Math.round(hcrP*100)+"%","Nộp bài (HCR)",(hcrP!=null&&hcrP>=kpiTh(/^HCR/,0.9))?"#16A34A":"#E08A1E","mục tiêu ≥ "+kpiChip(/^HCR/,0.9,1),"",hcrP==null?"Lớp chưa giao bài nào":pctG(hwSub,hw.length,"bài đã nộp")],
@@ -14498,7 +14569,7 @@ var BGORPH="__orph";
    /* Bấm vào là NHẢY THẲNG vào mục "(chưa có ai phụ trách)" của ô chọn - đúng chỗ chứa
       bấy nhiêu dòng. Trước đây ô này không bấm được, và câu chỉ đường của nó trỏ vào một
       cái bảng không bao giờ chứa chúng. */
-   ["ti-user-off",orph.length,"Lead chưa có ai phụ trách","#E24B4A",orph.length?"chia sớm, tránh để nguội":"không còn",
+   ["ti-user-off",orph.length,"Lead chưa có ai phụ trách","#E24B4A",orph.length?"Nên chia sớm, tránh để nguội":"không còn",
     "window.BGSRC='__orph';reRender('banggiao')"],
    /* V9.57: bo o "Co so dang co lead song" va "Nhan vien tu van" - ca hai la thong tin nen,
       biet roi cung khong ban giao khac di. Giu lai dung cai phai quyet: lead qua han lien he. */
@@ -14511,7 +14582,7 @@ var BGORPH="__orph";
       ô kia đo cái hẹn NV tự đặt, ô này đo hai mốc CỦA TRUNG TÂM (bỏ bê / ôm lâu). Một lead có
       thể đúng hẹn mà vẫn bị ôm 60 ngày không ra kết quả. */
    (function(){var nT=bgThuDS(src).length;
-    return ["ti-recharging",nT,"Đủ điều kiện thu về","#DB2777",nT?"quá mốc chăm sóc - thu rồi giao người khác":"không có lead nào quá mốc"]})()],"banggiao")})();
+    return ["ti-recharging",nT,"Đủ điều kiện thu về","#DB2777",nT?"Quá mốc chăm sóc - nên thu lại và giao người khác":"không có lead nào quá mốc"]})()],"banggiao")})();
  var allLeads=rows("DL02").filter(function(l){return laOrph?!String(l.assigned_to||"").trim():String(l.assigned_to||"")===src});
  var q=vnorm(window.BGQ||"").trim();var stf=window.BGST||"all";
  var stCount={};allLeads.forEach(function(l){var c=ecode(l.lead_status);if(c)stCount[c]=(stCount[c]||0)+1});
@@ -18798,7 +18869,7 @@ function renderLichWow(){
      dung+"/"+tong+" ô · còn "+_tron+" ô trống đặt được"]})(),
    (function(){var n=Object.keys(_nv).length;
     return ["ti-users",n,"NV WOW trực tuần này","#2E5A88",n?(Math.round(tuan.length/n*10)/10)+" ô/người":"chưa ai đăng ký ca"]})(),
-   ["ti-calendar-off",_trong,"Ngày không ai trực",(_trong?"#E24B4A":"#2E9E6B"),"học viên mở app ra là không đặt được"]],"lichwow");
+   ["ti-calendar-off",_trong,"Ngày không ai trực",(_trong?"#E24B4A":"#2E9E6B"),"Học viên mở app sẽ không đặt được ca"]],"lichwow");
  /* ── THANH ĐIỀU HƯỚNG TUẦN + CHIP CA ── */
  var _ca=lwCa();
  var _caChon=window.LWCA||"";
@@ -19126,7 +19197,7 @@ function renderWow(embed){var p="wow",fil=fget(p);var all=srows("DL14");
      Thu dang gia lai nam o cau phu ben duoi ("3 buoi thieu moc gio"). Dua no len lam so chinh. */
   (function(){var thieu=_done.filter(function(w){return !wowHours(w)}).length;
    return ["ti-clock-play",thieu,"Buổi thiếu mốc giờ vào/ra","#E08A1E",
-    thieu?"thiếu mốc thì không tính công được":"đủ mốc vào - ra cả"]})(),
+    thieu?"Thiếu mốc giờ thì không tính công được":"đủ mốc vào - ra cả"]})(),
   /* ═══ 14/08 - HAI Ô SAU ĐỔI SANG KPI/TỔNG LƯỢT (THE_NEN_LA_GI.md, nhóm B) ═════════════════
      Ô "Đã đặt, chờ HV ký cam kết" trùng đúng chip trạng thái "đã đặt" ngay dưới, và từ hôm nay
      còn trùng cả nhóm việc "Booking WOW chưa chốt lịch" - ba chỗ nói một con số. Ô "HV đã hết
@@ -19931,7 +20002,7 @@ function renderKetqua(){
    "mục tiêu ≥ "+Math.round(kpiTh(/^AR$/,0.7)*100)+"%","",aimG(tThu,"thi thử")],
   ["ti-award",aimO(tThat),"Đạt AIM · kỳ thi IELTS thật",(tThat.pct!=null&&tThat.pct>=Math.round(kpiTh(/^AR$/,0.7)*100))?"#16A34A":"#E08A1E",
    tThat.mau?(tThat.mau+" học viên đã đi thi"):"chưa có ai đi thi","",aimG(tThat,"thi thật")],
-  ["ti-clock-exclamation",chuaThi,"Chưa đi thi thật",chuaThi?"#E08A1E":"#16A34A",chuaThi?"chưa có kết quả chính thức":"đã có kết quả hết","",
+  ["ti-clock-exclamation",chuaThi,"Chưa đi thi thật",chuaThi?"#E08A1E":"#16A34A",chuaThi?"Chưa có kết quả chính thức":"đã có kết quả hết","",
    "Học viên đã học xong nhưng sổ kỳ thi IELTS thật chưa có lượt thi nào. Nhập bằng nút Nhập điểm thi thật ở đầu trang."]],"ketqua");
 
  /* ---- bảng bóc tách theo lát cắt ---- */
@@ -21530,7 +21601,7 @@ function statStrip(items,key,ids){
    var _w2=(_v.length>=10 && /^[\d.,\s]+(đ|h|%|đ\/giờ)?$/.test(_v));
    return [id,'<div class="bstat ro'+(_w2?" w2":"")+'"'+(id?' data-the="'+esc(id)+'"':'')+(full?' data-tip="'+esc(full)+'"':'')+'>'+
     '<span class="bsic" style="background:'+t[3]+'18;color:'+t[3]+'"><i class="ti '+t[0]+'"></i></span>'+
-    '<div class="bstx"><div class="bsn">'+esc(String(t[1]))+'</div><div class="bsl">'+esc(t[2])+'</div>'+(t[4]?('<div class="bsp">'+t[4]+'</div>'):'')+'</div></div>']});
+    '<div class="bstx"><div class="bsn">'+esc(String(t[1]))+'</div><div class="bsl">'+esc(t[2])+'</div>'+(t[4]?('<div class="bsp">'+thePhu(t[4],id)+'</div>'):'')+'</div></div>']});
   THEHTML[key]=parts;
   return '<div class="bstatsw" data-thekey="'+esc(key)+'">'+theBoxIn(key)+'</div>'}
  /* Dải hàng chờ việc KHÔNG mang neo `bstats` - neo của nó là tiêu đề `bangviec`. Trước bản này
@@ -21544,7 +21615,7 @@ function statStrip(items,key,ids){
  return '<div class="bstat'+(act?'':' static')+'"'+(act?' onclick="'+act+'" data-tip="'+esc(gi?(gi+" · "+bamDiDau(act)):bamDiDau(act))+'"':(gi?' data-tip="'+esc(gi)+'" style="cursor:default"':' style="cursor:default"'))+'><span class="bsic" style="background:'+t[3]+'18;color:'+t[3]+'"><i class="ti '+t[0]+'"></i></span>'+
   /* V9.29: phần phụ chú (t[4]) là chuỗi do lập trình viên viết, không phải dữ liệu người dùng nhập,
      nên KHÔNG esc để gắn được chip bánh răng "sửa ở đây". Tên và số vẫn esc như cũ. */
-  '<div class="bstx"><div class="bsn">'+esc(String(t[1]))+'</div><div class="bsl">'+esc(t[2])+'</div>'+(t[4]?('<div class="bsp">'+t[4]+'</div>'):'')+'</div></div>'}).join("")+'</div>'}
+  '<div class="bstx"><div class="bsn">'+esc(String(t[1]))+'</div><div class="bsl">'+esc(t[2])+'</div>'+(t[4]?('<div class="bsp">'+thePhu(t[4],"")+'</div>'):'')+'</div></div>'}).join("")+'</div>'}
 function kpiMini(rows2){/* rows2 = [mã, tên, giá trị, đạt?, mục tiêu] */
  return '<div class="kpipanel" style="margin-bottom:16px"><div class="kpiphh">KPI & SLA của riêng người này (ngưỡng CH6)</div>'+
   rows2.map(function(r){var cls=(r[3]==null?"gray":(r[3]?"green":"red"));
@@ -24681,12 +24752,12 @@ function renderGiaoviec(){
     lại giữ vì chúng KHÔNG phải là một tab: "Quá hạn của tôi" cắt theo MỐC THỜI GIAN trong tab
     của tôi (loại T2 - SLA), "Chờ tôi xác nhận" là mắt xích cuối của chuỗi giao việc mà không
     tab nào lọc riêng ra được. */
- h+=statStrip([["ti-clock-exclamation",mOver.length,"Quá hạn của tôi","#E24B4A",mOver.length?"cần làm ngay":"không có","tkTabSet('mine');tkFset('live')"],
+ h+=statStrip([["ti-clock-exclamation",mOver.length,"Quá hạn của tôi","#E24B4A",mOver.length?"Cần làm ngay":"không có","tkTabSet('mine');tkFset('live')"],
   /* V9.99z5 - ô này trước đây dẫn sang `tkFset('live')`, mà "live" = mới giao + đã nhận, KHÔNG
      có việc đã BÁO XONG. Nên bấm vào ô "Chờ tôi xác nhận (3)" là mở ra một danh sách không có
      ba việc ấy - mắt xích CUỐI của chuỗi giao việc (người giao xác nhận) không có cửa nào dẫn
      tới. Nay có riêng một nhóm lọc "Chờ tôi xác nhận" và ô số dẫn thẳng vào đó. */
-  ["ti-inbox",gWait.length,"Chờ tôi xác nhận","#E08A1E",gWait.length?"người nhận đã báo xong":"không có","tkTabSet('given');tkFset('cho')"],
+  ["ti-inbox",gWait.length,"Chờ tôi xác nhận","#E08A1E",gWait.length?"Người nhận đã báo xong":"không có","tkTabSet('given');tkFset('cho')"],
   ],"giaoviec",["gv_over","gv_wait"]);}
  /* V9.99u - TAB "VIỆC CHỜ NHẬN" đứng ĐẦU: đây là việc chưa ai đụng vào, người giao đang chờ,
     nên nó gấp hơn cả việc đang làm. Con số trên tab là việc CỦA CHÍNH NGƯỜI ĐANG ĐĂNG NHẬP. */
@@ -25054,7 +25125,7 @@ function renderCong(){
    slaChip("shiftNoon_hour",12,"h")+' là ca sáng, tới '+slaChip("shiftEvening_hour",17,"h")+' là ca chiều, sau đó là ca tối.</div></div></div>'}
  h+=statStrip([
   ["ti-school",tot,"Buổi lớp đã dạy trong tháng","#3B82C4",L.length+" giảng viên"],
-  ["ti-clock-hour-4",(Math.round(totG*10)/10)+"h","Tổng giờ dạy","#2E5A88",totThieu?(totThieu+" buổi thiếu giờ vào/ra"):"đủ giờ vào - giờ ra","",
+  ["ti-clock-hour-4",(Math.round(totG*10)/10)+"h","Tổng giờ dạy","#2E5A88",totThieu?(totThieu+" buổi thiếu giờ vào/ra"):"Đã đủ mốc giờ vào - giờ ra","",
    "Tổng giờ đứng lớp thật trong tháng, tính từ giờ vào lớp tới giờ kết thúc của những buổi ĐÃ DẠY XONG. Buổi thiếu mốc giờ không tính được nên nằm ngoài con số này."],
   /* AC3 (Trưởng phòng ACA 06/08) - hai ô này trả lời "giờ ấy đổ vào đâu": kèm riêng hay lớp
      đông. Cùng một tổng giờ nhưng nghiêng về 1-1 hay nghiêng về nhóm là hai bài toán xếp người
@@ -25073,8 +25144,8 @@ function renderCong(){
      ô nào rụng giữa chừng là lệch cả bảng khai (luật đã ghi ngay trên, ở dải Việc hôm nay).
      Không được xem thì ghi dấu gạch và nói thẳng vì sao. */
   ["ti-report-money",xTien?vnd(tien):"-","Tiền công tạm tính","#0D9488",xTien?"theo giờ x ca x người":"chỉ khối tiền xem được"],
-  ["ti-writing",noNote,"Buổi chưa ghi nhận xét","#E08A1E",noNote?"đối chiếu trước khi chốt":"đã đủ nhận xét"],
-  ["ti-clock",L.reduce(function(a,x){return a+x.late},0),"Buổi vào trễ giờ","#E24B4A","ảnh hưởng KPI ADC"]],"cong");
+  ["ti-writing",noNote,"Buổi chưa ghi nhận xét","#E08A1E",noNote?"Cần đối chiếu trước khi chốt công":"đã đủ nhận xét"],
+  ["ti-clock",L.reduce(function(a,x){return a+x.late},0),"Buổi vào trễ giờ","#E24B4A","Ảnh hưởng chỉ số ADC"]],"cong");
  /* AC3 - LỌC THEO CHI NHÁNH. Vế thứ ba Trưởng phòng ACA hỏi: giờ dạy ở CƠ SỞ NÀO. Bảng vốn
     có cột Cơ sở nhưng không lọc được, nên muốn biết cơ sở 3 tháng này ai dạy bao nhiêu giờ thì
     phải dò bằng mắt qua cả bảng. Lọc theo cơ sở của LỚP (nơi buổi học diễn ra) chứ không theo
@@ -25315,7 +25386,7 @@ function renderBangcong(){
       hôm nay phải gọi ai. */
    (function(){var ng={};thieu.forEach(function(x){if(x.teacher_id)ng[x.teacher_id]=1});
     var n=Object.keys(ng).length;
-    return ["ti-user-exclamation",n,"Giảng viên có buổi thiếu mốc","#E08A1E",n?"gọi từng người bổ sung trước khi chốt công":"không ai vướng"]})(),
+    return ["ti-user-exclamation",n,"Giảng viên có buổi thiếu mốc","#E08A1E",n?"gọi từng người bổ sung trước khi chốt công":"Không giảng viên nào đang vướng"]})(),
    /* V2 13/08 - thẻ "Buổi thiếu mốc giờ vào/ra" đã bỏ: chip "Buổi thiếu mốc giờ" ngay dưới mang
       đúng con số ấy. Thẻ đầu giữ vì nó đếm NGƯỜI chứ không đếm buổi - việc phải làm là gọi từng
       người, nên đó là con số khác hẳn. */
@@ -25364,9 +25435,9 @@ function renderGiangvien(){var tab=window.GVTAB||"ds";
    return ["ti-clock-hour-4",(Math.round(tong/ks.length*10)/10)+"h","Giờ dạy trung bình mỗi GV tháng này","#2E5A88",
     ks.length+" GV · tổng "+(Math.round(tong*10)/10)+"h"]})(),
   (function(){var n=bcThieuMoc().length;
-   return ["ti-clock-exclamation",n,"Buổi thiếu mốc giờ vào/ra","#E08A1E",n?"thiếu mốc thì tính công sai":"đủ mốc cả"]})(),
+   return ["ti-clock-exclamation",n,"Buổi thiếu mốc giờ vào/ra","#E08A1E",n?"Thiếu mốc giờ thì tính công sai":"đủ mốc cả"]})(),
   (function(){var n=srows("DL10").filter(lopThieuGV).length;
-   return ["ti-user-off",n,"Lớp đang mở chưa có GV chính","#E24B4A",n?"gán người trước khi tới buổi":"lớp nào cũng có GV"]})()],"giangvien");
+   return ["ti-user-off",n,"Lớp đang mở chưa có GV chính","#E24B4A",n?"gán người trước khi tới buổi":"Lớp nào cũng đã có giảng viên"]})()],"giangvien");
  /* V9.99z5 - tab "Bảng công giảng dạy" hỏi ĐÚNG một cửa với mục menu cùng tên (`navVis`), nên
     thanh tab và thanh menu không thể nói hai đằng. Trước bản này mọi chức danh xem được trang
     Giảng viên đều bấm được bảng công - tức đọc được giờ dạy dùng để chốt lương của cả trung
@@ -27251,7 +27322,7 @@ function renderSoCamKet(){
      nay đếm đúng con số ấy - `_checklap` L5 bắt trúng, và đúng luật đã ghi trong THE_NEN_LA_GI:
      *thẻ trả lời câu của chip thì nó chỉ còn là một cái chip không bấm được*. Con số vẫn còn ở
      hai chỗ: mẫu số của ô tỷ lệ bên trái, và chính cái chip. */
-  ["ti-clock",chua.length,"Chưa ký",(chua.length?"#E24B4A":"#2E9E6B"),"đang chờ học viên ký ở cổng"]],"socamket",["ck_ban","ck_chua"]);
+  ["ti-clock",chua.length,"Chưa ký",(chua.length?"#E24B4A":"#2E9E6B"),"Đang chờ học viên ký ở cổng học viên"]],"socamket",["ck_ban","ck_chua"]);
  /* `_checkkhuon` K4 đòi trang nghiệp vụ có dải chip lọc. Ba chip dưới đây KHÔNG phải chip cho
     có: chúng trả lời đúng ba câu người ta hỏi cuốn sổ này - *ai đang giữ chữ ký ở bản cũ* (mời
     ký lại), *ai ký tại trung tâm* (phải có ảnh bản giấy), *ai ký tại trung tâm mà thiếu ảnh*
