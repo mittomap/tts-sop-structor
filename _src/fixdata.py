@@ -349,6 +349,62 @@ for l in R("DL02"):
         l["last_contact_time"] = fmt(max(tps))
 log.append("8. Bộ đếm: cập nhật sĩ số %d lớp | lượt liên hệ %d lead | đồng bộ lần chạm gần nhất" % (c8, c8b))
 
+# ═══ 21. GIU CHO TINH HUONG "CON HAN GHI NHAN XET" (NA069) LUON CO THAT (15/08) ══════════
+# `check_sop.py` do 93 tinh huong so trigger HD3 bang cach chay THAT `naFor()` tren moi dong.
+# NA069 = "Con han ghi nhan xet": buoi da day xong, chua ghi nhan xet, VA chua qua han SLA.
+# No do vi mot ly do khong lien quan gi den ma nguon: hom nay ca 21 buoi chua ghi nhan xet deu
+# da qua 48 gio, nen `naFor` tra NA021 cho tat ca va NA069 khong con dong nao de sinh ra.
+#
+# Day la mot cho DO THEO DONG HO, khong phai theo ma - hom qua xanh, hom nay do, ma khong ai
+# sua gi. Kieu do ay te hon do that: no day nguoi doc di tim loi o cho khong co loi.
+# Nen phai GIEO CHO CHAC: luon de lai dung MOT buoi vua day xong con trong han ma chua ghi
+# nhan xet. Do cung la tinh huong THUONG GAP NHAT ngoai doi (thay vua day xong, chua kip ghi),
+# nen demo co no moi dung voi thuc te.
+#
+# Khong doi NGAY cua buoi nao - chi go phan nhan xet cua mot buoi da nam san trong cua so.
+# Doi ngay la dung vao thu tu buoi cua ca lop, ma `check_data` co luat ve thu tu do.
+# Chon theo session_id nho nhat trong so nhung buoi hop le -> tat dinh, `check_taolai` khong lech.
+_slaNX = 48
+try:
+    for _p in (d.get("config", {}).get("ch2") or []):
+        if str(_p.get("code") or _p.get("key") or "") == "slaTeacherNote_hours":
+            _slaNX = int(n(_p.get("value") or _p.get("val") or 48)) or 48
+except Exception:
+    pass
+_ungVien = []
+for _s in R("DL11"):
+    if code(_s.get("session_status")) != "completed":
+        continue
+    _dd = dt(_s.get("session_date"))
+    if not _dd or _dd > NOW:
+        continue
+    if (NOW - _dd).total_seconds() / 3600.0 > _slaNX:
+        continue
+    _ungVien.append(_s)
+# HOI DUNG PHEP DO MA APP DANG DUNG, dung tu doat ra mot phep do thu hai:
+# `bhState()` coi la "da ghi nhan xet" khi `has_teacher_note` la mot gia tri CO, HOAC
+# `teacher_note_summary` co chu. Ban dau em do bang `teacher_note_completed_at` - mot cot khac -
+# nen gieo xong van do, va em suyt tuong la gieo khong an.
+# *Hoi ham that dang chay, dung hoi cot nghe ten giong nhat.*
+def _coNX(x):
+    return (str(x.get("has_teacher_note") or "").strip().lower() in ("true", "1", "yes", "y", u"có", "x")
+            or bool(str(x.get("teacher_note_summary") or "").strip()))
+_conHan = [x for x in _ungVien if not _coNX(x)]
+_goNX = ""
+if _ungVien and not _conHan:
+    _ungVien.sort(key=lambda x: str(x.get("session_id") or ""))
+    _s = _ungVien[0]
+    for _k in ("has_teacher_note", "teacher_note_completed_at", "teacher_note_within_sla",
+               "teacher_note_summary", "note_reviewed_at", "note_reviewed_by",
+               "note_reviewed_by_name", "note_review_note"):
+        if _k in _s:
+            _s[_k] = ""
+    _goNX = str(_s.get("session_id") or "")
+log.append("21. Con han ghi nhan xet (NA069): %d buoi trong cua so %dh, %s"
+           % (len(_ungVien), _slaNX,
+              ("go nhan xet cua %s de tinh huong nay luon co that" % _goNX) if _goNX
+              else "da co %d buoi chua ghi - khong phai gieo" % len(_conHan)))
+
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("=" * 70)
 print("VA DU LIEU DEMO — XONG")
