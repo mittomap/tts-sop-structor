@@ -522,8 +522,16 @@ tr.cfhl>td{background:#FFF6D8}
 .setgrp.setg2 .stab.on{background:none;color:var(--navyd);font-weight:800;border-bottom-color:var(--navy)}
 /* Vung bam phai du 24x24 - bo kiem trinh duyet that bat dung: banh rang 19x14px thi tren may
    tinh bang khong ai bam trung. Icon van nho, chi vung cham la rong ra. */
+/* ═══ V2 15/08 (anh Luân, kèm ảnh: *"mấy cái bánh răng hình như nó hơi lệch so với hàng hả em"*)
+   Đo bằng thước thật trên trình duyệt: **10/10 bánh răng thấp hơn tâm hàng chữ đúng 5px**, tất cả
+   đều nằm trong dòng phụ của thẻ (`.bsp`). Gốc là `vertical-align:-6px` - một CON SỐ MA thửa cho
+   đúng một chỗ, một cỡ chữ. Chỗ nào chữ nhỏ hơn hoặc hàng thấp hơn thì cái đẩy 6px ấy thành thừa.
+   `middle` canh theo TÂM của hàng chữ nên nó tự đúng ở mọi cỡ chữ - không phải chỉnh lại lần nữa.
+   Giữ nguyên 24x24: `_checkui` bắt nút dưới 24px (ngón tay không bấm trúng), nên không được thu
+   ô lại cho vừa hàng - phải canh, không được co.
+   *Một con số nhúng tay chỉ đúng ở chỗ mình vừa nhìn; canh theo tâm thì đúng ở mọi chỗ.* */
 .gearbtn{background:none;border:0;color:var(--muted);cursor:pointer;font-size:13px;line-height:1;
- width:24px;height:24px;padding:0;display:inline-flex;align-items:center;justify-content:center;vertical-align:-6px}
+ width:24px;height:24px;padding:0;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}
 .gearbtn:hover{color:var(--navy)}
 /* V9.64 (anh Luân: *"bánh răng bị rớt xấu quá em"*). Bánh răng đứng SAU một khối chữ rộng
    (chip "việc cần làm" xuống dòng, cao 2-3 dòng) thì nó là một ô inline riêng - hết chỗ là rớt
@@ -7240,7 +7248,7 @@ function bvStrip(t,bc,d,o,tour){
  return '<div class="sechdw">'+
   '<div class="sechd"'+(tour==="bangduyet"?' data-tour="bangduyet"':(tour?' data-tour="bangviec"':''))+'>'+esc(t)+
   ' <span style="font-weight:600;text-transform:none;letter-spacing:0" class="mut">· '+esc(bc)+'</span>'+
-  '<div class="fhint">'+esc(d)+' Rê chuột vào một ô để biết nó đếm gì và xem danh sách ở đâu.</div></div>'+
+  '<div class="fhint">'+esc(d)+' Rê chuột hoặc chạm vào một ô để biết nó đếm gì và xem danh sách ở đâu.</div></div>'+
   (_nut?('<div class="sechdn">'+_nut+'</div>'):'')+'</div>'+
   statStrip(o,"bangviec",o.map(function(x){return bvMa(x[2])}))}
 /* V9.64: tên ô thẻ nay có thể MANG SỐ SỐNG lấy từ CH2 ("Đổi lớp từ 2 lần" - số 2 là tham số).
@@ -7522,7 +7530,7 @@ function saleCotChong(D,ng){
  return '<div class="panel"><div class="ph"><b><i class="ti ti-chart-bar" style="margin-right:6px"></i>Lượt kết nối theo cơ sở</b>'+
   '<span class="mut" style="font-size:11.5px">'+ng+' ngày gần nhất · mỗi màu một nhân viên</span></div>'+
   '<div class="pbody"><div class="chwrap">'+g+'</div>'+saleChu(D)+
-  '<div class="fhint" data-tip="Ba cái % cộng lại không ra con số nào có nghĩa, nên cột chồng đếm SỐ LƯỢT. Cơ sở không có lượt nào trong kỳ thì không vẽ cột.">Đếm <b>số lượt kết nối</b>, không chồng tỷ lệ %. Rê chuột vào một mảnh để xem tỷ lệ của người đó.</div></div></div>'}
+  '<div class="fhint" data-tip="Ba cái % cộng lại không ra con số nào có nghĩa, nên cột chồng đếm SỐ LƯỢT. Cơ sở không có lượt nào trong kỳ thì không vẽ cột.">Đếm <b>số lượt kết nối</b>, không chồng tỷ lệ %. Rê chuột hoặc chạm vào một mảnh để xem tỷ lệ của người đó.</div></div></div>'}
 /* TRÒN: doanh thu theo NV, kèm % - đúng câu "sale nào thu được bao nhiêu chiếm tỉ lệ bao nhiêu %". */
 function saleTron(D){
  var co=D.filter(function(x){return x.rev>0}).sort(function(a,b){return b.rev-a.rev});
@@ -10380,6 +10388,19 @@ function tipHide(){TIPCUR=null;var t=document.getElementById("tipbox");if(t)t.cl
 if(typeof document.addEventListener==="function"){
  document.addEventListener("mouseover",function(ev){var t=ev.target;if(!t||!t.closest)return;
   var el=t.closest("[data-tip]");if(el)tipShow(el);else if(TIPCUR)tipHide()});
+ /* ═══ V2 15/08 - CHẠM CŨNG PHẢI XEM ĐƯỢC CHÚ THÍCH ═══════════════════════════════════════
+    Anh Luân hỏi *"bao nhiêu chỗ bị hướng dẫn sai kiểu này"*, và đo ra một họ lỗi lớn hơn câu
+    hỏi: chú thích trong app CHỈ nghe `mouseover`. Trên điện thoại **không có sự kiện ấy**, nên
+    mọi chú thích đều không tồn tại - kể cả bốn chỗ app IN RA MỘT CÂU HỎI rồi giấu câu trả lời
+    vào chú thích, và bốn câu hướng dẫn bảo người dùng "rê chuột".
+    Trớ trêu: chính bộ kiểm đẻ ra họ lỗi này. Luật "đoạn nhắc đầu trang không quá 150 ký tự
+    (phần dài đưa vào chú thích rê chuột)" là luật đúng, nhưng cái LỐI THOÁT nó chỉ ra lại dẫn
+    vào một nơi mà nửa số thiết bị không tới được.
+    Nghe thêm `touchstart` và KHÔNG chặn hành vi gốc: thẻ chữ thuần thì chạm là hiện chú thích,
+    còn nút thì vừa hiện chú thích vừa chạy đúng việc của nó.
+    *Một lối thoát chỉ là lối thoát khi mọi người đi được qua nó.* */
+ document.addEventListener("touchstart",function(ev){var t=ev.target;if(!t||!t.closest)return;
+  var el=t.closest("[data-tip]");if(el)tipShow(el);else if(TIPCUR)tipHide()},{passive:true});
  document.addEventListener("mousedown",tipHide,true);
  if(typeof window.addEventListener==="function"){window.addEventListener("scroll",tipHide,true);window.addEventListener("resize",tipHide)}
 }
@@ -12535,9 +12556,11 @@ function renderYcHV(){
   '<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>'+
   /* V2 08/08 - 184 ký tự, quá trần 150. Cùng lý do với trang GV dự phòng: trang này từng khai
      `hide:1` nên chưa bao giờ bị soi. Phần "chuyển cho ai" vào chú thích rê chuột. */
-  'Yêu cầu gửi từ Cổng học viên, hạn nhận việc <b>'+slaChip("slaTaskAccept_hours",4,"giờ")+'</b>. '+
-  '<span data-tip="Hệ thống tự chuyển tới học vụ; riêng yêu cầu về tiền thì chuyển kế toán.">Ai nhận?</span> '+
-  'Nhận và trả lời ngay trong thẻ dưới đây.</div>';
+  /* V2 15/08 - BỎ CÂU HỎI "Ai nhận?" mà câu trả lời chỉ nằm trong chú thích. In một dấu hỏi ra
+     màn là hứa với người đọc rằng câu trả lời cũng ở trên màn ấy. Nay trả lời thẳng, vẫn dưới
+     trần 150 ký tự - rút chữ chứ không đẩy chữ vào chỗ khuất. */
+  'Yêu cầu gửi từ Cổng học viên, hạn nhận việc <b>'+slaChip("slaTaskAccept_hours",4,"giờ")+'</b> - '+
+  'app chuyển tới học vụ, riêng chuyện tiền thì kế toán. Nhận và trả lời ngay ở thẻ dưới.</div>';
  h+='<div class="panel"><div class="pbody">';
  if(!L.length)h+='<div class="empty">Chưa có yêu cầu nào gửi lên từ Cổng học viên.</div>';
  L.forEach(function(t){h+=tkCard(t,"mine")});
@@ -13992,7 +14015,7 @@ function renderBanglop(){
    /* đảm bảo có buổi đang chọn */
    if(!ses.some(function(s){return s.session_id===window.DDSESS}))window.DDSESS=ses[0].session_id;
    /* dải THẺ BUỔI: gọn, chấm màu theo trạng thái, dấu ✓ khi đã ghi nhận xét */
-   h+='<div class="panel"><div class="ph"><b>Chọn buổi để điểm danh</b><span class="mut" style="font-size:11.5px">'+ses.length+' buổi · chấm màu = trạng thái · ✓ xanh = đã ghi nhận xét · huy hiệu đỏ = việc chưa xong, dùng đúng biểu tượng của ô đếm ở đầu trang (rê chuột để biết việc gì)</span>'+
+   h+='<div class="panel"><div class="ph"><b>Chọn buổi để điểm danh</b><span class="mut" style="font-size:11.5px">'+ses.length+' buổi · chấm màu = trạng thái · ✓ xanh = đã ghi nhận xét · huy hiệu đỏ = việc chưa xong, dùng đúng biểu tượng của ô đếm ở đầu trang (rê chuột hoặc chạm để biết việc gì)</span>'+
     /* AC4 - nút mở cửa ghi "buổi nào là buổi thi". Chỉ hiện với người CÓ QUYỀN (CH3X ses_thi:
        Học vụ + TP ACA) - hiện cho người không có quyền rồi chặn khi bấm đúng là bệnh
        "mời rồi đuổi" mà app đã chữa ở thanh menu. */
@@ -14992,13 +15015,20 @@ function baocaoThan(_xemAi){
     Không gom chúng về đây (bảng việc phải nằm chỗ người ta bắt đầu ngày, đó là chủ ý cũ), nhưng
     phải CHỈ ĐƯỜNG. *Một báo cáo có thật mà người cần nó không biết đường tới thì với họ là chưa có.* */
  h+='<div class="notebar" style="margin:0 0 12px"><i class="ti ti-info-circle"></i>'+
-  'Trang này giữ các chỉ số KPI theo SOP. '+
+  /* ═══ V2 15/08 (anh Luân: *"e giải thích giúp tại sao chỗ này có link mở sổ học viên đc ko"*)
+     Không giải thích được, vì nó vô lý thật. Ô này in ra HAI CÂU HỎI - "Gồm những bảng nào?" và
+     "Báo cáo khác ở đâu?" - rồi giấu cả hai câu trả lời vào chú thích rê chuột, xong đặt một cái
+     link đứng ngay sau. Người đọc thấy: hai câu hỏi không ai trả lời, và một cái link không dính
+     gì tới câu nào. Link ấy CÓ lý do (BC1 Học viên nguy cơ nằm ở sổ Học viên) nhưng lý do ấy
+     nằm trong chú thích - tức là vô hình.
+     Nay trả lời thẳng cả hai, và câu trả lời tự nói ra vì sao có cái link.
+     *Đừng in một dấu hỏi lên màn rồi để câu trả lời ở chỗ phải rê chuột mới thấy.* */
   /* Câu về BC3 chỉ hiện cho người ĐƯỢC XEM miền khách tiềm năng. `_checkmien` bắt đúng: giáo
      viên mở trang Chỉ số ra và đọc thấy một từ của miền lead ngay trên màn - app rò một chữ
      cũng là rò. *Câu giải thích cũng là dữ liệu; nó phải đi qua đúng cái cửa mà số liệu đi qua.* */
-  ((function(){try{return navVis("nhaplead")}catch(e){return false}})()
-    ?'<span data-tip="BC2 chỉ số KPI và BC3 phễu khách nằm ngay trang này, cùng khối lượng việc theo nhân viên.">Gồm những bảng nào?</span> ':'')+
-  '<span data-tip="Bảng Học viên nguy cơ (BC1) nằm ở sổ Học viên. Các bảng việc theo chức danh (BC5-BC9) hiện ở trang đáp của từng người.">Báo cáo khác ở đâu?</span> '+
+  'Chỉ số KPI (BC2)'+
+  (((function(){try{return navVis("nhaplead")}catch(e){return false}})())?' và phễu khách (BC3)':'')+
+  ' ở ngay đây. Học viên nguy cơ (BC1) ở sổ Học viên; bảng việc BC5-BC9 ở trang đáp từng người. '+
   '<a class="lnk" onclick="go(\'hocvien\')">Mở sổ Học viên</a></div>';
  /* Dòng tình hình đứng TRƯỚC ba việc nên làm: biết mình đang ở đâu rồi mới đọc phải làm gì. */
  h+=kpiTinhHinh();
@@ -15651,7 +15681,7 @@ var SETMOTA={
  ch4:["Câu chữ của mọi lời nhắc việc, cộng kịch bản chăm sóc gợi ý theo từng chặng. Sửa câu ở đây là mọi nơi đổi theo.",function(){return ch4List().length+" thông điệp"},"ti-message-2"],
  ch1:["Danh mục lựa chọn của mọi ô chọn trong app: trạng thái, nguồn lead, chi nhánh, lý do nghỉ… Thêm giá trị mới cho hợp với trung tâm.",function(){return Object.keys(ENUM||{}).length+" danh mục"},"ti-list"],
  goiy:["Đoạn gợi ý tĩnh trên màn hình - sửa ở đây là áp ngay khắp app, đi theo cấu hình.",function(){return Object.keys(GOIYDEF).length+" đoạn"},"ti-blockquote"],
- the:["Các thẻ số ở đầu mỗi trang: chọn thẻ nào hiện, và sửa câu chú thích hiện lên khi rê chuột. Ngay trên trang cũng có nút Thẻ làm được việc ẩn/hiện.",function(){var a=theAll();var n=a.filter(function(x){return theHidden(x[1][0])}).length;return a.length+" thẻ"+(n?" · đang ẩn "+n:"")},"ti-layout-cards"],
+ the:["Các thẻ số ở đầu mỗi trang: chọn thẻ nào hiện, và sửa câu chú thích hiện lên khi rê chuột hoặc chạm. Ngay trên trang cũng có nút Thẻ làm được việc ẩn/hiện.",function(){var a=theAll();var n=a.filter(function(x){return theHidden(x[1][0])}).length;return a.length+" thẻ"+(n?" · đang ẩn "+n:"")},"ti-layout-cards"],
  tro:["Trợ lý - thứ dắt nhân viên đi hết hàng chờ của họ. Bật/tắt, chia lượt dọn, xếp nhóm việc nào dọn trước.",function(){return (tthCfg().order||[]).length+" nhóm việc"},"ti-bulb"],
  nhip:["Nhịp ngày - danh sách việc theo giờ của từng chức danh, hiện ngay trang đầu khi họ mở app buổi sáng.",function(){return nhipRoles().length+" chức danh"},"ti-clock"],
  qa:["Hộp Hỏi đáp: bổ sung câu trả lời cho những câu app chưa biết, và xem sổ những câu app đang bí.",function(){return qaCfg().muc.length+" mục tự khai"},"ti-message-question"],
@@ -23170,11 +23200,13 @@ function renderGvdp(embed){
    (co?(co+' giảng viên đã nhận lời - họ được xếp lên đầu danh sách người thay.'):'chưa ai đăng ký. Trưởng phòng ACA khai đầu tháng.')+
    ' <button class="btn sm" onclick="gvdpThangForm(\''+esc(gvdpKyThang(day))+'\')"><i class="ti ti-edit"></i>'+(gvdpAiKhai()?'Khai danh sách tháng':'Xem danh sách tháng')+'</button></div>'})();
  h+='<div class="notebar"><i class="ti ti-info-circle"></i>'+
-  '<b>Không cần đăng ký trước.</b> App tự tính ai thay được cho từng buổi. '+
-  '<span data-tip="Giáo viên thay thế = trống lịch đúng khung giờ đó, dạy được ở cơ sở của lớp (hoặc lớp online), '+
-  'và không vượt số buổi/ngày. Giáo viên nghỉ cả ngày thì để trống lịch của họ - họ tự rơi vào nhóm '+
-  '&quot;trống lịch cả ngày&quot; ở ô bên trên.">App tính thế nào?</span> '+
-  'Bấm <b>Đề xuất người dạy thay</b> ở dòng buổi tương ứng.</div>';
+  /* V2 15/08 - câu hỏi "App tính thế nào?" bỏ đi, luật tính viết thẳng ra. Chú thích vẫn giữ
+     phần dài (giáo viên nghỉ cả ngày thì rơi vào nhóm nào), nhưng nó gắn vào một CÂU KỂ - chú
+     thích được phép làm rõ thêm, không được là chỗ duy nhất trả lời một câu hỏi đã in ra. */
+  '<b>Không cần đăng ký trước.</b> '+
+  '<span data-tip="Giáo viên nghỉ cả ngày thì để trống lịch của họ - họ tự rơi vào nhóm '+
+  '&quot;trống lịch cả ngày&quot; ở ô bên trên.">App tự tính người thay: trống lịch đúng giờ, '+
+  'đúng cơ sở, chưa quá số buổi/ngày.</span> Bấm <b>Đề xuất người dạy thay</b> ở dòng buổi.</div>';
 /* V2 13/08 - BỎ DẢI THẺ. Anh Luân: *"thẻ nó phải mang tính khác biệt, chứ nó như cái chip thì
    giữ làm gì, sao ko ưu tiên KPI, SLA hoặc mấy cái nhóm quan trọng"*. Dải này chỉ đếm dòng của
    chính bảng ngay dưới - đúng việc mà chip đang làm, và chip còn bấm lọc được. Luật chốt ở
@@ -27855,11 +27887,23 @@ function banAiHTML(){
      ds.forEach(function(x){var v=elabel(x.role)||ecode(x.role)||"Khác";
        if(idx[v]===undefined){idx[v]=nhom.length;nhom.push([v,[]])}
        nhom[idx[v]][1].push(x)});
+     /* ═══ V2 15/08 (anh Luân, kèm ảnh: *"chọn theo chức danh rồi chọn người, mà danh sách chỉ
+        có người?"*) ═══════════════════════════════════════════════════════════════════════════
+        Hai lỗi, và lỗi thứ hai nặng hơn:
+        1. CHỨC DANH CHỈ NẰM Ở NHÃN `<optgroup>`. Nhãn ấy do trình duyệt vẽ, mỗi nơi một kiểu -
+           trên máy anh nó không hiện, thành ra danh sách đúng là "chỉ có người". Trong chính
+           file này đã có một dòng ghi nhớ đúng bài học đó (ô chọn buổi học, V2 11/08):
+           *"CHỮ TRONG TỪNG DÒNG PHẢI CÓ ĐỦ NGÀY, đừng trông vào nhãn optgroup"* - em đọc rồi
+           vẫn phạm lại ở ô này. Nay chức danh viết THẲNG vào từng dòng; `<optgroup>` giữ lại
+           như một thứ trang trí có ích khi trình duyệt chịu vẽ, không còn gánh thông tin nào.
+        2. CÂU HƯỚNG DẪN HỨA MỘT THAO TÁC KHÔNG CÓ. "Chọn theo chức danh RỒI chọn người" mô tả
+           một ô chọn HAI TẦNG. Đây là một ô một tầng: không có bước nào để chọn chức danh cả.
+           *Câu hướng dẫn phải tả đúng cái tay người ta sắp làm, không tả cái mình định làm.* */
      return nhom.map(function(g){
        return '<optgroup label="'+esc(g[0])+'">'+g[1].map(function(x){
-         return '<option value="'+esc(x.staff_id)+'">'+esc(x.full_name||x.staff_id)+'</option>'}).join("")+
+         return '<option value="'+esc(x.staff_id)+'">'+esc((x.full_name||x.staff_id)+" · "+g[0])+'</option>'}).join("")+
        '</optgroup>'}).join("")})()+
-  '</select><span class="mut" style="font-size:11.5px">chọn theo chức danh rồi chọn người - màn hình sẽ hiện đúng như người đó nhìn thấy</span>';
+  '</select><span class="mut" style="font-size:11.5px">danh sách xếp theo chức danh - chọn một người, màn hình hiện đúng như người đó nhìn thấy</span>';
  h+='</div>';
  return h}
 /* ── SỔ PHỤ HUYNH ─────────────────────────────────────────────────────────────────────────
