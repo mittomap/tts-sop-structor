@@ -148,6 +148,15 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 📋 15/08 chiều - CÒN TREO
+> 1. **Bảng "Điểm theo chủ thể" trục NHÂN VIÊN mới có 3 người** - vì `assigned_staff` của DL15
+>    chỉ có 2 người khác nhau (đội CSKH thật sự chỉ có hai NV trong DL01). Đúng dữ liệu, nhưng
+>    mỏng. Chưa đụng vì đó là chuyện gieo thêm nhân sự, không phải chuyện của màn hình này.
+> 2. **Khiếu nại tính vào giảng viên: hiện chỉ đếm `complaint_type = teacher`.** Đã khai rõ trong
+>    mã và đã báo anh Luân; nếu anh muốn tính mọi vụ của lớp vào người phụ trách thì đổi một dòng.
+> 3. **Trục "Buổi học" chỉ liệt kê buổi ĐÃ CÓ người nói tới (18 buổi)**, không kể buổi im lặng -
+>    cố ý, nhưng chưa có cách xem "buổi nào chưa ai đánh giá lần nào".
+>
 > ### 📋 15/08 - CÒN TREO
 > 1. **`check_taolai` đỏ ĐÚNG MỘT LẦN lúc 04:5x rồi không tái hiện.** Chạy tay ngay sau đó ĐẠT,
 >    chạy lặp thêm 6 lượt ĐẠT, ép lộ bằng `PYTHONHASHSEED` 0/1/2 (nghi thứ tự duyệt `set` chuỗi)
@@ -311,11 +320,96 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 15/08). Bản dựng đang chạy:
-> `33ad75` (15/08), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 15/08 chiều). Bản dựng đang chạy:
+> `f40ff4` (15/08), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `a6046c`, `882082`, `868f3f`, `a1bda4`, `519e91`, `dc6eb3`, `3f0446`, `39083f`.
+> Mốc cũ: `33ad75`, `6fc7a9`, `652360`, `fbfec7`, `46a0f2`, `a6046c`, `882082`, `868f3f`, `a1bda4`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 15/08 chiều - GỘP CSKH VỀ MỘT TRANG, ĐIỂM THEO CHỦ THỂ, VÀ MỘT DẢI TAB PHẢI LÀM BA LƯỢT
+>
+> **1. Khảo sát + Phản hồi + Khiếu nại = MỘT trang.** Anh Luân, kèm ảnh sidebar: *"2 trang này
+> khác nhau gì ko, nếu gộp lại?"* → *"hoặc có thể gộp cả khiếu nại vào luôn"* → *"khảo sát -
+> phản hồi - khiếu nại, tụi nó có vẻ cùng nhóm chủ đề hả"*.
+> Đo ra chỗ tệ hơn anh thấy: **BỐN cửa cho BA màn**. `khaosat` → `renderReview` (DL15, đơn vị là
+> LỚP) · `ghinhan` → `renderGhinhan` (DL16, đơn vị là PHIẾU) · `khieunai` → `renderKhieunai`
+> (DL17, đơn vị là VỤ) · và `cskh` - một hub gom đúng ba cái ấy, **trùng tên y hệt** trang con
+> thứ nhất ("CSKH · Khảo sát & Phản hồi" vs "Khảo sát & Phản hồi") mà lại nằm ở nhóm menu khác.
+> Thêm một lỗi tên: trang `khaosat` tên có chữ "Phản hồi" nhưng bên trong không có một dòng phản
+> hồi nào. Anh đọc menu thấy hai dòng cùng nói "phản hồi" là đúng - lỗi ở tên.
+> `cskh` thôi làm bí danh, trở lại là TRANG GỘP THẬT (bảng `HUBTHAT`, cùng đường với `duyet`);
+> ba trang con `hide:1`, `go()` dắt vào đúng tab nên hàng chục lối cũ vẫn sống.
+> **Nở NGƯỢC bản khai quyền** (`buildScope`): ai có một trang con thì có cửa vào hub - và điều
+> kiện SUY TỪ TRẠNG THÁI THẬT (chỉ nở khi MỌI trang con đã `hide`), không viết tay tên hub, nên
+> `duyet` (trang con vẫn đứng riêng) không bị nở theo. Thiếu bước này là ẩn trang con đi thành
+> khoá cửa của gần hết chức danh, vì quyền của họ viết bằng tên trang con.
+> Đo bằng thanh menu THẬT của 11 chức danh, so bản cũ với bản mới: đúng ba dòng thành một dòng ở
+> đúng chỗ cũ, không chức danh nào mất hay thêm gì khác.
+>
+> **2. Điểm theo chủ thể - LUẬT CỨNG SỐ 0 bắt được một mảng bỏ sót.** Anh Luân: *"1 lớp học, 1
+> buổi học, 1 giảng viên, 1 buổi wow, 1 wow coach, 1 vấn đề gì đó, 1 nhân viên nào đó sẽ là điểm
+> bị đánh giá, vậy để xem tổng hợp điểm số của mỗi chủ thể đó, thì có thể xem ở đâu em?"*
+> Đo trước khi trả lời, và câu trả lời thật là **gần như không xem được ở đâu**: sáu chỗ trong
+> app đọc `satisfaction_score`, cả sáu gom theo `class_id`. Theo giảng viên / buổi / WOW coach /
+> nhân viên thì không một màn nào có - hồ sơ giảng viên không mang một điểm hài lòng nào.
+> Tab thứ năm của trang gộp, bảy trục, một bộ cột chung tự ẩn cột rỗng. Khiếu nại chỉ tính vào
+> giảng viên khi `complaint_type` là `teacher`: một vụ học phí ở lớp thầy A không phải lỗi thầy A.
+> **Hai chỗ dữ liệu phải sửa Ở NGUỒN:** `DL16.session_id` mở từ hồi làm Cổng học viên mà trống
+> 29/29 - *mở một cột rồi không gieo gì vào thì tính năng đọc cột ấy chết ngay lúc sinh ra*; nay
+> neo 20 phản hồi vào đúng buổi (chỉ loại nói về chuyện xảy ra trong buổi). Và `classified_by` có
+> một dòng ghi "Học vụ" - một PHÒNG BAN chứ không phải một NGƯỜI, đẻ ra một dòng nhân viên không
+> tồn tại. Cả hai đều tất định, `check_taolai` dựng hai lượt vẫn ra một bộ.
+>
+> **3. "Điểm thì có rồi, nhưng muốn xem mấy cái nội dung thì xem thế nào?"** Đúng chỗ làm hụt:
+> bảng trả lời được "ai đang kém", nhưng người mở bảng bao giờ cũng hỏi tiếp **"kém vì cái gì"** -
+> mà câu ấy chỉ nằm trong phần CHỮ học viên viết ra. Nay một dòng có HAI lối: bấm CÁI TÊN → hồ sơ
+> chủ thể; bấm CHỖ CÒN LẠI → đúng chồng phiếu đã cộng nên con số đó, xếp Khiếu nại → Phản hồi →
+> Khảo sát → WOW, trong mỗi khối thì phiếu CHÊ trước phiếu KHEN.
+> *Một con số không tự giải thích được nó; chỉ có cái chữ nằm dưới nó mới giải thích được.*
+>
+> **4. Dải công tắc cách xem: LƯỢT BA mới đổi thật.** Anh Luân, kèm ảnh: *"mà em thực sự cho rằng
+> cái cách thiết kế ở đây và ở việc hôm nay nó đã nổi bật đó hả, a thấy nó mờ nhạt, xấu, ko có
+> màu sắc"*. Hai lỗi cộng lại:
+> · **Khối không hề tách khỏi trang** - nó khai `background:var(--bg)`, mà `--bg` CHÍNH LÀ nền
+>   trang (#EEF2F6). Ghi chú lượt trước em tự viết "cho nó một cái NỀN riêng" rồi lại tô đúng màu
+>   nền đang có. *Em chấm bài mình bằng chính câu mình vừa viết, không nhìn lại kết quả.*
+> · **Không một mã màu nào - và do chính em làm mất.** Bản `segHTML` cũ TỪNG tô số (phiếu chờ hổ
+>   phách, khiếu nại đỏ); lúc gom dải thành thành phần dùng chung `vwBar` em bỏ mất tham số tô
+>   màu. *Gộp thành phần mà đánh rơi một chiều thông tin thì không bộ kiểm nào biết là đã mất.*
+> Nay: khối nền TRẮNG, tab đang chọn tô ĐẶC navy (chữ + icon trắng), icon mang màu của KÊNH (khai
+> ở cột 6 của bảng, không đoán theo thứ tự), con số mang màu theo ĐỘ GẤP. Không mua thêm mã màu.
+>
+> **5. BỐN CHỖ HỎNG CHỈ ẢNH CHỤP MỚI BẮT ĐƯỢC** (ba cái do chính anh Luân chụp):
+> · **Hai icon không có trong font** (`ti-chart-histogram`, `ti-alert-hexagon`) - thêm icon mà
+>   quên dựng lại subset, đúng bẫy CLAUDE.md đã ghi. Ảnh anh gửi có một tab **không có icon**, em
+>   nhìn ảnh mới thấy. Đã dựng lại: 242 icon.
+> · **Ngăn kéo nội dung vỡ bố cục** - em mượn lớp `.obcards rows`, mà lớp ấy đặt `display:flex`
+>   cho thẻ nên các khối chữ nằm cạnh nhau, cột tên bị bóp còn nửa chữ; tệ hơn, lớp ấy có
+>   `.obm2{display:none}` nên câu "phiếu chưa trả lời nên không tính vào điểm trung bình" bị giấu
+>   luôn - một câu em viết ra mà không ai đọc được.
+>   *Mượn một lớp CSS là mượn cả bố cục nó được thiết kế cho, không chỉ mượn cái khung.*
+> · **`.dt td.phai` chưa từng tồn tại** - bảng khai cột là cột số, `th.phai` canh phải, mà ô nội
+>   dung không có luật nào nên vẫn canh trái. Đọc mã thì tưởng đã canh, nhìn ra thì lệch.
+>   *Một lớp khai một đằng mà không có luật nào đỡ thì nó là lời hứa suông trong mã.*
+>
+> **6. `check_sop` đỏ vì ĐỒNG HỒ, không vì mã.** NA069 "Còn hạn ghi nhận xét" không còn dòng nào
+> sinh ra: hôm nay cả 21 buổi chưa ghi nhận xét đều đã quá 48 giờ nên `naFor()` trả NA021 cho tất
+> cả. Hôm qua xanh, hôm nay đỏ, mà không ai sửa gì - **kiểu đỏ ấy tệ hơn đỏ thật, nó đẩy người
+> đọc đi tìm lỗi ở chỗ không có lỗi.** `fixdata` bước 21 luôn giữ đúng MỘT buổi vừa dạy xong còn
+> trong hạn mà chưa ghi nhận xét (cũng là tình huống thường gặp nhất ngoài đời). Không đổi ngày
+> buổi nào - đổi ngày là đụng thứ tự buổi của cả lớp mà `check_data` có luật canh.
+> **Bẫy cắn ngay trong lúc sửa:** em đo "đã ghi nhận xét" bằng cột `teacher_note_completed_at`,
+> trong khi `bhState()` của app đo bằng `has_teacher_note` HOẶC `teacher_note_summary`. Gieo xong
+> vẫn đỏ, và em suýt kết luận là gieo không ăn.
+> *Hỏi đúng hàm thật đang chạy, đừng hỏi cái cột nghe tên giống nhất.*
+>
+> **7. Năm bộ kiểm phải ĐỔI CÂU HỎI, không xoá luật.** `_check11` ("Khảo sát sáng cho chính nó"
+> → "đứng ở tab nào của trang gộp thì mục CSKH sáng, và chỉ nó") · `_check16` (go('khaosat') phải
+> về trang gộp VÀ mở đúng tab - hỏi cả hai vế, hỏi mỗi vế trang thì lọt ca nó đổ người ta xuống
+> tab Khiếu nại) · `_check14` (kênh vào thứ ba khai ở `.csway` đã gỡ → hỏi công tắc + câu mô tả)
+> · `_checkkhuon` K6 (cấm vẽ thanh tab hub cũ, TRỪ trang gộp thật) · `_checkv2` L2 (cấm hub BÍ
+> DANH đứng trên menu). Mục `_check16` này đã lật BA lần trong đời nó, mà điều cần bảo vệ không
+> đổi một ly suốt ba lần: **đường vào cũ không được vỡ.**
 >
 > ### 🟢 14/08 khuya - BA TRANG VỀ MỘT, BẢNG CÔNG TÁCH HAI ĐỘI, VÀ SÁU CHỖ ĐỎ TỰ MÌNH GÂY RA
 >
