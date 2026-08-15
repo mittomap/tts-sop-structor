@@ -318,9 +318,9 @@
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 15/08 chiều). Bản dựng đang chạy:
-> `f40ff4` (15/08), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> `37f39a` (15/08), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `33ad75`, `6fc7a9`, `652360`, `fbfec7`, `46a0f2`, `a6046c`, `882082`, `868f3f`, `a1bda4`.
+> Mốc cũ: `f40ff4`, `33ad75`, `6fc7a9`, `652360`, `fbfec7`, `46a0f2`, `a6046c`, `882082`, `868f3f`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
 > ### 🟢 15/08 chiều - GỘP CSKH VỀ MỘT TRANG, ĐIỂM THEO CHỦ THỂ, VÀ MỘT DẢI TAB PHẢI LÀM BA LƯỢT
