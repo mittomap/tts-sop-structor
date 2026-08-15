@@ -86,8 +86,15 @@ const vais=[...new Set(nguoi.map(s=>String(s.role||"")))].filter(Boolean).sort()
 (function(){
  try{gateEnter("")}catch(e){}
  const M=menuKeysAll();
- const hub=Object.keys(M).filter(k=>typeof HUBTAB!=="undefined"&&HUBTAB[k]);
- t("L2 · khong hub nao dung tren menu (V2 da bo hub)", hub.length===0,
+ /* V2 15/08 - trừ HUB GỘP THẬT. Điều luật này chặn là: một mục menu chỉ là BÍ DANH, bấm vào
+    thì `hubDich` đẩy sang một trang con - người ta bấm "Học tập & Giảng dạy" mà rơi vào "GV
+    dự phòng", nên menu không còn là bản đồ. Một trang GỘP THẬT thì không có chuyện đó: bấm
+    vào nó là vào chính nó, và nó gộp mấy sổ mà không sổ nào còn đứng riêng trên menu - đó là
+    menu NGẮN ĐI, đúng hướng luật này muốn. Phân biệt bằng `HUBTHAT`, cùng bảng mà `go()` đọc
+    để quyết định có chuyển hướng hay không, nên không thể lệch nhau. */
+ const hub=Object.keys(M).filter(k=>typeof HUBTAB!=="undefined"&&HUBTAB[k]&&
+   !(typeof HUBTHAT!=="undefined"&&HUBTHAT[k]));
+ t("L2 · khong hub BI DANH nao dung tren menu (V2 da bo hub)", hub.length===0,
    hub.map(k=>k+" o nhom \""+M[k]+"\"").join(" · "));
  /* Mục menu phải là trang CÓ THẬT - khai một tên chết là lối cụt im lặng.
     NGOẠI LỆ CÓ THẬT (thước này viết sai lần đầu, bắt nhầm cả bốn): `changA..changD` không phải

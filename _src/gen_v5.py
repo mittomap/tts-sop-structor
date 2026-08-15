@@ -12275,10 +12275,10 @@ function renderYcHV(){
    Cột 4 là KHOÁ QUYỀN: mỗi tab chỉ hiện với người xem được trang con của nó. Không có cột này
    thì gộp trang thành mở cửa - người chỉ được xem Khiếu nại sẽ đọc được cả sổ Khảo sát. */
 var CSVWDEF=[
- ["khaosat","Khảo sát","trung tâm chủ động đo (TT → HV): phiếu định kỳ theo tuần học; xem lớp nào chưa gửi, lớp nào trả lời kém.","khaosat","ti-clipboard-text"],
- ["phanhoi","Phản hồi & Góp ý","học viên tự nói (HV → TT): gửi từ Cổng học viên, hoặc nhân viên ghi hộ khi nhận qua gọi / nhắn / gặp trực tiếp; phân loại trong hạn rồi theo tới khi đóng.","ghinhan","ti-message-plus"],
- ["khieunai","Khiếu nại","phản hồi đã thành vụ (HV → TT): cử người xử lý, hạn tính theo mức độ, chỉ đóng khi học viên chấp nhận cách giải quyết.","khieunai","ti-alert-triangle"],
- ["ychv","Yêu cầu từ học viên","câu hỏi và đề nghị gửi từ Cổng học viên (HV → TT): app chuyển thẳng tới học vụ, hoặc kế toán nếu là chuyện tiền, kèm hạn nhận việc.","ychv","ti-school"]];
+ ["khaosat","Khảo sát","trung tâm chủ động đo (trung tâm → HV): phiếu định kỳ theo tuần học; xem lớp nào chưa gửi, lớp nào trả lời kém.","khaosat","ti-clipboard-text"],
+ ["phanhoi","Phản hồi & Góp ý","học viên tự nói (HV → trung tâm): gửi từ Cổng học viên, hoặc nhân viên ghi hộ khi nhận qua gọi / nhắn / gặp trực tiếp; phân loại trong hạn rồi theo tới khi đóng.","ghinhan","ti-message-plus"],
+ ["khieunai","Khiếu nại","phản hồi đã thành vụ (HV → trung tâm): cử người xử lý, hạn tính theo mức độ, chỉ đóng khi học viên chấp nhận cách giải quyết.","khieunai","ti-alert-triangle"],
+ ["ychv","Yêu cầu từ học viên","câu hỏi và đề nghị gửi từ Cổng học viên (HV → trung tâm): app chuyển thẳng tới học vụ, hoặc kế toán nếu là chuyện tiền, kèm hạn nhận việc.","ychv","ti-school"]];
 function CSVW(){var v=window.CSTAB||"khaosat",L=CSVWDEF.filter(vwCo);
  for(var i=0;i<L.length;i++)if(L[i][0]===v)return v;
  return (L[0]||CSVWDEF[0])[0]}
@@ -12290,7 +12290,7 @@ function renderCskh(){
  var nKnOpen=kn.filter(function(c){return !isc(c.complaint_status,"resolved")}).length;
  var nYcWait=ychvCho();
  var actBtn=(tab==="khaosat")?'<button class="btn primary" onclick="rvForm()"><i class="ti ti-send"></i>Gửi đợt khảo sát</button>':(tab==="phanhoi")?'<button class="btn primary" onclick="ghForm()"><i class="ti ti-message-plus"></i>Ghi nhận phản hồi</button>':(tab==="khieunai")?'<button class="btn primary" onclick="knAdd()"><i class="ti ti-plus"></i>Tiếp nhận khiếu nại</button>':"";
- var h=pageHead("CSKH · Tiếng nói học viên","Một vòng khép kín: trung tâm đo bằng khảo sát, học viên nói bằng phản hồi, nặng thì thành khiếu nại - cùng chủ thể bị chấm, cùng chỉ số hài lòng, nên xem chung một chỗ.",actBtn);
+ var h=pageHead("CSKH · Tiếng nói học viên","Một vòng khép kín: trung tâm đo bằng khảo sát, học viên nói bằng phản hồi, nặng thì thành khiếu nại - cùng chỉ số hài lòng nên xem chung một chỗ.",actBtn);
  h+=vwBar(CSVWDEF,tab,"csTabSet('{k}')",{khaosat:nSvWait||"",phanhoi:nFbOpen||"",khieunai:nKnOpen||"",ychv:nYcWait||""},"csvw");
  if(tab==="khaosat")h+=renderReview(1);
  else if(tab==="phanhoi")h+=renderGhinhan(1);
@@ -14217,16 +14217,15 @@ function kpiTinhHinh(){
  var top=[];try{top=kpiTop3()}catch(e){top=[]}
  var nang=top[0];
  if(!nLo)return '<div class="notebar nbgreen" data-tour="kpitinhhinh"><i class="ti ti-shield-check"></i>'+
-  '<b>'+m.tong+' chỉ số trong phạm vi của bạn đều đang đạt ngưỡng.</b> Tuần này không có chỗ nào phải chữa cháy - '+
-  'giữ nhịp và theo dõi tiếp.'+(m.chuadu?(' <span class="mut">'+m.chuadu+' chỉ số chưa đủ dữ liệu để tính.</span>'):'')+'</div>';
- return '<div class="notebar" data-tour="kpitinhhinh"><i class="ti ti-activity-heartbeat"></i>'+
-  'Trong <b>'+m.tong+'</b> chỉ số thuộc phạm vi của bạn: '+
+  '<b>'+m.tong+' chỉ số trong phạm vi của bạn đều đạt ngưỡng</b> - tuần này không có chỗ nào phải chữa cháy.'+
+  (m.chuadu?('<span data-tip="'+m.chuadu+' chỉ số chưa đủ dữ liệu để tính"> ('+m.chuadu+' chưa tính được)</span>'):'')+'</div>';
+ return '<div class="notebar" data-tour="kpitinhhinh"><i class="ti ti-gauge"></i>'+
+  '<b>'+m.tong+'</b> chỉ số trong phạm vi của bạn: '+
   (m.baodong?('<b style="color:var(--red)">'+m.baodong+' báo động</b> · '):'')+
-  (m.canhbao?('<b style="color:var(--amber)">'+m.canhbao+' cảnh báo</b> · '):'')+
-  (m.hut?('<b style="color:var(--amber)">'+m.hut+' hụt nhẹ</b> · '):'')+
+  (m.canhbao?('<b style="color:#854F0B">'+m.canhbao+' cảnh báo</b> · '):'')+
+  (m.hut?('<b style="color:#854F0B">'+m.hut+' hụt nhẹ</b> · '):'')+
   '<b style="color:var(--green)">'+m.dat+' đạt</b>'+
-  (m.chuadu?(' · <span class="mut">'+m.chuadu+' chưa đủ dữ liệu</span>'):'')+'. '+
-  (nang?('Nặng nhất là <b>'+esc(nang.name)+'</b> ('+esc(nang.code)+'). '):'')+
+  (m.chuadu?('<span data-tip="'+m.chuadu+' chỉ số chưa đủ dữ liệu để tính"> ·&nbsp;'+m.chuadu+' chưa tính được</span>'):'')+'. '+
   '<a class="lnk" onclick="window.KPIF=\'lo\';reRender(\'baocao\')">Xem '+nLo+' chỗ cần chú ý</a></div>';}
 function kpiTop3Section(){
  var top=kpiTop3();
@@ -29001,6 +29000,11 @@ var SOTRACUU=["dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc"
    `bangcong` cũng rời ra: nó là Bảng công giảng dạy, một nghiệp vụ riêng của Nhân sự, không phải
    một tab của trang Giảng viên. */
 var NAVSUB={changA:"chang",changB:"chang",changC:"chang",changD:"chang",
+ /* V2 15/08 - ba sổ CSKH gộp vào `cskh`: chúng không còn mục menu riêng, nên khai cha ở đây để
+    đứng ở tab nào thì mục "CSKH · Tiếng nói học viên" vẫn sáng. Không khai thì `go("khieunai")`
+    (còn hàng chục lối gọi thế) làm sidebar tối thui - đúng con bệnh `_check11` mục V9.19 canh:
+    *"mỗi nghiệp vụ trong chặng sáng ĐÚNG 1 mục sidebar"*. */
+ khaosat:"cskh",ghinhan:"cskh",khieunai:"cskh",review:"cskh",
  /* V2 RB3 - CHA TRƯỚC CON. `banglop` (Vận hành MỘT lớp) là trang con của `lop` (Lớp học): nó
     không có mục menu riêng, vào bằng cách bấm một lớp. Khai quan hệ ấy ở đây để khi đang đứng
     trong một lớp thì mục "Lớp học" trên sidebar SÁNG - người dùng đọc ra mình đang ở nhánh nào.

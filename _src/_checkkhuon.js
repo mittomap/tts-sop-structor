@@ -92,8 +92,12 @@ const KHONGTHE = {
      Muoi mot trang duoi day khong con the vi CA DAI cua chung chi dem dong. Trang nao co the
      thay bang mot chi so that (nhom B trong tai lieu) thi se lam sau va go khai o day. */
   tuvan:    _LYDO_TRUNGCHIP,
-  ghinhan:  _LYDO_TRUNGCHIP,
-  khieunai: _LYDO_TRUNGCHIP,
+  /* V2 15/08 - `ghinhan` va `khieunai` GO KHOI BANG NAY: chung khong con la trang nghiep vu
+     dung tren menu, chung la hai tab cua trang gop `cskh` (anh Luan: *"khao sat - phan hoi -
+     khieu nai, tui no co ve cung nhom chu de ha"*). Bang nay chi khai MIEN cho trang dang o
+     trong dien do; de lai dong khai cua mot trang da roi dien la de lai mot loi mien vinh vien
+     - mai kia trang ay quay lai lam trang rieng thi no duoc mien ma khong ai nho tai sao.
+     `cskh` khong khai o day: tab mac dinh cua no (Khao sat) co dai the that. */
   gvdp:     _LYDO_TRUNGCHIP,
   phong:    _LYDO_TRUNGCHIP,
   ketthuc:  _LYDO_TRUNGCHIP,
@@ -248,8 +252,16 @@ NV.forEach(k => {
   const coLoiRong = /class="empty"/.test(h);
   if (than.length < 120 && !coLoiRong) thieu.rong.push(k + " (than trang chi co " + than.length + " ky tu chu)");
 
-  /* K6 - không còn dính tới hub: trang nghiệp vụ không được vẽ thanh tab của hub cũ */
-  if (/TabSet\('|duyTabSet\(|tsTabSet\(|htTabSet\(|csTabSet\(/.test(h)) thieu.hub.push(k);
+  /* K6 - không còn dính tới hub: trang nghiệp vụ không được vẽ thanh tab của hub cũ.
+     V2 15/08 - HỎI CHÍNH XÁC HƠN. Điều xấu mà mục này bắt là: một trang nghiệp vụ ĐÃ TÁCH RA
+     rồi mà vẫn vẽ thanh tab của cái hub nó vừa rời - người dùng bấm một tab thì bị kéo ngược
+     về hub, tức là tách chưa xong. Nó KHÔNG phải là "cấm mọi thanh tab": một trang GỘP THẬT
+     (khai trong `HUBTHAT`, mọi trang con đã ẩn) thì thanh tab chính là cách xem của nó, vẽ ra
+     là đúng - trang Việc hôm nay cũng có đúng một dải như thế.
+     Phân biệt bằng bản khai, không bằng cảm tính: `HUBTHAT[k]` nói trang này là trang gộp.
+     *Bộ kiểm phải canh cái đích, không canh cách làm.* */
+  const laGop = (typeof HUBTHAT!=="undefined" && HUBTHAT[k]);
+  if (!laGop && /TabSet\('|duyTabSet\(|tsTabSet\(|htTabSet\(|csTabSet\(/.test(h)) thieu.hub.push(k);
 });
 
 /* Trang khai CHỈ ĐỌC mà lại có nút hành động thì bản khai đã cũ - gỡ dòng khai đi. */

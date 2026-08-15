@@ -593,7 +593,17 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
   var h=renderCskh();
   t("hub CSKH co tab Hoc vien lien he", h.indexOf("Học viên liên hệ")>=0);
   t("tab do liet ke dung so yeu cau", (h.match(/onclick="tkOpen\(/g)||[]).length>=yc.length);
-  t("bang hai chieu khai them kenh vao thu ba", h.indexOf("Yêu cầu &amp; câu hỏi")>=0||h.indexOf("Yêu cầu & câu hỏi")>=0);
+  /* V2 15/08 - DOI CAU HOI. Truoc day ba dong `.csway` o dau trang khai ba kenh vao, va muc
+     kiem nay tim chuoi "Yeu cau & cau hoi" trong ba dong ay. Khoi `.csway` da go: cac cau ay
+     nhap vao chinh cau mo ta cua tung tab trong cong tac cach xem, dung mot cho.
+     Dieu can bao ve khong doi: **kenh vao thu ba phai duoc KHAI RA, khong an trong mot tab
+     khong ai bam**. Nen hoi vao thu that su bao dam dieu do - co cong tac mo tab ay, va cau
+     mo ta noi ro no den tu Cong hoc vien. */
+  t("trang gop khai kenh vao thu ba - co cong tac mo tab yeu cau tu hoc vien",
+    h.indexOf("csTabSet('ychv')")>=0);
+  t("cau mo ta cua tab ay noi ro nguon la Cong hoc vien",
+    (function(){var d="";for(var i=0;i<CSVWDEF.length;i++)if(CSVWDEF[i][0]==="ychv")d=CSVWDEF[i][2];
+     return /Cổng học viên/.test(d)})());
   var one=yc[0];
   var card=tkCard(one,"mine");
   t("the goi dung ten loai - KHONG goi la 'Giao viec'", card.indexOf("Học viên liên hệ")>=0);

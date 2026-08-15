@@ -874,13 +874,18 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  /* xoa roi thi moi trang con lai van phai ve duoc */
  var loi=[];Object.keys(RENDER).forEach(function(k){try{if(typeof RENDER[k]()!=="string")loi.push(k)}catch(e){loi.push(k+": "+e.message)}});
  t("moi trang con lai van ve duoc"+(loi.length?(" - hong: "+loi.join(", ")):""), loi.length===0);
- /* duong vao cu khong duoc vo: go('khaosat') phai ve hub CSKH */
+ /* duong vao cu khong duoc vo: go('khaosat') phai ve dung tab Khao sat cua trang gop */
  go("khaosat");
- /* V2 - DOI CAU HOI. Truoc day `khaosat` la mot khoa CHET: no co trong PAGES nhung khong co
-    ham ve, `go('khaosat')` bi doi ten ve hub CSKH. Muc kiem nay canh dung dieu do.
-    Sang V2 `khaosat` LA MOT TRANG THAT (Khao sat & Phan hoi, ve bang `renderReview`). Cau hoi
-    dung bay gio la nguoc lai: bam vao no phai vao DUNG no, khong bi ai keo di dau. */
- t("go('khaosat') vao dung trang Khao sat (khong con bi keo ve hub)", CUR==="khaosat");
+ /* V2 - DOI CAU HOI (lan 2, 15/08). Lich su cua muc kiem nay:
+    · V1: `khaosat` la mot khoa CHET (co trong PAGES, khong co ham ve) - go() doi ten ve hub.
+    · V2 09/08: `khaosat` thanh TRANG THAT - cau hoi lat nguoc: bam vao no phai vao DUNG no.
+    · V2 15/08: anh Luan gop Khao sat + Phan hoi + Khieu nai ve mot trang - `khaosat` tro lai
+      lam mot TAB. Cau hoi lat lan nua, nhung dieu can bao ve thi khong doi mot ly nao suot ba
+      lan: **duong vao cu khong duoc vo**. Hang chuc cho trong app con goi go('khaosat').
+    Nen hoi ca hai ve: ve dung trang gop, VA mo dung tab khao sat - chi hoi ve trang thoi thi
+    lot ca truong hop no do nguoi ta xuong tab Khieu nai. */
+ t("go('khaosat') ve trang gop CSKH va mo dung tab Khao sat",
+   CUR==="cskh"&&window.CSTAB==="khaosat");
  go("banlam");
 })();
 

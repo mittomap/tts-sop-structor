@@ -391,9 +391,23 @@ t("V2 dung MOT muc sang, va la chinh trang dang mo (wow)", (function(){
    tren menu (anh Luan: *"bên sidebar giống như 1 cái bản đồ vậy"*) - luc ay van con hang CHA de
    ma "sang mo". Nay khong con hub, khong con cha: Khao sat la mot trang, no sang cho chinh no.
    Dieu can bao ve van la mot: nguoi dung nhin sidebar phai doc ra minh dang dung o dau. */
-t("V2 Khao sat la trang that, no sang cho chinh no", (function(){
- CUR="khaosat";
- return navInTree("khaosat")&&navCur("khaosat")===true&&navCur("khieunai")===false})());
+/* V2 15/08 - luat nay DOI LAN THU BA, va lan nay doi nguoc lai. Anh Luan gop Khao sat + Phan
+   hoi + Khieu nai ve MOT trang (`cskh`), ba trang con khai `hide:1` va rut khoi menu. Nen cau
+   "Khao sat sang cho chinh no" khong con do duoc gi: no khong con mot muc menu de ma sang.
+   Dieu CAN BAO VE van y nguyen tu dau: **nguoi dung nhin sidebar phai doc ra minh dang dung o
+   dau**. Cau hoi moi hoi dung dieu ay - dung o bat ky tab nao cua trang gop thi muc "CSKH ·
+   Tieng noi hoc vien" phai sang, va chi mot muc ay sang.
+   *Bo kiem canh CAI DICH, khong canh CACH LAM - cach lam doi thi doi cau hoi, dung xoa luat.* */
+t("V2 dung o tab nao cua trang gop CSKH thi muc CSKH sang, va chi no", (function(){
+ var okk=navInTree("cskh")&&!navInTree("khaosat")&&!navInTree("ghinhan")&&!navInTree("khieunai");
+ ["khaosat","phanhoi","khieunai","ychv"].forEach(function(tb){
+  CUR="cskh";window.CSTAB=tb;
+  if(navCur("cskh")!==true)okk=false;
+  if(navCur("buoihoc")===true)okk=false});
+ /* loi cu van phai song: go() dat dung tab roi moi ve trang gop */
+ CUR="viec";window.CSTAB="";go("khieunai");
+ if(!(CUR==="cskh"&&window.CSTAB==="khieunai"&&navCur("cskh")===true))okk=false;
+ return okk})());
 window.HTTAB="today";
 t("V9.19 crumbLabel noi ro tab dang dung", (function(){window.TSTAB="test";
  return crumbLabel("tuyensinh",{}).indexOf("·")>0})());
