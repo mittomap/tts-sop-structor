@@ -211,7 +211,13 @@ def add_feedback(sid, cat, typ, content):
         "student_id": sid, "class_id": ob.get("class_id", ""), "feedback_channel": "direct (Trực tiếp)",
         "feedback_type": typ, "feedback_category": cat, "feedback_score": "4",
         "feedback_content": content, "feedback_status": "resolved (Đã xử lý xong)",
-        "classified_at": F(NOW - dt.timedelta(days=5)), "classified_by": "Học vụ",
+        # V2 15/08 - TRUOC DAY GHI "Hoc vu", tuc mot PHONG BAN chu khong phai mot NGUOI.
+        # Bang "Diem theo chu the > Nhan vien" gom phieu theo nguoi phan loai, nen mot chuoi ten
+        # phong ban de ra mot dong nhan vien khong ton tai, bam vao khong mo duoc ho so ai.
+        # Moi cho khac trong pipeline deu ghi TEN NGUOI (`classified_by=random.choice([...])`),
+        # va chinh app cung ghi `myName()` vao cot nay - mot cho ghi khac kieu la mot cho lech.
+        "classified_at": F(NOW - dt.timedelta(days=5)),
+        "classified_by": ((one("DL01", "staff_id", "NV007") or {}).get("full_name") or "Học vụ"),
         "feedback_action_note": "Đã trao đổi và điều chỉnh.", "action_taken_at": F(NOW - dt.timedelta(days=4)),
         "related_complaint_id": "", "is_testimonial": "", "notes": "", "next_action": "",
         "student_id_name": S.get("full_name"), "class_id_name": ob.get("class_id_name", ""),

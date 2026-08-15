@@ -12265,6 +12265,164 @@ function renderYcHV(){
  L.forEach(function(t){h+=tkCard(t,"mine")});
  h+='</div></div>';
  return h}
+/* ═══ V2 15/08 - ĐIỂM THEO CHỦ THỂ ═════════════════════════════════════════════════════════
+   Anh Luân: *"Mình có khảo sát và phản hồi, tức là về 1 lớp học, 1 buổi học, 1 giảng viên,
+   1 buổi wow, 1 wow coach, 1 vấn đề gì đó, 1 nhân viên nào đó sẽ là điểm bị đánh giá, vậy để
+   xem tổng hợp điểm số của mỗi chủ thể đó, thì có thể xem ở đâu em?"*
+
+   ĐO TRƯỚC KHI TRẢ LỜI, và câu trả lời thật là: **gần như không xem được ở đâu.** Sáu chỗ trong
+   app đọc `satisfaction_score`, cả sáu đều gom theo `class_id`. Theo GIẢNG VIÊN · theo BUỔI ·
+   theo WOW COACH · theo NHÂN VIÊN thì không một màn nào có - hồ sơ giảng viên không mang một
+   điểm hài lòng nào, dù mỗi lớp đều có phiếu và mỗi lớp đều có người phụ trách.
+   Đúng diện LUẬT CỨNG SỐ 0: SOP mô tả (DL15/DL16/DL17/DL14 đều neo được vào những chủ thể ấy)
+   mà app chưa làm - tức là ta sai, không phải ta chưa tới lượt.
+
+   Bảng này KHÔNG đẻ ra điểm mới. Nó gom lại đúng những phiếu đã có, theo bảy trục anh kể.
+   Trục nào SUY RA từ trục khác thì cột "Nguồn" nói thẳng - vì học viên không chấm cho giảng
+   viên, họ chấm cho LỚP; app quy về người phụ trách lớp ấy. Hai chuyện đó khác nhau, và người
+   đọc bảng phải biết mình đang đọc cái nào.
+   *Một con số tổng hợp phải khai ra nó cộng từ đâu, nếu không nó chỉ là lời đồn có định dạng.* */
+/* Gộp hai bộ từ vựng: DL16 phân loại phản hồi, DL17 phân loại khiếu nại - hai sổ gọi tên khác
+   nhau cho cùng một chuyện ("teacher_quality" và "teacher"). Bảng này chỉ NỐI MÃ, còn nhãn hiện
+   trên màn vẫn lấy nguyên văn từ CH1 qua `elabel` - không tự đặt tên tiếng Việt mới. */
+var CTVANDE={teacher:"teacher_quality"};
+var CTDEF=[
+ ["lop","Lớp học","ti-users-group","học viên chấm thẳng vào lớp - đây là trục DUY NHẤT có điểm do chính người học cho."],
+ ["buoi","Buổi học","ti-calendar-event","phản hồi có neo mã buổi. Chỉ liệt kê buổi đã có người nói tới, không kể buổi im lặng."],
+ ["gv","Giảng viên","ti-chalkboard","suy từ lớp người đó phụ trách và buổi người đó dạy - học viên chấm lớp, app quy về người."],
+ ["wowbuoi","Buổi WOW","ti-star","điểm bốn kỹ năng coach chấm cho từng buổi kèm 1-1, cộng kết quả tiến bộ của buổi đó."],
+ ["wowcoach","WOW coach","ti-user-star","gom mọi buổi WOW của từng coach: số buổi, điểm trung bình, tỷ lệ học viên có tiến bộ."],
+ ["nv","Nhân viên","ti-id-badge","chất lượng chăm sóc: phiếu người ấy phụ trách, phản hồi người ấy phân loại, khiếu nại người ấy xử."],
+ ["vande","Vấn đề","ti-alert-hexagon","gom theo nhóm chuyện học viên kêu - biết trung tâm đang hỏng ở MẢNG nào, không phải ai hỏng."]];
+function CTVW(){var v=window.CTSUB||"lop";
+ for(var i=0;i<CTDEF.length;i++)if(CTDEF[i][0]===v)return v;
+ return "lop"}
+function ctSet(k){window.CTSUB=k;reRender("cskh")}
+function ctTB(a){if(!a.length)return null;var t=0;for(var i=0;i<a.length;i++)t+=a[i];return t/a.length}
+function ctSo(v){return v==null?"-":(Math.round(v*10)/10)}
+/* Gom phiếu về từng chủ thể. Trả về mảng thùng, mỗi thùng mang đủ bốn sổ để phần vẽ tự chọn cột. */
+function ctRows(k){
+ var SV=srows("DL15"),FB=srows("DL16"),KN=srows("DL17"),WO=srows("DL14");
+ var SES={},LOP={};
+ srows("DL11").forEach(function(x){SES[String(x.session_id||"")]=x});
+ srows("DL10").forEach(function(x){LOP[String(x.class_id||"")]=x});
+ var M={},ds=[];
+ /* `phu` = "thuộc về ai / ở đâu". Một mã buổi hay một mã WOW đứng trơ ra thì người đọc phải đi
+    tra mới biết nó của thầy nào - mà cột đó chính là thứ họ cần để hành động. */
+ function B(id,ten,go,phu,arg){id=String(id||"").trim();if(!id)return null;
+  var b=M[id];
+  if(!b){b=M[id]={id:id,ten:ten||id,go:go||"",phu:phu||"",arg:arg||id,sv:[],fb:[],kn:[],wow:[]};ds.push(b)}
+  if(phu&&!b.phu)b.phu=phu;
+  return b}
+ /* Ba cột `assigned_staff` · `classified_by` · `assigned_handler` lưu TÊN NGƯỜI, không lưu mã -
+    và đó là cố ý: chính app ghi `myName()` vào chúng (`knClaim`, `ghSave`, `rvForm`). Nên gom
+    thì gom theo tên, nhưng muốn BẤM MỞ được hồ sơ thì phải tra ngược ra mã.
+    Tra không ra thì vẫn giữ dòng, chỉ bỏ liên kết - xoá dòng đi là giấu mất một người đang gánh
+    việc thật. *Một cái tên không phải một mã, nhưng nó vẫn là một sự thật.* */
+ function nvTheoTen(ten){ten=String(ten||"").trim();if(!ten)return null;
+  var L=srows("DL01");for(var i=0;i<L.length;i++)if(String(L[i].full_name||"").trim()===ten)return L[i];
+  return null}
+ function gvLop(cid){var c=LOP[String(cid||"")];return c?String(c.main_teacher_id||""):""}
+ function tenNV(id){return nsTen(id)||id}
+ function vaiNV(id){var x=find("DL01","staff_id",id);return x?(elabel(x.role)||""):""}
+ if(k==="lop"){
+  SV.forEach(function(v){var b=B(v.class_id,v.class_id_name,"openLop",tenNV(gvLop(v.class_id)));if(b)b.sv.push(v)});
+  FB.forEach(function(f){var b=B(f.class_id,f.class_id_name,"openLop",tenNV(gvLop(f.class_id)));if(b)b.fb.push(f)});
+  KN.forEach(function(c){var b=B(c.class_id,c.class_id_name,"openLop",tenNV(gvLop(c.class_id)));if(b)b.kn.push(c)});
+ }else if(k==="buoi"){
+  FB.forEach(function(f){var x=SES[String(f.session_id||"")];if(!x)return;
+   var b=B(x.session_id,(x.class_id_name||x.class_id)+" · buổi "+(x.session_number||"?"),"",
+    x.teacher_id_name||tenNV(x.teacher_id));
+   if(b){b.fb.push(f);b.ses=x}});
+ }else if(k==="gv"){
+  SV.forEach(function(v){var g=gvLop(v.class_id);var b=B(g,tenNV(g),"openGV",vaiNV(g));if(b)b.sv.push(v)});
+  FB.forEach(function(f){var x=SES[String(f.session_id||"")];
+   var g=(x&&String(x.teacher_id||""))||gvLop(f.class_id);
+   var b=B(g,tenNV(g),"openGV",vaiNV(g));if(b)b.fb.push(f)});
+  /* Khiếu nại chỉ tính vào giảng viên khi NÓ NÓI VỀ GIẢNG VIÊN. Một vụ về học phí xảy ra ở lớp
+     của thầy A không phải lỗi của thầy A - đổ vào bảng của thầy là chấm sai người. */
+  KN.forEach(function(c){if(ecode(c.complaint_type)!=="teacher")return;
+   var g=gvLop(c.class_id);var b=B(g,tenNV(g),"openGV",vaiNV(g));if(b)b.kn.push(c)});
+ }else if(k==="wowbuoi"){
+  WO.forEach(function(w){if(!num(w.wow_overall)&&!num(w.wow_score_fc))return;
+   var b=B(w.wow_id,(w.student_name||w.student_id)+" · "+(elabel(w.wow_skill)||elabel(w.wow_session_type)||"WOW"),"wowMoc",
+    w.staff_name||tenNV(w.staff_id));
+   if(b)b.wow.push(w)});
+ }else if(k==="wowcoach"){
+  WO.forEach(function(w){var b=B(w.staff_id,w.staff_name||tenNV(w.staff_id),"openNSQuick",vaiNV(w.staff_id));if(b)b.wow.push(w)});
+ }else if(k==="nv"){
+  function bNV(ten){var x=nvTheoTen(ten);
+   return B(ten,ten,x?"openNSQuick":"",x?(elabel(x.role)||""):"",x?x.staff_id:"")}
+  SV.forEach(function(v){var b=bNV(v.assigned_staff);if(b)b.sv.push(v)});
+  FB.forEach(function(f){var b=bNV(f.classified_by);if(b)b.fb.push(f)});
+  KN.forEach(function(c){var b=bNV(c.assigned_handler);if(b)b.kn.push(c)});
+ }else if(k==="vande"){
+  FB.forEach(function(f){var c=ecode(f.feedback_category);if(!c)return;
+   var b=B(c,elabel(f.feedback_category)||c,"");if(b)b.fb.push(f)});
+  KN.forEach(function(c){var m=ecode(c.complaint_type);if(!m)return;var kk=CTVANDE[m]||m;
+   var b=B(kk,(M[kk]&&M[kk].ten)||elabel(c.complaint_type)||kk,"");if(b)b.kn.push(c)});
+ }
+ return ds}
+/* Cột tự ẩn khi cả bảng không có gì để đổ vào - cùng khuôn với bảng công giảng dạy: khai một
+   bộ cột chung rồi để dữ liệu quyết định cột nào đứng lại. Bảy trục dùng chung một hàm vẽ,
+   không đẻ bảy cái bảng. */
+function ctColHTML(ds){
+ var thSS=kpiTh(/\bSS\b|hài lòng/i,4);
+ function _sv(b){return b.sv.map(function(v){return num(v.satisfaction_score)}).filter(function(x){return x>0})}
+ function _nps(b){return b.sv.map(function(v){return num(v.nps_score)}).filter(function(x){return x>0})}
+ function _fbd(b){return b.fb.map(function(f){return num(f.feedback_score)}).filter(function(x){return x>0})}
+ function _wo(b){return b.wow.map(function(w){return num(w.wow_overall)}).filter(function(x){return x>0})}
+ function _xau(b){return b.fb.filter(function(f){return isc(f.feedback_type,"negative")}).length}
+ function _mo(b){return b.kn.filter(function(c){return !isc(c.complaint_status,"resolved")}).length}
+ function _tienbo(b){return b.wow.filter(function(w){return /improve|progress|good/.test(ecode(w.wow_outcome))}).length}
+ var COT=[
+  {t:"Chủ thể",co:function(){return true},cls:"",ve:function(b){
+    return b.go?('<a class="lnk" onclick="'+b.go+'(\''+esc(b.arg||b.id)+'\')">'+esc(b.ten)+'</a>')
+               :('<b>'+esc(b.ten)+'</b>')}},
+  {t:"Thuộc về",co:function(b){return b.phu},cls:"",ve:function(b){return b.phu?esc(b.phu):'<span class="mut">-</span>'}},
+  {t:"Khảo sát",co:function(b){return b.sv.length},cls:"phai",ve:function(b){return b.sv.length||'<span class="mut">-</span>'}},
+  {t:"Hài lòng",co:function(b){return _sv(b).length},cls:"phai",ve:function(b){var v=ctTB(_sv(b));
+    if(v==null)return '<span class="mut">-</span>';
+    return '<span class="chip '+(v>=thSS?"green":(v>=thSS-1?"amber":"red"))+'">'+ctSo(v)+'/5</span>'}},
+  {t:"Sẵn sàng giới thiệu",co:function(b){return _nps(b).length},cls:"phai",ve:function(b){var v=ctTB(_nps(b));return v==null?'<span class="mut">-</span>':(ctSo(v)+"/10")}},
+  {t:"Phản hồi",co:function(b){return b.fb.length},cls:"phai",ve:function(b){return b.fb.length||'<span class="mut">-</span>'}},
+  {t:"Tiêu cực",co:function(b){return _xau(b)},cls:"phai",ve:function(b){var n=_xau(b);return n?('<span class="chip red">'+n+'</span>'):'<span class="mut">0</span>'}},
+  {t:"Điểm phản hồi",co:function(b){return _fbd(b).length},cls:"phai",ve:function(b){var v=ctTB(_fbd(b));return v==null?'<span class="mut">-</span>':(ctSo(v)+"/5")}},
+  {t:"Buổi WOW",co:function(b){return b.wow.length},cls:"phai",ve:function(b){return b.wow.length||'<span class="mut">-</span>'}},
+  {t:"Điểm WOW",co:function(b){return _wo(b).length},cls:"phai",ve:function(b){var v=ctTB(_wo(b));return v==null?'<span class="mut">-</span>':(ctSo(v)+"/9")}},
+  {t:"Có tiến bộ",co:function(b){return _tienbo(b)},cls:"phai",ve:function(b){var n=_tienbo(b);return n?(n+"/"+b.wow.length):'<span class="mut">-</span>'}},
+  {t:"Khiếu nại",co:function(b){return b.kn.length},cls:"phai",ve:function(b){return b.kn.length||'<span class="mut">-</span>'}},
+  {t:"Còn mở",co:function(b){return _mo(b)},cls:"phai",ve:function(b){var n=_mo(b);return n?('<span class="chip red">'+n+'</span>'):'<span class="mut">0</span>'}}];
+ return {cot:COT.filter(function(c){return ds.some(function(b){return c.co(b)})}),
+  diem:function(b){var v=ctTB(_sv(b));if(v==null)v=ctTB(_fbd(b));if(v==null){var w=ctTB(_wo(b));v=(w==null?null:w*5/9)}
+   return {d:v,xau:_xau(b),mo:_mo(b)}}}
+}
+function ctCua(k){for(var i=0;i<CTDEF.length;i++)if(CTDEF[i][0]===k)return CTDEF[i];return CTDEF[0]}
+/* Chọn trục KHÔNG dùng lại dải công tắc lớn của trang. Hai dải giống hệt nhau chồng lên nhau thì
+   mắt không đọc ra cái nào là cấp trên: người ta tưởng đây là bảy tab ngang hàng với bốn tab kia.
+   Dải chip là điều khiển CẤP HAI vốn có của app - đúng thứ bậc, và không phải học thêm hình gì. */
+function renderCskhDiem(){
+ var k=CTVW();
+ var so={};CTDEF.forEach(function(V){try{so[V[0]]=ctRows(V[0]).length}catch(e){so[V[0]]=""}});
+ var h=tbar(segHTML(k,CTDEF.map(function(V){return [V[0],V[1],so[V[0]]||"",""]}),"ctSet('{k}')"),"");
+ var CUA=ctCua(k);
+ var ds=ctRows(k);
+ var C=ctColHTML(ds);
+ /* Xếp KÉM NHẤT LÊN ĐẦU. Bảng chất lượng mà xếp theo mã hay theo tên thì người đọc phải tự dò -
+    mà chỗ cần chữa mới là thứ họ mở bảng này để tìm. */
+ ds.sort(function(a,b){var A=C.diem(a),B=C.diem(b);
+  return (B.mo-A.mo)||(B.xau-A.xau)||((A.d==null?99:A.d)-(B.d==null?99:B.d))});
+ if(!ds.length)return h+'<div class="panel"><div class="pbody"><div class="empty">'+
+  'Chưa có phiếu nào neo vào '+esc(String(CUA[1]).toLowerCase())+
+  ' - khảo sát, phản hồi hoặc buổi WOW phải mang mã của chủ thể thì mới cộng vào đây được.</div></div></div>';
+ var o=h+'<div class="panel"><div class="ph"><b>'+esc(CUA[1])+' ('+ds.length+')</b>'+
+  '<div class="fhint">'+esc(CUA[3])+' Kém nhất xếp lên đầu: còn khiếu nại mở, rồi phản hồi tiêu cực, rồi điểm hài lòng thấp.</div></div>'+
+  '<div class="tbwrap"><table class="dt"><thead><tr>'+
+  C.cot.map(function(c){return '<th'+(c.cls?(' class="'+c.cls+'"'):'')+'>'+esc(c.t)+'</th>'}).join("")+
+  '</tr></thead><tbody>';
+ ds.forEach(function(b){o+='<tr>'+C.cot.map(function(c){
+  return '<td'+(c.cls?(' class="'+c.cls+'"'):'')+'>'+c.ve(b)+'</td>'}).join("")+'</tr>'});
+ return o+'</tbody></table></div></div>'}
 /* ═══ V2 15/08 - BẢN KHAI CÁCH XEM CỦA TRANG GỘP ═════════════════════════════════════════════
    Bốn tab là bốn KÊNH của cùng một việc: nghe học viên. Câu mô tả nói luôn CHIỀU ĐI, nên ba
    dòng `.csway` cũ (mỗi dòng một mũi tên TT→HV / HV→TT) không còn lý do tồn tại - chúng nói
@@ -12278,7 +12436,13 @@ var CSVWDEF=[
  ["khaosat","Khảo sát","trung tâm chủ động đo (trung tâm → HV): phiếu định kỳ theo tuần học; xem lớp nào chưa gửi, lớp nào trả lời kém.","khaosat","ti-clipboard-text"],
  ["phanhoi","Phản hồi & Góp ý","học viên tự nói (HV → trung tâm): gửi từ Cổng học viên, hoặc nhân viên ghi hộ khi nhận qua gọi / nhắn / gặp trực tiếp; phân loại trong hạn rồi theo tới khi đóng.","ghinhan","ti-message-plus"],
  ["khieunai","Khiếu nại","phản hồi đã thành vụ (HV → trung tâm): cử người xử lý, hạn tính theo mức độ, chỉ đóng khi học viên chấp nhận cách giải quyết.","khieunai","ti-alert-triangle"],
- ["ychv","Yêu cầu từ học viên","câu hỏi và đề nghị gửi từ Cổng học viên (HV → trung tâm): app chuyển thẳng tới học vụ, hoặc kế toán nếu là chuyện tiền, kèm hạn nhận việc.","ychv","ti-school"]];
+ ["ychv","Yêu cầu từ học viên","câu hỏi và đề nghị gửi từ Cổng học viên (HV → trung tâm): app chuyển thẳng tới học vụ, hoặc kế toán nếu là chuyện tiền, kèm hạn nhận việc.","ychv","ti-school"],
+ /* Tab thứ năm ĐỌC ngược ba sổ trên: cùng những phiếu ấy, gom theo CHỦ THỂ BỊ CHẤM thay vì
+    theo phiếu. Nó thuộc về đây chứ không đứng riêng một trang, vì nó cộng cả ba sổ - tách ra
+    là lại đẻ thêm một cửa nữa cho cùng một nhóm dữ liệu, đúng cái vừa dọn xong.
+    Khoá quyền là `khaosat`: điểm hài lòng lấy chủ yếu từ DL15, ai không được xem sổ ấy thì
+    cũng không được xem bản tổng hợp của nó. */
+ ["diem","Điểm theo chủ thể","cùng ba sổ trên, đọc theo chiều ngược: ai và cái gì đang bị chấm - lớp, buổi, giảng viên, buổi WOW, WOW coach, nhân viên, và nhóm vấn đề.","khaosat","ti-chart-histogram"]];
 function CSVW(){var v=window.CSTAB||"khaosat",L=CSVWDEF.filter(vwCo);
  for(var i=0;i<L.length;i++)if(L[i][0]===v)return v;
  return (L[0]||CSVWDEF[0])[0]}
@@ -12295,6 +12459,7 @@ function renderCskh(){
  if(tab==="khaosat")h+=renderReview(1);
  else if(tab==="phanhoi")h+=renderGhinhan(1);
  else if(tab==="ychv")h+=renderYcHV();
+ else if(tab==="diem")h+=renderCskhDiem();
  else h+=renderKhieunai(1);
  return h}
 function renderReview(embed){var p="review",fil=fget(p);

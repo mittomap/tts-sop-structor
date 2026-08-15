@@ -787,18 +787,57 @@ d.setdefault("enums", {})["enum_installment_status"] = [
 _fc = d["enums"].setdefault("enum_feedback_channel", [])
 if not any(str(x).startswith("app ") for x in _fc):
     _fc.insert(0, "app (Cổng học viên)")
+# ── V2 15/08 - CỘT NÀY TỪNG ĐƯỢC MỞ RA RỒI BỎ TRỐNG 29/29 ────────────────────────────────
+# Anh Luân hỏi: *"1 lớp học, 1 buổi học, 1 giảng viên, 1 buổi wow, 1 wow coach... để xem tổng
+# hợp điểm số của mỗi chủ thể đó, thì có thể xem ở đâu"*. Đo ra: khảo sát và phản hồi đều neo
+# được vào LỚP, nhưng **không dòng nào neo vào BUỔI** - cột `session_id` mở từ hồi làm Cổng học
+# viên mà chưa lần nào có dữ liệu. Một cột trống 100% thì màn hình đọc nó ra bảng rỗng, và
+# người xem kết luận là app hỏng chứ không kết luận là dữ liệu demo thiếu.
+# *Mở một cột mà không gieo dữ liệu vào thì tính năng đọc cột ấy chết ngay lúc sinh ra.*
+#
+# Neo theo LUẬT ĐỌC ĐƯỢC, không gieo bừa: phản hồi nói về chuyện xảy ra TRONG buổi (chất lượng
+# giảng dạy · nội dung học · giờ giấc) thì gắn vào buổi GẦN NHẤT của đúng lớp ấy, tính tới thời
+# điểm học viên phản hồi. Phản hồi về cơ sở vật chất và thái độ phục vụ thì KHÔNG gắn - chúng
+# không thuộc về một buổi nào, gắn vào là đổ oan cho buổi đó.
+# Hoàn toàn tất định (không bốc thăm, không đọc giờ chạy) nên `check_taolai` dựng hai lần vẫn
+# ra một bộ.
+_BUOI_CAT = ("teacher_quality", "curriculum", "schedule")
+_ss_theo_lop = {}
+for s in R("DL11"):
+    _ss_theo_lop.setdefault(str(s.get("class_id") or ""), []).append(s)
+for _v in _ss_theo_lop.values():
+    _v.sort(key=lambda s: (dt(s.get("session_date")) or datetime.datetime(1900, 1, 1),
+                           str(s.get("session_id") or "")))
 c14c = 0
+_gan = 0
 for f in R("DL16"):
     if "session_id" not in f:
         f["session_id"] = ""
         c14c += 1
+    if str(f.get("session_id") or "").strip():
+        continue
+    if code(f.get("feedback_category")) not in _BUOI_CAT:
+        continue
+    _mocf = dt(f.get("feedback_time"))
+    _ds = _ss_theo_lop.get(str(f.get("class_id") or ""), [])
+    _chon = None
+    for s in _ds:
+        _d = dt(s.get("session_date"))
+        if not _d or (_mocf and _d > _mocf):
+            continue
+        if code(s.get("session_status")) not in ("completed", "done", ""):
+            continue
+        _chon = s
+    if _chon:
+        f["session_id"] = _chon.get("session_id") or ""
+        _gan += 1
 _lk = 0
 for b in R("DL20"):
     if not str(b.get("file_link") or "").strip():
         b["file_link"] = "https://drive.google.com/itts/baitap/%s" % str(b.get("hw_bank_id") or "").lower()
         _lk += 1
-log.append("14c. Cổng học viên: thêm enum student_request | mở cột DL16.session_id cho %d dòng | "
-           "gán link tài liệu cho %d bài trong kho" % (c14c, _lk))
+log.append("14c. Cổng học viên: thêm enum student_request | mở cột DL16.session_id cho %d dòng, "
+           "neo %d phản hồi vào đúng buổi học | gán link tài liệu cho %d bài trong kho" % (c14c, _gan, _lk))
 
 # ═══ 14bis. KHỚP DỮ LIỆU VỚI GA NGHIỆP VỤ (28/07 - anh Luân bắt lỗi) ═══════
 # ĐẶT Ở ĐÂY CÓ CHỦ Ý: phải chạy TRƯỚC 14d, vì 14d chia lịch đóng theo đợt dựa trên
