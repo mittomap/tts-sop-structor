@@ -1492,10 +1492,33 @@ table.dt tbody tr.clk.on td{font-weight:600}
    Vạch 1px, không phải dải màu - luật W5 cấm dải viền trang trí.
    Câu bên phải trả lời "đang nhìn cái gì" ngay tại chỗ, thay cho việc bắt người ta bấm thử ba
    cái rồi tự đoán. */
-.viecvw{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:16px 0 12px;padding-top:14px;border-top:1px solid var(--line)}
-.viecvwc{flex:1 1 220px;min-width:0;color:var(--muted);font-size:12px;line-height:1.5}
+/* ═══ V2 14/08 lượt 2 (anh Luân: *"Theo chặng, theo người, theo việc quan trọng như vậy mà e
+   thì thiết kế chìm nghỉm"*) ════════════════════════════════════════════════════════════════
+   Đúng. Bản trước em mặc cho nó bộ đồ của chip SẮP XẾP - nền chìm, chữ 12.5px mờ, cái đang chọn
+   là một thẻ trắng nhỏ. Thứ ấy hợp với "đổi thứ tự danh sách", nhưng đây là công tắc ĐỔI CẢ VÙNG
+   LÀM VIỆC: bấm một cái là toàn bộ nửa dưới trang thành một màn khác. Một quyết định lớn cỡ đó
+   mà mặc áo của một tuỳ chọn nhỏ thì mắt lướt qua không dừng lại.
+   App đã có hai hình mang hai nghĩa (viên tròn = LỌC · góc vuông = HÀNH ĐỘNG). Cách xem là loại
+   thứ BA, nên nó lấy hình thứ ba: **THANH TAB có gạch chân** - hình mà ai cũng đọc ra là "đây là
+   những màn song song, đang đứng ở màn này". Không mua thêm màu (bảng màu đã chạm trần 110 mã),
+   không mua thêm cỡ chữ - chỉ dùng ĐỘ ĐẬM, GẠCH CHÂN và KHOẢNG TRỐNG.
+   Gạch chân 2px dưới tab đang chọn KHÔNG phạm luật W5: luật ấy cấm dải viền màu TRANG TRÍ ở mép
+   trái, còn gạch này mang đúng một tin không thứ gì khác nói thay - "bạn đang ở đây". */
+.viecvw{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;margin:18px 0 14px;
+ border-bottom:1px solid var(--line)}
+.viectab{display:flex;gap:2px;flex:none;margin-bottom:-1px}
+.viectb{border:0;background:transparent;font-family:inherit;font-size:13px;font-weight:700;
+ color:var(--muted);padding:9px 14px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+ white-space:nowrap;border-bottom:2px solid transparent;transition:.12s}
+.viectb:hover{color:var(--navy);background:var(--bg);border-radius:8px 8px 0 0}
+.viectb.on{color:var(--navy);border-bottom-color:var(--navy)}
+.viectb i.ti{font-size:15px;opacity:.85}
+.viectb .segn{font-style:normal;font-size:11.5px;font-weight:800;background:var(--bg);color:var(--muted);
+ border-radius:20px;padding:1px 7px;min-width:17px;text-align:center}
+.viectb.on .segn{background:rgba(30,42,56,.09);color:var(--navy)}
+.viecvwc{flex:1 1 220px;min-width:0;color:var(--muted);font-size:12px;line-height:1.5;padding-bottom:9px}
 .viecvwc b{color:var(--navy);font-weight:700}
-@media(max-width:700px){.viecvw{gap:8px}.viecvwc{flex-basis:100%}}
+@media(max-width:700px){.viecvw{gap:8px}.viecvwc{flex-basis:100%}.viectb{padding:9px 10px 10px}}
 .segb.zero{opacity:.45}
 .segb.zero:hover,.segb.zero.on{opacity:1}
 /* V9.47: nút mở/thu dải chip dài - phải KHÁC hẳn các chip lọc để mắt không nhầm nó là một nhóm */
@@ -2050,6 +2073,14 @@ table.dt tbody tr.clk.on td{font-weight:600}
    xin phần của ai. Hẹp hơn nhưng đọc được - *thẳng thớm là thứ mắt đọc, không phải số cột.* */
 .bl2c .cbwrap{grid-template-columns:1fr}
 .bl2c .cbo.rong{grid-column:auto}
+/* ═══ (anh Luân: *"thiết kế nhịp thì thiếu đồng bộ, cứ thò ra thụt vào"*) ═══════════════════
+   Nhịp ngày có BA khối (Đầu ngày · Trong ngày · Cuối ngày) trong một lưới `auto-fit` hai cột,
+   nên khối thứ ba luôn đứng một mình chiếm nửa hàng còn nửa kia bỏ trống; hai khối hàng trên thì
+   cao thấp khác nhau vì số mục khác nhau. Nhìn ra đúng chữ anh dùng: thò ra thụt vào.
+   Đứng cạnh "Cần chú ý" (đã xếp một cột từ lượt trước) thì nhịp cũng phải một cột - hai tấm cùng
+   một nhịp đọc, mọi tiêu đề khối thẳng đúng một mép, không khối nào mồ côi nửa hàng.
+   *Hai tấm đứng cạnh nhau thì phải cùng một cách xếp, không thì mắt phải học hai lần.* */
+.bl2c .nhipg{grid-template-columns:1fr}
 /* V2 08/08 - lưới thẻ của trang Tra cứu. Không dải viền màu trang trí (luật W5): mỗi thẻ chỉ
    có viền mảnh như mọi ô khác trong app, phân biệt bằng icon và con số chứ không bằng màu. */
 .bwctx{font-size:11.5px;color:#5A6675;line-height:1.6;margin-top:6px;max-width:640px}
@@ -4904,7 +4935,12 @@ var THEDEF={
   ["ban_gap","Có việc gấp","Trong số hồ sơ còn việc, đếm riêng những hồ sơ có ít nhất một việc mức ĐỎ - làm trước. Danh sách: bảng dưới xếp hồ sơ có việc gấp lên đầu."],
   ["ban_sach","Đang sạch việc","Hồ sơ trong phạm vi của bạn, không còn việc nào chờ xử lý. Danh sách: bảng dưới chỉ liệt kê hồ sơ còn việc, nên phần còn lại chính là nhóm này."]]},
  /* V2 13/08 - hai thẻ "vc_red"/"vc_amber" đã bỏ (trùng nguyên hai chip ở thanh Mức độ). */
- viec:{t:"Việc hôm nay",the:[
+ /* `ttl` - NHÃN CỦA DẢI. Hai thẻ này đứng ngay dưới dải Bảng quản lý mà không câu nào nói chúng
+    đo gì, nên người đọc gặp hai con số trơ trọi. Và nó còn giải một việc khác: nút "Thẻ (n/N)"
+    của dải phải đứng đâu đó - không có nhãn thì nó chiếm nguyên một hàng chỉ để đứng canh phải
+    (đúng chỗ anh Luân kêu). Có nhãn thì hàng ấy thành [nhãn] ....... [nút], một hàng có nội dung.
+    *Một hàng chỉ để đựng cái nút là hàng rỗng; thêm cho nó một câu thật là hàng ấy đáng tồn tại.* */
+ viec:{t:"Việc hôm nay",ttl:"Toàn bộ việc đang nợ theo luật SLA",the:[
   ["vc_old","Nợ quá N ngày","Trong số việc quá hạn, đếm riêng những việc đã để mốc quá số ngày khai ở Ngưỡng & SLA (viecOldAlert_days). Nợ càng lâu càng khó cứu. Danh sách: bấm chip 'Quá hạn' ở thanh Mức độ rồi nhìn phần ghi số ngày trễ của từng dòng."],
   ["vc_team","Quá hạn nhiều nhất","Bộ phận đang ôm nhiều việc QUÁ HẠN nhất (xếp theo quá hạn chứ không theo tổng việc) - hôm nay nên dồn người sang đó. Danh sách: chọn đúng bộ phận đó ở thanh Bộ phận ngay dưới."]]},
  /* `neo` khác "bstats": dải này nằm CÙNG TRANG với dải thẻ của trang (Trang bắt đầu có cả hai).
@@ -8298,10 +8334,12 @@ function viecTeam(t){window.VIECTEAM=t;window.VIECGRP="all";reRender("viec")}
    phạm vi từ V9.99p vì đo ra "0 thẻ, 0 dòng" - biến chúng thành hai cái công tắc luôn hiện là
    trả lại đúng hai màn trắng ấy cho họ, chỉ khác chỗ đứng.
    *Gộp trang thì phải mang theo cả bản khai quyền của từng trang, không chỉ mang phần dựng.* */
+/* Cột 5 là ICON - tab có hình thì mắt bắt được nhanh hơn đọc chữ, và ba cách xem này khác nhau
+   đủ rõ để mỗi cái có một hình riêng: danh sách việc · từng người · bản đồ chặng. */
 var VIECVWDEF=[
- ["viec","Theo việc","mọi việc đang nợ theo luật SLA, gom theo độ gấp - làm từ trên xuống là hết ngày.",""],
- ["nguoi","Theo người","từng hồ sơ trên hành trình khách. Bấm một người, app dắt qua đúng chặng người đó đang đứng.","banlam"],
- ["chang","Theo chặng","cùng ngần ấy hồ sơ nhưng xếp thành bản đồ chặng - để nhìn ra chỗ đang tắc, không phải để làm từng việc.","hanhtrinh"]];
+ ["viec","Theo việc","mọi việc đang nợ theo luật SLA, gom theo độ gấp - làm từ trên xuống là hết ngày.","","ti-checklist"],
+ ["nguoi","Theo người","từng hồ sơ trên hành trình khách. Bấm một người, app dắt qua đúng chặng người đó đang đứng.","banlam","ti-user-search"],
+ ["chang","Theo chặng","cùng ngần ấy hồ sơ nhưng xếp thành bản đồ chặng - để nhìn ra chỗ đang tắc, không phải để làm từng việc.","hanhtrinh","ti-route"]];
 function viecVWCo(V){if(!V[3])return true;try{return canSee(V[3])}catch(e){return true}}
 function viecVWList(){return VIECVWDEF.filter(viecVWCo)}
 function VIECVW(){var v=window.VIECVIEW||"viec",L=viecVWList();
@@ -8316,16 +8354,16 @@ function viecVWSet(k){window.VIECVIEW=k;reRender("viec")}
 function viecCongTac(soViec){
  var vw=VIECVW(),L=viecVWList(),cur=L[0]||VIECVWDEF[0],so={viec:soViec,nguoi:"",chang:""};
  try{so.nguoi=jAll().filter(function(J){return J.act}).length}catch(e){so.nguoi=""}
- var opts=L.map(function(V){if(V[0]===vw)cur=V;return [V[0],V[1],so[V[0]],""]});
- /* Nút chọn thẻ chỉ có nghĩa ở cách xem "Theo việc" - dải thẻ SLA nằm trong đúng cách xem ấy. */
- var _nut="";if(vw==="viec"){try{_nut=theNutHTML("viec")}catch(e){_nut=""}}
+ var _tabs=L.map(function(V){if(V[0]===vw)cur=V;
+  return '<button class="viectb'+(V[0]===vw?" on":"")+'" role="tab" aria-selected="'+(V[0]===vw?"true":"false")+
+   '" onclick="viecVWSet(\''+V[0]+'\')"><i class="ti '+V[4]+'"></i>'+esc(V[1])+
+   (so[V[0]]!==""&&so[V[0]]!=null?('<i class="segn">'+so[V[0]]+'</i>'):'')+'</button>'}).join("");
  /* Chỉ còn một cách xem thì KHÔNG vẽ công tắc: một cái công tắc có đúng một nấc là một câu hỏi
     không có câu trả lời nào khác - nó chỉ tốn một hàng và mời người ta bấm vào chỗ không đi đâu.
     Câu "đang nhìn cái gì" thì vẫn giữ, vì nó vẫn nói được một điều thật. */
  return '<div class="viecvw" data-tour="viecvw">'+
-  (opts.length>1?segHTML(vw,opts,"viecVWSet('{k}')","viec_cachxem","segsx"):"")+
-  '<div class="viecvwc">Đang xem <b>'+esc(cur[1])+'</b> - '+esc(cur[2])+'</div>'+
-  (_nut?('<div class="sechdn">'+_nut+'</div>'):'')+'</div>'}
+  (L.length>1?('<div class="viectab" role="tablist">'+_tabs+'</div>'):"")+
+  '<div class="viecvwc">Đang xem <b>'+esc(cur[1])+'</b> - '+esc(cur[2])+'</div></div>'}
 function renderViec(){var items=bellItems();
  var team=window.VIECTEAM||"all",grp=window.VIECGRP||"all";
  var sev=window.VIECSEV||(window.VIECOD?"red":"");   /* V9.29: MỘT biến cho mức độ; VIECOD là lối tắt cũ của "chỉ quá hạn" */
@@ -8402,7 +8440,6 @@ function renderViec(){var items=bellItems();
  /* Cùng lý do với `bvStrip`: nút "Thẻ (2/2)" của dải này vốn chiếm nguyên một hàng rỗng ngay
     dưới công tắc. Hàng công tắc còn thừa chỗ ở mép phải, mà nút thì điều khiển đúng dải nằm ngay
     dưới công tắc - cho hai thứ về một hàng. */
- window.THEROI=window.THEROI||{};window.THEROI.viec=1;
  _the=statStrip([
   /* ═══ V9.57 (anh Luân): "thẻ phải đại diện cho 1 vấn đề quan trọng, xem nhanh và NGÀY NÀO CŨNG
      PHẢI XEM". Hai thẻ cũ ở đây trượt cả hai vế:
@@ -8448,13 +8485,23 @@ function renderViec(){var items=bellItems();
     dưới công tắc là hết cảnh thẻ-panel-thẻ, đầu trang còn đúng MỘT dải thẻ, mà hai thẻ kia lại
     về đúng chỗ nói được điều của nó.
     *Một thứ đặt sai chỗ thì dù đẹp cỡ nào cũng làm hỏng nhịp đọc của cả trang.* */
+ /* ═══ V2 14/08 lượt 2 (anh Luân: *"Nhịp ngày thì chăng giữa 2 hàng thẻ"*) ═══════════════════
+    Đúng, và đó là lỗi của chính bản vá trước: sáng nay em dời hai thẻ SLA XUỐNG dưới công tắc vì
+    lý do NGHĨA (chúng đo đúng thứ mà cách xem "Theo việc" nói). Lý do ấy không sai, nhưng hậu quả
+    về HÌNH thì nặng hơn cái nó chữa: trang đọc thành *dải thẻ → hai tấm → dải thẻ*, và tấm Nhịp
+    ngày nằm kẹp giữa hai hàng thẻ như bị nhét vào.
+    Nay hai thẻ ấy đứng NGAY SAU dải Bảng quản lý - hai dải thẻ liền nhau đọc như một khối số, rồi
+    mới tới hai tấm tóm tắt, rồi tới công tắc. Và xét lại thì đúng hơn cả về nghĩa: "nợ quá N
+    ngày" với "mảng việc quá hạn nhiều nhất" đo TOÀN BỘ việc SLA, không riêng cách xem nào - dời
+    xuống là em suy diễn quá tay.
+    *Một khối đặt đúng nghĩa mà làm gãy nhịp đọc của trang thì nó vẫn đang đặt sai.* */
+ h+=_the;
  h+=(_nhip?('<div class="bl2c">'+_cbao+_nhip+'</div>'):_cbao);
  h+=viecCongTac(items.length);
  /* Hai cách xem kia là THÂN của hai trang cũ, gọi ở chế độ nhúng (bỏ đầu trang riêng của
     chúng). Không chép lại một dòng dựng nào: trang cũ sửa gì thì ở đây hưởng nấy. */
  if(VIECVW()==="nguoi")return h+renderBanlam(1);
  if(VIECVW()==="chang")return h+renderHanhtrinh(1);
- h+=_the;
  /* KHÔNG gọi `bangViecHTML()` ở đây. Bảng việc theo chức danh tự lên trang này ngay khi trang
     đáp đổi sang `viec`: `pageHead` đã gọi `bvSau()` -> `bangViecHTML()`, mà hàm ấy tự im ở mọi
     trang KHÔNG phải trang đáp (`if(CUR!==dap)return ""`). Em gọi thêm một lần nữa nên bảng in
