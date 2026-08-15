@@ -311,7 +311,7 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 42 BỘ KIỂM (thêm `_checkcau` 15/08). Bản dựng đang chạy:
+> **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 15/08). Bản dựng đang chạy:
 > `33ad75` (15/08), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
 > Mốc cũ: `a6046c`, `882082`, `868f3f`, `a1bda4`, `519e91`, `dc6eb3`, `3f0446`, `39083f`.
