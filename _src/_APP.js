@@ -9486,6 +9486,91 @@ function ctColHTML(ds){
    return {d:v,xau:_xau(b),mo:_mo(b)}}}
 }
 function ctCua(k){for(var i=0;i<CTDEF.length;i++)if(CTDEF[i][0]===k)return CTDEF[i];return CTDEF[0]}
+/* ═══ V2 15/08 - MỞ RA ĐỌC NGUYÊN VĂN, KHÔNG CHỈ NHÌN SỐ ═════════════════════════════════════
+   Anh Luân: *"cái cửa điểm theo chủ thể, điểm thì có rồi, nhưng muốn xem mấy cái nội dung thì
+   xem thế nào?"*
+
+   Đúng chỗ em làm hụt. Bảng trả lời được câu "ai đang kém", nhưng người mở bảng bao giờ cũng
+   hỏi tiếp **"kém vì cái gì"** - mà câu ấy chỉ nằm trong phần CHỮ học viên viết ra: lời khen,
+   lời chê, đề nghị, nội dung phản hồi, cách đã giải quyết. Bản đầu chỉ có một lối bấm, mà lối
+   ấy mở hồ sơ người/lớp - tức là dắt sang một câu chuyện khác, chưa trả lời câu vừa hỏi.
+   Nay một dòng có HAI lối, và hai lối nói hai chuyện khác nhau nên không lẫn được:
+   bấm CÁI TÊN -> hồ sơ chủ thể · bấm CHỖ CÒN LẠI -> đúng chồng phiếu đã cộng nên con số đó.
+   Mỗi phiếu vẫn có nút mở bản đầy đủ - ngăn kéo này không dựng lại bốn màn chi tiết đã có
+   (`svXem` · `fbXem` · `openComplaint` · `wowMoc`), nó chỉ xếp chúng cạnh nhau kèm nguyên văn.
+   *Một con số không tự giải thích được nó; chỉ có cái chữ nằm dưới nó mới giải thích được.* */
+/* Khoá chủ thể của trục "Nhân viên" là TÊN NGƯỜI chứ không phải mã (ba cột ấy lưu tên - xem ghi
+   chú ở `ctRows`), nên nó có dấu và có dấu cách. Bọc qua `encodeURIComponent` rồi ép nốt dấu
+   nháy đơn: chuỗi đi vào một thuộc tính HTML rồi mới thành đối số hàm, hai lớp thoát khác nhau. */
+function ctArg(s){return encodeURIComponent(String(s||"")).split("'").join("%27")}
+function ctKhoi(nhan,n){return n?('<div class="sechd">'+esc(nhan)+' ('+n+')</div><div class="obcards rows">'):''}
+function ctThe(ten,meta,chip,nut){
+ return '<div class="obcard"><div class="obh"><div><b>'+ten+'</b><div class="obm">'+meta+'</div></div>'+
+  (chip||'')+'</div>'}
+function ctXem(arg){
+ var p=String(arg||""),i=p.indexOf("|");if(i<0)return;
+ var k=p.slice(0,i),id=decodeURIComponent(p.slice(i+1));
+ var ds=ctRows(k),b=null;
+ for(var j=0;j<ds.length;j++)if(ds[j].id===id){b=ds[j];break}
+ if(!b){toast("Không thấy chủ thể này trong bảng.");return}
+ var CUA=ctCua(k),thSS=kpiTh(/\bSS\b|hài lòng/i,4);
+ var _sv=b.sv.map(function(v){return num(v.satisfaction_score)}).filter(function(x){return x>0});
+ var tb=_sv.length?(_sv.reduce(function(a,c){return a+c},0)/_sv.length):null;
+ var h='<div class="dcard"><h4><i class="ti '+CUA[2]+'"></i>'+esc(b.ten)+'</h4>';
+ h+=ctxRows([[CUA[1],esc(b.ten)+(b.phu?(' <span class="mut">· '+esc(b.phu)+'</span>'):'')],
+  ["Điểm hài lòng trung bình",tb==null?"chưa có phiếu chấm":
+    ('<span class="chip '+(tb>=thSS?"green":(tb>=thSS-1?"amber":"red"))+'">'+ctSo(tb)+'/5</span> trên '+_sv.length+' phiếu')],
+  ["Đang có",[b.sv.length?(b.sv.length+" phiếu khảo sát"):"",b.fb.length?(b.fb.length+" phản hồi"):"",
+    b.kn.length?(b.kn.length+" khiếu nại"):"",b.wow.length?(b.wow.length+" buổi WOW"):""]
+    .filter(function(x){return x}).join(" · ")||"chưa có gì"]]);
+ /* Ưu tiên đọc: chê trước khen. Người mở ngăn kéo này đang đi tìm chỗ hỏng. */
+ if(b.kn.length){h+=ctKhoi("Khiếu nại",b.kn.length);
+  b.kn.forEach(function(c){var sev=ecode(c.complaint_severity),mo=!isc(c.complaint_status,"resolved");
+   h+=ctThe(esc(c.student_id_name||c.student_id),
+    esc(elabel(c.complaint_type)||"")+' · '+esc(c.complaint_time||"")+(c.class_id_name?(' · '+esc(c.class_id_name)):''),
+    '<span class="chip '+(mo?"red":"green")+'">'+esc(elabel(c.complaint_status)||"")+'</span>');
+   h+=ctxContent("Học viên khiếu nại",c.complaint_content,sev==="high"?"var(--red)":"var(--navy)");
+   if(String(c.resolution_note||"").trim())h+=ctxContent("Đã giải quyết thế nào",c.resolution_note,"var(--green)");
+   h+='<div class="obact"><button class="btn sm" onclick="openComplaint(\''+esc(c.complaint_id)+'\')"><i class="ti ti-external-link"></i>Mở khiếu nại</button></div></div>'});
+  h+='</div>'}
+ if(b.fb.length){h+=ctKhoi("Phản hồi & Góp ý",b.fb.length);
+  b.fb.forEach(function(f){var lo=ecode(f.feedback_type);
+   h+=ctThe(esc(f.student_id_name||f.student_id||"(chưa gắn học viên)"),
+    esc(elabel(f.feedback_category)||"")+' · '+esc(f.feedback_time||"")+(num(f.feedback_score)?(' · '+esc(f.feedback_score)+'/5'):''),
+    '<span class="chip '+(lo==="negative"?"red":(lo==="positive"?"green":"gray"))+'">'+esc(elabel(f.feedback_type)||"-")+'</span>');
+   h+=ctxContent("Nội dung phản hồi",f.feedback_content,lo==="negative"?"var(--red)":"var(--navy)");
+   if(String(f.feedback_action_note||"").trim())h+=ctxContent("Đã xử lý thế nào",f.feedback_action_note,"var(--green)");
+   h+='<div class="obact"><button class="btn sm" onclick="fbXem(\''+esc(f.feedback_id)+'\')"><i class="ti ti-external-link"></i>Mở phản hồi</button></div></div>'});
+  h+='</div>'}
+ if(b.sv.length){h+=ctKhoi("Phiếu khảo sát",b.sv.length);
+  /* Phiếu chê xếp lên trước phiếu khen - cùng lý do với thứ tự khối ở trên. */
+  b.sv.slice().sort(function(x,y){return (num(x.satisfaction_score)||99)-(num(y.satisfaction_score)||99)})
+   .forEach(function(v){var d=num(v.satisfaction_score),tl=String(v.submitted_date||"").trim();
+   h+=ctThe(esc(v.student_name||v.student_id),
+    esc(elabel(v.survey_type)||"")+' · '+esc(tl||("gửi "+(v.sent_date||"")))+(v.class_id_name?(' · '+esc(v.class_id_name)):''),
+    d?('<span class="chip '+(d>=thSS?"green":(d>=thSS-1?"amber":"red"))+'">'+esc(v.satisfaction_score)+'/5</span>')
+     :'<span class="chip gray">chưa trả lời</span>');
+   if(String(v.negative_comments||"").trim())h+=ctxContent("Học viên chê",v.negative_comments,"var(--red)");
+   if(String(v.suggestions||"").trim())h+=ctxContent("Học viên đề xuất",v.suggestions,"var(--amber)");
+   if(String(v.positive_comments||"").trim())h+=ctxContent("Học viên khen",v.positive_comments,"var(--green)");
+   if(!tl)h+='<div class="obm2 mut">Phiếu chưa có trả lời nên không tính vào điểm trung bình.</div>';
+   h+='<div class="obact"><button class="btn sm" onclick="svXem(\''+esc(v.survey_id)+'\')"><i class="ti ti-external-link"></i>Mở phiếu</button></div></div>'});
+  h+='</div>'}
+ if(b.wow.length){h+=ctKhoi("Buổi WOW 1-1",b.wow.length);
+  b.wow.forEach(function(w){var kq=ecode(w.wow_outcome);
+   var diem=[["FC",w.wow_score_fc],["LR",w.wow_score_lr],["GRA",w.wow_score_gra],["PR",w.wow_score_pr]]
+    .filter(function(x){return num(x[1])}).map(function(x){return x[0]+" "+x[1]}).join(" · ");
+   h+=ctThe(esc(w.student_name||w.student_id),
+    esc(elabel(w.wow_skill)||elabel(w.wow_session_type)||"")+' · '+esc(w.wow_session_date||"")+(diem?(' · '+esc(diem)):''),
+    num(w.wow_overall)?('<span class="chip '+(/improve|progress|good/.test(kq)?"green":"amber")+'">'+esc(w.wow_overall)+'/9</span>'):'');
+   if(String(w.wow_content_note||"").trim())h+=ctxContent("Coach ghi lại buổi kèm",w.wow_content_note,"var(--navy)");
+   if(kq)h+='<div class="obm2">Kết quả buổi: <b>'+esc(elabel(w.wow_outcome)||kq)+'</b></div>';
+   h+='<div class="obact"><button class="btn sm" onclick="wowMoc(\''+esc(w.wow_id)+'\')"><i class="ti ti-external-link"></i>Mở buổi WOW</button></div></div>'});
+  h+='</div>'}
+ if(!b.kn.length&&!b.fb.length&&!b.sv.length&&!b.wow.length)
+  h+='<div class="empty">Chủ thể này chưa có phiếu nào có nội dung để đọc.</div>';
+ h+='</div>';
+ openDrawer(CUA[1]+" · "+(b.ten||""),h)}
 /* Chọn trục KHÔNG dùng lại dải công tắc lớn của trang. Hai dải giống hệt nhau chồng lên nhau thì
    mắt không đọc ra cái nào là cấp trên: người ta tưởng đây là bảy tab ngang hàng với bốn tab kia.
    Dải chip là điều khiển CẤP HAI vốn có của app - đúng thứ bậc, và không phải học thêm hình gì. */
@@ -9504,11 +9589,12 @@ function renderCskhDiem(){
   'Chưa có phiếu nào neo vào '+esc(String(CUA[1]).toLowerCase())+
   ' - khảo sát, phản hồi hoặc buổi WOW phải mang mã của chủ thể thì mới cộng vào đây được.</div></div></div>';
  var o=h+'<div class="panel"><div class="ph"><b>'+esc(CUA[1])+' ('+ds.length+')</b>'+
-  '<div class="fhint">'+esc(CUA[3])+' Kém nhất xếp lên đầu: còn khiếu nại mở, rồi phản hồi tiêu cực, rồi điểm hài lòng thấp.</div></div>'+
+  '<div class="fhint">'+esc(CUA[3])+' Kém nhất xếp lên đầu: còn khiếu nại mở, rồi phản hồi tiêu cực, rồi điểm hài lòng thấp. '+
+  'Bấm một dòng để đọc nguyên văn phiếu; bấm cái tên để mở hồ sơ.</div></div>'+
   '<div class="tbwrap"><table class="dt"><thead><tr>'+
   C.cot.map(function(c){return '<th'+(c.cls?(' class="'+c.cls+'"'):'')+'>'+esc(c.t)+'</th>'}).join("")+
   '</tr></thead><tbody>';
- ds.forEach(function(b){o+='<tr>'+C.cot.map(function(c){
+ ds.forEach(function(b){o+='<tr data-mo="ctXem" data-mo-arg="'+esc(k+"|"+ctArg(b.id))+'">'+C.cot.map(function(c){
   return '<td'+(c.cls?(' class="'+c.cls+'"'):'')+'>'+c.ve(b)+'</td>'}).join("")+'</tr>'});
  return o+'</tbody></table></div></div>'}
 /* ═══ V2 15/08 - BẢN KHAI CÁCH XEM CỦA TRANG GỘP ═════════════════════════════════════════════
