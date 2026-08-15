@@ -83,6 +83,45 @@ try:
     print("  moc neo    : %s" % (cap[0].get("meta") or {}).get("anchor"))
     print("  so bang    : %d" % len(cap[0].get("dl", {})))
     if ds:
+        # ── GIU LAI DAU VET (them 15/08) ─────────────────────────────────────────────
+        # Ngay 15/08 bo kiem nay do DUNG MOT LAN trong mot luot verify, roi 10 luot chay
+        # lai deu DAT - ke ca khi ep doi hat bam Python de lo thu tu duyet `set`. Khong
+        # tai hien duoc thi khong sua duoc, va bang chung duy nhat con lai la vai dong
+        # chu bi cat mat trong bang tong ket cua verify.
+        # Nay moi lan do deu VIET RA MOT HO SO: hai ban du lieu day du va phan khac nhau
+        # cua tung bang. Lan sau no do, se co thu de doc thay vi doan lai tu dau.
+        # *Loi hiem thi phai bat duoc dau vet ngay lan dau - lan thu hai co the khong toi.*
+        try:
+            import datetime
+            ho = os.path.join(SD, "_taolai_khac")
+            os.makedirs(ho, exist_ok=True)
+            json.dump(cap[0], open(os.path.join(ho, "luot1.json"), "w", encoding="utf-8"),
+                      ensure_ascii=False, indent=1)
+            json.dump(cap[1], open(os.path.join(ho, "luot2.json"), "w", encoding="utf-8"),
+                      ensure_ascii=False, indent=1)
+            with open(os.path.join(ho, "khac.txt"), "w", encoding="utf-8") as f:
+                f.write("moc neo: %s\n" % (cap[0].get("meta") or {}).get("anchor"))
+                f.write("gio ghi ho so: %s\n\n" % datetime.datetime.now().isoformat(" ")[:19])
+                for t in sorted(set(cap[0].get("dl", {})) | set(cap[1].get("dl", {}))):
+                    x = cap[0].get("dl", {}).get(t)
+                    y = cap[1].get("dl", {}).get(t)
+                    if x == y:
+                        continue
+                    f.write("=== bang %s ===\n" % t)
+                    x = x or []
+                    y = y or []
+                    f.write("  so dong: %d vs %d\n" % (len(x), len(y)))
+                    for i in range(min(len(x), len(y))):
+                        if x[i] != y[i]:
+                            kh = [k for k in sorted(set(x[i]) | set(y[i]))
+                                  if x[i].get(k) != y[i].get(k)]
+                            f.write("  dong %d lech o cot: %s\n" % (i, ", ".join(kh)))
+                            for k in kh[:6]:
+                                f.write("     %s: %r  |  %r\n" % (k, x[i].get(k), y[i].get(k)))
+                            break
+            print("\nDa ghi ho so vao _src/_taolai_khac/ (luot1.json, luot2.json, khac.txt)")
+        except Exception as e:
+            print("\n(khong ghi duoc ho so: %s)" % e)
         print("\nKHONG LAP LAI DUOC - %d cho khac giua hai luot dung:" % len(ds))
         for x in ds[:15]:
             print("   X %s" % x)

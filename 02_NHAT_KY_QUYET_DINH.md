@@ -148,6 +148,21 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 📋 15/08 - CÒN TREO
+> 1. **`check_taolai` đỏ ĐÚNG MỘT LẦN lúc 04:5x rồi không tái hiện.** Chạy tay ngay sau đó ĐẠT,
+>    chạy lặp thêm 6 lượt ĐẠT, ép lộ bằng `PYTHONHASHSEED` 0/1/2 (nghi thứ tự duyệt `set` chuỗi)
+>    cũng ra giống hệt, và lượt verify kế tiếp XANH HẾT. Bộ kiểm vốn đã phòng vệ cho nguyên nhân
+>    dễ đoán nhất (hai lượt vắt qua ranh một phút -> mốc neo lệch, nó thử tới ba lượt), nên lần đỏ
+>    ấy là nó tìm được **cặp cùng mốc neo mà dữ liệu vẫn khác** - còn một nguồn ngẫu nhiên chưa
+>    tìm ra. KHÔNG tuyên bố đã sửa. Đã làm việc duy nhất làm được lúc này: cho nó **ghi hồ sơ**
+>    (`_src/_taolai_khac/`: hai bản dữ liệu đầy đủ + phần lệch của từng bảng, tới tận tên cột) mỗi
+>    lần đỏ. *Lỗi hiếm thì phải bắt được dấu vết ngay lần đầu - lần thứ hai có thể không tới.*
+> 2. **Dải 5 thẻ Bảng quản lý (BC9) chữ vẫn ba dòng.** Nhãn mang số sống từ CH2 nhúng giữa câu.
+>    Rút chữ là chạm `_checkkhuon` K3b - phải nghĩ cách khác, không phải cắt bớt.
+> 3. **CSS ô chào `.bwhero` và họ hàng (~20 lớp) nay không ai vẽ ra.** Cố ý giữ: cắt CSS theo
+>    khoảng dòng đã một lần làm vỡ cả dải thẻ (xem bẫy 15/08). Muốn dọn thì phải gỡ theo từng
+>    luật một, có đo lại sau mỗi bước.
+>
 > ### 📋 14/08 khuya - CÒN TREO SAU ĐỢT GỘP TRANG
 > 1. **Dải 5 thẻ Bảng quản lý (BC9) chữ chen ba dòng.** Nhãn thẻ mang số sống từ CH2 nhúng giữa
 >    câu ("Đổi lớp từ **2 lần** · quá **1 lần** ⚙ miễn duyệt - cần quản lý phê duyệt") nên một ô
@@ -292,10 +307,10 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 41 BỘ KIỂM, XANH HẾT 41/41 (verify trọn bộ 14/08 khuya). Bản dựng đang chạy:
-> `a6046c` (14/08), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> **Phiên bản: V2 — 41 BỘ KIỂM, XANH HẾT 41/41 (verify trọn bộ 15/08 sáng). Bản dựng đang chạy:
+> `1b9765` (15/08), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `868f3f`, `a1bda4`, `519e91`, `dc6eb3`, `3f0446`, `39083f`, `d2d2d5`, `c6ea8b`.
+> Mốc cũ: `a6046c`, `882082`, `868f3f`, `a1bda4`, `519e91`, `dc6eb3`, `3f0446`, `39083f`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
 > ### 🟢 14/08 khuya - BA TRANG VỀ MỘT, BẢNG CÔNG TÁCH HAI ĐỘI, VÀ SÁU CHỖ ĐỎ TỰ MÌNH GÂY RA
