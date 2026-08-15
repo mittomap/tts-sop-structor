@@ -1999,7 +1999,7 @@ var THEDEF={
  /* V2 10/08 - dải thẻ của màn Lịch trực WOW. Ô thứ tư là ô quan trọng nhất của cả màn: những
     ngày KHÔNG AI TRỰC chính là những ngày học viên mở app ra và không đặt được buổi nào - SOP
     gọi ô trống trong lưới là "không ai trực", thẻ này đếm hộ để không phải rà mắt cả lưới. */
- lichwow:{t:"Lịch trực WOW",the:[
+ lichwow:{t:"Lịch trực WOW",ttl:"Ca WOW trong tuần đang xem",the:[
   ["lw_lap","Ô trực đã được đặt","Tỷ lệ ô trực trong tuần đã có người đặt trên tổng số ô đã đăng ký - đo hiệu suất của lịch trực. Chip đếm được ô trống nhưng không chia được cho tổng, mà quyết định \"mở thêm ca hay bớt ca\" nằm ở tỷ lệ chứ không ở con số tuyệt đối. Danh sách: ô màu nhạt trong lưới ngay dưới là ô còn trống."],
   ["lw_nv","NV WOW có đăng ký ca","Số người của team WOW có ít nhất một ca trong tuần này, kèm số ô trung bình mỗi người - để thấy ca có bị dồn vào một hai người không. Danh sách: bảng Tổng giờ trực ở cuối trang."],
   ["lw_trong","Ngày không ai trực","Số ngày trong tháng không một ai đăng ký ca nào - học viên mở app ra là không đặt được buổi WOW. Danh sách: cột nào toàn dấu chấm trong lưới ngay dưới."]]},
@@ -2011,18 +2011,18 @@ var THEDEF={
     ra phải khớp số ô khai, và mỗi ô phải nói được nó dẫn tới đâu. Một con số không dẫn tới đâu
     là đúng con bệnh anh Luân bắt hai lần: *"báo 2 học viên nguy cơ mà a chẳng thấy đâu"*. */
  /* V2 13/08 - `hocvien` từng khai ba thẻ; cả ba trùng nguyên ba chip lọc nên đã bỏ. */
- giangvien:{t:"Giảng viên & NV WOW",the:[
+ giangvien:{t:"Giảng viên & NV WOW",ttl:"Tải và nợ việc của cả đội",the:[
   ["gv_gio","Giờ dạy trung bình mỗi GV tháng này","Cộng giờ dạy thực tế (mốc vào - mốc ra) của mọi buổi đã dạy xong trong tháng, chia cho số giảng viên có buổi. Chip đếm được buổi nhưng không cộng giờ rồi chia - mà đây là con số quyết định có phải tuyển thêm người hay chia lại lớp. Danh sách: tab Bảng công giảng dạy ngay trên trang này."],
   ["gv_moc","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy xong mà thiếu mốc giờ - thiếu là tính công sai. Danh sách: tab Bảng công giảng dạy ngay trên trang này."],
   ["gv_trong","Lớp đang mở chưa có GV chính","Lớp đang chạy mà chưa gán giảng viên chính. Danh sách: trang Lớp học, cột Giảng viên để trống."]]},
- baitap:{t:"Giao & chấm Bài tập",the:[
+ baitap:{t:"Giao & chấm Bài tập",ttl:"Bài tập của lớp đang mở",the:[
   /* Thước đòi MỌI ô phải nói tìm danh sách ở đâu - kể cả ô chỉ số. Đúng: một con số không dẫn
      tới đâu là con bệnh anh Luân bắt hai lần (*"báo 2 học viên nguy cơ mà a chẳng thấy đâu"*),
      và "ô này chỉ để xem thôi" là đúng cái câu người ta hay dùng để né luật ấy. */
   ["bt_hcr","Nộp bài (HCR)","Tỷ lệ bài đã nộp trên tổng bài đã giao trong phạm vi đang xem, so với ngưỡng HCR ở Ngưỡng KPI. Chip đếm dòng nên không chia được mẫu số - đây là thứ chỉ thẻ nói được. Danh sách: chọn lớp rồi vào chế độ \"Thu bài\" để thấy bài chưa nộp."],
   ["bt_qhan","Bài quá hạn chấm","Bài học viên đã nộp mà quá ngưỡng slaHomeworkGrading_hours vẫn chưa có điểm - đo bằng ĐỒNG HỒ, khác chip \"Chờ chấm\" (chip đếm mọi bài chờ, kể cả bài vừa nộp xong). Danh sách: bấm chip \"Chờ chấm - mọi lớp\" ở thanh chế độ ngay dưới."],
   ["bt_diem","Điểm trung bình bài đã chấm","Trung bình cộng điểm của những bài đã có điểm trong phạm vi đang xem - lớp đang làm được tới đâu, chứ không phải bao nhiêu bài. Danh sách: sổ Bài tập trong trang Tra cứu, cột Điểm."]]},
- bangcong:{t:"Công giảng dạy & WOW",the:[
+ bangcong:{t:"Công giảng dạy & WOW",ttl:"Công của tháng đang chọn",the:[
   ["bc_nguoi","Giảng viên có buổi thiếu mốc","Đếm NGƯỜI đang vướng, không đếm buổi - vì việc phải làm là gọi từng người bổ sung mốc giờ. Danh sách: bấm chip \"Buổi thiếu mốc giờ\" ở thanh ngay dưới."],
   /* V2 13/08 - thẻ "bc_buoi" đã bỏ (trùng chip "Buổi thiếu mốc giờ"). */
   ["bc_du","Buổi đủ mốc, tính công được","Số buổi đã đủ hai mốc, chốt công được ngay. Danh sách: bảng ngay dưới, cột Giờ dạy."]]},
@@ -2053,23 +2053,23 @@ var THEDEF={
     câu hỏi, số không sai nhưng nó KHÔNG DẪN TỚI ĐÂU. */
 /* V2 13/08 - `tinnhan` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
 
- duyethd:{t:"Duyệt hợp đồng cam kết",the:[
+ duyethd:{t:"Duyệt hợp đồng cam kết",ttl:"Hợp đồng cam kết chờ quyết định",the:[
 /* V2 13/08 - các ô ĐẾM ĐƠN đã bỏ (trùng chip); chỉ giữ ô mang TIỀN hoặc CHỈ SỐ - xem THE_NEN_LA_GI.md. */
   ["hd_band","Band cam kết trung bình","Trung bình band mục tiêu của các hợp đồng đang chờ - nhìn nhanh xem đợt này sale cam kết cao hay thấp. Danh sách: bảng ngay dưới, cột band của từng dòng."]]},
 /* V2 13/08 - `duyetdot` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
 
- duyetck:{t:"Duyệt chiết khấu",the:[
+ duyetck:{t:"Duyệt chiết khấu",ttl:"Chiết khấu chờ quyết định",the:[
 /* V2 13/08 - các ô ĐẾM ĐƠN đã bỏ (trùng chip); chỉ giữ ô mang TIỀN hoặc CHỈ SỐ - xem THE_NEN_LA_GI.md. */
   ["dck_tien","Tổng tiền đang giảm","Cộng phần giảm của mọi đơn đang chờ - đây là số tiền trung tâm sẽ bớt nếu duyệt hết. Danh sách: cột Giảm ở từng đơn dưới."]]},
- duyethoan:{t:"Duyệt hoàn tiền",the:[
+ duyethoan:{t:"Duyệt hoàn tiền",ttl:"Hoàn tiền chờ quyết định",the:[
 /* V2 13/08 - các ô ĐẾM ĐƠN đã bỏ (trùng chip); chỉ giữ ô mang TIỀN hoặc CHỈ SỐ - xem THE_NEN_LA_GI.md. */
   ["dho_tien","Tổng tiền chờ hoàn","Cộng số đã thu của các đơn đang xin hoàn - số tiền có thể phải trả lại. Danh sách: cột số tiền ở từng yêu cầu dưới."]]},
 /* V2 13/08 - `duyetnghi` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
 
- duyetthu:{t:"Xác nhận thu tiền",the:[
+ duyetthu:{t:"Xác nhận thu tiền",ttl:"Phiếu thu chờ đối soát",the:[
 /* V2 13/08 - ô đếm đơn đã bỏ (trùng chip); giữ ô tiền - xem THE_NEN_LA_GI.md. */
   ["dth_tien","Tổng tiền chờ đối soát","Cộng số tiền của các khoản chờ - chưa đối soát thì chưa chắc đã về. Danh sách: cột số tiền ở từng khoản dưới."]]},
- lopruiro:{t:"Vận hành lớp - cần xử lý",the:[
+ lopruiro:{t:"Vận hành lớp - cần xử lý",ttl:"Lớp đang có dấu hiệu rủi ro",the:[
   ["lr_nguyco","Học viên nguy cơ","Học viên của lớp này đang bị đánh dấu nguy cơ - vắng nhiều hoặc điểm học thuật dưới ngưỡng. Muốn xem: tab Học viên ngay dưới, cột trạng thái có chip đỏ."],
   ["lr_chuadd","Buổi chưa điểm danh","Buổi ĐÃ dạy xong mà chưa có một dòng điểm danh nào. Buổi chưa tới thì không tính - chưa dạy thì chưa phải việc. Muốn xem: tab Điểm danh."],
   ["lr_chuanx","Buổi quá hạn chưa nhận xét","Buổi dạy xong đã quá ngưỡng giờ ghi nhận xét (chỉnh ở Cài đặt, slaTeacherNote_hours) mà giáo viên chưa ghi. Muốn xem: tab Buổi học, dòng nào quá hạn hiện đỏ."],
@@ -2078,12 +2078,12 @@ var THEDEF={
  socamket:{t:"Sổ cam kết đã ký",ttl:"Tình hình ký cam kết",the:[
   ["ck_ban","Đã ký bản hiện hành","Tỷ lệ hồ sơ đã ký mà chữ ký nằm ở BẢN QUY ĐỊNH ĐANG CÓ HIỆU LỰC. Nội dung sửa được ở Cài đặt, nên sau mỗi lần sửa sẽ có một nhóm người mang chữ ký vào bản cũ - tỷ lệ này là thứ nói ra điều đó. Danh sách: bảng ngay dưới, cột Bản."],
   ["ck_chua","Chưa ký","Hồ sơ onboarding chưa có dấu ký và cũng chưa từ chối - đang chờ học viên bấm đồng ý ở cổng của họ. Danh sách: trang Xếp lớp & Onboarding, chip \"Chờ HV ký cam kết\"."]]},
- dsphuhuynh:{t:"Sổ phụ huynh",the:[
+ dsphuhuynh:{t:"Sổ phụ huynh",ttl:"Người đồng hành của học viên",the:[
   /* 14/08 - "ph_nguoi" và "ph_nhieu" đã bỏ: một cái là số dòng của bảng ngay dưới, cái kia là
      một phép lọc của chính bảng ấy. Tên từng con vẫn nằm ở cột thứ hai của mỗi dòng. */
   ["ph_no","Tổng nợ học phí gộp theo phụ huynh","Cộng TIỀN còn lại của mọi đơn của mọi con, gộp về từng người đồng hành, rồi cộng toàn bộ. Chip đếm được bao nhiêu người nợ nhưng không cộng được tiền - mà 30 người nợ 5 triệu với 30 người nợ 900 triệu thì gọi điện theo hai cách khác nhau. Muốn xem: chip vàng ở cuối mỗi dòng."],
   ["ph_rui","Có con đang cảnh báo","Người có ít nhất một con đang ở mức đỏ về chuyên cần hoặc học thuật - cần chủ động liên hệ sớm. Muốn xem: chip đỏ ở cuối dòng ghi mấy con."]]},
- ban:{t:"Bàn làm việc",the:[
+ ban:{t:"Bàn làm việc",ttl:"Người đồng hành đang mở",the:[
   /* V2 13/08 - thẻ "ban_co" đã bỏ: con số ấy đã nằm sẵn trên nút chọn thực thể và trên tiêu đề
      bảng ngay dưới - ba lần một con số trên một màn. */
   ["ban_gap","Có việc gấp","Trong số hồ sơ còn việc, đếm riêng những hồ sơ có ít nhất một việc mức ĐỎ - làm trước. Danh sách: bảng dưới xếp hồ sơ có việc gấp lên đầu."],
@@ -2149,38 +2149,38 @@ var THEDEF={
   ["bl0_wow","WOW chờ xử lý","Buổi WOW đã đặt/đã xác nhận chưa dạy, cộng buổi đã dạy mà coach chưa ghi nội dung. Danh sách: WOW."],
   ["bl0_duyet","Chiết khấu chờ duyệt","Đăng ký có mức chiết khấu vượt ngưỡng phải trình quản lý mà chưa ai duyệt. Danh sách: Chờ duyệt."],
   ["bl0_debt","Đăng ký còn nợ","Đăng ký còn hiệu lực mà vẫn còn số tiền chưa thu. Danh sách: mở trang Thanh toán, chip 'Còn nợ'."]]},
- mykpi:{t:"Bảng số của tôi (trang cá nhân)",the:[
+ mykpi:{t:"Bảng số của tôi (trang cá nhân)",ttl:"Chỉ số của riêng bạn",the:[
   ["mk_lh","Lượt liên hệ hôm nay / N ngày","Số lần tôi đã gọi/nhắn cho khách: vế trái là hôm nay, vế phải là cửa sổ nhìn lại (đặt ở Cài đặt, tham số statsLookback_days). Danh sách: mở trang Lead và lọc theo tên mình."],
   ["mk_kn","Tỷ lệ kết nối N ngày","Trong các lượt liên hệ của cửa sổ nhìn lại, bao nhiêu phần trăm gặp được khách thật (không phải máy bận, không nghe). Rê chuột vào con số để thấy phép chia."],
   ["mk_dk","Đăng ký mới N ngày","Số khách tôi phụ trách đã chốt đăng ký trong cửa sổ nhìn lại. Danh sách: mở trang Đăng ký & Học phí."],
   ["mk_tien","Tiền thu N ngày","Tổng tiền các khoản do chính tôi ghi nhận trong cửa sổ nhìn lại. Danh sách: mở trang Thanh toán."]]},
- review:{t:"Khảo sát & phản hồi lớp",the:[
+ review:{t:"Khảo sát & phản hồi lớp",ttl:"Khảo sát đã gửi và phản hồi về",the:[
   ["rv_cho","Phiếu chờ trả lời","Số phiếu khảo sát đã gửi mà học viên chưa điền. Danh sách: bảng 'Phiếu gần đây' ngay dưới, cột Trạng thái là 'chờ'."],
   ["rv_quen","Gửi quá N ngày chưa ai trả lời","Trong số phiếu chờ, đếm riêng phiếu đã gửi quá số ngày khai ở Ngưỡng & SLA (svNudge_days) - đó là lớp cần gọi nhắc. Danh sách: bấm chip 'Trả lời kém' ở thanh lọc dưới."]]},
 /* V2 13/08 - `ghinhan` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
 
- giaoan:{t:"Giáo án & kho bài",the:[
+ giaoan:{t:"Giáo án & kho bài",ttl:"Giáo án của khóa đang mở",the:[
   /* 13/08 - "ga_kho" đã bỏ (trùng tab "Kho bài tập"). 14/08 - ba ô còn lại đổi sang tỷ lệ + đồng hồ. */
   ["ga_tl","Buổi sắp dạy đã có giáo án","Tỷ lệ buổi học sắp diễn ra trong khoảng nhìn trước (gaAhead_days) đã gắn giáo án. Chip đếm được buổi thiếu nhưng không chia cho tổng, mà cái quyết định \"có phải soạn gấp không\" nằm ở tỷ lệ. Danh sách: bấm tab 'Giáo án theo buổi' ở dưới."],
   ["ga_gan","Buổi chưa soạn gần nhất","Còn mấy ngày nữa là tới buổi sớm nhất chưa có giáo án - một cái đồng hồ đếm ngược, không phải một con số đếm. Danh sách: bấm tab 'Giáo án theo buổi', buổi thiếu nằm trên cùng."],
   ["ga_hw","Buổi đã soạn có gắn bài về nhà","Tỷ lệ buổi đã có giáo án và có gắn bài tập về nhà, kèm số khóa chưa soạn buổi nào. Danh sách: bấm tab 'Giáo án theo buổi'."]]},
- ketqua:{t:"Kết quả đầu ra & tỷ lệ đạt AIM",the:[
+ ketqua:{t:"Kết quả đầu ra & tỷ lệ đạt AIM",ttl:"Kết quả đầu ra đã ghi nhận",the:[
   ["kq_hv","Học viên đã học xong","Đếm hồ sơ kết thúc khóa ở trạng thái hoàn thành, trong phạm vi bộ lọc đang chọn. Danh sách: bảng chi tiết cuối trang."],
   ["kq_thu","Đạt AIM · thi thử tại trung tâm","Tỷ lệ học viên có điểm Overall bài thi thử cuối khóa đạt hoặc vượt band mục tiêu. Em nào chưa có điểm không nằm trong mẫu số. Danh sách: bảng chi tiết cuối trang, cột Overall thử."],
   ["kq_that","Đạt AIM · kỳ thi IELTS thật","Tỷ lệ học viên có điểm Overall kỳ thi IELTS chính thức đạt hoặc vượt band mục tiêu. Thi nhiều lần thì tính theo cách chọn khai ở aimOfficialPick. Danh sách: bảng chi tiết cuối trang, cột Overall thật."],
   ["kq_chua","Chưa đi thi thật","Đếm học viên đã học xong nhưng sổ kỳ thi IELTS thật chưa có lượt nào. Danh sách: bảng chi tiết cuối trang, cột Overall thật ghi \"chưa có điểm\". Nhập điểm bằng nút ở đầu trang."]]},
- banglop:{t:"Bảng lớp - một lớp",the:[
+ banglop:{t:"Bảng lớp - một lớp",ttl:"Lớp đang vận hành",the:[
   ["bl_off","Số buổi off còn lại","Giáo viên chính của lớp còn được nghỉ mấy buổi trong khóa này, trên quota khai ở teacherOffQuota_course. Đếm buổi của lớp do người khác GV chính dạy. Danh sách: tab Buổi học ngay dưới, buổi nào đổi giáo viên đều ghi lý do trong vết của buổi. Sĩ số vẫn nằm ở khối thông tin lớp."],
   ["bl_atr","Chuyên cần (ATR)","Tỷ lệ buổi có mặt trên tổng buổi đã điểm danh của cả lớp, so với ngưỡng ATR ở Ngưỡng KPI. Muốn xem chi tiết: tab Điểm danh."],
   ["bl_hcr","Nộp bài (HCR)","Tỷ lệ bài tập đã nộp trên tổng bài đã giao của cả lớp, so với ngưỡng HCR. Muốn xem chi tiết: tab Bài tập."],
   ["bl_risk","HV nguy cơ","Số học viên của lớp đang bị đánh dấu nguy cơ (chuyên cần hoặc học thuật). Danh sách: bảng học viên dưới, nhìn hai cột trạng thái."],
   ["bl_ss","Hài lòng (SS)","Điểm hài lòng trung bình lớp này trên thang 5, so với ngưỡng SS. Muốn xem chi tiết: trang Khảo sát & Phản hồi."]]},
- banggiao:{t:"Bàn giao lead",the:[
+ banggiao:{t:"Bàn giao lead",ttl:"Lead đang bàn giao qua lại",the:[
   ["bg_om","Tuổi trung bình lead đang ôm","Trung bình số ngày kể từ lúc lead được giao cho nhân viên đang chọn, kèm lead lâu nhất và trần ôm leadHoldMax_days. Bảng dưới đếm được bao nhiêu lead, nhưng không cộng được trung bình - mà 40 lead trung bình 6 ngày với 40 lead trung bình 52 ngày là hai chuyện khác hẳn. Danh sách: bảng lead ngay dưới, cột Ngày giao."],
   ["bg_orph","Lead chưa có ai phụ trách","Lead chưa gán cho ai - không ai gọi thì nguội. Danh sách: bấm chính ô này, ô chọn \"Từ NV\" nhảy sang mục (chưa có ai phụ trách) và bảng lead ngay dưới liệt kê đúng bấy nhiêu dòng."],
   ["bg_due","Quá hẹn liên hệ của NV này","Số lead nhân viên này phụ trách đã quá hẹn liên hệ, kèm mức trễ NẶNG NHẤT tính bằng ngày - trễ vài giờ và trễ vài tuần không phải một chuyện. Danh sách: bảng lead dưới, cột Hẹn liên hệ."],
   ["bg_thu","Đủ điều kiện thu về","Lead dính một trong hai mốc chăm sóc của trung tâm: quá leadStale_days ngày không ai liên hệ, hoặc một NV ôm quá leadHoldMax_days ngày. Khác ô bên trái - ô kia đo cái hẹn NV tự đặt, ô này đo mốc của trung tâm. Danh sách: nút Thu lead quá hạn ở thanh trên."]]},
- nhatky:{t:"Nhật ký thao tác",the:[
+ nhatky:{t:"Nhật ký thao tác",ttl:"Thao tác đã ghi lại",the:[
   ["nk_tong","Thao tác đã ghi","Tổng số dòng nhật ký đang giữ (có trần, cũ nhất bị đẩy ra). Muốn xem: bảng nhật ký ngay dưới."],
   ["nk_today","Hôm nay","Số thao tác ghi trong ngày hôm nay. Danh sách: lọc theo ngày ở thanh lọc dưới."],
   ["nk_nguoi","Người thao tác","Số người khác nhau đã ghi dữ liệu trong sổ này. Muốn xem: cột Người ở bảng dưới."],
@@ -2192,49 +2192,49 @@ var THEDEF={
  /* V2 13/08 - `reup` từng khai ba thẻ; cả ba trùng nguyên ba chip lọc nên đã bỏ. */
 /* V2 13/08 - `tuvan` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
 
- thanhtoan:{t:"Thanh toán & công nợ",the:[
+ thanhtoan:{t:"Thanh toán & công nợ",ttl:"Tiền đã vào và tiền còn phải thu",the:[
   ["tt_no","Tổng còn nợ","Tổng tiền còn phải thu của mọi đăng ký chưa huỷ, toàn hệ thống. Danh sách: bảng công nợ ngay dưới."],
   ["tt_hom","Tiền đến hạn hôm nay","Tổng tiền của các đợt có hạn đóng rơi vào hôm nay hoặc đã trễ - đây là con số kế toán phải nhìn đầu ngày. Danh sách: mở trang Dự thu theo đợt."]]},
- wow:{t:"WOW 1-1",the:[
+ wow:{t:"WOW 1-1",ttl:"Buổi WOW 1-1 đang chờ và đã dạy",the:[
   /* 13/08 - "ww_today" đã bỏ (trùng chip "Buổi hôm nay"). */
   ["ww_gio","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy nhưng coach chưa ghi giờ vào/giờ ra - thiếu mốc thì bảng công tính sai. Danh sách: chip 'Thiếu mốc giờ'."],
   ["ww_wor","Buổi WOW có tiến bộ (WOR)","Tỷ lệ buổi WOW đã dạy được ghi nhận học viên có tiến bộ, so với ngưỡng WOR ở Ngưỡng KPI. Chip lọc được buổi 'có tiến bộ' nhưng không chia được cho mẫu số - đây là thứ chỉ thẻ nói được. Danh sách: chip trạng thái 'đã hoàn thành' rồi xem cột Kết quả."],
   ["ww_quota","Lượt WOW còn lại toàn trung tâm","Cộng số lượt WOW chưa dùng của mọi học viên còn quota - đây là năng lực chăm sóc còn tồn, quyết định có nên mở thêm ca trực hay không. Danh sách: tab Quota."]]},
 /* V2 13/08 - `ketthuc` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
 
- tranghv:{t:"Cổng học viên (xem hộ)",the:[
+ tranghv:{t:"Cổng học viên (xem hộ)",ttl:"Việc học của học viên đang xem",the:[
   ["hv_att","Chuyên cần","Tỷ lệ buổi có mặt của riêng học viên này. Muốn xem chi tiết: mục Điểm danh trong hồ sơ."],
   ["hv_hw","Bài tập đã nộp","Tỷ lệ bài đã nộp trên tổng bài được giao của học viên này. Muốn xem chi tiết: mục Bài tập."],
   ["hv_diem","Điểm bài tập TB","Điểm trung bình các bài đã được chấm của học viên này. Muốn xem chi tiết: mục Bài tập."],
   ["hv_wow","Buổi WOW còn lại","Số lượt WOW 1-1 học viên còn được dùng theo quota khóa. Muốn xem chi tiết: mục WOW."]]},
 /* V2 13/08 - `magioithieu` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
 
- hosogv:{t:"Hồ sơ giảng viên",the:[
+ hosogv:{t:"Hồ sơ giảng viên",ttl:"Tải và nợ việc của người này",the:[
   ["gv_day","Buổi đã dạy","Số buổi giảng viên này đã dạy xong. Danh sách: bảng buổi dạy ngay dưới."],
   ["gv_nx","Cần viết nhận xét","Buổi đã dạy mà chưa ghi nhận xét, hạn theo slaTeacherNote_hours. Danh sách: bảng buổi dạy, cột Nhận xét trống."],
   ["gv_hw","Bài chờ chấm","Bài tập học viên đã nộp mà giảng viên chưa chấm, hạn theo slaHomeworkGrading_hours. Danh sách: trang Bài tập."],
   ["gv_risk","HV nguy cơ học thuật","Học viên trong lớp của giảng viên này đang bị đánh dấu nguy cơ học thuật - nên đề xuất buổi WOW. Danh sách: trang Học viên nguy cơ."]]},
- hosonv_ts:{t:"Hồ sơ nhân viên - khối tuyển sinh",the:[
+ hosonv_ts:{t:"Hồ sơ nhân viên - khối tuyển sinh",ttl:"Việc tuyển sinh của người này",the:[
   ["nvt_new","Lead mới chưa LH","Lead đã vào hệ thống mà nhân viên này chưa gọi lần nào, hạn theo slaLRT_minutes. Danh sách: bảng 'Lead cần liên hệ' ngay dưới."],
   ["nvt_work","Đang khai thác","Lead đã liên hệ và đang trong quá trình chăm. Danh sách: trang Lead, lọc theo nhân viên này."],
   ["nvt_test","Test sắp tới","Ca test đầu vào của khách nhân viên này phụ trách, sắp diễn ra. Danh sách: trang Test đầu vào."],
   ["nvt_due","Cần liên hệ hôm nay","Lead đã tới hoặc quá hẹn liên hệ. Danh sách: bảng 'Lead cần liên hệ' ngay dưới."]]},
- hosonv_wow:{t:"Hồ sơ nhân viên - khối test & WOW",the:[
+ hosonv_wow:{t:"Hồ sơ nhân viên - khối test & WOW",ttl:"Việc WOW của người này",the:[
   ["nvw_tw","Test chờ chấm","Ca test đã thi mà chưa ai chấm, hạn theo slaGLA_hours. Danh sách: trang Test đầu vào."],
   ["nvw_td","Test đã chấm","Ca test người này đã chấm xong và đã có điểm. Danh sách: trang Test đầu vào, lọc trạng thái 'đã chấm'."],
   ["nvw_wu","WOW sắp tới","Buổi WOW của người này đã đặt lịch, chưa dạy. Danh sách: bảng 'Buổi WOW sắp tới' ngay dưới."],
   ["nvw_wd","WOW đã dạy","Buổi WOW đã hoàn thành, kèm số buổi ghi nhận học viên có tiến bộ. Danh sách: trang WOW."]]},
- hosonv_hv:{t:"Hồ sơ nhân viên - khối học vụ",the:[
+ hosonv_hv:{t:"Hồ sơ nhân viên - khối học vụ",ttl:"Việc học vụ của người này",the:[
   ["nvh_ob","Onboarding chưa xong","Hồ sơ onboarding còn dở, hạn theo slaOBT_hours. Danh sách: trang Xếp lớp & Onboarding."],
   ["nvh_risk","HV nguy cơ","Học viên bị đánh dấu nguy cơ trên một trong hai trục chuyên cần / học thuật. Danh sách: bảng 'Học viên nguy cơ' ngay dưới."],
   ["nvh_fb","Phản hồi chờ phân loại","Phản hồi mới nhận, chưa ai xếp loại. Danh sách: trang Ghi nhận phản hồi."],
   ["nvh_kn","Khiếu nại đang xử lý","Khiếu nại chưa đóng, hạn xử lý theo mức độ. Danh sách: trang Khiếu nại."]]},
- hosokhoa:{t:"Hồ sơ khóa học",the:[
+ hosokhoa:{t:"Hồ sơ khóa học",ttl:"Khóa đang mở bán ra sao",the:[
   ["hk_lop","Lớp đã mở","Số lớp đã mở của khóa này, kèm tổng học viên. Danh sách: bảng lớp ngay dưới."],
   ["hk_dk","Đăng ký hiệu lực","Đăng ký còn hiệu lực của khóa (đã trừ số đã huỷ). Danh sách: bảng đăng ký dưới."],
   ["hk_thu","Doanh thu đã thu","Tổng tiền đã thu được của khóa này, đối chiếu với giá niêm yết. Danh sách: trang Thanh toán."],
   ["hk_no","Công nợ còn lại","Tổng tiền học viên khóa này còn nợ. Danh sách: trang Dự thu theo đợt."]]},
- httoday:{t:"Hôm nay của giảng viên",the:[
+ httoday:{t:"Hôm nay của giảng viên",ttl:"Buổi diễn ra trong hôm nay",the:[
   ["ht_ses","Buổi dạy hôm nay","Số buổi lớp tôi phải dạy trong hôm nay. Danh sách: bảng buổi ngay dưới, có ghi giờ và phòng."],
   ["ht_wow","Buổi WOW hôm nay","Số buổi kèm 1-1 tôi phải dạy hôm nay. Danh sách: bảng WOW ngay dưới."],
   ["ht_hw","Bài chờ chấm","Bài học viên đã nộp mà tôi chưa chấm, hạn theo slaHomeworkGrading_hours. Danh sách: bảng bài tập dưới."],
@@ -2244,20 +2244,20 @@ var THEDEF={
  /* V2 13/08 - thẻ "ph_dung" đã bỏ (trùng chip "Trùng phòng"). */
 /* V2 13/08 - `phong` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
 
- chang:{t:"Chạy quy trình theo chặng",the:[
+ chang:{t:"Chạy quy trình theo chặng",ttl:"Hồ sơ đang đứng ở chặng này",the:[
   /* 14/08 - "cg_hen" và "cg_thieu" đã bỏ: cả hai là một phép lọc của chính bảng hồ sơ ngay dưới. */
   ["cg_sla","Hồ sơ quá hạn SLA của chặng","Số hồ sơ ở chặng đang xem đã quá mốc SLA của chặng đó, kèm MỨC TRỄ NẶNG NHẤT và chính con số mốc - để đọc xong biết luôn nó so với cái gì. Danh sách: bảng hồ sơ ngay dưới, dòng tô đỏ."]]},
- giaoviec:{t:"Giao việc nội bộ",the:[
+ giaoviec:{t:"Giao việc nội bộ",ttl:"Việc giao đi và việc nhận về",the:[
   /* 13/08 - "gv_mine" và "gv_given" đã bỏ: cả hai trùng nguyên hai tab ngay dưới. */
   ["gv_over","Quá hạn của tôi","Số việc của tôi đã quá hạn. Danh sách: tab 'Việc của tôi', chip 'Quá hạn'."],
   ["gv_wait","Chờ tôi xác nhận","Việc tôi giao, người nhận đã báo xong và đang chờ tôi gật. Danh sách: tab 'Tôi giao', chip 'Chờ xác nhận'."],
   ]},
- tkreport:{t:"Báo cáo giao việc",the:[
+ tkreport:{t:"Báo cáo giao việc",ttl:"Việc giao trong kỳ đang xem",the:[
   ["tr_tong","Tổng số việc","Tổng số việc đã giao trong toàn trung tâm ở kỳ đang xem. Danh sách: bảng việc ngay dưới."],
   ["tr_done","Đã hoàn thành","Số việc đã đóng, kèm tỷ lệ trên tổng. Danh sách: lọc trạng thái 'hoàn thành' ở bảng dưới."],
   ["tr_over","Đang quá hạn","Việc chưa xong mà đã qua hạn - cần đốc thúc. Danh sách: lọc trạng thái 'quá hạn'."],
   ["tr_ontime","Xong đúng hạn","Trong số việc đã xong, bao nhiêu phần trăm xong trước hạn. Rê chuột vào con số để thấy phép chia."]]},
- cong:{t:"Bảng công giảng viên",the:[
+ cong:{t:"Bảng công giảng viên",ttl:"Tổng công của tháng đang chọn",the:[
   ["cg_buoi","Buổi lớp đã dạy trong tháng","Tổng số buổi lớp cả đội đã dạy trong tháng đang xem. Danh sách: bảng công theo người ngay dưới."],
   ["cg_gio","Tổng giờ dạy","Tổng số giờ đứng lớp tính từ mốc giờ vào/ra, kèm số buổi còn thiếu mốc. Danh sách: bảng công dưới, cột Giờ dạy."],
   ["cg_g11","Giờ kèm riêng 1-1","Phần giờ dạy đổ vào lớp kèm riêng (sĩ số tối đa 1 người) và tỷ lệ của nó trên tổng giờ. Danh sách: bảng công dưới, cột Chia 1-1 / nhóm."],
@@ -2267,7 +2267,7 @@ var THEDEF={
   ["cg_tien","Tiền công tạm tính","Tổng tiền công tạm tính = giờ dạy x đơn giá + ca WOW + ca test. Đây là số TẠM, chốt xong mới thành công nợ. Muốn xem chi tiết từng người: bảng công ngay dưới."],
   ["cg_nonx","Buổi chưa ghi nhận xét","Buổi đã dạy mà chưa có nhận xét - phải đối chiếu trước khi chốt công. Danh sách: bảng công dưới, cột Nhận xét."],
   ["cg_tre","Buổi vào trễ giờ","Số buổi giảng viên vào lớp trễ so với giờ xếp - ảnh hưởng KPI ADC. Danh sách: bảng công dưới, cột Trễ."]]},
- duthu:{t:"Dự thu theo đợt",the:[
+ duthu:{t:"Dự thu theo đợt",ttl:"Tiền dự kiến thu về",the:[
   ["dt_tong","Tổng còn phải thu","Tổng tiền của mọi đợt đóng chưa thu, kèm số đợt và số học viên. Danh sách: bảng đợt ngay dưới."],
   ["dt_late","Đã quá hạn","Tiền của các đợt đã qua hạn đóng quá số ngày khai ở installmentLate. Danh sách: bấm chip 'Quá hạn' ở thanh lọc dưới."],
   ["dt_soon","Sắp đến hạn","Tiền của các đợt sắp tới hạn trong khoảng nhắc trước khai ở installmentRemind. Danh sách: chip 'Sắp đến hạn'."],
