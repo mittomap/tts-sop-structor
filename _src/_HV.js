@@ -2022,7 +2022,9 @@ var THEDEF={
   ["bt_hcr","Nộp bài (HCR)","Tỷ lệ bài đã nộp trên tổng bài đã giao trong phạm vi đang xem, so với ngưỡng HCR ở Ngưỡng KPI. Chip đếm dòng nên không chia được mẫu số - đây là thứ chỉ thẻ nói được. Danh sách: chọn lớp rồi vào chế độ \"Thu bài\" để thấy bài chưa nộp."],
   ["bt_qhan","Bài quá hạn chấm","Bài học viên đã nộp mà quá ngưỡng slaHomeworkGrading_hours vẫn chưa có điểm - đo bằng ĐỒNG HỒ, khác chip \"Chờ chấm\" (chip đếm mọi bài chờ, kể cả bài vừa nộp xong). Danh sách: bấm chip \"Chờ chấm - mọi lớp\" ở thanh chế độ ngay dưới."],
   ["bt_diem","Điểm trung bình bài đã chấm","Trung bình cộng điểm của những bài đã có điểm trong phạm vi đang xem - lớp đang làm được tới đâu, chứ không phải bao nhiêu bài. Danh sách: sổ Bài tập trong trang Tra cứu, cột Điểm."]]},
- bangcong:{t:"Công giảng dạy & WOW",ttl:"Công của tháng đang chọn",the:[
+ /* Nhãn phải KHÁC nhãn dải "cong" ngay dưới, nếu không hai dải cùng một trang đọc ra một câu.
+   Dải này hỏi "chốt công được chưa"; dải kia là tổng công thật của tháng. */
+bangcong:{t:"Công giảng dạy & WOW",ttl:"Soát trước khi chốt công",the:[
   ["bc_nguoi","Giảng viên có buổi thiếu mốc","Đếm NGƯỜI đang vướng, không đếm buổi - vì việc phải làm là gọi từng người bổ sung mốc giờ. Danh sách: bấm chip \"Buổi thiếu mốc giờ\" ở thanh ngay dưới."],
   /* V2 13/08 - thẻ "bc_buoi" đã bỏ (trùng chip "Buổi thiếu mốc giờ"). */
   ["bc_du","Buổi đủ mốc, tính công được","Số buổi đã đủ hai mốc, chốt công được ngay. Danh sách: bảng ngay dưới, cột Giờ dạy."]]},
@@ -21931,7 +21933,18 @@ function renderCong(){
       có gì xảy ra. Bảng giá thì mỗi dòng là một MỨC GIÁ, không phải bản ghi; sửa giá đi cửa
       Cài đặt. Dùng đúng lớp bảng là nói đúng với người dùng lẫn với bộ kiểm rằng dòng này không
       bấm được. *Chọn lớp CSS theo bản chất của dữ liệu, không theo dáng mình muốn.* */
-   '<div class="tbwrap"><table class="tb"><thead><tr><th>Loại ngày</th>'+
+   /* ═══ V2 15/08 (anh Luân: *"bảng đơn giá đang áp, em làm co cụm quá, nhiều chỗ trống mà,
+      e dàn rộng ra đi"*) ══════════════════════════════════════════════════════════════════════
+      Bảng cũ chiếm chưa tới nửa panel, phần phải trống hoác - và ngay dưới nó là một dòng chữ
+      nhỏ nhét hai mức "WOW 1-1" với "Ca test" vào cuối, như phần thừa. Nhưng hai mức ấy KHÔNG
+      phải phần thừa: chúng là CÁCH TRẢ CÔNG THỨ HAI của trung tâm (theo LẦN, không nhân giờ) -
+      đúng vế mà anh Luân vừa bắt em tách thành cột riêng ở bảng công.
+      Nay panel chia hai theo đúng hai cách trả: bên trái là lưới giờ (loại ngày x ca) dàn hết bề
+      ngang còn lại, bên phải là hai mức theo lần. Chỗ trống biến mất không phải vì em kéo giãn
+      cái cũ, mà vì thứ vốn bị nhét xuống chân bảng đã về đúng chỗ của nó.
+      *Chỗ trống thường không phải lỗi của cái đang có - nó là chỗ của một thứ đang bị nhét sai.* */
+   '<div class="giapn">'+
+   '<div class="tbwrap"><table class="tb giatb"><thead><tr><th>Loại ngày</th>'+
    SHIFTK.map(function(k){return '<th>'+esc(k[1])+'</th>'}).join("")+'</tr></thead><tbody>';
   DAYK.forEach(function(d){
    h+='<tr><td><b>'+esc(d[1])+'</b></td>'+SHIFTK.map(function(k){
@@ -21939,10 +21952,14 @@ function renderCong(){
     return '<td style="font-variant-numeric:tabular-nums">'+(v!=null&&v>0
      ?('<b>'+vnd(v)+'</b><span class="mut" style="font-size:11px">/giờ</span>')
      :('<span class="mut" data-tip="Ca này chưa khai mức mặc định - đang lấy tham số chung">'+vnd(num(paramOf("teacherPayPerHour",180000)))+'/giờ · chung</span>'))+'</td>'}).join("")+'</tr>'});
-  h+='</tbody></table></div><div class="pbody" style="padding-top:0">'+
-   '<div class="fhint" data-tip="Hai việc này trả theo LẦN, không nhân giờ. Ranh giới ca tính theo giờ bắt đầu buổi: trước giờ trưa là ca sáng, tới giờ chiều là ca chiều, sau đó là ca tối - hai mốc ấy đặt ở Cài đặt nhóm CH2.">'+
-   'WOW 1-1: <b>'+vnd(wowRate())+'</b>/buổi · Ca test: <b>'+vnd(testRate())+'</b>/lần'+
-   '<i class="ti ti-info-circle gyti"></i></div></div></div>'}
+  h+='</tbody></table></div>'+
+   '<div class="gialan"><div class="gialh">Trả theo LẦN</div>'+
+   '<div class="gialr"><span>Buổi WOW 1-1</span><b>'+vnd(wowRate())+'</b></div>'+
+   '<div class="gialr"><span>Ca test đầu vào</span><b>'+vnd(testRate())+'</b></div>'+
+   '<div class="gialg">Hai việc này không nhân giờ - mỗi buổi, mỗi ca là một lần.</div></div>'+
+   '</div>'+
+   '<div class="pbody" style="padding-top:0"><div class="fhint">Ranh giới ca tính theo giờ bắt đầu buổi: trước '+
+   slaChip("shiftNoon_hour",12,"h")+' là ca sáng, tới '+slaChip("shiftEvening_hour",17,"h")+' là ca chiều, sau đó là ca tối.</div></div></div>'}
  h+=statStrip([
   ["ti-school",tot,"Buổi lớp đã dạy trong tháng","#3B82C4",L.length+" giảng viên"],
   ["ti-clock-hour-4",(Math.round(totG*10)/10)+"h","Tổng giờ dạy","#2E5A88",totThieu?(totThieu+" buổi thiếu giờ vào/ra"):"đủ giờ vào - giờ ra","",
