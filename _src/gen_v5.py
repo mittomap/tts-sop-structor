@@ -2142,7 +2142,28 @@ table.dt tbody tr.clk.on td{font-weight:600}
  display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rost .rn>*{min-width:0;overflow:hidden;text-overflow:ellipsis}
 .rost{flex-wrap:nowrap}
+
+/* ═══ V2 15/08 - TRÊN ĐIỆN THOẠI THÌ HÀNG NÀY PHẢI XUỐNG DÒNG ══════════════════════════════
+   `_checkmat` bắt khổ 390px: tên "Châu Bảo Luân", mã "HV044" và chip "nguy cơ học thuật" đều bị
+   cắt (28px / 13px / 28px). Đo ra cơ chế: `.rost` khai `flex-wrap:nowrap` nên cả hàng cố nhét
+   vào 348px; `.rn` xin 300px mà chỉ được 220px, rồi ba đứa con bên trong bị `text-overflow`
+   nuốt bớt chữ.
+   Đây KHÔNG phải lỗi vừa sinh ra: nó phụ thuộc DỮ LIỆU - hôm nay một học viên tên dài lại đúng
+   lúc bị gắn chip nguy cơ, nên hàng mới tràn. Ngày mai bộ dữ liệu khác thì nó tự xanh lại mà
+   không ai sửa gì. *Một chỗ đỏ đi theo dữ liệu thì vá đúng một cái tên là vá cho hôm nay thôi.*
+   Chữa vào CƠ CHẾ: màn hẹp thì cho hàng xuống dòng, `.rn` chiếm trọn một dòng. Không còn ai
+   phải nhường chỗ cho ai, nên không còn chữ nào bị nuốt - với mọi bộ dữ liệu. */
 @media(max-width:1280px){.rost .rn{flex:0 0 220px;max-width:220px}}
+
+/* BẪY: khối dưới đây PHẢI đứng SAU luật 1280px ngay trên. Lần đầu em đặt nó lên trước, và ở khổ
+   390px thì luật 1280px (cũng khớp) đè lại - `.rn` vẫn 220px, chữ vẫn bị nuốt, mà mã đọc lên thì
+   trông như đã chữa. *Hai media query cùng khớp thì cái viết SAU thắng - đặt trước là viết một
+   luật không bao giờ chạy.* */
+@media(max-width:700px){
+ .rost{flex-wrap:wrap;gap:6px 10px}
+ .rost .rn{flex:1 1 100%;max-width:none}
+ .rost .rn>*{overflow:visible;text-overflow:clip}}
+/* (giải thích ở khối ngay trên) */
 /* Hàng tiêu đề của bảng điểm danh: mượn nguyên bộ khung flex của dòng dữ liệu, chỉ thay nội dung
    trong mỗi cụm bằng một cái nhãn. Nhãn canh giữa cụm để nó chỉ đúng vào chùm nút bên dưới. */
 /* LỆCH LÀ VÌ HAI HÀNG ĐO BẰNG HAI THƯỚC KHÁC NHAU (anh Luân: *"lệch lệch kiểu gì ấy"*).
