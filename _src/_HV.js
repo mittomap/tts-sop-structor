@@ -9514,10 +9514,10 @@ function ctCua(k){for(var i=0;i<CTDEF.length;i++)if(CTDEF[i][0]===k)return CTDEF
    chú ở `ctRows`), nên nó có dấu và có dấu cách. Bọc qua `encodeURIComponent` rồi ép nốt dấu
    nháy đơn: chuỗi đi vào một thuộc tính HTML rồi mới thành đối số hàm, hai lớp thoát khác nhau. */
 function ctArg(s){return encodeURIComponent(String(s||"")).split("'").join("%27")}
-function ctKhoi(nhan,n){return n?('<div class="sechd">'+esc(nhan)+' ('+n+')</div><div class="obcards rows">'):''}
+function ctKhoi(nhan,n){return n?('<div class="sechd">'+esc(nhan)+' ('+n+')</div><div>'):''}
 function ctThe(ten,meta,chip,nut){
- return '<div class="obcard"><div class="obh"><div><b>'+ten+'</b><div class="obm">'+meta+'</div></div>'+
-  (chip||'')+'</div>'}
+ return '<div class="ctit"><div class="ctih"><b>'+ten+'</b>'+(chip||'')+
+  '<span class="ctim">'+meta+'</span>'+(nut||'')+'</div>'}
 function ctXem(arg){
  var p=String(arg||""),i=p.indexOf("|");if(i<0)return;
  var k=p.slice(0,i),id=decodeURIComponent(p.slice(i+1));
@@ -9539,19 +9539,21 @@ function ctXem(arg){
   b.kn.forEach(function(c){var sev=ecode(c.complaint_severity),mo=!isc(c.complaint_status,"resolved");
    h+=ctThe(esc(c.student_id_name||c.student_id),
     esc(elabel(c.complaint_type)||"")+' · '+esc(c.complaint_time||"")+(c.class_id_name?(' · '+esc(c.class_id_name)):''),
-    '<span class="chip '+(mo?"red":"green")+'">'+esc(elabel(c.complaint_status)||"")+'</span>');
+    '<span class="chip '+(mo?"red":"green")+'">'+esc(elabel(c.complaint_status)||"")+'</span>',
+    '<button class="btn sm" onclick="openComplaint(\''+esc(c.complaint_id)+'\')"><i class="ti ti-external-link"></i>Mở khiếu nại</button>');
    h+=ctxContent("Học viên khiếu nại",c.complaint_content,sev==="high"?"var(--red)":"var(--navy)");
    if(String(c.resolution_note||"").trim())h+=ctxContent("Đã giải quyết thế nào",c.resolution_note,"var(--green)");
-   h+='<div class="obact"><button class="btn sm" onclick="openComplaint(\''+esc(c.complaint_id)+'\')"><i class="ti ti-external-link"></i>Mở khiếu nại</button></div></div>'});
+   h+='</div>'});
   h+='</div>'}
  if(b.fb.length){h+=ctKhoi("Phản hồi & Góp ý",b.fb.length);
   b.fb.forEach(function(f){var lo=ecode(f.feedback_type);
    h+=ctThe(esc(f.student_id_name||f.student_id||"(chưa gắn học viên)"),
     esc(elabel(f.feedback_category)||"")+' · '+esc(f.feedback_time||"")+(num(f.feedback_score)?(' · '+esc(f.feedback_score)+'/5'):''),
-    '<span class="chip '+(lo==="negative"?"red":(lo==="positive"?"green":"gray"))+'">'+esc(elabel(f.feedback_type)||"-")+'</span>');
+    '<span class="chip '+(lo==="negative"?"red":(lo==="positive"?"green":"gray"))+'">'+esc(elabel(f.feedback_type)||"-")+'</span>',
+    '<button class="btn sm" onclick="fbXem(\''+esc(f.feedback_id)+'\')"><i class="ti ti-external-link"></i>Mở phản hồi</button>');
    h+=ctxContent("Nội dung phản hồi",f.feedback_content,lo==="negative"?"var(--red)":"var(--navy)");
    if(String(f.feedback_action_note||"").trim())h+=ctxContent("Đã xử lý thế nào",f.feedback_action_note,"var(--green)");
-   h+='<div class="obact"><button class="btn sm" onclick="fbXem(\''+esc(f.feedback_id)+'\')"><i class="ti ti-external-link"></i>Mở phản hồi</button></div></div>'});
+   h+='</div>'});
   h+='</div>'}
  if(b.sv.length){h+=ctKhoi("Phiếu khảo sát",b.sv.length);
   /* Phiếu chê xếp lên trước phiếu khen - cùng lý do với thứ tự khối ở trên. */
@@ -9560,12 +9562,13 @@ function ctXem(arg){
    h+=ctThe(esc(v.student_name||v.student_id),
     esc(elabel(v.survey_type)||"")+' · '+esc(tl||("gửi "+(v.sent_date||"")))+(v.class_id_name?(' · '+esc(v.class_id_name)):''),
     d?('<span class="chip '+(d>=thSS?"green":(d>=thSS-1?"amber":"red"))+'">'+esc(v.satisfaction_score)+'/5</span>')
-     :'<span class="chip gray">chưa trả lời</span>');
+     :'<span class="chip gray">chưa trả lời</span>',
+    '<button class="btn sm" onclick="svXem(\''+esc(v.survey_id)+'\')"><i class="ti ti-external-link"></i>Mở phiếu</button>');
    if(String(v.negative_comments||"").trim())h+=ctxContent("Học viên chê",v.negative_comments,"var(--red)");
    if(String(v.suggestions||"").trim())h+=ctxContent("Học viên đề xuất",v.suggestions,"var(--amber)");
    if(String(v.positive_comments||"").trim())h+=ctxContent("Học viên khen",v.positive_comments,"var(--green)");
-   if(!tl)h+='<div class="obm2 mut">Phiếu chưa có trả lời nên không tính vào điểm trung bình.</div>';
-   h+='<div class="obact"><button class="btn sm" onclick="svXem(\''+esc(v.survey_id)+'\')"><i class="ti ti-external-link"></i>Mở phiếu</button></div></div>'});
+   if(!tl)h+='<div class="ctno">Phiếu chưa có trả lời nên không tính vào điểm trung bình.</div>';
+   h+='</div>'});
   h+='</div>'}
  if(b.wow.length){h+=ctKhoi("Buổi WOW 1-1",b.wow.length);
   b.wow.forEach(function(w){var kq=ecode(w.wow_outcome);
@@ -9573,10 +9576,11 @@ function ctXem(arg){
     .filter(function(x){return num(x[1])}).map(function(x){return x[0]+" "+x[1]}).join(" · ");
    h+=ctThe(esc(w.student_name||w.student_id),
     esc(elabel(w.wow_skill)||elabel(w.wow_session_type)||"")+' · '+esc(w.wow_session_date||"")+(diem?(' · '+esc(diem)):''),
-    num(w.wow_overall)?('<span class="chip '+(/improve|progress|good/.test(kq)?"green":"amber")+'">'+esc(w.wow_overall)+'/9</span>'):'');
+    num(w.wow_overall)?('<span class="chip '+(/improve|progress|good/.test(kq)?"green":"amber")+'">'+esc(w.wow_overall)+'/9</span>'):'',
+    '<button class="btn sm" onclick="wowMoc(\''+esc(w.wow_id)+'\')"><i class="ti ti-external-link"></i>Mở buổi WOW</button>');
    if(String(w.wow_content_note||"").trim())h+=ctxContent("Coach ghi lại buổi kèm",w.wow_content_note,"var(--navy)");
-   if(kq)h+='<div class="obm2">Kết quả buổi: <b>'+esc(elabel(w.wow_outcome)||kq)+'</b></div>';
-   h+='<div class="obact"><button class="btn sm" onclick="wowMoc(\''+esc(w.wow_id)+'\')"><i class="ti ti-external-link"></i>Mở buổi WOW</button></div></div>'});
+   if(kq)h+='<div class="ctno">Kết quả buổi: <b>'+esc(elabel(w.wow_outcome)||kq)+'</b></div>';
+   h+='</div>'});
   h+='</div>'}
  if(!b.kn.length&&!b.fb.length&&!b.sv.length&&!b.wow.length)
   h+='<div class="empty">Chủ thể này chưa có phiếu nào có nội dung để đọc.</div>';
