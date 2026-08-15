@@ -157,11 +157,15 @@
 >    tìm ra. KHÔNG tuyên bố đã sửa. Đã làm việc duy nhất làm được lúc này: cho nó **ghi hồ sơ**
 >    (`_src/_taolai_khac/`: hai bản dữ liệu đầy đủ + phần lệch của từng bảng, tới tận tên cột) mỗi
 >    lần đỏ. *Lỗi hiếm thì phải bắt được dấu vết ngay lần đầu - lần thứ hai có thể không tới.*
-> 2. **Dải 5 thẻ Bảng quản lý (BC9) chữ vẫn ba dòng.** Nhãn mang số sống từ CH2 nhúng giữa câu.
->    Rút chữ là chạm `_checkkhuon` K3b - phải nghĩ cách khác, không phải cắt bớt.
-> 3. **CSS ô chào `.bwhero` và họ hàng (~20 lớp) nay không ai vẽ ra.** Cố ý giữ: cắt CSS theo
->    khoảng dòng đã một lần làm vỡ cả dải thẻ (xem bẫy 15/08). Muốn dọn thì phải gỡ theo từng
->    luật một, có đo lại sau mỗi bước.
+> 2. ~~Dải 5 thẻ BC9 chữ ba dòng~~ **XONG**. Đo lại thì K3b không hề ràng buộc dòng phụ - nó đo
+>    cột MÔ TẢ trong `THEDEF` (câu hiện khi rê chuột). Em đã tự dựng ra một ràng buộc không có,
+>    rồi lấy nó làm lý do treo việc. Rút phụ chú: bỏ phần lặp lại nhãn và lặp lại tên dải.
+> 3. ~~CSS ô chào không ai vẽ~~ **XONG** - dọn 21 luật, theo TÊN chứ không theo VỊ TRÍ: đo từng
+>    lớp xem còn chỗ nào trong HTML dùng tới không, rồi xoá đúng những dòng mà mọi selector đều
+>    đã chết. Giữ `.bwap` và `.bwsrchhint` vì hai lớp ấy còn sống.
+> 4. ~~Chưa có bộ kiểm bắt câu tự mâu thuẫn (nêu 11/08)~~ **XONG** - `_checkcau.js`, 6 phép thử
+>    trên 719 màn = 4.314 tiêu chí. Hai phép đã viết rồi BỎ vì báo oan (ghi lại trong file để
+>    người sau khỏi viết lại). Đã thử ngược thật: chèn 6 câu hỏng, cả 6 phép đều bắt.
 >
 > ### 📋 14/08 khuya - CÒN TREO SAU ĐỢT GỘP TRANG
 > 1. **Dải 5 thẻ Bảng quản lý (BC9) chữ chen ba dòng.** Nhãn thẻ mang số sống từ CH2 nhúng giữa
@@ -307,8 +311,8 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 41 BỘ KIỂM, XANH HẾT 41/41 (verify trọn bộ 15/08 sáng). Bản dựng đang chạy:
-> `1b9765` (15/08), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> **Phiên bản: V2 — 42 BỘ KIỂM (thêm `_checkcau` 15/08). Bản dựng đang chạy:
+> `33ad75` (15/08), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
 > Mốc cũ: `a6046c`, `882082`, `868f3f`, `a1bda4`, `519e91`, `dc6eb3`, `3f0446`, `39083f`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**

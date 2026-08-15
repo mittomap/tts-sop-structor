@@ -896,17 +896,9 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    Nay để nguyên khối CSS. CSS thừa vài chục dòng thì vô hại; cắt nhầm thì hỏng cả app, và bộ
    kiểm chữ nghĩa không bắt được - phải có người nhìn mới thấy.
    *Đừng bao giờ cắt một khoảng file bằng hai cái mốc mà mình chưa đo khoảng cách giữa chúng.* */
-.bwhero{display:flex;gap:16px;flex-wrap:wrap;align-items:center;background:linear-gradient(120deg,#0F2A4A,#1E4A7A);
  border-radius:12px;padding:14px 18px;margin-bottom:14px;color:#fff}
-.bwl{flex:1 1 300px;min-width:0}
-.bwr{flex:0 1 400px;min-width:240px}
-.bwg{font-size:17px;font-weight:800;line-height:1.3}
-.bwsub{font-size:12px;opacity:.9;margin-top:3px;line-height:1.5;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-.bwsub b{color:#fff}
-.bwdot{opacity:.45}
 /* Dấu ngăn + mục đi sau nó là MỘT khối: xuống dòng thì xuống cùng nhau. Xem ghi chú ở chỗ dựng
    dòng chào - dấu "·" treo cuối dòng trên khổ điện thoại. */
-.bwit{display:inline-flex;align-items:center;gap:7px}
 /* KHỔ HẸP THÌ BỎ HẲN DẤU NGĂN. Bọc dấu ngăn cùng mục sau nó chữa được cảnh nó treo CUỐI dòng,
    nhưng đo lại trên màn 390px thì nó chuyển sang đứng ĐẦU dòng hai - một dấu chấm lơ lửng
    trước cụm "Hẹn kế", vẫn lạ mắt y như cũ. Dấu ngăn chỉ có nghĩa khi hai thứ nó ngăn nằm CÙNG
@@ -919,18 +911,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
  cursor:pointer;transition:.12s;font-size:11.5px;line-height:1.5}
 .bwap>i{margin-right:5px;vertical-align:-1px}
 .bwap:hover{background:#ffffff33}
-.bwover{color:#FFD3D3;font-weight:800}
-.bwsearch{position:relative;display:flex;align-items:center;gap:8px;background:#fff;border-radius:10px;padding:0 12px;max-width:none}
-.bwsearch i{color:var(--muted)}
-.bwsearch input{flex:1;border:0;outline:0;height:36px;font-family:inherit;font-size:12.5px;background:transparent}
 @media(max-width:760px){.bwr{flex:1 1 100%}}
-.bwr{display:flex;flex-direction:column;gap:10px;justify-content:center;min-width:220px}
-.bwcta{display:flex;align-items:center;gap:12px;background:#fff;color:var(--navy);border:0;border-radius:12px;padding:14px 18px;cursor:pointer;font-family:inherit;text-align:left}
-.bwcta:hover{box-shadow:0 6px 20px rgba(0,0,0,.25)}
-.bwcta i{font-size:26px;color:var(--blue)}
-.bwcta b{font-size:15px;display:block}.bwcta small{font-size:11px;color:var(--muted)}
-.bwcta2{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:10px 14px;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600}
-.bwcta2:hover{background:rgba(255,255,255,.22)}
 .bstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin-bottom:16px}
 /* ═══ V2 14/08 - DẢI ÍT THẺ THÌ ĐỪNG KÉO THẺ RA CHO ĐẦY HÀNG ════════════════════════════════
    `auto-fit` gom các cột rỗng lại, nên một dải HAI thẻ thì mỗi thẻ phình ra ~560px: một cái ô
@@ -1007,6 +988,11 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    `overflow:visible` nên phần thò ra đội cả khung nội dung cuộn ngang 14px trên điện thoại.
    `.bsl` đã có `overflow-wrap:anywhere` từ trước - thiếu đúng dòng SỐ, tức nửa cái luật. */
 .bsn{font-size:20px;font-weight:800;color:var(--navy);line-height:1.1;overflow-wrap:anywhere}
+/* Ô chào lớn của Trang bắt đầu cũ: 21 luật CSS của nó đã dọn (15/08) sau khi nhánh vẽ ra nó
+   hết chỗ gọi. Dọn TỪNG LUẬT một, sau khi đo từng lớp xem còn chỗ nào trong HTML dùng tới không -
+   KHÔNG cắt theo khoảng dòng, vì đúng cái cách ấy đã làm vỡ cả dải thẻ sáng nay. Hai lớp còn
+   sống được giữ nguyên: `.bwap` (ô lý do trong màn chạy) và `.bwsrchhint` (hint cạnh ô tìm).
+   *Dọn mã chết thì dọn theo TÊN, đừng dọn theo VỊ TRÍ.* */
 /* ═══ BẪY ĐÃ CẮN LẦN HAI TRONG NGÀY 15/08 - KHÔI PHỤC CSS BẰNG BẢN CŨ THÌ ĐÈ MẤT BẢN MỚI ═════
    Sáng nay em cắt nhầm 49.071 ký tự CSS, và chữa bằng cách lấy nguyên khối ấy từ `git show HEAD`
    dán lại. Chữa được cái vỡ trước mắt, nhưng bản HEAD là bản TRƯỚC hai luật em vừa thêm vào
@@ -1022,8 +1008,6 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    chỗ cần ngắt, riêng `overflow-wrap:anywhere` vẫn để nó thò ra 2px trên khổ điện thoại. */
 .bsp{font-size:11px;color:var(--muted);opacity:.78;line-height:1.35;margin-top:2px;
  overflow-wrap:anywhere;word-break:break-word;min-width:0}
-.bwgh{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.3px;color:var(--muted);text-transform:uppercase;margin:12px 0 6px}
-.bwgc{background:var(--bg);border-radius:20px;padding:0 8px;font-size:11px}
 /* ===== THANH CÔNG CỤ CHUẨN - dùng cho MỌI trang có bộ lọc ===== */
 .hvj{position:relative;padding-left:6px}
 .hvjr{display:flex;align-items:center;gap:13px;padding:9px 0;position:relative}
@@ -3126,7 +3110,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">15/08/2026 · <b>1b9765</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">15/08/2026 · <b>33ad75</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -7010,9 +6994,16 @@ function BANGVIEC(){
         !(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())}).length,
       "Buổi thiếu mốc giờ vào/ra","#E08A1E","thiếu mốc là bảng công tính sai","go('bangcong')"]]},
  quanly:{bc:"BC9",t:"Bảng Quản lý",d:"Việc cần cấp quản lý phê duyệt, theo bảng phân quyền CH3.",
-  o:[["ti-discount-2",duyCkList().length,"Chiết khấu cần duyệt","#B58A2B","từ "+slaChip("thresholdDiscount_approval",1000000,"đ")+" trở lên","goDuyet('duyetck')"],
-     ["ti-transfer",OB.filter(function(r){return num(r.placement_change_count)>=dlNguong()}).length,"Đổi lớp từ "+dlNguong()+" lần","#6B4FA0","quá "+slaChip("placementChange_free_times",1,"lần")+" miễn duyệt - cần quản lý phê duyệt","go('xeplop')"],
-     ["ti-alert-triangle",KN.filter(function(r){return isc(r.complaint_severity,"high")&&!isc(r.complaint_status,"resolved")}).length,"Khiếu nại mức CAO","#E24B4A","quản lý tham gia trong "+slaChip("slaComplaintHigh_hours",4,"giờ"),"goCS('khieunai')"],
+  o:[["ti-discount-2",duyCkList().length,"Chiết khấu cần duyệt","#B58A2B","từ "+slaChip("thresholdDiscount_approval",1000000,"đ"),"goDuyet('duyetck')"],
+     ["ti-transfer",OB.filter(function(r){return num(r.placement_change_count)>=dlNguong()}).length,/* ═══ V2 15/08 - PHỤ CHÚ THẺ ĐỪNG NÓI LẠI THỨ NHÃN VỪA NÓI ═══════════════════════════════
+        Dòng phụ cũ: *"quá 1 lần ⚙ miễn duyệt - cần quản lý phê duyệt"* - vế sau lặp đúng nghĩa
+        của cả dải ("Việc cần cấp quản lý phê duyệt" đã ghi ngay trên đầu dải), còn vế đầu lặp
+        chính cái nhãn "Đổi lớp từ 2 lần". Ba dòng chữ trong một ô 220px mà hai dòng nói lại thứ
+        vừa đọc.
+        Giữ đúng phần MỚI: ngưỡng miễn duyệt là bao nhiêu - đó là con số người ta cần và là chỗ
+        có bánh răng để sửa. *Phụ chú là chỗ nói thêm, không phải chỗ nhắc lại.* */
+"Đổi lớp từ "+dlNguong()+" lần","#6B4FA0","miễn duyệt tới "+slaChip("placementChange_free_times",1,"lần"),"go('xeplop')"],
+     ["ti-alert-triangle",KN.filter(function(r){return isc(r.complaint_severity,"high")&&!isc(r.complaint_status,"resolved")}).length,"Khiếu nại mức CAO","#E24B4A","quản lý vào trong "+slaChip("slaComplaintHigh_hours",4,"giờ"),"goCS('khieunai')"],
      ["ti-arrow-up-right",KN.filter(function(r){return String(r.escalated_to||"").trim()&&!isc(r.complaint_status,"resolved")}).length,"Khiếu nại đã leo thang","#DB2777","Học viên không chấp nhận cách xử lý","goCS('khieunai')"],
      /* SOP liệt kê 4 ô ở BC9, nhưng CH3 còn giao cho quản lý việc "Xác nhận hoàn tiền" - việc đó
         CÓ hàng chờ đếm được, nên phải nhìn thấy chứ không để nằm khuất trong hub Chờ duyệt. */

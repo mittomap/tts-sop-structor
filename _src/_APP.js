@@ -3845,9 +3845,16 @@ function BANGVIEC(){
         !(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())}).length,
       "Buổi thiếu mốc giờ vào/ra","#E08A1E","thiếu mốc là bảng công tính sai","go('bangcong')"]]},
  quanly:{bc:"BC9",t:"Bảng Quản lý",d:"Việc cần cấp quản lý phê duyệt, theo bảng phân quyền CH3.",
-  o:[["ti-discount-2",duyCkList().length,"Chiết khấu cần duyệt","#B58A2B","từ "+slaChip("thresholdDiscount_approval",1000000,"đ")+" trở lên","goDuyet('duyetck')"],
-     ["ti-transfer",OB.filter(function(r){return num(r.placement_change_count)>=dlNguong()}).length,"Đổi lớp từ "+dlNguong()+" lần","#6B4FA0","quá "+slaChip("placementChange_free_times",1,"lần")+" miễn duyệt - cần quản lý phê duyệt","go('xeplop')"],
-     ["ti-alert-triangle",KN.filter(function(r){return isc(r.complaint_severity,"high")&&!isc(r.complaint_status,"resolved")}).length,"Khiếu nại mức CAO","#E24B4A","quản lý tham gia trong "+slaChip("slaComplaintHigh_hours",4,"giờ"),"goCS('khieunai')"],
+  o:[["ti-discount-2",duyCkList().length,"Chiết khấu cần duyệt","#B58A2B","từ "+slaChip("thresholdDiscount_approval",1000000,"đ"),"goDuyet('duyetck')"],
+     ["ti-transfer",OB.filter(function(r){return num(r.placement_change_count)>=dlNguong()}).length,/* ═══ V2 15/08 - PHỤ CHÚ THẺ ĐỪNG NÓI LẠI THỨ NHÃN VỪA NÓI ═══════════════════════════════
+        Dòng phụ cũ: *"quá 1 lần ⚙ miễn duyệt - cần quản lý phê duyệt"* - vế sau lặp đúng nghĩa
+        của cả dải ("Việc cần cấp quản lý phê duyệt" đã ghi ngay trên đầu dải), còn vế đầu lặp
+        chính cái nhãn "Đổi lớp từ 2 lần". Ba dòng chữ trong một ô 220px mà hai dòng nói lại thứ
+        vừa đọc.
+        Giữ đúng phần MỚI: ngưỡng miễn duyệt là bao nhiêu - đó là con số người ta cần và là chỗ
+        có bánh răng để sửa. *Phụ chú là chỗ nói thêm, không phải chỗ nhắc lại.* */
+"Đổi lớp từ "+dlNguong()+" lần","#6B4FA0","miễn duyệt tới "+slaChip("placementChange_free_times",1,"lần"),"go('xeplop')"],
+     ["ti-alert-triangle",KN.filter(function(r){return isc(r.complaint_severity,"high")&&!isc(r.complaint_status,"resolved")}).length,"Khiếu nại mức CAO","#E24B4A","quản lý vào trong "+slaChip("slaComplaintHigh_hours",4,"giờ"),"goCS('khieunai')"],
      ["ti-arrow-up-right",KN.filter(function(r){return String(r.escalated_to||"").trim()&&!isc(r.complaint_status,"resolved")}).length,"Khiếu nại đã leo thang","#DB2777","Học viên không chấp nhận cách xử lý","goCS('khieunai')"],
      /* SOP liệt kê 4 ô ở BC9, nhưng CH3 còn giao cho quản lý việc "Xác nhận hoàn tiền" - việc đó
         CÓ hàng chờ đếm được, nên phải nhìn thấy chứ không để nằm khuất trong hub Chờ duyệt. */

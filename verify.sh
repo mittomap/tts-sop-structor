@@ -141,6 +141,8 @@ chay "_checkdemo bay thu trong tuan" "CHECKDEMO OK"     node _checkdemo.js
 # hai ba nguoi - gui, vao hang cho, dung nguoi thay, co nhac, xu ly duoc, nguoi gui biet ket qua.
 # Bat ngay lan chay dau: o "Cho toi xac nhan" dan sang nhom loc khong chua chinh may viec do.
 chay "_checkchuoi chuoi phoi hop nhieu nguoi" "CHECKCHUOI OK" node _checkchuoi.js
+# 15/08 - bo kiem DOC CHU tren man roi bat cau tu mau thuan. Neu tu 11/08, lam 15/08.
+chay "_checkcau  cau tren man co nghia khong" "CHECKCAU OK" node _checkcau.js
 
 # MOT NGAY CUA TUNG CHUC DANH: khong hoi "co hong khong" ma hoi "ngoi vao ghe ho thi co lam duoc
 # viec khong". Bat duoc chuyen ba chuc danh Nhan su dap xuong Ban lam viec roi nhin 344 ho so ma
