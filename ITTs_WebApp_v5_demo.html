@@ -3183,7 +3183,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">15/08/2026 · <b>553234</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">15/08/2026 · <b>c7d1a0</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -23495,7 +23495,19 @@ function gvdpThangLuu(k){
  toast("Đã lưu "+chon.length+" giảng viên dự phòng cho tháng "+k+".",4600);
  reRender(CUR)}
 /* MÀN "GV DỰ PHÒNG THEO NGÀY": chọn ngày, thấy từng buổi hôm đó và ai đang trống để đẩy lên. */
-function gvdpDay(){var d=pvnd(window.GVDPD||"");if(d)return d;var t=new Date();t.setHours(0,0,0,0);return t}
+/* ═══ V2 15/08 - Ô CHỌN NGÀY CỦA TRANG NÀY CHƯA BAO GIỜ CHẠY ════════════════════════════════
+   Đo được lúc kiểm bảng "trống lịch theo ngày đã chọn": đổi `GVDPD` sang ngày nào thì bảng vẫn
+   ra hôm nay. Gốc: `<input type="date">` trả về dạng ISO `2026-08-18`, còn `pvnd` chỉ đọc dạng
+   `dd/mm/yyyy` - không khớp thì nó trả null, và dòng dưới lặng lẽ rơi về hôm nay.
+   Hỏng KIỂU IM LẶNG NHẤT: không lỗi, không báo, màn vẫn đầy dữ liệu - chỉ là dữ liệu của một
+   ngày khác với ngày người dùng vừa bấm. Đây rất có thể là điều anh Luân gặp khi hỏi *"sao lại
+   là dự phòng trong ngày nhỉ, a chọn ngày nào mà chẳng được"* - anh chọn, và không có gì đổi.
+   *Một ô nhập trả về định dạng A mà hàm đọc chỉ hiểu định dạng B thì cái ô ấy là đồ trang trí.* */
+function gvdpDay(){var v=String(window.GVDPD||"");
+ var m=v.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+ if(m)return new Date(+m[1],+m[2]-1,+m[3],0,0,0,0);
+ var d=pvnd(v);if(d){d.setHours(0,0,0,0);return d}
+ var t=new Date();t.setHours(0,0,0,0);return t}
 function gvdpSet(v){window.GVDPD=v;reRender(CUR)}
 function renderGvdp(embed){
  var day=gvdpDay();
@@ -23583,15 +23595,50 @@ function renderGvdp(embed){
    '<td>'+(n?'<span class="chip green">'+n+' người</span>':'<span class="chip red">không có ai</span>')+'</td>'+
    '<td><button class="btn primary sm" onclick="event.stopPropagation();gvBackupForm(\''+esc(x.session_id)+'\')"><i class="ti ti-user-plus"></i>Đề xuất người dạy thay</button></td></tr>'});
  h+='</tbody></table></div></div>';
- h+='<div class="panel"><div class="ph"><b>Giáo viên trống lịch hôm nay ('+free.length+')</b><span class="mut" style="font-size:11.5px">không có buổi nào trong ngày - nguồn dự phòng</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giáo viên</th><th>Cơ sở</th><th>Đã dạy ở</th><th>Buổi hôm nay</th></tr></thead><tbody>';
- if(!free.length)h+='<tr><td class="empty" colspan="4">Hôm nay giáo viên nào cũng có lịch - không còn người dự phòng.</td></tr>';
- GV.forEach(function(g){var nb=busyMap[g.staff_id]||0;
-  var brs=Object.keys(gvBranches(g.staff_id)).map(function(b){return elabel(b)||b});
-  h+='<tr data-mo="openNSQuick" data-mo-arg="'+esc(g.staff_id||"")+'"'+(nb?' style="opacity:.6"':'')+'><td>'+nsLnk(g.staff_id,g.full_name,"")+'</td>'+
-   '<td class="khongbe">'+cnT(g.branch)+'</td>'+
-   '<td style="font-size:11.5px">'+esc(brs.join(" · ")||"-")+'</td>'+
-   '<td>'+(nb?'<span class="chip amber">'+nb+' buổi</span>':'<span class="chip green">trống</span>')+'</td></tr>'});
- h+='</tbody></table></div></div>';
+ /* ═══ V2 15/08 - BẢNG NÀY TỪNG TRẢ LỜI MỘT CÂU KHÔNG CÓ NGHĨA ═══════════════════════════════
+    Anh Luân: *"Giáo viên trống lịch hôm nay là session có ý nghĩa gì ???"*
+    Không có nghĩa gì cả, và chính anh vừa chỉ ra vì sao ở lượt trước: giáo viên làm theo ca thì
+    **trống lịch chỉ có nghĩa là hôm ấy họ không đến trung tâm**, không có nghĩa là họ rảnh để
+    dạy thay. Bảng này bày bảy cái tên dưới nhãn "nguồn dự phòng" trong khi có thể không ai
+    trong bảy người ấy có mặt.
+    Và nó còn tự mâu thuẫn: tiêu đề đếm `free` (7 người không có buổi) nhưng thân bảng đổ **cả
+    10** giáo viên, người bận thì làm mờ đi. *Tiêu đề đếm một kiểu, bảng đổ ra một kiểu khác -
+    con số trên tiêu đề thành ra không nói về cái bảng nằm ngay dưới nó.*
+
+    Thay bằng câu HỌC VỤ THẬT SỰ CẦN vào ngày đang chọn: **ai đã nhận ca dạy thay hôm ấy, ai
+    chưa** - để còn gọi. Giữ lại cột "đã dạy ở" (biết người ấy đứng lớp được ở cơ sở nào) vì đó
+    là thông tin thật, không phải suy đoán. Cột "buổi hôm nay" ở lại nhưng đổi nghĩa: nó là TẢI
+    của người đó hôm ấy, không còn là bằng chứng "rảnh". */
+ (function(){
+  var _dk={};dpAll().forEach(function(x){var d=dpNgay(x);
+   if(d&&sameDay(d,day)&&!isc(x.dp_status,"cancelled"))(_dk[String(x.staff_id||"")]=_dk[String(x.staff_id||"")]||[]).push(x)});
+  /* V2 15/08 lượt 2 (anh Luân: *"E đổi lại để nó hiện danh sách giáo viên trống lịch theo ngày
+     đã chọn phía trên là ngon thôi"*). Rõ - anh vẫn muốn danh sách người trống lịch, chỉ cần nó
+     ĐÚNG NGÀY đang chọn ở trên. Nay bảng chỉ đổ người trống lịch ngày ấy, nên tiêu đề và thân
+     bảng đếm cùng một tập (trước đây tiêu đề 7 mà bảng đổ 10).
+     Giữ thêm cột "Ca đã đăng ký hôm nay": trống lịch mới là điều kiện cần, đã đăng ký mới là
+     người gọi được ngay - hai vế đứng cạnh nhau thì học vụ gọi đúng người từ cuộc đầu tiên. */
+  var _tr=GV.filter(function(g){return !busyMap[g.staff_id]});
+  var _co=_tr.filter(function(g){return (_dk[String(g.staff_id)]||[]).length}).length;
+  h+='<div class="panel"><div class="ph"><b>Giáo viên trống lịch ngày '+esc(vnd2(day))+' ('+_tr.length+')</b>'+
+   '<span class="mut" style="font-size:11.5px">không có buổi nào trong ngày · '+_co+' người đã đăng ký ca dạy thay - gọi được ngay</span>'+
+   '<div class="mini"><button class="pill" onclick="dpForm()"><i class="ti ti-calendar-plus"></i>Đăng ký hộ</button></div></div>'+
+   '<div class="tbwrap"><table class="dt"><thead><tr><th>Giáo viên</th><th>Cơ sở</th><th>Ca đã đăng ký hôm nay</th><th>Đã dạy ở</th></tr></thead><tbody>';
+  /* Người ĐÃ ĐĂNG KÝ xếp lên đầu: đó là danh sách gọi được ngay. */
+  _tr.slice().sort(function(a,b){return ((_dk[b.staff_id]?1:0)-(_dk[a.staff_id]?1:0))||
+    String(a.full_name||"").localeCompare(String(b.full_name||""))})
+   .forEach(function(g){
+   var ca=_dk[String(g.staff_id)]||[];
+   var brs=Object.keys(gvBranches(g.staff_id)).map(function(b){return elabel(b)||b});
+   h+='<tr data-mo="openNSQuick" data-mo-arg="'+esc(g.staff_id||"")+'">'+
+    '<td>'+nsLnk(g.staff_id,g.full_name,"")+'</td>'+
+    '<td class="khongbe">'+cnT(g.branch)+'</td>'+
+    '<td>'+(ca.length
+      ?ca.map(function(x){return '<span class="chip green khongbe">'+esc(x.slot_from+" - "+x.slot_to)+'</span>'}).join(" ")
+      :'<span class="mut">chưa đăng ký - phải gọi hỏi</span>')+'</td>'+
+    '<td style="font-size:11.5px">'+esc(brs.join(" · ")||"-")+'</td></tr>'});
+  if(!_tr.length)h+='<tr><td colspan="4"><div class="empty">Ngày '+esc(vnd2(day))+' giáo viên nào cũng có lịch dạy - không còn ai trống.</div></td></tr>';
+  h+='</tbody></table></div></div>'})();
  return h+gvTaiHTML()}
 /* ===== TẢI GIẢNG VIÊN CẢ ĐỘI =======================================================
    V9.40. App xem được từng giáo viên một (hồ sơ giảng viên rất đầy đủ) và xem được MỘT NGÀY
@@ -23736,11 +23783,25 @@ function dpKhoang(){
  if(tu>den){var _x=tu;tu=new Date(den.getTime());tu.setHours(0,0,0,0);den=_x;den.setHours(23,59,59,999)}
  return {tu:tu,den:den}}
 function dpKhoangSet(v,val){if(v==="tu")window.DPTU=val;else window.DPDEN=val;reRender(CUR)}
+function dpCsSet(v){window.DPCS=v;reRender(CUR)}
 function dpSoHTML(){
  var K=dpKhoang();
  var ds=dpAll().filter(function(x){var d=dpNgay(x);return d&&d>=K.tu&&d<=K.den})
   .sort(function(a,b){return (pvnd(a.slot_datetime)||0)-(pvnd(b.slot_datetime)||0)||
     String(a.staff_name||"").localeCompare(String(b.staff_name||""))});
+ /* ═══ V2 15/08 - LỌC THEO CƠ SỞ (anh Luân: *"thiếu bộ lọc cho cơ sở để tìm nhanh"*) ═════════
+    Ô lọc CHỈ liệt kê cơ sở CÓ THẬT trong khoảng ngày đang xem, không đổ cả danh mục: một lựa
+    chọn bấm vào ra bảng rỗng là một lựa chọn nói dối rằng ở đó có gì đó.
+    Mỗi mục mang theo SỐ CA của chính nó - chọn xong không bất ngờ.
+    *Bộ lọc phải sinh ra từ dữ liệu đang có, đừng sinh ra từ danh mục.* */
+ var _csDem={},_csTen={};
+ ds.forEach(function(x){var c=ecode(x.branch)||"(chưa ghi)";
+  _csDem[c]=(_csDem[c]||0)+1;_csTen[c]=elabel(x.branch)||x.branch||"(chưa ghi cơ sở)"});
+ var _csDs=Object.keys(_csDem).sort();
+ var _cs=window.DPCS||"";
+ if(_cs&&_csDem[_cs]==null)_cs=window.DPCS="";     /* đổi khoảng ngày mà cơ sở cũ không còn ca */
+ var nAll=ds.length;
+ if(_cs)ds=ds.filter(function(x){return (ecode(x.branch)||"(chưa ghi)")===_cs});
  var nTrong=ds.filter(dpConTrong).length;
  var h='<div class="sechd">Sổ ca dạy thay đã đăng ký</div>';
  h+=tbar('<span class="tblbl">Khoảng ngày</span>'+
@@ -23748,13 +23809,21 @@ function dpSoHTML(){
   '<input type="date" aria-label="Từ ngày" value="'+esc(window.DPTU||repISO(K.tu))+'" onchange="dpKhoangSet(\'tu\',this.value)">'+
   '<span class="mut" style="font-size:11.5px">đến</span>'+
   '<input type="date" aria-label="Đến ngày" value="'+esc(window.DPDEN||repISO(K.den))+'" onchange="dpKhoangSet(\'den\',this.value)">'+
+  (_csDs.length>1
+    ?('<span class="tblbl" style="margin-left:10px">Cơ sở</span>'+
+      segHTML(_cs,[["","Tất cả",nAll,""]].concat(_csDs.map(function(c){return [c,_csTen[c],_csDem[c],""]})),
+        "dpCsSet('{k}')","dp_cs_loc"))
+    :'')+
   '<button class="btn sm" onclick="dpForm()"><i class="ti ti-calendar-plus"></i>Đăng ký ca</button>',
   '<span class="tbcnt">'+ds.length+' ca · '+nTrong+' còn trống</span>');
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr>'+
   '<th>Giáo viên</th><th>Ngày</th><th>Khung giờ</th><th>Cơ sở nhận dạy</th><th>Trạng thái</th>'+
   '<th>Đã gán buổi</th><th>Đăng ký lúc</th><th>Ghi chú</th><th></th></tr></thead><tbody>';
- if(!ds.length)h+='<tr><td colspan="9"><div class="empty">Khoảng ngày này chưa ai đăng ký ca dạy thay nào. '+
-  'Đăng ký trước thì lúc có giáo viên báo nghỉ mới có người để xếp.</div></td></tr>';
+ if(!ds.length)h+='<tr><td colspan="9"><div class="empty">'+
+  (_cs?('Khoảng ngày này không có ca nào ở '+esc(_csTen[_cs]||"cơ sở đã chọn")+'. '+
+        '<button class="btn sm" onclick="dpCsSet(\'\')" style="margin-left:8px"><i class="ti ti-x"></i>Bỏ lọc cơ sở</button>')
+   :('Khoảng ngày này chưa ai đăng ký ca dạy thay nào. '+
+     'Đăng ký trước thì lúc có giáo viên báo nghỉ mới có người để xếp.'))+'</div></td></tr>';
  ds.forEach(function(x){
   var da=String(x.session_id||"").trim();
   var se=da?find("DL11","session_id",da):null;
