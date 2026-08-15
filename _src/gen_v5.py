@@ -527,6 +527,11 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    canh - lớp khai một đằng, mắt thấy một nẻo. Anh Luân đã dặn cả hai vế: *"a em đưa số qua bên
    phải đi, dễ canh cột hơn"* và *"header và nội dung canh giống nhau đi cho đẹp"*. */
 .dt td.phai{text-align:right}
+/* Ô/chuỗi có giá trị NGẮN thì không cho bẻ dòng - xem `_ngan` trong `tableHTML` để biết vì sao.
+   Để ở dạng lớp DÙNG CHUNG chứ không khoá trong `.dt td`: quá nửa số ô mang tên cơ sở nằm ở
+   những bảng dựng TAY, không đi qua `tableHTML`, nên một luật chỉ áp cho bảng chung là bỏ sót
+   đúng chỗ anh Luân chụp được. Đo ra 94 ô như thế trên 7 màn. */
+.khongbe{white-space:nowrap}
 /* Dùng lại đúng mã màu của đường kẻ NGANG (`#EEF2F6`) chứ không pha thêm một mã nhạt hơn: bảng
    màu app chạm trần 110 mã, thêm một mã cho một cái vạch là tiêu mất suất của một thứ đáng hơn -
    `_checkux` bắt ngay lượt chạy đầu (111/110). Và kẻ dọc cùng màu kẻ ngang thì lưới bảng đọc ra
@@ -5479,6 +5484,24 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
    if(v==null||v==="")return;
    if(/^-?[\d.,]+$/.test(String(v).trim()))co=true;else xau=true});
   _so[c[0]]=co&&!xau});
+ /* ═══ V2 15/08 - CỘT NGẮN THÌ KHÔNG ĐƯỢC RỚT DÒNG ══════════════════════════════════════════
+    Anh Luân, kèm ảnh cột Cơ sở: *"kị việc rớt tên chi nhánh như này, kiểm lại và giãn cột phù
+    hợp ở các nơi có nó"*. Cái tên "Cơ sở 5" gãy làm hai dòng - "Cơ sở" ở trên, "5" ở dưới - nên
+    mắt đọc ra một cột lởm chởm cao thấp, và mất luôn cảm giác đó là MỘT giá trị.
+    Không đi chỉnh bề rộng từng bảng: bề rộng cột do trình duyệt chia, mà chia sai chỉ vì ta cho
+    phép nó bẻ đôi một chuỗi vốn không nên bẻ. Cấm bẻ thì trình duyệt tự chừa đủ chỗ.
+    ĐO TRÊN CHỮ THẬT SẼ HIỆN RA, không đo giá trị thô: cột `branch` lưu "branch_5 (Cơ sở 5)" -
+    18 ký tự - nhưng in ra chỉ là "Cơ sở 5", 7 ký tự. Đo cái thô là kết luận ngược.
+    Chỉ cấm bẻ ở Ô NỘI DUNG, KHÔNG cấm ở tiêu đề: nhiều tiêu đề dài hơn hẳn giá trị ("Sẵn sàng
+    giới thiệu" trên một cột toàn số), cấm bẻ cả tiêu đề là kéo bảng rộng ra vô cớ.
+    *Đừng chỉnh bề rộng để chữa một chỗ gãy - cấm nó gãy thì bề rộng tự đúng.* */
+ var _ngan={};cols.forEach(function(c){
+  var dai=0,n=0;
+  for(var i=0;i<data.length&&n<40;i++){var r=data[i];
+   var t="";try{t=String(cell(r,c,cfg.code)||"")}catch(e){t=String(r[c[0]]||"")}
+   t=t.replace(/<[^>]*>/g," ").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/\s+/g," ").trim();
+   if(!t)continue;n++;if(t.length>dai)dai=t.length}
+  _ngan[c[0]]=dai>0&&dai<=16});
  function _cls(c){
   if(c[2]==="money")return " phai";
   if(c[2]==="chip"||c[2]==="enum"||c[2]==="calcnum"||c[2]==="calcso"||_so[c[0]])return " giua";
@@ -5527,7 +5550,8 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
     if(_the){h+='<td><span class="lopo">'+_the+'<span class="lopn">'+(lk||cell(r,c,cfg.code))+'</span></span></td>';return}
     if(lk){h+='<td>'+lk+'</td>';return}
     var _giua=(c[2]==="chip"||c[2]==="enum"||c[2]==="calcnum"||c[2]==="calcso"||_so[c[0]]);
-    h+='<td'+(c[2]==="money"?' style="text-align:right;font-variant-numeric:tabular-nums"':(_giua?' class="giua"':''))+'>'+cell(r,c,cfg.code)+'</td>'});
+    var _cl=(_giua?"giua":"")+(_ngan[c[0]]?" khongbe":"");
+    h+='<td'+(c[2]==="money"?' style="text-align:right;font-variant-numeric:tabular-nums"':(_cl.trim()?' class="'+_cl.trim()+'"':''))+'>'+cell(r,c,cfg.code)+'</td>'});
   /* ═══ V2 14/08 (anh Luân: *"nút làm ngay với xử lý trùng nhau nhỉ"*) ═════════════════════
      Trùng thật. "Làm ngay" mở đúng ô ghi của việc đang treo trên dòng; "Xử lý" mở màn Chạy quy
      trình của chính người đó - mà BƯỚC HIỆN TẠI của màn ấy chính là cái việc đang treo. Hai cửa
@@ -7157,12 +7181,36 @@ function bizSection(){
  var learning=S.filter(function(r){return/active|studying/.test(ecode(r.student_status))}).length;
  var lead30=L.filter(function(r){return in30(r.lead_created_time)}).length;
  var enr30=E.filter(function(r){return in30(r.enrollment_time)}).length;
+ /* ═══ V2 15/08 - TIỀN ĐI RA (anh Luân: *"thiếu mấy cái như: ca hoàn, tiền hoàn..."*) ═════════
+    Dải này chỉ kể tiền ĐI VÀO. Mà khoản hoàn ghi thành DÒNG THU ÂM trong DL07 (luật đặt từ khi
+    làm màn Duyệt hoàn tiền), nên "Doanh thu đã thu" hiện ra là số RÒNG - đã trừ hoàn rồi mà
+    không nói. Người đọc không có cách nào biết con số ấy đã bị trừ bao nhiêu, và cũng không
+    biết trung tâm trả lại khách bao nhiêu ca.
+    *Một con số đã bị trừ mà không khai phần trừ thì nó giấu đúng cái phần người ta cần biết.*
+    Hai ô mới đứng NGAY SAU hai ô doanh thu - đọc thành một mạch: thu vào bao nhiêu, trả ra bao
+    nhiêu. Và chú thích của ô doanh thu nay nói thẳng nó là số ròng, trừ mấy ca, trừ bao nhiêu.
+    Ô thứ ba là ca đã duyệt hoàn mà CHƯA chi - cùng họ với "Công nợ tồn" (tiền chưa xong việc),
+    chỉ khác chiều. Đếm bằng `srows` như mọi ô khác trong dải: một dải mà hai ô đếm theo hai
+    phạm vi khác nhau thì cộng trừ với nhau ra số vô nghĩa. */
+ var _hoanDs=pay.filter(function(p){return num(p.amount)<0});
+ var hoanSo=_hoanDs.length;
+ var hoanTien=Math.abs(_hoanDs.reduce(function(a,b){return a+num(b.amount)},0));
+ var hoanCho=srows("DL06").filter(function(r){
+   return (/cancel/.test(ecode(r.enrollment_status))||r.cancellation_reason)&&
+          !/hoàn tiền|hoan tien/i.test(String(r.notes||""))}).length;
  var revPrev=pay.filter(function(p){return inYm(p.payment_time,ymOf(-1))}).reduce(function(a,b){return a+num(b.amount)},0);
  var trend="";if(revPrev>0){var pctc=Math.round((revMonth-revPrev)/revPrev*100);trend=(pctc>=0?'<span style="color:#16A34A">▲ +':'<span style="color:#DC2626">▼ ')+Math.abs(pctc)+'%</span> so tháng trước'}
  /* V9.99s - ba ô LEAD trong dải này (Lead mới N ngày, Tỷ lệ chuyển đổi, và mẫu số của nó) dựng
     trên DL02; ai khai `lead:"none"` thì không hiện - cùng luật với phễu và biểu đồ lead phía dưới. */
  var _bizLead=dsLevel("lead")!=="none";
- var tiles=[["Doanh thu đã thu",vnd(revTotal),"ti-cash","#16A34A"],["Doanh thu tháng này",vnd(revMonth),"ti-report-money","#0D9488",trend,"Tổng tiền đã thu trong tháng này = "+vnd(revMonth)+(revPrev>0?("; tháng trước "+vnd(revPrev)+" -> chênh "+(revMonth>=revPrev?"+":"")+Math.round((revMonth-revPrev)/revPrev*100)+"%"):"; tháng trước chưa có số để so")],["Lead mới "+mkMoiNgay()+" ngày",String(lead30),"ti-user-plus","#3B82C4"],["Tỷ lệ chuyển đổi",cvr+"%","ti-trending-up",cvr>=40?"#16A34A":cvr>=25?"#D97706":"#DC2626","",pctG(conv,L.length,"lead đã thành học viên")],["Đăng ký "+mkMoiNgay()+" ngày",String(enr30),"ti-clipboard-check","#7C3AED"],["Công nợ tồn",vnd(debt),"ti-alert-triangle",debt>0?"#D97706":"#16A34A"],["HV đang học",String(learning),"ti-users-group","#3B82C4"]];
+ var tiles=[["Doanh thu đã thu",vnd(revTotal),"ti-cash","#16A34A","",
+   "Số RÒNG: tổng tiền đã thu trừ đi các khoản đã hoàn"+(hoanSo?(" ("+hoanSo+" ca, "+vnd(hoanTien)+")"):" (chưa có ca hoàn nào)")+"."],["Doanh thu tháng này",vnd(revMonth),"ti-report-money","#0D9488",trend,"Tổng tiền đã thu trong tháng này = "+vnd(revMonth)+(revPrev>0?("; tháng trước "+vnd(revPrev)+" -> chênh "+(revMonth>=revPrev?"+":"")+Math.round((revMonth-revPrev)/revPrev*100)+"%"):"; tháng trước chưa có số để so")],["Lead mới "+mkMoiNgay()+" ngày",String(lead30),"ti-user-plus","#3B82C4"],["Tỷ lệ chuyển đổi",cvr+"%","ti-trending-up",cvr>=40?"#16A34A":cvr>=25?"#D97706":"#DC2626","",pctG(conv,L.length,"lead đã thành học viên")],["Đăng ký "+mkMoiNgay()+" ngày",String(enr30),"ti-clipboard-check","#7C3AED"],["Ca hoàn tiền",String(hoanSo),"ti-arrow-back-up",hoanSo?"#D97706":"#6B7887","",
+   "Số lần trung tâm trả tiền lại cho khách - ghi thành dòng thu âm trong sổ thu (DL07) nên doanh thu đã tự trừ."],
+  ["Tiền đã hoàn",vnd(hoanTien),"ti-cash-off",hoanTien>0?"#D97706":"#6B7887","",
+   "Tổng tiền đã trả lại khách. Mức hoàn theo ba mốc ngày trong Cài đặt (CH2), duyệt ở màn Hoàn tiền."],
+  ["Hoàn chờ xử lý",String(hoanCho),"ti-receipt-refund",hoanCho?"#DC2626":"#16A34A","",
+   "Đơn đã hủy mà chưa ghi nhận hoàn tiền - còn nợ khách một khoản chưa chi. Xử ở Chờ duyệt › Hoàn tiền."],
+  ["Công nợ tồn",vnd(debt),"ti-alert-triangle",debt>0?"#D97706":"#16A34A"],["HV đang học",String(learning),"ti-users-group","#3B82C4"]];
  if(!_bizLead)tiles=tiles.filter(function(t){return !/^Lead mới|^Tỷ lệ chuyển đổi/.test(t[0])});
  /* V2 08/08 - neo riêng `@bizso`: bước cuối bài Kế toán ("Báo cáo doanh thu") nói đúng về khối
     này, mà trước đây neo `@man` nên khoanh trùng chỗ với bước 1 bài Quản lý. Vỏ trang thì bài
@@ -14703,7 +14751,26 @@ function kpiTinhHinh(){
   (m.hut?('<b style="color:#854F0B">'+m.hut+' hụt nhẹ</b> · '):'')+
   '<b style="color:var(--green)">'+m.dat+' đạt</b>'+
   (m.chuadu?('<span data-tip="'+m.chuadu+' chỉ số chưa đủ dữ liệu để tính"> ·&nbsp;'+m.chuadu+' chưa tính được</span>'):'')+'. '+
-  '<a class="lnk" onclick="window.KPIF=\'lo\';reRender(\'baocao\')">Xem '+nLo+' chỗ cần chú ý</a></div>';}
+  '<a class="lnk" onclick="kpiXemLo()">Xem '+nLo+' chỗ cần chú ý</a></div>';}
+/* ═══ V2 15/08 (anh Luân, kèm ảnh dòng tình hình: *"bấm cái này a k thấy gì ta"*) ════════════
+   Không thấy gì là ĐÚNG - cái link ấy trước đây không làm gì cả.
+   Nó đặt `KPIF="lo"` rồi vẽ lại. Mà `"lo"` CHÍNH LÀ giá trị mặc định của bộ lọc ấy
+   (`var kf=window.KPIF||"lo"`), nên nó gán một thứ đã có sẵn, vẽ lại y hệt, và trang đứng im
+   ở đầu - trong khi bảng KPI nằm tận dưới, ngoài tầm mắt.
+   *Một nút đổi TRẠNG THÁI sang đúng cái đang có là một nút không tồn tại - và người bấm không
+   kết luận "không có gì đổi", họ kết luận "app hỏng".*
+   Việc thật của cái link này chưa bao giờ là đổi bộ lọc: nó là ĐƯA NGƯỜI TA TỚI CHỖ ẤY. Nên nay
+   nó cuộn tới bảng và làm sáng hàng lọc một nhịp, kể cả khi bộ lọc vốn đã đúng. Đứng ở trang
+   khác thì mở trang trước rồi mới cuộn - `dashboard` cũng vẽ dòng này. */
+function kpiXemLo(){window.KPIF="lo";
+ if(CUR==="baocao")reRender("baocao");else go("baocao");
+ setTimeout(function(){
+  try{var el=document.querySelector('[data-tour="kpibang"]');
+   if(el&&el.scrollIntoView)el.scrollIntoView({block:"start"});
+   var loc=el&&el.nextSibling&&el.nextSibling.querySelector?el.nextSibling:null;
+   if(loc)cfHLDat(loc);
+   setTimeout(function(){try{cfHLXoa()}catch(e){}},1800);
+  }catch(e){}},90)}
 function kpiTop3Section(){
  var top=kpiTop3();
  if(!top.length)return '<div class="sechd" data-tour="kpitop">3 việc nên làm tuần này</div>'+
@@ -14756,7 +14823,7 @@ function baocaoBranch(){
  list.forEach(function(k){
   var tnr=k.ses?Math.round(k.note/k.ses*100):null;
   var rr=k.stu?Math.round(k.risk/k.stu*100):0;
-  h+='<tr><td><b>'+esc(brOf(k.b))+'</b></td><td>'+k.cls+'</td>'+
+  h+='<tr><td class="khongbe"><b>'+esc(brOf(k.b))+'</b></td><td>'+k.cls+'</td>'+
    '<td>'+(k.on?'<span class="chip blue">'+k.on+'</span>':'<span class="mut">0</span>')+'</td>'+
    '<td><b>'+k.stu+'</b></td>'+
    '<td>'+(k.risk?'<span class="chip '+(rr>=paramOf("riskRateRed_pct",20)?"red":"amber")+'" data-tip="'+esc(pctG(k.risk,k.stu,"học viên của cơ sở này đang bị đánh dấu nguy cơ (chuyên cần hoặc học lực)"))+'">'+k.risk+' ('+rr+'%)</span>':'<span class="chip green" data-tip="Không có học viên nào bị đánh dấu nguy cơ">0</span>')+'</td>'+
@@ -17701,6 +17768,16 @@ function ctxRows(pairs){var r=pairs.filter(function(p){return p[1]!=null&&p[1]!=
 /* mau -> class: he mau di qua nen nhat + mau tieu de, khong con dai vien doc (anh Luan che) */
 function ctxContent(label,text,color){var c=String(color||"");var cls=/red/.test(c)?" ccred":/blue/.test(c)?" ccblue":/green/.test(c)?" ccgreen":"";
  return '<div class="ctxcontent'+cls+'"><div class="cch">'+esc(label)+'</div><div class="ccb">'+esc(text&&String(text).trim()?text:"(không có nội dung)")+'</div></div>'}
+/* ═══ V2 15/08 - TÊN CƠ SỞ KHÔNG ĐƯỢC GÃY ĐÔI (anh Luân: *"kị việc rớt tên chi nhánh như này,
+   kiểm lại và giãn cột phù hợp ở các nơi có nó"*) ═════════════════════════════════════════════
+   "Cơ sở 5" gãy ở dấu cách thành "Cơ sở" / "5" - mắt đọc ra một cột lởm chởm và mất luôn cảm
+   giác đó là MỘT giá trị. Đo ra **94 ô** mang tên cơ sở trên 7 màn.
+   Bảng đi qua `tableHTML` đã tự lo (luật `_ngan`), nhưng quá nửa số ô nằm ở bảng dựng TAY với
+   đủ kiểu ghép chuỗi khác nhau - vá từng chỗ thì lần nào cũng sót, và lần sau ai thêm bảng mới
+   lại sót tiếp. Nên vá ở chỗ CHỮ ĐƯỢC SINH RA, không vá ở chỗ chữ được đặt vào.
+   *Sửa tại nguồn của chuỗi thì mọi chỗ dùng nó đều đúng, kể cả chỗ chưa viết.* */
+function cnT(v,rong){var t=elabel(v)||v||(rong||"-");
+ return '<span class="khongbe">'+esc(t)+'</span>'}
 function vnd(x){var n=num(x);return (n?n.toLocaleString("vi-VN"):"0")+"đ"}
 function isc(v){var c=ecode(v);for(var i=1;i<arguments.length;i++)if(c===arguments[i])return true;return false}
 function hwGraded(x){return !!(String((x&&x.graded_at)||"").trim()||String((x&&x.homework_score)||"").trim())}
@@ -19398,7 +19475,7 @@ function lwXemKhung(g){
   h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Ngày</th><th>NV WOW</th><th>Cơ sở</th><th>Trạng thái</th><th></th></tr></thead><tbody>';
   ds.forEach(function(x){var d=pvnd(x.slot_datetime);
    h+='<tr><td>'+esc(d?vnd2(d):"-")+'</td><td>'+nsLnk(x.staff_id,x.staff_name,"")+'</td>'+
-    '<td>'+esc(elabel(x.branch)||"-")+'</td>'+
+    '<td class="khongbe">'+cnT(x.branch)+'</td>'+
     '<td><span class="chip '+stCls(x.wow_slot_status)+'">'+esc(elabel(x.wow_slot_status)||"-")+'</span></td>'+
     '<td><button class="btn sm" onclick="lwXemO(\''+esc(x.slot_id)+'\')"><i class="ti ti-list-details"></i>Chi tiết ô</button></td></tr>'});
   h+='</tbody></table></div>'}
@@ -19446,7 +19523,7 @@ function lwXemO(sid){
  var w=x.wow_id?find("DL14","wow_id",x.wow_id):null;
  var h='<div class="dcard"><h4><i class="ti ti-calendar-event"></i>'+esc(x.slot_time||"")+' · '+esc(d?vnd2(d):"")+'</h4>';
  h+=ctxRows([["NV WOW",esc(x.staff_name||x.staff_id||"-")],
-   ["Cơ sở",esc(elabel(x.branch)||"-")],
+   ["Cơ sở",cnT(x.branch)],
    ["Trạng thái ô",'<span class="chip '+stCls(x.wow_slot_status)+'">'+esc(elabel(x.wow_slot_status)||"-")+'</span>']]);
  if(!w){
   h+='<div class="notebar" style="margin:10px 0"><i class="ti ti-info-circle"></i>'+
@@ -22109,7 +22186,7 @@ function renderHosoGV(){var id=window.GVID;var g=find("DL01","staff_id",id);
  h+='<div class="panel"><div class="pbody" style="display:flex;gap:14px;align-items:flex-start">'+
   avatarBig(g.full_name,g.avatar_url)+
   '<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:15px">'+esc(g.full_name)+'</div>'+
-  '<div class="mut" style="font-size:12px;margin:2px 0 8px">'+esc(elabel(g.role)||"Giảng viên")+(g.branch?' · '+esc(elabel(g.branch)||g.branch):'')+(g.email?' · '+esc(g.email):'')+'</div>'+
+  '<div class="mut" style="font-size:12px;margin:2px 0 8px">'+esc(elabel(g.role)||"Giảng viên")+(g.branch?' · '+cnT(g.branch,""):'')+(g.email?' · '+esc(g.email):'')+'</div>'+
   '<div class="bioBox">'+(String(bioText).trim()?esc(bioText):'<span class="mut">Chưa có tiểu sử. Bấm "Sửa tiểu sử" để thêm giới thiệu, chuyên môn, kinh nghiệm giảng dạy…</span>')+'</div>'+
   '<div style="margin-top:8px"><button class="btn sm" onclick="gvBioEdit(\''+esc(id)+'\')"><i class="ti ti-edit"></i>Sửa tiểu sử</button></div>'+
   '</div></div></div>';
@@ -22985,7 +23062,7 @@ function gvdpThangForm(k){
  GV.forEach(function(g){var r=da[String(g.staff_id)];
   h+='<tr>'+(suaDuoc?('<td><input type="checkbox" class="gdck" value="'+esc(g.staff_id)+'"'+(r?" checked":"")+'></td>'):'')+
    '<td>'+nsLnk(g.staff_id,g.full_name,"")+'</td>'+
-   '<td>'+esc(elabel(g.branch)||g.branch||"-")+'</td>'+
+   '<td class="khongbe">'+cnT(g.branch)+'</td>'+
    '<td>'+(suaDuoc
      ?('<input class="gdnote" data-sid="'+esc(g.staff_id)+'" value="'+esc(r?(r.ghi_chu||""):"")+'" placeholder="vd: chỉ nhận ca tối" style="width:100%;height:28px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:12px">')
      :(r?esc(r.ghi_chu||"-"):'<span class="mut">chưa đăng ký</span>'))+'</td></tr>'});
@@ -23090,7 +23167,7 @@ function renderGvdp(embed){
      *Một dòng trông bấm được mà bấm vào im lặng thì tệ hơn một dòng không bấm được: người ta
      bấm lại lần nữa, rồi bắt đầu ngờ cả những dòng khác.* */
   h+='<tr onclick="openLopQuick(\''+esc(x.class_id)+'\')" style="cursor:pointer" title="Xem nhanh lớp này"><td>'+esc(d?hhmmOf(d):"")+'</td><td>'+lopLnk(x.class_id,x.class_id_name,"")+' <span class="mut">buổi '+esc(x.session_number||"?")+'</span></td>'+
-   '<td>'+(clsOnline(c)?'<span class="chip blue">Online</span>':'<span class="chip">'+esc(elabel(c.branch)||c.branch||"-")+'</span> <span class="mut" style="font-size:11px">'+esc(elabel(c.learning_mode)||"")+'</span>')+'</td>'+
+   '<td class="khongbe">'+(clsOnline(c)?'<span class="chip blue">Online</span>':'<span class="chip">'+cnT(c.branch)+'</span> <span class="mut" style="font-size:11px">'+esc(elabel(c.learning_mode)||"")+'</span>')+'</td>'+
    '<td>'+(String(x.teacher_id||"").trim()?nsLnk(x.teacher_id,x.teacher_id_name,""):'<span class="chip red">chưa gán</span>')+'</td>'+
    '<td>'+(n?'<span class="chip green">'+n+' người</span>':'<span class="chip red">không có ai</span>')+'</td>'+
    '<td><button class="btn primary sm" onclick="event.stopPropagation();gvBackupForm(\''+esc(x.session_id)+'\')"><i class="ti ti-user-plus"></i>Đề xuất người dạy thay</button></td></tr>'});
@@ -23100,7 +23177,7 @@ function renderGvdp(embed){
  GV.forEach(function(g){var nb=busyMap[g.staff_id]||0;
   var brs=Object.keys(gvBranches(g.staff_id)).map(function(b){return elabel(b)||b});
   h+='<tr data-mo="openNSQuick" data-mo-arg="'+esc(g.staff_id||"")+'"'+(nb?' style="opacity:.6"':'')+'><td>'+nsLnk(g.staff_id,g.full_name,"")+'</td>'+
-   '<td>'+esc(elabel(g.branch)||g.branch||"-")+'</td>'+
+   '<td class="khongbe">'+cnT(g.branch)+'</td>'+
    '<td style="font-size:11.5px">'+esc(brs.join(" · ")||"-")+'</td>'+
    '<td>'+(nb?'<span class="chip amber">'+nb+' buổi</span>':'<span class="chip green">trống</span>')+'</td></tr>'});
  h+='</tbody></table></div></div>';
@@ -23295,7 +23372,7 @@ function renderPhong(embed){
   h+='<tr><td><span class="chip '+(x.t==="phong"?"red":x.t==="lop"?"amber":"blue")+'">'+esc(x.t==="phong"?"Trùng phòng":x.t==="lop"?"Lớp trùng giờ":"GV trùng giờ")+'</span></td>'+
    '<td>'+esc(String(x.a.session_date||"").slice(0,16))+'</td>'+
    '<td style="white-space:normal">'+esc(x.msg)+'</td>'+
-   '<td>'+esc(clsOnline(ca)?"online":(elabel(ca.branch)||ca.branch||"-"))+'</td>'+
+   '<td class="khongbe">'+esc(clsOnline(ca)?"online":(elabel(ca.branch)||ca.branch||"-"))+'</td>'+
    '<td><button class="btn sm" onclick="goDD(\''+esc(x.a.class_id)+'\',\''+esc(x.a.session_id)+'\')"><i class="ti ti-arrow-right"></i>Mở buổi</button>'+
    (x.t==="gv"?' <button class="btn primary sm" onclick="gvBackupForm(\''+esc(x.b.session_id)+'\')"><i class="ti ti-user-plus"></i>Đổi GV</button>':'')+'</td></tr>'});
  h+='</tbody></table></div></div>';
@@ -23305,7 +23382,7 @@ function renderPhong(embed){
  h+='<div class="panel"><div class="ph"><b>Lớp đang mở chưa có giáo viên chính ('+noGv.length+')</b><span class="mut" style="font-size:11.5px">giao lớp ngay tại đây</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Cơ sở</th><th>Hình thức</th><th>Lịch</th><th>Sĩ số</th><th></th></tr></thead><tbody>';
  if(!noGv.length)h+='<tr><td class="empty" colspan="6">Lớp đang mở nào cũng đã có giáo viên chính.</td></tr>';
  noGv.forEach(function(c){
-  h+='<tr><td>'+lopLnk(c.class_id,c.class_name,"")+'</td><td>'+esc(elabel(c.branch)||c.branch||"-")+'</td>'+
+  h+='<tr><td class="khongbe">'+lopLnk(c.class_id,c.class_name,"")+'</td><td class="khongbe">'+cnT(c.branch)+'</td>'+
    '<td>'+esc(elabel(c.learning_mode)||"-")+'</td><td>'+esc(c.class_schedule||"-")+'</td>'+
    '<td>'+esc(num(c.current_enrollment))+'/'+esc(c.class_capacity||"?")+'</td>'+
    '<td><button class="btn primary sm" onclick="clsTeacherForm(\''+esc(c.class_id)+'\')"><i class="ti ti-user-cog"></i>Giao lớp</button></td></tr>'});
@@ -23313,7 +23390,7 @@ function renderPhong(embed){
  h+='<div class="panel"><div class="ph"><b>Lớp học tại chỗ chưa ghi phòng ('+nr.length+')</b><span class="mut" style="font-size:11.5px">lớp online không cần phòng nên không nằm trong danh sách này</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Cơ sở</th><th>Hình thức</th><th>Lịch</th><th>Ghi chú phòng</th></tr></thead><tbody>';
  if(!nr.length)h+='<tr><td class="empty" colspan="5">Lớp tại chỗ nào cũng đã có phòng.</td></tr>';
  nr.forEach(function(c){
-  h+='<tr><td>'+lopLnk(c.class_id,c.class_name,"")+'</td><td>'+esc(elabel(c.branch)||c.branch||"-")+'</td>'+
+  h+='<tr><td class="khongbe">'+lopLnk(c.class_id,c.class_name,"")+'</td><td class="khongbe">'+cnT(c.branch)+'</td>'+
    '<td>'+esc(elabel(c.learning_mode)||c.learning_mode||"-")+'</td><td>'+esc(c.class_schedule||"-")+'</td>'+
    '<td class="mut">'+esc(c.venue_or_zoom_link||"(trống)")+'</td></tr>'});
  return h+'</tbody></table></div></div>'}
@@ -23588,7 +23665,7 @@ function moLop(cid){var c=find("DL10","class_id",cid);if(!c){toast("Không thấ
  else{h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>Sĩ số</th><th>Khai giảng</th><th>Cơ sở</th></tr></thead><tbody>';
   same.forEach(function(x){h+='<tr><td>'+lopLnk(x.class_id,x.class_name,x.class_id)+'</td>'+
    '<td>'+num(x.current_enrollment)+'/'+(num(x.class_capacity)||"?")+'</td><td>'+esc(x.class_start_date||"-")+'</td>'+
-   '<td>'+esc(clsOnline(x)?"online":(elabel(x.branch)||x.branch||"-"))+'</td></tr>'});
+   '<td class="khongbe">'+esc(clsOnline(x)?"online":(elabel(x.branch)||x.branch||"-"))+'</td></tr>'});
   h+='</tbody></table></div>'}
  /* ═══ V2 12/08 (HỌC VỤ-3) - SALE ĐẨY THẲNG HỌC VIÊN VÀO LỚP ĐÃ LÊN KẾ HOẠCH ══════════════════
     Anh Luân: *"sale có thể đẩy thẳng vào lớp đã lên kế hoạch"*. Trước bản này lấp lớp chỉ đi
