@@ -5586,9 +5586,9 @@ function viecTeam(t){window.VIECTEAM=t;window.VIECGRP="all";reRender("viec")}
 /* Cột 5 là ICON - tab có hình thì mắt bắt được nhanh hơn đọc chữ, và ba cách xem này khác nhau
    đủ rõ để mỗi cái có một hình riêng: danh sách việc · từng người · bản đồ chặng. */
 var VIECVWDEF=[
- ["viec","Theo việc","mọi việc đang nợ theo luật SLA, gom theo độ gấp - làm từ trên xuống là hết ngày.","","ti-checklist"],
- ["nguoi","Theo người","từng hồ sơ trên hành trình khách. Bấm một người, app dắt qua đúng chặng người đó đang đứng.","banlam","ti-user-search"],
- ["chang","Theo chặng","cùng ngần ấy hồ sơ, xếp thành bản đồ chặng để nhìn ra chỗ đang tắc. Bấm một cột hoặc một thẻ để xử lý; việc vận hành lớp thì làm ở hub Học tập & Giảng dạy.","hanhtrinh","ti-route"]];
+ ["viec","Theo việc","mọi việc đang nợ theo luật SLA, gom theo độ gấp - làm từ trên xuống là hết ngày.","","ti-checklist","red"],
+ ["nguoi","Theo người","từng hồ sơ trên hành trình khách. Bấm một người, app dắt qua đúng chặng người đó đang đứng.","banlam","ti-user-search","blue"],
+ ["chang","Theo chặng","cùng ngần ấy hồ sơ, xếp thành bản đồ chặng để nhìn ra chỗ đang tắc. Bấm một cột hoặc một thẻ để xử lý; việc vận hành lớp thì làm ở hub Học tập & Giảng dạy.","hanhtrinh","ti-route","navy"]];
 /* ═══ V2 15/08 - CÔNG TẮC CÁCH XEM TÁCH RA DÙNG CHUNG ════════════════════════════════════════
    Dải này dựng cho "Việc hôm nay". Nay trang CSKH gộp (Khảo sát + Phản hồi + Khiếu nại + Yêu
    cầu HV) cần đúng dải ấy - anh Luân: *"Sẽ có vài tab tương tự của việc hôm nay"*.
@@ -5601,12 +5601,18 @@ function vwCo(V){if(!V[3])return true;try{return canSee(V[3])}catch(e){return tr
    công tắc đang đọc: hai nơi lấy tên từ hai chỗ là sớm muộn sidebar nói một đằng, tab một nẻo -
    đúng cái anh Luân bắt được ở breadcrumb hôm 13/08. */
 function vwNhan(D,v){for(var i=0;i<D.length;i++)if(D[i][0]===v)return D[i][1];return ""}
+/* Cột 6 = MÀU CỦA KÊNH (blue/amber/red/green/navy), khai trong bảng chứ không đoán theo thứ tự:
+   mai kia chèn thêm một tab vào giữa thì màu vẫn đi theo đúng tab của nó.
+   `so[k]` nhận cả số trần lẫn cặp [số, sắc] - chỗ gọi cũ không phải sửa. */
 function vwBar(D,vw,fn,so,tour){
  var L=D.filter(vwCo),cur=L[0]||D[0];so=so||{};
  var _tabs=L.map(function(V){if(V[0]===vw)cur=V;
-  return '<button class="viectb'+(V[0]===vw?" on":"")+'" role="tab" aria-selected="'+(V[0]===vw?"true":"false")+
+  var _s=so[V[0]],_n=_s,_sac="";
+  if(Object.prototype.toString.call(_s)==="[object Array]"){_n=_s[0];_sac=_s[1]||""}
+  return '<button class="viectb'+(V[0]===vw?" on":"")+(V[5]?(" t"+V[5]):"")+
+   '" role="tab" aria-selected="'+(V[0]===vw?"true":"false")+
    '" onclick="'+fn.replace("{k}",V[0])+'"><i class="ti '+V[4]+'"></i>'+esc(V[1])+
-   (so[V[0]]!==""&&so[V[0]]!=null?('<i class="segn">'+so[V[0]]+'</i>'):'')+'</button>'}).join("");
+   (_n!==""&&_n!=null?('<i class="segn'+(_sac?(" s"+_sac):"")+'">'+_n+'</i>'):'')+'</button>'}).join("");
  /* Chỉ còn một cách xem thì KHÔNG vẽ công tắc: một cái công tắc có đúng một nấc là một câu hỏi
     không có câu trả lời nào khác - nó chỉ tốn một hàng và mời người ta bấm vào chỗ không đi đâu.
     Câu "đang nhìn cái gì" thì vẫn giữ, vì nó vẫn nói được một điều thật. */
@@ -5627,7 +5633,12 @@ function viecVWSet(k){window.VIECVIEW=k;reRender("viec")}
 function viecCongTac(soViec){
  var so={viec:soViec,nguoi:"",chang:""};
  try{so.nguoi=jAll().filter(function(J){return J.act}).length}catch(e){so.nguoi=""}
- return vwBar(VIECVWDEF,VIECVW(),"viecVWSet('{k}')",so,"viecvw")}
+ /* Số việc đang nợ tô ĐỎ khi trong đó có việc quá hạn, hổ phách khi chỉ là việc còn tồn: cùng
+    một con số nhưng hai tình huống khác hẳn nhau, và đó chính là chiều thông tin dải cũ có mà
+    bản gộp thành phần đánh rơi. */
+ var _qh=0;try{_qh=bellItems().filter(function(x){return x.tone==="overdue"||x.sev==="red"}).length}catch(e){_qh=0}
+ return vwBar(VIECVWDEF,VIECVW(),"viecVWSet('{k}')",
+  {viec:[so.viec,(_qh?"red":(num(so.viec)?"amber":""))],nguoi:[so.nguoi,(num(so.nguoi)?"amber":"")],chang:""},"viecvw")}
 function renderViec(){var items=bellItems();
  var team=window.VIECTEAM||"all",grp=window.VIECGRP||"all";
  var sev=window.VIECSEV||(window.VIECOD?"red":"");   /* V9.29: MỘT biến cho mức độ; VIECOD là lối tắt cũ của "chỉ quá hạn" */
@@ -9607,16 +9618,16 @@ function renderCskhDiem(){
    Cột 4 là KHOÁ QUYỀN: mỗi tab chỉ hiện với người xem được trang con của nó. Không có cột này
    thì gộp trang thành mở cửa - người chỉ được xem Khiếu nại sẽ đọc được cả sổ Khảo sát. */
 var CSVWDEF=[
- ["khaosat","Khảo sát","trung tâm chủ động đo (trung tâm → HV): phiếu định kỳ theo tuần học; xem lớp nào chưa gửi, lớp nào trả lời kém.","khaosat","ti-clipboard-text"],
- ["phanhoi","Phản hồi & Góp ý","học viên tự nói (HV → trung tâm): gửi từ Cổng học viên, hoặc nhân viên ghi hộ khi nhận qua gọi / nhắn / gặp trực tiếp; phân loại trong hạn rồi theo tới khi đóng.","ghinhan","ti-message-plus"],
- ["khieunai","Khiếu nại","phản hồi đã thành vụ (HV → trung tâm): cử người xử lý, hạn tính theo mức độ, chỉ đóng khi học viên chấp nhận cách giải quyết.","khieunai","ti-alert-triangle"],
- ["ychv","Yêu cầu từ học viên","câu hỏi và đề nghị gửi từ Cổng học viên (HV → trung tâm): app chuyển thẳng tới học vụ, hoặc kế toán nếu là chuyện tiền, kèm hạn nhận việc.","ychv","ti-school"],
+ ["khaosat","Khảo sát","trung tâm chủ động đo (trung tâm → HV): phiếu định kỳ theo tuần học; xem lớp nào chưa gửi, lớp nào trả lời kém.","khaosat","ti-clipboard-text","blue"],
+ ["phanhoi","Phản hồi & Góp ý","học viên tự nói (HV → trung tâm): gửi từ Cổng học viên, hoặc nhân viên ghi hộ khi nhận qua gọi / nhắn / gặp trực tiếp; phân loại trong hạn rồi theo tới khi đóng.","ghinhan","ti-message-plus","amber"],
+ ["khieunai","Khiếu nại","phản hồi đã thành vụ (HV → trung tâm): cử người xử lý, hạn tính theo mức độ, chỉ đóng khi học viên chấp nhận cách giải quyết.","khieunai","ti-alert-triangle","red"],
+ ["ychv","Yêu cầu từ học viên","câu hỏi và đề nghị gửi từ Cổng học viên (HV → trung tâm): app chuyển thẳng tới học vụ, hoặc kế toán nếu là chuyện tiền, kèm hạn nhận việc.","ychv","ti-school","blue"],
  /* Tab thứ năm ĐỌC ngược ba sổ trên: cùng những phiếu ấy, gom theo CHỦ THỂ BỊ CHẤM thay vì
     theo phiếu. Nó thuộc về đây chứ không đứng riêng một trang, vì nó cộng cả ba sổ - tách ra
     là lại đẻ thêm một cửa nữa cho cùng một nhóm dữ liệu, đúng cái vừa dọn xong.
     Khoá quyền là `khaosat`: điểm hài lòng lấy chủ yếu từ DL15, ai không được xem sổ ấy thì
     cũng không được xem bản tổng hợp của nó. */
- ["diem","Điểm theo chủ thể","cùng ba sổ trên, đọc theo chiều ngược: ai và cái gì đang bị chấm - lớp, buổi, giảng viên, buổi WOW, WOW coach, nhân viên, và nhóm vấn đề.","khaosat","ti-chart-histogram"]];
+ ["diem","Điểm theo chủ thể","cùng ba sổ trên, đọc theo chiều ngược: ai và cái gì đang bị chấm - lớp, buổi, giảng viên, buổi WOW, WOW coach, nhân viên, và nhóm vấn đề.","khaosat","ti-chart-histogram","green"]];
 function CSVW(){var v=window.CSTAB||"khaosat",L=CSVWDEF.filter(vwCo);
  for(var i=0;i<L.length;i++)if(L[i][0]===v)return v;
  return (L[0]||CSVWDEF[0])[0]}
@@ -9629,7 +9640,11 @@ function renderCskh(){
  var nYcWait=ychvCho();
  var actBtn=(tab==="khaosat")?'<button class="btn primary" onclick="rvForm()"><i class="ti ti-send"></i>Gửi đợt khảo sát</button>':(tab==="phanhoi")?'<button class="btn primary" onclick="ghForm()"><i class="ti ti-message-plus"></i>Ghi nhận phản hồi</button>':(tab==="khieunai")?'<button class="btn primary" onclick="knAdd()"><i class="ti ti-plus"></i>Tiếp nhận khiếu nại</button>':"";
  var h=pageHead("CSKH · Tiếng nói học viên","Một vòng khép kín: trung tâm đo bằng khảo sát, học viên nói bằng phản hồi, nặng thì thành khiếu nại - cùng chỉ số hài lòng nên xem chung một chỗ.",actBtn);
- h+=vwBar(CSVWDEF,tab,"csTabSet('{k}')",{khaosat:nSvWait||"",phanhoi:nFbOpen||"",khieunai:nKnOpen||"",ychv:nYcWait||""},"csvw");
+ /* Sắc của con số nói ĐỘ GẤP, không nói kênh: khiếu nại còn mở là đỏ, phiếu và phản hồi còn
+    treo là hổ phách. Hết việc thì không còn số, nên cũng không còn màu - đúng như nó phải thế. */
+ h+=vwBar(CSVWDEF,tab,"csTabSet('{k}')",
+  {khaosat:[nSvWait||"","amber"],phanhoi:[nFbOpen||"","amber"],khieunai:[nKnOpen||"","red"],
+   ychv:[nYcWait||"","amber"],diem:""},"csvw");
  if(tab==="khaosat")h+=renderReview(1);
  else if(tab==="phanhoi")h+=renderGhinhan(1);
  else if(tab==="ychv")h+=renderYcHV();
