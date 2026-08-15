@@ -23009,9 +23009,67 @@ function sesSetTeacher(sesId,gvId,ly){
  var old=x.teacher_id_name||x.teacher_id||"chưa gán";
  x.teacher_id=gvId;x.teacher_id_name=g.full_name;
  x.notes=(x.notes?x.notes+" | ":"")+"Đổi GV: "+old+" -> "+g.full_name+" ("+myName()+", "+nowStr()+")"+(ly?" - "+ly:"");
+ /* ═══ V2 15/08 - ĐÁNH DẤU CA ĐÃ DÙNG (anh Luân: *"nếu từ danh sách đó, gán ngược lại thay cho
+    1 buổi học của 1 khóa nào đó thì có được ko? 2 chiều"*) ══════════════════════════════════
+    Hai chiều thì được, nhưng chỉ khi hai chiều CÙNG GHI VÀO MỘT CHỖ. Xếp người từ màn buổi học
+    mà không đánh dấu ca đã dùng thì sổ đăng ký vẫn khai người đó "còn trống" - hôm sau học vụ
+    mở sổ ra, xếp tiếp người ấy vào buổi thứ hai trùng giờ, và không có gì chặn lại.
+    *Hai cửa ghi vào cùng một sự thật thì cửa nào cũng phải cập nhật cả hai đầu, nếu không thì
+    cái thứ hai chỉ là một bản sao đang cũ dần.* */
+ try{var _ca=dpChoBuoi(x).filter(function(z){return String(z.staff_id||"")===String(gvId)})[0];
+  if(_ca){_ca.session_id=x.session_id||"";
+   _ca.dp_status=eFull("enum_wow_slot_status","booked")||"booked (Đã đặt)";
+   _ca.note=(_ca.note?_ca.note+" | ":"")+"Dạy thay "+(x.class_id_name||x.class_id)+" buổi "+(x.session_number||"")}
+ }catch(e){}
  toast("Buổi "+(x.session_number||"")+" lớp "+(x.class_id_name||x.class_id)+" nay do "+g.full_name+" dạy."+
   (_q<=0?" Lưu ý: GV chính đã vượt quota "+gvOffQuota()+" buổi nghỉ của khóa này.":""));
  closeModal();reRender(CUR);persistSoon()}
+/* ═══ CHIỀU NGƯỢC: từ một CA ĐÃ ĐĂNG KÝ, tìm buổi nào ca ấy phủ được rồi gán vào ════════════
+   Chiều xuôi (từ buổi -> tìm người) trả lời câu của học vụ lúc có sự cố. Chiều ngược trả lời
+   câu của người xếp lịch lúc ngồi rà sổ: *"anh này đăng ký thứ Năm, có buổi nào cho anh ấy
+   không"*. Cùng một phép so khớp `dpPhuBuoi`, chỉ đảo vế đi tìm - nên không thể lệch nhau. */
+function dpBuoiChoCa(dpId){var x=dpAll().filter(function(z){return String(z.dp_id||"")===String(dpId)})[0];
+ if(!x)return [];
+ return srows("DL11").filter(function(se){
+  if(isc(se.session_status,"cancelled"))return false;
+  if(String(se.teacher_id||"").trim()===String(x.staff_id||""))return false;   /* chính họ đang dạy */
+  var cls=find("DL10","class_id",se.class_id);
+  return dpPhuBuoi(x,se,cls)})
+  .sort(function(a,b){return (pvnd(a.session_date)||0)-(pvnd(b.session_date)||0)})}
+function dpGanForm(dpId){
+ var x=dpAll().filter(function(z){return String(z.dp_id||"")===String(dpId)})[0];
+ if(!x){toast("Không thấy ca đăng ký này.");return}
+ var ds=dpBuoiChoCa(dpId);
+ var h='<div class="dcard"><h4><i class="ti ti-calendar-check"></i>Gán ca này vào một buổi học</h4>';
+ h+=ctxRows([["Giáo viên",esc(x.staff_name||x.staff_id)],
+  ["Ca đã đăng ký",esc(x.slot_date+" · "+x.slot_from+" - "+x.slot_to)],
+  ["Cơ sở nhận dạy",cnT(x.branch)],
+  ["Trạng thái",String(x.session_id||"").trim()
+    ?('<span class="chip amber">đã gán buổi '+esc(x.session_id)+'</span>')
+    :'<span class="chip green">còn trống</span>'],
+  ["Ghi chú",esc(x.note||"-")]]);
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>'+
+  'Chỉ hiện buổi <b>cùng ngày</b>, giờ nằm trong khung đã đăng ký, và <b>đúng cơ sở</b> ca này nhận '+
+  '(lớp online thì không ràng buộc cơ sở). Buổi nào đủ ba điều kiện mới gán được.</div>';
+ /* Lý do đổi giáo viên là BẮT BUỘC ở cửa ghi `sesSetTeacher` - hỏi ngay tại đây, không để người
+    dùng bấm xong mới bị chặn bằng một câu toast. */
+ h+='<div class="fld full"><label>Lý do đổi (bắt buộc)</label>'+
+  '<select id="f_gvly"><option value="">-- chọn lý do --</option>'+
+  gvLyDo().map(function(r){return '<option value="'+esc(r.ten)+'">'+esc(r.ten)+(r.off?'':' (không tính buổi off)')+'</option>'}).join("")+
+  '</select></div>';
+ h+='<div class="fld full"><label>Ghi thêm (tuỳ chọn)</label><input id="f_gvly2" placeholder="Chi tiết thêm, ghi vào vết của buổi..."></div>';
+ h+='<div class="dsec">Buổi ca này phủ được ('+ds.length+')</div><div class="pbody" style="padding:0">';
+ if(!ds.length)h+='<div class="empty">Không buổi nào trùng ngày, trùng giờ và trùng cơ sở với ca này. '+
+  'Ca vẫn giữ nguyên - hôm ấy đơn giản là không có lớp nào cần người thay.</div>';
+ ds.forEach(function(se){var c=find("DL10","class_id",se.class_id)||{};
+  var trong=!String(se.teacher_id||"").trim();
+  h+='<div class="absrow"><div class="absi"><b>'+esc((c.class_name||se.class_id)+" · buổi "+(se.session_number||"?"))+'</b>'+
+   '<span>'+esc(se.session_date+" · "+(clsOnline(c)?"lớp online":(elabel(c.branch)||c.branch||"-")))+
+   ' · '+(trong?'<b style="color:var(--red)">chưa có giáo viên</b>':('đang là '+esc(se.teacher_id_name||se.teacher_id)))+'</span></div>'+
+   '<div class="absa"><button class="btn '+(trong?"primary":"")+' sm" onclick="sesSetTeacher(\''+esc(se.session_id)+'\',\''+esc(x.staff_id)+'\',gvLyLay())">'+
+   '<i class="ti ti-check"></i>'+(trong?'Xếp vào buổi này':'Thay người đang dạy')+'</button></div></div>'});
+ h+='</div></div>';
+ openDrawer("Ca dạy thay · "+(x.staff_name||x.staff_id),h)}
 function gvBackupForm(sesId){
  var x=find("DL11","session_id",sesId);if(!x){toast("Không thấy buổi học");return}
  var c=find("DL10","class_id",x.class_id)||{};
@@ -23416,6 +23474,65 @@ function gvTaiHTML(){
   '"Nơi dạy" đếm số cơ sở khác nhau người đó có buổi trong kỳ - lớp online tính là một nơi riêng và không ràng buộc cơ sở. '+
   'Ngưỡng tỷ lệ có nhận xét lấy từ '+kpiChip(/^TNR/,0.9,1)+'. '+
   'Người đang <b>trống hoàn toàn</b> là chỗ nhận được lớp mới mà không phải tuyển thêm ai.</div></div>';
+ h+=dpSoHTML();
+ return h}
+/* ═══ V2 15/08 - SỔ CA ĐÃ ĐĂNG KÝ, KHOẢNG THỜI GIAN TỰ CHỌN ═════════════════════════════════
+   Anh Luân: *"vậy xem danh sách giáo viên dạy thay theo 1 khoảng thời gian tự chọn ở đâu, hiển
+   thị thông tin chi tiết đăng ký ấy? nếu từ danh sách đó, gán ngược lại thay cho 1 buổi học của
+   1 khóa nào đó thì có được ko? 2 chiều"*
+
+   Bảng phía trên trả lời câu của học vụ LÚC CÓ SỰ CỐ: một buổi mất giáo viên, ai thay được.
+   Bảng này trả lời câu của người xếp lịch LÚC NGỒI RÀ SỔ: hai tuần tới ai đã nhận ca, ca nào
+   còn trống, ca nào đã dùng. Hai câu khác nhau nên hai bảng - nhưng CÙNG một sổ và cùng một
+   phép so khớp, nên không thể nói khác nhau.
+   Khoảng ngày mặc định: hôm nay -> 14 ngày tới. Xếp lịch dạy thay là việc nhìn TỚI, không phải
+   nhìn lui; mở ra thấy sẵn hai tuần trước mắt thì đỡ một lần gõ. */
+function dpKhoang(){
+ var t=new Date();t.setHours(0,0,0,0);
+ var tu=repDate(window.DPTU)||t;
+ var den=repDate(window.DPDEN,1)||new Date(t.getTime()+14*864e5+864e5-1);
+ if(tu>den){var _x=tu;tu=new Date(den.getTime());tu.setHours(0,0,0,0);den=_x;den.setHours(23,59,59,999)}
+ return {tu:tu,den:den}}
+function dpKhoangSet(v,val){if(v==="tu")window.DPTU=val;else window.DPDEN=val;reRender(CUR)}
+function dpSoHTML(){
+ var K=dpKhoang();
+ var ds=dpAll().filter(function(x){var d=dpNgay(x);return d&&d>=K.tu&&d<=K.den})
+  .sort(function(a,b){return (pvnd(a.slot_datetime)||0)-(pvnd(b.slot_datetime)||0)||
+    String(a.staff_name||"").localeCompare(String(b.staff_name||""))});
+ var nTrong=ds.filter(dpConTrong).length;
+ var h='<div class="sechd">Sổ ca dạy thay đã đăng ký</div>';
+ h+=tbar('<span class="tblbl">Khoảng ngày</span>'+
+  '<span class="mut" style="font-size:11.5px">Từ</span>'+
+  '<input type="date" aria-label="Từ ngày" value="'+esc(window.DPTU||repISO(K.tu))+'" onchange="dpKhoangSet(\'tu\',this.value)">'+
+  '<span class="mut" style="font-size:11.5px">đến</span>'+
+  '<input type="date" aria-label="Đến ngày" value="'+esc(window.DPDEN||repISO(K.den))+'" onchange="dpKhoangSet(\'den\',this.value)">'+
+  '<button class="btn sm" onclick="dpForm()"><i class="ti ti-calendar-plus"></i>Đăng ký ca</button>',
+  '<span class="tbcnt">'+ds.length+' ca · '+nTrong+' còn trống</span>');
+ h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr>'+
+  '<th>Giáo viên</th><th>Ngày</th><th>Khung giờ</th><th>Cơ sở nhận dạy</th><th>Trạng thái</th>'+
+  '<th>Đã gán buổi</th><th>Đăng ký lúc</th><th>Ghi chú</th><th></th></tr></thead><tbody>';
+ if(!ds.length)h+='<tr><td colspan="9"><div class="empty">Khoảng ngày này chưa ai đăng ký ca dạy thay nào. '+
+  'Đăng ký trước thì lúc có giáo viên báo nghỉ mới có người để xếp.</div></td></tr>';
+ ds.forEach(function(x){
+  var da=String(x.session_id||"").trim();
+  var se=da?find("DL11","session_id",da):null;
+  h+='<tr>'+
+   '<td>'+nsLnk(x.staff_id,x.staff_name,"")+'</td>'+
+   '<td class="khongbe">'+esc(x.slot_date||"-")+'</td>'+
+   '<td class="khongbe">'+esc((x.slot_from||"")+" - "+(x.slot_to||""))+'</td>'+
+   '<td class="khongbe">'+cnT(x.branch)+'</td>'+
+   '<td>'+(da?'<span class="chip amber">đã dùng</span>':(isc(x.dp_status,"cancelled")
+     ?'<span class="chip gray">đã huỷ</span>':'<span class="chip green">còn trống</span>'))+'</td>'+
+   '<td>'+(se?('<a class="lnk" onclick="goDD(\''+esc(se.class_id)+'\',\''+esc(se.session_id)+'\')">'+
+     esc((se.class_id_name||se.class_id)+" · buổi "+(se.session_number||"?"))+'</a>')
+     :'<span class="mut">-</span>')+'</td>'+
+   '<td class="khongbe">'+esc(x.registered_at||"-")+'</td>'+
+   '<td>'+esc(x.note||"-")+'</td>'+
+   '<td>'+(da?'':('<button class="btn sm" onclick="dpGanForm(\''+esc(x.dp_id)+'\')"><i class="ti ti-arrow-right"></i>Gán vào buổi</button>'))+'</td></tr>'});
+ h+='</tbody></table></div>'+
+  '<div class="mut" style="font-size:11.5px;padding:11px 16px;line-height:1.7">'+
+  'Hai chiều dùng CHUNG một sổ này: xếp người từ bảng buổi học ở trên thì ca tương ứng tự chuyển '+
+  'sang "đã dùng"; gán từ đây thì buổi học cũng đổi giáo viên và ghi vết y như vậy.</div></div>';
  return h}
 /* ═══════ V9.29r - ĐỤNG PHÒNG / ĐỤNG GIỜ (việc tồn đợt 2 - khối xếp lịch) ═══════
    Lịch tuần trước đây chỉ soi TRÙNG GIỜ CỦA MỘT NGƯỜI. Ba loại đụng còn lại chưa ai canh:
