@@ -24555,8 +24555,17 @@ function canhBaoHTML(){
      rộng gấp đôi và hạ cỡ chữ, thay vì ép cái nhãn bên cạnh vỡ ra. */
   var _dai=String(x.so).length>6;
   h+='<div class="cbo '+x.muc+(_dai?' rong':'')+'" onclick="go(\''+esc(x.trang)+'\')" title="'+esc((x.viSao||"")+" - Bấm để mở trang "+(p.t||x.trang))+'">'+
-   '<span class="cbcham"></span><div class="cbso'+(_dai?' dai':'')+'">'+esc(String(x.so))+'</div>'+
+   /* ═══ V2 15/08 (anh Luân: *"a em đưa số qua bên phải đi, dễ canh cột hơn"*) ═══════════════
+      Số đứng BÊN TRÁI thì mọi con số bắt đầu ở cùng một mép nhưng KẾT THÚC ở mép khác nhau -
+      "158.216.668đ" dài gấp năm lần "3", nên hàng dài đẩy nhãn của nó thụt vào trong khi hàng
+      ngắn thì nhãn sát bên. Mắt quét dọc gặp bốn mép chữ khác nhau.
+      Đưa số sang phải: mọi con số kết thúc ở đúng MỘT mép, mọi nhãn bắt đầu ở đúng một mép.
+      Và đó cũng là cách người ta đọc bảng số ngoài đời - chữ trái, số phải.
+      *Số căn phải thì thẳng theo hàng đơn vị; số căn trái chỉ thẳng theo chữ số đầu tiên - mà
+      chữ số đầu tiên thì không mang nghĩa gì.* */
+   '<span class="cbcham"></span>'+
    '<div class="cbtx"><div class="cbn">'+esc(x.nhan)+'</div><div class="cbp">'+esc(p.t||x.trang)+'</div></div>'+
+   '<div class="cbso'+(_dai?' dai':'')+'">'+esc(String(x.so))+'</div>'+
    '<i class="ti ti-chevron-right cbmui"></i></div>'});
  return h+'</div></div></div>'}
 function hubDich(k){
