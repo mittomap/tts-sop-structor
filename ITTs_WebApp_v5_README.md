@@ -2414,9 +2414,19 @@ Mỗi mẫu có **tên · nhóm · kênh (email/Zalo/cả hai) · tiêu đề ·
 kèm người sửa lần cuối và thời điểm sửa.
 Bảy nhóm: **thông tin lớp · xin đánh giá · nhắc học phí · nhắc buổi · chăm sóc · tái đăng ký ·
 khiếu nại**. Trung tâm tự **soạn mới, sửa, nhân bản, tắt** — không cần dev.
-Ngăn kéo mẫu **xem thử trên một học viên thật**, không xem thử trên `{ten_hv}`. Biến nào chưa
-điền được thì **giữ nguyên dấu ngoặc** để người gửi thấy chỗ thiếu, chứ không xoá đi thành khoảng trống.
+Ngăn kéo mẫu **xem thử trên một học viên thật**, không xem thử trên `{ten}`. Biến nào chưa điền
+được thì **giữ nguyên dấu ngoặc** để người gửi thấy chỗ thiếu, chứ không xoá đi thành khoảng
+trống - và ngăn kéo nói luôn thiếu biến nào, vì sao, điền ở đâu.
 Các cửa soạn tin lấy mẫu từ đây, lọc theo đúng nhóm việc và đúng kênh đang gửi.
+
+Chín biến app điền hộ: `{ten}` · `{lop}` · `{giangvien}` · `{trungtam}` · `{ngay}` · `{gio}` ·
+`{sotien}` · `{hotline}` · `{diachi}`. **Tên trung tâm, hotline và địa chỉ lấy từ Cài đặt ›
+Thương hiệu & Màu** - đổi tên trung tâm ở đó là tiêu đề email đổi theo, không cắm cứng trong mẫu.
+Riêng sổ Tin đã gửi thì giữ nguyên văn tên tại thời điểm gửi: mẫu là thứ *sẽ* gửi nên theo cấu
+hình hôm nay, sổ là thứ *đã* gửi nên giữ tên hôm ấy.
+
+Dải thẻ đầu trang đếm ba thứ không đọc ra được từ bảng: **nhóm việc chưa có mẫu dùng được** (chỗ
+gửi thuộc nhóm đó mở ra là ô chọn mẫu trống), **mẫu sẽ gửi ra chỗ trống**, và **mẫu đang ngưng**.
 
 ## Bốn nhóm việc cấp LỚP (trước đây chỉ có một)
 Học vụ vận hành theo lớp, mà bảng việc trước nay chỉ biết nói theo từng người. Nay có thêm:

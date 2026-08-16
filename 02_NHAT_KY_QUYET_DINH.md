@@ -335,11 +335,11 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 42 BỘ KIỂM. Bản dựng đang chạy: `2e82d7` (16/08, kho mẫu tin DL32), đã lên
-> https://mittomap.github.io/itts-sop-demo-v2/ — verify trọn bộ ĐANG CHẠY trên bản này, chưa có
-> kết quả; lần xanh hết 42/42 gần nhất là `9a361d`.
+> **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 16/08 trên chính bản này).
+> Bản dựng đang chạy: `bad7f9` (16/08, kho mẫu tin DL32 + mã bản dựng phủ cả asset), đã lên
+> https://mittomap.github.io/itts-sop-demo-v2/ .
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `9a361d`, `f46a05`, `2f6620`, `c7d1a0`, `553234`, `5bdbec`, `8cf2fe`, `37f39a`, `f40ff4`.
+> Mốc cũ: `a9eb4b`, `cd5289`, `c16c57`, `2e82d7`, `9a361d`, `f46a05`, `2f6620`, `c7d1a0`, `553234`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
 > ### 🟢 16/08 - KHO MẪU TIN GỬI KHÁCH (DL32): ĐẶT SAI NHÀ HAI LƯỢT MỚI ĐẶT ĐÚNG
@@ -371,6 +371,58 @@
 > Cửa gửi thông tin lớp nay đọc mẫu từ DL32 (`mauCho`, lọc CẢ nhóm LẪN kênh). Và `fixdata` bước 24
 > **gỡ các mục TIN\* còn sót trong CH4** - để lại là hai nhà cho một thứ, hôm sau người ta sửa
 > nhà nào cũng "đúng" mà khách nhận được bản kia.
+>
+> **BỐN CHỖ TỰ MÌNH LÀM HỎNG KHI DỜI NHÀ - chụp ảnh soi lại mới ra, không bộ kiểm nào bắt trước:**
+> · **Trang không có mục menu nào.** Em khai `g:"Tra cứu"` ở PAGES rồi tưởng xong, nhưng menu chỉ
+>   vẽ những gì có tên trong `NAVTREE`. Đo: `navVis`=true, `uiMenuOn`=true, mà dựng thật thanh menu
+>   ra thì không thẻ nào mang `data-k="mautin"`. **Lần thứ ba** cùng con bệnh (Hỏi đáp 04/08, hai
+>   trang Nhân sự 05/08, `socamket` 14/08). *Khai ở bảng nào thì chỉ bảng ấy đọc - `g:` là lời khai
+>   về Ý ĐỊNH, `NAVTREE` mới là cái vẽ ra menu.*
+> · **`{giangvien}` không được điền** ở cửa gửi: chỗ đó tự ghép tay đúng hai biến thay vì gọi hàm
+>   thay biến chung, nên mẫu "Giới thiệu giảng viên" gửi đi còn nguyên dấu ngoặc giữa câu.
+>   *Hai chỗ cùng thay biến cho một kho mẫu thì cái viết sau luôn thiếu vài biến - và cái thiếu ấy
+>   đi thẳng ra tin nhắn của khách.*
+> · **Bánh răng vẫn mở cửa nhà cũ**: nhận mã `MAU04`, đem tra CH4, `ch4Get` trả null - bấm vào là
+>   mở ô sửa cho một câu nhắc không tồn tại. *Dời kho đi mà quên dời chìa khoá thì cửa vẫn mở,
+>   chỉ là mở sang phòng trống.*
+> · `mauCtxHV` lấy dòng DL08 đầu tiên có lớp - học viên học hai lớp thì tên giảng viên có thể sai
+>   lớp mà **câu văn vẫn trôi chảy**, loại sai không ai bắt được. Nay nhận thêm mã lớp.
+>
+> **VERIFY BẮT 5 CHỖ ĐỎ, TẤT CẢ Ở TRANG MỚI** - và cả năm đều là luật đúng: không bài hướng dẫn
+> nào đi qua trang · chưa khai trang này là sổ của thực thể nào · đoạn nhắc đầu trang 209 ký tự ·
+> câu ngữ cảnh 155 ký tự · thiếu dải thẻ. Danh sách bảy biến bị đẩy vào chú thích, vì **chỗ nó
+> thực sự cần có mặt là trong form soạn mẫu**, nơi người ta đang gõ. Dải thẻ ba ô đều là câu
+> không đọc ra được từ bảng dưới: nhóm việc chưa có mẫu dùng được (chip nhóm đếm cả mẫu đã ngưng
+> nên một nhóm hiện "1" vẫn có thể là cửa gửi TRỐNG) · mẫu sẽ gửi ra chỗ trống · mẫu đang ngưng.
+>
+> ### 🟢 16/08 - "HOTLINE CÓ TRONG CẤU HÌNH RỒI PHẢI KHÔNG EM" - VÀ CÂU HỎI ẤY LÔI RA MỘT CHỖ CẮM CỨNG
+>
+> Anh Luân hỏi: *"Còn mấy cái tham số như hotline này nọ là cũng có trong cấu hình rồi pk em"*.
+> **Hotline thì có** - `centerHotline`, sửa ở Cài đặt › Thương hiệu & Màu. Nó hiện ra `{hotline}`
+> trên demo là **cố ý**: `_check14` và `_check16` đang canh đúng luật anh chốt V9.29 - *"dữ liệu
+> demo KHÔNG bịa sẵn số hotline, trung tâm tự điền số thật"*.
+>
+> **Nhưng soi lại cả bộ biến thì bắt được chỗ em cắm cứng: 8/13 mẫu viết thẳng "IELTS The Tutors"
+> vào tiêu đề email**, trong khi Cài đặt đã có sẵn ô *"Tên trung tâm (dùng trong tin nhắn gửi
+> khách, phiếu in)"* từ lâu. Trung tâm đổi tên thì app đổi khắp nơi, TRỪ đúng cái email gửi ra
+> cho khách - chỗ duy nhất người ngoài đọc được.
+> *Cắm cứng một thứ đã có ô cấu hình thì cái ô ấy thành lời hứa suông.*
+> Nay đi qua `{trungtam}`, thêm `{diachi}`, và **gom danh sách biến về MỘT bảng khai `MAUBIEN`** -
+> trước đó khai ở hai chỗ, thêm một biến là lộ ngay: sửa chỗ này thì chỗ kia vẫn dạy bộ biến cũ.
+> **Một chỗ CỐ Ý không đổi:** sổ Tin đã gửi (DL29) và tên người chuyển khoản vẫn giữ nguyên văn
+> tên cũ. *Mẫu là thứ SẼ gửi - phải theo cấu hình hôm nay. Sổ là thứ ĐÃ gửi - phải giữ tên hôm ấy.*
+>
+> ### 🟢 16/08 - MÃ BẢN DỰNG BĂM TRƯỚC LÚC FILE ĐỦ NỘI DUNG (điểm mù của chính chốt cửa)
+>
+> Thêm hai icon cho dải thẻ, `_tall` báo thiếu font, dựng lại subset (245 -> 247 icon, 70826 ->
+> 71258 bytes), dựng lại app - **mã bản dựng vẫn là `a9eb4b`, y hệt bản đang thiếu icon.**
+> Vì phép băm nằm TRƯỚC hai bước nhúng font Tabler và Montserrat, tức nó không nhìn thấy phần
+> asset - vốn chiếm gần một phần tư dung lượng file.
+> Nghĩa là **bước 4 trong CLAUDE.md (đối chiếu mã bản dựng sau khi đẩy) không phân biệt được bản
+> có icon với bản thiếu icon** - trong khi đó chính là chốt cửa dựng lên để chặn bẫy "hai người
+> nhìn hai file khác nhau" đã ăn nguyên một ngày 05/08.
+> *Một mã băm "sát nội dung file" mà băm trước lúc file đủ nội dung thì nó băm vào bản nháp.*
+> Nay băm ở cuối, phủ cả hai file CSS asset. Chạy hai lượt liên tiếp vẫn ra đúng một mã.
 >
 > ### 🟢 16/08 khuya - XONG HÀNG CHỜ 6 VIỆC (anh Luân: *"Làm hết đi em"*)
 >
