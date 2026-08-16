@@ -19246,8 +19246,30 @@ function mauCtxHV(sid,cid){
  var o=(cid?ds.filter(function(x){return String(x.class_id||"")===String(cid)})[0]:null)||ds[0]||{};
  var ci=cid||o.class_id;
  var c=ci?(find("DL10","class_id",ci)||{}):{};
+ /* `trungtam` và `diachi` ĐI QUA CẤU HÌNH, không cắm cứng. Bản đầu em gieo thẳng chữ "IELTS The
+    Tutors" vào tiêu đề 8/13 mẫu, trong khi Cài đặt đã có sẵn ô "Tên trung tâm (dùng trong tin
+    nhắn gửi khách, phiếu in)" từ lâu. Hậu quả: trung tâm đổi tên thì app đổi khắp nơi, TRỪ đúng
+    cái email gửi ra cho khách - chỗ duy nhất người ngoài đọc được.
+    *Cắm cứng một thứ đã có ô cấu hình thì cái ô ấy thành lời hứa suông.* */
  return {ten:s.full_name||o.student_id_name||"",lop:(String(o.class_id||"")===String(ci)?(o.class_id_name||""):"")||c.class_name||ci||"",
-  giangvien:nsTen(c.main_teacher_id)||"",hotline:paramStr("centerHotline","")}}
+  giangvien:nsTen(c.main_teacher_id)||"",hotline:paramStr("centerHotline",""),
+  trungtam:(UI().center||UIDEF.center||""),diachi:paramStr("centerAddress","")}}
+/* BẢN KHAI BIẾN - khai MỘT chỗ, bốn nơi đọc: dòng gợi ý trong form soạn mẫu, chú thích ở đầu
+   trang kho, giá trị `bien` mặc định khi thêm mẫu mới, và câu giải thích "vì sao chỗ này còn
+   trống" ở ngăn kéo xem mẫu. Bản đầu em gõ danh sách này ra hai chỗ khác nhau - thêm biến
+   `{trungtam}` là lộ ngay: sửa một chỗ thì chỗ kia vẫn dạy người dùng bộ biến cũ.
+   Cột 3 = vì sao chỗ này có thể còn trống (rỗng nghĩa là luôn điền được). */
+var MAUBIEN=[
+ ["ten","tên người nhận",""],
+ ["lop","tên lớp",""],
+ ["giangvien","giảng viên chính của lớp","lớp này chưa có giảng viên chính"],
+ ["trungtam","tên trung tâm, lấy từ Cài đặt › Thương hiệu &amp; Màu",""],
+ ["ngay","ngày diễn ra buổi","chỉ điền được khi gửi từ một buổi học cụ thể"],
+ ["gio","giờ diễn ra buổi","chỉ điền được khi gửi từ một buổi học cụ thể"],
+ ["sotien","số tiền của khoản","chỉ điền được khi gửi từ một khoản học phí cụ thể"],
+ ["hotline","hotline trung tâm","Hotline chưa khai trong <b>Cài đặt › Thương hiệu &amp; Màu</b>"],
+ ["diachi","địa chỉ trung tâm","Địa chỉ chưa khai trong <b>Cài đặt › Thương hiệu &amp; Màu</b>"]];
+function mauBienHTML(){return MAUBIEN.map(function(b){return '<code>{'+b[0]+'}</code>'}).join(" · ")}
 /* Bánh răng của KHO MẪU - anh em với `msgEditBtn` (CH4) và `enumEditBtn` (CH1), nhưng mở đúng
    nhà của mình. Mở thẳng ô sửa ngay tại chỗ đang đứng, không bắt người ta rời màn đang làm dở. */
 function mauEditBtn(id){if(!id||!gearOn())return "";
@@ -19271,7 +19293,9 @@ function renderMauTin(){
  h+='<div class="notebar"><i class="ti ti-info-circle"></i>'+
   goiyG("gy_mautin_bien_7c31",
    'App tự điền <b>{ten}</b>, <b>{lop}</b> và các biến khác lúc gửi. Thiếu dữ liệu thì <b>giữ nguyên chỗ trống</b>, không xoá thành câu cụt.'+
-   '||Bảy biến app điền hộ: {ten} tên người nhận · {lop} tên lớp · {giangvien} giảng viên chính của lớp · {ngay} và {gio} lấy từ buổi học khi gửi từ một buổi · {sotien} lấy từ khoản học phí khi gửi từ một khoản · {hotline} lấy từ Cài đặt › Thương hiệu & Màu. Danh sách này cũng hiện ngay trong form soạn mẫu.')+'</div>';
+   '||'+MAUBIEN.length+' biến app điền hộ: '+MAUBIEN.map(function(b){
+     return "{"+b[0]+"} "+chuTho2(b[1])+(b[2]?(" - có thể còn trống: "+chuTho2(b[2])):"")}).join(" · ")+
+   '. Danh sách này cũng hiện ngay trong form soạn mẫu.')+'</div>';
  /* Dải thẻ: `_checkkhuon` K3 đòi trang nghiệp vụ phải có, và nó đòi đúng. Ba câu hỏi KHÔNG đọc
     được từ bảng bên dưới lẫn từ dải chip nhóm:
     · chip nhóm đếm CẢ mẫu đã ngưng, nên một nhóm hiện "1" vẫn có thể là một cửa gửi TRỐNG;
@@ -19331,11 +19355,7 @@ function mauXem(id){var x=find("DL32","mau_id",id);if(!x){toast("Không thấy m
      *Để lại một dấu hỏi trên màn mà không kèm câu trả lời là đẩy việc sang cho người đọc.* */
   var con=(t.match(/\{[a-z_]+\}/g)||[]);
   if(!con.length)return;
-  var lydo={hotline:'Hotline chưa khai trong <b>Cài đặt › Thương hiệu &amp; Màu</b>',
-   ngay:'chỉ điền được khi gửi từ một buổi học cụ thể',
-   gio:'chỉ điền được khi gửi từ một buổi học cụ thể',
-   sotien:'chỉ điền được khi gửi từ một khoản học phí cụ thể',
-   giangvien:'lớp này chưa có giảng viên chính'};
+  var lydo={};MAUBIEN.forEach(function(b){if(b[2])lydo[b[0]]=b[2]});
   h+='<div class="notebar nbamber" style="margin:0 0 10px"><i class="ti ti-alert-triangle"></i>'+
    'Còn '+con.length+' chỗ chưa điền được, app <b>giữ nguyên</b> để người gửi thấy mà bổ sung: '+
    con.map(function(b){var n=b.slice(1,-1);
@@ -19362,7 +19382,7 @@ function mauForm(id){
     return '<option value="'+k[0]+'"'+((mauDung(x)?"active":"ngung")===k[0]?" selected":"")+'>'+esc(k[1])+'</option>'}).join("")+
   '</select></div>';
  h+='<div class="notebar" style="margin:6px 0 0"><i class="ti ti-info-circle"></i>Dùng được các chỗ trống: '+
-  ["ten","lop","giangvien","ngay","gio","sotien","hotline"].map(function(b){return '<code>{'+b+'}</code>'}).join(" · ")+'</div>';
+  mauBienHTML()+'</div>';
  h+='<div class="dact"><button class="btn primary" onclick="mauLuu(\''+esc(id||"")+'\')"><i class="ti ti-device-floppy"></i>Lưu mẫu</button>'+
   '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
  openDrawer(id?("Sửa mẫu · "+(x.ten||id)):"Soạn mẫu tin mới",h)}
@@ -19378,7 +19398,7 @@ function mauLuu(id){
  if(id){var x=find("DL32","mau_id",id);if(!x){toast("Không thấy mẫu này.");return}
   for(var k in v)x[k]=v[k];
   toast("Đã lưu mẫu “"+ten+"” - áp ngay ở mọi chỗ gửi thuộc nhóm này.",4600)}
- else{v.mau_id="MAU"+seqNo("DL32","mau_id",2);v.bien="{ten} {lop} {giangvien} {ngay} {gio} {sotien} {hotline}";
+ else{v.mau_id="MAU"+seqNo("DL32","mau_id",2);v.bien=MAUBIEN.map(function(b){return "{"+b[0]+"}"}).join(" ");
   DL.DL32=DL.DL32||[];DL.DL32.push(v);
   toast("Đã thêm mẫu “"+ten+"” vào kho.",4600)}
  persistSoon();closeModal();reRender(CUR)}

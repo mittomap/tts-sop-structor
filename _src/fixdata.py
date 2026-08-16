@@ -575,32 +575,40 @@ log.append("23. Buoi trung gio trong cung mot lop: day %d buoi sang ngay hom sau
 #
 # DL32 · Kho mau tin gui khach: co NHOM CHU DE (thong tin lop, xin danh gia, nhac hoc phi...),
 # co KENH (email can tieu de, Zalo thi khong), co bien thay the, co trang thai dang dung / ngung.
-_MAU_BIEN = u"{ten} {lop} {giangvien} {ngay} {gio} {sotien} {hotline}"
+# TEN TRUNG TAM DI QUA BIEN {trungtam}, KHONG CAM CUNG (sua 16/08). Ban dau 8/13 tieu de email
+# viet thang "IELTS The Tutors", trong khi Cai dat da co san o "Ten trung tam (dung trong tin
+# nhan gui khach, phieu in)". Trung tam doi ten thi app doi khap noi TRU dung cai email gui ra
+# cho khach - cho duy nhat nguoi ngoai doc duoc.
+# LUU Y: cac ban ghi DL29 (so tin DA GUI) va sender_name cua giao dich ngan hang O DUOI VAN GIU
+# nguyen van "IELTS The Tutors" - CO CHU Y. Do la BAN GHI viec da xay ra: tin ay da gui di duoi
+# cai ten ay roi. Doi ten trung tam hom nay ma lich su cung doi theo thi so sach noi doi.
+# *Mau la thu SE gui - phai theo cau hinh hom nay. So la thu DA gui - phai giu ten hom ay.*
+_MAU_BIEN = u"{ten} {lop} {giangvien} {trungtam} {ngay} {gio} {sotien} {hotline} {diachi}"
 _MAU_TIN = [
     ("MAU01", u"Thông tin lớp · Đầy đủ", "thongtinlop", "ca",
-     u"IELTS The Tutors - thông tin lớp {lop}",
+     u"{trungtam} - thông tin lớp {lop}",
      u"Chào {ten}, trung tâm gửi thông tin lớp {lop}: lịch buổi học, phòng học, giảng viên phụ "
      u"trách và link nhóm lớp. Bạn kiểm tra giúp và phản hồi nếu có gì chưa đúng. Hotline {hotline}."),
     ("MAU02", u"Thông tin lớp · Lịch học & phòng", "thongtinlop", "ca",
-     u"IELTS The Tutors - lịch học lớp {lop}",
+     u"{trungtam} - lịch học lớp {lop}",
      u"Chào {ten}, lớp {lop} khai giảng theo lịch đã hẹn. Bạn kiểm tra giúp lịch buổi và phòng "
      u"học trong Cổng học viên nhé. Có gì chưa rõ bạn nhắn lại giúp trung tâm."),
     ("MAU03", u"Thông tin lớp · Mời vào nhóm lớp", "thongtinlop", "zalo", "",
      u"Chào {ten}, trung tâm gửi bạn thông tin lớp {lop} và link nhóm lớp. Bạn vào nhóm để nhận "
      u"thông báo buổi học, bài tập và nhắc lịch nhé."),
     ("MAU04", u"Thông tin lớp · Giới thiệu giảng viên", "thongtinlop", "ca",
-     u"IELTS The Tutors - giảng viên lớp {lop}",
+     u"{trungtam} - giảng viên lớp {lop}",
      u"Chào {ten}, lớp {lop} của bạn do thầy/cô {giangvien} phụ trách chính. Trung tâm gửi bạn "
      u"thông tin lớp, lịch học và cách liên hệ khi cần đổi buổi."),
     ("MAU05", u"Xin đánh giá · Sau buổi học đầu", "xindanhgia", "zalo", "",
      u"Chào {ten}, bạn thấy buổi học đầu ở lớp {lop} thế nào? Bạn dành 1 phút chấm điểm giúp "
      u"trung tâm trong Cổng học viên nhé - góp ý của bạn giúp lớp tốt hơn ngay từ tuần sau."),
     ("MAU06", u"Xin đánh giá · Giữa khoá", "xindanhgia", "ca",
-     u"IELTS The Tutors - xin ý kiến về lớp {lop}",
+     u"{trungtam} - xin ý kiến về lớp {lop}",
      u"Chào {ten}, lớp {lop} đã đi được nửa chặng. Trung tâm gửi bạn phiếu khảo sát ngắn để biết "
      u"bạn đang thấy thế nào về giảng viên, giáo trình và nhịp học. Cảm ơn bạn."),
     ("MAU07", u"Xin đánh giá · Cuối khoá + giới thiệu bạn", "xindanhgia", "ca",
-     u"IELTS The Tutors - cảm ơn {ten} đã hoàn thành khoá học",
+     u"{trungtam} - cảm ơn {ten} đã hoàn thành khoá học",
      u"Chào {ten}, chúc mừng bạn hoàn thành lớp {lop}. Bạn đánh giá giúp trung tâm một lượt cuối "
      u"khoá nhé. Nếu thấy hài lòng, bạn giới thiệu bạn bè bằng mã giới thiệu của mình để cả hai "
      u"cùng nhận ưu đãi."),
@@ -608,7 +616,7 @@ _MAU_TIN = [
      u"Chào {ten}, khoản học phí {sotien} của lớp {lop} sắp đến hạn ngày {ngay}. Bạn sắp xếp "
      u"giúp trung tâm nhé. Cần đổi lịch đóng thì nhắn lại giúp."),
     ("MAU09", u"Nhắc học phí · Đã quá hạn", "nhachocphi", "ca",
-     u"IELTS The Tutors - nhắc khoản học phí lớp {lop}",
+     u"{trungtam} - nhắc khoản học phí lớp {lop}",
      u"Chào {ten}, trung tâm ghi nhận khoản {sotien} của lớp {lop} đã quá hạn ngày {ngay}. "
      u"Bạn kiểm tra giúp, nếu đã đóng rồi thì bỏ qua tin này giúp trung tâm. Hotline {hotline}."),
     ("MAU10", u"Nhắc buổi học · Trước buổi 1 ngày", "nhacbuoi", "zalo", "",
@@ -617,11 +625,11 @@ _MAU_TIN = [
      u"Chào {ten}, trung tâm thấy bạn vắng vài buổi ở lớp {lop}. Bạn đang gặp khó khăn gì về lịch "
      u"không? Nhắn lại giúp trung tâm để sắp xếp hỗ trợ nhé."),
     ("MAU12", u"Mời tái đăng ký · Sắp kết thúc khoá", "taidangky", "ca",
-     u"IELTS The Tutors - lộ trình tiếp theo cho {ten}",
+     u"{trungtam} - lộ trình tiếp theo cho {ten}",
      u"Chào {ten}, lớp {lop} sắp kết thúc. Trung tâm gợi ý lộ trình tiếp theo phù hợp với kết quả "
      u"của bạn, kèm ưu đãi dành cho học viên học tiếp. Bạn xem giúp và phản hồi nhé."),
     ("MAU13", u"Phản hồi khiếu nại · Đã tiếp nhận", "khieunai", "ca",
-     u"IELTS The Tutors - phản hồi về vấn đề bạn nêu",
+     u"{trungtam} - phản hồi về vấn đề bạn nêu",
      u"Chào {ten}, trung tâm đã nhận phản ánh của bạn về lớp {lop} và đang xử lý. Trung tâm sẽ "
      u"phản hồi bạn trong thời gian sớm nhất. Cảm ơn bạn đã báo cho trung tâm biết."),
 ]
