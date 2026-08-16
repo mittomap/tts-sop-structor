@@ -562,38 +562,89 @@ for _cid, _ds in _theoLop.items():
                 _ds[_i]["class_start_scheduled"] = fmt(_b)
 log.append("23. Buoi trung gio trong cung mot lop: day %d buoi sang ngay hom sau" % _day)
 
-# ═══ 24. MAU TIN GUI THONG TIN LOP VAO CH4 (15/08) ═══════════════════════════════════════
-# Anh Luan: *"ma may cai mau gui do cau hinh o dau em"* - va cau tra loi that la KHONG O DAU:
-# em cam cung bon mau ay trong ma nguon. Do la pham dung LUAT CUNG cua du an ("cau nhac qua CH4
-# (`msgText`)"), va pham dung cho no dau nhat: cau chu gui cho KHACH la thu doi nhieu nhat - doi
-# giong xung ho, them link nhom lop, bo bot mot y - ma doi thi phai sua ma roi dung lai app.
-# *Thu nao khach doc duoc thi trung tam phai sua duoc, khong phai dev.*
-# Nay bon mau nam trong CH4 nhu moi cau nhac khac: mo Cai dat > Thong diep nhac viec la sua duoc,
-# co banh rang nhay thang toi dung dong.
-_TIN_MAU = [
-    ("TIN01", u"Thông tin lớp · Lịch học & phòng",
-     u"Chào {ten}, lớp {lop} của bạn khai giảng theo lịch đã hẹn. Bạn kiểm tra giúp lịch buổi và "
-     u"phòng học trong Cổng học viên nhé. Có gì chưa rõ bạn nhắn lại giúp trung tâm."),
-    ("TIN02", u"Thông tin lớp · Mời vào nhóm lớp",
+# ═══ 24. KHO MAU TIN GUI KHACH - DL32 (16/08) ════════════════════════════════════════════
+# Anh Luan: *"Cai do dau phai thong diep nhac viec, no la 1 trang rieng, chuyen soan mau mail va
+# tin nhan, mau xin danh gia ..."*
+#
+# Anh dung va em dat sai nha. CH4 la CAU NHAC VIEC NOI BO - no nhac NHAN VIEN phai lam gi ("Lead
+# qua 4 gio chua goi. Viec can lam: goi gap"). Con day la CHU GUI RA NGOAI CHO KHACH: loi chao,
+# giong xung ho, chu ky, tieu de email. Hai thu khac nhau ca nguoi doc, ca nguoi duyet, ca nhip
+# sua - nhet chung mot bang la mai kia sua giong xung ho voi khach lai phai loi qua 94 cau nhac
+# noi bo de tim.
+# *Cung la "cau chu cau hinh duoc" khong co nghia la cung mot cho cat.*
+#
+# DL32 · Kho mau tin gui khach: co NHOM CHU DE (thong tin lop, xin danh gia, nhac hoc phi...),
+# co KENH (email can tieu de, Zalo thi khong), co bien thay the, co trang thai dang dung / ngung.
+_MAU_BIEN = u"{ten} {lop} {giangvien} {ngay} {gio} {sotien} {hotline}"
+_MAU_TIN = [
+    ("MAU01", u"Thông tin lớp · Đầy đủ", "thongtinlop", "ca",
+     u"IELTS The Tutors - thông tin lớp {lop}",
+     u"Chào {ten}, trung tâm gửi thông tin lớp {lop}: lịch buổi học, phòng học, giảng viên phụ "
+     u"trách và link nhóm lớp. Bạn kiểm tra giúp và phản hồi nếu có gì chưa đúng. Hotline {hotline}."),
+    ("MAU02", u"Thông tin lớp · Lịch học & phòng", "thongtinlop", "ca",
+     u"IELTS The Tutors - lịch học lớp {lop}",
+     u"Chào {ten}, lớp {lop} khai giảng theo lịch đã hẹn. Bạn kiểm tra giúp lịch buổi và phòng "
+     u"học trong Cổng học viên nhé. Có gì chưa rõ bạn nhắn lại giúp trung tâm."),
+    ("MAU03", u"Thông tin lớp · Mời vào nhóm lớp", "thongtinlop", "zalo", "",
      u"Chào {ten}, trung tâm gửi bạn thông tin lớp {lop} và link nhóm lớp. Bạn vào nhóm để nhận "
      u"thông báo buổi học, bài tập và nhắc lịch nhé."),
-    ("TIN03", u"Thông tin lớp · Giới thiệu giảng viên",
-     u"Chào {ten}, lớp {lop} của bạn do giảng viên phụ trách chính. Trung tâm gửi bạn thông tin "
-     u"lớp, lịch học và cách liên hệ khi cần đổi buổi."),
-    ("TIN04", u"Thông tin lớp · Đầy đủ (lịch + nhóm + giảng viên)",
-     u"Chào {ten}, trung tâm gửi thông tin lớp {lop}: lịch buổi học, phòng học, giảng viên phụ "
-     u"trách và link nhóm lớp. Bạn kiểm tra giúp và phản hồi nếu có gì chưa đúng."),
+    ("MAU04", u"Thông tin lớp · Giới thiệu giảng viên", "thongtinlop", "ca",
+     u"IELTS The Tutors - giảng viên lớp {lop}",
+     u"Chào {ten}, lớp {lop} của bạn do thầy/cô {giangvien} phụ trách chính. Trung tâm gửi bạn "
+     u"thông tin lớp, lịch học và cách liên hệ khi cần đổi buổi."),
+    ("MAU05", u"Xin đánh giá · Sau buổi học đầu", "xindanhgia", "zalo", "",
+     u"Chào {ten}, bạn thấy buổi học đầu ở lớp {lop} thế nào? Bạn dành 1 phút chấm điểm giúp "
+     u"trung tâm trong Cổng học viên nhé - góp ý của bạn giúp lớp tốt hơn ngay từ tuần sau."),
+    ("MAU06", u"Xin đánh giá · Giữa khoá", "xindanhgia", "ca",
+     u"IELTS The Tutors - xin ý kiến về lớp {lop}",
+     u"Chào {ten}, lớp {lop} đã đi được nửa chặng. Trung tâm gửi bạn phiếu khảo sát ngắn để biết "
+     u"bạn đang thấy thế nào về giảng viên, giáo trình và nhịp học. Cảm ơn bạn."),
+    ("MAU07", u"Xin đánh giá · Cuối khoá + giới thiệu bạn", "xindanhgia", "ca",
+     u"IELTS The Tutors - cảm ơn {ten} đã hoàn thành khoá học",
+     u"Chào {ten}, chúc mừng bạn hoàn thành lớp {lop}. Bạn đánh giá giúp trung tâm một lượt cuối "
+     u"khoá nhé. Nếu thấy hài lòng, bạn giới thiệu bạn bè bằng mã giới thiệu của mình để cả hai "
+     u"cùng nhận ưu đãi."),
+    ("MAU08", u"Nhắc học phí · Sắp đến hạn", "nhachocphi", "zalo", "",
+     u"Chào {ten}, khoản học phí {sotien} của lớp {lop} sắp đến hạn ngày {ngay}. Bạn sắp xếp "
+     u"giúp trung tâm nhé. Cần đổi lịch đóng thì nhắn lại giúp."),
+    ("MAU09", u"Nhắc học phí · Đã quá hạn", "nhachocphi", "ca",
+     u"IELTS The Tutors - nhắc khoản học phí lớp {lop}",
+     u"Chào {ten}, trung tâm ghi nhận khoản {sotien} của lớp {lop} đã quá hạn ngày {ngay}. "
+     u"Bạn kiểm tra giúp, nếu đã đóng rồi thì bỏ qua tin này giúp trung tâm. Hotline {hotline}."),
+    ("MAU10", u"Nhắc buổi học · Trước buổi 1 ngày", "nhacbuoi", "zalo", "",
+     u"Chào {ten}, nhắc bạn lớp {lop} có buổi vào {ngay} lúc {gio}. Hẹn gặp bạn ở lớp nhé."),
+    ("MAU11", u"Chăm sóc · Học viên vắng nhiều", "chamsoc", "zalo", "",
+     u"Chào {ten}, trung tâm thấy bạn vắng vài buổi ở lớp {lop}. Bạn đang gặp khó khăn gì về lịch "
+     u"không? Nhắn lại giúp trung tâm để sắp xếp hỗ trợ nhé."),
+    ("MAU12", u"Mời tái đăng ký · Sắp kết thúc khoá", "taidangky", "ca",
+     u"IELTS The Tutors - lộ trình tiếp theo cho {ten}",
+     u"Chào {ten}, lớp {lop} sắp kết thúc. Trung tâm gợi ý lộ trình tiếp theo phù hợp với kết quả "
+     u"của bạn, kèm ưu đãi dành cho học viên học tiếp. Bạn xem giúp và phản hồi nhé."),
+    ("MAU13", u"Phản hồi khiếu nại · Đã tiếp nhận", "khieunai", "ca",
+     u"IELTS The Tutors - phản hồi về vấn đề bạn nêu",
+     u"Chào {ten}, trung tâm đã nhận phản ánh của bạn về lớp {lop} và đang xử lý. Trung tâm sẽ "
+     u"phản hồi bạn trong thời gian sớm nhất. Cảm ơn bạn đã báo cho trung tâm biết."),
 ]
-_ch4t = d.setdefault("config", {}).setdefault("ch4", [])
-_cocode = {str(x.get("code") or "") for x in _ch4t}
-_them = 0
-for _c, _ten, _tm in _TIN_MAU:
-    if _c in _cocode:
-        continue
-    _ch4t.append({"code": _c, "sheet": "DL08", "tmpl": _tm, "when": _ten,
-                  "owner": u"Học vụ", "params": []})
-    _them += 1
-log.append("24. Mau tin gui thong tin lop: them %d mau vao CH4 (sua duoc o Cai dat)" % _them)
+_dp32 = d["dl"].setdefault("DL32", [])
+if not _dp32:
+    for _c, _ten, _nhom, _kenh, _td, _nd in _MAU_TIN:
+        _dp32.append({
+            "mau_id": _c, "ten": _ten, "nhom": _nhom, "kenh": _kenh,
+            "tieu_de": _td, "noi_dung": _nd, "bien": _MAU_BIEN,
+            "trang_thai": u"active (Đang dùng)",
+            "sua_luc": NOW.strftime("%d/%m/%Y %H:%M"), "sua_boi": u"Hệ thống",
+        })
+log.append("24. Kho mau tin gui khach (DL32): %d mau tren 7 nhom chu de" % len(_dp32))
+
+# Go bon mau TIN01-TIN04 khoi CH4: chung da co nha rieng o DL32. De lai la HAI NHA cho mot thu,
+# ma hai nha thi sua mot ben khong ai biet ben kia con cai cu.
+_ch4x = d.setdefault("config", {}).setdefault("ch4", [])
+_bo = [x for x in _ch4x if re.match(r"^TIN\d+$", str(x.get("code") or ""))]
+for _x in _bo:
+    _ch4x.remove(_x)
+if _bo:
+    log.append("24b. Go %d mau TIN khoi CH4 - chung thuoc ve Kho mau tin, khong phai cau nhac viec" % len(_bo))
+
 
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("=" * 70)

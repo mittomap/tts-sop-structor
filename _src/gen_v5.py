@@ -3763,6 +3763,10 @@ var PAGES=[
 {k:"baoluu",g:"_",ic:"ti-player-pause",t:"Bảo lưu / Bỏ học",c:"Trong Tính năng khác",ty:"custom"},
 {k:"magioithieu",g:"_",ic:"ti-gift",t:"Mã giới thiệu",c:"Trong Tính năng khác",ty:"custom"},
 /* V2 12/08 (SALE-3) - sổ lưu mọi email/Zalo app đã gửi cho khách. */
+/* V2 16/08 - Kho mẫu tin đứng CẠNH Sổ tin đã gửi: một bên là cái sắp gửi, một bên là cái đã
+   gửi. Người mở sổ thấy một tin viết chưa ổn thì bước kế tiếp là sửa mẫu - hai trang cạnh nhau
+   thì bước ấy dài đúng một cú bấm. */
+{k:"mautin",g:"Tra cứu",ic:"ti-mail-cog",t:"Kho mẫu tin gửi khách",c:"Mẫu email và tin nhắn: thông tin lớp, xin đánh giá, nhắc học phí",ty:"custom"},
 {k:"tinnhan",g:"Tra cứu",ic:"ti-send",t:"Sổ tin đã gửi",c:"Email và Zalo đã gửi cho khách - lọc theo lớp, người gửi, thời gian",ty:"custom"},
 /* ===== QUẢN LÝ ===== */
 {k:"baocao",g:"Quản lý",ic:"ti-chart-bar",t:"Tổng quan · Báo cáo & KPI",c:"Điều hành theo SOP",ty:"custom"},
@@ -17579,9 +17583,11 @@ function obMark(id,vals,msg){var r=find("DL08","onboarding_id",id);function d(){
    việc là sửa được, và cạnh ô chọn có bánh răng nhảy thẳng tới đúng dòng.
    Danh sách mẫu SINH TỪ CH4 chứ không khai lại ở đây: khai hai nơi thì thêm một mẫu trong Cài
    đặt xong nó không hiện ra ở ô chọn, mà không ai hiểu vì sao. */
+/* Mẫu lấy từ KHO MẪU TIN (DL32), nhóm "thongtinlop". Sinh từ kho chứ không khai lại: thêm một
+   mẫu trong trang Kho mẫu là nó hiện ngay ở đây, không phải sửa hai nơi. */
 function obMauDs(){
- return ch4List().filter(function(m){return /^TIN\d+$/.test(String(m.code||""))})
-  .map(function(m){return [m.code,String(m.when||m.code).replace(/^Thông tin lớp · /,""),String(m.tmpl||"")]})}
+ return mauCho("thongtinlop","").map(function(m){
+  return [m.mau_id,String(m.ten||m.mau_id).replace(/^Thông tin lớp · /,""),String(m.noi_dung||"")]})}
 function obMauText(k,ten,lop){
  var ds=obMauDs();
  for(var i=0;i<ds.length;i++)if(ds[i][0]===k)
@@ -17951,7 +17957,9 @@ var DVI={chay:"hồ sơ",giaoan:"lớp",buoihoc:"buổi",diemdanh:"buổi",baita
  /* V2 15/08 - sổ ca dạy thay đếm bằng CA ĐĂNG KÝ: một ca là một người nhận một khung giờ một
     ngày. Không đếm bằng "buổi" (buổi là của lớp, một ca có thể phủ nhiều buổi hoặc không buổi
     nào) và không đếm bằng "người" (một người đăng ký nhiều ca trong tuần). */
- gvdp:"ca"};
+ gvdp:"ca",
+ /* Kho mẫu đếm bằng MẪU, không đếm bằng "tin": một mẫu đẻ ra nhiều tin, hai thứ khác nhau. */
+ mautin:"mẫu"};
 function dvi(p){return DVI[p]||"dòng"}
 /* V2 13/08 - NHÃN CỦA DẢI CHIP TRẠNG THÁI. Hầu hết sổ lọc theo một cột `*_status` nên "Trạng
    thái" đúng và không cần khai. Bốn cột không phải trạng thái thì phải gọi đúng tên nó, nếu
@@ -19173,6 +19181,147 @@ function msgMau(kind,A){
  if(kind==="email")
   return "Kinh gui "+ten+",\n\nIELTS The Tutors xin thong bao...\n\nTran trong,\nIELTS The Tutors"+(hot?("\nHotline: "+hot):"");
  return "IELTS The Tutors gui "+ten+": ..."+(hot?(" Hotline: "+hot):"")}
+
+/* ═══ V2 16/08 - KHO MẪU TIN GỬI KHÁCH (DL32) ═══════════════════════════════════════════════
+   Anh Luân: *"Cái đó đâu phải thông điệp nhắc việc, nó là 1 trang riêng, chuyên soạn mẫu mail và
+   tin nhắn, mẫu xin đánh giá …"*
+
+   Anh đúng và em đặt sai nhà hai lần liên tiếp: lần một cắm cứng trong mã, lần hai nhét vào CH4.
+   CH4 là CÂU NHẮC VIỆC NỘI BỘ - nó nhắc NHÂN VIÊN phải làm gì ("Lead quá 4 giờ chưa gọi. Việc
+   cần làm: gọi gấp"). Còn đây là CHỮ GỬI RA NGOÀI CHO KHÁCH: lời chào, giọng xưng hô, chữ ký,
+   tiêu đề email. Hai thứ khác nhau cả người đọc, cả người duyệt, cả nhịp sửa - nhét chung một
+   bảng là mai kia muốn sửa giọng xưng hô với khách lại phải lội qua 94 câu nhắc nội bộ để tìm.
+   *Cùng là "câu chữ cấu hình được" không có nghĩa là cùng một chỗ cất.*
+
+   Kho này khai đủ những thứ một mẫu gửi thật cần mà CH4 không có chỗ chứa: NHÓM CHỦ ĐỀ (để chỗ
+   gửi nào chỉ thấy mẫu của việc đó), KÊNH (email cần tiêu đề, Zalo thì không), BIẾN thay thế, và
+   TRẠNG THÁI đang dùng / ngưng - ngưng chứ không xoá, vì một mẫu đã gửi cho khách rồi thì xoá đi
+   là mất dấu vết của những tin đã đi. */
+var MAUNHOM=[["thongtinlop","Thông tin lớp"],["xindanhgia","Xin đánh giá & khảo sát"],
+ ["nhachocphi","Nhắc học phí"],["nhacbuoi","Nhắc buổi học"],["chamsoc","Chăm sóc học viên"],
+ ["taidangky","Mời tái đăng ký"],["khieunai","Phản hồi khiếu nại"]];
+function mauNhomTen(k){for(var i=0;i<MAUNHOM.length;i++)if(MAUNHOM[i][0]===k)return MAUNHOM[i][1];return k||"Khác"}
+function mauDs(){return rows("DL32")||[]}
+function mauDung(x){return !/ngung|off/.test(ecode(x&&x.trang_thai))}
+/* Mẫu hợp cho một chỗ gửi: đúng nhóm chủ đề VÀ đúng kênh (mẫu khai "ca" thì kênh nào cũng dùng
+   được). Lọc cả hai vế - lọc mỗi nhóm thì ô chọn email bày ra mẫu Zalo không có tiêu đề. */
+function mauCho(nhom,kenh){
+ return mauDs().filter(function(x){
+  if(!mauDung(x))return false;
+  if(nhom&&String(x.nhom||"")!==nhom)return false;
+  var k=String(x.kenh||"ca");
+  return !kenh||k==="ca"||k===kenh})}
+/* Thay biến. Thiếu dữ liệu thì để nguyên chỗ trống chứ KHÔNG xoá: người soạn nhìn thấy {sotien}
+   còn nguyên là biết tin này chưa đủ dữ liệu để gửi - xoá đi thành một câu cụt mà không ai hay. */
+function mauThay(t,ctx){t=String(t||"");ctx=ctx||{};
+ for(var k in ctx){if(ctx[k]==null||ctx[k]==="")continue;t=t.split("{"+k+"}").join(ctx[k])}
+ return t}
+function mauCtxHV(sid){
+ var s=find("DL09","student_id",sid)||{};
+ var o=rows("DL08").filter(function(x){return String(x.student_id||"")===String(sid)&&x.class_id})[0]||{};
+ var c=o.class_id?(find("DL10","class_id",o.class_id)||{}):{};
+ return {ten:s.full_name||o.student_id_name||"",lop:o.class_id_name||o.class_id||"",
+  giangvien:nsTen(c.main_teacher_id)||"",hotline:paramStr("centerHotline","")}}
+/* ── TRANG KHO MẪU ───────────────────────────────────────────────────────────────────────── */
+function mauNhomChon(){return window.MAUNHOMK||""}
+function mauNhomSet(k){window.MAUNHOMK=k;reRender("mautin")}
+function renderMauTin(){
+ var all=mauDs(),nh=mauNhomChon();
+ var ds=nh?all.filter(function(x){return String(x.nhom||"")===nh}):all;
+ var h=pageHead("Kho mẫu tin gửi khách",
+  "Soạn sẵn mẫu email và tin nhắn cho từng việc: gửi thông tin lớp, xin đánh giá, nhắc học phí... Chỗ nào cần gửi thì chọn mẫu ở đó, không phải gõ lại từ đầu.",
+  '<button class="btn primary" onclick="mauForm(\'\')"><i class="ti ti-plus"></i>Soạn mẫu mới</button>');
+ h+='<div class="notebar"><i class="ti ti-info-circle"></i>'+
+  '<b>Biến thay tự động:</b> '+["ten","lop","giangvien","ngay","gio","sotien","hotline"].map(function(b){
+    return '<code>{'+b+'}</code>'}).join(" · ")+
+  ' - app điền lúc gửi. Thiếu dữ liệu thì chỗ trống <b>giữ nguyên</b> để người soạn thấy mà bổ sung, '+
+  'chứ không tự xoá thành câu cụt.</div>';
+ h+=tbar('<span class="tblbl">Nhóm</span>'+
+  segHTML(nh,[["","Tất cả",all.length,""]].concat(MAUNHOM.map(function(g){
+    return [g[0],g[1],all.filter(function(x){return String(x.nhom||"")===g[0]}).length,""]})),
+   "mauNhomSet('{k}')","mau_nhom"),
+  '<span class="tbcnt">'+ds.length+' mẫu</span>');
+ h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr>'+
+  '<th>Mã</th><th>Tên mẫu</th><th>Nhóm</th><th>Kênh</th><th>Tiêu đề (email)</th><th>Nội dung</th>'+
+  '<th>Trạng thái</th><th>Sửa lần cuối</th><th></th></tr></thead><tbody>';
+ if(!ds.length)h+='<tr><td colspan="9"><div class="empty">Nhóm này chưa có mẫu nào. '+
+  'Bấm <b>Soạn mẫu mới</b> để thêm - mẫu soạn ở đây hiện ngay ở mọi chỗ gửi thuộc nhóm đó.</div></td></tr>';
+ ds.forEach(function(x){
+  h+='<tr data-mo="mauXem" data-mo-arg="'+esc(x.mau_id)+'">'+
+   '<td class="khongbe"><b>'+esc(x.mau_id)+'</b></td>'+
+   '<td>'+esc(x.ten||"-")+'</td>'+
+   '<td class="khongbe">'+esc(mauNhomTen(x.nhom))+'</td>'+
+   '<td class="khongbe">'+(String(x.kenh||"ca")==="ca"?'<span class="chip">email + Zalo</span>'
+     :(String(x.kenh)==="email"?'<span class="chip blue">email</span>':'<span class="chip green">Zalo</span>'))+'</td>'+
+   '<td>'+(String(x.tieu_de||"").trim()?esc(x.tieu_de):'<span class="mut">-</span>')+'</td>'+
+   '<td>'+esc(String(x.noi_dung||"").slice(0,70))+(String(x.noi_dung||"").length>70?'…':'')+'</td>'+
+   '<td>'+(mauDung(x)?'<span class="chip green">đang dùng</span>':'<span class="chip gray">đã ngưng</span>')+'</td>'+
+   '<td class="khongbe">'+esc(x.sua_luc||"-")+'</td>'+
+   '<td><button class="btn sm" onclick="event.stopPropagation();mauForm(\''+esc(x.mau_id)+'\')"><i class="ti ti-edit"></i>Sửa</button></td></tr>'});
+ h+='</tbody></table></div></div>';
+ return h}
+function mauXem(id){var x=find("DL32","mau_id",id);if(!x){toast("Không thấy mẫu này.");return}
+ var h='<div class="dcard"><h4><i class="ti ti-mail"></i>'+esc(x.ten||x.mau_id)+'</h4>';
+ h+=ctxRows([["Mã",esc(x.mau_id)],["Nhóm",esc(mauNhomTen(x.nhom))],
+  ["Kênh",esc(String(x.kenh||"ca")==="ca"?"email + Zalo":x.kenh)],
+  ["Trạng thái",mauDung(x)?'<span class="chip green">đang dùng</span>':'<span class="chip gray">đã ngưng</span>'],
+  ["Sửa lần cuối",esc((x.sua_luc||"-")+(x.sua_boi?(" · "+x.sua_boi):""))]]);
+ if(String(x.tieu_de||"").trim())h+=ctxContent("Tiêu đề email",x.tieu_de,"var(--navy)");
+ h+=ctxContent("Nội dung mẫu",x.noi_dung,"var(--navy)");
+ /* Xem thử với dữ liệu THẬT của một học viên: đọc mẫu có chỗ trống không hình dung ra câu cuối
+    cùng, mà câu cuối cùng mới là thứ khách nhận. */
+ (function(){var hv=(srows("DL09")||[])[0];if(!hv)return;
+  h+=ctxContent("Xem thử với "+(hv.full_name||hv.student_id),
+   mauThay(x.noi_dung,mauCtxHV(hv.student_id)),"var(--green)")})();
+ h+='<div class="dact"><button class="btn primary" onclick="mauForm(\''+esc(id)+'\')"><i class="ti ti-edit"></i>Sửa mẫu</button>'+
+  '<button class="btn" onclick="mauNhanBan(\''+esc(id)+'\')"><i class="ti ti-copy"></i>Nhân bản</button>'+
+  '<button class="btn" onclick="closeModal()">Đóng</button></div></div>';
+ openDrawer("Mẫu tin · "+(x.ten||id),h)}
+function mauForm(id){
+ var x=id?(find("DL32","mau_id",id)||{}):{};
+ var h='<div class="dcard"><h4><i class="ti ti-mail-plus"></i>'+(id?"Sửa mẫu tin":"Soạn mẫu tin mới")+'</h4>';
+ h+='<div class="fld full"><label>Tên mẫu <i>*</i></label><input id="mau_ten" value="'+esc(x.ten||"")+'" placeholder="vd: Xin đánh giá sau buổi học đầu"></div>';
+ h+='<div class="fld"><label>Nhóm chủ đề <i>*</i></label><select id="mau_nhom">'+
+  MAUNHOM.map(function(g){return '<option value="'+esc(g[0])+'"'+(String(x.nhom||"")===g[0]?" selected":"")+'>'+esc(g[1])+'</option>'}).join("")+
+  '</select></div>';
+ h+='<div class="fld"><label>Kênh gửi <i>*</i></label><select id="mau_kenh">'+
+  [["ca","Cả email và Zalo"],["email","Chỉ email"],["zalo","Chỉ Zalo"]].map(function(k){
+    return '<option value="'+k[0]+'"'+(String(x.kenh||"ca")===k[0]?" selected":"")+'>'+esc(k[1])+'</option>'}).join("")+
+  '</select></div>';
+ h+='<div class="fld full"><label>Tiêu đề (chỉ dùng khi gửi email)</label><input id="mau_td" value="'+esc(x.tieu_de||"")+'"></div>';
+ h+='<div class="fld full"><label>Nội dung <i>*</i></label><textarea id="mau_nd" rows="6">'+esc(x.noi_dung||"")+'</textarea></div>';
+ h+='<div class="fld full"><label>Trạng thái</label><select id="mau_tt">'+
+  [["active","Đang dùng"],["ngung","Đã ngưng - không hiện ở chỗ gửi nữa"]].map(function(k){
+    return '<option value="'+k[0]+'"'+((mauDung(x)?"active":"ngung")===k[0]?" selected":"")+'>'+esc(k[1])+'</option>'}).join("")+
+  '</select></div>';
+ h+='<div class="notebar" style="margin:6px 0 0"><i class="ti ti-info-circle"></i>Dùng được các chỗ trống: '+
+  ["ten","lop","giangvien","ngay","gio","sotien","hotline"].map(function(b){return '<code>{'+b+'}</code>'}).join(" · ")+'</div>';
+ h+='<div class="dact"><button class="btn primary" onclick="mauLuu(\''+esc(id||"")+'\')"><i class="ti ti-device-floppy"></i>Lưu mẫu</button>'+
+  '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
+ openDrawer(id?("Sửa mẫu · "+(x.ten||id)):"Soạn mẫu tin mới",h)}
+function mauLuu(id){
+ var ten=String(fldV("mau_ten")||"").trim(),nd=String(fldV("mau_nd")||"").trim();
+ if(!ten){toast("Đặt tên cho mẫu - tên là thứ người gửi nhìn thấy trong ô chọn.");return}
+ if(!nd){toast("Nội dung đang trống.");return}
+ if(!actGuard("mauLuu:"+(id||ten)))return;
+ var v={ten:ten,nhom:fldV("mau_nhom"),kenh:fldV("mau_kenh"),
+  tieu_de:String(fldV("mau_td")||"").trim(),noi_dung:nd,
+  trang_thai:(fldV("mau_tt")==="ngung")?"ngung (Đã ngưng)":"active (Đang dùng)",
+  sua_luc:nowStr(),sua_boi:myName()};
+ if(id){var x=find("DL32","mau_id",id);if(!x){toast("Không thấy mẫu này.");return}
+  for(var k in v)x[k]=v[k];
+  toast("Đã lưu mẫu “"+ten+"” - áp ngay ở mọi chỗ gửi thuộc nhóm này.",4600)}
+ else{v.mau_id="MAU"+seqNo("DL32","mau_id",2);v.bien="{ten} {lop} {giangvien} {ngay} {gio} {sotien} {hotline}";
+  DL.DL32=DL.DL32||[];DL.DL32.push(v);
+  toast("Đã thêm mẫu “"+ten+"” vào kho.",4600)}
+ persistSoon();closeModal();reRender(CUR)}
+function mauNhanBan(id){var x=find("DL32","mau_id",id);if(!x){toast("Không thấy mẫu này.");return}
+ if(!actGuard("mauNhanBan:"+id))return;
+ var v={};for(var k in x)v[k]=x[k];
+ v.mau_id="MAU"+seqNo("DL32","mau_id",2);v.ten=(x.ten||"")+" (bản sao)";
+ v.sua_luc=nowStr();v.sua_boi=myName();
+ DL.DL32=DL.DL32||[];DL.DL32.push(v);persistSoon();closeModal();
+ toast("Đã nhân bản thành "+v.mau_id+" - sửa lại rồi dùng.",4600);reRender(CUR)}
 function msgSoan(pid,kenh,tieude,noidung,chude){
  var A=msgAi(pid);if(!A){toast("Không thấy hồ sơ này.");return}
  var ks=msgKenhCo(A.rec);
@@ -28731,6 +28880,7 @@ function _duyAi(){try{return duyAiHTML()}catch(e){return ""}}
 
 RENDER.reup      = function(){return renderReupTab()};        /* tự có đầu trang riêng */
 RENDER.ychv      = function(){return renderYcHV()};           /* tự có đầu trang riêng */
+RENDER.mautin    = function(){return renderMauTin()};
 RENDER.khaosat   = function(){return renderReview()};         /* embed rỗng -> tự vẽ đầu trang */
 RENDER.buoihnay  = function(){return nvHead("buoihnay")+renderHtToday(1)};
 RENDER.lichtuan  = function(){return nvHead("lichtuan")+renderLichTuan(1)};
@@ -31542,6 +31692,8 @@ DOORS = {
  # thay cho nut "Xac nhan da gui" cu. Cua rieng chu khong goi lai `msgGui` vi no dong them mot
  # moc ben DL08 va gan chu de "thongtinlop" de trang thai doc nguoc lai duoc tu so.
  "DL29":["msgGui","obGuiThat"],
+ # V2 16/08 - DL32 kho mau tin gui khach: soan/sua mot mau, va nhan ban mot mau.
+ "DL32":["mauLuu","mauNhanBan"],
  # V2 12/08 (SALE-7): hop dong cam ket dau ra - can DU HAI chu ky moi qua buoc xep lop.
  "DL30":["hdLuu","hdQuyet","hdTuChoiRun"],
  "DL23":["hvReq","nvNhanHVSave","tkNewSave"],
