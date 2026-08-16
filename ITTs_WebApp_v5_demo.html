@@ -3261,7 +3261,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">16/08/2026 · <b>c16c57</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">16/08/2026 · <b>cd5289</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -5347,6 +5347,14 @@ function colMenuHTML(key){var cfg=LISTCFG[key];if(window.COLMENU!==key)return ''
    Bộ kiểm _checkux canh: dải nào gọi statStrip mà không khai ở đây là đỏ; số thẻ khai lệch với
    số thẻ vẽ ra thật cũng đỏ; thẻ nào còn onclick cũng đỏ. */
 var THEDEF={
+ /* V2 16/08 - dải thẻ của Kho mẫu tin. Ba ô đều là câu KHÔNG đọc ra được từ bảng ngay dưới:
+    dải chip nhóm đếm cả mẫu đã ngưng nên một nhóm hiện "1" vẫn có thể là cửa gửi trống, còn
+    biến không điền nổi thì phải mở từng mẫu xem thử mới lộ. Đúng luật thẻ nhóm B (14/08): thẻ
+    phải trả lời một câu người ta hỏi thật, không phải đếm lại dòng của bảng. */
+ mautin:{t:"Kho mẫu tin gửi khách",the:[
+  ["mt_thieu","Nhóm việc chưa có mẫu dùng được","Số nhóm chủ đề không còn mẫu nào đang bật - chỗ gửi thuộc nhóm đó mở ra là ô chọn mẫu trống, nhân viên phải tự gõ tay. Chip nhóm ngay dưới đếm cả mẫu đã ngưng nên không thấy được lỗ này. Danh sách: bấm từng chip nhóm ở hàng công cụ, nhóm nào bảng trống là nhóm đó."],
+  ["mt_trong","Mẫu sẽ gửi ra chỗ trống","Số mẫu đang dùng có biến mà app không điền nổi vì trung tâm chưa khai giá trị - gửi đi là khách đọc thấy dấu ngoặc nằm giữa câu. Danh sách: mở từng mẫu, ngăn kéo có dòng vàng nói rõ thiếu biến nào và vì sao."],
+  ["mt_ngung","Mẫu đang ngưng","Số mẫu đã tắt - không hiện ở chỗ gửi nữa nhưng vẫn giữ lại để bật lại hoặc nhân bản làm mẫu mới. Danh sách: cột Trạng thái trong bảng ngay dưới."]]},
  /* V2 10/08 - dải thẻ của màn Lịch trực WOW. Ô thứ tư là ô quan trọng nhất của cả màn: những
     ngày KHÔNG AI TRỰC chính là những ngày học viên mở app ra và không đặt được buổi nào - SOP
     gọi ô trống trong lưới là "không ai trực", thẻ này đếm hộ để không phải rà mắt cả lưới. */
@@ -19499,13 +19507,32 @@ function renderMauTin(){
  var all=mauDs(),nh=mauNhomChon();
  var ds=nh?all.filter(function(x){return String(x.nhom||"")===nh}):all;
  var h=pageHead("Kho mẫu tin gửi khách",
-  "Soạn sẵn mẫu email và tin nhắn cho từng việc: gửi thông tin lớp, xin đánh giá, nhắc học phí... Chỗ nào cần gửi thì chọn mẫu ở đó, không phải gõ lại từ đầu.",
+  "Mẫu email và tin Zalo soạn sẵn cho từng việc: gửi thông tin lớp, xin đánh giá, nhắc học phí. Chỗ nào cần gửi thì chọn mẫu ở đó.",
   '<button class="btn primary" onclick="mauForm(\'\')"><i class="ti ti-plus"></i>Soạn mẫu mới</button>');
+ /* Danh sách BẢY biến dài 209 ký tự, quá trần 150 của đoạn nhắc đầu trang. Không cắt bớt biến
+    (cắt là giấu mất một nửa thứ người soạn cần biết) mà đẩy phần liệt kê vào chú thích - và
+    chỗ NÓ THỰC SỰ CẦN CÓ MẶT là trong form soạn mẫu, nơi người ta đang gõ; ở đó nó đã có sẵn.
+    *Câu dài ở đầu trang là câu người ta đọc một lần rồi bỏ qua mãi mãi.* */
  h+='<div class="notebar"><i class="ti ti-info-circle"></i>'+
-  '<b>Biến thay tự động:</b> '+["ten","lop","giangvien","ngay","gio","sotien","hotline"].map(function(b){
-    return '<code>{'+b+'}</code>'}).join(" · ")+
-  ' - app điền lúc gửi. Thiếu dữ liệu thì chỗ trống <b>giữ nguyên</b> để người soạn thấy mà bổ sung, '+
-  'chứ không tự xoá thành câu cụt.</div>';
+  goiyG("gy_mautin_bien_7c31",
+   'App tự điền <b>{ten}</b>, <b>{lop}</b> và các biến khác lúc gửi. Thiếu dữ liệu thì <b>giữ nguyên chỗ trống</b>, không xoá thành câu cụt.'+
+   '||Bảy biến app điền hộ: {ten} tên người nhận · {lop} tên lớp · {giangvien} giảng viên chính của lớp · {ngay} và {gio} lấy từ buổi học khi gửi từ một buổi · {sotien} lấy từ khoản học phí khi gửi từ một khoản · {hotline} lấy từ Cài đặt › Thương hiệu & Màu. Danh sách này cũng hiện ngay trong form soạn mẫu.')+'</div>';
+ /* Dải thẻ: `_checkkhuon` K3 đòi trang nghiệp vụ phải có, và nó đòi đúng. Ba câu hỏi KHÔNG đọc
+    được từ bảng bên dưới lẫn từ dải chip nhóm:
+    · chip nhóm đếm CẢ mẫu đã ngưng, nên một nhóm hiện "1" vẫn có thể là một cửa gửi TRỐNG;
+    · mẫu còn biến app không điền nổi thì khách nhận được chữ {hotline} nằm giữa câu - đọc bảng
+      không thấy, phải mở từng mẫu ra xem thử mới biết. */
+ var _nhomTrong=MAUNHOM.filter(function(g){return !mauCho(g[0],"").length});
+ var _boNgo=all.filter(function(x){return mauDung(x)&&/\{hotline\}/.test(String(x.noi_dung||""))&&!paramStr("centerHotline","")});
+ var _ngung=all.filter(function(x){return !mauDung(x)});
+ h+=statStrip([
+  ["ti-mail-off",_nhomTrong.length,"Nhóm việc chưa có mẫu dùng được","#C2410C","",
+   "",_nhomTrong.length?("Đang thiếu: "+_nhomTrong.map(function(g){return g[1]}).join(", ")):"Bảy nhóm việc đều có ít nhất một mẫu đang dùng"],
+  ["ti-square-dot",_boNgo.length,"Mẫu sẽ gửi ra chỗ trống","#B45309","",
+   "",_boNgo.length?("Các mẫu này có biến {hotline} mà trung tâm chưa khai Hotline - gửi đi là khách đọc thấy dấu ngoặc giữa câu"):"Mọi biến trong các mẫu đang dùng đều điền được"],
+  ["ti-player-pause",_ngung.length,"Mẫu đang ngưng","#64748B","",
+   "","Mẫu tắt không hiện ở chỗ gửi nữa nhưng vẫn giữ lại để bật lại hoặc chép làm mẫu mới"]
+ ],"mautin");
  h+=tbar('<span class="tblbl">Nhóm</span>'+
   segHTML(nh,[["","Tất cả",all.length,""]].concat(MAUNHOM.map(function(g){
     return [g[0],g[1],all.filter(function(x){return String(x.nhom||"")===g[0]}).length,""]})),
@@ -22731,7 +22758,7 @@ var GOIYDEF={};
 /* Đoạn nào hiện ở màn nào - để người sửa biết mình đang sửa dòng ở đâu. */
 /* Bấm 'Xem tại chỗ' thì mở đúng màn đang chứa dòng đó. */
 var GOIYPG={gy_ay_la_cac_cau_3fed:"window.SETTAB='ch4';reRender('settings')",gy_ay_la_nguong_at_f276:"window.SETTAB='ch6';reRender('settings')",gy_cau_nhac_viec_chuan_281e:"window.SETTAB='ch4';reRender('settings')",gy_chi_quan_ly_giam_63c5:"window.SETTAB='ch2';reRender('settings')",gy_danh_muc_lua_chon_293d:"window.SETTAB='ch1';reRender('settings')",gy_email_dung_e_ang_eb0e:"window.SETTAB='staff';reRender('settings')",gy_hop_nay_tra_loi_5ff9:"go('hoidap')",gy_khoa_hoc_la_cau_1eb3:"window.SETTAB='khoa';reRender('settings')",gy_lop_nay_chua_co_a916:"go('banglop')",gy_nguoi_nay_la_giang_ade7:"go('hosonv')",gy_oi_ten_logo_va_844c:"window.SETTAB='brand';reRender('settings')",gy_phan_quyen_co_ba_7c33:"window.SETTAB='phanquyen';reRender('settings')",gy_ung_nhung_gi_hoc_ef1d:"go('hoso')"};
-var GOIYO={gy_ban_lam_viec_tt01:"Trang Bàn làm việc",gy_chua_ban_duoc_dong_4b71:"Bảng danh mục - cột tính tiền",gy_khoa_chua_co_don_9c28:"Bảng danh mục - cột đếm đơn",gy_chua_co_hoat_dong_3e05:"Bảng danh mục - cột lâu chưa hoạt động",gy_ay_la_cac_cau_3fed:"Cài đặt",gy_ay_la_nguong_at_f276:"Cài đặt",gy_cau_nhac_viec_chuan_281e:"Cài đặt",gy_chi_quan_ly_giam_63c5:"Cài đặt",gy_chon_mot_muc_ben_d524:"Màn pickerPage",gy_chon_nguoi_nhan_app_6ef8:"Màn tkNew",gy_danh_muc_lua_chon_293d:"Cài đặt",gy_email_dung_e_ang_eb0e:"Cài đặt",gy_ho_so_chua_ghi_1990:"Màn riskCare",gy_hop_nay_tra_loi_5ff9:"Trang Hỏi đáp",gy_khach_ngung_khong_phai_0425:"Màn ReupTab",gy_khoa_hoc_la_cau_1eb3:"Cài đặt",gy_lop_nay_chua_co_a916:"Vận hành lớp",gy_nguoi_nay_la_giang_ade7:"Hồ sơ Nhân viên",gy_oi_ten_logo_va_844c:"Cài đặt",gy_phan_quyen_co_ba_7c33:"Cài đặt",gy_ung_nhung_gi_hoc_ef1d:"Hồ sơ 360 học viên",gy_trang_gop_y_9c21:"Trang Ghi nhận góp ý",gy_trang_ca_nhan_7f30:"Trang cá nhân"};
+var GOIYO={gy_ban_lam_viec_tt01:"Trang Bàn làm việc",gy_chua_ban_duoc_dong_4b71:"Bảng danh mục - cột tính tiền",gy_khoa_chua_co_don_9c28:"Bảng danh mục - cột đếm đơn",gy_chua_co_hoat_dong_3e05:"Bảng danh mục - cột lâu chưa hoạt động",gy_ay_la_cac_cau_3fed:"Cài đặt",gy_ay_la_nguong_at_f276:"Cài đặt",gy_cau_nhac_viec_chuan_281e:"Cài đặt",gy_chi_quan_ly_giam_63c5:"Cài đặt",gy_chon_mot_muc_ben_d524:"Màn pickerPage",gy_chon_nguoi_nhan_app_6ef8:"Màn tkNew",gy_danh_muc_lua_chon_293d:"Cài đặt",gy_email_dung_e_ang_eb0e:"Cài đặt",gy_ho_so_chua_ghi_1990:"Màn riskCare",gy_hop_nay_tra_loi_5ff9:"Trang Hỏi đáp",gy_khach_ngung_khong_phai_0425:"Màn ReupTab",gy_khoa_hoc_la_cau_1eb3:"Cài đặt",gy_lop_nay_chua_co_a916:"Vận hành lớp",gy_nguoi_nay_la_giang_ade7:"Hồ sơ Nhân viên",gy_oi_ten_logo_va_844c:"Cài đặt",gy_phan_quyen_co_ba_7c33:"Cài đặt",gy_ung_nhung_gi_hoc_ef1d:"Hồ sơ 360 học viên",gy_trang_gop_y_9c21:"Trang Ghi nhận góp ý",gy_trang_ca_nhan_7f30:"Trang cá nhân",gy_mautin_bien_7c31:"Trang Kho mẫu tin gửi khách"};
 function goiy(k,vb){if(!(k in GOIYDEF))GOIYDEF[k]=vb;
  var g=(DATA.config&&DATA.config.goiy)||{};
  var v=g[k];return (v==null||v==="")?vb:String(v)}
@@ -25338,7 +25365,12 @@ var TOURS={
      trang Tra cứu ở bước ngay trên. Cả ba đều thuộc về NGƯỜI QUẢN LÝ nên đặt trong bài này. */
   {p:"duyetdot",sel:'@man',t:"Đổi đợt đóng phải qua bạn",d:"Sale xin lùi hạn một đợt hoặc xin chia lại cả lịch đợt đều dừng ở đây, kèm ảnh trao đổi với khách. Duyệt là lịch đợt của đơn đổi ngay, không phải ghi một cái dấu rồi để đó.",hint:"Bấm một chip để lọc riêng loại yêu cầu bạn đang muốn quyết."},
   {p:"duyethd",sel:'@man',t:"Hợp đồng cam kết cần đủ hai chữ ký",d:"Cam kết band đầu ra cần cả Trưởng phòng Tư vấn và Giám đốc duyệt; thiếu một chữ ký là học viên chưa xếp lớp được. Từ chối thì phải ghi lý do để sale sửa lại.",hint:"Bấm chip 'Mới một chữ ký' để thấy cái đang chờ chính bạn."},
-  {p:"tinnhan",sel:'@man',t:"Trung tâm đã nói gì với ai",d:"Mọi email và tin Zalo app đã gửi đều nằm ở đây - ai gửi, gửi gì, gửi lúc nào. Lọc theo lớp, theo người gửi hoặc theo khoảng thời gian khi cần đối chiếu.",hint:"Chọn một lớp ở ô Lớp để xem trung tâm đã nhắn gì cho lớp đó."}]},
+  {p:"tinnhan",sel:'@man',t:"Trung tâm đã nói gì với ai",d:"Mọi email và tin Zalo app đã gửi đều nằm ở đây - ai gửi, gửi gì, gửi lúc nào. Lọc theo lớp, theo người gửi hoặc theo khoảng thời gian khi cần đối chiếu.",hint:"Chọn một lớp ở ô Lớp để xem trung tâm đã nhắn gì cho lớp đó."},
+  /* V2 16/08 - `mautin` dựng xong là `_checktour` bắt ngay: *"TRANG KHONG BAI HUONG DAN NAO DI
+     QUA: mautin"*. Đúng con bệnh đã cắn ở `tracuu` (08/08) và ở ba màn 12/08 ngay trên. Đặt LIỀN
+     SAU `tinnhan` vì hai trang là hai đầu của một việc: kho mẫu là thứ soạn TRƯỚC khi gửi, sổ
+     tin là thứ đọc SAU khi gửi - dạy rời nhau thì người học không nối được hai đầu. */
+  {p:"mautin",sel:'@man',t:"Nội dung gửi khách soạn sẵn ở đây",d:"Mẫu email và tin Zalo cho từng việc: gửi thông tin lớp, xin đánh giá, nhắc học phí. Trung tâm tự sửa lời văn, không cần lập trình viên. Chỗ nào cần gửi thì chọn mẫu ở đó.",hint:"Bấm một dòng để xem mẫu, có phần xem thử trên một học viên thật."}]},
  /* ---------- CẤP 3: CHUYÊN NGHIỆP (người cấu hình) ---------- */
  cn_thuonghieu:{lv:"chuyennghiep",t:"Đổi thương hiệu và menu",ic:"ti-palette",d:"5 bước - biến app thành bản của trung tâm bạn",steps:[
   {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'@settabs',t:"Trang Cài đặt là trung tâm điều khiển",d:"9 tab: giao diện, menu, phân quyền, ngưỡng SLA, ngưỡng KPI, câu nhắc việc, danh mục, khóa học, nhân sự. App không cắm cứng con số nào.",hint:"Bấm Tiếp theo."},
@@ -27957,6 +27989,11 @@ var TTSO_NGOAI={
  tinnhan:"sổ VIỆC ĐÃ LÀM, không phải sổ của một thực thể - một tin gửi cho lead, tin sau gửi "+
   "cho học viên, tin nữa gửi cho phụ huynh. Nó trả lời câu \"trung tâm đã nói gì với ai\", "+
   "nên xếp theo THỜI GIAN chứ không xếp theo người. Cùng họ với Nhật ký thao tác.",
+ /* V2 16/08 */
+ mautin:"kho CẤU HÌNH, không phải sổ ghi chép - mỗi dòng là một BẢN MẪU chưa gửi cho ai. Nó "+
+  "chưa thuộc về thực thể nào cho tới lúc được đem đi gửi, và lúc ấy dấu vết nằm ở sổ Tin đã "+
+  "gửi chứ không nằm ở đây. Cùng họ với CH4 và danh mục CH1: thứ người ta SỬA, không phải thứ "+
+  "người ta TRA. Đứng cạnh sổ Tin đã gửi vì hai trang là hai đầu của một việc.",
  /* `socamket` đã sang kệ "Lịch & sổ tra cứu" của chặng Đang học nên không còn là một mục trong
     bảng khai này. Giữ lời giải thích lại đây vì nó vẫn đúng và vẫn đáng đọc:
     socamket = sổ CHỨNG TỪ, không phải sổ của một thực thể - mỗi dòng là một LẦN KÝ vào một BẢN
