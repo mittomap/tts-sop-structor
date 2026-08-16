@@ -31836,8 +31836,21 @@ out=out.replace("__GEN_STAMP__",_GEN); out_hv=out_hv.replace("__GEN_STAMP__",_GE
 # (giu dung luat "dung lai trong cung mot ngay ma khong doi dong ma nao thi file phai giong
 # het ban truoc"); doi mot ky tu -> ma doi. Anh Luan doc ma nay la biet minh dang xem ban nao.
 import hashlib as _hl
-_bid=_hl.sha1(out.replace("__BUILD_ID__","").encode("utf-8")).hexdigest()[:6]
-_bidhv=_hl.sha1(out_hv.replace("__BUILD_ID__","").encode("utf-8")).hexdigest()[:6]
+# BAM SAU KHI NHUNG XONG ASSET - sua 16/08, tim ra vi mot lan do that.
+# Ban cu bam o DAY, tuc TRUOC hai buoc nhung font icon Tabler va font Montserrat ben duoi. Hom
+# nay them hai icon moi vao dai the: `_tall` bao thieu font, em dung lai subset (70826 -> 71258
+# bytes), dung lai app - va MA BAN DUNG VAN LA `a9eb4b`, y het ban thieu icon.
+# Nghia la buoc doi chieu ma sau khi day (buoc 4 trong CLAUDE.md) KHONG PHAN BIET DUOC ban co
+# icon voi ban thieu icon. Ca cai chot cua ay dung de chan bay "hai nguoi nhin hai file khac
+# nhau" - ma no lai mu voi dung phan nang nhat cua file (font chiem gan mot phan tu dung luong).
+# *Mot ma bam "sat noi dung file" ma bam truoc luc file du noi dung thi no bam vao ban nhap.*
+# Bam o cuoi, sau khi ca hai font da nam trong `out`.
+_ASSET=""
+for _fn in ("tabler_inline.css","montserrat_inline.css"):
+    try: _ASSET+=open(os.path.join(_SD,_fn),"r",encoding="utf-8").read()
+    except Exception: pass
+_bid=_hl.sha1((out.replace("__BUILD_ID__","")+_ASSET).encode("utf-8")).hexdigest()[:6]
+_bidhv=_hl.sha1((out_hv.replace("__BUILD_ID__","")+_ASSET).encode("utf-8")).hexdigest()[:6]
 out=out.replace("__BUILD_ID__",_bid); out_hv=out_hv.replace("__BUILD_ID__",_bidhv)
 print("BUILD ID:",_bid)
 assert "demoBootHV()" in out_hv and 'id="login"' in out_hv, "LAP RAP HV GAY: boot/gate khong dung cho"
