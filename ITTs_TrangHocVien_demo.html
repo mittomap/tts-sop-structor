@@ -2869,6 +2869,12 @@ body.drsz .drawer{transition:none}
 .mstrip{display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;margin-left:auto;padding:4px 8px;border-radius:999px;transition:background .12s ease}
 .mstrip.clk{cursor:pointer}
 .mstrip.clk:hover{background:#EEF2F6;box-shadow:inset 0 0 0 1px #E3E9F0}
+/* Nhãn tên bước: chiếm đúng phần trống bên phải dải chấm. `min-width:0` + cắt đuôi để dòng dài
+   không đẩy dải ra khỏi hàng - dải chặng là thứ ĐI KÈM một dòng hồ sơ, không được lấn nó. */
+.mstrip .msnh{font-size:11.5px;color:var(--muted);font-weight:600;margin-left:6px;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px}
+.mstrip .msnh i{font-style:normal;opacity:.7;font-weight:500}
+@media(max-width:700px){.mstrip .msnh{max-width:none;white-space:normal}}
 .mstrip .msarc{font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--mscol,#2E5A88);border:1px solid currentColor;border-radius:6px;padding:1px 5px;line-height:1.5;opacity:.85;margin-right:3px;transition:opacity .12s ease}
 .mstrip.clk:hover .msarc{opacity:1}
 .mstrip .msd{width:11px;height:11px;border-radius:50%;background:#E3E9F0;flex:0 0 auto;position:relative;transition:transform .12s ease,background .12s ease}
@@ -8627,7 +8633,7 @@ function openOB(id){var o=find("DL08","onboarding_id",id);if(!o){toast("Không t
  var h='<div class="dcard"><h4><i class="ti ti-layout-grid-add"></i>Onboarding - '+esc(o.student_id_name||o.student_id)+'</h4>';
  h+=ctxRows([["Lớp",esc(o.class_id_name||o.class_id||"chưa xếp")],["Xếp lúc",esc(o.assigned_at||"-")],["HV ký cam kết",esc(elabel(o.class_confirmation_status)||"-")]]);
  h+='<div class="steps" style="margin:14px 0">'+stepHTML("Xếp lớp",true)+stepHTML("Gửi info",s.sent)+stepHTML("HV ký cam kết",s.confirmed)+stepHTML("Hoàn tất",s.done)+'</div><div class="dact">';
- if(!s.sent)h+='<button class="btn primary" onclick="obSendInfo(\''+esc(id)+'\');closeModal()"><i class="ti ti-send"></i>Đã gửi thông tin lớp</button>';
+ if(!s.sent)h+='<button class="btn primary" onclick="obSendInfo(\''+esc(id)+'\');closeModal()"><i class="ti ti-send"></i>Gửi thông tin lớp</button>';
  else if(!s.confirmed)h+='<button class="btn" onclick="obConfirm(\''+esc(id)+'\');closeModal()"><i class="ti ti-check"></i>Ghi nhận ký tại TT</button>';
  if(!s.done)h+='<button class="btn green" onclick="obFinish(\''+esc(id)+'\');closeModal()"><i class="ti ti-flag"></i>Hoàn tất onboarding</button>';
  h+='<button class="btn" onclick="closeModal();openHoso(\''+esc(o.student_id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ HV</button></div></div>';
@@ -11000,6 +11006,17 @@ function mstrip(k,over,pid){var S=JBY[k];if(!S)return "";
   else h+='<span class="'+cls+'" data-tip="'+esc(nen)+'"></span>'});
  if(br)h+=pid?('<span class="msd br clk'+(over?" over":"")+'" data-tipfn="mstripTip" data-tipa="'+esc(pid+"|"+k+"|Rẽ nhánh · "+S.t+(over?" - QUÁ HẠN":""))+'" onclick="event.stopPropagation();jStagePop(\''+esc(pid)+'\',\''+esc(k)+'\')"></span>')
   :('<span class="msd br'+(over?" over":"")+'" data-tip="'+esc("Rẽ nhánh · "+S.t+(over?" - QUÁ HẠN":""))+'"></span>');
+ /* ═══ V2 15/08 - DẢI CHẶNG PHẢI NÓI RA NÓ ĐANG Ở ĐÂU ═══════════════════════════════════════
+    Anh Luân: *"nhiều chỗ a thấy hàng trống, sao ko để thông tin hữu ích thêm, hoặc làm cho cái
+    chặng trực quan hơn thay vì dấu chấm"*.
+    Hai vế của anh là MỘT chuyện: dải này vẽ bốn cái chấm rồi bỏ trống nửa hàng, còn cái tên
+    chặng - thứ duy nhất đọc được - thì giấu trong chú thích rê chuột. Người dùng nhìn bốn chấm
+    không đọc ra gì, phần trống bên phải cũng không nói gì; muốn biết thì phải rê từng dòng.
+    Nay in thẳng TÊN BƯỚC ĐANG ĐỨNG và vị trí (3/5) vào đúng chỗ đang trống. Chấm giữ lại vì nó
+    là thứ nhìn một cái ra ngay TIẾN ĐỘ - chữ nói "đang ở đâu", chấm nói "còn bao xa".
+    *Chỗ trống trên một hàng không phải là khoảng thở - nó là chỗ chưa ai chịu trả lời câu người
+    ta đang hỏi.* */
+ h+='<span class="msnh">'+esc(S.t||k)+(br?' <i>rẽ nhánh</i>':(rail.length?(' <i>'+(ci+1)+'/'+rail.length+'</i>'):''))+'</span>';
  return h+'</span>'}
 TIPFNS.mstripTip=function(a){var pid=a[0],k=a[1],nen=a.slice(2).join("|");
  var sp="";try{sp=jOutSum(jCtx(pid),k,2)}catch(e){}
@@ -17695,7 +17712,10 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
   h+='<div class="obact">';
   h+='<div class="obsl a">'+(s.rejected
    ?'<button class="btn primary sm" onclick="obChange(\''+_oid+'\')"><i class="ti ti-transfer"></i>Đổi lớp khác</button>'
-   :(!s.sent?'<button class="btn primary sm" onclick="confirmRun(\'Xác nhận đã gửi thông tin lớp cho học viên?\',\'obSendInfo\',\''+_oid+'\')"><i class="ti ti-send"></i>Đã gửi thông tin lớp</button>'
+   /* V2 15/08 - nút này TỪNG hỏi "Xác nhận đã gửi?" rồi mới mở form: hỏi một câu mà người dùng
+      chưa có gì để trả lời, vì họ chưa gửi. Nay bấm là mở thẳng màn GỬI (chọn kênh, chọn mẫu,
+      gửi thật vào Sổ tin đã gửi). Không `confirmRun` nữa - không còn gì để xác nhận trước. */
+   :(!s.sent?'<button class="btn primary sm" onclick="obSendInfo(\''+_oid+'\')"><i class="ti ti-send"></i>Gửi thông tin lớp</button>'
     :(!s.confirmed?'<button class="btn sm" onclick="obConfirmForm(\''+_oid+'\')"><i class="ti ti-check"></i>Ghi nhận ký tại TT</button>':'')))+'</div>';
   /* ═══ V2 14/08 - "TỪ CHỐI" LÀ TRẠNG THÁI, KHÔNG PHẢI MỘT CÁI NÚT ════════════════════════
      Anh Luân phải nói ba lượt em mới nghe ra đúng câu. Lượt 1: *"học viên chưa xác nhận cam kết
@@ -17728,17 +17748,109 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
  h+='</div>';return h}
 function obMark(id,vals,msg){var r=find("DL08","onboarding_id",id);function d(){if(r)for(var k in vals)r[k]=vals[k];toast(msg);reRender(CUR)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d()}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiUpdate("DL08",id,vals)}else{d()}}
+/* ═══ V2 15/08 - GỬI THẬT RỒI ĐỌC TRẠNG THÁI TỪ SỔ, KHÔNG BẤM "TÔI ĐÃ GỬI" ═════════════════
+   Anh Luân: *"thay vì dùng nút xác nhận kiểu này, mình có sổ tin đã gửi mà, cho họ chọn cách
+   gửi, chọn mẫu gửi, hệ thống hiển thị được đã gửi hay chưa qua lịch sử mà"*.
+
+   Đúng, và cái nút cũ có một khuyết tật không sửa được bằng cách viết lại chữ trên nút: nó ghi
+   nhận một LỜI KHAI. Người dùng bấm "Xác nhận đã gửi" là app tin, dù thật ra chưa gửi, hay gửi
+   nhầm người, hay gửi thiếu thông tin lớp. Không có gì đối chiếu được vì không có gì được lưu.
+   App đã có sẵn Sổ tin đã gửi (DL29) và cửa gửi `msgSoan`/`msgGui` - tức đã có BẰNG CHỨNG, chỉ
+   là luồng onboarding không đi qua nó.
+   Nay: chọn KÊNH có thật của học viên đó, chọn MẪU, sửa nội dung rồi gửi - tin vào sổ, và mốc
+   `class_info_sent_at` được đóng bởi chính hành động gửi chứ không bởi một cái nút riêng.
+   *Trạng thái nên là DẤU VẾT của việc đã làm, đừng là một ô người ta tự tick.*
+
+   GIỮ đường "ghi nhận đã gửi ngoài app": có người gọi điện, có người nhắn từ máy cá nhân - bỏ
+   đường ấy là ép họ khai man qua đường còn lại. Nhưng nó xuống hàng hai và phải ghi rõ đã gửi
+   bằng cách nào, để đọc sổ còn phân biệt được tin có bằng chứng với lời khai. */
+var OBMAU=[
+ ["lich","Lịch học & phòng","Chào {ten}, lớp {lop} của bạn khai giảng theo lịch đã hẹn. Bạn kiểm tra giúp lịch buổi và phòng học trong Cổng học viên nhé. Có gì chưa rõ bạn nhắn lại giúp trung tâm."],
+ ["nhom","Mời vào nhóm lớp","Chào {ten}, trung tâm gửi bạn thông tin lớp {lop} và link nhóm lớp. Bạn vào nhóm để nhận thông báo buổi học, bài tập và nhắc lịch nhé."],
+ ["giaovien","Giới thiệu giảng viên","Chào {ten}, lớp {lop} của bạn do giảng viên phụ trách chính. Trung tâm gửi bạn thông tin lớp, lịch học và cách liên hệ khi cần đổi buổi."],
+ ["daydu","Đầy đủ (lịch + nhóm + giảng viên)","Chào {ten}, trung tâm gửi thông tin lớp {lop}: lịch buổi học, phòng học, giảng viên phụ trách và link nhóm lớp. Bạn kiểm tra giúp và phản hồi nếu có gì chưa đúng."]];
+function obMauText(k,ten,lop){
+ for(var i=0;i<OBMAU.length;i++)if(OBMAU[i][0]===k)
+  return OBMAU[i][2].split("{ten}").join(ten||"bạn").split("{lop}").join(lop||"của bạn");
+ return ""}
+/* Đã gửi hay chưa: HỎI SỔ trước, hỏi mốc cũ sau. Dữ liệu cũ chỉ có mốc, không có tin - vẫn phải
+   đọc ra "đã gửi", nếu không thì mọi hồ sơ cũ đột nhiên quay về trạng thái chưa làm. */
+function obTinDaGui(o){
+ var sid=String((o&&o.student_id)||""),cid=String((o&&o.class_id)||"");
+ if(!sid)return null;
+ var ds=(rows("DL29")||[]).filter(function(m){
+  return String(m.to_id||"")===sid&&String(m.chu_de||"")==="thongtinlop"&&
+   (!cid||!String(m.class_id||"")||String(m.class_id||"")===cid)});
+ ds.sort(function(a,b){return (pvnd(b.sent_at)||0)-(pvnd(a.sent_at)||0)});
+ return ds[0]||null}
 function obSendInfo(id){var o=find("DL08","onboarding_id",id)||{};
- var h='<div class="dcard"><h4><i class="ti ti-send"></i>Đã gửi thông tin lớp - '+esc(o.student_id_name||o.student_id||"")+'</h4>';
- h+=ctxRows([["Lớp",esc(o.class_id_name||o.class_id||"-")],["Giao lúc",esc(o.assigned_at||"-")]]);
- h+=attachBox("obi","Ảnh chụp tin nhắn Zalo đã gửi (không bắt buộc)");
- h+='<div class="fld full"><label>Ghi chú</label><input id="ob_note" placeholder="vd: đã gửi Zalo + thêm vào nhóm lớp"></div>';
- h+='<div class="fld full"><button class="btn primary" onclick="obSendInfoRun(\''+esc(id)+'\')"><i class="ti ti-check"></i>Xác nhận đã gửi</button></div></div>';
+ var sid=String(o.student_id||"");
+ var A=null;try{A=msgAi(sid)}catch(e){}
+ var ks=A?msgKenhCo(A.rec):[];
+ var lop=o.class_id_name||o.class_id||"";
+ var ten=o.student_id_name||o.student_id||"";
+ var da=obTinDaGui(o);
+ var h='<div class="dcard"><h4><i class="ti ti-send"></i>Gửi thông tin lớp - '+esc(ten)+'</h4>';
+ h+=ctxRows([["Lớp",esc(lop||"-")],["Giao lúc",esc(o.assigned_at||"-")],
+  ["Đã gửi chưa",da
+    ?('<span class="chip green">đã gửi</span> '+esc(da.sent_at)+' qua '+esc(da.kenh==="email"?"email":"Zalo")+
+      ' <a class="lnk" onclick="msgXem(\''+esc(da.msg_id)+'\')">xem tin</a>')
+    :(String(o.class_info_sent_at||"").trim()
+      ?('<span class="chip amber">đã đánh dấu tay</span> '+esc(o.class_info_sent_at)+' - không có tin trong sổ để đối chiếu')
+      :'<span class="chip red">chưa gửi</span>')]]);
+ if(!ks.length)
+  h+='<div class="notebar nbamber" style="margin:0 0 10px"><i class="ti ti-alert-triangle"></i>'+
+   'Hồ sơ này <b>chưa có Zalo hay email</b> nên app không gửi hộ được. Gửi tay rồi ghi nhận bên dưới, '+
+   'và bổ sung số Zalo vào hồ sơ để lần sau gửi thẳng từ đây.</div>';
+ else{
+  h+='<div class="fld"><label>Cách gửi <i>*</i></label><select id="ob_kenh">'+
+   ks.map(function(k){return '<option value="'+esc(k.k)+'">'+esc(k.lb+" · "+k.addr)+'</option>'}).join("")+'</select></div>';
+  h+='<div class="fld"><label>Mẫu gửi <i>*</i></label><select id="ob_mau" onchange="obMauDoi(\''+esc(id)+'\')">'+
+   OBMAU.map(function(m,i){return '<option value="'+esc(m[0])+'"'+(i===OBMAU.length-1?" selected":"")+'>'+esc(m[1])+'</option>'}).join("")+'</select></div>';
+  h+='<div class="fld full"><label>Nội dung sẽ gửi <i>*</i></label>'+
+   '<textarea id="ob_body" rows="5">'+esc(obMauText("daydu",ten,lop))+'</textarea></div>';
+  h+='<div class="fld full"><button class="btn primary" onclick="obGuiThat(\''+esc(id)+'\')"><i class="ti ti-send"></i>Gửi và lưu vào Sổ tin đã gửi</button></div>';
+ }
+ h+='<div class="dsec">Đã gửi ngoài app rồi?</div>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>'+
+  'Gọi điện hoặc nhắn từ máy cá nhân thì ghi nhận ở đây. Đường này <b>không để lại tin trong sổ</b> '+
+  'nên hãy đính ảnh chụp làm bằng chứng.</div>';
+ h+=attachBox("obi","Ảnh chụp tin nhắn đã gửi (nên có)");
+ h+='<div class="fld full"><label>Đã gửi bằng cách nào</label><input id="ob_note" placeholder="vd: nhắn Zalo từ máy cá nhân, đã thêm vào nhóm lớp"></div>';
+ h+='<div class="fld full"><button class="btn" onclick="obSendInfoRun(\''+esc(id)+'\')"><i class="ti ti-check"></i>Ghi nhận đã gửi ngoài app</button></div></div>';
  openDrawer("Gửi thông tin lớp",h)}
+function obMauDoi(id){var o=find("DL08","onboarding_id",id)||{};
+ var el=document.getElementById("ob_body");if(!el)return;
+ el.value=obMauText(fldV("ob_mau"),o.student_id_name||o.student_id||"",o.class_id_name||o.class_id||"")}
+function obGuiThat(id){
+ var o=find("DL08","onboarding_id",id)||{};
+ var sid=String(o.student_id||"");
+ var A=null;try{A=msgAi(sid)}catch(e){}
+ if(!A){toast("Không thấy hồ sơ học viên này.");return}
+ var kenh=fldV("ob_kenh");
+ var K=msgKenhCo(A.rec).filter(function(x){return x.k===kenh})[0];
+ if(!K){toast("Kênh này chưa có địa chỉ trong hồ sơ.");return}
+ var body=String(fldV("ob_body")||"").trim();
+ if(!body){toast("Nội dung đang trống - viết vào rồi hãy gửi.");return}
+ if(!actGuard("obGuiThat:"+id))return;
+ var m={msg_id:"TIN-"+seqNo("DL29","msg_id",4),sent_at:nowStr(),kenh:kenh,
+  to_kind:"student",to_id:sid,to_name:o.student_id_name||sid,to_addr:K.addr,
+  tieu_de:(kenh==="email"?("IELTS The Tutors - thông tin lớp "+(o.class_id_name||o.class_id||"")):""),
+  noi_dung:body,chu_de:"thongtinlop",
+  class_id:o.class_id||"",class_id_name:o.class_id_name||"",
+  sent_by:CURSTAFF||"",sent_by_name:myName()};
+ DL.DL29=DL.DL29||[];DL.DL29.unshift(m);
+ if(SVR)try{google.script.run.apiSave("DL29",m)}catch(e){}   /* CỬA NỐI RA BACKEND GỬI THẬT */
+ closeModal();
+ obMark(id,{class_info_sent_at:nowStr()},
+  "Đã gửi thông tin lớp qua "+(kenh==="email"?"email":"Zalo")+" tới "+K.addr+" - tin đã lưu vào Sổ tin đã gửi.")}
 function obSendInfoRun(id){var o=find("DL08","onboarding_id",id)||{};var note=fldV("ob_note")+attachLine("obi");closeModal();
  var v={class_info_sent_at:nowStr()};
- if(note.trim())v.onboarding_note=(o.onboarding_note?o.onboarding_note+" | ":"")+note.trim();
- obMark(id,v,"Đã đánh dấu gửi thông tin lớp - cảnh báo quá hạn tắt.")}
+ /* Ghi luôn ĐÃ GỬI BẰNG CÁCH NÀO vào vết hồ sơ: đường này không để lại tin trong sổ, nên nếu
+    không ghi thì ba tháng sau không ai nói được vì sao mốc này có mà tin thì không. */
+ var _c=note.trim()?note.trim():"gửi ngoài app - không ghi cách gửi";
+ v.onboarding_note=(o.onboarding_note?o.onboarding_note+" | ":"")+"Gửi thông tin lớp ngoài app: "+_c;
+ obMark(id,v,"Đã ghi nhận gửi thông tin lớp (ngoài app) - cảnh báo quá hạn tắt.")}
 /* V2 14/08 (anh Luan: *"cho nay la nhan tu dong, dau con la nut nua phai ko em"*).
    Gan dung, va cho em de ho thi anh chi trung: tu nay CHINH HOC VIEN ky o cong cua ho, nen mot
    cai nut de nhan vien bam ho la mo cua cho viec "ky thay" - chu ky mat nghia ngay.
@@ -18191,7 +18303,7 @@ function inNextDays(s,days){var d=pvnd(s);if(!d)return false;var t0=new Date();t
 /* BẢN KHAI CỬA GHI: hàm nào ghi vào bảng nào. Sinh LÚC BUILD từ đúng bản khai mà _check15
    vẫn dùng - một sự thật, một chỗ. Trước đây bản khai chỉ nằm trong bộ kiểm nên app không
    biết gì về nó; giờ app đọc chính bản khai đó để biết phải chụp ảnh bảng nào. */
-var DOORTB={absCallSave:["DL12"],absMakeup:["DL12"],absReq:["DL12"],absReview:["DL12"],bgSplitOrphansRun:["DL02"],bgThuRun:["DL02"],bhCancelRun:["DL11"],bhDone:["DL11"],bhMakeupSave:["DL11"],bhNoteDuyetSave:["DL11"],bhNoteSave:["DL11"],bkLuuEmailGV:["DL01"],bkLuuHoSoGV:["DL01"],bkLuuKetQua:["DL18"],bkLuuLienHe:["DL02b"],bkLuuMocGio:["DL11"],bkLuuMoiHoc:["DL18"],bkLuuNhacTest:["DL02b","DL03"],bkLuuPHNguyCo:["DL09"],bkLuuPHQuanHe:["DL09"],bkLuuTest:["DL03"],bkLuuTuVan:["DL02","DL03","DL04"],blCallSave:["DL09"],blComeback:["DL09"],blDropout:["DL09"],cancelEnrollRun:["DL06"],chamLuu:["DL13"],clsSetTeacher:["DL10","DL11"],cnLuu:["DL01"],ddSave:["DL11","DL12"],debtRemind:["DL06"],dhSave:["DL09"],doHandoverRun:["DL02"],doiSave:["DL11","DL11b"],dotApDung:["DL06b"],dotDuyet:["DL27"],dotTao:["DL27"],dotTuChoiRun:["DL27"],dpLuu:["DL31"],dupGhiLuot:["DL02b"],dupThemSoSave:["DL02"],duyetRefundRun:["DL07"],ensureStudent:["DL09"],fbClassifySave:["DL16"],fbResolveSave:["DL16"],fbToComplaintSave:["DL16","DL17"],gaMoiLuu:["DL21"],gaSave:["DL21"],ghSave:["DL16"],ghToKN:["DL16","DL17"],giaoBaiCaLop:["DL13"],giaoBaiRieng:["DL13"],gvBioSave:["DL01"],gvdpThangLuu:["DL28"],hdLuu:["DL30"],hdQuyet:["DL30"],hdTuChoiRun:["DL30"],hvAbsentSave:["DL12"],hvAskSaySave:["DL24"],hvClassConfirm:["DL08"],hvClassRejectSave:["DL08"],hvFeedbackSave:["DL16"],hvRateSes:["DL16"],hvReq:["DL23"],hvWowSave:["DL14","DL26"],hwbSave:["DL20"],insPlanSave:["DL06b"],insSync:["DL06"],knAddSave:["DL17"],knUpd:["DL17"],kqNhapThatSave:["DL18b"],ktFollowSave:["DL18"],ktGenSave:["DL09","DL18"],ktInvite:["DL18"],ktMissSave:["DL18"],ktResultSave:["DL18"],ktTestiSave:["DL18"],leadInboundSave:["DL02","DL02b"],lopDayHV:["DL08"],lwSave:["DL26"],mgtTraoLuu:["DL19"],midSave:["DL08"],moLopCancelRun:["DL10"],moLopDelay:["DL10"],msgGui:["DL29"],nvNhanHVSave:["DL23"],obChangeSave:["DL08","DL10"],obConfirmRun:["DL08"],obFinish:["DL08"],obMark:["DL08"],paySave:["DL06","DL07"],payVerifyRun:["DL07"],reassignSave:["DL02"],rfNeed:["DL02b","DL03","DL04","DL06","DL07","DL08","DL10","DL18"],riskCareSave:["DL09"],riskFlagRun:["DL09"],riskIgnoreSave:["DL09"],runCancelEnroll:["DL06"],runDropoutSave:["DL09"],runFlagRisk:["DL09"],runGiaoLaiRun:["DL02"],runGiveUpDo:["DL02"],runRejectSave:["DL02","DL02b"],runSkipTest:["DL04"],runTouchSave:["DL02b","DL09"],rvSend:["DL15"],sesAssignRun:["DL13"],sesSave:["DL20"],sesSetTeacher:["DL11","DL31"],sesThiSave:["DL11"],sessEnd:["DL11"],sessStart:["DL11"],staffAdd:["DL01"],staffSave:["DL01"],svFollowDone:["DL15"],svResultSave:["DL15"],svSendSave:["DL15"],testAttend:["DL03"],testBook:["DL03"],testConsult:["DL04"],testEnd:["DL03"],testNoShowSave:["DL03"],testQuickSave:["DL02","DL02b","DL03"],testRebookSave:["DL03"],testRefuse:["DL03"],testResultSave:["DL03"],thuLuu:["DL13"],tkNewSave:["DL23"],tkSay:["DL24"],touchLead:["DL02"],tvCloseSave:["DL04"],tvEnrollSave:["DL02","DL04","DL06","DL09"],tvQuickSave:["DL04"],tvSave:["DL03","DL04"],wowAddSave:["DL14","DL26"],wowCancelRun:["DL09","DL14"],wowConfirm:["DL14"],wowEnd:["DL14"],wowGrantSave:["DL09"],wowNoShow:["DL14"],wowNoteSave:["DL14"],wowRefuseRun:["DL14","DL26"],wowRescheduleRun:["DL14"],wowStart:["DL14"],wowTaught:["DL14"],wowUseQuota:["DL09","DL14"],xepMoiLuu:["DL08","DL10"]};
+var DOORTB={absCallSave:["DL12"],absMakeup:["DL12"],absReq:["DL12"],absReview:["DL12"],bgSplitOrphansRun:["DL02"],bgThuRun:["DL02"],bhCancelRun:["DL11"],bhDone:["DL11"],bhMakeupSave:["DL11"],bhNoteDuyetSave:["DL11"],bhNoteSave:["DL11"],bkLuuEmailGV:["DL01"],bkLuuHoSoGV:["DL01"],bkLuuKetQua:["DL18"],bkLuuLienHe:["DL02b"],bkLuuMocGio:["DL11"],bkLuuMoiHoc:["DL18"],bkLuuNhacTest:["DL02b","DL03"],bkLuuPHNguyCo:["DL09"],bkLuuPHQuanHe:["DL09"],bkLuuTest:["DL03"],bkLuuTuVan:["DL02","DL03","DL04"],blCallSave:["DL09"],blComeback:["DL09"],blDropout:["DL09"],cancelEnrollRun:["DL06"],chamLuu:["DL13"],clsSetTeacher:["DL10","DL11"],cnLuu:["DL01"],ddSave:["DL11","DL12"],debtRemind:["DL06"],dhSave:["DL09"],doHandoverRun:["DL02"],doiSave:["DL11","DL11b"],dotApDung:["DL06b"],dotDuyet:["DL27"],dotTao:["DL27"],dotTuChoiRun:["DL27"],dpLuu:["DL31"],dupGhiLuot:["DL02b"],dupThemSoSave:["DL02"],duyetRefundRun:["DL07"],ensureStudent:["DL09"],fbClassifySave:["DL16"],fbResolveSave:["DL16"],fbToComplaintSave:["DL16","DL17"],gaMoiLuu:["DL21"],gaSave:["DL21"],ghSave:["DL16"],ghToKN:["DL16","DL17"],giaoBaiCaLop:["DL13"],giaoBaiRieng:["DL13"],gvBioSave:["DL01"],gvdpThangLuu:["DL28"],hdLuu:["DL30"],hdQuyet:["DL30"],hdTuChoiRun:["DL30"],hvAbsentSave:["DL12"],hvAskSaySave:["DL24"],hvClassConfirm:["DL08"],hvClassRejectSave:["DL08"],hvFeedbackSave:["DL16"],hvRateSes:["DL16"],hvReq:["DL23"],hvWowSave:["DL14","DL26"],hwbSave:["DL20"],insPlanSave:["DL06b"],insSync:["DL06"],knAddSave:["DL17"],knUpd:["DL17"],kqNhapThatSave:["DL18b"],ktFollowSave:["DL18"],ktGenSave:["DL09","DL18"],ktInvite:["DL18"],ktMissSave:["DL18"],ktResultSave:["DL18"],ktTestiSave:["DL18"],leadInboundSave:["DL02","DL02b"],lopDayHV:["DL08"],lwSave:["DL26"],mgtTraoLuu:["DL19"],midSave:["DL08"],moLopCancelRun:["DL10"],moLopDelay:["DL10"],msgGui:["DL29"],nvNhanHVSave:["DL23"],obChangeSave:["DL08","DL10"],obConfirmRun:["DL08"],obFinish:["DL08"],obGuiThat:["DL29"],obMark:["DL08"],paySave:["DL06","DL07"],payVerifyRun:["DL07"],reassignSave:["DL02"],rfNeed:["DL02b","DL03","DL04","DL06","DL07","DL08","DL10","DL18"],riskCareSave:["DL09"],riskFlagRun:["DL09"],riskIgnoreSave:["DL09"],runCancelEnroll:["DL06"],runDropoutSave:["DL09"],runFlagRisk:["DL09"],runGiaoLaiRun:["DL02"],runGiveUpDo:["DL02"],runRejectSave:["DL02","DL02b"],runSkipTest:["DL04"],runTouchSave:["DL02b","DL09"],rvSend:["DL15"],sesAssignRun:["DL13"],sesSave:["DL20"],sesSetTeacher:["DL11","DL31"],sesThiSave:["DL11"],sessEnd:["DL11"],sessStart:["DL11"],staffAdd:["DL01"],staffSave:["DL01"],svFollowDone:["DL15"],svResultSave:["DL15"],svSendSave:["DL15"],testAttend:["DL03"],testBook:["DL03"],testConsult:["DL04"],testEnd:["DL03"],testNoShowSave:["DL03"],testQuickSave:["DL02","DL02b","DL03"],testRebookSave:["DL03"],testRefuse:["DL03"],testResultSave:["DL03"],thuLuu:["DL13"],tkNewSave:["DL23"],tkSay:["DL24"],touchLead:["DL02"],tvCloseSave:["DL04"],tvEnrollSave:["DL02","DL04","DL06","DL09"],tvQuickSave:["DL04"],tvSave:["DL03","DL04"],wowAddSave:["DL14","DL26"],wowCancelRun:["DL09","DL14"],wowConfirm:["DL14"],wowEnd:["DL14"],wowGrantSave:["DL09"],wowNoShow:["DL14"],wowNoteSave:["DL14"],wowRefuseRun:["DL14","DL26"],wowRescheduleRun:["DL14"],wowStart:["DL14"],wowTaught:["DL14"],wowUseQuota:["DL09","DL14"],xepMoiLuu:["DL08","DL10"]};
 var LOGDEPTH=0,LOGBATCH=0,LOGDOOR="",LOGSEEN={},LOGOFF=false,LOGTICK=false;
 /* Tên ô bằng tiếng Việt. Lấy TRƯỚC HẾT từ nhãn cột của chính bảng đó (LISTCFG đã khai rồi -
    không khai lại), thiếu thì tra từ điển chung, cuối cùng mới trả tên kỹ thuật. Nhật ký mà ghi
