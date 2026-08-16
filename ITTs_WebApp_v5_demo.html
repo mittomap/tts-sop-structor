@@ -3238,7 +3238,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">16/08/2026 · <b>0d7508</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">16/08/2026 · <b>d3b053</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -17841,14 +17841,28 @@ function obSendInfo(id){var o=find("DL08","onboarding_id",id)||{};
      *Mượn lớp của ô nhập cho một cái nút thì mượn luôn khoảng cách nó chừa cho ô nhập.* */
   h+='<div class="dact" style="margin:0 0 4px"><button class="btn primary" onclick="obGuiThat(\''+esc(id)+'\')"><i class="ti ti-send"></i>Gửi và lưu vào Sổ tin đã gửi</button></div>';
  }
- h+='<div class="dsec" style="margin-top:6px">Đã gửi ngoài app rồi?</div>';
- h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>'+
-  'Gọi điện hoặc nhắn từ máy cá nhân thì ghi nhận ở đây. Đường này <b>không để lại tin trong sổ</b> '+
-  'nên hãy đính ảnh chụp làm bằng chứng.</div>';
- h+=attachBox("obi","Ảnh chụp tin nhắn đã gửi (nên có)");
- h+='<div class="fld full"><label>Đã gửi bằng cách nào</label><input id="ob_note" placeholder="vd: nhắn Zalo từ máy cá nhân, đã thêm vào nhóm lớp"></div>';
- h+='<div class="fld full"><button class="btn" onclick="obSendInfoRun(\''+esc(id)+'\')"><i class="ti ti-check"></i>Ghi nhận đã gửi ngoài app</button></div></div>';
+ /* ═══ ĐƯỜNG PHỤ NẰM SAU MỘT NÚT, KHÔNG BÀY SẴN ═════════════════════════════════════════════
+    Bản đầu em bày CẢ HAI đường trong một ngăn kéo: form gửi ở trên, form ghi nhận tay ở dưới.
+    `_checkdrawer` đo được khe 149px giữa hai cụm - và nó đúng, vì hai cụm ấy là HAI VIỆC KHÁC
+    NHAU bị nhét vào một màn, người mở ra phải tự đoán mình đang được hỏi cái nào.
+    Đường phụ (gửi ngoài app) là ngoại lệ, không phải lựa chọn ngang hàng: bày sẵn cạnh đường
+    chính là mời người ta chọn cái nhanh hơn - mà cái nhanh hơn lại là cái không để lại bằng
+    chứng. Nay nó nằm sau một nút, mở ra một ngăn kéo riêng.
+    *Hai việc khác nhau thì hai màn; bày cạnh nhau là bắt người dùng phân loại hộ mình.* */
+ h+='<div class="dact"><button class="btn" onclick="obGhiNgoai(\''+esc(id)+'\')">'+
+  '<i class="ti ti-notes"></i>Đã gửi ngoài app - ghi nhận</button>'+
+  '<button class="btn" onclick="closeModal()">Đóng</button></div></div>';
  openDrawer("Gửi thông tin lớp",h)}
+function obGhiNgoai(id){var o=find("DL08","onboarding_id",id)||{};
+ var h='<div class="dcard"><h4><i class="ti ti-notes"></i>Ghi nhận đã gửi ngoài app - '+esc(o.student_id_name||o.student_id||"")+'</h4>';
+ h+='<div class="notebar nbamber" style="margin:0 0 10px"><i class="ti ti-alert-triangle"></i>'+
+  'Đường này <b>không để lại tin trong Sổ tin đã gửi</b>, nên sau này không đối chiếu được nội dung '+
+  'đã gửi. Hãy đính ảnh chụp và ghi rõ đã gửi bằng cách nào.</div>';
+ h+=attachBox("obi","Ảnh chụp tin nhắn đã gửi (nên có)");
+ h+='<div class="fld full"><label>Đã gửi bằng cách nào <i>*</i></label><input id="ob_note" placeholder="vd: nhắn Zalo từ máy cá nhân, đã thêm vào nhóm lớp"></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="obSendInfoRun(\''+esc(id)+'\')"><i class="ti ti-check"></i>Ghi nhận đã gửi</button>'+
+  '<button class="btn" onclick="obSendInfo(\''+esc(id)+'\')"><i class="ti ti-arrow-left"></i>Quay lại gửi trong app</button></div></div>';
+ openDrawer("Ghi nhận gửi ngoài app",h)}
 function obMauDoi(id){var o=find("DL08","onboarding_id",id)||{};
  var el=document.getElementById("ob_body");if(!el)return;
  el.value=obMauText(fldV("ob_mau"),o.student_id_name||o.student_id||"",o.class_id_name||o.class_id||"")}
