@@ -148,7 +148,11 @@
 
 ## 3. VIỆC TỒN (backlog)
 
-> ### 📋 15/08 tối - HÀNG CHỜ (anh Luân giao, chưa làm)
+> ### 📋 16/08 - HÀNG CHỜ ĐÃ XONG HẾT
+> Sáu việc của mục dưới đây đều đã làm và đã verify xanh trên `9a361d`. Việc tồn còn lại duy nhất
+> vẫn là `check_taolai` đỏ một lần không tái hiện (mục 15/08 bên dưới) - chưa tuyên bố đã sửa.
+>
+> ### 📋 15/08 tối - HÀNG CHỜ (đã xong 16/08)
 > 1. Xếp người dạy thay **ngay từ buổi học trong Vận hành lớp** (anh hỏi: *"hoặc là ở buổi học
 >    trong vận hành lớp đúng ko"*) - chưa kiểm đường đó có sẵn chưa.
 > 2. Chọn tuần bằng **danh sách** thay vì bấm từng tuần - hai chỗ: Lịch tuần, Lịch trực WOW.
@@ -331,10 +335,51 @@
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 15/08 chiều). Bản dựng đang chạy:
-> `f46a05` (15/08 tối), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> `9a361d` (16/08 khuya), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `2f6620`, `c7d1a0`, `553234`, `5bdbec`, `8cf2fe`, `37f39a`, `f40ff4`, `33ad75`, `6fc7a9`.
+> Mốc cũ: `f46a05`, `2f6620`, `c7d1a0`, `553234`, `5bdbec`, `8cf2fe`, `37f39a`, `f40ff4`, `33ad75`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 16/08 khuya - XONG HÀNG CHỜ 6 VIỆC (anh Luân: *"Làm hết đi em"*)
+>
+> **1. Xếp người dạy thay ngay tại buổi** trong Vận hành lớp - đường người ta ĐI THẬT: giáo viên
+> báo nghỉ thì học vụ đang mở lớp ấy ra xem. Cùng một cửa `gvBackupForm`, không dựng bản thứ hai.
+>
+> **2. Chọn tuần bằng DANH SÁCH** (Lịch tuần + Lịch trực WOW). Hai nút mũi tên chỉ đi một bước
+> một lượt - xem tuần cách hai tháng phải bấm chín lần. Nhãn nói CẢ khoảng ngày LẪN vị trí tương
+> đối ("2 tuần trước") vì đọc "18/08 - 24/08" không ai biết nó cách hôm nay bao xa. Giữ nguyên hai
+> mũi tên - đi một tuần liền kề thì bấm mũi tên vẫn nhanh hơn mở danh sách.
+>
+> **3. Đánh dấu chỗ mở ngăn kéo.** Đo: 239 dòng bảng + 28 thẻ + 15 dòng mở được ngăn kéo mà
+> KHÔNG cái nào nói ra. Dấu "›" hiện SẴN chứ không đợi rê chuột - rê mới thấy thì điện thoại
+> không bao giờ thấy. *Thứ bấm được mà không có dấu hiệu thì với người chưa quen nó không tồn tại.*
+>
+> **4. Gửi thông tin lớp: gửi thật rồi đọc trạng thái từ sổ.** Nút cũ có khuyết tật không sửa được
+> bằng cách viết lại chữ trên nút - nó ghi nhận một LỜI KHAI. App đã có sẵn Sổ tin đã gửi (DL29)
+> và cửa gửi, chỉ là luồng onboarding không đi qua nó.
+> *Trạng thái nên là DẤU VẾT của việc đã làm, đừng là một ô người ta tự tick.*
+> Giữ đường "gửi ngoài app" nhưng ĐẨY RA NGĂN KÉO RIÊNG: bày ngang hàng là mời người ta chọn cái
+> nhanh hơn - mà cái nhanh hơn lại đúng là cái không để lại bằng chứng.
+> **Và anh Luân hỏi tiếp: *"mấy cái mẫu gửi đó cấu hình ở đâu em"*** - câu trả lời thật là KHÔNG
+> Ở ĐÂU, em cắm cứng trong mã. Nay TIN01-TIN04 nằm trong CH4, sửa được ở Cài đặt, có bánh răng
+> nhảy tới đúng dòng, và danh sách mẫu SINH TỪ CH4 chứ không khai lại trong mã.
+> *Thứ nào khách đọc được thì trung tâm phải sửa được, không phải dev.*
+>
+> **5. Dải chặng in tên bước** vào đúng chỗ đang trống. Chữ nói "đang ở đâu", chấm nói "còn bao xa".
+> *Chỗ trống trên một hàng không phải khoảng thở - nó là chỗ chưa ai chịu trả lời câu người ta hỏi.*
+>
+> **6. Tên cơ sở: 65/74 ô đã cấm bẻ dòng.** Chín ô còn lại là cột liệt kê NHIỀU cơ sở - chỗ đó
+> xuống dòng mới đúng.
+>
+> **BÀI HỌC ĐẮT NHẤT ĐỢT NÀY - ba lần sửa một chỗ chật trên điện thoại:**
+> · Cấm bẻ dòng cho màn rộng, áp cả màn hẹp -> mất chữ. *Một luật chữa cho màn rộng mà áp cả cho
+>   màn hẹp thì nó đổi một chỗ xấu lấy một chỗ MẤT CHỮ.*
+> · Đặt `@media(max-width:700px)` TRƯỚC `@media(max-width:1280px)` -> ở 390px cả hai cùng khớp,
+>   cái viết sau thắng, luật mới không bao giờ chạy mà đọc mã lên thì trông như đã chữa.
+> · Gỡ `overflow:hidden` mà quên cho xuống dòng -> chữ thôi bị cắt nhưng TRÀN ra ngoài mép, trang
+>   cuộn ngang. *Gỡ cái chặn mà không mở lối đi thì thứ bị chặn không biến mất - nó chảy sang chỗ khác.*
+> · Và một lần viết selector nhắm sai chỗ hẳn (`.rost .rn` trong khi chữ tràn ở `.ph`/`.obcard`),
+>   đo lại vẫn thừa đúng 25px sau khi "đã sửa". *Đo lại sau mỗi lần sửa, đừng tin cái selector vừa gõ.*
 >
 > ### 🟢 15/08 tối - GIÁO VIÊN DẠY THAY: BỎ PHÉP TỰ ĐOÁN, VÀ BỐN LỖI IM LẶNG BỊ LÔI RA
 >
