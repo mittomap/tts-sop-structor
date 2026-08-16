@@ -540,6 +540,25 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    xuống dòng là hành vi ĐÚNG - chữ dài hơn màn thì phải xuống, không có lựa chọn nào khác.
    *Một luật chữa cho màn rộng mà áp cả cho màn hẹp thì nó đổi một chỗ xấu lấy một chỗ mất chữ.* */
 @media(max-width:700px){.khongbe{white-space:normal}}
+/* ═══ V2 15/08 - DẤU HIỆU CHO CHỖ BẤM VÀO SẼ MỞ NGĂN KÉO ════════════════════════════════════
+   Anh Luân: *"chỗ nào bấm vào mà hiện drawer thông tin nhanh thì nên có 1 cách đánh dấu để nhận
+   biết em"*. Đo ra 239 dòng bảng + 28 thẻ + 15 dòng nữa mở ngăn kéo được, mà **không cái nào nói
+   ra điều đó** - người dùng chỉ biết sau khi lỡ bấm. Thứ bấm được mà không có dấu hiệu thì với
+   người chưa quen nó không tồn tại; với người vừa quen, nó thành cái bẫy bấm nhầm.
+   Dấu hiệu phải HIỆN SẴN chứ không đợi rê chuột: rê mới thấy thì trên điện thoại không bao giờ
+   thấy, và cũng không ai rê thử từng dòng để dò xem dòng nào bấm được.
+   Dùng ký tự "›" - chữ thường, không tốn thêm icon font, không tốn thêm mã màu; mờ khi nghỉ, đậm
+   khi rê. Đặt ở MÉP PHẢI vì đó là quy ước "đi tiếp vào trong" mà mọi ứng dụng đều dùng - không
+   phải một hình mới mà ai cũng phải học. */
+.dt tr[data-mo],.dt tr.clk{cursor:pointer}
+.dt tr[data-mo]>td:last-child,.dt tr.clk>td:last-child{position:relative;padding-right:22px}
+.dt tr[data-mo]>td:last-child:after,.dt tr.clk>td:last-child:after{content:"\203A";position:absolute;
+ right:8px;top:50%;transform:translateY(-50%);color:var(--muted);opacity:.4;font-weight:700;font-size:14px}
+.dt tr[data-mo]:hover>td:last-child:after,.dt tr.clk:hover>td:last-child:after{opacity:1;color:var(--navy)}
+.obcard[data-mo]{position:relative}
+.obcard[data-mo]:after{content:"\203A";position:absolute;right:10px;top:10px;color:var(--muted);
+ opacity:.4;font-weight:700;font-size:14px}
+.obcard[data-mo]:hover:after{opacity:1;color:var(--navy)}
 /* Dùng lại đúng mã màu của đường kẻ NGANG (`#EEF2F6`) chứ không pha thêm một mã nhạt hơn: bảng
    màu app chạm trần 110 mã, thêm một mã cho một cái vạch là tiêu mất suất của một thứ đáng hơn -
    `_checkux` bắt ngay lượt chạy đầu (111/110). Và kẻ dọc cùng màu kẻ ngang thì lưới bảng đọc ra
@@ -13981,6 +14000,16 @@ function renderBanglop(){
      '<div class="pbi"><span>Bài về nhà</span><b>'+(P.hw?esc(P.hw.title):'<span class="mut">chưa đặt</span>')+'</b></div>'+
      '<div class="pbi"><span>Hạn nộp</span><b>'+(P.hw?dueChip(P):'-')+'</b></div>'+
      '<div class="pbi" style="flex:1"><span>Lời dặn</span><b style="max-width:none;white-space:normal;font-weight:500">'+(P.note?esc(P.note):'<span class="mut">-</span>')+'</b></div>'+
+     /* ═══ V2 15/08 - XẾP NGƯỜI DẠY THAY NGAY TẠI BUỔI (anh Luân: *"Anh có thể làm ở trang này,
+        hoặc là ở buổi học trong vận hành lớp đúng ko"*) ═══════════════════════════════════════
+        Đúng, và đó mới là đường người ta ĐI THẬT: giáo viên báo nghỉ thì học vụ đang mở lớp ấy
+        ra xem, không ai đi vòng qua một trang danh sách rồi lọc lại về đúng buổi mình vừa nhìn.
+        Cùng một cửa `gvBackupForm` với trang Xếp người dạy thay - không dựng bản thứ hai, nên
+        luật xếp hạng (đã đăng ký ca > đã dạy lớp này > đúng cơ sở) chỉ có một chỗ để sai.
+        Nút đổi CHỮ theo tình trạng buổi: chưa có ai dạy thì đó là việc GẤP, nói thẳng ra. */
+     '<button class="btn '+(String(cs.teacher_id||"").trim()?'':'primary')+' sm" onclick="gvBackupForm(\''+esc(window.DDSESS)+'\')" '+
+     'data-tip="Xem ai đã đăng ký ca dạy thay đúng giờ và đúng cơ sở của buổi này">'+
+     '<i class="ti ti-user-plus"></i>'+(String(cs.teacher_id||"").trim()?'Đổi người dạy':'Chưa có giáo viên - xếp người dạy')+'</button>'+
      '<button class="btn sm" onclick="sesForm(\''+esc(window.DDSESS)+'\')"><i class="ti ti-edit"></i>Cấu hình buổi</button></div>';
    }
   }
@@ -19384,11 +19413,51 @@ function lwRanh(sl,tuKhi,hv){var d=pvnd(sl.slot_datetime);
    một ô = một người ở một khung giờ - đúng đơn vị mà người đặt lịch cần. Lưới theo tháng đổi sang
    theo tuần cũng vì thế: 31 ngày × mấy người thì không màn nào chứa nổi. */
 function lwTuan(){return window.LWTUAN||lwDauTuan(new Date())}
+/* ═══ V2 15/08 - CHỌN TUẦN BẰNG DANH SÁCH ═══════════════════════════════════════════════════
+   Anh Luân, hai lần, ở hai màn khác nhau: *"chỗ này cho chọn theo danh sách cho trực quan em"* và
+   *"trường hợp người ta muốn xem các mốc xa, bấm như hiện tại sẽ bất tiện"*.
+   Đúng: hai cái nút "Tuần trước / Tuần sau" chỉ đi được MỘT BƯỚC một lượt. Muốn xem tuần cách
+   đây hai tháng thì bấm chín lần, và mỗi lần bấm là một lượt vẽ lại cả trang.
+   Ô chọn liệt kê thẳng các tuần kèm khoảng ngày, nên nhảy tới đâu cũng đúng một thao tác. Giữ
+   NGUYÊN hai nút mũi tên: đi một tuần liền kề thì bấm mũi tên vẫn nhanh hơn mở danh sách - hai
+   lối phục vụ hai kiểu đi khác nhau, bỏ cái nào cũng làm chậm một kiểu người dùng.
+   Nhãn nói cả khoảng ngày LẪN vị trí tương đối ("tuần này", "2 tuần trước") - đọc "18/08 - 24/08"
+   không ai biết nó cách hôm nay bao xa, mà đó mới là thứ người ta đang tìm. */
+function tuanDs(dauTuan,lui,toi){
+ var out=[],nay=lwDauTuan(new Date());
+ for(var i=-lui;i<=toi;i++){
+  var d=new Date(nay.getFullYear(),nay.getMonth(),nay.getDate()+i*7);
+  var c=new Date(d.getFullYear(),d.getMonth(),d.getDate()+6);
+  var nhan=vnd2(d)+" - "+vnd2(c);
+  var phu=(i===0?"tuần này":(i===-1?"tuần trước":(i===1?"tuần sau":
+    (i<0?(-i)+" tuần trước":i+" tuần sau"))));
+  out.push({i:i,d:d,nhan:nhan+" · "+phu,chon:sameDay(d,dauTuan)})}
+ return out}
+function tuanChonHTML(dauTuan,fn,lui,toi){
+ var ds=tuanDs(dauTuan,lui==null?8:lui,toi==null?8:toi);
+ /* Tuần đang xem nằm ngoài khoảng liệt kê (người ta gõ tay địa chỉ, hoặc nhảy từ chỗ khác) thì
+    CHÈN nó vào danh sách thay vì để ô chọn hiện sai một tuần khác. Một ô chọn hiển thị giá trị
+    không phải giá trị đang dùng là ô chọn nói dối. */
+ if(!ds.some(function(x){return x.chon}))
+  ds.unshift({i:0,d:dauTuan,nhan:vnd2(dauTuan)+" - "+vnd2(new Date(dauTuan.getFullYear(),dauTuan.getMonth(),dauTuan.getDate()+6))+" · đang xem",chon:true});
+ return '<select aria-label="Chọn tuần" onchange="'+fn+'" style="max-width:230px">'+
+  ds.map(function(x){return '<option value="'+repISO(x.d)+'"'+(x.chon?" selected":"")+'>'+esc(x.nhan)+'</option>'}).join("")+
+  '</select>'}
 function lwDauTuan(d){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());
  var k=(x.getDay()+6)%7;                    /* thứ 2 là đầu tuần, đúng lối người Việt đọc lịch */
  x.setDate(x.getDate()-k);return x}
 function lwDoiTuan(n){var d=lwTuan();window.LWTUAN=new Date(d.getFullYear(),d.getMonth(),d.getDate()+n*7);reRender("lichwow")}
 function lwVeTuanNay(){window.LWTUAN=null;reRender("lichwow")}
+function lwChonTuan(v){var m=String(v||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+ if(!m)return;window.LWTUAN=new Date(+m[1],+m[2]-1,+m[3]);reRender("lichwow")}
+/* Lịch tuần nhớ tuần đang xem bằng ĐỘ LỆCH (`WKOFF`) chứ không bằng ngày, nên ô chọn phải quy
+   ngày ra độ lệch. Đổi `WKOFF` sang lưu ngày thì gọn hơn, nhưng nó nằm trong bản khai ngữ cảnh
+   và trong địa chỉ - đổi kiểu lưu là làm chết mọi link người dùng đã gửi cho nhau. */
+function ltChonTuan(v){var m=String(v||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+ if(!m)return;
+ var d=new Date(+m[1],+m[2]-1,+m[3]),nay=lwDauTuan(new Date());
+ window.WKOFF=Math.round((d.getTime()-nay.getTime())/(7*864e5));
+ reRender(CUR)}
 function renderLichWow(){
  var d0=lwTuan(), ngay=[];
  for(var i=0;i<7;i++){var d=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()+i);ngay.push(d)}
@@ -19438,7 +19507,7 @@ function renderLichWow(){
  var _caChon=window.LWCA||"";
  var _dsCa=[["","Cả ngày"]].concat(_ca.map(function(c){return [c.t,c.t+" ("+c.tu+" - "+c.den+")"]}));
  h+=tbar('<button class="btn sm" onclick="lwDoiTuan(-1)" data-tip="Tuần trước" aria-label="Tuần trước"><i class="ti ti-chevron-left"></i></button>'+
-  '<span class="tblbl" style="margin:0 4px">'+esc(vnd2(ngay[0])+" – "+vnd2(ngay[6]))+'</span>'+
+  tuanChonHTML(d0,"lwChonTuan(this.value)")+
   '<button class="btn sm" onclick="lwDoiTuan(1)" data-tip="Tuần sau" aria-label="Tuần sau"><i class="ti ti-chevron-right"></i></button>'+
   '<button class="btn sm" onclick="lwVeTuanNay()">Tuần này</button>'+
   segHTML(_caChon,_dsCa,'window.LWCA=\'{v}\';reRender(\'lichwow\')'),
@@ -19547,7 +19616,7 @@ function lwTongGio(tuan){
   var gio=Math.round((v.ca-v.nghi)*_phut/60*10)/10;
   var csTop=Object.keys(v.cs).sort(function(a,c){return v.cs[c]-v.cs[a]})[0]||"";
   h+='<tr><td><b>'+esc(v.ten)+'</b> <span class="mut">'+esc(id)+'</span></td>'+
-   '<td>'+(csTop?esc(elabel(csTop)||csTop):'<span class="mut">-</span>')+'</td>'+
+   '<td class="khongbe">'+(csTop?esc(elabel(csTop)||csTop):'<span class="mut">-</span>')+'</td>'+
    '<td>'+v.ca+'</td><td><b>'+gio+'h</b></td><td>'+_cam+'h</td><td>'+v.ban+'</td><td>'+v.nghi+'</td></tr>'});
  h+='</tbody></table></div></div>';
  return h}
@@ -22884,9 +22953,9 @@ function renderLichTuan(embed){
   if(Math.abs(a.d.getTime()-b.d.getTime())<_sp){clash[a.who+"|"+a.d.getTime()]=1}})});
  var noGvCls=srows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()});
  var h='';
- h+=tbar('<button class="pill" onclick="window.WKOFF=(window.WKOFF||0)-1;reRender(CUR)"><i class="ti ti-chevron-left"></i>Tuần trước</button>'+
-  '<span class="tblbl" style="margin:0 6px">'+fmtD(mon)+' - '+fmtD(days[6])+(off===0?' (tuần này)':'')+'</span>'+
-  '<button class="pill" onclick="window.WKOFF=(window.WKOFF||0)+1;reRender(CUR)">Tuần sau<i class="ti ti-chevron-right"></i></button>'+
+ h+=tbar('<button class="pill" onclick="window.WKOFF=(window.WKOFF||0)-1;reRender(CUR)" data-tip="Tuần trước" aria-label="Tuần trước"><i class="ti ti-chevron-left"></i></button>'+
+  tuanChonHTML(mon,"ltChonTuan(this.value)")+
+  '<button class="pill" onclick="window.WKOFF=(window.WKOFF||0)+1;reRender(CUR)" data-tip="Tuần sau" aria-label="Tuần sau"><i class="ti ti-chevron-right"></i></button>'+
   (off!==0?' <button class="pill" onclick="window.WKOFF=0;reRender(CUR)">Về tuần này</button>':''),
   segHTML(mode,[["gv","Theo giảng viên"],["lop","Theo lớp"]],"window.WKMODE=\'{k}\';reRender(CUR)"));
  if(noGvCls.length)h+='<div class="notebar nbred"><i class="ti ti-alert-triangle"></i><b>'+noGvCls.length+' lớp đang mở CHƯA GÁN giảng viên chính:</b> '+esc(noGvCls.map(function(c){return c.class_name||c.class_id}).join(", "))+' - gán ở Cài đặt / danh sách Lớp.</div>';
@@ -23519,7 +23588,7 @@ function khoiLuongHTML(){
   function o(n){return n?('<b>'+n+'</b>'):'<span class="mut">0</span>'}
   /* V9.54: bấm tên trong bảng thì mở NGĂN KÉO xem nhanh, không quăng người ta sang trang hồ sơ -
      đang dò một bảng mà bị đổi trang là mất chỗ đang dò (ngăn kéo vẫn có nút mở hồ sơ đầy đủ). */
-  h+='<tr><td>'+nsLnk(x.id,x.ten)+'</td><td>'+esc(x.vai)+'</td><td>'+esc(x.br)+'</td>'+
+  h+='<tr><td>'+nsLnk(x.id,x.ten)+'</td><td class="khongbe">'+esc(x.vai)+'</td><td class="khongbe">'+esc(x.br)+'</td>'+
    (_klLead?('<td>'+o(x.lead)+'</td><td>'+o(x.cham)+'</td><td>'+o(x.tuvan)+'</td>'):'')+
    '<td>'+o(x.ob)+'</td><td>'+o(x.kn)+'</td><td>'+o(x.giao)+'</td>'+
    '<td>'+(qt?'<span class="chip red">'+x.tong+'</span>':'<b>'+x.tong+'</b>')+'</td></tr>'});
@@ -23545,7 +23614,7 @@ function gvTaiHTML(){
    '<span class="chip green">'+Math.round(tl*100)+'%</span>';
   var tnrOK=x.tnr==null?null:(x.tnr/100>=kpiTh(/^TNR/,0.9));
   h+='<tr><td>'+nsLnk(x.id,x.ten,"")+' <span class="mut" style="font-size:11px">'+esc(x.vai)+'</span></td>'+
-   '<td>'+esc(x.cs)+'</td><td><b>'+x.toi+'</b></td><td>'+chip+'</td>'+
+   '<td class="khongbe">'+esc(x.cs)+'</td><td><b>'+x.toi+'</b></td><td>'+chip+'</td>'+
    '<td>'+x.lop+'</td><td>'+(x.noi||"-")+'</td><td>'+x.daDay+'</td>'+
    '<td>'+(x.tre?'<span class="chip amber">'+x.tre+'</span>':'0')+'</td>'+
    '<td>'+(x.tnr==null?'<span class="mut">chưa có buổi</span>':('<span class="chip '+(tnrOK?"green":"red")+'">'+x.tnr+'%</span>'))+'</td>'+
@@ -26048,7 +26117,7 @@ function renderCong(){
     khác chỗ đứng, không khác cách tính. */
  var COT=[
   {k:"ten",t:"Người dạy",co:function(){return true},ve:function(x){return nsLnk(x.g.staff_id,x.g.full_name,"")}},
-  {k:"cs",t:"Cơ sở",co:function(){return true},ve:function(x){return esc(elabel(x.g.branch)||x.g.branch||"-")}},
+  {k:"cs",t:"Cơ sở",co:function(){return true},ve:function(x){return cnT(x.g.branch)}},
   {k:"n",t:"Buổi lớp",co:function(x){return x.n>0},ve:function(x){return '<b>'+x.n+'</b>'},tong:function(a,x){return a+x.n}},
   {k:"gio",t:"Giờ dạy",co:function(x){return x.gio>0||x.thieuGio>0},tong:function(a,x){return a+x.gio},dv:"h",
    ve:function(x){return '<b>'+(Math.round(x.gio*10)/10)+'h</b>'+(x.thieuGio?' <span class="chip red" data-tip="Buổi đã dạy xong mà không ghi giờ vào - giờ ra, không tính công được">'+x.thieuGio+' buổi thiếu giờ</span>':'')}},
