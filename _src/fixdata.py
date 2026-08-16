@@ -562,6 +562,39 @@ for _cid, _ds in _theoLop.items():
                 _ds[_i]["class_start_scheduled"] = fmt(_b)
 log.append("23. Buoi trung gio trong cung mot lop: day %d buoi sang ngay hom sau" % _day)
 
+# ═══ 24. MAU TIN GUI THONG TIN LOP VAO CH4 (15/08) ═══════════════════════════════════════
+# Anh Luan: *"ma may cai mau gui do cau hinh o dau em"* - va cau tra loi that la KHONG O DAU:
+# em cam cung bon mau ay trong ma nguon. Do la pham dung LUAT CUNG cua du an ("cau nhac qua CH4
+# (`msgText`)"), va pham dung cho no dau nhat: cau chu gui cho KHACH la thu doi nhieu nhat - doi
+# giong xung ho, them link nhom lop, bo bot mot y - ma doi thi phai sua ma roi dung lai app.
+# *Thu nao khach doc duoc thi trung tam phai sua duoc, khong phai dev.*
+# Nay bon mau nam trong CH4 nhu moi cau nhac khac: mo Cai dat > Thong diep nhac viec la sua duoc,
+# co banh rang nhay thang toi dung dong.
+_TIN_MAU = [
+    ("TIN01", u"Thông tin lớp · Lịch học & phòng",
+     u"Chào {ten}, lớp {lop} của bạn khai giảng theo lịch đã hẹn. Bạn kiểm tra giúp lịch buổi và "
+     u"phòng học trong Cổng học viên nhé. Có gì chưa rõ bạn nhắn lại giúp trung tâm."),
+    ("TIN02", u"Thông tin lớp · Mời vào nhóm lớp",
+     u"Chào {ten}, trung tâm gửi bạn thông tin lớp {lop} và link nhóm lớp. Bạn vào nhóm để nhận "
+     u"thông báo buổi học, bài tập và nhắc lịch nhé."),
+    ("TIN03", u"Thông tin lớp · Giới thiệu giảng viên",
+     u"Chào {ten}, lớp {lop} của bạn do giảng viên phụ trách chính. Trung tâm gửi bạn thông tin "
+     u"lớp, lịch học và cách liên hệ khi cần đổi buổi."),
+    ("TIN04", u"Thông tin lớp · Đầy đủ (lịch + nhóm + giảng viên)",
+     u"Chào {ten}, trung tâm gửi thông tin lớp {lop}: lịch buổi học, phòng học, giảng viên phụ "
+     u"trách và link nhóm lớp. Bạn kiểm tra giúp và phản hồi nếu có gì chưa đúng."),
+]
+_ch4t = d.setdefault("config", {}).setdefault("ch4", [])
+_cocode = {str(x.get("code") or "") for x in _ch4t}
+_them = 0
+for _c, _ten, _tm in _TIN_MAU:
+    if _c in _cocode:
+        continue
+    _ch4t.append({"code": _c, "sheet": "DL08", "tmpl": _tm, "when": _ten,
+                  "owner": u"Học vụ", "params": []})
+    _them += 1
+log.append("24. Mau tin gui thong tin lop: them %d mau vao CH4 (sua duoc o Cai dat)" % _them)
+
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("=" * 70)
 print("VA DU LIEU DEMO — XONG")

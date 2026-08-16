@@ -17547,14 +17547,24 @@ function obMark(id,vals,msg){var r=find("DL08","onboarding_id",id);function d(){
    GIỮ đường "ghi nhận đã gửi ngoài app": có người gọi điện, có người nhắn từ máy cá nhân - bỏ
    đường ấy là ép họ khai man qua đường còn lại. Nhưng nó xuống hàng hai và phải ghi rõ đã gửi
    bằng cách nào, để đọc sổ còn phân biệt được tin có bằng chứng với lời khai. */
-var OBMAU=[
- ["lich","Lịch học & phòng","Chào {ten}, lớp {lop} của bạn khai giảng theo lịch đã hẹn. Bạn kiểm tra giúp lịch buổi và phòng học trong Cổng học viên nhé. Có gì chưa rõ bạn nhắn lại giúp trung tâm."],
- ["nhom","Mời vào nhóm lớp","Chào {ten}, trung tâm gửi bạn thông tin lớp {lop} và link nhóm lớp. Bạn vào nhóm để nhận thông báo buổi học, bài tập và nhắc lịch nhé."],
- ["giaovien","Giới thiệu giảng viên","Chào {ten}, lớp {lop} của bạn do giảng viên phụ trách chính. Trung tâm gửi bạn thông tin lớp, lịch học và cách liên hệ khi cần đổi buổi."],
- ["daydu","Đầy đủ (lịch + nhóm + giảng viên)","Chào {ten}, trung tâm gửi thông tin lớp {lop}: lịch buổi học, phòng học, giảng viên phụ trách và link nhóm lớp. Bạn kiểm tra giúp và phản hồi nếu có gì chưa đúng."]];
+/* ═══ V2 15/08 - MẪU TIN LẤY TỪ CH4, KHÔNG CẮM CỨNG (anh Luân: *"mà mấy cái mẫu gửi đó cấu hình
+   ở đâu em"*) ═══════════════════════════════════════════════════════════════════════════════
+   Câu trả lời thật lúc anh hỏi là **không ở đâu cả** - em cắm cứng bốn mẫu ấy trong mã nguồn.
+   Đó là phạm đúng LUẬT CỨNG của dự án ("câu nhắc qua CH4"), và phạm đúng chỗ nó đau nhất: câu
+   chữ GỬI CHO KHÁCH là thứ đổi nhiều nhất - đổi giọng xưng hô, thêm link nhóm lớp, bỏ bớt một ý -
+   mà đổi thì phải sửa mã rồi dựng lại app.
+   *Thứ nào khách đọc được thì trung tâm phải sửa được, không phải dev.*
+   Nay bốn mẫu nằm trong CH4 như mọi câu nhắc khác (TIN01-TIN04): mở Cài đặt › Thông điệp nhắc
+   việc là sửa được, và cạnh ô chọn có bánh răng nhảy thẳng tới đúng dòng.
+   Danh sách mẫu SINH TỪ CH4 chứ không khai lại ở đây: khai hai nơi thì thêm một mẫu trong Cài
+   đặt xong nó không hiện ra ở ô chọn, mà không ai hiểu vì sao. */
+function obMauDs(){
+ return ch4List().filter(function(m){return /^TIN\d+$/.test(String(m.code||""))})
+  .map(function(m){return [m.code,String(m.when||m.code).replace(/^Thông tin lớp · /,""),String(m.tmpl||"")]})}
 function obMauText(k,ten,lop){
- for(var i=0;i<OBMAU.length;i++)if(OBMAU[i][0]===k)
-  return OBMAU[i][2].split("{ten}").join(ten||"bạn").split("{lop}").join(lop||"của bạn");
+ var ds=obMauDs();
+ for(var i=0;i<ds.length;i++)if(ds[i][0]===k)
+  return ds[i][2].split("{ten}").join(ten||"bạn").split("{lop}").join(lop||"của bạn");
  return ""}
 /* Đã gửi hay chưa: HỎI SỔ trước, hỏi mốc cũ sau. Dữ liệu cũ chỉ có mốc, không có tin - vẫn phải
    đọc ra "đã gửi", nếu không thì mọi hồ sơ cũ đột nhiên quay về trạng thái chưa làm. */
@@ -17588,10 +17598,13 @@ function obSendInfo(id){var o=find("DL08","onboarding_id",id)||{};
  else{
   h+='<div class="fld"><label>Cách gửi <i>*</i></label><select id="ob_kenh">'+
    ks.map(function(k){return '<option value="'+esc(k.k)+'">'+esc(k.lb+" · "+k.addr)+'</option>'}).join("")+'</select></div>';
-  h+='<div class="fld"><label>Mẫu gửi <i>*</i></label><select id="ob_mau" onchange="obMauDoi(\''+esc(id)+'\')">'+
-   OBMAU.map(function(m,i){return '<option value="'+esc(m[0])+'"'+(i===OBMAU.length-1?" selected":"")+'>'+esc(m[1])+'</option>'}).join("")+'</select></div>';
+  var _mds=obMauDs();
+  h+='<div class="fld"><label>Mẫu gửi <i>*</i>'+msgEditBtn(_mds.length?_mds[_mds.length-1][0]:"")+'</label>'+
+   '<select id="ob_mau" onchange="obMauDoi(\''+esc(id)+'\')">'+
+   (_mds.length?_mds.map(function(m,i){return '<option value="'+esc(m[0])+'"'+(i===_mds.length-1?" selected":"")+'>'+esc(m[1])+'</option>'}).join("")
+     :'<option value="">(chưa khai mẫu nào trong Cài đặt › Thông điệp nhắc việc)</option>')+'</select></div>';
   h+='<div class="fld full"><label>Nội dung sẽ gửi <i>*</i></label>'+
-   '<textarea id="ob_body" rows="5">'+esc(obMauText("daydu",ten,lop))+'</textarea></div>';
+   '<textarea id="ob_body" rows="5">'+esc(_mds.length?obMauText(_mds[_mds.length-1][0],ten,lop):"")+'</textarea></div>';
   /* Nút gửi đặt trong `.dact` chứ không trong `.fld full`: `.fld` mang lề dưới của một Ô NHẬP,
      mà đây là một nút. `_checkdrawer` đo được khe trống 107px giữa nút này và mục kế - lề của ô
      nhập cộng lề của tiêu đề mục, hai cái không ai định cho đứng cạnh nhau.
