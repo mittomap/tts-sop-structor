@@ -540,6 +540,19 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    xuống dòng là hành vi ĐÚNG - chữ dài hơn màn thì phải xuống, không có lựa chọn nào khác.
    *Một luật chữa cho màn rộng mà áp cả cho màn hẹp thì nó đổi một chỗ xấu lấy một chỗ mất chữ.* */
 @media(max-width:700px){.khongbe{white-space:normal}}
+/* ═══ V2 15/08 - CHỮ ĐẬM DÀI TRONG HÀNG FLEX PHẢI ĐƯỢC XUỐNG DÒNG TRÊN ĐIỆN THOẠI ══════════
+   `_checkui` bắt: khổ 390px, trang Nhận xét buổi - TRANG CUỘN NGANG thừa 25px. Đo ra hai thủ
+   phạm, cùng một bệnh: tên lớp "PRIVATE Ngô Thúy Quỳnh - ..." và tiêu đề panel "Học viên đã báo
+   nghỉ các..." đều là <b> nằm trong một hàng flex khai `flex:none` - tức "đừng co tôi lại". Trên
+   màn rộng thì không sao vì thừa chỗ; trên màn 390px thì nó đẩy cả trang rộng ra.
+   Trang cuộn ngang là lỗi nặng trên điện thoại: người dùng vuốt dọc để đọc, gặp trang trượt
+   ngang là mất phương hướng, và nút bên phải thì không bao giờ chạm tới.
+   *Trên màn hẹp, "đừng co tôi lại" phải đổi thành "cho tôi xuống dòng" - không có lựa chọn thứ ba.* */
+@media(max-width:700px){
+ .ph{flex-wrap:wrap}
+ .ph b{flex:1 1 100%;min-width:0;white-space:normal;word-break:break-word}
+ .obcard .obh b,.obcard .obh a,.obcard .obh>div{min-width:0;max-width:100%;
+  white-space:normal;word-break:break-word}}
 /* ═══ V2 15/08 - DẤU HIỆU CHO CHỖ BẤM VÀO SẼ MỞ NGĂN KÉO ════════════════════════════════════
    Anh Luân: *"chỗ nào bấm vào mà hiện drawer thông tin nhanh thì nên có 1 cách đánh dấu để nhận
    biết em"*. Đo ra 239 dòng bảng + 28 thẻ + 15 dòng nữa mở ngăn kéo được, mà **không cái nào nói
@@ -2181,7 +2194,15 @@ table.dt tbody tr.clk.on td{font-weight:600}
 @media(max-width:700px){
  .rost{flex-wrap:wrap;gap:6px 10px}
  .rost .rn{flex:1 1 100%;max-width:none}
- .rost .rn>*{overflow:visible;text-overflow:clip}}
+ /* BẪY LƯỢT TRƯỚC: em mới bỏ `overflow:hidden` để chữ thôi bị CẮT, nhưng quên nói cho nó được
+    XUỐNG DÒNG - thành ra chữ dài không bị cắt nữa mà tràn hẳn ra ngoài mép màn, và `_checkui`
+    bắt "trang cuộn ngang, thừa 25px". Đổi một chỗ chật từ CẮT sang TRÀN thì vẫn là chỗ chật.
+    Phải nói đủ cả ba: đừng cắt, được xuống dòng, và từ dài quá thì bẻ giữa từ.
+    *Gỡ cái chặn mà không mở lối đi thì thứ bị chặn không biến mất - nó chảy sang chỗ khác.* */
+ /* Chọn `*` chứ không `>*`: chữ tràn nằm trong một thẻ <b> LỒNG SÂU hai tầng, nên luật chỉ với
+    tới con trực tiếp thì không chạm được nó - đo ra vẫn thừa 25px sau khi "đã sửa".
+    *Đo lại sau mỗi lần sửa, đừng tin cái selector mình vừa gõ.* */
+ .rost .rn,.rost .rn *{overflow:visible;text-overflow:clip;white-space:normal;word-break:break-word;max-width:100%}}
 /* (giải thích ở khối ngay trên) */
 /* Hàng tiêu đề của bảng điểm danh: mượn nguyên bộ khung flex của dòng dữ liệu, chỉ thay nội dung
    trong mỗi cụm bằng một cái nhãn. Nhãn canh giữa cụm để nó chỉ đúng vào chùm nút bên dưới. */
