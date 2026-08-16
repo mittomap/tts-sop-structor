@@ -14558,9 +14558,13 @@ function obSendInfo(id){var o=find("DL08","onboarding_id",id)||{};
    OBMAU.map(function(m,i){return '<option value="'+esc(m[0])+'"'+(i===OBMAU.length-1?" selected":"")+'>'+esc(m[1])+'</option>'}).join("")+'</select></div>';
   h+='<div class="fld full"><label>Nội dung sẽ gửi <i>*</i></label>'+
    '<textarea id="ob_body" rows="5">'+esc(obMauText("daydu",ten,lop))+'</textarea></div>';
-  h+='<div class="fld full"><button class="btn primary" onclick="obGuiThat(\''+esc(id)+'\')"><i class="ti ti-send"></i>Gửi và lưu vào Sổ tin đã gửi</button></div>';
+  /* Nút gửi đặt trong `.dact` chứ không trong `.fld full`: `.fld` mang lề dưới của một Ô NHẬP,
+     mà đây là một nút. `_checkdrawer` đo được khe trống 107px giữa nút này và mục kế - lề của ô
+     nhập cộng lề của tiêu đề mục, hai cái không ai định cho đứng cạnh nhau.
+     *Mượn lớp của ô nhập cho một cái nút thì mượn luôn khoảng cách nó chừa cho ô nhập.* */
+  h+='<div class="dact" style="margin:0 0 4px"><button class="btn primary" onclick="obGuiThat(\''+esc(id)+'\')"><i class="ti ti-send"></i>Gửi và lưu vào Sổ tin đã gửi</button></div>';
  }
- h+='<div class="dsec">Đã gửi ngoài app rồi?</div>';
+ h+='<div class="dsec" style="margin-top:6px">Đã gửi ngoài app rồi?</div>';
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>'+
   'Gọi điện hoặc nhắn từ máy cá nhân thì ghi nhận ở đây. Đường này <b>không để lại tin trong sổ</b> '+
   'nên hãy đính ảnh chụp làm bằng chứng.</div>';
