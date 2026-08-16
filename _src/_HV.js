@@ -14533,10 +14533,18 @@ function obMark(id,vals,msg){var r=find("DL08","onboarding_id",id);function d(){
 function obMauDs(){
  return mauCho("thongtinlop","").map(function(m){
   return [m.mau_id,String(m.ten||m.mau_id).replace(/^Thông tin lớp · /,""),String(m.noi_dung||"")]})}
-function obMauText(k,ten,lop){
+/* Thay biến bằng `mauThay` + `mauCtxHV` chứ KHÔNG tự ghép tay. Bản đầu chỗ này tự thay đúng hai
+   biến `{ten}` và `{lop}`; đo ra: mẫu "Giới thiệu giảng viên" gửi đi còn nguyên chữ `{giangvien}`
+   giữa câu, trong khi lớp ấy CÓ giảng viên chính và `mauCtxHV` lấy được tên ngay.
+   *Hai chỗ cùng thay biến cho một kho mẫu thì cái viết sau luôn thiếu vài biến - và cái thiếu ấy
+   đi thẳng ra tin nhắn của khách.* Một hàm thay, mọi cửa gửi gọi nó. */
+function obMauText(k,sid,cid,lop){
  var ds=obMauDs();
- for(var i=0;i<ds.length;i++)if(ds[i][0]===k)
-  return ds[i][2].split("{ten}").join(ten||"bạn").split("{lop}").join(lop||"của bạn");
+ var ctx={};try{ctx=mauCtxHV(sid,cid)||{}}catch(e){ctx={}}
+ if(lop)ctx.lop=lop;
+ if(!ctx.ten)ctx.ten="bạn";
+ if(!ctx.lop)ctx.lop="của bạn";
+ for(var i=0;i<ds.length;i++)if(ds[i][0]===k)return mauThay(ds[i][2],ctx);
  return ""}
 /* Đã gửi hay chưa: HỎI SỔ trước, hỏi mốc cũ sau. Dữ liệu cũ chỉ có mốc, không có tin - vẫn phải
    đọc ra "đã gửi", nếu không thì mọi hồ sơ cũ đột nhiên quay về trạng thái chưa làm. */
@@ -14571,12 +14579,16 @@ function obSendInfo(id){var o=find("DL08","onboarding_id",id)||{};
   h+='<div class="fld"><label>Cách gửi <i>*</i></label><select id="ob_kenh">'+
    ks.map(function(k){return '<option value="'+esc(k.k)+'">'+esc(k.lb+" · "+k.addr)+'</option>'}).join("")+'</select></div>';
   var _mds=obMauDs();
-  h+='<div class="fld"><label>Mẫu gửi <i>*</i>'+msgEditBtn(_mds.length?_mds[_mds.length-1][0]:"")+'</label>'+
+  /* Bánh răng phải mở KHO MẪU, không mở CH4. Bản đầu em để nguyên `msgEditBtn` từ hồi mẫu còn
+     nằm trong CH4: nó nhận mã `MAU04`, gọi `msgPop("MAU04")`, mà `ch4Get("MAU04")` trả null -
+     bấm vào là mở một ô sửa cho một câu nhắc KHÔNG TỒN TẠI.
+     *Dời kho đi mà quên dời cái chìa khoá thì cửa vẫn mở, chỉ là mở sang phòng trống.* */
+  h+='<div class="fld"><label>Mẫu gửi <i>*</i>'+mauEditBtn(_mds.length?_mds[_mds.length-1][0]:"")+'</label>'+
    '<select id="ob_mau" onchange="obMauDoi(\''+esc(id)+'\')">'+
    (_mds.length?_mds.map(function(m,i){return '<option value="'+esc(m[0])+'"'+(i===_mds.length-1?" selected":"")+'>'+esc(m[1])+'</option>'}).join("")
-     :'<option value="">(chưa khai mẫu nào trong Cài đặt › Thông điệp nhắc việc)</option>')+'</select></div>';
+     :'<option value="">(kho mẫu chưa có mẫu nào nhóm Thông tin lớp - vào Tra cứu › Kho mẫu tin gửi khách)</option>')+'</select></div>';
   h+='<div class="fld full"><label>Nội dung sẽ gửi <i>*</i></label>'+
-   '<textarea id="ob_body" rows="5">'+esc(_mds.length?obMauText(_mds[_mds.length-1][0],ten,lop):"")+'</textarea></div>';
+   '<textarea id="ob_body" rows="5">'+esc(_mds.length?obMauText(_mds[_mds.length-1][0],sid,o.class_id||"",lop):"")+'</textarea></div>';
   /* Nút gửi đặt trong `.dact` chứ không trong `.fld full`: `.fld` mang lề dưới của một Ô NHẬP,
      mà đây là một nút. `_checkdrawer` đo được khe trống 107px giữa nút này và mục kế - lề của ô
      nhập cộng lề của tiêu đề mục, hai cái không ai định cho đứng cạnh nhau.
@@ -14607,7 +14619,7 @@ function obGhiNgoai(id){var o=find("DL08","onboarding_id",id)||{};
  openDrawer("Ghi nhận gửi ngoài app",h)}
 function obMauDoi(id){var o=find("DL08","onboarding_id",id)||{};
  var el=document.getElementById("ob_body");if(!el)return;
- el.value=obMauText(fldV("ob_mau"),o.student_id_name||o.student_id||"",o.class_id_name||o.class_id||"")}
+ el.value=obMauText(fldV("ob_mau"),o.student_id||"",o.class_id||"",o.class_id_name||o.class_id||"")}
 function obGuiThat(id){
  var o=find("DL08","onboarding_id",id)||{};
  var sid=String(o.student_id||"");
@@ -16161,12 +16173,25 @@ function mauCho(nhom,kenh){
 function mauThay(t,ctx){t=String(t||"");ctx=ctx||{};
  for(var k in ctx){if(ctx[k]==null||ctx[k]==="")continue;t=t.split("{"+k+"}").join(ctx[k])}
  return t}
-function mauCtxHV(sid){
+/* `cid` là tuỳ chọn nhưng KHÔNG thừa: một học viên có thể học nhiều lớp, mà bản đầu hàm này lấy
+   dòng DL08 ĐẦU TIÊN có lớp. Cửa gửi đang đứng ở lớp B mà tên giảng viên lấy từ lớp A thì tin
+   nhắn sai người - loại sai không ai bắt được vì câu văn vẫn trôi chảy.
+   *Biết mình đang đứng ở hồ sơ nào thì phải nói ra, đừng để hàm tự đoán lấy cái gặp trước.* */
+function mauCtxHV(sid,cid){
  var s=find("DL09","student_id",sid)||{};
- var o=rows("DL08").filter(function(x){return String(x.student_id||"")===String(sid)&&x.class_id})[0]||{};
- var c=o.class_id?(find("DL10","class_id",o.class_id)||{}):{};
- return {ten:s.full_name||o.student_id_name||"",lop:o.class_id_name||o.class_id||"",
+ var ds=rows("DL08").filter(function(x){return String(x.student_id||"")===String(sid)&&x.class_id});
+ var o=(cid?ds.filter(function(x){return String(x.class_id||"")===String(cid)})[0]:null)||ds[0]||{};
+ var ci=cid||o.class_id;
+ var c=ci?(find("DL10","class_id",ci)||{}):{};
+ return {ten:s.full_name||o.student_id_name||"",lop:(String(o.class_id||"")===String(ci)?(o.class_id_name||""):"")||c.class_name||ci||"",
   giangvien:nsTen(c.main_teacher_id)||"",hotline:paramStr("centerHotline","")}}
+/* Bánh răng của KHO MẪU - anh em với `msgEditBtn` (CH4) và `enumEditBtn` (CH1), nhưng mở đúng
+   nhà của mình. Mở thẳng ô sửa ngay tại chỗ đang đứng, không bắt người ta rời màn đang làm dở. */
+function mauEditBtn(id){if(!id||!gearOn())return "";
+ var x=find("DL32","mau_id",id)||{};
+ return '<button class="cfedit" onclick="event.stopPropagation();mauForm(\''+esc(id)+'\')" '+
+  'aria-label="Sửa mẫu tin '+esc(id)+'" '+
+  'data-tip="Mẫu '+esc(id)+(x.ten?" · "+esc(x.ten):"")+' · lấy từ Kho mẫu tin gửi khách - bấm để sửa ngay tại đây"><i class="ti ti-settings"></i></button>'}
 /* ── TRANG KHO MẪU ───────────────────────────────────────────────────────────────────────── */
 function mauNhomChon(){return window.MAUNHOMK||""}
 function mauNhomSet(k){window.MAUNHOMK=k;reRender("mautin")}
@@ -16216,8 +16241,23 @@ function mauXem(id){var x=find("DL32","mau_id",id);if(!x){toast("Không thấy m
  /* Xem thử với dữ liệu THẬT của một học viên: đọc mẫu có chỗ trống không hình dung ra câu cuối
     cùng, mà câu cuối cùng mới là thứ khách nhận. */
  (function(){var hv=(srows("DL09")||[])[0];if(!hv)return;
-  h+=ctxContent("Xem thử với "+(hv.full_name||hv.student_id),
-   mauThay(x.noi_dung,mauCtxHV(hv.student_id)),"var(--green)")})();
+  var t=mauThay(x.noi_dung,mauCtxHV(hv.student_id));
+  h+=ctxContent("Xem thử với "+(hv.full_name||hv.student_id),t,"var(--green)");
+  /* Chỗ trống còn lại phải NÓI RA VÌ SAO. Giữ nguyên `{hotline}` là đúng (xoá đi thành câu cụt),
+     nhưng chỉ giữ thôi thì người soạn nhìn vào tưởng app hỏng. Nay nói luôn biến nào chưa điền
+     được và điền ở đâu - câu hỏi và câu trả lời đứng cùng một chỗ.
+     *Để lại một dấu hỏi trên màn mà không kèm câu trả lời là đẩy việc sang cho người đọc.* */
+  var con=(t.match(/\{[a-z_]+\}/g)||[]);
+  if(!con.length)return;
+  var lydo={hotline:'Hotline chưa khai trong <b>Cài đặt › Thương hiệu &amp; Màu</b>',
+   ngay:'chỉ điền được khi gửi từ một buổi học cụ thể',
+   gio:'chỉ điền được khi gửi từ một buổi học cụ thể',
+   sotien:'chỉ điền được khi gửi từ một khoản học phí cụ thể',
+   giangvien:'lớp này chưa có giảng viên chính'};
+  h+='<div class="notebar nbamber" style="margin:0 0 10px"><i class="ti ti-alert-triangle"></i>'+
+   'Còn '+con.length+' chỗ chưa điền được, app <b>giữ nguyên</b> để người gửi thấy mà bổ sung: '+
+   con.map(function(b){var n=b.slice(1,-1);
+    return '<code>'+esc(b)+'</code>'+(lydo[n]?(" - "+lydo[n]):"")}).join(" · ")+'.</div>'})();
  h+='<div class="dact"><button class="btn primary" onclick="mauForm(\''+esc(id)+'\')"><i class="ti ti-edit"></i>Sửa mẫu</button>'+
   '<button class="btn" onclick="mauNhanBan(\''+esc(id)+'\')"><i class="ti ti-copy"></i>Nhân bản</button>'+
   '<button class="btn" onclick="closeModal()">Đóng</button></div></div>';
@@ -27237,7 +27277,13 @@ var NAVTREE=[
     ở PAGES từ lúc dựng, mà nhóm "Tra cứu" trên cây menu thì chưa ai thêm tên nó vào - tức bản
     khai đúng ý mà không ai đọc. `_checkv2` L3 bắt: trang xem được, không có mục menu, không có
     trang cha. Đúng con bệnh anh Luân bắt ba lần rồi: *"a tìm trên sidebar ko thấy"*. */
- {g:"Tra cứu",items:["tracuu","tinnhan"]}];
+ /* V2 16/08 - `mautin` VÀO ĐÂY, và đây là LẦN THỨ BA cùng một con bệnh (Hỏi đáp 04/08, hai trang
+    Nhân sự 05/08, `socamket` 14/08): em khai `g:"Tra cứu"` ở PAGES rồi tưởng thế là xong, trong
+    khi menu chỉ vẽ những gì có tên trong NAVTREE. Đo bằng máy: `navVis("mautin")=true`,
+    `uiMenuOn("mautin")=true`, mà dựng thật thanh menu ra thì KHÔNG có thẻ nào mang `data-k="mautin"`.
+    *Khai ở bảng nào thì chỉ bảng ấy đọc - `g:` trong PAGES là lời khai về Ý ĐỊNH, NAVTREE mới là
+    cái vẽ ra menu.* Đứng cạnh `tinnhan`: kho mẫu và sổ tin đã gửi là hai đầu của một việc. */
+ {g:"Tra cứu",items:["tracuu","tinnhan","mautin"]}];
 /* Danh mục sổ nằm sau cửa Tra cứu. Khai MỘT chỗ, BA nơi đọc: trang `tracuu` vẽ theo nó, `navCur`
    dùng nó để biết "đang đứng trong một cuốn sổ thì mục Tra cứu phải sáng", và `_checkcauhoi`
    dùng nó để biết các sổ ấy VẪN có lối trên menu (qua cửa cha). */
