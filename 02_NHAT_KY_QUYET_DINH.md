@@ -149,8 +149,9 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### 📋 16/08 - HÀNG CHỜ ĐÃ XONG HẾT
-> Sáu việc của mục dưới đây đều đã làm và đã verify xanh trên `9a361d`. Việc tồn còn lại duy nhất
-> vẫn là `check_taolai` đỏ một lần không tái hiện (mục 15/08 bên dưới) - chưa tuyên bố đã sửa.
+> Sáu việc của mục dưới đây đều đã làm và đã verify xanh trên `9a361d`. Mẫu tin gửi khách đã dọn
+> khỏi CH4 sang bảng riêng DL32 (`2e82d7`). Việc tồn còn lại duy nhất vẫn là `check_taolai` đỏ
+> một lần không tái hiện (mục 15/08 bên dưới) - chưa tuyên bố đã sửa.
 >
 > ### 📋 15/08 tối - HÀNG CHỜ (đã xong 16/08)
 > 1. Xếp người dạy thay **ngay từ buổi học trong Vận hành lớp** (anh hỏi: *"hoặc là ở buổi học
@@ -334,11 +335,42 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 15/08 chiều). Bản dựng đang chạy:
-> `9a361d` (16/08 khuya), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> **Phiên bản: V2 — 42 BỘ KIỂM. Bản dựng đang chạy: `2e82d7` (16/08, kho mẫu tin DL32), đã lên
+> https://mittomap.github.io/itts-sop-demo-v2/ — verify trọn bộ ĐANG CHẠY trên bản này, chưa có
+> kết quả; lần xanh hết 42/42 gần nhất là `9a361d`.
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `f46a05`, `2f6620`, `c7d1a0`, `553234`, `5bdbec`, `8cf2fe`, `37f39a`, `f40ff4`, `33ad75`.
+> Mốc cũ: `9a361d`, `f46a05`, `2f6620`, `c7d1a0`, `553234`, `5bdbec`, `8cf2fe`, `37f39a`, `f40ff4`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 16/08 - KHO MẪU TIN GỬI KHÁCH (DL32): ĐẶT SAI NHÀ HAI LƯỢT MỚI ĐẶT ĐÚNG
+>
+> Anh Luân hỏi *"mấy cái mẫu gửi đó cấu hình ở đâu em"*, em trả lời bằng cách nhét TIN01-TIN04 vào
+> **CH4**. Anh bác ngay: *"Cái đó đâu phải thông điệp nhắc việc, nó là 1 trang riêng, chuyên soạn
+> mẫu mail và tin nhắn, mẫu xin đánh giá…"* - và anh đúng.
+> **CH4 là câu app nói với NGƯỜI TRONG NHÀ** ("đơn này quá hạn 3 ngày, gọi đi"): một dòng, không
+> tiêu đề, không kênh gửi, không ai ký tên. **Mẫu gửi khách là thư đi RA NGOÀI**: có tiêu đề cho
+> email, có bản Zalo ngắn hơn bản email, có biến điền `{ten_hv}`, có người sửa lần cuối, có bật/tắt.
+> Nhét thứ thứ hai vào ô của thứ nhất thì mọi trường nó cần đều không có chỗ - và cái giá không
+> phải là "hơi chật", mà là **mẫu ấy vĩnh viễn không mọc thêm được cột nào nữa**.
+> *Hai thứ khác nhau đi chung một bảng thì bảng ấy chỉ phục vụ được cái nào tới trước.*
+>
+> **Ba lần đặt, ba nhà:** cắm cứng trong mã (không ai sửa được) -> CH4 (sửa được nhưng sai nhà)
+> -> **DL32 · kho mẫu tin gửi khách** (đúng nhà). Lần một sai vì em quên hỏi "ai là người sửa cái
+> này khi em không còn ở đây". Lần hai sai vì em đi tìm **cái bảng gần giống nhất đang có sẵn**
+> thay vì hỏi **thứ này thật ra là cái gì**. *Chọn nhà theo "chỗ nào trống" thì lần nào cũng có
+> chỗ trống, và lần nào cũng sai.*
+>
+> **DL32:** `mau_id, ten, nhom, kenh, tieu_de, noi_dung, bien, trang_thai, sua_luc, sua_boi`.
+> Bảy nhóm (thông tin lớp · xin đánh giá · nhắc học phí · nhắc buổi · chăm sóc · tái đăng ký ·
+> khiếu nại), 13 mẫu gieo sẵn. Trang **Kho mẫu tin gửi khách** nằm nhóm Tra cứu, cạnh Sổ tin đã
+> gửi: xem, soạn mới, sửa, **nhân bản** (mẫu Zalo và mẫu email của cùng một việc khác nhau chỗ
+> dài ngắn, chép rồi sửa nhanh hơn gõ lại), và **xem thử trên một học viên thật** chứ không xem
+> thử trên `{ten_hv}` - đọc bản đã điền mới biết câu ấy có xuôi không.
+> `mauThay` **giữ nguyên biến chưa điền được** thay vì xoá: một chỗ trống giữa câu thì người gửi
+> không thấy, còn `{ten_lop}` nằm chình ình thì thấy ngay. *Chỗ thiếu phải kêu, đừng lặng lẽ khép lại.*
+> Cửa gửi thông tin lớp nay đọc mẫu từ DL32 (`mauCho`, lọc CẢ nhóm LẪN kênh). Và `fixdata` bước 24
+> **gỡ các mục TIN\* còn sót trong CH4** - để lại là hai nhà cho một thứ, hôm sau người ta sửa
+> nhà nào cũng "đúng" mà khách nhận được bản kia.
 >
 > ### 🟢 16/08 khuya - XONG HÀNG CHỜ 6 VIỆC (anh Luân: *"Làm hết đi em"*)
 >

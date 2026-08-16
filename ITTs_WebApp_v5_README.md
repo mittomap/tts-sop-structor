@@ -2407,6 +2407,17 @@ Bản demo **không gửi thật** — chỗ nối ra backend đã đánh dấu 
 Đợt đóng quá hạn `commitCancel_days` (mặc định 14) ngày sinh việc **gửi thư huỷ cam kết đầu ra**,
 bấm là mở thẳng màn soạn thư với nội dung điền sẵn.
 
+## Kho mẫu tin gửi khách (DL32)
+Nội dung gửi ra ngoài không cắm cứng trong mã và cũng không nằm chung với câu nhắc việc nội bộ
+của CH4 — nó có nhà riêng: trang **Kho mẫu tin gửi khách** (nhóm Tra cứu, cạnh Sổ tin đã gửi).
+Mỗi mẫu có **tên · nhóm · kênh (email/Zalo/cả hai) · tiêu đề · nội dung · biến điền · bật-tắt**,
+kèm người sửa lần cuối và thời điểm sửa.
+Bảy nhóm: **thông tin lớp · xin đánh giá · nhắc học phí · nhắc buổi · chăm sóc · tái đăng ký ·
+khiếu nại**. Trung tâm tự **soạn mới, sửa, nhân bản, tắt** — không cần dev.
+Ngăn kéo mẫu **xem thử trên một học viên thật**, không xem thử trên `{ten_hv}`. Biến nào chưa
+điền được thì **giữ nguyên dấu ngoặc** để người gửi thấy chỗ thiếu, chứ không xoá đi thành khoảng trống.
+Các cửa soạn tin lấy mẫu từ đây, lọc theo đúng nhóm việc và đúng kênh đang gửi.
+
 ## Bốn nhóm việc cấp LỚP (trước đây chỉ có một)
 Học vụ vận hành theo lớp, mà bảng việc trước nay chỉ biết nói theo từng người. Nay có thêm:
 **lớp sắp thi cuối khóa** · **lớp đã học đủ giờ cam kết** · **lớp sắp kết thúc khóa** · **lớp có
