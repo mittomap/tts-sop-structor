@@ -2407,6 +2407,33 @@ Bản demo **không gửi thật** — chỗ nối ra backend đã đánh dấu 
 Đợt đóng quá hạn `commitCancel_days` (mặc định 14) ngày sinh việc **gửi thư huỷ cam kết đầu ra**,
 bấm là mở thẳng màn soạn thư với nội dung điền sẵn.
 
+## Công nợ học viên - cửa của Kế toán
+Trang **Công nợ học viên** (nhóm Điều hành) trả lời câu **"ai đang nợ bao nhiêu"** - khác với Sổ
+thu học phí, vốn đếm theo phiếu và theo đợt để trả lời "hôm nay tiền nào về".
+Mỗi học viên một dòng: **giá trị hợp đồng · đã thu · còn phải thu · thu trong kỳ · đợt đã đóng đủ
+· đợt kế tiếp kèm hạn · chứng từ**. Chọn **kỳ số liệu** (tháng này / 30 / 90 / toàn kỳ / từ ngày -
+đến ngày); kỳ lọc theo **ngày đăng ký đơn**, còn "đã thu" và "còn phải thu" là số tới hôm nay -
+đổi kỳ không làm hết nợ. Nút **Xuất ra Excel** ở đầu trang.
+Cột "Đợt đã đóng đủ" nói rõ phép đếm, và có chip **"đợt N đang dở"** cho đợt đã có tiền vào mà
+chưa đủ - nếu không thì một người đã nộp một phần vẫn hiện "0/3".
+
+**Hai cổng, một màn:** trang Học viên có nút **Chế độ kế toán** nhảy sang đây chứ không dựng bảng
+tiền tại chỗ - hai phép cộng cho một số tiền thì lệch nhau lúc nào không ai biết bên nào đúng.
+Năm nhóm thấy: **Kế toán · Giám đốc · Quản trị viên · Tư vấn · Học vụ**.
+
+Bấm một dòng ra ngăn kéo: từng đơn → **lịch đợt** kèm nút **Xin gia hạn** ngay trên dòng của đợt
+đó, nút **Chia thành nhiều đợt** (đơn đã chia rồi thì ghi "Chia lại lịch đợt") và **Ghi nhận thanh
+toán** → khối **"Chia đợt & đổi hạn - ai duyệt"** (người xin, nội dung xin, tình trạng, **người
+duyệt + thời điểm**, ghi chú khi duyệt, chứng từ) → bảng **phiếu thu / phiếu chi** kèm chứng từ.
+
+## Chứng từ phiếu thu và phiếu chi là bắt buộc
+Ghi khoản thu hoặc chốt hoàn tiền đều phải **đính ảnh biên lai / uỷ nhiệm chi**, hoặc **ghi rõ vì
+sao chưa có**. Không có cái nào thì app từ chối ghi.
+Lối "ghi lý do" là cố ý - thu tiền mặt lúc máy in biên lai hỏng là chuyện có thật, chặn cứng thì
+người ta ghi khoản thu sang chỗ khác hoặc ghi sai ngày. Nhưng lối ấy **để lại dấu vết và bị đếm**:
+cột Chứng từ có ba trạng thái **đủ** (mọi phiếu đã có ảnh) · **khai lý do N** (chưa có ảnh) ·
+**thiếu N** (chưa khai gì), và học viên chưa có phiếu nào thì ghi "chưa có phiếu" chứ không tô xanh.
+
 ## Kho mẫu tin gửi khách (DL32)
 Nội dung gửi ra ngoài không cắm cứng trong mã và cũng không nằm chung với câu nhắc việc nội bộ
 của CH4 — nó có nhà riêng: trang **Kho mẫu tin gửi khách** (nhóm Tra cứu, cạnh Sổ tin đã gửi).

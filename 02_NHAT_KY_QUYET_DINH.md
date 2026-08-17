@@ -148,6 +148,12 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 📋 17/08 - ĐANG CHỜ ANH LUÂN TRẢ LỜI
+> 1. **Thêm ô "đóng một lần hay chia đợt" ngay tại bước Tạo đăng ký?** Hiện bước ấy chỉ hỏi khóa
+>    học, học phí, chiết khấu - đơn tạo ra mặc định đóng MỘT LẦN, muốn chia phải tạo đơn xong rồi
+>    mở màn Thanh toán. Khách chốt xong xin trả góp ngay là chuyện thường. Nếu làm thì vẫn đi qua
+>    đúng cửa duyệt hiện tại (`insPlanSave` → DL27), không dựng cửa thứ hai. **Chưa làm, chờ anh.**
+>
 > ### 📋 16/08 - HÀNG CHỜ ĐÃ XONG HẾT
 > Sáu việc của mục dưới đây đều đã làm và đã verify xanh trên `9a361d`. Mẫu tin gửi khách đã dọn
 > khỏi CH4 sang bảng riêng DL32 (`2e82d7`). Việc tồn còn lại duy nhất vẫn là `check_taolai` đỏ
@@ -335,12 +341,64 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 16/08 trên chính bản này).
-> Bản dựng đang chạy: `bad7f9` (16/08, kho mẫu tin DL32 + mã bản dựng phủ cả asset), đã lên
-> https://mittomap.github.io/itts-sop-demo-v2/ .
+> **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 17/08 trên chính bản này).
+> Bản dựng đang chạy: `90c7dc` (17/08, trang Công nợ học viên + bắt buộc chứng từ phiếu thu/chi),
+> đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `a9eb4b`, `cd5289`, `c16c57`, `2e82d7`, `9a361d`, `f46a05`, `2f6620`, `c7d1a0`, `553234`.
+> Mốc cũ: `157461`, `f18e75`, `f1af4c`, `bad7f9`, `a9eb4b`, `cd5289`, `c16c57`, `2e82d7`, `9a361d`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 17/08 - CÔNG NỢ HỌC VIÊN: HAI CỔNG MỘT MÀN, VÀ BA CỬA TIỀN BỊ CHÔN NĂM TẦNG
+>
+> Anh Luân đặt: *"ở trang học viên, a muốn có 1 chip xem chế độ kế toán, có thể export (chỉ kế
+> toán và quản trị viên và giám đốc thấy)... Phiếu thu phiếu chi nếu lúc đóng tiền phải chụp để
+> upload lên hệ thống"* rồi bổ sung *"em cũng có thể bổ sung 1 trang riêng cho kế toán, đỡ phải
+> vào trang học viên của chặng 2 (tức là có 2 cổng nhỉ"*.
+>
+> **HAI CỔNG, MỘT MÀN.** Nút trên trang Học viên KHÔNG dựng bảng tiền tại chỗ - nó `go("congno")`.
+> *Hai phép cộng cho một số tiền thì lệch nhau lúc nào không ai biết bên nào đúng.* Cổng thứ hai
+> tồn tại vì kế toán không đi qua chặng 2.
+> **KHÔNG nhét vào Sổ thu học phí đã có:** sổ ấy đếm theo PHIẾU và theo ĐỢT - "hôm nay tiền nào
+> về". Màn này đếm theo NGƯỜI - "ai đang nợ bao nhiêu". Cùng kho dữ liệu, hai câu hỏi.
+> Sau đó anh mở thêm quyền cho **Học vụ và Tư vấn** - họ là người đối thoại với khách về tiền.
+>
+> **CHỨNG TỪ BẮT BUỘC, nhưng có lối thoát ĐẾM ĐƯỢC.** Chặn cứng thì người ta không dừng lại, họ
+> đi vòng (ghi khoản thu sang chỗ khác, ghi sai ngày) - và vòng ấy mình không nhìn thấy. Nên:
+> đính ảnh HOẶC ghi lý do, và lối "ghi lý do" bị đếm lên đúng con số kế toán cần.
+>
+> **BA CÂU HỎI CỦA ANH, MỖI CÂU LỘ MỘT LỖ:**
+> · *"học viên chia 3 đợt thì danh sách hiển thị thế nào"* → cột "Đợt" mập mờ: trong ngăn kéo của
+>   CHÍNH dòng ấy, bảng lịch đợt cũng ghi "1/3" nhưng nghĩa khác hẳn (đợt số mấy, không phải đã
+>   xong mấy đợt). Ca Lê Duy Khôi trùng khít ở cả hai chỗ nên không ai nhận ra. Và Hoàng Thanh
+>   Linh đã nộp 5 triệu vào đợt 1 mà cột ghi "0/3" trong khi cột Đã thu cùng hàng ghi 5 triệu.
+>   *Đếm "đã xong" mà không đếm "đang dở" thì phần đang dở biến thành chưa làm.*
+> · *"chứng từ ghi đủ khi nào"* → đang ghi SAI. 11 học viên có phiếu chỉ khai lý do vẫn hiện xanh
+>   "đủ" - **đúng cái lỗ hổng vừa tuyên bố sẽ theo dõi thì lại là cái không hiện ra**. Và 2 học
+>   viên CHƯA CÓ PHIẾU NÀO cũng hiện "đủ". *Đừng tô xanh một ô rỗng: không có gì để kiểm khác hẳn
+>   với đã kiểm xong.*
+> · *"chia nhỏ học phí phải được duyệt nhỉ, drawer hiển thị ai duyệt và duyệt khi nào"* → đúng.
+>   *Một con số đã được ai đó phê duyệt thì chữ ký phải đứng cạnh con số, không nằm ở trang khác.*
+>
+> **VÀ CÂU NẶNG NHẤT: *"tìm mãi ko thấy chỗ nào"*.** Vẽ thật 60 trang rồi đếm lối vào:
+> `insPlanForm` KHÔNG trang nào vẽ ra; `dotGiaHan` cũng KHÔNG, và cũng không nằm trong `payForm`
+> vì chỗ duy nhất dựng nút ấy là `insTableHTML(lst,TRUE)` mà `payForm` gọi với `false`. Muốn lùi
+> hạn một đợt phải đi năm bước, hai bước cuối nằm trong ngăn kéo MANG TÊN VIỆC KHÁC.
+> *Một hàng chờ duyệt mà cửa tạo yêu cầu chôn năm tầng thì hàng chờ ấy trống vì không ai tìm ra,
+> chứ không phải vì không ai cần.*
+>
+> **CHỤP ẢNH GỬI ANH LÀ THỨ BẮT ĐƯỢC HAI CHỖ TRÀN NGANG** mà không bộ kiểm nào đã chạy tới:
+> cột "Thu trong kỳ" ở Toàn kỳ bằng ĐÚNG cột "Đã thu" trên mọi hàng, và chính nó đẩy cột Chứng
+> từ ra ngoài mép. *Cột nào ở trạng thái mặc định chỉ chép lại cột bên cạnh thì bỏ đi.* Ba bảng
+> trong ngăn kéo đều tràn - bảng "ai duyệt" 6 cột phải đổi hẳn sang THẺ.
+> *Đừng bê nguyên bảng của trang rộng vào ngăn kéo hẹp - đổi hình dạng, đừng đổi cỡ chữ.*
+>
+> **VERIFY BẮT 5 CHỖ, HAI CHỖ LÀ DO CHÍNH LUẬT MỚI:** `_check16` và `_checkchuoi` lái `paySave`
+> bằng bộ ô cũ nên bị cửa từ chối. Mục tiêu hai bộ kiểm không đổi, cái đổi là ĐIỀU KIỆN VÀO CỬA -
+> nên dạy lại chúng, **và thêm hai phép thử mới cho chính luật ấy**.
+> *Cửa ghi thêm điều kiện thì bộ kiểm phải học điều kiện đó, không phải được miễn trừ khỏi nó.*
+> Ba chỗ còn lại: chưa bài hướng dẫn nào đi qua · chưa có nút hành động đầu trang (nút chính là
+> XUẤT, đưa lên đầu và gỡ khỏi thanh công cụ) · thẻ thứ năm trùng đúng chip lọc cùng tên → bỏ thẻ
+> giữ chip theo luật 13/08, phần chỉ thẻ mới nói thì dời xuống ghi chú cạnh chip.
 >
 > ### 🟢 16/08 - KHO MẪU TIN GỬI KHÁCH (DL32): ĐẶT SAI NHÀ HAI LƯỢT MỚI ĐẶT ĐÚNG
 >
