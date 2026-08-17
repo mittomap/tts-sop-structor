@@ -32369,7 +32369,10 @@ DOORS = {
  "DL03":["bkLuuTest","bkLuuTuVan","bkLuuNhacTest","rfNeed","testAttend","testBook","testNoShowSave","testQuickSave","testRebookSave","testRefuse","testResultSave","tvSave","testEnd"],
  "DL04":["bkLuuTuVan","rfNeed","runSkipTest","tvCloseSave","tvEnrollSave","tvQuickSave","tvSave","testConsult"],
  "DL06":["cancelEnrollRun","paySave","rfNeed","runCancelEnroll","tvEnrollSave","insSync","debtRemind"],
- "DL06b":["insPlanSave","dotApDung"],
+ # 17/08 - `dotGhiLich` la cua ghi THAT SU vao DL06b tu khi tach loi: `dotApDung` nay chi dung
+ # danh sach goi y roi goi no. Giu ca ba ten: hai ten cu van la duong nguoi ta di vao, con ten
+ # moi la cho tay dat but. Khai thieu la `_check15` bat dung - va no bat dung.
+ "DL06b":["insPlanSave","dotApDung","dotGhiLich"],
  "DL07":["duyetRefundRun","paySave","payVerifyRun","rfNeed"],
  "DL08":["hvClassConfirm","hvClassRejectSave","lopDayHV","midSave","obMark","obConfirmRun","rfNeed","xepMoiLuu","obChangeSave","obFinish"],
  "DL09":["bkLuuPHNguyCo","bkLuuPHQuanHe","blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave","riskCareSave","riskFlagRun","riskIgnoreSave","dhSave"],
