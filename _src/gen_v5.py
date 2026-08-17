@@ -3895,7 +3895,10 @@ var ROLESCOPE={
   tabs:{settings:["tongquan","brand","menu","ch2","ch6","ch4","goiy","the","ch1","tro","nhip",
    "huongdan","qa","staff","giagio","khoa","nhatky"]}},
  tuvan:{match:/^sales/,land:"viec",
-  pages:["viec","banlam","hanhtrinh","hocvien","giangvien","hosogv","tuyensinh","ketthuc","ketqua","khac","duyet","tinnhan"],
+  /* V2 16/08 - anh Luan bo sung `congno` cho Tu van va Hoc vu. Ho la nguoi DOI THOAI voi khach
+     ve tien (tu van chot don, hoc vu nhac dong hoc phi), nen bat ho hoi ke toan moi biet mot
+     hoc vien con no bao nhieu la chen mot nguoi vao giua cuoc goi. */
+  pages:["viec","banlam","hanhtrinh","hocvien","giangvien","hosogv","tuyensinh","ketthuc","ketqua","khac","duyet","congno","tinnhan"],
   tabs:{khac:["magioithieu"],duyet:["banggiao"]},
   blocks:["appt","new","contacted","test_done","enrolled","reup"],
   mine:1,mineBtn:1,kpi:1,bell:["Tuyển sinh","Giao việc"]},
@@ -3959,7 +3962,7 @@ var ROLESCOPE={
      (`obConfirmRun` là cửa ghi của họ, và cửa ấy bắt buộc đính ảnh bản giấy). Ghi vào một cuốn
      sổ mà không được mở chính cuốn sổ ấy ra tra là vô lý; `_checktour` bắt được ngay khi em thêm
      một bước hướng dẫn trỏ vào sổ này cho Học vụ. */
-  pages:["viec","hocvien","giangvien","hosogv","xeplop","banglop","hoctap","hosokhoa","giaoan","cskh","ychv","ketthuc","ketqua","khac","duyet","lichwow","gvdp","tinnhan","socamket"],
+  pages:["viec","hocvien","giangvien","hosogv","xeplop","banglop","hoctap","hosokhoa","giaoan","cskh","ychv","ketthuc","ketqua","khac","duyet","lichwow","gvdp","congno","tinnhan","socamket"],
   tabs:{khac:["baoluu"],duyet:["duyetnghi"]},
   blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:1,kpi:1,bell:["Học vụ","CSKH","Giao việc"]},
  /* V9.99z5 - GIÁO VIÊN không xếp người dạy thay và không gỡ đụng phòng: hai màn ấy là cửa
@@ -5113,7 +5116,7 @@ var THEDEF={
   ["cn_thu","Đã thu","Tiền thực nhận của những đơn ấy tính tới hôm nay, đã trừ các khoản hoàn. Danh sách: cột Đã thu trong bảng dưới."],
   ["cn_con","Còn phải thu","Phần chưa vào của những đơn ấy - đổi kỳ số liệu không làm hết nợ. Danh sách: bấm chip Còn nợ ở hàng dưới."],
   ["cn_qh","Trong đó đã quá hạn","Các đợt đã qua ngày hẹn mà chưa đóng đủ - phần phải gọi ngay, không phải phần chờ tới hạn. Danh sách: bấm chip Quá hạn."],
-  ["cn_ct","Phiếu thiếu chứng từ","Phiếu thu/chi chưa đính ảnh biên lai và cũng chưa khai lý do. Danh sách: bấm chip Thiếu chứng từ."]]},
+  ["cn_ct","Phiếu chưa có ảnh chứng từ","Phiếu thu/chi chưa đính ảnh biên lai - gồm cả phiếu đã khai lý do lẫn phiếu chưa khai gì, vì cuối tháng cả hai đều không đối chiếu được với sao kê. Dòng phụ tách riêng phần chưa khai gì. Danh sách: bấm chip Chưa có ảnh chứng từ."]]},
  /* V2 16/08 - dải thẻ của Kho mẫu tin. Ba ô đều là câu KHÔNG đọc ra được từ bảng ngay dưới:
     dải chip nhóm đếm cả mẫu đã ngưng nên một nhóm hiện "1" vẫn có thể là cửa gửi trống, còn
     biến không điền nổi thì phải mở từng mẫu xem thử mới lộ. Đúng luật thẻ nhóm B (14/08): thẻ
@@ -26824,7 +26827,7 @@ function cnDs(){
   var sid=String(e.student_id||"").trim();
   var key=sid||("lead:"+String(e.lead_id||e.enrollment_id));
   if(!theo[key]){theo[key]={sid:sid,ten:e.student_id_name||e.lead_id_name||sid||"(chưa có hồ sơ)",
-    don:[],tong:0,thu:0,con:0,quahan:0,dot:0,dotDu:0,ky:0,thieu:0,khoa:{},moc:null};
+    don:[],tong:0,thu:0,con:0,quahan:0,dot:0,dotDu:0,dodang:[],ky:0,phieu:0,ctAnh:0,ctLy:0,thieu:0,khoa:{},moc:null};
    out.push(theo[key])}
   var G=theo[key];G.don.push(e);
   var tot=num(e.final_fee)||num(e.total_fee);
@@ -26834,12 +26837,25 @@ function cnDs(){
   insOf(e.enrollment_id).forEach(function(x){
    G.dot++;if(isc(x.status,"paid"))G.dotDu++;
    var st=insDueState(x),left=Math.max(0,num(x.due_amount)-num(x.paid_amount));
+   /* ĐỢT ĐÓNG DỞ phải được đếm riêng. Đo trên dữ liệu thật: Hoàng Thanh Linh chia 3 đợt, đã
+      nộp 5.000.000đ vào đợt 1 (đợt ấy 7.200.000đ) - cột đợt ghi "0/3" vì chưa đợt nào ĐỦ, trong
+      khi cột "Đã thu" cùng hàng ghi 5.000.000đ. Hai ô cạnh nhau trên MỘT hàng nói hai chuyện:
+      một ô bảo chưa đóng gì, ô kia bảo đã có tiền. Người đọc tin ô nào cũng sai một nửa.
+      *Đếm "đã xong" mà không đếm "đang dở" thì phần đang dở biến thành chưa làm.* */
+   if(!isc(x.status,"paid")&&num(x.paid_amount)>0)G.dodang.push(x.installment_no);
    if((st.k==="late"||st.k==="due")&&left>0)G.quahan+=left;
    if(left>0&&st.days!==null&&(!G.moc||st.days<G.moc.days))G.moc={days:st.days,x:x,st:st}});
   rows("DL07").forEach(function(p){
    if(String(p.enrollment_id||"")!==String(e.enrollment_id))return;
    if(inRep(p.payment_time))G.ky+=num(p.amount);
-   if(cnThieuCT(p))G.thieu++})});
+   /* BA trạng thái, không phải hai. Bản đầu chỉ đếm phiếu KHÔNG CÓ GÌ, nên phiếu chỉ khai lý do
+      lọt vào ô xanh "đủ" - đúng cái lỗ hổng em vừa tuyên bố là sẽ theo dõi thì lại là cái không
+      hiện ra. Đo được: 11 học viên hiện "đủ" trong khi phiếu của họ chưa có ảnh nào.
+      *Đường thoát nào cũng phải đếm được, nếu không nó thành đường chính.* */
+   G.phieu++;
+   if(cnChungTu(p))G.ctAnh++;
+   else if(String(p.ct_lydo||"").trim())G.ctLy++;
+   else G.thieu++})});
  out.sort(function(a,b){return (b.quahan-a.quahan)||(b.con-a.con)});
  return out}
 function cnLocSet(k){window.CNLOC=k;reRender("congno")}
@@ -26847,7 +26863,10 @@ function cnLocCo(G,k){
  if(k==="no")return G.con>0;
  if(k==="quahan")return G.quahan>0;
  if(k==="du")return G.con<=0;
- if(k==="thieu")return G.thieu>0;
+ /* Chip hỏi ĐÚNG câu cái thẻ đang đếm: phiếu chưa có ẢNH, không phải phiếu chưa khai gì.
+    Thẻ đếm một tập mà chip lọc ra tập khác thì bấm vào thẻ ra thiếu người - và người dùng kết
+    luận app đếm sai, chứ không kết luận là hai chỗ hỏi hai câu. */
+ if(k==="thieu")return (G.thieu+G.ctLy)>0;
  return true}
 function renderCongno(){
  var all=cnDs(),lc=window.CNLOC||"";
@@ -26867,27 +26886,38 @@ function renderCongno(){
    "","Phần chưa vào của những đơn ấy. Danh sách: bấm chip Còn nợ ở hàng dưới."],
   ["ti-alert-triangle",vnd(S("quahan")),"Trong đó đã quá hạn","#E24B4A","",
    "","Các đợt đã qua ngày hẹn mà chưa đóng đủ - đây là phần phải gọi ngay, không phải phần chờ tới hạn. Danh sách: bấm chip Quá hạn."],
-  ["ti-camera-off",S("thieu"),"Phiếu thiếu chứng từ","#7C3AED","",
-   "","Phiếu thu/chi chưa đính ảnh biên lai và cũng chưa khai lý do - đối soát cuối tháng sẽ vướng đúng những phiếu này. Danh sách: bấm chip Thiếu chứng từ."]
+  /* Con số kế toán cần là PHIẾU CHƯA CÓ ẢNH - cả loại khai lý do lẫn loại không khai gì, vì
+     cuối tháng cả hai đều không đối chiếu được với sao kê. Dòng phụ tách ra phần nặng hơn
+     (không khai gì) để biết nên đi đòi ai trước.
+     *Một con số đã gộp hai thứ thì phải nói ngay bên dưới nó gộp cái gì.* */
+  ["ti-camera-off",S("thieu")+S("ctLy"),"Phiếu chưa có ảnh chứng từ","#7C3AED",
+   (S("thieu")?("trong đó "+S("thieu")+" phiếu chưa khai cả lý do"):"đều đã khai lý do, chỉ còn thiếu ảnh"),
+   "","Phiếu thu/chi chưa đính ảnh biên lai - gồm cả phiếu đã khai lý do lẫn phiếu chưa khai gì, vì đối soát cuối tháng thì cả hai đều không đối chiếu được với sao kê. Danh sách: bấm chip Chưa có ảnh chứng từ."]
  ],"congno");
  window.FLTLAST=window.FLTLAST||{};
  window.FLTLAST.congno=ds.map(function(G){return {
   ma_hv:G.sid,ho_ten:G.ten,khoa:Object.keys(G.khoa).join(" · "),so_don:G.don.length,
   tong_gia_tri:G.tong,da_thu:G.thu,con_phai_thu:G.con,qua_han:G.quahan,
-  thu_trong_ky:G.ky,dot_da_dong:G.dotDu+"/"+G.dot,
+  thu_trong_ky:G.ky,dot_da_dong_du:G.dotDu+"/"+G.dot,dot_dang_dong_do:G.dodang.join(" "),
   dot_ke_tiep:G.moc?((G.moc.x.installment_no+"/"+G.moc.x.installment_of)+" hạn "+(G.moc.x.due_date||"")):"",
-  phieu_thieu_chung_tu:G.thieu}});
+  so_phieu:G.phieu,phieu_co_anh_chung_tu:G.ctAnh,phieu_chi_khai_ly_do:G.ctLy,phieu_khong_co_gi:G.thieu}});
  h+=tbar('<span class="tblbl">Lọc nhanh</span>'+
   segHTML(lc,[["","Tất cả",all.length],["no","Còn nợ",all.filter(function(G){return cnLocCo(G,"no")}).length],
    ["quahan","Quá hạn",all.filter(function(G){return cnLocCo(G,"quahan")}).length],
    ["du","Đã đóng đủ",all.filter(function(G){return cnLocCo(G,"du")}).length],
-   ["thieu","Thiếu chứng từ",all.filter(function(G){return cnLocCo(G,"thieu")}).length]],
+   ["thieu","Chưa có ảnh chứng từ",all.filter(function(G){return cnLocCo(G,"thieu")}).length]],
    "cnLocSet('{k}')","cn_loc"),
   '<span class="tbcnt">'+ds.length+' học viên</span>'+
   '<button class="btn sm" onclick="pgExport(\'congno\')" data-tip="Tải '+ds.length+' dòng đang hiện ra tệp CSV - mở được bằng Excel"><i class="ti ti-table"></i>Xuất</button>');
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr>'+
   '<th>Mã</th><th>Họ tên</th><th>Khoá</th><th class="phai">Tổng giá trị</th><th class="phai">Đã thu</th>'+
-  '<th class="phai">Còn phải thu</th><th class="phai">Thu trong kỳ</th><th>Đợt</th><th>Đợt kế tiếp</th><th>Chứng từ</th>'+
+  '<th class="phai">Còn phải thu</th><th class="phai">Thu trong kỳ</th>'+
+  /* Tiêu đề cũ chỉ có một chữ "Đợt", mà ngay trong ngăn kéo của chính dòng ấy cột đầu bảng
+     lịch đợt CŨNG ghi "1/3" - với nghĩa khác hẳn: ở đó là ĐỢT SỐ MẤY, ở đây là ĐÃ XONG MẤY
+     ĐỢT. Cùng một cách viết, hai nghĩa, cách nhau một cú bấm; ca Lê Duy Khôi còn trùng khít
+     "1/3" ở cả hai chỗ nên không ai nhận ra. Tiêu đề phải nói ra phép đếm.
+     *Hai bảng dùng chung một cách viết cho hai phép đếm khác nhau thì phải có một bảng đổi tên.* */
+  '<th>Đợt đã đóng đủ</th><th>Đợt kế tiếp</th><th>Chứng từ</th>'+
   '</tr></thead><tbody>';
  if(!ds.length)h+='<tr><td colspan="10"><div class="empty">Không có học viên nào khớp điều kiện đang chọn. '+
   'Nới kỳ số liệu ra <b>Toàn kỳ</b> hoặc bỏ chip lọc là thấy lại.</div></td></tr>';
@@ -26898,9 +26928,18 @@ function renderCongno(){
    '<td class="phai">'+vnd(G.tong)+'</td><td class="phai">'+vnd(G.thu)+'</td>'+
    '<td class="phai">'+(G.con>0?('<b style="color:var(--red)">'+vnd(G.con)+'</b>'):'<span class="mut">0đ</span>')+'</td>'+
    '<td class="phai">'+(G.ky?vnd(G.ky):'<span class="mut">-</span>')+'</td>'+
-   '<td class="khongbe">'+G.dotDu+'/'+G.dot+'</td>'+
+   '<td class="khongbe" data-tip="'+esc(G.dotDu+" trong "+G.dot+" đợt đã đóng ĐỦ"+
+     (G.dodang.length?(". Ngoài ra đợt "+G.dodang.join(", ")+" đã có tiền vào nhưng chưa đủ - phần này nằm trong cột Đã thu, không nằm trong con số bên trái."):""))+'">'+
+     G.dotDu+'/'+G.dot+
+     (G.dodang.length?(' <span class="chip amber">đợt '+esc(G.dodang.join(", "))+' đang dở</span>'):'')+'</td>'+
    '<td class="khongbe">'+(G.moc?('<span class="chip '+G.moc.st.cls+'">'+esc(G.moc.st.lbl)+'</span> '+esc(G.moc.x.due_date||"")):'<span class="mut">-</span>')+'</td>'+
-   '<td>'+(G.thieu?('<span class="chip red">thiếu '+G.thieu+'</span>'):'<span class="chip green">đủ</span>')+'</td></tr>'});
+   /* "Đủ" chỉ được nói khi MỌI phiếu đã có ảnh. Học viên chưa đóng đồng nào thì không có gì để
+      kiểm - vẽ dấu xanh ở đó là khen một việc chưa ai làm; đo được 2 hàng như vậy.
+      *Đừng tô xanh một ô rỗng: không có gì để kiểm khác hẳn với đã kiểm xong.* */
+   '<td>'+(!G.phieu?'<span class="mut">chưa có phiếu</span>'
+     :(G.thieu?('<span class="chip red" data-tip="'+esc(G.thieu+" phiếu chưa đính ảnh chứng từ và cũng chưa khai lý do"+(G.ctLy?(", thêm "+G.ctLy+" phiếu mới chỉ khai lý do"):""))+'">thiếu '+G.thieu+'</span>')
+       :(G.ctLy?('<span class="chip amber" data-tip="'+esc(G.ctLy+" phiếu chưa có ảnh, mới chỉ khai lý do - đối soát cuối tháng vẫn phải bổ sung ảnh")+'">khai lý do '+G.ctLy+'</span>')
+         :'<span class="chip green" data-tip="'+esc("Cả "+G.ctAnh+" phiếu đều đã đính ảnh chứng từ")+'">đủ</span>')))+'</td></tr>'});
  h+='</tbody></table></div></div>';
  return h}
 /* Ngăn kéo: từng đơn -> lịch đợt -> từng phiếu thu/chi kèm chứng từ. Đây là chỗ kế toán đối
@@ -26917,6 +26956,35 @@ function cnXem(arg){
   h+='<div class="panel" style="margin:10px 0"><div class="ph"><b>'+esc(e.course_id_name||e.course_id||e.enrollment_id)+'</b>'+
    '<div class="mini"><span class="mut">'+esc(e.enrollment_id)+' · ký '+esc(String(e.enrollment_time||"").split(" ")[0]||"-")+'</span></div></div><div class="pbody">';
   h+=insTableHTML(insOf(e.enrollment_id),false);
+  /* AI DUYỆT CHIA ĐỢT, DUYỆT LÚC NÀO (anh Luân 16/08: *"hình như muốn chia nhỏ học phí phải
+     được duyệt nhỉ, trong drawer hiển thị ai duyệt và duyệt khi nào, kèm ghi chú nếu có"*).
+     Anh nhớ đúng: `insPlanSave` không ghi thẳng - người chưa có quyền duyệt thì nó sinh một yêu
+     cầu `replan` vào DL27 và lịch đợt chỉ đổi SAU khi được duyệt (`dotAiDuyet` là cửa chặn).
+     Bảng lịch đợt ở trên chỉ nói KẾT QUẢ; ai đồng ý cho chia như thế và vì sao thì nằm ở DL27 -
+     mở đúng chỗ này ra xem là khỏi phải sang trang Duyệt đổi đợt đóng rồi tìm lại theo tên.
+     *Một con số đã được ai đó phê duyệt thì chữ ký phải đứng cạnh con số, không nằm ở trang khác.* */
+  (function(){
+   var yc=rows("DL27").filter(function(r){return String(r.enrollment_id||"")===String(e.enrollment_id)});
+   h+='<div style="margin-top:10px"><b style="font-size:12px">Chia đợt &amp; đổi hạn - ai duyệt</b></div>';
+   if(!yc.length){h+='<div class="fhint" style="padding:4px 0">Đơn này chưa có yêu cầu chia lại hay gia hạn nào. Lịch đợt trên đang theo bản đặt lúc ghi nhận đơn, hoặc do người <b>có sẵn quyền duyệt</b> đặt thẳng nên không đi qua hàng chờ.</div>';return}
+   yc.sort(function(a,b){return (pvnd(b.req_time)||0)-(pvnd(a.req_time)||0)});
+   h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Yêu cầu</th><th>Người xin</th><th>Nội dung xin</th><th>Tình trạng</th><th>Người duyệt</th><th>Ghi chú khi duyệt</th></tr></thead><tbody>';
+   yc.forEach(function(r){
+    var c=ecode(r.req_status);
+    var chip=c==="approved"?'<span class="chip green">đã duyệt</span>'
+      :(c==="rejected"?'<span class="chip red">đã từ chối</span>':'<span class="chip amber">chờ duyệt</span>');
+    var noi=isc(r.req_type,"extend")
+      ?("Lùi hạn đợt "+esc(r.installment_no||"?")+": "+esc(r.due_old||"-")+" → "+esc(r.due_new||"-"))
+      :esc(r.reason||"Chia lại lịch đợt");
+    h+='<tr><td class="khongbe"><b>'+esc(r.req_id||"")+'</b><div class="mut" style="font-size:11px">'+esc(elabel(r.req_type)||r.req_type||"")+'</div></td>'+
+     '<td class="khongbe">'+esc(r.req_by_name||r.req_by||"-")+'<div class="mut" style="font-size:11px">'+esc(r.req_time||"")+'</div></td>'+
+     '<td>'+noi+(isc(r.req_type,"extend")&&r.reason?('<div class="mut" style="font-size:11px">'+esc(r.reason)+'</div>'):'')+
+       (r.evidence?(' '+linkOut(r.evidence)):'')+'</td>'+
+     '<td class="khongbe">'+chip+'</td>'+
+     '<td class="khongbe">'+(r.decided_by_name?(esc(r.decided_by_name)+'<div class="mut" style="font-size:11px">'+esc(r.decided_at||"")+'</div>')
+       :'<span class="mut">chưa ai quyết</span>')+'</td>'+
+     '<td>'+(String(r.decide_note||"").trim()?esc(r.decide_note):'<span class="mut">-</span>')+'</td></tr>'});
+   h+='</tbody></table></div>'})();
   var ps=rows("DL07").filter(function(p){return String(p.enrollment_id||"")===String(e.enrollment_id)});
   h+='<div style="margin-top:10px"><b style="font-size:12px">Phiếu thu / phiếu chi</b></div>';
   if(!ps.length)h+='<div class="empty">Đơn này chưa có phiếu nào.</div>';
@@ -26945,7 +27013,7 @@ function cnXem(arg){
    nhận `nut` là một hàm chính vì chuyện này: một chuỗi HTML tĩnh không hỏi được "ai đang xem". */
 function cnNutHV(){
  if(!cnQuyen())return "";
- return '<button class="btn" onclick="go(\'congno\')" data-tip="Mở màn Công nợ học viên - giá trị hợp đồng, đã thu, còn phải thu theo từng người. Chỉ Kế toán, Giám đốc và Quản trị viên thấy nút này."><i class="ti ti-receipt"></i>Chế độ kế toán</button>'}
+ return '<button class="btn" onclick="go(\'congno\')" data-tip="Mở màn Công nợ học viên - giá trị hợp đồng, đã thu, còn phải thu theo từng người, xuất ra Excel được. Kế toán, Giám đốc, Quản trị viên, Tư vấn và Học vụ thấy nút này."><i class="ti ti-receipt"></i>Chế độ kế toán</button>'}
 function renderSothu(){var tab=window.STTAB||"da";
  if(tab==="cong"){window.STTAB="da";tab="da"}   /* tab cũ trong dấu trang / liên kết cũ -> về Đã thu */
  var nDu=duthuList().length;

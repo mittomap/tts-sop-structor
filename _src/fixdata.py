@@ -1861,6 +1861,16 @@ if _donCo:
     _dotReqs.append(_dotReq(4, _m[3], "extend (Xin gia hạn đợt)", "rejected (Đã từ chối)",
                             "Khách xin lùi thêm lần thứ ba.", "", _dotTP,
                             "Đã gia hạn 2 lần, không lùi thêm - hẹn khách đóng đúng hạn."))
+    # Bon yeu cau tren khong co cai nao la CHIA LAI DA DUOC DUYET - ma do lai la ca anh Luan hoi
+    # den (16/08): *"muon chia nho hoc phi phai duoc duyet nhi, trong drawer hien thi ai duyet
+    # va duyet khi nao"*. Thieu no thi ngan keo Cong no chi bay duoc chia-lai-DANG-CHO va gia-han
+    # da duyet; nguoi xem demo khong thay duoc mot lich dot da chia DA CO CHU KY trong nao.
+    # *Gieo du BON goc cua mot bang trang thai, dung gieo ba goc roi de goc thu tu tu suy ra.*
+    _dotReqs.append(_dotReq(5, _donCo[4 % len(_donCo)], "replan (Xin chia lại đợt)",
+                            "approved (Đã duyệt)",
+                            "Khách xin chia 3 đợt, đợt đầu 40% - đã trao đổi và thống nhất.",
+                            "https://drive.google.com/file/d/demo-zalo-chia-dot/view", _dotTP,
+                            "Đồng ý chia 3 đợt. Đợt đầu thu ngay trong tuần này."))
 dl["DL27"] = _dotReqs
 # Danh muc cua bang moi: khai o NGUON de moi lan dung lai deu co, va de nhan enum in ra dung
 # nguyen van CH1 ("code (Nhãn tiếng Việt)").
@@ -3690,8 +3700,15 @@ log.append("20. Cam ket lop hoc: %d ho so co dau da ky / %d ho so onboarding"
 # may in bien lai hong) va vai phieu that su con thieu - de the con dem duoc mot con so co
 # nghia va bam vao con ra danh sach.
 # *Mot cot canh bao ma dong nao cung do thi no khong canh bao gi ca.*
+# MOI dong phai co DU CA HAI cot, ke ca khi de rong - check_logic 14a bat dung: "dong trong cung
+# bang KHONG cung bo cot (app render o trong)". Ban dau em chi gan cot cho dong nao can, nen
+# 120/120 dong lech nhau. Mot bang ma moi dong mot bo cot thi lop doc du lieu phai doan, va cho
+# nao doan thi cho do se doan sai vao mot ngay nao do.
 _p07 = R("DL07")
 _ctCo = _ctLy = _ctThieu = 0
+for _p in _p07:
+    _p.setdefault("chung_tu", "")
+    _p.setdefault("ct_lydo", "")
 for _i, _p in enumerate(_p07):
     if _p.get("chung_tu") or _p.get("ct_lydo"):
         continue
