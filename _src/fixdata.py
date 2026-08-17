@@ -3681,6 +3681,42 @@ for _i, _o in enumerate(R("DL08")):
 log.append("20. Cam ket lop hoc: %d ho so co dau da ky / %d ho so onboarding"
            % (_daKy, len(R("DL08"))))
 
+# ═══ 25. CHUNG TU CUA PHIEU THU / PHIEU CHI - DL07 (16/08) ═════════════════
+# Anh Luan: *"Phieu thu phieu chi neu luc dong tien phai chup de upload len he thong"*.
+# Cua ghi nay bat buoc tu hom nay, nhung cac phieu CU trong demo khong co gi dinh kem - de
+# nguyen thi man Cong no do ruc 115/120 phieu "thieu chung tu", ma mot con so do het thi no
+# khong con chi ra cho nao dang hong nua, no chi la mau nen.
+# Gieo cho GIONG THAT: phan lon phieu co anh chung tu; mot so it co ly do (thu tien mat luc
+# may in bien lai hong) va vai phieu that su con thieu - de the con dem duoc mot con so co
+# nghia va bam vao con ra danh sach.
+# *Mot cot canh bao ma dong nao cung do thi no khong canh bao gi ca.*
+_p07 = R("DL07")
+_ctCo = _ctLy = _ctThieu = 0
+for _i, _p in enumerate(_p07):
+    if _p.get("chung_tu") or _p.get("ct_lydo"):
+        continue
+    _note = str(_p.get("payment_note") or "")
+    _cu = ""
+    if u"Ch\u1ee9ng t\u1eeb:" in _note:
+        _cu = _note.split(u"Ch\u1ee9ng t\u1eeb:", 1)[1].strip()
+    _am = _p.get("amount") or 0
+    _chi = isinstance(_am, (int, float)) and _am < 0
+    if _cu:
+        _p["chung_tu"] = _cu
+        _ctCo += 1
+    elif _i % 11 == 3:
+        _p["ct_lydo"] = (u"Chi ti\u1ec1n m\u1eb7t t\u1ea1i qu\u1ea7y, \u0111ang ch\u1edd scan u\u1ef7 nhi\u1ec7m chi" if _chi
+                         else u"Thu ti\u1ec1n m\u1eb7t t\u1ea1i qu\u1ea7y, m\u00e1y in bi\u00ean lai h\u1ecfng - b\u1ed5 sung sau")
+        _ctLy += 1
+    elif _i % 11 == 7:
+        _ctThieu += 1
+    else:
+        _p["chung_tu"] = (u"chung-tu/%s-%s.jpg"
+                          % ("chi" if _chi else "thu", str(_p.get("payment_id") or _i)))
+        _ctCo += 1
+log.append("25. Chung tu DL07: %d phieu co anh | %d khai ly do | %d con thieu / %d phieu"
+           % (_ctCo, _ctLy, _ctThieu, len(_p07)))
+
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("  12. Da tao DL22 referral +", len(dl["DL22"]), "luot | DL19 thuong:", len(dl["DL19"]))
 for _l in log[-6:]: print("  "+_l)

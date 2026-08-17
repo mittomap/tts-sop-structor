@@ -3789,6 +3789,7 @@ var PAGES=[
 {k:"duyethoan",g:"_",ic:"ti-arrow-back-up",t:"Duyệt hoàn tiền",c:"Hoàn tiền theo mốc SOP",ty:"custom"},
 {k:"duyetnghi",g:"_",ic:"ti-user-question",t:"Duyệt xin nghỉ học",c:"Học viên báo nghỉ chờ học vụ duyệt",ty:"custom"},
 {k:"duyetthu",g:"_",ic:"ti-receipt",t:"Xác nhận thu tiền",c:"Kế toán đối soát khoản đã ghi",ty:"custom"},
+{k:"congno",g:"Điều hành",ic:"ti-report-money",t:"Công nợ học viên",c:"Giá trị hợp đồng, đã thu, còn phải thu theo từng người",ty:"custom"},
 /* V2 12/08 (SALE-4 + SALE-5) - hàng chờ thứ sáu: đổi đợt đóng (xin gia hạn / xin chia lại). */
 {k:"duyetdot",g:"_",ic:"ti-calendar-dollar",t:"Duyệt đổi đợt đóng",c:"Sale xin gia hạn hoặc chia lại đợt, chờ quản lý chốt",ty:"custom"},
 {k:"duyethd",g:"_",ic:"ti-file-certificate",t:"Duyệt hợp đồng cam kết",c:"Cam kết đầu ra - cần đủ chữ ký Trưởng phòng Tư vấn và Giám đốc",ty:"custom"},
@@ -3992,7 +3993,7 @@ var ROLESCOPE={
   /* V2 08/08 - thêm `dsthanhtoan` (Sổ thu học phí): nhịp cuối ngày của kế toán là "nhìn dự thu
      tháng", trỏ thẳng vào sổ ấy - mà trước bản này chỉ quản trị và điều hành được xem. Sổ thu
      học phí là sổ của chính phòng kế toán. */
-  pages:["viec","hocvien","giangvien","hosogv","tuyensinh","duyet","baocao","bangcong","dsthanhtoan","tinnhan"],   /* V9.99z5: kế toán chốt lương theo bảng công giảng dạy */
+  pages:["viec","hocvien","giangvien","hosogv","tuyensinh","duyet","baocao","bangcong","dsthanhtoan","congno","tinnhan"],   /* V9.99z5: kế toán chốt lương theo bảng công giảng dạy */
   /* V9.99r - Kế toán chỉ có phần THANH TOÁN của hub Tuyển sinh. Trước đây không khai tab nào
      nên họ bấm được cả Lead, Test đầu vào, Tư vấn & Đăng ký - ba bước họ khai `lead:"none"`,
      mở ra chỉ để nhìn. Khai đúng một tab thì phễu, câu mở đầu và menu cùng thu lại theo. */
@@ -4649,7 +4650,9 @@ function isRisk(v){return /at_risk|off_track/.test(ecode(v))}
    khóa) đều đã có sẵn nút "Hồ sơ đầy đủ" bên trong - ai cần sâu hơn thì đi tiếp một bước,
    còn đa số dừng ở ngăn kéo là đủ. */
 var LISTCFG={
-hocvien:{code:"DL09",filt:"student_status",ro:1,sub:"Học viên (DL09) - lọc theo trạng thái / nguy cơ / lớp / khóa",extra:"hvExtraFilter",
+/* `extra:"hvExtraFilter"` da GO 16/08: khai tu lau ma KHONG mot dong nao doc no va cung khong
+   co ham nao ten do - mot loi khai chet, im lang. Cho can dat nut nghiep vu la `nut`. */
+hocvien:{code:"DL09",filt:"student_status",ro:1,sub:"Học viên (DL09) - lọc theo trạng thái / nguy cơ / lớp / khóa",nut:function(){return cnNutHV()},
  /* ═══ V2 08/08 - TRANG NÀY TỪNG KHÔNG CÓ MỘT CON SỐ NÀO Ở ĐẦU ══════════════════════════════
     Anh Luân chốt V2: *"mỗi trang là nghiệp vụ riêng, và nó có thẻ, có chip lọc, có cảnh báo của
     riêng nó."* Học viên là trang nằm trong NHỊP NGÀY của ba chức danh (Học vụ, ACA, Trưởng phòng
@@ -5102,6 +5105,15 @@ function colMenuHTML(key){var cfg=LISTCFG[key];if(window.COLMENU!==key)return ''
    Bộ kiểm _checkux canh: dải nào gọi statStrip mà không khai ở đây là đỏ; số thẻ khai lệch với
    số thẻ vẽ ra thật cũng đỏ; thẻ nào còn onclick cũng đỏ. */
 var THEDEF={
+ /* V2 16/08 - dai the trang Cong no hoc vien. Bon o dau la tien, o cuoi la CHUNG TU: mot phieu
+    khong co anh bien lai thi cuoi thang doi soat khong co gi de doi chieu, ma doc bang thi no
+    chi la mot o trong - khong ai dem ho. */
+ congno:{t:"Công nợ học viên",the:[
+  ["cn_tong","Tổng giá trị hợp đồng","Cộng học phí sau chiết khấu của mọi đơn còn hiệu lực có ngày đăng ký trong kỳ đang chọn. Danh sách: chính bảng ngay dưới."],
+  ["cn_thu","Đã thu","Tiền thực nhận của những đơn ấy tính tới hôm nay, đã trừ các khoản hoàn. Danh sách: cột Đã thu trong bảng dưới."],
+  ["cn_con","Còn phải thu","Phần chưa vào của những đơn ấy - đổi kỳ số liệu không làm hết nợ. Danh sách: bấm chip Còn nợ ở hàng dưới."],
+  ["cn_qh","Trong đó đã quá hạn","Các đợt đã qua ngày hẹn mà chưa đóng đủ - phần phải gọi ngay, không phải phần chờ tới hạn. Danh sách: bấm chip Quá hạn."],
+  ["cn_ct","Phiếu thiếu chứng từ","Phiếu thu/chi chưa đính ảnh biên lai và cũng chưa khai lý do. Danh sách: bấm chip Thiếu chứng từ."]]},
  /* V2 16/08 - dải thẻ của Kho mẫu tin. Ba ô đều là câu KHÔNG đọc ra được từ bảng ngay dưới:
     dải chip nhóm đếm cả mẫu đã ngưng nên một nhóm hiện "1" vẫn có thể là cửa gửi trống, còn
     biến không điền nổi thì phải mở từng mẫu xem thử mới lộ. Đúng luật thẻ nhóm B (14/08): thẻ
@@ -6131,7 +6143,11 @@ function renderList(key,emb){window.__gvTai=null;   /* số đếm theo giảng 
     vào chữ trên nút, chữ không còn trên trang nữa).
     Nay trang danh sách khai được nút của chính nó ở `LISTCFG[key].nut`. Khai một chỗ, hiện ở
     đúng trang ấy - không phải nhớ rằng nó từng phụ thuộc vào một cái tab. */
- var _nutNV=(cfg.nut||"");
+ /* V2 16/08 - `nut` nhận được CẢ HÀM. Nút "Chế độ kế toán" chỉ ba chức danh thấy, mà một chuỗi
+    HTML tĩnh thì không hỏi được "ai đang xem" - nó được ghép lúc dựng bảng khai, trước khi có
+    người đăng nhập. `the` đã là hàm từ lâu vì đúng lý do ấy; `nut` nay theo cùng khuôn.
+    *Thứ nào phụ thuộc vào người đang đứng trước màn thì phải là hàm, không thể là hằng.* */
+ var _nutNV=(typeof cfg.nut==="function")?(function(){try{return cfg.nut()||""}catch(e){return ""}})():(cfg.nut||"");
  /* V2 Khúc 2b - DẢI THẺ CHO TRANG DANH SÁCH. `renderList` là hàm dùng chung của mọi sổ, nên
     trang danh sách không có chỗ nào để tự vẽ thẻ của riêng nó. Mở một cửa khai: `LISTCFG[k].the`
     là một HÀM nhận danh sách đã lọc theo phạm vi và trả về mảng thẻ cho `statStrip`.
@@ -7352,6 +7368,23 @@ function repKySet(k){window.REPKY=k;
  reRender(CUR)}
 function repTuySet(v,val){if(v==="tu")window.REPTU=val;else window.REPDEN=val;
  window.REPKY="tuy";reRender(CUR)}
+/* THANH CHỌN KỲ - MỘT bản dựng, mọi trang gọi. Trước 16/08 nó nằm gọn trong `renderBaocao`;
+   trang Công nợ cần đúng thanh ấy, mà chép sang là hai chỗ cùng vẽ một thứ - đúng cái bẫy đã
+   cắn hai lần trong ngày (danh sách biến mẫu tin, và tên trung tâm cắm cứng).
+   `ghi` là câu nói kỳ này áp cho cái gì trên TRANG ĐANG ĐỨNG - phần khác nhau duy nhất giữa
+   hai nơi, nên nó là tham số chứ không phải một bản dựng thứ hai.
+   *Hai trang cần cùng một thanh công cụ thì tách thanh ấy ra, đừng chép nó.* */
+function kyBarHTML(ghi){
+ var _rk=window.REPKY||"all",_rr=repRange();
+ var _oNgay=(_rk==="tuy")?('<span class="tbgr" style="margin-left:10px;align-items:center">'+
+   '<span class="mut" style="font-size:11.5px">Từ</span>'+
+   '<input type="date" aria-label="Ngày bắt đầu" value="'+esc(window.REPTU||"")+'" onchange="repTuySet(\'tu\',this.value)">'+
+   '<span class="mut" style="font-size:11.5px">đến</span>'+
+   '<input type="date" aria-label="Ngày kết thúc" value="'+esc(window.REPDEN||"")+'" onchange="repTuySet(\'den\',this.value)">'+
+   (_rr.dao?'<span class="chip amber">đã đảo lại cho đúng thứ tự</span>':'')+'</span>'):'';
+ return tbar('<span class="tblbl">Kỳ số liệu</span>'+
+  segHTML(_rk,[["m0","Tháng này"],["30","30 ngày"],["90","90 ngày"],["all","Toàn kỳ"],["tuy","Tuỳ chọn"]],"repKySet('{k}')")+_oNgay+
+  '<span class="mut" style="font-size:11px;margin-left:10px">Đang tính theo <b>'+esc(_rr.lb)+'</b>. '+(ghi||"")+'</span>',"")}
 function srcPerfSection(){var R=repRange();
  /* V9.99y - bảng này xếp hạng NGUỒN LEAD theo doanh thu ("nguồn nào đáng đổ tiền"). Ai khai
     `tien:"none"` thì cột doanh thu là thứ họ không được đọc, mà bỏ cột đi thì bảng mất nghĩa. */
@@ -9586,16 +9619,22 @@ function duyetRefund(id){var e=find("DL06","enrollment_id",id);if(!e){toast("Kh�
  /* V9.48 - do bang may tren 90 form ghi (anh Luan: "phai danh gia toan dien day em, lam ko toi
     thi ko ra gi ca"): BON form dung toi CHUNG TU ma khong co cho dinh kem. Thanh phan attachBox
     da co san va 5 cua ghi khac dang dung - bon cho nay chi la bo quen. */
- h+=attachBox("rfd","Chứng từ chuyển trả (ảnh uỷ nhiệm chi / màn hình chuyển khoản)");
+ h+=attachBox("rfd","Chứng từ chuyển trả (ảnh uỷ nhiệm chi / màn hình chuyển khoản) <i>*</i>");
+ h+='<div class="fld full"><label>Chưa có chứng từ thì ghi rõ vì sao</label>'+
+  '<input id="rf_ctly" placeholder="vd: trả tiền mặt tại quầy, đang chờ kế toán scan uỷ nhiệm chi">'+
+  '<div class="fhint">Bắt buộc một trong hai - phiếu chi cũng là chứng từ đối soát y như phiếu thu. Phiếu chỉ có lý do sẽ nằm trong ô "Phiếu thiếu chứng từ" ở màn Công nợ học viên.</div></div>';
  h+='<div class="dact"><button class="btn danger" onclick="duyetRefundRun(\''+esc(id)+'\')"><i class="ti ti-arrow-back-up"></i>Chốt hoàn tiền</button></div></div>';
  openDrawer("Xử lý hoàn tiền",h)}
 function duyetRefundRun(id){if(chanAct("hoantien"))return;var e=find("DL06","enrollment_id",id);if(!e)return;
  var amt=num(fldV("rf_amt"));var note=(fldV("rf_note")||"").trim();
  if(amt<0||amt>num(e.paid_amount)){toast("Số hoàn phải từ 0 tới số đã đóng.");return}
+ var _ct=attachVal("rfd"),_ctly=String(fldV("rf_ctly")||"").trim();
+ if(amt>0&&!_ct&&!_ctly){toast("Phiếu chi phải có chứng từ: đính ảnh uỷ nhiệm chi / màn hình chuyển khoản, hoặc ghi rõ vì sao chưa có.",6000);return}
  duyetWrite(id,"refund",function(r){
   if(amt>0){var pay={enrollment_id:id,student_id:r.student_id,student_id_name:r.student_id_name,
    payment_time:nowStr(),payment_method:eFull("enum_payment_method","bank_transfer"),amount:-amt,net_received:-amt,
-   received_by:CURSTAFF||"",received_by_name:myName(),payment_note:"HOÀN TIỀN"+(note?" - "+note:"")+attachLine("rfd")};
+   received_by:CURSTAFF||"",received_by_name:myName(),chung_tu:_ct,ct_lydo:_ct?"":_ctly,
+   payment_note:"HOÀN TIỀN"+(note?" - "+note:"")+attachLine("rfd")};
    pay.payment_id="PMT-"+seqNo("DL07","payment_id");rows("DL07").unshift(pay);
    if(SVR)google.script.run.apiSave("DL07",pay);
    try{insSync(id)}catch(e2){}
@@ -15012,16 +15051,7 @@ function baocaoThan(_xemAi){
   '<div class="sp"><button class="btn" onclick="go(\'banlam\')"><i class="ti ti-checklist"></i>Chạy quy trình</button><button class="btn" onclick="window.SETTAB=\'ch6\';go(\'settings\')"><i class="ti ti-adjustments"></i>Ngưỡng KPI</button></div></div>';
  /* Hai ô ngày chỉ hiện khi đang ở nấc "Tuỳ chọn" - bốn nấc kia không có ngày để sửa, bày sẵn
     hai ô mờ bên cạnh là mời người ta bấm vào chỗ không làm gì. */
- var _rk=window.REPKY||"all",_rr=repRange();
- var _oNgay=(_rk==="tuy")?('<span class="tbgr" style="margin-left:10px;align-items:center">'+
-   '<span class="mut" style="font-size:11.5px">Từ</span>'+
-   '<input type="date" aria-label="Ngày bắt đầu" value="'+esc(window.REPTU||"")+'" onchange="repTuySet(\'tu\',this.value)">'+
-   '<span class="mut" style="font-size:11.5px">đến</span>'+
-   '<input type="date" aria-label="Ngày kết thúc" value="'+esc(window.REPDEN||"")+'" onchange="repTuySet(\'den\',this.value)">'+
-   (_rr.dao?'<span class="chip amber">đã đảo lại cho đúng thứ tự</span>':'')+'</span>'):'';
- h+=tbar('<span class="tblbl">Kỳ số liệu</span>'+
-  segHTML(_rk,[["m0","Tháng này"],["30","30 ngày"],["90","90 ngày"],["all","Toàn kỳ"],["tuy","Tuỳ chọn"]],"repKySet('{k}')")+_oNgay+
-  '<span class="mut" style="font-size:11px;margin-left:10px">Đang tính theo <b>'+esc(_rr.lb)+'</b>. Kỳ này áp cho các chỉ số KPI bên dưới. Bảng nào dùng mốc thời gian riêng thì ghi rõ ngay trên tiêu đề của nó.</span>',"");
+ h+=kyBarHTML("Kỳ này áp cho các chỉ số KPI bên dưới. Bảng nào dùng mốc thời gian riêng thì ghi rõ ngay trên tiêu đề của nó.");
  /* Ô chọn người ngay trên trang này - quản lý mở Chỉ số ra là chọn được luôn, không phải quay
     về trang đáp mới đổi được người. Dùng CHUNG một ô với "Xem việc của" (cùng `window.BANAI`)
     nên chuông, Việc hôm nay, bảng việc và trang này luôn nói về cùng một người. */
@@ -17979,7 +18009,7 @@ var DVI={chay:"hồ sơ",giaoan:"lớp",buoihoc:"buổi",diemdanh:"buổi",baita
     nào) và không đếm bằng "người" (một người đăng ký nhiều ca trong tuần). */
  gvdp:"ca",
  /* Kho mẫu đếm bằng MẪU, không đếm bằng "tin": một mẫu đẻ ra nhiều tin, hai thứ khác nhau. */
- mautin:"mẫu"};
+ mautin:"mẫu",congno:"học viên"};
 function dvi(p){return DVI[p]||"dòng"}
 /* V2 13/08 - NHÃN CỦA DẢI CHIP TRẠNG THÁI. Hầu hết sổ lọc theo một cột `*_status` nên "Trạng
    thái" đúng và không cần khai. Bốn cột không phải trạng thái thì phải gọi đúng tên nó, nếu
@@ -19129,7 +19159,20 @@ function payForm(id){var e=find("DL06","enrollment_id",id)||{};var tot=num(e.fin
  h+='<div class="fld"><label>Hình thức</label><select id="pm_method">'+enumOpts("enum_payment_method")+'</select></div>';
  h+='<div class="fld"><label>Người gửi</label><input id="pm_sender" value="'+esc(e.student_id_name||"")+'"></div>';
  h+='<div class="fld"><label>Mã giao dịch</label><input id="pm_ref"></div>';
- h+=attachBox("pay","Ảnh biên lai / màn hình chuyển khoản");
+ /* CHỨNG TỪ NAY LÀ BẮT BUỘC (anh Luân 16/08: *"Phiếu thu phiếu chi nếu lúc đóng tiền phải chụp
+    để upload lên hệ thống"*). Trước bản này ô đính kèm có sẵn nhưng KHÔNG ai đòi - đo trên dữ
+    liệu demo thì phần lớn phiếu không có gì đính, mà cuối tháng đối soát thì đúng những phiếu
+    ấy là chỗ không cãi được với ai.
+    Có LỐI THOÁT khai lý do, và lối ấy là cố ý: thu tiền mặt tại quầy lúc máy in biên lai hỏng
+    là chuyện có thật, chặn cứng thì người ta ghi khoản thu sang chỗ khác hoặc ghi sai ngày -
+    tệ hơn hẳn. Nhưng lối thoát ấy ĐỂ LẠI DẤU VẾT và bị đếm lên thẻ "Phiếu thiếu chứng từ" ở
+    màn Công nợ, chứ không lặng lẽ đi qua.
+    *Chặn cứng một việc người ta buộc phải làm thì họ không dừng lại - họ đi vòng, và vòng ấy
+    mình không nhìn thấy.* */
+ h+=attachBox("pay","Ảnh biên lai / màn hình chuyển khoản <i>*</i>");
+ h+='<div class="fld full"><label>Chưa có chứng từ thì ghi rõ vì sao</label>'+
+  '<input id="pm_ctly" placeholder="vd: thu tiền mặt tại quầy, máy in biên lai hỏng - bổ sung ảnh trong ngày">'+
+  '<div class="fhint">Bắt buộc một trong hai: <b>đính chứng từ</b> hoặc <b>ghi lý do</b>. Phiếu chỉ có lý do sẽ nằm trong ô "Phiếu thiếu chứng từ" ở màn Công nợ học viên cho tới khi bổ sung.</div></div>';
  h+='<div class="fld"><label>Hẹn thu phần còn lại (nếu chưa đủ)</label><input id="pm_due" type="date" min="'+isoDay(0)+'" value="'+(rem>0?isoHen(e.next_payment_due,paramOf("slaPayment_grace_days",7)):"")+'"><div class="fhint">Đến hẹn, hồ sơ tự nổi vào "Tới hẹn thu" thay vì chờ quá kỳ nhắc nợ.'+(rem>0?' Điền sẵn theo hẹn đang có của đơn, chưa hẹn thì lấy '+slaChip("slaPayment_grace_days",7)+' - đổi được.':'')+'</div></div>';
  if(rem>0)h+='<div class="fld full">'+zaloBtn("phi",{ten:e.student_id_name||"",tien:vnd(rem),khoa:e.course_id_name||"",han:e.next_payment_due||"hạn đã hẹn",
   gh:(function(){var _s=find("DL09","student_id",e.student_id)||{};return ghNguoiTra(_s)==="guardian"?ghTen(_s):""})()},e.enrollment_id)+'</div>';
@@ -19652,7 +19695,9 @@ function paySave(id){var e=find("DL06","enrollment_id",id);
  if(!actGuard("paySave:"+id)){toast("Khoản thu này vừa được ghi xong - chờ một chút rồi kiểm lại danh sách, đừng bấm thêm để khỏi thu hai lần.",4500);return}
  var rem0=e.remaining_amount!==undefined&&e.remaining_amount!==""?num(e.remaining_amount):Math.max(0,(num(e.final_fee)||num(e.total_fee))-num(e.paid_amount));
  if(amt>rem0){toast("Số thu "+vnd(amt)+" VƯỢT phần còn lại "+vnd(rem0)+" - không cho đóng thừa. Kiểm lại số tiền.",4500);return}
- var pay={enrollment_id:id,student_id:e.student_id,student_id_name:e.student_id_name,payment_time:nowStr(),payment_method:fldV("pm_method"),amount:amt,net_received:amt,sender_name:fldV("pm_sender"),transaction_ref:fldV("pm_ref"),received_by:CURSTAFF||"",received_by_name:myName(),payment_note:(attachVal("pay")?("Chứng từ: "+attachVal("pay")):"")};
+ var _ct=attachVal("pay"),_ctly=String(fldV("pm_ctly")||"").trim();
+ if(!_ct&&!_ctly){toast("Phiếu thu phải có chứng từ: đính ảnh biên lai / màn hình chuyển khoản, hoặc ghi rõ vì sao chưa có. Không có cái nào thì cuối tháng đối soát không đối chiếu được với khoản này.",6000);return}
+ var pay={enrollment_id:id,student_id:e.student_id,student_id_name:e.student_id_name,payment_time:nowStr(),payment_method:fldV("pm_method"),amount:amt,net_received:amt,sender_name:fldV("pm_sender"),transaction_ref:fldV("pm_ref"),received_by:CURSTAFF||"",received_by_name:myName(),chung_tu:_ct,ct_lydo:_ct?"":_ctly,payment_note:(_ct?("Chứng từ: "+_ct):"")};
  var tot=num(e.final_fee)||num(e.total_fee);var newPaid=num(e.paid_amount)+amt;var rem=Math.max(0,tot-newPaid);var pstatus=eFull("enum_payment_status",rem<=0?"paid":"partial");
  function d(pid){pay.payment_id=pid;rows("DL07").unshift(pay);e.paid_amount=newPaid;e.remaining_amount=rem;e.payment_status=pstatus;
   /* Đã có tiền vào thì đơn phải sang "đã xác nhận", nếu không học viên đóng đủ tiền vẫn
@@ -26732,6 +26777,170 @@ function renderBangcong(){
    việc, khác người dùng. Kế toán mở sổ thu để đối soát phiếu thu; ai muốn soát công thì đi tìm
    trong danh sách giảng viên chứ không ai nghĩ tới việc mở sổ học phí. Nay bảng công là một tab
    của trang Giảng viên, đứng cạnh chính những con người mà nó tính công. */
+/* ═══════════ CÔNG NỢ HỌC VIÊN - CỬA CỦA KẾ TOÁN (16/08, anh Luân đặt) ═══════════════════════
+   *"ở trang học viên, a muốn có 1 chip xem chế độ kế toán, có thể export (chỉ kế toán và quản
+   trị viên và giám đốc thấy): Danh sách học viên có thể chọn theo thời gian, giá trị tổng và
+   các đợt thanh toán đã đóng và còn phải thu"* · *"em cũng có thể bổ sung 1 trang riêng cho kế
+   toán, đỡ phải vào trang học viên của chặng 2 (tức là có 2 cổng nhỉ"*.
+
+   HAI CỔNG, MỘT MÀN. Nút trên trang Học viên KHÔNG dựng bảng tiền tại chỗ - nó `go("congno")`.
+   Dựng bảng ở cả hai nơi là hai phép cộng cho một số tiền, và tiền là thứ lệch nhau thì không
+   ai biết bên nào đúng. Cổng thứ hai tồn tại vì kế toán KHÔNG đi qua chặng 2: họ mở app ra là
+   vào thẳng, không phải nhớ rằng sổ tiền của mình nằm trong trang của học vụ.
+   *Hai cổng là hai lối vào, không phải hai bản dựng.*
+
+   VÌ SAO KHÔNG NHÉT VÀO SỔ THU HỌC PHÍ ĐÃ CÓ: sổ ấy đếm theo PHIẾU (đã thu) và theo ĐỢT (dự
+   thu) - trả lời "hôm nay tiền nào về". Màn này đếm theo NGƯỜI - trả lời "ai đang nợ bao nhiêu".
+   Cùng một kho dữ liệu, hai câu hỏi khác nhau; gộp lại là bắt một bảng trả lời hai câu.
+
+   KỲ SỐ LIỆU ÁP VÀO ĐÂU - phải nói thẳng, vì đây là chỗ dễ hiểu nhầm nhất của một bảng tiền:
+   kỳ lọc theo NGÀY ĐĂNG KÝ của đơn (đơn ký trong kỳ mới tính vào "tổng giá trị" của kỳ đó).
+   Còn "đã thu" và "còn phải thu" là số TỚI THỜI ĐIỂM NÀY của chính những đơn ấy - một khoản nợ
+   không hết nợ chỉ vì người xem đổi kỳ. Cột "Thu trong kỳ" mới là tiền thực nhận trong kỳ.
+   *Một con số đã bị trừ đi cái gì thì phải khai ra cái đó ngay cạnh nó.* */
+function cnQuyen(){try{return canSee("congno")}catch(e){return false}}
+/* Chứng từ của một phiếu: đọc cột `chung_tu` trước, rồi mới mò trong ghi chú.
+   Dữ liệu cũ nhét link vào `payment_note` dạng "Chứng từ: <url>" - gỡ cột mới ra mà quên nhánh
+   cũ thì mọi phiếu trước hôm nay đột nhiên thành "thiếu chứng từ", và kế toán đi tìm một lỗi
+   không có thật. */
+function cnChungTu(p){
+ var v=String((p&&p.chung_tu)||"").trim();if(v)return v;
+ var m=String((p&&p.payment_note)||"").match(/Chứng từ:\s*(\S.*)$/);
+ return m?String(m[1]).trim():""}
+function cnThieuCT(p){return !cnChungTu(p)&&!String((p&&p.ct_lydo)||"").trim()}
+function cnPhieuLoai(p){return num(p&&p.amount)<0?"chi":"thu"}
+/* Gom theo HỌC VIÊN. Một học viên có thể có nhiều đơn (học tiếp, đổi khoá) - cộng lại, và giữ
+   danh sách đơn để ngăn kéo bày ra từng cái. */
+/* Lọc kỳ bằng `inRep()` - HÀM APP ĐANG DÙNG cho mọi bảng theo kỳ, không tự so ngày lấy.
+   Bản đầu em viết `R.f` và `R.t` trong khi `repRange()` trả về `from` và `to`: hai thuộc tính
+   ấy là `undefined` nên mọi điều kiện lọc đều bỏ qua - đo ra Toàn kỳ, Tháng này và 30 ngày CÙNG
+   ra 90 học viên. Không lỗi, không cảnh báo, chỉ là cái nút kỳ số liệu không làm gì.
+   *Hỏi đúng cái hàm thật đang chạy, đừng hỏi cái tên mình nhớ trong đầu.* */
+function cnDs(){
+ var out=[],theo={};
+ rows("DL06").forEach(function(e){
+  if(isc(e.enrollment_status,"cancelled"))return;
+  if(!inRep(e.enrollment_time))return;
+  var sid=String(e.student_id||"").trim();
+  var key=sid||("lead:"+String(e.lead_id||e.enrollment_id));
+  if(!theo[key]){theo[key]={sid:sid,ten:e.student_id_name||e.lead_id_name||sid||"(chưa có hồ sơ)",
+    don:[],tong:0,thu:0,con:0,quahan:0,dot:0,dotDu:0,ky:0,thieu:0,khoa:{},moc:null};
+   out.push(theo[key])}
+  var G=theo[key];G.don.push(e);
+  var tot=num(e.final_fee)||num(e.total_fee);
+  G.tong+=tot;G.thu+=num(e.paid_amount);
+  G.con+=Math.max(0,tot-num(e.paid_amount));
+  if(e.course_id_name)G.khoa[e.course_id_name]=1;
+  insOf(e.enrollment_id).forEach(function(x){
+   G.dot++;if(isc(x.status,"paid"))G.dotDu++;
+   var st=insDueState(x),left=Math.max(0,num(x.due_amount)-num(x.paid_amount));
+   if((st.k==="late"||st.k==="due")&&left>0)G.quahan+=left;
+   if(left>0&&st.days!==null&&(!G.moc||st.days<G.moc.days))G.moc={days:st.days,x:x,st:st}});
+  rows("DL07").forEach(function(p){
+   if(String(p.enrollment_id||"")!==String(e.enrollment_id))return;
+   if(inRep(p.payment_time))G.ky+=num(p.amount);
+   if(cnThieuCT(p))G.thieu++})});
+ out.sort(function(a,b){return (b.quahan-a.quahan)||(b.con-a.con)});
+ return out}
+function cnLocSet(k){window.CNLOC=k;reRender("congno")}
+function cnLocCo(G,k){
+ if(k==="no")return G.con>0;
+ if(k==="quahan")return G.quahan>0;
+ if(k==="du")return G.con<=0;
+ if(k==="thieu")return G.thieu>0;
+ return true}
+function renderCongno(){
+ var all=cnDs(),lc=window.CNLOC||"";
+ var ds=lc?all.filter(function(G){return cnLocCo(G,lc)}):all;
+ var R=repRange();
+ var h=pageHead("Công nợ học viên",
+  "Từng học viên: giá trị hợp đồng, đã đóng, còn phải thu và đợt kế tiếp. Xuất ra Excel được.",
+  '');
+ h+=kyBarHTML('Kỳ lọc theo <b>ngày đăng ký đơn</b>. Cột "Đã thu" và "Còn phải thu" là số tới hôm nay của chính những đơn ấy - đổi kỳ không làm hết nợ.');
+ function S(f){return ds.reduce(function(t,G){return t+G[f]},0)}
+ h+=statStrip([
+  ["ti-receipt",vnd(S("tong")),"Tổng giá trị hợp đồng","#1E3A5F","",
+   "","Cộng học phí sau chiết khấu của mọi đơn còn hiệu lực có ngày đăng ký trong kỳ ("+ds.length+" học viên). Danh sách: chính bảng ngay dưới."],
+  ["ti-cash",vnd(S("thu")),"Đã thu","#0D9488","",
+   "","Tiền thực nhận của những đơn ấy tính tới hôm nay, đã trừ các khoản hoàn. Danh sách: cột Đã thu trong bảng dưới."],
+  ["ti-wallet",vnd(S("con")),"Còn phải thu","#B45309","",
+   "","Phần chưa vào của những đơn ấy. Danh sách: bấm chip Còn nợ ở hàng dưới."],
+  ["ti-alert-triangle",vnd(S("quahan")),"Trong đó đã quá hạn","#E24B4A","",
+   "","Các đợt đã qua ngày hẹn mà chưa đóng đủ - đây là phần phải gọi ngay, không phải phần chờ tới hạn. Danh sách: bấm chip Quá hạn."],
+  ["ti-camera-off",S("thieu"),"Phiếu thiếu chứng từ","#7C3AED","",
+   "","Phiếu thu/chi chưa đính ảnh biên lai và cũng chưa khai lý do - đối soát cuối tháng sẽ vướng đúng những phiếu này. Danh sách: bấm chip Thiếu chứng từ."]
+ ],"congno");
+ window.FLTLAST=window.FLTLAST||{};
+ window.FLTLAST.congno=ds.map(function(G){return {
+  ma_hv:G.sid,ho_ten:G.ten,khoa:Object.keys(G.khoa).join(" · "),so_don:G.don.length,
+  tong_gia_tri:G.tong,da_thu:G.thu,con_phai_thu:G.con,qua_han:G.quahan,
+  thu_trong_ky:G.ky,dot_da_dong:G.dotDu+"/"+G.dot,
+  dot_ke_tiep:G.moc?((G.moc.x.installment_no+"/"+G.moc.x.installment_of)+" hạn "+(G.moc.x.due_date||"")):"",
+  phieu_thieu_chung_tu:G.thieu}});
+ h+=tbar('<span class="tblbl">Lọc nhanh</span>'+
+  segHTML(lc,[["","Tất cả",all.length],["no","Còn nợ",all.filter(function(G){return cnLocCo(G,"no")}).length],
+   ["quahan","Quá hạn",all.filter(function(G){return cnLocCo(G,"quahan")}).length],
+   ["du","Đã đóng đủ",all.filter(function(G){return cnLocCo(G,"du")}).length],
+   ["thieu","Thiếu chứng từ",all.filter(function(G){return cnLocCo(G,"thieu")}).length]],
+   "cnLocSet('{k}')","cn_loc"),
+  '<span class="tbcnt">'+ds.length+' học viên</span>'+
+  '<button class="btn sm" onclick="pgExport(\'congno\')" data-tip="Tải '+ds.length+' dòng đang hiện ra tệp CSV - mở được bằng Excel"><i class="ti ti-table"></i>Xuất</button>');
+ h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr>'+
+  '<th>Mã</th><th>Họ tên</th><th>Khoá</th><th class="phai">Tổng giá trị</th><th class="phai">Đã thu</th>'+
+  '<th class="phai">Còn phải thu</th><th class="phai">Thu trong kỳ</th><th>Đợt</th><th>Đợt kế tiếp</th><th>Chứng từ</th>'+
+  '</tr></thead><tbody>';
+ if(!ds.length)h+='<tr><td colspan="10"><div class="empty">Không có học viên nào khớp điều kiện đang chọn. '+
+  'Nới kỳ số liệu ra <b>Toàn kỳ</b> hoặc bỏ chip lọc là thấy lại.</div></td></tr>';
+ ds.forEach(function(G){
+  h+='<tr data-mo="cnXem" data-mo-arg="'+esc(G.sid||G.ten)+'">'+
+   '<td>'+esc(G.sid||"-")+'</td><td>'+(G.sid?nguoiLnk(G.sid,G.ten):esc(G.ten))+'</td>'+
+   '<td class="khongbe">'+esc(Object.keys(G.khoa).join(" · ")||"-")+'</td>'+
+   '<td class="phai">'+vnd(G.tong)+'</td><td class="phai">'+vnd(G.thu)+'</td>'+
+   '<td class="phai">'+(G.con>0?('<b style="color:var(--red)">'+vnd(G.con)+'</b>'):'<span class="mut">0đ</span>')+'</td>'+
+   '<td class="phai">'+(G.ky?vnd(G.ky):'<span class="mut">-</span>')+'</td>'+
+   '<td class="khongbe">'+G.dotDu+'/'+G.dot+'</td>'+
+   '<td class="khongbe">'+(G.moc?('<span class="chip '+G.moc.st.cls+'">'+esc(G.moc.st.lbl)+'</span> '+esc(G.moc.x.due_date||"")):'<span class="mut">-</span>')+'</td>'+
+   '<td>'+(G.thieu?('<span class="chip red">thiếu '+G.thieu+'</span>'):'<span class="chip green">đủ</span>')+'</td></tr>'});
+ h+='</tbody></table></div></div>';
+ return h}
+/* Ngăn kéo: từng đơn -> lịch đợt -> từng phiếu thu/chi kèm chứng từ. Đây là chỗ kế toán đối
+   soát thật, nên phiếu nào thiếu chứng từ phải KÊU LÊN chứ không im lặng bỏ trống ô. */
+function cnXem(arg){
+ var G=cnDs().filter(function(x){return String(x.sid||x.ten)===String(arg)})[0];
+ if(!G){toast("Không thấy học viên này trong kỳ đang chọn.");return}
+ var h='<div class="dcard"><h4><i class="ti ti-receipt"></i>'+esc(G.ten)+'</h4>';
+ h+=ctxRows([["Mã học viên",esc(G.sid||"-")],["Số đơn",String(G.don.length)],
+  ["Tổng giá trị",vnd(G.tong)],["Đã thu",vnd(G.thu)],
+  ["Còn phải thu",G.con>0?('<b style="color:var(--red)">'+vnd(G.con)+'</b>'):"0đ"],
+  ["Trong đó quá hạn",G.quahan>0?('<b style="color:var(--red)">'+vnd(G.quahan)+'</b>'):"0đ"]]);
+ G.don.forEach(function(e){
+  h+='<div class="panel" style="margin:10px 0"><div class="ph"><b>'+esc(e.course_id_name||e.course_id||e.enrollment_id)+'</b>'+
+   '<div class="mini"><span class="mut">'+esc(e.enrollment_id)+' · ký '+esc(String(e.enrollment_time||"").split(" ")[0]||"-")+'</span></div></div><div class="pbody">';
+  h+=insTableHTML(insOf(e.enrollment_id),false);
+  var ps=rows("DL07").filter(function(p){return String(p.enrollment_id||"")===String(e.enrollment_id)});
+  h+='<div style="margin-top:10px"><b style="font-size:12px">Phiếu thu / phiếu chi</b></div>';
+  if(!ps.length)h+='<div class="empty">Đơn này chưa có phiếu nào.</div>';
+  else{
+   h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Loại</th><th>Thời điểm</th><th class="phai">Số tiền</th><th>Hình thức</th><th>Người ghi</th><th>Chứng từ</th></tr></thead><tbody>';
+   ps.forEach(function(p){var la=cnPhieuLoai(p),ct=cnChungTu(p);
+    h+='<tr><td>'+(la==="chi"?'<span class="chip red">phiếu chi</span>':'<span class="chip green">phiếu thu</span>')+'</td>'+
+     '<td class="khongbe">'+esc(p.payment_time||"-")+'</td>'+
+     '<td class="phai">'+vnd(Math.abs(num(p.amount)))+'</td>'+
+     '<td class="khongbe">'+esc(elabel(p.payment_method)||p.payment_method||"-")+'</td>'+
+     '<td class="khongbe">'+esc(p.received_by_name||"-")+'</td>'+
+     '<td>'+(ct?(linkOut(ct)||('<span class="chip green">đã có</span> '+esc(ct)))
+       :(String(p.ct_lydo||"").trim()
+         ?('<span class="chip amber" data-tip="'+esc(p.ct_lydo)+'">khai lý do</span>')
+         :'<span class="chip red">chưa có chứng từ</span>'))+'</td></tr>'});
+   h+='</tbody></table></div>'}
+  h+='</div></div>'});
+ h+='<div class="dact"><button class="btn" onclick="closeModal()">Đóng</button></div></div>';
+ openDrawer("Công nợ · "+G.ten,h)}
+/* Nút trên trang Học viên. Trả về CHUỖI RỖNG với người không có quyền - `renderList` nay chấp
+   nhận `nut` là một hàm chính vì chuyện này: một chuỗi HTML tĩnh không hỏi được "ai đang xem". */
+function cnNutHV(){
+ if(!cnQuyen())return "";
+ return '<button class="btn" onclick="go(\'congno\')" data-tip="Mở màn Công nợ học viên - giá trị hợp đồng, đã thu, còn phải thu theo từng người. Chỉ Kế toán, Giám đốc và Quản trị viên thấy nút này."><i class="ti ti-receipt"></i>Chế độ kế toán</button>'}
 function renderSothu(){var tab=window.STTAB||"da";
  if(tab==="cong"){window.STTAB="da";tab="da"}   /* tab cũ trong dấu trang / liên kết cũ -> về Đã thu */
  var nDu=duthuList().length;
@@ -28948,7 +29157,7 @@ function banNutHoSo(ttk,r){
  if(ttk==="hocvien")return '<button class="btn" onclick="window.HOSO=\''+esc(r.student_id)+'\';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>';
  return '<button class="btn" onclick="openLop(\''+esc(r.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Mở lớp</button>'}
 
-var RENDER={ban:renderBan,canhan:renderCanhan,dsphuhuynh:renderSoPH,socamket:renderSoCamKet,hoidap:renderHoidap,tracuu:renderTracuu,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,banwow:renderBanWow,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,lichwow:renderLichWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,ketqua:renderKetqua,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong,tinnhan:renderTinnhan};
+var RENDER={ban:renderBan,canhan:renderCanhan,dsphuhuynh:renderSoPH,socamket:renderSoCamKet,hoidap:renderHoidap,tracuu:renderTracuu,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,banwow:renderBanWow,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,lichwow:renderLichWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,ketqua:renderKetqua,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong,tinnhan:renderTinnhan,congno:renderCongno};
 /* ═══ V2 - 25 NGHIỆP VỤ, 25 TRANG ═══════════════════════════════════════════════════════════
    Anh Luân: *"Mỗi nghiệp vụ 1 trang, vẫn sắp xếp được theo chặng trên sidebar, nhưng mỗi trang
    là nghiệp vụ riêng, và nó có thẻ, có chip lọc, có cảnh báo của riêng nó."*
@@ -30382,7 +30591,7 @@ var NAVTREE=[
     Luân bắt được hôm 04/08 (*"a tìm trên sidebar ko thấy"*).
     Bài học lặp lại lần thứ hai: hỏi `navVis` là hỏi "có ĐƯỢC PHÉP thấy không", không phải "có
     CHỖ ĐỨNG trên menu không". Hai câu khác nhau, và cái thước phải hỏi câu thứ hai. */
- {g:"Điều hành",items:["nhansu","bangcong","canhan","settings"]},
+ {g:"Điều hành",items:["nhansu","bangcong","congno","canhan","settings"]},
  /* V2 08/08 - mười sáu cuốn sổ chỉ-đọc rời khỏi cây menu, vào sau một cửa `tracuu` (ghi chú
     dài ở bảng PAGES). `hocvien` và `giangvien` Ở LẠI vì chúng nằm trong nhịp ngày của ba nhóm. */
  /* V2 14/08 - `socamket` (Sổ cam kết đã ký, dựng cùng ngày) VÀO ĐÂY. Nó đã khai `g:"Tra cứu"`
