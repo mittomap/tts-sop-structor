@@ -886,6 +886,17 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    sang tận mép kia. Nhìn xuống là bốn ô lơ lửng cách nhau rất xa với một ô lạc lõng ở cuối.
    Cột cố định 128px + cả khối dồn về trái: bốn ô điểm và ô Điểm tổng thành MỘT CỤM đọc liền
    mạch, đúng như cách người ta gõ chúng (bốn số rồi liếc sang kết quả). */
+/* BẢNG NHẬP TỪNG ĐỢT (17/08). Dùng lại đúng bộ màu và bo góc đang có - `_checkux` chốt trần 110
+   mã màu, 16 cỡ chữ, 10 nấc bo góc, thêm một nấc mới là vượt trần mà chẳng được gì. */
+.insplan{flex:1 1 100%;display:flex;flex-direction:column;gap:8px}
+.insrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.insno{min-width:52px;font-size:12px;font-weight:700;color:var(--muted)}
+.insrow input[type="date"]{height:34px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:12px;font-weight:600;color:var(--ink);background:#fff}
+.insrow input[type="number"]{height:34px;width:150px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:13px;font-weight:700;color:var(--ink);text-align:right;background:#fff}
+.insxx{font-size:12px;font-weight:600;border-radius:6px;padding:7px 10px;display:flex;align-items:center;gap:6px}
+.insxx.ok{background:#0D948814;color:#0D9488}
+.insxx.no{background:#E24B4A14;color:#E24B4A}
+@media(max-width:700px){.insrow input[type="number"]{width:120px}}
 .rband{flex:1 1 100%;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:flex-start;gap:12px}
 .rbg{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,128px);gap:12px}
 .rbc{display:flex;flex-direction:column;gap:5px}
@@ -3265,7 +3276,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">17/08/2026 · <b>6307b4</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">17/08/2026 · <b>719f65</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -9523,7 +9534,11 @@ function dotDuyet(id){
   insSync(eid);
  }else{
   var p={};try{p=JSON.parse(r.plan||"{}")}catch(er){}
-  dotApDung(eid,num(p.n)||1,num(p.gap)||num(paramOf("installmentGap_days",30)),
+  /* Có `lich` thì áp NGUYÊN danh sách đã trình. Bản cũ luôn tính lại từ (n, gap, dep) - đúng
+     hồi lịch đợt còn do máy chia, nhưng từ 17/08 Sale sửa được từng đợt, mà tính lại là người
+     duyệt bấm đồng ý một đằng, app ghi vào sổ một nẻo. */
+  if(p.lich&&p.lich.length)dotGhiLich(eid,p.lich);
+  else dotApDung(eid,num(p.n)||1,num(p.gap)||num(paramOf("installmentGap_days",30)),
    (num(p.dep)||num(paramOf("installmentDepositPercent",40)))/100,String(p.d0||""));
  }
  markRow("DL27","req_id",id,{req_status:eFull("enum_request_status","approved")||"approved (Đã duyệt)",
@@ -11571,6 +11586,12 @@ function jUpdRow(code,id,vals,cb){jIdInit();var idk=JIDK[code]||"id";var r=find(
 function rfHTML(fs,C){var h='<div class="rform">';
  fs.forEach(function(f){var id="r_"+f[0],lb=f[1],ty=f[2]||"text",op=f[3],req=f[4],dv=(f[5]!==undefined?f[5]:"");
   if(ty==="attach"){h+=attachBox(f[0],lb);return}
+  /* Kiểu ô "ins" - bảng nhập từng đợt. Cùng họ với "band" (bốn ô điểm + ô tổng tự tính): một
+     thành phần ghép nhiều ô có ràng buộc với nhau, không tách ra thành nhiều field rời được
+     vì cái phải kiểm là TỔNG của chúng. `op` là {pre, tot}. */
+  if(ty==="ins"){h+='<div class="fld full"><label>'+esc(lb)+(req?' <i>*</i>':'')+'</label>'+
+    insEditHTML((op||{}).pre,(op||{}).tot)+
+    (f[6]?('<div class="fhint">'+esc(f[6])+'</div>'):'')+'</div>';return}
   /* KHỐI ĐIỂM BAND: bốn ô một hàng đều nhau + ô điểm tổng tự tính. `op` là mảng [mã, nhãn]. */
   if(ty==="band"){h+='<div class="rband"><div class="rbg">'+
    (op||[]).map(function(b){return '<div class="rbc"><label>'+esc(b[1])+(req?' <i>*</i>':'')+'</label>'+
@@ -11581,12 +11602,12 @@ function rfHTML(fs,C){var h='<div class="rform">';
   var full=(ty==="ta"||ty==="seg")?" full":"";
   h+='<div class="fld'+full+'"><label>'+esc(lb)+(req?' <i>*</i>':'')+'</label>';
   if(ty==="ta")h+='<textarea id="'+id+'" rows="3">'+esc(dv)+'</textarea>';
-  else if(ty==="num")h+='<input id="'+id+'" type="number" value="'+esc(dv)+'">';
+  else if(ty==="num")h+='<input id="'+id+'" type="number" value="'+esc(dv)+'"'+(f[7]?(' oninput="'+f[7]+'"'):'')+'>';
   else if(ty==="dt"){h+='<input id="'+id+'" type="datetime-local" value="'+esc(toISOdt(dv))+'">';if(f[0]==="next_followup_time")h+=dtQuickHTML(id)}
   else if(ty==="date")h+='<input id="'+id+'" type="date" value="'+esc(toISOdt(dv,1))+'">';
   else if(ty==="enum")h+='<select id="'+id+'">'+enumOpts(op,dv)+'</select>';
   else if(ty==="cres")h+='<select id="'+id+'">'+cresOpts(dv||"connected")+'</select>';
-  else if(ty==="sel")h+='<select id="'+id+'">'+op+'</select>';
+  else if(ty==="sel")h+='<select id="'+id+'"'+(f[7]?(' onchange="'+f[7]+'"'):'')+'>'+op+'</select>';
   else if(ty==="seg"){h+='<div class="rseg">'+op.map(function(o,i){return '<button type="button" class="rsb'+(i===0?" on":"")+'" data-v="'+esc(o[0])+'" onclick="rfSeg(this)"><i class="ti '+o[2]+'"></i>'+esc(o[1])+'</button>'}).join("")+'<input type="hidden" id="'+id+'" value="'+esc(op[0][0])+'"></div>'}
   else h+='<input id="'+id+'" value="'+esc(dv)+'"'+(op?' placeholder="'+esc(op)+'"':'')+'>';
   if(f[6])h+='<div class="fhint">'+esc(f[6])+'</div>';
@@ -11715,8 +11736,12 @@ var RSTEP={
   fields:function(C){var cs=C.cons[0]||{};var course=rows("DL05").filter(function(x){return x.course_name===cs.recommended_course})[0]||{};
    return [
    ["course","Khóa học","sel",rows("DL05").map(function(c){return '<option value="'+esc(c.course_id)+'"'+(c.course_id===course.course_id?" selected":"")+'>'+esc(c.course_name)+'</option>'}).join(""),1],
-   ["fee","Học phí gốc","num",null,1,course.list_price||""],
-   ["disc","Chiết khấu","num",null,0,"0","Từ "+vnd(ckThreshold())+" trở lên phải trình quản lý duyệt."],
+   /* Sửa học phí hay chiết khấu thì TỔNG PHẢI CHIA đổi theo ngay. Không nối thì người ta gõ
+      học phí 14 triệu, chia 3 đợt, rồi sửa xuống 12 triệu - bảng vẫn báo "đã chia đủ 14 triệu",
+      tức app xác nhận một con số không còn tồn tại.
+      *Ô kiểm tra tổng phải nghe được mọi ô góp vào cái tổng ấy.* */
+   ["fee","Học phí gốc","num",null,1,course.list_price||"","","insEditFee()"],
+   ["disc","Chiết khấu","num",null,0,"0","Từ "+vnd(ckThreshold())+" trở lên phải trình quản lý duyệt.","insEditFee()"],
    ["disc_reason","Lý do chiết khấu","text","vd: ưu đãi khai giảng"],
    /* V2 17/08 (anh Luân: *"tạo đăng ký thì phải chọn giữa đóng 1 lần và theo đợt chứ"*).
       Trước bản này bước tạo đơn không hỏi, đơn nào cũng ra "đóng một lần" - khách xin trả góp
@@ -11725,15 +11750,35 @@ var RSTEP={
       ẩn hiện ô kia theo, mà khung nhập của bước chạy quy trình không có cửa nào làm việc ấy -
       thêm vào là dựng riêng một cơ chế cho đúng một chỗ. *Một câu hỏi thì một ô trả lời.*
       Khoảng cách giữa hai đợt và tỷ lệ đợt đầu vẫn lấy từ CH2, không hỏi lại ở đây. */
+   /* Ô chọn số đợt ĐIỀU KHIỂN bảng nhập ngay dưới: đổi số đợt là hiện/ẩn hàng và điền lại gợi ý
+      cho những hàng chưa ai gõ tay. Bản trước chỉ có "số đợt + ngày đợt đầu", máy tự chia đều -
+      anh Luân 17/08 đòi cho sửa từng đợt, vì khách hẹn "5 triệu trước Tết, phần còn lại tháng 3"
+      thì không tham số nào tả nổi. */
    ["insn","Cách đóng học phí","sel",
      [1,2,3,4].map(function(n){return '<option value="'+n+'">'+(n===1?"Đóng một lần":("Chia "+n+" đợt"))+'</option>'}).join(""),
-     1,"1","Chia đợt thì khoảng cách và tỷ lệ đợt đầu lấy từ Cài đặt (CH2). Chức danh chưa có quyền duyệt thì lịch đợt vào hàng chờ, chưa đổi ngay."],
-   ["insd0","Ngày đóng đợt đầu","date",null,0,"","Để trống là lấy ngày tạo đơn. Chỉ dùng khi chia đợt."]]},
+     1,"1","Chức danh chưa có quyền duyệt thì lịch đợt vào hàng chờ, chưa đổi ngay.",
+     "insEditSoDot(this.value,'')"],
+   ["insplan","Lịch đóng từng đợt","ins",
+     {pre:dotGoiYLich(Math.max(0,num(course.list_price)),1,num(paramOf("installmentGap_days",30)),
+        num(paramOf("installmentDepositPercent",40))/100,new Date()),
+      tot:Math.max(0,num(course.list_price))},0,"",
+     "Tổng các đợt phải bằng đúng học phí sau chiết khấu - app tự cộng lại và báo ngay bên dưới."]]},
   save:function(C,cb){var cid=rfV("course");var cs=find("DL05","course_id",cid)||{};
    var fee=num(rfV("fee")),d=num(rfV("disc"));
    /* CH3: ap chiet khau la mot HANH DONG CO CHU, khong phai mot o nhap. Duoi nguong thi
       `ck_nho`, tu nguong tro len thi `ck_lon` - hai muc, hai nhom nguoi khac nhau. */
    if(d>0&&ckChanTheoMuc(d))return;
+   /* CHẶN Ở CỬA GHI, không chỉ cảnh báo trên màn. Dòng cảnh báo dưới bảng là để người ta sửa
+      trong lúc gõ; nhưng cảnh báo mà vẫn lưu được thì nó chỉ là một lời than. Tiền thì chỉ cần
+      thủng một lần. */
+   var _n0=Math.max(1,Math.min(4,num(rfV("insn"))||1));
+   if(_n0>1){
+    var _R=insEditDoc();
+    var _fin=Math.max(0,fee-d);
+    if(_R.lst.some(function(x){return !x.due_date})){toast("Còn đợt chưa có hạn đóng - điền đủ ngày rồi lưu.",4500);return}
+    if(Math.abs(_R.tong-_fin)>=1){
+     toast("Tổng các đợt là "+vnd(_R.tong)+", học phí sau chiết khấu là "+vnd(_fin)+" - lệch "+
+       vnd(Math.abs(_R.tong-_fin))+". Sửa lại số tiền từng đợt, hoặc đổi số đợt.",6000);return}}
    function mk(sid,sname){
     var o={lead_id:C.L.lead_id,lead_id_name:C.L.full_name,student_id:sid,student_id_name:sname,
      course_id:cid,course_id_name:cs.course_name,consultation_id:(C.cons[0]||{}).consultation_id||"",
@@ -11747,8 +11792,10 @@ var RSTEP={
      var _msg="Đã tạo đăng ký"+(d>=ckThreshold()?" - chiết khấu cần quản lý duyệt":"");
      var _gap=num(paramOf("installmentGap_days",30)),_dep=num(paramOf("installmentDepositPercent",40))/100;
      /* Chia đợt đi qua LÕI CHUNG, không tự quyết - cùng một phép "có quyền thì chia thẳng,
-        chưa có quyền thì vào hàng chờ duyệt" mà `insPlanSave` đang dùng. */
-     var _r=(_n>1)?insChiaCore(o.enrollment_id,_n,_gap,_dep,String(rfV("insd0")||"")):{ok:true,xin:false};
+        chưa có quyền thì vào hàng chờ duyệt" mà `insPlanSave` đang dùng. Truyền DANH SÁCH người
+        dùng vừa nhập, không truyền lại ba tham số để máy tính lại: người ta sửa tay chính là để
+        khác công thức. */
+     var _r=(_n>1)?insChiaCore(o.enrollment_id,_n,_gap,_dep,"",insEditDoc().lst):{ok:true,xin:false};
      /* NỀN MẶC ĐỊNH LÀ MỘT ĐỢT "1/1", ghi ra cả khi chọn đóng một lần LẪN khi yêu cầu chia đang
         chờ duyệt. Hai lý do:
          · đơn cũ trong sổ đều có đúng một đợt; để trống là đơn mới mang hình dạng khác đơn cũ,
@@ -11757,7 +11804,7 @@ var RSTEP={
            thật hiện tại, không phải một khoảng trống. Duyệt xong `dotApDung` xoá nền này rồi
            ghi lịch mới, nên không chồng lấn.
         *Mặc định cũng là một lời khai - viết nó ra, đừng để người đọc tự suy.* */
-     if(_n<=1||_r.xin)dotApDung(o.enrollment_id,1,_gap,_dep,String(rfV("insd0")||""));
+     if(_n<=1||_r.xin)dotApDung(o.enrollment_id,1,_gap,_dep,"");
      if(_n>1&&_r.ok)_msg+=_r.xin
        ? (" - đã gửi xin chia "+_n+" đợt, lịch đợt chỉ đổi sau khi được duyệt")
        : (" - đã chia "+(_r.so||_n)+" đợt");
@@ -19348,11 +19395,19 @@ function insPlanForm(eid){
   '. Khoảng cách giữa hai đợt và tỷ lệ đợt đầu lấy từ Cài đặt (CH2) - đổi ở đó là mọi hồ sơ sau đều theo.</div>';
  if(lst.length)h+=insTableHTML(lst,true);
  if(!dotAiDuyet())h+='<div class="notebar nbamber" style="margin:0 0 10px"><i class="ti ti-lock"></i>Chia lại đợt của bạn sẽ vào <b>hàng chờ duyệt</b>, chưa đổi lịch ngay - trưởng phòng hoặc kế toán chốt mới có hiệu lực. Muốn lùi hạn ĐÚNG MỘT đợt thì dùng nút <b>Xin gia hạn</b> ở bảng trên, có chỗ đính ảnh trao đổi với khách.</div>';
- h+='<div class="fld"><label>Chia thành mấy đợt</label><select id="ip_n">'+
-  [1,2,3,4].map(function(n){return '<option value="'+n+'"'+(lst.length===n?" selected":"")+'>'+n+' đợt</option>'}).join("")+'</select></div>';
- h+='<div class="fld"><label>Ngày đóng đợt đầu</label><input id="ip_d0" type="date" value="'+isoDay(0)+'"><div class="fhint">Mặc định là hôm nay - sửa lại nếu đã hẹn ngày khác.</div></div>';
- h+='<div class="fld"><label>Cách nhau bao nhiêu ngày</label><input id="ip_gap" type="number" min="1" value="'+paramOf("installmentGap_days",30)+'"></div>';
- h+='<div class="fld"><label>Đợt đầu chiếm bao nhiêu %</label><input id="ip_dep" type="number" min="1" max="100" value="'+paramOf("installmentDepositPercent",40)+'"></div>';
+ /* CÙNG BẢNG NHẬP với bước Tạo đăng ký. Trước bản này cửa đây chỉ có bốn tham số (số đợt,
+    ngày đầu, cách mấy ngày, đợt đầu mấy %) rồi để máy chia đều - còn cửa Tạo đăng ký thì cho
+    sửa từng đợt. Hai cửa cùng làm một việc mà một bên làm được nhiều hơn bên kia là chuyện
+    người dùng phải học thuộc "muốn sửa tay thì phải vào đường nào" - đúng loại bẫy dự án này
+    đã cắn nhiều lần. *Cùng một việc thì mọi cửa phải làm được như nhau.*
+    Hai ô `ip_gap` / `ip_dep` bỏ đi: chúng là THAM SỐ SINH RA gợi ý, mà nay gợi ý sửa tay được
+    trực tiếp - giữ lại là hai chỗ điều khiển cùng một kết quả, sửa chỗ nào cũng "đúng". */
+ var _pre=(lst&&lst.length>1)?lst.map(function(x){return {due_date:x.due_date,due_amount:num(x.due_amount)}})
+   :dotGoiYLich(tot,1,num(paramOf("installmentGap_days",30)),num(paramOf("installmentDepositPercent",40))/100,new Date());
+ h+='<div class="fld"><label>Chia thành mấy đợt</label><select id="ip_n" onchange="insEditSoDot(this.value,\'\')">'+
+  [1,2,3,4].map(function(n){return '<option value="'+n+'"'+(_pre.length===n?" selected":"")+'>'+n+' đợt</option>'}).join("")+'</select></div>';
+ h+='<div class="fld full"><label>Lịch đóng từng đợt</label>'+insEditHTML(_pre,tot)+
+  '<div class="fhint">Tổng các đợt phải bằng đúng học phí của đơn - app tự cộng lại và báo ngay bên dưới.</div></div>';
  h+='<div class="dact"><button class="btn primary" onclick="insPlanSave(\''+esc(eid)+'\')"><i class="ti ti-check"></i>Lưu lịch đợt</button>'+
   '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
  openDrawer("Chia lịch đóng theo đợt",h)}
@@ -19363,44 +19418,145 @@ function dotChiaTien(tot,n,dep){
  if(n===1)return [tot];
  var first=r1000(tot*dep),rest=tot-first,per=r1000(rest/(n-1));
  var a=[first];for(var i=1;i<n-1;i++)a.push(per);a.push(tot-first-per*(n-2));return a}
+/* GHI LỊCH ĐỢT THEO DANH SÁCH TƯỜNG MINH - một chỗ ghi duy nhất vào DL06b.
+   Anh Luân 17/08: *"Nếu đã chọn chia đợt, thì hiển thị cho người ta chọn ngày đóng và số tiền
+   mỗi đợt, tự cảnh báo nếu chưa đủ số tổng"*. Trước bản này lịch đợt luôn do MÁY tính từ hai
+   tham số CH2 (40% đợt đầu, cách 30 ngày) - đúng cho ca thường, nhưng khách xin "đóng 5 triệu
+   trước Tết, phần còn lại tháng 3" thì không cửa nào nhập được.
+   Nay `dotApDung` chỉ còn là lớp mồi: nó dựng danh sách gợi ý rồi gọi hàm này. Cửa nào có danh
+   sách người dùng tự sửa thì gọi thẳng vào đây.
+   *Số máy tính ra là GỢI Ý; chỗ nhập tay mới là nơi sự thật của hợp đồng nằm.* */
+/* ═══ BẢNG NHẬP TỪNG ĐỢT - MỘT thành phần, hai cửa dùng (Tạo đăng ký · ngăn kéo Chia đợt) ═════
+   Bốn hàng dựng sẵn, hàng thừa ẩn đi theo số đợt đang chọn. Vẽ sẵn rồi ẩn chứ không dựng lại DOM
+   mỗi lần đổi số đợt: người ta gõ tay số tiền đợt 1 rồi đổi từ 2 sang 3 đợt mà dựng lại là mất
+   số vừa gõ - và mất im lặng, không ai báo.
+   Ô "còn thiếu / đã thừa" tính lại mỗi lần gõ. `_checkux` đòi mọi ô nhập phải có lời giải thích,
+   nên mỗi hàng nói rõ nó là đợt mấy. */
+var INSMAX=4;
+function insEditHTML(pre,tot){
+ var h='<div class="insplan" id="insplan"><div class="fhint" style="margin:0 0 6px">'+
+  'Số tiền và hạn dưới đây <b>điền sẵn theo Cài đặt (CH2)</b>: đợt đầu '+
+  esc(String(paramOf("installmentDepositPercent",40)))+'% học phí, các đợt cách nhau '+
+  esc(String(paramOf("installmentGap_days",30)))+' ngày. Sửa được từng ô - khách hẹn kiểu nào thì ghi đúng kiểu ấy.</div>';
+ /* ĐIỀN SẴN NGÀY CHO CẢ BỐN HÀNG, kể cả hàng đang ẩn. `_checkux` đòi "mọi ô chọn ngày đều có
+    sẵn yyyy-mm-dd" và nó đúng: người ta đổi từ 2 lên 4 đợt là hai hàng vừa hiện ra trống trơn,
+    phải tự nghĩ ra hai cái ngày. Ngày thì tính được mà không cần biết chia mấy đợt (đợt đầu +
+    30 ngày mỗi bước), nên điền luôn; số tiền phụ thuộc số đợt nên chỉ điền cho hàng đang dùng.
+    *Thứ nào đoán được hộ người dùng thì đoán sẵn, đừng bắt họ gõ lại cái máy đã biết.* */
+ var _d0=(pre&&pre[0]&&pvnd(pre[0].due_date))||new Date();
+ var _gapd=num(paramOf("installmentGap_days",30));
+ function _z(v){return v<10?"0"+v:v}
+ for(var i=0;i<INSMAX;i++){
+  var r=(pre&&pre[i])||{};
+  if(!r.due_date){var _dd=new Date(_d0.getTime()+_gapd*i*864e5);
+   r={due_date:_z(_dd.getDate())+"/"+_z(_dd.getMonth()+1)+"/"+_dd.getFullYear(),due_amount:r.due_amount}}
+  h+='<div class="insrow" id="insrow_'+i+'"'+(i>=((pre&&pre.length)||1)?' style="display:none"':'')+'>'+
+   '<span class="insno">Đợt '+(i+1)+'</span>'+
+   '<input type="date" id="ins_d_'+i+'" aria-label="Hạn đóng đợt '+(i+1)+'" value="'+esc(toISOdt(r.due_date||"",1))+'" onchange="this.dataset.tay=1;insEditTong()">'+
+   '<input type="number" id="ins_a_'+i+'" aria-label="Số tiền đợt '+(i+1)+'" min="0" step="1000" value="'+esc(String(r.due_amount||""))+'" oninput="this.dataset.tay=1;insEditTong()">'+
+   '</div>'}
+ h+='<div class="insxx" id="insxx"></div><input type="hidden" id="ins_tot" value="'+esc(String(num(tot)))+'"></div>';
+ return h}
+/* Đọc các hàng ĐANG HIỆN. Trả về {lst, tong, tot, thieu} - `thieu` dương là còn thiếu, âm là thừa. */
+function insEditDoc(){
+ var lst=[],tong=0;
+ for(var i=0;i<INSMAX;i++){
+  var row=document.getElementById("insrow_"+i);
+  if(!row||row.style.display==="none")continue;
+  var d=fldV("ins_d_"+i),a=num(fldV("ins_a_"+i));
+  lst.push({due_date:d?fromISOdt(d).split(" ")[0]:"",due_amount:a});tong+=a}
+ var tot=num(fldV("ins_tot"));
+ return {lst:lst,tong:tong,tot:tot,thieu:tot-tong}}
+/* CẢNH BÁO NGAY LÚC GÕ, không đợi bấm Lưu. Sale gõ xong bốn ô rồi bấm Lưu mới bị chặn thì họ
+   phải tự dò xem sai ở đâu; nói ngay dưới bảng thì họ sửa đúng ô vừa gõ.
+   *Chỗ báo sai phải nằm cạnh chỗ gây ra sai, và phải nói ra CÒN THIẾU BAO NHIÊU, không chỉ "sai".* */
+function insEditTong(){
+ var el=document.getElementById("insxx");if(!el)return;
+ var R=insEditDoc();
+ var trong=R.lst.filter(function(x){return !x.due_date}).length;
+ if(Math.abs(R.thieu)<1&&!trong){
+  el.className="insxx ok";
+  el.innerHTML='<i class="ti ti-check"></i>Đã chia đủ <b>'+vnd(R.tot)+'</b> thành '+R.lst.length+' đợt.';return}
+ var c=[];
+ if(R.thieu>0)c.push('còn thiếu <b>'+vnd(R.thieu)+'</b> so với học phí '+vnd(R.tot));
+ else if(R.thieu<0)c.push('đang thừa <b>'+vnd(-R.thieu)+'</b> so với học phí '+vnd(R.tot));
+ if(trong)c.push(trong+' đợt chưa có hạn đóng');
+ /* Câu khuyên phải khớp với chỗ đang sai. Bản đầu lúc nào cũng nói "sửa lại số tiền, hoặc đổi
+    số đợt" - kể cả khi lỗi duy nhất là một đợt CHƯA CÓ HẠN, tức chỉ vào đúng cái ô không có lỗi.
+    *Một câu khuyên nói sai chỗ còn tệ hơn không khuyên: nó cử người ta đi sửa thứ đang đúng.* */
+ var khuyen=(R.thieu!==0)
+   ? (trong?"Điền nốt hạn còn thiếu và cân lại số tiền.":"Sửa lại số tiền từng đợt, hoặc đổi số đợt ở ô trên.")
+   : "Điền nốt hạn đóng cho đợt còn trống.";
+ el.className="insxx no";
+ el.innerHTML='<i class="ti ti-alert-triangle"></i>'+c.join(' · ')+'. '+khuyen;}
+/* Đổi số đợt: hiện/ẩn hàng rồi ĐIỀN LẠI GỢI Ý cho các hàng CHƯA ai gõ. Hàng người ta đã sửa tay
+   thì giữ nguyên - máy không được đè lên con số người dùng vừa cân nhắc. */
+/* Học phí sau chiết khấu đổi -> cập nhật tổng phải chia rồi điền lại gợi ý. */
+function insEditFee(){
+ var el=document.getElementById("ins_tot");if(!el)return;
+ el.value=String(Math.max(0,num(fldV("r_fee"))-num(fldV("r_disc"))));
+ insEditSoDot(fldV("r_insn")||"1","")}
+function insEditSoDot(n,d0raw){
+ n=Math.max(1,Math.min(INSMAX,num(n)||1));
+ var tot=num(fldV("ins_tot"));
+ var d0=d0raw?pvnd(fromISOdt(d0raw)):null;if(!d0)d0=new Date();
+ var goi=dotGoiYLich(tot,n,num(paramOf("installmentGap_days",30)),
+   num(paramOf("installmentDepositPercent",40))/100,d0);
+ for(var i=0;i<INSMAX;i++){
+  var row=document.getElementById("insrow_"+i);if(!row)continue;
+  row.style.display=(i<n)?"":"none";
+  if(i<n){
+   var da=document.getElementById("ins_d_"+i),aa=document.getElementById("ins_a_"+i);
+   if(da&&!da.dataset.tay)da.value=toISOdt(goi[i].due_date,1);
+   if(aa&&!aa.dataset.tay)aa.value=String(goi[i].due_amount)}}
+ insEditTong()}
+function dotGhiLich(eid,lst){
+ var e=find("DL06","enrollment_id",eid);if(!e||!lst||!lst.length)return 0;
+ DL.DL06b=(DL.DL06b||[]).filter(function(x){return String(x.enrollment_id||"")!==String(eid)});
+ lst.forEach(function(r,i){
+  DL.DL06b.push({schedule_id:"SCH-"+seqNo("DL06b","schedule_id",4),enrollment_id:eid,
+   student_id:e.student_id||"",student_id_name:e.student_id_name||"",
+   course_id:e.course_id||"",course_id_name:e.course_id_name||"",
+   installment_no:i+1,installment_of:lst.length,
+   due_date:r.due_date||"",
+   due_amount:Math.round(num(r.due_amount)),paid_amount:0,remaining_amount:Math.round(num(r.due_amount)),
+   status:eFull("enum_installment_status","upcoming"),paid_time:"",note:"",next_action:""})});
+ insSync(eid);return lst.length}
+/* Dựng DANH SÁCH GỢI Ý từ hai tham số CH2 - dùng để điền sẵn ô nhập, và cũng là bản mặc định
+   khi không ai sửa gì. Trả về [{due_date, due_amount}]. */
+function dotGoiYLich(tot,n,gap,dep,d0){
+ function z(v){return v<10?"0"+v:v}
+ return dotChiaTien(tot,n,dep).map(function(amt,i){
+  var d=new Date(d0.getTime()+gap*i*864e5);
+  return {due_date:z(d.getDate())+"/"+z(d.getMonth()+1)+"/"+d.getFullYear(),due_amount:Math.round(amt)}})}
 function dotApDung(eid,n,gap,dep,d0raw){
  var e=find("DL06","enrollment_id",eid);if(!e)return false;
  var d0=d0raw?pvnd(fromISOdt(d0raw)):(pvnd(e.enrollment_time)||new Date());
  if(!d0)d0=new Date();
  var tot=num(e.final_fee)||num(e.total_fee);
  if(tot<=0){toast("Đơn này chưa có học phí để chia đợt.");return false}
- var amts=dotChiaTien(tot,n,dep);
- DL.DL06b=(DL.DL06b||[]).filter(function(x){return String(x.enrollment_id||"")!==String(eid)});
- amts.forEach(function(amt,i){
-  var d=new Date(d0.getTime()+gap*i*864e5);
-  function z(v){return v<10?"0"+v:v}
-  DL.DL06b.push({schedule_id:"SCH-"+seqNo("DL06b","schedule_id",4),enrollment_id:eid,
-   student_id:e.student_id||"",student_id_name:e.student_id_name||"",
-   course_id:e.course_id||"",course_id_name:e.course_id_name||"",
-   installment_no:i+1,installment_of:amts.length,
-   due_date:z(d.getDate())+"/"+z(d.getMonth()+1)+"/"+d.getFullYear(),
-   due_amount:Math.round(amt),paid_amount:0,remaining_amount:Math.round(amt),
-   status:eFull("enum_installment_status","upcoming"),paid_time:"",note:"",next_action:""})});
- insSync(eid);return amts.length}
+ return dotGhiLich(eid,dotGoiYLich(tot,n,gap,dep,d0))}
 function insPlanSave(eid){
  if(!actGuard("insPlan:"+eid))return;
  var e=find("DL06","enrollment_id",eid);if(!e)return;
  var n=Math.max(1,Math.min(4,num(fldV("ip_n"))||1));
- var gap=Math.max(1,num(fldV("ip_gap"))||paramOf("installmentGap_days",30));
- var dep=Math.max(1,Math.min(100,num(fldV("ip_dep"))||paramOf("installmentDepositPercent",40)))/100;
- var d0raw=(fldV("ip_d0")||"").trim();
- var d0=d0raw?pvnd(fromISOdt(d0raw)):(pvnd(e.enrollment_time)||new Date());
- if(!d0)d0=new Date();
+ var gap=num(paramOf("installmentGap_days",30));
+ var dep=num(paramOf("installmentDepositPercent",40))/100;
+ var d0raw="";
  var tot=num(e.final_fee)||num(e.total_fee);
  if(tot<=0){toast("Đơn này chưa có học phí để chia đợt.");return}
- var amts=dotChiaTien(tot,n,dep);
+ var _R=insEditDoc();
+ if(_R.lst.some(function(x){return !x.due_date})){toast("Còn đợt chưa có hạn đóng - điền đủ ngày rồi lưu.",4500);return}
+ if(Math.abs(_R.thieu)>=1){
+  toast("Tổng các đợt là "+vnd(_R.tong)+", học phí của đơn là "+vnd(_R.tot)+" - lệch "+
+   vnd(Math.abs(_R.thieu))+". Sửa lại số tiền từng đợt, hoặc đổi số đợt.",6000);return}
  /* V2 12/08 (SALE-5) - CHƯA CÓ QUYỀN THÌ GỬI XIN DUYỆT, KHÔNG GHI THẲNG. Chặn ở CỬA GHI chứ
     không ẩn nút: ẩn nút thì người ta vẫn tới đây bằng đường khác, mà tiền thì chỉ cần thủng
     một lần. */
  /* GỌI LÕI CHUNG. Bản đầu của lần tách này em dựng `insChiaCore` rồi để nguyên bản sao ở đây -
     tức khai là "tách lõi" mà thực chất thành HAI bản luật cho một quyết định, đúng thứ vừa nói
     là phải tránh. *Tách một hàm ra mà không đi gỡ chỗ cũ thì mới chỉ nhân đôi, chưa phải tách.* */
- var _r=insChiaCore(eid,n,gap,dep,d0raw);
+ var _r=insChiaCore(eid,n,gap,dep,d0raw,_R.lst);
  if(!_r.ok)return;
  closeModal();
  toast(_r.xin?("Đã gửi xin chia lại thành "+n+" đợt. Lịch đợt chỉ đổi sau khi được duyệt."):
@@ -19415,7 +19571,7 @@ function insPlanSave(eid){
    qua. Bản đầu của kho mẫu tin đã cắn đúng chuyện này hai lần trong ngày hôm qua.
    Trả về: {ok, xin} - `xin` là true khi yêu cầu đã vào hàng chờ duyệt thay vì áp ngay.
    *Một quyết định thì một chỗ quyết, mọi cửa gọi vào đó.* */
-function insChiaCore(eid,n,gap,dep,d0raw){
+function insChiaCore(eid,n,gap,dep,d0raw,lst){
  var e=find("DL06","enrollment_id",eid);if(!e)return {ok:false,xin:false};
  var tot=num(e.final_fee)||num(e.total_fee);
  if(tot<=0){toast("Đơn này chưa có học phí để chia đợt.");return {ok:false,xin:false}}
@@ -19424,20 +19580,22 @@ function insChiaCore(eid,n,gap,dep,d0raw){
    thế là mở một lối lách: ai muốn bỏ lịch đợt chỉ cần chọn "1 đợt".
    Riêng đơn VỪA TẠO chọn đóng một lần thì bước Tạo đăng ký xử riêng (xem ghi chú ở đó): lúc ấy
    chưa có lịch đợt nào để mà đổi, nên không có gì để duyệt. */
+ /* `lst` là lịch NGƯỜI DÙNG TỰ NHẬP. Có thì dùng nguyên; không có thì dựng gợi ý từ CH2.
+    Yêu cầu gửi đi hàng chờ mang theo CHÍNH danh sách ấy, để người duyệt bấm Duyệt là áp đúng
+    thứ đã xin - chứ không phải áp một lịch máy tính lại từ ba tham số.
+    *Cái được duyệt phải là đúng cái đã trình, từng con số một.* */
+ var d0=d0raw?pvnd(fromISOdt(d0raw)):(pvnd(e.enrollment_time)||new Date());
+ if(!d0)d0=new Date();
+ var L=(lst&&lst.length)?lst:dotGoiYLich(tot,n,gap,dep,d0);
  if(!dotAiDuyet()){
-  var d0=d0raw?pvnd(fromISOdt(d0raw)):(pvnd(e.enrollment_time)||new Date());
-  if(!d0)d0=new Date();
-  var _mo=dotChiaTien(tot,n,dep).map(function(amt,i){
-   var d=new Date(d0.getTime()+gap*i*864e5);
-   function z(v){return v<10?"0"+v:v}
-   return "Đợt "+(i+1)+": "+vnd(Math.round(amt))+" hạn "+z(d.getDate())+"/"+z(d.getMonth()+1)+"/"+d.getFullYear()}).join(" · ");
+  var _mo=L.map(function(r,i){return "Đợt "+(i+1)+": "+vnd(num(r.due_amount))+" hạn "+(r.due_date||"chưa đặt")}).join(" · ");
   dotTao({req_type:eFull("enum_dot_req_type","replan")||"replan (Xin chia lại đợt)",
    enrollment_id:eid,student_id:e.student_id||"",student_id_name:e.student_id_name||e.student_id||"",
    installment_no:"",due_old:"",due_new:"",amount:String(tot),
-   plan:JSON.stringify({n:n,gap:gap,dep:Math.round(dep*100),d0:d0raw||""}),
+   plan:JSON.stringify({n:L.length,gap:gap,dep:Math.round(dep*100),d0:d0raw||"",lich:L}),
    reason:_mo,evidence:""});
-  return {ok:true,xin:true,so:n}}
- var so=dotApDung(eid,n,gap,dep,d0raw);
+  return {ok:true,xin:true,so:L.length}}
+ var so=dotGhiLich(eid,L);
  return {ok:!!so,xin:false,so:so}}
 /* Bảng lịch đợt dùng chung cho màn thu tiền, drawer chia đợt và phiếu in. */
 /* `acts` bật thêm cột thao tác: nút XIN GIA HẠN cho từng đợt chưa đóng (SALE-4). Đặt ngay trên

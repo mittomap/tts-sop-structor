@@ -145,19 +145,54 @@ t("hoan tien goi ham loi insSync", /function duyetRefundRun[\s\S]{0,2000}?insSyn
 })();
 
 /* ---- 5. CHIA LAI LICH DOT ---- */
+/* 17/08 - CUA CHIA DOT DOI HINH DANG: truoc day bon tham so (so dot, ngay dau, cach may ngay,
+   dot dau may %) roi de MAY chia; nay Sale go tay tung dot (anh Luan: *"hien thi cho nguoi ta
+   chon ngay dong va so tien moi dot, tu canh bao neu chua du so tong"*).
+   Hai MUC TIEU cu van con nguyen, chi doi cho hoi:
+    · "gap 30 ngay / dot dau 40%" gio la LUAT CUA GOI Y -> hoi thang `dotGoiYLich`;
+    · "chia lai duoc / giu tong tien / phan bo dung tien da dong" -> hoi `insPlanSave` nhung dien
+      vao bang nhap moi, va doi hoi CHAT HON ban cu: lich ghi vao so phai KHOP TUNG CON SO voi
+      cai vua go, khong duoc la mot lich may tu tinh lai.
+   Them mot phep thu cho luat moi: go lech tong thi cua ghi phai TU CHOI. */
 (function(){
  var e=rows("DL06").filter(function(x){return !isc(x.enrollment_status,"cancelled")&&num(x.final_fee)>0})[0];
- var d=new Date(Date.now()+3*864e5);function z(n){return n<10?"0"+n:n}
- reset();setF({ip_n:"3",ip_d0:d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate()),ip_gap:"30",ip_dep:"40"});
+ var tot=num(e.final_fee);
+ /* --- luat cua GOI Y (van lay tu CH2) --- */
+ var G=dotGoiYLich(tot,3,30,0.4,new Date());
+ t("goi y: han cac dot cach nhau dung so ngay CH2",
+   (function(){var a=pvnd(G[0].due_date),b=pvnd(G[1].due_date);return a&&b&&Math.round((b-a)/864e5)===30})());
+ t("goi y: dot dau chiem dung ty le CH2", Math.abs(num(G[0].due_amount)-Math.round(tot*0.4/1000)*1000)<=1000);
+ t("goi y: tong cac dot = hoc phi", Math.abs(G.reduce(function(a,x){return a+num(x.due_amount)},0)-tot)<=1);
+ /* --- bat chuoc bang nhap tren man: 4 hang, hang thua an di --- */
+ function bang(tot2,rows_){
+  var F2={ins_tot:String(tot2)};
+  for(var i=0;i<4;i++){F2["ins_d_"+i]=rows_[i]?rows_[i].d:"";F2["ins_a_"+i]=rows_[i]?String(rows_[i].a):""}
+  reset();setF(F2);
+  for(var j=0;j<4;j++){var el=document.getElementById("insrow_"+j);el.style.display=rows_[j]?"":"none"}
+  document.getElementById("ip_n").value=String(rows_.length);
+  FIELDS.ip_n=String(rows_.length);
+ }
+ /* 1. go LECH tong -> phai bi tu choi */
+ var truoc=insOf(e.enrollment_id).length;
+ bang(tot,[{d:"2026-09-01",a:1000},{d:"2026-10-01",a:1000}]);
+ insPlanSave(e.enrollment_id);
+ t("go lech tong -> cua ghi TU CHOI, lich dot giu nguyen", insOf(e.enrollment_id).length===truoc);
+ /* 2. go DUNG tong, lich tu dat -> ghi vao so DUNG TUNG CON SO */
+ var a1=Math.round(tot*0.5/1000)*1000, a2=tot-a1;
+ bang(tot,[{d:"2026-12-20",a:a1},{d:"2027-03-10",a:a2},{d:"2027-04-10",a:0}]);
+ /* dot 3 = 0 la co y sai -> van phai bi tu choi vi tong van khop nhung mot dot rong khong hop le?
+    Khong: tong van khop, app cho qua - o day chi kiem tong. Doi lai thanh 3 dot chia that. */
+ var b1=Math.round(tot*0.4/1000)*1000,b2=Math.round(tot*0.3/1000)*1000,b3=tot-b1-b2;
+ bang(tot,[{d:"2026-12-20",a:b1},{d:"2027-03-10",a:b2},{d:"2027-04-10",a:b3}]);
  insPlanSave(e.enrollment_id);
  var L=insOf(e.enrollment_id);
  t("chia lai duoc thanh 3 dot", L.length===3);
- t("chia lai van giu tong tien = hoc phi", Math.abs(L.reduce(function(a,x){return a+num(x.due_amount)},0)-num(e.final_fee))<=1);
+ t("chia lai van giu tong tien = hoc phi", Math.abs(L.reduce(function(a,x){return a+num(x.due_amount)},0)-tot)<=1);
  t("chia lai xong van phan bo dung tien da dong",
    Math.abs(L.reduce(function(a,x){return a+num(x.paid_amount)},0)-num(e.paid_amount))<=1);
- t("chia lai xong han cac dot cach nhau dung so ngay",
-   (function(){var a=pvnd(L[0].due_date),b=pvnd(L[1].due_date);return a&&b&&Math.round((b-a)/864e5)===30})());
- t("dot dau chiem dung ty le da chon", Math.abs(num(L[0].due_amount)-Math.round(num(e.final_fee)*0.4/1000)*1000)<=1000);
+ t("lich ghi vao so KHOP TUNG CON SO voi cai vua go",
+   L.length===3 && String(L[0].due_date)==="20/12/2026" && String(L[2].due_date)==="10/04/2027" &&
+   num(L[0].due_amount)===b1 && num(L[1].due_amount)===b2 && num(L[2].due_amount)===b3);
 })();
 
 /* ---- 5b. DOI DOT DONG PHAI QUA MOT NGUOI DUYET (V2 12/08, SALE-4 + SALE-5) ----
@@ -187,8 +222,14 @@ t("hoan tien goi ham loi insSync", /function duyetRefundRun[\s\S]{0,2000}?insSyn
  /* NV tu van bam Luu lich dot -> KHONG duoc doi DL06b, phai de lai mot yeu cau cho duyet */
  vao(sale?sale.staff_id:"NV001");
  var truoc=insOf(e.enrollment_id).length, choTruoc=dotCho().length;
- var d=new Date(Date.now()+3*864e5);function z(n){return n<10?"0"+n:n}
- reset();setF({ip_n:"4",ip_d0:d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate()),ip_gap:"20",ip_dep:"50"});
+ /* Dien vao BANG NHAP moi thay cho bon tham so cu (xem ghi chu o khoi "chia lai dot" ben tren). */
+ var _tot=num(e.final_fee)||num(e.total_fee);
+ var _c1=Math.round(_tot*0.4/1000)*1000,_c2=Math.round(_tot*0.2/1000)*1000,_c3=Math.round(_tot*0.2/1000)*1000;
+ var _lich=[{d:"2026-12-05",a:_c1},{d:"2027-01-05",a:_c2},{d:"2027-02-05",a:_c3},{d:"2027-03-05",a:_tot-_c1-_c2-_c3}];
+ var _F={ins_tot:String(_tot),ip_n:"4"};
+ for(var _i=0;_i<4;_i++){_F["ins_d_"+_i]=_lich[_i].d;_F["ins_a_"+_i]=String(_lich[_i].a)}
+ reset();setF(_F);
+ for(var _j=0;_j<4;_j++)document.getElementById("insrow_"+_j).style.display="";
  insPlanSave(e.enrollment_id);
  t("sale chia lai dot -> lich dot GIU NGUYEN", insOf(e.enrollment_id).length===truoc);
  t("sale chia lai dot -> de lai mot yeu cau cho duyet", dotCho().length===choTruoc+1);
@@ -200,6 +241,12 @@ t("hoan tien goi ham loi insSync", /function duyetRefundRun[\s\S]{0,2000}?insSyn
  t("duyet xong -> yeu cau khong con nam trong hang cho", dotCho().indexOf(yc)<0);
  t("duyet xong -> van giu tong tien = hoc phi",
    Math.abs(insOf(e.enrollment_id).reduce(function(a,x){return a+num(x.due_amount)},0)-num(e.final_fee))<=1);
+ /* LUAT MOI 17/08: nguoi duyet bam dong y thi so phai ghi DUNG CAI DA TRINH, khong duoc tinh lai
+    tu (so dot, gap, %) - vi tu nay Sale sua tay tung dot. */
+ t("duyet xong -> lich trong so KHOP TUNG CON SO voi cai sale da trinh",
+   (function(){var L2=insOf(e.enrollment_id);
+    return L2.length===4 && String(L2[0].due_date)==="05/12/2026" && String(L2[3].due_date)==="05/03/2027" &&
+      num(L2[0].due_amount)===_c1 && num(L2[1].due_amount)===_c2})());
  window.GATE_SID="";applyScope("");setRole("all");CURSTAFF=_cs;
 })();
 
@@ -499,8 +546,12 @@ t("tipShow khong ve lai khi chuot di trong cung mot the", /if\(TIPCUR===el\)retu
  setF({tk_to:"NV007",tk_ti:"viec moi",tk_ct:"noi dung",tk_du:"2026-12-31T10:00",tk_ty:"assign",tk_pr:"normal"});
  door("tkNewSave (giao viec moi)",function(){tkNewSave()});
  var en=rows("DL06").filter(function(x){return num(x.final_fee)>0})[0];
- var dd=new Date(Date.now()+3*864e5);function z(n){return n<10?"0"+n:n}
- reset();setF({ip_n:"2",ip_d0:dd.getFullYear()+"-"+z(dd.getMonth()+1)+"-"+z(dd.getDate()),ip_gap:"30",ip_dep:"50"});
+ /* Dien BANG NHAP moi - cua ghi tu 17/08 doc tung dot chu khong doc bon tham so nua. */
+ (function(){var _t=num(en.final_fee)||num(en.total_fee),_h1=Math.round(_t*0.5/1000)*1000;
+  var _F={ins_tot:String(_t),ip_n:"2",ins_d_0:"2026-12-01",ins_a_0:String(_h1),
+    ins_d_1:"2027-01-01",ins_a_1:String(_t-_h1),ins_d_2:"",ins_a_2:"",ins_d_3:"",ins_a_3:""};
+  reset();setF(_F);
+  for(var _k=0;_k<4;_k++)document.getElementById("insrow_"+_k).style.display=(_k<2)?"":"none"})();
  door("insPlanSave",function(){insPlanSave(en.enrollment_id)});
  CURSTAFF="";CUR="banlam";setF({});
  /* doi trang thai xong phai NOI RO ket qua, khong chi bao "da doi" roi de nguoi dung doan */
