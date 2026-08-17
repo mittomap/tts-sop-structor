@@ -11691,7 +11691,18 @@ var RSTEP={
    ["course","Khóa học","sel",rows("DL05").map(function(c){return '<option value="'+esc(c.course_id)+'"'+(c.course_id===course.course_id?" selected":"")+'>'+esc(c.course_name)+'</option>'}).join(""),1],
    ["fee","Học phí gốc","num",null,1,course.list_price||""],
    ["disc","Chiết khấu","num",null,0,"0","Từ "+vnd(ckThreshold())+" trở lên phải trình quản lý duyệt."],
-   ["disc_reason","Lý do chiết khấu","text","vd: ưu đãi khai giảng"]]},
+   ["disc_reason","Lý do chiết khấu","text","vd: ưu đãi khai giảng"],
+   /* V2 17/08 (anh Luân: *"tạo đăng ký thì phải chọn giữa đóng 1 lần và theo đợt chứ"*).
+      Trước bản này bước tạo đơn không hỏi, đơn nào cũng ra "đóng một lần" - khách xin trả góp
+      ngay lúc chốt thì phải tạo đơn xong rồi mở tiếp màn Thanh toán mới chia được.
+      Một ô CHỌN SỐ ĐỢT chứ không phải hai ô (một ô bật/tắt rồi một ô số): ô bật/tắt thì phải
+      ẩn hiện ô kia theo, mà khung nhập của bước chạy quy trình không có cửa nào làm việc ấy -
+      thêm vào là dựng riêng một cơ chế cho đúng một chỗ. *Một câu hỏi thì một ô trả lời.*
+      Khoảng cách giữa hai đợt và tỷ lệ đợt đầu vẫn lấy từ CH2, không hỏi lại ở đây. */
+   ["insn","Cách đóng học phí","sel",
+     [1,2,3,4].map(function(n){return '<option value="'+n+'">'+(n===1?"Đóng một lần":("Chia "+n+" đợt"))+'</option>'}).join(""),
+     1,"1","Chia đợt thì khoảng cách và tỷ lệ đợt đầu lấy từ Cài đặt (CH2). Chức danh chưa có quyền duyệt thì lịch đợt vào hàng chờ, chưa đổi ngay."],
+   ["insd0","Ngày đóng đợt đầu","date",null,0,"","Để trống là lấy ngày tạo đơn. Chỉ dùng khi chia đợt."]]},
   save:function(C,cb){var cid=rfV("course");var cs=find("DL05","course_id",cid)||{};
    var fee=num(rfV("fee")),d=num(rfV("disc"));
    /* CH3: ap chiet khau la mot HANH DONG CO CHU, khong phai mot o nhap. Duoi nguong thi
@@ -11705,7 +11716,26 @@ var RSTEP={
      discount_type:d?eFull("enum_discount_type","promotion"):"",
      final_fee:Math.max(0,fee-d),paid_amount:0,remaining_amount:Math.max(0,fee-d),
      payment_status:eFull("enum_payment_status","unpaid")};
-    jSaveRow("DL06",o,function(){cb("Đã tạo đăng ký"+(d>=ckThreshold()?" - chiết khấu cần quản lý duyệt":""))})}
+    jSaveRow("DL06",o,function(){
+     var _n=Math.max(1,Math.min(4,num(rfV("insn"))||1));
+     var _msg="Đã tạo đăng ký"+(d>=ckThreshold()?" - chiết khấu cần quản lý duyệt":"");
+     var _gap=num(paramOf("installmentGap_days",30)),_dep=num(paramOf("installmentDepositPercent",40))/100;
+     /* Chia đợt đi qua LÕI CHUNG, không tự quyết - cùng một phép "có quyền thì chia thẳng,
+        chưa có quyền thì vào hàng chờ duyệt" mà `insPlanSave` đang dùng. */
+     var _r=(_n>1)?insChiaCore(o.enrollment_id,_n,_gap,_dep,String(rfV("insd0")||"")):{ok:true,xin:false};
+     /* NỀN MẶC ĐỊNH LÀ MỘT ĐỢT "1/1", ghi ra cả khi chọn đóng một lần LẪN khi yêu cầu chia đang
+        chờ duyệt. Hai lý do:
+         · đơn cũ trong sổ đều có đúng một đợt; để trống là đơn mới mang hình dạng khác đơn cũ,
+           và màn Công nợ đọc ra "0/0 đợt" trong khi tiền thì vẫn phải thu;
+         · đơn đang chờ duyệt chia 3 thì tới lúc này nó VẪN đang là đóng một lần - đó mới là sự
+           thật hiện tại, không phải một khoảng trống. Duyệt xong `dotApDung` xoá nền này rồi
+           ghi lịch mới, nên không chồng lấn.
+        *Mặc định cũng là một lời khai - viết nó ra, đừng để người đọc tự suy.* */
+     if(_n<=1||_r.xin)dotApDung(o.enrollment_id,1,_gap,_dep,String(rfV("insd0")||""));
+     if(_n>1&&_r.ok)_msg+=_r.xin
+       ? (" - đã gửi xin chia "+_n+" đợt, lịch đợt chỉ đổi sau khi được duyệt")
+       : (" - đã chia "+(_r.so||_n)+" đợt");
+     cb(_msg)})}
    if(C.sid)mk(C.sid,C.name);
    else ensureStudent(C.L.lead_id,function(sid){var S=find("DL09","student_id",sid)||{};mk(sid,S.full_name||C.name)})},
   alt:[{lb:"Khách đổi ý - không đăng ký nữa",ic:"ti-user-x",fn:"runReject"}]},
@@ -11715,15 +11745,24 @@ var RSTEP={
    ["amount","Số tiền thu","num",null,1,rem],
    ["method","Hình thức","enum","enum_payment_method",1,eFull("enum_payment_method","bank_transfer")],
    ["ref","Mã giao dịch","text","vd: FT2607..."],
-   ["pay","Ảnh biên lai","attach"]]},
+   /* CỬA GHI TIỀN THỨ BA - suýt lọt. Luật "phiếu thu phải có chứng từ" (17/08) em cắm ở `paySave`
+      và `duyetRefundRun`, quên mất bước `pay` của luồng chạy quy trình cũng ghi thẳng vào DL07
+      bằng payload riêng của nó. Để nguyên là có một đường đi vòng hợp lệ quanh chính cái luật
+      vừa đặt - mà đó lại là đường Sale đi nhiều nhất khi dắt tay khách qua từng bước.
+      *Đặt một luật ở cửa ghi thì phải đi đếm xem có mấy cửa ghi, đừng đếm mấy cái mình nhớ.* */
+   ["pay","Ảnh biên lai","attach"],
+   ["ctly","Chưa có chứng từ thì ghi rõ vì sao","text","vd: thu tiền mặt tại quầy, máy in biên lai hỏng",0,"","Bắt buộc một trong hai: đính ảnh hoặc ghi lý do. Phiếu chỉ có lý do nằm trong ô \"Phiếu chưa có ảnh chứng từ\" ở màn Công nợ học viên."]]},
   save:function(C,cb){var e=C.enrMain;var amt=num(rfV("amount"));
    if(amt<=0){toast("Nhập số tiền hợp lệ.");return}
+   var _ct=attachVal("pay"),_ctly=String(rfV("ctly")||"").trim();
+   if(!_ct&&!_ctly){toast("Phiếu thu phải có chứng từ: đính ảnh biên lai, hoặc ghi rõ vì sao chưa có. Không có cái nào thì cuối tháng đối soát không đối chiếu được với khoản này.",6000);return}
    var rem00=num(e.remaining_amount)||Math.max(0,(num(e.final_fee)||num(e.total_fee))-num(e.paid_amount));
    if(amt>rem00){toast("Số thu "+vnd(amt)+" VƯỢT phần còn lại "+vnd(rem00)+" - không cho đóng thừa.",4500);return}
    var o={enrollment_id:e.enrollment_id,student_id:e.student_id,student_id_name:e.student_id_name,
     payment_time:nowStr(),payment_method:rfV("method"),amount:amt,net_received:amt,
     transaction_ref:rfV("ref"),sender_name:e.student_id_name,received_by:CURSTAFF||"",received_by_name:myName(),
-    payment_note:(attachVal("pay")?("Chứng từ: "+attachVal("pay")):"")};
+    chung_tu:_ct,ct_lydo:_ct?"":_ctly,
+    payment_note:(_ct?("Chứng từ: "+_ct):"")};
    var tot=num(e.final_fee)||num(e.total_fee);var paid=num(e.paid_amount)+amt;var rem=Math.max(0,tot-paid);
    jSaveRow("DL07",o,function(){
     jUpdRow("DL06",e.enrollment_id,{paid_amount:paid,remaining_amount:rem,
@@ -19332,8 +19371,37 @@ function insPlanSave(eid){
  /* V2 12/08 (SALE-5) - CHƯA CÓ QUYỀN THÌ GỬI XIN DUYỆT, KHÔNG GHI THẲNG. Chặn ở CỬA GHI chứ
     không ẩn nút: ẩn nút thì người ta vẫn tới đây bằng đường khác, mà tiền thì chỉ cần thủng
     một lần. */
+ /* GỌI LÕI CHUNG. Bản đầu của lần tách này em dựng `insChiaCore` rồi để nguyên bản sao ở đây -
+    tức khai là "tách lõi" mà thực chất thành HAI bản luật cho một quyết định, đúng thứ vừa nói
+    là phải tránh. *Tách một hàm ra mà không đi gỡ chỗ cũ thì mới chỉ nhân đôi, chưa phải tách.* */
+ var _r=insChiaCore(eid,n,gap,dep,d0raw);
+ if(!_r.ok)return;
+ closeModal();
+ toast(_r.xin?("Đã gửi xin chia lại thành "+n+" đợt. Lịch đợt chỉ đổi sau khi được duyệt."):
+   ("Đã chia "+(_r.so||n)+" đợt cho "+(e.student_id_name||eid)+"."),_r.xin?5200:4200);
+ reRender(CUR)}
+/* ═══ LÕI CHIA ĐỢT DÙNG CHUNG - `insPlanSave` và bước "Tạo đăng ký" cùng gọi ═══════════════
+   Anh Luân 17/08: *"tạo đăng ký thì phải chọn giữa đóng 1 lần và theo đợt chứ"*. Đúng - khách
+   chốt xong xin trả góp ngay là chuyện thường, mà trước bản này phải tạo đơn rồi mở tiếp màn
+   Thanh toán mới chia được.
+   Cửa mới KHÔNG được tự viết lại phép "có quyền thì chia thẳng, chưa có quyền thì xin duyệt" -
+   viết lại là hai bản luật cho một quyết định, và hôm nào sửa một bên thì bên kia lặng lẽ cho
+   qua. Bản đầu của kho mẫu tin đã cắn đúng chuyện này hai lần trong ngày hôm qua.
+   Trả về: {ok, xin} - `xin` là true khi yêu cầu đã vào hàng chờ duyệt thay vì áp ngay.
+   *Một quyết định thì một chỗ quyết, mọi cửa gọi vào đó.* */
+function insChiaCore(eid,n,gap,dep,d0raw){
+ var e=find("DL06","enrollment_id",eid);if(!e)return {ok:false,xin:false};
+ var tot=num(e.final_fee)||num(e.total_fee);
+ if(tot<=0){toast("Đơn này chưa có học phí để chia đợt.");return {ok:false,xin:false}}
+/* KHÔNG có nhánh tắt cho n===1. Gộp một đơn đang chia 3 đợt về "đóng một lần" CŨNG là đổi điều
+   kiện hợp đồng, phải qua duyệt y như chia nhỏ ra. Bản đầu em cho n<=1 đi thẳng cho gọn - và
+   thế là mở một lối lách: ai muốn bỏ lịch đợt chỉ cần chọn "1 đợt".
+   Riêng đơn VỪA TẠO chọn đóng một lần thì bước Tạo đăng ký xử riêng (xem ghi chú ở đó): lúc ấy
+   chưa có lịch đợt nào để mà đổi, nên không có gì để duyệt. */
  if(!dotAiDuyet()){
-  var _mo=amts.map(function(amt,i){
+  var d0=d0raw?pvnd(fromISOdt(d0raw)):(pvnd(e.enrollment_time)||new Date());
+  if(!d0)d0=new Date();
+  var _mo=dotChiaTien(tot,n,dep).map(function(amt,i){
    var d=new Date(d0.getTime()+gap*i*864e5);
    function z(v){return v<10?"0"+v:v}
    return "Đợt "+(i+1)+": "+vnd(Math.round(amt))+" hạn "+z(d.getDate())+"/"+z(d.getMonth()+1)+"/"+d.getFullYear()}).join(" · ");
@@ -19342,13 +19410,9 @@ function insPlanSave(eid){
    installment_no:"",due_old:"",due_new:"",amount:String(tot),
    plan:JSON.stringify({n:n,gap:gap,dep:Math.round(dep*100),d0:d0raw||""}),
    reason:_mo,evidence:""});
-  closeModal();
-  toast("Đã gửi xin chia lại thành "+n+" đợt. Lịch đợt chỉ đổi sau khi được duyệt.",5200);
-  reRender(CUR);return}
- var _so=dotApDung(eid,n,gap,dep,d0raw);
- if(!_so)return;
- closeModal();
- toast("Đã chia "+_so+" đợt cho "+(e.student_id_name||eid)+".",4200);reRender(CUR)}
+  return {ok:true,xin:true,so:n}}
+ var so=dotApDung(eid,n,gap,dep,d0raw);
+ return {ok:!!so,xin:false,so:so}}
 /* Bảng lịch đợt dùng chung cho màn thu tiền, drawer chia đợt và phiếu in. */
 /* `acts` bật thêm cột thao tác: nút XIN GIA HẠN cho từng đợt chưa đóng (SALE-4). Đặt ngay trên
    dòng đợt vì đó là chỗ người ta đang nhìn khi khách gọi xin lùi hạn - bắt đi tìm một nút ở màn
