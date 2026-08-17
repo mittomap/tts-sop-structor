@@ -644,6 +644,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .insno{min-width:52px;font-size:12px;font-weight:700;color:var(--muted)}
 .insrow input[type="date"]{height:34px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:12px;font-weight:600;color:var(--ink);background:#fff}
 .insrow input[type="number"]{height:34px;width:150px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:13px;font-weight:700;color:var(--ink);text-align:right;background:#fff}
+.insrow input.khoa{background:var(--bg);color:var(--muted);cursor:default}
 .insxx{font-size:12px;font-weight:600;border-radius:6px;padding:7px 10px;display:flex;align-items:center;gap:6px}
 .insxx.ok{background:#0D948814;color:#0D9488}
 .insxx.no{background:#E24B4A14;color:#E24B4A}
@@ -11546,7 +11547,7 @@ var RSTEP={
         chưa có quyền thì vào hàng chờ duyệt" mà `insPlanSave` đang dùng. Truyền DANH SÁCH người
         dùng vừa nhập, không truyền lại ba tham số để máy tính lại: người ta sửa tay chính là để
         khác công thức. */
-     var _r=(_n>1)?insChiaCore(o.enrollment_id,_n,_gap,_dep,"",insEditDoc().lst):{ok:true,xin:false};
+     var _r=(_n>1)?insChiaCore(o.enrollment_id,_n,_gap,_dep,"",insEditDoc().lst,fldV("ins_che")):{ok:true,xin:false};
      /* NỀN MẶC ĐỊNH LÀ MỘT ĐỢT "1/1", ghi ra cả khi chọn đóng một lần LẪN khi yêu cầu chia đang
         chờ duyệt. Hai lý do:
          · đơn cũ trong sổ đều có đúng một đợt; để trống là đơn mới mang hình dạng khác đơn cũ,
@@ -19184,11 +19185,25 @@ function dotChiaTien(tot,n,dep){
    Ô "còn thiếu / đã thừa" tính lại mỗi lần gõ. `_checkux` đòi mọi ô nhập phải có lời giải thích,
    nên mỗi hàng nói rõ nó là đợt mấy. */
 var INSMAX=4;
-function insEditHTML(pre,tot){
- var h='<div class="insplan" id="insplan"><div class="fhint" style="margin:0 0 6px">'+
-  'Số tiền và hạn dưới đây <b>điền sẵn theo Cài đặt (CH2)</b>: đợt đầu '+
-  esc(String(paramOf("installmentDepositPercent",40)))+'% học phí, các đợt cách nhau '+
-  esc(String(paramOf("installmentGap_days",30)))+' ngày. Sửa được từng ô - khách hẹn kiểu nào thì ghi đúng kiểu ấy.</div>';
+/* HAI CHẾ ĐỘ CHIA (anh Luân 17/08): *"cho sale chọn: tách theo quy định, hoặc tách chủ động.
+   Cái nào cũng cần duyệt nghen, tách theo quy định thì đỡ phải nhập từng đợt, app tự tính giúp"*.
+   MỘT bảng, hai chế độ - không dựng hai màn:
+    · theo quy định: bảng vẫn hiện đủ nhưng KHOÁ, và luôn hiện đúng con số app sắp ghi. Bày ra
+      chứ không giấu, vì cái Sale phải đọc cho khách nghe là ba dòng "bao nhiêu, hạn nào" - giấu
+      đi rồi bắt họ tin một câu "app tự tính" là bắt họ đọc cho khách một thứ chưa nhìn thấy;
+    · chủ động: mở khoá đúng bảng ấy, gõ tay từng ô.
+   Đổi chế độ là điền lại theo quy định, kể cả những ô đã gõ tay - chọn "theo quy định" nghĩa là
+   bỏ hết cái mình vừa tự đặt, đó là chủ ý chứ không phải tai nạn.
+   *Hai chế độ thì một cái bảng đổi trạng thái, đừng hai cái bảng.* */
+function insCheMD(){return window.INSCHE||"quydinh"}
+function insEditHTML(pre,tot,che){
+ window.INSCHE=che||"quydinh";
+ var kh=(window.INSCHE!=="chudong");
+ var h='<div class="insplan" id="insplan">';
+ h+='<div class="tbgr" style="margin:0 0 4px">'+
+  segHTML(window.INSCHE,[["quydinh","Tách theo quy định"],["chudong","Tách chủ động"]],
+   "insEditChe('{k}')","ins_che")+'</div>';
+ h+='<div class="fhint" id="inschu" style="margin:0 0 6px"></div>';
  /* ĐIỀN SẴN NGÀY CHO CẢ BỐN HÀNG, kể cả hàng đang ẩn. `_checkux` đòi "mọi ô chọn ngày đều có
     sẵn yyyy-mm-dd" và nó đúng: người ta đổi từ 2 lên 4 đợt là hai hàng vừa hiện ra trống trơn,
     phải tự nghĩ ra hai cái ngày. Ngày thì tính được mà không cần biết chia mấy đợt (đợt đầu +
@@ -19203,11 +19218,41 @@ function insEditHTML(pre,tot){
    r={due_date:_z(_dd.getDate())+"/"+_z(_dd.getMonth()+1)+"/"+_dd.getFullYear(),due_amount:r.due_amount}}
   h+='<div class="insrow" id="insrow_'+i+'"'+(i>=((pre&&pre.length)||1)?' style="display:none"':'')+'>'+
    '<span class="insno">Đợt '+(i+1)+'</span>'+
-   '<input type="date" id="ins_d_'+i+'" aria-label="Hạn đóng đợt '+(i+1)+'" value="'+esc(toISOdt(r.due_date||"",1))+'" onchange="this.dataset.tay=1;insEditTong()">'+
-   '<input type="number" id="ins_a_'+i+'" aria-label="Số tiền đợt '+(i+1)+'" min="0" step="1000" value="'+esc(String(r.due_amount||""))+'" oninput="this.dataset.tay=1;insEditTong()">'+
+   '<input type="date" id="ins_d_'+i+'" aria-label="Hạn đóng đợt '+(i+1)+'"'+(kh?' readonly class="khoa"':'')+' value="'+esc(toISOdt(r.due_date||"",1))+'" onchange="this.dataset.tay=1;insEditTong()">'+
+   '<input type="number" id="ins_a_'+i+'" aria-label="Số tiền đợt '+(i+1)+'"'+(kh?' readonly class="khoa"':'')+' min="0" step="1000" value="'+esc(String(r.due_amount||""))+'" oninput="this.dataset.tay=1;insEditTong()">'+
    '</div>'}
- h+='<div class="insxx" id="insxx"></div><input type="hidden" id="ins_tot" value="'+esc(String(num(tot)))+'"></div>';
+ h+='<div class="insxx" id="insxx"></div><input type="hidden" id="ins_tot" value="'+esc(String(num(tot)))+'">'+
+  '<input type="hidden" id="ins_che" value="'+esc(window.INSCHE)+'"></div>';
  return h}
+/* Đổi chế độ = DỰNG LẠI cả khối. Bản đầu em định bật/tắt từng ô rồi tự tô lại nút của dải chọn -
+   nhưng `segHTML` không gắn `data-k` lên nút, nên đoạn tô lại ấy nhắm vào một thuộc tính không
+   tồn tại: chế độ đổi thật mà dải chọn vẫn sáng ở ô cũ. Dựng lại cả khối thì trạng thái trên màn
+   và trạng thái trong đầu app luôn là một.
+   Sang "chủ động" thì GIỮ số đang hiện làm điểm bắt đầu (người ta chuyển sang để sửa cái vừa
+   thấy, không phải để gõ lại từ đầu); về "theo quy định" thì tính lại sạch.
+   *Đừng vẽ lại một nửa màn hình - vẽ lại cả khối rẻ hơn nhiều so với một chỗ lệch không ai thấy.* */
+function insEditChe(v){
+ var moi=(v==="chudong")?"chudong":"quydinh";
+ var box=document.getElementById("insplan");if(!box)return;
+ var n=Math.max(1,Math.min(INSMAX,num(fldV("ip_n")||fldV("r_insn"))||1));
+ var tot=num(fldV("ins_tot"));
+ var pre;
+ if(moi==="chudong")pre=insEditDoc().lst;
+ else{
+  var d0=pvnd(fromISOdt(fldV("ins_d_0")))||new Date();
+  pre=dotGoiYLich(tot,n,num(paramOf("installmentGap_days",30)),
+    num(paramOf("installmentDepositPercent",40))/100,d0)}
+ box.outerHTML=insEditHTML(pre,tot,moi);
+ insEditTong()}
+/* Câu giải thích đổi theo chế độ - một dòng nói đúng thứ đang xảy ra, không phải một dòng chung
+   chung đọc cả hai chế độ đều thấy hợp lý. */
+function insEditChuThich(){
+ var el=document.getElementById("inschu");if(!el)return;
+ el.innerHTML=(insCheMD()==="chudong")
+  ? 'Bạn đang <b>tự đặt</b> từng đợt: gõ ngày và số tiền theo đúng thứ đã hẹn với khách. Tổng phải bằng học phí - app cộng lại và báo ngay bên dưới.'
+  : 'App chia theo <b>Cài đặt (CH2)</b>: đợt đầu '+esc(String(paramOf("installmentDepositPercent",40)))+
+    '% học phí, các đợt cách nhau '+esc(String(paramOf("installmentGap_days",30)))+
+    ' ngày. Bảng dưới là con số sẽ ghi vào sổ - đọc cho khách nghe được luôn. Muốn khác thì chuyển sang <b>Tách chủ động</b>.';}
 /* Đọc các hàng ĐANG HIỆN. Trả về {lst, tong, tot, thieu} - `thieu` dương là còn thiếu, âm là thừa. */
 function insEditDoc(){
  var lst=[],tong=0;
@@ -19222,6 +19267,7 @@ function insEditDoc(){
    phải tự dò xem sai ở đâu; nói ngay dưới bảng thì họ sửa đúng ô vừa gõ.
    *Chỗ báo sai phải nằm cạnh chỗ gây ra sai, và phải nói ra CÒN THIẾU BAO NHIÊU, không chỉ "sai".* */
 function insEditTong(){
+ insEditChuThich();
  var el=document.getElementById("insxx");if(!el)return;
  var R=insEditDoc();
  var trong=R.lst.filter(function(x){return !x.due_date}).length;
@@ -19258,8 +19304,11 @@ function insEditSoDot(n,d0raw){
   row.style.display=(i<n)?"":"none";
   if(i<n){
    var da=document.getElementById("ins_d_"+i),aa=document.getElementById("ins_a_"+i);
-   if(da&&!da.dataset.tay)da.value=toISOdt(goi[i].due_date,1);
-   if(aa&&!aa.dataset.tay)aa.value=String(goi[i].due_amount)}}
+   /* Chế độ "theo quy định" thì máy làm chủ: điền đè lên tất cả. Chế độ "chủ động" thì chỉ điền
+      vào ô người ta CHƯA đụng tới - đè lên con số họ vừa cân nhắc là xoá công của họ. */
+   var deAll=(insCheMD()!=="chudong");
+   if(da&&(deAll||!da.dataset.tay))da.value=toISOdt(goi[i].due_date,1);
+   if(aa&&(deAll||!aa.dataset.tay))aa.value=String(goi[i].due_amount)}}
  insEditTong()}
 function dotGhiLich(eid,lst){
  var e=find("DL06","enrollment_id",eid);if(!e||!lst||!lst.length)return 0;
@@ -19307,7 +19356,7 @@ function insPlanSave(eid){
  /* GỌI LÕI CHUNG. Bản đầu của lần tách này em dựng `insChiaCore` rồi để nguyên bản sao ở đây -
     tức khai là "tách lõi" mà thực chất thành HAI bản luật cho một quyết định, đúng thứ vừa nói
     là phải tránh. *Tách một hàm ra mà không đi gỡ chỗ cũ thì mới chỉ nhân đôi, chưa phải tách.* */
- var _r=insChiaCore(eid,n,gap,dep,d0raw,_R.lst);
+ var _r=insChiaCore(eid,n,gap,dep,d0raw,_R.lst,fldV("ins_che"));
  if(!_r.ok)return;
  closeModal();
  toast(_r.xin?("Đã gửi xin chia lại thành "+n+" đợt. Lịch đợt chỉ đổi sau khi được duyệt."):
@@ -19322,7 +19371,7 @@ function insPlanSave(eid){
    qua. Bản đầu của kho mẫu tin đã cắn đúng chuyện này hai lần trong ngày hôm qua.
    Trả về: {ok, xin} - `xin` là true khi yêu cầu đã vào hàng chờ duyệt thay vì áp ngay.
    *Một quyết định thì một chỗ quyết, mọi cửa gọi vào đó.* */
-function insChiaCore(eid,n,gap,dep,d0raw,lst){
+function insChiaCore(eid,n,gap,dep,d0raw,lst,che){
  var e=find("DL06","enrollment_id",eid);if(!e)return {ok:false,xin:false};
  var tot=num(e.final_fee)||num(e.total_fee);
  if(tot<=0){toast("Đơn này chưa có học phí để chia đợt.");return {ok:false,xin:false}}
@@ -19339,11 +19388,24 @@ function insChiaCore(eid,n,gap,dep,d0raw,lst){
  if(!d0)d0=new Date();
  var L=(lst&&lst.length)?lst:dotGoiYLich(tot,n,gap,dep,d0);
  if(!dotAiDuyet()){
-  var _mo=L.map(function(r,i){return "Đợt "+(i+1)+": "+vnd(num(r.due_amount))+" hạn "+(r.due_date||"chưa đặt")}).join(" · ");
+  /* NÓI RÕ SALE CHIA KIỂU GÌ. Người duyệt đọc "theo quy định" là biết con số đã đúng chính sách,
+     chỉ cần gật; đọc "chủ động" là biết phải soi từng dòng và hỏi lý do. Cùng một lịch đợt mà
+     hai cách sinh ra thì hai mức soi khác nhau - không nói ra là bắt người duyệt soi hết như nhau,
+     rồi họ soi qua loa hết như nhau. *Nói ra cái đã dùng để quyết, đừng chỉ nói kết quả.* */
+  /* NHÃN PHẢI ĐỐI CHIẾU, KHÔNG CHỈ TIN CỜ. Nếu ô ẩn `ins_che` mất hoặc rỗng (form dựng lại,
+     link cũ, cửa thứ ba nào đó gọi vào) thì cờ về mặc định "theo quy định" - trong khi lịch gửi
+     lên có thể là gõ tay. Người duyệt đọc "theo quy định" là gật nhanh, đúng lúc đáng soi nhất.
+     Nên so lịch gửi lên với lịch quy định sinh ra: khác một con số là khai "chủ động".
+     *Một nhãn dùng để quyết mà tin vào lời khai thì có ngày nó khai sai; cho nó tự đối chiếu.* */
+  var _goi=dotGoiYLich(tot,L.length,gap,dep,(pvnd(L[0]&&L[0].due_date)||d0));
+  var _khac=(che==="chudong")||L.some(function(r,i){
+    return !_goi[i]||String(r.due_date||"")!==String(_goi[i].due_date)||num(r.due_amount)!==num(_goi[i].due_amount)});
+  var _che=_khac?"chủ động":"theo quy định";
+  var _mo="Chia "+_che+" - "+L.map(function(r,i){return "Đợt "+(i+1)+": "+vnd(num(r.due_amount))+" hạn "+(r.due_date||"chưa đặt")}).join(" · ");
   dotTao({req_type:eFull("enum_dot_req_type","replan")||"replan (Xin chia lại đợt)",
    enrollment_id:eid,student_id:e.student_id||"",student_id_name:e.student_id_name||e.student_id||"",
    installment_no:"",due_old:"",due_new:"",amount:String(tot),
-   plan:JSON.stringify({n:L.length,gap:gap,dep:Math.round(dep*100),d0:d0raw||"",lich:L}),
+   plan:JSON.stringify({n:L.length,gap:gap,dep:Math.round(dep*100),d0:d0raw||"",lich:L,che:(_khac?"chudong":"quydinh")}),
    reason:_mo,evidence:""});
   return {ok:true,xin:true,so:L.length}}
  var so=dotGhiLich(eid,L);
