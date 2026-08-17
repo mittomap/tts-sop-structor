@@ -27098,6 +27098,7 @@ function renderCongno(){
  var all=cnDs(),lc=window.CNLOC||"";
  var ds=lc?all.filter(function(G){return cnLocCo(G,lc)}):all;
  var R=repRange();
+ var _coKy=(window.REPKY||"all")!=="all";
  var h=pageHead("Công nợ học viên",
   "Từng học viên: giá trị hợp đồng, đã đóng, còn phải thu và đợt kế tiếp. Xuất ra Excel được.",
   '');
@@ -27137,7 +27138,13 @@ function renderCongno(){
   '<button class="btn sm" onclick="pgExport(\'congno\')" data-tip="Tải '+ds.length+' dòng đang hiện ra tệp CSV - mở được bằng Excel"><i class="ti ti-table"></i>Xuất</button>');
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr>'+
   '<th>Mã</th><th>Họ tên</th><th>Khoá</th><th class="phai">Tổng giá trị</th><th class="phai">Đã thu</th>'+
-  '<th class="phai">Còn phải thu</th><th class="phai">Thu trong kỳ</th>'+
+  '<th class="phai">Còn phải thu</th>'+
+  /* Cột "Thu trong kỳ" CHỈ vẽ khi thật sự có kỳ. Ở "Toàn kỳ" nó bằng đúng cột "Đã thu" trên MỌI
+     hàng - một cột chiếm chỗ để nhắc lại cột bên cạnh, và chính nó đẩy cột Chứng từ ra ngoài mép
+     phải (đo bằng ảnh chụp: chip cuối bảng bị cắt còn "th…" và "k…").
+     *Cột nào ở trạng thái mặc định chỉ chép lại cột bên cạnh thì ở trạng thái ấy nó là chỗ trống
+     đắt tiền - bỏ đi, chỗ ấy trả về cho cột đang bị cắt.* */
+  (_coKy?'<th class="phai">Thu trong kỳ</th>':'')+
   /* Tiêu đề cũ chỉ có một chữ "Đợt", mà ngay trong ngăn kéo của chính dòng ấy cột đầu bảng
      lịch đợt CŨNG ghi "1/3" - với nghĩa khác hẳn: ở đó là ĐỢT SỐ MẤY, ở đây là ĐÃ XONG MẤY
      ĐỢT. Cùng một cách viết, hai nghĩa, cách nhau một cú bấm; ca Lê Duy Khôi còn trùng khít
@@ -27145,7 +27152,7 @@ function renderCongno(){
      *Hai bảng dùng chung một cách viết cho hai phép đếm khác nhau thì phải có một bảng đổi tên.* */
   '<th>Đợt đã đóng đủ</th><th>Đợt kế tiếp</th><th>Chứng từ</th>'+
   '</tr></thead><tbody>';
- if(!ds.length)h+='<tr><td colspan="10"><div class="empty">Không có học viên nào khớp điều kiện đang chọn. '+
+ if(!ds.length)h+='<tr><td colspan="'+(_coKy?10:9)+'"><div class="empty">Không có học viên nào khớp điều kiện đang chọn. '+
   'Nới kỳ số liệu ra <b>Toàn kỳ</b> hoặc bỏ chip lọc là thấy lại.</div></td></tr>';
  ds.forEach(function(G){
   h+='<tr data-mo="cnXem" data-mo-arg="'+esc(G.sid||G.ten)+'">'+
@@ -27153,7 +27160,7 @@ function renderCongno(){
    '<td class="khongbe">'+esc(Object.keys(G.khoa).join(" · ")||"-")+'</td>'+
    '<td class="phai">'+vnd(G.tong)+'</td><td class="phai">'+vnd(G.thu)+'</td>'+
    '<td class="phai">'+(G.con>0?('<b style="color:var(--red)">'+vnd(G.con)+'</b>'):'<span class="mut">0đ</span>')+'</td>'+
-   '<td class="phai">'+(G.ky?vnd(G.ky):'<span class="mut">-</span>')+'</td>'+
+   (_coKy?('<td class="phai">'+(G.ky?vnd(G.ky):'<span class="mut">-</span>')+'</td>'):'')+
    '<td class="khongbe" data-tip="'+esc(G.dotDu+" trong "+G.dot+" đợt đã đóng ĐỦ"+
      (G.dodang.length?(". Ngoài ra đợt "+G.dodang.join(", ")+" đã có tiền vào nhưng chưa đủ - phần này nằm trong cột Đã thu, không nằm trong con số bên trái."):""))+'">'+
      G.dotDu+'/'+G.dot+
@@ -27198,7 +27205,11 @@ function cnXem(arg){
      tìm ra, chứ không phải vì không ai cần.*
      Nay ba cửa đứng ngay cạnh lịch đợt của chính đơn ấy - chỗ người ta ĐANG NHÌN khi nghĩ tới
      việc đổi hạn. Quyền vẫn do `chanAct`/`dotAiDuyet` gác như cũ, đây chỉ là thêm lối đi. */
-  h+=insTableHTML(insOf(e.enrollment_id),true);
+  var _ins=insOf(e.enrollment_id);
+  /* Bật cột nút CHỈ khi còn đợt chưa đóng xong. Đơn đã đóng đủ mà vẫn truyền `true` thì
+     `insTableHTML` dựng thêm một cột rỗng - trong ngăn kéo hẹp, một cột rỗng là một cột
+     đẩy cột cuối cùng ra ngoài mép. */
+  h+=insTableHTML(_ins,_ins.some(function(x){return !isc(x.status,"paid")}));
   h+='<div class="dact" style="margin:8px 0 0">'+
    '<button class="btn sm" onclick="insPlanForm(\''+esc(e.enrollment_id)+'\')"><i class="ti ti-calendar-dollar"></i>Chia lại lịch đợt</button>'+
    '<button class="btn sm" onclick="payForm(\''+esc(e.enrollment_id)+'\')"><i class="ti ti-cash"></i>Ghi nhận thanh toán</button>'+
@@ -27215,7 +27226,10 @@ function cnXem(arg){
    h+='<div style="margin-top:10px"><b style="font-size:12px">Chia đợt &amp; đổi hạn - ai duyệt</b></div>';
    if(!yc.length){h+='<div class="fhint" style="padding:4px 0">Đơn này chưa có yêu cầu chia lại hay gia hạn nào. Lịch đợt trên đang theo bản đặt lúc ghi nhận đơn, hoặc do người <b>có sẵn quyền duyệt</b> đặt thẳng nên không đi qua hàng chờ.</div>';return}
    yc.sort(function(a,b){return (pvnd(b.req_time)||0)-(pvnd(a.req_time)||0)});
-   h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Yêu cầu</th><th>Người xin</th><th>Nội dung xin</th><th>Tình trạng</th><th>Người duyệt</th><th>Ghi chú khi duyệt</th></tr></thead><tbody>';
+   /* THẺ, KHÔNG PHẢI BẢNG. Bản đầu em dựng bảng 6 cột trong một ngăn kéo rộng ~700px: chụp ảnh
+      ra thì cột "Ghi chú khi duyệt" bị bóp còn bốn chữ một dòng, cột "Tình trạng" bị cắt mất.
+      Sáu cột là hình dạng của một bảng đứng giữa trang, không phải của một khối trong ngăn kéo.
+      *Đừng bê nguyên bảng của trang rộng vào ngăn kéo hẹp - đổi hình dạng, đừng đổi cỡ chữ.* */
    yc.forEach(function(r){
     var c=ecode(r.req_status);
     var chip=c==="approved"?'<span class="chip green">đã duyệt</span>'
@@ -27223,26 +27237,31 @@ function cnXem(arg){
     var noi=isc(r.req_type,"extend")
       ?("Lùi hạn đợt "+esc(r.installment_no||"?")+": "+esc(r.due_old||"-")+" → "+esc(r.due_new||"-"))
       :esc(r.reason||"Chia lại lịch đợt");
-    h+='<tr><td class="khongbe"><b>'+esc(r.req_id||"")+'</b><div class="mut" style="font-size:11px">'+esc(elabel(r.req_type)||r.req_type||"")+'</div></td>'+
-     '<td class="khongbe">'+esc(r.req_by_name||r.req_by||"-")+'<div class="mut" style="font-size:11px">'+esc(r.req_time||"")+'</div></td>'+
-     '<td>'+noi+(isc(r.req_type,"extend")&&r.reason?('<div class="mut" style="font-size:11px">'+esc(r.reason)+'</div>'):'')+
-       (r.evidence?(' '+linkOut(r.evidence)):'')+'</td>'+
-     '<td class="khongbe">'+chip+'</td>'+
-     '<td class="khongbe">'+(r.decided_by_name?(esc(r.decided_by_name)+'<div class="mut" style="font-size:11px">'+esc(r.decided_at||"")+'</div>')
-       :'<span class="mut">chưa ai quyết</span>')+'</td>'+
-     '<td>'+(String(r.decide_note||"").trim()?esc(r.decide_note):'<span class="mut">-</span>')+'</td></tr>'});
-   h+='</tbody></table></div>'})();
+    h+='<div class="obcard" style="display:block;margin:6px 0">'+
+     '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
+      '<b>'+esc(r.req_id||"")+'</b><span class="mut" style="font-size:11.5px">'+esc(elabel(r.req_type)||r.req_type||"")+'</span>'+chip+'</div>'+
+     '<div style="margin-top:4px">'+noi+(isc(r.req_type,"extend")&&r.reason?(' <span class="mut">- '+esc(r.reason)+'</span>'):'')+
+       (r.evidence?(' '+linkOut(r.evidence)):'')+'</div>'+
+     '<div class="mut" style="font-size:11.5px;margin-top:4px">Người xin: <b>'+esc(r.req_by_name||r.req_by||"-")+'</b> · '+esc(r.req_time||"")+'</div>'+
+     '<div class="mut" style="font-size:11.5px">'+(r.decided_by_name
+       ?('Người duyệt: <b>'+esc(r.decided_by_name)+'</b> · '+esc(r.decided_at||""))
+       :'Chưa ai quyết')+'</div>'+
+     (String(r.decide_note||"").trim()?('<div style="margin-top:4px">Ghi chú khi duyệt: '+esc(r.decide_note)+'</div>'):'')+
+     '</div>'})})();
   var ps=rows("DL07").filter(function(p){return String(p.enrollment_id||"")===String(e.enrollment_id)});
   h+='<div style="margin-top:10px"><b style="font-size:12px">Phiếu thu / phiếu chi</b></div>';
   if(!ps.length)h+='<div class="empty">Đơn này chưa có phiếu nào.</div>';
   else{
-   h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Loại</th><th>Thời điểm</th><th class="phai">Số tiền</th><th>Hình thức</th><th>Người ghi</th><th>Chứng từ</th></tr></thead><tbody>';
+   /* BỐN cột, không phải sáu: "hình thức" và "người ghi" là chú thích của một phiếu chứ không
+      phải hai trục để so sánh giữa các phiếu - chúng xuống dòng phụ ngay dưới thời điểm.
+      Sáu cột trong ngăn kéo thì cột cuối (Chứng từ - thứ kế toán mở ra để xem) bị đẩy ra mép. */
+   h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Loại</th><th>Thời điểm · hình thức · người ghi</th><th class="phai">Số tiền</th><th>Chứng từ</th></tr></thead><tbody>';
    ps.forEach(function(p){var la=cnPhieuLoai(p),ct=cnChungTu(p);
     h+='<tr><td>'+(la==="chi"?'<span class="chip red">phiếu chi</span>':'<span class="chip green">phiếu thu</span>')+'</td>'+
-     '<td class="khongbe">'+esc(p.payment_time||"-")+'</td>'+
+     '<td>'+esc(p.payment_time||"-")+
+       '<div class="mut" style="font-size:11.5px">'+esc(elabel(p.payment_method)||p.payment_method||"-")+
+       ' · '+esc(p.received_by_name||"-")+'</div></td>'+
      '<td class="phai">'+vnd(Math.abs(num(p.amount)))+'</td>'+
-     '<td class="khongbe">'+esc(elabel(p.payment_method)||p.payment_method||"-")+'</td>'+
-     '<td class="khongbe">'+esc(p.received_by_name||"-")+'</td>'+
      /* Chứng từ có link thật thì vẽ link; không thì CHỈ vẽ chip, tên tệp đưa vào chú thích.
         Bản đầu em in nguyên đường dẫn cạnh chip: cột cuối của một bảng nằm trong ngăn kéo hẹp
         hơn cột cùng tên ở bảng ngoài, nên "chung-tu/thu-PAY-2026-0117.jpg" bị bẻ thành bốn dòng
