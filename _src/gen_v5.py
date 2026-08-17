@@ -19152,7 +19152,10 @@ function payForm(id){var e=find("DL06","enrollment_id",id)||{};var tot=num(e.fin
  var _ins=insOf(id);
  var _open=_ins.filter(function(x){return !isc(x.status,"paid")})[0];
  if(_ins.length>1){
-  h+='<div class="fld full"><label>Lịch đóng theo đợt</label>'+insTableHTML(_ins,false)+
+  /* `true`: bảng lịch đợt ở ĐÂY cũng mang nút "Xin gia hạn". Bản cũ truyền `false` nên người
+     đang nhìn thẳng vào dòng "đợt 2 quá hạn 7 ngày" vẫn không có cách nào lùi hạn ngay tại đó -
+     phải mở tiếp một ngăn kéo nữa mới thấy nút. *Nút phải mọc cạnh cái dòng nó nói về.* */
+  h+='<div class="fld full"><label>Lịch đóng theo đợt</label>'+insTableHTML(_ins,true)+
    '<div class="fhint">Số tiền bên dưới đang điền sẵn theo <b>đợt '+esc(_open?_open.installment_no:"-")+'</b>'+
    (_open&&_open.due_date?(' (hạn '+esc(_open.due_date)+')'):'')+' - sửa lại được nếu khách đóng khác.</div></div>'}
  else h+='<div class="fld full"><div class="fhint">Đơn này đang đóng MỘT LẦN. '+
@@ -26955,7 +26958,28 @@ function cnXem(arg){
  G.don.forEach(function(e){
   h+='<div class="panel" style="margin:10px 0"><div class="ph"><b>'+esc(e.course_id_name||e.course_id||e.enrollment_id)+'</b>'+
    '<div class="mini"><span class="mut">'+esc(e.enrollment_id)+' · ký '+esc(String(e.enrollment_time||"").split(" ")[0]||"-")+'</span></div></div><div class="pbody">';
-  h+=insTableHTML(insOf(e.enrollment_id),false);
+  /* ═══ BA CỬA NÀY TỪNG BỊ CHÔN NĂM TẦNG (anh Luân 16/08: *"cái tạo đăng ký, chia đợt đóng,
+     đổi đợt đóng ở chỗ nào mà có chỗ duyệt ta, tìm mãi ko thấy chỗ nào"*) ═════════════════
+     Đo bằng cách VẼ THẬT 60 trang rồi đếm lối vào:
+      · `insPlanForm` (chia lại lịch đợt) - KHÔNG TRANG NÀO vẽ ra. Chỉ tới được từ bên trong
+        ngăn kéo `payForm`.
+      · `dotGiaHan` (xin gia hạn một đợt) - KHÔNG TRANG NÀO vẽ ra, và cũng không nằm trong
+        `payForm`: chỗ duy nhất dựng nút ấy là `insTableHTML(lst,TRUE)`, mà `payForm` gọi với
+        `false`. Nút chỉ mọc ra ở TẦNG THỨ NĂM, bên trong `insPlanForm`.
+     Nghĩa là muốn lùi hạn một đợt: Tuyển sinh → Thanh toán → tìm đơn → "Ghi nhận thanh toán"
+     → "Chia lại lịch đợt" → mới thấy "Xin gia hạn". Năm bước, mà hai bước cuối nằm trong một
+     ngăn kéo MANG TÊN VIỆC KHÁC - người đi tìm "đổi hạn đóng" không có lý do gì mở một cái
+     drawer tên "Ghi nhận thanh toán". Trang Duyệt đổi đợt đóng thì vẫn đứng đó chờ những yêu
+     cầu gần như không ai tạo nổi.
+     *Một hàng chờ duyệt mà cửa tạo yêu cầu chôn năm tầng thì hàng chờ ấy trống vì không ai
+     tìm ra, chứ không phải vì không ai cần.*
+     Nay ba cửa đứng ngay cạnh lịch đợt của chính đơn ấy - chỗ người ta ĐANG NHÌN khi nghĩ tới
+     việc đổi hạn. Quyền vẫn do `chanAct`/`dotAiDuyet` gác như cũ, đây chỉ là thêm lối đi. */
+  h+=insTableHTML(insOf(e.enrollment_id),true);
+  h+='<div class="dact" style="margin:8px 0 0">'+
+   '<button class="btn sm" onclick="insPlanForm(\''+esc(e.enrollment_id)+'\')"><i class="ti ti-calendar-dollar"></i>Chia lại lịch đợt</button>'+
+   '<button class="btn sm" onclick="payForm(\''+esc(e.enrollment_id)+'\')"><i class="ti ti-cash"></i>Ghi nhận thanh toán</button>'+
+   '</div>';
   /* AI DUYỆT CHIA ĐỢT, DUYỆT LÚC NÀO (anh Luân 16/08: *"hình như muốn chia nhỏ học phí phải
      được duyệt nhỉ, trong drawer hiển thị ai duyệt và duyệt khi nào, kèm ghi chú nếu có"*).
      Anh nhớ đúng: `insPlanSave` không ghi thẳng - người chưa có quyền duyệt thì nó sinh một yêu
