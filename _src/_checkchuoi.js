@@ -142,7 +142,11 @@ setRole("all");
  var tv=ai("sales_staff");
  vao(tv.staff_id);
  var truoc=rows("DL07").length,truocQ=duyPayList().length;
+ /* `pm_ctly`: tu 16/08 cua thu tien doi chung tu (anh HOAC ly do). Chuoi nay do viec PHOI HOP
+    giua nguoi thu va ke toan, khong do rieng luat chung tu (viec ay `_check16` lam) - nen o day
+    dien ly do cho qua duoc cua, de chuoi van do dung thu no dinh do. */
  FIELDS.pm_amt="500000";FIELDS.pm_method="";FIELDS.pm_ref="TEST-CHUOI";FIELDS.pm_note="thu thử";
+ FIELDS.pm_ctly="Thu tien mat tai quay - kiem thu chuoi";
  try{paySave(e.enrollment_id)}catch(err){}
  var moi=rows("DL07").length===truoc+1;
  t(TEN+" · 1. người thu ghi được khoản", moi);

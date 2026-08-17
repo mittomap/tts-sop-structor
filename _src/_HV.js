@@ -2060,8 +2060,7 @@ var THEDEF={
   ["cn_tong","Tổng giá trị hợp đồng","Cộng học phí sau chiết khấu của mọi đơn còn hiệu lực có ngày đăng ký trong kỳ đang chọn. Danh sách: chính bảng ngay dưới."],
   ["cn_thu","Đã thu","Tiền thực nhận của những đơn ấy tính tới hôm nay, đã trừ các khoản hoàn. Danh sách: cột Đã thu trong bảng dưới."],
   ["cn_con","Còn phải thu","Phần chưa vào của những đơn ấy - đổi kỳ số liệu không làm hết nợ. Danh sách: bấm chip Còn nợ ở hàng dưới."],
-  ["cn_qh","Trong đó đã quá hạn","Các đợt đã qua ngày hẹn mà chưa đóng đủ - phần phải gọi ngay, không phải phần chờ tới hạn. Danh sách: bấm chip Quá hạn."],
-  ["cn_ct","Phiếu chưa có ảnh chứng từ","Phiếu thu/chi chưa đính ảnh biên lai - gồm cả phiếu đã khai lý do lẫn phiếu chưa khai gì, vì cuối tháng cả hai đều không đối chiếu được với sao kê. Dòng phụ tách riêng phần chưa khai gì. Danh sách: bấm chip Chưa có ảnh chứng từ."]]},
+  ["cn_qh","Trong đó đã quá hạn","Các đợt đã qua ngày hẹn mà chưa đóng đủ - phần phải gọi ngay, không phải phần chờ tới hạn. Danh sách: bấm chip Quá hạn."]]},
  /* V2 16/08 - dải thẻ của Kho mẫu tin. Ba ô đều là câu KHÔNG đọc ra được từ bảng ngay dưới:
     dải chip nhóm đếm cả mẫu đã ngưng nên một nhóm hiện "1" vẫn có thể là cửa gửi trống, còn
     biến không điền nổi thì phải mở từng mẫu xem thử mới lộ. Đúng luật thẻ nhóm B (14/08): thẻ
@@ -22141,7 +22140,11 @@ var TOURS={
      QUA: mautin"*. Đúng con bệnh đã cắn ở `tracuu` (08/08) và ở ba màn 12/08 ngay trên. Đặt LIỀN
      SAU `tinnhan` vì hai trang là hai đầu của một việc: kho mẫu là thứ soạn TRƯỚC khi gửi, sổ
      tin là thứ đọc SAU khi gửi - dạy rời nhau thì người học không nối được hai đầu. */
-  {p:"mautin",sel:'@man',t:"Nội dung gửi khách soạn sẵn ở đây",d:"Mẫu email và tin Zalo cho từng việc: gửi thông tin lớp, xin đánh giá, nhắc học phí. Trung tâm tự sửa lời văn, không cần lập trình viên. Chỗ nào cần gửi thì chọn mẫu ở đó.",hint:"Bấm một dòng để xem mẫu, có phần xem thử trên một học viên thật."}]},
+  {p:"mautin",sel:'@man',t:"Nội dung gửi khách soạn sẵn ở đây",d:"Mẫu email và tin Zalo cho từng việc: gửi thông tin lớp, xin đánh giá, nhắc học phí. Trung tâm tự sửa lời văn, không cần lập trình viên. Chỗ nào cần gửi thì chọn mẫu ở đó.",hint:"Bấm một dòng để xem mẫu, có phần xem thử trên một học viên thật."},
+  /* V2 16/08 - `congno` dựng xong là `_checktour` bắt ngay, y hệt `mautin` sáng nay. Bài này là
+     bài của NGƯỜI QUẢN LÝ nên trang tiền đứng đúng chỗ; và nó đứng ngay sau kho mẫu tin vì hai
+     việc nối nhau trong đời thật: nhìn ra ai đang nợ, rồi lấy mẫu "nhắc học phí" gửi đi. */
+  {p:"congno",sel:'@man',t:"Ai đang nợ bao nhiêu, hạn nào",d:"Từng học viên một dòng: giá trị hợp đồng, đã thu, còn phải thu, đợt kế tiếp và phiếu nào chưa có ảnh chứng từ. Chọn kỳ số liệu ở trên, xuất ra Excel để đối soát.",hint:"Bấm chip Quá hạn để thấy phần phải gọi ngay, rồi bấm một dòng xem chi tiết từng đợt."}]},
  /* ---------- CẤP 3: CHUYÊN NGHIỆP (người cấu hình) ---------- */
  cn_thuonghieu:{lv:"chuyennghiep",t:"Đổi thương hiệu và menu",ic:"ti-palette",d:"5 bước - biến app thành bản của trung tâm bạn",steps:[
   {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'@settabs',t:"Trang Cài đặt là trung tâm điều khiển",d:"9 tab: giao diện, menu, phân quyền, ngưỡng SLA, ngưỡng KPI, câu nhắc việc, danh mục, khóa học, nhân sự. App không cắm cứng con số nào.",hint:"Bấm Tiếp theo."},
@@ -23822,8 +23825,12 @@ function renderCongno(){
  var R=repRange();
  var _coKy=(window.REPKY||"all")!=="all";
  var h=pageHead("Công nợ học viên",
-  "Từng học viên: giá trị hợp đồng, đã đóng, còn phải thu và đợt kế tiếp. Xuất ra Excel được.",
-  '');
+  "Từng học viên: giá trị hợp đồng, đã đóng, còn phải thu và đợt kế tiếp.",
+  /* Nút chính của trang này là XUẤT - đó là thứ kế toán làm với nó (anh Luân đặt hàng: *"có thể
+     export"*). `_checkkhuon` K2 bắt đúng khi trang chưa có nút nào ở đầu: một trang nghiệp vụ mở
+     ra chỉ để ngắm thì người dùng phải tự đoán mình làm được gì ở đây.
+     Đặt MỘT chỗ thôi - bản đầu em để ở thanh công cụ, đưa lên đây thì gỡ dưới kia. */
+  '<button class="btn primary" onclick="pgExport(\'congno\')"><i class="ti ti-table"></i>Xuất ra Excel</button>');
  h+=kyBarHTML('Kỳ lọc theo <b>ngày đăng ký đơn</b>. Cột "Đã thu" và "Còn phải thu" là số tới hôm nay của chính những đơn ấy - đổi kỳ không làm hết nợ.');
  function S(f){return ds.reduce(function(t,G){return t+G[f]},0)}
  h+=statStrip([
@@ -23835,13 +23842,12 @@ function renderCongno(){
    "","Phần chưa vào của những đơn ấy. Danh sách: bấm chip Còn nợ ở hàng dưới."],
   ["ti-alert-triangle",vnd(S("quahan")),"Trong đó đã quá hạn","#E24B4A","",
    "","Các đợt đã qua ngày hẹn mà chưa đóng đủ - đây là phần phải gọi ngay, không phải phần chờ tới hạn. Danh sách: bấm chip Quá hạn."],
-  /* Con số kế toán cần là PHIẾU CHƯA CÓ ẢNH - cả loại khai lý do lẫn loại không khai gì, vì
-     cuối tháng cả hai đều không đối chiếu được với sao kê. Dòng phụ tách ra phần nặng hơn
-     (không khai gì) để biết nên đi đòi ai trước.
-     *Một con số đã gộp hai thứ thì phải nói ngay bên dưới nó gộp cái gì.* */
-  ["ti-camera-off",S("thieu")+S("ctLy"),"Phiếu chưa có ảnh chứng từ","#7C3AED",
-   (S("thieu")?("trong đó "+S("thieu")+" phiếu chưa khai cả lý do"):"đều đã khai lý do, chỉ còn thiếu ảnh"),
-   "","Phiếu thu/chi chưa đính ảnh biên lai - gồm cả phiếu đã khai lý do lẫn phiếu chưa khai gì, vì đối soát cuối tháng thì cả hai đều không đối chiếu được với sao kê. Danh sách: bấm chip Chưa có ảnh chứng từ."]
+  /* THẺ THỨ NĂM ĐÃ BỎ (16/08). Nó đếm "phiếu chưa có ảnh chứng từ" = đúng con số chip lọc cùng
+     tên ngay dưới - `_checklap` bắt trên cả ba chức danh. Anh Luân chốt luật này 13/08: *"nếu
+     trùng thì bỏ thẻ"* - chip mang số VÀ lọc được, thẻ chỉ mang số.
+     Phần thẻ nói thêm mà chip không nói (tách riêng bao nhiêu phiếu chưa khai cả lý do) không
+     mất: nó xuống dòng ghi chú ngay cạnh dải chip, chỗ người ta đang đọc con số ấy.
+     *Bỏ một ô trùng không được bỏ luôn thứ chỉ ô ấy nói - phải dời nó đi đâu đó.* */
  ],"congno");
  window.FLTLAST=window.FLTLAST||{};
  window.FLTLAST.congno=ds.map(function(G){return {
@@ -23857,7 +23863,7 @@ function renderCongno(){
    ["thieu","Chưa có ảnh chứng từ",all.filter(function(G){return cnLocCo(G,"thieu")}).length]],
    "cnLocSet('{k}')","cn_loc"),
   '<span class="tbcnt">'+ds.length+' học viên</span>'+
-  '<button class="btn sm" onclick="pgExport(\'congno\')" data-tip="Tải '+ds.length+' dòng đang hiện ra tệp CSV - mở được bằng Excel"><i class="ti ti-table"></i>Xuất</button>');
+  (S("thieu")?('<span class="mut" style="font-size:11px;margin-left:10px">Trong '+(S("thieu")+S("ctLy"))+' phiếu chưa có ảnh, <b>'+S("thieu")+'</b> phiếu chưa khai cả lý do.</span>'):''));
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr>'+
   '<th>Mã</th><th>Họ tên</th><th>Khoá</th><th class="phai">Tổng giá trị</th><th class="phai">Đã thu</th>'+
   '<th class="phai">Còn phải thu</th>'+

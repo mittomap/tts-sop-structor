@@ -118,8 +118,21 @@ t("hoan tien goi ham loi insSync", /function duyetRefundRun[\s\S]{0,2000}?insSyn
  var L0=insOf(e.enrollment_id);
  var openIdx=L0.filter(function(x){return !isc(x.status,"paid")})[0];
  var amt=num(openIdx.remaining_amount)||num(openIdx.due_amount);
- reset();setF({pm_amt:String(amt),pm_method:"bank_transfer (Chuyển khoản NH)",pm_sender:"x",pm_ref:"y",pm_due:""});
+ /* 16/08 - CUA THU TIEN NAY DOI CHUNG TU. Bo kiem nay do dung MUC TIEU cu ("thu du mot dot thi
+    dot do phai chuyen sang Da dong du") - muc tieu ay khong doi. Cai doi la DIEU KIEN VAO cua:
+    tu nay phieu thu phai co anh chung tu HOAC mot ly do ghi ro. Nen o day dien them `pm_ctly`,
+    va them han mot phep thu MOI cho chinh dieu kien ay - neu chi dien cho qua thi bo kiem nay
+    im lang truoc mot luat vua sinh ra.
+    *Cua ghi them dieu kien thi bo kiem phai hoc dieu kien do, khong phai duoc mien tru khoi no.* */
+ reset();setF({pm_amt:String(amt),pm_method:"bank_transfer (Chuyển khoản NH)",pm_sender:"x",pm_ref:"y",pm_due:"",pm_ctly:""});
+ var _n0=rows("DL07").length;
  paySave(e.enrollment_id);
+ t("thu tien MA KHONG co chung tu lan ly do -> app tu choi ghi", rows("DL07").length===_n0);
+ reset();setF({pm_amt:String(amt),pm_method:"bank_transfer (Chuyển khoản NH)",pm_sender:"x",pm_ref:"y",pm_due:"",
+   pm_ctly:"Thu tien mat tai quay - bo sung anh trong ngay"});
+ paySave(e.enrollment_id);
+ t("khai ly do thay cho anh -> ghi duoc, va phieu mang dung ly do ay",
+   rows("DL07").length===_n0+1 && String((rows("DL07")[0]||{}).ct_lydo||"").indexOf("Thu tien mat")>=0);
  var L1=insOf(e.enrollment_id);
  var x1=L1.filter(function(x){return String(x.installment_no)===String(openIdx.installment_no)})[0];
  t("thu du tien mot dot -> dot do chuyen sang Da dong du", isc(x1.status,"paid"));
