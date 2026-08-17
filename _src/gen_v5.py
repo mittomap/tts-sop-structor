@@ -26988,7 +26988,12 @@ function cnXem(arg){
      đẩy cột cuối cùng ra ngoài mép. */
   h+=insTableHTML(_ins,_ins.some(function(x){return !isc(x.status,"paid")}));
   h+='<div class="dact" style="margin:8px 0 0">'+
-   '<button class="btn sm" onclick="insPlanForm(\''+esc(e.enrollment_id)+'\')"><i class="ti ti-calendar-dollar"></i>Chia lại lịch đợt</button>'+
+   /* Nhãn theo TÌNH TRẠNG THẬT của đơn. Đơn mới tạo chỉ có một đợt (bước "Tạo đăng ký" không
+      hỏi chia đợt), mà nút lại ghi "Chia LẠI lịch đợt" - chữ "lại" hứa rằng đã có một lần chia
+      trước đó, nên người đi tìm chỗ chia đợt lần đầu đọc xong sẽ đi tiếp chỗ khác.
+      *Một cái nhãn tả sai tình trạng hiện tại thì đúng người cần nó nhất lại là người bỏ qua nó.* */
+   '<button class="btn sm" onclick="insPlanForm(\''+esc(e.enrollment_id)+'\')"><i class="ti ti-calendar-dollar"></i>'+
+     (_ins.length>1?"Chia lại lịch đợt":"Chia thành nhiều đợt")+'</button>'+
    '<button class="btn sm" onclick="payForm(\''+esc(e.enrollment_id)+'\')"><i class="ti ti-cash"></i>Ghi nhận thanh toán</button>'+
    '</div>';
   /* AI DUYỆT CHIA ĐỢT, DUYỆT LÚC NÀO (anh Luân 16/08: *"hình như muốn chia nhỏ học phí phải
