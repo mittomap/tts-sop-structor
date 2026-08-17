@@ -3265,7 +3265,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">17/08/2026 · <b>a08a2a</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">17/08/2026 · <b>c9706c</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -27177,10 +27177,15 @@ function cnXem(arg){
      '<td class="phai">'+vnd(Math.abs(num(p.amount)))+'</td>'+
      '<td class="khongbe">'+esc(elabel(p.payment_method)||p.payment_method||"-")+'</td>'+
      '<td class="khongbe">'+esc(p.received_by_name||"-")+'</td>'+
-     '<td>'+(ct?(linkOut(ct)||('<span class="chip green">đã có</span> '+esc(ct)))
+     /* Chứng từ có link thật thì vẽ link; không thì CHỈ vẽ chip, tên tệp đưa vào chú thích.
+        Bản đầu em in nguyên đường dẫn cạnh chip: cột cuối của một bảng nằm trong ngăn kéo hẹp
+        hơn cột cùng tên ở bảng ngoài, nên "chung-tu/thu-PAY-2026-0117.jpg" bị bẻ thành bốn dòng
+        vụn - đọc ra một mớ chữ không nghĩa, mà thứ người ta cần biết chỉ là CÓ hay KHÔNG.
+        *Trong một ô hẹp, hãy trả lời câu hỏi trước; bằng chứng để dành cho chỗ rê chuột.* */
+     '<td class="khongbe">'+(ct?(linkOut(ct)||('<span class="chip green" data-tip="'+esc(ct)+'">đã có</span>'))
        :(String(p.ct_lydo||"").trim()
          ?('<span class="chip amber" data-tip="'+esc(p.ct_lydo)+'">khai lý do</span>')
-         :'<span class="chip red">chưa có chứng từ</span>'))+'</td></tr>'});
+         :'<span class="chip red">chưa có</span>'))+'</td></tr>'});
    h+='</tbody></table></div>'}
   h+='</div></div>'});
  h+='<div class="dact"><button class="btn" onclick="closeModal()">Đóng</button></div></div>';

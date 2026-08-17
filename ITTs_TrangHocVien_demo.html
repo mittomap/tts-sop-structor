@@ -27151,10 +27151,15 @@ function cnXem(arg){
      '<td class="phai">'+vnd(Math.abs(num(p.amount)))+'</td>'+
      '<td class="khongbe">'+esc(elabel(p.payment_method)||p.payment_method||"-")+'</td>'+
      '<td class="khongbe">'+esc(p.received_by_name||"-")+'</td>'+
-     '<td>'+(ct?(linkOut(ct)||('<span class="chip green">đã có</span> '+esc(ct)))
+     /* Chứng từ có link thật thì vẽ link; không thì CHỈ vẽ chip, tên tệp đưa vào chú thích.
+        Bản đầu em in nguyên đường dẫn cạnh chip: cột cuối của một bảng nằm trong ngăn kéo hẹp
+        hơn cột cùng tên ở bảng ngoài, nên "chung-tu/thu-PAY-2026-0117.jpg" bị bẻ thành bốn dòng
+        vụn - đọc ra một mớ chữ không nghĩa, mà thứ người ta cần biết chỉ là CÓ hay KHÔNG.
+        *Trong một ô hẹp, hãy trả lời câu hỏi trước; bằng chứng để dành cho chỗ rê chuột.* */
+     '<td class="khongbe">'+(ct?(linkOut(ct)||('<span class="chip green" data-tip="'+esc(ct)+'">đã có</span>'))
        :(String(p.ct_lydo||"").trim()
          ?('<span class="chip amber" data-tip="'+esc(p.ct_lydo)+'">khai lý do</span>')
-         :'<span class="chip red">chưa có chứng từ</span>'))+'</td></tr>'});
+         :'<span class="chip red">chưa có</span>'))+'</td></tr>'});
    h+='</tbody></table></div>'}
   h+='</div></div>'});
  h+='<div class="dact"><button class="btn" onclick="closeModal()">Đóng</button></div></div>';
