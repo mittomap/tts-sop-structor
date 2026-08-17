@@ -149,10 +149,21 @@
 ## 3. VIỆC TỒN (backlog)
 
 > ### 📋 17/08 - ĐANG CHỜ ANH LUÂN TRẢ LỜI
-> 1. **Thêm ô "đóng một lần hay chia đợt" ngay tại bước Tạo đăng ký?** Hiện bước ấy chỉ hỏi khóa
->    học, học phí, chiết khấu - đơn tạo ra mặc định đóng MỘT LẦN, muốn chia phải tạo đơn xong rồi
->    mở màn Thanh toán. Khách chốt xong xin trả góp ngay là chuyện thường. Nếu làm thì vẫn đi qua
->    đúng cửa duyệt hiện tại (`insPlanSave` → DL27), không dựng cửa thứ hai. **Chưa làm, chờ anh.**
+> 1. **"Cái nào cũng cần duyệt" - duyệt tới đâu?** Em đang hiểu là hai chế độ chia đợt (theo quy
+>    định / chủ động) đều không lách được hàng chờ, còn Trưởng phòng và Kế toán trưởng vẫn chia
+>    thẳng vì **chính họ là người duyệt**. Nếu ý anh là kể cả họ cũng phải có chữ ký thứ hai thì
+>    phải đổi `dotAiDuyet` và dựng thêm luật "không tự duyệt yêu cầu của mình". **Chưa làm, chờ anh.**
+> 2. **Ô số tiền từng đợt hiện số trần (`5600000`), không có dấu chấm ngăn nghìn** - vì là ô nhập
+>    kiểu số của trình duyệt, nó không nhận chuỗi có dấu chấm. Đổi sang ô chữ rồi tự bóc dấu lúc
+>    đọc thì đẹp hơn nhưng thêm một chỗ có thể sai. Dòng tổng bên dưới đã in dạng có dấu chấm.
+> 3. **Ô "Ngày đóng đợt đầu" ở bước Tạo đăng ký vẫn hiện khi chọn "Đóng một lần"** - em cố ý không
+>    dựng cơ chế ẩn/hiện cho khung nhập của bước chạy quy trình (thêm một cơ chế mới cho đúng một
+>    chỗ). Chú thích đã ghi "chỉ dùng khi chia đợt". Anh thấy vướng thì em làm.
+>
+> ### ✅ 17/08 - ĐÃ XONG (anh Luân đặt trong ngày)
+> · Bước Tạo đăng ký chọn đóng một lần hay chia đợt · nhập tay ngày và số tiền từng đợt, tự cảnh
+> báo lệch tổng · hai chế độ tách theo quy định / tách chủ động · trang Công nợ học viên hai cổng
+> · bắt buộc chứng từ phiếu thu và phiếu chi · ba cửa tiền bị chôn năm tầng đưa lên ngăn kéo.
 >
 > ### 📋 16/08 - HÀNG CHỜ ĐÃ XONG HẾT
 > Sáu việc của mục dưới đây đều đã làm và đã verify xanh trên `9a361d`. Mẫu tin gửi khách đã dọn
@@ -342,11 +353,60 @@
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 17/08 trên chính bản này).
-> Bản dựng đang chạy: `90c7dc` (17/08, trang Công nợ học viên + bắt buộc chứng từ phiếu thu/chi),
+> Bản dựng đang chạy: `e2239b` (17/08, chia đợt hai chế độ + Công nợ học viên + bắt buộc chứng từ),
 > đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `157461`, `f18e75`, `f1af4c`, `bad7f9`, `a9eb4b`, `cd5289`, `c16c57`, `2e82d7`, `9a361d`.
+> Mốc cũ: `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`, `bad7f9`, `a9eb4b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 17/08 - CHIA ĐỢT HỌC PHÍ: NHẬP TAY TỪNG ĐỢT, VÀ HAI CHẾ ĐỘ
+>
+> Anh Luân đặt ba lượt liền, mỗi lượt mở rộng thêm:
+> *"tạo đăng ký thì phải chọn giữa đóng 1 lần và theo đợt chứ"* → *"hiển thị cho người ta chọn
+> ngày đóng và số tiền mỗi đợt, tự cảnh báo nếu chưa đủ số tổng"* → *"cho sale chọn: tách theo
+> quy định, hoặc tách chủ động. Cái nào cũng cần duyệt nghen."*
+>
+> **Lịch đợt từng LUÔN do máy tính** từ hai tham số CH2 (đợt đầu 40%, cách nhau 30 ngày). Đúng
+> cho ca thường, nhưng khách hẹn *"5 triệu trước Tết, phần còn lại tháng 3"* thì không tham số
+> nào tả nổi. *Số máy tính ra là GỢI Ý; chỗ nhập tay mới là nơi sự thật của hợp đồng nằm.*
+>
+> **MỘT bảng, hai chế độ** - không dựng hai màn. Theo quy định: bảng vẫn hiện đủ nhưng KHOÁ, và
+> luôn hiện đúng con số app sắp ghi. **Bày ra chứ không giấu**: thứ Sale phải đọc cho khách nghe
+> là ba dòng "bao nhiêu, hạn nào"; giấu đi rồi bắt họ tin một câu "app tự tính" là bắt họ đọc cho
+> khách một thứ chưa nhìn thấy.
+>
+> **Ô cảnh báo tính lại mỗi lần gõ** ("còn thiếu 4.199.000đ so với học phí 14.000.000đ"), VÀ chặn
+> ở cửa ghi - *cảnh báo mà vẫn lưu được thì nó chỉ là một lời than.* Câu khuyên phải khớp chỗ
+> đang sai: bản đầu lúc nào cũng nói "sửa lại số tiền" kể cả khi lỗi là thiếu HẠN, tức chỉ vào
+> đúng cái ô không có lỗi.
+>
+> **BẢY CHỖ TỰ BẮT TRONG LÚC LÀM - phần lớn là cùng một bệnh: khai tách mà không tách thật:**
+> · Dựng `insChiaCore` rồi **để nguyên bản sao logic trong `insPlanSave`**. *Tách một hàm ra mà
+>   không đi gỡ chỗ cũ thì mới chỉ nhân đôi, chưa phải tách.*
+> · Nhánh tắt `n<=1` cho gọn → **mở một lối lách**: gộp đơn đang chia 3 đợt về "một lần" cũng là
+>   đổi điều kiện hợp đồng, mà ai muốn bỏ lịch đợt chỉ cần chọn "1 đợt".
+> · **Cửa ghi tiền thứ ba suýt lọt**: bước `pay` của luồng chạy quy trình ghi thẳng vào DL07 bằng
+>   payload riêng, không qua `paySave` nên không dính luật chứng từ. *Đặt một luật ở cửa ghi thì
+>   phải đi đếm xem có mấy cửa ghi, đừng đếm mấy cái mình nhớ.*
+> · Ngăn kéo Chia đợt vẫn là bản cũ bốn tham số trong khi bước Tạo đăng ký đã sửa tay được -
+>   *cùng một việc thì mọi cửa phải làm được như nhau.*
+> · Yêu cầu gửi hàng chờ phải mang **chính danh sách đã nhập**; bản cũ tính lại từ (n, gap, dep)
+>   nên người duyệt đồng ý một đằng, app ghi một nẻo.
+> · Đổi chế độ: em định bật/tắt từng ô rồi tô lại nút của dải chọn - nhưng `segHTML` **không gắn
+>   `data-k`**, nên đoạn tô lại nhắm vào một thuộc tính không tồn tại: chế độ đổi thật mà dải chọn
+>   vẫn sáng ở ô cũ. *Vẽ lại cả khối rẻ hơn một chỗ lệch không ai thấy.*
+> · **Nhãn chế độ có thể nói dối**: cờ mất thì mặc định "theo quy định" trong khi lịch là gõ tay -
+>   đúng lúc đáng soi nhất lại được gật nhanh. Nay nhãn **tự đối chiếu** với lịch quy định sinh ra.
+>
+> **VERIFY BẮT MỘT CHỖ:** `_check15` phát hiện `dotGhiLich` là cửa ghi MỚI vào DL06b chưa khai -
+> lúc tách lõi em chỉ nghĩ tới hai cửa người dùng đi vào, quên rằng chỗ tay đặt bút nay là hàm khác.
+> `_check16` và `_checkux` lái form bằng ô cũ nên đỏ; dạy lại theo cửa mới **và đòi chặt hơn**:
+> lịch ghi vào sổ phải KHỚP TỪNG CON SỐ với cái vừa gõ, cả đường tự lưu lẫn đường qua duyệt.
+>
+> **MỘT LẦN SUÝT BÁO LỖI KHÔNG CÓ THẬT:** thước của em báo *"NV Tư vấn không thấy nhóm Đăng ký -
+> chờ thu"*. Đo kỹ lại thì hồ sơ VẪN có trên màn họ - dải chip nhóm việc chỉ hiện tối đa mấy nhóm
+> rồi gộp phần còn lại vào "+N nhóm khác", nên chuỗi ấy không nằm trong đoạn em tìm.
+> *Trước khi khai một chỗ hỏng, hỏi xem cái thước có đang đo đúng thứ mình nghĩ không.*
 >
 > ### 🟢 17/08 - CÔNG NỢ HỌC VIÊN: HAI CỔNG MỘT MÀN, VÀ BA CỬA TIỀN BỊ CHÔN NĂM TẦNG
 >

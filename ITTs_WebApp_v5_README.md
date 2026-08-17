@@ -2407,6 +2407,26 @@ Bản demo **không gửi thật** — chỗ nối ra backend đã đánh dấu 
 Đợt đóng quá hạn `commitCancel_days` (mặc định 14) ngày sinh việc **gửi thư huỷ cam kết đầu ra**,
 bấm là mở thẳng màn soạn thư với nội dung điền sẵn.
 
+## Chia học phí theo đợt - hai chế độ, đều qua duyệt
+Ngay ở bước **Tạo đăng ký** đã chọn được **Đóng một lần** hay **Chia 2 · 3 · 4 đợt**, không phải
+tạo đơn xong rồi mở màn Thanh toán mới chia. Cùng bảng ấy có ở ngăn kéo **Chia lịch đợt**.
+
+Hai chế độ:
+- **Tách theo quy định** - app tính theo Cài đặt (CH2): đợt đầu bằng `installmentDepositPercent`
+  (mặc định **40%**) học phí, các đợt cách nhau `installmentGap_days` (mặc định **30 ngày**).
+  Bảng vẫn hiện đủ nhưng khoá - đọc cho khách nghe được ngay, không phải tin suông.
+- **Tách chủ động** - mở khoá đúng bảng ấy, gõ **ngày và số tiền từng đợt** theo thứ đã hẹn với
+  khách. Chuyển sang chế độ này thì giữ nguyên số đang hiện làm điểm bắt đầu.
+
+**Tự cộng và cảnh báo ngay lúc gõ**: *"còn thiếu 4.199.000đ so với học phí 14.000.000đ"* hoặc
+*"đang thừa..."* hoặc *"1 đợt chưa có hạn đóng"*, kèm câu khuyên đúng chỗ đang sai. Lệch tổng thì
+**cửa ghi từ chối**, không chỉ cảnh báo. Sửa học phí hay chiết khấu thì tổng phải chia đổi theo.
+
+**Cả hai chế độ đều qua cửa duyệt như nhau**: ai chưa có quyền duyệt thì yêu cầu vào **Duyệt đổi
+đợt đóng**, lịch đợt chưa đổi. Yêu cầu nói rõ *"Chia theo quy định"* hay *"Chia chủ động"* - và
+nhãn ấy tự đối chiếu với lịch quy định sinh ra, không tin cờ. Người duyệt bấm đồng ý là sổ ghi
+**đúng từng con số đã trình**, không tính lại.
+
 ## Công nợ học viên - cửa của Kế toán
 Trang **Công nợ học viên** (nhóm Điều hành) trả lời câu **"ai đang nợ bao nhiêu"** - khác với Sổ
 thu học phí, vốn đếm theo phiếu và theo đợt để trả lời "hôm nay tiền nào về".
