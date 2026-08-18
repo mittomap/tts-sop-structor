@@ -160,6 +160,17 @@
 > giảng viên (3-5 cột), bảng chờ xếp lớp (3 cột), Phiếu gần đây ở Khảo sát, bảng thưởng còn treo
 > ở Mã giới thiệu, các bảng trong Cài đặt và trong ngăn kéo.
 
+> ### ✅ 18/08 - ĐO LẠI BA MẢNG RÀ SOÁT: RA1 VỀ 0, RA2 CÒN 6 CHỖ KHÔNG PHẢI SỰ KIỆN
+> **RA1 (trục lọc): 13 → 0.** Thêm 10 trục: `contact_primary`, `payer_side` (DL09) · `student_type`,
+> `learning_goal`, `learning_mode` (DL02) · `discount_type` (DL06) · `complaint_result` (DL17) ·
+> `booking_status` (DL03) · khai trục tay cho sổ liên hệ DL02b · sửa gương `dsphanhoi`.
+> **RA2 (dòng thời gian): 12 → 6.** Thêm: gửi phiếu khảo sát · mời tái ghi danh · lớp khai giảng /
+> kết thúc · xin đổi lịch đợt đóng + kết quả duyệt. **Sáu mốc còn lại KHÔNG phải sự kiện** - khai
+> ra đây để lần sau khỏi đo lại: `expected_start_time` (mong muốn của khách) · `next_followup_time`
+> (hẹn ở tương lai) · `last_contact_time`, `last_learning_activity_time`, `joined_at`,
+> `first_enrollment_date` (số tổng kết của những việc đã có mặt trên dòng).
+> **RA3 (cửa ghi ngõ cụt): 0.**
+
 > ### 📋 17/08 - ĐANG CHỜ ANH LUÂN TRẢ LỜI
 > 1. **"Cái nào cũng cần duyệt" - duyệt tới đâu?** Em đang hiểu là hai chế độ chia đợt (theo quy
 >    định / chủ động) đều không lách được hàng chờ, còn Trưởng phòng và Kế toán trưởng vẫn chia
@@ -365,13 +376,35 @@
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 17/08 trên `ec42a8`).
-> Bản dựng đang chạy: `1f160a` (18/08, nút Cột phủ hết 16 sổ dựng tay), đã lên
-> https://mittomap.github.io/itts-sop-demo-v2/ - verify trọn bộ của bản này đang chạy.
+> Bản dựng đang chạy: `68db0a` (18/08, nút Cột phủ hết 16 sổ dựng tay + 10 trục lọc + 4 mốc dòng
+> thời gian), đã lên https://mittomap.github.io/itts-sop-demo-v2/ - verify trọn bộ đang chạy.
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
+> Mốc cũ: `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
 > `bad7f9`, `a9eb4b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
+> ### 🟢 18/08 - HAI LẦN THƯỚC ĐO SAI TRƯỚC KHI ĐO ĐƯỢC MỘT CHỖ HỎNG THẬT
+>
+> Đo lại ba mảng rà soát xem còn sót gì. Lần đầu thước báo **117 chỗ hỏng** - vì nó đếm cả cột SỐ
+> ít giá trị (học phí, điểm band, số lượt WOW) là "cột phân loại". Siết lại: còn **67** - vẫn sai,
+> vì đếm cả cột ghi chú tự do, cột mốc thời gian và cột mã người. Siết lần ba (mọi giá trị phải
+> đọc ra một mã enum app có khai ở CH1): còn **22**. Rồi phát hiện lỗi lớn nhất: thước đọc thẳng
+> `FLTDEF`, trong khi **app hỏi qua `fltAxes`** - hàm ấy gộp thêm trục gương của sổ tra cứu
+> (`FLTGUONG`) và trục tự sinh từ cột đang hiện. Đo đúng đường app đi: còn **13**, và 13 chỗ ấy là
+> thật.
+> *Một danh sách việc dựng trên thước sai thì mọi dòng trong đó đều là việc không có thật - và nó
+> tốn đúng bằng việc thật.* Đây là lý do luật "trước khi khai một chỗ hỏng, hỏi xem cái thước có
+> đang đo đúng thứ mình nghĩ không" phải chạy TRƯỚC khi báo cáo, không phải sau.
+>
+> Và cái thước đúng bắt được một chỗ hỏng thật: `dsphanhoi` soi gương vào `khaosat`, mà `khaosat`
+> **cũng đang đi mượn** (nó không khai trục nào, chỉ có trục tự sinh). Gương soi vào một tấm gương
+> khác thì mượn được đúng con số không - hai sổ phản hồi cùng thiếu ba trục mà trang `ghinhan` đã
+> có sẵn. *Khai quan hệ thì phải trỏ vào chỗ CÓ SỰ THẬT.*
+>
+> **Một luật mới cho dòng thời gian: chỉ ghi việc ĐÃ XẢY RA.** `class_end_date` là ngày kế hoạch;
+> thả thẳng vào là "Lớp kết thúc" nhảy lên đầu dòng thời gian (sắp mới nhất trước) của một em vẫn
+> đang đi học đều, và người đọc kết luận em ấy đã nghỉ. *Việc chưa tới thuộc về hàng chờ.*
+
 > ### 🟢 18/08 - NÚT CỘT: TỪ "LUẬT CỦA NỬA SỐ MÀN" THÀNH LUẬT
 >
 > Anh Luân nhắc lại luật cũ: *"tất cả các bảng đều có thể cấu hình ẩn hiện cột bất kỳ đúng ko?"*
