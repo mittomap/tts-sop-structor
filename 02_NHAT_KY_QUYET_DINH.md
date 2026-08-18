@@ -375,9 +375,10 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 17/08 trên `ec42a8`).
+> **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 18/08 trên chính bản này, 44m18s).
 > Bản dựng đang chạy: `68db0a` (18/08, nút Cột phủ hết 16 sổ dựng tay + 10 trục lọc + 4 mốc dòng
-> thời gian), đã lên https://mittomap.github.io/itts-sop-demo-v2/ - verify trọn bộ đang chạy.
+> thời gian), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> `_check17` (bộ máy lọc) từ 504 lên 551 tiêu chí - 10 trục mới đã vào tầm đo, không phải khai suông.
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
 > Mốc cũ: `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
 > `bad7f9`, `a9eb4b`.
