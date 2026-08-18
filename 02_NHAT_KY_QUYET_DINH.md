@@ -148,6 +148,18 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### ✅ 18/08 - ĐỢT 4 XONG: NÚT CỘT PHỦ HẾT SỔ CHÍNH DỰNG TAY
+> 12 sổ dựng tay còn lại đã có nút Cột (`1f160a`): Khảo sát theo lớp · Kho bài tập · Giáo án theo
+> khóa · Buổi học trong ngày (GV dự phòng) · Bàn giao lead · Sổ ca dạy thay · Sổ cam kết · Hồ sơ
+> khóa (lớp thuộc khóa) · Phòng học (điểm đụng) · Bảng lớp (học viên + lịch sử đổi lịch) · Mã
+> giới thiệu. Cộng bốn sổ làm hôm 17/08 là **16 sổ dựng tay**, cạnh 27 sổ đi qua `renderList`.
+> **Ranh giới đã đặt và khai ra để lần sau khỏi đoán lại:** gắn cho **SỔ CHÍNH của trang** - cuốn
+> sổ người ta mở trang ra để đọc. Bảng phụ trong ngăn kéo, trong hồ sơ một dòng, hay ba bốn cột kê
+> tạm thì **không** gắn: một nút Cột trên bảng bốn cột chỉ thêm một nút, mà mỗi panel một nút thì
+> trang thành bảng điều khiển. Chỗ chưa gắn theo ranh giới này: ba hàng đợi ở trang Hôm nay của
+> giảng viên (3-5 cột), bảng chờ xếp lớp (3 cột), Phiếu gần đây ở Khảo sát, bảng thưởng còn treo
+> ở Mã giới thiệu, các bảng trong Cài đặt và trong ngăn kéo.
+
 > ### 📋 17/08 - ĐANG CHỜ ANH LUÂN TRẢ LỜI
 > 1. **"Cái nào cũng cần duyệt" - duyệt tới đâu?** Em đang hiểu là hai chế độ chia đợt (theo quy
 >    định / chủ động) đều không lách được hàng chờ, còn Trưởng phòng và Kế toán trưởng vẫn chia
@@ -352,12 +364,39 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 17/08 trên chính bản này).
-> Bản dựng đang chạy: `e2239b` (17/08, chia đợt hai chế độ + Công nợ học viên + bắt buộc chứng từ),
-> đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 17/08 trên `ec42a8`).
+> Bản dựng đang chạy: `1f160a` (18/08, nút Cột phủ hết 16 sổ dựng tay), đã lên
+> https://mittomap.github.io/itts-sop-demo-v2/ - verify trọn bộ của bản này đang chạy.
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`, `bad7f9`, `a9eb4b`.
+> Mốc cũ: `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
+> `bad7f9`, `a9eb4b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 18/08 - NÚT CỘT: TỪ "LUẬT CỦA NỬA SỐ MÀN" THÀNH LUẬT
+>
+> Anh Luân nhắc lại luật cũ: *"tất cả các bảng đều có thể cấu hình ẩn hiện cột bất kỳ đúng ko?"*
+> Đo ra thì luật ấy mới đúng ở **27 sổ đi qua `renderList`**, vì cả bộ máy ẩn/hiện đọc
+> `LISTCFG[key].cols`. Đợt 3 mở bảng khai thứ hai (`COTTAY`) cho 4 sổ; đợt này phủ nốt **12 sổ**
+> còn lại. Ba thứ làm ở LÕI để mỗi sổ chỉ tốn ba dòng:
+> · **`cotLoc1(key,html,idx)`** - cắt cột cho đúng một bảng trong cả trang, gọi một lần ở chỗ
+>   trả về. Không phải đi bọc từng chỗ mở/đóng bảng của mỗi trang.
+> · **`cotDs` nhận một HÀM** - bảng nào có cột chỉ vẽ cho vài người (cột tiền ở Mã giới thiệu,
+>   "Thu trong kỳ" ở Công nợ) thì bản khai cột phải hỏi lại đúng câu ấy. *Khai thừa một cột là
+>   mọi ô sau đó lệch một nấc - bảng vẫn hiện, chỉ là số nằm sai cột.* Và menu cột là **bản mục
+>   lục của bảng** - mục lục không được kê một chương chưa in.
+> · **`filterBar`/`chipBar` nhận `them`** - nút Cột vào đúng cụm công cụ bên phải, giữ nguyên thứ
+>   tự [số dòng] [Xuất] [Bộ lọc] [Cột] mà hàm chung đang canh.
+>
+> **BẪY: "bảng thứ nhất" chỉ đếm được khi bảng ấy chắc chắn có mặt.** Bảng Lịch sử đổi lịch ở
+> Bảng lớp không ra đời khi lớp chưa dời buổi nào - lúc ấy `cotLoc1(…,0)` sẽ cắt nhầm cột của
+> bảng điểm danh ngay dưới, theo bản khai cột của một bảng khác. Hai bảng trong tab dựng vào
+> chuỗi riêng rồi mới cắt. *Đếm thứ tự chỉ đúng khi thứ được đếm chắc chắn có mặt.*
+>
+> **BỘ ĐO BẮT ĐƯỢC MỘT CHỖ HỎNG THẬT của đợt trước:** bảng Công nợ ẩn cột "Chứng từ" thì mất tiêu
+> đề mà ô dữ liệu vẫn còn - cả bảng lệch một nấc từ đó. Header có rào `_c("cn_ct")`, ô dữ liệu thì
+> không. *Rào ở tiêu đề mà quên rào ở ô là kiểu hỏng không kêu: bảng vẫn vẽ ra, chỉ là mỗi số đứng
+> dưới sai một cột.* Cách đo: vẽ thật từng bảng, bật/tắt **từng cột một** rồi đếm ô trên **mọi
+> hàng** - 258 tiêu chí. Đếm ở tiêu đề thôi thì đúng cái lỗi này lọt.
 >
 > ### 🟢 17/08 - CHIA ĐỢT HỌC PHÍ: NHẬP TAY TỪNG ĐỢT, VÀ HAI CHẾ ĐỘ
 >

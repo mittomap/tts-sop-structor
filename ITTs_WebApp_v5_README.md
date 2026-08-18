@@ -295,6 +295,19 @@ Trước đây menu Danh sách chỉ có **5/20 bảng**. Nay đủ cả 20, chi
 
 Mọi danh sách đều có sẵn: tìm kiếm (không cần bỏ dấu), chip lọc theo đúng thứ tự danh mục, ẩn/hiện cột, phân trang, và nút hành động phù hợp (Chạy quy trình / Hồ sơ / Bảng lớp).
 
+### Ẩn/hiện cột phủ luôn cả sổ dựng tay (18/08)
+Nút **Cột** trước đây chỉ có ở các sổ đi qua bộ máy danh sách chung, vì nó đọc danh sách cột từ
+khai báo của sổ ấy. Nay có bảng khai thứ hai cho các bảng dựng tay, nên **16 sổ chính dựng tay**
+cũng có nút Cột: Công nợ học viên · Kho mẫu tin · Sổ tin đã gửi · Sổ cam kết · Khảo sát theo lớp ·
+Kho bài tập · Giáo án theo khóa · Buổi học trong ngày (GV dự phòng) · Bàn giao lead · Sổ ca dạy
+thay · Hồ sơ khóa (lớp thuộc khóa) · Phòng học (điểm đụng) · Bảng lớp (học viên + lịch sử đổi
+lịch) · Mã giới thiệu. Lựa chọn nhớ theo từng người và giữ qua F5.
+
+Nút gắn cho **sổ chính của trang** - cuốn sổ người ta mở trang ra để đọc. Bảng phụ trong ngăn kéo,
+trong hồ sơ một dòng, hay chỉ ba bốn cột thì không gắn: mỗi panel một nút thì trang thành bảng
+điều khiển. Bảng nào có cột chỉ vẽ cho một số người (cột tiền, cột "Thu trong kỳ" khi chọn kỳ)
+thì menu cột cũng chỉ kê đúng những cột đang thật sự có trên bảng.
+
 **Kiểm chứng V5.9**: 20/20 danh sách render sạch, đúng bảng nguồn (Lịch sử liên hệ 550 dòng, Điểm danh 819, Bài tập 359, Tư vấn 106…); toàn app **47 trang render 0 lỗi**; Khóa học có Thêm mới/Sửa và hiện học phí dạng tiền; danh sách chỉ xem không còn dropdown đổi trạng thái; không hồi quy (KPI 36/48, CH4 94 câu, reup 33 hồ sơ).
 
 ---

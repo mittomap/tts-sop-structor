@@ -2809,15 +2809,34 @@ var FLTDEF={
   fxCalc("_wowcon","Quota WOW còn",function(r){var n=num(r.wow_quota_remaining);
     return n<=0?"het":(n<=2?"sap_het":"con")},
    function(v){return v==="het"?"Đã hết quota":(v==="sap_het"?"Còn 1-2 buổi":"Còn nhiều")}),
+  /* V2 18/08 - hai cột hồ sơ phụ huynh có dữ liệu thật mà không trục nào hỏi tới. Đây là câu
+     của CSKH trước mỗi đợt gọi ("em nào phải gọi người giám hộ") và của Kế toán trước mỗi đợt
+     nhắc phí ("ai là người đóng tiền"). */
+  fxEnum("contact_primary","Liên hệ chính"),fxEnum("payer_side","Bên đóng tiền"),
   fxDate("joined_at","Ngày vào học")],
+ /* V2 18/08 - ba cột KHÁCH LÀ AI và MUỐN GÌ: đối tượng, mục tiêu, hình thức học mong muốn. Chúng
+    có mặt trong DL02 từ đầu và Marketing hỏi đúng ba câu ấy khi chia chiến dịch ("nhóm du học",
+    "nhóm muốn học online"), nhưng trước bản này chỉ đọc được bằng cách mở từng lead ra xem. */
  nhaplead:[fxEnum("lead_status","Trạng thái lead"),fxStaff("assigned_to","Người phụ trách"),
   fxEnum("lead_source","Nguồn khách"),fxEnum("branch","Cơ sở"),fxEnum("lead_qualification_status","Mức độ tiềm năng"),
+  fxEnum("student_type","Đối tượng"),fxEnum("learning_goal","Mục tiêu học"),
+  fxEnum("learning_mode","Hình thức học mong muốn"),
   fxDate("lead_created_time","Ngày vào hệ thống"),fxDate("next_followup_time","Hẹn liên hệ lại")],
  test:[fxEnum("test_status","Trạng thái chấm"),fxEnum("test_kind","Thi thử / thi thật"),fxEnum("test_format","Hình thức test"),
+  fxEnum("booking_status","Trạng thái đặt lịch"),
   fxEnum("test_attendance_status","Dự test"),fxEnum("post_test_status","Sau khi có KQ"),
   fxStaff("graded_by","Người chấm"),fxDate("test_date","Ngày test")],
+ /* Sổ liên hệ khai trục TAY chứ không để tự sinh: trục tự sinh chỉ đọc CỘT ĐANG HIỆN, mà sổ tra
+    cứu `dslienhe` không hiện cột "Chiều liên hệ" nên nó mất luôn câu hỏi cơ bản nhất của cuốn sổ
+    này - *khách gọi đến hay mình gọi đi*. Khai ở đây thì cả hai sổ cùng có, qua cơ chế gương. */
+ lienhe:[fxEnum("direction","Chiều liên hệ"),fxEnum("channel","Kênh"),
+  fxEnum("result_note","Kết quả"),fxStaff("staff_id","Người liên hệ"),
+  fxRef("lead_id","Khách","DL02","lead_id","full_name"),fxDate("contact_time","Thời điểm")],
  tuvan:[fxEnum("enrollment_status","Trạng thái đơn"),fxEnum("payment_status","Tình trạng thu"),
   fxRef("course_id","Khóa học","DL05","course_id","course_name"),
+  /* Ưu đãi loại nào: Marketing cần đếm được bao nhiêu đơn về từ mã giới thiệu so với khuyến mãi,
+     mà cột `discount_type` có sẵn ở DL06 vẫn chưa ai hỏi tới. */
+  fxEnum("discount_type","Loại ưu đãi"),
   fxStaff("discount_approved_by","Người duyệt giảm giá"),
   fxDate("enrollment_time","Ngày đăng ký"),fxDate("next_payment_due","Hẹn thu tiếp")],
  /* V2 17/08 - ĐỢT SỐ MẤY và CHỨNG TỪ: hai câu kế toán hỏi khi đối soát. "Đợt 1 hay đợt cuối"
@@ -2873,6 +2892,9 @@ var FLTDEF={
   fxEnum("complaint_type","Loại khiếu nại"),fxEnum("complaint_channel","Kênh"),
   /* Người đang xử lý: câu hỏi đầu tiên của trưởng phòng khi mở bảng khiếu nại ra. */
   fxEnum("assigned_handler","Người xử lý"),
+  /* Kết quả xử lý: "chấp nhận / không chấp nhận / chờ HV phản hồi" là thứ trưởng phòng đọc lại
+     cuối tháng, khác hẳn "trạng thái" (đã đóng hay chưa). */
+  fxEnum("complaint_result","Kết quả xử lý"),
   fxRef("class_id","Lớp","DL10","class_id","class_name"),fxDate("complaint_time","Ngày tiếp nhận")],
  ketthuc:[fxEnum("re_enrollment_status","Tái ghi danh"),fxEnum("achievement_status","Kết quả đầu ra"),
   fxEnum("student_status","Trạng thái HV"),
@@ -10587,6 +10609,13 @@ function jTimeline(C){
  C.att.filter(function(a){return !isc(a.attendance_status,"on_time")}).slice(0,12).forEach(function(a){
   add(a.check_in_time||"","ti-user-check","Điểm danh",elabel(a.attendance_status)||"","amber")});
  C.wow.forEach(function(w){add(w.wow_session_date,"ti-star","Buổi WOW "+(elabel(w.wow_skill)||""),elabel(w.wow_status)||"","blue")});
+ /* GỬI phiếu là một điểm chạm, TRẢ LỜI là một điểm chạm khác - và khoảng cách giữa hai cái mới
+    là thứ nói lên lớp này có chịu nói chuyện với mình không. Trước bản này chỉ có cái thứ hai,
+    nên phiếu gửi rồi im luôn thì trên dòng thời gian không để lại dấu vết nào.
+    *Một việc mình đã làm mà đối phương chưa đáp thì nó vẫn là một việc đã làm.* */
+ C.sv.forEach(function(s){add(s.sent_date,"ti-send","Gửi phiếu khảo sát "+(elabel(s.survey_type)||""),
+   (String(s.submitted_date||"").trim()?"":"chưa trả lời"),
+   (String(s.submitted_date||"").trim()?"blue":"amber"))});
  C.sv.forEach(function(s){add(s.submitted_date,"ti-clipboard-text","Khảo sát "+(elabel(s.survey_type)||""),"Hài lòng "+(s.satisfaction_score||"-")+"/5",(num(s.satisfaction_score)<=3?"amber":"green"))});
  C.kn.forEach(function(k){add(k.complaint_time,"ti-alert-triangle","Khiếu nại "+(elabel(k.complaint_type)||""),elabel(k.complaint_status)||"","red");
   add(k.assigned_at,"ti-user-check","Giao người xử lý khiếu nại",esc(k.assigned_handler||""),"amber");
@@ -10667,7 +10696,33 @@ function jTimeline(C){
     (elabel(hd.duyet_gd)||hd.duyet_gd||"")+(hd.duyet_gd_boi?(" · "+(nsTen(hd.duyet_gd_boi)||hd.duyet_gd_boi)):"")+
     (String(hd.ly_do_gd||"").trim()?(" - "+hd.ly_do_gd):""),
     /rejected/.test(ecode(hd.duyet_gd))?"red":"green")})})();
- C.ce.forEach(function(c){add(c.course_completion_time,"ti-award","Kết thúc khóa","Điểm "+(c.final_test_score||"-")+" · "+(elabel(c.achievement_status)||""),"green")});
+ C.ce.forEach(function(c){add(c.course_completion_time,"ti-award","Kết thúc khóa","Điểm "+(c.final_test_score||"-")+" · "+(elabel(c.achievement_status)||""),"green");
+  /* Lời mời tái ghi danh: điểm chạm CUỐI CÙNG của cả hành trình, và là chỗ CSKH hỏi lại nhiều
+     nhất ("đã mời em này chưa, mời hôm nào"). Cột có sẵn ở DL18 từ đầu, chỉ chưa ai đưa lên. */
+  add(c.re_enrollment_contact_time,"ti-mail","Mời tái ghi danh",elabel(c.re_enrollment_status)||"","blue")});
+ /* ═══ HAI MỐC CỦA LỚP, VÀ MỘT LUẬT: DÒNG THỜI GIAN CHỈ GHI VIỆC ĐÃ XẢY RA ═══════════════════
+    `class_start_date`/`class_end_date` là ngày KẾ HOẠCH - lớp đang học thì ngày kết thúc nằm ở
+    tương lai. Thả thẳng vào đây là "Lớp kết thúc" nhảy lên ĐẦU dòng thời gian (sắp xếp mới nhất
+    trước) của một em vẫn đang đi học đều - người đọc kết luận em ấy đã nghỉ.
+    *Dòng thời gian là chuyện đã qua; việc chưa tới thuộc về hàng chờ, không thuộc về đây.* */
+ (function(){var _now=Date.now(),_da={};
+  function qua(t){var d=pvnd(t);return d&&d.getTime()<=_now?t:""}
+  (C.ob||[]).forEach(function(o){var cid=String(o.class_id||"");if(!cid||_da[cid])return;_da[cid]=1;
+   var c=find("DL10","class_id",cid);if(!c)return;var ten=c.class_name||cid;
+   add(qua(c.class_start_date),"ti-school","Lớp "+ten+" khai giảng",
+    (elabel(c.learning_mode)||"")+(c.main_teacher_id_name?(" · GV "+c.main_teacher_id_name):""),"blue");
+   add(qua(c.class_end_date),"ti-flag-check","Lớp "+ten+" kết thúc",elabel(c.class_status)||"","green")})})();
+ /* Xin đổi lịch đóng học phí + kết quả duyệt. Ngăn kéo Công nợ đã bày ra "ai duyệt, duyệt lúc
+    nào" (anh Luân đặt 17/08), nhưng đó là bày trong một ngăn kéo của người làm kế toán; còn hồ
+    sơ học viên - chỗ ai cũng mở khi có tranh chấp - thì không thấy việc ấy từng xảy ra. */
+ (function(){var _e={};(C.enr||[]).forEach(function(x){_e[String(x.enrollment_id||"")]=1});
+  rows("DL27").filter(function(r){return _e[String(r.enrollment_id||"")]}).forEach(function(r){
+   var giaHan=/extend/.test(ecode(r.req_type));
+   add(r.req_time,"ti-calendar-cog",giaHan?"Xin gia hạn hạn đóng":"Xin chia lại đợt đóng",
+    (r.req_by_name?("người gửi: "+r.req_by_name):"")+(r.reason?(" - "+String(r.reason).slice(0,90)):""),"amber");
+   add(r.decided_at,"ti-gavel","Duyệt yêu cầu đổi đợt: "+(elabel(r.req_status)||ecode(r.req_status)||""),
+    (r.decided_by_name?(r.decided_by_name):"")+(r.decide_note?(" - "+String(r.decide_note).slice(0,90)):""),
+    /reject/.test(ecode(r.req_status))?"red":"green")})})();
  ev=ev.filter(function(e){return pvnd(e.t)});
  ev.sort(function(a,b){return (pvnd(b.t)||0)-(pvnd(a.t)||0)});
  if(!ev.length)return '<div class="mut" style="font-size:12px">Chưa có hoạt động nào.</div>';
@@ -28256,7 +28311,14 @@ function mkRO(src,sub,lam){var c={};for(var k in src)c[k]=src[k];c.ro=1;if(sub)c
    còn sổ tra cứu tên "dskhieunai" là một tên khác nên tra không ra - dù hai trang đọc CÙNG bảng
    DL17 và hiện CÙNG những cột đó. Khai tay thêm 13 dòng nữa là nhân đôi một sự thật, mai kia
    thêm sổ thứ 14 lại sót. Nên khai QUAN HỆ: sổ này soi trang nào. */
-var FLTGUONG={dsbaitap:"baitap",dswow:"wow",dsketthuc:"ketthuc",dsphanhoi:"khaosat",dskhieunai:"khieunai",
+/* V2 18/08 - `dsphanhoi` soi nhầm sang `khaosat`. Sổ `khaosat` cũng đọc DL16 nhưng KHÔNG khai
+   trục nào (nó chỉ có trục tự sinh từ cột đang hiện), nên gương soi vào một tấm gương khác:
+   hai sổ phản hồi cùng thiếu ba trục mà trang nghiệp vụ `ghinhan` đã có sẵn - kênh phản hồi,
+   lớp, người phân loại. Nay cả hai soi thẳng vào `ghinhan`.
+   *Khai quan hệ thì phải trỏ vào chỗ CÓ SỰ THẬT, trỏ vào một chỗ cũng đang đi mượn thì mượn
+   được đúng con số không.* */
+var FLTGUONG={dsbaitap:"baitap",dswow:"wow",dsketthuc:"ketthuc",dsphanhoi:"ghinhan",khaosat:"ghinhan",
+ dskhieunai:"khieunai",
  dslienhe:"lienhe",dstest:"test",dstuvan:"tuvan",dsdangky:"tuvan",dsthanhtoan:"thanhtoan",
  dsbuoihoc:"buoihoc",dsdiemdanh:"diemdanh",dskhaosat:"review"};
 LISTCFG.dslienhe={code:"DL02b",filt:"channel",ro:1,lam:"nhaplead",sub:"Sổ liên hệ (DL02b) - mọi điểm chạm với khách, chỉ xem",
