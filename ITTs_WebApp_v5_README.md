@@ -303,6 +303,18 @@ Kho bài tập · Giáo án theo khóa · Buổi học trong ngày (GV dự phò
 thay · Hồ sơ khóa (lớp thuộc khóa) · Phòng học (điểm đụng) · Bảng lớp (học viên + lịch sử đổi
 lịch) · Mã giới thiệu. Lựa chọn nhớ theo từng người và giữ qua F5.
 
+### Cột mặc định chọn theo ngữ cảnh từng bảng (18/08)
+Mỗi sổ chỉ bày sẵn những cột người ta thật sự đọc; phần còn lại vẫn có trong nút Cột, bật là hiện.
+Ba loại cột mặc định ẩn: **cột mã** (mọi sổ, kể cả bảng dựng tay) · **cột gần như trống** (có dữ
+liệu ở dưới 10% số dòng) · **cột nói lại thứ cột bên cạnh đã nói**. Cột "việc kế tiếp" tuy cũng
+thưa nhưng luôn hiện - đó là cột người ta mở sổ ra để tìm.
+
+Sổ Giảng viên được xếp lại thứ tự theo đúng thứ tự câu hỏi: ai · vai trò · đang gánh bao nhiêu
+(lớp, học viên) · đang nợ gì (nhận xét, bài chấm) · còn làm hay đã nghỉ. Các số tổng kết (lớp đã
+dạy xong, buổi WOW tháng, ca test, giờ dạy tháng) chuyển xuống mặc định ẩn.
+
+Kết quả: 29 sổ danh sách bày 4-9 cột thay vì có sổ bày 12; 15 bảng dựng tay bỏ cột mã khỏi mặc định.
+
 Nút gắn cho **sổ chính của trang** - cuốn sổ người ta mở trang ra để đọc. Bảng phụ trong ngăn kéo,
 trong hồ sơ một dòng, hay chỉ ba bốn cột thì không gắn: mỗi panel một nút thì trang thành bảng
 điều khiển. Bảng nào có cột chỉ vẽ cho một số người (cột tiền, cột "Thu trong kỳ" khi chọn kỳ)

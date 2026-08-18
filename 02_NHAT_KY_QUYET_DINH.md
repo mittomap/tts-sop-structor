@@ -375,15 +375,52 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 18/08 trên chính bản này, 44m18s).
-> Bản dựng đang chạy: `68db0a` (18/08, nút Cột phủ hết 16 sổ dựng tay + 10 trục lọc + 4 mốc dòng
-> thời gian), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 18/08 trên chính bản này, 35m54s).
+> Bản dựng đang chạy: `52f95d` (18/08, cột mặc định theo ngữ cảnh từng bảng + bỏ chữ "đợt" khi
+> đóng một lần), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
 > `_check17` (bộ máy lọc) từ 504 lên 551 tiêu chí - 10 trục mới đã vào tầm đo, không phải khai suông.
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
+> Mốc cũ: `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
 > `bad7f9`, `a9eb4b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
+> ### 🟢 18/08 - CỘT MẶC ĐỊNH THEO NGỮ CẢNH · VÀ "ĐÓNG MỘT LẦN" THÌ ĐỪNG GỌI LÀ "ĐỢT"
+>
+> **Anh Luân hai câu.** (1) *"Đóng 1 lần thì ghi là ngày đóng, số tiền, chứ ai lại ghi đợt nữa
+> em"*. (2) *"Mặc định ẩn những cột người dùng ít dùng, ví dụ như ID... đọc ngữ cảnh của các bảng
+> rồi phân tích, hiện mặc định và sắp xếp hợp lý các cột cần thiết, còn lại ẩn đi."*
+>
+> **Chuyện (1) bắt đầu từ một tấm ảnh.** Anh bảo chụp màn để nhìn; chụp xong nhìn ảnh Tạo đăng ký
+> thì thấy đang chọn "Đóng một lần" mà màn vẫn bày dải "Tách theo quy định / Tách chủ động".
+> Nguyên nhân: `insEditSoDot` **có sẵn** dòng ẩn dải ấy khi chỉ một đợt, nhưng nó tìm theo id
+> `inschebar` mà `insEditHTML` chưa bao giờ đặt - dòng lệnh chạy vào chỗ trống.
+> **Lần thứ hai trong ba ngày** em viết mã trỏ vào một phần tử không tồn tại (lần trước là
+> `data-k` mà `segHTML` không phát ra). *Viết một dòng đi tìm phần tử thì phải đi xem chỗ dựng ra
+> nó có đặt đúng cái tên ấy không - dòng lệnh không kêu, nó chỉ lặng lẽ không làm gì.*
+> Sửa xong mới thấy chỗ anh Luân nói còn rộng hơn: một đợt thì cả chữ "Đợt 1" cũng sai. Nay một
+> đợt là "Ngày đóng học phí · Ngày đóng · Số tiền", không còn chữ "đợt" nào; ba cửa nhập đợt dùng
+> **chung một hàm đặt tên** (`insNhanHan`/`insNhanKhoi`/`insNhanGoi`) chứ không khai ba lần.
+> **Bộ kiểm không có cách nào bắt chỗ này** - không bộ nào biết dải ấy *đáng lẽ* phải biến mất.
+> Đây đúng là phần giao thức audit dặn: *máy đo được "không vỡ", không đo được "đọc có xuôi không"*.
+>
+> **Chuyện (2): chọn cột bằng SỐ ĐO, không bằng cảm giác.** Ba loại cột hạ xuống mặc định ẩn:
+> · **gần như trống** - `attendance_risk_reason` 6%, `academic_risk_reason` 2%, `follow_up_needed`
+>   5%. Nhưng cột "việc kế tiếp" cũng thưa mà **KHÔNG** hạ: đó là cột người ta mở sổ ra để tìm.
+>   *Thưa không phải là tiêu chí - thưa mà không ai hỏi tới mới là.*
+> · **nói lại thứ cột bên cạnh đã nói** - hai cột lý do nguy cơ đứng ngay cạnh hai chip nguy cơ;
+>   `class_level` đứng hai ô sau tên lớp vốn đã mang trình độ.
+> · **chỉ một nhóm người hỏi tới** - sổ Giảng viên bày 12 cột, 9 cột là số thống kê.
+> Luật cột mã mở rộng cho bảng dựng tay (`/_ma$/`) - **đã đếm trước khi đặt luật**: không một cột
+> dữ liệu thật nào kết thúc bằng `_ma`, nên luật không thể ẩn nhầm một cột nội dung.
+> Sổ Giảng viên còn được xếp lại thứ tự: ai · vai trò · đang gánh bao nhiêu · đang nợ gì · còn làm
+> hay đã nghỉ. Trước đó thứ trưởng phòng mở bảng ra để tìm nằm ở cột thứ mười ba.
+> *Thứ tự cột là thứ tự câu hỏi - hỏi trước thì đứng trước.*
+> Kết quả: 29 sổ danh sách bày 4-9 cột (trước có sổ bày 12), 15 bảng dựng tay bỏ cột mã.
+>
+> **Và bộ đo của em vướng chính luật vừa đặt:** nó so số cột khai với số ô **sau khi đã ẩn**, nên
+> báo đỏ ba bảng. Sửa cái thước, không sửa app. *Đặt một luật mới thì phải đi xem cái thước cũ có
+> đang đo theo luật cũ không.*
+
 > ### 🟢 18/08 - HAI LẦN THƯỚC ĐO SAI TRƯỚC KHI ĐO ĐƯỢC MỘT CHỖ HỎNG THẬT
 >
 > Đo lại ba mảng rà soát xem còn sót gì. Lần đầu thước báo **117 chỗ hỏng** - vì nó đếm cả cột SỐ
