@@ -893,6 +893,12 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .insplan{flex:1 1 100%;display:flex;flex-direction:column;gap:8px}
 .insrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .insno{min-width:52px;font-size:12px;font-weight:700;color:var(--muted)}
+/* Hàng tiêu đề của bảng nhập: nói rõ ô nào là ngày, ô nào là tiền. Hai ô đặt cùng bề ngang với
+   ô nhập ngay dưới để đọc thẳng xuống, không phải dò. */
+.inshd{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;color:var(--muted)}
+.inshd .h1{width:150px}
+.inshd .h2{width:150px;text-align:right}
+.insrow input[type="date"]{width:150px}
 .insrow input[type="date"]{height:34px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:12px;font-weight:600;color:var(--ink);background:#fff}
 .insrow input.insti{height:34px;width:150px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:13px;font-weight:700;color:var(--ink);text-align:right;background:#fff}
 .insrow input.khoa{background:var(--bg);color:var(--muted);cursor:default}
@@ -3279,7 +3285,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">18/08/2026 · <b>402988</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">18/08/2026 · <b>52f95d</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -4949,7 +4955,12 @@ hocvien:{code:"DL09",filt:"student_status",ro:1,sub:"Học viên (DL09) - lọc 
      ["vangnhieu","Vắng nhiều",function(s){var A=riskAuto(s.student_id)||{};
        return num(A.abs)>=num(paramOf("thresholdAtRisk_absences",2))}]],
  act:[{lb:"Xử lý",ic:"ti-player-play",fn:"runStart",arg:"student_id"}],
- cols:[["student_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["student_status","Trạng thái","chip"],["attendance_progress_status","Chuyên cần","chip"],["academic_progress_status","Học thuật","chip"],["attendance_risk_reason","Lý do CC","enum"],["academic_risk_reason","Lý do HT","enum"],["__vang","Vắng (buổi)","calcso"],["__thieubai","Thiếu bài","calcso"],["last_learning_activity_time","Hoạt động cuối","lau"],["wow_quota_remaining","WOW còn"],
+ /* V2 18/08 - hai cột "Lý do CC" / "Lý do HT" xuống cuối và mặc định ẩn: chúng chỉ có dữ liệu ở
+    6% và 2% số dòng, lại đứng ngay cạnh chính hai cột chip mà chúng giải thích. Ai muốn biết lý
+    do thì rê chuột vào chip hoặc mở hồ sơ - còn để nguyên hai cột gạch ngang giữa bảng thì mỗi
+    ngày mọi người đều phải đọc lướt qua chúng. */
+ cols:[["student_id","Mã"],["full_name","Họ tên"],["phone_number","SĐT"],["student_status","Trạng thái","chip"],["attendance_progress_status","Chuyên cần","chip"],["academic_progress_status","Học thuật","chip"],["__vang","Vắng (buổi)","calcso"],["__thieubai","Thiếu bài","calcso"],["last_learning_activity_time","Hoạt động cuối","lau"],["wow_quota_remaining","WOW còn"],
+   ["attendance_risk_reason","Lý do CC","enum"],["academic_risk_reason","Lý do HT","enum"],
    /* ═══ V2 14/08 - MƯỜI HAI CỘT HỒ SƠ, MẶC ĐỊNH ẨN (anh Luân: *"có thể nó thiếu cột"*) ══════
       Đo bằng máy: DL09 có 40 cột, sổ hiện 12, và **18 cột không thấy ở CẢ bảng lẫn hồ sơ 360**.
       Trong đó có `emergency_contact_phone` và `emergency_contact_relation` - đúng chỗ CLAUDE.md
@@ -5024,13 +5035,16 @@ lop:{code:"DL10",
  
  /* V9.40d: class_level là cột SOP mô tả từ đầu mà app chưa hiện ở đâu - xếp một em trình độ
     Foundation vào lớp IELTS 7.0+ là hỏng cả lớp, nên trình độ phải nhìn thấy ngay ở danh sách. */
- cols:[["class_id","Mã"],["class_name","Tên lớp"],["course_id_name","Khóa"],["class_level","Trình độ","enum"],["class_status","Trạng thái","chip"],["current_enrollment","Sĩ số"],["class_capacity","Sức chứa"],["main_teacher_id_name","GV chính"],["class_schedule","Lịch"],["class_start_date","Khai giảng"],
+ /* V2 18/08 - "Trình độ" xuống cuối và mặc định ẩn: tên lớp đã mang sẵn trình độ ở ngay đầu
+   ("IELTS 6.5 Tối T2-T4-T6"), nên cột này lặp lại thứ mắt vừa đọc cách đó hai ô. Vẫn bật lại
+   được, và vẫn lọc được ở Bộ lọc sâu. */
+cols:[["class_id","Mã"],["class_name","Tên lớp"],["course_id_name","Khóa"],["class_status","Trạng thái","chip"],["current_enrollment","Sĩ số"],["class_capacity","Sức chứa"],["main_teacher_id_name","GV chính"],["class_schedule","Lịch"],["class_start_date","Khai giảng"],
    /* V2 17/08 (anh Luân: *"hình như mình còn thiếu hình thức học phải ko ta: Offline, Online,
       Hybrid"*). Đo: DL10 CÓ cột `learning_mode` với dữ liệu thật (12 offline · 10 online · 4
       hybrid), và nó đã nằm trong Bộ lọc sâu từ lâu - nhưng sổ Lớp học KHÔNG hiện cột ấy và
       không có chip lọc nhanh. Tức app biết mà người dùng phải mở hai lớp mới hỏi được.
       Đúng con bệnh anh bắt 13/08 với chip 1-1 / nhóm: *"thông tin có, đường tới nó thì không"*. */
-   ["learning_mode","Hình thức học","enum"],["branch","Cơ sở","enum"]]},
+   ["learning_mode","Hình thức học","enum"],["class_level","Trình độ","enum"],["branch","Cơ sở","enum"]]},
 /* V9.42 - SOP tách HAI màn tra cứu: VH3 Giảng viên và VH3b NV WOW. App gộp một danh sách cho gọn
    (cùng bảng DL01, cùng cột) - hợp lý hơn hai màn giống hệt nhau - nhưng gộp mà không có đường
    tách ra thì đúng là làm SÓT màn VH3b: trưởng phòng muốn xem riêng đội WOW phải tự dò cột Vai trò.
@@ -5040,10 +5054,19 @@ giangvien:{code:"DL01",ro:1,sub:"Giảng viên & NV WOW (DL01) - lọc nhanh đ�
      ["gv","Chỉ giảng viên lớp",function(x){return /teacher/.test(ecode(x.role))},"blue"]],
  
  pre:function(s){return /teacher|wow|giảng|giang/.test(ecode(s.role))||/giảng|giang|teacher/i.test(String(s.role))},
- cols:[["staff_id","Mã"],["full_name","Họ tên"],["role","Vai trò","enum"],["phone","SĐT"],["email","Email"],["branch","Cơ sở","enum"],
-  ["__lop","Lớp đang dạy","calcnum"],["__lopxong","Lớp đã dạy xong","calcnum"],["__wow","Buổi WOW tháng","calcnum"],["__test","Ca test tháng","calcnum"],["__hv","Học viên","calcnum"],["__buoi7","Buổi 7 ngày tới","calcnum"],
-  ["__nxno","Nợ nhận xét","calcso"],["__baicho","Bài chờ chấm","calcso"],["__giothang","Giờ dạy tháng","calcnum"],
-  ["status","Trạng thái","chip"]]},
+ /* V2 18/08 - XẾP LẠI THỨ TỰ: cột dùng hằng ngày trước, cột bật khi cần sau. Bảng cũ đặt chín
+    con số thống kê xen giữa, nên thứ trưởng phòng mở bảng ra để tìm - AI ĐANG NỢ VIỆC - nằm mãi
+    ở cột thứ mười ba. Nay: ai · vai trò · đang gánh bao nhiêu (lớp, học viên) · đang nợ gì (nhận
+    xét, bài chấm) · còn sống hay đã nghỉ. Phần còn lại vẫn có trong nút Cột.
+    *Thứ tự cột là thứ tự câu hỏi - hỏi trước thì đứng trước.* */
+ cols:[["staff_id","Mã"],["full_name","Họ tên"],["role","Vai trò","enum"],
+  ["__lop","Lớp đang dạy","calcnum"],["__hv","Học viên","calcnum"],
+  ["__nxno","Nợ nhận xét","calcso"],["__baicho","Bài chờ chấm","calcso"],
+  ["status","Trạng thái","chip"],
+  ["phone","SĐT"],["email","Email"],["branch","Cơ sở","enum"],
+  ["__lopxong","Lớp đã dạy xong","calcnum"],["__wow","Buổi WOW tháng","calcnum"],
+  ["__test","Ca test tháng","calcnum"],["__buoi7","Buổi 7 ngày tới","calcnum"],
+  ["__giothang","Giờ dạy tháng","calcnum"]]},
 nhanvien:{code:"DL01",filt:"status",ro:1,lam:"nhansu",sub:"Toàn bộ nhân sự (DL01)",
  /* V2 08/08 - chip "Hồ sơ còn thiếu": nhịp sáng của Nhân sự là *"soát danh sách nhân sự - ai mới
     vào, ai đã nghỉ, ai chưa có chức danh hoặc chưa gắn cơ sở"*. App đã có `hsThieu()` đếm ra con
@@ -5347,10 +5370,41 @@ var DEFHIDE={phone_number:1,phone:1,contact_count:1,assigned_to_name:1,
     nhưng mặc định ẩn để bảng vẫn đọc được ở bề ngang bình thường. */
  email:1,dob:1,gender:1,student_type:1,address:1,emergency_contact_phone:1,
  emergency_contact_relation:1,branch:1,joined_at:1,pause_until:1,
- learning_followup_note:1,notes:1};
+ learning_followup_note:1,notes:1,
+ /* ═══ V2 18/08 - ĐỌC NGỮ CẢNH TỪNG SỔ RỒI CHỌN CỘT MẶC ĐỊNH ════════════════════════════════
+    Anh Luân: *"đọc ngữ cảnh của các bảng rồi phân tích, hiện mặc định và sắp xếp hợp lý các cột
+    cần thiết, còn lại ẩn đi, cần thì người ta bật lại"*.
+    Ba loại cột bị hạ xuống mặc định ẩn, mỗi loại một lý do đo được:
+    (1) CỘT GẦN NHƯ TRỐNG - có dữ liệu ở dưới 10% số dòng. Một cột mà 94% ô là gạch ngang thì
+        nó không mang tin, nó chỉ chiếm bề ngang: `attendance_risk_reason` 6%,
+        `academic_risk_reason` 2%, `follow_up_needed` 5%. (Cột "việc kế tiếp" cũng thưa nhưng
+        KHÔNG hạ - đó là cột người ta mở sổ ra để tìm.)
+    (2) CỘT NÓI LẠI THỨ CỘT BÊN CẠNH ĐÃ NÓI: hai cột lý do nguy cơ nằm ngay cạnh hai cột chip
+        nguy cơ; `graded_within_48h` là một cách đọc khác của điểm + hạn.
+    (3) CỘT CHỈ ĐÚNG MỘT NHÓM NGƯỜI HỎI TỚI - đo trên sổ Giảng viên: bảng đang bày 12 cột,
+        trong đó 9 cột là con số thống kê. Giữ lại số nói về VIỆC CÒN NỢ (nợ nhận xét, bài chờ
+        chấm, lớp đang dạy, học viên); các số tổng kết (lớp đã xong, buổi WOW, ca test, buổi 7
+        ngày, giờ dạy tháng) hạ xuống - trưởng phòng cần thì bật, còn mở bảng ra hằng ngày thì
+        không ai đọc chín con số một lúc.
+    *Một bảng bày ra mọi thứ thì không nhấn mạnh được thứ gì - bề ngang là tài nguyên có hạn.* */
+ attendance_risk_reason:1,academic_risk_reason:1,follow_up_needed:1,
+ graded_within_48h:1,testimonial_given:1,
+ __lopxong:1,__wow:1,__test:1,__buoi7:1,__giothang:1,
+ wow_quota_default:1,learning_mode_supported:1,duration_months:1,
+ /* Bảng dựng tay: tiêu đề email (chỉ có ở mẫu email, dài) · mô tả bài tập (đoạn văn) ·
+    giờ đăng ký ca (thứ tự trong sổ đã nói lên trước sau). */
+ mt_td:1,kb_mota:1,dp_dk:1,
+ class_level:1};
+/* Cột MÃ ẩn mặc định, bật lại được (anh Luân 18/08: *"mặc định ẩn những cột mà người dùng thông
+   thường ít dùng, ví dụ như ID"*). Sổ danh sách đã theo luật này từ lâu vì mã của chúng là tên
+   cột thật (`student_id`, `class_id`). Bảng dựng tay thì mã đặt theo lối riêng (`cn_ma`,
+   `bg_ma`...) nên lọt lưới - đúng cái anh nhìn thấy ở bảng Công nợ, cột Mã đứng đầu bảng trong
+   khi không ai đọc bảng công nợ bằng mã học viên.
+   Đã đếm trước khi đặt luật: không một cột dữ liệu thật nào kết thúc bằng `_ma`, nên luật này
+   không thể vô tình ẩn nhầm một cột nội dung. */
 function laCotMa(ck){ck=String(ck||"");
  if(/_id_name$/.test(ck))return false;
- return /_id$/.test(ck)||/_code$/.test(ck)||/^ma_/.test(ck)}
+ return /_id$/.test(ck)||/_code$/.test(ck)||/^ma_/.test(ck)||/_ma$/.test(ck)}
 /* ═══ CỘT CỦA BẢNG DỰNG TAY (17/08) ══════════════════════════════════════════════════════════
    Anh Luân nhắc lại luật cũ: *"tất cả các bảng đều có thể cấu hình ẩn hiện cột bất kỳ đúng ko?"*
    Đúng - nhưng đo ra thì luật ấy mới chỉ được giữ ở các SỔ DANH SÁCH đi qua `renderList`, vì cả
@@ -11777,9 +11831,10 @@ function rfHTML(fs,C){var h='<div class="rform">';
   /* Kiểu ô "ins" - bảng nhập từng đợt. Cùng họ với "band" (bốn ô điểm + ô tổng tự tính): một
      thành phần ghép nhiều ô có ràng buộc với nhau, không tách ra thành nhiều field rời được
      vì cái phải kiểm là TỔNG của chúng. `op` là {pre, tot}. */
-  if(ty==="ins"){h+='<div class="fld full"><label>'+esc(lb)+(req?' <i>*</i>':'')+'</label>'+
+  if(ty==="ins"){var _nIns=(((op||{}).pre)||[]).length||1;
+   h+='<div class="fld full"><label id="inslb">'+esc(insNhanKhoi(_nIns,lb))+(req?' <i>*</i>':'')+'</label>'+
     insEditHTML((op||{}).pre,(op||{}).tot)+
-    (f[6]?('<div class="fhint">'+esc(f[6])+'</div>'):'')+'</div>';return}
+    (f[6]?('<div class="fhint" id="inshint">'+esc(insNhanGoi(_nIns,f[6]))+'</div>'):'')+'</div>';return}
   /* KHỐI ĐIỂM BAND: bốn ô một hàng đều nhau + ô điểm tổng tự tính. `op` là mảng [mã, nhãn]. */
   if(ty==="band"){h+='<div class="rband"><div class="rbg">'+
    (op||[]).map(function(b){return '<div class="rbc"><label>'+esc(b[1])+(req?' <i>*</i>':'')+'</label>'+
@@ -19539,10 +19594,10 @@ function tvEnroll(id){var c=find("DL04","consultation_id",id)||{};var course=row
   [1,2,3,4].map(function(n){return '<option value="'+n+'">'+(n===1?"Đóng một lần":("Chia "+n+" đợt"))+'</option>'}).join("")+
   '</select><div class="fhint">Chức danh chưa có quyền duyệt thì lịch đợt vào hàng chờ, chưa đổi ngay.</div></div>';
  (function(){var _t=Math.max(0,num(course.list_price));
-  h+='<div class="fld full"><label>Lịch đóng từng đợt</label>'+
+  h+='<div class="fld full"><label id="inslb">'+esc(insNhanKhoi(1))+'</label>'+
    insEditHTML(dotGoiYLich(_t,1,num(paramOf("installmentGap_days",30)),
      num(paramOf("installmentDepositPercent",40))/100,new Date()),_t,"quydinh")+
-   '<div class="fhint">Tổng các đợt phải bằng đúng học phí sau chiết khấu - app tự cộng lại và báo ngay bên dưới.</div></div>'})();
+   '<div class="fhint" id="inshint">'+esc(insNhanGoi(1))+'</div></div>'})();
  h+='<div class="fld full"><button class="btn primary" onclick="tvEnrollSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Tạo đăng ký</button></div></div>';
  openDrawer("Tạo đăng ký",h)}
 function ensureStudent(leadId,cb){var exist=rows("DL06").filter(function(e){return e.lead_id===leadId&&e.student_id})[0];
@@ -19796,8 +19851,8 @@ function insPlanForm(eid){
    :dotGoiYLich(tot,1,num(paramOf("installmentGap_days",30)),num(paramOf("installmentDepositPercent",40))/100,new Date());
  h+='<div class="fld"><label>Chia thành mấy đợt</label><select id="ip_n" onchange="insEditSoDot(this.value,\'\')">'+
   [1,2,3,4].map(function(n){return '<option value="'+n+'"'+(_pre.length===n?" selected":"")+'>'+n+' đợt</option>'}).join("")+'</select></div>';
- h+='<div class="fld full"><label>Lịch đóng từng đợt</label>'+insEditHTML(_pre,tot)+
-  '<div class="fhint">Tổng các đợt phải bằng đúng học phí của đơn - app tự cộng lại và báo ngay bên dưới.</div></div>';
+ h+='<div class="fld full"><label id="inslb">'+esc(insNhanKhoi(_pre.length))+'</label>'+insEditHTML(_pre,tot)+
+  '<div class="fhint" id="inshint">'+esc(insNhanGoi(_pre.length,"Tổng các đợt phải bằng đúng học phí của đơn - app tự cộng lại và báo ngay bên dưới."))+'</div></div>';
  h+='<div class="dact"><button class="btn primary" onclick="insPlanSave(\''+esc(eid)+'\')"><i class="ti ti-check"></i>Lưu lịch đợt</button>'+
   '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
  openDrawer("Chia lịch đóng theo đợt",h)}
@@ -19861,6 +19916,15 @@ function insGoTien(el){
    bỏ hết cái mình vừa tự đặt, đó là chủ ý chứ không phải tai nạn.
    *Hai chế độ thì một cái bảng đổi trạng thái, đừng hai cái bảng.* */
 function insCheMD(){return window.INSCHE||"quydinh"}
+/* MỘT chỗ quyết định "đóng một lần hay chia đợt", ba chỗ hỏi (lúc dựng form, lúc đổi số đợt,
+   lúc đặt nhãn khối). Khai ở ba chỗ là ba cách hiểu, và cái sai sẽ là cái ít người bấm nhất. */
+function insMotDot(n){return (num(n)||1)<=1}
+function insNhanHan(n){return insMotDot(n)?"Ngày đóng":"Hạn đóng"}
+function insNhanKhoi(n,mac){return insMotDot(n)?"Ngày đóng học phí":(mac||"Lịch đóng từng đợt")}
+/* Câu nhắc dưới bảng cũng phải đổi: "tổng các đợt" là câu vô nghĩa khi chỉ có một lần đóng. */
+function insNhanGoi(n,mac){return insMotDot(n)
+ ?"Số tiền phải bằng đúng học phí sau chiết khấu - app tự đối chiếu và báo ngay bên dưới."
+ :(mac||"Tổng các đợt phải bằng đúng học phí sau chiết khấu - app tự cộng lại và báo ngay bên dưới.")}
 function insEditHTML(pre,tot,che){
  window.INSCHE=che||"quydinh";
  var kh=(window.INSCHE!=="chudong");
@@ -19879,6 +19943,15 @@ function insEditHTML(pre,tot,che){
  h+='<div class="tbgr" id="inschebar" style="margin:0 0 4px'+(_nDot<=1?";display:none":"")+'">'+
   segHTML(window.INSCHE,[["quydinh","Tách theo quy định"],["chudong","Tách chủ động"]],
    "insEditChe('{k}')","ins_che")+'</div>';
+ /* ═══ ĐÓNG MỘT LẦN THÌ ĐỪNG GỌI NÓ LÀ "ĐỢT" (anh Luân 18/08) ══════════════════════════════
+    *"Đóng 1 lần thì ghi là ngày đóng, số tiền, chứ ai lại ghi đợt nữa em"*. Đúng: bản cũ vẫn
+    dán nhãn "Đợt 1" lên hàng duy nhất, tức bắt người dùng đọc một cái tên của việc họ vừa chọn
+    KHÔNG làm. Nay một đợt thì bỏ hẳn số đợt, và hai ô có tiêu đề "Ngày đóng · Số tiền".
+    Hàng tiêu đề này giữ luôn cho trường hợp nhiều đợt (đổi thành "Hạn đóng") - trước đó hai ô
+    trần không có chữ nào, người ta phải đoán ô nào là ngày ô nào là tiền.
+    *Nhãn phải nói đúng thứ người dùng vừa chọn, không phải thứ bộ máy bên trong đang gọi nó.* */
+ h+='<div class="inshd"><span class="insno" id="inshdsp"'+(_nDot<=1?' style="display:none"':'')+'></span>'+
+  '<span class="h1" id="inshd1">'+esc(insNhanHan(_nDot))+'</span><span class="h2">Số tiền</span></div>';
  h+='<div class="fhint" id="inschu" style="margin:0 0 6px"></div>';
  /* ĐIỀN SẴN NGÀY CHO CẢ BỐN HÀNG, kể cả hàng đang ẩn. `_checkux` đòi "mọi ô chọn ngày đều có
     sẵn yyyy-mm-dd" và nó đúng: người ta đổi từ 2 lên 4 đợt là hai hàng vừa hiện ra trống trơn,
@@ -19893,7 +19966,7 @@ function insEditHTML(pre,tot,che){
   if(!r.due_date){var _dd=new Date(_d0.getTime()+_gapd*i*864e5);
    r={due_date:_z(_dd.getDate())+"/"+_z(_dd.getMonth()+1)+"/"+_dd.getFullYear(),due_amount:r.due_amount}}
   h+='<div class="insrow" id="insrow_'+i+'"'+(i>=((pre&&pre.length)||1)?' style="display:none"':'')+'>'+
-   '<span class="insno">Đợt '+(i+1)+'</span>'+
+   '<span class="insno" id="insno_'+i+'"'+(_nDot<=1?' style="display:none"':'')+'>Đợt '+(i+1)+'</span>'+
    '<input type="date" id="ins_d_'+i+'" aria-label="Hạn đóng đợt '+(i+1)+'"'+(kh?' readonly class="khoa"':'')+' value="'+esc(toISOdt(r.due_date||"",1))+'" onchange="this.dataset.tay=1;insEditTong()">'+
    '<input type="text" inputmode="numeric" id="ins_a_'+i+'" aria-label="Số tiền đợt '+(i+1)+'"'+(kh?' readonly class="insti khoa"':' class="insti"')+' value="'+esc(insDau(r.due_amount))+'" oninput="insGoTien(this)">'+
    '</div>'}
@@ -19998,6 +20071,15 @@ function insEditSoDot(n,d0raw){
    if(aa&&(deAll||!aa.dataset.tay))aa.value=insDau(goi[i].due_amount)}}
  var _bar=document.getElementById("inschebar");
  if(_bar)_bar.style.display=(n<=1)?"none":"";
+ /* Đổi số đợt thì ĐỔI LUÔN CÁCH GỌI: một đợt thì không còn "Đợt 1", chỉ còn ngày đóng và số
+    tiền. Ba thứ phải đổi cùng lúc - nhãn khối, tiêu đề cột ngày, và số đợt ở đầu từng hàng. */
+ var _1=insMotDot(n);
+ var _lb=document.getElementById("inslb");if(_lb)_lb.textContent=insNhanKhoi(n);
+ var _h1=document.getElementById("inshd1");if(_h1)_h1.textContent=insNhanHan(n);
+ var _hi=document.getElementById("inshint");if(_hi)_hi.textContent=insNhanGoi(n);
+ var _sp=document.getElementById("inshdsp");if(_sp)_sp.style.display=_1?"none":"";
+ for(var k=0;k<INSMAX;k++){var _no=document.getElementById("insno_"+k);
+  if(_no)_no.style.display=_1?"none":""}
  insEditTong()}
 function dotGhiLich(eid,lst){
  var e=find("DL06","enrollment_id",eid);if(!e||!lst||!lst.length)return 0;
