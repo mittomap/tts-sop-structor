@@ -19614,7 +19614,18 @@ function insEditHTML(pre,tot,che){
  window.INSCHE=che||"quydinh";
  var kh=(window.INSCHE!=="chudong");
  var h='<div class="insplan" id="insplan">';
- h+='<div class="tbgr" style="margin:0 0 4px">'+
+ /* `id="inschebar"` - THIẾU CÁI ID NÀY LÀ HỎNG CẢ MỘT LUẬT. `insEditSoDot` có sẵn dòng ẩn dải
+    chế độ khi chỉ đóng một đợt, nhưng nó tìm theo id mà khối này chưa bao giờ mang, nên dòng ấy
+    chạy vào chỗ trống: chọn "Đóng một lần" mà màn vẫn bày "Tách theo quy định / Tách chủ động" -
+    hỏi người ta tách kiểu gì cho một thứ không tách. Ảnh chụp màn bắt được, bộ kiểm thì không:
+    không bộ nào biết dải ấy ĐÁNG LẼ phải biến mất.
+    Đây là lần thứ hai trong ba ngày em viết mã trỏ vào một phần tử không tồn tại (lần trước là
+    `data-k` mà `segHTML` không phát ra). *Viết một dòng đi tìm phần tử thì phải đi xem chỗ dựng
+    ra nó có đặt đúng cái tên ấy không - dòng lệnh không kêu, nó chỉ lặng lẽ không làm gì.*
+    Ẩn NGAY TỪ LÚC DỰNG chứ không đợi người dùng đổi ô: mặc định của form chính là "Đóng một
+    lần", tức trạng thái người ta nhìn thấy đầu tiên cũng là trạng thái sai. */
+ var _nDot=Math.max(1,Math.min(INSMAX,(pre&&pre.length)||1));
+ h+='<div class="tbgr" id="inschebar" style="margin:0 0 4px'+(_nDot<=1?";display:none":"")+'">'+
   segHTML(window.INSCHE,[["quydinh","Tách theo quy định"],["chudong","Tách chủ động"]],
    "insEditChe('{k}')","ins_che")+'</div>';
  h+='<div class="fhint" id="inschu" style="margin:0 0 6px"></div>';
