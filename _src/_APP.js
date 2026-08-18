@@ -15933,10 +15933,26 @@ function tvCloseSave(id){
  if(chot)setTimeout(function(){try{tvEnroll(id)}catch(e){}},260)}
 function tvEnroll(id){var c=find("DL04","consultation_id",id)||{};var course=rows("DL05").filter(function(x){return x.course_name===c.recommended_course})[0]||{};
  var h='<div class="dcard"><h4><i class="ti ti-clipboard-check"></i>Tạo đăng ký - '+esc(c.customer_name_display||c.lead_id)+'</h4>';
- h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Học phí điền sẵn theo bảng giá của khóa. Chiết khấu từ '+slaChip("thresholdDiscount_approval",1000000)+' trở lên phải có Quản lý phê duyệt - cứ nhập rồi lưu, hệ thống tự đẩy vào hàng chờ duyệt. Chia đợt đóng làm ở bước sau.</div>';
+ /* Câu cũ ghi "Chia đợt đóng làm ở bước sau" - và đó là lời khai đúng của bản cũ, nhưng từ hôm
+    nay bước Tạo đăng ký của luồng chạy quy trình đã chia đợt được ngay tại chỗ. Hai cửa cùng tên
+    "Tạo đăng ký" mà một bên chia được, một bên bảo "để sau" - anh Luân đi qua đúng cửa yếu và
+    bắt được: *"nó chỉ cho đăng ký 1 lần chứ ko có theo đợt nha em"*.
+    Nặng hơn: chính hôm nay em cho "Cập nhật chốt" mở thẳng vào cửa này, tức em vừa dựng một
+    đường dẫn người dùng tới bản thiếu.
+    *Thêm một khả năng cho một cửa thì phải đi hỏi còn cửa nào cùng làm việc ấy - nếu không,
+    chính mình là người dựng ra cái chênh lệch.* */
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Học phí điền sẵn theo bảng giá của khóa. Chiết khấu từ '+slaChip("thresholdDiscount_approval",1000000)+' trở lên phải có Quản lý phê duyệt - cứ nhập rồi lưu, hệ thống tự đẩy vào hàng chờ duyệt.</div>';
  h+='<div class="fld"><label>Khóa</label><select id="en_course">'+rows("DL05").map(function(x){return '<option value="'+esc(x.course_id)+'"'+(x.course_name===c.recommended_course?" selected":"")+'>'+esc(x.course_name)+'</option>'}).join("")+'</select></div>';
- h+='<div class="fld"><label>Học phí</label><input id="en_fee" type="number" value="'+(num(course.list_price)||0)+'"></div>';
- h+='<div class="fld"><label>Chiết khấu</label><input id="en_disc" type="number" value="0"></div>';
+ h+='<div class="fld"><label>Học phí</label><input id="en_fee" type="number" value="'+(num(course.list_price)||0)+'" oninput="insEditFee()"></div>';
+ h+='<div class="fld"><label>Chiết khấu</label><input id="en_disc" type="number" value="0" oninput="insEditFee()"></div>';
+ h+='<div class="fld"><label>Cách đóng học phí</label><select id="en_insn" onchange="insEditSoDot(this.value,\'\')">'+
+  [1,2,3,4].map(function(n){return '<option value="'+n+'">'+(n===1?"Đóng một lần":("Chia "+n+" đợt"))+'</option>'}).join("")+
+  '</select><div class="fhint">Chức danh chưa có quyền duyệt thì lịch đợt vào hàng chờ, chưa đổi ngay.</div></div>';
+ (function(){var _t=Math.max(0,num(course.list_price));
+  h+='<div class="fld full"><label>Lịch đóng từng đợt</label>'+
+   insEditHTML(dotGoiYLich(_t,1,num(paramOf("installmentGap_days",30)),
+     num(paramOf("installmentDepositPercent",40))/100,new Date()),_t,"quydinh")+
+   '<div class="fhint">Tổng các đợt phải bằng đúng học phí sau chiết khấu - app tự cộng lại và báo ngay bên dưới.</div></div>'})();
  h+='<div class="fld full"><button class="btn primary" onclick="tvEnrollSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Tạo đăng ký</button></div></div>';
  openDrawer("Tạo đăng ký",h)}
 function ensureStudent(leadId,cb){var exist=rows("DL06").filter(function(e){return e.lead_id===leadId&&e.student_id})[0];
@@ -15949,12 +15965,29 @@ function ensureStudent(leadId,cb){var exist=rows("DL06").filter(function(e){retu
  function d(realId){stu.student_id=realId;rows("DL09").unshift(stu);toast("Đã tạo hồ sơ học viên "+realId+" từ lead.");cb(realId,stu.full_name)}
  if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi tạo HV: "+((res&&res.error)||""));cb("","");return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message);cb("","")}).apiSave("DL09",stu)}else{d(nid)}}
 function tvEnrollSave(id){var c=find("DL04","consultation_id",id)||{};var cid=fldV("en_course");var course=find("DL05","course_id",cid)||{};var fee=num(fldV("en_fee"));var disc=num(fldV("en_disc"));var fin=Math.max(0,fee-disc);
+ /* Chặn Y HỆT bước Tạo đăng ký của luồng chạy quy trình - cùng một việc thì cùng một luật, không
+    thể cửa này chặn lệch tổng còn cửa kia cho qua. */
+ var _n=Math.max(1,Math.min(4,num(fldV("en_insn"))||1));
+ if(_n>1){
+  var _R=insEditDoc();
+  if(_R.lst.some(function(x){return !x.due_date})){toast("Còn đợt chưa có hạn đóng - điền đủ ngày rồi lưu.",4500);return}
+  if(Math.abs(_R.tong-fin)>=1){
+   toast("Tổng các đợt là "+vnd(_R.tong)+", học phí sau chiết khấu là "+vnd(fin)+" - lệch "+
+    vnd(Math.abs(_R.tong-fin))+". Sửa lại số tiền từng đợt, hoặc đổi số đợt.",6000);return}}
  ensureStudent(c.lead_id,function(sid,sname){
   var enr={consultation_id:id,lead_id:c.lead_id,student_id:sid,student_id_name:sname,course_id:cid,course_id_name:course.course_name,enrollment_status:eFull("enum_enrollment_status","pending"),enrollment_time:nowStr(),total_fee:fee,discount_amount:disc,final_fee:fin,paid_amount:0,remaining_amount:fin,payment_status:eFull("enum_payment_status","unpaid")};
   function d(nid){enr.enrollment_id=nid;rows("DL06").unshift(enr);var lu=find("DL02","lead_id",c.lead_id);if(lu)lu.lead_status=eFull("enum_lead_status","converted");
    var s9=sid?find("DL09","student_id",sid):null;
    if(s9&&String(s9.wow_quota_remaining||"")===""&&num(course.wow_quota_default)>0){s9.wow_quota_default=String(course.wow_quota_default);s9.wow_quota_used="0";s9.wow_quota_remaining=String(course.wow_quota_default);
-    if(SVR)google.script.run.apiUpdate("DL09",sid,{wow_quota_default:s9.wow_quota_default,wow_quota_used:"0",wow_quota_remaining:s9.wow_quota_remaining})}if(SVR&&c.lead_id)google.script.run.apiUpdate("DL02",c.lead_id,{lead_status:eFull("enum_lead_status","converted")});markRow("DL04","consultation_id",id,{conversion_status:eFull("enum_conversion_status","confirmed_with_deposit")},"Đã tạo đăng ký "+nid+(sid?" cho HV "+sid:"")+".","tuvan");closeModal()}
+    if(SVR)google.script.run.apiUpdate("DL09",sid,{wow_quota_default:s9.wow_quota_default,wow_quota_used:"0",wow_quota_remaining:s9.wow_quota_remaining})}if(SVR&&c.lead_id)google.script.run.apiUpdate("DL02",c.lead_id,{lead_status:eFull("enum_lead_status","converted")});markRow("DL04","consultation_id",id,{conversion_status:eFull("enum_conversion_status","confirmed_with_deposit")},"Đã tạo đăng ký "+nid+(sid?" cho HV "+sid:"")+".","tuvan");
+   /* Lịch đợt đi qua ĐÚNG lõi chung `insChiaCore` - "có quyền thì chia thẳng, chưa có quyền thì
+      vào hàng chờ duyệt". Và luôn ghi nền một đợt "1/1" khi đóng một lần hoặc khi yêu cầu chia
+      còn đang chờ, để đơn mới không mang hình dạng khác đơn cũ. */
+   var _gap=num(paramOf("installmentGap_days",30)),_dep=num(paramOf("installmentDepositPercent",40))/100;
+   var _r=(_n>1)?insChiaCore(nid,_n,_gap,_dep,"",insEditDoc().lst,fldV("ins_che")):{ok:true,xin:false};
+   if(_n<=1||_r.xin)dotApDung(nid,1,_gap,_dep,"");
+   if(_n>1&&_r.ok)toast(_r.xin?("Đã gửi xin chia "+_n+" đợt - lịch đợt chỉ đổi sau khi được duyệt."):("Đã chia "+(_r.so||_n)+" đợt."),4600);
+   closeModal()}
   if(SVR){google.script.run.withSuccessHandler(function(res){if(!res||!res.ok){toast("Lỗi: "+((res&&res.error)||""));return}d(res.id)}).withFailureHandler(function(e){toast("Lỗi kết nối: "+e.message)}).apiSave("DL06",enr)}else{d("EN-"+seqNo("DL06","enrollment_id"))}
  })}
 /* ===== P4 Thu & xác nhận Thanh toán (DL06 + DL07) ===== */
@@ -16276,7 +16309,7 @@ function insEditHTML(pre,tot,che){
 function insEditChe(v){
  var moi=(v==="chudong")?"chudong":"quydinh";
  var box=document.getElementById("insplan");if(!box)return;
- var n=Math.max(1,Math.min(INSMAX,num(fldV("ip_n")||fldV("r_insn"))||1));
+ var n=Math.max(1,Math.min(INSMAX,num(insOSoDot())||1));
  var tot=num(fldV("ins_tot"));
  var pre;
  if(moi==="chudong")pre=insEditDoc().lst;
@@ -16334,11 +16367,18 @@ function insEditTong(){
  el.innerHTML='<i class="ti ti-alert-triangle"></i>'+c.join(' · ')+'. '+khuyen;}
 /* Đổi số đợt: hiện/ẩn hàng rồi ĐIỀN LẠI GỢI Ý cho các hàng CHƯA ai gõ. Hàng người ta đã sửa tay
    thì giữ nguyên - máy không được đè lên con số người dùng vừa cân nhắc. */
+/* BA CỬA, BA BỘ Ô, MỘT BẢNG CHIA ĐỢT. Bước Tạo đăng ký của luồng chạy quy trình dùng `r_*`,
+   ngăn kéo Chia lịch đợt dùng `ip_n`, ngăn kéo Tạo đăng ký dùng `en_*`. Bảng chia đợt phải hỏi
+   được cả ba mà không cần biết mình đang nằm trong cửa nào - nếu không thì mỗi lần thêm một cửa
+   phải nhớ đi sửa ba hàm, và cái quên sẽ IM LẶNG: bảng vẫn vẽ ra, chỉ là không nghe ô nào cả.
+   *Thành phần dùng chung thì phải tự tìm ô của nó, đừng bắt mỗi cửa tự khai lại.* */
+function insOCo(a){for(var i=0;i<a.length;i++){if(document.getElementById(a[i]))return a[i]}return ""}
+function insOSoDot(){return fldV(insOCo(["ip_n","r_insn","en_insn"]))||"1"}
 /* Học phí sau chiết khấu đổi -> cập nhật tổng phải chia rồi điền lại gợi ý. */
 function insEditFee(){
  var el=document.getElementById("ins_tot");if(!el)return;
- el.value=String(Math.max(0,num(fldV("r_fee"))-num(fldV("r_disc"))));
- insEditSoDot(fldV("r_insn")||"1","")}
+ el.value=String(Math.max(0,num(fldV(insOCo(["r_fee","en_fee"])))-num(fldV(insOCo(["r_disc","en_disc"])))));
+ insEditSoDot(insOSoDot(),"")}
 function insEditSoDot(n,d0raw){
  n=Math.max(1,Math.min(INSMAX,num(n)||1));
  var tot=num(fldV("ins_tot"));
