@@ -3279,7 +3279,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">18/08/2026 · <b>ec42a8</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">18/08/2026 · <b>1f160a</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -5372,10 +5372,55 @@ var COTTAY={
    ["tn_nd","Nội dung"],["tn_gui","Người gửi"]],
  socamket:[["ck_hv","Học viên"],["ck_lop","Lớp"],["ck_luc","Ký lúc"],["ck_ban","Bản"],
    ["ck_ht","Hình thức ký"],["ck_nguoi","Người ghi nhận"],["ck_anh","Ảnh"]],
- congno:[["cn_ma","Mã"],["cn_ten","Họ tên"],["cn_khoa","Khoá"],["cn_tong","Tổng giá trị"],
-   ["cn_thu","Đã thu"],["cn_con","Còn phải thu"],["cn_ky","Thu trong kỳ"],
-   ["cn_dot","Đợt đã đóng đủ"],["cn_ke","Đợt kế tiếp"],["cn_ct","Chứng từ"]]};
-function cotDs(key){return (LISTCFG[key]&&LISTCFG[key].cols)||COTTAY[key]||[]}
+ /* Cột "Thu trong kỳ" chỉ ra đời khi có chọn kỳ (xem ghi chú ở chỗ vẽ bảng), nên ở "Toàn kỳ"
+    bản khai cũng phải bỏ nó ra: để lại là menu bày một ô tích không điều khiển gì, và con số
+    trên nút Cột đếm một cột không có trên bảng.
+    *Menu cột là bản mục lục của bảng - mục lục không được kê một chương chưa in.* */
+ congno:function(){var a=[["cn_ma","Mã"],["cn_ten","Họ tên"],["cn_khoa","Khoá"],
+   ["cn_tong","Tổng giá trị"],["cn_thu","Đã thu"],["cn_con","Còn phải thu"]];
+  if((window.REPKY||"all")!=="all")a.push(["cn_ky","Thu trong kỳ"]);
+  return a.concat([["cn_dot","Đợt đã đóng đủ"],["cn_ke","Đợt kế tiếp"],["cn_ct","Chứng từ"]])},
+ /* ── V2 18/08 - MƯỜI HAI SỔ DỰNG TAY CÒN LẠI ───────────────────────────────────────────────
+    Ranh giới em đặt (và khai ra để lần sau không phải đoán lại): gắn nút Cột cho **SỔ CHÍNH
+    của trang** - cuốn sổ người ta mở trang ra để đọc. Bảng phụ nằm trong ngăn kéo, trong hồ sơ
+    một dòng, hay ba bốn cột kê tạm thì không gắn: nút Cột trên một bảng bốn cột chỉ tổ thêm
+    một nút, mà mỗi panel một nút thì trang thành cái bảng điều khiển.
+    Cột NÚT ở cuối mọi bảng cố ý KHÔNG khai - ẩn nó đi là mất luôn đường thao tác. */
+ kslop:[["ks_lop","Lớp"],["ks_hv","HV"],["ks_gui","Đã gửi"],["ks_tl","Đã trả lời"],
+   ["ks_srr","Tỷ lệ (SRR)"],["ks_hl","Hài lòng trung bình"],["ks_fu","Cần follow-up"],
+   ["ks_dot","Đợt gần nhất"]],
+ khobai:[["kb_ma","Mã"],["kb_ten","Tên bài"],["kb_kn","Kỹ năng"],["kb_kho","Độ khó"],
+   ["kb_mota","Mô tả"],["kb_tl","Thời lượng"],["kb_dk","Đính kèm"],["kb_dung","Dùng ở"]],
+ gakhoa:[["ga_buoi","Buổi"],["ga_chude","Chủ đề"],["ga_bt","Bài tập về nhà mặc định"],
+   ["ga_han","Hạn nộp"],["ga_dan","Lời dặn trước buổi"]],
+ gvdpso:[["gd_gio","Giờ"],["gd_lop","Lớp"],["gd_cs","Cơ sở / hình thức"],
+   ["gd_gv","Giáo viên đang phụ trách"],["gd_thay","Giáo viên thay thế"]],
+ /* Cột đầu là ô tích chọn để chuyển hàng loạt. Khai ra để người chỉ đọc bảng (không chuyển ai)
+    tắt được nó đi - và cũng để phép đếm ô không lệch một nấc ngay từ cột số 0. */
+ banggiao:[["bg_chon","Ô tích chọn"],["bg_ma","Mã"],["bg_ten","Họ tên"],["bg_sdt","SĐT"],
+   ["bg_tt","Trạng thái"],["bg_viec","Việc cần làm"]],
+ dpso:[["dp_gv","Giáo viên"],["dp_ngay","Ngày"],["dp_gio","Khung giờ"],["dp_cs","Cơ sở nhận dạy"],
+   ["dp_tt","Trạng thái"],["dp_gan","Đã gán buổi"],["dp_dk","Đăng ký lúc"],["dp_gc","Ghi chú"]],
+ hskhoa:[["hk_ma","Mã"],["hk_ten","Tên lớp"],["hk_tt","Trạng thái"],["hk_ss","Sĩ số"],
+   ["hk_gv","GV chính"],["hk_kg","Khai giảng"]],
+ phongdung:[["ph_loai","Loại"],["ph_ngay","Ngày giờ"],["ph_ct","Chi tiết"],["ph_cs","Cơ sở"]],
+ blhv:[["bl_ma","Mã HV"],["bl_ten","Họ tên"],["bl_cc","Chuyên cần"],["bl_bt","Bài tập"],
+   ["bl_tt","Trạng thái"]],
+ bldoi:[["bd_buoi","Buổi"],["bd_cu","Ngày cũ"],["bd_moi","Ngày mới"],["bd_lech","Lệch"],
+   ["bd_pv","Phạm vi"],["bd_ly","Lý do"],["bd_nguoi","Người dời"],["bd_luc","Lúc"]],
+ /* Bảng mã giới thiệu vẽ cột "Ưu đãi đã cấp" hay không là do MIỀN DỮ LIỆU của người đang xem
+    (`dsLevel("tien")`), nên bản khai cột phải hỏi lại đúng câu ấy - xem ghi chú ở `cotDs`. */
+ magt:function(){var a=[["mg_hv","Học viên chủ mã"],["mg_ma","Mã giới thiệu"],
+   ["mg_dung","Lượt dùng"],["mg_dk","Đã đăng ký"]];
+  if(dsLevel("tien")!=="none")a.push(["mg_uudai","Ưu đãi đã cấp"]);
+  a.push(["mg_thuong","Thưởng"]);return a}};
+/* Bảng nào có cột CÓ MẶT HAY KHÔNG tuỳ người đang xem (vd cột tiền chỉ vẽ cho người được xem
+   tiền) thì khai bằng MỘT HÀM trả về danh sách cột của lượt vẽ này. Không khai cứng được: bộ
+   cắt cột đếm ô theo THỨ TỰ, nên khai thừa một cột mà lượt vẽ ấy không có là mọi ô sau đó lệch
+   một nấc - bảng vẫn hiện, chỉ là số nằm sai cột, loại sai nhìn vào không biết sai ở đâu.
+   *Bảng đổi cột theo người xem thì bản khai cột cũng phải hỏi lại người xem.* */
+function cotDs(key){var c=(LISTCFG[key]&&LISTCFG[key].cols)||COTTAY[key]||[];
+ return (typeof c==="function")?(c()||[]):c}
 /* LỌC CỘT TRÊN HTML ĐÃ DỰNG. Bảng dựng tay mỗi cái ghép chuỗi một kiểu; đi sửa từng ô `<td>`
    trong 50 hàm là việc chắc chắn sót, và cái sót sẽ là một bảng lệch cột - loại lỗi nhìn vào
    không biết sai ở đâu. Nên cắt Ở ĐẦU RA: đếm ô theo thứ tự rồi bỏ những ô thuộc cột đang ẩn.
@@ -5406,6 +5451,19 @@ function cotLoc(key,html){
    if(an.indexOf(idx)<0)giu+=tr.slice(v[0],v[1]);
    pos=v[1]});
   return giu+tr.slice(pos)})}
+/* Cắt cột cho ĐÚNG MỘT bảng trong cả trang. Mỗi trang dựng tay ghép chuỗi một kiểu, đi bọc từng
+   chỗ mở/đóng bảng là mỗi trang một ca riêng và chắc chắn sót. Nay chỉ cần gọi một lần ở chỗ
+   trả về: tìm bảng `.dt` thứ `idx` (mặc định bảng đầu - bảng chính của trang), cắt trong phạm vi
+   ấy, phần còn lại của trang không đụng tới.
+   *Cùng một việc ở nhiều trang thì đưa việc về một dòng gọi, đừng đưa mình đi qua từng trang.* */
+function cotLoc1(key,html,idx){
+ var h=String(html||"");
+ var re=/<table class="dt"/g,m,vt=[];
+ while((m=re.exec(h)))vt.push(m.index);
+ var i=vt[idx||0];if(i==null)return h;
+ var j=h.indexOf("</table>",i);if(j<0)return h;
+ j+=8;
+ return h.slice(0,i)+cotLoc(key,h.slice(i,j))+h.slice(j)}
 /* Nút "Cột (n/N)" cho bảng dựng tay - cùng markup, cùng menu với sổ danh sách. */
 function cotNutHTML(key){
  var cols=cotDs(key);if(!cols.length)return '';
@@ -13436,7 +13494,7 @@ function renderReview(embed){var p="review",fil=fget(p);
    return ["ti-bell-ringing",n,"Gửi quá "+lim+" ngày chưa ai trả lời","#E24B4A",
     n?"gọi nhắc, để lâu là mất tiếng nói của lớp":"Không có phiếu nào bị bỏ quên"]})()],"review");
  view=fltApply(p,view);   /* V9.28: bộ lọc chuyên sâu - đặt TRƯỚC filterBar để số đếm cũng đúng */
- h+=filterBar(p,fil,[["all","Tất cả lớp",all.length],["none","Chưa gửi đợt nào",nNone,"red"],["low","Trả lời kém",nLow,"amber"],["fu","Có phiếu cần follow-up",nFu?nFu:"","amber"]],view.length);
+ h+=filterBar(p,fil,[["all","Tất cả lớp",all.length],["none","Chưa gửi đợt nào",nNone,"red"],["low","Trả lời kém",nLow,"amber"],["fu","Có phiếu cần follow-up",nFu?nFu:"","amber"]],view.length,null,cotNutHTML("kslop"));
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Lớp</th><th>HV</th><th>Đã gửi</th><th>Đã trả lời</th><th>Tỷ lệ (SRR)</th><th>Hài lòng trung bình</th><th>Cần follow-up</th><th>Đợt gần nhất</th><th>Thao tác</th></tr></thead><tbody>';
  if(!view.length)h+='<tr><td class="empty" colspan="9">Không có lớp nào khớp bộ lọc.</td></tr>';
  view.forEach(function(i){var c=i.c;
@@ -13458,7 +13516,8 @@ function renderReview(embed){var p="review",fil=fget(p);
   h+='<tr data-mo="svXem" data-mo-arg="'+esc(v.survey_id)+'"><td>'+esc(v.survey_id)+'</td><td>'+nguoiLnk(v.student_id,v.student_name)+'</td><td>'+lopLnk(v.class_id,v.class_id_name,"-")+'</td><td>'+esc(elabel(v.survey_type)||"-")+'</td><td>'+esc(v.sent_date||"-")+'</td>'+
    '<td>'+(sub?'<span class="chip green">đã trả lời</span>':'<span class="chip amber">chờ</span>')+'</td>'+
    '<td>'+(v.satisfaction_score?esc(v.satisfaction_score)+"/5":'<span class="mut">-</span>')+'</td></tr>'});
- return h+'</tbody></table></div></div>'}
+ h+='</tbody></table></div></div>';
+ return cotLoc1("kslop",h,0)}
 function vnd2(d){try{return ("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2)+"/"+d.getFullYear()}catch(e){return ""}}
 /* LỊCH SỬ KHẢO SÁT CỦA MỘT LỚP (V9.93 - anh Luân: *"bấm vào lớp cũng ko thấy liệt kê lịch sử"*).
    Bảng ngoài chỉ có số tổng; muốn biết lớp này đã gửi mấy đợt, ai trả lời, ai chấm thấp thì
@@ -14172,7 +14231,7 @@ function renderGiaoan(){var tab=window.GATAB||"ga";
   var q=vnorm(window.HWBQ||"");
   var list=hwBank().filter(function(b){return !q||vnorm(b.title+" "+b.skill+" "+b.description).indexOf(q)>=0});
   h+=tbar(srchHTML(window.HWBQ||"","window.HWBQ=this.value;reRenderKeep('giaoan')","Tìm bài trong kho...",280),
-   '<span class="tbcnt">'+list.length+'/'+hwBank().length+' bài</span>');
+   cotNutHTML("khobai")+'<span class="tbcnt">'+list.length+'/'+hwBank().length+' bài</span>');
   h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Tên bài</th><th>Kỹ năng</th><th>Độ khó</th><th>Mô tả</th><th>Thời lượng</th><th>Đính kèm</th><th>Dùng ở</th><th></th></tr></thead><tbody>';
   if(!list.length)h+='<tr><td class="empty" colspan="9">Không thấy bài nào.</td></tr>';
   list.forEach(function(b){
@@ -14184,13 +14243,13 @@ function renderGiaoan(){var tab=window.GATAB||"ga";
     '<td>'+(b.file_link?'<a class="lnk" onclick="toast(\'Bản demo chưa nối kho tệp.\')">có tệp</a>':'<span class="mut">-</span>')+'</td>'+
     '<td>'+(used?'<span class="chip blue">'+used+' buổi</span>':'<span class="mut">chưa dùng</span>')+'</td>'+
     '<td><button class="btn sm" onclick="hwbForm(\''+esc(b.hw_bank_id)+'\')"><i class="ti ti-edit"></i>Sửa</button></td></tr>'});
-  return h+'</tbody></table></div></div>'}
+  return cotLoc1("khobai",h+'</tbody></table></div></div>',0)}
  /* --- tab giáo án --- */
  var cid=window.GACRS||(rows("DL05")[0]||{}).course_id;
  var crs=find("DL05","course_id",cid)||{};
  h+=tbar('<span class="tblbl">Khóa học</span><select class="sel" style="min-width:230px" onchange="window.GACRS=this.value;reRender(\'giaoan\')">'+
   rows("DL05").map(function(c){return '<option value="'+esc(c.course_id)+'"'+(c.course_id===cid?" selected":"")+'>'+esc(c.course_name)+'</option>'}).join("")+'</select>',
-  '<span class="tbcnt">'+rows("DL10").filter(function(x){return x.course_id===cid}).length+' lớp</span>');
+  cotNutHTML("gakhoa")+'<span class="tbcnt">'+rows("DL10").filter(function(x){return x.course_id===cid}).length+' lớp</span>');
  var pls=rows("DL21").filter(function(p){return p.course_id===cid}).sort(function(a,b){return num(a.session_number)-num(b.session_number)});
  h+='<div class="notebar"><i class="ti ti-info-circle"></i>Sửa ở đây là <b>mọi lớp thuộc khóa '+esc(crs.course_name||cid)+'</b> áp dụng theo. Buổi nào giáo viên đã đổi riêng cho lớp mình thì giữ nguyên phần đổi đó.</div>';
  h+='<div class="panel"><div class="ph"><b>Giáo án '+esc(crs.course_name||cid)+' ('+pls.length+' buổi)</b><span class="mut" style="font-size:11.5px">hạn nộp tính từ ngày học của buổi đó</span>'+
@@ -14204,7 +14263,7 @@ function renderGiaoan(){var tab=window.GATAB||"ga";
    '<td style="max-width:340px;white-space:normal;font-size:11px;color:var(--muted)">'+esc(p.prep_note||"")+'</td>'+
    '<td><button class="btn sm" onclick="gaForm(\''+esc(p.plan_id)+'\')"><i class="ti ti-edit"></i>Sửa</button></td></tr>'});
  if(pls.length>40)h+='<tr><td class="empty" colspan="6">... còn '+(pls.length-40)+' buổi.</td></tr>';
- return h+'</tbody></table></div></div>'}
+ return cotLoc1("gakhoa",h+'</tbody></table></div></div>',0)}
 /* Đặt hạn nộp HÀNG LOẠT cho cả khóa - "sửa toàn bộ các buổi trước" */
 function gaBulkDue(cid){var crs=find("DL05","course_id",cid)||{};
  var pls=rows("DL21").filter(function(p){return p.course_id===cid});
@@ -14620,14 +14679,19 @@ function renderBanglop(){
       Trưởng phòng ACA đặt đúng vị trí này: nhìn dải buổi thấy ngày lệch so với lịch gốc thì
       câu hỏi kế tiếp luôn là "ai dời, vì sao" - câu trả lời phải nằm ngay đó, không bắt đi
       tìm ở trang khác. Lớp chưa dời lần nào thì KHÔNG vẽ bảng rỗng. */
+   /* Bảng này dựng vào một chuỗi RIÊNG rồi mới nối vào trang, để `cotLoc` cắt đúng nó. Không
+      dùng `cotLoc1(…,0)` ở cuối hàm được: lớp chưa dời lần nào thì bảng này không ra đời, và
+      "bảng .dt thứ nhất" lúc ấy là bảng của workspace điểm danh ngay dưới - cắt nhầm cột của
+      một bảng khác là lỗi im lặng, nhìn vào chỉ thấy số nằm sai cột.
+      *Đếm thứ tự chỉ đúng khi thứ được đếm chắc chắn có mặt.* */
    (function(){var LS=doiLichSu(cid);if(!LS.length)return;
-    h+='<div class="panel"><div class="ph"><b>Lịch sử đổi lịch</b><span class="mut" style="font-size:11.5px">'+LS.length+' lần dời · gần nhất trước</span></div>'+
+    var _t='<div class="panel"><div class="ph"><b>Lịch sử đổi lịch</b><span class="mut" style="font-size:11.5px">'+LS.length+' lần dời · gần nhất trước</span><div class="mini">'+cotNutHTML("bldoi")+'</div></div>'+
      '<div class="tbwrap"><table class="dt"><thead><tr><th>Buổi</th><th>Ngày cũ</th><th>Ngày mới</th><th style="width:80px">Lệch</th><th>Phạm vi</th><th>Lý do</th><th>Người dời</th><th>Lúc</th></tr></thead><tbody>';
     LS.forEach(function(x){var _l=num(x.so_ngay_doi);
      /* Dòng bảng phải BẤM ĐƯỢC. `_checkbam` gọi dòng câm là "IM LẶNG" và nó đúng: người dùng
         không biết mình bấm hụt hay app hỏng. Đây là lần thứ hai trong ngày em để một bảng mới
         ra đời với dòng câm - lần trước là bảng lát cắt ở màn Kết quả đầu ra. */
-     h+='<tr class="clk" onclick="doiXemChiTiet(\''+esc(x.change_id)+'\')" data-tip="Bấm để xem đầy đủ lần dời này"><td><b>Buổi '+esc(x.session_number||"?")+'</b></td>'+
+     _t+='<tr class="clk" onclick="doiXemChiTiet(\''+esc(x.change_id)+'\')" data-tip="Bấm để xem đầy đủ lần dời này"><td><b>Buổi '+esc(x.session_number||"?")+'</b></td>'+
       '<td>'+esc(String(x.ngay_cu||"").slice(0,10))+'</td>'+
       '<td>'+esc(String(x.ngay_moi||"").slice(0,10))+'</td>'+
       '<td><span class="chip '+(_l>0?"amber":"blue")+'" data-tip="'+esc(_l>0?("Lùi "+_l+" ngày"):("Dời sớm "+Math.abs(_l)+" ngày"))+'">'+(_l>0?"+":"")+esc(_l)+'d</span></td>'+
@@ -14635,7 +14699,7 @@ function renderBanglop(){
       '<td style="white-space:normal;max-width:280px">'+esc(x.ly_do||"-")+'</td>'+
       '<td>'+esc(x.nguoi_doi_name||x.nguoi_doi||"-")+'</td>'+
       '<td class="mut">'+esc(x.thoi_diem||"")+'</td></tr>'});
-    h+='</tbody></table></div></div>'})();
+    _t+='</tbody></table></div></div>';h+=cotLoc("bldoi",_t)})();
    /* thanh KẾ HOẠCH của buổi đang chọn - compact */
    var cs=find("DL11","session_id",window.DDSESS);
    if(cs){var P=sesPlan(cs);
@@ -14663,9 +14727,9 @@ function renderBanglop(){
  }
  else if(tab==="hocvien"){
   var sesOfCls={};srows("DL11").forEach(function(x){if(x.class_id===cid)sesOfCls[x.session_id]=1});
-  h+='<div class="panel"><div class="ph"><b>Học viên trong lớp ('+enr.length+')</b><div class="mini"><button class="pill" onclick="midForm(\''+esc(cid)+'\')"><i class="ti ti-writing"></i>Nhập điểm giữa khóa</button></div></div>'+
+  var _t='<div class="panel"><div class="ph"><b>Học viên trong lớp ('+enr.length+')</b><div class="mini">'+cotNutHTML("blhv")+'<button class="pill" onclick="midForm(\''+esc(cid)+'\')"><i class="ti ti-writing"></i>Nhập điểm giữa khóa</button></div></div>'+
    '<div style="padding:8px 14px 0"><span class="mut" style="font-size:11.5px">chuyên cần & bài tập tính THEO LỚP NÀY (không trộn lớp cũ của học viên)</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã HV</th><th>Họ tên</th><th>Chuyên cần</th><th>Bài tập</th><th>Trạng thái</th><th></th></tr></thead><tbody>';
-  if(!enr.length)h+='<tr><td class="empty" colspan="6">Lớp chưa có học viên.</td></tr>';
+  if(!enr.length)_t+='<tr><td class="empty" colspan="6">Lớp chưa có học viên.</td></tr>';
   enr.forEach(function(e){var s=find("DL09","student_id",e.student_id)||{};
    var att=srows("DL12").filter(function(x){return x.student_id===e.student_id&&sesOfCls[x.session_id]});
    var pr=att.filter(function(x){return/present|on_time|late/.test(ecode(x.attendance_status))}).length;
@@ -14683,11 +14747,12 @@ function renderBanglop(){
       và nói luôn vì sao - máy thấy hay người gắn - để người đọc biết có cần xác nhận lại. */
    var risk=stuRisk(s);var vsao=risk?stuRiskReasons(s).join(" · "):"";
    var mayThay=risk&&!isRisk(s.attendance_progress_status)&&!isRisk(s.academic_progress_status);
-   h+='<tr><td>'+esc(e.student_id)+'</td><td>'+nguoiLnk(e.student_id,s.full_name,"-")+'</td><td>'+rate+'</td><td>'+gr+'/'+hw.length+'</td>'+
+   _t+='<tr><td>'+esc(e.student_id)+'</td><td>'+nguoiLnk(e.student_id,s.full_name,"-")+'</td><td>'+rate+'</td><td>'+gr+'/'+hw.length+'</td>'+
     '<td><span class="chip '+(risk?"red":"green")+'"'+(vsao?' data-tip="'+esc(vsao)+'"':'')+'>'+(risk?"Nguy cơ":"Ổn định")+'</span>'+
     (mayThay?' <span class="chip amber" data-tip="Máy đếm thấy vượt ngưỡng nhưng chưa ai gắn cờ chính thức - vào hồ sơ xác nhận rồi gắn.">máy thấy</span>':'')+'</td>'+
     '<td><button class="btn sm" onclick="openHoso(\''+esc(e.student_id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button></td></tr>'});
-  h+='</tbody></table></div></div>';
+  _t+='</tbody></table></div></div>';
+  h+=cotLoc("blhv",_t);
  }
  else if(tab==="baitap"){
   h+=btHub(true);
@@ -15809,14 +15874,14 @@ var BGORPH="__orph";
  Object.keys(stCount).sort(function(a,b){return (ord[a]==null?999:ord[a])-(ord[b]==null?999:ord[b])}).forEach(function(c){
   bsegs.push([c,elabel(eFull("enum_lead_status",c))||c,stCount[c],stCls(c)])});
  h+=tbar(srchHTML(window.BGQ||"","window.BGQ=this.value;reRenderKeep(CUR)","Tìm tên, SĐT hoặc mã...",280)+segHTML(stf,bsegs,"window.BGST='{k}';reRender(CUR)"),
-  '<span class="tbcnt">'+leads.length+'/'+allLeads.length+' lead</span>'+
+  cotNutHTML("banggiao")+'<span class="tbcnt">'+leads.length+'/'+allLeads.length+' lead</span>'+
   ((stf!=="all"||q)?'<button class="btn sm" onclick="window.BGST=\'all\';window.BGQ=\'\';reRender(CUR)"><i class="ti ti-x"></i>Xóa lọc</button>':''));
  h+='<div class="panel"><div class="ph"><b>Lead của '+esc(src)+' - hiện '+leads.length+'/'+allLeads.length+'</b><div class="mini"><button class="pill" onclick="bgAll(true)">Chọn tất cả (đang hiện)</button><button class="pill" onclick="bgAll(false)">Bỏ chọn</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th style="width:36px"></th><th>Mã</th><th>Họ tên</th><th>SĐT</th><th>Trạng thái</th><th>Việc cần làm</th></tr></thead><tbody>';
  if(!allLeads.length)h+='<tr><td class="empty" colspan="6">NV này không còn lead.</td></tr>';
  else if(!leads.length)h+='<tr><td class="empty" colspan="6">Không có lead nào khớp bộ lọc.</td></tr>';
  /* V9.93: cả dòng mở hồ sơ khách (ô tick vẫn là ô tick - `moBam` không cướp việc của nó). */
  leads.forEach(function(l){h+='<tr data-mo="leadDetail" data-mo-arg="'+esc(l.lead_id)+'"><td><input type="checkbox" class="bgck" value="'+esc(l.lead_id)+'"></td><td>'+esc(l.lead_id)+'</td><td><a class="lnk" onclick="leadDetail(\''+esc(l.lead_id)+'\')">'+esc(l.full_name)+'</a></td><td>'+esc(l.phone_number||"")+'</td><td><span class="chip '+stCls(l.lead_status)+'">'+esc(elabel(l.lead_status))+'</span></td><td style="font-size:11.5px;color:var(--muted)">'+esc(naLive("DL02",l)||"")+'</td></tr>'});
- h+='</tbody></table></div></div>';return h}
+ h+='</tbody></table></div></div>';return cotLoc1("banggiao",h,0)}
 function bgAll(v){[].forEach.call(document.querySelectorAll(".bgck"),function(c){c.checked=v})}
 /* ═══ V2 12/08 (SALE-9) - THU LEAD QUÁ HẠN CHĂM SÓC ═══════════════════════════════════════════
    Trưởng phòng Tư vấn: *"trong trường hợp lead quá thời hạn chăm sóc em sẽ thu lead lại rồi đưa
@@ -18573,7 +18638,10 @@ function dvi(p){return DVI[p]||"dòng"}
    không phải nhớ khai thêm một chỗ nữa. */
 var LOCNHAN={channel:"Kênh liên hệ",payment_method:"Hình thức",debt:"Công nợ",survey_type:"Loại phiếu"};
 function locNhan(f){return LOCNHAN[String(f||"")]||"Trạng thái"}
-function filterBar(p,cur,opts,cnt,nhan){
+/* `them` (17/08): chỗ để trang gắn thêm một nút vào ĐÚNG cụm công cụ bên phải - nay là nút Cột
+   của bảng dựng tay. Không có tham số này thì mỗi trang tự chế một thanh riêng cho một cái nút,
+   và thứ tự [số dòng] [Xuất] [Bộ lọc] [Cột] mà hàm này đang giữ sẽ vỡ ở đúng những trang ấy. */
+function filterBar(p,cur,opts,cnt,nhan,them){
  /* V9.28: bộ lọc chuyên sâu gắn vào ĐÂY - một chỗ sửa, mọi trang tác vụ dùng filterBar đều có.
     Tab/chip nghiệp vụ bên trái giữ nguyên; bộ lọc nằm bên phải và chỉ thu hẹp trong tab đang mở. */
  /* V9.52 (anh Luân: "vị trí đặt để, cách thiết kế bộ lọc, nói chung chưa đồng bộ trong thiết
@@ -18592,16 +18660,16 @@ function filterBar(p,cur,opts,cnt,nhan){
     dòng thôi trôi theo độ dài dải chip. Nhãn mặc định là "Trạng thái" vì mọi trang tác vụ đều
     lọc theo bước của quy trình; trang nào khác thì truyền `nhan` riêng. */
  return locKhoi([locR("",tim),locR(nhan||"Trạng thái",segHTML(cur,opts,"fset('"+p+"','{k}');reRender(CUR)"))],
-  '<span class="tbcnt">'+cnt+' '+dvi(p)+'</span>'+fltBarHTML(p,1))}
+  '<span class="tbcnt">'+cnt+' '+dvi(p)+'</span>'+fltBarHTML(p,1)+(them||""))}
 /* ═══ V2 09/08 - DẢI CHIP KHÔNG KÈM Ô TÌM ═══════════════════════════════════════════════════
    `filterBar` luôn kèm một ô tìm ở đầu - đúng cho trang chưa có ô nào. Nhưng bốn trang em vừa
    thêm chip (Bảng công · Mã giới thiệu · GV dự phòng · Phòng học) ĐÃ CÓ ô tìm hoặc thanh chọn
    riêng, nên gọi `filterBar` là đẻ ra HAI Ô TÌM trên cùng một trang - người dùng gõ vào ô nào
    cũng được nhưng hai ô không nói chuyện với nhau. `_checkux` bắt ngay trong lượt verify đầu.
    Hàm này vẽ ĐÚNG dải chip, không kèm gì thêm. */
-function chipBar(p,cur,opts,cnt,nhan){
+function chipBar(p,cur,opts,cnt,nhan,them){
  return locKhoi([locR(nhan||"Trạng thái",segHTML(cur,opts,"fset('"+p+"','{k}');reRender(CUR)"))],
-  (cnt==null?"":'<span class="tbcnt">'+cnt+' '+dvi(p)+'</span>'));}
+  (cnt==null?"":'<span class="tbcnt">'+cnt+' '+dvi(p)+'</span>')+(them||""));}
 function stepBar(a){var h='<div class="steps">';a.forEach(function(s,i){h+=stepHTML(s[0],s[1]);if(i<a.length-1)h+='<div class="stpc'+(s[1]?" done":"")+'"></div>'});return h+'</div>'}
 /* `sel`: giá trị đang có của dòng - mở form sửa mà mục chọn nhảy về đầu danh sách là người dùng
    lưu đè mất giá trị cũ mà không biết. */
@@ -23348,7 +23416,7 @@ function renderMaGioiThieu(embed){
   if(mgF==="chay")return g.enrolled>0;
   return true});
  h+=tbar(srchHTML(window.MGQ||"","window.MGQ=this.value;reRenderKeep(CUR)","Tìm tên, SĐT hoặc mã...",300),
-  '<span class="tbcnt">'+list.length+'/'+amb.length+' học viên</span>');
+  cotNutHTML("magt")+'<span class="tbcnt">'+list.length+'/'+amb.length+' học viên</span>');
  h+=chipBar("magioithieu",mgF,[["all","Tất cả",amb.length],
   ["cho","Thưởng còn treo",nCho,nCho?"red":""],
   ["chay","Đã có người đăng ký",nChay]],list.length);
@@ -23378,7 +23446,7 @@ function renderMaGioiThieu(embed){
     '<td>'+esc(String(r.created_at||"").slice(0,10)||"-")+'</td>'+
     '<td><button class="btn primary sm" onclick="mgtTrao(\''+esc(r.reward_id)+'\')"><i class="ti ti-gift"></i>Trao thưởng</button></td></tr>'});
   h+='</tbody></table></div></div>'})();
- return h}
+ return cotLoc1("magt",h,0)}
 function mgDetail(key){var ev=rows("DL22").filter(function(x){return String(x.referrer_student_id||x.referrer_name)===String(key)});
  if(!ev.length){toast("Không có dữ liệu.");return}
  var nm=ev[0].referrer_name,code=ev[0].referral_code;
@@ -23741,10 +23809,10 @@ function renderHosoKhoa(){var id=window.KHID;var c=find("DL05","course_id",id);
  h+=kpiMini([
   ["CR10","Tỷ lệ hoàn thành khóa",crV==null?"-":Math.round(crV*100)+"%",crV==null?null:(crV>=kpiTh(/^CR10/,0.85)),"≥ "+kpiChip(/^CR10/,0.85,1)],
   ["AR","Tỷ lệ đạt mục tiêu đầu ra",arV==null?"-":Math.round(arV*100)+"%",arV==null?null:(arV>=kpiTh(/^AR$/,0.7)),"≥ "+Math.round(kpiTh(/^AR$/,0.7)*100)+"%"]]);
- h+='<div class="panel"><div class="ph"><b>Lớp thuộc khóa này ('+cls.length+')</b></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Tên lớp</th><th>Trạng thái</th><th>Sĩ số</th><th>GV chính</th><th>Khai giảng</th><th>Thao tác</th></tr></thead><tbody>';
+ h+='<div class="panel"><div class="ph"><b>Lớp thuộc khóa này ('+cls.length+')</b><div class="mini">'+cotNutHTML("hskhoa")+'</div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Tên lớp</th><th>Trạng thái</th><th>Sĩ số</th><th>GV chính</th><th>Khai giảng</th><th>Thao tác</th></tr></thead><tbody>';
  if(!cls.length)h+='<tr><td class="empty" colspan="7">Chưa có lớp nào.</td></tr>';
  cls.forEach(function(x){h+='<tr><td>'+esc(x.class_id)+'</td><td>'+esc(x.class_name)+'</td><td><span class="chip '+stCls(x.class_status)+'">'+esc(elabel(x.class_status))+'</span></td><td>'+esc(x.current_enrollment||0)+'/'+esc(x.class_capacity||0)+'</td><td>'+esc(x.main_teacher_id_name||x.main_teacher_id||"")+'</td><td>'+esc(x.class_start_date||"")+'</td><td><button class="btn sm" onclick="openLop(\''+esc(x.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Bảng lớp</button></td></tr>'});
- return h+'</tbody></table></div></div>'}
+ return cotLoc1("hskhoa",h+'</tbody></table></div></div>',0)}
 /* ===== P6 · BUỔI HỌC & NHẬN XÉT GV (DL11) - SOP NA019-NA024, NA068, NA069 ===== */
 /* ═══════════ AC4 · BUỔI THI GIỮA KHÓA / CUỐI KHÓA ═══════════════════════════════════════
    Trưởng phòng ACA hỏi 06/08: buổi thi phải HIỆN RA trong danh sách buổi, và **TP Học vụ hoặc
@@ -24727,7 +24795,7 @@ function renderGvdp(embed){
     phải đứng SAU nó. `_checkux` bắt được ngay lượt verify đầu. */
  h+=chipBar("gvdp",gvF,[["all","Tất cả buổi",_sesAll],
   ["trong","Chưa có giáo viên",_nTrong,_nTrong?"red":""],
-  ["huy","Đã huỷ",_nHuy,_nHuy?"amber":""]],null);
+  ["huy","Đã huỷ",_nHuy,_nHuy?"amber":""]],null,null,cotNutHTML("gvdpso"));
  h+='<div class="panel"><div class="ph"><b>Buổi học trong ngày</b><span class="mut" style="font-size:11.5px">bấm "Đề xuất người dạy thay" để xem ai nhận được</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Lớp</th><th>Cơ sở / hình thức</th><th>Giáo viên đang phụ trách</th><th>Giáo viên thay thế</th><th></th></tr></thead><tbody>';
  if(!ses.length)h+='<tr><td class="empty" colspan="6">Ngày này không có buổi học nào.</td></tr>';
  ses.forEach(function(x){var c=find("DL10","class_id",x.class_id)||{};
@@ -24790,7 +24858,7 @@ function renderGvdp(embed){
     '<td style="font-size:11.5px">'+esc(brs.join(" · ")||"-")+'</td></tr>'});
   if(!_tr.length)h+='<tr><td colspan="4"><div class="empty">Ngày '+esc(vnd2(day))+' giáo viên nào cũng có lịch dạy - không còn ai trống.</div></td></tr>';
   h+='</tbody></table></div></div>'})();
- return h+gvTaiHTML()}
+ return cotLoc1("gvdpso",h,0)+gvTaiHTML()}
 /* ===== TẢI GIẢNG VIÊN CẢ ĐỘI =======================================================
    V9.40. App xem được từng giáo viên một (hồ sơ giảng viên rất đầy đủ) và xem được MỘT NGÀY
    (bảng dự phòng ở trên), nhưng không có chỗ nào so ngang cả đội theo kỳ. Đo trên dữ liệu:
@@ -24969,7 +25037,7 @@ function dpSoHTML(){
   /* `tbcnt` chỉ được mang SỐ + ĐƠN VỊ, không nhét thêm vế nào: `_checkux` đọc đúng khuôn ấy để
      đối chiếu đơn vị với bảng DVI, nhét thêm chữ là nó đọc ra một đơn vị không có thật. Phần
      "còn trống" là một con số KHÁC, nên nó đứng thành một vế riêng. */
-  '<span class="tbcnt">'+ds.length+' ca</span>'+
+  cotNutHTML("dpso")+'<span class="tbcnt">'+ds.length+' ca</span>'+
   '<span class="mut" style="font-size:11.5px;align-self:center">'+nTrong+' còn trống</span>');
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr>'+
   '<th>Giáo viên</th><th>Ngày</th><th>Khung giờ</th><th>Cơ sở nhận dạy</th><th>Trạng thái</th>'+
@@ -24999,7 +25067,7 @@ function dpSoHTML(){
   '<div class="mut" style="font-size:11.5px;padding:11px 16px;line-height:1.7">'+
   'Hai chiều dùng CHUNG một sổ này: xếp người từ bảng buổi học ở trên thì ca tương ứng tự chuyển '+
   'sang "đã dùng"; gán từ đây thì buổi học cũng đổi giáo viên và ghi vết y như vậy.</div></div>';
- return h}
+ return cotLoc1("dpso",h,0)}
 /* ═══════ V9.29r - ĐỤNG PHÒNG / ĐỤNG GIỜ (việc tồn đợt 2 - khối xếp lịch) ═══════
    Lịch tuần trước đây chỉ soi TRÙNG GIỜ CỦA MỘT NGƯỜI. Ba loại đụng còn lại chưa ai canh:
      (1) hai lớp khác nhau xếp CÙNG MỘT PHÒNG cùng khung giờ - lớp thứ hai tới nơi không có chỗ;
@@ -25051,7 +25119,7 @@ function renderPhong(embed){
    `THE_NEN_LA_GI.md`: thẻ chỉ được mang KPI/tỷ lệ · mốc SLA · tiền-giờ cộng dồn · số đo trên
    dữ liệu KHÁC bảng dưới · xếp hạng giữa các nhóm. Ngoài năm loại đó là chip, không phải thẻ. */
 
- h+=pgBar("phong",cl.length);
+ h+=pgBar("phong",cl.length,cotNutHTML("phongdung"));
  /* V2 09/08 - DẢI CHIP ĐẶT SAU Ô TÌM. Thứ tự chuẩn của app (V9.52): [ô tìm] [dải chip] - đọc
     trái sang phải, thu hẹp thô trước rồi tinh sau. `pgBar` là thứ vẽ ô tìm ở trang này nên chip
     phải đứng SAU nó. `_checkux` bắt được ngay lượt verify đầu. */
@@ -25087,7 +25155,7 @@ function renderPhong(embed){
   h+='<tr><td class="khongbe">'+lopLnk(c.class_id,c.class_name,"")+'</td><td class="khongbe">'+cnT(c.branch)+'</td>'+
    '<td>'+esc(elabel(c.learning_mode)||c.learning_mode||"-")+'</td><td>'+esc(c.class_schedule||"-")+'</td>'+
    '<td class="mut">'+esc(c.venue_or_zoom_link||"(trống)")+'</td></tr>'});
- return h+'</tbody></table></div></div>'}
+ return cotLoc1("phongdung",h+'</tbody></table></div></div>',0)}
 function renderHoctap(){
  var tab=hubTab("hoctap");
  var cls=srows("DL10").filter(function(c){return /in_progress|open/.test(ecode(c.class_status))});
@@ -27780,7 +27848,7 @@ function renderCongno(){
   (_c("cn_dot")?'<th>Đợt đã đóng đủ</th>':'')+(_c("cn_ke")?'<th>Đợt kế tiếp</th>':'')+
   (_c("cn_ct")?'<th>Chứng từ</th>':'')+
   '</tr></thead><tbody>';
- var _sc=COTTAY.congno.filter(function(c){return _c(c[0])&&(c[0]!=="cn_ky"||_coKy)}).length||1;
+ var _sc=cotDs("congno").filter(function(c){return _c(c[0])}).length||1;
  if(!ds.length)h+='<tr><td colspan="'+_sc+'"><div class="empty">Không có học viên nào khớp điều kiện đang chọn. '+
   'Nới kỳ số liệu ra <b>Toàn kỳ</b> hoặc bỏ chip lọc là thấy lại.</div></td></tr>';
  ds.forEach(function(G){
@@ -27800,10 +27868,10 @@ function renderCongno(){
    /* "Đủ" chỉ được nói khi MỌI phiếu đã có ảnh. Học viên chưa đóng đồng nào thì không có gì để
       kiểm - vẽ dấu xanh ở đó là khen một việc chưa ai làm; đo được 2 hàng như vậy.
       *Đừng tô xanh một ô rỗng: không có gì để kiểm khác hẳn với đã kiểm xong.* */
-   '<td>'+(!G.phieu?'<span class="mut">chưa có phiếu</span>'
+   (!_c("cn_ct")?'':'<td>'+(!G.phieu?'<span class="mut">chưa có phiếu</span>'
      :(G.thieu?('<span class="chip red" data-tip="'+esc(G.thieu+" phiếu chưa đính ảnh chứng từ và cũng chưa khai lý do"+(G.ctLy?(", thêm "+G.ctLy+" phiếu mới chỉ khai lý do"):""))+'">thiếu '+G.thieu+'</span>')
        :(G.ctLy?('<span class="chip amber" data-tip="'+esc(G.ctLy+" phiếu chưa có ảnh, mới chỉ khai lý do - đối soát cuối tháng vẫn phải bổ sung ảnh")+'">khai lý do '+G.ctLy+'</span>')
-         :'<span class="chip green" data-tip="'+esc("Cả "+G.ctAnh+" phiếu đều đã đính ảnh chứng từ")+'">đủ</span>')))+'</td></tr>'});
+         :'<span class="chip green" data-tip="'+esc("Cả "+G.ctAnh+" phiếu đều đã đính ảnh chứng từ")+'">đủ</span>')))+'</td>')+'</tr>'});
  h+='</tbody></table></div></div>';
  return h}
 /* Ngăn kéo: từng đơn -> lịch đợt -> từng phiếu thu/chi kèm chứng từ. Đây là chỗ kế toán đối
@@ -29914,7 +29982,7 @@ function renderSoCamKet(){
    ["tt","Ký tại trung tâm",ds.filter(_fn.tt).length,""],
    ["hoanh","Ký tại trung tâm mà thiếu ảnh",ds.filter(_fn.hoanh).length,"red"]],
    "window.CKF='{k}';reRender(CUR)"),1)],
-  '<span class="tbcnt">'+view.length+' hồ sơ'+(ckf?" (đã lọc)":"")+'</span>',"cktbar");
+  cotNutHTML("socamket")+'<span class="tbcnt">'+view.length+' hồ sơ'+(ckf?" (đã lọc)":"")+'</span>',"cktbar");
  h+='<div class="panel"><div class="ph"><b>Danh sách đã ký ('+view.length+')</b><span class="mut" style="margin-left:auto;font-size:11px">bấm tên để mở hồ sơ đầy đủ</span></div><div class="pbody">';
  if(!view.length)h+='<div class="empty">'+(ckf?"Không có hồ sơ nào khớp chip lọc đang chọn.":"Chưa có hồ sơ nào ký cam kết.")+'</div>';
  else{
@@ -29930,7 +29998,7 @@ function renderSoCamKet(){
     '<td><button class="btn sm" onclick="ckXem(\''+esc(o.onboarding_id)+'\')"><i class="ti ti-file-text"></i>Xem bản đã ký</button></td></tr>'});
   h+='</tbody></table></div>';}
  h+='</div></div>';
- return h}
+ return cotLoc1("socamket",h,0)}
 /* Mo NGUYEN VAN ban DA KY cua mot ho so - khong phai ban dang hien hanh o Cai dat. Hai ban ay co
    the da khac nhau tu lau, va thu co gia tri lam bang chung la ban ho DA doc luc bam. */
 /* Ban DANG PHAT HANH (o Cai dat), khac han `ckXem` - cai kia mo ban MOT NGUOI DA KY. Hai thu
