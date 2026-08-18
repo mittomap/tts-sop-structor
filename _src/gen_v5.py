@@ -643,12 +643,12 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .insrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .insno{min-width:52px;font-size:12px;font-weight:700;color:var(--muted)}
 .insrow input[type="date"]{height:34px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:12px;font-weight:600;color:var(--ink);background:#fff}
-.insrow input[type="number"]{height:34px;width:150px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:13px;font-weight:700;color:var(--ink);text-align:right;background:#fff}
+.insrow input.insti{height:34px;width:150px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit;font-size:13px;font-weight:700;color:var(--ink);text-align:right;background:#fff}
 .insrow input.khoa{background:var(--bg);color:var(--muted);cursor:default}
 .insxx{font-size:12px;font-weight:600;border-radius:6px;padding:7px 10px;display:flex;align-items:center;gap:6px}
 .insxx.ok{background:#0D948814;color:#0D9488}
 .insxx.no{background:#E24B4A14;color:#E24B4A}
-@media(max-width:700px){.insrow input[type="number"]{width:120px}}
+@media(max-width:700px){.insrow input.insti{width:120px}}
 .rband{flex:1 1 100%;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:flex-start;gap:12px}
 .rbg{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,128px);gap:12px}
 .rbc{display:flex;flex-direction:column;gap:5px}
@@ -5088,14 +5088,41 @@ var DEFHIDE={phone_number:1,phone:1,contact_count:1,assigned_to_name:1,
 function laCotMa(ck){ck=String(ck||"");
  if(/_id_name$/.test(ck))return false;
  return /_id$/.test(ck)||/_code$/.test(ck)||/^ma_/.test(ck)}
+/* ═══ CỘT CỦA BẢNG DỰNG TAY (17/08) ══════════════════════════════════════════════════════════
+   Anh Luân nhắc lại luật cũ: *"tất cả các bảng đều có thể cấu hình ẩn hiện cột bất kỳ đúng ko?"*
+   Đúng - nhưng đo ra thì luật ấy mới chỉ được giữ ở các SỔ DANH SÁCH đi qua `renderList`, vì cả
+   bộ máy ẩn/hiện cột đọc `LISTCFG[key].cols`. **29 bảng dựng tay không có nút Cột**, trong đó có
+   bảng Công nợ anh vừa chụp.
+   `colVisible` và `colToggle` vốn đã dùng chung được (chúng chỉ cần một mã bảng và một mã cột);
+   thứ trói vào `LISTCFG` chỉ là chỗ ĐỌC DANH SÁCH CỘT. Nên mở một bảng khai thứ hai cho các bảng
+   dựng tay, và cho mọi chỗ hỏi qua `cotDs`.
+   *Một luật chỉ đúng ở nửa số màn thì nó chưa phải luật, nó là thói quen của nửa ấy.* */
+var COTTAY={
+ /* Bảng Công nợ học viên - bảng đầu tiên dựng tay được nút Cột. Mã cột đặt cố định, đổi chỗ cột
+    thì lựa chọn ẩn/hiện của người dùng vẫn còn nguyên. */
+ congno:[["cn_ma","Mã"],["cn_ten","Họ tên"],["cn_khoa","Khoá"],["cn_tong","Tổng giá trị"],
+   ["cn_thu","Đã thu"],["cn_con","Còn phải thu"],["cn_ky","Thu trong kỳ"],
+   ["cn_dot","Đợt đã đóng đủ"],["cn_ke","Đợt kế tiếp"],["cn_ct","Chứng từ"]]};
+function cotDs(key){return (LISTCFG[key]&&LISTCFG[key].cols)||COTTAY[key]||[]}
+/* Nút "Cột (n/N)" cho bảng dựng tay - cùng markup, cùng menu với sổ danh sách. */
+function cotNutHTML(key){
+ var cols=cotDs(key);if(!cols.length)return '';
+ hideInit(key);
+ var nHid=cols.filter(function(c){return !colVisible(key,c[0])}).length;
+ return '<div class="colwrap"><button class="btn'+(nHid?" primary":"")+' sm" onclick="colMenuToggle(\''+esc(key)+'\')" '+
+  'data-tip="Chọn cột nào hiện trên bảng này - lựa chọn được nhớ lại theo từng người"><i class="ti ti-columns"></i>Cột'+
+  (nHid?(" ("+(cols.length-nHid)+"/"+cols.length+")"):"")+'</button>'+colMenuHTML(key)+'</div>'}
 var HIDEINIT={};
-function hideInit(key){if(HIDEINIT[key])return;HIDEINIT[key]=1;var cfg=LISTCFG[key];if(!cfg)return;HIDECOL[key]=HIDECOL[key]||{};cfg.cols.forEach(function(c){if(DEFHIDE[c[0]]||laCotMa(c[0]))HIDECOL[key][c[0]]=1})}
+function hideInit(key){if(HIDEINIT[key])return;HIDEINIT[key]=1;var cols=cotDs(key);if(!cols.length)return;HIDECOL[key]=HIDECOL[key]||{};cols.forEach(function(c){if(DEFHIDE[c[0]]||laCotMa(c[0]))HIDECOL[key][c[0]]=1})}
 function colVisible(key,ck){return !(HIDECOL[key]&&HIDECOL[key][ck])}
-function colToggle(key,ck){HIDECOL[key]=HIDECOL[key]||{};if(HIDECOL[key][ck])delete HIDECOL[key][ck];else HIDECOL[key][ck]=1;rlist(key)}
-function colMenuToggle(key){window.COLMENU=(window.COLMENU===key)?"":key;rlist(key)}
-function colMenuHTML(key){var cfg=LISTCFG[key];if(window.COLMENU!==key)return '';
+/* `rlist` chỉ biết vẽ lại một SỔ DANH SÁCH. Bảng dựng tay thì vẽ lại trang đang đứng - không có
+   dòng này thì bấm vào ô chọn cột không có gì nhúc nhích, và người dùng kết luận nút hỏng. */
+function colVeLai(key){if(LISTCFG[key])rlist(key);else reRender(CUR)}
+function colToggle(key,ck){HIDECOL[key]=HIDECOL[key]||{};if(HIDECOL[key][ck])delete HIDECOL[key][ck];else HIDECOL[key][ck]=1;colVeLai(key)}
+function colMenuToggle(key){window.COLMENU=(window.COLMENU===key)?"":key;colVeLai(key)}
+function colMenuHTML(key){if(window.COLMENU!==key)return '';
  var h='<div class="colmenu"><div class="colmh">Hiện / ẩn cột</div>';
- hideInit(key);cfg.cols.forEach(function(c,i){var on=colVisible(key,c[0]);
+ hideInit(key);cotDs(key).forEach(function(c,i){var on=colVisible(key,c[0]);
   h+='<label class="colmi"><input type="checkbox" '+(on?"checked":"")+' onclick="colToggle(\''+key+'\',\''+esc(c[0])+'\')">'+esc(c[1])+'</label>'});
  h+='</div>';return h}
 /* ═══════════ V9.59 - THẺ CƯ XỬ ĐÚNG NHƯ CỘT ═══════════════════════════════════════════════
@@ -18910,12 +18937,28 @@ function tvSave(id){var vals={consultation_status:eFull("enum_consultation_statu
  closeModal()}
 function tvClose(id){var c=find("DL04","consultation_id",id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-target-arrow"></i>Cập nhật chốt - '+esc(c.customer_name_display||c.lead_id)+'</h4>';
- h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Chọn "confirmed_with_deposit" là mở đường sang bước Tạo đăng ký; chọn "dropped" thì hồ sơ ra khỏi hàng chờ chốt. Ghi chú ở đây là căn cứ khi rà lại tỷ lệ chốt của bạn.</div>';
+ /* NÓI ĐÚNG THỨ SẮP XẢY RA. Câu cũ viết "mở đường sang bước Tạo đăng ký" - mà app thì chỉ ghi
+    trạng thái rồi đóng ngăn kéo, người dùng phải tự quay ra tìm hồ sơ ấy trong chip "Chờ tạo ĐK".
+    Anh Luân bắt đúng (17/08): *"nếu bạn đồng ý thanh toán, thì chọn đồng ý thanh toán, nó có
+    nhảy qua thanh toán tiếp ko? hiện a chỉ thấy nó cập nhật trạng thái"*.
+    *"Mở đường" không phải là một hành động - người dùng không đi được trên một cánh cửa vừa mở
+    ở nơi họ không nhìn thấy.* Nay chốt xong là ĐI TIẾP luôn. */
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Chọn <b>confirmed_with_deposit</b> là app <b>mở luôn màn Tạo đăng ký</b> cho hồ sơ này, không phải quay ra tìm lại; chọn <b>dropped</b> thì hồ sơ ra khỏi hàng chờ chốt. Ghi chú ở đây là căn cứ khi rà lại tỷ lệ chốt của bạn.</div>';
  h+='<div class="fld"><label>Kết quả</label><select id="cv_st">'+enumOpts("enum_conversion_status")+'</select></div>';
  h+='<div class="fld full"><label>Ghi chú</label><textarea id="cv_note" rows="2"></textarea></div>';
  h+='<div class="fld full"><button class="btn primary" onclick="tvCloseSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Lưu</button></div></div>';
  openDrawer("Cập nhật chốt",h)}
-function tvCloseSave(id){markRow("DL04","consultation_id",id,{conversion_status:fldV("cv_st"),conversion_time:nowStr(),conversion_note:fldV("cv_note")},"Đã cập nhật kết quả chốt.","tuvan");closeModal()}
+function tvCloseSave(id){
+ var st=fldV("cv_st");
+ var chot=/confirmed/.test(ecode(st));
+ markRow("DL04","consultation_id",id,{conversion_status:st,conversion_time:nowStr(),conversion_note:fldV("cv_note")},
+  chot?"Đã chốt - mở tiếp màn Tạo đăng ký.":"Đã cập nhật kết quả chốt.","tuvan");
+ closeModal();
+ /* Chốt xong thì DẮT ĐI TIẾP, đừng bỏ người ta giữa đường. Đúng nhịp mà luồng chạy quy trình
+    đang dùng: xong một bước là màn kế tiếp tự mở.
+    Đợi một nhịp cho ngăn kéo cũ đóng hẳn rồi mới mở cái mới - mở chồng lên nhau thì cái sau
+    thay chỗ cái trước và hiệu ứng đóng của cái trước xoá luôn cái sau. */
+ if(chot)setTimeout(function(){try{tvEnroll(id)}catch(e){}},260)}
 function tvEnroll(id){var c=find("DL04","consultation_id",id)||{};var course=rows("DL05").filter(function(x){return x.course_name===c.recommended_course})[0]||{};
  var h='<div class="dcard"><h4><i class="ti ti-clipboard-check"></i>Tạo đăng ký - '+esc(c.customer_name_display||c.lead_id)+'</h4>';
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Học phí điền sẵn theo bảng giá của khóa. Chiết khấu từ '+slaChip("thresholdDiscount_approval",1000000)+' trở lên phải có Quản lý phê duyệt - cứ nhập rồi lưu, hệ thống tự đẩy vào hàng chờ duyệt. Chia đợt đóng làm ở bước sau.</div>';
@@ -19185,6 +19228,33 @@ function dotChiaTien(tot,n,dep){
    Ô "còn thiếu / đã thừa" tính lại mỗi lần gõ. `_checkux` đòi mọi ô nhập phải có lời giải thích,
    nên mỗi hàng nói rõ nó là đợt mấy. */
 var INSMAX=4;
+/* ═══ Ô TIỀN CÓ DẤU CHẤM NGĂN NGHÌN (anh Luân 17/08) ═════════════════════════════════════════
+   *"gõ 5000000 nó hiện 5.000.000 chứ ko phải ngược lại nghen"* - tức người ta gõ số trần, app
+   chấm hộ ngay lúc gõ; không bắt họ tự gõ dấu chấm.
+   *"tính toán cũng phải chính xác"* - và đây là chỗ nguy hiểm thật, đo được:
+   **`num("5.600.000")` trả về 5.6**, vì `num` coi dấu chấm là dấu thập phân. Nghĩa là chỉ cần
+   MỘT chỗ nào đó lỡ đọc ô này bằng `num()` là năm triệu sáu thành năm đồng sáu, im lặng, và
+   con số ấy đi thẳng vào sổ học phí.
+   Nên tiền trong ô đọc bằng ĐÚNG MỘT hàm `insSo` (bóc hết ký tự không phải chữ số rồi parseInt),
+   và cả app chỉ có một chỗ đọc ô này là `insEditDoc`.
+   *Đổi cách HIỂN THỊ một con số thì phải đi tìm mọi chỗ ĐỌC nó - cái đọc sai không kêu lên.* */
+function insSo(v){var d=String(v==null?"":v).replace(/\D/g,"");return d?parseInt(d,10):0}
+function insDau(n){n=Math.max(0,Math.round(Number(n)||0));return n?n.toLocaleString("vi-VN"):""}
+/* Chấm lại ngay lúc gõ, GIỮ chỗ con trỏ theo SỐ CHỮ SỐ đứng trước nó chứ không theo vị trí ký tự:
+   thêm một dấu chấm là mọi ký tự phía sau dịch đi một chỗ, giữ theo vị trí thì con trỏ nhảy lung
+   tung giữa lúc gõ. */
+function insGoTien(el){
+ if(!el)return;
+ var cu=String(el.value||"");
+ var pos=(el.selectionStart==null)?null:el.selectionStart;
+ var truoc=(pos==null)?0:cu.slice(0,pos).replace(/\D/g,"").length;
+ var d=cu.replace(/\D/g,"");
+ var moi=d?parseInt(d,10).toLocaleString("vi-VN"):"";
+ el.value=moi;
+ if(pos!=null){var i=0,dem=0;
+  while(i<moi.length&&dem<truoc){if(moi.charCodeAt(i)>=48&&moi.charCodeAt(i)<=57)dem++;i++}
+  try{el.setSelectionRange(i,i)}catch(e){}}
+ el.dataset.tay=1;insEditTong()}
 /* HAI CHẾ ĐỘ CHIA (anh Luân 17/08): *"cho sale chọn: tách theo quy định, hoặc tách chủ động.
    Cái nào cũng cần duyệt nghen, tách theo quy định thì đỡ phải nhập từng đợt, app tự tính giúp"*.
    MỘT bảng, hai chế độ - không dựng hai màn:
@@ -19219,7 +19289,7 @@ function insEditHTML(pre,tot,che){
   h+='<div class="insrow" id="insrow_'+i+'"'+(i>=((pre&&pre.length)||1)?' style="display:none"':'')+'>'+
    '<span class="insno">Đợt '+(i+1)+'</span>'+
    '<input type="date" id="ins_d_'+i+'" aria-label="Hạn đóng đợt '+(i+1)+'"'+(kh?' readonly class="khoa"':'')+' value="'+esc(toISOdt(r.due_date||"",1))+'" onchange="this.dataset.tay=1;insEditTong()">'+
-   '<input type="number" id="ins_a_'+i+'" aria-label="Số tiền đợt '+(i+1)+'"'+(kh?' readonly class="khoa"':'')+' min="0" step="1000" value="'+esc(String(r.due_amount||""))+'" oninput="this.dataset.tay=1;insEditTong()">'+
+   '<input type="text" inputmode="numeric" id="ins_a_'+i+'" aria-label="Số tiền đợt '+(i+1)+'"'+(kh?' readonly class="insti khoa"':' class="insti"')+' value="'+esc(insDau(r.due_amount))+'" oninput="insGoTien(this)">'+
    '</div>'}
  h+='<div class="insxx" id="insxx"></div><input type="hidden" id="ins_tot" value="'+esc(String(num(tot)))+'">'+
   '<input type="hidden" id="ins_che" value="'+esc(window.INSCHE)+'"></div>';
@@ -19248,6 +19318,8 @@ function insEditChe(v){
    chung đọc cả hai chế độ đều thấy hợp lý. */
 function insEditChuThich(){
  var el=document.getElementById("inschu");if(!el)return;
+ if(insEditDoc().lst.length<=1){
+  el.innerHTML='Đơn này đóng <b>một lần</b> - chỉ cần một hạn đóng. Muốn chia nhỏ thì đổi ô <b>Cách đóng học phí</b> ở trên.';return}
  el.innerHTML=(insCheMD()==="chudong")
   ? 'Bạn đang <b>tự đặt</b> từng đợt: gõ ngày và số tiền theo đúng thứ đã hẹn với khách. Tổng phải bằng học phí - app cộng lại và báo ngay bên dưới.'
   : 'App chia theo <b>Cài đặt (CH2)</b>: đợt đầu '+esc(String(paramOf("installmentDepositPercent",40)))+
@@ -19259,7 +19331,7 @@ function insEditDoc(){
  for(var i=0;i<INSMAX;i++){
   var row=document.getElementById("insrow_"+i);
   if(!row||row.style.display==="none")continue;
-  var d=fldV("ins_d_"+i),a=num(fldV("ins_a_"+i));
+  var d=fldV("ins_d_"+i),a=insSo(fldV("ins_a_"+i));
   lst.push({due_date:d?fromISOdt(d).split(" ")[0]:"",due_amount:a});tong+=a}
  var tot=num(fldV("ins_tot"));
  return {lst:lst,tong:tong,tot:tot,thieu:tot-tong}}
@@ -19273,7 +19345,9 @@ function insEditTong(){
  var trong=R.lst.filter(function(x){return !x.due_date}).length;
  if(Math.abs(R.thieu)<1&&!trong){
   el.className="insxx ok";
-  el.innerHTML='<i class="ti ti-check"></i>Đã chia đủ <b>'+vnd(R.tot)+'</b> thành '+R.lst.length+' đợt.';return}
+  el.innerHTML='<i class="ti ti-check"></i>'+((R.lst.length<=1)
+    ?('Đóng <b>một lần</b> '+vnd(R.tot)+(R.lst[0]&&R.lst[0].due_date?(', hạn '+esc(R.lst[0].due_date)):'')+'.')
+    :('Đã chia đủ <b>'+vnd(R.tot)+'</b> thành '+R.lst.length+' đợt.'));return}
  var c=[];
  if(R.thieu>0)c.push('còn thiếu <b>'+vnd(R.thieu)+'</b> so với học phí '+vnd(R.tot));
  else if(R.thieu<0)c.push('đang thừa <b>'+vnd(-R.thieu)+'</b> so với học phí '+vnd(R.tot));
@@ -19308,7 +19382,9 @@ function insEditSoDot(n,d0raw){
       vào ô người ta CHƯA đụng tới - đè lên con số họ vừa cân nhắc là xoá công của họ. */
    var deAll=(insCheMD()!=="chudong");
    if(da&&(deAll||!da.dataset.tay))da.value=toISOdt(goi[i].due_date,1);
-   if(aa&&(deAll||!aa.dataset.tay))aa.value=String(goi[i].due_amount)}}
+   if(aa&&(deAll||!aa.dataset.tay))aa.value=insDau(goi[i].due_amount)}}
+ var _bar=document.getElementById("inschebar");
+ if(_bar)_bar.style.display=(n<=1)?"none":"";
  insEditTong()}
 function dotGhiLich(eid,lst){
  var e=find("DL06","enrollment_id",eid);if(!e||!lst||!lst.length)return 0;
@@ -27201,38 +27277,45 @@ function renderCongno(){
    ["du","Đã đóng đủ",all.filter(function(G){return cnLocCo(G,"du")}).length],
    ["thieu","Chưa có ảnh chứng từ",all.filter(function(G){return cnLocCo(G,"thieu")}).length]],
    "cnLocSet('{k}')","cn_loc"),
-  '<span class="tbcnt">'+ds.length+' học viên</span>'+
+  cotNutHTML("congno")+'<span class="tbcnt">'+ds.length+' học viên</span>'+
   (S("thieu")?('<span class="mut" style="font-size:11px;margin-left:10px">Trong '+(S("thieu")+S("ctLy"))+' phiếu chưa có ảnh, <b>'+S("thieu")+'</b> phiếu chưa khai cả lý do.</span>'):''));
+ function _c(k){return colVisible("congno",k)}
+ hideInit("congno");
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr>'+
-  '<th>Mã</th><th>Họ tên</th><th>Khoá</th><th class="phai">Tổng giá trị</th><th class="phai">Đã thu</th>'+
-  '<th class="phai">Còn phải thu</th>'+
+  (_c("cn_ma")?'<th>Mã</th>':'')+(_c("cn_ten")?'<th>Họ tên</th>':'')+(_c("cn_khoa")?'<th>Khoá</th>':'')+
+  (_c("cn_tong")?'<th class="phai">Tổng giá trị</th>':'')+(_c("cn_thu")?'<th class="phai">Đã thu</th>':'')+
+  (_c("cn_con")?'<th class="phai">Còn phải thu</th>':'')+
   /* Cột "Thu trong kỳ" CHỈ vẽ khi thật sự có kỳ. Ở "Toàn kỳ" nó bằng đúng cột "Đã thu" trên MỌI
      hàng - một cột chiếm chỗ để nhắc lại cột bên cạnh, và chính nó đẩy cột Chứng từ ra ngoài mép
      phải (đo bằng ảnh chụp: chip cuối bảng bị cắt còn "th…" và "k…").
      *Cột nào ở trạng thái mặc định chỉ chép lại cột bên cạnh thì ở trạng thái ấy nó là chỗ trống
      đắt tiền - bỏ đi, chỗ ấy trả về cho cột đang bị cắt.* */
-  (_coKy?'<th class="phai">Thu trong kỳ</th>':'')+
+  ((_coKy&&_c("cn_ky"))?'<th class="phai">Thu trong kỳ</th>':'')+
   /* Tiêu đề cũ chỉ có một chữ "Đợt", mà ngay trong ngăn kéo của chính dòng ấy cột đầu bảng
      lịch đợt CŨNG ghi "1/3" - với nghĩa khác hẳn: ở đó là ĐỢT SỐ MẤY, ở đây là ĐÃ XONG MẤY
      ĐỢT. Cùng một cách viết, hai nghĩa, cách nhau một cú bấm; ca Lê Duy Khôi còn trùng khít
      "1/3" ở cả hai chỗ nên không ai nhận ra. Tiêu đề phải nói ra phép đếm.
      *Hai bảng dùng chung một cách viết cho hai phép đếm khác nhau thì phải có một bảng đổi tên.* */
-  '<th>Đợt đã đóng đủ</th><th>Đợt kế tiếp</th><th>Chứng từ</th>'+
+  (_c("cn_dot")?'<th>Đợt đã đóng đủ</th>':'')+(_c("cn_ke")?'<th>Đợt kế tiếp</th>':'')+
+  (_c("cn_ct")?'<th>Chứng từ</th>':'')+
   '</tr></thead><tbody>';
- if(!ds.length)h+='<tr><td colspan="'+(_coKy?10:9)+'"><div class="empty">Không có học viên nào khớp điều kiện đang chọn. '+
+ var _sc=COTTAY.congno.filter(function(c){return _c(c[0])&&(c[0]!=="cn_ky"||_coKy)}).length||1;
+ if(!ds.length)h+='<tr><td colspan="'+_sc+'"><div class="empty">Không có học viên nào khớp điều kiện đang chọn. '+
   'Nới kỳ số liệu ra <b>Toàn kỳ</b> hoặc bỏ chip lọc là thấy lại.</div></td></tr>';
  ds.forEach(function(G){
   h+='<tr data-mo="cnXem" data-mo-arg="'+esc(G.sid||G.ten)+'">'+
-   '<td>'+esc(G.sid||"-")+'</td><td>'+(G.sid?nguoiLnk(G.sid,G.ten):esc(G.ten))+'</td>'+
-   '<td class="khongbe">'+esc(Object.keys(G.khoa).join(" · ")||"-")+'</td>'+
-   '<td class="phai">'+vnd(G.tong)+'</td><td class="phai">'+vnd(G.thu)+'</td>'+
-   '<td class="phai">'+(G.con>0?('<b style="color:var(--red)">'+vnd(G.con)+'</b>'):'<span class="mut">0đ</span>')+'</td>'+
-   (_coKy?('<td class="phai">'+(G.ky?vnd(G.ky):'<span class="mut">-</span>')+'</td>'):'')+
-   '<td class="khongbe" data-tip="'+esc(G.dotDu+" trong "+G.dot+" đợt đã đóng ĐỦ"+
+   (_c("cn_ma")?('<td>'+esc(G.sid||"-")+'</td>'):'')+
+   (_c("cn_ten")?('<td>'+(G.sid?nguoiLnk(G.sid,G.ten):esc(G.ten))+'</td>'):'')+
+   (_c("cn_khoa")?('<td class="khongbe">'+esc(Object.keys(G.khoa).join(" · ")||"-")+'</td>'):'')+
+   (_c("cn_tong")?('<td class="phai">'+vnd(G.tong)+'</td>'):'')+
+   (_c("cn_thu")?('<td class="phai">'+vnd(G.thu)+'</td>'):'')+
+   (_c("cn_con")?('<td class="phai">'+(G.con>0?('<b style="color:var(--red)">'+vnd(G.con)+'</b>'):'<span class="mut">0đ</span>')+'</td>'):'')+
+   ((_coKy&&_c("cn_ky"))?('<td class="phai">'+(G.ky?vnd(G.ky):'<span class="mut">-</span>')+'</td>'):'')+
+   (!_c("cn_dot")?'':'<td class="khongbe" data-tip="'+esc(G.dotDu+" trong "+G.dot+" đợt đã đóng ĐỦ"+
      (G.dodang.length?(". Ngoài ra đợt "+G.dodang.join(", ")+" đã có tiền vào nhưng chưa đủ - phần này nằm trong cột Đã thu, không nằm trong con số bên trái."):""))+'">'+
      G.dotDu+'/'+G.dot+
-     (G.dodang.length?(' <span class="chip amber">đợt '+esc(G.dodang.join(", "))+' đang dở</span>'):'')+'</td>'+
-   '<td class="khongbe">'+(G.moc?('<span class="chip '+G.moc.st.cls+'">'+esc(G.moc.st.lbl)+'</span> '+esc(G.moc.x.due_date||"")):'<span class="mut">-</span>')+'</td>'+
+     (G.dodang.length?(' <span class="chip amber">đợt '+esc(G.dodang.join(", "))+' đang dở</span>'):'')+'</td>')+
+   (_c("cn_ke")?('<td class="khongbe">'+(G.moc?('<span class="chip '+G.moc.st.cls+'">'+esc(G.moc.st.lbl)+'</span> '+esc(G.moc.x.due_date||"")):'<span class="mut">-</span>')+'</td>'):'')+
    /* "Đủ" chỉ được nói khi MỌI phiếu đã có ảnh. Học viên chưa đóng đồng nào thì không có gì để
       kiểm - vẽ dấu xanh ở đó là khen một việc chưa ai làm; đo được 2 hàng như vậy.
       *Đừng tô xanh một ô rỗng: không có gì để kiểm khác hẳn với đã kiểm xong.* */
@@ -27244,6 +27327,45 @@ function renderCongno(){
  return h}
 /* Ngăn kéo: từng đơn -> lịch đợt -> từng phiếu thu/chi kèm chứng từ. Đây là chỗ kế toán đối
    soát thật, nên phiếu nào thiếu chứng từ phải KÊU LÊN chứ không im lặng bỏ trống ô. */
+/* ═══ BỔ SUNG CHỨNG TỪ SAU (anh Luân 17/08: *"chỗ chưa có ảnh chứng từ đó em, có cơ chế bổ sung
+   ko?"*) ═══════════════════════════════════════════════════════════════════════════════════
+   Chưa có - và thiếu nó thì cả cái cột kia thành một danh sách để ngắm. Đường thoát "khai lý do"
+   sinh ra với giả định *sẽ bổ sung ảnh sau*; không có cửa bổ sung thì lời hứa ấy không bao giờ
+   trả được, và con số "21 phiếu chưa có ảnh" chỉ có thể tăng.
+   *Đã dựng một danh sách việc còn nợ thì phải dựng luôn cái cửa trả nợ - nếu không nó là bảng
+   điểm danh chứ không phải việc.* */
+function ctBoSung(pid){
+ var p=rows("DL07").filter(function(x){return String(x.payment_id||"")===String(pid)})[0];
+ if(!p){toast("Không thấy phiếu này.");return}
+ var chi=cnPhieuLoai(p)==="chi";
+ var h='<div class="dcard"><h4><i class="ti ti-paperclip"></i>Bổ sung chứng từ - '+esc(pid)+'</h4>';
+ h+=ctxRows([["Loại",chi?'<span class="chip red">phiếu chi</span>':'<span class="chip green">phiếu thu</span>'],
+  ["Học viên",esc(p.student_id_name||p.student_id||"-")],
+  ["Thời điểm",esc(p.payment_time||"-")],
+  ["Số tiền",vnd(Math.abs(num(p.amount)))],
+  ["Người ghi",esc(p.received_by_name||"-")],
+  ["Lý do đã khai",String(p.ct_lydo||"").trim()?esc(p.ct_lydo):'<span class="mut">không có</span>']]);
+ h+=attachBox("ctbs",(chi?"Ảnh uỷ nhiệm chi / màn hình chuyển khoản":"Ảnh biên lai / màn hình chuyển khoản")+' <i>*</i>');
+ h+='<div class="dact"><button class="btn primary" onclick="ctLuu(\''+esc(pid)+'\')"><i class="ti ti-check"></i>Lưu chứng từ</button>'+
+  '<button class="btn" onclick="closeModal()">Đóng</button></div></div>';
+ openDrawer("Bổ sung chứng từ",h)}
+function ctLuu(pid){
+ var p=rows("DL07").filter(function(x){return String(x.payment_id||"")===String(pid)})[0];
+ if(!p){toast("Không thấy phiếu này.");return}
+ var u=attachVal("ctbs");
+ if(!u){toast("Chưa đính chứng từ - chọn tệp hoặc dán link rồi lưu.",4500);return}
+ if(!actGuard("ctLuu:"+pid))return;
+ var cu=String(p.ct_lydo||"").trim();
+ p.chung_tu=u;
+ /* GIỮ lý do cũ, không xoá: nó là dấu vết vì sao lúc thu không có ảnh, và người đối soát cuối
+    tháng cần đọc được cả hai - "đã bổ sung" khác với "chưa bao giờ thiếu". */
+ p.payment_note=String(p.payment_note||"").replace(/\s*\|?\s*Chứng từ:.*$/,"")+" | Chứng từ: "+u;
+ try{logAct("Bổ sung chứng từ","DL07",pid,null,
+  "Đính chứng từ cho phiếu "+pid+" của "+(p.student_id_name||p.student_id||"")+
+  (cu?(" - lý do khai lúc thu: "+cu):""))}catch(e){}
+ if(SVR)try{google.script.run.apiUpdate("DL07",pid,{chung_tu:u,payment_note:p.payment_note})}catch(e){}
+ persistSoon();closeModal();
+ toast("Đã bổ sung chứng từ cho phiếu "+pid+".",4200);reRender(CUR)}
 function cnXem(arg){
  var G=cnDs().filter(function(x){return String(x.sid||x.ten)===String(arg)})[0];
  if(!G){toast("Không thấy học viên này trong kỳ đang chọn.");return}
@@ -27340,9 +27462,10 @@ function cnXem(arg){
         vụn - đọc ra một mớ chữ không nghĩa, mà thứ người ta cần biết chỉ là CÓ hay KHÔNG.
         *Trong một ô hẹp, hãy trả lời câu hỏi trước; bằng chứng để dành cho chỗ rê chuột.* */
      '<td class="khongbe">'+(ct?(linkOut(ct)||('<span class="chip green" data-tip="'+esc(ct)+'">đã có</span>'))
-       :(String(p.ct_lydo||"").trim()
-         ?('<span class="chip amber" data-tip="'+esc(p.ct_lydo)+'">khai lý do</span>')
-         :'<span class="chip red">chưa có</span>'))+'</td></tr>'});
+       :((String(p.ct_lydo||"").trim()
+          ?('<span class="chip amber" data-tip="'+esc(p.ct_lydo)+'">khai lý do</span>')
+          :'<span class="chip red">chưa có</span>')+
+         ' <button class="btn sm" onclick="event.stopPropagation();ctBoSung(\''+esc(p.payment_id||"")+'\')"><i class="ti ti-paperclip"></i>Bổ sung</button>'))+'</td></tr>'});
    h+='</tbody></table></div>'}
   h+='</div></div>'});
  h+='<div class="dact"><button class="btn" onclick="closeModal()">Đóng</button></div></div>';
@@ -32373,7 +32496,8 @@ DOORS = {
  # danh sach goi y roi goi no. Giu ca ba ten: hai ten cu van la duong nguoi ta di vao, con ten
  # moi la cho tay dat but. Khai thieu la `_check15` bat dung - va no bat dung.
  "DL06b":["insPlanSave","dotApDung","dotGhiLich"],
- "DL07":["duyetRefundRun","paySave","payVerifyRun","rfNeed"],
+ # 17/08 - cua bo sung chung tu sau khi da ghi phieu (man Cong no hoc vien)
+ "DL07":["duyetRefundRun","paySave","payVerifyRun","rfNeed","ctLuu"],
  "DL08":["hvClassConfirm","hvClassRejectSave","lopDayHV","midSave","obMark","obConfirmRun","rfNeed","xepMoiLuu","obChangeSave","obFinish"],
  "DL09":["bkLuuPHNguyCo","bkLuuPHQuanHe","blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave","riskCareSave","riskFlagRun","riskIgnoreSave","dhSave"],
  "DL10":["xepMoiLuu","obChangeSave","rfNeed","clsSetTeacher","moLopDelay","moLopCancelRun"],
