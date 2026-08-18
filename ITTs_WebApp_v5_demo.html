@@ -3277,7 +3277,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">18/08/2026 · <b>0fe772</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">18/08/2026 · <b>40fab1</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -4975,8 +4975,14 @@ lop:{code:"DL10",
     được nhãn mà không tách được nhóm: đúng con bệnh "con số/nhãn không dẫn tới đâu" đã bắt hai
     lần. Chip đọc thẳng `lopLa11` - cùng hàm mà cái thẻ đang đọc, nên nhãn và bộ lọc không thể
     nói hai đằng. */
+ /* Ba chip hình thức học thêm 17/08 - cùng lý do ba chip 1-1/nhóm ra đời: dữ liệu có, trục
+    lọc có trong Bộ lọc sâu, nhưng người ta phải mở hai lớp mới hỏi được một câu hỏi hằng ngày
+    ("hôm nay lớp online nào chạy"). Chip đọc THẲNG cột `learning_mode`, không đẻ thêm cột suy ra. */
  qf:[["l11","Lớp kèm 1-1",function(c){return lopLa11(c)},""],
-     ["lnhom","Lớp nhóm",function(c){return !lopLa11(c)},""]],
+     ["lnhom","Lớp nhóm",function(c){return !lopLa11(c)},""],
+     ["hoffline","Học tại trung tâm",function(c){return ecode(c.learning_mode)==="offline"},""],
+     ["honline","Học trực tuyến",function(c){return ecode(c.learning_mode)==="online"},""],
+     ["hhybrid","Kết hợp",function(c){return ecode(c.learning_mode)==="hybrid"},""]],
  /* ═══ 13/08 - BỎ NỐT HAI THẺ CUỐI (anh Luân: *"vụ thẻ em chưa làm hả, sao mấy cái nhảm nhí
     còn xuất hiện"*). Sáng nay em giữ chúng lại với lý do "gộp nhiều trạng thái nên chip không
     nói thay được" - lý do ấy SAI khi đối chiếu số thật: thẻ "Lớp đang học 8" đứng trên chip
@@ -5016,7 +5022,13 @@ lop:{code:"DL10",
  
  /* V9.40d: class_level là cột SOP mô tả từ đầu mà app chưa hiện ở đâu - xếp một em trình độ
     Foundation vào lớp IELTS 7.0+ là hỏng cả lớp, nên trình độ phải nhìn thấy ngay ở danh sách. */
- cols:[["class_id","Mã"],["class_name","Tên lớp"],["course_id_name","Khóa"],["class_level","Trình độ","enum"],["class_status","Trạng thái","chip"],["current_enrollment","Sĩ số"],["class_capacity","Sức chứa"],["main_teacher_id_name","GV chính"],["class_schedule","Lịch"],["class_start_date","Khai giảng"]]},
+ cols:[["class_id","Mã"],["class_name","Tên lớp"],["course_id_name","Khóa"],["class_level","Trình độ","enum"],["class_status","Trạng thái","chip"],["current_enrollment","Sĩ số"],["class_capacity","Sức chứa"],["main_teacher_id_name","GV chính"],["class_schedule","Lịch"],["class_start_date","Khai giảng"],
+   /* V2 17/08 (anh Luân: *"hình như mình còn thiếu hình thức học phải ko ta: Offline, Online,
+      Hybrid"*). Đo: DL10 CÓ cột `learning_mode` với dữ liệu thật (12 offline · 10 online · 4
+      hybrid), và nó đã nằm trong Bộ lọc sâu từ lâu - nhưng sổ Lớp học KHÔNG hiện cột ấy và
+      không có chip lọc nhanh. Tức app biết mà người dùng phải mở hai lớp mới hỏi được.
+      Đúng con bệnh anh bắt 13/08 với chip 1-1 / nhóm: *"thông tin có, đường tới nó thì không"*. */
+   ["learning_mode","Hình thức học","enum"],["branch","Cơ sở","enum"]]},
 /* V9.42 - SOP tách HAI màn tra cứu: VH3 Giảng viên và VH3b NV WOW. App gộp một danh sách cho gọn
    (cùng bảng DL01, cùng cột) - hợp lý hơn hai màn giống hệt nhau - nhưng gộp mà không có đường
    tách ra thì đúng là làm SÓT màn VH3b: trưởng phòng muốn xem riêng đội WOW phải tự dò cột Vai trò.
@@ -13703,7 +13715,18 @@ function jTimeline(C){
  C.pays.forEach(function(x){add(x.payment_time,"ti-cash","Thu tiền "+vnd(num(x.amount)),(elabel(x.payment_method)||"")+(x.verified_by?" · đã xác nhận":" · chờ xác nhận"),"green")});
  C.ob.forEach(function(x){add(x.assigned_at,"ti-layout-grid-add","Xếp lớp "+(x.class_id_name||x.class_id||""),"","blue");
   add(x.class_info_sent_at,"ti-send","Gửi thông tin lớp","","blue");
-  add(x.confirmation_time,"ti-checks","HV ký cam kết lớp","","green");
+  add(x.confirmation_time,"ti-checks","HV xác nhận lớp","","green");
+  /* KÝ CAM KẾT LÀ ĐIỂM CHẠM, KHÔNG PHẢI MỘT CÁI Ô (anh Luân 17/08: *"ký cam kết đầu ra là điểm
+     chạm quan trọng, em cũng phải liệt kê ở mấy cái dòng thời gian nha"*).
+     Trước bản này dòng thời gian chỉ có `confirmation_time` - mà đó là XÁC NHẬN LỚP, không phải
+     ký cam kết. Bản quy định lớp học (`commit_at`, 84/88 hồ sơ đã ký) và hợp đồng cam kết đầu ra
+     (DL30) đều không có mặt, dù cả hai đều là lúc học viên ĐẶT BÚT KÝ - thứ mà khi có tranh cãi
+     là chỗ đầu tiên người ta đi tìm.
+     *Cái gì có chữ ký thì phải nằm trên dòng thời gian; nó là chỗ người ta quay lại tìm khi mọi
+     thứ khác đã quên.* */
+  add(x.commit_at,"ti-file-check","Ký cam kết lớp học"+(x.commit_version?(" (bản "+x.commit_version+")"):""),
+   (x.commit_kenh?("ký "+x.commit_kenh):"")+(x.commit_anh?" · có ảnh bản ký":"")+
+   (x.commit_by?(" · ghi nhận: "+(nsTen(x.commit_by)||x.commit_by)):""),"green");
   add(x.onboarding_completed_at,"ti-flag","Hoàn tất onboarding","","green")});
  C.att.filter(function(a){return !isc(a.attendance_status,"on_time")}).slice(0,12).forEach(function(a){
   add(a.check_in_time||"","ti-user-check","Điểm danh",elabel(a.attendance_status)||"","amber")});
@@ -13736,6 +13759,22 @@ function jTimeline(C){
    add(s.teacher_note_completed_at||s.session_date,"ti-writing","Nhận xét buổi "+(s.session_number||""),
     (s.teacher_id_name||s.teacher_id||"")+": "+String(s.teacher_note_summary||"").slice(0,120),"blue")});
  })();
+ /* HỢP ĐỒNG CAM KẾT ĐẦU RA (DL30): trình lên, Tư vấn duyệt, Giám đốc duyệt - ba mốc riêng, vì
+    một cam kết band chỉ có hiệu lực khi ĐỦ HAI CHỮ KÝ. Gộp thành một dòng "đã có cam kết" là
+    giấu mất chuyện nó đang thiếu chữ ký nào. */
+ (function(){var eids={};(C.enr||[]).forEach(function(e){eids[String(e.enrollment_id||"")]=1});
+  rows("DL30").filter(function(hd){return eids[String(hd.enrollment_id||"")]||
+    (C.sid&&String(hd.student_id||"")===String(C.sid))}).forEach(function(hd){
+   add(hd.trinh_luc,"ti-file-description","Trình hợp đồng cam kết đầu ra",
+    "Band "+(hd.target_band||"-")+" · hạn "+(hd.han||"-")+(hd.trinh_boi_ten?(" · "+hd.trinh_boi_ten):""),"amber");
+   add(hd.duyet_tuvan_luc,"ti-user-check","Trưởng phòng Tư vấn duyệt cam kết",
+    (elabel(hd.duyet_tuvan)||hd.duyet_tuvan||"")+(hd.duyet_tuvan_boi?(" · "+(nsTen(hd.duyet_tuvan_boi)||hd.duyet_tuvan_boi)):"")+
+    (String(hd.ly_do_tuvan||"").trim()?(" - "+hd.ly_do_tuvan):""),
+    /rejected/.test(ecode(hd.duyet_tuvan))?"red":"green");
+   add(hd.duyet_gd_luc,"ti-briefcase","Giám đốc duyệt cam kết",
+    (elabel(hd.duyet_gd)||hd.duyet_gd||"")+(hd.duyet_gd_boi?(" · "+(nsTen(hd.duyet_gd_boi)||hd.duyet_gd_boi)):"")+
+    (String(hd.ly_do_gd||"").trim()?(" - "+hd.ly_do_gd):""),
+    /rejected/.test(ecode(hd.duyet_gd))?"red":"green")})})();
  C.ce.forEach(function(c){add(c.course_completion_time,"ti-award","Kết thúc khóa","Điểm "+(c.final_test_score||"-")+" · "+(elabel(c.achievement_status)||""),"green")});
  ev=ev.filter(function(e){return pvnd(e.t)});
  ev.sort(function(a,b){return (pvnd(b.t)||0)-(pvnd(a.t)||0)});
