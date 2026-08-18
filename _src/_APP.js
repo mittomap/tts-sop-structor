@@ -10470,9 +10470,20 @@ function jDiTiep(pid,tre){
   if(typeof f!=="function")return;
   toast("Bước tiếp theo: "+J.act.lb+".",3200);
   f(J.act.arg)}catch(e){}},tre||300)}
+/* Tên một người trong dòng thời gian: học viên thì mở hồ sơ 360, nhân viên thì mở hồ sơ nhân sự.
+   Hỏi theo ID vì cùng một cột có thể chứa cả hai loại (xem ghi chú ở mốc Giao việc). */
+function jNguoiLnk(id,nm){
+ id=String(id||"");nm=String(nm||id||"");
+ if(!id)return esc(nm);
+ if(find("DL09","student_id",id))return nguoiLnk(id,nm);
+ if(find("DL01","staff_id",id))return nsLnk(id,nm);
+ return esc(nm)}
 function jTimeline(C){
  var ev=[];
- function add(t,ic,tt,d,cls){if(!t)return;ev.push({t:t,ic:ic,tt:tt,d:d||"",cls:cls||""})}
+ /* `raw` = mô tả đã là HTML sẵn (có liên kết tên người). Mặc định KHÔNG raw: mọi mô tả khác đều
+    là chữ người dùng gõ, phải escape - mở raw cho tất cả là mở một cửa cho tên có dấu ngoặc kép
+    làm gãy màn. *Cho phép HTML thì cho từng chỗ, đừng cho cả hàm.* */
+ function add(t,ic,tt,d,cls,raw){if(!t)return;ev.push({t:t,ic:ic,tt:tt,d:d||"",cls:cls||"",raw:!!raw})}
  if(C.L)add(C.L.lead_created_time,"ti-user-plus","Lead vào hệ thống",elabel(C.L.lead_source)||"","blue");
  /* CUỘC GỌI ĐẦU TIÊN là mốc SLA quan trọng nhất của Tư vấn (LRT) - 186/193 lead có, mà dòng thời
     gian không hề nhắc. Mốc này khác hẳn "một lần liên hệ" bên dưới: nó là cái đồng hồ bắt đầu
@@ -10545,9 +10556,16 @@ function jTimeline(C){
  (function(){var sid=C.sid,lid=C.L&&C.L.lead_id;
   rows("DL23").filter(function(t){var r=String(t.related_id||"");return r&&(r===String(sid)||r===String(lid))})
    .slice(0,10).forEach(function(t){
+    /* Tên người trong dòng này phải BẤM ĐƯỢC. Bản đầu em in tên trần - `_checklink` bắt đúng, và
+       lý do đáng nhớ: việc TASK-0028 có `assigner_id` là **HV061, một học viên thật** (kênh "ý
+       kiến học viên" đổ vào Giao việc), nên đó không phải tên nhân viên mà là tên học viên nằm
+       trần giữa màn. Chọn kiểu liên kết theo ID chứ không đoán theo vai: cùng một cột `assigner`
+       lúc là nhân viên, lúc là học viên.
+       *Một cột chứa hai loại người thì phải hỏi ID, đừng đoán theo tên cột.* */
     add(t.created_time,"ti-send","Giao việc: "+String(t.title||"").slice(0,70),
-     (t.assigner_id_name||"")+" → "+(t.assignee_id_name||""),"amber");
-    add(t.done_time,"ti-checks","Báo xong việc: "+String(t.title||"").slice(0,60),t.assignee_id_name||"","green")})})();
+     jNguoiLnk(t.assigner_id,t.assigner_id_name)+" → "+jNguoiLnk(t.assignee_id,t.assignee_id_name),"amber",1);
+    add(t.done_time,"ti-checks","Báo xong việc: "+String(t.title||"").slice(0,60),
+     jNguoiLnk(t.assignee_id,t.assignee_id_name),"green",1)})})();
  /* V2 14/08 - HAI MẢNG CÒN THIẾU CỦA "HỌC RA SAO TRONG LỚP". Dòng thời gian trước đây đi từ
     lead vào hệ thống tới kết thúc khóa, có cả WOW, khảo sát, khiếu nại - nhưng KHÔNG có bài
     tập và KHÔNG có nhận xét buổi của giáo viên. Nghĩa là mở hồ sơ ra thì thấy em ấy đi VÀO lớp
@@ -10594,7 +10612,7 @@ function jTimeline(C){
  ev=ev.filter(function(e){return pvnd(e.t)});
  ev.sort(function(a,b){return (pvnd(b.t)||0)-(pvnd(a.t)||0)});
  if(!ev.length)return '<div class="mut" style="font-size:12px">Chưa có hoạt động nào.</div>';
- return '<div class="jtl">'+ev.map(function(e){return '<div class="jtli"><div class="jtld '+e.cls+'"><i class="ti '+e.ic+'"></i></div><div class="jtlc"><div class="jtlt">'+esc(e.tt)+'</div>'+(e.d?'<div class="jtld2">'+esc(e.d)+'</div>':'')+'<div class="jtlw">'+esc(e.t)+'</div></div></div>'}).join("")+'</div>'}
+ return '<div class="jtl">'+ev.map(function(e){return '<div class="jtli"><div class="jtld '+e.cls+'"><i class="ti '+e.ic+'"></i></div><div class="jtlc"><div class="jtlt">'+esc(e.tt)+'</div>'+(e.d?'<div class="jtld2">'+(e.raw?e.d:esc(e.d))+'</div>':'')+'<div class="jtlw">'+esc(e.t)+'</div></div></div>'}).join("")+'</div>'}
 function renderHoso(){
  if(!canPid(window.JPID||window.HOSO))return dsDeny("Hồ sơ này");
  var ix=jIndex();
