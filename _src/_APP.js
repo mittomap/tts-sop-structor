@@ -2045,10 +2045,49 @@ function laCotMa(ck){ck=String(ck||"");
 var COTTAY={
  /* Bảng Công nợ học viên - bảng đầu tiên dựng tay được nút Cột. Mã cột đặt cố định, đổi chỗ cột
     thì lựa chọn ẩn/hiện của người dùng vẫn còn nguyên. */
+ /* V2 17/08 - ba sổ dựng tay nữa được nút Cột (anh Luân: *"tất cả các bảng đều có thể cấu hình
+    ẩn hiện cột bất kỳ"*). Mã cột cố định, đổi chỗ cột thì lựa chọn của người dùng vẫn còn.
+    Cột cuối là cột NÚT - cố ý không khai, ẩn nó đi thì mất luôn đường thao tác. */
+ mautin:[["mt_ma","Mã"],["mt_ten","Tên mẫu"],["mt_nhom","Nhóm"],["mt_kenh","Kênh"],
+   ["mt_td","Tiêu đề (email)"],["mt_nd","Nội dung"],["mt_tt","Trạng thái"],["mt_sua","Sửa lần cuối"]],
+ tinnhan:[["tn_luc","Gửi lúc"],["tn_kenh","Kênh"],["tn_nhan","Người nhận"],["tn_lop","Lớp"],
+   ["tn_nd","Nội dung"],["tn_gui","Người gửi"]],
+ socamket:[["ck_hv","Học viên"],["ck_lop","Lớp"],["ck_luc","Ký lúc"],["ck_ban","Bản"],
+   ["ck_ht","Hình thức ký"],["ck_nguoi","Người ghi nhận"],["ck_anh","Ảnh"]],
  congno:[["cn_ma","Mã"],["cn_ten","Họ tên"],["cn_khoa","Khoá"],["cn_tong","Tổng giá trị"],
    ["cn_thu","Đã thu"],["cn_con","Còn phải thu"],["cn_ky","Thu trong kỳ"],
    ["cn_dot","Đợt đã đóng đủ"],["cn_ke","Đợt kế tiếp"],["cn_ct","Chứng từ"]]};
 function cotDs(key){return (LISTCFG[key]&&LISTCFG[key].cols)||COTTAY[key]||[]}
+/* LỌC CỘT TRÊN HTML ĐÃ DỰNG. Bảng dựng tay mỗi cái ghép chuỗi một kiểu; đi sửa từng ô `<td>`
+   trong 50 hàm là việc chắc chắn sót, và cái sót sẽ là một bảng lệch cột - loại lỗi nhìn vào
+   không biết sai ở đâu. Nên cắt Ở ĐẦU RA: đếm ô theo thứ tự rồi bỏ những ô thuộc cột đang ẩn.
+   Quét theo ĐỘ SÂU THẺ chứ không bằng biểu thức đơn giản, vì trong ô có thể có `<div>`, `<span>`,
+   `<button>` lồng nhau - cắt bằng regex thô là ăn nhầm nửa ô bên cạnh.
+   Bỏ qua hàng có `colspan` (hàng trống "chưa có dữ liệu") - hàng ấy không đếm theo cột.
+   *Một việc lặp ở 50 chỗ thì làm ở đầu ra, đừng đi sửa 50 chỗ.* */
+function cotLoc(key,html){
+ var cols=cotDs(key);if(!cols.length)return html;
+ hideInit(key);
+ var an=[];cols.forEach(function(c,i){if(!colVisible(key,c[0]))an.push(i)});
+ if(!an.length)return html;
+ return String(html).replace(/<tr[\s\S]*?<\/tr>/g,function(tr){
+  if(/colspan=/.test(tr))return tr;
+  var re=/<(th|td)\b/gi,m,vt=[],i;
+  while((m=re.exec(tr))){
+   var tag=m[1].toLowerCase(),st=m.index,d=0,j=st;
+   /* đi tới thẻ đóng cùng cấp */
+   var re2=new RegExp("<\\/?"+tag+"\\b","gi");re2.lastIndex=st;var m2;
+   while((m2=re2.exec(tr))){
+    if(m2[0].charAt(1)==="/"){d--;if(d===0){j=m2.index+m2[0].length;var k=tr.indexOf(">",j);j=(k<0?j:k+1);break}}
+    else d++}
+   vt.push([st,j]);re.lastIndex=j}
+  if(!vt.length)return tr;
+  var giu="",pos=0;
+  vt.forEach(function(v,idx){
+   giu+=tr.slice(pos,v[0]);
+   if(an.indexOf(idx)<0)giu+=tr.slice(v[0],v[1]);
+   pos=v[1]});
+  return giu+tr.slice(pos)})}
 /* Nút "Cột (n/N)" cho bảng dựng tay - cùng markup, cùng menu với sổ danh sách. */
 function cotNutHTML(key){
  var cols=cotDs(key);if(!cols.length)return '';
@@ -2707,6 +2746,11 @@ var FLTDEF={
   fxCalc("_khoa","Khóa học",function(r){var e=rows("DL06").filter(function(x){return x.student_id===r.student_id&&!isc(x.enrollment_status,"cancelled")});
    return e.length?e.map(function(x){return x.course_id}):[""]},
    function(v){var c=find("DL05","course_id",v);return c?(c.course_name||v):"(chưa có khóa)"}),
+  /* V2 17/08 - QUOTA WOW: "ai còn buổi WOW", "ai hết quota mà vẫn đang học" là câu Học vụ hỏi
+     mỗi tuần khi xếp buổi WOW. Ba cột quota có dữ liệu thật mà không có trục nào hỏi tới. */
+  fxCalc("_wowcon","Quota WOW còn",function(r){var n=num(r.wow_quota_remaining);
+    return n<=0?"het":(n<=2?"sap_het":"con")},
+   function(v){return v==="het"?"Đã hết quota":(v==="sap_het"?"Còn 1-2 buổi":"Còn nhiều")}),
   fxDate("joined_at","Ngày vào học")],
  nhaplead:[fxEnum("lead_status","Trạng thái lead"),fxStaff("assigned_to","Người phụ trách"),
   fxEnum("lead_source","Nguồn khách"),fxEnum("branch","Cơ sở"),fxEnum("lead_qualification_status","Mức độ tiềm năng"),
@@ -2718,10 +2762,23 @@ var FLTDEF={
   fxRef("course_id","Khóa học","DL05","course_id","course_name"),
   fxStaff("discount_approved_by","Người duyệt giảm giá"),
   fxDate("enrollment_time","Ngày đăng ký"),fxDate("next_payment_due","Hẹn thu tiếp")],
+ /* V2 17/08 - ĐỢT SỐ MẤY và CHỨNG TỪ: hai câu kế toán hỏi khi đối soát. "Đợt 1 hay đợt cuối"
+    đổi hẳn cách đọc một khoản thu, còn "phiếu nào chưa có ảnh" thì trước nay chỉ đếm được ở màn
+    Công nợ chứ không lọc được ngay trên sổ thu. */
  thanhtoan:[fxEnum("payment_method","Hình thức thu"),fxStaff("received_by","Người thu"),
+  fxCalc("_dot","Đợt số",function(r){var n=num(r.installment_no);return n?("d"+n):"kdot"},
+   function(v){return v==="kdot"?"Không theo đợt":("Đợt "+v.slice(1))}),
+  fxCalc("_ct","Chứng từ",function(r){return cnChungTu(r)?"co":(String(r.ct_lydo||"").trim()?"lydo":"khong")},
+   function(v){return v==="co"?"Đã có ảnh":(v==="lydo"?"Mới khai lý do":"Chưa có gì")}),
   fxStaff("verified_by","Người đối soát"),fxDate("payment_time","Ngày thu")],
  xeplop:[fxEnum("onboarding_status","Trạng thái onboarding"),fxEnum("placement_status","Xếp lớp"),
   fxEnum("class_confirmation_status","HV ký cam kết lớp"),
+  /* V2 17/08 - hai trục học vụ hỏi thật: hồ sơ nào đã đổi lớp (đổi nhiều lần là dấu hiệu xếp
+     chưa đúng ngay từ đầu), và ai đã có điểm giữa khoá để biết còn phải thi bù cho ai. */
+  fxCalc("_doilop","Đã đổi lớp",function(r){return num(r.placement_change_count)>0?"co":"khong"},
+   function(v){return v==="co"?"Đã đổi lớp":"Chưa đổi lần nào"}),
+  fxCalc("_giuakhoa","Điểm giữa khoá",function(r){return String(r.mid_overall||"").trim()?"co":"khong"},
+   function(v){return v==="co"?"Đã có điểm":"Chưa thi giữa khoá"}),
   fxRef("class_id","Lớp","DL10","class_id","class_name"),
   fxStaff("assigned_by","Người xếp"),fxDate("assigned_at","Ngày xếp lớp")],
  /* V2 14/08 (anh Luân, kèm ảnh trang Lớp học: *"điển hình của thiếu chức năng nè, chẳng thấy lọc
@@ -2737,7 +2794,12 @@ var FLTDEF={
   fxStaff("main_teacher_id","Giáo viên chính"),
   fxRef("course_id","Khóa học","DL05","course_id","course_name"),
   fxDate("class_start_date","Ngày khai giảng")],
+ /* V2 17/08 - bốn trục WOW bị bỏ quên: hình thức (online/offline), loại buổi (luyện tập / giữa
+    kỳ / cuối kỳ), ai đặt buổi, và có trừ quota không. Cả bốn đều có dữ liệu thật và đều là câu
+    người ta hỏi hằng tuần ("tuần này bao nhiêu buổi WOW online", "buổi nào không trừ quota"). */
  wow:[fxEnum("wow_status","Trạng thái buổi"),fxEnum("wow_skill","Kỹ năng"),fxEnum("wow_session_type","Loại buổi"),
+  fxEnum("wow_mode","Hình thức WOW"),fxEnum("wow_lesson_type","Loại bài WOW"),
+  fxEnum("wow_booked_by","Ai đặt buổi"),fxEnum("quota_deducted","Có trừ quota"),
   fxStaff("staff_id","Giáo viên WOW"),fxDate("wow_session_date","Ngày học WOW")],
  /* Trang "Kho bài tập & Giáo án" là luồng giao/thu/chấm theo lớp + buổi, KHÔNG phải sổ danh sách -
     khai trục ở đó thì bộ kiểm xanh mà người dùng không bao giờ thấy nút. Nên cố ý không khai. */
@@ -2751,6 +2813,8 @@ var FLTDEF={
   fxDate("sent_date","Ngày gửi"),fxDate("submitted_date","Ngày trả lời")],
  khieunai:[fxEnum("complaint_status","Trạng thái"),fxEnum("complaint_severity","Mức độ"),
   fxEnum("complaint_type","Loại khiếu nại"),fxEnum("complaint_channel","Kênh"),
+  /* Người đang xử lý: câu hỏi đầu tiên của trưởng phòng khi mở bảng khiếu nại ra. */
+  fxEnum("assigned_handler","Người xử lý"),
   fxRef("class_id","Lớp","DL10","class_id","class_name"),fxDate("complaint_time","Ngày tiếp nhận")],
  ketthuc:[fxEnum("re_enrollment_status","Tái ghi danh"),fxEnum("achievement_status","Kết quả đầu ra"),
   fxEnum("student_status","Trạng thái HV"),
@@ -2783,6 +2847,8 @@ var FLTDEF={
     So `dsbaitap` moi la cho doc ca 384 dong. *Truc loc thuoc ve cho NHIN CA BANG, khong thuoc
     ve cho dang dung mot buoi.* */
  dsbaitap:[fxEnum("homework_status","Trạng thái bài"),fxEnum("skill","Kỹ năng"),
+  /* Nộp trễ: có cột `is_late` với dữ liệu thật mà không trục nào hỏi tới. */
+  fxEnum("is_late","Nộp trễ"),
   fxStaff("teacher_id","Giáo viên chấm"),fxDate("homework_due_date","Hạn nộp"),
   fxDate("homework_submitted_time","Ngày nộp"),fxEnum("is_late","Nộp trễ"),
   fxEnum("graded_within_48h","Chấm kịp hạn"),fxEnum("score_type","Loại điểm")]};
@@ -16801,14 +16867,14 @@ function renderMauTin(){
   segHTML(nh,[["","Tất cả",all.length,""]].concat(MAUNHOM.map(function(g){
     return [g[0],g[1],all.filter(function(x){return String(x.nhom||"")===g[0]}).length,""]})),
    "mauNhomSet('{k}')","mau_nhom"),
-  '<span class="tbcnt">'+ds.length+' mẫu</span>');
- h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr>'+
+  cotNutHTML("mautin")+'<span class="tbcnt">'+ds.length+' mẫu</span>');
+ var _tb='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr>'+
   '<th>Mã</th><th>Tên mẫu</th><th>Nhóm</th><th>Kênh</th><th>Tiêu đề (email)</th><th>Nội dung</th>'+
   '<th>Trạng thái</th><th>Sửa lần cuối</th><th></th></tr></thead><tbody>';
- if(!ds.length)h+='<tr><td colspan="9"><div class="empty">Nhóm này chưa có mẫu nào. '+
+ if(!ds.length)_tb+='<tr><td colspan="9"><div class="empty">Nhóm này chưa có mẫu nào. '+
   'Bấm <b>Soạn mẫu mới</b> để thêm - mẫu soạn ở đây hiện ngay ở mọi chỗ gửi thuộc nhóm đó.</div></td></tr>';
  ds.forEach(function(x){
-  h+='<tr data-mo="mauXem" data-mo-arg="'+esc(x.mau_id)+'">'+
+  _tb+='<tr data-mo="mauXem" data-mo-arg="'+esc(x.mau_id)+'">'+
    '<td class="khongbe"><b>'+esc(x.mau_id)+'</b></td>'+
    '<td>'+esc(x.ten||"-")+'</td>'+
    '<td class="khongbe">'+esc(mauNhomTen(x.nhom))+'</td>'+
@@ -16819,7 +16885,8 @@ function renderMauTin(){
    '<td>'+(mauDung(x)?'<span class="chip green">đang dùng</span>':'<span class="chip gray">đã ngưng</span>')+'</td>'+
    '<td class="khongbe">'+esc(x.sua_luc||"-")+'</td>'+
    '<td><button class="btn sm" onclick="event.stopPropagation();mauForm(\''+esc(x.mau_id)+'\')"><i class="ti ti-edit"></i>Sửa</button></td></tr>'});
- h+='</tbody></table></div></div>';
+ _tb+='</tbody></table></div></div>';
+ h+=cotLoc("mautin",_tb);
  return h}
 function mauXem(id){var x=find("DL32","mau_id",id);if(!x){toast("Không thấy mẫu này.");return}
  var h='<div class="dcard"><h4><i class="ti ti-mail"></i>'+esc(x.ten||x.mau_id)+'</h4>';
@@ -16994,20 +17061,21 @@ function renderTinnhan(embed){
   sel("tn_lop",fL,[["all","Tất cả lớp"]].concat(Object.keys(lops).map(function(k){return [k,lops[k]]})),"Lớp")+
   sel("tn_nguoi",fN,[["all","Mọi người gửi"]].concat(Object.keys(ngs).map(function(k){return [k,ngs[k]]})),"Người gửi")+
   sel("tn_tg",fT,[["all","Mọi lúc"],["homnay","Hôm nay"],["7ngay","7 ngày qua"],["30ngay","30 ngày qua"]],"Thời gian"),
-  '<span class="tbcnt">'+ds.length+'/'+all.length+' tin</span>');
+  cotNutHTML("tinnhan")+'<span class="tbcnt">'+ds.length+'/'+all.length+' tin</span>');
  h+=chipBar("tn_kenh",fK,[["all","Tất cả",all.length],
   ["email","Email",all.filter(function(m){return m.kenh==="email"}).length],
   ["zalo","Zalo",all.filter(function(m){return m.kenh==="zalo"}).length]],ds.length);
- h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Gửi lúc</th><th>Kênh</th><th>Người nhận</th><th>Lớp</th><th>Nội dung</th><th>Người gửi</th></tr></thead><tbody>';
- if(!ds.length)h+='<tr><td class="empty" colspan="6">Chưa có tin nào khớp bộ lọc.</td></tr>';
+ var _tb='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Gửi lúc</th><th>Kênh</th><th>Người nhận</th><th>Lớp</th><th>Nội dung</th><th>Người gửi</th></tr></thead><tbody>';
+ if(!ds.length)_tb+='<tr><td class="empty" colspan="6">Chưa có tin nào khớp bộ lọc.</td></tr>';
  ds.forEach(function(m){
-  h+='<tr data-mo="msgXem" data-mo-arg="'+esc(m.msg_id)+'"><td>'+esc(m.sent_at||"-")+'</td>'+
+  _tb+='<tr data-mo="msgXem" data-mo-arg="'+esc(m.msg_id)+'"><td>'+esc(m.sent_at||"-")+'</td>'+
    '<td><span class="chip '+(m.kenh==="email"?"blue":"green")+'">'+(m.kenh==="email"?"Email":"Zalo")+'</span></td>'+
    '<td>'+nguoiLnk(m.to_id,m.to_name,m.to_id)+' <span class="mut" style="font-size:11px">'+esc(m.to_addr||"")+'</span></td>'+
    '<td>'+(m.class_id?lopLnk(m.class_id,m.class_id_name,m.class_id):'<span class="mut">-</span>')+'</td>'+
    '<td style="max-width:340px">'+esc((m.tieu_de?m.tieu_de+" - ":"")+String(m.noi_dung||"").replace(/\s+/g," ").slice(0,90))+(String(m.noi_dung||"").length>90?"…":"")+'</td>'+
    '<td>'+nsLnk(m.sent_by,m.sent_by_name,"-")+'</td></tr>'});
- h+='</tbody></table></div></div>';
+ _tb+='</tbody></table></div></div>';
+ h+=cotLoc("tinnhan",_tb);
  return h}
 /* Chọn người nhận rồi đi thẳng vào cửa soạn tin đã có - không đẻ đường soạn thứ hai. */
 function msgMoi(){
