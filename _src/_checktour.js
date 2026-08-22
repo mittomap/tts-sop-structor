@@ -265,7 +265,10 @@ var TOUR_BOQUA={
  /* V9.34: them TANG THU TU "Don viec hom nay" - tro thu nhap vao guide (anh Luan: "cach lam cua
     guide rat hop de lam tro thu, e them tang tro thu vao guide la dinh"). Ba cap dau van la bai
     VIET SAN; cap thu tu KHONG viet san buoc nao - buoc sinh tu hang cho that. */
- t2("dung 4 cap do (3 bai viet san + 1 tang don viec)", lv.length===4);
+ /* 18/08 - them CAP 5 "Lam mot viec cu the": 16 bai cu deu day theo VAI hoac theo CAU HINH,
+    khong bai nao day MOT VIEC, nen cau hoi thuc te nhat ("lam sao de gui khao sat") khong co bai
+    nao do. Con so nay la CHOT KEO LEN theo so cap do thuc co - doi thi phai doi o day. */
+ t2("dung 5 cap do (4 bai viet san + 1 tang don viec)", lv.length===5);
  t2("ten cap do dung loi anh Luan",
    TOURLV[0][1]==="Tham quan"&&TOURLV[1][1]==="Thao tác mẫu"&&TOURLV[2][1]==="Cấu hình"&&TOURLV[3][1]==="Dọn việc hôm nay");
  t2("tang don viec KHONG co bai viet san (buoc phai sinh tu hang cho)",

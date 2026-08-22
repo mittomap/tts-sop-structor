@@ -95,13 +95,25 @@ const TRANG=["viec","socamket","giaoviec#hv","banlam","tuyensinh","hoctap","bang
      if(motDong && r.height>64) ra.push({l:"O MOT DONG MA CAO "+Math.round(r.height)+"px",c:el.className||el.tagName});
      if(r.right>db.right+1) ra.push({l:"THO RA NGOAI drawer "+Math.round(r.right-db.right)+"px",c:el.className||el.tagName});
     });
-    /* KHE HO DOC giua hai muc lien tiep - dung cai mat anh Luan nhin thay */
+    /* KHE HO DOC giua hai muc lien tiep - dung cai mat anh Luan nhin thay.
+       18/08 - PHAI HOI THEM MOT CAU: trong khe ay CO CHU KHONG. Ban truoc chi do khoang cach
+       giua hai `.fld`, nen mot doan giai thich dat giua hai nut (vd o ngan keo "Ghi nhan ky cam
+       ket": giua nut "Ghi nhan da ky" va nut "Hoc vien khong dong y" co mot cau noi ro khi nao
+       bam nut do) bi doc thanh "khe trong 58px". Nhin bang mat thi cho ay day chu va doc xuoi.
+       *Goi mot khoang la TRONG thi phai nhin xem trong do co gi da - khong thi minh dang do
+       khoang cach, khong phai do cho trong.* */
     const flds=[...d.querySelectorAll(".fld")].filter(e=>getComputedStyle(e).display!=="none"&&e.getBoundingClientRect().width>0);
     for(let j=1;j<flds.length;j++){
      const tren=flds[j-1].getBoundingClientRect(), duoi=flds[j].getBoundingClientRect();
-     if(duoi.top-tren.bottom>40 && Math.abs(duoi.left-tren.left)<4)
-      ra.push({l:"KHE TRONG "+Math.round(duoi.top-tren.bottom)+"px giua hai muc",
-        c:(flds[j-1].textContent||"").trim().slice(0,26)+" -> "+(flds[j].textContent||"").trim().slice(0,26)});
+     if(!(duoi.top-tren.bottom>40 && Math.abs(duoi.left-tren.left)<4))continue;
+     const coChu=[...d.querySelectorAll("*")].some(el=>{
+      const r=el.getBoundingClientRect();
+      return r.height>0 && r.top>=tren.bottom-1 && r.bottom<=duoi.top+1 &&
+             (el.textContent||"").trim().length>0;
+     });
+     if(coChu)continue;
+     ra.push({l:"KHE TRONG "+Math.round(duoi.top-tren.bottom)+"px giua hai muc",
+       c:(flds[j-1].textContent||"").trim().slice(0,26)+" -> "+(flds[j].textContent||"").trim().slice(0,26)});
     }
     /* NHAN va O NHAP le nhau, hoac o nhap thap hon 30px (o det) */
     d.querySelectorAll("input,select,textarea").forEach(el=>{

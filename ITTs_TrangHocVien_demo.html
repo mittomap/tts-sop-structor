@@ -26075,7 +26075,16 @@ var TOURLV=[
  ["chuyennghiep","Cấu hình","ti-settings","Cho người thiết lập: ngưỡng, phân quyền, thương hiệu, câu nhắc việc"],
  /* V9.34: tầng thứ tư - KHÔNG viết sẵn bước nào. Các bước sinh ra từ hàng chờ THẬT của chính người
     đang ngồi đó, làm xong việc nào app tự kiểm rồi nhảy việc kế cho tới lúc sạch hàng. */
- ["donviec","Dọn việc hôm nay","ti-checklist","Trợ lý hướng dẫn xử lý từng việc đang chờ, tới khi hết hàng chờ"]];
+ ["donviec","Dọn việc hôm nay","ti-checklist","Trợ lý hướng dẫn xử lý từng việc đang chờ, tới khi hết hàng chờ"],
+ /* ═══ CẤP 5 - BÀI THEO VIỆC (18/08) ═══════════════════════════════════════════════════════
+    Đo được khi nâng cấp hộp hỏi đáp: 16 bài hướng dẫn hiện có đều dạy theo VAI ("một ngày của
+    Học vụ") hoặc theo CẤU HÌNH. Không bài nào dạy MỘT VIỆC. Nên câu hỏi thật hay gặp nhất -
+    *"làm sao để gửi khảo sát"*, *"cách chia đợt đóng học phí"* - không có bài nào đỡ, và nhánh
+    "cách làm" mới nối vào hộp hỏi đáp cũng không có gì để mời.
+    Người ta không mở app lên để "sống một ngày của Học vụ"; họ mở lên vì đang có ĐÚNG MỘT việc
+    phải làm và chưa biết bấm đâu.
+    *Dạy theo vai là dạy cho người mới; dạy theo việc là dạy cho người đang mắc.* */
+ ["theoviec","Làm một việc cụ thể","ti-target-arrow","Đang mắc đúng một việc thì mở bài của việc đó - 4-5 bước, khoanh từng nút"]];
 var TOURS={
  /* ---------- CẤP 1: THAM QUAN ---------- */
  tq_tong:{lv:"thamquan",t:"Toàn cảnh app",ic:"ti-rocket",d:"10 bước - hiểu app chạy thế nào trong 2 phút",steps:[
@@ -26289,6 +26298,49 @@ var TOURS={
      việc nối nhau trong đời thật: nhìn ra ai đang nợ, rồi lấy mẫu "nhắc học phí" gửi đi. */
   {p:"congno",sel:'@man',t:"Ai đang nợ bao nhiêu, hạn nào",d:"Từng học viên một dòng: giá trị hợp đồng, đã thu, còn phải thu, đợt kế tiếp và phiếu nào chưa có ảnh chứng từ. Chọn kỳ số liệu ở trên, xuất ra Excel để đối soát.",hint:"Bấm chip Quá hạn để thấy phần phải gọi ngay, rồi bấm một dòng xem chi tiết từng đợt."}]},
  /* ---------- CẤP 3: CHUYÊN NGHIỆP (người cấu hình) ---------- */
+ /* ---------- CẤP 5: BÀI THEO VIỆC (18/08) ---------- */
+ /* Neo bằng `@txt:` - tìm đúng nút mang chữ ấy đang hiện trên màn. Chọn neo là CHỮ TRÊN NÚT chứ
+    không phải mã CSS: nút đổi chỗ thì bài vẫn trỏ đúng, còn đổi CHỮ thì `_checkneo` báo đỏ ngay -
+    đúng thứ nên đỏ, vì bài đang dạy người ta bấm một cái nút không còn tên đó nữa. */
+ /* ---------- CẤP 5: BÀI THEO VIỆC (18/08) ---------- */
+ /* Neo bằng `@txt:` - tìm đúng nút mang chữ ấy đang hiện trên màn. Chọn neo là CHỮ TRÊN NÚT chứ
+    không phải mã CSS: nút đổi chỗ thì bài vẫn trỏ đúng, còn đổi CHỮ thì `_checkneo` báo đỏ ngay -
+    đúng thứ nên đỏ, vì bài đang dạy người ta bấm một cái nút không còn tên đó nữa.
+    BỐN CHỖ `_checktour` BẮT NGAY LƯỢT ĐẦU, ghi lại để lần sau khỏi vấp:
+    · `@tbar` KHÔNG dùng được làm neo ở trang có nhiều thanh công cụ (gvdp có 4, congno có 2) -
+      `tourFind` lấy cái đầu tiên nên vòng sáng rơi tuỳ hên;
+    · `@tbar` cũng không có trên trang Học viên - neo vào một thứ không tồn tại;
+    · `p:"review"` bị `go()` remap sang hub Khảo sát, mở ra đúng tab khác nên không thấy nút -
+      phải đặt tab bằng `ctx` trước;
+    · câu `hint` phải NHẮC ĐÚNG TÊN NÚT mà vòng sáng đang khoanh, không được nói trống ("bấm nút
+      này") - người đọc nhìn hint để biết mình phải bấm cái gì. */
+ vi_khaosat:{lv:"theoviec",t:"Gửi khảo sát cho một lớp",ic:"ti-clipboard-text",
+  d:"4 bước - chọn lớp, gửi đợt, rồi xem lớp nào chưa ai trả lời",steps:[
+  /* Bước mở đầu KHÔNG khoanh gì (`mo:1`): `@man` trên hub CSKH đã bị bài "Một ngày của Học vụ"
+     dùng, mà hai bước khác nhau khoanh cùng một chỗ thì ít nhất một bước đang trỏ sai -
+     `_checkneo` bắt đúng chuyện đó. Bước này nói về CẢ CUỐN SỔ nên vốn không có ô nào để trỏ. */
+  {p:"cskh",ctx:function(){window.CSTAB="khaosat"},mo:1,sel:'',t:"Sổ khảo sát theo lớp",d:"Mỗi dòng là một lớp: đã gửi mấy phiếu, bao nhiêu em trả lời, điểm hài lòng trung bình. Cột Tỷ lệ (SRR) so với ngưỡng ở Cài đặt.",hint:"Bấm Tiếp theo."},
+  {p:"cskh",ctx:function(){window.CSTAB="khaosat"},sel:'@txt:Gửi đợt khảo sát',t:"Gửi một đợt khảo sát",d:"Chọn lớp và loại phiếu (tuần 1, giữa khóa, cuối khóa). App tạo phiếu cho TỪNG học viên của lớp, không phải một phiếu chung.",hint:"Bấm 'Gửi đợt mới cho một lớp' để mở form."},
+  {p:"cskh",ctx:function(){window.CSTAB="khaosat"},sel:'@txt:Chưa gửi đợt nào',t:"Lớp nào bị bỏ quên",d:"Chip này lọc ra đúng những lớp chưa gửi phiếu lần nào - đó là chỗ mất tiếng nói của học viên mà không ai biết.",hint:"Bấm chip 'Chưa gửi đợt nào'."},
+  {p:"cskh",ctx:function(){window.CSTAB="khaosat"},sel:'@txt:Lịch sử',t:"Lớp này đã nói gì",d:"Mở lịch sử của một lớp: đã gửi mấy đợt, ai trả lời, ai chấm thấp, ai cần gọi lại.",hint:"Bấm 'Lịch sử' ở một dòng bất kỳ. Xong bài."}]},
+ vi_daythay:{lv:"theoviec",t:"Xếp người dạy thay khi giáo viên bận",ic:"ti-user-plus",
+  d:"4 bước - tìm buổi thiếu người, xem ai nhận được, xếp vào",steps:[
+  {p:"gvdp",sel:'@man',t:"Buổi học trong ngày",d:"Chọn ngày rồi nhìn cột 'Giáo viên thay thế': con số là số người ĐÃ ĐĂNG KÝ ca đúng giờ và đúng cơ sở của buổi đó.",hint:"Bấm Tiếp theo."},
+  {p:"gvdp",sel:'@txt:Khai danh sách tháng',t:"Ai nhận dạy thay tháng này",d:"Giảng viên nhận lời trước cả tháng thì được xếp lên đầu danh sách người thay - khai ở đây một lần, dùng cả tháng.",hint:"Bấm 'Khai danh sách tháng' để xem."},
+  {p:"gvdp",sel:'@txt:Đề xuất người dạy thay',t:"Ai nhận được buổi này",d:"App xếp hạng: đã đăng ký ca > đã từng dạy lớp này > đúng cơ sở. Người chỉ trống lịch mà chưa đăng ký ca thì phải gọi hỏi trước.",hint:"Bấm 'Đề xuất người dạy thay' ở buổi cần xếp."},
+  {p:"gvdp",sel:'@txt:Đăng ký ca',t:"Sổ ca dạy thay",d:"Giáo viên tự đăng ký ca rảnh vào đây; xếp từ bảng trên hay gán từ sổ này đều ghi vết như nhau vì hai chiều dùng chung một sổ.",hint:"Bấm 'Đăng ký ca'. Xong bài."}]},
+ vi_locxuat:{lv:"theoviec",t:"Lọc một danh sách rồi xuất ra Excel",ic:"ti-table-export",
+  d:"4 bước - thu hẹp danh sách, chọn cột cần, tải về",steps:[
+  {p:"hocvien",sel:'@man',t:"Thu hẹp trước, xuất sau",d:"Ô tìm và dải chip lọc thô; muốn hẹp hơn thì dùng Bộ lọc. Xuất ra tệp bao giờ cũng là bước CUỐI, sau khi đã lọc xong.",hint:"Bấm Tiếp theo."},
+  {p:"hocvien",sel:'@txt:Bộ lọc',t:"Lọc sâu và lưu lại",d:"Chọn nhiều điều kiện cùng lúc: các ô khác nhau cộng dồn, nhiều lựa chọn trong cùng một ô là hoặc. Bộ lọc hay dùng thì lưu lại, lần sau bấm một cái là ra.",hint:"Bấm 'Bộ lọc' rồi đóng lại."},
+  {p:"hocvien",sel:'@txt:Cột',t:"Chọn cột cần nhìn",d:"Bảng chỉ bày sẵn cột hay dùng; cột mã, SĐT, email, địa chỉ đều có sẵn ở đây, bật lên là hiện. Lựa chọn được nhớ theo từng người.",hint:"Bấm 'Cột' rồi bật thử một cột."},
+  {p:"hocvien",sel:'@txt:Xuất',t:"Tải về đúng cái đang nhìn",d:"Tệp CSV mở được bằng Excel, và nó chứa ĐÚNG những dòng đang lọc và ĐÚNG những cột đang hiện - không phải cả bảng dữ liệu thô.",hint:"Bấm 'Xuất'. Xong bài."}]},
+ vi_congno:{lv:"theoviec",t:"Đọc công nợ và đòi đúng người",ic:"ti-cash",
+  d:"4 bước - xem ai còn nợ, đợt nào quá hạn, phiếu nào thiếu chứng từ",steps:[
+  {p:"congno",sel:'@man',t:"Công nợ từng học viên",d:"Mỗi dòng một em: tổng giá trị hợp đồng, đã thu, còn phải thu, đợt nào đã đóng đủ và đợt kế tiếp tới hạn khi nào.",hint:"Bấm Tiếp theo."},
+  {p:"congno",sel:'@txt:Toàn kỳ',t:"Chọn kỳ số liệu",d:"Toàn kỳ là số tới hôm nay của mọi đơn; chọn một kỳ thì lọc theo ngày đăng ký đơn, và có thêm cột 'Thu trong kỳ'.",hint:"Bấm 'Toàn kỳ' hoặc một kỳ khác để thấy số đổi theo."},
+  {p:"congno",sel:'@txt:Quá hạn',t:"Ai phải gọi trước",d:"Chip này lọc ra những em đã trễ hạn đóng đợt - gọi theo thứ tự này thay vì gọi từ trên xuống.",hint:"Bấm chip 'Quá hạn'."},
+  {p:"congno",sel:'@txt:Chưa có ảnh chứng từ',t:"Phiếu nào còn thiếu chứng từ",d:"Thu tiền thì phải có ảnh phiếu. Chip này lọc ra phiếu chưa đính ảnh; mở ngăn kéo của em đó là bổ sung được ngay.",hint:"Bấm chip 'Chưa có ảnh chứng từ'. Xong bài."}]},
  cn_thuonghieu:{lv:"chuyennghiep",t:"Đổi thương hiệu và menu",ic:"ti-palette",d:"5 bước - biến app thành bản của trung tâm bạn",steps:[
   {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'@settabs',t:"Trang Cài đặt là trung tâm điều khiển",d:"9 tab: giao diện, menu, phân quyền, ngưỡng SLA, ngưỡng KPI, câu nhắc việc, danh mục, khóa học, nhân sự. App không cắm cứng con số nào.",hint:"Bấm Tiếp theo."},
   {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'@cfbrandten',t:"Tên và logo",d:"Đổi tên hiển thị, tên trung tâm dùng trong tin nhắn gửi khách, tiêu đề tab trình duyệt, và logo - tải ảnh lên hoặc gõ chữ tắt.",hint:"Gõ tên trung tâm của bạn vào ô Tên trên đầu menu.",chk:function(){return (window.TOURB&&((UI().brand||"")+"|"+(UI().navy||""))!==window.TOURB.brand)}},
@@ -31404,10 +31456,25 @@ function asstHTML(){
  if(_q)return h+asstTraLoi(_q)+aiKhoiHTML(_q);
  /* Chưa hỏi gì thì gợi ý vài câu hỏi THẬT - một ô nhập trống không nói cho người ta biết hỏi
     được những gì. Tên học viên lấy từ đúng phạm vi của người đang đăng nhập. */
+ /* ═══ GỢI Ý ĐÚNG CÂU CỦA GHẾ ĐANG NGỒI (18/08) ═══════════════════════════════════════════
+    Ba chip cũ giống nhau ở mọi chức danh: một tên học viên, một tên lớp, một câu cấu hình. Người
+    mở Trợ lý ra không biết mình được phép hỏi gì, mà ba chip ấy cũng không nói cho họ biết.
+    Nay ba chip đầu là VIỆC CỦA CHÍNH GHẾ HỌ, đọc từ bảng nhịp ngày (`nhipList` - cùng bảng mà
+    hộp hỏi đáp vừa được nối vào), nên bấm một cái là ra số thật của họ kèm nút mở danh sách.
+    CỐ Ý KHÔNG nhét hàng chờ xử lý vào đây: anh Luân đã chốt *"trợ lý, em bỏ xử lý task đi, dùng
+    để hỏi thôi"*. Đây vẫn là chỗ HỎI - chỉ là hỏi sẵn đúng câu người ta hay hỏi.
+    *Một ô nhập trống không dạy ai hỏi gì; ba câu đúng nghề thì dạy được.* */
  var vd=[];
- try{var hv=srows("DL09")[0];if(hv&&hv.full_name)vd.push(hv.full_name)}catch(e){}
- try{var lp=srows("DL10")[0];if(lp&&lp.class_name)vd.push(lp.class_name)}catch(e){}
- vd.push("đổi ngưỡng nhắc lead ở đâu");
+ try{
+  var _nl=nhipList().filter(function(x){return x.t&&!x.hab});
+  _nl.slice(0,3).forEach(function(x){if(vd.indexOf(x.t)<0)vd.push(x.t)});
+ }catch(e){}
+ if(vd.length<3){
+  try{var hv=srows("DL09")[0];if(hv&&hv.full_name&&vd.indexOf(hv.full_name)<0)vd.push(hv.full_name)}catch(e){}
+  try{var lp=srows("DL10")[0];if(lp&&lp.class_name&&vd.indexOf(lp.class_name)<0)vd.push(lp.class_name)}catch(e){}
+  if(vd.indexOf("đổi ngưỡng nhắc lead ở đâu")<0)vd.push("đổi ngưỡng nhắc lead ở đâu");
+ }
+ vd=vd.slice(0,4);
  h+='<div class="asstChips">'+vd.map(function(x){
    return '<button class="asstChip" onclick="asstQDatText('+JSON.stringify(x).split('"').join("&quot;")+')">'+esc(x)+'</button>'}).join("")+'</div>';
  h+='<div class="asstFoot">'+
