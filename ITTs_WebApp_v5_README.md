@@ -2650,12 +2650,22 @@ Lý do nghỉ lấy từ danh mục `teacherChangeReasons` có sẵn ở Cài đ
 **Ghi vết:** cả bốn cửa ghi của nghiệp vụ này đều để lại dòng trong **Nhật ký thao tác** - gửi đơn,
 duyệt, từ chối, rút đơn, và cả lượt xếp người dạy thay.
 
-## Nhật ký thao tác - lọc theo kỳ và theo loại thao tác
+## Nhật ký thao tác - ra khỏi Cài đặt, thành một cuốn sổ
 
-Trang **Cài đặt → Dữ liệu & Sổ sách → Nhật ký thao tác** trước nay lọc được theo **Bảng** và theo
-**Người**. Nay thêm hai ô nữa, đúng hai câu người ta hỏi cuốn sổ này nhiều nhất:
-- **Kỳ**: Mọi lúc · Hôm nay · 7 ngày qua · 30 ngày qua.
-- **Loại**: Mọi thao tác · Tạo mới · Cập nhật · Xóa · Hoàn tác.
+**Chỗ mới: Tra cứu & sổ sách → Nhật ký thao tác.** Trước đây nó là một tab của Cài đặt, mà Cài đặt
+là nơi *đặt luật* của trung tâm còn nhật ký là cuốn sổ người ta mở ra để *tra* một chuyện đã xảy
+ra. Hậu quả thật của chỗ đặt cũ: Cài đặt chỉ Quản trị viên mở được, nên **không trưởng phòng nào
+tra được nhật ký** - trong khi chính họ phải trả lời câu "ai đổi con số này".
+
+- **Ai xem được:** trưởng phòng trở lên. Leader chi nhánh và nhân viên không có.
+- **Mỗi dòng vẫn nằm trong phạm vi dữ liệu của người đọc** - sổ này đi ngang qua mọi bảng kể cả
+  bảng tiền, nên nó không thành đường vòng qua lớp phân quyền.
+- **Lối cũ vẫn vào được:** link `settings` + tab `nhatky` cũ tự lái sang trang mới.
+- Bản demo có sẵn **24 dòng lịch sử 5 ngày gần nhất** để mở ra là thấy ngay sổ trông thế nào.
+  Dòng gieo sẵn không lùi lại được và nói rõ vì sao.
+
+**Bốn cách lọc:** ô tìm · dải chip **Kỳ** (Mọi lúc · Hôm nay · 7 ngày · 30 ngày, mỗi chip mang sẵn
+con số) · ô chọn **Bảng** · ô chọn **Người** · ô chọn **Loại** (Tạo mới · Cập nhật · Xóa · Hoàn tác).
 
 Cùng lượt này: cột **Thay đổi** không còn in tên ô bằng chữ máy (`next_payment_due` →
 "Hạn đóng kế tiếp"), và bỏ hai ô `updated_by` / `updated_at` - chúng lặp lại đúng hai cột **Lúc**

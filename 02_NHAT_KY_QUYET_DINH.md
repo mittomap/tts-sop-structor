@@ -383,14 +383,65 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 44 BỘ KIỂM, XANH HẾT 44/44 (verify trọn bộ 18/08 trên chính bản này, 39m01s).
-> Bản dựng đang chạy: `10e445` (18/08 - AUDIT TOÀN DIỆN + nâng cấp hỏi đáp / tour / trợ lý), đã
-> lên https://mittomap.github.io/itts-sop-demo-v2/ .
-> Thêm `_checkhoi` (kho câu hỏi gợi ý). Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
+> **Phiên bản: V2 — 44 BỘ KIỂM, XANH HẾT 44/44 (verify trọn bộ 18/08 trên chính bản này, 34m51s).
+> Bản dựng đang chạy: `9ac583` (18/08 - GIÁO VIÊN BÁO NGHỈ (DL33) + NHẬT KÝ RỜI KHỎI CÀI ĐẶT),
+> đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
+> Mốc cũ: `10e445`, `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
 > `bad7f9`, `a9eb4b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
+> ### 🟢 18/08 - NHẬT KÝ THAO TÁC RỜI KHỎI CÀI ĐẶT (anh Luân: *"Log mà sao ở cài đặt ta???"*)
+>
+> Anh hỏi đúng, và cái sai không phải chuyện xếp chỗ cho gọn mắt.
+> **Cài đặt là nơi ĐẶT LUẬT** của trung tâm - ngưỡng SLA, phân quyền, danh mục, câu nhắc việc.
+> **Nhật ký là một CUỐN SỔ** - mở ra để TRA một chuyện đã xảy ra: *"ai sửa hồ sơ này"*, *"hôm nay
+> ai làm gì"*, *"cái vừa rồi lùi lại được không"*. Hai việc khác hẳn nhau.
+>
+> **HẬU QUẢ ĐO ĐƯỢC, KHÔNG PHẢI CHUYỆN THẨM MỸ.** `settings` nằm trong `SENSITIVE` và **chỉ Quản
+> trị viên có nó** - nghĩa là suốt thời gian qua **không một trưởng phòng nào tra được nhật ký**,
+> trong khi chính họ là người phải trả lời câu *"ai đổi con số này"*. Một cuốn sổ dựng ra để QUY
+> TRÁCH NHIỆM mà cất trong phòng máy thì nó không quy được trách nhiệm cho ai. Và nó bắt người
+> muốn tra một dòng phải đi qua màn sửa luật của cả trung tâm - bấm nhầm ở đó là đổi ngưỡng toàn
+> hệ thống.
+> *Chỗ đặt một màn hình là một lời khai về việc nó phục vụ ai. Khai sai chỗ thì đúng người cần nó
+> lại là người không với tới.*
+>
+> **NAY:** một cuốn sổ trong **Tra cứu & sổ sách**, cùng cửa với 16 sổ chỉ-đọc khác, mở cho
+> **trưởng phòng trở lên** (Leader chi nhánh và nhân viên vẫn không có - đo lại từng ghế).
+> Lối cũ `settings` + `SETTAB='nhatky'` **vẫn sống**: `go()` lái sang trang mới, đúng một chỗ.
+>
+> **NỚI QUYỀN XEM MỘT MÀN KHÔNG BAO GIỜ CHỈ LÀ NỚI QUYỀN XEM MỘT MÀN.** Sổ này đi ngang qua MỌI
+> bảng: một dòng *"sửa Số tiền của PMT-071"* là miền TIỀN, một dòng *"sửa SĐT của HV045"* là miền
+> HỌC VIÊN. Mở cửa mà không gác lại từng dòng thì nó thành **cửa hậu đi vòng qua toàn bộ lớp phân
+> quyền dữ liệu** - đúng họ hàng với lỗ đã cắn ở `jTimeline` hôm audit. Nay `logXem()` hỏi lại
+> miền của bảng gốc: đo thật, TP ACA đọc **15/24** dòng, TP Kế toán đọc phần tiền, quản trị đọc đủ.
+>
+> **BA THỨ SỬA THEO, và cả ba đều do bộ kiểm chỉ ra chứ không phải em nhớ:**
+> · `SETMOTA` và `THEDEF` còn khai cho một tab đã biến mất (`_check16`). *Dời một màn thì phải đi
+>   gỡ tên nó khỏi mọi bản khai đang nói về chỗ cũ.*
+> · `_check18` đo màn Nhật ký bằng cách **vẽ trang Cài đặt rồi đổi tab** - tab ấy mất là thước
+>   hụt. Nếu chỉ sửa cho hết đỏ mà vẫn đo lối cũ thì từ nay màn ấy hỏng thật nó cũng báo xanh.
+>   *Dời chỗ một màn thì phải dời cả chỗ cái thước đang đo nó.* Nay vẽ thẳng `RENDER.nhatky`, và
+>   thêm hai tiêu chí: lọc được theo Kỳ/Loại, và có cửa gác phạm vi từng dòng.
+> · Đưa trục **KỲ** lên thành dải chip là **ba trong bốn ô của dải thẻ** lập tức nói lại đúng thứ
+>   chip đang nói ("Thao tác đã ghi" = chip "Mọi lúc", "Hôm nay" = chip "Hôm nay", "Dòng đã hoàn
+>   tác" = ô chọn Loại). `_checklap` bắt trên ba chức danh. Theo luật anh Luân chốt 13/08 (*"trùng
+>   thì bỏ thẻ"*) - bỏ hẳn dải thẻ; ô thứ tư ("Người thao tác") thì ô chọn Người đã nói.
+>   *Thêm một cách nói tốt hơn thì phải đi bỏ cách nói cũ, không thì màn hình có hai chỗ nói cùng
+>   một câu và người đọc phải tự đoán chỗ nào mới thật.*
+>
+> **GIEO 24 DÒNG NHẬT KÝ VÀO DỮ LIỆU DEMO.** Nhật ký vốn chỉ ghi trong phiên đang chạy, nên mở
+> demo lần đầu là sổ trống trơn - **một mục menu bấm vào mở ra bảng trống còn tệ hơn không có
+> mục**. Gieo 5 ngày gần nhất, đúng người đúng việc (kế toán sửa tiền, học vụ sửa hồ sơ học viên),
+> `row_id` trỏ vào dòng CÓ THẬT để cửa gác phạm vi tra ngược lại được. Dòng gieo sẵn không có ảnh
+> chụp trước/sau nên nút Hoàn tác **từ chối kèm lý do đọc được** - *một cái nút bấm vào không có
+> gì xảy ra thì tệ hơn một cái nút không có.*
+>
+> **MỘT CHI TIẾT NHỎ BỘ KIỂM DẠY LẠI:** em thử khai miễn trừ cho `nhatky` ở hai bảng của
+> `_checkkhuon` rồi phải gỡ ra - nó bắt *"bản khai nhắc trang không còn là nghiệp vụ"*, vì nhật ký
+> là **sổ tra cứu**, không nằm trong diện bộ ấy soi. *Miễn trừ chỉ có nghĩa ở đúng chỗ nó đang bị hỏi.*
+
 > ### 🟢 18/08 - GIÁO VIÊN BÁO NGHỈ BUỔI DẠY (DL33) + HAI TRỤC LỌC CÒN THIẾU CỦA NHẬT KÝ
 >
 > Anh Luân chốt: *"1, trưởng phòng aca duyệt, trưởng phòng học vụ cũng biết / 2, ko cần xin nếu là
