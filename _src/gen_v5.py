@@ -28866,7 +28866,10 @@ function qaNhipTim(q){
  var so=0;try{so=num(M.dem())}catch(e){so=0}
  return {so:so,don:"",t:M.viec,ic:"ti-target-arrow",k:"nhip:"+M.trang+":"+M.chip,
   phu:M.visao,
-  giai:"Con số này đọc cùng một hàm với chip trên trang "+esc((PBK[M.trang]||{}).t||M.trang)+
+  /* KHÔNG `esc` ở đây: chỗ vẽ câu trả lời đã `esc(SO.giai)` rồi, escape hai lần thì tên trang
+     "Xếp lớp & Onboarding" hiện ra màn thành "Xếp lớp &amp; Onboarding". Nhìn ảnh chụp mới thấy.
+     *Escape là việc của chỗ VẼ, không phải của chỗ dựng chuỗi - làm cả hai nơi là hỏng.* */
+  giai:"Con số này đọc cùng một hàm với chip trên trang "+((PBK[M.trang]||{}).t||M.trang)+
    ", nên bấm vào là ra đúng danh sách ấy, không lệch một dòng.",
   go:thay?("jumpFlow("+JSON.stringify(M.trang)+","+JSON.stringify(M.chip)+")"):"",
   nut:thay?("Mở "+((PBK[M.trang]||{}).t||M.trang)+(M.chip?" - đã lọc sẵn":"")):""}}

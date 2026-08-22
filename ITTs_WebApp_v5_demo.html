@@ -3285,7 +3285,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">22/08/2026 · <b>8f0526</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">22/08/2026 · <b>10e445</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -29117,7 +29117,10 @@ function qaNhipTim(q){
  var so=0;try{so=num(M.dem())}catch(e){so=0}
  return {so:so,don:"",t:M.viec,ic:"ti-target-arrow",k:"nhip:"+M.trang+":"+M.chip,
   phu:M.visao,
-  giai:"Con số này đọc cùng một hàm với chip trên trang "+esc((PBK[M.trang]||{}).t||M.trang)+
+  /* KHÔNG `esc` ở đây: chỗ vẽ câu trả lời đã `esc(SO.giai)` rồi, escape hai lần thì tên trang
+     "Xếp lớp & Onboarding" hiện ra màn thành "Xếp lớp &amp; Onboarding". Nhìn ảnh chụp mới thấy.
+     *Escape là việc của chỗ VẼ, không phải của chỗ dựng chuỗi - làm cả hai nơi là hỏng.* */
+  giai:"Con số này đọc cùng một hàm với chip trên trang "+((PBK[M.trang]||{}).t||M.trang)+
    ", nên bấm vào là ra đúng danh sách ấy, không lệch một dòng.",
   go:thay?("jumpFlow("+JSON.stringify(M.trang)+","+JSON.stringify(M.chip)+")"):"",
   nut:thay?("Mở "+((PBK[M.trang]||{}).t||M.trang)+(M.chip?" - đã lọc sẵn":"")):""}}
