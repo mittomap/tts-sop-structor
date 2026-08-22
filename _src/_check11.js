@@ -81,11 +81,24 @@ t("NAVTREE co 8 nhom (them nhom Cho duyet)", NAVTREE.length===8);
 /* V2 - nam hang cho phe duyet nay la NAM TRANG doc lap, khong con la nam tab cua mot hub.
    Hoi `DUYMAP[k]` va `navOwner(k)==="duyet"` la hoi ve quan he cha-con da khong con.
    Giu nguyen dieu can bao ve: du nam muc, khong lan `duyetgiao`, va moi muc la TRANG THAT. */
-/* 12/08: 5 -> 7 muc. Them "Duyet doi dot dong" (SALE-4 + SALE-5) va "Duyet hop dong cam ket" (SALE-7). Dieu can bao ve khong doi:
-   khong lan `duyetgiao` (no la mot TAB cua Giao viec, khong phai hang cho phe duyet), va moi
-   muc phai la mot TRANG THAT co ham ve. */
-t("nhom Cho duyet co du 7 muc phe duyet, moi muc la mot trang that", (function(){var G=NAVTREE.filter(function(x){return x.g==="Chờ duyệt"})[0];
- return G&&G.items.length===7&&G.items.indexOf("duyetgiao")<0&&G.items.every(function(k){return !!PBK[k]&&typeof RENDER[k]==="function"})})());
+/* 12/08: 5 -> 7 muc. Them "Duyet doi dot dong" (SALE-4 + SALE-5) va "Duyet hop dong cam ket" (SALE-7).
+   18/08: 7 -> 8 muc (them "Duyet GV bao nghi", DL33).
+   ═══ CHOT MOT LUAT, DUNG CHOT MOT CON SO ═══════════════════════════════════════════════════
+   Dong nay tung viet `items.length===7`, va do la lan THU BA trong ba ngay mot con so cam cung
+   trong bo kiem bat den mot viec dung. Con so ay khong bao ve dieu gi ca: them mot hang cho
+   phe duyet la mot viec BINH THUONG, con them nham mot thu khong phai hang cho phe duyet moi
+   la cai phai chan - va dieu do thi ba ve duoi day da noi du.
+   *Chot mot con so la chot cai HIEN CO; chot mot LUAT la chot cai PHAI DUNG. Cai thu nhat bao
+   dong moi lan ta lam dung viec.* */
+t("nhom Cho duyet: moi muc la mot hang cho phe duyet co trang that", (function(){var G=NAVTREE.filter(function(x){return x.g==="Chờ duyệt"})[0];
+ return G&&G.items.length>=5&&G.items.indexOf("duyetgiao")<0&&
+  G.items.every(function(k){return /^duyet|^banggiao$/.test(k)&&!!PBK[k]&&typeof RENDER[k]==="function"})})());
+/* Va chieu nguoc lai - moi tab cua hub Cho duyet phai co mot muc menu. Truoc day khong ai hoi
+   cau nay, nen them mot tab ma quen khai vao NAVTREE thi tab ay chi vao duoc tu trong hub:
+   dung con benh anh Luan bat ba lan - *"a tim tren sidebar ko thay"*. */
+t("moi tab cua hub Cho duyet deu co mat tren cay menu", (function(){var G=NAVTREE.filter(function(x){return x.g==="Chờ duyệt"})[0];
+ if(!G)return false;
+ return duyTabs().every(function(x){return G.items.indexOf(x.k)>=0})})());
 t("Viec cho nhan la mot TAB cua trang Giao viec", (function(){
  window.TKTAB="wait";var o="";try{o=RENDER.giaoviec()}catch(e){}
  return /tkTabSet\('wait'\)/.test(o)&&/Việc chờ nhận/.test(o)})());

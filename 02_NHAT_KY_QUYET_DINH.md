@@ -160,15 +160,13 @@
 > giảng viên (3-5 cột), bảng chờ xếp lớp (3 cột), Phiếu gần đây ở Khảo sát, bảng thưởng còn treo
 > ở Mã giới thiệu, các bảng trong Cài đặt và trong ngăn kéo.
 
-> ### 📋 18/08 - ĐANG CHỜ ANH LUÂN GẬT (sinh ra từ audit + đợt nâng cấp hỏi đáp)
-> 1. **"Giáo viên báo nghỉ" - một nghiệp vụ chưa ai khai.** Anh Luân hỏi hỏi đáp có tìm được
->    *"giáo viên nghỉ liên tiếp 2 buổi"* không. App KHÔNG ghi nhận việc giáo viên nghỉ, và SOP
->    gốc cũng không mô tả (đã tra 4.091 chuỗi). Muốn có thì phải dựng thêm một cửa ghi: giáo viên
->    báo nghỉ buổi nào · lý do · ai duyệt · tự đẩy sang màn Xếp người dạy thay, kèm trục lọc "nghỉ
->    từ N buổi". **Đây là THÊM nghiệp vụ mới, không phải vá lỗ hổng - chờ anh gật.**
-> 2. **"Cái nào cũng cần duyệt" - duyệt tới đâu?** (treo từ 17/08) Trưởng phòng và Kế toán trưởng
->    hiện chia đợt thẳng vì chính họ là người duyệt. Nếu kể cả họ cũng phải có chữ ký thứ hai thì
->    em dựng thêm luật "không tự duyệt yêu cầu của mình".
+> ### ✅ 18/08 - HAI CÂU HỎI TRÊN ĐÃ CÓ CÂU TRẢ LỜI, VÀ ĐÃ LÀM XONG
+> Anh Luân trả lời gọn cả hai: *"1, trưởng phòng aca duyệt, trưởng phòng học vụ cũng biết / 2, ko
+> cần xin nếu là trưởng phòng và kế toán, nhưng đừng quên là mọi thứ đều có log nhé."*
+> · **Câu 1** → dựng xong bảng **DL33 "Giáo viên báo nghỉ buổi dạy"** (mục 🟢 ngay dưới).
+> · **Câu 2** → **KHÔNG dựng luật "không tự duyệt yêu cầu của mình"**. Trưởng phòng và Kế toán chia
+>   đợt thẳng, không cần chữ ký thứ hai. Chỗ chốt lại là **cái log** - và đó cũng là phần thứ hai
+>   của phiên này: nhật ký thao tác được thêm hai trục lọc còn thiếu.
 
 > ### ✅ 18/08 - ĐO LẠI BA MẢNG RÀ SOÁT: RA1 VỀ 0, RA2 CÒN 6 CHỖ KHÔNG PHẢI SỰ KIỆN
 > **RA1 (trục lọc): 13 → 0.** Thêm 10 trục: `contact_primary`, `payer_side` (DL09) · `student_type`,
@@ -393,6 +391,91 @@
 > `bad7f9`, `a9eb4b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
+> ### 🟢 18/08 - GIÁO VIÊN BÁO NGHỈ BUỔI DẠY (DL33) + HAI TRỤC LỌC CÒN THIẾU CỦA NHẬT KÝ
+>
+> Anh Luân chốt: *"1, trưởng phòng aca duyệt, trưởng phòng học vụ cũng biết / 2, ko cần xin nếu là
+> trưởng phòng và kế toán, nhưng đừng quên là mọi thứ đều có log nhé. Tiện thể xem log ở đâu? Có
+> phân nhóm chưa"*.
+>
+> **LỖ HỔNG NẰM Ở NỬA ĐẦU CỦA MỘT CÂU CHUYỆN APP ĐÃ KỂ NỬA SAU.** App có sẵn nguyên một dây chuyền
+> XỬ LÝ việc giáo viên nghỉ: trang "Xếp người dạy thay", sổ ca dạy thay (DL31), danh sách dự phòng
+> theo tháng (DL28), quota "một khóa GV chính được nghỉ mấy buổi" (CH2). Nhưng **không có cửa nào
+> để giáo viên NÓI rằng mình nghỉ.** Học vụ chỉ biết khi giáo viên nhắn riêng, hoặc khi tới giờ mà
+> không ai đến lớp. Chú thích của chính trang gvdp viết *"ví dụ giáo viên báo nghỉ 3 ngày nữa..."* -
+> app giả định lá đơn ấy có suốt, mà chưa bao giờ có bảng nào giữ nó.
+> *Xây xong cả dây chuyền xử lý mà không có cửa nhận đơn thì dây chuyền chạy bằng tin nhắn riêng -
+> và tin nhắn riêng thì không duyệt được, không đếm được, không ai chịu trách nhiệm.*
+>
+> **VÒNG ĐỜI: GV BÁO → TP ACA DUYỆT (Học vụ thấy cùng lúc) → HỌC VỤ XẾP NGƯỜI THAY.**
+> Ba bước ba người nên ba mốc thời gian riêng trên cùng một dòng, không gộp thành một cờ.
+> · **Giáo viên báo** ở hai chỗ, cùng một cửa ghi: nút trên thẻ "Buổi dạy hôm nay" (ốm đột xuất
+>   sáng ngày dạy - ca thật nhất), và khối mới **"Buổi dạy sắp tới của tôi"** (14 ngày tới) để báo
+>   trước. Khối ấy gánh luôn vế thứ hai: **xem đơn mình gửi đang ở đâu** - đúng con bệnh V9.29 đã
+>   chữa cho học viên (báo xong rồi im, hôm sau vẫn phải hỏi lại bằng miệng).
+> · **TP ACA duyệt.** Trưởng phòng ACA trước nay KHÔNG có hub Chờ duyệt nào (họ không duyệt tiền);
+>   nay mở hub với ĐÚNG MỘT tab, các tab tiền vẫn khóa.
+> · **TP Học vụ thấy cùng tab ấy** nhưng không có nút quyết. Chặn ở **CỬA GHI** (`gvnDuyetDuoc`),
+>   không chỉ giấu nút - đúng câu app tự ghi từ V9.41: *giấu lối vào mà không khóa cửa ghi thì phân
+>   quyền chỉ là trang trí*.
+>
+> **BA CHỖ PHẢI SỬA THEO, KHÔNG PHẢI CHỖ NÀO CŨNG HIỆN RA NGAY:**
+> 1. **Duyệt xong KHÔNG xóa `teacher_id` của buổi** - xóa là mất dấu ai đáng lẽ dạy, và `gvOffSes`
+>    (đếm quota nghỉ) đọc chính cột ấy. Buổi giữ tên GV chính, chỉ mang thêm một lá đơn đã duyệt.
+> 2. **Nhưng thế thì `gvdpThieu()` mù.** Phép đếm cũ hỏi *"ô teacher_id có trống không"* - một buổi
+>    đã duyệt cho nghỉ vẫn đọc ra "có giáo viên", nên không một con số nào trên app nhắc rằng buổi
+>    ấy sắp không có ai đứng lớp. Nay cả thẻ nhịp ngày lẫn chip trên trang gvdp gọi chung
+>    `sesChuaCoNguoi()`. *Trang này hỏi "buổi nào sắp không có người dạy" chứ không hỏi "ô nào đang
+>    trống" - hai câu ấy trùng nhau cho tới ngày có lá đơn thứ nhất.*
+>    Và chúng BẮT BUỘC phải trùng: nút "Mở Xếp người dạy thay" ở hàng chờ duyệt nhảy sang đúng chip
+>    ấy, lệch một dòng là người bấm tới một danh sách rỗng.
+> 3. **Xếp xong người thay thì phải ĐÓNG LẠI lá đơn.** `sesSetTeacher` (cửa ghi duy nhất để đổi
+>    giáo viên của một buổi - không dựng cửa thứ hai) nay ghi ngược `gv_thay` vào DL33. Không ghi
+>    thì đơn nằm mãi trong hàng chờ "đã duyệt, chưa xếp ai" và học vụ làm lại một việc đã xong.
+>    Đúng luật hai chiều mà DL31 đã đặt hôm 15/08.
+>
+> **MỌI THỨ ĐỀU CÓ LOG - và đó không phải một lời hứa mà là một dòng khai.** Bốn cửa ghi
+> (`gvNghiLuu` · `gvNghiQuyet` · `gvNghiHuy` · `sesSetTeacher`) khai trong `DOORS` dưới `DL33`, nên
+> lớp bọc `logArm()` tự chụp ảnh bảng trước/sau. Đo thật: gửi một đơn → nhật ký ra một dòng
+> `DL33 · Tạo mới`; duyệt → thêm một dòng ghi rõ đổi ô nào từ gì sang gì.
+>
+> **THAM SỐ MỚI:** `slaTeacherOffNotice_days` = 3 (CH2). Báo muộn hơn vẫn nhận đơn - ốm đột xuất
+> thì không ai báo trước được - nhưng đơn mang dấu **"báo gấp"** để người duyệt xoay người ngay.
+> Lý do nghỉ dùng lại `teacherChangeReasons` có sẵn, không đẻ danh mục thứ hai.
+>
+> **PHẦN HAI - NHẬT KÝ THAO TÁC (trả lời *"xem log ở đâu? có phân nhóm chưa"*).**
+> Chỗ xem: **Cài đặt → Dữ liệu & Sổ sách → Nhật ký thao tác**. Đã có sẵn: 4 thẻ số, ô tìm, lọc theo
+> **Bảng**, lọc theo **Người**, gộp theo lượt bấm, nút Hoàn tác, nút Xuất CSV.
+> Thiếu đúng hai trục mà người ta hỏi cuốn sổ này nhiều nhất - và cả hai đều đã có sẵn dữ liệu, chỉ
+> là không có cửa nào hỏi tới: **KỲ** (`log_time` → Hôm nay / 7 ngày / 30 ngày) và **LOẠI THAO TÁC**
+> (`kind` → Tạo mới / Cập nhật / Xóa / Hoàn tác). *Một cuốn sổ tra được theo ba trục nhưng thiếu
+> đúng trục "hôm nay" thì người ta vẫn phải cuộn tay - và cuộn tay trên 500 dòng thì tra cũng như
+> không tra.*
+> Hai chỗ đỏ nữa **chỉ nhìn ảnh chụp mới thấy**:
+> · Cột "Thay đổi" in tên ô bằng chữ máy (`next_payment_due`, `venue_or_zoom_link`). `colVN` tra
+>   `LISTCFG` trước, nhưng hai ô ấy không nằm trong cột nào của bảng nào - chúng chỉ được sửa trong
+>   ngăn kéo. *Từ điển tên ô chỉ phủ những ô CÓ MẶT trên một bảng; ô nào chỉ sống trong ngăn kéo thì
+>   phải khai tay, mà đó chính là những ô người ta sửa nhiều nhất.* Thêm 20 tên.
+> · Mỗi dòng nhật ký in kèm `updated_by` / `updated_at` - lặp lại đúng hai cột **Lúc** và **Người**
+>   nằm ngay bên cạnh, đẩy ô thật sự đổi ra khỏi ba ô đầu mà `logWhat` in ra. *Một cuốn sổ ghi lại
+>   chính hành vi ghi sổ thì phần lớn số chữ trong nó không nói gì.*
+> · `SHEETVN` bổ sung **DL31 · DL32 · DL33** - ba bảng sinh ra rồi mà chưa có tên tiếng Việt, nên ô
+>   lọc "Bảng" bày ra chuỗi mã trần.
+>
+> **BẪY PIPELINE ĐÃ CẮN NGAY TRONG PHIÊN NÀY - CHỖ ĐỎ KHÔNG PHẢI DO TÍNH NĂNG MỚI.**
+> Dựng lại dữ liệu demo hôm nay thì `check_logic` đỏ hai luật 3h/3i: *buổi học ngày tương lai mà đã
+> có giờ dạy thực tế + trạng thái "Đã hoàn thành"*. Truy ra `fixdata.py` khối 23 (gỡ hai buổi cùng
+> lớp trùng giờ) đẩy buổi sau **sang ngày hôm sau** - và hôm nay cú đẩy ấy đưa một buổi từ QUÁ KHỨ
+> sang TƯƠNG LAI, trong khi buổi ấy đã có 12 dòng điểm danh treo vào.
+> Bản vá đầu của em xóa trạng thái đi cho hết đỏ - **hỏng nặng hơn**: 12 dòng điểm danh ấy thành
+> điểm danh cho một buổi "chưa diễn ra" (check_logic đổi từ 2 lỗi thành 34).
+> Vá đúng: **đổi giờ trong CÙNG MỘT NGÀY** (cộng đủ giờ cho hết chồng lấn), không đổi ngày; và mang
+> theo `class_start_actual`/`class_end_actual` theo đúng độ dời. Không dời được trong ngày thì
+> **khai ra chứ không dời bừa**.
+> *Một buổi học không phải một ô ngày - nó kéo theo điểm danh, bài tập, nhận xét, giờ vào lớp. Dời
+> nó qua ranh giới HÔM NAY là dời cả cái chùm ấy, mà cái chùm thì không dời được bằng một dòng lệnh.*
+> Đây cũng đúng loại vết **xuất hiện rồi biến mất theo ngày chạy** mà chính chú thích của khối 23
+> nói là phải chặn tại nguồn - nó viết ra điều đó rồi tự vấp vào.
+
 > ### 🟢 18/08 - NÂNG CẤP HỎI ĐÁP · TOUR · TRỢ LÝ (anh Luân giao ngay sau audit)
 >
 > Anh Luân: *"nâng cấp trợ lý, hỏi đáp và tour... nâng cấp cho nó thông minh hơn nữa nhé em"*, rồi
