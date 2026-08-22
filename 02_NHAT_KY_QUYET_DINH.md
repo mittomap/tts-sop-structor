@@ -385,11 +385,11 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 18/08 trên chính bản này, 35m54s).
-> Bản dựng đang chạy: `deb78b` (18/08 - AUDIT TOÀN DIỆN + nâng cấp hỏi đáp / tour / trợ lý), đã
+> **Phiên bản: V2 — 44 BỘ KIỂM, XANH HẾT 44/44 (verify trọn bộ 18/08 trên chính bản này, 39m01s).
+> Bản dựng đang chạy: `10e445` (18/08 - AUDIT TOÀN DIỆN + nâng cấp hỏi đáp / tour / trợ lý), đã
 > lên https://mittomap.github.io/itts-sop-demo-v2/ .
-> **44 bộ kiểm** (thêm `_checkhoi`). Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
+> Thêm `_checkhoi` (kho câu hỏi gợi ý). Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
+> Mốc cũ: `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
 > `bad7f9`, `a9eb4b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
