@@ -1245,6 +1245,33 @@ gi"; them mot trang nua la nguoc voi chinh luat V2 ("bot so trang mot nguoi phai
   dem so / cau chi so khong duoc roi vao tu dien). Tu thu: tat nhanh tu dien -> do, liet ke du 26.
 *Diem danh mot cai cua khong phai la thu mo no* - nen mot mat doc ma nguon, mot mat lai that.
 
+## 18/08 - `_checkhoi.js`: BAY RA MOT CAU GOI Y THI PHAI TRA LOI DUOC CAU DO
+
+Anh Luan: *"em thu dat ra vai chuc cau hoi ma cac team co the se tim, roi test thu xem the nao
+nhe, dung san trong cau hoi goi y de co gi a test"*, va truoc do: *"no co the thong minh den muc:
+hoi 'toi muon xem danh sach giao vien nghi lien tiep 2 buoi' thi no tro luon toi trang dich, va
+loc luon theo nhu cau duoc ko em"*.
+
+Do truoc khi lam - 53 cau nguoi that hoi: chi 9 cau ra so that; 23 cau hoi "ai/bao nhieu/nao" bi
+nhanh CHO CAU HINH do mat (hoi "ai chua xep lop" nhan ve ba mau cau nhac trong Cai dat). Va sau
+khi vá: 40/53 ra so that, 0 cau bi.
+
+Cach vá KHONG phai chep tay 20 y dinh moi: app da co bang `NHIP` khai cho 27 vai, moi dong la
+*viec · vi sao · TRANG DICH · HAM DEM · MA CHIP*, va `jumpFlow(trang,chip)` da biet ca nam kieu
+chip. Noi hai thu co san lai la xong - va con so trong cau tra loi doc CUNG MOT HAM voi chip
+tren trang dich nen khong the lech nhau.
+
+`_checkhoi.js` canh bon dieu cho tung cau trong kho (45 cau, 9 nhom theo ghe ngoi):
+1. co tra loi duoc khong (roi vao nhanh "bi" la do),
+2. nut mo co tro vao trang CO THAT khong,
+3. bam nut xong trang dich co ra danh sach khong (hua N ma ra 0 dong la do),
+4. khong moi roi duoi - nguoi khong duoc vao trang ay thi khong chia nut.
+
+BA LAN THUOC SAI khi dung bo nay, ghi lai de lan sau khoi mat cong: dem dong bang `<tr>` (10
+trang tac vu ve dong bang lop rieng, doc ra 0) · neo lop dong vao DAU thuoc tinh class (app viet
+`class="msd clk"`) · va phep dem dong van chi la UOC LUONG nen chenh lech chi duoc ghi chu, khong
+duoc ket luan app loc sai.
+
 ## 11/08 - MOT BO KIEM TUT TU 27 XUONG 17 MA VAN IN "OK"
 
 Sau khi them tu dien CH5, `_checkdrawer` bao *"mo that **17** ngan keo tren 15 trang"* - ba vong

@@ -28528,6 +28528,32 @@ var QASO=[
     hang:qaHang(L,function(r){return r.full_name||r.student_id},
      function(r){return (stuRiskReasons(r)||[]).slice(0,2).join(" · ")},
      function(r){return "window.HOSO="+JSON.stringify(String(r.student_id))+";go('hoso')"})}}},
+ /* ═══ BA Ý ĐỊNH BỔ SUNG SAU LƯỢT ĐO 18/08 ══════════════════════════════════════════════════
+    Ba câu duy nhất còn rơi vào nhánh chỉ-đường sau khi nối bảng NHỊP: hai câu này chưa có dòng
+    nhịp nào (trang Công nợ mới dựng hôm qua, và khiếu nại đang mở là câu của quản lý chứ không
+    phải việc trong ngày của ai). Khai tay đúng hai chỗ ấy, không khai bừa cho đủ. */
+ {k:"chungtu",t:"Phiếu thu/chi chưa có ảnh chứng từ",ic:"ti-paperclip",
+  tu:["chung tu","chungtu","anh phieu","phieu thu","phieu chi","bien lai","hoa don","doi soat"],
+  fn:function(){
+   var L=srows("DL07").filter(function(p){return !cnChungTu(p)});
+   var chuaLy=L.filter(function(p){return !String(p.ct_lydo||"").trim()});
+   return {so:L.length,don:"phiếu",phu:chuaLy.length+" phiếu chưa khai cả lý do",
+    go:"window.CNLOC='thieu';go('congno')",nut:"Mở Công nợ học viên - đã lọc sẵn",
+    giai:"Phiếu chưa đính ảnh chứng từ. Khai lý do là đường tạm; đối soát cuối tháng vẫn phải bổ sung ảnh.",
+    hang:qaHang(L,function(p){return p.student_id_name||p.payment_id},
+     function(p){return vnd(num(p.amount))+(String(p.ct_lydo||"").trim()?(" · lý do: "+p.ct_lydo):" · chưa khai lý do")},
+     function(p){return "ctBoSung("+JSON.stringify(String(p.payment_id||""))+")"})}}},
+ {k:"knmo",t:"Khiếu nại chưa xử lý xong",ic:"ti-alert-triangle",
+  tu:["khieu nai","phan nan","buc xuc","chua xu ly","dang xu ly","complaint"],
+  fn:function(){
+   var L=srows("DL17").filter(function(x){return !isc(x.complaint_status,"resolved")});
+   var cao=L.filter(function(x){return isc(x.complaint_severity,"high")}).length;
+   return {so:L.length,don:"khiếu nại",phu:cao?(cao+" vụ mức CAO"):"không vụ nào mức cao",
+    go:"goCS('khieunai')",nut:"Mở sổ khiếu nại",
+    giai:"Vụ chưa đóng. Mức cao có hạn riêng ở CH2 (slaComplaintHigh_hours).",
+    hang:qaHang(L,function(x){return x.student_id_name||x.complaint_id},
+     function(x){return (elabel(x.complaint_type)||"")+" · "+(elabel(x.complaint_severity)||"")},
+     function(x){return "window.HOSO="+JSON.stringify(String(x.student_id||""))+";go('hoso')"})}}},
  {k:"nophi",t:"Đơn còn nợ học phí",ic:"ti-cash",
   tu:["no hoc phi","con no","cong no","chua dong","chua thanh toan","no phi","doi tien"],
   fn:function(){var L=rows("DL06").filter(function(e){return num(e.remaining_amount)>0&&!isc(e.enrollment_status,"cancelled")});
@@ -28736,6 +28762,88 @@ function qaSoTim(q){
  try{var _g=String(kq.go||"").match(/go\('([a-z0-9_]+)'\)/);
   if(_g&&!canSee(_g[1])&&!SENSITIVE[_g[1]]){kq.go="";kq.nut=""}}catch(e){}
  return kq}
+/* ═══ HỎI ĐÁP ĐỌC THẲNG BẢNG NHỊP NGÀY (18/08 - anh Luân: *"nó có thể thông minh đến mức: hỏi
+   'tôi muốn xem danh sách giáo viên nghỉ liên tiếp 2 buổi' thì nó trỏ luôn tới trang đích, và
+   lọc luôn theo nhu cầu được ko em"*) ═══════════════════════════════════════════════════════
+   ĐO TRƯỚC KHI LÀM, 53 câu người thật hỏi: chỉ 9 câu ra số thật; 23 câu hỏi "ai / bao nhiêu /
+   cái nào" bị nhánh CHỖ CẤU HÌNH đỡ mất - hỏi *"ai chưa xếp lớp"* thì nhận về ba mẫu câu nhắc
+   trong Cài đặt, hỏi *"phiếu nào chưa có chứng từ"* thì nhận về tham số nhắc khảo sát và
+   hotline. Đúng chủ đề, sai hẳn câu hỏi.
+   Vá bằng cách KHÔNG chép tay thêm 20 ý định. App đã có bảng `NHIP` khai cho 27 vai, mỗi dòng
+   là *việc · vì sao · TRANG ĐÍCH · HÀM ĐẾM · MÃ CHIP* - tức mỗi dòng vốn đã là một câu hỏi kèm
+   sẵn con số và bộ lọc. Và `jumpFlow(trang,chip)` đã biết cả năm kiểu chip. Nối hai thứ có sẵn
+   ấy lại là hộp hỏi đáp trả lời được đúng những câu mỗi chức danh hỏi mỗi ngày, KÈM nút mở
+   thẳng tới danh sách ĐÃ LỌC.
+   Vì sao đọc bảng nhịp chứ không khai riêng: con số ở đây và con số trên chip của trang đích là
+   CÙNG MỘT HÀM, nên không thể lệch nhau - `_checkcauhoi` đã canh sẵn chuyện chip khớp nhịp.
+   *Câu trả lời và cái danh sách nó dẫn tới phải là cùng một tập, nếu không thì con số ấy chỉ là
+   một lời đồn.* */
+function qaNhipDs(){
+ if(window.__QANHIP)return window.__QANHIP;
+ var out=[],da={};
+ try{
+  Object.keys(NHIP).forEach(function(vai){
+   var ds=NHIP[vai];if(!Array.isArray(ds))return;
+   ds.forEach(function(r){
+    if(!r||!r[1]||!r[3]||typeof r[4]!=="function")return;
+    var k=String(r[1])+"|"+String(r[3])+"|"+String(r[5]||"");
+    if(da[k])return;da[k]=1;
+    out.push({viec:String(r[1]),visao:String(r[2]||""),trang:String(r[3]),
+     dem:r[4],chip:String(r[5]||""),
+     z:qaChuan(String(r[1])+" "+String(r[2]||"")+" "+String((PBK[r[3]]||{}).t||""))})})})
+ }catch(e){}
+ window.__QANHIP=out;return out}
+function qaNhipTim(q){
+ var z=qaMoRong(q)+" ";
+ /* Hỏi CHỖ CHỈNH thì để nhánh cấu hình trả lời - cùng luật với `qaSoTim`, không dựng luật thứ hai. */
+ if(QASOCAU.some(function(w){return z.indexOf(w)>=0}))return null;
+ var tu=z.split(" ").filter(function(w){return w.length>=3&&!QATUDEM[w]});
+ if(!tu.length)return null;
+ var best=null;
+ qaNhipDs().forEach(function(m){
+  var d=0;tu.forEach(function(w){if(m.z.indexOf(w)>=0)d++});
+  if(!d)return;
+  if(!best||d>best.d)best={m:m,d:d}});
+ /* Ngưỡng 2 từ: một từ trùng thì gần như câu nào cũng khớp một dòng nhịp nào đó, và trả lời
+    bừa còn tệ hơn nói "chưa hiểu câu này". */
+ if(!best||best.d<2)return null;
+ var M=best.m;
+ /* KHÔNG MỜI RỒI ĐUỔI: người này không được vào trang ấy thì đừng chìa nút. Cùng luật đã đặt
+    cho `qaSoTim` ở V9.99z10. */
+ var thay=true;try{thay=canSee(M.trang)}catch(e){}
+ var so=0;try{so=num(M.dem())}catch(e){so=0}
+ return {so:so,don:"",t:M.viec,ic:"ti-target-arrow",k:"nhip:"+M.trang+":"+M.chip,
+  phu:M.visao,
+  giai:"Con số này đọc cùng một hàm với chip trên trang "+esc((PBK[M.trang]||{}).t||M.trang)+
+   ", nên bấm vào là ra đúng danh sách ấy, không lệch một dòng.",
+  go:thay?("jumpFlow("+JSON.stringify(M.trang)+","+JSON.stringify(M.chip)+")"):"",
+  nut:thay?("Mở "+((PBK[M.trang]||{}).t||M.trang)+(M.chip?" - đã lọc sẵn":"")):""}}
+/* ═══ HỎI "LÀM SAO ĐỂ..." THÌ TRẢ LỜI BẰNG BÀI HƯỚNG DẪN CÓ SẴN (18/08) ═════════════════════
+   Đo: *"làm thế nào để gửi khảo sát"* rơi vào nhánh chỉ-đường và nhận về ba tham số nhắc khảo
+   sát. App có 15 bài hướng dẫn chạy từng bước, tức câu trả lời ĐÚNG NHẤT cho loại câu này đã
+   nằm sẵn trong app - chỉ là chưa ai nối hộp hỏi đáp vào nó.
+   Trả lời bằng bài hướng dẫn hơn hẳn chỉ đường: chỉ đường là *"trang ấy ở kia"*, còn bài hướng
+   dẫn là *"đi với tôi, tôi khoanh từng nút cho bạn bấm"*.
+   *Trước khi dựng một câu trả lời mới, hỏi xem trong app đã có ai trả lời câu ấy chưa.* */
+var QACACH=["lam sao","lam the nao","the nao de","cach ","huong dan","kieu gi","nhu the nao",
+ "bat dau tu dau","co the lam","thao tac"];
+function qaCachLam(q){
+ var z=qaMoRong(q)+" ";
+ if(!QACACH.some(function(w){return z.indexOf(w)>=0}))return null;
+ var tu=z.split(" ").filter(function(w){return w.length>=3&&!QATUDEM[w]});
+ if(!tu.length)return null;
+ var best=null;
+ try{
+  Object.keys(TOURS).forEach(function(id){
+   var T=TOURS[id];if(!T||!T.t)return;
+   /* Bài của bản kia thì không mời - cùng luật `_checktour` đang canh. */
+   if(T.chi&&String(T.chi)!=="5")return;
+   var zt=qaChuan(String(T.t)+" "+String(T.d||""));
+   var d=0;tu.forEach(function(w){if(zt.indexOf(w)>=0)d++});
+   if(d&&(!best||d>best.d))best={id:id,T:T,d:d}})
+ }catch(e){}
+ if(!best||best.d<2)return null;
+ return {id:best.id,t:best.T.t,d:best.T.d||"",so:(best.T.steps||[]).length}}
 function qaTraLoi(cau){
  var q=String(cau||"").trim();
  if(!q)return null;
@@ -28748,15 +28856,21 @@ function qaTraLoi(cau){
     bao nhiêu" vẫn rơi vào nhánh chỉ số với con số sống. */
  var td=tdTim(q);
  var so=(kp||td)?null:qaSoTim(q);
+ /* Bảng ý định viết tay (`QASO`) trả lời trước - nó có danh sách tên người kèm theo. Không khớp
+    thì hỏi tiếp bảng NHỊP NGÀY, vốn phủ đúng những câu mỗi chức danh hỏi mỗi ngày. */
+ if(!so&&!kp&&!td)so=qaNhipTim(q);
  /* THỨ TỰ ƯU TIÊN, và vì sao đúng thứ tự này:
     1. NGƯỜI - hỏi trúng một cái tên đủ chắc thì không còn gì để bàn.
     2. CHỈ SỐ - gõ đúng mã CH6 là câu hỏi rõ nhất trong mọi câu hỏi.
     3. SỐ LIỆU - "bao nhiêu / ai / danh sách"; nhánh này TỰ TỪ CHỐI khi câu có "ở đâu / chỗ nào"
        nên không cướp câu của nhánh cấu hình.
     4. CHỖ CẤU HÌNH. 5. Bí thì ghi vào sổ câu hỏi chưa trả lời được. */
- var loai=(ng.length&&ng[0].d>=70)?"nguoi":(td?"tudien":(kp?"kpi":(so?"so":(ht.length?"hethong":(ng.length?"nguoi":"bi")))));
+ /* Nhánh CÁCH LÀM đứng SAU số liệu, TRƯỚC chỗ cấu hình: "có bao nhiêu" vẫn là hỏi số, nhưng
+    "làm sao để gửi khảo sát" thì một bài hướng dẫn chạy từng bước đúng hơn một trang cấu hình. */
+ var cach=(so||kp||td)?null:qaCachLam(q);
+ var loai=(ng.length&&ng[0].d>=70)?"nguoi":(td?"tudien":(kp?"kpi":(so?"so":(cach?"cach":(ht.length?"hethong":(ng.length?"nguoi":"bi"))))));
  if(loai==="bi")qaGhiHut(q);
- return {q:q,loai:loai,nguoi:ng,hethong:ht,yd:yd,so:so,kpi:kp,td:td}}
+ return {q:q,loai:loai,nguoi:ng,hethong:ht,yd:yd,so:so,kpi:kp,td:td,cach:cach}}
 /* Khi bí: đừng trả về màn trắng. Gợi ý những thứ GẦN NHẤT mà app có - vài cái tên hao hao, vài
    chỗ cấu hình hao hao - để người hỏi bấm tiếp thay vì bỏ cuộc. */
 function qaGoiY(q){
@@ -28793,15 +28907,78 @@ function qaGoiY(q){
 function qaHoi(){window.QAQ=fldV("qa_q")||"";reRender("hoidap")}
 function qaViDu(s){window.QAQ=s;reRender("hoidap")}
 function qaXoa(){window.QAQ="";reRender("hoidap")}
+/* ═══ KHO CÂU HỎI GỢI Ý, CHIA THEO TEAM (18/08 - anh Luân: *"em thử đặt ra vài chục câu hỏi mà
+   các team có thể sẽ tìm, rồi test thử xem thế nào nhé, dựng sẵn trong câu hỏi gợi ý để có gì
+   a test"*) ═══════════════════════════════════════════════════════════════════════════════
+   Chín câu cũ là chín câu RỜI, không ai biết mình được phép hỏi tới đâu. Nay 44 câu chia theo
+   ghế ngồi: mở trang ra là thấy đúng những câu ghế mình hay hỏi.
+   Mỗi câu trong kho này đều đã CHẠY THẬT qua `qaTraLoi` trong bộ kiểm - câu nào rơi vào "chưa
+   hiểu" là đỏ. Bày ra một câu gợi ý mà bấm vào không trả lời được thì thà đừng bày.
+   Tên người và mã lớp kéo từ dữ liệu đang có, không viết cứng. */
+function qaKhoCau(){
+ var s=null,c=null;
+ try{s=srows("DL09")[0]}catch(e){}
+ try{c=srows("DL10")[0]}catch(e){}
+ return [
+  ["Việc trong ngày",[
+   "hôm nay tôi phải làm gì",
+   "việc quá hạn toàn trung tâm",
+   "nhận việc mới được giao",
+   "ai đang gánh nhiều việc nhất"]],
+  ["Tư vấn & Marketing",[
+   "gọi khách đã hẹn hôm nay",
+   "lead mới chưa ai nhận",
+   "lead bị đánh dấu không đạt chuẩn",
+   "chốt khách đã có kết quả test",
+   "soi lead đêm qua về từ nguồn nào",
+   "xem mã giới thiệu ai đang chạy",
+   "chiết khấu chờ duyệt"]],
+  ["Học vụ",[
+   "học viên đóng đủ mà chưa xếp lớp",
+   "gửi thông tin lớp và chốt xác nhận",
+   "học viên nguy cơ bỏ học",
+   "đơn xin nghỉ chờ duyệt",
+   "soi buổi chưa ghi nhận xét"]],
+  ["Giảng dạy & ACA",[
+   "bài tập đang chờ chấm",
+   "lớp thiếu giáo viên hôm nay",
+   "ghi nhận xét buổi vừa dạy",
+   "học viên nguy cơ học thuật",
+   "xem buổi dạy hôm nay"]],
+  ["WOW 1-1",[
+   "xem buổi WOW hôm nay",
+   "xác nhận các buổi mới được đặt",
+   "gọi lại học viên không đến buổi WOW"]],
+  ["Kế toán",[
+   "thu các đợt tới hạn hôm nay",
+   "ai chưa đóng học phí",
+   "đối soát khoản thu hôm qua",
+   "hoàn tiền đang chờ xử lý",
+   "phiếu nào chưa có ảnh chứng từ"]],
+  ["Quản lý & Giám đốc",[
+   "rà KPI dưới ngưỡng",
+   "duyệt hàng chờ quyết định",
+   "rà lịch trùng và lớp thiếu giảng viên",
+   "có bao nhiêu khiếu nại chưa xử lý",
+   "có bao nhiêu học viên nguy cơ",
+   "CVR đang bao nhiêu"]],
+  ["Một hồ sơ cụ thể",[
+   (s&&s.full_name?s.full_name+" đang có cảnh báo gì":"học viên nào đang có cảnh báo"),
+   (c&&c.class_id?("lớp "+c.class_id+" thế nào rồi"):"lớp nào sắp kết thúc"),
+   "lớp nào sắp kết thúc"]],
+  ["Nghĩa của từ & chỗ chỉnh",[
+   "GLA là gì",
+   "WOW là gì",
+   "onboarding là gì",
+   "đổi ngưỡng nợ quá hạn ở đâu",
+   "hạn chấm bài là bao lâu",
+   "sửa câu nhắc việc ở đâu",
+   "đổi logo trung tâm ở đâu"]]]}
+/* Dải chip cũ giữ nguyên tên hàm để chỗ khác gọi không gãy - nay nó lấy câu từ kho trên. */
 function qaViDuList(){
- var s=null;try{s=srows("DL09")[0]}catch(e){}
- var c=null;try{c=srows("DL10")[0]}catch(e){}
- /* Câu mẫu phải kéo từ dữ liệu THẬT đang có - viết cứng một cái tên là tới ngày gieo lại dữ
-    liệu thì nút mẫu trỏ vào người không tồn tại. */
- return [(s&&s.full_name?s.full_name+" đang có cảnh báo gì":"học viên nào đang có cảnh báo"),
-  "có bao nhiêu học viên nguy cơ","ai chưa đóng học phí","hôm nay tôi phải làm gì",
-  (c&&c.class_id?("lớp "+c.class_id+" thế nào rồi"):"lớp nào sắp kết thúc"),
-  "CVR đang bao nhiêu","GLA là gì","đổi ngưỡng nợ quá hạn ở đâu","hạn chấm bài là bao lâu"]}
+ var out=[];
+ qaKhoCau().forEach(function(g){g[1].forEach(function(x){if(out.indexOf(x)<0)out.push(x)})});
+ return out}
 function renderHoidap(){
  var q=window.QAQ||"";
  var h=pageHead("Hỏi đáp","Hỏi bằng tiếng Việt - về một học viên, hoặc về chỗ cấu hình trong app");
@@ -28810,8 +28987,14 @@ function renderHoidap(){
  h+='<div style="display:flex;gap:8px;flex-wrap:wrap" data-tour="qabox"><input id="qa_q" value="'+esc(q)+'" placeholder="vd: bạn Minh Anh có cảnh báo gì, giờ phải làm gì?" style="flex:1;min-width:260px;height:38px;border:1px solid var(--line);border-radius:8px;padding:0 12px;font-family:inherit;font-size:13px" onkeydown="if(event.key===\'Enter\')qaHoi()">'+
   '<button class="btn primary" onclick="qaHoi()"><i class="ti ti-search"></i>Hỏi</button>'+
   (q?'<button class="btn" onclick="qaXoa()"><i class="ti ti-x"></i>Xóa</button>':'')+'</div>';
- h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px" data-tour="qavd"><span class="mut" style="font-size:11px;align-self:center">Thử:</span>';
- qaViDuList().forEach(function(s){h+='<button class="pill" onclick="qaViDu('+JSON.stringify(s).split('"').join("&quot;")+')">'+esc(s)+'</button>'});
+ /* Kho câu hỏi bày theo NHÓM GHẾ NGỒI. Dải phẳng chín câu trước đây không nói được cho người
+    đọc biết mình được phép hỏi tới đâu; xếp theo team thì mở ra là thấy đúng câu của mình. */
+ h+='<div style="margin-top:10px" data-tour="qavd">';
+ qaKhoCau().forEach(function(G){
+  h+='<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:7px">'+
+   '<span class="mut" style="font-size:11px;min-width:132px;font-weight:700">'+esc(G[0])+'</span>';
+  G[1].forEach(function(x){h+='<button class="pill" onclick="qaViDu('+JSON.stringify(x).split('"').join("&quot;")+')">'+esc(x)+'</button>'});
+  h+='</div>'});
  h+='</div></div></div>';
  /* Chưa hỏi gì thì BÀY SẴN bảng thuật ngữ. Một cuốn từ điển chỉ mở ra khi đã biết phải hỏi gì
     thì người cần nó nhất - người mới, chưa biết GLA là gì - không bao giờ tìm thấy. */
@@ -28897,6 +29080,15 @@ function renderHoidap(){
   h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">'+
    (SO.go?'<button class="btn primary" onclick="'+SO.go.split('"').join("&quot;")+'"><i class="ti ti-arrow-right"></i>'+esc(SO.nut||"Mở màn làm việc")+'</button>':'')+
    '</div>';
+  h+='</div></div>';
+  return h}
+ /* Hỏi CÁCH LÀM: trả lời bằng bài hướng dẫn chạy từng bước, kèm nút chạy luôn. */
+ if(R.loai==="cach"&&R.cach){var CA=R.cach;
+  h+='<div class="panel"><div class="ph"><b><i class="ti ti-school" style="margin-right:6px"></i>Có bài hướng dẫn cho việc này</b></div><div class="pbody">';
+  h+='<div style="font-size:14px;font-weight:700;color:var(--ink)">'+esc(CA.t)+'</div>'+
+   (CA.d?'<div class="mut" style="font-size:12px;margin-top:4px">'+esc(CA.d)+'</div>':'')+
+   '<div class="fhint" style="margin-top:8px">Bài này '+CA.so+' bước - app sẽ khoanh từng nút cho bạn bấm, làm thật trên dữ liệu demo.</div>'+
+   '<div style="margin-top:12px"><button class="btn primary" onclick="tourStart('+JSON.stringify(CA.id).split('"').join("&quot;")+')"><i class="ti ti-player-play"></i>Chạy bài hướng dẫn này</button></div>';
   h+='</div></div>';
   return h}
  if(R.loai==="hethong"&&R.hethong.length){
@@ -31076,6 +31268,12 @@ function asstTraLoi(q){
   (SO.hang?SO.hang.ds:[]).slice(0,4).forEach(function(r){
    h+='<div class="qaHit"><div class="t">'+esc(r.t)+'</div>'+(r.p?'<div class="d">'+esc(r.p)+'</div>':'')+'</div>'});
   return h+'</div>'}
+ if(R.loai==="cach"&&R.cach){var CA=R.cach;
+  return h+'<div class="qaBody"><div class="sechd" style="margin-top:0">Có bài hướng dẫn cho việc này</div>'+
+   '<div class="qaHit"><div class="t">'+esc(CA.t)+'</div>'+
+   (CA.d?'<div class="d">'+esc(CA.d)+'</div>':'')+
+   '<div class="o">'+CA.so+' bước - app khoanh từng nút cho bạn bấm</div>'+
+   '<div style="margin-top:6px"><button class="btn sm" onclick="asstClose();tourStart('+JSON.stringify(CA.id).split('"').join("&quot;")+')"><i class="ti ti-player-play"></i>Chạy bài hướng dẫn</button></div></div></div>'}
  if(R.loai==="hethong"&&R.hethong.length){
   h+='<div class="qaBody"><div class="sechd" style="margin-top:0">'+R.hethong.length+' chỗ khớp câu hỏi</div>';
   R.hethong.forEach(function(k){
