@@ -3888,6 +3888,89 @@ if not _nghi and _gvN:
                   len([x for x in _nghi if x["trang_thai"].startswith("cho_duyet")]),
                   len([x for x in _nghi if x["trang_thai"].startswith("da_duyet")])))
 
+# ═══ 27. DL25 · NHAT KY THAO TAC CO SAN VAI CHUC DONG (18/08) ═════════════════
+# Anh Luan: *"Log ma sao o cai dat ta???"*. Chuyen no ra thanh mot cuon so trong "Tra cuu" thi
+# no thanh MOT MUC TREN MENU - va mot muc menu bam vao mo ra BANG TRONG con te hon khong co muc.
+# Nhat ky von chi ghi trong PHIEN dang chay (cua ghi cua app sinh ra no), nen bat dau phien la
+# so rong tron. Nguoi mo demo lan dau bam vao thay mot trang trong roi ket luan la tinh nang hong.
+#
+# Nen gieo san mot doan lich su: 5 ngay gan nhat, nhieu nguoi, nhieu bang, du bon loai thao tac.
+# Gieo TAT DINH theo chi so (khong boc tham) de `check_taolai` dung lai hai luot ra y het.
+#
+# BA THU PHAI DUNG, khong duoc gieo bua:
+#   · `sheet` phai la bang CO THAT va `row_id` phai la mot dong CO THAT trong bang ay - man hinh
+#     in ten bang bang tieng Viet va cua gac pham vi du lieu (`logXem`) tra nguoc lai dong goc.
+#     Gieo mot ma khong ton tai la gieo mot dong khong ai gac duoc.
+#   · `staff_id` phai la nguoi CO THAT va dung nguoi lam viec ay (ke toan sua tien, hoc vu sua
+#     ho so hoc vien) - khong thi bang tu noi doi ngay tren man.
+#   · `nguon:"demo"` de nut Hoan tac tu choi kem ly do doc duoc, thay vi bam vao roi im.
+_nk = d["dl"].setdefault("DL25", [])
+if not _nk:
+    _ns = {str(x.get("staff_id") or ""): x for x in R("DL01")}
+
+    def _ai(vai):
+        for _x in R("DL01"):
+            if code(_x.get("role") or "") == vai:
+                return _x
+        return {}
+
+    _keToan = _ai("accounting_manager")
+    _hocVu = _ai("academic_staff") or _ai("academic_manager")
+    _tvan = _ai("sales_staff")
+    _tpAca2 = _ai("aca_manager")
+    # [bang, khoa chinh, nguoi, hanh dong, loai, o doi, gia tri cu, gia tri moi]
+    _MAU = [
+        ("DL09", "student_id", _hocVu, u"C\u1eadp nh\u1eadt", "upd", "phone_number", "09xxxxxxxx", "09xxxxxxx1"),
+        ("DL06", "enrollment_id", _keToan, u"C\u1eadp nh\u1eadt", "upd", "next_payment_due", "", "-"),
+        ("DL10", "class_id", _hocVu, u"C\u1eadp nh\u1eadt", "upd", "venue_or_zoom_link", "", "-"),
+        ("DL09", "student_id", _hocVu, u"C\u1eadp nh\u1eadt", "upd", "learning_followup_note", "", "-"),
+        ("DL07", "payment_id", _keToan, u"T\u1ea1o m\u1edbi", "add", "", "", ""),
+        ("DL02", "lead_id", _tvan, u"C\u1eadp nh\u1eadt", "upd", "assigned_to_name", "", "-"),
+        ("DL11", "session_id", _tpAca2, u"C\u1eadp nh\u1eadt", "upd", "teacher_id_name", "", "-"),
+        ("DL12", "attendance_id", _hocVu, u"C\u1eadp nh\u1eadt", "upd", "attendance_status", "", "-"),
+    ]
+    _n25 = 0
+    for _i25 in range(24):
+        _tb, _pk, _ng, _act, _kind, _o, _cu, _moi = _MAU[_i25 % len(_MAU)]
+        _rows = R(_tb)
+        if not _rows or not _ng:
+            continue
+        _dong = _rows[(_i25 * 7) % len(_rows)]
+        _id = str(_dong.get(_pk) or "")
+        if not _id:
+            continue
+        # Gia tri THAT cua o do lam "gia tri moi" - dong nhat ky khop voi cai dang nam trong bang.
+        _sau = str(_dong.get(_o) or "") if _o else ""
+        _truoc = _cu if _cu else (u"(tr\u1ed1ng)" if _sau else "")
+        # Rai deu tren 5 ngay gan nhat, gio hanh chinh, moi tiep lui dan.
+        _luc = NOW - datetime.timedelta(days=_i25 // 5, hours=1 + (_i25 % 5) * 2, minutes=(_i25 * 7) % 60)
+        _dt25 = {}
+        if _o and _kind == "upd":
+            _dt25 = {_o: {"tu": _truoc, "den": _sau}}
+        _n25 += 1
+        _nk.append({
+            "log_id": "LOG-DEMO-%03d" % _n25,
+            "log_time": _luc.strftime("%d/%m/%Y %H:%M"),
+            "staff_id": _ng.get("staff_id") or "",
+            "staff_name": _ng.get("full_name") or "",
+            "action": _act,
+            "sheet": _tb,
+            "row_id": _id,
+            "door": "",
+            "summary": "" if _kind == "upd" else (u"Th\u00eam m\u1edbi \u1edf b\u1ea3ng " + _tb),
+            "detail": json.dumps(_dt25, ensure_ascii=False),
+            "kind": _kind,
+            "truoc": "",
+            "sau": "",
+            "undone": "",
+            "nguon": "demo",
+            "batch": "D%d" % _n25,
+        })
+    _nk.sort(key=lambda x: dt(x["log_time"]) or NOW, reverse=True)
+    log.append("27. DL25 nhat ky thao tac: gieo %d dong tren %d bang, %d nguoi"
+               % (len(_nk), len(set(x["sheet"] for x in _nk)),
+                  len(set(x["staff_id"] for x in _nk))))
+
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("  12. Da tao DL22 referral +", len(dl["DL22"]), "luot | DL19 thuong:", len(dl["DL19"]))
 for _l in log[-6:]: print("  "+_l)

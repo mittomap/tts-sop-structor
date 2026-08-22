@@ -3852,6 +3852,22 @@ var PAGES=[
    Nay nó là TRANG THẬT: cửa duy nhất dẫn vào mười sáu cuốn sổ chỉ-đọc vừa rời khỏi cây menu
    (menu CEO 60 -> 45). Cùng đường đi với `khaosat`: một khoá chết trở thành trang thật thì bộ
    kiểm phải ĐỔI CÂU HỎI, không phải xoá luật - `_check16` đã ghi tiền lệ ấy cho `khaosat` 07/08. */
+/* ═══ V2 18/08 - NHẬT KÝ THAO TÁC RỜI KHỎI CÀI ĐẶT (anh Luân: *"Log mà sao ở cài đặt ta???"*) ═══
+   Anh hỏi đúng, và cái sai không phải chuyện xếp chỗ cho gọn mắt.
+   **Cài đặt là nơi ĐẶT LUẬT của trung tâm** - ngưỡng SLA, phân quyền, danh mục, câu nhắc việc.
+   **Nhật ký là một CUỐN SỔ** - người ta mở nó ra để TRA một chuyện đã xảy ra: *"ai sửa hồ sơ
+   này"*, *"hôm nay ai làm gì"*, *"cái vừa rồi lùi lại được không"*. Hai việc khác hẳn nhau.
+   Hậu quả thật của chỗ đặt cũ, đo được: `settings` nằm trong `SENSITIVE` và **chỉ Quản trị viên
+   có nó** - nghĩa là suốt thời gian qua **không một trưởng phòng nào tra được nhật ký**, trong
+   khi chính họ là người phải trả lời câu "ai đổi con số này". Một cuốn sổ dựng ra để QUY TRÁCH
+   NHIỆM mà cất trong phòng máy thì nó không quy được trách nhiệm cho ai.
+   Và nó bắt người muốn tra một dòng phải đi qua màn sửa luật của cả trung tâm - một cú bấm nhầm
+   ở đó đổi ngưỡng của toàn hệ thống.
+   *Chỗ đặt một màn hình là một lời khai về việc nó phục vụ ai. Khai sai chỗ thì đúng người cần
+   nó lại là người không với tới.*
+   Nay nó là một cuốn sổ trong "Tra cứu & sổ sách", và mở cho **trưởng phòng trở lên** (xem
+   `buildScope`). Lối cũ `settings#nhatky` vẫn sống - `go()` lái sang trang mới. */
+{k:"nhatky",g:"Tra cứu",ic:"ti-history",t:"Nhật ký thao tác",c:"Ai sửa ô nào, lúc nào, từ giá trị nào sang giá trị nào - và lùi lại được",ty:"custom"},
 {k:"tracuu",g:"Tra cứu",ic:"ti-folders",t:"Tra cứu & sổ sách",c:"Các sổ chỉ-đọc - tra khi cần",ty:"custom"}];
 var PBK={};PAGES.forEach(function(p){PBK[p.k]=p});
 
@@ -3925,7 +3941,7 @@ var ROLESCOPE={
     Đây là ba cửa mà một người điều hành bấm nhầm là hỏng cả bản demo hoặc tự nâng quyền. */
  dieuhanh:{match:/^ceo$/,land:"baocao",pages:"*",blocks:"*",mine:0,mineBtn:0,kpi:0,bell:"*",
   tabs:{settings:["tongquan","brand","menu","ch2","ch6","ch4","goiy","the","ch1","tro","nhip",
-   "huongdan","qa","staff","giagio","khoa","nhatky"]}},
+   "huongdan","qa","staff","giagio","khoa"]}},
  tuvan:{match:/^sales/,land:"viec",
   /* V2 16/08 - anh Luan bo sung `congno` cho Tu van va Hoc vu. Ho la nguoi DOI THOAI voi khach
      ve tien (tu van chot don, hoc vu nhac dong hoc phi), nen bat ho hoi ke toan moi biet mot
@@ -4148,6 +4164,11 @@ function buildScope(code){
  var isLead=/leader/.test(code)&&!/manager/.test(code);
  eff.leader=isLead?1:0;
  eff.mgr=(isMgr&&!isLead)?1:0;   /* V9.41 + V9.99q: chỉ trưởng phòng trở lên mới là người DUYỆT */
+ /* V2 18/08 - NHẬT KÝ THAO TÁC cho trưởng phòng trở lên. Không mở cho Leader chi nhánh và nhân
+    viên: sổ này đi ngang qua MỌI bảng, kể cả bảng tiền, nên nó là quyền của cấp phải trả lời câu
+    "ai đổi con số này". Từng dòng vẫn còn một cửa gác thứ hai theo phạm vi dữ liệu (`logXem`),
+    nên mở tới cấp này không kéo theo chuyện ai cũng đọc được mọi thứ. */
+ if(eff.mgr&&eff.pages!=="*"&&eff.pages.indexOf("nhatky")<0)eff.pages.push("nhatky");
  if(isMgr&&eff.pages!=="*"){
   /* Trưởng phòng / Leader được xem Báo cáo - TRỪ vai bị cấm tiền (Marketing) và vai không đụng
      nghiệp vụ học viên (Nhân sự). Trước bản này câu lệnh này đẩy Báo cáo cho MỌI quản lý, nên
@@ -14026,7 +14047,7 @@ function renderHoso(){
   (C.enr||[]).forEach(function(e){lg=lg.concat(logForRow("DL06",e.enrollment_id))});
   lg.sort(function(a2,b2){return String(b2.log_id).localeCompare(String(a2.log_id))});
   h+='<div class="panel" style="margin-top:16px"><div class="ph"><b><i class="ti ti-history" style="margin-right:6px"></i>Ai đã sửa hồ sơ này</b>'+
-   '<button class="btn sm" onclick="window.SETTAB=\'nhatky\';window.NKQ=\''+esc(C.sid||(C.L&&C.L.lead_id)||"")+'\';go(\'settings\')" data-tip="Mở nhật ký thao tác đầy đủ"><i class="ti ti-external-link"></i>Nhật ký đầy đủ</button></div>'+
+   '<button class="btn sm" onclick="window.NKQ=\''+esc(C.sid||(C.L&&C.L.lead_id)||"")+'\';go(\'nhatky\')" data-tip="Mở nhật ký thao tác đầy đủ"><i class="ti ti-external-link"></i>Nhật ký đầy đủ</button></div>'+
    '<div class="pbody">'+
    (lg.length?logRowHTML2(lg):'<div class="mut" style="font-size:12px">Chưa có thao tác nào trên hồ sơ này trong buổi làm việc hiện tại. Nhật ký chỉ ghi từ lúc mở app - nối sheet thật thì đây là bảng DL25 lưu vĩnh viễn.</div>')+
    '</div></div>'})();
@@ -16068,6 +16089,30 @@ function logRowHTML(code,id,lim){return logRowHTML2(logForRow(code,id),lim)}
    nằm đó từ đầu, chỉ là không có cửa nào hỏi tới.
    *Một cuốn sổ tra được theo ba trục nhưng thiếu đúng trục "hôm nay" thì người ta vẫn phải cuộn
    tay - và cuộn tay trên 500 dòng thì tra cũng như không tra.* */
+/* ═══ V2 18/08 - MỞ RỘNG NGƯỜI ĐỌC THÌ PHẢI GÁC LẠI TỪNG DÒNG ═══════════════════════════════
+   Trước bản này nhật ký chỉ Quản trị viên mở được, nên `logRows()` đổ thẳng cả sổ ra là đúng -
+   người đọc vốn đã thấy mọi thứ. Nay trưởng phòng đọc được, mà sổ này đi ngang qua MỌI bảng: một
+   dòng "sửa Số tiền của PMT-071" là dữ liệu miền TIỀN, một dòng "sửa SĐT của HV045" là miền HỌC
+   VIÊN. Mở cửa mà không gác lại từng dòng thì cuốn sổ này thành cửa hậu đi vòng qua toàn bộ lớp
+   phân quyền dữ liệu - đúng con bệnh đã cắn ở `jTimeline` hôm audit.
+   *Nới quyền XEM MỘT MÀN không bao giờ chỉ là nới quyền xem một màn - phải hỏi lại màn ấy đang
+   chở dữ liệu của những miền nào.*
+   Dòng có bảng KHÔNG khai miền (`DL22` tham số, `DL25` chính nó, `DL33`...) thì không có gì để
+   gác - giữ nguyên, đúng cách `srows()` đang làm. */
+function logXem(e){
+ try{
+  var code=String((e&&e.sheet)||"");
+  if(!code||!DSDOM[code])return true;
+  var lv=dsLevel(DSDOM[code]);
+  if(lv==="all")return true;
+  if(lv==="none")return false;
+  var pk=logPk(code),r=pk?find(code,pk,e.row_id):null;
+  /* Dòng đã bị xoá khỏi bảng gốc thì không hỏi `canRow` được nữa. Vẫn cho xem: chính lúc dữ liệu
+     biến mất là lúc người ta cần nhật ký nhất, và người đọc đã qua được cửa miền ở trên. */
+  if(!r)return true;
+  return canRow(code,r);
+ }catch(x){return true}}
+function logRowsXem(){return logRows().filter(logXem)}
 function nkKy(e,k){
  if(!k)return true;
  var d=pvnd(e.log_time);if(!d)return false;
@@ -16080,7 +16125,7 @@ var NKACTOPT=[["","Mọi thao tác"],["add","Tạo mới"],["upd","Cập nhật"
 function nkFilt(){
  var q=String(window.NKQ||"").trim().toLowerCase(),tb=window.NKTB||"",who=window.NKWHO||"";
  var ky=window.NKKY||"",lo=window.NKACT||"";
- return logRows().filter(function(e){
+ return logRowsXem().filter(function(e){
   if(tb&&e.sheet!==tb)return false;
   if(who&&String(e.staff_id||"")!==who)return false;
   if(!nkKy(e,ky))return false;
@@ -16088,9 +16133,11 @@ function nkFilt(){
   if(!q)return true;
   return [e.log_time,e.staff_name,e.action,e.sheet,sheetVN(e.sheet),e.row_id,e.summary,e.door]
    .join(" ").toLowerCase().indexOf(q)>=0})}
-function nkSet(k,v){window[k]=v;reRender("settings")}
+/* 18/08 - hàm này từng đóng đinh `reRender("settings")` vì nhật ký là một tab của Cài đặt.
+   Nay nó là trang riêng, mà lối cũ vẫn còn - nên vẽ lại ĐÚNG TRANG ĐANG ĐỨNG, đừng đoán. */
+function nkSet(k,v){window[k]=v;reRender(CUR||"nhatky")}
 function renderNhatky(){
- var L=logRows(),F=nkFilt();
+ var L=logRowsXem(),F=nkFilt();
  window.FLTLAST=window.FLTLAST||{};window.FLTLAST.nhatky=F.map(function(e){
   return {luc:e.log_time,nguoi:e.staff_name||e.staff_id,thao_tac:e.action,bang:sheetVN(e.sheet),
    dong:e.row_id,thay_doi:e.summary,cua_ghi:e.door,da_hoan_tac:e.undone}});
@@ -16110,12 +16157,16 @@ function renderNhatky(){
  Object.keys(tbs).sort().forEach(function(c){bar+='<option value="'+esc(c)+'"'+(window.NKTB===c?" selected":"")+'>'+esc(sheetVN(c))+'</option>'});
  bar+='</select><span class="lbl">Người</span><select class="sel qsel" onchange="nkSet(\'NKWHO\',this.value)"><option value="">Tất cả</option>';
  Object.keys(whos).forEach(function(s){bar+='<option value="'+esc(s)+'"'+(window.NKWHO===s?" selected":"")+'>'+esc(whos[s])+'</option>'});
- bar+='<span class="lbl">Kỳ</span><select class="sel qsel" onchange="nkSet(\'NKKY\',this.value)">';
- NKKYOPT.forEach(function(o){bar+='<option value="'+esc(o[0])+'"'+((window.NKKY||"")===o[0]?" selected":"")+'>'+esc(o[1])+'</option>'});
- bar+='</select><span class="lbl">Loại</span><select class="sel qsel" onchange="nkSet(\'NKACT\',this.value)">';
+ bar+='<span class="lbl">Loại</span><select class="sel qsel" onchange="nkSet(\'NKACT\',this.value)">';
  NKACTOPT.forEach(function(o){bar+='<option value="'+esc(o[0])+'"'+((window.NKACT||"")===o[0]?" selected":"")+'>'+esc(o[1])+'</option>'});
  bar+='</select></span>';
  h+=tbar(bar,'<span class="tbcnt">'+F.length+' dòng</span><button class="btn sm" onclick="pgExport(\'nhatky\')" data-tip="Tải '+F.length+' dòng đang hiện ra tệp CSV"><i class="ti ti-table"></i>Xuất</button>');
+ /* KỲ là DẢI CHIP chứ không phải ô chọn: đây là trục người ta chạm nhiều nhất ("hôm nay ai làm
+    gì"), và chip mang sẵn CON SỐ - nhìn một cái là biết hôm nay có bao nhiêu thao tác mà chưa
+    phải bấm. Ô chọn giấu con số ấy đi sau một cú bấm. LOẠI thao tác thì ở lại làm ô chọn: nó là
+    trục thu hẹp phụ, và bốn chip nữa trên cùng một thanh là bắt mắt đọc hai dải giống nhau. */
+ h+=locKhoi([locR("Kỳ",segHTML(window.NKKY||"",NKKYOPT.map(function(o){
+   return [o[0],o[1],L.filter(function(e){return nkKy(e,o[0])}).length]}),"nkSet('NKKY','{k}')"))],"");
  if(!F.length)return h+'<div class="tbwrap"><table class="tb"><tbody><tr><td class="empty">'+
   (L.length?'Không có dòng nào khớp điều kiện lọc - bỏ bớt điều kiện rồi thử lại.':'Chưa có thao tác nào được ghi trong buổi làm việc này. Sửa một dữ liệu bất kỳ rồi quay lại đây.')+'</td></tr></tbody></table></div>';
  var seenB={};
@@ -16352,8 +16403,7 @@ function setTabs(){
   ["staff","Nhân viên & Email","quyen"],
   ["giagio","Đơn giá giờ dạy","quyen"],
   ["khoa","Khóa học","dulieu"],
-  ["health","Sức khỏe dữ liệu"+(nHealth?" ("+nHealth+")":""),"dulieu"],
-  ["nhatky","Nhật ký thao tác","dulieu"]]
+  ["health","Sức khỏe dữ liệu"+(nHealth?" ("+nHealth+")":""),"dulieu"]]
   .concat(SVR?[]:[["demo","Dữ liệu demo","dulieu"]])}
 /* Lối tắt tới việc hay làm nhất trong Cài đặt. [nhãn, icon, câu giải thích, hành động]. Mọi hành
    động ở đây phải là một cửa CÓ THẬT trong app - bộ kiểm gọi lại từng cái để chắc là không dẫn
@@ -16640,7 +16690,6 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
  if(tab==="tongquan")return h+renderSetTongquan();
  if(tab==="qa")return h+renderSetQA();
  if(tab==="health")return h+renderHealth();
- if(tab==="nhatky")return h+renderNhatky();
  if(tab==="tro")return h+renderTro();
  if(tab==="nhip")return h+renderNhip();
  if(tab==="huongdan")return h+renderHuongdan();
@@ -18940,6 +18989,11 @@ function logCanUndo(b){
  var L=logBatchRows(b);
  if(!L.length)return "Không tìm thấy thao tác này trong nhật ký.";
  if(L.some(function(e){return String(e.undone||"")==="yes"}))return "Thao tác này đã hoàn tác rồi.";
+ /* Dòng gieo sẵn của dữ liệu demo: nó KỂ LẠI một thao tác đã xảy ra trước khi bản demo được
+    dựng, nên không có ảnh chụp trước/sau để lùi về. Nói thẳng ra thay vì để nút Hoàn tác bấm
+    vào rồi im - *một cái nút bấm vào không có gì xảy ra thì tệ hơn một cái nút không có.* */
+ if(L.some(function(e){return String(e.nguon||"")==="demo"}))
+  return "Đây là dòng nhật ký của dữ liệu demo dựng sẵn - không có ảnh chụp trước/sau nên không lùi lại được.";
  var hit=logNewerHit(b);
  if(hit.length)return "Không hoàn tác được: sau đó đã có thay đổi khác trên "+hit.slice(0,3).join(", ")+(hit.length>3?" ...":"")+". Sửa tay để khỏi đè mất việc của người sau.";
  return ""}
@@ -30929,6 +30983,10 @@ RENDER.duyetnghi = function(){var L=absQueue();
 /* V2 18/08 - GIÁO VIÊN báo nghỉ buổi dạy. Không dải thẻ, cùng lý do với `duyetnghi` ngay trên:
    mọi con số của trang này đều là số đếm của chính danh sách nằm dưới. */
 RENDER.duyetgvnghi = function(){return nvHead("duyetgvnghi")+duyGvnHTML()+_duyAi()};
+RENDER.nhatky = function(){
+ return pageHead("Nhật ký thao tác",
+  "Mỗi lần ghi dữ liệu để lại một dòng: ai, lúc nào, bảng nào - dòng nào, ô nào đổi từ gì sang gì.","")+
+  renderNhatky()};
 RENDER.duyetthu  = function(){var L=duyPayList();
  return nvHead("duyetthu")+statStrip([
   /* V2 13/08 - ô đếm đơn đã bỏ (chip ngay dưới đếm đúng con số ấy). Giữ lại ô TIỀN:
@@ -32048,6 +32106,10 @@ function go(key,noHist){
     Hơn hai chục chỗ trong app vẫn gọi `go("banlam")` / `go("hanhtrinh")` - ô thẻ, nhịp ngày,
     gợi ý Trợ lý, bài hướng dẫn, nút "Thoát" của màn chạy. Đổi tên ở ĐÂY, đúng một chỗ, thay vì
     đi sửa hơn hai chục lời gọi rồi sót một cái và nó chết câm. */
+ /* V2 18/08 - LỐI CŨ KHÔNG ĐƯỢC CHẾT. Nhật ký rời khỏi Cài đặt, nhưng địa chỉ cũ
+    (`settings` + `SETTAB='nhatky'`) còn nằm trong link người ta đã lưu, trong ảnh chụp màn
+    hướng dẫn, và trong thói quen. Lái ở ĐÂY một chỗ - cùng lối `banlam`/`hanhtrinh` bên dưới. */
+ if(key==="settings"&&String(window.SETTAB||"")==="nhatky"){window.SETTAB="";key="nhatky"}
  if(key==="hanhtrinh"){window.VIECVIEW="chang";key="viec"}
  if(key==="banlam"){window.VIECVIEW="nguoi";key="viec"}
  /* V9.64: bảng công giảng dạy nay là một tab của trang Giảng viên. 4 chỗ trong app đang gọi
@@ -32367,7 +32429,10 @@ var NAVTREE=[
    dùng nó để biết "đang đứng trong một cuốn sổ thì mục Tra cứu phải sáng", và `_checkcauhoi`
    dùng nó để biết các sổ ấy VẪN có lối trên menu (qua cửa cha). */
 var SOTRACUU=["dslienhe","dstest","dstuvan","dsdangky","dsthanhtoan","dsbuoihoc","dsdiemdanh",
- "dsbaitap","dswow","dsphuhuynh","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","nhanvien"];
+ "dsbaitap","dswow","dsphuhuynh","dsketthuc","dskhaosat","dsphanhoi","dskhieunai","khoahoc","nhanvien",
+ /* 18/08 - nhật ký thao tác đứng CUỐI danh sách: nó là sổ tra chuyện của NGƯỜI LÀM, còn mười sáu
+    cuốn trên là sổ tra chuyện của KHÁCH và LỚP. Vào cùng một cửa nhưng không lẫn vào giữa. */
+ "nhatky"];
 /* ═══ V2 - 25 NGHIỆP VỤ ĐÃ RỜI KHỎI BẢNG NÀY ════════════════════════════════════════════════
    `NAVSUB` khai "mục này là MỤC CON của mục kia" - dùng cho `navOwner`, và `navOwner` là thứ
    quyết định mục nào sáng trên sidebar, mục nào bị chặn theo `rs.tabs` của hub chủ.
