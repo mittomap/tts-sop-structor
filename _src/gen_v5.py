@@ -1342,9 +1342,19 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    Nay vạch là `::before` của nhóm đi sau: xuống dòng thì nó đi theo nhóm, không bao giờ còn lại
    một mình. Và dưới 560px thì bỏ hẳn - xuống dòng rồi thì chính cái xuống dòng đã ngăn hộ, đúng
    lý do đã ghi ở `.bwdot`. */
-.tbgr{display:inline-flex;align-items:center;gap:8px}
+/* V2 18/08 - NHÓM NÀY PHẢI BIẾT XUỐNG DÒNG. `.tbar` bọc ngoài đã `flex-wrap:wrap` từ lâu, nên
+   suốt thời gian qua không ai thấy vấn đề: mỗi `.tbgr` chỉ có một hai ô nên nó vừa một hàng.
+   Thêm hai ô lọc cho màn Nhật ký (Kỳ · Loại) là nhóm thành BỐN cặp nhãn + ô chọn, và vì bản thân
+   nó `inline-flex` không xuống dòng nên nó đẩy cả trang cuộn ngang - `_checkui` đo được thừa
+   310px trên điện thoại, 233px trên máy tính bảng.
+   *Một khung biết xuống dòng mà nhét trong nó một khung không biết xuống dòng thì cái ngoài
+   xuống dòng cũng vô ích.* */
+.tbgr{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;max-width:100%}
 .tbgr::before{content:"";width:1px;height:20px;background:var(--line);flex:0 0 auto}
-@media(max-width:560px){.tbgr::before{display:none}.tbgr{gap:0}}
+@media(max-width:560px){.tbgr::before{display:none}.tbgr{gap:0 8px}}
+/* Ô chọn trong nhóm được phép co lại - `white-space:nowrap` của `.qsel` giữ chữ trên một dòng,
+   nên không co thì bốn ô cộng lại luôn rộng hơn màn hình dù nhóm đã biết xuống dòng. */
+@media(max-width:820px){.tbgr .qsel{max-width:44vw}}
 /* V9.67: trên điện thoại phễu XUỐNG DÒNG thay vì cuộn ngang. Một khung cuộn ngang lồng trong
    khung cuộn dọc là thứ khó dùng nhất trên cảm ứng - vuốt một cái không biết mình đang cuộn cái
    nào; và đo được là chính nó làm khung nội dung cuộn thêm 14px. Sáu bước xếp hai hàng vẫn đọc
@@ -17796,6 +17806,10 @@ var APPPARAMS=[
     số 3 trong mã: mỗi cơ sở xoay người nhanh chậm khác nhau, và chính chú thích cũ của trang
     Xếp người dạy thay đã lấy "3 ngày" làm ví dụ - ví dụ thì phải sửa được. */
  ["P6 · Buổi học, điểm danh & bài tập","slaTeacherOffNotice_days","Giáo viên nên báo nghỉ buổi dạy trước bao nhiêu ngày (muộn hơn thì đơn mang dấu báo gấp)","ngày",3],
+ /* Con số 14 này TỪNG NẰM TRẦN trong câu "còn N buổi nữa trong 14 ngày tới" - `_checkaudit` mục
+    M7 bắt đúng: một con số hiện trên màn mà không có bánh răng nào trỏ tới thì nó là hằng số của
+    phần mềm, không phải thông số của trung tâm. */
+ ["P6 · Buổi học, điểm danh & bài tập","teacherOffLookahead_days","Giáo viên nhìn trước bao nhiêu ngày lịch dạy của mình để báo nghỉ","ngày",14],
  ["P6 · Buổi học, điểm danh & bài tập","teacherChangeReasons","Danh sách lý do đổi giáo viên cho một buổi. Mỗi lý do ghi \"Tên lý do|co\" nếu tính là buổi GV nghỉ (trừ vào quota), \"|khong\" nếu không tính; các lý do ngăn nhau bằng dấu phẩy","lý do","GV báo nghỉ / bận việc riêng|co, GV ốm đau|co, GV đến trễ / kẹt không tới kịp|co, Trung tâm dời lịch / đổi GV lâu dài|co","text"],
  ["Giao việc nội bộ","slaTaskAccept_hours","Người nhận phải BẤM NHẬN việc trong bao lâu (quá hạn -> nhắc)","giờ",4],
  ["Giao việc nội bộ","slaTaskConfirm_hours","Người giao phải xác nhận sau khi được báo xong trong bao lâu","giờ",24],
@@ -24296,13 +24310,13 @@ function renderHtToday(embed){
  (function(){
   if(!CURSTAFF)return;
   var toi=gvnCuaToi(),toiCho=toi.filter(function(x){return isc(x.trang_thai,"cho_duyet")});
-  var sap=gvnBuoiToi(CURSTAFF,14);
+  var sap=gvnBuoiToi(CURSTAFF,gvnCuaSo());
   if(!sap.length&&!toi.length)return;
   h+='<div class="panel"><div class="ph"><b><i class="ti ti-calendar-off" style="margin-right:6px"></i>Buổi dạy sắp tới của tôi ('+sap.length+')</b>'+
-   '<span class="mut" style="font-size:11.5px">14 ngày tới · báo nghỉ trước '+slaChip("slaTeacherOffNotice_days",gvnHanBao())+' thì học vụ còn kịp xoay người'+
+   '<span class="mut" style="font-size:11.5px">'+slaChip("teacherOffLookahead_days",gvnCuaSo())+' tới · báo nghỉ trước '+slaChip("slaTeacherOffNotice_days",gvnHanBao())+' thì học vụ còn kịp xoay người'+
    (toiCho.length?(' · <b>'+toiCho.length+' đơn của bạn đang chờ duyệt</b>'):'')+'</span></div>';
   h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Ngày</th><th>Lớp</th><th>Buổi</th><th>Tình trạng</th><th></th></tr></thead><tbody>';
-  if(!sap.length)h+='<tr><td class="empty" colspan="5">14 ngày tới bạn không có buổi dạy nào trên lịch.</td></tr>';
+  if(!sap.length)h+='<tr><td class="empty" colspan="5">Bạn không có buổi dạy nào trên lịch trong cửa sổ này.</td></tr>';
   sap.slice(0,12).forEach(function(x){
    var dn=gvnCuaBuoi(x.session_id);
    var d=pvnd(x.session_date);
@@ -24315,7 +24329,7 @@ function renderHtToday(embed){
         ?'<button class="btn sm" onclick="gvNghiHuy(\''+esc(dn.nghi_id)+'\')"><i class="ti ti-arrow-back-up"></i>Rút đơn</button>'
         :(String(dn.gv_thay_ten||"").trim()?('<span class="chip green">'+esc(dn.gv_thay_ten)+' dạy thay</span>'):'<span class="mut">học vụ đang xếp người</span>'))
       :'<button class="btn sm" onclick="gvNghiForm(\''+esc(x.session_id)+'\')"><i class="ti ti-calendar-off"></i>Báo nghỉ</button>')+'</td></tr>'});
-  if(sap.length>12)h+='<tr><td colspan="5" class="mut" style="font-size:11px;padding:6px">... còn '+(sap.length-12)+' buổi nữa trong 14 ngày tới.</td></tr>';
+  if(sap.length>12)h+='<tr><td colspan="5" class="mut" style="font-size:11px;padding:6px">... còn '+(sap.length-12)+' buổi nữa trong cửa sổ trên.</td></tr>';
   h+='</tbody></table></div></div>'})();
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-star" style="margin-right:6px"></i>Buổi WOW hôm nay ('+wowT.length+')</b><div class="mini"><button class="pill" onclick="go(\'wow\')">Mở trang '+esc((PBK.wow||{}).t||"WOW")+'</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Học viên</th><th>Kỹ năng</th><th>Trọng tâm</th><th>Trạng thái</th><th></th></tr></thead><tbody>';
  if(!wowT.length)h+='<tr><td class="empty" colspan="6">Hôm nay không có buổi WOW nào'+(gid?' của người này':'')+'.</td></tr>';
@@ -24694,6 +24708,7 @@ function gvnBuoiToi(sid,ngay){
    nhận đơn (ốm đột xuất thì không ai báo trước được), nhưng đơn mang cờ "báo gấp" để người
    duyệt và học vụ biết mà xoay người ngay. */
 function gvnHanBao(){var n=num(paramOf("slaTeacherOffNotice_days",3));return n>0?n:3}
+function gvnCuaSo(){var n=num(paramOf("teacherOffLookahead_days",14));return n>0?n:14}
 function gvnGap(x){var d=pvnd((x&&x.session_date)||"");if(!d)return false;
  var bao=pvnd(x.bao_luc)||new Date();
  return (d.getTime()-bao.getTime())<gvnHanBao()*864e5}
@@ -24805,7 +24820,21 @@ function gvNghiQuyetForm(id){
  openDrawer("Duyệt đơn báo nghỉ",h)}
 /* ---- (3) HÀNG CHỜ DUYỆT (tab của hub Chờ duyệt) ---- */
 function duyGvnHTML(){
- var cho=fltApply("duyetgvnghi",gvnCho());
+ var cho0=gvnCho();
+ /* V2 18/08 - DẢI CHIP, KHÔNG DẢI THẺ. Hàng chờ này gộp ba loại đơn mà người duyệt xử lý theo
+    ba nhịp khác hẳn nhau: đơn BÁO GẤP phải quyết ngay trong buổi, đơn KHÔNG CÓ AI THAY ĐƯỢC phải
+    gọi điện trước khi gật, đơn còn lại đọc rồi quyết. Chip mang số VÀ bấm lọc được - đúng luật
+    anh Luân chốt 13/08 (*"nếu trùng thì bỏ thẻ"*), nên trang này không dựng dải thẻ. */
+ var gF=fget("duyetgvnghi");
+ var _nGap=cho0.filter(gvnGap).length;
+ var _nTrong=cho0.filter(function(r){var s0=find("DL11","session_id",r.session_id);
+  return !s0||!gvBackup(s0).filter(function(z){return z.ok}).length}).length;
+ var _nAll=cho0.length;
+ var cho1=cho0;
+ if(gF==="gap")cho1=cho0.filter(gvnGap);
+ else if(gF==="trong")cho1=cho0.filter(function(r){var s0=find("DL11","session_id",r.session_id);
+  return !s0||!gvBackup(s0).filter(function(z){return z.ok}).length});
+ var cho=fltApply("duyetgvnghi",cho1);
  /* Nút Xuất lấy dòng từ `FLTLAST`. Để nguyên thì tệp CSV in ra tên cột kỹ thuật (`nghi_id`,
     `bao_luc`) - đúng con bệnh mà bản khai `SHEETVN` vừa chữa ở nhật ký. Trang tác vụ không có
     LISTCFG thì tự khai bản đọc được, y như `renderNhatky` đang làm. */
@@ -24816,13 +24845,18 @@ function duyGvnHTML(){
   gv_de_xuat:r.de_xuat_gv_ten}});
  var quyen=gvnDuyetDuoc();
  var xep=gvnCanXep();
- var h='<div class="notebar"><i class="ti ti-info-circle"></i><b>Trưởng phòng ACA duyệt</b> đơn báo nghỉ của giáo viên; <b>Trưởng phòng Học vụ thấy cùng lúc</b> để xoay người dạy thay. Giáo viên nên báo trước '+slaChip("slaTeacherOffNotice_days",gvnHanBao())+' - đơn báo muộn hơn mang dấu <b>báo gấp</b>.</div>';
+ /* Câu này từng 178 ký tự - `_checkaudit` bắt đúng luật của app: đoạn nhắc đầu trang phải đọc
+    hết trong một nhịp mắt, phần dài đưa vào chú thích rê chuột. Giữ nguyên đủ ý, chỉ đổi chỗ đặt. */
+ var h='<div class="notebar" data-tour="gvnai" data-tip="Trưởng phòng Học vụ và NV Học vụ thấy cùng hàng chờ này để chuẩn bị xoay người dạy thay, nhưng nút quyết không hiện với họ. Đơn báo muộn hơn hạn vẫn nhận - ốm đột xuất thì không ai báo trước được - nhưng mang dấu báo gấp."><i class="ti ti-info-circle"></i><b>Trưởng phòng ACA duyệt</b>, Học vụ thấy cùng lúc để xoay người dạy thay. Nên báo trước '+slaChip("slaTeacherOffNotice_days",gvnHanBao())+'.</div>';
  if(!quyen)h+='<div class="notebar nbamber"><i class="ti ti-eye"></i>Bạn đang <b>xem</b> hàng chờ này. Quyết định cho nghỉ thuộc Trưởng phòng ACA - việc của bạn là xếp người dạy thay sau khi đơn được duyệt.</div>';
  if(xep.length)h+='<div class="notebar nbamber"><i class="ti ti-user-plus"></i><b>'+xep.length+' buổi đã duyệt cho nghỉ mà chưa có người dạy thay.</b> '+
   '<button class="btn sm" onclick="gvnGoXep()"><i class="ti ti-arrow-right"></i>Mở Xếp người dạy thay</button></div>';
  h+=pgBar("duyetgvnghi",cho.length);
+ h+=chipBar("duyetgvnghi",gF,[["all","Chờ duyệt",_nAll],
+  ["gap","Báo gấp",_nGap,_nGap?"red":""],
+  ["trong","Chưa có ai thay được",_nTrong,_nTrong?"amber":""]]);
  h+='<div class="panel"><div class="pbody">';
- if(!cho.length)h+='<div class="empty">Không có đơn báo nghỉ nào chờ duyệt.</div>';
+ if(!cho.length)h+='<div class="empty">'+(_nAll?"Không có đơn nào khớp chip đang chọn - bấm \"Chờ duyệt\" để xem lại tất cả.":"Không có đơn báo nghỉ nào chờ duyệt.")+'</div>';
  catXem("duygvn",cho,20).forEach(function(r){
   var s=find("DL11","session_id",r.session_id)||{};
   var n=s.session_id?gvBackup(s).filter(function(z){return z.ok}).length:0;
@@ -25067,7 +25101,7 @@ function renderGvdp(embed){
  (function(){var _xp=gvnCanXep();
   if(!_xp.length)return;
   _xp=_xp.slice().sort(function(a,b){return (pvnd(a.session_date)||0)-(pvnd(b.session_date)||0)});
-  h+='<div class="notebar nbred"><i class="ti ti-calendar-off"></i><b>'+_xp.length+' buổi đã duyệt cho giáo viên nghỉ mà chưa có người dạy thay.</b> '+
+  h+='<div class="notebar nbred" data-tour="gvnxep"><i class="ti ti-calendar-off"></i><b>'+_xp.length+' buổi đã duyệt cho giáo viên nghỉ mà chưa có người dạy thay.</b> '+
    _xp.slice(0,4).map(function(z){return '<button class="pill" onclick="gvdpSet(\''+esc(fmtYMD(pvnd(z.session_date)||new Date()))+'\')" data-tip="Chuyển bảng sang ngày của buổi này">'+
     esc((z.class_name||z.class_id||"")+" · "+String(z.session_date||"").slice(0,10))+'</button>'}).join(" ")+
    (_xp.length>4?(' <span class="mut" style="font-size:11.5px">... còn '+(_xp.length-4)+' buổi nữa</span>'):'')+'</div>'})();
@@ -26496,9 +26530,12 @@ var TOURS={
   /* Neo vào chính dòng vàng nói ra luật phân quyền, và hint bảo ĐỌC dòng ấy - không bảo "bấm
      Tiếp theo". `_checktour` bắt đúng ngay lượt đầu: hint nói một đằng, vòng sáng khoanh một nẻo
      thì người học nhìn vào chỗ này mà tay đi tìm chỗ kia. */
-  {p:"duyetgvnghi",sel:'@txt:Trưởng phòng ACA duyệt',t:"Ai quyết, ai chỉ xem",d:"Trưởng phòng ACA duyệt - đây là quyết định chuyên môn. Học vụ thấy cùng hàng chờ này để chuẩn bị xoay người, nhưng nút quyết không hiện với họ.",hint:"Đọc dòng đang được khoanh sáng, rồi đi tiếp."},
+  {p:"duyetgvnghi",sel:'@gvnai',t:"Ai quyết, ai chỉ xem",d:"Trưởng phòng ACA duyệt - đây là quyết định chuyên môn. Học vụ thấy cùng hàng chờ này để chuẩn bị xoay người, nhưng nút quyết không hiện với họ.",hint:"Đọc dòng đang được khoanh sáng, rồi đi tiếp."},
   {p:"duyetgvnghi",sel:'@txt:Xem',t:"Mở một đơn ra xem",d:"Trong đơn có lý do giáo viên nêu, giáo viên họ tự nhờ được ai chưa, và số người có thể dạy thay buổi đó. Quyết xong app ghi tên bạn và thời điểm - và để lại một dòng trong Nhật ký thao tác.",hint:"Bấm nút 'Xem & quyết' hoặc 'Xem đơn' ở một thẻ."},
-  {p:"gvdp",sel:'@man',t:"Duyệt xong thì buổi ấy chảy về đây",d:"Trang Xếp người dạy thay có dải cảnh báo liệt kê buổi đã duyệt cho nghỉ mà chưa có người, cộng chip 'GV đã báo nghỉ'. Xếp xong người thay là lá đơn tự đóng lại - không phải bấm thêm nút nào.",hint:"Xong bài."}]},
+  /* NEO RIÊNG, KHÔNG DÙNG `@man`. `_checkneo` bắt đúng: bước này và bước 1 của bài "Xếp người
+     dạy thay" cùng khoanh cả thân trang gvdp - hai bước khác nhau khoanh cùng một chỗ thì ít
+     nhất một bước đang trỏ sai. Dải cảnh báo đỏ mới chính là thứ bước này đang nói tới. */
+  {p:"gvdp",sel:'@gvnxep',t:"Duyệt xong thì buổi ấy chảy về đây",d:"Trang Xếp người dạy thay có dải cảnh báo liệt kê buổi đã duyệt cho nghỉ mà chưa có người, cộng chip 'GV đã báo nghỉ'. Xếp xong người thay là lá đơn tự đóng lại - không phải bấm thêm nút nào.",hint:"Xong bài."}]},
  cn_thuonghieu:{lv:"chuyennghiep",t:"Đổi thương hiệu và menu",ic:"ti-palette",d:"5 bước - biến app thành bản của trung tâm bạn",steps:[
   {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'@settabs',t:"Trang Cài đặt là trung tâm điều khiển",d:"9 tab: giao diện, menu, phân quyền, ngưỡng SLA, ngưỡng KPI, câu nhắc việc, danh mục, khóa học, nhân sự. App không cắm cứng con số nào.",hint:"Bấm Tiếp theo."},
   {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'@cfbrandten',t:"Tên và logo",d:"Đổi tên hiển thị, tên trung tâm dùng trong tin nhắn gửi khách, tiêu đề tab trình duyệt, và logo - tải ảnh lên hoặc gõ chữ tắt.",hint:"Gõ tên trung tâm của bạn vào ô Tên trên đầu menu.",chk:function(){return (window.TOURB&&((UI().brand||"")+"|"+(UI().navy||""))!==window.TOURB.brand)}},
@@ -31190,8 +31227,10 @@ var NHIP={
   /* V2 18/08 - dòng ĐẦU ngày của Trưởng phòng ACA. Đứng trên cả nhận xét buổi vì nó có ĐỒNG HỒ:
      duyệt trễ một buổi sáng là học vụ mất nguyên buổi chiều để tìm người, và buổi học tối nay
      không có ai đứng lớp. Nhận xét buổi trễ một ngày thì vẫn ghi được. */
+  /* Khai CHIP ĐÍCH ("all" = chip "Chờ duyệt"): con số dòng nhịp và con số chip đọc chung
+     `gvnCho()`, nên bấm từ nhịp sang là rơi đúng danh sách ấy, không lệch một dòng. */
   ["sang","Duyệt đơn giáo viên báo nghỉ","Duyệt trễ là học vụ không kịp tìm người dạy thay - buổi ấy phải huỷ","duyetgvnghi",
-   function(){return gvnCho().length}],
+   function(){return gvnCho().length},"all"],
   ["sang","Soi buổi dạy hôm qua đã có nhận xét chưa","Nhận xét trễ là học viên mất mạch phản hồi, và số SLA của cả phòng lệch theo","buoihoc",
    function(){return srows("DL11").filter(bhQuaHan).length},"overdue"],
   ["sang","Bài tập đang chờ chấm","Chấm trễ thì buổi sau giáo viên không biết lớp yếu chỗ nào","baitap",
@@ -32621,6 +32660,17 @@ NAVKE[arcGrpName("changB")]=[
 /* Cây PHẲNG chia nhóm khác cây chặng: khảo sát / phản hồi / khiếu nại nằm ở nhóm "Chăm sóc &
    Sau khóa", không ở đây. Khai kệ riêng theo ĐÚNG thành viên của nhóm này - dùng chung bảng
    với cây chặng thì kệ "Theo dõi chất lượng" chỉ còn một mục mà vẫn đội một cái tiêu đề. */
+/* ═══ V2 18/08 - NHÓM "CHỜ DUYỆT" CHẠM NGƯỠNG 8 MỤC ═══════════════════════════════════════
+   Thêm "Duyệt GV báo nghỉ" là nhóm này lên 8 mục, và luật L3d của V2 nói rõ: từ 8 mục trở lên
+   thì phải chia kệ, dưới 8 thì không được chia (tiêu đề nhiều hơn nội dung).
+   Chia theo THỨ NGƯỜI DUYỆT ĐANG QUYẾT, không chia theo phòng ban: năm hàng chờ đầu quyết bằng
+   TIỀN (giảm bao nhiêu, hoàn bao nhiêu, khoản này về chưa), ba hàng chờ sau quyết bằng NGƯỜI
+   (ai vắng buổi nào, ai phụ trách khách nào). Hai loại quyết định ấy khác nhau ở chỗ sai thì
+   mất gì - nên người duyệt cũng đọc chúng bằng hai tâm thế khác nhau.
+   *Chia kệ là để MẮT có chỗ bám, nên ranh giới phải là thứ người đọc nhận ra ngay từ cái tên.* */
+NAVKE["Chờ duyệt"]=[
+ ["Quyết định về tiền",["duyetck","duyethoan","duyetthu","duyetdot","duyethd"]],
+ ["Quyết định về người",["duyetnghi","duyetgvnghi","banggiao"]]];
 NAVKE["Lớp học & Giảng dạy"]=[
  ["Làm hằng ngày",["buoihnay","lop","wow","hocvien","giangvien","xeplop","baitap","giaoan"]],
  ["Theo dõi chất lượng",["buoihoc"]],

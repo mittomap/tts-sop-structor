@@ -103,6 +103,9 @@ const KHONGTHE = {
   ketthuc:  _LYDO_TRUNGCHIP,
   magioithieu: _LYDO_TRUNGCHIP,
   duyetnghi:   _LYDO_TRUNGCHIP,
+  /* V2 18/08 - 3 the = 3 chip: Cho duyet · Bao gap · Chua co ai thay duoc. Dung ho hang voi
+     `duyetnghi` ngay tren, va dung luat anh Luan chot 13/08. */
+  duyetgvnghi: _LYDO_TRUNGCHIP,
   duyetdot:    _LYDO_TRUNGCHIP,
   tinnhan:     _LYDO_TRUNGCHIP,
   lop:         _LYDO_TRUNGCHIP,   /* 3 the = 3 chip trang thai lop */

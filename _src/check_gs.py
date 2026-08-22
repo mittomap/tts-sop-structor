@@ -43,7 +43,10 @@ GOC = os.environ.get("ITTS_OUT") or os.path.dirname(SD)
 # ra may chu (tang), hoac vua bo mot cua ghi (giam). Sua bua cho het do la tu tuoc vu khi cua minh.
 # 12/08: 66 -> 73. Bay cua ghi moi cua dot feedback bon team, moi cua noi ra backend dung mot cho:
 #   dotTao · dotDuyet (2 cho: DL27 + DL06b) · msgGui · gvdpThangLuu · hdLuu · lopDayHV · nvNhanHVSave
-SVR_GOI = 76   # +1 (13/08): runGiaoLaiRun - cua ghi 'giao lai lead' theo SOP NA046
+SVR_GOI = 77   # +1 (13/08): runGiaoLaiRun - cua ghi 'giao lai lead' theo SOP NA046
+               # +1 (18/08): gvNghiLuu - cua ghi 'giao vien bao nghi buoi day' (DL33). Mot cua
+               #   ghi moi thi phai co mot cho noi ra backend, neu khong thi mai kia noi that
+               #   se co dung mot bang khong bao gio duoc gui di ma khong ai hay.
                # +1 (17/08): ctLuu - cua BO SUNG CHUNG TU cho mot phieu thu/chi da ghi.
                #   Day dung la mot cua ghi moi va no CO noi ra backend, nen so tang la dung.
                # +1 (15/08): obGuiThat - gui thong tin lop tu luong onboarding, ghi thang vao
