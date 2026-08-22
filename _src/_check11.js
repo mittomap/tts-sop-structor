@@ -500,8 +500,13 @@ t("V9.20 tab Giao dien + Menu co trong Cai dat", (function(){
 /* --- 12. V9.21: tour huong dan tung buoc --- */
 /* V9.34: TOURLV nay co 4 dong - 3 cap bai viet san + tang "Don viec hom nay" (buoc sinh tu hang
    cho, co y khong co bai viet san). Tieu chi cu dang doi MOI cap deu phai co bai. */
-t("V9.34 3 cap bai viet san deu co bai, cong tang don viec", (function(){var c={};Object.keys(TOURS).forEach(function(k){c[TOURS[k].lv]=1});
- return TOURLV.length===4&&TOURLV.filter(function(V){return V[0]!=="donviec"}).every(function(V){return c[V[0]]})&&!c.donviec})());
+/* 18/08 - BO CHOT SO 4. Hai tieu chi nay cam cung "dung 4 cap do", nen them cap thu nam
+   ("Lam mot viec cu the") la do - trong khi thu chung SINH RA de canh la: cap nao khai ra thi
+   phai co bai that, va tang "Don viec hom nay" thi CO Y khong co bai viet san.
+   Hoi dung dieu ay thi them cap thu sau cung khong gay, ma khai mot cap rong van do.
+   *Chot mot con so la chot cai hien co; chot mot LUAT la chot cai phai dung.* */
+t("moi cap do khai ra deu co bai that, rieng tang don viec co y khong co", (function(){var c={};Object.keys(TOURS).forEach(function(k){c[TOURS[k].lv]=1});
+ return TOURLV.length>=4&&TOURLV.filter(function(V){return V[0]!=="donviec"}).every(function(V){return c[V[0]]})&&!c.donviec})());
 t("V9.21 co tour theo tung vi tri (trai nghiem)", Object.keys(TOURS).filter(function(k){return TOURS[k].lv==="trainghiem"&&TOURS[k].role}).length>=4);
 /* V9.27: anh Luan yeu cau bo cap do KY THUAT (DEV) - huong dan trong app chi phuc vu nguoi dung
    nghiep vu; chuyen ky thuat nam o README_SRC.md va nhat ky, khong bay ra man hinh demo. */
@@ -509,7 +514,7 @@ t("V9.27 khong con cap do huong dan DEV", Object.keys(TOURS).filter(function(k){
 t("V9.27 TOURLV cung khong con dong dev", TOURLV.filter(function(r){return r[0]==="dev"}).length===0);
 /* V9.34: 3 cap do BAI VIET SAN + 1 tang "Don viec hom nay" (tro thu nhap vao guide). Tang do CO Y
    khong co bai viet san nao - buoc cua no sinh tu hang cho that luc chay. */
-t("V9.34 co 3 cap do bai viet san + 1 tang don viec", TOURLV.length===4&&TOURLV[3][0]==="donviec");
+t("van con tang \"Don viec hom nay\" trong danh sach cap do", TOURLV.some(function(V){return V[0]==="donviec"}));
 t("V9.34 moi cap do VIET SAN deu con bai huong dan",
   TOURLV.filter(function(r){return r[0]!=="donviec"}).filter(function(r){return !Object.keys(TOURS).some(function(k){return TOURS[k].lv===r[0]})}).length===0);
 t("V9.34 tang don viec dung duoc bai tu hang cho", (function(){
