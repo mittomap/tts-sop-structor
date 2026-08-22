@@ -23410,6 +23410,22 @@ var TOURS={
   {p:"congno",sel:'@txt:Toàn kỳ',t:"Chọn kỳ số liệu",d:"Toàn kỳ là số tới hôm nay của mọi đơn; chọn một kỳ thì lọc theo ngày đăng ký đơn, và có thêm cột 'Thu trong kỳ'.",hint:"Bấm 'Toàn kỳ' hoặc một kỳ khác để thấy số đổi theo."},
   {p:"congno",sel:'@txt:Quá hạn',t:"Ai phải gọi trước",d:"Chip này lọc ra những học viên đã trễ hạn đóng đợt - gọi theo thứ tự này thay vì gọi từ trên xuống.",hint:"Bấm chip 'Quá hạn'."},
   {p:"congno",sel:'@txt:Chưa có ảnh chứng từ',t:"Phiếu nào còn thiếu chứng từ",d:"Thu tiền thì phải có ảnh phiếu. Chip này lọc ra phiếu chưa đính ảnh; mở ngăn kéo của học viên đó là bổ sung được ngay.",hint:"Bấm chip 'Chưa có ảnh chứng từ'. Xong bài."}]},
+ /* V2 18/08 - bài thứ năm của cấp "Làm một việc cụ thể", dựng cùng ngày với nghiệp vụ nó dạy.
+    `_checktour` bắt được ngay lượt verify đầu: trang `duyetgvnghi` mới sinh mà KHÔNG bài hướng
+    dẫn nào đi qua. Đó là một câu hỏi đúng - một trang không nằm trong bài nào thì người mới nhận
+    bàn giao không có đường nào biết nó tồn tại.
+    Bài đi ĐÚNG ĐƯỜNG DÂY CHUYỀN chứ không đứng yên một trang: đơn nằm ở đâu · quyết ở đâu · rồi
+    buổi ấy chảy sang chỗ nào để xếp người - vì cái người ta hay hỏng là KHÚC NỐI giữa hai phòng,
+    không phải cái nút bấm. */
+ vi_gvnghi:{lv:"theoviec",t:"Giáo viên báo nghỉ - từ lá đơn tới người dạy thay",ic:"ti-calendar-off",
+  d:"4 bước - đơn nằm ở đâu, ai quyết, rồi buổi ấy chảy sang đâu",steps:[
+  {p:"duyetgvnghi",sel:'@man',t:"Hàng chờ đơn báo nghỉ",d:"Giáo viên báo nghỉ một buổi dạy thì đơn rơi vào đây. Mỗi thẻ nói đủ ba thứ để quyết ngay: khóa này giáo viên còn bao nhiêu buổi nghỉ trong quota, có ai thay được buổi đó không, và đơn có phải báo gấp không.",hint:"Bấm Tiếp theo."},
+  /* Neo vào chính dòng vàng nói ra luật phân quyền, và hint bảo ĐỌC dòng ấy - không bảo "bấm
+     Tiếp theo". `_checktour` bắt đúng ngay lượt đầu: hint nói một đằng, vòng sáng khoanh một nẻo
+     thì người học nhìn vào chỗ này mà tay đi tìm chỗ kia. */
+  {p:"duyetgvnghi",sel:'@txt:Trưởng phòng ACA duyệt',t:"Ai quyết, ai chỉ xem",d:"Trưởng phòng ACA duyệt - đây là quyết định chuyên môn. Học vụ thấy cùng hàng chờ này để chuẩn bị xoay người, nhưng nút quyết không hiện với họ.",hint:"Đọc dòng đang được khoanh sáng, rồi đi tiếp."},
+  {p:"duyetgvnghi",sel:'@txt:Xem',t:"Mở một đơn ra xem",d:"Trong đơn có lý do giáo viên nêu, giáo viên họ tự nhờ được ai chưa, và số người có thể dạy thay buổi đó. Quyết xong app ghi tên bạn và thời điểm - và để lại một dòng trong Nhật ký thao tác.",hint:"Bấm nút 'Xem & quyết' hoặc 'Xem đơn' ở một thẻ."},
+  {p:"gvdp",sel:'@man',t:"Duyệt xong thì buổi ấy chảy về đây",d:"Trang Xếp người dạy thay có dải cảnh báo liệt kê buổi đã duyệt cho nghỉ mà chưa có người, cộng chip 'GV đã báo nghỉ'. Xếp xong người thay là lá đơn tự đóng lại - không phải bấm thêm nút nào.",hint:"Xong bài."}]},
  cn_thuonghieu:{lv:"chuyennghiep",t:"Đổi thương hiệu và menu",ic:"ti-palette",d:"5 bước - biến app thành bản của trung tâm bạn",steps:[
   {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'@settabs',t:"Trang Cài đặt là trung tâm điều khiển",d:"9 tab: giao diện, menu, phân quyền, ngưỡng SLA, ngưỡng KPI, câu nhắc việc, danh mục, khóa học, nhân sự. App không cắm cứng con số nào.",hint:"Bấm Tiếp theo."},
   {p:"settings",ctx:function(){window.SETTAB="brand"},sel:'@cfbrandten',t:"Tên và logo",d:"Đổi tên hiển thị, tên trung tâm dùng trong tin nhắn gửi khách, tiêu đề tab trình duyệt, và logo - tải ảnh lên hoặc gõ chữ tắt.",hint:"Gõ tên trung tâm của bạn vào ô Tên trên đầu menu.",chk:function(){return (window.TOURB&&((UI().brand||"")+"|"+(UI().navy||""))!==window.TOURB.brand)}},

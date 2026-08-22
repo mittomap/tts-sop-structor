@@ -2617,3 +2617,47 @@ Không phải chuyện gọn mắt - ba chỗ này là lỗi thật, dọn thẻ
 Màn Xếp lớp có hai mốc SLA kèm bánh răng chỉnh ngưỡng nằm trong thẻ. Nay chúng nằm ở dòng ngay
 dưới dải chip: *"Hạn gửi thông tin lớp 24h - hạn hoàn tất onboarding 72h - quá là vào nhóm Quá
 hạn."* Bấm vào con số vẫn mở thẳng Cài đặt.
+
+
+---
+
+# Cập nhật 18/08 — Giáo viên báo nghỉ buổi dạy · hai trục lọc mới cho Nhật ký
+
+## Giáo viên báo nghỉ (bảng DL33)
+
+App vốn đã có đủ bộ máy XỬ LÝ khi giáo viên nghỉ - trang **Xếp người dạy thay**, sổ ca dạy thay,
+danh sách dự phòng theo tháng, quota "một khóa GV chính được nghỉ mấy buổi". Cái thiếu là **cửa để
+giáo viên nói rằng mình nghỉ**. Nay có.
+
+**Giáo viên báo ở đâu:** trang *Học tập & Giảng dạy → Buổi hôm nay*.
+- Nút **"Báo nghỉ buổi này"** ngay trên thẻ buổi đang dạy hôm nay (dành cho ca ốm đột xuất).
+- Khối **"Buổi dạy sắp tới của tôi"** - 14 ngày tới, mỗi buổi một nút Báo nghỉ. Khối này cũng là
+  chỗ giáo viên **theo dõi đơn mình đã gửi**: đang chờ duyệt / đã duyệt / ai dạy thay. Đơn chưa ai
+  quyết thì rút lại được.
+
+**Ai duyệt:** **Trưởng phòng ACA** - tab **"GV báo nghỉ"** trong nhóm *Chờ duyệt* trên thanh menu.
+**Trưởng phòng Học vụ và NV Học vụ thấy cùng tab ấy** (họ là người xoay người dạy thay) nhưng không
+có nút quyết - chặn ở cửa ghi, không phải chỉ giấu nút.
+
+**Sau khi duyệt:** buổi ấy vào hàng chờ của trang **Xếp người dạy thay** - có dải cảnh báo đỏ liệt
+kê từng buổi kèm nút nhảy thẳng sang đúng ngày, và một chip lọc mới **"GV đã báo nghỉ"**. Xếp xong
+người thay là lá đơn tự đóng lại, không phải bấm thêm nút nào.
+
+**Báo trước bao lâu là đủ sớm:** tham số CH2 mới `slaTeacherOffNotice_days` (mặc định **3 ngày**).
+Báo muộn hơn vẫn gửi được - ốm đột xuất thì không ai báo trước - nhưng đơn mang dấu **"báo gấp"**.
+Lý do nghỉ lấy từ danh mục `teacherChangeReasons` có sẵn ở Cài đặt.
+
+**Ghi vết:** cả bốn cửa ghi của nghiệp vụ này đều để lại dòng trong **Nhật ký thao tác** - gửi đơn,
+duyệt, từ chối, rút đơn, và cả lượt xếp người dạy thay.
+
+## Nhật ký thao tác - lọc theo kỳ và theo loại thao tác
+
+Trang **Cài đặt → Dữ liệu & Sổ sách → Nhật ký thao tác** trước nay lọc được theo **Bảng** và theo
+**Người**. Nay thêm hai ô nữa, đúng hai câu người ta hỏi cuốn sổ này nhiều nhất:
+- **Kỳ**: Mọi lúc · Hôm nay · 7 ngày qua · 30 ngày qua.
+- **Loại**: Mọi thao tác · Tạo mới · Cập nhật · Xóa · Hoàn tác.
+
+Cùng lượt này: cột **Thay đổi** không còn in tên ô bằng chữ máy (`next_payment_due` →
+"Hạn đóng kế tiếp"), và bỏ hai ô `updated_by` / `updated_at` - chúng lặp lại đúng hai cột **Lúc**
+và **Người** nằm ngay bên cạnh. Ô lọc **Bảng** cũng đã có tên tiếng Việt cho ba bảng mới nhất
+(Ca dạy thay · Kho mẫu tin · Giáo viên báo nghỉ).
