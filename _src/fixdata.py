@@ -540,7 +540,23 @@ try:
             _SPAN_H = float(n(_p.get("value") or _p.get("val") or 2)) or 2.0
 except Exception:
     pass
+def _doiGioBuoi(_se, _cu, _moi):
+    """Doi gio mot buoi hoc, MANG THEO moi moc gio thuc te cua chinh buoi ay.
+
+    Doi mot minh `session_date` la de lai mot buoi bat dau luc 16:00 ma gio vao lop ghi 14:00 -
+    tuc bao cao 'giao vien den som 2 tieng', va la mot dong du lieu khong the co that."""
+    _delta = _moi - _cu
+    _se["session_date"] = fmt(_moi)
+    if str(_se.get("class_start_scheduled") or "").strip():
+        _se["class_start_scheduled"] = fmt(_moi)
+    for _k68 in ("class_start_actual", "class_end_actual"):
+        _cu2 = dt(_se.get(_k68))
+        if _cu2:
+            _se[_k68] = fmt(_cu2 + _delta)
+
+
 _theoLop = {}
+_dayBo = 0
 for _se in R("DL11"):
     if code(_se.get("session_status") or "") == "cancelled":
         continue
@@ -553,14 +569,49 @@ for _cid, _ds in _theoLop.items():
         _a, _b = dt(_ds[_i - 1].get("session_date")), dt(_ds[_i].get("session_date"))
         if not _a or not _b:
             continue
-        while _b and (_b - _a).total_seconds() / 3600.0 < _SPAN_H:
-            _b = _b + datetime.timedelta(days=1)
-            _day += 1
-        if _b != dt(_ds[_i].get("session_date")):
-            _ds[_i]["session_date"] = fmt(_b)
-            if str(_ds[_i].get("class_start_scheduled") or "").strip():
-                _ds[_i]["class_start_scheduled"] = fmt(_b)
-log.append("23. Buoi trung gio trong cung mot lop: day %d buoi sang ngay hom sau" % _day)
+        # ═══ 18/08 - DAY TRONG CUNG MOT NGAY, VA MANG THEO GIO DAY THUC TE ══════════════
+        # Ban dau khoi nay day buoi sau sang NGAY HOM SAU. Ngay 22/08 no day mot buoi tu QUA KHU
+        # sang TUONG LAI - ma buoi ay dang mang trang thai "Da hoan thanh", co gio vao lop that,
+        # va co 12 dong diem danh treo vao no. `check_logic` bat dung: mot buoi chua toi ma da
+        # diem danh xong. Vet nay xuat hien roi bien mat theo NGAY CHAY, dung loai bay ma chinh
+        # chu thich cua khoi nay noi la phai chan tai nguon.
+        # *Mot buoi hoc khong phai mot o ngay - no keo theo diem danh, gio vao lop, nhan xet.
+        # Doi cai moc cua no ma khong doi ca chum ay la de lai mot dong tu mau thuan.*
+        #
+        # BA luat cua phep doi gio o day, xep theo do uu tien:
+        #   1. Doi trong CUNG MOT NGAY - de diem danh va bai tap khong lech ngay.
+        #   2. Khong doi mot buoi DA DIEN RA sang phia sau dong ho hien tai (va nguoc lai).
+        #   3. Doi den dau thi gio vao lop / gio ra ve di theo den do.
+        _canh = _a + datetime.timedelta(hours=_SPAN_H)
+        if _b and _b < _canh:
+            _ok = False
+            # (a) day buoi SAU ra sau - cach thuong dung.
+            _moi = _canh
+            if _moi.minute:
+                _moi = _moi.replace(minute=0) + datetime.timedelta(hours=1)
+            if (_moi.date() == _b.date() and _moi.hour <= 22
+                    and ((_b > NOW) == (_moi > NOW))):
+                _doiGioBuoi(_ds[_i], _b, _moi)
+                _ok = True
+            if not _ok:
+                # (b) khong duoc thi keo buoi TRUOC len som hon - van trong ngay cua no.
+                _moi2 = _b - datetime.timedelta(hours=_SPAN_H)
+                if _moi2.minute:
+                    _moi2 = _moi2.replace(minute=0)
+                if (_moi2.date() == _a.date() and _moi2.hour >= 6
+                        and ((_a > NOW) == (_moi2 > NOW))):
+                    _doiGioBuoi(_ds[_i - 1], _a, _moi2)
+                    _a = _moi2
+                    _ok = True
+            if _ok:
+                _day += 1
+            else:
+                # Khong go duoc ma khong lam hong gi thi THOI - khai ra. Mot dong khai la mot
+                # viec ton; mot dong du lieu tu mau thuan la mot cai bay.
+                _dayBo += 1
+log.append("23. Buoi trung gio trong cung mot lop: go %d cho (doi gio trong cung ngay, keo theo"
+           " gio vao lop) | %d cho khong go duoc ma khong lam hong du lieu - de nguyen"
+           % (_day, _dayBo))
 
 # ═══ 24. KHO MAU TIN GUI KHACH - DL32 (16/08) ════════════════════════════════════════════
 # Anh Luan: *"Cai do dau phai thong diep nhac viec, no la 1 trang rieng, chuyen soan mau mail va
@@ -3733,6 +3784,109 @@ for _i, _p in enumerate(_p07):
         _ctCo += 1
 log.append("25. Chung tu DL07: %d phieu co anh | %d khai ly do | %d con thieu / %d phieu"
            % (_ctCo, _ctLy, _ctThieu, len(_p07)))
+
+# ═══ 26. DL33 · GIAO VIEN BAO NGHI BUOI DAY (18/08) ════════════════════
+# Anh Luan chot: *"truong phong aca duyet, truong phong hoc vu cung biet"*.
+#
+# GIEO VAO DUNG CHO TINH NANG DOC, khong gieo rai deu - dung luat ma khoi DL31 phia tren da dat.
+# Ba trang thai phai co mat cung luc, vi ba trang thai ay hien o BA CHO KHAC NHAU tren app:
+#   (1) cho_duyet -> hang cho cua Truong phong ACA (tab "GV bao nghi")
+#   (2) da_duyet, chua co nguoi thay -> dai canh bao do o trang "Xep nguoi day thay" + chip
+#       "Chua co nguoi dung lop" + con so "lop thieu giao vien" cua nhip ngay
+#   (3) da_duyet, DA xep nguoi thay -> khoi "Da quyet gan day", de nguoi xem thay ca ket cuc
+# Thieu mot trang thai la mot trong ba man ay ra bang rong, va nguoi xem demo ket luan la tinh
+# nang hong chu khong ket luan la du lieu thieu.
+#
+# Gieo TAT DINH theo chi so (khong boc tham) de `check_taolai` dung lai duoc y het hai luot.
+_gvN = [x for x in R("DL01")
+        if "teacher" in code(x.get("role") or "") and code(x.get("status") or "") in ("active", "")]
+_gvN.sort(key=lambda x: str(x.get("staff_id") or ""))
+_tpAca = ([x for x in R("DL01") if code(x.get("role") or "") == "aca_manager"] or [{}])[0]
+_lopN = {str(x.get("class_id") or ""): x for x in R("DL10")}
+_nghi = d["dl"].setdefault("DL33", [])
+if not _nghi and _gvN:
+    _LYDO = [u"GV \u1ed1m \u0111au",
+             u"GV b\u00e1o ngh\u1ec9 / b\u1eadn vi\u1ec7c ri\u00eang",
+             u"GV \u1ed1m \u0111au"]
+    _GHI = [u"S\u1ed1t cao t\u1eeb \u0111\u00eam, c\u00f3 gi\u1ea5y kh\u00e1m c\u1ee7a ph\u00f2ng kh\u00e1m",
+            u"\u0110\u00e1m c\u01b0\u1edbi ng\u01b0\u1eddi nh\u00e0 \u1edf t\u1ec9nh, \u0111\u00e3 b\u00e1o tr\u01b0\u1edbc m\u1ed9t tu\u1ea7n",
+            u"\u0110au d\u1ea1 d\u00e0y, \u0111ang n\u1eb1m vi\u1ec7n theo d\u00f5i"]
+    _ung = []
+    for _s33 in R("DL11"):
+        _dd = dt(_s33.get("session_date"))
+        if not _dd or _dd <= NOW:
+            continue
+        if code(_s33.get("session_status") or "") == "cancelled":
+            continue
+        if not str(_s33.get("teacher_id") or "").strip():
+            continue
+        _ung.append((_dd, _s33))
+    _ung.sort(key=lambda z: (z[0], str(z[1].get("session_id") or "")))
+    # Moi giao vien nhieu nhat mot don - mot nguoi bao nghi ba buoi lien la mot cau chuyen khac
+    # (bo viec), khong phai cau chuyen ma man hinh nay ke.
+    _daGv, _chon = set(), []
+    for _dd, _s33 in _ung:
+        _gid = str(_s33.get("teacher_id") or "")
+        if _gid in _daGv:
+            continue
+        _daGv.add(_gid)
+        _chon.append((_dd, _s33))
+        if len(_chon) >= 3:
+            break
+    for _i33, (_dd, _s33) in enumerate(_chon):
+        _g33 = ([x for x in R("DL01")
+                 if str(x.get("staff_id") or "") == str(_s33.get("teacher_id") or "")] or [{}])[0]
+        _c33 = _lopN.get(str(_s33.get("class_id") or ""), {})
+        # Bao truoc 4 ngay (du som) o don dau, 1 ngay (bao gap) o don thu hai - de ca hai nhanh
+        # cua co "bao gap" deu co dong that de xem.
+        _bao = _dd - datetime.timedelta(days=[4, 1, 6][_i33])
+        _r33 = {
+            "nghi_id": "GVN-%04d" % (_i33 + 1),
+            "staff_id": _g33.get("staff_id") or "",
+            "staff_name": _g33.get("full_name") or "",
+            "session_id": _s33.get("session_id") or "",
+            "class_id": _s33.get("class_id") or "",
+            "class_name": _c33.get("class_name") or _s33.get("class_id") or "",
+            "session_number": _s33.get("session_number") or "",
+            "session_date": _s33.get("session_date") or "",
+            "ly_do": _LYDO[_i33],
+            "ghi_chu": _GHI[_i33],
+            "de_xuat_gv": "",
+            "de_xuat_gv_ten": "",
+            "bao_luc": _bao.strftime("%d/%m/%Y %H:%M"),
+            "trang_thai": u"cho_duyet (Ch\u1edd duy\u1ec7t)",
+            "duyet_boi": "",
+            "duyet_boi_ten": "",
+            "duyet_luc": "",
+            "duyet_ghichu": "",
+            "gv_thay": "",
+            "gv_thay_ten": "",
+            "xep_luc": "",
+        }
+        if _i33 == 1:
+            # (2) da duyet, CHUA co nguoi thay - dong lam dai canh bao do sang len.
+            _r33["trang_thai"] = u"da_duyet (\u0110\u00e3 duy\u1ec7t)"
+            _r33["duyet_boi"] = _tpAca.get("staff_id") or ""
+            _r33["duyet_boi_ten"] = _tpAca.get("full_name") or ""
+            _r33["duyet_luc"] = (_bao + datetime.timedelta(hours=3)).strftime("%d/%m/%Y %H:%M")
+            _r33["duyet_ghichu"] = u"\u0110\u1ed3ng \u00fd - nh\u1edd h\u1ecdc v\u1ee5 xoay ng\u01b0\u1eddi gi\u00fap"
+        elif _i33 == 2:
+            # (3) da duyet VA da xep xong nguoi thay - tron vong doi, de nguoi xem thay ket cuc.
+            _thay = ([x for x in _gvN
+                      if str(x.get("staff_id") or "") != str(_g33.get("staff_id") or "")] or [{}])[0]
+            _r33["trang_thai"] = u"da_duyet (\u0110\u00e3 duy\u1ec7t)"
+            _r33["duyet_boi"] = _tpAca.get("staff_id") or ""
+            _r33["duyet_boi_ten"] = _tpAca.get("full_name") or ""
+            _r33["duyet_luc"] = (_bao + datetime.timedelta(hours=2)).strftime("%d/%m/%Y %H:%M")
+            _r33["duyet_ghichu"] = u"\u0110\u1ed3ng \u00fd cho ngh\u1ec9"
+            _r33["gv_thay"] = _thay.get("staff_id") or ""
+            _r33["gv_thay_ten"] = _thay.get("full_name") or ""
+            _r33["xep_luc"] = (_bao + datetime.timedelta(hours=6)).strftime("%d/%m/%Y %H:%M")
+        _nghi.append(_r33)
+    log.append("26. DL33 GV bao nghi: gieo %d don (%d cho duyet, %d da duyet)"
+               % (len(_nghi),
+                  len([x for x in _nghi if x["trang_thai"].startswith("cho_duyet")]),
+                  len([x for x in _nghi if x["trang_thai"].startswith("da_duyet")])))
 
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("  12. Da tao DL22 referral +", len(dl["DL22"]), "luot | DL19 thuong:", len(dl["DL19"]))

@@ -3806,6 +3806,10 @@ var PAGES=[
 {k:"duyetck",g:"_",ic:"ti-discount-2",t:"Duyệt chiết khấu",c:"Chiết khấu vượt ngưỡng chờ quản lý",ty:"custom"},
 {k:"duyethoan",g:"_",ic:"ti-arrow-back-up",t:"Duyệt hoàn tiền",c:"Hoàn tiền theo mốc SOP",ty:"custom"},
 {k:"duyetnghi",g:"_",ic:"ti-user-question",t:"Duyệt xin nghỉ học",c:"Học viên báo nghỉ chờ học vụ duyệt",ty:"custom"},
+/* V2 18/08 - GIÁO VIÊN báo nghỉ buổi dạy. Đứng riêng với `duyetnghi` (HỌC VIÊN xin nghỉ buổi
+   học) vì khác người gửi, khác người duyệt và khác hậu quả: học viên nghỉ thì chốt chuyên cần,
+   giáo viên nghỉ thì phải có người khác đứng lớp trước giờ học. */
+{k:"duyetgvnghi",g:"_",ic:"ti-calendar-off",t:"Duyệt GV báo nghỉ",c:"Giáo viên xin nghỉ buổi dạy - TP ACA duyệt, học vụ xoay người",ty:"custom"},
 {k:"duyetthu",g:"_",ic:"ti-receipt",t:"Xác nhận thu tiền",c:"Kế toán đối soát khoản đã ghi",ty:"custom"},
 {k:"congno",g:"Điều hành",ic:"ti-report-money",t:"Công nợ học viên",c:"Giá trị hợp đồng, đã thu, còn phải thu theo từng người",ty:"custom"},
 /* V2 12/08 (SALE-4 + SALE-5) - hàng chờ thứ sáu: đổi đợt đóng (xin gia hạn / xin chia lại). */
@@ -3961,7 +3965,13 @@ var ROLESCOPE={
      Đo trước khi sửa: đóng vai đủ 16 chức danh rồi hỏi `navVis("gvdp")` - CHỈ quản trị mở được,
      trong khi chú thích trong mã khai đây là cửa ghi của Học vụ / TP ACA. Chú thích nói một đằng,
      cấu hình chạy một nẻo - và cái chạy thì thắng. */
-  pages:["viec","hocvien","giangvien","hosogv","banglop","hoctap","hosokhoa","giaoan","baitap","ketqua","bangcong","lichwow","gvdp"],
+  /* V2 18/08 - thêm `duyet`: anh Luân *"trưởng phòng aca duyệt, trưởng phòng học vụ cũng biết"*.
+     Trưởng phòng ACA trước nay KHÔNG có hub Chờ duyệt nào - họ không duyệt tiền, nên chưa cần.
+     Đơn giáo viên báo nghỉ là quyết định chuyên môn đầu tiên rơi vào tay họ, nên mở hub với
+     ĐÚNG MỘT tab; các tab tiền vẫn khoá. Học vụ thấy cùng tab ấy nhưng không có nút quyết -
+     `gvnDuyetDuoc()` canh ở CỬA GHI chứ không chỉ giấu nút. */
+  pages:["viec","hocvien","giangvien","hosogv","banglop","hoctap","hosokhoa","giaoan","baitap","ketqua","bangcong","lichwow","gvdp","duyet"],
+  tabs:{duyet:["duyetgvnghi"]},
   blocks:["test_grading","risk"],mine:0,mineBtn:0,kpi:1,mgr:1,
   /* V9.99y (anh Luân 05/08): *"Trưởng phòng aca cũng quản lý toàn bộ team Wow, em đừng quên"*.
      Đội WOW nằm trong phòng ACA nên phạm vi NGƯỜI đã đúng sẵn; thiếu là cái chuông - 21 việc
@@ -3981,7 +3991,7 @@ var ROLESCOPE={
      sổ mà không được mở chính cuốn sổ ấy ra tra là vô lý; `_checktour` bắt được ngay khi em thêm
      một bước hướng dẫn trỏ vào sổ này cho Học vụ. */
   pages:["viec","hocvien","giangvien","hosogv","xeplop","banglop","hoctap","hosokhoa","giaoan","cskh","ychv","ketthuc","ketqua","khac","duyet","lichwow","gvdp","congno","tinnhan","socamket"],
-  tabs:{khac:["baoluu"],duyet:["duyetnghi"]},
+  tabs:{khac:["baoluu"],duyet:["duyetnghi","duyetgvnghi"]},
   blocks:["test_grading","paid","onboarding","risk","wow"],mine:0,mineBtn:1,kpi:1,bell:["Học vụ","CSKH","Giao việc"]},
  /* V9.99z5 - GIÁO VIÊN không xếp người dạy thay và không gỡ đụng phòng: hai màn ấy là cửa
     GHI của Học vụ / Trưởng phòng ACA (CH3). Trước bản này chúng vẫn mở cho giáo viên, đầy nút
@@ -9357,6 +9367,7 @@ function duyTabs(){
   {k:"duyetck",  t:"Chiết khấu",     ic:"ti-discount-2",   n:duyCkList().length},
   {k:"duyethoan",t:"Hoàn tiền",      ic:"ti-arrow-back-up",n:duyRefundList().length},
   {k:"duyetnghi",t:"Xin nghỉ học",   ic:"ti-user-question",n:absQueue().length},
+  {k:"duyetgvnghi",t:"GV báo nghỉ",  ic:"ti-calendar-off", n:gvnCho().length},
   {k:"duyetthu", t:"Xác nhận thu tiền",ic:"ti-receipt",    n:duyPayList().length},
   /* V2 12/08 (SALE-4) - Trưởng phòng Tư vấn: *"chỗ chờ duyệt này được cho em xin thêm cái duyệt
      gia hạn đợt đóng nữa"*. Cùng một tab gánh luôn SALE-5 (xin chia lại đợt) vì hai thứ đều là
@@ -9473,6 +9484,7 @@ function renderDuyet(){var TH=ckThreshold();
  if(tab==="duyetdot")return h+duyDotHTML()+_ai;
  if(tab==="duyethd")return h+duyHdHTML()+_ai;
  if(tab==="duyetnghi")return h+duyNghiHTML()+_ai;
+ if(tab==="duyetgvnghi")return h+duyGvnHTML()+_ai;
  if(tab==="duyetthu")return h+duyThuHTML()+_ai;
  if(tab==="banggiao")return h+renderBanggiao(1)+_ai;
  if(tab==="duyethoan")return h+duyHoanHTML()+_ai;
@@ -16021,7 +16033,11 @@ var SHEETVN={DL01:"Nhân sự",DL02:"Lead",DL02b:"Lượt chạm lead",DL03:"Tes
  DL15:"Khảo sát",DL16:"Ghi nhận phản hồi",DL17:"Khiếu nại",DL18:"Kết thúc khóa",DL18b:"Kỳ thi IELTS thật",DL19:"Nhật ký hệ thống",
  DL20:"Giáo án - Buổi & Bài tập",DL21:"Giáo án chi tiết",DL22:"Tham số",DL23:"Việc được giao",
  DL24:"Trao đổi trong việc",DL25:"Nhật ký thao tác",DL26:"Lịch trực NV WOW",
- DL27:"Yêu cầu đổi đợt đóng",DL28:"Giảng viên dự phòng theo tháng",DL29:"Sổ tin đã gửi",DL30:"Hợp đồng cam kết đầu ra"};
+ DL27:"Yêu cầu đổi đợt đóng",DL28:"Giảng viên dự phòng theo tháng",DL29:"Sổ tin đã gửi",DL30:"Hợp đồng cam kết đầu ra",
+ /* V2 18/08 - ba bảng dưới đây SINH RA RỒI MÀ CHƯA CÓ TÊN TIẾNG VIỆT ở bản khai này. Nhật ký
+    thao tác in ra "DL31", "DL32" trần trụi, và ô lọc theo bảng cũng bày đúng chuỗi mã ấy.
+    *Một bảng có tên trong sổ mà không có tên trên màn thì người tra không tìm thấy nó.* */
+ DL31:"Ca dạy thay đã đăng ký",DL32:"Kho mẫu tin gửi khách",DL33:"Giáo viên báo nghỉ buổi dạy"};
 function sheetVN(c){return SHEETVN[c]?(SHEETVN[c]+" ("+c+")"):(c||"")}
 function logForRow(code,id){return logRows().filter(function(e){
  return e.sheet===code&&String(e.row_id)===String(id)})}
@@ -16034,11 +16050,31 @@ function logRowHTML2(L,lim){
   '</td><td><span class="chip">'+esc(e.action)+'</span></td><td style="white-space:normal">'+esc(e.summary||"-")+'</td></tr>'});
  return h+'</tbody></table>'}
 function logRowHTML(code,id,lim){return logRowHTML2(logForRow(code,id),lim)}
+/* ═══ V2 18/08 - HAI TRỤC LỌC CÒN THIẾU CỦA NHẬT KÝ ═════════════════════════════════════════
+   Anh Luân hỏi *"tiện thể xem log ở đâu? có phân nhóm chưa"*. Có ba trục: tìm chữ, theo Bảng,
+   theo Người. Nhưng hai câu hỏi mà người ta hỏi cuốn sổ này NHIỀU NHẤT thì không có trục nào:
+   *"hôm nay ai làm gì"* (trục THỜI GIAN) và *"có ai xoá cái gì không"* (trục LOẠI THAO TÁC).
+   Trục thời gian thì mỗi dòng đã có sẵn `log_time`, trục loại thì đã có sẵn `kind` - dữ liệu
+   nằm đó từ đầu, chỉ là không có cửa nào hỏi tới.
+   *Một cuốn sổ tra được theo ba trục nhưng thiếu đúng trục "hôm nay" thì người ta vẫn phải cuộn
+   tay - và cuộn tay trên 500 dòng thì tra cũng như không tra.* */
+function nkKy(e,k){
+ if(!k)return true;
+ var d=pvnd(e.log_time);if(!d)return false;
+ var t0=new Date();t0.setHours(0,0,0,0);
+ if(k==="today")return d.getTime()>=t0.getTime();
+ var n=num(k)||0;
+ return n?(d.getTime()>=t0.getTime()-(n-1)*864e5):true}
+var NKKYOPT=[["","Mọi lúc"],["today","Hôm nay"],["7","7 ngày qua"],["30","30 ngày qua"]];
+var NKACTOPT=[["","Mọi thao tác"],["add","Tạo mới"],["upd","Cập nhật"],["del","Xóa"],["undo","Hoàn tác"]];
 function nkFilt(){
  var q=String(window.NKQ||"").trim().toLowerCase(),tb=window.NKTB||"",who=window.NKWHO||"";
+ var ky=window.NKKY||"",lo=window.NKACT||"";
  return logRows().filter(function(e){
   if(tb&&e.sheet!==tb)return false;
   if(who&&String(e.staff_id||"")!==who)return false;
+  if(!nkKy(e,ky))return false;
+  if(lo&&String(e.kind||"upd")!==lo)return false;
   if(!q)return true;
   return [e.log_time,e.staff_name,e.action,e.sheet,sheetVN(e.sheet),e.row_id,e.summary,e.door]
    .join(" ").toLowerCase().indexOf(q)>=0})}
@@ -16064,6 +16100,10 @@ function renderNhatky(){
  Object.keys(tbs).sort().forEach(function(c){bar+='<option value="'+esc(c)+'"'+(window.NKTB===c?" selected":"")+'>'+esc(sheetVN(c))+'</option>'});
  bar+='</select><span class="lbl">Người</span><select class="sel qsel" onchange="nkSet(\'NKWHO\',this.value)"><option value="">Tất cả</option>';
  Object.keys(whos).forEach(function(s){bar+='<option value="'+esc(s)+'"'+(window.NKWHO===s?" selected":"")+'>'+esc(whos[s])+'</option>'});
+ bar+='<span class="lbl">Kỳ</span><select class="sel qsel" onchange="nkSet(\'NKKY\',this.value)">';
+ NKKYOPT.forEach(function(o){bar+='<option value="'+esc(o[0])+'"'+((window.NKKY||"")===o[0]?" selected":"")+'>'+esc(o[1])+'</option>'});
+ bar+='</select><span class="lbl">Loại</span><select class="sel qsel" onchange="nkSet(\'NKACT\',this.value)">';
+ NKACTOPT.forEach(function(o){bar+='<option value="'+esc(o[0])+'"'+((window.NKACT||"")===o[0]?" selected":"")+'>'+esc(o[1])+'</option>'});
  bar+='</select></span>';
  h+=tbar(bar,'<span class="tbcnt">'+F.length+' dòng</span><button class="btn sm" onclick="pgExport(\'nhatky\')" data-tip="Tải '+F.length+' dòng đang hiện ra tệp CSV"><i class="ti ti-table"></i>Xuất</button>');
  if(!F.length)return h+'<div class="tbwrap"><table class="tb"><tbody><tr><td class="empty">'+
@@ -17752,6 +17792,10 @@ var APPPARAMS=[
     cắm cứng trong mã. Mỗi lý do mang một cờ "có tính là buổi off không": trung tâm dời lịch dài
     hạn thì sau này có thể muốn KHÔNG trừ vào quota của giáo viên, đổi cờ là xong. */
  ["P6 · Buổi học, điểm danh & bài tập","teacherOffQuota_course","Một khóa, giáo viên chính được nghỉ (có người dạy thay) tối đa bao nhiêu buổi","buổi",2],
+ /* V2 18/08 - mốc "báo trước bao nhiêu ngày là đủ sớm" của đơn giáo viên báo nghỉ. KHÔNG cắm
+    số 3 trong mã: mỗi cơ sở xoay người nhanh chậm khác nhau, và chính chú thích cũ của trang
+    Xếp người dạy thay đã lấy "3 ngày" làm ví dụ - ví dụ thì phải sửa được. */
+ ["P6 · Buổi học, điểm danh & bài tập","slaTeacherOffNotice_days","Giáo viên nên báo nghỉ buổi dạy trước bao nhiêu ngày (muộn hơn thì đơn mang dấu báo gấp)","ngày",3],
  ["P6 · Buổi học, điểm danh & bài tập","teacherChangeReasons","Danh sách lý do đổi giáo viên cho một buổi. Mỗi lý do ghi \"Tên lý do|co\" nếu tính là buổi GV nghỉ (trừ vào quota), \"|khong\" nếu không tính; các lý do ngăn nhau bằng dấu phẩy","lý do","GV báo nghỉ / bận việc riêng|co, GV ốm đau|co, GV đến trễ / kẹt không tới kịp|co, Trung tâm dời lịch / đổi GV lâu dài|co","text"],
  ["Giao việc nội bộ","slaTaskAccept_hours","Người nhận phải BẤM NHẬN việc trong bao lâu (quá hạn -> nhắc)","giờ",4],
  ["Giao việc nội bộ","slaTaskConfirm_hours","Người giao phải xác nhận sau khi được báo xong trong bao lâu","giờ",24],
@@ -18749,7 +18793,29 @@ var COLVN={updated_by:"Người sửa",updated_at:"Lúc sửa",notes:"Ghi chú",
  amount:"Số tiền",discount_amount:"Chiết khấu",payment_status:"Trạng thái thu",
  session_date:"Ngày buổi học",attendance_status:"Điểm danh",room:"Phòng",
  wow_quota_remaining:"Lượt WOW còn",wow_extra_approved:"Lượt WOW được cấp thêm",
- learning_mode:"Hình thức học",zoom_link:"Link học online"};
+ learning_mode:"Hình thức học",zoom_link:"Link học online",
+ /* V2 18/08 - BỔ SUNG SAU KHI SOI ẢNH CHỤP MÀN NHẬT KÝ. Ba lần ghi thử ra ba dòng, thì hai dòng
+    in tên ô bằng chữ máy: "next_payment_due", "venue_or_zoom_link". `colVN` tra `LISTCFG` trước,
+    nhưng hai ô ấy không nằm trong cột nào của bảng nào - chúng chỉ được sửa trong ngăn kéo.
+    *Từ điển tên ô chỉ phủ những ô CÓ MẶT trên một bảng nào đó; ô nào chỉ sống trong ngăn kéo
+    thì phải khai tay, và đó chính là những ô người ta sửa nhiều nhất.* */
+ next_payment_due:"Hạn đóng kế tiếp",venue_or_zoom_link:"Phòng học / link Zoom",
+ learning_followup_note:"Ghi chú theo dõi học tập",attendance_risk_reason:"Lý do cờ nguy cơ chuyên cần",
+ academic_risk_reason:"Lý do cờ nguy cơ học thuật",next_action:"Việc kế tiếp",
+ class_start_actual:"GV bắt đầu lúc",class_end_actual:"GV kết thúc lúc",
+ teacher_note:"Nhận xét của giáo viên",prep_note:"Lời dặn trước buổi",
+ emergency_contact_name:"Người liên hệ khẩn",emergency_contact_phone:"SĐT liên hệ khẩn",
+ emergency_contact_relation:"Quan hệ với học viên",
+ trang_thai:"Trạng thái",ly_do:"Lý do",ghi_chu:"Ghi chú",
+ duyet_boi:"Người duyệt",duyet_boi_ten:"Người duyệt",duyet_luc:"Lúc duyệt",
+ duyet_ghichu:"Ghi chú người duyệt",gv_thay:"Người dạy thay",gv_thay_ten:"Người dạy thay",
+ xep_luc:"Lúc xếp người thay",bao_luc:"Lúc báo"};
+/* Ô KHÔNG ĐÁNG GHI VÀO NHẬT KÝ. `updated_by` và `updated_at` là DẤU VẾT của chính lượt ghi đó -
+   bảng nhật ký đã có cột "Lúc" và cột "Người" nói đúng hai điều ấy, nên in lại trong cột "Thay
+   đổi" là mỗi dòng nhật ký tự nhắc lại mình hai lần, đẩy ô thật sự đổi xuống dưới hoặc ra khỏi
+   ba ô đầu mà `logWhat` in ra.
+   *Một cuốn sổ ghi lại chính hành vi ghi sổ thì phần lớn số chữ trong nó không nói gì.* */
+var LOGBOQUA={updated_by:1,updated_at:1,updated_by_name:1};
 function colVN(code,k){
  try{for(var key in LISTCFG){var c=LISTCFG[key];
    if(!c||c.code!==code||!c.cols)continue;
@@ -18760,7 +18826,8 @@ function logRows(){DATA.dl=DATA.dl||{};if(!DATA.dl.DL25)DATA.dl.DL25=[];return D
 function logSnap(r,keys){var o={};if(!r)return o;
  (keys||Object.keys(r)).forEach(function(k){o[k]=r[k]});return o}
 function logDiff(a,b){var out={};
- for(var k in b){var v1=String(a&&a[k]!=null?a[k]:""),v2=String(b[k]!=null?b[k]:"");
+ for(var k in b){if(LOGBOQUA[k])continue;
+  var v1=String(a&&a[k]!=null?a[k]:""),v2=String(b[k]!=null?b[k]:"");
   if(v1!==v2)out[k]={tu:v1,den:v2}}
  return out}
 function logWhat(code,id,d){
@@ -23988,9 +24055,20 @@ function wowVang(w){return isc(w.wow_status,"no_show")&&!String(w.wow_no_show_re
 function wowHomNay(w){var d=pvnd(w.wow_session_date),t=new Date();
  return !!(d&&sameDay(d,t)&&!isc(w.wow_status,"cancelled"))}
 function lopThieuGV(c){return /in_progress|open/.test(ecode(c.class_status))&&!String(c.main_teacher_id||"").trim()}
-/* Buổi HÔM NAY chưa có người dạy - việc của trang GV dự phòng. */
+/* Buổi HÔM NAY chưa có người dạy - việc của trang GV dự phòng.
+   V2 18/08 - ĐẾM CẢ BUỔI CÓ ĐƠN BÁO NGHỈ ĐÃ DUYỆT. Trước đây phép đếm chỉ hỏi "ô teacher_id có
+   trống không", mà đơn báo nghỉ được duyệt KHÔNG xoá ô ấy (cố ý - xoá là mất dấu ai đáng lẽ dạy
+   và hỏng phép đếm quota). Nên một buổi đã duyệt cho nghỉ vẫn đọc ra "có giáo viên" và không
+   một con số nào trên app nhắc rằng buổi ấy sắp không có ai đứng lớp.
+   *Trang này hỏi "buổi nào sắp không có người dạy" chứ không hỏi "ô nào đang trống" - hai câu
+   ấy trùng nhau cho tới ngày có lá đơn thứ nhất.* */
+function sesChuaCoNguoi(x){
+ if(!x||isc(x.session_status,"cancelled"))return false;
+ if(!String(x.teacher_id||"").trim())return true;
+ var dn=null;try{dn=gvnCuaBuoi(x.session_id)}catch(e){}
+ return !!(dn&&isc(dn.trang_thai,"da_duyet")&&!String(dn.gv_thay||"").trim())}
 function gvdpThieu(){var t=new Date();return srows("DL11").filter(function(x){var d=pvnd(x.session_date);
- return d&&sameDay(d,t)&&!isc(x.session_status,"cancelled")&&!String(x.teacher_id||"").trim()})}
+ return !!d&&sameDay(d,t)&&sesChuaCoNguoi(x)})}
 /* Khoá chưa có một giáo án nào trong ngân hàng. */
 function gaThieuKhoa(){return srows("DL05").filter(function(k){
  return !rows("DL21").some(function(p){return String(p.course_id||"")===String(k.course_id)})})}
@@ -24193,12 +24271,52 @@ function renderHtToday(embed){
        (roomOf(c)?(' · '+esc(roomOf(c))):' · <span class="mut">chưa ghi phòng</span>')))+'</div>';
   if(sp.hw)h+='<div class="obm2">Bài sẽ giao: '+esc(sp.hw.title||"")+(sp.hwFrom?' <span class="mut">(theo '+esc(sp.hwFrom)+')</span>':'')+'</div>';
   if(sp.note)h+='<div class="obm2">Lời dặn: '+esc(sp.note)+'</div>';
-  h+='<div class="obact"><button class="btn primary sm" onclick="goDD(\''+esc(x.class_id)+'\',\''+esc(x.session_id)+'\')"><i class="ti ti-checkbox"></i>Vào lớp / điểm danh</button></div></div>'});
+  h+='<div class="obact"><button class="btn primary sm" onclick="goDD(\''+esc(x.class_id)+'\',\''+esc(x.session_id)+'\')"><i class="ti ti-checkbox"></i>Vào lớp / điểm danh</button>'+
+   /* V2 18/08 - báo nghỉ NGAY TRÊN THẺ BUỔI, và chỉ hiện với chính người đứng buổi ấy. Ốm đột
+      xuất sáng ngày dạy là ca thật nhất của việc này; bắt họ đi tìm một trang khác lúc ấy thì
+      họ sẽ nhắn Zalo cho học vụ - đúng cái đường vòng mà bảng DL33 sinh ra để thay thế. */
+   (String(x.teacher_id||"")===String(CURSTAFF||"")&&CURSTAFF
+     ?(function(){var dn=gvnCuaBuoi(x.session_id);
+       return dn?('<span class="chip '+(isc(dn.trang_thai,"da_duyet")?"green":"amber")+'">'+(isc(dn.trang_thai,"da_duyet")?"đã duyệt cho nghỉ":"đơn nghỉ chờ duyệt")+'</span>')
+        :('<button class="btn sm" onclick="gvNghiForm(\''+esc(x.session_id)+'\')"><i class="ti ti-calendar-off"></i>Báo nghỉ buổi này</button>')})()
+     :'')+'</div></div>'});
  h+='</div></div>';
  /* V9.40 - BUỔI WOW HÔM NAY. Thanh chỉ số đã ĐẾM buổi WOW từ lâu nhưng không có panel nào liệt
     kê và không có nút nào bấm - ba panel bên dưới đều lọc DL11/DL13 theo teacher_id, mà giáo
     viên WOW (wow_coach) có 0 dòng ở cả hai bảng đó. Nghĩa là coach mở app buổi sáng thì màn
     hình nói với họ "hôm nay anh hết việc", trong khi họ sở hữu toàn bộ 70 buổi WOW của trung tâm. */
+ /* ═══ V2 18/08 - CHỖ GIÁO VIÊN BÁO NGHỈ TRƯỚC (anh Luân: *"trưởng phòng aca duyệt, trưởng
+    phòng học vụ cũng biết"*) ══════════════════════════════════════════════════════════════════
+    Đặt ở ĐÂY chứ không dựng một trang riêng, vì đây là trang giáo viên rơi vào khi mở app
+    (`giaovien` land: hoctap · tab today). Một cửa báo nghỉ nằm ở trang mà người phải báo không
+    bao giờ đi qua thì nó chỉ tồn tại trên giấy.
+    Khối gánh hai việc cùng lúc, cố ý: BÁO trước, và XEM đơn mình đã báo đang ở đâu. Bản đầu em
+    định chỉ làm vế thứ nhất - nhưng đó đúng con bệnh V9.29 đã chữa cho học viên: báo xong rồi
+    im, người báo không biết đã được duyệt chưa nên hôm sau vẫn phải hỏi lại bằng miệng. */
+ (function(){
+  if(!CURSTAFF)return;
+  var toi=gvnCuaToi(),toiCho=toi.filter(function(x){return isc(x.trang_thai,"cho_duyet")});
+  var sap=gvnBuoiToi(CURSTAFF,14);
+  if(!sap.length&&!toi.length)return;
+  h+='<div class="panel"><div class="ph"><b><i class="ti ti-calendar-off" style="margin-right:6px"></i>Buổi dạy sắp tới của tôi ('+sap.length+')</b>'+
+   '<span class="mut" style="font-size:11.5px">14 ngày tới · báo nghỉ trước '+slaChip("slaTeacherOffNotice_days",gvnHanBao())+' thì học vụ còn kịp xoay người'+
+   (toiCho.length?(' · <b>'+toiCho.length+' đơn của bạn đang chờ duyệt</b>'):'')+'</span></div>';
+  h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Ngày</th><th>Lớp</th><th>Buổi</th><th>Tình trạng</th><th></th></tr></thead><tbody>';
+  if(!sap.length)h+='<tr><td class="empty" colspan="5">14 ngày tới bạn không có buổi dạy nào trên lịch.</td></tr>';
+  sap.slice(0,12).forEach(function(x){
+   var dn=gvnCuaBuoi(x.session_id);
+   var d=pvnd(x.session_date);
+   h+='<tr><td class="nw">'+esc(String(x.session_date||"").slice(0,10))+' <span class="mut">'+esc(d?hhmmOf(d):"")+'</span></td>'+
+    '<td>'+lopLnk(x.class_id,x.class_id_name,"")+'</td>'+
+    '<td>Buổi '+esc(x.session_number||"?")+'</td>'+
+    '<td>'+(dn?gvnStChip(dn)+' <span class="mut" style="font-size:11px">'+esc(dn.ly_do||"")+'</span>':'<span class="mut">đang dạy bình thường</span>')+'</td>'+
+    '<td class="nw">'+(dn
+      ?(isc(dn.trang_thai,"cho_duyet")
+        ?'<button class="btn sm" onclick="gvNghiHuy(\''+esc(dn.nghi_id)+'\')"><i class="ti ti-arrow-back-up"></i>Rút đơn</button>'
+        :(String(dn.gv_thay_ten||"").trim()?('<span class="chip green">'+esc(dn.gv_thay_ten)+' dạy thay</span>'):'<span class="mut">học vụ đang xếp người</span>'))
+      :'<button class="btn sm" onclick="gvNghiForm(\''+esc(x.session_id)+'\')"><i class="ti ti-calendar-off"></i>Báo nghỉ</button>')+'</td></tr>'});
+  if(sap.length>12)h+='<tr><td colspan="5" class="mut" style="font-size:11px;padding:6px">... còn '+(sap.length-12)+' buổi nữa trong 14 ngày tới.</td></tr>';
+  h+='</tbody></table></div></div>'})();
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-star" style="margin-right:6px"></i>Buổi WOW hôm nay ('+wowT.length+')</b><div class="mini"><button class="pill" onclick="go(\'wow\')">Mở trang '+esc((PBK.wow||{}).t||"WOW")+'</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Học viên</th><th>Kỹ năng</th><th>Trọng tâm</th><th>Trạng thái</th><th></th></tr></thead><tbody>';
  if(!wowT.length)h+='<tr><td class="empty" colspan="6">Hôm nay không có buổi WOW nào'+(gid?' của người này':'')+'.</td></tr>';
  wowT.sort(function(a,b){return (pvnd(a.wow_session_date)||0)-(pvnd(b.wow_session_date)||0)});
@@ -24436,6 +24554,13 @@ function sesSetTeacher(sesId,gvId,ly){
    _ca.dp_status=eFull("enum_wow_slot_status","booked")||"booked (Đã đặt)";
    _ca.note=(_ca.note?_ca.note+" | ":"")+"Dạy thay "+(x.class_id_name||x.class_id)+" buổi "+(x.session_number||"")}
  }catch(e){}
+ /* V2 18/08 - ĐÓNG LẠI LÁ ĐƠN. Cùng một luật hai chiều mà khối ngay trên vừa đặt cho sổ ca dạy
+    thay: xếp xong người mà không ghi ngược vào đơn báo nghỉ thì đơn ấy nằm mãi trong hàng chờ
+    "đã duyệt, chưa xếp ai" - học vụ mở ra thấy một việc đã làm xong từ hôm kia và làm lại. */
+ try{var _dn=gvnCuaBuoi(x.session_id);
+  if(_dn&&isc(_dn.trang_thai,"da_duyet")&&String(_dn.staff_id||"")!==String(gvId)){
+   _dn.gv_thay=gvId;_dn.gv_thay_ten=g.full_name||gvId;_dn.xep_luc=nowStr()}
+ }catch(e){}
  toast("Buổi "+(x.session_number||"")+" lớp "+(x.class_id_name||x.class_id)+" nay do "+g.full_name+" dạy."+
   (_q<=0?" Lưu ý: GV chính đã vượt quota "+gvOffQuota()+" buổi nghỉ của khóa này.":""));
  closeModal();reRender(CUR);persistSoon()}
@@ -24518,6 +24643,225 @@ function gvBackupForm(sesId){
   noL.forEach(function(r){h+='<div class="absrow" style="opacity:.7"><div class="absi"><b>'+esc(r.g.full_name)+'</b><span>'+esc(r.no)+'</span></div></div>'});
   h+='</div>'}
  openDrawer("Giáo viên dự phòng",h+'</div>')}
+/* ═══ V2 18/08 - GIÁO VIÊN BÁO NGHỈ BUỔI DẠY (DL33) ═════════════════════════════════════════
+   Anh Luân chốt 18/08: *"trưởng phòng aca duyệt, trưởng phòng học vụ cũng biết"*.
+
+   LỖ HỔNG ĐÃ CÓ TỪ ĐẦU, VÀ NÓ NẰM Ở NỬA ĐẦU CỦA MỘT CÂU CHUYỆN APP ĐÃ KỂ NỬA SAU.
+   App có nguyên một trang "Xếp người dạy thay", có sổ ca dạy thay (DL31), có danh sách dự phòng
+   theo tháng (DL28), có quota "một khóa GV chính được nghỉ mấy buổi" (CH2 `teacherOffQuota_course`)
+   - toàn bộ bộ máy để XỬ LÝ một buổi giáo viên nghỉ. Nhưng KHÔNG có chỗ nào để giáo viên NÓI
+   rằng mình nghỉ. Học vụ chỉ biết khi giáo viên nhắn riêng, hoặc khi buổi học tới giờ mà không
+   ai tới. Chú thích của chính trang gvdp viết *"Ví dụ giáo viên báo nghỉ 3 ngày nữa..."* - app
+   giả định có cái đơn ấy suốt, mà chưa bao giờ có bảng nào giữ nó.
+   *Xây xong cả dây chuyền xử lý mà không có cửa nhận đơn thì dây chuyền chạy bằng tin nhắn
+   riêng - và tin nhắn riêng thì không duyệt được, không đếm được, không ai chịu trách nhiệm.*
+
+   VÒNG ĐỜI: GV BÁO NGHỈ -> TP ACA DUYỆT (Học vụ thấy cùng lúc) -> HỌC VỤ XẾP NGƯỜI DẠY THAY.
+   Ba bước ba người, nên ba mốc thời gian riêng trên cùng một dòng - không gộp thành một cờ.
+   Duyệt xong KHÔNG tự xoá `teacher_id` của buổi: xoá đi là mất dấu ai là người đáng lẽ dạy, và
+   `gvOffSes` (đếm quota) đọc chính cột ấy. Buổi vẫn giữ tên GV chính, chỉ mang thêm một lá đơn
+   đã duyệt - `gvnCanXep()` đọc lá đơn ấy để đẩy buổi vào hàng chờ xếp người.
+   Cửa xếp người vẫn là `sesSetTeacher` cũ, không dựng cửa thứ hai; nó ghi ngược lại DL33 để sổ
+   đơn biết việc đã xong (đúng luật hai chiều cùng ghi một chỗ mà DL31 đã đặt ở dưới). */
+function gvnAll(){return rows("DL33")||[]}
+function gvnRows(){return srows("DL33")||[]}
+/* Đơn CÒN SỐNG của một buổi: chưa duyệt, hoặc đã duyệt mà chưa xếp xong người thay.
+   Đơn bị từ chối và đơn đã xếp xong đều không còn chặn gì nữa. */
+function gvnCuaBuoi(sid){var s=String(sid||"");
+ return gvnAll().filter(function(x){return String(x.session_id||"")===s&&
+  isc(x.trang_thai,"cho_duyet","da_duyet")})[0]||null}
+function gvnCho(){return gvnRows().filter(function(x){return isc(x.trang_thai,"cho_duyet")})}
+/* Đã duyệt mà buổi vẫn chưa có người khác đứng lớp - đây đúng là việc của trang Xếp người dạy thay. */
+function gvnCanXep(){return gvnRows().filter(function(x){
+ if(!isc(x.trang_thai,"da_duyet"))return false;
+ if(String(x.gv_thay||"").trim())return false;
+ var s=find("DL11","session_id",x.session_id);
+ return !!s&&!isc(s.session_status,"cancelled")})}
+function gvnCuaToi(){var me=String(CURSTAFF||"");
+ return gvnAll().filter(function(x){return String(x.staff_id||"")===me})}
+/* Buổi sắp tới của chính người đang đăng nhập - danh sách để họ bấm báo nghỉ TRƯỚC.
+   Lấy theo `teacher_id` chứ không theo GV chính của lớp: người dạy thay cũng có quyền báo nghỉ
+   buổi mình đã nhận, và buổi ấy mới là buổi họ đứng tên. */
+function gvnBuoiToi(sid,ngay){
+ var me=String(sid||CURSTAFF||""),t0=new Date();t0.setHours(0,0,0,0);
+ var t1=t0.getTime()+(num(ngay)||14)*864e5;
+ return rows("DL11").filter(function(x){
+  if(String(x.teacher_id||"")!==me)return false;
+  if(isc(x.session_status,"cancelled","completed"))return false;
+  var d=pvnd(x.session_date);return !!d&&d.getTime()>=t0.getTime()&&d.getTime()<t1})
+ .sort(function(a,b){return (pvnd(a.session_date)||0)-(pvnd(b.session_date)||0)})}
+/* Báo trước bao nhiêu ngày là ĐỦ SỚM - đi qua CH2 chứ không cắm số. Báo muộn hơn mức này vẫn
+   nhận đơn (ốm đột xuất thì không ai báo trước được), nhưng đơn mang cờ "báo gấp" để người
+   duyệt và học vụ biết mà xoay người ngay. */
+function gvnHanBao(){var n=num(paramOf("slaTeacherOffNotice_days",3));return n>0?n:3}
+function gvnGap(x){var d=pvnd((x&&x.session_date)||"");if(!d)return false;
+ var bao=pvnd(x.bao_luc)||new Date();
+ return (d.getTime()-bao.getTime())<gvnHanBao()*864e5}
+function gvnStChip(x){var c=ecode(x&&x.trang_thai);
+ var m={cho_duyet:["amber","Chờ duyệt"],da_duyet:["green","Đã duyệt"],tu_choi:["red","Từ chối"],
+  huy:["gray","GV đã rút"]};
+ var v=m[c]||["","-"];
+ return '<span class="chip '+v[0]+'">'+esc(elabel(x&&x.trang_thai)||v[1])+'</span>'}
+/* AI DUYỆT: Trưởng phòng ACA. Đây là quyết định CHUYÊN MÔN (ai đứng lớp được, quota nghỉ của
+   giáo viên trong khóa) nên nó thuộc phòng ACA, không phải học vụ. Học vụ THẤY cùng lúc và là
+   người xếp người thay - hai việc khác nhau nên hai quyền khác nhau. */
+function gvnDuyetDuoc(){
+ if(banToanQuyen())return true;
+ if(!CURSTAFF)return true;                  /* chưa chọn ghế (xem thử) - không chặn */
+ var me=find("DL01","staff_id",CURSTAFF);
+ if(!me)return false;
+ return /^(aca_manager|ceo)$/.test(ecode(me.role))}
+/* ---- (1) GIÁO VIÊN BÁO NGHỈ ---- */
+function gvNghiForm(sesId){
+ var s=find("DL11","session_id",sesId);if(!s){toast("Không thấy buổi học.");return}
+ var c=find("DL10","class_id",s.class_id)||{};
+ var cu=gvnCuaBuoi(sesId);
+ if(cu){toast("Buổi này đã có đơn báo nghỉ "+(isc(cu.trang_thai,"cho_duyet")?"đang chờ duyệt":"đã được duyệt")+".",4200);return}
+ var con=gvOffLeft(c);
+ var h='<div class="dcard"><h4><i class="ti ti-calendar-off"></i>Báo nghỉ buổi dạy</h4>';
+ h+=ctxRows([["Lớp",lopLnk(s.class_id,s.class_id_name||c.class_name)],
+  ["Buổi",esc("Buổi "+(s.session_number||"?")+" · "+(s.session_date||"-"))],
+  ["Cơ sở / hình thức",clsOnline(c)?"Online":esc(elabel(c.branch)||c.branch||"-")],
+  ["Quota nghỉ của khóa này",(con>0?('còn <b>'+con+'</b>/'+gvOffQuota()+' buổi'):('<b style="color:var(--red)">đã hết</b> ('+gvOffQuota()+' buổi)'))]]);
+ h+='<div class="notebar" style="margin:10px 0"><i class="ti ti-info-circle"></i>Báo trước '+
+  slaChip("slaTeacherOffNotice_days",gvnHanBao())+' thì học vụ còn kịp xoay người. Báo gấp hơn vẫn gửi được, nhưng đơn sẽ mang dấu <b>báo gấp</b> để người duyệt xử lý ngay.</div>';
+ if(con<=0)h+='<div class="notebar nbamber"><i class="ti ti-alert-triangle"></i>Khóa này bạn đã dùng hết quota nghỉ. Đơn vẫn gửi được - Trưởng phòng ACA sẽ cân nhắc, và lý do nên ghi thật rõ.</div>';
+ h+='<div class="fld full"><label>Lý do <i>*</i></label><select id="gvn_ly">'+
+  gvLyDo().map(function(r){return '<option>'+esc(r.ten)+'</option>'}).join("")+'</select></div>';
+ h+='<div class="fld full"><label>Nói rõ thêm</label><textarea id="gvn_note" rows="2" placeholder="vd: khám bệnh theo lịch hẹn, có giấy hẹn của bệnh viện"></textarea></div>';
+ h+='<div class="fld full"><label>Bạn đã nhờ được ai dạy thay chưa</label><select id="gvn_de">'+
+  '<option value="">Chưa - nhờ học vụ xếp giúp</option>'+
+  rows("DL01").filter(isGVRole).filter(function(g){return String(g.staff_id)!==String(CURSTAFF)&&staffActive(g)})
+   .map(function(g){return '<option value="'+esc(g.staff_id)+'">'+esc(g.full_name||g.staff_id)+'</option>'}).join("")+
+  '</select><div class="fhint">Đề xuất thôi - học vụ vẫn kiểm lại giờ giấc và cơ sở trước khi chốt.</div></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="gvNghiLuu(\''+esc(sesId)+'\')"><i class="ti ti-send"></i>Gửi đơn báo nghỉ</button></div></div>';
+ openDrawer("Báo nghỉ buổi dạy",h)}
+function gvNghiLuu(sesId){
+ if(!actGuard("gvNghi:"+sesId))return;
+ var s=find("DL11","session_id",sesId);if(!s){toast("Không thấy buổi học.");return}
+ if(gvnCuaBuoi(sesId)){toast("Buổi này đã có đơn báo nghỉ rồi.");return}
+ var ly=String(fldV("gvn_ly")||"").trim();
+ if(!ly){toast("Chọn lý do nghỉ trước đã.");return}
+ var g=find("DL01","staff_id",CURSTAFF)||{};
+ var c=find("DL10","class_id",s.class_id)||{};
+ var de=String(fldV("gvn_de")||"").trim();
+ var r={nghi_id:"GVN-"+seqNo("DL33","nghi_id",4),
+  staff_id:CURSTAFF||"",staff_name:g.full_name||myName()||"",
+  session_id:sesId,class_id:s.class_id||"",class_name:c.class_name||s.class_id_name||"",
+  session_number:s.session_number||"",session_date:s.session_date||"",
+  ly_do:ly,ghi_chu:String(fldV("gvn_note")||"").trim(),
+  de_xuat_gv:de,de_xuat_gv_ten:de?((find("DL01","staff_id",de)||{}).full_name||de):"",
+  bao_luc:nowStr(),trang_thai:"cho_duyet (Chờ duyệt)",
+  duyet_boi:"",duyet_boi_ten:"",duyet_luc:"",duyet_ghichu:"",
+  gv_thay:"",gv_thay_ten:"",xep_luc:""};
+ DL.DL33=DL.DL33||[];DL.DL33.unshift(r);
+ if(SVR)try{google.script.run.apiSave("DL33",r)}catch(e){}
+ persistSoon();closeModal();
+ toast("Đã gửi đơn báo nghỉ buổi "+(s.session_number||"")+" lớp "+(c.class_name||s.class_id)+" - Trưởng phòng ACA sẽ duyệt, học vụ thấy cùng lúc.",5200);
+ reRender(CUR)}
+/* Giáo viên rút đơn của CHÍNH MÌNH, và chỉ khi chưa ai quyết. Rút sau khi đã duyệt là kéo học vụ
+   chạy lại từ đầu mà họ không hay - muốn đổi ý lúc ấy thì nói với người duyệt. */
+function gvNghiHuy(id){
+ var r=find("DL33","nghi_id",id);if(!r){toast("Không thấy đơn.");return}
+ if(String(r.staff_id||"")!==String(CURSTAFF||"")){toast("Chỉ người gửi đơn mới rút được đơn của mình.");return}
+ if(!isc(r.trang_thai,"cho_duyet")){toast("Đơn đã được quyết rồi - báo lại với Trưởng phòng ACA nếu bạn đổi ý.",4600);return}
+ if(!actGuard("gvNghiHuy:"+id))return;
+ markRow("DL33","nghi_id",id,{trang_thai:"huy (GV đã rút)",duyet_luc:nowStr()},
+  "Giáo viên rút đơn báo nghỉ "+id+".","gvNghiHuy");
+ reRender(CUR)}
+/* ---- (2) TRƯỞNG PHÒNG ACA DUYỆT ---- */
+function gvNghiQuyet(id,kind){
+ var r=find("DL33","nghi_id",id);if(!r){toast("Không thấy đơn.");return}
+ if(!gvnDuyetDuoc()){toast("Đơn báo nghỉ của giáo viên do Trưởng phòng ACA duyệt. Chức danh của bạn xem và xếp người dạy thay.",5200);return}
+ if(!actGuard("gvNghiQuyet:"+id+":"+kind))return;
+ var g=find("DL01","staff_id",CURSTAFF)||{};
+ var ok=(kind==="duyet");
+ markRow("DL33","nghi_id",id,{
+  trang_thai:ok?"da_duyet (Đã duyệt)":"tu_choi (Từ chối)",
+  duyet_boi:CURSTAFF||"",duyet_boi_ten:g.full_name||myName()||"",
+  duyet_luc:nowStr(),duyet_ghichu:String(fldV("gvq_note")||"").trim()},
+  (ok?"Duyệt":"Từ chối")+" đơn báo nghỉ "+id+" của "+(r.staff_name||r.staff_id)+".","gvNghiQuyet");
+ closeModal();
+ toast(ok?("Đã duyệt - buổi "+(r.session_number||"")+" lớp "+(r.class_name||r.class_id)+" vào hàng chờ xếp người dạy thay của học vụ.")
+       :("Đã từ chối - giáo viên vẫn đứng buổi này."),5200);
+ reRender(CUR)}
+function gvNghiQuyetForm(id){
+ var r=find("DL33","nghi_id",id);if(!r){toast("Không thấy đơn.");return}
+ var s=find("DL11","session_id",r.session_id)||{};
+ var c=find("DL10","class_id",r.class_id)||{};
+ var con=gvOffLeft(c);
+ var n=s.session_id?gvBackup(s).filter(function(z){return z.ok}).length:0;
+ var h='<div class="dcard"><h4><i class="ti ti-calendar-off"></i>Đơn báo nghỉ '+esc(id)+'</h4>';
+ h+=ctxRows([["Giáo viên",nsLnk(r.staff_id,r.staff_name)],
+  ["Buổi",lopLnk(r.class_id,r.class_name)+' · buổi '+esc(r.session_number||"?")+' · '+esc(r.session_date||"-")],
+  ["Báo lúc",esc(r.bao_luc||"-")+(gvnGap(r)?' <span class="chip red">báo gấp</span>':'')],
+  ["Quota nghỉ khóa này",(con>0?('còn '+con+'/'+gvOffQuota()+' buổi'):('<b style="color:var(--red)">đã hết</b>'))],
+  ["Người thay sẵn có",(n?('<b style="color:var(--green)">'+n+' người</b> nhận được buổi này'):'<b style="color:var(--red)">chưa có ai</b> - duyệt xong học vụ phải gọi tìm')]]);
+ h+=ctxContent("Lý do",String(r.ly_do||"-")+(r.ghi_chu?(" - "+r.ghi_chu):""),"var(--navy)");
+ if(r.de_xuat_gv_ten)h+='<div class="notebar nbgreen"><i class="ti ti-user-check"></i>Giáo viên đã tự nhờ được <b>'+esc(r.de_xuat_gv_ten)+'</b> - học vụ vẫn kiểm lại giờ và cơ sở trước khi chốt.</div>';
+ h+='<div class="fld full"><label>Ghi chú của bạn</label><textarea id="gvq_note" rows="2" placeholder="vd: đã trao đổi, đồng ý cho nghỉ - nhờ học vụ xếp cô Ngọc"></textarea></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="gvNghiQuyet(\''+esc(id)+'\',\'duyet\')"><i class="ti ti-check"></i>Duyệt cho nghỉ</button>'+
+  '<button class="btn danger" onclick="gvNghiQuyet(\''+esc(id)+'\',\'tuchoi\')"><i class="ti ti-x"></i>Không duyệt</button></div></div>';
+ openDrawer("Duyệt đơn báo nghỉ",h)}
+/* ---- (3) HÀNG CHỜ DUYỆT (tab của hub Chờ duyệt) ---- */
+function duyGvnHTML(){
+ var cho=fltApply("duyetgvnghi",gvnCho());
+ /* Nút Xuất lấy dòng từ `FLTLAST`. Để nguyên thì tệp CSV in ra tên cột kỹ thuật (`nghi_id`,
+    `bao_luc`) - đúng con bệnh mà bản khai `SHEETVN` vừa chữa ở nhật ký. Trang tác vụ không có
+    LISTCFG thì tự khai bản đọc được, y như `renderNhatky` đang làm. */
+ window.FLTLAST=window.FLTLAST||{};
+ window.FLTLAST.duyetgvnghi=cho.map(function(r){return {ma_don:r.nghi_id,giao_vien:r.staff_name||r.staff_id,
+  lop:r.class_name||r.class_id,buoi:r.session_number,ngay_hoc:r.session_date,ly_do:r.ly_do,
+  ghi_chu:r.ghi_chu,bao_luc:r.bao_luc,bao_gap:gvnGap(r)?"Có":"",trang_thai:elabel(r.trang_thai)||r.trang_thai,
+  gv_de_xuat:r.de_xuat_gv_ten}});
+ var quyen=gvnDuyetDuoc();
+ var xep=gvnCanXep();
+ var h='<div class="notebar"><i class="ti ti-info-circle"></i><b>Trưởng phòng ACA duyệt</b> đơn báo nghỉ của giáo viên; <b>Trưởng phòng Học vụ thấy cùng lúc</b> để xoay người dạy thay. Giáo viên nên báo trước '+slaChip("slaTeacherOffNotice_days",gvnHanBao())+' - đơn báo muộn hơn mang dấu <b>báo gấp</b>.</div>';
+ if(!quyen)h+='<div class="notebar nbamber"><i class="ti ti-eye"></i>Bạn đang <b>xem</b> hàng chờ này. Quyết định cho nghỉ thuộc Trưởng phòng ACA - việc của bạn là xếp người dạy thay sau khi đơn được duyệt.</div>';
+ if(xep.length)h+='<div class="notebar nbamber"><i class="ti ti-user-plus"></i><b>'+xep.length+' buổi đã duyệt cho nghỉ mà chưa có người dạy thay.</b> '+
+  '<button class="btn sm" onclick="gvnGoXep()"><i class="ti ti-arrow-right"></i>Mở Xếp người dạy thay</button></div>';
+ h+=pgBar("duyetgvnghi",cho.length);
+ h+='<div class="panel"><div class="pbody">';
+ if(!cho.length)h+='<div class="empty">Không có đơn báo nghỉ nào chờ duyệt.</div>';
+ catXem("duygvn",cho,20).forEach(function(r){
+  var s=find("DL11","session_id",r.session_id)||{};
+  var n=s.session_id?gvBackup(s).filter(function(z){return z.ok}).length:0;
+  h+='<div class="appcard"><div class="info"><div class="id">'+esc(r.nghi_id)+'</div>'+
+   '<div class="big">'+nsLnk(r.staff_id,r.staff_name)+' - '+lopLnk(r.class_id,r.class_name)+' buổi '+esc(r.session_number||"?")+'</div>'+
+   '<div class="rs">'+esc(r.session_date||"-")+' · lý do: '+esc(r.ly_do||"-")+(r.ghi_chu?(" - "+esc(r.ghi_chu)):"")+'</div>'+
+   '<div class="rs">'+(gvnGap(r)?'<span class="chip red">báo gấp</span> ':'')+
+    (n?('<span class="chip green">'+n+' người thay được</span>'):'<span class="chip red">chưa có ai thay được</span>')+
+    (r.de_xuat_gv_ten?(' <span class="chip blue">GV đề xuất '+esc(r.de_xuat_gv_ten)+'</span>'):'')+'</div></div>'+
+   '<div class="act">'+
+   (quyen?('<button class="btn primary" onclick="gvNghiQuyetForm(\''+esc(r.nghi_id)+'\')"><i class="ti ti-gavel"></i>Xem &amp; quyết</button>')
+        :('<button class="btn" onclick="gvNghiQuyetForm(\''+esc(r.nghi_id)+'\')"><i class="ti ti-eye"></i>Xem đơn</button>'))+
+   '</div></div>'});
+ h+='</div>'+xemTiepBtn("duygvn",cho.length,20)+'</div>';
+ /* Đã quyết gần đây: người duyệt phải thấy lại được việc mình vừa làm, và học vụ đọc chính khối
+    này để biết buổi nào sắp phải xoay người. */
+ var xong=gvnRows().filter(function(x){return isc(x.trang_thai,"da_duyet","tu_choi")}).slice(0,10);
+ if(xong.length){
+  h+='<div class="sechd">Đã quyết gần đây</div><div class="panel"><div class="pbody">';
+  xong.forEach(function(r){
+   h+='<div class="appcard done"><div class="info"><div class="id">'+esc(r.nghi_id)+'</div>'+
+    '<div class="big">'+nsLnk(r.staff_id,r.staff_name)+' - '+lopLnk(r.class_id,r.class_name)+' buổi '+esc(r.session_number||"?")+' · '+esc(r.session_date||"")+'</div>'+
+    '<div class="rs">'+(r.duyet_boi_ten?esc(r.duyet_boi_ten):'chưa ghi người duyệt')+(r.duyet_luc?(' · '+esc(r.duyet_luc)):'')+
+     (r.duyet_ghichu?(' · '+esc(r.duyet_ghichu)):'')+'</div></div>'+
+    '<div class="act">'+gvnStChip(r)+
+    (isc(r.trang_thai,"da_duyet")?(String(r.gv_thay||"").trim()
+      ?('<span class="chip green">đã xếp '+esc(r.gv_thay_ten||r.gv_thay)+'</span>')
+      :('<button class="btn sm" onclick="gvnGoXep(\''+esc(r.session_date||"")+'\')"><i class="ti ti-user-plus"></i>Xếp người thay</button>')):'')+
+    '</div></div>'});
+  h+='</div></div>'}
+ return h}
+/* Nhảy sang trang Xếp người dạy thay, ĐẶT SẴN NGÀY của buổi cần xoay - không bắt học vụ tự dò
+   lại ngày. Không truyền ngày thì lấy ngày của buổi cần xếp gần nhất. */
+function gvnGoXep(ngay){
+ var d=pvnd(ngay||"");
+ if(!d){var a=gvnCanXep().map(function(x){return pvnd(x.session_date)}).filter(Boolean)
+   .sort(function(x,y){return x-y});d=a[0]}
+ if(d)window.GVDPD=fmtYMD(d);
+ jumpFlow("gvdp","trong")}
 /* ═══ V2 12/08 (HỌC VỤ-2) - SỔ ĐĂNG KÝ GV DỰ PHÒNG THEO THÁNG (DL28) ══════════════════════════
    Khai theo THÁNG chứ không khai một lần rồi để đó: lịch giảng viên đổi theo học kỳ, một danh
    sách khai một lần là danh sách sai sau ba tháng. Người khai: Trưởng phòng ACA (anh Luân chốt). */
@@ -24716,6 +25060,17 @@ function renderGvdp(embed){
  /* V2 15/08 - CÂU NÀY TỪNG NÓI SAI SỰ THẬT. Nó viết "Không cần đăng ký trước - app tự tính
     người thay", trong khi giáo viên làm theo ca không hề có mặt sẵn. Nay nói đúng thứ tự: đăng
     ký là nguồn chính, phép tính chỉ là gợi ý hạng hai và phải hỏi lại người ta. */
+ /* V2 18/08 - ĐƠN BÁO NGHỈ ĐÃ DUYỆT MÀ CHƯA XẾP AI. Dòng này KHÔNG lọc theo ngày đang chọn:
+    học vụ mở trang ra là phải thấy hết những buổi sắp hổng, kể cả buổi tuần sau - đó đúng là
+    thứ mà bản thân trang này khuyên người ta làm (*"chọn 3 ngày nữa để đẩy giảng viên dạy
+    thay"*) mà trước nay không có danh sách nào để chọn. */
+ (function(){var _xp=gvnCanXep();
+  if(!_xp.length)return;
+  _xp=_xp.slice().sort(function(a,b){return (pvnd(a.session_date)||0)-(pvnd(b.session_date)||0)});
+  h+='<div class="notebar nbred"><i class="ti ti-calendar-off"></i><b>'+_xp.length+' buổi đã duyệt cho giáo viên nghỉ mà chưa có người dạy thay.</b> '+
+   _xp.slice(0,4).map(function(z){return '<button class="pill" onclick="gvdpSet(\''+esc(fmtYMD(pvnd(z.session_date)||new Date()))+'\')" data-tip="Chuyển bảng sang ngày của buổi này">'+
+    esc((z.class_name||z.class_id||"")+" · "+String(z.session_date||"").slice(0,10))+'</button>'}).join(" ")+
+   (_xp.length>4?(' <span class="mut" style="font-size:11.5px">... còn '+(_xp.length-4)+' buổi nữa</span>'):'')+'</div>'})();
  (function(){var _dk=dpTuan(new Date(day.getFullYear(),day.getMonth(),day.getDate()-3)).length;
   h+='<div class="notebar '+(_dk?'nbgreen':'nbamber')+'"><i class="ti ti-calendar-check"></i>'+
    '<b>Xếp theo ca đã đăng ký</b> - '+
@@ -24737,10 +25092,17 @@ function renderGvdp(embed){
     nhưng bảng bên dưới đổ hết mọi buổi trong ngày, muốn tìm buổi trống thì phải dò cột.
     Đếm bằng chính phép thử mà thẻ và `gvdpThieu()` của nhịp ngày đang dùng. */
  var gvF=fget("gvdp");
- var _nTrong=ses.filter(function(x){return !String(x.teacher_id||"").trim()}).length;
+ /* V2 18/08 - CHIP NÀY VÀ THẺ "lớp thiếu giáo viên hôm nay" PHẢI ĐẾM CÙNG MỘT THỨ. Trước đây
+    cả hai cùng hỏi "ô teacher_id trống không", nên chúng bằng nhau một cách tình cờ; từ khi có
+    đơn báo nghỉ thì phép thử ấy bỏ sót đúng loại buổi mà trang này sinh ra để lo. Nay cả hai
+    gọi `sesChuaCoNguoi()` - và nút "Mở Xếp người dạy thay" ở hàng chờ duyệt nhảy sang đây với
+    chính chip này, nên nếu hai bên lệch thì người bấm sẽ tới một danh sách rỗng. */
+ var _nTrong=ses.filter(sesChuaCoNguoi).length;
  var _nHuy=ses.filter(function(x){return isc(x.session_status,"cancelled")}).length;
+ var _nNghi=ses.filter(function(x){var dn=gvnCuaBuoi(x.session_id);return !!dn}).length;
  var _sesAll=ses.length;
- if(gvF==="trong")ses=ses.filter(function(x){return !String(x.teacher_id||"").trim()});
+ if(gvF==="trong")ses=ses.filter(sesChuaCoNguoi);
+ else if(gvF==="nghi")ses=ses.filter(function(x){return !!gvnCuaBuoi(x.session_id)});
  else if(gvF==="huy")ses=ses.filter(function(x){return isc(x.session_status,"cancelled")});
  ses=fltApply("gvdp",ses);
  h+=pgBar("gvdp",ses.length);
@@ -24748,7 +25110,8 @@ function renderGvdp(embed){
     trái sang phải, thu hẹp thô trước rồi tinh sau. `pgBar` là thứ vẽ ô tìm ở trang này nên chip
     phải đứng SAU nó. `_checkux` bắt được ngay lượt verify đầu. */
  h+=chipBar("gvdp",gvF,[["all","Tất cả buổi",_sesAll],
-  ["trong","Chưa có giáo viên",_nTrong,_nTrong?"red":""],
+  ["trong","Chưa có người đứng lớp",_nTrong,_nTrong?"red":""],
+  ["nghi","GV đã báo nghỉ",_nNghi,_nNghi?"amber":""],
   ["huy","Đã huỷ",_nHuy,_nHuy?"amber":""]],null,null,cotNutHTML("gvdpso"));
  h+='<div class="panel"><div class="ph"><b>Buổi học trong ngày</b><span class="mut" style="font-size:11.5px">bấm "Đề xuất người dạy thay" để xem ai nhận được</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Lớp</th><th>Cơ sở / hình thức</th><th>Giáo viên đang phụ trách</th><th>Giáo viên thay thế</th><th></th></tr></thead><tbody>';
  if(!ses.length)h+='<tr><td class="empty" colspan="6">Ngày này không có buổi học nào.</td></tr>';
@@ -24764,7 +25127,11 @@ function renderGvdp(embed){
      bấm lại lần nữa, rồi bắt đầu ngờ cả những dòng khác.* */
   h+='<tr onclick="openLopQuick(\''+esc(x.class_id)+'\')" style="cursor:pointer" title="Xem nhanh lớp này"><td>'+esc(d?hhmmOf(d):"")+'</td><td>'+lopLnk(x.class_id,x.class_id_name,"")+' <span class="mut">buổi '+esc(x.session_number||"?")+'</span></td>'+
    '<td class="khongbe">'+(clsOnline(c)?'<span class="chip blue">Online</span>':'<span class="chip">'+cnT(c.branch)+'</span> <span class="mut" style="font-size:11px">'+esc(elabel(c.learning_mode)||"")+'</span>')+'</td>'+
-   '<td>'+(String(x.teacher_id||"").trim()?nsLnk(x.teacher_id,x.teacher_id_name,""):'<span class="chip red">chưa gán</span>')+'</td>'+
+   '<td>'+(String(x.teacher_id||"").trim()?nsLnk(x.teacher_id,x.teacher_id_name,""):'<span class="chip red">chưa gán</span>')+
+    (function(){var dn=gvnCuaBuoi(x.session_id);if(!dn)return "";
+     return isc(dn.trang_thai,"da_duyet")
+      ?'<div><span class="chip red">đã duyệt cho nghỉ</span> <span class="mut" style="font-size:11px">'+esc(dn.ly_do||"")+'</span></div>'
+      :'<div><span class="chip amber">xin nghỉ, chờ TP ACA duyệt</span></div>'})()+'</td>'+
    '<td>'+(n?'<span class="chip green">'+n+' người</span>':'<span class="chip red">không có ai</span>')+'</td>'+
    '<td><button class="btn primary sm" onclick="event.stopPropagation();gvBackupForm(\''+esc(x.session_id)+'\')"><i class="ti ti-user-plus"></i>Đề xuất người dạy thay</button></td></tr>'});
  h+='</tbody></table></div></div>';
@@ -28996,6 +29363,7 @@ function qaKhoCau(){
    "soi buổi chưa ghi nhận xét"]],
   ["Giảng dạy & ACA",[
    "bài tập đang chờ chấm",
+   "duyệt đơn giáo viên báo nghỉ",
    "lớp thiếu giáo viên hôm nay",
    "ghi nhận xét buổi vừa dạy",
    "học viên nguy cơ học thuật",
@@ -30505,6 +30873,9 @@ RENDER.duyetnghi = function(){var L=absQueue();
 /* V2 13/08 - BỎ DẢI THẺ: cả hai ô đều là số đếm của chip ngay dưới. Trang này không có ô
    tiền nào để giữ (đơn xin nghỉ không mang số tiền), nên bỏ trọn. */
  return nvHead("duyetnghi")+duyNghiHTML()+_duyAi()};
+/* V2 18/08 - GIÁO VIÊN báo nghỉ buổi dạy. Không dải thẻ, cùng lý do với `duyetnghi` ngay trên:
+   mọi con số của trang này đều là số đếm của chính danh sách nằm dưới. */
+RENDER.duyetgvnghi = function(){return nvHead("duyetgvnghi")+duyGvnHTML()+_duyAi()};
 RENDER.duyetthu  = function(){var L=duyPayList();
  return nvHead("duyetthu")+statStrip([
   /* V2 13/08 - ô đếm đơn đã bỏ (chip ngay dưới đếm đúng con số ấy). Giữ lại ô TIỀN:
@@ -30800,6 +31171,11 @@ var NHIP={
     xoay quanh CHẤT LƯỢNG DẠY chứ không phải xếp lớp: nhận xét buổi có kịp hạn không, bài có
     được chấm không, lớp nào đang đuối, giáo án đã đủ cho khoá chưa. */
  aca:[
+  /* V2 18/08 - dòng ĐẦU ngày của Trưởng phòng ACA. Đứng trên cả nhận xét buổi vì nó có ĐỒNG HỒ:
+     duyệt trễ một buổi sáng là học vụ mất nguyên buổi chiều để tìm người, và buổi học tối nay
+     không có ai đứng lớp. Nhận xét buổi trễ một ngày thì vẫn ghi được. */
+  ["sang","Duyệt đơn giáo viên báo nghỉ","Duyệt trễ là học vụ không kịp tìm người dạy thay - buổi ấy phải huỷ","duyetgvnghi",
+   function(){return gvnCho().length}],
   ["sang","Soi buổi dạy hôm qua đã có nhận xét chưa","Nhận xét trễ là học viên mất mạch phản hồi, và số SLA của cả phòng lệch theo","buoihoc",
    function(){return srows("DL11").filter(bhQuaHan).length},"overdue"],
   ["sang","Bài tập đang chờ chấm","Chấm trễ thì buổi sau giáo viên không biết lớp yếu chỗ nào","baitap",
@@ -31902,7 +32278,7 @@ var NAVTREE=[
     sáng cho mục con. Mời người ta vào một mục rồi tô sáng mục khác là làm họ mất dấu.
     Trang `duyet` vẫn sống (nhịp ngày và Việc hôm nay dẫn tới), chỉ không đứng trên menu - và
     `_checkcauhoi` khai thẳng đúng một dòng nhịp còn thiếu lối menu vì chuyện này. */
- {g:"Chờ duyệt",items:["duyetck","duyethoan","duyetnghi","duyetthu","duyetdot","duyethd","banggiao"]},
+ {g:"Chờ duyệt",items:["duyetck","duyethoan","duyetnghi","duyetgvnghi","duyetthu","duyetdot","duyethd","banggiao"]},
  /* V9.99m (anh Luân 04/08: *"cái trang hỏi đáp... nó đang ở đâu nhỉ, a thấy tour thì hiện ra,
     mà a tìm trên sidebar ko thấy"*) - đúng, và đây là một chỗ SÓT KHI GỠ V6: trang Hỏi đáp có
     mục menu ở cây của bản v6 (đã gỡ 06/08) nhưng chưa bao giờ có ở cây menu V5, nên chỉ mở được bằng nút Trợ
@@ -32054,7 +32430,7 @@ var HUBTAB={
  hoctap:{v:"HTTAB",d:"lop",m:{today:"buoihnay",lop:"lop",buoihoc:"buoihoc",wow:"wow",lichtuan:"lichtuan",gvdp:"gvdp",phong:"phong"}},
  cskh:{v:"CSTAB",d:"khaosat",m:{khaosat:"khaosat",phanhoi:"ghinhan",khieunai:"khieunai",ychv:"ychv"}},
  khac:{v:"KTAB",d:"baoluu",m:{baoluu:"baoluu",magioithieu:"magioithieu"}},
- duyet:{v:"DUYTAB",d:"duyetck",m:{duyetck:"duyetck",duyethoan:"duyethoan",duyetnghi:"duyetnghi",duyetthu:"duyetthu",banggiao:"banggiao"}}};
+ duyet:{v:"DUYTAB",d:"duyetck",m:{duyetck:"duyetck",duyethoan:"duyethoan",duyetnghi:"duyetnghi",duyetgvnghi:"duyetgvnghi",duyetthu:"duyetthu",banggiao:"banggiao"}}};
 /* ═══ HUB GỘP THẬT - KHÔNG PHẢI BÍ DANH ══════════════════════════════════════════════════════
    Trước đây `go()` viết thẳng `key!=="duyet"` để chừa một ngoại lệ. Nay có hai cái, và một luật
    chỉ áp cho một trang thì không phải luật - khai thành BẢNG để mọi chỗ hỏi cùng một nguồn.
@@ -32095,6 +32471,7 @@ var HUBCAU={
  duyet:{duyetck:"Đang mở Chiết khấu - đơn giảm học phí vượt mức tự quyết, chờ người có quyền duyệt.",
   duyethoan:"Đang mở Hoàn tiền - yêu cầu hoàn, kèm lý do và số tiền.",
   duyetnghi:"Đang mở Xin nghỉ học - đơn xin nghỉ buổi, duyệt thì buổi đó không tính vắng.",
+  duyetgvnghi:"Đang mở GV báo nghỉ - giáo viên xin nghỉ buổi dạy, duyệt xong phải xếp người dạy thay.",
   duyetthu:"Đang mở Xác nhận thu tiền - khoản thu chờ đối soát đã về tài khoản.",
   banggiao:"Đang mở Bàn giao lead - lead chuyển tay giữa các tư vấn viên."}};
 function hubCau(hub,tab){var m=HUBCAU[hub]||{};return m[tab]?(" "+m[tab]):""}
@@ -33330,6 +33707,10 @@ DOORS = {
  # (xep nguoi xong thi danh dau ca da dung - cua ay ghi ca DL11 lan DL31, khai du ca hai cho
  # thi kiem ke moi doc ra duoc duong di that cua du lieu).
  "DL31":["dpLuu","sesSetTeacher"],
+ # V2 18/08 - DL33 giao vien bao nghi buoi day. BON cua ghi, va cua thu tu la `sesSetTeacher`:
+ # xep nguoi day thay xong thi phai dong lai la don (ghi `gv_thay`), neu khong thi don van nam
+ # mai trong hang cho xep cua hoc vu du viec da xong. Cua ay nay ghi bon bang - DL11, DL31, DL33.
+ "DL33":["gvNghiLuu","gvNghiQuyet","gvNghiHuy","sesSetTeacher"],
  # V2 12/08 (SALE-3): so luu tin da gui - dev noi duong gui that sau, cho noi da danh dau.
  # V2 15/08 - `obGuiThat`: gui thong tin lop tu luong onboarding, ghi thang vao So tin da gui
  # thay cho nut "Xac nhan da gui" cu. Cua rieng chu khong goi lai `msgGui` vi no dong them mot
