@@ -303,6 +303,24 @@ Kho bài tập · Giáo án theo khóa · Buổi học trong ngày (GV dự phò
 thay · Hồ sơ khóa (lớp thuộc khóa) · Phòng học (điểm đụng) · Bảng lớp (học viên + lịch sử đổi
 lịch) · Mã giới thiệu. Lựa chọn nhớ theo từng người và giữ qua F5.
 
+### Hỏi đáp trả lời bằng SỐ THẬT và dẫn tới danh sách đã lọc (18/08)
+Hộp Hỏi đáp và Trợ lý nay đọc thẳng bảng nhịp ngày của app: mỗi dòng nhịp là một việc kèm sẵn
+trang đích, hàm đếm và mã chip lọc. Hỏi *"ai chưa xếp lớp"*, *"bài tập đang chờ chấm"*, *"thu các
+đợt tới hạn hôm nay"* - app trả về **con số thật**, kèm nút mở **đúng danh sách đã lọc sẵn**. Con
+số trong câu trả lời và con số trên chip của trang đích đọc cùng một hàm nên không thể lệch nhau.
+
+Đo trước và sau: 53 câu người thật hỏi - trước 9 câu ra số thật, sau **40 câu**; câu app không
+hiểu từ 2 xuống **0**.
+
+Hỏi *"làm sao để..."* thì app trả lời bằng **bài hướng dẫn chạy từng bước** kèm nút chạy luôn.
+Trang Hỏi đáp có sẵn **45 câu mẫu chia 9 nhóm theo ghế ngồi**; Trợ lý gợi ý ba câu của chính chức
+danh đang đăng nhập.
+
+### Bài hướng dẫn theo VIỆC (18/08)
+Thêm cấp thứ năm "Làm một việc cụ thể" - 4 bài: gửi khảo sát cho một lớp · xếp người dạy thay ·
+lọc một danh sách rồi xuất ra Excel · đọc công nợ và đòi đúng người. Trước đó 16 bài đều dạy theo
+vai ("một ngày của Học vụ") hoặc theo cấu hình, không bài nào dạy một việc.
+
 ### Cột mặc định chọn theo ngữ cảnh từng bảng (18/08)
 Mỗi sổ chỉ bày sẵn những cột người ta thật sự đọc; phần còn lại vẫn có trong nút Cột, bật là hiện.
 Ba loại cột mặc định ẩn: **cột mã** (mọi sổ, kể cả bảng dựng tay) · **cột gần như trống** (có dữ

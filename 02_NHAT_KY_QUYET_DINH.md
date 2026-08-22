@@ -160,6 +160,16 @@
 > giảng viên (3-5 cột), bảng chờ xếp lớp (3 cột), Phiếu gần đây ở Khảo sát, bảng thưởng còn treo
 > ở Mã giới thiệu, các bảng trong Cài đặt và trong ngăn kéo.
 
+> ### 📋 18/08 - ĐANG CHỜ ANH LUÂN GẬT (sinh ra từ audit + đợt nâng cấp hỏi đáp)
+> 1. **"Giáo viên báo nghỉ" - một nghiệp vụ chưa ai khai.** Anh Luân hỏi hỏi đáp có tìm được
+>    *"giáo viên nghỉ liên tiếp 2 buổi"* không. App KHÔNG ghi nhận việc giáo viên nghỉ, và SOP
+>    gốc cũng không mô tả (đã tra 4.091 chuỗi). Muốn có thì phải dựng thêm một cửa ghi: giáo viên
+>    báo nghỉ buổi nào · lý do · ai duyệt · tự đẩy sang màn Xếp người dạy thay, kèm trục lọc "nghỉ
+>    từ N buổi". **Đây là THÊM nghiệp vụ mới, không phải vá lỗ hổng - chờ anh gật.**
+> 2. **"Cái nào cũng cần duyệt" - duyệt tới đâu?** (treo từ 17/08) Trưởng phòng và Kế toán trưởng
+>    hiện chia đợt thẳng vì chính họ là người duyệt. Nếu kể cả họ cũng phải có chữ ký thứ hai thì
+>    em dựng thêm luật "không tự duyệt yêu cầu của mình".
+
 > ### ✅ 18/08 - ĐO LẠI BA MẢNG RÀ SOÁT: RA1 VỀ 0, RA2 CÒN 6 CHỖ KHÔNG PHẢI SỰ KIỆN
 > **RA1 (trục lọc): 13 → 0.** Thêm 10 trục: `contact_primary`, `payer_side` (DL09) · `student_type`,
 > `learning_goal`, `learning_mode` (DL02) · `discount_type` (DL06) · `complaint_result` (DL17) ·
@@ -376,14 +386,110 @@
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 42 BỘ KIỂM, XANH HẾT 42/42 (verify trọn bộ 18/08 trên chính bản này, 35m54s).
-> Bản dựng đang chạy: `52f95d` (18/08, cột mặc định theo ngữ cảnh từng bảng + bỏ chữ "đợt" khi
-> đóng một lần), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
-> `_check17` (bộ máy lọc) từ 504 lên 551 tiêu chí - 10 trục mới đã vào tầm đo, không phải khai suông.
-> Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
+> Bản dựng đang chạy: `deb78b` (18/08 - AUDIT TOÀN DIỆN + nâng cấp hỏi đáp / tour / trợ lý), đã
+> lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> **44 bộ kiểm** (thêm `_checkhoi`). Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
+> Mốc cũ: `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
 > `bad7f9`, `a9eb4b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
+> ### 🟢 18/08 - NÂNG CẤP HỎI ĐÁP · TOUR · TRỢ LÝ (anh Luân giao ngay sau audit)
+>
+> Anh Luân: *"nâng cấp trợ lý, hỏi đáp và tour... nâng cấp cho nó thông minh hơn nữa nhé em"*, rồi
+> nói rõ mức mong muốn: *"hỏi: tôi muốn xem danh sách giáo viên nghỉ liên tiếp 2 buổi, thì nó trỏ
+> luôn tới trang đích, và lọc luôn theo nhu cầu được ko em?"*, và *"em thử đặt ra vài chục câu hỏi
+> mà các team có thể sẽ tìm, rồi test thử, dựng sẵn trong câu hỏi gợi ý để có gì a test"*.
+>
+> **ĐO TRƯỚC KHI LÀM - 53 câu người thật hỏi**, viết như người ta gõ (không dấu, cụt): chỉ **9 câu
+> ra số thật**; **23 câu** hỏi "ai / bao nhiêu / cái nào" bị nhánh CHỖ CẤU HÌNH đỡ mất; 2 câu bí.
+> Hỏi *"ai chưa xếp lớp"* nhận về ba mẫu câu nhắc trong Cài đặt. Hỏi *"phiếu nào chưa có chứng
+> từ"* nhận về tham số nhắc khảo sát và hotline. Đúng chủ đề, sai hẳn câu hỏi.
+>
+> **VÁ BẰNG CÁCH NỐI HAI THỨ CÓ SẴN, KHÔNG CHÉP TAY 20 Ý ĐỊNH MỚI.** App đã có bảng `NHIP` khai
+> cho 27 vai - mỗi dòng là *việc · vì sao · TRANG ĐÍCH · HÀM ĐẾM · MÃ CHIP*, tức mỗi dòng vốn đã
+> là một câu hỏi kèm sẵn con số và bộ lọc; và `jumpFlow(trang,chip)` đã biết cả năm kiểu chip.
+> Nối lại là xong - và vì con số trong câu trả lời đọc **cùng một hàm** với chip trên trang đích
+> nên hai bên không thể lệch nhau.
+> Kết quả: **40/53 câu ra số thật** (trước 9), **0 câu bí**.
+>
+> Thêm: hai ý định khai tay cho chỗ chưa có dòng nhịp (phiếu thiếu chứng từ · khiếu nại chưa xử
+> lý) · **nhánh CÁCH LÀM**: hỏi *"làm sao để..."* thì trả lời bằng BÀI HƯỚNG DẪN có sẵn kèm nút
+> chạy luôn - *chỉ đường là "trang ấy ở kia", bài hướng dẫn là "đi với tôi, tôi khoanh từng nút
+> cho bạn bấm"* · **kho 45 câu chia 9 nhóm theo ghế ngồi** ngay trên trang Hỏi đáp.
+>
+> **BỘ KIỂM MỚI `_checkhoi.js`** (43 → 44 bộ): bày ra một câu gợi ý thì phải trả lời được câu đó.
+> Bốn phép: trả lời được không · nút trỏ vào trang CÓ THẬT không · bấm xong trang đích có ra danh
+> sách không (hứa N mà ra 0 dòng là đỏ) · không mời rồi đuổi.
+>
+> **TOUR - THÊM CẤP THỨ NĂM "Làm một việc cụ thể".** Đo: 16 bài cũ đều dạy theo VAI hoặc theo CẤU
+> HÌNH, không bài nào dạy MỘT VIỆC - nên câu hỏi thực tế nhất không có bài nào đỡ.
+> *Người ta không mở app lên để "sống một ngày của Học vụ"; họ mở lên vì đang có ĐÚNG MỘT việc
+> phải làm và chưa biết bấm đâu.* Bốn bài mới → 20 bài / 120 bước.
+>
+> **TRỢ LÝ - ba chip gợi ý nay là việc của CHÍNH GHẾ đang ngồi** (đọc cùng bảng nhịp). Trước đó ba
+> chip giống hệt nhau ở mọi chức danh. Đo: 16 ghế, 48/48 chip bấm vào đều trả lời được.
+> **CỐ Ý KHÔNG** nhét lại hàng chờ xử lý vào trợ lý - anh Luân đã chốt *"trợ lý, em bỏ xử lý task
+> đi, dùng để hỏi thôi"*. Đây vẫn là chỗ HỎI, chỉ là hỏi sẵn đúng câu.
+>
+> **KHAI THẲNG VỀ VÍ DỤ CỦA ANH LUÂN:** *"giáo viên nghỉ liên tiếp 2 buổi"* - **app chưa ghi nhận
+> việc giáo viên nghỉ**. Đã tra cả DL11 lẫn file SOP gốc: có `cancel_reason`, `teacher_late_minutes`,
+> sổ ca dạy thay DL31, nhưng không cột nào ghi "giáo viên báo nghỉ", và trong 4.091 chuỗi của SOP
+> không dòng nào mô tả tình huống ấy. **Không phải lỗ hổng - là một nghiệp vụ chưa ai khai.** Ba
+> thứ gần nhất app có số thật thì nay hỏi được: buổi phải xếp người dạy thay · buổi bị huỷ kèm lý
+> do · giáo viên trễ giờ.
+
+> ### 🟢 18/08 - AUDIT TOÀN DIỆN (anh Luân: *"dừng code thêm để các team làm feedback - em dùng
+> thời gian rảnh này audit toàn diện, vá sạch các lỗ hổng đi"*)
+>
+> Chạy trọn `GIAO_THUC_AUDIT.md`. Verify máy đã xanh trên `52f95d` nên audit **không đo lại phần
+> ấy** - audit là đi tìm **chỗ bộ kiểm chưa đi qua**. Bảng chín mảng ở cuối mục này.
+>
+> **CHỖ HỎNG NẶNG NHẤT - RÒ RỈ MIỀN TIỀN Ở HỒ SƠ 360.** Đo: **16/16 chức danh** - kể cả 10 giáo
+> viên, 2 NV WOW, Nhân sự, Marketing, những người app khai miền tiền là *"không xem"* - vẫn đọc
+> được trên dòng thời gian *"Thu tiền 5.750.000đ"*, *"Duyệt chiết khấu 1.500.000đ"*, và cả thẻ
+> HỌC PHÍ với tổng phí / đã thu / còn nợ. Không phải một chức danh lọt, mà **mọi chức danh giống
+> hệt nhau**: dòng thời gian dựng từ `C.pays`/`C.enr` - hai mảng lấy từ chỉ mục nội bộ, không đi
+> qua `srows`/`canRow` như 30 cuốn sổ khác. `_checkmien` vẫn in 0/0 vì phạm vi nó soi là các SỔ
+> DANH SÁCH; hồ sơ 360 nằm ngoài tầm đo.
+> *Một cửa gác đặt ở 30 cuốn sổ mà bỏ trống ở hồ sơ - thì hồ sơ chính là cửa người ta đi.*
+> Vá bằng cách hỏi lại đúng hàm app đang dùng (`canRow`), không viết luật mới. Mốc ĐĂNG KÝ vẫn
+> giữ cho mọi người (học khóa nào là việc học); chỉ CON SỐ tiền mới cắt theo miền.
+>
+> **BỐN CHỖ CÒN LẠI:** ngăn kéo "Bản cam kết đã ký" là ngõ cụt và in thẳng tên tệp ảnh ra màn (hai
+> chỗ - đúng bệnh vừa sửa ở bảng Công nợ hôm qua mà chưa đi soi chỗ còn lại) · `_checkreset` chỉ
+> đo HAI cổng trong khi đầu file tự khai là đo BA (*một bản khai rộng hơn thứ nó đo là một cách
+> nói dối lặng lẽ*) · lý do miễn trừ trong `check_sop` viện dẫn tên hàm mà không ai đối chiếu
+> (đổi tên hàm là lời khai lặng lẽ thành sai) · **nút Xuất CSV hứa một đằng làm một nẻo**: chú
+> thích ghi *"tải N dòng ĐANG HIỆN"* mà cột thì đổ mọi trường thô với tiêu đề tiếng Anh, kể cả
+> cột người dùng vừa ẩn. `_check17` chỉ hỏi "có nút Xuất không", không mở tệp ra xem.
+>
+> **BỐN LẦN THƯỚC SAI trong audit** - đều là em đo sai, app đúng; ghi ra để lần sau khỏi mất công:
+> đọc nội dung trang ở `#app` thay vì `#content` (ra "0 lượt vẽ" mà vẫn in kết quả) · hỏi rò rỉ
+> lương bằng chữ "lương" (trùng tên *Lương Bảo Ngọc* - bốn trang báo đỏ oan) · xếp `openHoso` /
+> `openLop` / `ktInvite` vào nhóm cửa mở ngăn kéo (chúng chuyển trang / ghi thẳng) · và phán
+> "mục không ẩn thì phải có trên trang" trong khi app cố ý chỉ vẽ mục CÓ NỘI DUNG.
+>
+> | Mảng | Kết quả |
+> |---|---|
+> | 1 · Giao diện | XANH - verify + chụp màn nhìn bằng mắt (bắt được lỗi dải chế độ, xem mục dưới) |
+> | 2 · Nghiệp vụ | XANH - `check_sop` đạt cả 8 mặt; siết thêm: lý do miễn trừ bị máy đối chiếu |
+> | 3 · Chức năng | ĐÃ VÁ 1 - nút Xuất CSV không xuất đúng bảng đang nhìn |
+> | 4 · Dữ liệu demo + Reset | ĐÃ VÁ 1 - bộ kiểm reset thiếu cổng phụ huynh (15 → 19 tiêu chí) |
+> | 5 · Ngữ cảnh | ĐÃ VÁ 1 - ngăn kéo cam kết ngõ cụt + in tên tệp; 21/21 ngăn kéo còn lại sạch |
+> | 6 · Phạm vi dữ liệu | ĐÃ VÁ 1 - rò rỉ miền tiền ở hồ sơ 360, 16/16 chức danh |
+> | 7 · Nhất quán ba cổng | XANH - 680 con số đối chiếu giữa hai cổng, khớp hết; 151 lượt vẽ sạch |
+> | 8 · Tài liệu | XANH - 43/43 bộ kiểm đều có mặt trong README_SRC và verify.sh |
+> | 9 · Chưa đo được | khai ở mục dưới |
+>
+> **MẢNG 9 - KHAI THẲNG PHẦN CHƯA ĐO ĐƯỢC:**
+> · Phép đếm dòng của `_checkhoi` chỉ là **ước lượng** (đếm lớp dòng trên HTML) - chênh lệch chỉ
+>   được ghi chú, không được kết luận app lọc sai.
+> · `check_taolai` đỏ đúng một lần 15/08 rồi không tái hiện - **chưa tuyên bố đã sửa**.
+> · Nhịp làm việc thật và câu chữ có tự nhiên không thì **người thật dùng mới biết** - đó chính là
+>   đợt feedback các team đang chạy.
+> · Giới hạn còn tồn của bản demo: không backend · dữ liệu trong localStorage từng máy · phân
+>   quyền thi hành ở trình duyệt · dữ liệu là dữ liệu mẫu.
+
 > ### 🟢 18/08 - CỘT MẶC ĐỊNH THEO NGỮ CẢNH · VÀ "ĐÓNG MỘT LẦN" THÌ ĐỪNG GỌI LÀ "ĐỢT"
 >
 > **Anh Luân hai câu.** (1) *"Đóng 1 lần thì ghi là ngày đóng, số tiền, chứ ai lại ghi đợt nữa
