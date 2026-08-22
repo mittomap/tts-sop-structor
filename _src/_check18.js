@@ -629,13 +629,20 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
   okk=okk&&(logRows().length<=3);
   r.value=cu;return okk})());
  /* --- man tra nhat ky --- */
- (function(){window.SETTAB="nhatky";var o="";try{o=RENDER.settings()}catch(e){o=""}
-  window.SETTAB="ch2";
+ /* 18/08 - man nay ROI KHOI Cai dat (anh Luan: *"Log ma sao o cai dat ta???"*), nay la mot cuon
+    so trong nhom Tra cuu. Thuoc do phai di theo: ve THANG trang do, khong ve trang Cai dat roi
+    doi mot tab khong con ton tai - lam vay thi sau nay man Nhat ky co hong that no cung xanh.
+    *Doi cho mot man thi phai doi ca cho cai thuoc dang do no.* */
+ (function(){var o="";try{o=RENDER.nhatky()}catch(e){o=""}
   t("man Nhat ky thao tac ve duoc", o.length>400);
   t("man Nhat ky co o tim", /class="pgq"/.test(o));
   t("man Nhat ky xuat duoc CSV", /pgExport\('nhatky'\)/.test(o));
   t("man Nhat ky loc duoc theo bang va theo nguoi", /nkSet\('NKTB'/.test(o)&&/nkSet\('NKWHO'/.test(o));
   t("man Nhat ky noi thang gioi han giu bao nhieu dong", o.indexOf("dòng gần nhất")>=0);
+  t("man Nhat ky loc duoc theo KY va theo LOAI thao tac", /nkSet\('NKKY'/.test(o)&&/nkSet\('NKACT'/.test(o));
+  /* Cua gac pham vi du lieu tung dong: mo cho truong phong doc thi phai co no, neu khong cuon so
+     nay thanh cua hau di vong qua toan bo lop phan quyen du lieu. */
+  t("nhat ky gac lai tung dong theo mien du lieu", typeof logXem==="function"&&typeof logRowsXem==="function");
   t("man Nhat ky goi ten bang bang tieng Viet", o.indexOf("Test đầu vào")>=0||o.indexOf("Buổi học")>=0)})();
  /* ============ 27. THAM SO CAU HINH PHAI CO TAC DUNG THAT (V9.39) ============
     Anh Luan lo: "gio a dua cho dev, no khong the lam duoc la chet anh that su".
@@ -1039,7 +1046,7 @@ t("không in mã enum thô ra màn hình"+(rawCode.length?(" - "+rawCode.slice(0
    var L0=rows("DL02")[0];if(!L0)return false;
    window.JPID=L0.lead_id;var o="";try{o=RENDER.hoso()}catch(e){o=""}
    window.JPID="";
-   return o.indexOf("Ai đã sửa hồ sơ này")>=0&&/SETTAB=\\?'nhatky/.test(o)})());
+   return o.indexOf("Ai đã sửa hồ sơ này")>=0&&/go\('nhatky'\)/.test(o)})());
  t("khoi 'ai da sua dong nay' dung duoc cho bat ky bang nao",
    typeof logRowHTML==="function"&&logRowHTML("DL03","KHONG-CO").indexOf("Chưa có thao tác")>=0);
 })();

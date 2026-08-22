@@ -106,6 +106,9 @@ const KHONGTHE = {
   /* V2 18/08 - 3 the = 3 chip: Cho duyet · Bao gap · Chua co ai thay duoc. Dung ho hang voi
      `duyetnghi` ngay tren, va dung luat anh Luan chot 13/08. */
   duyetgvnghi: _LYDO_TRUNGCHIP,
+  /* 18/08 - `nhatky` KHONG khai o day: bo nay chi soi trang NGHIEP VU, ma nhat ky la mot so tra
+     cuu. Da thu khai roi go ra - chinh bo kiem bat "ban khai nhac trang khong con la nghiep vu".
+     *Mien tru chi co nghia o dung cho no dang bi hoi.* */
   duyetdot:    _LYDO_TRUNGCHIP,
   tinnhan:     _LYDO_TRUNGCHIP,
   lop:         _LYDO_TRUNGCHIP,   /* 3 the = 3 chip trang thai lop */
@@ -119,6 +122,9 @@ const CHIDOC = {
             "loc ra dung nhom can goi, va nut Xuat de mang bang di doi chieu voi ke toan.",
   phong:    "trang doi chieu phong va gio - no CHI RA cho dung, con sua thi sua o lich cua lop.",
   buoihnay: "lat cat theo ngay cua buoi hoc - moi viec tren buoi deu mo tu chinh dong buoi do.",
+  /* 18/08 - KHONG khai `nhatky` o day: no la mot SO TRA CUU, khong nam trong dien "trang nghiep
+     vu" ma bo nay soi. Khai thua mot dong la khai mot lo mien tru cho thu chua bao gio bi hoi -
+     va chinh bo kiem bat duoc ngay. *Mien tru chi co nghia o dung cho no dang bi hoi.* */
 };
 
 const meta = (() => { try { return JSON.parse(FS.readFileSync(PATH.join(__dirname, "demo_data_big.json"), "utf8")).meta || {} } catch (e) { return {} } })();

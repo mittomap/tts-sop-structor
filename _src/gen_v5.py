@@ -5553,11 +5553,8 @@ bangcong:{t:"Công giảng dạy & WOW",ttl:"Soát trước khi chốt công",th
   ["bg_orph","Lead chưa có ai phụ trách","Lead chưa gán cho ai - không ai gọi thì nguội. Danh sách: bấm chính ô này, ô chọn \"Từ NV\" nhảy sang mục (chưa có ai phụ trách) và bảng lead ngay dưới liệt kê đúng bấy nhiêu dòng."],
   ["bg_due","Quá hẹn liên hệ của NV này","Số lead nhân viên này phụ trách đã quá hẹn liên hệ, kèm mức trễ NẶNG NHẤT tính bằng ngày - trễ vài giờ và trễ vài tuần không phải một chuyện. Danh sách: bảng lead dưới, cột Hẹn liên hệ."],
   ["bg_thu","Đủ điều kiện thu về","Lead dính một trong hai mốc chăm sóc của trung tâm: quá leadStale_days ngày không ai liên hệ, hoặc một NV ôm quá leadHoldMax_days ngày. Khác ô bên trái - ô kia đo cái hẹn NV tự đặt, ô này đo mốc của trung tâm. Danh sách: nút Thu lead quá hạn ở thanh trên."]]},
- nhatky:{t:"Nhật ký thao tác",ttl:"Thao tác đã ghi lại",the:[
-  ["nk_tong","Thao tác đã ghi","Tổng số dòng nhật ký đang giữ (có trần, cũ nhất bị đẩy ra). Muốn xem: bảng nhật ký ngay dưới."],
-  ["nk_today","Hôm nay","Số thao tác ghi trong ngày hôm nay. Danh sách: lọc theo ngày ở thanh lọc dưới."],
-  ["nk_nguoi","Người thao tác","Số người khác nhau đã ghi dữ liệu trong sổ này. Muốn xem: cột Người ở bảng dưới."],
-  ["nk_undo","Dòng đã hoàn tác","Số thao tác đã bị bấm hoàn tác - dữ liệu đã trả về giá trị cũ. Muốn xem: bảng dưới, dòng có dấu hoàn tác."]]},
+ /* 18/08 - bản khai dải thẻ của màn Nhật ký GỠ theo dải thẻ. Giữ lại là một lời khai về một
+    dải không còn được vẽ - lần sau ai đọc cũng tưởng màn ấy vẫn có thẻ. */
  /* 13/08 - ba thẻ trùng nhãn với chip lọc đã bỏ (xl_send · xl_cfm · xl_over); hai thẻ còn lại
     nói thứ chip không nói: "chờ xếp lớp" là hàng đợi TRƯỚC khi vào onboarding, còn "onboarding
     chưa xong" mang mốc SLA 72 giờ. */
@@ -16141,16 +16138,20 @@ function renderNhatky(){
  window.FLTLAST=window.FLTLAST||{};window.FLTLAST.nhatky=F.map(function(e){
   return {luc:e.log_time,nguoi:e.staff_name||e.staff_id,thao_tac:e.action,bang:sheetVN(e.sheet),
    dong:e.row_id,thay_doi:e.summary,cua_ghi:e.door,da_hoan_tac:e.undone}});
- var h='<div class="notebar"><i class="ti ti-history"></i>Mọi lần ghi dữ liệu trong buổi làm việc này đều để lại một dòng ở đây: <b>ai</b>, <b>lúc nào</b>, <b>đổi ô nào từ gì sang gì</b>. Bản demo giữ <b>'+logMax()+' dòng gần nhất</b> ngay trong trình duyệt (đổi ở CH2 - <span class="mono">auditLogKeep_rows</span>); nối sheet thật thì đây là bảng <b>DL25</b>. Nhật ký <b>không tự có</b> - nó do các cửa ghi của app sinh ra, nên thao tác nào chưa hiện ở đây là cửa ghi đó chưa được khai.</div>';
- var today=nowStr().slice(0,10);
- var nToday=L.filter(function(e){return String(e.log_time||"").indexOf(today)===0}).length;
+ /* 358 ký tự - `_checkaudit` bắt đúng luật của app: đoạn nhắc đầu trang đọc hết trong một nhịp
+    mắt, phần dài vào chú thích rê chuột. Trang này còn có `pageHead` nói nó là gì rồi, nên câu ở
+    đây chỉ cần nói ĐIỀU KHÔNG NHÌN RA ĐƯỢC: sổ giữ tối đa bao nhiêu dòng. */
+ var h='<div class="notebar" data-tip="Nhật ký không tự có - nó do các cửa ghi của app sinh ra, nên thao tác nào chưa hiện ở đây là cửa ghi đó chưa được khai. Bản demo giữ sổ ngay trong trình duyệt; nối sheet thật thì đây là bảng DL25."><i class="ti ti-history"></i>Sổ giữ <b>'+logMax()+' dòng gần nhất</b> - đổi ở Cài đặt &rsaquo; CH2 (<span class="mono">auditLogKeep_rows</span>).</div>';
  var whos={};L.forEach(function(e){if(e.staff_id)whos[e.staff_id]=e.staff_name||e.staff_id});
- var nUndone=L.filter(function(e){return String(e.undone||"")==="yes"}).length;
- h+=statStrip([
-  ["ti-history",L.length,"Thao tác đã ghi","#2E5A88","giữ tối đa "+logMax()+" dòng"],
-  ["ti-calendar",nToday,"Hôm nay","#16A34A",today],
-  ["ti-users",Object.keys(whos).length,"Người thao tác","#B45309",""],
-  ["ti-arrow-back-up",nUndone,"Dòng đã hoàn tác","#D51920",""]],"nhatky");
+ /* ═══ 18/08 - DẢI THẺ BỎ HẲN, VÀ ĐÂY LÀ HỆ QUẢ TRỰC TIẾP CỦA VIỆC ĐỔI Ô CHỌN THÀNH CHIP ═════
+    Dải thẻ cũ có bốn ô: Thao tác đã ghi · Hôm nay · Người thao tác · Dòng đã hoàn tác.
+    Đưa trục KỲ lên thành dải chip là ba trong bốn ô ấy lập tức nói lại đúng thứ chip đang nói:
+    "Thao tác đã ghi" = chip "Mọi lúc", "Hôm nay" = chip "Hôm nay", "Dòng đã hoàn tác" = ô chọn
+    Loại &rsaquo; Hoàn tác. `_checklap` bắt cái thứ hai trên ba chức danh.
+    Luật anh Luân chốt 13/08: *"thẻ và chip lọc dễ bị trùng nhau, nếu trùng thì bỏ thẻ"* - và chip
+    hơn thẻ ở chỗ nó BẤM LỌC ĐƯỢC. Ô thứ tư ("Người thao tác") thì ô chọn Người đã nói.
+    *Thêm một cách nói tốt hơn thì phải đi bỏ cách nói cũ, không thì màn hình có hai chỗ nói cùng
+    một câu và người đọc phải tự đoán chỗ nào mới thật.* */
  var tbs={};L.forEach(function(e){if(e.sheet)tbs[e.sheet]=1});
  var bar='<span class="pgq"><i class="ti ti-search"></i><input value="'+esc(window.NKQ||"")+'" placeholder="Tìm trong trang này..." oninput="nkSet(\'NKQ\',this.value)" aria-label="Tìm trong nhật ký"></span>';
  bar+='<span class="tbgr"><span class="lbl">Bảng</span><select class="sel qsel" onchange="nkSet(\'NKTB\',this.value)"><option value="">Tất cả</option>';
@@ -16381,7 +16382,9 @@ var SETMOTA={
  giagio:["Bảng đơn giá giờ dạy theo giảng viên x loại ngày x ca - bảng công tháng của giảng viên tính thẳng từ đây.",function(){return rows("DL01").filter(isCongRole).length+" giảng viên"},"ti-clock-dollar"],
  khoa:["Danh mục khóa học: học phí, số buổi, quota WOW. Đây là cấu hình sản phẩm, không phải lớp đang chạy.",function(){return rows("DL05").length+" khóa"},"ti-school"],
  health:["Máy tự soi dữ liệu đang có và chỉ ra chỗ thiếu, chỗ lệch, chỗ mâu thuẫn - vào đây trước khi tin một con số báo cáo.",function(){var n=dataHealth().filter(function(x){return x.sev!=="ok"}).length;return n?(n+" chỗ cần xem"):"không có cảnh báo"},"ti-stethoscope"],
- nhatky:["Ai đổi ô nào, từ gì sang gì, lúc mấy giờ, qua cửa nào - mọi lần ghi dữ liệu đều để lại một dòng.",function(){return logRows().length+" dòng"},"ti-history"],
+ /* 18/08 - dòng khai của tab `nhatky` đã GỠ cùng lúc với việc tab ấy rời Cài đặt. Để lại là
+    một lời khai về một tab không còn tồn tại; `_check16` bắt đúng ngay lượt verify đầu.
+    *Dời một màn đi thì phải đi gỡ tên nó khỏi mọi bản khai đang nói về chỗ cũ.* */
  demo:["Dựng lại demo, kéo ngày tháng về hôm nay, xoá sạch làm lại - chỉ có ở bản demo chạy trong trình duyệt.",function(){return "bản demo"},"ti-table"]};
 function setTabs(){
  var nHealth=dataHealth().filter(function(x){return x.sev!=="ok"}).length;
@@ -26366,7 +26369,11 @@ var TOURS={
   {p:"dsbaitap",sel:'@tbarct',t:"Sổ nào cũng cùng một bộ công cụ",d:"Đổi sang sổ bài tập: vẫn ô tìm, vẫn Bộ lọc, vẫn Cột, vẫn Xuất, vẫn dòng đếm n/N ở cùng chỗ. Học một sổ là dùng được cả 13 sổ - không phải học lại từng cái.",hint:"So thanh công cụ với sổ vừa xem."},
   {p:"dsdiemdanh",sel:'@tbarct',t:"Chọn cột và xuất ra file",d:"Bấm Cột để tắt bớt cột không cần - bảng gọn lại, in ra vừa trang. Bấm Xuất là ra file CSV mở được bằng Excel, kèm đúng phần đang lọc chứ không phải cả bảng.",hint:"Bấm Cột, tắt vài cột, rồi bấm Xuất."},
   {p:"dsphuhuynh",sel:'@man',t:"Sổ phụ huynh - một người, tất cả các con",d:"Ba sổ trên đọc theo BẢNG dữ liệu. Sổ này đọc theo NGƯỜI: gộp học viên theo số điện thoại người đồng hành, nên nhận cuộc gọi \"tôi là mẹ cháu Minh\" là tra ra ngay người ấy có mấy con đang học, tổng còn nợ bao nhiêu, con nào đang cảnh báo. Bấm một dòng là sang thẳng Bàn làm việc đúng người đó.",hint:"Nhìn dải bốn số ở đầu trang."},
-  {p:"dswow",sel:'@man',t:"Từ sổ sang chỗ làm việc",d:"Tra ra rồi thì bấm nút ở đầu sổ để sang màn xử lý - sổ chỉ để đọc, mọi thao tác ghi đều nằm ở trang nghiệp vụ. Đó là lý do sổ không có nút Thêm.",hint:"Xong phần sổ tra cứu!"}]},
+  {p:"dswow",sel:'@man',t:"Từ sổ sang chỗ làm việc",d:"Tra ra rồi thì bấm nút ở đầu sổ để sang màn xử lý - sổ chỉ để đọc, mọi thao tác ghi đều nằm ở trang nghiệp vụ. Đó là lý do sổ không có nút Thêm.",hint:"Bấm Tiếp theo."},
+  /* V2 18/08 - bước thêm khi Nhật ký rời khỏi Cài đặt vào đúng nhóm này (anh Luân: *"Log mà sao
+     ở cài đặt ta???"*). Nó là cuốn sổ cuối cùng của bài, và cố ý đứng cuối: mười sáu cuốn trên
+     tra chuyện của KHÁCH và LỚP, cuốn này tra chuyện của NGƯỜI LÀM. */
+  {p:"nhatky",sel:'@man',t:"Sổ cuối: ai đã sửa gì",d:"Mỗi lần ghi dữ liệu để lại một dòng - ai, lúc nào, ô nào đổi từ giá trị nào sang giá trị nào, qua cửa ghi nào. Lọc theo Kỳ (hôm nay / 7 ngày / 30 ngày), theo Bảng, theo Người, theo Loại thao tác. Sổ này dành cho trưởng phòng trở lên, và mỗi dòng vẫn nằm trong phạm vi dữ liệu của người đọc.",hint:"Bấm chip 'Hôm nay' để xem hôm nay ai làm gì. Xong phần sổ tra cứu!"}]},
  tq_troly:{lv:"thamquan",t:"Hỏi Trợ lý - nhanh hơn đi tìm",ic:"ti-message-question",d:"4 bước - hỏi về người, hỏi số, hỏi chỉ số, hỏi chỗ cấu hình",steps:[
   {p:"hoidap",sel:'@man',t:"Gõ tiếng Việt, không cần nhớ menu",d:"Trợ lý trả lời bốn loại câu hỏi: một hồ sơ (học viên, khách, nhân viên, lớp, khóa), một con số ('có bao nhiêu học viên nguy cơ'), một chỉ số (gõ mã như CVR), và chuyện của app ('đổi hotline ở đâu').",hint:"Bấm Tiếp theo."},
   {p:"hoidap",sel:'@qabox',t:"Hỏi về một con người",d:"Gõ tên một học viên: Trợ lý đọc hồ sơ rồi trả lời hiện trạng, vì sao có cảnh báo, và việc phải làm tiếp theo SOP - kèm nút mở thẳng màn xử lý. Trùng tên thì nó hỏi lại chứ không đoán bừa.",hint:"Gõ tên một học viên rồi bấm Hỏi."},
@@ -29728,6 +29735,10 @@ var TTSO_NGOAI={
   "phục vụ. Nó là dữ liệu nền của cả bốn thực thể chứ không thuộc riêng thực thể nào.",
  nhanvien:"sổ nhân sự - người trong nhà, cùng họ với sổ Giảng viên. Bốn thực thể là người "+
   "được phục vụ, nhân viên là người phục vụ.",
+ /* V2 18/08 - nhật ký thao tác vào nhóm Tra cứu (anh Luân: *"Log mà sao ở cài đặt ta"*). */
+ nhatky:"sổ của NGƯỜI LÀM, không phải sổ của người được phục vụ. Một dòng ở đây nói 'ai chạm "+
+  "vào ô nào lúc mấy giờ' - nó đi ngang qua CẢ BỐN thực thể chứ không đứng trong thực thể nào. "+
+  "Muốn xem vết trên một hồ sơ cụ thể thì đã có khối 'Ai đã sửa hồ sơ này' ngay trong hồ sơ 360.",
  /* V2 12/08 (SALE-3) */
  tinnhan:"sổ VIỆC ĐÃ LÀM, không phải sổ của một thực thể - một tin gửi cho lead, tin sau gửi "+
   "cho học viên, tin nữa gửi cho phụ huynh. Nó trả lời câu \"trung tâm đã nói gì với ai\", "+
