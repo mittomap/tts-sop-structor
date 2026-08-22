@@ -6156,17 +6156,42 @@ function fltApply(pg,arr){
 /* ---- XUẤT CSV: xuất ĐÚNG những dòng đang hiện trên màn hình ---- */
 function csvCell(v){var s=String(v==null?"":v);
  return /[",\n;]/.test(s)?('"'+s.split('"').join('""')+'"'):s}
-function csvOf(arr){
+/* ═══ XUẤT RA ĐÚNG CÁI BẢNG ĐANG NHÌN (audit 18/08) ══════════════════════════════════════════
+   Bản cũ đổ MỌI TRƯỜNG THÔ của dòng: tiêu đề là tên cột máy (`attendance_progress_status`), giá
+   trị là mã thô (`active (Đang làm việc)`), và cột nào người dùng vừa ẩn đi vẫn nằm trong tệp -
+   trong khi chú thích của chính nút ấy hứa *"Tải N dòng ĐANG HIỆN ra tệp CSV"*. Dòng thì đúng
+   là dòng đang hiện; cột thì không phải cột đang hiện. Nửa lời hứa.
+   Không bộ kiểm nào bắt được: `_check17` chỉ hỏi "trang có nút Xuất không", không mở tệp ra xem.
+   Nay xuất đi qua ĐÚNG hàm dựng ô của bảng (`cell`) rồi bóc thẻ - nên tệp CSV và màn hình luôn
+   là một, kể cả những cột tính tại chỗ (vắng mấy buổi, thiếu mấy bài) mà dữ liệu thô không có.
+   Trang không khai cột (bảng dựng tay chưa có bản khai) thì vẫn đổ trường thô như cũ - có còn
+   hơn không, và khai thêm cột lúc nào thì tệp tự đúng lúc ấy.
+   *Một cái nút hứa gì thì phải làm đúng thứ ấy - làm một nửa thì người ta phát hiện ở nhà, lúc
+   mở tệp ra đối chiếu.* */
+function csvVal(r,c,code){
+ var t="";
+ try{t=String(cell(r,c,code)||"")}catch(e){t=String(r[c[0]]==null?"":r[c[0]])}
+ return t.replace(/<[^>]*>/g," ").replace(/&nbsp;/g," ").replace(/&amp;/g,"&")
+  .replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/\s+/g," ").trim()}
+function csvOf(arr,pg){
  if(!arr||!arr.length)return "";
+ var cfg=pg&&LISTCFG[pg];
+ if(cfg&&cfg.cols&&cfg.cols.length){
+  hideInit(pg);
+  var cot=cfg.cols.filter(function(c){return colVisible(pg,c[0])});
+  if(!cot.length)cot=[cfg.cols[0]];
+  var out=[cot.map(function(c){return csvCell(c[1])}).join(",")];
+  arr.forEach(function(r){out.push(cot.map(function(c){return csvCell(csvVal(r,c,cfg.code))}).join(","))});
+  return out.join("\n")}
  var cols=[];arr.forEach(function(r){for(var k in r)if(cols.indexOf(k)<0)cols.push(k)});
- var out=[cols.join(",")];
- arr.forEach(function(r){out.push(cols.map(function(c){return csvCell(r[c])}).join(","))});
- return out.join("\n")}
+ var out2=[cols.join(",")];
+ arr.forEach(function(r){out2.push(cols.map(function(c){return csvCell(r[c])}).join(","))});
+ return out2.join("\n")}
 function pgExport(pg){
  var arr=(window.FLTLAST&&window.FLTLAST[pg])||[];
  if(!arr.length){toast("Không có dòng nào để xuất - bỏ bớt điều kiện lọc rồi thử lại.",4200);return}
  /* BOM để Excel bản Việt mở ra không vỡ dấu - thiếu nó là người dùng nghĩ app xuất hỏng */
- var csv="\ufeff"+csvOf(arr);
+ var csv="\ufeff"+csvOf(arr,pg);
  var nm=(PBK[pg]&&PBK[pg].t?slugify(PBK[pg].t):pg)+"-"+fmtYMD(new Date())+".csv";
  try{
   var b=new Blob([csv],{type:"text/csv;charset=utf-8;"});
@@ -13708,11 +13733,28 @@ function jTimeline(C){
   add(x.conversion_time,"ti-target-arrow","Kết quả chốt",
    (elabel(x.conversion_status)||x.conversion_status||"")+(x.conversion_note?(" - "+x.conversion_note):""),
    /reject|drop|lost/.test(ecode(x.conversion_status))?"red":"green")});
- C.enr.forEach(function(x){add(x.enrollment_time,"ti-clipboard-check","Đăng ký "+(x.course_id_name||x.course_id||""),vnd(num(x.final_fee)),"amber");
+ /* ═══ HỒ SƠ 360 CŨNG PHẢI ĐI QUA PHẠM VI DỮ LIỆU (audit 18/08) ════════════════════════════
+    Đo được: MỌI chức danh - kể cả 10 giáo viên, 2 NV WOW, cả Nhân sự và Marketing, những người
+    app khai miền tiền là **"không xem"** - vẫn đọc được trên dòng thời gian *"Thu tiền
+    5.750.000đ"*, *"Duyệt chiết khấu 1.500.000đ"* và học phí của đơn. Không phải một chức danh
+    lọt, mà **16/16 chức danh giống hệt nhau**: dòng thời gian dựng từ `C.pays` / `C.enr` - hai
+    mảng lấy từ chỉ mục nội bộ, không đi qua `srows`/`canRow` như mọi bảng khác.
+    `_checkmien` vẫn in 0/0 vì phạm vi nó soi là các SỔ DANH SÁCH; hồ sơ 360 nằm ngoài tầm đo.
+    *Một cửa gác đặt ở 30 cuốn sổ mà bỏ trống ở hồ sơ - thì hồ sơ chính là cửa người ta đi.*
+    Hỏi lại đúng hàm app đang dùng (`canRow`) chứ không tự viết luật mới: `all` thì qua hết,
+    `none` thì chặn hết, `mine`/`team` thì hỏi chủ sở hữu của chính dòng ấy. */
+ function xemTien(code,r){try{return canRow(code,r)}catch(e){return true}}
+ C.enr.forEach(function(x){
+  /* Mốc ĐĂNG KÝ vẫn giữ cho mọi người - biết em ấy đăng ký khóa nào là việc học, không phải
+     việc tiền; chỉ CON SỐ HỌC PHÍ mới cắt theo miền tiền. */
+  add(x.enrollment_time,"ti-clipboard-check","Đăng ký "+(x.course_id_name||x.course_id||""),
+   xemTien("DL06",x)?vnd(num(x.final_fee)):"","amber");
   /* DUYỆT CHIẾT KHẤU: 11/96 đơn có, và đó đúng là những đơn cần đọc lại khi rà doanh thu. */
-  add(x.discount_approved_at,"ti-discount","Duyệt chiết khấu "+vnd(num(x.discount_amount)),
-   (x.discount_approved_by_name?("bởi "+x.discount_approved_by_name):"")+(x.discount_reason?(" - "+x.discount_reason):""),"green")});
- C.pays.forEach(function(x){add(x.payment_time,"ti-cash","Thu tiền "+vnd(num(x.amount)),(elabel(x.payment_method)||"")+(x.verified_by?" · đã xác nhận":" · chờ xác nhận"),"green")});
+  if(xemTien("DL06",x))
+   add(x.discount_approved_at,"ti-discount","Duyệt chiết khấu "+vnd(num(x.discount_amount)),
+    (x.discount_approved_by_name?("bởi "+x.discount_approved_by_name):"")+(x.discount_reason?(" - "+x.discount_reason):""),"green")});
+ C.pays.forEach(function(x){if(!xemTien("DL07",x))return;
+  add(x.payment_time,"ti-cash","Thu tiền "+vnd(num(x.amount)),(elabel(x.payment_method)||"")+(x.verified_by?" · đã xác nhận":" · chờ xác nhận"),"green")});
  C.ob.forEach(function(x){add(x.assigned_at,"ti-layout-grid-add","Xếp lớp "+(x.class_id_name||x.class_id||""),"","blue");
   add(x.class_info_sent_at,"ti-send","Gửi thông tin lớp","","blue");
   add(x.confirmation_time,"ti-checks","HV xác nhận lớp","","green");
@@ -13837,7 +13879,11 @@ function jTimeline(C){
  /* Xin đổi lịch đóng học phí + kết quả duyệt. Ngăn kéo Công nợ đã bày ra "ai duyệt, duyệt lúc
     nào" (anh Luân đặt 17/08), nhưng đó là bày trong một ngăn kéo của người làm kế toán; còn hồ
     sơ học viên - chỗ ai cũng mở khi có tranh chấp - thì không thấy việc ấy từng xảy ra. */
- (function(){var _e={};(C.enr||[]).forEach(function(x){_e[String(x.enrollment_id||"")]=1});
+ (function(){
+  /* DL27 là yêu cầu đổi LỊCH ĐÓNG TIỀN - cùng miền với DL06/DL07. Bảng này không khai trong
+     `DSDOM` (nó chưa có sổ danh sách riêng), nên hỏi mượn miền của chính cái đơn nó gắn vào:
+     ai không được xem đơn thì cũng không được xem chuyện chia lại đợt của đơn ấy. */
+  var _e={};(C.enr||[]).forEach(function(x){if(xemTien("DL06",x))_e[String(x.enrollment_id||"")]=1});
   rows("DL27").filter(function(r){return _e[String(r.enrollment_id||"")]}).forEach(function(r){
    var giaHan=/extend/.test(ecode(r.req_type));
    add(r.req_time,"ti-calendar-cog",giaHan?"Xin gia hạn hạn đóng":"Xin chia lại đợt đóng",
@@ -13909,7 +13955,13 @@ function renderHoso(){
    br15("S",t15.skill_speaking,o15.mid_speaking,ce15.final_speaking)+
    br15("<b>Overall</b>",t15.overall_score,o15.mid_overall,ce15.final_test_score)+
    '</tbody></table></div>'+((ce15.target_band||L.target_band)?kv("Mục tiêu",esc(ce15.target_band||L.target_band)):""))}
- if(C.enr.length)h+=card("ti-cash","Học phí",kv("Số đăng ký",C.enr.length)+kv("Tổng phí",vnd(totFee))+kv("Đã thu",vnd(paid))+kv("Còn lại",'<b style="color:'+(rem>0?"var(--red)":"var(--green)")+'">'+vnd(rem)+'</b>')+kv("Trạng thái",esc(elabel((C.enrMain||{}).payment_status)||"-"))+((C.enrMain||{}).next_payment_due?kv("Hẹn thu tiếp",esc(C.enrMain.next_payment_due)):""));
+ /* Thẻ HỌC PHÍ cắt theo miền tiền, cùng luật với dòng thời gian ngay dưới (audit 18/08). Trước
+    bản này một giáo viên mở hồ sơ học viên ra là đọc được cả tổng phí, đã thu và còn nợ - trong
+    khi app khai miền tiền của họ là "không xem". Số đăng ký (em ấy học mấy khóa) KHÔNG phải
+    thông tin tiền nên vẫn giữ; chỉ ba con số tiền và tình trạng thu là cắt.
+    *Cùng một sự thật hiện ở hai chỗ thì phải cắt bằng cùng một cái kéo.* */
+ if(C.enr.length){var _xt=C.enr.some(function(x){try{return canRow("DL06",x)}catch(e){return true}});
+  h+=card("ti-cash","Học phí",kv("Số đăng ký",C.enr.length)+(_xt?(kv("Tổng phí",vnd(totFee))+kv("Đã thu",vnd(paid))+kv("Còn lại",'<b style="color:'+(rem>0?"var(--red)":"var(--green)")+'">'+vnd(rem)+'</b>')+kv("Trạng thái",esc(elabel((C.enrMain||{}).payment_status)||"-"))+((C.enrMain||{}).next_payment_due?kv("Hẹn thu tiếp",esc(C.enrMain.next_payment_due)):"")):kv("Học phí",'<span class="mut">không thuộc phạm vi dữ liệu của bạn</span>')))}
  if(C.ob.length){var o=C.obMain;h+=card("ti-school","Lớp & học tập",kv("Lớp",lopLnk(o.class_id,o.class_id_name,"-"))+kv("Onboarding",esc(elabel(o.onboarding_status)||"-"))+kv("Chuyên cần",present+"/"+C.att.length+" buổi")+kv("Bài tập",C.hw.filter(hwGraded).length+"/"+C.hw.length+" đã chấm")+kv("WOW còn",esc(S.wow_quota_remaining||"-")))}
  if(C.sv.length||C.kn.length)h+=card("ti-message-2","Cảm nhận & khiếu nại",kv("Khảo sát",C.sv.length)+kv("Phản hồi",C.fb.length)+kv("Khiếu nại",C.kn.length)+C.kn.slice(0,3).map(function(k){return kv(esc(elabel(k.complaint_type)),'<span class="chip '+stCls(k.complaint_status)+'">'+esc(elabel(k.complaint_status))+'</span>')}).join(""));
  if(C.ceMain)h+=card("ti-flag","Kết thúc & tái ĐK",kv("Điểm cuối",esc(C.ceMain.final_test_score||"-"))+kvT("Chuyên cần",esc(C.ceMain.attendance_rate||"-"),"Tỷ lệ buổi có mặt tính cho CẢ KHÓA, chốt lúc kết thúc khóa (DL18 · attendance_rate) - không phải số đang chạy của lớp hiện tại")+kv("Đạt mục tiêu",esc(elabel(C.ceMain.achievement_status)||"-"))+kv("Tái ĐK",esc(elabel(C.ceMain.re_enrollment_status)||"-")));
@@ -13935,7 +13987,12 @@ function renderHoso(){
    ctxRows([["Ký lúc",esc(_ob.commit_at||"-")],["Bản",esc(_ob.commit_version||"-")],
     ["Hình thức ký",esc(_ob.commit_kenh||"học viên tự ký ở cổng")],
     ["Người ghi nhận",esc(_ob.commit_by?nsTen(_ob.commit_by):"-")],
-    ["Ảnh bản đã ký",esc(_ob.commit_anh||"-")]])+
+    /* Chỗ thứ hai in tên tệp ra màn - cùng một cách hiển thị với ngăn kéo `ckXem`. */
+    ["Ảnh bản đã ký",String(_ob.commit_anh||"").trim()
+      ?('<span class="chip blue" data-tip="'+esc("Tệp ảnh bản giấy đã ký: "+_ob.commit_anh)+'"><i class="ti ti-paperclip"></i>đã có ảnh</span>')
+      :(/trung tâm/i.test(String(_ob.commit_kenh||""))
+        ?'<span class="chip red" data-tip="Ký tại trung tâm thì phải có ảnh bản giấy - hồ sơ này còn thiếu">chưa có ảnh</span>'
+        :'<span class="mut">không cần (học viên tự ký ở cổng)</span>')]])+
    commitHTML(_ob.commit_text,_ob.commit_version)+'</div></div>'})();
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-timeline" style="margin-right:6px"></i>Dòng thời gian</b></div><div class="pbody">'+jTimeline(C)+'</div></div>';
  /* V9.31: "AI ĐÃ SỬA HỒ SƠ NÀY" - dòng thời gian kể chuyện NGHIỆP VỤ (đã test, đã đóng tiền),
@@ -29911,8 +29968,23 @@ function ckXem(obid){var o=find("DL08","onboarding_id",obid);if(!o){toast("Khôn
   ["Bản",esc(o.commit_version||"-")+(ckVerCu(o.commit_version,commitVer())?" (bản cũ - hiện hành là "+esc(commitVer())+")":"")],
   ["Hình thức ký",esc(o.commit_kenh||"học viên tự ký ở cổng")],
   ["Người ghi nhận",esc(o.commit_by?nsTen(o.commit_by):"-")],
-  ["Ảnh bản đã ký",esc(o.commit_anh||"-")]]);
+  /* Ảnh bản giấy: in THẲNG tên tệp là bày ra một chuỗi không bấm được, không nói được gì thêm -
+     đúng chỗ em đã sửa ở bảng Công nợ hôm qua mà chưa đi soi những chỗ còn lại.
+     *Sửa một kiểu hiển thị thì phải đi tìm mọi chỗ đang hiển thị kiểu ấy.* */
+  ["Ảnh bản đã ký",String(o.commit_anh||"").trim()
+    ?('<span class="chip blue" data-tip="'+esc("Tệp ảnh bản giấy đã ký: "+o.commit_anh)+'"><i class="ti ti-paperclip"></i>đã có ảnh</span>')
+    :(/trung tâm/i.test(String(o.commit_kenh||""))
+      ?'<span class="chip red" data-tip="Ký tại trung tâm thì phải có ảnh bản giấy - hồ sơ này còn thiếu">chưa có ảnh</span>'
+      :'<span class="mut">không cần (học viên tự ký ở cổng)</span>')]]);
  h+=commitHTML(o.commit_text,o.commit_version)+'</div>';
+ /* NGÕ CỤT: bản trước mở ra đọc xong là hết đường - không nút nào. Hai việc người ta làm ngay
+    sau khi đọc bản đã ký: mở hồ sơ em ấy, và đối chiếu với bản đang phát hành (khi bản đã ký là
+    bản cũ). *Một ngăn kéo chỉ để đọc vẫn phải có đường đi tiếp, nếu không nó là ngõ cụt.* */
+ h+='<div class="dact"><button class="btn primary" onclick="closeModal();openHoso(\''+esc(o.student_id||"")+'\')">'+
+  '<i class="ti ti-id-badge-2"></i>Mở hồ sơ học viên</button>'+
+  (ckVerCu(o.commit_version,commitVer())
+   ?'<button class="btn" onclick="ckXemBanHienHanh()"><i class="ti ti-file-text"></i>Xem bản đang phát hành để đối chiếu</button>':'')+
+  '</div>';
  openDrawer("Bản cam kết đã ký",h)}
 function renderSoPH(){
  var ds=phDS().filter(function(P){

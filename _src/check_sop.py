@@ -216,6 +216,25 @@ if thua_boqua:
     for x in thua_boqua:
         print("   - %s   (bo dong nay khoi BOQUA)" % x)
     print()
+# ═══ LY DO MIEN TRU PHAI CON DUNG, KHONG CHI CON TON TAI (audit 18/08) ══════════════════════
+# Sau moi ban khai BOQUA la mot cau kieu "app tinh song bang obState()/naFor()/bhState()". Bo
+# kiem cu chi hoi "cot nay co khai mien khong"; khong ai hoi "cai ham duoc vien dan con song
+# khong". Doi ten mot ham la loi khai lang le thanh sai - cot van duoc mien, ma ly do mien thi
+# khong con thuc. Nay moi ten ham xuat hien trong ly do deu phai tim thay trong app.
+_hamThieu = []
+for _k, _ly in BOQUA.items():
+    for _fn in set(re.findall(r"\b([a-zA-Z][A-Za-z0-9_]{2,})\(\)", _ly)):
+        if not re.search(r"\bfunction\s+" + re.escape(_fn) + r"\s*\(", SRC):
+            _hamThieu.append("%s.%s -> ly do vien dan `%s()` ma app khong co ham do"
+                             % (_k[0], _k[1], _fn))
+if _hamThieu:
+    print("LY DO MIEN TRU DA LOI THOI - ham duoc vien dan khong con trong app:")
+    for x in _hamThieu:
+        print("   X %s" % x)
+    print("   Sua lai ly do trong BOQUA cho dung ten ham hien tai, hoac bo mien tru di.")
+    print("KET QUA: KHONG DAT")
+    sys.exit(1)
+
 if sot:
     print("SOT %d COT SOP MO TA MA APP KHONG HE DUNG:" % len(sot))
     for x in sot:

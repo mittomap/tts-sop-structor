@@ -128,6 +128,35 @@ for(const [f,ten] of [["ITTs_WebApp_v5_demo.html","cong nhan vien"],["ITTs_Trang
   t(ten+" khong loi JS", l2.length===0, l2[0]||"");
   await p2.close();
 }
+/* CONG PHU HUYNH - cong THU BA, truoc day khong bo kiem nao mo no SAU KHI RESET.
+   Giao thuc audit muc 4 doi "ca ba cong mo ra deu co du lieu"; dau file nay cung khai la co do
+   ba cong, nhung vong lap tren chi di qua HAI. Mot ban khai rong hon thu no do la mot cach noi
+   doi lang le - va cong phu huynh la cong duy nhat co luat AN BOT thong tin, tuc cong de hong
+   nhat sau mot lan reset.
+   Vao dung cua nguoi dung di: `gateEnterPH(<ma HV co nguoi giam ho>)`. (audit 18/08) */
+{
+  const p3=await ctx.newPage();
+  const l3=[]; p3.on("pageerror",e=>l3.push(e.message.slice(0,90)));
+  await p3.addInitScript(()=>{try{sessionStorage.setItem("ITTS_WHO_HV","");localStorage.setItem("ITTS_HELLO_V1","1")}catch(e){}});
+  await p3.goto(OUT+"ITTs_TrangHocVien_demo.html",{waitUntil:"load"});
+  await p3.waitForTimeout(1500);
+  const rPH=await p3.evaluate(()=>{
+    try{
+      /* hoc vien CO nguoi giam ho - chi ho moi vao duoc cong phu huynh */
+      const S=(DL.DL09||[]).filter(x=>String(ghSdt(x)||"").trim())[0];
+      if(!S)return {loi:"khong co hoc vien nao khai nguoi giam ho"};
+      gateEnterPH(S.student_id);
+      const c=document.getElementById("hvBody")||document.body;
+      const t=(c.textContent||"").replace(/\s+/g," ").trim();
+      return {dai:t.length, ph:!!window.HVPHONE, ten:(S.full_name||S.student_id)};
+    }catch(e){return {loi:e.message}}
+  });
+  t("cong phu huynh vao duoc sau reset", !rPH.loi, rPH.loi||("hoc vien: "+rPH.ten));
+  t("cong phu huynh mo ra co noi dung", (rPH.dai||0)>500, (rPH.dai||0)+" ky tu");
+  t("cong phu huynh dung dung danh tinh phu huynh", !!rPH.ph, rPH.ph?"co so dien thoai nguoi giam ho":"khong dat duoc HVPHONE");
+  t("cong phu huynh khong loi JS", l3.length===0, l3[0]||"");
+  await p3.close();
+}
 console.log("\n=== AUDIT NUT RESET DEMO ===");
 ok.forEach(x=>console.log("  v "+x));
 do_.forEach(x=>console.log("  X "+x));
