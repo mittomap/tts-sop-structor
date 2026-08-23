@@ -10174,6 +10174,21 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
   h+='<span class="chip '+(stt==="completed"?"green":stt==="in_progress"?"amber":stt==="cancelled"?"red":"gray")+'">'+esc(elabel(ses.session_status)||"Đã lên lịch")+'</span>';
   if(punc)h+='<span class="chip '+punc.cls+'"><i class="ti '+punc.ic+'" style="margin-right:3px"></i>'+esc(punc.txt)+'</span>';
   h+='<span style="flex:1"></span>';
+  /* ═══ V2 18/08 lượt 2 - NÚT BÁO NGHỈ ĐỨNG Ở ĐÂY (anh Luân: *"Ý là cái nút xin nghỉ đâu á?"*) ═══
+     Đây là chỗ giảng viên ĐANG ĐỨNG khi mở buổi học của mình ra, và trước bản này nó trống trơn:
+     đo trên 9 màn thì nút chỉ có ở "Buổi hôm nay", nằm sau 2 panel phải cuộn mới thấy.
+     Nút biến mất khi buổi ĐÃ BẮT ĐẦU - lúc ấy giảng viên đã đứng lớp rồi, "báo nghỉ" không còn
+     nghĩa gì; buổi lỡ dở thì đó là chuyện của huỷ buổi, một cửa khác. Buổi đã có đơn thì thay
+     bằng chip nói đơn đang ở đâu, để không ai gửi hai lần. */
+  if(!started){
+   var _dn=gvnCuaBuoi(ses.session_id);
+   if(_dn)h+='<span class="chip '+(isc(_dn.trang_thai,"da_duyet")?"green":"amber")+'" data-tip="'+
+     esc((_dn.staff_name||"")+" - "+(_dn.ly_do||""))+'"><i class="ti ti-calendar-off" style="margin-right:3px"></i>'+
+     (isc(_dn.trang_thai,"da_duyet")?"đã duyệt cho nghỉ":"đơn báo nghỉ chờ duyệt")+'</span>';
+   else if(gvnAiBao(ses))h+='<button class="btn sm" onclick="gvNghiForm(\''+esc(ses.session_id)+'\')" data-tip="'+
+     (gvnBaoHo(ses)?"Giáo viên gọi báo nghỉ - nhập hộ ngay tại đây":"Báo cho Trưởng phòng ACA duyệt, học vụ xoay người dạy thay")+
+     '"><i class="ti ti-calendar-off"></i>'+(gvnBaoHo(ses)?"Báo nghỉ hộ GV":"Báo nghỉ buổi này")+'</button>';
+  }
   if(!started){
    if(gateOpen)h+='<button class="btn primary sm" onclick="sessStart(\''+esc(ses.session_id)+'\')"><i class="ti ti-player-play"></i>Bắt đầu lớp</button>';
    else h+='<span class="chip amber" title="Chỉ điểm danh được từ '+gateMin+' phút trước giờ học"><i class="ti ti-lock"></i> Cổng mở '+esc(hmMinus(ses.session_date,gateMin))+'</span>';
@@ -24408,15 +24423,25 @@ function renderHtToday(embed){
     định chỉ làm vế thứ nhất - nhưng đó đúng con bệnh V9.29 đã chữa cho học viên: báo xong rồi
     im, người báo không biết đã được duyệt chưa nên hôm sau vẫn phải hỏi lại bằng miệng. */
  (function(){
-  if(!CURSTAFF)return;
-  var toi=gvnCuaToi(),toiCho=toi.filter(function(x){return isc(x.trang_thai,"cho_duyet")});
-  var sap=gvnBuoiToi(CURSTAFF,gvnCuaSo());
+  /* V2 18/08 lượt 2 - KHỐI NÀY ĐI THEO Ô CHỌN GIẢNG VIÊN CÓ SẴN Ở ĐẦU TRANG, không chỉ theo
+     người đang đăng nhập. Trước đó nó mở đầu bằng `if(!CURSTAFF)return`, nên ghế Quản trị (xem
+     thử, chưa chọn người) mở trang ra là khối biến mất sạch - mà đó chính là ghế anh Luân dùng
+     để soi demo. *Một khối tên là "của tôi" thì phải hỏi trang xem "tôi" đang là ai, chứ đừng
+     tự quyết là không có ai.* */
+  var _ai=gid||CURSTAFF;
+  if(!_ai)return;
+  var _minh=(String(_ai)===String(CURSTAFF));
+  var _ten=(find("DL01","staff_id",_ai)||{}).full_name||_ai;
+  var toi=gvnAll().filter(function(x){return String(x.staff_id||"")===String(_ai)});
+  var toiCho=toi.filter(function(x){return isc(x.trang_thai,"cho_duyet")});
+  var sap=gvnBuoiToi(_ai,gvnCuaSo());
   if(!sap.length&&!toi.length)return;
-  h+='<div class="panel"><div class="ph"><b><i class="ti ti-calendar-off" style="margin-right:6px"></i>Buổi dạy sắp tới của tôi ('+sap.length+')</b>'+
+  h+='<div class="panel"><div class="ph"><b><i class="ti ti-calendar-off" style="margin-right:6px"></i>'+
+   (_minh?"Buổi dạy sắp tới của tôi":("Buổi dạy sắp tới của "+esc(_ten)))+' ('+sap.length+')</b>'+
    '<span class="mut" style="font-size:11.5px">'+slaChip("teacherOffLookahead_days",gvnCuaSo())+' tới · báo nghỉ trước '+slaChip("slaTeacherOffNotice_days",gvnHanBao())+' thì học vụ còn kịp xoay người'+
-   (toiCho.length?(' · <b>'+toiCho.length+' đơn của bạn đang chờ duyệt</b>'):'')+'</span></div>';
+   (toiCho.length?(' · <b>'+toiCho.length+' đơn '+(_minh?"của bạn ":"")+'đang chờ duyệt</b>'):'')+'</span></div>';
   h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Ngày</th><th>Lớp</th><th>Buổi</th><th>Tình trạng</th><th></th></tr></thead><tbody>';
-  if(!sap.length)h+='<tr><td class="empty" colspan="5">Bạn không có buổi dạy nào trên lịch trong cửa sổ này.</td></tr>';
+  if(!sap.length)h+='<tr><td class="empty" colspan="5">'+(_minh?"Bạn":esc(_ten))+' không có buổi dạy nào trên lịch trong cửa sổ này.</td></tr>';
   sap.slice(0,12).forEach(function(x){
    var dn=gvnCuaBuoi(x.session_id);
    var d=pvnd(x.session_date);
@@ -24426,9 +24451,9 @@ function renderHtToday(embed){
     '<td>'+(dn?gvnStChip(dn)+' <span class="mut" style="font-size:11px">'+esc(dn.ly_do||"")+'</span>':'<span class="mut">đang dạy bình thường</span>')+'</td>'+
     '<td class="nw">'+(dn
       ?(isc(dn.trang_thai,"cho_duyet")
-        ?'<button class="btn sm" onclick="gvNghiHuy(\''+esc(dn.nghi_id)+'\')"><i class="ti ti-arrow-back-up"></i>Rút đơn</button>'
+        ?(_minh?('<button class="btn sm" onclick="gvNghiHuy(\''+esc(dn.nghi_id)+'\')"><i class="ti ti-arrow-back-up"></i>Rút đơn</button>'):'<span class="mut">chờ TP ACA duyệt</span>')
         :(String(dn.gv_thay_ten||"").trim()?('<span class="chip green">'+esc(dn.gv_thay_ten)+' dạy thay</span>'):'<span class="mut">học vụ đang xếp người</span>'))
-      :'<button class="btn sm" onclick="gvNghiForm(\''+esc(x.session_id)+'\')"><i class="ti ti-calendar-off"></i>Báo nghỉ</button>')+'</td></tr>'});
+      :(gvnAiBao(x)?('<button class="btn sm" onclick="gvNghiForm(\''+esc(x.session_id)+'\')"><i class="ti ti-calendar-off"></i>'+(_minh?"Báo nghỉ":"Báo nghỉ hộ")+'</button>'):'<span class="mut">-</span>'))+'</td></tr>'});
   if(sap.length>12)h+='<tr><td colspan="5" class="mut" style="font-size:11px;padding:6px">... còn '+(sap.length-12)+' buổi nữa trong cửa sổ trên.</td></tr>';
   h+='</tbody></table></div></div>'})();
  h+='<div class="panel"><div class="ph"><b><i class="ti ti-star" style="margin-right:6px"></i>Buổi WOW hôm nay ('+wowT.length+')</b><div class="mini"><button class="pill" onclick="go(\'wow\')">Mở trang '+esc((PBK.wow||{}).t||"WOW")+'</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Giờ</th><th>Học viên</th><th>Kỹ năng</th><th>Trọng tâm</th><th>Trạng thái</th><th></th></tr></thead><tbody>';
@@ -24807,6 +24832,33 @@ function gvnBuoiToi(sid,ngay){
 /* Báo trước bao nhiêu ngày là ĐỦ SỚM - đi qua CH2 chứ không cắm số. Báo muộn hơn mức này vẫn
    nhận đơn (ốm đột xuất thì không ai báo trước được), nhưng đơn mang cờ "báo gấp" để người
    duyệt và học vụ biết mà xoay người ngay. */
+/* ═══ V2 18/08 lượt 2 - AI BẤM ĐƯỢC NÚT BÁO NGHỈ (anh Luân: *"Ý là cái nút xin nghỉ đâu á?"*) ═══
+   Đo lại trên 9 màn, đóng vai giáo viên: nút chỉ có ở ĐÚNG MỘT trang (Buổi hôm nay), nằm sau 2
+   panel - phải cuộn 1/3 trang mới thấy - và **màn Vận hành lớp / Điểm danh, nơi giảng viên đang
+   mở chính buổi học của mình ra, KHÔNG có nút nào**. Ghế Quản trị (chưa chọn người) thì không
+   thấy nút ở đâu hết, vì khối kia mở đầu bằng `if(!CURSTAFF)return`.
+   Chính chú thích của khối ấy viết *"một cửa báo nghỉ nằm ở trang mà người phải báo không bao giờ
+   đi qua thì nó chỉ tồn tại trên giấy"* - viết ra rồi vẫn phạm bằng một đường khác: đặt đúng
+   trang nhưng sai CHỖ, và bỏ trống đúng màn người ta đang đứng.
+
+   VÀ MỘT LỖ THỨ HAI LỘ RA CÙNG LÚC. Anh Luân chốt 11/08: *"giáo viên có thể sẽ báo cho học vụ
+   hoặc báo cho trưởng phòng aca"* - câu ấy đang nằm ngay trong chú thích của trang `gvdp`. Vậy mà
+   Học vụ / TP ACA **không có cửa nào để báo hộ**: giáo viên gọi điện xong thì họ ngồi nhìn, rồi
+   quay lại đúng đường tin nhắn riêng mà bảng DL33 sinh ra để thay thế.
+   *Khai một câu của anh Luân vào chú thích không làm nó thành tính năng.*
+
+   Nên quyền bấm nút = một trong ba:
+     · chính người đứng buổi ấy (báo cho mình);
+     · Học vụ / TP ACA - người nhận điện thoại (báo hộ, đơn ghi rõ ai báo hộ cho ai);
+     · ghế xem thử chưa chọn người (quản trị) - để bấm thử được. */
+function gvnAiBao(ses){
+ if(!ses)return false;
+ if(!String(ses.teacher_id||"").trim())return false;      /* buổi chưa có ai dạy thì không có ai để nghỉ */
+ if(!CURSTAFF)return true;                                /* ghế xem thử */
+ if(String(ses.teacher_id||"")===String(CURSTAFF))return true;
+ try{return canSee("gvdp")}catch(e){return false}         /* Học vụ + TP ACA + quản trị */
+}
+function gvnBaoHo(ses){return !!(ses&&CURSTAFF&&String(ses.teacher_id||"")!==String(CURSTAFF))}
 function gvnHanBao(){var n=num(paramOf("slaTeacherOffNotice_days",3));return n>0?n:3}
 function gvnCuaSo(){var n=num(paramOf("teacherOffLookahead_days",14));return n>0?n:14}
 function gvnGap(x){var d=pvnd((x&&x.session_date)||"");if(!d)return false;
@@ -24832,12 +24884,18 @@ function gvNghiForm(sesId){
  var c=find("DL10","class_id",s.class_id)||{};
  var cu=gvnCuaBuoi(sesId);
  if(cu){toast("Buổi này đã có đơn báo nghỉ "+(isc(cu.trang_thai,"cho_duyet")?"đang chờ duyệt":"đã được duyệt")+".",4200);return}
+ if(!gvnAiBao(s)){toast("Buổi này không phải buổi dạy của bạn, và chức danh của bạn không báo hộ được.",5000);return}
  var con=gvOffLeft(c);
+ var _ho=gvnBaoHo(s);
+ var _gv=find("DL01","staff_id",s.teacher_id)||{};
  var h='<div class="dcard"><h4><i class="ti ti-calendar-off"></i>Báo nghỉ buổi dạy</h4>';
- h+=ctxRows([["Lớp",lopLnk(s.class_id,s.class_id_name||c.class_name)],
+ if(_ho)h+='<div class="notebar nbamber"><i class="ti ti-phone"></i>Bạn đang <b>báo hộ</b> cho '+
+  esc(_gv.full_name||s.teacher_id_name||s.teacher_id)+' - đơn sẽ ghi rõ giáo viên nghỉ là ai và ai là người nhập hộ.</div>';
+ h+=ctxRows([["Lớp",lopLnk(s.class_id,s.class_id_name||c.class_name)]].concat(
+  _ho?[["Giáo viên nghỉ",nsLnk(s.teacher_id,_gv.full_name||s.teacher_id_name)]]:[]).concat([
   ["Buổi",esc("Buổi "+(s.session_number||"?")+" · "+(s.session_date||"-"))],
   ["Cơ sở / hình thức",clsOnline(c)?"Online":esc(elabel(c.branch)||c.branch||"-")],
-  ["Quota nghỉ của khóa này",(con>0?('còn <b>'+con+'</b>/'+gvOffQuota()+' buổi'):('<b style="color:var(--red)">đã hết</b> ('+gvOffQuota()+' buổi)'))]]);
+  ["Quota nghỉ của khóa này",(con>0?('còn <b>'+con+'</b>/'+gvOffQuota()+' buổi'):('<b style="color:var(--red)">đã hết</b> ('+gvOffQuota()+' buổi)'))]]));
  h+='<div class="notebar" style="margin:10px 0"><i class="ti ti-info-circle"></i>Báo trước '+
   slaChip("slaTeacherOffNotice_days",gvnHanBao())+' thì học vụ còn kịp xoay người. Báo gấp hơn vẫn gửi được, nhưng đơn sẽ mang dấu <b>báo gấp</b> để người duyệt xử lý ngay.</div>';
  if(con<=0)h+='<div class="notebar nbamber"><i class="ti ti-alert-triangle"></i>Khóa này bạn đã dùng hết quota nghỉ. Đơn vẫn gửi được - Trưởng phòng ACA sẽ cân nhắc, và lý do nên ghi thật rõ.</div>';
@@ -24846,7 +24904,9 @@ function gvNghiForm(sesId){
  h+='<div class="fld full"><label>Nói rõ thêm</label><textarea id="gvn_note" rows="2" placeholder="vd: khám bệnh theo lịch hẹn, có giấy hẹn của bệnh viện"></textarea></div>';
  h+='<div class="fld full"><label>Bạn đã nhờ được ai dạy thay chưa</label><select id="gvn_de">'+
   '<option value="">Chưa - nhờ học vụ xếp giúp</option>'+
-  rows("DL01").filter(isGVRole).filter(function(g){return String(g.staff_id)!==String(CURSTAFF)&&staffActive(g)})
+  /* Loại NGƯỜI NGHỈ khỏi danh sách người thay - không loại người đang bấm: học vụ nhập hộ thì
+     chính họ không phải người nghỉ, mà giáo viên nghỉ vẫn phải bị loại. */
+  rows("DL01").filter(isGVRole).filter(function(g){return String(g.staff_id)!==String(s.teacher_id||"")&&staffActive(g)})
    .map(function(g){return '<option value="'+esc(g.staff_id)+'">'+esc(g.full_name||g.staff_id)+'</option>'}).join("")+
   '</select><div class="fhint">Đề xuất thôi - học vụ vẫn kiểm lại giờ giấc và cơ sở trước khi chốt.</div></div>';
  h+='<div class="dact"><button class="btn primary" onclick="gvNghiLuu(\''+esc(sesId)+'\')"><i class="ti ti-send"></i>Gửi đơn báo nghỉ</button></div></div>';
@@ -24854,14 +24914,20 @@ function gvNghiForm(sesId){
 function gvNghiLuu(sesId){
  if(!actGuard("gvNghi:"+sesId))return;
  var s=find("DL11","session_id",sesId);if(!s){toast("Không thấy buổi học.");return}
+ if(!gvnAiBao(s)){toast("Buổi này không phải buổi dạy của bạn, và chức danh của bạn không báo hộ được.",5000);return}
  if(gvnCuaBuoi(sesId)){toast("Buổi này đã có đơn báo nghỉ rồi.");return}
  var ly=String(fldV("gvn_ly")||"").trim();
  if(!ly){toast("Chọn lý do nghỉ trước đã.");return}
  var g=find("DL01","staff_id",CURSTAFF)||{};
  var c=find("DL10","class_id",s.class_id)||{};
  var de=String(fldV("gvn_de")||"").trim();
+ /* NGƯỜI NGHỈ là giáo viên của BUỔI, không phải người đang bấm - hai thứ ấy khác nhau khi
+    học vụ nhập hộ. Ghi nhầm là quota nghỉ trừ vào đầu người nhập, và hàng chờ hiện sai tên. */
+ var _gvn=find("DL01","staff_id",s.teacher_id)||{};
+ var _hoAi=gvnBaoHo(s)?(g.full_name||myName()||CURSTAFF||""):"";
  var r={nghi_id:"GVN-"+seqNo("DL33","nghi_id",4),
-  staff_id:CURSTAFF||"",staff_name:g.full_name||myName()||"",
+  staff_id:s.teacher_id||CURSTAFF||"",staff_name:_gvn.full_name||s.teacher_id_name||g.full_name||"",
+  bao_ho_boi:_hoAi?(CURSTAFF||""):"",bao_ho_ten:_hoAi,
   session_id:sesId,class_id:s.class_id||"",class_name:c.class_name||s.class_id_name||"",
   session_number:s.session_number||"",session_date:s.session_date||"",
   ly_do:ly,ghi_chu:String(fldV("gvn_note")||"").trim(),
@@ -24872,7 +24938,8 @@ function gvNghiLuu(sesId){
  DL.DL33=DL.DL33||[];DL.DL33.unshift(r);
  if(SVR)try{google.script.run.apiSave("DL33",r)}catch(e){}
  persistSoon();closeModal();
- toast("Đã gửi đơn báo nghỉ buổi "+(s.session_number||"")+" lớp "+(c.class_name||s.class_id)+" - Trưởng phòng ACA sẽ duyệt, học vụ thấy cùng lúc.",5200);
+ toast((_hoAi?("Đã báo hộ "+(r.staff_name||"")+" nghỉ buổi "):"Đã gửi đơn báo nghỉ buổi ")+
+  (s.session_number||"")+" lớp "+(c.class_name||s.class_id)+" - Trưởng phòng ACA sẽ duyệt, học vụ thấy cùng lúc.",5200);
  reRender(CUR)}
 /* Giáo viên rút đơn của CHÍNH MÌNH, và chỉ khi chưa ai quyết. Rút sau khi đã duyệt là kéo học vụ
    chạy lại từ đầu mà họ không hay - muốn đổi ý lúc ấy thì nói với người duyệt. */
@@ -25267,7 +25334,13 @@ function renderGvdp(embed){
       ?'<div><span class="chip red">đã duyệt cho nghỉ</span> <span class="mut" style="font-size:11px">'+esc(dn.ly_do||"")+'</span></div>'
       :'<div><span class="chip amber">xin nghỉ, chờ TP ACA duyệt</span></div>'})()+'</td>'+
    '<td>'+(n?'<span class="chip green">'+n+' người</span>':'<span class="chip red">không có ai</span>')+'</td>'+
-   '<td><button class="btn primary sm" onclick="event.stopPropagation();gvBackupForm(\''+esc(x.session_id)+'\')"><i class="ti ti-user-plus"></i>Đề xuất người dạy thay</button></td></tr>'});
+   '<td><div class="rowact"><button class="btn primary sm" onclick="event.stopPropagation();gvBackupForm(\''+esc(x.session_id)+'\')"><i class="ti ti-user-plus"></i>Đề xuất người dạy thay</button>'+
+    /* Anh Luân 11/08: *"giáo viên có thể sẽ báo cho học vụ hoặc báo cho trưởng phòng aca"*. Đây
+       là màn học vụ đang mở khi nhận cuộc gọi ấy - nút nhập hộ phải ở ngay đây, không thì họ
+       nghe điện xong lại quay về đường tin nhắn riêng. */
+    ((!gvnCuaBuoi(x.session_id)&&gvnAiBao(x))
+      ?('<button class="btn sm" onclick="event.stopPropagation();gvNghiForm(\''+esc(x.session_id)+'\')" data-tip="GV gọi báo nghỉ - nhập hộ ngay tại đây"><i class="ti ti-calendar-off"></i>Báo nghỉ hộ</button>')
+      :'')+'</div></td></tr>'});
  h+='</tbody></table></div></div>';
  /* ═══ V2 15/08 - BẢNG NÀY TỪNG TRẢ LỜI MỘT CÂU KHÔNG CÓ NGHĨA ═══════════════════════════════
     Anh Luân: *"Giáo viên trống lịch hôm nay là session có ý nghĩa gì ???"*
