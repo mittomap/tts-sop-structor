@@ -177,6 +177,7 @@ chay "_checkkhuon khuon trang nghiep vu" "CHECKKHUON (OK|BO QUA)" node _checkkhu
 # len trang thi getElementById vo trung ban o duoi, app ghi mot con so KHAC con so nguoi ta go
 # (bay so 4 cua BAN_GIAO_V2, da can that).
 chay "_checkmotcua mot nghiep vu mot cua ghi" "CHECKMOTCUA (OK|BO QUA)" node _checkmotcua.js
+chay "_checkghe  ngoi vao ghe tung chuc danh" "CHECKGHE OK" node _checkghe.js
 # Anh Luan 08/08: "moi nhan vien, moi truong phong, ho hoi bao nhieu loai cau hoi, ho can bao
 # nhieu trang? He thong lon, nhung qua kho dung thi chet ngay." Do bang bang NHIP - ban khai cua
 # chinh app ve "moi ngay chuc danh nay lam gi". Bat duoc chuyen nang nhat: NHIP dem toan trung

@@ -9879,7 +9879,18 @@ function duyCkHTML(TH){
  h+='<div class="sechd">Chiết khấu chờ duyệt ('+ck.length+')</div><div class="panel"><div class="pbody">';
  if(!ck.length)h+='<div class="empty">Không có chiết khấu nào chờ duyệt.</div>';
  ck.forEach(function(r){var id=esc(r.enrollment_id);var pct=num(r.total_fee)?Math.round(num(r.discount_amount)/num(r.total_fee)*100):0;
-  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+duyWho(r)+' - '+esc(r.course_id_name||r.course_id)+'</div><div class="amt">'+money(r.discount_amount)+'đ <span style="font-size:12px;color:var(--muted);font-weight:600" data-tip="'+esc(pctG(num(r.discount_amount),num(r.total_fee),"đồng chiết khấu trên học phí gốc"))+'">('+pct+'% / học phí gốc '+money(r.total_fee)+'đ)</span></div><div class="rs">Loại: '+esc(elabel(r.discount_type)||"-")+' - Lý do: '+esc(r.discount_reason||"-")+'</div></div><div class="act">'+duyXemBtn(r)+'<button class="btn primary" onclick="confirmRun(\'Duyệt chiết khấu '+money(r.discount_amount)+'đ cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi tên bạn là người duyệt.\',\'duyetOK\',\''+id+'\')"><i class="ti ti-check"></i>Duyệt</button><button class="btn danger" onclick="confirmRun(\'TỪ CHỐI chiết khấu này? Chiết khấu về 0 và học phí tính lại.\',\'duyetNo\',\''+id+'\')"><i class="ti ti-x"></i>Từ chối</button></div></div>'});
+  h+='<div class="appcard"><div class="info"><div class="id">'+id+'</div><div class="big">'+duyWho(r)+' - '+esc(r.course_id_name||r.course_id)+'</div><div class="amt">'+money(r.discount_amount)+'đ <span style="font-size:12px;color:var(--muted);font-weight:600" data-tip="'+esc(pctG(num(r.discount_amount),num(r.total_fee),"đồng chiết khấu trên học phí gốc"))+'">('+pct+'% / học phí gốc '+money(r.total_fee)+'đ)</span></div><div class="rs">Loại: '+esc(elabel(r.discount_type)||"-")+' - Lý do: '+esc(r.discount_reason||"-")+'</div></div><div class="act">'+duyXemBtn(r)+
+   /* ═══ V2 18/08 lượt 3 - `_checkghe` (bộ kiểm dựng cùng ngày) BẮT ĐƯỢC NGAY LƯỢT CHẠY ĐẦU ═══
+      Sale Leader chi nhánh thấy đủ hai nút Duyệt / Từ chối, bấm vào thì `ckChanNeuKhongQuyen`
+      từ chối. Lỗ này có SẴN TỪ TRƯỚC, không phải mới sinh: lớp phủ quản lý trong `buildScope`
+      phát tab `duyetck` theo cờ `isMgr` - mà cờ ấy gồm cả *leader*, trong khi anh Luân chốt
+      04/08 *"Duyệt chiết khấu chỉ có trưởng phòng tư vấn và giám đốc mới có quyền em"* và
+      V9.99q đã tách `mgr` khỏi `leader` ĐÚNG vì câu ấy. Cửa ghi tách rồi, cái nút thì không.
+      Giữ nguyên tab cho họ XEM (quyền chặn tay, không che mắt), chỉ bỏ hai nút quyết. */
+   (canDuyetCK()&&!chanActIm("ck_lon")
+     ?('<button class="btn primary" onclick="confirmRun(\'Duyệt chiết khấu '+money(r.discount_amount)+'đ cho '+esc(r.student_id_name||r.student_id)+'? Sẽ ghi tên bạn là người duyệt.\',\'duyetOK\',\''+id+'\')"><i class="ti ti-check"></i>Duyệt</button><button class="btn danger" onclick="confirmRun(\'TỪ CHỐI chiết khấu này? Chiết khấu về 0 và học phí tính lại.\',\'duyetNo\',\''+id+'\')"><i class="ti ti-x"></i>Từ chối</button>')
+     :'<span class="chip amber" data-tip="Bảng phân quyền CH3: chiết khấu vượt ngưỡng do Trưởng phòng Tư vấn hoặc Giám đốc duyệt. Bạn xem được để theo dõi đơn của cơ sở mình.">chờ Trưởng phòng Tư vấn duyệt</span>')+
+   '</div></div>'});
  h+='</div></div>';
  if(appr.length){h+='<div class="sechd">Đã quyết định gần đây</div><div class="panel"><div class="pbody">';
   appr.slice(0,8).forEach(function(r){var rej=/từ chối|tu choi/i.test(String(r.discount_approved_by));h+='<div class="appcard done"><div class="info"><div class="id">'+esc(r.enrollment_id)+'</div><div class="big">'+nguoiLnk(r.student_id,r.student_id_name)+' - chiết khấu '+money(r.discount_amount)+'đ</div><div class="rs">'+duyetAiTen(r.discount_approved_by)+(r.discount_approved_at?' · '+esc(r.discount_approved_at):'')+'</div></div><div class="act"><span class="chip '+(rej?"red":"green")+'" style="padding:6px 12px">'+(rej?"Đã từ chối":"Đã duyệt")+'</span></div></div>'});
@@ -9896,6 +9907,9 @@ function canDuyetCK(){var rs=SCOPE();
  return t?t.indexOf("duyetck")>=0:(rs.pages.indexOf("duyet")>=0)}
 /* Chan theo MUC chiet khau. Nguong lay tu CH2 (ckThreshold) chu khong cam so trong ma -
    doi nguong o Cai dat la cho chan doi theo ngay. */
+/* Hỏi quyền để VẼ thì phải hỏi IM LẶNG - `chanAct` bắn ra toast, gọi nó lúc dựng HTML là mỗi
+   lần mở trang lại nổ một câu từ chối trước khi người ta bấm gì. */
+function chanActIm(k){try{return !canAct(k)}catch(e){return false}}
 function ckChanTheoMuc(d){
  var TH=0;try{TH=num(ckThreshold())}catch(e){TH=0}
  var act=(TH&&num(d)>=TH)?"ck_lon":"ck_nho";
@@ -9933,7 +9947,23 @@ function refundSuggest(e){var paid=num(e.paid_amount);if(paid<=0)return {pct:0,a
  return {pct:0,amt:0,why:"đã học "+days+" ngày (quá "+rd+") - theo chính sách không hoàn"}}
 function duyetRefund(id){var e=find("DL06","enrollment_id",id);if(!e){toast("Không thấy đăng ký.");return}
  var sg=refundSuggest(e);
+ /* V2 18/08 lượt 3 - CÙNG CON BỆNH, chỗ này có sẵn từ trước chứ không phải mới sinh: quét bằng
+    máy ra 5/6 chức danh mở được ngăn kéo này với đủ ô nhập số tiền, ô đính chứng từ và nút
+    "Chốt hoàn tiền" - bấm vào thì `chanAct("hoantien")` từ chối. Tức là app mời người ta điền
+    xong một cái phiếu rồi mới nói không phải việc của bạn.
+    *Một cái form điền được mà lưu không được thì tệ hơn không có form: nó lấy mất thời gian
+    thật của người điền, và làm họ ngờ cả những form khác.* */
+ /* Hỏi quyền để VẼ thì phải hỏi IM LẶNG - `chanAct` bắn ra toast, gọi nó lúc dựng HTML là
+    mỗi lần mở ngăn kéo lại nổ một câu từ chối trước cả khi người ta bấm gì. `canAct` là chính
+    phép thử ấy, không kèm tiếng động. */
+ var _qh=true;try{_qh=canAct("hoantien")}catch(x){_qh=true}
  var h='<div class="dcard"><h4><i class="ti ti-arrow-back-up"></i>Hoàn tiền - '+esc(e.student_id_name||e.student_id)+'</h4>';
+ if(!_qh){
+  h+=ctxRows([["Khóa",esc(e.course_id_name||e.course_id||"-")],["Đã đóng",vnd(num(e.paid_amount))],
+   ["Chính sách",esc(sg.why)],["Mức gợi ý",vnd(sg.amt)+" ("+sg.pct+"%)"]]);
+  h+='<div class="notebar nbamber"><i class="ti ti-eye"></i><b>Kế toán chốt khoản hoàn này.</b> Bạn xem được mức gợi ý theo chính sách và lý do huỷ - việc chi tiền và đính chứng từ là của Kế toán.</div>';
+  return openDrawer("Yêu cầu hoàn tiền",h+'</div>');
+ }
  h+=ctxRows([["Khóa",esc(e.course_id_name||e.course_id||"-")],["Đã đóng",vnd(num(e.paid_amount))],["Chính sách",esc(sg.why)]]);
  h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Mức gợi ý theo 3 mốc CH2 (refundFull/Partial/Reduced_days). Sửa được số tiền trước khi chốt. Khoản hoàn ghi thành DÒNG THU ÂM trong sổ (DL07) để doanh thu trừ đúng.</div>';
  h+='<div class="fld"><label>Số tiền hoàn <i>*</i></label><input id="rf_amt" type="number" min="0" max="'+num(e.paid_amount)+'" value="'+sg.amt+'"></div>';
@@ -24973,6 +25003,16 @@ function gvNghiQuyetForm(id){
  var c=find("DL10","class_id",r.class_id)||{};
  var con=gvOffLeft(c);
  var n=s.session_id?gvBackup(s).filter(function(z){return z.ok}).length:0;
+ /* ═══ V2 18/08 lượt 3 - MỜI RỒI ĐUỔI, LẦN THỨ HAI TRONG MỘT PHIÊN ═══════════════════════════
+    Anh Luân: *"Học vụ theo dõi thôi chứ được duyệt giáo viên nghỉ khi nào nhỉ???"*
+    Đúng - và cái sai nằm ở HÀM NÀY, hàm em vừa viết cùng ngày. Cửa ghi `gvNghiQuyet` có gác
+    (`gvnDuyetDuoc`), nhưng ngăn kéo thì bày đủ hai nút "Duyệt cho nghỉ" / "Không duyệt" cho MỌI
+    chức danh. Quét bằng máy: 6/6 chức danh thấy nút, chỉ 1 người bấm được.
+    Cay hơn cả: cách đó hai chục phút em vừa vá đúng bệnh này cho `absForm` (đơn xin nghỉ của học
+    viên) - rồi không đi hỏi lại cái hàm anh em của nó.
+    *Vá một chỗ theo một luật thì phải đi hỏi mọi chỗ khác đang sống dưới luật ấy - không thì
+    lần sau người ta bắt lại đúng con bệnh, chỉ khác cái tên hàm.* */
+ var _q=gvnDuyetDuoc();
  var h='<div class="dcard"><h4><i class="ti ti-calendar-off"></i>Đơn báo nghỉ '+esc(id)+'</h4>';
  h+=ctxRows([["Giáo viên",nsLnk(r.staff_id,r.staff_name)],
   ["Buổi",lopLnk(r.class_id,r.class_name)+' · buổi '+esc(r.session_number||"?")+' · '+esc(r.session_date||"-")],
@@ -24981,6 +25021,12 @@ function gvNghiQuyetForm(id){
   ["Người thay sẵn có",(n?('<b style="color:var(--green)">'+n+' người</b> nhận được buổi này'):'<b style="color:var(--red)">chưa có ai</b> - duyệt xong học vụ phải gọi tìm')]]);
  h+=ctxContent("Lý do",String(r.ly_do||"-")+(r.ghi_chu?(" - "+r.ghi_chu):""),"var(--navy)");
  if(r.de_xuat_gv_ten)h+='<div class="notebar nbgreen"><i class="ti ti-user-check"></i>Giáo viên đã tự nhờ được <b>'+esc(r.de_xuat_gv_ten)+'</b> - học vụ vẫn kiểm lại giờ và cơ sở trước khi chốt.</div>';
+ if(!_q){
+  /* Người CHỈ XEM: nói thẳng ai quyết, và không bày ô ghi chú - một ô nhập mà lưu không được là
+     một cái bẫy. Học vụ mở đơn này ra là để chuẩn bị xoay người, không phải để gật. */
+  h+='<div class="notebar nbamber"><i class="ti ti-eye"></i><b>Trưởng phòng ACA quyết đơn này.</b> Bạn mở ra để biết trước buổi nào sắp hổng và chuẩn bị người dạy thay - duyệt cho nghỉ là quyết định chuyên môn của phòng ACA.</div>';
+  return openDrawer("Đơn báo nghỉ của giáo viên",h+'</div>');
+ }
  h+='<div class="fld full"><label>Ghi chú của bạn</label><textarea id="gvq_note" rows="2" placeholder="vd: đã trao đổi, đồng ý cho nghỉ - nhờ học vụ xếp cô Ngọc"></textarea></div>';
  h+='<div class="dact"><button class="btn primary" onclick="gvNghiQuyet(\''+esc(id)+'\',\'duyet\')"><i class="ti ti-check"></i>Duyệt cho nghỉ</button>'+
   '<button class="btn danger" onclick="gvNghiQuyet(\''+esc(id)+'\',\'tuchoi\')"><i class="ti ti-x"></i>Không duyệt</button></div></div>';
