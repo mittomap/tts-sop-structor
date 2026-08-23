@@ -9979,6 +9979,29 @@ function renderDiemDanh(){return ddHub({})}
    Nay: BÁO NGHỈ -> CHỜ DUYỆT -> (Có phép / Không phép) -> tuỳ chọn XẾP BÙ.
    MỘT HÀNH ĐỘNG = MỘT HÀM LÕI: absReq (xin) · absReview (duyệt) · absMakeup (xếp bù).
    Cổng học viên và app nhân viên đều đi qua đúng ba hàm này, không ai ghi tay vào DL12 nữa. */
+/* ═══ V2 18/08 - AI ĐƯỢC DUYỆT ĐƠN XIN NGHỈ CỦA HỌC VIÊN (anh Luân, đứng ở cổng giảng viên:
+   *"a đang ở cổng của chính giảng viên này, sao lại có chữ duyệt nhỉ???? có phải trưởng phòng
+   aca đâu???"*) ═══════════════════════════════════════════════════════════════════════════════
+   Anh bắt đúng một LỖ THẬT, không phải một chỗ xấu mắt.
+   Khối "Đã báo nghỉ buổi này - chờ duyệt" nằm trên màn Điểm danh là CỐ Ý và vẫn đúng: giáo viên
+   phải biết TRƯỚC giờ dạy ai vắng để chuẩn bị phần bù (ghi chú V9.29 ngay dưới). Cái sai là nút
+   **Duyệt** đứng cạnh nó, và nút ấy không có ai gác: `absRun` chỉ gọi `actGuard` - mà `actGuard`
+   là chốt chống-bấm-hai-lần, KHÔNG phải chốt quyền. Nghĩa là giáo viên bấm vào là **chốt luôn
+   chuyên cần của học viên** - đúng cái quyền mà cả vòng đời V9.29 dựng ra để lấy khỏi tay họ
+   (trước đó học viên tự chốt, nay thành giáo viên tự chốt - chỉ đổi người, không đổi bệnh).
+   *Quyền chặn TAY, không che MẮT.* Nên: khối vẫn hiện đủ cho giáo viên đọc, chỉ cái NÚT là của
+   người có thẩm quyền; và chặn ở CỬA GHI chứ không chỉ giấu nút - giấu lối vào mà không khoá cửa
+   ghi thì phân quyền chỉ là trang trí (luật app tự ghi từ V9.41).
+   Đọc quyền theo đúng cách `canDuyetCK` đang đọc: có tab `duyetnghi` trong hub Chờ duyệt. */
+function canDuyetNghi(){var rs=SCOPE();
+ if(rs.pages==="*")return true;
+ var t=rs.tabs&&rs.tabs.duyet;
+ if(t)return t.indexOf("duyetnghi")>=0;
+ return rs.pages.indexOf("duyetnghi")>=0||rs.pages.indexOf("duyet")>=0}
+function absChanNeuKhongQuyen(){
+ if(canDuyetNghi())return false;
+ toast("Đơn xin nghỉ của học viên do Học vụ duyệt. Bạn xem được để biết trước giờ dạy ai vắng, nhưng không chốt được chuyên cần.",5600);
+ return true}
 function absPending(a){return ecode(a&&a.absence_type)==="pending_review"}
 function absOf(sid,sess){return rows("DL12").filter(function(r){
  return String(r.student_id||"")===String(sid)&&String(r.session_id||"")===String(sess)})[0]}
@@ -10042,13 +10065,24 @@ function absForm(attId){
  var a=find("DL12","attendance_id",attId); if(!a){toast("Không thấy dòng báo nghỉ.");return}
  var s2=find("DL11","session_id",a.session_id)||{};
  var lop=find("DL10","class_id",s2.class_id)||{};
- var h='<div class="dcard"><h4><i class="ti ti-user-question"></i>Duyệt xin nghỉ học</h4>';
+ /* Tiêu đề đi theo QUYỀN chứ không cứng một chữ: người chỉ xem mà đọc "Duyệt xin nghỉ học"
+    thì vẫn tưởng mình sắp duyệt được, dù bên dưới không có nút nào. */
+ var _quyen0=canDuyetNghi();
+ var h='<div class="dcard"><h4><i class="ti ti-user-question"></i>'+
+  (_quyen0?"Duyệt xin nghỉ học":"Đơn xin nghỉ của học viên")+'</h4>';
  h+=ctxRows([["Học viên",esc(a.student_name||a.student_id)],
   ["Buổi",esc("Buổi "+(s2.session_number||"?")+" · "+(s2.session_date||"-"))],
   ["Lớp",lopLnk(s2.class_id,lop.class_name)],
   ["HV báo lúc",esc(a.absence_reported_at||"-")],
   ["Xin học bù",a.absence_want_makeup?'<b style="color:var(--navy)">Có</b>':"không"]]);
  h+=ctxContent("Lý do học viên nêu",hvSelfWhy(a)||a.note||"(không ghi)","var(--navy)");
+ var _quyen=_quyen0;
+ if(!_quyen){
+  /* Ngăn kéo của người CHỈ XEM: nói thẳng ai quyết và vì sao mình vẫn được mở nó ra. Không bày
+     ô ghi chú - một ô nhập mà lưu không được là một cái bẫy. */
+  h+='<div class="notebar nbamber" style="margin:10px 0"><i class="ti ti-eye"></i><b>Học vụ chốt đơn này.</b> Bạn mở ra để biết trước giờ dạy em này vắng và có xin học bù không - chuyên cần do Học vụ quyết.</div>';
+  return openDrawer("Đơn xin nghỉ của học viên",h+'</div>');
+ }
  h+='<div class="notebar" style="margin:10px 0"><i class="ti ti-info-circle"></i>Chuyên cần của học viên chỉ được chốt khi bạn duyệt. Trước lúc đó buổi này <b>chưa</b> tính là vắng không phép.</div>';
  h+='<div class="fld full"><label>Ghi chú của bạn</label><textarea id="ab_note" rows="2" placeholder="vd: đã gọi xác nhận với phụ huynh"></textarea></div>';
  h+='<div class="dact"><button class="btn primary" onclick="absRun(\''+esc(attId)+'\',\'excused\')"><i class="ti ti-check"></i>Duyệt - vắng CÓ PHÉP</button>'+
@@ -10064,6 +10098,7 @@ function absForm(attId){
    '<div class="dact"><button class="btn" onclick="absMkRun(\''+esc(attId)+'\')"><i class="ti ti-calendar-plus"></i>Xếp buổi bù này</button></div>'}}
  return openDrawer("Duyệt xin nghỉ",h+'</div>')}
 function absRun(attId,kind){
+ if(absChanNeuKhongQuyen())return;
  if(!actGuard("absReview:"+attId))return;
  var a=absReview(attId,kind,fldV("ab_note"));
  if(!a)return;
@@ -10071,6 +10106,7 @@ function absRun(attId,kind){
  toast(kind==="excused"?"Đã duyệt: buổi này tính là vắng CÓ PHÉP.":"Đã ghi: buổi này tính là vắng KHÔNG PHÉP.",4200);
  reRender(CUR)}
 function absMkRun(attId){
+ if(absChanNeuKhongQuyen())return;
  if(!actGuard("absMakeup:"+attId))return;
  var t=fldV("ab_mk"); if(!t){toast("Chọn buổi học bù đã.");return}
  var a=absMakeup(attId,t);
@@ -10086,7 +10122,14 @@ function absQueueHTML(list,tit){
    '<span>'+esc((c.class_name||s2.class_id||"")+" · buổi "+(s2.session_number||"?")+" · "+(s2.session_date||""))+'</span>'+
    '<span class="absw">'+esc(hvSelfWhy(a)||a.note||"")+'</span></div>'+
    (a.absence_want_makeup?'<span class="chip blue">xin học bù</span>':'')+
-   '<button class="btn primary sm" onclick="absForm(\''+esc(a.attendance_id)+'\')"><i class="ti ti-gavel"></i>Duyệt</button></div>'});
+   /* Người KHÔNG có quyền duyệt vẫn mở xem được lý do và tình trạng đơn - họ cần đúng thông tin
+      ấy trước giờ dạy - nhưng nhãn nút nói thật là "Xem đơn", và bên trong không có hai nút
+      quyết. *Một cái nút ghi "Duyệt" chìa cho người không được duyệt là một lời hứa suông.* */
+   (canDuyetNghi()
+     ?'<button class="btn primary sm" onclick="absForm(\''+esc(a.attendance_id)+'\')"><i class="ti ti-gavel"></i>Duyệt</button>'
+     :'<span class="chip amber" data-tip="Học vụ là người chốt chuyên cần. Bạn xem được để biết trước giờ dạy ai vắng.">chờ Học vụ duyệt</span>'+
+      '<button class="btn sm" onclick="absForm(\''+esc(a.attendance_id)+'\')"><i class="ti ti-eye"></i>Xem đơn</button>')+
+   '</div>'});
  return h+'</div></div>'}
 function ddHub(opt){opt=opt||{};var embed=opt.embed;
  var cls=rows("DL10");
