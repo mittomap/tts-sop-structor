@@ -160,7 +160,14 @@
 > giảng viên (3-5 cột), bảng chờ xếp lớp (3 cột), Phiếu gần đây ở Khảo sát, bảng thưởng còn treo
 > ở Mã giới thiệu, các bảng trong Cài đặt và trong ngăn kéo.
 
-> ### 📋 18/08 - VIỆC TỒN ĐÁNG LÀM NHẤT: MỘT BỘ KIỂM BIẾT "NGỒI VÀO GHẾ"
+> ### ✅ 18/08 - ĐÃ DỰNG XONG `_checkghe` (bộ kiểm thứ 45) - mục dưới đây giữ lại làm lý do
+> Em khai mục này là "chờ anh Luân gật". Rồi anh hỏi câu thứ ba - *"Học vụ theo dõi thôi chứ được
+> duyệt giáo viên nghỉ khi nào nhỉ???"* - và đó là **lần thứ ba cùng một con bệnh trong một
+> phiên**. Đến lúc ấy nó không còn là một đề xuất: nó là thứ duy nhất chặn được cái đang tái phát.
+> Đã dựng, đã nối vào `verify.sh`, và **lượt chạy đầu bắt ngay một lỗ có sẵn từ trước** (Sale
+> Leader chi nhánh thấy nút duyệt chiết khấu). Chi tiết bốn câu hỏi: `_src/README_SRC.md`.
+
+> ### 📋 (lý do dựng) VIỆC TỒN ĐÁNG LÀM NHẤT: MỘT BỘ KIỂM BIẾT "NGỒI VÀO GHẾ"
 > Trong một phiên, anh Luân bắt **ba lỗ** chỉ bằng cách mở cổng giảng viên ra xem, mà **44 bộ kiểm
 > không bộ nào bắt được**: nút Duyệt chìa cho người không có quyền (và cửa ghi không khoá) · nút
 > Báo nghỉ đặt ở chỗ người phải bấm không đi qua · Học vụ không có cửa báo hộ dù anh đã chốt từ
@@ -396,14 +403,45 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 44 BỘ KIỂM, XANH HẾT 44/44 (verify trọn bộ 18/08 trên chính bản này, 34m51s).
-> Bản dựng đang chạy: `994d3f` (18/08 - GIÁO VIÊN BÁO NGHỈ (DL33) + NHẬT KÝ RỜI KHỎI CÀI ĐẶT
-> + hai lỗ phân quyền anh Luân bắt tại chỗ), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> **Phiên bản: V2 — 45 BỘ KIỂM, XANH HẾT 45/45 (verify trọn bộ 18/08 trên chính bản này, 35m20s).
+> Bản dựng đang chạy: `723da0` (18/08 - GIÁO VIÊN BÁO NGHỈ (DL33) · NHẬT KÝ RỜI KHỎI CÀI ĐẶT ·
+> BỐN LỖ PHÂN QUYỀN anh Luân bắt tại chỗ · **bộ kiểm thứ 45 `_checkghe`**), đã lên
+> https://mittomap.github.io/itts-sop-demo-v2/ .
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `9ac583`, `10e445`, `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
+> Mốc cũ: `994d3f`, `9ac583`, `10e445`, `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
 > `bad7f9`, `a9eb4b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
+> ### 🟢 18/08 - LỖ THỨ BA VÀ THỨ TƯ: "MỜI RỒI ĐUỔI" Ở BA HÀNG CHỜ DUYỆT
+>
+> Anh Luân: *"Học vụ theo dõi thôi chứ được duyệt giáo viên nghỉ khi nào nhỉ???"*
+> Quét bằng máy cả ba hàng chờ, đóng vai 6 chức danh:
+> · **GV báo nghỉ**: 6/6 chức danh thấy đủ hai nút Duyệt / Không duyệt, **1 người bấm được**.
+> · **Hoàn tiền**: 5/6 mở được ngăn kéo có ô nhập số tiền + ô đính chứng từ, bấm Chốt thì bị từ chối.
+> · **Chiết khấu**: Sale Leader chi nhánh thấy nút duyệt - **lỗ có sẵn từ trước**.
+> Cửa ghi đều có gác nên không ai ghi bừa được, nhưng đó chính là *mời rồi đuổi*: app cho người ta
+> mở form, điền, rồi mới nói không phải việc của bạn.
+> *Một cái form điền được mà lưu không được thì tệ hơn không có form: nó lấy mất thời gian thật
+> của người điền, rồi làm họ ngờ cả những form khác.*
+>
+> **CHỖ ĐAU NHẤT LÀ CHỖ EM SAI.** Cách đó hai chục phút em vừa vá **đúng con bệnh này** cho
+> `absForm` (đơn xin nghỉ của học viên) - rồi không đi hỏi lại `gvNghiQuyetForm`, cái hàm anh em
+> của nó, mà hàm ấy **chính em vừa viết cùng ngày**.
+> *Vá một chỗ theo một luật thì phải đi hỏi mọi chỗ khác đang sống dưới luật ấy - không thì lần
+> sau người ta bắt lại đúng con bệnh, chỉ khác cái tên hàm.*
+>
+> **Chiết khấu là một chuyện khác và đáng nhớ hơn:** lớp phủ quản lý trong `buildScope` phát tab
+> `duyetck` theo cờ `isMgr`, mà cờ ấy gồm cả *leader*. V9.99q đã tách `mgr` khỏi `leader` ĐÚNG vì
+> câu anh Luân chốt 04/08 (*"Duyệt chiết khấu chỉ có trưởng phòng tư vấn và giám đốc mới có
+> quyền em"*) - **tách ở cửa ghi, mà không ai đi tách ở cái nút.** Sửa một luật thì phải đi hỏi
+> lại mọi chỗ đang vẽ theo luật cũ.
+>
+> **Vá cả ba theo cùng một luật:** giữ tab cho họ XEM (quyền chặn tay, không che mắt) · bỏ nút
+> quyết, thay bằng chip nói rõ ai quyết · **không bày ô nhập nào** (ô nhập mà lưu không được là
+> một cái bẫy) · tiêu đề ngăn kéo đổi theo quyền.
+> Thêm `chanActIm(k)` - hỏi quyền IM LẶNG để vẽ: `chanAct` bắn ra toast, gọi nó lúc dựng HTML là
+> mỗi lần mở màn lại nổ một câu từ chối trước khi người ta bấm gì.
+
 > ### 🟢 18/08 - HAI LỖ PHÂN QUYỀN ANH LUÂN BẮT TẠI CHỖ, CHỈ BẰNG CÁCH NGỒI VÀO GHẾ GIẢNG VIÊN
 >
 > Cả hai đều lộ ra trong một phút, khi anh mở cổng giảng viên ra xem thử. Không bộ kiểm nào trong

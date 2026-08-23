@@ -2671,3 +2671,27 @@ Cùng lượt này: cột **Thay đổi** không còn in tên ô bằng chữ m�
 "Hạn đóng kế tiếp"), và bỏ hai ô `updated_by` / `updated_at` - chúng lặp lại đúng hai cột **Lúc**
 và **Người** nằm ngay bên cạnh. Ô lọc **Bảng** cũng đã có tên tiếng Việt cho ba bảng mới nhất
 (Ca dạy thay · Kho mẫu tin · Giáo viên báo nghỉ).
+
+
+---
+
+# Cập nhật 18/08 (cuối ngày) — Ai được bấm nút quyết định
+
+Bốn chỗ trong app cho người ta **thấy nút quyết định mà bấm vào thì bị từ chối**. Cửa ghi đều có
+gác nên không ai ghi bừa được, nhưng app vẫn cho mở form, điền xong rồi mới nói không phải việc
+của bạn. Đã dọn sạch:
+
+| Hàng chờ | Trước: ai thấy nút | Nay chỉ |
+|---|---|---|
+| Duyệt GV báo nghỉ | 6/6 chức danh | Trưởng phòng ACA |
+| Duyệt xin nghỉ của học viên | có cả giáo viên | Học vụ |
+| Chốt hoàn tiền | 5/6 chức danh | Kế toán |
+| Duyệt chiết khấu | có cả Sale Leader chi nhánh | TP Tư vấn + Giám đốc |
+
+**Người không có quyền vẫn XEM được đầy đủ** - quyền chặn tay, không che mắt. Học vụ mở đơn báo
+nghỉ của giáo viên ra để chuẩn bị xoay người; giáo viên mở đơn xin nghỉ của học viên ra để biết
+trước giờ dạy ai vắng. Chỉ khác: không có nút quyết, không có ô nhập, và có một dòng nói rõ ai là
+người chốt.
+
+Riêng đơn **xin nghỉ của học viên** còn một chỗ nặng hơn hiển thị: cửa ghi phía sau chưa từng
+khoá, nên giáo viên bấm là chốt luôn chuyên cần của học viên. Nay chặn ở cửa ghi.
