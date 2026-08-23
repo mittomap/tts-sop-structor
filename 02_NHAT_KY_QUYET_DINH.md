@@ -160,6 +160,19 @@
 > giảng viên (3-5 cột), bảng chờ xếp lớp (3 cột), Phiếu gần đây ở Khảo sát, bảng thưởng còn treo
 > ở Mã giới thiệu, các bảng trong Cài đặt và trong ngăn kéo.
 
+> ### 📋 18/08 - VIỆC TỒN ĐÁNG LÀM NHẤT: MỘT BỘ KIỂM BIẾT "NGỒI VÀO GHẾ"
+> Trong một phiên, anh Luân bắt **ba lỗ** chỉ bằng cách mở cổng giảng viên ra xem, mà **44 bộ kiểm
+> không bộ nào bắt được**: nút Duyệt chìa cho người không có quyền (và cửa ghi không khoá) · nút
+> Báo nghỉ đặt ở chỗ người phải bấm không đi qua · Học vụ không có cửa báo hộ dù anh đã chốt từ
+> 11/08.
+> Chỗ hụt của bộ kiểm hiện tại: chúng hỏi *"trang vẽ ra được không"*, *"nút bấm có chuyện gì
+> không"*, *"menu có mời rồi đuổi không"* - **không bộ nào hỏi "cái nút này có ĐÚNG NGƯỜI được
+> bấm không"** và **"người phải làm việc này có tìm thấy chỗ làm không"**.
+> Đề xuất `_checkghe`: với mỗi chức danh, đóng vai rồi (a) gọi THẲNG từng cửa ghi đã khai trong
+> `DOORS` - cửa nào ghi được mà chức danh ấy không có quyền là đỏ; (b) với mỗi việc trong nhịp
+> ngày của họ, tìm xem nút làm việc ấy có xuất hiện trên màn họ đi qua không.
+> **Chưa làm - chờ anh Luân gật, vì đây là dựng thêm một bộ kiểm chứ không phải vá một lỗ.**
+
 > ### ✅ 18/08 - HAI CÂU HỎI TRÊN ĐÃ CÓ CÂU TRẢ LỜI, VÀ ĐÃ LÀM XONG
 > Anh Luân trả lời gọn cả hai: *"1, trưởng phòng aca duyệt, trưởng phòng học vụ cũng biết / 2, ko
 > cần xin nếu là trưởng phòng và kế toán, nhưng đừng quên là mọi thứ đều có log nhé."*
@@ -384,13 +397,60 @@
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 44 BỘ KIỂM, XANH HẾT 44/44 (verify trọn bộ 18/08 trên chính bản này, 34m51s).
-> Bản dựng đang chạy: `9ac583` (18/08 - GIÁO VIÊN BÁO NGHỈ (DL33) + NHẬT KÝ RỜI KHỎI CÀI ĐẶT),
-> đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
+> Bản dựng đang chạy: `994d3f` (18/08 - GIÁO VIÊN BÁO NGHỈ (DL33) + NHẬT KÝ RỜI KHỎI CÀI ĐẶT
+> + hai lỗ phân quyền anh Luân bắt tại chỗ), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `10e445`, `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
+> Mốc cũ: `9ac583`, `10e445`, `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
 > `bad7f9`, `a9eb4b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
+> ### 🟢 18/08 - HAI LỖ PHÂN QUYỀN ANH LUÂN BẮT TẠI CHỖ, CHỈ BẰNG CÁCH NGỒI VÀO GHẾ GIẢNG VIÊN
+>
+> Cả hai đều lộ ra trong một phút, khi anh mở cổng giảng viên ra xem thử. Không bộ kiểm nào trong
+> 44 bộ bắt được - đáng ghi lại vì sao.
+>
+> **(1) *"a đang ở cổng của chính giảng viên này, sao lại có chữ duyệt nhỉ???? có phải trưởng
+> phòng aca đâu???"*** - khối "Đã báo nghỉ buổi này - chờ duyệt" trên màn Điểm danh có nút
+> **Duyệt** chìa ra cho giáo viên.
+> Khối ấy hiện cho giáo viên là **cố ý và vẫn đúng** (V9.29: phải biết trước giờ dạy ai vắng).
+> Cái sai là cái nút - và nó không dừng ở hiển thị: `absRun` chỉ gọi `actGuard`, mà `actGuard` là
+> chốt **chống bấm hai lần**, KHÔNG phải chốt quyền. Đo bằng cách gọi thẳng cửa ghi: đơn **đổi
+> trạng thái thật**. Nghĩa là giáo viên chốt luôn chuyên cần của học viên - đúng cái quyền mà cả
+> vòng đời V9.29 dựng ra để lấy khỏi tay họ. Trước đó học viên tự chốt, nay thành giáo viên tự
+> chốt: *chỉ đổi người, không đổi bệnh.*
+> Vá theo luật app tự ghi từ V9.41 - **quyền chặn TAY, không che MẮT**: khối vẫn hiện đủ, nút chỉ
+> của người có thẩm quyền, người khác thấy chip "chờ Học vụ duyệt" + "Xem đơn", tiêu đề ngăn kéo
+> đổi theo quyền, và **chặn ở cửa ghi** (`absRun` + `absMkRun`), không chỉ giấu nút.
+>
+> **(2) *"Ý là cái nút xin nghỉ đâu á?"*** - và câu trả lời thật là: **gần như không có ở đâu cả.**
+> Đo trên 9 màn, đóng vai giáo viên: nút chỉ có ở ĐÚNG MỘT trang (Buổi hôm nay), nằm sau 2 panel -
+> phải cuộn 1/3 trang mới thấy - còn **Vận hành lớp / Điểm danh, nơi giảng viên đang mở chính buổi
+> học của mình ra, KHÔNG có nút nào**. Ghế Quản trị (ghế anh Luân soi demo) thì không thấy nút ở
+> đâu hết, vì khối kia mở đầu bằng `if(!CURSTAFF)return`.
+> Chính chú thích của khối ấy viết *"một cửa báo nghỉ nằm ở trang mà người phải báo không bao giờ
+> đi qua thì nó chỉ tồn tại trên giấy"* - **viết ra rồi vẫn phạm bằng một đường khác**: đặt đúng
+> trang nhưng sai CHỖ, và bỏ trống đúng màn người ta đang đứng.
+> *Một câu luật viết trong chú thích không tự canh lấy mình.*
+>
+> **VÀ MỘT LỖ THỨ BA LỘ RA LÚC ĐO LẠI.** Anh Luân chốt 11/08: *"giáo viên có thể sẽ báo cho học vụ
+> hoặc báo cho trưởng phòng aca"* - câu ấy đang nằm ngay trong chú thích của trang `gvdp`. Vậy mà
+> Học vụ / TP ACA **không có cửa nào để báo hộ**: giáo viên gọi điện xong thì họ ngồi nhìn, rồi
+> quay lại đúng đường tin nhắn riêng mà bảng DL33 sinh ra để thay thế.
+> *Khai một câu của anh Luân vào chú thích không làm nó thành tính năng.*
+>
+> **Đã sửa:** `gvnAiBao(ses)` = chính người dạy buổi ấy · HOẶC Học vụ/TP ACA (báo hộ) · HOẶC ghế
+> xem thử. Nút lên **thanh buổi** của Vận hành lớp / Điểm danh (biến mất khi buổi đã bắt đầu; buổi
+> đã có đơn thì thay bằng chip nói đơn ở đâu) · nút **"Báo nghỉ hộ"** trên bảng buổi của trang Xếp
+> người dạy thay · đơn ghi **người nghỉ là GV của BUỔI** chứ không phải người bấm (ghi nhầm là
+> quota nghỉ trừ vào đầu người nhập) kèm hai cột `bao_ho_boi`/`bao_ho_ten` · khối "Buổi dạy sắp
+> tới" đi theo ô chọn giảng viên có sẵn ở đầu trang thay vì chỉ theo người đăng nhập.
+>
+> **BÀI HỌC VỀ BỘ KIỂM, không phải về tính năng.** 44 bộ kiểm không bắt được cả ba, vì chúng hỏi
+> *"trang này vẽ ra được không"*, *"nút này bấm có chuyện gì không"*, *"menu có mời rồi đuổi không"*
+> - không bộ nào hỏi **"cái nút này có ĐÚNG NGƯỜI được bấm không"** và **"người phải làm việc này
+> có tìm thấy chỗ làm không"**. Anh Luân bắt được chỉ bằng cách NGỒI VÀO GHẾ. Đó là phép thử mà
+> máy chưa có, và là việc tồn đáng làm nhất sau đợt này.
+
 > ### 🟢 18/08 - NHẬT KÝ THAO TÁC RỜI KHỎI CÀI ĐẶT (anh Luân: *"Log mà sao ở cài đặt ta???"*)
 >
 > Anh hỏi đúng, và cái sai không phải chuyện xếp chỗ cho gọn mắt.
