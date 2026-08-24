@@ -403,16 +403,49 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 46 BỘ KIỂM. Bản dựng đang chạy: `66c286` (24/08 - MỖI CHỨC DANH MỘT BẢN BÁO
-> CÁO RIÊNG (`BCMAU`/`BCKHOI`) · SO KỲ TRƯỚC TRÊN MẶT TRANG · BỐN BẢNG CỐT LÕI (WOW · tiền ·
-> nhân sự · việc của chính mình) · KHO CÂU HỎI GỢI Ý CĂN THEO CỘT · MÀN CHẤM BÀI VÀ THU BÀI HẾT
-> CO CỤM · `_checkmat` có luật M9 và đi qua cả bốn nấc trang Bài tập · **bộ kiểm thứ 46
-> `_checkbc`**), đã lên https://mittomap.github.io/itts-sop-demo-v2/ . Verify trọn bộ đang chạy
-> trên chính bản này - lượt xanh hết gần nhất là 45/45 trên `1741ce` (18/08, 46m18s).
+> **Phiên bản: V2 — 46 BỘ KIỂM, XANH HẾT (verify trọn bộ 24/08 trên chính bản này, 35m25s).
+> Bản dựng đang chạy: `6ff0d0` (24/08 - MỖI CHỨC DANH MỘT BẢN BÁO CÁO RIÊNG (`BCMAU`/`BCKHOI`) ·
+> SO KỲ TRƯỚC TRÊN MẶT TRANG · BỐN BẢNG CỐT LÕI (WOW · tiền · nhân sự · việc của chính mình) ·
+> CHIP NGUY CƠ NÓI CÙNG LUẬT VỚI BỘ LỌC · KHO CÂU HỎI GỢI Ý CĂN THEO CỘT · MÀN CHẤM BÀI VÀ THU
+> BÀI HẾT CO CỤM · `_checkmat` có luật M9 và đi qua cả bốn nấc trang Bài tập · **bộ kiểm thứ 46
+> `_checkbc`** với bảy luật B0-B7), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `e72074`, `5f5349`, `48f65b`, `df07aa`, `1bd190`, `1741ce`, `723da0`, `994d3f`, `9ac583`, `10e445`, `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
+> Mốc cũ: `3da7b0`, `66c286`, `e72074`, `5f5349`, `48f65b`, `df07aa`, `1bd190`, `1741ce`, `723da0`, `994d3f`, `9ac583`, `10e445`, `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
 > `bad7f9`, `a9eb4b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 24/08 (cuối) - BẢNG NGUY CƠ TỰ CÃI CHÍNH NÓ, VÀ BA CHỖ ĐỎ VERIFY BẮT ĐƯỢC
+>
+> Anh Luân gửi ảnh bảng "Học viên nguy cơ cần theo dõi (23)": *"học viên nguy cơ cần theo dõi gì
+> mà xanh lè vậy e"* - bảy dòng đầu có CẢ HAI cột đều xanh, cột Việc cần làm ghi "-".
+> Đo ra: **các em ấy nguy cơ THẬT** - HV029 vắng không phép 2 buổi (ngưỡng 2), HV061 thiếu 3 bài
+> (ngưỡng 3). Cái sai không nằm ở bộ lọc mà ở **cột đang hiện**: `stuRisk` gộp HAI nguồn - cờ do
+> NGƯỜI gắn và cảnh báo do MÁY đếm - nhưng **ba** cái bảng chỉ in ra nguồn thứ nhất.
+> *Một bảng lọc theo luật A mà chỉ hiện cột của luật B thì người đọc không kết luận "cột thiếu",
+> họ kết luận "bảng sai" - và họ thôi tin cả những dòng đúng.*
+> `stuChipCC`/`stuChipHT` là bản dựng chip duy nhất cho cả ba bảng, giữ nguyên phân biệt
+> người/máy. Kèm một chỗ cùng bệnh: `phNguyCo` đếm con của phụ huynh bằng cách hỏi **màu chip**
+> (`stCls(...)==="red"`) - *đếm bằng MÀU là đếm bằng thứ hiển thị ra, không phải bằng thứ được
+> hỏi*. Nay đếm bằng chính `stuRisk`.
+> **Không bộ nào trong 46 bộ bắt được**: bảng vẽ ra được, không rò miền, không cắt chữ, con số 23
+> hoàn toàn đúng. Nó chỉ TỰ CÃI CHÍNH NÓ. Thêm **luật B7** - mỗi dòng phải nói ra được lý do nó
+> có mặt, VÀ người không nguy cơ không được tô đỏ (để luật trên không thoả được rẻ tiền bằng cách
+> tô đỏ tất). Thử phá: B7 đỏ 15 dòng trên bản cũ.
+>
+> **BA CHỖ ĐỎ VERIFY BẮT - CẢ BA ĐỀU DO MÃ EM VỪA THÊM, và một chỗ đáng nhớ:**
+> · `_checkux` mất **62 con số %** không nói được cách tính. Nguyên nhân là cái `<span>` em bọc
+>   quanh con số để xếp mũi tên xuống dưới: luật ấy tìm chú thích trên **chính thẻ mở ra trước
+>   con số**, mà thẻ ấy nay là một `<span>` trơn không thuộc tính; `data-tipfn` vẫn còn nguyên
+>   trên `.kpiv` nhưng đã bị đẩy ra ngoài tầm nhìn của phép đo. Chú thích VẪN CÓ, rê chuột vẫn
+>   đọc được - nhưng một phép đo đi đúng đường người dùng đi thì nó phải thấy, và ở đây nó không
+>   thấy. *Bọc thêm một lớp thẻ là đổi quan hệ cha-con mà mọi phép đo đang dựa vào.*
+> · `_checkui` bắt `.kpidl.khong` màu `#C3CBD6` tương phản **1,6** - chữ chìm hẳn vào nền.
+> · `_checkux` còn bắt `font-size:10.5px` là một **BẬC MỚI** trong thang cỡ chữ, đẩy 16 → 17
+>   (trần 16). *Một cỡ chữ mới không bao giờ chỉ là một cỡ chữ mới.*
+> · `_checkaudit` bắt ba chỗ: hai khối trùng tên "Đang chờ bạn" trên cùng một trang · câu nhắc
+>   đầu trang vọt lên **188 ký tự** (trần 150) vì em nối câu xu hướng vào `notebar` - *hai câu
+>   vốn là hai việc khác nhau, nối vào một dòng thì dòng ấy dài gấp đôi mà không rõ hơn* · ba con
+>   số ngày cắm cứng trong câu chữ, trong đó "90 ngày" nay đi qua CH2 thành `hrNewStaff_days`.
 >
 > ### 🟢 24/08 (tiếp) - SO KỲ TRƯỚC, VÀ BỐN BẢNG CỐT LÕI CÒN THIẾU
 >
