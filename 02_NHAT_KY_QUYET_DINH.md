@@ -403,14 +403,68 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 45 BỘ KIỂM. Bản dựng đang chạy: `df07aa` (24/08 - MÀN CHẤM BÀI VÀ THU BÀI
-> HẾT CO CỤM · `_checkmat` có luật M9 và đi qua cả bốn nấc trang Bài tập), đã lên
-> https://mittomap.github.io/itts-sop-demo-v2/ . Verify trọn bộ đang chạy trên chính bản này -
-> lượt trước xanh hết 45/45 trên `1741ce` (18/08, 46m18s).
+> **Phiên bản: V2 — 46 BỘ KIỂM. Bản dựng đang chạy: `5f5349` (24/08 - MỖI CHỨC DANH MỘT BẢN BÁO
+> CÁO RIÊNG (`BCMAU`/`BCKHOI`) · KHO CÂU HỎI GỢI Ý CĂN THEO CỘT · MÀN CHẤM BÀI VÀ THU BÀI HẾT CO
+> CỤM · `_checkmat` có luật M9 và đi qua cả bốn nấc trang Bài tập · **bộ kiểm thứ 46 `_checkbc`**),
+> đã lên https://mittomap.github.io/itts-sop-demo-v2/ . Verify trọn bộ đang chạy trên chính bản
+> này - lượt xanh hết gần nhất là 45/45 trên `1741ce` (18/08, 46m18s).
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `1bd190`, `1741ce`, `723da0`, `994d3f`, `9ac583`, `10e445`, `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
+> Mốc cũ: `48f65b`, `df07aa`, `1bd190`, `1741ce`, `723da0`, `994d3f`, `9ac583`, `10e445`, `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
 > `bad7f9`, `a9eb4b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 24/08 - MỖI CHỨC DANH MỘT BẢN BÁO CÁO, KHÔNG PHẢI MỘT KHUNG CHUNG RỒI ẨN BỚT
+>
+> Anh Luân: *"trang tổng quan, báo cáo và KPI hình như mỗi chức danh lại là 1 cách thiết kế khác
+> nhau mới đúng em. Chứ em dùng khung chung, cái nào có thì hiện, ko có thì ẩn anh thấy ko hợp
+> lý, ko sát với nghiệp vụ đâu"*.
+>
+> **Đo trước khi sửa, đóng đủ 17 chức danh rồi đếm khối vẽ ra - anh đúng từng chữ:**
+> · **năm khối hiện cho CẢ 17 ghế, đúng một thứ tự** (3 việc nên làm · Sắp diễn ra · KPI ·
+>   Chuyên cần & Học thuật · Việc đang nợ theo phòng ban);
+> · Trưởng phòng Nhân sự và Marketing khai `hocvien:"none"` mà vẫn nhận biểu đồ Chuyên cần &
+>   Học thuật - **vẽ ra toàn số 0**;
+> · **12 ghế** nhận bảng "Học viên nguy cơ cần theo dõi **(0)**";
+> · Giáo viên WOW nhận cả Phễu chuyển đổi lẫn Phân bố trạng thái Lead - phễu bán hàng.
+>
+> **Vì sao khung chung nghe thì hợp lý mà làm ra thì sai:** nó trả lời câu *"khối này có được
+> phép hiện không"* trong khi câu phải hỏi là *"người ngồi ghế này mở trang ra để biết điều gì"*.
+> Câu thứ nhất chỉ lọc ra được một tập con; câu thứ hai mới quyết định **THỨ TỰ ĐỌC**, và thứ tự
+> mới là cái làm nên một bản báo cáo. *Ẩn đi cái không có thì được một trang không sai. Nó không
+> cho ta một trang ĐÚNG.*
+>
+> Hai bảng mới tách hẳn hai việc, cùng một lối đã dùng cho `NHIP`: **`BCKHOI`** khai từng khối vẽ
+> gì và cần điều kiện gì mới có nghĩa; **`BCMAU`** khai mỗi ghế đọc những khối nào, theo thứ tự
+> nào, tên trang là gì và **câu hỏi mở đầu** là gì. Câu hỏi ấy là phần quan trọng nhất: viết được
+> nó thì thứ tự khối tự lộ ra; viết không được thì ghế ấy chưa có bản báo cáo, chỉ có một trang
+> chứa số. Đo lại: **14 bản bố cục khác nhau trên 17 ghế**, không còn bảng "(0)", không còn khối
+> của miền lạ.
+>
+> **HAI CHỮA KHÁC LỘ RA TRONG LÚC LÀM:**
+> · **Marketing trước đây mất đúng khối trụ cột của mình.** `srcPerfSection` trả về rỗng cho ai
+>   khai `tien:"none"`, lý do ghi trong mã là *"bỏ cột doanh thu thì bảng mất nghĩa"*. Câu ấy
+>   đúng với người quyết chi tiêu và sai với người làm marketing - họ đọc bảng để hỏi *nguồn nào
+>   đẻ ra lead chịu đi test và chịu đăng ký*, bốn cột còn lại trả lời trọn vẹn. Nay bỏ cột doanh
+>   thu và xếp hạng theo số đăng ký. *Một bảng mất nghĩa với người này chưa chắc mất nghĩa với
+>   người kia - hỏi lại câu hỏi trước khi cắt cả cái bảng.*
+> · **`_checkmien` bắt được chính câu chữ em vừa viết:** câu hỏi mở đầu của giáo viên là "còn nợ
+>   gì", mà "nợ" là từ của miền tiền - giáo viên khai `tien:"none"`. Sửa câu chữ, KHÔNG nới trần
+>   bộ kiểm. *Câu giải thích cũng là dữ liệu; nó phải đi qua đúng cái cửa mà số liệu đi qua.*
+>
+> **BỘ KIỂM THỨ 46 `_checkbc` - và một luật của chính nó không bao giờ đỏ được.**
+> 45 bộ cũ không bộ nào đỏ, vì chúng hỏi *"trang có vẽ được không"*, *"có rò dữ liệu miền khác
+> không"*, *"chữ có bị cắt không"*. Không bộ nào hỏi *"trang này có phải bản báo cáo CỦA NGƯỜI
+> NÀY không"*. **Một khung chung không rò dữ liệu, không gãy, không cắt chữ - nó chỉ SAI NGƯỜI,
+> và cái sai ấy không có hình dạng nào để bắt.**
+> Bản đầu của luật B3 hỏi *"thứ tự vẽ ra có khớp thứ tự đã khai không"*. Thử phá bằng cách đảo
+> hẳn dàn bài Học vụ: **vẫn xanh** - bộ dựng đọc bản khai rồi vẽ theo bản khai, nên đảo bản khai
+> là đảo luôn thứ tự vẽ, hai vế lúc nào cũng bằng nhau. Đúng cái bẫy đã ghi từ 14/08: *đo cái ống
+> mình vừa nối thì bao giờ cũng thấy thông*. Thay bằng hai câu độc lập với bộ dựng: **B3a** khối
+> nào vẽ ra cũng phải có tên trong dàn bài (bắt được ca sẽ tái diễn thật - ai đó thêm thẳng
+> `h+=deptSection()` vào `baocaoThan`, khung chung mọc lại từ chính chỗ nó vừa bị gỡ), và **B3b**
+> khối ĐẦU TIÊN phải thuộc chủ đề của ghế.
+> Năm luật đã thử phá và đều đỏ đúng chỗ: B1 (xoá một dàn bài) · B3a · B3b · B4 (thêm khối miền
+> lead mà quên khai điều kiện) · B5 (trả bảng HV nguy cơ về điều kiện cũ).
 >
 > ### 🟢 24/08 - "CO CỤM": CẮT CHỮ TRONG KHI CÒN NGUYÊN CHỖ TRỐNG (anh Luân gửi ảnh màn Chấm
 > bài: *"thiết kế nó bị co cụm lại thì phải"*)

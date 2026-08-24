@@ -118,7 +118,22 @@ const banDo = {};       /* role -> {key, khoi vẽ ra} */
 GHE.forEach(rc => {
   const st = daRole[rc];
   let key = "", M = null, html = "";
-  try { window.GATE_SID = st.staff_id; applyScope(st.staff_id); } catch (e) { xau.push("khong dong vai duoc " + rc + ": " + e.message); return; }
+  /* ── NGỒI VÀO GHẾ CHO ĐÚNG - BƯỚC `setRole` KHÔNG ĐƯỢC THIẾU ────────────────────────────
+     Lượt dựng đầu bộ này chỉ gọi `applyScope(sid)`. `applyScope` đặt đúng NHÓM và MỨC miền,
+     nên `bcKey()`, `dsLevel()` đều trả lời đúng và mọi thứ trông như đang chạy. Nhưng
+     `CURSTAFF` thì do `setRole()` đặt (nó đọc `window.GATE_SID`) - thiếu bước ấy thì CURSTAFF
+     vẫn là "ADMIN", và mọi phép so "của mình" trong `canRow` đem chủ sở hữu ra so với "ADMIN"
+     nên trượt hết. Hậu quả: `srows("DL09")`, `srows("DL11")` đều trả về 0 cho MỌI chức danh,
+     và em đã đọc con số 0 ấy thành "app không gán lớp cho giáo viên" - trong khi giáo viên
+     NV005 dạy 70 buổi có thật.
+     *Đo một thứ đang bị che thì mọi con số đều là 0, và số 0 trông y hệt một kết quả.*
+     Vì thế ngay dưới đây có một phép tự kiểm: ngồi xuống rồi phải hỏi lại xem mình đã ngồi
+     đúng ghế chưa. Một bộ kiểm không kiểm chính cái thước của nó thì nó đo bằng niềm tin. */
+  try { window.GATE_SID = st.staff_id; applyScope(st.staff_id); setRole("all"); }
+  catch (e) { xau.push("khong dong vai duoc " + rc + ": " + e.message); return; }
+  t("B0 " + rc + " ngoi dung ghe", CURSTAFF === st.staff_id,
+    "goi applyScope+setRole roi ma CURSTAFF van la \"" + CURSTAFF + "\" thay vi \"" + st.staff_id + "\"" +
+    " - moi phep so \"cua minh\" sau day deu do bang nguoi khac");
   try { if (dsLevel("baocao") === "none") return; } catch (e) {}
   try { key = bcKey(); M = bcMau(); } catch (e) { xau.push("bcKey/bcMau loi o " + rc + ": " + e.message); return; }
   try { CUR = "baocao"; html = RENDER.baocao(); } catch (e) { xau.push("khong ve duoc trang Chi so cho " + rc + ": " + e.message); return; }
@@ -192,7 +207,7 @@ GHE.forEach(rc => {
   const so0 = (html.match(/<b>[^<]*\(0\)<\/b>/g) || []);
   t("B5 " + rc + " khong co bang tieu de (0)", so0.length === 0, so0.slice(0, 2).join(" · "));
 });
-try { window.GATE_SID = ""; applyScope(""); } catch (e) {}
+try { window.GATE_SID = ""; applyScope(""); setRole("all"); } catch (e) {}
 
 /* B6 - hai ghế khác nghiệp vụ phải đọc hai bản khác nhau. Đây là câu hỏi TỔNG: nếu mọi ghế vẫn
    ra cùng một danh sách khối thì bảng khai có mà thiết kế vẫn là một cái khung chung. */
