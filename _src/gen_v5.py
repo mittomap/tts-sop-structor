@@ -3013,6 +3013,21 @@ body.drsz .drawer{transition:none}
 .kpiphh{font-size:11.5px;font-weight:800;color:var(--navy);padding:10px 14px;background:linear-gradient(180deg,#FAFBFD,#fff);border-bottom:1px solid var(--line)}
 .kpirow{display:flex;align-items:flex-start;gap:8px;padding:7px 14px;border-bottom:1px solid #FAFBFD}
 .kpirow:last-child{border-bottom:0}
+/* SO KỲ TRƯỚC XẾP NGAY DƯỚI CON SỐ, KHÔNG PHẢI MỘT CỘT RIÊNG.
+   Lượt đầu em cho nó một cột `flex:0 0 96px` - đúng luật "một cột chỉ là cột khi mọi dòng cùng
+   bắt đầu ở một chỗ" đã đặt cho màn Chấm bài, nhưng SAI CHỖ: bảng KPI không nằm trên một hàng
+   rộng cả trang, nó nằm trong `.kpipanel` chỉ **367px** (lưới ba cột). 96px cộng ba cột số sẵn
+   có ăn hết 285px, tên chỉ số còn **20px** và vỡ 23 dòng - `_checkmat` bắt ngay ở khổ MÁY TÍNH,
+   nơi em đinh ninh là rộng rãi.
+   *Một luật đúng cho hàng rộng cả trang không tự động đúng trong một ô 367px - phải hỏi lại bề
+   rộng THẬT của khung chứa, không hỏi bề rộng màn hình.*
+   Xếp dọc trong ô giá trị thì nó không xin thêm một pixel ngang nào, và đúng chỗ mắt đang nhìn. */
+.kpiv{display:flex;flex-direction:column;align-items:flex-end;line-height:1.25}
+.kpidl{font-weight:800;white-space:nowrap;font-size:10.5px;margin-top:1px}
+.kpidl.len{color:var(--green)}
+.kpidl.xuong{color:var(--red)}
+.kpidl.bang{color:var(--muted);font-weight:600}
+.kpidl.khong{color:#C3CBD6;font-weight:600;cursor:help}
 .kpil{flex:1;min-width:0;display:flex;align-items:center;gap:7px}
 .kpic{font-size:11px;font-weight:800;color:var(--muted);background:var(--bg);border-radius:3px;padding:2px 5px;flex:none}
 /* TÊN CHỈ SỐ ĐƯỢC PHÉP XUỐNG DÒNG, KHÔNG BỊ CẮT.
@@ -3031,6 +3046,19 @@ body.drsz .drawer{transition:none}
 .kpiv{font-size:12.5px;font-weight:800;flex:none;min-width:52px;text-align:right}
 .kpiv.green{color:var(--green)}.kpiv.red{color:var(--red)}.kpiv.gray{color:var(--muted)}
 .kpig{font-size:11px;color:var(--muted);flex:none;min-width:64px;text-align:right;white-space:nowrap}
+/* KHỔ HẸP: bốn cột số cộng cột so kỳ trước không đủ chỗ cạnh tên chỉ số - `_checkmat` bắt ngay
+   lượt đầu sau khi thêm cột: tên "TB phút từ lead vào gọi LH đầu" bị bóp còn **9px, vỡ 23 dòng**.
+   Chữa vào cơ chế chứ không nới vài px: cho hàng xuống dòng, tên chiếm trọn dòng trên, cụm số
+   xếp hàng ở dòng dưới. Cùng cách đã dùng cho `.rost` - màn hẹp thì đừng bắt ai nhường ai.
+   VÀ KHỐI NÀY PHẢI ĐỨNG SAU `.kpil`/`.kpiv`/`.kpig` - lượt đầu em đặt nó lên TRƯỚC, đúng cái bẫy
+   đã ghi ngay trong file này ở khối `.rost` 15/08: hai luật cùng độ ưu tiên thì cái viết SAU
+   thắng, nên `.kpil{flex:1}` ở dưới đè mất `.kpil{flex:1 1 100%}` ở trên và `_checkmat` vẫn báo
+   tên chỉ số vỡ 23 dòng y như trước khi sửa. *Đặt một luật lên trước thứ nó cần đè là viết một
+   luật không bao giờ chạy - và mã đọc lên thì trông như đã chữa.* */
+@media(max-width:820px){
+ .kpirow{flex-wrap:wrap;row-gap:3px}
+ .kpil{flex:1 1 100%}
+ .kpiv{margin-left:auto}}
 .kdot{width:7px;height:7px;border-radius:50%;flex:none}
 .kdot.green{background:var(--green)}.kdot.red{background:var(--red)}.kdot.gray{background:#D5DEE8}
 .chartrow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
@@ -7816,7 +7844,15 @@ function repDate(v,cuoiNgay){var m=String(v||"").match(/^(\d{4})-(\d{2})-(\d{2})
  if(!m)return null;
  return cuoiNgay?new Date(+m[1],+m[2]-1,+m[3],23,59,59,999):new Date(+m[1],+m[2]-1,+m[3],0,0,0,0)}
 function repDMY(d){return d?(("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2)+"/"+d.getFullYear()):""}
-function repRange(){var k=window.REPKY||"all";var now=new Date();
+/* ═══ V2 24/08 - CỬA MƯỢN KỲ (anh Luân hỏi trang Chỉ số đã đủ nghiệp vụ chưa) ══════════════════
+   Đo được: **không một ghế nào trong 17 ghế so được với kỳ trước**. Mọi khối đều là ảnh chụp
+   một thời điểm, trong khi câu hỏi đầu tiên của bất kỳ ai mở báo cáo ra là *"đang tốt lên hay
+   xấu đi"*. Đó là chỗ thiếu lớn nhất của trang này, lớn hơn mọi khối còn thiếu cộng lại.
+   `kpiCompute()` vốn đã đọc kỳ qua `repRange()`, nên không cần viết lại một bộ tính thứ hai -
+   chỉ cần MƯỢN kỳ một lúc rồi trả lại. Một cửa duy nhất ở đây, đặt và trả trong `finally`.
+   *Có sẵn một bộ tính biết đọc kỳ thì đừng viết bộ thứ hai để tính kỳ khác - hãy đổi cái kỳ.* */
+function repRange(){if(window.REPOVR)return window.REPOVR;
+ var k=window.REPKY||"all";var now=new Date();
  if(k==="tuy"){var f=repDate(window.REPTU),t=repDate(window.REPDEN,1),dao=false;
   if(f&&t&&f>t){var _x=f;f=repDate(window.REPDEN);t=repDate(window.REPTU,1);_x=null;dao=true}
   if(!f&&!t)return {from:null,to:null,lb:"toàn kỳ - chưa chọn ngày"};
@@ -15547,26 +15583,75 @@ function kpiQuy(code,v,th,dir){var d=kpiNum(code);var fee=kpiAvgFee();
 
 /* Xu hướng: chỉ bật cho nhóm A. Nhóm B (CVR/TBR/PCR/RER/AR...) mẫu số là LÔ CẦN THỜI GIAN CHÍN -
    lead vào tháng này chưa kịp đăng ký, so với toàn kỳ ra 17% so 46% là so BẬY. */
+/* ═══ KỲ TRƯỚC LÀ KỲ NÀO - MỘT BẢN KHAI DUY NHẤT ═══════════════════════════════════════════
+   Bản cũ tự tính kỳ đối chiếu ngay trong `kpiTrendHTML`, và nó SO SAI ở ba trong bốn nấc:
+   "tháng này" đem so với "90 ngày", "30 ngày" và "90 ngày" đem so với "toàn kỳ" - tức là so một
+   khoảng với một khoảng RỘNG HƠN CÓ CHỨA CHÍNH NÓ. Chú thích của chính hàm ấy đã nói đúng điều
+   này cho nấc "Tuỳ chọn" (*"so một khoảng hai tuần với cả năm - ra con số nào cũng vô nghĩa"*)
+   rồi vẫn làm đúng như thế với ba nấc kia.
+   *Viết ra được lý do một cách làm là sai mà vẫn để nó chạy ở chỗ khác thì lý do ấy chưa được
+   dùng - nó mới chỉ được ghi.*
+   Nay đúng một luật cho cả bốn nấc: kỳ trước là cửa sổ DÀI ĐÚNG BẰNG kỳ đang xem, nằm NGAY
+   TRƯỚC nó, không chồng lấn một ngày nào.
+   "Toàn kỳ" thì trả về null - toàn kỳ không có kỳ trước, và bịa ra một cái để có con số đẹp thì
+   tệ hơn là nói thẳng rằng không so được. */
+function repTruoc(){
+ var k=window.REPKY||"all",now=new Date();
+ if(k==="all")return null;
+ if(k==="m0"){var d0=new Date(now.getFullYear(),now.getMonth(),1);
+  return {from:new Date(now.getFullYear(),now.getMonth()-1,1),to:new Date(d0.getTime()-1),lb:"tháng trước"}}
+ if(k==="30"||k==="90"){var n=+k;
+  return {from:new Date(now.getTime()-2*n*864e5),to:new Date(now.getTime()-n*864e5-1),lb:n+" ngày liền trước đó"}}
+ if(k==="tuy"){var R=repRange();if(!R.from||!R.to)return null;
+  var dai=R.to.getTime()-R.from.getTime();
+  return {from:new Date(R.from.getTime()-dai-864e5),to:new Date(R.from.getTime()-1),lb:"kỳ dài bằng ngay trước đó"}}
+ return null}
+/* Tính TOÀN BỘ chỉ số cho kỳ trước, bằng chính `kpiCompute` - mượn kỳ rồi trả lại.
+   Không nhớ đệm: bộ tính đọc cả `CURSTAFF`, `BANAI`, kỳ, và dữ liệu vừa sửa xong; một cái đệm
+   ở đây là một chỗ để số cũ sống sót qua lần lưu. Gọi hai lần một lượt vẽ, chấp nhận. */
+function kpiKyTruoc(){
+ var P=repTruoc();if(!P)return null;
+ var giu=window.REPOVR,r=null;
+ window.REPOVR=P;
+ try{r=kpiCompute()}catch(e){r=null}
+ finally{window.REPOVR=giu}
+ return r}
+/* Chỉ số này TỐT LÊN hay XẤU ĐI - trả về 1 / -1 / 0, hoặc null nếu không so được.
+   `dir` lấy thẳng từ CH6: ngưỡng "≤" nghĩa là THẤP MỚI TỐT, nên số giảm là tốt lên.
+   BẢN CŨ CÓ MỘT LỖI THẬT ở đúng chỗ này: `var good=(...)?up:up` - hai nhánh của phép ba ngôi
+   giống hệt nhau, nên `good` luôn bằng `up`. Hậu quả: LRT (số phút từ lúc lead về tới cuộc gọi
+   đầu, thấp mới tốt) tụt từ 40 phút xuống 12 phút - một cải thiện lớn - thì app tô ĐỎ.
+   *Một phép ba ngôi mà hai nhánh giống nhau là một câu hỏi chưa từng được hỏi.* */
+function kpiHuong(code,dir,comp,truoc){
+ if(!KPITREND[code]||!truoc)return null;
+ var a=comp[code],b=truoc[code];
+ if(a==null||isNaN(a)||b==null||isNaN(b))return null;
+ var dl=a-b;
+ if(Math.abs(dl)<1e-9)return 0;
+ return ((dir==="≤")?(dl<0):(dl>0))?1:-1}
+function kpiSoKyHTML(code,dir,comp,truoc){
+ /* Bản khai `KPITREND` giữ nguyên chủ ý cũ: chỉ số dạng LÔ (tỷ lệ chốt của lứa lead vừa về)
+    thì lứa mới chưa chín, so hai cửa sổ liền nhau ra kết luận sai. Nhưng KHÔNG im lặng bỏ qua -
+    im lặng thì người đọc tưởng chỉ số ấy không đổi. Nói thẳng là không so được và vì sao. */
+ if(!KPITREND[code])return '<span class="kpidl khong" data-tip="Chỉ số dạng lô: lứa dữ liệu của kỳ này chưa chín, đem so với kỳ trước sẽ ra kết luận sai">–</span>';
+ var P=repTruoc();
+ if(!P)return '<span class="kpidl khong" data-tip="Đang xem Toàn kỳ - không có kỳ nào trước nó để so. Chọn Tháng này / 30 ngày / 90 ngày để thấy xu hướng">–</span>';
+ var a=comp[code],b=truoc?truoc[code]:null;
+ if(a==null||isNaN(a)||b==null||isNaN(b))
+  return '<span class="kpidl khong" data-tip="Kỳ trước ('+esc(P.lb)+') chưa đủ dữ liệu để tính chỉ số này">–</span>';
+ var hg=kpiHuong(code,dir,comp,truoc);
+ var tip="Kỳ trước ("+P.lb+"): "+kpiFmt(code,b)+" · kỳ này: "+kpiFmt(code,a);
+ if(hg===0)return '<span class="kpidl bang" data-tip="'+esc(tip)+'">không đổi</span>';
+ var len=(a-b)>0;
+ return '<span class="kpidl '+(hg>0?"len":"xuong")+'" data-tip="'+esc(tip)+'">'+
+  (len?"▲":"▼")+" "+esc(kpiFmt(code,Math.abs(a-b)))+'</span>'}
 function kpiTrendHTML(code){
- if(!KPITREND[code])return '<span class="mut" style="font-size:11px">Không so kỳ trước - lô dữ liệu cần thời gian chín, so sẽ ra kết luận sai</span>';
- /* V2 15/08 - kỳ TUỲ CHỌN không có "kỳ đối chiếu" định sẵn, nên lấy CỬA SỔ NGAY TRƯỚC NÓ, dài
-    đúng bằng nó: chọn 01-15/08 thì so với 17-31/07. So với "toàn kỳ" như ba nấc kia là so một
-    khoảng hai tuần với cả năm - ra con số nào cũng vô nghĩa. */
- var keep=window.REPKY,keepT=window.REPTU,keepD=window.REPDEN;
- var now=kpiCompute()[code];
- if(keep==="tuy"){var _r=repRange();
-  if(_r.from&&_r.to){var _len=_r.to.getTime()-_r.from.getTime();
-   var _tr=new Date(_r.from.getTime()-864e5);
-   window.REPDEN=repISO(_tr);window.REPTU=repISO(new Date(_tr.getTime()-_len));}
-  else window.REPKY="all";}
- else window.REPKY=(keep==="m0"||!keep||keep==="all")?"90":"all";
- var prev=kpiCompute()[code];
- window.REPKY=keep;window.REPTU=keepT;window.REPDEN=keepD;
- if(now==null||prev==null)return "";
- var dl=now-prev;if(Math.abs(dl)<1e-9)return '<span class="mut" style="font-size:11px">Không đổi so kỳ đối chiếu</span>';
- var up=dl>0;var good=(KPIBAND[code]==="thang5"||KPIBAND[code]==="nps")?up:up;
- return '<span style="font-size:11px;color:'+(good?"#16A34A":"#DC2626")+'">'+(up?"▲":"▼")+" "+kpiFmt(code,Math.abs(dl))+' so kỳ đối chiếu</span>'}
-function kpiSection(){var comp=kpiCompute();var ch6=(DATA.config&&DATA.config.ch6)||[];
+ var ch6=(DATA.config&&DATA.config.ch6)||[];
+ var k=ch6.filter(function(x){return x.code===code})[0]||{};
+ var P=repTruoc();
+ var s=kpiSoKyHTML(code,k.dir,kpiCompute(),kpiKyTruoc());
+ return s+(P?('<div class="mut" style="font-size:11px;margin-top:2px">so với '+esc(P.lb)+'</div>'):"")}
+function kpiSection(){var comp=kpiCompute();var _truoc=kpiKyTruoc();var ch6=(DATA.config&&DATA.config.ch6)||[];
  if(!ch6.length)return '<div class="sechd">KPI theo SOP</div><div class="panel"><div class="empty">Chưa nạp được ngưỡng KPI (CH6).</div></div>';
  ch6=ch6.filter(kpiCoMien);
  /* V9.99w - Ở PHẠM VI CÁ NHÂN, chỉ số không có dữ liệu của bạn thì không phải chỉ số của bạn.
@@ -15621,9 +15706,14 @@ function kpiSection(){var comp=kpiCompute();var ch6=(DATA.config&&DATA.config.ch
    var doc=KPIDOC[k.code];
    /* TẦNG 1: nhãn 5 mức thay chấm nhị phân. TẦNG 2: một dòng nhận xét hiện sẵn CHỈ khi chưa đạt.
       TẦNG 3: bung chi tiết khi bấm. */
+   /* Cột SO KỲ TRƯỚC nằm ngay cạnh con số, trên MẶT TRANG. Trước bản này phép so có tồn tại
+      nhưng chỉ hiện trong ngăn kéo khi bấm vào một chỉ số - đo cả 17 ghế không thấy một chữ
+      "kỳ trước" nào trên trang. *Một câu trả lời chỉ hiện ra khi đã biết phải bấm vào đâu thì
+      người cần nó nhất không bao giờ đọc được.* */
    h+='<div class="kpirow'+(doc?" hasdoc":"")+'" title="'+esc(k.name)+'"'+(doc?' onclick="kpiOpen(\''+k.code+'\')" style="cursor:pointer"':'')+'>'+
     '<div class="kpil"><span class="kpic">'+esc(k.code)+'</span><span class="kpin">'+esc(kpiShort(k.name))+'</span></div>'+
-    '<div class="kpiv '+SL[1]+'" data-tipfn="kpiTip" data-tipa="'+esc(k.code)+'">'+esc(kpiFmt(k.code,na?null:c))+'</div>'+
+    '<div class="kpiv '+SL[1]+'" data-tipfn="kpiTip" data-tipa="'+esc(k.code)+'"><span>'+esc(kpiFmt(k.code,na?null:c))+'</span>'+
+     kpiSoKyHTML(k.code,k.dir,comp,_truoc)+'</div>'+
     '<div class="kpig" data-tipfn="kpiTip" data-tipa="'+esc(k.code)+'">'+esc(k.dir||"")+' '+esc(kpiFmt(k.code,th))+'</div>'+
     '<span class="kpisev '+SL[1]+'">'+esc(SL[0])+'</span></div>';
    if(doc&&!na&&sev!=="tot"&&sev!=="dat"){
@@ -15726,17 +15816,43 @@ function kpiTinhHinh(){
  var nLo=m.baodong+m.canhbao+m.hut;
  var top=[];try{top=kpiTop3()}catch(e){top=[]}
  var nang=top[0];
- if(!nLo)return '<div class="notebar nbgreen" data-tour="kpitinhhinh"><i class="ti ti-shield-check"></i>'+
-  '<b>'+m.tong+' chỉ số trong phạm vi của bạn đều đạt ngưỡng</b> - tuần này không có chỗ nào phải chữa cháy.'+
-  (m.chuadu?('<span data-tip="'+m.chuadu+' chỉ số chưa đủ dữ liệu để tính"> ('+m.chuadu+' chưa tính được)</span>'):'')+'</div>';
- return '<div class="notebar" data-tour="kpitinhhinh"><i class="ti ti-gauge"></i>'+
-  '<b>'+m.tong+'</b> chỉ số trong phạm vi của bạn: '+
-  (m.baodong?('<b style="color:var(--red)">'+m.baodong+' báo động</b> · '):'')+
-  (m.canhbao?('<b style="color:#854F0B">'+m.canhbao+' cảnh báo</b> · '):'')+
-  (m.hut?('<b style="color:#854F0B">'+m.hut+' hụt nhẹ</b> · '):'')+
-  '<b style="color:var(--green)">'+m.dat+' đạt</b>'+
-  (m.chuadu?('<span data-tip="'+m.chuadu+' chỉ số chưa đủ dữ liệu để tính"> ·&nbsp;'+m.chuadu+' chưa tính được</span>'):'')+'. '+
-  '<a class="lnk" onclick="kpiXemLo()">Xem '+nLo+' chỗ cần chú ý</a></div>';}
+ return '<div class="notebar'+(nLo?"":" nbgreen")+'" data-tour="kpitinhhinh"><i class="ti ti-'+(nLo?"gauge":"shield-check")+'"></i>'+
+  (nLo
+   ?('<b>'+m.tong+'</b> chỉ số trong phạm vi của bạn: '+
+     (m.baodong?('<b style="color:var(--red)">'+m.baodong+' báo động</b> · '):'')+
+     (m.canhbao?('<b style="color:#854F0B">'+m.canhbao+' cảnh báo</b> · '):'')+
+     (m.hut?('<b style="color:#854F0B">'+m.hut+' hụt nhẹ</b> · '):'')+
+     '<b style="color:var(--green)">'+m.dat+' đạt</b>'+
+     (m.chuadu?('<span data-tip="'+m.chuadu+' chỉ số chưa đủ dữ liệu để tính"> ·&nbsp;'+m.chuadu+' chưa tính được</span>'):'')+'. '+
+     '<a class="lnk" onclick="kpiXemLo()">Xem '+nLo+' chỗ cần chú ý</a>')
+   :('<b>'+m.tong+' chỉ số trong phạm vi của bạn đều đạt ngưỡng</b> - tuần này không có chỗ nào phải chữa cháy.'+
+     (m.chuadu?('<span data-tip="'+m.chuadu+' chỉ số chưa đủ dữ liệu để tính"> ('+m.chuadu+' chưa tính được)</span>'):'')))+
+  kpiXuHuongCau(ch6,comp)+'</div>';}
+/* ═══ TỐT LÊN HAY XẤU ĐI - CÂU ĐẦU TIÊN AI CŨNG HỎI ════════════════════════════════════════
+   Dòng tình hình cũ chỉ đếm được BAO NHIÊU chỉ số đang lệch. Nó không nói được chiều - mà một
+   trung tâm có 6 chỗ báo động và đang tốt lên thì hoàn toàn khác một trung tâm có 6 chỗ báo
+   động và đang xấu đi, dù hai dòng chữ y hệt nhau.
+   *Một con số không có chiều thì nó nói tình trạng, không nói tình hình.*
+   Ở "Toàn kỳ" thì nói thẳng là không so được, kèm nút bấm một phát sang 30 ngày - đừng bắt
+   người ta tự đoán ra rằng phải đổi kỳ mới thấy xu hướng. */
+function kpiXuHuongCau(ch6,comp){
+ var P=repTruoc();
+ if(!P)return ' <span class="mut">Đang xem <b>Toàn kỳ</b> nên không so được với kỳ nào trước đó. '+
+  '<button class="pill" onclick="repKySet(\'30\')"><i class="ti ti-trending-up"></i>So 30 ngày với 30 ngày trước</button></span>';
+ var truoc=kpiKyTruoc();
+ var len=0,xuong=0,bang=0,khong=0;
+ ch6.forEach(function(k){var hg=kpiHuong(k.code,k.dir,comp,truoc);
+  if(hg==null)khong++;else if(hg>0)len++;else if(hg<0)xuong++;else bang++});
+ if(!len&&!xuong&&!bang)return ' <span class="mut">Chưa chỉ số nào so được với '+esc(P.lb)+'.</span>';
+ var cau=(len>xuong)?"Nhìn chung đang <b style=\"color:var(--green)\">tốt lên</b>"
+   :(xuong>len)?"Nhìn chung đang <b style=\"color:var(--red)\">xấu đi</b>"
+   :"Nhìn chung <b>đi ngang</b>";
+ return '<div style="margin-top:6px">'+cau+' so với <b>'+esc(P.lb)+'</b>: '+
+  (len?('<b style="color:var(--green)">'+len+' tốt lên</b>'):'0 tốt lên')+' · '+
+  (xuong?('<b style="color:var(--red)">'+xuong+' xấu đi</b>'):'0 xấu đi')+
+  (bang?(' · '+bang+' không đổi'):'')+
+  (khong?('<span class="mut" data-tip="Gồm chỉ số dạng lô (lứa dữ liệu chưa chín, so hai cửa sổ liền nhau ra kết luận sai) và chỉ số kỳ trước chưa đủ dữ liệu"> · '+khong+' không so được</span>'):'')+
+  '.</div>'}
 /* ═══ V2 15/08 (anh Luân, kèm ảnh dòng tình hình: *"bấm cái này a k thấy gì ta"*) ════════════
    Không thấy gì là ĐÚNG - cái link ấy trước đây không làm gì cả.
    Nó đặt `KPIF="lo"` rồi vẽ lại. Mà `"lo"` CHÍNH LÀ giá trị mặc định của bộ lọc ấy
