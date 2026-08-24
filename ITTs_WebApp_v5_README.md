@@ -2,6 +2,38 @@
 
 > `ITTs_WebApp_v5_demo.html` là bản app: mở bằng trình duyệt, mọi thao tác ghi thật vào bộ nhớ trình duyệt. **Lớp Google Sheets đã cho nghỉ hưu 30/07** - không còn bản `.gs` nào, mọi cấu hình nằm trong màn Cài đặt của chính app. Khi anh Luân chốt nền tảng backend, 66 chỗ ghi trong app đã có sẵn đường nối ra máy chủ (xem khối ghi chú tại `var SVR=` trong `gen_v5.py`).
 
+## ⭐ MỚI 24/08/2026 — **Trang Chỉ số: mỗi chức danh một bản báo cáo riêng**
+
+Trước đây 17 chức danh đọc chung một khung, chỉ khác nhau ở chỗ khối nào bị ẩn - nên Trưởng phòng
+Nhân sự vẫn nhận biểu đồ chuyên cần học viên (vẽ ra toàn số 0), 12 chức danh nhận bảng "Học viên
+nguy cơ **(0)**", và Giáo viên WOW nhận cả phễu bán hàng.
+
+Nay mỗi ghế có **tên trang riêng**, **câu hỏi mở đầu riêng** và **thứ tự khối riêng**:
+
+| Ghế | Tên trang | Mở đầu bằng |
+|---|---|---|
+| Giám đốc | Bức tranh điều hành | Tình hình chung · 3 việc nên làm · So sánh cơ sở |
+| Tư vấn | Báo cáo Tư vấn / phòng Tư vấn | Phễu chuyển đổi |
+| Marketing | Báo cáo Marketing | Hiệu quả theo NGUỒN lead |
+| ACA · Giáo viên | Báo cáo chuyên môn / giảng dạy | Chuyên cần & Học thuật |
+| Học vụ | Báo cáo Học vụ | Học viên nguy cơ |
+| WOW | Báo cáo WOW 1-1 | **Bảng buổi WOW** (mới) |
+| Kế toán | Báo cáo Kế toán | **Tiền và công nợ** (mới) |
+| Nhân sự | Báo cáo Nhân sự | **Quân số theo nhóm** (mới) |
+
+Nhân viên tuyến dưới có thêm bảng **"Đang chờ bạn xử lý"** - mọi hàng chờ đều bấm được sang đúng
+danh sách.
+
+### So với kỳ trước
+
+Mỗi chỉ số nay có mũi tên xanh/đỏ ngay dưới con số, và dòng đầu trang nói thẳng **đang tốt lên hay
+xấu đi**. Kỳ đối chiếu luôn dài đúng bằng kỳ đang xem và nằm ngay trước nó (chọn "30 ngày" thì so
+với 30 ngày liền trước đó). Chọn "Toàn kỳ" thì app nói thẳng là không có kỳ nào trước để so, kèm
+nút bấm một phát sang 30 ngày.
+
+Chỉ số dạng lô (tỷ lệ chốt của lứa lead vừa về) không so - lứa mới chưa chín, so hai cửa sổ liền
+nhau sẽ ra kết luận sai. App ghi rõ lý do thay vì im lặng bỏ qua.
+
 ## ⭐ MỚI 24/08/2026 — **Chấm bài và Thu bài đọc được theo cột**
 
 Hai màn này trước đây dồn tên học viên, chip trạng thái, hạn nộp và giờ nộp vào **cùng một cột

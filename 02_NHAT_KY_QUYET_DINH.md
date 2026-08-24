@@ -403,15 +403,80 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 46 BỘ KIỂM. Bản dựng đang chạy: `5f5349` (24/08 - MỖI CHỨC DANH MỘT BẢN BÁO
-> CÁO RIÊNG (`BCMAU`/`BCKHOI`) · KHO CÂU HỎI GỢI Ý CĂN THEO CỘT · MÀN CHẤM BÀI VÀ THU BÀI HẾT CO
-> CỤM · `_checkmat` có luật M9 và đi qua cả bốn nấc trang Bài tập · **bộ kiểm thứ 46 `_checkbc`**),
-> đã lên https://mittomap.github.io/itts-sop-demo-v2/ . Verify trọn bộ đang chạy trên chính bản
-> này - lượt xanh hết gần nhất là 45/45 trên `1741ce` (18/08, 46m18s).
+> **Phiên bản: V2 — 46 BỘ KIỂM. Bản dựng đang chạy: `66c286` (24/08 - MỖI CHỨC DANH MỘT BẢN BÁO
+> CÁO RIÊNG (`BCMAU`/`BCKHOI`) · SO KỲ TRƯỚC TRÊN MẶT TRANG · BỐN BẢNG CỐT LÕI (WOW · tiền ·
+> nhân sự · việc của chính mình) · KHO CÂU HỎI GỢI Ý CĂN THEO CỘT · MÀN CHẤM BÀI VÀ THU BÀI HẾT
+> CO CỤM · `_checkmat` có luật M9 và đi qua cả bốn nấc trang Bài tập · **bộ kiểm thứ 46
+> `_checkbc`**), đã lên https://mittomap.github.io/itts-sop-demo-v2/ . Verify trọn bộ đang chạy
+> trên chính bản này - lượt xanh hết gần nhất là 45/45 trên `1741ce` (18/08, 46m18s).
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `48f65b`, `df07aa`, `1bd190`, `1741ce`, `723da0`, `994d3f`, `9ac583`, `10e445`, `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
+> Mốc cũ: `e72074`, `5f5349`, `48f65b`, `df07aa`, `1bd190`, `1741ce`, `723da0`, `994d3f`, `9ac583`, `10e445`, `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
 > `bad7f9`, `a9eb4b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 24/08 (tiếp) - SO KỲ TRƯỚC, VÀ BỐN BẢNG CỐT LÕI CÒN THIẾU
+>
+> Anh Luân hỏi tiếp: *"e đánh giá trang tổng quan, báo cáo KPI đã đủ chi tiết chưa??? đầy đủ
+> nghiệp vụ của từng vị trí chưa?"* - rồi *"chờ chốt gì nhỉ, e cứ làm thôi"*.
+>
+> **TRƯỚC HẾT: LƯỢT ĐO ĐẦU CỦA EM SAI, VÀ SUÝT BÁO CHO ANH MỘT KẾT LUẬN NGƯỢC.**
+> Probe và cả `_checkbc` chỉ gọi `applyScope(sid)`. `applyScope` đặt đúng NHÓM và MỨC miền nên
+> `bcKey()`, `dsLevel()` đều trả lời đúng và mọi thứ trông như đang chạy - nhưng `CURSTAFF` do
+> `setRole()` đặt (nó đọc `window.GATE_SID`). Thiếu bước ấy thì CURSTAFF vẫn là **"ADMIN"**, và
+> mọi phép so "của mình" trong `canRow` đem chủ sở hữu ra so với "ADMIN" nên **trượt hết**:
+> `srows("DL09")`, `srows("DL11")` trả về **0 cho MỌI chức danh**. Em đã đọc con số 0 ấy thành
+> *"app không gán lớp cho giáo viên"* - trong khi giáo viên NV005 dạy **70 buổi** có thật.
+> Đo lại bằng `gateEnter()` thì Giáo viên ACA có 13 HV, 2 lớp, 29 buổi, 61 bài, 30/36 chỉ số.
+> *Đo một thứ đang bị che thì mọi con số đều là 0, và số 0 trông y hệt một kết quả.*
+> `_checkbc` nay có **luật B0**: ngồi xuống rồi phải hỏi lại xem mình đã ngồi đúng ghế chưa.
+> *Một bộ kiểm không kiểm chính cái thước của nó thì nó đo bằng niềm tin.*
+> (`_checkghe` làm đúng từ đầu - `applyScope` rồi `setRole`. Đã đối chiếu.)
+>
+> **1. SO KỲ TRƯỚC - chỗ thiếu lớn nhất, và nó phủ cả 17 ghế.**
+> Đo đúng rồi vẫn ra một sự thật: **không ghế nào so được với kỳ trước**. Mọi khối là ảnh chụp
+> một thời điểm, trong khi câu hỏi đầu tiên của bất kỳ ai mở báo cáo ra là *"đang tốt lên hay xấu
+> đi"*. Phép so CÓ tồn tại nhưng hỏng ba chỗ:
+> · nó **chỉ hiện trong ngăn kéo** khi bấm vào một chỉ số - *một câu trả lời chỉ hiện ra khi đã
+>   biết phải bấm vào đâu thì người cần nó nhất không bao giờ đọc được*;
+> · **kỳ đối chiếu sai ở 3/4 nấc**: "tháng này" so với "90 ngày", "30 ngày" và "90 ngày" so với
+>   "toàn kỳ" - so một khoảng với một khoảng RỘNG HƠN CÓ CHỨA CHÍNH NÓ. Chú thích của chính hàm
+>   ấy đã nói đúng điều này cho nấc "Tuỳ chọn" rồi vẫn làm thế với ba nấc kia. *Viết ra được lý
+>   do một cách làm là sai mà vẫn để nó chạy ở chỗ khác thì lý do ấy chưa được dùng - nó mới chỉ
+>   được ghi.*
+> · **một lỗi thật:** `var good=(...)?up:up` - hai nhánh của phép ba ngôi giống hệt nhau nên
+>   `good` luôn bằng `up`. LRT (phút từ lúc lead về tới cuộc gọi đầu, THẤP mới tốt) tụt
+>   **143,6 → 116,0** - một cải thiện lớn - mà app tô **ĐỎ**. *Một phép ba ngôi mà hai nhánh
+>   giống nhau là một câu hỏi chưa từng được hỏi.*
+> Nay `repTruoc()` là bản khai duy nhất: kỳ trước luôn dài đúng bằng kỳ đang xem, nằm ngay trước
+> nó, không chồng lấn. "Toàn kỳ" trả về null và nói thẳng là không so được, kèm nút bấm một phát
+> sang 30 ngày. `kpiHuong()` đọc `dir` từ CH6 nên ngưỡng "≤" thì giảm mới là tốt lên. Dòng tình
+> hình thêm một câu: **đang tốt lên hay xấu đi**, bao nhiêu chỉ số mỗi bên.
+>
+> **HAI BẪY CSS CẮN TRONG MỘT LƯỢT, CẢ HAI ĐỀU CÓ BẢN GHI SẴN TRONG FILE NÀY:**
+> · Đặt khối `@media` **TRƯỚC** các luật gốc nó cần đè → `.kpil{flex:1}` ở dưới đè mất
+>   `.kpil{flex:1 1 100%}` ở trên, `_checkmat` vẫn báo tên chỉ số vỡ 23 dòng y như trước khi sửa.
+>   Đúng bẫy đã ghi ở khối `.rost` ngày 15/08.
+> · Cho cột so kỳ trước một cột riêng `flex:0 0 96px` theo luật *"một cột chỉ là cột khi mọi dòng
+>   cùng bắt đầu ở một chỗ"* (đặt cho màn Chấm bài) - luật ĐÚNG nhưng **SAI CHỖ**: bảng KPI không
+>   nằm trên hàng rộng cả trang, nó nằm trong `.kpipanel` chỉ **367px**. 96px cộng ba cột số sẵn
+>   có ăn hết 285px, tên chỉ số còn **20px**. `_checkmat` bắt ngay ở khổ **máy tính** - nơi em
+>   đinh ninh là rộng rãi. *Một luật đúng cho hàng rộng cả trang không tự động đúng trong một ô
+>   367px - phải hỏi bề rộng THẬT của khung chứa, không hỏi bề rộng màn hình.*
+>   Chữa: xếp mũi tên ngay DƯỚI con số, không xin thêm một pixel ngang nào.
+>
+> **2. BỐN BẢNG CỐT LÕI CÒN THIẾU.** Bố cục đúng người rồi thì việc còn lại là đổ đúng nội dung:
+> WOW có 22-24 HV và 34/49 chỉ số mà **không một bảng buổi WOW nào** (DL14 vắng mặt hoàn toàn) ·
+> Kế toán 85 HV, 28/32 chỉ số mà **0 bảng tiền** · Nhân sự trang 6.948 ký tự, **0 biểu đồ 0 bảng**
+> · nhân viên tuyến dưới có phễu và KPI nhưng **0 bảng**, không có danh sách việc của chính họ.
+> *Một dàn bài đúng mà các mục bỏ trống thì nó vẫn chỉ là một dàn bài.*
+> Bốn khối mới đều **dùng lại hàm luật đã có** chứ không viết bộ thứ hai: `wowChoXN`/`wowChoGhi`/
+> `wowVang` (đúng ba hàm nhịp ngày và sổ WOW đang đếm) · `cnDs()` của trang Công nợ (*hai nơi cùng
+> cộng một số tiền thì kiểu gì cũng có ngày lệch, và lệch tiền là loại không ai tha*) · nhóm phân
+> quyền cho bảng quân số · `nhipList()` cho bảng việc. Mọi hàng chờ đều **bấm được** sang đúng
+> danh sách - *một con số không bấm được thì người đọc phải tự đi tìm chỗ xử lý, và phần lớn sẽ
+> không đi.*
+> Độ dài trang đo lại: GV WOW 12.973 → 17.612 · TP Kế toán 19.280 → 23.690 · TP Nhân sự 10.306 →
+> 12.698 · NV Tư vấn 21.738 → 27.184 · CEO 86.453 → 96.375 (7 → 10 panel).
 >
 > ### 🟢 24/08 - MỖI CHỨC DANH MỘT BẢN BÁO CÁO, KHÔNG PHẢI MỘT KHUNG CHUNG RỒI ẨN BỚT
 >
