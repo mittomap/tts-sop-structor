@@ -14478,8 +14478,24 @@ function btHub(embed){
   var list=(titles[pick]||[]).slice().sort(function(a,b){return (hwGraded(a)?1:0)-(hwGraded(b)?1:0)});
   h+='<div class="panel"><div class="ph"><b>Chấm: '+esc(pick||"-")+'</b><div class="mini"><button class="btn green sm" onclick="chamLuu()"><i class="ti ti-device-floppy"></i>Lưu chấm bài</button></div></div><div class="pbody">';
   if(!list.length)h+='<div class="empty">Lớp này chưa có bài để chấm. Sang tab Giao bài để giao trước.</div>';
-  list.forEach(function(r){h+='<div class="rost" data-hwid="'+esc(r.homework_id)+'"><div class="rn">'+nguoiLnk(r.student_id,r.student_name)+' '+hwChip(r)+(hwSubmitted(r)?' <span class="mut" style="font-weight:500">nộp '+esc(r.homework_submitted_time||"")+'</span>':'')+'</div><div class="att"><input class="hwscore" type="number" min="0" max="9" step="0.5" placeholder="'+esc(hwThang(r))+'" value="'+esc(r.homework_score||"")+'" style="width:64px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit">'+
-(hwSubmitted(r)?'':'<select class="hwlate" title="Bài chưa thu - học viên này nộp thế nào?" style="height:30px;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:11px"><option value="on">nộp đúng hạn</option><option value="late">nộp trễ</option></select>')+'<input class="hwfb" placeholder="Nhận xét" value="'+esc(r.teacher_feedback||"")+'" style="width:230px;height:30px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font-family:inherit"></div></div>'});
+  /* ═══ V2 18/08 (anh Luân, kèm ảnh màn chấm bài: *"thiết kế nó bị co cụm lại thì phải"*) ═════
+     Đo thật ở khổ 1440: cột tên chốt cứng 300px mà phải chứa BA thứ - tên · chip trạng thái nộp ·
+     ngày giờ nộp - nên **mọi dòng đều bị cắt cả ba** (tên thiếu 8-26px, chip 11-25px, giờ nộp
+     16-31px), trong khi cả cụm chỉ dùng 63% bề rộng panel, còn 37% bỏ trống bên phải.
+     Con số 300px ấy là quyết định đúng của ngày 14/08 - nhưng đúng cho màn ĐIỂM DANH, nơi cột
+     tên chỉ chứa tên và một cái chip ngắn. Màn này nhồi vào đó ba thứ.
+     *Một luật đặt cho màn này áp sang màn kia mà không hỏi lại nội dung của nó thì nó bóp chết
+     nội dung ấy.*
+     Nay ba thứ thành BA CỘT riêng, và ô Nhận xét giãn chiếm hết phần trống - vì nhận xét là thứ
+     giáo viên gõ nhiều nhất mà lại đang bị bóp còn 230px. */
+  list.forEach(function(r){h+='<div class="rost chrow" data-hwid="'+esc(r.homework_id)+'">'+
+   '<div class="rn">'+nguoiLnk(r.student_id,r.student_name)+'</div>'+
+   '<div class="chst">'+hwChip(r)+'</div>'+
+   '<div class="chtm">'+(hwSubmitted(r)?('nộp '+esc(r.homework_submitted_time||"")):'<i>chưa nộp</i>')+'</div>'+
+   '<div class="att"><input class="hwscore" type="number" min="0" max="9" step="0.5" placeholder="'+esc(hwThang(r))+'" value="'+esc(r.homework_score||"")+'">'+
+/* Dòng ĐÃ NỘP không có ô chọn này, nhưng vẫn phải giữ đúng chỗ ấy - nếu không thì ô Nhận xét
+   của hai loại dòng bắt đầu ở hai cột khác nhau và cả bảng lởm chởm. */
+(hwSubmitted(r)?'<span class="hwgap"></span>':'<select class="hwlate" title="Bài chưa thu - học viên này nộp thế nào?"><option value="on">nộp đúng hạn</option><option value="late">nộp trễ</option></select>')+'<input class="hwfb" placeholder="Nhận xét cho học viên" value="'+esc(r.teacher_feedback||"")+'"></div></div>'});
   h+='</div></div>';
  }
  return h}
