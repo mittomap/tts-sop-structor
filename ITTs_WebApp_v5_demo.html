@@ -3438,7 +3438,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">24/08/2026 · <b>66c286</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">24/08/2026 · <b>3da7b0</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -7132,6 +7132,36 @@ function stuGone(s){return /dropped|graduated|transferred/.test(ecode(s&&s.stude
 function stuAtt(s){return !!s&&(isRisk(s.attendance_progress_status)||(!ignRisk(s)&&riskAuto(s.student_id).att))}
 function stuAca(s){return !!s&&(isRisk(s.academic_progress_status)||(!ignRisk(s)&&riskAuto(s.student_id).aca))}
 function stuRisk(s){return stuAtt(s)||stuAca(s)}
+/* ═══ V2 24/08 - CHIP NGUY CƠ PHẢI NÓI CÙNG MỘT LUẬT VỚI BỘ LỌC ĐÃ ĐƯA HỌ VÀO BẢNG ════════════
+   Anh Luân gửi ảnh bảng "Học viên nguy cơ cần theo dõi (23)": *"học viên nguy cơ cần theo dõi gì
+   mà xanh lè vậy e"*. Bảy dòng đầu có CẢ HAI cột đều xanh - "Đang đều đặn" và "Đang tiến bộ" -
+   và cột Việc cần làm ghi "-". Đọc lên thì bảng tự cãi chính nó.
+   Đo ra thì **các em ấy nguy cơ THẬT**: HV029 vắng không phép 2 buổi (ngưỡng 2), HV061 thiếu 3
+   bài (ngưỡng 3). Cái sai không nằm ở bộ lọc mà ở CỘT ĐANG HIỆN.
+   `stuRisk` gộp HAI nguồn - cờ do NGƯỜI gắn (`attendance_progress_status`) và cảnh báo do MÁY
+   đếm (`riskAuto`: vắng không phép ≥ ngưỡng, thiếu bài ≥ ngưỡng). Ba cái bảng đang vẽ chỉ in ra
+   nguồn THỨ NHẤT. Học viên nào máy thấy mà chưa ai gắn cờ tay thì lọt vào bảng với hai ô xanh.
+   *Một bảng lọc theo luật A mà chỉ hiện cột của luật B thì người đọc không kết luận "cột thiếu",
+   họ kết luận "bảng sai" - và họ thôi tin cả những dòng đúng.*
+   Hai hàm dưới đây là bản dựng chip DUY NHẤT cho cả ba bảng, và chúng giữ nguyên phân biệt
+   người/máy (chú thích ở `stuRiskReasons` đã đặt luật ấy 29/07: *"người gắn cờ" và "máy đếm vượt
+   ngưỡng" là hai chuyện khác nhau - trộn chung thì học vụ không biết nên tin cái nào*). */
+function stuChipCC(s){
+ if(isRisk(s.attendance_progress_status))
+  return '<span class="chip '+stCls(s.attendance_progress_status)+'">'+esc(elabel(s.attendance_progress_status))+'</span>';
+ var A=riskAuto(s.student_id);
+ if(!ignRisk(s)&&A.att)
+  return '<span class="chip red" data-tip="Máy đếm được, chưa ai xác nhận bằng tay. Ngưỡng '+
+   num(paramOf("thresholdAtRisk_absences",2))+' buổi - chỉnh ở Cài đặt (CH2).">Vắng '+A.abs+' buổi (máy)</span>';
+ return '<span class="chip '+stCls(s.attendance_progress_status)+'">'+esc(elabel(s.attendance_progress_status))+'</span>'}
+function stuChipHT(s){
+ if(isRisk(s.academic_progress_status))
+  return '<span class="chip '+stCls(s.academic_progress_status)+'">'+esc(elabel(s.academic_progress_status))+'</span>';
+ var A=riskAuto(s.student_id);
+ if(!ignRisk(s)&&A.aca)
+  return '<span class="chip red" data-tip="Máy đếm được, chưa ai xác nhận bằng tay. Ngưỡng '+
+   num(paramOf("thresholdAtRisk_hw_missing",3))+' bài - chỉnh ở Cài đặt (CH2).">Thiếu '+A.miss+' bài (máy)</span>';
+ return '<span class="chip '+stCls(s.academic_progress_status)+'">'+esc(elabel(s.academic_progress_status))+'</span>'}
 /* ═══ 12/08 - ĐIỀU KIỆN HOÀN THÀNH KHÓA (anh Luân thông báo) ═════════════════════════════════
    *"Học viên phải đảm bảo 90% khối lượng BTVN và tham gia đầy đủ 2 bài kiểm tra Midterm/Final."*
    Ba điều kiện, ba nguồn khác nhau, và trước bản này KHÔNG chỗ nào gộp lại để trả lời câu
@@ -16582,7 +16612,7 @@ function bcNguyCoHTML(){
  var rk=srows("DL09").filter(stuRisk);
  var h='<div class="panel"><div class="ph"><b>Học viên nguy cơ cần theo dõi ('+rk.length+')</b><div class="mini"><button class="pill" onclick="go(\'viec\')">Mở Việc hôm nay</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã HV</th><th>Họ tên</th><th>Chuyên cần</th><th>Học thuật</th><th>Việc cần làm</th></tr></thead><tbody>';
  if(!rk.length)h+='<tr><td class="empty" colspan="5">Không có học viên nguy cơ.</td></tr>';
- catXem("bcrisk",rk,30).forEach(function(r){h+='<tr><td>'+esc(r.student_id)+'</td><td>'+nguoiLnk(r.student_id,r.full_name)+'</td><td><span class="chip '+stCls(r.attendance_progress_status)+'">'+elabel(r.attendance_progress_status)+'</span></td><td><span class="chip '+stCls(r.academic_progress_status)+'">'+elabel(r.academic_progress_status)+'</span></td><td>'+naDecor(r.next_action||"-")+'</td></tr>'});
+ catXem("bcrisk",rk,30).forEach(function(r){h+='<tr><td>'+esc(r.student_id)+'</td><td>'+nguoiLnk(r.student_id,r.full_name)+'</td><td>'+stuChipCC(r)+'</td><td>'+stuChipHT(r)+'</td><td>'+naDecor(r.next_action||"-")+'</td></tr>'});
  return h+'</tbody></table></div>'+xemTiepBtn("bcrisk",rk.length,30)+'</div>'}
 function revByMonth(){var m={};srows("DL07").forEach(function(p){var d=pvnd(p.payment_time);if(!d)return;var k=d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2);m[k]=(m[k]||0)+num(p.amount)});var ks=Object.keys(m).sort().slice(-6);return ks.map(function(k){return [k.slice(5)+"/"+k.slice(2,4),Math.round(m[k]/1000000)]})}
 
@@ -24768,7 +24798,7 @@ function renderHosoNV(){var id=window.NVID;var s=find("DL01","staff_id",id);
    ["ti-alert-triangle",knOpen.length,"Khiếu nại đang xử lý","#E24B4A","theo mức độ"]],"hosonv_hv");
   h+='<div class="panel"><div class="ph"><b>Học viên nguy cơ ('+risk2.length+')</b><div class="mini"><button class="pill" onclick="goRisk()">Mở danh sách</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã</th><th>Họ tên</th><th>Chuyên cần</th><th>Học thuật</th><th>Thao tác</th></tr></thead><tbody>';
   if(!risk2.length)h+='<tr><td class="empty" colspan="5">Không có HV nguy cơ.</td></tr>';
-  risk2.slice(0,25).forEach(function(x){h+='<tr><td>'+esc(x.student_id)+'</td><td>'+esc(x.full_name)+'</td><td><span class="chip '+stCls(x.attendance_progress_status)+'">'+esc(elabel(x.attendance_progress_status))+'</span></td><td><span class="chip '+stCls(x.academic_progress_status)+'">'+esc(elabel(x.academic_progress_status))+'</span></td><td><button class="btn sm" onclick="openHoso(\''+esc(x.student_id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button></td></tr>'});
+  risk2.slice(0,25).forEach(function(x){h+='<tr><td>'+esc(x.student_id)+'</td><td>'+esc(x.full_name)+'</td><td>'+stuChipCC(x)+'</td><td>'+stuChipHT(x)+'</td><td><button class="btn sm" onclick="openHoso(\''+esc(x.student_id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ</button></td></tr>'});
   h+='</tbody></table></div></div>'}
  if(!isSales&&!isWow&&!isAca&&!isTeach)h+='<div class="panel"><div class="empty">Vai trò này chưa có bảng việc riêng trong SOP.</div></div>';
  return h}
@@ -31606,8 +31636,11 @@ function banAiHTML(){
    chỉ ĐỌC, mọi thao tác ghi vẫn nằm ở hồ sơ học viên, đúng luật của các sổ khác. */
 function phNo(P){var t=0;phCon(P).forEach(function(c){
   ttDonCua(c.student_id).forEach(function(e){t+=num(e.remaining_amount)})});return t}
-function phNguyCo(P){return phCon(P).filter(function(c){
-  return stCls(c.attendance_progress_status)==="red"||stCls(c.academic_progress_status)==="red"}).length}
+/* Đếm bằng CHÍNH `stuRisk` - hàm mà mọi bảng nguy cơ khác đang lọc theo. Bản cũ hỏi màu chip
+   (`stCls(...)==="red"`), tức chỉ thấy cờ do NGƯỜI gắn: con của phụ huynh vắng không phép 3 buổi
+   mà chưa ai gắn cờ thì ô này ghi 0, trong khi bảng của học vụ đang liệt kê chính em ấy.
+   *Đếm bằng MÀU là đếm bằng thứ hiển thị ra, không phải bằng thứ được hỏi.* */
+function phNguyCo(P){return phCon(P).filter(stuRisk).length}
 function renderSoCamKet(){
  var ban=commitVer();
  var ds=srows("DL08").filter(function(o){return String(o.commit_at||"").trim()})

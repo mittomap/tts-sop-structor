@@ -214,6 +214,43 @@ GHE.forEach(rc => {
 });
 try { window.GATE_SID = ""; applyScope(""); setRole("all"); } catch (e) {}
 
+/* ═══ B7 - BẢNG LỌC THEO LUẬT NÀO THÌ PHẢI HIỆN CỘT CỦA LUẬT ẤY ════════════════════════════
+   Anh Luân gửi ảnh bảng "Học viên nguy cơ cần theo dõi (23)": *"học viên nguy cơ cần theo dõi gì
+   mà xanh lè vậy e"*. Bảy dòng đầu có CẢ HAI cột đều xanh và cột Việc cần làm ghi "-".
+   Đo ra: các em ấy nguy cơ THẬT - máy đếm được vắng không phép ≥ ngưỡng hoặc thiếu bài ≥ ngưỡng.
+   `stuRisk` gộp hai nguồn (cờ do NGƯỜI gắn + cảnh báo do MÁY đếm) nhưng ba cái bảng chỉ in ra
+   nguồn thứ nhất, nên ai máy thấy mà chưa ai gắn cờ tay thì lọt vào bảng với hai ô xanh.
+   *Một bảng lọc theo luật A mà chỉ hiện cột của luật B thì người đọc không kết luận "cột thiếu",
+   họ kết luận "bảng sai" - và họ thôi tin cả những dòng đúng.*
+   Không bộ nào trong 46 bộ bắt được: bảng vẽ ra được, không rò miền, không cắt chữ, con số 23
+   hoàn toàn đúng. Nó chỉ TỰ CÃI CHÍNH NÓ, và cái đó không có hình dạng nào để bắt - trừ khi hỏi
+   thẳng: mỗi dòng trong bảng có nói ra được lý do nó có mặt không? */
+(function(){
+ try{window.GATE_SID="";applyScope("");setRole("all")}catch(e){}
+ var rk=[];try{rk=srows("DL09").filter(stuRisk)}catch(e){xau.push("B7 khong chay duoc stuRisk: "+e.message);return}
+ t("B7 co hoc vien nguy co de do", rk.length>0, "khong co dong nao - phep do nay dang do so 0");
+ var xanhCaHai=[];
+ rk.forEach(function(s){
+  var a="",b2="";
+  try{a=stuChipCC(s);b2=stuChipHT(s)}catch(e){xau.push("B7 stuChipCC/HT loi: "+e.message);return}
+  var lo=function(x){return /chip\s+(red|amber)/.test(String(x))};
+  if(!lo(a)&&!lo(b2))xanhCaHai.push(s.student_id+" "+(s.full_name||""));
+ });
+ t("B7 khong dong nao trong bang nguy co ma ca hai cot deu on", xanhCaHai.length===0,
+   xanhCaHai.length+" dong: "+xanhCaHai.slice(0,4).join(" · ")+
+   " - bang loc theo stuRisk (co tay HOAC may dem) ma chip chi in ra co tay");
+ /* Và ngược lại: ai KHÔNG nguy cơ thì không được có chip báo động - nếu không thì luật trên
+    thoả một cách rẻ tiền bằng cách tô đỏ tất. */
+ var khong=[];
+ srows("DL09").filter(function(s){return !stuRisk(s)}).slice(0,120).forEach(function(s){
+  var a="",b2="";
+  try{a=stuChipCC(s);b2=stuChipHT(s)}catch(e){return}
+  if(/chip\s+red/.test(String(a))||/chip\s+red/.test(String(b2)))khong.push(s.student_id);
+ });
+ t("B7 khong to do nham nguoi khong nguy co", khong.length===0,
+   khong.length+" hoc vien khong nguy co ma van co chip do: "+khong.slice(0,4).join(" · "));
+})();
+
 /* B6 - hai ghế khác nghiệp vụ phải đọc hai bản khác nhau. Đây là câu hỏi TỔNG: nếu mọi ghế vẫn
    ra cùng một danh sách khối thì bảng khai có mà thiết kế vẫn là một cái khung chung. */
 const cap = [["academic_staff", "hr_staff"], ["teacher", "sales_staff"], ["accountant", "teacher"],
