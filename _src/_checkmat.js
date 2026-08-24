@@ -381,6 +381,37 @@ const CAT_OK = [
     gom(r.bopCot, "CHU BI BOP THANH MOT COT HEP");
   }
 
+  /* ═══ M8 · CHA PHẢI NỔI HƠN CON TRÊN MENU (anh Luân 18/08, kèm ảnh: *"menu thiết kế xấu quá,
+     theo nhóm mà nhóm lại thiếu nổi bật hơn bên trong"*) ══════════════════════════════════════
+     Không bộ kiểm nào bắt được, vì đây không phải lỗi CẮT CHỮ hay CHE NHAU - nó là lỗi THỨ BẬC:
+     hai cấp cùng viết hoa, cùng đậm 800, và cấp CON lại sáng hơn cấp CHA (đo ra 162 so với 145).
+     Đo được bằng máy vì độ sáng là một con số: lấy `getComputedStyle` của nhãn nhóm và nhãn kệ
+     rồi so luma. *Một thứ bậc mà mắt đọc ngược thì cái menu không còn là bản đồ nữa.*
+     Đo trên khổ máy tính thôi - thứ bậc màu không đổi theo khổ màn. */
+  if (V.n === "maytinh") {
+    const tb = await page.evaluate(() => {
+      function luma(c){const m=String(c).match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+        if(!m)return null;const a=m[4]===undefined?1:+m[4];
+        return (0.2126*+m[1]+0.7152*+m[2]+0.0722*+m[3])*a;}
+      /* Mở MỌI nhóm có kệ để cả hai cấp cùng nằm trên màn. */
+      try{(NAVKE?Object.keys(NAVKE):[]).forEach(g=>{
+        const el=[...document.querySelectorAll(".navlbl")].find(x=>(x.textContent||"").trim().toUpperCase().indexOf(g.toUpperCase())===0);
+        if(el&&!el.classList.contains("open"))el.click();})}catch(e){}
+      const lb=[...document.querySelectorAll(".navlbl")];
+      const ke=[...document.querySelectorAll(".navke")];
+      if(!lb.length||!ke.length)return null;
+      function tb2(a){let s=0,n=0;a.forEach(x=>{const v=luma(getComputedStyle(x).color)*(+getComputedStyle(x).opacity||1);
+        if(v!=null){s+=v;n++}});return n?Math.round(s/n):null}
+      return {nhom:tb2(lb), ke:tb2(ke), soKe:ke.length};
+    });
+    if (tb && tb.nhom != null && tb.ke != null) {
+      soDo += 2;
+      if (tb.nhom <= tb.ke)
+        do_.push("M8 THU BAC MENU NGUOC: ten NHOM sang " + tb.nhom + ", ten KE sang " + tb.ke
+          + " - cap cha phai noi hon cap con (" + tb.soKe + " ke tren menu)");
+    }
+  }
+
   await ctx.close();
   }
   await browser.close();
