@@ -30038,7 +30038,10 @@ function buildNav(){
    '<i class="ti ti-chevron-right navchev"></i>'+(A?'<span class="navarc" style="background:'+A.col+'"></span>':'')+'<span>'+esc(uiGroupLabel(G.g))+'</span>'+
    (!open&&gb?'<span class="dot">'+(gb>99?"99+":gb)+'</span>':'')+'</div>';
   if(!open)return;
-  h+='<div class="navgrp">';
+  /* V2 18/08 lượt 3 - ĐÁNH DẤU NHÓM CÓ KỆ. Thụt lề của cả kệ lẫn mục bên trong nó phải lùi thêm
+     một bậc so với nhóm không kệ, mà CSS thì không tự biết nhóm nào có kệ. Khai bằng một lớp ở
+     đây, ngay chỗ đã biết câu trả lời - đừng bắt CSS đoán bằng `:has()`. */
+  h+='<div class="navgrp'+(NAVKE[G.g]?" coke":"")+'">';
   /* Có khai kệ thì xếp lại thứ tự theo kệ và chèn tiêu đề kệ khi sang kệ mới. Mục "Bản đồ chặng"
      (changA..D) là mục CHA của cả nhóm nên luôn đứng trên mọi kệ, không thuộc kệ nào. */
   var _ke=NAVKE[G.g]||null, _keDang=-1;

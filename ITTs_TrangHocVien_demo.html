@@ -690,8 +690,23 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    dưới. *Cái gì đứng gần nhau thì mắt đọc là một nhóm - khoảng trắng chính là dấu ngoặc.*
    Kệ ĐẦU TIÊN cần ít khoảng trên hơn: tên nhóm ngay trên nó đã có nền riêng để tách rồi. */
 .navke{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
- color:#7E93B2;opacity:1;padding:15px 12px 2px 42px;user-select:none}
+ color:#7E93B2;opacity:1;padding:15px 12px 2px 34px;user-select:none}
 .navke:first-child{padding-top:10px}
+/* ═══ V2 18/08 lượt 3 (anh Luân, ảnh cận cảnh nhóm Chờ duyệt: *"thụt lề vẫn sai phải ko?"*) ═══
+   Anh đúng, và lỗi nằm ở CÁI THƯỚC của em: lượt trước em đo mép trái của CHỮ và đọc ra
+   "40 / 52 / 52 - đã có bậc". Nhưng mắt đọc thụt lề theo thứ NHÌN THẤY ĐẦU TIÊN trên dòng, mà
+   dòng của một mục menu bắt đầu bằng cái ICON chứ không bằng chữ.
+   Đo lại theo MÉP TRÁI NỘI DUNG: nhóm 20px · kệ 52px · mục 21px - tên kệ thụt sâu hơn chính
+   mục nó cai quản 31px, nên nó lơ lửng giữa trời còn mục thì nhô ra ngoài trái.
+   *Đo thụt lề thì phải đo từ thứ đầu tiên mắt chạm tới, không phải từ chữ.*
+   Nay tên kệ THẲNG CỘT với icon của mục (cùng 33px), và CẢ HAI lùi một bậc 13px so với tên
+   nhóm. Ba cấp thành ba mốc đọc ra được, không cấp nào lấn cấp nào. */
+/* Mốc 34px chọn để CẢ HAI cách đọc đều ra "kệ thụt hơn cha": mép NỘI DUNG nhóm 20 → kệ 44,
+   và mép CHỮ nhóm 40 → kệ 44. Thử mốc 23px trước rồi bỏ - nó đúng theo nội dung (33 > 20) nhưng
+   chữ kệ lại nhô ra TRÁI hơn chữ nhóm (33 < 40), nhìn ảnh cận cảnh là thấy ngay.
+   *Một con số đúng theo phép đo này mà sai theo phép đo kia thì chưa phải con số đúng - phải
+   tìm chỗ cả hai cùng đúng.* */
+.navgrp.coke .navitem{padding-left:34px}
 .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px;margin-bottom:20px}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px;cursor:pointer}
 .kpi:hover{border-color:#C4D2E4}
@@ -33380,7 +33395,10 @@ function buildNav(){
    '<i class="ti ti-chevron-right navchev"></i>'+(A?'<span class="navarc" style="background:'+A.col+'"></span>':'')+'<span>'+esc(uiGroupLabel(G.g))+'</span>'+
    (!open&&gb?'<span class="dot">'+(gb>99?"99+":gb)+'</span>':'')+'</div>';
   if(!open)return;
-  h+='<div class="navgrp">';
+  /* V2 18/08 lượt 3 - ĐÁNH DẤU NHÓM CÓ KỆ. Thụt lề của cả kệ lẫn mục bên trong nó phải lùi thêm
+     một bậc so với nhóm không kệ, mà CSS thì không tự biết nhóm nào có kệ. Khai bằng một lớp ở
+     đây, ngay chỗ đã biết câu trả lời - đừng bắt CSS đoán bằng `:has()`. */
+  h+='<div class="navgrp'+(NAVKE[G.g]?" coke":"")+'">';
   /* Có khai kệ thì xếp lại thứ tự theo kệ và chèn tiêu đề kệ khi sang kệ mới. Mục "Bản đồ chặng"
      (changA..D) là mục CHA của cả nhóm nên luôn đứng trên mọi kệ, không thuộc kệ nào. */
   var _ke=NAVKE[G.g]||null, _keDang=-1;

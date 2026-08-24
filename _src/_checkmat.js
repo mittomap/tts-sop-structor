@@ -425,7 +425,20 @@ const CAT_OK = [
         if(!m1)continue;
         const a1=hopChu(lb1),a2=hopChu(k1),a3=hopChu(m1);
         if(!a1||!a2||!a3)continue;
-        if(thut===null)thut={nhom:Math.round(a1.x),ke:Math.round(a2.x),muc:Math.round(a3.x)};
+        /* MEP TRAI NOI DUNG, khong phai mep trai CHU: mat doc thut le theo thu NHIN THAY dau
+           tien tren dong, ma dong cua mot muc menu bat dau bang cai ICON. Thuoc ban dau chi do
+           chu nen bao "40/52/52 - da co bac" trong khi anh Luan nhin thay icon nam ngoai cung
+           ben trai va noi "thut le van sai phai ko?".
+           *Do thut le thi phai do tu thu dau tien mat cham toi, khong phai tu chu.*
+           Giu CA HAI phep do: mot con so dung theo phep do nay ma sai theo phep do kia thi chua
+           phai con so dung. */
+        function xND(el){let x=null;
+          el.querySelectorAll("*").forEach(c=>{const r=c.getBoundingClientRect();
+            if(r.width<1||r.height<1)return; if(x===null||r.left<x)x=r.left});
+          const h2=hopChu(el); if(h2&&(x===null||h2.x<x))x=h2.x;
+          return x===null?null:Math.round(x)}
+        if(thut===null)thut={nhomC:Math.round(a1.x),keC:Math.round(a2.x),mucC:Math.round(a3.x),
+          nhom:xND(lb1),ke:xND(k1),muc:xND(m1)};
         const tr0=k1.previousElementSibling?(hopChu(k1.previousElementSibling)||{b:a1.b}).b:a1.b;
         const tren=Math.round(a2.t-tr0), duoi=Math.round(a3.t-a2.b);
         if(gan===null||tren-duoi<gan.chenh)gan={tren:tren,duoi:duoi,chenh:tren-duoi};
@@ -441,12 +454,20 @@ const CAT_OK = [
          bac cha->ke chi 4px, mat khong doc ra mot bac 4px. Doi >= 8px, va ten ke khong duoc thut
          sau hon chinh muc no cai quan. */
       if (tb.thut) {
-        soDo++;
+        soDo += 3;
         const bac = tb.thut.ke - tb.thut.nhom;
-        if (bac < 8) do_.push("M8b THUT LE MENU KHONG CO BAC: ten nhom o " + tb.thut.nhom
-          + "px, ten ke o " + tb.thut.ke + "px - chenh " + bac + "px, mat khong doc ra (can >= 8px)");
-        if (tb.thut.ke > tb.thut.muc) do_.push("M8b TEN KE THUT SAU HON MUC no cai quan: ke "
-          + tb.thut.ke + "px > muc " + tb.thut.muc + "px");
+        if (bac < 8) do_.push("M8b THUT LE MENU KHONG CO BAC (do theo NOI DUNG): ten nhom o "
+          + tb.thut.nhom + "px, ten ke o " + tb.thut.ke + "px - chenh " + bac
+          + "px, mat khong doc ra (can >= 8px)");
+        /* Ten ke phai THANG COT voi mep trai cua muc no cai quan - lech qua 4px la mot cot go ghe. */
+        if (Math.abs(tb.thut.ke - tb.thut.muc) > 4)
+          do_.push("M8b TEN KE KHONG THANG COT VOI MUC no cai quan: ke " + tb.thut.ke
+            + "px, muc " + tb.thut.muc + "px");
+        /* Va doc theo CHU cung khong duoc nguoc: chu ten ke nho ra trai hon chu ten nhom thi mat
+           van doc ra "con khong thut hon cha", du mep noi dung da dung. */
+        if (tb.thut.keC < tb.thut.nhomC)
+          do_.push("M8b CHU TEN KE NHO RA TRAI HON CHU TEN NHOM: ke " + tb.thut.keC
+            + "px < nhom " + tb.thut.nhomC + "px");
       }
       /* M8c - LUAT GAN-XA. Mot tieu de thuoc ve phan NAM DUOI no, nen khoang TREN phai lon hon
          khoang DUOI. Do ra 15/15 (bang nhau) thi mat khong biet no thuoc ve ai - dung cai anh
