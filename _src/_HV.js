@@ -12439,7 +12439,7 @@ function kpiSoKyHTML(code,dir,comp,truoc){
     im lặng thì người đọc tưởng chỉ số ấy không đổi. Nói thẳng là không so được và vì sao. */
  if(!KPITREND[code])return '<span class="kpidl khong" data-tip="Chỉ số dạng lô: lứa dữ liệu của kỳ này chưa chín, đem so với kỳ trước sẽ ra kết luận sai">–</span>';
  var P=repTruoc();
- if(!P)return '<span class="kpidl khong" data-tip="Đang xem Toàn kỳ - không có kỳ nào trước nó để so. Chọn Tháng này / 30 ngày / 90 ngày để thấy xu hướng">–</span>';
+ if(!P)return '<span class="kpidl khong" data-tip="Đang xem Toàn kỳ - không có kỳ nào trước nó để so. Chọn một kỳ ở thanh Kỳ số liệu để thấy xu hướng">–</span>';
  var a=comp[code],b=truoc?truoc[code]:null;
  if(a==null||isNaN(a)||b==null||isNaN(b))
   return '<span class="kpidl khong" data-tip="Kỳ trước ('+esc(P.lb)+') chưa đủ dữ liệu để tính chỉ số này">–</span>';
@@ -12516,7 +12516,15 @@ function kpiSection(){var comp=kpiCompute();var _truoc=kpiKyTruoc();var ch6=(DAT
       người cần nó nhất không bao giờ đọc được.* */
    h+='<div class="kpirow'+(doc?" hasdoc":"")+'" title="'+esc(k.name)+'"'+(doc?' onclick="kpiOpen(\''+k.code+'\')" style="cursor:pointer"':'')+'>'+
     '<div class="kpil"><span class="kpic">'+esc(k.code)+'</span><span class="kpin">'+esc(kpiShort(k.name))+'</span></div>'+
-    '<div class="kpiv '+SL[1]+'" data-tipfn="kpiTip" data-tipa="'+esc(k.code)+'"><span>'+esc(kpiFmt(k.code,na?null:c))+'</span>'+
+    /* CON SO NAM TRUC TIEP TRONG `.kpiv`, KHONG BOC THEM MOT `<span>` NAO.
+       Luot dau em boc no lai de xep doc - va `_checkux` do ngay 62 cho: luat "moi con so %
+       phai noi duoc cach tinh" tim chu thich tren CHINH THE mo ra truoc con so, ma the ay
+       nay la `<span>` tron khong thuoc tinh; `data-tipfn` van con nguyen tren `.kpiv` nhung
+       da bi day ra ngoai tam nhin cua phep do. Chu thich VAN CO, nguoi dung re chuot van doc
+       duoc - nhung mot phep do di dung duong nguoi dung di thi no phai thay, va o day no
+       khong thay. *Boc them mot lop the la doi quan he cha-con ma moi phep do dang dua vao.*
+       Flex van xep doc duoc voi mot nut chu tran: no thanh mot o an danh cua luoi flex. */
+    '<div class="kpiv '+SL[1]+'" data-tipfn="kpiTip" data-tipa="'+esc(k.code)+'">'+esc(kpiFmt(k.code,na?null:c))+
      kpiSoKyHTML(k.code,k.dir,comp,_truoc)+'</div>'+
     '<div class="kpig" data-tipfn="kpiTip" data-tipa="'+esc(k.code)+'">'+esc(k.dir||"")+' '+esc(kpiFmt(k.code,th))+'</div>'+
     '<span class="kpisev '+SL[1]+'">'+esc(SL[0])+'</span></div>';
@@ -12631,7 +12639,7 @@ function kpiTinhHinh(){
      '<a class="lnk" onclick="kpiXemLo()">Xem '+nLo+' chỗ cần chú ý</a>')
    :('<b>'+m.tong+' chỉ số trong phạm vi của bạn đều đạt ngưỡng</b> - tuần này không có chỗ nào phải chữa cháy.'+
      (m.chuadu?('<span data-tip="'+m.chuadu+' chỉ số chưa đủ dữ liệu để tính"> ('+m.chuadu+' chưa tính được)</span>'):'')))+
-  kpiXuHuongCau(ch6,comp)+'</div>';}
+  '</div>'+kpiXuHuongCau(ch6,comp);}
 /* ═══ TỐT LÊN HAY XẤU ĐI - CÂU ĐẦU TIÊN AI CŨNG HỎI ════════════════════════════════════════
    Dòng tình hình cũ chỉ đếm được BAO NHIÊU chỉ số đang lệch. Nó không nói được chiều - mà một
    trung tâm có 6 chỗ báo động và đang tốt lên thì hoàn toàn khác một trung tâm có 6 chỗ báo
@@ -12641,17 +12649,24 @@ function kpiTinhHinh(){
    người ta tự đoán ra rằng phải đổi kỳ mới thấy xu hướng. */
 function kpiXuHuongCau(ch6,comp){
  var P=repTruoc();
- if(!P)return ' <span class="mut">Đang xem <b>Toàn kỳ</b> nên không so được với kỳ nào trước đó. '+
-  '<button class="pill" onclick="repKySet(\'30\')"><i class="ti ti-trending-up"></i>So 30 ngày với 30 ngày trước</button></span>';
+ /* KHỐI RIÊNG, KHÔNG NHÉT VÀO `notebar`. `_checkaudit` chốt trần 150 ký tự cho câu nhắc đầu
+    trang (phần dài phải đưa vào chú thích rê chuột) - nối thêm câu xu hướng vào đó là đẩy nó lên
+    188 ký tự. Mà hai câu này vốn là hai việc khác nhau: một cái đếm chỗ đang lệch, một cái nói
+    chiều. *Nối hai câu vào một dòng vì chúng đứng cạnh nhau thì dòng ấy dài gấp đôi mà không rõ
+    hơn.*
+    VÀ KHÔNG VIẾT CON SỐ NGÀY VÀO CÂU: `_checkaudit` canh "số nghiệp vụ cắm cứng" - viết "30 ngày"
+    thẳng vào chữ là một con số không có bánh răng nào trỏ tới, đổi nấc kỳ thì câu chữ nói sai. */
+ if(!P)return '<div class="notebar"><i class="ti ti-trending-up"></i>Đang xem <b>Toàn kỳ</b> nên không có kỳ nào trước đó để so. '+
+  '<button class="pill" onclick="repKySet(\'30\')"><i class="ti ti-trending-up"></i>Xem xu hướng theo kỳ gần nhất</button></div>';
  var truoc=kpiKyTruoc();
  var len=0,xuong=0,bang=0,khong=0;
  ch6.forEach(function(k){var hg=kpiHuong(k.code,k.dir,comp,truoc);
   if(hg==null)khong++;else if(hg>0)len++;else if(hg<0)xuong++;else bang++});
- if(!len&&!xuong&&!bang)return ' <span class="mut">Chưa chỉ số nào so được với '+esc(P.lb)+'.</span>';
+ if(!len&&!xuong&&!bang)return '<div class="notebar"><i class="ti ti-trending-up"></i><span class="mut">Chưa chỉ số nào so được với '+esc(P.lb)+'.</span></div>';
  var cau=(len>xuong)?"Nhìn chung đang <b style=\"color:var(--green)\">tốt lên</b>"
    :(xuong>len)?"Nhìn chung đang <b style=\"color:var(--red)\">xấu đi</b>"
    :"Nhìn chung <b>đi ngang</b>";
- return '<div style="margin-top:6px">'+cau+' so với <b>'+esc(P.lb)+'</b>: '+
+ return '<div class="notebar"><i class="ti ti-trending-up"></i>'+cau+' so với <b>'+esc(P.lb)+'</b>: '+
   (len?('<b style="color:var(--green)">'+len+' tốt lên</b>'):'0 tốt lên')+' · '+
   (xuong?('<b style="color:var(--red)">'+xuong+' xấu đi</b>'):'0 xấu đi')+
   (bang?(' · '+bang+' không đổi'):'')+
@@ -13045,7 +13060,7 @@ function bcWowHTML(){
  var hang=[["Chờ xác nhận lịch",choXN.length,"confirm","Học viên đặt rồi mà chưa ai chốt lịch - để lâu là mất buổi"],
            ["Đã dạy, chưa ghi nội dung",choGhi.length,"note","Quá "+num(paramOf("slaWowNote_hours",24))+" giờ chưa ghi là hụt SLA"],
            ["Vắng, chưa hỏi lý do",vangChuaHoi.length,"noshow","Không hỏi lý do thì không biết có mất học viên không"]];
- h+='<div class="sechd" style="margin-top:6px">Đang chờ bạn</div>';
+ h+='<div class="sechd" style="margin-top:6px">Buổi WOW đang chờ bạn</div>';
  hang.forEach(function(x){
   h+='<div class="rost"><div class="rn">'+esc(x[0])+'</div>'+
    '<div class="chst"><span class="chip'+(x[1]?" amber":" green")+'">'+x[1]+'</span></div>'+
@@ -13075,7 +13090,7 @@ function bcTienHTML(){
   '<div class="chst"><span class="chip'+(S("quahan")>0?" red":" green")+'">'+vnd(S("quahan"))+'</span></div>'+
   '<div class="chtm">'+qh.length+' học viên - đây là phần phải gọi ngay, không phải phần chờ tới hạn</div>'+
   '<div class="att">'+(qh.length?'<button class="pill" onclick="window.CNLOC=\'quahan\';go(\'congno\')">Mở danh sách</button>':'<span class="mut" style="font-size:11.5px">xong</span>')+'</div></div>';
- h+='<div class="sechd" style="margin-top:6px">Đang chờ bạn</div>';
+ h+='<div class="sechd" style="margin-top:6px">Tiền đang chờ bạn</div>';
  h+='<div class="rost"><div class="rn">Phiếu thu chưa có chứng từ</div>'+
   '<div class="chst"><span class="chip'+(thieuCT.length?" amber":" green")+'">'+thieuCT.length+'</span></div>'+
   '<div class="chtm">Không có ảnh chứng từ thì đối soát ngân hàng không khớp được</div>'+
@@ -13098,8 +13113,9 @@ function bcNhanSuHTML(){
   if(!theo[g]){theo[g]={g:g,n:0,ten:(NHIPTEN&&NHIPTEN[g])||g};th.push(theo[g])}
   theo[g].n++});
  th.sort(function(a,b){return b.n-a.n});
+ var _nMoi=Math.max(1,num(paramOf("hrNewStaff_days",90)));
  var moi=dang.filter(function(x){var d=pvnd(x.start_date||x.hire_date||x.created_time);
-  return !!d&&(Date.now()-d.getTime())<90*864e5});
+  return !!d&&(Date.now()-d.getTime())<_nMoi*864e5});
  var h='<div class="panel"><div class="ph"><b><i class="ti ti-users" style="margin-right:6px"></i>Quân số theo nhóm</b>'+
   '<div class="mini"><button class="pill" onclick="go(\'nhansu\')">Mở Nhân sự</button></div></div><div class="pbody">';
  h+='<div class="rost"><div class="rn">Đang làm việc</div><div class="att"><b>'+dang.length+'</b>'+
@@ -13107,9 +13123,12 @@ function bcNhanSuHTML(){
  th.forEach(function(x){
   h+='<div class="rost"><div class="rn">'+esc(x.ten)+'</div>'+
    '<div class="chst"><span class="chip">'+x.n+' người</span></div>'+
-   '<div class="chtm">'+(Math.round(x.n*100/dang.length))+'% quân số</div><div class="att"></div></div>'});
+   /* Mọi con số % phải nói được cách tính - luật anh Luân đặt ("mấy con số như kiểu 95% là tính
+      như thế nào, e ghi chú cụ thể ở hover cho anh"). Dùng `pctG` là hàm chung, không tự viết
+      câu giải thích lần thứ 300. */
+   '<div class="chtm" data-tip="'+esc(pctG(x.n,dang.length,"người đang làm việc"))+'">'+(Math.round(x.n*100/dang.length))+'% quân số</div><div class="att"></div></div>'});
  if(moi.length){
-  h+='<div class="sechd" style="margin-top:6px">Mới vào dưới 90 ngày - còn trong kỳ theo dõi</div>';
+  h+='<div class="sechd" style="margin-top:6px">Mới vào - còn trong kỳ theo dõi '+slaChip("hrNewStaff_days",90)+'</div>';
   moi.slice(0,8).forEach(function(x){
    h+='<div class="rost"><div class="rn">'+nguoiLnk(x.staff_id,x.full_name)+'</div>'+
     '<div class="chst"><span class="chip">'+esc(elabel(x.role)||"")+'</span></div>'+
@@ -15394,6 +15413,10 @@ var APPPARAMS=[
  ["Bảng số & cửa sổ nhìn lại","sourceMinLeads","Một nguồn lead phải có ít nhất bao nhiêu lead thì mới kết luận nguồn đó tốt hay kém","lead",10],
  ["Bảng số & cửa sổ nhìn lại","statsUpcoming_days","Dải \"Sắp diễn ra\" ở Tổng quan nhìn tới bao nhiêu ngày","ngày",7],
  ["Bảng số & cửa sổ nhìn lại","statsNewWindow_days","Ô \"Lead mới\" và \"Đăng ký\" ở Tổng quan đếm trong bao nhiêu ngày gần nhất","ngày",30],
+ /* V2 24/08 - `_checkaudit` bắt "Mới vào dưới 90 ngày" trên bảng quân số: một con số nghiệp vụ
+    viết thẳng vào câu chữ, không bánh răng nào trỏ tới. Nó đúng là một CỬA SỔ NHÌN LẠI của một
+    bảng số, nên thuộc đúng nhóm này. */
+ ["Bảng số & cửa sổ nhìn lại","hrNewStaff_days","Nhân viên vào dưới bao nhiêu ngày thì bảng Nhân sự còn xếp vào diện mới - còn trong kỳ theo dõi","ngày",90],
  ["P5 · Xếp lớp & nhập học","placementChange_free_times","Học viên được đổi lớp mấy lần trước khi phải trình quản lý phê duyệt","lần",1],
  ["P5 · Xếp lớp & nhập học","slaClassInfoZalo_hours","Hạn gửi thông tin lớp cho HV sau khi xếp lớp","giờ",24],
  ["P5 · Xếp lớp & nhập học","slaOBT_hours","Hạn hoàn tất onboarding cho HV mới","giờ",48],
