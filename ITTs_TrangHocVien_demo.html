@@ -8084,7 +8084,17 @@ function kyBarHTML(ghi){
 function srcPerfSection(){var R=repRange();
  /* V9.99y - bảng này xếp hạng NGUỒN LEAD theo doanh thu ("nguồn nào đáng đổ tiền"). Ai khai
     `tien:"none"` thì cột doanh thu là thứ họ không được đọc, mà bỏ cột đi thì bảng mất nghĩa. */
- if(dsLevel("tien")==="none")return "";
+ /* ═══ V2 24/08 - CÂU TRÊN ĐÚNG MỘT NỬA, VÀ NỬA SAI CỦA NÓ CẮT MẤT KHỐI TRỤ CỘT CỦA MARKETING.
+    Đo được khi dựng `BCMAU`: dàn bài của Marketing mở đầu bằng chính bảng này, mà nó KHÔNG hiện
+    ra - vì Marketing khai `tien:"none"` nên hàm trả về chuỗi rỗng ngay dòng đầu.
+    Bỏ cột doanh thu thì bảng mất nghĩa với NGƯỜI ĐỌC NÓ ĐỂ QUYẾT CHI TIÊU. Nhưng người làm
+    marketing đọc bảng này để hỏi một câu khác: *nguồn nào đẻ ra lead chịu đi test và chịu đăng
+    ký* - bốn cột còn lại (lead · đã test · đăng ký · tỷ lệ chốt) trả lời trọn vẹn câu ấy.
+    Nay ai không có miền tiền thì bảng bỏ cột doanh thu và xếp hạng theo số đăng ký. Không phải
+    "ẩn một cột": nó là một bảng khác, sắp xếp theo một câu hỏi khác.
+    *Một bảng mất nghĩa với người này chưa chắc mất nghĩa với người kia - hỏi lại câu hỏi trước
+    khi cắt cả cái bảng.* */
+ var _tien=dsLevel("tien")!=="none";
  var by={},order=[];
  rows("DL02").forEach(function(l){if(!inRep(l.lead_created_time))return;
   var k=ecode(l.lead_source)||"khac";if(!by[k]){by[k]={lb:elabel(l.lead_source)||k,n:0,test:0,enr:0,rev:0};order.push(k)}
@@ -8093,11 +8103,14 @@ function srcPerfSection(){var R=repRange();
  rows("DL03").forEach(function(t){if(!isc(t.test_status,"graded"))return;var k=leadSrc[t.lead_id];if(by[k]&&inRep(t.test_date||t.result_time))by[k].test++});
  rows("DL06").forEach(function(e){if(isc(e.enrollment_status,"cancelled"))return;var k=leadSrc[e.lead_id];if(by[k]&&inRep(e.enrollment_time))by[k].enr++});
  rows("DL07").forEach(function(p){if(!inRep(p.payment_time))return;var e=find("DL06","enrollment_id",p.enrollment_id);var k=e?leadSrc[e.lead_id]:null;if(k&&by[k])by[k].rev+=num(p.amount)});
- order.sort(function(a,b){return by[b].rev-by[a].rev||by[b].n-by[a].n});
- var h='<div class="panel"><div class="ph"><b><i class="ti ti-broadcast" style="margin-right:6px"></i>Hiệu quả theo NGUỒN lead ('+R.lb+')</b><span class="mut" style="font-size:11.5px">nguồn nào đáng đổ tiền - nhìn doanh thu trên số lead</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Nguồn</th><th>Lead</th><th>Đã test</th><th>Đăng ký</th><th>Tỷ lệ chốt</th><th>Doanh thu</th></tr></thead><tbody>';
- if(!order.length)h+='<tr><td class="empty" colspan="6">Không có lead nào trong kỳ.</td></tr>';
+ order.sort(_tien?function(a,b){return by[b].rev-by[a].rev||by[b].n-by[a].n}
+                :function(a,b){return by[b].enr-by[a].enr||by[b].n-by[a].n});
+ var h='<div class="panel"><div class="ph"><b><i class="ti ti-broadcast" style="margin-right:6px"></i>Hiệu quả theo NGUỒN lead ('+R.lb+')</b><span class="mut" style="font-size:11.5px">'+
+  (_tien?'nguồn nào đáng đổ tiền - nhìn doanh thu trên số lead':'nguồn nào đẻ ra lead chịu đi test và chịu đăng ký')+
+  '</span></div><div class="tbwrap"><table class="dt"><thead><tr><th>Nguồn</th><th>Lead</th><th>Đã test</th><th>Đăng ký</th><th>Tỷ lệ chốt</th>'+(_tien?'<th>Doanh thu</th>':'')+'</tr></thead><tbody>';
+ if(!order.length)h+='<tr><td class="empty" colspan="'+(_tien?6:5)+'">Không có lead nào trong kỳ.</td></tr>';
  order.forEach(function(k){var v=by[k];
-  h+='<tr><td><b>'+esc(v.lb)+'</b></td><td>'+v.n+'</td><td>'+v.test+'</td><td>'+v.enr+'</td><td'+(v.n?' data-tip="'+esc(pctG(v.enr,v.n,"lead từ nguồn này đã đăng ký"))+'"':' data-tip="Nguồn này chưa có lead nào trong kỳ"')+'>'+(v.n?Math.round(v.enr*100/v.n)+"%":"-")+'</td><td style="text-align:right;font-variant-numeric:tabular-nums">'+vnd(v.rev)+'</td></tr>'});
+  h+='<tr><td><b>'+esc(v.lb)+'</b></td><td>'+v.n+'</td><td>'+v.test+'</td><td>'+v.enr+'</td><td'+(v.n?' data-tip="'+esc(pctG(v.enr,v.n,"lead từ nguồn này đã đăng ký"))+'"':' data-tip="Nguồn này chưa có lead nào trong kỳ"')+'>'+(v.n?Math.round(v.enr*100/v.n)+"%":"-")+'</td>'+(_tien?('<td style="text-align:right;font-variant-numeric:tabular-nums">'+vnd(v.rev)+'</td>'):'')+'</tr>'});
  return h+'</tbody></table></div></div>'}
 function staffPerfSection(){var sales=rows("DL01").filter(function(x){return /sales/.test(ecode(x.role))&&!/inactive|nghỉ/i.test(String(x.status||""))});
  if(!sales.length)return "";
@@ -16057,6 +16070,122 @@ function bcMuc(){
    mọi trang khác không đổi; chỉ đúng một trang đọc số theo người được chọn.
    KHÔNG có leo thang quyền: chỉ chọn được người TRONG ĐỘI mình (`banAiDS`), mà phạm vi của cấp
    dưới bao giờ cũng hẹp hơn của mình. */
+/* ═══ V2 24/08 - TRANG CHỈ SỐ CÓ BỐ CỤC RIÊNG CHO TỪNG GHẾ NGỒI ════════════════════════════════
+   Anh Luân: *"trang tổng quan, báo cáo và KPI hình như mỗi chức danh lại là 1 cách thiết kế khác
+   nhau mới đúng em. Chứ em dùng khung chung, cái nào có thì hiện, ko có thì ẩn anh thấy ko hợp
+   lý, ko sát với nghiệp vụ đâu"*.
+   ĐO TRƯỚC KHI SỬA, đóng đủ 17 chức danh rồi đếm khối vẽ ra - anh nói đúng từng chữ:
+    · **năm khối hiện cho CẢ 17 chức danh, đúng một thứ tự**: 3 việc nên làm · Sắp diễn ra · KPI ·
+      Chuyên cần & Học thuật · Việc đang nợ theo phòng ban;
+    · Trưởng phòng Nhân sự và Marketing khai `hocvien:"none"` mà vẫn nhận biểu đồ Chuyên cần &
+      Học thuật - **vẽ ra toàn số 0**;
+    · **12 chức danh** nhận bảng "Học viên nguy cơ cần theo dõi **(0)**";
+    · Giáo viên WOW nhận cả Phễu chuyển đổi và Phân bố trạng thái Lead - phễu bán hàng, vẽ ra 0.
+   Vì sao khung chung nghe thì hợp lý mà làm ra thì sai: nó trả lời câu *"khối này có được phép
+   hiện không"* trong khi câu phải hỏi là *"người ngồi ghế này mở trang ra để biết điều gì"*.
+   Câu thứ nhất chỉ lọc ra được một tập con; câu thứ hai mới quyết định **thứ tự đọc**, và thứ tự
+   mới là cái làm nên một bản báo cáo. Ẩn bớt một khối trong dàn bài của người khác thì phần còn
+   lại vẫn là dàn bài của người khác.
+   *Ẩn đi cái không có thì được một trang không sai. Nó không cho ta một trang ĐÚNG.*
+   Hai bảng dưới đây tách hẳn hai việc: `BCKHOI` khai TỪNG KHỐI vẽ gì và cần điều kiện gì mới có
+   nghĩa; `BCMAU` khai MỖI GHẾ đọc những khối nào, theo thứ tự nào, và mở trang ra để hỏi câu gì.
+   Thêm một khối = thêm một dòng ở bảng đầu; đổi dàn bài của một phòng = sửa đúng một dòng ở bảng
+   sau. Không đụng vào mã vẽ. */
+function bcCoLead(){try{return dsLevel("lead")!=="none"}catch(e){return false}}
+function bcCoHV(){try{return dsLevel("hocvien")!=="none"}catch(e){return false}}
+/* Bang hoc vien nguy co doi THEM mot dieu kien nua: pham vi phai co hoc vien that. Do duoc
+   khi dung `BCMAU`: Giao vien WOW va WOW Leader khai mien hoc vien la "mine" nen dieu kien
+   dau gat, nhung pham vi ho khong co dong DL09 nao - bang ve ra dung chu "(0)" tren mot bang
+   rong. Khac han voi Hoc vu co 85 hoc vien ma khong ai nguy co: cau "Khong co hoc vien nguy
+   co" luc ay la mot cau TRA LOI, con voi WOW no la mot cau khong ai hoi.
+   *Mot bang rong vi khong co gi de dem thi khac mot bang rong vi moi thu deu on.* */
+function bcCoHVThat(){try{return bcCoHV()&&srows("DL09").length>0}catch(e){return false}}
+var BCKHOI={
+ tinhhinh:{ve:function(){return kpiTinhHinh()}},
+ top3:    {ve:function(){return kpiTop3Section()}},
+ /* Bảng so sánh 5 cơ sở là câu hỏi của người điều hành chuỗi; nhân viên nhìn nó không quyết
+    được gì mà số của họ cũng chỉ nằm ở đúng một ô. */
+ coso:    {ve:function(){return baocaoBranch()},can:function(){return bcMuc()!=="mine"}},
+ kinhdoanh:{ve:function(){return bizSection()}},
+ sapdien: {ve:function(){return upcomingSection()}},
+ kpi:     {ve:function(){return kpiSection()}},
+ /* VH11 là bảng so người với người - chỉ có nghĩa với người quản lý nhiều hơn một người. */
+ vh11:    {ve:function(){return '<div class="sechd">Khối lượng việc theo nhân viên · VH11</div>'+khoiLuongHTML()},
+           can:function(){return bcMuc()!=="mine"}},
+ /* Ba khối biểu đồ đi theo CẶP trên một hàng - khai `doi` để bộ dựng ghép hai cái liền nhau vào
+    chung một `.chartrow`, lẻ một cái thì cho nó chiếm trọn hàng. */
+ pheu:    {doi:1,ve:function(){return bcPheuHTML()},can:bcCoLead},
+ leadtt:  {doi:1,ve:function(){return bcLeadTTHTML()},can:bcCoLead},
+ hvbieu:  {doi:1,ve:function(){return bcHVBieuHTML()},can:bcCoHV},
+ nguon:   {ve:function(){return srcPerfSection()},can:function(){return bcCoLead()&&bcMuc()!=="mine"}},
+ doitv:   {ve:function(){return staffPerfSection()},can:function(){return bcCoLead()&&bcMuc()!=="mine"}},
+ phongban:{ve:function(){return deptSection()},can:function(){return bcMuc()!=="mine"}},
+ hvnguyco:{ve:function(){return bcNguyCoHTML()},can:bcCoHVThat}};
+/* Câu hỏi đầu trang là phần QUAN TRỌNG NHẤT của mỗi dàn bài: nó nói người ngồi ghế ấy mở trang
+   này ra để biết điều gì. Viết được câu đó thì thứ tự khối tự nó lộ ra; viết không được thì cái
+   ghế ấy chưa có bản báo cáo, chỉ có một trang chứa số. */
+var BCMAU={
+ dieuhanh:{ten:"Bức tranh điều hành",hoi:"Trung tâm đang chạy thế nào, và chỗ nào phải can thiệp trước",
+  khoi:["tinhhinh","top3","coso","kinhdoanh","kpi","pheu","leadtt","nguon","doitv","vh11","phongban","hvbieu","hvnguyco"]},
+ tuvan:{ten:"Báo cáo Tư vấn",hoi:"Phễu của tôi đang tắc ở bước nào",
+  khoi:["pheu","leadtt","kpi","top3","sapdien"]},
+ tuvanql:{ten:"Báo cáo phòng Tư vấn",hoi:"Đội tư vấn về đích tới đâu, nguồn nào đang nuôi phễu, ai đang đuối",
+  khoi:["pheu","leadtt","nguon","doitv","kpi","top3","vh11","sapdien"]},
+ marketing:{ten:"Báo cáo Marketing",hoi:"Nguồn nào đang đẻ ra lead, nguồn nào đang đốt tiền",
+  khoi:["nguon","pheu","leadtt","kpi","top3"]},
+ marketingql:{ten:"Báo cáo phòng Marketing",hoi:"Nguồn nào đang đẻ ra lead, và tiền quảng cáo đang đi về đâu",
+  khoi:["nguon","pheu","leadtt","kpi","top3","vh11"]},
+ /* ACA lo CHẤT LƯỢNG DẠY: học thuật trước, hàng chờ nhận xét và chấm bài sau. Không có một chữ
+    nào của miền lead ở đây - phễu bán hàng không phải câu hỏi của người phụ trách chuyên môn. */
+ aca:{ten:"Báo cáo chuyên môn",hoi:"Lớp tôi dạy đang ra sao, còn nhận xét và bài chấm nào chưa xong",
+  khoi:["hvbieu","hvnguyco","sapdien","kpi"]},
+ acaql:{ten:"Báo cáo phòng ACA",hoi:"Chất lượng dạy đang thế nào, phòng còn tồn bao nhiêu nhận xét và bài chấm",
+  khoi:["hvbieu","hvnguyco","kpi","vh11","sapdien","top3"]},
+ giaovien:{ten:"Báo cáo giảng dạy",hoi:"Lớp tôi đang thế nào, còn việc gì chưa xong",
+  khoi:["hvbieu","hvnguyco","sapdien","kpi"]},
+ hocvu:{ten:"Báo cáo Học vụ",hoi:"Học viên nào đang rơi, và xếp lớp có kịp không",
+  khoi:["hvnguyco","hvbieu","kpi","sapdien","top3"]},
+ hocvuql:{ten:"Báo cáo phòng Học vụ",hoi:"Học viên nào đang rơi, phòng Học vụ còn tồn việc gì",
+  khoi:["hvnguyco","hvbieu","kpi","vh11","phongban","sapdien","top3"]},
+ wow:{ten:"Báo cáo WOW 1-1",hoi:"Buổi WOW của tôi có đủ người đặt không, ai bỏ buổi",
+  khoi:["sapdien","hvnguyco","kpi"]},
+ wowql:{ten:"Báo cáo phòng WOW",hoi:"Quota WOW dùng tới đâu, ai bỏ buổi, đội đang gánh bao nhiêu",
+  khoi:["sapdien","hvnguyco","kpi","vh11","top3"]},
+ ketoan:{ten:"Báo cáo Kế toán",hoi:"Tiền vào bao nhiêu, ai đang nợ, đợt nào tới hạn",
+  khoi:["kinhdoanh","sapdien","kpi","top3"]},
+ ketoanql:{ten:"Báo cáo phòng Kế toán",hoi:"Tiền vào bao nhiêu, công nợ đang đọng ở đâu",
+  khoi:["kinhdoanh","sapdien","kpi","vh11","top3"]},
+ /* Nhân sự không quản học viên và không quản lead - dàn bài của họ là NGƯỜI và VIỆC. Trước bản
+    này họ nhận cả biểu đồ chuyên cần lẫn bảng học viên nguy cơ, cả hai đều vẽ ra số 0. */
+ nhansu:{ten:"Báo cáo Nhân sự",hoi:"Việc đang dồn vào ai, phòng nào còn tồn nhiều nhất",
+  khoi:["vh11","phongban","kpi","sapdien","top3"]},
+ hotro:{ten:"Báo cáo của bạn",hoi:"Việc của tôi và các mốc sắp tới",
+  khoi:["sapdien","kpi","top3"]}};
+/* Ghế nào đọc dàn bài nào - HỎI THẲNG tầng phân quyền, đúng cách `nhipKey` đã làm. Hai chỗ cùng
+   phân loại chức danh thì kiểu gì cũng có ngày lệch nhau. */
+function bcKey(){
+ var rs=SCOPE()||{};
+ var g=rs.group||"";
+ var mgr=!!rs.mgr||!!rs.leader;
+ if(g==="dieuhanh"||g==="quantri"||rs.pages==="*")return "dieuhanh";
+ if(mgr&&BCMAU[g+"ql"])return g+"ql";
+ if(BCMAU[g])return g;
+ return "dieuhanh"}
+function bcMau(){return BCMAU[bcKey()]||BCMAU.dieuhanh}
+/* Dựng thân trang theo dàn bài của ghế. Khối nào khai `can` mà `can` trả false thì KHÔNG MỜI -
+   khác hẳn với "mời rồi ẩn": khối không được mời thì nó không chiếm chỗ trong thứ tự đọc. */
+function bcThanTheoGhe(){
+ var M=bcMau(),h="",cho=null;
+ function xa(){if(cho){h+='<div class="chartrow">'+cho.replace('<div class="chartp">','<div class="chartp" style="grid-column:1/-1">')+'</div>';cho=null}}
+ (M.khoi||[]).forEach(function(k){
+  var B=BCKHOI[k];if(!B)return;
+  if(B.can&&!B.can())return;
+  var x="";try{x=B.ve()||""}catch(e){x=""}
+  if(!x)return;
+  if(B.doi){if(cho){h+='<div class="chartrow">'+cho+x+'</div>';cho=null}else cho=x;return}
+  xa();h+=x});
+ xa();
+ return h}
 function renderBaocao(){
  var _bcAi=window.BANAI||"";
  var _stAi=_bcAi&&find("DL01","staff_id",_bcAi);
@@ -16075,23 +16204,25 @@ function renderBaocao(){
  return baocaoThan("")}
 function baocaoThan(_xemAi){
  if(dsLevel("baocao")==="none")return dsDeny("Báo cáo & KPI");
- var L=srows("DL02"),S=srows("DL09"),E=srows("DL06");
- var risk=S.filter(stuRisk).length;   /* cùng một hàm với trang Học viên nguy cơ và thẻ của lớp */
  /* V9.99w - TRANG NÀY LÀ CỦA AI. Ba mức phạm vi thì ba câu khác nhau, nói thẳng trên tiêu đề -
     người đọc phải biết con số đang đếm tập nào trước khi tin nó. */
  var _bcLv=bcMuc();
+ /* V2 24/08 - TÊN TRANG VÀ CÂU MỞ ĐẦU ĐI THEO GHẾ NGỒI. Trước bản này mọi ghế cùng đọc một câu
+    ("Bức tranh điều hành + toàn bộ chỉ số KPI theo SOP") - câu ấy đúng với Giám đốc và sai với
+    mười sáu người còn lại. Câu hỏi của mỗi ghế khai ở `BCMAU`, cùng chỗ với dàn bài của nó, để
+    không có chuyện tiêu đề hứa một đằng mà các khối bên dưới nói một nẻo. */
+ var _M=bcMau();
  var _bcTen=_xemAi?((find("DL01","staff_id",_xemAi)||{}).full_name||_xemAi)
-   :(_bcLv==="all")?"Toàn trung tâm"
-   :(_bcLv==="team")?"Đội của bạn"
-   :"Của riêng bạn";
+   :(_M.ten||"Chỉ số & KPI");
+ var _bcPham=(_bcLv==="all")?"Toàn trung tâm":(_bcLv==="team")?"Đội của bạn":"Của riêng bạn";
  var _bcCau=_xemAi
    ?("Đang xem chỉ số của "+((find("DL01","staff_id",_xemAi)||{}).full_name||_xemAi)+" - mọi con số dưới đây tính theo đúng phạm vi công việc của người này. Bấm \"Về việc của tôi\" ở trên để quay lại số của bạn.")
-   :(_bcLv==="all")
-   ?"Bức tranh điều hành + toàn bộ chỉ số KPI theo SOP. Số liệu tính thẳng từ dữ liệu vận hành; ngưỡng chỉnh ở Cài đặt (CH6)."
+   :((_M.hoi?(_M.hoi+". "):"")+((_bcLv==="all")
+   ?"Số liệu tính thẳng từ dữ liệu vận hành toàn trung tâm; ngưỡng chỉnh ở Cài đặt (CH6)."
    :(_bcLv==="team")
-   ?"Chỉ số của ĐỘI BẠN - mọi con số dưới đây chỉ đếm phần dữ liệu thuộc phạm vi bạn quản lý, không phải toàn trung tâm. Ngưỡng dùng chung của trung tâm (CH6)."
-   :"Chỉ số của RIÊNG BẠN - mọi con số dưới đây chỉ đếm hồ sơ, lớp và việc do chính bạn phụ trách. Ngưỡng so sánh dùng chung của trung tâm (CH6).";
- var h='<div class="phead" data-tour="phead"><div><div class="t">Chỉ số &amp; KPI · '+esc(_bcTen)+'</div><div class="s">'+esc(_bcCau)+'</div></div>'+
+   ?"Mọi con số dưới đây chỉ đếm phần dữ liệu thuộc phạm vi bạn quản lý, không phải toàn trung tâm. Ngưỡng dùng chung của trung tâm (CH6)."
+   :"Mọi con số dưới đây chỉ đếm hồ sơ, lớp và việc do chính bạn phụ trách. Ngưỡng so sánh dùng chung của trung tâm (CH6)."));
+ var h='<div class="phead" data-tour="phead"><div><div class="t">'+esc(_bcTen)+' · '+esc(_bcPham)+'</div><div class="s">'+esc(_bcCau)+'</div></div>'+
   '<div class="sp"><button class="btn" onclick="go(\'banlam\')"><i class="ti ti-checklist"></i>Chạy quy trình</button><button class="btn" onclick="window.SETTAB=\'ch6\';go(\'settings\')"><i class="ti ti-adjustments"></i>Ngưỡng KPI</button></div></div>';
  /* Hai ô ngày chỉ hiện khi đang ở nấc "Tuỳ chọn" - bốn nấc kia không có ngày để sửa, bày sẵn
     hai ô mờ bên cạnh là mời người ta bấm vào chỗ không làm gì. */
@@ -16127,59 +16258,47 @@ function baocaoThan(_xemAi){
   (((function(){try{return navVis("nhaplead")}catch(e){return false}})())?' và phễu khách (BC3)':'')+
   ' ở ngay đây. Học viên nguy cơ (BC1) ở sổ Học viên; bảng việc BC5-BC9 ở trang đáp từng người. '+
   '<a class="lnk" onclick="go(\'hocvien\')">Mở sổ Học viên</a></div>';
- /* Dòng tình hình đứng TRƯỚC ba việc nên làm: biết mình đang ở đâu rồi mới đọc phải làm gì. */
- h+=kpiTinhHinh();
- h+=kpiTop3Section();
- /* Bảng so sánh 5 cơ sở là câu hỏi của người điều hành chuỗi ("cơ sở nào đang gánh") - một nhân
-    viên nhìn bảng ấy không quyết được gì, mà số của họ cũng chỉ nằm ở đúng một ô. */
- if(_bcLv!=="mine")h+=baocaoBranch();
- h+=bizSection();
- h+=upcomingSection();
- h+=kpiSection();
- /* V9.42 - VH11 của SOP: ai đang ôm bao nhiêu việc. Đặt ở Báo cáo vì đây là câu hỏi của quản lý. */
- /* VH11 là bảng so người với người - chỉ có nghĩa với người quản lý nhiều hơn một người. */
- if(_bcLv!=="mine")h+='<div class="sechd">Khối lượng việc theo nhân viên · VH11</div>'+khoiLuongHTML();
- /* V9.99s - PHẦN LEAD CỦA BÁO CÁO CHỈ DÀNH CHO NGƯỜI CÓ MIỀN LEAD. Đo được 05/08: Kế toán và
-    Trưởng phòng Học vụ khai `lead:"none"` nhưng trang Báo cáo vẫn bày đủ phễu chuyển đổi, biểu
-    đồ phân bố trạng thái lead và bảng hiệu quả nguồn - ba khối dựng hoàn toàn trên DL02. Quyền
-    xem BÁO CÁO và quyền xem MIỀN LEAD là hai chuyện khác nhau; báo cáo không phải cửa hậu. */
- /* V9.99s - PHẦN LEAD CỦA BÁO CÁO CHỈ DÀNH CHO NGƯỜI CÓ MIỀN LEAD. Đo được 05/08: Kế toán và
-    Trưởng phòng Học vụ khai `lead:"none"` nhưng trang Báo cáo vẫn bày đủ phễu chuyển đổi, biểu
-    đồ phân bố trạng thái lead và bảng hiệu quả nguồn - ba khối dựng hoàn toàn trên DL02. Quyền
-    xem BÁO CÁO và quyền xem MIỀN LEAD là hai chuyện khác nhau; báo cáo không phải cửa hậu.
-    Hai biểu đồ Chuyên cần & Học thuật thì GIỮ - chúng dựng trên DL09, đúng miền của họ. */
- var _coLead=dsLevel("lead")!=="none";
+ /* Thân trang dựng theo DÀN BÀI CỦA GHẾ (`BCMAU`), không phải theo một khung chung rồi ẩn bớt -
+    xem khối chú thích dài ở `BCKHOI` ngay trên `renderBaocao`. */
+ h+=bcThanTheoGhe();
+ return h}
+/* ── BỐN KHỐI DƯỚI ĐÂY TRƯỚC ĐÂY VIẾT THẲNG TRONG `baocaoThan` ────────────────────────────────
+   Tách ra thành hàm gọi tên được để `BCKHOI` mời được chúng theo thứ tự của từng ghế. Nội dung
+   giữ y nguyên; chỉ đổi chỗ nó được gọi, không đổi thứ nó vẽ. */
+/* V9.99s - PHẦN LEAD CỦA BÁO CÁO CHỈ DÀNH CHO NGƯỜI CÓ MIỀN LEAD. Đo được 05/08: Kế toán và
+   Trưởng phòng Học vụ khai `lead:"none"` nhưng trang Báo cáo vẫn bày đủ phễu chuyển đổi, biểu đồ
+   phân bố trạng thái lead và bảng hiệu quả nguồn - ba khối dựng hoàn toàn trên DL02. Quyền xem
+   BÁO CÁO và quyền xem MIỀN LEAD là hai chuyện khác nhau; báo cáo không phải cửa hậu.
+   Nay điều kiện ấy nằm ở `can` của từng khối trong `BCKHOI`, một chỗ duy nhất. */
+function bcPheuHTML(){
+ var L=srows("DL02"),S=srows("DL09"),E=srows("DL06");
+ function uniqLead(code){var m={};rows(code).forEach(function(x){if(x.lead_id)m[x.lead_id]=1});return Object.keys(m).length}
+ var funnel=[["Lead",L.length],["Đặt test",uniqLead("DL03")],["Tư vấn",uniqLead("DL04")],["Đăng ký",E.length],["Đang học",S.filter(function(r){return/active|studying/.test(ecode(r.student_status))}).length]];
+ var fmax=funnel[0][1]||1;
+ var h='<div class="chartp" style="grid-column:1/-1"><h4>Phễu chuyển đổi</h4>';
+ funnel.forEach(function(f,i){var pct=Math.round(f[1]/fmax*100);var conv2=i>0&&funnel[i-1][1]?Math.round(f[1]/funnel[i-1][1]*100):null;
+  var gt=(conv2!=null?pctG(f[1],funnel[i-1][1],funnel[i-1][0].toLowerCase()+" đi tiếp được tới bước \""+f[0]+"\""):"")
+   +(conv2!=null?" · ":"")+"So với tổng đầu phễu: "+pctG(f[1],fmax,"lead");
+  h+='<div class="funrow" data-tip="'+esc(gt)+'"><div class="funh"><span>'+f[0]+'</span><span>'+f[1]+(conv2!=null?' <span class="funpct">('+conv2+'% từ bước trước)</span>':'')+'</span></div><div class="funbar"><i style="width:'+pct+'%"></i></div></div>'});
+ return h+'</div>'}
+function bcLeadTTHTML(){
+ var L=srows("DL02");
+ var lsCount={};["new","contacted","considering","converted","no_response","unreachable","rejected"].forEach(function(k){lsCount[k]=0});
+ L.forEach(function(r){var c=ecode(r.lead_status);if(lsCount[c]==null)lsCount[c]=0;lsCount[c]++});
+ var lsSeg=[["Mới",lsCount.new||0,"#9AA5B1"],["Đã LH",lsCount.contacted||0,"#2F6BFF"],["Cân nhắc",lsCount.considering||0,"#F59E0B"],["Chuyển đổi",lsCount.converted||0,"#16A34A"],["Mất",(lsCount.no_response||0)+(lsCount.unreachable||0)+(lsCount.rejected||0),"#DC2626"]];
+ return '<div class="chartp"><h4>Phân bố trạng thái Lead</h4>'+svgDonut(lsSeg)+'</div>'}
+function bcHVBieuHTML(){
+ var S=srows("DL09");
  function cnt(arr,re){return arr.filter(function(r){return re.test(ecode(r))}).length}
  var att=[["Đều",cnt(S.map(function(r){return r.attendance_progress_status}),/on_track/)],["Nguy cơ",cnt(S.map(function(r){return r.attendance_progress_status}),/at_risk/)],["Sa sút",cnt(S.map(function(r){return r.attendance_progress_status}),/off_track/)]];
  var aca=[["Tiến bộ",cnt(S.map(function(r){return r.academic_progress_status}),/on_track/)],["Nguy cơ",cnt(S.map(function(r){return r.academic_progress_status}),/at_risk/)],["Lệch",cnt(S.map(function(r){return r.academic_progress_status}),/off_track/)]];
- var _bAca='<div class="chartp"><h4>Chuyên cần &amp; Học thuật (số HV)</h4><div class="grid2"><div>'+svgBarsV(att,{color:"#2F6BFF",h:120})+'<div class="mut" style="text-align:center;font-size:11px">Chuyên cần</div></div><div>'+svgBarsV(aca,{color:"#7C3AED",h:120})+'<div class="mut" style="text-align:center;font-size:11px">Học thuật</div></div></div></div>';
- if(_coLead){
-  function uniqLead(code){var m={};rows(code).forEach(function(x){if(x.lead_id)m[x.lead_id]=1});return Object.keys(m).length}
-  var funnel=[["Lead",L.length],["Đặt test",uniqLead("DL03")],["Tư vấn",uniqLead("DL04")],["Đăng ký",E.length],["Đang học",S.filter(function(r){return/active|studying/.test(ecode(r.student_status))}).length]];
-  var fmax=funnel[0][1]||1;
-  h+='<div class="chartrow"><div class="chartp" style="grid-column:1/-1"><h4>Phễu chuyển đổi</h4>';
-  funnel.forEach(function(f,i){var pct=Math.round(f[1]/fmax*100);var conv2=i>0&&funnel[i-1][1]?Math.round(f[1]/funnel[i-1][1]*100):null;
-   var gt=(conv2!=null?pctG(f[1],funnel[i-1][1],funnel[i-1][0].toLowerCase()+" đi tiếp được tới bước \""+f[0]+"\""):"")
-    +(conv2!=null?" · ":"")+"So với tổng đầu phễu: "+pctG(f[1],fmax,"lead");
-   h+='<div class="funrow" data-tip="'+esc(gt)+'"><div class="funh"><span>'+f[0]+'</span><span>'+f[1]+(conv2!=null?' <span class="funpct">('+conv2+'% từ bước trước)</span>':'')+'</span></div><div class="funbar"><i style="width:'+pct+'%"></i></div></div>'});
-  h+='</div></div>';
-  var lsCount={};["new","contacted","considering","converted","no_response","unreachable","rejected"].forEach(function(k){lsCount[k]=0});
-  L.forEach(function(r){var c=ecode(r.lead_status);if(lsCount[c]==null)lsCount[c]=0;lsCount[c]++});
-  var lsSeg=[["Mới",lsCount.new||0,"#9AA5B1"],["Đã LH",lsCount.contacted||0,"#2F6BFF"],["Cân nhắc",lsCount.considering||0,"#F59E0B"],["Chuyển đổi",lsCount.converted||0,"#16A34A"],["Mất",(lsCount.no_response||0)+(lsCount.unreachable||0)+(lsCount.rejected||0),"#DC2626"]];
-  h+='<div class="chartrow"><div class="chartp"><h4>Phân bố trạng thái Lead</h4>'+svgDonut(lsSeg)+'</div>'+_bAca+'</div>';
- }else{
-  h+='<div class="chartrow">'+_bAca.replace('<div class="chartp">','<div class="chartp" style="grid-column:1/-1">')+'</div>';
- }
- // Hiệu quả nguồn + hiệu suất đội + KPI phòng ban + bảng HV nguy cơ
- if(_coLead&&_bcLv!=="mine")h+=srcPerfSection();
- if(_bcLv!=="mine")h+=staffPerfSection();
- h+=deptSection();
- // risk table
- h+='<div class="panel"><div class="ph"><b>Học viên nguy cơ cần theo dõi ('+risk+')</b><div class="mini"><button class="pill" onclick="go(\'viec\')">Mở Việc hôm nay</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã HV</th><th>Họ tên</th><th>Chuyên cần</th><th>Học thuật</th><th>Việc cần làm</th></tr></thead><tbody>';
- var rk=S.filter(stuRisk);
+ return '<div class="chartp"><h4>Chuyên cần &amp; Học thuật (số HV)</h4><div class="grid2"><div>'+svgBarsV(att,{color:"#2F6BFF",h:120})+'<div class="mut" style="text-align:center;font-size:11px">Chuyên cần</div></div><div>'+svgBarsV(aca,{color:"#7C3AED",h:120})+'<div class="mut" style="text-align:center;font-size:11px">Học thuật</div></div></div></div>'}
+function bcNguyCoHTML(){
+ var rk=srows("DL09").filter(stuRisk);
+ var h='<div class="panel"><div class="ph"><b>Học viên nguy cơ cần theo dõi ('+rk.length+')</b><div class="mini"><button class="pill" onclick="go(\'viec\')">Mở Việc hôm nay</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã HV</th><th>Họ tên</th><th>Chuyên cần</th><th>Học thuật</th><th>Việc cần làm</th></tr></thead><tbody>';
  if(!rk.length)h+='<tr><td class="empty" colspan="5">Không có học viên nguy cơ.</td></tr>';
  catXem("bcrisk",rk,30).forEach(function(r){h+='<tr><td>'+esc(r.student_id)+'</td><td>'+nguoiLnk(r.student_id,r.full_name)+'</td><td><span class="chip '+stCls(r.attendance_progress_status)+'">'+elabel(r.attendance_progress_status)+'</span></td><td><span class="chip '+stCls(r.academic_progress_status)+'">'+elabel(r.academic_progress_status)+'</span></td><td>'+naDecor(r.next_action||"-")+'</td></tr>'});
- h+='</tbody></table></div>'+xemTiepBtn("bcrisk",rk.length,30)+'</div>';return h}
+ return h+'</tbody></table></div>'+xemTiepBtn("bcrisk",rk.length,30)+'</div>'}
 function revByMonth(){var m={};srows("DL07").forEach(function(p){var d=pvnd(p.payment_time);if(!d)return;var k=d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2);m[k]=(m[k]||0)+num(p.amount)});var ks=Object.keys(m).sort().slice(-6);return ks.map(function(k){return [k.slice(5)+"/"+k.slice(2,4),Math.round(m[k]/1000000)]})}
 
 function renderBanggiao(embed){

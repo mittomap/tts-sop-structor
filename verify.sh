@@ -178,6 +178,11 @@ chay "_checkkhuon khuon trang nghiep vu" "CHECKKHUON (OK|BO QUA)" node _checkkhu
 # (bay so 4 cua BAN_GIAO_V2, da can that).
 chay "_checkmotcua mot nghiep vu mot cua ghi" "CHECKMOTCUA (OK|BO QUA)" node _checkmotcua.js
 chay "_checkghe  ngoi vao ghe tung chuc danh" "CHECKGHE OK" node _checkghe.js
+# _checkbc (24/08) - anh Luan: "moi chuc danh lai la 1 cach thiet ke khac nhau moi dung em. Chu
+# em dung khung chung, cai nao co thi hien, ko co thi an anh thay ko hop ly". 45 bo cu khong bo
+# nao do: chung hoi "trang co ve duoc khong", khong bo nao hoi "trang nay co phai ban bao cao
+# CUA NGUOI NAY khong". Bo nay dong du 17 ghe roi doc dan bai vo ra.
+chay "_checkbc   moi ghe mot ban bao cao" "CHECKBC OK" node _checkbc.js
 # Anh Luan 08/08: "moi nhan vien, moi truong phong, ho hoi bao nhieu loai cau hoi, ho can bao
 # nhieu trang? He thong lon, nhung qua kho dung thi chet ngay." Do bang bang NHIP - ban khai cua
 # chinh app ve "moi ngay chuc danh nay lam gi". Bat duoc chuyen nang nhat: NHIP dem toan trung
