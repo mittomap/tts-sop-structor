@@ -16011,19 +16011,24 @@ var BCKHOI={
  nguon:   {ve:function(){return srcPerfSection()},can:function(){return bcCoLead()&&bcMuc()!=="mine"}},
  doitv:   {ve:function(){return staffPerfSection()},can:function(){return bcCoLead()&&bcMuc()!=="mine"}},
  phongban:{ve:function(){return deptSection()},can:function(){return bcMuc()!=="mine"}},
- hvnguyco:{ve:function(){return bcNguyCoHTML()},can:bcCoHVThat}};
+ hvnguyco:{ve:function(){return bcNguyCoHTML()},can:bcCoHVThat},
+ /* Bốn khối cốt lõi thêm 24/08 - mỗi khối là bảng mà nghề ấy không thể thiếu. */
+ wow:     {ve:function(){return bcWowHTML()},can:function(){try{return srows("DL14").length>0}catch(e){return false}}},
+ tien:    {ve:function(){return bcTienHTML()},can:function(){return dsLevel("tien")!=="none"}},
+ nhansu:  {ve:function(){return bcNhanSuHTML()},can:function(){try{return srows("DL01").length>1}catch(e){return false}}},
+ viectoi: {ve:function(){return bcViecToiHTML()}}};
 /* Câu hỏi đầu trang là phần QUAN TRỌNG NHẤT của mỗi dàn bài: nó nói người ngồi ghế ấy mở trang
    này ra để biết điều gì. Viết được câu đó thì thứ tự khối tự nó lộ ra; viết không được thì cái
    ghế ấy chưa có bản báo cáo, chỉ có một trang chứa số. */
 var BCMAU={
  dieuhanh:{ten:"Bức tranh điều hành",hoi:"Trung tâm đang chạy thế nào, và chỗ nào phải can thiệp trước",
-  khoi:["tinhhinh","top3","coso","kinhdoanh","kpi","pheu","leadtt","nguon","doitv","vh11","phongban","hvbieu","hvnguyco"]},
- tuvan:{ten:"Báo cáo Tư vấn",hoi:"Phễu của tôi đang tắc ở bước nào",
-  khoi:["pheu","leadtt","kpi","top3","sapdien"]},
+  khoi:["tinhhinh","top3","coso","kinhdoanh","tien","kpi","pheu","leadtt","nguon","doitv","wow","vh11","nhansu","phongban","hvbieu","hvnguyco"]},
+ tuvan:{ten:"Báo cáo Tư vấn",hoi:"Phễu của tôi đang tắc ở bước nào, và giờ tôi phải làm gì",
+  khoi:["pheu","leadtt","viectoi","kpi","top3","sapdien"]},
  tuvanql:{ten:"Báo cáo phòng Tư vấn",hoi:"Đội tư vấn về đích tới đâu, nguồn nào đang nuôi phễu, ai đang đuối",
   khoi:["pheu","leadtt","nguon","doitv","kpi","top3","vh11","sapdien"]},
  marketing:{ten:"Báo cáo Marketing",hoi:"Nguồn nào đang đẻ ra lead, nguồn nào đang đốt tiền",
-  khoi:["nguon","pheu","leadtt","kpi","top3"]},
+  khoi:["nguon","pheu","leadtt","viectoi","kpi","top3"]},
  marketingql:{ten:"Báo cáo phòng Marketing",hoi:"Nguồn nào đang đẻ ra lead, và tiền quảng cáo đang đi về đâu",
   khoi:["nguon","pheu","leadtt","kpi","top3","vh11"]},
  /* ACA lo CHẤT LƯỢNG DẠY: học thuật trước, hàng chờ nhận xét và chấm bài sau. Không có một chữ
@@ -16039,19 +16044,19 @@ var BCMAU={
  hocvuql:{ten:"Báo cáo phòng Học vụ",hoi:"Học viên nào đang rơi, phòng Học vụ còn tồn việc gì",
   khoi:["hvnguyco","hvbieu","kpi","vh11","phongban","sapdien","top3"]},
  wow:{ten:"Báo cáo WOW 1-1",hoi:"Buổi WOW của tôi có đủ người đặt không, ai bỏ buổi",
-  khoi:["sapdien","hvnguyco","kpi"]},
+  khoi:["wow","sapdien","hvnguyco","kpi"]},
  wowql:{ten:"Báo cáo phòng WOW",hoi:"Quota WOW dùng tới đâu, ai bỏ buổi, đội đang gánh bao nhiêu",
-  khoi:["sapdien","hvnguyco","kpi","vh11","top3"]},
+  khoi:["wow","sapdien","hvnguyco","kpi","vh11","top3"]},
  ketoan:{ten:"Báo cáo Kế toán",hoi:"Tiền vào bao nhiêu, ai đang nợ, đợt nào tới hạn",
-  khoi:["kinhdoanh","sapdien","kpi","top3"]},
+  khoi:["tien","kinhdoanh","sapdien","kpi","top3"]},
  ketoanql:{ten:"Báo cáo phòng Kế toán",hoi:"Tiền vào bao nhiêu, công nợ đang đọng ở đâu",
-  khoi:["kinhdoanh","sapdien","kpi","vh11","top3"]},
+  khoi:["tien","kinhdoanh","sapdien","kpi","vh11","top3"]},
  /* Nhân sự không quản học viên và không quản lead - dàn bài của họ là NGƯỜI và VIỆC. Trước bản
     này họ nhận cả biểu đồ chuyên cần lẫn bảng học viên nguy cơ, cả hai đều vẽ ra số 0. */
- nhansu:{ten:"Báo cáo Nhân sự",hoi:"Việc đang dồn vào ai, phòng nào còn tồn nhiều nhất",
-  khoi:["vh11","phongban","kpi","sapdien","top3"]},
+ nhansu:{ten:"Báo cáo Nhân sự",hoi:"Quân số đang thế nào, việc đang dồn vào ai",
+  khoi:["nhansu","vh11","phongban","viectoi","kpi","sapdien","top3"]},
  hotro:{ten:"Báo cáo của bạn",hoi:"Việc của tôi và các mốc sắp tới",
-  khoi:["sapdien","kpi","top3"]}};
+  khoi:["viectoi","sapdien","kpi","top3"]}};
 /* Ghế nào đọc dàn bài nào - HỎI THẲNG tầng phân quyền, đúng cách `nhipKey` đã làm. Hai chỗ cùng
    phân loại chức danh thì kiểu gì cũng có ngày lệch nhau. */
 function bcKey(){
@@ -16184,6 +16189,144 @@ function bcHVBieuHTML(){
  var att=[["Đều",cnt(S.map(function(r){return r.attendance_progress_status}),/on_track/)],["Nguy cơ",cnt(S.map(function(r){return r.attendance_progress_status}),/at_risk/)],["Sa sút",cnt(S.map(function(r){return r.attendance_progress_status}),/off_track/)]];
  var aca=[["Tiến bộ",cnt(S.map(function(r){return r.academic_progress_status}),/on_track/)],["Nguy cơ",cnt(S.map(function(r){return r.academic_progress_status}),/at_risk/)],["Lệch",cnt(S.map(function(r){return r.academic_progress_status}),/off_track/)]];
  return '<div class="chartp"><h4>Chuyên cần &amp; Học thuật (số HV)</h4><div class="grid2"><div>'+svgBarsV(att,{color:"#2F6BFF",h:120})+'<div class="mut" style="text-align:center;font-size:11px">Chuyên cần</div></div><div>'+svgBarsV(aca,{color:"#7C3AED",h:120})+'<div class="mut" style="text-align:center;font-size:11px">Học thuật</div></div></div></div>'}
+/* ═══ V2 24/08 - BỐN BẢNG CỐT LÕI CÒN THIẾU (anh Luân: *"đã đủ chi tiết chưa, đầy đủ nghiệp vụ
+   của từng vị trí chưa"*) ══════════════════════════════════════════════════════════════════════
+   Đo bằng máy, đóng đủ 17 ghế và đăng nhập THẬT (`gateEnter`, không phải `applyScope` suông):
+    · **WOW** có 22-24 học viên trong phạm vi và 34/49 chỉ số tính được, mà trang báo cáo **0 biểu
+      đồ, không một bảng buổi WOW nào** - DL14 không xuất hiện ở đâu. Bản báo cáo của người làm
+      WOW mà không có buổi WOW.
+    · **Kế toán** 85 học viên, 28/32 chỉ số, mà **0 bảng tiền** - công nợ, đối soát, hoàn tiền
+      đều vắng.
+    · **Nhân sự** trang chỉ 6.948 ký tự, **0 biểu đồ 0 bảng** - không quân số, không onboarding.
+    · **Nhân viên tuyến dưới** (NV Tư vấn, NV Marketing) có phễu và KPI nhưng **0 bảng** - không
+      có danh sách việc phải làm của chính họ.
+   Bố cục đúng người rồi thì việc còn lại là ĐỔ ĐÚNG NỘI DUNG vào. *Một dàn bài đúng mà các mục
+   bỏ trống thì nó vẫn chỉ là một dàn bài.*
+   Bốn khối dưới đây dùng lại hàm luật đã có (`wowSt`/`wowChoXN`/`wowChoGhi`/`wowVang`, `dueRows`,
+   `tkSt`) chứ không viết bộ luật thứ hai - hai nơi cùng đếm một thứ thì kiểu gì cũng có ngày
+   lệch nhau. */
+function bcWowHTML(){
+ var W=srows("DL14");if(!W.length)return "";
+ var R=repRange();
+ var trongKy=W.filter(function(w){return inRep(w.wow_session_date)});
+ function d(f){return trongKy.filter(f).length}
+ var xong=d(function(w){return isc(w.wow_status,"completed")}),
+     vang=d(function(w){return isc(w.wow_status,"no_show")}),
+     huy =d(function(w){return isc(w.wow_status,"cancelled")}),
+     xn  =d(function(w){return isc(w.wow_status,"confirmed")}),
+     dat =d(function(w){return isc(w.wow_status,"booked")});
+ var tong=trongKy.length;
+ /* Ba hàng chờ THẬT - dùng đúng ba hàm mà nhịp ngày và sổ WOW đang đếm, để ba nơi không nói ba
+    con số. Lấy trên TOÀN phạm vi chứ không chỉ trong kỳ: một buổi chờ xác nhận từ tháng trước
+    vẫn đang chờ hôm nay. */
+ var choXN=W.filter(wowChoXN),choGhi=W.filter(wowChoGhi),vangChuaHoi=W.filter(wowVang);
+ var h='<div class="panel"><div class="ph"><b><i class="ti ti-star" style="margin-right:6px"></i>Buổi WOW 1-1 ('+esc(R.lb)+')</b>'+
+  '<div class="mini"><button class="pill" onclick="go(\'wow\')">Mở màn Buổi WOW</button></div></div><div class="pbody">';
+ if(!tong)h+='<div class="empty">Không có buổi WOW nào trong kỳ này.</div>';
+ else{
+  h+='<div class="rost"><div class="rn">Buổi trong kỳ</div><div class="att" style="gap:8px;flex-wrap:wrap">'+
+   '<span class="chip green" data-tip="Đã dạy xong">'+xong+' hoàn thành</span>'+
+   '<span class="chip" data-tip="Đã chốt lịch, chưa tới ngày">'+xn+' đã xác nhận</span>'+
+   '<span class="chip'+(dat?" amber":"")+'" data-tip="Học viên đặt rồi mà chưa ai chốt lịch">'+dat+' chờ xác nhận</span>'+
+   '<span class="chip'+(vang?" red":"")+'" data-tip="Học viên không đến">'+vang+' vắng</span>'+
+   (huy?('<span class="chip">'+huy+' huỷ</span>'):'')+
+   '<span class="mut" style="font-size:11.5px">tổng '+tong+'</span></div></div>';
+  var dtb=trongKy.filter(function(w){return num(w.wow_overall)>0});
+  if(dtb.length){var tb=dtb.reduce(function(s,w){return s+num(w.wow_overall)},0)/dtb.length;
+   h+='<div class="rost"><div class="rn">Điểm buổi trung bình</div><div class="att"><b>'+(Math.round(tb*10)/10)+'</b>'+
+    '<span class="mut" style="font-size:11.5px">trên '+dtb.length+' buổi đã chấm</span></div></div>'}
+ }
+ /* Ba hàng chờ bày thành BA DÒNG BẤM ĐƯỢC - một con số không bấm được thì người đọc phải tự đi
+    tìm chỗ xử lý, và phần lớn sẽ không đi. */
+ var hang=[["Chờ xác nhận lịch",choXN.length,"confirm","Học viên đặt rồi mà chưa ai chốt lịch - để lâu là mất buổi"],
+           ["Đã dạy, chưa ghi nội dung",choGhi.length,"note","Quá "+num(paramOf("slaWowNote_hours",24))+" giờ chưa ghi là hụt SLA"],
+           ["Vắng, chưa hỏi lý do",vangChuaHoi.length,"noshow","Không hỏi lý do thì không biết có mất học viên không"]];
+ h+='<div class="sechd" style="margin-top:6px">Đang chờ bạn</div>';
+ hang.forEach(function(x){
+  h+='<div class="rost"><div class="rn">'+esc(x[0])+'</div>'+
+   '<div class="chst"><span class="chip'+(x[1]?" amber":" green")+'">'+x[1]+'</span></div>'+
+   '<div class="chtm">'+esc(x[3])+'</div>'+
+   '<div class="att">'+(x[1]?('<button class="pill" onclick="fset(\'wow\',\''+x[2]+'\');go(\'wow\')">Mở danh sách</button>'):'<span class="mut" style="font-size:11.5px">xong</span>')+'</div></div>'});
+ return h+'</div></div>'}
+/* TIỀN - dàn bài của Kế toán mở đầu bằng đúng bảng này. Dùng lại `cnDs()` của trang Công nợ chứ
+   không cộng lại lần nữa: hai nơi cùng cộng một số tiền thì kiểu gì cũng có ngày lệch, và lệch
+   tiền là loại lệch không ai tha. */
+function bcTienHTML(){
+ if(dsLevel("tien")==="none")return "";
+ var G=[];try{G=cnDs()}catch(e){return ""}
+ if(!G.length)return "";
+ function S(f){return G.reduce(function(t,x){return t+x[f]},0)}
+ var no=G.filter(function(x){return x.con>0}),qh=G.filter(function(x){return x.quahan>0}),
+     thieuCT=G.filter(function(x){return (x.thieu+x.ctLy)>0});
+ var hoan=[];try{hoan=duyRefundList()}catch(e){}
+ var R=repRange();
+ var h='<div class="panel"><div class="ph"><b><i class="ti ti-cash" style="margin-right:6px"></i>Tiền và công nợ ('+esc(R.lb)+')</b>'+
+  '<div class="mini"><button class="pill" onclick="go(\'congno\')">Mở Công nợ</button></div></div><div class="pbody">';
+ h+='<div class="rost"><div class="rn">Giá trị hợp đồng</div><div class="att"><b>'+vnd(S("tong"))+'</b>'+
+  '<span class="mut" style="font-size:11.5px">'+G.length+' học viên có đơn trong kỳ</span></div></div>';
+ h+='<div class="rost"><div class="rn">Đã thu</div><div class="att"><b style="color:var(--green)">'+vnd(S("thu"))+'</b></div></div>';
+ h+='<div class="rost"><div class="rn">Còn phải thu</div><div class="att"><b style="color:#B45309">'+vnd(S("con"))+'</b>'+
+  '<span class="mut" style="font-size:11.5px">'+no.length+' học viên</span></div></div>';
+ h+='<div class="rost"><div class="rn">Trong đó đã quá hạn</div>'+
+  '<div class="chst"><span class="chip'+(S("quahan")>0?" red":" green")+'">'+vnd(S("quahan"))+'</span></div>'+
+  '<div class="chtm">'+qh.length+' học viên - đây là phần phải gọi ngay, không phải phần chờ tới hạn</div>'+
+  '<div class="att">'+(qh.length?'<button class="pill" onclick="window.CNLOC=\'quahan\';go(\'congno\')">Mở danh sách</button>':'<span class="mut" style="font-size:11.5px">xong</span>')+'</div></div>';
+ h+='<div class="sechd" style="margin-top:6px">Đang chờ bạn</div>';
+ h+='<div class="rost"><div class="rn">Phiếu thu chưa có chứng từ</div>'+
+  '<div class="chst"><span class="chip'+(thieuCT.length?" amber":" green")+'">'+thieuCT.length+'</span></div>'+
+  '<div class="chtm">Không có ảnh chứng từ thì đối soát ngân hàng không khớp được</div>'+
+  '<div class="att">'+(thieuCT.length?'<button class="pill" onclick="window.CNLOC=\'thieu\';go(\'congno\')">Mở danh sách</button>':'<span class="mut" style="font-size:11.5px">xong</span>')+'</div></div>';
+ h+='<div class="rost"><div class="rn">Hoàn tiền chờ xử lý</div>'+
+  '<div class="chst"><span class="chip'+(hoan.length?" amber":" green")+'">'+hoan.length+'</span></div>'+
+  '<div class="chtm">Hoàn trễ là học viên đã nghỉ rồi còn giữ ấn tượng xấu</div>'+
+  '<div class="att">'+(hoan.length?'<button class="pill" onclick="go(\'duyethoan\')">Mở danh sách</button>':'<span class="mut" style="font-size:11.5px">xong</span>')+'</div></div>';
+ return h+'</div></div>'}
+/* NHÂN SỰ - dàn bài của HR trước bản này chỉ có 6 chỉ số và không một cái bảng nào. Bảng của họ
+   là NGƯỜI: quân số theo phòng, ai mới vào, ai đã nghỉ. */
+function bcNhanSuHTML(){
+ var NV=srows("DL01");if(!NV.length)return "";
+ function sng(x){return !/inactive|nghỉ|nghi_viec|resigned/i.test(String(x.status||""))}
+ var dang=NV.filter(sng),nghi=NV.filter(function(x){return !sng(x)});
+ /* Gom theo NHÓM PHÂN QUYỀN chứ không theo chuỗi phòng ban tự do: nhóm là thứ app đã dùng để
+    chia việc và chia quyền, nên hai bảng nói cùng một cách chia. */
+ var theo={},th=[];
+ dang.forEach(function(x){var g="";try{g=(buildScope(ecode(x.role))||{}).group||"khac"}catch(e){g="khac"}
+  if(!theo[g]){theo[g]={g:g,n:0,ten:(NHIPTEN&&NHIPTEN[g])||g};th.push(theo[g])}
+  theo[g].n++});
+ th.sort(function(a,b){return b.n-a.n});
+ var moi=dang.filter(function(x){var d=pvnd(x.start_date||x.hire_date||x.created_time);
+  return !!d&&(Date.now()-d.getTime())<90*864e5});
+ var h='<div class="panel"><div class="ph"><b><i class="ti ti-users" style="margin-right:6px"></i>Quân số theo nhóm</b>'+
+  '<div class="mini"><button class="pill" onclick="go(\'nhansu\')">Mở Nhân sự</button></div></div><div class="pbody">';
+ h+='<div class="rost"><div class="rn">Đang làm việc</div><div class="att"><b>'+dang.length+'</b>'+
+  (nghi.length?('<span class="mut" style="font-size:11.5px">'+nghi.length+' đã nghỉ</span>'):'')+'</div></div>';
+ th.forEach(function(x){
+  h+='<div class="rost"><div class="rn">'+esc(x.ten)+'</div>'+
+   '<div class="chst"><span class="chip">'+x.n+' người</span></div>'+
+   '<div class="chtm">'+(Math.round(x.n*100/dang.length))+'% quân số</div><div class="att"></div></div>'});
+ if(moi.length){
+  h+='<div class="sechd" style="margin-top:6px">Mới vào dưới 90 ngày - còn trong kỳ theo dõi</div>';
+  moi.slice(0,8).forEach(function(x){
+   h+='<div class="rost"><div class="rn">'+nguoiLnk(x.staff_id,x.full_name)+'</div>'+
+    '<div class="chst"><span class="chip">'+esc(elabel(x.role)||"")+'</span></div>'+
+    '<div class="chtm">vào '+esc(x.start_date||x.hire_date||"-")+'</div><div class="att"></div></div>'});
+ }
+ return h+'</div></div>'}
+/* VIỆC CỦA CHÍNH TÔI - nhân viên tuyến dưới (NV Tư vấn, NV Marketing) trước bản này có phễu và
+   KPI nhưng KHÔNG MỘT BẢNG NÀO. Một bản báo cáo chỉ toàn tỷ lệ mà không nói "vậy giờ tôi phải
+   làm gì" thì người đọc gấp trang lại và không quay lại nữa. */
+function bcViecToiHTML(){
+ var L=[];try{L=nhipList()}catch(e){return ""}
+ L=L.filter(function(x){return !x.hab&&x.n>0});
+ if(!L.length)return "";
+ var h='<div class="panel"><div class="ph"><b><i class="ti ti-checklist" style="margin-right:6px"></i>Đang chờ bạn xử lý</b>'+
+  '<div class="mini"><button class="pill" onclick="go(\'viec\')">Mở Việc hôm nay</button></div></div><div class="pbody">';
+ L.slice(0,7).forEach(function(x){
+  h+='<div class="rost"><div class="rn">'+esc(x.t)+'</div>'+
+   '<div class="chst"><span class="chip'+(x.n?" amber":" green")+'">'+x.n+'</span></div>'+
+   '<div class="chtm">'+esc(x.vi||"")+'</div>'+
+   '<div class="att"><button class="pill" onclick="jumpFlow('+JSON.stringify(x.page).split('"').join("&quot;")+','+JSON.stringify(x.chip||"").split('"').join("&quot;")+')">Mở</button></div></div>'});
+ return h+'</div></div>'}
 function bcNguyCoHTML(){
  var rk=srows("DL09").filter(stuRisk);
  var h='<div class="panel"><div class="ph"><b>Học viên nguy cơ cần theo dõi ('+rk.length+')</b><div class="mini"><button class="pill" onclick="go(\'viec\')">Mở Việc hôm nay</button></div></div><div class="tbwrap"><table class="dt"><thead><tr><th>Mã HV</th><th>Họ tên</th><th>Chuyên cần</th><th>Học thuật</th><th>Việc cần làm</th></tr></thead><tbody>';

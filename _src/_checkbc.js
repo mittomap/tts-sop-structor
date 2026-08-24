@@ -99,13 +99,18 @@ const DAU = {
   nguon:     /Hiệu quả theo NGUỒN lead/,
   doitv:     /Hiệu suất đội tư vấn/,
   phongban:  /Việc đang nợ theo phòng ban/,
-  hvnguyco:  /Học viên nguy cơ cần theo dõi/
+  hvnguyco:  /Học viên nguy cơ cần theo dõi/,
+  wow:       /Buổi WOW 1-1 \(/,
+  tien:      /Tiền và công nợ \(/,
+  nhansu:    /Quân số theo nhóm/,
+  viectoi:   /Đang chờ bạn xử lý/
 };
 /* Khối của MIỀN nào - dùng cho B4. Thấy một khối ở đây mà miền tương ứng là "none" thì đó là rò
    nghiệp vụ: không rò một dòng dữ liệu, nhưng rò cả một câu hỏi không phải của họ. */
 const MIEN = {
   pheu: "lead", leadtt: "lead", nguon: "lead", doitv: "lead",
-  hvbieu: "hocvien", hvnguyco: "hocvien"
+  hvbieu: "hocvien", hvnguyco: "hocvien",
+  tien: "tien"
 };
 
 /* Một người thật cho mỗi chức danh, đóng vai rồi vẽ trang Chỉ số. */
@@ -179,10 +184,10 @@ GHE.forEach(rc => {
     marketing: ["nguon", "pheu", "leadtt"], marketingql: ["nguon", "pheu", "leadtt"],
     aca: ["hvbieu", "hvnguyco"], acaql: ["hvbieu", "hvnguyco"], giaovien: ["hvbieu", "hvnguyco"],
     hocvu: ["hvnguyco", "hvbieu"], hocvuql: ["hvnguyco", "hvbieu"],
-    wow: ["sapdien", "hvnguyco"], wowql: ["sapdien", "hvnguyco"],
-    ketoan: ["kinhdoanh", "sapdien"], ketoanql: ["kinhdoanh", "sapdien"],
-    nhansu: ["vh11", "phongban", "kpi"],
-    dieuhanh: ["tinhhinh", "top3", "coso"], hotro: ["sapdien", "kpi"]
+    wow: ["wow", "sapdien", "hvnguyco"], wowql: ["wow", "sapdien", "hvnguyco"],
+    ketoan: ["tien", "kinhdoanh", "sapdien"], ketoanql: ["tien", "kinhdoanh", "sapdien"],
+    nhansu: ["nhansu", "vh11", "phongban", "kpi", "viectoi"],
+    dieuhanh: ["tinhhinh", "top3", "coso"], hotro: ["viectoi", "sapdien", "kpi"]
   };
   const cd = CHUDE[key];
   if (cd && khoiVe.length)
