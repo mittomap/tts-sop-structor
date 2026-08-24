@@ -46,8 +46,19 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
    Tên nhóm 10px đứng trên các mục con 13px - nhóm NHỎ HƠN thứ nó chứa, đọc ra là ngược thứ bậc;
    nhóm sổ ra rồi thì mắt không còn phân biệt đâu là đầu nhóm, đâu là mục. Nay nhóm to hơn và
    nặng nét hơn mục con. */
-.navlbl{font-size:12px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:#7E93B2;margin:9px 2px 2px;display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;cursor:pointer;user-select:none;transition:.12s}
+.navlbl{font-size:12px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:#B9C6D6;margin:9px 2px 2px;display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;cursor:pointer;user-select:none;transition:.12s}
 .navlbl:hover{background:#ffffff10;color:#B9C6D6}
+/* ═══ V2 18/08 - CHA PHẢI NỔI HƠN CON (anh Luân, kèm ảnh menu: *"menu thiết kế xấu quá, theo
+   nhóm mà nhóm lại thiếu nổi bật hơn bên trong"*) ═════════════════════════════════════════════
+   Đo ra thì anh đúng bằng SỐ, không phải cảm giác: tên nhóm dùng mã tối (độ sáng ~145 trên nền
+   menu) còn tên kệ dùng mã sáng (~162 sau khi tính cả opacity). Cộng thêm CẢ HAI cùng weight
+   800, cùng viết hoa, cùng giãn chữ - nên hai cấp trông như một cấp, chỉ khác mỗi thụt lề.
+   Kệ là thứ em vừa thêm hôm nay cho nhóm "Chờ duyệt", nhưng lỗi thì có sẵn ở mọi nhóm có kệ.
+   Sửa bằng cách HOÁN ĐỔI hai mã đã có (bảng màu chạm trần 110 mã, thêm mã mới là `_checkux` đỏ)
+   và cho nhóm ĐANG MỞ một nền nhẹ - nền là thứ tách hai cấp mạnh hơn mọi khác biệt về cỡ chữ.
+   *Thứ bậc không đọc bằng cách so hai con số cỡ chữ hơn kém nhau 1px - nó đọc bằng cái nào có
+   nền, cái nào không.* */
+.navlbl.open{background:#ffffff10}
 .navlbl>span{flex:1;min-width:0}
 .navchev{font-size:13px;flex:none;transition:transform .15s;opacity:.75}
 .navlbl.open .navchev{transform:rotate(90deg)}
@@ -404,8 +415,8 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    VÀ ĐỪNG VIẾT MÃ MÀU RA TRONG CHÚ THÍCH: khối chú thích này nằm trong chuỗi CSS nên nó được
    in THẲNG vào file dựng, mà thước đếm mã hex trên chính file ấy - nhắc tên mã trong lời giải
    thích là tự cộng thêm một mã. Dự án đã cắn đúng bẫy này một lần với dải viền màu. */
-.navke{font-size:11px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;
- color:#B9C6D6;opacity:.75;padding:10px 12px 4px 34px;user-select:none}
+.navke{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
+ color:#7E93B2;opacity:1;padding:10px 12px 4px 34px;user-select:none}
 .navke:first-child{padding-top:2px}
 .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px;margin-bottom:20px}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px;cursor:pointer}
@@ -3258,6 +3269,46 @@ function tshAuto(){
  if(!d)return 0;
  var n=tshApply(d);
  if(n)setTimeout(function(){toast("Dữ liệu demo đã được kéo về hiện tại ("+(d>0?"+":"")+d+" ngày, "+n+" mốc thời gian) để lịch và hạn xử lý còn hợp lý.",6000)},900);
+ return n}
+/* ═══ V2 18/08 - NHẬT KÝ GIEO SẴN PHẢI CHẠM TỚI HÔM NAY (anh Luân: *"cái nút reset data, giờ
+   anh bấm cái thì nó có đủ demo rồi phải ko"*) ══════════════════════════════════════════════
+   Đo thật sau khi bấm Reset: **chip "Hôm nay" của sổ Nhật ký ra 0**. Dữ liệu dựng 22/08, hôm nay
+   24/08 - lệch 2 ngày, mà `tshApply` chỉ dịch theo BỘI SỐ 7 (cố ý, để giữ nguyên thứ trong tuần).
+   Nên độ lệch 1-6 ngày là chuyện BÌNH THƯỜNG và luôn tồn tại.
+   Các bảng khác sống được với độ lệch ấy vì chúng gieo PHỦ ĐỀU 0..+7 ngày (`_phuDeu` trong
+   gen_demo.py) - hôm nay rơi vào đâu trong khoảng đó cũng có dữ liệu. Nhật ký thì ngược hẳn: nó
+   là chuyện ĐÃ XẢY RA, mọi dòng đều ≤ mốc neo, nên hôm nay luôn nằm SAU dòng mới nhất.
+   *Một bảng chỉ có quá khứ thì không thể phủ đều về phía trước - phép kéo chung không cứu được
+   nó, và đó là lý do chính đáng để nó có phép kéo riêng.*
+   Sổ này KHÔNG ràng buộc thứ trong tuần (không ai xem "ai sửa gì vào các thứ Ba"), nên nó được
+   kéo theo NGÀY THẬT chứ không theo bội số 7. Chỉ đụng dòng gieo sẵn (`nguon:"demo"`) - thao tác
+   thật của người dùng trong phiên không bao giờ bị dịch. */
+function nkDemoKeo(){
+ if(SVR)return 0;
+ var L=null;try{L=(DATA.dl&&DATA.dl.DL25)||null}catch(e){}
+ if(!L||!L.length)return 0;
+ var ds=L.filter(function(e){return String(e&&e.nguon||"")==="demo"});
+ if(!ds.length)return 0;
+ var moi=null;
+ ds.forEach(function(e){var d=pvnd(e.log_time);if(d&&(!moi||d>moi))moi=d});
+ if(!moi)return 0;
+ /* DỊCH THEO PHÚT, KHÔNG THEO NGÀY - và đây là lượt sửa thứ ba của cùng một hàm, đáng ghi lại.
+    Bản 1 dịch theo ngày: dữ liệu dựng cùng ngày thì `days===0`, không dịch gì, mà dòng gieo ở
+    giờ hành chính (13:20) vẫn là TƯƠNG LAI với người mở app lúc 2 giờ sáng.
+    Bản 2 thêm bước kẹp "dòng nào ở tương lai thì lùi một ngày" - hết ghi chuyện ngày mai, nhưng
+    lùi xong thì chip "Hôm nay" về 0, tức chữa một bệnh bằng cách gây một bệnh khác.
+    Bản này dịch cả cụm sao cho dòng MỚI NHẤT vừa xảy ra cách đây ít phút. Một phép dịch trả lời
+    được cả hai câu, vì cả hai câu vốn là một: *"lịch sử này phải vừa mới xảy ra"*.
+    Nhật ký không ràng buộc thứ trong tuần hay giờ hành chính (không ai xem "ai sửa gì vào các
+    thứ Ba lúc 9 giờ"), nên nó dịch được theo phút - khác hẳn lịch học. */
+ var tre=num(paramOf("demoLogFresh_minutes",25))||25;
+ var lech=Date.now()-tre*60000-moi.getTime();
+ if(Math.abs(lech)<60000)return 0;
+ function dich(v,ms){var d=pvnd(v);if(!d)return null;
+  var x=new Date(d.getTime()+ms);function p(n){return n<10?"0"+n:n}
+  return p(x.getDate())+"/"+p(x.getMonth()+1)+"/"+x.getFullYear()+" "+p(x.getHours())+":"+p(x.getMinutes())}
+ var n=0;
+ ds.forEach(function(e){var v=dich(e.log_time,lech);if(v!==null){e.log_time=v;n++}});
  return n}
 /* Nút bấm tay: dịch về hôm nay ngay lập tức. */
 function tshNow(){
@@ -17950,6 +18001,10 @@ var APPPARAMS=[
     M7 bắt đúng: một con số hiện trên màn mà không có bánh răng nào trỏ tới thì nó là hằng số của
     phần mềm, không phải thông số của trung tâm. */
  ["P6 · Buổi học, điểm danh & bài tập","teacherOffLookahead_days","Giáo viên nhìn trước bao nhiêu ngày lịch dạy của mình để báo nghỉ","ngày",14],
+ /* Chỉ có ở bản demo: nhật ký gieo sẵn được kéo lên sao cho dòng mới nhất vừa xảy ra cách đây
+    bấy nhiêu phút - để mở demo lúc nào cũng thấy "hôm nay ai làm gì" mà không có dòng nào ghi
+    một việc chưa xảy ra. */
+ ["Dữ liệu demo","demoLogFresh_minutes","Nhật ký demo: dòng mới nhất vừa xảy ra cách đây bao nhiêu phút","phút",25],
  ["P6 · Buổi học, điểm danh & bài tập","teacherChangeReasons","Danh sách lý do đổi giáo viên cho một buổi. Mỗi lý do ghi \"Tên lý do|co\" nếu tính là buổi GV nghỉ (trừ vào quota), \"|khong\" nếu không tính; các lý do ngăn nhau bằng dấu phẩy","lý do","GV báo nghỉ / bận việc riêng|co, GV ốm đau|co, GV đến trễ / kẹt không tới kịp|co, Trung tâm dời lịch / đổi GV lâu dài|co","text"],
  ["Giao việc nội bộ","slaTaskAccept_hours","Người nhận phải BẤM NHẬN việc trong bao lâu (quá hạn -> nhắc)","giờ",4],
  ["Giao việc nội bộ","slaTaskConfirm_hours","Người giao phải xác nhận sau khi được báo xong trong bao lâu","giờ",24],
@@ -33616,7 +33671,7 @@ function demoGateHV(){var el=document.getElementById("login");if(!el){bootHV();r
 function demoBootHV(){window.HVPORTAL=1;try{hvPHmodeRead()}catch(e){}
  /* V9.30: cổng học viên PHẢI kéo thời gian y hệt cổng nhân viên. Bỏ sót ở đây thì hai cổng mở
     cạnh nhau hiện hai bộ ngày khác nhau - lỗi khó tin nhất khi đang demo trước mặt khách. */
- try{cfEnsure()}catch(e){}try{tshAuto()}catch(e){}
+ try{cfEnsure()}catch(e){}try{tshAuto()}catch(e){}try{nkDemoKeo()}catch(e){}
  try{deriveAll();autoReturnHandovers()}catch(e){}
  if(__base===null)__base=demoPack();
  try{logArm()}catch(e){}
@@ -33911,7 +33966,7 @@ function congDi(w){if(w===congDangO())return;
 function demoBoot(){
  /* V9.30: kéo dữ liệu về hiện tại TRƯỚC khi tính cột dẫn xuất - deriveAll đọc ngày để suy trạng
     thái, chạy sau khi dịch mới ra số đúng. */
- try{cfEnsure()}catch(e){}try{tshAuto()}catch(e){}
+ try{cfEnsure()}catch(e){}try{tshAuto()}catch(e){}try{nkDemoKeo()}catch(e){}
  try{deriveAll();autoReturnHandovers()}catch(e){}
  try{uiApply()}catch(e){}   /* V9.20: áp tên/logo/màu/tiêu đề tab do người dùng cấu hình */
  /* autoReturnHandovers chạy TRƯỚC khi chụp __base: lead tự quay về khi hết hạn bàn giao

@@ -3216,7 +3216,18 @@ def _dungAi(ss, moc):
 
 
 _moc68 = _gioLui(0.75)          # "45 phut truoc", nhung neo vao gio day chu khong vao dong ho
-for _c68 in [x for x in R("DL11") if code(x.get("session_status")) == "scheduled"]:
+# ═══ 18/08 - DOI MOT BUOI THI PHAI HOI XEM CO CUON SO NAO DANG KE VE NGAY CU CUA NO ══════
+# `check_logic` 19a do ra: "so doi lich khai ngay moi 29/06, DL11 dang la 23/08". Khoi nay keo
+# mot buoi ve "45 phut truoc" de tinh huong NA068 luon co that, va hom nay no vo dung buoi ma
+# khoi 14i (so doi lich DL11b) vua viet mot dong ke chuyen. So thi van ke ngay cu, con buoi thi
+# da di cho khac - cuon so noi doi ma khong ai hay.
+# Day la loai vet TROI THEO NGAY CHAY: buoi nao duoc chon phu thuoc ngay dung, nen hom nay do
+# hom qua xanh. Chan tai nguon bang cach bo qua nhung buoi da co ten trong so doi lich.
+# *Mot ban ghi khong chi la mot dong du lieu - no con la thu ma nhung dong khac dang tro toi.*
+_daKeTrongSo = {str(x.get("session_id") or "") for x in R("DL11b")}
+for _c68 in [x for x in R("DL11")
+             if code(x.get("session_status")) == "scheduled"
+             and str(x.get("session_id") or "") not in _daKeTrongSo]:
     _t68 = _mocRanh(_c68, _moc68)
     if not _t68:
         continue
@@ -3229,8 +3240,13 @@ for _c68 in [x for x in R("DL11") if code(x.get("session_status")) == "scheduled
 # NA069 - vua day xong, chua ghi nhan xet, CON TRONG HAN (han slaTeacherNote_hours = 48 gio).
 # Lui them 2 gio nua so voi moc cua NA068 de hai buoi khong roi trung mot phut.
 _moc69 = _gioLui(0.75) - datetime.timedelta(hours=2)
+# Cung cai gac vua dat cho NA068 ngay tren: buoi da co ten trong so doi lich thi ngay cua no
+# dang duoc mot dong khac tro toi - doi no la lam cuon so noi doi. Chinh chu thich ngay duoi
+# da hoc bai nay cho DIEM DANH roi, ma khong di hoi not SO DOI LICH.
+# *Hoc mot bai o mot cho thi phai di hoi moi cho khac dang co cung quan he.*
 for _s69 in [x for x in R("DL11") if code(x.get("session_status")) == "completed"
-             and not str(x.get("teacher_note_summary") or "").strip() and x is not _bo68]:
+             and not str(x.get("teacher_note_summary") or "").strip() and x is not _bo68
+             and str(x.get("session_id") or "") not in _daKeTrongSo]:
     _t69 = _mocRanh(_s69, _moc69)
     if not _t69:
         continue
@@ -3811,10 +3827,20 @@ if not _nghi and _gvN:
     _GHI = [u"S\u1ed1t cao t\u1eeb \u0111\u00eam, c\u00f3 gi\u1ea5y kh\u00e1m c\u1ee7a ph\u00f2ng kh\u00e1m",
             u"\u0110\u00e1m c\u01b0\u1edbi ng\u01b0\u1eddi nh\u00e0 \u1edf t\u1ec9nh, \u0111\u00e3 b\u00e1o tr\u01b0\u1edbc m\u1ed9t tu\u1ea7n",
             u"\u0110au d\u1ea1 d\u00e0y, \u0111ang n\u1eb1m vi\u1ec7n theo d\u00f5i"]
+    # ═══ 18/08 - DON CHO DUYET PHAI CHO BUOI DU XA ═══════════════════════════════════════
+    # Do that sau khi bam Reset: don GVN-0001 "cho duyet" tro vao buoi 23/08 trong khi hom nay
+    # da 24/08 - tuc anh Luan bam Duyet cho mot buoi DA DIEN RA.
+    # Goc: app keo du lieu theo BOI SO 7 (co y, de giu thu trong tuan), nen do lech 1-6 ngay
+    # giua ngay dung va ngay mo app la chuyen BINH THUONG va luon ton tai. Cac bang khac song
+    # duoc voi no vi gieo PHU DEU 0..+7 ngay; mot la don thi chi co MOT ngay, nen phai gieo no
+    # ra ngoai vung troi ay.
+    # *Mot ban ghi don le neo vao "ngay mai" thi no chi dung dung mot ngay.*
+    _CACH = 8               # >= 7 de sau khi lech toi da 6 ngay buoi van con o tuong lai
+    _moc33 = NOW + datetime.timedelta(days=_CACH)
     _ung = []
     for _s33 in R("DL11"):
         _dd = dt(_s33.get("session_date"))
-        if not _dd or _dd <= NOW:
+        if not _dd or _dd <= _moc33:
             continue
         if code(_s33.get("session_status") or "") == "cancelled":
             continue
@@ -3837,9 +3863,9 @@ if not _nghi and _gvN:
         _g33 = ([x for x in R("DL01")
                  if str(x.get("staff_id") or "") == str(_s33.get("teacher_id") or "")] or [{}])[0]
         _c33 = _lopN.get(str(_s33.get("class_id") or ""), {})
-        # Bao truoc 4 ngay (du som) o don dau, 1 ngay (bao gap) o don thu hai - de ca hai nhanh
-        # cua co "bao gap" deu co dong that de xem.
-        _bao = _dd - datetime.timedelta(days=[4, 1, 6][_i33])
+        # BAO LUC luon o QUA KHU (giao vien da bao roi, don dang nam cho) - neo vao NOW chu khong
+        # neo vao ngay buoi hoc, neu khong thi don thu hai co "bao luc" nam o tuong lai.
+        _bao = NOW - datetime.timedelta(days=[1, 2, 3][_i33], hours=[2, 5, 1][_i33])
         _r33 = {
             "nghi_id": "GVN-%04d" % (_i33 + 1),
             "staff_id": _g33.get("staff_id") or "",
@@ -3870,6 +3896,12 @@ if not _nghi and _gvN:
             _r33["duyet_boi_ten"] = _tpAca.get("full_name") or ""
             _r33["duyet_luc"] = (_bao + datetime.timedelta(hours=3)).strftime("%d/%m/%Y %H:%M")
             _r33["duyet_ghichu"] = u"\u0110\u1ed3ng \u00fd - nh\u1edd h\u1ecdc v\u1ee5 xoay ng\u01b0\u1eddi gi\u00fap"
+            # KHONG ep mot don thanh "bao gap" o day. Da thu roi go ra: bao gap nghia la bao_luc
+            # cach buoi < 3 ngay, ma buoi phai o >= NOW+8 (de khong thanh qua khu) con bao_luc
+            # phai <= NOW (da bao roi) - hai rang buoc ay ep khoang cach >= 8 ngay.
+            # *Mot don vua "bao gap" vua "ben qua nhieu ngay" la thu khong ton tai.*
+            # Nen chip "Bao gap" dem 0, va do la TRANG THAI THAT cua trung tam luc ay (khong ai
+            # bao gap), khong phai mot cho hong. Ep no khac 0 bang mot don se hong sau hai ngay.
         elif _i33 == 2:
             # (3) da duyet VA da xep xong nguoi thay - tron vong doi, de nguoi xem thay ket cuc.
             _thay = ([x for x in _gvN
@@ -3942,8 +3974,14 @@ if not _nk:
         # Gia tri THAT cua o do lam "gia tri moi" - dong nhat ky khop voi cai dang nam trong bang.
         _sau = str(_dong.get(_o) or "") if _o else ""
         _truoc = _cu if _cu else (u"(tr\u1ed1ng)" if _sau else "")
-        # Rai deu tren 5 ngay gan nhat, gio hanh chinh, moi tiep lui dan.
-        _luc = NOW - datetime.timedelta(days=_i25 // 5, hours=1 + (_i25 % 5) * 2, minutes=(_i25 * 7) % 60)
+        # ═══ 18/08 - GIO PHAI LA GIO HANH CHINH CO DINH, KHONG LUI TU LUC CHAY PIPELINE ═══
+        # Ban dau: `NOW - hours=1+(i%5)*2`. Pipeline chay luc 02:39 sang thi 4/5 dong cua "hom
+        # nay" roi sang hom qua - do that sau khi bam Reset: chip "Hom nay" chi con 1 dong.
+        # Gio cua mot thao tac khong lien quan gi toi gio chay pipeline; neo vao gio HANH CHINH
+        # thi mo app luc nao trong ngay lam viec cung thay du dong.
+        # *Neo mot moc gia vao dong ho that la de no doi nghia moi lan chay.*
+        _GIO = [(7, 10), (8, 25), (9, 40), (10, 55), (13, 20)][_i25 % 5]
+        _luc = (NOW - datetime.timedelta(days=_i25 // 5)).replace(hour=_GIO[0], minute=_GIO[1])
         _dt25 = {}
         if _o and _kind == "upd":
             _dt25 = {_o: {"tu": _truoc, "den": _sau}}
