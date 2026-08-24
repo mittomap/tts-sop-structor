@@ -14464,7 +14464,10 @@ function btHub(embed){
   h+='<div class="panel"><div class="ph"><b>Thu bài: '+esc(pick2||"-")+'</b><div class="mini"><button class="btn green sm" onclick="confirmRun(\'Lưu tình trạng nộp bài? (đúng hạn / trễ / không nộp)\',\'thuLuu\',\'\')"><i class="ti ti-device-floppy"></i>Lưu thu bài</button></div></div><div class="pbody">';
   if(!list2.length)h+='<div class="empty">Chưa có bài nào để thu. Sang tab Giao bài trước.</div>';
   list2.forEach(function(r){var c=ecode(r.homework_status);var pp=c==="submitted_on_time"?"p":c==="submitted_late"?"l":c==="missing"?"a":"";
-   h+='<div class="rost" data-hwid="'+esc(r.homework_id)+'"><div class="rn">'+nguoiLnk(r.student_id,r.student_name)+' '+hwChip(r)+(r.homework_due_date?' <span class="mut" style="font-weight:500">hạn '+esc(r.homework_due_date)+'</span>':'')+(hwSubmitted(r)?' <span class="mut" style="font-weight:500">· nộp '+esc(r.homework_submitted_time||"")+'</span>':'')+'</div><div class="att">'+
+   h+='<div class="rost thurow" data-hwid="'+esc(r.homework_id)+'"><div class="rn">'+nguoiLnk(r.student_id,r.student_name)+'</div>'+
+    '<div class="chst">'+hwChip(r)+'</div>'+
+    '<div class="chtm">'+(r.homework_due_date?'hạn '+esc(r.homework_due_date):'')+(hwSubmitted(r)?(r.homework_due_date?' · ':'')+'nộp '+esc(r.homework_submitted_time||""):'')+'</div>'+
+    '<div class="att">'+
     '<button class="attb p'+(pp==="p"?" on":"")+'" onclick="ddSet(this)" title="Học viên nộp trong hạn">Nộp đúng hạn</button>'+
     '<button class="attb l'+(pp==="l"?" on":"")+'" onclick="ddSet(this)" title="Học viên CÓ nộp nhưng quá hạn">Nộp trễ</button>'+
     '<button class="attb a'+(pp==="a"?" on":"")+'" onclick="ddSet(this)" title="Không có bài nộp">Không nộp</button></div></div>'});

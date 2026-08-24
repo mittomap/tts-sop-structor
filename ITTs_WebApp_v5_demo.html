@@ -2570,6 +2570,32 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .rost.chrow .hwlate{flex:0 0 132px;font-size:11px;padding:0 4px}
 .rost.chrow .hwgap{flex:0 0 132px}
 .rost.chrow .hwfb{flex:1;min-width:160px}
+/* ═══ V2 24/08 - DÒNG THU BÀI CŨNG BỆNH ĐÚNG NHƯ VẬY, VÀ NÓ Ở NGAY BÊN CẠNH ═════════════════
+   Vá xong màn Chấm bài em dựng phép đo M9 trong `_checkmat` (cắt chữ trong khi hàng còn bỏ
+   trống chỗ) rồi mở thêm ba nấc của trang Bài tập cho nó đi qua - lượt chạy ĐẦU TIÊN đỏ ngay ở
+   nấc **Thu bài**: bỏ trống 507px trên 1100px mà tên học viên, chip và hạn nộp đều cụt. Cùng
+   một bệnh, cùng một trang, chỉ khác cái nút bấm ở trên - và nó đã nằm đó suốt.
+   *Vá một chỗ theo một luật thì phải đi hỏi mọi chỗ khác đang sống dưới luật ấy.* Lần này cái
+   thước đi hỏi hộ, nên chỗ thứ hai lộ ra trong một phút thay vì chờ anh Luân gửi thêm một ảnh.
+   Ba nút thu bài rộng cố định nên để `.chtm` nuốt phần dôi: cụm nút dồn về mép phải, mọi dòng
+   thẳng cột, không còn khoảng trắng chết ở cuối hàng. */
+.rost.thurow .rn{flex:0 0 200px;max-width:200px}
+.rost.thurow .chst{flex:0 0 152px;white-space:nowrap}
+.rost.thurow .chtm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+ font-size:12px;font-weight:500;color:var(--muted)}
+.rost.thurow .att{flex:0 0 auto}
+/* KHỔ HẸP: hai dòng này có cột riêng nên luật chung `.rost .rn{flex:1 1 100%}` không đủ - mấy
+   cột kia vẫn ôm bề rộng cố định rồi chen nhau trong 336px. Cho tất cả cùng xuống dòng và bỏ
+   sàn bề rộng của ô nhận xét (`min-width:160px` chính là thứ đẩy nó tràn ở 390px). */
+@media(max-width:700px){
+ .rost.chrow .rn,.rost.thurow .rn{flex:1 1 100%;max-width:none}
+ .rost.chrow .chst,.rost.thurow .chst,.rost.chrow .chtm,.rost.thurow .chtm{flex:0 0 auto}
+ /* Ô nhận xét xuống hẳn một dòng riêng. Để nó cùng dòng với ô điểm và ô "nộp thế nào" thì
+    336px chia ba, phần nó nhận được là 66px - gõ được đúng bốn chữ. Một ô để viết câu nhận xét
+    mà hẹp hơn cái nhãn của chính nó thì nó không còn là ô nhập nữa. */
+ .rost.chrow .att{flex:1 1 100%;min-width:0;flex-wrap:wrap;row-gap:6px}
+ .rost.chrow .hwfb{flex:1 1 100%;min-width:0}
+ .rost.chrow .hwgap{display:none}}
 .att{display:flex;gap:5px}.attb{height:28px;padding:0 10px;border-radius:6px;border:1px solid var(--line);background:#fff;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;color:#5A6675}
 .attb.p.on{background:var(--green);border-color:var(--green);color:#fff}.attb.l.on{background:var(--amber);border-color:var(--amber);color:#fff}.attb.a.on{background:var(--red);border-color:var(--red);color:#fff}.attb.mk.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .ddrow{flex-wrap:wrap}
@@ -3361,7 +3387,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">24/08/2026 · <b>1bd190</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">24/08/2026 · <b>df07aa</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -17864,7 +17890,10 @@ function btHub(embed){
   h+='<div class="panel"><div class="ph"><b>Thu bài: '+esc(pick2||"-")+'</b><div class="mini"><button class="btn green sm" onclick="confirmRun(\'Lưu tình trạng nộp bài? (đúng hạn / trễ / không nộp)\',\'thuLuu\',\'\')"><i class="ti ti-device-floppy"></i>Lưu thu bài</button></div></div><div class="pbody">';
   if(!list2.length)h+='<div class="empty">Chưa có bài nào để thu. Sang tab Giao bài trước.</div>';
   list2.forEach(function(r){var c=ecode(r.homework_status);var pp=c==="submitted_on_time"?"p":c==="submitted_late"?"l":c==="missing"?"a":"";
-   h+='<div class="rost" data-hwid="'+esc(r.homework_id)+'"><div class="rn">'+nguoiLnk(r.student_id,r.student_name)+' '+hwChip(r)+(r.homework_due_date?' <span class="mut" style="font-weight:500">hạn '+esc(r.homework_due_date)+'</span>':'')+(hwSubmitted(r)?' <span class="mut" style="font-weight:500">· nộp '+esc(r.homework_submitted_time||"")+'</span>':'')+'</div><div class="att">'+
+   h+='<div class="rost thurow" data-hwid="'+esc(r.homework_id)+'"><div class="rn">'+nguoiLnk(r.student_id,r.student_name)+'</div>'+
+    '<div class="chst">'+hwChip(r)+'</div>'+
+    '<div class="chtm">'+(r.homework_due_date?'hạn '+esc(r.homework_due_date):'')+(hwSubmitted(r)?(r.homework_due_date?' · ':'')+'nộp '+esc(r.homework_submitted_time||""):'')+'</div>'+
+    '<div class="att">'+
     '<button class="attb p'+(pp==="p"?" on":"")+'" onclick="ddSet(this)" title="Học viên nộp trong hạn">Nộp đúng hạn</button>'+
     '<button class="attb l'+(pp==="l"?" on":"")+'" onclick="ddSet(this)" title="Học viên CÓ nộp nhưng quá hạn">Nộp trễ</button>'+
     '<button class="attb a'+(pp==="a"?" on":"")+'" onclick="ddSet(this)" title="Không có bài nộp">Không nộp</button></div></div>'});

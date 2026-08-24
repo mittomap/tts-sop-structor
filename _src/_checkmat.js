@@ -50,9 +50,27 @@ const PATHS = ["/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
    Nam trang them vao deu la KIEU BO CUC rieng cua ban V2: dai the nhieu o mang so tien
    (`bangcong`), trang ho so nguoi (`giangvien`), trang hai tang danh sach (`baitap`), trang
    luoi thoi gian (`lichtuan`), trang muc luc (`tracuu`). */
+/* V2 24/08 - MỘT TRANG CÓ NHIỀU NẤC THÌ ĐI QUA MỘT NẤC LÀ ĐI QUA MỘT PHẦN.
+   Anh Luân gửi ảnh màn Chấm bài: *"thiết kế nó bị co cụm lại thì phải"* - mọi tên học viên,
+   chip trạng thái và giờ nộp đều cụt, ô điểm hiện "Banc" thay vì "Band 0-9", nửa phải màn hình
+   bỏ trống (đo ra chỉ dùng 63% bề ngang ở khổ 1440px).
+   Bộ này CÓ đi qua trang `baitap` và CÓ phép `batNat` hỏi thẳng trình duyệt "đang cắt chữ chỗ
+   nào" - nhưng nó xanh, vì `go("baitap")` chỉ mở nấc mặc định "Giao bài". Ba nấc còn lại
+   (Thu bài · Chấm bài · Chờ chấm) là BA BỐ CỤC KHÁC HẲN, và chưa nấc nào từng bị đo.
+   Đây là lần thứ BA cùng một cái bẫy, chỉ đổi hình: 06/08 thiếu TRANG `viec` · 09/08 thiếu
+   TRANG `bangcong` · nay thiếu NẤC bên trong một trang đã có tên trong danh sách. Hai lần trước
+   em kết luận "danh sách phải phủ đủ kiểu bố cục" rồi vẫn đếm bố cục theo TÊN TRANG.
+   *Một trang có tên trong danh sách không có nghĩa là mọi thứ trang ấy vẽ ra đều được nhìn.*
+   Mục nào cần đứng ở một chỗ cụ thể thì khai `dat` - câu lệnh chạy ngay trước `go()`. */
 const TRANG = ["banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","hocvien",
                "giaoviec","duyet","baocao","nhansu","khac","canhan","settings","viec",
-               "bangcong","giangvien","baitap","lichtuan","tracuu"];
+               "bangcong","giangvien","baitap","lichtuan","tracuu",
+  /* Màn Điểm danh: cùng dùng luật `.rost .rn{flex:0 0 300px}` với màn Chấm bài, nên hai màn phải
+     đo CÙNG NHAU - luật ấy đúng cho màn này (tên + một chip ngắn) mà bóp chết màn kia. */
+  {k: "diemdanh", ten: "diemdanh"},
+  {k: "baitap", ten: "baitap/thu",     dat: "window.BTMODE='thu'"},
+  {k: "baitap", ten: "baitap/cham",    dat: "try{var _c=(DL.DL13||[]).filter(function(x){return x.class_id})[0];if(_c)window.BTCLASS=_c.class_id}catch(e){} window.BTMODE='cham'"},
+  {k: "baitap", ten: "baitap/chocham", dat: "window.BTMODE='chocham'"}];
 
 /* Chỗ được phép cắt chữ, kèm lý do đọc được. Thêm dòng vào đây là một quyết định. */
 const CAT_OK = [
@@ -110,14 +128,16 @@ const CAT_OK = [
   } catch (e) {} });
   await page.waitForTimeout(600);
 
-  for (const k of TRANG) {
-    const r = await page.evaluate(async ([k, CAT_OK_SRC]) => {
+  for (const M of TRANG.map(x => typeof x === "string" ? {k: x, ten: x} : x)) {
+    const k = M.ten;
+    const r = await page.evaluate(async ([k, CAT_OK_SRC, DAT]) => {
       const CAT_OK = CAT_OK_SRC.map(x => ({khop: new RegExp(x.k, x.f), ly: x.ly}));
-      try { go(k); } catch (e) { return {loi: "khong mo duoc trang"}; }
+      if (DAT && DAT.dat) { try { (0, eval)(DAT.dat); } catch (e) { return {loi: "khong dat duoc nac: " + e.message}; } }
+      try { go(DAT ? DAT.k : k); } catch (e) { return {loi: "khong mo duoc trang"}; }
       await new Promise(r => setTimeout(r, 340));
       const c = document.getElementById("content");
       if (!c) return {loi: "khong co than trang"};
-      const ra = {cat: [], che: [], hep: [], moCoi: [], deNhau: [], thucThe: [], soVo: [], batNat: [], bopCot: [], dem: 0};
+      const ra = {cat: [], che: [], hep: [], moCoi: [], deNhau: [], thucThe: [], soVo: [], batNat: [], bopCot: [], coCum: [], dem: 0};
 
       /* Thước đo bề rộng THẬT của một đoạn chữ với đúng font của nó. Dựng một lần, dùng lại. */
       const do_ = document.createElement("span");
@@ -255,6 +275,54 @@ const CAT_OK = [
           ra.batNat.push('"' + t.slice(0, 30) + '" (.' + (cl.split(" ")[0] || el.tagName) +
                          ") bi cat " + (el.scrollWidth - el.clientWidth) + "px");
         });
+        /* ── M9: CO CỤM - CẮT CHỮ TRONG KHI CHÍNH HÀNG ẤY ĐANG BỎ TRỐNG CHỖ ────────────────
+           Anh Luân 24/08, ảnh màn Chấm bài: *"thiết kế nó bị co cụm lại thì phải"*.
+           Ba phép đo cũ đều không nói được cái sai này, và mỗi cái có lý do riêng:
+            · `batNat` thấy CHỮ BỊ CẮT nhưng không biết bên cạnh còn thừa chỗ - nó báo y hệt một
+              màn thật sự chật, nên đọc xong không biết nên nới hay nên rút gọn nội dung;
+            · M3 CÓ hỏi "hàng chứa nó còn thừa chỗ không", nhưng nó chỉ ngước lên đúng một nấc
+              `.sp,.tbar,.tbtren,.fld,.phead` - trong một dòng danh sách, cha của ô là chính
+              cái dòng, không mang lớp nào trong số đó, nên vế "còn thừa" không bao giờ chạy;
+            · M6 hỏi "chữ bị bóp thành cột hẹp" - ở đây chữ không xuống dòng, nó bị CẮT CỤT.
+           Gốc của lỗi: một dòng flex mà tổng bề rộng các cột nhỏ hơn hẳn bề rộng dòng thì phần
+           dôi ra không rơi vào cột nào - nó nằm trơ ở cuối dòng, trong khi từng cột vẫn cụt chữ.
+           Đo được vì cả hai vế đều là số: hỏi trình duyệt xem có cột nào đang cắt chữ, rồi lấy
+           bề rộng dòng trừ đi tổng bề rộng các cột và các khe.
+           *Cắt chữ vì hết chỗ là một quyết định; cắt chữ trong khi còn chỗ là một chỗ hỏng.* */
+        than.querySelectorAll(".rost, .lrow, .obrow").forEach(hang => {
+          const con = [...hang.children].filter(x => {
+            const r2 = x.getBoundingClientRect();
+            return r2.width > 0 && r2.height > 0 && getComputedStyle(x).position === "static";
+          });
+          if (con.length < 2) return;
+          /* Dòng đã XUỐNG HÀNG (khổ hẹp bật `flex-wrap:wrap`) thì cộng bề rộng theo hàng ngang
+             là vô nghĩa - lúc ấy các cột nằm chồng lên nhau theo chiều dọc. */
+          const dinh = con.map(x => x.getBoundingClientRect().top);
+          if (Math.max(...dinh) - Math.min(...dinh) > 6) return;
+          /* Có cột nào đang cắt chữ không - hỏi cả chính cột lẫn thứ nằm trong nó. */
+          const cut = [];
+          con.forEach(x => {
+            [x, ...x.querySelectorAll("*")].forEach(el => {
+              if (el.children.length) return;
+              if ((el.textContent || "").trim().length < 4) return;
+              const d = el.scrollWidth - el.clientWidth;
+              if (d > 1) cut.push('"' + (el.textContent || "").trim().slice(0, 20) + '" thieu ' + d + "px");
+            });
+          });
+          if (!cut.length) return;
+          const cs = getComputedStyle(hang);
+          const trong = hang.getBoundingClientRect().width
+                      - parseFloat(cs.paddingLeft || 0) - parseFloat(cs.paddingRight || 0);
+          const khe = (parseFloat(cs.columnGap) || parseFloat(cs.gap) || 0) * (con.length - 1);
+          const dung = con.reduce((s, x) => s + x.getBoundingClientRect().width, 0);
+          const thua = trong - dung - khe;
+          /* 60px: đủ để không chạm oan một dòng chỉ dôi vài pixel làm tròn, mà vẫn bắt được ca
+             đã cắn (dôi 415px trên bề ngang 1124px). */
+          if (thua < 60) return;
+          ra.coCum.push("dong ." + (String(hang.className || "").split(" ")[0]) + " bo trong " +
+            Math.round(thua) + "px/" + Math.round(trong) + "px ma van cat chu: " +
+            [...new Set(cut)].slice(0, 3).join(" · "));
+        });
         /* M5 - CON SỐ BỊ BẺ ĐÔI GIỮA HAI CHỮ SỐ.
            Bẫy cắn 09/08, tìm ra bằng mắt: ô "Tiền công tạm tính" hiện `10.660.0` rồi xuống dòng
            `00đ`. `.bsn{overflow-wrap:anywhere}` đúng cho CHỮ dài (thà xuống dòng còn hơn tràn),
@@ -365,7 +433,7 @@ const CAT_OK = [
 
       do_.remove();
       return ra;
-    }, [k, CAT_OK.map(x => ({k: x.khop.source, f: x.khop.flags, ly: x.ly}))]);
+    }, [k, CAT_OK.map(x => ({k: x.khop.source, f: x.khop.flags, ly: x.ly})), M]);
 
     if (r.loi) { do_.push(V.n + " · " + k + ": " + r.loi); continue; }
     soDo += r.dem || 0;
@@ -379,6 +447,7 @@ const CAT_OK = [
     gom(r.soVo, "CON SO BI BE DOI GIUA HAI CHU SO");
     gom(r.batNat, "TRINH DUYET DANG CAT CHU (hoi scrollWidth)");
     gom(r.bopCot, "CHU BI BOP THANH MOT COT HEP");
+    gom(r.coCum, "CO CUM - cat chu trong khi hang con bo trong cho");
   }
 
   /* ═══ M8 · CHA PHẢI NỔI HƠN CON TRÊN MENU (anh Luân 18/08, kèm ảnh: *"menu thiết kế xấu quá,
