@@ -314,7 +314,17 @@ body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:va
 .navchev{font-size:13px;flex:none;transition:transform .15s;opacity:.75}
 .navlbl.open .navchev{transform:rotate(90deg)}
 .navlbl .dot{background:var(--red);color:#fff;font-size:11px;font-weight:800;min-width:14px;height:14px;border-radius:6px;display:flex;align-items:center;justify-content:center;padding:0 3px;letter-spacing:0;flex:none} /* V9.18: badge nhỏ lại - nhóm thu gọn không bị bóp chữ */
-.navlbl .navarc{width:7px;height:7px;border-radius:50%;flex:none;opacity:.9}
+/* ═══ V2 18/08 - CHẤM CHẶNG KHÔNG ĐƯỢC ĐẨY CHỮ (lộ ra khi dựng luật M8b của `_checkmat`) ═════
+   Đo ba cấp trên nhóm CÓ CHẤM: tên nhóm 55px · mục con 52px - **cha thụt sâu hơn con**, và đó
+   là lỗi CÓ SẴN chứ không do kệ. Nhìn cả thanh menu cũng thấy: "LÀM VIỆC" bắt đầu ở 40px còn
+   "ĐANG HỌC" ở 55px, các tên nhóm không thẳng cột, đọc ra lởm chởm.
+   Nguyên nhân: chấm màu nằm TRONG luồng flex nên nó cộng thêm 7px chấm + 6px gap vào mọi thứ
+   đứng sau. Nó là một DẤU HIỆU bên lề, không phải một phần của dòng chữ - nên cho nó ra khỏi
+   luồng, nằm sát mép trái như một dấu chỉ mục. Chữ mọi tên nhóm nay thẳng một cột.
+   *Thứ chỉ để đánh dấu thì không được quyền xê dịch thứ để đọc.* */
+.navlbl{position:relative}
+.navlbl .navarc{width:7px;height:7px;border-radius:50%;flex:none;opacity:.9;
+ position:absolute;left:-6px;top:50%;transform:translateY(-50%)}
 /* V9.23 (Luân): 4 CHẶNG vòng đời phải nổi hẳn so với trang nghiệp vụ - chặng là "bản đồ",
    nghiệp vụ là "chỗ làm việc". Nhóm chặng: chữ sáng hơn + vạch màu chặng chạy dọc mép trái.
    Mục "Tổng quan chặng": viên thuốc nền màu chặng, chữ hoa, không giống mục nghiệp vụ. */
@@ -666,9 +676,22 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    VÀ ĐỪNG VIẾT MÃ MÀU RA TRONG CHÚ THÍCH: khối chú thích này nằm trong chuỗi CSS nên nó được
    in THẲNG vào file dựng, mà thước đếm mã hex trên chính file ấy - nhắc tên mã trong lời giải
    thích là tự cộng thêm một mã. Dự án đã cắn đúng bẫy này một lần với dải viền màu. */
+/* ═══ V2 18/08 lượt 2 (anh Luân: *"con nó phải thụt vào nhiều hơn so với cha chứ, với lại cái
+   nhóm nó padding top, bottom cũng chưa có hợp lý"*) ═════════════════════════════════════════
+   Đo vị trí THẬT của chữ ở ba cấp: nhóm 40px · kệ 44px · mục 52px. Bậc cha→kệ chỉ **4px**, trong
+   khi kệ→mục là 8px - mắt không đọc ra một bậc 4px, nên hai cấp trên trông ngang hàng.
+   Nay tên kệ THẲNG HÀNG VỚI CHỮ CỦA MỤC nó cai quản (cùng 52px): bậc cha→kệ thành 12px, rõ hẳn,
+   và tên kệ nằm đúng trên đầu cột chữ nó gọi tên - đọc ra ngay nó nói về đám dưới.
+
+   KHOẢNG DỌC: đo ra tên kệ cách khối TRÊN 2px và cách mục DƯỚI 0px - nó dính vào cả hai bên như
+   nhau, nên không thuộc về bên nào. Kệ thứ hai còn dính sát mục cuối của kệ trước, trông như một
+   dòng phụ của chính mục ấy.
+   Luật gần-xa: **khoảng TRÊN một tiêu đề phải lớn hơn khoảng DƯỚI nó**, vì nó thuộc về phần nằm
+   dưới. *Cái gì đứng gần nhau thì mắt đọc là một nhóm - khoảng trắng chính là dấu ngoặc.*
+   Kệ ĐẦU TIÊN cần ít khoảng trên hơn: tên nhóm ngay trên nó đã có nền riêng để tách rồi. */
 .navke{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
- color:#7E93B2;opacity:1;padding:10px 12px 4px 34px;user-select:none}
-.navke:first-child{padding-top:2px}
+ color:#7E93B2;opacity:1;padding:15px 12px 2px 42px;user-select:none}
+.navke:first-child{padding-top:10px}
 .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px;margin-bottom:20px}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px;cursor:pointer}
 .kpi:hover{border-color:#C4D2E4}
@@ -3306,7 +3329,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">24/08/2026 · <b>7f8b75</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">24/08/2026 · <b>de1b86</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">

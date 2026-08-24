@@ -402,13 +402,62 @@ const CAT_OK = [
       if(!lb.length||!ke.length)return null;
       function tb2(a){let s=0,n=0;a.forEach(x=>{const v=luma(getComputedStyle(x).color)*(+getComputedStyle(x).opacity||1);
         if(v!=null){s+=v;n++}});return n?Math.round(s/n):null}
-      return {nhom:tb2(lb), ke:tb2(ke), soKe:ke.length};
+      /* Thut le va khoang doc: do HOP CHU chu khong do hop phan tu - khoang trang ma MAT nhin
+         thay nam giua chu voi chu, con rect cua phan tu da nuot ca padding vao trong. Thuoc do
+         theo phan tu luc nao cung ra 0 va noi "khong co khoang cach" trong khi mat thay co. */
+      function hopChu(el){
+        if(!el)return null;
+        const rg=document.createRange(),w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);
+        let n,t=null,b2=null,x=null;
+        while((n=w.nextNode())){ if(!String(n.nodeValue||"").trim())continue; rg.selectNode(n);
+          const r=rg.getBoundingClientRect(); if(!r.width)continue;
+          if(t===null||r.top<t)t=r.top; if(b2===null||r.bottom>b2)b2=r.bottom;
+          if(x===null||r.left<x)x=r.left; }
+        return t===null?null:{t:t,b:b2,x:x};
+      }
+      /* Ba cap tren mot nhom CO KE: ten nhom -> ten ke -> muc dau tien cua ke ay. */
+      let thut=null,gan=null;
+      for(const k1 of ke){
+        const grp=k1.closest(".navgrp"); if(!grp)continue;
+        const lb1=grp.previousElementSibling; if(!lb1||!lb1.classList.contains("navlbl"))continue;
+        let m1=k1.nextElementSibling;
+        while(m1&&!m1.classList.contains("navitem"))m1=m1.nextElementSibling;
+        if(!m1)continue;
+        const a1=hopChu(lb1),a2=hopChu(k1),a3=hopChu(m1);
+        if(!a1||!a2||!a3)continue;
+        if(thut===null)thut={nhom:Math.round(a1.x),ke:Math.round(a2.x),muc:Math.round(a3.x)};
+        const tr0=k1.previousElementSibling?(hopChu(k1.previousElementSibling)||{b:a1.b}).b:a1.b;
+        const tren=Math.round(a2.t-tr0), duoi=Math.round(a3.t-a2.b);
+        if(gan===null||tren-duoi<gan.chenh)gan={tren:tren,duoi:duoi,chenh:tren-duoi};
+      }
+      return {nhom:tb2(lb), ke:tb2(ke), soKe:ke.length, thut:thut, gan:gan};
     });
     if (tb && tb.nhom != null && tb.ke != null) {
       soDo += 2;
       if (tb.nhom <= tb.ke)
         do_.push("M8 THU BAC MENU NGUOC: ten NHOM sang " + tb.nhom + ", ten KE sang " + tb.ke
           + " - cap cha phai noi hon cap con (" + tb.soKe + " ke tren menu)");
+      /* M8b - THUT LE PHAI CO BAC DOC RA DUOC. Do that truoc khi sua: nhom 40 / ke 44 / muc 52 -
+         bac cha->ke chi 4px, mat khong doc ra mot bac 4px. Doi >= 8px, va ten ke khong duoc thut
+         sau hon chinh muc no cai quan. */
+      if (tb.thut) {
+        soDo++;
+        const bac = tb.thut.ke - tb.thut.nhom;
+        if (bac < 8) do_.push("M8b THUT LE MENU KHONG CO BAC: ten nhom o " + tb.thut.nhom
+          + "px, ten ke o " + tb.thut.ke + "px - chenh " + bac + "px, mat khong doc ra (can >= 8px)");
+        if (tb.thut.ke > tb.thut.muc) do_.push("M8b TEN KE THUT SAU HON MUC no cai quan: ke "
+          + tb.thut.ke + "px > muc " + tb.thut.muc + "px");
+      }
+      /* M8c - LUAT GAN-XA. Mot tieu de thuoc ve phan NAM DUOI no, nen khoang TREN phai lon hon
+         khoang DUOI. Do ra 15/15 (bang nhau) thi mat khong biet no thuoc ve ai - dung cai anh
+         Luan goi la "padding top, bottom chua hop ly".
+         *Cai gi dung gan nhau thi mat doc la mot nhom - khoang trang chinh la dau ngoac.* */
+      if (tb.gan) {
+        soDo++;
+        if (tb.gan.tren <= tb.gan.duoi)
+          do_.push("M8c TEN KE DINH DEU HAI BEN: khoang TREN " + tb.gan.tren + "px, khoang DUOI "
+            + tb.gan.duoi + "px - tieu de thuoc ve phan nam DUOI no, khoang tren phai lon hon");
+      }
     }
   }
 
