@@ -403,15 +403,59 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 45 BỘ KIỂM, XANH HẾT 45/45 (verify trọn bộ 18/08 trên chính bản này, 46m18s).
-> Bản dựng đang chạy: `1741ce` (18/08 - GIÁO VIÊN BÁO NGHỈ (DL33) · NHẬT KÝ RỜI KHỎI CÀI ĐẶT ·
-> BỐN LỖ PHÂN QUYỀN · RESET DEMO ĐỨNG VỮNG QUA NGÀY · THỨ BẬC MENU · **bộ kiểm thứ 45
-> `_checkghe`** + ba luật M8/M8b/M8c của `_checkmat`), đã lên
-> https://mittomap.github.io/itts-sop-demo-v2/ .
+> **Phiên bản: V2 — 45 BỘ KIỂM. Bản dựng đang chạy: `df07aa` (24/08 - MÀN CHẤM BÀI VÀ THU BÀI
+> HẾT CO CỤM · `_checkmat` có luật M9 và đi qua cả bốn nấc trang Bài tập), đã lên
+> https://mittomap.github.io/itts-sop-demo-v2/ . Verify trọn bộ đang chạy trên chính bản này -
+> lượt trước xanh hết 45/45 trên `1741ce` (18/08, 46m18s).
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `723da0`, `994d3f`, `9ac583`, `10e445`, `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
+> Mốc cũ: `1bd190`, `1741ce`, `723da0`, `994d3f`, `9ac583`, `10e445`, `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
 > `bad7f9`, `a9eb4b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 24/08 - "CO CỤM": CẮT CHỮ TRONG KHI CÒN NGUYÊN CHỖ TRỐNG (anh Luân gửi ảnh màn Chấm
+> bài: *"thiết kế nó bị co cụm lại thì phải"*)
+>
+> Đo ở khổ 1440px: mọi tên học viên, chip trạng thái và giờ nộp đều cụt (thiếu 8-31px), ô điểm
+> hiện **"Banc"** thay vì "Band 0-9", và **nửa phải màn hình bỏ trống** - cả hàng chỉ dùng 63%
+> bề ngang.
+> **Gốc: một luật ĐÚNG bị mang sang chỗ khác mà không hỏi lại nội dung.** `.rost .rn{flex:0 0
+> 300px}` đặt 14/08 cho màn **Điểm danh** - ở đó cột tên chỉ chứa tên cộng một chip ngắn, chốt
+> 300px là để mỗi dòng đúng một dòng. Màn **Chấm bài** mượn nguyên class ấy rồi nhét **BA thứ**
+> vào cùng 300px: tên, chip, giờ nộp. *Một luật đặt cho màn này áp sang màn kia mà không hỏi lại
+> nội dung của nó thì nó bóp chết nội dung ấy.*
+> Tách 4 cột: tên 200 · chip 152 · giờ nộp 170 · cụm nhập (điểm 104 + nhận xét nuốt phần còn
+> lại). Đo lại: 33 dòng thẳng cột, không chỗ nào cụt, dùng 95%. Màn Điểm danh không đổi.
+>
+> **RỒI DỰNG THƯỚC, VÀ THƯỚC BẮT ĐƯỢC CHỖ THỨ HAI TRONG MỘT PHÚT.** Thêm **M9** vào `_checkmat`:
+> một dòng danh sách đang **cắt chữ** trong khi **chính dòng ấy** còn bỏ trống chỗ. Ba phép đo cũ
+> đều không nói được cái sai này, mỗi cái vì một lý do riêng - và đây là chỗ đáng học:
+> · `batNat` **có thấy** chữ bị cắt, nhưng nó không biết bên cạnh còn thừa chỗ, nên nó báo y hệt
+>   một màn thật sự chật - đọc xong không biết nên nới bố cục hay nên rút gọn nội dung;
+> · **M3 có sẵn đúng câu hỏi** "hàng chứa nó còn thừa chỗ không" - nhưng nó chỉ ngước lên đúng
+>   một nấc `.sp,.tbar,.tbtren,.fld,.phead`; trong một dòng danh sách, cha của ô **chính là cái
+>   dòng**, không mang lớp nào trong số đó, nên vế "còn thừa" **chưa bao giờ chạy**;
+> · M6 hỏi "chữ bị bóp thành cột hẹp" - ở đây chữ không xuống dòng, nó bị cắt cụt.
+> *Có sẵn câu hỏi đúng mà hỏi sai chỗ thì cũng bằng không hỏi.*
+>
+> **VÀ MỞ THÊM BA NẤC CHO BỘ KIỂM ĐI QUA - LẦN THỨ BA CÙNG MỘT CÁI BẪY.** `_checkmat` **có** đi
+> qua trang `baitap`, nhưng `go("baitap")` chỉ mở nấc mặc định **Giao bài**; ba nấc còn lại
+> (Thu bài · Chấm bài · Chờ chấm) là ba bố cục khác hẳn và **chưa nấc nào từng bị đo**.
+> 06/08 thiếu TRANG `viec` · 09/08 thiếu TRANG `bangcong` · nay thiếu **NẤC bên trong một trang
+> đã có tên trong danh sách**. Hai lần trước em kết luận "danh sách phải phủ đủ KIỂU BỐ CỤC" rồi
+> vẫn đếm bố cục theo TÊN TRANG. *Một trang có tên trong danh sách không có nghĩa là mọi thứ
+> trang ấy vẽ ra đều được nhìn.* Mục trong `TRANG` nay khai được `dat` - câu lệnh chạy ngay
+> trước `go()`; thêm cả màn `diemdanh` để hai màn sống chung một luật thì đo cùng nhau.
+>
+> **Lượt chạy ĐẦU TIÊN đỏ ngay ở màn Thu bài:** bỏ trống **507px trên 1100px** mà tên, chip và
+> hạn nộp đều cụt. Cùng một bệnh, cùng một trang, chỉ khác cái nút ở trên - và nó nằm đó suốt.
+> *Vá một chỗ theo một luật thì phải đi hỏi mọi chỗ khác đang sống dưới luật ấy* - lần này cái
+> thước đi hỏi hộ, nên chỗ thứ hai lộ ra trong một phút thay vì chờ anh Luân gửi thêm một ảnh.
+> Tách 4 cột như trên, cụm ba nút dồn về mép phải: 33 dòng thẳng cột, dùng 97%.
+> Khổ điện thoại cũng lộ hai chỗ: chip vỡ 3 dòng ở màn Thu bài, và ô Nhận xét chỉ còn **66px**
+> ở màn Chấm bài (ô điểm và ô "nộp thế nào" ăn hết 336px) - *một ô để viết nhận xét mà hẹp hơn
+> cái nhãn của chính nó thì nó không còn là ô nhập nữa*. Thêm media 700px cho cả hai dòng, ô
+> Nhận xét xuống hẳn một dòng riêng. `_checkmat`: 24 trang x 2 khổ, 3090 chuỗi - xanh.
+> **M9 không cần cố tình phá để chứng minh** - nó đỏ thật ngay lượt đầu, ở một chỗ chưa ai chỉ.
 >
 > ### 🟢 18/08 - RESET DEMO PHẢI ĐỨNG VỮNG QUA NGÀY (anh Luân: *"cái nút reset data, giờ anh
 > bấm cái thì nó có đủ demo rồi phải ko"*)

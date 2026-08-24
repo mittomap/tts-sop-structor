@@ -2,6 +2,28 @@
 
 > `ITTs_WebApp_v5_demo.html` là bản app: mở bằng trình duyệt, mọi thao tác ghi thật vào bộ nhớ trình duyệt. **Lớp Google Sheets đã cho nghỉ hưu 30/07** - không còn bản `.gs` nào, mọi cấu hình nằm trong màn Cài đặt của chính app. Khi anh Luân chốt nền tảng backend, 66 chỗ ghi trong app đã có sẵn đường nối ra máy chủ (xem khối ghi chú tại `var SVR=` trong `gen_v5.py`).
 
+## ⭐ MỚI 24/08/2026 — **Chấm bài và Thu bài đọc được theo cột**
+
+Hai màn này trước đây dồn tên học viên, chip trạng thái, hạn nộp và giờ nộp vào **cùng một cột
+300px**, trong khi nửa phải màn hình bỏ trống - mọi dòng đều cụt chữ và ô điểm hiện "Banc" thay
+vì "Band 0-9".
+
+Nay mỗi thứ một cột riêng, bề rộng cố định nên **mọi dòng bắt đầu ở cùng một chỗ**, đọc dọc theo
+cột được:
+
+| | Chấm bài | Thu bài |
+|---|---|---|
+| Cột 1 | Học viên (200px) | Học viên (200px) |
+| Cột 2 | Nộp thế nào (152px) | Nộp thế nào (152px) |
+| Cột 3 | Nộp lúc nào (170px) | Hạn nộp · giờ nộp (nuốt phần dôi) |
+| Cột 4 | Điểm (104px) + Nhận xét (giãn hết phần còn lại) | Ba nút thu bài, dồn về mép phải |
+
+Trên điện thoại cả hàng xuống dòng, ô Nhận xét chiếm trọn một dòng riêng.
+
+**Bộ kiểm `_checkmat` nay có luật M9** - báo đỏ khi một dòng danh sách đang cắt chữ trong lúc
+chính dòng ấy còn bỏ trống chỗ - và nó đi qua **cả bốn nấc** của trang Bài tập (Giao · Thu ·
+Chấm · Chờ chấm) cộng màn Điểm danh, thay vì chỉ nấc mặc định như trước.
+
 ## ⭐ MỚI 10/08/2026 — **Lịch trực WOW**: đặt buổi WOW nay bám vào ca trực có thật
 
 Trước đây app mặc định **lúc nào cũng có người trực**: ô giờ để trống trơn, gõ 03:00 sáng ngày
