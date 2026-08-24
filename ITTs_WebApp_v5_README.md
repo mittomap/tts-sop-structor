@@ -2695,3 +2695,27 @@ người chốt.
 
 Riêng đơn **xin nghỉ của học viên** còn một chỗ nặng hơn hiển thị: cửa ghi phía sau chưa từng
 khoá, nên giáo viên bấm là chốt luôn chuyên cần của học viên. Nay chặn ở cửa ghi.
+
+
+---
+
+# Cập nhật 18/08 (chốt ngày) — Reset demo và thứ bậc menu
+
+## Bấm Reset là có ngay một bộ demo đứng vững
+
+Nút **Dựng lại demo** (Cài đặt → Dữ liệu demo) kéo dữ liệu về gốc *và* về hiện tại. Hai bảng mới
+của hôm nay nay cũng đứng vững qua ngày:
+
+- **Đơn giáo viên báo nghỉ** trỏ vào buổi còn ở phía trước, không phải buổi đã diễn ra.
+- **Nhật ký thao tác** có sẵn lịch sử 5 ngày gần nhất, dòng mới nhất vừa xảy ra ít phút trước -
+  nên mở lúc nào cũng thấy "hôm nay ai làm gì". Đổi ở Cài đặt → CH2, tham số
+  `demoLogFresh_minutes`.
+
+## Menu đọc ra ba cấp
+
+Nhóm → kệ → mục nay khác nhau rõ ở cả ba mặt: **màu** (tên nhóm sáng nhất, có nền khi đang mở),
+**thụt lề** (tên kệ lùi một bậc và thẳng cột với icon của các mục nó cai quản), và **khoảng
+trắng** (khoảng phía trên tên kệ rộng hơn phía dưới, nên mắt đọc ra nó thuộc về đám bên dưới).
+
+Chấm màu của bốn chặng vòng đời nay nằm sát mép trái như một dấu chỉ mục, không đẩy chữ nữa - nên
+tên mọi nhóm thẳng một cột.

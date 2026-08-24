@@ -403,15 +403,80 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 45 BỘ KIỂM, XANH HẾT 45/45 (verify trọn bộ 18/08 trên chính bản này, 35m20s).
-> Bản dựng đang chạy: `723da0` (18/08 - GIÁO VIÊN BÁO NGHỈ (DL33) · NHẬT KÝ RỜI KHỎI CÀI ĐẶT ·
-> BỐN LỖ PHÂN QUYỀN anh Luân bắt tại chỗ · **bộ kiểm thứ 45 `_checkghe`**), đã lên
+> **Phiên bản: V2 — 45 BỘ KIỂM, XANH HẾT 45/45 (verify trọn bộ 18/08 trên chính bản này, 46m18s).
+> Bản dựng đang chạy: `1741ce` (18/08 - GIÁO VIÊN BÁO NGHỈ (DL33) · NHẬT KÝ RỜI KHỎI CÀI ĐẶT ·
+> BỐN LỖ PHÂN QUYỀN · RESET DEMO ĐỨNG VỮNG QUA NGÀY · THỨ BẬC MENU · **bộ kiểm thứ 45
+> `_checkghe`** + ba luật M8/M8b/M8c của `_checkmat`), đã lên
 > https://mittomap.github.io/itts-sop-demo-v2/ .
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
-> Mốc cũ: `994d3f`, `9ac583`, `10e445`, `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
+> Mốc cũ: `723da0`, `994d3f`, `9ac583`, `10e445`, `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
 > `bad7f9`, `a9eb4b`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
+> ### 🟢 18/08 - RESET DEMO PHẢI ĐỨNG VỮNG QUA NGÀY (anh Luân: *"cái nút reset data, giờ anh
+> bấm cái thì nó có đủ demo rồi phải ko"*)
+>
+> Bấm Reset THẬT trên trình duyệt (phá dữ liệu trước rồi bấm): nó nạp lại **đủ** cả hai bảng mới.
+> Nhưng đo kỹ thì ra **hai chỗ hỏng**, cùng một gốc.
+> **App kéo dữ liệu về hôm nay theo BỘI SỐ 7** (cố ý, để giữ nguyên thứ trong tuần), nên độ lệch
+> 1-6 ngày giữa ngày dựng và ngày mở app là chuyện BÌNH THƯỜNG và luôn tồn tại. Các bảng khác
+> sống được với nó vì gieo **phủ đều 0..+7 ngày** (`_phuDeu`) - hôm nay rơi vào đâu cũng có dữ
+> liệu. Hai bảng em vừa thêm không theo hợp đồng đó.
+> · **Đơn "chờ duyệt" trỏ vào buổi HÔM QUA** - anh bấm Duyệt cho một buổi đã diễn ra. Nay gieo
+>   buổi cách mốc ≥ 8 ngày, `bao_luc` neo vào NOW nên luôn ở quá khứ.
+>   Và KHÔNG ép một đơn thành "báo gấp": báo gấp nghĩa là buổi trong <3 ngày, mà buổi ấy vài ngày
+>   nữa là quá khứ. *Một đơn vừa "báo gấp" vừa "bền qua nhiều ngày" là thứ không tồn tại.* Chip
+>   ấy đếm 0, và đó là trạng thái THẬT của trung tâm lúc ấy, không phải một chỗ hỏng.
+> · **Nhật ký: chip "Hôm nay" ra 0.** Sổ này chỉ có QUÁ KHỨ nên không thể phủ đều về phía trước -
+>   phép kéo chung không cứu được nó. *Một bảng chỉ có quá khứ thì phải có phép kéo riêng.*
+>   **SỬA BA LẦN MỚI ĐÚNG, ghi lại cả ba:** bản 1 dịch theo NGÀY - dữ liệu dựng cùng ngày thì
+>   `days===0`, không dịch gì, mà dòng gieo ở giờ hành chính vẫn là tương lai với người mở app
+>   lúc 2 giờ sáng. Bản 2 thêm bước kẹp "dòng nào ở tương lai thì lùi một ngày" - hết ghi chuyện
+>   ngày mai, nhưng chip Hôm nay lại về 0, tức **chữa một bệnh bằng cách gây một bệnh khác**.
+>   Bản 3 dịch cả cụm theo PHÚT sao cho dòng mới nhất vừa xảy ra 25 phút trước (CH2
+>   `demoLogFresh_minutes`) - một phép dịch trả lời được cả hai câu, vì cả hai vốn là một.
+> · Gieo giờ HÀNH CHÍNH cố định thay vì lùi từ lúc chạy pipeline: pipeline chạy 02:39 sáng thì
+>   4/5 dòng của "hôm nay" rơi sang hôm qua. *Neo một mốc giả vào đồng hồ thật là để nó đổi
+>   nghĩa mỗi lần chạy.*
+> · Và một chỗ đỏ CÓ SẴN lộ ra: `fixdata` NA068/NA069 kéo một buổi mà **không hỏi sổ đổi lịch
+>   DL11b đang kể về ngày cũ của nó** (`check_logic` 19a). Chú thích của chính NA069 đã học bài
+>   này cho ĐIỂM DANH mà không đi hỏi nốt SỔ ĐỔI LỊCH. *Học một bài ở một chỗ thì phải đi hỏi
+>   mọi chỗ khác đang có cùng quan hệ.*
+
+> ### 🟢 18/08 - THỨ BẬC MENU: BA LƯỢT ANH LUÂN CHỈ, BA LẦN EM ĐO SAI THỨ
+>
+> Anh chỉ ba lượt, mỗi lượt sâu hơn một tầng - và cả ba đều là **em đo sai thứ rồi kết luận là xong**.
+> 1. *"menu thiết kế xấu quá, theo nhóm mà nhóm lại thiếu nổi bật hơn bên trong"* → đo màu: tên
+>    nhóm sáng 145, tên kệ sáng 162 - **con sáng hơn cha**, lại cùng weight 800, cùng viết hoa.
+>    Hoán đổi hai mã đã có (bảng màu chạm trần 110 mã) + cho nhóm đang mở một nền nhẹ.
+>    *Thứ bậc đọc bằng cái nào có nền, không bằng hai con số cỡ chữ hơn kém nhau 1px.*
+> 2. *"con nó phải thụt vào nhiều hơn so với cha chứ, với lại padding top, bottom cũng chưa hợp
+>    lý"* → bậc thụt cha→kệ chỉ **4px**; khoảng dọc trên/dưới tên kệ **bằng nhau (15/15)** nên nó
+>    không thuộc về bên nào, kệ thứ hai còn dính sát mục cuối của kệ trước.
+>    Luật gần-xa: **khoảng TRÊN một tiêu đề phải lớn hơn khoảng DƯỚI**, vì nó thuộc phần nằm dưới.
+>    Sửa xong thì lộ một lỗ CÓ SẴN: **chấm chặng nằm trong luồng flex** nên đẩy chữ nhóm sang
+>    55px trong khi mục con ở 52px - cha thụt sâu hơn con, và các tên nhóm không thẳng cột.
+>    Cho chấm ra khỏi luồng. *Thứ chỉ để đánh dấu thì không được quyền xê dịch thứ để đọc.*
+> 3. *"thụt lề vẫn sai phải ko?"* (kèm ảnh cận cảnh) → **lỗi ở CÁI THƯỚC**: em đo mép trái của
+>    CHỮ và đọc ra "40/52/52 - đã có bậc". Nhưng mắt đọc thụt lề theo thứ NHÌN THẤY ĐẦU TIÊN trên
+>    dòng, mà dòng của một mục menu bắt đầu bằng **icon**. Đo lại theo mép NỘI DUNG: nhóm 20 · kệ
+>    52 · mục 21 - tên kệ thụt sâu hơn chính mục nó cai quản 31px.
+>    *Đo thụt lề thì phải đo từ thứ đầu tiên mắt chạm tới, không phải từ chữ.*
+>    Nay đánh dấu nhóm có kệ (`navgrp.coke`) rồi thụt CẢ kệ LẪN mục vào một bậc.
+>    Đã thử mốc 23px rồi bỏ: đúng theo nội dung (33>20) nhưng chữ kệ nhô TRÁI hơn chữ nhóm
+>    (33<40). *Một con số đúng theo phép đo này mà sai theo phép đo kia thì chưa phải con số đúng.*
+>
+> **Ba luật mới trong `_checkmat`, và cả ba đều đã được THỬ LÀM HỎNG có chủ ý để chắc chúng bắt:**
+> **M8** tên nhóm phải sáng hơn tên kệ · **M8b** thụt lề phải có bậc ≥8px, tên kệ thẳng cột với
+> mục nó cai quản, và chữ kệ không nhô trái hơn chữ nhóm (đo CẢ HAI phép) · **M8c** khoảng trên
+> tiêu đề phải lớn hơn khoảng dưới. Chính M8b bắt được lỗ chấm chặng.
+> Thước cũng phải sửa hai lần: nó đo `top` của cả ô (đã gồm padding) nên khoảng dọc lúc nào cũng
+> ra 0 - phải đo **chữ với chữ** mới nói đúng cái mắt thấy.
+>
+> **Và một chỗ verify bắt cuối cùng:** thêm tham số CH2 vào một nhóm CHƯA TỪNG CÓ mà quên khai
+> trong `CFNHOM` - **lần thứ hai cùng chỗ hụt này** (lần trước 14/08). *Bảng tham số và bảng nhóm
+> là hai bảng; sửa một bên không tự sửa bên kia.*
+
 > ### 🟢 18/08 - LỖ THỨ BA VÀ THỨ TƯ: "MỜI RỒI ĐUỔI" Ở BA HÀNG CHỜ DUYỆT
 >
 > Anh Luân: *"Học vụ theo dõi thôi chứ được duyệt giáo viên nghỉ khi nào nhỉ???"*
