@@ -504,6 +504,29 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .pill{height:29px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--muted);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;
  white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
 .pill:hover{border-color:#B9C6D6}.pill.on{background:var(--navy);border-color:var(--navy);color:#fff}
+/* ═══ V2 24/08 - KHO CÂU HỎI GỢI Ý PHẢI CĂN THEO CỘT (anh Luân: *"căn theo cột nhìn cho nó bài
+   bản em, luộm thuộm quá"*) ══════════════════════════════════════════════════════════════════
+   Bản cũ dựng mỗi nhóm bằng MỘT hàng flex riêng: nhãn là một item `min-width:132px`, chip là các
+   item sau nó. Hai chỗ hỏng, và cả hai đều là hệ quả của việc mỗi hàng tự quyết lấy bề rộng cột:
+    · `min-width` chỉ đặt SÀN, không đặt TRẦN - nhãn "Nghĩa của từ & chỗ chỉnh" dài hơn 132px nên
+      nó nở ra, và cả dải chip của riêng hàng ấy bị đẩy lệch sang phải so với tám hàng kia;
+    · chip tràn dòng thì `flex-wrap` trả nó về MÉP TRÁI của hàng, tức nằm dưới cột NHÃN chứ không
+      thẳng cột với chip - hàng "Tư vấn & Marketing", "Giảng dạy & ACA" và "Quản lý & Giám đốc"
+      đều có dòng hai bắt đầu lệch hẳn ra ngoài cột.
+   Chữa bằng cách đổi thứ ĐANG QUYẾT ĐỊNH bề rộng: một lưới hai cột dùng chung cho CẢ CHÍN nhóm,
+   cột nhãn `max-content` nên nó rộng đúng bằng nhãn dài nhất và mọi hàng dùng chung con số ấy.
+   Chip nằm trong ô lưới của nó nên tràn dòng là tự thụt vào đúng cột.
+   *Chín hàng tự đo lấy cột của mình thì không có cột nào - cột là thứ phải đo một lần cho tất cả.* */
+.qagoi{display:grid;grid-template-columns:max-content minmax(0,1fr);column-gap:14px;row-gap:9px;
+ align-items:start;margin-top:12px}
+.qagl{font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap;line-height:29px}
+.qagc{display:flex;gap:6px;flex-wrap:wrap;min-width:0}
+/* Khổ hẹp: cột nhãn cộng chip dài nhất không đủ chỗ, giữ lưới hai cột là ép chip vỡ chữ. Cho
+   nhãn đứng riêng một dòng trên đầu nhóm của nó - vẫn là nhãn của nhóm ấy, chỉ đổi chỗ đứng. */
+@media(max-width:760px){
+ .qagoi{grid-template-columns:1fr;row-gap:4px}
+ .qagl{line-height:1.5;margin-top:8px}
+ .qagc{margin-bottom:2px}}
 .task{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:8px;margin:6px 4px;background:#fff}
 .task:hover{background:#FAFBFD}
 .task .ti{flex:1;min-width:0}.task .id{font-size:11px;color:var(--navy);font-weight:700}
@@ -29850,10 +29873,10 @@ function renderHoidap(){
   (q?'<button class="btn" onclick="qaXoa()"><i class="ti ti-x"></i>Xóa</button>':'')+'</div>';
  /* Kho câu hỏi bày theo NHÓM GHẾ NGỒI. Dải phẳng chín câu trước đây không nói được cho người
     đọc biết mình được phép hỏi tới đâu; xếp theo team thì mở ra là thấy đúng câu của mình. */
- h+='<div style="margin-top:10px" data-tour="qavd">';
+ /* MỘT lưới cho cả chín nhóm, không phải chín hàng rời - xem chú thích ở `.qagoi` trong CSS. */
+ h+='<div class="qagoi" data-tour="qavd">';
  qaKhoCau().forEach(function(G){
-  h+='<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:7px">'+
-   '<span class="mut" style="font-size:11px;min-width:132px;font-weight:700">'+esc(G[0])+'</span>';
+  h+='<span class="qagl">'+esc(G[0])+'</span><div class="qagc">';
   G[1].forEach(function(x){h+='<button class="pill" onclick="qaViDu('+JSON.stringify(x).split('"').join("&quot;")+')">'+esc(x)+'</button>'});
   h+='</div>'});
  h+='</div></div></div>';

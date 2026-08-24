@@ -26675,10 +26675,10 @@ function renderHoidap(){
   (q?'<button class="btn" onclick="qaXoa()"><i class="ti ti-x"></i>Xóa</button>':'')+'</div>';
  /* Kho câu hỏi bày theo NHÓM GHẾ NGỒI. Dải phẳng chín câu trước đây không nói được cho người
     đọc biết mình được phép hỏi tới đâu; xếp theo team thì mở ra là thấy đúng câu của mình. */
- h+='<div style="margin-top:10px" data-tour="qavd">';
+ /* MỘT lưới cho cả chín nhóm, không phải chín hàng rời - xem chú thích ở `.qagoi` trong CSS. */
+ h+='<div class="qagoi" data-tour="qavd">';
  qaKhoCau().forEach(function(G){
-  h+='<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:7px">'+
-   '<span class="mut" style="font-size:11px;min-width:132px;font-weight:700">'+esc(G[0])+'</span>';
+  h+='<span class="qagl">'+esc(G[0])+'</span><div class="qagc">';
   G[1].forEach(function(x){h+='<button class="pill" onclick="qaViDu('+JSON.stringify(x).split('"').join("&quot;")+')">'+esc(x)+'</button>'});
   h+='</div>'});
  h+='</div></div></div>';
