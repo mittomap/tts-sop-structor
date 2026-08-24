@@ -17953,6 +17953,13 @@ var CFNHOM=[
  ["P7 · Buổi WOW 1-1","Hạn xác nhận buổi mới đặt, hạn ghi nội dung sau buổi, mỗi lần cấp thêm tối đa mấy lượt, và bao lâu không bấm kết thúc thì máy tự chốt.",["hoctap","dswow"]],
  ["P8-P9 · Khảo sát, phản hồi & khiếu nại","Điểm hài lòng dưới mức nào thì phải hỏi lại, hạn phân loại phản hồi, và ba mức hạn xử lý khiếu nại theo độ nghiêm trọng.",["cskh","viec"]],
  ["P10 · Kết thúc khóa & tái đăng ký","Trước khi hết khóa bao nhiêu ngày thì chuẩn bị, bao lâu phải mời tái đăng ký, và học viên bảo lưu bao lâu thì nhắc lại.",["ketthuc","viec"]],
+ /* V2 18/08 - NHÓM "Dữ liệu demo" khai ở đây, lần thứ HAI cùng một chỗ hụt (xem ghi chú ngay
+    dưới, 14/08). Em thêm một tham số vào một nhóm CHƯA TỪNG CÓ mà không khai - `_check16` bắt
+    ngay. Đây là nhóm chỉ có ở bản demo: nó không phải thông số nghiệp vụ của trung tâm, mà là
+    núm vặn để bản demo trông đúng lúc mở ra.
+    *Thêm một tham số thì phải hỏi nhóm của nó đã có tên chưa - bảng tham số và bảng nhóm là hai
+    bảng, sửa một bên không tự sửa bên kia.* */
+ ["Dữ liệu demo","Núm vặn chỉ có ở bản demo chạy trong trình duyệt - không phải thông số nghiệp vụ của trung tâm. Đổi ở đây để bản demo trông đúng ngay lúc mở ra.",["settings"]],
  /* V2 14/08 - NHÓM CÒN THIẾU BẢN KHAI. Hai tham số của tính năng cam kết (dựng sáng nay) đã có
     trong `APPPARAMS` nhưng chưa có dòng nào trong `CFNHOM` - `_check16` bắt đúng: nhóm không khai
     thì màn Cài đặt vẫn hiện tham số, nhưng nó rơi xuống cuối không tiêu đề, không câu giải thích,
