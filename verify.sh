@@ -250,6 +250,11 @@ chay "_checkdrawer hinh hoc ngan keo" "CHECKDRAWER OK" node _checkdrawer.js
 # ban regex dau tien dem 428 cho, that ra chi 101. Xem dau file _checklink.js.
 chay "_checklink ten nguoi bam duoc" "CHECKLINK OK" node _checklink.js
 chay "_checkcrumb vet duong di" "CHECKCRUMB OK" node _checkcrumb.js
+# _checkmuc (26/08) - anh Luan: "e nen xem lai ca cach bo tri menu, a thay no cu chay len chay
+# xuong". Goc la muc luc va than trang co HAI thu tu khac nhau; da chua bang hvSec/hvXep (HVGRP
+# thanh thu tu duy nhat). Bo nay canh cho luat ay khoi troi: cuon THAT bang con lan chuot va so
+# hai thu tu tren DOM. Xem dau file _checkmuc.js.
+chay "_checkmuc muc luc cong hoc vien" "CHECKMUC OK" node _checkmuc.js
 chay "_checklap khong noi hai lan" "CHECKLAP OK" node _checklap.js
 if [ $NHANH -eq 1 ]; then
   ghi "_checkui" BOQUA "bo qua vi chay voi --nhanh"

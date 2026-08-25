@@ -31405,7 +31405,10 @@ function hvSpy(){var box=document.getElementById("hvMain");if(!box)return;
   ds.push([x[0],el.offsetTop])});
  if(!ds.length)return;
  ds.sort(function(a,b){return a[1]-b[1]});
- var day=(box.scrollTop+box.clientHeight>=box.scrollHeight-4);
+ /* "Đang ở đáy" chỉ có nghĩa khi trang THẬT SỰ dài hơn khung - lúc app còn đang dựng, hoặc với
+    một hồ sơ ít nội dung, `scrollHeight` xấp xỉ `clientHeight` nên phép so này luôn đúng và mục
+    cuối luôn thắng. */
+ var day=(box.scrollHeight>box.clientHeight+40)&&(box.scrollTop+box.clientHeight>=box.scrollHeight-4);
  var best=ds[0][0];
  if(day)best=ds[ds.length-1][0];
  else{var vach=box.scrollTop+Math.min(150,Math.round(box.clientHeight*0.3));
@@ -31443,7 +31446,20 @@ function hvRender(){
  document.getElementById("hvWho").textContent=(_ph&&_ph.ten)||S.full_name||"-";
  document.getElementById("hvWho2").textContent=_ph?((_ph.qh||"Người đồng hành")+" của "+(S.full_name||"")):(S.student_id||"");
  document.getElementById("hvAv").textContent=String(S.full_name||"?").trim().split(" ").pop().slice(0,1).toUpperCase();
- hvNav();hvTopPaint();try{cfBarSync()}catch(e){}var box=document.getElementById("hvMain");if(box)box.scrollTop=0;hvSpy()}
+ hvNav();hvTopPaint();try{cfBarSync()}catch(e){}
+ /* ═══ 26/08 - VỀ ĐẦU TRANG PHẢI VỀ NGAY, KHÔNG ĐƯỢC TRƯỢT ════════════════════════════════════
+    `.hvmain` có `scroll-behavior:smooth`, nên `scrollTop=0` KHÔNG về 0 ngay - nó khởi động một
+    quãng trượt. `hvSpy()` chạy ngay dòng sau đó đọc phải vị trí CŨ (đáy trang của hồ sơ vừa
+    xem), thấy "đang ở đáy" nên tô sáng mục CUỐI. Đổi hồ sơ xong, mục lục sáng ở "Giới thiệu bạn
+    bè" cho tới khi người ta cuộn một cái.
+    Bộ kiểm `_checkmuc` bắt được ngay lượt chạy đầu: đường đi bắt đầu bằng `15 15 0 ...`.
+    Tắt hiệu ứng đúng một nhịp rồi bật lại - cuộn mượt là để người ta BẤM mục lục, không phải để
+    app tự về đầu trang.
+    *Một lệnh có hiệu ứng thì nó không còn là một lệnh - nó là một lời hứa sẽ xong sau vài trăm
+    mili giây, và dòng ngay dưới nó đang tin là đã xong.* */
+ var box=document.getElementById("hvMain");
+ if(box){var _sb=box.style.scrollBehavior;box.style.scrollBehavior="auto";box.scrollTop=0;box.style.scrollBehavior=_sb||""}
+ hvSpy()}
 /* (n) Trên điện thoại, mở mục lục xong bấm ra ngoài KHÔNG đóng được - phải bấm đúng nút.
    Thêm lớp mờ phủ: bấm đâu cũng đóng, đúng phản xạ người dùng. */
 function hvToggleSide(){var s=document.getElementById("hvSide");if(!s)return;
