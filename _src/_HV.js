@@ -2512,7 +2512,8 @@ bangcong:{t:"Công giảng dạy & WOW",ttl:"Soát trước khi chốt công",th
   ["bv_tk_doing","Đang làm","Việc tôi đã nhận và chưa báo xong. Danh sách: mở Quản lý việc giao & nhận ở menu trái, tab Việc của tôi."],
   ["bv_tk_late","Quá hạn","Việc của tôi đã qua hạn mà chưa xong - cần báo lại người giao. Danh sách: mở Quản lý việc giao & nhận ở menu trái, tab Việc của tôi."],
   ["bv_tk_wait","Chờ người giao xác nhận","Việc tôi đã báo xong, đang chờ người giao xác nhận. Danh sách: mở Quản lý việc giao & nhận ở menu trái, tab Tôi đã giao."],
-  ["bv_hs_thieu","Hồ sơ nhân sự còn thiếu","Nhân viên chưa điền chức danh, hoặc là giáo viên / tư vấn viên mà chưa khai cơ sở - thiếu thì phân quyền và phân công đều sai. Khối văn phòng (giám đốc, trưởng phòng, marketing, kế toán, nhân sự) không gắn cơ sở nào nên không tính là thiếu. Danh sách: bảng nhân sự ngay dưới trên chính trang này."],
+  ["bv_hs_thieu","Hồ sơ nhân sự còn thiếu","Nhân viên chưa điền chức danh, chưa có email hoặc số điện thoại, hoặc là giáo viên / tư vấn viên mà chưa khai cơ sở - thiếu chức danh hay cơ sở thì phân quyền và phân công đều sai, thiếu email thì app không gửi thông báo tới họ được. Khối văn phòng (giám đốc, trưởng phòng, marketing, kế toán, nhân sự) không gắn cơ sở nào nên không tính là thiếu, và ô biên chế chưa tuyển được người thì đếm riêng ở ô Vị trí đang trống. Danh sách: bảng nhân sự ngay dưới trên chính trang này."],
+  ["bv_hs_trong","Vị trí đang trống","Ô biên chế đã mở mà chưa tuyển được người - mỗi ô trống là một phần việc đang không có ai làm, và là việc đầu tiên của phòng Nhân sự. Danh sách: bảng nhân sự ngay dưới, các dòng mang tên dạng \"(Chưa tuyển - <phòng>)\"."],
   ["bv_gio_thieu","Buổi thiếu mốc giờ vào/ra","Buổi đã dạy mà chưa ghi giờ vào hoặc giờ ra - thiếu mốc thì bảng công tính sai. Danh sách: Bảng công giảng dạy."],
   /* V9.99p - năm ô của bảng Chuyên môn (ACA), nhóm tách khỏi Học vụ 04/08. */
   ["bv_aca_note","Buổi quá hạn nhận xét","Buổi đã dạy xong mà giáo viên chưa ghi nhận xét, tính theo hạn SLA. Danh sách: Học tập & Giảng dạy > Nhận xét buổi."],
@@ -4461,11 +4462,15 @@ function BANGVIEC(){
      ["ti-check",gvSo("done"),"Chờ người giao xác nhận","#16A34A","đã báo xong","go('giaoviec')"]]},
  /* Bộ phận Nhân sự: SOP không giao cho họ việc nào với học viên, nên bảng của họ nói về CON
     NGƯỜI và về việc nội bộ - đúng phạm vi họ được xem. */
- nhansu:{bc:"nhân sự",t:"Bảng Nhân sự",d:"Bốn con số đầu ca: hồ sơ nhân sự còn thiếu, buổi dạy thiếu mốc giờ, và việc nội bộ của bạn.",
-  o:[["ti-id-badge",hsThieu().length,"Hồ sơ nhân sự còn thiếu","#B58A2B","thiếu chức danh, hoặc thiếu cơ sở ở vai làm việc tại cơ sở","go('nhansu')"],
+ nhansu:{bc:"nhân sự",t:"Bảng Nhân sự",d:"Bốn con số đầu ca: hồ sơ nhân sự còn thiếu, vị trí đang trống, buổi dạy thiếu mốc giờ, và việc nội bộ của bạn.",
+  o:[["ti-id-badge",hsThieu().length,"Hồ sơ nhân sự còn thiếu","#B58A2B",(function(){
+   var g={};hsThieu().forEach(function(x){hsThieuGi(x).forEach(function(k){g[k]=(g[k]||0)+1})});
+   var ks=Object.keys(g);
+   return ks.length?("thiếu "+ks.map(function(k){return k+" ("+g[k]+")"}).join(" · ")):"không hồ sơ nào thiếu chức danh, cơ sở, email hay số điện thoại"})(),"go('nhansu')"],
+     ["ti-user-plus",hsTrong().length,"Vị trí đang trống","#6B4FA0",(function(){
+   var L=hsTrong();return L.length?("chưa tuyển: "+L.map(function(x){return elabel(x.role)||x.role||"?"}).join(" · ")):"mọi ô biên chế đều đã có người"})(),"go('nhansu')"],
      ["ti-clock-exclamation",rows("DL11").filter(function(x){return isc(x.session_status,"completed")&&!(String(x.class_start_actual||"").trim()&&String(x.class_end_actual||"").trim())}).length,"Buổi thiếu mốc giờ vào/ra","#E24B4A","thiếu mốc là tính công sai","go('bangcong')"],
-     ["ti-inbox",gvSo("new"),"Việc mới chờ nhận","#3B82C4","bấm Nhận để bắt đầu","go('giaoviec')"],
-     ["ti-player-play",gvSo("doing"),"Đang làm","#0D9488","đã nhận, chưa báo xong","go('giaoviec')"]]},
+     ["ti-inbox",gvSo("new"),"Việc mới chờ nhận","#3B82C4","bấm Nhận để bắt đầu","go('giaoviec')"]]},
  /* SOP chưa dựng bảng riêng cho Kế toán; bảng này dựng theo cùng khuôn bốn con số đầu ca. */
  ketoan:{bc:"tiền & học phí",t:"Bảng Kế toán",d:"Bốn con số đầu ca của kế toán: nợ phí, phiếu thu chờ đối soát, hoàn tiền và chiết khấu chờ duyệt.",
   o:[["ti-cash",E.filter(function(r){return num(r.remaining_amount)>0&&!isc(r.enrollment_status,"cancelled")}).length,"Đơn còn nợ phí","#B58A2B","nhắc trước hạn "+slaChip("installmentRemind_days",3,"ngày"),"goTS('thanhtoan')"],
@@ -4592,11 +4597,39 @@ var BVDUYET=[["ck_lon",0],["doilop2",1],["kn_duyet",2],["kn_duyet",3],["hoantien
 var VAI_CO_SO=/^(teacher|sales_staff|sales_leader)/;
 /* V2 08/08 - tách phép thử MỘT hồ sơ ra khỏi phép đếm cả danh sách, để chip lọc trên trang
    Nhân sự và con số trên nhịp ngày dùng chung một luật (chứ không phải hai bản chép tay). */
-function hsThieuMot(x){
- if(!String(x.role||"").trim())return true;
- return VAI_CO_SO.test(ecode(x.role)||"")&&!String(x.branch||"").trim()}
+/* ═══ 26/08 - MỘT HÀNG CHỜ CHỈ HỎI HAI CÂU THÌ NÓ RỖNG QUANH NĂM ════════════════════════════
+   Nhịp sáng của Nhân sự là *"soát danh sách nhân sự - ai mới vào, ai đã nghỉ, ai chưa có chức
+   danh hoặc chưa gắn cơ sở"*, và app có sẵn chip lọc + ô thẻ cho việc ấy. Đo 26/08: chip khớp
+   **0/36 dòng**, ô thẻ bằng 0 - vì nó chỉ hỏi đúng hai câu (thiếu chức danh · vai làm ở cơ sở
+   mà chưa gắn cơ sở) và dữ liệu demo không có ai như vậy. Cùng lúc `_checkngay` đo ra cả **ba
+   chức danh Nhân sự có 0 việc của chính mình**.
+   Mà hồ sơ CÓ chỗ thiếu thật: **2 người không có email**, và email là đường app gửi thông báo
+   đi. Hàng chờ không rỗng vì trung tâm sạch - nó rỗng vì nó không hỏi tới.
+   *Một hàng chờ chỉ tìm được thứ nó biết hỏi; thứ nó không hỏi thì không tồn tại đối với nó.*
+   Và nói luôn THIẾU GÌ - đếm ra "2 hồ sơ còn thiếu" mà không nói thiếu ô nào thì người ta phải
+   mở từng hồ sơ ra dò. */
+/* Ô biên chế chưa có người thì KHÔNG phải "hồ sơ còn thiếu" - việc phải làm với nó là tuyển
+   người, không phải điền email. Nó có hàng chờ riêng ngay dưới. */
+function hsTrongCho(x){return /vị trí trống/i.test(String((x&&x.notes)||""))}
+function hsThieuGi(x){var t=[];
+ if(hsTrongCho(x))return t;
+ if(!String(x.role||"").trim())t.push("chức danh");
+ if(VAI_CO_SO.test(ecode(x.role)||"")&&!String(x.branch||"").trim())t.push("cơ sở");
+ if(!String(x.email||"").trim())t.push("email");
+ if(!String(x.phone||"").trim())t.push("số điện thoại");
+ return t}
+function hsThieuMot(x){return hsThieuGi(x).length>0}
 function hsThieu(){return rows("DL01").filter(hsThieuMot)}
-var BVMA={"Học viên liên hệ":"bv_ychv","Lead mới (chưa LH)":"bv_lead_new","Lead đang khai thác":"bv_lead_work","Test sắp tới":"bv_test_up","Tư vấn cần làm":"bv_tv_can","Test chờ chấm":"bv_test_wait","Test đã chấm":"bv_test_done","WOW sắp tới":"bv_wow_up","WOW có tiến bộ":"bv_wow_imp","Buổi đã hoàn thành":"bv_ses_done","Cần viết nhận xét buổi":"bv_ses_note","Bài tập chờ chấm":"bv_hw_wait","HV nguy cơ học thuật":"bv_risk_aca","Nhập học chưa xong":"bv_ob_open","Học viên nguy cơ":"bv_risk_stu","Phản hồi chờ phân loại":"bv_fb_new","Khiếu nại đang xử lý":"bv_kn_open","Chiết khấu cần duyệt":"bv_ck_duyet","Đổi lớp từ N lần":"bv_doilop2","Lead mới N ngày":"bv_mk_moi","Lead chưa ai phụ trách":"bv_mk_orph","Nguồn đang kém":"bv_mk_yeu","Khách cũ chờ chạy lại":"bv_mk_cu","Thưởng giới thiệu chưa trao":"bv_mk_thuong","Khiếu nại mức CAO":"bv_kn_high","Khiếu nại đã leo thang":"bv_kn_esc","Hoàn tiền chờ duyệt":"bv_hoan","Việc mới chờ nhận":"bv_tk_new","Đang làm":"bv_tk_doing","Quá hạn":"bv_tk_late","Chờ người giao xác nhận":"bv_tk_wait","Hồ sơ nhân sự còn thiếu":"bv_hs_thieu","Buổi thiếu mốc giờ vào/ra":"bv_gio_thieu","Buổi quá hạn nhận xét":"bv_aca_note","Buổi hôm nay chưa có giáo viên":"bv_aca_gv","Học viên đuối học thuật":"bv_aca_risk","Đơn còn nợ phí":"bv_no_phi","Phiếu thu chờ đối soát":"bv_thu_soat"};
+/* ═══ 26/08 - Ô BIÊN CHẾ TRỐNG: VIỆC NHÂN SỰ MÀ APP CHƯA HỀ NÓI TỚI ═════════════════════════
+   Dữ liệu demo có sẵn hai ô biên chế chưa tuyển được người (`notes` = "vị trí trống"), và
+   chúng đang đội lốt "Đã nghỉ việc" vì danh mục trạng thái CH1 không có mức nào cho "chưa
+   tuyển". Không một màn nào trong app nói ra hai ô ấy - trong khi "vị trí nào đang trống" là
+   câu hỏi đầu tiên của một phòng Nhân sự.
+   Đo 26/08: cả ba chức danh Nhân sự mở app ra có **0 việc của chính mình** (`_checkngay`).
+   Đây không phải bịa việc cho đủ - đây là việc đã nằm sẵn trong dữ liệu mà không có cửa nào
+   nhìn thấy nó. *Dữ liệu có mà màn hình không hỏi tới thì với người dùng, nó không tồn tại.* */
+function hsTrong(){return rows("DL01").filter(hsTrongCho)}
+var BVMA={"Học viên liên hệ":"bv_ychv","Lead mới (chưa LH)":"bv_lead_new","Lead đang khai thác":"bv_lead_work","Test sắp tới":"bv_test_up","Tư vấn cần làm":"bv_tv_can","Test chờ chấm":"bv_test_wait","Test đã chấm":"bv_test_done","WOW sắp tới":"bv_wow_up","WOW có tiến bộ":"bv_wow_imp","Buổi đã hoàn thành":"bv_ses_done","Cần viết nhận xét buổi":"bv_ses_note","Bài tập chờ chấm":"bv_hw_wait","HV nguy cơ học thuật":"bv_risk_aca","Nhập học chưa xong":"bv_ob_open","Học viên nguy cơ":"bv_risk_stu","Phản hồi chờ phân loại":"bv_fb_new","Khiếu nại đang xử lý":"bv_kn_open","Chiết khấu cần duyệt":"bv_ck_duyet","Đổi lớp từ N lần":"bv_doilop2","Lead mới N ngày":"bv_mk_moi","Lead chưa ai phụ trách":"bv_mk_orph","Nguồn đang kém":"bv_mk_yeu","Khách cũ chờ chạy lại":"bv_mk_cu","Thưởng giới thiệu chưa trao":"bv_mk_thuong","Khiếu nại mức CAO":"bv_kn_high","Khiếu nại đã leo thang":"bv_kn_esc","Hoàn tiền chờ duyệt":"bv_hoan","Việc mới chờ nhận":"bv_tk_new","Đang làm":"bv_tk_doing","Quá hạn":"bv_tk_late","Chờ người giao xác nhận":"bv_tk_wait","Hồ sơ nhân sự còn thiếu":"bv_hs_thieu","Vị trí đang trống":"bv_hs_trong","Buổi thiếu mốc giờ vào/ra":"bv_gio_thieu","Buổi quá hạn nhận xét":"bv_aca_note","Buổi hôm nay chưa có giáo viên":"bv_aca_gv","Học viên đuối học thuật":"bv_aca_risk","Đơn còn nợ phí":"bv_no_phi","Phiếu thu chờ đối soát":"bv_thu_soat"};
 /* ═══ V2 14/08 (anh Luân: *"chưa gì vào thôi đã thấy nó kém rồi"*) ═════════════════════════
    Khối này đang tốn BA HÀNG trước khi tới con số đầu tiên: một hàng tiêu đề, một hàng mô tả, và
    một hàng CHỈ ĐỂ ĐỰNG cái nút "Thẻ (5/5)" canh phải. Hàng thứ ba là hàng rỗng đúng nghĩa - nó
