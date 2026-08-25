@@ -1712,6 +1712,18 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    lại trên trang - và một chỗ chữ hoa lẻ loi thì không đọc ra "nhấn mạnh", nó đọc ra "chỗ này
    quên chưa sửa". */
 #hvapp .dt th{text-transform:none;letter-spacing:0;font-size:11.5px;color:#5A6675;background:#FAFBFD}
+/* Thẻ chứng nhận: chỗ CHỮ HOA cuối cùng còn sót của đợt 26/08. Nó lọt vì lớp thị giác mới gọi
+   tên từng chỗ (`.sechd`, `.hvf span`, `.dt th`) mà thẻ này mang lớp riêng - không có tên trong
+   danh sách thì không ai sửa tới, và nó chỉ hiện với hồ sơ ĐÃ HỌC XONG nên ảnh chụp thường
+   không có nó.
+   *Sửa theo danh sách tên thì mỗi cái tên không nằm trong danh sách là một vùng tối - và vùng
+   tối ấy chỉ lộ ra khi có người mở đúng màn hình có nó.* */
+#hvapp .hvcertg span{text-transform:none;letter-spacing:0;font-size:11.5px}
+#hvapp .hvcertg b{font-size:15px}
+#hvapp .hvcert{border-radius:16px}
+/* Nhãn của dải thẻ ("Việc học của học viên đang xem") - chỗ chữ hoa thứ hai lọt lưới, và lần
+   này chính bộ kiểm tìm ra chứ không phải mắt em. */
+#hvapp .tblbl{text-transform:none;letter-spacing:0;font-size:12px}
 #hvapp .hvtop{min-height:60px;border-bottom-color:var(--line)}
 #hvapp .hvtt b{font-size:15px;letter-spacing:-.01em}
 @media(max-width:900px){

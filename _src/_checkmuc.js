@@ -122,6 +122,34 @@ const AI = (process.env.AI || "HV061,HV065,HV002").split(",").filter(Boolean);
       do_.push("   than trang: " + theoTrang.join(" "));
     }
 
+    /* ---- M5: không còn CHỮ HOA trong thân trang ----
+       Đợt 26/08 bỏ chữ hoa ở tiêu đề khối, nhãn tiền và tiêu đề cột - nhưng sửa theo DANH SÁCH
+       TÊN LỚP, nên thẻ "Chứng nhận hoàn thành khóa" (lớp riêng, và chỉ hiện với hồ sơ đã học
+       xong) lọt lưới và giữ nguyên "HỌC VIÊN · HOÀN THÀNH NGÀY · CHUYÊN CẦN".
+       *Sửa theo danh sách tên thì mỗi cái tên không nằm trong danh sách là một vùng tối - và
+       vùng tối ấy chỉ lộ ra khi có người mở đúng màn hình có nó.*
+       Nay hỏi bằng CÂU HỎI thay vì bằng danh sách: trong thân trang cổng học viên, có phần tử
+       nào đang `text-transform:uppercase` không.
+       MỤC LỤC ĐƯỢC MIỄN có lý do: tên nhóm ở mục lục là nhãn phân cấp cỡ 10-11px, chữ hoa ở đó
+       là để phân biệt với tên mục chứ không phải để nhấn mạnh - và nó nằm ngoài `#hvMain`. */
+    const hoa = await page.evaluate(() => {
+      const than = document.getElementById("hvMain");
+      if (!than) return [];
+      const ra = [];
+      than.querySelectorAll("*").forEach(el => {
+        const cs = getComputedStyle(el);
+        if (cs.textTransform !== "uppercase") return;
+        const t = (el.textContent || "").trim();
+        if (!t) return;
+        const r = el.getBoundingClientRect();
+        if (r.width < 4 || r.height < 4) return;
+        ra.push(t.slice(0, 26) + "  (." + (String(el.className || "").split(" ")[0] || el.tagName) + ")");
+      });
+      return [...new Set(ra)];
+    });
+    t(nhan + " · M5 than trang khong con nhan CHU HOA", hoa.length === 0);
+    if (hoa.length) hoa.slice(0, 6).forEach(x => do_.push("   chu hoa: " + x));
+
     /* ---- M2: cuộn THẬT, vệt sáng không được lùi ---- */
     await page.evaluate(() => { const m = document.getElementById("hvMain"); if (m) m.scrollTop = 0; });
     await page.waitForTimeout(350);

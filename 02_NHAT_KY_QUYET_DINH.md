@@ -168,16 +168,21 @@
 > *Một danh sách việc tồn không được đọc lại thì nó thôi mô tả hiện tại và bắt đầu mô tả quá khứ -
 > và người đọc nó sẽ đi làm những việc đã xong.*
 
-> ### 📋 26/08 - VIỆC TỒN SAU ĐỢT NÂNG CẤP CỔNG HỌC VIÊN
-> · **Chưa dựng bộ kiểm cho "thứ tự mục lục = thứ tự thân trang"** - luật vừa đặt hôm nay đang
->   chỉ được giữ bằng `hvXep`, không có ai canh nếu mai kia có người vẽ một khối mà quên cắm mốc
->   `hvSec`. Khối ấy sẽ rơi xuống cuối trang mà không ai hay. *Một luật mới đặt mà chưa có bộ
->   kiểm thì nó chỉ sống bằng trí nhớ của người vừa đặt ra nó.*
-> · **Mục "Chứng nhận hoàn thành" (`s-chungnhan`) và "Nhật ký buổi WOW" (`s-wow`) chưa soi lại**
->   sau khi đổi lớp thị giác - hai mục này chỉ hiện với một số hồ sơ nên ảnh chụp không có.
-> · **Ba mục dưới chưa soi kỹ bằng mắt**: Tiến độ của bạn · Hành trình điểm số · Khảo sát của bạn.
-> · **Cổng phụ huynh chưa chụp lại** sau đợt nâng cấp - nó dùng chung thân trang nhưng ẩn hai mục
->   riêng tư, nên thứ tự nhóm mới có thể để lại một nhóm rỗng.
+> ### ✅ 26/08 - BỐN VIỆC TỒN CỦA ĐỢT NÂNG CẤP CỔNG HỌC VIÊN: ĐÃ ĐÓNG CẢ BỐN
+> · **Bộ kiểm cho "thứ tự mục lục = thứ tự thân trang"** → đã dựng, `_checkmuc` (bộ thứ 48).
+> · **Cổng phụ huynh soi lại** → bắt được **hai lỗi thật**: lớp che "bạn bè" chưa bao giờ chạy
+>   (phụ huynh đọc thấy "Giới thiệu **anh bè**"), và nhóm "Nói chuyện với trung tâm" còn đúng một
+>   mục là "Giới thiệu bạn bè" - một cái tên nhóm nói sai về chính nó.
+> · **Mục Chứng nhận · WOW · Tiến độ · Điểm · Khảo sát soi lại** → thẻ "Chứng nhận hoàn thành
+>   khóa" vẫn còn nhãn CHỮ HOA, và nhãn dải thẻ (`.tblbl`) cũng vậy.
+>   **Vì sao lọt:** đợt trước em sửa chữ hoa **theo danh sách tên lớp** (`.sechd`, `.hvf span`,
+>   `.dt th`) - mà thẻ chứng nhận mang lớp riêng và chỉ hiện với hồ sơ ĐÃ HỌC XONG nên ảnh chụp
+>   thường không có nó.
+>   *Sửa theo danh sách tên thì mỗi cái tên không nằm trong danh sách là một vùng tối - và vùng
+>   tối ấy chỉ lộ ra khi có người mở đúng màn hình có nó.*
+>   Nay `_checkmuc` có **luật M5** hỏi bằng CÂU HỎI thay vì bằng danh sách: *trong thân trang cổng
+>   học viên còn phần tử nào `text-transform:uppercase` không*. Nó tìm ra ngay chỗ thứ hai
+>   (`.tblbl`) mà mắt em đã bỏ qua.
 
 > ### ✅ 26/08 - ĐÓNG HAI VIỆC TỒN TREO TỪ 25/08: MỘT CÁI KHÔNG PHẢI LỖI, MỘT CÁI LÀ LỖI THẬT
 >
