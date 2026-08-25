@@ -2911,7 +2911,21 @@ function tableHTML(cfg,data,key){var act=cfg.act||[];var pk=cfg.cols[0][0];
  if(coTT)h+='<th>Thao tác</th>';
  h+='</tr></thead><tbody>';
  if(!data.length){var isF=(SEARCH[key]||(FILT[key]||[]).length||(window.QF||{})[key]||((key==="hocvien")&&(window.HVFCLS||window.HVFCRS)));
-  h+='<tr><td class="empty" colspan="'+(cols.length+(coTT?1:0))+'">'+(isF?'Không có bản ghi khớp BỘ LỌC hiện tại. <button class="btn sm" onclick="clearFilt(\''+key+'\')" style="margin-left:8px"><i class="ti ti-x"></i>Xóa lọc</button>':'Chưa có bản ghi nào trong bảng này.')+'</td></tr>'}
+  /* ═══ 26/08 - BẢNG RỖNG PHẢI NÓI ĐÚNG VÌ SAO NÓ RỖNG ══════════════════════════════════════
+     Trước bản này chỉ có hai câu: "không khớp bộ lọc" và "chưa có bản ghi nào trong bảng này".
+     Câu thứ hai nói SAI trong một trường hợp hay gặp: trung tâm CÓ đầy bản ghi, chỉ là không
+     bản nào thuộc phạm vi dữ liệu của người đang đọc. Đo được 26/08 trên trang Giảng viên: dải
+     thẻ ngay trên bảng ghi "6 GV · tổng 122.6h" mà bảng lại bảo "chưa có bản ghi nào" - hai câu
+     trên một màn cãi nhau, và người đọc kết luận app hỏng chứ không kết luận mình thiếu quyền.
+     Cửa `navVis` nay đã chặn trang mà cả MIỀN bị khoá; câu này lo nốt phần còn lại - miền mở
+     nhưng mức "mine"/"team" không chạm tới dòng nào.
+     *Một câu giải thích sai còn tệ hơn không giải thích: nó gửi người ta đi tìm ở nhầm chỗ.* */
+  var _tong=0;try{_tong=rows(cfg.code).length}catch(e){_tong=0}
+  var _ngoai=(!isF&&_tong>0);
+  h+='<tr><td class="empty" colspan="'+(cols.length+(coTT?1:0))+'">'+
+   (isF?'Không có bản ghi khớp BỘ LỌC hiện tại. <button class="btn sm" onclick="clearFilt(\''+key+'\')" style="margin-left:8px"><i class="ti ti-x"></i>Xóa lọc</button>'
+      :(_ngoai?('Trung tâm có '+_tong+' bản ghi trong sổ này, nhưng không bản nào nằm trong phạm vi dữ liệu của bạn. Phạm vi do chức danh quyết định - xem ở Cài đặt > Phân quyền.')
+              :'Chưa có bản ghi nào trong bảng này.'))+'</td></tr>'}
  /* V9.93 - MỖI DÒNG PHẢI MỞ RA ĐƯỢC. Bộ kiểm `_checkbam` bấm thử 122 thẻ/dòng và bắt được
     **92 chỗ bấm vào không có gì xảy ra** - gần như toàn bộ sổ tra cứu. Người dùng bấm vào dòng
     theo phản xạ (anh Luân bấm đúng như thế và kết luận app hỏng). Sửa ở ĐÂY, một chỗ dựng bảng
@@ -2975,8 +2989,18 @@ function fltColOk(code,c){var rs=rows(code);
  for(var i=0;i<rs.length;i++)if(Object.prototype.hasOwnProperty.call(rs[i],c))return true;
  return false}
 /* --- khai trục --- */
-function fxEnum(c,t){return {k:c,t:t,ty:"multi",col:c,get:function(r){return ecode(r[c])},
- lab:function(v,all){for(var i=0;i<all.length;i++)if(ecode(all[i][c])===v)return elabel(all[i][c])||v;return v}}}
+/* ═══ 26/08 - GIÁ TRỊ TRỐNG PHẢI CÓ TÊN, VÌ NÓ THƯỜNG LÀ NHÓM PHẢI ĐI LÀM ════════════════════
+   Hộp lọc CÓ đếm cả ô trống - nhưng nhãn của nó rơi vào chữ cuối cùng "(trống)". Đo 26/08:
+   **19 trục lọc** bày ra một nút tên "(trống)", và ở trang Buổi học nút ấy gom **260 buổi** -
+   tức là "buổi CHƯA GHI NHẬN XÉT", đúng nhóm mà học vụ mở bộ lọc ra để tìm. Người đọc thấy
+   "(trống) 260" thì hiểu là ô dữ liệu bị thiếu, không hiểu là một nhóm việc.
+   `fxStaff`/`fxRef` đã đặt tên cho ô trống từ lâu ("(chưa gán)", "(chưa có)"); riêng `fxEnum`
+   thì không - nên mặc định của nó nay là "(chưa có)", và trục nào mà app ĐÃ TỰ ĐỊNH NGHĨA nghĩa
+   của ô trống thì khai thẳng tên ấy ra.
+   *Một nhóm không có tên thì không ai đi làm nó.* */
+function fxEnum(c,t,trongLb){return {k:c,t:t,ty:"multi",col:c,get:function(r){return ecode(r[c])},
+ lab:function(v,all){if(!String(v||"").trim())return trongLb||"(chưa có)";
+  for(var i=0;i<all.length;i++)if(ecode(all[i][c])===v)return elabel(all[i][c])||v;return v}}}
 function fxStaff(c,t){return {k:c,t:t,ty:"multi",col:c,get:function(r){return String(r[c]||"")},
  lab:function(v){var s=find("DL01","staff_id",v);return s?(s.full_name+" · "+v):(v||"(chưa gán)")}}}
 function fxRef(c,t,code,idf,nmf){return {k:c,t:t,ty:"multi",col:c,get:function(r){return String(r[c]||"")},
@@ -3047,7 +3071,7 @@ var FLTDEF={
    function(v){return v==="co"?"Đã có ảnh":(v==="lydo"?"Mới khai lý do":"Chưa có gì")}),
   fxStaff("verified_by","Người đối soát"),fxDate("payment_time","Ngày thu")],
  xeplop:[fxEnum("onboarding_status","Trạng thái onboarding"),fxEnum("placement_status","Xếp lớp"),
-  fxEnum("class_confirmation_status","HV ký cam kết lớp"),
+  fxEnum("class_confirmation_status","HV ký cam kết lớp","Chưa ký"),
   /* V2 17/08 - hai trục học vụ hỏi thật: hồ sơ nào đã đổi lớp (đổi nhiều lần là dấu hiệu xếp
      chưa đúng ngay từ đầu), và ai đã có điểm giữa khoá để biết còn phải thi bù cho ai. */
   fxCalc("_doilop","Đã đổi lớp",function(r){return num(r.placement_change_count)>0?"co":"khong"},
@@ -3082,7 +3106,7 @@ var FLTDEF={
   fxEnum("feedback_category","Nhóm nội dung"),fxEnum("feedback_channel","Kênh"),
   fxRef("class_id","Lớp","DL10","class_id","class_name"),
   fxStaff("classified_by","Người phân loại"),fxDate("feedback_time","Ngày phản hồi")],
- review:[fxEnum("survey_type","Loại khảo sát"),fxEnum("follow_up_needed","Cần follow-up"),
+ review:[fxEnum("survey_type","Loại khảo sát"),fxEnum("follow_up_needed","Cần follow-up","Không cần"),
   fxRef("class_id","Lớp","DL10","class_id","class_name"),
   fxStaff("assigned_staff","Người phụ trách"),
   fxDate("sent_date","Ngày gửi"),fxDate("submitted_date","Ngày trả lời")],
@@ -3117,7 +3141,7 @@ var FLTDEF={
     `dsbaitap->baitap` từ trước, nên khai một chỗ là cả hai cùng giàu lên. */
  buoihoc:[fxEnum("session_status","Trạng thái buổi"),fxEnum("session_type","Loại buổi"),
   fxStaff("teacher_id","Giáo viên dạy"),fxDate("session_date","Ngày học"),
-  fxEnum("has_teacher_note","Đã ghi nhận xét"),fxEnum("teacher_note_within_sla","Nhận xét kịp hạn"),
+  fxEnum("has_teacher_note","Đã ghi nhận xét","Chưa ghi nhận xét"),fxEnum("teacher_note_within_sla","Nhận xét kịp hạn"),
   fxDate("teacher_note_completed_at","Ngày ghi nhận xét")],
  /* Khai duoi ten SO `dsbaitap`, KHONG duoi ten trang `baitap`: `baitap` la trang lam viec theo
     MOT lop + MOT buoi (co hai o chon rieng), nen mot bo loc sau tren toan bang se da nhau voi
@@ -3345,6 +3369,24 @@ function fltOpen(pg){var ax=fltAxes(pg);if(!ax.length){toast("Trang này chưa k
   '</div></div>'}
  ax.forEach(function(a){
   var cur=st[a.k];
+  /* ═══ 26/08 - TRỤC CHỈ CÓ MỘT GIÁ TRỊ THÌ NÓ KHÔNG LỌC ĐƯỢC GÌ ═════════════════════════════
+     Bấm vào nó chỉ có hai kết cục: giữ nguyên cả bảng, hoặc bỏ chọn để giữ nguyên cả bảng.
+     Đo 26/08: ba trục như thế (Giảng viên "Tình trạng" - 13/13 đang làm · Khóa học "Trạng thái
+     khóa" - 16/16 đang mở · Sổ bài tập "Loại điểm" - 384/384 band).
+     Ẩn theo DỮ LIỆU ĐANG CÓ chứ không xoá lời khai: hôm nào có một giảng viên nghỉ việc là trục
+     ấy tự hiện lại. *Một cái nút mà bấm hay không bấm đều ra cùng một kết quả thì nó không phải
+     công cụ, nó là chỗ để người ta bấm thử rồi hoang mang.*
+     Đếm TRƯỚC khi vẽ đầu mục - đếm sau rồi cắt chuỗi đã ghép là sửa cái đã viết ra, và chỉ cần
+     ai đó thêm một khối `fltsec` nữa ở giữa là nhát cắt ấy rơi nhầm chỗ. */
+  var _seen={},_ord=[];
+  if(a.ty!=="date"){
+   all.forEach(function(r){var g=a.get(r); if(!g||!g.join)g=[g];
+    g.forEach(function(x){x=String(x==null?"":x);
+     if(!_seen[x]){_seen[x]={n:0,lb:a.lab(x,all)};_ord.push(x)}
+     _seen[x].n++})});
+   _ord.sort(function(x,y){return _seen[y].n-_seen[x].n});
+   if(_ord.length<=1)return;
+  }
   h+='<div class="fltsec"><div class="fltlb">'+esc(a.t)+
    ((cur&&(cur.length||cur.p||cur.from||cur.to))?' <button class="pill fltrm" onclick="fltAxClear(\''+esc(pg)+'\',\''+esc(a.k)+'\')"><i class="ti ti-x"></i>bỏ</button>':'')+'</div>';
   if(a.ty==="date"){
@@ -3354,18 +3396,11 @@ function fltOpen(pg){var ax=fltAxes(pg);if(!ax.length){toast("Trang này chưa k
    h+='<div class="fltrow"><label>Từ</label><input type="date" value="'+esc(v.from||"")+'" onchange="fltDateSet(\''+esc(pg)+'\',\''+esc(a.k)+'\',\'from\',this.value)">'+
     '<label>đến</label><input type="date" value="'+esc(v.to||"")+'" onchange="fltDateSet(\''+esc(pg)+'\',\''+esc(a.k)+'\',\'to\',this.value)"></div>';
   }else{
-   var seen={},ord=[];
-   all.forEach(function(r){var g=a.get(r); if(!g||!g.join)g=[g];
-    g.forEach(function(x){x=String(x==null?"":x);
-     if(!seen[x]){seen[x]={n:0,lb:a.lab(x,all)};ord.push(x)}
-     seen[x].n++})});
-   ord.sort(function(x,y){return seen[y].n-seen[x].n});
-   if(!ord.length)h+='<div class="mut" style="font-size:11.5px">Không có dữ liệu để lọc.</div>';
-   h+='<div class="fltops">'+ord.slice(0,40).map(function(x){
+   h+='<div class="fltops">'+_ord.slice(0,40).map(function(x){
     var on=cur&&cur.indexOf(x)>=0;
     return '<button class="pill'+(on?" on":"")+'" onclick="fltPick(\''+esc(pg)+'\',\''+esc(a.k)+'\',\''+esc(x).split("'").join("&#39;")+'\')">'+
-     esc(seen[x].lb||"(trống)")+' <b>'+seen[x].n+'</b></button>'}).join("")+'</div>';
-   if(ord.length>40)h+='<div class="mut" style="font-size:11px">Chỉ hiện 40 giá trị nhiều dòng nhất (còn '+(ord.length-40)+' giá trị nữa).</div>';
+     esc(_seen[x].lb||"(chưa có)")+' <b>'+_seen[x].n+'</b></button>'}).join("")+'</div>';
+   if(_ord.length>40)h+='<div class="mut" style="font-size:11px">Chỉ hiện 40 giá trị nhiều dòng nhất (còn '+(_ord.length-40)+' giá trị nữa).</div>';
   }
   h+='</div>'});
  var n=fltApply(pg,all).length;
