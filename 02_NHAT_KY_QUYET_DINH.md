@@ -456,8 +456,12 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 46 BỘ KIỂM, XANH HẾT (verify trọn bộ 24/08 trên chính bản này, 35m25s).
-> Bản dựng đang chạy: `6ff0d0` (24/08 - MỖI CHỨC DANH MỘT BẢN BÁO CÁO RIÊNG (`BCMAU`/`BCKHOI`) ·
+> **Phiên bản: V2 — 47 BỘ KIỂM (verify 25/08 bắt đúng một chỗ đỏ tài liệu, đã vá, đang chạy
+> lượt chốt).
+> Bản dựng đang chạy: `b8e482` (25/08 - AUDIT TRỌN 9 MẢNG: trục "GV nghỉ liên tiếp" · tên khách
+> chưa thành học viên bấm được · vệt đường đi đọc được · **bộ kiểm thứ 47 `_checkcong`** đối chiếu
+> hai cổng · một lỗi dữ liệu thật (lớp trùng giờ với chính nó). Mốc trước `6ff0d0` 24/08 - MỖI
+> CHỨC DANH MỘT BẢN BÁO CÁO RIÊNG (`BCMAU`/`BCKHOI`) ·
 > SO KỲ TRƯỚC TRÊN MẶT TRANG · BỐN BẢNG CỐT LÕI (WOW · tiền · nhân sự · việc của chính mình) ·
 > CHIP NGUY CƠ NÓI CÙNG LUẬT VỚI BỘ LỌC · KHO CÂU HỎI GỢI Ý CĂN THEO CỘT · MÀN CHẤM BÀI VÀ THU
 > BÀI HẾT CO CỤM · `_checkmat` có luật M9 và đi qua cả bốn nấc trang Bài tập · **bộ kiểm thứ 46

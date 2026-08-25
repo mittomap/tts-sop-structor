@@ -34,6 +34,23 @@ nút bấm một phát sang 30 ngày.
 Chỉ số dạng lô (tỷ lệ chốt của lứa lead vừa về) không so - lứa mới chưa chín, so hai cửa sổ liền
 nhau sẽ ra kết luận sai. App ghi rõ lý do thay vì im lặng bỏ qua.
 
+## ⭐ MỚI 25/08/2026 — **Hàng chờ giáo viên báo nghỉ nhìn được cả bức tranh**
+
+Trước đây hàng chờ trả lời được "ai xin nghỉ buổi nào", nhưng không trả lời được hai câu người
+duyệt hỏi ngay sau đó. Nay có:
+
+- **Chip "Nghỉ liên tiếp"** - giáo viên xin nghỉ từ 2 buổi liền kề của cùng một lớp. Nghỉ một
+  buổi thì tìm người dạy thay là xong; nghỉ ba buổi liền thì phải xếp người dài hạn **và** báo
+  học viên - hai việc khác hẳn nhau. Đếm theo số buổi của lớp, không theo ngày.
+- **Chip "Người nghỉ nhiều lần"** - đếm số đơn còn sống trong cửa sổ nhìn lại. Một đơn thì duyệt;
+  lần thứ tư trong tháng thì đó là câu chuyện nhân sự, không còn là một cái đơn.
+- **8 trục lọc** (trước đây trang này không có trục nào): giáo viên · lớp · lý do · trạng thái ·
+  ngày buổi học · báo lúc · nghỉ liên tiếp · số lần đã xin nghỉ.
+- Hỏi Trợ lý **"giáo viên nào hay nghỉ"** cũng ra được danh sách.
+
+Hai ngưỡng chỉnh ở Cài đặt (CH2): cửa sổ nhìn lại `teacherOffLookback_days` và số lần
+`teacherOffRepeat_times`.
+
 ## ⭐ MỚI 24/08/2026 — **Chấm bài và Thu bài đọc được theo cột**
 
 Hai màn này trước đây dồn tên học viên, chip trạng thái, hạn nộp và giờ nộp vào **cùng một cột
