@@ -6032,6 +6032,21 @@ function cfSetMode(m){try{ssSet(CFMODEKEY,m)}catch(e){}try{cfBarSync()}catch(e){
 function cfBarSync(){var b=document.getElementById("cfBar");if(!b)return;
  if(SVR){b.className="cfbar";b.innerHTML="";return}
  if(!cfGhiDuoc()){
+  /* ═══ 26/08 - Ở CỔNG HỌC VIÊN, CỤM NÀY ĐANG ĐỨNG NHẦM CHỖ ═══════════════════════════════════
+     Cụm "Chế độ xem thử · Mở quyền quản trị" đúng chỗ trên app nhân viên: người ngồi đó là người
+     có thể mở quyền, và họ cần biết mình đang sửa vào một bản không lưu được.
+     Nhưng trên cổng học viên nó chiếm **chỗ đắt nhất của màn** - ngay cạnh tên cổng, là thứ đập
+     vào mắt đầu tiên - để nói một câu học viên không làm gì được ("mở quyền quản trị" là việc
+     của trung tâm, không phải của em ấy). Người đi xem demo nhìn thấy nó trước cả lời chào, và
+     nó nói thẳng vào mặt họ rằng đây là một công cụ nội bộ.
+     Nay ở cổng học viên nó co thành MỘT nút tròn nhỏ đứng chung hàng với các nút khác. Không bỏ
+     một cửa nào: bấm vào vẫn là đúng `cfDoiCheDo()`, và câu giải thích vẫn còn nguyên trong chú
+     thích rê chuột. *Giữ đủ cửa không có nghĩa là cửa nào cũng phải to bằng nhau.* */
+  if(window.HVPORTAL){
+   b.className="cfbar on gon";
+   b.innerHTML='<button class="tbtn" onclick="cfDoiCheDo()" aria-label="Chế độ xem thử - mở quyền quản trị" '+
+    'data-tip="Chế độ xem thử: đang chạy trên dữ liệu demo, chỉnh trong Cài đặt sẽ hiện ngay trên màn nhưng không lưu lại. Bấm để mở quyền quản trị."><i class="ti ti-eye"></i></button>';
+   return}
   b.className="cfbar on";
   b.innerHTML='<i class="ti ti-eye"></i><span data-tip="Đang chạy trên dữ liệu demo. Chỉnh trong Cài đặt sẽ hiện ngay trên màn nhưng không được lưu lại."><b>Chế độ xem thử</b></span>'+
    '<button class="btn sm" onclick="cfDoiCheDo()"><i class="ti ti-lock-open"></i>Mở quyền quản trị</button>';
@@ -20137,7 +20152,9 @@ function renderTrangHV(){
   (_p?('<div class="hvsub" style="margin-bottom:2px">'+esc(_p.qh||"Người đồng hành")+' của <b>'+esc(S.full_name||"")+'</b> - đang xem trang học tập của con</div>'):'')+
   '<div class="hvsub">'+esc(S.student_id)+(lop?' · Lớp <b>'+esc(lop.class_name)+'</b>':'')+(lop&&lop.course_id_name?' · '+esc(lop.course_id_name):'')+
   ' · <span class="chip '+stCls(S.student_status)+'">'+esc(elabel(S.student_status))+'</span></div>'+
-  (nextSes?('<div class="hvsub" style="margin-top:6px"><i class="ti ti-calendar-check" style="margin-right:5px"></i>Buổi học tiếp theo: <b>'+esc(nextSes.session_date)+'</b>'+(nextSes.teacher_id_name?' · GV '+esc(nextSes.teacher_id_name):'')+'</div>'):'')+
+  /* Ngày giờ buổi tới nay nằm ở tấm bên phải (xem `hvHeroNext`); dòng này chỉ còn nói NGƯỜI
+     dạy - thứ tấm kia không có chỗ chứa mà học viên vẫn cần biết trước khi tới lớp. */
+  (nextSes&&nextSes.teacher_id_name?('<div class="hvsub" style="margin-top:6px"><i class="ti ti-user" style="margin-right:5px"></i>Buổi tới do <b>GV '+esc(nextSes.teacher_id_name)+'</b> dạy</div>'):'')+
   '<div style="margin-top:9px;display:flex;gap:7px;flex-wrap:wrap">'+
   '<button class="pill" style="background:#ffffff22;border-color:#ffffff55;color:#fff" onclick="hvGo(\'s-saptoi\')"><i class="ti ti-calendar-check"></i> Lịch sắp tới</button>'+
   /* V9.40d: hai nút này trỏ vào phần RIÊNG của học viên - chế độ phụ huynh không có hai mục đó
@@ -20153,7 +20170,7 @@ function renderTrangHV(){
    '<button class="pill" style="background:#ffffff22;border-color:#ffffff55;color:#fff" onclick="hvGo(\'s-hoidap\')"><i class="ti ti-messages"></i> Trao đổi với trung tâm</button>')+
   (hvHotline()?hvCallHTML("Gọi trung tâm "+hvHotline(),"hvcall-dark"):'')+
   '</div></div>'+
-  '<div class="hvav">'+esc(String(S.full_name||"?").trim().split(" ").pop().slice(0,1).toUpperCase())+'</div></div>';
+  hvHeroNext(nextSes)+'</div>';
  /* ---- KHÓA CỦA BẠN ----
     V9.29n (anh Luân: "Khóa của bạn chứ, là chỗ chọn khóa ở đầu trang ấy"): khối này trước đây chỉ
     hiện khi học viên học TỪ 2 KHÓA TRỞ LÊN. Nghĩa là đa số học viên - người học đúng một khóa -
@@ -20701,6 +20718,28 @@ function renderTrangHV(){
    thay vì mở ra bằng "thủ tục trung tâm đã xác nhận".
    Cắt bằng MỐC CỦA CHÍNH MÌNH chứ không dò thẻ HTML: chuỗi `<!--HVSEC:...-->` do em đặt ra nên
    nó không phụ thuộc vào việc khối ấy mở bằng thẻ gì, và không có cách nào cắt nhầm. */
+/* ═══ 26/08 - CHỖ ĐẮT NHẤT CỦA THẺ CHÀO ĐANG ĐỰNG MỘT CHỮ CÁI ═══════════════════════════════
+   Góc phải thẻ chào là ô to nhất, sáng nhất, mắt chạm vào thứ hai sau lời chào - và nó đang
+   đựng **chữ cái đầu của tên** trong một vòng tròn. Học viên biết tên mình; cạnh đó, mục lục
+   bên trái đã có đúng cái vòng tròn ấy kèm cả họ tên lẫn mã. Nó không nói thêm điều gì.
+   Nay chỗ ấy trả lời câu học viên mở cổng ra để hỏi: **buổi tới là khi nào, còn mấy ngày**.
+   Đếm ngược tính theo NGÀY LỊCH chứ không theo số giờ chia 24: buổi 19h tối nay và buổi 8h
+   sáng mai cách nhau 13 tiếng, nhưng với người đi học thì một cái là "hôm nay" và một cái là
+   "ngày mai" - đó mới là thứ họ sắp xếp cuộc sống theo.
+   *Chỗ đắt nhất trên màn phải trả lời câu hỏi đắt nhất; đựng một thứ ai cũng biết là bỏ phí.* */
+function hvHeroNext(ses){
+ if(!ses)return "";
+ var d=pvnd(ses.session_date);if(!d)return "";
+ var TH=["Chủ nhật","Thứ hai","Thứ ba","Thứ tư","Thứ năm","Thứ sáu","Thứ bảy"];
+ var t0=new Date();t0.setHours(0,0,0,0);
+ var d0=new Date(d.getTime());d0.setHours(0,0,0,0);
+ var con=Math.round((d0.getTime()-t0.getTime())/864e5);
+ var conTxt=(con<=0)?"hôm nay":(con===1?"ngày mai":("còn "+con+" ngày"));
+ var gio=String(ses.session_date||"").split(" ")[1]||"";
+ return '<div class="hvnext"><span>Buổi học tiếp theo</span>'+
+  '<b>'+d.getDate()+'<em>/'+(d.getMonth()+1)+'</em></b>'+
+  '<u>'+esc(TH[d.getDay()])+(gio?(" · "+esc(gio)):"")+'</u>'+
+  '<i>'+esc(conTxt)+'</i></div>'}
 function hvSec(id){return "<!--HVSEC:"+id+"-->"}
 function hvXep(h){
  var M=String(h||"").split(/<!--HVSEC:([a-z-]+)-->/);
