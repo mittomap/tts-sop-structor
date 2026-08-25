@@ -470,9 +470,10 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 47 BỘ KIỂM (verify 25/08 bắt đúng một chỗ đỏ tài liệu, đã vá, đang chạy
-> lượt chốt).
-> Bản dựng đang chạy: `b8e482` (25/08 - AUDIT TRỌN 9 MẢNG: trục "GV nghỉ liên tiếp" · tên khách
+> **Phiên bản: V2 — 47 BỘ KIỂM, VERIFY XANH HẾT trên bản đang chạy (44m05s, 25/08).
+> Bản dựng đang chạy: `4bff6a` (25/08 cuối - BỐN CHỖ ÁP SÁT VIỀN + LUẬT M10 · DẢI CẢNH BÁO QUÉT
+> ĐÚNG PHẠM VI NGƯỜI ĐỌC · BỊT RÒ RỈ `THESO` GIỮA HAI DANH TÍNH · NEO `blstats` cho dải 5 ô).
+> Mốc trước `b8e482` (25/08 - AUDIT TRỌN 9 MẢNG: trục "GV nghỉ liên tiếp" · tên khách
 > chưa thành học viên bấm được · vệt đường đi đọc được · **bộ kiểm thứ 47 `_checkcong`** đối chiếu
 > hai cổng · một lỗi dữ liệu thật (lớp trùng giờ với chính nó). Mốc trước `6ff0d0` 24/08 - MỖI
 > CHỨC DANH MỘT BẢN BÁO CÁO RIÊNG (`BCMAU`/`BCKHOI`) ·
@@ -482,8 +483,57 @@
 > `_checkbc`** với bảy luật B0-B7), đã lên https://mittomap.github.io/itts-sop-demo-v2/ .
 > Verify trọn bộ chạy SAU khi đẩy (luật mới 13/08).
 > Mốc cũ: `3da7b0`, `66c286`, `e72074`, `5f5349`, `48f65b`, `df07aa`, `1bd190`, `1741ce`, `723da0`, `994d3f`, `9ac583`, `10e445`, `8f0526`, `deb78b`, `367fa1`, `b0daf6`, `52f95d`, `402988`, `68db0a`, `1f160a`, `ec42a8`, `e2239b`, `f37501`, `719f65`, `6307b4`, `90c7dc`, `157461`, `f18e75`, `f1af4c`,
-> `bad7f9`, `a9eb4b`.
+> `bad7f9`, `a9eb4b`, `b8e482`, `c01fad`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
+>
+> ### 🟢 25/08 (cuối) - "CÓ TRÀN KHÔNG" LÀ CÂU HỎI SAI, VÀ MỘT CÁI SỔ KHÔNG BAO GIỜ ĐƯỢC XOÁ
+>
+> Anh Luân: *"Chỉ số của riêng bạn, và cái ô bên dưới bị tràn ra viền em ko thấy à"*.
+> **Em đã đo chỗ ấy hai lần và cả hai lần báo xanh** - vì cả hai lần em hỏi *"thẻ có tràn RA
+> NGOÀI panel không"*, mà thẻ dừng đúng ở mép nên câu trả lời luôn là không.
+> *Hỏi "có vượt qua không" thì cái gì dừng đúng ở vạch cũng đạt. Câu phải hỏi là "có ĐỦ CÁCH
+> mép không".*
+> Đo lại ở đúng tỷ lệ anh dùng (90%): thẻ cuối ở x=1416, mép trong panel x=1417 - **cách 1px**.
+> Gốc: "KPI của tôi" là panel **duy nhất trong app** đặt dải thẻ làm con trực tiếp của `.panel`,
+> bỏ qua lớp `.pbody` - mà 6px đệm nằm ở `.pbody`. Quét cả file: 1/1 chỗ.
+> Ba chỗ cùng họ trong cùng lượt: `.bl2c` để `align-items:stretch` nên ô "Cần chú ý" cao 45px bị
+> kéo bằng ô bên cạnh cao 450px (**405px khoảng trắng**) · thanh "Nhóm" ở Chạy quy trình đệm 0
+> nên hộp có viền của nó dính vào viền panel và lệch trục 6px so với danh sách ngay dưới.
+>
+> **"Cần chú ý chỉ có 1 mục, dựng lại demo ko có ý nghĩa gì à"** - nút Reset không sai. `canhBaoQuet`
+> dựng phạm vi quét từ `HUBTAB`, tức chỉ những trang là ĐÍCH CỦA MỘT TAB HUB: với Trưởng phòng ACA
+> ra **8 trang, 7 trong 8 không đăng ký thẻ nào**. Trang lõi của phòng ACA - Bài tập, Giáo án, Bảng
+> lớp, Giảng viên - không phải đích của tab hub nào nên chưa bao giờ được quét, dù chính chúng mới
+> là nơi chuyện của ACA xảy ra. Nay quét theo `PBK` + `navVis`: TP ACA **1 → 9**, GV ACA **0 → 3**.
+> *Chọn phạm vi quét theo một bảng khai có sẵn thì tiện, nhưng bảng ấy sinh ra để trả lời câu hỏi
+> khác - và phần nó không nói tới sẽ im lặng biến mất khỏi kết quả.*
+>
+> **THÊM LUẬT M10 vào `_checkmat`** - "khối nội dung áp sát viền panel", hỏi đúng câu còn thiếu,
+> trên 54 màn × 2 khổ. Nó tự bắt ra chỗ thanh "Nhóm" mà em chưa hề nhìn tới. Hai lần phải sửa
+> chính cái thước: bản đầu đỏ **96 chỗ**, gần hết là `.pbody` - mà `.pbody` theo thiết kế ôm trọn
+> bề ngang panel và giữ đệm **ở bên trong** nó (*khoảng thở không nằm ở chỗ cái hộp bắt đầu, nó
+> nằm ở chỗ CHỮ bắt đầu*); rồi 8 cái bảng - **miễn theo LÝ DO** ("bên trong có `<table>`") chứ
+> không theo tên lớp, vì *miễn theo tên lớp thì mỗi lần ai đó dựng cùng một thứ dưới một cái tên
+> khác là phải khai lại; miễn theo lý do thì khai một lần*.
+>
+> **HAI CHỖ ĐỎ VERIFY BẮT - và chỗ thứ hai là một bài học về chính bộ kiểm:**
+> · `_checkmien`: Trưởng phòng Marketing (khai `tien:"none"`) đọc được **"Đăng ký còn nợ"** trong
+>   "Cần chú ý". Sổ `THESO` - nơi mỗi trang ghi lại "tôi vừa bày ra những thẻ nào" - chỉ được GHI
+>   ĐÈ, không bao giờ được XOÁ. Trang nào vẽ xong mà không gọi tới dải thẻ (chức danh `lite` thoát
+>   sớm, hoặc lọc hết thẻ theo `SCOPE().blocks`) thì sổ giữ nguyên trang của **người trước**. Đóng
+>   vai riêng người ấy thì sạch; chỉ lộ khi chạy nối tiếp nhiều người - **đúng lúc bấm Đổi vai**.
+>   *Một cái sổ chỉ được ghi đè chứ không bao giờ được xoá thì nó không kể chuyện hiện tại - nó kể
+>   chuyện lần cuối có người ghi.*
+> · `_checkneo`: hai bước hướng dẫn khoanh trùng chỗ. **Chỗ này từng xanh vì một lý do sai** -
+>   chính cái rò rỉ `THESO` ở trên làm tấm "Cần chú ý" lúc có lúc không, nên chỉ số thứ tự trong
+>   đường DOM của hai lượt đo lệch nhau. Vá chỗ rò rỉ thì chỗ trùng lộ ra. *Một chỗ đỏ không hiện
+>   ra không có nghĩa là không có; đôi khi chỉ có nghĩa là cái thước đang rung.*
+>   Và dưới nó là lỗi thật hơn: **cả hai bước đang khoanh NHẦM DẢI**. Từ V2 dải 5 ô của Trang bắt
+>   đầu được nhúng vào trang Việc hôm nay - mà trang ấy đã có dải thẻ riêng; hai dải cùng lấy neo
+>   mặc định `bstats` và `tourFind` trả về cái đầu tiên, nên bài nói *"Mở máy là nhìn 5 ô này"*
+>   lại tô sáng **dải công nợ** nằm trên nó. Đã cấp neo riêng `blstats`.
+>   *Một mã neo dùng chung chỉ đúng chừng nào mỗi màn có duy nhất một thứ mang nó; ngày có thứ
+>   hai, nó thôi là địa chỉ và thành một hướng chỉ tay.*
 >
 > ### 🟢 24/08 (cuối) - BẢNG NGUY CƠ TỰ CÃI CHÍNH NÓ, VÀ BA CHỖ ĐỎ VERIFY BẮT ĐƯỢC
 >

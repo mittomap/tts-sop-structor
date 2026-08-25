@@ -2,6 +2,20 @@
 
 > `ITTs_WebApp_v5_demo.html` là bản app: mở bằng trình duyệt, mọi thao tác ghi thật vào bộ nhớ trình duyệt. **Lớp Google Sheets đã cho nghỉ hưu 30/07** - không còn bản `.gs` nào, mọi cấu hình nằm trong màn Cài đặt của chính app. Khi anh Luân chốt nền tảng backend, 66 chỗ ghi trong app đã có sẵn đường nối ra máy chủ (xem khối ghi chú tại `var SVR=` trong `gen_v5.py`).
 
+## ⭐ MỚI 25/08/2026 — **"Cần chú ý" nay quét đúng những trang bạn xem được**
+
+Khối "Cần chú ý" ở trang đáp gom mọi chỗ bất thường từ các trang nghiệp vụ. Trước đây nó chỉ đi
+qua những trang là **đích của một tab hub** - mà trang lõi của phòng ACA (Bài tập, Giáo án, Bảng
+lớp, Giảng viên) không phải đích của tab hub nào, dù chính chúng mới là nơi chuyện của ACA xảy ra.
+Kết quả: Trưởng phòng ACA mở app ra chỉ thấy **1 mục**, Giáo viên ACA thấy **khối trống**.
+
+Nay nó quét **mọi trang chức danh ấy được xem** - Trưởng phòng ACA **1 → 9 mục** (trong đó "Bài
+quá hạn chấm = 18" và "Buổi chưa soạn gần nhất" đều đỏ), Giáo viên ACA **0 → 3**, Giáo viên WOW
+**1 → 3**. Vẫn chỉ quét trang bạn có quyền vào, và mỗi ô vẫn bấm được để đi thẳng tới trang đẻ ra
+con số đó.
+
+Kèm: khối này không còn giữ số của **người đăng nhập trước** khi bạn bấm Đổi vai.
+
 ## ⭐ MỚI 24/08/2026 — **Trang Chỉ số: mỗi chức danh một bản báo cáo riêng**
 
 Trước đây 17 chức danh đọc chung một khung, chỉ khác nhau ở chỗ khối nào bị ẩn - nên Trưởng phòng

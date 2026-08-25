@@ -93,7 +93,7 @@ Bộ kiểm gồm **18 phần, phải xanh HẾT mới được giao** (~2.100 t
 | `python3 check_sop.py` | `KET QUA: DAT` - **đối chiếu SOP gốc, TÁM mặt** (14/08 ĐẠT trọn tám): 357 cột DL · 93 tình huống sổ trigger HD3 (chạy THẬT `naFor()` trên mọi dòng) · 51 chỉ số bảng BC2 (phải có cả công thức lẫn dòng ngưỡng CH6) · 31 hành động bảng phân quyền CH3 (đóng vai từng chức danh rồi hỏi lại `canAct`, và mỗi việc "Quản lý phê duyệt" phải có cửa ghi gọi `chanAct`) · **12 màn vận hành VH0-VH11 và 9 bảng báo cáo BC1-BC9** (vẽ THẬT mọi trang, mọi tab, mọi danh sách, cộng bảng việc của từng chức danh, rồi tìm chuỗi phải có). · 26 thuật ngữ CH5 · **cột "Người phụ trách" của sổ HD3** (81 tình huống, app phải biết ai làm) · **bốn sheet cấu hình CH1/CH2/CH4/CH6** - bốn LUẬT CỨNG của dự án, đối chiếu từng nhóm enum, từng tham số `paramOf`, từng câu `msgText`, từng ngưỡng `kpiTh`. Chỗ nào cố ý không làm phải khai vào `BOQUA` / `TRIG_BOQUA` / `KPI_BOQUA` / `CH3_BOQUA` / `VHBC_BOQUA` / `CH_BOQUA` **kèm lý do đọc được**. **Bẫy vận hành:** `check_sop` đọc `_APP.js`, mà `_APP.js` chỉ đúng khi trích bằng `ITTS_OUT=<gốc repo> python3 _src/extract_js.py` - quên biến ấy là trích nhầm bản cũ |
 | `ITTS_OUT=<out> node _checkui.js` | `CHECKUI OK: da mo THAT 492 luot` - **kiểm thử trên trình duyệt thật** (cần `npm i playwright` một lần; máy không có Chromium thì tự BỎ QUA chứ không báo đỏ bậy) | **Từ V9.62**: bộ kiểm phải ĐÓNG VAI NGƯỜI DÙNG ĐÃ CHỌN chế độ Cài đặt trước khi quét (`cfSetMode("that")`), và **đóng ngăn kéo còn sót trước mỗi màn**. Không làm vậy thì `go("settings")` chỉ mở popup hỏi chế độ chứ không điều hướng: 19 tab Cài đặt không tab nào được đo, mà ngăn kéo popup nằm mở suốt các màn sau, kéo theo hàng loạt báo "thò ra ngoài màn" hoàn toàn giả. **Luật: thêm một cửa chặn thì phải hỏi lại - bộ kiểm có biết gõ cửa không?* **Từ V9.67 chữa một chỗ ĐO NHẦM đã im lặng nhiều bản**: nó đo `documentElement.scrollWidth`, mà tràn ngang trong app này xảy ra BÊN TRONG khung cuộn `#content` - khung có thanh cuộn riêng nên phần thò ra không đội `<html>` rộng thêm chút nào. Máy báo "không cuộn ngang" trong khi mở điện thoại lên phải vuốt ngang mới đọc hết (7 trang). Nay đo thêm chính `#content` và `#hvBody`; vừa sửa thước là nó tự tìm ra thêm 6 trang tràn ở khổ iPad. **Và thêm một mặt kiểm mới**: ở khổ điện thoại, chạy hết 15 bài hướng dẫn, bước nào có neo trỏ RA NGOÀI MÀN là đỏ - từ 820px xuống sidebar là ngăn kéo đóng, phần tử trong đó vẫn tồn tại và vẫn có kích thước, chỉ toạ độ là x âm. Đợi 950ms mỗi bước cho đủ nhịp của chính app (cuộn mượt 300ms + vẽ lại 320ms + trượt ngăn kéo 260ms) - đo non hơn là đỏ của cái thước chứ không phải của app. |
 | `ITTS_APP=./_APP.js node _checkbc.js` | `CHECKBC OK: 17 ghe · 14 ban bo cuc khac nhau · 167 tieu chi` - **MOI GHE MOT BAN BAO CAO** (24/08). Anh Luan: *"moi chuc danh lai la 1 cach thiet ke khac nhau moi dung em. Chu em dung khung chung, cai nao co thi hien, ko co thi an anh thay ko hop ly"*. 45 bo cu khong bo nao do - chung hoi "trang co ve duoc khong", khong bo nao hoi "trang nay co phai ban bao cao CUA NGUOI NAY khong". Sau luat B0-B6, chi tiet o muc 24/08 cuoi file. | Dong du 17 ghe roi doc dan bai vo ra: dan bai rieng · ten + cau hoi mo dau · khong khoi la chen vao · khoi dau thuoc chu de cua ghe · khong khoi mien la · khong bang rong. |
-| `ITTS_OUT=<out> node _checkmat.js` | `CHECKMAT OK: 24 trang x 2 kho man, 3090 chuoi chu do bang thuoc that` (24 muc, vi trang `baitap` duoc mo o ca bon nac) - **ĐO BẰNG MẮT** (V9.99k, nay 9 phep do M1-M9). Anh Luân 04/08: *"quá trình verify của em rất lâu, nhưng lần nào a cũng bắt được lỗi... vừa tốn thời gian vừa ko hiệu quả thì giữ như cũ làm gì"*. Đếm lại thì đúng: trong một ngày, **sáu lỗi đều do anh Luân chỉ ra, không lỗi nào do 26 bộ kiểm (18 phút) tìm ra**. Ba trong sáu lỗi ấy cùng một họ mà không bộ nào có cửa để thấy - **HTML đúng hoàn toàn** (không tràn, không lỗi JS, nút đủ to, chữ đủ tương phản) **nhưng nhìn vào thì hỏng**. Bốn phép đo: **M1** chữ rộng hơn chỗ nó có (đo bề rộng THẬT của chuỗi với đúng font, so với khung) · **M2** bị cái khác phủ lên (`elementFromPoint` - hỏi đúng cách trình duyệt quyết định cú bấm rơi vào đâu) · **M3** ô hẹp giữa khoảng trống (bị cắt trong khi hàng chứa nó còn thừa chỗ) · **M4** dấu ngăn mồ côi (›/·/\| nằm khác dòng với mục đi kèm). Chạy lần đầu bắt ngay 7 chỗ nút bị nút Trợ lý nổi che. **Cố ý rẻ** (một khổ màn, 14 trang, ~50 giây) để nằm được ở TẦNG NHANH - bộ kiểm 18 phút thì người ta chạy một ngày một lần, mà lỗi sinh ra từ chính lần sửa vừa rồi. | Nút Trợ lý nổi nay chỉ còn **biểu tượng** là vùng bấm (tròn 38px), cả dải chữ cho chuột đi xuyên qua - hạ số chỗ bị khoá từ 7 xuống 1. Chỗ cuối nằm đúng dưới vùng bấm ấy: **khai có trần TỐI ĐA 2**, quá 2 là đỏ, vì quá 2 nghĩa là vùng bấm lại phình ra. Một cái trần có số, không phải một công tắc tắt luật. |
+| `ITTS_OUT=<out> node _checkmat.js` | `CHECKMAT OK: 54 trang x 2 kho man, 9388 chuoi chu do bang thuoc that` (54 muc, vi mot so trang duoc mo o nhieu nac qua khoa `dat`) - **ĐO BẰNG MẮT** (V9.99k, nay 10 phep do M1-M10). Anh Luân 04/08: *"quá trình verify của em rất lâu, nhưng lần nào a cũng bắt được lỗi... vừa tốn thời gian vừa ko hiệu quả thì giữ như cũ làm gì"*. Đếm lại thì đúng: trong một ngày, **sáu lỗi đều do anh Luân chỉ ra, không lỗi nào do 26 bộ kiểm (18 phút) tìm ra**. Ba trong sáu lỗi ấy cùng một họ mà không bộ nào có cửa để thấy - **HTML đúng hoàn toàn** (không tràn, không lỗi JS, nút đủ to, chữ đủ tương phản) **nhưng nhìn vào thì hỏng**. Bốn phép đo: **M1** chữ rộng hơn chỗ nó có (đo bề rộng THẬT của chuỗi với đúng font, so với khung) · **M2** bị cái khác phủ lên (`elementFromPoint` - hỏi đúng cách trình duyệt quyết định cú bấm rơi vào đâu) · **M3** ô hẹp giữa khoảng trống (bị cắt trong khi hàng chứa nó còn thừa chỗ) · **M4** dấu ngăn mồ côi (›/·/\| nằm khác dòng với mục đi kèm). Chạy lần đầu bắt ngay 7 chỗ nút bị nút Trợ lý nổi che. **Cố ý rẻ** (một khổ màn, 14 trang, ~50 giây) để nằm được ở TẦNG NHANH - bộ kiểm 18 phút thì người ta chạy một ngày một lần, mà lỗi sinh ra từ chính lần sửa vừa rồi. | Nút Trợ lý nổi nay chỉ còn **biểu tượng** là vùng bấm (tròn 38px), cả dải chữ cho chuột đi xuyên qua - hạ số chỗ bị khoá từ 7 xuống 1. Chỗ cuối nằm đúng dưới vùng bấm ấy: **khai có trần TỐI ĐA 2**, quá 2 là đỏ, vì quá 2 nghĩa là vùng bấm lại phình ra. Một cái trần có số, không phải một công tắc tắt luật. |
 | `ITTS_OUT=<out> node _checkmotcua.js` | `CHECKMOTCUA OK` - **MỘT NGHIỆP VỤ MỘT CỬA GHI** (RB1 của V2). Anh Luân: *"cùng 1 nghiệp vụ, mà ở bản hiện tại có thể làm được ở rất nhiều nơi, sẽ làm cho nhân sự bị rối."* **Đo lại thì phải sửa chính chẩn đoán ban đầu.** Báo cáo hội đồng đợt đầu ghi *"146 cửa ghi trên 24 bảng, riêng DL09 mười tám cửa - chỗ đáng lo nhất"*. Đọc kỹ thì 18 cửa ấy là **18 nghiệp vụ khác nhau** (bảo lưu · quay lại · bỏ học · chăm nguy cơ · quota WOW · đăng ký) - không cửa nào thừa. Một bảng có nhiều cửa ghi là bình thường; cái phải bắt là **hai cửa cùng làm một việc**. **Dấu vết không cãi được**: hai hàm cùng phát ra CÙNG MỘT `id=` cho ô nhập = hai bản dựng cho một form. Đo trên 1604 hàm của bản build - chỉ 4 ô nhập dùng chung, cả 4 đều giữa hai ngăn kéo. **Và trùng id không chỉ là chuyện gọn gàng - nó là một lỗi GHI DỮ LIỆU**: bẫy số 4 của `BAN_GIAO_V2.md`, ngăn kéo mở đè lên trang mà trang vẫn còn trong DOM, `getElementById` vớ trúng bản ở trang bên dưới, app ghi một con số KHÁC con số người ta gõ. Ba mặt: **M1** hai hàm cùng dựng một ô nhập · **M2** hàm lưu phải đi tới được một cửa ghi · **M3** bản khai `NGHIEPVU` phải trỏ vào hàm có thật. | **BA LẦN CÁI THƯỚC BẮT NGƯỜI VIẾT NÓ SAI, cả ba đều đáng ghi:** (1) *đoán tên hàm* (`ddOpen`, `xmSave`) thay vì hỏi thẳng app - đúng luật *"hỏi thẳng từ vựng mà app dùng, đừng tự đặt tên"* mà vẫn phạm; tên thật là `ddHub`, `xepMoiLuu`. (2) *chấm mọi trùng id thành đỏ* - trong khi hậu quả khác hẳn nhau: **ngăn kéo + TRANG** là đỏ thật, còn **ngăn kéo + ngăn kéo** thì vô hại vì `openDrawer` thay nội dung. Đỏ ở chỗ không nguy hiểm thì người ta quen mắt, rồi ca đỏ THẬT trôi qua cùng một màu - nay tách hai mức, một cái đỏ một cái ghi chú. (3) *đòi hàm lưu phải LÀ cửa ghi* - báo đỏ `knResolveSave`, trong khi nó gọi `knUpd` và `knUpd` đã khai đàng hoàng; đòi mỗi hàm lưu tự mình là một cửa ghi là **ép app bỏ hàm ghi dùng chung, tức ép nó làm ngược lại đúng điều RB1 muốn**. Câu hỏi đúng: hàm lưu phải ĐI TỚI ĐƯỢC một cửa ghi. |
 | `ITTS_APP=./_APP.js node _checkcong.js` | `CHECKCONG OK: 25 hoc vien x 5 cau hoi = 152 tieu chi` - **HAI CONG CO NOI CUNG MOT CON SO KHONG** (25/08, bo thu 47). Mang 7 cua `GIAO_THUC_AUDIT.md` (*"mot su that hien o nhieu noi thi phai hien GIONG NHAU"*) do lai thi **chua co bo kiem nao di qua**: `_check14` soi kenh hai chieu cua cong hoc vien, `_checkmien` soi ro du lieu, `_check18` soi trung khoi - khong bo nao DOI CHIEU hai ben. Day la loai hong im lang nhat: ca hai cong deu ve duoc, deu khong loi, deu co so - chi la hai so khac nhau, va nguoi phat hien ra se la hoc vien goi dien len hoi. Nam cau: **C1** chuyen can (kem C1b: phai noi ra phan so de ra con so ay) · **C2** bai tap · **C3** cong no · **C4** quota WOW · **C5** ten. Doc so tu HTML cua cong hoc vien chu KHONG goi lai ham - goi lai ham thi hai ve dung chung mot phep tinh va bo kiem chi chung minh rang mot ham bang chinh no. **Ba lan sua thuoc truoc khi no do dung**, ca ba cung mot ho (do chuoi phang thay vi do cau truc) - chi tiet o dau file. | Ve THAT trang cong hoc vien cho 25 em roi doc `.bsn`/`.bsl`/`.bsp` cua tung the tren dai so, so voi phep tinh cua cong nhan vien. |
 | `ITTS_APP=./_APP.js node _checkghe.js` | `CHECKGHE OK` - **NGỒI VÀO GHẾ RỒI HỎI: CÁI NÚT NÀY CÓ ĐÚNG NGƯỜI ĐƯỢC BẤM KHÔNG.** Dựng 18/08 sau khi anh Luân bắt BA lỗ trong một phiên chỉ bằng cách mở cổng giảng viên ra xem - mà 44 bộ kiểm không bộ nào bắt được. Lý do đọc ra được: 44 bộ kia hỏi về MÀN HÌNH (*"trang vẽ ra được không"*, *"nút bấm có chuyện gì không"*, *"menu có mời rồi đuổi không"*), không bộ nào hỏi câu về NGƯỜI. Bốn câu: **G1** đóng vai đủ 16 chức danh, mở từng màn quyết định, đỏ khi CÓ nút quyết mà bản khai quyền nói KHÔNG - chỉ tính người MỞ ĐƯỢC màn ấy (bẫy đã cắn ngay lượt đầu: gọi thẳng `RENDER.duyet()` là đi vòng qua chính cửa đang cần đo, nên nó tố oan giáo viên "thấy nút duyệt chiết khấu"). **G2** gọi THẲNG cửa ghi, bỏ qua mọi cái nút - giấu nút mà không khoá cửa ghi thì phân quyền chỉ là trang trí, và đó đúng là cách lỗ `absRun` tồn tại (`actGuard` là chốt chống-bấm-hai-lần, không phải chốt quyền). **G3** quét tên hàm `*QuyetForm`/`duyet*Form` trong mã và đòi mọi màn quyết định phải có mặt trong bản khai `CUA` - thêm hàng chờ mới mà quên khai thì bộ này im lặng bỏ qua nó. **G4** mọi việc trong nhịp ngày của một chức danh phải mở được trang của nó. Soi 6 quyết định: chiết khấu · hoàn tiền · xác nhận thu · đổi đợt đóng · hợp đồng cam kết · GV báo nghỉ · xin nghỉ học. Bắt được ngay lượt chạy đầu một lỗ có sẵn từ trước: Sale Leader chi nhánh thấy nút duyệt chiết khấu, trong khi anh Luân chốt 04/08 *"chỉ trưởng phòng tư vấn và giám đốc"*. |
@@ -1478,3 +1478,73 @@ Thay bang hai cau **doc lap voi bo dung**:
 | B6 | hai ghe khac nghiep vu co doc hai ban khac nhau khong | (cau truc) |
 
 Ket qua hien tai: **17 ghe · 14 ban bo cuc khac nhau · 167 tieu chi**.
+
+---
+
+## 25/08 - M10 "AP SAT VIEN PANEL": CAU HOI SAI THI DO BAO NHIEU LAN CUNG XANH
+
+Anh Luan: *"Chi so cua rieng ban, va cai o ben duoi bi tran ra vien em ko thay a"*.
+
+**Em da do cho ay HAI LAN va ca hai lan bao xanh.** Vi ca hai lan em hoi *"the co tran RA NGOAI
+panel khong"* - ma the dung dung o mep, nen cau tra loi luon la khong.
+*Hoi "co vuot qua khong" thi cai gi dung dung o vach cung dat. Cau phai hoi la "co DU CACH mep
+khong".*
+
+Do lai o dung ty le anh dung (90%): the cuoi o x=1416, mep trong panel x=1417 - **cach 1px**.
+Goc: "KPI cua toi" la panel **duy nhat trong app** dat `statStrip` lam con truc tiep cua `.panel`,
+bo qua lop `.pbody` - ma 6px dem nam o `.pbody`. Quet ca file: 1/1 cho.
+
+### Luat M10
+
+Voi moi `.panel`, moi khoi con cua no phai cach vien panel **>= 3px** o ca hai ben, trong do
+"khoang tho" = phan thut vao **CONG dem cua chinh khoi ay**.
+
+Hai lan phai sua chinh cai thuoc truoc khi no do duoc:
+
+| Ban | Ket qua | Vi sao sai | Sua |
+|---|---|---|---|
+| v1 | **96 cho do** | gan het la `.pbody` - ma `.pbody` theo thiet ke om tron be ngang panel va giu dem **o ben trong** no. Do mep ngoai cua no thi bao gio cung ra 0 | cong `paddingLeft/Right` cua chinh khoi con vao khoang tho. *Khoang tho khong nam o cho cai hop bat dau - no nam o cho CHU bat dau* |
+| v2 | **8 cho do** | deu la bang: vach ke cua bang chay tron be ngang panel moi thanh mot khoi lien | mien theo **LY DO** (`con.querySelector("table")`), khong theo ten lop. `.giapn` o Bang cong va khoi nhom viec o Viec hom nay khong mang lop `tbwrap` nhung ben trong van la `<table>`. *Mien theo ten lop thi moi lan ai do dung cung mot thu duoi mot cai ten khac la phai khai lai; mien theo ly do thi khai mot lan* |
+
+**M10 tu bat ra mot cho chua ai nhin toi:** thanh "Nhom" o Chay quy trinh nam trong `<div
+style="padding:0 0 2px">` - no la mot hop CO VIEN cua rieng no, de sat mep panel la hai duong
+vien dinh nhau, ma no lai rong hon danh sach ben duoi dung 6px moi ben nen hai khoi lech truc.
+
+---
+
+## 25/08 - `THESO`: MOT CAI SO CHI DUOC GHI DE, KHONG BAO GIO DUOC XOA
+
+`_checkmien` do: Truong phong Marketing (khai `tien:"none"`) doc duoc **"Dang ky con no"** trong
+"Can chu y". Dong vai rieng nguoi ay thi **sach**; chi lo khi chay noi tiep nhieu nguoi.
+
+`statStrip` chi GHI vao `THESO[key]` khi no thuc su duoc goi. Trang nao ve xong ma **khong goi**
+- `banlam` cua chuc danh `lite` thoat som truoc dai the, hoac trang loc het the theo
+`SCOPE().blocks` - thi so giu nguyen trang cu cua **NGUOI TRUOC**. Trong app that, do la luc bam
+**Doi vai**.
+
+*Mot cai so chi duoc ghi de chu khong bao gio duoc xoa thi no khong ke chuyen hien tai - no ke
+chuyen lan cuoi co nguoi ghi.*
+
+Va: `canhBaoQuet` dung pham vi quet tu `HUBTAB`, tuc chi nhung trang la DICH CUA MOT TAB HUB.
+Truong phong ACA ra **8 trang, 7 trong 8 khong dang ky the nao** -> "Can chu y" chi con **1 muc**.
+Trang loi cua phong ACA (Bai tap, Giao an, Bang lop, Giang vien) khong phai dich cua tab hub nao
+nen chua bao gio duoc quet. Nay quet theo `PBK` + `navVis`: TP ACA **1 -> 9**, GV ACA **0 -> 3**.
+*Chon pham vi quet theo mot bang khai co san thi tien, nhung bang ay sinh ra de tra loi cau hoi
+khac - va phan no khong noi toi se im lang bien mat khoi ket qua.*
+
+### Va no lam lo mot cho do khac tung "xanh vi mot ly do sai"
+
+`_checkneo` bao `tq_tong 3/10` va `tn_sale 1/8` khoanh trung cho. Truoc do bo nay **xanh** -
+nhung xanh vi chinh cai ro ri `THESO`: tam "Can chu y" luc co luc khong nen chi so thu tu trong
+duong DOM cua hai luot do lech nhau. Va cho ro ri xong thi cho trung lo ra.
+
+*Mot cho do khong hien ra khong co nghia la khong co; doi khi chi co nghia la cai thuoc dang rung.*
+
+Va duoi no la mot loi that hon: **ca hai buoc dang khoanh NHAM DAI**. Tu V2, dai 5 o cua Trang bat
+dau duoc nhung vao trang **Viec hom nay** - ma trang ay da co dai the rieng. Hai dai cung lay neo
+mac dinh `bstats`, `tourFind` tra ve **cai dau tien**, nen bai noi *"Mo may la nhin 5 o nay - Toi
+hen hom nay..."* lai to sang **dai cong no** nam tren no. Da cap neo rieng `blstats` cho dai cua
+Trang bat dau (`THEDEF.banlam.neo`), va khai ly do cho cho hai bai cung tro mot dai.
+
+*Mot ma neo dung chung chi dung chung nao moi man co duy nhat mot thu mang no; ngay co thu hai,
+no thoi la dia chi va thanh mot huong chi tay.*
