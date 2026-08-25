@@ -79,6 +79,19 @@ const NEO_CHUNG = {
   "tn_quanly 1/6":
     "Màn Báo cáo, trùng với tn_ketoan 5/5. Cùng một màn dạy cho hai chức danh: kế toán đọc "
     + "doanh thu, quản lý đọc toàn cảnh. Không tách nhỏ được vì cả hai bước đều giới thiệu CẢ màn.",
+  /* 25/08 - CHỖ NÀY TỪNG XANH VÌ MỘT LÝ DO SAI. Hai bước dưới đây luôn khoanh cùng một chỗ,
+     nhưng trước đây chúng lọt vì `canhBaoQuet` đọc phải sổ `THESO` còn sót của lượt trước, nên
+     tấm "Cần chú ý" lúc có lúc không và chỉ số thứ tự trong đường DOM của hai lượt đo lệch
+     nhau. Vá đúng chỗ rò rỉ ấy thì hai đường DOM bằng nhau và chỗ trùng lộ ra.
+     Và nó lộ ra một lỗi thật nằm dưới: cả hai bước đang khoanh NHẦM DẢI (dải công nợ của trang
+     Việc hôm nay) vì trang này có hai dải cùng mang neo `bstats`. Đã cấp neo riêng `blstats`
+     cho dải của Trang bắt đầu - nay hai bước khoanh ĐÚNG dải 5 ô, và vẫn là cùng một dải.
+     *Một chỗ đỏ không hiện ra không có nghĩa là không có; đôi khi chỉ có nghĩa là cái thước
+     đang rung.* */
+  "tn_sale 1/8":
+    "Dải 5 ô đầu ngày của Trang bắt đầu, trùng với tq_tong 3/10. Bài tham quan dạy CÁCH ĐỌC "
+    + "dải này cho người mới mở app lần đầu; bài của Nhân viên Tư vấn mở đầu một ngày làm việc "
+    + "bằng chính dải ấy. Dải chỉ có một, và cả hai bước đều đang nói về đúng nó.",
 };
 
 /* ── BƯỚC CỐ Ý DẠY VỀ VỎ APP (N4) ─────────────────────────────────────────────────────────

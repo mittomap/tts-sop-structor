@@ -2473,7 +2473,14 @@ bangcong:{t:"Công giảng dạy & WOW",ttl:"Soát trước khi chốt công",th
   ["bv_mk_thuong","Thưởng giới thiệu chưa trao","Bạn được giới thiệu đã đăng ký mà người giới thiệu chưa nhận thưởng. Hứa mà không trao là mất uy tín chương trình. Danh sách: mở trang Mã giới thiệu."],
   ["bv_no_phi","Đơn còn nợ phí","Đăng ký còn hiệu lực mà vẫn còn tiền chưa thu. Danh sách: trang Tuyển sinh, bước Thanh toán."],
   ["bv_thu_soat","Phiếu thu chờ đối soát","Phiếu thu đã ghi mà kế toán chưa xác nhận. Danh sách: Chờ duyệt › Xác nhận thu tiền."]]},
- banlam:{t:"Trang bắt đầu",ttl:"Hàng chờ trên hành trình khách",the:[
+ /* ═══ NEO RIÊNG `blstats` - VÌ TRANG NÀY CÓ HAI DẢI THẺ ═══════════════════════════════════
+    Từ V2, dải thẻ của Trang bắt đầu được nhúng vào trang **Việc hôm nay**, mà trang ấy đã có
+    dải thẻ của riêng nó. Hai dải cùng lấy neo mặc định `bstats`, và `tourFind` trả về CÁI ĐẦU
+    TIÊN - nên hai bước hướng dẫn nói về "5 ô mở máy là nhìn" (`tq_tong 3/10`, `tn_sale 1/8`)
+    lại khoanh vào dải công nợ nằm trên nó. Cả hai bước đều dạy đúng chữ mà chỉ sai chỗ.
+    *Một mã neo dùng chung chỉ đúng chừng nào mỗi màn có duy nhất một thứ mang nó; ngày có
+    thứ hai, nó thôi là địa chỉ và thành một hướng chỉ tay.* */
+ banlam:{t:"Trang bắt đầu",ttl:"Hàng chờ trên hành trình khách",neo:"blstats",the:[
   ["bl0_appt","Tới hẹn hôm nay","Số hồ sơ có lịch hẹn liên hệ rơi vào hôm nay, cộng phần đã quá hẹn từ hôm trước. Danh sách: chip Tới hẹn / quá hẹn. ngay dưới."],
   ["bl0_risk","Học viên nguy cơ","Học viên đang bị đánh dấu nguy cơ trên trục chuyên cần hoặc trục học thuật, toàn trung tâm. Danh sách: Học viên nguy cơ."],
   ["bl0_wow","WOW chờ xử lý","Buổi WOW đã đặt/đã xác nhận chưa dạy, cộng buổi đã dạy mà coach chưa ghi nội dung. Danh sách: WOW."],
@@ -2703,7 +2710,9 @@ function theBoxIn(key){var parts=THEHTML[key]||[];
   /* Viết THẲNG chuỗi `data-tour="bstats"` cho trường hợp mặc định: bộ kiểm hướng dẫn quét MÃ
      NGUỒN tìm literal, ghép biến là neo "tàng hình" với nó - đúng cái bẫy đã ghi ở V9.60. */
   ?'<div class="bstats'+(hien<=3?" itfew":"")+'" data-tour="bstats">'
-  :'<div class="bstats'+(hien<=3?" itfew":"")+'" data-tour="bvstats">')+body+'</div>'}
+  :(neo==="blstats"
+   ?'<div class="bstats'+(hien<=3?" itfew":"")+'" data-tour="blstats">'
+   :'<div class="bstats'+(hien<=3?" itfew":"")+'" data-tour="bvstats">'))+body+'</div>'}
 /* ═══════════ V9.36 - BẤM TÊN LÀ RA NGĂN KÉO, Ở MỌI BẢNG ═══════════
    (anh Luân: "a nhớ học viên có làm drawer rồi mà sao mấy trang này chưa có")
    Trước đây tableHTML nối ngăn kéo bằng cách LIỆT KÊ TÊN TRANG - đúng 6 trang được nối tay, 23
@@ -23998,7 +24007,7 @@ var TOURS={
      LUẬT TỪ ĐÂY: bước hướng dẫn KHÔNG được trỏ vào trang chỉ có ở bản kia. `_checktour` canh
      bằng cách so hai cây menu, nên quên là đỏ ngay. */
   {p:"banlam",sel:'@navarc',t:"Menu theo 4 chặng vòng đời",d:"C1 Khách tiềm năng - C2 Đang học - C3 Tạm dừng - C4 Kết thúc & Học tiếp. Chấm màu là chặng, số đỏ là việc quá hạn.",hint:"Bấm một nhóm chặng để mở ra."},
-  {p:"banlam",sel:'@bstats',t:"Việc cần xử lý hôm nay",d:"Mỗi ô là một con số phải nhìn mỗi sáng. Ô chỉ để XEM, không bấm - rê chuột vào ô sẽ có câu chú thích nói con số đó đếm gì và muốn xem danh sách thì bấm chip nào ở dưới. Nút Thẻ ở góc phải cho bạn tắt bớt ô không cần.",hint:"Rê chuột vào ô Tới hẹn hôm nay để đọc chú thích."},
+  {p:"banlam",sel:'@blstats',t:"Việc cần xử lý hôm nay",d:"Mỗi ô là một con số phải nhìn mỗi sáng. Ô chỉ để XEM, không bấm - rê chuột vào ô sẽ có câu chú thích nói con số đó đếm gì và muốn xem danh sách thì bấm chip nào ở dưới. Nút Thẻ ở góc phải cho bạn tắt bớt ô không cần.",hint:"Rê chuột vào ô Tới hẹn hôm nay để đọc chú thích."},
   {p:"banlam",sel:'@chaybody',t:"Danh sách người cần xử lý",d:"Mỗi dòng là một người kèm việc kế tiếp. Dải hạt màu cho biết họ đang ở chặng nào. Rê vào MỘT HẠT là biết chặng đó đã để lại gì trong hồ sơ; bấm vào hạt mở ngăn kéo riêng của chặng đó; bấm chữ C1/C2 đầu dải mở cả hành trình.",hint:"Rê vào một hạt rồi bấm thử - ngăn kéo kể đủ sản phẩm của chặng đó."},
   {p:"changA",sel:'@nrail',t:"Bản đồ một chặng",d:"Đường ray hiện số người ở từng ga và phần trăm chuyển đổi thật giữa các ga - nhìn là biết đang tắc ở đâu.",hint:"Bấm một ga để lọc người ở ga đó."},
   {sel:'@bell',t:"Chuông cảnh báo",d:"Mọi việc trễ hẹn theo quy trình chuẩn dồn về đây, chia theo bộ phận. Việc mới từ máy khác còn nổ bong bóng góc màn hình.",hint:"Bấm chuông xem thử."},
@@ -24042,7 +24051,7 @@ var TOURS={
   {p:"hoidap",sel:'@qavd',t:"Hỏi số - và số đó là số thật",d:"Bấm thử câu mẫu 'có bao nhiêu học viên nguy cơ'. Con số trả về chính là con số app đang hiện trên thẻ, tính lại tại chỗ theo ngưỡng CH2 - không phải số gõ sẵn. Bên dưới còn liệt kê cụ thể là ai.",hint:"Bấm một câu mẫu."},
   {p:"hoidap",sel:'@qabox',t:"Không hiểu thì nói là không hiểu",d:"Hỏi câu Trợ lý chưa trả lời được thì nó nói thẳng, gợi ý những thứ gần nhất, và GHI câu đó vào sổ trong Cài đặt để quản trị viên soạn câu trả lời một lần - lần sau app trả lời được ngay.",hint:"Xong phần Trợ lý!"}]},
  tn_sale:{lv:"trainghiem",role:"Nhân viên Tư vấn",t:"Một ngày của Nhân viên Tư vấn",ic:"ti-phone",d:"8 bước - từ khách mới tới lúc thu tiền",steps:[
-  {p:"banlam",sel:'@bstats',t:"Mở máy là nhìn 5 ô này",d:"Tới hẹn hôm nay là việc gấp nhất - khách đã hẹn mà không gọi là mất. Sau đó tới học viên nguy cơ và đăng ký còn nợ. Ô chỉ để xem; muốn ra danh sách thì bấm chip Tới hẹn / quá hẹn ở thanh Nhóm.",hint:"Bấm chip Tới hẹn / quá hẹn ở thanh Nhóm."},
+  {p:"banlam",sel:'@blstats',t:"Mở máy là nhìn 5 ô này",d:"Tới hẹn hôm nay là việc gấp nhất - khách đã hẹn mà không gọi là mất. Sau đó tới học viên nguy cơ và đăng ký còn nợ. Ô chỉ để xem; muốn ra danh sách thì bấm chip Tới hẹn / quá hẹn ở thanh Nhóm.",hint:"Bấm chip Tới hẹn / quá hẹn ở thanh Nhóm."},
   /* V9.97: neo cũ là '@txt:Thêm mới' - KHÔNG CÓ nút nào tên vậy trên màn này. Trang `nhaplead`
      đi qua remap của go() thành tab "lead" của hub Tuyển sinh, mà ở đó nút thêm tên là "Khách mới
      liên hệ đến". Bài bảo người ta bấm một nút không tồn tại, và câu "Việc cần làm" cũng sai theo.
@@ -28762,6 +28771,17 @@ function canhBaoQuet(){
    /* Chỉ quét trang NGƯỜI NÀY ĐƯỢC XEM. Cảnh báo về một trang họ không có quyền vào là mời rồi
       đuổi - luật đã ghi ở `navVis`. */
    try{if(!navVis(k))return}catch(e){return}
+   /* ═══ XOÁ SỔ CŨ TRƯỚC KHI VẼ - CHỖ RÒ RỈ DỮ LIỆU GIỮA HAI DANH TÍNH ══════════════════════
+      `THESO` là sổ ghi "trang này vừa bày ra những thẻ nào", và `statStrip` chỉ GHI vào sổ khi
+      nó thật sự được gọi. Trang nào vẽ xong mà KHÔNG gọi `statStrip` - `banlam` của một chức
+      danh `lite` thoát sớm trước dải thẻ, hay một trang lọc hết thẻ theo `SCOPE().blocks` - thì
+      sổ giữ nguyên trang cũ của NGƯỜI TRƯỚC. Đổi vai trong demo là đọc lại đúng cái sổ ấy.
+      `_checkmien` bắt được: Trưởng phòng Marketing (`tien:"none"`) thấy "Đăng ký còn nợ" trong
+      "Cần chú ý" - con số của một người khác, ở một miền dữ liệu họ không được xem. Đóng vai
+      riêng mình họ thì sạch; chỉ lộ khi chạy nối tiếp nhiều người, đúng như lúc bấm Đổi vai.
+      *Một cái sổ chỉ được GHI ĐÈ chứ không bao giờ được XOÁ thì nó không kể chuyện hiện tại -
+      nó kể chuyện lần cuối có người ghi.* */
+   THESO[k]=[];
    try{CUR=k;(PBK[k].ty==="list")?renderList(k):(RENDER[k]&&RENDER[k]())}catch(e){return}
    (THESO[k]||[]).forEach(function(o){
     var so=num(String(o.so).replace(/[^0-9.-]/g,""));
