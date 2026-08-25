@@ -273,6 +273,35 @@
 > Nay là **một chấm nửa navy nửa xanh lá**, có ô riêng trong chú thích và câu rê chuột nói cả hai
 > ngày. Không thêm mã màu nào - `linear-gradient` dùng đúng hai token cũ.
 
+> ### 🧪 26/08 - VERIFY BẮT HAI CHỖ ĐỎ, CẢ HAI ĐỀU LÀ CÂY THƯỚC, VÀ CẢ HAI ĐỀU DẠY MỘT ĐIỀU
+>
+> Lượt verify trọn bộ đầu tiên có cây thước band (bản `030666`): **46/48 xanh, 2 đỏ**, cả hai do
+> chính khối em vừa dựng. Đáng ghi vì cả hai đều thuộc loại *mắt nhìn thì đúng, máy đọc thì sai*.
+>
+> **`_checkux` - bảng màu 110 -> 111.** Cây thước đẻ ra đúng một mã xám lạ, dùng đúng một lần,
+> cho cái đường kẻ giữa hai hàng. Đổi sang `var(--line)`.
+> *Một mã màu dùng đúng một lần thì nó không phải là màu của app - nó là màu của cái mình vừa
+> viết ra.*
+> **Và lượt sửa đầu KHÔNG ăn:** em gỡ mã khỏi CSS rồi **chép nguyên nó vào dòng chú thích giải
+> thích vì sao gỡ** - bảng màu vẫn đếm 111. `_checkux` bắt mẫu `#` sáu ký tự trên VĂN BẢN cả file,
+> mà chú thích cũng nằm trong file dựng ra.
+> *Một phép đo đọc văn bản thì lời mình viết VỀ mã nguồn cũng là mã nguồn đối với nó.*
+>
+> **`_checkui` - 107 chỗ "chữ chìm vào nền".** Con số của mỗi mốc được viết là `<b>` NẰM TRONG cái
+> chấm rồi đẩy ra ngoài bằng `position:absolute`. Mắt thấy số nằm trên nền trắng; nhưng cây phả hệ
+> vẫn khai nó là con của một cái chấm navy / xanh lá / hổ phách, nên bộ kiểm leo lên tổ tiên tìm
+> nền và đọc ra "chữ mực trên nền navy, tương phản 2.0".
+> Đây KHÔNG phải thước tố oan: HTML đang khai sai chỗ thuộc về. Nay là hai thẻ anh em cùng một
+> toạ độ `left` (`.brm` là cái chấm, `.brmn` là con số).
+> *Đẩy một phần tử ra khỏi chỗ của nó bằng CSS thì mắt tin, còn mọi thứ đọc CẤU TRÚC thì không -
+> và nền, tiêu điểm, trình đọc màn hình đều đọc cấu trúc.*
+>
+> Kèm hai việc nhỏ dọn cùng lượt: ô mã buổi ở nhật ký WOW chỉ có mỗi icon ngôi sao trong một ô
+> rộng 62px vốn để đựng chữ (nhật ký buổi học để "Buổi 64" ở đúng chỗ ấy) - nay điền **"WOW 3"**,
+> số thứ tự buổi kèm riêng của chính em ấy. Và dòng điểm danh nói *"Vắng · Có phép · đã được
+> duyệt: vắng có phép"* - "có phép" ba lần một dòng; bỏ nhãn loại vắng khi đơn ĐÃ được duyệt
+> (vắng không phép và vắng chờ duyệt vẫn giữ, vì ở hai ca đó loại vắng và kết luận là hai chuyện).
+
 > ### 🔄 25/08 - ĐỌC LẠI TOÀN BỘ VIỆC TỒN, VÀ PHẦN LỚN ĐÃ XONG TỪ LÚC NÀO
 > Anh Luân: *"xử lý toàn bộ việc tồn, audit toàn diện, chủ động fix sạch toàn bộ"*.
 > Việc đầu tiên hoá ra là **đi hỏi lại từng mục xem nó còn đúng không** - và mảng 8 của giao thức

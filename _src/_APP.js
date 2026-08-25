@@ -20558,8 +20558,17 @@ function renderTrangHV(){
     var vao=cls.indexOf("vao")>=0;
     var inSo=so&&(vao||_tren.indexOf(v)<0);
     if(so&&!vao)_tren.push(v);
-    return '<span class="brm '+cls+'" style="left:'+pc(v).toFixed(2)+'%" data-tip="'+esc(tip)+'">'+
-     (inSo?'<b>'+v+'</b>':'')+'</span>'};
+    /* CON SỐ ĐỨNG RIÊNG, KHÔNG NẰM TRONG CÁI CHẤM. Bản đầu nhét `<b>` vào trong `.brm` rồi đẩy
+       nó ra ngoài bằng `position:absolute` - mắt thấy số nằm trên nền trắng, nhưng CÂY PHẢ HỆ
+       vẫn khai nó là con của một cái chấm navy/xanh lá/hổ phách. `_checkui` dò nền bằng cách
+       leo lên tổ tiên nên nó đọc ra "chữ mực trên nền navy, tương phản 2.0" và báo đỏ 107 chỗ.
+       Cái thước ấy nói đúng cái nó đo được: HTML đang khai con số thuộc về cái chấm.
+       *Đẩy một phần tử ra khỏi chỗ của nó bằng CSS thì mắt tin, còn mọi thứ đọc cấu trúc thì
+       không - và nền, tiêu điểm, trình đọc màn hình đều đọc cấu trúc.*
+       Nay là hai thẻ anh em, cùng một toạ độ `left`. */
+    var _L=pc(v).toFixed(2);
+    return '<span class="brm '+cls+'" style="left:'+_L+'%" data-tip="'+esc(tip)+'"></span>'+
+     (inSo?'<span class="brmn '+cls+'" style="left:'+_L+'%">'+v+'</span>':'')};
    var tipOf=function(ten,v,ngay){return ten+": band "+v+(ngay?(" · "+ngay):"")};
    /* GIỮA KHÓA TRÙNG ĐẦU RA: một chấm chia đôi màu, không phải hai chấm chồng nhau.
       Cỡ lồng nhau cứu được ca "đầu vào trùng mốc sau" (vòng rỗng rộng hơn nên dấu sau nằm gọn
@@ -20654,7 +20663,11 @@ function renderTrangHV(){
   the+='<div class="hvsb">';
   if(a){the+='<div class="hvev"><i class="ti ti-user-check"></i><span><b>Điểm danh:</b> '+esc(elabel(a.attendance_status))+
    (a.check_in_time?' · vào lúc '+esc(String(a.check_in_time).slice(-5)):'')+
-   (a.absence_type?' · '+esc(elabel(a.absence_type)):'')+
+   /* Vắng ĐÃ ĐƯỢC DUYỆT thì không in nhãn loại vắng nữa: câu duyệt ngay sau đó đã nói đúng
+      chữ ấy rồi ("Vắng · Có phép · đã được duyệt: vắng có phép" - "có phép" ba lần một dòng).
+      Vắng không phép và vắng chờ duyệt vẫn giữ nhãn, vì ở hai ca đó loại vắng và kết luận của
+      trung tâm là hai chuyện khác nhau. */
+   (a.absence_type&&!(ecode(a.absence_type)==="excused"&&!absPending(a))?' · '+esc(elabel(a.absence_type)):'')+
    (a.in_class_performance?' · thái độ trong lớp: <b>'+esc(elabel(a.in_class_performance))+'</b>':'')+
    /* (m) DL12.note là ghi chú NỘI BỘ (vd "đã gọi hỏi thăm, HV hứa đi học lại") - in nguyên
       văn cho học viên đọc là lộ chuyện chăm sóc nội bộ. Chỉ hiện phần HỌC VIÊN TỰ GHI. */
@@ -20690,12 +20703,19 @@ function renderTrangHV(){
   /* V9.47: dùng ĐÚNG dòng thời gian của nhật ký buổi học ngay phía trên - hai mục nằm sát nhau,
      cùng là chuyện đã xảy ra theo thứ tự, không có lý do gì trình bày hai kiểu. */
   h+=hvTLopen();
+  /* Ô mã buổi (`.hvsn`) là ô đựng CHỮ - nhật ký buổi học ngay trên kia để "Buổi 64" ở đúng chỗ
+     này, còn nhật ký WOW chỉ để mỗi cái icon ngôi sao nên ô rộng 62px trông như một cái nhãn bị
+     bỏ trống. Nay điền số thứ tự buổi WOW CỦA CHÍNH HỌC VIÊN (đếm theo ngày tăng dần) - vừa lấp
+     đúng chỗ ấy, vừa nói thêm một điều mà cả thẻ chưa nói: đây là buổi kèm riêng thứ mấy của em.
+     *Một ô để trống không phải là một ô yên lặng - nó là một cái nhãn đang nói "chưa điền".* */
+  var _wSort=C.wow.slice().sort(function(a,b){return (pvnd(a.wow_session_date)||0)-(pvnd(b.wow_session_date)||0)});
   C.wow.slice().sort(function(a,b){return (pvnd(b.wow_session_date)||0)-(pvnd(a.wow_session_date)||0)}).forEach(function(w){
+   var _wn=_wSort.indexOf(w)+1;
    var oc=ecode(w.wow_outcome);
    var ocls=oc==="improved"?"green":(oc==="needs_more"?"amber":"");
    var _g=hvGio(w.wow_session_date), the="";
    the+='<div class="hvses"><div class="hvsh">'+
-    '<span class="hvsn" style="background:#DB277718;color:#DB2777"><i class="ti ti-star"></i></span>'+
+    '<span class="hvsn" style="background:#DB277718;color:#DB2777">WOW '+_wn+'</span>'+
     '<div class="hvst"><b>'+esc(elabel(w.wow_skill)||"")+(w.wow_content_focus?' · '+esc(w.wow_content_focus):'')+'</b>'+
     '<span>'+(_g?esc(_g)+' · ':'')+esc(elabel(w.wow_session_type)||"")+'</span></div>'+
     '<span class="chip '+stCls(w.wow_status)+'">'+esc(elabel(w.wow_status))+'</span></div>';
