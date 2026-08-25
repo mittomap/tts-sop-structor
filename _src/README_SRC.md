@@ -1548,3 +1548,58 @@ Trang bat dau (`THEDEF.banlam.neo`), va khai ly do cho cho hai bai cung tro mot 
 
 *Mot ma neo dung chung chi dung chung nao moi man co duy nhat mot thu mang no; ngay co thu hai,
 no thoi la dia chi va thanh mot huong chi tay.*
+
+---
+
+## 26/08 - AUDIT "DA CO NHUNG LAM CHUA TOI": BA CAU HOI CHUA AI HOI
+
+47 bo kiem dang XANH HET, nen vong dau khong phai chay lai chung ma la **gom cac "ghi chu" ma
+chinh chung dang ha xuong muc khong-do**. Roi dung ba phep do moi, deu la "dong vai 33 nguoi, ve
+that 729 luot trang":
+
+| Phep do | Cau hoi | Ket qua lan dau |
+|---|---|---|
+| Khoi rong | khoi nao tren trang rong | 24 khoi |
+| Bang rong theo tung nguoi | MOI bang tren trang deu rong | `giangvien` 24/30 nguoi · `magioithieu` 12/13 |
+| Trang tren menu ma mien du lieu la "none" | menu co moi vao cho khong xem duoc khong | 2 cum |
+| Ngan keo cut | bam mot dong so ra ngan keo KHONG NUT NAO | 1 lop loi, phu moi so chi-xem |
+| Truc loc chet | truc khai ra ma khong loc duoc gi | 3 truc mot gia tri · 19 truc co nut ten "(trong)" |
+| Cot luon rong | cot khai ma 0/N dong co du lieu | **0/238** - da sach tu truoc |
+| Xuat CSV vs cot dang hien | xuat co dung cot nguoi ta thay khong | khop - sach |
+
+### Loai loi khong bao gio keu: TEN COT khong ton tai
+
+`recOwners` xep DL19 va DL22 chung nhanh voi DL06, ma nhanh ay hoi `r.lead_id` va `r.created_by`
+- **hai bang gioi thieu khong co cot nao trong hai cot do** (DL22 goi no la `referred_lead_id`).
+Ban khai chu so huu tra ve mang rong vinh vien: khong loi JS, khong canh bao, chi la moi nguoi
+duoi muc "all" doc ra 0 dong.
+
+Cung ho voi "ma ma" ma `_checkaudit` da canh (`isc(x.cot,"ma")` bang mot ma khong co trong CH1),
+chi khac la lan nay cai khong ton tai la **TEN COT** chu khong phai gia tri. Chua co bo kiem nao
+hoi cau do.
+
+### Mot bang tra loi hai cau hoi khac nhau
+
+`DSDOM` gan MOI BANG dung mot mien. Nhung DL01 duoc doc theo hai cach: trang Bang cong doc no nhu
+**ho so nhan su** (co luong), trang Giang vien doc no nhu **tai giang day** (lop dang day, hoc
+vien, no nhan xet, bai cho cham). Khoa ca hai theo `nhansu` la chan mat cai thu hai.
+
+Nay `LISTCFG` khai duoc `mien` rieng, va bon cho dung lai danh sach goc cua mot so (than trang ·
+hop loc sau · bo dem chip · bo dem menu) di chung mot cua `listRows(key)` - vi *them mot luat vao
+so ma chi sua mot trong bon cho la bang noi mot dang, con so tren chip noi mot neo*.
+
+### Luat viet bang TEN RIENG thi moi trang moi lai phai nho khai lai
+
+Luat "moi roi duoi con te hon khong moi" da dat HAI LAN trong `navVis`, ca hai lan deu goi dich
+danh mot trang (`bangcong`, roi `baocao`). Trang thu ba mac dung benh thi khong ai hoi toi.
+Nay hoi chung: so chinh cua trang thuoc mien nao, nguoi nay co xem duoc mien ay khong.
+
+### Ba lan nghi cai thuoc truoc, ca ba lan thuoc sai
+
+- Phep do truc loc doc `ax.fx || r[ax.k]` trong khi truc tinh toan khai getter o `ax.get` -> bao
+  oan 10 truc "khong khop dong nao".
+- Ban sua lai van tu BO gia tri trong, trong khi hop loc THAT van dem no -> bao oan 7 truc.
+- Dem dong bang `srows("giangvien")` - `srows` nhan MA BANG chu khong nhan ten so, nen no tra ve
+  0 cho moi nguoi va suyt bi doc thanh "khong ai xem duoc trang nay".
+
+*Tin lan do dau thi da di "sua" ba cho app hoan toan dung.*

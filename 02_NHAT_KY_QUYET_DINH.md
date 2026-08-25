@@ -470,8 +470,13 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 47 BỘ KIỂM, VERIFY XANH HẾT trên bản đang chạy (44m05s, 25/08).
-> Bản dựng đang chạy: `4bff6a` (25/08 cuối - BỐN CHỖ ÁP SÁT VIỀN + LUẬT M10 · DẢI CẢNH BÁO QUÉT
+> **Phiên bản: V2 — 47 BỘ KIỂM.
+> Bản dựng đang chạy: `9786b3` (26/08 - AUDIT "ĐÃ CÓ NHƯNG LÀM CHƯA TỚI", **10 chỗ + 1 lỗ dữ
+> liệu**: hai miền dữ liệu khai sai (sổ Giảng viên · hai bảng giới thiệu) · một bản khai chủ sở
+> hữu chết vĩnh viễn · menu mời vào trang không xem được · ngăn kéo dòng sổ là ngõ cụt · nhãn
+> "(trống)" trên 19 trục lọc · bảng rỗng nói sai lý do · Nhân sự có việc thật. Báo cáo đầy đủ:
+> `AUDIT_26_08_2026.md`).
+> Mốc trước `4bff6a` (25/08 cuối - BỐN CHỖ ÁP SÁT VIỀN + LUẬT M10 · DẢI CẢNH BÁO QUÉT
 > ĐÚNG PHẠM VI NGƯỜI ĐỌC · BỊT RÒ RỈ `THESO` GIỮA HAI DANH TÍNH · NEO `blstats` cho dải 5 ô).
 > Mốc trước `b8e482` (25/08 - AUDIT TRỌN 9 MẢNG: trục "GV nghỉ liên tiếp" · tên khách
 > chưa thành học viên bấm được · vệt đường đi đọc được · **bộ kiểm thứ 47 `_checkcong`** đối chiếu
@@ -486,6 +491,56 @@
 > `bad7f9`, `a9eb4b`, `b8e482`, `c01fad`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
+> ### 🟢 26/08 - AUDIT "ĐÃ CÓ NHƯNG LÀM CHƯA TỚI": MƯỜI CHỖ, VÀ MỘT LOẠI LỖI KHÔNG BAO GIỜ KÊU
+>
+> Anh Luân: *"hôm nay a ko bổ sung chức năng gì, em cứ audit toàn diện để fix những cái đã có
+> nhưng làm chưa tới đi"*. Điểm xuất phát: **47 bộ kiểm đang xanh hết**. Nên việc đầu tiên là gom
+> lại toàn bộ **"ghi chú"** mà chính các bộ kiểm đang hạ xuống mức không-đỏ - chỗ máy đã biết là
+> chưa tới nhưng không có quyền chặn. Báo cáo đầy đủ: `AUDIT_26_08_2026.md`.
+>
+> **Phép đo mới dựng cho lần này:** đóng vai 33 người, vẽ **729 lượt trang**, rồi hỏi ba câu chưa
+> ai hỏi - *khối nào rỗng* · *bảng nào rỗng với ai* · *menu có mời vào trang mà miền dữ liệu khai
+> "none" không*. Ra ngay: `giangvien` rỗng với **24/30** người, `magioithieu` rỗng với **12/13**.
+>
+> **Lỗi nặng nhất, và nó thuộc loại không bao giờ kêu:** `recOwners` xếp DL19 và DL22 chung nhánh
+> với DL06, mà nhánh ấy hỏi `r.lead_id` và `r.created_by` - **hai bảng giới thiệu không có cột
+> nào trong hai cột đó**. Bản khai chủ sở hữu trả về mảng rỗng vĩnh viễn: không lỗi JS, không
+> cảnh báo, chỉ là mọi người dưới mức "all" đọc ra 0 dòng. Cùng họ với "mã ma" mà `_checkaudit`
+> đã canh (`isc(x.cột,"mã")` bằng một mã không có trong CH1), chỉ khác là lần này cái không tồn
+> tại là **TÊN CỘT** chứ không phải giá trị.
+> *Một nhánh viết cho bảng này đem dùng cho bảng khác mà không hỏi lại chúng có những cột ấy
+> không thì nó không sai to tiếng - nó trả về rỗng và im.*
+>
+> **Hai miền dữ liệu khai sai, cùng một kiểu:** sổ Giảng viên hỏi về **tải giảng dạy** (lớp đang
+> dạy · học viên · nợ nhận xét · bài chờ chấm) mà lấy dòng theo miền **nhân sự** - miền khai
+> `none` cho gần hết mọi người, vì DL01 CÒN chứa lương. Hai bảng giới thiệu thì bị khoá theo miền
+> **tiền** trong khi DL19 không giữ một con số tiền nào và cột tiền của DL22 đã được che riêng.
+> *Một bảng có thể trả lời hai câu hỏi khác nhau; khoá nó theo câu hỏi kia là chặn mất câu này.*
+> Chữa bằng `mien` khai riêng cho từng sổ + `listRows(key)` để **bốn** chỗ dựng lại danh sách gốc
+> cùng đi một cửa - thân trang, hộp lọc sâu, bộ đếm chip, bộ đếm menu.
+>
+> **Và luật "mời rồi đuổi còn tệ hơn không mời" đã đặt HAI LẦN mà cả hai lần đều gọi đích danh
+> một trang** (`bangcong`, rồi `baocao`), nên trang thứ ba mắc đúng bệnh thì không ai hỏi tới.
+> Nay `navVis` hỏi chung: sổ chính của trang thuộc miền nào, người này có xem được miền ấy không.
+> *Một luật viết bằng tên riêng thì mỗi trang mới lại phải nhớ khai lại; viết bằng câu hỏi thì
+> khai một lần.*
+>
+> **Sửa xong lại lộ ra chỗ sai thứ hai** - `_checkcauhoi` bắt "nhịp nói 2 mà chip hiện 1". Trước
+> đó bị che vì Marketing khai `tien:"none"` nên `srows("DL19")` luôn bằng 0: hai con số là 2 và 0,
+> đủ khác nhau để không ai đối chiếu. Bên dưới là hai lỗi chồng nhau - một phép đếm riêng đọc
+> `rows` thay vì `srows` và định nghĩa "còn treo" khác hai nơi kia, cộng với nhịp đếm PHẦN THƯỞNG
+> còn chip đếm NGƯỜI.
+> *Sửa một chỗ sai làm lộ ra chỗ sai thứ hai không phải là làm hỏng thêm - đó là chỗ sai thứ hai
+> thôi hết chỗ nấp.*
+>
+> **Ba lần phải nghi cái thước trước, và cả ba lần thước sai:** phép đo trục lọc đọc nhầm cách
+> khai `fxCalc` · rồi tự bỏ giá trị trống trong khi hộp lọc vẫn đếm nó · và một lần đếm dòng bằng
+> hàm không nhận tên sổ. Tin lần đo đầu thì đã đi "sửa" ba chỗ app hoàn toàn đúng.
+>
+> **Đo lại:** trang mở ra rỗng `giangvien 80%→0` · `magioithieu 92%→8%` · `banggiao 54%→15%` ·
+> `duyet 44%→22%` · `hocvien 13%→4%`. Ngõ cụt ở ngăn kéo dòng sổ: **0 trên toàn bộ LISTCFG**.
+> Cột luôn rỗng: **0/238** - mảng ấy đã sạch từ trước.
+
 > ### 🟢 25/08 (cuối) - "CÓ TRÀN KHÔNG" LÀ CÂU HỎI SAI, VÀ MỘT CÁI SỔ KHÔNG BAO GIỜ ĐƯỢC XOÁ
 >
 > Anh Luân: *"Chỉ số của riêng bạn, và cái ô bên dưới bị tràn ra viền em ko thấy à"*.

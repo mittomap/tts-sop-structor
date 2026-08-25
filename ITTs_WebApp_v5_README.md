@@ -2,6 +2,29 @@
 
 > `ITTs_WebApp_v5_demo.html` là bản app: mở bằng trình duyệt, mọi thao tác ghi thật vào bộ nhớ trình duyệt. **Lớp Google Sheets đã cho nghỉ hưu 30/07** - không còn bản `.gs` nào, mọi cấu hình nằm trong màn Cài đặt của chính app. Khi anh Luân chốt nền tảng backend, 66 chỗ ghi trong app đã có sẵn đường nối ra máy chủ (xem khối ghi chú tại `var SVR=` trong `gen_v5.py`).
 
+## ⭐ MỚI 26/08/2026 — **Mở trang ra là có thứ để đọc**
+
+Đợt rà soát 26/08 chỉ làm một việc: đi tìm những chỗ app **đã có mà làm nửa chừng**. Kết quả gần
+như đều nằm ở cùng một chỗ - trang mở ra nhưng bảng trống.
+
+- **Trang Giảng viên** trước đây rỗng với gần hết mọi người (giáo viên, NV WOW, học vụ, kế toán,
+  phần lớn tư vấn) trong khi dải thẻ ngay trên vẫn ghi "6 GV · tổng 122.6h". Nay nó đọc theo
+  **tải giảng dạy**: giáo viên và NV WOW thấy đúng dòng của chính mình (kèm số lớp, số học viên,
+  nợ nhận xét, bài chờ chấm), học vụ / tư vấn / ACA / nhân sự / điều hành thấy cả đội.
+- **Trang Mã giới thiệu** trước đây chỉ Giám đốc thấy được dòng nào. Nay Marketing thấy trọn kho
+  mã (số tiền ưu đãi vẫn che theo phân quyền như cũ), tư vấn viên thấy phần khách của mình.
+- **Bàn giao lead** mở ra là rơi vào nguồn **có lead thật** thay vì sổ trống của chính người xem,
+  và ô chọn "Từ NV" nay ghi luôn mỗi người đang ôm bao nhiêu lead.
+- **Menu** không còn mời vào trang mà bạn không có quyền xem dữ liệu.
+- **Bấm một dòng trong sổ** luôn có đường đi tiếp - dòng nhân sự nay có nút "Hồ sơ đầy đủ".
+- **Bộ lọc chuyên sâu**: nhóm "chưa có" nay có tên thật ("Chưa ghi nhận xét", "Chưa ký", "Không
+  cần") thay vì "(trống)", và trục nào chỉ có đúng một giá trị thì không bày ra nữa.
+- **Bảng rỗng nói đúng vì sao nó rỗng** - do bộ lọc, do sổ chưa có gì, hay do nằm ngoài phạm vi
+  dữ liệu của bạn.
+- **Bảng Nhân sự** có thêm ô **"Vị trí đang trống"** (ô biên chế đã mở mà chưa tuyển được người),
+  và ô "Hồ sơ nhân sự còn thiếu" nay nói luôn thiếu ô nào - chức danh, cơ sở, email hay số điện
+  thoại.
+
 ## ⭐ MỚI 25/08/2026 — **"Cần chú ý" nay quét đúng những trang bạn xem được**
 
 Khối "Cần chú ý" ở trang đáp gom mọi chỗ bất thường từ các trang nghiệp vụ. Trước đây nó chỉ đi
