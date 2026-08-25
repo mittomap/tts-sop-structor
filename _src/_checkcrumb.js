@@ -47,13 +47,23 @@ const PATHS=["/opt/pw-browsers/chromium-1194/chrome-linux/chrome","/opt/pw-brows
    const c=document.getElementById("pgCrumb"); const rc=c.getBoundingClientRect();
    const items=[...c.querySelectorAll(".crbi")].map(e=>(e.textContent||"").replace(/^›/,"").trim());
    let lap=0; for(let i=1;i<items.length;i++) if(items[i]&&items[i]===items[i-1]) lap++;
-   return {cao:Math.round(rc.height), soMoc:items.length, lap, tran:c.scrollWidth>c.clientWidth+1, items};
+   /* ═══ 25/08 - HỎI TỪNG MỐC, KHÔNG CHỈ HỎI CẢ KHỐI ══════════════════════════════════════
+      Luật `tran` ở trên hỏi khối `#pgCrumb` có tràn không - mà khối ấy khai `overflow:hidden`
+      và các mốc bên trong khai `flex:0 100 auto`, nên chúng TỰ CO cho vừa và khối KHÔNG BAO GIỜ
+      tràn. Bộ kiểm xanh trong khi màn hình đọc ra *"Việc hôm ... › ... › CSKH · Tiếng nói học
+      viên · K... › Nhâ... › Công giảng dạy & WOW"* - ba mốc bị cắt 6-21px mỗi mốc.
+      *Hỏi cả khối có vừa không thì cái khối nào cũng vừa - phải hỏi từng thứ bên trong nó có
+      còn đọc được không.* */
+   const cat=[...c.querySelectorAll(".crb")].filter(e=>e.scrollWidth>e.clientWidth+1)
+     .map(e=>((e.textContent||"").trim().slice(0,18)+" thieu "+(e.scrollWidth-e.clientWidth)+"px"));
+   return {cao:Math.round(rc.height), soMoc:items.length, lap, tran:c.scrollWidth>c.clientWidth+1, cat, items};
   });
   if(r.cao>26) xau.push("rong "+W+"px: vet duong di cao "+r.cao+"px - da rot xuong dong thu hai");
   if(r.lap)    xau.push("rong "+W+"px: "+r.lap+" moc lap lai y het moc lien truoc");
   if(r.tran)   xau.push("rong "+W+"px: vet bi cat cut o mep phai (tran ngang)");
   if(r.soMoc<2)xau.push("rong "+W+"px: vet chi con "+r.soMoc+" moc - khong con la mot vet duong di");
-  do_+=4;
+  if(r.cat&&r.cat.length)xau.push("rong "+W+"px: "+r.cat.length+" moc bi cat chu ("+r.cat.slice(0,3).join(" · ")+")");
+  do_+=5;
   await ctx.close();
  }
  await b.close();

@@ -345,9 +345,20 @@ tr.cfhl>td{background:#FFF6D8}
 a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-decoration:underline}
 .crb.cur{color:var(--ink);font-weight:600}
 .crbsep{color:#B9C6D6;font-size:11px}
-.crbi{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;min-width:0;flex:0 100 auto}
+/* 25/08 - MỐC KHÔNG CO NỮA. Nhãn đã được cắt theo chữ ở `crbNgan` nên bề rộng đoán trước
+   được; để chúng co tiếp là cắt lần thứ hai, lần này ở giữa từ. Riêng mốc HIỆN TẠI vẫn co
+   được (nó là mốc duy nhất giữ nguyên tên đầy đủ) và vẫn có sàn 140px ngay dưới. */
+.crbi{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;min-width:0;flex:none}
 /* Mốc đang đứng co sau cùng và không bao giờ nhỏ hơn 140px - chật mấy cũng phải đọc được mình ở đâu. */
 .crbi:last-child{flex:0 1 auto;min-width:140px}
+/* ═══ 25/08 - KHỔ HẸP THÌ BỎ HẲN CÁC MỐC CŨ, GIỮ MỐC HIỆN TẠI ════════════════════════════
+   Đo bằng `_checkcrumb` ở ba khổ: 1440px thì bốn mốc vừa, nhưng 1100px và 860px thì khối vệt
+   chỉ còn hơn hai trăm pixel và mốc hiện tại vẫn hụt 35px sau khi đã cắt nhãn.
+   Chỗ chật thì phải BỎ BỚT MỤC, không phải bóp mọi mục nhỏ lại: bóp thì được bốn mẩu chữ cụt,
+   bỏ thì được một câu đọc trọn. Nút Quay lại vẫn nằm nguyên ở đầu vệt nên đường lùi không mất -
+   thứ mất chỉ là mấy cái tên mà ở khổ ấy vốn đã không đọc nổi.
+   *Chật thì cắt bớt thứ để bỏ được, đừng cắt đều tay lên mọi thứ.* */
+@media(max-width:1250px){.crumb .crbi:not(:last-child){display:none}}
 .crbi .crb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .rolesel{margin-left:auto;display:flex;align-items:center;gap:8px;position:relative}
 .notif{position:absolute;top:46px;right:0;width:372px;max-height:74vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 44px #0000002e;z-index:80;display:none}
@@ -32807,15 +32818,49 @@ function renderCrumb(){var host=document.getElementById("pgCrumb");if(!host)retu
  if(h.length){var prev=h[h.length-1];
   out+='<button class="crbback" onclick="navBack()" aria-label="Quay lại" title="Quay lại: '+esc(crumbLabel(prev.key,prev.ctx))+'"><i class="ti ti-chevron-left"></i></button>';}
  var parts=[];
- function step(i){var s=h[i];
-  return '<a class="crb" onclick="navJump('+i+')" title="Về: '+esc(crumbLabel(s.key,s.ctx))+'">'+esc(crumbLabel(s.key,s.ctx))+'</a>'}
- if(h.length>4){                        /* rút gọn: mốc đầu ... 2 mốc gần nhất */
+ /* ═══ CẮT NHÃN Ở BỘ DỰNG, KHÔNG ĐỂ CSS CẮT ═══════════════════════════════════════════════
+    `.crbi` khai `flex:0 100 auto` nên mọi mốc cùng co khi chật - kể cả dấu "...". Đo ra: ngay
+    trên khổ 1440px cũng có mốc bị cắt 5-19px, và ở 1100px thì mốc "Theo dõi nhận xét buổi" hụt
+    128px, tức mất gần hết chữ. CSS `text-overflow` cắt ở chỗ NÓ hết chỗ, không cắt ở chỗ chữ
+    còn nghĩa - nên ra "Nhâ..." và "Việc hôm ...".
+    Cắt ở đây thì cắt được THEO CHỮ: giữ trọn từ, thêm dấu ba chấm thật, và tên đầy đủ vẫn nằm
+    trong `title` để rê chuột đọc được. Bề rộng nhờ thế đoán trước được, nên không mốc nào phải
+    co thêm lần nữa.
+    *Cắt bằng CSS là cắt ở nơi hết chỗ; cắt bằng mã là cắt ở nơi còn nghĩa.* */
+ function crbNgan(t,tran){t=String(t||"");tran=tran||22;
+  if(t.length<=tran)return t;
+  var c=t.slice(0,tran),k=c.lastIndexOf(" ");
+  if(k>=Math.round(tran*0.55))c=c.slice(0,k);
+  return c.replace(/[\s·-]+$/,"")+"…"}
+ function step(i){var s=h[i];var _t=crumbLabel(s.key,s.ctx);
+  return '<a class="crb" onclick="navJump('+i+')" title="Về: '+esc(_t)+'">'+esc(crbNgan(_t))+'</a>'}
+ /* ═══ V2 25/08 - RÚT GỌN SỚM HƠN, VÌ CHỖ CHỈ CÓ NGẦN ẤY ══════════════════════════════════
+    Đo thật trên khổ 1440px: khối vệt đường đi chỉ được **496px** (nó chia hàng trên cùng với
+    tên trang và cụm nút bên phải). Luật cũ rút gọn khi lịch sử quá 4 bước và vẫn bày ra NĂM mục
+    (đầu · … · hai mốc gần · hiện tại). Năm mục trong 496px thì mỗi mục co lại một ít, và vì
+    `.crbi` khai `flex:0 100 auto` nên MỌI mục cùng co - kết quả là mấy mẩu chữ cụt: đọc ra
+    *"Việc hôm ... › ... › CSKH · Tiếng nói học viên · K... › Nhâ... › Công giảng dạy & WOW"*.
+    Ba mục bị cắt 6-21px mỗi mục. `_checkcrumb` không bắt vì nó hỏi "có nằm trọn một hàng không",
+    mà chúng CÓ nằm trọn - chúng chỉ không đọc được.
+    *Nhồi thêm một mốc vào một hàng chật không cho người ta thêm thông tin - nó lấy bớt thông tin
+    của mọi mốc đang có.*
+    Nay giữ đúng bốn mục và rút gọn từ bước thứ ba: mốc ĐẦU (về nhà), dấu … (bấm được, có nói
+    còn mấy bước), mốc NGAY TRƯỚC (thứ người ta hay quay lại nhất), và mốc HIỆN TẠI. Nút Quay
+    lại vẫn nằm ngay đầu vệt như cũ. */
+ if(h.length>2){
   parts.push(step(0));
-  parts.push('<a class="crb" onclick="navJump(1)" title="Còn '+(h.length-3)+' bước ở giữa - bấm để lùi về bước thứ 2">...</a>');
-  parts.push(step(h.length-2));parts.push(step(h.length-1));
+  parts.push('<a class="crb" onclick="navJump(1)" title="Còn '+(h.length-2)+' bước ở giữa - bấm để lùi về bước thứ 2">...</a>');
+  parts.push(step(h.length-1));
  }else{for(var i=0;i<h.length;i++)parts.push(step(i))}
  if(!h.length&&p.g&&p.g!=="_")parts.push('<span class="crb">'+esc(p.g)+'</span>'); /* chưa đi đâu: hiện nhóm menu cho có ngữ cảnh */
- parts.push('<span class="crb cur">'+esc(crumbLabel(CUR,navSnap()))+'</span>');
+ /* MỐC HIỆN TẠI cũng phải cắt, chỉ là cắt rộng tay hơn (30 chữ thay vì 22).
+    Luật cũ "chật mấy cũng phải đọc được mình ở đâu" đúng về ý nhưng thực hiện bằng cách để nó
+    giữ nguyên tên đầy đủ - và ở khổ 1100px cái tên "Lớp · Foundation PLA T7-CN sáng (06/2026)"
+    hụt 114px, tức đọc được ít hơn hẳn so với khi nó được cắt tử tế.
+    Vả lại TÊN TRANG in to ngay phía trên đã nói mình đang ở đâu; vệt đường đi chỉ cần đủ để
+    nhận ra. Tên đầy đủ vẫn nằm trong `title`. */
+ (function(){var _tc=crumbLabel(CUR,navSnap());
+  parts.push('<span class="crb cur" title="'+esc(_tc)+'">'+esc(crbNgan(_tc,30))+'</span>')})();
  /* V9.99z10 - KHONG NOI LAI THU VUA NOI. Anh Luân gửi ảnh có "Học tập & Giảng dạy · Theo dõi
     nhận xét buổi" đứng LIỀN NHAU HAI LẦN. Lịch sử gạn trùng theo KHOÁ TRANG, mà hai khoá khác
     nhau (`buoihoc` và `hoctap`) lại vẽ ra ĐÚNG MỘT dòng chữ vì `go()` gộp tab con về trang cha.

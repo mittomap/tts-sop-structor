@@ -148,6 +148,59 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 🔄 25/08 - ĐỌC LẠI TOÀN BỘ VIỆC TỒN, VÀ PHẦN LỚN ĐÃ XONG TỪ LÚC NÀO
+> Anh Luân: *"xử lý toàn bộ việc tồn, audit toàn diện, chủ động fix sạch toàn bộ"*.
+> Việc đầu tiên hoá ra là **đi hỏi lại từng mục xem nó còn đúng không** - và mảng 8 của giao thức
+> audit đã cảnh báo sẵn: *"VIỆC TỒN có phản ánh đúng những gì đang thiếu không - đây là chỗ dễ
+> nói dối bản thân nhất."* Đúng thế thật:
+>
+> | Mục | Khai là | Đo lại |
+> |---|---|---|
+> | Trục "GV nghỉ liên tiếp N buổi" | còn treo | **CÒN THẬT** - đã làm hôm nay |
+> | Ô số tiền đợt thiếu dấu chấm ngăn nghìn (17/08 #2) | còn treo | **ĐÃ XONG** - ô nay là `type="text"` qua `insDau()`, hiện `5.600.000` |
+> | Ô "Ngày đóng đợt đầu" hiện cả khi đóng một lần (17/08 #3) | còn treo | **ĐÃ XONG** - đã thay bằng ô chọn số đợt, một đợt thì nhãn là "Ngày đóng" và dải chế độ ẩn |
+> | `renderBanlam` nhánh embed=0 là mã chết (14/08 #2) | còn treo | **ĐÃ GỠ** - hàm nay chỉ còn một chế độ |
+> | Trịnh Quốc Bảo: 1 mục menu mở ra trống (06/08) | chờ quyết | **ĐÃ HẾT** - `_checkux` canh "không mục menu nào mở ra trang trống trơn", xanh |
+> | `check_taolai` đỏ một lần không tái hiện (15/08) | còn treo | **VẪN CÒN TREO** - không tuyên bố đã sửa, đã có ghi hồ sơ mỗi lần đỏ |
+> | Chặn đăng nhập test quá hạn 1 tuần (12/08) | cố ý không code | **GIỮ NGUYÊN** - anh Luân chốt "để a cho dev làm sau" |
+> | Gửi email/Zalo thật (12/08) | không có backend | **GIỮ NGUYÊN** - mô phỏng, đã đánh dấu chỗ nối |
+>
+> *Một danh sách việc tồn không được đọc lại thì nó thôi mô tả hiện tại và bắt đầu mô tả quá khứ -
+> và người đọc nó sẽ đi làm những việc đã xong.*
+
+> ### ✅ 25/08 - TRỤC "NGHỈ LIÊN TIẾP" + "NGHỈ NHIỀU LẦN" CHO HÀNG CHỜ GV BÁO NGHỈ
+> Bảng DL33 (18/08) trả lời được "ai xin nghỉ buổi nào" nhưng không trả lời được hai câu người
+> duyệt hỏi ngay sau: *buổi này có nằm trong chuỗi nghỉ liên tiếp không* (nghỉ một buổi thì tìm
+> người thay là xong; nghỉ ba buổi liền của một lớp thì phải xếp người dài hạn VÀ báo học viên -
+> hai việc khác hẳn) và *người này đã nghỉ mấy lần rồi* (một đơn thì duyệt; lần thứ tư trong
+> tháng thì đó là chuyện nhân sự).
+> *Một hàng chờ chỉ nói về từng dòng thì người duyệt thấy cây mà không thấy rừng.*
+> Đếm chuỗi theo **số buổi của lớp**, không theo ngày - "liên tiếp" ở đây là liên tiếp trong MẠCH
+> HỌC, đó mới là thứ học viên cảm nhận được. Thêm 2 chip, 2 dấu trên thẻ, 2 cột xuất, **8 trục
+> lọc** (trang này trước đó KHÔNG có trục nào), 1 ý định Trợ lý, 2 tham số CH2, và gieo thêm chuỗi
+> 3 buổi liên tiếp vào dữ liệu demo.
+> **Bẫy đã cắn:** khai xong sáu trục mà đo lại vẫn ra mảng rỗng - `fltAxes` thoát ngay dòng đầu
+> khi `fltCode` không biết bảng nguồn của trang. *Khai một trục lọc thì phải khai luôn bảng nguồn.*
+> **VÀ NÓ LỘ RA MỘT LỖI DỮ LIỆU THẬT:** lớp `LOP-IELTS-6.5-04` có **ba buổi cùng ngày lúc 17:00,
+> 18:00, 19:00** - chồng lên chính nó. Khối 23 đã gỡ hết chỗ trùng giờ, rồi NA068/NA069 mới dời
+> buổi về "45 phút trước" - và cửa chặn của chúng so chuỗi ngày-giờ **khít từng phút**, trong khi
+> app coi một buổi chiếm **2 tiếng**. *Hai nơi cùng nói về "trùng giờ" mà đo bằng hai thước khác
+> nhau thì nơi nào đổi sau sẽ phá việc của nơi trước, và không ai thấy mình vừa phá.*
+> `check_data`/`check_logic` không bắt được - chúng không hỏi câu ấy; `_check16` bắt.
+
+> ### ✅ 25/08 - AUDIT: TÊN KHÁCH CHƯA THÀNH HỌC VIÊN PHẢI BẤM ĐƯỢC
+> Đọc ảnh chụp trang Công nợ: hai dòng in tên ĐEN giữa một bảng toàn tên bấm được. Hai người ấy
+> đã đăng ký và đang nợ tiền nhưng **chưa chuyển thành học viên** - `student_id` rỗng, chỉ có
+> `lead_id`. *Một dòng không mở ra được cái gì là một ngõ cụt, và ngõ cụt trên bảng công nợ nghĩa
+> là người đi đòi tiền phải tự đi tìm hồ sơ ở trang khác.*
+> Chữa ở ba tầng: `CELLLNK` nay khai được **mã dự phòng** (mọi sổ qua `renderList` tự được hưởng) ·
+> 11 chỗ gọi `nguoiLnk` trên dòng đơn/phiếu · `cnDs` nhớ lại cả mã lead.
+> **Và một lỗ của chính bộ kiểm:** `_checklink` chỉ lấy tên từ DL09 nên nó có một vùng tối đúng
+> bằng cả bảng DL02. *Một bộ kiểm hỏi "mọi tên có bấm được không" mà chỉ lấy tên từ một bảng thì
+> nó đang hỏi "mọi tên TRONG BẢNG ẤY".* Nới sang cả hai bảng - nó bắt ngay 13 chỗ, 10 chỗ thật.
+> Kèm: cột "Họ tên" rộng **90px** và tên vỡ hai dòng trong khi cột "Khoá" được 253px. *Trình duyệt
+> chia bề rộng theo độ dài chữ; con người chia theo tầm quan trọng.* Đặt sàn 132px.
+
 > ### ✅ 18/08 - ĐỢT 4 XONG: NÚT CỘT PHỦ HẾT SỔ CHÍNH DỰNG TAY
 > 12 sổ dựng tay còn lại đã có nút Cột (`1f160a`): Khảo sát theo lớp · Kho bài tập · Giáo án theo
 > khóa · Buổi học trong ngày (GV dự phòng) · Bàn giao lead · Sổ ca dạy thay · Sổ cam kết · Hồ sơ
