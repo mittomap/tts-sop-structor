@@ -15952,8 +15952,16 @@ function kpiTrendHTML(code){
  var ch6=(DATA.config&&DATA.config.ch6)||[];
  var k=ch6.filter(function(x){return x.code===code})[0]||{};
  var P=repTruoc();
+ /* TRONG NGĂN KÉO THÌ NÓI BẰNG CHỮ, ĐỪNG ĐỂ MỘT DẤU GẠCH TRƠ.
+    Đọc tay bảy ngăn kéo (mảng 5 của giao thức audit) thì ra: ngăn kéo chỉ số đọc thành
+    *"47% · Tốt · mục tiêu ≥ 40% · –"* - một dấu gạch không ai hiểu, lời giải thích thì giấu
+    trong chú thích rê chuột. Trên BẢNG thì dấu gạch ấy đúng chỗ (cột hẹp, cả cột cùng một kiểu),
+    nhưng trong ngăn kéo có cả một khoảng trống bên phải.
+    *Cùng một thông tin, chỗ chật thì rút thành ký hiệu, chỗ rộng thì nói thành câu - đừng bê
+    nguyên ký hiệu sang chỗ rộng rồi bắt người ta rê chuột.* */
+ if(!P)return '<span class="mut" style="font-size:11px">Đang xem Toàn kỳ<br>chọn một kỳ để thấy xu hướng</span>';
  var s=kpiSoKyHTML(code,k.dir,kpiCompute(),kpiKyTruoc());
- return s+(P?('<div class="mut" style="font-size:11px;margin-top:2px">so với '+esc(P.lb)+'</div>'):"")}
+ return s+'<div class="mut" style="font-size:11px;margin-top:2px">so với '+esc(P.lb)+'</div>'}
 function kpiSection(){var comp=kpiCompute();var _truoc=kpiKyTruoc();var ch6=(DATA.config&&DATA.config.ch6)||[];
  if(!ch6.length)return '<div class="sechd">KPI theo SOP</div><div class="panel"><div class="empty">Chưa nạp được ngưỡng KPI (CH6).</div></div>';
  ch6=ch6.filter(kpiCoMien);

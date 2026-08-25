@@ -183,6 +183,10 @@ chay "_checkghe  ngoi vao ghe tung chuc danh" "CHECKGHE OK" node _checkghe.js
 # nao do: chung hoi "trang co ve duoc khong", khong bo nao hoi "trang nay co phai ban bao cao
 # CUA NGUOI NAY khong". Bo nay dong du 17 ghe roi doc dan bai vo ra.
 chay "_checkbc   moi ghe mot ban bao cao" "CHECKBC OK" node _checkbc.js
+# _checkcong (25/08) - mang 7 cua GIAO_THUC_AUDIT ("mot su that hien o nhieu noi thi phai hien
+# GIONG NHAU") chua co bo kiem nao di qua. Ca hai cong deu ve duoc, deu khong loi, deu co so -
+# chi la hai so khac nhau, va nguoi phat hien ra se la hoc vien goi dien len hoi.
+chay "_checkcong hai cong cung mot con so" "CHECKCONG OK" node _checkcong.js
 # Anh Luan 08/08: "moi nhan vien, moi truong phong, ho hoi bao nhieu loai cau hoi, ho can bao
 # nhieu trang? He thong lon, nhung qua kho dung thi chet ngay." Do bang bang NHIP - ban khai cua
 # chinh app ve "moi ngay chuc danh nay lam gi". Bat duoc chuyen nang nhat: NHIP dem toan trung
