@@ -20388,22 +20388,40 @@ function renderTrangHV(){
    '<b>'+esc(title)+'</b><span class="chip'+(items.length?"":" ")+'">'+items.length+'</span></div>';
   if(!items.length){h+='<div class="hvempty">'+esc(emptyTxt)+'</div>';return}
   items.forEach(render)}
+ /* ═══ V2 26/08 - BỐN BUỔI, BỐN LẦN CÙNG MỘT HÌNH DẠNG ═══════════════════════════════════════
+    Bản cũ vẽ mỗi buổi thành một khối cao ~300px gồm hai nút và HAI HỘP MÀU ("Giáo viên dặn"
+    nền vàng, "Bài sẽ giao" nền xanh). Bốn buổi là hết một màn hình, và bốn khối ấy giống hệt
+    nhau tới từng cái viền - người đọc phải quét lại cùng một hình dạng bốn lần để tìm ra thứ
+    duy nhất khác nhau giữa chúng: NGÀY và TÊN BUỔI.
+    *Lặp lại một hình dạng không làm nó dễ đọc hơn - nó làm mắt thôi phân biệt.*
+    Nay mỗi buổi là một hàng: ô lịch bên trái để mắt bám vào NGÀY, tên buổi và giờ ở giữa, hai
+    nút gom về bên phải. Hai lời dặn thành hai dòng chữ thường có biểu tượng dẫn - **không mất
+    một chữ nào**, chỉ thôi đóng khung mỗi câu lại thành một cái hộp.
+    Ô lịch KHÔNG thay dòng ngày đầy đủ: nó là chỗ để mắt bám, còn ngày tháng năm và giờ vẫn ghi
+    nguyên ở dòng dưới - một cái mốc quét nhanh không được phép nuốt mất dữ kiện. */
  upGrp("ti-calendar-check","#3B82C4","Buổi học",upSes.slice(0,4),function(s2){
   var P=(typeof sesPlan==="function")?sesPlan(s2):null;
   var _huy=isc(s2.session_status,"cancelled"),_bu=/BU/.test(String(s2.session_id||""))||/học bù/i.test(String(s2.notes||""));
   /* GV của BUỔI, không phải GV chính của lớp - buổi dạy thay hiện sai tên là học viên tới lớp gặp người khác */
   var _gvn=s2.teacher_id_name||(gv?gv.full_name:"");
-  h+='<div class="hvup2'+(_huy?" off":"")+'"><b>'+(_huy?'<span class="chip red" style="margin-right:6px">Đã nghỉ</span>':(_bu?'<span class="chip blue" style="margin-right:6px">Học bù</span>':''))+
-   'Buổi '+esc(s2.session_number||"")+' · '+esc(lop?lop.class_name:"")+(P&&P.topic?' - '+esc(P.topic):'')+'</b>'+
-   '<span>'+esc(s2.session_date||"")+(_gvn?' · GV '+esc(_gvn):'')+(lop&&lop.venue_or_zoom_link?' · '+esc(lop.venue_or_zoom_link):'')+'</span>';
+  var _d=pvnd(s2.session_date);
+  var _TH=["CN","T2","T3","T4","T5","T6","T7"];
+  h+='<div class="hvses'+(_huy?" off":"")+'">'+
+   '<div class="hvsesd'+(_huy?" off":"")+'"><b>'+(_d?_d.getDate():"-")+'</b><span>'+(_d?("Th "+(_d.getMonth()+1)):"")+'</span>'+
+    (_d?('<em>'+_TH[_d.getDay()]+'</em>'):'')+'</div>'+
+   '<div class="hvsesb"><div class="hvsest">'+
+    (_huy?'<span class="chip red" style="margin-right:6px">Đã nghỉ</span>':(_bu?'<span class="chip blue" style="margin-right:6px">Học bù</span>':''))+
+    'Buổi '+esc(s2.session_number||"")+' · '+esc(lop?lop.class_name:"")+(P&&P.topic?' - '+esc(P.topic):'')+'</div>'+
+   '<div class="hvsesm">'+esc(s2.session_date||"")+(_gvn?' · GV '+esc(_gvn):'')+(lop&&lop.venue_or_zoom_link?' · '+esc(lop.venue_or_zoom_link):'')+'</div>';
   if(_huy){h+='<div class="hvdan nbred"><i class="ti ti-calendar-x"></i><span><b>Buổi này KHÔNG diễn ra.</b> '+
-   esc(String(s2.notes||"Trung tâm sẽ xếp buổi học bù và báo lại lịch cho bạn."))+'</span></div></div>';return}
-  if(!_huy&&!isc(s2.session_status,"completed")){
-   h+='<div class="hvaskf" style="margin-top:7px"><button class="btn sm" onclick="hvAbsentAsk(\''+esc(s2.session_id)+'\')"><i class="ti ti-user-off"></i>Báo nghỉ buổi này</button>'+
+   esc(String(s2.notes||"Trung tâm sẽ xếp buổi học bù và báo lại lịch cho bạn."))+'</span></div></div></div>';return}
+  if(P&&P.note)h+='<div class="hvsesn"><i class="ti ti-notes"></i><span><b>Giáo viên dặn:</b> '+esc(P.note)+'</span></div>';
+  if(P&&P.hw)h+='<div class="hvsesn"><i class="ti ti-book"></i><span><b>Bài sẽ giao sau buổi:</b> '+esc(P.hw.title)+
+   (P.hw.est_minutes?' · khoảng '+esc(P.hw.est_minutes)+' phút':'')+(P.hw.description?' - '+esc(P.hw.description):'')+'</span></div>';
+  h+='</div>';
+  if(!isc(s2.session_status,"completed")){
+   h+='<div class="hvsesa"><button class="btn sm" onclick="hvAbsentAsk(\''+esc(s2.session_id)+'\')"><i class="ti ti-user-off"></i>Báo nghỉ buổi này</button>'+
     '<button class="btn sm" onclick="hvMakeupAsk(\''+esc(s2.session_id)+'\')"><i class="ti ti-calendar-plus"></i>Xin học bù</button></div>'}
-  if(P&&P.note)h+='<div class="hvdan"><i class="ti ti-notes"></i><span><b>Giáo viên dặn:</b> '+esc(P.note)+'</span></div>';
-  if(P&&P.hw)h+='<div class="hvdan hw"><i class="ti ti-book"></i><span><b>Bài sẽ giao sau buổi:</b> '+esc(P.hw.title)+
-   (P.hw.est_minutes?' · khoảng '+esc(P.hw.est_minutes)+' phút':'')+(P.hw.description?'<br>'+esc(P.hw.description):'')+'</span></div>';
   h+='</div>'},
   "Chưa có buổi học nào sắp tới.");
  upGrp("ti-star","#DB2777","Buổi WOW 1-1",upWow.slice(0,4),function(w){

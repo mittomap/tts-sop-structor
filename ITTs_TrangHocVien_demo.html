@@ -1294,6 +1294,26 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .hvdan.hw{background:var(--blueb);border-color:#CFE0F7;color:#2E5A88}
 .hvdan.nbred{background:#FBF0EF;border-color:#EBC8C4;color:#7E3A32}
 .hvdan i{font-size:15px;flex:none;margin-top:1px;opacity:.85}
+/* Hàng buổi học sắp tới - xem ghi chú "BỐN BUỔI, BỐN LẦN CÙNG MỘT HÌNH DẠNG" ở `upGrp`. */
+.hvses{display:flex;gap:14px;padding:13px 0 14px;border-top:1px solid #F1F4F8}
+.hvgt+.hvses,.hvses:first-child{border-top:0}
+.hvses.off{opacity:.72}
+.hvsesd{width:50px;flex:none;text-align:center;background:#F5F7FA;border-radius:12px;padding:7px 0 6px;line-height:1.15}
+.hvsesd b{display:block;font-size:17px;font-weight:800;color:var(--navy)}
+.hvsesd span{display:block;font-size:11px;font-weight:700;color:var(--muted)}
+.hvsesd em{display:block;font-size:11px;font-style:normal;font-weight:700;color:#9BAABB;margin-top:1px}
+.hvsesd.off b{color:var(--muted)}
+.hvsesb{flex:1;min-width:0}
+.hvsest{font-size:13px;font-weight:700;line-height:1.4;color:var(--ink)}
+.hvsesm{font-size:11.5px;color:var(--muted);margin-top:2px}
+.hvsesn{display:flex;gap:7px;margin-top:7px;font-size:11.5px;color:#4A5A6E;line-height:1.55}
+.hvsesn i{font-size:15px;color:#9BAABB;flex:none;margin-top:1px}
+.hvsesn b{font-weight:700;color:var(--ink)}
+.hvsesa{display:flex;flex-direction:column;gap:6px;flex:none}
+@media(max-width:700px){
+ .hvses{flex-wrap:wrap}
+ .hvsesa{flex-direction:row;flex-wrap:wrap;width:100%;padding-left:64px}
+}
 .hvcrs{display:grid;grid-template-columns:repeat(auto-fit,minmax(275px,1fr));gap:12px;margin-bottom:18px}
 .hvcr{position:relative;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:14px 15px;cursor:pointer;transition:.15s}
 .hvcr:hover{border-color:#B9C6D6;transform:translateY(-1px);box-shadow:0 4px 16px rgba(16,32,58,.08)}
@@ -1617,6 +1637,67 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .hvrec b{display:block;font-size:12.5px}.hvrec span{font-size:11.5px;color:var(--muted);line-height:1.5}
 .cols2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:900px){.cols2{grid-template-columns:1fr}.hvhero{padding:16px}}
+/* ═══ V2 26/08 - LỚP THỊ GIÁC RIÊNG CỦA CỔNG HỌC VIÊN ═══════════════════════════════════════
+   Anh Luân: *"a muốn nó còn chuyên nghiệp và hiện đại nhiều hơn nữa"*.
+   Đọc lại ba ảnh chụp thì thấy gốc của cảm giác "công cụ nội bộ" không nằm ở một chỗ nào cụ
+   thể - nó nằm ở chỗ **cổng học viên đang mặc nguyên bộ đồ của app nhân viên**: cùng `.panel`
+   viền 1px, cùng `.sechd` CHỮ HOA XÁM 12,5px, cùng nhãn số kiểu bảng tính. Bộ đồ ấy đúng cho
+   người ngồi làm việc 8 tiếng với ba mươi bảng; nó sai cho một em học viên mở ra xem tuần này
+   mình học tới đâu.
+   Nên đây KHÔNG phải đi sửa từng khối, mà là đắp một lớp thị giác **chỉ áp trong `#hvapp`**.
+   Thân trang vẫn là những hàm ấy, nên khi nhân viên xem trang này trong hồ sơ 360 thì nó vẫn
+   mặc bộ đồ của app nhân viên - đúng chỗ nào ra chỗ nấy.
+   Ba việc, theo đúng thứ tự sức nặng:
+   1. **Bỏ CHỮ HOA ở tiêu đề khối.** Đây là tín hiệu "phần mềm nội bộ" mạnh nhất trên màn. Câu
+      thường, to hơn, đậm hơn, và có khoảng thở phía trên để mắt biết một phần mới bắt đầu.
+   2. **Phân định bằng KHOẢNG TRẮNG VÀ ĐỘ NỔI, không bằng viền.** Viền 1px quanh mọi thứ làm
+      mọi khối nặng ngang nhau; bóng mềm cho khối nổi lên khỏi nền mà không kẻ ô.
+   3. **Có thang bậc.** Trước đây tiêu đề khối, nhãn số và chữ thường gần như cùng một cỡ.
+   *Một giao diện không có thang bậc thì người đọc phải tự đọc hết mới biết cái gì quan trọng.* */
+#hvapp .hvmain{background:#F5F7FA}
+#hvapp .sechd{font-size:16px;font-weight:800;color:var(--ink);text-transform:none;
+ letter-spacing:0;margin:26px 2px 11px}
+#hvapp .hvbody>.sechd:first-child{margin-top:2px}
+#hvapp .sechd .mut{font-size:12.5px;font-weight:600}
+#hvapp .panel{border-color:#EDF1F6;border-radius:16px;
+ box-shadow:0 1px 2px rgba(16,32,58,.04),0 10px 26px -18px rgba(16,32,58,.30)}
+#hvapp .panel>.ph{padding:14px 18px 12px;border-bottom-color:#F1F4F8}
+#hvapp .panel>.ph>b{font-size:14px}
+#hvapp .panel>.pbody{padding:14px 18px 16px}
+/* Thẻ chào: bo góc lớn hơn và dịu hơn - nó là thứ đầu tiên đập vào mắt mỗi lần mở trang. */
+#hvapp .hvhero{border-radius:16px;padding:24px 26px;margin-bottom:20px;
+ background:linear-gradient(120deg,var(--navyd),var(--navy) 58%,#3E7BB5)}
+#hvapp .hvg{font-size:23px;letter-spacing:-.015em}
+#hvapp .hvsub{font-size:13px;opacity:.92}
+#hvapp .hvav{width:58px;height:58px;font-size:24px;box-shadow:0 0 0 6px #ffffff14}
+/* Nhãn số tiền: câu thường thay vì CHỮ HOA GIÃN CHỮ, và số to hẳn lên một bậc. */
+#hvapp .hvf span{font-size:11.5px;font-weight:600;text-transform:none;letter-spacing:0}
+#hvapp .hvf b{font-size:17px;letter-spacing:-.01em}
+#hvapp .hvf{border-right-color:#F1F4F8;padding:10px 16px}
+/* Ô xác nhận / thẻ nhỏ: cùng bo góc với panel để cả trang là một hệ. */
+#hvapp .hvc{border-radius:14px;border-color:#EDF1F6;padding:14px 16px}
+#hvapp .bstat{border-radius:14px;border-color:#EDF1F6}
+/* MỤC LỤC - nhẹ đi, và mục đang đọc có một vạch nhận diện thay vì chỉ đổi nền mờ. */
+#hvapp .hvside{width:268px}
+#hvapp .hvni{border-radius:10px;padding:10px 12px;font-size:13px;position:relative}
+#hvapp .hvni.on{background:#ffffff1f}
+#hvapp .hvni.on::before{content:"";position:absolute;left:-9px;top:9px;bottom:9px;width:3px;
+ border-radius:0 3px 3px 0;background:#8FC0F0}
+#hvapp .hvgrph{font-size:10.5px;letter-spacing:.6px;opacity:.62;margin:16px 12px 5px}
+#hvapp .hvbrand,#hvapp .hvme{border-bottom-color:#ffffff10}
+/* Thanh trên: tên mục đang đọc là thứ đáng đọc nhất trên thanh, cho nó đúng cỡ. */
+/* Tiêu đề cột bảng: sau khi mọi nhãn khác đã thành câu thường, đây là chỗ CHỮ HOA duy nhất còn
+   lại trên trang - và một chỗ chữ hoa lẻ loi thì không đọc ra "nhấn mạnh", nó đọc ra "chỗ này
+   quên chưa sửa". */
+#hvapp .dt th{text-transform:none;letter-spacing:0;font-size:11.5px;color:#5A6675;background:#F8FAFC}
+#hvapp .hvtop{min-height:60px;border-bottom-color:#EDF1F6}
+#hvapp .hvtt b{font-size:15px;letter-spacing:-.01em}
+@media(max-width:900px){
+ #hvapp .hvmain{padding:14px 13px 48px}
+ #hvapp .hvhero{padding:18px;border-radius:14px}
+ #hvapp .hvg{font-size:20px}
+ #hvapp .sechd{font-size:15px;margin:22px 2px 9px}
+}
 /* Cấp 1: chọn cách giao (thẻ lớn) - Cấp 2: khối con lồng bên trong */
 .mswrap{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .mslb{grid-column:1/-1;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--navy)}
@@ -23925,22 +24006,40 @@ function renderTrangHV(){
    '<b>'+esc(title)+'</b><span class="chip'+(items.length?"":" ")+'">'+items.length+'</span></div>';
   if(!items.length){h+='<div class="hvempty">'+esc(emptyTxt)+'</div>';return}
   items.forEach(render)}
+ /* ═══ V2 26/08 - BỐN BUỔI, BỐN LẦN CÙNG MỘT HÌNH DẠNG ═══════════════════════════════════════
+    Bản cũ vẽ mỗi buổi thành một khối cao ~300px gồm hai nút và HAI HỘP MÀU ("Giáo viên dặn"
+    nền vàng, "Bài sẽ giao" nền xanh). Bốn buổi là hết một màn hình, và bốn khối ấy giống hệt
+    nhau tới từng cái viền - người đọc phải quét lại cùng một hình dạng bốn lần để tìm ra thứ
+    duy nhất khác nhau giữa chúng: NGÀY và TÊN BUỔI.
+    *Lặp lại một hình dạng không làm nó dễ đọc hơn - nó làm mắt thôi phân biệt.*
+    Nay mỗi buổi là một hàng: ô lịch bên trái để mắt bám vào NGÀY, tên buổi và giờ ở giữa, hai
+    nút gom về bên phải. Hai lời dặn thành hai dòng chữ thường có biểu tượng dẫn - **không mất
+    một chữ nào**, chỉ thôi đóng khung mỗi câu lại thành một cái hộp.
+    Ô lịch KHÔNG thay dòng ngày đầy đủ: nó là chỗ để mắt bám, còn ngày tháng năm và giờ vẫn ghi
+    nguyên ở dòng dưới - một cái mốc quét nhanh không được phép nuốt mất dữ kiện. */
  upGrp("ti-calendar-check","#3B82C4","Buổi học",upSes.slice(0,4),function(s2){
   var P=(typeof sesPlan==="function")?sesPlan(s2):null;
   var _huy=isc(s2.session_status,"cancelled"),_bu=/BU/.test(String(s2.session_id||""))||/học bù/i.test(String(s2.notes||""));
   /* GV của BUỔI, không phải GV chính của lớp - buổi dạy thay hiện sai tên là học viên tới lớp gặp người khác */
   var _gvn=s2.teacher_id_name||(gv?gv.full_name:"");
-  h+='<div class="hvup2'+(_huy?" off":"")+'"><b>'+(_huy?'<span class="chip red" style="margin-right:6px">Đã nghỉ</span>':(_bu?'<span class="chip blue" style="margin-right:6px">Học bù</span>':''))+
-   'Buổi '+esc(s2.session_number||"")+' · '+esc(lop?lop.class_name:"")+(P&&P.topic?' - '+esc(P.topic):'')+'</b>'+
-   '<span>'+esc(s2.session_date||"")+(_gvn?' · GV '+esc(_gvn):'')+(lop&&lop.venue_or_zoom_link?' · '+esc(lop.venue_or_zoom_link):'')+'</span>';
+  var _d=pvnd(s2.session_date);
+  var _TH=["CN","T2","T3","T4","T5","T6","T7"];
+  h+='<div class="hvses'+(_huy?" off":"")+'">'+
+   '<div class="hvsesd'+(_huy?" off":"")+'"><b>'+(_d?_d.getDate():"-")+'</b><span>'+(_d?("Th "+(_d.getMonth()+1)):"")+'</span>'+
+    (_d?('<em>'+_TH[_d.getDay()]+'</em>'):'')+'</div>'+
+   '<div class="hvsesb"><div class="hvsest">'+
+    (_huy?'<span class="chip red" style="margin-right:6px">Đã nghỉ</span>':(_bu?'<span class="chip blue" style="margin-right:6px">Học bù</span>':''))+
+    'Buổi '+esc(s2.session_number||"")+' · '+esc(lop?lop.class_name:"")+(P&&P.topic?' - '+esc(P.topic):'')+'</div>'+
+   '<div class="hvsesm">'+esc(s2.session_date||"")+(_gvn?' · GV '+esc(_gvn):'')+(lop&&lop.venue_or_zoom_link?' · '+esc(lop.venue_or_zoom_link):'')+'</div>';
   if(_huy){h+='<div class="hvdan nbred"><i class="ti ti-calendar-x"></i><span><b>Buổi này KHÔNG diễn ra.</b> '+
-   esc(String(s2.notes||"Trung tâm sẽ xếp buổi học bù và báo lại lịch cho bạn."))+'</span></div></div>';return}
-  if(!_huy&&!isc(s2.session_status,"completed")){
-   h+='<div class="hvaskf" style="margin-top:7px"><button class="btn sm" onclick="hvAbsentAsk(\''+esc(s2.session_id)+'\')"><i class="ti ti-user-off"></i>Báo nghỉ buổi này</button>'+
+   esc(String(s2.notes||"Trung tâm sẽ xếp buổi học bù và báo lại lịch cho bạn."))+'</span></div></div></div>';return}
+  if(P&&P.note)h+='<div class="hvsesn"><i class="ti ti-notes"></i><span><b>Giáo viên dặn:</b> '+esc(P.note)+'</span></div>';
+  if(P&&P.hw)h+='<div class="hvsesn"><i class="ti ti-book"></i><span><b>Bài sẽ giao sau buổi:</b> '+esc(P.hw.title)+
+   (P.hw.est_minutes?' · khoảng '+esc(P.hw.est_minutes)+' phút':'')+(P.hw.description?' - '+esc(P.hw.description):'')+'</span></div>';
+  h+='</div>';
+  if(!isc(s2.session_status,"completed")){
+   h+='<div class="hvsesa"><button class="btn sm" onclick="hvAbsentAsk(\''+esc(s2.session_id)+'\')"><i class="ti ti-user-off"></i>Báo nghỉ buổi này</button>'+
     '<button class="btn sm" onclick="hvMakeupAsk(\''+esc(s2.session_id)+'\')"><i class="ti ti-calendar-plus"></i>Xin học bù</button></div>'}
-  if(P&&P.note)h+='<div class="hvdan"><i class="ti ti-notes"></i><span><b>Giáo viên dặn:</b> '+esc(P.note)+'</span></div>';
-  if(P&&P.hw)h+='<div class="hvdan hw"><i class="ti ti-book"></i><span><b>Bài sẽ giao sau buổi:</b> '+esc(P.hw.title)+
-   (P.hw.est_minutes?' · khoảng '+esc(P.hw.est_minutes)+' phút':'')+(P.hw.description?'<br>'+esc(P.hw.description):'')+'</span></div>';
   h+='</div>'},
   "Chưa có buổi học nào sắp tới.");
  upGrp("ti-star","#DB2777","Buổi WOW 1-1",upWow.slice(0,4),function(w){
