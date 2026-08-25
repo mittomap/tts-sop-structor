@@ -3195,20 +3195,39 @@ def _mocRanh(ss, moc, thu=8):
 
 
 def _dungAi(ss, moc):
-    """dung phut `moc` da co buoi khac CUNG giao vien / CUNG lop / CUNG phong chua"""
-    key = moc.strftime("%d/%m/%Y %H:%M")
+    """dung KHUNG GIO `moc` da co buoi khac CUNG giao vien / CUNG lop / CUNG phong chua
+
+    ═══ 25/08 - CUA CHAN NAY TUNG CHI HOI "TRUNG DUNG MOT PHUT" ════════════════════════════
+    Do ra sau khi dung lai du lieu: lop LOP-IELTS-6.5-04 co BA buoi cung ngay 24/08 luc 17:00,
+    18:00 va 19:00 - chong len chinh no. `_check16` bat ("khong lop nao trung gio voi chinh no"),
+    con `check_data`/`check_logic` deu DAT vi chung khong hoi cau nay.
+    Goc: khoi 23 phia tren da go het cho trung gio, roi NA068/NA069 o day moi doi buoi ve "45
+    phut truoc" - va cua chan cua chung so chuoi ngay-gio KHIT TUNG PHUT, trong khi app coi mot
+    buoi CHIEM 2 TIENG (`sesSpanH`). Doi vao 17:00 khi da co buoi 18:00 thi khong trung phut nao,
+    nen cua gat - va de lai dung cai mau thuan ma khoi 23 vua don xong.
+    *Hai noi cung noi ve "trung gio" ma do bang hai thuoc khac nhau thi noi nao doi sau se pha
+    viec cua noi truoc, va khong ai thay minh vua pha.*
+    Nay dung CHUNG `_SPAN_H` voi khoi 23 va voi app: hai buoi dung nhau khi khoang cach nho hon
+    mot buoi day.
+    """
     gv = str(ss.get("teacher_id") or "")
     lop = str(ss.get("class_id") or "")
     ph = str((IDX["DL10"].get(lop) or {}).get("venue_or_zoom_link") or "")
+    _span = datetime.timedelta(hours=_SPAN_H)
     for _o in R("DL11"):
         if _o is ss:
             continue
-        if str(_o.get("session_date") or "")[:16] != key:
+        if code(_o.get("session_status") or "") == "cancelled":
+            continue
+        _od = dt(_o.get("session_date"))
+        if not _od:
+            continue
+        if abs(_od - moc) >= _span:
             continue
         if gv and str(_o.get("teacher_id") or "") == gv:
             return True
         if lop and str(_o.get("class_id") or "") == lop:
-            return True          # mot lop khong the co hai buoi cung mot phut
+            return True          # mot lop khong the co hai buoi chong khung gio nhau
         _oph = str((IDX["DL10"].get(str(_o.get("class_id") or "")) or {}).get("venue_or_zoom_link") or "")
         if ph and _oph == ph:
             return True
@@ -3848,8 +3867,16 @@ if not _nghi and _gvN:
             continue
         _ung.append((_dd, _s33))
     _ung.sort(key=lambda z: (z[0], str(z[1].get("session_id") or "")))
-    # Moi giao vien nhieu nhat mot don - mot nguoi bao nghi ba buoi lien la mot cau chuyen khac
-    # (bo viec), khong phai cau chuyen ma man hinh nay ke.
+    # 18/08: "Moi giao vien nhieu nhat mot don - mot nguoi bao nghi ba buoi lien la mot cau
+    # chuyen khac (bo viec), khong phai cau chuyen ma man hinh nay ke."
+    # 25/08 - CAU TREN DUNG LUC VIET VA SAI TU HOM NAY. Hang cho vua co them hai truc "nghi lien
+    # tiep" va "nguoi nghi nhieu lan" (viec ton 18/08). Gieo moi nguoi dung mot don thi CA HAI
+    # chip ay dem 0 vinh vien, va nguoi xem demo ket luan tinh nang hong chu khong ket luan du
+    # lieu thieu - dung cai bay ma chinh khoi nay da ghi o dong tren.
+    # Va mot giao vien nam vien mot tuan, nghi ba buoi lien cua mot lop, KHONG phai "bo viec":
+    # do la ca ma hoc vu phai xep nguoi day thay dai han va phai bao hoc vien. Chinh la ca ma hai
+    # chip moi sinh ra de bat.
+    # *Them mot truc loc ma khong gieo du lieu cho no thi truc ay chi ton tai trong ma nguon.*
     _daGv, _chon = set(), []
     for _dd, _s33 in _ung:
         _gid = str(_s33.get("teacher_id") or "")
@@ -3915,10 +3942,61 @@ if not _nghi and _gvN:
             _r33["gv_thay_ten"] = _thay.get("full_name") or ""
             _r33["xep_luc"] = (_bao + datetime.timedelta(hours=6)).strftime("%d/%m/%Y %H:%M")
         _nghi.append(_r33)
-    log.append("26. DL33 GV bao nghi: gieo %d don (%d cho duyet, %d da duyet)"
+    # ── CHUOI NGHI LIEN TIEP + NGUOI NGHI NHIEU LAN (25/08) ────────────────────────────────
+    # Chon MOT giao vien co it nhat ba buoi LIEN TIEP cua CUNG mot lop nam du xa trong tuong lai.
+    # Lien tiep tinh theo session_number (mach hoc cua lop), khong theo ngay - hai buoi lien ke
+    # co the cach nhau hai hoac nam ngay tuy lich tuan, ma "lien tiep" o day la lien tiep trong
+    # mach hoc, do moi la thu hoc vien cam nhan duoc.
+    def _sn0(v):
+        try:
+            return int(str(v).strip() or 0)
+        except Exception:
+            return 0
+    _theoLop = {}
+    for _dd, _s33 in _ung:
+        _k = (str(_s33.get("teacher_id") or ""), str(_s33.get("class_id") or ""))
+        if not _k[0] or not _k[1]:
+            continue
+        _theoLop.setdefault(_k, []).append((_dd, _s33))
+    _chuoi = None
+    for _k in sorted(_theoLop.keys()):
+        _ds = sorted(_theoLop[_k], key=lambda z: _sn0(z[1].get("session_number")))
+        _sn = [_sn0(z[1].get("session_number")) for z in _ds]
+        for _i in range(len(_ds) - 2):
+            if _sn[_i] > 0 and _sn[_i + 1] == _sn[_i] + 1 and _sn[_i + 2] == _sn[_i] + 2:
+                _chuoi = (_k, _ds[_i:_i + 3])
+                break
+        if _chuoi:
+            break
+    if _chuoi:
+        (_gid, _cid), _ba = _chuoi
+        _g34 = ([x for x in R("DL01") if str(x.get("staff_id") or "") == _gid] or [{}])[0]
+        _c34 = _lopN.get(_cid, {})
+        _bao34 = NOW - datetime.timedelta(days=2, hours=4)
+        for _j, (_dd, _s34) in enumerate(_ba):
+            _nghi.append({
+                "nghi_id": "GVN-%04d" % (len(_nghi) + 1),
+                "staff_id": _gid,
+                "staff_name": _g34.get("full_name") or "",
+                "session_id": _s34.get("session_id") or "",
+                "class_id": _cid,
+                "class_name": _c34.get("class_name") or _cid,
+                "session_number": _s34.get("session_number") or "",
+                "session_date": _s34.get("session_date") or "",
+                "ly_do": u"GV \u1ed1m \u0111au",
+                "ghi_chu": (u"N\u1eb1m vi\u1ec7n theo d\u00f5i m\u1ed9t tu\u1ea7n - "
+                            u"xin ngh\u1ec9 c\u1ea3 ba bu\u1ed5i li\u00ean ti\u1ebfp"),
+                "de_xuat_gv": "", "de_xuat_gv_ten": "",
+                "bao_luc": _bao34.strftime("%d/%m/%Y %H:%M"),
+                "trang_thai": u"cho_duyet (Ch\u1edd duy\u1ec7t)",
+                "duyet_boi": "", "duyet_boi_ten": "", "duyet_luc": "", "duyet_ghichu": "",
+                "gv_thay": "", "gv_thay_ten": "", "xep_luc": "",
+            })
+    log.append("26. DL33 GV bao nghi: gieo %d don (%d cho duyet, %d da duyet)%s"
                % (len(_nghi),
                   len([x for x in _nghi if x["trang_thai"].startswith("cho_duyet")]),
-                  len([x for x in _nghi if x["trang_thai"].startswith("da_duyet")])))
+                  len([x for x in _nghi if x["trang_thai"].startswith("da_duyet")]),
+                  (" + chuoi 3 buoi lien tiep" if _chuoi else " (KHONG tim duoc chuoi 3 buoi)")))
 
 # ═══ 27. DL25 · NHAT KY THAO TAC CO SAN VAI CHUC DONG (18/08) ═════════════════
 # Anh Luan: *"Log ma sao o cai dat ta???"*. Chuyen no ra thanh mot cuon so trong "Tra cuu" thi

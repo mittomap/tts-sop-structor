@@ -6272,6 +6272,22 @@ var FLTDEF={
     hai o ay - `_check17` bat dung: no doi trang co khai truc loc thi phai co thanh loc that.
     So `dsbaitap` moi la cho doc ca 384 dong. *Truc loc thuoc ve cho NHIN CA BANG, khong thuoc
     ve cho dang dung mot buoi.* */
+ /* V2 25/08 - HÀNG CHỜ GV BÁO NGHỈ CHƯA TỪNG CÓ TRỤC LỌC NÀO. Trang này tự vẽ (không qua
+    `renderList`) nên không có `LISTCFG` để `fltAuto` đọc, mà cũng chưa ai khai tay - `fltApply`
+    vẫn được gọi nhưng nó lọc trên một danh sách trục RỖNG. Ba chip có sẵn trả lời ba câu gấp;
+    còn "lý do gì", "lớp nào", "giáo viên nào" thì không hỏi được.
+    Hai trục cuối là trục DẪN XUẤT (`fxCalc`) - chúng không nằm ở cột nào trong bảng, chúng là
+    câu hỏi tính ra từ cả bảng. Đó cũng là lý do phải khai tay: lưới tự sinh chỉ đọc được cột. */
+ duyetgvnghi:[fxStaff("staff_id","Giáo viên xin nghỉ"),
+  fxRef("class_id","Lớp","DL10","class_id","class_name"),
+  fxEnum("ly_do","Lý do"),fxEnum("trang_thai","Trạng thái đơn"),
+  fxDate("session_date","Ngày buổi học"),fxDate("bao_luc","Báo lúc"),
+  fxCalc("_chuoi","Nghỉ liên tiếp",
+   function(r){var n=gvnChuoi(r);return [n>=3?"3+":(n===2?"2":"1")]},
+   function(v){return v==="1"?"Chỉ một buổi":(v==="2"?"2 buổi liên tiếp":"3 buổi liên tiếp trở lên")}),
+  fxCalc("_solan","Số lần đã xin nghỉ",
+   function(r){var n=gvnSoLan(r.staff_id);return [n>=5?"5+":String(n||1)]},
+   function(v){return v==="5+"?"5 lần trở lên":(v+" lần")})],
  dsbaitap:[fxEnum("homework_status","Trạng thái bài"),fxEnum("skill","Kỹ năng"),
   /* Nộp trễ: có cột `is_late` với dữ liệu thật mà không trục nào hỏi tới. */
   fxEnum("is_late","Nộp trễ"),
@@ -6282,7 +6298,12 @@ var FLTDEF={
 /* 14/08 - `buoihoc` va `baitap` la trang TU VE (khong qua renderList) nen khong co `code` de
    `fltCode` doc. Khai bang nguon o day thi truc loc vua khai moi tro dung cot that, va so tra
    cuu cung bang moi muon duoc qua `FLTGUONG`. */
-var FLTSRC={giaoviec:"DL23",ghinhan:"DL16",review:"DL15",buoihoc:"DL11"};
+/* 25/08 - `duyetgvnghi` cung mot ho: trang TU VE, khong co LISTCFG, nen `fltCode` tra ve rong
+   va `fltAxes` thoat ngay dong dau - khai bao nhieu truc o `FLTDEF` cung khong co truc nao ra.
+   Da cắn dung cai nay: khai xong sau truc ma do lai van ra mang rong.
+   *Khai mot truc loc thi phai khai luon bang nguon cua trang - hai ban khai, sua mot ben
+   khong tu sua ben kia.* */
+var FLTSRC={giaoviec:"DL23",ghinhan:"DL16",review:"DL15",buoihoc:"DL11",duyetgvnghi:"DL33"};
 function fltCode(pg){return FLTSRC[pg]||((LISTCFG[pg]||{}).code)||""}
 /* V9.64 - TRỤC LỌC TỰ SINH TỪ CHÍNH CÁC CỘT ĐANG HIỆN.
    Luật: cột nào người dùng đang NHÌN THẤY và nó là trạng thái/phân loại (enum, chip) hoặc là mốc
@@ -18562,6 +18583,10 @@ var APPPARAMS=[
     M7 bắt đúng: một con số hiện trên màn mà không có bánh răng nào trỏ tới thì nó là hằng số của
     phần mềm, không phải thông số của trung tâm. */
  ["P6 · Buổi học, điểm danh & bài tập","teacherOffLookahead_days","Giáo viên nhìn trước bao nhiêu ngày lịch dạy của mình để báo nghỉ","ngày",14],
+ /* V2 25/08 - hai núm của trục "nghỉ nhiều lần" (việc tồn 18/08). Ngưỡng nghiệp vụ thì đi qua
+    CH2, không cắm cứng - trung tâm nào coi 2 lần đã là nhiều thì chỉnh ở Cài đặt. */
+ ["P6 · Buổi học, điểm danh & bài tập","teacherOffLookback_days","Đếm số lần giáo viên xin nghỉ trong bao nhiêu ngày gần nhất","ngày",60],
+ ["P6 · Buổi học, điểm danh & bài tập","teacherOffRepeat_times","Xin nghỉ mấy lần trong cửa sổ trên thì hàng chờ gắn dấu \"nghỉ nhiều lần\"","lần",3],
  /* Chỉ có ở bản demo: nhật ký gieo sẵn được kéo lên sao cho dòng mới nhất vừa xảy ra cách đây
     bấy nhiêu phút - để mở demo lúc nào cũng thấy "hôm nay ai làm gì" mà không có dòng nào ghi
     một việc chưa xảy ra. */
@@ -25468,6 +25493,48 @@ function gvnCanXep(){return gvnRows().filter(function(x){
  return !!s&&!isc(s.session_status,"cancelled")})}
 function gvnCuaToi(){var me=String(CURSTAFF||"");
  return gvnAll().filter(function(x){return String(x.staff_id||"")===me})}
+/* ═══ V2 25/08 - NGHỈ LIÊN TIẾP MẤY BUỔI, VÀ NGHỈ MẤY LẦN TRONG KỲ ═════════════════════════════
+   Việc tồn từ 18/08. Bảng DL33 dựng xong thì hàng chờ trả lời được câu "ai xin nghỉ buổi nào",
+   nhưng KHÔNG trả lời được hai câu mà người duyệt hỏi ngay sau đó:
+    · *buổi này có nằm trong một chuỗi nghỉ liên tiếp không* - nghỉ một buổi thì tìm người dạy
+      thay là xong; nghỉ ba buổi liền của cùng một lớp thì đó là chuyện phải xếp người dài hạn và
+      phải báo học viên, hai việc khác hẳn nhau;
+    · *người này đã xin nghỉ mấy lần rồi* - một đơn thì duyệt, lần thứ tư trong tháng thì đó là
+      câu chuyện nhân sự chứ không còn là một cái đơn.
+   *Một hàng chờ chỉ nói về từng dòng thì người duyệt thấy cây mà không thấy rừng - và những
+   quyết định sai đắt nhất đều nằm ở chỗ nhìn một dòng mà tưởng đã nhìn cả bức tranh.*
+   Đếm theo SỐ BUỔI của lớp (`session_number`) chứ không theo ngày: hai buổi liền kề của một lớp
+   có thể cách nhau hai ngày hoặc năm ngày tuỳ lịch tuần, mà "liên tiếp" ở đây là liên tiếp trong
+   MẠCH HỌC của lớp - đó mới là thứ học viên cảm nhận được. */
+function gvnConSong(x){return isc(x.trang_thai,"cho_duyet","da_duyet")}
+function gvnChuoi(r){
+ if(!r)return 1;
+ var lop=String(r.class_id||""),gv=String(r.staff_id||"");
+ if(!lop)return 1;
+ var so={};
+ gvnAll().forEach(function(x){
+  if(!gvnConSong(x))return;
+  if(String(x.class_id||"")!==lop||String(x.staff_id||"")!==gv)return;
+  var n=num(x.session_number);if(n>0)so[n]=1});
+ var n0=num(r.session_number);
+ if(!(n0>0))return 1;
+ var d=1,i;
+ for(i=n0-1;so[i];i--)d++;
+ for(i=n0+1;so[i];i++)d++;
+ return d}
+/* Bao nhiêu đơn CÒN SỐNG của người này trong cửa sổ nhìn lại - "mấy lần rồi" hỏi theo NGƯỜI,
+   không theo lớp: một giáo viên nghỉ ở ba lớp khác nhau vẫn là ba lần vắng mặt. */
+function gvnSoLan(staff){
+ var me=String(staff||"");if(!me)return 0;
+ var n=Math.max(1,num(paramOf("teacherOffLookback_days",60)));
+ var moc=Date.now()-n*864e5;
+ return gvnAll().filter(function(x){
+  if(String(x.staff_id||"")!==me||!gvnConSong(x))return false;
+  var d=pvnd(x.bao_luc)||pvnd(x.session_date);
+  return !!d&&d.getTime()>=moc}).length}
+/* Ngưỡng "nghỉ nhiều" đi qua CH2 như mọi hằng số nghiệp vụ khác. */
+function gvnNhieuLan(r){return gvnSoLan(r&&r.staff_id)>=Math.max(2,num(paramOf("teacherOffRepeat_times",3)))}
+function gvnLienTiep(r){return gvnChuoi(r)>=2}
 /* Buổi sắp tới của chính người đang đăng nhập - danh sách để họ bấm báo nghỉ TRƯỚC.
    Lấy theo `teacher_id` chứ không theo GV chính của lớp: người dạy thay cũng có quyền báo nghỉ
    buổi mình đã nhận, và buổi ấy mới là buổi họ đứng tên. */
@@ -25663,8 +25730,15 @@ function duyGvnHTML(){
  var _nTrong=cho0.filter(function(r){var s0=find("DL11","session_id",r.session_id);
   return !s0||!gvBackup(s0).filter(function(z){return z.ok}).length}).length;
  var _nAll=cho0.length;
+ /* V2 25/08 - hai chip mới: chuỗi nghỉ liên tiếp, và người xin nghỉ nhiều lần. Xem chú thích ở
+    `gvnChuoi` - hai câu này người duyệt hỏi ngay sau câu "ai nghỉ buổi nào", mà trước bản này
+    hàng chờ không trả lời được câu nào trong hai. */
+ var _nChuoi=cho0.filter(gvnLienTiep).length;
+ var _nNhieu=cho0.filter(gvnNhieuLan).length;
  var cho1=cho0;
  if(gF==="gap")cho1=cho0.filter(gvnGap);
+ else if(gF==="chuoi")cho1=cho0.filter(gvnLienTiep);
+ else if(gF==="nhieu")cho1=cho0.filter(gvnNhieuLan);
  else if(gF==="trong")cho1=cho0.filter(function(r){var s0=find("DL11","session_id",r.session_id);
   return !s0||!gvBackup(s0).filter(function(z){return z.ok}).length});
  var cho=fltApply("duyetgvnghi",cho1);
@@ -25675,7 +25749,7 @@ function duyGvnHTML(){
  window.FLTLAST.duyetgvnghi=cho.map(function(r){return {ma_don:r.nghi_id,giao_vien:r.staff_name||r.staff_id,
   lop:r.class_name||r.class_id,buoi:r.session_number,ngay_hoc:r.session_date,ly_do:r.ly_do,
   ghi_chu:r.ghi_chu,bao_luc:r.bao_luc,bao_gap:gvnGap(r)?"Có":"",trang_thai:elabel(r.trang_thai)||r.trang_thai,
-  gv_de_xuat:r.de_xuat_gv_ten}});
+  gv_de_xuat:r.de_xuat_gv_ten,nghi_lien_tiep:gvnChuoi(r),so_lan_trong_ky:gvnSoLan(r.staff_id)}});
  var quyen=gvnDuyetDuoc();
  var xep=gvnCanXep();
  /* Câu này từng 178 ký tự - `_checkaudit` bắt đúng luật của app: đoạn nhắc đầu trang phải đọc
@@ -25687,7 +25761,9 @@ function duyGvnHTML(){
  h+=pgBar("duyetgvnghi",cho.length);
  h+=chipBar("duyetgvnghi",gF,[["all","Chờ duyệt",_nAll],
   ["gap","Báo gấp",_nGap,_nGap?"red":""],
-  ["trong","Chưa có ai thay được",_nTrong,_nTrong?"amber":""]]);
+  ["trong","Chưa có ai thay được",_nTrong,_nTrong?"amber":""],
+  ["chuoi","Nghỉ liên tiếp",_nChuoi,_nChuoi?"red":""],
+  ["nhieu","Người nghỉ nhiều lần",_nNhieu,_nNhieu?"amber":""]]);
  h+='<div class="panel"><div class="pbody">';
  if(!cho.length)h+='<div class="empty">'+(_nAll?"Không có đơn nào khớp chip đang chọn - bấm \"Chờ duyệt\" để xem lại tất cả.":"Không có đơn báo nghỉ nào chờ duyệt.")+'</div>';
  catXem("duygvn",cho,20).forEach(function(r){
@@ -25697,6 +25773,8 @@ function duyGvnHTML(){
    '<div class="big">'+nsLnk(r.staff_id,r.staff_name)+' - '+lopLnk(r.class_id,r.class_name)+' buổi '+esc(r.session_number||"?")+'</div>'+
    '<div class="rs">'+esc(r.session_date||"-")+' · lý do: '+esc(r.ly_do||"-")+(r.ghi_chu?(" - "+esc(r.ghi_chu)):"")+'</div>'+
    '<div class="rs">'+(gvnGap(r)?'<span class="chip red">báo gấp</span> ':'')+
+    (gvnLienTiep(r)?('<span class="chip red" data-tip="Giáo viên này xin nghỉ '+gvnChuoi(r)+' buổi LIÊN TIẾP của lớp - phải xếp người dạy thay dài hạn và báo học viên, không chỉ xoay một buổi">nghỉ '+gvnChuoi(r)+' buổi liên tiếp</span> '):'')+
+    (gvnNhieuLan(r)?('<span class="chip amber" data-tip="Đếm số đơn còn sống của người này trong cửa sổ nhìn lại đặt ở Cài đặt (CH2). Nhiều lần thì đây là câu chuyện nhân sự, không còn là một cái đơn.">lần thứ '+gvnSoLan(r.staff_id)+'</span> '):'')+
     (n?('<span class="chip green">'+n+' người thay được</span>'):'<span class="chip red">chưa có ai thay được</span>')+
     (r.de_xuat_gv_ten?(' <span class="chip blue">GV đề xuất '+esc(r.de_xuat_gv_ten)+'</span>'):'')+'</div></div>'+
    '<div class="act">'+
@@ -29847,6 +29925,25 @@ var QASO=[
     Ba câu duy nhất còn rơi vào nhánh chỉ-đường sau khi nối bảng NHỊP: hai câu này chưa có dòng
     nhịp nào (trang Công nợ mới dựng hôm qua, và khiếu nại đang mở là câu của quản lý chứ không
     phải việc trong ngày của ai). Khai tay đúng hai chỗ ấy, không khai bừa cho đủ. */
+ /* V2 25/08 - Ý ĐỊNH "GIÁO VIÊN NGHỈ NHIỀU". Hàng chờ nay trả lời được câu này bằng chip, nhưng
+    người hỏi Trợ lý không gõ "mở hàng chờ" - họ gõ "giáo viên nào hay nghỉ". Một câu hỏi trả lời
+    được trên màn mà Trợ lý không hiểu thì với người quen hỏi Trợ lý là chưa có. */
+ {k:"gvnghinhieu",t:"Giáo viên xin nghỉ nhiều lần",ic:"ti-calendar-off",
+  tu:["gv nghi nhieu","giao vien nghi nhieu","hay nghi","nghi lien tiep","nghi nhieu lan",
+      "xin nghi nhieu","giao vien vang nhieu","bao nghi nhieu"],
+  fn:function(){
+   var don=gvnRows().filter(gvnConSong);
+   var theo={};don.forEach(function(x){var k2=String(x.staff_id||"");if(!k2)return;(theo[k2]=theo[k2]||[]).push(x)});
+   var L=Object.keys(theo).map(function(k2){var ds=theo[k2];
+    var chuoi=0;ds.forEach(function(x){var c=gvnChuoi(x);if(c>chuoi)chuoi=c});
+    return {id:k2,ten:(ds[0].staff_name||k2),n:gvnSoLan(k2),chuoi:chuoi}})
+    .filter(function(x){return x.n>=Math.max(2,num(paramOf("teacherOffRepeat_times",3)))||x.chuoi>=2});
+   L.sort(function(a2,b2){return b2.n-a2.n||b2.chuoi-a2.chuoi});
+   return {so:L.length,don:"giáo viên",go:"go('duyetgvnghi')",nut:"Mở hàng chờ GV báo nghỉ",
+    giai:"Đếm đơn còn sống trong cửa sổ nhìn lại (CH2 teacherOffLookback_days) và chuỗi buổi nghỉ liên tiếp của cùng một lớp. Ngưỡng 'nhiều lần' đặt ở CH2.",
+    hang:qaHang(L,function(r){return r.ten},
+     function(r){return r.n+" lần"+(r.chuoi>=2?(" · có chuỗi "+r.chuoi+" buổi liên tiếp"):"")},
+     function(r){return "window.NVID="+JSON.stringify(String(r.id))+";go('hosonv')"})}}},
  {k:"chungtu",t:"Phiếu thu/chi chưa có ảnh chứng từ",ic:"ti-paperclip",
   tu:["chung tu","chungtu","anh phieu","phieu thu","phieu chi","bien lai","hoa don","doi soat"],
   fn:function(){
