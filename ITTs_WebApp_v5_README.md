@@ -2846,3 +2846,36 @@ trắng** (khoảng phía trên tên kệ rộng hơn phía dưới, nên mắt 
 
 Chấm màu của bốn chặng vòng đời nay nằm sát mép trái như một dấu chỉ mục, không đẩy chữ nữa - nên
 tên mọi nhóm thẳng một cột.
+
+## Hành trình điểm số đọc bằng thước band, không đọc bằng bảng số
+
+Khối "Hành trình điểm số" ở cổng học viên trước đây là một bảng sáu cột: đầu vào, giữa khóa, đầu
+ra, mức tăng, mục tiêu. Sáu con số xếp cạnh nhau bắt người đọc tự trừ trong đầu mới ra được câu
+hỏi thật của họ - *mình đi được bao xa rồi, còn bao xa nữa*.
+
+Nay mỗi kỹ năng là **một cây thước band 0-9** với bốn loại dấu đặt đúng vị trí điểm của nó:
+
+| Dấu | Nghĩa |
+|---|---|
+| Vòng tròn rỗng, viền xám, to nhất | Đầu vào |
+| Chấm navy nhỏ | Giữa khóa |
+| Chấm xanh lá nhỏ | Đầu ra |
+| Vạch đứng cam | Mục tiêu |
+
+Đoạn từ đầu vào tới điểm mới nhất được tô nhạt - nó là một **quãng**, không phải một mốc, nên nó
+nhạt hơn mọi cái dấu. Rê chuột vào từng dấu hiện tên mốc, band và ngày chấm.
+
+Ba chi tiết được đặt có chủ ý:
+
+- **Một cây thang 0-9 vẽ MỘT LẦN ở dưới cùng**, năm hàng cùng đọc theo nó. Vẽ mỗi hàng một thang
+  là năm cây thước rời, và so sánh giữa các kỹ năng lại thành phép tính.
+- **Số của đầu vào nằm dưới vạch, số của các mốc sau nằm trên vạch.** Hai tầng thì hai mốc đứng
+  sát nhau vẫn đọc được, và người ta thấy ngay đâu là chỗ bắt đầu.
+- **Ba cỡ dấu lồng vào nhau.** Hai mốc trùng band (đầu vào 5 và giữa khóa cũng 5) thì dấu sau nằm
+  gọn trong vòng trước chứ không xoá mất nó.
+
+Trên điện thoại, nhãn kỹ năng - điểm mới nhất - chip mức tăng nằm chung một dòng ở trên, cây thước
+xuống dòng dưới ăn trọn bề ngang, nên mỗi band rộng gấp đôi so với việc nhồi tất cả vào một hàng.
+
+Không mất một con số nào so với bảng cũ: mục tiêu và trạng thái *đạt / chưa đạt* nằm ở dòng chú
+thích dưới thước, ngày của từng mốc nằm cả ở chú thích lẫn trong tooltip.

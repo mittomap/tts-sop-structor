@@ -148,6 +148,49 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 🎨 26/08 - NÂNG CẤP FRONT END: THAY MỘT BẢNG SÁU CỘT BẰNG CÂY THƯỚC BAND
+> Anh Luân: *"nếu đã có, thì sau khi làm việc tồn, nâng cấp front end cho anh"* (nói về plugin
+> `frontend-design` vừa cài).
+>
+> Bài của plugin dặn: **bắt gốc ở chính đối tượng** - "the subject's own world, its materials,
+> instruments, artifacts, is where distinctive choices come from" - và **dồn táo bạo vào đúng MỘT
+> chỗ**, phần còn lại giữ im.
+>
+> Thứ đặc trưng nhất trong thế giới một học viên IELTS là **thang band 0-9, bước 0,5**. Cả đời học
+> của em ấy đo bằng cái thang đó. Mà bản cũ vẽ nó ra thành **một bảng sáu cột số** - tức là vứt đi
+> đúng cái làm nó đọc được: **VỊ TRÍ**. "3.5 rồi 5.0, mục tiêu 7.0" là ba con số phải tự trừ trong
+> đầu; cùng ba con số ấy đặt lên một cây thước thì đoạn đã đi và đoạn còn lại hiện ra thành **ĐỘ
+> DÀI**, không phải phép tính.
+>
+> *Khi bản thân đối tượng đã có sẵn một cái thước, đừng vẽ lại nó thành bảng tính.*
+>
+> Không thêm một mã màu hay một bậc cỡ chữ nào mới - cả hai thang đều đang sát trần `_checkux`.
+>
+> **Ba chỗ phải sửa lại sau khi soi ảnh chụp bản đầu** (và cả ba đều là bài học, không phải lỗi vặt):
+>
+> · **Hai dấu trùng band thì dấu sau che sạch dấu trước.** HV065 Speaking: đầu vào 5, giữa khóa
+>   cũng 5 - hai chấm cùng cỡ 12px chồng khít, còn lại đúng một chấm navy với **hai con số không
+>   biết bám vào đâu**. Nay ba cỡ **lồng vào nhau**: vòng đầu vào 14px rỗng, các dấu sau 10px đặc,
+>   nên dấu sau nằm gọn TRONG vòng trước.
+>   *Chồng hai dấu lên một chỗ mà cùng cỡ thì cái sau không che một phần - nó che sạch.*
+>
+> · **Quãng đã đi tô navy đặc, đúng màu của dấu "giữa khóa".** Một cái là QUÃNG, một cái là ĐIỂM -
+>   hai thứ khác loại mà cùng một sắc độ thì màu thôi không còn phân biệt được chúng. Nay quãng
+>   lùi hẳn xuống nền nhạt (`opacity:.28`), chỉ các dấu còn đậm.
+>
+> · **Quãng chỉ vẽ khi điểm mới CAO HƠN đầu vào.** Một em tụt band thì cây thước không có đoạn nào
+>   - trông y như **chưa có dữ liệu**, trong khi sự thật là *có* dữ liệu và nó xấu.
+>   *Vẽ có điều kiện theo chiều tốt thì chiều xấu biến thành "chưa có".*
+>
+> **Điện thoại:** bản đầu giữ nguyên một hàng cho cả nhãn - thước - điểm - chip, nên trên máy 390px
+> cây thước chỉ còn ~160px cho chín band, mỗi band 18px, các dấu dính vào nhau. Nay nhãn và điểm
+> lên một dòng riêng, thước xuống dòng dưới ăn trọn bề ngang - mỗi band rộng gấp đôi. Làm bằng
+> `flex-wrap` + `flex:1 0 100%` chứ không đổi thẻ, nên `_checkmuc`/`_checkmat` không phải khai lại.
+>
+> **Một chỗ chữ chết theo bảng cũ:** dòng nhắc còn viết *"sẽ hiện ở cột giữa khi trung tâm chấm
+> xong"* - **không còn cột nào cả**. Đổi thành "sẽ hiện thành một dấu trên thước".
+> *Đổi cách vẽ mà không đổi lời nói thì lời nói ở lại tả cái hình cũ.*
+
 > ### 🔄 25/08 - ĐỌC LẠI TOÀN BỘ VIỆC TỒN, VÀ PHẦN LỚN ĐÃ XONG TỪ LÚC NÀO
 > Anh Luân: *"xử lý toàn bộ việc tồn, audit toàn diện, chủ động fix sạch toàn bộ"*.
 > Việc đầu tiên hoá ra là **đi hỏi lại từng mục xem nó còn đúng không** - và mảng 8 của giao thức

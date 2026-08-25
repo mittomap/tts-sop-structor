@@ -20491,22 +20491,74 @@ function renderTrangHV(){
  var hasIn=!!(t&&t.overall_score), hasOut=!!(ce&&ce.final_test_score);
  if(hasIn||hasOut){
   h+=hvSec("s-diem")+'<div class="sechd" id="s-diem">Hành trình điểm số · từ đầu vào đến đầu ra</div>';
-  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Kỹ năng</th><th>Đầu vào'+(t.result_time?' <span class="mut">('+esc(String(t.result_time).slice(0,10))+')</span>':'')+'</th><th>Giữa khóa'+(ob.mid_test_date?' <span class="mut">('+esc(ob.mid_test_date)+')</span>':'')+'</th><th>Đầu ra'+(ce.course_completion_time?' <span class="mut">('+esc(String(ce.course_completion_time).slice(0,10))+')</span>':'')+'</th><th>Tăng</th><th>Mục tiêu</th></tr></thead><tbody>';
+  /* ═══ V2 26/08 - THƯỚC BAND 0-9 THAY CHO MỘT BẢNG SÁU CỘT ═══════════════════════════════════
+     Thứ đặc trưng nhất trong thế giới của một học viên IELTS là **thang band 0-9, bước 0,5**.
+     Cả đời học của em ấy đo bằng cái thang đó. Mà bản cũ vẽ nó thành một bảng sáu cột số - tức
+     là vứt đi đúng cái làm nó đọc được: **VỊ TRÍ**. "3.5 rồi 5.0, mục tiêu 7.0" là ba con số
+     phải tự trừ trong đầu; cùng ba con số ấy đặt lên một cây thước thì đoạn đã đi và đoạn còn
+     lại hiện ra thành ĐỘ DÀI, không phải phép tính.
+     *Khi bản thân đối tượng đã có sẵn một cái thước, đừng vẽ lại nó thành bảng tính.*
+     MỘT cây thang vẽ MỘT LẦN ở dưới, năm hàng cùng đọc theo nó - đó là chỗ cấu trúc mang nghĩa
+     thật: các hàng so được với nhau vì chúng dùng chung một trục.
+     KHÔNG MẤT MỘT CON SỐ NÀO so với bảng cũ (luật số 0): đầu vào và điểm mới nhất in thẳng hai
+     bên thước · giữa khóa và mục tiêu in trên đúng dấu của nó · mức tăng vẫn là con chip cũ ·
+     ngày chấm nằm trong chú thích rê chuột của từng dấu.
+     Táo bạo đúng MỘT chỗ: cây thước. Mọi thứ quanh nó giữ nguyên, không thêm một nét trang trí
+     nào - và không dùng một mã màu hay bậc cỡ chữ nào mới. */
+  var _bDate=function(v){v=String(v||"").trim();return v?v.slice(0,10):""};
+  var _tIn=_bDate(t.result_time), _tMid=_bDate(ob.mid_test_date), _tOut=_bDate(ce.course_completion_time);
+  h+='<div class="panel"><div class="pbody">';
   function bandRow(lb,vin,vmid,vout,tg,bold){
    var last=(vout>0?vout:(vmid>0?vmid:0));
    var d=(vin>0&&last>0)?(last-vin):null;
-   var dtxt=d==null?'<span class="mut">-</span>':(d>0?'<span class="chip green">+'+d.toFixed(1)+'</span>':(d<0?'<span class="chip red">'+d.toFixed(1)+'</span>':'<span class="chip">0</span>'));
-   var okT=(tg>0&&vout>0)?(vout>=tg?'<span class="chip green">đạt</span>':'<span class="chip amber">chưa đạt</span>'):'';
-   return '<tr'+(bold?' style="background:var(--bg)"':'')+'><td>'+(bold?'<b>'+esc(lb)+'</b>':esc(lb))+'</td>'+
-    '<td>'+(vin>0?(bold?'<b>'+vin+'</b>':vin):'<span class="mut">-</span>')+'</td>'+
-    '<td>'+(vmid>0?(bold?'<b>'+vmid+'</b>':vmid):'<span class="mut">chưa chấm</span>')+'</td>'+
-    '<td>'+(vout>0?(bold?'<b>'+vout+'</b>':vout):'<span class="mut">chưa có</span>')+'</td>'+
-    '<td>'+dtxt+'</td><td>'+(tg>0?tg+" "+okT:'<span class="mut">-</span>')+'</td></tr>'}
+   var pc=function(v){return Math.max(0,Math.min(100,v/9*100))};
+   /* Số của mốc đầu vào nằm TẦNG DƯỚI, các mốc còn lại nằm TẦNG TRÊN - nên chỉ tầng trên mới có
+      chuyện hai số đè lên nhau khi hai mốc trùng band (mục tiêu trùng giữa khóa chẳng hạn).
+      Ghi lại những số đã in ở tầng ấy rồi bỏ qua bản thứ hai. */
+   var _tren=[];
+   var mark=function(v,cls,ten,ngay,so){
+    if(!(v>0))return "";
+    var inSo=so&&(cls==="vao"||_tren.indexOf(v)<0);
+    if(so&&cls!=="vao")_tren.push(v);
+    return '<span class="brm '+cls+'" style="left:'+pc(v).toFixed(2)+'%" data-tip="'+esc(ten+": band "+v+(ngay?(" · "+ngay):""))+'">'+
+     (inSo?'<b>'+v+'</b>':'')+'</span>'};
+   /* Quãng đã đi vẽ cho CẢ HAI CHIỀU. Bản đầu chỉ vẽ khi điểm mới cao hơn đầu vào, nên một em tụt
+      band thì cây thước không có đoạn nào - trông y như chưa có dữ liệu, trong khi sự thật là
+      *có* dữ liệu và nó xấu. Chiều tụt đã đọc được từ vị trí hai dấu và từ con chip đỏ, nên đoạn
+      này chỉ cần một màu nhạt duy nhất, không cần đổi màu theo chiều. */
+   var _lo=Math.min(vin,last), _hi=Math.max(vin,last);
+   var h2='<div class="brrow'+(bold?' cai':'')+'">'+
+    '<div class="brlb">'+esc(lb)+'</div>'+
+    '<div class="brul">'+
+     '<span class="brtrack"></span>'+
+     ((vin>0&&last>0&&last!==vin)?('<span class="brfill" style="left:'+pc(_lo).toFixed(2)+'%;width:'+(pc(_hi)-pc(_lo)).toFixed(2)+'%"></span>'):'')+
+     mark(tg,"dich","Mục tiêu","",1)+
+     mark(vin,"vao","Đầu vào",_tIn,1)+
+     mark(vmid,"giua","Giữa khóa",_tMid,(vmid>0&&!(vout>0))?0:1)+
+     mark(vout,"ra","Đầu ra",_tOut,0)+
+    '</div>'+
+    '<div class="brv moi">'+(last>0?last:'<span class="mut">-</span>')+
+     (last>0?('<em>'+(vout>0?"đầu ra":"giữa khóa")+'</em>'):'')+'</div>'+
+    '<div class="brd">'+(d==null?'<span class="mut">-</span>':(d>0?'<span class="chip green">+'+d.toFixed(1)+'</span>':(d<0?'<span class="chip red">'+d.toFixed(1)+'</span>':'<span class="chip">0</span>')))+'</div>'+
+    '</div>';
+   return h2}
   h+=bandRow("Overall",num(t.overall_score),num(ob.mid_overall),num(ce.final_test_score),num(ce.target_band),true);
   var MIDK={Listening:"mid_listening",Reading:"mid_reading",Writing:"mid_writing",Speaking:"mid_speaking"};
   SK.forEach(function(k){h+=bandRow(k[0],num(t[k[1]]),num(ob[MIDK[k[0]]]),num(ce[k[2]]),0,false)});
-  h+='</tbody></table></div>';
-  h+='<div class="pbody"><div class="mut" style="font-size:11.5px"><i class="ti ti-info-circle" style="margin-right:5px"></i>Bài kiểm tra <b>giữa khóa</b> '+(ob.mid_test_date?'đã chấm ngày '+esc(ob.mid_test_date)+'.':'sẽ hiện ở cột giữa khi trung tâm chấm xong.')+' </div></div>';
+  /* Cây thang vẽ MỘT LẦN cho cả khối - năm hàng trên kia so được với nhau chính vì chúng đọc
+     chung một trục. Vẽ mỗi hàng một thang là năm cái thước rời, và so sánh lại thành phép tính. */
+  h+='<div class="brrow bang"><div class="brlb"></div><div class="brul brsc">'+
+   [0,1,2,3,4,5,6,7,8,9].map(function(n){return '<span class="brt" style="left:'+(n/9*100).toFixed(2)+'%">'+n+'</span>'}).join("")+
+   '</div><div class="brv"></div><div class="brd"></div></div>';
+  h+='<div class="brchu">'+
+   '<span><i class="brk vao"></i>Đầu vào'+(_tIn?(' <span class="mut">'+esc(_tIn)+'</span>'):'')+'</span>'+
+   (num(ob.mid_overall)>0?('<span><i class="brk giua"></i>Giữa khóa'+(_tMid?(' <span class="mut">'+esc(_tMid)+'</span>'):'')+'</span>'):'')+
+   (num(ce.final_test_score)>0?('<span><i class="brk ra"></i>Đầu ra'+(_tOut?(' <span class="mut">'+esc(_tOut)+'</span>'):'')+'</span>'):'')+
+   (num(ce.target_band)>0?('<span><i class="brk dich"></i>Mục tiêu '+num(ce.target_band)+
+     ((num(ce.final_test_score)>0)?(num(ce.final_test_score)>=num(ce.target_band)?' <span class="chip green">đạt</span>':' <span class="chip amber">chưa đạt</span>'):'')+'</span>'):'')+
+   '</div>';
+  h+='</div>';
+  h+='<div class="pbody"><div class="mut" style="font-size:11.5px"><i class="ti ti-info-circle" style="margin-right:5px"></i>Bài kiểm tra <b>giữa khóa</b> '+(ob.mid_test_date?'đã chấm ngày '+esc(ob.mid_test_date)+'.':'sẽ hiện thành một dấu trên thước khi trung tâm chấm xong.')+' </div></div>';
   if(!hasOut)h+='<div class="pbody"><div class="mut" style="font-size:11.5px"><i class="ti ti-info-circle" style="margin-right:5px"></i>Bạn chưa thi đầu ra. Trong lúc học, điểm bài tập theo kỹ năng bên dưới cho biết bạn đang tiến bộ tới đâu.</div></div>';
   if(ce.achievement_note)h+='<div class="pbody"><div class="notebar" style="margin:0"><i class="ti ti-award"></i>'+esc(ce.achievement_note)+'</div></div>';
   h+='</div>';

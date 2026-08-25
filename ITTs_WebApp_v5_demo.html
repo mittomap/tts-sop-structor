@@ -1627,6 +1627,75 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .hvc.ok i{color:var(--green)}
 .hvc b{display:block;font-size:12.5px;color:var(--text)}
 .hvc span{font-size:11.5px;color:var(--muted)}
+/* ═══ THƯỚC BAND 0-9 - xem ghi chú ở khối "Hành trình điểm số" ══════════════════════════════
+   Không một mã màu mới, không một bậc cỡ chữ mới: mọi thứ lấy từ token đã có, vì thang màu và
+   thang chữ của app đều đang sát trần của `_checkux` (110 mã màu · 16 bậc cỡ chữ · 10 bậc bo
+   góc) - và luật đã ghi từ 24/08: *một cỡ chữ mới không bao giờ chỉ là một cỡ chữ mới.* */
+.brrow{display:flex;align-items:center;gap:10px;padding:2px 0}
+.brrow+.brrow{border-top:1px solid #F1F4F8}
+.brlb{width:92px;flex:none;font-size:12px;font-weight:600;color:var(--ink)}
+.brrow.cai .brlb{font-weight:800}
+.brv{width:58px;flex:none;text-align:right;font-size:13px;font-weight:700;color:var(--ink);
+ font-variant-numeric:tabular-nums;line-height:1.2}
+.brv em{display:block;font-style:normal;font-size:11px;font-weight:600;color:var(--muted)}
+.brrow.cai .brv.moi{font-size:17px;font-weight:800}
+.brd{width:56px;flex:none;text-align:right}
+/* Thân thước: một đường ray, một đoạn đã đi, và các dấu mốc đặt theo đúng vị trí band. */
+.brul{position:relative;flex:1 1 auto;min-width:0;height:26px;margin:14px 0 15px}
+.brrow.bang .brul{margin:0}
+.brtrack{position:absolute;left:0;right:0;top:12px;height:2px;background:var(--line);border-radius:999px}
+/* Đoạn đã đi là một QUÃNG, cái dấu là một ĐIỂM - hai thứ khác loại thì không được cùng một sắc
+   độ. Bản đầu tô đoạn ấy bằng navy đặc, đúng màu của dấu "giữa khóa", nên nhìn ra như thể cả
+   quãng đường là một cái mốc dài. Nay quãng lùi hẳn xuống nền nhạt, chỉ các dấu còn đậm.
+   *Hai thứ khác loại mà cùng một màu thì màu thôi không còn phân biệt được chúng.* */
+.brfill{position:absolute;top:11px;height:4px;background:var(--navy);border-radius:999px;opacity:.28}
+/* Ba cỡ LỒNG VÀO NHAU: vòng đầu vào rộng nhất, dấu về sau nhỏ hơn - hai mốc trùng band thì dấu
+   sau nằm GỌN TRONG vòng trước chứ không xoá mất nó. HV065 Speaking đang là đúng ca ấy: đầu vào
+   5, giữa khóa 5, và bản đầu chỉ còn một chấm navy với hai con số không biết bám vào đâu.
+   *Chồng hai dấu lên một chỗ mà cùng cỡ thì cái sau không che một phần - nó che sạch.* */
+.brm{position:absolute;top:6px;width:14px;height:14px;margin-left:-7px;border-radius:999px;
+ background:#fff;box-shadow:inset 0 0 0 2px var(--muted);cursor:default}
+.brm.giua,.brm.ra{top:8px;width:10px;height:10px;margin-left:-5px;box-shadow:none}
+.brm.giua{background:var(--navy)}
+.brm.ra{background:var(--green)}
+.brm.dich{width:3px;height:20px;top:3px;margin-left:-1.5px;border-radius:999px;
+ background:var(--amber);box-shadow:none}
+/* Số của MỐC ĐẦU nằm DƯỚI vạch, các mốc sau nằm TRÊN - hai tầng thì mốc đứng sát nhau vẫn đọc
+   được, và người ta thấy ngay đâu là chỗ bắt đầu.
+   Bản đầu để số đầu vào ở một CỘT RIÊNG bên trái thước: nó đứng cách cái dấu của chính nó nửa
+   cây thước, nên đọc ra như thể nó đang gọi tên mốc 0.
+   *Một con số đặt xa cái nó nói về thì người đọc sẽ gán nó cho thứ gần nhất.* */
+.brm b{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+ font-size:11px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.brm.vao b{bottom:auto;top:14px;color:var(--muted);font-weight:700}
+.brm.dich b{color:var(--amber)}
+/* Cây thang vẽ một lần ở dưới cùng. */
+.brrow.bang{padding-top:2px;border-top:0}
+.brsc{height:16px}
+.brt{position:absolute;top:0;transform:translateX(-50%);font-size:11px;color:var(--muted);
+ font-variant-numeric:tabular-nums}
+.brchu{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:11.5px;color:var(--ink)}
+.brchu span{display:inline-flex;align-items:center;gap:6px}
+.brk{width:12px;height:12px;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 2px var(--muted);flex:none}
+.brk.giua,.brk.ra{width:9px;height:9px;box-shadow:none}
+.brk.giua{background:var(--navy)}
+.brk.ra{background:var(--green)}
+.brk.dich{width:3px;height:14px;border-radius:999px;background:var(--amber);box-shadow:none}
+/* ĐIỆN THOẠI: trả cả bề ngang cho cây thước.
+   Bản đầu giữ nguyên một hàng cho cả nhãn - thước - điểm - chip, nên trên máy 390px cây thước chỉ
+   còn khoảng 160px cho chín band: mỗi band 18px, các dấu dính vào nhau. Nhãn và điểm lên một dòng
+   riêng ở trên, thước xuống dòng dưới ăn trọn bề ngang thì mỗi band rộng gấp đôi.
+   Làm bằng flex-wrap chứ không đổi thẻ: `.brul` nhận `flex:1 0 100%` là nó tự tách dòng. */
+@media(max-width:640px){
+ .brrow{flex-wrap:wrap;gap:0 8px;padding:6px 0}
+ .brlb{width:auto;flex:1 1 auto}
+ .brv{width:auto;font-size:13px}
+ .brv em{display:inline;margin-left:5px}
+ .brd{width:auto}
+ .brul{flex:1 0 100%;order:2;margin:12px 0 15px}
+ .brrow.bang{padding-top:0}
+ .brrow.bang .brlb,.brrow.bang .brv,.brrow.bang .brd{display:none}
+}
 .hvskill{display:flex;flex-direction:column;gap:10px}
 .hvsk{display:flex;align-items:center;gap:12px}
 .hvskl{width:150px;font-size:12px;flex:none}
@@ -3652,7 +3721,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">25/08/2026 · <b>3dea82</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">25/08/2026 · <b>ecbd69</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -24182,22 +24251,74 @@ function renderTrangHV(){
  var hasIn=!!(t&&t.overall_score), hasOut=!!(ce&&ce.final_test_score);
  if(hasIn||hasOut){
   h+=hvSec("s-diem")+'<div class="sechd" id="s-diem">Hành trình điểm số · từ đầu vào đến đầu ra</div>';
-  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Kỹ năng</th><th>Đầu vào'+(t.result_time?' <span class="mut">('+esc(String(t.result_time).slice(0,10))+')</span>':'')+'</th><th>Giữa khóa'+(ob.mid_test_date?' <span class="mut">('+esc(ob.mid_test_date)+')</span>':'')+'</th><th>Đầu ra'+(ce.course_completion_time?' <span class="mut">('+esc(String(ce.course_completion_time).slice(0,10))+')</span>':'')+'</th><th>Tăng</th><th>Mục tiêu</th></tr></thead><tbody>';
+  /* ═══ V2 26/08 - THƯỚC BAND 0-9 THAY CHO MỘT BẢNG SÁU CỘT ═══════════════════════════════════
+     Thứ đặc trưng nhất trong thế giới của một học viên IELTS là **thang band 0-9, bước 0,5**.
+     Cả đời học của em ấy đo bằng cái thang đó. Mà bản cũ vẽ nó thành một bảng sáu cột số - tức
+     là vứt đi đúng cái làm nó đọc được: **VỊ TRÍ**. "3.5 rồi 5.0, mục tiêu 7.0" là ba con số
+     phải tự trừ trong đầu; cùng ba con số ấy đặt lên một cây thước thì đoạn đã đi và đoạn còn
+     lại hiện ra thành ĐỘ DÀI, không phải phép tính.
+     *Khi bản thân đối tượng đã có sẵn một cái thước, đừng vẽ lại nó thành bảng tính.*
+     MỘT cây thang vẽ MỘT LẦN ở dưới, năm hàng cùng đọc theo nó - đó là chỗ cấu trúc mang nghĩa
+     thật: các hàng so được với nhau vì chúng dùng chung một trục.
+     KHÔNG MẤT MỘT CON SỐ NÀO so với bảng cũ (luật số 0): đầu vào và điểm mới nhất in thẳng hai
+     bên thước · giữa khóa và mục tiêu in trên đúng dấu của nó · mức tăng vẫn là con chip cũ ·
+     ngày chấm nằm trong chú thích rê chuột của từng dấu.
+     Táo bạo đúng MỘT chỗ: cây thước. Mọi thứ quanh nó giữ nguyên, không thêm một nét trang trí
+     nào - và không dùng một mã màu hay bậc cỡ chữ nào mới. */
+  var _bDate=function(v){v=String(v||"").trim();return v?v.slice(0,10):""};
+  var _tIn=_bDate(t.result_time), _tMid=_bDate(ob.mid_test_date), _tOut=_bDate(ce.course_completion_time);
+  h+='<div class="panel"><div class="pbody">';
   function bandRow(lb,vin,vmid,vout,tg,bold){
    var last=(vout>0?vout:(vmid>0?vmid:0));
    var d=(vin>0&&last>0)?(last-vin):null;
-   var dtxt=d==null?'<span class="mut">-</span>':(d>0?'<span class="chip green">+'+d.toFixed(1)+'</span>':(d<0?'<span class="chip red">'+d.toFixed(1)+'</span>':'<span class="chip">0</span>'));
-   var okT=(tg>0&&vout>0)?(vout>=tg?'<span class="chip green">đạt</span>':'<span class="chip amber">chưa đạt</span>'):'';
-   return '<tr'+(bold?' style="background:var(--bg)"':'')+'><td>'+(bold?'<b>'+esc(lb)+'</b>':esc(lb))+'</td>'+
-    '<td>'+(vin>0?(bold?'<b>'+vin+'</b>':vin):'<span class="mut">-</span>')+'</td>'+
-    '<td>'+(vmid>0?(bold?'<b>'+vmid+'</b>':vmid):'<span class="mut">chưa chấm</span>')+'</td>'+
-    '<td>'+(vout>0?(bold?'<b>'+vout+'</b>':vout):'<span class="mut">chưa có</span>')+'</td>'+
-    '<td>'+dtxt+'</td><td>'+(tg>0?tg+" "+okT:'<span class="mut">-</span>')+'</td></tr>'}
+   var pc=function(v){return Math.max(0,Math.min(100,v/9*100))};
+   /* Số của mốc đầu vào nằm TẦNG DƯỚI, các mốc còn lại nằm TẦNG TRÊN - nên chỉ tầng trên mới có
+      chuyện hai số đè lên nhau khi hai mốc trùng band (mục tiêu trùng giữa khóa chẳng hạn).
+      Ghi lại những số đã in ở tầng ấy rồi bỏ qua bản thứ hai. */
+   var _tren=[];
+   var mark=function(v,cls,ten,ngay,so){
+    if(!(v>0))return "";
+    var inSo=so&&(cls==="vao"||_tren.indexOf(v)<0);
+    if(so&&cls!=="vao")_tren.push(v);
+    return '<span class="brm '+cls+'" style="left:'+pc(v).toFixed(2)+'%" data-tip="'+esc(ten+": band "+v+(ngay?(" · "+ngay):""))+'">'+
+     (inSo?'<b>'+v+'</b>':'')+'</span>'};
+   /* Quãng đã đi vẽ cho CẢ HAI CHIỀU. Bản đầu chỉ vẽ khi điểm mới cao hơn đầu vào, nên một em tụt
+      band thì cây thước không có đoạn nào - trông y như chưa có dữ liệu, trong khi sự thật là
+      *có* dữ liệu và nó xấu. Chiều tụt đã đọc được từ vị trí hai dấu và từ con chip đỏ, nên đoạn
+      này chỉ cần một màu nhạt duy nhất, không cần đổi màu theo chiều. */
+   var _lo=Math.min(vin,last), _hi=Math.max(vin,last);
+   var h2='<div class="brrow'+(bold?' cai':'')+'">'+
+    '<div class="brlb">'+esc(lb)+'</div>'+
+    '<div class="brul">'+
+     '<span class="brtrack"></span>'+
+     ((vin>0&&last>0&&last!==vin)?('<span class="brfill" style="left:'+pc(_lo).toFixed(2)+'%;width:'+(pc(_hi)-pc(_lo)).toFixed(2)+'%"></span>'):'')+
+     mark(tg,"dich","Mục tiêu","",1)+
+     mark(vin,"vao","Đầu vào",_tIn,1)+
+     mark(vmid,"giua","Giữa khóa",_tMid,(vmid>0&&!(vout>0))?0:1)+
+     mark(vout,"ra","Đầu ra",_tOut,0)+
+    '</div>'+
+    '<div class="brv moi">'+(last>0?last:'<span class="mut">-</span>')+
+     (last>0?('<em>'+(vout>0?"đầu ra":"giữa khóa")+'</em>'):'')+'</div>'+
+    '<div class="brd">'+(d==null?'<span class="mut">-</span>':(d>0?'<span class="chip green">+'+d.toFixed(1)+'</span>':(d<0?'<span class="chip red">'+d.toFixed(1)+'</span>':'<span class="chip">0</span>')))+'</div>'+
+    '</div>';
+   return h2}
   h+=bandRow("Overall",num(t.overall_score),num(ob.mid_overall),num(ce.final_test_score),num(ce.target_band),true);
   var MIDK={Listening:"mid_listening",Reading:"mid_reading",Writing:"mid_writing",Speaking:"mid_speaking"};
   SK.forEach(function(k){h+=bandRow(k[0],num(t[k[1]]),num(ob[MIDK[k[0]]]),num(ce[k[2]]),0,false)});
-  h+='</tbody></table></div>';
-  h+='<div class="pbody"><div class="mut" style="font-size:11.5px"><i class="ti ti-info-circle" style="margin-right:5px"></i>Bài kiểm tra <b>giữa khóa</b> '+(ob.mid_test_date?'đã chấm ngày '+esc(ob.mid_test_date)+'.':'sẽ hiện ở cột giữa khi trung tâm chấm xong.')+' </div></div>';
+  /* Cây thang vẽ MỘT LẦN cho cả khối - năm hàng trên kia so được với nhau chính vì chúng đọc
+     chung một trục. Vẽ mỗi hàng một thang là năm cái thước rời, và so sánh lại thành phép tính. */
+  h+='<div class="brrow bang"><div class="brlb"></div><div class="brul brsc">'+
+   [0,1,2,3,4,5,6,7,8,9].map(function(n){return '<span class="brt" style="left:'+(n/9*100).toFixed(2)+'%">'+n+'</span>'}).join("")+
+   '</div><div class="brv"></div><div class="brd"></div></div>';
+  h+='<div class="brchu">'+
+   '<span><i class="brk vao"></i>Đầu vào'+(_tIn?(' <span class="mut">'+esc(_tIn)+'</span>'):'')+'</span>'+
+   (num(ob.mid_overall)>0?('<span><i class="brk giua"></i>Giữa khóa'+(_tMid?(' <span class="mut">'+esc(_tMid)+'</span>'):'')+'</span>'):'')+
+   (num(ce.final_test_score)>0?('<span><i class="brk ra"></i>Đầu ra'+(_tOut?(' <span class="mut">'+esc(_tOut)+'</span>'):'')+'</span>'):'')+
+   (num(ce.target_band)>0?('<span><i class="brk dich"></i>Mục tiêu '+num(ce.target_band)+
+     ((num(ce.final_test_score)>0)?(num(ce.final_test_score)>=num(ce.target_band)?' <span class="chip green">đạt</span>':' <span class="chip amber">chưa đạt</span>'):'')+'</span>'):'')+
+   '</div>';
+  h+='</div>';
+  h+='<div class="pbody"><div class="mut" style="font-size:11.5px"><i class="ti ti-info-circle" style="margin-right:5px"></i>Bài kiểm tra <b>giữa khóa</b> '+(ob.mid_test_date?'đã chấm ngày '+esc(ob.mid_test_date)+'.':'sẽ hiện thành một dấu trên thước khi trung tâm chấm xong.')+' </div></div>';
   if(!hasOut)h+='<div class="pbody"><div class="mut" style="font-size:11.5px"><i class="ti ti-info-circle" style="margin-right:5px"></i>Bạn chưa thi đầu ra. Trong lúc học, điểm bài tập theo kỹ năng bên dưới cho biết bạn đang tiến bộ tới đâu.</div></div>';
   if(ce.achievement_note)h+='<div class="pbody"><div class="notebar" style="margin:0"><i class="ti ti-award"></i>'+esc(ce.achievement_note)+'</div></div>';
   h+='</div>';
