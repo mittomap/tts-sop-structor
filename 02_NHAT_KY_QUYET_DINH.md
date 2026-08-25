@@ -168,6 +168,17 @@
 > *Một danh sách việc tồn không được đọc lại thì nó thôi mô tả hiện tại và bắt đầu mô tả quá khứ -
 > và người đọc nó sẽ đi làm những việc đã xong.*
 
+> ### 📋 26/08 - VIỆC TỒN SAU ĐỢT NÂNG CẤP CỔNG HỌC VIÊN
+> · **Chưa dựng bộ kiểm cho "thứ tự mục lục = thứ tự thân trang"** - luật vừa đặt hôm nay đang
+>   chỉ được giữ bằng `hvXep`, không có ai canh nếu mai kia có người vẽ một khối mà quên cắm mốc
+>   `hvSec`. Khối ấy sẽ rơi xuống cuối trang mà không ai hay. *Một luật mới đặt mà chưa có bộ
+>   kiểm thì nó chỉ sống bằng trí nhớ của người vừa đặt ra nó.*
+> · **Mục "Chứng nhận hoàn thành" (`s-chungnhan`) và "Nhật ký buổi WOW" (`s-wow`) chưa soi lại**
+>   sau khi đổi lớp thị giác - hai mục này chỉ hiện với một số hồ sơ nên ảnh chụp không có.
+> · **Ba mục dưới chưa soi kỹ bằng mắt**: Tiến độ của bạn · Hành trình điểm số · Khảo sát của bạn.
+> · **Cổng phụ huynh chưa chụp lại** sau đợt nâng cấp - nó dùng chung thân trang nhưng ẩn hai mục
+>   riêng tư, nên thứ tự nhóm mới có thể để lại một nhóm rỗng.
+
 > ### 📋 25/08 - CÒN TREO THẬT: HAI CHỖ TRÊN `hanhtrinh` VÀ `chang`
 > Mở rộng `_checkmat` từ 19 lên 52 trang (audit mảng 9: đếm ra **33 trang chưa từng bị đo hình
 > học**) thì ra 24 chỗ đỏ. 21 chỗ đã vá trong lượt này, 3 chỗ là lỗi của chính thước. Còn hai:
@@ -471,7 +482,10 @@
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 47 BỘ KIỂM.
-> Bản dựng đang chạy: `9786b3` (26/08 - AUDIT "ĐÃ CÓ NHƯNG LÀM CHƯA TỚI", **10 chỗ + 1 lỗ dữ
+> Bản dựng đang chạy: `75bc70` (26/08 cuối - **NÂNG CẤP CỔNG HỌC VIÊN**: một thứ tự duy nhất cho
+> mục lục và thân trang (menu thôi "chạy lên chạy xuống") · lớp thị giác riêng cho cổng HV ·
+> hàng buổi học thôi lặp khối · thẻ chào trả lời "buổi tới còn mấy ngày" · khung demo co lại.
+> Mốc trước `9786b3` (26/08 - AUDIT "ĐÃ CÓ NHƯNG LÀM CHƯA TỚI", **10 chỗ + 1 lỗ dữ
 > liệu**: hai miền dữ liệu khai sai (sổ Giảng viên · hai bảng giới thiệu) · một bản khai chủ sở
 > hữu chết vĩnh viễn · menu mời vào trang không xem được · ngăn kéo dòng sổ là ngõ cụt · nhãn
 > "(trống)" trên 19 trục lọc · bảng rỗng nói sai lý do · Nhân sự có việc thật. Báo cáo đầy đủ:
@@ -491,6 +505,67 @@
 > `bad7f9`, `a9eb4b`, `b8e482`, `c01fad`.
 > V1 mốc cũ: V9.99z12, 34 bộ, `829572`, https://mittomap.github.io/itts-sop-demo/ — KHÔNG đụng tới.**
 >
+> ### 🟢 26/08 (cuối) - NÂNG CẤP CỔNG HỌC VIÊN, VÀ BA CHỖ ĐỎ DO CHÍNH ĐỢT NÂNG CẤP ẤY
+>
+> Anh Luân: *"a muốn nó còn chuyên nghiệp và hiện đại nhiều hơn nữa"*, rồi giữa chừng: *"e nên
+> xem lại cả cách bố trí menu, a thấy nó cứ chạy lên chạy xuống"*.
+>
+> **MENU: đo trước khi sửa.** Cuộn THẬT bằng con lăn chuột từ đầu tới cuối trang rồi ghi lại mục
+> nào đang sáng - đường đi ra **3 → 4 → 0 → 5 → 6 → 7 → 1 → 10 → 13 → 8 → 9 → 2**, tức **lùi
+> ngược 4 lần**. Gốc KHÔNG nằm ở phép dò cuộn: **mục lục xếp theo nhu cầu** (`HVGRP`) còn **thân
+> trang xếp theo thứ tự viết mã**. Hai thứ tự khác hẳn nhau, nên dù phép dò có đúng tuyệt đối thì
+> vệt sáng vẫn nhảy - nó trung thành với trang, mà trang không đi theo mục lục.
+> *Hai bảng thứ tự cho cùng một danh sách thì không có bảng nào sai; cái sai là có hai bảng.*
+> Nay `HVGRP` là thứ tự DUY NHẤT: mỗi khối tự cắm một mốc vô hình (`hvSec`), `hvXep` xếp lại theo
+> đúng thứ tự mục lục trước khi trả về. **Cắt bằng mốc của chính mình, không dò thẻ HTML.** Kèm
+> sửa `hvSpy` từ "mục gần nhất theo trị tuyệt đối" sang "mục cuối cùng đã cuộn qua vạch" - phép
+> "gần nhất" không có chiều, còn đọc thì có chiều. Đo lại: **lùi ngược 0 lần**.
+>
+> **GIAO DIỆN: gốc không nằm ở một chỗ nào cụ thể** - nó nằm ở chỗ **cổng học viên đang mặc
+> nguyên bộ đồ của app nhân viên** (cùng `.panel` viền 1px, cùng `.sechd` CHỮ HOA XÁM 12,5px,
+> cùng nhãn số kiểu bảng tính). Bộ đồ ấy đúng cho người ngồi làm việc 8 tiếng với ba mươi bảng;
+> nó sai cho một em học viên mở ra xem tuần này mình học tới đâu. Nên đắp một lớp thị giác **chỉ
+> áp trong `#hvapp`** - nhân viên xem trang này trong hồ sơ 360 thì vẫn bộ đồ cũ.
+> Kèm: hàng buổi học thôi lặp khối (bản cũ mỗi buổi một khối ~300px với hai hộp màu giống hệt
+> nhau; bốn buổi hết một màn hình) · thẻ chào bỏ chữ cái tròn để trả lời "buổi tới còn mấy ngày"
+> · khung demo ở thanh trên co thành một nút tròn.
+>
+> ### 🔴 VÀ BA CHỖ ĐỎ - CẢ BA ĐỀU DO CHÍNH ĐỢT NÂNG CẤP NÀY
+>
+> **1. Đặt tên lớp CSS đã có chủ.** Em đặt `.hvses` cho hàng buổi học sắp tới - mà tên ấy đang là
+> **thẻ buổi trên đường kẻ thời gian** của "Nhật ký buổi học". Hai hậu quả cùng lúc: CSS mới đè
+> lên thẻ nhật ký làm cột trái của nó giãn ra một mảng xám trống, và `_check14` (đếm
+> `class="hvses"` rồi đối chiếu số dòng đường kẻ) báo đỏ.
+> **Chỗ đáng nhớ nhất của cả phiên:** em ĐÃ NHÌN THẤY mảng xám ấy trong ảnh chụp lúc soi các mục
+> dưới, và đã định ghi nó vào danh sách "lỗi có sẵn cần sửa". Nó là do chính em vừa gây ra.
+> *Đặt cho một thứ mới cái tên đang có chủ thì không phải là trùng tên - là chiếm chỗ: mọi thứ
+> đang dựa vào cái tên ấy đều quay ra nói về thứ khác.*
+> Và bài học thứ hai: *thấy một chỗ hỏng thì hỏi "nó hỏng từ bao giờ" trước khi hỏi "sửa thế
+> nào" - nếu không, mình đi vá cái vết chân của chính mình.*
+>
+> **2. Thứ tự nhóm đạp lên một luật cũ.** Từ khi `HVGRP` thành thứ tự duy nhất của cả mục lục lẫn
+> thân trang, mỗi dòng trong nó không còn chỉ xếp menu - nó xếp luôn trang. Và ngay lượt đầu nó
+> đạp lên luật V9.29m *"Lớp của bạn đứng trước học phí và bảng xác nhận"*. Luật ấy vẫn đúng và
+> KHÔNG mâu thuẫn với điều em muốn (việc phải làm lên trước thủ tục) - hai thứ chỉ chen nhau vì
+> bị nhét chung một nhóm. Tách thành **bốn nhóm**: khóa+lớp là ngữ cảnh đứng đầu · việc phải làm ·
+> theo dõi việc học · nói chuyện với trung tâm.
+> *Một bảng vừa xếp menu vừa xếp trang thì mỗi lần đổi nó là đổi hai thứ - phải đọc lại cả hai bộ
+> luật, không chỉ bộ mình đang nghĩ tới.*
+> Kèm sửa hai câu kiểm trong `_check14` cho khớp quyết định mới - và câu "bảng xác nhận không bị
+> xếp vào nhóm việc phải làm" nay hỏi theo **TÊN NHÓM** chứ không theo số thứ tự: *số thứ tự của
+> một nhóm đổi ngay khi thêm một nhóm ở trước, lúc đó phép đo vẫn xanh nhưng nó đang hỏi về một
+> nhóm khác.*
+>
+> **3. Ghi chú dài đẩy nút ra khỏi tầm phép đo.** `_check14` tìm `demoResetHoi()` trong **900 ký
+> tự** sau tên hàm `cfBarSync`; đoạn ghi chú em vừa viết trong thân hàm đẩy nút ấy ra ngoài -
+> đỏ mà không có gì hỏng thật. Tách phần mới ra hàm riêng `cfBarGon`.
+> *Một phép đo theo khoảng cách chữ thì lời bình cũng chiếm chỗ như mã.*
+>
+> **Kèm ba chỗ hệ thống thị giác:** chữ "T4" ở ô lịch tương phản **2,2** (`_checkui` bắt **1015
+> lượt**) · thang cỡ chữ vọt 16 → 19 bậc · thang bo góc 10 → 11 bậc. Sửa bằng cách **dùng lại
+> bậc và token đã có** thay vì đẻ ra bậc mới - *một cỡ chữ mới không bao giờ chỉ là một cỡ chữ
+> mới*, luật này đã ghi từ 24/08 và em vừa phạm lại.
+
 > ### 🟢 26/08 - AUDIT "ĐÃ CÓ NHƯNG LÀM CHƯA TỚI": MƯỜI CHỖ, VÀ MỘT LOẠI LỖI KHÔNG BAO GIỜ KÊU
 >
 > Anh Luân: *"hôm nay a ko bổ sung chức năng gì, em cứ audit toàn diện để fix những cái đã có

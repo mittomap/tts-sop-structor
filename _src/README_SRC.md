@@ -1603,3 +1603,61 @@ Nay hoi chung: so chinh cua trang thuoc mien nao, nguoi nay co xem duoc mien ay 
   0 cho moi nguoi va suyt bi doc thanh "khong ai xem duoc trang nay".
 
 *Tin lan do dau thi da di "sua" ba cho app hoan toan dung.*
+
+---
+
+## 26/08 - NANG CAP CONG HOC VIEN: BA BAI HOC, CA BA DEU VE CACH DO
+
+### 1. Menu "chay len chay xuong" - do TRUOC khi sua
+
+Cuon THAT bang con lan chuot tu dau toi cuoi trang roi ghi lai muc nao dang sang:
+
+```
+duong di: 3 → 4 → 0 → 5 → 6 → 7 → 1 → 10 → 13 → 8 → 9 → 2      (LUI NGUOC 4 lan)
+```
+
+Goc KHONG nam o phep do cuon: **muc luc xep theo nhu cau** (`HVGRP`) con **than trang xep theo
+thu tu viet ma**. Du phep do cuon co dung tuyet doi thi vet sang van nhay - no trung thanh voi
+trang, ma trang khong di theo muc luc.
+
+Chua: `HVGRP` thanh thu tu DUY NHAT. Moi khoi tu cam mot moc vo hinh (`hvSec`), `hvXep` xep lai
+truoc khi tra ve. **Cat bang MOC CUA CHINH MINH chu khong do the HTML** - chuoi `<!--HVSEC:...-->`
+do minh dat ra nen no khong phu thuoc vao viec khoi ay mo bang the gi.
+
+Kem: `hvSpy` doi tu "muc gan nhat theo tri tuyet doi" sang "muc cuoi cung da cuon qua vach".
+*Mot phep do "gan nhat" khong co chieu; doc thi co chieu.*
+
+### 2. DAT TEN LOP CSS DA CO CHU - va no lam minh di va vet chan cua chinh minh
+
+Em dat `.hvses` cho hang buoi hoc sap toi. Ten ay **dang la the buoi tren duong ke thoi gian**
+cua "Nhat ky buoi hoc". Hai hau qua cung luc:
+
+- CSS moi de len the nhat ky -> cot trai cua no gian ra mot mang xam trong;
+- `_check14` dem `class="hvses"` roi doi chieu voi so dong duong ke -> do.
+
+Cho dang nho nhat: em **DA NHIN THAY** mang xam ay trong anh chup luc soi cac muc duoi, va da
+dinh ghi no vao danh sach "loi co san can sua". No la do chinh em vua gay ra.
+
+> *Dat cho mot thu moi cai ten dang co chu thi khong phai la trung ten - la chiem cho: moi thu
+> dang dua vao cai ten ay deu quay ra noi ve thu khac.*
+>
+> *Thay mot cho hong thi hoi "no hong tu bao gio" TRUOC khi hoi "sua the nao".*
+
+Cach tranh: truoc khi dat ten lop moi, `grep -c` cai ten do trong `gen_v5.py`. Ra khac 0 la doi ten.
+
+### 3. Hai phep do bi chinh loi binh cua minh lam do
+
+- `_check14` tim `demoResetHoi()` trong **900 ky tu** sau ten ham `cfBarSync`. Doan ghi chu dai
+  viet trong than ham day nut ay ra khoi tam nhin cua phep do - do ma khong co gi hong.
+  *Mot phep do theo khoang cach chu thi loi binh cung chiem cho nhu ma.* Tach phan moi ra ham
+  rieng `cfBarGon`.
+- `_check14` con hoi "bang xac nhan khong bi xep vao nhom viec phai lam" bang **SO THU TU NHOM**
+  (`HVGRP[0]`, `HVGRP[1]`). Them mot nhom o truoc la so thu tu truot, phep do van xanh nhung no
+  dang hoi ve mot nhom khac. Nay hoi theo **TEN NHOM**.
+  *Hoi bang so thu tu la hoi mot cau chi dung cho den lan sap xep tiep theo.*
+
+### Va mot luat cu vua bi pham lai
+
+Thang co chu vot 16 -> 19 bac, thang bo goc 10 -> 11 bac, bang mau 110 -> 112 ma - vi lop thi
+giac moi de ra bac moi thay vi dung lai bac da co. Luat nay da ghi tu 24/08 ("mot co chu moi
+khong bao gio chi la mot co chu moi") va van bi pham. Sua bang cach dung lai token co san.

@@ -2,6 +2,25 @@
 
 > `ITTs_WebApp_v5_demo.html` là bản app: mở bằng trình duyệt, mọi thao tác ghi thật vào bộ nhớ trình duyệt. **Lớp Google Sheets đã cho nghỉ hưu 30/07** - không còn bản `.gs` nào, mọi cấu hình nằm trong màn Cài đặt của chính app. Khi anh Luân chốt nền tảng backend, 66 chỗ ghi trong app đã có sẵn đường nối ra máy chủ (xem khối ghi chú tại `var SVR=` trong `gen_v5.py`).
 
+## ⭐ MỚI 26/08/2026 — **Cổng học viên: gọn hơn, đọc nhanh hơn, và menu thôi nhảy**
+
+- **Mục lục không còn "chạy lên chạy xuống".** Trước đây thứ tự các mục trên menu và thứ tự các
+  phần trên trang là hai thứ tự khác nhau, nên cuộn xuống đều một mạch mà vệt sáng vẫn nhảy tới
+  nhảy lui. Nay chỉ còn **một thứ tự duy nhất** cho cả hai, và mục đang đọc luôn đi xuống theo
+  bạn, không lùi lại.
+- **Trang xếp lại theo bốn nhóm**: khóa và lớp của bạn (bạn đang học gì, ở đâu, với ai) → việc
+  cần bạn xử lý (học phí · buổi sắp tới · phiếu khảo sát) → theo dõi việc học → nói chuyện với
+  trung tâm.
+- **Thẻ chào trả lời câu bạn mở cổng ra để hỏi**: buổi tới là ngày nào, thứ mấy, mấy giờ, còn
+  mấy ngày - thay cho vòng tròn chữ cái đầu tên bạn.
+- **Danh sách buổi sắp tới gọn lại**: mỗi buổi một hàng có ô lịch để mắt bám vào ngày; lời dặn
+  của giáo viên và bài sẽ giao thành hai dòng chữ thường. Cùng một khoảng màn hình trước kia chỉ
+  chứa được một buổi rưỡi thì nay đọc được ba buổi. Không mất một chữ nào.
+- **Giao diện riêng cho cổng học viên**: bỏ chữ hoa ở tiêu đề khối và nhãn số, phân định bằng
+  khoảng trắng và độ nổi thay vì viền quanh mọi thứ, cỡ chữ có thang bậc rõ ràng.
+- Khung "Chế độ xem thử · Mở quyền quản trị" ở thanh trên co thành một nút nhỏ - nó là chuyện
+  của trung tâm, không phải việc học viên phải đọc đầu tiên.
+
 ## ⭐ MỚI 26/08/2026 — **Mở trang ra là có thứ để đọc**
 
 Đợt rà soát 26/08 chỉ làm một việc: đi tìm những chỗ app **đã có mà làm nửa chừng**. Kết quả gần
