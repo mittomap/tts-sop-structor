@@ -34,7 +34,17 @@ const NGUONG=3;
   veDuoc++;
   await pg.waitForTimeout(60);
   const n=await pg.evaluate(()=>{
-   const ten=rows("DL09").map(s=>String(s.full_name||"")).filter(x=>x.length>5);
+   /* ═══ V2 25/08 - TÊN KHÁCH TIỀM NĂNG CŨNG PHẢI BẤM ĐƯỢC ══════════════════════════════
+      Bộ này chỉ lấy tên từ DL09 (học viên), nên nó có một vùng tối đúng bằng cả bảng DL02.
+      Đọc ảnh chụp trang Công nợ mới thấy: hai dòng "Đỗ Ngọc Tâm" và "Hoàng Thanh Linh" in tên
+      ĐEN giữa một bảng toàn tên bấm được - hai người ấy đã đăng ký và đang nợ tiền nhưng CHƯA
+      chuyển thành học viên, nên `student_id` rỗng và bảng không có gì để bấm.
+      `openQuick` vốn mở được cả hồ sơ lead; thứ thiếu là cái mã, và thứ thiếu ở ĐÂY là câu hỏi.
+      *Một bộ kiểm hỏi "mọi tên có bấm được không" mà chỉ lấy tên từ một bảng thì nó đang hỏi
+      "mọi tên TRONG BẢNG ẤY", và phần còn lại im lặng trôi qua.* */
+   const ten=rows("DL09").map(s=>String(s.full_name||""))
+     .concat(rows("DL02").map(s=>String(s.full_name||"")))
+     .filter(x=>x.length>5);
    const goc=document.getElementById("content"); if(!goc)return {n:0,vd:[]};
    window.__vd=[];   /* XOA vi du cua trang truoc - khong xoa thi moi trang deu in mau cua trang dau */
    const w=document.createTreeWalker(goc,NodeFilter.SHOW_TEXT);
