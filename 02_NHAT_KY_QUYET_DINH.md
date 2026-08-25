@@ -191,6 +191,46 @@
 > xong"* - **không còn cột nào cả**. Đổi thành "sẽ hiện thành một dấu trên thước".
 > *Đổi cách vẽ mà không đổi lời nói thì lời nói ở lại tả cái hình cũ.*
 
+> ### 🔴 26/08 - SOI ẢNH CHỤP RA HAI LỖI THẬT NỮA (không phải chuyện thẩm mỹ)
+>
+> **1. Chứng nhận in một con số KHÁC bảng điểm danh - 17/18 hồ sơ đều lệch.**
+> Thẻ "Chứng nhận hoàn thành khóa" của HV065 in *Chuyên cần **78%***, còn dải tiến độ **ngay trên
+> nó** đếm *87% - 55/63 buổi có mặt*. Cùng một học viên, cùng một trang, cách nhau chừng 700px.
+> Đo cả bảng: **17/18 dòng DL18 lệch chuyên cần, 16/16 dòng lệch tỷ lệ hoàn thành.**
+>
+> Gốc: `gen_demo.py` sinh hai ô ấy bằng `random.randint(78,98)` - một con số **không đọc từ đâu
+> cả**, trong khi DL12 (điểm danh) và DL13 (bài tập) đã nằm sẵn đầy đủ. App thì tính thật.
+> App đã có sẵn công thức đúng (`derFill` trong `gen_v5.py`) - nhưng `derFill` **chỉ điền vào ô
+> TRỐNG**, mà ô này không trống: nó đang giữ một con số bịa.
+> *Một ô đã có sẵn giá trị sai thì mọi cơ chế "tự điền khi thiếu" đều im lặng - nó chỉ cứu được
+> chỗ trống, không cứu được chỗ sai.*
+>
+> Đáng chú ý hơn: **bên nhân viên đã từng vá chuyện này bằng một dòng chú giải** - *"Tỷ lệ buổi có
+> mặt tính cho CẢ KHÓA, chốt lúc kết thúc khóa - không phải số đang chạy của lớp hiện tại"*. Lời
+> ấy đúng về nghiệp vụ, nhưng ở đây nó đang che cho một con số bịa: cùng 63 buổi ấy, không có lý
+> do gì để ra 78 thay vì 87.
+> *Khi hai con số mâu thuẫn, viết một lời giải thích rẻ hơn sửa dữ liệu - và nó biến cái sai thành
+> một đặc điểm có tên.*
+>
+> Sửa ở NGUỒN: `fixdata.py` mục 29 đọc lại cả hai ô từ DL12/DL13 đúng công thức của app (sửa 18 ô
+> chuyên cần + 16 ô tỷ lệ hoàn thành). Đo lại sau khi sửa: **còn đúng 3 hồ sơ lệch, và cả ba là
+> học viên học HAI LỚP** (HV062/063/067) - chênh lệch thật giữa "lớp đang học" và "cả khóa".
+> Nên nhãn ở chứng nhận nói thẳng phạm vi: **"Chuyên cần cả khóa"**, **"Bài tập đã nộp cả khóa"**.
+> *Hai phạm vi khác nhau mà cùng một cái nhãn thì hai con số thành ra mâu thuẫn - trong khi chúng
+> chỉ đang trả lời hai câu hỏi.*
+>
+> **2. Năm thẻ khuyến nghị, năm cái nút giống hệt nhau.**
+> Khối Khuyến nghị của HV065 có năm việc khác hẳn nhau - nợ học phí, vắng không phép, thiếu bài,
+> còn buổi WOW, hết khóa - mà cả năm nút đều là *"Trao đổi với trung tâm"*. Cơ chế bên dưới đúng
+> (nút đã mang ngữ cảnh của thẻ từ 12/08), chỉ có **lời nói** của nút bỏ trống chỗ ấy.
+> *Một cái nút không nói ra việc nó làm thì người ta phải bấm thử mới biết - và cả năm cái cùng im
+> như nhau thì thẻ nào cũng thành thẻ chung.*
+> Nay mỗi thẻ tự đặt tên cho việc của nó ("Hỏi về học phí", "Báo lý do vắng", "Xin nộp bù bài
+> tập"...). Và thẻ nào có sẵn một đường làm ngay trong app thì **thêm** nút ấy - không bỏ nút nhắn
+> (luật số 0): thẻ bài tập có "Xem bài chưa nộp", thẻ WOW có "Đặt buổi WOW 1-1".
+> Hàm `hvWowAsk()` đã có từ lâu mà **đúng chỗ nhắc dùng WOW thì lại không trỏ tới** - một cửa mở
+> sẵn mà không có lối dẫn vào.
+
 > ### 🔄 25/08 - ĐỌC LẠI TOÀN BỘ VIỆC TỒN, VÀ PHẦN LỚN ĐÃ XONG TỪ LÚC NÀO
 > Anh Luân: *"xử lý toàn bộ việc tồn, audit toàn diện, chủ động fix sạch toàn bộ"*.
 > Việc đầu tiên hoá ra là **đi hỏi lại từng mục xem nó còn đúng không** - và mảng 8 của giao thức

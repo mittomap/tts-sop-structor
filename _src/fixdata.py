@@ -4176,6 +4176,49 @@ if _daChuyen:
 else:
     log.append("28. Giao vien khong co hoc vien nao: khong con ai")
 
+# ---- 29. CHUNG NHAN KHONG DUOC IN MOT CON SO KHAC VOI BANG DIEM DANH ----
+# Soi anh chup cong hoc vien 26/08: the "Chung nhan hoan thanh khoa" cua HV065 in
+# "Chuyen can 78%", con dai tien do NGAY TREN NO dem "87% - 55/63 buoi co mat". Cung mot hoc
+# vien, cung mot trang, cach nhau chung 700px. Do lai ca bang: 17/18 dong DL18 lech chuyen can
+# va 16/16 dong lech ty le hoan thanh.
+#
+# Goc: gen_demo.py sinh hai o nay bang random.randint - mot con so KHONG doc tu dau ca, trong khi
+# DL12 (diem danh) va DL13 (bai tap) da nam san day du. App thi tinh that tu DL12/DL13.
+# Ban than app da co san cong thuc dung (derFill trong gen_v5.py: so buoi on_time+late chia tong,
+# so bai submitted* chia tong) - nhung derFill chi dien vao O TRONG, ma o nay khong trong: no
+# dang giu mot con so bia. *Mot o da co san gia tri sai thi moi co che "tu dien khi thieu"
+# deu im lang - no chi cuu duoc cho trong, khong cuu duoc cho sai.*
+#
+# Ben nhan vien tung vá chuyen nay bang mot dong chu giai thich ("chot luc ket thuc khoa - khong
+# phai so dang chay cua lop hien tai"). Loi giai thich ay dung ve nghiep vu nhung o day no dang
+# che cho mot con so bia: cung 63 buoi ay, khong co ly do gi de ra 78 thay vi 87.
+# *Khi hai con so mau thuan, viet mot loi giai thich re hon sua du lieu - va no bien cai sai
+# thanh mot dac diem co ten.*
+_att18, _hw18 = {}, {}
+for _r in R("DL12"):
+    _att18.setdefault(str(_r.get("student_id") or ""), []).append(_r)
+for _r in R("DL13"):
+    _hw18.setdefault(str(_r.get("student_id") or ""), []).append(_r)
+_suaAtt = _suaHw = 0
+for _r in R("DL18"):
+    _sid = str(_r.get("student_id") or "")
+    _as = _att18.get(_sid, [])
+    if _as:
+        _ok = sum(1 for _a in _as if code(_a.get("attendance_status", "")) in ("on_time", "late"))
+        _v = "%d%%" % round(_ok * 100.0 / len(_as))
+        if str(_r.get("attendance_rate") or "") != _v:
+            _r["attendance_rate"] = _v
+            _suaAtt += 1
+    _hs = _hw18.get(_sid, [])
+    if _hs:
+        _sub = sum(1 for _h in _hs if code(_h.get("homework_status", "")).startswith("submitted"))
+        _v = "%d%%" % round(_sub * 100.0 / len(_hs))
+        if str(_r.get("completion_rate") or "") != _v:
+            _r["completion_rate"] = _v
+            _suaHw += 1
+log.append("29. DL18 doc lai tu DL12/DL13: sua %d o chuyen can, %d o ty le hoan thanh"
+           % (_suaAtt, _suaHw))
+
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("  12. Da tao DL22 referral +", len(dl["DL22"]), "luot | DL19 thuong:", len(dl["DL19"]))
 for _l in log[-6:]: print("  "+_l)

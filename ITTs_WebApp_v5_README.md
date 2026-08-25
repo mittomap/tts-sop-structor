@@ -2879,3 +2879,28 @@ xuống dòng dưới ăn trọn bề ngang, nên mỗi band rộng gấp đôi 
 
 Không mất một con số nào so với bảng cũ: mục tiêu và trạng thái *đạt / chưa đạt* nằm ở dòng chú
 thích dưới thước, ngày của từng mốc nằm cả ở chú thích lẫn trong tooltip.
+
+## Khuyến nghị: mỗi thẻ một cái nút nói đúng việc của nó
+
+Khối "Khuyến nghị cho bạn" trước đây mọi thẻ đều mang cùng một nút *"Trao đổi với trung tâm"* -
+năm việc khác hẳn nhau mà cả năm nút im như nhau. Nay nhãn nút nói ra việc của chính thẻ:
+
+| Thẻ | Nút |
+|---|---|
+| Còn học phí chưa đóng | Hỏi về học phí |
+| Chưa xác nhận lớp | Hỏi về lớp này |
+| Vắng không phép N buổi | Báo lý do vắng |
+| Còn N bài tập chưa nộp | **Xem bài chưa nộp** + Xin nộp bù bài tập |
+| Còn N buổi WOW 1-1 | **Đặt buổi WOW 1-1** + Hỏi về buổi WOW |
+| Tiến độ học thuật chậm | Xin kèm thêm |
+| Khóa đã kết thúc | Hỏi về khóa tiếp theo |
+
+Hai nút in đậm là **đường làm ngay trong app** (nhảy tới mục bài tập, mở hộp đặt buổi WOW), thêm
+vào chứ không thay nút nhắn - tin nhắn vẫn mang theo ngữ cảnh của thẻ như cũ.
+
+## Chứng nhận nói rõ phạm vi của từng con số
+
+Thẻ chứng nhận ghi **"Chuyên cần cả khóa"** và **"Bài tập đã nộp cả khóa"** - tính trên toàn bộ
+buổi và bài của học viên, chốt lúc kết thúc khóa. Dải tiến độ ở mục *Tiến độ của bạn* thì đếm
+theo **lớp đang học**. Học viên học hai lớp sẽ thấy hai con số khác nhau, và cái nhãn nói ra vì
+sao. Cả hai đều đọc từ DL12/DL13, không còn ô nào giữ số tự sinh.

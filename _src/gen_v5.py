@@ -23806,8 +23806,13 @@ function renderTrangHV(){
    '<div class="hvcertg">'+
     '<div><span>Học viên</span><b>'+esc(S.full_name)+'</b></div>'+
     '<div><span>Hoàn thành ngày</span><b>'+esc(String(ce.course_completion_time||"").slice(0,10))+'</b></div>'+
-    (_ar?'<div><span>Chuyên cần</span><b>'+Math.round(_ar)+'%</b></div>':'')+
-    (_cr?'<div><span>Hoàn thành chương trình</span><b>'+Math.round(_cr)+'%</b></div>':'')+
+    /* "Chuyên cần CẢ KHÓA" chứ không phải "Chuyên cần" trống không: dải tiến độ ở trên đếm theo
+       LỚP ĐANG HỌC, ô này chốt trên toàn bộ buổi của học viên. Hai phạm vi khác nhau mà cùng một
+       cái nhãn thì hai con số thành ra mâu thuẫn - trong khi chúng chỉ đang trả lời hai câu hỏi.
+       (Số bên dưới đã được nắn lại đúng từ DL12/DL13 ở fixdata.py mục 29 - nhãn này chống lệch
+       phạm vi, không phải chống số bịa.) */
+    (_ar?'<div><span>Chuyên cần cả khóa</span><b>'+Math.round(_ar)+'%</b></div>':'')+
+    (_cr?'<div><span>Bài tập đã nộp cả khóa</span><b>'+Math.round(_cr)+'%</b></div>':'')+
     (ce.final_test_score?'<div><span>Điểm đầu ra</span><b>'+esc(ce.final_test_score)+'</b></div>':'')+
     (ce.target_band?'<div><span>Mục tiêu ban đầu</span><b>'+esc(ce.target_band)+'</b></div>':'')+
    '</div>'+
@@ -23970,16 +23975,20 @@ function renderTrangHV(){
   "Không có phiếu khảo sát nào đang chờ.");
  h+='</div></div>';
  /* ---- 5. KHUYẾN NGHỊ ---- */
+ /* Ô thứ 5 của mỗi thẻ là NHÃN RIÊNG cho nút nhắn, ô thứ 6 là nút việc-làm-được-ngay (nếu có).
+    Bỏ trống thì rơi về nhãn chung "Trao đổi với trung tâm". */
  var rec=[];
- if(rem>0)rec.push(["ti-cash","amber","Còn "+vnd(rem)+" học phí chưa đóng","Liên hệ trung tâm để hoàn tất, tránh gián đoạn việc học."]);
- if(lop&&!clsOK)rec.push(["ti-users-group","amber","Bạn chưa xác nhận lớp "+lop.class_name,"Xác nhận sớm để trung tâm giữ chỗ và gửi tài liệu."]);
+ if(rem>0)rec.push(["ti-cash","amber","Còn "+vnd(rem)+" học phí chưa đóng","Liên hệ trung tâm để hoàn tất, tránh gián đoạn việc học.","Hỏi về học phí"]);
+ if(lop&&!clsOK)rec.push(["ti-users-group","amber","Bạn chưa xác nhận lớp "+lop.class_name,"Xác nhận sớm để trung tâm giữ chỗ và gửi tài liệu.","Hỏi về lớp này"]);
  var absU=attC.filter(function(a){return isc(a.attendance_status,"no_show")&&/unexcused/.test(ecode(a.absence_type))}).length;
- if(absU>=paramOf("thresholdAtRisk_absences",2))rec.push(["ti-alert-triangle","red","Bạn đã vắng không phép "+absU+" buổi","Vắng nhiều ảnh hưởng trực tiếp tới kết quả đầu ra. Báo trung tâm nếu bạn gặp khó khăn về lịch."]);
+ if(absU>=paramOf("thresholdAtRisk_absences",2))rec.push(["ti-alert-triangle","red","Bạn đã vắng không phép "+absU+" buổi","Vắng nhiều ảnh hưởng trực tiếp tới kết quả đầu ra. Báo trung tâm nếu bạn gặp khó khăn về lịch.","Báo lý do vắng"]);
  var miss=hwC.filter(hwMissing).length;
- if(miss>=paramOf("thresholdAtRisk_hw_missing",3))rec.push(["ti-book","red","Còn "+miss+" bài tập chưa nộp","Nộp bù sớm để giảng viên kịp chấm và chữa cho bạn."]);
- if(wowLeft>0)rec.push(["ti-star","green","Bạn còn "+wowLeft+" buổi WOW 1-1","Buổi kèm riêng miễn phí trong gói - nên dùng cho kỹ năng yếu nhất"+(t.overall_score&&typeof low!=="undefined"?" ("+low[0]+")":"")+"."]);
- if(isRisk(S.academic_progress_status))rec.push(["ti-chart-line","amber","Tiến độ học thuật đang chậm so với lộ trình","Trung tâm sẽ liên hệ để sắp buổi kèm thêm cho bạn."]);
- if(ce.course_end_id&&!isc(ce.re_enrollment_status,"confirmed_with_deposit"))rec.push(["ti-refresh","green","Khóa học của bạn đã kết thúc","Đăng ký khóa tiếp theo trong "+num(paramOf("reEnrollGrace_days",30))+" ngày để giữ ưu đãi học viên cũ."+(ce.next_course_recommendation?" Gợi ý: "+ce.next_course_recommendation:"")]);
+ if(miss>=paramOf("thresholdAtRisk_hw_missing",3))rec.push(["ti-book","red","Còn "+miss+" bài tập chưa nộp","Nộp bù sớm để giảng viên kịp chấm và chữa cho bạn.","Xin nộp bù bài tập",
+  '<button class="btn sm" onclick="hvGo(\'s-buoihoc\')"><i class="ti ti-list-check"></i>Xem bài chưa nộp</button>']);
+ if(wowLeft>0)rec.push(["ti-star","green","Bạn còn "+wowLeft+" buổi WOW 1-1","Buổi kèm riêng miễn phí trong gói - nên dùng cho kỹ năng yếu nhất"+(t.overall_score&&typeof low!=="undefined"?" ("+low[0]+")":"")+".","Hỏi về buổi WOW",
+  '<button class="btn primary sm" onclick="hvWowAsk()"><i class="ti ti-star"></i>Đặt buổi WOW 1-1</button>']);
+ if(isRisk(S.academic_progress_status))rec.push(["ti-chart-line","amber","Tiến độ học thuật đang chậm so với lộ trình","Trung tâm sẽ liên hệ để sắp buổi kèm thêm cho bạn.","Xin kèm thêm"]);
+ if(ce.course_end_id&&!isc(ce.re_enrollment_status,"confirmed_with_deposit"))rec.push(["ti-refresh","green","Khóa học của bạn đã kết thúc","Đăng ký khóa tiếp theo trong "+num(paramOf("reEnrollGrace_days",30))+" ngày để giữ ưu đãi học viên cũ."+(ce.next_course_recommendation?" Gợi ý: "+ce.next_course_recommendation:""),"Hỏi về khóa tiếp theo"]);
  if(!rec.length)rec.push(["ti-thumb-up","green","Bạn đang học rất tốt","Giữ nhịp chuyên cần và nộp bài đúng hạn nhé."]);
  h+=hvSec("s-khuyennghi")+'<div class="sechd" id="s-khuyennghi">Khuyến nghị dành cho bạn</div><div class="panel"><div class="pbody">';
  /* ═══ V2 12/08 (ACA-4) - NÚT "TRAO ĐỔI VỚI TRUNG TÂM" NGAY TRÊN TỪNG THẺ ════════════════════
@@ -23988,8 +23997,20 @@ function renderTrangHV(){
     ngõ cụt: bảo người ta làm một việc rồi không cho đường làm.
     Và tin nhắn phải MANG THEO NGỮ CẢNH của thẻ (vắng buổi nào, thiếu bài nào) chứ không mở một
     ô trống bắt người ta kể lại từ đầu - anh Luân dặn rõ vế này. */
+ /* ═══ V2 26/08 - NĂM CÁI NÚT GIỐNG HỆT NHAU THÌ KHÔNG CÁI NÀO NÓI ĐƯỢC GÌ ═══════════════════
+    Ảnh chụp 26/08: khối Khuyến nghị của HV065 có năm thẻ, năm việc khác hẳn nhau - nợ học phí,
+    vắng không phép, thiếu bài, còn buổi WOW, hết khóa - và **năm cái nút giống hệt nhau**, cùng
+    một dòng chữ "Trao đổi với trung tâm". Cơ chế bên dưới thì đúng: nút đã mang theo ngữ cảnh
+    của thẻ (anh Luân dặn từ 12/08). Chỉ có LỜI NÓI của nút là bỏ trống chỗ ấy.
+    *Một cái nút không nói ra việc nó làm thì người ta phải bấm thử mới biết - và cả năm cái cùng
+    im như nhau thì thẻ nào cũng thành thẻ chung.*
+    Nay mỗi thẻ tự đặt tên cho việc của nó, và thẻ nào có sẵn một đường làm ngay trong app thì
+    thêm nút ấy (KHÔNG bỏ nút nhắn - luật số 0: thêm thì được, bớt thì không): thẻ bài tập có
+    "Xem bài chưa nộp", thẻ WOW có "Đặt buổi WOW 1-1" - hàm `hvWowAsk()` đã có từ lâu mà đúng
+    chỗ nhắc dùng WOW thì lại không trỏ tới. */
  rec.forEach(function(r){h+='<div class="hvrec '+r[1]+'"><i class="ti '+r[0]+'"></i><div><b>'+esc(r[2])+'</b><span>'+esc(r[3])+'</span>'+
-  '<div class="hvrecact"><button class="btn sm" onclick="hvAskNew('+JSON.stringify(String(r[2]))+','+JSON.stringify(String(r[3]))+')"><i class="ti ti-messages"></i>Trao đổi với trung tâm</button></div>'+
+  '<div class="hvrecact">'+(r[5]||'')+
+  '<button class="btn sm" onclick="hvAskNew('+JSON.stringify(String(r[2]))+','+JSON.stringify(String(r[3]))+')"><i class="ti ti-messages"></i>'+esc(r[4]||"Trao đổi với trung tâm")+'</button></div>'+
   '</div></div>'});
  h+='</div></div>';
  /* ---- 5b. GIỚI THIỆU BẠN BÈ ---- */
