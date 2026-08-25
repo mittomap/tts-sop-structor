@@ -148,6 +148,17 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### ✅ 26/08 cuối - CHỐT PHIÊN: 48/48 XANH TRÊN ĐÚNG BẢN ĐANG CHẠY
+> `./verify.sh` chạy trọn bộ trên `3b8718` - **XANH HẾT, 45m43s**, và đó đúng là bản đã đẩy lên
+> `itts-sop-demo-v2` (mã bản dựng khớp).
+>
+> **Còn treo, đã khai thẳng, KHÔNG tuyên bố đã sửa:**
+> · `check_taolai` đỏ một lần 15/08 chưa tái hiện - đã có ghi hồ sơ mỗi lần đỏ.
+> · `stuOwners` chưa tính giáo viên dạy thay (dữ liệu demo chưa có ca nào để đo).
+> · `_checkngay` còn 6 ghi chú "cần xem thêm" (không phải lỗi, là chỗ đáng nhìn lại).
+> · Ba hồ sơ HV062/063/067 có chuyên cần ở dải tiến độ khác ở chứng nhận - **đúng như thế**:
+>   một bên đếm lớp đang học, một bên chốt cả khóa, và nhãn đã nói rõ phạm vi.
+
 > ### 🎨 26/08 - NÂNG CẤP FRONT END: THAY MỘT BẢNG SÁU CỘT BẰNG CÂY THƯỚC BAND
 > Anh Luân: *"nếu đã có, thì sau khi làm việc tồn, nâng cấp front end cho anh"* (nói về plugin
 > `frontend-design` vừa cài).
@@ -673,8 +684,15 @@
 
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
-> **Phiên bản: V2 — 47 BỘ KIỂM.
-> Bản dựng đang chạy: `75bc70` (26/08 cuối - **NÂNG CẤP CỔNG HỌC VIÊN**: một thứ tự duy nhất cho
+> **Phiên bản: V2 — 48 BỘ KIỂM.
+> Bản dựng đang chạy: `3b8718` (26/08 cuối - **NÂNG CẤP FRONT END CỔNG HỌC VIÊN + 6 LỖI THẬT**:
+> *thước band 0-9* thay bảng sáu cột ở "Hành trình điểm số" (một cây thang vẽ một lần, năm hàng
+> cùng đọc theo nó; điện thoại trả trọn bề ngang cho thước; hai mốc trùng band thì lồng cỡ hoặc
+> chia đôi màu chứ không xoá nhau) · **chứng nhận thôi in số bịa** (17/18 hồ sơ DL18 từng lệch với
+> bảng điểm danh - `fixdata.py` mục 29 đọc lại từ DL12/DL13) · mỗi thẻ khuyến nghị một cái nút nói
+> đúng việc của nó (+ hai nút làm-được-ngay) · hết giờ nửa đêm giả ở "Hành trình cùng ITTs" · dải
+> thẻ cổng HV thôi nói giọng nhân viên · bảng lịch sử đóng tiền có tên. **48/48 xanh, 45m43s.**
+> Mốc trước `75bc70` (26/08 - NÂNG CẤP CỔNG HỌC VIÊN: một thứ tự duy nhất cho
 > mục lục và thân trang (menu thôi "chạy lên chạy xuống") · lớp thị giác riêng cho cổng HV ·
 > hàng buổi học thôi lặp khối · thẻ chào trả lời "buổi tới còn mấy ngày" · khung demo co lại.
 > Mốc trước `9786b3` (26/08 - AUDIT "ĐÃ CÓ NHƯNG LÀM CHƯA TỚI", **10 chỗ + 1 lỗ dữ
