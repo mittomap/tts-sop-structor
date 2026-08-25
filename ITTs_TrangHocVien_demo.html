@@ -1296,25 +1296,32 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .hvdan.hw{background:var(--blueb);border-color:#CFE0F7;color:#2E5A88}
 .hvdan.nbred{background:#FBF0EF;border-color:#EBC8C4;color:#7E3A32}
 .hvdan i{font-size:15px;flex:none;margin-top:1px;opacity:.85}
-/* Hàng buổi học sắp tới - xem ghi chú "BỐN BUỔI, BỐN LẦN CÙNG MỘT HÌNH DẠNG" ở `upGrp`. */
-.hvses{display:flex;gap:14px;padding:13px 0 14px;border-top:1px solid #F1F4F8}
-.hvgt+.hvses,.hvses:first-child{border-top:0}
-.hvses.off{opacity:.72}
-.hvsesd{width:50px;flex:none;text-align:center;background:#F5F7FA;border-radius:12px;padding:7px 0 6px;line-height:1.15}
-.hvsesd b{display:block;font-size:17px;font-weight:800;color:var(--navy)}
-.hvsesd span{display:block;font-size:11px;font-weight:700;color:var(--muted)}
-.hvsesd em{display:block;font-size:11px;font-style:normal;font-weight:700;color:#9BAABB;margin-top:1px}
-.hvsesd.off b{color:var(--muted)}
-.hvsesb{flex:1;min-width:0}
-.hvsest{font-size:13px;font-weight:700;line-height:1.4;color:var(--ink)}
-.hvsesm{font-size:11.5px;color:var(--muted);margin-top:2px}
-.hvsesn{display:flex;gap:7px;margin-top:7px;font-size:11.5px;color:#4A5A6E;line-height:1.55}
-.hvsesn i{font-size:15px;color:#9BAABB;flex:none;margin-top:1px}
-.hvsesn b{font-weight:700;color:var(--ink)}
-.hvsesa{display:flex;flex-direction:column;gap:6px;flex:none}
+/* Hàng buổi học sắp tới - xem ghi chú "BỐN BUỔI, BỐN LẦN CÙNG MỘT HÌNH DẠNG" ở `upGrp`.
+   TÊN LỚP `hvsrow` CHỨ KHÔNG PHẢI `hvses`: bản đầu em đặt tên `hvses` cho khối này, mà tên ấy
+   ĐÃ CÓ CHỦ - nó là thẻ buổi trên đường kẻ thời gian của "Nhật ký buổi học". Hai hậu quả cùng
+   lúc: CSS mới đè lên thẻ nhật ký làm cột trái của nó bị kéo giãn ra một mảng xám trống, và
+   `_check14` (đếm `class="hvses"` rồi đối chiếu với số dòng đường kẻ) báo đỏ vì nay có những
+   thẻ mang tên ấy mà không nằm trên đường kẻ nào.
+   *Đặt cho một thứ mới cái tên đang có chủ thì không phải là trùng tên - là chiếm chỗ: mọi thứ
+   đang dựa vào cái tên ấy đều quay ra nói về thứ khác.* */
+.hvsrow{display:flex;gap:14px;padding:13px 0 14px;border-top:1px solid var(--line)}
+.hvgt+.hvsrow,.hvsrow:first-child{border-top:0}
+.hvsrow.off{opacity:.72}
+.hvsrd{width:50px;flex:none;text-align:center;background:var(--bg);border-radius:12px;padding:7px 0 6px;line-height:1.15}
+.hvsrd b{display:block;font-size:17px;font-weight:800;color:var(--navy)}
+.hvsrd span{display:block;font-size:11px;font-weight:700;color:var(--muted)}
+.hvsrd em{display:block;font-size:11px;font-style:normal;font-weight:700;color:var(--muted);margin-top:1px}
+.hvsrd.off b{color:var(--muted)}
+.hvsrb{flex:1;min-width:0}
+.hvsrt{font-size:13px;font-weight:700;line-height:1.4;color:var(--ink)}
+.hvsrm{font-size:11.5px;color:var(--muted);margin-top:2px}
+.hvsrn{display:flex;gap:7px;margin-top:7px;font-size:11.5px;color:#4A5A6E;line-height:1.55}
+.hvsrn i{font-size:15px;color:var(--muted);flex:none;margin-top:1px}
+.hvsrn b{font-weight:700;color:var(--ink)}
+.hvsra{display:flex;flex-direction:column;gap:6px;flex:none}
 @media(max-width:700px){
- .hvses{flex-wrap:wrap}
- .hvsesa{flex-direction:row;flex-wrap:wrap;width:100%;padding-left:64px}
+ .hvsrow{flex-wrap:wrap}
+ .hvsra{flex-direction:row;flex-wrap:wrap;width:100%;padding-left:64px}
 }
 .hvcrs{display:grid;grid-template-columns:repeat(auto-fit,minmax(275px,1fr));gap:12px;margin-bottom:18px}
 .hvcr{position:relative;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:14px 15px;cursor:pointer;transition:.15s}
@@ -1656,55 +1663,60 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
       mọi khối nặng ngang nhau; bóng mềm cho khối nổi lên khỏi nền mà không kẻ ô.
    3. **Có thang bậc.** Trước đây tiêu đề khối, nhãn số và chữ thường gần như cùng một cỡ.
    *Một giao diện không có thang bậc thì người đọc phải tự đọc hết mới biết cái gì quan trọng.* */
-#hvapp .hvmain{background:#F5F7FA}
+/* KHÔNG đặt thêm tông màu mới cho cổng học viên: `_checkux` giữ bảng màu ở trần 110 mã (đã có
+   thời phình lên 202), và hai tông xám nhạt em định thêm đẩy nó lên 112. Độ "thoáng" của lớp
+   thị giác này không nằm ở việc có thêm hai sắc xám - nó nằm ở bo góc, bóng mềm, khoảng trắng
+   và thang chữ. *Thêm một mã màu là thêm một thứ người sau phải nhớ; nếu bỏ đi mà nhìn không
+   khác thì nó chưa bao giờ cần thiết.* */
+#hvapp .hvmain{background:var(--bg)}
 #hvapp .sechd{font-size:16px;font-weight:800;color:var(--ink);text-transform:none;
  letter-spacing:0;margin:26px 2px 11px}
 #hvapp .hvbody>.sechd:first-child{margin-top:2px}
 #hvapp .sechd .mut{font-size:12.5px;font-weight:600}
-#hvapp .panel{border-color:#EDF1F6;border-radius:16px;
+#hvapp .panel{border-color:var(--line);border-radius:16px;
  box-shadow:0 1px 2px rgba(16,32,58,.04),0 10px 26px -18px rgba(16,32,58,.30)}
-#hvapp .panel>.ph{padding:14px 18px 12px;border-bottom-color:#F1F4F8}
+#hvapp .panel>.ph{padding:14px 18px 12px;border-bottom-color:var(--line)}
 #hvapp .panel>.ph>b{font-size:14px}
 #hvapp .panel>.pbody{padding:14px 18px 16px}
 /* Thẻ chào: bo góc lớn hơn và dịu hơn - nó là thứ đầu tiên đập vào mắt mỗi lần mở trang. */
 #hvapp .hvhero{border-radius:16px;padding:24px 26px;margin-bottom:20px;
  background:linear-gradient(120deg,var(--navyd),var(--navy) 58%,#3E7BB5)}
-#hvapp .hvg{font-size:23px;letter-spacing:-.015em}
+#hvapp .hvg{font-size:22px;letter-spacing:-.015em}
 #hvapp .hvsub{font-size:13px;opacity:.92}
 .hvnext{margin-left:auto;flex:none;text-align:center;min-width:132px;padding:13px 16px 12px;
- border-radius:14px;background:#ffffff1f;box-shadow:inset 0 0 0 1px #ffffff26}
+ border-radius:12px;background:#ffffff1f;box-shadow:inset 0 0 0 1px #ffffff28}
 .hvnext span{display:block;font-size:11px;font-weight:700;opacity:.85;letter-spacing:.2px}
-.hvnext b{display:block;font-size:32px;font-weight:800;line-height:1.1;margin-top:3px;letter-spacing:-.02em}
+.hvnext b{display:block;font-size:30px;font-weight:800;line-height:1.1;margin-top:3px;letter-spacing:-.02em}
 .hvnext b em{font-size:16px;font-style:normal;font-weight:700;opacity:.8}
 .hvnext u{display:block;font-size:12px;text-decoration:none;opacity:.92;margin-top:1px}
 .hvnext i{display:inline-block;font-style:normal;font-size:11.5px;font-weight:700;margin-top:7px;
- padding:3px 10px;border-radius:8px;background:#ffffff2b}
-@media(max-width:700px){.hvnext{min-width:112px;padding:11px 13px}.hvnext b{font-size:27px}}
+ padding:3px 10px;border-radius:8px;background:#ffffff28}
+@media(max-width:700px){.hvnext{min-width:112px;padding:11px 13px}.hvnext b{font-size:26px}}
 /* Nhãn số tiền: câu thường thay vì CHỮ HOA GIÃN CHỮ, và số to hẳn lên một bậc. */
 #hvapp .hvf span{font-size:11.5px;font-weight:600;text-transform:none;letter-spacing:0}
 #hvapp .hvf b{font-size:17px;letter-spacing:-.01em}
-#hvapp .hvf{border-right-color:#F1F4F8;padding:10px 16px}
+#hvapp .hvf{border-right-color:var(--line);padding:10px 16px}
 /* Ô xác nhận / thẻ nhỏ: cùng bo góc với panel để cả trang là một hệ. */
-#hvapp .hvc{border-radius:14px;border-color:#EDF1F6;padding:14px 16px}
-#hvapp .bstat{border-radius:14px;border-color:#EDF1F6}
+#hvapp .hvc{border-radius:12px;border-color:var(--line);padding:14px 16px}
+#hvapp .bstat{border-radius:12px;border-color:var(--line)}
 /* MỤC LỤC - nhẹ đi, và mục đang đọc có một vạch nhận diện thay vì chỉ đổi nền mờ. */
 #hvapp .hvside{width:268px}
 #hvapp .hvni{border-radius:10px;padding:10px 12px;font-size:13px;position:relative}
 #hvapp .hvni.on{background:#ffffff1f}
 #hvapp .hvni.on::before{content:"";position:absolute;left:-9px;top:9px;bottom:9px;width:3px;
- border-radius:0 3px 3px 0;background:#8FC0F0}
-#hvapp .hvgrph{font-size:10.5px;letter-spacing:.6px;opacity:.62;margin:16px 12px 5px}
+ border-radius:0 3px 3px 0;background:var(--blue)}
+#hvapp .hvgrph{font-size:11px;letter-spacing:.6px;opacity:.62;margin:16px 12px 5px}
 #hvapp .hvbrand,#hvapp .hvme{border-bottom-color:#ffffff10}
 /* Thanh trên: tên mục đang đọc là thứ đáng đọc nhất trên thanh, cho nó đúng cỡ. */
 /* Tiêu đề cột bảng: sau khi mọi nhãn khác đã thành câu thường, đây là chỗ CHỮ HOA duy nhất còn
    lại trên trang - và một chỗ chữ hoa lẻ loi thì không đọc ra "nhấn mạnh", nó đọc ra "chỗ này
    quên chưa sửa". */
-#hvapp .dt th{text-transform:none;letter-spacing:0;font-size:11.5px;color:#5A6675;background:#F8FAFC}
-#hvapp .hvtop{min-height:60px;border-bottom-color:#EDF1F6}
+#hvapp .dt th{text-transform:none;letter-spacing:0;font-size:11.5px;color:#5A6675;background:#FAFBFD}
+#hvapp .hvtop{min-height:60px;border-bottom-color:var(--line)}
 #hvapp .hvtt b{font-size:15px;letter-spacing:-.01em}
 @media(max-width:900px){
  #hvapp .hvmain{padding:14px 13px 48px}
- #hvapp .hvhero{padding:18px;border-radius:14px}
+ #hvapp .hvhero{padding:18px;border-radius:12px}
  #hvapp .hvg{font-size:20px}
  #hvapp .sechd{font-size:15px;margin:22px 2px 9px}
 }
@@ -9656,25 +9668,30 @@ var CFMODEKEY="ITTS_CFMODE";
 function matKhau(){return String((DATA.config&&DATA.config.matKhau)||"mittomap")}
 function cfMode(){try{return ssGet(CFMODEKEY)||""}catch(e){return ""}}
 function cfSetMode(m){try{ssSet(CFMODEKEY,m)}catch(e){}try{cfBarSync()}catch(e){}}
-/* Dải vàng thường trực dưới thanh trên - chỉ hiện khi đang XEM THỬ. */
+/* Dải vàng thường trực dưới thanh trên - chỉ hiện khi đang XEM THỬ.
+   ═══ 26/08 - Ở CỔNG HỌC VIÊN, CỤM NÀY ĐANG ĐỨNG NHẦM CHỖ ═══════════════════════════════════
+   Cụm "Chế độ xem thử · Mở quyền quản trị" đúng chỗ trên app nhân viên: người ngồi đó là người
+   có thể mở quyền, và họ cần biết mình đang sửa vào một bản không lưu được.
+   Nhưng trên cổng học viên nó chiếm **chỗ đắt nhất của màn** - ngay cạnh tên cổng, là thứ đập
+   vào mắt đầu tiên - để nói một câu học viên không làm gì được ("mở quyền quản trị" là việc của
+   trung tâm, không phải của em ấy). Người đi xem demo nhìn thấy nó trước cả lời chào.
+   Nay ở cổng học viên nó co thành MỘT nút tròn nhỏ. Không bỏ một cửa nào: bấm vào vẫn là đúng
+   `cfDoiCheDo()`, câu giải thích vẫn còn nguyên trong chú thích rê chuột.
+   *Giữ đủ cửa không có nghĩa là cửa nào cũng phải to bằng nhau.*
+   GHI CHÚ ĐỂ NGOÀI THÂN HÀM CÓ CHỦ Ý: `_check14` canh "dải dữ liệu demo có nút dựng lại dữ
+   liệu" bằng cách tìm `demoResetHoi()` trong 900 ký tự sau tên hàm này. Đoạn ghi chú dài nằm
+   trong thân hàm đẩy nút ấy ra khỏi tầm nhìn của phép đo - đỏ mà không có gì hỏng.
+   *Một phép đo theo khoảng cách chữ thì lời bình cũng chiếm chỗ như mã.* */
+/* Tách hẳn ra một hàm: thân `cfBarSync` phải giữ NGẮN vì `_check14` đo nút "Dựng lại demo"
+   theo KHOẢNG CÁCH CHỮ tính từ tên hàm - nhét thêm bốn dòng vào giữa là nút ấy rơi ra khỏi
+   tầm nhìn của phép đo. */
+function cfBarGon(b){b.className="cfbar on gon";
+ b.innerHTML='<button class="tbtn" onclick="cfDoiCheDo()" aria-label="Chế độ xem thử - mở quyền quản trị" '+
+  'data-tip="Chế độ xem thử: đang chạy trên dữ liệu demo, chỉnh trong Cài đặt sẽ hiện ngay trên màn nhưng không lưu lại. Bấm để mở quyền quản trị."><i class="ti ti-eye"></i></button>'}
 function cfBarSync(){var b=document.getElementById("cfBar");if(!b)return;
  if(SVR){b.className="cfbar";b.innerHTML="";return}
  if(!cfGhiDuoc()){
-  /* ═══ 26/08 - Ở CỔNG HỌC VIÊN, CỤM NÀY ĐANG ĐỨNG NHẦM CHỖ ═══════════════════════════════════
-     Cụm "Chế độ xem thử · Mở quyền quản trị" đúng chỗ trên app nhân viên: người ngồi đó là người
-     có thể mở quyền, và họ cần biết mình đang sửa vào một bản không lưu được.
-     Nhưng trên cổng học viên nó chiếm **chỗ đắt nhất của màn** - ngay cạnh tên cổng, là thứ đập
-     vào mắt đầu tiên - để nói một câu học viên không làm gì được ("mở quyền quản trị" là việc
-     của trung tâm, không phải của em ấy). Người đi xem demo nhìn thấy nó trước cả lời chào, và
-     nó nói thẳng vào mặt họ rằng đây là một công cụ nội bộ.
-     Nay ở cổng học viên nó co thành MỘT nút tròn nhỏ đứng chung hàng với các nút khác. Không bỏ
-     một cửa nào: bấm vào vẫn là đúng `cfDoiCheDo()`, và câu giải thích vẫn còn nguyên trong chú
-     thích rê chuột. *Giữ đủ cửa không có nghĩa là cửa nào cũng phải to bằng nhau.* */
-  if(window.HVPORTAL){
-   b.className="cfbar on gon";
-   b.innerHTML='<button class="tbtn" onclick="cfDoiCheDo()" aria-label="Chế độ xem thử - mở quyền quản trị" '+
-    'data-tip="Chế độ xem thử: đang chạy trên dữ liệu demo, chỉnh trong Cài đặt sẽ hiện ngay trên màn nhưng không lưu lại. Bấm để mở quyền quản trị."><i class="ti ti-eye"></i></button>';
-   return}
+  if(window.HVPORTAL){cfBarGon(b);return}   /* bản co gọn - xem ghi chú trên đầu hàm */
   b.className="cfbar on";
   b.innerHTML='<i class="ti ti-eye"></i><span data-tip="Đang chạy trên dữ liệu demo. Chỉnh trong Cài đặt sẽ hiện ngay trên màn nhưng không được lưu lại."><b>Chế độ xem thử</b></span>'+
    '<button class="btn sm" onclick="cfDoiCheDo()"><i class="ti ti-lock-open"></i>Mở quyền quản trị</button>';
@@ -24051,21 +24068,21 @@ function renderTrangHV(){
   var _gvn=s2.teacher_id_name||(gv?gv.full_name:"");
   var _d=pvnd(s2.session_date);
   var _TH=["CN","T2","T3","T4","T5","T6","T7"];
-  h+='<div class="hvses'+(_huy?" off":"")+'">'+
-   '<div class="hvsesd'+(_huy?" off":"")+'"><b>'+(_d?_d.getDate():"-")+'</b><span>'+(_d?("Th "+(_d.getMonth()+1)):"")+'</span>'+
+  h+='<div class="hvsrow'+(_huy?" off":"")+'">'+
+   '<div class="hvsrd'+(_huy?" off":"")+'"><b>'+(_d?_d.getDate():"-")+'</b><span>'+(_d?("Th "+(_d.getMonth()+1)):"")+'</span>'+
     (_d?('<em>'+_TH[_d.getDay()]+'</em>'):'')+'</div>'+
-   '<div class="hvsesb"><div class="hvsest">'+
+   '<div class="hvsrb"><div class="hvsrt">'+
     (_huy?'<span class="chip red" style="margin-right:6px">Đã nghỉ</span>':(_bu?'<span class="chip blue" style="margin-right:6px">Học bù</span>':''))+
     'Buổi '+esc(s2.session_number||"")+' · '+esc(lop?lop.class_name:"")+(P&&P.topic?' - '+esc(P.topic):'')+'</div>'+
-   '<div class="hvsesm">'+esc(s2.session_date||"")+(_gvn?' · GV '+esc(_gvn):'')+(lop&&lop.venue_or_zoom_link?' · '+esc(lop.venue_or_zoom_link):'')+'</div>';
+   '<div class="hvsrm">'+esc(s2.session_date||"")+(_gvn?' · GV '+esc(_gvn):'')+(lop&&lop.venue_or_zoom_link?' · '+esc(lop.venue_or_zoom_link):'')+'</div>';
   if(_huy){h+='<div class="hvdan nbred"><i class="ti ti-calendar-x"></i><span><b>Buổi này KHÔNG diễn ra.</b> '+
    esc(String(s2.notes||"Trung tâm sẽ xếp buổi học bù và báo lại lịch cho bạn."))+'</span></div></div></div>';return}
-  if(P&&P.note)h+='<div class="hvsesn"><i class="ti ti-notes"></i><span><b>Giáo viên dặn:</b> '+esc(P.note)+'</span></div>';
-  if(P&&P.hw)h+='<div class="hvsesn"><i class="ti ti-book"></i><span><b>Bài sẽ giao sau buổi:</b> '+esc(P.hw.title)+
+  if(P&&P.note)h+='<div class="hvsrn"><i class="ti ti-notes"></i><span><b>Giáo viên dặn:</b> '+esc(P.note)+'</span></div>';
+  if(P&&P.hw)h+='<div class="hvsrn"><i class="ti ti-book"></i><span><b>Bài sẽ giao sau buổi:</b> '+esc(P.hw.title)+
    (P.hw.est_minutes?' · khoảng '+esc(P.hw.est_minutes)+' phút':'')+(P.hw.description?' - '+esc(P.hw.description):'')+'</span></div>';
   h+='</div>';
   if(!isc(s2.session_status,"completed")){
-   h+='<div class="hvsesa"><button class="btn sm" onclick="hvAbsentAsk(\''+esc(s2.session_id)+'\')"><i class="ti ti-user-off"></i>Báo nghỉ buổi này</button>'+
+   h+='<div class="hvsra"><button class="btn sm" onclick="hvAbsentAsk(\''+esc(s2.session_id)+'\')"><i class="ti ti-user-off"></i>Báo nghỉ buổi này</button>'+
     '<button class="btn sm" onclick="hvMakeupAsk(\''+esc(s2.session_id)+'\')"><i class="ti ti-calendar-plus"></i>Xin học bù</button></div>'}
   h+='</div>'},
   "Chưa có buổi học nào sắp tới.");
@@ -34885,8 +34902,21 @@ function hvXungLoc(h){
   .replace(/\bB\u1ea1n b\u00e8\b/g,"\u0002")
   .replace(/\bb\u1ea1n\b/g,x).replace(/\bB\u1ea1n\b/g,X)
   .replace(/\u0001/g,"b\u1ea1n b\u00e8").replace(/\u0002/g,"B\u1ea1n b\u00e8")}
-var HVGRP=[["Cần bạn xử lý",["s-hocphi","s-saptoi","s-khaosat"]],
- ["Việc học của bạn",["s-khoa","s-lop","s-xacnhan","s-hanhtrinh","s-tiendo","s-diem","s-buoihoc","s-wow","s-khuyennghi","s-chungnhan"]],
+/* ═══ 26/08 - XẾP LẠI NHÓM, VÀ TRẢ LẠI MỘT LUẬT CŨ EM VỪA ĐẠP LÊN ═══════════════════════════
+   Từ khi `hvXep` lấy bảng này làm thứ tự DUY NHẤT của cả mục lục lẫn thân trang, mỗi dòng ở đây
+   không còn chỉ xếp menu - nó xếp luôn trang. Và ngay lượt đầu nó đã đạp lên một luật đặt từ
+   V9.29m: **"Lớp của bạn" phải đứng trước học phí và bảng xác nhận** - lý do khi ấy là *vừa vào
+   cổng thấy một danh sách tích xanh hành chính chứ không thấy LỚP CỦA MÌNH*. `_check14` canh
+   đúng câu đó và báo đỏ ngay.
+   Luật ấy vẫn đúng, và nó KHÔNG mâu thuẫn với điều em muốn (việc phải làm lên trước thủ tục) -
+   hai thứ chỉ chen nhau vì bị nhét chung một nhóm. Nên tách thành bốn nhóm: khóa và lớp là NGỮ
+   CẢNH (tôi đang học cái gì, ở đâu, với ai) nên đứng đầu; rồi tới việc phải làm; rồi mới tới
+   phần theo dõi và thủ tục.
+   *Một bảng vừa xếp menu vừa xếp trang thì mỗi lần đổi nó là đổi hai thứ - phải đọc lại cả hai
+   bộ luật, không chỉ bộ mình đang nghĩ tới.* */
+var HVGRP=[["Khóa và lớp của bạn",["s-khoa","s-lop"]],
+ ["Cần bạn xử lý",["s-hocphi","s-saptoi","s-khaosat"]],
+ ["Theo dõi việc học",["s-xacnhan","s-hanhtrinh","s-tiendo","s-diem","s-buoihoc","s-wow","s-khuyennghi","s-chungnhan"]],
  ["Nói chuyện với trung tâm",["s-hoidap","s-gopy","s-gioithieu"]]];
 function hvGo(id){hvCloseSide();var el=document.getElementById(id);if(!el)return;
  var box=document.getElementById("hvMain");

@@ -297,7 +297,13 @@ t("(k) link tai lieu la the a bam duoc", /function hvLink/.test(SRC)&&/hvLink\(s
  t("(p) so lay tu cau hinh CH2 chu khong cam cung", /paramStr\("centerHotline"/.test(SRC));})();
 
 /* ---- 13. (n) muc luc chia 3 nhom ---- */
-t("(n) muc luc chia 3 nhom theo nhu cau", typeof HVGRP!=="undefined"&&HVGRP.length===3);
+/* 26/08 - DOI TU 3 SANG 4 NHOM, va giu phep dem CHINH XAC chu khong noi thanh ">=3".
+   Tu khi HVGRP thanh thu tu duy nhat cua ca muc luc lan than trang, no phai vua chia nhom theo
+   nhu cau vua ton trong luat "Lop cua ban dung truoc hoc phi va bang xac nhan" (V9.29m). Hai
+   viec ay chen nhau khi khoa+lop bi nhet chung nhom voi phan theo doi, nen tach rieng lam nhom
+   NGU CANH dung dau. Con so o day van la mot con so CHINH XAC: noi thanh ">=3" la bo luon kha
+   nang bat duoc ngay ai do lam menu vun ra tam nhom. */
+t("(n) muc luc chia nhom theo nhu cau", typeof HVGRP!=="undefined"&&HVGRP.length===4);
 t("(n) moi muc trong HVSEC deu thuoc mot nhom",
   HVSEC.every(function(x){return HVGRP.some(function(G){return G[1].indexOf(x[0])>=0})}));
 
@@ -355,8 +361,13 @@ t("(n) bam mot muc trong muc luc thi dong luon", /function hvGo\(id\)\{hvCloseSi
  /* muc luc phai xep dung thu tu tren trang, khong thi scrollspy nhay lung tung */
  t("muc luc: Lop cua ban ngay sau Khoa cua ban", HVSEC[1][0]==="s-lop");
  /* "Trung tam da xac nhan" khong con nam trong nhom "Can ban xu ly" - no khong co viec gi de lam */
- t("bang xac nhan khong bi xep vao nhom viec phai lam",
-   HVGRP[0][1].indexOf("s-xacnhan")<0&&HVGRP[1][1].indexOf("s-xacnhan")>=0);
+ /* Hoi theo TEN NHOM chu khong theo SO THU TU: cau nay muon noi "xac nhan khong nam trong nhom
+    viec phai lam", ma so thu tu cua nhom ay doi ngay khi them mot nhom o truoc - luc do phep do
+    van xanh nhung no dang hoi ve mot nhom khac. */
+ (function(){var iViec=-1,iCo=-1;
+  HVGRP.forEach(function(G,i){if(/xử lý/i.test(G[0]))iViec=i;
+   if(G[1].indexOf("s-xacnhan")>=0)iCo=i});
+  t("bang xac nhan khong bi xep vao nhom viec phai lam", iViec>=0&&iCo>=0&&iCo!==iViec)})();
  /* cau hoi "ban co nhan lop nay khong" thi VAN phai o tren - do la viec that */
  (function(){var found=0,good=0;
   rows("DL09").slice(0,80).forEach(function(s){window.HVID=s.student_id;

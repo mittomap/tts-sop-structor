@@ -6028,25 +6028,30 @@ var CFMODEKEY="ITTS_CFMODE";
 function matKhau(){return String((DATA.config&&DATA.config.matKhau)||"mittomap")}
 function cfMode(){try{return ssGet(CFMODEKEY)||""}catch(e){return ""}}
 function cfSetMode(m){try{ssSet(CFMODEKEY,m)}catch(e){}try{cfBarSync()}catch(e){}}
-/* Dải vàng thường trực dưới thanh trên - chỉ hiện khi đang XEM THỬ. */
+/* Dải vàng thường trực dưới thanh trên - chỉ hiện khi đang XEM THỬ.
+   ═══ 26/08 - Ở CỔNG HỌC VIÊN, CỤM NÀY ĐANG ĐỨNG NHẦM CHỖ ═══════════════════════════════════
+   Cụm "Chế độ xem thử · Mở quyền quản trị" đúng chỗ trên app nhân viên: người ngồi đó là người
+   có thể mở quyền, và họ cần biết mình đang sửa vào một bản không lưu được.
+   Nhưng trên cổng học viên nó chiếm **chỗ đắt nhất của màn** - ngay cạnh tên cổng, là thứ đập
+   vào mắt đầu tiên - để nói một câu học viên không làm gì được ("mở quyền quản trị" là việc của
+   trung tâm, không phải của em ấy). Người đi xem demo nhìn thấy nó trước cả lời chào.
+   Nay ở cổng học viên nó co thành MỘT nút tròn nhỏ. Không bỏ một cửa nào: bấm vào vẫn là đúng
+   `cfDoiCheDo()`, câu giải thích vẫn còn nguyên trong chú thích rê chuột.
+   *Giữ đủ cửa không có nghĩa là cửa nào cũng phải to bằng nhau.*
+   GHI CHÚ ĐỂ NGOÀI THÂN HÀM CÓ CHỦ Ý: `_check14` canh "dải dữ liệu demo có nút dựng lại dữ
+   liệu" bằng cách tìm `demoResetHoi()` trong 900 ký tự sau tên hàm này. Đoạn ghi chú dài nằm
+   trong thân hàm đẩy nút ấy ra khỏi tầm nhìn của phép đo - đỏ mà không có gì hỏng.
+   *Một phép đo theo khoảng cách chữ thì lời bình cũng chiếm chỗ như mã.* */
+/* Tách hẳn ra một hàm: thân `cfBarSync` phải giữ NGẮN vì `_check14` đo nút "Dựng lại demo"
+   theo KHOẢNG CÁCH CHỮ tính từ tên hàm - nhét thêm bốn dòng vào giữa là nút ấy rơi ra khỏi
+   tầm nhìn của phép đo. */
+function cfBarGon(b){b.className="cfbar on gon";
+ b.innerHTML='<button class="tbtn" onclick="cfDoiCheDo()" aria-label="Chế độ xem thử - mở quyền quản trị" '+
+  'data-tip="Chế độ xem thử: đang chạy trên dữ liệu demo, chỉnh trong Cài đặt sẽ hiện ngay trên màn nhưng không lưu lại. Bấm để mở quyền quản trị."><i class="ti ti-eye"></i></button>'}
 function cfBarSync(){var b=document.getElementById("cfBar");if(!b)return;
  if(SVR){b.className="cfbar";b.innerHTML="";return}
  if(!cfGhiDuoc()){
-  /* ═══ 26/08 - Ở CỔNG HỌC VIÊN, CỤM NÀY ĐANG ĐỨNG NHẦM CHỖ ═══════════════════════════════════
-     Cụm "Chế độ xem thử · Mở quyền quản trị" đúng chỗ trên app nhân viên: người ngồi đó là người
-     có thể mở quyền, và họ cần biết mình đang sửa vào một bản không lưu được.
-     Nhưng trên cổng học viên nó chiếm **chỗ đắt nhất của màn** - ngay cạnh tên cổng, là thứ đập
-     vào mắt đầu tiên - để nói một câu học viên không làm gì được ("mở quyền quản trị" là việc
-     của trung tâm, không phải của em ấy). Người đi xem demo nhìn thấy nó trước cả lời chào, và
-     nó nói thẳng vào mặt họ rằng đây là một công cụ nội bộ.
-     Nay ở cổng học viên nó co thành MỘT nút tròn nhỏ đứng chung hàng với các nút khác. Không bỏ
-     một cửa nào: bấm vào vẫn là đúng `cfDoiCheDo()`, và câu giải thích vẫn còn nguyên trong chú
-     thích rê chuột. *Giữ đủ cửa không có nghĩa là cửa nào cũng phải to bằng nhau.* */
-  if(window.HVPORTAL){
-   b.className="cfbar on gon";
-   b.innerHTML='<button class="tbtn" onclick="cfDoiCheDo()" aria-label="Chế độ xem thử - mở quyền quản trị" '+
-    'data-tip="Chế độ xem thử: đang chạy trên dữ liệu demo, chỉnh trong Cài đặt sẽ hiện ngay trên màn nhưng không lưu lại. Bấm để mở quyền quản trị."><i class="ti ti-eye"></i></button>';
-   return}
+  if(window.HVPORTAL){cfBarGon(b);return}   /* bản co gọn - xem ghi chú trên đầu hàm */
   b.className="cfbar on";
   b.innerHTML='<i class="ti ti-eye"></i><span data-tip="Đang chạy trên dữ liệu demo. Chỉnh trong Cài đặt sẽ hiện ngay trên màn nhưng không được lưu lại."><b>Chế độ xem thử</b></span>'+
    '<button class="btn sm" onclick="cfDoiCheDo()"><i class="ti ti-lock-open"></i>Mở quyền quản trị</button>';
@@ -20423,21 +20428,21 @@ function renderTrangHV(){
   var _gvn=s2.teacher_id_name||(gv?gv.full_name:"");
   var _d=pvnd(s2.session_date);
   var _TH=["CN","T2","T3","T4","T5","T6","T7"];
-  h+='<div class="hvses'+(_huy?" off":"")+'">'+
-   '<div class="hvsesd'+(_huy?" off":"")+'"><b>'+(_d?_d.getDate():"-")+'</b><span>'+(_d?("Th "+(_d.getMonth()+1)):"")+'</span>'+
+  h+='<div class="hvsrow'+(_huy?" off":"")+'">'+
+   '<div class="hvsrd'+(_huy?" off":"")+'"><b>'+(_d?_d.getDate():"-")+'</b><span>'+(_d?("Th "+(_d.getMonth()+1)):"")+'</span>'+
     (_d?('<em>'+_TH[_d.getDay()]+'</em>'):'')+'</div>'+
-   '<div class="hvsesb"><div class="hvsest">'+
+   '<div class="hvsrb"><div class="hvsrt">'+
     (_huy?'<span class="chip red" style="margin-right:6px">Đã nghỉ</span>':(_bu?'<span class="chip blue" style="margin-right:6px">Học bù</span>':''))+
     'Buổi '+esc(s2.session_number||"")+' · '+esc(lop?lop.class_name:"")+(P&&P.topic?' - '+esc(P.topic):'')+'</div>'+
-   '<div class="hvsesm">'+esc(s2.session_date||"")+(_gvn?' · GV '+esc(_gvn):'')+(lop&&lop.venue_or_zoom_link?' · '+esc(lop.venue_or_zoom_link):'')+'</div>';
+   '<div class="hvsrm">'+esc(s2.session_date||"")+(_gvn?' · GV '+esc(_gvn):'')+(lop&&lop.venue_or_zoom_link?' · '+esc(lop.venue_or_zoom_link):'')+'</div>';
   if(_huy){h+='<div class="hvdan nbred"><i class="ti ti-calendar-x"></i><span><b>Buổi này KHÔNG diễn ra.</b> '+
    esc(String(s2.notes||"Trung tâm sẽ xếp buổi học bù và báo lại lịch cho bạn."))+'</span></div></div></div>';return}
-  if(P&&P.note)h+='<div class="hvsesn"><i class="ti ti-notes"></i><span><b>Giáo viên dặn:</b> '+esc(P.note)+'</span></div>';
-  if(P&&P.hw)h+='<div class="hvsesn"><i class="ti ti-book"></i><span><b>Bài sẽ giao sau buổi:</b> '+esc(P.hw.title)+
+  if(P&&P.note)h+='<div class="hvsrn"><i class="ti ti-notes"></i><span><b>Giáo viên dặn:</b> '+esc(P.note)+'</span></div>';
+  if(P&&P.hw)h+='<div class="hvsrn"><i class="ti ti-book"></i><span><b>Bài sẽ giao sau buổi:</b> '+esc(P.hw.title)+
    (P.hw.est_minutes?' · khoảng '+esc(P.hw.est_minutes)+' phút':'')+(P.hw.description?' - '+esc(P.hw.description):'')+'</span></div>';
   h+='</div>';
   if(!isc(s2.session_status,"completed")){
-   h+='<div class="hvsesa"><button class="btn sm" onclick="hvAbsentAsk(\''+esc(s2.session_id)+'\')"><i class="ti ti-user-off"></i>Báo nghỉ buổi này</button>'+
+   h+='<div class="hvsra"><button class="btn sm" onclick="hvAbsentAsk(\''+esc(s2.session_id)+'\')"><i class="ti ti-user-off"></i>Báo nghỉ buổi này</button>'+
     '<button class="btn sm" onclick="hvMakeupAsk(\''+esc(s2.session_id)+'\')"><i class="ti ti-calendar-plus"></i>Xin học bù</button></div>'}
   h+='</div>'},
   "Chưa có buổi học nào sắp tới.");
@@ -31257,8 +31262,21 @@ function hvXungLoc(h){
   .replace(/\bB\u1ea1n b\u00e8\b/g,"\u0002")
   .replace(/\bb\u1ea1n\b/g,x).replace(/\bB\u1ea1n\b/g,X)
   .replace(/\u0001/g,"b\u1ea1n b\u00e8").replace(/\u0002/g,"B\u1ea1n b\u00e8")}
-var HVGRP=[["Cần bạn xử lý",["s-hocphi","s-saptoi","s-khaosat"]],
- ["Việc học của bạn",["s-khoa","s-lop","s-xacnhan","s-hanhtrinh","s-tiendo","s-diem","s-buoihoc","s-wow","s-khuyennghi","s-chungnhan"]],
+/* ═══ 26/08 - XẾP LẠI NHÓM, VÀ TRẢ LẠI MỘT LUẬT CŨ EM VỪA ĐẠP LÊN ═══════════════════════════
+   Từ khi `hvXep` lấy bảng này làm thứ tự DUY NHẤT của cả mục lục lẫn thân trang, mỗi dòng ở đây
+   không còn chỉ xếp menu - nó xếp luôn trang. Và ngay lượt đầu nó đã đạp lên một luật đặt từ
+   V9.29m: **"Lớp của bạn" phải đứng trước học phí và bảng xác nhận** - lý do khi ấy là *vừa vào
+   cổng thấy một danh sách tích xanh hành chính chứ không thấy LỚP CỦA MÌNH*. `_check14` canh
+   đúng câu đó và báo đỏ ngay.
+   Luật ấy vẫn đúng, và nó KHÔNG mâu thuẫn với điều em muốn (việc phải làm lên trước thủ tục) -
+   hai thứ chỉ chen nhau vì bị nhét chung một nhóm. Nên tách thành bốn nhóm: khóa và lớp là NGỮ
+   CẢNH (tôi đang học cái gì, ở đâu, với ai) nên đứng đầu; rồi tới việc phải làm; rồi mới tới
+   phần theo dõi và thủ tục.
+   *Một bảng vừa xếp menu vừa xếp trang thì mỗi lần đổi nó là đổi hai thứ - phải đọc lại cả hai
+   bộ luật, không chỉ bộ mình đang nghĩ tới.* */
+var HVGRP=[["Khóa và lớp của bạn",["s-khoa","s-lop"]],
+ ["Cần bạn xử lý",["s-hocphi","s-saptoi","s-khaosat"]],
+ ["Theo dõi việc học",["s-xacnhan","s-hanhtrinh","s-tiendo","s-diem","s-buoihoc","s-wow","s-khuyennghi","s-chungnhan"]],
  ["Nói chuyện với trung tâm",["s-hoidap","s-gopy","s-gioithieu"]]];
 function hvGo(id){hvCloseSide();var el=document.getElementById(id);if(!el)return;
  var box=document.getElementById("hvMain");
