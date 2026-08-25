@@ -332,10 +332,20 @@ def _ob_anchor(ob, kg):
     base = kg - dt.timedelta(days=5)
     if _et and base < _et:
         base = _et + dt.timedelta(hours=2)
-    ob["assigned_at"] = F(base)
-    ob["class_info_sent_at"] = F(base + dt.timedelta(days=1))
-    ob["confirmation_time"] = F(base + dt.timedelta(days=2))
-    ob["onboarding_completed_at"] = F(base + dt.timedelta(days=3))
+    # GIO HANH CHINH, KHONG PHAI NUA DEM. `kg` doc tu class_start_date - mot o CHI CO NGAY, nen
+    # p2() tra ve 00:00 va ca bon moc nhap hoc deu mang gio 00:00. Tren "Hanh trinh cung ITTs"
+    # o cong hoc vien no in ra "27/02/2026 00:00" bon dong lien tiep: mot con gio KHONG AI ghi
+    # nhan ma van duoc in nhu that. Ca bang chi co 2/88 dong bi - va do dung la hai ho so demo
+    # anh Luan hay mo (HV061, HV065), vi chi hai ho so nay di qua _ob_anchor.
+    # *Mot o chi co ngay ma doc bang ham doc ngay-gio thi no khong tra ve "khong biet gio" -
+    # no tra ve nua dem, va nua dem trong nhu mot cai gio that.*
+    # Chi nan gio khi no dang la 00:00 - nhanh `_et + 2h` ben tren da co gio that thi giu nguyen.
+    def _gio(x, g):
+        return x.replace(hour=g, minute=0) if (x.hour == 0 and x.minute == 0) else x
+    ob["assigned_at"] = F(_gio(base, 10))
+    ob["class_info_sent_at"] = F(_gio(base + dt.timedelta(days=1), 13))
+    ob["confirmation_time"] = F(_gio(base + dt.timedelta(days=2), 19))
+    ob["onboarding_completed_at"] = F(_gio(base + dt.timedelta(days=3), 10))
 for ob in rows("DL08"):
     if ob.get("student_id") != "HV061" or not ob.get("class_id"):
         continue

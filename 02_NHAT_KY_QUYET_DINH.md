@@ -231,6 +231,48 @@
 > Hàm `hvWowAsk()` đã có từ lâu mà **đúng chỗ nhắc dùng WOW thì lại không trỏ tới** - một cửa mở
 > sẵn mà không có lối dẫn vào.
 
+> ### 🔴 26/08 (tiếp) - SOI VÒNG HAI: BỐN CHỖ NỮA, MỖI CHỖ MỘT KIỂU IM LẶNG
+>
+> **3. Nửa đêm giả - và nó rơi đúng hai hồ sơ anh Luân hay mở.** "Hành trình cùng ITTs" của HV065
+> in bốn dòng liên tiếp *27/02/2026 **00:00*** · *28/02 00:00* · *01/03 00:00* · *02/03 00:00*.
+> Đo cả bảng DL08: chỉ **2/88 dòng** bị - và đúng là HV061 với HV065, vì chỉ hai hồ sơ ấy đi qua
+> `_ob_anchor` trong `mkdemo.py`. Hàm ấy neo bốn mốc nhập học vào `class_start_date` - **một ô CHỈ
+> CÓ NGÀY** - rồi đọc bằng hàm đọc ngày-giờ.
+> *Một ô chỉ có ngày mà đọc bằng hàm đọc ngày-giờ thì nó không trả về "không biết giờ" - nó trả về
+> nửa đêm, và nửa đêm trông như một cái giờ thật.*
+> Nắn về giờ hành chính (10:00 · 13:00 · 19:00 · 10:00) và chỉ nắn khi đang là 00:00 - nhánh
+> `_et + 2h` đã có giờ thật thì giữ nguyên. Còn 0 ô nửa đêm.
+>
+> **4. Nhãn dải thẻ nói giọng nhân viên ngay giữa cổng học viên.** Dải bốn thẻ Chuyên cần / Bài
+> tập / Điểm TB / WOW mang nhãn **"Việc học của học viên đang xem"** - đúng ở trang *"Cổng học
+> viên (xem hộ)"* bên cổng nhân viên, sai hẳn ở cổng học viên thật: chính em ấy đang đọc.
+> Cùng một `THEDEF.tranghv` vẽ ở hai nơi, mà nhãn nằm tận bảng cấu hình, xa chỗ vẽ - nên cái luật
+> V9.17 (*không nói từ vựng vận hành nội bộ với học viên*) không với tới được.
+> *Một chuỗi chữ dùng chung cho hai người đọc khác nhau thì nó chỉ đúng với người viết ra nó.*
+> Thêm `ttlHV:"Việc học của bạn"`, `theBoxIn` chọn theo `window.HVPORTAL`. Phụ huynh đọc sẽ thành
+> "Việc học của con" nhờ `hvXungLoc` - không phải khai thêm chuỗi thứ ba.
+>
+> **5. Một cái bảng không có tên, đứng ngay dưới một cái bảng có tên.** Mục Học phí: trên là *"Lịch
+> đóng học phí theo đợt"*, dưới là một bảng trần bốn cột (Ngày đóng · Số tiền · Hình thức · Xác
+> nhận) không một dòng tiêu đề. Hai bảng nói **hai chuyện ngược nhau** - một cái là SẼ PHẢI ĐÓNG,
+> một cái là ĐÃ ĐÓNG.
+> *Bảng không tên thì người đọc mượn tên của bảng gần nhất.*
+> Nay có tên **"Các lần bạn đã đóng"** kèm *n lần · tổng X*. Tổng ấy cộng **ngay từ các dòng bên
+> dưới**, không lấy `paid` của đơn: một câu tóm tắt đặt trên đầu bảng mà đếm từ nguồn khác thì có
+> ngày nó nói khác chính cái bảng nó đang tóm tắt.
+>
+> **6. Cỡ lồng nhau chỉ cứu được một trong ba ca trùng - em đã tự cho qua ca thứ hai.**
+> Vòng đầu vào 14px rỗng ôm được dấu 10px vẽ sau, nên ca *đầu vào trùng mốc sau* đã ổn. Nhưng
+> **giữa khóa và đầu ra cùng cỡ 10px**: Reading và Speaking của HV065 đều 6.5 ở cả hai mốc, chấm
+> xanh lá vẽ sau che sạch chấm navy - cây thước đọc ra là **hai kỹ năng ấy không hề được chấm giữa
+> khóa**, trong khi chú thích ngay dưới ghi rành rành "Giữa khóa 20/05/2026".
+> Lúc viết luật lồng cỡ em ĐÃ nghĩ tới ca này và tự kết luận "chấp nhận được vì con số vẫn khớp".
+> Ảnh chụp cho thấy nó không chấp nhận được: khớp số không cứu được một cái mốc biến mất.
+> *Hai mốc trùng nhau là một sự thật ("không đổi trong nửa sau"), không phải một mốc biến mất - nên
+> phải vẽ thành một dấu mang cả hai màu, chứ không phải bớt đi một dấu.*
+> Nay là **một chấm nửa navy nửa xanh lá**, có ô riêng trong chú thích và câu rê chuột nói cả hai
+> ngày. Không thêm mã màu nào - `linear-gradient` dùng đúng hai token cũ.
+
 > ### 🔄 25/08 - ĐỌC LẠI TOÀN BỘ VIỆC TỒN, VÀ PHẦN LỚN ĐÃ XONG TỪ LÚC NÀO
 > Anh Luân: *"xử lý toàn bộ việc tồn, audit toàn diện, chủ động fix sạch toàn bộ"*.
 > Việc đầu tiên hoá ra là **đi hỏi lại từng mục xem nó còn đúng không** - và mảng 8 của giao thức

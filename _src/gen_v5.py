@@ -1407,6 +1407,9 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .brm.giua,.brm.ra{top:8px;width:10px;height:10px;margin-left:-5px;box-shadow:none}
 .brm.giua{background:var(--navy)}
 .brm.ra{background:var(--green)}
+/* Nửa navy nửa xanh lá: giữa khóa và đầu ra rơi đúng cùng một band. Đặt SAU hai luật trên để
+   thắng chúng ở cùng độ đặc hiệu - không dùng thêm mã màu nào ngoài hai token đã có. */
+.brm.ra2{background:linear-gradient(90deg,var(--navy) 0 50%,var(--green) 50% 100%)}
 .brm.dich{width:3px;height:20px;top:3px;margin-left:-1.5px;border-radius:999px;
  background:var(--amber);box-shadow:none}
 /* Số của MỐC ĐẦU nằm DƯỚI vạch, các mốc sau nằm TRÊN - hai tầng thì mốc đứng sát nhau vẫn đọc
@@ -1429,6 +1432,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .brk.giua,.brk.ra{width:9px;height:9px;box-shadow:none}
 .brk.giua{background:var(--navy)}
 .brk.ra{background:var(--green)}
+.brk.ra2{width:9px;height:9px;box-shadow:none;background:linear-gradient(90deg,var(--navy) 0 50%,var(--green) 50% 100%)}
 .brk.dich{width:3px;height:14px;border-radius:999px;background:var(--amber);box-shadow:none}
 /* ĐIỆN THOẠI: trả cả bề ngang cho cây thước.
    Bản đầu giữ nguyên một hàng cho cả nhãn - thước - điểm - chip, nên trên máy 390px cây thước chỉ
@@ -6098,7 +6102,13 @@ bangcong:{t:"Công giảng dạy & WOW",ttl:"Soát trước khi chốt công",th
   ["ww_quota","Lượt WOW còn lại toàn trung tâm","Cộng số lượt WOW chưa dùng của mọi học viên còn quota - đây là năng lực chăm sóc còn tồn, quyết định có nên mở thêm ca trực hay không. Danh sách: tab Quota."]]},
 /* V2 13/08 - `ketthuc` không còn dải thẻ (cả dải chỉ đếm dòng - xem THE_NEN_LA_GI.md). */
 
- tranghv:{t:"Cổng học viên (xem hộ)",ttl:"Việc học của học viên đang xem",the:[
+ /* `ttlHV`: cùng một dải thẻ ấy được vẽ ở HAI NƠI - trang "xem hộ" bên cổng nhân viên và cổng
+    học viên thật. Nhãn "Việc học của học viên đang xem" đúng ở chỗ thứ nhất và sai hẳn ở chỗ
+    thứ hai: chính em ấy đang đọc, không ai "đang xem" em ấy cả. Đúng cái luật V9.17 đã đặt -
+    không nói từ vựng vận hành nội bộ với học viên - mà chỗ này lọt vì nhãn ở tận bảng cấu hình,
+    xa chỗ vẽ. Câu "của bạn" sẽ tự thành "của con" khi phụ huynh đọc (qua `hvXungLoc`).
+    *Một chuỗi chữ dùng chung cho hai người đọc khác nhau thì nó chỉ đúng với người viết ra nó.* */
+ tranghv:{t:"Cổng học viên (xem hộ)",ttl:"Việc học của học viên đang xem",ttlHV:"Việc học của bạn",the:[
   ["hv_att","Chuyên cần","Tỷ lệ buổi có mặt của riêng học viên này. Muốn xem chi tiết: mục Điểm danh trong hồ sơ."],
   ["hv_hw","Bài tập đã nộp","Tỷ lệ bài đã nộp trên tổng bài được giao của học viên này. Muốn xem chi tiết: mục Bài tập."],
   ["hv_diem","Điểm bài tập TB","Điểm trung bình các bài đã được chấm của học viên này. Muốn xem chi tiết: mục Bài tập."],
@@ -6256,7 +6266,7 @@ function theBoxIn(key){var parts=THEHTML[key]||[];
     trang DUY NHẤT không gọi `pageHead` (xem ghi chú V9.60), nên nó cũng là trang duy nhất mất
     câu ngữ cảnh mà mọi trang khác được `pageHead` phát cho. Khai `ttl` là vá đúng chỗ thủng đó,
     và chỉ trang nào khai mới có - trang có `pageHead` mà thêm nhãn là nói hai lần. */
- var ttl=(THEDEF[key]&&THEDEF[key].ttl)||"";
+ var ttl=(THEDEF[key]&&((window.HVPORTAL&&THEDEF[key].ttlHV)||THEDEF[key].ttl))||"";
  /* V2 14/08 (anh Luân: *"cấu hình thẻ, nó chiếm 1 hàng uổng quá, e có cách khác ko"*).
     Nút "Thẻ (n/N)" trước đây LUÔN chiếm nguyên một hàng ngang trang chỉ để đứng một mình canh
     phải - trong khi ngay bên dưới đã có sẵn một hàng công cụ chứa "Cột (n/N)", đúng cái nút anh
@@ -23782,7 +23792,16 @@ function renderTrangHV(){
     '<button class="btn primary sm" onclick="hvPaidNotify(\''+esc(enr.enrollment_id||"")+'\')"><i class="ti ti-upload"></i>Tôi đã chuyển khoản</button>'+
     '<span class="mut" style="font-size:11px;align-self:center">Báo để kế toán đối soát nhanh - bạn không cần gọi điện.</span></div>'}
   h+='</div>';
-  if(paysC.length){h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Ngày đóng</th><th>Số tiền</th><th>Hình thức</th><th>Xác nhận</th></tr></thead><tbody>';
+  /* Bảng này trước đây không có tên: ngay dưới nút "Tôi đã chuyển khoản" là một cái bảng trần
+     bốn cột, người đọc phải tự đoán nó đang liệt kê cái gì (lịch phải đóng? hay đã đóng?).
+     Ngay trên nó là "Lịch đóng học phí theo đợt" - hai bảng cạnh nhau, một cái có tên, một cái
+     không, mà chúng nói hai chuyện ngược nhau: một cái là SẼ PHẢI ĐÓNG, một cái là ĐÃ ĐÓNG.
+     *Bảng không tên thì người đọc mượn tên của bảng gần nhất.* */
+  if(paysC.length){h+='<div class="ph" style="border-top:1px solid var(--line)"><b><i class="ti ti-receipt" style="margin-right:6px"></i>Các lần bạn đã đóng</b>'+
+    /* Tổng cộng NGAY TỪ CÁC DÒNG BÊN DƯỚI, không lấy `paid` của đơn: một câu tóm tắt đặt trên
+       đầu bảng mà đếm từ nguồn khác thì có ngày nó nói khác chính cái bảng nó đang tóm tắt. */
+    '<span class="mut" style="font-size:11.5px">'+paysC.length+' lần · tổng '+vnd(paysC.reduce(function(a,p){return a+num(p.amount)},0))+'</span></div>'+
+   '<div class="tbwrap"><table class="dt"><thead><tr><th>Ngày đóng</th><th>Số tiền</th><th>Hình thức</th><th>Xác nhận</th></tr></thead><tbody>';
    paysC.slice().sort(function(a,b){return (pvnd(b.payment_time)||0)-(pvnd(a.payment_time)||0)}).forEach(function(pp){var v=pp.verified_by&&String(pp.verified_by).trim();
     h+='<tr><td>'+esc(pp.payment_time||"")+'</td><td><b>'+vnd(num(pp.amount))+'</b></td><td>'+esc(elabel(pp.payment_method)||"")+'</td>'+
      '<td>'+(v?'<span class="chip green">đã xác nhận</span>':'<span class="chip amber">trung tâm đang xác nhận</span>')+'</td></tr>'});
@@ -24038,6 +24057,7 @@ function renderTrangHV(){
   var _bDate=function(v){v=String(v||"").trim();return v?v.slice(0,10):""};
   var _tIn=_bDate(t.result_time), _tMid=_bDate(ob.mid_test_date), _tOut=_bDate(ce.course_completion_time);
   h+='<div class="panel"><div class="pbody">';
+  var _coGR=false;   /* có ít nhất một kỹ năng giữa khóa trùng đầu ra -> chú thích phải có ô ấy */
   function bandRow(lb,vin,vmid,vout,tg,bold){
    var last=(vout>0?vout:(vmid>0?vmid:0));
    var d=(vin>0&&last>0)?(last-vin):null;
@@ -24046,12 +24066,23 @@ function renderTrangHV(){
       chuyện hai số đè lên nhau khi hai mốc trùng band (mục tiêu trùng giữa khóa chẳng hạn).
       Ghi lại những số đã in ở tầng ấy rồi bỏ qua bản thứ hai. */
    var _tren=[];
-   var mark=function(v,cls,ten,ngay,so){
+   var mark=function(v,cls,tip,so){
     if(!(v>0))return "";
-    var inSo=so&&(cls==="vao"||_tren.indexOf(v)<0);
-    if(so&&cls!=="vao")_tren.push(v);
-    return '<span class="brm '+cls+'" style="left:'+pc(v).toFixed(2)+'%" data-tip="'+esc(ten+": band "+v+(ngay?(" · "+ngay):""))+'">'+
+    var vao=cls.indexOf("vao")>=0;
+    var inSo=so&&(vao||_tren.indexOf(v)<0);
+    if(so&&!vao)_tren.push(v);
+    return '<span class="brm '+cls+'" style="left:'+pc(v).toFixed(2)+'%" data-tip="'+esc(tip)+'">'+
      (inSo?'<b>'+v+'</b>':'')+'</span>'};
+   var tipOf=function(ten,v,ngay){return ten+": band "+v+(ngay?(" · "+ngay):"")};
+   /* GIỮA KHÓA TRÙNG ĐẦU RA: một chấm chia đôi màu, không phải hai chấm chồng nhau.
+      Cỡ lồng nhau cứu được ca "đầu vào trùng mốc sau" (vòng rỗng rộng hơn nên dấu sau nằm gọn
+      bên trong), nhưng KHÔNG cứu được ca này - giữa khóa và đầu ra cùng cỡ, chấm xanh lá vẽ sau
+      che sạch chấm navy. Ảnh chụp 26/08: Reading và Speaking của HV065 đều 6.5 ở cả hai mốc nên
+      cây thước chỉ còn một chấm xanh lá - đọc ra là *hai kỹ năng ấy không hề được chấm giữa
+      khóa*, trong khi chú thích ngay dưới lại ghi "Giữa khóa 20/05/2026".
+      *Hai mốc trùng nhau là một sự thật ("không đổi trong nửa sau"), không phải một mốc biến mất
+      - nên phải vẽ thành một dấu mang cả hai màu, chứ không phải bớt đi một dấu.* */
+   var _gr=(vmid>0&&vout>0&&vmid===vout); if(_gr)_coGR=true;
    /* Quãng đã đi vẽ cho CẢ HAI CHIỀU. Bản đầu chỉ vẽ khi điểm mới cao hơn đầu vào, nên một em tụt
       band thì cây thước không có đoạn nào - trông y như chưa có dữ liệu, trong khi sự thật là
       *có* dữ liệu và nó xấu. Chiều tụt đã đọc được từ vị trí hai dấu và từ con chip đỏ, nên đoạn
@@ -24062,10 +24093,12 @@ function renderTrangHV(){
     '<div class="brul">'+
      '<span class="brtrack"></span>'+
      ((vin>0&&last>0&&last!==vin)?('<span class="brfill" style="left:'+pc(_lo).toFixed(2)+'%;width:'+(pc(_hi)-pc(_lo)).toFixed(2)+'%"></span>'):'')+
-     mark(tg,"dich","Mục tiêu","",1)+
-     mark(vin,"vao","Đầu vào",_tIn,1)+
-     mark(vmid,"giua","Giữa khóa",_tMid,(vmid>0&&!(vout>0))?0:1)+
-     mark(vout,"ra","Đầu ra",_tOut,0)+
+     mark(tg,"dich",tipOf("Mục tiêu",tg,""),1)+
+     mark(vin,"vao",tipOf("Đầu vào",vin,_tIn),1)+
+     (_gr?mark(vmid,"giua ra2","Giữa khóa và đầu ra cùng band "+vmid+
+        (_tMid?(" · giữa khóa "+_tMid):"")+(_tOut?(" · đầu ra "+_tOut):""),1)
+        :(mark(vmid,"giua",tipOf("Giữa khóa",vmid,_tMid),(vmid>0&&!(vout>0))?0:1)+
+          mark(vout,"ra",tipOf("Đầu ra",vout,_tOut),0)))+
     '</div>'+
     '<div class="brv moi">'+(last>0?last:'<span class="mut">-</span>')+
      (last>0?('<em>'+(vout>0?"đầu ra":"giữa khóa")+'</em>'):'')+'</div>'+
@@ -24084,6 +24117,7 @@ function renderTrangHV(){
    '<span><i class="brk vao"></i>Đầu vào'+(_tIn?(' <span class="mut">'+esc(_tIn)+'</span>'):'')+'</span>'+
    (num(ob.mid_overall)>0?('<span><i class="brk giua"></i>Giữa khóa'+(_tMid?(' <span class="mut">'+esc(_tMid)+'</span>'):'')+'</span>'):'')+
    (num(ce.final_test_score)>0?('<span><i class="brk ra"></i>Đầu ra'+(_tOut?(' <span class="mut">'+esc(_tOut)+'</span>'):'')+'</span>'):'')+
+   (_coGR?'<span><i class="brk ra2"></i>Giữa khóa và đầu ra cùng band</span>':'')+
    (num(ce.target_band)>0?('<span><i class="brk dich"></i>Mục tiêu '+num(ce.target_band)+
      ((num(ce.final_test_score)>0)?(num(ce.final_test_score)>=num(ce.target_band)?' <span class="chip green">đạt</span>':' <span class="chip amber">chưa đạt</span>'):'')+'</span>'):'')+
    '</div>';

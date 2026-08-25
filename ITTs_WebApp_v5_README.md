@@ -2861,6 +2861,7 @@ Nay mỗi kỹ năng là **một cây thước band 0-9** với bốn loại d�
 | Chấm navy nhỏ | Giữa khóa |
 | Chấm xanh lá nhỏ | Đầu ra |
 | Vạch đứng cam | Mục tiêu |
+| Chấm nửa navy nửa xanh lá | Giữa khóa và đầu ra rơi đúng cùng một band |
 
 Đoạn từ đầu vào tới điểm mới nhất được tô nhạt - nó là một **quãng**, không phải một mốc, nên nó
 nhạt hơn mọi cái dấu. Rê chuột vào từng dấu hiện tên mốc, band và ngày chấm.
@@ -2872,7 +2873,8 @@ Ba chi tiết được đặt có chủ ý:
 - **Số của đầu vào nằm dưới vạch, số của các mốc sau nằm trên vạch.** Hai tầng thì hai mốc đứng
   sát nhau vẫn đọc được, và người ta thấy ngay đâu là chỗ bắt đầu.
 - **Ba cỡ dấu lồng vào nhau.** Hai mốc trùng band (đầu vào 5 và giữa khóa cũng 5) thì dấu sau nằm
-  gọn trong vòng trước chứ không xoá mất nó.
+  gọn trong vòng trước chứ không xoá mất nó. Riêng giữa khóa trùng đầu ra - hai dấu cùng cỡ - thì
+  gộp thành một chấm chia đôi màu, có ô riêng trong chú thích.
 
 Trên điện thoại, nhãn kỹ năng - điểm mới nhất - chip mức tăng nằm chung một dòng ở trên, cây thước
 xuống dòng dưới ăn trọn bề ngang, nên mỗi band rộng gấp đôi so với việc nhồi tất cả vào một hàng.
