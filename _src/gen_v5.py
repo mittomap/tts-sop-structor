@@ -4723,7 +4723,19 @@ function mapRoleCode(c){c=String(c||"");
 var DSDOM={DL02:"lead",DL02b:"lead",DL03:"lead",DL04:"lead",
  DL09:"hocvien",DL08:"hocvien",DL12:"hocvien",DL15:"hocvien",DL16:"hocvien",DL17:"hocvien",DL18:"hocvien",DL18b:"hocvien",
  DL10:"lop",DL11:"lop",DL11b:"lop",DL13:"lop",DL14:"lop",DL21:"lop",
- DL06:"tien",DL07:"tien",DL19:"tien",DL22:"tien",
+ DL06:"tien",DL07:"tien",
+ /* ═══ 26/08 - LƯỢT GIỚI THIỆU VÀ PHẦN THƯỞNG KHÔNG THUỘC MIỀN TIỀN ═══════════════════════
+    DL22 (lượt dùng mã) là một sự kiện **thu hút khách**: một người bạn được giới thiệu tới và
+    thành lead. DL19 (phần thưởng) không giữ một con số tiền nào - phần thưởng là hiện vật
+    ("1 buổi WOW 1-1 miễn phí"). Xếp cả hai vào miền `tien` là khoá đúng những người làm chương
+    trình này: Marketing khai `tien:"none"` nên đọc ra 0 dòng, trong khi thẻ "Thưởng giới thiệu
+    chưa trao" trên chính bảng việc của họ vẫn đếm và vẫn bảo "mở trang Mã giới thiệu".
+    Ghi chú cũ ngay trong `renderMaGioiThieu` đã nói đúng ý mà mới làm một nửa: *"Chương trình
+    giới thiệu là việc của họ, nhưng số tiền thì không"* - cột `friend_discount_amount` đã được
+    che riêng theo `dsLevel("tien")`, nhưng cả cái bảng vẫn chết theo miền tiền.
+    *Che đúng một cột tiền rồi để cả bảng chết theo miền tiền thì người ta không thấy cột nào
+    hết - kể cả những cột không dính tới tiền.* */
+ DL19:"lead",DL22:"lead",
  DL01:"nhansu",DL23:"viec",DL24:"viec"};
 var DSDOMT={lead:"Khách tiềm năng",hocvien:"Học viên",lop:"Lớp & giảng dạy",tien:"Tiền & học phí",
  baocao:"Báo cáo tổng",viec:"Việc được giao",nhansu:"Nhân sự",noidung:"Nội dung nhạy cảm"};
@@ -4857,7 +4869,23 @@ function recOwners(code,r){if(!r)return [];
   case "DL13":return [r.teacher_id,(r.class_id&&(find("DL10","class_id",r.class_id)||{}).main_teacher_id)];
   case "DL14":return [r.staff_id,r.wow_booked_by];
   case "DL21":return [];
-  case "DL06":case "DL19":case "DL22":{var L6=r.lead_id&&find("DL02","lead_id",r.lead_id);return [L6&&L6.assigned_to,r.created_by]}
+  case "DL06":{var L6=r.lead_id&&find("DL02","lead_id",r.lead_id);return [L6&&L6.assigned_to,r.created_by]}
+  /* ═══ 26/08 - HAI BẢNG GIỚI THIỆU TỪNG ĐI CHUNG NHÁNH VỚI DL06, VÀ KHÔNG CÓ CỘT NÀO CỦA NÓ ══
+     Nhánh trên hỏi `r.lead_id` và `r.created_by`. DL06 có `lead_id`; DL19 và DL22 **không có
+     cột nào trong hai cột ấy** - DL22 gọi tên nó là `referred_lead_id`, DL19 thì không giữ mã
+     lead. Nên với hai bảng này bản khai chủ sở hữu trả về **mảng rỗng vĩnh viễn**: không lỗi,
+     không cảnh báo, chỉ là mọi người dưới mức "all" đọc ra 0 dòng.
+     Đo được 26/08: 12/13 người thấy trang Mã giới thiệu ra `0 mã` - kể cả **cả ba người
+     Marketing**, tức chính chủ của chương trình, và cả bảy tư vấn viên. Chỉ Giám đốc điều hành
+     (`lead:"all"`, không đi qua phép lọc này) là thấy.
+     *Một nhánh viết cho bảng này đem dùng cho bảng khác mà không hỏi lại chúng có những cột ấy
+     không thì nó không sai to tiếng - nó trả về rỗng và im.*
+     Chủ của một LƯỢT GIỚI THIỆU: người phụ trách bạn được giới thiệu (đó là một lead thật),
+     cộng những người đang giữ hồ sơ của học viên chủ mã. Chủ của một PHẦN THƯỞNG: người giữ hồ
+     sơ chủ mã, cộng người đã trao. */
+  case "DL22":{var Lr=r.referred_lead_id&&find("DL02","lead_id",r.referred_lead_id);
+   return [Lr&&Lr.assigned_to].concat(stuOwners(r.referrer_student_id))}
+  case "DL19":return [r.granted_by].concat(stuOwners(r.referrer_student_id))
   case "DL07":return [r.received_by,r.verified_by];
   case "DL01":return [r.staff_id,r.reports_to];
   case "DL23":case "DL24":return [r.assignee_id,r.assigner_id,r.staff_id];
@@ -4913,7 +4941,10 @@ function recBranches(code,r){if(!r)return {};
  if(lid){var L=find("DL02","lead_id",lid);if(L&&L.branch)o[L.branch]=1}
  return o}
 /* gác cổng MỘT bản ghi */
-function canRow(code,r){var dom=DSDOM[code];if(!dom)return true;
+/* `mienOv` - miền khai RIÊNG cho một cuốn sổ, đè lên miền mặc định của bảng. Xem ghi chú ở
+   `LISTCFG.giangvien`: cùng một bảng DL01, trang Bảng công đọc nó như hồ sơ NHÂN SỰ, còn trang
+   Giảng viên đọc nó như TẢI GIẢNG DẠY - hai câu hỏi khác nhau trên cùng một bảng. */
+function canRow(code,r,mienOv){var dom=mienOv||DSDOM[code];if(!dom)return true;
  var lv=dsLevel(dom);
  if(lv==="all")return true;
  if(lv==="none")return false;
@@ -4961,10 +4992,17 @@ function dsDeny(what){return '<div class="panel" style="max-width:560px;margin:3
  '<div style="font-weight:800;font-size:15px;margin:10px 0 6px">'+esc(what||"Nội dung này")+' nằm ngoài phạm vi dữ liệu của bạn</div>'+
  '<div class="mut" style="font-size:12.5px;margin-bottom:14px">Chức danh của bạn chỉ xem được phần dữ liệu được giao. Cần xem thêm thì nhờ quản lý cấp quyền ở <b>Cài đặt &gt; Phân quyền &amp; Phạm vi dữ liệu</b>.</div>'+
  '<button class="btn primary" onclick="go(SCOPE().land||\'viec\')"><i class="ti ti-home"></i>Về trang chính</button></div>'}
-function scopeList(code,arr){ /* CỔ CHAI 1: mọi trang danh sách (renderList) + phễu */
+function scopeList(code,arr,mienOv){ /* CỔ CHAI 1: mọi trang danh sách (renderList) + phễu */
  if(!CURSTAFF||!dsCfg().on)return arr;
- var dom=DSDOM[code];if(!dom||dsLevel(dom)==="all")return arr;
- return arr.filter(function(r){return canRow(code,r)})}
+ var dom=mienOv||DSDOM[code];if(!dom||dsLevel(dom)==="all")return arr;
+ return arr.filter(function(r){return canRow(code,r,mienOv)})}
+/* ═══ MỘT SỔ, MỘT CỬA LẤY DÒNG ══════════════════════════════════════════════════════════════
+   Bốn chỗ trong app cùng dựng lại danh sách gốc của một cuốn sổ: thân trang, hộp lọc sâu, bộ
+   đếm của chip lọc nhanh, và bộ đếm trên menu. Thêm một luật vào sổ mà chỉ sửa một trong bốn
+   chỗ là bảng nói một đằng, con số trên chip nói một nẻo - dự án này đã cắn đúng thế ở "trùng
+   giờ" và ở "đếm bằng màu". Nên bốn chỗ ấy nay gọi chung một hàm. */
+function listRows(key){var c=LISTCFG[key];if(!c||!c.code)return [];
+ return scopeList(c.code,rows(c.code),c.mien)}
 
 function staffFor(role){var r=RBK[role]||{codes:[],name:"Admin"};var a=rows("DL01");
  for(var i=0;i<a.length;i++){var c=ecode(a[i].role);if(r.codes&&r.codes.length&&r.codes.indexOf(c)>=0&&!/inactive|nghỉ/i.test(String(a[i].status))){return a[i]}}
@@ -5108,7 +5146,21 @@ cols:[["class_id","Mã"],["class_name","Tên lớp"],["course_id_name","Khóa"],
    (cùng bảng DL01, cùng cột) - hợp lý hơn hai màn giống hệt nhau - nhưng gộp mà không có đường
    tách ra thì đúng là làm SÓT màn VH3b: trưởng phòng muốn xem riêng đội WOW phải tự dò cột Vai trò.
    Nay hai chip lọc một chạm, và bộ kiểm SOP canh chúng còn sống. */
-giangvien:{code:"DL01",ro:1,sub:"Giảng viên & NV WOW (DL01) - lọc nhanh để tách riêng từng đội",
+/* ═══ 26/08 - CUỐN SỔ NÀY HỎI VỀ TẢI GIẢNG DẠY, KHÔNG HỎI VỀ HỒ SƠ NHÂN SỰ ═══════════════════
+   Đo được 26/08: **24/30 người có mục "Giảng viên" trên menu mở ra thấy bảng rỗng** - toàn bộ
+   giáo viên, NV WOW, học vụ, kế toán và phần lớn tư vấn. Mà ngay phía trên bảng rỗng ấy, dải
+   thẻ vẫn ghi "6 GV · tổng 122.6h" và "Lớp nào cũng đã có giảng viên": **trang tự cãi chính
+   nó**, đúng con bệnh anh Luân bắt ở bảng "học viên nguy cơ xanh lè".
+   Gốc: sổ lấy dòng từ DL01, mà `DSDOM.DL01="nhansu"` - miền ấy khai `none` cho gần hết mọi
+   người, vì DL01 CÒN chứa lương và hợp đồng. Nhưng cuốn sổ NÀY không hiện một chữ nào của
+   những thứ đó: cột của nó là lớp đang dạy · học viên · nợ nhận xét · bài chờ chấm · trạng
+   thái. Đó là TẢI GIẢNG DẠY - thứ mà ai xem được lớp thì xem được.
+   Nên khai `mien:"lop"` cho riêng sổ này: giáo viên và NV WOW (`lop:"mine"`) thấy đúng dòng của
+   chính mình - và đó cũng chính là điều dòng phụ đề của trang đã hứa ("bảng công giảng dạy của
+   chính họ"); học vụ, tư vấn, ACA, nhân sự, điều hành (`lop:"all"`) thấy cả đội. Trang Bảng
+   công vẫn đọc DL01 theo miền `nhansu` như cũ - lương không đi qua cửa này.
+   *Một bảng có thể trả lời hai câu hỏi khác nhau; khoá nó theo câu hỏi kia là chặn mất câu này.* */
+giangvien:{code:"DL01",mien:"lop",ro:1,sub:"Giảng viên & NV WOW (DL01) - lọc nhanh để tách riêng từng đội",
  qf:[["wow","Chỉ NV WOW",function(x){return /wow/.test(ecode(x.role))},"blue"],
      ["gv","Chỉ giảng viên lớp",function(x){return /teacher/.test(ecode(x.role))},"blue"]],
  
@@ -6584,7 +6636,7 @@ function fltDateSet(pg,k,field,v){var st=fltSt(pg),o=st[k]||{};
 function fltAxClear(pg,k){var st=fltSt(pg);delete st[k];PAGE[pg]=0;fltOpen(pg);reRenderKeep(CUR)}
 /* bảng chọn: mở drawer, mỗi trục một khối, chọn tới đâu danh sách bên dưới hẹp tới đó */
 function fltOpen(pg){var ax=fltAxes(pg);if(!ax.length){toast("Trang này chưa khai trục lọc.");return}
- var code=fltCode(pg), all=scopeList(code,rows(code));
+ var code=fltCode(pg), all=scopeList(code,rows(code),(LISTCFG[pg]||{}).mien);
  var st=fltSt(pg);
  var h='<div class="dcard"><h4><i class="ti ti-filter"></i>Bộ lọc chuyên sâu</h4>'+
   '<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Chọn nhiều điều kiện cùng lúc: các <b>ô khác nhau cộng dồn</b> (và), <b>nhiều lựa chọn trong cùng một ô</b> là hoặc. Tab ở trên vẫn giữ nguyên - bộ lọc chỉ thu hẹp bên trong tab đang mở.</div>';
@@ -6663,7 +6715,7 @@ function fltBarHTML(pg,daCoTim){
  return h}
 function renderList(key,emb){window.__gvTai=null;   /* số đếm theo giảng viên: tươi lại mỗi lượt vẽ */
  var cfg=LISTCFG[key], p=PBK[key], q=vnorm(SEARCH[key]||""), fa=FILT[key]||[];
- hideInit(key);var all=scopeList(cfg.code, rows(cfg.code)); if(cfg.pre)all=all.filter(cfg.pre); var data=all;
+ hideInit(key);var all=listRows(key); if(cfg.pre)all=all.filter(cfg.pre); var data=all;
  if(q)data=data.filter(function(r){return cfg.cols.some(function(c){return vnorm(r[c[0]]).indexOf(q)>=0})});
  if(fa.length&&cfg.filt)data=data.filter(function(r){return fa.indexOf(ecode(r[cfg.filt]))>=0});
  data=fltApply(key,data);   /* V9.28: bộ lọc chuyên sâu - kết hợp nhiều trục, dùng chung một lõi */
@@ -6941,7 +6993,7 @@ function qfToggle(key,k){window.QF=window.QF||{};window.QF[key]=(window.QF[key]=
 function qfDem(key,k){
  var c=LISTCFG[key];if(!c||!c.qf)return 0;
  var d=c.qf.filter(function(x){return x[0]===k})[0];if(!d)return 0;
- var all=scopeList(c.code,rows(c.code));if(c.pre)all=all.filter(c.pre);
+ var all=listRows(key);if(c.pre)all=all.filter(c.pre);
  return all.filter(d[2]).length}
 /* Bấm tên bất kỳ (Trang bắt đầu / Hành trình) -> MỞ DRAWER thông tin trước; muốn xử lý thì bấm nút. */
 /* V9.29 (anh Luân: "ở xếp lớp & onboarding, sao ko có drawer tóm tắt thông tin học viên em").
@@ -16561,10 +16613,35 @@ function renderBanggiao(embed){
    *Một ô số chỉ đáng tin khi chỗ nó chỉ tới thật sự có bấy nhiêu dòng.*
    Nay ô chọn "Từ NV" có thêm một mục **(chưa có ai phụ trách)**; ô số nhảy thẳng vào mục ấy. */
 var BGORPH="__orph";
+/* Đếm lead CÒN SỐNG của một nguồn (một NV, hoặc nhóm vô chủ). Một phép đếm cho cả ba chỗ đọc:
+   chọn nguồn mặc định, nhãn trong ô chọn, và ô số "Lead chưa có ai phụ trách". */
+function bgDem(id){return rows("DL02").filter(function(l){
+ return (id===BGORPH?!String(l.assigned_to||"").trim():String(l.assigned_to||"")===String(id))
+  &&!isc(l.lead_status,"converted","rejected","unreachable")}).length}
  var src=(bgQL?window.BGSRC:"")||"";
  if(src===BGORPH&&!bgQL)src="";   /* không phải quản lý thì không có ô chọn, cũng không có mục này */
  if(src&&src!==BGORPH&&!staff.some(function(s){return s.staff_id===src}))src="";
- if(!src)src=(staff.some(function(s){return s.staff_id===CURSTAFF})?CURSTAFF:((staff[0]&&staff[0].staff_id)||CURSTAFF||""));
+ /* ═══ 26/08 - MỞ TRANG RA PHẢI RƠI VÀO CHỖ CÓ DÒNG ══════════════════════════════════════════
+    Bản cũ luôn mở ở sổ của CHÍNH NGƯỜI ĐANG XEM. Đúng với một tư vấn viên - họ vào đây để giao
+    lead của mình đi. Nhưng người có ô chọn lại là **quản lý và Marketing**, mà hai nhóm ấy
+    không ai giữ lead: mở trang ra là một cái bảng rỗng, một ô chọn chưa đụng tới, và không có
+    dấu hiệu nào cho biết lead đang nằm ở đâu. Đo được 26/08: **7/13 người thấy Bàn giao lead
+    hoàn toàn rỗng**, phần lớn là Marketing và quản lý.
+    Nay: có lead của chính mình thì mở ở đó; không thì mở ở nhóm vô chủ nếu nhóm ấy có dòng;
+    không nữa thì mở ở người đang ôm nhiều nhất. Người thường vẫn chỉ có sổ của chính họ - luật
+    phân quyền ngay trên không đổi một chữ.
+    Và ô chọn nay **mang theo số dòng của từng mục**, để không phải bấm thử từng người mới biết
+    ai đang ôm bao nhiêu.
+    *Một cái bảng rỗng không nói được rằng nó rỗng vì mình đang đứng nhầm chỗ.* */
+ if(!src){
+  if(!bgQL)src=(staff.some(function(s){return s.staff_id===CURSTAFF})?CURSTAFF:"");
+  else{
+   if(bgDem(CURSTAFF)&&staff.some(function(s){return s.staff_id===CURSTAFF}))src=CURSTAFF;
+   else if(bgDem(BGORPH))src=BGORPH;
+   else{var _bn="",_bs=-1;staff.forEach(function(s){var v=bgDem(s.staff_id);if(v>_bs){_bs=v;_bn=s.staff_id}});src=_bn}
+  }
+  if(!src)src=(staff.some(function(s){return s.staff_id===CURSTAFF})?CURSTAFF:((staff[0]&&staff[0].staff_id)||CURSTAFF||""));
+ }
  var laOrph=(src===BGORPH);
  var others=staffAll.filter(function(s){return s.staff_id!==src});
  var h=embed?'':'<div class="phead" data-tour="phead"><div><div class="t">Bàn giao lead</div><div class="s">Chuyển lead từ một NV sang NV khác (khi nghỉ / quá tải). NV nhận mới thấy lead, NV cũ không còn thấy.</div></div></div>';
@@ -16573,7 +16650,7 @@ var BGORPH="__orph";
     gì. Ghi thẳng tên mình cho họ đọc, đúng chỗ ô chọn từng đứng. */
  h+='<div class="fbar"><span class="lbl">Từ NV</span>'+
   (bgQL
-   ?'<select class="sel" onchange="window.BGSRC=this.value;reRender(CUR)">'+'<option value="'+BGORPH+'"'+(laOrph?" selected":"")+'>(chưa có ai phụ trách)</option>'+staff.map(function(s){return '<option value="'+esc(s.staff_id)+'"'+(s.staff_id===src?" selected":"")+'>'+esc(s.staff_id+" - "+s.full_name)+'</option>'}).join("")+'</select>'
+   ?'<select class="sel" onchange="window.BGSRC=this.value;reRender(CUR)">'+'<option value="'+BGORPH+'"'+(laOrph?" selected":"")+'>(chưa có ai phụ trách) - '+bgDem(BGORPH)+' lead</option>'+staff.map(function(s){return '<option value="'+esc(s.staff_id)+'"'+(s.staff_id===src?" selected":"")+'>'+esc(s.staff_id+" - "+s.full_name+" - "+bgDem(s.staff_id)+" lead")+'</option>'}).join("")+'</select>'
    :(src
      ?'<b>'+esc(src+" - "+(((find("DL01","staff_id",src))||{}).full_name||"bạn"))+'</b><span class="mut" style="font-size:11.5px;margin-left:6px">bạn chỉ bàn giao được lead của chính mình</span>'
      :'<span class="mut" style="font-size:11.5px">chức danh của bạn không giữ sổ lead nên không có gì để bàn giao</span>'));
@@ -29554,7 +29631,7 @@ function renderGiangvien(){var tab=window.GVTAB||"ds";
  h+=(tab==="cong")?renderCong():renderList("giangvien",1);
  return h}
 function gvDsSo(){var c=LISTCFG.giangvien;
- try{return scopeList(c.code,rows(c.code)).filter(c.pre).length}catch(e){return ""}}
+ try{return listRows("giangvien").filter(c.pre).length}catch(e){return ""}}
 /* ═══════════ V9.47 - HỎI ĐÁP: HỎI BẰNG TIẾNG VIỆT, TRẢ LỜI KÈM ĐƯỜNG BẤM THẲNG ═══════════
    Anh Luân đặt hai việc, và chúng là hai loại câu hỏi khác hẳn nhau:
 
@@ -33586,6 +33663,19 @@ function navVis(k){var r=RBK[CURROLE],rs=SCOPE();
  /* baocao còn một chốt thứ hai theo PHẠM VI DỮ LIỆU (dsLevel) - renderBaocao gặp "none" là
     từ chối cả trang. Menu phải hỏi đúng chốt đó, không được mời suông. */
  if((k==="baocao"||o==="baocao")&&dsLevel("baocao")==="none")return false;
+ /* ═══ 26/08 - HỎI CHUNG CÂU MÀ DÒNG NGAY TRÊN ĐANG HỎI RIÊNG CHO MỘT TRANG ═══════════════════
+    Luật "mời rồi đuổi còn tệ hơn không mời" đã đặt hai lần ở trên, nhưng cả hai lần đều **gọi
+    đích danh một trang**: `bangcong`, rồi `baocao`. Trang thứ ba mắc đúng bệnh ấy thì không ai
+    hỏi tới. Đo được 26/08: Marketing có mục "Học viên" trên menu trong khi khai `hocvien:"none"`
+    - bấm vào là một cái bảng rỗng, không một lời giải thích.
+    Nay hỏi chung: sổ chính của trang này thuộc miền nào, người này có xem được miền ấy không.
+    "none" nghĩa là **mọi dòng đều bị chặn** - không phải "hôm nay chưa có dữ liệu" mà là "sẽ
+    không bao giờ có dòng nào", nên đây là câu trả lời chắc chắn, không phải một phỏng đoán.
+    *Một luật viết bằng tên riêng thì mỗi trang mới lại phải nhớ khai lại; viết bằng câu hỏi thì
+    khai một lần.* */
+ var _lc=LISTCFG[k];
+ if(_lc&&_lc.code){var _dm=_lc.mien||DSDOM[_lc.code];
+  if(_dm&&dsLevel(_dm)==="none")return false}
  /* Bản đồ chặng là HÀNH TRÌNH HỌC VIÊN. Ai làm việc với học viên đều thấy; nhóm gọn (lite) và
     nhóm không chạm học viên (Nhân sự) thì không - V9.60: trước bản này Nhân sự vào app là thấy
     ngay bản đồ vòng đời học viên, trong khi họ không có một việc nào với học viên. */
