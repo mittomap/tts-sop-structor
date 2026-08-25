@@ -740,7 +740,18 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
    Xếp cạnh nhau thì đọc một lượt là xong và lấy lại được chiều cao của tấm thấp hơn. */
 /* `stretch` chứ không `start`: hai tấm đặt cạnh nhau mà đáy lệch nhau vài chục pixel thì đọc
    ra như một cái bị hụt. Bằng đáy thì cặp ấy thành MỘT khối trong mắt, đúng điều muốn nói. */
-.bl2c{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
+/* ═══ V2 25/08 - ĐẢO LẠI QUYẾT ĐỊNH TRÊN, VÌ NÓ ĐÚNG VỚI "VÀI CHỤC PIXEL" MÀ SAI VỚI 405 ═══════
+   Anh Luân gửi ảnh cổng Trưởng phòng ACA: *"a bấm dựng lại demo rồi mà cái cần chú ý nó chỉ có 1
+   mục nhỉ? dựng lại demo ko có ý nghĩa gì à"* - và trong ảnh, dưới cái mục duy nhất ấy là một
+   mảng trắng mênh mông.
+   Đo ra: khối "Cần chú ý" có nội dung cao **45px** mà bị kéo lên **450px** cho bằng khối "Nhịp
+   ngày" bên cạnh - **405px trắng**. Lý do là dòng `align-items:stretch` ngay trên, đặt với lập
+   luận "đáy lệch vài chục pixel thì đọc như bị hụt". Lập luận ấy đúng cho vài chục pixel; ở 405px
+   thì thứ người ta đọc được không còn là "hai tấm bằng đáy", mà là "cái tấm này hỏng".
+   *Một luật thẩm mỹ đặt cho khoảng chênh nhỏ thì phải có trần - vượt trần, nó quay ra chống lại
+   chính điều nó muốn bảo vệ.*
+   Nay để mỗi tấm cao theo nội dung của nó. Đáy lệch thì lệch - thà lệch còn hơn trống. */
+.bl2c{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
 .bl2c>.panel{display:flex;flex-direction:column}
 .bl2c>.panel>.pbody{flex:1 1 auto}
 .bl2c>.panel{margin-bottom:16px}
@@ -13394,11 +13405,21 @@ function myKpiHTML(){var me=find("DL01","staff_id",CURSTAFF);if(!me)return "";
  var myL={};rows("DL02").forEach(function(l){if(String(l.assigned_to||"")===CURSTAFF)myL[l.lead_id]=1});
  var enrW=rows("DL06").filter(function(e){var d=pvnd(e.enrollment_time);return d&&d>=w0&&myL[e.lead_id]&&!isc(e.enrollment_status,"cancelled")});
  var revW=0;rows("DL07").forEach(function(p){var d=pvnd(p.payment_time);if(d&&d>=w0&&String(p.received_by||"")===CURSTAFF)revW+=num(p.amount)});
- return '<div class="panel"><div class="ph"><b><i class="ti ti-chart-line" style="margin-right:6px"></i>KPI của tôi</b><span class="mut" style="font-size:11.5px">tính theo tài khoản đang vào cổng - '+esc(myName())+'</span></div>'+
+ /* ═══ V2 25/08 - DẢI THẺ PHẢI NẰM TRONG `.pbody`, KHÔNG ÁP THẲNG VÀO VIỀN PANEL ═══════════
+    Anh Luân: *"Chỉ số của riêng bạn, và cái ô bên dưới bị tràn ra viền em ko thấy à"*.
+    Đo ra: thẻ cuối của dải có mép phải ở **1416px**, viền trong của panel ở **1417px** - tức thẻ
+    cách viền đúng **một pixel**, viền thẻ chồng lên viền panel. Nhìn ra đúng như tràn.
+    Gốc: đây là panel DUY NHẤT trong app đặt dải thẻ làm con TRỰC TIẾP của `.panel`, bỏ qua
+    `.pbody` - mà `.pbody` chính là chỗ giữ đệm 6px. Quét cả tệp: 1/1 chỗ, không còn chỗ nào khác.
+    *Một khối bỏ qua cái vỏ mà mọi khối cùng loại đều đi qua thì nó không thừa hưởng thứ gì cái
+    vỏ ấy đang giữ - và thứ nó đánh mất luôn là thứ không ai nghĩ tới: khoảng thở.*
+    Em không thấy vì hai phép đo em chạy đều hỏi "có tràn RA NGOÀI panel không" - và câu trả lời
+    là không, thẻ dừng đúng ở mép. Câu phải hỏi là "có ĐỦ CÁCH mép không". */
+ return '<div class="panel"><div class="ph"><b><i class="ti ti-chart-line" style="margin-right:6px"></i>KPI của tôi</b><span class="mut" style="font-size:11.5px">tính theo tài khoản đang vào cổng - '+esc(myName())+'</span></div><div class="pbody">'+
   statStrip([["ti-phone",cT.length+" / "+cW.length,"Lượt liên hệ hôm nay / "+_nhan,"#3B82C4",""],
   ["ti-phone-call",(cW.length?Math.round(okW.length*100/cW.length)+"%":"-"),"Tỷ lệ kết nối "+_nhan,"#2E9E6B",okW.length+"/"+cW.length+" lượt gặp được"],
   ["ti-clipboard-check",enrW.length,"Đăng ký mới "+_nhan,"#7C3AED","khách tôi phụ trách"],
-  ["ti-cash",vnd(revW),"Tiền thu "+_nhan,"#0D9488","khoản tôi ghi nhận"]],"mykpi")+'</div>'}
+  ["ti-cash",vnd(revW),"Tiền thu "+_nhan,"#0D9488","khoản tôi ghi nhận"]],"mykpi")+'</div></div>'}
 /* `embed=1`: thân trang này được NHÚNG làm cách xem "Theo người" của trang Việc hôm nay (V2
    14/08). Lúc ấy bỏ ba thứ vì trang cha đã có rồi: ô chào + đầu trang, biển chỉ đường sang
    Việc hôm nay (đứng trong chính Việc hôm nay thì nó trỏ vào chỗ đang đứng), và công tắc
@@ -13501,7 +13522,10 @@ function renderBanlam(embed){
  if(reupN)segs.push(["reup","Chăm lại/Reup",reupN,"amber"]);
  JBRANCH.forEach(function(k){if(k!=="paused"&&k!=="cancelled")return;var S=JBY[k];var n=all0.filter(function(J){return J.k===k&&J.act}).length;if(n)segs.push([k,S.t,n,"red"])});
  var meReal=find("DL01","staff_id",CURSTAFF)&&SCOPE().mineBtn;
- h+='<div style="padding:0 0 2px">'+tbar('<span class="tblbl">Nhóm</span>'+segHTML(q,segs,"chayQSet('{k}')"),
+ /* Đệm 6px hai bên cho BẰNG `.pbody` ngay dưới: thanh Nhóm là một hộp CÓ VIỀN của riêng nó,
+    để nó sát mép panel là hai đường viền dính nhau, mà nó lại rộng hơn danh sách bên dưới đúng
+    6px mỗi bên nên hai khối lệch trục. Bắt được bằng M10 của `_checkmat`. */
+ h+='<div style="padding:0 6px 2px">'+tbar('<span class="tblbl">Nhóm</span>'+segHTML(q,segs,"chayQSet('{k}')"),
   (meReal?'<button class="pill'+(window.MINEONLY?' on':'')+'" onclick="window.MINEONLY=window.MINEONLY?0:1;reRender(CUR)" title="Chỉ hiện hồ sơ tôi phụ trách"><i class="ti ti-user-check" style="margin-right:4px"></i>Chỉ khách của tôi</button> ':'')+
   '<span class="tbcnt">'+chayList().length+' hồ sơ</span>')+'</div>';
  h+='<div class="pbody"><div id="chaybody" data-tour="chaybody">'+chayListHTML()+'</div></div></div>';
@@ -32256,7 +32280,20 @@ function canhBaoQuet(){
  window.__cbDangQuet=1;
  var cuCUR=CUR, ra=[];
  try{
-  var NV=[];for(var h in HUBTAB){var m=HUBTAB[h].m||{};for(var t in m)if(NV.indexOf(m[t])<0)NV.push(m[t])}
+  /* ═══ V2 25/08 - QUÉT MỌI TRANG NGƯỜI NÀY XEM ĐƯỢC, KHÔNG CHỈ ĐÍCH CỦA TAB HUB ═══════════
+     Bản cũ dựng danh sách quét từ `HUBTAB` - tức chỉ những trang là ĐÍCH CỦA MỘT TAB HUB. Với
+     Trưởng phòng ACA, danh sách ấy ra **8 trang**, và **7 trong 8 trang không đăng ký thẻ thống
+     kê nào**, nên "Cần chú ý" của họ chỉ còn **đúng 1 mục**. Với Giáo viên ACA thì **0 mục** -
+     một cái khối trống hoàn toàn.
+     Trang lõi của phòng ACA - Bài tập, Giáo án, Bảng lớp, Giảng viên - đều KHÔNG phải đích của
+     tab hub nào, nên chúng chưa bao giờ được quét, dù chính chúng mới là nơi chuyện của ACA xảy
+     ra. Đo bằng cách quét mọi trang họ xem được: TP ACA **1 → 9 chỗ** (trong đó "Bài quá hạn
+     chấm = 18" và "Buổi chưa soạn gần nhất = 1 ngày" đều là màu đỏ), Giáo viên ACA **0 → 3**,
+     Giáo viên WOW **1 → 3**. Tốn thêm 120-180ms.
+     *Chọn phạm vi quét theo một bảng khai có sẵn thì tiện, nhưng bảng ấy sinh ra để trả lời câu
+     hỏi khác - và phần nó không nói tới sẽ im lặng biến mất khỏi kết quả.*
+     `navVis` vẫn là cửa duy nhất: chỉ quét trang người này được xem, không mời rồi đuổi. */
+  var NV=Object.keys(PBK).filter(function(k){try{return navVis(k)}catch(e){return false}});
   NV.forEach(function(k){
    if(!PBK[k])return;
    /* Chỉ quét trang NGƯỜI NÀY ĐƯỢC XEM. Cảnh báo về một trang họ không có quyền vào là mời rồi

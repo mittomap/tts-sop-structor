@@ -156,7 +156,7 @@ const CAT_OK = [
       await new Promise(r => setTimeout(r, 340));
       const c = document.getElementById("content");
       if (!c) return {loi: "khong co than trang"};
-      const ra = {cat: [], che: [], hep: [], moCoi: [], deNhau: [], thucThe: [], soVo: [], batNat: [], bopCot: [], coCum: [], dem: 0};
+      const ra = {cat: [], che: [], hep: [], moCoi: [], deNhau: [], thucThe: [], soVo: [], batNat: [], bopCot: [], coCum: [], apSat: [], dem: 0};
 
       /* Thước đo bề rộng THẬT của một đoạn chữ với đúng font của nó. Dựng một lần, dùng lại. */
       const do_ = document.createElement("span");
@@ -361,6 +361,51 @@ const CAT_OK = [
             Math.round(thua) + "px/" + Math.round(trong) + "px ma van cat chu: " +
             [...new Set(cut)].slice(0, 3).join(" · "));
         });
+        /* ── M10: NỘI DUNG ÁP SÁT VIỀN PANEL ────────────────────────────────────────────────
+           Anh Luân 25/08: *"Chỉ số của riêng bạn, và cái ô bên dưới bị tràn ra viền em ko thấy à"*.
+           Đo ra: thẻ cuối của dải có mép phải ở 1416px, viền trong của panel ở 1417px - cách nhau
+           đúng MỘT pixel, viền thẻ chồng lên viền panel. Nhìn ra đúng như tràn.
+           **Em đã đo hai lần và cả hai lần đều báo XANH**, vì cả hai lần em hỏi *"có tràn RA
+           NGOÀI panel không"* - và câu trả lời là không, thẻ dừng đúng ở mép. Câu phải hỏi là
+           *"có ĐỦ CÁCH mép không"*.
+           *Hỏi "có vượt qua không" thì cái gì dừng đúng ở vạch cũng đạt; mà dừng đúng ở vạch,
+           với mắt người, là đã chạm vào rồi.*
+           Gốc của ca ấy: dải thẻ được đặt làm con TRỰC TIẾP của `.panel`, bỏ qua `.pbody` - cái
+           vỏ giữ đệm. Luật này canh HẬU QUẢ (áp sát viền) chứ không canh cách viết (thiếu
+           `.pbody`), nên nó bắt được cả những cách bỏ đệm khác chưa ai nghĩ ra. */
+        than.querySelectorAll(".panel").forEach(pan => {
+          const pr = pan.getBoundingClientRect();
+          if (pr.width < 40 || pr.height < 20) return;
+          const cs0 = getComputedStyle(pan);
+          /* Bảng cuộn ngang và ảnh nền cố ý chạm mép - hai thứ ấy không đi qua `.pbody`. */
+          [...pan.children].forEach(con => {
+            if (con.classList && (con.classList.contains("ph") || con.classList.contains("tbwrap"))) return;
+            /* BẢNG thì áp mép là CỐ Ý - vạch kẻ của bảng chạy trọn bề ngang panel mới thành một
+               khối liền, và `.tbwrap` (bảng cuộn ngang) đã được miễn ngay dòng trên vì đúng lý do
+               ấy. Miễn theo LÝ DO - "khối này là một cái bảng" - chứ không theo TÊN LỚP: hai chỗ
+               còn lại (`.giapn` ở Bảng công, khối nhóm việc ở Việc hôm nay) không mang lớp
+               `tbwrap` nhưng bên trong vẫn là `<table>`.
+               *Miễn theo tên lớp thì mỗi lần ai đó dựng cùng một thứ dưới một cái tên khác là
+               phải khai lại; miễn theo lý do thì khai một lần.* */
+            if (con.querySelector && con.querySelector("table")) return;
+            const cr = con.getBoundingClientRect();
+            if (cr.width < 40 || cr.height < 10) return;
+            /* KHOẢNG THỞ = phần thụt vào CỘNG đệm của chính khối ấy.
+               Bản đầu chỉ đo phần thụt vào và ra 96 chỗ đỏ - gần hết là `.pbody`, mà `.pbody`
+               THEO THIẾT KẾ ôm trọn bề ngang panel và giữ đệm 6px Ở BÊN TRONG nó. Đo mép ngoài
+               của nó thì bao giờ cũng ra 0.
+               *Khoảng thở không nằm ở chỗ cái hộp bắt đầu - nó nằm ở chỗ CHỮ bắt đầu.* */
+            const csc = getComputedStyle(con);
+            const traiHo = (cr.left - pr.left - parseFloat(cs0.borderLeftWidth || 0)) + parseFloat(csc.paddingLeft || 0);
+            const phaiHo = (pr.right - cr.right - parseFloat(cs0.borderRightWidth || 0)) + parseFloat(csc.paddingRight || 0);
+            /* 3px: đủ để không chạm oan một khối cố ý sát mép vài pixel, mà vẫn bắt được ca
+               đã cắn (1px). */
+            if (traiHo >= 3 && phaiHo >= 3) return;
+            const t0 = (con.textContent || "").replace(/\s+/g, " ").trim().slice(0, 26);
+            ra.apSat.push('"' + t0 + '" (.' + (String(con.className || "").split(" ")[0] || con.tagName) +
+              ") cach vien panel " + Math.round(traiHo) + "px trai / " + Math.round(phaiHo) + "px phai");
+          });
+        });
         /* M5 - CON SỐ BỊ BẺ ĐÔI GIỮA HAI CHỮ SỐ.
            Bẫy cắn 09/08, tìm ra bằng mắt: ô "Tiền công tạm tính" hiện `10.660.0` rồi xuống dòng
            `00đ`. `.bsn{overflow-wrap:anywhere}` đúng cho CHỮ dài (thà xuống dòng còn hơn tràn),
@@ -486,6 +531,7 @@ const CAT_OK = [
     gom(r.batNat, "TRINH DUYET DANG CAT CHU (hoi scrollWidth)");
     gom(r.bopCot, "CHU BI BOP THANH MOT COT HEP");
     gom(r.coCum, "CO CUM - cat chu trong khi hang con bo trong cho");
+    gom(r.apSat, "AP SAT VIEN PANEL - noi dung khong co khoang tho");
   }
 
   /* ═══ M8 · CHA PHẢI NỔI HƠN CON TRÊN MENU (anh Luân 18/08, kèm ảnh: *"menu thiết kế xấu quá,
