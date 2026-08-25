@@ -4087,6 +4087,95 @@ if not _nk:
                % (len(_nk), len(set(x["sheet"] for x in _nk)),
                   len(set(x["staff_id"] for x in _nk))))
 
+# ---- 28. MOI GIAO VIEN DANG LAM PHAI CO HOC VIEN TRONG TAM NHIN ----
+# Anh Luan doi bam Reset demo la MOI CHUC DANH deu co viec. Do lai 26/08 thi thay luat ay dung
+# o muc CHUC DANH ma thung o muc NGUOI: NV037 (Luong Bao Ngoc, Giao vien ACA, dang lam viec) phu
+# trach dung hai lop - mot lop "Dang tuyen sinh" va mot lop "Dang len ke hoach", ca hai deu
+# KHONG CO HOC VIEN NAO. Ma pham vi du lieu cua giao vien di qua hoc vien cua lop ho day, nen
+# dang nhap bang nguoi nay la ca cai app trong: 0 hoc vien, Lich tuan trong, Lop hoc trong.
+# "Chuc danh giao vien co viec" khong cuu duoc nguoi ngoi vao ghe ay.
+#
+# Chua bang cach THAT nhat trong nghiep vu: DOI GIAO VIEN PHU TRACH mot lop dang chay. Khong
+# them dong DL08 (mot hoc vien vao lop thu hai thi phai co don dang ky thu hai - se de lai mot
+# ma tham chieu chet), khong doi class_id cua dong xep lop da co (se bo lai diem danh cua mot
+# lop hoc vien khong con hoc).
+# Buoi DA DAY giu nguyen teacher_id cu - nguoi day that thi cong that; chi buoi TU HOM NAY TRO DI
+# moi sang ten giao vien moi. Do dung la hinh dang cua mot cuoc ban giao lop giua khoa.
+# NGUONG BAT: chi va cho nguoi co DUNG 0 hoc vien - do moi la cai lo that (app trong tron ven).
+# Mot giao vien co 1-2 hoc vien van co lop, co buoi, co bai de cham; keo them cho ho la xao tron
+# du lieu ma khong cuu ai. NGUONG GIU: nguoi cho di phai con it nhat 3 hoc vien, keo lai vua va
+# xong cho nay thi thung cho kia.
+_NGUONG_BAT = 1
+_NGUONG_GIU = 3
+_gvAct = [s for s in R("DL01")
+          if code(s.get("role", "")).startswith("teacher") and code(s.get("status", "")) == "active"]
+_lopTheoGV = {}
+for _c in R("DL10"):
+    _lopTheoGV.setdefault(str(_c.get("main_teacher_id") or ""), []).append(_c)
+_hvTheoLop = {}
+for _b in R("DL08"):
+    _hvTheoLop.setdefault(str(_b.get("class_id") or ""), set()).add(str(_b.get("student_id") or ""))
+
+
+def _hvCuaGV(sid):
+    o = set()
+    for _c in _lopTheoGV.get(sid, []):
+        o |= _hvTheoLop.get(str(_c.get("class_id") or ""), set())
+    return o
+
+
+# THIEU NHAT TRUOC. Ban dau vong lap chay theo thu tu DL01 va lop du duy nhat roi vao nguoi
+# dang co 1 hoc vien, con nguoi co 0 hoc vien thi het lop de nhan - va do la nguoi duy nhat can.
+# *Xep hang theo thu tu bang goc la xep theo thu tu KHONG LIEN QUAN GI toi muc do can.*
+_daChuyen = []
+for _gv in sorted(_gvAct, key=lambda x: len(_hvCuaGV(str(x.get("staff_id") or "")))):
+    _sid = str(_gv.get("staff_id") or "")
+    if len(_hvCuaGV(_sid)) >= _NGUONG_BAT:
+        continue
+    # Lop cho di: lop CON DANG CHAY, du hoc vien de dang mot lop, va nguoi cho di van con du
+    # nguong sau khi cho. Chon lop it hoc vien nhat trong so dat - cho vua du, khong cho nhieu.
+    _ung = []
+    for _c in R("DL10"):
+        if code(_c.get("class_status", "")) not in ("in_progress", "open"):
+            continue
+        _chu = str(_c.get("main_teacher_id") or "")
+        if not _chu or _chu == _sid:
+            continue
+        _n = len(_hvTheoLop.get(str(_c.get("class_id") or ""), set()))
+        if _n < _NGUONG_GIU:
+            continue
+        if len(_hvCuaGV(_chu) - _hvTheoLop.get(str(_c.get("class_id") or ""), set())) < _NGUONG_GIU:
+            continue
+        _ung.append((_n, _c))
+    if not _ung:
+        continue
+    _ung.sort(key=lambda x: x[0])
+    _n, _c = _ung[0]
+    _cu = str(_c.get("main_teacher_id") or "")
+    _c["main_teacher_id"] = _sid
+    _moc = NOW.replace(hour=0, minute=0)
+    _soBuoi = 0
+    for _s in R("DL11"):
+        if str(_s.get("class_id") or "") != str(_c.get("class_id") or ""):
+            continue
+        _ng = dt(_s.get("session_date"))
+        if not _ng or _ng < _moc:
+            continue
+        _s["teacher_id"] = _sid
+        _s["teacher_id_name"] = _gv.get("full_name") or ""
+        _soBuoi += 1
+    _lopTheoGV.setdefault(_sid, []).append(_c)
+    _lopTheoGV[_cu] = [x for x in _lopTheoGV.get(_cu, []) if x is not _c]
+    _daChuyen.append((_sid, _gv.get("full_name") or _sid, _c.get("class_id"), _cu, _n, _soBuoi))
+
+if _daChuyen:
+    log.append("28. Giao vien khong co hoc vien nao: chuyen lop phu trach cho %d nguoi (%s)"
+               % (len(_daChuyen),
+                  " · ".join("%s <- %s (%d HV, %d buoi toi doi ten)" % (x[1], x[2], x[4], x[5])
+                             for x in _daChuyen)))
+else:
+    log.append("28. Giao vien khong co hoc vien nao: khong con ai")
+
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("  12. Da tao DL22 referral +", len(dl["DL22"]), "luot | DL19 thuong:", len(dl["DL19"]))
 for _l in log[-6:]: print("  "+_l)

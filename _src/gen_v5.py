@@ -6152,6 +6152,16 @@ function lstXem(arg){
     và từ V2 nó là trang con chính thức của Lớp học - hai tên cho một chỗ là người ta phải bấm
     thử mới biết (luật M1 "một việc chỉ một tên" của `_checkaudit`). */
  if(r.class_id)nut.push('<button class="btn primary" onclick="openLop(\''+esc(r.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Vận hành lớp</button>');
+ /* ═══ 26/08 - MỘT DÒNG NGƯỜI KHÔNG ĐƯỢC LÀ NGÕ CỤT ═══════════════════════════════════════════
+    Ba câu hỏi ở trên đi tìm học viên, khách và lớp - không câu nào hỏi tới NHÂN SỰ. Nên sổ
+    `giangvien` (`ro:1`, không `act`, không `lam`, dòng DL01 không mang `student_id`/`lead_id`/
+    `class_id`) mở ngăn kéo ra chỉ có một tờ khai cột và câu "sổ này chỉ để tra cứu" - trong khi
+    app CÓ sẵn hồ sơ đầy đủ của một nhân sự (`hosogv` / `hosonv`) và một ngăn kéo xem nhanh.
+    `_checkbam` đã ghi chú ba lần ("ngăn kéo không có nút nào, 233 ký tự") nhưng để ở mức
+    không-đỏ, nên nó nằm đó.
+    *Cửa đã có sẵn mà không nối vào thì người dùng không biết là có.* */
+ if(cfg.code==="DL01"&&String(r.staff_id||"").trim())
+  nut.push('<button class="btn primary" onclick="closeModal();'+(isGVRole(r)?"openGV":"openNV")+'(\''+esc(r.staff_id)+'\')"><i class="ti ti-id-badge-2"></i>Hồ sơ đầy đủ</button>');
  (cfg.act||[]).forEach(function(a){
   nut.push('<button class="btn" onclick="'+a.fn+'(\''+esc(String(r[a.arg]||""))+'\')"><i class="ti '+a.ic+'"></i>'+esc(a.lb)+'</button>')});
  if(!cfg.ro)nut.push('<button class="btn primary" onclick="closeModal();openEdit(\''+esc(key)+'\',\''+esc(id)+'\')"><i class="ti ti-edit"></i>Sửa bản ghi</button>');
