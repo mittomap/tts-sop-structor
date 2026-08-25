@@ -4545,8 +4545,19 @@ function mkKhoCu(){return scopeList("DL02",rows("DL02")).filter(function(l){
 /* Cột thật của DL19 là `granted_at`, KHÔNG phải `reward_granted_at` - viết nhầm tên cột thì ô
    này đếm cả những phần thưởng đã trao và không ai nghi ngờ, vì con số vẫn trông hợp lý.
    Bẫy này đã cắn ở phiên trước với `placement_time` / `reservation_end_date`. */
-function mkThuongTreo(){return rows("DL19").filter(function(r){
- return String(r.referred_name||"").trim()&&!String(r.granted_at||"").trim()}).length}
+/* ═══ 26/08 - MỘT KHÁI NIỆM, MỘT PHÉP ĐẾM ═══════════════════════════════════════════════════
+   Ô "Thưởng giới thiệu chưa trao" trên bảng việc Marketing từng có phép đếm RIÊNG, lệch với hai
+   nơi kia đúng hai đường một lúc: nó đọc `rows` (toàn trung tâm) trong khi trang Mã giới thiệu
+   và hàng chờ SLA đọc `srows` (phạm vi người xem), VÀ nó định nghĩa "còn treo" bằng
+   `granted_at` rỗng trong khi hai nơi kia hỏi `reward_status = pending`.
+   Trước 26/08 chỗ lệch này bị che: Marketing khai `tien:"none"` nên `srows("DL19")` luôn bằng 0,
+   hai con số là 2 và 0 - đủ khác nhau để không ai đối chiếu. Mở đúng miền dữ liệu cho họ xong
+   thì nó thành 2 và 1, và `_checkcauhoi` bắt ngay: *"nhịp nói 2 mà chip hiện 1 - hai con số cho
+   cùng một câu hỏi"*.
+   *Sửa một chỗ sai làm lộ ra chỗ sai thứ hai không phải là làm hỏng thêm - đó là chỗ sai thứ
+   hai thôi hết chỗ nấp.*
+   Nay ô thẻ đọc thẳng `mgtChoChi()` - đúng danh sách mà bấm vào sẽ thấy. */
+function mkThuongTreo(){return mgtChoChi().length}
 var BVLAND={tuvan:["viec",null],marketing:["tuyensinh","lead"],hocvu:["xeplop",null],aca:["hoctap","lop"],
  giaovien:["hoctap","today"],wow:["hoctap","wow"],ketoan:["tuyensinh","thanhtoan"],
  hotro:["giaoviec",null],nhansu:["nhansu",null],dieuhanh:["baocao",null],quantri:["viec",null]};
@@ -21176,7 +21187,7 @@ function renderMaGioiThieu(embed){
  h+=tbar(srchHTML(window.MGQ||"","window.MGQ=this.value;reRenderKeep(CUR)","Tìm tên, SĐT hoặc mã...",300),
   cotNutHTML("magt")+'<span class="tbcnt">'+list.length+'/'+amb.length+' học viên</span>');
  h+=chipBar("magioithieu",mgF,[["all","Tất cả",amb.length],
-  ["cho","Thưởng còn treo",nCho,nCho?"red":""],
+  ["cho","Chủ mã có thưởng treo",nCho,nCho?"red":""],
   ["chay","Đã có người đăng ký",nChay]],list.length);
  h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Học viên chủ mã</th><th>Mã giới thiệu</th><th>Lượt dùng</th><th>Đã đăng ký</th>'+(dsLevel("tien")==="none"?'':'<th>Ưu đãi đã cấp</th>')+'<th>Thưởng</th><th></th></tr></thead><tbody>';
  if(!list.length)h+='<tr><td class="empty" colspan="7">Chưa có mã giới thiệu nào được dùng.</td></tr>';
@@ -21822,6 +21833,18 @@ function ttToiHan(){return srows("DL06").filter(function(e){var s=pinfo(e),du=pv
 function reupToiHen(){return tsReupList().filter(function(J){var nf=jNF(J);return !!(nf&&nf<=endToday())})}
 /* Mã giới thiệu có thưởng còn treo, chưa chi. */
 function mgtChoChi(){return srows("DL19").filter(function(r){return isc(r.reward_status,"pending")})}
+/* ═══ 26/08 - HAI CON SỐ CHO MỘT CÂU HỎI, VÌ CHÚNG ĐẾM HAI ĐƠN VỊ ═══════════════════════════
+   Nhịp ngày của Marketing đếm PHẦN THƯỞNG còn treo (2), còn chip trên trang Mã giới thiệu lọc
+   bảng "học viên chủ mã" nên đếm NGƯỜI (1) - hai phần thưởng ấy cùng một người giới thiệu.
+   `_checkcauhoi` bắt: *"nhịp nói 2 mà chip hiện 1 - hai con số cho cùng một câu hỏi"*.
+   Cả hai con số đều ĐÚNG, cái sai là chúng đứng cạnh nhau mà không nói mình đang đếm gì. Nay:
+   chip mang đúng tên đơn vị của nó ("Chủ mã có thưởng treo") và nhịp đếm cùng đơn vị ấy, còn
+   bảng ngay dưới vẫn đếm phần thưởng và vẫn ghi rõ "Thưởng còn treo, chưa trao (N)" - nên không
+   con số nào biến mất, chỉ là mỗi con số nói ra nó đang đếm cái gì.
+   *Hai phép đếm khác đơn vị đứng cạnh nhau thì người đọc không kết luận "hai đơn vị", họ kết
+   luận "một trong hai sai".* */
+function mgtChoChiAi(){var o={};mgtChoChi().forEach(function(r){
+ var k=r.referrer_student_id||r.referrer_name;if(k)o[k]=1});return Object.keys(o)}
 /* DL19 chỉ ghi TÊN người được giới thiệu, không ghi mã HV - muốn bấm được vào tên thì phải lần
    ngược DL19 -> DL22 (lượt dùng mã) -> DL06 (đơn) mới ra student_id. Không có đơn thì trả rỗng,
    nguoiLnk tự in chữ thường. */
@@ -29230,7 +29253,7 @@ var NHIP={
   ["chieu","Khơi lại kho khách cũ","Khách đã nguội vẫn rẻ hơn khách mới - mỗi ngày chạm lại một ít","reup",
    function(){return reupToiHen().length},"toihen"],
   ["chieu","Xem mã giới thiệu ai đang chạy","Khách cũ giới thiệu là nguồn rẻ nhất, đừng để thưởng treo","magioithieu",
-   function(){return mgtChoChi().length},"cho"]],
+   function(){return mgtChoChiAi().length},"cho"]],
  /* V9.44 - NHỊP NGÀY CHO NHÓM HỖ TRỢ (HR, IT, bảo vệ, tạp vụ). Họ không đụng vào phễu hay lớp
     học, chỉ làm việc qua module Giao việc - nhưng "không có nhịp" khác hẳn "nhịp ngắn". */
  hotro:[
