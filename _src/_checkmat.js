@@ -81,15 +81,19 @@ const TRANG = ["banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","hocvi
      trôi hai dòng bị chấm là "bị phủ lên").
      *Một danh sách "các trang chính" không có con số đi kèm thì nó là một lời hứa, không phải
      một phạm vi.*
-     HAI TRANG CÒN THIẾU - `hanhtrinh` và `chang` - KHÔNG đưa vào đây, và đó là một VIỆC TỒN
-     THẬT chứ không phải một ngoại lệ: trên `hanhtrinh` còn một chỗ hai chữ đè nhau 18x14px mà
-     em đã sửa BỐN lần theo chiều ngang (cho vỏ co · cho tên co · chặn tràn · cho thành khối
-     riêng) và lần nào đo lại cũng y nguyên - tức là em chưa hiểu cơ chế, mà khai ngoại lệ cho
-     một thứ mình chưa hiểu thì đó là tắt đèn chứ không phải dọn nhà. Ghi vào VIỆC TỒN. */
+     26/08 - HAI TRANG `hanhtrinh` VÀ `chang` NAY ĐÃ VÀO DANH SÁCH. Chúng bị rút ra hôm 25/08 vì
+     `hanhtrinh` báo hai chữ đè nhau 18x14px mà em sửa BỐN lần theo chiều ngang đều không suy
+     suyển - và vì chưa hiểu cơ chế nên không khai ngoại lệ (khai ngoại lệ cho một thứ mình chưa
+     hiểu là tắt đèn chứ không phải dọn nhà).
+     Hôm nay đo tới nơi thì ra **app không sai một chỗ nào**: đứa con `<i>5/7</i>` trôi ra ngoài
+     khối cha `.msnh` 73px và rơi lên thẻ của cột bên cạnh, nhưng cha có `overflow:hidden` nên
+     phần trôi ra ấy bị cắt sạch - mắt không thấy một pixel nào. Cái sai nằm ở phép đo: nó đọc
+     `getBoundingClientRect()` mà không hỏi tổ tiên có cắt hay không. Đã dạy `nhinThay` hỏi câu
+     đó (xem `biCatHet`), và hai trang này quay lại danh sách. */
   "ban","dsphuhuynh","socamket","hoidap","giaoan","hosogv","hosonv","hosokhoa","buoihoc","baoluu",
   "dashboard","review","ghinhan","chay","hoso","banwow","banggiao","xeplop","test",
   "tuvan","wow","dsthanhtoan","gvdp","phong","tinnhan","magioithieu","khieunai","ketqua",
-  "lichwow","banglop"];
+  "lichwow","banglop","hanhtrinh","chang"];
 
 /* Chỗ được phép cắt chữ, kèm lý do đọc được. Thêm dòng vào đây là một quyết định. */
 const CAT_OK = [
@@ -278,13 +282,62 @@ const CAT_OK = [
          Nay so cac O CHU LA (khong con phan tu con), bo qua cap co quan he to-tien, bo qua chu
          troi nhieu dong va lop noi, va doi giao nhau day dan (>4px ca hai chieu). */
       (function(){
+        /* ═══ 26/08 - "CÓ TOẠ ĐỘ" KHÔNG CÓ NGHĨA LÀ "HIỆN RA" ═════════════════════════════════════
+           Việc tồn treo từ 25/08: trên `hanhtrinh` có hai chữ đè nhau **18x14px** mà em sửa BỐN
+           lần theo chiều ngang đều không suy suyển - và vì chưa hiểu cơ chế nên KHÔNG khai ngoại
+           lệ, để nguyên đó cùng hai trang bị rút khỏi danh sách.
+           Đo lại cho tới nơi thì ra: `<i>5/7</i>` nằm ở **x=1831**, trong khi khối cha `.msnh`
+           của chính nó chỉ tới **x=1758**. Đứa con đã trôi ra ngoài cha 73px và rơi đúng lên thẻ
+           của **cột kanban bên cạnh** (`cungStrip: false` - hai thẻ khác nhau, hai cột khác nhau).
+           Mà `.msnh` có `overflow:hidden`, nên phần trôi ra ấy **bị cắt sạch, mắt không thấy một
+           pixel nào**. `getBoundingClientRect()` vẫn trả về toạ độ chưa cắt - đó là hợp đồng của
+           nó, không phải lỗi của nó.
+           Nên **app không sai một chỗ nào**: bốn bản vá kia không ăn vì không có gì để vá.
+           *Một phép đo hình học đọc toạ độ mà không hỏi tổ tiên có cắt hay không thì nó đang đo
+           một thế giới rộng hơn cái màn hình - và mọi thứ trôi ra ngoài đều thành "đè nhau".*
+           CHỈ tính `hidden` và `clip` - hai thứ cắt VĨNH VIỄN. `auto`/`scroll` thì cuộn một cái
+           là thấy, chỗ hỏng ở đó vẫn là chỗ hỏng thật.
+           Luật "chữ bị cắt" (`batNat`) KHÔNG đi qua cửa này, nên chỗ nào cắt chữ thật vẫn bị bắt
+           như cũ - đây chỉ thôi coi phần đã bị cắt là "đang hiện". */
+        /* DỪNG Ở KHỐI CUỘN ĐẦU TIÊN - bản đầu của phép này KHÔNG dừng, và nó suýt giết cả ba luật
+           đang dùng `nhinThay` mà vẫn in ra màu xanh.
+           Bẫy: vỏ app có một khối cao đúng bằng màn hình mang `overflow:hidden`, còn phần cuộn
+           thật nằm ở `#content` (`overflow-y:auto`) BÊN TRONG nó. Cứ leo lên mà cắt thì mọi thứ
+           nằm dưới nếp gấp - tức gần hết trang - đều bị chấm là "đã bị cắt, không nhìn thấy".
+           Đo được lúc thử phá: số lá chữ trên `hanhtrinh` tụt từ **738 xuống 59**, mà bảng kết
+           quả vẫn xanh.
+           *Một phép đo bị nới lỏng thì nó không kêu lên - nó chỉ im lặng hơn trước, và im lặng
+           thì trông y hệt như sạch.*
+           Luật đúng: gặp khối CUỘN ĐƯỢC trên trục nào thì thôi cắt theo trục ấy - cuộn một cái
+           là thấy, nên đó không phải "cắt vĩnh viễn". Chỉ `hidden`/`clip` trên một khối mà mình
+           gặp TRƯỚC khối cuộn mới thật sự cắt mất. */
+        const biCatHet = el => {
+          const r = el.getBoundingClientRect();
+          let x1 = r.left, y1 = r.top, x2 = r.right, y2 = r.bottom;
+          let catX = true, catY = true;
+          for (let p = el.parentElement; p && p !== document.body && (catX || catY); p = p.parentElement) {
+            const pc = getComputedStyle(p);
+            const pr = p.getBoundingClientRect();
+            if (catX) {
+              if (/auto|scroll/.test(pc.overflowX)) catX = false;
+              else if (/hidden|clip/.test(pc.overflowX)) { x1 = Math.max(x1, pr.left); x2 = Math.min(x2, pr.right); }
+            }
+            if (catY) {
+              if (/auto|scroll/.test(pc.overflowY)) catY = false;
+              else if (/hidden|clip/.test(pc.overflowY)) { y1 = Math.max(y1, pr.top); y2 = Math.min(y2, pr.bottom); }
+            }
+            if (x2 - x1 <= 1 || y2 - y1 <= 1) return true;
+          }
+          return false;
+        };
         const nhinThay = el => {
           const cs = getComputedStyle(el);
           if (cs.display === "none" || cs.visibility === "hidden" || +cs.opacity === 0) return false;
           if (cs.position === "absolute" || cs.position === "fixed") return false;
           if (el.getClientRects().length !== 1) return false;
           const r = el.getBoundingClientRect();
-          return r.width > 0 && r.height > 0;
+          if (r.width <= 0 || r.height <= 0) return false;
+          return !biCatHet(el);
         };
         const than = document.getElementById("content"); if (!than) return;
         /* M8 - HỎI THẲNG TRÌNH DUYỆT XEM NÓ CÓ ĐANG CẮT CHỮ KHÔNG.

@@ -1662,3 +1662,52 @@ Cach tranh: truoc khi dat ten lop moi, `grep -c` cai ten do trong `gen_v5.py`. R
 Thang co chu vot 16 -> 19 bac, thang bo goc 10 -> 11 bac, bang mau 110 -> 112 ma - vi lop thi
 giac moi de ra bac moi thay vi dung lai bac da co. Luat nay da ghi tu 24/08 ("mot co chu moi
 khong bao gio chi la mot co chu moi") va van bi pham. Sua bang cach dung lai token co san.
+
+---
+
+## 26/08 - "CO TOA DO" KHONG CO NGHIA LA "HIEN RA" (`_checkmat`, dong hai viec ton)
+
+Hai trang `hanhtrinh` va `chang` bi rut khoi danh sach hom 25/08 vi mot cho do chua hieu. Nay ca
+hai da quay lai: **56 trang x 2 kho man, xanh**.
+
+### hanhtrinh 18x14px - app khong sai mot cho nao
+
+`<i>5/7</i>` nam o **x=1831**, khoi cha `.msnh` cua chinh no chi toi **x=1758**. Dua con troi ra
+ngoai cha 73px va roi len the cua **cot kanban ben canh**. Ma `.msnh` co `overflow:hidden` nen
+phan troi ra bi cat sach - mat khong thay mot pixel nao. `getBoundingClientRect()` van tra toa do
+chua cat; do la hop dong cua no.
+
+> *Mot phep do hinh hoc doc toa do ma khong hoi to tien co cat hay khong thi no dang do mot the
+> gioi rong hon cai man hinh - va moi thu troi ra ngoai deu thanh "de nhau".*
+
+Bon ban va truoc do khong an vi **khong co gi de va**.
+
+### Va ban va DAU TIEN cho phep do ay suyt giet ca ba luat
+
+`nhinThay` duoc day leo len hoi to tien - nhung leo toi cung. Vo app co mot khoi cao dung bang
+man hinh mang `overflow:hidden`, con phan cuon that nam o `#content` ben trong no. Cu leo ma cat
+thi **moi thu duoi nep gap deu bi cham la "da bi cat"**.
+
+| | so la chu tren `hanhtrinh` | thu pha (xo hai chu de len nhau) |
+|---|---|---|
+| ban va v1 | **59** | bat 0 cho |
+| ban va v2 (dung) | **738** | bat 40 cho |
+
+> *Mot phep do bi noi long thi no khong keu len - no chi im lang hon truoc, va im lang thi trong
+> y het nhu sach.*
+
+Luat dung: **gap khoi CUON DUOC tren truc nao thi thoi cat theo truc ay** - cuon mot cai la thay,
+nen do khong phai "cat vinh vien".
+
+**Bai hoc ve quy trinh:** sua mot bo kiem thi phai THU PHA no ngay sau do. Neu chi chay lai va
+thay xanh, thi mot bo kiem da chet cung cho ra dung mau xanh ay.
+
+### chang 57px - loi that, va truoc day va sai huong
+
+Do ra cho trong co that: `o 177px = bieu tuong 30 + mui ten 14 + so dem 28 + ba khe 8px -> chu
+con 57px`. Ba thu kia deu co dinh va deu dang giu.
+
+> *Cho chu co chi chia lai phan con thua; khi phan thua da het thi phai tra lai cho, khong phai
+> chia tiep.*
+
+Duoi 560px moi the mot hang: nhan tu **57px -> 242px**.

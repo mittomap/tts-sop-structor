@@ -3298,6 +3298,19 @@ body.drsz .drawer{transition:none}
 .arcjob .ajt{flex:1 1 auto;min-width:0}
 .arcjob .ajn{margin-left:auto;flex:0 0 auto;font-size:11px;font-weight:800;background:var(--bg);border-radius:20px;padding:2px 7px;color:var(--navy)}
 @media(max-width:820px){.arcjobs{flex-wrap:wrap}.arcjob{flex:1 1 44%}}
+/* ═══ 26/08 - 177px KHÔNG ĐỦ CHO MỘT CÁI NHÃN CỘNG BA THỨ CỐ ĐỊNH ══════════════════════════
+   Việc tồn treo từ 25/08: trên khổ điện thoại, nhãn "Lead & khai thác" bị bóp còn **57px trong
+   khối 177px** và vỡ ba dòng. Trước đây em vá bằng cách cho chữ co (`min-width:0`, `flex:1 1
+   auto`, cho xuống dòng) - đúng nhưng không cứu được, vì đo ra mới thấy chỗ trống có thật chỉ
+   còn đúng bấy nhiêu:
+     ô 177px = biểu tượng 30 + mũi tên 14 + số đếm 28 + ba khe 8px  ->  chữ còn 57px.
+   Ba thứ kia đều cố định và đều đáng giữ. Nên cái sai không nằm ở chữ - nó nằm ở chỗ **ép hai
+   thẻ nằm cạnh nhau trên một màn 390px**: luật `flex:1 1 44%` đặt cho khoảng 820px, và ở 390px
+   nó vẫn còn hiệu lực.
+   *Cho chữ co chỉ chia lại phần còn thừa; khi phần thừa đã hết thì phải trả lại chỗ, không phải
+   chia tiếp.*
+   Dưới 560px cho mỗi thẻ một hàng - nhãn có ~250px, đủ nằm một dòng. */
+@media(max-width:560px){.arcjob{flex:1 1 100%}}
 .arcjob .ajn.hot{background:#FBF0EF;color:var(--red)}
 @media(max-width:640px){.nsl{max-width:74px}.nst{min-width:72px}}
 /* V9.67: trên điện thoại thẻ dòng phải ĐƯỢC XUỐNG DÒNG. Luật `flex-wrap:nowrap` ở trên đúng cho

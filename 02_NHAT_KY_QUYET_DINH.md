@@ -179,7 +179,40 @@
 > · **Cổng phụ huynh chưa chụp lại** sau đợt nâng cấp - nó dùng chung thân trang nhưng ẩn hai mục
 >   riêng tư, nên thứ tự nhóm mới có thể để lại một nhóm rỗng.
 
-> ### 📋 25/08 - CÒN TREO THẬT: HAI CHỖ TRÊN `hanhtrinh` VÀ `chang`
+> ### ✅ 26/08 - ĐÓNG HAI VIỆC TỒN TREO TỪ 25/08: MỘT CÁI KHÔNG PHẢI LỖI, MỘT CÁI LÀ LỖI THẬT
+>
+> Mục ngay dưới đây treo từ 25/08, kèm lời tự dặn *"sửa bốn lần không ăn thì đừng sửa lần thứ
+> năm cùng một hướng - em chưa hiểu cơ chế"*. Hôm nay đi hiểu cơ chế.
+>
+> **`hanhtrinh` 18×14px: APP KHÔNG SAI MỘT CHỖ NÀO.** Đo tới nơi thì `<i>5/7</i>` nằm ở **x=1831**
+> trong khi khối cha `.msnh` của chính nó chỉ tới **x=1758** - đứa con trôi ra ngoài cha 73px và
+> rơi đúng lên thẻ của **cột kanban bên cạnh** (hai thẻ khác nhau, hai cột khác nhau). Mà `.msnh`
+> có `overflow:hidden`, nên phần trôi ra ấy **bị cắt sạch - mắt không thấy một pixel nào**.
+> `getBoundingClientRect()` vẫn trả toạ độ chưa cắt; đó là hợp đồng của nó, không phải lỗi của nó.
+> Bốn bản vá kia không ăn vì **không có gì để vá**.
+> *Một phép đo hình học đọc toạ độ mà không hỏi tổ tiên có cắt hay không thì nó đang đo một thế
+> giới rộng hơn cái màn hình - và mọi thứ trôi ra ngoài đều thành "đè nhau".*
+>
+> **VÀ BẢN VÁ ĐẦU TIÊN CHO CHÍNH PHÉP ĐO ẤY SUÝT GIẾT CẢ BA LUẬT.** Em dạy `nhinThay` leo lên hỏi
+> tổ tiên - nhưng leo tới cùng. Vỏ app có một khối cao đúng bằng màn hình mang `overflow:hidden`,
+> còn phần cuộn thật nằm ở `#content` bên trong nó; nên **mọi thứ dưới nếp gấp đều bị chấm là "đã
+> bị cắt"**. Thử phá mới lộ: số lá chữ trên `hanhtrinh` tụt từ **738 xuống 59** mà bảng kết quả
+> vẫn xanh, và cố ý xô hai chữ đè lên nhau thì bộ kiểm vẫn báo 0 chỗ.
+> *Một phép đo bị nới lỏng thì nó không kêu lên - nó chỉ im lặng hơn trước, và im lặng thì trông
+> y hệt như sạch.*
+> Luật đúng: **gặp khối cuộn được trên trục nào thì thôi cắt theo trục ấy.** Thử phá lại: bình
+> thường 0 chỗ, cố ý xô thì bắt **40 chỗ**.
+>
+> **`chang` nhãn 57px: LỖI THẬT, và trước đây em vá sai hướng.** Đo ra chỗ trống có thật:
+> `ô 177px = biểu tượng 30 + mũi tên 14 + số đếm 28 + ba khe 8px → chữ còn 57px`. Ba thứ kia đều
+> cố định và đều đáng giữ, nên cái sai không nằm ở chữ - nó nằm ở chỗ **ép hai thẻ nằm cạnh nhau
+> trên một màn 390px** (luật `flex:1 1 44%` đặt cho khoảng 820px mà ở 390px vẫn còn hiệu lực).
+> *Cho chữ co chỉ chia lại phần còn thừa; khi phần thừa đã hết thì phải trả lại chỗ, không phải
+> chia tiếp.* Dưới 560px mỗi thẻ một hàng: nhãn từ **57px → 242px**, nằm gọn một dòng.
+>
+> Hai trang đã quay lại danh sách của `_checkmat`: **56 trang × 2 khổ màn, xanh**.
+
+> ### 📋 25/08 (đã đóng 26/08) - CÒN TREO THẬT: HAI CHỖ TRÊN `hanhtrinh` VÀ `chang`
 > Mở rộng `_checkmat` từ 19 lên 52 trang (audit mảng 9: đếm ra **33 trang chưa từng bị đo hình
 > học**) thì ra 24 chỗ đỏ. 21 chỗ đã vá trong lượt này, 3 chỗ là lỗi của chính thước. Còn hai:
 > · **`hanhtrinh`**: `<i>5/7</i>` và `.msarc "C1"` của cùng một dải chặng đè nhau **18×14px**,
