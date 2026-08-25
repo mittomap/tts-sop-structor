@@ -31254,12 +31254,25 @@ function hvChao(greet,S){
    quen mot cho, ma quen thi khong ai thay. Doi o dung mot cua ra thi hoac dung het, hoac sai
    het - va co bo kiem canh.
    Chua "ban be" (chuong trinh gioi thieu ban be) - do la danh tu, khong phai dai tu. */
+/* 26/08 - LOP CHE "BAN BE" CHUA BAO GIO CHAY MOT LAN NAO.
+   Ham nay doi xung ho cho che do phu huynh: "ban" -> "anh/chi/co/bac" theo quan he da khai. No
+   CO mot lop che cho cum "ban be" - vi day la DANH TU (friends), khong phai dai tu - nhung lop
+   che ay viet `\bban be\b`, va **`\b` cua JavaScript la ranh gioi theo ASCII**: chu `e` co dau
+   huyen khong phai ky tu tu trong bang ASCII, nen `\b` dung sau no chi khop khi ky tu KE TIEP
+   la chu cai ASCII. Trong app, sau "ban be" luon la `<`, dau cach hay dau cham - **khong mot
+   cho nao khop**. Nen phu huynh mo cong ra doc thay "Gioi thieu ANH BE", "Gioi thieu CHI BE".
+   Day la lan thu HAI du an can dung cai bay ASCII nay - lan truoc la "CHANG" bi `\b` cat thanh
+   CH+NG trong `_checkaudit` (ghi o README_SRC, nhom M6b).
+   *Mot lop bao ve viet ra ma chua bao gio chay thi no khong phai la bao ve - no la mot loi hua
+   nam trong ma nguon.*
+   Bo `\b` o duoi: cum "ban be" da du dac thu. `\b` o dau van giu - no dung truoc `b` (ASCII)
+   nen chay dung, va no chan viec khop vao giua mot tu. */
 function hvXungLoc(h){
  if(!hvPH())return h;
  var x=hvXung(),X=hvXungHoa();
  return String(h)
-  .replace(/\bb\u1ea1n b\u00e8\b/g,"\u0001")
-  .replace(/\bB\u1ea1n b\u00e8\b/g,"\u0002")
+  .replace(/\bb\u1ea1n b\u00e8/g,"\u0001")
+  .replace(/\bB\u1ea1n b\u00e8/g,"\u0002")
   .replace(/\bb\u1ea1n\b/g,x).replace(/\bB\u1ea1n\b/g,X)
   .replace(/\u0001/g,"b\u1ea1n b\u00e8").replace(/\u0002/g,"B\u1ea1n b\u00e8")}
 /* ═══ 26/08 - XẾP LẠI NHÓM, VÀ TRẢ LẠI MỘT LUẬT CŨ EM VỪA ĐẠP LÊN ═══════════════════════════
@@ -31363,7 +31376,16 @@ function hvNav(){var h="",BK={};
  HVGRP.forEach(function(G){
   var items=G[1].filter(function(k){return BK[k]&&document.getElementById(k)&&!hvAn(k)});
   if(!items.length)return;
-  h+='<div class="hvgrph">'+esc(G[0])+'</div>';
+  /* ═══ 26/08 - MOT NHOM CON MOT MUC THI CAI TEN NHOM THANH LOI HUA HAO ═══════════════════════
+     Che do phu huynh an hai muc rieng tu ("Trao doi" va "Gop y" - chuyen rieng giua em va trung
+     tam). Nhom "Noi chuyen voi trung tam" con dung MOT muc: "Gioi thieu ban be" - ma cai do
+     khong phai mot kenh lien lac. Phu huynh doc tieu de nhom roi bam vao, nhan duoc mot ma
+     gioi thieu.
+     Nhom con mot muc thi bo tieu de di, de muc ay dung mot minh - thua khong co ten con hon
+     mang mot cai ten noi sai ve chinh no.
+     *Tieu de nhom la mot loi hua ve nhung gi nam duoi no; con mot muc thi loi hua ay chi con
+     mot co hoi de dung, va o day no truot.* */
+  if(items.length>1)h+='<div class="hvgrph">'+esc(G[0])+'</div>';
   items.forEach(function(k){var x=BK[k];
    var n=num((window.HVDEM||{})[x[0]]);
    h+='<div class="hvni" data-s="'+x[0]+'" onclick="hvGo(\''+x[0]+'\')"><i class="ti '+x[2]+'"></i><span>'+esc(x[1])+'</span>'+
