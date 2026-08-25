@@ -70,7 +70,26 @@ const TRANG = ["banlam","tuyensinh","hoctap","banglop","cskh","thanhtoan","hocvi
   {k: "diemdanh", ten: "diemdanh"},
   {k: "baitap", ten: "baitap/thu",     dat: "window.BTMODE='thu'"},
   {k: "baitap", ten: "baitap/cham",    dat: "try{var _c=(DL.DL13||[]).filter(function(x){return x.class_id})[0];if(_c)window.BTCLASS=_c.class_id}catch(e){} window.BTMODE='cham'"},
-  {k: "baitap", ten: "baitap/chocham", dat: "window.BTMODE='chocham'"}];
+  {k: "baitap", ten: "baitap/chocham", dat: "window.BTMODE='chocham'"},
+  /* ═══ V2 25/08 - 31 TRANG CHƯA TỪNG BỊ ĐO HÌNH HỌC ═══════════════════════════════════════════
+     Audit trọn 9 mảng: đếm ra bộ này chỉ đi qua **19 trên 52 trang** trong `RENDER`. Ba lần trước
+     bài học đều được ghi là "danh sách phải phủ đủ KIỂU BỐ CỤC" - nhưng "đủ kiểu bố cục" là một
+     câu tự trấn an không kiểm chứng được, còn "33 trang chưa ai nhìn" là một con số.
+     Chạy thử với danh sách mở rộng: **24 chỗ đỏ**, trong đó 21 chỗ thật đã vá trong lượt này
+     (dải chặng tràn khỏi cột · nhãn chặng cắt chữ · tên trong thẻ chọn người · ô chọn tuần ·
+     câu mời ở ô hỏi Trợ lý) và 3 chỗ là LỖI CỦA CHÍNH THƯỚC (ô tích bị đo bề rộng chữ · link
+     trôi hai dòng bị chấm là "bị phủ lên").
+     *Một danh sách "các trang chính" không có con số đi kèm thì nó là một lời hứa, không phải
+     một phạm vi.*
+     HAI TRANG CÒN THIẾU - `hanhtrinh` và `chang` - KHÔNG đưa vào đây, và đó là một VIỆC TỒN
+     THẬT chứ không phải một ngoại lệ: trên `hanhtrinh` còn một chỗ hai chữ đè nhau 18x14px mà
+     em đã sửa BỐN lần theo chiều ngang (cho vỏ co · cho tên co · chặn tràn · cho thành khối
+     riêng) và lần nào đo lại cũng y nguyên - tức là em chưa hiểu cơ chế, mà khai ngoại lệ cho
+     một thứ mình chưa hiểu thì đó là tắt đèn chứ không phải dọn nhà. Ghi vào VIỆC TỒN. */
+  "ban","dsphuhuynh","socamket","hoidap","giaoan","hosogv","hosonv","hosokhoa","buoihoc","baoluu",
+  "dashboard","review","ghinhan","chay","hoso","banwow","banggiao","xeplop","test",
+  "tuvan","wow","dsthanhtoan","gvdp","phong","tinnhan","magioithieu","khieunai","ketqua",
+  "lichwow","banglop"];
 
 /* Chỗ được phép cắt chữ, kèm lý do đọc được. Thêm dòng vào đây là một quyết định. */
 const CAT_OK = [
@@ -168,6 +187,13 @@ const CAT_OK = [
       c.querySelectorAll("input:not([type=hidden]), .bsn, .bsl, .crb, h1, h2, h3, h4, b, .chip, button").forEach(el => {
         const cs = getComputedStyle(el);
         if (cs.display === "none" || cs.visibility === "hidden") return;
+        /* Ô TÍCH / Ô TRÒN: `value` của chúng là MÃ GỬI ĐI, không phải chữ hiện ra màn.
+           Bẫy đo được 25/08 khi mở rộng danh sách trang: `<input type="checkbox" class="bgck"
+           value="L-2026-00006">` bị chấm là "cắt chữ, thiếu 66px" - trong khi ô tích rộng 16px
+           là đúng và không ai đọc cái mã trong nó. Bốn dòng đỏ trên trang Bàn giao lead, cả bốn
+           đều oan.
+           *Đo bề rộng chữ của một ô thì phải hỏi trước: ô này CÓ hiện chữ ra không.* */
+        if (el.tagName === "INPUT" && /^(checkbox|radio|hidden|file|range|color)$/i.test(el.type || "")) return;
         const box = el.getBoundingClientRect();
         if (box.width < 8 || box.height < 6) return;
         /* Chỉ đo phần tử TỰ NÓ mang chữ - đo cả thẻ bọc là đo lại một câu nhiều lần. */
@@ -204,6 +230,18 @@ const CAT_OK = [
       c.querySelectorAll("button, input, select, a.lnk, .obcard").forEach(el => {
         const cs = getComputedStyle(el);
         if (cs.display === "none" || cs.visibility === "hidden" || cs.pointerEvents === "none") return;
+        /* ═══ 25/08 - LINK TRÔI NHIỀU DÒNG THÌ HỘP CỦA NÓ LÀ HỘP GỘP ══════════════════════════
+           Một `<a>` inline trải hai dòng thì `getBoundingClientRect` trả về hộp TRÙM cả hai dòng,
+           kể cả phần trống ở cuối dòng một. Điểm giữa của cái hộp ấy rơi vào khoảng giữa hai
+           dòng - nơi phần tử ĐỨNG SAU nó đang nằm - nên `elementFromPoint` trả về phần tử kia và
+           M2 kết luận "bị phủ lên, không bấm được", trong khi link bấm bình thường.
+           Bẫy này đã được ghi ngay trong file này cho M5 (*"Số MỌI CẶP PHẦN TỬ: bắt oan 4 chỗ ở
+           trang Báo cáo"*) và có sẵn cách chữa - `getClientRects().length !== 1` - nhưng chỉ gắn
+           cho M5, không gắn cho M2. Đo được 25/08 trên trang GV dự phòng: link "Foundation PLA
+           T7-CN sáng" bị chấm là bị `span.mut "buổi 9"` phủ lên.
+           *Ghi lại một cái bẫy ở một chỗ không làm nó biến mất ở chỗ khác - phải đi gắn cho mọi
+           phép đo đang đứng dưới cùng cái bẫy ấy.* */
+        if (el.getClientRects().length !== 1) return;
         const b = el.getBoundingClientRect();
         if (b.width < 6 || b.height < 6) return;
         if (b.bottom < 0 || b.top > innerHeight || b.right < 0 || b.left > innerWidth) return;

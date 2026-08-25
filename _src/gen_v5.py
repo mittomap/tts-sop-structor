@@ -1399,7 +1399,12 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .pickc i{font-size:18px;color:var(--muted);flex:none}
 .pickc:hover i{color:var(--navy)}
 .pickc span{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
-.pickc b{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 25/08 - TÊN NGƯỜI TRONG THẺ CHỌN ĐƯỢC XUỐNG DÒNG. `_checkmat` đo trên trang Hồ sơ nhân sự:
+   "Nguyễn Huỳnh Thanh Phương" cần 207px mà ô chỉ có 203px - hụt 4px ở khổ máy tính và 10px ở
+   khổ điện thoại. Thẻ này là THẺ CHỌN NGƯỜI: cái tên chính là thứ người ta đọc để bấm, cắt nó
+   đi bốn pixel là đổi "Phương" thành "Phươn…". Dòng phụ (mã, chức danh) vẫn giữ một dòng.
+   *Chỗ nào cái tên LÀ nội dung thì đừng cắt tên để giữ một dòng.* */
+.pickc b{font-size:13px;font-weight:700;color:var(--ink);white-space:normal;overflow-wrap:anywhere;line-height:1.3}
 .pickc small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pickc .chip{flex:none}
 /* V9.46: thẻ chọn có câu giải thích DÀI (bản đồ màn Cài đặt) - phải xuống dòng, không cắt cụt.
@@ -2141,7 +2146,12 @@ table.dt tbody tr.clk.on td{font-weight:600}
    `.fld` xếp DỌC, nên 224px thành CHIỀU CAO - ô chọn học viên cao 224px, chừa một mảng trắng
    to bằng nửa màn hình giữa ô gõ và mục kế tiếp. Nay bề rộng nói bằng `min-width` (không phụ
    thuộc trục), còn `flex-basis` để `auto` nên chiều cao luôn bằng đúng nội dung. */
-.pk{position:relative;display:flex;flex-direction:column;flex:1 1 auto;min-width:224px;max-width:100%}
+/* 25/08 - SÀN 224px KHÔNG ĐỦ CHO GIÁ TRỊ DÀI NHẤT ô này phải đựng. `_checkmat` đo trên Lịch
+   trực WOW: "24/08/2026 - 30/08/2026 · tuần này" cần 224px mà ô chỉ có 220px (sàn 224 trừ đi
+   20px đệm và 2px viền), trong khi hàng chứa nó còn thừa 884px. Nâng sàn lên 264px - vẫn là
+   sàn, ô co giãn theo hàng như cũ.
+   *Đặt sàn bằng bề rộng cái khung thì quên mất phần đệm; sàn phải đủ cho NỘI DUNG dài nhất.* */
+.pk{position:relative;display:flex;flex-direction:column;flex:1 1 auto;min-width:264px;max-width:100%}
 /* Ô gõ tự mang đủ dáng của một ô nhập: nó có thể được dựng ở NGOÀI .fld (thanh lọc trên trang),
    nơi không có luật CSS nào của form chạm tới - để trần là ra một ô cao 19px, đúng loại lỗi
    `_checkui` bắt trên trình duyệt thật. */
@@ -2810,12 +2820,44 @@ body.drsz .drawer{transition:none}
 .obcards.rows .obcard.open .obact{margin-left:0;flex-wrap:wrap}
 /* ===== V9.15 NODE TANG 2 - mstrip: dai hat hanh trinh tren tung dong =====
    V9.27: hat to hon + gian ra cho de tro chuot, va co phan hoi hover ngay lap tuc. */
-.mstrip{display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;margin-left:auto;padding:4px 8px;border-radius:999px;transition:background .12s ease}
+/* ═══ V2 25/08 - DẢI CHẶNG KHÔNG ĐƯỢC RỘNG HƠN CÁI CỘT CHỨA NÓ ═══════════════════════════
+   Mở rộng `_checkmat` sang 33 trang chưa từng bị đo thì trang Bản đồ chặng đỏ: *"5/7" đè lên
+   "C1"*. Đo ra hai dải chặng rộng **341px và 282px** nằm trong một cột **250px** của thẻ hồ sơ -
+   `flex:0 0 auto` nghĩa là "không co dù chật", nên cả hai tràn ra ngoài cột và chồng lên nhau.
+   Luật ấy đúng cho chỗ nó sinh ra (một hàng rộng, dải nằm nép bên phải), sai khi dải bị mang
+   vào một thẻ hẹp. *Một thành phần dùng lại được ở nhiều chỗ thì phải biết co - chỗ nào cũng
+   rộng rãi là một giả định, không phải một luật.*
+   Cho nó co và chặn trần bằng bề rộng cột; tên bước bên trong tự cắt bằng `text-overflow` sẵn có. */
+/* `overflow:hidden` là chốt cuối: vỏ dải đã co đúng 250px rồi nhưng mấy cái HẠT khai
+   `flex:0 0 auto` nên chúng không nhường, và với `overflow:visible` chúng vẫn VẼ ra ngoài vỏ -
+   đo ra vỏ đúng 250px mà hai dải vẫn chồng chữ lên nhau. *Cho một khối co lại chỉ đổi cái hộp;
+   muốn đổi cả thứ được vẽ thì phải nói thêm một câu nữa.* Cắt vài cái hạt cuối vẫn đọc được
+   tiến độ, còn chồng chữ lên nhau thì không đọc được gì. */
+.mstrip{display:inline-flex;align-items:center;gap:7px;flex:0 1 auto;min-width:0;max-width:100%;overflow:hidden;margin-left:auto;padding:4px 8px;border-radius:999px;transition:background .12s ease}
 .mstrip.clk{cursor:pointer}
 .mstrip.clk:hover{background:#EEF2F6;box-shadow:inset 0 0 0 1px #E3E9F0}
+/* ═══ 25/08 - HAI DẢI TRONG MỘT THẺ THÌ MỖI DẢI MỘT DÒNG RIÊNG ═══════════════════════════════
+   Trên Bản đồ chặng, một thẻ hồ sơ có thể mang HAI dải chặng (người ấy đi hai hành trình).
+   `.mstrip` là `inline-flex` nên hai dải nằm theo dòng chữ và gói xuống dòng hai - mà hộp của
+   chúng (cao ~29px kể cả đệm) CAO HƠN hộp dòng chữ, nên dòng dưới trèo lên dòng trên 14px và
+   chữ "5/7" của dải này đè lên chữ "C1" của dải kia.
+   Đã thử ba lần trước khi đúng, ghi lại cả ba vì chúng dạy ba thứ khác nhau: cho vỏ CO ĐƯỢC
+   (`flex:0 1 auto`) - vỏ co thật nhưng nội dung vẫn tràn; cho TÊN BƯỚC co (`min-width:0`) -
+   tên co thật nhưng mấy cái hạt không nhường; chặn `overflow:hidden` - hết tràn ngang nhưng
+   vẫn chồng DỌC. Ba lần ấy đều chữa chiều NGANG, mà chỗ hỏng là chiều DỌC.
+   *Sửa ba lần không ăn thì đừng sửa lần thứ tư cùng một hướng - đo lại xem mình đang chữa
+   đúng cái chiều đang hỏng không.*
+   Trong thẻ hồ sơ thì cho dải thành khối riêng: không còn dòng chữ nào để trèo lên nhau. */
+.jcard .mstrip{display:flex;margin-left:0}
+.jcard .mstrip+.mstrip{margin-top:4px}
 /* Nhãn tên bước: chiếm đúng phần trống bên phải dải chấm. `min-width:0` + cắt đuôi để dòng dài
    không đẩy dải ra khỏi hàng - dải chặng là thứ ĐI KÈM một dòng hồ sơ, không được lấn nó. */
+/* Vỏ dải co được rồi thì phần CO ĐƯỢC bên trong phải là TÊN BƯỚC - mấy cái hạt có bề rộng cố
+   định, không nhường được. Thiếu `min-width:0` thì `.msnh` lấy bề rộng nội dung làm sàn và
+   nội dung vẫn tràn ra ngoài vỏ dù vỏ đã đúng 250px. *Cho một khối co lại mà không nói thứ
+   nào bên trong nó chịu co thì nó chỉ co cái viền.* */
 .mstrip .msnh{font-size:11.5px;color:var(--muted);font-weight:600;margin-left:6px;
+ flex:0 1 auto;min-width:0;
  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px}
 .mstrip .msnh i{font-style:normal;opacity:.7;font-weight:500}
 @media(max-width:700px){.mstrip .msnh{max-width:none;white-space:normal}}
@@ -2882,7 +2924,13 @@ body.drsz .drawer{transition:none}
 .arcjob{display:flex;gap:8px;align-items:center;flex:1 1 0;min-width:0;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 11px;cursor:pointer;transition:.13s}
 .arcjob:hover{border-color:var(--mscol,#2E5A88);box-shadow:0 3px 12px rgba(16,32,58,.08)}
 .arcjob .aji{width:30px;height:30px;border-radius:8px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--blueb);color:var(--blue)}
-.arcjob .ajt{font-size:12px;font-weight:800;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 25/08 - CHO XUỐNG DÒNG thay vì cắt. `_checkmat` đo trên trang Chặng: "Lead & khai thác" hụt
+   8px ở 1440px và **50px** ở 390px, "Tư vấn & Đăng ký" hụt 11px/53px. Năm thẻ chia đều một
+   hàng thì mỗi thẻ chỉ được ~200px, mà đây là NHÃN CHẶNG - đọc thiếu một chữ là không biết
+   chặng nào. Hai dòng chữ 12px vẫn gọn hơn nhiều so với một dòng cụt.
+   *Cắt một cái nhãn để giữ một dòng là đổi thứ người ta cần lấy thứ mình thấy đẹp.* */
+.arcjob .ajt{font-size:12px;font-weight:800;color:var(--navy);white-space:normal;line-height:1.25;overflow-wrap:break-word}
+.arcjob .ajt{flex:1 1 auto;min-width:0}
 .arcjob .ajn{margin-left:auto;flex:0 0 auto;font-size:11px;font-weight:800;background:var(--bg);border-radius:20px;padding:2px 7px;color:var(--navy)}
 @media(max-width:820px){.arcjobs{flex-wrap:wrap}.arcjob{flex:1 1 44%}}
 .arcjob .ajn.hot{background:#FBF0EF;color:var(--red)}
@@ -30451,7 +30499,7 @@ function renderHoidap(){
  var h=pageHead("Hỏi đáp","Hỏi bằng tiếng Việt - về một học viên, hoặc về chỗ cấu hình trong app");
  h+='<div class="notebar"><i class="ti ti-message-question"></i>'+goiyG("gy_hop_nay_tra_loi_5ff9",'Hỏi bằng tiếng Việt về <b>một hồ sơ</b>, <b>một con số</b>, <b>một chỉ số</b> hoặc <b>chỗ cấu hình</b>.||Hồ sơ: tên học viên, khách, nhân viên, lớp, khóa - trả về hiện trạng, lý do cảnh báo và việc phải làm theo SOP. Con số: "có bao nhiêu học viên nguy cơ" - trả về đúng số app đang hiện, kèm danh sách và nút mở màn xử lý. Chỉ số: gõ mã CH6 như CVR, LRT - trả về giá trị, ngưỡng, mức đạt. Cấu hình: "đổi hotline ở đâu" - mở thẳng tới đó. Mọi câu trả lời đọc lại chính bộ luật app đang áp dụng.')+'</div>';
  h+='<div class="panel"><div class="pbody">';
- h+='<div style="display:flex;gap:8px;flex-wrap:wrap" data-tour="qabox"><input id="qa_q" value="'+esc(q)+'" placeholder="vd: bạn Minh Anh có cảnh báo gì, giờ phải làm gì?" style="flex:1;min-width:260px;height:38px;border:1px solid var(--line);border-radius:8px;padding:0 12px;font-family:inherit;font-size:13px" onkeydown="if(event.key===\'Enter\')qaHoi()">'+
+ h+='<div style="display:flex;gap:8px;flex-wrap:wrap" data-tour="qabox"><input id="qa_q" value="'+esc(q)+'" placeholder="'+esc(window.innerWidth<520?"vd: bạn Minh Anh có cảnh báo gì?":"vd: bạn Minh Anh có cảnh báo gì, giờ phải làm gì?")+'" style="flex:1;min-width:260px;height:38px;border:1px solid var(--line);border-radius:8px;padding:0 12px;font-family:inherit;font-size:13px" onkeydown="if(event.key===\'Enter\')qaHoi()">'+
   '<button class="btn primary" onclick="qaHoi()"><i class="ti ti-search"></i>Hỏi</button>'+
   (q?'<button class="btn" onclick="qaXoa()"><i class="ti ti-x"></i>Xóa</button>':'')+'</div>';
  /* Kho câu hỏi bày theo NHÓM GHẾ NGỒI. Dải phẳng chín câu trước đây không nói được cho người

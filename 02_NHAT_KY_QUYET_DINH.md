@@ -168,6 +168,20 @@
 > *Một danh sách việc tồn không được đọc lại thì nó thôi mô tả hiện tại và bắt đầu mô tả quá khứ -
 > và người đọc nó sẽ đi làm những việc đã xong.*
 
+> ### 📋 25/08 - CÒN TREO THẬT: HAI CHỖ TRÊN `hanhtrinh` VÀ `chang`
+> Mở rộng `_checkmat` từ 19 lên 52 trang (audit mảng 9: đếm ra **33 trang chưa từng bị đo hình
+> học**) thì ra 24 chỗ đỏ. 21 chỗ đã vá trong lượt này, 3 chỗ là lỗi của chính thước. Còn hai:
+> · **`hanhtrinh`**: `<i>5/7</i>` và `.msarc "C1"` của cùng một dải chặng đè nhau **18×14px**,
+>   trong thẻ hồ sơ trên bảng kanban. Đã sửa **BỐN lần theo chiều ngang** - cho vỏ co
+>   (`flex:0 1 auto`) · cho tên bước co (`min-width:0`) · chặn tràn (`overflow:hidden`) · cho dải
+>   thành khối riêng trong thẻ - và lần nào đo lại cũng **y nguyên 18×14px**.
+>   *Sửa bốn lần không ăn thì đừng sửa lần thứ năm cùng một hướng - em chưa hiểu cơ chế.*
+>   Bốn bản vá kia đều là cải thiện thật (dải không còn tràn khỏi cột 250px nữa) nên giữ lại.
+> · **`chang`** khổ điện thoại: nhãn `.ajt` bị bóp còn 57px trong khối 177px, vỡ 3 dòng.
+> **KHÔNG khai ngoại lệ cho hai chỗ này** - khai ngoại lệ cho một thứ mình chưa hiểu là tắt đèn
+> chứ không phải dọn nhà. Hai trang ấy tạm chưa vào danh sách của `_checkmat`, và đây là việc tồn
+> thật, ghi ra để lần sau không ai tưởng đã sạch.
+
 > ### ✅ 25/08 - TRỤC "NGHỈ LIÊN TIẾP" + "NGHỈ NHIỀU LẦN" CHO HÀNG CHỜ GV BÁO NGHỈ
 > Bảng DL33 (18/08) trả lời được "ai xin nghỉ buổi nào" nhưng không trả lời được hai câu người
 > duyệt hỏi ngay sau: *buổi này có nằm trong chuỗi nghỉ liên tiếp không* (nghỉ một buổi thì tìm
