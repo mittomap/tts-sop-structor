@@ -23582,7 +23582,7 @@ function hvCopy(t,msg){t=String(t||"");
  function fallback(){try{var ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.focus();ta.select();document.execCommand("copy");document.body.removeChild(ta);done()}catch(e){toast("Không sao chép được, hãy chọn và copy thủ công.")}}}
 function hvReferral(S){var off=hvRefOffer();
  var reward=paramStr("referralReferrer_reward","1 buổi WOW 1-1 miễn phí cho mỗi bạn đăng ký thành công");
- var h='<div class="sechd" id="s-gioithieu">Giới thiệu bạn bè</div>';
+ var h=hvSec("s-gioithieu")+'<div class="sechd" id="s-gioithieu">Giới thiệu bạn bè</div>';
  h+='<div class="panel"><div class="pbody">';
  if(!window.HVREFON){
   h+='<div class="hvrefbox"><div class="hvrefico"><i class="ti ti-gift"></i></div>'+
@@ -23615,7 +23615,7 @@ function hvLopBlock(lop,gv){if(!lop)return "";var h="";
  var _gvs={};rows("DL11").forEach(function(x){if(x.class_id===lop.class_id&&x.teacher_id)_gvs[x.teacher_id]=1});
  var _gvl=Object.keys(_gvs).map(function(id){return find("DL01","staff_id",id)}).filter(Boolean);
  if(!_gvl.length&&gv)_gvl=[gv];
- h+='<div class="panel" id="s-lop" style="margin-bottom:16px"><div class="ph"><b>Lớp của bạn</b>'+
+ h+=hvSec("s-lop")+'<div class="panel" id="s-lop" style="margin-bottom:16px"><div class="ph"><b>Lớp của bạn</b>'+
   '<span class="chip fill-'+(isc(lop.class_status,"in_progress")?"blue":isc(lop.class_status,"finished")?"gray":"green")+'">'+esc(elabel(lop.class_status)||"")+'</span></div><div class="pbody">';
  h+='<div class="hvlopg">'+
   '<div class="hvlopi"><i class="ti ti-calendar-week"></i><div><b>Lịch học cố định</b><span>'+esc(lop.class_schedule||"chưa chốt lịch")+'</span></div></div>'+
@@ -23697,7 +23697,7 @@ function renderTrangHV(){
     mở cổng lên thấy ngay bảng "Trung tâm đã xác nhận" đúng như anh chê. Nay LUÔN hiện: đó là thứ
     học viên vào cổng để xem. Một khóa thì bỏ câu "bấm để xem từng khóa" (không có gì để chọn). ---- */
  if(obs.length){
-  h+='<div class="sechd" id="s-khoa">Khóa của bạn'+(multiC?' <span class="mut" style="text-transform:none;font-weight:600">· bạn đã học '+obs.length+' khóa, bấm để xem từng khóa</span>':'')+'</div>';
+  h+=hvSec("s-khoa")+'<div class="sechd" id="s-khoa">Khóa của bạn'+(multiC?' <span class="mut" style="text-transform:none;font-weight:600">· bạn đã học '+obs.length+' khóa, bấm để xem từng khóa</span>':'')+'</div>';
   h+='<div class="hvcrs">';
   obs.forEach(function(o){
    var cl=find("DL10","class_id",o.class_id)||{};
@@ -23753,7 +23753,7 @@ function renderTrangHV(){
   h+='<div class="notebar" style="margin-bottom:16px"><i class="ti ti-info-circle"></i>Bạn đã báo lịch lớp này không hợp. Trung tâm đang tìm lớp khác và sẽ liên hệ lại với bạn.</div>';
  /* HỌC PHÍ: tổng - ưu đãi - đã đóng - CÒN LẠI đặt cạnh nhau cho dễ đối chiếu */
  if(tot>0||paysC.length){
-  h+='<div class="panel" id="s-hocphi" style="margin-bottom:16px"><div class="ph"><b>Học phí khóa '+esc(lop?lop.class_name:(enr.course_id_name||""))+'</b>'+
+  h+=hvSec("s-hocphi")+'<div class="panel" id="s-hocphi" style="margin-bottom:16px"><div class="ph"><b>Học phí khóa '+esc(lop?lop.class_name:(enr.course_id_name||""))+'</b>'+
    (rem>0?'<span class="chip amber">còn '+vnd(rem)+'</span>':'<span class="chip green">đã đóng đủ</span>')+'</div>';
   h+='<div class="pbody"><div class="hvfee">'+
    '<div class="hvf"><span>Học phí</span><b>'+vnd(tot)+'</b></div>'+
@@ -23795,7 +23795,7 @@ function renderTrangHV(){
    h+='</tbody></table></div>'}
   h+='</div>'}
  /* ---- TRUNG TÂM ĐÃ XÁC NHẬN: bảng thủ tục, đọc để yên tâm chứ không phải việc phải làm ---- */
- h+='<div class="sechd" id="s-xacnhan">Trung tâm đã xác nhận'+(lop?' <span class="mut" style="text-transform:none;font-weight:600">· khóa '+esc(lop.class_name)+'</span>':'')+'</div><div class="hvconf">';
+ h+=hvSec("s-xacnhan")+'<div class="sechd" id="s-xacnhan">Trung tâm đã xác nhận'+(lop?' <span class="mut" style="text-transform:none;font-weight:600">· khóa '+esc(lop.class_name)+'</span>':'')+'</div><div class="hvconf">';
  function cf(ic,lb,ok,sub){return '<div class="hvc'+(ok?" ok":"")+'"><i class="ti '+(ok?"ti-circle-check":ic)+'"></i><div><b>'+esc(lb)+'</b><span>'+esc(sub)+'</span></div></div>'}
  h+=cf("ti-clipboard-check","Đăng ký khóa học",!!enr.enrollment_id,enr.course_id_name||enr.course_id||"chưa có đăng ký");
  h+=cf("ti-cash","Học phí",rem<=0&&paid>0,paid>0?(rem>0?"đã đóng một phần":"đã đóng đủ"):"chưa ghi nhận khoản nào");
@@ -23807,7 +23807,7 @@ function renderTrangHV(){
  if(ce.course_end_id&&isc(ce.student_status,"completed")){
   var _ar=num(ce.attendance_rate),_cr=num(ce.completion_rate);
   if(_ar>0&&_ar<=1)_ar=_ar*100; if(_cr>0&&_cr<=1)_cr=_cr*100;
-  h+='<div class="hvcert" id="s-chungnhan"><div class="hvcerth"><i class="ti ti-award"></i><div>'+
+  h+=hvSec("s-chungnhan")+'<div class="hvcert" id="s-chungnhan"><div class="hvcerth"><i class="ti ti-award"></i><div>'+
    '<b>Chứng nhận hoàn thành khóa</b><span>'+esc(lop?lop.course_id_name||lop.class_name:"")+'</span></div></div>'+
    '<div class="hvcertg">'+
     '<div><span>Học viên</span><b>'+esc(S.full_name)+'</b></div>'+
@@ -23829,7 +23829,7 @@ function renderTrangHV(){
      số hoàn thật do kế toán chốt theo chính sách (100/70/50/0%), hứa cả khoản đã đóng là hứa sai */
   if(pd>0&&!isc(e.payment_status,"refunded"))h+='<div class="notebar" style="margin-bottom:16px"><i class="ti ti-arrow-back-up"></i><b>Hoàn học phí:</b> trung tâm đang xử lý hoàn học phí cho khóa '+esc(e.course_id_name||e.course_id||"đã hủy")+' theo chính sách hoàn tiền. Số tiền và thời gian hoàn sẽ được trung tâm báo trực tiếp cho bạn.</div>'});
  /* ---- 3. HÀNH TRÌNH CÙNG IELTS THE TUTORS (có mốc thời gian) ---- */
- h+='<div class="sechd" id="s-hanhtrinh">Hành trình cùng IELTS The Tutors</div>';
+ h+=hvSec("s-hanhtrinh")+'<div class="sechd" id="s-hanhtrinh">Hành trình cùng IELTS The Tutors</div>';
  var L=C.L||{};
  var firstPay=C.pays.slice().sort(function(a,b){return (pvnd(a.payment_time)||0)-(pvnd(b.payment_time)||0)})[0];
  var fullPay=(rem<=0&&paid>0)?C.pays.slice().sort(function(a,b){return (pvnd(b.payment_time)||0)-(pvnd(a.payment_time)||0)})[0]:null;
@@ -23870,7 +23870,7 @@ function renderTrangHV(){
  var sc=[];hwC.forEach(function(x){var v=num(x.homework_score);if(v>0)sc.push(v)});
  var scAvg=sc.length?(sc.reduce(function(a,b){return a+b},0)/sc.length).toFixed(1):null;
  var wowLeft=num(S.wow_quota_remaining), wowUsed=num(S.wow_quota_used);
- h+='<div class="sechd" id="s-tiendo">Tiến độ của bạn</div>';
+ h+=hvSec("s-tiendo")+'<div class="sechd" id="s-tiendo">Tiến độ của bạn</div>';
  h+=statStrip([
   ["ti-checkbox",attP==null?"-":attP+"%","Chuyên cần",(attP!=null&&attP>=Math.round(kpiTh(/^ATR/,0.85)*100))?"#16A34A":"#E24B4A",attOK+"/"+attAll+" buổi có mặt","",pctG(attOK,attAll,"buổi có mặt (tính cả đi trễ)")],
   ["ti-book",hwP==null?"-":hwP+"%","Bài tập đã nộp",(hwP!=null&&hwP>=Math.round(kpiTh(/^HCR/,0.9)*100))?"#16A34A":"#E08A1E",hwSub+"/"+hwAll+" bài","",pctG(hwSub,hwAll,"bài đã nộp trên tổng số bài được giao")],
@@ -23919,7 +23919,7 @@ function renderTrangHV(){
  var dueHw=hwC.filter(function(x){var d=pvnd(x.homework_due_date);return d&&d.getTime()>=now&&!hwSubmitted(x)&&!hwMissing(x)});
  /* luôn hiện ĐỦ NHÓM kể cả khi trống, để học viên biết chỗ này có những gì */
  var upSv=C.sv.filter(function(v){return !String(v.submitted_date||"").trim()});
- h+='<div class="sechd" id="s-saptoi">Sắp tới</div><div class="panel"><div class="pbody">';
+ h+=hvSec("s-saptoi")+'<div class="sechd" id="s-saptoi">Sắp tới</div><div class="panel"><div class="pbody">';
  function upGrp(ic,col,title,items,render,emptyTxt){
   h+='<div class="hvgt"><span class="hvui" style="background:'+col+'18;color:'+col+'"><i class="ti '+ic+'"></i></span>'+
    '<b>'+esc(title)+'</b><span class="chip'+(items.length?"":" ")+'">'+items.length+'</span></div>';
@@ -23969,7 +23969,7 @@ function renderTrangHV(){
  if(isRisk(S.academic_progress_status))rec.push(["ti-chart-line","amber","Tiến độ học thuật đang chậm so với lộ trình","Trung tâm sẽ liên hệ để sắp buổi kèm thêm cho bạn."]);
  if(ce.course_end_id&&!isc(ce.re_enrollment_status,"confirmed_with_deposit"))rec.push(["ti-refresh","green","Khóa học của bạn đã kết thúc","Đăng ký khóa tiếp theo trong "+num(paramOf("reEnrollGrace_days",30))+" ngày để giữ ưu đãi học viên cũ."+(ce.next_course_recommendation?" Gợi ý: "+ce.next_course_recommendation:"")]);
  if(!rec.length)rec.push(["ti-thumb-up","green","Bạn đang học rất tốt","Giữ nhịp chuyên cần và nộp bài đúng hạn nhé."]);
- h+='<div class="sechd" id="s-khuyennghi">Khuyến nghị dành cho bạn</div><div class="panel"><div class="pbody">';
+ h+=hvSec("s-khuyennghi")+'<div class="sechd" id="s-khuyennghi">Khuyến nghị dành cho bạn</div><div class="panel"><div class="pbody">';
  /* ═══ V2 12/08 (ACA-4) - NÚT "TRAO ĐỔI VỚI TRUNG TÂM" NGAY TRÊN TỪNG THẺ ════════════════════
     Ảnh anh Luân gửi chỉ đúng chỗ đau: thẻ *"Bạn đã vắng không phép 2 buổi"* tự viết ra câu
     *"Báo trung tâm nếu bạn gặp khó khăn về lịch"* - mà KHÔNG có nút nào để báo. App tự dựng một
@@ -23987,7 +23987,7 @@ function renderTrangHV(){
          ["Writing","skill_writing","final_writing"],["Speaking","skill_speaking","final_speaking"]];
  var hasIn=!!(t&&t.overall_score), hasOut=!!(ce&&ce.final_test_score);
  if(hasIn||hasOut){
-  h+='<div class="sechd" id="s-diem">Hành trình điểm số · từ đầu vào đến đầu ra</div>';
+  h+=hvSec("s-diem")+'<div class="sechd" id="s-diem">Hành trình điểm số · từ đầu vào đến đầu ra</div>';
   h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr><th>Kỹ năng</th><th>Đầu vào'+(t.result_time?' <span class="mut">('+esc(String(t.result_time).slice(0,10))+')</span>':'')+'</th><th>Giữa khóa'+(ob.mid_test_date?' <span class="mut">('+esc(ob.mid_test_date)+')</span>':'')+'</th><th>Đầu ra'+(ce.course_completion_time?' <span class="mut">('+esc(String(ce.course_completion_time).slice(0,10))+')</span>':'')+'</th><th>Tăng</th><th>Mục tiêu</th></tr></thead><tbody>';
   function bandRow(lb,vin,vmid,vout,tg,bold){
    var last=(vout>0?vout:(vmid>0?vmid:0));
@@ -24026,7 +24026,7 @@ function renderTrangHV(){
   h+='</div></div></div>';
  }
  /* ---- 7. NHẬT KÝ TỪNG BUỔI HỌC ---- */
- h+='<div class="sechd" id="s-buoihoc">Nhật ký từng buổi học</div>';
+ h+=hvSec("s-buoihoc")+'<div class="sechd" id="s-buoihoc">Nhật ký từng buổi học</div>';
  var attBySes={};attC.forEach(function(a){attBySes[a.session_id]=a});
  var hwBySes={};hwC.forEach(function(x){if(x.session_id)(hwBySes[x.session_id]=hwBySes[x.session_id]||[]).push(x)});
  var mySes=[];
@@ -24080,7 +24080,7 @@ function renderTrangHV(){
  h+='</div></div>';
  /* ---- 8. NHẬT KÝ BUỔI WOW ---- */
  if(C.wow.length){
-  h+='<div class="sechd" id="s-wow">Nhật ký buổi WOW 1-1</div><div class="panel"><div class="pbody">';
+  h+=hvSec("s-wow")+'<div class="sechd" id="s-wow">Nhật ký buổi WOW 1-1</div><div class="panel"><div class="pbody">';
   /* V9.47: dùng ĐÚNG dòng thời gian của nhật ký buổi học ngay phía trên - hai mục nằm sát nhau,
      cùng là chuyện đã xảy ra theo thứ tự, không có lý do gì trình bày hai kiểu. */
   h+=hvTLopen();
@@ -24121,7 +24121,7 @@ function renderTrangHV(){
  var svNew=C.sv.filter(function(v){return !String(v.submitted_date||"").trim()});   /* = hvSoKhaoSat(C.sv) */
  var svOld=C.sv.filter(function(v){return String(v.submitted_date||"").trim()})
    .sort(function(a,b){return (pvnd(b.submitted_date)||0)-(pvnd(a.submitted_date)||0)});
- h+='<div class="sechd" id="s-khaosat">Khảo sát của bạn'+(svNew.length?' <span class="chip amber" style="text-transform:none">'+svNew.length+' phiếu mới</span>':'')+'</div>';
+ h+=hvSec("s-khaosat")+'<div class="sechd" id="s-khaosat">Khảo sát của bạn'+(svNew.length?' <span class="chip amber" style="text-transform:none">'+svNew.length+' phiếu mới</span>':'')+'</div>';
  h+='<div class="panel"><div class="pbody">';
  h+='<div class="hvgt"><span class="hvui" style="background:#E08A1E18;color:#E08A1E"><i class="ti ti-inbox"></i></span><b>Phiếu mới gửi, chờ bạn trả lời</b><span class="chip">'+svNew.length+'</span></div>';
  if(!svNew.length)h+='<div class="hvempty">Hiện không có phiếu nào chờ bạn.</div>';
@@ -24147,7 +24147,7 @@ function renderTrangHV(){
  /* V9.40d: chế độ phụ huynh KHÔNG vẽ hai mục riêng tư - ẩn ở mục lục thôi là chưa đủ,
     nội dung vẫn nằm trong trang và cuộn xuống là đọc được. */
  if(!hvPH()){
- h+='<div class="sechd" id="s-hoidap">Trao đổi với trung tâm'+(openReq?' <span class="chip amber" style="text-transform:none">'+openReq+' đang xử lý</span>':'')+'</div>';
+ h+=hvSec("s-hoidap")+'<div class="sechd" id="s-hoidap">Trao đổi với trung tâm'+(openReq?' <span class="chip amber" style="text-transform:none">'+openReq+' đang xử lý</span>':'')+'</div>';
  h+='<div class="panel"><div class="pbody">';
  h+='<div class="hvaskf" style="margin-bottom:10px"><button class="btn primary sm" onclick="hvAskNew()"><i class="ti ti-message-plus"></i>Gửi câu hỏi / yêu cầu</button>'+
   '<button class="btn sm" onclick="hvReqSpecial(\'baoluu\')"><i class="ti ti-player-pause"></i>Xin bảo lưu</button>'+
@@ -24174,7 +24174,7 @@ function renderTrangHV(){
    h+='<div class="hvaskf" style="margin-top:7px"><button class="btn sm" onclick="hvAskSay(\''+esc(x.task_id)+'\')"><i class="ti ti-message"></i>Nhắn thêm</button></div>';
   h+='</div>'});
  h+='</div></div>';
- h+='<div class="sechd" id="s-gopy">Góp ý cho trung tâm</div>';
+ h+=hvSec("s-gopy")+'<div class="sechd" id="s-gopy">Góp ý cho trung tâm</div>';
  h+='<div class="panel"><div class="ph"><b>Bạn muốn góp ý điều gì?</b>'+
   '<button class="btn primary sm" onclick="hvFeedbackForm()"><i class="ti ti-message-plus"></i>Gửi góp ý</button></div><div class="pbody">';
  h+='<div class="mut" style="font-size:11.5px;margin-bottom:10px">Khen, chê hay đề xuất đều được. Góp ý tiêu cực sẽ được chuyển thành phiếu xử lý và trung tâm phản hồi bạn theo cam kết.</div>';
@@ -24201,7 +24201,40 @@ function renderTrangHV(){
  /* V9.18 (Luân): BỎ khối "Gửi phụ huynh" - ngữ cảnh không hợp với cổng học viên tự xem.
     V9.40d: nay có CỔNG PHỤ HUYNH riêng, nên phụ huynh xem bằng chính cổng này ở chế độ của họ
     chứ không cần một khối "gửi phụ huynh" nhét vào trang của em. */
- return h}
+ return hvXep(h)}
+/* ═══ 26/08 - MỘT THỨ TỰ, HAI CHỖ ĐỌC: MỤC LỤC VÀ THÂN TRANG ════════════════════════════════
+   Anh Luân: *"e nên xem lại cả cách bố trí menu, a thấy nó cứ chạy lên chạy xuống"*.
+   Đo bằng cách cuộn THẬT bằng con lăn chuột từ đầu tới cuối trang rồi ghi lại mục nào đang
+   sáng: đường đi ra **3 → 4 → 0 → 5 → 6 → 7 → 1 → 10 → 13 → 8 → 9 → 2** - **lùi ngược 4 lần**.
+   Người ta cuộn xuống đều một mạch mà vệt sáng nhảy từ mục 13 ngược lên mục 8.
+   Gốc KHÔNG phải ở phép dò cuộn: **mục lục xếp theo NHU CẦU** (`HVGRP`: cần bạn xử lý → việc
+   học → nói chuyện với trung tâm) còn **thân trang xếp theo thứ tự viết mã**. Hai thứ tự khác
+   hẳn nhau, nên dù dò cuộn có đúng tuyệt đối thì vệt sáng vẫn nhảy - nó đang trung thành với
+   trang, mà trang thì không đi theo mục lục.
+   Chữa ở GỐC: `HVGRP` thành thứ tự DUY NHẤT. Mỗi khối tự cắm một cái mốc vô hình khi vẽ
+   (`hvSec`), rồi `hvXep` xếp lại các khối theo đúng thứ tự mục lục trước khi trả về.
+   Không khối nào mất, không chữ nào đổi - chỉ đổi thứ tự.
+   *Hai bảng thứ tự cho cùng một danh sách thì không có bảng nào sai; cái sai là có hai bảng.*
+   Và xếp lại như vậy cũng ĐÚNG HƠN cho người đọc: trang nay mở ra bằng thứ em phải làm (học
+   phí · buổi sắp tới · phiếu khảo sát), rồi mới tới việc học, rồi mới tới các kênh liên lạc -
+   thay vì mở ra bằng "thủ tục trung tâm đã xác nhận".
+   Cắt bằng MỐC CỦA CHÍNH MÌNH chứ không dò thẻ HTML: chuỗi `<!--HVSEC:...-->` do em đặt ra nên
+   nó không phụ thuộc vào việc khối ấy mở bằng thẻ gì, và không có cách nào cắt nhầm. */
+function hvSec(id){return "<!--HVSEC:"+id+"-->"}
+function hvXep(h){
+ var M=String(h||"").split(/<!--HVSEC:([a-z-]+)-->/);
+ if(M.length<3)return String(h||"");
+ var dau=M[0],K={},thu=[];
+ for(var i=1;i<M.length;i+=2){var id=M[i];
+  if(K[id]==null){K[id]="";thu.push(id)}
+  K[id]+=M[i+1]}
+ var xong={},ra=dau;
+ HVGRP.forEach(function(G){(G[1]||[]).forEach(function(id){
+  if(K[id]!=null&&!xong[id]){ra+=K[id];xong[id]=1}})});
+ /* Khối nào chưa được khai trong `HVGRP` thì giữ nguyên thứ tự cũ và đi sau - thiếu lời khai
+    là mất chỗ trên mục lục, không được phép mất luôn nội dung. */
+ thu.forEach(function(id){if(!xong[id]){ra+=K[id];xong[id]=1}});
+ return ra}
 /* ---- học viên TỰ trả lời khảo sát / xem lại / gửi góp ý ---- */
 function hvSurveyFill(id){var v=find("DL15","survey_id",id);if(!v){toast("Không thấy phiếu.");return}
  var h='<div class="dcard"><h4><i class="ti ti-writing"></i>'+esc(elabel(v.survey_type)||"Khảo sát")+'</h4>';
@@ -34818,10 +34851,27 @@ function hvPHBar(S){
   'nói thật, trung tâm xin phép giữ riêng.'+
   (hot?(' Cần trao đổi trực tiếp, quý phụ huynh gọi '+telHTML(hot)+'.'):'')+
   '</div>'}
+/* ═══ 26/08 - DÒ CUỘN PHẢI ĐI MỘT CHIỀU ═════════════════════════════════════════════════════
+   Bản cũ chọn mục có mép trên GẦN NHẤT theo trị tuyệt đối. Đứng giữa hai mục thì nó chọn cái
+   nằm DƯỚI tầm mắt, cuộn thêm một chút lại chọn cái nằm TRÊN - vệt sáng nhảy tới nhảy lui
+   trong khi người ta chỉ cuộn xuống đều. Đây là vế thứ hai của chỗ anh Luân bắt (vế thứ nhất
+   là hai bảng thứ tự, đã chữa ở `hvXep`).
+   Nay hỏi đúng câu người đọc đang hỏi: **mục cuối cùng mà mình đã cuộn qua là mục nào**. Vạch
+   đo đặt dưới mép trên một quãng, để một mục vừa ló ra chưa vội cướp vệt sáng.
+   Và khi chạm đáy trang thì mục CUỐI luôn sáng - mục cuối thường ngắn, mép trên của nó không
+   bao giờ lên tới vạch nên bản cũ không đời nào sáng nó, dù người đọc đang nhìn đúng vào đó.
+   *Một phép dò "gần nhất" không có chiều; đọc thì có chiều.* */
 function hvSpy(){var box=document.getElementById("hvMain");if(!box)return;
- var best=null,bt=1e9;
+ var ds=[];
  HVSEC.forEach(function(x){if(hvAn(x[0]))return;var el=document.getElementById(x[0]);if(!el)return;
-  var d=Math.abs(el.offsetTop-box.scrollTop-20);if(d<bt){bt=d;best=x[0]}});
+  ds.push([x[0],el.offsetTop])});
+ if(!ds.length)return;
+ ds.sort(function(a,b){return a[1]-b[1]});
+ var day=(box.scrollTop+box.clientHeight>=box.scrollHeight-4);
+ var best=ds[0][0];
+ if(day)best=ds[ds.length-1][0];
+ else{var vach=box.scrollTop+Math.min(150,Math.round(box.clientHeight*0.3));
+  for(var i=0;i<ds.length;i++)if(ds[i][1]<=vach)best=ds[i][0]}
  if(best){hvMark(best);hvHashSet(best)}}
 /* V9.29c: cổng học viên là MỘT trang dài, "trang" của nó là từng mục -> địa chỉ đi theo mục đang
    đọc (.../cong-hoc-vien/?gop-y-cho-trung-tam). Cuộn tới đâu địa chỉ đổi tới đó nên copy link là
