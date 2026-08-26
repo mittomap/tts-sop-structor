@@ -148,6 +148,77 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 🟢 26/08 - BỐN VIỆC ANH LUÂN ĐẶT TRONG MỘT LƯỢT
+> Nguyên văn: *"liệt kê danh sách chi tiêt feedback, khiếu nại đã nhận / gửi thông tin thông báo
+> cho danh sách: lơp, học viên, nhân viên / In hợp đồng, xác nhận đã nhận hợp đồng, chụp ảnh hợp
+> đồng khi đã nhận upload lên / Nội dung onboarding, có dấu tick khi gửi và xác nhận từ học viên:
+> sách, hợp đồng, quà tặng đi kèm, thông tin lớp"*.
+>
+> **ĐO TRƯỚC KHI LÀM - và phép đo đổi hẳn khối lượng của ba trong bốn việc.** Việc 1 hoá ra gần
+> như đã có (hub CSKH có màn chi tiết đủ cả); việc 2 có một nửa (sổ tin, kho mẫu, cửa gửi một
+> người); việc 3 và 4 có chung một cái xương sống nên gộp làm một. Nếu bổ đầu vào viết thì đã
+> dựng lại ba thứ đang chạy tốt.
+>
+> **(A) BỘ ONBOARDING - BỐN MÓN, MỖI MÓN HAI DẤU** (gộp việc 3 + 4).
+> Trước bản này app theo dõi **đúng một** trong bốn món: thông tin lớp. Sách, hợp đồng, quà tặng -
+> những thứ trung tâm thật sự trao tay - không ở đâu ghi đã trao chưa, học viên nhận chưa. Tháng
+> sau em nhắn "em chưa nhận sách" thì không có gì đối chiếu, mà cãi nhau bằng trí nhớ thì trung
+> tâm luôn là bên phải xin lỗi.
+> · **Một đăng ký `OBGOI`, không phải bốn khối mã chép tay.** Bốn món giống nhau tới 90%: mốc gửi,
+>   mốc nhận, một cửa ghi mỗi phía, một dòng trên thẻ, một dòng ở cổng học viên. Viết tay bốn lần
+>   là bốn cơ hội để món thứ tư thiếu một nhánh - mà món thứ tư là quà tặng, thứ ít người kiểm
+>   nhất. Thêm món thứ năm (áo lớp, thẻ học viên) về sau chỉ là thêm MỘT DÒNG.
+> · **HAI MỐC, KHÔNG PHẢI MỘT.** Gộp làm một ô "đã xong" là mất đúng cái khoảng giữa - đã giao mà
+>   học viên chưa xác nhận - và đó mới là khoảng cần nhắc việc.
+>   *Một dấu tick mà hai bên cùng đánh thì nó không còn là bằng chứng của bên nào.*
+> · **"Thông tin lớp" mượn đúng hai cột SOP đã có** (`class_info_sent_at`/`confirmation_time`) chứ
+>   không đẻ cột mới song song. Nhưng `confirmation_time` cũng được đóng khi học viên TỪ CHỐI, nên
+>   đọc nó trần là **đếm một lời từ chối thành một dấu xác nhận** - phải hỏi thêm trạng thái.
+> · **Quà tặng: "không áp dụng" khác hẳn "chưa giao".** Đếm chung là bịa ra một việc tồn cho mọi
+>   học viên không thuộc đợt ưu đãi nào.
+> · **Hợp đồng có thêm IN và ẢNH** vì tờ hợp đồng là một vật thể: in ra, trao đi, chụp lại. Ba mốc
+>   ấy không suy ra được từ nhau - in mà chưa trao là một trạng thái thật. Bản in mang **nguyên văn
+>   điều khoản CH2 `commitText`** - cùng bản học viên bấm đồng ý trên màn hình; hai bản khác nhau
+>   thì chữ ký trên giấy đang ký vào một thứ khác.
+> · **Ảnh bắt buộc ở đường nhân viên bấm hộ, KHÔNG bắt buộc ở cổng học viên** - đúng luật đã đặt cho
+>   "ghi nhận ký cam kết tại trung tâm": học viên tự bấm thì chính cú bấm là bằng chứng.
+> · **Bẫy đã cắn ngay lượt chạy đầu:** `check_logic` luật 14a bắt 62/88 dòng DL08 lệch bộ cột, vì
+>   khối gieo chỉ ghi cột cho dòng có lớp. App dựng đầu bảng theo dòng ĐẦU TIÊN, nên dòng đầu thiếu
+>   cột nào là cả cột ấy biến khỏi màn hình.
+>   *Một bảng mà mỗi dòng tự khai bộ cột của riêng nó thì nó không còn là một bảng.*
+> · **Bẫy thứ hai - chỗ đặt giết chết chỗ rõ:** bản đầu em ghi thẳng chữ "giao" và "HV nhận" vào
+>   mỗi chip cho khỏi phải giải thích; bốn chip dài tới mức xuống hai hàng, thẻ phình từ hai dòng
+>   lên bốn, cả trang Xếp lớp cao gấp đôi. Nay là hai ô vuông theo thứ tự cố định, nghĩa của chúng
+>   nói MỘT LẦN ở hàng ghi chú dưới dải chip lọc chứ không nhắc lại 88 lần trên 88 thẻ.
+>   *Viết ra cho rõ mà làm hỏng chỗ đặt thì nó không còn rõ nữa - người đọc bỏ qua cả cụm.*
+>
+> **(B) GỬI THÔNG BÁO CHO MỘT DANH SÁCH** (việc 2).
+> Trước bản này app gửi được cho **một người một lượt**, và chỉ cho học viên hoặc lead - cột
+> `to_kind` của sổ tin chưa từng mang giá trị nào khác. Nghỉ lễ, đổi phòng, dời lịch cả lớp: học vụ
+> mở từng hồ sơ, 18 lần cho một lớp. Ai cũng biết cách chữa là mở Zalo nhóm lớp gửi một phát - và
+> thế là **tin quan trọng nhất trong tháng là tin duy nhất không có trong sổ**.
+> *Cửa hẹp không ngăn được việc; nó chỉ đẩy việc ra chỗ mình không nhìn thấy.*
+> · Ba nhóm người nhận, một cửa gửi. Lớp và học viên khác nhau ở cách CHỌN chứ không khác ở việc
+>   gửi. Nhân viên là nhóm thứ ba thật sự khác: DL01 chỉ khai email, nên ô chọn kênh **không bày
+>   lựa chọn Zalo** ở nhóm ấy - bày ra là mời người ta chọn một đường chắc chắn không tới.
+> · **Mỗi người một dòng trong sổ**, không gộp thành một dòng "đã gửi 18 người": sổ tin là thứ để
+>   tra lại "em có nhận được thông báo không", mà biến `{ten}`/`{lop}` cũng cần chỗ để khác nhau.
+> · **Khai thẳng số bị bỏ qua** ngay trên form ("19 người sẽ nhận · 3 người thiếu địa chỉ, sẽ bỏ
+>   qua") và có nút xem trọn danh sách kèm lý do từng người.
+> · **Bẫy:** `confirmRun` đóng ngăn kéo trước khi chạy, nên đọc lại `fldV` sau khi hỏi là lấy về
+>   chuỗi rỗng - tin gửi đi trắng trơn. Phải giữ nội dung ở biến trước khi hỏi.
+>
+> **(C) SỔ PHẢN HỒI / KHIẾU NẠI: HAI MÀN CHI TIẾT, MÀN NGHÈO LÀ MÀN CÓ NGƯỜI GẶP** (việc 1).
+> App CÓ sẵn màn chi tiết đầy đủ cho cả hai (`fbXem`, `openComplaint`): nội dung học viên nói, kênh
+> nhận, người phân loại, đã xử lý thế nào, dải bước, đường nhảy sang khiếu nại liên quan. Nhưng ai
+> vào bằng cửa **Sổ phản hồi / Sổ khiếu nại** thì không gặp màn ấy: `lstXem` dựng ngăn kéo từ DANH
+> SÁCH CỘT, mà danh sách cột không có cột nội dung - mở một phản hồi ra chỉ thấy mã, tên, loại,
+> điểm. Đúng thứ người ta mở sổ để đọc thì không có.
+> *Hai màn chi tiết cho một bản ghi thì màn nghèo hơn luôn là màn có người gặp phải.*
+> Nay `LISTCFG` khai được `xem` (sổ nào khai thì đi thẳng vào màn thật; sổ chưa khai vẫn dùng ngăn
+> kéo chung), và hai sổ thêm cột **nhận lúc · kênh · nội dung · người xử lý**.
+> *Một danh sách các bản ghi văn xuôi mà không hiện văn xuôi thì nó là danh sách mã số.*
+
 > ### 🔴 26/08 - "CHỈ SỐ NÀY CHƯA CÓ PHẦN DIỄN GIẢI": 34/51 CHỈ SỐ THỦNG
 > Anh Luân bấm **Xem chỉ số** ở OBT trong từ điển và nhận lại một dòng *"Chỉ số này chưa có phần
 > diễn giải."* rồi hỏi: *"ko có mô tả là sao nhỉ"*.
@@ -962,7 +1033,14 @@
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 48 BỘ KIỂM.
-> Bản dựng đang chạy: `3b8718` (26/08 cuối - **NÂNG CẤP FRONT END CỔNG HỌC VIÊN + 6 LỖI THẬT**:
+> Bản dựng đang chạy: `8bde04` (26/08 cuối - **BỐN VIỆC ANH LUÂN ĐẶT TRONG MỘT LƯỢT**:
+> *bộ onboarding* bốn món hai dấu (sách · hợp đồng · quà tặng · thông tin lớp) - dải tick trên mỗi
+> thẻ Xếp lớp, ngăn kéo cập nhật, **in hợp đồng** kèm nguyên văn điều khoản CH2 và hai ô chữ ký,
+> ảnh bản đã nhận, và nửa còn lại ở cổng học viên (khối "Bộ hồ sơ nhập học", học viên tự bấm đã
+> nhận) · *gửi thông báo cho một danh sách* lớp / học viên / nhân viên, mỗi người một dòng trong
+> Sổ tin đã gửi, `to_kind` nay có `staff` · *sổ phản hồi và sổ khiếu nại* đi thẳng vào màn chi tiết
+> thật và hiện nội dung ngay trên bảng. `fixdata.py` khối 30 gieo 13 cột mới trên DL08.
+> Mốc trước `3b8718` (26/08 - **NÂNG CẤP FRONT END CỔNG HỌC VIÊN + 6 LỖI THẬT**:
 > *thước band 0-9* thay bảng sáu cột ở "Hành trình điểm số" (một cây thang vẽ một lần, năm hàng
 > cùng đọc theo nó; điện thoại trả trọn bề ngang cho thước; hai mốc trùng band thì lồng cỡ hoặc
 > chia đôi màu chứ không xoá nhau) · **chứng nhận thôi in số bịa** (17/18 hồ sơ DL18 từng lệch với

@@ -2,6 +2,65 @@
 
 > `ITTs_WebApp_v5_demo.html` là bản app: mở bằng trình duyệt, mọi thao tác ghi thật vào bộ nhớ trình duyệt. **Lớp Google Sheets đã cho nghỉ hưu 30/07** - không còn bản `.gs` nào, mọi cấu hình nằm trong màn Cài đặt của chính app. Khi anh Luân chốt nền tảng backend, 66 chỗ ghi trong app đã có sẵn đường nối ra máy chủ (xem khối ghi chú tại `var SVR=` trong `gen_v5.py`).
 
+## ⭐ MỚI 26/08/2026 — **Bộ onboarding · gửi thông báo cho cả danh sách · sổ phản hồi đọc được**
+
+### Bộ onboarding: bốn món, mỗi món hai dấu
+
+Từ nay mỗi hồ sơ xếp lớp theo dõi đủ **bốn món** trung tâm giao cho học viên mới - **thông tin
+lớp · hợp đồng nhập học · sách & giáo trình · quà tặng đi kèm** - và mỗi món có **hai dấu** riêng:
+
+- **dấu trước** = trung tâm đã giao,
+- **dấu sau** = học viên đã xác nhận nhận.
+
+Hai dấu tách nhau vì khoảng giữa chúng (đã giao mà chưa ai xác nhận) chính là khoảng cần nhắc việc.
+
+**Ở màn Xếp lớp & Onboarding**: mỗi thẻ có một dải bốn chip, nhìn một cái là biết hồ sơ nào còn
+thiếu món gì. Bấm **Cập nhật bộ** mở bảng đầy đủ: đánh dấu đã giao, ghi nhận học viên đã nhận,
+**In hợp đồng**, và xem ảnh bản đã nhận.
+
+**In hợp đồng** ra một tờ đầy đủ: thông tin học viên và người đồng hành, khóa - lớp - lịch học -
+giảng viên, học phí và lịch đóng theo đợt, bộ tài liệu và quà đi kèm, **nguyên văn quy định lớp
+học & cam kết đang hiệu lực** (lấy từ Cài đặt, đúng bản học viên bấm đồng ý trên cổng), và hai ô
+chữ ký. In xong app tự ghi lại đã in lúc nào, ai in.
+
+**Ghi nhận học viên đã nhận hợp đồng thì bắt buộc đính ảnh** bản hợp đồng - vì đó là đường nhân
+viên bấm hộ. Học viên tự bấm ở cổng của họ thì không cần: chính cú bấm đã là bằng chứng.
+
+**Ở cổng học viên** có khối mới **Bộ hồ sơ nhập học** trong nhóm "Cần bạn xử lý": bốn dòng, món
+nào trung tâm đã giao thì có nút **Tôi đã nhận**; riêng hợp đồng có thêm chỗ tải ảnh bản đang giữ.
+Món chưa giao vẫn hiện ra (xám, "trung tâm chưa giao") để học viên biết mình còn thiếu gì. Huy
+hiệu việc trên thanh trên đếm đúng số món bấm được.
+
+**Cài đặt** có nhóm mới **Bộ onboarding** để khai bộ sách và quà tặng mặc định của đợt đang chạy -
+điền sẵn khi giao, vẫn sửa được cho từng học viên.
+
+### Gửi thông báo cho một danh sách
+
+Ở **Sổ tin đã gửi**, nút **Gửi thông báo** cho phép gửi một lượt cho:
+
+- **cả lớp** (chọn một hay nhiều lớp - app tự lấy toàn bộ học viên của lớp),
+- **danh sách học viên** chọn tay,
+- **nhân viên** (thông báo nội bộ).
+
+Chọn kênh (tự chọn theo hồ sơ, ưu tiên Zalo · chỉ Zalo · chỉ email), chọn mẫu có sẵn từ Kho mẫu
+tin, rồi soạn. Biến `{ten}`, `{lop}`, `{giangvien}`… **thay theo từng người**, nên mỗi người nhận
+đúng tên và đúng lớp của mình.
+
+App **nói thẳng số người sẽ bị bỏ qua** ngay trên form ("19 người sẽ nhận · 3 người thiếu địa chỉ,
+sẽ bỏ qua") và có nút **Xem danh sách nhận** liệt kê từng người kèm địa chỉ hoặc lý do bỏ qua.
+Gửi xong, **mỗi người một dòng riêng trong Sổ tin đã gửi** - tra tên nào cũng ra.
+
+Hồ sơ nhân sự chỉ khai email nên nhóm "Nhân viên" không bày lựa chọn Zalo.
+
+### Sổ phản hồi và Sổ khiếu nại: đọc được nội dung
+
+Hai sổ tra cứu trước đây chỉ hiện mã - tên - loại - trạng thái, tức nói VỀ phản hồi mà không nói
+phản hồi ấy là gì. Nay bảng có thêm **nhận lúc · kênh · nội dung · người xử lý**, và bấm một dòng
+là mở **đúng màn chi tiết đầy đủ** (nội dung học viên nói, dải bước xử lý, đường nhảy sang khiếu
+nại liên quan) chứ không còn là một ngăn kéo liệt kê cột.
+
+Hai cột đoạn văn "sau khi xử lý" để mặc định ẩn cho bảng gọn - bật lại ở nút **Cột**.
+
 ## ⭐ MỚI 26/08/2026 — **Cổng học viên: gọn hơn, đọc nhanh hơn, và menu thôi nhảy**
 
 - **Mục lục không còn "chạy lên chạy xuống".** Trước đây thứ tự các mục trên menu và thứ tự các
