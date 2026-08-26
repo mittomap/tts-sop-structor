@@ -2940,3 +2940,29 @@ phải nhìn một cột trống.
 `DL11.teacher_id` với `DL10.main_teacher_id` sẽ gán nhầm mọi buổi của một lớp **đã bàn giao** là
 dạy thay - người ấy dạy chúng khi lớp còn là lớp của mình. Chủ nhiệm là trạng thái hôm nay; buổi
 dạy là sự việc đã xảy ra.
+
+## Màu, font và cỡ chữ đổi được ngay trong Cài đặt
+
+**Cài đặt > Thương hiệu & giao diện** nay chỉnh được **18 ô màu · font chữ · 6 bậc cỡ chữ**, áp
+ngay lên toàn app mà không phải build lại.
+
+Mỗi ô khai theo **VAI, không theo CHỖ** - "màu chính" chứ không phải "màu nút Lưu" - kèm câu nói
+nó đang dùng ở đâu. Màn mới thêm sau này tự ăn theo, không phải khai thêm ô.
+
+| Nhóm | Gồm |
+|---|---|
+| Màu nhận diện | Màu chính · Màu chính đậm · Nền thanh menu |
+| Nền và chữ | Nền trang · Nền thẻ · Đường kẻ · Chữ đậm · Chữ thường · Chữ phụ · Xám trung tính |
+| Màu báo trạng thái | Đỏ · Hổ phách · Xanh lá · Xanh dương, mỗi màu kèm nền nhạt của nó |
+
+Sáu bậc cỡ chữ: chữ thân · tiêu đề trang · tiêu đề mục · chữ trên menu · chữ trong bảng · chữ
+trong chip. Để trống một ô là dùng lại bậc gốc. Đây là **thiết kế của trung tâm** (lưu cùng cấu
+hình, ai mở cũng thấy như nhau) - khác với nút thu phóng trên thanh trên, cái đó là sở thích riêng
+của từng máy.
+
+**Ba bộ dựng sẵn**, bấm một phát là cả app đổi: *Nhận diện ITTs - nền đỏ trầm* · *Nhận diện ITTs -
+nền indigo* · *Bản gốc của app*. Bộ dựng sẵn chỉ ghi đè những ô nó khai, ô đã chỉnh tay giữ nguyên.
+
+**Khung xem trước** ở cuối trang dùng chính các thành phần thật của app (menu, nút, chip, thẻ,
+bảng, dải nhắc) chứ không phải hình vẽ minh hoạ - nên nó không thể lệch với app, và nó cho biết
+ngay chữ trắng trên nền vừa chọn có đọc được không.

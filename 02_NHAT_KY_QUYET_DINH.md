@@ -148,6 +148,68 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 🎨 26/08 - MÀU SẮC THÀNH CẤU HÌNH, KHÔNG THÀNH MỘT LẦN SƠN
+> Anh Luân gửi bộ nhận diện thương hiệu (bản 2026, 71 trang) rồi hỏi: *"a muốn nó sát nhận diện
+> thương hiệu 1 tí"*. Em đã đi được nửa đường theo hướng SAI - dựng một phép xoay tông màu để sửa
+> tay 40 mã trong nguồn - thì anh chặn lại: *"e chỉ cần thêm vào cấu hình cho phép thay đổi chi
+> tiết màu sắc, font family và font size của từng chỗ là xong mà, sau này cần gì người ta sẽ đổi,
+> nhớ có ví dụ trực quan khi đổi nha"*.
+> *Sửa một lần là xong một lần; làm cho nó sửa được là xong mãi mãi.*
+>
+> **Bảng màu trong bộ nhận diện:** đỏ là màu chính, indigo và vàng là màu phụ, cộng đen trắng.
+> Font: Public Sans (chính) + Montserrat (phụ) - may là app đã dùng Montserrat sẵn.
+>
+> **Một xung đột phải GIẢI, không phải để NÉ.** Bộ nhận diện lấy ĐỎ làm màu chính, mà trong app
+> này đỏ đang là tiếng nói của VIỆC GẤP. Bản đầu em né bằng cách đặt indigo làm màu chính - anh
+> Luân xem xong: *"a hổng thích cái màu xanh đó của sidebar, hay em nghiên cứu sang màu đỏ mà ko
+> bị chói đi"*. Đúng: né là mất luôn cái nhận diện, mà nhận diện mới là thứ anh đang đi tìm.
+>
+> Giải bằng **ĐỘ SÁNG** chứ không bằng cách đổi tông. Cả ba bậc đều là đỏ, và **nghĩa tăng dần
+> theo độ sáng**: nền thanh menu là đỏ rất trầm (đồ đạc, không ai phải nhìn) · nút và tên bấm được
+> là đỏ đậm vừa · đỏ thương hiệu nguyên bản dành cho việc gấp. Trên màn hình, **cái đỏ sáng nhất
+> luôn là cái cần chú ý** - nên đỏ vẫn báo động được dù cả app đều đỏ.
+> Nền trầm đo ra **cùng độ sáng với nền xanh cũ** (L 0,035 so với 0,032) nên mắt vẫn đọc nó là một
+> mảng tối yên, không phải một mảng đỏ rực. Chọn bằng phép đo, không bằng cảm giác.
+> *Hai thứ cùng một màu vẫn phân biệt được nếu chúng khác nhau về SỨC - cái nào sáng hơn thì cái
+> đó đang nói to hơn.*
+> Bản indigo giữ lại thành một bộ dựng sẵn thứ hai, ai thích thì bấm.
+>
+> **Đã có sẵn một nửa cơ chế:** `uiApply()` từ lâu đã ghi `--navy` và `--red` lên `:root`. Chỉ là
+> nó dừng ở HAI ô. Nay mở ra trọn bộ **18 ô màu + font + 6 bậc cỡ chữ**, và `uiApply` duyệt thẳng
+> bản khai `UIMAU` chứ không liệt kê tay - thêm một vai màu là nó tự được áp.
+> Mỗi ô khai theo **VAI, không theo CHỖ** ("màu chính", không phải "màu nút Lưu") kèm câu nói đang
+> dùng ở đâu: *một cái tên theo chỗ thì mỗi màn mới lại phải khai thêm một ô; một cái tên theo vai
+> thì màn mới tự ăn theo.*
+> Sáu bậc cỡ chữ được nối vào CSS bằng biến (`--fs-body`, `--fs-h1`, `--fs-sec`, `--fs-nav`,
+> `--fs-tb`, `--fs-sm`): *một con số nằm rải trong CSS thì không ai sửa được; gom nó thành một cái
+> tên thì có.*
+>
+> **Khung xem trước** (anh Luân dặn riêng) dùng **chính các thành phần thật** của app - `.navitem`,
+> `.btn`, `.chip`, `.panel`, `.dt` - chứ không vẽ lại mấy ô màu tượng trưng. Một ô màu vuông không
+> cho biết chữ trắng trên nền ấy có đọc được không; một cái nút thật thì cho biết ngay. Và nó tự
+> đổi màu mà không cần một dòng mã nào, vì mọi thứ trong khung đều đang uống từ đúng những biến
+> `uiApply()` vừa ghi.
+> *Muốn xem trước cho thật thì đừng vẽ lại cái thật - hãy đặt chính nó vào khung.*
+>
+> **Bẫy cắn LẦN THỨ BA trong một ngày:** bảng màu vọt lên 117. Bảy mã mới - sáu của bộ dựng sẵn,
+> **một nằm trong chú thích** của em. Lần này em không bẻ câu chữ: luật đếm bảng màu là luật DUY
+> NHẤT trong nhóm còn đếm cả chú thích, trong khi luật viền ngay dưới nó đã bỏ chú thích từ 07/08
+> với đúng lý do *"chú thích viết cho người sửa app đọc, không phải cho máy đếm"*. Nay nó cũng bỏ.
+> *Một phép đo phạt đúng thứ mình muốn khuyến khích thì nó không nghiêm - nó chỉ đắt.*
+> Và tách hai con số: **bảng màu app VẼ RA (<=110)** khác **catalogue bộ dựng sẵn (<=12 mã)** -
+> *một cái thang đo bằng số BẬC, không đo bằng số giá trị người ta có thể gán vào bậc.*
+>
+> **Một lỗi CSS tự em gài:** dải bốn ô màu của bộ dựng sẵn xếp DỌC thành một cột. Do luật
+> `.uibob span{display:block}` của chính em đè lên `.uiboc` - hai luật cùng độ đặc hiệu thì luật
+> viết sau thắng. Phải đo `display` tính được mới thấy.
+> *Đặt một luật cho MỌI thẻ loại nào đó bên trong một khối là đã đặt luật cho cả những thẻ mình
+> sẽ thêm vào ngày mai.*
+>
+> **Việc tồn để lại:** 299 lượt cắm cứng trong nguồn đúng bằng giá trị một biến đã có (viết thẳng
+> `#E24B4A` thay vì `var(--red)`). Nối lại là độ phủ cấu hình **58% -> 72%** mà không đổi một
+> pixel. Chưa làm vì có vài chỗ nguy hiểm - `statStrip` nối chuỗi `t[3]+"18"` để pha độ mờ, thay
+> bằng `var()` là vỡ.
+
 > ### 🔴 26/08 - ANH LUÂN BẮT LẠI LUẬT W5, VÀ EM VỪA TỰ TAY DỰNG LẠI NÓ TRONG CHÍNH PHIÊN NÀY
 > Anh Luân gửi ảnh thẻ "Khóa của bạn": một dải navy 4px dọc mép trái. *"a đã từng dặn ko dùng
 > thiết kế border kiểu này"* - rồi hỏi thẳng: *"e có luật nhưng vẫn làm sai? lý do? cách khắc phục"*.
@@ -218,9 +280,9 @@
 > Đo ra: Phan Trung Chính 19 buổi/29.3h **trong đó dạy thay 1 buổi (3h)**; Phạm Tấn Phát 17 buổi
 > **nhờ người dạy thay 1 buổi**.
 >
-> **Còn chờ anh Luân quyết:** dạy thay có ăn **đơn giá khác** không? Hiện đơn giá tra theo
-> (giảng viên x loại ngày x ca). Muốn có phụ cấp dạy thay thì đó là một tham số CH2 mới - em không
-> tự đặt con số ấy.
+> **Anh Luân đã chốt:** *"dạy thay lương tương tự dạy chính"* - tức app đang làm đúng sẵn (cùng
+> `hourRate`, không có tham số riêng). Câu ấy nay ghi thẳng lên chú thích của cột để sau này không
+> ai phải hỏi lại.
 
 > ### ✅ 26/08 - GIÁO VIÊN DẠY THAY: ĐÓNG VIỆC TỒN, VÀ HOÁ RA LÀ HAI LỖ CHỨ KHÔNG PHẢI MỘT
 > Anh Luân: *"ồ, giáo viên dạy thay đúng rồi, e làm đi"*.

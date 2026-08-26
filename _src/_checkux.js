@@ -729,9 +729,33 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
 (function(){
  var CSS_ALL=require("fs").readFileSync(process.env.ITTS_OUT+"/ITTs_WebApp_v5_demo.html","utf8");
  function tap(re){var m={};(CSS_ALL.match(re)||[]).forEach(function(x){m[x]=1});return Object.keys(m)}
- var mau=tap(/#[0-9A-Fa-f]{6}/g).map(function(x){return x.toUpperCase()});
+ /* ═══ 26/08 - TÁCH "MÀU APP VẼ RA" KHỎI "MÀU APP ĐEM RA CHO NGƯỜI TA CHỌN" ══════════════════
+    Từ hôm nay Cài đặt có bộ màu dựng sẵn (`UIBO`) - anh Luân: *"thêm vào cấu hình cho phép thay
+    đổi chi tiết màu sắc... sau này cần gì người ta sẽ đổi"*. Bộ ấy mang theo bảng màu của bộ
+    nhận diện thương hiệu, và đếm gộp vào là bảng màu vọt lên 117.
+    Nhưng luật này sinh ra để canh MỘT chuyện: *app đang vẽ bằng bao nhiêu sắc khác nhau* - nguyên
+    văn lý do cũ là "202 mã màu, 118 mã chỉ dùng đúng một lần, 26 sắc trắng cho cùng một việc,
+    app không có THANG nào cả". Một bộ dựng sẵn KHÔNG thêm một bậc nào vào cái thang ấy: nó thay
+    GIÁ TRỊ đứng sau 18 cái vai đã có, chứ không đẻ ra vai thứ 19.
+    *Một cái thang đo bằng số BẬC, không đo bằng số giá trị người ta có thể gán vào bậc.*
+    Nên: đếm riêng hai con số, và cả hai đều phải qua cửa - bảng màu app vẽ <=110, và bản thân
+    catalogue bộ dựng sẵn <=12 mã (để không ai đổ cả cầu vồng vào đó rồi gọi là "cấu hình"). */
+ /* BỎ CHÚ THÍCH TRƯỚC KHI ĐẾM - luật này là luật DUY NHẤT trong nhóm còn đếm cả lời kể.
+    Nhóm 6 ngay dưới đã bỏ chú thích từ 07/08 với đúng lý do ấy: *"chú thích mã nguồn viết cho
+    người sửa app đọc, không phải cho máy đếm... bẻ một lần là lần sau người ta không dám ghi
+    lại bài học nữa."* Nhóm này thì chưa - nên 26/08 nó bắt liên tiếp BA lần một chú thích đang
+    GIẢI THÍCH vì sao gỡ / vì sao chọn một mã màu, mà không bắt một nét vẽ nào.
+    *Một phép đo phạt đúng thứ mình muốn khuyến khích thì nó không nghiêm - nó chỉ đắt.* */
+ var CSS_ALL_KO=CSS_ALL.replace(/\/\*[\s\S]*?\*\//g," ");
+ var UIBO_RE=/var UIBO=\[[\s\S]*?\]\];/;
+ var _bo=(CSS_ALL_KO.match(UIBO_RE)||[""])[0];
+ var _boMau={};(_bo.match(/#[0-9A-Fa-f]{6}/g)||[]).forEach(function(x){_boMau[x.toUpperCase()]=1});
+ var CSS_VE=CSS_ALL_KO.replace(UIBO_RE," ");
+ function tapVe(re){var m={};(CSS_VE.match(re)||[]).forEach(function(x){m[x]=1});return Object.keys(m)}
+ var mau=tapVe(/#[0-9A-Fa-f]{6}/g).map(function(x){return x.toUpperCase()});
  var uniq={};mau.forEach(function(x){uniq[x]=1});
  var soMau=Object.keys(uniq).length;
+ t("bo mau dung san khai gon (<=12 ma): "+Object.keys(_boMau).length, Object.keys(_boMau).length<=12);
  var soChu=tap(/font-size:\s*[0-9.]+px/g).length;
  var soGoc=tap(/border-radius:\s*[0-9]+px/g).length;
  t("bang mau khong phinh tro lai (<=110 ma, truoc 202): "+soMau, soMau<=110);

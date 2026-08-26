@@ -266,9 +266,16 @@
 </style>
 <style>
 :root{--navy:#2E5A88;--navyd:#1E3A5F;--sidebar:#1B3350;--bg:#EEF2F6;--card:#fff;--line:#E3E9F0;--text:#1E2A38;--muted:#6B7887;--ink:#1E2A38;
---red:#E24B4A;--redb:#FBF0EF;--amber:#E08A1E;--amberb:#FFF6D8;--green:#2E9E6B;--greenb:#E4F5EC;--blue:#3B82C4;--blueb:#EEF2F6;--gray:#EEF2F6}
+--red:#E24B4A;--redb:#FBF0EF;--amber:#E08A1E;--amberb:#FFF6D8;--green:#2E9E6B;--greenb:#E4F5EC;--blue:#3B82C4;--blueb:#EEF2F6;--gray:#EEF2F6;
+/* KIỂU CHỮ CŨNG LÀ CẤU HÌNH. Anh Luân 26/08: *"thêm vào cấu hình cho phép thay đổi chi tiết
+   màu sắc, font family và font size của từng chỗ"*. Sáu bậc dưới đây là SÁU VAI đọc được
+   trên màn, không phải sáu con số: chữ thân · tiêu đề trang · tiêu đề mục · chữ trên menu ·
+   chữ trong bảng · chữ phụ. Đổi ở Cài đặt là `uiApply()` ghi đè thẳng lên đây.
+   *Một con số nằm rải trong CSS thì không ai sửa được; gom nó thành một cái tên thì có.* */
+--font:Montserrat,system-ui,sans-serif;
+--fs-body:14px;--fs-h1:18px;--fs-sec:12.5px;--fs-nav:13px;--fs-tb:12.5px;--fs-sm:11px}
 *{box-sizing:border-box;margin:0;padding:0}html,body{height:100%}
-body{font-family:Montserrat,system-ui,sans-serif;color:var(--text);background:var(--bg);font-size:14px;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);color:var(--text);background:var(--bg);font-size:var(--fs-body);-webkit-font-smoothing:antialiased}
 /* V9.97 (anh Luân, kèm ảnh: *"tự nhiên có cái footer bar đấy... nó thô quá"*). Không phải
    footer bar - là một CÁI HỐ do chính tính năng thu nhỏ đẻ ra. `zoom:.9` co luôn đơn vị `vh`:
    vỏ app cao `100vh` hoá ra chỉ còn 810px vật lý trong cửa sổ 900px, chừa 90px nền trống ở đáy
@@ -477,7 +484,7 @@ tr.cfhl>td{background:#FFF6D8}
 .btn.hvcall-dark{background:#ffffff1f;border-color:#ffffff4d;color:#fff}
 .btn.hvcall-dark:hover{background:#ffffff33;border-color:#ffffff80}
 .navgrp{margin-bottom:3px}
-.navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;cursor:pointer;color:#C4D2E4;font-size:13px;font-weight:500}
+.navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;cursor:pointer;color:#C4D2E4;font-size:var(--fs-nav);font-weight:500}
 /* Mục menu phải nằm GỌN MỘT DÒNG - rớt chữ làm gãy nhịp đọc của cả cột. Bề rộng đã nới ở
    `.sidebar`; thêm chốt này để nếu mai kia có tên dài hơn nữa thì nó cắt bằng dấu ... chứ
    không tự xuống dòng (và tooltip `title` vẫn nói đủ tên). */
@@ -649,7 +656,7 @@ a.crb{color:var(--navy);cursor:pointer;text-decoration:none}a.crb:hover{text-dec
    rộng bao nhiêu, nên chặn theo ĐIỂM GÃY là canh sai chỗ; để nó tự xuống dòng mới đúng. */
 .phead{display:flex;align-items:flex-end;gap:14px;margin-bottom:18px;flex-wrap:wrap}
 .phead>div:first-child{min-width:0}
-.phead .t{font-size:18px;font-weight:800;letter-spacing:-.2px}.phead .s{font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}
+.phead .t{font-size:var(--fs-h1);font-weight:800;letter-spacing:-.2px}.phead .s{font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}
 /* V9.67: dải nút bên phải tiêu đề trang phải XUỐNG DÒNG và co được. Ô chọn lớp mang tên đầy đủ
    ("LOP-FOUND-PLA-01 - Foundation PLA T7-CN sáng (06/2026)") dài 477px, đẩy trang Bảng lớp cuộn
    ngang ở cả iPad dọc lẫn điện thoại xoay ngang. */
@@ -819,7 +826,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
       được mà bo 20px y như nhãn tĩnh. Nay chốt một quy ước: **bo 8px = bấm được, bo 20px =
       nhãn đọc thôi**. Đây là trục còn chỗ - bảng màu đã chạm trần 110 mã, thang chữ 16/16,
       riêng bo góc mới dùng 10 bậc và chưa bị canh. */
-.chip{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap;display:inline-block;background:var(--gray);color:#5A6675}
+.chip{font-size:var(--fs-sm);font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap;display:inline-block;background:var(--gray);color:#5A6675}
 /* Ô lưới Lịch trực là NÚT, không phải nhãn - nên nó phải đủ to để ngón tay bấm. `.chip` trần chỉ
    cao 22px, dưới ngưỡng chạm 24px mà `_checkui` canh trên khổ điện thoại. Cái chuẩn ấy không
    phải để làm đẹp: một cái nút nhỏ hơn đầu ngón tay là một cái nút bấm ba lần mới trúng. */
@@ -855,7 +862,7 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .alert{display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid var(--line)}.alert:last-child{border-bottom:0}
 .alert .ab{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .alert .at{flex:1}.alert .at b{font-size:13px;font-weight:600}.alert .at small{display:block;color:var(--muted);font-size:11px}.alert .av{font-size:18px;font-weight:800}
-.dt{width:100%;border-collapse:collapse;font-size:12.5px}
+.dt{width:100%;border-collapse:collapse;font-size:var(--fs-tb)}
 /* ═══ V2 15/08 (anh Luân: *"Header của bảng thì nên canh giữa em ạ, border chia cột trong bảng
    nên có cái dọc mờ cho phân biệt"*) ═══════════════════════════════════════════════════════════
    Header căn giữa cho MỌI cột trừ cột đầu - cột đầu là tên (người, lớp, mã), nội dung của nó
@@ -2726,7 +2733,7 @@ table.dt tbody tr.clk.on td{font-weight:600}
 .notebar.nbamber{background:#FFFBF2;border-color:#F2D9AE;color:#7A5B12}
 .notebar>i{margin-right:8px;vertical-align:-2px}
 .notebar>.btn,.notebar>button{margin-left:8px;vertical-align:-3px}
-.sechd{font-size:12.5px;font-weight:800;color:#3A4756;margin:14px 4px 4px;text-transform:uppercase;letter-spacing:.4px}
+.sechd{font-size:var(--fs-sec);font-weight:800;color:#3A4756;margin:14px 4px 4px;text-transform:uppercase;letter-spacing:.4px}
 /* Hàng tiêu đề của một dải: [tên + câu mô tả] đẩy [nút điều khiển] về mép phải. Nút đứng cạnh
    thứ nó điều khiển, và câu mô tả không còn phải đẻ ra một hàng riêng cho nó. */
 .sechdw{display:flex;align-items:flex-end;gap:12px;margin-bottom:8px}
@@ -3173,6 +3180,37 @@ body.drsz .drawer{transition:none}
    trông như dính vào đáy ô. */
 .dcard textarea+.cfpline,.dcard input+.cfpline{margin-top:10px}
 .lnk{color:var(--navy);font-weight:700;cursor:pointer;border-bottom:1px dashed #B9C6D6}.lnk:hover{color:var(--navyd)}
+/* ---- Màn chỉnh giao diện: bộ dựng sẵn, từng ô màu, và khung xem trước ---- */
+.uibo{display:flex;gap:10px;flex-wrap:wrap}
+.uibob{flex:1 1 240px;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:12px;
+ padding:11px 13px;cursor:pointer;transition:.15s;font-family:inherit}
+.uibob:hover{border-color:var(--navy);box-shadow:0 3px 12px rgba(16,32,58,.08)}
+.uibob b{display:block;font-size:13px;color:var(--ink);margin:7px 0 2px}
+.uibob span{display:block;font-size:11.5px;color:var(--muted);line-height:1.5}
+/* `.uibob .uiboc` chứ không phải `.uiboc`: ô màu là một `<span>` nằm trong `.uibob`, mà luật
+   ngay trên đã đặt `display:block` cho mọi `<span>` trong đó - hai luật cùng một độ đặc hiệu thì
+   luật viết sau thắng, nên dải bốn ô màu xếp dọc thành một cột. Đo ra `display` tính được là
+   `block` chứ không phải `flex` mới thấy.
+   *Đặt một luật cho MỌI thẻ loại nào đó bên trong một khối là đã đặt luật cho cả những thẻ mình
+   sẽ thêm vào ngày mai.* */
+.uibob .uiboc{display:flex;gap:4px}
+.uiboc i{width:22px;height:22px;border-radius:6px;display:block}
+.uimau{display:flex;flex-direction:column;gap:9px}
+.uimr{display:flex;align-items:center;gap:11px}
+.uimr input[type=color]{width:42px;height:34px;padding:2px;border:1px solid var(--line);border-radius:8px;background:var(--card);flex:none;cursor:pointer}
+.uimt{flex:1;min-width:0}
+.uimt b{display:block;font-size:12.5px;color:var(--ink)}
+.uimt span{display:block;font-size:11.5px;color:var(--muted);line-height:1.45}
+.uimhex{width:104px;flex:none;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
+ text-transform:uppercase;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+/* Khung xem trước: một khung nhỏ mô phỏng bố cục thật (menu tối bên trái, thân trang bên phải). */
+.uipv{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg)}
+.uipvs{width:184px;flex:none;background:var(--sidebar);padding:11px 9px;display:flex;flex-direction:column;gap:3px}
+.uipvb{display:flex;align-items:center;gap:8px;padding:2px 4px 11px;color:#fff}
+.uipvb b{font-size:12.5px}
+.uipvm{flex:1;min-width:0;padding:13px 15px;overflow:hidden}
+.uipvm .phead{margin-bottom:8px}
+@media(max-width:720px){.uipvs{display:none}}
 .settabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;border-bottom:1px solid var(--line);padding-bottom:10px}
 .stab{height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:#fff;color:#5A6675;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
 .stab:hover{border-color:#B9C6D6}.stab.on{background:var(--navy);border-color:var(--navy);color:#fff}
@@ -18222,11 +18260,7 @@ function renderSettings(){var tab=window.SETTAB||"tongquan";var cf=(DATA.config)
    '<input value="'+esc(u.gopy||"")+'" oninput="uiSet(\'gopy\',this.value)" placeholder="'+esc(GOPYMAC)+'">'+
    '<div class="fhint" data-tip="Nút hình loa trên thanh trên mở thẳng địa chỉ này ở tab mới. Để trống là dùng bảng mặc định.">Nút hình loa trên thanh trên mở địa chỉ này. Để trống là dùng bảng mặc định.</div></div>';
   h+='</div></div></div><div>';
-  h+='<div class="panel" data-tour="cfbrandmau"><div class="ph"><b><i class="ti ti-palette" style="margin-right:6px"></i>Màu thương hiệu</b></div><div class="pbody">';
-  h+='<div class="fld"><label>Màu nền menu (chủ đạo)</label><input type="color" value="'+esc(u.navy)+'" oninput="uiSet(\'navy\',this.value)" style="height:38px;padding:2px"></div>';
-  h+='<div class="fld"><label>Màu nhấn (logo, cảnh báo)</label><input type="color" value="'+esc(u.red)+'" oninput="uiSet(\'red\',this.value)" style="height:38px;padding:2px"></div>';
-  h+='<div class="mut" style="font-size:11.5px;padding:6px 2px 0">Đổi màu áp ngay lên toàn app. Nhớ chọn màu nền menu đủ TỐI để chữ trắng còn đọc được.</div>';
-  h+='</div></div>';
+  h+=uiThemeHTML(u);
   h+='<div class="panel"><div class="ph"><b><i class="ti ti-phone" style="margin-right:6px"></i>Thông tin liên hệ (in trên phiếu, tin nhắn)</b></div><div class="pbody">';
   h+='<div class="fld full"><label>Hotline</label><input id="cf_centerHotline" value="'+esc(paramStr("centerHotline",""))+'" onchange="saveParam(\'centerHotline\')" placeholder="1900 xxxx"></div>';
   h+='<div class="fld full"><label>Địa chỉ</label><input id="cf_centerAddress" value="'+esc(paramStr("centerAddress",""))+'" onchange="saveParam(\'centerAddress\')" placeholder="Số nhà, đường, quận..."></div>';
@@ -29002,8 +29036,86 @@ function tourOpenBack(){
    Lưu trong DATA.config.ui -> tự đồng bộ đa cổng/đa máy như mọi dữ liệu demo và Reset demo đưa về gốc.
    Áp bằng uiApply(): đổi biến màu CSS, tên + logo trên sidebar, tiêu đề tab trình duyệt.
    Menu: ẩn/hiện nhóm & mục, đổi tên nhóm - buildNav đọc UI().menu (KHÔNG sửa NAVTREE gốc). */
+/* ═══ 26/08 - BẢNG MÀU VÀ KIỂU CHỮ THÀNH CẤU HÌNH, KHÔNG PHẢI THÀNH MỘT LẦN SƠN ══════════════
+   Anh Luân gửi bộ nhận diện thương hiệu rồi chốt cách làm: *"e chỉ cần thêm vào cấu hình cho
+   phép thay đổi chi tiết màu sắc, font family và font size của từng chỗ là xong mà, sau này cần
+   gì người ta sẽ đổi, nhớ có ví dụ trực quan khi đổi nha"*.
+   Đúng - và nó đắt hơn hẳn cách em định làm (đi sửa tay 40 mã màu trong nguồn). Sơn một lần thì
+   lần sau đổi nhận diện lại phải sửa mã; một cái nút vặn thì ai cũng vặn được, kể cả trung tâm
+   khác mang bản demo này về dùng.
+   *Sửa một lần là xong một lần; làm cho nó sửa được là xong mãi mãi.*
+
+   MỖI Ô LÀ MỘT VAI, KHÔNG PHẢI MỘT CHỖ. Không khai "màu của nút Lưu" mà khai "màu chính" - vì
+   một cái tên theo chỗ thì mỗi màn mới lại phải khai thêm một ô, còn một cái tên theo vai thì
+   màn mới tự ăn theo. Câu mô tả đi kèm nói ĐANG DÙNG Ở ĐÂU, để người sửa không phải đoán. */
+var UIMAU=[
+ ["Màu nhận diện",[
+  ["navy","Màu chính","Nút chính, tên bấm được, tiêu đề, ô icon - thứ dẫn mắt người dùng"],
+  ["navyd","Màu chính đậm","Lúc rê chuột và lúc nhấn xuống của nút chính"],
+  ["sidebar","Nền thanh menu","Mảng tối chạy dọc bên trái - vùng màu lớn nhất màn hình"]]],
+ ["Nền và chữ",[
+  ["bg","Nền trang","Nền phía sau mọi thẻ và bảng"],
+  ["card","Nền thẻ","Nền của thẻ, bảng, ngăn kéo, form"],
+  ["line","Đường kẻ","Viền thẻ, kẻ bảng, đường chia mục"],
+  ["ink","Chữ đậm","Tên người, con số, tiêu đề trong thẻ"],
+  ["text","Chữ thường","Chữ chạy trong câu"],
+  ["muted","Chữ phụ","Câu giải thích, đơn vị, ngày tháng, nhãn cột"],
+  ["gray","Xám trung tính","Nền chip không màu, nền ô rỗng"]]],
+ ["Màu báo trạng thái",[
+  ["red","Đỏ - việc gấp","Quá hạn, còn nợ, bị từ chối, vắng không phép"],
+  ["redb","Nền đỏ nhạt","Nền của dải cảnh báo đỏ và chip đỏ"],
+  ["amber","Hổ phách - cần để ý","Sắp tới hạn, chờ duyệt, thiếu một phần"],
+  ["amberb","Nền hổ phách nhạt","Nền của dải nhắc và chip hổ phách"],
+  ["green","Xanh lá - đã xong","Đã đóng đủ, đã duyệt, đúng giờ, đạt mục tiêu"],
+  ["greenb","Nền xanh lá nhạt","Nền của chip xanh và dải báo đã xong"],
+  ["blue","Xanh dương - thông tin","Số liệu, nhãn phân loại, đường dẫn phụ"],
+  ["blueb","Nền xanh dương nhạt","Nền của chip xanh dương"]]]];
+/* Ba lựa chọn font: một cái CHẮC CHẮN hiện đúng (nhúng sẵn trong file), một cái theo bộ nhận
+   diện, một cái mượn của máy. Phải nói thẳng cái nào cần có font trong máy - hứa một font mà
+   máy người xem không có thì trình duyệt lặng lẽ thay bằng font khác và không ai biết. */
+var UIFONT=[
+ ["Montserrat","Montserrat","đã nhúng sẵn trong app - luôn hiện đúng, kể cả khi không có mạng","Montserrat,system-ui,sans-serif"],
+ ["PublicSans","Public Sans","font chính của bộ nhận diện - cần máy đã cài font này","'Public Sans',Montserrat,system-ui,sans-serif"],
+ ["Hethong","Font hệ thống","mượn font sẵn có của máy - nhẹ nhất, mỗi máy một vẻ","system-ui,-apple-system,'Segoe UI',Roboto,sans-serif"]];
+/* Sáu bậc cỡ chữ = sáu vai đọc được trên màn. Đơn vị px, khai kèm khoảng cho phép để không ai
+   gõ một con số làm vỡ bố cục. Đây KHÁC với nút thu phóng ở thanh trên: nút ấy là sở thích của
+   TỪNG MÁY xem (nhớ trong trình duyệt), còn đây là thiết kế của TRUNG TÂM (lưu cùng cấu hình). */
+var UICO=[
+ ["fs-body","Chữ thân","Chữ chạy trong câu, trong form, trong thẻ",12,18],
+ ["fs-h1","Tiêu đề trang","Dòng tên to nhất ở đầu mỗi trang",15,26],
+ ["fs-sec","Tiêu đề mục","Dòng tên nhóm chạy giữa trang",11,17],
+ ["fs-nav","Chữ trên menu","Tên các mục trên thanh menu bên trái",11,17],
+ ["fs-tb","Chữ trong bảng","Chữ của mọi bảng danh sách",11,17],
+ ["fs-sm","Chữ trong chip","Chữ của các nhãn trạng thái nhỏ",9,14]];
+/* Bộ dựng sẵn: bấm một phát là cả app đổi. Bộ "Nhận diện ITTs 2026" lấy thẳng từ bộ nhận diện
+   thương hiệu anh Luân gửi 26/08 - đỏ là màu chính, indigo và vàng là màu phụ.
+   (Không chép lại mã màu vào chú thích: `_checkux` đếm mã trên VĂN BẢN cả file nên lời kể về
+   một mã cũng bị tính là một mã - đã cắn sáng nay ở luật dải viền.)
+   MỘT XUNG ĐỘT PHẢI GIẢI, KHÔNG PHẢI MỘT XUNG ĐỘT ĐỂ NÉ: bộ nhận diện lấy ĐỎ làm màu chính,
+   mà trong app này đỏ đang là tiếng nói của VIỆC GẤP - quá hạn, còn nợ, bị từ chối.
+   Bản đầu em né bằng cách đặt indigo làm màu chính. Anh Luân xem xong: *"a hổng thích cái màu
+   xanh đó của sidebar, hay em nghiên cứu sang màu đỏ mà ko bị chói đi"*. Đúng - né là mất luôn
+   cái nhận diện, mà nhận diện mới là thứ anh đang đi tìm.
+   Giải bằng ĐỘ SÁNG chứ không bằng cách đổi tông: cả ba bậc đều là đỏ, và NGHĨA TĂNG DẦN THEO
+   ĐỘ SÁNG - nền thanh menu là đỏ rất trầm (đồ đạc, không ai phải nhìn), nút và tên bấm được là
+   đỏ đậm vừa, còn đỏ thương hiệu nguyên bản dành cho việc gấp. Trên màn hình, **cái đỏ sáng nhất
+   luôn là cái cần chú ý** - nên đỏ vẫn báo động được dù cả app đều đỏ.
+   Nền trầm đo ra CÙNG ĐỘ SÁNG với nền xanh cũ (L 0,035 so với 0,032), tức mắt vẫn đọc nó là
+   "một mảng tối yên", không phải một mảng đỏ rực.
+   *Hai thứ cùng một màu vẫn phân biệt được nếu chúng khác nhau về SỨC - cái nào sáng hơn thì cái
+   đó đang nói to hơn.* */
+var UIBO=[
+ ["itts","Nhận diện ITTs - nền đỏ trầm","thang đỏ ba bậc: nền rất trầm, nút đỏ đậm, đỏ thương hiệu để dành cho việc gấp",
+  {navy:"#8E1622",navyd:"#6E101A",sidebar:"#5C0F19",red:"#C40319",redb:"#FBECEE"}],
+ ["ittsx","Nhận diện ITTs - nền indigo","lấy màu phụ của bộ nhận diện làm nền, đỏ thương hiệu để dành cho việc gấp",
+  {navy:"#20298D",navyd:"#171F6E",sidebar:"#161C63",red:"#C40319",redb:"#FBECEE"}],
+ ["mac","Bản gốc của app","xanh thép trầm - bản đang chạy từ đầu",null]];
 var UIDEF={brand:"ITTs - SOP TEMP",sub:"Hệ thống tuân thủ SOP",center:"IELTS The Tutors",
  title:"IELTS The Tutors · Cổng làm việc",logo:"",navy:"#1E3A5F",red:"#D51920",
+ navyd:"#1E3A5F",sidebar:"#1B3350",bg:"#EEF2F6",card:"#FFFFFF",line:"#E3E9F0",
+ text:"#1E2A38",ink:"#1E2A38",muted:"#6B7887",gray:"#EEF2F6",redb:"#FBF0EF",
+ amber:"#E08A1E",amberb:"#FFF6D8",green:"#2E9E6B",greenb:"#E4F5EC",blue:"#3B82C4",blueb:"#EEF2F6",
+ font:"Montserrat",co:{},
  /* V9.53 (anh Luân): công tắc hiện/ẩn BÁNH RĂNG trỏ cấu hình. Bản demo để BẬT - ai xem cũng
     sửa được thông số theo thực tế của trung tâm mình ngay tại chỗ thấy con số. Trung tâm chạy
     thật thì tắt đi cho gọn, số vẫn đúng, chỉ không còn nút nhảy. */
@@ -29018,13 +29130,39 @@ function UI(){var c=(DATA.config=DATA.config||{});var u=(c.ui=c.ui||{});
  for(var k in UIDEF)if(u[k]===undefined)u[k]=(typeof UIDEF[k]==="object"?JSON.parse(JSON.stringify(UIDEF[k])):UIDEF[k]);
  return u}
 function uiSet(k,v){UI()[k]=v;uiApply();persistSoon()}
+/* Cỡ chữ lưu RIÊNG trong `u.co` chứ không trộn vào cùng chỗ với màu: hai họ khác đơn vị, khác
+   khoảng cho phép, và "về mặc định" của chúng cũng khác nhau (bỏ trống = ăn theo bản gốc). */
+function uiSetCo(k,v){var u=UI();u.co=u.co||{};
+ var d=UICO.filter(function(x){return x[0]===k})[0]||[null,"","",1,999];
+ var n=num(v);
+ if(!n){delete u.co[k]}else u.co[k]=Math.max(d[3],Math.min(d[4],n));
+ uiApply();persistSoon()}
+/* Bộ dựng sẵn chỉ ghi ĐÈ những ô nó khai, các ô khác giữ nguyên - để ai đã chỉnh tay một vài ô
+   không bị một cú bấm cuốn sạch. Bộ "bản gốc" thì khai null = trả mọi ô màu về UIDEF. */
+function uiBo(k){var b=UIBO.filter(function(x){return x[0]===k})[0];if(!b)return;
+ var u=UI(),m=b[3];
+ UIMAU.forEach(function(nh){nh[1].forEach(function(x){
+  if(m&&m[x[0]])u[x[0]]=m[x[0]]; else if(!m)u[x[0]]=UIDEF[x[0]]})});
+ uiApply();persistSoon();reRender(CUR);
+ toast("Đã áp bộ màu “"+b[1]+"” cho cả app.",4000)}
 function uiLogoHTML(size){var u=UI(),s=size||26;
  if(u.logo&&/^(data:|https?:)/.test(u.logo))return '<img src="'+esc(u.logo)+'" alt="logo" style="width:'+s+'px;height:'+s+'px;object-fit:contain;border-radius:6px">';
  if(u.logo)return '<span style="font-size:'+Math.round(s*0.72)+'px;font-weight:800;color:'+esc(u.red)+'">'+esc(u.logo.slice(0,2))+'</span>';
  return '<svg viewBox="0 0 40 40" width="'+s+'" height="'+s+'" aria-hidden="true"><g fill="none" stroke="'+esc(u.red)+'" stroke-width="3.2"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="7.5"/></g><circle cx="20" cy="20" r="3.4" fill="'+esc(u.red)+'"/><g stroke="'+esc(u.red)+'" stroke-width="3.2"><line x1="20" y1="1.5" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="38.5"/><line x1="1.5" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="38.5" y2="20"/></g></svg>'}
+function uiFontCss(k){var f=UIFONT.filter(function(x){return x[0]===(k||"Montserrat")})[0]||UIFONT[0];return f[3]}
+function uiCo(k){var c=(UI().co)||{};var d=UICO.filter(function(x){return x[0]===k})[0]||[];
+ var v=num(c[k]);return (v>0?v:0)||null}
 function uiApply(){var u=UI();
  try{var r=document.documentElement;
-  if(r&&r.style){r.style.setProperty("--navy",u.navy||UIDEF.navy);r.style.setProperty("--red",u.red||UIDEF.red)}
+  /* Ghi TRỌN BỘ, không ghi hai màu như bản trước. Duyệt thẳng bản khai `UIMAU` chứ không liệt
+     kê tay: thêm một vai màu ở bản khai là nó tự được áp, không phải nhớ sửa thêm chỗ này.
+     *Một danh sách viết tay ở nơi thứ hai thì sớm muộn nó lệch với nơi thứ nhất.* */
+  if(r&&r.style){
+   UIMAU.forEach(function(nh){nh[1].forEach(function(m){
+    var v=String(u[m[0]]||UIDEF[m[0]]||"").trim();if(v)r.style.setProperty("--"+m[0],v)})});
+   r.style.setProperty("--font",uiFontCss(u.font));
+   UICO.forEach(function(c){var v=uiCo(c[0]);
+    r.style.setProperty("--"+c[0],v?(Math.max(c[3],Math.min(c[4],v))+"px"):"")})}
   var lg=document.getElementById("brandLogo");if(lg)lg.innerHTML=uiLogoHTML(26);
   var bn=document.getElementById("brandName");if(bn)bn.textContent=u.brand||UIDEF.brand;
   var bs=document.getElementById("brandSub");if(bs)bs.textContent=u.sub||"";
@@ -29045,6 +29183,93 @@ function uiFactoryRun(){if(DATA.config)delete DATA.config.ui_default;
 function uiReset(){confirmRun(uiHasBase()?"Đưa giao diện (tên, logo, màu, menu) về bản mặc định của trung tâm?":"Đưa toàn bộ giao diện (tên, logo, màu, menu) về mặc định?","uiResetRun")}
 function uiResetRun(){DATA.config.ui=JSON.parse(JSON.stringify(uiBase()));uiApply();
  if(typeof buildNav==="function")buildNav();toast("Đã đưa giao diện về mặc định.");reRender(CUR)}
+/* ═══ MÀN CHỈNH GIAO DIỆN + KHUNG XEM TRƯỚC ═══════════════════════════════════════════════════
+   Anh Luân dặn kèm: *"nhớ có ví dụ trực quan khi đổi nha"*.
+   KHUNG XEM TRƯỚC DÙNG CHÍNH CÁC THÀNH PHẦN THẬT của app - `.navitem`, `.btn`, `.chip`, `.panel`,
+   `.dt`, `.bstat` - chứ không vẽ lại mấy ô màu tượng trưng. Hai lý do:
+   · một ô màu vuông không cho biết chữ trắng trên nền ấy có đọc được không, còn một cái nút thật
+     thì cho biết ngay;
+   · và nếu vẽ lại thì khung xem trước là một BẢN SAO - hôm nào app đổi kiểu nút mà quên đổi bản
+     sao là nó bày ra một thứ không còn tồn tại.
+   *Muốn xem trước cho thật thì đừng vẽ lại cái thật - hãy đặt chính nó vào khung.*
+   Nó tự đổi màu theo mà không cần một dòng mã nào, vì `uiApply()` ghi biến lên `:root` và mọi
+   thứ trong khung đều đang uống từ đúng những biến ấy. */
+function uiXemTruoc(){
+ var h='<div class="uipv">';
+ h+='<div class="uipvs">'+
+   '<div class="uipvb">'+uiLogoHTML(20)+'<b>'+esc(UI().brand||UIDEF.brand)+'</b></div>'+
+   '<div class="navitem on"><i class="ti ti-home"></i>Mục đang mở</div>'+
+   '<div class="navitem"><i class="ti ti-users"></i>Một mục khác<span class="dot">3</span></div>'+
+   '<div class="navitem"><i class="ti ti-file-text"></i>Mục thứ ba</div></div>';
+ h+='<div class="uipvm">'+
+   '<div class="phead"><div><div class="t">Tiêu đề trang</div><div class="s">Câu ngữ cảnh nói trang này trả lời câu hỏi gì.</div></div></div>'+
+   '<div class="sechd">Tiêu đề mục</div>'+
+   '<div class="panel"><div class="ph"><b>Một cái thẻ</b><span class="mut" style="font-size:11.5px">câu phụ bên phải</span></div>'+
+    '<div class="pbody">'+
+     '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px">'+
+      '<span class="chip green">đã xong</span><span class="chip amber">chờ duyệt</span>'+
+      '<span class="chip red">quá hạn</span><span class="chip blue">thông tin</span><span class="chip">không màu</span></div>'+
+     '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary sm" type="button">Nút chính</button>'+
+      '<button class="btn sm" type="button">Nút thường</button>'+
+      '<a href="javascript:void(0)" class="lnk" onclick="return false" style="align-self:center">một cái tên bấm được</a></div>'+
+     '<div class="mut" style="font-size:11.5px;margin-top:9px">Đây là chữ phụ - câu giải thích, đơn vị, ngày tháng.</div>'+
+    '</div>'+
+    '<div class="tbwrap"><table class="dt"><thead><tr><th>Cột thứ nhất</th><th>Cột thứ hai</th><th>Trạng thái</th></tr></thead>'+
+     '<tbody><tr><td>Một dòng dữ liệu</td><td><b>1.250.000đ</b></td><td><span class="chip green">đã đóng</span></td></tr>'+
+     '<tr><td>Một dòng nữa</td><td><b>800.000đ</b></td><td><span class="chip red">còn nợ</span></td></tr></tbody></table></div>'+
+   '</div>'+
+   '<div class="notebar" style="margin:10px 0 0"><i class="ti ti-info-circle"></i>Một dải nhắc việc.</div>'+
+  '</div></div>';
+ return h}
+function uiThemeHTML(u){
+ var h='<div class="panel" data-tour="cfbrandmau"><div class="ph"><b><i class="ti ti-palette" style="margin-right:6px"></i>Màu, font và cỡ chữ</b>'+
+  '<span class="mut" style="font-size:11.5px">đổi ô nào là cả app đổi ngay, khung dưới xem thử trước</span></div>';
+ /* 1. BỘ DỰNG SẴN - đặt trên cùng vì phần lớn người dùng chỉ cần một cú bấm. */
+ h+='<div class="pbody"><div class="dsec">Bộ màu dựng sẵn</div><div class="uibo">';
+ UIBO.forEach(function(b){
+  h+='<button class="uibob" type="button" onclick="uiBo(\''+esc(b[0])+'\')">'+
+   '<span class="uiboc">'+(b[3]?['navy','red','amber','blue'].map(function(k){
+      return '<i style="background:'+esc(b[3][k]||UIDEF[k])+'"></i>'}).join(""):
+     ['navy','red','amber','blue'].map(function(k){
+      return '<i style="background:'+esc(UIDEF[k])+'"></i>'}).join(""))+'</span>'+
+   '<b>'+esc(b[1])+'</b><span>'+esc(b[2])+'</span></button>'});
+ h+='</div></div>';
+ /* 2. TỪNG Ô MÀU, chia ba nhóm theo VAI - kèm câu nói đang dùng ở đâu. */
+ UIMAU.forEach(function(nh){
+  h+='<div class="pbody" style="border-top:1px solid var(--line)"><div class="dsec">'+esc(nh[0])+'</div><div class="uimau">';
+  nh[1].forEach(function(m){
+   var v=String(u[m[0]]||UIDEF[m[0]]);
+   h+='<div class="uimr">'+
+    '<input type="color" value="'+esc(v)+'" oninput="uiSet(\''+esc(m[0])+'\',this.value);uiVeMa(\''+esc(m[0])+'\')" aria-label="'+esc(m[1])+'">'+
+    '<div class="uimt"><b>'+esc(m[1])+'</b><span>'+esc(m[2])+'</span></div>'+
+    '<input class="uimhex" id="uihex_'+esc(m[0])+'" value="'+esc(v)+'" spellcheck="false" '+
+     'onchange="uiSet(\''+esc(m[0])+'\',this.value);reRender(CUR)"></div>'});
+  h+='</div></div>'});
+ /* 3. FONT + CỠ CHỮ */
+ h+='<div class="pbody" style="border-top:1px solid var(--line)"><div class="dsec">Kiểu chữ</div>';
+ h+='<div class="fld full"><label>Font chữ toàn app</label><select onchange="uiSet(\'font\',this.value);reRender(CUR)">'+
+  UIFONT.map(function(f){return '<option value="'+esc(f[0])+'"'+((u.font||"Montserrat")===f[0]?" selected":"")+'>'+esc(f[1]+" - "+f[2])+'</option>'}).join("")+
+  '</select></div>';
+ h+='<div class="uimau">';
+ UICO.forEach(function(c){
+  var cur=uiCo(c[0]);
+  h+='<div class="uimr"><div class="uimt"><b>'+esc(c[1])+'</b><span>'+esc(c[2])+'</span></div>'+
+   '<input class="uimhex" type="number" min="'+c[3]+'" max="'+c[4]+'" step="0.5" value="'+(cur||"")+'" '+
+    'placeholder="mặc định" onchange="uiSetCo(\''+esc(c[0])+'\',this.value);reRender(CUR)">'+
+   '<span class="mut" style="font-size:11px;white-space:nowrap">'+c[3]+'-'+c[4]+'px</span></div>'});
+ h+='</div>';
+ h+='<div class="mut" style="font-size:11.5px;padding:8px 2px 0">Để trống một ô cỡ chữ là dùng lại bậc gốc của app. '+
+  'Cỡ chữ ở đây là <b>thiết kế của trung tâm</b> (lưu cùng cấu hình, ai mở cũng thấy như nhau) - khác với nút thu phóng trên thanh trên, cái đó là sở thích của riêng từng máy.</div>';
+ h+='</div>';
+ /* 4. XEM TRƯỚC - dặn của anh Luân, và đặt CUỐI để người ta chỉnh ở trên rồi liếc xuống. */
+ h+='<div class="pbody" style="border-top:1px solid var(--line)"><div class="dsec">Xem trước</div>'+
+  '<div class="mut" style="font-size:11.5px;margin-bottom:9px">Khung dưới đây là các thành phần THẬT của app, không phải hình vẽ minh hoạ - đổi ô nào ở trên là nó đổi theo ngay.</div>'+
+  uiXemTruoc()+'</div>';
+ h+='</div>';
+ return h}
+/* Ô mã màu chạy theo bảng chọn màu mà KHÔNG vẽ lại cả trang: kéo trong bảng chọn màu là bắn ra
+   hàng chục lượt `oninput`, vẽ lại cả trang mỗi lượt thì ô đang kéo bị thay thế và tuột tay. */
+function uiVeMa(k){try{var el=document.getElementById("uihex_"+k);if(el)el.value=String(UI()[k]||"")}catch(e){}}
 function uiLogoFile(inp){var f=inp&&inp.files&&inp.files[0];if(!f)return;
  if(f.size>260000){toastErr("Ảnh nặng quá (>250KB) - chọn ảnh nhỏ hơn cho nhẹ bản demo.");return}
  var rd=new FileReader();rd.onload=function(){uiSet("logo",String(rd.result));reRender(CUR);toast("Đã đổi logo.")};
