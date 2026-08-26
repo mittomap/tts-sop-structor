@@ -2,6 +2,50 @@
 
 > `ITTs_WebApp_v5_demo.html` là bản app: mở bằng trình duyệt, mọi thao tác ghi thật vào bộ nhớ trình duyệt. **Lớp Google Sheets đã cho nghỉ hưu 30/07** - không còn bản `.gs` nào, mọi cấu hình nằm trong màn Cài đặt của chính app. Khi anh Luân chốt nền tảng backend, 66 chỗ ghi trong app đã có sẵn đường nối ra máy chủ (xem khối ghi chú tại `var SVR=` trong `gen_v5.py`).
 
+## ⭐ MỚI 26/08/2026 — **Hóa đơn · phiếu thu kèm quy định · 17 cuốn sổ về đúng chỗ**
+
+### Xuất phiếu thu kèm quy định — ngay lúc đóng tiền
+
+Ghi nhận một khoản thu xong, nút **In phiếu thu kèm quy định** in ra **hai tờ**:
+
+1. **Phiếu thu học phí** — chứng từ kế toán giữ, có chữ ký hai bên (như cũ).
+2. **Quy định lớp học & cam kết** — tờ học viên cầm về, ký nhận. Nội dung lấy nguyên văn từ
+   Cài đặt, đúng bản học viên sẽ bấm đồng ý ở cổng và đúng bản in trong hợp đồng.
+
+Lúc đóng tiền là lúc duy nhất chắc chắn có mặt cả học viên lẫn người trả tiền, và là lúc họ chưa
+học buổi nào. App ghi lại **bản quy định số mấy** đã giao cùng phiếu thu nào — sau này tra lại là
+biết học viên cầm về bản nào.
+
+### Hóa đơn sau khi hoàn thành khóa học
+
+Trước bản này app không có hóa đơn ở đâu cả. Nay:
+
+- **Trang Công nợ học viên** có chip **Chờ xuất hóa đơn** và cột **Hóa đơn**. Bấm một học viên là
+  thấy từng đơn, mỗi đơn có nút **Xuất hóa đơn** của riêng nó.
+- **Ba trạng thái** chứ không phải hai: *chưa ai hỏi tới · học viên đã yêu cầu mà chưa xuất · đã
+  xuất*. Khúc giữa mới là hàng chờ của kế toán.
+- Hóa đơn xuất **một lần cho cả khóa**, chỉ sau khi học viên có bản ghi kết thúc khóa.
+- App **chặn** xuất hóa đơn vượt quá số tiền học viên đã thực đóng.
+- Bản in đầy đủ: đơn vị bán (kèm mã số thuế lấy từ Cài đặt), bên nhận hóa đơn (tên · MST · địa
+  chỉ · email), nội dung dịch vụ, thuế GTGT, tổng cộng và **số tiền bằng chữ**.
+- **Cổng học viên**: hoàn thành khóa xong có nút **Yêu cầu xuất hóa đơn** — học viên tự khai tên
+  đơn vị và mã số thuế (đọc qua điện thoại là sai, mà sai một chữ là phải xuất lại tờ khác). Yêu
+  cầu bay thẳng sang kế toán.
+- **Cài đặt** có nhóm mới **Hóa đơn**: hạn xuất sau khi học viên yêu cầu, thuế suất GTGT, mã số
+  thuế của trung tâm.
+
+### Tra cứu & sổ sách: xếp theo chặng nghiệp vụ, và mở cửa hai chiều
+
+Trang Tra cứu trước đây bày 17 cuốn sổ thành một lưới phẳng, không nhóm, không nói cuốn nào thuộc
+việc gì. Nay:
+
+- Sổ **xếp theo đúng nhóm trên menu bên trái** (Khách tiềm năng · Đang học · Kết thúc & Học tiếp ·
+  Điều hành · Sổ dùng chung).
+- Mỗi thẻ nói thêm **"làm ở &lt;trang nghiệp vụ&gt;"** — cuốn sổ này phục vụ màn làm việc nào.
+- **Từ màn nghiệp vụ mở thẳng sổ của nó**: mỗi trang nghiệp vụ nay có nút *Sổ …* ngay trên đầu
+  trang. Trước đây chỉ có đường một chiều (từ sổ sang chỗ làm việc); chiều hay dùng hơn thì phải
+  đi vòng qua menu.
+
 ## ⭐ MỚI 26/08/2026 — **Bộ onboarding · gửi thông báo cho cả danh sách · sổ phản hồi đọc được**
 
 ### Bộ onboarding: bốn món, mỗi món hai dấu

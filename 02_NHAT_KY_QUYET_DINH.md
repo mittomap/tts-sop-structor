@@ -148,6 +148,77 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 🟢 26/08 - 17 CUỐN SỔ THÔI NẰM MỘT ĐỐNG
+> Anh Luân, kèm ảnh chụp trang Tra cứu: *"mấy cái trang này để rời nó vô lý quá, sao ko đưa vào
+> gần chỗ nghiệp vụ phù hợp cho dễ dùng???? và nâng cấp nó lên cho chuyên nghiệp"*.
+>
+> **Cái sai nằm đúng chỗ anh chỉ.** Trang bày mười bảy thẻ thành một lưới phẳng xếp theo thứ tự
+> khai trong mã - không nhóm, không nói cuốn nào thuộc việc gì. Người đi tìm "sổ khiếu nại" phải
+> quét mắt qua mười sáu cái tên khác; người đang làm ở màn CSKH thì không biết là có một cuốn sổ
+> của chính màn ấy.
+> *Một danh sách phẳng bắt người đọc tự phân loại hộ mình - và họ sẽ phân loại lại từ đầu mỗi lần
+> mở trang.*
+>
+> **XẾP NHÓM BẰNG BẢN KHAI ĐÃ CÓ.** Mỗi cuốn sổ từ lâu đã tự khai nó phục vụ trang nghiệp vụ nào
+> (`LISTCFG[k].lam`) - đó là thứ nút "Sang X để làm" trong mỗi sổ vẫn đang dùng. Nhóm của cuốn sổ
+> = nhóm menu của trang nghiệp vụ ấy. Gõ thêm một bảng "sổ nào thuộc nhóm nào" là khai lần thứ
+> hai một sự thật đã có, và hai bản khai thì sớm muộn lệch nhau.
+>
+> **VÀ MỞ CỬA CHIỀU NGƯỢC LẠI - đây mới là nửa còn thiếu.** App vốn chỉ có đường SỔ → NGHIỆP VỤ.
+> Chiều hay dùng hơn thì không có: đang đứng ở màn nghiệp vụ, muốn tra lại một dòng cũ thì phải
+> đi vòng qua menu → Tra cứu → tìm trong mười bảy cuốn.
+> *Một liên kết một chiều là nửa cái cầu.*
+> Gắn ở `pageHead` và ở đầu trang của `renderList` - hai chỗ dùng chung, không chép vào ba mươi
+> hàm vẽ trang (chép vào ba mươi trang là ba mươi cơ hội để một trang bị quên, mà trang bị quên
+> thì không ai thấy). Ba trang tự dựng đầu trang bằng tay thì gắn tại chỗ và đánh dấu.
+>
+> **Hai bản khai trỏ vào trang ĐÃ ĐỔI HƯỚNG - loại sai không bao giờ báo lỗi.**
+> `dsbuoihoc.lam="hoctap"` và `dskhieunai.lam="khieunai"`: cả hai trang ấy từ V2 đều được `go()`
+> chuyển hướng đi nơi khác (`lop` và `cskh`). Nút "Sang ... để làm" vẫn chạy, chỉ là đưa người ta
+> tới một trang khác cái tên nó vừa hứa - và không ai phát hiện vì không có gì đỏ.
+> Nay khai thẳng vào trang có thật: `banglop` và `cskh`.
+>
+> Bẫy nhỏ đã cắn: dòng phụ "làm ở ..." để tự xuống dòng thì "làm ở Tư vấn & Đăng ký sau test" gãy
+> làm hai, hai thẻ cùng hàng cao thấp khác nhau, cả lưới đọc ra lởm chởm - đúng cái "nhìn không
+> chuyên nghiệp" mà đợt này sinh ra để chữa.
+> *Một dòng phụ được phép dài thì nó quyết định chiều cao của cả hàng.*
+
+> ### 🟢 26/08 - HÓA ĐƠN SAU KHI HOÀN THÀNH KHÓA + PHIẾU THU IN KÈM QUY ĐỊNH
+> Anh Luân: *"Bổ sung xuất hóa đơn sau khi hoàn thành khóa học -> Xuất phiếu thu + quy định ngay
+> khi đóng tiền"*.
+>
+> **(A) QUY ĐỊNH IN KÈM PHIẾU THU.** Lúc đóng tiền là lúc DUY NHẤT chắc chắn có mặt cả học viên
+> lẫn người trả tiền, và là lúc họ CHƯA học buổi nào - tức chưa có gì để tranh cãi. Đưa tờ quy
+> định vào đúng lúc ấy thì mọi tranh chấp sau này về nghỉ học, bảo lưu, hoàn phí đều có một mốc
+> để trả về. Đưa muộn, lúc đã học nửa khóa, thì nó chỉ còn là một tờ giấy.
+> Nội dung lấy từ CH2 `commitText` - **cùng bản** học viên bấm đồng ý ở cổng và cùng bản in trong
+> hợp đồng. Ba nơi một nguồn, nếu không thì tờ giấy cầm về nói khác cái nút đã bấm.
+> In ra TRANG RIÊNG: phiếu thu là chứng từ kế toán giữ, tờ quy định là thứ học viên cầm về - hai
+> người giữ hai tờ nên chúng không được nằm chung một trang.
+> Và ghi lại **BẢN** đã giao (`qd_ban`), không chỉ ghi "đã in".
+> *Một tờ giấy giao đi mà không ghi lại NÓ GHI GÌ thì lưu vết ấy chứng minh được có giấy, không
+> chứng minh được nội dung.*
+>
+> **(B) HÓA ĐƠN.** Trước bản này app KHÔNG CÓ hóa đơn ở bất kỳ đâu. Có phiếu thu (chứng từ nội
+> bộ), có hợp đồng, có phiếu xác nhận đăng ký - nhưng hóa đơn là tờ dành cho BÊN THỨ BA, thường
+> là công ty của học viên đang trả học phí, và là thứ duy nhất họ mang đi quyết toán.
+> · **Ba trạng thái, không phải hai:** chưa ai hỏi tới · học viên ĐÃ YÊU CẦU mà chưa xuất · đã
+>   xuất. *Một việc chỉ trở thành việc khi có người đợi nó; gộp "chưa ai hỏi" với "có người đang
+>   đợi" là xoá mất hàng chờ.*
+> · **Mốc là ĐƠN ĐĂNG KÝ, không phải phiếu thu:** một khóa đóng ba đợt nhưng hóa đơn xuất một lần
+>   cho cả khóa. Gắn vào phiếu thu là đẻ ra ba hóa đơn.
+> · **Chặn ở cửa ghi, không nhắc bằng một dòng chữ:** hóa đơn không được vượt số tiền đã thực
+>   đóng. Đó là chuyện thuế, không phải chuyện giao diện - và người vội thì không đọc dòng chữ.
+> · **Số tiền bằng chữ viết trong mã (`vndChu`)**, không để người dùng tự gõ: gõ tay thì số và chữ
+>   có ngày nói hai con số khác nhau, mà tờ giấy ấy là thứ mang đi quyết toán.
+> · **Đặt cửa xuất ở TRANG CÔNG NỢ chứ không ở Kết thúc khóa:** đo bản khai phạm vi thì kế toán
+>   KHÔNG có trang `ketthuc` trong danh sách trang của họ. Đặt cửa ghi ở nơi người làm việc ấy
+>   không mở được là dựng một cái cửa khoá.
+>
+> **Bẫy đã cắn:** `hd_tien` viết `'value="'+num(e.hdon_tien)||daTra+'"` - `||` bám vào cả cụm chuỗi
+> phía trước (luôn truthy) nên ô luôn ra 0 thay vì số mặc định. Loại lỗi không báo gì, chỉ ra sai
+> một con số ở ô người ta sắp bấm Lưu.
+
 > ### 🟢 26/08 - BỐN VIỆC ANH LUÂN ĐẶT TRONG MỘT LƯỢT
 > Nguyên văn: *"liệt kê danh sách chi tiêt feedback, khiếu nại đã nhận / gửi thông tin thông báo
 > cho danh sách: lơp, học viên, nhân viên / In hợp đồng, xác nhận đã nhận hợp đồng, chụp ảnh hợp
@@ -1033,7 +1104,13 @@
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 48 BỘ KIỂM.
-> Bản dựng đang chạy: `8bde04` (26/08 cuối - **BỐN VIỆC ANH LUÂN ĐẶT TRONG MỘT LƯỢT**:
+> Bản dựng đang chạy: `203ce1` (26/08 cuối - **HÓA ĐƠN + PHIẾU THU KÈM QUY ĐỊNH + DỌN 17 CUỐN SỔ**:
+> hóa đơn sau khi hoàn thành khóa (ba trạng thái, chặn vượt số đã thu, số tiền bằng chữ, cửa xuất
+> ở trang Công nợ vì kế toán không có trang Kết thúc khóa) · phiếu thu in thêm một tờ quy định lấy
+> từ CH2 · trang Tra cứu xếp theo chặng nghiệp vụ bằng chính bản khai `lam`, và mở cửa chiều ngược
+> lại từ mỗi trang nghiệp vụ vào sổ của nó.
+> Mốc trước `0e6845` (26/08 - **XANH HẾT 48/48, 61m45s** - sửa 8 chỗ đỏ của đợt bộ onboarding).
+> Mốc trước `8bde04` (26/08 - **BỐN VIỆC ANH LUÂN ĐẶT TRONG MỘT LƯỢT**:
 > *bộ onboarding* bốn món hai dấu (sách · hợp đồng · quà tặng · thông tin lớp) - dải tick trên mỗi
 > thẻ Xếp lớp, ngăn kéo cập nhật, **in hợp đồng** kèm nguyên văn điều khoản CH2 và hai ô chữ ký,
 > ảnh bản đã nhận, và nửa còn lại ở cổng học viên (khối "Bộ hồ sơ nhập học", học viên tự bấm đã
