@@ -148,6 +148,51 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 🎛️ 26/08 (tiếp) - HAI Ô MÀU TRÊN THANH TRÊN · THAN ÁM ĐỎ · BẢNG CHẠY LẠI DEMO
+>
+> **Nền đỏ bị bác, và cái được chọn thay không phải màu khác - là ĐỘ TỐI khác.** Anh Luân xem bản
+> đỏ trầm: *"nền đỏ ghê quá, em có đề xuất nền khác thay thế cho nền đỏ đó ko"*. Đề xuất và anh
+> chốt luôn: **than ám đỏ** - nền gần như đen nhưng có sắc đỏ ngầm. Mảng lớn thì yên, còn logo đỏ
+> và nút đỏ thì nổi hẳn lên vì quanh nó không còn gì đỏ nữa.
+> *Muốn một màu nổi thì đừng tô nó ra khắp nơi - hãy dọn chỗ quanh nó.*
+> Bộ "đỏ trầm" **gỡ hẳn**, không giữ lại cả trong Cài đặt: *một lựa chọn đã bị bác mà vẫn để lại
+> trong danh sách thì nó không còn là lựa chọn - nó là rác.*
+>
+> **Hai ô màu trên thanh trên** (*"em thêm 2 cái ô màu lên navbar, để a đổi giữa đỏ này và xanh cũ
+> nha"* · *"a chỉ cần 2 nút thôi"*). Ô đang dùng có vòng sáng, và trạng thái ấy **suy từ giá trị
+> đang chạy** chứ không nhớ riêng một biến - ai chỉnh tay một ô màu ở Cài đặt thì không ô nào sáng
+> nữa, và đó là sự thật.
+> Chú giải chỉ ghi **tên màu** (*"bỏ giúp anh cái tooltip... chỉ ghi màu sắc là được"*):
+> *chú giải sinh ra cho chỗ khó đoán; dán nó lên chỗ đã tự nói được thì nó thành tiếng ồn.*
+>
+> **App mở ra là đã sát nhận diện**, mà không đụng `:root`. Đem bảng màu thương hiệu vào `:root`
+> là bảng màu vọt lên 114 và **không gỡ xuống được**: 42 chỗ màu thẻ truyền hex vào `statStrip`
+> rồi nối chuỗi `+"18"` để pha độ mờ, thay bằng `var()` là vỡ. Nên gieo bộ ấy vào CẤU HÌNH ở lượt
+> mở đầu tiên.
+> *Muốn đổi thứ app mở ra bằng mặc định thì đổi CÁI ĐƯỢC CHỌN, đừng đổi cái để rơi về.*
+>
+> **Bảng chạy lại demo** (*"khi a bấm dựng lại demo, e có thể tạo 1 cái popup như chạy code để
+> hiển thị từng dòng những cái được thay đổi ko em???"*). Sáu dòng hiện dần, và **mọi con số đều
+> đếm được**: số bảng/dòng từ `DATA.dl`, số ngày kéo chụp từ `tshDays()` TRƯỚC khi nạp lại, số ô
+> tự điền là bộ đếm mới trong `derFill`, số thông số từ `DATA.config`.
+> *Thứ duy nhất đáng chiếu lên màn hình trong lúc chờ là việc đang thật sự xảy ra - một bảng chạy
+> chữ mà nội dung là bịa thì nó không phải minh bạch, nó là hoạt ảnh đội lốt minh bạch.*
+> Phần việc nặng nằm SAU khi nạp lại trang nên cờ đi qua `sessionStorage`, bảng mở ở lượt boot kế
+> tiếp - đó mới là lúc có số để nói.
+>
+> **Ba cái bẫy nhỏ cắn trong lúc dựng bảng ấy**, cả ba đều là "tên nghe đúng nhưng không có thật":
+> · ba icon (`ti-database-import`, `ti-wand`, `ti-settings-check`) không nằm trong font subset đã
+>   nhúng - ba dòng hiện ra với một ô trống ở đầu. *Một cái tên icon nghe đúng không có nghĩa là nó
+>   có trong font mình mang theo.* `_tall.js` canh đúng chuyện này, chỉ là em chưa chạy nó.
+> · vòng xoay mượn `ti-loader` cũng không có - nay vẽ bằng CSS, không nhúng thêm icon chỉ để quay
+>   một giây.
+> · `.rsh i{font-size:19px}` đẻ ra bậc cỡ chữ thứ 17, vượt trần 16. Đổi sang 18px - bậc đã có sẵn,
+>   mà một pixel ở cỡ ấy mắt không phân biệt được.
+>
+> Và một dòng phải sửa lại lời: **"Tự điền các ô suy ra được = 0 ô"**. Số 0 ấy là SỰ THẬT (bộ dữ
+> liệu gốc đã đủ), nhưng in trơ ra thì người đọc tưởng hỏng. Nay câu chữ đổi theo con số.
+> *Một con số bằng 0 vẫn là một câu trả lời - chỉ cần nói nó ra cho đúng nghĩa.*
+
 > ### 🎨 26/08 - MÀU SẮC THÀNH CẤU HÌNH, KHÔNG THÀNH MỘT LẦN SƠN
 > Anh Luân gửi bộ nhận diện thương hiệu (bản 2026, 71 trang) rồi hỏi: *"a muốn nó sát nhận diện
 > thương hiệu 1 tí"*. Em đã đi được nửa đường theo hướng SAI - dựng một phép xoay tông màu để sửa

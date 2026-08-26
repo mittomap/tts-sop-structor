@@ -2966,3 +2966,28 @@ nền indigo* · *Bản gốc của app*. Bộ dựng sẵn chỉ ghi đè nhữ
 **Khung xem trước** ở cuối trang dùng chính các thành phần thật của app (menu, nút, chip, thẻ,
 bảng, dải nhắc) chứ không phải hình vẽ minh hoạ - nên nó không thể lệch với app, và nó cho biết
 ngay chữ trắng trên nền vừa chọn có đọc được không.
+
+## Hai ô đổi màu trên thanh trên
+
+Cạnh nút thu phóng có **hai ô màu**: **Than ám đỏ** (theo bộ nhận diện ITTs) và **Xanh thép trầm**
+(bảng màu app chạy từ đầu). Bấm là cả app đổi ngay. Ô đang dùng có vòng sáng - trạng thái ấy suy
+từ giá trị màu đang chạy, nên khi ai đó chỉnh tay một ô màu trong Cài đặt thì không ô nào sáng,
+đúng như thực tế.
+
+App mở lần đầu chọn sẵn bộ **Than ám đỏ**.
+
+## Bấm Dựng lại demo thì thấy app vừa làm gì
+
+Trước đây bấm **Dựng lại demo** là màn hình chớp một cái rồi hiện lại - việc app làm nhiều nhất
+trong một cú bấm lại là việc người ta thấy ít nhất. Nay có một bảng chạy từng dòng:
+
+1. Xoá bản lưu của buổi demo trên máy này
+2. Nạp lại bộ dữ liệu gốc - *n bảng · m dòng*
+3. Kéo lịch về hôm nay - *dịch bao nhiêu ngày*
+4. Tự điền các ô suy ra được - *bao nhiêu ô*
+5. Giữ nguyên cấu hình của trung tâm - *bao nhiêu thông số*
+6. Giữ nguyên giao diện đang chọn - *tên bộ màu*
+
+**Mọi con số đều đếm thật**, không có dòng nào diễn: số bảng và dòng đếm từ dữ liệu vừa nạp, số
+ngày kéo chụp trước khi nạp lại, số ô tự điền là bộ đếm trong `derFill`, số thông số đếm từ cấu
+hình. Bảng chỉ hiện sau một cú Dựng lại demo, không hiện khi tải lại trang bình thường.

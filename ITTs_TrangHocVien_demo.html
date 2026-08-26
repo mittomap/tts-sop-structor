@@ -3206,6 +3206,36 @@ body.drsz .drawer{transition:none}
 .lnk{color:var(--navy);font-weight:700;cursor:pointer;border-bottom:1px dashed #B9C6D6}.lnk:hover{color:var(--navyd)}
 /* ---- Màn chỉnh giao diện: bộ dựng sẵn, từng ô màu, và khung xem trước ---- */
 /* Hai ô màu trên thanh trên - cùng khổ với các nút khác của thanh để hàng không gãy nhịp. */
+/* ---- Bảng chạy lại demo: một khung chạy chữ, mỗi dòng là một việc THẬT vừa xong ---- */
+.rsmask{position:fixed;inset:0;background:rgba(12,16,24,.62);z-index:9600;display:none;
+ align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
+.rsmask.on{display:flex}
+.rsw{width:min(560px,100%);background:var(--card);border-radius:16px;overflow:hidden;
+ box-shadow:0 24px 70px rgba(12,16,24,.42)}
+.rsh{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--sidebar);color:#fff;
+ background-image:linear-gradient(175deg,rgba(255,255,255,.085),rgba(0,0,0,.16))}
+/* 18px chứ không phải 19: thang cỡ chữ đang sát trần 16 bậc, thêm một bậc mới là `_checkux` đỏ.
+   Bậc 18 đã có sẵn và mắt không phân biệt được một pixel ở cỡ này. */
+.rsh i{font-size:18px}
+.rsh b{font-size:14px}
+.rsl{padding:8px 10px;max-height:min(56vh,420px);overflow:auto}
+.rsr{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;opacity:.55;transition:.2s}
+.rsr.ok{opacity:1;background:var(--bg)}
+.rsr>i{font-size:17px;color:var(--muted);flex:none;width:20px;text-align:center}
+.rsr.ok>i{color:var(--green)}
+.rst{flex:1;min-width:0}
+.rst b{display:block;font-size:12.5px;color:var(--ink)}
+.rst span{display:block;font-size:11.5px;color:var(--muted);line-height:1.45}
+.rsr em{font-style:normal;font-size:12px;font-weight:800;color:var(--navy);white-space:nowrap;
+ font-variant-numeric:tabular-nums}
+/* Vòng xoay vẽ bằng CSS chứ không mượn icon: `ti-loader` không nằm trong font subset đã nhúng
+   (`_tall.js` bắt đúng chỗ này), mà nhúng thêm một icon chỉ để quay một giây là không đáng. */
+.rsdot{width:15px;height:15px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--navy);
+ display:inline-block;flex:none;animation:rsspin .8s linear infinite}
+@keyframes rsspin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.rsspin{animation:none}}
+.rsf{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;
+ border-top:1px solid var(--line);font-size:11.5px}
 .bosw{display:flex;gap:5px;align-items:center}
 .bosb{width:34px;height:30px;padding:0;border:1px solid rgba(30,42,56,.22);border-radius:8px;background:var(--card);
  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;transition:.14s}
@@ -3822,6 +3852,7 @@ body.drsz .drawer{transition:none}
      chay o cong nhan vien), bam khong ra gi. Tro ly doc hang cho va du lieu NOI BO cua trung
      tam nen no khong duoc phep co mat o cong hoc vien - khong phai an di, ma la khong dung. -->
 <div class="mask" id="mask" onclick="closeModal()"></div>
+<div class="rsmask" id="rsbox"></div>
 <div class="cfmask" id="cfm"><div class="cfbox"><div class="cfh"><i class="ti ti-alert-triangle"></i> Xác nhận thao tác</div><div class="cfmsg" id="cfmMsg"></div><div class="cfa"><button class="btn" onclick="closeConfirm()">Hủy</button><button class="btn primary" onclick="confirmYes()">Xác nhận</button></div></div></div>
 <div class="drawer" id="drawer"><div class="drszr" id="drszr" title="Kéo để đổi độ rộng - bấm đúp để về mặc định"></div><div class="dh"><b id="drawerTitle">Chi tiết</b><button class="x" onclick="closeModal()">&times;</button></div><div class="dbody" id="drawerBody"></div></div>
 <script src="ITTs_data.js"></script>
@@ -4084,11 +4115,76 @@ function demoReset(){
   " CẤU HÌNH TRONG CÀI ĐẶT ĐƯỢC GIỮ NGUYÊN - ngưỡng, câu nhắc, danh mục, thương hiệu, phân quyền"+
   " không mất; muốn bỏ thì bấm riêng nút 'Về mặc định toàn bộ cấu hình'."+
   " (mọi cổng đang mở cũng nạp lại)","demoResetRun")}
-function demoResetRun(){if(CANLS)try{localStorage.removeItem(LSKEY)}catch(e){};
+/* ═══ 26/08 - BẢNG CHẠY LẠI DEMO: NÓI RA APP VỪA LÀM GÌ ════════════════════════════════════════
+   Anh Luân: *"khi a bấm dựng lại demo, e có thể tạo 1 cái popup như chạy code để hiển thị từng
+   dòng những cái được thay đổi ko em???"*
+   Trước bản này, bấm Dựng lại demo là màn hình chớp một cái rồi hiện lại - người xem demo không
+   biết vừa có chuyện gì, và cái việc app làm nhiều nhất trong một cú bấm lại là cái người ta thấy
+   ít nhất.
+   MỌI DÒNG ĐỀU LÀ SỐ ĐẾM ĐƯỢC, KHÔNG MỘT DÒNG NÀO DIỄN. Số bảng và số dòng đếm từ `DATA.dl`;
+   số ngày kéo lấy từ `tshDays()` chụp TRƯỚC khi nạp lại; số ô tự điền là bộ đếm trong `derFill`;
+   số tham số cấu hình đếm từ `DATA.config`. Một bảng chạy chữ mà nội dung là bịa thì nó không
+   phải minh bạch - nó là một hoạt ảnh đội lốt minh bạch.
+   *Thứ duy nhất đáng chiếu lên màn hình trong lúc chờ là việc đang thật sự xảy ra.*
+   Vì phần việc nặng nằm SAU khi nạp lại trang, cờ được gửi qua `sessionStorage` rồi bảng mở lại
+   ở lượt boot kế tiếp - đó mới là lúc có số để nói. */
+var RSKEY="ITTS_RESETLOG_V1";
+function demoResetRun(){
+ try{sessionStorage.setItem(RSKEY,JSON.stringify({keo:tshDays()||0,t0:Date.now()}))}catch(e){}
+ if(CANLS)try{localStorage.removeItem(LSKEY)}catch(e){};
  /* giữ đúng lời hộp xác nhận vừa hứa: kéo dữ liệu về hôm nay, kể cả khi chưa tới ngưỡng tự dịch */
  if(CANLS)try{if(tshDays())localStorage.setItem(FORCESHIFT,"1")}catch(e){};
  if(ROOM.on){try{roomCast({t:"reset"})}catch(e){};setTimeout(function(){location.reload()},250);return}
  location.reload()}
+/* Bảng chạy chữ: mở khi lượt boot này là lượt NGAY SAU một cú Dựng lại demo. */
+function rsDong(ic,ten,so,phu){return {ic:ic,t:ten,n:so,p:phu||""}}
+function rsBang(){
+ var raw=null;try{raw=sessionStorage.getItem(RSKEY);sessionStorage.removeItem(RSKEY)}catch(e){}
+ if(!raw)return; var st={};try{st=JSON.parse(raw)||{}}catch(e){return}
+ var el=document.getElementById("rsbox");if(!el)return;
+ var soBang=0,soDong=0;
+ try{for(var k in DATA.dl){if(!DATA.dl.hasOwnProperty(k))continue;soBang++;soDong+=(DATA.dl[k]||[]).length}}catch(e){}
+ var cf=DATA.config||{};
+ var soTS=((cf.ch2||[]).length)+((cf.ch6||[]).length)+((cf.ch4||[]).length);
+ var keo=num(st.keo)||0;
+ var L=[
+  /* ICON PHẢI CÓ THẬT TRONG FONT SUBSET. Lượt đầu em lấy ba cái tên nghe hợp lý
+     (`ti-database-import`, `ti-wand`, `ti-settings-check`) - cả ba không nằm trong bộ đã nhúng
+     nên ba dòng hiện ra với một ô trống ở đầu. `_tall.js` canh đúng chuyện này, chỉ là em chưa
+     chạy nó. *Một cái tên icon nghe đúng không có nghĩa là nó có trong font mình mang theo.* */
+  rsDong("ti-trash","Xoá bản lưu của buổi demo trên máy này","xong","mọi thao tác đã ghi trong buổi được bỏ đi"),
+  rsDong("ti-refresh","Nạp lại bộ dữ liệu gốc",soBang+" bảng · "+soDong+" dòng","đúng bộ mẫu xuất xưởng, chưa ai đụng vào"),
+  rsDong("ti-calendar-event","Kéo lịch về hôm nay",(keo?((keo>0?"+":"")+keo+" ngày"):"không phải kéo"),
+   keo?"buổi học, hạn nộp, hẹn gọi dịch theo để hợp lý với hôm nay":"dữ liệu vốn đã neo đúng ngày hôm nay"),
+  /* Con số này thường bằng 0 - và đó là SỰ THẬT ĐÁNG NÓI, không phải một dòng thừa: bộ dữ liệu
+     gốc đã điền đủ nên app không phải suy ra gì. Nói "0 ô" trơ ra thì người đọc tưởng hỏng, nên
+     câu chữ đổi theo con số. *Một con số bằng 0 vẫn là một câu trả lời - chỉ cần nói nó ra cho
+     đúng nghĩa.* */
+  rsDong("ti-sparkles","Tự điền các ô suy ra được",
+   ((window.__derN||0)?((window.__derN)+" ô"):"không phải điền"),
+   (window.__derN||0)?"tên người theo mã, tiền còn lại, sĩ số, quota WOW...":"bộ dữ liệu gốc đã đủ, app không phải suy ra ô nào"),
+  rsDong("ti-settings","Giữ nguyên cấu hình của trung tâm",soTS+" thông số","ngưỡng, câu nhắc, danh mục, thương hiệu, phân quyền đều không mất"),
+  rsDong("ti-palette","Giữ nguyên giao diện đang chọn",(UIBO.filter(function(b){return b[0]===uiBoDang()})[0]||["","tự chỉnh"])[1],"màu, font và cỡ chữ nằm trong cấu hình nên không bị cuốn theo")];
+ el.innerHTML='<div class="rsw"><div class="rsh"><i class="ti ti-refresh"></i><b>Đang dựng lại bộ dữ liệu demo</b></div>'+
+  '<div class="rsl" id="rsl"></div>'+
+  '<div class="rsf"><span class="mut" id="rsft">đang chạy...</span>'+
+  '<button class="btn primary sm" id="rsdone" style="display:none" onclick="rsDong2()">Xong, vào xem</button></div></div>';
+ el.classList.add("on");
+ var box=document.getElementById("rsl"),i=0;
+ (function buoc(){
+  if(i>=L.length){
+   var gy=Math.max(1,Math.round((Date.now()-(num(st.t0)||Date.now()))/100)/10);
+   var ft=document.getElementById("rsft");if(ft)ft.textContent="Xong sau "+gy+" giây - demo đã về trạng thái chuẩn.";
+   var bt=document.getElementById("rsdone");if(bt){bt.style.display="";try{bt.focus()}catch(e){}}
+   return}
+  var x=L[i++];
+  var row=document.createElement("div");row.className="rsr";
+  row.innerHTML='<i class="rsdot"></i><div class="rst"><b>'+esc(x.t)+'</b><span>'+esc(x.p)+'</span></div><em>'+esc(String(x.n))+'</em>';
+  box.appendChild(row);box.scrollTop=box.scrollHeight;
+  setTimeout(function(){row.className="rsr ok";
+   row.querySelector("i").className="ti "+x.ic;
+   setTimeout(buoc,150)},260)})()}
+function rsDong2(){var el=document.getElementById("rsbox");if(el){el.classList.remove("on");el.innerHTML=""}}
 window.__pendSync=0;
 function syncApply(){if(!window.__pendSync)return;
  var raw=null;try{raw=localStorage.getItem(LSKEY)}catch(e){}
@@ -29138,12 +29234,15 @@ var UICO=[
    "một mảng tối yên", không phải một mảng đỏ rực.
    *Hai thứ cùng một màu vẫn phân biệt được nếu chúng khác nhau về SỨC - cái nào sáng hơn thì cái
    đó đang nói to hơn.* */
+/* HAI Ô TRÊN THANH TRÊN, KHÔNG BA (anh Luân: *"a chỉ cần 2 nút thôi"*). Bộ "đỏ trầm" - cả thanh
+   menu là một mảng đỏ sẫm - đã bị chính anh loại: *"nền đỏ ghê quá"*. Nên nó không nằm lại đâu cả,
+   kể cả trong Cài đặt: giữ một lựa chọn đã bị bác chỉ để "cho có" là bắt mọi người sau này phải
+   đọc và loại nó thêm một lần nữa.
+   *Một lựa chọn đã bị bác mà vẫn để lại trong danh sách thì nó không còn là lựa chọn - nó là rác.* */
 var UIBO=[
- ["itts","Nhận diện ITTs - nền đỏ trầm","thang đỏ ba bậc: nền rất trầm, nút đỏ đậm, đỏ thương hiệu để dành cho việc gấp",
-  {navy:"#8E1622",navyd:"#6E101A",sidebar:"#5C0F19",red:"#C40319",redb:"#FBECEE"},1],
- ["mac","Xanh thép trầm (bản cũ)","bảng màu app chạy từ đầu - xanh navy trầm",null,1],
- ["ittsx","Nhận diện ITTs - nền indigo","lấy màu phụ của bộ nhận diện làm nền, đỏ thương hiệu để dành cho việc gấp",
-  {navy:"#20298D",navyd:"#171F6E",sidebar:"#161C63",red:"#C40319",redb:"#FBECEE"}]];
+ ["than","Than ám đỏ","theo bộ nhận diện ITTs - nền gần như đen có sắc đỏ ngầm, mảng lớn thì yên mà logo và nút đỏ nổi hẳn lên",
+  {navy:"#A8121F",navyd:"#830D17",sidebar:"#1F1417",red:"#C40319",redb:"#FBECEE"},1],
+ ["mac","Xanh thép trầm","bảng màu app chạy từ đầu - xanh navy trầm",null,1]];
 var UIDEF={brand:"ITTs - SOP TEMP",sub:"Hệ thống tuân thủ SOP",center:"IELTS The Tutors",
  title:"IELTS The Tutors · Cổng làm việc",logo:"",navy:"#1E3A5F",red:"#D51920",
  navyd:"#1E3A5F",sidebar:"#1B3350",bg:"#EEF2F6",card:"#FFFFFF",line:"#E3E9F0",
@@ -29169,7 +29268,7 @@ var UIDEF={brand:"ITTs - SOP TEMP",sub:"Hệ thống tuân thủ SOP",center:"IE
    *Muốn đổi thứ app mở ra bằng mặc định thì đổi CÁI ĐƯỢC CHỌN, đừng đổi cái để rơi về.* */
 function UI(){var c=(DATA.config=DATA.config||{});var moi=!c.ui;var u=(c.ui=c.ui||{});
  for(var k in UIDEF)if(u[k]===undefined)u[k]=(typeof UIDEF[k]==="object"?JSON.parse(JSON.stringify(UIDEF[k])):UIDEF[k]);
- if(moi)try{var b=UIBO.filter(function(x){return x[0]==="itts"})[0];
+ if(moi)try{var b=UIBO.filter(function(x){return x[0]==="than"})[0];
   if(b&&b[3])for(var q in b[3])u[q]=b[3][q]}catch(e){}
  return u}
 function uiSet(k,v){UI()[k]=v;uiApply();persistSoon()}
@@ -29207,7 +29306,11 @@ function uiBoVe(){var el=document.getElementById("boSw");if(!el)return;
  el.innerHTML=UIBO.filter(function(b){return b[4]}).map(function(b){
   var m=b[3]||UIDEF;
   return '<button class="bosb'+(cur===b[0]?" on":"")+'" onclick="uiBo(\''+esc(b[0])+'\')" aria-label="'+esc(b[1])+'"'+
-   ' data-tip="'+esc(b[1]+" - "+b[2]+(cur===b[0]?" (đang dùng)":". Đổi cả app ngay, đổi lại được bất cứ lúc nào."))+'">'+
+   /* Chú giải CHỈ ghi tên màu - anh Luân: *"e bỏ giúp anh cái tooltip chỗ 2 nút đó đi nhé, chỉ
+      ghi màu sắc là được"*. Hai cái nút này ai nhìn cũng hiểu là đổi màu; một đoạn giải thích dài
+      bật ra mỗi lần rê chuột qua thanh trên là phiền chứ không phải giúp.
+      *Chú giải sinh ra cho chỗ khó đoán; dán nó lên chỗ đã tự nói được thì nó thành tiếng ồn.* */
+   ' data-tip="'+esc(b[1])+'">'+
    '<i style="background:'+esc(m.sidebar||UIDEF.sidebar)+'"></i>'+
    '<i style="background:'+esc(m.red||UIDEF.red)+'"></i></button>'}).join("")}
 function uiLogoHTML(size){var u=UI(),s=size||26;
@@ -35265,8 +35368,12 @@ function toastErr(m){toast(m,6000,"err")}
 /* ===== TỰ TÍNH CÁC CỘT DẪN XUẤT =====
    App KHÔNG lệ thuộc công thức trên sheet: cột nào sheet để trống (hoặc sai)
    thì app tự tính lại từ dữ liệu gốc. Sheet tính đúng thì giữ nguyên giá trị của sheet. */
-function derFill(o,k,v){if(!o)return;var cur=String(o[k]==null?"":o[k]).trim();if(cur==="" && v!=null && v!=="")o[k]=v}
-function derNum(o,k,v){if(!o)return;var cur=String(o[k]==null?"":o[k]).trim();if((cur===""||num(cur)===0) && num(v)>0)o[k]=String(v)}
+/* Đếm số ô THẬT SỰ được tự điền. Bảng "Dựng lại demo" đọc con số này - và nó phải là số đếm
+   được chứ không phải một con số cho đẹp: cả bảng ấy sinh ra để nói app vừa làm gì, nói sai một
+   con số là hỏng đúng cái công dụng của nó. */
+window.__derN=0;
+function derFill(o,k,v){if(!o)return;var cur=String(o[k]==null?"":o[k]).trim();if(cur==="" && v!=null && v!==""){o[k]=v;window.__derN++}}
+function derNum(o,k,v){if(!o)return;var cur=String(o[k]==null?"":o[k]).trim();if((cur===""||num(cur)===0) && num(v)>0){o[k]=String(v);window.__derN++}}
 function derSort(a){a.sort(function(x,y){var dx=pvnd(x)||0,dy=pvnd(y)||0;return dx-dy});return a}
 var DERREF={student_id:["DL09","full_name"],lead_id:["DL02","full_name"],class_id:["DL10","class_name"],
  course_id:["DL05","course_name"],staff_id:["DL01","full_name"],teacher_id:["DL01","full_name"],
@@ -35414,6 +35521,7 @@ function enter(k){
  try{moGan()}catch(e){}
  try{zoomInit()}catch(e){}
  try{asstHeMo()}catch(e){}
+ try{rsBang()}catch(e){}
  try{tourOfferOnce()}catch(e){}}
 
 /* ============ CỔNG HỌC VIÊN (file HTML riêng) ============
