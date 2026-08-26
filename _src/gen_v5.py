@@ -2719,7 +2719,7 @@ table.dt tbody tr.clk.on td{font-weight:600}
    có viền mảnh như mọi ô khác trong app, phân biệt bằng icon và con số chứ không bằng màu. */
 .bwctx{font-size:11.5px;color:#5A6675;line-height:1.6;margin-top:6px;max-width:640px}
 .tcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:8px;padding:2px}
-.tco{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:#fff;transition:.12s}
+.tco{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:#fff;transition:.12s;width:100%;font-family:inherit;text-align:left}
 /* V2 08/08 - KHÔNG ĐẺ MÃ MÀU MỚI. Ba màu em gõ riêng cho dải thẻ này (nền rê chuột, chữ số,
    nền số) đẩy bảng màu từ 110 lên 113 mã - `_checkux` bắt ngay. Cùng một luật với thang cỡ chữ:
    không chỗ nào sai hẳn, cả trăm chỗ lệch nhẹ thì app nhìn lộn xộn.
@@ -2727,17 +2727,42 @@ table.dt tbody tr.clk.on td{font-weight:600}
    BẪY CẮN HAI LẦN TRONG MỘT NGÀY: lần vá đầu em vẫn để NGUYÊN ba mã hex trong chính dòng chú
    thích này, nên bộ kiểm vẫn đếm ra 113 - nó soi cả tệp chứ không phân biệt mã sống hay mã nằm
    trong lời giải thích. Viết tên màu bằng chữ, đừng gõ mã. */
-.tco:hover{border-color:var(--brand);background:var(--bg)}
+.tco:hover{border-color:var(--brand);background:var(--bg);box-shadow:0 3px 14px rgba(16,32,58,.09)}
 /* V2 08/08 - dùng ĐÚNG bậc đã có trong thang. Bản đầu em gõ 19px và bo góc 7px cho riêng dải
    thẻ này; `_checkux` bắt ngay: thang cỡ chữ nhảy 20 -> 21 bậc, thang bo góc 10 -> 11. Đó chính
    là con bệnh "nhìn app hơi lộn xộn mà không chỉ ra được chỗ nào sai" mà bộ kiểm ấy sinh ra để
    chặn - không chỗ nào sai hẳn, cả trăm chỗ lệch nhẹ. Thêm một bậc cho một màn mới là bắt đầu
    lại từ đầu. */
 .tco>i{font-size:18px;color:var(--brand);flex:none}
-.tcn{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+/* 26/08 - icon vào một ô nền nhạt thay vì nằm trần. Không một mã màu mới, không một bậc cỡ chữ
+   hay bo góc mới: nền lấy `--bg`, viền lấy `--line`, bo 8px và cỡ 18px đều là bậc đang có.
+   Đây là chỗ đã cắn hai lần trong một ngày (xem ghi chú ngay trên) - lần này đo trước khi gõ. */
+.tcic{width:34px;height:34px;border-radius:8px;background:var(--bg);border:1px solid var(--line);
+ display:inline-flex;align-items:center;justify-content:center;flex:none}
+.tcic>i{font-size:18px;color:var(--brand)}
+.tco:hover .tcic{border-color:var(--brand)}
+.tcn{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;text-align:left}
 .tcn b{font-size:13px;font-weight:700}
 .tcn span{font-size:11px;line-height:1.45}
+/* Dòng thứ ba: cuốn sổ này phục vụ trang nghiệp vụ nào. Đây là thứ trước đây trang không nói,
+   và là đúng thứ anh Luân hỏi - "sao ko đưa vào gần chỗ nghiệp vụ phù hợp". */
+/* MỘT HÀNG, cắt bằng ba chấm. Bản đầu để nó tự xuống dòng: "làm ở Tư vấn & Đăng ký sau test"
+   gãy làm hai dòng nên hai thẻ trong cùng một hàng cao thấp khác nhau, và cả lưới đọc ra lởm
+   chởm - đúng cái "nhìn không chuyên nghiệp" mà đợt này sinh ra để chữa.
+   *Một dòng phụ được phép dài thì nó quyết định chiều cao của cả hàng.* */
+.tclam{color:var(--muted);display:flex;align-items:center;gap:4px;margin-top:1px;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.tclam>i{font-size:12px;flex:none}
+.tco{align-items:flex-start}
+.tcic,.tcso{margin-top:1px}
 .tcso{flex:none;font-size:11.5px;font-weight:700;color:var(--muted);background:var(--bg);border-radius:6px;padding:2px 8px;font-variant-numeric:tabular-nums}
+/* Tiêu đề nhóm: nhãn - số sổ - một đường mảnh chạy hết phần còn lại. Đường ấy là `border-top`
+   của một phần tử co giãn, KHÔNG phải một dải trang trí dựng bằng `::before` (luật W5). */
+.tcsec{display:flex;align-items:center;gap:10px;margin:14px 0 8px;padding:0 2px}
+.tcsec:first-child{margin-top:2px}
+.tcsec>b{font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--navy);white-space:nowrap}
+.tcsn{font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap}
+.tcsl{flex:1;border-top:1px solid var(--line);min-width:20px}
 /* LUẬT W5 - CẤM DẢI VIỀN MÀU TRANG TRÍ (kể cả dải dựng bằng ::before). Bản đầu của ô cảnh báo
    dùng `border-left:3px` màu đỏ/vàng để nói mức độ - `_checkux` bắt ngay, và luật đúng: một dải
    màu ở mép là trang trí, nó không mang thông tin nào mà chính con số và cái chấm không nói được.
@@ -7294,7 +7319,10 @@ function renderList(key,emb){window.__gvTai=null;   /* số đếm theo giảng 
     đẻ ra nó thì sổ nào thêm nút nghiệp vụ cũng sẽ trúng.
     Luật: **sổ đã khai nút nghiệp vụ của mình thì thôi vẽ nút chung.** Nút nghiệp vụ luôn là cái
     đúng hơn - nó đi qua cửa quyền CH3, nó ghi đủ các bảng SOP đòi, nút chung chỉ đẻ một dòng. */
- '<div class="sp">'+((cfg.ro||cfg.nut)?'':'<button class="btn primary" onclick="newForm(\''+key+'\')"><i class="ti ti-plus"></i>Thêm mới</button>')+'</div></div>');
+ /* Cửa vào sổ tra cứu của chính trang này - `renderList` dựng đầu trang riêng, không đi qua
+    `pageHead`, nên phải gắn ở cả hai chỗ. Hai chỗ chứ không ba: mọi trang khác đều qua
+    `pageHead`, còn vài trang tự dựng đầu trang thì gắn tay tại chỗ (đã đánh dấu). */
+ '<div class="sp">'+((cfg.ro||cfg.nut)?'':'<button class="btn primary" onclick="newForm(\''+key+'\')"><i class="ti ti-plus"></i>Thêm mới</button>')+soCuaTrangHTML(key)+'</div></div>');
  /* V2 - BẢNG VIỆC CỦA TÔI PHẢI TỚI ĐƯỢC CẢ TRANG DANH SÁCH.
     `pageHead()` gắn bảng việc (BC5-BC9 của SOP) ở một chỗ dùng chung - nhưng `renderList` KHÔNG
     gọi `pageHead`, nó tự dựng đầu trang bằng tay. Ở V1 chuyện đó vô hại vì không chức danh nào
@@ -11191,7 +11219,7 @@ function ddHub(opt){opt=opt||{};var embed=opt.embed;
  if(!sessList.length){for(var k=1;k<=12;k++){var n=(k<10?"0"+k:k);sessList.push({id:cid+"-S"+n,label:"Buổi "+k,obj:null})}}
  var sess=window.DDSESS;if(!sessList.some(function(x){return x.id===sess})){sess=sessList[0].id;window.DDSESS=sess}
  var sel=null;sessList.forEach(function(x){if(x.id===sess)sel=x});var ses=sel&&sel.obj;
- var h=embed?'':'<div class="phead" data-tour="phead"><div><div class="t">Điểm danh & nhận xét buổi</div><div class="s">Dạy xong làm một chỗ: điểm danh + đánh giá từng học viên + nhận xét chung cả lớp (gộp từ trang Buổi học)</div></div></div>';
+ var h=embed?'':'<div class="phead" data-tour="phead"><div><div class="t">Điểm danh & nhận xét buổi</div><div class="s">Dạy xong làm một chỗ: điểm danh + đánh giá từng học viên + nhận xét chung cả lớp (gộp từ trang Buổi học)</div></div><div class="sp">'+soCuaTrangHTML("banglop")+'</div></div>';
  if(!embed)h+=classBar(cid);
  if(opt.noSessUI){/* trang Lớp học đã có dải thẻ buổi riêng - không lặp bộ chọn */}
  else if(opt.hideSess){                         /* bảng phía trên đã là bộ chọn buổi */
@@ -15614,7 +15642,11 @@ function renderBanglop(){
     đè bằng giá trị trả về (undefined) và cái nút biến mất không một tiếng động - `_checkkhuon`
     vẫn báo đỏ đúng chỗ cũ nên em tưởng bản vá chưa ăn. */
  var _nutDD="";
- try{if(navVis("diemdanh"))_nutDD='<div class="sp"><button class="btn primary" onclick="window.DDCLASS=window.BLCLASS;go(\'diemdanh\')"><i class="ti ti-user-check"></i>Điểm danh lớp này</button></div>'}catch(e){_nutDD=""}
+ try{if(navVis("diemdanh"))_nutDD='<button class="btn primary" onclick="window.DDCLASS=window.BLCLASS;go(\'diemdanh\')"><i class="ti ti-user-check"></i>Điểm danh lớp này</button>'}catch(e){_nutDD=""}
+ /* Vận hành lớp dựng đầu trang bằng tay nên phải gắn cửa vào sổ tại chỗ. Gộp luôn `_nutDD` vào
+    cùng MỘT ô `.sp`: trước đây nó tự mang một ô riêng, thêm ô thứ hai nữa là ba ô cạnh nhau. */
+ try{_nutDD=(_nutDD||"")+soCuaTrangHTML("banglop")}catch(e){}
+ if(_nutDD)_nutDD='<div class="sp">'+_nutDD+'</div>';
  var h='<div class="phead" data-tour="phead"><div><div class="t">Vận hành lớp · '+lopThe(lop)+esc(lop.class_name||cid)+'</div><div class="s">Buổi học · điểm danh · nhận xét · giao & chấm bài tập - tất cả cho lớp này ở một chỗ</div></div>'+_nutDD;
  h+='<div class="sp"><select class="sel" onchange="window.BLCLASS=this.value;window.DDSESS=null;window.BTSESS=null;reRender(CUR)">';
  /* Ô chọn phải nói lớp nào ĐÃ KẾT THÚC. Trước bản này nó liệt kê hết mọi lớp như nhau, nên bảo
@@ -19073,7 +19105,7 @@ function btHub(embed){
  var cid=window.BTCLASS||(cls[0]&&cls[0].class_id)||"";
  var lop=find("DL10","class_id",cid)||{};var mode=window.BTMODE||"giao";
  var enr=rows("DL08").filter(function(e){return e.class_id===cid});
- var h=embed?'':'<div class="phead" data-tour="phead"><div><div class="t">Bài tập</div><div class="s">Chọn lớp và buổi, rồi giao bài cho cả lớp hoặc chấm bài từng học viên - đúng cách giáo viên làm việc</div></div></div>';
+ var h=embed?'':'<div class="phead" data-tour="phead"><div><div class="t">Bài tập</div><div class="s">Chọn lớp và buổi, rồi giao bài cho cả lớp hoặc chấm bài từng học viên - đúng cách giáo viên làm việc</div></div><div class="sp">'+soCuaTrangHTML("baitap")+'</div></div>';
  /* V2 08/08 - trang này vừa được mở quyền cho giáo viên và ACA (trước đó khai `hide:1`, app giục
     họ chấm 12 bài mà không có cửa vào). Mở ra thì mọi luật chung của V2 mới áp được - và luật
     đầu tiên là trang nghiệp vụ phải có dải thẻ. Ba thẻ đọc CÙNG hàm `btChoCham` mà nhịp ngày và
@@ -20637,7 +20669,16 @@ function pageHead(t,s,btn,hoan){/* UX-23: tiêu đề đã có ở topbar (#pgTi
     Bộ kiểm canh: trang nào hoãn thì bảng việc phải xuất hiện ĐÚNG MỘT LẦN và phải nằm SAU
     thanh chọn - hoãn mà quên gọi lại là mất hẳn bảng việc của một chức danh. */
  var bv=hoan?"":bvSau();
- return '<div class="phead nohd" data-tour="phead"><div><div class="s" style="margin-top:0">'+s+'</div></div><div class="sp">'+(btn||"")+'</div></div>'+bv}
+ /* ═══ 26/08 - CỬA VÀO SỔ CỦA CHÍNH TRANG NÀY ═══════════════════════════════════════════════
+    App vốn chỉ có đường một chiều SỔ → NGHIỆP VỤ (nút "Sang X để làm" trong mỗi sổ). Chiều hay
+    dùng hơn thì thiếu: đang đứng ở màn nghiệp vụ, muốn tra lại một dòng cũ thì phải đi vòng qua
+    menu → Tra cứu → tìm trong mười bảy cuốn.
+    Gắn ở ĐÂY, một chỗ dùng chung cho mọi trang, chứ không chép vào từng hàm vẽ trang: chép vào
+    ba mươi trang là ba mươi cơ hội để một trang bị quên, mà trang bị quên thì không ai thấy.
+    Bảng tra là `LISTCFG[k].lam` - đúng bản khai mà chiều kia đang dùng, nên hai chiều không thể
+    lệch nhau. */
+ var so="";try{so=soCuaTrangHTML(CUR)}catch(e){so=""}
+ return '<div class="phead nohd" data-tour="phead"><div><div class="s" style="margin-top:0">'+s+'</div></div><div class="sp">'+(btn||"")+so+'</div></div>'+bv}
 /* ═══ V2 08/08 - NHỊP NGÀY VỀ ĐÚNG TRANG NGƯỜI TA ĐÁP XUỐNG ══════════════════════════════════
    Anh Luân 08/08: *"Hệ thống lớn, nhưng quá khó dùng thì chết ngay. Như v1, a ko chắc nhân viên
    sale có hiểu hành trình và cách app trình bày ko đó."*
@@ -31366,32 +31407,100 @@ function renderDuthu(){
    Chỉ vẽ những sổ người đang đăng nhập được xem - hỏi thẳng `navVis`, không tự chép lại luật
    phân quyền lần thứ hai (chép lại là gốc của mọi lần lệch). */
 function tcTim(v){window.TCQ=String(v||"");reRender("tracuu")}
+/* ═══ 26/08 - MƯỜI BẢY CUỐN SỔ THÔI NẰM MỘT ĐỐNG ═══════════════════════════════════════════════
+   Anh Luân, kèm ảnh chụp trang này: *"mấy cái trang này để rời nó vô lý quá, sao ko đưa vào gần
+   chỗ nghiệp vụ phù hợp cho dễ dùng???? và nâng cấp nó lên cho chuyên nghiệp"*.
+
+   Anh đúng, và cái sai nằm đúng ở chỗ anh chỉ: trang này bày MƯỜI BẢY thẻ thành một lưới phẳng
+   xếp theo thứ tự khai trong mã, không nhóm, không nói cuốn nào thuộc việc gì. Người đi tìm "sổ
+   khiếu nại" phải quét mắt qua mười sáu cái tên khác; người đang làm ở màn CSKH thì không biết
+   là có một cuốn sổ của chính màn ấy.
+   *Một danh sách phẳng bắt người đọc tự phân loại hộ mình - và họ sẽ phân loại lại từ đầu mỗi
+   lần mở trang.*
+
+   XẾP NHÓM BẰNG BẢN KHAI ĐÃ CÓ, KHÔNG GÕ THÊM MỘT BẢNG THỨ HAI. Mỗi cuốn sổ từ lâu đã tự khai
+   nó phục vụ trang nghiệp vụ nào - đó là `LISTCFG[k].lam`, cái mà nút "Sang X để làm" trong sổ
+   vẫn đang dùng. Nhóm của cuốn sổ = nhóm menu của trang nghiệp vụ ấy. Gõ một bảng "sổ nào thuộc
+   nhóm nào" là khai lần thứ hai một sự thật đã có, và hai bản khai thì sớm muộn lệch nhau.
+
+   VÀ MỞ CỬA CHIỀU NGƯỢC LẠI: trước bản này chỉ có đường SỔ → NGHIỆP VỤ. Chiều hay dùng hơn lại
+   thiếu - đang đứng ở màn nghiệp vụ, muốn tra lại một dòng cũ thì phải đi vòng qua menu. Nay
+   `pageHead` tự gắn cửa vào sổ của chính trang ấy (xem `soCuaTrang`).
+   *Một liên kết một chiều là nửa cái cầu.* */
+function tcNhom(k){
+ var cfg=LISTCFG[k]||{},lam=String(cfg.lam||"");
+ if(!lam)return {g:"",lam:"",ten:""};
+ var own=lam;try{own=navOwner(lam)||lam}catch(e){}
+ var g="";
+ (typeof NAVTREE!=="undefined"?NAVTREE:[]).forEach(function(G){
+  if(g)return;
+  var it=G.items||[];
+  if(it.indexOf(lam)>=0||it.indexOf(own)>=0)g=G.g});
+ return {g:g,lam:lam,ten:(PBK[lam]||{}).t||lam}}
+/* Sổ của MỘT trang nghiệp vụ - dùng cho cửa chiều ngược lại ở `pageHead`. Chỉ trả về sổ người
+   đang đăng nhập được xem: mời vào một trang họ không có quyền mở là một lời hứa hụt. */
+function soCuaTrang(page){
+ page=String(page||"");
+ if(!page)return [];
+ return SOTRACUU.filter(function(k){
+  if(k===page)return false;
+  var cfg=LISTCFG[k]||{};
+  if(String(cfg.lam||"")!==page)return false;
+  try{return !!PBK[k]&&navVis(k)}catch(e){return false}})}
+function soCuaTrangHTML(page){
+ var ds=soCuaTrang(page);
+ if(!ds.length)return "";
+ /* Tới ba cuốn thì bày cả ba - hub CSKH có đúng ba (khảo sát · phản hồi · khiếu nại) và ba
+    cái tên ấy soi đúng ba tab của chính nó, nên bày ra là đọc được ngay. Từ bốn trở lên mới
+    gom thành một cửa chung: bốn nút phụ là tranh chỗ với nút chính, mà nút chính mới là việc
+    người ta tới trang này để làm. */
+ if(ds.length>3)
+  return '<button class="btn" onclick="go(\'tracuu\')" data-tip="Trang này có '+ds.length+' cuốn sổ tra cứu"><i class="ti ti-folders"></i>Sổ tra cứu ('+ds.length+')</button>';
+ return ds.map(function(k){var p=PBK[k]||{};
+  return '<button class="btn" onclick="go(\''+esc(k)+'\')" data-tip="'+esc((p.c||"")+" - sổ chỉ đọc, tra lại hồ sơ cũ")+'"><i class="ti '+esc(p.ic||"ti-folders")+'"></i>'+esc(p.t)+'</button>'}).join("")}
+function tcSoDong(k){
+ var cfg=LISTCFG[k];
+ try{if(cfg&&cfg.code){var a=scopeList(cfg.code,rows(cfg.code));if(cfg.pre)a=a.filter(cfg.pre);return a.length}}catch(e){}
+ return null}
+function tcThe(k){
+ var p=PBK[k]||{},N=tcNhom(k),n=tcSoDong(k);
+ var cfg=LISTCFG[k]||{};
+ return '<button class="tco" type="button" onclick="go(\''+esc(k)+'\')" data-tip="'+esc("Mở "+p.t+(cfg.code?(" - bảng "+cfg.code):""))+'">'+
+  '<span class="tcic"><i class="ti '+esc(p.ic||"ti-file")+'"></i></span>'+
+  '<span class="tcn"><b>'+esc(p.t)+'</b><span class="mut">'+esc(p.c||"")+'</span>'+
+  (N.ten?('<span class="tclam"><i class="ti ti-corner-down-right"></i>làm ở '+esc(N.ten)+'</span>'):'')+'</span>'+
+  (n==null?'':'<span class="tcso">'+n+'</span>')+'</button>'}
 function renderTracuu(){
  var q=vnorm(window.TCQ||"");
  var h=pageHead("Tra cứu & sổ sách",
-  "Các sổ CHỈ-ĐỌC của trung tâm. Nghiệp vụ làm ở trang nghiệp vụ; ở đây chỉ để tra lại một hồ sơ, một khoản thu, một buổi học đã qua.","");
+  "Các sổ CHỈ-ĐỌC của trung tâm, xếp theo chặng nghiệp vụ. Nghiệp vụ làm ở trang nghiệp vụ; ở đây chỉ để tra lại một hồ sơ, một khoản thu, một buổi học đã qua.","");
  /* Ô tìm dùng ĐÚNG câu mời chuẩn của app ("Tìm trong trang này..."). Bản đầu em viết riêng
     "Tìm sổ..." cho hợp cảnh - `_checkux` bắt: mỗi trang một cách gọi thì người dùng phải học
     lại từng màn. Một câu mời cho cả app, không có ngoại lệ cho màn nào. */
  h+='<div class="tbar" data-tour="tbar">'+srchHTML(window.TCQ||"","tcTim(this.value)","Tìm trong trang này...",280)+'<div class="tbsp"></div></div>';
  var co=SOTRACUU.filter(function(k){try{return !!PBK[k]&&navVis(k)}catch(e){return false}});
- var hien=co.filter(function(k){var p=PBK[k]||{};
-  return !q||vnorm(p.t).indexOf(q)>=0||vnorm(p.c||"").indexOf(q)>=0});
+ var hien=co.filter(function(k){var p=PBK[k]||{},N=tcNhom(k);
+  return !q||vnorm(p.t).indexOf(q)>=0||vnorm(p.c||"").indexOf(q)>=0||vnorm(N.ten||"").indexOf(q)>=0||vnorm(N.g||"").indexOf(q)>=0});
  h+='<div class="panel"><div class="ph"><b>'+hien.length+' sổ</b>'+
   (q?'<span class="mut" style="font-size:11.5px">lọc theo "'+esc(window.TCQ)+'" - toàn bộ có '+co.length+' sổ</span>':
-     '<span class="mut" style="font-size:11.5px">bấm một thẻ để mở sổ</span>')+'</div><div class="pbody">';
+     '<span class="mut" style="font-size:11.5px">xếp theo chặng nghiệp vụ · bấm một thẻ để mở sổ</span>')+'</div><div class="pbody">';
  if(!hien.length)h+='<div class="empty">'+(co.length?'Không có sổ nào khớp "'+esc(window.TCQ)+'". Xóa từ khoá để xem đủ '+co.length+' sổ.'
    :'Chức danh của bạn chưa được cấp sổ tra cứu nào. Cấp thêm ở Cài đặt &rsaquo; Phân quyền trang.')+'</div>';
  else{
-  h+='<div class="tcgrid">';
-  hien.forEach(function(k){var p=PBK[k]||{};
-   var cfg=LISTCFG[k],n=null;
-   try{if(cfg&&cfg.code){var a=scopeList(cfg.code,rows(cfg.code));if(cfg.pre)a=a.filter(cfg.pre);n=a.length}}catch(e){n=null}
-   h+='<div class="tco" onclick="go(\''+esc(k)+'\')" title="Mở '+esc(p.t)+'">'+
-    '<i class="ti '+esc(p.ic||"ti-file")+'"></i>'+
-    '<div class="tcn"><b>'+esc(p.t)+'</b><span class="mut">'+esc(p.c||"")+'</span></div>'+
-    (n==null?'':'<span class="tcso">'+n+'</span>')+'</div>'});
-  h+='</div>'}
+  /* Thứ tự nhóm bám ĐÚNG thứ tự menu bên trái - người ta đã học thứ tự ấy rồi, dạy họ một thứ
+     tự thứ hai trên cùng một app là bắt học lại. Sổ chưa khai `lam` (Sổ phụ huynh, Khóa học,
+     Nhật ký thao tác) gom vào một nhóm cuối, khai thẳng là chúng dùng chung. */
+  var nhom={},thu=[];
+  hien.forEach(function(k){var g=tcNhom(k).g||"Sổ dùng chung";
+   if(!nhom[g]){nhom[g]=[];thu.push(g)}
+   nhom[g].push(k)});
+  var xep=[];
+  (typeof NAVTREE!=="undefined"?NAVTREE:[]).forEach(function(G){if(nhom[G.g]&&xep.indexOf(G.g)<0)xep.push(G.g)});
+  thu.forEach(function(g){if(g!=="Sổ dùng chung"&&xep.indexOf(g)<0)xep.push(g)});
+  if(nhom["Sổ dùng chung"])xep.push("Sổ dùng chung");
+  xep.forEach(function(g){
+   h+='<div class="tcsec"><b>'+esc(g)+'</b><span class="tcsn">'+nhom[g].length+' sổ</span><i class="tcsl"></i></div>';
+   h+='<div class="tcgrid">'+nhom[g].map(tcThe).join("")+'</div>'})}
  return h+'</div></div>'}
 function renderNhansu(){
  /* V2 13/08 - BỎ HẲN DẢI THẺ. Ba thẻ ở đây đọc đúng ba hàm mà ba chip lọc ngay dưới đang đọc
@@ -35729,7 +35838,12 @@ LISTCFG.dsdangky=mkRO(LISTCFG.tuvan,"Sổ đăng ký khóa (DL06) - chỉ xem; t
    khoá. Nay đưa mã thật lên đầu. */
 LISTCFG.dsthanhtoan={code:"DL07",filt:"payment_method",ro:1,lam:"thanhtoan",sub:"Sổ thu học phí (DL07) - chỉ xem; thu tiền ở Tuyển sinh > Thanh toán",
  cols:[["payment_id","Mã"],["payment_time","Ngày thu"],["student_id_name","Học viên"],["amount","Số tiền","money"],["payment_method","Hình thức","enum"],["received_by","Người thu"],["verified_by","KT xác nhận"]]};
-LISTCFG.dsbuoihoc={code:"DL11",filt:"session_status",ro:1,lam:"hoctap",sub:"Sổ buổi học (DL11) - chỉ xem; vận hành ở hub Học tập",
+/* 26/08 - `lam` cũ trỏ vào `hoctap`, mà `go("hoctap")` từ V2 đã đổi hướng sang trang Lớp học -
+   nên nút "Sang ... để làm" của cuốn sổ này đưa người ta tới một trang khác cái tên nó vừa hứa.
+   Chỗ vận hành THẬT của một buổi học (điểm danh, nhận xét, bài tập) là Vận hành lớp.
+   *Một bản khai trỏ vào trang đã đổi hướng thì nó vẫn chạy, chỉ là chạy tới chỗ khác - loại sai
+   không bao giờ báo lỗi.* */
+LISTCFG.dsbuoihoc={code:"DL11",filt:"session_status",ro:1,lam:"banglop",sub:"Sổ buổi học (DL11) - chỉ xem; vận hành ở màn Vận hành lớp",
  cols:[["session_id","Mã"],["class_id_name","Lớp"],["session_number","Buổi"],["session_date","Ngày giờ"],["teacher_id_name","GV"],["session_status","Trạng thái","chip"]]};
 LISTCFG.dsdiemdanh={code:"DL12",filt:"attendance_status",ro:1,lam:"banglop",sub:"Sổ điểm danh (DL12) - chỉ xem; điểm danh ở Vận hành lớp",
  cols:[["attendance_id","Mã"],["student_name","Học viên"],["session_id","Buổi"],["attendance_status","Điểm danh","chip"],["check_in_time","Giờ vào"],["in_class_performance","Trong lớp","enum"]]};
@@ -35739,7 +35853,9 @@ LISTCFG.dsketthuc=mkRO(LISTCFG.ketthuc,"Sổ kết thúc khóa (DL18) - chỉ xe
 LISTCFG.dskhaosat={code:"DL15",filt:"survey_type",ro:1,lam:"cskh",sub:"Sổ khảo sát định kỳ (DL15) - chỉ xem; gửi/xử lý ở hub CSKH",
  cols:[["survey_id","Mã"],["student_name","Học viên"],["survey_type","Đợt","enum"],["sent_date","Gửi"],["submitted_date","Trả lời"],["satisfaction_score","Hài lòng"],["follow_up_needed","Cần follow-up","enum"]]};
 LISTCFG.dsphanhoi=mkRO(LISTCFG.khaosat,"Sổ phản hồi / góp ý (DL16) - chỉ xem; xử lý ở hub CSKH");LISTCFG.dsphanhoi.lam="cskh";
-LISTCFG.dskhieunai=mkRO(LISTCFG.khieunai,"Sổ khiếu nại (DL17) - chỉ xem; xử lý ở hub CSKH","khieunai");
+/* 26/08 - `lam:"khieunai"` cũng là một bản khai trỏ vào trang đã đổi hướng: `go("khieunai")` đưa
+   về hub CSKH. Khai thẳng `cskh` để cửa hai chiều mở đúng chỗ nó nói. */
+LISTCFG.dskhieunai=mkRO(LISTCFG.khieunai,"Sổ khiếu nại (DL17) - chỉ xem; xử lý ở hub CSKH","cskh");
 
 var NAVTREE=[
  /* V9.29: "Việc hôm nay" trước đây khai hide:1 - vào được từ chuông và các ô Tổng quan nhưng
