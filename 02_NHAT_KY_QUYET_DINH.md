@@ -174,6 +174,16 @@
 > đó đang nói to hơn.*
 > Bản indigo giữ lại thành một bộ dựng sẵn thứ hai, ai thích thì bấm.
 >
+> **Rồi anh Luân hỏi tiếp: *"e có thể làm nó bóng hơn ko?"*** - làm bằng **lớp phủ trong suốt**
+> chồng lên `var(--sidebar)`: một vệt sáng rất nhạt ở trên, sẫm dần xuống dưới, cộng một sợi sáng
+> ở mép trong; nút chính có ánh ở mép trên và bóng đổ. Ba lý do đều là lý do kỹ thuật:
+> · lớp phủ dùng `rgba` nên **không đẻ thêm một mã màu nào** - bảng màu vẫn nguyên;
+> · nó **ăn theo bất kỳ màu nền nào** người dùng chọn ở Cài đặt, nên bộ màu nào cũng bóng như
+>   nhau - nếu tô bằng hai mã cụ thể thì đổi bộ màu là hết bóng, hoặc tệ hơn là chỏi màu;
+> · và nó không phải một dải viền trang trí nên không đụng luật W5.
+> *Muốn một thứ bóng ở mọi màu thì đừng vẽ ánh sáng bằng màu - hãy vẽ bằng độ trong.*
+> Khung xem trước cũng mang đúng chất liệu ấy, nếu không thì nó đang xem trước một thứ khác.
+>
 > **Đã có sẵn một nửa cơ chế:** `uiApply()` từ lâu đã ghi `--navy` và `--red` lên `:root`. Chỉ là
 > nó dừng ở HAI ô. Nay mở ra trọn bộ **18 ô màu + font + 6 bậc cỡ chữ**, và `uiApply` duyệt thẳng
 > bản khai `UIMAU` chứ không liệt kê tay - thêm một vai màu là nó tự được áp.
