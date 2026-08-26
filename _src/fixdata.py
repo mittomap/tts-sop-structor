@@ -4406,6 +4406,15 @@ _hocvu = [s for s in R("DL01")
 if not _hocvu:
     _hocvu = [s for s in R("DL01") if code(s.get("status", "")) == "active"]
 _rnd30 = random.Random(20260826)
+# TRAN THOI GIAN PHAI DUNG YEN TRONG NGAY, KHONG DUOC LA `NOW`.
+# Ban dau cho nay ghi `fmt(_x if _x <= NOW else NOW)` - chan khong cho gieo mot moc o tuong lai.
+# Y dinh dung, nhung `NOW` doi TUNG PHUT, nen ho so nao bi cham tran se mang mot gio khac nhau o
+# hai luot dung lai cach nhau mot phut - va `check_taolai.py` (dung lai demo hai lan roi so tung
+# bang) bat do ngay. Chay hai lan trong CUNG mot phut thi no van xanh, nen loi nay thuoc loai
+# "xanh khi minh thu, do khi may chay" - loai kho tin nhat.
+# *Mot khoi gieo du lieu phai la ham cua HAT GIONG va NGAY CHAY, khong duoc la ham cua DONG HO.*
+# 19:00 hom qua: mot moc dung yen suot ngay chay, va chac chan da o qua khu.
+_TRAN30 = NOW.replace(hour=0, minute=0) - datetime.timedelta(hours=5)
 _n30 = {"in": 0, "gui": 0, "nhan": 0, "anh": 0}
 # MOI DONG DEU PHAI CO DU BAY NHIEU COT, du la o rong. `check_logic` luat 14a canh dung chuyen
 # nay va bat duoc ngay lan chay dau: 62/88 dong lech bo cot. Ly do no la LOI chu khong phai
@@ -4431,7 +4440,7 @@ for _i, _o in enumerate(R("DL08")):
 
     def _moc(gio, ngay=0):
         _x = (_neo + datetime.timedelta(days=ngay)).replace(hour=gio, minute=_rnd30.choice([0, 15, 30, 45]))
-        return fmt(_x if _x <= NOW else NOW)
+        return fmt(_x if _x <= _TRAN30 else _TRAN30)
 
     # HOP DONG: in ngay khi xep lop xong, trao khi hoc vien toi lop dau tien.
     # Chua ky quy dinh lop thi chua trao hop dong - do la thu tu that o quay.

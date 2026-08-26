@@ -506,10 +506,19 @@ tv5("V9.20 doi ten nhom menu hien dung tren sidebar", (function(){
  uiGroupRename("Làm việc","Bàn của tôi");buildNav();
  var okk=NAVEL.innerHTML.indexOf("Bàn của tôi")>=0;
  uiGroupRename("Làm việc","");buildNav();return okk})());
+/* ═══ 26/08 - HỎI KHỐI CÓ MẶT KHÔNG, ĐỪNG HỎI NÓ ĐANG TÊN GÌ ═══════════════════════════════
+   Câu này từng đòi đúng chuỗi "Màu thương hiệu". Đợt 26/08 khối ấy nở ra thành cả bảng màu +
+   font + cỡ chữ nên đổi tên thành "Màu, font và cỡ chữ" - đúng việc nó làm bây giờ - và bộ kiểm
+   đỏ, dù cái nó canh (tab Giao diện có khối đổi màu) vẫn còn nguyên.
+   Luật thật là "tab Giao diện phải có khối đổi màu thương hiệu", nên hỏi bằng MỐC NEO của khối
+   (`data-tour="cfbrandmau"` - chính cái neo bài hướng dẫn trỏ tới, và `_checkneo` canh nó có
+   thật), chứ không hỏi bằng dòng chữ đang in trên đầu khối.
+   *Một phép đo bám vào câu chữ trên nhãn thì mỗi lần viết lại nhãn cho đúng hơn là một lần đỏ
+   giả - và người sửa sẽ học được rằng cách rẻ nhất là đừng sửa nhãn nữa.* */
 t("V9.20 tab Giao dien + Menu co trong Cai dat", (function(){
  window.SETTAB="brand";var o1=RENDER.settings();
  window.SETTAB="menu";var o2=RENDER.settings();window.SETTAB="ch2";
- return o1.indexOf("Tên trung tâm")>=0&&o1.indexOf("Màu thương hiệu")>=0&&o2.indexOf("Menu sidebar")>=0})());
+ return o1.indexOf("Tên trung tâm")>=0&&o1.indexOf('data-tour="cfbrandmau"')>=0&&o2.indexOf("Menu sidebar")>=0})());
 /* --- 12. V9.21: tour huong dan tung buoc --- */
 /* V9.34: TOURLV nay co 4 dong - 3 cap bai viet san + tang "Don viec hom nay" (buoc sinh tu hang
    cho, co y khong co bai viet san). Tieu chi cu dang doi MOI cap deu phai co bai. */

@@ -2105,7 +2105,7 @@ table.dt tbody tr.clk.on td{font-weight:600}
    danh sách học viên là 85 dòng, để nó đẩy nút Gửi xuống dưới màn là người dùng chọn xong
    không thấy nút đâu. */
 .tbbox{max-height:230px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:5px;background:var(--bg)}
-.tbck{display:flex;align-items:center;gap:9px;padding:5px 8px;border-radius:7px;cursor:pointer}
+.tbck{display:flex;align-items:center;gap:9px;padding:5px 8px;border-radius:6px;cursor:pointer}
 .tbck:hover{background:var(--bg2)}
 .tbck input{flex:none;margin:0}
 .tbck b{font-size:12.5px;font-weight:600}
@@ -3143,15 +3143,18 @@ body.drsz .drawer{transition:none}
    Chữ "giao" và "HV nhận" viết THẲNG RA chứ không để hai chấm trần: hai chấm cạnh nhau thì
    người đọc phải học xem chấm nào là ai, mà học xong tuần sau lại quên. */
 .obkit{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:5px;min-width:0}
+/* 6px và 3px là hai BẬC ĐÃ CÓ trong thang bo góc. Bản đầu em đặt 7px và 4px - "chỉ nhỏ hơn một
+   chút cho vừa cái chip" - và thang bo góc nhảy từ 10 lên 12 bậc, `_checkux` đỏ ngay.
+   *Một bậc bo góc mới không bao giờ chỉ là một bậc bo góc mới.* */
 .obkq{display:inline-flex;align-items:center;gap:5px;padding:2px 7px;border:1px solid var(--line);
- border-radius:7px;font-size:11px;background:var(--card);white-space:nowrap}
+ border-radius:6px;font-size:11px;background:var(--card);white-space:nowrap}
 .obkq>i.ti{font-size:12px;color:var(--muted)}
 .obkq.ok{border-color:var(--green)}
 .obkq.ok>i.ti{color:var(--green)}
 .obkq.part{border-color:var(--amber)}
 .obkq.part>i.ti{color:var(--amber)}
 .obkq.na{opacity:.5}
-.obkd{width:14px;height:14px;border:1px solid var(--line);border-radius:4px;display:inline-flex;
+.obkd{width:14px;height:14px;border:1px solid var(--line);border-radius:3px;display:inline-flex;
  align-items:center;justify-content:center;flex:none;background:var(--bg)}
 .obkd.on{background:var(--green);border-color:var(--green)}
 .obkd>i.ti{font-size:11px;color:#fff}
@@ -10006,7 +10009,14 @@ function wowTaught(id){var w=find("DL14","wow_id",id)||{};
 function openComplaint(id){var c=find("DL17","complaint_id",id);if(!c){toast("Không thấy khiếu nại.");return}
  var code=ecode(c.complaint_status);var sevc=ecode(c.complaint_severity);
  var isNew=!(/assigned|in_progress|resolved|escalated/.test(code));var working=/in_progress|resolved|escalated/.test(code);var resolved=code==="resolved";
- var h='<div class="dcard"><h4><i class="ti ti-alert-triangle"></i>Khiếu nại - '+esc(c.student_id_name||c.student_id)+'</h4>';
+ /* ═══ 26/08 - NGĂN KÉO PHẢI NHẮC TỚI HỒ SƠ VỪA BẤM ═══════════════════════════════════════
+    `_checkbam` bắt được ngay lượt đầu sau khi Sổ khiếu nại đi thẳng vào màn này: bấm dòng
+    KN-2026-001 thì ngăn kéo mở ra không có chữ "KN-2026-001" ở đâu cả - chỉ có tên học viên.
+    Ở hub CSKH thì không sao vì người ta vừa đọc cả thẻ; nhưng vào từ SỔ, thứ người ta bấm là
+    một MÃ, mà màn mở ra không xác nhận lại mã ấy thì không có gì bảo đảm mình mở đúng dòng -
+    nhất là hai khiếu nại của cùng một học viên.
+    *Màn mở ra phải nhắc lại thứ người ta vừa bấm, nếu không thì họ phải tin chứ không kiểm được.* */
+ var h='<div class="dcard"><h4><i class="ti ti-alert-triangle"></i>Khiếu nại '+esc(c.complaint_id||id)+' - '+esc(c.student_id_name||c.student_id)+'</h4>';
  h+=ctxRows([["Trạng thái",'<span class="chip '+knStatusCls(code)+'">'+esc(elabel(c.complaint_status)||code||"mới tiếp nhận")+'</span>'],["Học viên",esc(c.student_id_name||c.student_id)],["Lớp",esc(c.class_id_name||c.class_id||"-")],["Loại",esc(elabel(c.complaint_type)||c.complaint_type||"-")],["Mức độ",'<span class="chip '+(sevc==="high"?"red":sevc==="medium"?"amber":"")+'">'+esc(elabel(c.complaint_severity)||sevc)+'</span>'],["Kênh",esc(elabel(c.complaint_channel)||c.complaint_channel||"-")],["Tiếp nhận",esc(c.complaint_time||"-")],["Người xử lý",esc(c.assigned_handler||"chưa phân công")]]);
  h+=ctxContent("Nội dung khiếu nại",c.complaint_content,sevc==="high"?"var(--red)":"var(--amber)");
  h+=stepBar([["Tiếp nhận",true],["Phân công",!isNew],["Xử lý",working],["Đóng",resolved]]);
@@ -10016,7 +10026,7 @@ function openComplaint(id){var c=find("DL17","complaint_id",id);if(!c){toast("Kh
  else if(isNew){h+='<div class="dact"><button class="btn primary" onclick="confirmRun(\'Bạn nhận xử lý khiếu nại này? Khiếu nại sẽ được gán cho bạn và chuyển sang Đang xử lý.\',\'knClaim\',\''+esc(id)+'\')"><i class="ti ti-user-check"></i>Nhận khiếu nại</button><button class="btn danger" onclick="confirmRun(\'Leo thang khiếu nại này lên quản lý cấp cao?\',\'knEscalate\',\''+esc(id)+'\')"><i class="ti ti-arrow-up"></i>Leo thang</button></div>';}
  else if(!working){h+='<div class="dact"><button class="btn primary" onclick="confirmRun(\'Bắt đầu xử lý khiếu nại này?\',\'knStart\',\''+esc(id)+'\')"><i class="ti ti-tool"></i>Bắt đầu xử lý</button><button class="btn danger" onclick="confirmRun(\'Leo thang khiếu nại này lên quản lý cấp cao?\',\'knEscalate\',\''+esc(id)+'\')"><i class="ti ti-arrow-up"></i>Leo thang</button></div>';}
  else{h+='<div class="fld"><label>Kết quả xử lý</label><select id="kr_res">'+enumOpts("enum_complaint_result")+'</select></div><div class="fld full"><label>Cách xử lý / phản hồi học viên <i>*</i></label><textarea id="kr_note" rows="3" placeholder="Mô tả hướng giải quyết, cam kết, đền bù (nếu có)..."></textarea></div><div class="dact"><button class="btn green" onclick="knResolveSave(\''+esc(id)+'\')"><i class="ti ti-check"></i>Đóng khiếu nại</button><button class="btn danger" onclick="confirmRun(\'Leo thang khiếu nại này lên quản lý cấp cao?\',\'knEscalate\',\''+esc(id)+'\')"><i class="ti ti-arrow-up"></i>Leo thang</button></div>';}
- h+='</div>';openDrawer("Khiếu nại · "+(c.student_id_name||c.student_id),h)}
+ h+='</div>';openDrawer("Khiếu nại "+(c.complaint_id||id)+" · "+(c.student_id_name||c.student_id),h)}
 function slaRow(it){var age=it.age!=null?'<span class="agebadge '+it.sev+'">'+esc(fmtAge(it.age))+'</span>':'';
  /* ═══ V2 14/08 (anh Luân: *"sự khác nhau ở các thiết kế nút đến từ lý do gì em"*) ══════════
     Bốn nhánh dưới đây có thật và mỗi nhánh dẫn đi một nơi khác nhau - nhưng BA trong bốn cùng
@@ -16320,7 +16330,7 @@ var KPIDOC={
   visao:"Đi học đủ mà không tiến bộ thì tới cuối khoá vẫn không đạt mục tiêu - và đó là lúc phát sinh khiếu nại.",
   nguon:"DL09.academic_progress_status, đếm số hồ sơ ở mức nguy cơ chia tổng học viên đang học.",
   doc:{tot:"Cả lớp đang tiến đều.",dat:"Trong ngưỡng.",
-   hut:"Vài em bắt đầu đuối.",canhbao:"Nhiều em không theo kịp - nên xếp buổi WOW kèm riêng.",
+   hut:"Vài học viên bắt đầu đuối.",canhbao:"Nhiều học viên không theo kịp - nên xếp buổi WOW kèm riêng.",
    baodong:"Phần lớn học viên không tiến bộ. Xem lại giáo án và cách xếp trình độ."},
   viec:{hut:[["Mở danh sách học viên nguy cơ","ti-user-exclamation","hocvien",{}]],
    canhbao:[["Mở danh sách học viên nguy cơ","ti-user-exclamation","hocvien",{}],["Đặt buổi WOW kèm riêng","ti-star","wow",{}]],
@@ -16329,7 +16339,7 @@ var KPIDOC={
   visao:"Gắn cờ mà không ai kéo về thì cái cờ ấy chỉ là một con số. Đây là chỉ số đo việc CHĂM, không đo việc PHÁT HIỆN.",
   nguon:"DL09: đối chiếu trạng thái nguy cơ giữa hai kỳ liền nhau.",
   doc:{tot:"Kéo về được gần hết.",dat:"Đạt mục tiêu.",
-   hut:"Một số em gắn cờ rồi để đó.",canhbao:"Phần lớn em nguy cơ vẫn nguy cơ - việc chăm chưa tới nơi.",
+   hut:"Một số hồ sơ gắn cờ rồi để đó.",canhbao:"Phần lớn học viên nguy cơ vẫn nguy cơ - việc chăm chưa tới nơi.",
    baodong:"Gắn cờ xong không ai làm gì. Cả cơ chế cảnh báo đang chạy không."},
   viec:{hut:[["Mở việc chăm học viên","ti-heart-handshake","cskh",{}]],
    canhbao:[["Mở việc chăm học viên","ti-heart-handshake","cskh",{}],["Mở danh sách nguy cơ","ti-user-exclamation","hocvien",{}]],
@@ -16384,7 +16394,7 @@ var KPIDOC={
   visao:"Nộp trễ thì giảng viên chấm dồn, chữa muộn, và học viên không kịp sửa trước buổi sau.",
   nguon:"DL13: đếm bài submitted_on_time chia tổng bài đã giao trong kỳ.",
   doc:{tot:"Cả lớp nộp bài đúng nhịp.",dat:"Đạt mục tiêu.",
-   hut:"Một số em bắt đầu nộp trễ.",canhbao:"Nộp trễ thành phổ biến - vòng phản hồi bài tập đang đứt.",
+   hut:"Một số học viên bắt đầu nộp trễ.",canhbao:"Nộp trễ thành phổ biến - vòng phản hồi bài tập đang đứt.",
    baodong:"Gần như không ai nộp đúng hạn."},
   viec:{hut:[["Mở sổ bài tập","ti-book","dsbaitap",{}]],
    canhbao:[["Mở sổ bài tập","ti-book","dsbaitap",{}],["Sửa câu nhắc nộp bài","ti-message","settings",{settab:"ch4"}]],
@@ -16402,7 +16412,7 @@ var KPIDOC={
   visao:"Đây là câu trả lời thẳng cho câu hỏi học viên hỏi nhiều nhất: học ở đây tôi có lên điểm không.",
   nguon:"DL15 (điểm kỹ năng) so giữa hai mốc đo của cùng học viên.",
   doc:{tot:"Phần lớn học viên lên điểm rõ.",dat:"Đạt mục tiêu.",
-   hut:"Tiến bộ chậm ở một nhóm.",canhbao:"Nhiều em không nhích được điểm nào.",
+   hut:"Tiến bộ chậm ở một nhóm.",canhbao:"Nhiều học viên không nhích được điểm nào.",
    baodong:"Học viên không tiến bộ. Đây là vấn đề chuyên môn, không phải vấn đề chăm sóc."},
   viec:{hut:[["Mở kết quả học tập","ti-chart-line","ketqua",{}]],
    canhbao:[["Mở kết quả học tập","ti-chart-line","ketqua",{}],["Đặt buổi WOW kèm riêng","ti-star","wow",{}]],
@@ -19631,6 +19641,12 @@ var CFNHOM=[
  ["Giới thiệu bạn bè","Người giới thiệu được thưởng bao nhiêu, bạn được giới thiệu giảm bao nhiêu, và trao thưởng trong bao lâu.",["magioithieu"]],
  ["Giao việc nội bộ","Việc giao xuống bao lâu phải bấm nhận, báo xong rồi bao lâu người giao phải xác nhận.",["giaoviec"]],
  ["Hẹn giờ mặc định","Khi app tự đặt lịch hẹn thì lấy mấy giờ làm mặc định cho sáng - trưa - chiều - tối, và bao lâu nữa thì tính là 'sắp tới'.",["viec","tuyensinh"]],
+ /* 26/08 - LẦN THỨ BA CÙNG MỘT CHỖ HỤT. Thêm hai tham số cho bộ onboarding vào một nhóm chưa
+    từng có tên, và `_check16` bắt ngay - lần này kéo theo cả `_check11` đỏ, vì màn Cài đặt dựng
+    thân trang theo bảng nhóm này nên một nhóm không khai làm cả màn gãy giữa chừng.
+    *Bảng tham số và bảng nhóm là hai bảng; sửa một bên không tự sửa bên kia, và bên bị quên
+    không im lặng - nó làm hỏng cả cái màn chứa nó.* */
+ ["Bộ onboarding","Bộ sách - giáo trình và quà tặng đi kèm mà trung tâm giao cho học viên mới. Khai ở đây để màn giao món điền sẵn, vẫn sửa được cho từng học viên; đổi đợt ưu đãi thì đổi ở đây một lần.",["xeplop"]],
  ["Hệ thống & dữ liệu demo","Nhật ký thao tác giữ bao nhiêu dòng, hoàn tác được trong bao nhiêu giây, và dữ liệu demo cũ bao nhiêu ngày thì tự kéo về hiện tại.",["settings"]]];
 var CFNHOMBY={};CFNHOM.forEach(function(x,i){CFNHOMBY[x[0]]={d:x[1],pg:x[2],ord:i}});
 var APPPARAMS=[
@@ -19925,20 +19941,27 @@ function obState(o){var sent=!!(o.class_info_sent_at&&String(o.class_info_sent_a
    "Thông tin lớp" MƯỢN ĐÚNG HAI CỘT SOP ĐÃ CÓ (`class_info_sent_at`/`confirmation_time`) chứ
    không đẻ cột mới song song - đẻ cột mới là để hai con số cùng tả một việc rồi có ngày lệch.
 
-   Bảng: [mã, tên, icon, cột GỬI, cột NHẬN, cột ẢNH, cột TÊN MÓN, cột KÊNH GIAO, mô tả,
-          tham số CH2 cho nội dung mặc định] */
+   Bảng: [mã, tên, icon, cột GỬI, cột NHẬN, cột ẢNH, cột TÊN MÓN, cột KÊNH GIAO, mô tả, tên ngắn] */
 var OBGOI=[
  ["lop","Thông tin lớp","ti-school","class_info_sent_at","confirmation_time","","","",
-  "Lịch học, địa chỉ lớp, giảng viên và nhóm chat lớp","","Lớp"],
+  "Lịch học, địa chỉ lớp, giảng viên và nhóm chat lớp","Lớp"],
  ["hd","Hợp đồng nhập học","ti-file-text","bo_hd_gui_at","bo_hd_nhan_at","bo_hd_anh","","bo_hd_gui_kenh",
-  "Bản in có chữ ký hai bên - học viên giữ một bản","","Hợp đồng"],
+  "Bản in có chữ ký hai bên - học viên giữ một bản","Hợp đồng"],
  ["sach","Sách & giáo trình","ti-book","bo_sach_gui_at","bo_sach_nhan_at","","bo_sach_ten","",
-  "Giáo trình và vở ghi phát ở buổi học đầu","obKitSach","Sách"],
+  "Giáo trình và vở ghi phát ở buổi học đầu","Sách"],
  ["qua","Quà tặng đi kèm","ti-gift","bo_qua_gui_at","bo_qua_nhan_at","","bo_qua_ten","",
-  "Quà của đợt ưu đãi - không phải hồ sơ nào cũng có","obKitQua","Quà"]];
+  "Quà của đợt ưu đãi - không phải hồ sơ nào cũng có","Quà"]];
 function obGoi(k){for(var i=0;i<OBGOI.length;i++)if(OBGOI[i][0]===k)return OBGOI[i];return null}
-function obKitMacDinh(k){var g=obGoi(k);if(!g||!g[9])return "";
- try{return String(paramStr(g[9],"")||"")}catch(e){return String(paramOf(g[9],"")||"")}}
+/* Tên tham số CH2 viết THẲNG ở đây chứ không tra qua một cột trong `OBGOI`. Lý do là một phép đo:
+   `_check16` canh "tham số chết" (có ô sửa trong Cài đặt mà không dòng mã nào đọc) bằng cách tìm
+   chữ `paramStr("<tên>")` trong mã nguồn - đọc qua một biến thì phép đo ấy không nhìn thấy, và nó
+   báo hai tham số này là chết trong khi chúng đang được đọc thật. Nới phép đo là nới đúng chỗ nó
+   đang canh: một ô cấu hình không ai đọc là một lời hứa suông với người ngồi sửa nó.
+   *Chỗ nào phép đo không nhìn xuyên qua được thì viết thẳng ra, đừng bắt phép đo đoán.* */
+function obKitMacDinh(k){
+ if(k==="sach")return String(paramStr("obKitSach","")||"");
+ if(k==="qua")return String(paramStr("obKitQua","")||"");
+ return ""}
 function obKit(o){o=o||{};
  return OBGOI.map(function(g){
   var gui=String(o[g[3]]||"").trim(),nhan=String(o[g[4]]||"").trim();
@@ -19948,7 +19971,7 @@ function obKit(o){o=o||{};
   var mon=g[6]?String(o[g[6]]||"").trim():"";
   /* Quà tặng KHÔNG phải hồ sơ nào cũng có. "Không áp dụng" khác hẳn "chưa giao": đếm chung là
      bịa ra một việc tồn cho mọi học viên không thuộc đợt ưu đãi nào. */
-  return {k:g[0],ten:g[1],ngan:g[10]||g[1],ic:g[2],mo:g[8],mon:mon,gui:gui,nhan:nhan,
+  return {k:g[0],ten:g[1],ngan:g[9]||g[1],ic:g[2],mo:g[8],mon:mon,gui:gui,nhan:nhan,
    kenh:g[7]?String(o[g[7]]||"").trim():"",
    anh:g[5]?String(o[g[5]]||"").trim():"",coAnh:!!g[5],
    ap:(g[0]!=="qua")||!!mon||!!gui}})}
@@ -34948,7 +34971,22 @@ function renderCrumb(){var host=document.getElementById("pgCrumb");if(!host)retu
     Nay dấu ngăn đi LIỀN với mục đứng sau nó trong cùng một khối `nowrap`: xuống dòng thì cả cặp
     cùng xuống, không bao giờ còn một dấu `›` mồ côi. */
  host.innerHTML=out+parts.map(function(x,i){
-  return '<span class="crbi">'+(i?'<span class="crbsep">›</span>':'')+x+'</span>'}).join("")}
+  return '<span class="crbi">'+(i?'<span class="crbsep">›</span>':'')+x+'</span>'}).join("");
+ /* ═══ 26/08 - CẮT THEO CHỖ THẬT, KHÔNG CẮT THEO SỐ CHỮ ĐOÁN TRƯỚC ═══════════════════════════
+    `_checkcrumb` vẫn đỏ ở khổ 1100px: mốc hiện tại "Lớp · Foundation PLA T7-CN…" cần 167px mà
+    chỗ còn lại chỉ có 136px. Đã cắt rồi - cắt ở 30 chữ - nhưng cắt theo SỐ CHỮ là đoán, còn thứ
+    quyết định là BỀ RỘNG CÒN LẠI, mà bề rộng ấy đổi theo khổ màn, theo độ dài tên trang bên
+    cạnh, và theo cụm nút bên phải. Chọn con số nào cũng đúng ở một khổ và sai ở khổ khác.
+    Nay đo thật rồi cắt dần cho tới khi vừa: một vòng lặp ngắn trên chính phần tử đã vẽ ra. Tên
+    đầy đủ vẫn nằm trong `title` nên rê chuột là đọc trọn.
+    *Muốn một thứ vừa chỗ thì phải hỏi cái chỗ ấy rộng bao nhiêu, đừng hỏi cái thứ ấy dài bao
+    nhiêu chữ.* */
+ (function(){
+  var el=host.querySelector(".crbi:last-child .crb");if(!el)return;
+  if(!el.clientWidth)return;                    /* đang ẩn thì không đo được - để nguyên */
+  var day=el.getAttribute("title")||el.textContent||"";
+  var n=day.length,vong=0;
+  while(el.scrollWidth>el.clientWidth+1&&n>8&&vong<40){n=Math.max(8,n-2);el.textContent=crbNgan(day,n);vong++}})()}
 function navBack(){var h=window.NAVHIST;if(!h||!h.length)return;var last=h.pop();navApply(last.ctx);go(last.key,true)}
 function navJump(i){var h=window.NAVHIST;if(!h||i<0||i>=h.length)return;var target=h[i];h.length=i;navApply(target.ctx);go(target.key,true)}
 /* Bảng gộp trang: 4 trang tuyển sinh -> HUB Tuyển sinh đúng tab, 4 chặng -> trang Chặng...
@@ -36950,7 +36988,10 @@ DOORS = {
  "DL06b":["insPlanSave","dotApDung","dotGhiLich"],
  # 17/08 - cua bo sung chung tu sau khi da ghi phieu (man Cong no hoc vien)
  "DL07":["duyetRefundRun","paySave","payVerifyRun","rfNeed","ctLuu"],
- "DL08":["hvClassConfirm","hvClassRejectSave","lopDayHV","midSave","obMark","obConfirmRun","rfNeed","xepMoiLuu","obChangeSave","obFinish"],
+ # 26/08 - hvKitNhanRun: hoc vien tu bam "toi da nhan" mot mon trong bo onboarding o cong cua
+ # ho (ghi moc nhan + anh hop dong). Day la cua ghi cua NGUOI NGOAI to chuc nen no cang phai
+ # co ten trong ban khai: nhat ky thao tac doc bang nay, thieu ten la mot cu ghi khong ai thay.
+ "DL08":["hvClassConfirm","hvClassRejectSave","lopDayHV","midSave","obMark","obConfirmRun","rfNeed","xepMoiLuu","obChangeSave","obFinish","hvKitNhanRun"],
  "DL09":["bkLuuPHNguyCo","bkLuuPHQuanHe","blCallSave","blComeback","blDropout","ensureStudent","ktGenSave","runDropoutSave","runFlagRisk","runTouchSave","tvEnrollSave","wowCancelRun","wowUseQuota","wowGrantSave","riskCareSave","riskFlagRun","riskIgnoreSave","dhSave"],
  "DL10":["xepMoiLuu","obChangeSave","rfNeed","clsSetTeacher","moLopDelay","moLopCancelRun"],
  "DL11":["bhCancelRun","bhDone","bhMakeupSave","bhNoteDuyetSave","bhNoteSave","bkLuuMocGio","ddSave","sessEnd","sessStart","sesSetTeacher","clsSetTeacher","sesThiSave","doiSave"],
@@ -36997,7 +37038,9 @@ DOORS = {
  # V2 15/08 - `obGuiThat`: gui thong tin lop tu luong onboarding, ghi thang vao So tin da gui
  # thay cho nut "Xac nhan da gui" cu. Cua rieng chu khong goi lai `msgGui` vi no dong them mot
  # moc ben DL08 va gan chu de "thongtinlop" de trang thai doc nguoc lai duoc tu so.
- "DL29":["msgGui","obGuiThat"],
+ # 26/08 - tbGuiChay: gui thong bao hang loat cho mot danh sach lop / hoc vien / nhan vien,
+ # moi nguoi mot dong DL29 rieng.
+ "DL29":["msgGui","obGuiThat","tbGuiChay"],
  # V2 16/08 - DL32 kho mau tin gui khach: soan/sua mot mau, va nhan ban mot mau.
  "DL32":["mauLuu","mauNhanBan"],
  # V2 12/08 (SALE-7): hop dong cam ket dau ra - can DU HAI chu ky moi qua buoc xep lop.

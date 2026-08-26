@@ -1,0 +1,70 @@
+moc neo: 26/08/2026 05:36
+gio ghi ho so: 2026-08-26 05:36:03
+
+=== bang DL02 ===
+  so dong: 193 vs 193
+  dong 0 lech o cot: last_contact_time
+     last_contact_time: '25/08/2026 09:27'  |  '25/08/2026 09:28'
+=== bang DL02b ===
+  so dong: 505 vs 505
+  dong 271 lech o cot: contact_time
+     contact_time: '24/08/2026 13:04'  |  '24/08/2026 13:05'
+=== bang DL03 ===
+  so dong: 159 vs 159
+  dong 85 lech o cot: result_time
+     result_time: '26/08/2026 05:24'  |  '26/08/2026 05:25'
+=== bang DL04 ===
+  so dong: 111 vs 111
+  dong 85 lech o cot: consultation_time
+     consultation_time: '25/08/2026 09:35'  |  '25/08/2026 09:36'
+=== bang DL06 ===
+  so dong: 96 vs 96
+  dong 82 lech o cot: enrollment_time
+     enrollment_time: '24/08/2026 05:35'  |  '24/08/2026 05:36'
+=== bang DL06b ===
+  so dong: 192 vs 192
+  dong 163 lech o cot: paid_time
+     paid_time: '09/08/2026 05:35'  |  '09/08/2026 05:36'
+=== bang DL07 ===
+  so dong: 120 vs 120
+  dong 103 lech o cot: payment_time
+     payment_time: '09/08/2026 05:35'  |  '09/08/2026 05:36'
+=== bang DL08 ===
+  so dong: 88 vs 88
+  dong 78 lech o cot: assigned_at
+     assigned_at: '23/08/2026 06:35'  |  '23/08/2026 06:36'
+=== bang DL09 ===
+  so dong: 85 vs 85
+  dong 1 lech o cot: learning_followup_note
+     learning_followup_note: '24/08/2026 05:35: đã gọi nhắc học + xếp 1 buổi WOW củng cố, HV đi học lại đều'  |  '24/08/2026 05:36: đã gọi nhắc học + xếp 1 buổi WOW củng cố, HV đi học lại đều'
+=== bang DL13 ===
+  so dong: 384 vs 384
+  dong 33 lech o cot: homework_submitted_time
+     homework_submitted_time: '26/08/2026 04:35'  |  '26/08/2026 04:36'
+=== bang DL14 ===
+  so dong: 87 vs 87
+  dong 40 lech o cot: booking_date
+     booking_date: '25/08/2026 05:35'  |  '25/08/2026 05:36'
+=== bang DL15 ===
+  so dong: 58 vs 58
+  dong 0 lech o cot: sent_date, submitted_date
+     sent_date: '27/07/2026 05:35'  |  '27/07/2026 05:36'
+     submitted_date: '29/07/2026 05:35'  |  '29/07/2026 05:36'
+=== bang DL16 ===
+  so dong: 29 vs 29
+  dong 0 lech o cot: action_taken_at, classified_at, feedback_time
+     action_taken_at: '20/08/2026 05:35'  |  '20/08/2026 05:36'
+     classified_at: '19/08/2026 09:35'  |  '19/08/2026 09:36'
+     feedback_time: '19/08/2026 05:35'  |  '19/08/2026 05:36'
+=== bang DL17 ===
+  so dong: 14 vs 14
+  dong 0 lech o cot: complaint_time
+     complaint_time: '26/08/2026 03:35'  |  '26/08/2026 03:36'
+=== bang DL18 ===
+  so dong: 18 vs 18
+  dong 2 lech o cot: re_enrollment_contact_time
+     re_enrollment_contact_time: '25/08/2026 23:35'  |  '25/08/2026 23:36'
+=== bang DL25 ===
+  so dong: 24 vs 24
+  dong 13 lech o cot: detail
+     detail: '{"learning_followup_note": {"tu": "(trống)", "den": "24/08/2026 05:35: đã gọi nhắc học + xếp 1 buổi WOW củng cố, HV đi học lại đều"}}'  |  '{"learning_followup_note": {"tu": "(trống)", "den": "24/08/2026 05:36: đã gọi nhắc học + xếp 1 buổi WOW củng cố, HV đi học lại đều"}}'

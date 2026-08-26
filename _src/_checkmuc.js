@@ -70,7 +70,23 @@ const AI = (process.env.AI || "HV061,HV065,HV002").split(",").filter(Boolean);
   await page.waitForFunction(() => typeof window.bootHV === "function", null, {timeout: 30000});
   await page.waitForTimeout(600);
 
-  for (const CA of AI.map(x => ({sid: x, ph: 0})).concat([{sid: AI[0], ph: 1}])) {
+  /* ═══ 26/08 - CỬA CỔNG PHỤ HUYNH CÓ QUYỀN TỪ CHỐI, VÀ NÓ ĐÃ TỪ CHỐI SUỐT ═══════════════════
+     Ca "cổng phụ huynh" trước đây luôn lấy `AI[0]` = HV061 - hồ sơ chưa khai số điện thoại người
+     đồng hành. `gateEnterPH` gặp thế thì toast một câu rồi RETURN, không vào chế độ phụ huynh.
+     Phép đo vẫn ghi `vao = true` (nó chỉ bắt exception), rồi đo tiếp - trên MÀN HÌNH CỦA HỒ SƠ
+     LƯỢT TRƯỚC, đang cuộn ở đáy. Nên "cổng phụ huynh" chưa từng được đo một lần nào, mà lại đẻ
+     ra một chỗ đỏ giả: vệt sáng "lùi ngược" từ mục cuối về mục đầu chính là màn cũ chưa kịp
+     theo lệnh cuộn về đầu.
+     *Một phép đo đi vào bằng một cửa CÓ QUYỀN TỪ CHỐI mà không hỏi lại xem mình đã vào chưa thì
+     nó đang đo màn hình của lượt trước.*
+     Hai chỗ sửa: chọn hồ sơ CÓ người đồng hành, và sau khi vào thì hỏi lại `hvPH()`. */
+  const sidPH = await page.evaluate(([ds]) => {
+    const co = s => { try { const S = find("DL09", "student_id", s); return !!(S && ghSdt(S)); } catch (e) { return false; } };
+    for (const s of ds) if (co(s)) return s;
+    try { const r = (rows("DL09") || []).filter(x => ghSdt(x))[0]; return r ? r.student_id : ""; } catch (e) { return ""; }
+  }, [AI]);
+  if (!sidPH) ghi.push("khong tim ra ho so nao co so dien thoai nguoi dong hanh - bo qua ca cong phu huynh");
+  for (const CA of AI.map(x => ({sid: x, ph: 0})).concat(sidPH ? [{sid: sidPH, ph: 1}] : [])) {
     const nhan = CA.sid + (CA.ph ? " (cổng phụ huynh)" : "");
     /* ĐI ĐÚNG CỬA APP DÙNG - `gateEnterHV`/`gateEnterPH`, không tự đặt biến rồi gọi hàm vẽ.
        Luật này đã cắn ba lần trong dự án (xem GIAO_THUC_AUDIT mục 2). */
@@ -86,6 +102,11 @@ const AI = (process.env.AI || "HV061,HV065,HV002").split(",").filter(Boolean);
     }, [CA.sid, CA.ph]);
     if (!vao) { ghi.push(nhan + ": khong vao duoc cong (bo qua)"); continue; }
     await page.waitForTimeout(1100);
+    /* Vao THAT chua? Cua phu huynh tu choi im lang thi moi phep do sau day deu do man cu. */
+    if (CA.ph) {
+      const daVao = await page.evaluate(() => { try { return !!hvPH(); } catch (e) { return false; } });
+      if (!daVao) { do_.push(nhan + ": goi gateEnterPH xong ma app KHONG o che do phu huynh - cua da tu choi"); continue; }
+    }
     soCa++;
 
     /* ---- M1 + M3 + M4: so hai thứ tự trên DOM thật ---- */
