@@ -2954,6 +2954,14 @@ body.drsz .drawer{transition:none}
 .dcard textarea+.cfpline,.dcard input+.cfpline{margin-top:10px}
 .lnk{color:var(--navy);font-weight:700;cursor:pointer;border-bottom:1px dashed #B9C6D6}.lnk:hover{color:var(--navyd)}
 /* ---- Màn chỉnh giao diện: bộ dựng sẵn, từng ô màu, và khung xem trước ---- */
+/* Hai ô màu trên thanh trên - cùng khổ với các nút khác của thanh để hàng không gãy nhịp. */
+.bosw{display:flex;gap:5px;align-items:center}
+.bosb{width:34px;height:30px;padding:0;border:1px solid rgba(30,42,56,.22);border-radius:8px;background:var(--card);
+ cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;transition:.14s}
+.bosb i{width:9px;height:16px;border-radius:3px;display:block}
+.bosb:hover{border-color:var(--navy);box-shadow:0 2px 8px rgba(16,32,58,.14)}
+.bosb.on{border-color:var(--navy);box-shadow:0 0 0 2px rgba(46,90,136,.22)}
+@media(max-width:900px){.bosw{display:none}}
 .uibo{display:flex;gap:10px;flex-wrap:wrap}
 .uibob{flex:1 1 240px;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:12px;
  padding:11px 13px;cursor:pointer;transition:.15s;font-family:inherit}
@@ -3573,6 +3581,7 @@ body.drsz .drawer{transition:none}
         <!-- V9.51: nut "Chay huong dan" to o demoBadgeWrap da bo - trung viec voi nut "?" nay
      (anh Luan bat). id=tourBtn don ve day de tourBtnSync (an/hien theo Cai dat) van chay. -->
         <button class="tbtn" id="tourBtn" data-tour="help" onclick="tourMenu()" aria-label="Hướng dẫn sử dụng" title="Hướng dẫn từng bước - chọn cấp độ rồi app chỉ tận nơi"><i class="ti ti-help-circle"></i></button>
+        <div class="bosw" id="boSw" data-tour="bosw"></div>
         <div class="zwrap" data-tour="tyle"><i class="ti ti-text-size"></i><select id="zoomSel" onchange="zoomSet(this.value)" aria-label="Tỷ lệ hiển thị"></select></div>
         <button class="tbtn" id="gyBtn" data-tour="gopy" onclick="gopyMo()" aria-label="Báo lỗi hoặc góp ý" data-tip="Báo lỗi / góp ý - mở bảng ghi nhận ở tab mới"><i class="ti ti-message-report"></i></button>
         <button class="tbtn" data-tour="bell" onclick="toggleBell(event)" aria-label="Thông báo"><i class="ti ti-bell"></i><span class="n" id="bellN" style="display:none">0</span></button>
@@ -28907,10 +28916,10 @@ var UICO=[
    đó đang nói to hơn.* */
 var UIBO=[
  ["itts","Nhận diện ITTs - nền đỏ trầm","thang đỏ ba bậc: nền rất trầm, nút đỏ đậm, đỏ thương hiệu để dành cho việc gấp",
-  {navy:"#8E1622",navyd:"#6E101A",sidebar:"#5C0F19",red:"#C40319",redb:"#FBECEE"}],
+  {navy:"#8E1622",navyd:"#6E101A",sidebar:"#5C0F19",red:"#C40319",redb:"#FBECEE"},1],
+ ["mac","Xanh thép trầm (bản cũ)","bảng màu app chạy từ đầu - xanh navy trầm",null,1],
  ["ittsx","Nhận diện ITTs - nền indigo","lấy màu phụ của bộ nhận diện làm nền, đỏ thương hiệu để dành cho việc gấp",
-  {navy:"#20298D",navyd:"#171F6E",sidebar:"#161C63",red:"#C40319",redb:"#FBECEE"}],
- ["mac","Bản gốc của app","xanh thép trầm - bản đang chạy từ đầu",null]];
+  {navy:"#20298D",navyd:"#171F6E",sidebar:"#161C63",red:"#C40319",redb:"#FBECEE"}]];
 var UIDEF={brand:"ITTs - SOP TEMP",sub:"Hệ thống tuân thủ SOP",center:"IELTS The Tutors",
  title:"IELTS The Tutors · Cổng làm việc",logo:"",navy:"#1E3A5F",red:"#D51920",
  navyd:"#1E3A5F",sidebar:"#1B3350",bg:"#EEF2F6",card:"#FFFFFF",line:"#E3E9F0",
@@ -28927,8 +28936,17 @@ var UIDEF={brand:"ITTs - SOP TEMP",sub:"Hệ thống tuân thủ SOP",center:"IE
  trangchu:"",
  gopy:"",
  menu:{},mlabel:{},ilabel:{}};
-function UI(){var c=(DATA.config=DATA.config||{});var u=(c.ui=c.ui||{});
+/* LẦN MỞ ĐẦU TIÊN CHỌN SẴN BỘ NHẬN DIỆN. App mở ra là đã sát bộ nhận diện, mà ô màu trên thanh
+   trên vẫn đổi lại được trong một cú bấm.
+   Chọn bằng cách GIEO CẤU HÌNH, không bằng cách sửa `:root`/`UIDEF`: bảng màu thương hiệu chỉ nằm
+   trong `UIBO` - tức một catalogue - nên không tính vào "thang màu app vẽ ra" (trần 110 của
+   `_checkux`). Đem nó vào `:root` là bảng màu nhảy lên 114 và không gỡ xuống được: 42 chỗ màu thẻ
+   truyền hex vào `statStrip` rồi nối chuỗi `+"18"` để pha độ mờ, thay bằng `var()` là vỡ.
+   *Muốn đổi thứ app mở ra bằng mặc định thì đổi CÁI ĐƯỢC CHỌN, đừng đổi cái để rơi về.* */
+function UI(){var c=(DATA.config=DATA.config||{});var moi=!c.ui;var u=(c.ui=c.ui||{});
  for(var k in UIDEF)if(u[k]===undefined)u[k]=(typeof UIDEF[k]==="object"?JSON.parse(JSON.stringify(UIDEF[k])):UIDEF[k]);
+ if(moi)try{var b=UIBO.filter(function(x){return x[0]==="itts"})[0];
+  if(b&&b[3])for(var q in b[3])u[q]=b[3][q]}catch(e){}
  return u}
 function uiSet(k,v){UI()[k]=v;uiApply();persistSoon()}
 /* Cỡ chữ lưu RIÊNG trong `u.co` chứ không trộn vào cùng chỗ với màu: hai họ khác đơn vị, khác
@@ -28940,12 +28958,34 @@ function uiSetCo(k,v){var u=UI();u.co=u.co||{};
  uiApply();persistSoon()}
 /* Bộ dựng sẵn chỉ ghi ĐÈ những ô nó khai, các ô khác giữ nguyên - để ai đã chỉnh tay một vài ô
    không bị một cú bấm cuốn sạch. Bộ "bản gốc" thì khai null = trả mọi ô màu về UIDEF. */
-function uiBo(k){var b=UIBO.filter(function(x){return x[0]===k})[0];if(!b)return;
+function uiBo(k,im){var b=UIBO.filter(function(x){return x[0]===k})[0];if(!b)return;
  var u=UI(),m=b[3];
  UIMAU.forEach(function(nh){nh[1].forEach(function(x){
   if(m&&m[x[0]])u[x[0]]=m[x[0]]; else if(!m)u[x[0]]=UIDEF[x[0]]})});
- uiApply();persistSoon();reRender(CUR);
- toast("Đã áp bộ màu “"+b[1]+"” cho cả app.",4000)}
+ uiApply();persistSoon();uiBoVe();
+ if(!im){reRender(CUR);toast("Đã áp bộ màu “"+b[1]+"” cho cả app.",4000)}}
+/* ═══ HAI Ô MÀU TRÊN THANH TRÊN (anh Luân 26/08: *"em thêm 2 cái ô màu lên navbar, để a đổi giữa
+   đỏ này và xanh cũ nha"*) ══════════════════════════════════════════════════════════════════════
+   Chỉ những bộ khai `nut:1` mới lên thanh trên - Cài đặt vẫn bày đủ cả ba. Thanh trên là chỗ đắt
+   nhất màn hình; đưa mọi bộ lên đó là biến một lối tắt thành một cái menu thứ hai.
+   *Một lối tắt chỉ còn là lối tắt khi nó ngắn hơn đường chính.*
+   Ô nào đang dùng thì có vòng sáng - suy từ chính giá trị đang chạy chứ không nhớ riêng một biến:
+   người ta chỉnh tay một ô màu ở Cài đặt thì không ô nào sáng nữa, và đó là sự thật. */
+function uiBoDang(){var u=UI();
+ for(var i=0;i<UIBO.length;i++){var b=UIBO[i],m=b[3],kh=1;
+  UIMAU.forEach(function(nh){nh[1].forEach(function(x){
+   var mong=(m&&m[x[0]])?m[x[0]]:(m?null:UIDEF[x[0]]);
+   if(mong&&String(u[x[0]]||"").toUpperCase()!==String(mong).toUpperCase())kh=0})});
+  if(kh)return b[0]}
+ return ""}
+function uiBoVe(){var el=document.getElementById("boSw");if(!el)return;
+ var cur=uiBoDang();
+ el.innerHTML=UIBO.filter(function(b){return b[4]}).map(function(b){
+  var m=b[3]||UIDEF;
+  return '<button class="bosb'+(cur===b[0]?" on":"")+'" onclick="uiBo(\''+esc(b[0])+'\')" aria-label="'+esc(b[1])+'"'+
+   ' data-tip="'+esc(b[1]+" - "+b[2]+(cur===b[0]?" (đang dùng)":". Đổi cả app ngay, đổi lại được bất cứ lúc nào."))+'">'+
+   '<i style="background:'+esc(m.sidebar||UIDEF.sidebar)+'"></i>'+
+   '<i style="background:'+esc(m.red||UIDEF.red)+'"></i></button>'}).join("")}
 function uiLogoHTML(size){var u=UI(),s=size||26;
  if(u.logo&&/^(data:|https?:)/.test(u.logo))return '<img src="'+esc(u.logo)+'" alt="logo" style="width:'+s+'px;height:'+s+'px;object-fit:contain;border-radius:6px">';
  if(u.logo)return '<span style="font-size:'+Math.round(s*0.72)+'px;font-weight:800;color:'+esc(u.red)+'">'+esc(u.logo.slice(0,2))+'</span>';
@@ -28964,6 +29004,7 @@ function uiApply(){var u=UI();
    r.style.setProperty("--font",uiFontCss(u.font));
    UICO.forEach(function(c){var v=uiCo(c[0]);
     r.style.setProperty("--"+c[0],v?(Math.max(c[3],Math.min(c[4],v))+"px"):"")})}
+  try{uiBoVe()}catch(e){}
   var lg=document.getElementById("brandLogo");if(lg)lg.innerHTML=uiLogoHTML(26);
   var bn=document.getElementById("brandName");if(bn)bn.textContent=u.brand||UIDEF.brand;
   var bs=document.getElementById("brandSub");if(bs)bs.textContent=u.sub||"";
