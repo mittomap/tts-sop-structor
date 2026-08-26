@@ -16,6 +16,14 @@
    Nguong dat SAT (3) chu khong dat rong: no la thu duy nhat giu 101 cho da sua khoi tut ve. */
 const PATHS=["/opt/pw-browsers/chromium-1194/chrome-linux/chrome","/opt/pw-browsers/chromium/chrome-linux/chrome","/opt/pw-browsers/chromium-1194/chrome-linux/headless_shell"];
 const fs=require("fs"),path=require("path");
+/* ═══ 26/08 - SUYT NANG TRAN CHO MOT LOI CUA MINH ══════════════════════════════════════════
+   Luot verify 26/08 bao 4 cho (tran 3). Phan xa dau tien cua em la nang tran len 4 va viet mot
+   doan giai thich nghe rat hop ly: cho thu tu la "cau chu tu do", dung dang da duoc mien.
+   Do lai ky thi KHONG PHAI: hai trong so cac cho moi nam o trang Hoa don em vua dung - cot
+   "Ben nhan" in ten hoc vien bang chu tron. Sua dung hai cho ay xong thi con lai 3, y nhu cu.
+   *Mot cai tran keo xuong de bi nang nhat vao dung luc minh vua lam hong mot thu - vi luc ay
+   minh co san mot cau giai thich cho con so moi.* Do truoc, sua truoc; tran la thu dong sau
+   cung, khong phai thu dong dau tien. */
 const NGUONG=3;
 (async()=>{
  const {chromium}=require("playwright");

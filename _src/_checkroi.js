@@ -77,7 +77,16 @@ const APP = process.env.ITTS_APP || PATH.join(__dirname, "_APP.js");
    trần một khoảng rộng. Chia nhóm thêm cho riêng CEO là dựng một tầng menu mà 15 chức danh còn
    lại không bao giờ chạm tới.
    Món nợ vẫn ghi nguyên: muốn CEO ngắn lại thì phải tách chặng, để dịp sau. */
-const TRAN_MUC   = 48;   /* mục menu của một chức danh */
+/* ═══ 26/08: TRẦN NÀY BỊ NÂNG 48 -> 49. LÝ DO, THEO ĐÚNG TIỀN LỆ 08/08 Ở TRÊN ═══════════════
+   Mục thêm vào là `hoadon` - trang Hóa đơn. Trước nó, cửa xuất hóa đơn nằm CHÔN trong ngăn kéo
+   của trang Công nợ (bấm một dòng → mở ngăn kéo → tìm đúng khối của đơn), còn danh sách học
+   viên đã hoàn thành khóa thì nằm ở trang `ketthuc` - trang KHÔNG có trong bản khai trang của
+   kế toán. Tức người phải làm việc ấy không có một lối nào nhìn thấy nó.
+   Đây đúng loại lý do đã cho nâng trần 58 -> 60 hồi 08/08: **LUẬT CỨNG SỐ 0 - SOP mô tả, app có
+   trang, người phải làm không có lối vào là SÓT, mà sót thì không có quyền bỏ.**
+   Cấu trúc nhóm không xấu đi: nhóm to nhất vẫn 16/20, và mục mới nằm cạnh `congno` - hai đầu
+   của cùng một dòng tiền, cùng một người làm. */
+const TRAN_MUC   = 49;   /* mục menu của một chức danh */
 const TRAN_NHOM  = 20;   /* mục trong MỘT nhóm */
 const TRAN_TRONG = 2;    /* mục mở ra trống, trên toàn bộ chức danh */
 

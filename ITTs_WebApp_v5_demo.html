@@ -3919,7 +3919,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">26/08/2026 · <b>448999</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">26/08/2026 · <b>9e433b</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -26330,8 +26330,13 @@ function hvHdonForm(eid){
  var e=find("DL06","enrollment_id",eid);if(!e){toast("Không thấy đơn đăng ký.");return}
  var S=hvMe()||{};
  var h='<div class="dcard"><h4><i class="ti ti-receipt"></i>Yêu cầu xuất hóa đơn</h4>';
- h+='<div class="hvaskb" style="margin-bottom:10px">Khóa <b>'+esc(e.course_id_name||e.course_id||"")+'</b> · học phí đã đóng <b>'+vnd(num(e.paid_amount))+'</b>.'+
-  ' Điền đúng tên và mã số thuế trên giấy phép của đơn vị nhé - sai một chữ là phải xuất lại tờ khác.</div>';
+ /* Khối bối cảnh dựng bằng `ctxRows` chứ không bằng một dòng chữ tự viết: `_checkux` canh
+    "không form nào mở ra mà không một chữ giải thích" bằng cách tìm `notebar` / `fhint` /
+    `ctxRows` / `ctxContent` trong thân hàm - lớp `.hvaskb` của cổng học viên nó không biết.
+    Và đổi sang `ctxRows` thì hơn thật: hai con số ấy đọc thành bảng dễ hơn đọc trong một câu. */
+ h+=ctxRows([["Khóa học",esc(e.course_id_name||e.course_id||"-")],
+  ["Học phí đã đóng",'<b>'+vnd(num(e.paid_amount))+'</b>']]);
+ h+='<div class="fhint" style="margin:0 0 10px">Điền đúng tên và mã số thuế trên giấy phép của đơn vị nhé - đọc qua điện thoại rất dễ sai, mà sai một chữ là phải xuất lại tờ khác.</div>';
  h+='<div class="fld full"><label>Xuất cho ai <i>*</i></label><input id="hvhd_ten" value="'+esc(S.full_name||"")+'" placeholder="Tên bạn, hoặc tên công ty trả học phí"></div>';
  h+='<div class="fld"><label>Mã số thuế</label><input id="hvhd_mst" placeholder="để trống nếu xuất cho cá nhân"></div>';
  h+='<div class="fld"><label>Email nhận hóa đơn</label><input id="hvhd_mail" value="'+esc(S.email||"")+'"></div>';
@@ -29934,7 +29939,11 @@ var TOURS={
   /* V2 16/08 - `congno` dựng xong là `_checktour` bắt ngay, y hệt `mautin` sáng nay. Bài này là
      bài của NGƯỜI QUẢN LÝ nên trang tiền đứng đúng chỗ; và nó đứng ngay sau kho mẫu tin vì hai
      việc nối nhau trong đời thật: nhìn ra ai đang nợ, rồi lấy mẫu "nhắc học phí" gửi đi. */
-  {p:"congno",sel:'@man',t:"Ai đang nợ bao nhiêu, hạn nào",d:"Từng học viên một dòng: giá trị hợp đồng, đã thu, còn phải thu, đợt kế tiếp và phiếu nào chưa có ảnh chứng từ. Chọn kỳ số liệu ở trên, xuất ra Excel để đối soát.",hint:"Bấm chip Quá hạn để thấy phần phải gọi ngay, rồi bấm một dòng xem chi tiết từng đợt."}]},
+  {p:"congno",sel:'@man',t:"Ai đang nợ bao nhiêu, hạn nào",d:"Từng học viên một dòng: giá trị hợp đồng, đã thu, còn phải thu, đợt kế tiếp và phiếu nào chưa có ảnh chứng từ. Chọn kỳ số liệu ở trên, xuất ra Excel để đối soát.",hint:"Bấm chip Quá hạn để thấy phần phải gọi ngay, rồi bấm một dòng xem chi tiết từng đợt."},
+  /* 26/08 - `hoadon` dựng xong là `_checktour` bắt ngay, y hệt `mautin` và `congno` trước đó.
+     Đặt LIỀN SAU `congno` vì hai trang là hai đầu của một dòng tiền: nhìn ra ai còn nợ, rồi xuất
+     giấy tờ cho người đã đóng xong - dạy rời nhau thì người học không nối được hai đầu. */
+  {p:"hoadon",sel:'@man',t:"Xuất hóa đơn cho người đã học xong",d:"Học viên hoàn thành khóa là tới lượt hóa đơn. Ba trạng thái: chưa ai yêu cầu · học viên đã yêu cầu mà chưa xuất · đã xuất. App chặn xuất quá số tiền học viên đã thực đóng, và in ra tờ có số tiền bằng chữ.",hint:"Bấm chip 'Chờ xuất' để thấy phần có người đang đợi, rồi bấm một dòng."}]},
  /* ---------- CẤP 3: CHUYÊN NGHIỆP (người cấu hình) ---------- */
  /* ---------- CẤP 5: BÀI THEO VIỆC (18/08) ---------- */
  /* Neo bằng `@txt:` - tìm đúng nút mang chữ ấy đang hiện trên màn. Chọn neo là CHỮ TRÊN NÚT chứ
@@ -31801,12 +31810,23 @@ function tcTim(v){window.TCQ=String(v||"");reRender("tracuu")}
    thiếu - đang đứng ở màn nghiệp vụ, muốn tra lại một dòng cũ thì phải đi vòng qua menu. Nay
    `pageHead` tự gắn cửa vào sổ của chính trang ấy (xem `soCuaTrang`).
    *Một liên kết một chiều là nửa cái cầu.* */
+/* ═══ 26/08 - ĐỌC CÂY MENU CỦA CHÍNH NGƯỜI ĐANG XEM, KHÔNG ĐỌC BẢNG GỐC ══════════════════════
+   `_checkmien` bắt ngay lượt verify đầu: kế toán (`lead:"none"`) mở trang Tra cứu thấy tiêu đề
+   nhóm **"Khách tiềm năng"** - một cụm chữ thuộc miền lead mà họ không được xem.
+   Gốc: bản đầu của hàm này đọc thẳng hằng `NAVTREE`. Mà `NAVTREE` là BẢNG GỐC, còn menu thật của
+   từng chức danh do `navCay()` dựng - và với kế toán, `navCay()` đặt tên nhóm ấy là "Tuyển sinh
+   & Thu tiền". Tức app đã có sẵn cái tên đúng cho họ, em chỉ là không hỏi đúng chỗ.
+   *Đọc bản khai gốc thay vì bản đã cắt theo người đang xem là cách chắc chắn nhất để in ra một
+   chữ mà người ấy không có quyền đọc.* */
+function tcCay(){
+ try{var c=navCay();if(c&&c.length)return c}catch(e){}
+ return (typeof NAVTREE!=="undefined"?NAVTREE:[])}
 function tcNhom(k){
  var cfg=LISTCFG[k]||{},lam=String(cfg.lam||"");
  if(!lam)return {g:"",lam:"",ten:""};
  var own=lam;try{own=navOwner(lam)||lam}catch(e){}
  var g="";
- (typeof NAVTREE!=="undefined"?NAVTREE:[]).forEach(function(G){
+ tcCay().forEach(function(G){
   if(g)return;
   var it=G.items||[];
   if(it.indexOf(lam)>=0||it.indexOf(own)>=0)g=G.g});
@@ -31869,7 +31889,7 @@ function renderTracuu(){
    if(!nhom[g]){nhom[g]=[];thu.push(g)}
    nhom[g].push(k)});
   var xep=[];
-  (typeof NAVTREE!=="undefined"?NAVTREE:[]).forEach(function(G){if(nhom[G.g]&&xep.indexOf(G.g)<0)xep.push(G.g)});
+  tcCay().forEach(function(G){if(nhom[G.g]&&xep.indexOf(G.g)<0)xep.push(G.g)});
   thu.forEach(function(g){if(g!=="Sổ dùng chung"&&xep.indexOf(g)<0)xep.push(g)});
   if(nhom["Sổ dùng chung"])xep.push("Sổ dùng chung");
   xep.forEach(function(g){
@@ -32091,7 +32111,12 @@ function renderHoadon(){
   '</div></td></tr>';
  catXem("hoadon",view,40).forEach(function(r){
   var e=r.e,s=r.s,eid=esc(e.enrollment_id);
-  h+='<tr><td class="tennguoi">'+nguoiLnk(e.student_id,e.student_id_name,e.student_id)+'</td>'+
+  /* `_checkbam` bắt đúng: bảng này bấm vào dòng KHÔNG CÓ GÌ XẢY RA. Nút ở cột cuối thì có, mà
+     người dùng bấm cả dòng - và một dòng không phản hồi thì họ kết luận app đơ, chứ không kết
+     luận là phải bấm đúng cái nút bên phải.
+     *Bảng nào cũng bấm được dòng thì bảng nào không bấm được là bảng hỏng - luật của app đã dạy
+     tay người dùng như thế ở 80 màn khác.* */
+  h+='<tr data-mo="hdonMoDong" data-mo-arg="'+eid+'"><td class="tennguoi">'+nguoiLnk(e.student_id,e.student_id_name,e.student_id)+'</td>'+
    '<td class="khongbe">'+esc(e.course_id_name||e.course_id||"-")+'</td>'+
    '<td>'+esc(String(r.ce.course_completion_time||"").slice(0,10)||"-")+'</td>'+
    '<td class="phai" style="font-variant-numeric:tabular-nums">'+vnd(num(e.paid_amount))+'</td>'+
@@ -32100,8 +32125,13 @@ function renderHoadon(){
      :(s.cho
        ?('<span class="chip '+(s.tre?"red":"amber")+'">'+(s.tre?"quá hạn":"chờ xuất")+'</span><div class="mut" style="font-size:11px">HV yêu cầu '+esc(String(e.hdon_yc_luc||"").slice(0,10))+'</div>')
        :'<span class="mut">chưa ai yêu cầu</span>'))+'</td>'+
+   /* Bên nhận hóa đơn có thể là CÔNG TY (chữ trơn, đúng) hoặc chính học viên (phải bấm được -
+      `_checklink` bắt hai chỗ ở đây ngay lượt đầu). Hỏi bằng cách so tên với hồ sơ, không đoán
+      theo việc có mã số thuế hay không: cá nhân vẫn có thể có mã số thuế. */
    '<td class="khongbe">'+(String(e.hdon_ten||"").trim()
-     ?(esc(e.hdon_ten)+(e.hdon_mst?('<div class="mut" style="font-size:11px">MST '+esc(e.hdon_mst)+'</div>'):''))
+     ?((vnorm(e.hdon_ten)===vnorm(e.student_id_name||"")
+        ?nguoiLnk(e.student_id,e.hdon_ten,e.student_id):esc(e.hdon_ten))+
+       (e.hdon_mst?('<div class="mut" style="font-size:11px">MST '+esc(e.hdon_mst)+'</div>'):''))
      :'<span class="mut">-</span>')+'</td>'+
    '<td>'+(s.daXuat
      ?('<button class="btn sm" onclick="hdonXem(\''+eid+'\')"><i class="ti ti-printer"></i>In lại</button>')
@@ -32111,6 +32141,11 @@ function renderHoadon(){
  return h}
 /* Nút chính: mở thẳng đơn ĐANG CHỜ LÂU NHẤT. Người ta tới trang này để xuất hóa đơn, không phải
    để chọn xem xuất cái nào trước - thứ tự ưu tiên app đã biết rồi. */
+/* Bấm cả dòng: đã xuất thì mở tờ hóa đơn, chưa xuất thì mở màn xuất - đúng việc tiếp theo của
+   chính dòng ấy, không bắt người dùng chọn giữa hai cửa. */
+function hdonMoDong(eid){
+ var e=find("DL06","enrollment_id",eid);if(!e){toast("Không thấy đơn đăng ký.");return}
+ if(String(e.hdon_so||"").trim())hdonXem(eid);else hdonForm(eid)}
 function hdonTiep(){
  var r=hdonDs().filter(function(x){return x.s.cho})[0];
  if(!r){toast("Không còn đơn nào chờ xuất hóa đơn.");return}
@@ -32560,6 +32595,9 @@ var QATUDIENDEF=[
     (qua chữ "Quản lý") thì `_checkaudit` đo được cả "QL" trên màn. Chữ nào hiện ra trước mắt
     người dùng thì phải tra được nghĩa - đó là luật cũ của dự án, và nhập một bảng mới từ SOP
     thì mang theo cả từ vựng của nó. */
+ /* 26/08 - "MST" hiện trên màn Hóa đơn (ô nhập, cột Bên nhận, và bản in). Chữ nào hiện ra
+    trước mắt người dùng thì phải tra được nghĩa - luật cũ của dự án, `_checkaudit` canh. */
+ ["MST","ma so thue","Mã số thuế của đơn vị nhận hóa đơn. Công ty trả học phí cho học viên thì hóa đơn phải ghi đúng mã số thuế của công ty - sai một chữ là phải xuất lại tờ khác.","Menu > Điều hành > Hóa đơn","go('hoadon')"],
  ["CEO","giam doc dieu hanh","Người đứng đầu trung tâm. SOP giao cho CEO đúng một tình huống: khiếu nại đã leo thang lên mức cao nhất (NA040) - lúc đó chỉ CEO hoặc quản lý cấp cao mới xử lý tiếp.","Menu > Chờ duyệt & quyết định","go('duyet')"],
  ["QL","quan ly truc tiep","Người quản lý trực tiếp của một nhân viên (cột reports_to ở sổ Nhân sự). App dùng để leo thang: việc quá hạn thì báo cả quản lý của người đang phụ trách. SOP tự leo thang ở bốn chỗ - khiếu nại mức cao, khiếu nại đã leo thang, giảm giá vượt mức, học viên yếu cả hai mặt.","Menu > Quản lý > Nhân sự","go('nhansu')"],
  ["AIM","band muc tieu dau ra","Band điểm học viên đăng ký nhắm tới khi vào học (ghi ở cột target_band). ĐẠT AIM = điểm Overall của học viên đạt hoặc vượt band đó. App đo hai mốc: điểm bài thi thử cuối khóa tại trung tâm, và điểm kỳ thi IELTS chính thức.","Menu > Chặng CSKH & Kết thúc > Kết quả đầu ra & AIM","go('ketqua')"],
