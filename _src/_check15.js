@@ -38,6 +38,21 @@ for(var i=0;i<funcs.length-1;i++){
 var KHAI=(function(){var o={};
  Object.keys(DOORTB||{}).forEach(function(fn){(DOORTB[fn]||[]).forEach(function(tb){(o[tb]=o[tb]||[]).push(fn)})});
  return o})();
+/* ═══ 26/08 - KHÔNG HAI HÀM NÀO ĐƯỢC TRÙNG TÊN ═══════════════════════════════════════════════
+   Bẫy vừa cắn hôm nay: trang Hóa đơn mới đặt tên `hdList`, mà `hdList` ĐÃ CÓ - nó là danh sách
+   hợp đồng cam kết đầu ra (DL30). JavaScript không kêu một tiếng: hàm khai sau đè hàm khai
+   trước. Hậu quả thấy được là màn "Duyệt hợp đồng cam kết" vẽ 12 thẻ trống rỗng; hậu quả KHÔNG
+   thấy được là `hdChanXepLop` - cửa chặn xếp lớp khi hợp đồng chưa đủ chữ ký - cũng đọc cùng
+   hàm ấy, tức một luật nghiệp vụ bị vô hiệu mà không có gì báo.
+   *Một cái tên trùng trong JavaScript không gây lỗi - nó gây một app khác.*
+   Bộ này đã dựng sẵn bảng `funcs` (mọi hàm khai ở tầng ngoài cùng) nên luật chỉ tốn ba dòng.
+   Đây là loại luật mà giá của nó bằng không còn cái nó chặn thì không có cách nào tự lộ ra. */
+(function(){
+ var dem={},trung=[];
+ funcs.forEach(function(f){if(f[1]==="__END__")return;
+  dem[f[1]]=(dem[f[1]]||0)+1;if(dem[f[1]]===2)trung.push(f[1])});
+ if(trung.length)bad.push("  ham trung ten (khai sau de khai truoc): "+trung.join(", "));
+ t("khong hai ham nao trung ten"+(trung.length?" ("+trung.length+")":""), trung.length===0)})();
 t("app co ban khai cua ghi DOORTB (de tu ghi nhat ky)", Object.keys(KHAI).length>15);
 t("moi ham trong ban khai cua ghi deu ton tai trong app", (function(){
  var thieu=Object.keys(DOORTB||{}).filter(function(f){return typeof global[f]!=="function"});

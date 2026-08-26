@@ -3919,7 +3919,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">26/08/2026 · <b>c95f97</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">26/08/2026 · <b>6d34ee</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -10156,6 +10156,22 @@ function cfSetMode(m){try{ssSet(CFMODEKEY,m)}catch(e){}try{cfBarSync()}catch(e){
 /* Tách hẳn ra một hàm: thân `cfBarSync` phải giữ NGẮN vì `_check14` đo nút "Dựng lại demo"
    theo KHOẢNG CÁCH CHỮ tính từ tên hàm - nhét thêm bốn dòng vào giữa là nút ấy rơi ra khỏi
    tầm nhìn của phép đo. */
+/* ═══ 26/08 - HAI NÚT, MỘT VIỆC (anh Luân, kèm ảnh chụp thanh trên cổng học viên: *"ở cổng học
+   viên, chỗ này cứ sai sai kiểu gì"*) ═════════════════════════════════════════════════════════
+   Đo ra: ở cổng học viên, khi đã mở quyền quản trị thì thanh trên có ĐÚNG HAI nút cùng gọi
+   `demoResetHoi()` - một cái trong `cfBarSync` (có nhãn "Dựng lại demo"), một cái trong
+   `hvTopPaint` (chỉ có icon `ti-refresh`), cách nhau 269px, cùng một hình. Người nhìn không đọc
+   ra hai nút làm hai việc hay một việc; họ đọc ra là app lặp.
+   Anh Luân đã chốt đúng luật này 14/08 cho app nhân viên (*"để 1 nút dựng lại demo là đủ em"*),
+   và nó mọc lại ở cổng học viên.
+   Giữ nút nào? Nút trong `hvTopPaint`: dải `.cfbar` tự ẩn dưới 900px, nên giữ nút ở đó là mất
+   nút trên điện thoại. Câu giải thích "đây là bản demo" không mất - nó chuyển sang chú thích của
+   chính cái nút còn lại.
+   *Hai cái nút giống hệt nhau cạnh nhau không nói lên rằng có hai việc - nó nói rằng người làm
+   app không biết mình đã đặt nút ở đâu.*
+   VÀ GHI CHÚ NÀY PHẢI NẰM NGOÀI THÂN HÀM: đo lại sau khi viết nó vào trong thân thì khoảng cách
+   từ tên hàm tới `demoResetHoi()` nhảy từ ~700 lên 1595 chữ, vượt trần 900 của `_check14` - tức
+   là em vừa đạp đúng cái bẫy mà dòng ghi chú ngay bên trên đang cảnh báo. */
 function cfBarGon(b){b.className="cfbar on gon";
  b.innerHTML='<button class="tbtn" onclick="cfDoiCheDo()" aria-label="Chế độ xem thử - mở quyền quản trị" '+
   'data-tip="Chế độ xem thử: đang chạy trên dữ liệu demo, chỉnh trong Cài đặt sẽ hiện ngay trên màn nhưng không lưu lại. Bấm để mở quyền quản trị."><i class="ti ti-eye"></i></button>'}
@@ -10175,6 +10191,7 @@ function cfBarSync(){var b=document.getElementById("cfBar");if(!b)return;
     chính cái nút. Giữ nguyên nút Dựng lại demo: trước khi giao anh Luân bấm đúng nút này.
     (Trạng thái "Chế độ xem thử" bên trên VẪN giữ nhãn - nó cảnh báo rằng chỉnh gì cũng không
     lưu được, đó là thứ người ta cần đọc chứ không suy ra được từ tên nút.) */
+ if(window.HVPORTAL){b.className="cfbar";b.innerHTML="";return}   /* xem ghi chú trên đầu hàm */
  b.className="cfbar on demo";
  b.innerHTML='<button class="btn sm" onclick="demoResetHoi()" title="Dựng lại demo" data-tip="Đây là bản demo: mọi thao tác chạy thật nhưng chỉ lưu trên máy này, không ảnh hưởng số liệu thật. Bấm để dựng lại bộ dữ liệu mẫu."><i class="ti ti-refresh"></i><span class="cfbtxt">Dựng lại demo</span></button>'}
 function cfGhiDuoc(){return cfMode()==="that"}
@@ -10865,9 +10882,9 @@ function duyDotHTML(){
  var nCL=cho0.filter(function(r){return isc(r.req_type,"replan")}).length;
  if(dF==="giahan")cho0=cho0.filter(function(r){return isc(r.req_type,"extend")});
  else if(dF==="chialai")cho0=cho0.filter(function(r){return isc(r.req_type,"replan")});
- var q=fltApply("duyetdot",cho0);
+ var q=qLoc("q_duyetdot",fltApply("duyetdot",cho0));
  var xong=dotList().filter(function(r){return !isc(r.req_status,"pending")}).slice(0,8);
- var h=tbar(srchHTML(fget("q_duyetdot")||"","fset('q_duyetdot',this.value);reRenderKeep(CUR)","Tìm tên, SĐT hoặc mã...",300),
+ var h=tbar(srchHTML(qGet("q_duyetdot"),"qSet('q_duyetdot',this.value);reRenderKeep(CUR)","Tìm tên, SĐT hoặc mã...",300),
   '<span class="tbcnt">'+q.length+'/'+dotList().length+' yêu cầu</span>');
  h+=chipBar("duyetdot",dF,[["all","Tất cả",nGH+nCL],
   ["giahan","Xin gia hạn đợt",nGH,nGH?"amber":""],
@@ -11094,10 +11111,10 @@ function duyHdHTML(){
  var nMot=cho0.filter(function(h){return isc(h.duyet_tuvan,"approved")!==isc(h.duyet_gd,"approved")}).length;
  if(hF==="chuaai")cho0=cho0.filter(function(h){return !isc(h.duyet_tuvan,"approved")&&!isc(h.duyet_gd,"approved")});
  else if(hF==="motky")cho0=cho0.filter(function(h){return isc(h.duyet_tuvan,"approved")!==isc(h.duyet_gd,"approved")});
- var cho=fltApply("duyethd",cho0);
+ var cho=qLoc("q_duyethd",fltApply("duyethd",cho0));
  var xong=hdList().filter(function(h){return hdDaDu(h)||hdBiTuChoi(h)}).slice(0,8);
  var toi=hdDuyetDuoc();
- var h=tbar(srchHTML(fget("q_duyethd")||"","fset('q_duyethd',this.value);reRenderKeep(CUR)","Tìm tên, SĐT hoặc mã...",300),
+ var h=tbar(srchHTML(qGet("q_duyethd"),"qSet('q_duyethd',this.value);reRenderKeep(CUR)","Tìm tên, SĐT hoặc mã...",300),
   '<span class="tbcnt">'+cho.length+'/'+hdList().length+' hợp đồng</span>');
  h+=chipBar("duyethd",hF,[["all","Tất cả",nChua+nMot],
   ["chuaai","Chưa ai ký",nChua,nChua?"red":""],
@@ -20927,6 +20944,27 @@ function xepMoiLuu(){var sid=document.getElementById("xm_stu").value,cid=documen
    renderList("thanhtoan") là bảng TRỐNG TRƠN kèm dòng "không khớp bộ lọc" trong khi dữ liệu
    còn nguyên. Tách hẳn sang biến riêng CARDF. */
 function fget(p){return (window.CARDF&&window.CARDF[p])||"all"}
+/* ═══ 26/08 - Ô TÌM KHÔNG ĐƯỢC DÙNG CHUNG KHO VỚI CHIP LỌC ═══════════════════════════════════
+   Anh Luân chụp màn "Duyệt hợp đồng cam kết" hỏi *"đang lỗi à"*. Lỗi chính là chuyện tên hàm
+   trùng (ghi ở `hdonDs`), nhưng trong đúng tấm ảnh ấy còn một chỗ nữa: **ô tìm hiện sẵn chữ
+   "all"**. Hai trang duyệt lấy giá trị ô tìm bằng `fget("q_...")` - mà `fget` sinh ra cho CHIP
+   LỌC nên nó **mặc định trả về "all"**. Ô tìm mở ra là đã có sẵn một từ khoá không ai gõ.
+   Và tệ hơn: giá trị gõ vào KHÔNG được dùng để lọc ở đâu cả - hai ô ấy là ô tìm chết, gõ gì
+   cũng không có chuyện gì xảy ra.
+   *Mượn kho của một thứ có mặc định khác thì cái mặc định ấy đi theo - và ở đây nó đi thẳng ra
+   màn hình dưới dạng một từ khoá ma.*
+   Nay ô tìm có kho riêng (mặc định RỖNG) và giá trị gõ vào được đem lọc thật. */
+function qGet(p){return String((window.SRCHQ||{})[p]||"")}
+function qSet(p,v){(window.SRCHQ=window.SRCHQ||{})[p]=String(v==null?"":v)}
+/* Lọc một danh sách theo ô tìm: gõ gì cũng so trên chuỗi đã bỏ dấu của MỌI ô trong dòng, để
+   người dùng gõ tên, số điện thoại hay mã đều ra. */
+function qLoc(p,ds){
+ var q=vnorm(qGet(p)).trim();
+ if(!q)return ds;
+ return (ds||[]).filter(function(r){
+  var t="";for(var k in r){var v=r[k];if(v==null)continue;
+   if(typeof v==="object")continue;t+=" "+v}
+  return vnorm(t).indexOf(q)>=0})}
 function fset(p,v){window.CARDF=window.CARDF||{};window.CARDF[p]=v}
 function pageHead(t,s,btn,hoan){/* UX-23: tiêu đề đã có ở topbar (#pgTitle) - phead chỉ còn mô tả + nút, đỡ lặp và tiết kiệm ~46px */
  /* V9.29v (hội đồng audit): dòng mô tả là chuỗi do LẬP TRÌNH VIÊN viết (không phải dữ liệu người
@@ -25401,28 +25439,6 @@ function renderTrangHV(){
    h+='<div class="hvaskf" style="padding:0 14px 12px">'+
     '<button class="btn primary sm" onclick="hvPaidNotify(\''+esc(enr.enrollment_id||"")+'\')"><i class="ti ti-upload"></i>Tôi đã chuyển khoản</button>'+
     '<span class="mut" style="font-size:11px;align-self:center">Báo để kế toán đối soát nhanh - bạn không cần gọi điện.</span></div>'}
-  /* ═══ 26/08 - HỌC VIÊN TỰ HỎI HÓA ĐƠN Ở CỔNG CỦA HỌ ═══════════════════════════════════════
-     Hóa đơn là thứ học viên đi làm cần để công ty thanh toán học phí - mà trước bản này họ chỉ
-     có một đường: gọi điện. Kế toán nghe điện rồi ghi ra giấy, và tờ giấy ấy không ở trong app.
-     Ở đây học viên khai thẳng tên đơn vị và mã số thuế - hai thứ mà đọc qua điện thoại là sai,
-     và sai một chữ trên hóa đơn là phải xuất lại.
-     Chỉ hiện khi ĐÃ HỌC XONG khóa ấy: hóa đơn xuất một lần sau khi hoàn thành khóa, mời họ hỏi
-     sớm hơn là hứa một thứ chưa tới lượt. */
-  (function(){var _hs=hdonState(enr);
-   if(!_hs.xong)return;
-   if(_hs.daXuat){
-    h+='<div class="hvaskf" style="padding:0 14px 12px"><span class="chip green">Đã xuất hóa đơn '+esc(enr.hdon_so)+'</span>'+
-     '<span class="mut" style="font-size:11px;align-self:center">Ngày '+esc(String(enr.hdon_ngay||"").split(" ")[0])+' · cho '+esc(enr.hdon_ten||"")+
-     (enr.hdon_email?(" · đã gửi về "+esc(enr.hdon_email)):"")+'. Cần bản khác thì nhắn cho trung tâm.</span></div>';
-    return}
-   if(_hs.daYeuCau){
-    h+='<div class="hvaskf" style="padding:0 14px 12px"><span class="chip amber">Đang xuất hóa đơn</span>'+
-     '<span class="mut" style="font-size:11px;align-self:center">Bạn đã yêu cầu ngày '+esc(String(enr.hdon_yc_luc||"").split(" ")[0])+
-     ' - kế toán xuất trong '+hdonHan()+' ngày làm việc.</span></div>';
-    return}
-   h+='<div class="hvaskf" style="padding:0 14px 12px">'+
-    '<button class="btn sm" onclick="hvHdonForm(\''+esc(enr.enrollment_id||"")+'\')"><i class="ti ti-receipt"></i>Yêu cầu xuất hóa đơn</button>'+
-    '<span class="mut" style="font-size:11px;align-self:center">Bạn đã hoàn thành khóa này - cần hóa đơn cho công ty thì yêu cầu ở đây.</span></div>'})();
   h+='</div>';
   /* Bảng này trước đây không có tên: ngay dưới nút "Tôi đã chuyển khoản" là một cái bảng trần
      bốn cột, người đọc phải tự đoán nó đang liệt kê cái gì (lịch phải đóng? hay đã đóng?).
@@ -25439,6 +25455,7 @@ function renderTrangHV(){
      '<td>'+(v?'<span class="chip green">đã xác nhận</span>':'<span class="chip amber">trung tâm đang xác nhận</span>')+'</td></tr>'});
    h+='</tbody></table></div>'}
   h+='</div>'}
+ h+=hvHdonBlock();
  /* ---- TRUNG TÂM ĐÃ XÁC NHẬN: bảng thủ tục, đọc để yên tâm chứ không phải việc phải làm ---- */
  h+=hvSec("s-xacnhan")+'<div class="sechd" id="s-xacnhan">Trung tâm đã xác nhận'+(lop?' <span class="mut" style="text-transform:none;font-weight:600">· khóa '+esc(lop.class_name)+'</span>':'')+'</div><div class="hvconf">';
  function cf(ic,lb,ok,sub){return '<div class="hvc'+(ok?" ok":"")+'"><i class="ti '+(ok?"ti-circle-check":ic)+'"></i><div><b>'+esc(lb)+'</b><span>'+esc(sub)+'</span></div></div>'}
@@ -26237,6 +26254,58 @@ function hvKitNhanRun(obid,k){
  hvReRender()}
 /* Cửa yêu cầu hóa đơn ở cổng học viên. Hỏi đủ bốn thứ hóa đơn cần, và hỏi MỘT LẦN: gọi điện đọc
    mã số thuế thì sai một chữ là phải xuất lại tờ khác. */
+/* ═══ 26/08 - HÓA ĐƠN Ở CỔNG HỌC VIÊN: MỘT MỤC RIÊNG, KHÔNG CHÔN Ở ĐÁY KHỐI HỌC PHÍ ══════════
+   Anh Luân: *"yêu cầu xuất hóa đơn ở cổng học viên em để đâu"*.
+   Câu hỏi ấy chính là câu trả lời. Đo lại chỗ em đặt bản đầu: nút nằm ở ĐÁY khối Học phí, dưới
+   cả lịch đóng đợt và bảng "các lần bạn đã đóng", ở toạ độ y≈1315 - phải cuộn qua hai màn hình
+   mới thấy, và không có mục nào trên mục lục trỏ tới nó.
+   *Đặt một cửa vào cuối một khối dài thì nó chỉ tới được với người đã đọc hết khối ấy - mà
+   người cần nó thì đang đi tìm, không đang đọc.*
+
+   Và bản đầu còn một lỗ nữa: nó chỉ hỏi `enr` - ĐƠN CHÍNH của học viên. Ai học hai khóa, xong
+   khóa cũ trước, thì cổng chỉ hiện hóa đơn của một đơn. Nay duyệt MỌI đơn đã hoàn thành khóa.
+   *Một hàm chỉ đọc "đơn đầu tiên" thì nó đúng với đa số và sai với đúng nhóm người phức tạp
+   nhất - nhóm mà sai một cái là mất nhiều nhất.* */
+function hvHdonDon(){
+ var S=hvMe();if(!S)return [];
+ var K=hdonXongKhoa();
+ return rows("DL06").filter(function(e){
+  return String(e.student_id||"")===String(S.student_id)&&!!K[String(e.enrollment_id||"")]})
+  .sort(function(a,b){return (pvnd((K[String(b.enrollment_id||"")]||{}).course_completion_time)||0)-
+   (pvnd((K[String(a.enrollment_id||"")]||{}).course_completion_time)||0)})}
+function hvSoHdon(){
+ /* Đếm ĐÚNG SỐ NÚT BẤM ĐƯỢC: đơn đã học xong mà chưa ai yêu cầu hóa đơn. Đơn đang chờ kế toán
+    xuất thì không phải việc của học viên nữa - đếm vào huy hiệu là giục họ làm một việc đã làm. */
+ try{return hvHdonDon().filter(function(e){return !hdonState(e).daYeuCau&&!hdonState(e).daXuat}).length}
+ catch(e){return 0}}
+function hvHdonBlock(){
+ var ds=hvHdonDon();
+ if(!ds.length)return "";
+ var cho=hvSoHdon();
+ var K=hdonXongKhoa();
+ var h=hvSec("s-hoadon")+'<div class="sechd" id="s-hoadon">Hóa đơn khóa học'+
+  (cho?' <span class="chip amber">'+cho+' khóa chưa yêu cầu</span>':'')+'</div>';
+ h+='<div class="panel" style="margin-bottom:16px"><div class="pbody"><div class="hvkit">';
+ ds.forEach(function(e){
+  var s=hdonState(e),ce=K[String(e.enrollment_id||"")]||{};
+  var st=s.daXuat?"ok":(s.daYeuCau?"wait":"none");
+  h+='<div class="hvkr '+st+'"><i class="ti '+(s.daXuat?"ti-circle-check":"ti-receipt")+'"></i>'+
+   '<div class="hvkt"><b>'+esc(e.course_id_name||e.course_id||"Khóa học")+'</b>'+
+   '<span>Hoàn thành '+esc(String(ce.course_completion_time||"").slice(0,10))+' · học phí đã đóng '+vnd(num(e.paid_amount))+'</span></div>'+
+   '<div class="hvks">'+
+    (s.daXuat?('Đã xuất hóa đơn <b>'+esc(e.hdon_so)+'</b> ngày '+esc(String(e.hdon_ngay||"").slice(0,10))+
+      '<br>cho '+esc(e.hdon_ten||"")+(e.hdon_email?(' · gửi về '+esc(e.hdon_email)):''))
+     :(s.daYeuCau?('Bạn đã yêu cầu ngày '+esc(String(e.hdon_yc_luc||"").slice(0,10))+
+       ' - kế toán xuất trong '+hdonHan()+' ngày làm việc')
+      :'Chưa yêu cầu hóa đơn cho khóa này'))+
+   '</div><div class="hvka">'+
+    (s.daXuat?'':(s.daYeuCau?'<span class="chip amber">đang xuất</span>'
+     :'<button class="btn primary sm" onclick="hvHdonForm(\''+esc(e.enrollment_id||"")+'\')"><i class="ti ti-receipt"></i>Yêu cầu xuất hóa đơn</button>'))+
+   '</div></div>'});
+ h+='</div>';
+ h+='<div class="fhint" style="margin-top:8px">Công ty trả học phí cho bạn thì điền tên và mã số thuế của công ty - đọc qua điện thoại rất dễ sai, mà sai một chữ là phải xuất lại tờ khác.</div>';
+ h+='</div></div>';
+ return h}
 function hvHdonForm(eid){
  var e=find("DL06","enrollment_id",eid);if(!e){toast("Không thấy đơn đăng ký.");return}
  var S=hvMe()||{};
@@ -31933,10 +32002,22 @@ function cnLocCo(G,k){
  if(k==="thieu")return (G.thieu+G.ctLy)>0;
  if(k==="hdon")return G.hdCho>0;
  return true}
-/* ═══ 26/08 - TRANG HÓA ĐƠN: DANH SÁCH ĐỂ LÀM, KHÔNG PHẢI CHIP ĐỂ ĐẾM ═══════════════════════
+/* ═══ 26/08 - TÊN HÀM TRÙNG LÀ MỘT CÁI ĐÈ, KHÔNG PHẢI MỘT LỖI CÚ PHÁP ══════════════════════════
+   Bản đầu của trang này đặt tên `hdList` / `hdLoc` / `hdTiep`. Mà `hdList` ĐÃ CÓ từ lâu - nó là
+   danh sách HỢP ĐỒNG CAM KẾT ĐẦU RA (DL30), và `hdOf`, `hdCho`, `hdChanXepLop` đều gọi nó.
+   JavaScript không kêu một tiếng nào: hàm khai sau đè hàm khai trước, và từ đó trang "Duyệt hợp
+   đồng cam kết" nhận về 12 ĐƠN ĐĂNG KÝ thay vì 5 hợp đồng - vẽ ra 12 thẻ trống rỗng
+   ("- - cam kết band ?", "học phí 0đ"), ô tìm hiện chữ "all" vì nó nhận `hdLoc()` của trang khác.
+   Anh Luân bắt được ngay: *"đang lỗi à"*.
+   Tệ hơn phần nhìn thấy: `hdChanXepLop` là cửa CHẶN xếp lớp khi hợp đồng cam kết chưa đủ chữ ký -
+   nó cũng đọc `hdList()`, tức một luật nghiệp vụ vừa bị vô hiệu mà không có gì báo.
+   *Một cái tên trùng trong JavaScript không gây lỗi - nó gây một app khác.*
+   Nay ba hàm về đúng họ `hdon*` của chính nó, và `_check15` có thêm một luật canh tên trùng.
+
+   ═══ TRANG HÓA ĐƠN: DANH SÁCH ĐỂ LÀM, KHÔNG PHẢI CHIP ĐỂ ĐẾM ═══════════════════════════════
    Mỗi dòng là MỘT ĐƠN đã hoàn thành khóa - không gộp theo học viên: hóa đơn xuất theo đơn, mà
    một người học hai khóa thì hai đơn hai hóa đơn, gộp lại là không biết nút bấm cho cái nào. */
-function hdList(){
+function hdonDs(){
  var K=hdonXongKhoa();
  return srows("DL06").filter(function(e){return !!K[String(e.enrollment_id||"")]})
   .map(function(e){return {e:e,ce:K[String(e.enrollment_id||"")],s:hdonState(e)}})
@@ -31945,9 +32026,9 @@ function hdList(){
   .sort(function(a,b){
    var uu=function(x){return x.s.tre?0:(x.s.cho?1:(x.s.daXuat?3:2))};
    return uu(a)-uu(b)||((pvnd(a.ce.course_completion_time)||0)-(pvnd(b.ce.course_completion_time)||0))})}
-function hdLoc(){return fget("hoadon")}
+function hdonLoc(){return fget("hoadon")}
 function renderHoadon(){
- var all=hdList(),fil=hdLoc();
+ var all=hdonDs(),fil=hdonLoc();
  var view=all.filter(function(r){
   if(fil==="cho")return r.s.cho;
   if(fil==="tre")return r.s.tre;
@@ -31962,7 +32043,7 @@ function renderHoadon(){
   "Học viên đã hoàn thành khóa - xuất hóa đơn cho họ hoặc cho công ty trả học phí. Hạn xuất "+slaChip("invoiceIssue_days",7)+" tính từ lúc học viên yêu cầu.",
   /* Nút chính của trang: làm việc tiếp theo phải làm, không bắt người ta tự dò trong bảng.
      Hết việc thì không vẽ nút - một nút lúc nào cũng hiện mà bấm vào không có gì là rác. */
-  (nCho?('<button class="btn primary" onclick="hdTiep()"><i class="ti ti-receipt"></i>Xuất hóa đơn tiếp theo ('+nCho+')</button>'):''));
+  (nCho?('<button class="btn primary" onclick="hdonTiep()"><i class="ti ti-receipt"></i>Xuất hóa đơn tiếp theo ('+nCho+')</button>'):''));
  h+=statStrip([
   ["ti-receipt",vnd(tienXuat),"Đã xuất hóa đơn","#0D9488","",
    "","Cộng số tiền ghi trên "+all.filter(function(r){return r.s.daXuat}).length+" hóa đơn đã xuất."],
@@ -32010,8 +32091,8 @@ function renderHoadon(){
  return h}
 /* Nút chính: mở thẳng đơn ĐANG CHỜ LÂU NHẤT. Người ta tới trang này để xuất hóa đơn, không phải
    để chọn xem xuất cái nào trước - thứ tự ưu tiên app đã biết rồi. */
-function hdTiep(){
- var r=hdList().filter(function(x){return x.s.cho})[0];
+function hdonTiep(){
+ var r=hdonDs().filter(function(x){return x.s.cho})[0];
  if(!r){toast("Không còn đơn nào chờ xuất hóa đơn.");return}
  hdonForm(r.e.enrollment_id)}
 function renderCongno(){
@@ -34793,7 +34874,14 @@ RENDER.duyethd   = function(){var L=hdCho();
  return nvHead("duyethd")+statStrip([
   /* V2 13/08 - hai ô đếm đơn đã bỏ (trùng chip). Giữ "Band cam kết trung bình": đó là một
      CHỈ SỐ, không phải số đếm - chip không có cách nào tính trung bình. */
-  (function(){var b=L.map(function(r){return num(r.committed_band)}).filter(function(x){return x>0});
+  /* 26/08 - ĐỌC NHẦM TÊN CỘT, VÀ NÓ IM LẶNG SUỐT. Ô này đọc `committed_band` - một cột KHÔNG
+     TỒN TẠI trong DL30 (cột thật tên `target_band`), nên `num()` trả 0, mảng lọc xong rỗng, và
+     thẻ in ra dấu "-" ở mọi lượt vẽ. Không có gì đỏ: một cột đọc nhầm tên trong JavaScript trả
+     về `undefined`, và `undefined` đi qua `num()` thành 0 rất êm.
+     Anh Luân chụp đúng màn này hỏi "đang lỗi à" - dấu "-" ấy nằm ngay trên ảnh.
+     *Một ô số in ra dấu gạch thì người đọc cho là "chưa có dữ liệu", chứ không ai đoán là app
+     đang hỏi sai tên cột.* */
+  (function(){var b=L.map(function(r){return num(r.target_band||r.committed_band)}).filter(function(x){return x>0});
     return ["ti-target",b.length?(Math.round(b.reduce(function(a,x){return a+x},0)/b.length*10)/10):"-","Band cam kết trung bình","#6B4FA0",""]})()],"duyethd")+duyHdHTML()+_duyAi()};
 RENDER.duyetdot  = function(){var L=dotCho();
 /* V2 13/08 - BỎ DẢI THẺ: ba ô đều là số đếm của ba chip ngay dưới. */
@@ -37031,6 +37119,7 @@ var HVSEC=[
  ["s-khoa","Khóa của bạn","ti-school"],
  ["s-lop","Lớp của bạn","ti-users-group"],
  ["s-bogiao","Bộ hồ sơ nhập học","ti-package"],
+ ["s-hoadon","Hóa đơn khóa học","ti-receipt"],
  ["s-hocphi","Học phí","ti-cash"],
  ["s-xacnhan","Trung tâm đã xác nhận","ti-circle-check"],
  ["s-hanhtrinh","Hành trình cùng ITTs","ti-route"],
@@ -37129,7 +37218,7 @@ function hvXungLoc(h){
    *Một bảng vừa xếp menu vừa xếp trang thì mỗi lần đổi nó là đổi hai thứ - phải đọc lại cả hai
    bộ luật, không chỉ bộ mình đang nghĩ tới.* */
 var HVGRP=[["Khóa và lớp của bạn",["s-khoa","s-lop"]],
- ["Cần bạn xử lý",["s-bogiao","s-hocphi","s-saptoi","s-khaosat"]],
+ ["Cần bạn xử lý",["s-bogiao","s-hocphi","s-hoadon","s-saptoi","s-khaosat"]],
  ["Theo dõi việc học",["s-xacnhan","s-hanhtrinh","s-tiendo","s-diem","s-buoihoc","s-wow","s-khuyennghi","s-chungnhan"]],
  ["Nói chuyện với trung tâm",["s-hoidap","s-gopy","s-gioithieu"]]];
 function hvGo(id){hvCloseSide();var el=document.getElementById(id);if(!el)return;
@@ -37166,7 +37255,10 @@ function hvTopPaint(){var t=document.getElementById("hvTools");if(!t)return;
  try{h+=hvCallHTML("","",1)}catch(e){}
  h+='<button class="tbtn" onclick="congDoiMo()" aria-label="Đổi cổng" data-tip="Đổi cổng - sang cổng nhân viên hoặc cổng phụ huynh, dữ liệu vẫn là một"><i class="ti ti-arrows-exchange"></i></button>';
  h+='<button class="tbtn" onclick="gateSwitchHV()" aria-label="Đổi người đang xem" data-tip="Đổi người đang xem - quay về màn chọn của cổng này"><i class="ti ti-user-check"></i></button>';
- if(CANLS&&!SVR)h+='<button class="tbtn" onclick="demoResetHoi()" aria-label="Dựng lại demo" data-tip="Dựng lại demo về nguyên bản - cấu hình đã chỉnh vẫn giữ"><i class="ti ti-refresh"></i></button>';
+ /* NÚT DUY NHẤT dựng lại demo của cổng học viên - bản sao ở `.cfbar` đã gỡ (xem ghi chú ở
+    `cfBarSync`). Chú thích mang luôn câu của bản sao ấy: đây là bản demo, thao tác chạy thật
+    nhưng chỉ lưu trên máy này. */
+ if(CANLS&&!SVR)h+='<button class="tbtn" onclick="demoResetHoi()" aria-label="Dựng lại demo" data-tip="Dựng lại demo về nguyên bản - đây là bản demo, mọi thao tác chạy thật nhưng chỉ lưu trên máy này; cấu hình đã chỉnh vẫn giữ"><i class="ti ti-refresh"></i></button>';
  t.innerHTML=hvXungLoc(h)}   /* qua cửa đổi xưng hô - xem ghi chú ở `hvNav` */
 /* ═══ V9.65 - HUY HIỆU "VIỆC CẦN BẠN XỬ LÝ" Ở CỔNG HỌC VIÊN ══════════════════════════════
    Mục lục cổng học viên đã có nhóm "Cần bạn xử lý" từ lâu, nhưng nó chỉ là một CÁI TÊN: mở cổng
@@ -37213,9 +37305,10 @@ function hvSoBoGiao(sid){
  return n}
 function hvDemViec(sid,sv){
  sid=String(sid||"");
- var d={"s-hocphi":0,"s-khaosat":0,"s-hoidap":0,"s-bogiao":0};
+ var d={"s-hocphi":0,"s-khaosat":0,"s-hoidap":0,"s-bogiao":0,"s-hoadon":0};
  if(!sid)return d;
  try{d["s-bogiao"]=hvSoBoGiao(sid)}catch(e){}
+ try{d["s-hoadon"]=hvSoHdon()}catch(e){}
  try{d["s-hocphi"]=hvSoHocPhi(sid)}catch(e){}
  try{d["s-khaosat"]=hvSoKhaoSat(sv||[])}catch(e){}
  /* Chế độ phụ huynh KHÔNG thấy mục Trao đổi (chuyện riêng của học viên) - nên cũng không đếm
