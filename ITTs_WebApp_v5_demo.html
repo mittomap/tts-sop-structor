@@ -2352,6 +2352,16 @@ table.dt tbody tr.clk.on td{font-weight:600}
  background:var(--bg);border-top:1px solid var(--line)}
 .tbar.hai>.tbduoi .tbcnt{margin-right:auto}
 .tbcnt{font-size:11.5px;color:var(--muted);font-weight:600;white-space:nowrap}
+/* Hộp chọn nhiều người nhận của màn Gửi thông báo. Cuộn trong hộp chứ không kéo dài ngăn kéo:
+   danh sách học viên là 85 dòng, để nó đẩy nút Gửi xuống dưới màn là người dùng chọn xong
+   không thấy nút đâu. */
+.tbbox{max-height:230px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:5px;background:var(--bg)}
+.tbck{display:flex;align-items:center;gap:9px;padding:5px 8px;border-radius:7px;cursor:pointer}
+.tbck:hover{background:var(--bg2)}
+.tbck input{flex:none;margin:0}
+.tbck b{font-size:12.5px;font-weight:600}
+.tbck em{display:block;font-style:normal;font-size:11px;color:var(--muted)}
+.tbcka{float:right;font-weight:400;font-size:11px;text-transform:none;letter-spacing:0}
 .tblbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
 @media(max-width:860px){.tbar{padding:8px}.seg{width:100%}}
 .colwrap{position:relative;display:inline-block;margin-left:8px}
@@ -3881,7 +3891,7 @@ body.drsz .drawer{transition:none}
          demo chạy trên GitHub Pages và trình duyệt giữ lại file cũ (file app nặng 5MB nên cache
          rất dai). Từ nay chân menu ghi NGÀY DỰNG + MÃ BẢN DỰNG: đọc mã ấy là biết ngay đang xem
          bản nào, khỏi đoán. Mã sinh từ nội dung file nên nội dung y hệt thì mã y hệt. -->
-    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">26/08/2026 · <b>d96417</b></div>
+    <div class="navver" id="navver" title="Ngày dựng và mã bản dựng - đọc mã này khi báo lỗi để biết chắc đang xem đúng bản nào">26/08/2026 · <b>8bde04</b></div>
   </aside>
   <div class="navmask" id="navmask" onclick="closeNav()"></div>
   <div class="main">
@@ -5938,11 +5948,17 @@ baitap:{code:"DL13",filt:"homework_status",
 wow:{code:"DL14",filt:"wow_status",
  cols:[["wow_id","Mã"],["student_name","Học viên"],["wow_session_date","Ngày học"],["wow_session_type","Loại","enum"],["wow_status","Trạng thái","chip"],["wow_outcome","Kết quả","enum"],["staff_name","NV WOW"]],
  form:[["student_id","Chọn HV (gõ SĐT/tên)","@student",1],["wow_session_type","Loại buổi","enum_wow_session_type"],["wow_skill","Kỹ năng","enum_homework_skill"],["wow_session_date","Ngày học"],["wow_status","Trạng thái","enum_wow_status"],["wow_outcome","Kết quả","enum_wow_outcome"],["wow_content_note","Ghi chú sau buổi","ta"]],idp:"WOW-"},
-khaosat:{code:"DL16",filt:"feedback_status",
- cols:[["feedback_id","Mã"],["student_id_name","Học viên"],["feedback_type","Loại","enum"],["feedback_category","Danh mục","enum"],["feedback_score","Điểm"],["feedback_status","Trạng thái","chip"]],
+/* Cột của sổ phản hồi: bản đầu chỉ có mã - tên - loại - danh mục - điểm - trạng thái, tức
+   NÓI VỀ phản hồi mà không nói phản hồi ấy là gì. Người mở sổ ra đang tìm một câu học viên đã
+   nói; sáu cột kia đều là nhãn dán lên câu ấy.
+   *Một danh sách các bản ghi văn xuôi mà không hiện văn xuôi thì nó là danh sách mã số.*
+   Bốn cột thêm vào (nhận lúc · kênh · nội dung · đã xử lý thế nào) đều tắt/bật được ở nút Cột,
+   nên ai cần bảng gọn vẫn gọn lại được. */
+khaosat:{code:"DL16",filt:"feedback_status",xem:"fbXem",
+ cols:[["feedback_id","Mã"],["feedback_time","Nhận lúc"],["student_id_name","Học viên"],["feedback_channel","Kênh","enum"],["feedback_type","Loại","enum"],["feedback_category","Danh mục","enum"],["feedback_score","Điểm"],["feedback_content","Nội dung"],["feedback_action_note","Đã xử lý thế nào"],["feedback_status","Trạng thái","chip"]],
  form:[["student_id","Chọn HV (gõ SĐT/tên)","@student"],["feedback_channel","Kênh","enum_feedback_channel"],["feedback_type","Loại","enum_feedback_type"],["feedback_category","Danh mục","enum_feedback_category"],["feedback_score","Điểm 1-5"],["feedback_content","Nội dung","ta"]],idp:"FB-"},
-khieunai:{code:"DL17",filt:"complaint_status",
- cols:[["complaint_id","Mã"],["student_id_name","Học viên"],["complaint_type","Loại","enum"],["complaint_severity","Mức độ","chip"],["complaint_status","Trạng thái","chip"],["complaint_time","Tiếp nhận"],["next_action","Việc cần làm","na"]],
+khieunai:{code:"DL17",filt:"complaint_status",xem:"openComplaint",
+ cols:[["complaint_id","Mã"],["complaint_time","Tiếp nhận"],["student_id_name","Học viên"],["complaint_channel","Kênh","enum"],["complaint_type","Loại","enum"],["complaint_severity","Mức độ","chip"],["complaint_content","Nội dung"],["assigned_handler","Người xử lý"],["resolution_note","Hướng xử lý"],["complaint_status","Trạng thái","chip"],["next_action","Việc cần làm","na"]],
  form:[["student_id","Chọn HV (gõ SĐT/tên)","@student",1],["complaint_channel","Kênh tiếp nhận","enum_complaint_channel"],["complaint_type","Loại","enum_complaint_type"],["complaint_severity","Mức độ","enum_complaint_severity"],["complaint_content","Nội dung khiếu nại","ta"]],idp:"KN-2026-"},
 ketthuc:{code:"DL18",filt:"re_enrollment_status",
  cols:[["course_end_id","Mã"],["student_id_name","Học viên"],["final_test_score","Điểm cuối"],["attendance_rate","Chuyên cần"],["achievement_status","Đạt mục tiêu","chip"],["re_enrollment_status","Tái ĐK","chip"],["testimonial_given","Cảm nhận HV"]],
@@ -6208,6 +6224,11 @@ var DEFHIDE={phone_number:1,phone:1,contact_count:1,assigned_to_name:1,
  /* Bảng dựng tay: tiêu đề email (chỉ có ở mẫu email, dài) · mô tả bài tập (đoạn văn) ·
     giờ đăng ký ca (thứ tự trong sổ đã nói lên trước sau). */
  mt_td:1,kb_mota:1,dp_dk:1,
+ /* 26/08 - hai cột "sau khi xử lý" của sổ phản hồi và sổ khiếu nại. Cột NỘI DUNG thì hiện mặc
+    định (đó là thứ người ta mở sổ ra để đọc), còn hai cột này là đoạn văn thứ hai trên cùng một
+    dòng - bày cả hai là một dòng bảng cao bằng nửa màn hình. Bật lại được ở nút Cột, và ngăn
+    kéo chi tiết luôn hiện đủ. */
+ feedback_action_note:1,resolution_note:1,
  class_level:1};
 /* Cột MÃ ẩn mặc định, bật lại được (anh Luân 18/08: *"mặc định ẩn những cột mà người dùng thông
    thường ít dùng, ví dụ như ID"*). Sổ danh sách đã theo luật này từ lâu vì mã của chúng là tên
@@ -6848,6 +6869,17 @@ function lstXem(arg){
  var pk=cfg.cols[0][0];
  var r=find(cfg.code,pk,id);
  if(!r){toast("Không thấy bản ghi "+id+".");return}
+ /* ═══ 26/08 - SỔ TRA CỨU KHÔNG ĐƯỢC DỰNG MỘT MÀN CHI TIẾT NGHÈO HƠN MÀN ĐÃ CÓ ══════════════
+    Anh Luân: *"liệt kê danh sách chi tiết feedback, khiếu nại đã nhận"*. Đo lại thì app CÓ màn
+    chi tiết đầy đủ cho cả hai (`fbXem`, `openComplaint`): nội dung học viên nói, kênh nhận,
+    người phân loại, đã xử lý thế nào, dải bước, và đường nhảy sang khiếu nại liên quan.
+    Nhưng ai vào bằng cửa **Sổ phản hồi / Sổ khiếu nại** thì không gặp màn ấy: `lstXem` dựng
+    ngăn kéo từ DANH SÁCH CỘT của bảng, mà danh sách cột không có cột nội dung - nên mở một
+    phản hồi ra chỉ thấy mã, tên, loại, điểm. Đúng thứ người ta mở sổ để đọc thì không có.
+    *Hai màn chi tiết cho một bản ghi thì màn nghèo hơn luôn là màn có người gặp phải.*
+    Nay sổ nào khai `xem` thì đi thẳng vào màn chi tiết thật. Khai chứ không đoán: sổ chưa khai
+    vẫn dùng ngăn kéo chung, không có màn nào bị mất. */
+ if(cfg.xem){var _g=cfnGet(cfg.xem);if(_g){_g(id);return}}
  var p=PBK[key]||{};
  var h='<div class="dcard"><h4><i class="ti '+(p.ic||"ti-list-details")+'"></i>'+esc(p.t||key)+' · '+esc(id)+'</h4>';
  /* mọi cột ĐÃ KHAI, kể cả cột người dùng đang ẩn trên bảng - đây là chỗ đọc đủ */
@@ -22852,7 +22884,8 @@ function renderTinnhan(embed){
  /* Sổ này là sổ VIỆC ĐÃ LÀM, nhưng nó vẫn phải có một cửa LÀM VIỆC: đứng ở đây mà muốn nhắn
     thêm cho một khách thì không có lý gì bắt đi vòng qua hồ sơ rồi quay lại. */
  var h=embed?'':pageHead("Sổ tin đã gửi","Mọi email và tin Zalo app đã gửi cho khách - ai gửi, gửi gì, gửi lúc nào. Lọc theo lớp, người gửi và khoảng thời gian.",
-  '<button class="btn primary" onclick="msgMoi()"><i class="ti ti-send"></i>Soạn tin mới</button>');
+  '<button class="btn primary" onclick="msgHangLoat()"><i class="ti ti-speakerphone"></i>Gửi thông báo</button>'+
+  '<button class="btn" onclick="msgMoi()"><i class="ti ti-send"></i>Soạn tin mới</button>');
 /* V2 13/08 - BỎ DẢI THẺ. Anh Luân: *"thẻ nó phải mang tính khác biệt, chứ nó như cái chip thì
    giữ làm gì, sao ko ưu tiên KPI, SLA hoặc mấy cái nhóm quan trọng"*. Dải này chỉ đếm dòng của
    chính bảng ngay dưới - đúng việc mà chip đang làm, và chip còn bấm lọc được. Luật chốt ở
@@ -22906,6 +22939,198 @@ function msgMoi(){
 function msgMoiDi(){
  var pid=fldV("mm_ai");if(!pid){toast("Chọn người nhận trước.");return}
  msgSoan(pid,fldV("mm_kenh")||"email")}
+/* ═══ 26/08 - GỬI THÔNG BÁO CHO MỘT DANH SÁCH ═══════════════════════════════════════════════
+   Anh Luân: *"gửi thông tin thông báo cho danh sách: lớp, học viên, nhân viên"*.
+
+   Trước bản này app chỉ gửi được cho MỘT người một lượt (`msgSoan`), và chỉ cho học viên hoặc
+   lead - cột `to_kind` của sổ tin chưa từng mang giá trị nào khác. Nghỉ lễ, đổi phòng học, dời
+   lịch cả lớp: học vụ mở từng hồ sơ, soạn từng tin, 18 lần cho một lớp. Ai cũng biết cách chữa
+   là mở Zalo nhóm lớp gửi một phát - và thế là tin quan trọng nhất trong tháng là tin DUY NHẤT
+   không có trong sổ.
+   *Cửa hẹp không ngăn được việc; nó chỉ đẩy việc ra chỗ mình không nhìn thấy.*
+
+   BA NHÓM NGƯỜI NHẬN, MỘT CỬA GỬI. Lớp và học viên khác nhau ở cách CHỌN chứ không khác ở việc
+   gửi - chọn lớp là chọn nhanh cả danh sách học viên của lớp ấy. Nhân viên là nhóm thứ ba thật
+   sự khác: họ không có Zalo trong hồ sơ (DL01 chỉ khai email), nên app phải nói thẳng điều đó
+   chứ không bày một cái nút gửi Zalo rồi báo lỗi từng người.
+
+   MỖI NGƯỜI MỘT DÒNG TRONG SỔ, không gộp thành một dòng "đã gửi 18 người". Sổ tin là thứ để
+   tra lại "em có nhận được thông báo không" - một dòng gộp thì tra tên không ra, mà biến thay
+   theo từng người ({ten}, {lop}) cũng không còn chỗ để khác nhau. */
+var TBNHOM=[["lop","Cả lớp","ti-users-group"],["hv","Học viên","ti-user"],["nv","Nhân viên","ti-id-badge-2"]];
+function tbNhom(){return window.TBNK||"lop"}
+function tbSetNhom(k){window.TBNK=k;window.TBSEL={};msgHangLoat()}
+function tbSel(){return (window.TBSEL=window.TBSEL||{})}
+/* Chọn kênh cho TỪNG người, không chọn một kênh cho cả danh sách rồi bỏ rơi người không có nó.
+   "Tự chọn" ưu tiên Zalo vì đó là kênh khách đọc; không có Zalo thì rơi xuống email. */
+function tbKenhCho(rec,mode){
+ var ks=msgKenhCo(rec);
+ function co(k){for(var i=0;i<ks.length;i++)if(ks[i].k===k)return ks[i];return null}
+ if(mode==="email")return co("email");
+ if(mode==="zalo")return co("zalo");
+ return co("zalo")||co("email")}
+/* Danh sách người nhận THẬT, dựng từ lựa chọn hiện tại. Trả về cả người KHÔNG gửi được (kèm lý
+   do) - giấu họ đi là báo "đã gửi 18 người" trong khi 3 người không nhận được gì. */
+function tbNhanDs(mode){
+ var S=tbSel(),nh=tbNhom(),out=[];
+ if(nh==="nv"){
+  srows("DL01").forEach(function(x){
+   if(!S[String(x.staff_id||"")])return;
+   var K=tbKenhCho(x,mode);
+   out.push({kind:"staff",id:x.staff_id,name:x.full_name||x.staff_id,rec:x,cid:"",cname:"",K:K,
+    ly:K?"":"chưa khai email trong hồ sơ nhân sự"})});
+  return out}
+ var hvIds={},cua={};
+ if(nh==="lop"){
+  rows("DL08").forEach(function(o){
+   var c=String(o.class_id||"");if(!c||!S[c])return;
+   var sid=String(o.student_id||"");if(!sid||hvIds[sid])return;
+   hvIds[sid]=1;cua[sid]={cid:c,cname:o.class_id_name||c}})}
+ else srows("DL09").forEach(function(x){
+  var sid=String(x.student_id||"");if(!S[sid])return;
+  hvIds[sid]=1;cua[sid]=msgLopCua(sid)?{cid:msgLopCua(sid).id,cname:msgLopCua(sid).name}:{cid:"",cname:""}});
+ Object.keys(hvIds).forEach(function(sid){
+  var x=find("DL09","student_id",sid);if(!x)return;
+  var K=tbKenhCho(x,mode);
+  out.push({kind:"student",id:sid,name:x.full_name||sid,rec:x,
+   cid:(cua[sid]||{}).cid||"",cname:(cua[sid]||{}).cname||"",K:K,
+   ly:K?"":(mode==="zalo"?"hồ sơ chưa có Zalo":(mode==="email"?"hồ sơ chưa có email":"hồ sơ chưa có Zalo và email"))})});
+ out.sort(function(a,b){return String(a.name||"").localeCompare(String(b.name||""),"vi")});
+ return out}
+function tbDem(){
+ var mode=fldV("tb_kenh")||"auto";
+ var ds=tbNhanDs(mode),ok=ds.filter(function(x){return x.K}).length;
+ var el=document.getElementById("tb_dem");
+ if(el)el.innerHTML=ds.length
+  ?('<b>'+ok+'</b> người sẽ nhận'+(ds.length>ok?(' · <span style="color:var(--amber)">'+(ds.length-ok)+' người thiếu địa chỉ, sẽ bỏ qua</span>'):''))
+  :'Chưa chọn ai';
+ return ds}
+function tbTick(k,on){var S=tbSel();if(on)S[k]=1;else delete S[k];tbDem()}
+function tbAll(on){
+ var S=tbSel();
+ [].forEach.call(document.querySelectorAll("#tb_ds input[type=checkbox]"),function(c){
+  c.checked=!!on;if(on)S[c.value]=1;else delete S[c.value]});
+ tbDem()}
+function tbHang(k,ten,phu){
+ return '<label class="tbck"><input type="checkbox" value="'+esc(k)+'"'+(tbSel()[k]?" checked":"")+
+  ' onchange="tbTick(\''+esc(k)+'\',this.checked)"><span><b>'+esc(ten)+'</b>'+
+  (phu?'<em>'+esc(phu)+'</em>':'')+'</span></label>'}
+function msgHangLoat(){
+ var nh=tbNhom();
+ var h='<div class="dcard"><h4><i class="ti ti-speakerphone"></i>Gửi thông báo cho một danh sách</h4>';
+ /* Dải chọn nhóm dùng `segHTML` chứ không tự vẽ nút: app đã có đúng một cách vẽ dải chọn
+    (`.seg`/`.segb`, có luôn nhánh thu gọn khi quá dài). Tự vẽ một dải thứ hai trông na ná là
+    đẻ ra một thành phần không ai bảo trì - và bản đầu em đã vẽ nhầm tên lớp (`.segs`) nên nó
+    ra một hàng nút trần không khung. */
+ h+='<div class="fld full"><label>Gửi cho nhóm nào <i>*</i></label>'+
+  segHTML(nh,TBNHOM.map(function(g){return [g[0],g[1]]}),"tbSetNhom('{k}')","tbnhom")+'</div>';
+ h+='<div class="fld full"><label>Chọn người nhận <i>*</i>'+
+  '<span class="tbcka"><a class="lnk" onclick="tbAll(1)">Chọn tất cả</a> · <a class="lnk" onclick="tbAll(0)">Bỏ chọn</a></span></label>'+
+  '<div class="tbbox" id="tb_ds">';
+ if(nh==="lop"){
+  var soHV={};rows("DL08").forEach(function(o){var c=String(o.class_id||"");if(c)soHV[c]=(soHV[c]||0)+1});
+  var cs=srows("DL10").filter(function(c){return !isc(c.class_status,"cancelled")});
+  if(!cs.length)h+='<div class="empty">Chưa có lớp nào trong phạm vi bạn xem được.</div>';
+  cs.forEach(function(c){
+   h+=tbHang(c.class_id,(c.class_name||c.class_id),
+    (soHV[c.class_id]||0)+" học viên · "+(elabel(c.class_status)||"")+(c.class_schedule?" · "+c.class_schedule:""))})}
+ else if(nh==="hv"){
+  var hv=srows("DL09").filter(function(x){return !isc(x.student_status,"dropped")});
+  if(!hv.length)h+='<div class="empty">Chưa có học viên nào trong phạm vi bạn xem được.</div>';
+  hv.forEach(function(x){
+   var L=msgLopCua(x.student_id);
+   h+=tbHang(x.student_id,x.full_name||x.student_id,
+    (L.name?L.name+" · ":"")+(msgKenhCo(x).map(function(k){return k.k}).join("/")||"chưa có địa chỉ"))})}
+ else{
+  var nv=srows("DL01").filter(function(x){return isc(x.status,"active")});
+  if(!nv.length)h+='<div class="empty">Chưa có nhân viên nào trong phạm vi bạn xem được.</div>';
+  nv.forEach(function(x){
+   h+=tbHang(x.staff_id,x.full_name||x.staff_id,
+    (elabel(x.role)||x.role||"")+(x.email?" · "+x.email:" · chưa có email"))})}
+ h+='</div><div class="fhint" id="tb_dem">Chưa chọn ai</div></div>';
+ /* Nhân viên chỉ có email trong hồ sơ - bày ô chọn kênh đủ ba lựa chọn ở đó là mời người ta
+    chọn một đường chắc chắn không tới. */
+ if(nh==="nv")
+  h+='<input type="hidden" id="tb_kenh" value="email">'+
+   '<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Hồ sơ nhân sự chỉ khai <b>email</b>, chưa khai Zalo - thông báo nội bộ gửi qua email.</div>';
+ else
+  h+='<div class="fld"><label>Gửi bằng kênh nào <i>*</i></label><select id="tb_kenh" onchange="tbDem()">'+
+   '<option value="auto">Tự chọn theo hồ sơ (ưu tiên Zalo)</option><option value="zalo">Chỉ Zalo</option><option value="email">Chỉ email</option>'+
+   '</select><div class="fhint">Ai không có kênh đã chọn thì bị bỏ qua - số bị bỏ qua hiện ngay ở trên.</div></div>';
+ var _m=mauDs().filter(mauDung);
+ h+='<div class="fld"><label>Mẫu có sẵn</label><select id="tb_mau" onchange="tbMauDoi()">'+
+  '<option value="">-- tự viết --</option>'+
+  MAUNHOM.map(function(g){
+   var ds=_m.filter(function(x){return String(x.nhom||"")===g[0]});
+   if(!ds.length)return "";
+   return '<optgroup label="'+esc(g[1])+'">'+ds.map(function(x){
+    return '<option value="'+esc(x.mau_id)+'">'+esc(x.ten||x.mau_id)+'</option>'}).join("")+'</optgroup>'}).join("")+
+  '</select></div>';
+ h+='<div class="fld full"><label>Tiêu đề (email)</label><input id="tb_sub" placeholder="vd: Thông báo nghỉ lễ 02/09"></div>';
+ h+='<div class="fld full"><label>Nội dung <i>*</i></label><textarea id="tb_body" rows="6" placeholder="Viết nội dung thông báo. Dùng biến để tin của mỗi người mang đúng tên và lớp của họ."></textarea>'+
+  '<div class="fhint">Biến thay theo từng người: '+mauBienHTML()+'</div></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="tbGuiHoi()"><i class="ti ti-send"></i>Gửi thông báo</button>'+
+  '<button class="btn" onclick="tbXemDs()"><i class="ti ti-list-check"></i>Xem danh sách nhận</button>'+
+  '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
+ openDrawer("Gửi thông báo",h);
+ setTimeout(tbDem,30)}
+function tbMauDoi(){
+ var id=fldV("tb_mau");if(!id)return;
+ var m=find("DL32","mau_id",id);if(!m)return;
+ var b=document.getElementById("tb_body");if(b)b.value=String(m.noi_dung||"");
+ var s2=document.getElementById("tb_sub");if(s2&&String(m.tieu_de||"").trim())s2.value=String(m.tieu_de||"")}
+function tbXemDs(){
+ var mode=fldV("tb_kenh")||"auto";
+ var ds=tbNhanDs(mode);
+ if(!ds.length){toast("Chưa chọn ai.");return}
+ var h='<div class="dcard"><h4><i class="ti ti-list-check"></i>Danh sách nhận thông báo</h4>';
+ h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Người nhận</th><th>Lớp</th><th>Gửi qua</th></tr></thead><tbody>';
+ ds.forEach(function(x){
+  h+='<tr><td>'+(x.kind==="staff"?nsLnk(x.id,x.name,x.id):nguoiLnk(x.id,x.name,x.id))+'</td>'+
+   '<td>'+esc(x.cname||"-")+'</td>'+
+   '<td>'+(x.K?('<span class="chip '+(x.K.k==="email"?"blue":"green")+'">'+(x.K.k==="email"?"Email":"Zalo")+'</span> <span class="mut" style="font-size:11px">'+esc(x.K.addr)+'</span>')
+     :('<span class="chip amber">bỏ qua</span> <span class="mut" style="font-size:11px">'+esc(x.ly)+'</span>'))+'</td></tr>'});
+ h+='</tbody></table></div>';
+ h+='<div class="dact"><button class="btn" onclick="msgHangLoat()"><i class="ti ti-arrow-left"></i>Quay lại soạn</button></div></div>';
+ openDrawer("Danh sách nhận",h)}
+function tbGuiHoi(){
+ var mode=fldV("tb_kenh")||"auto";
+ var body=String(fldV("tb_body")||"").trim();
+ if(!body){toast("Nội dung đang trống - viết vào rồi hãy gửi.");return}
+ var ds=tbNhanDs(mode).filter(function(x){return x.K});
+ if(!ds.length){toast("Không ai trong danh sách có địa chỉ gửi được.",4600);return}
+ var sub=String(fldV("tb_sub")||"").trim();
+ if(!sub&&ds.filter(function(x){return x.K.k==="email"}).length){toast("Có người nhận qua email - phải có tiêu đề.");return}
+ /* Giữ nội dung ở BIẾN chứ không đọc lại từ form sau khi hỏi: `confirmRun` đóng ngăn kéo, ô
+    nhập biến mất, và `fldV` sau đó trả chuỗi rỗng - tin gửi đi trắng trơn mà không ai hay. */
+ window.TBDON={mode:mode,body:body,sub:sub,mau:fldV("tb_mau")||""};
+ confirmRun("Gửi thông báo này cho "+ds.length+" người? Mỗi người một tin riêng, lưu vào Sổ tin đã gửi.","tbGuiChay","")}
+function tbGuiChay(){
+ var D=window.TBDON||{};if(!D.body){toast("Không còn nội dung để gửi.");return}
+ if(!actGuard("tbGui:"+tbNhom()+":"+D.body.length))return;
+ var ds=tbNhanDs(D.mode||"auto").filter(function(x){return x.K});
+ if(!ds.length){toast("Không ai trong danh sách có địa chỉ gửi được.");return}
+ var m0=D.mau?find("DL32","mau_id",D.mau):null;
+ var chude=m0?String(m0.nhom||""):"thongbao";
+ var n=0;
+ DL.DL29=DL.DL29||[];
+ ds.forEach(function(x){
+  var ctx;
+  if(x.kind==="staff")ctx={ten:x.name,lop:"",giangvien:"",hotline:paramStr("centerHotline",""),
+   trungtam:(UI().center||UIDEF.center||""),diachi:paramStr("centerAddress","")};
+  else{try{ctx=mauCtxHV(x.id,x.cid)||{}}catch(e){ctx={ten:x.name,lop:x.cname}}}
+  var m={msg_id:"TIN-"+seqNo("DL29","msg_id",4),sent_at:nowStr(),kenh:x.K.k,
+   to_kind:x.kind,to_id:x.id,to_name:x.name,to_addr:x.K.addr,
+   tieu_de:(x.K.k==="email"?mauThay(D.sub,ctx):""),
+   noi_dung:mauThay(D.body,ctx),chu_de:chude,
+   class_id:x.cid||"",class_id_name:x.cname||"",
+   sent_by:CURSTAFF||"",sent_by_name:myName()};
+  DL.DL29.unshift(m);n++;
+  if(SVR)try{google.script.run.apiSave("DL29",m)}catch(e){}});   /* CỬA NỐI RA BACKEND GỬI THẬT */
+ window.TBDON=null;window.TBSEL={};
+ persistSoon();closeModal();
+ toast("Đã gửi "+n+" tin và lưu vào Sổ tin đã gửi.",5000);
+ reRender(CUR)}
 function msgXem(id){var m=find("DL29","msg_id",id);if(!m){toast("Không thấy tin này.");return}
  var h='<div class="dcard"><h4><i class="ti '+(m.kenh==="email"?"ti-mail":"ti-brand-messenger")+'"></i>'+esc(m.msg_id)+'</h4>';
  h+=ctxRows([["Gửi lúc",esc(m.sent_at||"-")],["Kênh",m.kenh==="email"?"Email":"Zalo"],
