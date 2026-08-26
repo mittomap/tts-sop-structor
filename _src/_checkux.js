@@ -231,7 +231,35 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
         (_src/trangchu_demo.html) va bi soi cung mot thuoc do.
     (2) no chi canh thuoc tinh `border` - dai mau dung bang ::before/::after (mot khoi content:""
         cao vai px, keo het chieu ngang, co background mau) thi lot het. Nay canh ca kieu do. */
- var DAI=/(::before|::after)\{content:"";[^}]*height:[1-6](\.\d+)?px[^}]*background[^}]*\}/g;
+ /* ═══ 26/08 - THƯỚC NÀY HẸP HƠN CHÍNH LUẬT NÓ ĐANG CANH ═══════════════════════════════════
+    Anh Luân bắt lại đúng lỗi cũ, lần thứ ba, bằng một ảnh chụp thẻ "Khóa của bạn": một dải navy
+    4px dọc mép trái. Và một chỗ nữa em vừa TỰ TAY dựng trong cùng phiên - vạch xanh 3px ở mục
+    lục cổng học viên. Cả hai đều đi lọt, và verify vẫn xanh suốt.
+    Đo ra thì cái thước hụt HAI đường cùng lúc:
+      (1) nó chỉ bắt `::before` HAI dấu hai chấm. Cả hai chỗ vi phạm viết `:before` MỘT dấu -
+          cú pháp CSS2, trình duyệt hiểu y hệt, biểu thức thì không.
+      (2) nó chỉ bắt dải NGANG (`height:1-6px`). Dải DỌC mảnh theo chiều `width`, cao thì kéo
+          bằng top/bottom - mà nguyên văn lời anh Luân có sẵn ba chữ *"kể cả viền dọc"*.
+    Tức là luật viết trong tài liệu rộng, phép đo cài trong máy hẹp - và giữa hai cái đó thì
+    CÁI CHẠY ĐƯỢC mới là cái có hiệu lực. Em đi đúng vào khe ấy mà vẫn thấy màu xanh.
+    *Một phép đo hẹp hơn luật nó đại diện thì nó không bảo vệ luật - nó cấp giấy phép cho phần
+    luật mà nó không với tới.*
+    Nay: bắt cả một lẫn hai dấu hai chấm, bắt cả chiều dọc lẫn chiều ngang, và ĐẢO CHIỀU CÂU HỎI -
+    dải mảnh nào có nền thì phải NẰM TRONG BẢN KHAI dưới đây kèm lý do đọc được. Thêm một dải mới
+    mà không khai là đỏ, kể cả khi nó vô hại. Danh sách tên thì mỗi cái tên không nằm trong danh
+    sách là một vùng tối; bản khai thì ngược lại - mỗi cái mới là một câu hỏi bắt buộc trả lời. */
+ var DAI_KHAI={
+  ".hvjr:before":"truc doc cua dong thoi gian Hanh trinh cung ITTs - cau truc, mau var(--line)",
+  ".hvtl:before":"truc doc cua dong thoi gian nhat ky buoi hoc - cau truc, mau var(--line)",
+  ".jtli:before":"truc doc cua dong thoi gian viec da lam - cau truc, mau var(--line)",
+  ".tbgr::before":"duong ke nhom cot trong bang - cau truc, mau var(--line)",
+  ".navitem.sub::before":"vach thut le cua ke con tren menu - 1px trang 12% tren nen navy",
+  ".stp+.stp:before":"duong noi giua hai buoc cua thanh chang - 2px xam trung tinh",
+  ".sbszr:after":"tay nam keo rong thanh menu - mot NUT keo, khong phai net trang tri",
+  ".drszr:after":"tay nam keo rong ngan keo - mot NUT keo, khong phai net trang tri",
+  ".navitem.chang:after":"cham 6x6px danh dau bon chang vong doi - mot CHAM chi muc, khong phai dai"
+ };
+ var DAI=/([#.\w][^\s{}]*?:{1,2}(?:before|after))\{content:"";([^}]*)\}/g;
  (function(){
   var fs=require('fs');
   var TC="";try{TC=fs.readFileSync('./trangchu_demo.html','utf8')}catch(e){TC=""}
@@ -245,7 +273,17 @@ function moiDate(html){var out=[],re=/<input[^>]*type="date"[^>]*>/g,m;
    var b1=(ma.match(/border-left:\s*[3-9]px[^;"'\}]*/g)||[]).filter(function(m){return !/transparent/.test(m)});
    var b2=(ma.match(/border-top:\s*[3-9]px[^;"'\}]*/g)||[]);
    var b3=(ma.match(/border-left-color:[^;"'\}]*/g)||[]);
-   var b4=(ma.match(DAI)||[]);
+   /* Dải mảnh dựng bằng :before/:after - chỉ đo cái CÓ NỀN và có một chiều <=6px (tức là một
+      cái vạch), rồi hỏi bản khai. Hình tròn, ô vuông to, lớp phủ không lọt vào đây. */
+   var b4=[],m4;DAI.lastIndex=0;
+   while((m4=DAI.exec(ma))){
+    var _sel=m4[1],_than=m4[2];
+    if(!/background/.test(_than))continue;
+    var _w=/width:\s*([\d.]+)px/.exec(_than),_h=/height:\s*([\d.]+)px/.exec(_than);
+    var _manh=(_w&&parseFloat(_w[1])<=6)||(_h&&parseFloat(_h[1])<=6);
+    if(!_manh)continue;
+    if(DAI_KHAI[_sel])continue;                       /* da khai ly do -> tha */
+    b4.push(_sel+" {"+_than.slice(0,60)+"}")}
    var xau2=b1.concat(b2,b3,b4);
    t("("+ten+") khong co dai vien mau, ke ca dai dung bang ::before"+(xau2.length?" - CON: "+xau2.slice(0,3).join(" | ").slice(0,160):""), xau2.length===0)});
   t("(trang chu) the cong hover doi BONG chu khong doi mau vien",

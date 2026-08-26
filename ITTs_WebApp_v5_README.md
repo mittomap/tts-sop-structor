@@ -2922,3 +2922,21 @@ Lấy theo LỚP chứ không theo điểm danh: điểm danh chỉ có sau khi 
 Xếp người dạy thay ghi vào **cả hai đầu** - lá đơn (`DL33.gv_thay`) và buổi học
 (`DL11.teacher_id`), kèm một dòng vết trong `notes` của buổi. `check_logic.py` mục 20 canh để hai
 đầu không lệch nhau.
+
+## Bảng công tách "dạy thay" ra khỏi "dạy chính"
+
+Bảng **Công giảng dạy & WOW** đếm theo `DL11.teacher_id` - người ĐỨNG BUỔI - nên ai đứng lớp thì
+người ấy có công. Hai cột phụ nói rõ phần nào là dạy thay:
+
+| Cột | Nghĩa | Có tính công không |
+|---|---|---|
+| **Trong đó dạy thay** | Buổi mình đứng thay người khác theo đơn báo nghỉ đã duyệt | **Có** - đã nằm trong giờ dạy và tiền công ở các cột bên trái |
+| **Nhờ người dạy thay** | Buổi của lớp mình mà người khác đứng | **Không** - trả lời câu "sao tháng này giờ hụt" |
+
+Cả hai tự ẩn khi cả bảng đều bằng 0 - dạy thay là chuyện hiếm, tháng nào không có thì không ai
+phải nhìn một cột trống.
+
+**"Dạy thay" đọc từ lá đơn `DL33`, không đọc từ phép so sánh với chủ nhiệm lớp.** So
+`DL11.teacher_id` với `DL10.main_teacher_id` sẽ gán nhầm mọi buổi của một lớp **đã bàn giao** là
+dạy thay - người ấy dạy chúng khi lớp còn là lớp của mình. Chủ nhiệm là trạng thái hôm nay; buổi
+dạy là sự việc đã xảy ra.

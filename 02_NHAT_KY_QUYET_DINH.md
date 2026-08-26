@@ -148,6 +148,80 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 🔴 26/08 - ANH LUÂN BẮT LẠI LUẬT W5, VÀ EM VỪA TỰ TAY DỰNG LẠI NÓ TRONG CHÍNH PHIÊN NÀY
+> Anh Luân gửi ảnh thẻ "Khóa của bạn": một dải navy 4px dọc mép trái. *"a đã từng dặn ko dùng
+> thiết kế border kiểu này"* - rồi hỏi thẳng: *"e có luật nhưng vẫn làm sai? lý do? cách khắc phục"*.
+>
+> **Có hai chỗ, không phải một:** `.hvcr.on:before` (thẻ khóa) và `.hvni.on::before` (vạch xanh ở
+> mục lục cổng học viên) - **cái thứ hai là em vừa thêm vào trong phiên này**, ngay sau khi đọc
+> chính luật ấy.
+>
+> **Lý do - và nó KHÔNG phải "em quên":**
+> Luật W5 nằm trong CLAUDE.md và có một bộ kiểm canh (`_checkux` nhóm 6). Nhưng phép đo cài trong
+> máy **hẹp hơn cái luật nó đại diện**, hụt hai đường cùng lúc:
+> · Nó chỉ bắt `::before` **hai** dấu hai chấm. Cả hai chỗ vi phạm viết `:before` **một** dấu -
+>   cú pháp CSS2, trình duyệt hiểu y hệt, biểu thức thì không.
+> · Nó chỉ bắt dải **NGANG** (`height:1-6px`). Dải **DỌC** mảnh theo chiều `width`, cao thì kéo
+>   bằng `top/bottom` - trong khi nguyên văn lời anh Luân có sẵn ba chữ *"kể cả viền dọc"*.
+>
+> Tức là **tài liệu ghi rộng, máy đo hẹp** - và giữa hai cái đó thì **cái chạy được mới có hiệu
+> lực**. Em đi đúng vào khe ấy, verify vẫn xanh, và em đọc màu xanh ấy thành "thiết kế này ổn".
+> *Một phép đo hẹp hơn luật nó đại diện thì nó không bảo vệ luật - nó cấp giấy phép cho phần luật
+> mà nó không với tới.*
+> Và vì sao phép đo hẹp: nó được viết đúng lúc đang đuổi **một** con - dải ngang trên trang chủ
+> bản demo - nên nó học đúng hình dạng con ấy. *Một bộ kiểm sinh ra từ một lỗi cụ thể thì mặc định
+> nó chỉ biết đúng lỗi ấy; muốn nó canh cả LUẬT thì phải đi nới nó ra một lần nữa, có chủ ý.*
+>
+> **Cách khắc phục - ba phần, phần thứ ba mới là phần thật:**
+> 1. Gỡ dải ở thẻ khóa. Trạng thái "đang xem" vốn đã nói ra bằng **bốn** cách khác (viền navy, nền
+>    chuyển sắc, bóng đổ, ô icon tô đặc, dấu tích) - cái dải thứ năm không thêm thông tin nào.
+>    *Một trạng thái đã đọc được bằng bốn cách thì cách thứ năm không phải nhấn mạnh, nó là thừa.*
+> 2. Mục lục cổng học viên nói "mục đang mở" bằng **đúng thứ tiếng thanh menu cổng nhân viên đã
+>    nói từ V9.19**: nền đậm hơn, chữ trắng đậm, một đường tóc bên trong, icon sáng lên.
+>    *Hai cổng cùng một app mà đánh dấu cùng một trạng thái bằng hai ngôn ngữ khác nhau thì cái
+>    mới gần như chắc chắn là cái sai - vì cái cũ đã đi qua mắt người duyệt rồi.*
+> 3. **Siết thước, và đảo chiều câu hỏi.** Nay `_checkux` bắt cả một lẫn hai dấu hai chấm, bắt cả
+>    chiều dọc lẫn chiều ngang, và **mọi dải mảnh có nền đều phải nằm trong BẢN KHAI kèm lý do**
+>    (9 mục: trục dòng thời gian, kẻ bảng, tay nắm kéo, chấm chỉ mục...). Thêm một dải mới mà
+>    không khai là đỏ, **kể cả khi nó vô hại**.
+>    *Sửa theo danh sách tên thì mỗi cái tên không nằm trong danh sách là một vùng tối; bản khai
+>    thì ngược lại - mỗi cái mới là một câu hỏi bắt buộc phải trả lời.*
+>    Đã thử ngược trên nguồn ở commit trước: **cắn đúng 2 chỗ**, sạch trên nguồn mới.
+
+> ### ✅ 26/08 - BẢNG CÔNG: TÁCH "DẠY THAY", VÀ CÁI BẪY NẰM Ở CHỖ ĐỊNH NGHĨA
+> Anh Luân: *"là giờ đã đếm đúng công rồi phải ko em, trong công có nên phân biệt 2 cột ko:
+> dạy chính, dạy thay?"*
+>
+> **Công vốn đã đếm đúng ở phần công thức:** `congThang()` đếm theo `DL11.teacher_id` - người
+> ĐỨNG BUỔI - lọc buổi đã dạy xong. Cái sai trước đây nằm ở DỮ LIỆU (buổi không mang tên người dạy
+> thay), nên bảng công cộng cho người vắng mặt. Sửa dữ liệu xong là công về đúng người.
+>
+> **Cái bẫy của câu hỏi thứ hai:** cách rẻ nhất để biết "buổi này có phải dạy thay không" là so
+> `DL11.teacher_id` với `DL10.main_teacher_id`. Và nó **SAI**. Đo 26/08: 368 buổi đã dạy xong, 9
+> buổi người dạy khác chủ nhiệm hiện tại, và **cả 9 đều là ca BÀN GIAO LỚP** - người ấy dạy khi lớp
+> còn là lớp của mình. Gán chúng là "dạy thay" là xoá sạch công dạy CHÍNH của một người, đúng cái
+> cột này sinh ra để làm rõ.
+> *Chủ nhiệm là một trạng thái HÔM NAY; buổi dạy là một sự việc ĐÃ XẢY RA. Đem cái hôm nay so với
+> cái đã xảy ra thì mọi thay đổi về sau đều biến thành một sự việc chưa từng có.*
+> Nên đọc từ **lá đơn `DL33`** - một sự thật có người ghi, không phải một suy luận từ phép so sánh.
+>
+> **Hai cột kiểu "TRONG ĐÓ", không phải hai cột song song:**
+> · **Trong đó dạy thay** - buổi mình đứng thay người khác, ĐÃ nằm trong giờ dạy và tiền công.
+> · **Nhờ người dạy thay** - buổi của mình người khác đứng, KHÔNG có công. Đây mới là cột trả lời
+>   câu của kế toán lúc chốt lương: *sao tháng này giờ của người này hụt*.
+> Hai cột song song bắt người đọc cộng lại mới ra tổng; một tổng kèm một lát cắt thì đọc thẳng.
+> Cả hai tự ẩn khi cả bảng đều 0 - đúng luật bảng này đặt từ 14/08.
+>
+> Và gieo thêm **một ca dạy thay ĐÃ DẠY XONG trong tháng đang xem** (`GVN-0007`): trước đó mọi đơn
+> đều trỏ vào buổi tương lai, mà bảng công chỉ đếm buổi đã xong - nên cột mới sẽ rỗng vĩnh viễn.
+> *Thêm một cột mà không gieo dữ liệu cho nó thì cột ấy chỉ tồn tại trong mã nguồn.*
+> Đo ra: Phan Trung Chính 19 buổi/29.3h **trong đó dạy thay 1 buổi (3h)**; Phạm Tấn Phát 17 buổi
+> **nhờ người dạy thay 1 buổi**.
+>
+> **Còn chờ anh Luân quyết:** dạy thay có ăn **đơn giá khác** không? Hiện đơn giá tra theo
+> (giảng viên x loại ngày x ca). Muốn có phụ cấp dạy thay thì đó là một tham số CH2 mới - em không
+> tự đặt con số ấy.
+
 > ### ✅ 26/08 - GIÁO VIÊN DẠY THAY: ĐÓNG VIỆC TỒN, VÀ HOÁ RA LÀ HAI LỖ CHỨ KHÔNG PHẢI MỘT
 > Anh Luân: *"ồ, giáo viên dạy thay đúng rồi, e làm đi"*.
 >

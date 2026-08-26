@@ -4075,6 +4075,72 @@ if not _nghi and _gvN:
                 "duyet_boi": "", "duyet_boi_ten": "", "duyet_luc": "", "duyet_ghichu": "",
                 "gv_thay": "", "gv_thay_ten": "", "xep_luc": "",
             })
+    # ── MOT CA DAY THAY DA DIEN RA, NAM TRONG THANG BANG CONG DANG XEM ────────────────────
+    # Ba don tren deu tro vao buoi TUONG LAI - dung, vi mot don "cho duyet" phai cho mot buoi
+    # chua xay ra. Nhung BANG CONG chi dem buoi DA DAY XONG, nen khong don nao trong so do cham
+    # vao cot "day thay": cot ay se rong voi moi giang vien, moi thang.
+    # *Them mot cot ma khong gieo du lieu cho no thi cot ay chi ton tai trong ma nguon.*
+    # Nen gieo them MOT ca da tron ven - don cua thang nay, da duyet, da xep nguoi, va buoi DA
+    # DAY XONG - de bang cong thay duoc ca hai dau: nguoi day thay duoc cong len, nguoi bao nghi
+    # bi hut xuong. Mot ca thoi la du: day thay la chuyen hiem, gieo nhieu la ve sai buc tranh.
+    _daDung = set(str(x.get("session_id") or "") for x in _nghi)
+    _uv = []
+    for _sx in R("DL11"):
+        if code(_sx.get("session_status") or "") != "completed":
+            continue
+        if not str(_sx.get("teacher_id") or "").strip():
+            continue
+        if str(_sx.get("session_id") or "") in _daDung:
+            continue
+        _dx = dt(_sx.get("session_date"))
+        if not _dx or (_dx.year, _dx.month) != (NOW.year, NOW.month) or _dx > NOW:
+            continue
+        _uv.append((_dx, _sx))
+    _uv.sort(key=lambda z: (z[0], str(z[1].get("session_id") or "")))
+    for _dx, _sx in _uv:
+        _lp = _lopN.get(str(_sx.get("class_id") or ""), {})
+        _gcu = ([x for x in R("DL01")
+                 if str(x.get("staff_id") or "") == str(_sx.get("teacher_id") or "")] or [{}])[0]
+        _gm = _chonGVThay(_sx, _lp, _gcu)
+        if not _gm.get("staff_id"):
+            continue
+        _bao4 = _dx - datetime.timedelta(days=3, hours=2)
+        _duyet4 = _dx - datetime.timedelta(days=2, hours=5)
+        _xep4 = _dx - datetime.timedelta(days=1, hours=6)
+        _id4 = "GVN-%04d" % (len(_nghi) + 1)
+        _nghi.append({
+            "nghi_id": _id4,
+            "staff_id": _gcu.get("staff_id") or "",
+            "staff_name": _gcu.get("full_name") or "",
+            "session_id": _sx.get("session_id") or "",
+            "class_id": _sx.get("class_id") or "",
+            "class_name": _lp.get("class_name") or _sx.get("class_id") or "",
+            "session_number": _sx.get("session_number") or "",
+            "session_date": _sx.get("session_date") or "",
+            "ly_do": u"GV báo nghỉ / bận việc riêng",
+            "ghi_chu": u"Có việc gia đình đột xuất, đã báo trước ba ngày",
+            "de_xuat_gv": _gm.get("staff_id") or "",
+            "de_xuat_gv_ten": _gm.get("full_name") or "",
+            "bao_luc": _bao4.strftime("%d/%m/%Y %H:%M"),
+            "trang_thai": u"da_duyet (Đã duyệt)",
+            "duyet_boi": _tpAca.get("staff_id") or "",
+            "duyet_boi_ten": _tpAca.get("full_name") or "",
+            "duyet_luc": _duyet4.strftime("%d/%m/%Y %H:%M"),
+            "duyet_ghichu": u"Đồng ý - đã có người nhận đứng lớp",
+            "gv_thay": _gm.get("staff_id") or "",
+            "gv_thay_ten": _gm.get("full_name") or "",
+            "xep_luc": _xep4.strftime("%d/%m/%Y %H:%M"),
+        })
+        _cu4 = _sx.get("teacher_id_name") or _sx.get("teacher_id") or ""
+        _sx["teacher_id"] = _gm["staff_id"]
+        _sx["teacher_id_name"] = _gm.get("full_name") or ""
+        _sx["notes"] = ((str(_sx.get("notes") or "").strip() + " | ")
+                        if str(_sx.get("notes") or "").strip() else "") + \
+            (u"Đổi GV: %s -> %s (%s, %s) - xếp người dạy thay theo đơn %s"
+             % (_cu4, _gm.get("full_name") or "", _tpAca.get("full_name") or u"Học vụ",
+                _xep4.strftime("%d/%m/%Y %H:%M"), _id4))
+        break
+
     log.append("26. DL33 GV bao nghi: gieo %d don (%d cho duyet, %d da duyet)%s"
                % (len(_nghi),
                   len([x for x in _nghi if x["trang_thai"].startswith("cho_duyet")]),

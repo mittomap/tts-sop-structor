@@ -1075,8 +1075,13 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .hvcrs{display:grid;grid-template-columns:repeat(auto-fit,minmax(275px,1fr));gap:12px;margin-bottom:18px}
 .hvcr{position:relative;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:14px 15px;cursor:pointer;transition:.15s}
 .hvcr:hover{border-color:#B9C6D6;transform:translateY(-1px);box-shadow:0 4px 16px rgba(16,32,58,.08)}
+/* KHÔNG có dải màu dọc ở mép trái. Anh Luân đã cấm từ V9.50 (*"a ko thích mấy cái kiểu bo viền
+   này, nhìn nó xấu lắm, kể cả viền dọc"*) và bắt lại đúng cái thẻ này 26/08.
+   Thẻ đang xem vốn đã nói ra bằng BỐN cách khác: viền navy, nền chuyển sắc, bóng đổ, ô icon tô
+   đặc navy, cộng dấu tích ở góc. Cái dải thứ năm không thêm một thông tin nào - nó chỉ thêm một
+   nét trang trí, đúng cái bị cấm.
+   *Một trạng thái đã đọc được bằng bốn cách thì cách thứ năm không phải là nhấn mạnh, nó là thừa.* */
 .hvcr.on{border-color:var(--navy);background:linear-gradient(180deg,#FAFBFD,#fff);box-shadow:0 4px 18px rgba(46,90,136,.16)}
-.hvcr.on:before{content:"";position:absolute;left:-1.5px;top:14px;bottom:14px;width:4px;border-radius:3px;background:var(--navy)}
 .hvcrh{display:flex;align-items:flex-start;gap:11px}
 .hvcri{width:38px;height:38px;border-radius:10px;background:var(--bg);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
 .hvcr.on .hvcri{background:var(--navy);color:#fff}
@@ -1529,12 +1534,16 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 /* Ô xác nhận / thẻ nhỏ: cùng bo góc với panel để cả trang là một hệ. */
 #hvapp .hvc{border-radius:12px;border-color:var(--line);padding:14px 16px}
 #hvapp .bstat{border-radius:12px;border-color:var(--line)}
-/* MỤC LỤC - nhẹ đi, và mục đang đọc có một vạch nhận diện thay vì chỉ đổi nền mờ. */
+/* MỤC LỤC - nhẹ đi, và mục đang đọc nói ra bằng ĐÚNG THỨ TIẾNG mà thanh menu cổng nhân viên đã
+   nói từ V9.19: nền đậm hơn, chữ trắng, chữ đậm, một đường tóc bên trong, icon sáng lên.
+   Bản trước em dựng một VẠCH MÀU 3px ở mép trái - và đó chính là thứ anh Luân cấm từ V9.50, cấm
+   luôn cả viền dọc. Em tự tay dựng lại nó trong phiên này, ngay sau khi vừa đọc luật ấy.
+   *Hai cổng cùng một app mà đánh dấu "mục đang mở" bằng hai ngôn ngữ khác nhau thì cái mới gần
+   như chắc chắn là cái sai - vì cái cũ đã đi qua mắt người duyệt rồi.* */
 #hvapp .hvside{width:268px}
 #hvapp .hvni{border-radius:10px;padding:10px 12px;font-size:13px;position:relative}
-#hvapp .hvni.on{background:#ffffff1f}
-#hvapp .hvni.on::before{content:"";position:absolute;left:-9px;top:9px;bottom:9px;width:3px;
- border-radius:0 3px 3px 0;background:var(--blue)}
+#hvapp .hvni.on{background:#ffffff2e;color:#fff;font-weight:700;box-shadow:inset 0 0 0 1px #ffffff1f}
+#hvapp .hvni.on i{opacity:1;color:#A8D5F7}
 #hvapp .hvgrph{font-size:11px;letter-spacing:.6px;opacity:.62;margin:16px 12px 5px}
 #hvapp .hvbrand,#hvapp .hvme{border-bottom-color:#ffffff10}
 /* Thanh trên: tên mục đang đọc là thứ đáng đọc nhất trên thanh, cho nó đúng cỡ. */
@@ -29320,6 +29329,19 @@ function congThang(ym){
  var GV=rows("DL01").filter(isCongRole);
  function inYM(v){var d=pvnd(v);if(!d)return false;
   return (d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2))===ym}
+ /* ═══ 26/08 - DẠY THAY ĐỌC TỪ LÁ ĐƠN, KHÔNG ĐỌC TỪ PHÉP SO SÁNH ═══════════════════════════
+    Anh Luân hỏi: *"trong công có nên phân biệt 2 cột ko: dạy chính, dạy thay?"*
+    Cách rẻ nhất là so `DL11.teacher_id` với `DL10.main_teacher_id` - và nó SAI. Đo trên dữ liệu
+    26/08: 368 buổi đã dạy xong, 9 buổi có người dạy khác chủ nhiệm hiện tại, và **cả 9 đều là ca
+    BÀN GIAO LỚP** - người ấy dạy khi lớp còn là lớp của mình, sau mới sang tên người khác. Gán
+    chúng là "dạy thay" là xoá sạch công dạy CHÍNH của một người, đúng cái cột này sinh ra để
+    làm rõ.
+    *Chủ nhiệm là một trạng thái HÔM NAY; buổi dạy là một sự việc ĐÃ XẢY RA. Đem cái hôm nay so
+    với cái đã xảy ra thì mọi thay đổi về sau đều biến thành một sự việc chưa từng có.*
+    Dạy thay là chuyện có người ghi vào sổ: một lá đơn báo nghỉ đã duyệt, có tên người được xếp.
+    Đọc `DL33` - hỏi đúng cuốn sổ ghi việc ấy. */
+ var THAY={};rows("DL33").forEach(function(x){
+  var k=String(x.session_id||"");if(!k||!String(x.gv_thay||"").trim())return;THAY[k]=x});
  var out=GV.map(function(g){
   var ses=rows("DL11").filter(function(x){
    if(String(x.teacher_id||"")!==g.staff_id||!isc(x.session_status,"completed"))return false;
@@ -29332,6 +29354,19 @@ function congThang(ym){
   var test=rows("DL03").filter(function(x){
    if(String(x.graded_by||"")!==g.staff_id||!isc(x.test_status,"graded"))return false;
    return inYM(x.result_time||x.test_attendance_time||x.test_date)});
+  /* Hai chiều của cùng một lá đơn, và chúng KHÔNG cộng vào nhau:
+     · `thay`  - buổi mình đứng thay người khác: đã nằm trong `ses` nên đã có công, đây chỉ là
+       một lát cắt "trong đó" của giờ dạy bên trái.
+     · `nhoThay` - buổi của mình mà người khác đứng: KHÔNG nằm trong `ses` (buổi đã sang tên
+       người kia) nên không có công. Nó tồn tại để trả lời câu của kế toán lúc chốt lương -
+       *sao tháng này giờ của người này hụt* - mà không phải đi mở sổ báo nghỉ. */
+  var thay=ses.filter(function(x){var t=THAY[String(x.session_id||"")];
+   return !!(t&&String(t.gv_thay||"")===g.staff_id)});
+  var gioThay=0;thay.forEach(function(x){gioThay+=sesHours(x)||0});
+  var nhoThay=rows("DL11").filter(function(x){
+   if(!isc(x.session_status,"completed")||!inYM(x.session_date))return false;
+   var t=THAY[String(x.session_id||"")];
+   return !!(t&&String(t.staff_id||"")===g.staff_id&&String(t.gv_thay||"")!==g.staff_id)});
   var late=ses.filter(function(x){return num(x.teacher_late_minutes)>0});
   var noNote=ses.filter(function(x){return !bhState(x).note})
    .concat(wow.filter(function(w){return !String(w.wow_content_note||"").trim()}));
@@ -29372,6 +29407,7 @@ function congThang(ym){
   var gioTest=0,thieuTest=0;
   test.forEach(function(x){var y=testHours(x);if(y)gioTest+=y;else thieuTest++});
   return {g:g,n:ses.length,wow:wow.length,test:test.length,late:late.length,noNote:noNote.length,brs:brs,onl:onl,
+   thay:thay.length,gioThay:gioThay,nhoThay:nhoThay.length,
    gio:gio,thieuGio:thieuGio,theoCa:theoCa,
    gio11:gio11,gioNhom:gioNhom,n11:n11,nNhom:nNhom,gioCS:gioCS,buoiCS:buoiCS,
    gioWow:gioWow,thieuWow:thieuWow,gioTest:gioTest,thieuTest:thieuTest,
@@ -29600,6 +29636,15 @@ function renderCong(){
   {k:"ca",t:"Chia theo ca",co:function(x){return !!caText(x.theoCa,xTien)},
    ve:function(x){return '<span style="font-size:11.5px">'+esc(caText(x.theoCa,xTien)||"-")+'</span>'}},
   {k:"onl",t:"Trong đó online",co:function(x){return x.onl>0},ve:function(x){return x.onl?'<span class="chip blue">'+x.onl+'</span>':'<span class="mut">0</span>'}},
+  /* Kiểu "TRONG ĐÓ" chứ không phải hai cột song song "dạy chính / dạy thay". Hai cột song song
+     bắt người đọc cộng lại mới ra tổng; một tổng kèm một lát cắt thì đọc thẳng, không phải tính.
+     Và `co()` giấu hẳn cột khi cả bảng đều 0 - đúng luật bảng này đã đặt từ 14/08 (*"quá nửa mặt
+     bảng là những con số 0 nói đúng một điều: người này không làm việc ấy"*): dạy thay là chuyện
+     hiếm, tháng nào không có thì không ai phải nhìn một cột trống. */
+  {k:"thay",t:"Trong đó dạy thay",co:function(x){return x.thay>0},tong:function(a,x){return a+x.thay},
+   ve:function(x){return x.thay?('<span class="chip amber" data-tip="'+esc("Buổi đứng thay cho giảng viên khác theo đơn báo nghỉ đã duyệt - ĐÃ tính vào giờ dạy và tiền công ở các cột bên trái")+'">'+x.thay+' buổi</span> <span class="mut" style="font-size:11px">'+(Math.round(x.gioThay*10)/10)+'h</span>'):'<span class="mut">0</span>'}},
+  {k:"nhothay",t:"Nhờ người dạy thay",co:function(x){return x.nhoThay>0},tong:function(a,x){return a+x.nhoThay},
+   ve:function(x){return x.nhoThay?('<span class="chip" data-tip="'+esc("Buổi của lớp mình mà người khác đứng thay theo đơn báo nghỉ đã duyệt - KHÔNG tính vào công tháng này")+'">'+x.nhoThay+' buổi</span>'):'<span class="mut">0</span>'}},
   {k:"wow",t:"Buổi WOW (giờ kèm)",co:function(x){return x.wow>0},tong:function(a,x){return a+x.wow},
    ve:function(x){return x.wow?('<span class="chip" style="background:#FCE7F3;color:#9D174D">'+x.wow+'</span> <span class="mut" style="font-size:11px">'+(Math.round(x.gioWow*10)/10)+'h'+(x.thieuWow?(' · '+x.thieuWow+' thiếu mốc'):'')+'</span>'):'<span class="mut">0</span>'}},
   {k:"test",t:"Ca test",co:function(x){return x.test>0},tong:function(a,x){return a+x.test},
