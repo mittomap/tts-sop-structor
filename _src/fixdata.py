@@ -4379,6 +4379,102 @@ for _r in R("DL18"):
 log.append("29. DL18 doc lai tu DL12/DL13: sua %d o chuyen can, %d o ty le hoan thanh"
            % (_suaAtt, _suaHw))
 
+# ---- 30. BO ONBOARDING: SACH · HOP DONG · QUA TANG · THONG TIN LOP ----
+# Anh Luan dat 26/08: *"Noi dung onboarding, co dau tick khi gui va xac nhan tu hoc vien: sach,
+# hop dong, qua tang di kem, thong tin lop"* + *"In hop dong, xac nhan da nhan hop dong, chup anh
+# hop dong khi da nhan upload len"*.
+#
+# Truoc khoi nay app chi theo doi DUNG MOT trong bon mon: thong tin lop (class_info_sent_at /
+# confirmation_time). Ba mon con lai - sach, hop dong, qua tang - la nhung thu TRUNG TAM THAT SU
+# TRAO TAY cho hoc vien, ma khong o dau ghi lai da trao chua, hoc vien da nhan chua. Hoc vu nho
+# bang tri nho, va den thang sau khi hoc vien hoi "em chua nhan sach" thi khong co gi de tra loi.
+#
+# MOI MON HAI MOC, KHONG PHAI MOT: `gui` la viec cua trung tam, `nhan` la xac nhan cua hoc vien.
+# Gop lam mot o "da xong" thi mat dung cai khoang giua - da giao roi ma hoc vien chua xac nhan -
+# va do moi la khoang can nhac viec. *Mot dau tick do hai ben cung danh thi no khong con la bang
+# chung cua ben nao.*
+#
+# Rieng hop dong co them IN va ANH: to hop dong la vat the, no duoc in ra, trao di, roi chup lai
+# lam bang chung. Ba moc ay khong the suy ra tu nhau - in ma chua trao la mot trang thai that.
+_QUA = ["Túi vải ITTs + bình nước", "Sổ tay lộ trình + bút", "Túi vải ITTs + sổ tay",
+        "Bình nước ITTs + móc khóa"]
+_SACH = ["Cambridge IELTS 18 + vở ghi ITTs", "Bộ giáo trình lớp + vở ghi ITTs",
+         "Cambridge IELTS 17-18 + bộ đề luyện"]
+_KENH_HD = ["trao tay tại trung tâm", "trao tay tại trung tâm", "gửi Zalo bản chụp", "gửi email bản PDF"]
+_hocvu = [s for s in R("DL01")
+          if code(s.get("role", "")).startswith(("academic", "hocvu")) and code(s.get("status", "")) == "active"]
+if not _hocvu:
+    _hocvu = [s for s in R("DL01") if code(s.get("status", "")) == "active"]
+_rnd30 = random.Random(20260826)
+_n30 = {"in": 0, "gui": 0, "nhan": 0, "anh": 0}
+# MOI DONG DEU PHAI CO DU BAY NHIEU COT, du la o rong. `check_logic` luat 14a canh dung chuyen
+# nay va bat duoc ngay lan chay dau: 62/88 dong lech bo cot. Ly do no la LOI chu khong phai
+# chuyen hinh thuc - app doc cot theo dong DAU TIEN cua bang de dung dau bang, dong dau thieu
+# cot nao la ca cot ay bien mat khoi man hinh.
+# *Mot bang ma moi dong tu khai bo cot cua rieng no thi no khong con la mot bang.*
+_COT30 = ["bo_hd_in_at", "bo_hd_in_boi", "bo_hd_in_boi_ten", "bo_hd_gui_at", "bo_hd_gui_kenh",
+          "bo_hd_nhan_at", "bo_hd_anh", "bo_sach_ten", "bo_sach_gui_at", "bo_sach_nhan_at",
+          "bo_qua_ten", "bo_qua_gui_at", "bo_qua_nhan_at"]
+for _o in R("DL08"):
+    for _c in _COT30:
+        _o.setdefault(_c, "")
+for _i, _o in enumerate(R("DL08")):
+    if not str(_o.get("class_id") or "").strip():
+        continue
+    _neo = dt(_o.get("class_info_sent_at")) or dt(_o.get("assigned_at"))
+    if not _neo:
+        continue
+    _xong = bool(str(_o.get("onboarding_completed_at") or "").strip())
+    _kyroi = bool(str(_o.get("confirmation_time") or "").strip()) and \
+        code(_o.get("class_confirmation_status", "")) == "confirmed"
+    _nv = _hocvu[_i % len(_hocvu)] if _hocvu else {}
+
+    def _moc(gio, ngay=0):
+        _x = (_neo + datetime.timedelta(days=ngay)).replace(hour=gio, minute=_rnd30.choice([0, 15, 30, 45]))
+        return fmt(_x if _x <= NOW else NOW)
+
+    # HOP DONG: in ngay khi xep lop xong, trao khi hoc vien toi lop dau tien.
+    # Chua ky quy dinh lop thi chua trao hop dong - do la thu tu that o quay.
+    if _kyroi or _xong:
+        _o["bo_hd_in_at"] = _moc(9)
+        _o["bo_hd_in_boi"] = _nv.get("staff_id") or ""
+        _o["bo_hd_in_boi_ten"] = _nv.get("full_name") or ""
+        _n30["in"] += 1
+        _o["bo_hd_gui_at"] = _moc(10, 1)
+        _o["bo_hd_gui_kenh"] = _KENH_HD[_i % len(_KENH_HD)]
+        _n30["gui"] += 1
+        # Ba ho so co chu de lai: da trao ma hoc vien chua bam xac nhan -> con viec de nhac.
+        if _xong and _i % 7 != 3:
+            _o["bo_hd_nhan_at"] = _moc(19, 2)
+            _n30["nhan"] += 1
+            if _i % 4 != 1:
+                _o["bo_hd_anh"] = "(demo) hopdong_%s_daky.jpg" % str(_o.get("student_id") or "")
+                _n30["anh"] += 1
+    elif str(_o.get("class_info_sent_at") or "").strip():
+        # Da gui thong tin lop nhung chua ky: hop dong moi chi IN, chua trao.
+        _o["bo_hd_in_at"] = _moc(9)
+        _o["bo_hd_in_boi"] = _nv.get("staff_id") or ""
+        _o["bo_hd_in_boi_ten"] = _nv.get("full_name") or ""
+        _n30["in"] += 1
+
+    # SACH: phat o buoi dau. Trao roi thi hoc vien xac nhan ngay tai lop.
+    if _kyroi or _xong:
+        _o["bo_sach_ten"] = _SACH[_i % len(_SACH)]
+        _o["bo_sach_gui_at"] = _moc(18, 1)
+        if _xong and _i % 6 != 2:
+            _o["bo_sach_nhan_at"] = _moc(20, 1)
+
+    # QUA TANG: khong phai ho so nao cung co (chi cac dot khuyen mai) - de trong la dung,
+    # khong phai la thieu. Ghi ro trong app: "khong ap dung" khac han "chua giao".
+    if (_kyroi or _xong) and _i % 3 != 2:
+        _o["bo_qua_ten"] = _QUA[_i % len(_QUA)]
+        _o["bo_qua_gui_at"] = _moc(18, 1)
+        if _xong and _i % 5 != 0:
+            _o["bo_qua_nhan_at"] = _moc(20, 1)
+
+log.append("30. Bo onboarding DL08: in hop dong %d · trao %d · HV nhan %d · co anh %d"
+           % (_n30["in"], _n30["gui"], _n30["nhan"], _n30["anh"]))
+
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("  12. Da tao DL22 referral +", len(dl["DL22"]), "luot | DL19 thuong:", len(dl["DL19"]))
 for _l in log[-6:]: print("  "+_l)

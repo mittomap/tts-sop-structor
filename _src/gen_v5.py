@@ -1412,6 +1412,21 @@ a.btn,a.pill{text-decoration:none}   /* V9.29: nút dạng thẻ <a> (gọi đi�
 .hvc.ok i{color:var(--green)}
 .hvc b{display:block;font-size:12.5px;color:var(--text)}
 .hvc span{font-size:11.5px;color:var(--muted)}
+/* ═══ BỘ HỒ SƠ NHẬP HỌC (cổng học viên) - bốn dòng, mỗi dòng một món ═══════════════════════
+   Dùng lại đúng thang màu và thang chữ đã có: `_checkux` đếm mã màu trong CẢ file và cả hai
+   thang đang sát trần (110 mã màu · 16 bậc cỡ chữ · 10 bậc bo góc). */
+.hvkit{display:flex;flex-direction:column;gap:9px}
+.hvkr{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:12px;padding:11px 14px;flex-wrap:wrap}
+.hvkr>i.ti{font-size:20px;color:#B9C6D6;flex:none}
+.hvkr.ok{border-color:var(--green)}
+.hvkr.ok>i.ti{color:var(--green)}
+.hvkr.wait{border-color:var(--amber)}
+.hvkr.wait>i.ti{color:var(--amber)}
+.hvkt{flex:1 1 180px;min-width:0}
+.hvkt b{display:block;font-size:12.5px;color:var(--text)}
+.hvkt span{font-size:11.5px;color:var(--muted)}
+.hvks{flex:0 1 auto;font-size:11.5px;color:var(--muted)}
+.hvka{margin-left:auto;flex:none;display:flex;align-items:center}
 /* ═══ THƯỚC BAND 0-9 - xem ghi chú ở khối "Hành trình điểm số" ══════════════════════════════
    Không một mã màu mới, không một bậc cỡ chữ mới: mọi thứ lấy từ token đã có, vì thang màu và
    thang chữ của app đều đang sát trần của `_checkux` (110 mã màu · 16 bậc cỡ chữ · 10 bậc bo
@@ -3109,6 +3124,28 @@ body.drsz .drawer{transition:none}
    day o rong hon nut roi nut dat le trai, nen khoang trong thua don het vao giua hai cot - nhin
    ra nhu khoang cach 28px trong khi khe that chi 8px. Nut lap day o thi khe giua hai nut dung
    bang khe flex, va nut trong cung mot cot cung mot be rong luon. */
+/* ═══ 26/08 - DẢI BỘ ONBOARDING TRÊN THẺ ════════════════════════════════════════════════════
+   Bốn món, mỗi món hai dấu: giao (việc của trung tâm) và HV nhận (xác nhận của học viên). Nằm
+   ở HÀNG THỨ BA trong khối tên - dưới tên và dưới hàng chip trạng thái - vì `.obh>div:first-child`
+   đã là block, thêm một con nữa là nó tự xuống hàng, không đụng tới cột nút đã chốt bề rộng.
+   Không dùng dải màu trang trí: viền đổi màu theo TRẠNG THÁI (luật W5 cấm dải viền màu trang
+   trí, không cấm viền mang nghĩa - đây là viền của một cái chip có nội dung bên trong).
+   Chữ "giao" và "HV nhận" viết THẲNG RA chứ không để hai chấm trần: hai chấm cạnh nhau thì
+   người đọc phải học xem chấm nào là ai, mà học xong tuần sau lại quên. */
+.obkit{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:5px;min-width:0}
+.obkq{display:inline-flex;align-items:center;gap:5px;padding:2px 7px;border:1px solid var(--line);
+ border-radius:7px;font-size:11px;background:var(--card);white-space:nowrap}
+.obkq>i.ti{font-size:12px;color:var(--muted)}
+.obkq.ok{border-color:var(--green)}
+.obkq.ok>i.ti{color:var(--green)}
+.obkq.part{border-color:var(--amber)}
+.obkq.part>i.ti{color:var(--amber)}
+.obkq.na{opacity:.5}
+.obkd{width:14px;height:14px;border:1px solid var(--line);border-radius:4px;display:inline-flex;
+ align-items:center;justify-content:center;flex:none;background:var(--bg)}
+.obkd.on{background:var(--green);border-color:var(--green)}
+.obkd>i.ti{font-size:11px;color:#fff}
+.obkit>.btn{font-size:11px}
 .obcards.rows .obcard .obsl.a{width:168px}
 .obcards.rows .obcard .obsl.b{width:104px}
 .obcards.rows .obcard .obsl.c{width:96px}
@@ -16435,9 +16472,9 @@ var KPIDOC={
   doc:{tot:"Duyệt nhanh, không ai phải chờ.",dat:"Trong hạn.",
    hut:"Vài yêu cầu để quá hạn.",canhbao:"Hàng chờ duyệt đang dày - các chặng sau bị chặn theo.",
    baodong:"Yêu cầu nằm chờ không ai quyết. Cả quy trình đang tắc ở khâu ký."},
-  viec:{hut:[["Mở hàng chờ duyệt","ti-checkup-list","duyet",{}]],
-   canhbao:[["Mở hàng chờ duyệt","ti-checkup-list","duyet",{}],["Sửa hạn duyệt","ti-adjustments","settings",{settab:"ch2"}]],
-   baodong:[["Mở hàng chờ duyệt","ti-checkup-list","duyet",{}],["Sửa hạn duyệt","ti-adjustments","settings",{settab:"ch2"}]]}},
+  viec:{hut:[["Mở hàng chờ duyệt","ti-checklist","duyet",{}]],
+   canhbao:[["Mở hàng chờ duyệt","ti-checklist","duyet",{}],["Sửa hạn duyệt","ti-adjustments","settings",{settab:"ch2"}]],
+   baodong:[["Mở hàng chờ duyệt","ti-checklist","duyet",{}],["Sửa hạn duyệt","ti-adjustments","settings",{settab:"ch2"}]]}},
  SS_ALL:{nghia:"Điểm hài lòng trung bình của toàn trung tâm, gộp mọi phiếu khảo sát trong kỳ.",
   visao:"Đây là con số duy nhất nói được sức khoẻ dịch vụ bằng một chữ số - và là con số học viên dùng để quyết định có giới thiệu bạn hay không.",
   nguon:"DL15b/DL16: trung bình điểm hài lòng của mọi phiếu có trả lời trong kỳ.",
@@ -19697,6 +19734,11 @@ var APPPARAMS=[
     dòng, mà không ai hay. Nên mỗi lần xác nhận lưu kèm SỐ HIỆU BẢN + BẢN CHỤP nguyên văn. */
  ["Quy định & cam kết lớp học","commitVersion","Số hiệu bản quy định hiện hành. Sửa nội dung thì tăng số này lên - người đã ký bản cũ vẫn tính là đã ký, nhưng hồ sơ ghi rõ họ ký ở bản nào","bản","1.0","text"],
  ["Quy định & cam kết lớp học","commitText","Nội dung quy định lớp học và cam kết mà học viên phải đọc rồi bấm đồng ý. Mỗi dòng một điều","chữ","1. Đi học đúng giờ. Vào lớp trễ quá 15 phút tính là buổi muộn.\n2. Nghỉ học phải báo trước ít nhất 24 giờ qua học vụ; nghỉ không báo tính là vắng không phép.\n3. Làm và nộp bài tập về nhà đúng hạn giáo viên giao.\n4. Giữ trật tự, tôn trọng giáo viên và các bạn cùng lớp.\n5. Học phí đã đóng được bảo lưu theo chính sách của trung tâm; không hoàn tiền khi đã học quá số buổi quy định.\n6. Trung tâm có quyền đổi giáo viên hoặc dời lịch khi có lý do chính đáng, và sẽ báo trước cho học viên.","text"],
+ /* Nội dung bộ onboarding - thứ trung tâm đổi theo từng đợt (hết sách bản cũ, đổi quà khuyến
+    mãi), nên nó phải nằm ở Cài đặt chứ không cắm cứng trong mã. Đây là giá trị ĐIỀN SẴN khi
+    học vụ mở màn giao món, vẫn sửa được cho từng học viên. */
+ ["Bộ onboarding","obKitSach","Bộ sách & giáo trình mặc định giao cho học viên mới - điền sẵn ở màn giao món","chữ","Cambridge IELTS 18 + vở ghi ITTs","text"],
+ ["Bộ onboarding","obKitQua","Quà tặng đi kèm mặc định của đợt ưu đãi đang chạy - để trống nếu đợt này không có quà","chữ","Túi vải ITTs + bình nước","text"],
  ["Trung tâm","centerHotline","Hotline hiện trong tin nhắn xác nhận và phiếu thu","chữ","","text"],
  ["P10 · Kết thúc khóa & tái đăng ký","thresholdPauseRemind_days","Nhắc gọi mời HV bảo lưu quay lại TRƯỚC hạn bao nhiêu ngày","ngày",14],
  /* AC2 - học viên thi IELTS thật nhiều lần thì lấy lượt nào để tính đạt AIM. Anh Luân chọn
@@ -19827,6 +19869,237 @@ function pvnd(s){
 function hoursSince(s){var d=pvnd(s);return d?(Date.now()-d.getTime())/3600000:null}
 function nowStr(){var d=new Date();function p(n){return n<10?"0"+n:n}return p(d.getDate())+"/"+p(d.getMonth()+1)+"/"+d.getFullYear()+" "+p(d.getHours())+":"+p(d.getMinutes())}
 function obState(o){var sent=!!(o.class_info_sent_at&&String(o.class_info_sent_at).trim());var confirmed=/confirmed/.test(ecode(o.class_confirmation_status));var rejected=ecode(o.class_confirmation_status)==="rejected";var done=/completed/.test(ecode(o.onboarding_status));var infoLim=paramOf("slaClassInfoZalo_hours",24),obLim=paramOf("slaOBT_hours",48);var hs=hoursSince(o.assigned_at);return {sent:sent,confirmed:confirmed,rejected:rejected,done:done,infoOverdue:!sent&&hs!=null&&hs>infoLim,obOverdue:!done&&hs!=null&&hs>obLim}}
+/* ═══ 26/08 - BỘ ONBOARDING: BỐN MÓN, MỖI MÓN HAI DẤU ══════════════════════════════════════
+   Anh Luân: *"Nội dung onboarding, có dấu tick khi gửi và xác nhận từ học viên: sách, hợp đồng,
+   quà tặng đi kèm, thông tin lớp"* và *"In hợp đồng, xác nhận đã nhận hợp đồng, chụp ảnh hợp
+   đồng khi đã nhận upload lên"*.
+
+   Trước bản này app theo dõi ĐÚNG MỘT trong bốn món - thông tin lớp. Ba món còn lại là những
+   thứ trung tâm THẬT SỰ trao tay học viên, mà không chỗ nào ghi đã trao chưa, học viên nhận
+   chưa. Học vụ nhớ bằng trí nhớ; tháng sau học viên nhắn "em chưa nhận sách" thì không có gì
+   để đối chiếu, và cãi nhau bằng trí nhớ thì trung tâm luôn là bên phải xin lỗi.
+
+   MỖI MÓN HAI MỐC, KHÔNG PHẢI MỘT. `gửi` là việc của trung tâm, `nhận` là xác nhận của học
+   viên. Gộp làm một ô "đã xong" là mất đúng cái khoảng giữa - đã giao rồi mà học viên chưa xác
+   nhận - và đó mới là khoảng cần nhắc việc.
+   *Một dấu tick mà hai bên cùng đánh thì nó không còn là bằng chứng của bên nào.*
+
+   MỘT ĐĂNG KÝ, KHÔNG PHẢI BỐN KHỐI MÃ CHÉP TAY. Bốn món giống nhau tới 90%: đều có mốc gửi,
+   mốc nhận, một cửa ghi mỗi phía, một dòng trên thẻ, một dòng ở cổng học viên. Viết tay bốn
+   lần là bốn cơ hội để món thứ tư thiếu một nhánh mà không ai thấy - và món thứ tư ở đây là
+   quà tặng, thứ ít người kiểm nhất.
+   Thêm món thứ năm (áo lớp, thẻ học viên...) về sau chỉ là thêm MỘT DÒNG ở bảng này.
+
+   "Thông tin lớp" MƯỢN ĐÚNG HAI CỘT SOP ĐÃ CÓ (`class_info_sent_at`/`confirmation_time`) chứ
+   không đẻ cột mới song song - đẻ cột mới là để hai con số cùng tả một việc rồi có ngày lệch.
+
+   Bảng: [mã, tên, icon, cột GỬI, cột NHẬN, cột ẢNH, cột TÊN MÓN, cột KÊNH GIAO, mô tả,
+          tham số CH2 cho nội dung mặc định] */
+var OBGOI=[
+ ["lop","Thông tin lớp","ti-school","class_info_sent_at","confirmation_time","","","",
+  "Lịch học, địa chỉ lớp, giảng viên và nhóm chat lớp","","Lớp"],
+ ["hd","Hợp đồng nhập học","ti-file-text","bo_hd_gui_at","bo_hd_nhan_at","bo_hd_anh","","bo_hd_gui_kenh",
+  "Bản in có chữ ký hai bên - học viên giữ một bản","","Hợp đồng"],
+ ["sach","Sách & giáo trình","ti-book","bo_sach_gui_at","bo_sach_nhan_at","","bo_sach_ten","",
+  "Giáo trình và vở ghi phát ở buổi học đầu","obKitSach","Sách"],
+ ["qua","Quà tặng đi kèm","ti-gift","bo_qua_gui_at","bo_qua_nhan_at","","bo_qua_ten","",
+  "Quà của đợt ưu đãi - không phải hồ sơ nào cũng có","obKitQua","Quà"]];
+function obGoi(k){for(var i=0;i<OBGOI.length;i++)if(OBGOI[i][0]===k)return OBGOI[i];return null}
+function obKitMacDinh(k){var g=obGoi(k);if(!g||!g[9])return "";
+ try{return String(paramStr(g[9],"")||"")}catch(e){return String(paramOf(g[9],"")||"")}}
+function obKit(o){o=o||{};
+ return OBGOI.map(function(g){
+  var gui=String(o[g[3]]||"").trim(),nhan=String(o[g[4]]||"").trim();
+  /* `confirmation_time` cũng được đóng khi học viên TỪ CHỐI (xem `hvClassReject`). Đọc nó trần
+     là đếm một lời từ chối thành một dấu xác nhận - đúng thứ không được phép nhầm. */
+  if(g[0]==="lop"&&nhan&&!isc(o.class_confirmation_status,"confirmed"))nhan="";
+  var mon=g[6]?String(o[g[6]]||"").trim():"";
+  /* Quà tặng KHÔNG phải hồ sơ nào cũng có. "Không áp dụng" khác hẳn "chưa giao": đếm chung là
+     bịa ra một việc tồn cho mọi học viên không thuộc đợt ưu đãi nào. */
+  return {k:g[0],ten:g[1],ngan:g[10]||g[1],ic:g[2],mo:g[8],mon:mon,gui:gui,nhan:nhan,
+   kenh:g[7]?String(o[g[7]]||"").trim():"",
+   anh:g[5]?String(o[g[5]]||"").trim():"",coAnh:!!g[5],
+   ap:(g[0]!=="qua")||!!mon||!!gui}})}
+function obKitDem(o){var a=obKit(o).filter(function(x){return x.ap});
+ return {tong:a.length,gui:a.filter(function(x){return x.gui}).length,
+  nhan:a.filter(function(x){return x.nhan}).length,
+  cho:a.filter(function(x){return x.gui&&!x.nhan}).length,
+  thieu:a.filter(function(x){return !x.gui}).length}}
+/* HAI Ô TICK, KHÔNG PHẢI HAI CHỮ. Bản đầu em ghi thẳng chữ "giao" và "HV nhận" vào mỗi chip
+   cho khỏi phải giải thích - và bốn chip ấy dài tới mức xuống hai hàng, thẻ phình từ hai dòng
+   lên bốn dòng, cả trang Xếp lớp cao gấp đôi. *Viết ra cho rõ mà làm hỏng chỗ đặt thì nó
+   không còn rõ nữa - người đọc bỏ qua cả cụm.*
+   Nay là hai ô vuông theo thứ tự CỐ ĐỊNH (trước: trung tâm giao · sau: học viên nhận), nghĩa
+   của chúng nói MỘT LẦN ở hàng ghi chú dưới dải chip lọc (`xlNote`) chứ không nhắc lại 88 lần
+   trên 88 thẻ, và rê chuột vào chip là đọc được nguyên câu kèm ngày. */
+function obKitChips(o,id){
+ var h='<div class="obkit">';
+ obKit(o).forEach(function(x){
+  var st=!x.ap?"na":(x.nhan?"ok":(x.gui?"part":"no"));
+  var tip=x.ten+(x.mon?" · "+x.mon:"")+" - "+(x.gui?("trung tâm giao "+x.gui):"trung tâm chưa giao")+
+   " · "+(x.nhan?("học viên xác nhận "+x.nhan):(x.ap?"học viên chưa xác nhận":"không áp dụng hồ sơ này"));
+  h+='<span class="obkq '+st+'" data-tip="'+esc(tip)+'"><i class="ti '+x.ic+'"></i>'+esc(x.ngan)+
+   '<b class="obkd'+(x.gui?" on":"")+'">'+(x.gui?'<i class="ti ti-check"></i>':'')+'</b>'+
+   '<b class="obkd'+(x.nhan?" on":"")+'">'+(x.nhan?'<i class="ti ti-check"></i>':'')+'</b></span>'});
+ h+='<button class="btn sm" onclick="obKitMo(\''+esc(id)+'\')"><i class="ti ti-checkbox"></i>Cập nhật bộ</button>';
+ return h+'</div>'}
+function obKitMo(id){var o=find("DL08","onboarding_id",id);if(!o){toast("Không thấy hồ sơ.");return}
+ var d=obKitDem(o);
+ var h='<div class="dcard"><h4><i class="ti ti-package"></i>Bộ onboarding - '+esc(o.student_id_name||o.student_id||"")+'</h4>';
+ h+=ctxRows([["Lớp",lopLnk(o.class_id,o.class_id_name,"chưa xếp")],
+  ["Trung tâm đã giao",d.gui+"/"+d.tong+" món"],
+  ["Học viên đã xác nhận",d.nhan+"/"+d.tong+" món"+(d.cho?' · <span style="color:var(--amber)">'+d.cho+' món chờ học viên</span>':'')]]);
+ h+='<div class="tbwrap"><table class="dt"><thead><tr><th>Món</th><th>Trung tâm giao</th><th>Học viên xác nhận</th><th></th></tr></thead><tbody>';
+ obKit(o).forEach(function(x){
+  var _o=esc(id),_k=esc(x.k);
+  h+='<tr><td><b><i class="ti '+x.ic+'" style="margin-right:6px;color:var(--muted)"></i>'+esc(x.ten)+'</b>'+
+   (x.mon?'<div class="mut" style="font-size:11.5px">'+esc(x.mon):'<div class="mut" style="font-size:11.5px">'+esc(x.mo))+'</div></td>';
+  /* Cột GIAO */
+  h+='<td>'+(x.gui
+   ?('<span class="chip green">đã giao</span><div class="mut" style="font-size:11.5px">'+esc(x.gui)+(x.kenh?' · '+esc(x.kenh):'')+'</div>')
+   :(!x.ap?'<span class="mut">không áp dụng</span>'
+     :'<button class="btn primary sm" onclick="obKitGui(\''+_o+'\',\''+_k+'\')"><i class="ti ti-send"></i>Đánh dấu đã giao</button>'))+'</td>';
+  /* Cột HỌC VIÊN XÁC NHẬN */
+  h+='<td>'+(x.nhan
+   ?('<span class="chip green">đã nhận</span><div class="mut" style="font-size:11.5px">'+esc(x.nhan)+'</div>')
+   :(x.k==="lop"
+     ?'<span class="mut">học viên tự xác nhận ở cổng</span>'
+     :(x.gui
+       ?'<button class="btn sm" onclick="obKitNhan(\''+_o+'\',\''+_k+'\')"><i class="ti ti-checkbox"></i>Ghi nhận đã nhận</button>'
+       :'<span class="mut">chờ giao đã</span>')))+'</td>';
+  /* Cột riêng của hợp đồng: in ra giấy, và ảnh bản đã nhận */
+  h+='<td>'+(x.k==="hd"
+   ?('<button class="btn sm" onclick="obInHopDong(\''+_o+'\')"><i class="ti ti-printer"></i>In hợp đồng</button>'+
+     (String(o.bo_hd_in_at||"").trim()?'<div class="mut" style="font-size:11.5px">đã in '+esc(o.bo_hd_in_at)+(o.bo_hd_in_boi_ten?' · '+esc(o.bo_hd_in_boi_ten):'')+'</div>':'')+
+     (x.anh?'<div style="font-size:11.5px"><i class="ti ti-photo" style="margin-right:4px"></i>'+esc(x.anh)+'</div>':''))
+   :'')+'</td></tr>'});
+ h+='</tbody></table></div>';
+ h+='<div class="fhint" style="margin-top:10px">Học viên bấm xác nhận ở <b>cổng học viên</b> thì dấu bên phải tự lên - chỉ ghi tay khi bạn trao tận tay và học viên không dùng cổng.</div>';
+ h+='<div class="dact"><button class="btn" onclick="closeModal()">Đóng</button></div></div>';
+ openDrawer("Bộ onboarding",h)}
+function obKitGui(id,k){
+ if(k==="lop"){obSendInfo(id);return}   /* thông tin lớp có cửa gửi thật của nó, đừng đẻ cửa thứ hai */
+ var o=find("DL08","onboarding_id",id);if(!o){toast("Không thấy hồ sơ.");return}
+ var g=obGoi(k);if(!g)return;
+ var x=obKit(o).filter(function(y){return y.k===k})[0]||{};
+ var h='<div class="dcard"><h4><i class="ti '+g[2]+'"></i>Giao '+esc(g[1].toLowerCase())+' - '+esc(o.student_id_name||o.student_id||"")+'</h4>';
+ h+=ctxRows([["Lớp",esc(o.class_id_name||o.class_id||"-")],["Nội dung",esc(g[8])]]);
+ if(g[6])h+='<div class="fld full"><label>Gồm những gì <i>*</i></label><input id="obk_mon" value="'+esc(x.mon||obKitMacDinh(k))+'" placeholder="'+esc(obKitMacDinh(k)||"vd: giáo trình + vở ghi")+'"><div class="fhint">Điền sẵn theo cấu hình <b>Bộ onboarding</b> ở Cài đặt - sửa được cho từng học viên.</div></div>';
+ if(g[7])h+='<div class="fld"><label>Giao bằng cách nào <i>*</i></label><select id="obk_kenh">'+
+  ["trao tay tại trung tâm","gửi qua chuyển phát","gửi Zalo bản chụp","gửi email bản PDF"]
+   .map(function(c){return '<option value="'+esc(c)+'"'+(x.kenh===c?" selected":"")+'>'+esc(c)+'</option>'}).join("")+'</select></div>';
+ h+='<div class="fld full"><label>Ghi chú</label><input id="obk_ghi" placeholder="vd: giao ở buổi học đầu, có phụ huynh đi cùng"></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="obKitGuiRun(\''+esc(id)+'\',\''+esc(k)+'\')"><i class="ti ti-check"></i>Ghi nhận đã giao</button>'+
+  '<button class="btn" onclick="obKitMo(\''+esc(id)+'\')"><i class="ti ti-arrow-left"></i>Quay lại</button></div></div>';
+ openDrawer("Giao "+g[1].toLowerCase(),h)}
+function obKitGuiRun(id,k){var o=find("DL08","onboarding_id",id);if(!o)return;
+ var g=obGoi(k);if(!g)return;
+ if(!actGuard("obKitGui:"+id+":"+k))return;
+ var v={};v[g[3]]=nowStr();
+ if(g[6]){var mon=(fldV("obk_mon")||"").trim();
+  if(!mon){toast("Ghi rõ giao những gì thì sau này mới đối chiếu được.");return}
+  v[g[6]]=mon}
+ if(g[7])v[g[7]]=fldV("obk_kenh")||"";
+ var gc=(fldV("obk_ghi")||"").trim();
+ v.onboarding_note=(o.onboarding_note?o.onboarding_note+" | ":"")+"Giao "+g[1]+" "+nowStr()+(gc?" - "+gc:"");
+ closeModal();
+ obMark(id,v,"Đã ghi nhận giao "+g[1].toLowerCase()+" - chờ học viên xác nhận đã nhận.");
+ obKitMo(id)}
+function obKitNhan(id,k){var o=find("DL08","onboarding_id",id);if(!o){toast("Không thấy hồ sơ.");return}
+ var g=obGoi(k);if(!g||k==="lop")return;
+ var h='<div class="dcard"><h4><i class="ti ti-checkbox"></i>Ghi nhận học viên đã nhận '+esc(g[1].toLowerCase())+'</h4>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Học viên bấm xác nhận ở <b>cổng của họ</b> thì dấu này tự lên. Chỉ ghi tay khi bạn <b>trao tận tay</b> và học viên không dùng cổng.</div>';
+ /* Ảnh là BẮT BUỘC ở đường ghi tay của hợp đồng, và chỉ ở đường này - đúng luật đã đặt cho
+    "ghi nhận ký cam kết tại trung tâm": học viên tự bấm ở cổng thì chính cú bấm là bằng chứng,
+    còn nhân viên bấm hộ mà không có ảnh thì nó y hệt một cái nút tự phong. */
+ if(g[5])h+=attachBox("obn","Ảnh bản hợp đồng học viên đã nhận (bắt buộc)");
+ h+='<div class="fld full"><label>Ghi chú</label><input id="obn_ghi" placeholder="vd: nhận tại quầy '+esc(nowStr().slice(0,10))+'"></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="obKitNhanRun(\''+esc(id)+'\',\''+esc(k)+'\')"><i class="ti ti-check"></i>Ghi nhận đã nhận</button>'+
+  '<button class="btn" onclick="obKitMo(\''+esc(id)+'\')"><i class="ti ti-arrow-left"></i>Quay lại</button></div></div>';
+ openDrawer("Ghi nhận đã nhận",h)}
+function obKitNhanRun(id,k){var o=find("DL08","onboarding_id",id);if(!o)return;
+ var g=obGoi(k);if(!g||k==="lop")return;
+ if(!actGuard("obKitNhan:"+id+":"+k))return;
+ var anh=g[5]?attachVal("obn"):"";
+ if(g[5]&&!anh){toast("Phải đính ảnh bản hợp đồng học viên đã nhận - không có ảnh thì để học viên tự xác nhận ở cổng.",5200);return}
+ var v={};v[g[4]]=nowStr();
+ if(g[5]&&anh)v[g[5]]=anh;
+ var gc=(fldV("obn_ghi")||"").trim();
+ v.onboarding_note=(o.onboarding_note?o.onboarding_note+" | ":"")+"HV nhận "+g[1]+" "+nowStr()+(gc?" - "+gc:"")+(anh?" | Ảnh: "+anh:"");
+ closeModal();
+ obMark(id,v,"Đã ghi nhận học viên nhận "+g[1].toLowerCase()+".");
+ obKitMo(id)}
+/* ═══ IN HỢP ĐỒNG NHẬP HỌC ══════════════════════════════════════════════════════════════════
+   Anh Luân: *"In hợp đồng, xác nhận đã nhận hợp đồng"*. App đã có `printEnroll` (phiếu xác nhận
+   đăng ký) nhưng đó là PHIẾU - một tờ tóm tắt số tiền, không có điều khoản, không có chỗ ký.
+   Hợp đồng phải mang được thứ mà tờ phiếu không mang: nội dung quy định lớp học và cam kết
+   (CH2 `commitText`, cùng bản mà học viên ký ở cổng), và hai ô chữ ký.
+   *Bản in ra giấy phải nói CÙNG một nội dung với bản học viên bấm đồng ý trên màn hình - hai
+   bản khác nhau thì chữ ký trên giấy đang ký vào một thứ khác.*
+   In xong thì đóng mốc `bo_hd_in_at` - "đã in" là một trạng thái thật, khác hẳn "đã trao". */
+function obInHopDong(id){var o=find("DL08","onboarding_id",id);if(!o){toast("Không thấy hồ sơ.");return}
+ var sid=String(o.student_id||"");
+ var S=find("DL09","student_id",sid)||{};
+ var e=rows("DL06").filter(function(x){return String(x.student_id||"")===sid&&String(x.enrollment_id||"")===String(o.enrollment_id||"")})[0]
+  ||rows("DL06").filter(function(x){return String(x.student_id||"")===sid&&!isc(x.enrollment_status,"cancelled")})[0]||{};
+ var c=o.class_id?find("DL10","class_id",o.class_id):null;
+ var hot=paramStr("centerHotline",""),addr=paramStr("centerAddress","");
+ var gh=ghTen(S),ghq=ghQuanHe(S),ghs=ghSdt(S);
+ var w=window.open("","_blank");if(!w){toast("Trình duyệt chặn cửa sổ in - cho phép popup rồi thử lại.");return}
+ var so="HĐ-"+String(e.enrollment_id||o.onboarding_id||"").replace(/^ENR-/,"");
+ var row=function(a,b){return '<tr><td>'+a+'</td><td>'+b+'</td></tr>'};
+ w.document.write('<html><head><title>Hợp đồng nhập học '+esc(so)+'</title><style>'+
+  'body{font-family:Arial,sans-serif;max-width:600px;margin:24px auto;color:#1E2A38;font-size:13px;line-height:1.5}'+
+  'h2{text-align:center;margin:4px 0}.c{text-align:center;color:#666;font-size:12px}'+
+  'table{width:100%;border-collapse:collapse;margin:12px 0}td{padding:6px 4px;border-bottom:1px solid #E3E9F0;vertical-align:top}'+
+  'td:first-child{color:#666;width:36%}h3{font-size:13px;margin:16px 0 6px}'+
+  'ol{margin:0;padding-left:18px}li{margin:3px 0}'+
+  '.sg{display:flex;gap:24px;margin-top:26px}.sg div{flex:1;text-align:center}'+
+  '.sg b{display:block;margin-bottom:52px;font-size:12.5px}'+
+  '.sm{font-size:11px;color:#999;text-align:center;margin-top:18px}'+
+  '</style></head><body>'+
+  '<h2>IELTS THE TUTORS</h2><div class="c">'+esc(addr||"")+(hot?(' · Hotline: '+esc(hot)):'')+'</div>'+
+  '<h2 style="margin-top:16px">HỢP ĐỒNG NHẬP HỌC</h2>'+
+  '<div class="c">Số: '+esc(so)+' · Ngày in: '+esc(nowStr())+' · Bản quy định '+esc(commitVer())+'</div>'+
+  '<h3>1. Thông tin học viên</h3><table>'+
+  row("Học viên",'<b>'+esc(S.full_name||o.student_id_name||sid)+'</b>')+
+  row("Mã học viên",esc(sid))+
+  (S.phone?row("Điện thoại",esc(S.phone)):"")+
+  (gh?row("Người đồng hành",esc(gh)+(ghq?" ("+esc(ghq)+")":"")+(ghs?" · "+esc(ghs):"")):"")+
+  '</table><h3>2. Khóa học và lớp</h3><table>'+
+  row("Khóa học",esc(e.course_id_name||e.course_id||""))+
+  (c?row("Lớp",esc((c.class_name||"")+(c.class_schedule?" · "+c.class_schedule:""))):"")+
+  (c&&c.class_start_date?row("Thời gian học",esc(String(c.class_start_date).slice(0,10)+(c.class_end_date?" → "+String(c.class_end_date).slice(0,10):""))):"")+
+  (c&&c.main_teacher_id_name?row("Giảng viên chính",esc(c.main_teacher_id_name)):"")+
+  '</table><h3>3. Học phí</h3><table>'+
+  row("Học phí gốc",vnd(num(e.total_fee)))+
+  (num(e.discount_amount)>0?row("Ưu đãi","- "+vnd(num(e.discount_amount))):"")+
+  row("Học phí phải đóng",'<b>'+vnd(num(e.final_fee)||num(e.total_fee))+'</b>')+
+  row("Đã đóng",vnd(num(e.paid_amount)))+
+  row("Còn lại",vnd(num(e.remaining_amount))+(e.next_payment_due?(" (hẹn thu "+esc(e.next_payment_due)+")"):""))+
+  '</table>'+
+  (function(){var L=[];try{L=insOf(e.enrollment_id)}catch(x){L=[]}
+   if(!L||L.length<2)return "";
+   var t='<h3>4. Lịch đóng học phí theo đợt</h3><table>';
+   L.forEach(function(x){t+=row("Đợt "+esc(x.installment_no)+"/"+esc(x.installment_of),
+    esc(x.due_date||"-")+" · "+vnd(num(x.due_amount)))});
+   return t+'</table>'})()+
+  /* Bộ bàn giao in thẳng vào hợp đồng: học viên cầm tờ này về là biết mình được nhận những gì,
+     và chính tờ này là cái để đối chiếu khi thiếu món. */
+  (function(){var K=obKit(o).filter(function(x){return x.ap&&x.k!=="lop"&&x.k!=="hd"});
+   if(!K.length)return "";
+   var t='<h3>5. Bộ tài liệu và quà đi kèm</h3><table>';
+   K.forEach(function(x){t+=row(esc(x.ten),esc(x.mon||"theo quy định của trung tâm"))});
+   return t+'</table>'})()+
+  '<h3>6. Quy định lớp học và cam kết</h3><ol>'+
+  commitDong().map(function(x){return '<li>'+esc(x.replace(/^\d+[.)]\s*/,""))+'</li>'}).join("")+'</ol>'+
+  '<div class="sg"><div><b>ĐẠI DIỆN TRUNG TÂM</b>(ký, ghi rõ họ tên)</div>'+
+  '<div><b>'+(gh?"HỌC VIÊN / NGƯỜI ĐỒNG HÀNH":"HỌC VIÊN")+'</b>(ký, ghi rõ họ tên)</div></div>'+
+  '<div class="sm">In từ hệ thống vận hành ITTs · '+esc(so)+' · bản quy định '+esc(commitVer())+'</div>'+
+  '<script>window.print()<\/script></body></html>');
+ w.document.close();
+ obMark(id,{bo_hd_in_at:nowStr(),bo_hd_in_boi:(CURSTAFF||""),bo_hd_in_boi_ten:myName()},
+  "Đã in hợp đồng "+so+" - bước tiếp: trao cho học viên rồi đánh dấu đã giao.")}
 function stuCourse(sid){var e=rows("DL06").filter(function(x){return x.student_id===sid&&!/cancel/.test(ecode(x.enrollment_status))})[0]||rows("DL06").filter(function(x){return x.student_id===sid})[0]||{};return {course_id:e.course_id||"",course_name:e.course_id_name||""}}
 /* ═══ V9.30 (N3) - GHÉP ĐÚNG CẶP KHÓA - LỚP - TIỀN CỦA MỘT HỌC VIÊN ═══
    Bẫy đã cắn: drawer xem nhanh lấy `stuCourse(sid)` (đơn ĐẦU TIÊN) cho ô "Khóa" và lấy dòng DL08
@@ -19892,7 +20165,9 @@ function xlSegs(fil,obs,wait){
    GHI CHÚ chạy hết bề ngang, nằm dưới cùng khối lọc - đọc trọn câu, không tranh chỗ với chip. */
 function xlNote(){
  return 'Hạn gửi thông tin lớp '+slaChip("slaClassInfoZalo_hours",24)+
-  ' · hạn hoàn tất onboarding '+slaChip("slaOBT_hours",72)+' - quá là vào nhóm Quá hạn.'}
+  ' · hạn hoàn tất onboarding '+slaChip("slaOBT_hours",72)+' - quá là vào nhóm Quá hạn.'+
+  ' · Dải <b>bộ onboarding</b> trên mỗi thẻ: mỗi món hai ô - <b>ô trước</b> là trung tâm đã giao, '+
+  '<b>ô sau</b> là học viên đã xác nhận nhận.'}
 function xlLoc(fil,obs,wait,ct){
  return locKhoi([locR("",timHTML("xeplop")),
   locR("Bước onboarding",xlSegs(fil,obs,wait)),
@@ -19976,7 +20251,7 @@ function renderXeplop(){var fil=window.XLFILT||"all";var obs=srows("DL08");
  var MIX=jIndex();
  view.forEach(function(o){var s=obState(o);var sid=o.student_id;
   var chg=num(o.placement_change_count);
-  h+='<div class="obcard"><div class="obh"><div><div class="obten"><b>'+nguoiLnk(sid,o.student_id_name)+'</b><div class="obm">Lớp: '+lopLnk(o.class_id,o.class_id_name,"chưa xếp")+' · '+esc(sid||"")+(chg?' · <span style="color:var(--amber)">đã đổi lớp '+chg+' lần</span>':'')+'</div></div>'+'<div class="obst">'+mstripFor(sid,MIX)+(s.rejected?'<span class="chip red">HV từ chối cam kết</span>':(s.infoOverdue?'<span class="chip red">Quá hạn gửi info</span>':(s.obOverdue?'<span class="chip red">Quá hạn onboarding</span>':(s.done?'<span class="chip green">Hoàn tất</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div></div></div>';
+  h+='<div class="obcard"><div class="obh"><div><div class="obten"><b>'+nguoiLnk(sid,o.student_id_name)+'</b><div class="obm">Lớp: '+lopLnk(o.class_id,o.class_id_name,"chưa xếp")+' · '+esc(sid||"")+(chg?' · <span style="color:var(--amber)">đã đổi lớp '+chg+' lần</span>':'')+'</div></div>'+'<div class="obst">'+mstripFor(sid,MIX)+(s.rejected?'<span class="chip red">HV từ chối cam kết</span>':(s.infoOverdue?'<span class="chip red">Quá hạn gửi info</span>':(s.obOverdue?'<span class="chip red">Quá hạn onboarding</span>':(s.done?'<span class="chip green">Hoàn tất</span>':'<span class="chip amber">Đang xử lý</span>'))))+'</div>'+obKitChips(o,o.onboarding_id)+'</div></div>';
   h+='<div class="steps">'+stepHTML("Xếp lớp",true)+stepHTML("Gửi info",s.sent)+stepHTML("HV ký cam kết",s.confirmed)+stepHTML("Hoàn tất",s.done)+'</div>';
   /* MOI NUT MOT O CO DINH. So nut doi theo trang thai (dong thi 4 nut, dong thi 2), nen neu
      de chung don sat nhau thi dong nao thieu nut la moi thu truot ngang - "Hoan tat" nam mot
@@ -24291,6 +24566,7 @@ function renderTrangHV(){
    '<button class="btn sm" onclick="hvClassReject(\''+esc(ob.onboarding_id)+'\')"><i class="ti ti-x"></i>Tôi có thắc mắc, xin liên hệ lại</button></div></div>'}
  if(isc(ob.class_confirmation_status,"rejected"))
   h+='<div class="notebar" style="margin-bottom:16px"><i class="ti ti-info-circle"></i>Bạn đã báo lịch lớp này không hợp. Trung tâm đang tìm lớp khác và sẽ liên hệ lại với bạn.</div>';
+ h+=hvKitBlock(ob);
  /* HỌC PHÍ: tổng - ưu đãi - đã đóng - CÒN LẠI đặt cạnh nhau cho dễ đối chiếu */
  if(tot>0||paysC.length){
   h+=hvSec("s-hocphi")+'<div class="panel" id="s-hocphi" style="margin-bottom:16px"><div class="ph"><b>Học phí khóa '+esc(lop?lop.class_name:(enr.course_id_name||""))+'</b>'+
@@ -25074,6 +25350,71 @@ function commitHTML(txt,ver){
  if(!ds.length)return '<div class="mut">(chưa khai nội dung quy định - vào Cài đặt > Quy định &amp; cam kết lớp học)</div>';
  return '<div class="ctxcontent ccblue"><div class="cch">Quy định lớp học &amp; cam kết'+(ver?(' · bản '+esc(ver)):"")+'</div>'+
   '<div class="ccb">'+ds.map(function(x){return esc(x)}).join("<br>")+'</div></div>'}
+/* ═══ 26/08 - BỘ HỒ SƠ NHẬP HỌC Ở CỔNG HỌC VIÊN ═══════════════════════════════════════════
+   Nửa còn lại của bộ onboarding. Bên nhân viên đánh dấu ĐÃ GIAO; ở đây học viên đánh dấu ĐÃ
+   NHẬN - và chỉ được đánh dấu món trung tâm đã giao. Món chưa giao vẫn HIỆN RA (xám, "trung
+   tâm chưa giao") chứ không giấu: học viên phải thấy mình còn thiếu gì mới hỏi được, giấu đi
+   là bắt họ tự nhớ danh mục.
+   *Cái ô không tick được vẫn phải nhìn thấy - nó là lời hứa chưa trả.*
+   Món "Thông tin lớp" ở đây CHỈ ĐỌC: chỗ xác nhận của nó là khối "Quy định lớp học & cam kết"
+   phía trên, nơi có nguyên văn để đọc trước khi ký. Đẻ thêm một nút xác nhận ở đây là mở đường
+   ký mà không đọc. */
+function hvKitBlock(ob){
+ if(!ob||!ob.onboarding_id)return "";
+ var K=obKit(ob).filter(function(x){return x.ap});
+ if(!K.length)return "";
+ var cho=K.filter(function(x){return x.gui&&!x.nhan&&x.k!=="lop"}).length;
+ var h=hvSec("s-bogiao")+'<div class="sechd" id="s-bogiao">Bộ hồ sơ nhập học'+
+  (cho?' <span class="chip amber">'+cho+' món chờ bạn xác nhận</span>':'')+'</div>';
+ h+='<div class="panel" style="margin-bottom:16px"><div class="pbody"><div class="hvkit">';
+ K.forEach(function(x){
+  var st=x.nhan?"ok":(x.gui?"wait":"none");
+  h+='<div class="hvkr '+st+'"><i class="ti '+(x.nhan?"ti-circle-check":x.ic)+'"></i>'+
+   '<div class="hvkt"><b>'+esc(x.ten)+'</b><span>'+esc(x.mon||x.mo)+'</span></div>'+
+   '<div class="hvks">'+
+    (x.nhan?((x.k==="lop"?'Bạn đã xác nhận ngày ':'Bạn đã nhận ngày ')+esc(String(x.nhan).slice(0,10)))
+     :(x.gui?('Trung tâm đã giao '+esc(String(x.gui).slice(0,10))+(x.kenh?' · '+esc(x.kenh):''))
+       :'Trung tâm chưa giao'))+
+   '</div><div class="hvka">'+
+    (x.nhan?''
+     :(x.k==="lop"
+       ?'<span class="mut" style="font-size:11px">xác nhận ở khối Quy định lớp học phía trên</span>'
+       :(x.gui
+         ?'<button class="btn primary sm" onclick="hvKitNhan(\''+esc(ob.onboarding_id)+'\',\''+esc(x.k)+'\')"><i class="ti ti-check"></i>Tôi đã nhận</button>'
+         :'<span class="mut" style="font-size:11px">chờ trung tâm</span>')))+
+   '</div></div>'});
+ h+='</div>';
+ h+='<div class="fhint" style="margin-top:8px">Chưa nhận đủ? Nhắn cho trung tâm ở mục <b>Trao đổi với trung tâm</b>, hoặc gọi hotline.</div>';
+ h+='</div></div>';
+ return h}
+function hvKitNhan(obid,k){
+ var o=find("DL08","onboarding_id",obid);if(!o){toast("Không thấy hồ sơ.");return}
+ var g=obGoi(k);if(!g||k==="lop")return;
+ if(!String(o[g[3]]||"").trim()){toast("Trung tâm chưa giao món này - chờ trung tâm giao rồi bạn xác nhận nhé.",4200);return}
+ /* Hợp đồng thì mời chụp ảnh bản đã nhận - đây chính là đường anh Luân dặn ("chụp ảnh hợp đồng
+    khi đã nhận upload lên"). KHÔNG bắt buộc ở đây: chính cú bấm của học viên trong cổng đã là
+    bằng chứng, bắt thêm ảnh là dựng một cái cửa mà nhiều người sẽ bỏ dở giữa chừng. Bắt buộc
+    chỉ áp cho đường nhân viên bấm hộ. */
+ if(g[5]){
+  var h='<div class="dcard"><h4><i class="ti '+g[2]+'"></i>Xác nhận đã nhận '+esc(g[1].toLowerCase())+'</h4>';
+  h+='<div class="hvaskb" style="margin-bottom:10px">Bạn đã nhận bản hợp đồng có chữ ký của trung tâm. Chụp lại bản bạn đang giữ và tải lên giúp trung tâm nhé - sau này cần đối chiếu thì có sẵn, bạn không phải tìm lại tờ giấy.</div>';
+  h+=attachBox("hvk","Ảnh bản hợp đồng bạn đang giữ (nên có)");
+  h+='<div class="dact"><button class="btn primary" onclick="hvKitNhanRun(\''+esc(obid)+'\',\''+esc(k)+'\')"><i class="ti ti-check"></i>Xác nhận đã nhận</button>'+
+   '<button class="btn" onclick="closeModal()">Để lúc khác</button></div></div>';
+  openDrawer("Xác nhận đã nhận hợp đồng",h);return}
+ hvKitNhanRun(obid,k)}
+function hvKitNhanRun(obid,k){
+ if(!actGuard("hvKitNhan:"+obid+":"+k))return;
+ var o=find("DL08","onboarding_id",obid);if(!o)return;
+ var g=obGoi(k);if(!g||k==="lop")return;
+ var anh=g[5]?attachVal("hvk"):"";
+ o[g[4]]=nowStr();
+ if(g[5]&&anh)o[g[5]]=anh;
+ var v={};v[g[4]]=o[g[4]];if(g[5]&&anh)v[g[5]]=anh;
+ if(SVR)try{google.script.run.apiUpdate("DL08",obid,v)}catch(e){}   /* CỬA NỐI RA BACKEND */
+ persistSoon();closeModal();
+ toast("Cảm ơn bạn - trung tâm đã ghi nhận bạn nhận "+g[1].toLowerCase()+"."+(anh?" Ảnh đã lưu vào hồ sơ.":""),4200);
+ hvReRender()}
 function hvClassConfirm(obid){
  if(!actGuard("hvClassConfirm:"+obid))return;
  var o=find("DL08","onboarding_id",obid);if(!o){toast("Không thấy hồ sơ xếp lớp.");return}
@@ -35633,6 +35974,7 @@ function enter(k){
 var HVSEC=[
  ["s-khoa","Khóa của bạn","ti-school"],
  ["s-lop","Lớp của bạn","ti-users-group"],
+ ["s-bogiao","Bộ hồ sơ nhập học","ti-package"],
  ["s-hocphi","Học phí","ti-cash"],
  ["s-xacnhan","Trung tâm đã xác nhận","ti-circle-check"],
  ["s-hanhtrinh","Hành trình cùng ITTs","ti-route"],
@@ -35731,7 +36073,7 @@ function hvXungLoc(h){
    *Một bảng vừa xếp menu vừa xếp trang thì mỗi lần đổi nó là đổi hai thứ - phải đọc lại cả hai
    bộ luật, không chỉ bộ mình đang nghĩ tới.* */
 var HVGRP=[["Khóa và lớp của bạn",["s-khoa","s-lop"]],
- ["Cần bạn xử lý",["s-hocphi","s-saptoi","s-khaosat"]],
+ ["Cần bạn xử lý",["s-bogiao","s-hocphi","s-saptoi","s-khaosat"]],
  ["Theo dõi việc học",["s-xacnhan","s-hanhtrinh","s-tiendo","s-diem","s-buoihoc","s-wow","s-khuyennghi","s-chungnhan"]],
  ["Nói chuyện với trung tâm",["s-hoidap","s-gopy","s-gioithieu"]]];
 function hvGo(id){hvCloseSide();var el=document.getElementById(id);if(!el)return;
@@ -35802,10 +36144,22 @@ function hvSoHocPhi(sid){
   if(isc(x.installment_status,"paid"))return false;
   var d=pvnd(x.due_date);
   return d&&(d.getTime()-truoc)<=nay}).length}
+/* Bộ hồ sơ nhập học: đếm món trung tâm ĐÃ GIAO mà học viên chưa xác nhận nhận - đúng những
+   món có nút bấm được ở khối ấy. Món chưa giao thì không phải việc của học viên (chờ trung
+   tâm), và "Thông tin lớp" xác nhận ở khối cam kết chứ không ở đây - đếm cả hai loại vào huy
+   hiệu là hứa một cái nút không tồn tại.
+   *Huy hiệu phải đếm đúng số nút bấm được, không đếm số dòng nhìn thấy.* */
+function hvSoBoGiao(sid){
+ var n=0;
+ rows("DL08").forEach(function(o){
+  if(String(o.student_id||"")!==String(sid))return;
+  obKit(o).forEach(function(x){if(x.ap&&x.k!=="lop"&&x.gui&&!x.nhan)n++})});
+ return n}
 function hvDemViec(sid,sv){
  sid=String(sid||"");
- var d={"s-hocphi":0,"s-khaosat":0,"s-hoidap":0};
+ var d={"s-hocphi":0,"s-khaosat":0,"s-hoidap":0,"s-bogiao":0};
  if(!sid)return d;
+ try{d["s-bogiao"]=hvSoBoGiao(sid)}catch(e){}
  try{d["s-hocphi"]=hvSoHocPhi(sid)}catch(e){}
  try{d["s-khaosat"]=hvSoKhaoSat(sv||[])}catch(e){}
  /* Chế độ phụ huynh KHÔNG thấy mục Trao đổi (chuyện riêng của học viên) - nên cũng không đếm
