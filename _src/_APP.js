@@ -22339,13 +22339,33 @@ function hvHdonBlock(){
        ' - kế toán xuất trong '+hdonHan()+' ngày làm việc')
       :'Chưa yêu cầu hóa đơn cho khóa này'))+
    '</div><div class="hvka">'+
-    (s.daXuat?'':(s.daYeuCau?'<span class="chip amber">đang xuất</span>'
+    /* ═══ 26/08 - XUẤT RỒI THÌ PHẢI XEM ĐƯỢC (anh Luân: *"có xem được file pdf hóa đơn ko"*) ═══
+       Bản đầu cổng chỉ IN RA SỐ hóa đơn rồi thôi - học viên biết là đã có, mà không mở được tờ
+       giấy, nên vẫn phải nhắn xin. Tức app làm xong việc khó (xuất) rồi dừng lại trước việc dễ.
+       *Nói với người ta rằng thứ họ cần đã tồn tại, mà không đưa cho họ, thì tin ấy chỉ làm họ
+       phải đi hỏi.*
+       Bản in dùng ĐÚNG hàm của bên nhân viên (`inHoaDon`) - một tờ hóa đơn, một khuôn; hai
+       khuôn cho cùng một số hóa đơn là hai tờ giấy khác nhau mang cùng một số. */
+    (s.daXuat?('<button class="btn sm" onclick="hvHdonXem(\''+esc(e.enrollment_id||"")+'\')"><i class="ti ti-printer"></i>Xem / lưu PDF</button>')
+     :(s.daYeuCau?'<span class="chip amber">đang xuất</span>'
      :'<button class="btn primary sm" onclick="hvHdonForm(\''+esc(e.enrollment_id||"")+'\')"><i class="ti ti-receipt"></i>Yêu cầu xuất hóa đơn</button>'))+
    '</div></div>'});
  h+='</div>';
- h+='<div class="fhint" style="margin-top:8px">Công ty trả học phí cho bạn thì điền tên và mã số thuế của công ty - đọc qua điện thoại rất dễ sai, mà sai một chữ là phải xuất lại tờ khác.</div>';
+ h+='<div class="fhint" style="margin-top:8px">Công ty trả học phí cho bạn thì điền tên và mã số thuế của công ty - đọc qua điện thoại rất dễ sai, mà sai một chữ là phải xuất lại tờ khác.'+
+  '<br>Hóa đơn đã xuất: bấm <b>Xem / lưu PDF</b> để mở bản in - trong hộp in của trình duyệt chọn <b>Lưu thành PDF</b> là có file gửi cho công ty.</div>';
  h+='</div></div>';
  return h}
+/* Cổng học viên chỉ được mở hóa đơn CỦA CHÍNH MÌNH. `inHoaDon` nhận một mã đơn và không hỏi
+   ai đang xem - nó viết cho màn nhân viên, nơi phạm vi đã được `srows` cắt từ trước. Gọi thẳng
+   nó từ cổng là để ngỏ một cửa đọc theo mã.
+   *Một hàm an toàn ở màn này không tự nhiên an toàn ở màn khác - cái giữ an toàn là phạm vi
+   của màn, mà phạm vi thì không đi theo hàm.* */
+function hvHdonXem(eid){
+ var S=hvMe();if(!S){toast("Không thấy hồ sơ của bạn.");return}
+ var e=find("DL06","enrollment_id",eid);
+ if(!e||String(e.student_id||"")!==String(S.student_id)){toast("Không mở được hóa đơn này.");return}
+ if(!String(e.hdon_so||"").trim()){toast("Khóa này chưa xuất hóa đơn.");return}
+ inHoaDon(eid)}
 function hvHdonForm(eid){
  var e=find("DL06","enrollment_id",eid);if(!e){toast("Không thấy đơn đăng ký.");return}
  var S=hvMe()||{};
