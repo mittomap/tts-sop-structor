@@ -6020,7 +6020,7 @@ var COTTAY={
  congno:function(){var a=[["cn_ma","Mã"],["cn_ten","Họ tên"],["cn_khoa","Khoá"],
    ["cn_tong","Tổng giá trị"],["cn_thu","Đã thu"],["cn_con","Còn phải thu"]];
   if((window.REPKY||"all")!=="all")a.push(["cn_ky","Thu trong kỳ"]);
-  return a.concat([["cn_dot","Đợt đã đóng đủ"],["cn_ke","Đợt kế tiếp"],["cn_ct","Chứng từ"]])},
+  return a.concat([["cn_dot","Đợt đã đóng đủ"],["cn_ke","Đợt kế tiếp"],["cn_ct","Chứng từ"],["cn_hdon","Hóa đơn"]])},
  /* ── V2 18/08 - MƯỜI HAI SỔ DỰNG TAY CÒN LẠI ───────────────────────────────────────────────
     Ranh giới em đặt (và khai ra để lần sau không phải đoán lại): gắn nút Cột cho **SỔ CHÍNH
     của trang** - cuốn sổ người ta mở trang ra để đọc. Bảng phụ nằm trong ngăn kéo, trong hồ sơ
@@ -19646,6 +19646,7 @@ var CFNHOM=[
     thân trang theo bảng nhóm này nên một nhóm không khai làm cả màn gãy giữa chừng.
     *Bảng tham số và bảng nhóm là hai bảng; sửa một bên không tự sửa bên kia, và bên bị quên
     không im lặng - nó làm hỏng cả cái màn chứa nó.* */
+ ["Hóa đơn","Hạn xuất hóa đơn sau khi học viên yêu cầu, thuế suất GTGT ghi trên hóa đơn và mã số thuế của trung tâm. Đây là nhóm của kế toán - đổi ở đây thì mọi hóa đơn in ra sau đó đổi theo.",["congno","ketthuc"]],
  ["Bộ onboarding","Bộ sách - giáo trình và quà tặng đi kèm mà trung tâm giao cho học viên mới. Khai ở đây để màn giao món điền sẵn, vẫn sửa được cho từng học viên; đổi đợt ưu đãi thì đổi ở đây một lần.",["xeplop"]],
  ["Hệ thống & dữ liệu demo","Nhật ký thao tác giữ bao nhiêu dòng, hoàn tác được trong bao nhiêu giây, và dữ liệu demo cũ bao nhiêu ngày thì tự kéo về hiện tại.",["settings"]]];
 var CFNHOMBY={};CFNHOM.forEach(function(x,i){CFNHOMBY[x[0]]={d:x[1],pg:x[2],ord:i}});
@@ -19785,6 +19786,12 @@ var APPPARAMS=[
  /* Nội dung bộ onboarding - thứ trung tâm đổi theo từng đợt (hết sách bản cũ, đổi quà khuyến
     mãi), nên nó phải nằm ở Cài đặt chứ không cắm cứng trong mã. Đây là giá trị ĐIỀN SẴN khi
     học vụ mở màn giao món, vẫn sửa được cho từng học viên. */
+ /* Hóa đơn - thứ kế toán phải xuất sau khi học viên kết thúc khóa. Ba núm vặn, mỗi cái trả lời
+    một câu người ngồi ở Cài đặt sẽ hỏi: bao lâu phải xuất · thuế suất ghi bao nhiêu · mã số thuế
+    của trung tâm in trên hóa đơn là gì. */
+ ["Hóa đơn","invoiceIssue_days","Học viên (hoặc công ty của họ) đã yêu cầu hóa đơn thì trong bao nhiêu ngày kế toán phải xuất - quá hạn thì hồ sơ nổi đỏ ở trang Công nợ","ngày",7],
+ ["Hóa đơn","invoiceVat_percent","Thuế suất GTGT ghi trên hóa đơn. Dịch vụ đào tạo thường KHÔNG chịu thuế GTGT - để 0 thì hóa đơn in dòng \"Không chịu thuế GTGT\"","%",0],
+ ["Hóa đơn","invoiceSeller_mst","Mã số thuế của trung tâm, in ở phần đơn vị bán trên hóa đơn","chữ","","text"],
  ["Bộ onboarding","obKitSach","Bộ sách & giáo trình mặc định giao cho học viên mới - điền sẵn ở màn giao món","chữ","Cambridge IELTS 18 + vở ghi ITTs","text"],
  ["Bộ onboarding","obKitQua","Quà tặng đi kèm mặc định của đợt ưu đãi đang chạy - để trống nếu đợt này không có quà","chữ","Túi vải ITTs + bình nước","text"],
  ["Trung tâm","centerHotline","Hotline hiện trong tin nhắn xác nhận và phiếu thu","chữ","","text"],
@@ -22970,17 +22977,193 @@ function payReceipt(eid,amt,method,ref,payId){var e=find("DL06","enrollment_id",
  var msg=payMsgText(e,amt,method,ref);
  var remN=Math.max(0,(num(e.final_fee)||num(e.total_fee))-num(e.paid_amount));
  var h='<div class="dcard"><h4><i class="ti ti-receipt"></i>Đã thu '+vnd(amt)+(remN>0?' · còn lại '+vnd(remN):' · ĐỦ HỌC PHÍ')+'</h4>';
- h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Copy tin bên dưới dán vào Zalo cho khách, hoặc in phiếu thu đưa tận tay. Khép trọn một lần chốt.</div>';
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Copy tin bên dưới dán vào Zalo cho khách, hoặc in phiếu thu đưa tận tay. Bản in gồm <b>hai tờ</b>: phiếu thu (trung tâm giữ) và <b>quy định lớp học bản '+esc(commitVer())+'</b> (học viên cầm về, ký nhận). Khép trọn một lần chốt.</div>';
  h+='<div class="fld full"><label>Tin nhắn xác nhận (sửa được trước khi copy)</label><textarea id="prc_msg" rows="5">'+esc(msg)+'</textarea></div>';
  h+='<div class="dact"><button class="btn primary" onclick="hvCopy(fldV(\'prc_msg\'),\'Đã copy tin xác nhận - dán vào Zalo cho khách.\')"><i class="ti ti-copy"></i>Copy tin Zalo</button>'+
-  '<button class="btn" onclick="printReceipt(\''+esc(eid)+'\','+amt+',\''+esc(payId||"")+'\')"><i class="ti ti-receipt"></i>In phiếu thu</button>'+
+  '<button class="btn" onclick="printReceipt(\''+esc(eid)+'\','+amt+',\''+esc(payId||"")+'\')"><i class="ti ti-receipt"></i>In phiếu thu kèm quy định</button>'+
   '<button class="btn" onclick="closeModal()"><i class="ti ti-arrow-right"></i>Xong - tiếp tục</button></div></div>';
  openDrawer("Xác nhận thu tiền",h)}
+/* ═══ 26/08 - HÓA ĐƠN SAU KHI HOÀN THÀNH KHÓA HỌC ═════════════════════════════════════════════
+   Anh Luân: *"Bổ sung xuất hóa đơn sau khi hoàn thành khóa học"*.
+
+   Trước bản này app KHÔNG CÓ hóa đơn ở bất kỳ đâu. Có phiếu thu (chứng từ nội bộ, ai đưa tiền
+   thì ký nhận), có hợp đồng, có phiếu xác nhận đăng ký - nhưng hóa đơn là một tờ khác hẳn: nó
+   dành cho BÊN THỨ BA, thường là công ty của học viên đang trả học phí, và nó là thứ duy nhất
+   họ mang đi quyết toán. Học viên đi làm hỏi hóa đơn thì kế toán đang xử lý hoàn toàn ngoài app.
+
+   BA TRẠNG THÁI, KHÔNG PHẢI HAI: chưa ai hỏi tới · học viên ĐÃ YÊU CẦU mà chưa xuất · đã xuất.
+   Chỉ có "đã xuất / chưa xuất" thì hàng chờ của kế toán biến mất - mà cái đáng nhắc chính là
+   khúc giữa: có người đang đợi.
+   *Một việc chỉ trở thành việc khi có người đợi nó; gộp "chưa ai hỏi" với "có người đang đợi"
+   là xoá mất hàng chờ.*
+
+   MỐC LÀ ĐƠN ĐĂNG KÝ (DL06), không phải phiếu thu: một khóa học có thể đóng làm ba đợt, nhưng
+   hóa đơn xuất MỘT LẦN cho cả khóa sau khi học xong. Gắn vào phiếu thu là đẻ ra ba hóa đơn.
+   Điều kiện xuất: học viên đã có bản ghi KẾT THÚC KHÓA (DL18) với trạng thái hoàn thành - đúng
+   câu anh Luân đặt ("sau khi hoàn thành khóa học"). */
+function hdonHan(){return Math.max(1,num(paramOf("invoiceIssue_days",7)))}
+function hdonVat(){return Math.max(0,num(paramOf("invoiceVat_percent",0)))}
+var _hdC=null,_hdV=-1;
+/* Đơn nào đã học xong: enrollment_id -> dòng DL18. Đọc theo ĐƠN chứ không theo học viên - một
+   người học hai khóa thì khóa này xong không có nghĩa khóa kia xong. */
+function hdonXongKhoa(){
+ if(_hdC&&_hdV===DVER)return _hdC;
+ var o={};
+ rows("DL18").forEach(function(r){
+  var e=String(r.enrollment_id||"");if(!e)return;
+  if(!isc(r.student_status,"completed"))return;o[e]=r});
+ _hdV=DVER;return (_hdC=o)}
+function hdonState(e){e=e||{};
+ var so=String(e.hdon_so||"").trim(),yc=String(e.hdon_yc_luc||"").trim();
+ var xong=!!hdonXongKhoa()[String(e.enrollment_id||"")];
+ var tre=false;
+ if(xong&&!so&&yc){var d=pvnd(yc);if(d)tre=((Date.now()-d.getTime())/864e5)>hdonHan()}
+ return {xong:xong,daXuat:!!so,daYeuCau:!!yc,cho:xong&&!so&&!!yc,tre:tre,
+  so:so,ngay:String(e.hdon_ngay||"").trim()}}
+/* Số hóa đơn: HDON-<năm>-<4 số>, lấy số lớn nhất ĐANG CÓ của năm nay rồi cộng một - không đếm
+   theo số dòng đã xuất, vì huỷ một hóa đơn rồi xuất tiếp là trùng số ngay. */
+function hdonSoMoi(){
+ var nam=new Date().getFullYear(),max=0;
+ rows("DL06").forEach(function(x){
+  var m=String(x.hdon_so||"").match(/^HDON-(\d{4})-(\d+)$/);
+  if(m&&m[1]===String(nam))max=Math.max(max,parseInt(m[2],10)||0)});
+ var t=String(max+1);while(t.length<4)t="0"+t;
+ return "HDON-"+nam+"-"+t}
+/* Số tiền bằng chữ - hóa đơn nào cũng có dòng này và nó không suy ra được từ chỗ khác. Viết ra
+   một lần ở đây thay vì để người dùng tự gõ: gõ tay thì số và chữ có ngày nói hai con số khác
+   nhau, mà tờ giấy ấy là thứ mang đi quyết toán. */
+var HDCHU=["không","một","hai","ba","bốn","năm","sáu","bảy","tám","chín"];
+function hdon3(n,dayDu){
+ var tr=Math.floor(n/100),ch=Math.floor((n%100)/10),dv=n%10,s="";
+ if(tr>0)s+=HDCHU[tr]+" trăm";
+ else if(dayDu)s+="không trăm";
+ if(ch>1)s+=" "+HDCHU[ch]+" mươi";
+ else if(ch===1)s+=" mười";
+ else if(dv>0&&(tr>0||dayDu))s+=" lẻ";
+ if(dv>0){
+  if(ch>1&&dv===1)s+=" mốt";
+  else if(ch>=1&&dv===5)s+=" lăm";
+  else s+=" "+HDCHU[dv]}
+ return s.replace(/\s+/g," ").trim()}
+function vndChu(v){
+ var n=Math.round(num(v));if(!(n>0))return "Không đồng";
+ var don=["", " nghìn"," triệu"," tỷ"],kh=[],out="";
+ while(n>0){kh.push(n%1000);n=Math.floor(n/1000)}
+ for(var i=kh.length-1;i>=0;i--){if(kh[i]===0)continue;
+  out+=" "+hdon3(kh[i],i<kh.length-1)+(don[i]||"")}
+ out=out.replace(/\s+/g," ").trim();
+ return out.charAt(0).toUpperCase()+out.slice(1)+" đồng"}
+/* Hàng chờ của kế toán: đơn đã học xong, đã có người hỏi, chưa xuất. */
+function hdonCho(){
+ return srows("DL06").filter(function(e){return hdonState(e).cho})}
+function hdonForm(eid){
+ var e=find("DL06","enrollment_id",eid);if(!e){toast("Không thấy đơn đăng ký.");return}
+ var s=hdonState(e);
+ if(!s.xong){toast("Chỉ xuất hóa đơn SAU KHI học viên hoàn thành khóa - đơn này chưa có bản ghi kết thúc khóa.",5400);return}
+ if(s.daXuat){hdonXem(eid);return}
+ var daTra=num(e.paid_amount);
+ var S=find("DL09","student_id",e.student_id)||{};
+ var h='<div class="dcard"><h4><i class="ti ti-receipt"></i>Xuất hóa đơn - '+esc(e.student_id_name||e.student_id||"")+'</h4>';
+ h+=ctxRows([["Khóa học",esc(e.course_id_name||e.course_id||"-")],
+  ["Đơn đăng ký",esc(eid)],
+  ["Kết thúc khóa",esc((hdonXongKhoa()[String(eid)]||{}).course_completion_time||"-")],
+  ["Đã đóng",'<b>'+vnd(daTra)+'</b>'],
+  ["Học viên yêu cầu lúc",s.daYeuCau?esc(e.hdon_yc_luc):'<span class="mut">chưa ai yêu cầu - bạn đang chủ động xuất</span>']]);
+ h+='<div class="notebar" style="margin:0 0 10px"><i class="ti ti-info-circle"></i>Hóa đơn xuất <b>một lần cho cả khóa</b>, không xuất theo từng đợt đóng. Số tiền không được vượt quá số học viên đã thực đóng.</div>';
+ h+='<div class="fld full"><label>Tên người / đơn vị nhận hóa đơn <i>*</i></label><input id="hd_ten" value="'+esc(e.hdon_ten||e.student_id_name||"")+'" placeholder="Cá nhân thì ghi tên học viên, công ty trả thì ghi tên công ty"></div>';
+ h+='<div class="fld"><label>Mã số thuế</label><input id="hd_mst" value="'+esc(e.hdon_mst||"")+'" placeholder="để trống nếu xuất cho cá nhân"></div>';
+ h+='<div class="fld"><label>Số tiền trên hóa đơn <i>*</i></label><input id="hd_tien" type="number" min="0" value="'+(num(e.hdon_tien)||daTra)+'"><div class="fhint">Mặc định bằng số đã đóng '+vnd(daTra)+'.</div></div>';
+ h+='<div class="fld full"><label>Địa chỉ</label><input id="hd_dc" value="'+esc(e.hdon_diachi||S.address||"")+'"></div>';
+ h+='<div class="fld full"><label>Email nhận hóa đơn</label><input id="hd_mail" value="'+esc(e.hdon_email||S.email||"")+'" placeholder="hóa đơn điện tử gửi về địa chỉ này"></div>';
+ h+='<div class="fld full"><label>Ghi chú</label><input id="hd_ghi" value="'+esc(e.hdon_ghi||"")+'" placeholder="vd: công ty của học viên thanh toán học phí"></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="hdonLuu(\''+esc(eid)+'\')"><i class="ti ti-receipt"></i>Xuất hóa đơn và in</button>'+
+  '<button class="btn" onclick="closeModal()">Hủy</button></div></div>';
+ openDrawer("Xuất hóa đơn",h)}
+function hdonLuu(eid){
+ var e=find("DL06","enrollment_id",eid);if(!e)return;
+ if(!hdonState(e).xong){toast("Đơn này chưa có bản ghi kết thúc khóa.");return}
+ if(String(e.hdon_so||"").trim()){toast("Đơn này đã có hóa đơn "+e.hdon_so+" - không xuất hai lần.",4600);return}
+ var ten=(fldV("hd_ten")||"").trim();
+ if(!ten){toast("Ghi tên người hoặc đơn vị nhận hóa đơn.");return}
+ var tien=num(fldV("hd_tien"));
+ if(tien<=0){toast("Số tiền trên hóa đơn phải lớn hơn 0.");return}
+ /* CHẶN Ở CỬA GHI, không chỉ nhắc bằng một dòng chữ. Xuất hóa đơn quá số tiền đã thu là chuyện
+    thuế, không phải chuyện giao diện - và người vội thì không đọc dòng chữ. */
+ var daTra=num(e.paid_amount);
+ if(tien>daTra){toast("Hóa đơn "+vnd(tien)+" lớn hơn số học viên đã thực đóng ("+vnd(daTra)+") - không xuất được.",5600);return}
+ if(!actGuard("hdonLuu:"+eid))return;
+ var v={hdon_so:hdonSoMoi(),hdon_ngay:nowStr(),hdon_boi:(CURSTAFF||""),hdon_boi_ten:myName(),
+  hdon_ten:ten,hdon_mst:(fldV("hd_mst")||"").trim(),hdon_diachi:(fldV("hd_dc")||"").trim(),
+  hdon_email:(fldV("hd_mail")||"").trim(),hdon_tien:String(tien),hdon_ghi:(fldV("hd_ghi")||"").trim()};
+ if(!String(e.hdon_yc_luc||"").trim())v.hdon_yc_luc=nowStr();
+ for(var k in v)e[k]=v[k];
+ if(SVR)try{google.script.run.apiUpdate("DL06",eid,v)}catch(x){}   /* CỬA NỐI RA BACKEND */
+ persistSoon();closeModal();
+ toast("Đã xuất hóa đơn "+v.hdon_so+" cho "+ten+" - "+vnd(tien)+".",5200);
+ reRender(CUR);
+ inHoaDon(eid)}
+function hdonXem(eid){
+ var e=find("DL06","enrollment_id",eid);if(!e){toast("Không thấy đơn đăng ký.");return}
+ var s=hdonState(e);
+ if(!s.daXuat){hdonForm(eid);return}
+ var h='<div class="dcard"><h4><i class="ti ti-receipt"></i>Hóa đơn '+esc(e.hdon_so)+'</h4>';
+ h+=ctxRows([["Học viên",nguoiLnk(e.student_id,e.student_id_name,e.student_id)],
+  ["Khóa học",esc(e.course_id_name||e.course_id||"-")],
+  ["Bên nhận hóa đơn",'<b>'+esc(e.hdon_ten||"-")+'</b>'+(e.hdon_mst?(' · MST '+esc(e.hdon_mst)):'')],
+  ["Địa chỉ",esc(e.hdon_diachi||"-")],
+  ["Email nhận",esc(e.hdon_email||"-")],
+  ["Số tiền",'<b>'+vnd(num(e.hdon_tien))+'</b>'],
+  ["Xuất lúc",esc(e.hdon_ngay||"-")+(e.hdon_boi_ten?(" · "+esc(e.hdon_boi_ten)):"")],
+  ["Học viên yêu cầu lúc",esc(e.hdon_yc_luc||"-")]]);
+ if(String(e.hdon_ghi||"").trim())h+=ctxContent("Ghi chú",e.hdon_ghi,"var(--navy)");
+ h+='<div class="dact"><button class="btn primary" onclick="inHoaDon(\''+esc(eid)+'\')"><i class="ti ti-printer"></i>In lại hóa đơn</button>'+
+  '<button class="btn" onclick="closeModal()">Đóng</button></div></div>';
+ openDrawer("Hóa đơn "+e.hdon_so,h)}
+function inHoaDon(eid){
+ var e=find("DL06","enrollment_id",eid)||{};
+ if(!String(e.hdon_so||"").trim()){toast("Đơn này chưa xuất hóa đơn.");return}
+ var hot=paramStr("centerHotline",""),addr=paramStr("centerAddress",""),mst=paramStr("invoiceSeller_mst","");
+ var vat=hdonVat(),tien=num(e.hdon_tien);
+ var thue=Math.round(tien*vat/100),tong=tien+thue;
+ var ce=hdonXongKhoa()[String(eid)]||{};
+ var w=window.open("","_blank");if(!w){toast("Trình duyệt chặn cửa sổ in - cho phép popup rồi thử lại.");return}
+ var row=function(a,b){return '<tr><td>'+a+'</td><td>'+b+'</td></tr>'};
+ w.document.write('<html><head><title>Hóa đơn '+esc(e.hdon_so)+'</title><style>'+
+  'body{font-family:Arial,sans-serif;max-width:600px;margin:24px auto;color:#1E2A38;font-size:13px;line-height:1.5}'+
+  'h2{text-align:center;margin:4px 0}.c{text-align:center;color:#666;font-size:12px}'+
+  'table{width:100%;border-collapse:collapse;margin:12px 0}td{padding:6px 4px;border-bottom:1px solid #E3E9F0;vertical-align:top}'+
+  'td:first-child{color:#666;width:36%}h3{font-size:13px;margin:16px 0 6px}'+
+  '.sig{display:flex;justify-content:space-between;margin-top:28px;text-align:center;font-size:12.5px}.sig div{width:45%}'+
+  '.sm{font-size:11px;color:#999;text-align:center;margin-top:20px}'+
+  '</style></head><body>'+
+  '<h2>IELTS THE TUTORS</h2><div class="c">'+esc(addr||"")+(hot?(' · Hotline: '+esc(hot)):'')+(mst?(' · MST: '+esc(mst)):'')+'</div>'+
+  '<h2 style="margin-top:16px">HÓA ĐƠN DỊCH VỤ ĐÀO TẠO</h2>'+
+  '<div class="c">Số: '+esc(e.hdon_so)+' · Ngày xuất: '+esc(e.hdon_ngay||nowStr())+'</div>'+
+  '<h3>Bên nhận hóa đơn</h3><table>'+
+  row("Tên đơn vị / cá nhân",'<b>'+esc(e.hdon_ten||e.student_id_name||"")+'</b>')+
+  (e.hdon_mst?row("Mã số thuế",esc(e.hdon_mst)):"")+
+  (e.hdon_diachi?row("Địa chỉ",esc(e.hdon_diachi)):"")+
+  (e.hdon_email?row("Email nhận hóa đơn",esc(e.hdon_email)):"")+
+  '</table><h3>Nội dung</h3><table>'+
+  row("Dịch vụ",esc("Học phí khóa "+(e.course_id_name||e.course_id||"")))+
+  row("Học viên",esc(e.student_id_name||e.student_id||""))+
+  (ce.course_completion_time?row("Hoàn thành khóa",esc(ce.course_completion_time)):"")+
+  row("Thành tiền",vnd(tien))+
+  row("Thuế GTGT",vat>0?(vat+"% · "+vnd(thue)):"Không chịu thuế GTGT (dịch vụ đào tạo)")+
+  row("Tổng cộng",'<b>'+vnd(tong)+'</b>')+
+  row("Bằng chữ",'<i>'+esc(vndChu(tong))+'</i>')+
+  '</table>'+
+  (String(e.hdon_ghi||"").trim()?('<div class="c" style="text-align:left;margin-top:8px">Ghi chú: '+esc(e.hdon_ghi)+'</div>'):'')+
+  '<div class="sig"><div>Người nhận hóa đơn<br><br><br>(Ký, họ tên)</div>'+
+  '<div>Đại diện đơn vị bán<br><br><br>(Ký, họ tên, đóng dấu)</div></div>'+
+  '<div class="sm">In từ hệ thống vận hành ITTs · '+esc(e.hdon_so)+'</div>'+
+  '<script>window.print()<\/script></body></html>');
+ w.document.close()}
 function printReceipt(eid,amt,payId){var e=find("DL06","enrollment_id",eid)||{};
  var hot=paramStr("centerHotline",""),addr=paramStr("centerAddress","");
  var rem=Math.max(0,(num(e.final_fee)||num(e.total_fee))-num(e.paid_amount));
  var w=window.open("","_blank");if(!w){toast("Trình duyệt chặn cửa sổ in - cho phép popup rồi thử lại.");return}
- w.document.write('<html><head><title>Phiếu thu '+esc(payId||"")+'</title><style>body{font-family:Arial,sans-serif;max-width:520px;margin:24px auto;color:#1E2A38;font-size:14px}h2{text-align:center;margin:4px 0}.c{text-align:center;color:#666;font-size:12px}table{width:100%;border-collapse:collapse;margin:14px 0}td{padding:7px 4px;border-bottom:1px solid #E3E9F0}td:first-child{color:#666;width:38%}.sig{display:flex;justify-content:space-between;margin-top:28px;text-align:center;font-size:12.5px}.sig div{width:45%}.sm{font-size:11px;color:#999;text-align:center;margin-top:20px}</style></head><body>'+
+ w.document.write('<html><head><title>Phiếu thu '+esc(payId||"")+'</title><style>body{font-family:Arial,sans-serif;max-width:520px;margin:24px auto;color:#1E2A38;font-size:14px}h2{text-align:center;margin:4px 0}.c{text-align:center;color:#666;font-size:12px}table{width:100%;border-collapse:collapse;margin:14px 0}td{padding:7px 4px;border-bottom:1px solid #E3E9F0}td:first-child{color:#666;width:38%}.sig{display:flex;justify-content:space-between;margin-top:28px;text-align:center;font-size:12.5px}.sig div{width:45%}.sm{font-size:11px;color:#999;text-align:center;margin-top:20px}.qd{page-break-before:always;padding-top:8px}.qd ol{margin:14px 0 0;padding-left:18px}.qd li{margin:6px 0;font-size:13px}</style></head><body>'+
   '<h2>IELTS THE TUTORS</h2><div class="c">'+esc(addr||"")+(hot?(' · Hotline: '+esc(hot)):'')+'</div><h2 style="margin-top:16px">PHIẾU THU HỌC PHÍ</h2><div class="c">Số: '+esc(payId||"-")+' · Ngày: '+esc(nowStr())+'</div>'+
   /* V9.40d: phiếu thu ghi ĐÚNG tên người nộp. Nếu hồ sơ khai người giám hộ là người đóng thì
      phải in tên họ, không phải tên em - đây là chỗ kế toán hay bị hỏi lại và là chỗ SOP đã mô tả
@@ -22993,9 +23176,41 @@ function printReceipt(eid,amt,payId){var e=find("DL06","enrollment_id",eid)||{};
   '<tr><td>Còn lại</td><td>'+(rem>0?vnd(rem):"0đ - đã đủ học phí")+'</td></tr>'+
   '<tr><td>Người thu</td><td>'+esc(myName())+'</td></tr></table>'+
   '<div class="sig"><div>Người nộp tiền<br><br><br>(Ký, họ tên)</div><div>Người thu tiền<br><br><br>(Ký, họ tên)</div></div>'+
-  '<div class="sm">Phiếu in từ hệ thống vận hành ITTs</div>'+
+  '<div class="sm">Phiếu in từ hệ thống vận hành ITTs · kèm bản quy định lớp học '+esc(commitVer())+' ở trang sau</div>'+
+  /* ═══ 26/08 - QUY ĐỊNH IN KÈM PHIẾU THU, IN NGAY LÚC ĐÓNG TIỀN ══════════════════════════════
+     Anh Luân: *"Xuất phiếu thu + quy định ngay khi đóng tiền"*.
+     Lúc đóng tiền là lúc DUY NHẤT chắc chắn có mặt cả học viên lẫn người trả tiền, và là lúc họ
+     CHƯA học buổi nào - tức chưa có gì để tranh cãi. Đưa tờ quy định vào đúng lúc ấy thì mọi
+     tranh chấp sau này về nghỉ học, bảo lưu, hoàn phí đều có một mốc để trả về. Đưa muộn, lúc đã
+     học nửa khóa, thì nó chỉ còn là một tờ giấy.
+     NỘI DUNG LẤY TỪ CH2 `commitText` - CÙNG bản học viên bấm đồng ý ở cổng và cùng bản in trong
+     hợp đồng. Ba nơi một nguồn, nếu không thì tờ giấy cầm về nói khác cái nút đã bấm.
+     TRANG RIÊNG (`page-break-before`): phiếu thu là chứng từ kế toán giữ, tờ quy định là thứ học
+     viên cầm về - hai người giữ hai tờ, nên chúng không được nằm chung một trang. */
+  (function(){var ds=commitDong();
+   if(!ds.length)return "";
+   return '<div class="qd"><h2>QUY ĐỊNH LỚP HỌC &amp; CAM KẾT</h2>'+
+    '<div class="c">Bản '+esc(commitVer())+' · giao cho học viên lúc đóng học phí '+esc(nowStr())+'</div>'+
+    '<div class="c" style="margin-top:6px">'+esc(e.student_id_name||e.student_id||"")+
+    ' · khóa '+esc(e.course_id_name||e.course_id||"")+'</div>'+
+    '<ol>'+ds.map(function(x){return '<li>'+esc(x.replace(/^\d+[.)]\s*/,""))+'</li>'}).join("")+'</ol>'+
+    '<div class="sig"><div>Người nộp tiền<br>đã đọc và đồng ý<br><br>(Ký, họ tên)</div>'+
+    '<div>Đại diện trung tâm<br><br><br>(Ký, họ tên)</div></div>'+
+    '<div class="sm">Bản quy định '+esc(commitVer())+' - in kèm phiếu thu '+esc(payId||"")+'</div></div>'})()+
   '<script>window.print()<\/script></body></html>');
- w.document.close()}
+ w.document.close();
+ ptGhiQD(payId)}
+/* Ghi lại BẢN quy định đã giao, không chỉ ghi "đã in". Nội dung quy định sửa được trong Cài đặt và
+   có số hiệu bản; in ra mà chỉ ghi "đã in phiếu thu" thì ba tháng sau không ai nói được học viên
+   ấy cầm về bản nào - mà tranh chấp thì luôn hỏi đúng câu đó.
+   *Một tờ giấy giao đi mà không ghi lại NÓ GHI GÌ thì lưu vết ấy chứng minh được có giấy, không
+   chứng minh được nội dung.* */
+function ptGhiQD(payId){
+ var r=payId?find("DL07","payment_id",payId):null;if(!r)return;
+ var v={qd_ban:commitVer(),phieu_in_luc:nowStr()};
+ for(var k in v)r[k]=v[k];
+ if(SVR)try{google.script.run.apiUpdate("DL07",payId,v)}catch(e){}   /* CỬA NỐI RA BACKEND */
+ persistSoon()}
 /* HAI LỐI THOÁT IM LẶNG - đã vá. `_checknv` bắt được: bấm Lưu mà KHÔNG GHI, KHÔNG BÁO gì cả.
    Luật chấm của bộ kiểm ấy viết ra đúng để canh chuyện này: bấm Lưu xong chỉ hai kết cục được
    tính là đạt - app GHI, hoặc app TỪ CHỐI CÓ LỜI. Im lặng là kiểu hỏng nguy hiểm nhất vì người
@@ -24160,6 +24375,15 @@ function renderKetthuc(){var p="ketthuc",fil=fget(p);var all=srows("DL18");
  var MIX=jIndex();
  view.forEach(function(r){var s=st(r);var id=r.course_end_id;
   h+='<div class="obcard"><div class="obh"><div><b>'+nguoiLnk(r.student_id||r.lead_id,r.student_id_name||r.lead_id_name)+'</b><div class="obm">'+lopLnk(r.class_id,r.class_id_name,"")+(r.final_test_score?" · Overall "+esc(r.final_test_score):"")+'</div></div>'+mstripFor(r.student_id,MIX)+(s.closed?'<span class="chip green">Xong</span>':(s.scored?'<span class="chip '+(r.achievement_status?stCls(r.achievement_status):"")+'">'+esc(elabel(r.achievement_status)||"Đã có KQ")+'</span>':'<span class="chip">Chờ kết quả</span>'))+'</div>';
+  /* Chip hóa đơn ở đây là ĐỂ ĐỌC, không phải để bấm: Học vụ mở trang này, còn xuất hóa đơn là
+     việc của Kế toán ở trang Công nợ. Vẫn phải hiện, vì học viên hỏi hóa đơn thì họ hỏi đúng
+     người vừa gọi mời tái đăng ký - và câu trả lời phải nằm ngay trên màn ấy.
+     Chỉ hiện khi CÓ CHUYỆN: đã xuất, hoặc có người đang đợi. Không ai hỏi thì không vẽ gì -
+     một chip "chưa xuất" trên mọi thẻ là một việc tồn bịa ra cho cả trang. */
+  (function(){var _e=r.enrollment_id?find("DL06","enrollment_id",r.enrollment_id):null;
+   if(!_e)return;var hs=hdonState(_e);
+   if(hs.daXuat)h+='<div class="obm2"><span class="chip green">Hóa đơn '+esc(_e.hdon_so)+'</span> <span class="mut">xuất '+esc(String(_e.hdon_ngay||"").split(" ")[0])+'</span></div>';
+   else if(hs.cho)h+='<div class="obm2"><span class="chip '+(hs.tre?"red":"amber")+'">Học viên đã yêu cầu hóa đơn</span> <span class="mut">kế toán xuất ở trang Công nợ học viên</span></div>'})();
   h+=stepBar([["Kết thúc",true],["Kết quả đầu ra",s.scored],["Mời tái ĐK",s.invited],["Chốt",s.closed]]);
   h+='<div class="obact">';
   if(!s.scored)h+='<button class="btn primary sm" onclick="ktResult(\''+esc(id)+'\')"><i class="ti ti-writing"></i>Nhập kết quả đầu ra</button>';
@@ -24851,6 +25075,28 @@ function renderTrangHV(){
    h+='<div class="hvaskf" style="padding:0 14px 12px">'+
     '<button class="btn primary sm" onclick="hvPaidNotify(\''+esc(enr.enrollment_id||"")+'\')"><i class="ti ti-upload"></i>Tôi đã chuyển khoản</button>'+
     '<span class="mut" style="font-size:11px;align-self:center">Báo để kế toán đối soát nhanh - bạn không cần gọi điện.</span></div>'}
+  /* ═══ 26/08 - HỌC VIÊN TỰ HỎI HÓA ĐƠN Ở CỔNG CỦA HỌ ═══════════════════════════════════════
+     Hóa đơn là thứ học viên đi làm cần để công ty thanh toán học phí - mà trước bản này họ chỉ
+     có một đường: gọi điện. Kế toán nghe điện rồi ghi ra giấy, và tờ giấy ấy không ở trong app.
+     Ở đây học viên khai thẳng tên đơn vị và mã số thuế - hai thứ mà đọc qua điện thoại là sai,
+     và sai một chữ trên hóa đơn là phải xuất lại.
+     Chỉ hiện khi ĐÃ HỌC XONG khóa ấy: hóa đơn xuất một lần sau khi hoàn thành khóa, mời họ hỏi
+     sớm hơn là hứa một thứ chưa tới lượt. */
+  (function(){var _hs=hdonState(enr);
+   if(!_hs.xong)return;
+   if(_hs.daXuat){
+    h+='<div class="hvaskf" style="padding:0 14px 12px"><span class="chip green">Đã xuất hóa đơn '+esc(enr.hdon_so)+'</span>'+
+     '<span class="mut" style="font-size:11px;align-self:center">Ngày '+esc(String(enr.hdon_ngay||"").split(" ")[0])+' · cho '+esc(enr.hdon_ten||"")+
+     (enr.hdon_email?(" · đã gửi về "+esc(enr.hdon_email)):"")+'. Cần bản khác thì nhắn cho trung tâm.</span></div>';
+    return}
+   if(_hs.daYeuCau){
+    h+='<div class="hvaskf" style="padding:0 14px 12px"><span class="chip amber">Đang xuất hóa đơn</span>'+
+     '<span class="mut" style="font-size:11px;align-self:center">Bạn đã yêu cầu ngày '+esc(String(enr.hdon_yc_luc||"").split(" ")[0])+
+     ' - kế toán xuất trong '+hdonHan()+' ngày làm việc.</span></div>';
+    return}
+   h+='<div class="hvaskf" style="padding:0 14px 12px">'+
+    '<button class="btn sm" onclick="hvHdonForm(\''+esc(enr.enrollment_id||"")+'\')"><i class="ti ti-receipt"></i>Yêu cầu xuất hóa đơn</button>'+
+    '<span class="mut" style="font-size:11px;align-self:center">Bạn đã hoàn thành khóa này - cần hóa đơn cho công ty thì yêu cầu ở đây.</span></div>'})();
   h+='</div>';
   /* Bảng này trước đây không có tên: ngay dưới nút "Tôi đã chuyển khoản" là một cái bảng trần
      bốn cột, người đọc phải tự đoán nó đang liệt kê cái gì (lịch phải đóng? hay đã đóng?).
@@ -25662,6 +25908,41 @@ function hvKitNhanRun(obid,k){
  if(SVR)try{google.script.run.apiUpdate("DL08",obid,v)}catch(e){}   /* CỬA NỐI RA BACKEND */
  persistSoon();closeModal();
  toast("Cảm ơn bạn - trung tâm đã ghi nhận bạn nhận "+g[1].toLowerCase()+"."+(anh?" Ảnh đã lưu vào hồ sơ.":""),4200);
+ hvReRender()}
+/* Cửa yêu cầu hóa đơn ở cổng học viên. Hỏi đủ bốn thứ hóa đơn cần, và hỏi MỘT LẦN: gọi điện đọc
+   mã số thuế thì sai một chữ là phải xuất lại tờ khác. */
+function hvHdonForm(eid){
+ var e=find("DL06","enrollment_id",eid);if(!e){toast("Không thấy đơn đăng ký.");return}
+ var S=hvMe()||{};
+ var h='<div class="dcard"><h4><i class="ti ti-receipt"></i>Yêu cầu xuất hóa đơn</h4>';
+ h+='<div class="hvaskb" style="margin-bottom:10px">Khóa <b>'+esc(e.course_id_name||e.course_id||"")+'</b> · học phí đã đóng <b>'+vnd(num(e.paid_amount))+'</b>.'+
+  ' Điền đúng tên và mã số thuế trên giấy phép của đơn vị nhé - sai một chữ là phải xuất lại tờ khác.</div>';
+ h+='<div class="fld full"><label>Xuất cho ai <i>*</i></label><input id="hvhd_ten" value="'+esc(S.full_name||"")+'" placeholder="Tên bạn, hoặc tên công ty trả học phí"></div>';
+ h+='<div class="fld"><label>Mã số thuế</label><input id="hvhd_mst" placeholder="để trống nếu xuất cho cá nhân"></div>';
+ h+='<div class="fld"><label>Email nhận hóa đơn</label><input id="hvhd_mail" value="'+esc(S.email||"")+'"></div>';
+ h+='<div class="fld full"><label>Địa chỉ trên hóa đơn</label><input id="hvhd_dc" value="'+esc(S.address||"")+'"></div>';
+ h+='<div class="dact"><button class="btn primary" onclick="hvHdonGui(\''+esc(eid)+'\')"><i class="ti ti-send"></i>Gửi yêu cầu</button>'+
+  '<button class="btn" onclick="closeModal()">Để lúc khác</button></div></div>';
+ openDrawer("Yêu cầu xuất hóa đơn",h)}
+function hvHdonGui(eid){
+ if(!actGuard("hvHdon:"+eid))return;
+ var e=find("DL06","enrollment_id",eid);if(!e){toast("Không thấy đơn đăng ký.");return}
+ var ten=(fldV("hvhd_ten")||"").trim();
+ if(!ten){toast("Cho trung tâm biết xuất hóa đơn cho ai nhé.");return}
+ var v={hdon_yc_luc:nowStr(),hdon_ten:ten,hdon_mst:(fldV("hvhd_mst")||"").trim(),
+  hdon_email:(fldV("hvhd_mail")||"").trim(),hdon_diachi:(fldV("hvhd_dc")||"").trim()};
+ for(var k in v)e[k]=v[k];
+ if(SVR)try{google.script.run.apiUpdate("DL06",eid,v)}catch(x){}   /* CỬA NỐI RA BACKEND */
+ /* Việc bay thẳng sang KẾ TOÁN (`kind:"tien"`), không rơi vào học vụ: người xuất hóa đơn là kế
+    toán, và trang họ mở mỗi sáng là Công nợ học viên - nơi hồ sơ này vừa nổi lên chip "Chờ xuất". */
+ hvReq("Học viên yêu cầu xuất hóa đơn",
+  "Đơn: "+eid+"\nKhóa: "+(e.course_id_name||e.course_id||"")+"\nXuất cho: "+ten+
+  (v.hdon_mst?("\nMã số thuế: "+v.hdon_mst):"")+
+  (v.hdon_diachi?("\nĐịa chỉ: "+v.hdon_diachi):"")+
+  (v.hdon_email?("\nEmail nhận: "+v.hdon_email):"")+
+  "\nSố đã đóng: "+vnd(num(e.paid_amount)),"tien");
+ persistSoon();closeModal();
+ toast("Đã gửi yêu cầu - kế toán xuất hóa đơn trong "+hdonHan()+" ngày làm việc và gửi về cho bạn.",5000);
  hvReRender()}
 function hvClassConfirm(obid){
  if(!actGuard("hvClassConfirm:"+obid))return;
@@ -31209,9 +31490,16 @@ function cnDs(){
      nghĩa là người đi đòi tiền phải tự đi tìm hồ sơ ở trang khác.* */
   if(!theo[key]){theo[key]={sid:sid,pid:sid||String(e.lead_id||""),
     ten:e.student_id_name||e.lead_id_name||sid||"(chưa có hồ sơ)",
-    don:[],tong:0,thu:0,con:0,quahan:0,dot:0,dotDu:0,dodang:[],ky:0,phieu:0,ctAnh:0,ctLy:0,thieu:0,khoa:{},moc:null};
+    don:[],tong:0,thu:0,con:0,quahan:0,dot:0,dotDu:0,dodang:[],ky:0,phieu:0,ctAnh:0,ctLy:0,thieu:0,khoa:{},moc:null,
+    hdXong:0,hdXuat:0,hdCho:0,hdTre:0};
    out.push(theo[key])}
   var G=theo[key];G.don.push(e);
+  /* Hóa đơn đếm theo ĐƠN, không theo người: một người học hai khóa thì khóa này đã xuất hóa đơn
+     không nói gì về khóa kia. */
+  (function(){var hs=hdonState(e);
+   if(!hs.xong)return;
+   G.hdXong++;
+   if(hs.daXuat)G.hdXuat++;else if(hs.daYeuCau){G.hdCho++;if(hs.tre)G.hdTre++}})();
   var tot=num(e.final_fee)||num(e.total_fee);
   G.tong+=tot;G.thu+=num(e.paid_amount);
   G.con+=Math.max(0,tot-num(e.paid_amount));
@@ -31249,6 +31537,7 @@ function cnLocCo(G,k){
     Thẻ đếm một tập mà chip lọc ra tập khác thì bấm vào thẻ ra thiếu người - và người dùng kết
     luận app đếm sai, chứ không kết luận là hai chỗ hỏi hai câu. */
  if(k==="thieu")return (G.thieu+G.ctLy)>0;
+ if(k==="hdon")return G.hdCho>0;
  return true}
 function renderCongno(){
  var all=cnDs(),lc=window.CNLOC||"";
@@ -31291,7 +31580,11 @@ function renderCongno(){
   segHTML(lc,[["","Tất cả",all.length],["no","Còn nợ",all.filter(function(G){return cnLocCo(G,"no")}).length],
    ["quahan","Quá hạn",all.filter(function(G){return cnLocCo(G,"quahan")}).length],
    ["du","Đã đóng đủ",all.filter(function(G){return cnLocCo(G,"du")}).length],
-   ["thieu","Chưa có ảnh chứng từ",all.filter(function(G){return cnLocCo(G,"thieu")}).length]],
+   ["thieu","Chưa có ảnh chứng từ",all.filter(function(G){return cnLocCo(G,"thieu")}).length],
+   /* Hàng chờ của kế toán: học viên đã học xong, đã hỏi hóa đơn, chưa xuất. Đặt trên dải chip
+      này chứ không đẻ một trang mới - người đi đòi tiền và người xuất hóa đơn là một người,
+      và họ mở đúng trang này mỗi sáng. */
+   ["hdon","Chờ xuất hóa đơn",all.filter(function(G){return cnLocCo(G,"hdon")}).length,"amber"]],
    "cnLocSet('{k}')","cn_loc"),
   cotNutHTML("congno")+'<span class="tbcnt">'+ds.length+' học viên</span>'+
   (S("thieu")?('<span class="mut" style="font-size:11px;margin-left:10px">Trong '+(S("thieu")+S("ctLy"))+' phiếu chưa có ảnh, <b>'+S("thieu")+'</b> phiếu chưa khai cả lý do.</span>'):''));
@@ -31314,6 +31607,7 @@ function renderCongno(){
      *Hai bảng dùng chung một cách viết cho hai phép đếm khác nhau thì phải có một bảng đổi tên.* */
   (_c("cn_dot")?'<th>Đợt đã đóng đủ</th>':'')+(_c("cn_ke")?'<th>Đợt kế tiếp</th>':'')+
   (_c("cn_ct")?'<th>Chứng từ</th>':'')+
+  (_c("cn_hdon")?'<th>Hóa đơn</th>':'')+
   '</tr></thead><tbody>';
  var _sc=cotDs("congno").filter(function(c){return _c(c[0])}).length||1;
  if(!ds.length)h+='<tr><td colspan="'+_sc+'"><div class="empty">Không có học viên nào khớp điều kiện đang chọn. '+
@@ -31338,7 +31632,13 @@ function renderCongno(){
    (!_c("cn_ct")?'':'<td>'+(!G.phieu?'<span class="mut">chưa có phiếu</span>'
      :(G.thieu?('<span class="chip red" data-tip="'+esc(G.thieu+" phiếu chưa đính ảnh chứng từ và cũng chưa khai lý do"+(G.ctLy?(", thêm "+G.ctLy+" phiếu mới chỉ khai lý do"):""))+'">thiếu '+G.thieu+'</span>')
        :(G.ctLy?('<span class="chip amber" data-tip="'+esc(G.ctLy+" phiếu chưa có ảnh, mới chỉ khai lý do - đối soát cuối tháng vẫn phải bổ sung ảnh")+'">khai lý do '+G.ctLy+'</span>')
-         :'<span class="chip green" data-tip="'+esc("Cả "+G.ctAnh+" phiếu đều đã đính ảnh chứng từ")+'">đủ</span>')))+'</td>')+'</tr>'});
+         :'<span class="chip green" data-tip="'+esc("Cả "+G.ctAnh+" phiếu đều đã đính ảnh chứng từ")+'">đủ</span>')))+'</td>')+
+   /* Cột hóa đơn chỉ nói khi CÓ CHUYỆN ĐỂ NÓI. Học viên chưa học xong thì hóa đơn chưa tới lượt -
+      vẽ "chưa xuất" ở đó là bịa ra một việc tồn cho cả bảng. */
+   (!_c("cn_hdon")?'':'<td>'+(!G.hdXong?'<span class="mut">chưa tới lượt</span>'
+     :(G.hdCho?('<span class="chip '+(G.hdTre?"red":"amber")+'" data-tip="'+esc(G.hdCho+" đơn học viên đã yêu cầu hóa đơn mà chưa xuất"+(G.hdTre?(", trong đó "+G.hdTre+" đơn đã quá hạn "+hdonHan()+" ngày"):""))+'">chờ xuất '+G.hdCho+'</span>')
+       :(G.hdXuat?('<span class="chip green" data-tip="'+esc("Đã xuất hóa đơn cho "+G.hdXuat+"/"+G.hdXong+" đơn đã học xong")+'">đã xuất '+G.hdXuat+'</span>')
+         :'<span class="mut" data-tip="'+esc(G.hdXong+" đơn đã học xong nhưng chưa ai yêu cầu hóa đơn")+'">chưa ai hỏi</span>')))+'</td>')+'</tr>'});
  h+='</tbody></table></div></div>';
  return h}
 /* Ngăn kéo: từng đơn -> lịch đợt -> từng phiếu thu/chi kèm chứng từ. Đây là chỗ kế toán đối
@@ -31423,6 +31723,15 @@ function cnXem(arg){
    '<button class="btn sm" onclick="insPlanForm(\''+esc(e.enrollment_id)+'\')"><i class="ti ti-calendar-dollar"></i>'+
      (_ins.length>1?"Chia lại lịch đợt":"Chia thành nhiều đợt")+'</button>'+
    '<button class="btn sm" onclick="payForm(\''+esc(e.enrollment_id)+'\')"><i class="ti ti-cash"></i>Ghi nhận thanh toán</button>'+
+   /* HÓA ĐƠN ĐỨNG NGAY CẠNH ĐƠN CỦA NÓ. Hóa đơn thuộc về một ĐƠN ĐĂNG KÝ cụ thể, mà ngăn kéo này
+      đã bày từng đơn thành từng khối - nên cửa xuất hóa đơn phải nằm trong đúng khối ấy, không
+      phải một nút chung ở cuối ngăn kéo. Người có hai đơn mà thấy một nút "Xuất hóa đơn" thì
+      phải đoán nó xuất cho đơn nào. */
+   (function(){var hs=hdonState(e);
+    if(!hs.xong)return '<span class="mut" style="font-size:11px;align-self:center">Hóa đơn xuất sau khi học viên hoàn thành khóa.</span>';
+    if(hs.daXuat)return '<button class="btn sm" onclick="hdonXem(\''+esc(e.enrollment_id)+'\')"><i class="ti ti-receipt"></i>Hóa đơn '+esc(e.hdon_so)+'</button>';
+    return '<button class="btn '+(hs.cho?"primary ":"")+'sm" onclick="hdonForm(\''+esc(e.enrollment_id)+'\')"><i class="ti ti-receipt"></i>Xuất hóa đơn'+
+     (hs.cho?(hs.tre?" (quá hạn)":" (HV đã yêu cầu)"):"")+'</button>'})()+
    '</div>';
   /* AI DUYỆT CHIA ĐỢT, DUYỆT LÚC NÀO (anh Luân 16/08: *"hình như muốn chia nhỏ học phí phải
      được duyệt nhỉ, trong drawer hiển thị ai duyệt và duyệt khi nào, kèm ghi chú nếu có"*).
@@ -36981,13 +37290,13 @@ DOORS = {
  "DL02b":["bkLuuLienHe","bkLuuNhacTest","dupGhiLuot","leadInboundSave","rfNeed","runRejectSave","runTouchSave","testQuickSave"],
  "DL03":["bkLuuTest","bkLuuTuVan","bkLuuNhacTest","rfNeed","testAttend","testBook","testNoShowSave","testQuickSave","testRebookSave","testRefuse","testResultSave","tvSave","testEnd"],
  "DL04":["bkLuuTuVan","rfNeed","runSkipTest","tvCloseSave","tvEnrollSave","tvQuickSave","tvSave","testConsult"],
- "DL06":["cancelEnrollRun","paySave","rfNeed","runCancelEnroll","tvEnrollSave","insSync","debtRemind"],
+ "DL06":["cancelEnrollRun","paySave","rfNeed","runCancelEnroll","tvEnrollSave","insSync","debtRemind","hdonLuu","hvHdonGui"],
  # 17/08 - `dotGhiLich` la cua ghi THAT SU vao DL06b tu khi tach loi: `dotApDung` nay chi dung
  # danh sach goi y roi goi no. Giu ca ba ten: hai ten cu van la duong nguoi ta di vao, con ten
  # moi la cho tay dat but. Khai thieu la `_check15` bat dung - va no bat dung.
  "DL06b":["insPlanSave","dotApDung","dotGhiLich"],
  # 17/08 - cua bo sung chung tu sau khi da ghi phieu (man Cong no hoc vien)
- "DL07":["duyetRefundRun","paySave","payVerifyRun","rfNeed","ctLuu"],
+ "DL07":["duyetRefundRun","paySave","payVerifyRun","rfNeed","ctLuu","ptGhiQD"],
  # 26/08 - hvKitNhanRun: hoc vien tu bam "toi da nhan" mot mon trong bo onboarding o cong cua
  # ho (ghi moc nhan + anh hop dong). Day la cua ghi cua NGUOI NGOAI to chuc nen no cang phai
  # co ten trong ban khai: nhat ky thao tac doc bang nay, thieu ten la mot cu ghi khong ai thay.

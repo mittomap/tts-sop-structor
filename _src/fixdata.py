@@ -4484,6 +4484,106 @@ for _i, _o in enumerate(R("DL08")):
 log.append("30. Bo onboarding DL08: in hop dong %d · trao %d · HV nhan %d · co anh %d"
            % (_n30["in"], _n30["gui"], _n30["nhan"], _n30["anh"]))
 
+# ---- 31. PHIEU THU KEM QUY DINH (DL07) + HOA DON SAU KHI KET THUC KHOA (DL06) ----
+# Anh Luan dat 26/08: *"Bo sung xuat hoa don sau khi hoan thanh khoa hoc -> Xuat phieu thu +
+# quy dinh ngay khi dong tien"*.
+#
+# HAI GIAY TO O HAI DAU CUA MOT DONG TIEN, va truoc khoi nay app chi co mot nua cua mot cai:
+#   · PHIEU THU da in duoc, nhung in TRAN - khong kem quy dinh lop hoc. Ma luc dong tien la luc
+#     DUY NHAT chac chan co mat hoc vien va nguoi tra tien, va la luc HO CHUA HOC BUOI NAO. Dua
+#     to quy dinh vao dung luc ay thi moi tranh chap ve nghi hoc, bao luu, hoan phi ve sau deu co
+#     mot moc de tra ve. Dua sau, luc da hoc nua khoa, thi no chi con la mot to giay.
+#   · HOA DON thi khong co o dau ca. Hoc vien di lam, cong ty tra hoc phi - ho doi hoa don, va
+#     ke toan dang xu ly chuyen ay ngoai app hoan toan.
+#
+# GHI LAI BAN QUY DINH DA GIAO, KHONG CHI GHI "DA IN". Noi dung quy dinh sua duoc trong Cai dat
+# (CH2 `commitText`, co so hieu ban); in ra ma chi ghi "da in phieu thu" thi ba thang sau khong
+# ai noi duoc hoc vien ay cam ve ban nao.
+# *Mot to giay giao di ma khong ghi lai NO GHI GI thi luu vet ay chi chung minh duoc co giay,
+# khong chung minh duoc noi dung.*
+_QD_BAN = "1.0"   # so hieu ban quy dinh hien hanh trong CH2 luc gieo
+_COT31_DL07 = ["qd_ban", "phieu_in_luc"]
+_COT31_DL06 = ["hdon_so", "hdon_ngay", "hdon_boi", "hdon_boi_ten", "hdon_ten", "hdon_mst",
+               "hdon_diachi", "hdon_email", "hdon_tien", "hdon_ghi", "hdon_yc_luc"]
+for _r in R("DL07"):
+    for _c in _COT31_DL07:
+        _r.setdefault(_c, "")
+for _r in R("DL06"):
+    for _c in _COT31_DL06:
+        _r.setdefault(_c, "")
+
+_n31 = {"qd": 0, "hdon": 0, "yc": 0}
+for _i, _r in enumerate(R("DL07")):
+    if n(_r.get("amount")) <= 0:
+        continue
+    _t = dt(_r.get("payment_time"))
+    if not _t:
+        continue
+    # De ho mot phan: co phieu thu in ma quen kem quy dinh - do la viec ton co that o quay.
+    if _i % 7 == 3:
+        continue
+    _r["qd_ban"] = _QD_BAN
+    _r["phieu_in_luc"] = fmt(min(_t + datetime.timedelta(minutes=5), _TRAN30))
+    _n31["qd"] += 1
+
+# HOA DON: chi xuat cho don cua hoc vien DA KET THUC KHOA (dung nhu anh Luan mo ta). Khoi nay
+# chay sau moi khoi khac nen DL18 da day du.
+_KETTHUC = {}
+for _r in R("DL18"):
+    _e = str(_r.get("enrollment_id") or "")
+    if _e and code(_r.get("student_status", "")) == "completed":
+        _KETTHUC[_e] = _r
+_DVI = [
+    ("Công ty TNHH Giải pháp Phần mềm Minh Long", "0312874561", "45 Nguyễn Văn Trỗi, P.12, Q.Phú Nhuận, TP.HCM"),
+    ("Công ty CP Thương mại Dịch vụ An Phát", "0309887712", "120 Cộng Hòa, P.4, Q.Tân Bình, TP.HCM"),
+    ("Ngân hàng TMCP Đông Nam Á - CN Sài Gòn", "0200112233", "88 Lê Lợi, P.Bến Nghé, Q.1, TP.HCM"),
+]
+_nam = NOW.year
+_seq31 = 0
+for _i, _e in enumerate(R("DL06")):
+    _eid = str(_e.get("enrollment_id") or "")
+    _ce = _KETTHUC.get(_eid)
+    if not _ce:
+        continue
+    _xong = dt(_ce.get("course_completion_time")) or _TRAN30
+    # Ba trang thai co that, khong chi hai: da xuat · hoc vien DA YEU CAU ma chua xuat · chua ai hoi.
+    # Bo het thanh "da xuat" la xoa mat hang cho cua ke toan; bo het thanh "chua" la trang trong.
+    # Chi co 12 don du dieu kien (12 dong DL18 hoan thanh co enrollment_id), nen ty le phai
+    # chia sao cho HANG CHO cua ke toan con nhin thay duoc. Lan gieo dau em de 1/3 - 1/3 - 1/3
+    # va hang cho con DUNG HAI dong: mot dai chip ghi "Cho xuat hoa don 2" thi khong ai tin day
+    # la mot hang cho that. *Ty le dep tren mot tap lon co the thanh vo nghia tren mot tap nho -
+    # phai do so dong that truoc khi chon ty le.*
+    if _i % 4 == 3:
+        continue                       # chua ai hoi toi hoa don
+    if _i % 4 in (1, 2):
+        _e["hdon_yc_luc"] = fmt(min(_xong + datetime.timedelta(days=2, hours=10), _TRAN30))
+        _n31["yc"] += 1
+        continue                       # da yeu cau, cho ke toan xuat
+    _seq31 += 1
+    _nv31 = [x for x in R("DL01") if code(x.get("role", "")).startswith("accounting")
+             and code(x.get("status", "")) == "active"]
+    _nv31 = _nv31[0] if _nv31 else ([x for x in R("DL01") if code(x.get("status", "")) == "active"] or [{}])[0]
+    _e["hdon_so"] = "HDON-%d-%04d" % (_nam, _seq31)
+    _e["hdon_ngay"] = fmt(min(_xong + datetime.timedelta(days=3, hours=9), _TRAN30))
+    _e["hdon_boi"] = _nv31.get("staff_id") or ""
+    _e["hdon_boi_ten"] = _nv31.get("full_name") or ""
+    _e["hdon_tien"] = str(int(n(_e.get("paid_amount")) or n(_e.get("final_fee")) or n(_e.get("total_fee"))))
+    if _seq31 % 3 == 1:
+        _dv = _DVI[_seq31 % len(_DVI)]
+        _e["hdon_ten"], _e["hdon_mst"], _e["hdon_diachi"] = _dv[0], _dv[1], _dv[2]
+        _e["hdon_ghi"] = "Công ty của học viên thanh toán học phí - xuất hóa đơn cho đơn vị."
+    else:
+        _e["hdon_ten"] = str(_e.get("student_id_name") or "")
+        _e["hdon_diachi"] = ""
+        _e["hdon_ghi"] = ""
+    _e["hdon_email"] = ""
+    _e["hdon_yc_luc"] = fmt(min(_xong + datetime.timedelta(days=1, hours=14), _TRAN30))
+    _n31["hdon"] += 1
+
+log.append("31. Phieu thu kem quy dinh: %d/%d phieu · Hoa don: %d da xuat, %d dang cho xuat"
+           % (_n31["qd"], len([x for x in R("DL07") if n(x.get("amount")) > 0]),
+              _n31["hdon"], _n31["yc"]))
+
 json.dump(d, open(P, "w", encoding="utf-8"), ensure_ascii=False)
 print("  12. Da tao DL22 referral +", len(dl["DL22"]), "luot | DL19 thuong:", len(dl["DL19"]))
 for _l in log[-6:]: print("  "+_l)

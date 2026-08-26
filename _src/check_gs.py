@@ -43,7 +43,7 @@ GOC = os.environ.get("ITTS_OUT") or os.path.dirname(SD)
 # ra may chu (tang), hoac vua bo mot cua ghi (giam). Sua bua cho het do la tu tuoc vu khi cua minh.
 # 12/08: 66 -> 73. Bay cua ghi moi cua dot feedback bon team, moi cua noi ra backend dung mot cho:
 #   dotTao · dotDuyet (2 cho: DL27 + DL06b) · msgGui · gvdpThangLuu · hdLuu · lopDayHV · nvNhanHVSave
-SVR_GOI = 79   # +1 (13/08): runGiaoLaiRun - cua ghi 'giao lai lead' theo SOP NA046
+SVR_GOI = 82   # +1 (13/08): runGiaoLaiRun - cua ghi 'giao lai lead' theo SOP NA046
                # +1 (18/08): gvNghiLuu - cua ghi 'giao vien bao nghi buoi day' (DL33). Mot cua
                #   ghi moi thi phai co mot cho noi ra backend, neu khong thi mai kia noi that
                #   se co dung mot bang khong bao gio duoc gui di ma khong ai hay.
@@ -59,6 +59,12 @@ SVR_GOI = 79   # +1 (13/08): runGiaoLaiRun - cua ghi 'giao lai lead' theo SOP NA
                #   cua ghi THAT: mot cai ghi xac nhan cua nguoi ngoai to chuc, mot cai gui chu
                #   ra ngoai cho khach - thieu duong noi backend la mai kia noi that thi hoac
                #   xac nhan cua hoc vien khong bao gio ve, hoac thong bao khong bao gio di.
+               # +3 (26/08): ptGhiQD - ghi lai BAN quy dinh da in kem phieu thu (DL07);
+               #   hdonLuu - ke toan xuat hoa don sau khi hoc vien hoan thanh khoa (DL06);
+               #   hvHdonGui - hoc vien tu yeu cau xuat hoa don o cong cua ho (DL06).
+               #   Ca ba deu la giay to co gia tri doi voi ben thu ba (co quan thue, cong ty tra
+               #   hoc phi), nen neu mai kia noi that ma thieu duong noi thi so hoa don sinh ra o
+               #   may nay khong bao gio ve toi so sach - dung loai lech khong ai phat hien som.
 
 XOA = ["ITTs_WebApp.gs", "ITTs_WebApp_v4.gs", "ITTs_Reminders.gs", "ITTs_SeedDemo.gs",
        "ITTs_XuLyDuLieu.gs", "ITTs_Form_NhapLieu.gs", "ITTs_FixCotTinh.gs",
