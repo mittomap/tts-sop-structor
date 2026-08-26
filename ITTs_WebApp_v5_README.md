@@ -2906,3 +2906,19 @@ Thẻ chứng nhận ghi **"Chuyên cần cả khóa"** và **"Bài tập đã n
 buổi và bài của học viên, chốt lúc kết thúc khóa. Dải tiến độ ở mục *Tiến độ của bạn* thì đếm
 theo **lớp đang học**. Học viên học hai lớp sẽ thấy hai con số khác nhau, và cái nhãn nói ra vì
 sao. Cả hai đều đọc từ DL12/DL13, không còn ô nào giữ số tự sinh.
+
+## Người đứng buổi cũng là chủ hồ sơ học viên
+
+Phạm vi dữ liệu của một giáo viên trước đây đi qua `DL10.main_teacher_id` - **người mang tên lớp**.
+Nay nó đi qua `DL11.teacher_id` - **người đứng buổi**. Hai thứ ấy tách nhau ở hai ca:
+
+- **Dạy thay.** Thầy chính báo nghỉ (DL33), học vụ xếp người khác đứng một buổi. Người được xếp
+  thấy ngay lớp ấy và học viên của nó - trước buổi, đúng lúc cần để soạn bài.
+- **Bàn giao lớp giữa khóa.** Lớp sang tên người mới, buổi đã dạy vẫn giữ tên người cũ. Người cũ
+  vẫn xem lại được những em mình đã dạy và những nhận xét chính mình đã viết.
+
+Lấy theo LỚP chứ không theo điểm danh: điểm danh chỉ có sau khi buổi đã diễn ra.
+
+Xếp người dạy thay ghi vào **cả hai đầu** - lá đơn (`DL33.gv_thay`) và buổi học
+(`DL11.teacher_id`), kèm một dòng vết trong `notes` của buổi. `check_logic.py` mục 20 canh để hai
+đầu không lệch nhau.

@@ -5110,7 +5110,35 @@ function stuOwners(sid){if(!sid)return [];var o=[];
     coach WOW. Nên một coach đang kèm riêng 32 buổi cho các em vẫn mở ra thấy 0-1 học viên.
     Ai ngồi kèm một em 1-1 thì em ấy là học viên của họ, đúng nghĩa đen. */
  rows("DL14").forEach(function(w){if(w.student_id!==sid)return;o.push(w.staff_id);o.push(w.wow_booked_by)});
+ /* ═══ 26/08 - GIÁO VIÊN DẠY THAY CŨNG LÀ CHỦ HỒ SƠ ══════════════════════════════════════════
+    Bảng trên chỉ tính `main_teacher_id` của lớp - tức là **người mang tên lớp**, không phải
+    người ĐỨNG BUỔI. Hai thứ đó tách nhau ở đúng hai ca mà nghiệp vụ nào cũng có:
+    · **Dạy thay**: thầy chính báo nghỉ, học vụ xếp người khác đứng một buổi. Người ấy phải soạn
+      bài, phải biết lớp có ai, ai đang yếu chỗ nào - mà mở app ra thì lớp ấy không tồn tại.
+    · **Bàn giao lớp giữa khóa**: lớp sang tên người mới, buổi ĐÃ DẠY vẫn giữ tên người cũ (đúng,
+      vì người dạy thật thì công thật). Nhưng người cũ lập tức mất sạch những em mình vừa dạy
+      hôm qua - kể cả để xem lại nhận xét chính mình đã viết.
+    Nên hỏi lại bằng câu đúng: *ai đã (hoặc sắp) đứng một buổi của lớp em ấy học* - đọc thẳng
+    `DL11.teacher_id`, không đọc `DL10.main_teacher_id`.
+    Lấy theo LỚP chứ không lấy theo điểm danh: điểm danh chỉ có sau khi buổi đã diễn ra, mà người
+    dạy thay cần thấy lớp TRƯỚC buổi - đó mới là lúc họ cần.
+    *Một bảng chủ sở hữu dựng trên chức danh thì nó tả sơ đồ tổ chức; dựng trên việc đã làm thì
+    nó mới tả ai thật sự đang làm việc với người này.* */
+ var _gt=stuTeachTab()[String(sid)];if(_gt)for(var _k in _gt)o.push(_k);
  return o}
+/* Bảng tra "lớp này đã có những ai đứng buổi" -> "học viên này có những giáo viên nào", dựng MỘT
+   lần cho mỗi lượt dữ liệu. `stuOwners` được gọi trên TỪNG DÒNG của mọi sổ có gác miền, nên một
+   phép quét DL11 đặt thẳng trong đó là quét 607 dòng nhân với số dòng đang lọc. */
+var _stC=null,_stV=-1;
+function stuTeachTab(){
+ if(_stC&&_stV===DVER)return _stC;
+ var byC={};
+ rows("DL11").forEach(function(s){var c=String(s.class_id||"");
+  if(!c||!String(s.teacher_id||"").trim())return;(byC[c]||(byC[c]={}))[s.teacher_id]=1});
+ var T={};
+ rows("DL08").forEach(function(b){var g=byC[String(b.class_id||"")];if(!g)return;
+  var t=T[b.student_id]||(T[b.student_id]={});for(var k in g)t[k]=1});
+ _stV=DVER;return (_stC=T)}
 /* ===== CƠ SỞ CỦA MỘT HỌC VIÊN: NƠI ĐĂNG KÝ **VÀ** NƠI ĐANG HỌC ===================
    V9.40. DL09.branch được ghi ĐÚNG MỘT LẦN - lúc lead chuyển thành học viên, chép từ hồ sơ
    lead - và không hàm nào trong 13.000 dòng ghi lại nó. Đo trên dữ liệu: 71/84 hồ sơ xếp lớp

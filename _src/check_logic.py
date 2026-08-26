@@ -919,6 +919,38 @@ rep("NANG", "19a. so doi lich khai ngay moi khong khop ngay that cua buoi", _a19
 rep("NANG", "19b. ghi so doi lich SAU khi buoi da dien ra", _b19)
 rep("VUA", "19c. pham vi ca khoa ma cac buoi sau khong dich theo", _c19)
 
+# ══ 20. DON BAO NGHI DA XEP NGUOI THAY THI BUOI PHAI MANG TEN NGUOI AY (26/08) ═══════════
+# Cung ho voi luat 19 va tim ra cung mot kieu: mot bang tu khai mot su kien ma phan con lai cua
+# du lieu phu nhan. Don GVN-0003 khai "NV006 day thay" trong khi DL11 cua dung buoi ay van ghi
+# NV005 - nen lich buoi hoc, cong hoc vien, bang cong va ca pham vi du lieu deu doc ra nguoi cu.
+# Nguoi thay da duoc xep xong ma khong ai biet, ke ca chinh ho.
+# Ba mat, moi mat mot cau hoi khac nhau:
+#   20a  don da xep nguoi -> buoi phai mang dung staff_id ay;
+#   20b  buoi phai KHONG con mang ten nguoi xin nghi (mot nguoi vua duoc duyet nghi ma van dung
+#        ten tren buoi la mot cau chuyen khong the xay ra that);
+#   20c  xep nguoi thay xong roi thi trang thai don phai la "da_duyet" - xep nguoi cho mot la
+#        don chua duyet la lam nguoc thu tu.
+_ses20 = {s(x, "session_id"): x for x in R("DL11")}
+_a20, _b20, _c20 = [], [], []
+for _r in R("DL33"):
+    _th = s(_r, "gv_thay")
+    if not _th:
+        continue
+    _sx = _ses20.get(s(_r, "session_id"))
+    if not _sx:
+        continue
+    if s(_sx, "teacher_id") != _th:
+        _a20.append("%s: don xep %s, DL11 dang la %s"
+                    % (s(_r, "nghi_id"), _th, s(_sx, "teacher_id") or "(trong)"))
+    if s(_sx, "teacher_id") and s(_sx, "teacher_id") == s(_r, "staff_id"):
+        _b20.append("%s: buoi van mang ten nguoi xin nghi (%s)" % (s(_r, "nghi_id"), s(_r, "staff_id")))
+    if not code(s(_r, "trang_thai")).startswith("da_duyet"):
+        _c20.append("%s: da xep %s ma don dang o trang thai %s"
+                    % (s(_r, "nghi_id"), _th, s(_r, "trang_thai")))
+rep("NANG", "20a. don da xep nguoi day thay ma buoi van mang ten giao vien cu", _a20)
+rep("NANG", "20b. buoi da co nguoi thay ma van ghi ten nguoi xin nghi", _b20)
+rep("VUA", "20c. xep nguoi day thay cho mot la don chua duyet", _c20)
+
 print("\n" + "="*90)
 tot = 0
 coy_tot = 0

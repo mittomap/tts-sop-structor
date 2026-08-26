@@ -148,13 +148,60 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### ✅ 26/08 - GIÁO VIÊN DẠY THAY: ĐÓNG VIỆC TỒN, VÀ HOÁ RA LÀ HAI LỖ CHỨ KHÔNG PHẢI MỘT
+> Anh Luân: *"ồ, giáo viên dạy thay đúng rồi, e làm đi"*.
+>
+> **Lỗ 1 - dữ liệu: một sự thật ghi vào một sổ, sổ kia không biết.**
+> Đơn `GVN-0003` khai *"NV006 dạy thay"* mà `DL11` của đúng buổi ấy vẫn ghi NV005. Nên lịch buổi
+> học, cổng học viên, bảng công và cả tầng phân quyền **đều đọc ra người cũ**. Người thay đã được
+> xếp xong mà không ai biết, kể cả chính họ.
+> Cửa ghi của app thì làm đúng: `sesSetTeacher` ghi cả hai đầu và đã tự dặn từ 15/08 - *"Hai cửa
+> ghi vào cùng một sự thật thì cửa nào cũng phải cập nhật cả hai đầu, nếu không thì cái thứ hai
+> chỉ là một bản sao đang cũ dần."* Chỉ có **khối GIEO dữ liệu** là đi đường tắt, và đi đường tắt
+> ngay đúng chỗ luật ấy canh.
+> *Một khối gieo dữ liệu không đi qua cửa ghi của app thì nó không được miễn LUẬT của cửa ghi ấy -
+> nó chỉ được miễn việc bị chặn.*
+> Nay khối 26 chọn người thay theo **đúng ba điều app đang chặn** (không phải chính người xin nghỉ ·
+> không bận giờ đó · lớp tại chỗ thì phải có mặt được ở cơ sở ấy) rồi ghi cả hai đầu, kèm vết
+> *"Đổi GV: A -> B (người xếp, lúc) - xếp người dạy thay theo đơn GVN-xxxx"*.
+> *Dữ liệu demo chỉ được chứa những gì đi lọt qua đúng cái cửa mà người thật phải đi qua.*
+>
+> **Và một cái bẫy cắn ngay lượt chạy đầu:** khối 28 (bàn giao lớp giữa khóa) chạy SAU khối 26 và
+> quét mọi buổi tương lai của lớp nó chọn - lượt này lớp ấy **chính là** lớp có buổi vừa xếp người
+> thay. Không chặn thì nó ghi đè, và lá đơn lại khai một người mà buổi không còn mang tên. Hai
+> khối chọn lớp theo hai điều kiện riêng, không ai hỏi ai.
+> *Hai khối cùng ghi vào một ô mà không khối nào biết khối kia tồn tại thì thứ tự chạy trở thành
+> một luật ngầm - và luật ngầm thì đổi khi dữ liệu đổi.*
+>
+> **Lỗ 2 - app: `stuOwners` đọc chức danh chứ không đọc việc đã làm.**
+> Bảng chủ hồ sơ chỉ tính `DL10.main_teacher_id` - tức **người mang tên lớp**, không phải người
+> ĐỨNG BUỔI. Hai thứ đó tách nhau ở đúng hai ca nghiệp vụ nào cũng có:
+> · **Dạy thay** - người được xếp phải soạn bài, phải biết lớp có ai, ai yếu chỗ nào; mà mở app ra
+>   thì lớp ấy không tồn tại.
+> · **Bàn giao lớp giữa khóa** - buổi ĐÃ DẠY vẫn giữ tên người cũ (đúng, người dạy thật thì công
+>   thật), nhưng người cũ mất sạch những em mình vừa dạy hôm qua, kể cả để xem lại nhận xét chính
+>   mình đã viết.
+> Nay hỏi lại bằng câu đúng: *ai đã (hoặc sắp) đứng một buổi của lớp em ấy học* - đọc thẳng
+> `DL11.teacher_id`. Lấy theo LỚP chứ không theo điểm danh, vì điểm danh chỉ có sau khi buổi đã
+> diễn ra mà người dạy thay cần thấy lớp TRƯỚC buổi.
+> *Một bảng chủ sở hữu dựng trên chức danh thì nó tả sơ đồ tổ chức; dựng trên việc đã làm thì nó
+> mới tả ai thật sự đang làm việc với người này.*
+> Đo trước/sau (tắt luật mới ngay trong trình duyệt rồi đo lại): **người dạy thay 0/9 -> 9/9**,
+> **người bàn giao lớp 0/9 -> 9/9**, chủ nhiệm giữ nguyên 9/9.
+>
+> **Luật mới trong `check_logic.py` (mục 20)** để chuyện này không lặng lẽ quay lại: đơn đã xếp
+> người thay thì buổi phải mang đúng tên ấy (20a) · buổi không được còn mang tên người xin nghỉ
+> (20b) · xếp người xong thì đơn phải ở trạng thái đã duyệt (20c). Đã thử ngược trên dữ liệu chưa
+> sửa: **cắn đúng 2 chỗ**.
+
 > ### ✅ 26/08 cuối - CHỐT PHIÊN: 48/48 XANH TRÊN ĐÚNG BẢN ĐANG CHẠY
 > `./verify.sh` chạy trọn bộ trên `3b8718` - **XANH HẾT, 45m43s**, và đó đúng là bản đã đẩy lên
 > `itts-sop-demo-v2` (mã bản dựng khớp).
 >
 > **Còn treo, đã khai thẳng, KHÔNG tuyên bố đã sửa:**
 > · `check_taolai` đỏ một lần 15/08 chưa tái hiện - đã có ghi hồ sơ mỗi lần đỏ.
-> · `stuOwners` chưa tính giáo viên dạy thay (dữ liệu demo chưa có ca nào để đo).
+> · ~~`stuOwners` chưa tính giáo viên dạy thay~~ **XONG 26/08** - và dữ liệu demo hoá ra CÓ ca:
+>   đơn GVN-0003 đã xếp người thay từ lâu, chỉ là buổi không mang tên người ấy nên không ai thấy.
 > · `_checkngay` còn 6 ghi chú "cần xem thêm" (không phải lỗi, là chỗ đáng nhìn lại).
 > · Ba hồ sơ HV062/063/067 có chuyên cần ở dải tiến độ khác ở chứng nhận - **đúng như thế**:
 >   một bên đếm lớp đang học, một bên chốt cả khóa, và nhãn đã nói rõ phạm vi.

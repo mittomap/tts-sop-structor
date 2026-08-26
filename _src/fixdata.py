@@ -3886,6 +3886,67 @@ if not _nghi and _gvN:
         _chon.append((_dd, _s33))
         if len(_chon) >= 3:
             break
+    # ── CHON NGUOI DAY THAY THEO DUNG LUAT APP DANG CHAN ──────────────────────────────────
+    # `sesSetTeacher` ben app chan ba dieu truoc khi cho doi giao vien cua mot buoi: khong phai
+    # chinh nguoi xin nghi · nguoi ay khong ban gio do (buoi lop hoac buoi WOW cach duoi
+    # `sessionSpan_hours`) · lop hoc TAI CHO thi nguoi ay phai co mat duoc o co so ay.
+    # Gieo mot ca ma chinh app se tu choi la gieo mot ca khong the xay ra.
+    # *Du lieu demo chi duoc chua nhung gi di lot qua dung cai cua ma nguoi that phai di qua.*
+    _SPAN_H = 2      # `sessionSpan_hours` - mac dinh CH2; app soi trung gio bang dung con so nay
+
+    def _gvCoSo(_gid):
+        """Moi co so nguoi nay that su co mat - giong `gvBranches` ben app."""
+        _o = set()
+        _st = ([x for x in R("DL01") if str(x.get("staff_id") or "") == str(_gid)] or [{}])[0]
+        if str(_st.get("branch") or "").strip():
+            _o.add(str(_st["branch"]))
+        for _c in R("DL10"):
+            if str(_c.get("main_teacher_id") or "") == str(_gid) and _c.get("branch"):
+                _o.add(str(_c["branch"]))
+        for _x in R("DL11"):
+            if str(_x.get("teacher_id") or "") != str(_gid):
+                continue
+            _cx = _lopN.get(str(_x.get("class_id") or ""), {})
+            if _cx.get("branch"):
+                _o.add(str(_cx["branch"]))
+        return _o
+
+    def _gvBan(_gid, _when, _boQua):
+        for _x in R("DL11"):
+            if str(_x.get("teacher_id") or "") != str(_gid):
+                continue
+            if str(_x.get("session_id") or "") == str(_boQua):
+                continue
+            if code(_x.get("session_status") or "") == "cancelled":
+                continue
+            _dx = dt(_x.get("session_date"))
+            if _dx and abs((_dx - _when).total_seconds()) < _SPAN_H * 3600:
+                return True
+        for _w in R("DL14"):
+            if str(_w.get("staff_id") or "") != str(_gid):
+                continue
+            if code(_w.get("wow_status") or "") == "cancelled":
+                continue
+            _dw = dt(_w.get("wow_session_date"))
+            if _dw and abs((_dw - _when).total_seconds()) < _SPAN_H * 3600:
+                return True
+        return False
+
+    def _chonGVThay(_ses, _lop, _gvXin):
+        _when = dt(_ses.get("session_date"))
+        _onl = code(_lop.get("learning_mode") or "") == "online"
+        _br = str(_lop.get("branch") or "")
+        for _x in _gvN:
+            _id = str(_x.get("staff_id") or "")
+            if not _id or _id == str(_gvXin.get("staff_id") or ""):
+                continue
+            if not _onl and _br and _br not in _gvCoSo(_id):
+                continue
+            if _when and _gvBan(_id, _when, _ses.get("session_id")):
+                continue
+            return _x
+        return {}
+
     for _i33, (_dd, _s33) in enumerate(_chon):
         _g33 = ([x for x in R("DL01")
                  if str(x.get("staff_id") or "") == str(_s33.get("teacher_id") or "")] or [{}])[0]
@@ -3931,8 +3992,7 @@ if not _nghi and _gvN:
             # bao gap), khong phai mot cho hong. Ep no khac 0 bang mot don se hong sau hai ngay.
         elif _i33 == 2:
             # (3) da duyet VA da xep xong nguoi thay - tron vong doi, de nguoi xem thay ket cuc.
-            _thay = ([x for x in _gvN
-                      if str(x.get("staff_id") or "") != str(_g33.get("staff_id") or "")] or [{}])[0]
+            _thay = _chonGVThay(_s33, _c33, _g33)
             _r33["trang_thai"] = u"da_duyet (\u0110\u00e3 duy\u1ec7t)"
             _r33["duyet_boi"] = _tpAca.get("staff_id") or ""
             _r33["duyet_boi_ten"] = _tpAca.get("full_name") or ""
@@ -3940,7 +4000,30 @@ if not _nghi and _gvN:
             _r33["duyet_ghichu"] = u"\u0110\u1ed3ng \u00fd cho ngh\u1ec9"
             _r33["gv_thay"] = _thay.get("staff_id") or ""
             _r33["gv_thay_ten"] = _thay.get("full_name") or ""
-            _r33["xep_luc"] = (_bao + datetime.timedelta(hours=6)).strftime("%d/%m/%Y %H:%M")
+            _xep = (_bao + datetime.timedelta(hours=6))
+            _r33["xep_luc"] = _xep.strftime("%d/%m/%Y %H:%M")
+            # ---- HAI DAU CUA MOT SU THAT ----------------------------------------------
+            # Truoc ban nay khoi gieo chi ghi `gv_thay` VAO LA DON roi thoi - buoi SES ay van
+            # mang ten giao vien cu. Ket qua do duoc 26/08: don GVN-0003 khai "NV006 day thay"
+            # ma lich buoi hoc, cong hoc vien, bang cong, pham vi du lieu deu van doc ra NV005.
+            # Nguoi thay duoc xep xong ma khong ai biet, ke ca chinh ho.
+            # Chinh app da ghi luat nay tu 15/08 ngay trong `sesSetTeacher`: *"Hai cua ghi vao
+            # cung mot su that thi cua nao cung phai cap nhat ca hai dau, neu khong thi cai thu
+            # hai chi la mot ban sao dang cu dan."* Cua ghi cua app lam dung; con khoi GIEO nay
+            # thi di duong tat, va di duong tat ngay dung cho luat ay canh.
+            # *Mot khoi gieo du lieu ma khong di qua cua ghi cua app thi no khong duoc mien luat
+            # cua cua ghi ay - no chi duoc mien viec bi chan.*
+            if _thay.get("staff_id"):
+                _cu33 = _s33.get("teacher_id_name") or _s33.get("teacher_id") or u"ch\u01b0a g\u00e1n"
+                _s33["teacher_id"] = _thay["staff_id"]
+                _s33["teacher_id_name"] = _thay.get("full_name") or ""
+                _s33["notes"] = ((str(_s33.get("notes") or "").strip() + " | ")
+                                 if str(_s33.get("notes") or "").strip() else "") + \
+                    (u"\u0110\u1ed5i GV: %s -> %s (%s, %s) - x\u1ebfp ng\u01b0\u1eddi d\u1ea1y "
+                     u"thay theo \u0111\u01a1n %s"
+                     % (_cu33, _thay.get("full_name") or "",
+                        _tpAca.get("full_name") or u"H\u1ecdc v\u1ee5",
+                        _xep.strftime("%d/%m/%Y %H:%M"), _r33["nghi_id"]))
         _nghi.append(_r33)
     # ── CHUOI NGHI LIEN TIEP + NGUOI NGHI NHIEU LAN (25/08) ────────────────────────────────
     # Chon MOT giao vien co it nhat ba buoi LIEN TIEP cua CUNG mot lop nam du xa trong tuong lai.
@@ -4155,11 +4238,22 @@ for _gv in sorted(_gvAct, key=lambda x: len(_hvCuaGV(str(x.get("staff_id") or ""
     _c["main_teacher_id"] = _sid
     _moc = NOW.replace(hour=0, minute=0)
     _soBuoi = 0
+    # BUOI DA XEP NGUOI DAY THAY THI BAN GIAO KHONG DUOC DE LEN. Khoi 26 vua ghi mot buoi sang
+    # ten nguoi day thay (kem mot la don DL33 giai thich), khoi nay chay SAU va quet moi buoi
+    # tuong lai cua lop - de trung lop thi no ghi de, va la don ay lai khai mot nguoi ma buoi
+    # khong con mang ten. Hom nay hai khoi roi vao hai lop khac nhau, nhung do la MAY chu khong
+    # phai la chac: ca hai deu chon lop theo dieu kien rieng, khong ai hoi ai.
+    # *Hai khoi cung ghi vao mot o ma khong khoi nao biet khoi kia ton tai thi thu tu chay tro
+    # thanh mot luat ngam - va luat ngam thi doi khi du lieu la doi.*
+    _dathay = set(str(x.get("session_id") or "") for x in R("DL33")
+                  if str(x.get("gv_thay") or "").strip())
     for _s in R("DL11"):
         if str(_s.get("class_id") or "") != str(_c.get("class_id") or ""):
             continue
         _ng = dt(_s.get("session_date"))
         if not _ng or _ng < _moc:
+            continue
+        if str(_s.get("session_id") or "") in _dathay:
             continue
         _s["teacher_id"] = _sid
         _s["teacher_id_name"] = _gv.get("full_name") or ""
