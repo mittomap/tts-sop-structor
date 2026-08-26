@@ -4418,6 +4418,23 @@ var PAGES=[
    moi lan sua se co mot nhom nguoi mang chu ky vao mot ban khong con hieu luc. Khong co man nay
    thi cai nhom do vo hinh. */
 {k:"socamket",g:"Tra cứu",ic:"ti-file-check",t:"Sổ cam kết đã ký",c:"Ai đã ký quy định lớp học, ký bản nào, ký bằng đường nào",ty:"custom"},
+/* ═══ 26/08 - TRANG HÓA ĐƠN ═══════════════════════════════════════════════════════════════════
+   Anh Luân, ngay sau khi em giao đợt hóa đơn: *"vậy chỗ danh sách học viên đã hoàn thành khóa
+   học đâu, mấy chỗ xuất hóa đơn đồ đâu em?"*
+
+   Anh chỉ đúng chỗ đau. Em có dựng cửa xuất hóa đơn, nhưng dựng NGAY TRONG NGĂN KÉO của trang
+   Công nợ: phải bấm một dòng học viên, ngăn kéo mở ra, tìm đúng khối của đơn đã học xong, mới
+   thấy nút. Ba tầng. Còn "danh sách học viên đã hoàn thành khóa" thì kế toán KHÔNG CÓ - trang
+   Kết thúc khóa không nằm trong bản khai trang của họ.
+   Nên nhìn từ ghế kế toán thì tính năng ấy **không tồn tại**: không có danh sách để mở ra làm,
+   không có cửa nào thấy được từ mặt trang.
+
+   Đây đúng là con bệnh dự án đã ghi tên từ 16/08 ("một hàng chờ duyệt mà cửa tạo yêu cầu chôn
+   năm tầng thì hàng chờ ấy trống vì không ai tìm ra, chứ không phải vì không ai cần") - và em
+   vừa dựng lại nó bằng một đường khác, chỉ mấy giờ sau khi đọc chính dòng ghi chú ấy.
+   *Một chip đếm việc không thay được một danh sách để làm việc: chip nói CÓ BAO NHIÊU, danh
+   sách mới cho người ta làm từng cái một.* */
+{k:"hoadon",g:"Điều hành",ic:"ti-receipt",t:"Hóa đơn",c:"Học viên đã hoàn thành khóa - xuất hóa đơn cho họ hoặc cho công ty trả học phí",ty:"custom"},
 /* V9.92 - trang meta cua dot dung thu: khong phai nghiep vu SOP, nhung la cho duy nhat
    giu cho gop y khong troi. Ai cung thay duoc (VIEW_ALWAYS) vi ai cung co quyen gop y. */
 /* V9.94: trang CA NHAN - thoi quen cua mot nguoi tren mot may, khac han Cai dat cua trung tam. */
@@ -4781,7 +4798,11 @@ var ROLESCOPE={
   /* V2 08/08 - thêm `dsthanhtoan` (Sổ thu học phí): nhịp cuối ngày của kế toán là "nhìn dự thu
      tháng", trỏ thẳng vào sổ ấy - mà trước bản này chỉ quản trị và điều hành được xem. Sổ thu
      học phí là sổ của chính phòng kế toán. */
-  pages:["viec","hocvien","giangvien","hosogv","tuyensinh","duyet","baocao","bangcong","dsthanhtoan","congno","tinnhan"],   /* V9.99z5: kế toán chốt lương theo bảng công giảng dạy */
+  /* 26/08 - `hoadon`: xuất hóa đơn là việc CỦA KẾ TOÁN. Trước đó cửa xuất nằm trong ngăn kéo
+     của trang Công nợ, còn danh sách học viên đã hoàn thành khóa thì nằm ở trang `ketthuc` -
+     trang mà kế toán không có trong bản khai này. Tức là người phải làm việc ấy không có đường
+     nào nhìn thấy nó. */
+  pages:["viec","hocvien","giangvien","hosogv","tuyensinh","duyet","baocao","bangcong","dsthanhtoan","congno","hoadon","tinnhan"],   /* V9.99z5: kế toán chốt lương theo bảng công giảng dạy */
   /* V9.99r - Kế toán chỉ có phần THANH TOÁN của hub Tuyển sinh. Trước đây không khai tab nào
      nên họ bấm được cả Lead, Test đầu vào, Tư vấn & Đăng ký - ba bước họ khai `lead:"none"`,
      mở ra chỉ để nhìn. Khai đúng một tab thì phễu, câu mở đầu và menu cùng thu lại theo. */
@@ -6176,6 +6197,12 @@ var THEDEF={
  /* V2 16/08 - dai the trang Cong no hoc vien. Bon o dau la tien, o cuoi la CHUNG TU: mot phieu
     khong co anh bien lai thi cuoi thang doi soat khong co gi de doi chieu, ma doc bang thi no
     chi la mot o trong - khong ai dem ho. */
+ /* Ba thẻ của trang Hóa đơn đều là TIỀN CỘNG DỒN, không phải đếm lại dòng của bảng ngay dưới
+    (dải chip đã đếm dòng). Đúng luật thẻ: chip nói bao nhiêu VIỆC, thẻ nói bao nhiêu TIỀN. */
+ hoadon:{t:"Hóa đơn",the:[
+  ["hd_daxuat","Đã xuất hóa đơn","Cộng số tiền ghi trên những hóa đơn đã xuất cho các đơn đã hoàn thành khóa. Danh sách: bấm chip Đã xuất ở hàng dưới."],
+  ["hd_cho","Đang chờ xuất","Cộng số tiền đã thực đóng của những đơn học viên ĐÃ YÊU CẦU hóa đơn mà kế toán chưa xuất. Danh sách: bấm chip Chờ xuất."],
+  ["hd_tre","Trong đó quá hạn","Phần chờ xuất đã quá hạn tính từ lúc học viên yêu cầu - đây là phần phải làm hôm nay. Danh sách: bấm chip Quá hạn."]]},
  congno:{t:"Công nợ học viên",the:[
   ["cn_tong","Tổng giá trị hợp đồng","Cộng học phí sau chiết khấu của mọi đơn còn hiệu lực có ngày đăng ký trong kỳ đang chọn. Danh sách: chính bảng ngay dưới."],
   ["cn_thu","Đã thu","Tiền thực nhận của những đơn ấy tính tới hôm nay, đã trừ các khoản hoàn. Danh sách: cột Đã thu trong bảng dưới."],
@@ -24398,7 +24425,13 @@ function knAddSave(){var sid=fldV("ka_stu");if(!sid){toast("Chọn học viên."
 /* ===== P10 Kết thúc khóa & Tái ghi danh (DL18) ===== */
 function renderKetthuc(){var p="ketthuc",fil=fget(p);var all=srows("DL18");
  function st(r){var scored=!!(r.final_test_score&&String(r.final_test_score).trim());var invited=isc(r.re_enrollment_status,"contacted","interested","confirmed_with_deposit","rejected");var closed=isc(r.re_enrollment_status,"confirmed_with_deposit","rejected");return {scored:scored,invited:invited,closed:closed}}
- var view=all.filter(function(r){var s=st(r);if(fil==="all")return true;if(fil==="score")return !s.scored;if(fil==="invite")return s.scored&&!s.invited;if(fil==="follow")return s.invited&&!s.closed;return true});
+ /* 26/08 - chip "Đã hoàn thành khóa" (anh Luân: *"chỗ danh sách học viên đã hoàn thành khóa
+    học đâu"*). Bảng này đọc DL18, mà DL18 gom cả ba kết cục: hoàn thành · bỏ học · chuyển lớp.
+    Không có chip nào tách riêng nhóm hoàn thành, nên câu hỏi cơ bản nhất của trang - "ai đã học
+    xong" - phải tự đếm bằng mắt.
+    *Một bảng gom ba kết cục mà không có cách tách thì nó trả lời được câu "có bao nhiêu hồ sơ",
+    không trả lời được câu người ta thật sự hỏi.* */
+ var view=all.filter(function(r){var s=st(r);if(fil==="all")return true;if(fil==="xong")return isc(r.student_status,"completed");if(fil==="score")return !s.scored;if(fil==="invite")return s.scored&&!s.invited;if(fil==="follow")return s.invited&&!s.closed;return true});
  var h=pageHead("Kết thúc khóa & Tái ghi danh","Nhập kết quả đầu ra - đánh giá mục tiêu - mời & chốt tái ghi danh",'<button class="btn primary" onclick="ktGen()"><i class="ti ti-school-off"></i>Tạo hồ sơ kết thúc cho lớp</button>');
  /* V9.51: 3 o loc doi lot bo, so don vao chip; giu o "Da tai ghi danh" vi mang muc tieu RER */
 /* V2 13/08 - BỎ DẢI THẺ. Anh Luân: *"thẻ nó phải mang tính khác biệt, chứ nó như cái chip thì
@@ -24409,6 +24442,7 @@ function renderKetthuc(){var p="ketthuc",fil=fget(p);var all=srows("DL18");
 
  view=fltApply(p,view);
  h+=filterBar(p,fil,[["all","Tất cả",all.length],
+  ["xong","Đã hoàn thành khóa",all.filter(function(x){return isc(x.student_status,"completed")}).length,"green"],
   ["score","Chờ nhập kết quả",all.filter(function(x){return !String(x.final_test_score||"").trim()}).length,"amber"],
   ["invite","Chờ mời tái ĐK",all.filter(function(x){return String(x.final_test_score||"").trim()&&isc(x.re_enrollment_status,"not_contacted")}).length],
   ["follow","Đang theo đuổi",all.filter(function(x){return isc(x.re_enrollment_status,"contacted","interested")}).length]],view.length);
@@ -24424,7 +24458,7 @@ function renderKetthuc(){var p="ketthuc",fil=fget(p);var all=srows("DL18");
   (function(){var _e=r.enrollment_id?find("DL06","enrollment_id",r.enrollment_id):null;
    if(!_e)return;var hs=hdonState(_e);
    if(hs.daXuat)h+='<div class="obm2"><span class="chip green">Hóa đơn '+esc(_e.hdon_so)+'</span> <span class="mut">xuất '+esc(String(_e.hdon_ngay||"").split(" ")[0])+'</span></div>';
-   else if(hs.cho)h+='<div class="obm2"><span class="chip '+(hs.tre?"red":"amber")+'">Học viên đã yêu cầu hóa đơn</span> <span class="mut">kế toán xuất ở trang Công nợ học viên</span></div>'})();
+   else if(hs.cho)h+='<div class="obm2"><span class="chip '+(hs.tre?"red":"amber")+'">Học viên đã yêu cầu hóa đơn</span> <span class="mut">kế toán xuất ở trang Hóa đơn</span></div>'})();
   h+=stepBar([["Kết thúc",true],["Kết quả đầu ra",s.scored],["Mời tái ĐK",s.invited],["Chốt",s.closed]]);
   h+='<div class="obact">';
   if(!s.scored)h+='<button class="btn primary sm" onclick="ktResult(\''+esc(id)+'\')"><i class="ti ti-writing"></i>Nhập kết quả đầu ra</button>';
@@ -31648,6 +31682,87 @@ function cnLocCo(G,k){
  if(k==="thieu")return (G.thieu+G.ctLy)>0;
  if(k==="hdon")return G.hdCho>0;
  return true}
+/* ═══ 26/08 - TRANG HÓA ĐƠN: DANH SÁCH ĐỂ LÀM, KHÔNG PHẢI CHIP ĐỂ ĐẾM ═══════════════════════
+   Mỗi dòng là MỘT ĐƠN đã hoàn thành khóa - không gộp theo học viên: hóa đơn xuất theo đơn, mà
+   một người học hai khóa thì hai đơn hai hóa đơn, gộp lại là không biết nút bấm cho cái nào. */
+function hdList(){
+ var K=hdonXongKhoa();
+ return srows("DL06").filter(function(e){return !!K[String(e.enrollment_id||"")]})
+  .map(function(e){return {e:e,ce:K[String(e.enrollment_id||"")],s:hdonState(e)}})
+  /* Thứ tự đọc = thứ tự phải làm: quá hạn trước, rồi đang chờ, rồi chưa ai hỏi, cuối cùng là
+     việc đã xong. Trong mỗi nhóm thì hồ sơ kết thúc khóa lâu nhất lên trước. */
+  .sort(function(a,b){
+   var uu=function(x){return x.s.tre?0:(x.s.cho?1:(x.s.daXuat?3:2))};
+   return uu(a)-uu(b)||((pvnd(a.ce.course_completion_time)||0)-(pvnd(b.ce.course_completion_time)||0))})}
+function hdLoc(){return fget("hoadon")}
+function renderHoadon(){
+ var all=hdList(),fil=hdLoc();
+ var view=all.filter(function(r){
+  if(fil==="cho")return r.s.cho;
+  if(fil==="tre")return r.s.tre;
+  if(fil==="chuahoi")return !r.s.daXuat&&!r.s.daYeuCau;
+  if(fil==="daxuat")return r.s.daXuat;
+  return true});
+ var tienXuat=all.filter(function(r){return r.s.daXuat}).reduce(function(t,r){return t+num(r.e.hdon_tien)},0);
+ var tienCho=all.filter(function(r){return r.s.cho}).reduce(function(t,r){return t+num(r.e.paid_amount)},0);
+ var tienTre=all.filter(function(r){return r.s.tre}).reduce(function(t,r){return t+num(r.e.paid_amount)},0);
+ var nCho=all.filter(function(r){return r.s.cho}).length;
+ var h=pageHead("Hóa đơn",
+  "Học viên đã hoàn thành khóa - xuất hóa đơn cho họ hoặc cho công ty trả học phí. Hạn xuất "+slaChip("invoiceIssue_days",7)+" tính từ lúc học viên yêu cầu.",
+  /* Nút chính của trang: làm việc tiếp theo phải làm, không bắt người ta tự dò trong bảng.
+     Hết việc thì không vẽ nút - một nút lúc nào cũng hiện mà bấm vào không có gì là rác. */
+  (nCho?('<button class="btn primary" onclick="hdTiep()"><i class="ti ti-receipt"></i>Xuất hóa đơn tiếp theo ('+nCho+')</button>'):''));
+ h+=statStrip([
+  ["ti-receipt",vnd(tienXuat),"Đã xuất hóa đơn","#0D9488","",
+   "","Cộng số tiền ghi trên "+all.filter(function(r){return r.s.daXuat}).length+" hóa đơn đã xuất."],
+  ["ti-clock",vnd(tienCho),"Đang chờ xuất","#E08A1E","",
+   "","Học phí đã thực đóng của "+nCho+" đơn học viên đã yêu cầu hóa đơn mà chưa xuất."],
+  ["ti-alert-triangle",vnd(tienTre),"Trong đó quá hạn","#E24B4A","",
+   "","Phần chờ xuất đã quá "+hdonHan()+" ngày kể từ lúc học viên yêu cầu - phần phải làm hôm nay."]],"hoadon");
+ view=fltApply("hoadon",view);
+ h+=filterBar("hoadon",fil,[["all","Tất cả",all.length],
+  ["cho","Chờ xuất",nCho,"amber"],
+  ["tre","Quá hạn",all.filter(function(r){return r.s.tre}).length,"red"],
+  ["chuahoi","Chưa ai yêu cầu",all.filter(function(r){return !r.s.daXuat&&!r.s.daYeuCau}).length],
+  ["daxuat","Đã xuất",all.filter(function(r){return r.s.daXuat}).length,"green"]],view.length);
+ h+='<div class="panel"><div class="tbwrap"><table class="dt"><thead><tr>'+
+  '<th>Học viên</th><th>Khóa học</th><th>Hoàn thành khóa</th><th class="phai">Đã đóng</th>'+
+  '<th>Hóa đơn</th><th>Bên nhận</th><th></th></tr></thead><tbody>';
+ /* K5 - trạng thái rỗng phải NÓI VÌ SAO rỗng, và nói khác nhau ở từng chip: rỗng vì chưa ai học
+    xong khác hẳn rỗng vì đã xuất hết. */
+ if(!view.length)h+='<tr><td colspan="7"><div class="empty">'+
+  (!all.length?'Chưa có học viên nào hoàn thành khóa - hóa đơn chỉ xuất sau khi kết thúc khóa. Hồ sơ kết thúc khóa tạo ở màn <b>Kết thúc &amp; Tái ĐK</b>.'
+   :(fil==="cho"?'Không còn đơn nào chờ xuất hóa đơn - đã xuất hết cho những người đã yêu cầu.'
+    :(fil==="tre"?'Không có đơn nào quá hạn xuất hóa đơn.'
+     :(fil==="daxuat"?'Chưa xuất hóa đơn nào.'
+      :'Không có đơn nào khớp bộ lọc - bấm chip <b>Tất cả</b> để xem đủ '+all.length+' đơn.'))))+
+  '</div></td></tr>';
+ catXem("hoadon",view,40).forEach(function(r){
+  var e=r.e,s=r.s,eid=esc(e.enrollment_id);
+  h+='<tr><td class="tennguoi">'+nguoiLnk(e.student_id,e.student_id_name,e.student_id)+'</td>'+
+   '<td class="khongbe">'+esc(e.course_id_name||e.course_id||"-")+'</td>'+
+   '<td>'+esc(String(r.ce.course_completion_time||"").slice(0,10)||"-")+'</td>'+
+   '<td class="phai" style="font-variant-numeric:tabular-nums">'+vnd(num(e.paid_amount))+'</td>'+
+   '<td>'+(s.daXuat
+     ?('<span class="chip green">'+esc(e.hdon_so)+'</span><div class="mut" style="font-size:11px">'+esc(String(e.hdon_ngay||"").slice(0,10))+'</div>')
+     :(s.cho
+       ?('<span class="chip '+(s.tre?"red":"amber")+'">'+(s.tre?"quá hạn":"chờ xuất")+'</span><div class="mut" style="font-size:11px">HV yêu cầu '+esc(String(e.hdon_yc_luc||"").slice(0,10))+'</div>')
+       :'<span class="mut">chưa ai yêu cầu</span>'))+'</td>'+
+   '<td class="khongbe">'+(String(e.hdon_ten||"").trim()
+     ?(esc(e.hdon_ten)+(e.hdon_mst?('<div class="mut" style="font-size:11px">MST '+esc(e.hdon_mst)+'</div>'):''))
+     :'<span class="mut">-</span>')+'</td>'+
+   '<td>'+(s.daXuat
+     ?('<button class="btn sm" onclick="hdonXem(\''+eid+'\')"><i class="ti ti-printer"></i>In lại</button>')
+     :('<button class="btn '+(s.cho?"primary ":"")+'sm" onclick="hdonForm(\''+eid+'\')"><i class="ti ti-receipt"></i>Xuất hóa đơn</button>'))+
+   '</td></tr>'});
+ h+='</tbody></table></div>'+xemTiepBtn("hoadon",view.length,40)+'</div>';
+ return h}
+/* Nút chính: mở thẳng đơn ĐANG CHỜ LÂU NHẤT. Người ta tới trang này để xuất hóa đơn, không phải
+   để chọn xem xuất cái nào trước - thứ tự ưu tiên app đã biết rồi. */
+function hdTiep(){
+ var r=hdList().filter(function(x){return x.s.cho})[0];
+ if(!r){toast("Không còn đơn nào chờ xuất hóa đơn.");return}
+ hdonForm(r.e.enrollment_id)}
 function renderCongno(){
  var all=cnDs(),lc=window.CNLOC||"";
  var ds=lc?all.filter(function(G){return cnLocCo(G,lc)}):all;
@@ -34362,7 +34477,7 @@ function banNutHoSo(ttk,r){
  if(ttk==="hocvien")return '<button class="btn" onclick="window.HOSO=\''+esc(r.student_id)+'\';go(\'hoso\')"><i class="ti ti-id-badge-2"></i>Hồ sơ 360</button>';
  return '<button class="btn" onclick="openLop(\''+esc(r.class_id)+'\')"><i class="ti ti-clipboard-list"></i>Mở lớp</button>'}
 
-var RENDER={ban:renderBan,canhan:renderCanhan,dsphuhuynh:renderSoPH,socamket:renderSoCamKet,hoidap:renderHoidap,tracuu:renderTracuu,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,banwow:renderBanWow,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,lichwow:renderLichWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,ketqua:renderKetqua,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong,tinnhan:renderTinnhan,congno:renderCongno};
+var RENDER={ban:renderBan,canhan:renderCanhan,dsphuhuynh:renderSoPH,socamket:renderSoCamKet,hoidap:renderHoidap,tracuu:renderTracuu,giaoviec:renderGiaoviec,giaoan:renderGiaoan,hoctap:renderHoctap,hosogv:renderHosoGV,hosonv:renderHosoNV,hosokhoa:renderHosoKhoa,buoihoc:renderBuoihoc,baoluu:renderBaoluu,dashboard:renderDashboard,banlam:renderBanlam,review:renderReview,ghinhan:renderGhinhan,cskh:renderCskh,viec:renderViec,hanhtrinh:renderHanhtrinh,chay:renderChay,duyet:renderDuyet,diemdanh:renderDiemDanh,hoso:renderHoso,banglop:renderBanglop,banwow:renderBanWow,baocao:renderBaocao,bangcong:renderBangcong,giangvien:renderGiangvien,nhansu:renderNhansu,banggiao:renderBanggiao,settings:renderSettings,baitap:renderBaitap,xeplop:renderXeplop,tuyensinh:renderTuyensinh,test:renderTest,tuvan:renderTuvan,thanhtoan:renderThanhtoan,wow:renderWow,lichwow:renderLichWow,khieunai:renderKhieunai,ketthuc:renderKetthuc,ketqua:renderKetqua,magioithieu:renderMaGioiThieu,khac:renderKhac,chang:renderChang,dsthanhtoan:renderSothu,gvdp:renderGvdp,phong:renderPhong,tinnhan:renderTinnhan,congno:renderCongno,hoadon:renderHoadon};
 /* ═══ V2 - 25 NGHIỆP VỤ, 25 TRANG ═══════════════════════════════════════════════════════════
    Anh Luân: *"Mỗi nghiệp vụ 1 trang, vẫn sắp xếp được theo chặng trên sidebar, nhưng mỗi trang
    là nghiệp vụ riêng, và nó có thẻ, có chip lọc, có cảnh báo của riêng nó."*
@@ -35922,7 +36037,9 @@ var NAVTREE=[
     Luân bắt được hôm 04/08 (*"a tìm trên sidebar ko thấy"*).
     Bài học lặp lại lần thứ hai: hỏi `navVis` là hỏi "có ĐƯỢC PHÉP thấy không", không phải "có
     CHỖ ĐỨNG trên menu không". Hai câu khác nhau, và cái thước phải hỏi câu thứ hai. */
- {g:"Điều hành",items:["nhansu","bangcong","congno","canhan","settings"]},
+ /* `hoadon` đứng NGAY SAU `congno`: hai trang là hai đầu của cùng một dòng tiền (thu vào, và
+    giấy tờ xuất ra cho bên trả tiền), và người làm cả hai là một người. */
+ {g:"Điều hành",items:["nhansu","bangcong","congno","hoadon","canhan","settings"]},
  /* V2 08/08 - mười sáu cuốn sổ chỉ-đọc rời khỏi cây menu, vào sau một cửa `tracuu` (ghi chú
     dài ở bảng PAGES). `hocvien` và `giangvien` Ở LẠI vì chúng nằm trong nhịp ngày của ba nhóm. */
  /* V2 14/08 - `socamket` (Sổ cam kết đã ký, dựng cùng ngày) VÀO ĐÂY. Nó đã khai `g:"Tra cứu"`

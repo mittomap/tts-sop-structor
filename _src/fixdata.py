@@ -4556,7 +4556,16 @@ for _i, _e in enumerate(R("DL06")):
     if _i % 4 == 3:
         continue                       # chua ai hoi toi hoa don
     if _i % 4 in (1, 2):
-        _e["hdon_yc_luc"] = fmt(min(_xong + datetime.timedelta(days=2, hours=10), _TRAN30))
+        # HAI KIEU CHO, KHONG PHAI MOT. Lan gieo dau em cho moc yeu cau = ngay ket thuc khoa + 2
+        # ngay, ma khoa nao cung ket thuc tu thang truoc - nen CA BON don cho deu qua han, chip
+        # "Cho xuat 4" va chip "Qua han 4" ra dung mot con so, va hai o tien tren dai the cung
+        # bang nhau. Nhin vao thi khong phan biet duoc "dang trong han" voi "da tre".
+        # *Gieo mot trang thai ma moi dong deu roi vao mot dau cua thang do thi cai thang ay
+        # khong con do duoc gi.*
+        if _i % 8 in (1, 2):
+            _e["hdon_yc_luc"] = fmt(_TRAN30 - datetime.timedelta(days=2))     # con trong han
+        else:
+            _e["hdon_yc_luc"] = fmt(min(_xong + datetime.timedelta(days=2, hours=10), _TRAN30))
         _n31["yc"] += 1
         continue                       # da yeu cau, cho ke toan xuat
     _seq31 += 1
