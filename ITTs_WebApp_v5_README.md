@@ -2,6 +2,27 @@
 
 > `ITTs_WebApp_v5_demo.html` là bản app: mở bằng trình duyệt, mọi thao tác ghi thật vào bộ nhớ trình duyệt. **Lớp Google Sheets đã cho nghỉ hưu 30/07** - không còn bản `.gs` nào, mọi cấu hình nằm trong màn Cài đặt của chính app. Khi anh Luân chốt nền tảng backend, 66 chỗ ghi trong app đã có sẵn đường nối ra máy chủ (xem khối ghi chú tại `var SVR=` trong `gen_v5.py`).
 
+## ⭐ MỚI 26/08/2026 — **Trang Hóa đơn: danh sách người đã học xong, xuất ngay trên dòng**
+
+Menu **Điều hành › Hóa đơn**, ngay dưới Công nợ học viên.
+
+- Mỗi dòng là **một đơn đã hoàn thành khóa**: học viên · khóa · ngày hoàn thành · đã đóng ·
+  tình trạng hóa đơn · bên nhận. Nút **Xuất hóa đơn** nằm ngay trên dòng.
+- Thứ tự đọc = thứ tự phải làm: quá hạn → đang chờ → chưa ai hỏi → đã xong.
+- Chip lọc: *Tất cả · Chờ xuất · Quá hạn · Chưa ai yêu cầu · Đã xuất*. Ba thẻ tiền: đã xuất ·
+  đang chờ · trong đó quá hạn.
+- Nút **"Xuất hóa đơn tiếp theo"** mở thẳng đơn chờ lâu nhất. Hết việc thì không vẽ nút.
+- **Kế toán mở được trang này** - trước đó cửa xuất hóa đơn chôn trong ngăn kéo trang Công nợ,
+  còn danh sách người đã học xong thì ở trang Kết thúc khóa, trang kế toán không có quyền mở.
+
+Màn **Kết thúc & Tái ĐK** thêm chip **"Đã hoàn thành khóa"** - bảng ấy gom cả ba kết cục (hoàn
+thành · bỏ học · chuyển lớp) mà trước đây không có cách tách riêng nhóm đã học xong.
+
+**Cổng học viên** có mục riêng **Hóa đơn khóa học** trong nhóm *Cần bạn xử lý* (có trên mục lục,
+có huy hiệu việc): mỗi khóa đã hoàn thành một dòng, chưa yêu cầu thì bấm **Yêu cầu xuất hóa đơn**,
+đã xuất thì bấm **Xem / lưu PDF** để mở bản in - trong hộp in của trình duyệt chọn *Lưu thành PDF*
+là có file gửi cho công ty.
+
 ## ⭐ MỚI 26/08/2026 — **Hóa đơn · phiếu thu kèm quy định · 17 cuốn sổ về đúng chỗ**
 
 ### Xuất phiếu thu kèm quy định — ngay lúc đóng tiền

@@ -148,6 +148,72 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 🔴 26/08 - MỘT CÁI TÊN TRÙNG KHÔNG GÂY LỖI, NÓ GÂY MỘT APP KHÁC
+> Anh Luân chụp màn "Duyệt hợp đồng cam kết" hỏi *"đang lỗi à"*: 12 thẻ trống rỗng
+> (*"- - cam kết band ?"*, *"học phí 0đ"*), ô tìm hiện sẵn chữ "all", thẻ "Band cam kết trung
+> bình" in dấu gạch. **Ba lỗi khác nhau nằm chồng trên một màn**, và cái nặng nhất là của em.
+>
+> **(1) `hdList` bị đè.** Trang Hóa đơn mới em đặt tên `hdList`/`hdLoc`/`hdTiep`. Mà `hdList` ĐÃ
+> CÓ từ lâu - nó là danh sách **hợp đồng cam kết đầu ra** (DL30), và `hdOf`, `hdCho`,
+> `hdChanXepLop` đều gọi nó. JavaScript không kêu một tiếng: hàm khai sau đè hàm khai trước.
+> Phần nhìn thấy: màn duyệt nhận về 12 ĐƠN ĐĂNG KÝ thay vì 5 hợp đồng.
+> **Phần KHÔNG nhìn thấy mới đáng sợ:** `hdChanXepLop` là cửa CHẶN xếp lớp khi hợp đồng cam kết
+> chưa đủ hai chữ ký - nó cũng đọc `hdList()`, tức **một luật nghiệp vụ vừa bị vô hiệu mà không
+> có gì báo**.
+> *Một cái tên trùng trong JavaScript không gây lỗi - nó gây một app khác.*
+> Đã thêm luật vào `_check15` (bộ đã dựng sẵn bảng `funcs` nên luật tốn ba dòng), và **thử ngược
+> trên bản đang hỏng: nó đỏ và gọi đúng tên `hdList`**.
+> *Loại luật mà giá của nó bằng không, còn cái nó chặn thì không có cách nào tự lộ ra.*
+>
+> **(2) Ô tìm chết, và hiện sẵn chữ "all".** Hai trang duyệt lấy giá trị ô tìm bằng
+> `fget("q_...")` - mà `fget` sinh ra cho CHIP LỌC nên **mặc định trả về "all"**. Ô tìm mở ra đã
+> có sẵn một từ khoá không ai gõ; và giá trị gõ vào **không được dùng để lọc ở đâu cả**.
+> *Mượn kho của một thứ có mặc định khác thì cái mặc định ấy đi theo - và ở đây nó đi thẳng ra
+> màn hình dưới dạng một từ khoá ma.*
+>
+> **(3) Thẻ đọc nhầm tên cột.** "Band cam kết trung bình" đọc `r.committed_band` - cột KHÔNG tồn
+> tại (cột thật là `target_band`). `num(undefined)` = 0 rất êm, nên thẻ in dấu "-" ở mọi lượt vẽ
+> suốt từ lúc dựng.
+> *Một ô số in ra dấu gạch thì người đọc cho là "chưa có dữ liệu", chứ không ai đoán là app đang
+> hỏi sai tên cột.*
+
+> ### 🟢 26/08 - TRANG HÓA ĐƠN, VÀ BẢY LUẬT CŨ MỘT TRANG MỚI PHẢI CHÀO
+> Anh Luân, ngay sau khi em giao đợt hóa đơn: *"vậy chỗ danh sách học viên đã hoàn thành khóa học
+> đâu, mấy chỗ xuất hóa đơn đồ đâu em?"*
+>
+> Em CÓ dựng cửa xuất hóa đơn - nhưng dựng **trong ngăn kéo** của trang Công nợ: bấm một dòng
+> học viên → ngăn kéo mở → tìm đúng khối của đơn đã học xong → mới thấy nút. Ba tầng. Còn danh
+> sách học viên đã hoàn thành khóa thì nằm ở trang `ketthuc` - **trang không có trong bản khai
+> trang của kế toán**. Nhìn từ ghế kế toán thì tính năng ấy **không tồn tại**.
+> Đây đúng con bệnh dự án đã ghi tên từ 16/08 (*"một hàng chờ duyệt mà cửa tạo yêu cầu chôn năm
+> tầng thì hàng chờ ấy trống vì không ai tìm ra, chứ không phải vì không ai cần"*) - và em dựng
+> lại nó bằng một đường khác, mấy giờ sau khi đọc chính dòng ghi chú ấy.
+> *Một chip đếm việc không thay được một danh sách để làm việc: chip nói CÓ BAO NHIÊU, danh sách
+> mới cho người ta làm từng cái một.*
+>
+> **Verify sau đó bắt 7 chỗ đỏ, 6 chỗ do chính trang mới** - đây là bảng giá thật của việc thêm
+> một trang vào một app đã có luật:
+> `_checkmien` (tiêu đề nhóm ngoài miền) · `_checkbam` (bấm dòng không phản hồi) · `_checklink`
+> (tên in chữ trơn) · `_checktour` (chưa bài nào đi qua) · `_checkux` (form không có lời giải
+> thích *máy đọc được*) · `_checkaudit` (chữ "MST" chưa có trong từ điển) · `_checkroi` (menu
+> vượt trần).
+>
+> **`_checkmien` chỉ ra một lỗi thật:** `tcNhom` đọc thẳng hằng `NAVTREE` - BẢNG GỐC - trong khi
+> menu thật của từng chức danh do `navCay()` dựng. Với kế toán, `navCay()` đặt tên nhóm ấy là
+> "Tuyển sinh & Thu tiền", còn bảng gốc ghi "Khách tiềm năng" - một cụm chữ miền lead mà họ
+> không được xem. App đã có sẵn cái tên đúng; em chỉ là không hỏi đúng chỗ.
+> *Đọc bản khai gốc thay vì bản đã cắt theo người đang xem là cách chắc chắn nhất để in ra một
+> chữ mà người ấy không có quyền đọc.*
+>
+> **Và một chỗ em suýt xử sai:** `_checklink` báo 4 chỗ trên trần 3. Phản xạ đầu tiên là nâng
+> trần lên 4 kèm một đoạn giải thích nghe rất hợp lý ("chỗ thứ tư là câu chữ tự do, đúng dạng đã
+> được miễn"). Đo lại kỹ thì **không phải**: hai trong số các chỗ mới nằm ở cột "Bên nhận" của
+> chính trang em vừa dựng. Sửa hai chỗ ấy xong thì còn lại đúng 3, trần giữ nguyên.
+> *Một cái trần kéo xuống dễ bị nâng nhất vào đúng lúc mình vừa làm hỏng một thứ - vì lúc ấy
+> mình có sẵn một câu giải thích cho con số mới. Đo trước, sửa trước; trần là thứ động sau cùng.*
+> (`_checkroi` thì nâng thật, 48 → 49, khai thẳng theo đúng tiền lệ 08/08: người phải làm việc ấy
+> không có lối vào là SÓT theo LUẬT CỨNG SỐ 0, mà sót thì không có quyền bỏ.)
+
 > ### 🟢 26/08 - 17 CUỐN SỔ THÔI NẰM MỘT ĐỐNG
 > Anh Luân, kèm ảnh chụp trang Tra cứu: *"mấy cái trang này để rời nó vô lý quá, sao ko đưa vào
 > gần chỗ nghiệp vụ phù hợp cho dễ dùng???? và nâng cấp nó lên cho chuyên nghiệp"*.
@@ -1104,7 +1170,13 @@
 
 > ### ⭐ HIỆN TRẠNG WEB APP (cập nhật cuối — đọc đầu tiên khi Luân nói "tiếp tục")
 > **Phiên bản: V2 — 48 BỘ KIỂM.
-> Bản dựng đang chạy: `203ce1` (26/08 cuối - **HÓA ĐƠN + PHIẾU THU KÈM QUY ĐỊNH + DỌN 17 CUỐN SỔ**:
+> Bản dựng đang chạy: `9e433b` (26/08 cuối - **XANH HẾT 48/48, 61m53s**. Trang **Hóa đơn** riêng
+> (danh sách học viên đã hoàn thành khóa, nút Xuất ngay trên dòng, ba trạng thái, chặn vượt số đã
+> thu, số tiền bằng chữ, kế toán mở được) · cổng học viên có mục **Hóa đơn khóa học** tự yêu cầu
+> và **Xem / lưu PDF** · chip "Đã hoàn thành khóa" ở màn Kết thúc · sửa ba lỗi trên màn Duyệt hợp
+> đồng cam kết (tên hàm trùng, ô tìm chết hiện chữ "all", thẻ đọc nhầm tên cột) · gỡ nút Dựng lại
+> demo bị nhân đôi ở cổng học viên · `_check15` có luật canh TÊN HÀM TRÙNG.
+> Mốc trước `203ce1` (26/08 - **HÓA ĐƠN + PHIẾU THU KÈM QUY ĐỊNH + DỌN 17 CUỐN SỔ**:
 > hóa đơn sau khi hoàn thành khóa (ba trạng thái, chặn vượt số đã thu, số tiền bằng chữ, cửa xuất
 > ở trang Công nợ vì kế toán không có trang Kết thúc khóa) · phiếu thu in thêm một tờ quy định lấy
 > từ CH2 · trang Tra cứu xếp theo chặng nghiệp vụ bằng chính bản khai `lam`, và mở cửa chiều ngược
