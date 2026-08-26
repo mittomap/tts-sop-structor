@@ -49,9 +49,29 @@ t("chi so muc tieu 100% co dai RIENG (hut 5% da la nghiem trong)",
 t("thang diem 1-5 co dai rieng", KPIBAND.SS==="thang5"&&kpiSev("SS",4.5,4.5,"≥")==="dat"&&kpiSev("SS",3.6,4.5,"≥")==="baodong");
 t("NPS co dai rieng", KPIBAND.NPS==="nps");
 
-/* --- 3. 17 chi so quan trong deu co du 6 truong dien giai --- */
+/* --- 3. MOI CHI SO CO NGUONG DEU PHAI CO PHAN DIEN GIAI (mo rong 26/08) ---
+   Truoc 26/08 luat nay khoa cung con so 17: `t("co dung 17 chi so duoc dien giai", ...)`. Con so
+   ay dung luc viet - hoi ay KPIDOC co dung 17 muc - nhung no khong tra loi cau hoi ma nguoi doc
+   can: *co chi so nao co nut ma bam vao khong ra gi khong*.
+   Anh Luan bam "Xem chi so" o OBT trong tu dien va nhan lai *"Chi so nay chua co phan dien giai."*
+   Do ra 34/51 chi so thung. Cai NUT moc len theo `CH6` (bang nguong), con `kpiOpen` tra `KPIDOC`
+   (bang dien giai) - hai danh sach khac nhau, va luat cu dem MOT trong hai chu khong doi chieu.
+   *Mot con so khoa cung chi giu duoc hien trang; muon giu duoc LUAT thi phai doi chieu hai ban
+   khai voi nhau.*
+   Va hau qua lang hon, khong ai bam ra duoc: `kpiTop3` bo qua moi chi so khong co KPIDOC - suot
+   thoi gian qua no chi can nhac 17 trong 51 chi so.
+   *Mot bang tra thieu thi cho on nhat la cho bao loi, con cho hai nhat la cho im lang bo qua.* */
 var codes=Object.keys(KPIDOC);
-t("co dung 17 chi so duoc dien giai", codes.length===17);
+(function(){
+ var ch6=(DATA.config&&DATA.config.ch6)||[];
+ var thieu=ch6.map(function(c){return String(c.code||"")}).filter(function(c){return c&&!KPIDOC[c]});
+ t("moi chi so CH6 deu co phan dien giai"+(thieu.length?" - THIEU: "+thieu.join(", "):"")+
+   " ("+ch6.length+" chi so)", thieu.length===0);})();
+/* 17 ma COT LOI phai co them SO CON that va CO MAU - do la nhung chi so `kpiNum` da viet tay
+   logic dem. 34 ma con lai co du phan chu nhung chua co so con; `ctxRows` tu bo dong rong nen
+   ngan keo khong bay ra o trong, va viec ay ghi vao VIEC TON chu khong giau di. */
+var KPICOT=["LRT","TBR","CVR","PCR","CAR","CLR","CUR","ATR","UAR","HCR","GCR7","TNR","SS","NPS","CR10","RER","AR"];
+t("du 17 ma cot loi", KPICOT.every(function(c){return !!KPIDOC[c]}));
 codes.forEach(function(c){
  var d=KPIDOC[c];
  t(c+": co truong nghia", !!d.nghia);
@@ -60,10 +80,18 @@ codes.forEach(function(c){
  t(c+": doc() du ca 5 bac", ["tot","dat","hut","canhbao","baodong"].every(function(k){return !!d.doc[k]}));
  t(c+": viec() co hanh dong cho 3 bac chua dat",
    ["hut","canhbao","baodong"].every(function(k){return (d.viec[k]||[]).length>=1}));
+ /* `PBK` chu khong phai `RENDER`. Luat nay ten la "tro toi trang CO THAT" ma lai do bang
+    `RENDER` - so dang ky cac trang co HAM VE RIENG. Chin trang so danh sach (dstest, dstuvan,
+    hocvien, dsdiemdanh, dswow, dsphanhoi, dskhieunai, dsbaitap, dskhaosat) di qua bo ve danh
+    sach chung nen khong co muc trong `RENDER`, du `go()` mo duoc va noi dung day du - da mo
+    that ca 24 trang de kiem chung truoc khi doi thuoc.
+    *Mot phep do mang ten "co that" ma lai dem "co ham rieng" thi no dang tra loi mot cau hoi
+    khac - va cau tra loi ay dung cho toi khi ai do dung mot trang khong co ham rieng.* */
  t(c+": moi hanh dong tro toi trang CO THAT",
-   Object.keys(d.viec).every(function(k){return (d.viec[k]||[]).every(function(a){return !!RENDER[a[2]]})}));
- t(c+": vi du co SO CON that", !!kpiNum(c).lbl);
- t(c+": noi duoc co mau", !!kpiMau(c));
+   Object.keys(d.viec).every(function(k){return (d.viec[k]||[]).every(function(a){return !!PBK[a[2]]})}));
+ if(KPICOT.indexOf(c)>=0){
+  t(c+": vi du co SO CON that", !!kpiNum(c).lbl);
+  t(c+": noi duoc co mau", !!kpiMau(c));}
 });
 
 /* --- 4. quy ra NGUOI va TIEN --- */

@@ -148,6 +148,45 @@
 
 ## 3. VIỆC TỒN (backlog)
 
+> ### 🔴 26/08 - "CHỈ SỐ NÀY CHƯA CÓ PHẦN DIỄN GIẢI": 34/51 CHỈ SỐ THỦNG
+> Anh Luân bấm **Xem chỉ số** ở OBT trong từ điển và nhận lại một dòng *"Chỉ số này chưa có phần
+> diễn giải."* rồi hỏi: *"ko có mô tả là sao nhỉ"*.
+>
+> **Gốc: hai danh sách khác nhau.** Cái NÚT mọc lên theo `CH6` (bảng ngưỡng), còn `kpiOpen` lại
+> tra `KPIDOC` (bảng diễn giải). Mã nào có ở bảng thứ nhất mà thiếu ở bảng thứ hai đều là một ngõ
+> cụt - và **không ai thấy, vì phải bấm mới biết**. Đo ra: **34/51 chỉ số không có mục nào.**
+> *Một cái nút mọc lên theo danh sách A rồi gọi vào danh sách B thì mọi mã có ở A mà thiếu ở B đều
+> là một lời hứa suông.*
+>
+> **Và một hậu quả LẶNG hơn, không ai bấm ra được:** `kpiTop3` - ô "3 việc nên làm tuần này" -
+> bỏ qua mọi chỉ số không có `KPIDOC`. Tức suốt thời gian qua nó chỉ cân nhắc **17 trong 51** chỉ
+> số; 34 chỉ số kia dù đỏ tới đâu cũng không bao giờ được đề xuất.
+> *Một bảng tra thiếu thì chỗ ồn nhất là chỗ báo lỗi, còn chỗ hại nhất là chỗ im lặng bỏ qua.*
+>
+> Đã viết đủ **34 mục** còn lại: nghĩa · vì sao đáng quan tâm · số lấy từ đâu · một câu cho từng
+> bậc trong năm bậc · và việc nên làm kèm nút bấm tới đúng chỗ. Nay đủ 51.
+>
+> **Bộ kiểm cũ khoá cứng con số 17.** `_check13` có dòng `t("co dung 17 chi so duoc dien giai",
+> codes.length===17)` - đúng lúc viết, mà không trả lời được câu người đọc cần: *có chỉ số nào có
+> nút mà bấm vào không ra gì không*. Nó đếm MỘT trong hai danh sách chứ không đối chiếu hai bảng.
+> *Một con số khoá cứng chỉ giữ được hiện trạng; muốn giữ được LUẬT thì phải đối chiếu hai bản
+> khai với nhau.* Nay luật hỏi: mọi mã CH6 phải có mục trong KPIDOC. Thử ngược bằng cách gỡ đúng
+> một mục ra khỏi bản dựng: **cắn ngay và gọi đúng tên mã**.
+>
+> **Một thước nữa hẹp hơn tên của nó.** Luật `"moi hanh dong tro toi trang CO THAT"` lại đo bằng
+> `RENDER` - sổ đăng ký các trang có HÀM VẼ RIÊNG. Chín trang sổ danh sách (`dstest`, `dstuvan`,
+> `hocvien`, `dsdiemdanh`, `dswow`, `dsphanhoi`, `dskhieunai`, `dsbaitap`, `dskhaosat`) đi qua bộ
+> vẽ danh sách chung nên không có mục trong `RENDER`, dù `go()` mở được và nội dung đầy đủ.
+> **Đã mở thật cả 24 trang để kiểm chứng TRƯỚC khi đổi thước** - app đúng, thước hẹp. Nay đo bằng
+> `PBK` (sổ đăng ký trang).
+> *Một phép đo mang tên "có thật" mà lại đếm "có hàm riêng" thì nó đang trả lời một câu hỏi khác -
+> và câu trả lời ấy đúng cho tới khi ai đó dùng một trang không có hàm riêng.*
+>
+> **Việc tồn thật thà:** 34 mục mới có đủ phần chữ nhưng **chưa có "quy ra người và tiền" và "cỡ
+> mẫu"** - hai thứ ấy cần một nhánh đếm viết tay trong `kpiNum` cho từng mã, và một con số đếm sai
+> còn tệ hơn không có số. `ctxRows` tự bỏ dòng rỗng nên ngăn kéo không bày ra ô trống. Bộ kiểm giữ
+> nguyên yêu cầu ấy cho **17 mã cốt lõi** (khai thành `KPICOT`) để chỗ đã có không rơi lại.
+
 > ### 🎛️ 26/08 (tiếp) - HAI Ô MÀU TRÊN THANH TRÊN · THAN ÁM ĐỎ · BẢNG CHẠY LẠI DEMO
 >
 > **Nền đỏ bị bác, và cái được chọn thay không phải màu khác - là ĐỘ TỐI khác.** Anh Luân xem bản
